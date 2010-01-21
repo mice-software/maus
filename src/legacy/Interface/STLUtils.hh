@@ -16,13 +16,14 @@
  *
  */
 
-#ifndef STLUtils_HH
-#define STLUtils_HH
+#ifndef _SRC_LEGACY_INTERFACE_STLUTILS_HH_
+#define _SRC_LEGACY_INTERFACE_STLUTILS_HH_
+
+#include <stdlib.h>
 
 #include <string>
 #include <sstream>
 #include <iomanip>
-#include <stdlib.h>
 
 /// STLUtils namespace contains useful utility functions for the STL.
 
@@ -143,7 +144,14 @@ template <class TEMP_CLASS> std::string ToString
   return ss.str();
 }
 
-std::string ReplaceVariables( std::string fileName );
+/** Find and replace environment variables in a string
+ *
+ *  Search through a string looking for environment variables with format like
+ *  "my_${ENV_VARIABLE}_string". Replace the ${ENV_VARIABLE} with the value of
+ *  the environment variable. Throw a Squeal if the environment variable could
+ *  not be found.
+ */
+std::string ReplaceVariables(std::string fileName);
 }
 
 /// A macro to disallow the copy constructor and operator= functions

@@ -20,6 +20,7 @@
 
 #include "gtest/gtest.h"
 
+#include "src/legacy/Interface/Squeal.hh"
 #include "src/legacy/Interface/STLUtils.hh"
 
 namespace {
@@ -63,9 +64,21 @@ TEST(STLUtilsTest, ToStringTest) {
 }
 
 TEST(STLUtilsTest, ReplaceVariablesTest) {
-  EXPECT_EQ(1, 0);
+    char* mrd_c = getenv("MAUS_ROOT_DIR");
+    if (mrd_c == NULL) {
+        ASSERT_EQ(1, 0) << "Need to define $MAUS_ROOT_DIR for env var test";
+    }
+    std::string mrd(mrd_c);
+
+    EXPECT_EQ(STLUtils::ReplaceVariables("some_string"), "some_string");
+    EXPECT_EQ(STLUtils::ReplaceVariables("some_${MAUS_ROOT_DIR}_string"),
+                                         "some_"+mrd+"_string");
+    EXPECT_EQ(STLUtils::ReplaceVariables("${MAUS_ROOT_DIR}_some_string"),
+                                         mrd+"_some_string");
+    EXPECT_EQ(STLUtils::ReplaceVariables("some_string_${MAUS_ROOT_DIR}"),
+                                         "some_string_"+mrd);
+    EXPECT_THROW(STLUtils::ReplaceVariables
+                      ("some_string_${UNDEFINED_ENV_VAR_ZSSDFDSASD}"), Squeal);
 }
-
-
 }
 
