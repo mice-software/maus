@@ -1,0 +1,1 @@
+export MAUSHOME=/home/tunnell/mice/maus1
