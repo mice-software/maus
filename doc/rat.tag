@@ -1209,7 +1209,6 @@
     <file>oscalls.py</file>
     <file>ReadGenericCalibration.py</file>
     <file>region.py</file>
-    <file>typedef.C</file>
   </compound>
   <compound kind="dir">
     <name>workers/</name>

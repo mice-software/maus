@@ -15,7 +15,7 @@ maus_root_dir=`pwd`
 
 cat > env.sh <<EOF
 #!/bin/sh
-MAUS_ROOT_DIR=$ratroot
+MAUS_ROOT_DIR=$maus_root_dir
 PATH=\$MAUS_ROOT_DIR/bin:\$PATH
 LD_LIBRARY_PATH=\$MAUS_ROOT_DIR/lib:\$LD_LIBRARY_PATH
 PYTHONPATH=\$MAUS_ROOT_DIR/python:\$PYTHONPATH
@@ -24,7 +24,7 @@ EOF
 
 cat > env.csh <<EOF
 #!/bin/csh
-setenv MAUS_ROOT_DIR $ratroot
+setenv MAUS_ROOT_DIR $maus_root_dir
 setenv PATH "\$MAUS_ROOT_DIR/bin:\$PATH"
 if ({\$?LD_LIBRARY_PATH}) then
   setenv LD_LIBRARY_PATH "\$MAUS_ROOT_DIR/lib:\$LD_LIBRARY_PATH"

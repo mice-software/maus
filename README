@@ -7,9 +7,9 @@ Required Dependencies:
 python
 ROOT
 scons
+geant4
 
 Suggested Dependencies:
 
 doxygen
 dot (from  graphviz)
-texlive-extra-utils (for doxygen)

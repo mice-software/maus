@@ -7,7 +7,7 @@
   
   string G4SYSTEM = getenv("G4SYSTEM");
   string libname = string("libRATEvent_") + G4SYSTEM;
-  gSystem->Load(libname.c_str());
-  gSystem->AddIncludePath(" -I$RATROOT/include");
+  //  gSystem->Load(libname.c_str());
+    //  gSystem->AddIncludePath(" -I$RATROOT/include");
 }
 

@@ -7,6 +7,7 @@ if [ "${MAUS_ROOT_DIR}" ]; then
     find ${MAUS_ROOT_DIR} -name '*.pyc' -exec rm '{}' \; -print 
     rm -Rf ${MAUS_ROOT_DIR}/doc/html
     rm -Rf ${MAUS_ROOT_DIR}/doc/latex
+    rm env.sh env.csh
 else
     echo "Please define the MAUS_ROOT_DIR environmental variable"
 fi
