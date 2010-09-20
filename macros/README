@@ -1,0 +1,11 @@
+Please write a comment like the following on each macro with your contact information, a few sentence description of what the macro does, and when you wrote it.
+
+# Author: Christopher Tunnell <tunnell@hep.uchicago.edu>
+#
+# This is a script intended to provide summary status information about the
+# CIS system to somebody like the DQ leader.
+#
+# March 05, 2009
+#
+
+The only way we'll ever understand what everybody else is doing in Tucs is by at very *least* having this.

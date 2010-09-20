@@ -1,1 +1,1 @@
-export MAUSHOME=/home/tunnell/mice/maus1
+export MAUS_ROOT_DIR=/home/tunnell/mice/maus1

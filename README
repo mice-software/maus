@@ -1,3 +1,15 @@
 This project is maintained at:
 
-http://mice.lithitux.org/projects/maus
+http://micewww.pp.rl.ac.uk:8080/projects/maus
+
+Required Dependencies:
+
+python
+ROOT
+scons
+
+Suggested Dependencies:
+
+doxygen
+dot (from  graphviz)
+texlive-extra-utils (for doxygen)
