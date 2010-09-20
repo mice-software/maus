@@ -1,0 +1,40 @@
+#!/bin/bash
+# Configure script
+# Run once when you unpack source
+
+### Check for GEANT4 install
+if [ -z $G4INSTALL ]; then
+    echo '$G4INSTALL not set.  Please install GEANT4 and set your environment variables.'
+    exit 1
+fi
+
+type -P python &>/dev/null || { echo "I require python but it's not installed.  Aborting." >&2; exit 1; }
+
+### Create environment files
+maus_root_dir=`pwd`
+
+cat > env.sh <<EOF
+#!/bin/sh
+MAUS_ROOT_DIR=$ratroot
+PATH=\$MAUS_ROOT_DIR/bin:\$PATH
+LD_LIBRARY_PATH=\$MAUS_ROOT_DIR/lib:\$LD_LIBRARY_PATH
+PYTHONPATH=\$MAUS_ROOT_DIR/python:\$PYTHONPATH
+export MAUS_ROOT_DIR PATH LD_LIBRARY_PATH GLG4DATA RAT_CFLAGS
+EOF
+
+cat > env.csh <<EOF
+#!/bin/csh
+setenv MAUS_ROOT_DIR $ratroot
+setenv PATH "\$MAUS_ROOT_DIR/bin:\$PATH"
+if ({\$?LD_LIBRARY_PATH}) then
+  setenv LD_LIBRARY_PATH "\$MAUS_ROOT_DIR/lib:\$LD_LIBRARY_PATH"
+else
+  setenv LD_LIBRARY_PATH "\$MAUS_ROOT_DIR/lib"
+endif
+if ({\$?PYTHONPATH}) then
+  setenv PYTHONPATH "\$MAUS_ROOT_DIR/python:\$PYTHONPATH"
+else
+  setenv PYTHONPATH "\$MAUS_ROOT_DIR/python"
+endif
+EOF
+
