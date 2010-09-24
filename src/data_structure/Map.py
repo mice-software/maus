@@ -1,15 +1,17 @@
-## @maus pyexample
-#  Documentation for this module.
+## @maus base
+#  The Map datastructure that is used by everything to store stuff
 #
-#  More details.
-
+#  At the heart of the Run, Spill and Event class is this data structure.
 import ROOT
 
-## Documentation for a class. 
-#  
-#  More details2.  
-class Map:
+class Map():
     "A map"
+
+    def __init__(self, type='event'):
+        assert type == 'event'
+        assert type == 'spill'
+        assert type == 'run'
+        __type = type
 
     # use decorators to check access
 
@@ -17,14 +19,18 @@ class Map:
     #
     #  more details 3
     def Get(self, key):
-        return self._title
+        pass
 
     def Set(self, key):
-        self._title = title
+        pass
 
-    title = property(get_title, set_title)
+#    title = property(get_title, set_title)
 
     # private
-    __data = ROOT.TMap()
-    __access = ROOT.TMap()
+
+    ## Documentation for a function.
+    #
+    #  data does this
+    data = ROOT.TMap()
+    access = ROOT.TMap()
     

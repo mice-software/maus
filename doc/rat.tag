@@ -224,6 +224,10 @@
       <arglist></arglist>
     </member>
   </compound>
+  <compound kind="namespace">
+    <name>pyexample</name>
+    <filename>namespacepyexample.html</filename>
+  </compound>
   <compound kind="class">
     <name>ReadCellNoiseDB::ReadCellNoiseDB</name>
     <filename>classReadCellNoiseDB_1_1ReadCellNoiseDB.html</filename>
@@ -1145,6 +1149,14 @@
     <file>WriteCsDB.py</file>
   </compound>
   <compound kind="dir">
+    <name>src/data_structure/</name>
+    <path>/home/tunnell/mice/maus1/src/data_structure/</path>
+    <filename>dir_554c1579f0c06ef89f5d60cb9c8cd80d.html</filename>
+    <file>Map.py</file>
+    <file>test_treenode.py</file>
+    <file>typedef.C</file>
+  </compound>
+  <compound kind="dir">
     <name>doc/</name>
     <path>/home/tunnell/mice/maus1/doc/</path>
     <filename>dir_9f4c0162887fc2750c94d91bf070ee14.html</filename>
@@ -1198,6 +1210,7 @@
     <name>src/</name>
     <path>/home/tunnell/mice/maus1/src/</path>
     <filename>dir_da79879001f6090b6808f29bbd34dd8e.html</filename>
+    <dir>src/data_structure/</dir>
     <file>__init__.py</file>
     <file>event.py</file>
     <file>GenericWorker.py</file>
@@ -1247,4 +1260,3 @@
     <file>Use.py</file>
     <file>WriteDB.py</file>
   </compound>
-</tagfile>

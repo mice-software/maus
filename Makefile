@@ -1,6 +1,6 @@
 all:
 	scons
-	@echo 'You can run "scons" directly to compile RAT.'
+	@echo 'You can run "scons" directly to compile MAUS.'
 
 doc:
 	scons doc
