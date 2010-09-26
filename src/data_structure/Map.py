@@ -24,6 +24,12 @@ class Map():
     def Set(self, key):
         pass
 
+    def TestKey(self, key):
+        if key:
+            return true
+        else:
+            return false
+
 #    title = property(get_title, set_title)
 
     # private

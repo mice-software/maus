@@ -18,23 +18,27 @@ cat > env.sh <<EOF
 MAUS_ROOT_DIR=$maus_root_dir
 PATH=\$MAUS_ROOT_DIR/bin:\$PATH
 LD_LIBRARY_PATH=\$MAUS_ROOT_DIR/lib:\$LD_LIBRARY_PATH
-PYTHONPATH=\$MAUS_ROOT_DIR/python:\$PYTHONPATH
+
+# scons
+PYTHONPATH=\$MAUS_ROOT_DIR/third_party/scons-2.0.1/lib/scons-2.0.1:\$PYTHONPATH
+PATH=\$MAUS_ROOT_DIR/third_party/scons-2.0.1/bin:\$PATH
+
 export MAUS_ROOT_DIR PATH LD_LIBRARY_PATH GLG4DATA RAT_CFLAGS
 EOF
 
-cat > env.csh <<EOF
+#cat > env.csh <<EOF
 #!/bin/csh
-setenv MAUS_ROOT_DIR $maus_root_dir
-setenv PATH "\$MAUS_ROOT_DIR/bin:\$PATH"
-if ({\$?LD_LIBRARY_PATH}) then
-  setenv LD_LIBRARY_PATH "\$MAUS_ROOT_DIR/lib:\$LD_LIBRARY_PATH"
-else
-  setenv LD_LIBRARY_PATH "\$MAUS_ROOT_DIR/lib"
-endif
-if ({\$?PYTHONPATH}) then
-  setenv PYTHONPATH "\$MAUS_ROOT_DIR/python:\$PYTHONPATH"
-else
-  setenv PYTHONPATH "\$MAUS_ROOT_DIR/python"
-endif
-EOF
+#setenv MAUS_ROOT_DIR $maus_root_dir
+#setenv PATH "\$MAUS_ROOT_DIR/bin:\$PATH"
+#if ({\$?LD_LIBRARY_PATH}) then
+#  setenv LD_LIBRARY_PATH "\$MAUS_ROOT_DIR/lib:\$LD_LIBRARY_PATH"
+#else
+#  setenv LD_LIBRARY_PATH "\$MAUS_ROOT_DIR/lib"
+#endif
+#if ({\$?PYTHONPATH}) then
+#  setenv PYTHONPATH "\$MAUS_ROOT_DIR/third_party/scons-2.0.1/lib/scons-2.0.1:\$PYTHONPATH"
+#else
+#  setenv PYTHONPATH "\$MAUS_ROOT_DIR/third_party/scons-2.0.1/lib/scons-2.0.1"
+#endif
+#EOF
 

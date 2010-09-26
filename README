@@ -6,7 +6,7 @@ Required Dependencies:
 
 python
 ROOT
-scons
+scons # -included and should add licence
 geant4
 
 Suggested Dependencies:
