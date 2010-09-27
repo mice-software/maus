@@ -4,9 +4,9 @@ http://micewww.pp.rl.ac.uk:8080/projects/maus
 
 Required Dependencies:
 
+gcc ?
 python
 ROOT
-scons # -included and should add licence
 geant4
 
 Suggested Dependencies:
