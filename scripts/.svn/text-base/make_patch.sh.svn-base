@@ -1,8 +1,0 @@
-#!/bin/bash
-# Author: Christopher Tunnell <tunnell@hep.uchicago.edu>
-
-export PATH=$PATH:/afs/cern.ch/user/c/ctunnell/scratch0/git-1.6.1
-git commit -a -m 'user patch'
-git format-patch origin/master
-
-

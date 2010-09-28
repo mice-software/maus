@@ -9,6 +9,24 @@
     <name>pyexample</name>
     <filename>namespacepyexample.html</filename>
   </compound>
+  <compound kind="namespace">
+    <name>src::load</name>
+    <filename>namespacesrc_1_1load.html</filename>
+    <member kind="function">
+      <type>def</type>
+      <name>execdir</name>
+      <anchorfile>namespacesrc_1_1load.html</anchorfile>
+      <anchor>de0c5aca6948544edececa30756b1db5</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type></type>
+      <name>_argv</name>
+      <anchorfile>namespacesrc_1_1load.html</anchorfile>
+      <anchor>a08231dda6c8b7353810601934d9bc08</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
   <compound kind="dir">
     <name>src/data_structure/</name>
     <path>/home/tunnell/mice/maus1/src/data_structure/</path>

@@ -4,36 +4,44 @@
 # March 04, 2009
 #
 import os, sys, gc
-from src.region import *
+#from src.region import * # remove?
 from datetime import datetime
 
-# This processes everything
+import logging
+
+logging.basicConfig(level=logging.INFO)
+
+logger_core_go = logging.getLogger('core.go')
+
 class Go:
+    ## Iterate through the workers
+    #
+    # this processor handles all the workers
     def __init__(self, workers):
-        print 'Welcome to TUCS (pid %d).  Building detector tree... ' % os.getpid(),
+        logger_core_go.info('Welcome to MAUS (pid %d).  Loading configuration file... ' % os.getpid())
         startup = datetime.today()
         
-        self.detector = constructTileCal()
-        print 'done!'
-        print
-        print 'Entering worker loop:'
+        #self.detector = constructTileCal()
+        logger_core_go.info('done!\
+                             \
+                             Entering worker loop:')
 
         if workers:
             for worker in workers:
                 if worker:
                     print 'Running %s - %s' % (worker.__class__.__name__, worker.__class__.__doc__)
                     sys.stdout.flush()
-                    self.detector = worker.HandleDetector(self.detector)
+                    #self.detector = worker.HandleDetector(self.detector)
                     gc.collect()
-                    if not isinstance(self.detector, Region):
-                        print "The following worker returned non-sense:", worker
-                        break
+                    #if not isinstance(self.detector, Region):
+                    #    print "The following worker returned non-sense:", worker
+                    #    break
 
         # free up memory
-        for region in self.detector.RegionGenerator():
-            region.SetEvents(set())
-            region.SetChildren(set())
-        del self.detector
-        gc.collect(2)
+        #for region in self.detector.RegionGenerator():
+        #    region.SetEvents(set())
+        #    region.SetChildren(set())
+        #del self.detector
+        #gc.collect(2)
         print
-        print 'TUCS finished in:', datetime.today() - startup
+        print 'MAUS finished in:', datetime.today() - startup

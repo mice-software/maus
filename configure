@@ -23,6 +23,10 @@ LD_LIBRARY_PATH=\$MAUS_ROOT_DIR/lib:\$LD_LIBRARY_PATH
 PYTHONPATH=\$MAUS_ROOT_DIR/third_party/scons-2.0.1/lib/scons-2.0.1:\$PYTHONPATH
 PATH=\$MAUS_ROOT_DIR/third_party/scons-2.0.1/bin:\$PATH
 
+# nose
+PYTHONPATH=\$MAUS_ROOT_DIR/third_party/nose-0.11.3/lib/python:\$PYTHONPATH
+PATH=\$MAUS_ROOT_DIR/third_party/nose-0.11.3/bin:\$PATH 
+
 export MAUS_ROOT_DIR PATH LD_LIBRARY_PATH GLG4DATA RAT_CFLAGS
 EOF
 

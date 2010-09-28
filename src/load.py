@@ -1,28 +1,32 @@
-# Author: Christopher Tunnell <tunnell@hep.uchicago.edu>
-#
-# March 04, 2009
-#
+"""@package core
+Documentation for this module.
 
+More details.
+"""
 # This loads everything from features and calibrations
 import os, sys, string, fnmatch
-_argv = sys.argv        # Hide this programs command line arguements
-sys.argv = sys.argv[:1] # from ROOT
+
+# Hide command line arguments from ROOT: part 1/2 
+_argv = sys.argv        # Store command line args in a temp variable
+sys.argv = sys.argv[:1] # then remove them from what ROOT sees. The macro uses commandline args
+
 try:
-    import ROOT
+    import ROOT  # pyroot
     ROOT.gROOT.SetBatch()   # Run in batch mode since we don't need X
-    import PyCintex
+    import PyCintex # allows for reflex dictionaries
 except ImportError:
-    print "FATAL ERROR: You need to setup Athena/ROOT before proceeding"
+    print "FATAL ERROR: You need to setup pyROOT before proceeding"
     sys.exit(-1)
 
 # Setup the PythonPath to include the Tucs modules and MySQL modules
-sys.path.insert(0, '.')
-sys.path.insert(0, '/afs/cern.ch/user/c/ctunnell/scratch0/MySQL-python-1.2.2/build/lib.linux-x86_64-2.5')#lib.linux-i686-2.5')
-    
+sys.path.insert(0, '.') # TODO add appropriate path?
+
+# I do a import * here to make macros easier to understand
 from src.go import *
-sys.argv = _argv
-del _argv
-#from optparse import OptionParser
+
+# Hide command line arguments from ROOT: part 2/2
+sys.argv = _argv # recover command line arguments
+del _argv        # and get rid of our temporary variable
 
 # Load all python files in the directory passed
 def execdir(dir, scope):
