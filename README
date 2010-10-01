@@ -8,6 +8,7 @@ gcc ?
 python
 ROOT
 geant4
+bzr (2.something) # if you want to commit
 
 Suggested Dependencies:
 
