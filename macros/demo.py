@@ -1,4 +1,4 @@
-execfile('src/load.py', globals()) # don't remove this!
+execfile('core/load.py', globals()) # don't remove this!
 
 # load config file
 config = None # config file
