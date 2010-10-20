@@ -3,7 +3,7 @@
 # Run once when you unpack source
 
 ### Check for GEANT4 install
-if [ -z $G4INSTALL ]; then
+if [ -z "$G4INSTALL" ]; then
     echo '$G4INSTALL not set.  Please install GEANT4 and set your environment variables.'
     exit 1
 fi
@@ -12,22 +12,37 @@ type -P python &>/dev/null || { echo "I require python but it's not installed.  
 
 ### Create environment files
 maus_root_dir=`pwd`
+target=`g++ -dumpversion`
 
 cat > env.sh <<EOF
 #!/bin/sh
-MAUS_ROOT_DIR=$maus_root_dir
-PATH=\$MAUS_ROOT_DIR/bin:\$PATH
-LD_LIBRARY_PATH=\$MAUS_ROOT_DIR/lib:\$LD_LIBRARY_PATH
+if [ -z "\$MAUS_ROOT_DIR" ]; then
+     MAUS_ROOT_DIR=$maus_root_dir
+     PATH=\$MAUS_ROOT_DIR/bin:\$PATH
+     if [ -z "${LD_LIBRARY_PATH}" ]; then
+          LD_LIBRARY_PATH=\$MAUS_ROOT_DIR/lib
+     else
+          LD_LIBRARY_PATH=\$MAUS_ROOT_DIR/lib:\$LD_LIBRARY_PATH   
+     fi
 
-# scons
-PYTHONPATH=\$MAUS_ROOT_DIR/third_party/scons-2.0.1/lib/scons-2.0.1:\$PYTHONPATH
-PATH=\$MAUS_ROOT_DIR/third_party/scons-2.0.1/bin:\$PATH
+     # scons
+     PYTHONPATH=\$MAUS_ROOT_DIR/third_party/scons-2.0.1/lib/scons-2.0.1:\$PYTHONPATH
+     PATH=\$MAUS_ROOT_DIR/third_party/scons-2.0.1/bin:\$PATH
 
-# nose
-PYTHONPATH=\$MAUS_ROOT_DIR/third_party/nose-0.11.3/lib/python:\$PYTHONPATH
-PATH=\$MAUS_ROOT_DIR/third_party/nose-0.11.3/bin:\$PATH 
+     # nose
+     PYTHONPATH=\$MAUS_ROOT_DIR/third_party/nose-0.11.3/lib/python:\$PYTHONPATH
+     PATH=\$MAUS_ROOT_DIR/third_party/nose-0.11.3/bin:\$PATH 
 
-export MAUS_ROOT_DIR PATH LD_LIBRARY_PATH GLG4DATA RAT_CFLAGS
+     # jsoncpp
+     PATH=\$MAUS_ROOT_DIR/third_party/jsoncpp-src-0.5.0/bin/linux-gcc-${target}:\$PATH  
+     LD_LIBRARY_PATH=\$MAUS_ROOT_DIR/third_party/jsoncpp-src-0.5.0/libs/linux-gcc-${target}:\$LD_LIBRARY_PATH
+ 
+     export MAUS_ROOT_DIR PATH LD_LIBRARY_PATH GLG4DATA RAT_CFLAGS
+     echo "SUCCESS: MAUS setup"
+else
+     echo "ERROR: MAUS already setup"
+fi
+
 EOF
 
 #cat > env.csh <<EOF
