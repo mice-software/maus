@@ -76,3 +76,6 @@ dox = env.Command('does_not_exist3', 'doc/Doxyfile',
 
 env.Alias('doc', [dox])
 
+### Target: JsonCpp
+SConscript('dir/SConscript', exports=['env', 'variable'])
+

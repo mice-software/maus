@@ -45,6 +45,17 @@ fi
 
 EOF
 
+source env.sh
+
+echo "Setting up jsoncpp"
+cd third_party/jsoncpp-src-0.5.0
+scons platform=linux-gcc
+cd test
+python runjsontests.py  ../bin/linux-gcc-4.3.4/jsontestrunner
+cd ../..
+
+echo "Done with JsonCpp and running JsonCpp test"
+
 #cat > env.csh <<EOF
 #!/bin/csh
 #setenv MAUS_ROOT_DIR $maus_root_dir
