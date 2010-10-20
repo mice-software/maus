@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svnroot/jsoncpp/!svn/ver/138/tags/jsoncpp/0.5.0/test
+END
+generate_expected.py
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svnroot/jsoncpp/!svn/ver/138/tags/jsoncpp/0.5.0/test/generate_expected.py
+END
+pyjsontestrunner.py
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svnroot/jsoncpp/!svn/ver/138/tags/jsoncpp/0.5.0/test/pyjsontestrunner.py
+END
+runjsontests.py
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svnroot/jsoncpp/!svn/ver/138/tags/jsoncpp/0.5.0/test/runjsontests.py
+END
+cleantests.py
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svnroot/jsoncpp/!svn/ver/138/tags/jsoncpp/0.5.0/test/cleantests.py
+END
+rununittests.py
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svnroot/jsoncpp/!svn/ver/138/tags/jsoncpp/0.5.0/test/rununittests.py
+END

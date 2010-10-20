@@ -34,8 +34,8 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      PATH=\$MAUS_ROOT_DIR/third_party/nose-0.11.3/bin:\$PATH 
 
      # jsoncpp
-     PATH=\$MAUS_ROOT_DIR/third_party/jsoncpp-src-0.5.0/bin/linux-gcc-${target}:\$PATH  
-     LD_LIBRARY_PATH=\$MAUS_ROOT_DIR/third_party/jsoncpp-src-0.5.0/libs/linux-gcc-${target}:\$LD_LIBRARY_PATH
+     PATH=\$MAUS_ROOT_DIR/third_party/JsonCpp_0.5.0/bin/linux-gcc-${target}:\$PATH  
+     LD_LIBRARY_PATH=\$MAUS_ROOT_DIR/third_party/JsonCpp_0.5.0/libs/linux-gcc-${target}:\$LD_LIBRARY_PATH
  
      export MAUS_ROOT_DIR PATH LD_LIBRARY_PATH GLG4DATA RAT_CFLAGS
      echo "SUCCESS: MAUS setup"
@@ -48,7 +48,7 @@ EOF
 source env.sh
 
 echo "Setting up jsoncpp"
-cd third_party/jsoncpp-src-0.5.0
+cd third_party/JsonCpp_0.5.0
 scons platform=linux-gcc
 cd test
 python runjsontests.py  ../bin/linux-gcc-4.3.4/jsontestrunner
