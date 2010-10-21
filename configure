@@ -2,10 +2,18 @@
 # Configure script
 # Run once when you unpack source
 
+use_g4="yes"
+use_root="yes"
+
 ### Check for GEANT4 install
 if [ -z "$G4INSTALL" ]; then
-    echo '$G4INSTALL not set.  Please install GEANT4 and set your environment variables.'
-    exit 1
+    echo '$G4INSTALL not set, so Geant4 will not be used'
+    use_g4="no"
+fi
+
+if [ -z "$ROOTSYS" ]; then
+    echo '$ROOTSYS not set, so ROOT will not be used'
+    use_root="no"
 fi
 
 type -P python &>/dev/null || { echo "I require python but it's not installed.  Aborting." >&2; exit 1; }
@@ -16,6 +24,10 @@ target=`g++ -dumpversion`
 
 cat > env.sh <<EOF
 #!/bin/sh
+
+export USE_ROOT=$use_root
+export USE_G4=$use_g4
+
 if [ -z "\$MAUS_ROOT_DIR" ]; then
      MAUS_ROOT_DIR=$maus_root_dir
      PATH=\$MAUS_ROOT_DIR/bin:\$PATH
@@ -29,6 +41,9 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      PYTHONPATH=\$MAUS_ROOT_DIR/third_party/scons-2.0.1/lib/scons-2.0.1:\$PYTHONPATH
      PATH=\$MAUS_ROOT_DIR/third_party/scons-2.0.1/bin:\$PATH
 
+     # config python scripts
+     PYTHONPATH=\$MAUS_ROOT_DIR/config:\$PYTHONPATH 
+
      # nose
      PYTHONPATH=\$MAUS_ROOT_DIR/third_party/nose-0.11.3/lib/python:\$PYTHONPATH
      PATH=\$MAUS_ROOT_DIR/third_party/nose-0.11.3/bin:\$PATH 
@@ -36,6 +51,10 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      # jsoncpp
      PATH=\$MAUS_ROOT_DIR/third_party/JsonCpp_0.5.0/bin/linux-gcc-${target}:\$PATH  
      LD_LIBRARY_PATH=\$MAUS_ROOT_DIR/third_party/JsonCpp_0.5.0/libs/linux-gcc-${target}:\$LD_LIBRARY_PATH
+
+     # workers
+     PYTHONPATH=\$MAUS_ROOT_DIR/workers/cpp/build/release/:\$PYTHON_PATH
+     LD_LIBRARY_PATH=\$MAUS_ROOT_DIR/workers/cpp/build/release:\$LD_LIBRARY_PATH
  
      export MAUS_ROOT_DIR PATH LD_LIBRARY_PATH GLG4DATA RAT_CFLAGS
      echo "SUCCESS: MAUS setup"
@@ -45,16 +64,18 @@ fi
 
 EOF
 
-source env.sh
+source env.sh > /dev/null
 
 echo "Setting up jsoncpp"
 cd third_party/JsonCpp_0.5.0
 scons platform=linux-gcc
-cd test
-python runjsontests.py  ../bin/linux-gcc-4.3.4/jsontestrunner
 cd ../..
 
 echo "Done with JsonCpp and running JsonCpp test"
+echo
+echo "Summary:"
+echo "    Using geant4: $use_g4"
+echo "    Using ROOT: $use_root"
 
 #cat > env.csh <<EOF
 #!/bin/csh
