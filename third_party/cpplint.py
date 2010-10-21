@@ -1,1 +1,0 @@
-../third_party/google-styleguide/cpplint/cpplint.py

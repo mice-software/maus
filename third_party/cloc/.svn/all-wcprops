@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 32
+/svnroot/cloc/!svn/ver/195/trunk
+END
+cloc
+K 25
+svn:wc:ra_dav:version-url
+V 37
+/svnroot/cloc/!svn/ver/195/trunk/cloc
+END
+sqlite_formatter
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/svnroot/cloc/!svn/ver/158/trunk/sqlite_formatter
+END
+run_tests
+K 25
+svn:wc:ra_dav:version-url
+V 41
+/svnroot/cloc/!svn/ver/62/trunk/run_tests
+END
