@@ -92,9 +92,9 @@ Export('env')
 env.jDev.Subproject('workers/map/CppPrint')
 
 #### Target: Documentation
-#dox = env.Command('does_not_exist3', 'doc/Doxyfile',
-#                  'doxygen doc/Doxyfile && cd doc/html')
-#env.Alias('doc', [dox])
+dox = env.Command('does_not_exist3', 'doc/Doxyfile',
+                  'doxygen doc/Doxyfile && cd doc/html')
+env.Alias('doc', [dox])
 
 ## autoconf
 if 'configure' in COMMAND_LINE_TARGETS:
