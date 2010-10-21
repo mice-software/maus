@@ -2,6 +2,8 @@
 # Configure script
 # Run once when you unpack source
 
+build_type="release"
+
 use_g4="yes"
 use_root="yes"
 
@@ -53,8 +55,8 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      LD_LIBRARY_PATH=\$MAUS_ROOT_DIR/third_party/JsonCpp_0.5.0/libs/linux-gcc-${target}:\$LD_LIBRARY_PATH
 
      # workers
-     PYTHONPATH=\$MAUS_ROOT_DIR/workers/cpp/build/release/:\$PYTHON_PATH
-     LD_LIBRARY_PATH=\$MAUS_ROOT_DIR/workers/cpp/build/release:\$LD_LIBRARY_PATH
+     PYTHONPATH=\$MAUS_ROOT_DIR/workers/build/${build_type}/:\$PYTHON_PATH
+     LD_LIBRARY_PATH=\$MAUS_ROOT_DIR/workers/build/${build_type}:\$LD_LIBRARY_PATH
  
      export MAUS_ROOT_DIR PATH LD_LIBRARY_PATH GLG4DATA RAT_CFLAGS
      echo "SUCCESS: MAUS setup"

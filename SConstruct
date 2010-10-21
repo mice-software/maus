@@ -16,8 +16,8 @@ class Dev:
   #sets up the build for a given project
   def Buildit(self, localenv, project):
      name = project.split('/')[-1]
-     builddir =  '../build/' + env.jDev.mymode
-     targetpath = '../build/' + env.jDev.mymode + '/_' + name
+     builddir =  '../../build/' + env.jDev.mymode
+     targetpath = '../../build/' + env.jDev.mymode + '/_' + name
 
      #append the user's additional compile flags
      #assume debugcflags and releasecflags are defined
@@ -27,7 +27,7 @@ class Dev:
          localenv.Append(CCFLAGS=self.releasecflags)
 
      #specify the build directory
-     localenv.VariantDir(variant_dir=builddir, src_dir='.', duplicate=0)
+     localenv.VariantDir(variant_dir=builddir, src_dir='.', duplicate=1)
 
      srclst = map(lambda x: builddir + '/' + x, glob.glob('*.cpp'))
      print srclst
@@ -43,9 +43,9 @@ class Dev:
   def SPath(self, project):
      return project + '/sconscript'
 
-env = Environment(SWIGFLAGS=['-python'], SHLIBPREFIX="")
+env = Environment(SWIGFLAGS=['-python', '-c++'], SHLIBPREFIX="")
 
-env.Append(CPPPATH="/usr/include/python2.6")
+env.Append(CPPPATH=["/usr/include/python2.6","%s/third_party/JsonCpp_0.5.0/include" % os.environ.get('MAUS_ROOT_DIR')])
 
 env['ENV']['PATH'] = os.environ.get('PATH')
 
@@ -58,6 +58,9 @@ if os.environ.get('USE_ROOT') == 'yes':
    env['USE_ROOT'] = True
 else: 
    env['USE_ROOT'] = False
+
+env.Append(LIBPATH = ["%s/third_party/JsonCpp_0.5.0/libs/linux-gcc-4.3.4" % os.environ.get('MAUS_ROOT_DIR')])
+env.Append(LIBS = ['json_linux-gcc-4.3.4_libmt'])
 
 #put all .sconsign files in one place
 env.SConsignFile()
@@ -86,7 +89,12 @@ env.jDev.releasecflags = ['-O2', '-DNDEBUG',]         #extra compile flags for r
 Export('env')
 
 #specify all of the sub-projects in the section
-env.jDev.Subproject('workers/cpp/CppPrint')
+env.jDev.Subproject('workers/map/CppPrint')
+
+#### Target: Documentation
+#dox = env.Command('does_not_exist3', 'doc/Doxyfile',
+#                  'doxygen doc/Doxyfile && cd doc/html')
+#env.Alias('doc', [dox])
 
 ## autoconf
 if 'configure' in COMMAND_LINE_TARGETS:

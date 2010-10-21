@@ -4,15 +4,18 @@ require_g4 = False
 #get environment and project
 Import('env', 'project')
 localenv = env.Clone()
-print 'test'
 
 #call back to jDev to build the project for us
 if (\
    ((not require_root) or env['USE_ROOT']) and \
-   ((not require_g4) or env['USE_G4'])\
+   ((not require_g4) or env['USE_G4']) \
    ):
       
    if require_root:
       localenv.ParseConfig("root-config --cflags --ldflags --libs")  # UNCOMMENT for ROOT
    
    env.jDev.Buildit(localenv, project)
+else:
+   print "Not building %s because:" % project
+   print '\trequire_root = ', require_root
+   print '\trequire_g4 = ', require_g4
