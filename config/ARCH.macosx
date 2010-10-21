@@ -1,7 +1,0 @@
-#-*-python-*-
-# MacOS X with gcc
-
-arch = SConscript('ARCH.gcc') # Use default settings
-arch['Xm'].update( { 'CPPPATH' : '/sw/include',
-                     'LIBPATH' : '/sw/lib' }    )
-Return('arch')

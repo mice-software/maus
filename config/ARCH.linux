@@ -1,5 +1,0 @@
-#-*-python-*-
-# Linux with gcc
-
-arch = SConscript('ARCH.gcc') # Use default settings
-Return('arch')

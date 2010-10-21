@@ -32,7 +32,7 @@ export USE_G4=$use_g4
 
 if [ -z "\$MAUS_ROOT_DIR" ]; then
      MAUS_ROOT_DIR=$maus_root_dir
-     PATH=\$MAUS_ROOT_DIR/bin:\$PATH
+
      if [ -z "${LD_LIBRARY_PATH}" ]; then
           LD_LIBRARY_PATH=\$MAUS_ROOT_DIR/lib
      else
