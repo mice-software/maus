@@ -1,6 +1,6 @@
-bash - contains the scripts that download, compile, and locally install dependencies
-build - contains the build of the dependencies
-install - where the dependencies get installed
-md5 - md5sum sums of each dependency to ensure they were downloaded correctly
-README - the file you're reading now, duh
-source - the source code archives of each dependency (which can be fetched by the bash scripts referenced above)
+bash - scripts that download, configure, then locally install dependencies
+build - where the source archives are expanded to and where code is built/compiled from
+install - where dependencies are installed
+md5 - md5sums to make sure files downloaded correctly
+README - this file (duh)
+source - the source archives in, for example, .tar.gz format
