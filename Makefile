@@ -1,3 +1,6 @@
+#   A Makefile that just links into scons.  This is provided to help
+# people who are used to make.
+
 all:
 	scons
 	@echo 'You can run "scons" directly to compile MAUS.'

@@ -4,8 +4,12 @@ http://micewww.pp.rl.ac.uk:8080/projects/maus
 
 Required Dependencies:
 
-gcc ?
 python
+scons
+jsoncpp
+
+
+optional:
 ROOT
 geant4
 bzr (2.something) # if you want to commit

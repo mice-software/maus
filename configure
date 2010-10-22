@@ -32,34 +32,16 @@ export USE_G4=$use_g4
 
 if [ -z "\$MAUS_ROOT_DIR" ]; then
      MAUS_ROOT_DIR=$maus_root_dir
-     PATH=\$MAUS_ROOT_DIR/third_party/bin:\$PATH 
+     PATH=\$MAUS_ROOT_DIR/third_party/install/bin:\$PATH 
 
      if [ -z "${LD_LIBRARY_PATH}" ]; then
-          LD_LIBRARY_PATH=\$MAUS_ROOT_DIR/lib
+          LD_LIBRARY_PATH=\$MAUS_ROOT_DIR/third_party/install/lib
      else
-          LD_LIBRARY_PATH=\$MAUS_ROOT_DIR/lib:\$LD_LIBRARY_PATH   
+          LD_LIBRARY_PATH=\$MAUS_ROOT_DIR/third_party/install/lib:\$LD_LIBRARY_PATH   
      fi
-
-     # cpplint
-     PATH=\$MAUS_ROOT_DIR/third_party/google-styleguide/cpplint:\$PATH 
-
-     # cloc
-     PATH=\$MAUS_ROOT_DIR/third_party/cloc:\$PATH 
-
-     # scons
-     PYTHONPATH=\$MAUS_ROOT_DIR/third_party/scons-2.0.1/lib/scons-2.0.1:\$PYTHONPATH
-     PATH=\$MAUS_ROOT_DIR/third_party/scons-2.0.1/bin:\$PATH
 
      # config python scripts
      PYTHONPATH=\$MAUS_ROOT_DIR/config:\$PYTHONPATH 
-
-     # nose
-     PYTHONPATH=\$MAUS_ROOT_DIR/third_party/nose-0.11.3/lib/python:\$PYTHONPATH
-     PATH=\$MAUS_ROOT_DIR/third_party/nose-0.11.3/bin:\$PATH 
-
-     # jsoncpp
-     PATH=\$MAUS_ROOT_DIR/third_party/JsonCpp_0.5.0/bin/linux-gcc-${target}:\$PATH  
-     LD_LIBRARY_PATH=\$MAUS_ROOT_DIR/third_party/JsonCpp_0.5.0/libs/linux-gcc-${target}:\$LD_LIBRARY_PATH
 
      # workers
      PYTHONPATH=\$MAUS_ROOT_DIR/workers/build/${build_type}/:\$PYTHON_PATH
@@ -73,15 +55,6 @@ fi
 
 EOF
 
-source env.sh > /dev/null
-
-echo "Setting up jsoncpp"
-cd third_party/JsonCpp_0.5.0
-scons platform=linux-gcc
-cd ../..
-
-echo "Done with JsonCpp and running JsonCpp test"
-echo
 echo "Summary:"
 echo "    Using geant4: $use_g4"
 echo "    Using ROOT: $use_root"
