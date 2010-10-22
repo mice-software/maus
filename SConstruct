@@ -43,8 +43,10 @@ class Dev:
   def SPath(self, project):
      return project + '/sconscript'
 
-env = Environment(SWIGFLAGS=['-python', '-c++'], SHLIBPREFIX="")
-
+env = Environment(SHLIBPREFIX="")
+env.Tool('swig', '%s/third_party/swig-2.0.1' % os.environ.get('MAUS_ROOT_DIR'))
+env.Append(SWIGFLAGS=['-python', '-c++'])
+#env.Append(SHLIBPREFIX="")
 env.Append(CPPPATH=["/usr/include/python2.6","%s/third_party/JsonCpp_0.5.0/include" % os.environ.get('MAUS_ROOT_DIR')])
 
 env['ENV']['PATH'] = os.environ.get('PATH')
