@@ -22,7 +22,6 @@ type -P python &>/dev/null || { echo "I require python but it's not installed.  
 
 ### Create environment files
 maus_root_dir=`pwd`
-target=`g++ -dumpversion`
 
 cat > env.sh <<EOF
 #!/bin/sh

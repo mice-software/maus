@@ -3197,3 +3197,1313 @@
       <anchor>4e964af1d130dbfe312a46f36c39e2b8</anchor>
       <arglist>[]</arglist>
     </member>
+  </compound>
+  <compound kind="class">
+    <name>cheprep</name>
+    <filename>classcheprep.html</filename>
+  </compound>
+  <compound kind="class">
+    <name>CppPrint</name>
+    <filename>classCppPrint.html</filename>
+    <class kind="class">CppPrint::_object</class>
+    <class kind="class">CppPrint::CppPrint</class>
+    <member kind="function">
+      <type></type>
+      <name>CppPrint</name>
+      <anchorfile>classCppPrint.html</anchorfile>
+      <anchor>0bafe72262d3ac111f150bd079203f93</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>CppPrint</name>
+      <anchorfile>classCppPrint.html</anchorfile>
+      <anchor>a5f77f6d12069210e418b3d8b5311634</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function">
+      <type>char *</type>
+      <name>Process</name>
+      <anchorfile>classCppPrint.html</anchorfile>
+      <anchor>85ed9748fd83a61d02e36744b2d8b0d8</anchor>
+      <arglist>(char *document)</arglist>
+    </member>
+    <member kind="function">
+      <type>char *</type>
+      <name>Process</name>
+      <anchorfile>classCppPrint.html</anchorfile>
+      <anchor>6bc5fa4e83eaf5614214712e4312f116</anchor>
+      <arglist>(char *document)</arglist>
+    </member>
+    <member kind="variable">
+      <type></type>
+      <name>CppPrint_swigregister</name>
+      <anchorfile>classCppPrint.html</anchorfile>
+      <anchor>a55a91667d8b1bc6bd0f1d796df7799f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type></type>
+      <name>new_instancemethod</name>
+      <anchorfile>classCppPrint.html</anchorfile>
+      <anchor>06ad5e362b7028898448516ec3774b95</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="property" protection="private">
+      <type></type>
+      <name>_swig_property</name>
+      <anchorfile>classCppPrint.html</anchorfile>
+      <anchor>e4a2208501ee41d193b5ea55bbdc3269</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" protection="private">
+      <type>tuple</type>
+      <name>_CppPrint</name>
+      <anchorfile>classCppPrint.html</anchorfile>
+      <anchor>399d64090bd5dd9cd9a1fc55523d94cd</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" protection="private">
+      <type>int</type>
+      <name>_newclass</name>
+      <anchorfile>classCppPrint.html</anchorfile>
+      <anchor>7fd2c56cfc8714362b43064e516457e5</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" protection="private">
+      <type></type>
+      <name>_object</name>
+      <anchorfile>classCppPrint.html</anchorfile>
+      <anchor>dab2f851c2c8f2fe92cca644c4453f49</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>CppPrint::_object</name>
+    <filename>classCppPrint_1_1__object.html</filename>
+  </compound>
+  <compound kind="class">
+    <name>CppPrint::CppPrint</name>
+    <filename>classCppPrint_1_1CppPrint.html</filename>
+    <base>CppPrint::_object</base>
+    <base>CppPrint::_object</base>
+    <member kind="function">
+      <type>def</type>
+      <name>__init__</name>
+      <anchorfile>classCppPrint_1_1CppPrint.html</anchorfile>
+      <anchor>c4d3465baed989d12dda5cc1b3fda174</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>def</type>
+      <name>__init__</name>
+      <anchorfile>classCppPrint_1_1CppPrint.html</anchorfile>
+      <anchor>c4d3465baed989d12dda5cc1b3fda174</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>def</type>
+      <name>Process</name>
+      <anchorfile>classCppPrint_1_1CppPrint.html</anchorfile>
+      <anchor>1aacf63d429c2f0d11997d948d234354</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>def</type>
+      <name>Process</name>
+      <anchorfile>classCppPrint_1_1CppPrint.html</anchorfile>
+      <anchor>1aacf63d429c2f0d11997d948d234354</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type></type>
+      <name>this</name>
+      <anchorfile>classCppPrint_1_1CppPrint.html</anchorfile>
+      <anchor>a6358d53ff18efff7b50280e95726de5</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" protection="private" static="yes">
+      <type>tuple</type>
+      <name>__getattr__</name>
+      <anchorfile>classCppPrint_1_1CppPrint.html</anchorfile>
+      <anchor>be8f3a3cde58de7a58d80f35a86f9e01</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" protection="private" static="yes">
+      <type></type>
+      <name>__repr__</name>
+      <anchorfile>classCppPrint_1_1CppPrint.html</anchorfile>
+      <anchor>f5b941257a714ac24429524dd237972e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" protection="private" static="yes">
+      <type>tuple</type>
+      <name>__setattr__</name>
+      <anchorfile>classCppPrint_1_1CppPrint.html</anchorfile>
+      <anchor>0707a7d79265e273a051b35bf5366564</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" protection="private" static="yes">
+      <type></type>
+      <name>__swig_destroy__</name>
+      <anchorfile>classCppPrint_1_1CppPrint.html</anchorfile>
+      <anchor>40b75496004e794e3ba93508e149ef70</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" protection="private" static="yes">
+      <type>dictionary</type>
+      <name>__swig_getmethods__</name>
+      <anchorfile>classCppPrint_1_1CppPrint.html</anchorfile>
+      <anchor>2436e5b5adb5d1c298bb7682d48c2f96</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" protection="private" static="yes">
+      <type>dictionary</type>
+      <name>__swig_setmethods__</name>
+      <anchorfile>classCppPrint_1_1CppPrint.html</anchorfile>
+      <anchor>71042ef1c3e4ae95103b3ab238e1b312</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>HEPREP</name>
+    <filename>classHEPREP.html</filename>
+  </compound>
+  <compound kind="class">
+    <name>object</name>
+    <filename>classobject.html</filename>
+  </compound>
+  <compound kind="struct">
+    <name>swig_attribute</name>
+    <filename>structswig__attribute.html</filename>
+    <member kind="variable">
+      <type>swig_wrapper</type>
+      <name>getmethod</name>
+      <anchorfile>structswig__attribute.html</anchorfile>
+      <anchor>efdb5dac00173df821f5fa7cff604015</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>const char *</type>
+      <name>name</name>
+      <anchorfile>structswig__attribute.html</anchorfile>
+      <anchor>42173c1d85ef054f5072daecaca90391</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>swig_wrapper</type>
+      <name>setmethod</name>
+      <anchorfile>structswig__attribute.html</anchorfile>
+      <anchor>0a7ad707ba40238bfe08bd63e758fc40</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>swig_cast_info</name>
+    <filename>structswig__cast__info.html</filename>
+    <member kind="variable">
+      <type>swig_converter_func</type>
+      <name>converter</name>
+      <anchorfile>structswig__cast__info.html</anchorfile>
+      <anchor>a630fddfbb1bf9c97a03f9479ba32f76</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>struct swig_cast_info *</type>
+      <name>next</name>
+      <anchorfile>structswig__cast__info.html</anchorfile>
+      <anchor>2fc1b5702ec07bc23135df5c5db8e53e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>struct swig_cast_info *</type>
+      <name>prev</name>
+      <anchorfile>structswig__cast__info.html</anchorfile>
+      <anchor>0f5d1fc81b494c3e032a153609fd3268</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>swig_type_info *</type>
+      <name>type</name>
+      <anchorfile>structswig__cast__info.html</anchorfile>
+      <anchor>06b74832d16cc0c4fd147e4c39095cd9</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>swig_class</name>
+    <filename>structswig__class.html</filename>
+    <member kind="variable">
+      <type>swig_attribute *</type>
+      <name>attributes</name>
+      <anchorfile>structswig__class.html</anchorfile>
+      <anchor>9aada2b6c1fc7aa9baf0fce5d3b6ff1f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>const char **</type>
+      <name>base_names</name>
+      <anchorfile>structswig__class.html</anchorfile>
+      <anchor>6a7cee5518db75a6973bcb3b832100b8</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>struct swig_class **</type>
+      <name>bases</name>
+      <anchorfile>structswig__class.html</anchorfile>
+      <anchor>f0a37b0bd2995c221f6287674115b525</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>swig_wrapper</type>
+      <name>constructor</name>
+      <anchorfile>structswig__class.html</anchorfile>
+      <anchor>e698c63acdd7d358747cf3748d7e3c22</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>void(*</type>
+      <name>destructor</name>
+      <anchorfile>structswig__class.html</anchorfile>
+      <anchor>c46aed39c0f5737fb8c03b181ead9be8</anchor>
+      <arglist>)(void *)</arglist>
+    </member>
+    <member kind="variable">
+      <type>swig_method *</type>
+      <name>methods</name>
+      <anchorfile>structswig__class.html</anchorfile>
+      <anchor>6ffdc82a467a618db8d810081753ae02</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>swig_module_info *</type>
+      <name>module</name>
+      <anchorfile>structswig__class.html</anchorfile>
+      <anchor>340eec5aa59094a231416b702c0e93f2</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>const char *</type>
+      <name>name</name>
+      <anchorfile>structswig__class.html</anchorfile>
+      <anchor>6951968e03cdc53b54c1e11f2ea3954c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>swig_type_info **</type>
+      <name>type</name>
+      <anchorfile>structswig__class.html</anchorfile>
+      <anchor>f3a32a02599af9883e43a402ad6dbb7c</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>swig_command_info</name>
+    <filename>structswig__command__info.html</filename>
+    <member kind="variable">
+      <type>ClientData</type>
+      <name>clientdata</name>
+      <anchorfile>structswig__command__info.html</anchorfile>
+      <anchor>035b0c49eb66efb6795405700a4cc864</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>const char *</type>
+      <name>name</name>
+      <anchorfile>structswig__command__info.html</anchorfile>
+      <anchor>1bead0f17ed5ed2b19f8b4f65844780f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>int(*</type>
+      <name>wrapper</name>
+      <anchorfile>structswig__command__info.html</anchorfile>
+      <anchor>a0e31a0e91582d8db9e1b6fe24594a5b</anchor>
+      <arglist>)(ClientData, Tcl_Interp *, int, Tcl_Obj *CONST[])</arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>swig_const_info</name>
+    <filename>structswig__const__info.html</filename>
+    <member kind="variable">
+      <type>double</type>
+      <name>dvalue</name>
+      <anchorfile>structswig__const__info.html</anchorfile>
+      <anchor>74e477f1dbf515bcb7e2ef07a1d34c35</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>long</type>
+      <name>lvalue</name>
+      <anchorfile>structswig__const__info.html</anchorfile>
+      <anchor>f142e4c21ad4fe61f6c2624bff034583</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>char *</type>
+      <name>name</name>
+      <anchorfile>structswig__const__info.html</anchorfile>
+      <anchor>db8a1bc6fcbfb39737a9dc72dfabf8f1</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>swig_type_info **</type>
+      <name>ptype</name>
+      <anchorfile>structswig__const__info.html</anchorfile>
+      <anchor>374efde326bb281d91791c91306e3f08</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>void *</type>
+      <name>pvalue</name>
+      <anchorfile>structswig__const__info.html</anchorfile>
+      <anchor>37585059046a4951907eb779c97e7cc8</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>int</type>
+      <name>type</name>
+      <anchorfile>structswig__const__info.html</anchorfile>
+      <anchor>e8bbc99e1cda11f24e306365cbf33893</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>swig_globalvar</name>
+    <filename>structswig__globalvar.html</filename>
+    <member kind="variable">
+      <type>PyObject *(*</type>
+      <name>get_attr</name>
+      <anchorfile>structswig__globalvar.html</anchorfile>
+      <anchor>bde9c98ae8b5fda1e1016b7076be8d93</anchor>
+      <arglist>)(void)</arglist>
+    </member>
+    <member kind="variable">
+      <type>char *</type>
+      <name>name</name>
+      <anchorfile>structswig__globalvar.html</anchorfile>
+      <anchor>f635550754b1baf44334ba28da6512af</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>struct swig_globalvar *</type>
+      <name>next</name>
+      <anchorfile>structswig__globalvar.html</anchorfile>
+      <anchor>29127bf3ee4e4434f39d5ff815c74586</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>int(*</type>
+      <name>set_attr</name>
+      <anchorfile>structswig__globalvar.html</anchorfile>
+      <anchor>f176a3f24fc1c5458a1239cf18eb9def</anchor>
+      <arglist>)(PyObject *)</arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>swig_instance</name>
+    <filename>structswig__instance.html</filename>
+    <member kind="variable">
+      <type>swig_class *</type>
+      <name>classptr</name>
+      <anchorfile>structswig__instance.html</anchorfile>
+      <anchor>6c89f38dae595c1c4ee252603b34e52e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>Tcl_Command</type>
+      <name>cmdtok</name>
+      <anchorfile>structswig__instance.html</anchorfile>
+      <anchor>db73b3594d77f9d047445a5e609baada</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>int</type>
+      <name>destroy</name>
+      <anchorfile>structswig__instance.html</anchorfile>
+      <anchor>c9bd8041d71379dd47e5759299331c9c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>Tcl_Obj *</type>
+      <name>thisptr</name>
+      <anchorfile>structswig__instance.html</anchorfile>
+      <anchor>b7ea954067cb614584e16c1aa76c927c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>void *</type>
+      <name>thisvalue</name>
+      <anchorfile>structswig__instance.html</anchorfile>
+      <anchor>d9c381ef4f1cfd8545aa8b0df808428d</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>swig_method</name>
+    <filename>structswig__method.html</filename>
+    <member kind="variable">
+      <type>swig_wrapper</type>
+      <name>method</name>
+      <anchorfile>structswig__method.html</anchorfile>
+      <anchor>a4edf908187beac38056625ef36d25e7</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>const char *</type>
+      <name>name</name>
+      <anchorfile>structswig__method.html</anchorfile>
+      <anchor>58ef1c726726af181d16ab5913a5859d</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>swig_module_info</name>
+    <filename>structswig__module__info.html</filename>
+    <member kind="variable">
+      <type>swig_cast_info **</type>
+      <name>cast_initial</name>
+      <anchorfile>structswig__module__info.html</anchorfile>
+      <anchor>14e4f7b0c9e0ff10543475c269b83507</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>void *</type>
+      <name>clientdata</name>
+      <anchorfile>structswig__module__info.html</anchorfile>
+      <anchor>39999692b76f191b66a5ce746681dc84</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>struct swig_module_info *</type>
+      <name>next</name>
+      <anchorfile>structswig__module__info.html</anchorfile>
+      <anchor>dc59649870cda1ab12f45e57de99e572</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>size_t</type>
+      <name>size</name>
+      <anchorfile>structswig__module__info.html</anchorfile>
+      <anchor>af8907cf8509ee0464af8c9dfd909042</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>swig_type_info **</type>
+      <name>type_initial</name>
+      <anchorfile>structswig__module__info.html</anchorfile>
+      <anchor>af36c0bb2e9e796ff1576359d52507c9</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>swig_type_info **</type>
+      <name>types</name>
+      <anchorfile>structswig__module__info.html</anchorfile>
+      <anchor>0a70e9ae189c2a26c92adbf2fabcd549</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>swig_type_info</name>
+    <filename>structswig__type__info.html</filename>
+    <member kind="variable">
+      <type>struct swig_cast_info *</type>
+      <name>cast</name>
+      <anchorfile>structswig__type__info.html</anchorfile>
+      <anchor>e535f16234db99893f07880cb94a848e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>void *</type>
+      <name>clientdata</name>
+      <anchorfile>structswig__type__info.html</anchorfile>
+      <anchor>2e1f9087e639dd7c8c131fbc6e399194</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>swig_dycast_func</type>
+      <name>dcast</name>
+      <anchorfile>structswig__type__info.html</anchorfile>
+      <anchor>07df4bedf85be77b23756b531b60e0dd</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>const char *</type>
+      <name>name</name>
+      <anchorfile>structswig__type__info.html</anchorfile>
+      <anchor>a6c9f9ed3037043b6d346162cf932daf</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>int</type>
+      <name>owndata</name>
+      <anchorfile>structswig__type__info.html</anchorfile>
+      <anchor>93c25d5903cbfcb82208eea7227c32bd</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>const char *</type>
+      <name>str</name>
+      <anchorfile>structswig__type__info.html</anchorfile>
+      <anchor>aafd19f362ddc521d6a846ce41044471</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>swig_var_info</name>
+    <filename>structswig__var__info.html</filename>
+    <member kind="variable">
+      <type>void *</type>
+      <name>addr</name>
+      <anchorfile>structswig__var__info.html</anchorfile>
+      <anchor>77fcf8baf4e92b38e3b1a60d66bdce2e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>char *(*</type>
+      <name>get</name>
+      <anchorfile>structswig__var__info.html</anchorfile>
+      <anchor>a3a2ba5cd3041e6ab6fa0065169e4c77</anchor>
+      <arglist>)(ClientData, Tcl_Interp *, char *, char *, int)</arglist>
+    </member>
+    <member kind="variable">
+      <type>const char *</type>
+      <name>name</name>
+      <anchorfile>structswig__var__info.html</anchorfile>
+      <anchor>c298ea31c51573da3d9385c81237e936</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>char *(*</type>
+      <name>set</name>
+      <anchorfile>structswig__var__info.html</anchorfile>
+      <anchor>c3aa7f59d0f7753bce19a20cb378f9d2</anchor>
+      <arglist>)(ClientData, Tcl_Interp *, char *, char *, int)</arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>swig_varlinkobject</name>
+    <filename>structswig__varlinkobject.html</filename>
+    <member kind="variable">
+      <type>PyObject_HEAD swig_globalvar *</type>
+      <name>vars</name>
+      <anchorfile>structswig__varlinkobject.html</anchorfile>
+      <anchor>1625fef753ee4bf3ff55a658a1a740ac</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>SwigPyClientData</name>
+    <filename>structSwigPyClientData.html</filename>
+    <member kind="variable">
+      <type>int</type>
+      <name>delargs</name>
+      <anchorfile>structSwigPyClientData.html</anchorfile>
+      <anchor>fe96700b74a6d5aaa652efd71e4ea3ed</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>PyObject *</type>
+      <name>destroy</name>
+      <anchorfile>structSwigPyClientData.html</anchorfile>
+      <anchor>7faf7ea74e5dd2a442fc369f54e636f5</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>int</type>
+      <name>implicitconv</name>
+      <anchorfile>structSwigPyClientData.html</anchorfile>
+      <anchor>597bb90eb130eac184f0745830b8394e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>PyObject *</type>
+      <name>klass</name>
+      <anchorfile>structSwigPyClientData.html</anchorfile>
+      <anchor>6431434ad280bf3849f35d6107688a16</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>PyObject *</type>
+      <name>newargs</name>
+      <anchorfile>structSwigPyClientData.html</anchorfile>
+      <anchor>e5e921224f42c1a84b41d9890ee39bfe</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>PyObject *</type>
+      <name>newraw</name>
+      <anchorfile>structSwigPyClientData.html</anchorfile>
+      <anchor>0c50c5adf1f4c0b08227c9db6418d6a9</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>SwigPyObject</name>
+    <filename>structSwigPyObject.html</filename>
+    <member kind="variable">
+      <type>PyObject *</type>
+      <name>next</name>
+      <anchorfile>structSwigPyObject.html</anchorfile>
+      <anchor>c2c75001ab105dcce2db40bd663fdf9c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>int</type>
+      <name>own</name>
+      <anchorfile>structSwigPyObject.html</anchorfile>
+      <anchor>88b41c8023825a4fbb3ee2f7afd74c47</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>PyObject_HEAD void *</type>
+      <name>ptr</name>
+      <anchorfile>structSwigPyObject.html</anchorfile>
+      <anchor>9b730ab94cc4473b3d2fb17cb3c1bfc8</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>swig_type_info *</type>
+      <name>ty</name>
+      <anchorfile>structSwigPyObject.html</anchorfile>
+      <anchor>827a4a78b5eaa0f22f39ea31f5132a2e</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>SwigPyPacked</name>
+    <filename>structSwigPyPacked.html</filename>
+    <member kind="variable">
+      <type>PyObject_HEAD void *</type>
+      <name>pack</name>
+      <anchorfile>structSwigPyPacked.html</anchorfile>
+      <anchor>eeddffb4fbd70d9628504d70b5bdee30</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>size_t</type>
+      <name>size</name>
+      <anchorfile>structSwigPyPacked.html</anchorfile>
+      <anchor>0be0ea420ca0f925b582336f977c3444</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>swig_type_info *</type>
+      <name>ty</name>
+      <anchorfile>structSwigPyPacked.html</anchorfile>
+      <anchor>57c6ce3968fc2aabe8e93d64b52f8d4e</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="namespace">
+    <name>cheprep</name>
+    <filename>namespacecheprep.html</filename>
+  </compound>
+  <compound kind="namespace">
+    <name>core</name>
+    <filename>namespacecore.html</filename>
+    <namespace>core::FetchRuns</namespace>
+    <namespace>core::GenericProcessor</namespace>
+    <namespace>core::go</namespace>
+    <namespace>core::load</namespace>
+    <namespace>core::logon</namespace>
+    <namespace>core::MakeCanvas</namespace>
+    <namespace>core::Map</namespace>
+    <namespace>core::oscalls</namespace>
+    <namespace>core::region</namespace>
+    <namespace>core::test</namespace>
+    <namespace>core::test_fetch_runs</namespace>
+    <namespace>core::test_treenode</namespace>
+  </compound>
+  <compound kind="namespace">
+    <name>core::FetchRuns</name>
+    <filename>namespacecore_1_1FetchRuns.html</filename>
+    <member kind="function">
+      <type>def</type>
+      <name>FetchRuns</name>
+      <anchorfile>namespacecore_1_1FetchRuns.html</anchorfile>
+      <anchor>990d59dff7c17e0565cd3907ec99cb4f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>tuple</type>
+      <name>logger_core_fr</name>
+      <anchorfile>namespacecore_1_1FetchRuns.html</anchorfile>
+      <anchor>890865a373f6eebb258b39bd57c9540b</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="namespace">
+    <name>core::GenericProcessor</name>
+    <filename>namespacecore_1_1GenericProcessor.html</filename>
+    <class kind="class">core::GenericProcessor::GenericProcessor</class>
+  </compound>
+  <compound kind="class">
+    <name>core::GenericProcessor::GenericProcessor</name>
+    <filename>classcore_1_1GenericProcessor_1_1GenericProcessor.html</filename>
+    <base>object</base>
+    <member kind="function">
+      <type>def</type>
+      <name>__init__</name>
+      <anchorfile>classcore_1_1GenericProcessor_1_1GenericProcessor.html</anchorfile>
+      <anchor>e39de2e621bdee771e9a33b7c2bc2116</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>def</type>
+      <name>Process</name>
+      <anchorfile>classcore_1_1GenericProcessor_1_1GenericProcessor.html</anchorfile>
+      <anchor>7345a8859eb01ab0d8b5984d09c9b287</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>def</type>
+      <name>ProcessStart</name>
+      <anchorfile>classcore_1_1GenericProcessor_1_1GenericProcessor.html</anchorfile>
+      <anchor>5aebcf08186f9a2116ea0f12d65bda9f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>def</type>
+      <name>ProcessStop</name>
+      <anchorfile>classcore_1_1GenericProcessor_1_1GenericProcessor.html</anchorfile>
+      <anchor>47d7e182d429b57072adc7b3a08a9266</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type></type>
+      <name>verbose</name>
+      <anchorfile>classcore_1_1GenericProcessor_1_1GenericProcessor.html</anchorfile>
+      <anchor>0f178ebdf123bcee3d2900637ce4fc32</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="namespace">
+    <name>core::go</name>
+    <filename>namespacecore_1_1go.html</filename>
+    <class kind="class">core::go::Go</class>
+  </compound>
+  <compound kind="class">
+    <name>core::go::Go</name>
+    <filename>classcore_1_1go_1_1Go.html</filename>
+    <member kind="function">
+      <type>def</type>
+      <name>__init__</name>
+      <anchorfile>classcore_1_1go_1_1Go.html</anchorfile>
+      <anchor>972ae23a554c6abb7431fab105704dd1</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="namespace">
+    <name>core::load</name>
+    <filename>namespacecore_1_1load.html</filename>
+    <member kind="function">
+      <type>def</type>
+      <name>execdir</name>
+      <anchorfile>namespacecore_1_1load.html</anchorfile>
+      <anchor>3b678792e909ad96d3eab5a69744422c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type></type>
+      <name>_argv</name>
+      <anchorfile>namespacecore_1_1load.html</anchorfile>
+      <anchor>74d612f496c590272576be184f08ed49</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="namespace">
+    <name>core::logon</name>
+    <filename>namespacecore_1_1logon.html</filename>
+  </compound>
+  <compound kind="namespace">
+    <name>core::MakeCanvas</name>
+    <filename>namespacecore_1_1MakeCanvas.html</filename>
+    <member kind="function">
+      <type>def</type>
+      <name>MakeCanvas</name>
+      <anchorfile>namespacecore_1_1MakeCanvas.html</anchorfile>
+      <anchor>5f422978d72391425e5032dd55d1eced</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>int</type>
+      <name>canvas_number</name>
+      <anchorfile>namespacecore_1_1MakeCanvas.html</anchorfile>
+      <anchor>82d5fd0055282efb3f018665cda32cf4</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="namespace">
+    <name>core::Map</name>
+    <filename>namespacecore_1_1Map.html</filename>
+    <class kind="class">core::Map::Map</class>
+  </compound>
+  <compound kind="class">
+    <name>core::Map::Map</name>
+    <filename>classcore_1_1Map_1_1Map.html</filename>
+    <member kind="function">
+      <type>def</type>
+      <name>__init__</name>
+      <anchorfile>classcore_1_1Map_1_1Map.html</anchorfile>
+      <anchor>67a0f8e3295778959e447f15f2662cc7</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>def</type>
+      <name>Get</name>
+      <anchorfile>classcore_1_1Map_1_1Map.html</anchorfile>
+      <anchor>b46ad3a4eedfae61468f18ae05665fdd</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>def</type>
+      <name>Set</name>
+      <anchorfile>classcore_1_1Map_1_1Map.html</anchorfile>
+      <anchor>4a234a12957f9dcff4b2694bce191ca6</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>def</type>
+      <name>TestKey</name>
+      <anchorfile>classcore_1_1Map_1_1Map.html</anchorfile>
+      <anchor>30fb03b39c8dabfc80246aed38bc8931</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>tuple</type>
+      <name>access</name>
+      <anchorfile>classcore_1_1Map_1_1Map.html</anchorfile>
+      <anchor>e6e2b6ba69625c926912cf9d3ab91183</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>tuple</type>
+      <name>data</name>
+      <anchorfile>classcore_1_1Map_1_1Map.html</anchorfile>
+      <anchor>148c5f3cd951c2e0fa2a5d4a37a5f856</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="namespace">
+    <name>core::oscalls</name>
+    <filename>namespacecore_1_1oscalls.html</filename>
+    <member kind="function">
+      <type>def</type>
+      <name>createDir</name>
+      <anchorfile>namespacecore_1_1oscalls.html</anchorfile>
+      <anchor>a0a6e28fe9e39dcd6afff00b4ce511a3</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>def</type>
+      <name>getPlotDirectory</name>
+      <anchorfile>namespacecore_1_1oscalls.html</anchorfile>
+      <anchor>3f3383a7dd53e08200a5e2dfbcc54a26</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="namespace">
+    <name>core::region</name>
+    <filename>namespacecore_1_1region.html</filename>
+    <class kind="class">core::region::Region</class>
+    <member kind="function">
+      <type>def</type>
+      <name>constructMICE</name>
+      <anchorfile>namespacecore_1_1region.html</anchorfile>
+      <anchor>4b077e17b257e577b846f348c2a52e06</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>core::region::Region</name>
+    <filename>classcore_1_1region_1_1Region.html</filename>
+    <member kind="function">
+      <type>def</type>
+      <name>__init__</name>
+      <anchorfile>classcore_1_1region_1_1Region.html</anchorfile>
+      <anchor>effac2fc6135ef6ea66cfdb7042139ca</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>def</type>
+      <name>AddEvent</name>
+      <anchorfile>classcore_1_1region_1_1Region.html</anchorfile>
+      <anchor>ad3a8f2dcdac622c3f3d0cd12a5c5ae8</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>def</type>
+      <name>GetChildren</name>
+      <anchorfile>classcore_1_1region_1_1Region.html</anchorfile>
+      <anchor>591f795fd7cfba9e6e2b7dc67c031493</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>def</type>
+      <name>GetEvents</name>
+      <anchorfile>classcore_1_1region_1_1Region.html</anchorfile>
+      <anchor>1c8d9b300ad9582a7d422fbc9ff2fa16</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>def</type>
+      <name>GetHash</name>
+      <anchorfile>classcore_1_1region_1_1Region.html</anchorfile>
+      <anchor>b355bb90ca2e8d37cecc5a4e08f8d2ec</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>def</type>
+      <name>GetName</name>
+      <anchorfile>classcore_1_1region_1_1Region.html</anchorfile>
+      <anchor>db99659e88b4f419bd9b37efc18c1722</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>def</type>
+      <name>GetNumber</name>
+      <anchorfile>classcore_1_1region_1_1Region.html</anchorfile>
+      <anchor>977bd740a26007e77e43f01212e7ed1b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>def</type>
+      <name>GetParent</name>
+      <anchorfile>classcore_1_1region_1_1Region.html</anchorfile>
+      <anchor>0019d84f7ae63689c71c206314841a1a</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>def</type>
+      <name>GetType</name>
+      <anchorfile>classcore_1_1region_1_1Region.html</anchorfile>
+      <anchor>fbcd8984b590de851097434b5bdf0e1b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>def</type>
+      <name>Print</name>
+      <anchorfile>classcore_1_1region_1_1Region.html</anchorfile>
+      <anchor>795730cf4e107be55aa28ad700b5f14a</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>def</type>
+      <name>RecursiveGetEvents</name>
+      <anchorfile>classcore_1_1region_1_1Region.html</anchorfile>
+      <anchor>0543b57ffe5d750c45c33161bbce1e44</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>def</type>
+      <name>RegionGenerator</name>
+      <anchorfile>classcore_1_1region_1_1Region.html</anchorfile>
+      <anchor>68c856bdf63510709529828abf2080df</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>def</type>
+      <name>SanityCheck</name>
+      <anchorfile>classcore_1_1region_1_1Region.html</anchorfile>
+      <anchor>8bce45153806091990d966d50fba71c0</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>def</type>
+      <name>SetChildren</name>
+      <anchorfile>classcore_1_1region_1_1Region.html</anchorfile>
+      <anchor>c5e91a781fca87d38452649d2deabc84</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>def</type>
+      <name>SetEvents</name>
+      <anchorfile>classcore_1_1region_1_1Region.html</anchorfile>
+      <anchor>b98eae4b77a2b22749699192d358e4b2</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>def</type>
+      <name>SetParent</name>
+      <anchorfile>classcore_1_1region_1_1Region.html</anchorfile>
+      <anchor>79ca5a0dd17d044222c93ef8feea2967</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" protection="private">
+      <type></type>
+      <name>__children</name>
+      <anchorfile>classcore_1_1region_1_1Region.html</anchorfile>
+      <anchor>9a30ee26ad43574a21d32bb274de5c08</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" protection="private">
+      <type></type>
+      <name>__events</name>
+      <anchorfile>classcore_1_1region_1_1Region.html</anchorfile>
+      <anchor>c79f02fe40db0752c588efe0b15d1e50</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" protection="private">
+      <type></type>
+      <name>__hashs</name>
+      <anchorfile>classcore_1_1region_1_1Region.html</anchorfile>
+      <anchor>4dc0c29fa0261da6db5b8aafa93b4806</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" protection="private">
+      <type></type>
+      <name>__names</name>
+      <anchorfile>classcore_1_1region_1_1Region.html</anchorfile>
+      <anchor>1ffe99bcdba23b34de816a84f470546f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" protection="private">
+      <type></type>
+      <name>__parents</name>
+      <anchorfile>classcore_1_1region_1_1Region.html</anchorfile>
+      <anchor>4bf7e0529eecd6cb6b026ab1aa598f79</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" protection="private">
+      <type></type>
+      <name>__type</name>
+      <anchorfile>classcore_1_1region_1_1Region.html</anchorfile>
+      <anchor>06f553262560023cae9f124634868ae2</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="namespace">
+    <name>core::test</name>
+    <filename>namespacecore_1_1test.html</filename>
+    <member kind="variable">
+      <type>tuple</type>
+      <name>logger</name>
+      <anchorfile>namespacecore_1_1test.html</anchorfile>
+      <anchor>222549db41144d43d6ca064506445721</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>tuple</type>
+      <name>test</name>
+      <anchorfile>namespacecore_1_1test.html</anchorfile>
+      <anchor>5bbec9ba058160b449e0c4f2d549dc5d</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="namespace">
+    <name>core::test_fetch_runs</name>
+    <filename>namespacecore_1_1test__fetch__runs.html</filename>
+    <member kind="function">
+      <type>def</type>
+      <name>test_run_number</name>
+      <anchorfile>namespacecore_1_1test__fetch__runs.html</anchorfile>
+      <anchor>c3fcb6e69b67a441e72362e399268c07</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="namespace">
+    <name>core::test_treenode</name>
+    <filename>namespacecore_1_1test__treenode.html</filename>
+    <member kind="function">
+      <type>def</type>
+      <name>test_type</name>
+      <anchorfile>namespacecore_1_1test__treenode.html</anchorfile>
+      <anchor>c66fd7bc7c610afbd6c7345c87e880cf</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="namespace">
+    <name>CppPrint</name>
+    <filename>namespaceCppPrint.html</filename>
+    <member kind="function" protection="private">
+      <type>def</type>
+      <name>_swig_getattr</name>
+      <anchorfile>namespaceCppPrint.html</anchorfile>
+      <anchor>38ef527ecee8cd219c6dd00aa58d0965</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function" protection="private">
+      <type>def</type>
+      <name>_swig_repr</name>
+      <anchorfile>namespaceCppPrint.html</anchorfile>
+      <anchor>4718f7ae5a655a51e078e110a1d2972a</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function" protection="private">
+      <type>def</type>
+      <name>_swig_setattr</name>
+      <anchorfile>namespaceCppPrint.html</anchorfile>
+      <anchor>7acb3504d84d29b0b2b0e605012b9bd9</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function" protection="private">
+      <type>def</type>
+      <name>_swig_setattr_nondynamic</name>
+      <anchorfile>namespaceCppPrint.html</anchorfile>
+      <anchor>955c490305ed54e53a531da6fcb40b2f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>def</type>
+      <name>swig_import_helper</name>
+      <anchorfile>namespaceCppPrint.html</anchorfile>
+      <anchor>ada8aec35306ade3c162f1085e225591</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="namespace">
+    <name>HEPREP</name>
+    <filename>namespaceHEPREP.html</filename>
+  </compound>
+  <compound kind="namespace">
+    <name>pyexample</name>
+    <filename>namespacepyexample.html</filename>
+  </compound>
+  <compound kind="namespace">
+    <name>swig</name>
+    <filename>namespaceswig.html</filename>
+    <class kind="class">swig::SwigPtr_PyObject</class>
+    <class kind="struct">swig::SwigVar_PyObject</class>
+  </compound>
+  <compound kind="class">
+    <name>swig::SwigPtr_PyObject</name>
+    <filename>classswig_1_1SwigPtr__PyObject.html</filename>
+    <member kind="function">
+      <type></type>
+      <name>operator PyObject *</name>
+      <anchorfile>classswig_1_1SwigPtr__PyObject.html</anchorfile>
+      <anchor>4af35a2e77522ee28f1807a4375e0ddf</anchor>
+      <arglist>() const </arglist>
+    </member>
+    <member kind="function">
+      <type>PyObject *</type>
+      <name>operator-&gt;</name>
+      <anchorfile>classswig_1_1SwigPtr__PyObject.html</anchorfile>
+      <anchor>64f126380f15546299cd61d7c05f4d0a</anchor>
+      <arglist>() const </arglist>
+    </member>
+    <member kind="function">
+      <type>SwigPtr_PyObject &amp;</type>
+      <name>operator=</name>
+      <anchorfile>classswig_1_1SwigPtr__PyObject.html</anchorfile>
+      <anchor>0960697badae6db470ad81a28c73389a</anchor>
+      <arglist>(const SwigPtr_PyObject &amp;item)</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>SwigPtr_PyObject</name>
+      <anchorfile>classswig_1_1SwigPtr__PyObject.html</anchorfile>
+      <anchor>aee6ca27ea70ccb4d0721b2fabc69d69</anchor>
+      <arglist>(PyObject *obj, bool initial_ref=true)</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>SwigPtr_PyObject</name>
+      <anchorfile>classswig_1_1SwigPtr__PyObject.html</anchorfile>
+      <anchor>30ab1b4115ccab07bf659236e5b98e1e</anchor>
+      <arglist>(const SwigPtr_PyObject &amp;item)</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>SwigPtr_PyObject</name>
+      <anchorfile>classswig_1_1SwigPtr__PyObject.html</anchorfile>
+      <anchor>92da27cf6133bad1ce29cdbb8e4ad881</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>~SwigPtr_PyObject</name>
+      <anchorfile>classswig_1_1SwigPtr__PyObject.html</anchorfile>
+      <anchor>743e8157d52cb65b433701f3596b04cb</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="variable" protection="protected">
+      <type>PyObject *</type>
+      <name>_obj</name>
+      <anchorfile>classswig_1_1SwigPtr__PyObject.html</anchorfile>
+      <anchor>6172a2526da28605afa6b41d4d8a88be</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>swig::SwigVar_PyObject</name>
+    <filename>structswig_1_1SwigVar__PyObject.html</filename>
+    <base>swig::SwigPtr_PyObject</base>
+    <member kind="function">
+      <type>SwigVar_PyObject &amp;</type>
+      <name>operator=</name>
+      <anchorfile>structswig_1_1SwigVar__PyObject.html</anchorfile>
+      <anchor>e2b3a63adaea7be18e6d563d73096f1a</anchor>
+      <arglist>(PyObject *obj)</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>SwigVar_PyObject</name>
+      <anchorfile>structswig_1_1SwigVar__PyObject.html</anchorfile>
+      <anchor>d72a4e7e7983e938dbfa90accd7a7d9c</anchor>
+      <arglist>(PyObject *obj=0)</arglist>
+    </member>
+  </compound>
+  <compound kind="dir">
+    <name>workers/build/</name>
+    <path>/home/tunnell/mice/maus1/workers/build/</path>
+    <filename>dir_d480c1e0927e661d63df991aa5dbe18f.html</filename>
+    <dir>workers/build/release/</dir>
+  </compound>
+  <compound kind="dir">
+    <name>core/</name>
+    <path>/home/tunnell/mice/maus1/core/</path>
+    <filename>dir_81ddef4a5008719002517a9b39cd6bc6.html</filename>
+    <file>__init__.py</file>
+    <file>FetchRuns.py</file>
+    <file>GenericProcessor.py</file>
+    <file>go.py</file>
+    <file>load.py</file>
+    <file>logon.py</file>
+    <file>MakeCanvas.py</file>
+    <file>Map.py</file>
+    <file>oscalls.py</file>
+    <file>region.py</file>
+    <file>test.py</file>
+    <file>test_fetch_runs.py</file>
+    <file>test_treenode.py</file>
+  </compound>
+  <compound kind="dir">
+    <name>workers/map/CppPrint/</name>
+    <path>/home/tunnell/mice/maus1/workers/map/CppPrint/</path>
+    <filename>dir_8960a0581a958436233b352c4b7405a1.html</filename>
+    <file>CppPrint.cpp</file>
+    <file>CppPrint.h</file>
+    <file>CppPrint.py</file>
+  </compound>
+  <compound kind="dir">
+    <name>doc/</name>
+    <path>/home/tunnell/mice/maus1/doc/</path>
+    <filename>dir_9f4c0162887fc2750c94d91bf070ee14.html</filename>
+    <file>mainpage.hh</file>
+  </compound>
+  <compound kind="dir">
+    <name>workers/map/</name>
+    <path>/home/tunnell/mice/maus1/workers/map/</path>
+    <filename>dir_cff964f590205c1269a49a4c9b75e7da.html</filename>
+    <dir>workers/map/CppPrint/</dir>
+  </compound>
+  <compound kind="dir">
+    <name>workers/build/release/</name>
+    <path>/home/tunnell/mice/maus1/workers/build/release/</path>
+    <filename>dir_eb4f17bae76a24901355ceedca42cee4.html</filename>
+    <file>CppPrint.cpp</file>
+    <file>CppPrint.h</file>
+    <file>CppPrint.py</file>
+    <file>CppPrint_wrap.c</file>
+    <file>CppPrint_wrap.cc</file>
+  </compound>
+  <compound kind="dir">
+    <name>workers/</name>
+    <path>/home/tunnell/mice/maus1/workers/</path>
+    <filename>dir_472ea85e18a045933fc7876bbb723712.html</filename>
+    <dir>workers/build/</dir>
+    <dir>workers/map/</dir>
+  </compound>
+</tagfile>
