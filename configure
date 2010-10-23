@@ -2,49 +2,86 @@
 # Configure script
 # Run once when you unpack source
 
-build_type="release"
+echo "This is the './configure' script.  You should only run this once. The purpose of me is to:"
+echo
+echo "     1. Check that you have Python"
+echo "     2. Check your version of Python is supported"
+echo "     3. Create a file called 'env.sh' that stores your environmental variables"
+echo
+echo
 
-use_g4="yes"
-use_root="yes"
+build_type="release"  # TODO remove, scons artifact
+
+# Find where MAUS is installed
+maus_root_dir=`pwd`
+echo "MAUS ROOT directory (this *should* also be your current directory):"
+echo 
+echo "     ${maus_root_dir}"
+echo
+echo
+
+# Temporarily setup the environment (this gets repeated in the env.sh output)
+#      PATH says where the binaries are
+#      LD_LIBRARY_PATH says where your shared libraries are
+PATH=${maus_root_dir}/third_party/install/bin:$PATH  
+if [ -z "${LD_LIBRARY_PATH}" ]; then  # see if the variable exists yet
+    LD_LIBRARY_PATH=${maus_root_dir}/third_party/install/lib   # if not, initialize it
+else                                                                                                                                                               
+    LD_LIBRARY_PATH=${maus_root_dir}/third_party/install/lib:$LD_LIBRARY_PATH # else add to it
+fi 
+
+# Check for Python
+type -P python &>/dev/null || { echo "FATAL: Python is required.  To install within MAUS, please run:" >&2; echo "FATAL:      ./third_party/bash/00python.bash";exit 1; }
+
+python_version=`LD_LIBRARY_PATH=./third_party/install/lib python --version 2>&1` 
+## Check for supported python version
+if [ "${python_version}" != "Python 2.7" ]
+then
+    echo "WARNING: Unsupported python version (You are using ${python_version})."
+    echo "WARNING: Please us Python 2.7 by running the following command:"
+    echo "WARNING:    MAUS_ROOT_DIR=${maus_root_dir} ./third_party/bash/00python.bash"
+    echo
+fi
+
+type -P scons &>/dev/null || { echo "FATAL: Scons is required.  To install within MAUS, please run:" >&2; echo "FATAL:      MAUS_ROOT_DIR=${maus_root_dir} ./third_party/bash/01scons.bash";echo "FATAL:";echo "FATAL: but it's weird that it's not working.  This ships with MAUS.  Is your MAUS ROOT directory correct?";exit 1; }
 
 ### Check for GEANT4 install
-if [ -z "$G4INSTALL" ]; then
-    echo '$G4INSTALL not set, so Geant4 will not be used'
-    use_g4="no"
-fi
+#if [ -z "$G4INSTALL" ]; then
+#    echo 'WARNING: $G4INSTALL not set, so Geant4 will not be used'
+#    echo
+#    use_g4="no"
+#fi
 
-if [ -z "$ROOTSYS" ]; then
-    echo '$ROOTSYS not set, so ROOT will not be used'
-    use_root="no"
-fi
+### Check for ROOT install
+#if [ -z "$ROOTSYS" ]; then
+#    echo 'WARNING: $ROOTSYS not set, so ROOT will not be used'
+#    echo
+#    use_root="no"
+#fi
 
-type -P python &>/dev/null || { echo "I require python but it's not installed.  Aborting." >&2; exit 1; }
+#type -P python &>/dev/null || { echo "I require python but it's not installed.  Aborting." >&2; exit 1; }
 
 ### Create environment files
-maus_root_dir=`pwd`
 
 cat > env.sh <<EOF
 #!/bin/sh
 
-export USE_ROOT=$use_root
-export USE_G4=$use_g4
-
 if [ -z "\$MAUS_ROOT_DIR" ]; then
-     MAUS_ROOT_DIR=$maus_root_dir
-     PATH=\$MAUS_ROOT_DIR/third_party/install/bin:\$PATH 
+     MAUS_ROOT_DIR=${maus_root_dir}
+     PATH=\${MAUS_ROOT_DIR}/third_party/install/bin:\$PATH 
 
      if [ -z "${LD_LIBRARY_PATH}" ]; then
-          LD_LIBRARY_PATH=\$MAUS_ROOT_DIR/third_party/install/lib
+          LD_LIBRARY_PATH=\${MAUS_ROOT_DIR}/third_party/install/lib
      else
-          LD_LIBRARY_PATH=\$MAUS_ROOT_DIR/third_party/install/lib:\$LD_LIBRARY_PATH   
+          LD_LIBRARY_PATH=\${MAUS_ROOT_DIR}/third_party/install/lib:\${LD_LIBRARY_PATH}
      fi
 
      # config python scripts
-     PYTHONPATH=\$MAUS_ROOT_DIR/config:\$PYTHONPATH 
+     #PYTHONPATH=\${MAUS_ROOT_DIR}/config:\${PYTHONPATH}
 
      # workers
-     PYTHONPATH=\$MAUS_ROOT_DIR/workers/build/${build_type}/:\$PYTHON_PATH
-     LD_LIBRARY_PATH=\$MAUS_ROOT_DIR/workers/build/${build_type}:\$LD_LIBRARY_PATH
+     #PYTHONPATH=\$MAUS_ROOT_DIR/workers/build/${build_type}/:\$PYTHON_PATH
+     #LD_LIBRARY_PATH=\$MAUS_ROOT_DIR/workers/build/${build_type}:\$LD_LIBRARY_PATH
  
      export MAUS_ROOT_DIR PATH LD_LIBRARY_PATH GLG4DATA RAT_CFLAGS
      echo "SUCCESS: MAUS setup"
@@ -54,23 +91,9 @@ fi
 
 EOF
 
-echo "Summary:"
-echo "    Using geant4: $use_g4"
-echo "    Using ROOT: $use_root"
-
-#cat > env.csh <<EOF
-#!/bin/csh
-#setenv MAUS_ROOT_DIR $maus_root_dir
-#setenv PATH "\$MAUS_ROOT_DIR/bin:\$PATH"
-#if ({\$?LD_LIBRARY_PATH}) then
-#  setenv LD_LIBRARY_PATH "\$MAUS_ROOT_DIR/lib:\$LD_LIBRARY_PATH"
-#else
-#  setenv LD_LIBRARY_PATH "\$MAUS_ROOT_DIR/lib"
-#endif
-#if ({\$?PYTHONPATH}) then
-#  setenv PYTHONPATH "\$MAUS_ROOT_DIR/third_party/scons-2.0.1/lib/scons-2.0.1:\$PYTHONPATH"
-#else
-#  setenv PYTHONPATH "\$MAUS_ROOT_DIR/third_party/scons-2.0.1/lib/scons-2.0.1"
-#endif
-#EOF
-
+echo 
+echo "Whenever you want to use MAUS, you must run:"
+echo 
+echo "     source env.sh"
+echo
+echo "which can be added to your ~/.bashrc if you wish to automate it"
