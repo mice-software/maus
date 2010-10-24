@@ -2,43 +2,47 @@
 # Configure script
 # Run once when you unpack source
 
-echo "This is the './configure' script.  You should only run this once. The purpose of me is to:"
-echo
-echo "     1. Check that you have Python"
-echo "     2. Check your version of Python is supported"
-echo "     3. Create a file called 'env.sh' that stores your environmental variables"
-echo
+echo "INFO: This is the './configure' script.  You should only run this once. The purpose of me is to:"
+echo "INFO: "
+echo "INFO:     1. Check that you have Python"
+echo "INFO:     2. Check your version of Python is supported"
+echo "INFO:     3. Create a file called 'env.sh' that stores your environmental variables"
+echo "INFO:"
 echo
 
 build_type="release"  # TODO remove, scons artifact
 
 # Find where MAUS is installed
 maus_root_dir=`pwd`
-echo "MAUS ROOT directory (this *should* also be your current directory):"
-echo 
-echo "     ${maus_root_dir}"
-echo
+echo "INFO: MAUS ROOT directory, which internal to the program is called \$MAUS_ROOT_DIR.  This *should* also be your current directory:"
+echo "INFO:"
+echo "INFO:     ${maus_root_dir}"
+echo "INFO:"
 echo
 
 # Temporarily setup the environment (this gets repeated in the env.sh output)
 #      PATH says where the binaries are
 #      LD_LIBRARY_PATH says where your shared libraries are
-PATH=${maus_root_dir}/third_party/install/bin:$PATH  
+if [ -z "${PATH}" ]; then  # see if the variable exists yet
+    PATH=${maus_root_dir}/third_party/install/bin       # if not, initialize it
+else
+    PATH=${maus_root_dir}/third_party/install/bin:$PATH # else add to it
+fi
 if [ -z "${LD_LIBRARY_PATH}" ]; then  # see if the variable exists yet
-    LD_LIBRARY_PATH=${maus_root_dir}/third_party/install/lib   # if not, initialize it
+    LD_LIBRARY_PATH=${maus_root_dir}/third_party/install/lib                  # if not, initialize it
 else                                                                                                                                                               
-    LD_LIBRARY_PATH=${maus_root_dir}/third_party/install/lib:$LD_LIBRARY_PATH # else add to it
+    LD_LIBRARY_PATH=${maus_root_dir}/third_party/install/lib:$LD_LIBRARY_PATH # else add to to it
 fi 
 
 # Check for Python
-type -P python &>/dev/null || { echo "FATAL: Python is required.  To install within MAUS, please run:" >&2; echo "FATAL:      ./third_party/bash/00python.bash";exit 1; }
+type -P python &>/dev/null || { echo "FATAL: Python is required.  To install within MAUS, please run:" >&2; echo "FATAL:      MAUS_ROOT_DIR=${maus_root_dir} ./third_party/bash/00python.bash";exit 1; }
 
 python_version=`LD_LIBRARY_PATH=./third_party/install/lib python --version 2>&1` 
 ## Check for supported python version
 if [ "${python_version}" != "Python 2.7" ]
 then
     echo "WARNING: Unsupported python version (You are using ${python_version})."
-    echo "WARNING: Please us Python 2.7 by running the following command:"
+    echo "WARNING: Please us Python 2.7 within MAUS by running the following command:"
     echo "WARNING:    MAUS_ROOT_DIR=${maus_root_dir} ./third_party/bash/00python.bash"
     echo
 fi
@@ -59,31 +63,45 @@ type -P scons &>/dev/null || { echo "FATAL: Scons is required.  To install withi
 #    use_root="no"
 #fi
 
-#type -P python &>/dev/null || { echo "I require python but it's not installed.  Aborting." >&2; exit 1; }
 
 ### Create environment files
 
 cat > env.sh <<EOF
-#!/bin/sh
-
+#/bin/sh
 if [ -z "\$MAUS_ROOT_DIR" ]; then
      MAUS_ROOT_DIR=${maus_root_dir}
-     PATH=\${MAUS_ROOT_DIR}/third_party/install/bin:\$PATH 
 
-     if [ -z "${LD_LIBRARY_PATH}" ]; then
-          LD_LIBRARY_PATH=\${MAUS_ROOT_DIR}/third_party/install/lib
+     if [ -z "\${PATH}" ]; then  # see if the variable exists yet
+         PATH=\${MAUS_ROOT_DIR}/third_party/install/bin # initialize it
      else
-          LD_LIBRARY_PATH=\${MAUS_ROOT_DIR}/third_party/install/lib:\${LD_LIBRARY_PATH}
+         PATH=\${MAUS_ROOT_DIR}/third_party/install/bin:\${PATH} # else add it
      fi
 
-     # config python scripts
-     #PYTHONPATH=\${MAUS_ROOT_DIR}/config:\${PYTHONPATH}
+     if [ -z "${LD_LIBRARY_PATH}" ]; then  # see if the variable exists yet 
+          LD_LIBRARY_PATH=\${MAUS_ROOT_DIR}/third_party/install/lib # intiailize it
+     else
+          LD_LIBRARY_PATH=\${MAUS_ROOT_DIR}/third_party/install/lib:\${LD_LIBRARY_PATH} # else add it
+     fi
+
+     if [ -z "${MANPATH}" ]; then
+           MANPATH="\${MAUS_ROOT_DIR}/third_party/install/share/man/man1"
+     else
+          MANPATH="\${MAUS_ROOT_DIR}/third_party/install/share/man/man1":$MANPATH
+     fi
+
+     # ROOT specific garbage
+     LD_LIBRARY_PATH=\${MAUS_ROOT_DIR}/third_party/install/lib/root:\${LD_LIBRARY_PATH}
+     if [ -z "${PYTHONPATH}" ]; then  # see if the variable exists yet
+          PYTHONPATH=\${MAUS_ROOT_DIR}/third_party/install/lib/root # intiailize it
+     else
+          PYTHONPATH=\${MAUS_ROOT_DIR}/third_party/install/lib/root:\${PYTHONPATH} # else add it
+     fi
 
      # workers
      #PYTHONPATH=\$MAUS_ROOT_DIR/workers/build/${build_type}/:\$PYTHON_PATH
      #LD_LIBRARY_PATH=\$MAUS_ROOT_DIR/workers/build/${build_type}:\$LD_LIBRARY_PATH
  
-     export MAUS_ROOT_DIR PATH LD_LIBRARY_PATH GLG4DATA RAT_CFLAGS
+     export MAUS_ROOT_DIR PATH LD_LIBRARY_PATH PYTHONPATH MANPATH
      echo "SUCCESS: MAUS setup"
 else
      echo "ERROR: MAUS already setup"
@@ -91,9 +109,8 @@ fi
 
 EOF
 
-echo 
-echo "Whenever you want to use MAUS, you must run:"
-echo 
-echo "     source env.sh"
-echo
-echo "which can be added to your ~/.bashrc if you wish to automate it"
+echo "SUCCESS: Whenever you want to use MAUS, you must run:"
+echo "SUCCESS:"
+echo "SUCCESS:      source env.sh"
+echo "SUCCESS:"
+echo "SUCCESS: which can be added to your ~/.bashrc if you wish to automate it"

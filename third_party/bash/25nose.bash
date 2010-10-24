@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-directory=scons-2.0.1
+directory=nose-0.11.3
 filename=${directory}.tar.gz
-url=http://prdownloads.sourceforge.net/scons/${filename}
+url=http://python-nose.googlecode.com/files/${filename}
 
 my_prefix=/install
 my_destdir=${MAUS_ROOT_DIR}/third_party
@@ -20,7 +20,6 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 	sleep 1
 	python setup.py build
 	echo "Installing within MAUS's third party directory:"
-	sleep 1
 	python setup.py install --prefix=${my_prefix} --root=${my_destdir}
 	echo "${filename} should be locally build now in your third_party directory, which the rest of MAUS will find."
     else
@@ -59,5 +58,5 @@ echo "1. Set the MAUS_ROOT_DIR from the command line by (if XXX is the directory
 echo "        MAUS_ROOT_DIR=XXX ${0}"
 echo
 echo "2. Run the './configure' script in the MAUS ROOT directory, run 'source env.sh', then rerun this command"
-echo 
+echo
 fi
