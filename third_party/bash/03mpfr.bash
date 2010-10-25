@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-directory=gmp-4.2.4
+directory=mpfr-2.4.1
 filename=${directory}.tar.gz
-url=http://ftp.gnu.org/gnu/gmp/${filename}
+url=http://ftp.gnu.org/gnu/mpfr/${filename}
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
@@ -34,7 +34,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         cd ${MAUS_ROOT_DIR}/third_party/build/${directory}
         echo "INFO: Configuring:"
         sleep 1
-        ./configure --prefix=${MAUS_ROOT_DIR}/third_party/install
+        ./configure --with-gmp=${MAUS_ROOT_DIR}/third_party/install --prefix=${MAUS_ROOT_DIR}/third_party/install
         echo "INFO: Making:"
         sleep 1
         make
