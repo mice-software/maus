@@ -37,7 +37,7 @@ fi
 # Check for Python
 type -P python &>/dev/null || { echo "FATAL: Python is required.  To install within MAUS, please run:" >&2; echo "FATAL:      MAUS_ROOT_DIR=${maus_root_dir} ./third_party/bash/00python.bash";exit 1; }
 
-python_version=`LD_LIBRARY_PATH=./third_party/install/lib python --version 2>&1` 
+python_version=`LD_LIBRARY_PATH=./third_party/install/lib python -V 2>&1` 
 ## Check for supported python version
 if [ "${python_version}" != "Python 2.7" ]
 then
