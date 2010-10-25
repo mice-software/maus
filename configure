@@ -12,8 +12,8 @@ echo "INFO:"
 echo
 
 # Check for g++                                                                                                                                              
-type -P gcc &>/dev/null || { echo "FATAL: gcc/g++ is required to compile code." >&2; exit 1; }
-type -P g++ &>/dev/null || { echo "FATAL: gcc/g++ is required to compile code." >&2; exit 1; }
+type -P gcc &>/dev/null || { echo "FATAL: gcc/g++ is required to compile code." >&2; echo "FATAL: To install within MAUS, please run:" >&2; echo: "FATAL:      MAUS_ROOT_DIR=${maus_root_dir} ./third_party/bash/01mpfr.bash" >&2; echo: "FATAL:      MAUS_ROOT_DIR=${maus_root_dir} ./third_party/bash/02gcc.bash" >&2; echo: "FATAL:      MAUS_ROOT_DIR=${maus_root_dir} ./third_party/bash/03python.bash" >&2; exit 1; }
+type -P g++ &>/dev/null || { echo "FATAL: gcc/g++ is required to compile code." >&2; echo "FATAL: To install within MAUS, please run:" >&2; echo: "FATAL:      MAUS_ROOT_DIR=${maus_root_dir} ./third_party/bash/01mpfr.bash" >&2; echo: "FATAL:      MAUS_ROOT_DIR=${maus_root_dir} ./third_party/bash/02gcc.bash" >&2; echo: "FATAL:      MAUS_ROOT_DIR=${maus_root_dir} ./third_party/bash/03python.bash" >&2; exit 1; }
 
 build_type="release"  # TODO remove, scons artifact
 
@@ -40,7 +40,7 @@ else
 fi 
 
 # Check for Python
-type -P python &>/dev/null || { echo "FATAL: Python is required.  To install within MAUS, please run:" >&2; echo "FATAL:      MAUS_ROOT_DIR=${maus_root_dir} ./third_party/bash/00python.bash";exit 1; }
+type -P python &>/dev/null || { echo "FATAL: Python is required.  To install within MAUS, please run:" >&2; echo "FATAL:      MAUS_ROOT_DIR=${maus_root_dir} ./third_party/bash/03python.bash";exit 1; }
 
 python_version=`LD_LIBRARY_PATH=./third_party/install/lib python -V 2>&1` 
 ## Check for supported python version
