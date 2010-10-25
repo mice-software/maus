@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-directory=gcc-4.5.1
+directory=gcc-4.3.4
 filename=${directory}.tar.gz
-url=ftp://ftp.gnu.org/gnu/gcc/gcc-4.5.1/${filename}
+url=ftp://ftp.gnu.org/gnu/gcc/gcc-4.3.4/${filename}
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
