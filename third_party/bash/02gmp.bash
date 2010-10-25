@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
-directory=Python-2.7
-filename=${directory}.tgz
-url=http://www.python.org/ftp/python/2.7/${filename}
+http://ftp.gnu.org/gnu/gmp/gmp-4.2.4.tar.gz
+directory=gmp-4.2.4
+filename=${directory}.tar.gz
+url=http://ftp.gnu.org/gnu/gmp/${filename}
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
@@ -34,7 +35,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         cd ${MAUS_ROOT_DIR}/third_party/build/${directory}
         echo "INFO: Configuring:"
         sleep 1
-        ./configure --enable-shared --prefix=${MAUS_ROOT_DIR}/third_party/install
+        ./configure --prefix=${MAUS_ROOT_DIR}/third_party/install
         echo "INFO: Making:"
         sleep 1
         make
