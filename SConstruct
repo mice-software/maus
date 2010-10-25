@@ -62,10 +62,8 @@ env.Append(CPPPATH=["%s/third_party/install/include" % os.environ.get('MAUS_ROOT
 env.Append(LIBPATH = ["%s/third_party/install/lib" % os.environ.get('MAUS_ROOT_DIR')])
 env.Append(LIBS = ['json'])
 
-if os.environ.get('USE_G4') == 'yes':
-   env['USE_G4'] = True
-else:
-   env['USE_G4'] = False
+env['USE_G4'] = False
+env['USE_ROOT'] = False
 
 #put all .sconsign files in one place
 env.SConsignFile()
@@ -106,87 +104,84 @@ def CheckCommand(context, cmd):
 
 
 ## autoconf-like stuff
-if 'configure' in COMMAND_LINE_TARGETS:
-   print "Configuring..."
-   conf = Configure(env, custom_tests = {'CheckCommand' : CheckCommand})
+print "Configuring..."
+conf = Configure(env, custom_tests = {'CheckCommand' : CheckCommand})
 
-   # ---- check for compiler and do sanity checks
-   if not conf.CheckCXX():
-       print('!! Your compiler and/or environment is not correctly configured.')
-       Exit(0)
+# ---- check for compiler and do sanity checks
+if not conf.CheckCXX():
+  print('!! Your compiler and/or environment is not correctly configured.')
+  Exit(0)
 
-   if not conf.CheckLib( "stdc++" , language='C++'):
-       print( "can't find stdc++ library which is needed" );
-       Exit(1)
+if not conf.CheckLib( "stdc++" , language='C++'):
+  print( "can't find stdc++ library which is needed" );
+  Exit(1)
 
-   if not conf.CheckFunc('printf'):
-       print('!! Your compiler and/or environment is not correctly configured.')
-       Exit(0)
+if not conf.CheckFunc('printf'):
+  print('!! Your compiler and/or environment is not correctly configured.')
+  Exit(0)
 
-   # check for math.h
-   if not conf.CheckHeader('math.h'):
-       print "You need 'math.h' to compile this program"
-       Exit(1)
+# check for math.h
+if not conf.CheckHeader('math.h'):
+  print "You need 'math.h' to compile this program"
+  Exit(1)
 
-   # check for stdlib.h
-   if not conf.CheckCHeader('stdlib.h'):
-       print "You need 'stdlib.h' to compile this program"
-       Exit(1)
+# check for stdlib.h
+if not conf.CheckCHeader('stdlib.h'):
+  print "You need 'stdlib.h' to compile this program"
+  Exit(1)
 
-   if not conf.CheckCXXHeader('iostream', '<>'):
-      print "You need 'iostream' to compile this program"
-      Exit(1)
+if not conf.CheckCXXHeader('iostream', '<>'):
+  print "You need 'iostream' to compile this program"
+  Exit(1)
 
-   if not conf.CheckCommand('python'):
-       print "Cound't find python"
-       Exit(1)
+if not conf.CheckCommand('python'):
+  print "Cound't find python"
+  Exit(1)
 
-   if not conf.CheckCXXHeader('Python.h'):
-      print "You need 'Python.h' to compile this program"
-      Exit(1)
+if not conf.CheckCXXHeader('Python.h'):
+  print "You need 'Python.h' to compile this program"
+  Exit(1)
 
-   if not conf.CheckCXXHeader('json/json.h'):
-      print "You need 'json/json.h' to compile this program"
-      Exit(1)
+if not conf.CheckCXXHeader('json/json.h'):
+  print "You need 'json/json.h' to compile this program"
+  Exit(1)
 
-   if not conf.CheckCommand('root'):
-       print "Cound't find root"
-       env['USE_ROOT'] = False
-   else:
-       print
-       print "!! Found the program 'root', so assume you want to use it with MAUS."
-       print
-       env['USE_ROOT'] = True
+if not conf.CheckCommand('root'):
+  print "Cound't find root"
+else:
+  print
+  print "!! Found the program 'root', so assume you want to use it with MAUS."
+  print
+  env['USE_ROOT'] = True
 
-   if env['USE_ROOT']:
-       if not conf.CheckCommand('root-config'):
-           print "Cound't find root-config"
-           Exit(1)
-       else:
-           env.ParseConfig("root-config --cflags --ldflags --libs") 
+  if not conf.CheckCommand('root-config'):
+    print "Cound't find root-config"
+    Exit(1)
+  else:
+    env.ParseConfig("root-config --cflags --ldflags --libs") 
 
-       root_libs = ['Minuit', 'Core', 'Cint', 'RIO', 'Net', 'Hist', 'Graf', 'Graf3d', 'Gpad', 'Tree', 'Rint', 'Postscript', 'Matrix', 'Physics', 'MathCore', 'Thread', 'pthread', 'm', 'dl']  # the important libraries I've found by looking at root-config output
+  root_libs = ['Minuit', 'Core', 'Cint', 'RIO', 'Net', 'Hist', 'Graf', 'Graf3d', 'Gpad', 'Tree', 'Rint', 'Postscript', 'Matrix', 'Physics', 'MathCore', 'Thread', 'pthread', 'm', 'dl']  # the important libraries I've found by looking at root-config output
        
-       for lib in root_libs:
-           if not conf.CheckLib(lib, language='c++'):
-               print "You need %s to compile this program" % lib
-               Exit(1)
+  for lib in root_libs:
+    if not conf.CheckLib(lib, language='c++'):
+      print "You need %s to compile this program" % lib
+      Exit(1)
 
-       if not conf.CheckCXXHeader('TH1F.h'):
-           print "You need 'TH1F.h' to compile this program"
-           Exit(1)
+  if not conf.CheckCXXHeader('TH1F.h'):
+    print "You need 'TH1F.h' to compile this program"
+    Exit(1)
 
-       if not conf.CheckCXXHeader('TMinuit.h'):
-           print "You need 'TH1F.h' to compile this program"
-           Exit(1)
+  if not conf.CheckCXXHeader('TMinuit.h'):
+    print "You need 'TH1F.h' to compile this program"
+    Exit(1)
 
-       print WhereIs("root")
+  #print WhereiS('root')
 
 
 
      # check types size!!!
 
-   env = conf.Finish()
+env = conf.Finish()
 
 
 # NOTE: do this after configure!  So we know if we have ROOT/geant4
