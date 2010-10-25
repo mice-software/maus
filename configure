@@ -4,11 +4,16 @@
 
 echo "INFO: This is the './configure' script.  You should only run this once. The purpose of me is to:"
 echo "INFO: "
-echo "INFO:     1. Check that you have Python"
-echo "INFO:     2. Check your version of Python is supported"
-echo "INFO:     3. Create a file called 'env.sh' that stores your environmental variables"
+echo "INFO:     1. Check that you have a compiler"
+echo "INFO:     2. Check that you have Python"
+echo "INFO:     3. Check your version of Python is supported"
+echo "INFO:     4. Create a file called 'env.sh' that stores your environmental variables"
 echo "INFO:"
 echo
+
+# Check for g++                                                                                                                                              
+type -P gcc &>/dev/null || { echo "FATAL: gcc/g++ is required to compile code." >2; exit 1 }
+type -P g++ &>/dev/null || { echo "FATAL: gcc/g++ is required to compile code." >2; exit 1 }
 
 build_type="release"  # TODO remove, scons artifact
 
