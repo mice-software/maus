@@ -12,8 +12,8 @@ echo "INFO:"
 echo
 
 # Check for g++                                                                                                                                              
-type -P gcc &>/dev/null || { echo "FATAL: gcc/g++ is required to compile code." >2; exit 1 }
-type -P g++ &>/dev/null || { echo "FATAL: gcc/g++ is required to compile code." >2; exit 1 }
+type -P gcc &>/dev/null || { echo "FATAL: gcc/g++ is required to compile code." >&2; exit 1; }
+type -P g++ &>/dev/null || { echo "FATAL: gcc/g++ is required to compile code." >&2; exit 1; }
 
 build_type="release"  # TODO remove, scons artifact
 
