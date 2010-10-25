@@ -9,53 +9,64 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
     if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ]
     then
-	echo "Found source archive in 'source' directory"
+	echo "INFO: Found source archive in 'source' directory"
     else
-	echo "Source archive doesn't exist.  Downloading..."
+	echo "INFO: Source archive doesn't exist.  Downloading..."
 
 	wget --directory-prefix=${MAUS_ROOT_DIR}/third_party/source ${url}
 
-	echo "These next two strings should agree (otherwise the file didn't download properly):"
-	md5sum ${MAUS_ROOT_DIR}/third_party/source/${filename}
-	cat ${MAUS_ROOT_DIR}/third_party/md5/${filename}.md5 
-	
-	echo
-	echo "but if they don't agree, then please run:"
-	echo
-	echo "rm ${MAUS_ROOT_DIR}/third_party/source/${filename}"
-	echo 
-	echo "then download the file manually and put it in the 'source' directory"
     fi
 	
     if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ]
     then
-	echo "Source archive exists.  Unpacking:"
+	echo "INFO: Source archive exists."
+        echo
+        echo "INFO: Checking MD5 checksum (otherwise the file didn't"
+        echo "INFO: download properly):"
+        echo
+        cd ${MAUS_ROOT_DIR}/third_party/source
+        md5sum -c ${filename}.md5 || { echo "FATAL: Failed to download:" >&2; echo "FATAL: ${filename}." >&2; echo "FATAL: MD5 checksum failed.">&2; echo "FATAL: Try rerunning this command to redownload, or check" >&2; echo "FATAL: internet connection"  >&2; rm -f ${filename}; exit 1; }
+        sleep 1
+        echo
+        echo "INFO: Unpacking:"
+        echo
         rm -Rf ${MAUS_ROOT_DIR}/third_party/build/${directory}
         sleep 1
         tar xvfz ${MAUS_ROOT_DIR}/third_party/source/${filename} -C ${MAUS_ROOT_DIR}/third_party/build
         cd ${MAUS_ROOT_DIR}/third_party/build/${directory}
-        echo "Configuring:"
+        echo "INFO: Configuring:"
         sleep 1
         CFLAGS="-g -O2 -fPIC" ./configure --with-pic --prefix=/install
-        echo "Making:"
+        echo "INFO: Making:"
         sleep 1
-        make -j5
+        make
 	make install DESTDIR=${MAUS_ROOT_DIR}/third_party
-        echo "${filename} should be locally build now in your third_party directory, which the rest of MAUS will find."
+	echo
+        echo "INFO: The package should be locally build now in your"
+        echo "INFO: third_party directory, which the rest of MAUS will"
+        echo "INFO: find."
     else
-	echo "Source archive still doesn't exist.  Please file a bug report with your operating system, distribution, and any other useful information at:"
-	echo
-	echo "http://micewww.pp.rl.ac.uk:8080/projects/maus/issues/"
-	echo
-	echo "Giving up, sorry..."
+        echo "FATAL: Source archive still doesn't exist.  Please file a bug report with your operating system,">&2
+        echo "FATAL: distribution, and any other useful information at:" >&2
+        echo "FATAL: " >&2
+        echo "FATAL: http://micewww.pp.rl.ac.uk:8080/projects/maus/issues/" >&2
+        echo "FATAL:" >&2
+        echo "FATAL: Giving up, sorry..." >&2
     fi
 
 else
-echo "MAUS_ROOT_DIR is not set, which is required to know where to install this package.  You have two options:"
 echo
-echo "1. Set the MAUS_ROOT_DIR from the command line by (if XXX is the directory where MAUS is installed):"
-echo "        MAUS_ROOT_DIR=XXX ${0}"
-echo
-echo "2. Run the './configure' script in the MAUS ROOT directory, run 'source env.sh', then rerun this command"
+echo "FATAL: MAUS_ROOT_DIR is not set, which is required to" >&2
+echo "FATAL: know where to install this package.  You have two" >&2
+echo "FATAL: options:" >&2
+echo "FATAL:" >&2
+echo "FATAL: 1. Set the MAUS_ROOT_DIR from the command line by" >&2
+echo "FATAL: (if XXX is the directory where MAUS is installed):" >&2
+echo "FATAL:" >&2
+echo "FATAL:        MAUS_ROOT_DIR=XXX ${0}" >&2
+echo "FATAL:" >&2
+echo "FATAL: 2. Run the './configure' script in the MAUS ROOT" >&2
+echo "FATAL: directory, run 'source env.sh' then rerun this" >&2
+echo "FATAL: command ">&2
 echo
 fi
