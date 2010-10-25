@@ -39,17 +39,27 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         tar xvfz ${MAUS_ROOT_DIR}/third_party/source/${filename} -C ${MAUS_ROOT_DIR}/third_party/build
 	mv ${MAUS_ROOT_DIR}/third_party/build/${version}/CLHEP ${MAUS_ROOT_DIR}/third_party/build/${directory}
         cd ${MAUS_ROOT_DIR}/third_party/build/${directory}
+	
 	echo
-        echo "INFO: Configuring:"
+	echo "INFO: Unpacking data"
+	echo
+	tar xvfz ${MAUS_ROOT_DIR}/third_party/source/geant_data.tar.gz
+
+	echo
+        echo "INFO: Unpacking config"
+        echo
+        tar xvfz ${MAUS_ROOT_DIR}/third_party/source/geant_config.tar.gz
+
+	echo
+        echo "INFO: Building:"
 	echo
         sleep 1
-        ./configure --prefix=${MAUS_ROOT_DIR}/third_party/install
+	./Configure -f .config/bin/Linux-g++/config.sh -build
 	echo
-        echo "INFO: Making:"
+        echo "INFO: Installing:"
 	echo
         sleep 1
-        make
-	make install
+	./Configure -install
 	            ################################################## 
 	echo
         echo "INFO: The package should be locally build now in your"
