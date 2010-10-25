@@ -35,6 +35,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         sleep 1
         tar xvfz ${MAUS_ROOT_DIR}/third_party/source/${filename} -C ${MAUS_ROOT_DIR}/third_party/build
 	mv ${MAUS_ROOT_DIR}/third_party/build/${version}/CLHEP ${MAUS_ROOT_DIR}/third_party/build/${directory}
+	rmdir ${MAUS_ROOT_DIR}/third_party/build/${version}
         cd ${MAUS_ROOT_DIR}/third_party/build/${directory}
 	echo
         echo "INFO: Configuring:"
