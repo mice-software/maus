@@ -13,6 +13,8 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     else  
 	echo "INFO: Source archive doesn't exist.  Downloading..."
 
+	rm -f ${MAUS_ROOT_DIR}/third_party/source/geant_config.tar.gz 
+	rm -f ${MAUS_ROOT_DIR}/third_party/source/geant_data.tar.gz 
 	wget --directory-prefix=${MAUS_ROOT_DIR}/third_party/source ${url}
 	wget --directory-prefix=${MAUS_ROOT_DIR}/third_party/source http://www-pnp.physics.ox.ac.uk/~tunnell/geant_config.tar.gz # TODO fixme
 	wget --directory-prefix=${MAUS_ROOT_DIR}/third_party/source http://www-pnp.physics.ox.ac.uk/~tunnell/geant_data.tar.gz  # TODO fixme
@@ -27,6 +29,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 	echo "INFO: download properly):"
 	echo
         cd ${MAUS_ROOT_DIR}/third_party/source
+	ls ${filename}.md5
 	md5sum -c ${filename}.md5 || { echo "FATAL: Failed to download:" >&2; echo "FATAL: ${filename}." >&2; echo "FATAL: MD5 checksum failed.">&2; echo "FATAL: Try rerunning this command to redownload, or check" >&2; echo "FATAL: internet connection"  >&2; rm -f ${filename}; exit 1; }
 	md5sum -c geant_data.tar.gz.md5 || { echo "FATAL: Failed to download:" >&2; echo "FATAL: geant_data.tar.gz." >&2; echo "FATAL: MD5 checksum failed.">&2; echo "FATAL: Try rerunning this command to redownload, or check" >&2; echo "FATAL: internet connection"  >&2; rm -f ${filename}; exit 1; }  # TODO fixme
 	md5sum -c geant_config.tar.gz.md5 || { echo "FATAL: Failed to download:" >&2; echo "FATAL: geant_config.tar.gz." >&2; echo "FATAL: MD5 checksum failed.">&2; echo "FATAL: Try rerunning this command to redownload, or check" >&2; echo "FATAL: internet connection"  >&2; rm -f ${filename}; exit 1; } # todo fixme
@@ -49,12 +52,14 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         echo "INFO: Unpacking config"
         echo
         tar xvfz ${MAUS_ROOT_DIR}/third_party/source/geant_config.tar.gz
-
+	maus_geant4_setup.py ${MAUS_ROOT_DIR}/third_party/build/geant4.9.2.p01/.config/bin/Linux-g++ ${MAUS_ROOT_DIR}/third_party/build/geant4.9.2.p01 ${MAUS_ROOT_DIR}/third_party/install
+	
 	echo
         echo "INFO: Building:"
 	echo
         sleep 1
 	./Configure -f .config/bin/Linux-g++/config.sh -build
+	exit 1
 	echo
         echo "INFO: Installing:"
 	echo
