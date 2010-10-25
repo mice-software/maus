@@ -34,7 +34,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         cd ${MAUS_ROOT_DIR}/third_party/build/${directory}
         echo "INFO: Configuring:"
         sleep 1
-        ./configure --enable-shared --with-readline --prefix=/install
+        ./configure --enable-shared --prefix=/install
         echo "INFO: Making:"
         sleep 1
         make
