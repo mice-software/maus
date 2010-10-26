@@ -52,9 +52,6 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         echo "FATAL:" >&2
         echo "FATAL: Giving up, sorry..." >&2
     fi
-    
-fi
-
 else
 echo
 echo "FATAL: MAUS_ROOT_DIR is not set, which is required to" >&2
