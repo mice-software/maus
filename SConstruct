@@ -14,27 +14,41 @@ class Dev:
       SConscript(env.jDev.SPath(project), exports=['project'])
 
   #sets up the build for a given project
-  def Buildit(self, localenv, project):
-     name = project.split('/')[-1]
-     builddir =  '../../build/' + env.jDev.mymode
-     targetpath = '../../build/' + env.jDev.mymode + '/_' + name
+  def Buildit(self, localenv, project, use_root, use_g4):
+    if use_root and not env['USE_ROOT']:
+      print "The worker", project, "requires ROOT which is disabled. Skipping..."
+      return
+    if use_g4 and not env['USE_G4']:
+      print "The worker", project, "requires Geant4 which is disabled. Skipping..."
+      return
+    
 
-     #append the user's additional compile flags
-     #assume debugcflags and releasecflags are defined
-     if self.mymode == 'debug':
-         localenv.Append(CCFLAGS=self.debugcflags)
-     else:
-         localenv.Append(CCFLAGS=self.releasecflags)
+    name = project.split('/')[-1]
+    builddir =  '../../build/' + env.jDev.mymode
+    targetpath = '../../build/' + env.jDev.mymode + '/_' + name
 
-     #specify the build directory
-     localenv.VariantDir(variant_dir=builddir, src_dir='.', duplicate=1)
+    #append the user's additional compile flags
+    #assume debugcflags and releasecflags are defined
+    if self.mymode == 'debug':
+      localenv.Append(CCFLAGS=self.debugcflags)
+    else:
+      localenv.Append(CCFLAGS=self.releasecflags)
+      
+    if use_root:
+      localenv.ParseConfig("root-config --cflags --ldflags --libs")  # UNCOMMENT for ROOT
 
-     srclst = map(lambda x: builddir + '/' + x, glob.glob('*.cpp'))
-     print srclst
-     srclst += map(lambda x: builddir + '/' + x, glob.glob('*.i'))
-     print srclst
-     pgm = localenv.SharedLibrary(targetpath, source=srclst)
-     env.Alias('all', pgm)  #note: not localenv
+    if use_g4:
+      print "error: g4 unknown at present" # fixme
+
+    #specify the build directory
+    localenv.VariantDir(variant_dir=builddir, src_dir='.', duplicate=1)
+
+    srclst = map(lambda x: builddir + '/' + x, glob.glob('*.cpp'))
+    print srclst
+    srclst += map(lambda x: builddir + '/' + x, glob.glob('*.i'))
+    print srclst
+    pgm = localenv.SharedLibrary(targetpath, source=srclst)
+    env.Alias('all', pgm)  #note: not localenv
 
   #---- PRIVATE ----
 
@@ -48,7 +62,7 @@ class Dev:
 # have a 'lib' prefix, which is needed for python to find SWIG generated libraries
 env = Environment(SHLIBPREFIX="") 
 
-#env.Tool('swig', '%s/third_party/swig-2.0.1' % os.environ.get('MAUS_ROOT_DIR'))
+env.Tool('swig', '%s/third_party/swig-2.0.1' % os.environ.get('MAUS_ROOT_DIR'))
 env.Append(SWIGFLAGS=['-python', '-c++']) # tell SWIG to make python bindings for C++
 
 #env.Append(PATH="%s/third_party/install/bin" % os.environ.get('MAUS_ROOT_DIR'))
@@ -102,7 +116,6 @@ def CheckCommand(context, cmd):
        context.Result(result is not None)
        return result
 
-
 ## autoconf-like stuff
 print "Configuring..."
 conf = Configure(env, custom_tests = {'CheckCommand' : CheckCommand})
@@ -146,6 +159,13 @@ if not conf.CheckCommand('python'):
 
 if not conf.CheckCXXHeader('Python.h'):
   print "You need 'Python.h' to compile this program"
+  print "If you want to install python locally, run:"
+  print ("MAUS_ROOT_DIR=%s ./third_party/bash/03python.bash" % os.environ.get('MAUS_ROOT_DIR'))
+  Exit(1)
+
+if not conf.CheckCommand('swig'):
+  print "Cound't find swig.  If you want it, then run:"
+  print ("MAUS_ROOT_DIR=%s ./third_party/bash/10swig.bash" % os.environ.get('MAUS_ROOT_DIR'))
   Exit(1)
 
 if not conf.CheckCommand('root'):
@@ -179,7 +199,7 @@ else:
     print "You need 'TH1F.h' to compile this program"
     Exit(1)
 
-  #print WhereiS('root')
+
 
 
 

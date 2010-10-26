@@ -35,11 +35,11 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         cd ${MAUS_ROOT_DIR}/third_party/build/${directory}
         echo "INFO: Configuring:"
         sleep 1
-        ./configure --prefix=/install
+        ./configure --prefix=${MAUS_ROOT_DIR}/third_party/install
         echo "INFO: Making:"
         sleep 1
         make
-        make install DESTDIR=${MAUS_ROOT_DIR}/third_party
+        make install
 	echo
         echo "INFO: The package should be locally build now in your"
         echo "INFO: third_party directory, which the rest of MAUS will"
