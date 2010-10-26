@@ -211,4 +211,4 @@ env = conf.Finish()
 # NOTE: do this after configure!  So we know if we have ROOT/geant4
 # TODO: this should be a loop that discovers stuff
 #specify all of the sub-projects in the section
-env.jDev.Subproject('workers/map/CppPrint')
+env.jDev.Subproject('workers/map/MapCppPrint')

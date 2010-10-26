@@ -1,4 +1,4 @@
-/** @class CppPrint
+/** @class MapCppPrint
  *  Print events to some stream
  *
  *  @author Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
@@ -10,22 +10,22 @@
  */
 #include <iostream>
 #include <string>
-#include "CppPrint.h"
+#include "MapCppPrint.h"
 
-CppPrint::CppPrint()
+MapCppPrint::MapCppPrint()
   { 
   }
 
   /** Destroy count processor. */
-//CppPrint::~CppPrint() 
+//MapCppPrint::~MapCppPrint() 
 //  { } 
   
-/*int CppPrint::ProcessEvent(TMap run, TMap spill, TMap event) 
+/*int MapCppPrint::ProcessEvent(TMap run, TMap spill, TMap event) 
   { 
     return x+y;
     }*/
 
-char* CppPrint::Process(char* document){
+char* MapCppPrint::Process(char* document){
   Json::Value root;   // will contains the root value after parsing.
   Json::Reader reader;
   std::string somestring(document);

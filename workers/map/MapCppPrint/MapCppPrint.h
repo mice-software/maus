@@ -1,4 +1,4 @@
-/** @class CppPrint
+/** @class MapCppPrint
  *  Print events to some stream
  *
  *  @author Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
@@ -15,7 +15,7 @@
 /**
  * This class is the simulation class
  */
-class CppPrint
+class MapCppPrint
 {
 public: 
   /** Create new count processor.
@@ -23,7 +23,7 @@ public:
    *  Default update interval is to print a status line for every
    *  physics event.
    */
-  CppPrint();
+  MapCppPrint();
 
   //  int ProcessEvent(TMap run, TMap spill, TMap event);
   
