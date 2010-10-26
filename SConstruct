@@ -149,7 +149,9 @@ if not conf.CheckCXXHeader('Python.h'):
   Exit(1)
 
 if not conf.CheckCommand('root'):
-  print "Cound't find root"
+  print "Cound't find root.  If you want it, then run:"
+  print ("MAUS_ROOT_DIR=%s ./third_party/bash/20gsl.bash" % os.environ.get('MAUS_ROOT_DIR'))
+  print ("MAUS_ROOT_DIR=%s ./third_party/bash/21root.bash" % os.environ.get('MAUS_ROOT_DIR'))
 else:
   print
   print "!! Found the program 'root', so assume you want to use it with MAUS."
