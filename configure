@@ -103,7 +103,7 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      fi
 
      # workers
-     PYTHONPATH=\$MAUS_ROOT_DIR/workers/build/${build_type}/:\$PYTHON_PATH
+     PYTHONPATH=\$MAUS_ROOT_DIR/workers/build/${build_type}/:\$PYTHONPATH
      LD_LIBRARY_PATH=\$MAUS_ROOT_DIR/workers/build/${build_type}:\$LD_LIBRARY_PATH
  
      export MAUS_ROOT_DIR PATH LD_LIBRARY_PATH PYTHONPATH MANPATH
