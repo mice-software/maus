@@ -112,6 +112,12 @@ if not conf.CheckCXX():
   print('!! Your compiler and/or environment is not correctly configured.')
   Exit(0)
 
+if not conf.CheckLib( "json" , language='C++') or not conf.CheckCXXHeader('json/json.h'):
+  print( "can't find jsoncpp which is needed" );
+  print ( "You may install it by running:");
+  print ("MAUS_ROOT_DIR=%s ./third_party/bash/11jsoncpp.bash" % os.environ.get('MAUS_ROOT_DIR'))
+  Exit(1)
+
 if not conf.CheckLib( "stdc++" , language='C++'):
   print( "can't find stdc++ library which is needed" );
   Exit(1)
@@ -140,10 +146,6 @@ if not conf.CheckCommand('python'):
 
 if not conf.CheckCXXHeader('Python.h'):
   print "You need 'Python.h' to compile this program"
-  Exit(1)
-
-if not conf.CheckCXXHeader('json/json.h'):
-  print "You need 'json/json.h' to compile this program"
   Exit(1)
 
 if not conf.CheckCommand('root'):
