@@ -128,7 +128,7 @@ if not conf.CheckCXX():
 if not conf.CheckLib( "json" , language='C++') or not conf.CheckCXXHeader('json/json.h'):
   print( "can't find jsoncpp which is needed" );
   print ( "You may install it by running:");
-  print ("MAUS_ROOT_DIR=%s ./third_party/bash/11jsoncpp.bash" % os.environ.get('MAUS_ROOT_DIR'))
+  print ("     MAUS_ROOT_DIR=%s ./third_party/bash/11jsoncpp.bash" % os.environ.get('MAUS_ROOT_DIR'))
   Exit(1)
 
 if not conf.CheckLib( "stdc++" , language='C++'):
@@ -160,18 +160,18 @@ if not conf.CheckCommand('python'):
 if not conf.CheckCXXHeader('Python.h'):
   print "You need 'Python.h' to compile this program"
   print "If you want to install python locally, run:"
-  print ("MAUS_ROOT_DIR=%s ./third_party/bash/03python.bash" % os.environ.get('MAUS_ROOT_DIR'))
+  print ("     MAUS_ROOT_DIR=%s ./third_party/bash/03python.bash" % os.environ.get('MAUS_ROOT_DIR'))
   Exit(1)
 
 if not conf.CheckCommand('swig'):
   print "Cound't find swig.  If you want it, then run:"
-  print ("MAUS_ROOT_DIR=%s ./third_party/bash/10swig.bash" % os.environ.get('MAUS_ROOT_DIR'))
+  print ("     MAUS_ROOT_DIR=%s ./third_party/bash/10swig.bash" % os.environ.get('MAUS_ROOT_DIR'))
   Exit(1)
 
 if not conf.CheckCommand('root'):
   print "Cound't find root.  If you want it, then run:"
-  print ("MAUS_ROOT_DIR=%s ./third_party/bash/20gsl.bash" % os.environ.get('MAUS_ROOT_DIR'))
-  print ("MAUS_ROOT_DIR=%s ./third_party/bash/21root.bash" % os.environ.get('MAUS_ROOT_DIR'))
+  print ("      MAUS_ROOT_DIR=%s ./third_party/bash/20gsl.bash" % os.environ.get('MAUS_ROOT_DIR'))
+  print ("      MAUS_ROOT_DIR=%s ./third_party/bash/21root.bash" % os.environ.get('MAUS_ROOT_DIR'))
 else:
   print
   print "!! Found the program 'root', so assume you want to use it with MAUS."
