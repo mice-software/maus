@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
-    find bash | grep -v \# | grep bash |grep -v REDUNDANT |sort| xargs -i bash {}
+    find bash -type f -executable |grep -v REDUNDANT |sort| xargs -i bash {}
 else
 echo
 echo "FATAL: MAUS_ROOT_DIR is not set, which is required to" >&2
