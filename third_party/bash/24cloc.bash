@@ -27,5 +27,5 @@ echo "FATAL:" >&2
 echo "FATAL: 2. Run the './configure' script in the MAUS ROOT" >&2
 echo "FATAL: directory, run 'source env.sh' then rerun this" >&2
 echo "FATAL: command ">&2
-echo
+exit 1
 fi
