@@ -35,7 +35,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         cd ${MAUS_ROOT_DIR}/third_party/build/${directory}
         echo "INFO: Configuring:"
         sleep 1
-        ./configure --prefix=${MAUS_ROOT_DIR}/third_party/install
+        ./configure --without-pcre --prefix=${MAUS_ROOT_DIR}/third_party/install  # without pcre disables regex, but is needed for older SL versions
         echo "INFO: Making:"
         sleep 1
         make
