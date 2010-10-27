@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
-    find bash/0* -type f -executable |grep -v REDUNDANT |sort| xargs -i bash {}
-    find bash/1* -type f -executable |grep -v REDUNDANT |sort| xargs -i bash {}
+    find ${MAUS_ROOT_DIR}/bash/0* -type f -executable |grep -v REDUNDANT |sort| xargs -i bash {}
+    find ${MAUS_ROOT_DIR}/bash/1* -type f -executable |grep -v REDUNDANT |sort| xargs -i bash {}
 else
 echo
 echo "FATAL: MAUS_ROOT_DIR is not set, which is required to" >&2
@@ -16,6 +16,6 @@ echo "FATAL:" >&2
 echo "FATAL: 2. Run the './configure' script in the MAUS ROOT" >&2
 echo "FATAL: directory, run 'source env.sh' then rerun this" >&2
 echo "FATAL: command ">&2
-echo
+exit 1
 fi
 
