@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
-    find ${MAUS_ROOT_DIR}/third_party/bash -type f -executable |grep -v REDUNDANT |sort| xargs -i bash {}
+    find ${MAUS_ROOT_DIR}/third_party/bash -type f |grep -v REDUNDANT | sort| xargs -i bash {}
 else
 echo
 echo "FATAL: MAUS_ROOT_DIR is not set, which is required to" >&2
