@@ -24,8 +24,8 @@ class Dev:
     
 
     name = project.split('/')[-1]
-    builddir =  '../../build/' + env.jDev.mymode
-    targetpath = '../../build/' + env.jDev.mymode + '/_' + name
+    builddir =   '../../../build/' + env.jDev.mymode
+    targetpath = '../../../build/' + env.jDev.mymode + '/_' + name
 
     #append the user's additional compile flags
     #assume debugcflags and releasecflags are defined
@@ -211,4 +211,4 @@ env = conf.Finish()
 # NOTE: do this after configure!  So we know if we have ROOT/geant4
 # TODO: this should be a loop that discovers stuff
 #specify all of the sub-projects in the section
-env.jDev.Subproject('workers/map/MapCppPrint')
+env.jDev.Subproject('components/map/MapCppPrint')
