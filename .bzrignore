@@ -2,3 +2,10 @@
 *~
 *.tmp
 *.py[co]
+env.sh
+config.log
+doc/maus.tag
+doc/man
+doc/html
+.sconf_temp
+.sconsign.dblite
