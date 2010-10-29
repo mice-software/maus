@@ -38,26 +38,26 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 	echo
 	echo "INFO: If applicable, performing libXpm symbolic link since"
 	echo "INFO: old versions of Scientific Linux and ROOT don't work"
-	echo "INFO: together.  Aren't you glad we have Scientific Linux?"
+	echo "INFO: together.  Aren't you glad we have Scientific Linux?"    
 	echo
 
+	extra=""
 	if [ -e "/usr/lib/libXpm.so.4" ]
 	then
 	    ln -s /usr/lib/libXpm.so.4 ${MAUS_ROOT_DIR}/third_party/install/lib/libXpm.so # known ROOT/SL4 bug since 2003 (!!)
-	    echo
-            echo "INFO: Configuring:"
-            echo
-            sleep 1
-	    
-            ./configure --enable-roofit --disable-fftw3 --disable-xrootd --disable-krb5 --build=debug --with-gsl-incdir=${MAUS_ROOT_DIR}/third_party/install/include --with-gsl-libdir=${MAUS_ROOT_DIR}/third_party/install/lib --prefix=${MAUS_ROOT_DIR}/third_party/install --use-xpm-libdir=${MAUS_ROOT_DIR}/third_party/install/lib
-	else
-	    echo
-            echo "INFO: Configuring:"
-	    echo
-	    sleep 1
-
-            ./configure --enable-roofit --disable-fftw3 --disable-xrootd --disable-krb5 --build=debug --with-gsl-incdir=${MAUS_ROOT_DIR}/third_party/install/include --with-gsl-libdir=${MAUS_ROOT_DIR}/third_party/install/lib --prefix=${MAUS_ROOT_DIR}/third_party/install
+	    extra="--use-xpm-libdir=${MAUS_ROOT_DIR}/third_party/install/lib"
+	elif [ -e "/usr/lib/libXpm.so.4" ]
+	then
+	    ln -s /usr/lib64/libXpm.so.4 ${MAUS_ROOT_DIR}/third_party/install/lib/libXpm.so # known ROOT/SL4 bug since 2003 (!!)
+            extra="--use-xpm-libdir=${MAUS_ROOT_DIR}/third_party/install/lib"
 	fi
+		
+	echo
+        echo "INFO: Configuring:"
+	echo
+	sleep 1
+
+	./configure --enable-roofit --disable-fftw3 --disable-xrootd --disable-krb5 --build=debug --with-gsl-incdir=${MAUS_ROOT_DIR}/third_party/install/include --with-gsl-libdir=${MAUS_ROOT_DIR}/third_party/install/lib --prefix=${MAUS_ROOT_DIR}/third_party/install ${extra}
 
 
 	echo
