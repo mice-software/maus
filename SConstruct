@@ -68,12 +68,19 @@ env.Append(SWIGFLAGS=['-python', '-c++']) # tell SWIG to make python bindings fo
 #env.Append(PATH="%s/third_party/install/bin" % os.environ.get('MAUS_ROOT_DIR'))
 env['ENV']['PATH'] =  os.environ.get('PATH')  # useful to set for root-config
 
-# this should find swig and json
-env.Append(CPPPATH=["%s/third_party/install/include" % os.environ.get('MAUS_ROOT_DIR'), \
-                    "%s/third_party/install/include/python2.7" % os.environ.get('MAUS_ROOT_DIR')])
-
 # to find JSON
-env.Append(LIBPATH = ["%s/third_party/install/lib" % os.environ.get('MAUS_ROOT_DIR'), "%s/third_party/build/geant4.9.2.p01/lib/Linux-g++" % os.environ.get('MAUS_ROOT_DIR'), ])
+if os.environ.get('G4INSTALL'): # does geant4 exist?  but use json et all regardless
+  env.Append(LIBPATH = ["%s/third_party/install/lib" % os.environ.get('MAUS_ROOT_DIR'), "%s/%s" % (os.environ.get('G4LIB'), os.environ.get('G4SYSTEM'))])
+  # this should find swig and json and python
+  env.Append(CPPPATH=["%s/third_party/install/include" % os.environ.get('MAUS_ROOT_DIR'), \
+                    "%s/third_party/install/include/python2.7" % os.environ.get('MAUS_ROOT_DIR'), \
+                        os.environ.get("G4INCLUDE")])
+else:
+  env.Append(LIBPATH = ["%s/third_party/install/lib" % os.environ.get('MAUS_ROOT_DIR')])
+  # this should find swig and json
+  env.Append(CPPPATH=["%s/third_party/install/include" % os.environ.get('MAUS_ROOT_DIR'), \
+                        "%s/third_party/install/include/python2.7" % os.environ.get('MAUS_ROOT_DIR')])
+
 print env['LIBPATH']
 env.Append(LIBS = ['json'])
 
@@ -169,6 +176,7 @@ if not conf.CheckCommand('swig'):
   print ("     MAUS_ROOT_DIR=%s ./third_party/bash/10swig.bash" % os.environ.get('MAUS_ROOT_DIR'))
   Exit(1)
 
+
 if not conf.CheckCommand('root'):
   print "Cound't find root.  If you want it, then run:"
   print ("      MAUS_ROOT_DIR=%s ./third_party/bash/20gsl.bash" % os.environ.get('MAUS_ROOT_DIR'))
@@ -180,12 +188,12 @@ else:
   env['USE_ROOT'] = True
 
   if not conf.CheckCommand('root-config'):
-    print "Cound't find root-config"
+    print "Cound not find 't find roo"
     Exit(1)
   else:
     env.ParseConfig("root-config --cflags --ldflags --libs") 
 
-  root_libs = ['Minuit', 'Core', 'Cint', 'RIO', 'Net', 'Hist', 'Graf', 'Graf3d', 'Gpad', 'Tree', 'Rint', 'Postscript', 'Matrix', 'Physics', 'MathCore', 'Thread', 'pthread', 'm', 'dl']  # the important libraries I've found by looking at root-config output
+    root_libs = ['Minuit', 'Core', 'Cint', 'RIO', 'Net', 'Hist', 'Graf', 'Graf3d', 'Gpad', 'Tree', 'Rint', 'Postscript', 'Matrix', 'Physics', 'MathCore', 'Thread', 'pthread', 'm', 'dl']  # the important libraries I've found by looking at root-config output
        
   for lib in root_libs:
     if not conf.CheckLib(lib, language='c++'):
@@ -200,7 +208,7 @@ else:
     print "You need 'TH1F.h' to compile this program"
     Exit(1)
 
-if not conf.CheckCommand('root'):
+if not os.environ.get('G4INSTALL'):
   print "Cound't find geant4.  If you want it, then run:"
   print ("      MAUS_ROOT_DIR=%s ./third_party/bash/22clhep.bash" % os.environ.get('MAUS_ROOT_DIR'))
   print ("      MAUS_ROOT_DIR=%s ./third_party/bash/23geant4.bash" % os.environ.get('MAUS_ROOT_DIR'))
@@ -208,6 +216,9 @@ else:
   print
   print "!! Found the package 'geant4', so assume you want to use it with MAUS."
   print
+
+  env.ParseConfig('%s/liblist -m %s < %s/libname.map'.replace('%s', os.path.join(os.environ.get('G4LIB'), os.environ.get('G4SYSTEM'))))
+
   geant4_libs = ['CLHEP', 'G4digits_hits', 'G4error_propagation', 'G4event', 'G4FR', 'G4geometry', 'G4global', 'G4graphics_reps', 'G4intercoms', 'G4interfaces', 'G4materials', 'G4modeling', 'G4parmodels', 'G4particles', 'G4persistency', 'G4physicslists', 'G4processes', 'G4RayTracer', 'G4readout', 'G4run', 'G4tracking', 'G4track', 'G4Tree', 'G4visHepRep', 'G4vis_management', 'G4visXXX', 'G4VRML', 'list']  # the important raries I've found by looking at root-config output                                                                                                           
   for lib in geant4_libs:
     if not conf.CheckLib(lib, language='c++'):
