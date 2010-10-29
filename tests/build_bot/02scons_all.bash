@@ -1,4 +1,4 @@
 #!/bin/bash
 ./configure
 source env.sh
-scons all
+scons -c && scons all
