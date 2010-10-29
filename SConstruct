@@ -73,7 +73,8 @@ env.Append(CPPPATH=["%s/third_party/install/include" % os.environ.get('MAUS_ROOT
                     "%s/third_party/install/include/python2.7" % os.environ.get('MAUS_ROOT_DIR')])
 
 # to find JSON
-env.Append(LIBPATH = ["%s/third_party/install/lib" % os.environ.get('MAUS_ROOT_DIR')])
+env.Append(LIBPATH = ["%s/third_party/install/lib" % os.environ.get('MAUS_ROOT_DIR'), "%s/third_party/build/geant4.9.2.p01/lib/Linux-g++" % os.environ.get('MAUS_ROOT_DIR'), ])
+print env['LIBPATH']
 env.Append(LIBS = ['json'])
 
 env['USE_G4'] = False
@@ -198,6 +199,20 @@ else:
   if not conf.CheckCXXHeader('TMinuit.h'):
     print "You need 'TH1F.h' to compile this program"
     Exit(1)
+
+if not conf.CheckCommand('root'):
+  print "Cound't find geant4.  If you want it, then run:"
+  print ("      MAUS_ROOT_DIR=%s ./third_party/bash/22clhep.bash" % os.environ.get('MAUS_ROOT_DIR'))
+  print ("      MAUS_ROOT_DIR=%s ./third_party/bash/23geant4.bash" % os.environ.get('MAUS_ROOT_DIR'))
+else:
+  print
+  print "!! Found the package 'geant4', so assume you want to use it with MAUS."
+  print
+  geant4_libs = ['CLHEP', 'G4digits_hits', 'G4error_propagation', 'G4event', 'G4FR', 'G4geometry', 'G4global', 'G4graphics_reps', 'G4intercoms', 'G4interfaces', 'G4materials', 'G4modeling', 'G4parmodels', 'G4particles', 'G4persistency', 'G4physicslists', 'G4processes', 'G4RayTracer', 'G4readout', 'G4run', 'G4tracking', 'G4track', 'G4Tree', 'G4visHepRep', 'G4vis_management', 'G4visXXX', 'G4VRML', 'list']  # the important raries I've found by looking at root-config output                                                                                                           
+  for lib in geant4_libs:
+    if not conf.CheckLib(lib, language='c++'):
+      print "You need %s to compile this program" % lib
+      Exit(1)
 
 
 
