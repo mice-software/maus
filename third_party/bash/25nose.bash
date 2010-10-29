@@ -36,7 +36,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         rm -Rf ${MAUS_ROOT_DIR}/third_party/build/${directory}
 	sleep 1
  
-        tar xvfz ${MAUS_ROOT_DIR}/third_party/source/${filename} -C ${MAUS_ROOT_DIR}/third_party/build
+        tar xvfz ${MAUS_ROOT_DIR}/third_party/source/${filename} -C ${MAUS_ROOT_DIR}/third_party/build > /dev/null
         cd ${MAUS_ROOT_DIR}/third_party/build/${directory}
 	echo
         echo "INFO: Building:"

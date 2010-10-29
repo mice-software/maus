@@ -39,19 +39,19 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 	echo
         rm -Rf ${MAUS_ROOT_DIR}/third_party/build/${directory}
         sleep 1
-        tar xvfz ${MAUS_ROOT_DIR}/third_party/source/${filename} -C ${MAUS_ROOT_DIR}/third_party/build
+        tar xvfz ${MAUS_ROOT_DIR}/third_party/source/${filename} -C ${MAUS_ROOT_DIR}/third_party/build > /dev/null
 	mv ${MAUS_ROOT_DIR}/third_party/build/${version}/CLHEP ${MAUS_ROOT_DIR}/third_party/build/${directory}
         cd ${MAUS_ROOT_DIR}/third_party/build/${directory}
 	
 	echo
 	echo "INFO: Unpacking data"
 	echo
-	tar xvfz ${MAUS_ROOT_DIR}/third_party/source/geant_data.tar.gz
+	tar xvfz ${MAUS_ROOT_DIR}/third_party/source/geant_data.tar.gz > /dev/null
 
 	echo
         echo "INFO: Unpacking config"
         echo
-        tar xvfz ${MAUS_ROOT_DIR}/third_party/source/geant_config.tar.gz
+        tar xvfz ${MAUS_ROOT_DIR}/third_party/source/geant_config.tar.gz > /dev/null
 	maus_geant4_setup.py ${MAUS_ROOT_DIR}/third_party/build/geant4.9.2.p01/.config/bin/Linux-g++ ${MAUS_ROOT_DIR}/third_party/build/geant4.9.2.p01 ${MAUS_ROOT_DIR}/third_party/install
 	
 	echo
