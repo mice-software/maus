@@ -16,7 +16,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 	rm -f ${MAUS_ROOT_DIR}/third_party/source/geant_config.tar.gz 
 	rm -f ${MAUS_ROOT_DIR}/third_party/source/geant_data.tar.gz 
 	wget --directory-prefix=${MAUS_ROOT_DIR}/third_party/source ${url}
-	wget --directory-prefix=${MAUS_ROOT_DIR}/third_party/source http://micewww.pp.rl.ac.uk:8080/attachments/download/82/geant_config.tar.gz # TODO fixme
+	wget --directory-prefix=${MAUS_ROOT_DIR}/third_party/source http://micewww.pp.rl.ac.uk:8080/attachments/download/83/geant_config.tar.gz # TODO fixme
 	wget --directory-prefix=${MAUS_ROOT_DIR}/third_party/source http://micewww.pp.rl.ac.uk:8080/attachments/download/81/geant_data.tar.gz  # TODO fixme
 
     fi
@@ -58,8 +58,9 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         echo "INFO: Building:"
 	echo
         sleep 1
+
 	./Configure -f .config/bin/Linux-g++/config.sh -d -e -build
-	exit 1
+
 	echo
         echo "INFO: Installing:"
 	echo
