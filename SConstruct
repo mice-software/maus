@@ -175,9 +175,15 @@ if not env.GetOption('clean'):
     print ("     MAUS_ROOT_DIR=%s ./third_party/bash/10swig.bash" % os.environ.get('MAUS_ROOT_DIR'))
     Exit(1)
 
-  if not conf.CheckCommand('root'):
-    print "Cound't find root.  If you want it, then run:"
+  if not conf.CheckLib('gsl', language='c++'):
+    print "Cound't find GSL (required for ROOT).  If you want it, then run:"
     print ("      MAUS_ROOT_DIR=%s ./third_party/bash/20gsl.bash" % os.environ.get('MAUS_ROOT_DIR'))
+    if os.environ.get('REQUIREALL'):
+      print "When running with 'REQUIREALL' all possible dependcies must exist"
+      Exit(1)
+
+  if not conf.CheckCommand('root'):
+    print "Cound't find root.  If you want it, after installing GSL, then run:"
     print ("      MAUS_ROOT_DIR=%s ./third_party/bash/21root.bash" % os.environ.get('MAUS_ROOT_DIR'))
     if os.environ.get('REQUIREALL'):
       print "When running with 'REQUIREALL' all possible dependcies must exist"
@@ -209,9 +215,15 @@ if not env.GetOption('clean'):
       print "You need 'TH1F.h' to compile this program"
       Exit(1)
 
-  if not os.environ.get('G4INSTALL'):
-    print "Cound't find geant4.  If you want it, then run:"
+  if not conf.CheckLib('CLHEP', language='c++'):
+    print "Cound't find CLHEP (required for geant4).  If you want it, then run:"
     print ("      MAUS_ROOT_DIR=%s ./third_party/bash/22clhep.bash" % os.environ.get('MAUS_ROOT_DIR'))
+    if os.environ.get('REQUIREALL'):
+      print "When running with 'REQUIREALL' all possible dependcies must exist"
+      Exit(1)
+
+  if not os.environ.get('G4INSTALL'):
+    print "Cound't find geant4.  If you want it, after installing CLHEP, then run:"
     print ("      MAUS_ROOT_DIR=%s ./third_party/bash/23geant4.bash" % os.environ.get('MAUS_ROOT_DIR'))
     if os.environ.get('REQUIREALL'):
       print "When running with 'REQUIREALL' all possible dependcies must exist"
@@ -223,7 +235,7 @@ if not env.GetOption('clean'):
     
     env.ParseConfig('%s/liblist -m %s < %s/libname.map'.replace('%s', os.path.join(os.environ.get('G4LIB'), os.environ.get('G4SYSTEM'))))
 
-    geant4_libs = ['CLHEP', 'G4digits_hits', 'G4error_propagation', 'G4event', 'G4FR', 'G4geometry', 'G4global', 'G4graphics_reps', 'G4intercoms', 'G4interfaces', 'G4materials', 'G4modeling', 'G4parmodels', 'G4particles', 'G4persistency', 'G4physicslists', 'G4processes', 'G4RayTracer', 'G4readout', 'G4run', 'G4tracking', 'G4track', 'G4Tree', 'G4visHepRep', 'G4vis_management', 'G4visXXX', 'G4VRML', 'list']  # the important raries I've found by looking at root-config output                                                                                                           
+    geant4_libs = ['G4digits_hits', 'G4error_propagation', 'G4event', 'G4FR', 'G4geometry', 'G4global', 'G4graphics_reps', 'G4intercoms', 'G4interfaces', 'G4materials', 'G4modeling', 'G4parmodels', 'G4particles', 'G4persistency', 'G4physicslists', 'G4processes', 'G4RayTracer', 'G4readout', 'G4run', 'G4tracking', 'G4track', 'G4Tree', 'G4visHepRep', 'G4vis_management', 'G4visXXX', 'G4VRML', 'list']  # the important raries I've found by looking at root-config output                                                                                                           
     for lib in geant4_libs:
       if not conf.CheckLib(lib, language='c++'):
         print "You need %s to compile this program" % lib
