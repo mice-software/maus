@@ -231,7 +231,7 @@ if not env.GetOption('clean'):
 
      # check types size!!!
 
-env = conf.Finish()
+  env = conf.Finish()
 
 
 # NOTE: do this after configure!  So we know if we have ROOT/geant4
