@@ -42,17 +42,27 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 	echo
 
 	extra=""
-	if [ -e "/usr/lib64/libXpm.so.4" ]
+	if [ -e "/usr/lib64/libXpm.so.4" ] # sl55 64bit
 	then
-	    echo "INFO: Applying 64-bit libXpm fix since ROOT/SL suck."
+	    echo "INFO: Applying SL5 64-bit libXpm fix since ROOT/SL suck."
 	    ln -s /usr/lib64/libXpm.so.4 ${MAUS_ROOT_DIR}/third_party/install/lib/libXpm.so # known ROOT/SL4 bug since 2003 (!!)
 	    extra="--with-xpm-libdir=${MAUS_ROOT_DIR}/third_party/install/lib"
-	elif [ -e "/usr/lib/libXpm.so.4" ]
+	elif [ -e "/usr/lib/libXpm.so.4" ] # sl55 32bit
 	then
-	    echo "INFO: Applying 32-bit libXpm fix since ROOT/SL suck."
+	    echo "INFO: Applying SL5 32-bit libXpm fix since ROOT/SL suck."
 	    ln -s /usr/lib/libXpm.so.4 ${MAUS_ROOT_DIR}/third_party/install/lib/libXpm.so # known ROOT/SL4 bug since 2003 (!!)
             extra="--with-xpm-libdir=${MAUS_ROOT_DIR}/third_party/install/lib"
-	fi
+        elif [ -e "/usr/X11R6/lib64/libXpm.so.4" ] # sl48 64bit
+        then
+            echo "INFO: Applying SL4 64-bit libXpm fix since ROOT/SL suck."
+            ln -s /usr/X11R6/lib64/libXpm.so.4 ${MAUS_ROOT_DIR}/third_party/install/lib/libXpm.so # known ROOT/SL4 bug since 2003 (!!)
+            extra="--with-xpm-libdir=${MAUS_ROOT_DIR}/third_party/install/lib"
+        elif [ -e "/usr/X11R6/lib/libXpm.so.4" ] # sl48 32bit
+        then
+            echo "INFO: Applying SL4 32-bit libXpm fix since ROOT/SL suck."
+            ln -s /usr/X11R6/lib/libXpm.so.4 ${MAUS_ROOT_DIR}/third_party/install/lib/libXpm.so # known ROOT/SL4 bug since 2003 (!!)
+            extra="--with-xpm-libdir=${MAUS_ROOT_DIR}/third_party/install/lib"
+        fi
 		
 	echo
         echo "INFO: Configuring:"
@@ -66,7 +76,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         echo "INFO: Making:"
 	echo
         sleep 1
-        make
+        make 
 	make install
 	            ################################################## 
 	echo
