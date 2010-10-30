@@ -42,13 +42,15 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 	echo
 
 	extra=""
-	if [ -e "/usr/lib/libXpm.so.4" ]
+	if [ -e "/usr/lib64/libXpm.so.4" ]
 	then
-	    ln -s /usr/lib/libXpm.so.4 ${MAUS_ROOT_DIR}/third_party/install/lib/libXpm.so # known ROOT/SL4 bug since 2003 (!!)
+	    echo "INFO: Applying 64-bit libXpm fix since ROOT/SL suck."
+	    ln -s /usr/lib64/libXpm.so.4 ${MAUS_ROOT_DIR}/third_party/install/lib/libXpm.so # known ROOT/SL4 bug since 2003 (!!)
 	    extra="--use-xpm-libdir=${MAUS_ROOT_DIR}/third_party/install/lib"
 	elif [ -e "/usr/lib/libXpm.so.4" ]
 	then
-	    ln -s /usr/lib64/libXpm.so.4 ${MAUS_ROOT_DIR}/third_party/install/lib/libXpm.so # known ROOT/SL4 bug since 2003 (!!)
+	    echo "INFO: Applying 32-bit libXpm fix since ROOT/SL suck."
+	    ln -s /usr/lib/libXpm.so.4 ${MAUS_ROOT_DIR}/third_party/install/lib/libXpm.so # known ROOT/SL4 bug since 2003 (!!)
             extra="--use-xpm-libdir=${MAUS_ROOT_DIR}/third_party/install/lib"
 	fi
 		
