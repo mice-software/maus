@@ -179,8 +179,8 @@ if not env.GetOption('clean'):
     print "Cound't find root.  If you want it, then run:"
     print ("      MAUS_ROOT_DIR=%s ./third_party/bash/20gsl.bash" % os.environ.get('MAUS_ROOT_DIR'))
     print ("      MAUS_ROOT_DIR=%s ./third_party/bash/21root.bash" % os.environ.get('MAUS_ROOT_DIR'))
-    if 'configure-full' in COMMAND_LINE_TARGETS:
-      print "When running with 'config-full' all possible dependcies must exist"
+    if os.environ.get('REQUIRE_ALL')
+      print "When running with 'REQUIRE_ALL' all possible dependcies must exist"
       Exit(1)
   else:
     print
@@ -213,8 +213,8 @@ if not env.GetOption('clean'):
     print "Cound't find geant4.  If you want it, then run:"
     print ("      MAUS_ROOT_DIR=%s ./third_party/bash/22clhep.bash" % os.environ.get('MAUS_ROOT_DIR'))
     print ("      MAUS_ROOT_DIR=%s ./third_party/bash/23geant4.bash" % os.environ.get('MAUS_ROOT_DIR'))
-    if 'configure-full' in COMMAND_LINE_TARGETS:
-      print "When running with 'config-full' all possible dependcies must exist"
+    if os.environ.get('REQUIRE_ALL')
+      print "When running with 'REQUIRE_ALL' all possible dependcies must exist"
       Exit(1)
   else:
     print
