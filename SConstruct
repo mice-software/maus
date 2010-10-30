@@ -175,7 +175,16 @@ if not env.GetOption('clean'):
     print ("     MAUS_ROOT_DIR=%s ./third_party/bash/10swig.bash" % os.environ.get('MAUS_ROOT_DIR'))
     Exit(1)
 
-  if not conf.CheckLib('gsl', language='c++'):
+  if not conf.CheckLib('gslcblas'):
+    print "Cound't find GSL (required for ROOT).  If you want it, then run:"
+    print ("      MAUS_ROOT_DIR=%s ./third_party/bash/20gsl.bash" % os.environ.get('MAUS_ROOT_DIR'))
+    if os.environ.get('REQUIREALL'):
+      print "When running with 'REQUIREALL' all possible dependcies must exist"
+      Exit(1)
+  else:
+    conf.env.Append(LIBS = ['gslcblas'])
+
+  if not conf.CheckLib('gsl'):
     print "Cound't find GSL (required for ROOT).  If you want it, then run:"
     print ("      MAUS_ROOT_DIR=%s ./third_party/bash/20gsl.bash" % os.environ.get('MAUS_ROOT_DIR'))
     if os.environ.get('REQUIREALL'):
@@ -188,6 +197,7 @@ if not env.GetOption('clean'):
     if os.environ.get('REQUIREALL'):
       print "When running with 'REQUIREALL' all possible dependcies must exist"
       Exit(1)
+
   else:
     print
     print "!! Found the program 'root', so assume you want to use it with MAUS."
