@@ -125,109 +125,109 @@ def CheckCommand(context, cmd):
        return result
 
 ## autoconf-like stuff
-print "Configuring..."
-conf = Configure(env, custom_tests = {'CheckCommand' : CheckCommand})
+if not env.GetOption('clean'):
+  print "Configuring..."
+  conf = Configure(env, custom_tests = {'CheckCommand' : CheckCommand})
 
-# ---- check for compiler and do sanity checks
-if not conf.CheckCXX():
-  print('!! Your compiler and/or environment is not correctly configured.')
-  Exit(0)
+  # ---- check for compiler and do sanity checks
+  if not conf.CheckCXX():
+    print('!! Your compiler and/or environment is not correctly configured.')
+    Exit(0)
 
-if not conf.CheckLib( "json" , language='C++') or not conf.CheckCXXHeader('json/json.h'):
-  print( "can't find jsoncpp which is needed" );
-  print ( "You may install it by running:");
-  print ("     MAUS_ROOT_DIR=%s ./third_party/bash/11jsoncpp.bash" % os.environ.get('MAUS_ROOT_DIR'))
-  Exit(1)
-
-if not conf.CheckLib( "stdc++" , language='C++'):
-  print( "can't find stdc++ library which is needed" );
-  Exit(1)
-
-if not conf.CheckFunc('printf'):
-  print('!! Your compiler and/or environment is not correctly configured.')
-  Exit(0)
-
-# check for math.h
-if not conf.CheckHeader('math.h'):
-  print "You need 'math.h' to compile this program"
-  Exit(1)
-
-# check for stdlib.h
-if not conf.CheckCHeader('stdlib.h'):
-  print "You need 'stdlib.h' to compile this program"
-  Exit(1)
-
-if not conf.CheckCXXHeader('iostream', '<>'):
-  print "You need 'iostream' to compile this program"
-  Exit(1)
-
-if not conf.CheckCommand('python'):
-  print "Cound't find python"
-  Exit(1)
-
-if not conf.CheckCXXHeader('Python.h'):
-  print "You need 'Python.h' to compile this program"
-  print "If you want to install python locally, run:"
-  print ("     MAUS_ROOT_DIR=%s ./third_party/bash/03python.bash" % os.environ.get('MAUS_ROOT_DIR'))
-  Exit(1)
-
-if not conf.CheckCommand('swig'):
-  print "Cound't find swig.  If you want it, then run:"
-  print ("     MAUS_ROOT_DIR=%s ./third_party/bash/10swig.bash" % os.environ.get('MAUS_ROOT_DIR'))
-  Exit(1)
-
-
-if not conf.CheckCommand('root'):
-  print "Cound't find root.  If you want it, then run:"
-  print ("      MAUS_ROOT_DIR=%s ./third_party/bash/20gsl.bash" % os.environ.get('MAUS_ROOT_DIR'))
-  print ("      MAUS_ROOT_DIR=%s ./third_party/bash/21root.bash" % os.environ.get('MAUS_ROOT_DIR'))
-else:
-  print
-  print "!! Found the program 'root', so assume you want to use it with MAUS."
-  print
-  env['USE_ROOT'] = True
-
-  if not conf.CheckCommand('root-config'):
-    print "Cound not find 't find roo"
+  if not conf.CheckLib( "json" , language='C++') or not conf.CheckCXXHeader('json/json.h'):
+    print( "can't find jsoncpp which is needed" );
+    print ( "You may install it by running:");
+    print ("     MAUS_ROOT_DIR=%s ./third_party/bash/11jsoncpp.bash" % os.environ.get('MAUS_ROOT_DIR'))
     Exit(1)
+
+  if not conf.CheckLib( "stdc++" , language='C++'):
+    print( "can't find stdc++ library which is needed" );
+    Exit(1)
+
+  if not conf.CheckFunc('printf'):
+    print('!! Your compiler and/or environment is not correctly configured.')
+    Exit(0)
+
+  if not conf.CheckHeader('math.h'):
+    print "You need 'math.h' to compile this program"
+    Exit(1)
+
+  if not conf.CheckCHeader('stdlib.h'):
+    print "You need 'stdlib.h' to compile this program"
+    Exit(1)
+
+  if not conf.CheckCXXHeader('iostream', '<>'):
+    print "You need 'iostream' to compile this program"
+    Exit(1)
+
+  if not conf.CheckCommand('python'):
+    print "Cound't find python"
+    Exit(1)
+
+  if not conf.CheckCXXHeader('Python.h'):
+    print "You need 'Python.h' to compile this program"
+    print "If you want to install python locally, run:"
+    print ("     MAUS_ROOT_DIR=%s ./third_party/bash/03python.bash" % os.environ.get('MAUS_ROOT_DIR'))
+    Exit(1)
+
+  if not conf.CheckCommand('swig'):
+    print "Cound't find swig.  If you want it, then run:"
+    print ("     MAUS_ROOT_DIR=%s ./third_party/bash/10swig.bash" % os.environ.get('MAUS_ROOT_DIR'))
+    Exit(1)
+
+  if not conf.CheckCommand('root'):
+    print "Cound't find root.  If you want it, then run:"
+    print ("      MAUS_ROOT_DIR=%s ./third_party/bash/20gsl.bash" % os.environ.get('MAUS_ROOT_DIR'))
+    print ("      MAUS_ROOT_DIR=%s ./third_party/bash/21root.bash" % os.environ.get('MAUS_ROOT_DIR'))
+    if 'configure-full' in COMMAND_LINE_TARGETS:
+      print "When running with 'config-full' all possible dependcies must exist"
+      Exit(1)
   else:
-    env.ParseConfig("root-config --cflags --ldflags --libs") 
+    print
+    print "!! Found the program 'root', so assume you want to use it with MAUS."
+    print
+    env['USE_ROOT'] = True
+
+    if not conf.CheckCommand('root-config'):
+      print "Cound not find 't find roo"
+      Exit(1)
+    else:
+      env.ParseConfig("root-config --cflags --ldflags --libs") 
 
     root_libs = ['Minuit', 'Core', 'Cint', 'RIO', 'Net', 'Hist', 'Graf', 'Graf3d', 'Gpad', 'Tree', 'Rint', 'Postscript', 'Matrix', 'Physics', 'MathCore', 'Thread', 'pthread', 'm', 'dl']  # the important libraries I've found by looking at root-config output
        
-  for lib in root_libs:
-    if not conf.CheckLib(lib, language='c++'):
-      print "You need %s to compile this program" % lib
+    for lib in root_libs:
+      if not conf.CheckLib(lib, language='c++'):
+        print "You need %s to compile this program" % lib
+        Exit(1)
+
+    if not conf.CheckCXXHeader('TH1F.h'):
+      print "You need 'TH1F.h' to compile this program"
       Exit(1)
 
-  if not conf.CheckCXXHeader('TH1F.h'):
-    print "You need 'TH1F.h' to compile this program"
-    Exit(1)
-
-  if not conf.CheckCXXHeader('TMinuit.h'):
-    print "You need 'TH1F.h' to compile this program"
-    Exit(1)
-
-if not os.environ.get('G4INSTALL'):
-  print "Cound't find geant4.  If you want it, then run:"
-  print ("      MAUS_ROOT_DIR=%s ./third_party/bash/22clhep.bash" % os.environ.get('MAUS_ROOT_DIR'))
-  print ("      MAUS_ROOT_DIR=%s ./third_party/bash/23geant4.bash" % os.environ.get('MAUS_ROOT_DIR'))
-else:
-  print
-  print "!! Found the package 'geant4', so assume you want to use it with MAUS."
-  print
-
-  env.ParseConfig('%s/liblist -m %s < %s/libname.map'.replace('%s', os.path.join(os.environ.get('G4LIB'), os.environ.get('G4SYSTEM'))))
-
-  geant4_libs = ['CLHEP', 'G4digits_hits', 'G4error_propagation', 'G4event', 'G4FR', 'G4geometry', 'G4global', 'G4graphics_reps', 'G4intercoms', 'G4interfaces', 'G4materials', 'G4modeling', 'G4parmodels', 'G4particles', 'G4persistency', 'G4physicslists', 'G4processes', 'G4RayTracer', 'G4readout', 'G4run', 'G4tracking', 'G4track', 'G4Tree', 'G4visHepRep', 'G4vis_management', 'G4visXXX', 'G4VRML', 'list']  # the important raries I've found by looking at root-config output                                                                                                           
-  for lib in geant4_libs:
-    if not conf.CheckLib(lib, language='c++'):
-      print "You need %s to compile this program" % lib
+    if not conf.CheckCXXHeader('TMinuit.h'):
+      print "You need 'TH1F.h' to compile this program"
       Exit(1)
 
+  if not os.environ.get('G4INSTALL'):
+    print "Cound't find geant4.  If you want it, then run:"
+    print ("      MAUS_ROOT_DIR=%s ./third_party/bash/22clhep.bash" % os.environ.get('MAUS_ROOT_DIR'))
+    print ("      MAUS_ROOT_DIR=%s ./third_party/bash/23geant4.bash" % os.environ.get('MAUS_ROOT_DIR'))
+    if 'configure-full' in COMMAND_LINE_TARGETS:
+      print "When running with 'config-full' all possible dependcies must exist"
+      Exit(1)
+  else:
+    print
+    print "!! Found the package 'geant4', so assume you want to use it with MAUS."
+    print
+    
+    env.ParseConfig('%s/liblist -m %s < %s/libname.map'.replace('%s', os.path.join(os.environ.get('G4LIB'), os.environ.get('G4SYSTEM'))))
 
-
-
+    geant4_libs = ['CLHEP', 'G4digits_hits', 'G4error_propagation', 'G4event', 'G4FR', 'G4geometry', 'G4global', 'G4graphics_reps', 'G4intercoms', 'G4interfaces', 'G4materials', 'G4modeling', 'G4parmodels', 'G4particles', 'G4persistency', 'G4physicslists', 'G4processes', 'G4RayTracer', 'G4readout', 'G4run', 'G4tracking', 'G4track', 'G4Tree', 'G4visHepRep', 'G4vis_management', 'G4visXXX', 'G4VRML', 'list']  # the important raries I've found by looking at root-config output                                                                                                           
+    for lib in geant4_libs:
+      if not conf.CheckLib(lib, language='c++'):
+        print "You need %s to compile this program" % lib
+        Exit(1)
 
      # check types size!!!
 
