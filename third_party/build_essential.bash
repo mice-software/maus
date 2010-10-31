@@ -1,7 +1,24 @@
 #!/usr/bin/env bash
+# one can use 'set -u' to have bash exit whenever a variable
+# is found that isn't defined.  I prefer to catch it, alert
+# the user about the problem, then exit with an error code.
+# This is more dangerous and requires that people be careful
+# when using environmental variables
+# set -u
+
+# Exit the script if ANY command fails
+set -e
+
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
-    find ${MAUS_ROOT_DIR}/third_party/bash/0* -type f |grep -v REDUNDANT |sort| xargs -i bash {}
-    find ${MAUS_ROOT_DIR}/third_party/bash/1* -type f |grep -v REDUNDANT |sort| xargs -i bash {}
+    # One could do the line below, but the problem is error codes.  Xargs doesn't exit nicely
+    # (at least the xargs on most machines) if one of the many commands die.  Not using find
+    # also happens to make the code a little more readable
+    #find ${MAUS_ROOT_DIR}/third_party/bash/0* -type f |grep -v REDUNDANT |sort| xargs -i bash {}
+    #find ${MAUS_ROOT_DIR}/third_party/bash/1* -type f |grep -v REDUNDANT |sort| xargs -i bash {}
+    ${MAUS_ROOT_DIR}/third_party/bash/03python.bash
+    ${MAUS_ROOT_DIR}/third_party/bash/04scons.bash
+    ${MAUS_ROOT_DIR}/third_party/bash/10swig.bash
+    ${MAUS_ROOT_DIR}/third_party/bash/11jsoncpp.bash
 else
 echo
 echo "FATAL: MAUS_ROOT_DIR is not set, which is required to" >&2
