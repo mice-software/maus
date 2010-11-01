@@ -54,8 +54,6 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         echo "FATAL: Giving up, sorry..." >&2
 	exit 1;
     fi
-  
-fi
 
 else
 echo
