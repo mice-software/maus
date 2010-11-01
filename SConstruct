@@ -192,7 +192,7 @@ if not env.GetOption('clean'):
       print "When running with 'REQUIREALL' all possible dependcies must exist"
       Exit(1)
 
-  if True:
+  if not conf.CheckCommand('root')::
     print "Cound't find root.  If you want it, after installing GSL, then run:"
     print ("      MAUS_ROOT_DIR=%s ./third_party/bash/21root.bash" % os.environ.get('MAUS_ROOT_DIR'))
     if os.environ.get('REQUIREALL'):
