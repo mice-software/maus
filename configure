@@ -88,8 +88,14 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      fi
 
      # workers
-     PYTHONPATH=\$MAUS_ROOT_DIR/workers/build/${build_type}/:\$PYTHONPATH
-     LD_LIBRARY_PATH=\$MAUS_ROOT_DIR/workers/build/${build_type}:\$LD_LIBRARY_PATH
+     PYTHONPATH=\$MAUS_ROOT_DIR/build/${build_type}/:\$PYTHONPATH
+     LD_LIBRARY_PATH=\$MAUS_ROOT_DIR/build/${build_type}:\$LD_LIBRARY_PATH
+
+     # disco
+     DISCO_HOME=\$MAUS_ROOT_DIR/third_party/build/tuulos-disco-742e814
+     PATH=\$DISCO_HOME/bin:\$PATH
+     PYTHONPATH=\$DISCO_HOME/lib:\$PYTHONPATH
+     LD_LIBRARY_PATH=\$DISCO_HOME/lib:\$LD_LIBRARY_PATH
 
      # clhep
      export CLHEPVERS=2.0.4.2
@@ -117,7 +123,7 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      export G4LEVELGAMMADATA=\${G4INSTALL}/data/PhotonEvaporation2.0/
      export G4RADIOACTIVEDATA=\${G4INSTALL}/data/RadioactiveDecay3.2/
  
-     export MAUS_ROOT_DIR PATH LD_LIBRARY_PATH PYTHONPATH MANPATH
+     export MAUS_ROOT_DIR PATH LD_LIBRARY_PATH PYTHONPATH MANPATH DISCO_HOME
      echo "SUCCESS: MAUS setup"
 else
      echo "ERROR: MAUS already setup"
