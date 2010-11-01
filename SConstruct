@@ -208,11 +208,10 @@ if not env.GetOption('clean'):
     if not conf.CheckCommand('root-config'):
       print "Cound not find root-config"
       Exit(1)
-    else:
-      pass
-#conf.env.ParseConfig("root-config --cflags --ldflags --libs") 
+
+    conf.env.ParseConfig("root-config --cflags --ldflags --libs") 
       
-    root_libs = ['Minuit', 'Core', 'Cint', 'RIO', 'Net', 'Hist', 'Graf', 'Graf3d', 'Gpad', 'Tree', 'Rint', 'Postscript', 'Matrix', 'Physics', 'MathCore', 'Thread', 'pthread', 'm', 'dl']  # the important libraries I've found by looking at root-config output
+    root_libs = ['Core', 'Cint', 'RIO', 'Net', 'Hist', 'Graf', 'Graf3d', 'Gpad', 'Tree', 'Rint', 'Postscript', 'Matrix', 'Physics', 'MathCore', 'Thread', 'pthread', 'm', 'dl', 'Minuit']  # the important libraries I've found by looking at root-config output
        
     for lib in root_libs:
       if not conf.CheckLib(lib, language='c++'):
