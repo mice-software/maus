@@ -4,9 +4,8 @@ import glob, os
 #this is our catch-all Dev class
 #it keeps track of all the variables and common functions we need
 class Dev:
-  mymode = ''
-  debugcflags = ''
-  releasecflags = ''
+  cflags = ''
+  ecflags = ''
 
   #---
   # sets up the sconscript file for a given sub-project
@@ -22,18 +21,15 @@ class Dev:
       print "The worker", project, "requires Geant4 which is disabled. Skipping..."
       return
     
-
+    builddir = 'build'
     name = project.split('/')[-1]
-    builddir =   '../../../build/' + env.jDev.mymode
-    targetpath = '../../../build/' + env.jDev.mymode + '/_' + name
+    targetpath = os.path.join('build', '_%s' % name)
 
     #append the user's additional compile flags
     #assume debugcflags and releasecflags are defined
-    if self.mymode == 'debug':
-      localenv.Append(CCFLAGS=self.debugcflags)
-    else:
-      localenv.Append(CCFLAGS=self.releasecflags)
-      
+    localenv.Append(CCFLAGS=self.cflags)
+    localenv.Append(LIBS=['interface','beamtools','common','detmodel','engmodel','simulation'] )
+
     if use_root:
       #localenv.ParseConfig("root-config --cflags --ldflags --libs")  # UNCOMMENT for ROOT
       pass
@@ -49,6 +45,9 @@ class Dev:
     srclst += map(lambda x: builddir + '/' + x, glob.glob('*.i'))
     print srclst
     pgm = localenv.SharedLibrary(targetpath, source=srclst)
+
+    env.Install(os.path.join(os.environ.get('MAUS_ROOT_DIR'), builddir) , "build/%s.py" % name)
+    env.Install(os.path.join(os.environ.get('MAUS_ROOT_DIR'), builddir) , pgm)
     env.Alias('all', pgm)  #note: not localenv
 
   #---- PRIVATE ----
@@ -70,9 +69,11 @@ env.Append(SWIGFLAGS=['-python', '-c++']) # tell SWIG to make python bindings fo
 env['ENV']['PATH'] =  os.environ.get('PATH')  # useful to set for root-config
 
 # to find third party libs, includes
-env.Append(LIBPATH = ["%s/third_party/install/lib" % os.environ.get('MAUS_ROOT_DIR')])
+env.Append(LIBPATH = ["%s/third_party/install/lib" % os.environ.get('MAUS_ROOT_DIR'),\
+                        "%s/build" % os.environ.get('MAUS_ROOT_DIR')])
 env.Append(CPPPATH=["%s/third_party/install/include" % os.environ.get('MAUS_ROOT_DIR'), \
-                      "%s/third_party/install/include/python2.7" % os.environ.get('MAUS_ROOT_DIR')])
+                      "%s/third_party/install/include/python2.7" % os.environ.get('MAUS_ROOT_DIR'), \
+                      "%s/commonCpp" % os.environ.get('MAUS_ROOT_DIR'), ])
 
 env['USE_G4'] = False
 env['USE_ROOT'] = False
@@ -104,9 +105,9 @@ env.jDev.releasecflags = ['-O2', '-DNDEBUG',]         #extra compile flags for r
 Export('env')
 
 #### Target: Documentation
-dox = env.Command('does_not_exist3', 'doc/Doxyfile',
-                  'doxygen doc/Doxyfile && cd doc/html')
-env.Alias('doc', [dox])
+#dox = env.Command('does_not_exist3', 'doc/Doxyfile',
+#                  'doxygen doc/Doxyfile && cd doc/html')
+#env.Alias('doc', [dox])
 
 def CheckCommand(context, cmd):
        context.Message('Checking for %s command... ' % cmd)
@@ -194,7 +195,7 @@ if not env.GetOption('clean'):
 
     conf.env.ParseConfig("root-config --cflags --ldflags --libs") 
       
-    root_libs = ['Core', 'Cint', 'RIO', 'Net', 'Hist', 'Graf', 'Graf3d', 'Gpad', 'Tree', 'Rint', 'Postscript', 'Matrix', 'Physics', 'MathCore', 'Thread', 'pthread', 'm', 'dl', 'Minuit']  # the important libraries I've found by looking at root-config output
+    root_libs = []#['Core', 'Cint', 'RIO', 'Net', 'Hist', 'Graf', 'Graf3d', 'Gpad', 'Tree', 'Rint', 'Postscript', 'Matrix', 'Physics', 'MathCore', 'Thread', 'pthread', 'm', 'dl', 'Minuit']  # the important libraries I've found by looking at root-config output
        
     for lib in root_libs:
       if not conf.CheckLib(lib, language='c++'):
@@ -223,26 +224,117 @@ if not env.GetOption('clean'):
     print
     print "!! Found the package 'geant4', so assume you want to use it with MAUS."
     print
-
-    if not conf.CheckCXXHeader('geant4/G4EventManager.hh'):
-      Exit(1)
+    env['USE_G4'] = True
 
     env.Append(LIBPATH = ["%s/%s" % (os.environ.get('G4LIB'), os.environ.get('G4SYSTEM'))])
     env.Append(CPPPATH=[os.environ.get("G4INCLUDE")])
+
+    if not conf.CheckCXXHeader('G4EventManager.hh'):
+      Exit(1)
   
     conf.env.ParseConfig('%s/liblist -m %s < %s/libname.map'.replace('%s', os.path.join(os.environ.get('G4LIB'), os.environ.get('G4SYSTEM'))))
 
-    geant4_libs = ['G4error_propagation', 'G4mctruth', 'G4readout', 'G4phys_lists', 'G4gflash', 'G4phys_builders', 'G4visHepRep', 'G4biasing', 'G4geomtext', 'G4FR', 'G4brep', 'G4RayTracer', 'G4Tree', 'G4VRML', 'G4visXXX', 'G4vis_management', 'G4geomBoolean', 'G4hadronic_radioactivedecay', 'G4decay', 'G4UIbasic', 'G4UIGAG', 'G4UIcommon', 'G4emhighenergy', 'G4partadj', 'G4muons', 'G4empolar', 'G4emlowenergy', 'G4xrays', 'G4hadronic_coherent_elastic', 'G4emstandard', 'G4hadronic_binary', 'G4partutils', 'G4run', 'G4had_theo_max', 'G4had_muon_nuclear', 'G4scoring', 'G4hadronic_interface_ci', 'G4hadronic_abrasion', 'G4transportation', 'G4hadronic_bert_cascade', 'G4hadronic_hetcpp_evaporation', 'G4hadronic_proc', 'G4hadronic_stop', 'G4hadronic_em_dissociation', 'G4hadronic_mgt', 'G4hadronic_qmd', 'G4hadronic_hetcpp_utils', 'G4hadronic_iso', 'G4hadronic_ablation', 'G4optical', 'G4had_preequ_exciton', 'G4hadronic_incl_cascade', 'G4hadronic_deex_handler', 'G4had_lll_fis', 'G4hadronic_deex_evaporation', 'G4had_neu_hp', 'G4had_string_diff', 'G4hadronic_leading_particle', 'G4hadronic_deex_gem_evaporation', 'G4hadronic_deex_fission', 'G4hadronic_deex_fermi_breakup', 'G4detutils', 'G4hadronic_deex_photon_evaporation', 'G4hadronic_deex_multifragmentation', 'G4had_string_frag', 'G4hadronic_HE', 'G4parameterisation', 'G4hadronic_qgstring', 'G4had_string_man', 'G4had_im_r_matrix', 'G4hadronic_deex_management', 'G4hadronic_LE', 'G4hadronic_body_ci', 'G4hadronic_RPG', 'G4hadronic_deex_util', 'G4shortlived', 'G4geomdivision', 'G4hadronic_xsect', 'G4had_mod_util', 'G4detscorer', 'G4had_mod_man', 'G4hadronic_util', 'G4modeling', 'G4event', 'G4geombias', 'G4specsolids', 'G4mesons', 'G4tracking', 'G4emutils', 'G4leptons', 'G4bosons', 'G4ions', 'G4baryons', 'G4cuts', 'G4procman', 'G4csg', 'G4digits', 'G4detector', 'G4hepnumerics', 'G4track', 'G4hits', 'G4navigation', 'G4magneticfield', 'G4partman', 'G4volumes', 'G4geometrymng', 'G4materials', 'G4graphics_reps', 'G4intercoms', 'G4globman']
+    geant4_libs = []#['G4error_propagation', 'G4mctruth', 'G4readout', 'G4phys_lists', 'G4gflash', 'G4phys_builders', 'G4visHepRep', 'G4biasing', 'G4geomtext', 'G4FR', 'G4brep', 'G4RayTracer', 'G4Tree', 'G4VRML', 'G4visXXX', 'G4vis_management', 'G4geomBoolean', 'G4hadronic_radioactivedecay', 'G4decay', 'G4UIbasic', 'G4UIGAG', 'G4UIcommon', 'G4emhighenergy', 'G4partadj', 'G4muons', 'G4empolar', 'G4emlowenergy', 'G4xrays', 'G4hadronic_coherent_elastic', 'G4emstandard', 'G4hadronic_binary', 'G4partutils', 'G4run', 'G4had_theo_max', 'G4had_muon_nuclear', 'G4scoring', 'G4hadronic_interface_ci', 'G4hadronic_abrasion', 'G4transportation', 'G4hadronic_bert_cascade', 'G4hadronic_hetcpp_evaporation', 'G4hadronic_proc', 'G4hadronic_stop', 'G4hadronic_em_dissociation', 'G4hadronic_mgt', 'G4hadronic_qmd', 'G4hadronic_hetcpp_utils', 'G4hadronic_iso', 'G4hadronic_ablation', 'G4optical', 'G4had_preequ_exciton', 'G4hadronic_incl_cascade', 'G4hadronic_deex_handler', 'G4had_lll_fis', 'G4hadronic_deex_evaporation', 'G4had_neu_hp', 'G4had_string_diff', 'G4hadronic_leading_particle', 'G4hadronic_deex_gem_evaporation', 'G4hadronic_deex_fission', 'G4hadronic_deex_fermi_breakup', 'G4detutils', 'G4hadronic_deex_photon_evaporation', 'G4hadronic_deex_multifragmentation', 'G4had_string_frag', 'G4hadronic_HE', 'G4parameterisation', 'G4hadronic_qgstring', 'G4had_string_man', 'G4had_im_r_matrix', 'G4hadronic_deex_management', 'G4hadronic_LE', 'G4hadronic_body_ci', 'G4hadronic_RPG', 'G4hadronic_deex_util', 'G4shortlived', 'G4geomdivision', 'G4hadronic_xsect', 'G4had_mod_util', 'G4detscorer', 'G4had_mod_man', 'G4hadronic_util', 'G4modeling', 'G4event', 'G4geombias', 'G4specsolids', 'G4mesons', 'G4tracking', 'G4emutils', 'G4leptons', 'G4bosons', 'G4ions', 'G4baryons', 'G4cuts', 'G4procman', 'G4csg', 'G4digits', 'G4detector', 'G4hepnumerics', 'G4track', 'G4hits', 'G4navigation', 'G4magneticfield', 'G4partman', 'G4volumes', 'G4geometrymng', 'G4materials', 'G4graphics_reps', 'G4intercoms', 'G4globman']
     for lib in geant4_libs:
       if not conf.CheckLib(lib, language='c++'):
         Exit(1)
 
      # check types size!!!
 
-  print conf.Finish()
+  env = conf.Finish()
 
 
 # NOTE: do this after configure!  So we know if we have ROOT/geant4
 # TODO: this should be a loop that discovers stuff
 #specify all of the sub-projects in the section
+
+interface = env.SharedLibrary(target = 'commonCpp/libinterface', source = ['commonCpp/Interface/AnalysisEventBank.cc', 'commonCpp/Interface/AnalysisPlaneBank.cc', 'commonCpp/Interface/BetaFuncBank.cc', 'commonCpp/Interface/DataBaseAPI.cc', 'commonCpp/Interface/DataBaseReader.cc', 'commonCpp/Interface/dataCards.cc', 'commonCpp/Interface/Differentiator.cc', 'commonCpp/Interface/EmCalDigit.cc', 'commonCpp/Interface/EmCalHit.cc', 'commonCpp/Interface/EmCalTrack.cc', 'commonCpp/Interface/EMRDigit.cc', 'commonCpp/Interface/EMRHit.cc', 'commonCpp/Interface/EventTime.cc', 'commonCpp/Interface/For003Bank.cc', 'commonCpp/Interface/For009Bank.cc', 'commonCpp/Interface/G4BLBank.cc', 'commonCpp/Interface/Interpolator.cc', 'commonCpp/Interface/KLDigit.cc', 'commonCpp/Interface/KLHit.cc', 'commonCpp/Interface/MagFieldMap.cc', 'commonCpp/Interface/MCHit.cc', 'commonCpp/Interface/MCParticle.cc', 'commonCpp/Interface/MCVertex.cc', 'commonCpp/Interface/Memory.cc', 'commonCpp/Interface/Mesh.cc', 'commonCpp/Interface/MICEEvent.cc', 'commonCpp/Interface/MiceMaterials.cc', 'commonCpp/Interface/MICERun.cc', 'commonCpp/Interface/MICESpill.cc', 'commonCpp/Interface/MICEUnits.cc', 'commonCpp/Interface/MMatrix.cc', 'commonCpp/Interface/MMatrixToCLHEP.cc', 'commonCpp/Interface/MVector.cc', 'commonCpp/Interface/PolynomialVector.cc', 'commonCpp/Interface/RFData.cc', 'commonCpp/Interface/RFFieldMap.cc', 'commonCpp/Interface/RunFooter.cc', 'commonCpp/Interface/RunHeader.cc', 'commonCpp/Interface/SciFiDigit.cc', 'commonCpp/Interface/SciFiHit.cc', 'commonCpp/Interface/SpecialHit.cc', 'commonCpp/Interface/Spline1D.cc', 'commonCpp/Interface/SplineInterpolator.cc', 'commonCpp/Interface/Squeak.cc', 'commonCpp/Interface/Squeal.cc', 'commonCpp/Interface/ThreeDFieldMap.cc', 'commonCpp/Interface/TofDigit.cc', 'commonCpp/Interface/TofHit.cc', 'commonCpp/Interface/TriangularMesh.cc', 'commonCpp/Interface/TurtleBank.cc', 'commonCpp/Interface/VersionInfo.cc', 'commonCpp/Interface/VirtualHit.cc', 'commonCpp/Interface/VlpcHit.cc', 'commonCpp/Interface/VmeAdcHit.cc', 'commonCpp/Interface/VmeBaseHit.cc', 'commonCpp/Interface/VmefAdcHit.cc', 'commonCpp/Interface/VmeScalerData.cc', 'commonCpp/Interface/VmeTdcHit.cc', 'commonCpp/Interface/XMLMessage.cc', 'commonCpp/Interface/ZustandVektor.cc',])
+env.Install("build", interface)
+
+simulation= env.SharedLibrary(target= 'commonCpp/libsimulation', source = ['commonCpp/Simulation/DataCardsMessenger.cc',
+'commonCpp/Simulation/FillMaterials.cc',
+'commonCpp/Simulation/MICEBGPlane.cc',
+'commonCpp/Simulation/MICEDetectorConstruction.cc',
+'commonCpp/Simulation/MICEEventAction.cc',
+'commonCpp/Simulation/MiceMessenger.cc',
+'commonCpp/Simulation/MICEPhysicsList.cc',
+'commonCpp/Simulation/MICEPrimaryGeneratorAction.cc',
+'commonCpp/Simulation/MICERunAction.cc',
+'commonCpp/Simulation/MICEStackingAction.cc',
+'commonCpp/Simulation/MICESteppingAction.cc',
+'commonCpp/Simulation/MICEStepStatistics.cc',
+'commonCpp/Simulation/MICETrackingAction.cc',
+'commonCpp/Simulation/MICEVisManager.cc',
+'commonCpp/Simulation/StripSpecialHits.cc',
+'commonCpp/Simulation/VirtualPlanes.cc'])
+env.Install("build", simulation)
+
+config= env.SharedLibrary(target= 'commonCpp/libcommon', source = ['commonCpp/Config/RFParameters.cc',
+'commonCpp/Config/BeamParameters.cc',
+'commonCpp/Config/VlpcCableOsaka.cc',
+'commonCpp/Config/CoolingChannelGeom.cc',
+'commonCpp/Config/ModuleTextFileIO.cc',
+'commonCpp/Config/VirtualGeomParameters.cc',
+'commonCpp/Config/RFBackgroundParameters.cc',
+'commonCpp/Config/VlpcCableOsaka2.cc',
+'commonCpp/Config/TofCable.cc',
+'commonCpp/Config/VlpcCableOsaka3.cc',
+'commonCpp/Config/VlpcCableImperial.cc',
+'commonCpp/Config/MagnetParameters.cc',
+'commonCpp/Config/BeamlineGeometry.cc',
+'commonCpp/Config/BeamlineParameters.cc',
+'commonCpp/Config/SciFiCableManager.cc',
+'commonCpp/Config/ModuleConverter.cc',
+'commonCpp/Config/MiceModule.cc',
+'commonCpp/Config/PidFits.cc',])
+env.Install("build", config)
+
+beamtools= env.SharedLibrary(target= 'commonCpp/libbeamtools', source = ['commonCpp/BeamTools/BT3dFieldMap.cc',
+'commonCpp/BeamTools/BTCombinedFunction.cc',
+'commonCpp/BeamTools/BTConstantField.cc',
+'commonCpp/BeamTools/BTFastSolenoid.cc',
+'commonCpp/BeamTools/BTField.cc',
+'commonCpp/BeamTools/BTFieldConstructor.cc',
+'commonCpp/BeamTools/BTFieldGroup.cc',
+'commonCpp/BeamTools/BTMagFieldMap.cc',
+'commonCpp/BeamTools/BTMidplaneMap.cc',
+'commonCpp/BeamTools/BTMultipole.cc',
+'commonCpp/BeamTools/BTPhaser.cc',
+'commonCpp/BeamTools/BTPillBox.cc',
+'commonCpp/BeamTools/BTQuad.cc',
+'commonCpp/BeamTools/BTRFFieldMap.cc',
+'commonCpp/BeamTools/BTSheet.cc',
+'commonCpp/BeamTools/BTSolenoid.cc',
+'commonCpp/BeamTools/BTSpaceChargeField.cc',
+'commonCpp/BeamTools/BTTracker.cc',
+'commonCpp/BeamTools/micegsl.cc',])
+env.Install("build", beamtools)
+
+
+engmodel = env.SharedLibrary(target= 'commonCpp/libengmodel', source = ['commonCpp/EngModel/MiceModToG4Solid.cc',
+'commonCpp/EngModel/MultipoleAperture.cc',
+'commonCpp/EngModel/Polycone.cc',
+'commonCpp/EngModel/Q35.cc',])
+env.Install("build", engmodel)
+
+
+detmodel = env.SharedLibrary(target= 'commonCpp/libdetmodel', source = ['commonCpp/DetModel/KL/KLFiber.cc',
+'commonCpp/DetModel/KL/KLSD.cc',
+'commonCpp/DetModel/KL/KLGlue.cc',
+'commonCpp/DetModel/TOF/TofSD.cc',
+'commonCpp/DetModel/Virtual/SpecialVirtualSD.cc',
+'commonCpp/DetModel/EMR/EMRSD.cc',
+'commonCpp/DetModel/SciFi/DoubletFiberParam.cc',
+'commonCpp/DetModel/SciFi/SciFiSD.cc',
+'commonCpp/DetModel/SciFi/SciFiPlane.cc',
+'commonCpp/DetModel/EMCal/EmCalSD.cc',
+'commonCpp/DetModel/EMCal/EmCalKLFiber.cc',
+'commonCpp/DetModel/EMCal/EmCalKLGlue.cc',
+'commonCpp/DetModel/Ckov/CkovMirror.cc',
+'commonCpp/DetModel/Ckov/CKOVSD.cc',])
+env.Install("build", detmodel)
+
 env.jDev.Subproject('components/map/MapCppPrint')
+env.jDev.Subproject('components/map/MapCppSimulation')
+
+env.Alias('install', ['%s/build' % os.environ.get('MAUS_ROOT_DIR')])

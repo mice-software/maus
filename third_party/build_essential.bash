@@ -16,7 +16,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     #find ${MAUS_ROOT_DIR}/third_party/bash/0* -type f |grep -v REDUNDANT |sort| xargs -i bash {}
     #find ${MAUS_ROOT_DIR}/third_party/bash/1* -type f |grep -v REDUNDANT |sort| xargs -i bash {}
     ${MAUS_ROOT_DIR}/third_party/bash/03python.bash
-    ${MAUS_ROOT_DIR}/third_party/bash/04scons.bash
+    #${MAUS_ROOT_DIR}/third_party/bash/04scons.bash # included
     ${MAUS_ROOT_DIR}/third_party/bash/10swig.bash
     ${MAUS_ROOT_DIR}/third_party/bash/11jsoncpp.bash
 else

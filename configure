@@ -15,8 +15,6 @@ echo
 type -P gcc &>/dev/null || { echo "FATAL: gcc/g++ is required to compile code." >&2; echo "FATAL: To install within MAUS, please run:" >&2; echo: "FATAL:      MAUS_ROOT_DIR=${maus_root_dir} ./third_party/bash/01mpfr.bash" >&2; echo: "FATAL:      MAUS_ROOT_DIR=${maus_root_dir} ./third_party/bash/02gcc.bash" >&2; echo: "FATAL:      MAUS_ROOT_DIR=${maus_root_dir} ./third_party/bash/03python.bash" >&2; exit 1; }
 type -P g++ &>/dev/null || { echo "FATAL: gcc/g++ is required to compile code." >&2; echo "FATAL: To install within MAUS, please run:" >&2; echo: "FATAL:      MAUS_ROOT_DIR=${maus_root_dir} ./third_party/bash/01mpfr.bash" >&2; echo: "FATAL:      MAUS_ROOT_DIR=${maus_root_dir} ./third_party/bash/02gcc.bash" >&2; echo: "FATAL:      MAUS_ROOT_DIR=${maus_root_dir} ./third_party/bash/03python.bash" >&2; exit 1; }
 
-build_type="release"  # TODO remove, scons artifact
-
 # Find where MAUS is installed
 maus_root_dir=`pwd`
 echo "INFO: MAUS ROOT directory, which internal to the program is called \$MAUS_ROOT_DIR.  This *should* also be your current directory:"
@@ -88,8 +86,8 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      fi
 
      # workers
-     PYTHONPATH=\$MAUS_ROOT_DIR/build/${build_type}/:\$PYTHONPATH
-     LD_LIBRARY_PATH=\$MAUS_ROOT_DIR/build/${build_type}:\$LD_LIBRARY_PATH
+     PYTHONPATH=\$MAUS_ROOT_DIR/build:\$PYTHONPATH
+     LD_LIBRARY_PATH=\$MAUS_ROOT_DIR/build:\$LD_LIBRARY_PATH
 
      # disco
      DISCO_HOME=\$MAUS_ROOT_DIR/third_party/build/tuulos-disco-742e814
@@ -109,7 +107,8 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      export G4VERS=geant4.9.2.p01
      export G4SYSTEM=Linux-g++
      export G4INSTALL=\${MAUS_ROOT_DIR}/third_party/build/\${G4VERS}
-     export G4LIB=\${G4INSTALL}/lib/
+     export G4LIB=\${G4INSTALL}/lib
+     LD_LIBRARY_PATH=\${G4LIB}/\${G4SYSTEM}:\${LD_LIBRARY_PATH}
      export G4INCLUDE=\${G4INSTALL}/include/
      export G4TMP=\${G4INSTALL}
      export G4VIS_BUILD_DAWNFILE_DRIVER=1

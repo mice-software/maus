@@ -1,0 +1,635 @@
+//BTField is the parent of all fields in the beamtools package
+//Abstract Base Class
+//Has simply a GetFieldValue method
+
+
+#include "BTFieldConstructor.hh"
+#include "BTMultipole.hh"
+#include "BTFastSolenoid.hh"
+#include "BTSolenoid.hh"
+#include "BTFieldGroup.hh"
+#include "BTPhaser.hh"
+#include "BTMagFieldMap.hh"
+#include "BTConstantField.hh"
+#include "BTCombinedFunction.hh"
+#include "BT3dFieldMap.hh"
+#include "BTPillBox.hh"
+#include "BTRFFieldMap.hh"
+
+#include "Config/MiceModule.hh"
+
+std::string       BTFieldConstructor::_defaultSolenoidMode = "";
+const int         BTFieldConstructor::_numberOfFieldTypes  = 13;
+const std::string BTFieldConstructor::_fieldTypes[14] 
+           = {"Solenoid","PillBox","MagneticFieldMap", "Quadrupole", "RFFieldMap", 
+              "RectangularField", "CylindricalField", "Dipole1", "Dipole2", "Multipole", "CombinedFunction", "FastSolenoid", 
+              "FieldAmalgamation",""};
+int               BTFieldConstructor::_fieldNameIndex = 0;
+
+BTFieldConstructor::BTFieldConstructor() :
+                                              _magneticField(new BTFieldGroup()),
+                                              _electroMagneticField(new BTFieldGroup()),
+                                              _needsPhases(false), _amalgamatedFields(0)
+{
+	if(GetGridDefault()[0]<2 || GetGridDefault()[1]<2 || GetGridDefault()[2]<2) 
+		throw(Squeal(Squeal::recoverable, "FieldGridX, FieldGridY, FieldGridZ datacards must be > 1", "BTFieldConstructor::BTFieldConstructor"));
+	SetGridSize( BTFieldGroup::GetGridDefault() );
+	_electroMagneticField->AddField(_magneticField, Hep3Vector(0,0,0));
+	AddField(_electroMagneticField, Hep3Vector(0,0,0));
+}
+
+
+BTFieldConstructor::BTFieldConstructor(MiceModule * rootModule) :
+                                              _magneticField(new BTFieldGroup()),
+                                              _electroMagneticField(new BTFieldGroup()),
+                                              _needsPhases(false), _amalgamatedFields(0)
+{
+  _electroMagneticField->AddField(_magneticField, Hep3Vector(0,0,0));
+  AddField(_electroMagneticField, Hep3Vector(0,0,0));
+  BuildFields(rootModule);
+}
+
+void BTFieldConstructor::BuildFields(MiceModule * rootModule)
+{
+	SetDefaults();
+	if(GetGridDefault()[0]<2 || GetGridDefault()[1]<2 || GetGridDefault()[2]<2) 
+		throw(Squeal(Squeal::recoverable, "FieldGridX, FieldGridY, FieldGridZ datacards must be > 1", "BTFieldConstructor::BTFieldConstructor"));
+	SetGridSize( BTFieldGroup::GetGridDefault() );
+	_magneticField       ->SetGridSize( BTFieldGroup::GetGridDefault() );
+	_electroMagneticField->SetGridSize( BTFieldGroup::GetGridDefault() );
+	try {
+	int ignoredAmalgamated = 0;
+	_needsPhases = false;
+	BTSolenoid::ClearStaticMaps();
+	std::vector<const MiceModule*> daughterModules;
+	for(int fields = 0; fields < _numberOfFieldTypes; fields++)
+	{
+		daughterModules = rootModule->findModulesByPropertyString( "FieldType", _fieldTypes[fields] );
+		for(unsigned int i=0; i<daughterModules.size(); i++)
+		{ try{
+			BTField * newField;
+			const MiceModule * theModule   = daughterModules[i];
+			if(daughterModules[i]->propertyExistsThis("IsAmalgamated", "bool"))
+			{
+				if(daughterModules[i]->propertyBoolThis("IsAmalgamated")) //don't use, the BTFieldAmalgamation should deal with it
+				{ignoredAmalgamated++; newField = NULL;}
+				else{ newField = GetField(theModule); } //not amalgamated, use as normal
+			}
+			else{   newField    = GetField(theModule); } //not amalgamated, use as normal
+			Hep3Vector         position    = theModule->globalPosition();
+			HepRotation        rotation    = theModule->globalRotation();
+			double             scaleFactor = theModule->globalScaleFactor();
+  		if(newField==NULL) {;} //error do nothing
+			else if(newField->DoesFieldChangeEnergy())
+				_electroMagneticField->AddField(newField, position, rotation, scaleFactor, false); //make sure that I call Close at the end!
+			else
+				_magneticField->AddField(newField, position, rotation, scaleFactor, false);
+			SetName(newField, theModule);
+		}
+		catch(Squeal squee) {std::cerr << "Error while loading fields from module "+daughterModules[i]->fullName() << std::endl; squee.Print(); exit(1);}
+		catch(...)          
+		{std::cerr << "Unhandled exception while loading fields from module "+daughterModules[i]->fullName()+" - bailing" << std::endl; exit(1);}
+		}
+	}
+  _magneticField->Close();
+
+	SetPhaser();
+	WriteFieldMaps();
+	if(_amalgamatedFields != ignoredAmalgamated)
+	{
+		std::stringstream in;
+		in << "Error - detected " << ignoredAmalgamated << " fields with PropertyBool IsAmalgamated 1, but only " 
+		   << _amalgamatedFields << " in Amalgamation MiceModules";
+		throw(Squeal(Squeal::recoverable, in.str(), "BTFieldConstructor()"));
+	}
+	}
+	catch(Squeal squee) {squee.Print(); exit(1);}
+	catch(...)          {std::cerr << "Unhandled exception while loading fields - bailing" << std::endl; exit(1);}
+}
+
+bool BTFieldConstructor::ModuleHasElectromagneticField(const MiceModule * theModule)
+{
+	if(theModule->propertyExistsThis("CavityMode", "string") ) return true;
+	return false;
+}
+
+BTField * BTFieldConstructor::GetField(const MiceModule * theModule)
+{
+	std::string field = theModule->propertyStringThis("FieldType");
+	if(field == "Solenoid")
+		return GetSolenoid(theModule);
+	if(field == "FastSolenoid")
+		return GetFastSolenoid(theModule);
+	else if(field == "PillBox")
+		return GetRFCavity(theModule);
+	else if(field == "MagneticFieldMap")
+		return GetMagFieldMap(theModule);
+	else if(field == "Quadrupole")
+		return GetQuadrupole(theModule);
+	else if(field == "RFFieldMap")
+		return GetRFCavity(theModule);
+	else if(field == "RectangularField" || field == "CylindricalField")
+		return GetConstantField(theModule);
+	else if(field == "Dipole1" || field == "Dipole2")
+		return GetDipole(theModule);
+	else if(field == "Multipole")
+		return GetMultipole(theModule);
+	else if(field == "CombinedFunction")
+		return GetCombinedFunction(theModule);
+	else if(field == "FieldAmalgamation")
+		return GetFieldAmalgamation(theModule);
+	else
+	{
+		Squeak::mout(Squeak::warning) << "Unrecognised field of type " << theModule->propertyStringThis("FieldType") << std::endl;
+		return NULL;
+	}
+
+}
+
+
+BTField * BTFieldConstructor::GetSolenoid(const MiceModule * theModule)
+{
+	//If in read mode, read in a file
+	std::string solenoidMode=_defaultSolenoidMode;
+	std::string interpolation = "LinearCubic";
+	if(theModule->propertyExistsThis( "InterpolationAlgorithm", "string" ) )
+		interpolation = theModule->propertyStringThis("InterpolationAlgorithm");
+	std::string filename = (theModule->propertyStringThis("FileName"));
+	if(theModule->propertyExistsThis( "FieldMapMode", "string"))
+		solenoidMode = (theModule->propertyStringThis("FieldMapMode"));
+	if(solenoidMode == "Read")
+	{
+		return (new BTSolenoid(theModule->propertyStringThis("FileName").c_str(), interpolation) );
+	}
+	else if(solenoidMode != "Write" && solenoidMode != "Analytic" && solenoidMode != "WriteDynamic")
+	{
+		std::cerr << "Unrecognised field map mode " << solenoidMode << " in module " << theModule->name() << " - aborting" << std::endl;
+		exit (1);
+	}
+
+	BTSolenoid * newSolenoid = new BTSolenoid();
+
+	//Overload defaults if required
+	double fieldTolerance = -1;
+	if(theModule->propertyExistsThis( "ZExtentFactor", "double") )
+		newSolenoid->SetZExtentFactor(theModule->propertyDoubleThis("ZExtentFactor"));
+	if(theModule->propertyExistsThis( "RExtentFactor", "double") )
+		newSolenoid->SetRExtentFactor(theModule->propertyDoubleThis("RExtentFactor"));
+	if(theModule->propertyExistsThis( "NumberOfZCoords", "int") )
+		newSolenoid->SetNumberOfZCoords(theModule->propertyIntThis("NumberOfZCoords"));
+	if(theModule->propertyExistsThis( "NumberOfRCoords", "int") )
+		newSolenoid->SetNumberOfZCoords(theModule->propertyIntThis("NumberOfRCoords"));
+	if(theModule->propertyExistsThis( "NumberOfSheets", "int") )
+		newSolenoid->SetNumberOfSheets(theModule->propertyIntThis("NumberOfSheets"));
+	if(solenoidMode == "WriteDynamic")
+        {
+		if(theModule->propertyExistsThis( "FieldTolerance", "double") )
+                {
+			fieldTolerance = theModule->propertyDoubleThis("FieldTolerance");
+ 		}
+		else
+		{
+			theModule->printTree(0);
+			throw(Squeal(Squeal::recoverable, "Solenoid mode is WriteDynamic but no tolerance set in module "+theModule->name(), 
+			                                  "BTFieldConstructor::GetSolenoid") );
+		}
+	}
+
+	double length=(theModule->propertyDoubleThis("Length"));
+	double thickness=(theModule->propertyDoubleThis("Thickness"));
+	double innerRadius=(theModule->propertyDoubleThis("InnerRadius"));
+	double currentDensity=(theModule->propertyDoubleThis("CurrentDensity"));
+	if(solenoidMode == "Analytic")
+	{
+		newSolenoid->SetIsAnalytic(true);
+		newSolenoid->BuildSheets(length,thickness,innerRadius,currentDensity);
+	}
+	else
+		newSolenoid->BuildSheets(length,thickness,innerRadius,currentDensity, fieldTolerance, filename, interpolation);
+	return newSolenoid;
+}
+
+BTField * BTFieldConstructor::GetRFCavity(const MiceModule * theModule)
+{
+	BTPillBox * newPillBox = NULL;
+
+	double length=0, energyGain=0, frequency=0, timeDelay=0;
+
+	std::string fieldMapFile       = "";
+	std::string fieldMapType       = "";
+	std::string fieldDuringPhasing = "";
+	std::string pillBoxMode        = theModule->propertyStringThis("CavityMode");
+
+	fieldDuringPhasing = theModule->propertyStringThis("FieldDuringPhasing");
+	if(theModule->propertyStringThis("FieldType") == "RFFieldMap")
+	{
+		fieldMapFile = theModule->propertyStringThis("FileName");
+		if(theModule->propertyExistsThis("FileType","string"))
+			fieldMapType = theModule->propertyStringThis("FileType");
+	}
+
+
+	length = theModule->propertyDoubleThis("Length");
+	if(pillBoxMode == "Electrostatic")
+	{
+		energyGain    = theModule->propertyDoubleThis("PeakEField");
+		double radius = theModule->propertyDoubleThis("FieldRadius");
+		newPillBox = new BTPillBox(length, energyGain, radius);
+		if(theModule->propertyStringThis("FieldType") == "RFFieldMap")
+			throw(Squeal(Squeal::recoverable, "Can't have electrostatic RFFieldMap", "BTFieldConstructor::GetRFCavity"));
+	}
+	else if(pillBoxMode == "Unphased" || pillBoxMode == "AutomaticPhasing")
+	{
+		frequency = theModule->propertyDoubleThis("Frequency");
+		if(BTPillBox::StringToPhaseModel(fieldDuringPhasing) == BTPillBox::bestGuess)
+			energyGain = theModule->propertyDoubleThis("EnergyGain");
+		else    energyGain = theModule->propertyDoubleThis("PeakEField");
+		if(theModule->propertyString("FieldType") == "PillBox")
+			newPillBox = new BTPillBox(frequency, length, energyGain, fieldDuringPhasing);
+		else if(theModule->propertyStringThis("FieldType") == "RFFieldMap")
+			newPillBox = new BTRFFieldMap(frequency, length, energyGain, fieldDuringPhasing, fieldMapFile, fieldMapType);
+		_needsPhases = true;
+	}
+	else
+	{
+		energyGain = theModule->propertyDoubleThis("PeakEField");
+		timeDelay  = theModule->propertyDoubleThis("TimeDelay");
+		if(theModule->propertyStringThis("FieldType") == "PillBox")
+			newPillBox = new BTPillBox(frequency, length, energyGain, timeDelay);
+		else if(theModule->propertyStringThis("FieldType") == "RFFieldMap")
+			newPillBox = new BTRFFieldMap(frequency, length, energyGain, timeDelay, fieldMapFile, fieldMapType);
+	}
+	if(newPillBox==NULL)
+		throw(Squeal(Squeal::recoverable, "Unrecognised CavityMode", "BTFieldConstructor::GetRFCavity" ));
+	if(theModule->propertyExistsThis("ReferenceParticlePhase", "double"))
+		newPillBox->SetRefParticlePhase(theModule->propertyDoubleThis("ReferenceParticlePhase"));
+	return newPillBox;
+}
+
+BTField * BTFieldConstructor::GetMagFieldMap(const MiceModule * theModule)
+{
+	std::string fieldMapMode = theModule->propertyStringThis("FieldMapMode");
+	std::string filetype="g4micetext";
+	if(theModule->propertyExistsThis( "FileType", "string"))
+		filetype = (theModule->propertyStringThis("FileType"));
+
+	if(fieldMapMode=="Write" && filetype != "g4bl3dGrid")
+	{
+		_fieldMapsForWriting.push_back(theModule);
+		return NULL;
+	}
+	else if(fieldMapMode != "Read")
+	{
+		std::cerr << "Unrecognised field map mode " << fieldMapMode << " in module "
+		     << theModule->name() << " - aborting" << std::endl;
+		exit (1);
+	}
+
+	std::string filename = (theModule->propertyStringThis("FileName"));
+	if(filetype == "g4bl3dGrid") 
+	{
+		std::string symmetry = "None";
+		if(theModule->propertyExistsThis( "Symmetry", "string"))
+			symmetry     = theModule->propertyStringThis("Symmetry");
+		return new BT3dFieldMap("", filename, filetype, symmetry);
+	}
+	return new BTMagFieldMap(filename, filetype, "interpolation");
+}
+
+BTField * BTFieldConstructor::GetQuadrupole(const MiceModule * theModule)
+{
+	//Require four parameters
+	double width  = theModule->propertyDoubleThis("Width");
+	double height = width;
+	double length = theModule->propertyDoubleThis("Length");
+	double field  = 0.;
+	if(theModule->propertyExistsThis("FieldAtPoleTip", "double") )
+		field           = theModule->propertyDoubleThis("FieldAtPoleTip")/theModule->propertyDoubleThis("PoleTipRadius") * width/2.;
+	else if(theModule->propertyExistsThis("FieldGradient", "double") )
+		field           = theModule->propertyDoubleThis("FieldGradient") * width/2.;
+	else
+		field           = theModule->propertyDoubleThis("Magnitude");
+	int    pole = 2;
+
+	if(!theModule->propertyExistsThis("EndFieldType", "string"))
+		return new BTMultipole(pole, field, length, 0., height, width, "");
+	else if(!theModule->propertyExistsThis("EndFieldType", "string"))
+		return new BTMultipole(pole, field, length, 0., height, width, "");
+	else if(theModule->propertyStringThis("EndFieldType") == "Enge")
+	{
+		double effectiveWidth = theModule->propertyDoubleThis("EffectiveWidth");
+    double endLength      = 0.;
+    if(!theModule->propertyExistsThis("EndLength", "double"))
+  		endLength           = theModule->propertyDouble("EndLength");
+		int    endPole        = theModule->propertyIntThis("MaxEndPole") - pole;
+		if(endPole < 0) throw(Squeal(Squeal::recoverable, "MaxEndPole must be >= pole", "BTFieldConstructor::GetMultipole(MiceModule*)"));
+		vector<double> enge;
+		bool propertyExists = true;
+		int  engeNumber     = 0;
+		while(propertyExists)
+		{
+			engeNumber++;
+			std::stringstream property;
+			property << "Enge" << engeNumber;
+			if(theModule->propertyExistsThis(property.str(), "double"))
+				enge.push_back( theModule->propertyDoubleThis(property.str()) );
+			else propertyExists = false;
+		}
+		if(engeNumber == 1) enge = MagnetParameters::getInstance()->QuadrupoleFringeParameters();
+		return new BTMultipole(pole, field, length, 0., height, width, effectiveWidth, endLength, endPole, enge, "");
+	}
+	else
+		throw(Squeal(Squeal::recoverable, "Did not recognise field type", "BTFieldConstructor::GetMultipole(const MiceModule*)"));
+}
+
+BTField * BTFieldConstructor::GetConstantField(const MiceModule * theModule)
+{
+	CLHEP::Hep3Vector field = theModule->propertyHep3VectorThis("ConstantField");
+	if(theModule->propertyStringThis("FieldType") == "RectangularField")
+	{
+		double width  = theModule->propertyDoubleThis("Width");
+		double height = theModule->propertyDoubleThis("Height");
+		double length = theModule->propertyDoubleThis("Length"); 
+		return new BTConstantField(length, width, height, field);
+	}
+	else
+	{
+		double radius = theModule->propertyDoubleThis("FieldRadius");
+		double length = theModule->propertyDoubleThis("Length"); 
+		return new BTConstantField(length, radius, field);
+	}
+	
+}
+
+BTField * BTFieldConstructor::GetDipole(const MiceModule * theModule)
+{
+	double height  = theModule->propertyDoubleThis("Height");
+	double width   = theModule->propertyDoubleThis("Width");
+	double length  = theModule->propertyDoubleThis("Length"); //length along reference trajectory
+
+	if(theModule->propertyString("FieldType") == "Dipole1")
+	{
+		double field             = theModule->propertyDoubleThis("DipoleField");
+		double radiusOfCurvature = theModule->propertyDoubleThis("ReferenceCurvature");
+		return new BTMultipole(1, field, length, radiusOfCurvature, height, width);
+	}
+	else if(theModule->propertyString("FieldType") == "Dipole2")
+	{
+		double momentum  = theModule->propertyDoubleThis("ReferenceMomentum");
+		double angle     = theModule->propertyDoubleThis("BendingAngle");
+		return new BTMultipole(BTMultipole::DipoleFromMomentum(momentum, length, angle, height, width));
+	}
+	else
+	{
+		Squeak::mout(Squeak::error) << "Unexpected error in BTFieldConstructor::GetDipole" << std::endl;
+		exit(1);
+	}
+
+}
+
+BTField * BTFieldConstructor::GetMultipole(const MiceModule * theModule)
+{
+	double height  = theModule->propertyDoubleThis("Height");
+	double width   = theModule->propertyDoubleThis("Width");
+	double length  = theModule->propertyDoubleThis("Length"); //length along reference trajectory
+
+	int    pole               = theModule->propertyIntThis("Pole");
+	std::string geometry = ""; 
+	if(theModule->propertyExistsThis("CurvatureModel", "string"))
+		geometry  = theModule->propertyStringThis("CurvatureModel");
+
+	double radiusVariable  = 0;
+	double field           = 0;
+	if(theModule->propertyExistsThis("ReferenceCurvature", "double"))
+		radiusVariable = theModule->propertyDoubleThis("ReferenceCurvature");
+	if(theModule->propertyExistsThis("Magnitude", "double"))
+		field          = theModule->propertyDoubleThis("Magnitude");
+	if(geometry=="MomentumBased")
+	{
+		if(theModule->propertyExistsThis("ReferenceMomentum", "double")) 
+			radiusVariable = theModule->propertyDoubleThis("ReferenceMomentum");
+		else 
+			throw(Squeal(Squeal::nonRecoverable, "Did not define multipole reference momentum", "BTFieldConstructor::GetMultipole(const MiceModule*)") );
+		if(theModule->propertyExistsThis("BendingAngle", "double")) 
+			field          = theModule->propertyDoubleThis("BendingAngle");
+		else 
+			throw(Squeal(Squeal::nonRecoverable, "Did not define multipole bending angle", "BTFieldConstructor::GetMultipole(const MiceModule*)") );
+	}
+
+	if(!theModule->propertyExistsThis("EndFieldType", "string"))
+		return new BTMultipole(pole, field, length, radiusVariable, height, width, geometry);
+	else if(theModule->propertyStringThis("EndFieldType") == "HardEdged")
+		return new BTMultipole(pole, field, length, radiusVariable, height, width, geometry);
+	else if(theModule->propertyStringThis("EndFieldType") == "Enge")
+	{
+		double effectiveWidth = theModule->propertyDoubleThis("EffectiveWidth");
+		double endLength      = theModule->propertyDoubleThis("Length");//theModule->propertyDouble("EndLength"); I think force this to 0 and just use length
+		int    endPole        = theModule->propertyIntThis("MaxEndPole") - pole;
+		if(endPole < 0) throw(Squeal(Squeal::recoverable, "MaxEndPole must be >= pole", "BTFieldConstructor::GetMultipole(MiceModule*)"));
+		vector<double> enge;
+		bool propertyExists = true;
+		int  engeNumber     = 0;
+		while(propertyExists)
+		{
+			engeNumber++;
+			std::stringstream property;
+			property << "Enge" << engeNumber;
+			if(theModule->propertyExistsThis(property.str(), "double"))
+				enge.push_back( theModule->propertyDoubleThis(property.str()) );
+			else propertyExists = false;
+		}
+		if(engeNumber == 1) enge = MagnetParameters::getInstance()->QuadrupoleFringeParameters();
+		return new BTMultipole(pole, field, length, radiusVariable, height, width, effectiveWidth, endLength, endPole, enge, geometry);
+	}
+	else
+		throw(Squeal(Squeal::recoverable, "Did not recognise field type", "BTFieldConstructor::GetMultipole(const MiceModule*)"));
+}
+
+BTField * BTFieldConstructor::GetCombinedFunction(const MiceModule * theModule)
+{
+	double height  = theModule->propertyDoubleThis("Height");
+	double width   = theModule->propertyDoubleThis("Width");
+	double length  = theModule->propertyDoubleThis("Length"); //length along reference trajectory
+
+	int    maxPole            = theModule->propertyIntThis("MaximumPole");
+	double fieldIndex         = theModule->propertyDoubleThis("FieldIndex");
+	double radiusVariable     = 0;
+	double field              = 0;
+	std::string geometry      = "";
+	if(theModule->propertyExistsThis("CurvatureModel", "string"))
+		geometry  = theModule->propertyStringThis("CurvatureModel");
+
+	if(geometry=="MomentumBased")
+	{
+		if(theModule->propertyExistsThis("ReferenceMomentum", "double")) 
+			radiusVariable = theModule->propertyDoubleThis("ReferenceMomentum");
+		else 
+			throw(Squeal(Squeal::nonRecoverable, "Did not define multipole reference momentum", "BTFieldConstructor::GetMultipole(const MiceModule*)") );
+		if(theModule->propertyExistsThis("BendingAngle", "double")) 
+			field          = theModule->propertyDoubleThis("BendingAngle");
+		else 
+			throw(Squeal(Squeal::nonRecoverable, "Did not define multipole bending angle", "BTFieldConstructor::GetMultipole(const MiceModule*)") );
+	}
+	else
+	{
+		radiusVariable = theModule->propertyDoubleThis("ReferenceCurvature");
+		field          = theModule->propertyDoubleThis("BendingField");
+	}
+
+	if(!theModule->propertyExistsThis("EndFieldType", "string"))
+		return new BTCombinedFunction(field, fieldIndex, length, radiusVariable, height, width, maxPole, geometry);
+	else if(theModule->propertyStringThis("EndFieldType") == "HardEdged")
+		return new BTCombinedFunction(field, fieldIndex, length, radiusVariable, height, width, maxPole, geometry);
+	else if(theModule->propertyStringThis("EndFieldType") == "Enge")
+	{
+		double effectiveWidth = theModule->propertyDoubleThis("EffectiveWidth");
+		double endLength      = theModule->propertyDoubleThis("Length");
+		int    endPole        = theModule->propertyIntThis("EndPole");
+		vector<double> enge;
+		bool propertyExists = true;
+		int  engeNumber     = 0;
+		while(propertyExists)
+		{
+			engeNumber++;
+			std::stringstream property;
+			property << "Enge" << engeNumber;
+			if(theModule->propertyExistsThis(property.str(), "double"))
+				enge.push_back( theModule->propertyDoubleThis(property.str()) );
+			else propertyExists = false;
+		}
+		if(engeNumber == 1) enge = MagnetParameters::getInstance()->QuadrupoleFringeParameters();
+		return new BTCombinedFunction(field, fieldIndex, length, radiusVariable, height, width, maxPole, effectiveWidth, endLength, 
+		                              endPole, enge, geometry);
+	}
+	else
+		throw(Squeal(Squeal::recoverable, "Did not recognise end field type", "BTFieldConstructor::GetCombinedFunction(const MiceModule*)"));
+}
+
+BTField * BTFieldConstructor::GetFastSolenoid(const MiceModule * theModule)
+{
+  BTFastSolenoid * fast = NULL;
+  std::string mode      = theModule->propertyStringThis("EndFieldModel");
+  double      peakField = theModule->propertyDoubleThis("PeakField");
+  double      zMax      = theModule->propertyDoubleThis("ZMax");
+  double      rMax      = theModule->propertyDoubleThis("RMax");
+  int         order     = theModule->propertyIntThis   ("Order");
+  bool        lookup    = true;
+
+  try{lookup = theModule->propertyBoolThis("LookupMode");} catch(...) {}
+  if(mode == "Tanh")
+  {
+    double eFoldDist = theModule->propertyDoubleThis("EFoldLength");
+    double length    = theModule->propertyDoubleThis("CentreLength");
+    fast = new BTFastSolenoid( BTFastSolenoid::BTFastTanh  (peakField, eFoldDist, length, zMax, rMax, order));
+  }
+  else if(mode == "Glaser")
+  {
+    double lambda    = theModule->propertyDoubleThis("Lambda");
+    fast = new BTFastSolenoid( BTFastSolenoid::BTFastGlaser(peakField, lambda, zMax, rMax, order));
+  }
+  else
+    throw(Squeal(Squeal::recoverable, "EndFieldModel "+mode+" not recognised in module "+theModule->name(), "BTFieldConstructor::GetFastSolenoid"));
+  if(lookup)
+  {
+    double lookupStep = theModule->propertyDoubleThis("LookupStepSize");
+    fast->DoLookup(lookupStep);
+  }
+  return fast;
+}
+
+BTField * BTFieldConstructor::GetFieldAmalgamation(const MiceModule * theModule)
+{
+//  BTFieldAmalgamation(double r_max_, double length_, double z_step_, double r_step_, std::string interpolation_, field_type type_=solenoid);
+  double r_max  = theModule->propertyDoubleThis("RMax");
+  double length = theModule->propertyDoubleThis("Length");
+  double z_step = theModule->propertyDoubleThis("ZStep");
+  double r_step = theModule->propertyDoubleThis("RStep");
+  std::string interpolation = "LinearCubic";
+  if(theModule->propertyExistsThis( "InterpolationAlgorithm", "string" ) )
+    interpolation = theModule->propertyStringThis("InterpolationAlgorithm");
+
+  BTFieldAmalgamation* field = new BTFieldAmalgamation(r_max, length, z_step, r_step, interpolation);
+  std::vector<const MiceModule*> daughterModules = theModule->findModulesByPropertyExists( "bool", "IsAmalgamated" );
+  for(unsigned int i=0; i<daughterModules.size(); i++)
+  {
+    if(daughterModules[i]->propertyExistsThis("IsAmalgamated", "bool") && daughterModules[i]->propertyExistsThis("FieldType", "string"))
+    {
+      if(daughterModules[i]->propertyBoolThis("IsAmalgamated")) //include in BTFieldAmalgamation should deal with it
+      {
+        BTField *   newField    = GetField(daughterModules[i]);  //not amalgamated, use as normal
+        Hep3Vector  position    = daughterModules[i]->relativePosition(theModule);//daughterModules[i]);
+        double      scaleFactor = daughterModules[i]->globalScaleFactor()/theModule->globalScaleFactor(); //scale factor relative to this
+//        std::cout << "AMALGAMATE " << theModule->name() << " gscale " << daughterModules[i]->globalScaleFactor() << " scale " << scaleFactor << std::endl;
+        if(newField==NULL)  {;} //error do nothing
+        else field->AddField(newField, position, scaleFactor);
+        _amalgamatedFields++;
+      }
+    }
+  }
+  field->AmalgamateThis();
+  return field;
+}
+
+
+
+void BTFieldConstructor::SetDefaults()
+{
+	MagnetParameters* MagParams = MagnetParameters::getInstance();
+	RFParameters* RFParams = RFParameters::getInstance();
+	//Defaults for solenoids
+	//"useFiles" for backward compatibility
+	if(MagParams->SolDataFiles()==("useFiles"))
+		_defaultSolenoidMode = "Read";
+	else _defaultSolenoidMode = MagParams->SolDataFiles();
+	BTSolenoid::SetStaticVariables(MagParams->NumberNodesRGrid(), MagParams->NumberNodesZGrid(),
+	                               MagParams->DefaultNumberOfSheets(), MagParams->SolzMapExtendFactor(),
+	                               MagParams->SolrMapExtendFactor());
+	//Defaults for Pill box Cavities
+	BTPillBox::SetStaticRefParticlePhase (RFParams->rfAccelerationPhase());
+	//use default for now BTPillBox::SetStaticPhaseModel(RFParams->phaseModel());
+	//Defaults for Quadrupoles
+	vector<double> AVec = MagParams->QuadrupoleFringeParameters();
+	double AArray[6];
+	if(AVec.size()==0) AVec = vector<double>(6);
+	for(unsigned int i=0; i<6; i++) AArray[i] = AVec[i];
+	BTPhaser::SetPhaseTolerance (RFParams->rfPhaseTolerance());
+	BTPhaser::SetEnergyTolerance(RFParams->rfEnergyTolerance());
+	int gridSpace[3] = {MagParams->FieldGridX(),MagParams->FieldGridY(),MagParams->FieldGridZ()};
+	BTFieldGroup::SetGridDefault(std::vector<int>(gridSpace, gridSpace+3));
+}
+
+
+
+void BTFieldConstructor::WriteFieldMaps()
+{
+	for(unsigned int i=0; i<_fieldMapsForWriting.size(); i++)
+	{
+		const MiceModule * theModule = _fieldMapsForWriting[i];
+		std::string filename = theModule->propertyStringThis("FileName");
+		double zMin = theModule->propertyDoubleThis("ZMin");
+		double zMax = theModule->propertyDoubleThis("ZMax");
+		double rMin = theModule->propertyDoubleThis("RMin");
+		double rMax = theModule->propertyDoubleThis("RMax");
+		double dz = theModule->propertyDoubleThis("ZStep");
+		double dr = theModule->propertyDoubleThis("RStep");
+
+		BTMagFieldMap * fieldMap = new BTMagFieldMap(_magneticField);
+		fieldMap->WriteG4MiceTextMap( filename, zMin,zMax,dz,rMin,rMax,dr);
+	}
+}
+
+void BTFieldConstructor::SetName(BTField* newField, const MiceModule* theModule) const
+{
+  if(!newField) return;
+  _fieldNameIndex++;
+  std::stringstream ss;
+  ss << "Field" << _fieldNameIndex;
+  newField->BTField::SetName( ss.str() );
+  if(theModule == NULL) return;
+  else if(theModule->propertyExistsThis( "FieldName", "string" ) )
+    newField->BTField::SetName( theModule->propertyStringThis("FieldName") );  
+
+}
+
+
+
