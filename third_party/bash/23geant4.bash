@@ -16,7 +16,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 	rm -f ${MAUS_ROOT_DIR}/third_party/source/geant_config.tar.gz 
 	rm -f ${MAUS_ROOT_DIR}/third_party/source/geant_data.tar.gz 
 	wget --directory-prefix=${MAUS_ROOT_DIR}/third_party/source ${url}
-	wget --directory-prefix=${MAUS_ROOT_DIR}/third_party/source http://micewww.pp.rl.ac.uk:8080/attachments/download/91/geant_config.tar.gz # TODO fixme
+	wget --directory-prefix=${MAUS_ROOT_DIR}/third_party/source http://micewww.pp.rl.ac.uk:8080/attachments/download/92/geant_config.tar.gz # TODO fixme
 	wget --directory-prefix=${MAUS_ROOT_DIR}/third_party/source http://micewww.pp.rl.ac.uk:8080/attachments/download/81/geant_data.tar.gz  # TODO fixme
 
     fi
