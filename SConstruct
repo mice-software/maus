@@ -69,21 +69,10 @@ env.Append(SWIGFLAGS=['-python', '-c++']) # tell SWIG to make python bindings fo
 #env.Append(PATH="%s/third_party/install/bin" % os.environ.get('MAUS_ROOT_DIR'))
 env['ENV']['PATH'] =  os.environ.get('PATH')  # useful to set for root-config
 
-# to find JSON
-if os.environ.get('G4INSTALL'): # does geant4 exist?  but use json et all regardless
-  env.Append(LIBPATH = ["%s/third_party/install/lib" % os.environ.get('MAUS_ROOT_DIR'), "%s/%s" % (os.environ.get('G4LIB'), os.environ.get('G4SYSTEM'))])
-  # this should find swig and json and python
-  env.Append(CPPPATH=["%s/third_party/install/include" % os.environ.get('MAUS_ROOT_DIR'), \
-                    "%s/third_party/install/include/python2.7" % os.environ.get('MAUS_ROOT_DIR'), \
-                        os.environ.get("G4INCLUDE")])
-else:
-  env.Append(LIBPATH = ["%s/third_party/install/lib" % os.environ.get('MAUS_ROOT_DIR')])
-  # this should find swig and json
-  env.Append(CPPPATH=["%s/third_party/install/include" % os.environ.get('MAUS_ROOT_DIR'), \
-                        "%s/third_party/install/include/python2.7" % os.environ.get('MAUS_ROOT_DIR')])
-
-print env['LIBPATH']
-#env.Append()
+# to find third party libs, includes
+env.Append(LIBPATH = ["%s/third_party/install/lib" % os.environ.get('MAUS_ROOT_DIR')])
+env.Append(CPPPATH=["%s/third_party/install/include" % os.environ.get('MAUS_ROOT_DIR'), \
+                      "%s/third_party/install/include/python2.7" % os.environ.get('MAUS_ROOT_DIR')])
 
 env['USE_G4'] = False
 env['USE_ROOT'] = False
@@ -142,7 +131,6 @@ if not env.GetOption('clean'):
     Exit(1)
 
   if not conf.CheckLib( "stdc++" , language='C++'):
-    print( "can't find stdc++ library which is needed" );
     Exit(1)
 
   if not conf.CheckFunc('printf'):
@@ -150,19 +138,15 @@ if not env.GetOption('clean'):
     Exit(0)
 
   if not conf.CheckHeader('math.h'):
-    print "You need 'math.h' to compile this program"
     Exit(1)
 
   if not conf.CheckCHeader('stdlib.h'):
-    print "You need 'stdlib.h' to compile this program"
     Exit(1)
 
   if not conf.CheckCXXHeader('iostream', '<>'):
-    print "You need 'iostream' to compile this program"
     Exit(1)
 
   if not conf.CheckCommand('python'):
-    print "Cound't find python"
     Exit(1)
 
   if not conf.CheckCXXHeader('Python.h'):
@@ -179,7 +163,7 @@ if not env.GetOption('clean'):
   if not conf.CheckLib('gslcblas'):
     print "Cound't find GSL (required for ROOT).  If you want it, then run:"
     print ("      MAUS_ROOT_DIR=%s ./third_party/bash/20gsl.bash" % os.environ.get('MAUS_ROOT_DIR'))
-    if os.environ.get('REQUIREALL'):
+    if 'REQUIREALL' in os.environ:
       print "When running with 'REQUIREALL' all possible dependcies must exist"
       Exit(1)
   else:
@@ -188,14 +172,14 @@ if not env.GetOption('clean'):
   if not conf.CheckLib('gsl'):
     print "Cound't find GSL (required for ROOT).  If you want it, then run:"
     print ("      MAUS_ROOT_DIR=%s ./third_party/bash/20gsl.bash" % os.environ.get('MAUS_ROOT_DIR'))
-    if os.environ.get('REQUIREALL'):
+    if 'REQUIREALL' in os.environ:
       print "When running with 'REQUIREALL' all possible dependcies must exist"
       Exit(1)
 
   if not conf.CheckCommand('root'):
     print "Cound't find root.  If you want it, after installing GSL, then run:"
     print ("      MAUS_ROOT_DIR=%s ./third_party/bash/21root.bash" % os.environ.get('MAUS_ROOT_DIR'))
-    if os.environ.get('REQUIREALL'):
+    if 'REQUIREALL' in os.environ:
       print "When running with 'REQUIREALL' all possible dependcies must exist"
       Exit(1)
 
@@ -206,7 +190,6 @@ if not env.GetOption('clean'):
     env['USE_ROOT'] = True
 
     if not conf.CheckCommand('root-config'):
-      print "Cound not find root-config"
       Exit(1)
 
     conf.env.ParseConfig("root-config --cflags --ldflags --libs") 
@@ -215,41 +198,43 @@ if not env.GetOption('clean'):
        
     for lib in root_libs:
       if not conf.CheckLib(lib, language='c++'):
-        print "You need %s to compile this program" % lib
         Exit(1)
 
     if not conf.CheckCXXHeader('TH1F.h'):
-      print "You need 'TH1F.h' to compile this program"
       Exit(1)
 
     if not conf.CheckCXXHeader('TMinuit.h'):
-      print "You need 'TH1F.h' to compile this program"
       Exit(1)
 
   if not conf.CheckLib('CLHEP', language='c++'):
     print "Cound't find CLHEP (required for geant4).  If you want it, then run:"
     print ("      MAUS_ROOT_DIR=%s ./third_party/bash/22clhep.bash" % os.environ.get('MAUS_ROOT_DIR'))
-    if os.environ.get('REQUIREALL'):
+    if 'REQUIREALL' in os.environ:
       print "When running with 'REQUIREALL' all possible dependcies must exist"
       Exit(1)
 
-  if not os.environ.get('G4INSTALL') or not os.path.exists(os.environ.get('G4INSTALL')):
+  if 'G4INSTALL' not in os.environ or (not os.path.exists(os.environ.get('G4INSTALL'))):
     print "Cound't find geant4.  If you want it, after installing CLHEP, then run:"
     print ("      MAUS_ROOT_DIR=%s ./third_party/bash/23geant4.bash" % os.environ.get('MAUS_ROOT_DIR'))
-    if os.environ.get('REQUIREALL'):
+    if 'REQUIREALL' in os.environ:
       print "When running with 'REQUIREALL' all possible dependcies must exist"
       Exit(1)
   else:
     print
     print "!! Found the package 'geant4', so assume you want to use it with MAUS."
     print
-    
+
+    if not conf.CheckCXXHeader('geant4/G4EventManager.hh'):
+      Exit(1)
+
+    env.Append(LIBPATH = ["%s/%s" % (os.environ.get('G4LIB'), os.environ.get('G4SYSTEM'))])
+    env.Append(CPPPATH=[os.environ.get("G4INCLUDE")])
+  
     conf.env.ParseConfig('%s/liblist -m %s < %s/libname.map'.replace('%s', os.path.join(os.environ.get('G4LIB'), os.environ.get('G4SYSTEM'))))
 
     geant4_libs = ['G4error_propagation', 'G4mctruth', 'G4readout', 'G4phys_lists', 'G4gflash', 'G4phys_builders', 'G4visHepRep', 'G4biasing', 'G4geomtext', 'G4FR', 'G4brep', 'G4RayTracer', 'G4Tree', 'G4VRML', 'G4visXXX', 'G4vis_management', 'G4geomBoolean', 'G4hadronic_radioactivedecay', 'G4decay', 'G4UIbasic', 'G4UIGAG', 'G4UIcommon', 'G4emhighenergy', 'G4partadj', 'G4muons', 'G4empolar', 'G4emlowenergy', 'G4xrays', 'G4hadronic_coherent_elastic', 'G4emstandard', 'G4hadronic_binary', 'G4partutils', 'G4run', 'G4had_theo_max', 'G4had_muon_nuclear', 'G4scoring', 'G4hadronic_interface_ci', 'G4hadronic_abrasion', 'G4transportation', 'G4hadronic_bert_cascade', 'G4hadronic_hetcpp_evaporation', 'G4hadronic_proc', 'G4hadronic_stop', 'G4hadronic_em_dissociation', 'G4hadronic_mgt', 'G4hadronic_qmd', 'G4hadronic_hetcpp_utils', 'G4hadronic_iso', 'G4hadronic_ablation', 'G4optical', 'G4had_preequ_exciton', 'G4hadronic_incl_cascade', 'G4hadronic_deex_handler', 'G4had_lll_fis', 'G4hadronic_deex_evaporation', 'G4had_neu_hp', 'G4had_string_diff', 'G4hadronic_leading_particle', 'G4hadronic_deex_gem_evaporation', 'G4hadronic_deex_fission', 'G4hadronic_deex_fermi_breakup', 'G4detutils', 'G4hadronic_deex_photon_evaporation', 'G4hadronic_deex_multifragmentation', 'G4had_string_frag', 'G4hadronic_HE', 'G4parameterisation', 'G4hadronic_qgstring', 'G4had_string_man', 'G4had_im_r_matrix', 'G4hadronic_deex_management', 'G4hadronic_LE', 'G4hadronic_body_ci', 'G4hadronic_RPG', 'G4hadronic_deex_util', 'G4shortlived', 'G4geomdivision', 'G4hadronic_xsect', 'G4had_mod_util', 'G4detscorer', 'G4had_mod_man', 'G4hadronic_util', 'G4modeling', 'G4event', 'G4geombias', 'G4specsolids', 'G4mesons', 'G4tracking', 'G4emutils', 'G4leptons', 'G4bosons', 'G4ions', 'G4baryons', 'G4cuts', 'G4procman', 'G4csg', 'G4digits', 'G4detector', 'G4hepnumerics', 'G4track', 'G4hits', 'G4navigation', 'G4magneticfield', 'G4partman', 'G4volumes', 'G4geometrymng', 'G4materials', 'G4graphics_reps', 'G4intercoms', 'G4globman']
     for lib in geant4_libs:
       if not conf.CheckLib(lib, language='c++'):
-        print "You need %s to compile this program" % lib
         Exit(1)
 
      # check types size!!!
