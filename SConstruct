@@ -248,90 +248,22 @@ if not env.GetOption('clean'):
 # TODO: this should be a loop that discovers stuff
 #specify all of the sub-projects in the section
 
-interface = env.SharedLibrary(target = 'commonCpp/libinterface', source = ['commonCpp/Interface/AnalysisEventBank.cc', 'commonCpp/Interface/AnalysisPlaneBank.cc', 'commonCpp/Interface/BetaFuncBank.cc', 'commonCpp/Interface/DataBaseAPI.cc', 'commonCpp/Interface/DataBaseReader.cc', 'commonCpp/Interface/dataCards.cc', 'commonCpp/Interface/Differentiator.cc', 'commonCpp/Interface/EmCalDigit.cc', 'commonCpp/Interface/EmCalHit.cc', 'commonCpp/Interface/EmCalTrack.cc', 'commonCpp/Interface/EMRDigit.cc', 'commonCpp/Interface/EMRHit.cc', 'commonCpp/Interface/EventTime.cc', 'commonCpp/Interface/For003Bank.cc', 'commonCpp/Interface/For009Bank.cc', 'commonCpp/Interface/G4BLBank.cc', 'commonCpp/Interface/Interpolator.cc', 'commonCpp/Interface/KLDigit.cc', 'commonCpp/Interface/KLHit.cc', 'commonCpp/Interface/MagFieldMap.cc', 'commonCpp/Interface/MCHit.cc', 'commonCpp/Interface/MCParticle.cc', 'commonCpp/Interface/MCVertex.cc', 'commonCpp/Interface/Memory.cc', 'commonCpp/Interface/Mesh.cc', 'commonCpp/Interface/MICEEvent.cc', 'commonCpp/Interface/MiceMaterials.cc', 'commonCpp/Interface/MICERun.cc', 'commonCpp/Interface/MICESpill.cc', 'commonCpp/Interface/MICEUnits.cc', 'commonCpp/Interface/MMatrix.cc', 'commonCpp/Interface/MMatrixToCLHEP.cc', 'commonCpp/Interface/MVector.cc', 'commonCpp/Interface/PolynomialVector.cc', 'commonCpp/Interface/RFData.cc', 'commonCpp/Interface/RFFieldMap.cc', 'commonCpp/Interface/RunFooter.cc', 'commonCpp/Interface/RunHeader.cc', 'commonCpp/Interface/SciFiDigit.cc', 'commonCpp/Interface/SciFiHit.cc', 'commonCpp/Interface/SpecialHit.cc', 'commonCpp/Interface/Spline1D.cc', 'commonCpp/Interface/SplineInterpolator.cc', 'commonCpp/Interface/Squeak.cc', 'commonCpp/Interface/Squeal.cc', 'commonCpp/Interface/ThreeDFieldMap.cc', 'commonCpp/Interface/TofDigit.cc', 'commonCpp/Interface/TofHit.cc', 'commonCpp/Interface/TriangularMesh.cc', 'commonCpp/Interface/TurtleBank.cc', 'commonCpp/Interface/VersionInfo.cc', 'commonCpp/Interface/VirtualHit.cc', 'commonCpp/Interface/VlpcHit.cc', 'commonCpp/Interface/VmeAdcHit.cc', 'commonCpp/Interface/VmeBaseHit.cc', 'commonCpp/Interface/VmefAdcHit.cc', 'commonCpp/Interface/VmeScalerData.cc', 'commonCpp/Interface/VmeTdcHit.cc', 'commonCpp/Interface/XMLMessage.cc', 'commonCpp/Interface/ZustandVektor.cc',])
+interface = env.SharedLibrary(target = 'commonCpp/libinterface', source = glob.glob("commonCpp/Interface/*cc"))
 env.Install("build", interface)
 
-simulation= env.SharedLibrary(target= 'commonCpp/libsimulation', source = ['commonCpp/Simulation/DataCardsMessenger.cc',
-'commonCpp/Simulation/FillMaterials.cc',
-'commonCpp/Simulation/MICEBGPlane.cc',
-'commonCpp/Simulation/MICEDetectorConstruction.cc',
-'commonCpp/Simulation/MICEEventAction.cc',
-'commonCpp/Simulation/MiceMessenger.cc',
-'commonCpp/Simulation/MICEPhysicsList.cc',
-'commonCpp/Simulation/MICEPrimaryGeneratorAction.cc',
-'commonCpp/Simulation/MICERunAction.cc',
-'commonCpp/Simulation/MICEStackingAction.cc',
-'commonCpp/Simulation/MICESteppingAction.cc',
-'commonCpp/Simulation/MICEStepStatistics.cc',
-'commonCpp/Simulation/MICETrackingAction.cc',
-'commonCpp/Simulation/MICEVisManager.cc',
-'commonCpp/Simulation/StripSpecialHits.cc',
-'commonCpp/Simulation/VirtualPlanes.cc'])
+simulation= env.SharedLibrary(target= 'commonCpp/libsimulation', source =  glob.glob("commonCpp/Simulation/*cc"))
 env.Install("build", simulation)
 
-config= env.SharedLibrary(target= 'commonCpp/libcommon', source = ['commonCpp/Config/RFParameters.cc',
-'commonCpp/Config/BeamParameters.cc',
-'commonCpp/Config/VlpcCableOsaka.cc',
-'commonCpp/Config/CoolingChannelGeom.cc',
-'commonCpp/Config/ModuleTextFileIO.cc',
-'commonCpp/Config/VirtualGeomParameters.cc',
-'commonCpp/Config/RFBackgroundParameters.cc',
-'commonCpp/Config/VlpcCableOsaka2.cc',
-'commonCpp/Config/TofCable.cc',
-'commonCpp/Config/VlpcCableOsaka3.cc',
-'commonCpp/Config/VlpcCableImperial.cc',
-'commonCpp/Config/MagnetParameters.cc',
-'commonCpp/Config/BeamlineGeometry.cc',
-'commonCpp/Config/BeamlineParameters.cc',
-'commonCpp/Config/SciFiCableManager.cc',
-'commonCpp/Config/ModuleConverter.cc',
-'commonCpp/Config/MiceModule.cc',
-'commonCpp/Config/PidFits.cc',])
+config= env.SharedLibrary(target= 'commonCpp/libcommon', source = glob.glob("commonCpp/Config/*cc"))
 env.Install("build", config)
 
-beamtools= env.SharedLibrary(target= 'commonCpp/libbeamtools', source = ['commonCpp/BeamTools/BT3dFieldMap.cc',
-'commonCpp/BeamTools/BTCombinedFunction.cc',
-'commonCpp/BeamTools/BTConstantField.cc',
-'commonCpp/BeamTools/BTFastSolenoid.cc',
-'commonCpp/BeamTools/BTField.cc',
-'commonCpp/BeamTools/BTFieldConstructor.cc',
-'commonCpp/BeamTools/BTFieldGroup.cc',
-'commonCpp/BeamTools/BTMagFieldMap.cc',
-'commonCpp/BeamTools/BTMidplaneMap.cc',
-'commonCpp/BeamTools/BTMultipole.cc',
-'commonCpp/BeamTools/BTPhaser.cc',
-'commonCpp/BeamTools/BTPillBox.cc',
-'commonCpp/BeamTools/BTQuad.cc',
-'commonCpp/BeamTools/BTRFFieldMap.cc',
-'commonCpp/BeamTools/BTSheet.cc',
-'commonCpp/BeamTools/BTSolenoid.cc',
-'commonCpp/BeamTools/BTSpaceChargeField.cc',
-'commonCpp/BeamTools/BTTracker.cc',
-'commonCpp/BeamTools/micegsl.cc',])
+beamtools= env.SharedLibrary(target= 'commonCpp/libbeamtools', source = glob.glob("commonCpp/BeamTools/*cc"))
 env.Install("build", beamtools)
 
-
-engmodel = env.SharedLibrary(target= 'commonCpp/libengmodel', source = ['commonCpp/EngModel/MiceModToG4Solid.cc',
-'commonCpp/EngModel/MultipoleAperture.cc',
-'commonCpp/EngModel/Polycone.cc',
-'commonCpp/EngModel/Q35.cc',])
+engmodel = env.SharedLibrary(target= 'commonCpp/libengmodel', source =  glob.glob("commonCpp/EngModel/*cc"))
 env.Install("build", engmodel)
 
-
-detmodel = env.SharedLibrary(target= 'commonCpp/libdetmodel', source = ['commonCpp/DetModel/KL/KLFiber.cc',
-'commonCpp/DetModel/KL/KLSD.cc',
-'commonCpp/DetModel/KL/KLGlue.cc',
-'commonCpp/DetModel/TOF/TofSD.cc',
-'commonCpp/DetModel/Virtual/SpecialVirtualSD.cc',
-'commonCpp/DetModel/EMR/EMRSD.cc',
-'commonCpp/DetModel/SciFi/DoubletFiberParam.cc',
-'commonCpp/DetModel/SciFi/SciFiSD.cc',
-'commonCpp/DetModel/SciFi/SciFiPlane.cc',
-'commonCpp/DetModel/EMCal/EmCalSD.cc',
-'commonCpp/DetModel/EMCal/EmCalKLFiber.cc',
-'commonCpp/DetModel/EMCal/EmCalKLGlue.cc',
-'commonCpp/DetModel/Ckov/CkovMirror.cc',
-'commonCpp/DetModel/Ckov/CKOVSD.cc',])
+detmodel = env.SharedLibrary(target= 'commonCpp/libdetmodel', source =  glob.glob("commonCpp/DetModel/*/*cc"))
 env.Install("build", detmodel)
 
 env.jDev.Subproject('components/map/MapCppPrint')
