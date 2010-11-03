@@ -40,7 +40,6 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         rm -Rf ${MAUS_ROOT_DIR}/third_party/build/${directory}
         sleep 1
         tar xvfz ${MAUS_ROOT_DIR}/third_party/source/${filename} -C ${MAUS_ROOT_DIR}/third_party/build > /dev/null
-	mv ${MAUS_ROOT_DIR}/third_party/build/${version}/CLHEP ${MAUS_ROOT_DIR}/third_party/build/${directory}
         cd ${MAUS_ROOT_DIR}/third_party/build/${directory}
 	
 	echo
@@ -59,13 +58,13 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 	echo
         sleep 1
 
-	./Configure -f .config/bin/Linux-g++/config.sh -d -e -build
+	./Configure -f .config/bin/Linux-g++/config.sh -d -e -build -install
 
-	echo
-        echo "INFO: Installing:"
-	echo
-        sleep 1
-	./Configure -install
+	#echo
+        #echo "INFO: Installing:"
+	#echo
+        #sleep 1
+	#./Configure -install
 	            ################################################## 
 	echo
         echo "INFO: The package should be locally build now in your"
