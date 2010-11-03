@@ -41,6 +41,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 	echo "INFO: together.  Aren't you glad we have Scientific Linux?"    
 	echo
 
+	rm -f ${MAUS_ROOT_DIR}/third_party/install/lib/libXpm.so # in-case it exists
 	extra=""
 	if [ -e "/usr/lib64/libXpm.so.4" ] # sl55 64bit
 	then
@@ -69,6 +70,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 	echo
 	sleep 1
 
+	print "INFO: extra flags to configure are ${extra}"
 	./configure --enable-roofit --disable-fftw3 --disable-xrootd --disable-krb5 --build=debug --with-gsl-incdir=${MAUS_ROOT_DIR}/third_party/install/include --with-gsl-libdir=${MAUS_ROOT_DIR}/third_party/install/lib --prefix=${MAUS_ROOT_DIR}/third_party/install ${extra}
 
 
