@@ -71,15 +71,8 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 	sleep 1
 
 	print "INFO: extra flags to configure are ${extra}"
-	./configure --enable-roofit --disable-fftw3 --disable-xrootd --disable-krb5 --build=debug --with-gsl-incdir=${MAUS_ROOT_DIR}/third_party/install/include --with-gsl-libdir=${MAUS_ROOT_DIR}/third_party/install/lib --prefix=${MAUS_ROOT_DIR}/third_party/install ${extra}
+	./configure --enable-roofit --disable-fftw3 --disable-xrootd --disable-krb5 --build=debug --with-gsl-incdir=${MAUS_ROOT_DIR}/third_party/install/include --with-gsl-libdir=${MAUS_ROOT_DIR}/third_party/install/lib --prefix=${MAUS_ROOT_DIR}/third_party/install ${extra} && echo && echo && echo "INFO: Making:" && echo && sleep 1 && make && make install || {echo "FAIL: Failed to configure/make";exit 1}
 
-
-	echo
-        echo "INFO: Making:"
-	echo
-        sleep 1
-        make 
-	make install
 	            ################################################## 
 	echo
         echo "INFO: The package should be locally build now in your"
