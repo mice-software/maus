@@ -58,7 +58,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 	echo
         sleep 1
 
-	./Configure -f .config/bin/Linux-g++/config.sh -d -e -build -install
+	./Configure -f .config/bin/Linux-g++/config.sh -d -e -build && ./Configure -install
 
 	#echo
         #echo "INFO: Installing:"
