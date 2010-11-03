@@ -247,24 +247,24 @@ if not env.GetOption('clean'):
 # NOTE: do this after configure!  So we know if we have ROOT/geant4
 # TODO: this should be a loop that discovers stuff
 #specify all of the sub-projects in the section
+if env['USE_G4'] and env['USE_ROOT']:
+  interface = env.SharedLibrary(target = 'commonCpp/libinterface', source = glob.glob("commonCpp/Interface/*cc"))
+  env.Install("build", interface)
 
-interface = env.SharedLibrary(target = 'commonCpp/libinterface', source = glob.glob("commonCpp/Interface/*cc"))
-env.Install("build", interface)
+  simulation= env.SharedLibrary(target= 'commonCpp/libsimulation', source =  glob.glob("commonCpp/Simulation/*cc"))
+  env.Install("build", simulation)
 
-simulation= env.SharedLibrary(target= 'commonCpp/libsimulation', source =  glob.glob("commonCpp/Simulation/*cc"))
-env.Install("build", simulation)
+  config= env.SharedLibrary(target= 'commonCpp/libcommon', source = glob.glob("commonCpp/Config/*cc"))
+  env.Install("build", config)
 
-config= env.SharedLibrary(target= 'commonCpp/libcommon', source = glob.glob("commonCpp/Config/*cc"))
-env.Install("build", config)
+  beamtools= env.SharedLibrary(target= 'commonCpp/libbeamtools', source = glob.glob("commonCpp/BeamTools/*cc"))
+  env.Install("build", beamtools)
 
-beamtools= env.SharedLibrary(target= 'commonCpp/libbeamtools', source = glob.glob("commonCpp/BeamTools/*cc"))
-env.Install("build", beamtools)
+  engmodel = env.SharedLibrary(target= 'commonCpp/libengmodel', source =  glob.glob("commonCpp/EngModel/*cc"))
+  env.Install("build", engmodel)
 
-engmodel = env.SharedLibrary(target= 'commonCpp/libengmodel', source =  glob.glob("commonCpp/EngModel/*cc"))
-env.Install("build", engmodel)
-
-detmodel = env.SharedLibrary(target= 'commonCpp/libdetmodel', source =  glob.glob("commonCpp/DetModel/*/*cc"))
-env.Install("build", detmodel)
+  detmodel = env.SharedLibrary(target= 'commonCpp/libdetmodel', source =  glob.glob("commonCpp/DetModel/*/*cc"))
+  env.Install("build", detmodel)
 
 env.jDev.Subproject('components/map/MapCppPrint')
 env.jDev.Subproject('components/map/MapCppSimulation')
