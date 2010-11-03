@@ -28,7 +28,8 @@ class Dev:
     #append the user's additional compile flags
     #assume debugcflags and releasecflags are defined
     localenv.Append(CCFLAGS=self.cflags)
-    localenv.Append(LIBS=['interface','beamtools','common','detmodel','engmodel','simulation'] )
+    if use_root and use_g4:
+      localenv.Append(LIBS=['interface','beamtools','common','detmodel','engmodel','simulation'] )
 
     if use_root:
       #localenv.ParseConfig("root-config --cflags --ldflags --libs")  # UNCOMMENT for ROOT
