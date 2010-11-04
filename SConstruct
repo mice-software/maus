@@ -247,6 +247,8 @@ if not env.GetOption('clean'):
      # check types size!!!
 
   env = conf.Finish()
+  if 'configure' in COMMAND_LINE_TARGETS:
+    os.sys.exit(0)
 
 
 # NOTE: do this after configure!  So we know if we have ROOT/geant4
@@ -260,3 +262,4 @@ env.jDev.Subproject('components/map/MapCppPrint')
 env.jDev.Subproject('components/map/MapCppSimulation')
 
 env.Alias('install', ['%s/build' % os.environ.get('MAUS_ROOT_DIR')])
+env.Alias('g4mice', 'commonCpp/')
