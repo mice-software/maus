@@ -15,10 +15,12 @@ class Dev:
   #sets up the build for a given project
   def Buildit(self, localenv, project, use_root, use_g4):
     if use_root and not env['USE_ROOT']:
-      print "The worker", project, "requires ROOT which is disabled. Skipping..."
+      if not env.GetOption('clean'):
+        print "The worker", project, "requires ROOT which is disabled. Skipping..."
       return
     if use_g4 and not env['USE_G4']:
-      print "The worker", project, "requires Geant4 which is disabled. Skipping..."
+      if not env.GetOption('clean'):
+        print "The worker", project, "requires Geant4 which is disabled. Skipping..."
       return
     
     builddir = 'build'
@@ -31,20 +33,11 @@ class Dev:
     if use_root and use_g4:
       localenv.Append(LIBS=['g4mice'])
 
-    if use_root:
-      #localenv.ParseConfig("root-config --cflags --ldflags --libs")  # UNCOMMENT for ROOT
-      pass
-
-    if use_g4:
-      print "error: g4 unknown at present" # fixme
-
     #specify the build directory
     localenv.VariantDir(variant_dir=builddir, src_dir='.', duplicate=1)
 
     srclst = map(lambda x: builddir + '/' + x, glob.glob('*.cpp'))
-    print srclst
     srclst += map(lambda x: builddir + '/' + x, glob.glob('*.i'))
-    print srclst
     pgm = localenv.SharedLibrary(targetpath, source=srclst)
 
     env.Install(os.path.join(os.environ.get('MAUS_ROOT_DIR'), builddir) , "build/%s.py" % name)
@@ -251,15 +244,16 @@ if not env.GetOption('clean'):
     os.sys.exit(0)
 
 
-# NOTE: do this after configure!  So we know if we have ROOT/geant4
-# TODO: this should be a loop that discovers stuff
-#specify all of the sub-projects in the section
-if env['USE_G4'] and env['USE_ROOT']:
-  g4mice = env.SharedLibrary(target = 'commonCpp/libg4mice', source = glob.glob("commonCpp/*/*cc") + glob.glob("commonCpp/*/*/*cc"))
-  env.Install("build", g4mice)
+  # NOTE: do this after configure!  So we know if we have ROOT/geant4
+  # TODO: this should be a loop that discovers stuff
+  #specify all of the sub-projects in the section
+  if env['USE_G4'] and env['USE_ROOT']:
+    env.Append(LIBS='recpack')
+    g4mice = env.SharedLibrary(target = 'commonCpp/libg4mice', source = glob.glob("commonCpp/*/*cc") + glob.glob("commonCpp/*/*/*cc"))
+    env.Install("build", g4mice)
 
-env.jDev.Subproject('components/map/MapCppPrint')
-env.jDev.Subproject('components/map/MapCppSimulation')
+  env.jDev.Subproject('components/map/MapCppPrint')
+  env.jDev.Subproject('components/map/MapCppSimulation')
 
-env.Alias('install', ['%s/build' % os.environ.get('MAUS_ROOT_DIR')])
-env.Alias('g4mice', 'commonCpp/')
+  env.Alias('install', ['%s/build' % os.environ.get('MAUS_ROOT_DIR')])
+  env.Alias('g4mice', 'commonCpp/')

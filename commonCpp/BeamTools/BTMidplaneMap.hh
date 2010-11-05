@@ -19,7 +19,7 @@ public:
 	void GetFieldValue( const double Point[4], double *EMfield ) const;
 
 	//Utility methods
-	void            Print(std::ostream &out) const;
+  //	void            Print(std::ostream &out) const;
 	BTMidplaneMap * Clone() const {return new BTMidplaneMap(*this);}
 
 private:
