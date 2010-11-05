@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 directory=recpack
-filename=${directory}.tar.gz 
-url=http://micewww.pp.rl.ac.uk:8080/attachments/download/99/${filename}
+filename=${directory}.src.20090424.tgz
+url=http://micewww.pp.rl.ac.uk:8080/attachments/download/34/${filename}
 
 my_prefix=/install
 my_destdir=${MAUS_ROOT_DIR}/third_party
@@ -35,7 +35,14 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         sleep 1
         tar xvfz ${MAUS_ROOT_DIR}/third_party/source/${filename} -C ${MAUS_ROOT_DIR}/third_party/build > /dev/null
         cd ${MAUS_ROOT_DIR}/third_party/build/${directory}
+	echo
+	echo "INFO: Automake and autoconf"
+	echo
+	./autogen.sh
+	./autogen.sh
+	echo
         echo "INFO: Configuring"
+	echo
         sleep 1
 	./configure --prefix=${MAUS_ROOT_DIR}/third_party/install --with-pic --enable-shared
 	echo 

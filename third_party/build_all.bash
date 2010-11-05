@@ -23,6 +23,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     ${MAUS_ROOT_DIR}/third_party/bash/24cloc.bash
     ${MAUS_ROOT_DIR}/third_party/bash/25nose.bash
     ${MAUS_ROOT_DIR}/third_party/bash/26bzr.bash
+    ${MAUS_ROOT_DIR}/third_party/bash/27recpack.bash
 else
 echo
 echo "FATAL: MAUS_ROOT_DIR is not set, which is required to" >&2
