@@ -3,19 +3,4 @@ This project is maintained at:
 
 http://micewww.pp.rl.ac.uk:8080/projects/maus
 
-Required Dependencies:
-
-python
-scons
-jsoncpp
-
-
-optional:
-ROOT
-geant4
-bzr (2.something) # if you want to commit
-
-Suggested Dependencies:
-
-doxygen
-dot (from  graphviz)
+License information can be found in COPYING. Licensing information for libraries distributed with MAUS can be found in third_party/license.
