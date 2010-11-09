@@ -32,7 +32,7 @@ private :
 
 	double _default;
 	std::map<const std::string, double> _units;
-	static HepTool::Evaluator  _evaluator;
+	HepTool::Evaluator  _evaluator;
 };
 
 #endif

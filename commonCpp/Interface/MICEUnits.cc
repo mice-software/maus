@@ -9,7 +9,7 @@ using CLHEP::kelvin;
 using CLHEP::mole;
 using CLHEP::candela;
 
-HepTool::Evaluator  MICEUnits::_evaluator;
+//HepTool::Evaluator  MICEUnits::_evaluator;
 
 MICEUnits::MICEUnits() : _default(1.), _units()
 {

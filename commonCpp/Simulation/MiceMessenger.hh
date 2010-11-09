@@ -11,7 +11,6 @@
 #include "globals.hh"
 #include "G4UImessenger.hh"
 
-class DataCardsMessenger;
 class G4UIdirectory;
 
 /**
@@ -29,8 +28,6 @@ class MiceMessenger: public G4UImessenger {
 
 private:
   G4UIdirectory*        miceDir;
-
-  DataCardsMessenger*   dataCardsMessenger;
 
 public:
   /**

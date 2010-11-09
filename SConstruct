@@ -4,7 +4,7 @@ import glob, os
 #this is our catch-all Dev class
 #it keeps track of all the variables and common functions we need
 class Dev:
-  cflags = ''
+  cflags = '-g'
   ecflags = ''
 
   #---
@@ -31,15 +31,16 @@ class Dev:
     #assume debugcflags and releasecflags are defined
     localenv.Append(CCFLAGS=self.cflags)
     if use_root and use_g4:
-      localenv.Append(LIBS=['g4mice'])
+      #localenv.Append(LIBS=['simulate'])
+      pass
 
     #specify the build directory
     localenv.VariantDir(variant_dir=builddir, src_dir='.', duplicate=1)
 
     srclst = map(lambda x: builddir + '/' + x, glob.glob('*.cpp'))
     srclst += map(lambda x: builddir + '/' + x, glob.glob('*.i'))
-    pgm = localenv.SharedLibrary(targetpath, source=srclst)
-
+    pgm = localenv.SharedLibrary(targetpath, source=srclst, LIBS=['simulate'])
+    
     env.Install(os.path.join(os.environ.get('MAUS_ROOT_DIR'), builddir) , "build/%s.py" % name)
     env.Install(os.path.join(os.environ.get('MAUS_ROOT_DIR'), builddir) , pgm)
     env.Alias('all', pgm)  #note: not localenv
@@ -248,12 +249,16 @@ if not env.GetOption('clean'):
   # TODO: this should be a loop that discovers stuff
   #specify all of the sub-projects in the section
   if env['USE_G4'] and env['USE_ROOT']:
-    env.Append(LIBS='recpack')
-    g4mice = env.SharedLibrary(target = 'commonCpp/libg4mice', source = glob.glob("commonCpp/*/*cc") + glob.glob("commonCpp/*/*/*cc"))
-    env.Install("build", g4mice)
+    env.Append(CCFLAGS=['-g',])
+    
+    commonCppFiles = glob.glob("commonCpp/*/*cc") + glob.glob("commonCpp/*/*/*cc") 
+    simulate = env.SharedLibrary(target = 'commonCpp/libsimulate', source = commonCppFiles + ['commonCpp/Simulation.cc'], LIBS=['recpack'] +  env['LIBS'])
+    env.Install("build", simulate)
+
+    env.Program(target="sim", source=["commonCpp/Simulation.cc"] + glob.glob("commonCpp/*/*cc") + glob.glob("commonCpp/*/*/*cc"), LIBS=['recpack'] +  env['LIBS'])
 
   env.jDev.Subproject('components/map/MapCppPrint')
   env.jDev.Subproject('components/map/MapCppSimulation')
 
   env.Alias('install', ['%s/build' % os.environ.get('MAUS_ROOT_DIR')])
-  env.Alias('g4mice', 'commonCpp/')
+

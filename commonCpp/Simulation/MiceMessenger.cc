@@ -5,7 +5,6 @@
  */
 
 #include "MiceMessenger.hh"
-#include "DataCardsMessenger.hh"
 #include "Interface/dataCards.hh"
 #include "G4UIdirectory.hh"
 #include "G4ios.hh"
@@ -14,14 +13,14 @@ MiceMessenger::MiceMessenger() {
   miceDir = new G4UIdirectory("/mice/");
   miceDir->SetGuidance("MICE-specific commands");
 
-  dataCardsMessenger = new DataCardsMessenger(&MyDataCards);
+  //  dataCardsMessenger = new DataCardsMessenger(&MyDataCards);
 
   G4cout << "/mice/ menu successfully created.\n";
 }
 
 
 MiceMessenger::~MiceMessenger() {
-  delete dataCardsMessenger;
+  //  delete dataCardsMessenger;
 
   delete miceDir;
 }

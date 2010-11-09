@@ -121,6 +121,8 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      export G4NEUTRONDATA=\${G4INSTALL}/data/G4NDL3.13/
      export G4LEVELGAMMADATA=\${G4INSTALL}/data/PhotonEvaporation2.0/
      export G4RADIOACTIVEDATA=\${G4INSTALL}/data/RadioactiveDecay3.2/
+
+     export MICEFILES=\${MAUS_ROOT_DIR}/commonCpp/FILES
  
      export MAUS_ROOT_DIR PATH LD_LIBRARY_PATH PYTHONPATH MANPATH DISCO_HOME
      echo "SUCCESS: MAUS setup"
