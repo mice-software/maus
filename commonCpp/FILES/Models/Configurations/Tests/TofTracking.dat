@@ -1,0 +1,41 @@
+// FILES/Models/Configurations/Tests/TofTracking.dat
+//
+// Positions of TOF centres and Quads according to Willie for use by Applications/QuadTrack/
+// January 2009
+
+Configuration TofTracking
+{
+	Dimensions 2. 2. 5. m
+	PropertyString Material Galactic
+	PropertyDouble G4StepMax 5.0 mm
+
+	Module Tests/Tof0SV.dat 
+	{
+		Position 0. 0. -3.98305 m
+		Rotation 0. 0. 0. degree
+	}
+	Module BeamLine/QuadTypeQC_Boolean.dat 
+	{
+		Position 0. 0. 0.24005 m
+		Rotation 0. 0. 0. degree
+		ScaleFactor +1.5125
+	}
+	Module BeamLine/QuadTypeQC_Boolean.dat 
+	{
+		Position 0. 0. 1.40005 m
+		Rotation 0. 0. 0. degree
+		ScaleFactor -2.2902
+	}
+	Module BeamLine/QuadTypeQC_Boolean.dat 
+	{
+		Position 0. 0. 2.56005 m
+		Rotation 0. 0. 0. degree
+		ScaleFactor +1.9579
+	}
+	Module Tests/Tof1SV.dat 
+	{
+		Position 0. 0. 3.98305 m
+		Rotation 0. 0. 0. degree
+	}
+}
+

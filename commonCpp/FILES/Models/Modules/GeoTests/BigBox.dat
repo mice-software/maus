@@ -1,0 +1,18 @@
+// A test of the cylinder in a box
+//
+
+Module TestBox
+{
+  Volume Box
+  Dimensions 10.0 10.0 20.0 cm
+
+  PropertyString Material Galactic
+
+  PropertyDouble RedColour 1.0
+  PropertyInt Plane 1
+  Module GeoTests/smallBox.dat
+  {
+    Position 0.0 0.0 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }  
+}

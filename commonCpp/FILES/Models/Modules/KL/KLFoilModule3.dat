@@ -1,0 +1,17 @@
+// FILES/Models/Modules/KL/KLFoilModule3.dat
+//
+
+Module KLFoilModule3
+{
+  Volume Box
+  Dimensions 932 132.2 40.2 mm
+  PropertyInt Plane 0
+//  PropertyDouble GreenColour 1.
+  PropertyBool Invisible 1
+  PropertyString Material Al
+  Module KL/KLModule3.dat
+  {
+    Position 0.0 0.0 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+}

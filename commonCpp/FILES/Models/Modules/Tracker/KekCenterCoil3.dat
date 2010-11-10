@@ -1,0 +1,20 @@
+// FILES/Models/Modules/Tracker/KekCenterCoil3.dat
+//
+// Kek Solenoid Magnet Center Coil layer 3 (3rd layer out)
+// 
+// A.Fish 23/08/06
+
+Module KekCenterCoil3
+{
+  Volume Tube 
+  Dimensions 49.71 49.85 129.96 cm
+  PropertyDouble RedColour 1.0
+  PropertyString Material Cu
+//Field
+  PropertyString FieldType      Solenoid
+  PropertyString FileName       KekCenter3.dat
+  PropertyDouble CurrentDensity    163.5
+  PropertyDouble Length            1299.6
+  PropertyDouble Thickness         1.39
+  PropertyDouble InnerRadius       497.1
+}

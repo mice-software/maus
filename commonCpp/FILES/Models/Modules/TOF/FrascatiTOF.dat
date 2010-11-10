@@ -1,0 +1,26 @@
+// FILES/Models/Modules/TOF/FrascatiTOF.dat
+//
+
+Module FrascatiTOF
+{
+  Volume Box
+  Dimensions 50.0 10.0 50.0 cm
+  PropertyInt Station 0
+  PropertyBool Invisible 1
+  Module TOF/FrascatiTOFSlab0.dat
+  {
+    Position 0.0 0.0 -13.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module TOF/FrascatiTOFSlab1.dat
+  {
+    Position 0.0 0.0 -3.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module TOF/FrascatiTOFSlab2.dat
+  {
+    Position 0.0 0.0 2.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+}
+

@@ -1,0 +1,46 @@
+// FILES/Models/Modules/Tracker/TrackerStation1.dat
+//
+// Description of the first tracker module
+// 
+//
+
+Module TrackerStation1
+{
+  Volume Cylinder
+  Dimensions 19.0 0.20 cm
+  PropertyDouble GreenColour 1.0
+  PropertyDouble RedColour 1.0
+  PropertyInt Station 1
+  PropertyString Material POLYSTYRENE
+  PropertyDouble OpticsMaterialLength 0 mm
+  Module Tracker/TrackerViewV.dat
+  {
+    Position 0.0 0.0 -0.6398 mm
+    Rotation 0.0 0.0 120.0 degree
+  }
+  Module Tracker/TrackerViewW.dat
+  {
+    Position 0.0 0.0 0.00125 cm
+    Rotation 0.0 0.0 -120.0 degree
+  }
+  Module Tracker/TrackerViewX.dat
+  {
+    Position 0.0 0.0 0.6648 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Tracker/TrackerMylar.dat
+  {
+    Position 0.0 0.0 -0.096595 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Tracker/TrackerMylar.dat
+  {
+    Position 0.0 0.0 -0.031365 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Tracker/TrackerMylar.dat
+  {
+    Position 0.0 0.0 0.033865 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+}

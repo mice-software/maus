@@ -1,0 +1,19 @@
+// FILES/Models/Configurations/MICEStage6/Stage6.dat
+//
+// 1st Draft Stage 6 Floor Plan, z=0 at middle H absorber
+
+Configuration Stage6
+{
+  Dimensions 1500.0 1000.0 5000.0 cm
+  PropertyString Material AIR
+  Module Tracker/TrackerSolenoid0.dat
+  {
+    Position 0.0 0.0 -478.3 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Tracker/TrackerSolenoid1.dat
+  {
+    Position 0.0 0.0 478.3 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+}

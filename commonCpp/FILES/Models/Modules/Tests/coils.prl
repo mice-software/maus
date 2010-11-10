@@ -1,0 +1,94 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+
+#Mice Setup info
+my  $miceStage        = 6;   #1-6
+my  $flipMode         = 1;   #0==non-flip; 1==flip
+my  $momentum         = 200; #140, 170, 200, 240
+my  $beta             = 42;  #42, 25, 15, 7
+
+#MiceModules area
+our $miceModules      = "$ENV{'MICEFILES'}/Models/Modules";
+
+#coil geometry (from MICE note 153, Apollonio & Witte, Nov 6 2006)
+my $ncoils          = 7;
+my @folder          = ("Tracker",  "Tracker",    "Tracker",  "Tracker",    "Tracker",    "AFC",   "RFCC");
+my @moduleName      = ("EndCoil2", "CenterCoil", "EndCoil1", "MatchCoil2", "MatchCoil1", "FCoil", "CouplingCoil");
+my @coilCurrent     = &setCoilCurrents($miceStage, $flipMode, $momentum, $beta);
+my @coilInnerRadius = ( 255.,       255.,         255.,       255.,         255.,         263.,    725.);
+my @coilThickness   = ( 149.,       50.,          138.,       57.,          100.,         84.,     116.);
+my @coilLength      = ( 120.,       1260.,        120.,       202.,         202.,         210.,    250.);
+
+#this is the new geometry information - but not implemented as the current list is incomplete
+#my @coilInnerRadius = { 258.,       258.,         258.,       258.,         258.,         263.,    725.};
+#my @coilThickness   = { 63.9,       21.3,         59.6,       29.8,         44.6,         84.,     116.};
+#my @coilLength      = { 110.6,      1322.3,       110.6,      199.5,        201.2,        210.,    250.,};
+
+
+
+for(my $coil = 0; $coil < $ncoils; $coil++)
+{
+	&makeCoil($folder[$coil], $moduleName[$coil], $coilInnerRadius[$coil], $coilThickness[$coil], 
+	          $coilLength[$coil], $coilCurrent[$coil]);
+}
+
+#arguments are folder, moduleName, innerRadius, thickness, outerRadius, length, current
+sub makeCoil
+{
+	my $material     = "Cu";
+	my $units        = "mm";
+	my $folder       = $_[0];
+	my $module       = $_[1];
+	my $innerRadius  = $_[2];
+	my $thickness    = $_[3];
+	my $outerRadius  = $innerRadius + $thickness;
+	my $length       = $_[4];
+	my $current      = $_[5];
+	my $file         = "$miceModules/$folder/$module.dat";
+	my $Header       = ""; #trick to get the CVS version output
+	open(OUT, ">$file") || die ("Error - could not open $file\n");
+	print OUT "// $file\n";
+	print OUT "// $module created by perl script version:\n";
+	print OUT "// $Header: /home/mice/cvsroot/MICE/FILES/Models/Modules/Tests/coils.prl,v 1.1 2007-04-27 10:30:15 rogers Exp $Header"; #perhaps will be filled with cvs Header info
+	print OUT "Module $module\n\n";
+	print OUT "{\n";
+	print OUT "  Volume         Tube\n";
+	print OUT "  Dimensions     $innerRadius $outerRadius $length $units\n";
+	print OUT "  PropertyDouble RedColour      1.0\n";
+	print OUT "  PropertyString Material       $material\n";
+	print OUT "  PropertyString FieldType      Solenoid\n";
+	print OUT "  PropertyString FileName       $module.dat\n";
+	print OUT "  PropertyDouble CurrentDensity $current\n";
+	print OUT "  PropertyDouble Thickness      $thickness\n";
+	print OUT "  PropertyDouble InnerRadius    $innerRadius\n";
+	print OUT "}\n\n";
+}
+
+#arguments are stage, flip, momentum, beta (at absorber)
+sub setCoilCurrents
+{
+	my $setup    = "$_[0].$_[1].$_[2].$_[3]"; #stage.flip.momentum
+	#it would be great to include an error catch here but I don't know how to implement
+	#such a thing
+	my %coilCurrents = (
+		'6.1.200.42' => [67.11, 64.44, 62.80, 66.79, 56.30, 96.21,  113.95],
+		'6.1.240.42' => [67.11, 64.44, 62.59, 73.25, 66.82, 115.45, 136.74],
+		'6.1.200.25' => [67.11, 64.44, 62.80, 57.92, 54.71, 87.41,  140.14],
+		'6.1.170.15' => [57.04, 54.77, 54.41, 38.90, 42.05, 61.91,  134.44],
+		'6.1.140.7'  => [46.98, 45.11, 45.65, 30.34, 21.55, 27.52,  130.95],
+
+		'6.0.200.42' => [68.23, 63.49, 62.80, 54.82, 61.80, 87.41,  59.52],
+		'6.0.240.42' => [68.23, 63.49, 60.39, 65.62, 71.31, 104.89, 71.42],
+		'6.0.200.25' => [68.23, 63.49, 64.01, 34.67, 62.62, 79.14,  79.59],
+		'6.0.200.15' => [68.23, 63.49, 65.21, 29.96, 55.52, 68.90,  97.62],
+		'6.0.200.7'  => [68.23, 63.49, 67.63, 16.32, 44.26, 44.48, 112.76]
+	);
+
+#known currents for the new coil geometries... not implemented as the list is incomplete
+#		'6.1.200.42' => {135.18, 152.44, 127.37, 137.13, 118.56, 113.95, 96.21 },
+#		'6.1.240.42' => {135.18, 152.44, 127.37, 150.52, 142.48, 136.74, 115.45},
+	my $currentRef = $coilCurrents{$setup};
+	return @{$currentRef};
+}

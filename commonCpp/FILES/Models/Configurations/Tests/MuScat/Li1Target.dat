@@ -1,0 +1,22 @@
+// FILES/Models/Configurations/MuScat/Li1Target.dat
+//
+// Model of the MuScat targets
+//
+// M.Wojcik 1st Feb 2007
+
+Configuration Li1Target
+{
+  Dimensions 200.0 200.0 200.0 cm
+  PropertyString Material Galactic 
+  Module MuScatTargets/Li1.dat
+  {
+    Position 0.0 0.0 0.0 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module MuScatTargets/SpecialVirtual.dat
+  {
+    Position 0.0 0.0 100.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+}
+

@@ -1,0 +1,15 @@
+//
+
+
+Module Tof1SV
+{
+  Volume Cylinder
+  Dimensions 600 0.0001 mm
+  PropertyString Material Galactic
+  PropertyString SensitiveDetector SpecialVirtual
+  PropertyBool   SteppingInto 0
+  PropertyBool   SteppingThrough 0
+  PropertyBool   SteppingAcross 1
+  PropertyBool   SteppingOutOf 1
+}
+

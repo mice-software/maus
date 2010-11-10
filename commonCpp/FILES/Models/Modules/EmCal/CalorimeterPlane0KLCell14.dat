@@ -1,0 +1,25 @@
+// FILES/Models/Modules/EmCal/CalorimeterPlane0KLCell14.dat
+//
+
+Module CalorimeterPlane0KLCell14
+{
+  Volume Box
+  Dimensions 100.0 4 4 cm
+  PropertyInt Layer 0
+  PropertyInt Cell 14
+  PropertyInt numPMTs 2
+  PropertyDouble BlueColour 0.5
+  PropertyDouble RedColour 0.5
+  PropertyDouble GreenColour 0.5
+  PropertyString Material Pb
+  Module EmCal/KLGlue.dat
+  {
+    Position 0 0 0 cm
+    Rotation 0 0 0 degree
+  }
+  Module EmCal/KLFiber.dat
+    {
+    Position 0 0 0 cm
+    Rotation 0 0 0 degree
+  }
+}

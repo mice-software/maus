@@ -1,0 +1,313 @@
+Module DownstreamMatchWithRings
+{
+  Volume  Cylinder
+  Dimensions  55.5 320.0 cm 
+  PropertyString  Material Galactic
+  PropertyInt   Tracker   5
+  PropertyBool  Invisible  1
+  Module Matching/ManxCoil.dat
+  {
+    Position 25.5  -1.2491e-014  -146.25  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position 24.481  4.91122  -139.948  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position 22.5466  9.42566  -133.646  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position 19.8119  13.379  -127.344  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position 16.4201  16.6364  -121.042  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position 12.5355  19.0971  -114.74  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position 8.33584  20.6969  -108.438  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position 4.00435  21.41  -102.135  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position -0.278154  21.2482  -95.8333  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position -4.34082  20.2589  -89.5313  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position -8.02955  18.5219  -83.2292  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position -11.2128  16.1444  -76.9271  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position -13.7863  13.2553  -70.625  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position -15.6764  9.99897  -64.3229  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position -16.8415  6.52817  -58.0208  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position -17.2731  2.99718  -51.7188  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position -16.9942  -0.445008  -45.4167  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position -16.0567  -3.66089  -39.1146  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position -14.5383  -6.52998  -32.8125  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position -12.5376  -8.95329  -26.5104  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position -10.1684  -10.8567  -20.2083  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position -7.55453  -12.1931  -13.9063  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position -4.82312  -12.9431  -7.60417  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position -2.09911  -13.1143  -1.30208  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position 0.500563  -12.7402  5  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position 2.87185  -11.8765  11.3021  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position 4.92779  -10.5979  17.6042  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position 6.6017  -8.9933  23.9063  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position 7.84921  -7.16104  30.2083  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position 8.6492  -5.20338  36.5104  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position 9.00352  -3.22151  42.8125  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position 8.93566  -1.31054  49.1146  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position 8.48835  0.444856  55.4167  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position 7.72034  1.97417  61.7188  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position 6.70246  3.22388  68.0208  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position 5.51331  4.15929  74.3229  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position 4.23461  4.76537  80.625  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position 2.94668  5.04643  86.9271  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position 1.7241  5.02495  93.2292  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position 0.631834  4.73932  99.5313  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position -0.277963  4.2409  105.833  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position -0.968359  3.59046  112.135  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position -1.41914  2.85415  118.438  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position -1.62735  2.09938  124.74  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position -1.6068  1.39062  131.042  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position -1.3867  0.785556  137.344  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position -1.00942  0.331636  143.646  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position -0.527465  0.0633049  149.948  cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor  0.523984
+  }
+  Module Matching/GlobalSolenoid.dat
+  {
+//    Position 0.0 0.0 -346.25 cm
+    Position  0. 0. 0. cm
+    Rotation 0.0 0.0 0.0
+    ScaleFactor    0.523984
+  }
+  Module Matching/DownstreamMatchingStation1.dat
+  {
+    Position 0.0 0.0 -50 cm
+    Rotation 0.0 0.0 0.0 degree 
+  }
+  Module Matching/DownstreamMatchingStation2.dat
+  {
+    Position 0.0 0.0 -150 cm
+    Rotation 0.0 0.0 0.0 degree 
+  }
+}

@@ -1,0 +1,171 @@
+//Boolean volume for quad type qc
+//Start with the BaseModule, then apply operations defined by 
+//BooleanModuleType with the volume defined in BooleanModule.
+//This defines the volume only - no material, field definitions etc.
+//Then add copper pole pieces as normal mice modules
+//In reality these pole pieces are some complex geometry of cooling,
+//laminate, copper (and iron?) - so I don't know how realistic this is!
+
+
+
+Module QuadTypeQC_Boolean
+{
+  Volume             Box
+  Dimensions         1.5 1.5 1.046 m
+
+  PropertyDouble     RedColour    0.0
+  PropertyDouble     GreenColour  1.0
+  PropertyDouble     BlueColour   1.0
+  PropertyBool       Invisible    1
+  PropertyString     Material     Galactic
+
+//Field model
+  Module QCField
+  {
+    Volume None
+    Position 0.0 0.0 -5.633106e+02/2. mm
+  //Field model
+    PropertyString FieldType           Multipole
+    PropertyInt    Pole                2 //Quad field
+    PropertyInt    MaxEndPole          6 //Simulate end field up to octupole order
+    PropertyDouble Magnitude           -2.237294e-04     //normalised to Opera Field map
+    PropertyDouble Height              0.54     m
+    PropertyDouble Width               0.54     m     
+    PropertyDouble Length              5.633106e+02  mm
+    PropertyDouble EndLength           1.772302e+02
+    PropertyString EndFieldType        Enge
+    PropertyDouble EffectiveWidth      1.538410e+01  mm
+    PropertyDouble Enge1               1.075890e-01 
+    PropertyDouble Enge2               5.710438e-02 
+    PropertyDouble Enge3               2.734375e-06 
+    PropertyDouble Enge4               1.367187e-08
+  }
+
+//Geometry model
+  Module BeamLine/QC_Body.dat
+  {
+    Position 0.0 0.0 0.0 m
+    Rotation 0.0 0.0 0.0 degree
+  }
+
+  Module BeamLine/QC_Pole.dat
+  {
+    Position 0.2955 0.2955 0.0 m
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module BeamLine/QC_Pole.dat
+  {
+    Position -0.2955 0.2955 0.0 m
+    Rotation 0.0 0.0 270.0 degree
+  }
+
+  Module BeamLine/QC_Pole.dat
+  {
+    Position 0.2955 -0.2955 0.0 m
+    Rotation 0.0 0.0 90.0 degree
+  }
+  Module BeamLine/QC_Pole.dat
+  {
+    Position -0.2955 -0.2955 0.0 m
+    Rotation 0.0 0.0 180.0 degree
+  }
+
+  Module BeamLine/QC_MirrorPlate.dat
+  {
+    Position 0.0 0.0 0.493 m
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module BeamLine/QC_MirrorPlate.dat
+  {
+    Position 0.0 0.0 -0.493 m
+    Rotation 0.0 0.0 0.0 degree
+  }
+
+
+
+  Module BeamLine/QC_MirrorSmallSpacer.dat
+  {
+    Position 0.7025 0.0 -0.398 m
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module BeamLine/QC_MirrorLargeSpacer.dat
+  {
+    Position 0.5525 0.0 -0.398 m
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module BeamLine/QC_MirrorSmallSpacer.dat
+  {
+    Position -0.7025 0.0 -0.398 m
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module BeamLine/QC_MirrorLargeSpacer.dat
+  {
+    Position -0.5525 0.0 -0.398 m
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module BeamLine/QC_MirrorSmallSpacer.dat
+  {
+    Position 0.0 -0.7025 -0.398 m
+    Rotation 0.0 0.0 90.0 degree
+  }
+  Module BeamLine/QC_MirrorLargeSpacer.dat
+  {
+    Position 0.0 -0.5525 -0.398 m
+    Rotation 0.0 0.0 90.0 degree
+  }
+  Module BeamLine/QC_MirrorSmallSpacer.dat
+  {
+    Position 0.0 0.7025 -0.398 m
+    Rotation 0.0 0.0 90.0 degree
+  }
+  Module BeamLine/QC_MirrorLargeSpacer.dat
+  {
+    Position 0.0 0.5525 -0.398 m
+    Rotation 0.0 0.0 90.0 degree
+  }
+
+  Module BeamLine/QC_MirrorSmallSpacer.dat
+  {
+    Position 0.7025 0.0 0.398 m
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module BeamLine/QC_MirrorLargeSpacer.dat
+  {
+    Position 0.5525 0.0 0.398 m
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module BeamLine/QC_MirrorSmallSpacer.dat
+  {
+    Position -0.7025 0.0 0.398 m
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module BeamLine/QC_MirrorLargeSpacer.dat
+  {
+    Position -0.5525 0.0 0.398 m
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module BeamLine/QC_MirrorSmallSpacer.dat
+  {
+    Position 0.0 -0.7025 0.398 m
+    Rotation 0.0 0.0 90.0 degree
+  }
+  Module BeamLine/QC_MirrorLargeSpacer.dat
+  {
+    Position 0.0 -0.5525 0.398 m
+    Rotation 0.0 0.0 90.0 degree
+  }
+  Module BeamLine/QC_MirrorSmallSpacer.dat
+  {
+    Position 0.0 0.7025 0.398 m
+    Rotation 0.0 0.0 90.0 degree
+  }
+  Module BeamLine/QC_MirrorLargeSpacer.dat
+  {
+    Position 0.0 0.5525 0.398 m
+    Rotation 0.0 0.0 90.0 degree
+  }
+}
+
+
+
+

@@ -1,0 +1,13 @@
+// A test Tube for geometry test
+//
+
+Module tube
+{
+  Volume Tube
+  Dimensions 3.0 4.0 10.0 cm
+
+  PropertyString Material Galactic
+
+  PropertyDouble BlueColour 1.0
+  PropertyInt Plane 1
+}

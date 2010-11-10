@@ -1,0 +1,32 @@
+// FILES/Models/Configurations/MICEDAQ/MiceDAQ.dat
+//
+// 1st Draft Stage 1 Floor Plan
+//
+// 
+// 
+
+Configuration MiceDAQ
+{
+  PropertyString Material Galactic
+
+  Module DAQ/Ldc0.dat
+  {
+    Position 0.0 0.0 0.0 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module DAQ/Ldc1.dat
+  {
+    Position 0.0 0.0 0.0 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module DAQ/Ldc2.dat
+  {
+    Position 0.0 0.0 0.0 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module DAQ/Ldc3.dat
+  {
+    Position 0.0 0.0 0.0 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+}

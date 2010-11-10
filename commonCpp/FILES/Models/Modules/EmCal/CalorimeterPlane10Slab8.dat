@@ -1,0 +1,20 @@
+// FILES/Models/Modules/EmCal/CalorimeterPlane10Slab8.dat
+//
+
+Module CalorimeterPlane10Slab8
+{
+  Volume Box
+  Dimensions 100.0 11 12 cm
+
+  PropertyString Material Galactic
+
+  PropertyInt Layer 10
+  PropertyInt Cell 8
+  PropertyInt numPMTs 2
+  PropertyDouble BlueColour 1.0
+  Module EmCal/CalorimeterPlane10Slab8Sci.dat
+  {
+      Position 0.0 0.0 0.0 mm
+      Rotation 0.0 0.0 0.0 degree
+  }
+}

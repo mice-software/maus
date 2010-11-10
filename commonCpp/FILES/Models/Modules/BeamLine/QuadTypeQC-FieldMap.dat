@@ -1,0 +1,24 @@
+
+Module QuadTypeQC-FieldMap
+{
+//Physical model
+  Volume         Multipole
+  PropertyDouble BlueColour  0.5
+  PropertyString Material            Fe
+  PropertyDouble ApertureCurvature   0.     m
+  PropertyDouble ApertureLength      0.914  m
+  PropertyDouble ApertureInnerHeight 0.4    m
+  PropertyDouble ApertureInnerWidth  0.4    m
+  PropertyDouble ApertureOuterHeight 0.6    m
+  PropertyDouble ApertureOuterWidth  0.6    m
+  PropertyDouble PoleCenterRadius    0.25   m
+  PropertyDouble PoleTipRadius       0.1782 m
+  PropertyInt    NumberOfPoles       4
+//Field model
+  PropertyString FieldType           MagneticFieldMap
+  PropertyString FieldMapMode        Read
+  PropertyString FileType            g4bl3dGrid
+  PropertyString FileName            ${MICESRC}/FILES/Models/Modules/BeamLine/q365-with-MPs-rect-cent-field-region-data.table
+  PropertyString Symmetry            Quadrupole
+}
+

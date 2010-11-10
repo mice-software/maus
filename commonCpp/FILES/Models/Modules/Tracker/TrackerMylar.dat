@@ -1,0 +1,13 @@
+// FILES/Models/Modules/Tracker/TrackerMylar.dat
+//
+// Definition of a Mylar layer as used in the tracker for MICE
+// 
+//
+
+Module TrackerMylar
+{
+  Volume Cylinder
+  Dimensions 18.9 0.0025 cm
+  PropertyString Material MYLAR
+  PropertyDouble RedColour 1.0
+}

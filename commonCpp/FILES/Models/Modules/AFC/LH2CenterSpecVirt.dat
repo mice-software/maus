@@ -1,0 +1,20 @@
+// FILES/Models/Modules/AFC/LH2Center.dat
+//
+// The cylindrical region for the liquid Hydrogen in the 
+// H absorber in the muon cooling device
+//
+// 
+// 
+
+Module LH2CenterSpecVirt
+{
+  Volume Cylinder
+  Dimensions 150 1e-6 mm
+  PropertyString Material lH2
+  PropertyDouble OpticsMaterialLength 0.
+  PropertyDouble BlueColour 0.75
+  PropertyString SensitiveDetector SpecialVirtual
+  PropertyBool   SteppingInto 0
+  PropertyBool   SteppingThrough 0
+}
+

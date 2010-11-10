@@ -1,0 +1,22 @@
+// FILES/Models/Modules/Tracker/D1.dat
+//
+// Definition of Defining Counter 1 as used in the KEK test beam of October 2005
+//
+// A.Fish 23rd May 2006
+
+Module D1
+{
+  Volume Cylinder
+  Dimensions 15.0 1.0 cm // Alan thinks thickness is either 1cm or 0.5inch
+  PropertyString Detector TOF
+  PropertyString SensitiveDetector TOF
+  PropertyString Material POLYSTYRENE
+  PropertyInt Station 5
+  PropertyInt numPlanes 1
+  PropertyInt Plane 1
+  PropertyInt numSlabs 1
+  PropertyInt Slab 1
+  PropertyInt numPMTs 1
+  PropertyDouble RedColour 1.0
+  PropertyDouble GreenColour 0.5
+}

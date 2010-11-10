@@ -1,0 +1,230 @@
+//0.000000	0.000000	-20.000000	0
+//0.454095	0.000000	-16.230172	9
+//1.955814	0.000000	-14.704222	51
+//2.307111	0.000000	-11.467713	0
+//3.148329	0.000000	-10.236834	45
+//3.423861	0.000000	-7.071641	0
+//1.380562	0.000000	-4.638681	-45
+//-0.715368	0.000000	-4.363149	-90
+//-3.148329	0.000000	-6.406448	-135
+//-3.423861	0.000000	-9.571641	-180
+//-2.582643	0.000000	-10.802520	-225
+//-2.307111	0.000000	-13.967713	-180
+//-0.790095	0.000000	-15.648203	-231
+//-0.141226	0.000000	-18.205549	-189
+//0.000000	0.000000	-20.000000	-180
+
+
+
+
+Module Recirculator
+{
+  Volume Box
+  Dimensions 40.0 2.0 40.0 m
+  PropertyBool Invisible 1
+  PropertyString Material Galactic
+  PropertyDouble G4StepMax 100 mm
+  Module DogboneRecirculator/RecVirt.dat
+  {
+    Position 0.0 0.0 -20.0 m
+    Rotation 0.0 0.0 0.0 degree
+  }
+
+  Module DogboneRecirculator/Kicker.dat
+  {
+    Position 0.0 0.0 -19.999 m
+    Rotation 0.0 0.0 0.0   degree
+  }
+  Module DogboneRecirculator/RecVirt.dat
+  {
+    Position 0.0 0.0 -18.2 m
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module DogboneRecirculator/RecVirt.dat
+  {
+    Position 0.454095 0.0 -16.230172 m
+    Rotation 0.0 -9.0 0.0 degree  
+  }
+  Module DogboneRecirculator/BN.dat
+  {
+    Position 0.454095 0.0 -16.230172 m
+    Rotation 0.0 -9.0 0.0 degree
+  }
+  Module DogboneRecirculator/RecVirt.dat
+  {
+    Position 0.790095	0.000000	-15.648203 m
+    Rotation 0.0 -51.0 0.0 degree
+  }
+  Module DogboneRecirculator/RecVirt.dat
+  {
+    Position 1.955814 0.0 -14.703222 m
+    Rotation 0.0 -51.0 0.0 degree
+  }
+  Module DogboneRecirculator/BP.dat
+  {
+    Position 1.955814 0.0 -14.704222 m
+//    Rotation 0.0 0.0 0.0 degree
+    Rotation 0.0 -51.0 0.0 degree
+  }
+  Module DogboneRecirculator/RecVirt.dat
+  {
+    Position 2.307111	0.000000	-13.967713 m
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module DogboneRecirculator/RecVirt.dat
+  {
+    Position 2.307111 0.0 -11.466713 m
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module DogboneRecirculator/BR.dat
+  {
+    Position 2.307111 0.0 -11.467713 m
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module DogboneRecirculator/RecVirt.dat
+  {
+    Position 2.582643	0.000000	-10.802520 m
+    Rotation 0.0 -45.0 0.0 degree
+  }
+  Module DogboneRecirculator/RecVirt.dat
+  {
+    Position 3.148329 0.0 -10.235834 m
+    Rotation 0.0 -45.0 0.0 degree
+  }
+  Module DogboneRecirculator/BD.dat
+  {
+    Position 3.148329 0.0 -10.236834 m
+    Rotation 0.0 -45.0 0.0 degree
+  }
+  Module DogboneRecirculator/RecVirt.dat
+  {
+    Position 3.423861	0.000000	-9.571641 m
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module DogboneRecirculator/RecVirt.dat
+  {
+    Position 3.423861 0.0 -7.070641 m
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module DogboneRecirculator/BD.dat
+  {
+    Position 3.423861 0.0 -7.071641 m
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module DogboneRecirculator/RecVirt.dat
+  {
+    Position 3.148329	0.000000	-6.406448 m
+    Rotation 0.0 45.0 0.0 degree
+  }
+  Module DogboneRecirculator/RecVirt.dat
+  {
+    Position 1.380562 0.0 -4.637681 m
+    Rotation 0.0 45.0 0.0 degree
+  }
+  Module DogboneRecirculator/BD.dat
+  {
+    Position 1.380562 0.0 -4.638681 m
+    Rotation 0.0 45.0 0.0 degree
+  }
+  Module DogboneRecirculator/RecVirt.dat
+  {
+    Position 0.715369	0.000000	-4.363149 m
+    Rotation 0.0 90 0.0  degree
+  }
+  Module DogboneRecirculator/RecVirt.dat
+  {
+    Position -0.0 0.0 -4.363149 m
+    Rotation 0.0 90 0.0  degree
+  }
+  //half way
+  Module DogboneRecirculator/RecVirt.dat
+  {
+    Position -0.715368 0.0 -4.363149 m
+    Rotation 0.0 90 0.0  degree
+  }
+  Module DogboneRecirculator/BD.dat
+  {
+    Position -0.715368 0.0 -4.363149 m
+    Rotation 0.0 90 0.0  degree
+  }
+  Module DogboneRecirculator/RecVirt.dat
+  {
+    Position -1.380562	0.000000	-4.638681 m
+    Rotation 0.0 135 0.0 degree
+  }
+  Module DogboneRecirculator/RecVirt.dat
+  {
+    Position -3.148329 0.0 -6.406448 m
+    Rotation 0.0 135 0.0 degree
+  }
+  Module DogboneRecirculator/BD.dat
+  {
+    Position -3.148329 0.0 -6.406448 m
+    Rotation 0.0 135 0.0 degree
+  }
+  Module DogboneRecirculator/RecVirt.dat
+  {
+    Position -3.423861	0.000000	-7.071641 m
+    Rotation 0.0 180 0.0 degree
+  }
+  Module DogboneRecirculator/RecVirt.dat
+  {
+    Position -3.423861 0.0 -9.571641 m
+    Rotation 0.0 180 0.0 degree
+  }
+  Module DogboneRecirculator/BD.dat
+  {
+    Position -3.423861 0.0 -9.571641 m
+    Rotation 0.0 180 0.0 degree
+  }
+  Module DogboneRecirculator/RecVirt.dat
+  {
+    Position -3.148329	0.000000	-10.236834 m
+    Rotation 0.0 225 0.0 degree
+  }
+  Module DogboneRecirculator/RecVirt.dat
+  {
+    Position -2.582643 0.0 -10.802520 m
+    Rotation 0.0 225 0.0 degree
+  }
+  Module DogboneRecirculator/BR.dat
+  {
+    Position -2.582643 0.0 -10.802520 m
+    Rotation 0.0 225 0.0 degree
+  }
+  Module DogboneRecirculator/RecVirt.dat
+  {
+    Position -2.307111	0.000000	-11.467713 m
+    Rotation 0.0 180 0.0 degree
+  }
+  Module DogboneRecirculator/RecVirt.dat
+  {
+    Position -2.307111 0.0 -13.967713 m
+    Rotation 0.0 180 0.0 degree
+  }
+  Module DogboneRecirculator/BP.dat
+  {
+    Position -2.307111 0.0 -13.967713 m
+    Rotation 0.0 180 0.0 degree
+  }
+  Module DogboneRecirculator/RecVirt.dat
+  {
+    Position -1.955814	0.000000	-14.704222 m
+    Rotation 0.0 231 0.0 degree
+  }
+  Module DogboneRecirculator/RecVirt.dat
+  {
+    Position -0.790095 0.0 -15.648203 m
+    Rotation 0.0 231 0.0 degree
+  }
+  Module DogboneRecirculator/BN.dat
+  {
+    Position -0.790095 0.0 -15.648203 m
+    Rotation 0.0 231 0.0 degree
+  }
+  Module DogboneRecirculator/RecVirt.dat
+  {
+    Position -0.454095	0.000000	-16.230172 m
+    Rotation 0.0 189 0.0 degree
+  }
+}

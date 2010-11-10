@@ -1,0 +1,17 @@
+// FILES/Models/Configurations/KEKOctober2005/KekOctober.dat
+//
+// A model of the KEK test beam setup in which all detectors are described
+//
+// M.Ellis 16th May 2006
+// Modified by A.Fish 23rd May 2006
+
+Configuration Test
+{
+  Dimensions 2000 2000 2000 cm
+  PropertyString Material Galactic		
+  Module Tests/box.dat
+  {
+    Position 100.0 0.0 0.0 cm
+    Rotation 0.0 0.0 45.0 degree
+  }
+}

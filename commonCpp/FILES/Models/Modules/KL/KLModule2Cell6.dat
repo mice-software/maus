@@ -1,0 +1,25 @@
+// FILES/Models/Modules/KL/KLModule2Cell6.dat
+//
+
+Module KLModule2Cell6
+{
+  Volume Box
+  Dimensions 932 44 40 mm
+  PropertyInt Cell 6
+  PropertyInt numPMTs 2
+  PropertyDouble BlueColour 0.5
+  PropertyDouble RedColour 0.5
+  PropertyDouble GreenColour 0.5
+  PropertyString Material Pb
+  PropertyBool Invisible 1
+  Module KL/KLGlue.dat
+  {
+    Position 0 0 0 cm
+    Rotation 0 0 0 degree
+  }
+  Module KL/KLFiber.dat
+  {
+    Position 0 0 0 cm
+    Rotation 0 0 0 degree
+  }
+}

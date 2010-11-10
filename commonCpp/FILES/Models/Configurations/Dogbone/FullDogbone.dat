@@ -1,0 +1,24 @@
+// FILES/Models/Configurations/MICEStage6/Stage6.dat
+//
+// 1st Draft Stage 6 Floor Plan, z=0 at middle H absorber
+
+Configuration Dogbone10m
+{
+  Dimensions 100.0 1.0 200.0 m
+  PropertyString Material Galactic
+  Module DogboneRecirculator/Recirculator.dat
+  {
+    Position 0.0 0.0 -70.0 m
+    Rotation 0.0 180.0 0.0 degree
+  }
+  Module DogboneStraightLattice/10mLattice.dat
+  {
+    Position 0.0 0.0 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module DogboneRecirculator/Recirculator.dat
+  {
+    Position 0.0 0.0 70.0 m
+    Rotation 0.0 0.0 0.0 degree
+  }
+}

@@ -1,0 +1,26 @@
+// FILES/Models/Modules/TOF/KekTOF.dat
+//
+// Definition of the TOF Hodoscope in the KEK pi2 beam line in October 2005
+//
+// A.Fish 23rd May 2006
+
+Module KekTOF
+{
+  Volume Box
+  Dimensions 145.0 145.0 4.0 cm
+  PropertyString Material POLYSTYRENE
+  PropertyDouble PhotoElectronsResolution 43.5
+  PropertyString Detector TOF
+  PropertyInt Station 4
+  PropertyInt numPlanes 2
+  Module TOF/KekTOFHorizontal.dat
+  {
+    Position 0.0 0.0 -10.0 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module TOF/KekTOFVertical.dat
+  {
+    Position 0.0 0.0 10.0 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+}

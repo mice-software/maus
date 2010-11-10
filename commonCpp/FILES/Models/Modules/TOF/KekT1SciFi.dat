@@ -1,0 +1,15 @@
+// FILES/Models/Modules/TOF/KekT1.dat
+//
+// Definition of the scintillating fiber in T1 scintillation counter in the KEK test beam
+//
+// M.Ellis 22nd May 2006
+
+Module KekT1Sci
+{
+  Volume Box
+  Dimensions 10 5.0 2.0 cm
+  PropertyString SensitiveDetector TOF
+  PropertyString Material POLYSTYRENE
+  PropertyDouble GreenColour 1.0
+  PropertyDouble RedColour 1.0
+}

@@ -1,0 +1,13 @@
+// FILES/Models/Modules/MuScatTargets/Al8.dat
+//
+
+Module Al8
+{
+  Volume Box 
+  Dimensions 100.0 100.0 1.50 mm
+  PropertyDouble BlueColour 1.0
+  PropertyDouble RedColour 1.0
+  PropertyInt Plane 1
+  PropertyString Material Al
+}
+

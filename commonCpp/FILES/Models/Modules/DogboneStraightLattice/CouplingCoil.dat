@@ -1,0 +1,23 @@
+// FILES/Models/Modules/AFC/FCoil.dat
+//
+// The Focusing Coil in the H absorber in the muon cooling device
+//
+// 
+// 
+
+Module CouplingCoil
+{
+  Volume Tube
+  Dimensions 750.0 850.0 250.0 mm
+  PropertyString Material Cu
+  PropertyDouble BlueColour 0.15
+  PropertyDouble GreenColour 0.15
+//field
+  PropertyString FieldType       Solenoid
+  PropertyString FileName        coupling.dat
+  PropertyDouble CurrentDensity      1.
+  PropertyDouble Length            250.
+  PropertyDouble Thickness         100.
+  PropertyDouble InnerRadius       750.
+}
+

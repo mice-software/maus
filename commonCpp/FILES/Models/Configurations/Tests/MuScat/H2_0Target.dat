@@ -1,0 +1,22 @@
+// FILES/Models/Configurations/MuScat/H2_0Target.dat
+//
+// Model of the MuScat targets
+//
+// M.Wojcik 1st Feb 2007
+
+Configuration H2_0Target
+{
+  Dimensions 200.0 200.0 200.0 cm
+  PropertyString Material Galactic
+  Module MuScatTargets/H2_0.dat
+  {
+    Position 0.0 0.0 0.0 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module MuScatTargets/SpecialVirtual.dat
+  {
+    Position 0.0 0.0 100.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+}
+

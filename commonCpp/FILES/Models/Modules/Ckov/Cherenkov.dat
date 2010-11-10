@@ -1,0 +1,22 @@
+// FILES/Models/Modules/Ckov/Cherenkov.dat
+// 
+
+Module Cherenkov
+{
+  Volume Box
+  Dimensions 800.0 800.0 693.0 mm
+  PropertyString Material AIR
+  Module Ckov/Vessel1.dat
+  {
+    Position 0.0 0.0 -173.25 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Ckov/Vessel2.dat
+  {
+    Position 0.0 0.0 173.25 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+}
+
+
+

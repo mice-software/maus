@@ -1,0 +1,29 @@
+// FILES/Models/Modules/Tracker/KekDownstream.dat
+//
+// Definition of the Downstream box for Solenoid rotation for the four station prototype
+// tested in the KEK pi2 beam line in October 2005
+//
+// A.Fish 6th June 2006
+
+Module KekDownstream
+{
+  Volume Box
+  Dimensions 1500 1500 3600 mm
+  PropertyBool Invisible 1
+  PropertyInt KalmanSolenoid 1
+  Module TOF/KekTOF.dat
+  {
+     Position 0.0 0.0 -825.3 mm
+     Rotation 0.0 0.0 0.0 degree
+  }
+  Module Tracker/KekSolenoid.dat
+  {
+    Position 0.0 0.0 233.05 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module TOF/KekD2.dat
+  {
+    Position 0.0 0.0 1761 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+}

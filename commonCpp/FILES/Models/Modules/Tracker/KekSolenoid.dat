@@ -1,0 +1,66 @@
+// FILES/Models/Modules/Tracker/KekSolenoid.dat
+//
+// Definition of the tracker module for the four station prototype
+// tested in the KEK pi2 beam line in October 2006
+//
+// M.Ellis 16th May 2006
+
+Module KekSolenoid
+{
+  Volume Cylinder
+  Dimensions 590 2035 mm
+  PropertyDouble RedColour 1.0
+  PropertyDouble GreenColour 1.0
+  PropertyDouble BlueColour 1.0
+  PropertyInt KalmanSolenoid 1
+  Module TOF/KekD1.dat
+  {
+    Position 0.0 0.0 -975.25 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Tracker/KekFourStationTracker.dat
+  {
+     Position 0.0 0.0 -350.85 mm
+     Rotation 0.0 0.0 0.0 degree
+  }
+  Module Tracker/KekSolenoidShell.dat
+  {
+     Position 0.0 0.0 0.0 mm
+     Rotation 0.0 0.0 0.0 degree
+  }
+  Module Tracker/KekSolenoidNeck.dat
+  {
+     Position 0.0 0.0 1205.0 mm
+     Rotation 0.0 0.0 0.0 degree
+  }
+  Module Tracker/KekEndCoil1.dat
+  {
+     Position 0.0 0.0 -807.75 mm
+     Rotation 0.0 0.0 0.0 degree
+  }
+  Module Tracker/KekCenterCoil1.dat
+  {
+     Position 0.0 0.0 -233.05 mm
+     Rotation 0.0 0.0 0.0 degree
+  }
+  Module Tracker/KekCenterCoil2.dat
+  {
+     Position 0.0 0.0 -233.05 mm
+     Rotation 0.0 0.0 0.0 degree
+  }
+  Module Tracker/KekCenterCoil3.dat
+  {
+     Position 0.0 0.0 -233.05 mm
+     Rotation 0.0 0.0 0.0 degree
+  }
+  Module Tracker/KekCenterCoil4.dat
+  {
+     Position 0.0 0.0 -233.05 mm
+     Rotation 0.0 0.0 0.0 degree
+  }
+  Module Tracker/KekEndCoil2.dat
+  {
+     Position 0.0 0.0 341.65 mm
+     Rotation 0.0 0.0 0.0 degree
+  }
+}

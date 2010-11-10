@@ -1,0 +1,44 @@
+// FILES/Models/Modules/Tracker/TrackerStation5.dat
+//
+// Description of the fifth tracker module
+// 
+//
+
+Module TrackerStation5
+{
+  Volume Cylinder
+  Dimensions 19.0 0.19569 cm
+  PropertyDouble GreenColour 1.0
+  PropertyDouble RedColour 1.0
+  PropertyInt Station 5
+  Module Tracker/PrototypeStation5ViewV.dat
+  {
+    Position 0.0 0.0 -0.6398 mm
+    Rotation 0.0 0.0 120.0 degree
+  }
+  Module Tracker/PrototypeStation5ViewW.dat
+  {
+    Position 0.0 0.0 0.00125 cm
+    Rotation 0.0 0.0 -120.0 degree
+  }
+  Module Tracker/PrototypeStation5ViewX.dat
+  {
+    Position -2.34 0.0 0.6648 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Tracker/TrackerMylar.dat
+  {
+    Position 0.0 0.0 -0.096595 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Tracker/TrackerMylar.dat
+  {
+    Position 0.0 0.0 -0.031365 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Tracker/TrackerMylar.dat
+  {
+    Position 0.0 0.0 0.033865 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+}

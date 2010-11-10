@@ -1,0 +1,38 @@
+// FILES/Models/Modules/TOF/KekTOFVertical.dat
+//
+// Definition of Slabs 1-5 in the KEK test beam of October 2005
+//
+// A.Fish 23rd May 2006
+
+Module KekTOFVertical
+{
+  Volume Box
+  Dimensions 40.0 145.0 2.0 cm
+  PropertyInt Plane 2
+  PropertyInt numSlabs 5
+  Module TOF/KekTOFSlab1.dat
+  {
+    Position -16.0 0.0 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module TOF/KekTOFSlab2.dat
+  {
+    Position -8.0 0.0 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }  
+  Module TOF/KekTOFSlab3.dat
+  {
+    Position 0.0 0.0 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }  
+  Module TOF/KekTOFSlab4.dat
+  {
+    Position 8.0 0.0 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module TOF/KekTOFSlab5.dat
+  {
+    Position 16.0 0.0 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+}

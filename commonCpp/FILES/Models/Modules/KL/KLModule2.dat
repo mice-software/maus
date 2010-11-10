@@ -1,0 +1,26 @@
+// FILES/Models/Modules/KL/KLModule2.dat
+//
+
+Module KLModule2
+{
+  Volume Box
+  Dimensions 932 132 40 mm
+//  PropertyDouble GreenColour 1.
+//  PropertyInt numSlabs 24
+  PropertyBool Invisible 1
+  Module KL/KLModule2Cell6.dat
+  {
+    Position 0.0 -4.4 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module KL/KLModule2Cell7.dat
+  {
+    Position 0.0 0.0 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module KL/KLModule2Cell8.dat
+  {
+    Position 0.0 4.4 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+}

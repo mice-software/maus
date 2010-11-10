@@ -1,0 +1,13 @@
+// FILES/Models/Modules/Ckov/GlassWindow.dat
+// 
+
+Module GlassWindow
+{
+  Volume Box
+  Dimensions 600.0 600.0 3.0 mm
+  PropertyString Material OptAIR
+  PropertyDouble RedColour 1.0
+  PropertyDouble GreenColour 1.0
+  PropertyDouble BlueColour 0.0
+}
+

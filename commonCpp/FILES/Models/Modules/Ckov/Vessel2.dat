@@ -1,0 +1,63 @@
+// FILES/Models/Modules/Ckov/Vessel2.dat
+// 
+
+Module Vessel2
+{
+  Volume Box
+  Dimensions 800.0 800.0 346.5 mm
+  PropertyString Material AIR
+  PropertyInt Plane 2
+  PropertyDouble BlueColour 1.0
+  Module Ckov/Window.dat
+  {
+    Position 0.0 0.0 -170.75 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Ckov/Mirror.dat
+  {
+    Position 0.0 0.0 -166.75 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Ckov/Acc2.dat
+  {
+    Position 0.0 0.0 -152.75 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Ckov/GlassWindow.dat
+  {
+    Position 0.0 0.0 -139.75 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Ckov/ConicalMirror.dat
+  {                           
+    Position 0.0 0.0 -139.75 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Ckov/Window.dat
+  {
+    Position 0.0 0.0 170.75 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Ckov/PMT0.dat
+  {
+    Position 403.08 0.0 29.75 mm
+    Rotation 0.0 90.0 0.0 degree
+  }
+  Module Ckov/PMT1.dat
+  {
+    Position 0.0 403.08 29.75 mm
+    Rotation -90.0 0.0 0.0 degree
+  }
+  Module Ckov/PMT2.dat
+  {
+    Position -403.08 0.0 29.75 mm
+    Rotation 0.0 -90.0 0.0 degree
+  }
+  Module Ckov/PMT3.dat
+  {
+    Position 0.0 -403.08 29.75 mm
+    Rotation 90.0 0.0 0.0 degree
+  }
+}
+
+

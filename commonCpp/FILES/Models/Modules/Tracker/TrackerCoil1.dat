@@ -1,0 +1,41 @@
+// FILES/Models/Modules/Tracker/TrackerCoil.dat
+//
+// The solenoid magnet in the tracker device, first approx.
+//
+// Based on drawing MICE-TM-C001-R02
+
+Module TrackerCoil
+{
+  Volume Tube 
+  Dimensions 245.0 326.2 2494.0 mm
+  Module Tracker/MatchCoil1.dat
+  {
+    Position 0.0 0.0 1148 mm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor 104.6115
+  }
+  Module Tracker/MatchCoil2.dat
+  {
+    Position 0.0 0.0 707.5 mm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor 161.3
+  }
+  Module Tracker/EndCoil1.dat
+  {
+    Position 0.0 0.0 308.0 mm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor 136.80 
+  }
+  Module Tracker/CenterCoil.dat
+  {
+    Position 0.0 0.0 -442.0 mm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor 146.9
+  }
+  Module Tracker/EndCoil2.dat
+  {
+    Position 0.0 0.0 -1192.0 mm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor 142.492
+  }
+}

@@ -1,0 +1,18 @@
+// A big tube in which stuff can be put inside, box cylinder tube
+//
+
+Module Tube
+{
+  Volume Tube
+  Dimensions 5.0 7.0 20.0 cm
+
+  PropertyString Material Galactic
+
+  PropertyDouble RedColour 1.0
+  PropertyInt Plane 1
+  Module GeoTests/smallBox.dat
+  {
+    Position 0.0 0.0 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }  
+}

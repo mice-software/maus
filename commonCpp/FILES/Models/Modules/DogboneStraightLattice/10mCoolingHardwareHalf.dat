@@ -1,0 +1,47 @@
+Module 10mCoolingHardwareHalf
+{
+  Volume Cylinder
+  Dimensions 1.0 5.0 m
+  PropertyString Material Galactic
+  PropertyBool   Invisible 1
+  Module DogboneStraightLattice/Cavity.dat
+  {
+    Position 0.0 0.0 62.5 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module DogboneStraightLattice/Cavity.dat
+  {
+    Position 0.0 0.0 10. cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Tests/SpecVirt.dat
+  {
+    Position 0.0 0.0 -250. cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module DogboneStraightLattice/LH2Half.dat
+  {
+    Position 0.0 0.0 241.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Tests/SpecVirt.dat
+  {
+    Position 0.0 0.0 -150. cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Tests/SpecVirt.dat
+  {
+    Position 0.0 0.0 -50. cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Tests/SpecVirt.dat
+  {
+    Position 0.0 0.0 150. cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Tests/SpecVirt.dat
+  {
+    Position 0.0 0.0 250. cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+}

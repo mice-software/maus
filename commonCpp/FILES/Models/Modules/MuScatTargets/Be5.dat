@@ -1,0 +1,12 @@
+// FILES/Models/Modules/MuScatTargets/Be5.dat
+//
+
+Module Be5
+{
+  Volume Box 
+  Dimensions 100.0 100.0 3.73 mm
+  PropertyDouble RedColour 1.0
+  PropertyInt Plane 1
+  PropertyString Material Be
+}
+

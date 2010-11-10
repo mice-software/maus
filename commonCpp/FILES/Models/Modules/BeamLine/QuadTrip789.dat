@@ -1,0 +1,43 @@
+// FILES/Models/Modules/Beamline/QuadTrip789.dat
+//
+// 
+//
+// 
+// 
+
+Module QuadTrip789
+{
+  Volume Cylinder
+  Dimensions 70.0 340.0 cm
+  PropertyBool Invisible 1
+
+  PropertyString Material Galactic
+
+  Module BeamLine/QuadTypeQC.dat
+  {
+    Position 0.0 0.0 -120 cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor 1.07175285
+  }
+  Module BeamLine/QuadTypeQC.dat
+  {
+    Position 0.0 0.0 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor -1.621368
+  }
+  Module BeamLine/QuadTypeQC.dat
+  {
+    Position 0.0 0.0 120.0 cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor 1.196592968
+  }
+}
+
+
+
+
+
+
+
+
+

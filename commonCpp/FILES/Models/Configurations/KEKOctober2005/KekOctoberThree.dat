@@ -1,0 +1,43 @@
+// FILES/Models/Configurations/KEKOctober2005/KekOctoberThree.dat
+//
+// A model of the KEK test beam setup in which all detectors are described
+//
+// M.Ellis 16th May 2006
+// Modified by A.Fish 23rd May 2006
+
+Configuration KekOctoberThree
+{
+  Dimensions 400 400 2000 cm
+  PropertyString Material AIR
+  PropertyDouble G4StepMax 1000
+  PropertyDouble G4TrackMax 100000.0 mm
+  PropertyDouble G4TimeMax 1000 ns
+  PropertyDouble G4EKinMin 0.
+  PropertyDouble G4RangMin 0.
+  Module TOF/KekT1.dat
+  {
+    Position 475.5 0.0 12.4 mm
+    Rotation 0.0 -3.0 0.0 degree
+  }
+  Module TOF/KekR1.dat
+  {
+    Position 474.0 0.0 40.3 mm
+    Rotation 0.0 -3.0 0.0 degree
+  }
+  Module Ckov/KekACC.dat
+  {
+    Position 455.0 0.0 402.3 mm
+    Rotation 0.0 -3.0 0.0 degree
+  }
+  Module TOF/KekPb_Diffuser.dat
+  {
+    Position 443.3 0.0 624.6 mm
+    Rotation 0.0 -3.0 0.0 degree
+  }
+  Module Tracker/KekDownstream.dat
+  {
+    Position 0.0 0.0 9072.3 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+}
+

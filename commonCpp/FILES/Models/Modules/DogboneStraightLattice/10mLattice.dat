@@ -1,0 +1,77 @@
+// FILES/Models/Configurations/MICEStage6/Stage6.dat
+//
+// 1st Draft Stage 6 Floor Plan, z=0 at middle H absorber
+
+Module 10mLattice
+{
+  Volume Cylinder
+  Dimensions 1.0 200.0 m
+  PropertyString Material Galactic
+  PropertyBool   Invisible 1
+  Module DogboneStraightLattice/10mEndCell.dat
+  {
+    Position 0.0 0.0 -47.5 m
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor 1.
+  }
+  Module DogboneStraightLattice/10mCell-.dat
+  {
+    Position 0.0 0.0 -40.0 m
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor 1.
+  }
+  Module DogboneStraightLattice/10mCell+.dat
+  {
+    Position 0.0 0.0 -30.0 m
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor 1.
+  }
+  Module DogboneStraightLattice/10mCell-.dat
+  {
+    Position 0.0 0.0 -20.0 m
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor 1.
+  }
+  Module DogboneStraightLattice/10mCell+.dat
+  {
+    Position 0.0 0.0 -10.0 m
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor 1.
+  }
+  Module DogboneStraightLattice/10mCell-.dat
+  {
+    Position 0.0 0.0 0.0 m
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor 1.
+  }
+  Module DogboneStraightLattice/10mCell+.dat
+  {
+    Position 0.0 0.0 10.0 m
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor 1.
+  }
+  Module DogboneStraightLattice/10mCell-.dat
+  {
+    Position 0.0 0.0  20.0 m
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor 1.
+  }
+  Module DogboneStraightLattice/10mCell+.dat
+  {
+    Position 0.0 0.0  30.0 m
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor 1.
+  }
+  Module DogboneStraightLattice/10mCell-.dat
+  {
+    Position 0.0 0.0  40.0 m
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor 1.
+  }
+  Module DogboneStraightLattice/10mEndCell.dat
+  {
+    Position 0.0 0.0  47.5 m
+    Rotation 180.0 0.0 0.0 degree
+    ScaleFactor -1.
+  }
+}

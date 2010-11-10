@@ -1,0 +1,23 @@
+// FILES/Models/Modules/Tracker/KekViewW.dat
+//
+// Definition of a W plane as used in the four station tracker prorotype
+// in the KEK test beam of October 2006
+//
+// M.Ellis 16th May 2006
+
+Module KekViewW
+{
+  Volume Cylinder
+  Dimensions 19.0 0.06273 cm
+  PropertyString Material POLYSTYRENE
+  PropertyString SensitiveDetector SciFi
+  PropertyInt Plane 2
+  PropertyDouble ActiveRadius 150.0 mm
+  PropertyDouble Pitch 0.420 mm
+  PropertyDouble FibreDiameter 0.350 mm
+  PropertyDouble CoreDiameter 0.3325 mm
+  PropertyDouble CentralFibre 105.5
+  PropertyBool Invisible 1
+  PropertyString G4Detector SciFiPlane
+  PropertyDouble LY 8.1 // 11.5
+}

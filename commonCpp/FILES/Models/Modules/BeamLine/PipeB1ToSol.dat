@@ -1,0 +1,13 @@
+
+Module PipeB1ToSol
+{
+  Volume Tube
+  Dimensions 100.0 103. 1192.5 mm
+  PropertyString Material Al
+  PropertyDouble RedColour 1.0
+  Module BeamLine/VacuumB1ToSol.dat
+  {
+     Position 0.0 0.0 0.0 m
+     Rotation 0.0 0.0 0.0 degree
+  }
+}

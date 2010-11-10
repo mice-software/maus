@@ -1,0 +1,16 @@
+// @(#) $Id: CryostatBackEndPlate.dat,v 1.2 2007-06-01 02:05:47 ellis Exp $  $Name:  $
+//
+// FILES/Models/Modules/Tracker/CryostatBackEndPlate.dat
+//
+// Spectrometer solenoid cryostat inner face plate (AFC-module side)
+// Based on drawing MICE-TM-V004-R03
+
+Module TrackerCryostatBackEndPlate
+{
+  Volume Tube
+  Dimensions 202.0 687.0 18.0 mm
+  PropertyString Material STEEL304
+  PropertyDouble BlueColour 0.87
+  PropertyDouble GreenColour 0.77
+  PropertyDouble RedColour 0.69
+}

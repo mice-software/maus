@@ -1,0 +1,44 @@
+// FILES/Models/Modules/RFCC/RFCouplingCoil.dat
+//
+// A coupling coil module in the muon cooling device
+//
+// 
+// 
+
+Module RFCouplingCoil
+{
+  Volume Cylinder
+  Dimensions 66.0 187.4 cm
+  PropertyString Material Galactic
+  PropertyBool Invisible 1
+  Module RFCC/CouplingCoil.dat
+  {
+    Position 0.0 0.0 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor 96.21
+  }
+  Module RFCC/CavityWithFieldMap.dat
+  {
+    Position 0.0 0.0 23.425 cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor -1
+  }
+  Module RFCC/CavityWithFieldMap.dat
+  {
+    Position 0.0 0.0 -23.425 cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor -1
+  }
+  Module RFCC/CavityWithFieldMap.dat
+  {
+    Position 0.0 0.0 70.275 cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor -1
+  }
+  Module RFCC/CavityWithFieldMap.dat
+  {
+    Position 0.0 0.0 -70.275 cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor -1
+  }
+}

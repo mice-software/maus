@@ -1,0 +1,16 @@
+// @(#) $Id: CryostatFrontEndPlate.dat,v 1.2 2007-06-01 02:05:47 ellis Exp $  $Name:  $
+//
+// FILES/Models/Modules/Tracker/CryostatFrontEndPlate.dat
+//
+// Spectrometer solenoid cryostat outer face plate (Fe-shield side)
+// Based on drawing MICE-TM-V003-R03
+
+Module TrackerCryostatFrontEndPlate
+{
+  Volume Tube
+  Dimensions 202.0 687.0 18.0 mm
+  PropertyString Material STEEL304
+  PropertyDouble BlueColour 0.87
+  PropertyDouble GreenColour 0.77
+  PropertyDouble RedColour 0.69
+}

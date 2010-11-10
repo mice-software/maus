@@ -1,0 +1,14 @@
+// FILES/Models/Modules/RFCC/CavityEndWall.dat
+//
+// The end wall in the RF cavity
+// 
+// 
+
+Module CavityEndWall 
+{
+  Volume Tube
+  Dimensions 21.0 63.0 1.5 cm
+  PropertyDouble RedColour 0.75
+  PropertyString Material   Cu
+}
+

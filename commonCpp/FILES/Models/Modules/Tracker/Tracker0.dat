@@ -1,0 +1,45 @@
+// FILES/Models/Modules/Tracker/Tracker0.dat
+//
+// A tracker in the muon cooling device
+//
+// 
+// 
+
+Module Tracker0
+{
+  Volume Cylinder
+  Dimensions 20.0 113.0 cm
+  PropertyInt Tracker 0
+  PropertyBool Invisible 1
+  PropertyString Material He
+  Module Tracker/TrackerRef0.dat
+  {
+    Position 0.0 0.0 56.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Tracker/TrackerStation1.dat
+  {
+    Position 0.0 0.0 54.98789 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Tracker/TrackerStation2.dat
+  {
+    Position -0.159 -0.380 349.9143 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Tracker/TrackerStation3.dat
+  {
+    Position -0.454 -0.236 100.0513 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Tracker/TrackerStation4.dat
+  {
+    Position -0.325 -0.281 -199.949 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Tracker/TrackerStation5.dat
+  {
+    Position 0.0 0.0 -54.98789 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+}

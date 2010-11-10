@@ -1,0 +1,139 @@
+// FILES/Models/Modules/EmCal/CalorimeterPlane0.dat
+//
+
+Module CalorimeterPlane0
+{
+  Volume Box
+  Dimensions 100.0 100 4 cm
+
+  PropertyString Material Galactic
+
+  PropertyInt Plane 0
+  PropertyInt numSlabs 24
+  PropertyBool Invisible 1
+  Module EmCal/CalorimeterPlane0KLCell0.dat
+  {
+    Position 0.0 -48 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module EmCal/CalorimeterPlane0KLCell1.dat
+  {
+    Position 0.0 -44 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module EmCal/CalorimeterPlane0KLCell2.dat
+  {
+    Position 0.0 -40 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module EmCal/CalorimeterPlane0KLCell3.dat
+  {
+    Position 0.0 -36 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module EmCal/CalorimeterPlane0KLCell4.dat
+  {
+    Position 0.0 -32 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module EmCal/CalorimeterPlane0KLCell5.dat
+  {
+    Position 0.0 -28 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module EmCal/CalorimeterPlane0KLCell6.dat
+  {
+    Position 0.0 -24 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module EmCal/CalorimeterPlane0KLCell7.dat
+  {
+    Position 0.0 -20 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module EmCal/CalorimeterPlane0KLCell8.dat
+  {
+    Position 0.0 -16 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module EmCal/CalorimeterPlane0KLCell9.dat
+  {
+    Position 0.0 -12 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module EmCal/CalorimeterPlane0KLCell10.dat
+  {
+    Position 0.0 -8 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module EmCal/CalorimeterPlane0KLCell11.dat
+  {
+    Position 0.0 -4 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module EmCal/CalorimeterPlane0KLCell12.dat
+  {
+    Position 0.0 0 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module EmCal/CalorimeterPlane0KLCell13.dat
+  {
+    Position 0.0 4 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module EmCal/CalorimeterPlane0KLCell14.dat
+  {
+    Position 0.0 8 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module EmCal/CalorimeterPlane0KLCell15.dat
+  {
+    Position 0.0 12 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module EmCal/CalorimeterPlane0KLCell16.dat
+  {
+    Position 0.0 16 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module EmCal/CalorimeterPlane0KLCell17.dat
+  {
+    Position 0.0 20 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module EmCal/CalorimeterPlane0KLCell18.dat
+  {
+    Position 0.0 24 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module EmCal/CalorimeterPlane0KLCell19.dat
+  {
+    Position 0.0 28 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module EmCal/CalorimeterPlane0KLCell20.dat
+  {
+    Position 0.0 32 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module EmCal/CalorimeterPlane0KLCell21.dat
+  {
+    Position 0.0 36 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module EmCal/CalorimeterPlane0KLCell22.dat
+  {
+    Position 0.0 40 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module EmCal/CalorimeterPlane0KLCell23.dat
+  {
+    Position 0.0 44 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module EmCal/CalorimeterPlane0KLCell24.dat
+  {
+    Position 0.0 48 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+}

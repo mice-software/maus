@@ -1,0 +1,13 @@
+// A test box for geometry test
+//
+
+Module TestBox
+{
+  Volume Box
+  Dimensions 7.0 7.0 15.0 cm
+
+  PropertyString Material Galactic
+
+  PropertyDouble BlueColour 1.0
+  PropertyInt Plane 1
+}

@@ -1,0 +1,19 @@
+// FILES/Models/Modules/Tracker/TrackerRef1.dat
+//
+// A tracker reference plane
+//
+// 
+// 
+
+Module TrackerRef1
+{
+  Volume Cylinder
+  Dimensions 20.0 0.1 cm
+  PropertyInt RedColour 1.0
+  PropertyInt BlueColour 0.5
+  PropertyInt GreenColour 0.5
+  PropertyInt Station 9002
+  PropertyInt Plane 9002
+  PropertyString SensitiveDetector SpecialVirtual
+  PropertyString Material He
+}

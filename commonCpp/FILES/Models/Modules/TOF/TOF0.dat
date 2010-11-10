@@ -1,0 +1,30 @@
+// FILES/Models/Moduels/TOF/TOF0.dat
+//
+// 
+//
+// 
+// 
+
+Module TOF0
+{
+  Volume Box
+  Dimensions 40.0 40.0 5.00001 cm
+  PropertyDouble BlueColour 1.0
+  PropertyDouble RedColour 1.0
+  PropertyString Material POLYSTYRENE
+  PropertyString Detector TOF
+  PropertyInt Station 0
+  PropertyInt numPlanes 2
+  PropertyString SensitiveDetector SpecialVirtual
+  Module TOF/TOF0Horizontal.dat
+  {
+    Position 0.0 0.0 -12.5 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module TOF/TOF0Vertical.dat
+  {
+    Position 0.0 0.0 12.5 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+}
+

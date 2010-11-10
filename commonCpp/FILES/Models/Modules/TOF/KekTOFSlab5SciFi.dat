@@ -1,0 +1,15 @@
+// FILES/Models/Modules/TOF/KekTOFSlab5SciFi.dat
+//
+// Definition of TOF scintillating fiber in slab 5 in the KEK test beam of October 2005
+//
+// A.Fish 23rd May 2006
+
+Module KekTOFSlab5Sci
+{
+  Volume Box
+  Dimensions 8.0 40.0 2.0 cm
+  PropertyString SensitiveDetector TOF
+  PropertyString Material POLYSTYRENE
+  PropertyDouble GreenColour 1.0
+  PropertyDouble RedColour 1.0
+}

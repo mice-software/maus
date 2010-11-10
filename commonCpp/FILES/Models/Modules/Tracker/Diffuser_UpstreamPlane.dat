@@ -1,0 +1,13 @@
+// Based on Tests/SpecVirt.dat
+
+
+Module Diffuser_UpstreamPlane
+{
+  Volume Cylinder
+  Dimensions 129 0.0001 mm
+  PropertyString Material Galactic
+  PropertyString SensitiveDetector SpecialVirtual
+  PropertyBool   SteppingInto 0
+  PropertyBool   SteppingThrough 0
+}
+

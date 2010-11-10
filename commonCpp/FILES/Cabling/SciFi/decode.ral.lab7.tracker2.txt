@@ -1,0 +1,10 @@
+###
+###
+###
+
+RO_RIGHT   = readout-right.v2.txt
+RO_LEFT    = readout-left.v2.txt
+CONNECTION = fibre2cassette.ral.lab7.tracker2.txt
+FIBRE_MAP  = cabling_ral.lab7.tracker2.dat
+
+# eof

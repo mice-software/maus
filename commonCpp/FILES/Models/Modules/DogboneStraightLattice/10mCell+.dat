@@ -1,0 +1,37 @@
+Module 10mCell
+{
+  Volume Cylinder
+  Dimensions 1.0 10.0 m
+  PropertyString Material Galactic
+  PropertyBool   Invisible 1
+  Module DogboneStraightLattice/10mCoolingHardwareHalf.dat
+  {
+    Position 0.0 0.0 2.5 m
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor 1
+  }
+  Module DogboneStraightLattice/10mCoolingHardwareHalf.dat
+  {
+    Position 0.0 0.0 -2.5 m
+    Rotation 180.0 0.0 0.0 degree
+    ScaleFactor -1
+  }
+  Module DogboneStraightLattice/FCoil.dat
+  {
+    Position 0.0 0.0 -418.89 cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor 98.1726
+  }
+  Module DogboneStraightLattice/CouplingCoil.dat
+  {
+    Position 0.0 0.0 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor 68.1626
+  }
+  Module DogboneStraightLattice/FCoil.dat
+  {
+    Position 0.0 0.0 418.89 cm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor 98.1726
+  }
+}

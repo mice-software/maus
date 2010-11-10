@@ -1,0 +1,10 @@
+###
+###
+###
+
+RO_RIGHT   = readout-right.txt
+RO_LEFT    = readout-left.txt
+CONNECTION = fibre2cassette.txt
+FIBRE_MAP  = fibremap.txt
+
+# eof

@@ -1,0 +1,30 @@
+// FILES/Models/Modules/Tracker/Station5.dat
+//
+// Definition of the Station 5 set up including scintillators same ones as used at KEK 
+// so have recylcled them here. 
+//
+// Tested at Fermilab in March 2007
+//
+// A.Fish 20th March 2007
+
+Configuration Station5
+{
+  Dimensions 1000 1000 1000 mm
+  PropertyString Material AIR
+  PropertyDouble GreenColour 1.0
+  Module TOF/KekD1.dat
+  {
+     Position 0.0 0.0 127.5 mm
+     Rotation 0.0 0.0 0.0 degree
+  }
+  Module Tracker/Station5Box.dat
+  {
+    Position 0.0 0.0 0.0 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module TOF/KekD2.dat
+  {
+    Position 0.0 0.0 -137.5 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+}

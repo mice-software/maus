@@ -22,7 +22,7 @@ class Dev:
       if not env.GetOption('clean'):
         print "The worker", project, "requires Geant4 which is disabled. Skipping..."
       return
-    
+    print 'found', project
     builddir = 'build'
     name = project.split('/')[-1]
     targetpath = os.path.join('build', '_%s' % name)

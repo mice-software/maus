@@ -1,0 +1,13 @@
+// FILES/Models/Modules/MuScatTargets/C7.dat
+//
+
+Module C7
+{
+  Volume Box 
+  Dimensions 100.0 100.0 2.50 mm
+  PropertyDouble BlueColour 1.0
+  PropertyDouble GreenColour 1.0
+  PropertyInt Plane 1
+  PropertyString Material C
+}
+

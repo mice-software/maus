@@ -1,0 +1,10 @@
+
+
+Module QC_MirrorStraightBox
+{
+  Volume Box
+  Dimensions 1.453 1.453 0.060 m
+
+  PropertyString Material Galactic
+
+}

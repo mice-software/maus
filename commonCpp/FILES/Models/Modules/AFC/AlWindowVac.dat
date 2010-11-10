@@ -1,0 +1,16 @@
+// FILES/Models/Modules/AFC/AlWindowVac.dat
+//
+// The Aluminum container for the liquid hydrogen absorber
+//
+// 
+// 
+
+Module AlWindowVac
+{
+  Volume Cylinder
+  Dimensions 160 0.19  mm
+  PropertyString Material Al 
+  PropertyDouble BlueColour 0.87
+  PropertyDouble GreenColour 0.77
+  PropertyDouble RedColour 0.69
+}

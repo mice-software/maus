@@ -1,0 +1,15 @@
+// FILES/Models/Modules/EmCal/FrascatiCalorimeterPlane2Sci.dat
+//
+
+Module FrascatiCalorimeterPlane2Sci
+{
+  Volume Box
+  Dimensions 120 20 1.5 cm
+  PropertyInt Layer 2
+  PropertyInt Cell 0
+  PropertyString SensitiveDetector EMCAL
+  PropertyString Material POLYSTYRENE
+  PropertyDouble GreenColour 1.0
+  PropertyDouble RedColour 1.0
+  PropertyDouble G4StepMax 0.5 cm
+}

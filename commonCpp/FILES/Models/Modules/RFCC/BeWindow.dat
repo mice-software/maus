@@ -1,0 +1,15 @@
+// FILES/Models/Modules/RFCC/BeWindow.dat
+//
+// A Be window in the RFCC
+// 
+// 
+
+Module BeWindow 
+{
+  Volume Cylinder
+  Dimensions 21.0 0.038 cm
+  PropertyDouble GreenColour 0.75
+  PropertyString Material Be
+  PropertyBool   Invisible 1
+}
+

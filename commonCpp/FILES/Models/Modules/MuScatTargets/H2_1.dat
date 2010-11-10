@@ -1,0 +1,12 @@
+// FILES/Models/Modules/MuScatTargets/H2_1.dat
+//
+
+Module H2_1
+{
+  Volume Box 
+  Dimensions 100.0 100.0 159.0 mm
+  PropertyDouble BlueColour 1.0
+  PropertyInt Plane 1
+  PropertyString Material lH2
+}
+

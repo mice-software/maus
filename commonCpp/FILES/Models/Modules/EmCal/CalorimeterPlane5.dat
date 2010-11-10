@@ -1,0 +1,56 @@
+// FILES/Models/Modules/EmCal/CalorimeterPlane5.dat
+//
+
+Module CalorimeterPlane5
+{
+  Volume Box
+  Dimensions 99 100 6 cm
+  PropertyInt Layer 5
+  PropertyInt numSlabs 8
+  PropertyBool Invisible 1
+  Module EmCal/CalorimeterPlane5Slab0.dat
+  {
+    Position -44 0.0 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module EmCal/CalorimeterPlane5Slab1.dat
+  {
+    Position -33 0.0 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module EmCal/CalorimeterPlane5Slab2.dat
+  {
+    Position -22 0.0 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module EmCal/CalorimeterPlane5Slab3.dat
+  {
+    Position -11 0.0 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module EmCal/CalorimeterPlane5Slab4.dat
+  {
+    Position 0 0.0 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module EmCal/CalorimeterPlane5Slab5.dat
+  {
+    Position 11 0.0 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module EmCal/CalorimeterPlane5Slab6.dat
+  {
+    Position 22 0.0 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module EmCal/CalorimeterPlane5Slab7.dat
+  {
+    Position 33 0.0 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module EmCal/CalorimeterPlane5Slab8.dat
+  {
+    Position 44 0.0 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+}

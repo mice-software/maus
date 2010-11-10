@@ -1,0 +1,14 @@
+// FILES/Models/Modules/EmCal/CalorimeterPlane7Slab7Sci.dat
+//
+
+Module CalorimeterPlane7Slab7Sci
+{
+  Volume Box
+  Dimensions 11 100 10 cm
+  PropertyInt Layer 7
+  PropertyInt Cell 7
+  PropertyString SensitiveDetector EMCAL
+  PropertyString Material POLYSTYRENE
+  PropertyDouble GreenColour 1.0
+  PropertyDouble RedColour 1.0
+}

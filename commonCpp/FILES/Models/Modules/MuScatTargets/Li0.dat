@@ -1,0 +1,12 @@
+// FILES/Models/Modules/MuScatTargets/Li0.dat
+//
+
+Module Li0
+{
+  Volume Box 
+  Dimensions 100.0 100.0 12.78 mm
+  PropertyDouble RedColour 1.0
+  PropertyInt Plane 1
+  PropertyString Material Li
+}
+

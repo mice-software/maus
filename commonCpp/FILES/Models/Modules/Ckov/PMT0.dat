@@ -1,0 +1,15 @@
+// FILES/Models/Modules/Ckov/PMT4.dat
+//
+
+Module PMT0.dat
+{
+  Volume Sphere
+  Dimensions 100.0 110.0 mm
+  PropertyHep3Vector Phi 0.0 360.0 -1.0 deg
+  PropertyHep3Vector Theta 0.0 45.0 -1.0 deg
+  PropertyString SensitiveDetector CKOV
+  PropertyInt CkovPmtNum 0
+  PropertyDouble RedColour 1.0
+  PropertyDouble GreenColour 0.5
+  PropertyString Material OptAIR
+}

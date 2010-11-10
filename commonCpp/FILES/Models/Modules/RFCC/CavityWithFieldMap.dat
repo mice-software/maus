@@ -1,0 +1,48 @@
+// FILES/Models/Modules/RFCC/CavityWithFieldMap.dat
+//
+// A Cavity volume inc walls and windows
+// also with field map
+// 
+
+Module CavityWithFieldMap
+{
+  Volume Cylinder
+  Dimensions 64.5 46.8 cm
+  PropertyBool   Invisible          1
+  PropertyString Material           Galactic
+  PropertyString FieldType          RFFieldMap
+  PropertyString FileName           ${MICEFILES}/Models/Modules/RFCC/sf7.txt
+  PropertyString CavityMode         Unphased
+  PropertyString FieldDuringPhasing TimeVarying
+  PropertyDouble EnergyGain         3.2     MeV //Used when FieldDuringPhasing is EnergyGainOptimised
+  PropertyDouble PeakEField         9 MV/m
+  PropertyDouble Length             43.0 cm
+  PropertyDouble Frequency          0.20125
+  PropertyString PhasingVolume      SpecialVirtual
+  Module RFCC/CavityOuterWall.dat
+  {
+    Position 0.0 0.0 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module RFCC/CavityEndWall.dat
+  {
+    Position 0.0 0.0 -21.25 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module RFCC/CavityEndWall.dat
+  {
+    Position 0.0 0.0 22.25 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module RFCC/BeWindowPolycone.dat
+  {
+    Position 0.0 0.0 20.25 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module RFCC/BeWindowPolycone.dat
+  {
+    Position 0.0 0.0 -23.25 cm
+    Rotation 0.0 0.0 180.0 degree
+  }
+}
+

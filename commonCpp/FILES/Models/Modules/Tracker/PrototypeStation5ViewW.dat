@@ -1,0 +1,20 @@
+// FILES/Models/Modules/Tracker/TrackerViewW.dat
+//
+// The W View of the tracker fibres.
+//
+
+Module TrackerViewW
+{
+  Volume Cylinder
+  Dimensions 19.0 0.06273 cm
+  PropertyString Material POLYSTYRENE
+  PropertyString SensitiveDetector SciFi
+  PropertyInt Plane 2
+  PropertyDouble ActiveRadius 150.0 mm
+  PropertyDouble Pitch 0.426 mm
+  PropertyDouble FibreDiameter 0.350 mm
+  PropertyDouble CoreDiameter 0.3325 mm
+  PropertyDouble CentralFibre 107.0 none
+  PropertyBool Invisible 1
+  PropertyString G4Detector SciFiPlane
+}

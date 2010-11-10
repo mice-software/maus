@@ -1,0 +1,147 @@
+// October 2005 cabling map - version 2 - 10th April 2006
+2 Cassettes	// There were two VLPC Cassettes
+105 104 107	// cassette 105 has AFE boards 104 and 107
+111 106 105	// cassette 111 has AFE boards 106 and 105
+16 Waveguides	// There were 16 Waveguides
+105 1 12 old	// cassette 105, position 1 is connected to old style waveguide 2
+105 2 11 old
+105 3 6 old
+105 4 8 old
+105 5 7 old
+105 6 14 old
+105 7 3 old
+105 8 2 old
+111 1 102 modified
+111 2 101 modified
+111 3 105 modified
+111 4 103 new
+111 5 104 new
+111 6 1 old
+111 7 9 old
+111 8 4 old
+4 Stations	// The tracker had 4 stations
+Station 1 Old	// Station A is an old style station
+2 Views		// Station A has two views
+View 1 10	// View "V" has 10 connectors
+1 2 5		// station connector 1 is connected to cable number 5 of waveguide number 2
+2 2 6
+3 2 7
+4 7 1
+5 7 2
+6 7 3
+7 7 4
+8 7 5
+9 7 6
+10 7 7
+View 2 11	// View "X" has 11 connectors
+2 3 1
+3 3 2 swap2 7 8
+4 3 3
+5 3 4
+6 3 5
+7 3 6
+8 3 7
+9 2 1 swap2 5 6
+10 2 2
+11 2 3
+12 2 4
+Station 2 Old	// Station B is an old style station
+3 Views		// Station B has three views
+View 1 12	// View "V" has 12 connectors
+1 14 3 rev
+2 14 4 rev
+3 14 5 rev
+4 14 6 rev
+5 14 7 rev
+6 6 1 rev
+7 6 2 rev
+8 6 3 rev
+9 6 4 rev
+10 6 5 rev
+11 6 6 rev
+12 6 7 rev
+View 2 12	// View "X" has 12 connectors
+1 12 5 rev
+2 12 6 rev
+3 12 7 rev
+4 11 1 rev
+5 11 2 rev
+6 11 3 rev
+7 11 4 rev
+8 11 5 rev
+9 11 6 rev
+10 11 7 rev
+11 14 1 rev
+12 14 2 rev
+View 3 11	// View "W" has 11 connectors
+2 8 1 rev
+3 8 2 rev
+4 8 3 rev
+5 8 4 rev
+6 8 5 rev
+7 8 6 rev+swap2 10 12
+8 8 7 rev
+9 12 1 rev
+10 12 2 rev
+11 12 3 rev
+12 12 4 rev
+Station 3 Old	// Station C is an old style station
+2 Views		// Station C has 2 views
+View 2 11	// View "X" has 11 connectors
+1 4 4
+2 4 5
+3 4 6 rev
+4 4 7 swap2 16 18
+5 9 1
+6 9 2
+7 9 3
+8 9 4
+9 9 5 rev
+10 9 6
+11 9 7 rev
+View 3 10	// View "W" has 10 connectors
+3 1 1
+4 1 2
+5 1 3
+6 1 4
+7 1 5
+8 1 6
+9 1 7
+10 4 1
+11 4 2
+12 4 3
+Station 4 New 	// Station D is a new style station
+3 Views		// Station D has 3 views
+View 1 10	// all new stations have 10 connectors
+1 102 4 1	// station connector 1 is connected to waveguide 102, cable number 4 and the first channel is reading out bundle 1 on the plane
+2 102 3 23
+3 102 2 45
+4 102 1 67
+5 101 6 86
+6 101 5 106
+7 101 4 128
+8 101 3 150
+9 101 2 172
+10 101 1 194
+View 2 10	// View "X"
+1 104 2 1 
+2 104 1 23
+3 103 6 43 
+4 103 5 63
+5 103 4 85
+6 103 3 107
+7 103 2 129
+8 103 1 151
+9 102 6 171
+10 102 5 190
+View 3 10	// View "W"
+1 105 6 3
+2 105 5 21
+3 105 4 43
+4 105 3 65
+5 105 2 87
+6 105 1 109
+7 104 6 128
+8 104 5 148
+9 104 4 170
+10 104 3 192
