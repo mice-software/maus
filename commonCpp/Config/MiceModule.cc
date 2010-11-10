@@ -1049,4 +1049,55 @@ void MiceModule::removeDaughter(MiceModule* daughter)
   for(unsigned int i=0; i<_daughters.size(); i++) if(_daughters[i] == daughter) {_daughters.erase(_daughters.begin()+i); i--;}
 }
 
+//idr 27/10/10
+
+//! Get the map of boolean properties for the MiceModule
+template <>
+std::map<std::string, bool> MiceModule::getListOfProperties<bool>()
+{
+  std::map<std::string, bool> r = _bools;
+  return r;
+}
+
+//! Get the map of integer properties for the MiceModule
+template <>
+std::map<std::string, int> MiceModule::getListOfProperties<int>()
+{
+  std::map<std::string, int> r = _ints;
+  return r;
+}
+
+//! Get the map of std::string properties for the MiceModule
+template <>
+std::map<std::string, std::string> MiceModule::getListOfProperties<std::string>()
+{
+  std::map<std::string, std::string> r = _strings;
+  return r;
+}
+
+//! Get the map of double properties for the MiceModule
+
+//! Use the evaluator to convert from string and account for units
+template <>
+std::map<std::string, double> MiceModule::getListOfProperties<double>()
+{
+  std::map<std::string, double> r;
+  for( std::map<std::string,std::string>::const_iterator it = _doubles.begin(); it != _doubles.end(); ++it )
+    r[it->first] = propertyDouble( it->first );
+
+  return r;
+}
+
+//! Get the map of Hep3Vector properties for the MiceModule
+
+//! Use the evaluator to convert from string and account for units
+template <>
+std::map<std::string, Hep3Vector> MiceModule::getListOfProperties<Hep3Vector>()
+{
+  std::map<std::string, Hep3Vector> r;
+  for( std::map<std::string, std::string>::const_iterator it = _hep3vectors.begin(); it != _hep3vectors.end(); ++it )
+    r[it->first] = propertyHep3Vector( it->first );
+
+  return r;
+}
 

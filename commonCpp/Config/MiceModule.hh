@@ -173,6 +173,10 @@ class MiceModule
 
     void        addParameter(std::string key, double value);
 
+    //idr 27/10/10
+    //! Template the code to get lists of properties from the MiceModule
+    template <typename T>
+    std::map<std::string, T> getListOfProperties();
 
   private :
    void			printProperties( std::string ) const;
