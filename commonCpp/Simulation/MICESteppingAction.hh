@@ -18,8 +18,8 @@ class MICESteppingAction : public G4UserSteppingAction
     void CleanEmptyTraces();
     //added by rikard
     inline MICEStepStatistics* GetStepStatistics(){return m_StepStatistics;};
-    void SetPrimaryGenerator(MICEPrimaryGeneratorAction * primaryGenerator) {m_generator=primaryGenerator;}
-    void SetEventAction     (MICEEventAction            * eventAction)      {m_eventAction=eventAction;}
+  //    void SetPrimaryGenerator(MICEPrimaryGeneratorAction * primaryGenerator) {m_generator=primaryGenerator;}
+  //    void SetEventAction     (MICEEventAction            * eventAction)      {m_eventAction=eventAction;}
 
   private:
    void AddKillHit(const G4Track* aTrack, std::string reasonForDying) const;
@@ -35,9 +35,9 @@ class MICESteppingAction : public G4UserSteppingAction
    int ih_ELossTarget, ih_ELossAll, ih_ELossCSol, ih_ELossEndDecay;
 
    MICEStepStatistics* m_StepStatistics;
-   MICEPrimaryGeneratorAction* m_generator;
+  //   MICEPrimaryGeneratorAction* m_generator;
    G4String m_volumeIntr;
-   MICEEventAction* m_eventAction;
+  //   MICEEventAction* m_eventAction;
 
    //phasing information
    bool        isInCavity;

@@ -37,7 +37,7 @@
 extern bool      settingRF;
 extern MICEEvent simEvent;
 
-MICESteppingAction::MICESteppingAction():m_StepStatistics(NULL), m_generator(NULL), m_eventAction(NULL)
+MICESteppingAction::MICESteppingAction():m_StepStatistics(NULL)
 {
   std::string rfType = "none"; //ME MyDataCards.fetchValueString("rfCellType");
   this->hasRF = (rfType  != "none");
@@ -109,12 +109,12 @@ void MICESteppingAction::DoReferenceParticle(G4Track* aTrack)
   G4StepPoint* PreStep    = aTrack->GetStep()->GetPreStepPoint();
   //if i am stepping into a cavity set the primary generator to run the ref particle from the start of the cavity
   //remember the initial energy
-  if(!isInCavity && BTPhaser::IsCavity(volumeName) && PreStep->GetStepStatus()==fGeomBoundary && m_generator)
+  if(!isInCavity && BTPhaser::IsCavity(volumeName) && PreStep->GetStepStatus()==fGeomBoundary && 0)
   {
      isInCavity   = true;
      refEnergyIn  = PreStep->GetTotalEnergy();
      cavityName   = volumeName;
-     m_generator->SetNextEvent(PreStep->GetGlobalTime(), PreStep->GetPosition(), PreStep->GetTotalEnergy(), PreStep->GetMomentum());
+
   }
   //if i am stepping through the cavity detector set the position and time for phasing
   if(BTPhaser::IsCavityDetector(volumeName))
@@ -134,8 +134,8 @@ void MICESteppingAction::DoReferenceParticle(G4Track* aTrack)
       Squeak::mout(Squeak::debug) << "Trying again on cavity "+cavityName << std::endl;
       AddKillHit(aTrack, "Failed to phase cavity");
       pastDetector = false;
-      if(m_generator)   m_generator->ForceNextEvent(true);
-      if(m_eventAction) m_eventAction->SetBTPhaserDone(false);
+
+      //      if(m_eventAction) m_eventAction->SetBTPhaserDone(false);
     }
     else
     {
@@ -144,7 +144,7 @@ void MICESteppingAction::DoReferenceParticle(G4Track* aTrack)
       pastDetector     = false;
       timeAtMiddle     = 0;
       positionAtMiddle = Hep3Vector();
-      if(m_eventAction) m_eventAction->SetBTPhaserDone(true);
+      //      if(m_eventAction) m_eventAction->SetBTPhaserDone(true);
     }
   }
 }
