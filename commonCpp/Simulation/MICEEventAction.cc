@@ -23,7 +23,7 @@ using std::endl;
 
 extern MICEEvent simEvent;
 
-extern void writeEvent();
+//extern void writeEvent();
 
 MICEEventAction::MICEEventAction() :_btPhaserDone(true) { theVirtualPlanes = VirtualPlaneManager::getVirtualPlaneManager();  }
 
@@ -45,6 +45,8 @@ void MICEEventAction::EndOfEventAction(const G4Event* currentEvent)
     for( G4int i = 0; i < trajs->entries(); ++i )
     {
       G4VTrajectory* traj = (*trajs)[i];
+      std::cout<<traj->GetParticleName()<<endl;
+      traj->ShowTrajectory();
       MCParticle* found = NULL;
 
        for( unsigned int j = 0; j < simEvent.mcParticles.size(); ++j )
@@ -58,7 +60,7 @@ void MICEEventAction::EndOfEventAction(const G4Event* currentEvent)
       }
   }
 
-  writeEvent();
+  //  writeEvent();
 
   G4String drawFlag = "all";
   if (G4VVisManager::GetConcreteInstance()) 
