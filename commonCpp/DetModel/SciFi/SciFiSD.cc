@@ -115,8 +115,11 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep,G4TouchableHistory* ROhist)
   newHit->SetPID( aStep->GetTrack()->GetDefinition()->GetPDGEncoding() );
   newHit->SetCharge( aStep->GetTrack()->GetDefinition()->GetPDGCharge() );
   newHit->SetMass( aStep->GetTrack()->GetDefinition()->GetPDGMass() );
-
+  std::cout<<"am here before"<<std::endl;
+  _event->Print();
   _event->sciFiHits.push_back( newHit );
+  std::cout<<"am here after"<<std::endl;
+  _event->Print();
 
   if (nChans == 2) {
 	SciFiHit* secondHit = new SciFiHit();

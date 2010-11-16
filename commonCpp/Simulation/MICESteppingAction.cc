@@ -34,7 +34,6 @@
 #include "G4Polyline.hh"
 
 
-extern bool      settingRF;
 extern MICEEvent simEvent;
 
 MICESteppingAction::MICESteppingAction():m_StepStatistics(NULL)
@@ -171,7 +170,7 @@ bool MICESteppingAction::CheckStopAndKill(const G4Track* aTrack, const G4Step* a
     killIt = true;
     AddKillHit(aTrack, "Track only muons set");
   }
-  else if ( ! settingRF ) 
+  else 
   {
     if( rrSq > this->maxRadSqGlobal )
     {

@@ -14,6 +14,7 @@
 #include "Interface/MICEEvent.hh"
 #include "Config/MiceModule.hh"
 #include "Interface/TofHit.hh"
+#include <iostream>
 
 TofSD::TofSD( MICEEvent* event, MiceModule* mod, bool dEdxCut )
  : G4VSensitiveDetector( mod->fullName()) 
@@ -45,6 +46,7 @@ void TofSD::Initialize(G4HCofThisEvent* HCE)
 
 G4bool TofSD::ProcessHits(G4Step* aStep, G4TouchableHistory* History)
 {
+  std::cout<<"hi "<<aStep->GetTotalEnergyDeposit()<<std::endl;
   G4double edep = aStep->GetTotalEnergyDeposit();
   if( edep == 0. && _dEdxCut )  return true;
 

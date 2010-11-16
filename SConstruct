@@ -254,7 +254,7 @@ if not env.GetOption('clean'):
     env.Append(CCFLAGS=['-g',])
     
     commonCppFiles = glob.glob("commonCpp/*/*cc") + glob.glob("commonCpp/*/*/*cc") 
-    simulate = env.SharedLibrary(target = 'commonCpp/libsimulate', source = commonCppFiles + ['commonCpp/Simulation.cc'], LIBS=['recpack'] +  env['LIBS'])
+    simulate = env.SharedLibrary(target = 'commonCpp/libsimulate', source = commonCppFiles, LIBS=['recpack'] +  env['LIBS'])
     env.Install("build", simulate)
 
     #env.Program(target="sim", source=["commonCpp/Simulation.cc"] + glob.glob("commonCpp/*/*cc") + glob.glob("commonCpp/*/*/*cc"), LIBS=['recpack'] +  env['LIBS'])
