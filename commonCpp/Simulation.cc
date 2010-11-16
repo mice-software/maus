@@ -137,7 +137,7 @@ void  writeEvent()
 
   writer->writeEvent();
 
-  clearEvent( simEvent );
+    clearEvent( simEvent );
   clearEvent( rfEvent );
 
   if( reader )
