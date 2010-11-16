@@ -35,9 +35,11 @@ class Dev:
       pass
 
     #specify the build directory
-    localenv.VariantDir(variant_dir=builddir, src_dir='.', duplicate=1)
+    localenv.VariantDir(variant_dir=builddir, src_dir='.', duplicate=0)
+    localenv.Append(CPPPATH='.')
 
     srclst = map(lambda x: builddir + '/' + x, glob.glob('*.cpp'))
+    print srclst
     srclst += map(lambda x: builddir + '/' + x, glob.glob('*.i'))
     pgm = localenv.SharedLibrary(targetpath, source=srclst, LIBS=['simulate'])
     
@@ -255,7 +257,7 @@ if not env.GetOption('clean'):
     simulate = env.SharedLibrary(target = 'commonCpp/libsimulate', source = commonCppFiles + ['commonCpp/Simulation.cc'], LIBS=['recpack'] +  env['LIBS'])
     env.Install("build", simulate)
 
-    env.Program(target="sim", source=["commonCpp/Simulation.cc"] + glob.glob("commonCpp/*/*cc") + glob.glob("commonCpp/*/*/*cc"), LIBS=['recpack'] +  env['LIBS'])
+    #env.Program(target="sim", source=["commonCpp/Simulation.cc"] + glob.glob("commonCpp/*/*cc") + glob.glob("commonCpp/*/*/*cc"), LIBS=['recpack'] +  env['LIBS'])
 
   env.jDev.Subproject('components/map/MapCppPrint')
   env.jDev.Subproject('components/map/MapCppSimulation')
