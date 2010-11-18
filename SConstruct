@@ -31,7 +31,7 @@ class Dev:
     #assume debugcflags and releasecflags are defined
     localenv.Append(CCFLAGS=self.cflags)
     if use_root and use_g4:
-      #localenv.Append(LIBS=['simulate'])
+      localenv.Append(LIBS=['simulate'])
       pass
 
     #specify the build directory
@@ -41,7 +41,7 @@ class Dev:
     srclst = map(lambda x: builddir + '/' + x, glob.glob('*.cpp'))
     print srclst
     srclst += map(lambda x: builddir + '/' + x, glob.glob('*.i'))
-    pgm = localenv.SharedLibrary(targetpath, source=srclst, LIBS=['simulate'])
+    pgm = localenv.SharedLibrary(targetpath, source=srclst)#, LIBS=['simulate'])
     
     env.Install(os.path.join(os.environ.get('MAUS_ROOT_DIR'), builddir) , "build/%s.py" % name)
     env.Install(os.path.join(os.environ.get('MAUS_ROOT_DIR'), builddir) , pgm)

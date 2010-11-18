@@ -19,10 +19,12 @@
 TofSD::TofSD( MICEEvent* event, MiceModule* mod, bool dEdxCut )
  : G4VSensitiveDetector( mod->fullName()) 
 {
+  std::cout<<"special detector name:"<< mod->fullName() <<std::endl;
   miceMemory.addNew( Memory::TofSD ); 
   _dEdxCut = dEdxCut;
   _event   = event;
   _module  = mod;
+  _event_document = "{test test}";
 }
 
 TofSD::~TofSD() 

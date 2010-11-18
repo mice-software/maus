@@ -10,6 +10,8 @@
 #ifndef MICEDETECTORCONSTRUCTION_H
 #define MICEDETECTORCONSTRUCTION_H 1
 
+#include <string>
+#include <vector>
 #include "G4VUserDetectorConstruction.hh"
 #include "G4UniformMagField.hh"
 
@@ -38,10 +40,17 @@ public:
 
   G4VPhysicalVolume* Construct();
 
-	//Set the magnetic fields from BeamTools using MiceModule
-	void    setBTMagneticField(MiceModule* rootModule);
+  //Set the magnetic fields from BeamTools using MiceModule
+  void    setBTMagneticField(MiceModule* rootModule);
+
+  std::string GetSDEvent(int i);
+
+  int GetSDSize() { return _SDs.size(); }
+
 private:
 
+  std::vector<TofSD*> _SDs; // todo: add get/set 
+  
   void		addDaughter( MiceModule*, G4VPhysicalVolume* );
 
 
@@ -59,6 +68,7 @@ private:
   G4LogicalVolume* BuildQ35(MiceModule * mod);
 
   MICEEvent*			_event;
+
   MiceModule*			_model;
   MiceMaterials*		_materials;
   G4LogicalVolume*		MICEExpHallLog;

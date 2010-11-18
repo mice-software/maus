@@ -7,7 +7,10 @@
 
 #include "G4VSensitiveDetector.hh"
 #include "Interface/TofHit.hh"
-#include "Interface/Memory.hh" 
+#include "Interface/Memory.hh"
+
+#include <json/json.h>
+#include <string>
 
 class G4Step;
 class G4HCofThisEvent;
@@ -29,9 +32,13 @@ class TofSD : public G4VSensitiveDetector
 
       void EndOfEvent(G4HCofThisEvent*);
 
+  std::string GetEvent() { return _event_document; }
+
   private:
 
 	MICEEvent*	_event;
+
+  std::string _event_document;
 
 	MiceModule*	_module;
 
