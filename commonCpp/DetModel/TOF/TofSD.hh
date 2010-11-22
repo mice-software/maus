@@ -39,6 +39,8 @@ class TofSD : public G4VSensitiveDetector
 	MICEEvent*	_event;
 
   std::string _event_document;
+  Json::Value _root;   // will contains the root value after parsing.
+  Json::Reader _reader;
 
 	MiceModule*	_module;
 

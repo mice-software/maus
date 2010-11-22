@@ -538,7 +538,7 @@ G4LogicalVolume * MICEDetectorConstruction::BuildQ35(MiceModule * mod)
 }
 
 std::string MICEDetectorConstruction::GetSDEvent(int i){
-  if (i > 0 and i < _SDs.size() and _SDs[i]){
+  if (i >= 0 and i < _SDs.size() and _SDs[i]){
     return _SDs[i]->GetEvent();
   }
   return NULL;
