@@ -5,6 +5,7 @@
 #ifndef _TOFSD_HH_
 #define _TOFSD_HH_ 1
 
+#include "DetModel/MAUSSD.hh"
 #include "G4VSensitiveDetector.hh"
 #include "Interface/TofHit.hh"
 #include "Interface/Memory.hh"
@@ -18,35 +19,25 @@ class MICEEvent;
 class MiceModule;
 //class TofHit;
 
-class TofSD : public G4VSensitiveDetector
-{
-  public:
+class TofSD : public MAUSSD {
+ public:
+  TofSD( MiceModule* , bool dEdxCut);
 
-      TofSD( MICEEvent*, MiceModule* , bool dEdxCut);
+  void Initialize(G4HCofThisEvent*);
+  G4bool ProcessHits(G4Step*, G4TouchableHistory*);
+  void EndOfEvent(G4HCofThisEvent*);
 
-     ~TofSD();
+  //  bool isHit() { return _isHit; }
+  //  Json::Value GetHit() { return _hit; }
 
-      void Initialize(G4HCofThisEvent*);
-
-      G4bool ProcessHits(G4Step*, G4TouchableHistory*);
-
-      void EndOfEvent(G4HCofThisEvent*);
-
-  std::string GetEvent() { return _event_document; }
-
-  private:
-
-	MICEEvent*	_event;
-
-  std::string _event_document;
-  Json::Value _root;   // will contains the root value after parsing.
-  Json::Reader _reader;
-
-	MiceModule*	_module;
-
-	TofHit		_hit;
-	bool            _dEdxCut;
-
+  // private:
+  //  Json::Value _hit;   // will contains the root value after parsing.
+  //   bool _isHit;
+  
+  //  MiceModule*	_module;
+  //  
+  //  bool            _dEdxCut;
+  
 };
 
 #endif

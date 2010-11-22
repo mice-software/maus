@@ -255,7 +255,7 @@ void    MICEDetectorConstruction::addDaughter( MiceModule* mod, G4VPhysicalVolum
       cut = false;
     if( sdName == "TOF" )
     {
-      TofSD* tofSD = new TofSD( _event, mod, cut );
+      TofSD* tofSD = new TofSD( mod, cut );
       MICESDMan->AddNewDetector( tofSD );
       logic->SetSensitiveDetector( tofSD );
       _SDs.push_back(tofSD);
@@ -537,10 +537,12 @@ G4LogicalVolume * MICEDetectorConstruction::BuildQ35(MiceModule * mod)
   return Quad.buildQ35();
 }
 
-std::string MICEDetectorConstruction::GetSDEvent(int i){
+Json::Value MICEDetectorConstruction::GetSDHit(int i){
   if (i >= 0 and i < _SDs.size() and _SDs[i]){
-    return _SDs[i]->GetEvent();
+    if (_SDs[i]->isHit()) {
+      return _SDs[i]->GetHit();
+    }
   }
-  return NULL;
+  return Json::Value();
 }
       

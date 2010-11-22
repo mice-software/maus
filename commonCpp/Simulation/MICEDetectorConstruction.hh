@@ -12,6 +12,7 @@
 
 #include <string>
 #include <vector>
+#include <json/json.h>
 #include "G4VUserDetectorConstruction.hh"
 #include "G4UniformMagField.hh"
 
@@ -43,7 +44,7 @@ public:
   //Set the magnetic fields from BeamTools using MiceModule
   void    setBTMagneticField(MiceModule* rootModule);
 
-  std::string GetSDEvent(int i);
+  Json::Value GetSDHit(int i);
 
   int GetSDSize() { return _SDs.size(); }
 
