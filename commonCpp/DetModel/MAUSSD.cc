@@ -5,6 +5,8 @@ MAUSSD::MAUSSD( MiceModule* mod, bool dEdxCut )
 {
   _dEdxCut = dEdxCut;
   _module  = mod;
+  _isHit = false;
 }
+
 
 

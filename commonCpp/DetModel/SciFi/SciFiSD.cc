@@ -18,37 +18,25 @@ David Adey - Modified October 19, 2010
 #include "G4SDManager.hh"
 #include "G4ios.hh"
 
-#include "Interface/dataCards.hh"
 #include <fstream>
 
 #include "Interface/MICEEvent.hh"
 #include "Config/MiceModule.hh"
 
-SciFiSD::SciFiSD( MICEEvent* event, MiceModule* mod, bool dEdXcut ) : G4VSensitiveDetector( mod->fullName() )
+SciFiSD::SciFiSD( MiceModule* mod, bool dEdxCut ) : MAUSSD(mod, dEdxCut)
 {
-  miceMemory.addNew( Memory::SciFiSD ); 
-	
-  _event = event;
-  _module = mod;
-  _dEdXcut = dEdXcut;
+
 }
 
-SciFiSD::~SciFiSD()
-{
-  miceMemory.addDelete( Memory::SciFiSD ); 
-}
-
-void SciFiSD::Initialize(G4HCofThisEvent* HCE)
-{
-  if( HCE ) ;
-}
 
 G4bool SciFiSD::ProcessHits(G4Step* aStep,G4TouchableHistory* ROhist)
 {
+  _hits.push_back(Json::Value());
+  
   std::cout << "Starting SciFiSD" << std::endl;
   G4double edep = aStep->GetTotalEnergyDeposit();
 
-  if( edep == 0. && _dEdXcut ) return false;
+  if( edep == 0. && _dEdxCut ) return false;
   else if( edep == 0. ) edep = 1.0 * MeV;	// fake energy deposit just so that we get some photons digitised out of this hit!
 
   // determine the fibre number based on the position in the tracker and the
@@ -89,66 +77,45 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep,G4TouchableHistory* ROhist)
 	}
   }
 
-  SciFiHit* newHit = new SciFiHit();
+  int hit_i = _hits.size();
+  _hits.push_back(Json::Value());
 
-  newHit->SetTrackID( aStep->GetTrack()->GetTrackID() );
+  Json::Value channel_id;
+  channel_id["type"] = "Tracker";
+  _hits[hit_i]["track_id"] = aStep->GetTrack()->GetTrackID();
+  channel_id["fiber_number"] = firstChan;
 
-  newHit->SetFiberNo(firstChan);
-
-  newHit->SetVolumeName( aStep->GetPreStepPoint()->GetPhysicalVolume()->GetName() );
-
-  newHit->SetTrackerNo( _module->propertyInt( "Tracker" ) );
-  newHit->SetStationNo( _module->propertyInt( "Station" ) );
-  newHit->SetPlaneNo( _module->propertyInt( "Plane" ) );
+  _hits[hit_i]["volume_name"] = aStep->GetPreStepPoint()->GetPhysicalVolume()->GetName();
+  
+  channel_id["tracker_number"] = _module->propertyInt( "Tracker" );
+  channel_id["station_number"] = _module->propertyInt( "Station" );
+  channel_id["plane_number"] = _module->propertyInt( "Plane" );
+  _hits[hit_i]["channel_id"] = channel_id;
 
   std::cout << nChans << " channels" << std::endl;
   if (nChans == 2) {
-  	newHit->SetEdep( edep/2.0 );
+    _hits[hit_i]["energy_deposited"] = edep/2.0;
   }
   else {
-	newHit->SetEdep(edep);
+    _hits[hit_i]["energy_deposited"] = edep;
   }
-  newHit->SetPos( aStep->GetPostStepPoint()->GetPosition() );
-  newHit->SetMom( aStep->GetTrack()->GetMomentum() );
-  newHit->SetTime( aStep->GetPostStepPoint()->GetGlobalTime() );
-  newHit->SetEnergy( aStep->GetTrack()->GetTotalEnergy() );
-  newHit->SetPID( aStep->GetTrack()->GetDefinition()->GetPDGEncoding() );
-  newHit->SetCharge( aStep->GetTrack()->GetDefinition()->GetPDGCharge() );
-  newHit->SetMass( aStep->GetTrack()->GetDefinition()->GetPDGMass() );
-  std::cout<<"am here before"<<std::endl;
-  _event->Print();
-  _event->sciFiHits.push_back( newHit );
-  std::cout<<"am here after"<<std::endl;
-  _event->Print();
+  
+  _hits[hit_i]["time"] = aStep->GetPostStepPoint()->GetGlobalTime();
+  _hits[hit_i]["energy"] = aStep->GetTrack()->GetTotalEnergy();
+  _hits[hit_i]["pid"] = aStep->GetTrack()->GetDefinition()->GetPDGEncoding();
+  _hits[hit_i]["charge"] =  aStep->GetTrack()->GetDefinition()->GetPDGCharge();
+  _hits[hit_i]["mass"] = aStep->GetTrack()->GetDefinition()->GetPDGMass();
+      
+  //  newHit->SetPos( aStep->GetPostStepPoint()->GetPosition() );
+  //  newHit->SetMom( aStep->GetTrack()->GetMomentum() );
+
 
   if (nChans == 2) {
-	SciFiHit* secondHit = new SciFiHit();
-	newHit->SetTrackID( aStep->GetTrack()->GetTrackID() );
-
-  	secondHit->SetFiberNo(secondChan);
-
-  	secondHit->SetVolumeName( aStep->GetPreStepPoint()->GetPhysicalVolume()->GetName() );
-
-  	secondHit->SetTrackerNo( _module->propertyInt( "Tracker" ) );
-  	secondHit->SetStationNo( _module->propertyInt( "Station" ) );
-  	secondHit->SetPlaneNo( _module->propertyInt( "Plane" ) );
-	
-	secondHit->SetEdep( edep/2.0 );
-	secondHit->SetPos( aStep->GetPostStepPoint()->GetPosition() );
-  	secondHit->SetMom( aStep->GetTrack()->GetMomentum() );
-  	secondHit->SetTime( aStep->GetPostStepPoint()->GetGlobalTime() );
-  	secondHit->SetEnergy( aStep->GetTrack()->GetTotalEnergy() );
-  	secondHit->SetPID( aStep->GetTrack()->GetDefinition()->GetPDGEncoding() );
-  	secondHit->SetCharge( aStep->GetTrack()->GetDefinition()->GetPDGCharge() );
-  	secondHit->SetMass( aStep->GetTrack()->GetDefinition()->GetPDGMass() );
-
-	_event->sciFiHits.push_back(secondHit);
+    _hits.push_back(_hits[hit_i]);
+    _hits[_hits.size() - 1]["channel_id"]["fiber_number"] = secondChan;
   }
 
-  /*else {
-	return false;
-  }*/
-
+  _isHit = true;
   return true;
 }
 
@@ -156,10 +123,7 @@ void SciFiSD::EndOfEvent(G4HCofThisEvent* HCE)
 {
   // loop over hits and merge together hits that are on the same fibre
 
-  std::vector<SciFiHit*> hits;
-
-  for( unsigned int i = 0; i < _event->sciFiHits.size(); ++i )
-  {
+  /*  for( unsigned int i = 0; i < _hits.size(); ++i ) {
     SciFiHit* found = NULL;
 
     for( unsigned int j = 0; j < hits.size(); ++j )
@@ -178,5 +142,12 @@ void SciFiSD::EndOfEvent(G4HCofThisEvent* HCE)
      hits.push_back( _event->sciFiHits[i] );
   }
 
-  _event->sciFiHits = hits;
+  _event->sciFiHits = hits;*/
+  std::cout<<"number of scifi hits "<<_hits.size()<<std::endl;
+  for (int i=0; i<_hits.size(); i++){
+    Json::StyledWriter writer;
+    // Make a new JSON document for the configuration. Preserve original comments.
+    std::string outputConfig = writer.write( _hits[i]);
+    std::cout<<"doc: "<<outputConfig<<std::endl;
+  }
 }

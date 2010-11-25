@@ -18,6 +18,8 @@
 #include "EngModel/MiceModToG4Solid.hh"
 #include "VirtualPlanes.hh"
 
+#include "DetModel/MAUSSD.hh"
+
 #include "G4VSolid.hh"
 #include "G4Material.hh"
 #include "G4Element.hh"
@@ -262,9 +264,10 @@ void    MICEDetectorConstruction::addDaughter( MiceModule* mod, G4VPhysicalVolum
     }
     else if( sdName == "SciFi" )
     {
-      SciFiSD* sciFiSD = new SciFiSD( _event, mod, cut );
+      SciFiSD* sciFiSD = new SciFiSD( mod, cut );
       MICESDMan->AddNewDetector( sciFiSD );
       logic->SetSensitiveDetector( sciFiSD );
+      _SDs.push_back(sciFiSD); 
     }
     else if( sdName == "CKOV" )
     {
@@ -537,12 +540,13 @@ G4LogicalVolume * MICEDetectorConstruction::BuildQ35(MiceModule * mod)
   return Quad.buildQ35();
 }
 
-Json::Value MICEDetectorConstruction::GetSDHit(int i){
+std::vector<Json::Value> MICEDetectorConstruction::GetSDHits(int i){
   if (i >= 0 and i < _SDs.size() and _SDs[i]){
     if (_SDs[i]->isHit()) {
-      return _SDs[i]->GetHit();
+      return _SDs[i]->GetHits();
     }
   }
-  return Json::Value();
+  std::vector<Json::Value> empty;
+  return empty;
 }
       

@@ -257,10 +257,20 @@ if not env.GetOption('clean'):
     simulate = env.SharedLibrary(target = 'commonCpp/libsimulate', source = commonCppFiles, LIBS=['recpack'] +  env['LIBS'])
     env.Install("build", simulate)
 
-    #env.Program(target="sim", source=["commonCpp/Simulation.cc"] + glob.glob("commonCpp/*/*cc") + glob.glob("commonCpp/*/*/*cc"), LIBS=['recpack'] +  env['LIBS'])
 
-  env.jDev.Subproject('components/map/MapCppPrint')
-  env.jDev.Subproject('components/map/MapCppSimulation')
+    
+  for directory in glob.glob("components/map/*"):
+    parts = directory.split("/")
+    assert len(parts) == 3
+    
+    if parts[2][0:5] == "MapPy":
+      print 'Found Python mapper: %s' % parts[2]
+      env.Install("build", "%s/%s.py" % (directory, parts[2]))
+
+    if parts[2][0:6] == 'MapCpp':
+      print 'Found C++ mapper: %s' % parts[2] 
+      env.jDev.Subproject(directory)
+    
 
   env.Alias('install', ['%s/build' % os.environ.get('MAUS_ROOT_DIR')])
 

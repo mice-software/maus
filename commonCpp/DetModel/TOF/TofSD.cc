@@ -23,7 +23,7 @@ TofSD::TofSD( MiceModule* mod, bool dEdxCut )
 
 void TofSD::Initialize(G4HCofThisEvent* HCE)
 {
-  _hit = Json::Value();
+  _hits.push_back(Json::Value());
   Json::Value hw_id;
   
   hw_id["type"] = "TOF";
@@ -31,11 +31,12 @@ void TofSD::Initialize(G4HCofThisEvent* HCE)
   hw_id["plane"] =  _module->propertyInt( "Plane" ) ;
   hw_id["station_number"] = _module->propertyInt( "Station" ) ;
 
-  _hit["hw_id"] = hw_id;
-  _hit["energy_deposited"] = 0.0;
-  _hit["path_length"] = 0.0;
-  _hit["time"] = 0.0;
+  _hits[0]["hw_id"] = hw_id;
+
+  _hits[0]["energy_deposited"] = 0.0;
+  _hits[0]["path_length"] = 0.0;
   
+
   _isHit = false;
 }
 
@@ -46,38 +47,51 @@ G4bool TofSD::ProcessHits(G4Step* aStep, G4TouchableHistory* History)
 
   G4double length = aStep->GetStepLength();
 
-  if(_hit["path_length"] == 0) {
+  if(_hits[0].get("path_length", 0.0) == 0) {
   	G4Track* track = aStep->GetTrack();
 
-        _hit["volume_name"] = _module->fullName();
-        G4ThreeVector threeVectorTemp = aStep->GetPreStepPoint()->GetPosition();
+        _hits[0]["volume_name"] = _module->fullName();
+
         Json::Value threeVectorValue;
-        threeVectorValue["x"] = threeVectorTemp.x();
-        threeVectorValue["y"] = threeVectorTemp.y();
-        threeVectorValue["z"] = threeVectorTemp.z(); 
+
+        threeVectorValue["x"] = aStep->GetPreStepPoint()->GetPosition().x();
+        threeVectorValue["y"] = aStep->GetPreStepPoint()->GetPosition().y();
+        threeVectorValue["z"] = aStep->GetPreStepPoint()->GetPosition().z(); 
         
-        _hit["position"]["x"] = threeVectorTemp.x();
-        
-        /*  	_hit.SetVolumeName( _module->fullName() );
-  	_hit.SetPosition( aStep->GetPreStepPoint()->GetPosition() );
-  	_hit.SetTime( aStep->GetPreStepPoint()->GetGlobalTime() );
-	_hit.setCharge( track->GetDefinition()->GetPDGCharge() );
-  	_hit.SetMomentum( track->GetMomentum() );
-  	_hit.SetEnergy( track->GetTotalEnergy() );
-  	_hit.SetPID( track->GetDefinition()->GetPDGEncoding() );
-  	_hit.SetMass( track->GetDefinition()->GetPDGMass() );
-  	_hit.SetTrackID( track->GetTrackID() );*/
+        _hits[0]["position"] = threeVectorValue;
+
+        threeVectorValue["x"] = track->GetMomentum().x();
+        threeVectorValue["y"] = track->GetMomentum().y();
+        threeVectorValue["z"] = track->GetMomentum().z();
+
+        _hits[0]["momentum"] = threeVectorValue;
+
+        _hits[0]["time"] = aStep->GetPreStepPoint()->GetGlobalTime();
+
+        _hits[0]["charge"] = track->GetDefinition()->GetPDGCharge();
+        _hits[0]["mass"] = track->GetDefinition()->GetPDGMass();
+        _hits[0]["particle_id"] = track->GetDefinition()->GetPDGEncoding();
+        _hits[0]["energy"] = track->GetTotalEnergy();
+        _hits[0]["track_id"] = aStep->GetTrack()->GetTrackID();
+  
+  
+    Json::StyledWriter writer;
+    // Make a new JSON document for the configuration. Preserve original comments.
+    for (int i=0; i< _hits.size(); i++){
+      std::string outputConfig = writer.write( _hits[i]);
+      std::cout<<"doc["<<i<<"]: "<<outputConfig<<std::endl;
+    }
   }
 
-  _hit["energy_deposited"] = _hit.get("energy_deposited", 0).asDouble() + edep;
-  _hit["path_length"] = _hit.get("path_length", 0).asDouble() + length;
+  _hits[0]["energy_deposited"] = _hits[0].get("energy_deposited", 0).asDouble() + edep;
+  _hits[0]["path_length"] = _hits[0].get("path_length", 0).asDouble() + length;
 
    return true;
 }
 
 void TofSD::EndOfEvent(G4HCofThisEvent* HCE)
 {
-  if( !(_hit["energy_deposited"] == 0. && _dEdxCut) && _hit["path_length"] != 0.){ 
+  if( !(_hits[0]["energy_deposited"] == 0. && _dEdxCut) && _hits[0]["path_length"] != 0.){ 
     _isHit = true;
   }
  

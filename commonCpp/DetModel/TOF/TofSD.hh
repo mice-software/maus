@@ -26,17 +26,6 @@ class TofSD : public MAUSSD {
   void Initialize(G4HCofThisEvent*);
   G4bool ProcessHits(G4Step*, G4TouchableHistory*);
   void EndOfEvent(G4HCofThisEvent*);
-
-  //  bool isHit() { return _isHit; }
-  //  Json::Value GetHit() { return _hit; }
-
-  // private:
-  //  Json::Value _hit;   // will contains the root value after parsing.
-  //   bool _isHit;
-  
-  //  MiceModule*	_module;
-  //  
-  //  bool            _dEdxCut;
   
 };
 

@@ -16,6 +16,8 @@
 #include "G4VUserDetectorConstruction.hh"
 #include "G4UniformMagField.hh"
 
+#include "DetModel/MAUSSD.hh"  
+
 #include "Interface/MICERun.hh"
 
 #include "BeamTools/BTFieldConstructor.hh"
@@ -44,13 +46,13 @@ public:
   //Set the magnetic fields from BeamTools using MiceModule
   void    setBTMagneticField(MiceModule* rootModule);
 
-  Json::Value GetSDHit(int i);
+  std::vector<Json::Value> GetSDHits(int i);
 
   int GetSDSize() { return _SDs.size(); }
 
 private:
 
-  std::vector<TofSD*> _SDs; // todo: add get/set 
+  std::vector<MAUSSD*> _SDs; // todo: add get/set 
   
   void		addDaughter( MiceModule*, G4VPhysicalVolume* );
 
