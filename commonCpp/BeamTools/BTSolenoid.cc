@@ -481,7 +481,7 @@ void BTSolenoid::BuildSheets(double length, double thickness, double innerRadius
 	rMin = 0;
 	zMin = -1*zMax;
 	SetTheFieldMap(tolerance, interpolation);
-	if(fileName!="") WriteFieldMap(fileName.c_str());
+	//if(fileName!="") WriteFieldMap(fileName.c_str());
 	double myBbMin[3]={-rMax, -rMax, zMin}, myBbMax[3]={rMax, rMax, zMax};
 	BTField::bbMin = std::vector<double>(myBbMin, myBbMin+3);
 	BTField::bbMax = std::vector<double>(myBbMax, myBbMax+3);
