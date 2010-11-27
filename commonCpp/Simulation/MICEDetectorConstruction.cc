@@ -79,9 +79,9 @@
 
 const double MICEDetectorConstruction::_pillBoxSpecialVirtualLength = 1.e-6*mm;
 
-MICEDetectorConstruction::MICEDetectorConstruction( MICERun& run, MICEEvent* event ) : _simRun(*MICERun::getInstance()), _checkVolumes(false)
+MICEDetectorConstruction::MICEDetectorConstruction( MICERun& run ) : _simRun(*MICERun::getInstance()), _checkVolumes(false)
 {
-  _event = event;
+  _event = new MICEEvent();
   _model = run.miceModule;
   _materials = run.miceMaterials;
   _checkVolumes = (_simRun.DataCards->fetchValueInt("CheckVolumeOverlaps") == 1);

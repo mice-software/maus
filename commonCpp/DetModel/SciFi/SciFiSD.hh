@@ -10,6 +10,7 @@
 #include "DetModel/MAUSSD.h"
 #include "Interface/SciFiHit.hh"
 
+using namespace MAUS;
 
 /**
 * SciFiSD is the sensitive detector for GEANT4 that handles the Scintillating

@@ -30,14 +30,14 @@ class G4LogicalVolume;
 class G4VSolid;
 
 class MICEEvent;
+using namespace MAUS;
 class TofSD;
 
 class MICEDetectorConstruction : public G4VUserDetectorConstruction
 {
 
 public:
-
-  MICEDetectorConstruction( MICERun&, MICEEvent* );
+  MICEDetectorConstruction( MICERun&);
 
   ~MICEDetectorConstruction();
 

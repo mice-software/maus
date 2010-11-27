@@ -13,6 +13,8 @@
 #include <json/json.h>
 #include <string>
 
+using namespace MAUS;
+
 class G4Step;
 class G4HCofThisEvent;
 class MICEEvent;
