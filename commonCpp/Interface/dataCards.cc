@@ -418,7 +418,6 @@ void dataCards::fillVector(const char* st, const int& nentries, const double* en
 int dataCards::readKeys(const char* fileName)
 {
   std::ifstream in(fileName);
-  std::cout<<"using infile "<<fileName<<std::endl;
   if (!in) return 0;
 
   std::string s;

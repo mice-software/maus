@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from MapCppSimulation import MapCppSimulation
 from MapPyRemoveTracks import MapPyRemoveTracks
 
@@ -15,3 +16,6 @@ document = """{
 }"""
 
 map(mappers[0].Process, [document])
+
+mappers[0].Death()
+

@@ -42,9 +42,13 @@ class Dev:
     print srclst
     srclst += map(lambda x: builddir + '/' + x, glob.glob('*.i'))
     pgm = localenv.SharedLibrary(targetpath, source=srclst)#, LIBS=['simulate'])
+
+    tests = glob.glob('test_*.py')
+    print "tests:", tests
     
     env.Install(os.path.join(os.environ.get('MAUS_ROOT_DIR'), builddir) , "build/%s.py" % name)
     env.Install(os.path.join(os.environ.get('MAUS_ROOT_DIR'), builddir) , pgm)
+    env.Install(os.path.join(os.environ.get('MAUS_ROOT_DIR'), builddir) , tests)
     env.Alias('all', pgm)  #note: not localenv
 
   #---- PRIVATE ----
