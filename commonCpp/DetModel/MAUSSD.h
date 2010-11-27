@@ -13,31 +13,30 @@
 #ifndef _COMMONCPP_DETMODEL_MAUSSD_H_
 #define _COMMONCPP_DETMODEL_MAUSSD_H_
 
-#include <vector>
-#include <json/json.h>   
+#include <json/json.h>
 #include <G4VSensitiveDetector.hh>
+#include <vector>
 #include "Config/MiceModule.hh"
 
-class MAUSSD : public G4VSensitiveDetector
-{
- public:
-  MAUSSD( MiceModule* , bool dEdxCut);
+namespace MAUS {
 
-  virtual void Initialize(G4HCofThisEvent*) { /* do nothing */ }
-  virtual G4bool ProcessHits(G4Step*, G4TouchableHistory*) { return false; }
-  virtual void EndOfEvent(G4HCofThisEvent*) {}
+class MAUSSD : public G4VSensitiveDetector {
+ public:
+  MAUSSD(MiceModule* , bool dEdxCut);
 
   bool isHit() { return _isHit; }
   int GetNHits() { return _hits.size(); }
   std::vector<Json::Value> GetHits() { return _hits; }
 
  protected:
-  std::vector<Json::Value> _hits;  
+  std::vector<Json::Value> _hits;
   bool _isHit;
-  
-  MiceModule*	_module;
-  
+
+  MiceModule* _module;
+
   bool            _dEdxCut;
 };
+
+}  //  ends MAUS namespace
 
 #endif  //  _COMMONCPP_DETMODEL_MAUSSD_H_

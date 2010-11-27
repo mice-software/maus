@@ -18,8 +18,6 @@
 #include "EngModel/MiceModToG4Solid.hh"
 #include "VirtualPlanes.hh"
 
-#include "DetModel/MAUSSD.hh"
-
 #include "G4VSolid.hh"
 #include "G4Material.hh"
 #include "G4Element.hh"

@@ -16,7 +16,7 @@
 #include "G4VUserDetectorConstruction.hh"
 #include "G4UniformMagField.hh"
 
-#include "DetModel/MAUSSD.hh"  
+#include "DetModel/MAUSSD.h"  
 
 #include "Interface/MICERun.hh"
 

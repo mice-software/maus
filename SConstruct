@@ -257,7 +257,7 @@ if not env.GetOption('clean'):
   if env['USE_G4'] and env['USE_ROOT']:
     env.Append(CCFLAGS=['-g',])
     
-    commonCppFiles = glob.glob("commonCpp/*/*cc") + glob.glob("commonCpp/*/*/*cc") 
+    commonCppFiles = glob.glob("commonCpp/*/*cc") + glob.glob("commonCpp/*/*/*cc") + glob.glob("commonCpp/*/*cpp") + glob.glob("commonCpp/*/*/*cpp")
     simulate = env.SharedLibrary(target = 'commonCpp/libsimulate', source = commonCppFiles, LIBS=['recpack'] +  env['LIBS'])
     env.Install("build", simulate)
 

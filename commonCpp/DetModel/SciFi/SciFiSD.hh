@@ -7,7 +7,7 @@
 #define SciFiSD_h 1
 
 #include <json/json.h>
-#include "DetModel/MAUSSD.hh"
+#include "DetModel/MAUSSD.h"
 #include "Interface/SciFiHit.hh"
 
 

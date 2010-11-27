@@ -5,7 +5,7 @@
 #ifndef _TOFSD_HH_
 #define _TOFSD_HH_ 1
 
-#include "DetModel/MAUSSD.hh"
+#include "DetModel/MAUSSD.h"
 #include "G4VSensitiveDetector.hh"
 #include "Interface/TofHit.hh"
 #include "Interface/Memory.hh"
@@ -17,7 +17,6 @@ class G4Step;
 class G4HCofThisEvent;
 class MICEEvent;
 class MiceModule;
-//class TofHit;
 
 class TofSD : public MAUSSD {
  public:
