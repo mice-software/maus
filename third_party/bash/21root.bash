@@ -56,7 +56,8 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         elif [ -e "/usr/X11R6/lib64/libXpm.so.4" ] # sl48 64bit
         then
             echo "INFO: Applying SL4 64-bit libXpm fix since ROOT/SL suck."
-            ln -s /usr/X11R6/lib64/libXpm.so.4 ${MAUS_ROOT_DIR}/third_party/install/lib/libXpm.so # known ROOT/SL4 bug since 2003 (!!)
+            #ln -s /usr/X11R6/lib64/libXpm.so.4 ${MAUS_ROOT_DIR}/third_party/install/lib/libXpm.so # known ROOT/SL4 bug since 2003 (!!)
+	    find /usr/X11R6/lib64/libX*so | xargs -i cp -s {}  ${MAUS_ROOT_DIR}/third_party/install/lib
             extra="--with-xpm-libdir=${MAUS_ROOT_DIR}/third_party/install/lib"
         elif [ -e "/usr/X11R6/lib/libXpm.so.4" ] # sl48 32bit
         then
@@ -79,8 +80,8 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         elif [ -e "/usr/X11R6/lib64/libX11.so.6" ] # sl48 64bit
         then
             echo "INFO: Applying SL4 64-bit libXpm fix since ROOT/SL suck."
-            ln -s /usr/X11R6/lib64/libX11.so.6 ${MAUS_ROOT_DIR}/third_party/install/lib/libX11.so # known ROOT/SL4 bug since 2003 (!!)
-            extra="${extra} --with-x11-libdir=${MAUS_ROOT_DIR}/third_party/install/lib"
+            #ln -s /usr/X11R6/lib64/libX11.so.6 ${MAUS_ROOT_DIR}/third_party/install/lib/libX11.so # known ROOT/SL4 bug since 2003 (!!)
+            #extra="${extra} --with-x11-libdir=${MAUS_ROOT_DIR}/third_party/install/lib"
         elif [ -e "/usr/X11R6/lib/libX11.so.6" ] # sl48 32bit
         then
             echo "INFO: Applying SL4 32-bit libXpm fix since ROOT/SL suck."
