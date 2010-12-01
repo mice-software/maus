@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 from MapCppSimulation import MapCppSimulation
 from MapPyRemoveTracks import MapPyRemoveTracks
+from Go import Go
 
+mappers = [MapCppSimulation()]#, MapPyRemoveTracks(),]
+goer = Go(mappers)
 
-mappers = [MapCppSimulation(), MapPyRemoveTracks(),]
-
-mappers[0].Birth()
 document = """{
 "mc": [{
 "position": { "x": 0.1, "y": -0.1, "z": -5000 },
@@ -15,7 +15,6 @@ document = """{
 }]
 }"""
 
-map(mappers[0].Process, [document])
+new_document = map(goer.Process, [document])
 
-mappers[0].Death()
-
+print new_document
