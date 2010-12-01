@@ -1,6 +1,13 @@
+1.  Introduction
 
-This project is maintained at:
+Welcome to MAUS (MICE Analysis User Software).  This open-source software project is hosted at:
 
 http://micewww.pp.rl.ac.uk:8080/projects/maus
 
+2. License
+
 License information can be found in COPYING. Licensing information for libraries distributed with MAUS can be found in third_party/license.
+
+3. Directory Structure
+
+http://micewww.pp.rl.ac.uk:8080/projects/maus/wiki/Design#The-Directory-Struture
