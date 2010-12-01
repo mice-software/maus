@@ -50,6 +50,10 @@ then
     echo
 fi
 
+# save default manpath
+man_path=`manpath -g`
+
+# check for SCons
 type -P scons &>/dev/null || { echo "FATAL: Scons is required.  To install within MAUS, please run:" >&2; echo "FATAL:      MAUS_ROOT_DIR=${maus_root_dir} ./third_party/bash/01scons.bash";echo "FATAL:";echo "FATAL: but it's weird that it's not working.  This ships with MAUS.  Is your MAUS ROOT directory correct?";exit 1; }
 
 ### Create environment files
@@ -72,9 +76,9 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      fi
 
      if [ -z "\${MANPATH}" ]; then
-           MANPATH="\${MAUS_ROOT_DIR}/third_party/install/share/man/man1"
+          MANPATH=\${MAUS_ROOT_DIR}/third_party/install/share/man/man1:${man_path}
      else
-          MANPATH="\${MAUS_ROOT_DIR}/third_party/install/share/man/man1":$MANPATH
+          MANPATH=\${MAUS_ROOT_DIR}/third_party/install/share/man/man1:\${MANPATH}
      fi
 
      # ROOT specific garbage
@@ -98,14 +102,6 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      PATH=\$DISCO_HOME/bin:\$PATH
      PYTHONPATH=\$DISCO_HOME/lib:\$PYTHONPATH
      LD_LIBRARY_PATH=\$DISCO_HOME/lib:\$LD_LIBRARY_PATH
-
-     # clhep
-     export CLHEPVERS=2.0.4.2
-     export CLHEP_BASE_DIR=\${MICE_PATH}/\${COMPILER}/CLHEP/\${CLHEPVERS}/CLHEP
-     export CLHEP_INCLUDE_DIR=$CLHEP_BASE_DIR/include
-     export CLHEP_LIB_DIR=$CLHEP_BASE_DIR/lib
-     export CLHEP_LIB=CLHEP
-     export CLHEPSYS=\${CLHEP_BASE_DIR}
 
      export G4DEBUG=1
      export G4VERS=geant4.9.2.p01
