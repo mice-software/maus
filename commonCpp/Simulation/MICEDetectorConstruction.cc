@@ -115,7 +115,6 @@ G4VPhysicalVolume* MICEDetectorConstruction::Construct()
 
   _hasBTFields = BTFieldConstructor::HasBTFields();
 
-  Squeak::mout(Squeak::info) << "Building fields" << std::endl;
   if(_hasBTFields)
     setBTMagneticField( _model );
   else
@@ -126,11 +125,10 @@ G4VPhysicalVolume* MICEDetectorConstruction::Construct()
     globalFieldMgr->SetDetectorField ( magField );
     globalFieldMgr->CreateChordFinder( magField );
   }
-  Squeak::mout(Squeak::info) << "Building physical geometry" << std::endl;
-  if(_checkVolumes) Squeak::setStandardOutputs(0); //turn on cout if check volumes is active
+
   for( int i = 0; i < _model->daughters(); ++i )
     addDaughter( _model->daughter( i ), MICEExpHall );
-  if(_checkVolumes) Squeak::setStandardOutputs(-1); //turn cout back to default mode if check volumes is active
+
   VirtualPlaneManager::ConstructVirtualPlanes(_miceElectroMagneticField->GetField(), _model);
 
   return MICEExpHall;
@@ -205,12 +203,6 @@ void    MICEDetectorConstruction::addDaughter( MiceModule* mod, G4VPhysicalVolum
     G4VSolid* solid = MiceModToG4Solid::buildSolid(mod);
     logic = new G4LogicalVolume( solid, mat, mod->name() + "Logic", 0, 0, 0 );
     place = new G4PVPlacement( (G4RotationMatrix*) mod->rotationPointer(), mod->position(), mod->name(), logic, moth, false, 0, _checkVolumes);
-    Squeak::errorLevel myerr;
-    if(mod->mother()->isRoot()) myerr = Squeak::info;
-    else              myerr = Squeak::debug;
-    Squeak::mout(myerr) << "Placing " << mod->name() << " of type " << mod->volType() << " position: " << mod->globalPosition() << " rotationVector: " << mod->globalRotation().getAxis() 
-                        << " angle: "  << mod->globalRotation().delta()/degree << " volume: " << solid->GetCubicVolume()/meter/meter/meter << " m^3" << std::endl;
-
   }
 
   //Set a volume in cavity centre for phasing

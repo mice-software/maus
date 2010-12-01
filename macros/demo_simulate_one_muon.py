@@ -3,7 +3,7 @@ from MapCppSimulation import MapCppSimulation
 from MapPyRemoveTracks import MapPyRemoveTracks
 from Go import Go
 
-mappers = [MapCppSimulation()]#, MapPyRemoveTracks(),]
+mappers = [MapCppSimulation(), MapPyRemoveTracks(),]
 goer = Go(mappers)
 
 document = """{
@@ -17,4 +17,7 @@ document = """{
 
 new_document = map(goer.Process, [document])
 
-print new_document
+for thing in new_document:
+    f = open("output", "w")
+    f.write("%s\n" % thing)
+    f.close()

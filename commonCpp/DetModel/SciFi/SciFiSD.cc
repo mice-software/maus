@@ -33,7 +33,6 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep,G4TouchableHistory* ROhist)
 {
   _hits.push_back(Json::Value());
   
-  std::cout << "Starting SciFiSD" << std::endl;
   G4double edep = aStep->GetTotalEnergyDeposit();
 
   if( edep == 0. && _dEdxCut ) return false;
@@ -50,24 +49,17 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep,G4TouchableHistory* ROhist)
   Hep3Vector delta = aStep->GetPostStepPoint()->GetPosition() - pos;
 
   double dist = delta.x() * perp.x() + delta.y() * perp.y() + delta.z() * perp.z();
-  std::cout << "Dist = " << dist << std::endl;
   double fibre = _module->propertyDouble( "CentralFibre" ) + dist * 2.0 / ( _module->propertyDouble( "Pitch" ) * 7.0 );
 
   double centFibre = _module->propertyDouble( "CentralFibre" );
   int  firstChan = (int)(fibre + 0.5);
-  //int firstChan = int(floor((dist/chanWidth)+0.5) + centFibre);
-  std::cout << "floor((dist/chanWidth)+0.5 = " << floor((dist/chanWidth)+0.5) << std::endl;
   int secondChan(-1);
   double overlap = chanWidth - (0.1365/2.0);
    double underlap = (0.1365/2.0);
   int nChans(1);
   double distInChan = ((firstChan - centFibre)*chanWidth) - dist;
-  std::cout << "Overlap: " << overlap << " Underlap: " << underlap << std::endl; 
-  std::cout << "Channel = " << firstChan << " width = " << chanWidth << std::endl;
-  std::cout << "Central channel = " << centFibre << std::endl;
-  std::cout << "Dist in chan = " << distInChan << std::endl;
+
   if ((sqrt(distInChan*distInChan) > overlap) || (sqrt(distInChan*distInChan) < underlap)) { // distance in channel greater than section which does not overlap 
-	std::cout << "Making second channel" << std::endl;	
 	nChans = 2;
 	if (distInChan < 0) {
 		secondChan = firstChan - 1;
@@ -92,7 +84,6 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep,G4TouchableHistory* ROhist)
   channel_id["plane_number"] = _module->propertyInt( "Plane" );
   _hits[hit_i]["channel_id"] = channel_id;
 
-  std::cout << nChans << " channels" << std::endl;
   if (nChans == 2) {
     _hits[hit_i]["energy_deposited"] = edep/2.0;
   }
@@ -106,10 +97,6 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep,G4TouchableHistory* ROhist)
   _hits[hit_i]["charge"] =  aStep->GetTrack()->GetDefinition()->GetPDGCharge();
   _hits[hit_i]["mass"] = aStep->GetTrack()->GetDefinition()->GetPDGMass();
       
-  //  newHit->SetPos( aStep->GetPostStepPoint()->GetPosition() );
-  //  newHit->SetMom( aStep->GetTrack()->GetMomentum() );
-
-
   if (nChans == 2) {
     _hits.push_back(_hits[hit_i]);
     _hits[_hits.size() - 1]["channel_id"]["fiber_number"] = secondChan;
@@ -121,33 +108,5 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep,G4TouchableHistory* ROhist)
 
 void SciFiSD::EndOfEvent(G4HCofThisEvent* HCE)
 {
-  // loop over hits and merge together hits that are on the same fibre
-
-  /*  for( unsigned int i = 0; i < _hits.size(); ++i ) {
-    SciFiHit* found = NULL;
-
-    for( unsigned int j = 0; j < hits.size(); ++j )
-      if( hits[j]->GetFiberNo() == _event->sciFiHits[i]->GetFiberNo() &&
-          hits[j]->GetPlaneNo() == _event->sciFiHits[i]->GetPlaneNo() &&
-          hits[j]->GetStationNo() == _event->sciFiHits[i]->GetStationNo() &&
-          hits[j]->GetTrackerNo() == _event->sciFiHits[i]->GetTrackerNo() )
-        found = hits[j];
-
-   if( found )
-   {
-     found->mergeHit( _event->sciFiHits[i] );
-     delete _event->sciFiHits[i];
-   }
-   else
-     hits.push_back( _event->sciFiHits[i] );
-  }
-
-  _event->sciFiHits = hits;*/
-  std::cout<<"number of scifi hits "<<_hits.size()<<std::endl;
-  for (int i=0; i<_hits.size(); i++){
-    Json::StyledWriter writer;
-    // Make a new JSON document for the configuration. Preserve original comments.
-    std::string outputConfig = writer.write( _hits[i]);
-    std::cout<<"doc: "<<outputConfig<<std::endl;
-  }
+  // Do nothing
 }
