@@ -85,9 +85,13 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
           PYTHONPATH=\${MAUS_ROOT_DIR}/third_party/install/lib/root:\${PYTHONPATH} # else add it
      fi
 
-     # workers
+     # maus workers
      PYTHONPATH=\$MAUS_ROOT_DIR/build:\$PYTHONPATH
      LD_LIBRARY_PATH=\$MAUS_ROOT_DIR/build:\$LD_LIBRARY_PATH
+
+     # maus core
+     PYTHONPATH=\$MAUS_ROOT_DIR/core:\$PYTHONPATH
+     LD_LIBRARY_PATH=\$MAUS_ROOT_DIR/core:\$LD_LIBRARY_PATH
 
      # disco
      DISCO_HOME=\$MAUS_ROOT_DIR/third_party/build/tuulos-disco-742e814
