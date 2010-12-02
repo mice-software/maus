@@ -2,26 +2,47 @@
 # Configure script
 # Run once when you unpack source
 
-echo "INFO: This is the './configure' script.  You should only run this once. The purpose of me is to:"
-echo "INFO: "
+# This is the maximum length of text (ignoring whitespace), 50 chars
+##################################################                                                                                                                                   
+# this is the maximum amount of characters (including whitespace) per line)
+######################################################################
+
+
+            ##################################################
+echo "INFO: This is the './configure' script.  You should only"
+echo "INFO: run this once. The purpose of me is to:"
+echo "INFO:"
 echo "INFO:     1. Check that you have a compiler"
 echo "INFO:     2. Check that you have Python"
 echo "INFO:     3. Check your version of Python is supported"
-echo "INFO:     4. Create a file called 'env.sh' that stores your environmental variables"
+echo "INFO:     4. Create files called 'env.sh' and 'env.csh'"
+echo "INFO:        that store your environmental variables"
 echo "INFO:"
 echo
 
-# Check for g++                                                                                                                                              
-type -P gcc &>/dev/null || { echo "FATAL: gcc/g++ is required to compile code." >&2; echo "FATAL: To install within MAUS, please run:" >&2; echo: "FATAL:      MAUS_ROOT_DIR=${maus_root_dir} ./third_party/bash/01mpfr.bash" >&2; echo: "FATAL:      MAUS_ROOT_DIR=${maus_root_dir} ./third_party/bash/02gcc.bash" >&2; echo: "FATAL:      MAUS_ROOT_DIR=${maus_root_dir} ./third_party/bash/03python.bash" >&2; exit 1; }
-type -P g++ &>/dev/null || { echo "FATAL: gcc/g++ is required to compile code." >&2; echo "FATAL: To install within MAUS, please run:" >&2; echo: "FATAL:      MAUS_ROOT_DIR=${maus_root_dir} ./third_party/bash/01mpfr.bash" >&2; echo: "FATAL:      MAUS_ROOT_DIR=${maus_root_dir} ./third_party/bash/02gcc.bash" >&2; echo: "FATAL:      MAUS_ROOT_DIR=${maus_root_dir} ./third_party/bash/03python.bash" >&2; exit 1; }
+# Check for g++ ################################################## 
+(type -P gcc &>/dev/null && type -P g++ &>/dev/null) || {
+    echo "FATAL: gcc/g++ is required to compile code." >&2;
+    echo "FATAL:" >&2;
+    echo "FATAL: To install within MAUS, set the MAUS_ROOT_DIR" >&2;
+    echo "FATAL: environmental variable.  For Bourne-compatible" >&2;
+    echo "FATAL: shells like 'bash', run:" >&2;
+    echo "FATAL:" >&2;
+    echo "FATAL:      export MAUS_ROOT_DIR=${maus_root_dir}" >&2;
+    echo "FATAL:" >&2;
+    echo "FATAL: whilst for C-compatible shells like 'csh', run:" >&2;
+    echo "FATAL:" >&2;
+    echo "FATAL:      setenv MAUS_ROOT_DIR ${maus_root_dir}" >&2;
+    echo "FATAL:" >&2;
+    echo "FATAL: then run the following two commands to install" >&2;
+    echo "FATAL: the GCC compiler and it's dependency MPFR:" >&2;
+    echo "FATAL:" >&2;
+    echo "FATAL:      ./third_party/bash/01mpfr.bash" >&2;
+    echo "FATAL:      ./third_party/bash/02gcc.bash" >&2;
+    exit 1; }
 
 # Find where MAUS is installed
 maus_root_dir=`pwd`
-echo "INFO: MAUS ROOT directory, which internal to the program is called \$MAUS_ROOT_DIR.  This *should* also be your current directory:"
-echo "INFO:"
-echo "INFO:     ${maus_root_dir}"
-echo "INFO:"
-echo
 
 # Temporarily setup the environment (this gets repeated in the env.sh output)
 #      PATH says where the binaries are
@@ -38,15 +59,44 @@ else
 fi 
 
 # Check for Python
-type -P python &>/dev/null || { echo "FATAL: Python is required.  To install within MAUS, please run:" >&2; echo "FATAL:      MAUS_ROOT_DIR=${maus_root_dir} ./third_party/bash/03python.bash";exit 1; }
+type -P python &>/dev/null || {
+    echo "FATAL: Python is required.">&2;
+    echo "FATAL:">&2;
+    echo "FATAL: To install within MAUS, set the MAUS_ROOT_DIR" >&2;
+    echo "FATAL: environmental variable.  For Bourne-compatible" >&2;
+    echo "FATAL: shells like 'bash', run:" >&2;
+    echo "FATAL:" >&2;
+    echo "FATAL:      export MAUS_ROOT_DIR=${maus_root_dir}" >&2;
+    echo "FATAL:" >&2;
+    echo "FATAL: whilst for C-compatible shells like 'csh', run:" >&2;
+    echo "FATAL:" >&2;
+    echo "FATAL:      setenv MAUS_ROOT_DIR ${maus_root_dir}" >&2;
+    echo "FATAL:" >&2;
+    echo "FATAL: then run the following to install Python 2.7:" >&2;
+    echo "FATAL:" >&2;
+    echo "FATAL:      ./third_party/bash/03python.bash" >&2;
+    exit 1; }
 
 python_version=`LD_LIBRARY_PATH=./third_party/install/lib python -V 2>&1` 
 ## Check for supported python version
 if [ "${python_version}" != "Python 2.7" ]
-then
-    echo "WARNING: Unsupported python version (You are using ${python_version})."
-    echo "WARNING: Please us Python 2.7 within MAUS by running the following command:"
-    echo "WARNING:    MAUS_ROOT_DIR=${maus_root_dir} ./third_party/bash/00python.bash"
+then               ##################################################  
+    echo "WARNING: Unsupported python version (You are using ${python_version}),";
+    echo "WARNING: so using Python 2.7 is recommended";
+    echo "WARNING: ";
+    echo "WARNING: To install within MAUS, set the MAUS_ROOT_DIR";
+    echo "WARNING: environmental variable.  For Bourne-compatible";
+    echo "WARNING: shells like 'bash', run:";
+    echo "WARNING: ";
+    echo "WARNING:       export MAUS_ROOT_DIR=${maus_root_dir}";
+    echo "WARNING: ";
+    echo "WARNING:  whilst for C-compatible shells like 'csh', run:";
+    echo "WARNING: ";
+    echo "WARNING:       setenv MAUS_ROOT_DIR ${maus_root_dir}";
+    echo "WARNING: ";
+    echo "WARNING: then run the following to install Python 2.7:"
+    echo "WARNING: ";
+    echo "WARNING:       ./third_party/bash/03python.bash";
     echo
 fi
 
@@ -54,61 +104,80 @@ fi
 man_path=`manpath -g`
 
 # check for SCons
-type -P scons &>/dev/null || { echo "FATAL: Scons is required.  To install within MAUS, please run:" >&2; echo "FATAL:      MAUS_ROOT_DIR=${maus_root_dir} ./third_party/bash/01scons.bash";echo "FATAL:";echo "FATAL: but it's weird that it's not working.  This ships with MAUS.  Is your MAUS ROOT directory correct?";exit 1; }
+type -P scons &>/dev/null || {
+    echo "FATAL: Scons is required. It's weird that it's not" >&2;
+    echo "FATAL: since it ships within MAUS.  Is your MAUS ROOT" >&2;
+    echo "FATAL: directory correct?." >&2;
+    echo "FATAL:" >&2;
+    echo "FATAL: To reinstall within MAUS, set the MAUS_ROOT_DIR" >&2;
+    echo "FATAL: environmental variable.  For Bourne-compatible" >&2;
+    echo "FATAL: shells like 'bash', run:" >&2;
+    echo "FATAL:" >&2;
+    echo "FATAL:      export MAUS_ROOT_DIR=${maus_root_dir}" >&2;
+    echo "FATAL:" >&2;
+    echo "FATAL: whilst for C-compatible shells like 'csh', run:" >&2;
+    echo "FATAL:" >&2;
+    echo "FATAL:      setenv MAUS_ROOT_DIR ${maus_root_dir}" >&2;
+    echo "FATAL:" >&2;
+    echo "FATAL: then run the following to install Scons:" >&2;
+    echo "FATAL:" >&2;
+    echo "FATAL:      ./third_party/bash/01scons.bash";
+    echo "FATAL:";
+    exit 1;}
 
 ### Create environment files
 
 cat > env.sh <<EOF
 #/bin/sh
 if [ -z "\$MAUS_ROOT_DIR" ]; then
-     MAUS_ROOT_DIR=${maus_root_dir}
+     export MAUS_ROOT_DIR=${maus_root_dir}
 
      if [ -z "\${PATH}" ]; then  # see if the variable exists yet
-         PATH=\${MAUS_ROOT_DIR}/third_party/install/bin # initialize it
+         export PATH=\${MAUS_ROOT_DIR}/third_party/install/bin # initialize it
      else
-         PATH=\${MAUS_ROOT_DIR}/third_party/install/bin:\${PATH} # else add it
+         export PATH=\${MAUS_ROOT_DIR}/third_party/install/bin:\${PATH} # else add it
      fi
 
      if [ -z "\${LD_LIBRARY_PATH}" ]; then  # see if the variable exists yet 
-          LD_LIBRARY_PATH=\${MAUS_ROOT_DIR}/third_party/install/lib # intiailize it
+          export LD_LIBRARY_PATH=\${MAUS_ROOT_DIR}/third_party/install/lib # intiailize it
      else
-          LD_LIBRARY_PATH=\${MAUS_ROOT_DIR}/third_party/install/lib:\${LD_LIBRARY_PATH} # else add it
+          export LD_LIBRARY_PATH=\${MAUS_ROOT_DIR}/third_party/install/lib:\${LD_LIBRARY_PATH} # else add it
      fi
 
      if [ -z "\${MANPATH}" ]; then
-          MANPATH=\${MAUS_ROOT_DIR}/third_party/install/share/man/man1:${man_path}
+          export MANPATH=\${MAUS_ROOT_DIR}/third_party/install/share/man/man1:${man_path}
      else
-          MANPATH=\${MAUS_ROOT_DIR}/third_party/install/share/man/man1:\${MANPATH}
+          export MANPATH=\${MAUS_ROOT_DIR}/third_party/install/share/man/man1:\${MANPATH}
      fi
 
      # ROOT specific garbage
-     LD_LIBRARY_PATH=\${MAUS_ROOT_DIR}/third_party/install/lib/root:\${LD_LIBRARY_PATH}
+     export LD_LIBRARY_PATH=\${MAUS_ROOT_DIR}/third_party/install/lib/root:\${LD_LIBRARY_PATH}
      if [ -z "\${PYTHONPATH}" ]; then  # see if the variable exists yet
-          PYTHONPATH=\${MAUS_ROOT_DIR}/third_party/install/lib/root # intiailize it
+          export PYTHONPATH=\${MAUS_ROOT_DIR}/third_party/install/lib/root # intiailize it
      else
-          PYTHONPATH=\${MAUS_ROOT_DIR}/third_party/install/lib/root:\${PYTHONPATH} # else add it
+          export PYTHONPATH=\${MAUS_ROOT_DIR}/third_party/install/lib/root:\${PYTHONPATH} # else add it
      fi
 
      # maus workers
-     PYTHONPATH=\$MAUS_ROOT_DIR/build:\$PYTHONPATH
-     LD_LIBRARY_PATH=\$MAUS_ROOT_DIR/build:\$LD_LIBRARY_PATH
+     export PYTHONPATH=\$MAUS_ROOT_DIR/build:\$PYTHONPATH
+     export LD_LIBRARY_PATH=\$MAUS_ROOT_DIR/build:\$LD_LIBRARY_PATH
 
      # maus core
-     PYTHONPATH=\$MAUS_ROOT_DIR/core:\$PYTHONPATH
-     LD_LIBRARY_PATH=\$MAUS_ROOT_DIR/core:\$LD_LIBRARY_PATH
+     export PYTHONPATH=\$MAUS_ROOT_DIR/core:\$PYTHONPATH
+     export LD_LIBRARY_PATH=\$MAUS_ROOT_DIR/core:\$LD_LIBRARY_PATH
 
      # disco
-     DISCO_HOME=\$MAUS_ROOT_DIR/third_party/build/tuulos-disco-742e814
-     PATH=\$DISCO_HOME/bin:\$PATH
-     PYTHONPATH=\$DISCO_HOME/lib:\$PYTHONPATH
-     LD_LIBRARY_PATH=\$DISCO_HOME/lib:\$LD_LIBRARY_PATH
+     export DISCO_HOME=\$MAUS_ROOT_DIR/third_party/build/tuulos-disco-742e814
+     export PATH=\$DISCO_HOME/bin:\$PATH
+     export PYTHONPATH=\$DISCO_HOME/lib:\$PYTHONPATH
+     export LD_LIBRARY_PATH=\$DISCO_HOME/lib:\$LD_LIBRARY_PATH
 
      export G4DEBUG=1
      export G4VERS=geant4.9.2.p01
      export G4SYSTEM=Linux-g++
      export G4INSTALL=\${MAUS_ROOT_DIR}/third_party/build/\${G4VERS}
      export G4LIB=\${G4INSTALL}/lib
-     LD_LIBRARY_PATH=\${G4LIB}/\${G4SYSTEM}:\${LD_LIBRARY_PATH}
+     export LD_LIBRARY_PATH=\${G4LIB}/\${G4SYSTEM}:\${LD_LIBRARY_PATH}
      export G4INCLUDE=\${G4INSTALL}/include/
      export G4TMP=\${G4INSTALL}
      export G4VIS_BUILD_DAWNFILE_DRIVER=1
@@ -124,7 +193,6 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
 
      export MICEFILES=\${MAUS_ROOT_DIR}/commonCpp/FILES
  
-     export MAUS_ROOT_DIR PATH LD_LIBRARY_PATH PYTHONPATH MANPATH DISCO_HOME
      echo "SUCCESS: MAUS setup"
 else
      echo "ERROR: MAUS already setup"
@@ -132,8 +200,88 @@ fi
 
 EOF
 
-echo "SUCCESS: Whenever you want to use MAUS, you must run:"
+cat > env.csh <<EOF
+#/bin/csh
+if ({\$?MAUS_ROOT_DIR}) then
+     echo "ERROR: MAUS already setup" 
+else
+     setenv MAUS_ROOT_DIR ${maus_root_dir}
+
+     if ({\$?PATH}) then       
+          setenv PATH \${MAUS_ROOT_DIR}/third_party/install/bin:\${PATH} # else add it  
+     else
+          setenv PATH \${MAUS_ROOT_DIR}/third_party/install/bin # initialize it
+     endif
+
+     if ({\$?LD_LIBRARY_PATH}) then  
+          setenv LD_LIBRARY_PATH \${MAUS_ROOT_DIR}/third_party/install/lib:\${LD_LIBRARY_PATH} # else add it  
+     else
+          setenv LD_LIBRARY_PATH \${MAUS_ROOT_DIR}/third_party/install/lib # intiailize it
+     endif
+
+     if ({\$?MANPATH}) then 
+          setenv MANPATH \${MAUS_ROOT_DIR}/third_party/install/share/man/man1:\${MANPATH}  
+     else
+          setenv MANPATH \${MAUS_ROOT_DIR}/third_party/install/share/man/man1:${man_path}
+     endif
+
+     # ROOT specific garbage
+     setenv LD_LIBRARY_PATH \${MAUS_ROOT_DIR}/third_party/install/lib/root:\${LD_LIBRARY_PATH}
+     if ({\$?PYTHONPATH}) then
+          setenv PYTHONPATH \${MAUS_ROOT_DIR}/third_party/install/lib/root:\${PYTHONPATH} # else add it
+     else
+          setenv PYTHONPATH \${MAUS_ROOT_DIR}/third_party/install/lib/root # intiailize it   
+     endif
+
+     # maus workers
+     setenv PYTHONPATH \$MAUS_ROOT_DIR/build:\$PYTHONPATH
+     setenv LD_LIBRARY_PATH \$MAUS_ROOT_DIR/build:\$LD_LIBRARY_PATH
+
+     # maus core
+     setenv PYTHONPATH \$MAUS_ROOT_DIR/core:\$PYTHONPATH
+     setenv LD_LIBRARY_PATH \$MAUS_ROOT_DIR/core:\$LD_LIBRARY_PATH
+
+     # disco
+     setenv DISCO_HOME \$MAUS_ROOT_DIR/third_party/build/tuulos-disco-742e814
+     setenv PATH \$DISCO_HOME/bin:\$PATH
+     setenv PYTHONPATH \$DISCO_HOME/lib:\$PYTHONPATH
+     setenv LD_LIBRARY_PATH \$DISCO_HOME/lib:\$LD_LIBRARY_PATH
+
+     setenv G4DEBUG 1
+     setenv G4VERS geant4.9.2.p01
+     setenv G4SYSTEM Linux-g++
+     setenv G4INSTALL \${MAUS_ROOT_DIR}/third_party/build/\${G4VERS}
+     setenv G4LIB \${G4INSTALL}/lib
+     setenv LD_LIBRARY_PATH \${G4LIB}/\${G4SYSTEM}:\${LD_LIBRARY_PATH}
+     setenv G4INCLUDE \${G4INSTALL}/include/
+     setenv G4TMP \${G4INSTALL}
+     setenv G4VIS_BUILD_DAWNFILE_DRIVER 1
+     setenv G4VIS_USE_DAWNFILE 1
+     setenv G4VIS_USE 0
+     setenv G4OPTIMISE 2
+     setenv OGLHOME /usr/X11R6
+     setenv G4LEDATA \${G4INSTALL}/data/G4EMLOW6.2/
+     setenv G4ABLADATA \${G4INSTALL}/data/G4ABLA3.0/
+     setenv G4NEUTRONDATA \${G4INSTALL}/data/G4NDL3.13/
+     setenv G4LEVELGAMMADATA \${G4INSTALL}/data/PhotonEvaporation2.0/
+     setenv G4RADIOACTIVEDATA \${G4INSTALL}/data/RadioactiveDecay3.2/
+
+     setenv MICEFILES \${MAUS_ROOT_DIR}/commonCpp/FILES
+
+     echo "SUCCESS: MAUS setup"
+endif
+
+EOF
+
+echo "SUCCESS: Whenever you want to use MAUS, you must 'source'"
+echo "SUCCESS: the environmental variables file.  For Bourne-"
+echo "SUCCESS: compatible shells like 'bash', run:"
 echo "SUCCESS:"
 echo "SUCCESS:      source env.sh"
 echo "SUCCESS:"
-echo "SUCCESS: which can be added to your ~/.bashrc if you wish to automate it"
+echo "SUCCESS: and for C-compatible shells, run:"
+echo "SUCCESS:"
+echo "SUCCESS:      source env.csh"
+echo "SUCCESS:"
+echo "SUCCESS: which can be added to your respective shell's"
+echo "SUCCESS: startup scripts.  Example: ~/.bashrc for 'bash'."
