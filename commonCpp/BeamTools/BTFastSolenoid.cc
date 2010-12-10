@@ -205,11 +205,11 @@ void AddTanhDiffIndex(int n)
     tdi.push_back(std::vector<int>(2,0));
     tdi.back()[1] = 1.;
   }
-  while(uint(n) >= tdi.size() )
+  while(size_t(n) >= tdi.size() )
   {
     tdi.push_back(std::vector<int>(tdi.back().size()+1, 0));
     std::vector<int>& tdi_last = tdi[tdi.size()-2];
-    for(uint i=1; i<tdi_last.size(); i++)
+    for(size_t i=1; i<tdi_last.size(); i++)
     {
       tdi.back()[i-1] += i*tdi_last[i];
       tdi.back()[i+1] -= i*tdi_last[i];
@@ -218,8 +218,9 @@ void AddTanhDiffIndex(int n)
 
 }
 
-std::vector< std::vector<int> > TanhDiffIndices()
-{ return tdi;}
+std::vector< std::vector<int> > TanhDiffIndices(int n)
+{ AddTanhDiffIndex(n)
+      return tdi;}
 
 }
 

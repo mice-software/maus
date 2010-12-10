@@ -335,7 +335,7 @@ void BTMultipole::Print(std::ostream &out) const
 
 	out << "Multipole Order: " << 2*_pole << " Length: " << _length << " Magnitude: " << _magnitude << " BendingRadius: " << _rCurv
 	    << " Height: " << _height << " Width: " << _width << " EndField: "+endFieldModel;
-	if(_pole == 2) out << " EffectiveLength: " << QuadEffectiveLength(1.);
+	//if(_pole == 2) out << " EffectiveLength: " << QuadEffectiveLength(1.);
 	BTField::Print(out);
 }
 

@@ -129,9 +129,9 @@ void dataCards::fillCards(int app)
     cs["SciFiCable"] = "";  //SciFi detector cabling file, found in ${MICEFILES}/Cabling/SciFi/<SciFiCable>
     cs["SciFiCableType"] = ""; //Set to "Imperial" or "Osaka" for different cabling types
     cs["TofCable"] = "tofcabling.txt";  //Tof detector cabling file, found in ${MICEFILES}/Cabling/<TofCable>
-    ci["FieldGridX"]             = 100; //Number of points in the field grid in x. As an optimisation, G4MICE divides the world into a grid. At each step, G4MICE only looks at fields in the local grid. The number of points in each dimension should roughly match the size of the problem in each dimension for a reasonable option, and FieldGridX*FieldGridY*FieldGridZ should be small, say<1e6.
-    ci["FieldGridY"]             = 10; //Number of points in the field grid in y
-    ci["FieldGridZ"]             = 1000; //Number of points in the field grid in z
+    ci["FieldGridX"]             = 2; //Number of points in the field grid in x. As an optimisation, G4MICE divides the world into a grid. At each step, G4MICE only looks at fields in the local grid. The number of points in each dimension should roughly match the size of the problem in each dimension for a reasonable option, and FieldGridX*FieldGridY*FieldGridZ should be small, say<1e6.
+    ci["FieldGridY"]             = 2; //Number of points in the field grid in y
+    ci["FieldGridZ"]             = 100; //Number of points in the field grid in z
 
     // <head>Simulation Application run control</head>
     cd["MaxRadiusInChannel"] = 1.e9 * mm; // Events with r = sqrt(x^2 + y^2) > MaxRadius in global coordinates are killed

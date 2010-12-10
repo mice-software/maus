@@ -22,10 +22,10 @@ public:
   //constructor - with error level, error message and location
 	Squeal(exceptionLevel level, std::string errorMessage, std::string location) throw();
   //constructor - does nothing
-	Squeal() throw() {;}
+  Squeal() throw();
 
   //destructor - does nothing
-	~Squeal() throw() {;}
+  ~Squeal() throw() {;}
   //! Return char buffer message+" at "+location
 	const char* what() const throw() {return (_message+" at "+_location).c_str();}
   //! Print the Message to Squeak::mout(Squeak::error) and Location to Squeak::mout(Squeak::debug)

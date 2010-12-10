@@ -1,4 +1,5 @@
 #include "Squeal.hh"
+#include "Squeak.hh"
 
 #include <ostream>
 #include <sstream>
@@ -13,6 +14,9 @@ std::ostream * Squeal::_debOut       = NULL;
 std::ostream * Squeal::_recOut       = NULL;
 std::ostream * Squeal::_nonRecOut    = NULL;
 const size_t   Squeal::_maxStackSize = 100;
+
+Squeal::Squeal() throw()
+{Squeak::mout();}
 
 Squeal::Squeal(exceptionLevel level, std::string errorMessage, std::string location) throw()
       : exception(), _message(errorMessage), _location(location), _stacktrace(MakeStackTrace(2)), _level(level)

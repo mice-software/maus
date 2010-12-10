@@ -29,8 +29,8 @@ public:
 	void ReadMap(const std::string& mapFile, const std::string& fileType);
 	//Return the file name
 	std::string GetFileName() {return _fileName;}
-	std::vector<double> BoundingBoxMin() {std::vector<double> bbMin(3); bbMin[0]=-_rMin; bbMin[1]=-_rMin; bbMin[2]=_zMin; return bbMin;}
-	std::vector<double> BoundingBoxMax() {std::vector<double> bbMax(3); bbMax[0]=+_rMin; bbMax[1]=+_rMin; bbMax[2]=_zMax; return bbMax;}
+	std::vector<double> BoundingBoxMin() {std::vector<double> bbMin(3); bbMin[0]=-_rMin; bbMin[1]=-_rMax; bbMin[2]=_zMin; return bbMin;}
+	std::vector<double> BoundingBoxMax() {std::vector<double> bbMax(3); bbMax[0]=+_rMin; bbMax[1]=+_rMax; bbMax[2]=_zMax; return bbMax;}
 private:
 	//Spline 1Ds and then a linear interpolation
 	//Thinking about integrating this with the SplineInterpolator

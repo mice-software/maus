@@ -137,7 +137,7 @@ void  fillMaterials( MICERun& run )
   G4Element* elK = man->FindOrBuildElement("K");
   G4Element* elCa = man->FindOrBuildElement("Ca");
   b270->AddElement(elSi, 31.9*perCent);
-  b270->AddElement(elO,  48.6*perCent);
+  b270->AddElement(elO,  48.5*perCent);
   b270->AddElement(elB,   3.3*perCent);
   b270->AddElement(elNa,  5.7*perCent);
   b270->AddElement(elK,   9.9*perCent);

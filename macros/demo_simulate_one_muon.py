@@ -1,17 +1,15 @@
 #!/usr/bin/env python
 from MapCppSimulation import *
 from MapPyRemoveTracks import *
-from Go import * # required by MAUS
+from Map import * # required by MAUS
 
 
 # Create an empty array
-myMappers = []  
+myMap = Map()
 
 # Append the mappers we want
-myMappers.append(MapCppSimulation())
-myMappers.append(MapPyRemoveTracks())
-
-goer = Go(mappers=myMappers)
+myMap.append(MapCppSimulation())
+myMap.append(MapPyRemoveTracks())
 
 document = """{
 "mc": [{
@@ -22,7 +20,8 @@ document = """{
 }]
 }"""
 
-new_document = map(goer.Process, [document])
+myMap.Birth()
+new_document = map(myMap.Process, [document])
 
 for thing in new_document:
     f = open("output", "w")

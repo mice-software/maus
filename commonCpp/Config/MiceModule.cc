@@ -18,17 +18,13 @@
 // Constructor takes the name of a file from which information is read in to instantiate this module or sub component
 
 static int _count = 0;
+const int MiceModule::precision = 100;
 
 MiceModule::MiceModule( std::string filename )
           : _isroot(true), _mother(NULL), _rotation()
 {
   miceMemory.addNew( Memory::MiceModule ); 
   addPropertyString("Volume",  "Box");
-  addPropertyDouble("ScaleFactor", "1.");
-  addPropertyHep3Vector("Dimensions", "0. 0. 0. mm");
-  addPropertyHep3Vector("Position", "0. 0. 0. mm");
-  addPropertyHep3Vector("Rotation", "0. 0. 0. degree");
-
   ModuleTextFileIO io(filename);
   *this = *io.getModule();
   checkNames();
@@ -38,23 +34,13 @@ MiceModule::MiceModule( )
           : _isroot(true), _name(""), _mother(NULL), _rotation()
 {
   miceMemory.addNew( Memory::MiceModule ); 
-  addPropertyString("Volume",  "");
-  addPropertyDouble("ScaleFactor", "1.");
-  addPropertyHep3Vector("Dimensions", "0. 0. 0. mm");
-  addPropertyHep3Vector("Position", "0. 0. 0. mm");
-  addPropertyHep3Vector("Rotation", "0. 0. 0. degree");
 }
 
 MiceModule::MiceModule( MiceModule* parent, std::string name )
           : _isroot(parent==NULL), _name(name), _mother(parent), _rotation()
 {
   miceMemory.addNew( Memory::MiceModule ); 
-  addPropertyString("Volume",  "");
   if(isRoot()) addPropertyString("Volume",  "Box");
-  addPropertyDouble("ScaleFactor", "1.");
-  addPropertyHep3Vector("Dimensions", "0. 0. 0. mm");
-  addPropertyHep3Vector("Position", "0. 0. 0. mm");
-  addPropertyHep3Vector("Rotation", "0. 0. 0. degree");
 }
 
 MiceModule&	MiceModule::operator=( MiceModule& rhs )
@@ -211,6 +197,19 @@ HepGeom::Transform3D MiceModule::relativeTransform(const MiceModule* module ) co
   return transform;
 }
 
+Hep3Vector	MiceModule::dimensions() const {
+  if(propertyExistsThis("Dimensions", "Hep3Vector")) 
+    return propertyHep3Vector("Dimensions");
+  else return Hep3Vector(0,0,0);
+}
+
+
+Hep3Vector	MiceModule::position() const {
+  if(propertyExistsThis("Position", "Hep3Vector")) 
+    return propertyHep3Vector("Position");
+  else return Hep3Vector(0,0,0);
+}
+
 Hep3Vector              MiceModule::relativePosition( const MiceModule* module ) const
 {
   HepGeom::Transform3D transform = relativeTransform(module);
@@ -231,8 +230,15 @@ Hep3Vector		MiceModule::globalPosition() const
   return relativePosition( mother );
 }
 
-// Return the rotation of this module with respect to another module that it is inside of
 
+HepRotation		MiceModule::rotation() const {
+  if(propertyExistsThis("Rotation", "Hep3Vector")) 
+    return Hep3VecToRotation(propertyHep3Vector("Rotation"));
+  else return Hep3VecToRotation(Hep3Vector(0,0,0));
+
+}
+
+// Return the rotation of this module with respect to another module that it is inside of
 HepRotation             MiceModule::relativeRotation( const MiceModule* module ) const
 {
   HepGeom::Transform3D transform = relativeTransform(module);
@@ -253,6 +259,15 @@ HepRotation		MiceModule::globalRotation() const
   return relativeRotation( mother );
 }
 
+double MiceModule::scaleFactor() const 
+{
+  if(propertyExistsThis("ScaleFactor","double"))
+    return propertyDouble("ScaleFactor");
+  else
+    return 1;
+}
+
+
 double   MiceModule::globalScaleFactor() const
 {
   const MiceModule*   mother = this;
@@ -267,18 +282,35 @@ double   MiceModule::globalScaleFactor() const
 }
 
 // --- Methods to add properties
+
+void MiceModule::addPropertyBool( std::string name, std::string val ) {
+  if(_bools.find(name) != _bools.end()) 
+    throw(Squeal(Squeal::recoverable, "Attempt to add PropertyBool "+name+" twice in module "+this->fullName(), "MiceModule::addPropertyBool")); 
+  _bools[name] = val;
+}
+
 void MiceModule::addPropertyBool( std::string name, bool val )
 { 
   if(_bools.find(name) != _bools.end()) 
     throw(Squeal(Squeal::recoverable, "Attempt to add PropertyBool "+name+" twice in module "+this->fullName(), "MiceModule::addPropertyBool")); 
-  _bools[name] = val; 
+
+  std::stringstream myInpStream;
+  myInpStream << val;
+  _bools[name] = myInpStream.str(); 
 }
 
 void MiceModule::addPropertyInt( std::string name, int val )
 { 
-  if(_ints.find(name) != _ints.end()) 
+  std::stringstream myInpStream;
+  myInpStream << val;
+  addPropertyInt(name, myInpStream.str());
+}
+
+void MiceModule::addPropertyInt( std::string name, std::string val )
+{
+  if(_ints.find(name) != _ints.end())
     throw(Squeal(Squeal::recoverable, "Attempt to add PropertyInt "+name+" twice in module "+this->fullName(), "MiceModule::addPropertyInt")); 
-  _ints[name] = val; 
+  _ints[name] = val;
 }
 
 void MiceModule::addPropertyDouble( std::string name, double val )
@@ -291,20 +323,14 @@ void MiceModule::addPropertyDouble( std::string name, double val )
 
 void MiceModule::addPropertyDouble( std::string name, std::string val )
 { 
-  std::string exceptions[1] = {"ScaleFactor"};
-  bool exception = false;
-  for(int i=0; i<1; i++) if(exceptions[i] == name) exception = true;
-  if(!exception && _doubles.find(name) != _doubles.end())
+  if(_doubles.find(name) != _doubles.end())
     throw(Squeal(Squeal::recoverable, "Attempt to add PropertyDouble "+name+" twice in module "+this->fullName(), "MiceModule::addPropertyDouble")); 
   _doubles[name] = val;
 }
 
 void MiceModule::addPropertyString( std::string name, std::string val )
 { 
-  std::string exceptions[1] = {"Volume"};
-  bool exception = false;
-  for(int i=0; i<1; i++) if(exceptions[i] == name) exception = true;
-  if(!exception && _strings.find(name) != _strings.end()) 
+  if(_strings.find(name) != _strings.end()) 
     throw(Squeal(Squeal::recoverable, "Attempt to add PropertyString "+name+" twice in module "+this->fullName(), "MiceModule::addPropertyString")); 
   _strings[name] = val;
 }
@@ -319,10 +345,7 @@ void MiceModule::addPropertyHep3Vector( std::string name, CLHEP::Hep3Vector val 
 
 void MiceModule::addPropertyHep3Vector( std::string name, std::string val )
 { 
-  std::string exceptions[3] = {"Dimensions", "Position", "Rotation"};
-  bool exception = false;
-  for(int i=0; i<3; i++) if(exceptions[i] == name) exception = true;
-  if(!exception && _hep3vectors.find(name) != _hep3vectors.end()) 
+  if(_hep3vectors.find(name) != _hep3vectors.end()) 
     throw(Squeal(Squeal::recoverable, "Attempt to add PropertyHep3Vector "+name+" twice in module "+this->fullName(), "MiceModule::addPropertyHep3Vector")); 
   _hep3vectors[name] = val; 
 }
@@ -382,7 +405,8 @@ bool                    MiceModule::propertyBoolThis( std::string property ) con
 bool                    MiceModule::propertyBool( std::string property ) const
 {
   Squeal squeal(Squeal::recoverable, "Couldn't find property "+property+" in module "+fullName(), "MiceModule::propertyBool");
-  bool prop = false;
+  std::string prop;
+  bool        prop_bool;
 
   if( propertyExistsThis( property, "bool" ) )
     prop = _bools.find( property )->second;
@@ -390,8 +414,9 @@ bool                    MiceModule::propertyBool( std::string property ) const
     try{prop = _mother->propertyBool( property );} catch(Squeal squee) {throw squeal;}
   else
     throw(squeal);
+  ModuleTextFileIO::parseString(prop, prop_bool);
 
-  return prop;
+  return prop_bool;
 }
 
 //  Return the named integer property
@@ -403,18 +428,29 @@ int                    MiceModule::propertyIntThis( std::string property ) const
     throw Squeal(Squeal::recoverable, "Couldn't find property "+property+" in module "+fullName(), "MiceModule::propertyIntThis");
 }
 
-int                     MiceModule::propertyInt( std::string property ) const
+// Return the named int property
+int                  MiceModule::propertyInt( std::string property ) const
 {
-  Squeal squeal(Squeal::recoverable, "Couldn't find property "+property+" in module "+fullName(), "MiceModule::propertyInt");
-  int prop = -1;
+  std::string prop_str;
+  int      prop_int;
   if( propertyExistsThis( property, "int" ) )
-    prop = _ints.find( property )->second;
+  {
+    try{
+      prop_str = _ints.find( property )->second;
+      ModuleTextFileIO::setEvaluator(_parameters);
+      ModuleTextFileIO::parseString(prop_str, prop_int);
+    }
+    catch(Squeal squee)
+    {
+      std::string error = squee.GetMessage();
+      throw(Squeal(Squeal::recoverable, "Error parsing MiceModule "+fullName()+" property "+property+". Error was reported as \'"+error+"\'", "MiceModule::propertyInt"));
+    }
+  }
   else if( _mother )
-    try{prop = _mother->propertyInt( property );} catch(Squeal squee) {throw squeal;}
+    prop_int = _mother->propertyInt( property );
   else
-    throw(squeal);
-
-  return prop;
+    throw Squeal(Squeal::recoverable, "Couldn't find property "+property+" in module "+fullName(), "MiceModule::propertyInt");
+  return prop_int;
 }
 
 double                  MiceModule::propertyDoubleThis( std::string property ) const
@@ -548,18 +584,19 @@ void			MiceModule::printProperties( std::string indent ) const
 {
   // print out any boolean properties of this module
 
-  for( std::map<std::string,bool>::const_iterator it = _bools.begin(); it != _bools.end(); ++it )
+  for( std::map<std::string,std::string>::const_iterator it = _bools.begin(); it != _bools.end(); ++it )
      std::cout << indent << "Boolean property " << (*it).first << " has the value " << (*it).second << std::endl;
 
   // print out any integer properties of this module
-
-  for( std::map<std::string,int>::const_iterator it = _ints.begin(); it != _ints.end(); ++it )
-     std::cout << indent << "Integer property " << (*it).first << " has the value " << (*it).second << std::endl;
-
+  for( std::map<std::string,std::string>::const_iterator it = _ints.begin(); it != _ints.end(); ++it )//reads strings
+    {
+      std::cout << indent << "Integer property " << (*it).first << " has the value " << (*it).second << std::endl;
+    }
+  
   // print out any double properties of this module
 
   for( std::map<std::string,std::string>::const_iterator it = _doubles.begin(); it != _doubles.end(); ++it )
-     std::cout << indent << "Double property " << (*it).first << " has the value " << (*it).second << std::endl;
+    std::cout << indent << "Double property " << (*it).first << " has the value " << (*it).second << std::endl;
 
   // print out any string properties of this module
 
@@ -675,12 +712,12 @@ void MiceModule::ithBool( int i, std::string& name, bool& val ) const
 {
   int count = 0;
 
-  for( std::map<std::string,bool>::const_iterator it = _bools.begin(); it != _bools.end(); ++it )
+  for( std::map<std::string,std::string>::const_iterator it = _bools.begin(); it != _bools.end(); ++it )
   {
     if( count == i )
     {
       name = it->first;
-      val = it->second;
+      val = propertyBool(it->first);
       it = _bools.end();
     }
     ++count;
@@ -691,12 +728,12 @@ void MiceModule::ithInt( int i, std::string& name, int& val ) const
 {
   int count = 0;
 
-  for( std::map<std::string,int>::const_iterator it = _ints.begin(); it != _ints.end(); ++it )
+  for( std::map<std::string, std::string>::const_iterator it = _ints.begin(); it != _ints.end(); ++it )
   {
     if( count == i )
     {
       name = it->first;
-      val = it->second;
+      val = propertyInt(name);
       it = _ints.end();
     }
     ++count;
@@ -1027,9 +1064,9 @@ std::string MiceModule::rotationString(HepRotation rot)
 MiceModule* MiceModule::copyDisplaced(Hep3Vector translation, HepRotation rotation, double scaleFactor)
 {
   MiceModule* copy = deepCopy(*this, true);
-  copy->setPosition(copy->position() + copy->rotation().inverse()*translation);
-  copy->setRotation(rotation*copy->rotation());
-  copy->setScaleFactor(copy->scaleFactor()*scaleFactor);
+  copy->_hep3vectors["Position"]     = ModuleTextFileIO::toString(copy->position() + copy->rotation().inverse()*translation, precision);
+  copy->_hep3vectors["Rotation"]     = ModuleTextFileIO::toString(HepRotationTo3Vec(rotation*copy->rotation()),              precision);
+  copy->_doubles    ["ScaleFactor"]  = ModuleTextFileIO::toString(copy->scaleFactor()*scaleFactor,                           precision);
   return copy;
 }
 
@@ -1037,7 +1074,6 @@ void MiceModule::addParameter(std::string key, double value)
 {
   _parameters[key] = value;
 }
-
 void MiceModule::setRotation(HepRotation rotation)     
 {
   addPropertyHep3Vector( "Rotation", HepRotationTo3Vec(rotation) );
@@ -1052,23 +1088,28 @@ void MiceModule::removeDaughter(MiceModule* daughter)
 //idr 27/10/10
 
 //! Get the map of boolean properties for the MiceModule
-template <>
+template <> 
 std::map<std::string, bool> MiceModule::getListOfProperties<bool>()
 {
-  std::map<std::string, bool> r = _bools;
+  std::map<std::string, bool> r;
+  for( std::map<std::string,std::string>::const_iterator it = _bools.begin(); it != _bools.end(); ++it )
+    r[it->first] = propertyBool( it->first );
   return r;
 }
 
 //! Get the map of integer properties for the MiceModule
-template <>
+template <> 
 std::map<std::string, int> MiceModule::getListOfProperties<int>()
 {
-  std::map<std::string, int> r = _ints;
+  std::map<std::string, int> r;
+  for( std::map<std::string,std::string>::const_iterator it = _ints.begin(); it != _ints.end(); ++it )
+    r[it->first] = propertyInt( it->first );
+
   return r;
 }
 
 //! Get the map of std::string properties for the MiceModule
-template <>
+template <> 
 std::map<std::string, std::string> MiceModule::getListOfProperties<std::string>()
 {
   std::map<std::string, std::string> r = _strings;
@@ -1078,7 +1119,7 @@ std::map<std::string, std::string> MiceModule::getListOfProperties<std::string>(
 //! Get the map of double properties for the MiceModule
 
 //! Use the evaluator to convert from string and account for units
-template <>
+template <> 
 std::map<std::string, double> MiceModule::getListOfProperties<double>()
 {
   std::map<std::string, double> r;
@@ -1091,7 +1132,7 @@ std::map<std::string, double> MiceModule::getListOfProperties<double>()
 //! Get the map of Hep3Vector properties for the MiceModule
 
 //! Use the evaluator to convert from string and account for units
-template <>
+template <> 
 std::map<std::string, Hep3Vector> MiceModule::getListOfProperties<Hep3Vector>()
 {
   std::map<std::string, Hep3Vector> r;
@@ -1100,4 +1141,8 @@ std::map<std::string, Hep3Vector> MiceModule::getListOfProperties<Hep3Vector>()
 
   return r;
 }
+
+
+
+
 

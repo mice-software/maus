@@ -19,8 +19,26 @@
 #include "CLHEP/Geometry/Transform3D.h"
 
 #include "Interface/MICEUnits.hh"
+#include "Config/ModuleTextFileIO.hh"
 
-#include "Interface/Memory.hh" 
+#include "Interface/Memory.hh"
+
+using namespace CLHEP;
+
+//! MiceModule object handles geometry information and other relevant parameters for G4MICE
+//! 
+//! MiceModule is essentially a wrapper for a std::map from string property name to int, 
+//! Hep3Vector, string and double property types. Caveat is that numerical property types 
+//! are stored as strings until they are needed. This is so that we can evaluate them as 
+//! equations.
+//!
+//! MiceModules sit in a nested tree structure, so that one module will sit inside another
+//! module with relative position and rotation to the parent module. MiceModule is stores 
+//! position, rotation and scale information, including a few functions to get e.g. position 
+//! relative to another module, or relative to the global volume. ScaleFactor is a property
+//! for the field maps, giving a linear scaling to the fields represented by the MiceModule
+//! and all fields below it.
+//!
 
 using namespace CLHEP;
 
@@ -42,30 +60,30 @@ class MiceModule
 
     std::string	name() const		{ return _name; };
     std::string	fullName() const; // Return the concatenated name of this module with all its mothers
-    bool		isRoot() const		{ return _isroot; };
+    bool		isRoot() const	  	{ return _isroot; };
     void		printTree( int ) const;
     MiceModule*	mother() const		{ return _mother; };
-    MiceModule*	mother()		{ return _mother; };
+    MiceModule*	mother()	      	{ return _mother; };
  
     int			daughters() const	{ return _daughters.size(); };
     MiceModule*	daughter( int ) const;
     std::vector<MiceModule*> allDaughters() const 	{ return _daughters; };
 
     // Return the type of volume this module is describing
-    std::string	volType() const		{ return propertyString("Volume"); };
-    Hep3Vector	dimensions() const	{ return propertyHep3Vector("Dimensions"); };
+    std::string volType()    const {return propertyString("Volume");}
+    Hep3Vector	dimensions() const;
     bool        isInside( const MiceModule* ) const;
 
     // Return the position of this module with respect to the parent module
-    Hep3Vector		position() const	{ return propertyHep3Vector("Position"); };
+    Hep3Vector		position() const;
     // Return the position of this module with respect to another module that it is inside of
     Hep3Vector		relativePosition( const MiceModule* ) const;
     // Return the position of this module with respect to the global coordinate system
     Hep3Vector		globalPosition() const;
     // Return the rotation of this module with respect to the module that it is inside
-    HepRotation		rotation() const	{ return Hep3VecToRotation(propertyHep3Vector("Rotation")); };
+    HepRotation		rotation() const;
     // Return the rotation of this module with respect to another module that it is inside of
-    const HepRotation*	rotationPointer() { _rotation = Hep3VecToRotation(propertyHep3Vector("Rotation")); return &_rotation; };
+    const HepRotation*	rotationPointer() { _rotation = rotation(); return &_rotation; };
     HepRotation		relativeRotation( const MiceModule* ) const;
 
     // Return the rotation of this module with respect to the global coordinate system
@@ -74,11 +92,16 @@ class MiceModule
     // Do the relative transformation
     HepGeom::Transform3D relativeTransform( const MiceModule* ) const;
 
-    // Return the scale factor
-    double scaleFactor() const {return propertyDouble("ScaleFactor");}
+    // Return the scale factor (or default 1.)
+    double scaleFactor() const;
 
     // Return the product of this scale factor and all parents' scale factors
     double globalScaleFactor() const;
+
+
+    //Set the named property - doesn't throw an exception if property already exists, just silently overwrites
+    template <typename T> 
+    void setProperty(std::string property, T val);
 
     // --- Methods to provide "Properties" of a Module
     // Return true if this property exists as a particular type
@@ -95,6 +118,7 @@ class MiceModule
     unsigned int	numPropertyBool() const 						{ return _bools.size(); };
     void		ithBool( int i, std::string& name, bool& val ) const;
     void		addPropertyBool( std::string name, bool val );
+    void		addPropertyBool( std::string name, std::string val );
 
     //Return the named int property
     int			propertyIntThis( std::string propertyName ) const;
@@ -105,6 +129,7 @@ class MiceModule
     unsigned int	numPropertyInt() const 							{ return _ints.size(); };
     void		ithInt( int i, std::string& name, int& val ) const;
     void		addPropertyInt( std::string name, int val );
+    void		addPropertyInt( std::string name, std::string val );
 
     //Return the named double property
     double		propertyDoubleThis( std::string propertyName ) const;
@@ -154,14 +179,10 @@ class MiceModule
     bool		checkGeometry( MiceModule* daught ) const;
     bool		isInside( const Hep3Vector&, const MiceModule*,  bool quiet = false ) const;
 
-	//setup methods
+    //setup methods
     void        addDaughter(MiceModule* daughter)     {_daughters.push_back(daughter); daughter->_mother=this;}
     void        removeDaughter(MiceModule* daughter);
-    void        setDimensions(Hep3Vector dim)         {addPropertyHep3Vector( "Dimensions", dim );}
-    void        setPosition(Hep3Vector position)      {addPropertyHep3Vector( "Position", position );}
     void        setRotation(HepRotation rotation);
-    void        setScaleFactor(double scaleFactor)    {addPropertyDouble    ( "ScaleFactor", scaleFactor );}
-    void        setVolumeType(std::string volumeType) {addPropertyString    ( "Volume", volumeType );}
     void        setName(std::string name)             {_name        = name;}
     void        setMother(MiceModule* mother)         {_mother      = mother;}
     //convert from HepRotation to string "xTheta yTheta zTheta"
@@ -173,38 +194,51 @@ class MiceModule
 
     void        addParameter(std::string key, double value);
 
-    //idr 27/10/10
-    //! Template the code to get lists of properties from the MiceModule
-    template <typename T>
-    std::map<std::string, T> getListOfProperties();
+  //idr 27/10/10
+  //! Template the code to get lists of properties from the MiceModule
+  template <typename T>
+  std::map<std::string, T> getListOfProperties();
+private :
 
-  private :
+   //return the map of the appropriate type
+   std::map<std::string, std::string>* getPropertyMap(bool        dummy) {return &_bools;}
+   std::map<std::string, std::string>* getPropertyMap(int         dummy) {return &_ints;}
+   std::map<std::string, std::string>* getPropertyMap(std::string dummy) {return &_strings;}
+   std::map<std::string, std::string>* getPropertyMap(double      dummy) {return &_doubles;}
+   std::map<std::string, std::string>* getPropertyMap(CLHEP::Hep3Vector dummy) {return &_hep3vectors;}
+
    void			printProperties( std::string ) const;
-
    void			checkNames();
 
-   bool					_isroot;
+   bool					      _isroot;
    std::string				_name;
    MiceModule*				_mother;
    std::vector<MiceModule*>		_daughters;
    HepRotation				_rotation;
-//   std::string			_volType; CTR - Is now a property
-//   Hep3Vector				_dimensions;
-//   Hep3Vector				_position;
-//   double                   		_scaleFactor; //scale factor for fields defined in the module
 
-   std::map<std::string,bool>		_bools;
-   std::map<std::string,int>		_ints;
-   std::map<std::string,std::string> 	_strings;
+   std::map<std::string,std::string> _bools;
+   std::map<std::string,std::string> _ints;//Oct2010. Now ints will be read as strings
+   std::map<std::string,std::string> _strings;
    //I store doubles as strings so that I can use evaluator on them...
    //It would be nice if I could always use evaluator at ModuleTextFileIO time, but that's not always possible
    //In particular, when doing repeats, I need to parse the propertyInt number of repeats, then run the
-   //evaluator against the $$RepeatNumber, so I have to run the evaluator after doing IO
-   std::map<std::string,std::string> 	_doubles; 
-   std::map<std::string,std::string>	_hep3vectors;
-   //parameters to be passed to the evaluator. Note that $$ is aliased to MI_ as evaluator can only handle alphanumerics
+   //evaluator against the @RepeatNumber, so I have to run the evaluator after doing IO
+   std::map<std::string,std::string> _doubles; 
+   std::map<std::string,std::string> _hep3vectors;
+   //parameters to be passed to the evaluator. Note that @ is aliased to MI_ as evaluator can only handle alphanumerics
    std::map<std::string,double>		_parameters;
+   static const int precision;
 };
+
+//Set the named property - doesn't throw an exception if property already exists, just silently overwrites
+template <typename T>
+void MiceModule::setProperty(std::string property, T val) {
+  std::string val_string = ModuleTextFileIO::toString(val, precision);
+  std::map<std::string, std::string>* prop_map = getPropertyMap(val);
+  (*prop_map)[property] = val_string;
+}
+
+
 
 
 

@@ -92,6 +92,7 @@ void BTFieldConstructor::BuildFields(MiceModule * rootModule)
 		}
 	}
   _magneticField->Close();
+  _electroMagneticField->Close();
 
 	SetPhaser();
 	WriteFieldMaps();

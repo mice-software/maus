@@ -14,19 +14,19 @@
 //along with xboa in the doc folder.  If not, see 
 //<http://www.gnu.org/licenses/>.
 //
-//Wrapper for GSL matrix
-//MMatrix class handles matrix algebra, maths operators and some
-//higher level calculation like matrix inversion, eigenvector
-//analysis etc
+//! Wrapper for GSL matrix
+//! MMatrix class handles matrix algebra, maths operators and some
+//! higher level calculation like matrix inversion, eigenvector
+//! analysis etc
 //
-//Use template to define two types:
-// (i) MMatrix<double> is a matrix of doubles
-// (ii) MMatrix<m_complex> is a matrix of m_complex
+//! Use template to define two types:
+//! (i) MMatrix<double> is a matrix of doubles
+//! (ii) MMatrix<m_complex> is a matrix of m_complex
 //
-//Maths operators and a few others are defined, but maths operators
-//don't allow operations between types - i.e. you can't multiply
-//a complex matrix by a double matrix. Instead use interface methods
-//like real() and complex() to convert between types first
+//! Maths operators and a few others are defined, but maths operators
+//! don't allow operations between types - i.e. you can't multiply
+//! a complex matrix by a double matrix. Instead use interface methods
+//! like real() and complex() to convert between types first
 
 
 #ifndef MMatrix_h
@@ -50,11 +50,11 @@ class MMatrix
 {
 public:
   MMatrix();
-  MMatrix(const MMatrix<Tmplt>& mv ); //matrix with dimension i*j, filled with value
-  MMatrix(size_t nrows, size_t ncols, Tmplt* data_beginning ); //matrix with dimension i*j, filled with data from memory block starting at data_beg
-  MMatrix(size_t nrows, size_t ncols, Tmplt  value    ); //matrix with dimension i*j, filled with value
-  MMatrix(size_t nrows, size_t ncols); //matrix with dimension i*j, filled with 0.
-  static MMatrix<Tmplt>  Diagonal(size_t i, Tmplt diag_value, Tmplt off_diag_value); //matrix with dimension i*i, filled with diag_value on the diagonal and off_diag_value elsewhere
+  MMatrix(const MMatrix<Tmplt>& mv ); //! matrix with dimension i*j, filled with value
+  MMatrix(size_t nrows, size_t ncols, Tmplt* data_beginning ); //! matrix with dimension i*j, filled with data from memory block starting at data_beg
+  MMatrix(size_t nrows, size_t ncols, Tmplt  value    ); //! matrix with dimension i*j, filled with value
+  MMatrix(size_t nrows, size_t ncols); //! matrix with dimension i*j, filled with 0.
+  static MMatrix<Tmplt>  Diagonal(size_t i, Tmplt diag_value, Tmplt off_diag_value); //! matrix with dimension i*i, filled with diag_value on the diagonal and off_diag_value elsewhere
 //  static MMatrix<double> Rotation(size_t dimension, Tmplt* angle_beginning); //arbitrary dimension rotation matrix; angle_beginning is an array of angles; matrix is given by M(t1)*M(t2)*...
   ~MMatrix();
  
@@ -80,6 +80,12 @@ public:
 
   MMatrix<Tmplt>& operator= (const MMatrix<Tmplt>& mm);
 
+  //TODO - implement iterator
+  //class iterator
+  //{
+  //}
+
+
   friend MMatrix<m_complex>& operator *=(MMatrix<m_complex>& m,  m_complex          c);
   friend MMatrix<double>&    operator *=(MMatrix<double>&    m,  double             d);
   friend MMatrix<m_complex>& operator *=(MMatrix<m_complex>& m1, MMatrix<m_complex> m2);
@@ -94,6 +100,7 @@ public:
   friend const gsl_matrix_complex* MMatrix_to_gsl(const MMatrix<gsl_complex>& m);
  
   friend class MMatrix<double>; //To do the eigenvector problem, MMatrix<double> needs to see MMatrix<complex>'s _matrix
+
 
 private:
   //build the matrix with size i,j, data not initialised

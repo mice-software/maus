@@ -30,7 +30,8 @@ MICEPhysicsList* MICEPhysicsList::GetMICEPhysicsList()
   dataCards& dc = *MICERun::getInstance()->DataCards;
   std::string physModel     = dc.fetchValueString("PhysicsModel");
   G4PhysListFactory fact;
-  return new MICEPhysicsList(fact.GetReferencePhysList(physModel) );
+  if(fact.IsReferencePhysList(physModel)) return new MICEPhysicsList(fact.GetReferencePhysList(physModel) );
+  else throw(Squeal(Squeal::recoverable, "Failed to recognise physics list model "+physModel, "MICEPhysicsList::GetMICEPhysicsList()"));
 }
 
 void MICEPhysicsList::BeginOfReferenceParticleAction()
@@ -191,13 +192,22 @@ void MICEPhysicsList::SetHadronic(hadronic hadronicModel)
       break;
   }
 
-  G4UImanager*       UI           = G4UImanager::GetUIpointer();
+  G4UImanager*       UI    = G4UImanager::GetUIpointer();
   G4ProcessVector*   pvec  = G4ProcessTable::GetProcessTable()->FindProcesses(fHadronic);
   for(int i=0; i<pvec->size(); i++) {
     std::string pname = (*pvec)[i]->GetProcessName();
     Squeak::mout(Squeak::debug) << "Applying " << activation+pname << std::endl;
     UI->ApplyCommand( activation+pname );
   }
+}
+
+void MICEPhysicsList::SetSpecialProcesses()
+{
+  theParticleIterator->reset(); //from G4VUserPhysicsList
+  while( (*theParticleIterator)() ) {
+    G4ProcessManager* pmanager = theParticleIterator->value()->GetProcessManager();
+    pmanager->AddProcess( new G4StepLimiter,-1,-1,2);
+  }  
 }
 
 void MICEPhysicsList::RunUserUICommand(std::string filename)
@@ -210,8 +220,8 @@ void MICEPhysicsList::SetHalfLife(double pionHalfLife,  double muonHalfLife)
 {
   SetParticleHalfLife("pi+", pionHalfLife);
   SetParticleHalfLife("pi-", pionHalfLife);
-  SetParticleHalfLife("mu+", pionHalfLife);
-  SetParticleHalfLife("mu-", pionHalfLife);
+  SetParticleHalfLife("mu+", muonHalfLife);
+  SetParticleHalfLife("mu-", muonHalfLife);
 }
 
 void MICEPhysicsList::SetParticleHalfLife(std::string particleName, double halfLife)

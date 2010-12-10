@@ -524,8 +524,6 @@ PolynomialVector* PolynomialVector::Chi2SweepingLeastSquaresFitVariableWalls
         chi2  = pvec1->GetAvgChi2OfDifference(in, out);
         if(chi2 > chi2Max)
           delta[i] /= deltaFactor;
-        for(size_t i=0; i<delta.size(); i++) std::cout << delta[i] << " ";
-        std::cout << "** " << chi2 << " " << chi2Max << std::endl;
       }
     }
     delete pvec1;

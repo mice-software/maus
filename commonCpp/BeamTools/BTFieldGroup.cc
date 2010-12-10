@@ -68,8 +68,6 @@ void BTFieldGroup::AddField(BTField * newField, const Hep3Vector position, doubl
 	_closed = false;
 	newField->SetParentField(this);
 	_fields.push_back(newField);
-//	HepVector positionAsVector;
-//	positionAsVector = position; //use a HepVector for matrix multiplication etc
 	_translations.push_back(position);
 	_isRotated.push_back(false);
 	_rotations.push_back(HepRotation());
@@ -84,8 +82,6 @@ void BTFieldGroup::AddField(BTField * newField, const Hep3Vector position,
 	_closed = false;
 	newField->SetParentField(this);
 	_fields.push_back(newField);
-	//HepVector positionAsVector;
-	//positionAsVector = position; //use a HepVector for matrix multiplication etc
 	_translations.push_back(position);
 	_isRotated.push_back(!rotation.isIdentity());
 	_rotations.push_back(rotation.inverse());
@@ -96,6 +92,7 @@ void BTFieldGroup::AddField(BTField * newField, const Hep3Vector position,
 
 void BTFieldGroup::Close()
 {
+  if(_closed) return;
   double tol = 1e-9; //double point tolerance
   //bb abbreviates bounding box, bb is a list of vertices of each field's bounding box
   std::vector< std::vector<CLHEP::Hep3Vector> > bb(_fields.size(), std::vector<CLHEP::Hep3Vector>(8));

@@ -284,7 +284,7 @@ TwoDGrid* BTSolenoid::BuildGrid1(double absoluteTolerance)
 		
 	std::vector<double> newZ(zGrid.size()*2-1, 0);
 	for(unsigned int i=0; i<zGrid.size(); i++) {newZ[zGrid.size()-i-1] = -zGrid[i]; newZ[zGrid.size()+i-1] = +zGrid[i];}
-	Squeak::mout(Squeak::info) << "Generated grid with " << rGrid.size() << "x" << zGrid.size() << " points extending " 
+	Squeak::mout(Squeak::debug) << "Generated grid with " << rGrid.size() << "x" << zGrid.size() << " points extending " 
 	                           << (rGrid.back()-rGrid[0])/m << "x" << (zGrid.back()-zGrid[0])/m << " m with tolerance " << absoluteTolerance/tesla
 	                           << " T calculated at (" << rOrder << "," << zOrder << ") order" << std::endl;
 
