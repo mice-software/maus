@@ -16,11 +16,11 @@ std::ostream * Squeal::_nonRecOut    = NULL;
 const size_t   Squeal::_maxStackSize = 100;
 
 Squeal::Squeal() throw()
-{Squeak::mout();}
+{Squeak::mout();} //make sure we initialise Squeak otherwise can get segv
 
 Squeal::Squeal(exceptionLevel level, std::string errorMessage, std::string location) throw()
       : exception(), _message(errorMessage), _location(location), _stacktrace(MakeStackTrace(2)), _level(level)
-{}
+{Squeak::mout();} //make sure we initialise Squeak otherwise can get segv
 
 void Squeal::Print()
 {

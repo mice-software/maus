@@ -48,43 +48,34 @@ G4VSolid* buildSolid ( MiceModule* mod )
 //One for each supported G4Solid
 G4VSolid * buildWedge    ( MiceModule* mod)
 {
-  checkDim(mod, 3);
 	return new G4Trd( mod->name()+"Wedge", mod->dimensions().x()/2., mod->dimensions().x()/2., 
 	                  mod->dimensions().y(), 0, mod->dimensions().z()/2.);
 }
 
 G4VSolid * buildBox      ( MiceModule* mod)
 {
-  checkDim(mod, 3);
 	return new G4Box( mod->name() + "Box", mod->dimensions().x() / 2., mod->dimensions().y() / 2.,
 	                  mod->dimensions().z() / 2. );
 }
 
 G4VSolid * buildCylinder ( MiceModule* mod )
 {
-  checkDim(mod, 2);
 	return new G4Tubs( mod->name() + "Tubs", 0., mod->dimensions().x(), mod->dimensions().y() / 2., 0. * deg, 360. * deg );
 }
 
 G4VSolid * buildTube     ( MiceModule* mod )
 {
-  checkDim(mod, 3);
-  if(mod->dimensions().x() > mod->dimensions().y()) 
-    throw(Squeal(Squeal::recoverable, "Inner radius > outer radius of tube made from module "+mod->fullName(), "MiceModToG4Solid::buildTube") );
 	return new G4Tubs( mod->name() + "Tubs", mod->dimensions().x(), mod->dimensions().y(), mod->dimensions().z() / 2., 0. * deg, 360. * deg );
 }
 
 G4VSolid * buildEllipticalCone   ( MiceModule* mod )
 {
 	double zcut = 2.*mod->dimensions().z();
-	if( mod->propertyExistsThis( "ZCut", "double" )) {
-  	if( mod->propertyDouble( "ZCut" )>0.) 
-      zcut = mod->propertyDoubleThis("ZCut");
-    else 
-      throw(Squeal(Squeal::recoverable, "Elliptical cone ZCut should be > 0.", "MiceModule::buildEllipticalCone"));
-  }
-  G4EllipticalCone * out = new G4EllipticalCone(mod->name() + "Cone", mod->dimensions().x()/mod->dimensions().z(), 
-                                                mod->dimensions().y()/mod->dimensions().z(), mod->dimensions().z(), zcut);
+	if( mod->propertyExistsThis( "ZCut", "double" ))
+		zcut = mod->propertyDoubleThis("ZCut");
+        //G4EllipticalCone takes semi_axis_x/length, semi_axis_y/length, length
+        G4EllipticalCone * out = new G4EllipticalCone(mod->name() + "Cone", mod->dimensions().x()/mod->dimensions().z(), 
+                                                      mod->dimensions().y()/mod->dimensions().z(), mod->dimensions().z(), zcut);
 	return out;
 }
 
@@ -96,18 +87,11 @@ G4VSolid * buildSphere   ( MiceModule* mod )
 	if( mod->propertyExistsThis( "Phi", "Hep3Vector" )) 
 		phi = mod->propertyHep3VectorThis("Phi");
 	else	phi = Hep3Vector(0.0*deg, 360.0*deg, -1.0);
-  if(phi.x() < 0.*deg || phi.x() > 360.*deg || phi.y() < 0.*deg || phi.y() > 360.*deg)
-    throw(Squeal(Squeal::recoverable, "Phi out of range in sphere module "+mod->fullName(), "MiceModToG4Solid::buildSphere") );
 
 	if( mod->propertyExistsThis( "Theta", "Hep3Vector" ))
 		theta = mod->propertyHep3VectorThis("Theta");
-	else	theta = Hep3Vector(0.0*deg, 180.0*deg, -1.0);
-  if(theta.x() < 0.*deg || theta.x() > 180.*deg || theta.y() < 0.*deg || theta.y() > 180.*deg)
-    throw(Squeal(Squeal::recoverable, "Theta out of range in sphere module "+mod->fullName(), "MiceModToG4Solid::buildSphere") );
+	else	theta = Hep3Vector(0.0*deg, 360.0*deg, -1.0);
 
-  if( mod->dimensions().x() >= mod->dimensions().y() )
-    throw(Squeal(Squeal::recoverable, "Inner radius > outer radius of sphere made from module "+mod->fullName(), "MiceModToG4Solid::buildSphere") );
-  checkDim(mod, 2);
 	return new G4Sphere(mod->name() + "Sphere", mod->dimensions().x(), mod->dimensions().y(), phi.x(), phi.y(), theta.x(), theta.y());
 }
 
@@ -124,13 +108,7 @@ G4VSolid * buildTorus    ( MiceModule* mod )
 	double rCurv      = mod->propertyDoubleThis("TorusRadiusOfCurvature");
 	double angleStart = mod->propertyDoubleThis("TorusAngleStart");
 	double openAngle  = mod->propertyDoubleThis("TorusOpeningAngle");
-  if(pRmin < 0.)    throw(Squeal(Squeal::recoverable, "Negative torus inner radius not allowed in module "+mod->fullName(), "MiceModToG4Solid::buildTorus"));
-  if(pRmax < pRmin) throw(Squeal(Squeal::recoverable, "Torus outer radius should be > torus inner radius in module "+mod->fullName(), "MiceModToG4Solid::buildTorus"));
-  if(pRmax > rCurv) throw(Squeal(Squeal::recoverable, "Torus outer radius should be < torus radius of curvature in module "+mod->fullName(), "MiceModToG4Solid::buildTorus"));
-  if(angleStart < 0. || angleStart > 360.*deg) 
-    throw(Squeal(Squeal::recoverable, "Torus start angle out of range in module "+mod->fullName(), "MiceModToG4Solid::buildTorus"));
-  if(openAngle <= 0. || openAngle > 360.*deg) 
-    throw(Squeal(Squeal::recoverable, "Torus start angle out of range in module "+mod->fullName(), "MiceModToG4Solid::buildTorus"));
+
 	return new G4Torus( mod->name() + "TorusSegment", pRmin, pRmax, rCurv, angleStart, openAngle );
 }
 
@@ -143,10 +121,10 @@ G4VSolid * buildMultipole( MiceModule* mod )
 
 G4VSolid * buildBoolean  ( MiceModule* mod )
 {
-	MiceModule* base      = getModule(mod, mod->propertyStringThis("BaseModule"));
-	G4VSolid*   baseSolid = buildSolid(base);
-	std::string boolProp  = "BooleanModule1";
-	int         index     = 1;
+	MiceModule* base     = getModule(mod, mod->propertyStringThis("BaseModule"));
+	G4VSolid*   baseSolid    = buildSolid(base);
+	std::string boolProp = "BooleanModule1";
+	int         index    = 1;
 	while(mod->propertyExistsThis(boolProp, "string"))
 	{
 		MiceModule*         next   = getModule(mod, mod->propertyStringThis(boolProp));
@@ -164,7 +142,7 @@ G4VSolid * buildBoolean  ( MiceModule* mod )
 		else throw(Squeal(Squeal::recoverable, "Did not recognise boolean type "+type, 
 		                                       "MiceModToG4Solid::buildBoolean"));
 		index++;
-		std::stringstream iStream;
+		std::stringstream iStream; 
 		iStream << "BooleanModule" << index;
 		boolProp = iStream.str();
 		mod->removeDaughter(next);
@@ -172,7 +150,7 @@ G4VSolid * buildBoolean  ( MiceModule* mod )
 		delete rot;
 		Squeak::mout(Squeak::debug) << "Searching for " << iStream.str() << std::endl;
 	}
-  mod->removeDaughter(base);
+        mod->removeDaughter(base);
 
 	delete base;
 	return baseSolid;
@@ -199,15 +177,6 @@ MiceModule* getModule      (MiceModule* mod, std::string newModName)
 	ModuleTextFileIO daughter  (mod, newModName, modStream2);
 	return daughter.getModule  ();
 }
-
-void checkDim(MiceModule* mod, size_t length) {
-  std::string axes[] = {"x", "y", "z"};
-  for(size_t i=0; i<length && i<3; i++)
-    if(mod->dimensions()[i] <= 0.) {
-      throw(Squeal(Squeal::recoverable, "Dimension "+axes[i]+" in module "+mod->fullName()+" out of range", "MiceModToG4Solid::checkDim"));
-    }
-}
-
 
 }
 
