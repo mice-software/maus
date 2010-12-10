@@ -218,9 +218,10 @@ void AddTanhDiffIndex(int n)
 
 }
 
-std::vector< std::vector<int> > TanhDiffIndices(int n)
-{ AddTanhDiffIndex(n)
-      return tdi;}
+std::vector< std::vector<int> > TanhDiffIndices(int n) { 
+  AddTanhDiffIndex(n);
+  return tdi;
+}
 
 }
 

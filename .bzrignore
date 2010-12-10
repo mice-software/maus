@@ -3,6 +3,7 @@
 *.tmp
 *.py[co]
 env.sh
+commonCpp/patches
 config.log
 doc/maus.tag
 doc/man
