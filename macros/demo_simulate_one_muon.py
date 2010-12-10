@@ -1,10 +1,17 @@
 #!/usr/bin/env python
-from MapCppSimulation import MapCppSimulation
-from MapPyRemoveTracks import MapPyRemoveTracks
-from Go import Go
+from MapCppSimulation import *
+from MapPyRemoveTracks import *
+from Go import * # required by MAUS
 
-mappers = [MapCppSimulation(), MapPyRemoveTracks(),]
-goer = Go(mappers)
+
+# Create an empty array
+myMappers = []  
+
+# Append the mappers we want
+myMappers.append(MapCppSimulation())
+myMappers.append(MapPyRemoveTracks())
+
+goer = Go(mappers=myMappers)
 
 document = """{
 "mc": [{
