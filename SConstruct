@@ -262,18 +262,32 @@ if not env.GetOption('clean'):
     env.Install("build", simulate)
 
 
-    
-  for directory in glob.glob("components/map/*"):
+  directories = []
+  directories += glob.glob("components/input/*")
+  directories += glob.glob("components/map/*")
+  directories += glob.glob("components/reduce/*")
+  for directory in directories:
+
     parts = directory.split("/")
     assert len(parts) == 3
     
+    if parts[2][0:7] == "InputPy":  
+      print 'Found Python input: %s' % parts[2]
+      env.Install("build", "%s/%s.py" % (directory, parts[2]))
+
     if parts[2][0:5] == "MapPy":
       print 'Found Python mapper: %s' % parts[2]
+      env.Install("build", "%s/%s.py" % (directory, parts[2]))
+
+    if parts[2][0:8] == "ReducePy":
+      print 'Found Python reducer: %s' % parts[2]
       env.Install("build", "%s/%s.py" % (directory, parts[2]))
 
     if parts[2][0:6] == 'MapCpp':
       print 'Found C++ mapper: %s' % parts[2] 
       env.jDev.Subproject(directory)
+
+    
     
 
   env.Alias('install', ['%s/build' % os.environ.get('MAUS_ROOT_DIR')])
