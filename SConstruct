@@ -110,6 +110,10 @@ Export('env')
 #                  'doxygen doc/Doxyfile && cd doc/html')
 #env.Alias('doc', [dox])
 
+#unit = env.Command('does_not_exist2', 'build',
+#                   'python -m unittest discover -b -v build')
+#env.Alias('unittest', [unit])
+
 def CheckCommand(context, cmd):
        context.Message('Checking for %s command... ' % cmd)
        result = WhereIs(cmd)
@@ -277,7 +281,8 @@ if not env.GetOption('clean'):
 
     if parts[2][0:5] == "MapPy":
       print 'Found Python mapper: %s' % parts[2]
-      env.Install("build", "%s/%s.py" % (directory, parts[2]))
+      files = glob.glob('%s/test_*' % directory) +  ["%s/%s.py" % (directory, parts[2])]
+      env.Install("build", files)
 
     if parts[2][0:8] == "ReducePy":
       print 'Found Python reducer: %s' % parts[2]
