@@ -106,13 +106,13 @@ env.jDev.releasecflags = ['-O2', '-DNDEBUG',]         #extra compile flags for r
 Export('env')
 
 #### Target: Documentation
-#dox = env.Command('does_not_exist3', 'doc/Doxyfile',
-#                  'doxygen doc/Doxyfile && cd doc/html')
-#env.Alias('doc', [dox])
+dox = env.Command('does_not_exist3', 'doc/Doxyfile',
+                  'doxygen doc/Doxyfile && cd doc/html')
+env.Alias('doc', [dox])
 
-#unit = env.Command('does_not_exist2', 'build',
-#                   'python -m unittest discover -b -v build')
-#env.Alias('unittest', [unit])
+unit = env.Command('does_not_exist2', 'build',
+                   'python -m unittest discover -b -v build')
+env.Alias('unittest', [unit])
 
 def CheckCommand(context, cmd):
        context.Message('Checking for %s command... ' % cmd)
