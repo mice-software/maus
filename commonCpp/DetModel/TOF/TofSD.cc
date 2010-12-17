@@ -24,14 +24,14 @@ TofSD::TofSD( MiceModule* mod, bool dEdxCut )
 void TofSD::Initialize(G4HCofThisEvent* HCE)
 {
   _hits.push_back(Json::Value());
-  Json::Value hw_id;
+  Json::Value channel_id;
   
-  hw_id["type"] = "TOF";
-  hw_id["slab"] =  _module->propertyInt( "Slab" ) ;
-  hw_id["plane"] =  _module->propertyInt( "Plane" ) ;
-  hw_id["station_number"] = _module->propertyInt( "Station" ) ;
+  channel_id["type"] = "TOF";
+  channel_id["slab"] =  _module->propertyInt( "Slab" ) ;
+  channel_id["plane"] =  _module->propertyInt( "Plane" ) ;
+  channel_id["station_number"] = _module->propertyInt( "Station" ) ;
 
-  _hits[0]["hw_id"] = hw_id;
+  _hits[0]["channel_id"] = channel_id;
 
   _hits[0]["energy_deposited"] = 0.0;
   _hits[0]["path_length"] = 0.0;
@@ -47,7 +47,7 @@ G4bool TofSD::ProcessHits(G4Step* aStep, G4TouchableHistory* History)
 
   G4double length = aStep->GetStepLength();
 
-  if(_hits[0].get("path_length", 0.0) == 0) {
+  if(_hits[0].get("path_length", 0.0).asDouble() == 0) {
   	G4Track* track = aStep->GetTrack();
 
         _hits[0]["volume_name"] = _module->fullName();

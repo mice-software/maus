@@ -110,9 +110,9 @@ dox = env.Command('does_not_exist3', 'doc/Doxyfile',
                   'doxygen doc/Doxyfile && cd doc/html')
 env.Alias('doc', [dox])
 
-unit = env.Command('does_not_exist2', 'build',
-                   'python -m unittest discover -b -v build')
-env.Alias('unittest', [unit])
+#unit = env.Command('does_not_exist2', 'build',
+#                   'python -m unittest discover -b -v build')
+#env.Alias('unittest', [unit])
 
 def CheckCommand(context, cmd):
        context.Message('Checking for %s command... ' % cmd)
@@ -259,7 +259,7 @@ if not env.GetOption('clean'):
   # TODO: this should be a loop that discovers stuff
   #specify all of the sub-projects in the section
   if env['USE_G4'] and env['USE_ROOT']:
-    env.Append(CCFLAGS=['-g',])
+    env.Append(CCFLAGS=['-g','-pg'])
     
     commonCppFiles = glob.glob("commonCpp/*/*cc") + glob.glob("commonCpp/*/*/*cc") + glob.glob("commonCpp/*/*cpp") + glob.glob("commonCpp/*/*/*cpp")
     simulate = env.SharedLibrary(target = 'commonCpp/libsimulate', source = commonCppFiles, LIBS=['recpack'] +  env['LIBS'])
