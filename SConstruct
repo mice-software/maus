@@ -2,7 +2,6 @@ from SCons.Script.SConscript import SConsEnvironment
 import glob, os
 
 #this is our catch-all Dev class
-#it keeps track of all the variables and common functions we need
 class Dev:
   cflags = '-g'
   ecflags = ''
