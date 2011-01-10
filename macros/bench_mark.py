@@ -24,8 +24,6 @@ myMap = MapPyGroup()
 # Append the mappers we want
 myMap.append(MapCppSimulation())
 
-
-
 spill = {}
 spill['mc'] = []
 
