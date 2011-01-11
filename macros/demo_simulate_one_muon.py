@@ -14,7 +14,7 @@ myMap = MapPyGroup()
 myMap.append(MapCppSimulation())
 rt = MapPyRemoveTracks()
 rt.KeepOnlyMuons()
-myMap.append(rt)
+#myMap.append(rt)
 
 document = StringIO.StringIO(2*"""{"mc": [{"position": { "x": 0.0, "y": -0.0, "z": -5000 },"particle_id" : 13,"energy" : 210,"unit_momentum" : { "x":0, "y":0, "z":1 }}]}\n""")
 
