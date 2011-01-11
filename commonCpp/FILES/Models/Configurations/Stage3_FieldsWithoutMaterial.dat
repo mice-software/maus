@@ -1,7 +1,4 @@
-//Stage6 Coils
-//I use repeat placements for Focus Coils - you may prefer just to explicitly write out each one
-
-Module Stage6Coils
+Module Stage3Coils
 {
   Volume None //Note - this will generate a warning in MICEDetectorConstruction; it should be okay.
 
@@ -53,7 +50,7 @@ Module Stage6Coils
     Volume None
     Position 0.0 0.0 -4051.05 mm
     Rotation 0.0 0.0 0.0 degree
-    ScaleFactor  137.13 
+    ScaleFactor  92.42
   //Field
     PropertyString FieldType      Solenoid
     PropertyString FileName       match2.fld
@@ -67,7 +64,7 @@ Module Stage6Coils
     Volume None
     Position 0.0 0.0 -3611.0 mm
     Rotation 0.0 0.0 0.0 degree
-    ScaleFactor 118.56 
+    ScaleFactor 158.87 
   //Field
     PropertyString FieldType      Solenoid
     PropertyString FileName       match1.fld
@@ -76,70 +73,11 @@ Module Stage6Coils
     PropertyDouble Thickness          44.7
     PropertyDouble InnerRadius       258.
   }
-  Module FocusCoil
-  {
-    Volume None
-    Position 0.0 0.0 -2955.0 mm
-    Rotation 0.0 0.0 0.0 degree
-    ScaleFactor 113.95
-  //field
-    PropertyString FieldType       Solenoid
-    PropertyString FileName        focus.fld
-    PropertyDouble CurrentDensity      1.
-    PropertyDouble Length            210.
-    PropertyDouble Thickness          84.
-    PropertyDouble InnerRadius       263.
-  //repeat placements
-    PropertyBool       RepeatModule      1
-    PropertyInt        NumberOfRepeats   2
-    PropertyHep3Vector RepeatTranslation 0.0 0.0 2.75 m
-    PropertyHep3Vector RepeatRotation    0.0 0.0 0.0 degree
-    PropertyDouble     RepeatScaleFactor -1.
-  }
-  Module FocusCoil
-  {
-    Volume None
-    Position 0.0 0.0 -2545.0 mm
-    Rotation 0.0 0.0 0.0 degree
-    ScaleFactor -113.95
-  //field
-    PropertyString FieldType       Solenoid
-    PropertyString FileName        focus.fld
-    PropertyDouble CurrentDensity      1.
-    PropertyDouble Length            210.
-    PropertyDouble Thickness          84.
-    PropertyDouble InnerRadius       263.
-  //repeat placements
-    PropertyBool       RepeatModule      1
-    PropertyInt        NumberOfRepeats   2
-    PropertyHep3Vector RepeatTranslation 0.0 0.0 2.75 m
-    PropertyHep3Vector RepeatRotation    0.0 0.0 0.0 degree
-    PropertyDouble     RepeatScaleFactor -1.
-  }
-  Module CouplingCoil
-  {
-    Volume None
-    Position 0.0 0.0 -1375.0 mm
-    Rotation 0.0 0.0 0.0 degree
-    ScaleFactor -96.21
-  //field
-    PropertyString FieldType       Solenoid
-    PropertyString FileName        coupling.fld
-    PropertyDouble CurrentDensity    1.
-    PropertyDouble Length          250.
-    PropertyDouble Thickness       116.
-    PropertyDouble InnerRadius     725.
-  //repeat placements
-    PropertyBool       RepeatModule      1
-    PropertyInt        NumberOfRepeats   1
-    PropertyHep3Vector RepeatTranslation 0.0 0.0 2.75 m
-    PropertyHep3Vector RepeatRotation    0.0 0.0 0.0 degree
-    PropertyDouble     RepeatScaleFactor -1.
-  }
+  
   Module EndCoil2
   {
     Volume None
-    Position 0.0 0.0 5951 mm
+    Position 0.0 0.0 -239.8 mm //
     Rotation 0.0 0.0 0.0 degree
     ScaleFactor -135.18
   //Field
@@ -153,7 +91,7 @@ Module Stage6Coils
   Module CenterCoil
   {
     Volume None
-    Position 0.0 0.0 5201.05 mm
+    Position 0.0 0.0 -989.75 mm //
     Rotation 0.0 0.0 0.0 degree
     ScaleFactor -152.44
   //Field
@@ -167,7 +105,7 @@ Module Stage6Coils
   Module EndCoil1
   {
     Volume None
-    Position 0.0 0.0 4451 mm
+    Position 0.0 0.0 -1739.8 mm //
     Rotation 0.0 0.0 0.0 degree
     ScaleFactor -127.37
   //Field
@@ -179,12 +117,12 @@ Module Stage6Coils
     PropertyDouble InnerRadius     258.
   }
 
-  Module MatchCoil1
+  Module MatchCoil1       // CHECKED AUG 18TH !!!   
   {
     Volume None
-    Position 0.0 0.0 3611.0 mm
+    Position 0.0 0.0 -2579.8 mm //
     Rotation 0.0 0.0 0.0 degree
-    ScaleFactor  -118.56// -114.41 3.5%
+    ScaleFactor  -158.87
   //Field
     PropertyString FieldType      Solenoid
     PropertyString FileName       match1.fld
@@ -196,9 +134,9 @@ Module Stage6Coils
   Module MatchCoil2
   {
     Volume None
-    Position 0.0 0.0 4051.05 mm
+    Position 0.0 0.0 -2139.8 mm 
     Rotation 0.0 0.0 0.0 degree
-    ScaleFactor -137.13 //-132.33 3.5%
+    ScaleFactor -92.42
   //Field
     PropertyString FieldType      Solenoid
     PropertyString FileName       match2.fld

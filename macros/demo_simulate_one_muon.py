@@ -16,6 +16,9 @@ rt = MapPyRemoveTracks()
 rt.KeepOnlyMuons()
 #myMap.append(rt)
 
+#Stage1.dat  Stage2.dat  Stage3.dat  Stage4.dat  Stage5.dat  Stage6.dat  Stage6_FieldsWithoutMaterial.dat
+
+
 document = StringIO.StringIO(2*"""{"mc": [{"position": { "x": 0.0, "y": -0.0, "z": -5000 },"particle_id" : 13,"energy" : 210,"unit_momentum" : { "x":0, "y":0, "z":1 }}]}\n""")
 
 

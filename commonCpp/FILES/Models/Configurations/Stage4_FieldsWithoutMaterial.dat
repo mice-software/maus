@@ -90,11 +90,11 @@ Module Stage6Coils
     PropertyDouble Thickness          84.
     PropertyDouble InnerRadius       263.
   //repeat placements
-    PropertyBool       RepeatModule      1
-    PropertyInt        NumberOfRepeats   2
-    PropertyHep3Vector RepeatTranslation 0.0 0.0 2.75 m
-    PropertyHep3Vector RepeatRotation    0.0 0.0 0.0 degree
-    PropertyDouble     RepeatScaleFactor -1.
+    //PropertyBool       RepeatModule      1
+    //PropertyInt        NumberOfRepeats   2
+    //PropertyHep3Vector RepeatTranslation 0.0 0.0 2.75 m
+    //PropertyHep3Vector RepeatRotation    0.0 0.0 0.0 degree
+    //PropertyDouble     RepeatScaleFactor -1.
   }
   Module FocusCoil
   {
@@ -110,36 +110,18 @@ Module Stage6Coils
     PropertyDouble Thickness          84.
     PropertyDouble InnerRadius       263.
   //repeat placements
-    PropertyBool       RepeatModule      1
-    PropertyInt        NumberOfRepeats   2
-    PropertyHep3Vector RepeatTranslation 0.0 0.0 2.75 m
-    PropertyHep3Vector RepeatRotation    0.0 0.0 0.0 degree
-    PropertyDouble     RepeatScaleFactor -1.
+//     PropertyBool       RepeatModule      1
+//     PropertyInt        NumberOfRepeats   2
+//     PropertyHep3Vector RepeatTranslation 0.0 0.0 2.75 m
+//     PropertyHep3Vector RepeatRotation    0.0 0.0 0.0 degree
+//     PropertyDouble     RepeatScaleFactor -1.
   }
-  Module CouplingCoil
-  {
-    Volume None
-    Position 0.0 0.0 -1375.0 mm
-    Rotation 0.0 0.0 0.0 degree
-    ScaleFactor -96.21
-  //field
-    PropertyString FieldType       Solenoid
-    PropertyString FileName        coupling.fld
-    PropertyDouble CurrentDensity    1.
-    PropertyDouble Length          250.
-    PropertyDouble Thickness       116.
-    PropertyDouble InnerRadius     725.
-  //repeat placements
-    PropertyBool       RepeatModule      1
-    PropertyInt        NumberOfRepeats   1
-    PropertyHep3Vector RepeatTranslation 0.0 0.0 2.75 m
-    PropertyHep3Vector RepeatRotation    0.0 0.0 0.0 degree
-    PropertyDouble     RepeatScaleFactor -1.
-  }
+
+
   Module EndCoil2
   {
     Volume None
-    Position 0.0 0.0 5951 mm
+    Position 0.0 0.0 451 mm //5951 mm
     Rotation 0.0 0.0 0.0 degree
     ScaleFactor -135.18
   //Field
@@ -153,7 +135,7 @@ Module Stage6Coils
   Module CenterCoil
   {
     Volume None
-    Position 0.0 0.0 5201.05 mm
+      Position 0.0 0.0 -298.95 mm //5201.05 mm
     Rotation 0.0 0.0 0.0 degree
     ScaleFactor -152.44
   //Field
@@ -167,7 +149,7 @@ Module Stage6Coils
   Module EndCoil1
   {
     Volume None
-    Position 0.0 0.0 4451 mm
+      Position 0.0 0.0 -1049 mm //4451 mm
     Rotation 0.0 0.0 0.0 degree
     ScaleFactor -127.37
   //Field
@@ -182,7 +164,7 @@ Module Stage6Coils
   Module MatchCoil1
   {
     Volume None
-    Position 0.0 0.0 3611.0 mm
+      Position 0.0 0.0 -1889 mm //3611.0 mm
     Rotation 0.0 0.0 0.0 degree
     ScaleFactor  -118.56// -114.41 3.5%
   //Field
@@ -196,7 +178,7 @@ Module Stage6Coils
   Module MatchCoil2
   {
     Volume None
-    Position 0.0 0.0 4051.05 mm
+      Position 0.0 0.0 -1448.95 mm //4051.05 mm
     Rotation 0.0 0.0 0.0 degree
     ScaleFactor -137.13 //-132.33 3.5%
   //Field
