@@ -1,5 +1,3 @@
-// FILES/Models/Configurations/MICEStage1/Stage1.dat
-//
 // Stage 1 Floor Plan, everything is relative to z=0 at middle H absorber in Stage 6
 
 Configuration Stage1

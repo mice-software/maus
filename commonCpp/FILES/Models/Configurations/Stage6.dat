@@ -1,5 +1,3 @@
-// FILES/Models/Configurations/MICEStage6/Stage6.dat
-//
 // Stage 6 Floor Plan, z=0 at middle H absorber
 
 Configuration Stage6
@@ -60,11 +58,11 @@ Configuration Stage6
     Position 0. 0. 6.5245 m
     Rotation 0. 0. 0. degree
   }
-//  Module EmCal/Calorimeter.dat
-//  {
-//    Position 0. 0. 7.0495 m
-//    Rotation 0. 0. 0. degree
-//  }
+  Module EmCal/Calorimeter.dat
+  {
+    Position 0. 0. 7.0495 m
+    Rotation 0. 0. 0. degree
+  }
   Module CoilConfig/Stage6CoilCurrents.dat
   {
   }
