@@ -109,10 +109,11 @@ dox = env.Command('does_not_exist3', 'doc/Doxyfile',
                   'doxygen doc/Doxyfile && cd doc/html')
 env.Alias('doc', [dox])
 
-#unit = env.Command('does_not_exist2', 'build',
-#                   'python -m unittest discover -b -v build')
-#env.Alias('unittest', [unit])
-
+#python_executable = '%s/third_party/install/bin/python' % os.environ.get('MAUS_ROOT_DIR')
+#if os.path.isfile(python_executable):
+#  unit = env.Command('does_not_exist2', 'build', '%s -m unittest discover -b -v build' % python_executable)
+#  env.Alias('unittest', [unit])
+  
 def CheckCommand(context, cmd):
        context.Message('Checking for %s command... ' % cmd)
        result = WhereIs(cmd)
@@ -292,7 +293,8 @@ if not env.GetOption('clean'):
       env.jDev.Subproject(directory)
 
     
-    
+  files = glob.glob('tests/unit/test_*')
+  env.Install("build", files)
 
   env.Alias('install', ['%s/build' % os.environ.get('MAUS_ROOT_DIR')])
 

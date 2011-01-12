@@ -28,13 +28,13 @@ class MapCppSimulationTestCase(unittest.TestCase):
         self.assertTrue(len(files) != 0)
 
         for file in files:
-            args = ['python', '%s/tests/unit/geometry_test.py' %  os.environ.get("MAUS_ROOT_DIR"), file]
+            args = ['python', '%s/tests/unit/test_geometry.py' %  os.environ.get("MAUS_ROOT_DIR"), file]
             p = subprocess.Popen(args)
             p.wait()
             self.assertEqual(p.returncode, 0)
 
     def test_bad_geometry(self):
-        args = ['python', '%s/tests/unit/geometry_test.py' %  os.environ.get("MAUS_ROOT_DIR"), '/dev/null']
+        args = ['python', '%s/tests/unit/test_geometry.py' %  os.environ.get("MAUS_ROOT_DIR"), '/dev/null']
         p = subprocess.Popen(args)
         p.wait()
         self.assertNotEqual(p.returncode, 0)
