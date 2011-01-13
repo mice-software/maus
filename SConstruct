@@ -21,7 +21,7 @@ class Dev:
       if not env.GetOption('clean'):
         print "The worker", project, "requires Geant4 which is disabled. Skipping..."
       return
-    print 'found', project
+
     builddir = 'build'
     name = project.split('/')[-1]
     targetpath = os.path.join('build', '_%s' % name)
@@ -38,12 +38,10 @@ class Dev:
     localenv.Append(CPPPATH='.')
 
     srclst = map(lambda x: builddir + '/' + x, glob.glob('*.cpp'))
-    print srclst
     srclst += map(lambda x: builddir + '/' + x, glob.glob('*.i'))
     pgm = localenv.SharedLibrary(targetpath, source=srclst)#, LIBS=['simulate'])
 
     tests = glob.glob('test_*.py')
-    print "tests:", tests
     
     env.Install(os.path.join(os.environ.get('MAUS_ROOT_DIR'), builddir) , "build/%s.py" % name)
     env.Install(os.path.join(os.environ.get('MAUS_ROOT_DIR'), builddir) , pgm)
@@ -267,13 +265,15 @@ if not env.GetOption('clean'):
 
 
   directories = []
-  directories += glob.glob("components/input/*")
-  directories += glob.glob("components/map/*")
-  directories += glob.glob("components/reduce/*")
-  for directory in directories:
+  types = ["input", "map", "reduce", "output"]
+  for type in types:
+    directories += glob.glob("components/%s/*" % type)
 
+  for directory in directories:
     parts = directory.split("/")
     assert len(parts) == 3
+    assert parts[0] == 'components'
+    assert parts[1] in types
     
     if parts[2][0:7] == "InputPy":  
       print 'Found Python input: %s' % parts[2]
@@ -286,6 +286,10 @@ if not env.GetOption('clean'):
 
     if parts[2][0:8] == "ReducePy":
       print 'Found Python reducer: %s' % parts[2]
+      env.Install("build", "%s/%s.py" % (directory, parts[2]))
+
+    if parts[2][0:8] == "OutputPy":
+      print 'Found Python output: %s' % parts[2]
       env.Install("build", "%s/%s.py" % (directory, parts[2]))
 
     if parts[2][0:6] == 'MapCpp':
