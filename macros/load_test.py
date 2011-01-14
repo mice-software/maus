@@ -3,6 +3,7 @@ import sys
 
 from InputPyEmptyDocument import *
 from MapPyFakeTestSimulation import *
+from MapPyDoNothing import *
 from ReducePyDoNothing import *
 from OutputPyJSON import *
 
@@ -15,7 +16,8 @@ if len(sys.argv) == 2:
 print "Testing with %d events..." % big_number
 
 inputer = InputPyEmptyDocument(big_number)
-mapper = MapPyFakeTestSimulation()
+#mapper = MapPyFakeTestSimulation()
+mapper = MapPyDoNothing()
 reducer = ReducePyDoNothing()
 outputer = OutputPyJSON('load_test')
 
