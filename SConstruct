@@ -275,22 +275,10 @@ if not env.GetOption('clean'):
     assert parts[0] == 'components'
     assert parts[1] in types
     
-    if parts[2][0:7] == "InputPy":  
+    if 'Py' in parts[2] and 'Cpp' not in parts[2]:
       print 'Found Python input: %s' % parts[2]
-      env.Install("build", "%s/%s.py" % (directory, parts[2]))
-
-    if parts[2][0:5] == "MapPy":
-      print 'Found Python mapper: %s' % parts[2]
       files = glob.glob('%s/test_*' % directory) +  ["%s/%s.py" % (directory, parts[2])]
-      env.Install("build", files)
-
-    if parts[2][0:8] == "ReducePy":
-      print 'Found Python reducer: %s' % parts[2]
-      env.Install("build", "%s/%s.py" % (directory, parts[2]))
-
-    if parts[2][0:8] == "OutputPy":
-      print 'Found Python output: %s' % parts[2]
-      env.Install("build", "%s/%s.py" % (directory, parts[2]))
+      env.Install("build", files)   
 
     if parts[2][0:6] == 'MapCpp':
       print 'Found C++ mapper: %s' % parts[2] 
