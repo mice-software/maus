@@ -7,6 +7,7 @@ from MapPyRemoveTracks import *
 from ReducePyDoNothing import *
 from MapPyGroup import *
 from MapCppPrint import *
+from MapCppTOFDigitization import *
 from Go import *
 
 import os, sys
@@ -20,10 +21,13 @@ file = '%s/Models/Configurations/Stage6.dat' % os.environ.get('MICEFILES')
 print file
 # Append the mappers we want
 sim = MapCppSimulation(file)
-#sim.DisableStoredTracks()
+sim.DisableStoredTracks()
 myMap.append(sim)
 rt = MapPyRemoveTracks()
 rt.KeepOnlyMuons()
+myMap.append(rt)
+tof = MapCppTOFDigitization()
+myMap.append(tof)
 
 #myMap.append(rt)
 
