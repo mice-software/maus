@@ -101,7 +101,7 @@ then               ##################################################
 fi
 
 # save default manpath
-man_path=`manpath -g`
+man_path=`manpath`
 
 # check for SCons
 type -P scons &>/dev/null || {
