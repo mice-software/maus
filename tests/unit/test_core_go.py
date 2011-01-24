@@ -4,6 +4,7 @@ import subprocess
 import glob
 import os
 import sys
+from StringIO import StringIO
 
 from InputPyEmptyDocument import *
 from MapPyDoNothing import *
@@ -22,25 +23,12 @@ class GoTestCase(unittest.TestCase):
         inputer = InputPyEmptyDocument(1)
         mapper = MapPyDoNothing()
         reducer = ReducePyDoNothing()
-        outputer = OutputPyJSON('unit_test')  #  this file won't appear since exception 
+        outputer = OutputPyJSON(open('unit_test', 'w'))  #  this file won't appear since exception 
+
+        configFile = StringIO("""map_reduce_type="bad_type" """)
 
         with self.assertRaises(AssertionError):
-            Go(inputer, mapper, reducer, outputer, argMapReduceType = "bad_type")
-
-        self.assertFalse(os.path.isfile('unit_test'))
-
-
-
-    def test_save_temp_type(self):
-        inputer = InputPyEmptyDocument(1)
-        mapper = MapPyDoNothing()
-        reducer = ReducePyDoNothing()
-        outputer = OutputPyJSON('unit_test')  #  this file won't appear since exception
-
-        with self.assertRaises(AssertionError):
-            Go(inputer, mapper, reducer, outputer, argKeepTemp = "bad_type")
-
-        self.assertFalse(os.path.isfile('unit_test'))
+            Go(inputer, mapper, reducer, outputer, configFile)
 
 
 

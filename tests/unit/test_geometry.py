@@ -18,6 +18,7 @@ class MapCppSimulationTestCase(unittest.TestCase):
 
 
     def test_geometries(self):
+        self.assertTrue(False)
         self.assertTrue(os.environ.get("MICEFILES") != None)
         self.assertTrue(os.path.isdir(os.environ.get("MICEFILES")))
 
@@ -46,6 +47,6 @@ if __name__ == '__main__':
     if len(sys.argv) == 2:
         file = str(sys.argv[1])
         
-        map = MapCppSimulation(file)
-        map.Birth()
+        map = MapCppSimulation()
+        map.Birth("""{ "geometry_file" : "%s" } """ % file)
         map.Death()        

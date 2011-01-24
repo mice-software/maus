@@ -20,11 +20,11 @@ file = '%s/Models/Configurations/Stage6.dat' % os.environ.get('MICEFILES')
 
 print file
 # Append the mappers we want
-sim = MapCppSimulation(file)
+sim = MapCppSimulation()
 sim.DisableStoredTracks()
 myMap.append(sim)
 rt = MapPyRemoveTracks()
-rt.KeepOnlyMuons()
+#rt.KeepOnlyMuons()
 myMap.append(rt)
 tof = MapCppTOFDigitization()
 myMap.append(tof)
