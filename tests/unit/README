@@ -1,1 +1,11 @@
-These are for non-input/map/reduce/output workers.  Those unit tests are stored in their respective source directory then installed into 'build' like everything else.
+These tests are for the 'core' of MAUS or the library area of 'commonCpp'. These are not for input/map/reduce/output workers since those unit tests are stored in their respective source directory then installed into 'build' like everything else.
+
+These tests are built by running 'scons' in the MAUS_ROOT_DIR.  They are run by either directly calling them with python:
+
+ python test_something.py
+
+or to discover and run all tests run:
+
+ python -m unittest discover -b -v build 
+
+in $MAUS_ROOT_DIR.
