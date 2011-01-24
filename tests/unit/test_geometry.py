@@ -18,7 +18,6 @@ class MapCppSimulationTestCase(unittest.TestCase):
 
 
     def test_geometries(self):
-        self.assertTrue(False)
         self.assertTrue(os.environ.get("MICEFILES") != None)
         self.assertTrue(os.path.isdir(os.environ.get("MICEFILES")))
 
