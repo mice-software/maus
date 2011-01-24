@@ -47,5 +47,5 @@ if __name__ == '__main__':
         file = str(sys.argv[1])
         
         map = MapCppSimulation()
-        map.Birth("""{ "geometry_file" : "%s" } """ % file)
+        map.Birth("""{ "simulation_geometry_filename" : "%s" } """ % file)
         map.Death()        

@@ -36,11 +36,11 @@ class ConfigurationTestCase(unittest.TestCase):
 
     def test_overwrite_value(self):
         ## actual data
-        stringFile = StringIO.StringIO("geometry_file = 'Stage4Something.dat'")
+        stringFile = StringIO.StringIO("simulation_geometry_filename = 'Stage4Something.dat'")
         value = Configuration.getConfigJSON(stringFile)
 
         jsonValue = json.loads(value)
-        self.assertEqual(jsonValue["geometry_file"], 'Stage4Something.dat')
+        self.assertEqual(jsonValue["simulation_geometry_filename"], 'Stage4Something.dat')
 
 
 if __name__ == '__main__':
