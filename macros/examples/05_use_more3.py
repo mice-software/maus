@@ -3,7 +3,7 @@
 # Show how to run Use() with the last week of runs
 #
 
-execfile('src/load.py', globals()) # don't remove this!
+exec(compile(open('src/load.py').read(), 'src/load.py', 'exec'), globals()) # don't remove this!
 
 # One nice feature of Use() is that you can select runs
 # in a certain time range.  For instance, the last month

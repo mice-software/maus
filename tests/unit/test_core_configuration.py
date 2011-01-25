@@ -4,7 +4,7 @@ import subprocess
 import glob
 import os
 import sys
-import StringIO
+import io
 
 import Configuration
 
@@ -28,7 +28,7 @@ class ConfigurationTestCase(unittest.TestCase):
 
     def test_new_value(self):
         ## actual data
-        stringFile = StringIO.StringIO("test = 4")
+        stringFile = io.StringIO("test = 4")
         value = Configuration.getConfigJSON(stringFile)
 
         jsonValue = json.loads(value)
@@ -36,7 +36,7 @@ class ConfigurationTestCase(unittest.TestCase):
 
     def test_overwrite_value(self):
         ## actual data
-        stringFile = StringIO.StringIO("simulation_geometry_filename = 'Stage4Something.dat'")
+        stringFile = io.StringIO("simulation_geometry_filename = 'Stage4Something.dat'")
         value = Configuration.getConfigJSON(stringFile)
 
         jsonValue = json.loads(value)

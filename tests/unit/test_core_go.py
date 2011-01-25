@@ -4,7 +4,7 @@ import subprocess
 import glob
 import os
 import sys
-from StringIO import StringIO
+from io import StringIO
 
 from InputPyEmptyDocument import *
 from MapPyDoNothing import *

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import StringIO
+import io
 from InputPyJSON import *
 from MapCppSimulation import *
 from MapPyRemoveTracks import *
@@ -10,13 +10,13 @@ from Go import *
 import sys
 import json
 
-print sys.argv
+print(sys.argv)
 assert len(sys.argv) == 3
 
 number_spills = int(sys.argv[1])
 number_particles_per_spill = int(sys.argv[2])
 
-print "Running %d spills with %d particles per spill...\n" % (number_spills, number_particles_per_spill)
+print("Running %d spills with %d particles per spill...\n" % (number_spills, number_particles_per_spill))
 
 # Create an empty array
 myMap = MapPyGroup()
@@ -38,9 +38,9 @@ for i in range(number_particles_per_spill):
     
 spillString = "%s\n" % json.dumps(spill)
 
-print spillString
+print(spillString)
 
-document = StringIO.StringIO(number_spills * spillString)
+document = io.StringIO(number_spills * spillString)
 
 
 Go(InputPyJSON(document), myMap, ReducePyDoNothing, None)

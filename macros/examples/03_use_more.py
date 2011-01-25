@@ -2,7 +2,7 @@
 #
 # Show how Use works with a single run, but only looking 
 #
-execfile('src/load.py', globals()) # don't remove this!
+exec(compile(open('src/load.py').read(), 'src/load.py', 'exec'), globals()) # don't remove this!
 
 # Here we set the string variable 'selected_region' to whatever
 # region we want.  You have to use the naming convention of TUCS

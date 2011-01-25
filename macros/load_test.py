@@ -13,7 +13,7 @@ big_number = 1000
 if len(sys.argv) == 2:
     big_number = int(sys.argv[1])
 
-print "Testing with %d events..." % big_number
+print("Testing with %d events..." % big_number)
 
 inputer = InputPyEmptyDocument(big_number)
 mapper = MapPyFakeTestSimulation()

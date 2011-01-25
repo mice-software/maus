@@ -2,7 +2,7 @@
 #
 # Show how Use works with a list of runs
 #
-execfile('src/load.py', globals()) # don't remove this!
+exec(compile(open('src/load.py').read(), 'src/load.py', 'exec'), globals()) # don't remove this!
 
 # Instead of setting a run number for Use(), you can also
 # set a list of runs as follows:

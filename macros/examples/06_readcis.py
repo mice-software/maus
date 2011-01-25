@@ -3,7 +3,7 @@
 # This example shows you how to read in some CIS events
 #
 
-execfile('src/load.py', globals()) # don't remove this!
+exec(compile(open('src/load.py').read(), 'src/load.py', 'exec'), globals()) # don't remove this!
 
 runs = "-1 week"
 run_type = "CIS"

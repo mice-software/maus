@@ -4,7 +4,7 @@
 #
 
 # This line sets up TUCS and should be at the top of each macro
-execfile('src/load.py', globals()) # don't remove this!
+exec(compile(open('src/load.py').read(), 'src/load.py', 'exec'), globals()) # don't remove this!
 
 Go([       # Put your workers as a comma seperated list after this line
     None,  # "None" means do nothing

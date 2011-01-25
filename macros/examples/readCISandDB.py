@@ -4,7 +4,7 @@
 # example involves reading in CIS events with ReadCISFile() and then
 # reading from the database with ReadDB()
 #
-execfile('src/load.py', globals()) # don't remove this!
+exec(compile(open('src/load.py').read(), 'src/load.py', 'exec'), globals()) # don't remove this!
 
 # Use run 9055 and only look at LBA module 33 channel 26
 u = Use(run=90555, region='LBA_m33_c26')

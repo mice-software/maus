@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import StringIO
+import io
 from InputPyJSON import *
 from OutputPyJSON import *
 from MapCppSimulation import *
@@ -18,7 +18,7 @@ myMap = MapPyGroup()
 #file = '%s/Models/Configurations/Stage6_FieldsWithoutMaterial.dat' % os.environ.get('MICEFILES')
 file = '%s/Models/Configurations/Stage6.dat' % os.environ.get('MICEFILES')
 
-print file
+print(file)
 # Append the mappers we want
 sim = MapCppSimulation()
 sim.DisableStoredTracks()
@@ -33,8 +33,8 @@ myMap.append(tof)
 
 #Stage1.dat  Stage2.dat  Stage3.dat  Stage4.dat  Stage5.dat  Stage6.dat  Stage6_FieldsWithoutMaterial.dat
 #'%s/Models/Configurations/Stage6_FieldsWithoutMaterial.dat' % os.environ.get('MICEFILES')
-print sys.argv
-document = StringIO.StringIO(int(sys.argv[1])*"""{"mc": [{"position": { "x": 0.0, "y": -0.0, "z": -5000 },"particle_id" : 13,"energy" : 210, "random_seed" : 10, "unit_momentum" : { "x":0, "y":0, "z":1 }}]}\n""")
+print(sys.argv)
+document = io.StringIO(int(sys.argv[1])*"""{"mc": [{"position": { "x": 0.0, "y": -0.0, "z": -5000 },"particle_id" : 13,"energy" : 210, "random_seed" : 10, "unit_momentum" : { "x":0, "y":0, "z":1 }}]}\n""")
 
 
 Go(InputPyJSON(document), myMap, ReducePyDoNothing(), OutputPyJSON(), argKeepTemp=True)

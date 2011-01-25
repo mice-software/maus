@@ -4,7 +4,7 @@
 # constants for the last week of runs
 #
 
-execfile('src/load.py', globals()) # don't remove this!
+exec(compile(open('src/load.py').read(), 'src/load.py', 'exec'), globals()) # don't remove this!
 
 runs = "-1 week"
 selected_region = "EBC_m62_c37_highgain"

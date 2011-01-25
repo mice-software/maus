@@ -2,7 +2,7 @@
 #
 # Show how Use works with a single run
 #
-execfile('src/load.py', globals()) # don't remove this!
+exec(compile(open('src/load.py').read(), 'src/load.py', 'exec'), globals()) # don't remove this!
 
 Go([
     Use(run=90555),     # Tell Use() to prepare TUCS to use run 90555
