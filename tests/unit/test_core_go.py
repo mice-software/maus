@@ -25,7 +25,7 @@ class GoTestCase(unittest.TestCase):
         reducer = ReducePyDoNothing()
         outputer = OutputPyJSON(open('unit_test', 'w'))  #  this file won't appear since exception 
 
-        configFile = StringIO("""map_reduce_type="bad_type" """)
+        configFile = StringIO(u"""map_reduce_type="bad_type" """)
 
         with self.assertRaises(AssertionError):
             Go(inputer, mapper, reducer, outputer, configFile)
