@@ -34,10 +34,10 @@ myMap.append(tof)
 #Stage1.dat  Stage2.dat  Stage3.dat  Stage4.dat  Stage5.dat  Stage6.dat  Stage6_FieldsWithoutMaterial.dat
 #'%s/Models/Configurations/Stage6_FieldsWithoutMaterial.dat' % os.environ.get('MICEFILES')
 print(sys.argv)
-document = io.StringIO(int(sys.argv[1])*"""{"mc": [{"position": { "x": 0.0, "y": -0.0, "z": -5000 },"particle_id" : 13,"energy" : 210, "random_seed" : 10, "unit_momentum" : { "x":0, "y":0, "z":1 }}]}\n""")
+document = io.StringIO(int(sys.argv[1])*u"""{"mc": [{"position": { "x": 0.0, "y": -0.0, "z": -5000 },"particle_id" : 13,"energy" : 210, "random_seed" : 10, "unit_momentum" : { "x":0, "y":0, "z":1 }}]}\n""")
 
 
-Go(InputPyJSON(document), myMap, ReducePyDoNothing(), OutputPyJSON(), argKeepTemp=True)
+Go(InputPyJSON(document), myMap, ReducePyDoNothing(), OutputPyJSON())
 
 #new_document = map(myMap.Process, [document])
 #print new_document
