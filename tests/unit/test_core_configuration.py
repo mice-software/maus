@@ -6,12 +6,13 @@ import os
 import sys
 import io
 
-import Configuration
+from Configuration import Configuration
 
 class ConfigurationTestCase(unittest.TestCase):
     def test_defaults(self):
         ## actual data
-        value = Configuration.getConfigJSON()
+        c = Configuration()
+        value = c.getConfigJSON()
 
         ## test setup
         MAUSRootDir = os.environ.get('MAUS_ROOT_DIR')
@@ -29,7 +30,8 @@ class ConfigurationTestCase(unittest.TestCase):
     def test_new_value(self):
         ## actual data
         stringFile = io.StringIO(u"test = 4")
-        value = Configuration.getConfigJSON(stringFile)
+        c = Configuration()
+        value = c.getConfigJSON(stringFile)
 
         jsonValue = json.loads(value)
         self.assertEqual(jsonValue["test"], 4)
@@ -37,7 +39,8 @@ class ConfigurationTestCase(unittest.TestCase):
     def test_overwrite_value(self):
         ## actual data
         stringFile = io.StringIO(u"simulation_geometry_filename = 'Stage4Something.dat'")
-        value = Configuration.getConfigJSON(stringFile)
+        c = Configuration()
+        value = c.getConfigJSON(stringFile)
 
         jsonValue = json.loads(value)
         self.assertEqual(jsonValue["simulation_geometry_filename"], 'Stage4Something.dat')
