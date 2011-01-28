@@ -4,8 +4,10 @@ import subprocess
 import glob
 import os
 import sys
+import io
 
 from MapCppSimulation import MapCppSimulation
+from Configuration import Configuration
 
 class MapCppSimulationTestCase(unittest.TestCase):
     @classmethod
@@ -47,5 +49,12 @@ if __name__ == '__main__':
         file = str(sys.argv[1])
         
         map = MapCppSimulation()
-        map.Birth("""{ "simulation_geometry_filename" : "%s" } """ % file)
+        
+        configFile = io.StringIO(u"simulation_geometry_filename = '%s'\n" % file)
+        c = Configuration()
+        success = map.Birth(c.getConfigJSON(configFile))
+
+        if not success:
+            sys.exit(-1)
+        
         map.Death()        
