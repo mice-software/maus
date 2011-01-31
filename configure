@@ -1,6 +1,5 @@
 #!/bin/bash
 # Configure script
-# Run once when you unpack source
 
 # This is the maximum length of text (ignoring whitespace), 50 chars
 ##################################################                                                                                                                                   
