@@ -14,9 +14,9 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     # (at least the xargs on most machines) if one of the many commands die.  Not using find
     # also happens to make the code a little more readable
 
-    ${MAUS_ROOT_DIR}/third_party/bash/03python.bash
-    ${MAUS_ROOT_DIR}/third_party/bash/10swig.bash
-    ${MAUS_ROOT_DIR}/third_party/bash/11jsoncpp.bash
+    "${MAUS_ROOT_DIR}/third_party/bash/03python.bash"
+    "${MAUS_ROOT_DIR}/third_party/bash/10swig.bash"
+    "${MAUS_ROOT_DIR}/third_party/bash/11jsoncpp.bash"
 else
 echo
 echo "FATAL: MAUS_ROOT_DIR is not set, which is required to" >&2
