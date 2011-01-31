@@ -59,8 +59,10 @@ class Dev:
 # Setup the environment.  NOTE: SHLIBPREFIX means that shared libraries don't
 # have a 'lib' prefix, which is needed for python to find SWIG generated libraries
 env = Environment(SHLIBPREFIX="") 
-#env['CC'] = "llvm-gcc"
-#env['CXX'] = "llvm-g++"
+
+if os.path.isfile('.use_llvm_with_maus'):
+  env['CC'] = "llvm-gcc"
+  env['CXX'] = "llvm-g++"
 
 env.Tool('swig', '%s/third_party/swig-2.0.1' % os.environ.get('MAUS_ROOT_DIR'))
 env.Append(SWIGFLAGS=['-python', '-c++']) # tell SWIG to make python bindings for C++
