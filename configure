@@ -28,11 +28,11 @@ echo
     echo "FATAL: environmental variable.  For Bourne-compatible" >&2;
     echo "FATAL: shells like 'bash', run:" >&2;
     echo "FATAL:" >&2;
-    echo "FATAL:      export MAUS_ROOT_DIR=${maus_root_dir}" >&2;
+    echo "FATAL:      export MAUS_ROOT_DIR=\"${maus_root_dir}\"" >&2;
     echo "FATAL:" >&2;
     echo "FATAL: whilst for C-compatible shells like 'csh', run:" >&2;
     echo "FATAL:" >&2;
-    echo "FATAL:      setenv MAUS_ROOT_DIR ${maus_root_dir}" >&2;
+    echo "FATAL:      setenv MAUS_ROOT_DIR \"${maus_root_dir}\"" >&2;
     echo "FATAL:" >&2;
     echo "FATAL: then run the following two commands to install" >&2;
     echo "FATAL: the GCC compiler and it's dependency MPFR:" >&2;
@@ -48,14 +48,14 @@ maus_root_dir=`pwd`
 #      PATH says where the binaries are
 #      LD_LIBRARY_PATH says where your shared libraries are
 if [ -z "${PATH}" ]; then  # see if the variable exists yet
-    PATH=${maus_root_dir}/third_party/install/bin       # if not, initialize it
+    PATH=\"${maus_root_dir}/third_party/install/bin\"       # if not, initialize it
 else
-    PATH=${maus_root_dir}/third_party/install/bin:$PATH # else add to it
+    PATH=\"${maus_root_dir}/third_party/install/bin:$PATH\" # else add to it
 fi
 if [ -z "${LD_LIBRARY_PATH}" ]; then  # see if the variable exists yet
-    LD_LIBRARY_PATH=${maus_root_dir}/third_party/install/lib                  # if not, initialize it
+    LD_LIBRARY_PATH=\"${maus_root_dir}/third_party/install/lib\"                  # if not, initialize it
 else                                                                                                                                                               
-    LD_LIBRARY_PATH=${maus_root_dir}/third_party/install/lib:$LD_LIBRARY_PATH # else add to to it
+    LD_LIBRARY_PATH=\"${maus_root_dir}/third_party/install/lib:$LD_LIBRARY_PATH\" # else add to to it
 fi 
 
 # Check for Python
@@ -133,65 +133,65 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      export MAUS_ROOT_DIR="${maus_root_dir}"
 
      if [ -z "\${PATH}" ]; then  # see if the variable exists yet
-         export PATH=\${MAUS_ROOT_DIR}/third_party/install/bin # initialize it
+         export PATH="\${MAUS_ROOT_DIR}/third_party/install/bin" # initialize it
      else
-         export PATH=\${MAUS_ROOT_DIR}/third_party/install/bin:\${PATH} # else add it
+         export PATH="\${MAUS_ROOT_DIR}/third_party/install/bin:\${PATH}" # else add it
      fi
 
      if [ -z "\${LD_LIBRARY_PATH}" ]; then  # see if the variable exists yet 
-          export LD_LIBRARY_PATH=\${MAUS_ROOT_DIR}/third_party/install/lib # intiailize it
+          export LD_LIBRARY_PATH="\${MAUS_ROOT_DIR}/third_party/install/lib" # intiailize it
      else
-          export LD_LIBRARY_PATH=\${MAUS_ROOT_DIR}/third_party/install/lib:\${LD_LIBRARY_PATH} # else add it
+          export LD_LIBRARY_PATH="\${MAUS_ROOT_DIR}/third_party/install/lib:\${LD_LIBRARY_PATH}" # else add it
      fi
 
      if [ -z "\${MANPATH}" ]; then
-          export MANPATH=\${MAUS_ROOT_DIR}/third_party/install/share/man/man1:${man_path}
+          export MANPATH="\${MAUS_ROOT_DIR}/third_party/install/share/man/man1:${man_path}"
      else
-          export MANPATH=\${MAUS_ROOT_DIR}/third_party/install/share/man/man1:\${MANPATH}
+          export MANPATH="\${MAUS_ROOT_DIR}/third_party/install/share/man/man1:\${MANPATH}"
      fi
 
      # ROOT specific garbage
-     export LD_LIBRARY_PATH=\${MAUS_ROOT_DIR}/third_party/install/lib/root:\${LD_LIBRARY_PATH}
+     export LD_LIBRARY_PATH="\${MAUS_ROOT_DIR}/third_party/install/lib/root:\${LD_LIBRARY_PATH}"
      if [ -z "\${PYTHONPATH}" ]; then  # see if the variable exists yet
-          export PYTHONPATH=\${MAUS_ROOT_DIR}/third_party/install/lib/root # intiailize it
+          export PYTHONPATH="\${MAUS_ROOT_DIR}/third_party/install/lib/root" # intiailize it
      else
-          export PYTHONPATH=\${MAUS_ROOT_DIR}/third_party/install/lib/root:\${PYTHONPATH} # else add it
+          export PYTHONPATH="\${MAUS_ROOT_DIR}/third_party/install/lib/root:\${PYTHONPATH}" # else add it
      fi
 
      # maus workers
-     export PYTHONPATH=\$MAUS_ROOT_DIR/build:\$PYTHONPATH
-     export LD_LIBRARY_PATH=\$MAUS_ROOT_DIR/build:\$LD_LIBRARY_PATH
+     export PYTHONPATH="\$MAUS_ROOT_DIR/build:\$PYTHONPATH"
+     export LD_LIBRARY_PATH="\$MAUS_ROOT_DIR/build:\$LD_LIBRARY_PATH"
 
      # maus core
-     export PYTHONPATH=\$MAUS_ROOT_DIR/core:\$PYTHONPATH
-     export LD_LIBRARY_PATH=\$MAUS_ROOT_DIR/core:\$LD_LIBRARY_PATH
+     export PYTHONPATH="\$MAUS_ROOT_DIR/core:\$PYTHONPATH"
+     export LD_LIBRARY_PATH="\$MAUS_ROOT_DIR/core:\$LD_LIBRARY_PATH"
 
      # disco
-     export DISCO_HOME=\$MAUS_ROOT_DIR/third_party/build/tuulos-disco-742e814
-     export PATH=\$DISCO_HOME/bin:\$PATH
-     export PYTHONPATH=\$DISCO_HOME/lib:\$PYTHONPATH
-     export LD_LIBRARY_PATH=\$DISCO_HOME/lib:\$LD_LIBRARY_PATH
+     export DISCO_HOME="\$MAUS_ROOT_DIR/third_party/build/tuulos-disco-742e814"
+     export PATH="\$DISCO_HOME/bin:\$PATH"
+     export PYTHONPATH="\$DISCO_HOME/lib:\$PYTHONPATH"
+     export LD_LIBRARY_PATH="\$DISCO_HOME/lib:\$LD_LIBRARY_PATH"
 
      export G4DEBUG=1
      export G4VERS=geant4.9.2.p01
      export G4SYSTEM=Linux-g++
-     export G4INSTALL=\${MAUS_ROOT_DIR}/third_party/build/\${G4VERS}
-     export G4LIB=\${G4INSTALL}/lib
-     export LD_LIBRARY_PATH=\${G4LIB}/\${G4SYSTEM}:\${LD_LIBRARY_PATH}
-     export G4INCLUDE=\${G4INSTALL}/include/
-     export G4TMP=\${G4INSTALL}
+     export G4INSTALL="\${MAUS_ROOT_DIR}/third_party/build/\${G4VERS}"
+     export G4LIB="\${G4INSTALL}/lib"
+     export LD_LIBRARY_PATH="\${G4LIB}/\${G4SYSTEM}:\${LD_LIBRARY_PATH}"
+     export G4INCLUDE="\${G4INSTALL}/include/"
+     export G4TMP="\${G4INSTALL}"
      export G4VIS_BUILD_DAWNFILE_DRIVER=1
      export G4VIS_USE_DAWNFILE=1
      export G4VIS_USE=0
      export G4OPTIMISE=2
      export OGLHOME=/usr/X11R6
-     export G4LEDATA=\${G4INSTALL}/data/G4EMLOW6.2/
-     export G4ABLADATA=\${G4INSTALL}/data/G4ABLA3.0/
-     export G4NEUTRONDATA=\${G4INSTALL}/data/G4NDL3.13/
-     export G4LEVELGAMMADATA=\${G4INSTALL}/data/PhotonEvaporation2.0/
-     export G4RADIOACTIVEDATA=\${G4INSTALL}/data/RadioactiveDecay3.2/
+     export G4LEDATA="\${G4INSTALL}/data/G4EMLOW6.2/"
+     export G4ABLADATA="\${G4INSTALL}/data/G4ABLA3.0/"
+     export G4NEUTRONDATA="\${G4INSTALL}/data/G4NDL3.13/"
+     export G4LEVELGAMMADATA"=\${G4INSTALL}/data/PhotonEvaporation2.0/"
+     export G4RADIOACTIVEDATA"=\${G4INSTALL}/data/RadioactiveDecay3.2/"
 
-     export MICEFILES=\${MAUS_ROOT_DIR}/commonCpp/FILES
+     export MICEFILES="\${MAUS_ROOT_DIR}/commonCpp/FILES"
  
      echo "SUCCESS: MAUS setup"
 else
@@ -208,65 +208,65 @@ else
      setenv MAUS_ROOT_DIR "${maus_root_dir}"
 
      if ({\$?PATH}) then       
-          setenv PATH \${MAUS_ROOT_DIR}/third_party/install/bin:\${PATH} # else add it  
+          setenv PATH "\${MAUS_ROOT_DIR}/third_party/install/bin:\${PATH}" # else add it  
      else
-          setenv PATH \${MAUS_ROOT_DIR}/third_party/install/bin # initialize it
+          setenv PATH "\${MAUS_ROOT_DIR}/third_party/install/bin" # initialize it
      endif
 
      if ({\$?LD_LIBRARY_PATH}) then  
-          setenv LD_LIBRARY_PATH \${MAUS_ROOT_DIR}/third_party/install/lib:\${LD_LIBRARY_PATH} # else add it  
+          setenv LD_LIBRARY_PATH "\${MAUS_ROOT_DIR}/third_party/install/lib:\${LD_LIBRARY_PATH}" # else add it  
      else
-          setenv LD_LIBRARY_PATH \${MAUS_ROOT_DIR}/third_party/install/lib # intiailize it
+          setenv LD_LIBRARY_PATH "\${MAUS_ROOT_DIR}/third_party/install/lib" # intiailize it
      endif
 
      if ({\$?MANPATH}) then 
-          setenv MANPATH \${MAUS_ROOT_DIR}/third_party/install/share/man/man1:\${MANPATH}  
+          setenv MANPATH "\${MAUS_ROOT_DIR}/third_party/install/share/man/man1:\${MANPATH}" 
      else
-          setenv MANPATH \${MAUS_ROOT_DIR}/third_party/install/share/man/man1:${man_path}
+          setenv MANPATH "\${MAUS_ROOT_DIR}/third_party/install/share/man/man1:${man_path}"
      endif
 
      # ROOT specific garbage
-     setenv LD_LIBRARY_PATH \${MAUS_ROOT_DIR}/third_party/install/lib/root:\${LD_LIBRARY_PATH}
+     setenv LD_LIBRARY_PATH "\${MAUS_ROOT_DIR}/third_party/install/lib/root:\${LD_LIBRARY_PATH}"
      if ({\$?PYTHONPATH}) then
-          setenv PYTHONPATH \${MAUS_ROOT_DIR}/third_party/install/lib/root:\${PYTHONPATH} # else add it
+          setenv PYTHONPATH "\${MAUS_ROOT_DIR}/third_party/install/lib/root:\${PYTHONPATH}" # else add it
      else
-          setenv PYTHONPATH \${MAUS_ROOT_DIR}/third_party/install/lib/root # intiailize it   
+          setenv PYTHONPATH "\${MAUS_ROOT_DIR}/third_party/install/lib/root" # intiailize it   
      endif
 
      # maus workers
-     setenv PYTHONPATH \$MAUS_ROOT_DIR/build:\$PYTHONPATH
-     setenv LD_LIBRARY_PATH \$MAUS_ROOT_DIR/build:\$LD_LIBRARY_PATH
+     setenv PYTHONPATH "\$MAUS_ROOT_DIR/build:\$PYTHONPATH"
+     setenv LD_LIBRARY_PATH "\$MAUS_ROOT_DIR/build:\$LD_LIBRARY_PATH"
 
      # maus core
-     setenv PYTHONPATH \$MAUS_ROOT_DIR/core:\$PYTHONPATH
-     setenv LD_LIBRARY_PATH \$MAUS_ROOT_DIR/core:\$LD_LIBRARY_PATH
+     setenv PYTHONPATH "\$MAUS_ROOT_DIR/core:\$PYTHONPATH"
+     setenv LD_LIBRARY_PATH "\$MAUS_ROOT_DIR/core:\$LD_LIBRARY_PATH"
 
      # disco
-     setenv DISCO_HOME \$MAUS_ROOT_DIR/third_party/build/tuulos-disco-742e814
-     setenv PATH \$DISCO_HOME/bin:\$PATH
-     setenv PYTHONPATH \$DISCO_HOME/lib:\$PYTHONPATH
-     setenv LD_LIBRARY_PATH \$DISCO_HOME/lib:\$LD_LIBRARY_PATH
+     setenv DISCO_HOME "\$MAUS_ROOT_DIR/third_party/build/tuulos-disco-742e814"
+     setenv PATH "\$DISCO_HOME/bin:\$PATH"
+     setenv PYTHONPATH "\$DISCO_HOME/lib:\$PYTHONPATH"
+     setenv LD_LIBRARY_PATH "\$DISCO_HOME/lib:\$LD_LIBRARY_PATH"
 
      setenv G4DEBUG 1
      setenv G4VERS geant4.9.2.p01
      setenv G4SYSTEM Linux-g++
-     setenv G4INSTALL \${MAUS_ROOT_DIR}/third_party/build/\${G4VERS}
-     setenv G4LIB \${G4INSTALL}/lib
-     setenv LD_LIBRARY_PATH \${G4LIB}/\${G4SYSTEM}:\${LD_LIBRARY_PATH}
-     setenv G4INCLUDE \${G4INSTALL}/include/
-     setenv G4TMP \${G4INSTALL}
+     setenv G4INSTALL "\${MAUS_ROOT_DIR}/third_party/build/\${G4VERS}"
+     setenv G4LIB "\${G4INSTALL}/lib"
+     setenv LD_LIBRARY_PATH "\${G4LIB}/\${G4SYSTEM}:\${LD_LIBRARY_PATH}"
+     setenv G4INCLUDE "\${G4INSTALL}/include/"
+     setenv G4TMP "\${G4INSTALL}"
      setenv G4VIS_BUILD_DAWNFILE_DRIVER 1
      setenv G4VIS_USE_DAWNFILE 1
      setenv G4VIS_USE 0
      setenv G4OPTIMISE 2
      setenv OGLHOME /usr/X11R6
-     setenv G4LEDATA \${G4INSTALL}/data/G4EMLOW6.2/
-     setenv G4ABLADATA \${G4INSTALL}/data/G4ABLA3.0/
-     setenv G4NEUTRONDATA \${G4INSTALL}/data/G4NDL3.13/
-     setenv G4LEVELGAMMADATA \${G4INSTALL}/data/PhotonEvaporation2.0/
-     setenv G4RADIOACTIVEDATA \${G4INSTALL}/data/RadioactiveDecay3.2/
+     setenv G4LEDATA "\${G4INSTALL}/data/G4EMLOW6.2/"
+     setenv G4ABLADATA "\${G4INSTALL}/data/G4ABLA3.0/"
+     setenv G4NEUTRONDATA "\${G4INSTALL}/data/G4NDL3.13/"
+     setenv G4LEVELGAMMADATA "\${G4INSTALL}/data/PhotonEvaporation2.0/"
+     setenv G4RADIOACTIVEDATA "\${G4INSTALL}/data/RadioactiveDecay3.2/"
 
-     setenv MICEFILES \${MAUS_ROOT_DIR}/commonCpp/FILES
+     setenv MICEFILES "\${MAUS_ROOT_DIR}/commonCpp/FILES"
 
      echo "SUCCESS: MAUS setup"
 endif
