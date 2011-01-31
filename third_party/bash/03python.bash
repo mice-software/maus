@@ -12,7 +12,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     else
         echo "INFO: Source archive doesn't exist.  Downloading..."
 
-	wget --directory-prefix=${MAUS_ROOT_DIR}/third_party/source ${url}
+	wget --directory-prefix="${MAUS_ROOT_DIR}/third_party/source" ${url}
     fi
 	
     if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ]
@@ -22,19 +22,19 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         echo "INFO: Checking MD5 checksum (otherwise the file didn't"
         echo "INFO: download properly):"
         echo
-        cd ${MAUS_ROOT_DIR}/third_party/source
+        cd "${MAUS_ROOT_DIR}/third_party/source"
         md5sum -c ${filename}.md5 || { echo "FATAL: Failed to download:" >&2; echo "FATAL: ${filename}." >&2; echo "FATAL: MD5 checksum failed.">&2; echo "FATAL: Try rerunning this command to redownload, or check" >&2; echo "FATAL: internet connection"  >&2; rm -f ${filename}; exit 1; }
         sleep 1
         echo
         echo "INFO: Unpacking:"
         echo
-	rm -Rf ${MAUS_ROOT_DIR}/third_party/build/${directory}
+	rm -Rf "${MAUS_ROOT_DIR}/third_party/build/${directory}"
         sleep 1
-        tar xvfz ${MAUS_ROOT_DIR}/third_party/source/${filename} -C ${MAUS_ROOT_DIR}/third_party/build > /dev/null
-        cd ${MAUS_ROOT_DIR}/third_party/build/${directory}
+        tar xvfz "${MAUS_ROOT_DIR}/third_party/source/${filename}" -C "${MAUS_ROOT_DIR}/third_party/build" > /dev/null
+        cd "${MAUS_ROOT_DIR}/third_party/build/${directory}"
         echo "INFO: Configuring:"
         sleep 1
-        ./configure --enable-shared --prefix=${MAUS_ROOT_DIR}/third_party/install
+        ./configure --enable-shared --prefix="${MAUS_ROOT_DIR}/third_party/install"
         echo "INFO: Making:"
         sleep 1
         make
