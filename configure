@@ -66,11 +66,11 @@ type -P python &>/dev/null || {
     echo "FATAL: environmental variable.  For Bourne-compatible" >&2;
     echo "FATAL: shells like 'bash', run:" >&2;
     echo "FATAL:" >&2;
-    echo "FATAL:      export MAUS_ROOT_DIR=${maus_root_dir}" >&2;
+    echo "FATAL:      export MAUS_ROOT_DIR=\"${maus_root_dir}\"" >&2;
     echo "FATAL:" >&2;
     echo "FATAL: whilst for C-compatible shells like 'csh', run:" >&2;
     echo "FATAL:" >&2;
-    echo "FATAL:      setenv MAUS_ROOT_DIR ${maus_root_dir}" >&2;
+    echo "FATAL:      setenv MAUS_ROOT_DIR \"${maus_root_dir}\"" >&2;
     echo "FATAL:" >&2;
     echo "FATAL: then run the following to install Python 2.7:" >&2;
     echo "FATAL:" >&2;
@@ -88,11 +88,11 @@ then               ##################################################
     echo "WARNING: environmental variable.  For Bourne-compatible";
     echo "WARNING: shells like 'bash', run:";
     echo "WARNING: ";
-    echo "WARNING:       export MAUS_ROOT_DIR=${maus_root_dir}";
+    echo "WARNING:       export MAUS_ROOT_DIR=\"${maus_root_dir}\"";
     echo "WARNING: ";
     echo "WARNING:  whilst for C-compatible shells like 'csh', run:";
     echo "WARNING: ";
-    echo "WARNING:       setenv MAUS_ROOT_DIR ${maus_root_dir}";
+    echo "WARNING:       setenv MAUS_ROOT_DIR \"${maus_root_dir}\"";
     echo "WARNING: ";
     echo "WARNING: then run the following to install Python 2.7:"
     echo "WARNING: ";
@@ -113,11 +113,11 @@ type -P scons &>/dev/null || {
     echo "FATAL: environmental variable.  For Bourne-compatible" >&2;
     echo "FATAL: shells like 'bash', run:" >&2;
     echo "FATAL:" >&2;
-    echo "FATAL:      export MAUS_ROOT_DIR=${maus_root_dir}" >&2;
+    echo "FATAL:      export MAUS_ROOT_DIR=\"${maus_root_dir}\"" >&2;
     echo "FATAL:" >&2;
     echo "FATAL: whilst for C-compatible shells like 'csh', run:" >&2;
     echo "FATAL:" >&2;
-    echo "FATAL:      setenv MAUS_ROOT_DIR ${maus_root_dir}" >&2;
+    echo "FATAL:      setenv MAUS_ROOT_DIR \"${maus_root_dir}\"" >&2;
     echo "FATAL:" >&2;
     echo "FATAL: then run the following to install Scons:" >&2;
     echo "FATAL:" >&2;
@@ -130,7 +130,7 @@ type -P scons &>/dev/null || {
 cat > env.sh <<EOF
 #/bin/sh
 if [ -z "\$MAUS_ROOT_DIR" ]; then
-     export MAUS_ROOT_DIR=${maus_root_dir}
+     export MAUS_ROOT_DIR="${maus_root_dir}"
 
      if [ -z "\${PATH}" ]; then  # see if the variable exists yet
          export PATH=\${MAUS_ROOT_DIR}/third_party/install/bin # initialize it
@@ -205,7 +205,7 @@ cat > env.csh <<EOF
 if ({\$?MAUS_ROOT_DIR}) then
      echo "ERROR: MAUS already setup" 
 else
-     setenv MAUS_ROOT_DIR ${maus_root_dir}
+     setenv MAUS_ROOT_DIR "${maus_root_dir}"
 
      if ({\$?PATH}) then       
           setenv PATH \${MAUS_ROOT_DIR}/third_party/install/bin:\${PATH} # else add it  
