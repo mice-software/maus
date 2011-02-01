@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import sys
+import gzip
 
 from InputPyEmptyDocument import *
 from MapPyFakeTestSimulation import *
@@ -19,7 +20,7 @@ inputer = InputPyEmptyDocument(big_number)
 mapper = MapPyFakeTestSimulation()
 #mapper = MapPyDoNothing()
 reducer = ReducePyDoNothing()
-outputer = OutputPyJSON('load_test')
+outputer = OutputPyJSON(gzip.GzipFile('mausput.gz', 'wb'))
 
 
-Go(inputer, mapper, reducer, outputer, argKeepTemp=True)
+Go(inputer, mapper, reducer, outputer)

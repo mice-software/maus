@@ -50,7 +50,7 @@ G4bool TofSD::ProcessHits(G4Step* aStep, G4TouchableHistory* History)
   if(_hits[0].get("path_length", 0.0).asDouble() == 0) {
   	G4Track* track = aStep->GetTrack();
 
-        _hits[0]["volume_name"] = _module->fullName();
+        //        _hits[0]["volume_name"] = _module->fullName();
 
         Json::Value threeVectorValue;
 

@@ -77,7 +77,7 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep,G4TouchableHistory* ROhist)
   _hits[hit_i]["track_id"] = aStep->GetTrack()->GetTrackID();
   channel_id["fiber_number"] = firstChan;
 
-  _hits[hit_i]["volume_name"] = aStep->GetPreStepPoint()->GetPhysicalVolume()->GetName();
+  //_hits[hit_i]["volume_name"] = aStep->GetPreStepPoint()->GetPhysicalVolume()->GetName();
   
   channel_id["tracker_number"] = _module->propertyInt( "Tracker" );
   channel_id["station_number"] = _module->propertyInt( "Station" );

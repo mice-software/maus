@@ -3,7 +3,7 @@ import glob, os
 
 #this is our catch-all Dev class
 class Dev:
-  cflags = '-g'
+  cflags = ''
   ecflags = ''
 
   #---
@@ -22,8 +22,9 @@ class Dev:
         print "The worker", project, "requires Geant4 which is disabled. Skipping..."
       return
 
-    builddir = 'build'
+
     name = project.split('/')[-1]
+    builddir = 'build'
     targetpath = os.path.join('build', '_%s' % name)
 
     #append the user's additional compile flags
@@ -75,7 +76,7 @@ env.Append(LIBPATH = ["%s/third_party/install/lib" % os.environ.get('MAUS_ROOT_D
                         "%s/build" % os.environ.get('MAUS_ROOT_DIR')])
 env.Append(CPPPATH=["%s/third_party/install/include" % os.environ.get('MAUS_ROOT_DIR'), \
                       "%s/third_party/install/include/python2.7" % os.environ.get('MAUS_ROOT_DIR'), \
-                      "%s/commonCpp" % os.environ.get('MAUS_ROOT_DIR'), ])
+                      "%s/commonCpp" % os.environ.get('MAUS_ROOT_DIR'), ""])
 
 env['USE_G4'] = False
 env['USE_ROOT'] = False
