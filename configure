@@ -186,7 +186,7 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      export LD_LIBRARY_PATH="\$MAUS_ROOT_DIR/src/core:\$LD_LIBRARY_PATH"
 
      # disco
-     export DISCO_HOME="\$MAUS_ROOT_DIR/third_party/build/tuulos-disco-742e814"
+#     export DISCO_HOME="\$MAUS_ROOT_DIR/third_party/build/tuulos-disco-742e814"
      export PATH="\$DISCO_HOME/bin:\$PATH"
      export PYTHONPATH="\$DISCO_HOME/lib:\$PYTHONPATH"
      export LD_LIBRARY_PATH="\$DISCO_HOME/lib:\$LD_LIBRARY_PATH"
@@ -261,7 +261,7 @@ else
      setenv LD_LIBRARY_PATH "\$MAUS_ROOT_DIR/src/core:\$LD_LIBRARY_PATH"
 
      # disco
-     setenv DISCO_HOME "\$MAUS_ROOT_DIR/third_party/build/tuulos-disco-742e814"
+#     setenv DISCO_HOME "\$MAUS_ROOT_DIR/third_party/build/tuulos-disco-742e814"
      setenv PATH "\$DISCO_HOME/bin:\$PATH"
      setenv PYTHONPATH "\$DISCO_HOME/lib:\$PYTHONPATH"
      setenv LD_LIBRARY_PATH "\$DISCO_HOME/lib:\$LD_LIBRARY_PATH"
