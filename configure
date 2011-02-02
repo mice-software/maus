@@ -43,7 +43,7 @@ echo
 # Find where MAUS is installed
 maus_root_dir=`pwd`
 
-if [[ "$maus_root_dir" =~ \ |\' ]]    #  slightly more readable: if [[ "$string" =~ ( |\') ]]
+if echo $maus_root_dir | grep -E '[ "]' >/dev/null;
 then
     echo "FATAL: No whitespace allowed in directory names.">&2;
     echo "FATAL:">&2;
