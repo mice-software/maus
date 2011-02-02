@@ -29,6 +29,9 @@ class MapCppSimulationTestCase(unittest.TestCase):
         files = glob.glob("%s/Models/Configurations/*.dat" % os.environ.get("MICEFILES"))
         self.assertTrue(len(files) != 0)
 
+        files = map(lambda x: x.split('/')[-1], files)
+        print files
+
         for file in files:
             args = ['python', '%s/tests/unit/test_geometry.py' %  os.environ.get("MAUS_ROOT_DIR"), file]
             p = subprocess.Popen(args)
