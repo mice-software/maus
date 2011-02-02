@@ -36,7 +36,7 @@ class Configuration:
         assert MAUSRootDir != None
 
         configDict = {}
-        defaultFilename = '%s/core/ConfigurationDefaults.py' % MAUSRootDir
+        defaultFilename = '%s/src/core/ConfigurationDefaults.py' % MAUSRootDir
         exec(open(defaultFilename,'r').read(), globals(), configDict)
 
         if configFile != None:

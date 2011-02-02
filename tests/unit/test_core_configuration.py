@@ -19,7 +19,7 @@ class ConfigurationTestCase(unittest.TestCase):
         self.assertNotEqual(MAUSRootDir,  None)
 
         configDict = {}
-        defaultFilename = '%s/core/ConfigurationDefaults.py' % MAUSRootDir
+        defaultFilename = '%s/src/core/ConfigurationDefaults.py' % MAUSRootDir
         exec(open(defaultFilename,'r').read(), globals(), configDict)
 
         configJSONStr = json.JSONEncoder().encode(configDict)
