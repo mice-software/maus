@@ -1,0 +1,16 @@
+// FILES/Models/Modules/AFC/AFCCryostat.dat
+//
+// The AFC cryostat. 
+// More details should be added (it is not a solid Al donut in reality).
+// 
+// 
+
+Module AFCCryostat
+{
+  Volume Tube
+  Dimensions 235.5 757 844 mm
+  PropertyString Material Al 
+  PropertyDouble BlueColour 0.87
+  PropertyDouble GreenColour 0.77
+  PropertyDouble RedColour 0.69
+}

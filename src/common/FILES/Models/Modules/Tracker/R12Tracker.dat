@@ -1,0 +1,20 @@
+// FILES/Models/Modules/Tracker/R12Tracker.dat
+//
+// A Tracker inside a simple cylinder for the R12 test
+// 
+//
+
+Module R12Tracker
+{
+  Volume Cylinder
+  Dimensions 450.0 1200.0 mm
+  PropertyString Material AIR
+  PropertyDouble RedColour 1.0
+  PropertyDouble GreenColour 1.0
+  PropertyDouble BlueColour 1.0
+  Module Tracker/Tracker1.dat
+  {
+    Position 0.0 0.0 0.0 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+}

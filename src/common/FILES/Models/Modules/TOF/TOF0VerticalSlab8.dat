@@ -1,0 +1,18 @@
+// FILES/Models/Modules/TOF/TOF0VerticalSlab8.dat
+//
+
+Module TOF0VerticalSlab8
+{
+  Volume Box
+  Dimensions 4.0 40.0 2.5 cm
+  PropertyInt Slab 8
+  PropertyInt numPMTs 2
+  PropertyHep3Vector Pmt1Pos 0.0 20.0 0.0 cm
+  PropertyHep3Vector Pmt2Pos 0.0 -20.0 0.0 cm
+  PropertyDouble BlueColour 1.0
+  Module TOF/TOF0VerticalSlab8Sci.dat
+  {
+    Position 0.0 0.0 0.0 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+}

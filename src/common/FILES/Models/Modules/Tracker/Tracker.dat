@@ -1,0 +1,15 @@
+// FILES/Models/Modules/Tracker/Tracker.dat
+//
+// A tracker in the muon cooling device
+//
+// 
+// 
+
+Module Tracker
+{
+  Volume Cylinder
+  Dimensions 39.0 260.0 cm
+  PropertyDouble GreenColour 0.5
+  PropertyDouble RedColour 1.0
+}
+

@@ -1,0 +1,36 @@
+//
+//
+//    FILES/Models/Modules/Matching/DownstreamMatch.dat
+//
+//    Matching region downstream of MANX cooling channel
+//
+//    Created 14 March 2007  by Steve Kahn
+//
+
+Module DownstreamMatch
+{
+   Volume Cylinder
+   Dimensions   55.5 320.0 cm
+
+  PropertyString Material Galactic
+
+   PropertyBool   Invisible   1
+   PropertyInt    Tracker  5
+   Module Matching/DownstreamMatchField.dat
+   {
+      Position  0.0  0.0  0.0  cm
+      Rotation  0.0  0.0  0.0  degree
+   }
+   Module Matching/DownstreamMatchingStation1.dat
+   {
+      Position  0.0  0.0  -150.0 cm
+      Rotation  0.0  0.0  0.0  degree
+   }
+   Module Matching/DownstreamMatchingStation2.dat
+   {
+      Position  0.0  0.0  -50.0 cm
+      Rotation  0.0  0.0  0.0  degree
+   }
+}
+
+ 

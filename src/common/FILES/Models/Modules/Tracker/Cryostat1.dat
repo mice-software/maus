@@ -1,0 +1,42 @@
+// @(#) $Id: Cryostat1.dat,v 1.5 2007-02-27 17:45:14 sandstrom Exp $  $Name:  $
+//
+// FILES/Models/Modules/Tracker/Cryostat.dat
+//
+// Spectrometer solenoid cryostat
+//
+// Simple model with 2 tubes and 2 end plates
+// Ignoring the radiation shutter, magnetic shield supports,
+// chimneys on top, cold mass support, support frame underneath
+//
+// Based on drawing MICE-TM-GA0000-R05
+
+Module Cryostat1
+{
+  Volume Tube
+  Dimensions 200.5 702. 2733. mm
+  PropertyDouble BlueColour 0.87
+  PropertyDouble GreenColour 0.17
+  PropertyDouble RedColour 0.
+  PropertyString Material He
+  Module Tracker/CryostatOuterVessel.dat
+  {
+    Position 0.0 0.0 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Tracker/CryostatInnerTube.dat
+  {
+    Position 0.0 0.0 0.0 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Tracker/CryostatFrontEndPlate.dat
+  {
+    Position 0.0 0.0 1357.5 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Tracker/CryostatBackEndPlate.dat
+  {
+    Position 0.0 0.0 -1357.5 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+}
+

@@ -1,0 +1,15 @@
+//Virtual Plane - you will need to add another property, like
+//PropertyString IndependentVariable t
+//PropertyString IndependentVariable z
+//That defines the indepenent variable used in integration
+//If IndependentVariable is t, you will also have to add
+//PropertyDouble PlaneTime <some_time>
+//Particles will be output at times corresponding to the double value of <some_time>
+//Else the z position will be used
+
+Module Virtual
+{
+  Volume     None
+  PropertyString SensitiveDetector   Virtual
+}
+

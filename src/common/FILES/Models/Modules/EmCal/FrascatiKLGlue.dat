@@ -1,0 +1,16 @@
+Module FrascatiKLGlue.dat
+{
+  Volume Box
+  Dimensions 92.0 4.4 4 cm
+  PropertyString G4Detector EmCalKLGlue
+  PropertyDouble GlueThickness 0.09 mm
+  PropertyDouble FibreDiameter 1.0 mm
+  PropertyDouble FibreLength 920.0 mm
+  PropertyDouble FibreSpacingY 1.35 mm
+  PropertyDouble FibreSpacingZ 0.97 mm
+  PropertyString Material BC600
+  PropertyDouble BlueColour 0
+  PropertyDouble RedColour 0.8
+  PropertyDouble GreenColour 0.8
+  PropertyBool Invisible 1
+}

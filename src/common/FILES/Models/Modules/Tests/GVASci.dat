@@ -1,0 +1,16 @@
+// FILES/Models/Modules/Tests/GvaSci.dat
+//
+// Scintilator Module for GVA1 and GVA2
+//
+// V.Verguilov Sep 2008
+
+Module GvaSci
+{
+  Volume Box
+  Dimensions 20.0 20.0 1.0 cm
+  PropertyString SensitiveDetector TOF
+  PropertyDouble RedColour 0.6
+  PropertyDouble GreenColour 0.8
+  PropertyDouble BlueColour 0.6		
+  PropertyString Material POLYSTYRENE
+}

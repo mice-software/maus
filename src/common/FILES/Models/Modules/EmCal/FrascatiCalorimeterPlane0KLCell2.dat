@@ -1,0 +1,25 @@
+// FILES/Models/Modules/EmCal/FrascatiCalorimeterPlane0KLCell2.dat
+//
+
+Module FrascatiCalorimeterPlane0KLCell2
+{
+  Volume Box
+  Dimensions 92.0 4.4 4 cm
+  PropertyInt Layer 0
+  PropertyInt Cell 2
+  PropertyInt numPMTs 2
+  PropertyDouble BlueColour 0.5
+  PropertyDouble RedColour 0.5
+  PropertyDouble GreenColour 0.5
+  PropertyString Material Pb
+  Module EmCal/FrascatiKLGlue.dat
+  {
+    Position 0 0 0 cm
+    Rotation 0 0 0 degree
+  }
+  Module EmCal/FrascatiKLFiber.dat
+    {
+    Position 0 0 0 cm
+    Rotation 0 0 0 degree
+  }
+}

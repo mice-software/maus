@@ -1,0 +1,119 @@
+//BeamLine start is 0 0 0 m in this coordinate system which is at
+//-20.574 0.000000 -12.007 m
+//wrt the lead scatterer in MICE
+
+
+Module BeamLine
+{ 
+  Volume Box
+  PropertyString Material   Galactic
+  PropertyDouble G4StepMax  0.2 m
+  Dimensions 41.2 5 30 m
+  PropertyBool Invisible 1
+//Uncomment to load beam from for003.g4mice.dat into your local directory 
+//if datacard BeamType is set to MiceModule. Max number of events to read set in Tests/beam.dat
+//  Module Tests/beam.dat 
+//  {
+//    Position 0. 0.000000 0. m
+//    Rotation 0.0 0.0 0.0 degree
+//  }
+  Module BeamLine/IsisPipe.dat //ISIS beam pipe - need to check dimensions, quite a bit of material here
+  {
+    Position 0.0 0.0 0.0 mm
+    Rotation 0.0 90.0 0.0 degree
+  }
+  Module BeamLine/VacuumWindow.dat //ISIS beam pipe - need to check dimensions
+  {
+    Position 0.0 0.0 400.0 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module BeamLine/QuadTrip123.dat //Centred on start of Q2
+  {
+    Position 0.0 0.0 3.973300 m
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module BeamLine/PipeIsisToB1.dat 
+  {
+    Position 0.0 0.0 3.8171 m
+    Rotation 0.0 0.0 0.0 degree
+  }
+//B1 tuned for initial pion momentum of 444.7 MeV/c at target
+//=> 433.057 MeV/c in the dipole
+  Module BeamLine/BendMag.dat  
+  {
+    Position 0.0 0.0 7.434200 m
+    Rotation 0.0 -30.0 0.0 degree 
+    ScaleFactor -0.927685
+  }
+  Module BeamLine/PipeB1ToSol.dat
+  {
+    Position 1.102268 0.000000 8.669884 m
+    Rotation 0.0 -60.0 0.0 degree
+  }
+  Module BeamLine/DSAEastWall.dat
+  {
+    Position 3.775689 0.000000 10.213384 m
+    Rotation 0.0 -60.0 0.0 degree
+  }
+  Module BeamLine/DecaySolenoid.dat //NO CURRENT
+  {
+    Position 3.775689 0.000000 10.213384 m
+    Rotation 0.0 -60.0 0.0 degree
+    ScaleFactor 0
+  }
+  Module Tests/GVA1.dat
+  {
+    Position 6.2059445 0.000000 11.633384 m
+    Rotation 0.0 -60.0 0.0 degree
+  }
+//B2 tuned for muon momentum of 270.0 MeV/c
+  Module BeamLine/BendMag.dat
+  {
+    Position 6.416200 0.000000 11.737884 m
+    Rotation 0.0 -75.0 0.0 degree
+    ScaleFactor -0.298981 //-0.42654
+  }
+  Module BeamLine/QuadTrip456.dat //Centred on start of Q5
+  {
+    Position 9.590731 0.000000 12.006539 m
+    Rotation 0.0 -90.0 0.0 degree
+  }
+  Module Tests/GVA2.dat //Geneva 2
+  {
+    Position 11.76281 0.000000 12.006539 m
+    Rotation 0.0 -90.0 0.0 degree
+  }
+  Module TOF/TOF0.dat
+  {
+    Position 12.541831 0.000000 12.006539 m
+    Rotation 0.0 -90.0 0.0 degree
+  }
+  Module Ckov/Cherenkov.dat
+  {
+    Position 13.184931 0.000000 12.006539 m
+    Rotation 0.0 -90.0 0.0 degree
+  }
+  Module BeamLine/DSAWestWall.dat
+  {
+    Position 14.2 0.000000 12.006539 m
+    Rotation 0.0 -90.0 0.0 degree
+  }
+  Module BeamLine/QuadTrip789.dat //Centred on start of Q8
+  {
+    Position 17.222831 0.000000 12.006539 m
+    Rotation 0.0 -90.0 0.0 degree
+  }
+//  Module TOF/TOF1.dat
+//  {
+//    Position 19.942831 0.000000 12.006539 m
+//    Rotation 0.0 -90.0 0.0 degree
+//  }
+  //The downstream face of the lead scatterer would be at 
+  //20.566131	0.000000	12.006539
+  //in this coordinate system
+}
+
+
+
+
+

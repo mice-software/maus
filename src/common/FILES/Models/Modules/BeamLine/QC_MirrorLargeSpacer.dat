@@ -1,0 +1,10 @@
+
+Module QC_MirrorLargeSpacer
+{
+  Volume Box
+  Dimensions 0.08 0.25 0.13 m
+  PropertyDouble RedColour 0.0
+  PropertyDouble GreenColour  1.0
+  PropertyDouble BlueColour   1.0
+  PropertyString Material     STEEL304
+}

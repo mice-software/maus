@@ -1,0 +1,51 @@
+// FILES/Models/Modules/AeroGel/AeroGelHolder.dat
+//
+
+Module AeroGelHolder
+{
+  Volume Box 
+  Dimensions 230.0 230.0 230.0 mm
+  PropertyInt Plane 1
+  PropertyString Material AIR 
+  Module AeroGel/AeroGel103a.dat
+  {
+    Position 0.0 0.0 103.5 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module AeroGel/Baffle.dat
+  {
+    Position 0.0 0.0 0.0 cm
+    Rotation 45.0 0.0 0.0 degree
+  }
+  Module AeroGel/SideWall.dat
+  {
+    Position 0.0 0.0 11.5 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module AeroGel/SideWall.dat
+  {
+    Position 0.0 0.0 -11.5 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module AeroGel/SideWall.dat
+  {
+    Position 11.5 0.0 0.0 cm
+    Rotation 0.0 90.0 0.0 degree
+  }
+  Module AeroGel/SideWall.dat
+  {
+    Position -11.5 0.0 0.0 cm
+    Rotation 0.0 90.0 0.0 degree
+  }
+  Module AeroGel/SideWall.dat
+  {
+    Position 0.0 11.5 0.0 cm
+    Rotation 90.0 0.0 0.0 degree
+  }
+  Module AeroGel/SideWall.dat
+  {
+    Position 0.0 11.5 0.0 cm
+    Rotation 90.0 0.0 0.0 degree
+  }
+}
+

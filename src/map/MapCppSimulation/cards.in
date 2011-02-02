@@ -1,0 +1,13 @@
+!****General
+MiceModel Stage6Coils.dat
+!MICEStage6/Stage6.dat
+!
+numEvts 10
+!
+ZOffsetStart -15 m
+SigmaX 1.0 mm
+SigmaXPrime 0.0
+SigmaYPrime 0.0
+! TrackOnlyMuons True
+!
+OutputFile Sim.out.stage6.gz

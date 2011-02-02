@@ -1,0 +1,19 @@
+// FILES/Models/Modules/Ckov/ConicalMirror.dat
+// 
+
+Module ConicalMirror
+{
+  PropertyString G4Detector CkovMirror
+  PropertyString Material B270
+
+  PropertyDouble RedColour 0.5
+  PropertyDouble GreenColour 1.0
+  PropertyDouble BlueColour 0.0
+
+  PropertyDouble Thickness[mm]           3.00
+  PropertyDouble DiameterOfPmt[mm]     220.00
+  PropertyDouble DiameterOfGate[mm]    556.82
+  PropertyDouble XoffsetOfPmt[mm]      303.08
+  PropertyDouble ZoffsetOfPmt[mm]      169.50
+}
+

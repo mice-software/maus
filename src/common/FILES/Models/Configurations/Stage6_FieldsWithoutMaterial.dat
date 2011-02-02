@@ -1,0 +1,13 @@
+// Stage 6 Floor Plan, z=0 at middle H absorber
+
+Configuration Stage6
+{
+  Dimensions 6. 6. 31. m
+  PropertyString Material AIR
+  PropertyDouble G4StepMax 1.0 mm
+
+  Module CoilConfig/Stage6CoilCurrents.dat
+  {
+  }
+}
+

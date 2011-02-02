@@ -1,0 +1,19 @@
+// FILES/Models/Modules/Fields/fieldMapWrite.dat
+//
+// MICE field map writer
+// 
+// 
+
+Module fieldMapWrite
+{ 
+  Volume None
+  PropertyString FieldType      MagneticFieldMap
+  PropertyString FieldMapMode   Write
+  PropertyString FileName       bfield.map
+  PropertyDouble ZMin           -6000.
+  PropertyDouble ZMax            6000.
+  PropertyDouble RMin               0.
+  PropertyDouble RMax             100.
+  PropertyDouble ZStep             10.
+  PropertyDouble RStep            200.
+}

@@ -1,8 +1,0 @@
-
-Module PipeB1ToSol
-{
-  Volume Cylinder
-  Dimensions 100.0 1192.5 mm
-  PropertyString Material Galactic
-  PropertyDouble RedColour 1.0
-}

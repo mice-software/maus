@@ -1,0 +1,13 @@
+
+Module PipeTargetToB1
+{
+  Volume Tube
+  Dimensions 100.0 103. 7184.2 mm
+  PropertyString Material Al
+  PropertyDouble RedColour 1.0
+  Module BeamLine/VacuumIsisToB1.dat
+  {
+     Position 0.0 0.0 0.0 mm
+     Rotation 0.0 0.0 0.0 degree
+  }
+}

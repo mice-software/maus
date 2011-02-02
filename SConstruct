@@ -76,7 +76,7 @@ env.Append(LIBPATH = ["%s/third_party/install/lib" % os.environ.get('MAUS_ROOT_D
                         "%s/build" % os.environ.get('MAUS_ROOT_DIR')])
 env.Append(CPPPATH=["%s/third_party/install/include" % os.environ.get('MAUS_ROOT_DIR'), \
                       "%s/third_party/install/include/python2.7" % os.environ.get('MAUS_ROOT_DIR'), \
-                      "%s/commonCpp" % os.environ.get('MAUS_ROOT_DIR'), ""])
+                      "%s/src/common" % os.environ.get('MAUS_ROOT_DIR'), ""])
 
 env['USE_G4'] = False
 env['USE_ROOT'] = False
@@ -272,12 +272,12 @@ if not env.GetOption('clean'):
   directories = []
   types = ["input", "map", "reduce", "output"]
   for type in types:
-    directories += glob.glob("components/%s/*" % type)
+    directories += glob.glob("src/%s/*" % type)
 
   for directory in directories:
     parts = directory.split("/")
     assert len(parts) == 3
-    assert parts[0] == 'components'
+    assert parts[0] == 'src'
     assert parts[1] in types
     
     if 'Py' in parts[2] and 'Cpp' not in parts[2]:

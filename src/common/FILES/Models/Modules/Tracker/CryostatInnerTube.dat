@@ -1,0 +1,17 @@
+// @(#) $Id: CryostatInnerTube.dat,v 1.2 2007-01-16 14:49:52 sandstrom Exp $  $Name:  $
+//
+// FILES/Models/Modules/Tracker/CryostatInnerTube.dat
+//
+// Spectrometer solenoid cryostat warm bore tube
+// Based on drawing MICE-TM-V005-R03
+// Yagmur Torun - Sep 
+
+Module TrackerCryostatInnerTube
+{
+  Volume Tube
+  Dimensions 200.5 202.0 2733.0 mm
+  PropertyString Material STEEL304
+  PropertyDouble BlueColour 0.87
+  PropertyDouble GreenColour 0.77
+  PropertyDouble RedColour 0.69
+}

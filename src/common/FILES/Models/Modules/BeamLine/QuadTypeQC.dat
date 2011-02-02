@@ -1,0 +1,28 @@
+
+Module QuadTypeQC
+{
+//Physical model
+  Volume         Multipole
+  PropertyDouble BlueColour  0.5
+  PropertyString Material            Fe
+  PropertyDouble ApertureCurvature   0.     m
+  PropertyDouble ApertureLength      0.914  m
+  PropertyDouble ApertureInnerHeight 0.4    m
+  PropertyDouble ApertureInnerWidth  0.4    m
+  PropertyDouble ApertureOuterHeight 0.6    m
+  PropertyDouble ApertureOuterWidth  0.6    m
+  PropertyDouble PoleCenterRadius    0.25   m
+  PropertyDouble PoleTipRadius       0.1782 m
+  PropertyInt    NumberOfPoles       4
+//Field model
+  PropertyString FieldType           Multipole
+  PropertyInt    Pole                2 //Quad field
+  PropertyInt    MaxEndPole          3 //Simulate end field up to sextupole order
+  PropertyDouble Magnitude           0.4     tesla //normalise to 1 T/m
+  PropertyDouble Height              0.4     m
+  PropertyDouble Width               0.4     m     
+  PropertyDouble Length              0.660   m
+  PropertyString EndFieldType        Enge
+  PropertyDouble EffectiveWidth      0.3564  m
+}
+

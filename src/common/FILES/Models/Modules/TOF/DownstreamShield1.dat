@@ -1,0 +1,12 @@
+// FILES/Models/Modules/TOF/DownstreamShield1.dat
+//
+
+Module DownstreamShield1.dat
+{
+  Volume Tube
+  Dimensions 300.0 750.0 100.0 mm
+  PropertyDouble RedColour 1.0
+  PropertyDouble GreenColour 0.5
+  PropertyString Material Fe
+}
+

@@ -1,0 +1,35 @@
+// FILES/Models/Modules/Beamline/BendMag.dat
+//
+// 
+//
+// 
+// 
+
+Module BendMag
+{
+//Physical properties
+  Volume Multipole
+  PropertyString Material   Al
+  PropertyDouble BlueColour 0.5
+  PropertyDouble ApertureCurvature   0.     m
+  PropertyDouble ApertureLength      1.038  m
+  PropertyDouble ApertureInnerHeight 0.1525 m
+  PropertyDouble ApertureInnerWidth  0.66   m
+  PropertyDouble ApertureOuterHeight 1.320  m
+  PropertyDouble ApertureOuterWidth  1.828  m
+//Field properties
+  PropertyString FieldType          Multipole
+  PropertyDouble Height             20 cm
+  PropertyDouble Width              66 cm
+  PropertyDouble Length             103.8 cm
+  PropertyInt    Pole               1 //Dipole field
+  PropertyInt    MaxEndPole         3 //Simulate end field up to sextupole order
+  PropertyDouble Magnitude          1   tesla 
+  PropertyDouble ReferenceCurvature 0   cm
+  PropertyString EndFieldType       Enge
+  PropertyDouble EffectiveWidth     66  cm
+  PropertyDouble EndLength          10  cm
+}
+
+
+

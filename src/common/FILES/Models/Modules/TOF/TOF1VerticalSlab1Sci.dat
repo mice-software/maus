@@ -1,0 +1,12 @@
+// FILES/Models/Modules/TOF/TOF1VerticalSlab1Sci.dat
+//
+
+Module TOF1VerticalSlab1Sci
+{
+  Volume Box
+  Dimensions 6.0 42.0 2.5 cm
+  PropertyString SensitiveDetector TOF
+  PropertyString Material POLYSTYRENE
+  PropertyDouble GreenColour 1.0
+  PropertyDouble RedColour 1.0
+}

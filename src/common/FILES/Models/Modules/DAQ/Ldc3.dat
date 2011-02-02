@@ -1,0 +1,7 @@
+// FILES/Models/Modules/DAQ/Ldc3.dat
+//
+
+Module Ldc3
+{
+  PropertyInt LdcId 3
+}

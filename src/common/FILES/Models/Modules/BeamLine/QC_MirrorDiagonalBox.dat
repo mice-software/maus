@@ -1,0 +1,10 @@
+
+
+Module QC_MirrorDiagonalBox
+{
+  Volume Box
+  Dimensions 1.280 1.280 0.10 m
+
+  PropertyString Material Galactic
+
+}

@@ -1,0 +1,42 @@
+Module DecaySolenoid
+{
+  Volume Cylinder
+  Dimensions 200.0 5137 mm
+  PropertyBool   Invisible 1
+
+  PropertyString Material Galactic
+
+  Module BeamLine/VacuumWindow.dat
+  {
+    Position 0.0 0.0 -2568.25 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module BeamLine/VacuumWindow.dat
+  {
+    Position 0.0 0.0  2568.25 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module BeamLine/DecayBody.dat
+  {
+    Position 0.0 0.0 0.0 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module BeamLine/DecayCoil.dat
+  {
+    Position 0.0 0.0 0.0 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module BeamLine/DecayEnd.dat
+  {
+    Position 0.0 0.0 -2534 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module BeamLine/DecayEnd.dat
+  {
+    Position 0.0 0.0 2534 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+
+
+}
+

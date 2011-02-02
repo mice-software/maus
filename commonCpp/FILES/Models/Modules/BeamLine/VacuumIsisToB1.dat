@@ -1,8 +1,0 @@
-
-Module VacuumPipe
-{
-  Volume Tube
-  Dimensions 0.0 100. 7184.2 mm
-  PropertyString Material Galactic
-  PropertyDouble RedColour 1.0
-}

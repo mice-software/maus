@@ -1,0 +1,19 @@
+// FILES/Models/Modules/Tracker/KekSolenoid.dat
+//
+// Definition of the tracker module for the four station prototype
+// tested in the KEK pi2 beam line in October 2006
+//
+// M.Ellis 16th May 2006
+ 
+Module line
+{
+  Volume Cylinder
+  Dimensions 0.5 80.0 cm
+
+  PropertyString Material Galactic
+
+  PropertyDouble RedColour 1.0
+  PropertyDouble GreenColour 0.0
+  PropertyDouble BlueColour 0.0
+
+}

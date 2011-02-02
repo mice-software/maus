@@ -1,0 +1,26 @@
+// FILES/Models/Modules/EmCal/FrascatiCalorimeterPlane1.dat
+//
+
+Module FrascatiCalorimeterPlane1
+{
+  Volume Box
+  Dimensions 92.0 13.2 4 cm
+  PropertyInt Plane 0
+  PropertyInt numSlabs 24
+  PropertyBool Invisible 1
+  Module EmCal/FrascatiCalorimeterPlane1KLCell0.dat
+  {
+    Position 0.0 -4.4 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module EmCal/FrascatiCalorimeterPlane1KLCell1.dat
+  {
+    Position 0.0 0.0 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module EmCal/FrascatiCalorimeterPlane1KLCell2.dat
+  {
+    Position 0.0 4.4 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+}

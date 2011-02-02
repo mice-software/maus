@@ -1,7 +1,0 @@
-// FILES/Models/Modules/DAQ/Ldc2.dat
-//
-
-Module Ldc2
-{
-  PropertyInt LdcId 2
-}

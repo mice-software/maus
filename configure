@@ -182,8 +182,8 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      export LD_LIBRARY_PATH="\$MAUS_ROOT_DIR/build:\$LD_LIBRARY_PATH"
 
      # maus core
-     export PYTHONPATH="\$MAUS_ROOT_DIR/core:\$PYTHONPATH"
-     export LD_LIBRARY_PATH="\$MAUS_ROOT_DIR/core:\$LD_LIBRARY_PATH"
+     export PYTHONPATH="\$MAUS_ROOT_DIR/src/core:\$PYTHONPATH"
+     export LD_LIBRARY_PATH="\$MAUS_ROOT_DIR/src/core:\$LD_LIBRARY_PATH"
 
      # disco
      export DISCO_HOME="\$MAUS_ROOT_DIR/third_party/build/tuulos-disco-742e814"
@@ -210,7 +210,7 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      export G4LEVELGAMMADATA"=\${G4INSTALL}/data/PhotonEvaporation2.0/"
      export G4RADIOACTIVEDATA"=\${G4INSTALL}/data/RadioactiveDecay3.2/"
 
-     export MICEFILES="\${MAUS_ROOT_DIR}/commonCpp/FILES"
+     export MICEFILES="\${MAUS_ROOT_DIR}/src/common/FILES"
 
      echo "SUCCESS: MAUS setup"
 else
@@ -257,8 +257,8 @@ else
      setenv LD_LIBRARY_PATH "\$MAUS_ROOT_DIR/build:\$LD_LIBRARY_PATH"
 
      # maus core
-     setenv PYTHONPATH "\$MAUS_ROOT_DIR/core:\$PYTHONPATH"
-     setenv LD_LIBRARY_PATH "\$MAUS_ROOT_DIR/core:\$LD_LIBRARY_PATH"
+     setenv PYTHONPATH "\$MAUS_ROOT_DIR/src/core:\$PYTHONPATH"
+     setenv LD_LIBRARY_PATH "\$MAUS_ROOT_DIR/src/core:\$LD_LIBRARY_PATH"
 
      # disco
      setenv DISCO_HOME "\$MAUS_ROOT_DIR/third_party/build/tuulos-disco-742e814"
@@ -285,7 +285,7 @@ else
      setenv G4LEVELGAMMADATA "\${G4INSTALL}/data/PhotonEvaporation2.0/"
      setenv G4RADIOACTIVEDATA "\${G4INSTALL}/data/RadioactiveDecay3.2/"
 
-     setenv MICEFILES "\${MAUS_ROOT_DIR}/commonCpp/FILES"
+     setenv MICEFILES "\${MAUS_ROOT_DIR}/src/common/FILES"
 
      echo "SUCCESS: MAUS setup"
 endif

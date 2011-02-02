@@ -1,0 +1,35 @@
+// FILES/Models/Moduels/TOF/TOF2.dat
+//
+// 
+//
+// 
+// 
+
+Module TOF2
+{
+  Volume Box
+  Dimensions 150.0 150.0 25.0 cm
+  PropertyBool Invisible 1
+  PropertyString Material AIR
+  Module TOF/DownstreamShield1.dat
+  {
+    Position 0.0 0.0 -75.0 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module TOF/DownstreamShieldLink.dat
+  {
+    Position 0.0 0.0 25.0 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module TOF/DownstreamShield2.dat
+  {
+    Position 0.0 0.0 100.0 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module TOF/TOF2Detector.dat
+  {
+    Position 0.0 0.0 25.0 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+}
+

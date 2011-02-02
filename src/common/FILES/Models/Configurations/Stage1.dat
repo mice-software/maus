@@ -1,0 +1,19 @@
+// Stage 1 Floor Plan, everything is relative to z=0 at middle H absorber in Stage 6
+
+Configuration Stage1
+{
+  Dimensions 6. 6. 31. m
+  PropertyString Material AIR
+  PropertyDouble G4StepMax 1.0 mm
+  Module BeamLine/BeamLine.dat
+  {
+    Position 0. 0. -10.283 m
+    Rotation 0. 0. 0. degree
+  }
+  Module EmCal/Calorimeter.dat
+  {
+    Position 0. 0. -6.11 m
+    Rotation 0. 0. 0. degree
+  }
+}
+

@@ -1,0 +1,25 @@
+// @(#) $Id: ManxCryostatOuterCoils.dat
+//
+// FILES/Models/Modules/Helical/ManxCryostatOuterCoils.dat
+//
+// Outer Coils of MANX cryostat
+//
+// Created 10 March 2007  by Steve Kahn
+//
+
+Module ManxCryostatOuterCoils
+{
+   Volume Tube
+   Dimensions 30. 55.5 400. cm
+   PropertyString  Material    Cu
+   PropertyDouble BlueColour   0.
+   PropertyDouble GreenColour   0.
+   PropertyDouble RedColour     1.0
+
+   PropertyString FieldType   MagFieldMap3D
+   PropertyString FileName    Field3.txt
+   PropertyString FieldMapMode    Read
+   PropertyDouble CurrentDensity  1.0
+   PropertyDouble Length          4000.
+   PropertyDouble zOffset        -2000.
+}

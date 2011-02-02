@@ -1,0 +1,11 @@
+
+Module DecayBody
+{
+  Volume Tube 
+  Dimensions 48.0 180.0 68.0 mm
+  PropertyString Material Al
+  PropertyDouble RedColour 0.2
+//field
+}
+
+

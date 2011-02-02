@@ -1,0 +1,36 @@
+// FILES/Models/Moduels/TOF/TOF1.dat
+//
+// 
+//
+// 
+// 
+
+Module TOF1
+{
+  Volume Box
+  Dimensions 150.0 150.0 25.0 cm
+  PropertyBool Invisible 1
+  PropertyString Material AIR
+  PropertyBool UseDaughtersInOptics 0
+  Module TOF/UpstreamShield1.dat
+  {
+    Position 0.0 0.0 75.0 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module TOF/UpstreamShieldLink.dat
+  {
+    Position 0.0 0.0 -25.0 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module TOF/UpstreamShield2.dat
+  {
+    Position 0.0 0.0 -100.0 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module TOF/TOF1Detector.dat
+  {
+    Position 0.0 0.0 -25.0 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+}
+

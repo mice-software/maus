@@ -1,0 +1,208 @@
+// Stage 6 coil currents
+// I use repeat placements for Focus Coils - you may prefer just to explicitly write out each one
+
+Module Stage6CoilCurrents
+{
+  Volume None //Note - this will generate a warning in MICEDetectorConstruction; it should be okay.
+  Module CouplingCoil
+  {
+    Volume None
+    Position 0.0 0.0 -1375.0 mm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor -96.21
+  //field
+    PropertyString FieldType       Solenoid
+    PropertyString FileName        coupling.fld
+    PropertyDouble CurrentDensity    1.
+    PropertyDouble Length          250.
+    PropertyDouble Thickness       116.
+    PropertyDouble InnerRadius     725.
+  //repeat placements
+    PropertyBool       RepeatModule      1
+    PropertyInt        NumberOfRepeats   1
+    PropertyHep3Vector RepeatTranslation 0.0 0.0 2.75 m
+    PropertyHep3Vector RepeatRotation    0.0 0.0 0.0 degree
+    PropertyDouble     RepeatScaleFactor -1.
+  }
+  Module FocusCoil
+  {
+    Volume None
+    Position 0.0 0.0 -2955.0 mm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor +113.95
+  //field
+    PropertyString FieldType       Solenoid
+    PropertyString FileName        focus.fld
+    PropertyDouble CurrentDensity      1.
+    PropertyDouble Length            210.
+    PropertyDouble Thickness          84.
+    PropertyDouble InnerRadius       263.
+  //repeat placements
+    PropertyBool       RepeatModule      1
+    PropertyInt        NumberOfRepeats   2
+    PropertyHep3Vector RepeatTranslation 0.0 0.0 2.75 m
+    PropertyHep3Vector RepeatRotation    0.0 0.0 0.0 degree
+    PropertyDouble     RepeatScaleFactor -1.
+  }
+  Module FocusCoil
+  {
+    Volume None
+    Position 0.0 0.0 -2545.0 mm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor -113.95
+  //field
+    PropertyString FieldType       Solenoid
+    PropertyString FileName        focus.fld
+    PropertyDouble CurrentDensity      1.
+    PropertyDouble Length            210.
+    PropertyDouble Thickness          84.
+    PropertyDouble InnerRadius       263.
+  //repeat placements
+    PropertyBool       RepeatModule      1
+    PropertyInt        NumberOfRepeats   2
+    PropertyHep3Vector RepeatTranslation 0.0 0.0 2.75 m
+    PropertyHep3Vector RepeatRotation    0.0 0.0 0.0 degree
+    PropertyDouble     RepeatScaleFactor -1.
+  }
+  Module MatchCoil1
+  {
+    Volume None
+    Position 0.0 0.0 -3611.0 mm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor +118.56
+  //Field
+    PropertyString FieldType      Solenoid
+    PropertyString FileName       match1.fld
+    PropertyDouble CurrentDensity      1.
+    PropertyDouble Length            201.2
+    PropertyDouble Thickness          44.7
+    PropertyDouble InnerRadius       258.
+  }
+  Module MatchCoil1
+  {
+    Volume None
+    Position 0.0 0.0 3611.0 mm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor -118.56
+  //Field
+    PropertyString FieldType      Solenoid
+    PropertyString FileName       match1.fld
+    PropertyDouble CurrentDensity      1.
+    PropertyDouble Length            201.2
+    PropertyDouble Thickness          44.7
+    PropertyDouble InnerRadius       258.
+  }
+  Module MatchCoil2
+  {
+    Volume None
+    Position 0.0 0.0 -4051.05 mm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor +137.13
+  //Field
+    PropertyString FieldType      Solenoid
+    PropertyString FileName       match2.fld
+    PropertyDouble CurrentDensity      1.
+    PropertyDouble Length            199.5
+    PropertyDouble Thickness          29.8
+    PropertyDouble InnerRadius       258.
+  }
+  Module MatchCoil2
+  {
+    Volume None
+    Position 0.0 0.0 4051.05 mm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor -137.13
+  //Field
+    PropertyString FieldType      Solenoid
+    PropertyString FileName       match2.fld
+    PropertyDouble CurrentDensity      1.
+    PropertyDouble Length            199.5
+    PropertyDouble Thickness          29.8
+    PropertyDouble InnerRadius       258.
+  }
+  Module EndCoil1
+  {
+    Volume None
+    Position 0.0 0.0 -4451 mm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor +127.37
+  //Field
+    PropertyString FieldType      Solenoid
+    PropertyString FileName       end1.fld
+    PropertyDouble CurrentDensity    1.
+    PropertyDouble Length          110.6
+    PropertyDouble Thickness        59.6
+    PropertyDouble InnerRadius     258.
+  }
+  Module EndCoil1
+  {
+    Volume None
+    Position 0.0 0.0 4451 mm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor -127.37
+  //Field
+    PropertyString FieldType      Solenoid
+    PropertyString FileName       end1.fld
+    PropertyDouble CurrentDensity    1.
+    PropertyDouble Length          110.6
+    PropertyDouble Thickness        59.6
+    PropertyDouble InnerRadius     258.
+  }
+  Module CenterCoil
+  {
+    Volume None
+    Position 0.0 0.0 -5201.05 mm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor +152.44
+  //Field
+    PropertyString FieldType      Solenoid
+    PropertyString FileName       center.fld
+    PropertyDouble CurrentDensity    1.
+    PropertyDouble Length         1314.3
+    PropertyDouble Thickness        21.3
+    PropertyDouble InnerRadius     258.
+  }
+  Module CenterCoil
+  {
+    Volume None
+    Position 0.0 0.0 5201.05 mm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor -152.44
+  //Field
+    PropertyString FieldType      Solenoid
+    PropertyString FileName       center.fld
+    PropertyDouble CurrentDensity    1.
+    PropertyDouble Length         1314.3
+    PropertyDouble Thickness        21.3
+    PropertyDouble InnerRadius     258.
+  }
+  Module EndCoil2 //Note this file doesn't exist - that's fine, G4MICE will write a warning in debug mode
+  {
+    Volume None
+    Position 0.0 0.0 -5951 mm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor +135.18 //Scales the field linearly
+  //Field
+    PropertyString FieldType      Solenoid //Tell G4MICE you want to build a solenoid
+    PropertyString FileName       end2.fld //File name - sometimes G4MICE stores a lookup table of fields here, depending on settings
+    PropertyDouble CurrentDensity    1.    //Current Density - I set this to 1. and then use ScaleFactor to set the field strength; IMPLICIT (!) default units are A/mm^2
+    PropertyDouble Length          110.6   //Length along z
+    PropertyDouble Thickness        66     //Radial thickness
+    PropertyDouble InnerRadius     258.    //Inner radius
+  }
+  Module EndCoil2
+  {
+    Volume None
+    Position 0.0 0.0 5951 mm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor -135.18
+  //Field
+    PropertyString FieldType      Solenoid
+    PropertyString FileName       end2.fld
+    PropertyDouble CurrentDensity    1.
+    PropertyDouble Length          110.6
+    PropertyDouble Thickness        66
+    PropertyDouble InnerRadius     258.
+  }
+}
+

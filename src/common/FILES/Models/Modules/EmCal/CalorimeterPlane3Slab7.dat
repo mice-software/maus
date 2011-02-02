@@ -1,0 +1,17 @@
+// FILES/Models/Modules/EmCal/CalorimeterPlane3Slab7.dat
+//
+
+Module CalorimeterPlane3Slab7
+{
+  Volume Box
+  Dimensions 11 100 3 cm
+  PropertyInt Layer 3
+  PropertyInt Cell 7
+  PropertyInt numPMTs 2
+  PropertyDouble BlueColour 1.0
+  Module EmCal/CalorimeterPlane3Slab7Sci.dat
+  {
+      Position 0.0 0.0 0.0 mm
+      Rotation 0.0 0.0 0.0 degree
+  }
+}

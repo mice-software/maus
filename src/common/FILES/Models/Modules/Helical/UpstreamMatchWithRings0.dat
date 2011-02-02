@@ -1,0 +1,91 @@
+Module UpstreamMatchWithRings
+{
+  Volume  Cylinder
+  Dimensions  55.5 320.0 cm 
+  PropertyString  Material Galactic
+  PropertyBool  Invisible  1
+//  PropertyInt   Tracker  3
+  Module Matching/ManxCoil.dat
+  {
+    Position 0  0  -160  cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position 0.286356  0.881312  -140  cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position -1.49938  1.08936  -120  cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position -2.24907  -1.63404  -100  cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position 1.14542  -3.52525  -80  cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position 4.63333  2.26968e-015  -60  cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position 1.71813  5.28787  -40  cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position -5.24782  3.81277  -20  cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position -5.99751  -4.35745  0  cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position 2.5772  -7.93181  20  cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position 9.26667  2.26968e-015  40  cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position 3.14991  9.69444  60  cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position -8.99627  6.53617  80  cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position -9.74596  -7.08085  100  cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Matching/ManxCoil.dat
+  {
+    Position 4.00898  -12.3384  120  cm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Matching/UpstreamMatchingStation1.dat
+  {
+    Position 0.0 0.0 50 cm
+  }
+  Module Matching/UpstreamMatchingStation2.dat
+  {
+    Position 0.0 0.0 150 cm
+  }
+}

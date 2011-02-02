@@ -1,0 +1,21 @@
+// FILES/Models/Modules/DAQ/V1290.dat
+//
+
+Module V1290
+{
+  PropertyInt Geo 0
+  PropertyString BoardType TDC
+
+  PropertyString Channel6    TRIGGER
+  PropertyString Channel16   GVA1
+  PropertyString Channel17   CKOVA_0
+  PropertyString Channel18   GVA2
+  PropertyString Channel19   CKOVA_1
+  PropertyString Channel21   CKOVA_2
+  PropertyString Channel23   CKOVA_3
+  PropertyString Channel25   CKOVB_0
+  PropertyString Channel27   CKOVB_1
+  PropertyString Channel29   CKOVB_2
+  PropertyString Channel31   CKOVB_3
+
+}
