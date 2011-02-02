@@ -70,10 +70,13 @@ env.Append(SWIGFLAGS=['-python', '-c++']) # tell SWIG to make python bindings fo
 
 #env.Append(PATH="%s/third_party/install/bin" % os.environ.get('MAUS_ROOT_DIR'))
 env['ENV']['PATH'] =  os.environ.get('PATH')  # useful to set for root-config
+env['ENV']['LD_LIBRARY_PATH'] = os.environ.get('LD_LIBRARY_PATH') 
+
+libs = os.environ.get('LD_LIBRARY_PATH')
 
 # to find third party libs, includes
-env.Append(LIBPATH = ["%s/third_party/install/lib" % os.environ.get('MAUS_ROOT_DIR'),\
-                        "%s/build" % os.environ.get('MAUS_ROOT_DIR')])
+env.Append(LIBPATH =  libs.split(':') + ["%s/build" % os.environ.get('MAUS_ROOT_DIR')])
+
 env.Append(CPPPATH=["%s/third_party/install/include" % os.environ.get('MAUS_ROOT_DIR'), \
                       "%s/third_party/install/include/python2.7" % os.environ.get('MAUS_ROOT_DIR'), \
                       "%s/src/common" % os.environ.get('MAUS_ROOT_DIR'), ""])
