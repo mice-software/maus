@@ -22,6 +22,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     ${MAUS_ROOT_DIR}/third_party/bash/23geant4.bash
     ${MAUS_ROOT_DIR}/third_party/bash/24cloc.bash
     ${MAUS_ROOT_DIR}/third_party/bash/25numpy.bash
+    ${MAUS_ROOT_DIR}/third_party/bash/25xboa.bash
     ${MAUS_ROOT_DIR}/third_party/bash/27recpack.bash
 else
 echo
