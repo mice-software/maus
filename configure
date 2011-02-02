@@ -2,7 +2,7 @@
 # Configure script
 
 # This is the maximum length of text (ignoring whitespace), 50 chars
-##################################################                                                                                                                                   
+##################################################
 # this is the maximum amount of characters (including whitespace) per line)
 ######################################################################
 
@@ -19,7 +19,7 @@ echo "INFO:        that store your environmental variables"
 echo "INFO:"
 echo
 
-# Check for g++ ################################################## 
+# Check for g++ ##################################################
 (type -P gcc &>/dev/null && type -P g++ &>/dev/null) || {
     echo "FATAL: gcc/g++ is required to compile code." >&2;
     echo "FATAL:" >&2;
@@ -43,6 +43,26 @@ echo
 # Find where MAUS is installed
 maus_root_dir=`pwd`
 
+if [[ "$maus_root_dir" =~ \ |\' ]]    #  slightly more readable: if [[ "$string" =~ ( |\') ]]
+then
+    echo "FATAL: No whitespace allowed in directory names.">&2;
+    echo "FATAL:">&2;
+    echo "FATAL: See:" >&2;
+    echo "FATAL:" >&2;
+    echo "FATAL: http://micewww.pp.rl.ac.uk:8080/issues/306" >&2;
+    echo "FATAL:" >&2;
+    echo "FATAL:      export MAUS_ROOT_DIR=\"${maus_root_dir}\"" >&2;
+    echo "FATAL:" >&2;
+    echo "FATAL: whilst for C-compatible shells like 'csh', run:" >&2;
+    echo "FATAL:" >&2;
+    echo "FATAL:      setenv MAUS_ROOT_DIR \"${maus_root_dir}\"" >&2;
+    echo "FATAL:" >&2;
+    echo "FATAL: then run the following to install Python 2.7:" >&2;
+    echo "FATAL:" >&2;
+    echo "FATAL:      ./third_party/bash/03python.bash" >&2;
+    exit 1;
+fi
+
 # Temporarily setup the environment (this gets repeated in the env.sh output)
 #      PATH says where the binaries are
 #      LD_LIBRARY_PATH says where your shared libraries are
@@ -53,9 +73,9 @@ else
 fi
 if [ -z "${LD_LIBRARY_PATH}" ]; then  # see if the variable exists yet
     LD_LIBRARY_PATH="${maus_root_dir}/third_party/install/lib"                  # if not, initialize it
-else                                                                                                                                                               
+else
     LD_LIBRARY_PATH="${maus_root_dir}/third_party/install/lib:$LD_LIBRARY_PATH" # else add to to it
-fi 
+fi
 
 # Check for Python
 type -P python &>/dev/null || {
@@ -76,10 +96,10 @@ type -P python &>/dev/null || {
     echo "FATAL:      ./third_party/bash/03python.bash" >&2;
     exit 1; }
 
-python_version=`LD_LIBRARY_PATH=./third_party/install/lib python -V 2>&1` 
+python_version=`LD_LIBRARY_PATH=./third_party/install/lib python -V 2>&1`
 ## Check for supported python version
 if [ "${python_version}" != "Python 2.7" ]
-then               ##################################################  
+then               ##################################################
     echo "WARNING: Unsupported python version (You are using ${python_version}),";
     echo "WARNING: so using Python 2.7 is recommended";
     echo "WARNING: ";
@@ -137,7 +157,7 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
          export PATH="\${MAUS_ROOT_DIR}/third_party/install/bin:\${PATH}" # else add it
      fi
 
-     if [ -z "\${LD_LIBRARY_PATH}" ]; then  # see if the variable exists yet 
+     if [ -z "\${LD_LIBRARY_PATH}" ]; then  # see if the variable exists yet
           export LD_LIBRARY_PATH="\${MAUS_ROOT_DIR}/third_party/install/lib" # intiailize it
      else
           export LD_LIBRARY_PATH="\${MAUS_ROOT_DIR}/third_party/install/lib:\${LD_LIBRARY_PATH}" # else add it
@@ -191,7 +211,7 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      export G4RADIOACTIVEDATA"=\${G4INSTALL}/data/RadioactiveDecay3.2/"
 
      export MICEFILES="\${MAUS_ROOT_DIR}/commonCpp/FILES"
- 
+
      echo "SUCCESS: MAUS setup"
 else
      echo "ERROR: MAUS already setup"
@@ -202,24 +222,24 @@ EOF
 cat > env.csh <<EOF
 #/bin/csh
 if ({\$?MAUS_ROOT_DIR}) then
-     echo "ERROR: MAUS already setup" 
+     echo "ERROR: MAUS already setup"
 else
      setenv MAUS_ROOT_DIR "${maus_root_dir}"
 
-     if ({\$?PATH}) then       
-          setenv PATH "\${MAUS_ROOT_DIR}/third_party/install/bin:\${PATH}" # else add it  
+     if ({\$?PATH}) then
+          setenv PATH "\${MAUS_ROOT_DIR}/third_party/install/bin:\${PATH}" # else add it
      else
           setenv PATH "\${MAUS_ROOT_DIR}/third_party/install/bin" # initialize it
      endif
 
-     if ({\$?LD_LIBRARY_PATH}) then  
-          setenv LD_LIBRARY_PATH "\${MAUS_ROOT_DIR}/third_party/install/lib:\${LD_LIBRARY_PATH}" # else add it  
+     if ({\$?LD_LIBRARY_PATH}) then
+          setenv LD_LIBRARY_PATH "\${MAUS_ROOT_DIR}/third_party/install/lib:\${LD_LIBRARY_PATH}" # else add it
      else
           setenv LD_LIBRARY_PATH "\${MAUS_ROOT_DIR}/third_party/install/lib" # intiailize it
      endif
 
-     if ({\$?MANPATH}) then 
-          setenv MANPATH "\${MAUS_ROOT_DIR}/third_party/install/share/man/man1:\${MANPATH}" 
+     if ({\$?MANPATH}) then
+          setenv MANPATH "\${MAUS_ROOT_DIR}/third_party/install/share/man/man1:\${MANPATH}"
      else
           setenv MANPATH "\${MAUS_ROOT_DIR}/third_party/install/share/man/man1:${man_path}"
      endif
@@ -229,7 +249,7 @@ else
      if ({\$?PYTHONPATH}) then
           setenv PYTHONPATH "\${MAUS_ROOT_DIR}/third_party/install/lib/root:\${PYTHONPATH}" # else add it
      else
-          setenv PYTHONPATH "\${MAUS_ROOT_DIR}/third_party/install/lib/root" # intiailize it   
+          setenv PYTHONPATH "\${MAUS_ROOT_DIR}/third_party/install/lib/root" # intiailize it
      endif
 
      # maus workers
