@@ -11,9 +11,16 @@
 set -e
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
+    filename="third_party_source.tar.gz"
+    wget http://micewww.pp.rl.ac.uk:8080/attachments/download/176/${filename} -O ${MAUS_ROOT_DIR}/third_party/source/${filename}
+
+    cd ${MAUS_ROOT_DIR}/third_party/source
+    filename=${filename} 
+    md5sum -c ${filename}.md5 || { echo "FATAL: Failed to download:" >&2; echo "FATAL: ${filename}." >&2; echo "FATAL: MD5 checksum failed.">&2; echo "FATAL: Try rerunning this\
+ command to redownload, or check" >&2; echo "FATAL: internet connection"  >&2; rm -f ${filename}; exit 1; }
+
     cd ${MAUS_ROOT_DIR}
-    wget http://micewww.pp.rl.ac.uk:8080/attachments/download/176/third_party_source.tar.gz -O ${MAUS_ROOT_DIR}/third_party_source.tar.gz
-    tar xvfz ${MAUS_ROOT_DIR}/third_party_source.tar.gz
+    tar xvfz ${MAUS_ROOT_DIR}/${filename}
     
 
     # One could do the xargs line below, but the problem is error codes.  Xargs doesn't exit nicely
