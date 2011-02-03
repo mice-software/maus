@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 
-directory=root_v5.22.00f
+directory=root_v5.28.00
 filename=${directory}.source.tar.gz 
-url=http://root.cern.ch/download/${filename}
-
+url=ftp://root.cern.ch/root/${filename}
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 

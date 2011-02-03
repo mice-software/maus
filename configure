@@ -119,9 +119,6 @@ then               ##################################################
     echo
 fi
 
-# save default manpath
-man_path=`manpath`
-
 # check for SCons
 type -P scons &>/dev/null || {
     echo "FATAL: Scons is required. It's weird that it's not" >&2;
@@ -161,12 +158,6 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
           export LD_LIBRARY_PATH="\${MAUS_ROOT_DIR}/third_party/install/lib" # intiailize it
      else
           export LD_LIBRARY_PATH="\${MAUS_ROOT_DIR}/third_party/install/lib:\${LD_LIBRARY_PATH}" # else add it
-     fi
-
-     if [ -z "\${MANPATH}" ]; then
-          export MANPATH="\${MAUS_ROOT_DIR}/third_party/install/share/man/man1:${man_path}"
-     else
-          export MANPATH="\${MAUS_ROOT_DIR}/third_party/install/share/man/man1:\${MANPATH}"
      fi
 
      # ROOT specific garbage
@@ -236,12 +227,6 @@ else
           setenv LD_LIBRARY_PATH "\${MAUS_ROOT_DIR}/third_party/install/lib:\${LD_LIBRARY_PATH}" # else add it
      else
           setenv LD_LIBRARY_PATH "\${MAUS_ROOT_DIR}/third_party/install/lib" # intiailize it
-     endif
-
-     if ({\$?MANPATH}) then
-          setenv MANPATH "\${MAUS_ROOT_DIR}/third_party/install/share/man/man1:\${MANPATH}"
-     else
-          setenv MANPATH "\${MAUS_ROOT_DIR}/third_party/install/share/man/man1:${man_path}"
      endif
 
      # ROOT specific garbage
