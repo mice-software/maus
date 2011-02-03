@@ -175,25 +175,19 @@ if not env.GetOption('clean'):
   if not conf.CheckLib('gslcblas'):
     print "Cound't find GSL (required for ROOT).  If you want it, then run:"
     print ("      MAUS_ROOT_DIR=%s ./third_party/bash/20gsl.bash" % os.environ.get('MAUS_ROOT_DIR'))
-    if 'REQUIREALL' in os.environ:
-      print "When running with 'REQUIREALL' all possible dependcies must exist"
-      Exit(1)
+    Exit(1)
   else:
     conf.env.Append(LIBS = ['gslcblas'])
 
   if not conf.CheckLib('gsl'):
     print "Cound't find GSL (required for ROOT).  If you want it, then run:"
     print ("      MAUS_ROOT_DIR=%s ./third_party/bash/20gsl.bash" % os.environ.get('MAUS_ROOT_DIR'))
-    if 'REQUIREALL' in os.environ:
-      print "When running with 'REQUIREALL' all possible dependcies must exist"
-      Exit(1)
+    Exit(1)
 
   if not conf.CheckCommand('root'):
     print "Cound't find root.  If you want it, after installing GSL, then run:"
     print ("      MAUS_ROOT_DIR=%s ./third_party/bash/21root.bash" % os.environ.get('MAUS_ROOT_DIR'))
-    if 'REQUIREALL' in os.environ:
-      print "When running with 'REQUIREALL' all possible dependcies must exist"
-      Exit(1)
+    Exit(1)
 
   else:
     print
@@ -221,16 +215,12 @@ if not env.GetOption('clean'):
   if not conf.CheckLib('CLHEP', language='c++'):
     print "Cound't find CLHEP (required for geant4).  If you want it, then run:"
     print ("      MAUS_ROOT_DIR=%s ./third_party/bash/22clhep.bash" % os.environ.get('MAUS_ROOT_DIR'))
-    if 'REQUIREALL' in os.environ:
-      print "When running with 'REQUIREALL' all possible dependcies must exist"
-      Exit(1)
+    Exit(1)
 
   if 'G4INSTALL' not in os.environ or (not os.path.exists(os.environ.get('G4INSTALL'))):
     print "Cound't find geant4.  If you want it, after installing CLHEP, then run:"
     print ("      MAUS_ROOT_DIR=%s ./third_party/bash/23geant4.bash" % os.environ.get('MAUS_ROOT_DIR'))
-    if 'REQUIREALL' in os.environ:
-      print "When running with 'REQUIREALL' all possible dependcies must exist"
-      Exit(1)
+    Exit(1)
   else:
     print
     print "!! Found the package 'geant4', so assume you want to use it with MAUS."
