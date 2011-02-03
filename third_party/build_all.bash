@@ -11,10 +11,17 @@
 set -e
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
-    # One could do the line below, but the problem is error codes.  Xargs doesn't exit nicely
+    cd ${MAUS_ROOT_DIR}
+    wget http://micewww.pp.rl.ac.uk:8080/attachments/download/176/third_party_source.tar.gz -O ${MAUS_ROOT_DIR}/third_party_source.tar.gz
+    tar xvfz ${MAUS_ROOT_DIR}/third_party_source.tar.gz
+    
+
+    # One could do the xargs line below, but the problem is error codes.  Xargs doesn't exit nicely
     # (at least the xargs on most machines) if one of the many commands die.  Not using find
     # also happens to make the code a little more readable
     # find ${MAUS_ROOT_DIR}/third_party/bash -type f |grep -v REDUNDANT | sort| xargs -i bash {}
+
+
     ${MAUS_ROOT_DIR}/third_party/build_essential.bash
     ${MAUS_ROOT_DIR}/third_party/bash/20gsl.bash
     ${MAUS_ROOT_DIR}/third_party/bash/21root.bash
