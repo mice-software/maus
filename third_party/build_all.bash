@@ -20,7 +20,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
  command to redownload, or check" >&2; echo "FATAL: internet connection"  >&2; rm -f ${filename}; exit 1; }
 
     cd ${MAUS_ROOT_DIR}
-    tar xvfz ${MAUS_ROOT_DIR}/${filename}
+    tar xvfz third_party/source/${filename}
     
 
     # One could do the xargs line below, but the problem is error codes.  Xargs doesn't exit nicely
