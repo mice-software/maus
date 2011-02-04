@@ -183,7 +183,7 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      export LD_LIBRARY_PATH="\$DISCO_HOME/lib:\$LD_LIBRARY_PATH"
 
      export G4DEBUG=1
-     export G4VERS=geant4.9.2.p01
+     export G4VERS=geant4.9.2.p04
      export G4SYSTEM=Linux-g++
      export G4INSTALL="\${MAUS_ROOT_DIR}/third_party/build/\${G4VERS}"
      export G4LIB="\${G4INSTALL}/lib"
@@ -252,7 +252,7 @@ else
      setenv LD_LIBRARY_PATH "\$DISCO_HOME/lib:\$LD_LIBRARY_PATH"
 
      setenv G4DEBUG 1
-     setenv G4VERS geant4.9.2.p01
+     setenv G4VERS geant4.9.2.p04
      setenv G4SYSTEM Linux-g++
      setenv G4INSTALL "\${MAUS_ROOT_DIR}/third_party/build/\${G4VERS}"
      setenv G4LIB "\${G4INSTALL}/lib"
