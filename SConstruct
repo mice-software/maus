@@ -134,7 +134,7 @@ if not env.GetOption('clean'):
   # ---- check for compiler and do sanity checks
   if not conf.CheckCXX():
     print('!! Your compiler and/or environment is not correctly configured.')
-    Exit(0)
+    Exit(1)
 
   if not conf.CheckLib( "json" , language='C++') or not conf.CheckCXXHeader('json/json.h'):
     print( "can't find jsoncpp which is needed" );
@@ -147,7 +147,7 @@ if not env.GetOption('clean'):
 
   if not conf.CheckFunc('printf'):
     print('!! Your compiler and/or environment is not correctly configured.')
-    Exit(0)
+    Exit(1)
 
   if not conf.CheckHeader('math.h'):
     Exit(1)
@@ -249,7 +249,7 @@ if not env.GetOption('clean'):
 
   env = conf.Finish()
   if 'configure' in COMMAND_LINE_TARGETS:
-    os.sys.exit(0)
+    Exit(0)
 
 
   # NOTE: do this after configure!  So we know if we have ROOT/geant4
