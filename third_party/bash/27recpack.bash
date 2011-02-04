@@ -35,6 +35,13 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         sleep 1
         tar xvfz ${MAUS_ROOT_DIR}/third_party/source/${filename} -C ${MAUS_ROOT_DIR}/third_party/build > /dev/null
         cd ${MAUS_ROOT_DIR}/third_party/build/${directory}
+
+	echo
+	echo "INFO: Patching"
+	echo
+	cp ${MAUS_ROOT_DIR}/third_party/source/EAlgebra.cpp ${MAUS_ROOT_DIR}/third_party/build/${directory}/util/EAlgebra.cpp
+	grep stdio util/EAlgebra.cpp || exit 1
+
 	echo
 	echo "INFO: Automake and autoconf"
 	echo
