@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-directory=geant4.9.2.p01
+directory=geant4.9.2.p04
 filename=${directory}.tar.gz
-url=http://geant4.cern.ch/support/source/${filename}
+url=http://www.geant4.org/geant4/support/source/${filename}
 
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
