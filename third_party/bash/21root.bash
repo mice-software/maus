@@ -34,66 +34,13 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         tar xvfz ${MAUS_ROOT_DIR}/third_party/source/${filename} -C ${MAUS_ROOT_DIR}/third_party/build > /dev/null
         mv ${MAUS_ROOT_DIR}/third_party/build/root ${MAUS_ROOT_DIR}/third_party/build/${directory}
         cd ${MAUS_ROOT_DIR}/third_party/build/${directory}
-	echo
-	echo "INFO: If applicable, performing libXpm symbolic link since"
-	echo "INFO: old versions of Scientific Linux and ROOT don't work"
-	echo "INFO: together.  Aren't you glad we have Scientific Linux?"    
-	echo
-
-	rm -f ${MAUS_ROOT_DIR}/third_party/install/lib/libXpm.so # in-case it exists
-	extra=""
-	if [ -e "/usr/lib64/libXpm.so.4" ] # sl55 64bit
-	then
-	    echo "INFO: Applying SL5 64-bit libXpm fix since ROOT/SL suck."
-	    ln -s /usr/lib64/libXpm.so.4 ${MAUS_ROOT_DIR}/third_party/install/lib/libXpm.so # known ROOT/SL4 bug since 2003 (!!)
-	    extra="--with-xpm-libdir=${MAUS_ROOT_DIR}/third_party/install/lib"
-	elif [ -e "/usr/lib/libXpm.so.4" ] # sl55 32bit
-	then
-	    echo "INFO: Applying SL5 32-bit libXpm fix since ROOT/SL suck."
-	    ln -s /usr/lib/libXpm.so.4 ${MAUS_ROOT_DIR}/third_party/install/lib/libXpm.so # known ROOT/SL4 bug since 2003 (!!)
-            extra="--with-xpm-libdir=${MAUS_ROOT_DIR}/third_party/install/lib"
-        elif [ -e "/usr/X11R6/lib64/libXpm.so.4" ] # sl48 64bit
-        then
-            echo "INFO: Applying SL4 64-bit libXpm fix since ROOT/SL suck."
-#	    find /usr/X11R6/lib64/libX*so | xargs -i cp -s {}  ${MAUS_ROOT_DIR}/third_party/install/lib
-#            extra="--with-xpm-libdir=${MAUS_ROOT_DIR}/third_party/install/lib"
-        elif [ -e "/usr/X11R6/lib/libXpm.so.4" ] # sl48 32bit
-        then
-            echo "INFO: Applying SL4 32-bit libXpm fix since ROOT/SL suck."
-#            ln -s /usr/X11R6/lib/libXpm.so.4 ${MAUS_ROOT_DIR}/third_party/install/lib/libXpm.so # known ROOT/SL4 bug since 2003 (!!)
-#            extra="--with-xpm-libdir=${MAUS_ROOT_DIR}/third_party/install/lib"
-        fi
-
-	rm -f ${MAUS_ROOT_DIR}/third_party/install/lib/libX11.so
-	if [ -e "/usr/lib64/libX11.so.6" ] # sl55 64bit
-        then
-            echo "INFO: Applying SL5 64-bit libXpm fix since ROOT/SL suck."
-            ln -s /usr/lib64/libX11.so.6 ${MAUS_ROOT_DIR}/third_party/install/lib/libX11.so # known ROOT/SL4 bug since 2003 (!!)
-            extra="${extra} --with-x11-libdir=${MAUS_ROOT_DIR}/third_party/install/lib"
-        elif [ -e "/usr/lib/libX11.so.6" ] # sl55 32bit
-        then
-            echo "INFO: Applying SL5 32-bit libXpm fix since ROOT/SL suck."
-            ln -s /usr/lib/libX11.so.6 ${MAUS_ROOT_DIR}/third_party/install/lib/libX11.so # known ROOT/SL4 bug since 2003 (!!)
-            extra="${extra} --with-x11-libdir=${MAUS_ROOT_DIR}/third_party/install/lib"
-        elif [ -e "/usr/X11R6/lib64/libX11.so.6" ] # sl48 64bit
-        then
-            echo "INFO: Applying SL4 64-bit libXpm fix since ROOT/SL suck."
-            #ln -s /usr/X11R6/lib64/libX11.so.6 ${MAUS_ROOT_DIR}/third_party/install/lib/libX11.so # known ROOT/SL4 bug since 2003 (!!)
-            #extra="${extra} --with-x11-libdir=${MAUS_ROOT_DIR}/third_party/install/lib"
-        elif [ -e "/usr/X11R6/lib/libX11.so.6" ] # sl48 32bit
-        then
-            echo "INFO: Applying SL4 32-bit libXpm fix since ROOT/SL suck."
-#            ln -s /usr/X11R6/lib/libX11.so.6 ${MAUS_ROOT_DIR}/third_party/install/lib/libX11.so # known ROOT/SL4 bug since 2003 (!!)
-#            extra="${extra} --with-x11-libdir=${MAUS_ROOT_DIR}/third_party/install/lib"
-        fi
 		
 	echo
         echo "INFO: Configuring:"
 	echo
 	sleep 1
 
-	echo "INFO: extra flags to configure are ${extra}"
-	./configure --enable-roofit --disable-fftw3 --disable-xrootd --disable-krb5 --build=debug --with-gsl-incdir=${MAUS_ROOT_DIR}/third_party/install/include --with-gsl-libdir=${MAUS_ROOT_DIR}/third_party/install/lib --prefix=${MAUS_ROOT_DIR}/third_party/install ${extra} && echo && echo && echo "INFO: Making:" && echo && sleep 1 && make && make install || { echo "FAIL: Failed to configure/make";exit 1; }
+	./configure --enable-roofit --disable-fftw3 --disable-xrootd --disable-krb5 --build=debug --with-gsl-incdir=${MAUS_ROOT_DIR}/third_party/install/include --with-gsl-libdir=${MAUS_ROOT_DIR}/third_party/install/lib --prefix=${MAUS_ROOT_DIR}/third_party/install && echo && echo && echo "INFO: Making:" && echo && sleep 1 && make && make install || { echo "FAIL: Failed to configure/make";exit 1; }
 
 	            ################################################## 
 	echo
