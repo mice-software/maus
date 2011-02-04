@@ -4,7 +4,6 @@ directory=geant4.9.2.p04
 filename=${directory}.tar.gz
 url=http://www.geant4.org/geant4/support/source/${filename}
 
-
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
     if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ]
@@ -58,7 +57,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         echo "INFO: Unpacking config"
         echo
         tar xvfz ${MAUS_ROOT_DIR}/third_party/source/geant_config.tar.gz > /dev/null
-	maus_geant4_setup.py ${MAUS_ROOT_DIR}/third_party/build/geant4.9.2.p01/.config/bin/Linux-g++ ${MAUS_ROOT_DIR}/third_party/build/geant4.9.2.p01 ${MAUS_ROOT_DIR}/third_party/install
+	maus_geant4_setup.py ${MAUS_ROOT_DIR}/third_party/build/${directory}/.config/bin/Linux-g++ ${MAUS_ROOT_DIR}/third_party/build/${directory} ${MAUS_ROOT_DIR}/third_party/install
 	cp ${MAUS_ROOT_DIR}/third_party/source/Configure .
 	
 	echo
