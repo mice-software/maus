@@ -178,9 +178,9 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
 
      # disco
 #     export DISCO_HOME="\$MAUS_ROOT_DIR/third_party/build/tuulos-disco-742e814"
-     export PATH="\$DISCO_HOME/bin:\$PATH"
-     export PYTHONPATH="\$DISCO_HOME/lib:\$PYTHONPATH"
-     export LD_LIBRARY_PATH="\$DISCO_HOME/lib:\$LD_LIBRARY_PATH"
+#     export PATH="\$DISCO_HOME/bin:\$PATH"
+#     export PYTHONPATH="\$DISCO_HOME/lib:\$PYTHONPATH"
+#     export LD_LIBRARY_PATH="\$DISCO_HOME/lib:\$LD_LIBRARY_PATH"
 
      export G4DEBUG=1
      export G4VERS=geant4.9.2.p04
@@ -247,9 +247,9 @@ else
 
      # disco
 #     setenv DISCO_HOME "\$MAUS_ROOT_DIR/third_party/build/tuulos-disco-742e814"
-     setenv PATH "\$DISCO_HOME/bin:\$PATH"
-     setenv PYTHONPATH "\$DISCO_HOME/lib:\$PYTHONPATH"
-     setenv LD_LIBRARY_PATH "\$DISCO_HOME/lib:\$LD_LIBRARY_PATH"
+#     setenv PATH "\$DISCO_HOME/bin:\$PATH"
+#     setenv PYTHONPATH "\$DISCO_HOME/lib:\$PYTHONPATH"
+#     setenv LD_LIBRARY_PATH "\$DISCO_HOME/lib:\$LD_LIBRARY_PATH"
 
      setenv G4DEBUG 1
      setenv G4VERS geant4.9.2.p04
