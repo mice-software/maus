@@ -14,7 +14,7 @@
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
 
-## @class OutputPyJSON.OutputPyJSON
+## @class OutputPyJSON
 #  OutputPyJSON writes JSON files to python files
 #
 #  This class outputs to a python file object that
