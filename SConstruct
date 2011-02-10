@@ -247,6 +247,12 @@ if not env.GetOption('clean'):
 
      # check types size!!!
 
+
+  if not conf.CheckLib('recpack', language='c++') or\
+     not conf.CheckCXXHeader('recpack/RecpackManager.h'):
+      Exit(1)
+  
+
   env = conf.Finish()
   if 'configure' in COMMAND_LINE_TARGETS:
     Exit(0)
