@@ -64,7 +64,6 @@ class Go:
         jsonConfigDictionary = json.loads(self.jsonConfigDocument)
         mapReduceType = jsonConfigDictionary['map_reduce_type']
 
-        print(mapReduceType)
         # Be sure to add other assertions here when new
         # map reduce implementations get put in.
         assert mapReduceType in ["native_python" , "native_python_profile"]
@@ -72,7 +71,7 @@ class Go:
         if mapReduceType == "native_python":
             self.NativePythonMapReduce()
         elif mapReduceType == "native_python_profile":
-            cProfile.runctx('self.NativePythonMapReduce()', globals(), locals(), 'list.prof')
+            profile.runctx('self.NativePythonMapReduce()', globals(), locals(), 'list.prof')
             p = pstats.Stats('list.prof') 
             p.strip_dirs().sort_stats('time').print_stats() 
         else:

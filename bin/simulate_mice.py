@@ -11,17 +11,15 @@ from MapCppTOFDigitization import *
 from MapCppTrackerDigitization import *
 from Go import *
 
-import os, sys
-
 # Create an empty array
 myMap = MapPyGroup()
 
 file = 'Stage6.dat' #'%s/Models/Configurations/Stage6.dat' % os.environ.get('MICEFILES')
 
 print(file)
+
 # Append the mappers we want
 sim = MapCppSimulation()
-sim.DisableStoredTracks()
 myMap.append(sim)
 
 #rt.KeepOnlyMuons()
@@ -32,11 +30,9 @@ myMap.append(tof)
 tracker = MapCppTrackerDigitization()
 myMap.append(tracker)
 
-#myMap.append(rt)
+myMap.append(MapCppPrint())
 
-#Stage1.dat  Stage2.dat  Stage3.dat  Stage4.dat  Stage5.dat  Stage6.dat  Stage6_FieldsWithoutMaterial.dat
-#'%s/Models/Configurations/Stage6_FieldsWithoutMaterial.dat' % os.environ.get('MICEFILES')
-print(sys.argv)
+#myMap.append(rt)
 
 number_of_events = 10
 

@@ -31,6 +31,19 @@ class GoTestCase(unittest.TestCase):
             Go(inputer, mapper, reducer, outputer, configFile)
 
 
+    def test_map_reduce_type(self):
+        inputer = InputPyEmptyDocument(1)
+        mapper = MapPyDoNothing()
+        reducer = ReducePyDoNothing()
+        outputer = OutputPyJSON(open('unit_test', 'w'))  #  this file won't appear since exception                                                                                   
+        for MapRedType in ["native_python", "native_python_profile"]:
+            configFile = StringIO(u"""map_reduce_type="%s" """ % MapRedType)
+
+        Go(inputer, mapper, reducer, outputer, configFile)
+
+
+
+
 
 if __name__ == '__main__':
     unittest.main()
