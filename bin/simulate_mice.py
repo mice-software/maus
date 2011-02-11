@@ -32,8 +32,7 @@ myMap = MapPyGroup()
 myMap.append(MapCppSimulation())  #  geant4 simulation 
 myMap.append(MapCppTOFDigitization())  #  TOF detector digitization
 myMap.append(MapCppTrackerDigitization())  #  tracker detector digitization
-myMap.append(MapCppPrint())  #  print to screen
 
-#  The Go() drives all the components you pass in.
+#  The Go() drives all the components you pass in, then check the file
+#  'mausput' for the output
 Go(myInput, myMap, ReducePyDoNothing(), OutputPyJSON())
-

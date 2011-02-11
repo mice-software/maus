@@ -1,42 +1,36 @@
 #!/usr/bin/env python
 import sys
-import gzip
 
 from InputPyEmptyDocument import *
+from MapPyGroup import *
 from MapPyFakeTestSimulation import *
 from MapPyDoNothing import *
 from ReducePyDoNothing import *
-from MapPyRemoveTracks import *
-from OutputPyJSON import *
-from MapPyGroup import *
-import io
+from OutputPyDoNothing import *
+
 from Go import *
 
-group = MapPyGroup()
+mapGroup = MapPyGroup()
 
 big_number = 1000
 
 if len(sys.argv) == 3:
-    group.append(MapPyDoNothing())
+    print 'do nothing'
+    mapGroup.append(MapPyDoNothing())
 else:
-    group.append(MapPyFakeTestSimulation())
-    
-    if len(sys.argv) >= 2:
-        big_number = int(sys.argv[1])
+    mapGroup.append(MapPyFakeTestSimulation())
 
-        if big_number < 0:
-            rt = MapPyRemoveTracks()                                                                                                                
-            group.append(rt)   
-            big_number = -1 * big_number
+if len(sys.argv) >= 2:
+    big_number = int(sys.argv[1])
+
 
 print("Testing with %d events..." % big_number)
 
 
 inputer = InputPyEmptyDocument(big_number)
-
-#mapper = MapPyDoNothing()
+# mapMapGroup
 reducer = ReducePyDoNothing()
-outputer = OutputPyJSON(gzip.GzipFile('mausput.gz', 'wb'))
+outputer = OutputPyDoNothing()
 
 
-Go(inputer, group, reducer, outputer)
+Go(inputer, mapGroup, reducer, outputer)

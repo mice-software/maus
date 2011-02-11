@@ -111,9 +111,9 @@ env.jDev.releasecflags = ['-O2', '-DNDEBUG',]         #extra compile flags for r
 Export('env')
 
 #### Target: Documentation
-dox = env.Command('does_not_exist3', 'doc/Doxyfile',
-                  'doxygen doc/Doxyfile && cd doc/html')
-env.Alias('doc', [dox])
+#dox = env.Command('does_not_exist3', 'doc/Doxyfile',
+#                  'doxygen doc/Doxyfile && cd doc/html')
+#env.Alias('doc', [dox])
 
 #python_executable = '%s/third_party/install/bin/python' % os.environ.get('MAUS_ROOT_DIR')
 #if os.path.isfile(python_executable):
@@ -282,7 +282,7 @@ if not env.GetOption('clean'):
     
     if 'Py' in parts[2] and 'Cpp' not in parts[2]:
       print 'Found Python input: %s' % parts[2]
-      files = glob.glob('%s/test_*' % directory) +  ["%s/%s.py" % (directory, parts[2])]
+      files = glob.glob('%s/test_*.py' % directory) +  ["%s/%s.py" % (directory, parts[2])]
       env.Install("build", files)   
 
     if parts[2][0:6] == 'MapCpp':
