@@ -1,4 +1,4 @@
-// @(#) $Id: dataCards.cc,v 1.298 2010-10-22 08:53:07 rogers Exp $  $Name:  $
+// @(#) $Id: dataCards.cc,v 1.302 2011-02-11 15:56:42 rogers Exp $  $Name:  $
 /*
 ** modified from Yagmur Torun's MICE simulation package
 ** Ed McKigney - Aug 21 2002
@@ -6,6 +6,7 @@
 
 #include "dataCards.hh"
 #include "Squeak.hh"
+#include "Squeal.hh"
 #include "CLHEP/Units/SystemOfUnits.h"
 using CLHEP::ms;
 using CLHEP::mm;
@@ -138,7 +139,7 @@ void dataCards::fillCards(int app)
     cd["MaxZInChannel"] = 1.e9 * mm; // Events with z > MaxZ are killed in Simulation
     cd["MaxTimeAllowed"] = 1. * ms; // Events with t > MaxT are killed in Simulation
     ci["RandomSeed"] = 0; // Random seed for stochastic algorithms
-    cs["PhysicsModel"] = "QGSP"; //Physics package loaded by G4MICE to set default values; modifications can be made as per following
+    cs["PhysicsModel"] = "QGSP_BERT"; //Physics package loaded by G4MICE to set default values; modifications can be made as per following
     cs["MultipleScatteringModel"] = "mcs"; //"mcs" (multiple coulomb scattering) or "none"
     cs["EnergyLossModel"] = "estrag"; //"estrag" (full energy loss), "ionisation" (mean energy loss only) or "none"
     cs["HadronicModel"] = "All"; //"All" (All hadronic interactions) or "None" (no hadronic interactions)
@@ -153,13 +154,14 @@ void dataCards::fillCards(int app)
     cd["MuonHalfTime"]           = -1 * ns;  //Set the muon half life; use g4 default if negative.
     cd["ChargedPionHalfTime"]    = -1 * ns;  //Set the pi+ and pi- half life; use g4 default if negative.
     cs["TrackOnlyMuons"]         = "False"; //Set to true to kill non-muons on production
-    ci["MaxStepsWOELoss"]        = 2000;  //Maximum number of steps GEANT4 will take without energy loss. Subsequently, assumes particle is stuck and kills it
+    ci["MaxStepsWOELoss"]        = -1;  //Deprecated - please use LoopCheck
+    ci["LoopMaxSteps"]           = 2000;  //Check every #LoopCheck steps to look for particle progression. If particle has not advanced, kill it.
     ci["StepStatisticsOutput"]   = 0; //I *think* set to 1 to see physics processes output
     cs["StepStatisticsVolume"]   = "All"; //I *think* selects which volumes to write physics processes output from
     ci["CheckVolumeOverlaps"]    = 0; //Set to 1 to check for volume overlaps in GEANT4 physical volumes
 
     // <head>Simulation Application beam control</head>
-    cs["BeamType"] = "Pencil"; //Type of beam; "Pencil" generates a pencil beam using parameters below, "Gaussian" generates a beam with gaussian distribution using parameters below, "ICOOL", "G4BeamLine", "TURTLE",  "G4MICE_PrimaryGenHit" set G4MICE to read from a beam file with the appropriate format and file name defined in datacard "InputBeamFileName"; "MiceModule" uses the beam definition taken from MiceModules (see mice module docs), and allows arbitrary placement of beams with arbitrary multivariate gaussian distributions; in general, MiceModules are the preferred method for setting up beams. The reference particle is the first particle created if FirstEventIsReference is 0, otherwise it is taken from Reference parameters below.
+    cs["BeamType"] = "Pencil"; //Type of beam; "Pencil" generates a pencil beam using parameters below, "Gaussian" generates a beam with gaussian distribution using parameters below, "ICOOL", "G4BeamLine", "TURTLE",  "G4MICE_PrimaryGenHit" set G4MICE to read from a beam file with the appropriate format and file name defined in datacard "InputBeamFileName"; "MiceModule" uses the beam definition taken from MiceModules (see mice module docs), and allows arbitrary placement of beams with arbitrary multivariate gaussian distributions; in general, MiceModules are the preferred method for setting up beams. The reference particle is the first particle created. If BeamType is Random, the first particle will have no random distribution.
     cd["BeamMomentum"] = 200.0 * MeV; //When BeamType is Pencil or Random, controls momentum of the beam
     cd["ZOffsetStart"] = -6011. * mm; //Z-position of input beam when not in MiceModule mode. x and y are 0. Added to any z-position in beam file.
     ci["BeamPid"]      = -13;         //Particle ID of pencil beam and TURTLE beam (11 is e-, -13 is mu+, 211 is pi+, 2212 is proton)
@@ -419,7 +421,11 @@ int dataCards::readKeys(const char* fileName)
 {
   std::ifstream in(fileName);
   if (!in) return 0;
+  else     return readKeys(in);
+}
 
+int dataCards::readKeys(std::istream& in)
+{
   std::string s;
   std::string t;
   std::string c;
@@ -440,7 +446,8 @@ int dataCards::readKeys(const char* fileName)
       double d;
       units = "";
       is >> d >> units;
-      cd[t] = d * getUnits( units );
+      cd[t] = d;
+      cd[t] *= getUnits(t, units);
       ok = 1;
     }
     if( ok == 0)
@@ -630,8 +637,9 @@ std::ostream& operator<<(std::ostream& o, const dataCards& d)
 
 }
 
-double dataCards::getUnits( std::string u )
+double dataCards::getUnits( std::string dc, std::string u )
 {
-  return units.GetUnits(u);
+  try   { return units.GetUnits(u); }
+  catch(Squeal squee) { throw(Squeal(Squeal::recoverable, "Failed to evaluate units "+u+" in datacard "+dc, "dataCards::readKeys")); }
 }
 

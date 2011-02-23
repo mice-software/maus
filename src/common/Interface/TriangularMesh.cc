@@ -23,7 +23,7 @@ TriangularMesh::TriangularMesh(int numberOfPoints, int numberOfDimensions, doubl
 		for(int i=0; i<numberOfPoints; i++) AddPoint_Delaunay(thePoints[i]);
 	}
 	else
-		for(int i=0; i<numberOfPoints; i++) AddPoint_Delaunay(thePoints[i]);
+		throw(Squeal(Squeal::recoverable, "TriangularMesh only implemented for 2d", "TriangularMesh::TriangularMesh(...)"));
 }
 
 TriangularMesh::~TriangularMesh() 
@@ -147,13 +147,6 @@ void TriangularMesh::Position(const Mesh::Iterator& it, double * position) const
 
 void TriangularMesh::AddCorners(double* min, double* max)
 {
-	for(int i=0; i<nDims; i++)
-	{
-		double delta = max[i] - min[i];
-		min[i]      -= delta;
-		max[i]      += delta;
-	}
-
 	for(int i=0; i<4; i++)
 	{
 		points.push_back(new Point(nDims));
@@ -174,6 +167,17 @@ void TriangularMesh::AddCorners(double* min, double* max)
 	simplices.push_back( new Simplex(this, pointsSimp1 ) );
 	Point* pointsSimp2[3] = {points[0], points[3], points[2]};
 	simplices.push_back( new Simplex(this, pointsSimp2 ) );
+}
+
+std::vector<TriangularMesh::Point*> TriangularMesh::ConnectedPoints(TriangularMesh::Point* point) {
+  std::vector<Point*> nn;
+  for(size_t i=0; i<point->simplices.size(); i++) {//loop over points that are nearest neighbours of this point
+    TriangularMesh::Simplex* s = point->simplices[i];
+    for(int j=0; j<3; j++) {
+      if(&s->MyPoint(j) != point) nn.push_back(point);
+    }
+  }
+  return nn;
 }
 
 void TriangularMesh::AddPoint_Delaunay(double * point)
@@ -200,7 +204,7 @@ void TriangularMesh::AddPoint_NoTriangulation(double * point)
 	points.back()->coords = point;
 }
 
-void TriangularMesh::BarycentricCoordinates(Point& test, Point& apex, Point& end0, Point& end1, double baryCoords[2])
+void TriangularMesh::BarycentricCoordinates(const Point& test, const Point& apex, const Point& end0, const Point& end1, double baryCoords[2])
 {
 	Point vec0 = end0 - apex;
 	Point vec1 = end1 - apex;
