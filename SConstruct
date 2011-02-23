@@ -111,9 +111,10 @@ env.jDev.releasecflags = ['-O2', '-DNDEBUG',]         #extra compile flags for r
 Export('env')
 
 #### Target: Documentation
-#dox = env.Command('does_not_exist3', 'doc/Doxyfile',
-#                  'doxygen doc/Doxyfile && cd doc/html')
-#env.Alias('doc', [dox])
+if conf.CheckCommand('doxygen'):
+  dox = env.Command('does_not_exist3', 'doc/Doxyfile',
+                  'doxygen doc/Doxyfile && cd doc/html')
+  env.Alias('doc', [dox])
 
 #python_executable = '%s/third_party/install/bin/python' % os.environ.get('MAUS_ROOT_DIR')
 #if os.path.isfile(python_executable):
