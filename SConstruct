@@ -110,11 +110,6 @@ env.jDev.releasecflags = ['-O2', '-DNDEBUG',]         #extra compile flags for r
 #don't need to export anything but 'env'
 Export('env')
 
-#### Target: Documentation
-if conf.CheckCommand('doxygen'):
-  dox = env.Command('does_not_exist3', 'doc/Doxyfile',
-                  'doxygen doc/Doxyfile && cd doc/html')
-  env.Alias('doc', [dox])
 
 #python_executable = '%s/third_party/install/bin/python' % os.environ.get('MAUS_ROOT_DIR')
 #if os.path.isfile(python_executable):
@@ -131,6 +126,11 @@ def CheckCommand(context, cmd):
 if not env.GetOption('clean'):
   print "Configuring..."
   conf = Configure(env, custom_tests = {'CheckCommand' : CheckCommand})
+
+  if conf.CheckCommand('doxygen'):
+    dox = env.Command('does_not_exist3', 'doc/Doxyfile',
+                      'doxygen doc/Doxyfile && cd doc/html')
+    env.Alias('doc', [dox])
 
   # ---- check for compiler and do sanity checks
   if not conf.CheckCXX():
