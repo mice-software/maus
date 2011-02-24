@@ -21,7 +21,7 @@ from Go import *
 #
 # where the file format has a JSON document per line.  I just toss the file
 # in here for simplicity.
-number_of_events = 1
+number_of_events = 10
 documentFile = io.StringIO(number_of_events*u"""{"mc": [{"position": { "x": 0.0, "y": -0.0, "z": -5000 },"particle_id" : 13,"energy" : 210, "random_seed" : 10, "unit_momentum" : { "x":0, "y":0, "z":1 }}]}\n""")
 
 myInput = InputPyJSON(documentFile)
