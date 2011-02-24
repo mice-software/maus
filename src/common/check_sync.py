@@ -26,8 +26,8 @@ def get_file_list(path, suffixes=['hh','cc']):
   file_list = []
   for root, dirs, files in os.walk(path):
     for suffix in suffixes:
-      files = filter(lambda x: x.find(suffix) == len(x)-len(suffix), files)
-      for file in files: 
+      files_suffix = filter(lambda x: x.find(suffix) == len(x)-len(suffix), files)
+      for file in files_suffix: 
         file_list.append(os.path.join(root, file))
   return file_list
 
