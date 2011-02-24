@@ -195,6 +195,8 @@ def set_recpack(conf, env):
 
 def set_gtest(conf, env):
   gtest = os.environ.get('GTEST_ROOT')
+  if gtest == None:
+    raise EnvironmentError('$GTEST_ROOT not set')
   env.Append(CPPPATH = os.path.join((gtest), 'include'))
   env.Append(LIBPATH = os.path.join((gtest), 'lib'))
   env.Append(LIBPATH = os.path.join((gtest), 'lib', '.lib'))
