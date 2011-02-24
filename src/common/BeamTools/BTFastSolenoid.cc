@@ -1,4 +1,4 @@
-#include "BTFastSolenoid.hh"
+#include "BeamTools/BTFastSolenoid.hh"
 #include "Interface/Squeak.hh"
 
 #include "gsl/gsl_sf_gamma.h"
@@ -29,7 +29,7 @@ BTFastSolenoid BTFastSolenoid::BTFastTanh(double peakField, double efoldDistance
   sol.bbMin[2] = -sol._zMax;
   sol.bbMax[2] =  sol._zMax;
 
-  Tanh::AddTanhDiffIndex(highestOrder+1);
+  Tanh2::AddTanhDiffIndex(highestOrder+1);
 
   return sol;
 }
@@ -93,7 +93,7 @@ double BTFastSolenoid::BzDifferential(const double& z, const int& order, endFiel
   switch (model)
   {
     case tanh:
-      return _peakField/2.*(-Tanh::Tanh(z, order+1, _efoldDistance, _length/2.)+Tanh::Tanh(z, order+1, _efoldDistance, -_length/2.));
+      return _peakField/2.*(-Tanh2::Tanh(z, order+1, _efoldDistance, _length/2.)+Tanh2::Tanh(z, order+1, _efoldDistance, -_length/2.));
     case glaser:
       return _peakField *(Glaser::Glaser(z, order, _lambda));
     case lookup:
@@ -181,7 +181,7 @@ void BTFastSolenoid::DoLookup(double stepSize)
   }
 }
 
-namespace Tanh
+namespace Tanh2
 {
 
 std::vector< std::vector<int> > tdi; //indexes nth differential of tanh
@@ -215,7 +215,6 @@ void AddTanhDiffIndex(int n)
       tdi.back()[i+1] -= i*tdi_last[i];
     }
   }
-
 }
 
 std::vector< std::vector<int> > TanhDiffIndices(int n) { 

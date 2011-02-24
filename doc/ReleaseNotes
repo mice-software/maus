@@ -1,0 +1,849 @@
+------------------- Release notes for G4MICE 2.4.1 ------------------------
+
+The following bugs were fixed:
+
+* A bug in MiceModules resulting in slow loading of modules has been repaired
+
+* A bug in BTMultipole resulting in erroneous end fields for multipoles (e.g. 
+  quadrupoles and dipoles) has been repaired. Note that some changes in the User
+  Interface have been made necessary by this change.
+
+Chris Rogers, February 2011
+
+
+------------------- Release notes for G4MICE 2.4 --------------------------
+
+As well as a number of bug fixes, the following improvements have been made:
+
+* New Optics algorithm, PolyFit, finds a polynomial of arbitrary order that fits
+  tracking within some user-specified tolerance
+
+* Added the ability to transport individual particles in Optics application by
+  defining a BeamType in the module that the Envelope is defined
+
+* Optics optimiser should now run quicker.
+
+* G4MICE now uses GEANT4 physics packages for tracking. QGSP_BERT is the
+  default, although alternate packages can be selected using the PhysicsModel
+  datacard. Hadronic processes can be controlled using the HadronicModel
+  datacard. Note that this does change the energy loss and multiple scattering
+  distribution slightly for muons. There is a significant change in the energy
+  loss and multiple scattering distribution for electrons.
+
+Chris Rogers, December 2010
+
+
+------------------- Release notes for G4MICE 2.3 --------------------------
+
+As well as a number of bug fixes, the following improvements have been made:
+
+* Updated tracker simulation, used for the analysis of the cosmic ray data taken
+  in Lab 7
+
+* Updated tracker analysis application used for the generation of plots used in
+  the tracker NIM paper
+
+* Numerous new and updated online applications, including OnlineScalers,
+  OnlineReconstruction, DataQualityCheck TofTree and TofTrace
+
+
+Malcolm Ellis, 1 August 2010
+
+
+------------------- Release notes for G4MICE 2.2 --------------------------
+
+As well as a number of bug fixes, the following improvements have been made:
+
+* Expressions in MiceModules - can evaluate expressions like
+  PropertyDouble Energy (200.**2..+105.658**2.)**0.5 MeV
+
+* Substitutions in MiceModules - can evaluate substitutions:
+Define substitution at the level of the configuration file
+  Substitution $mu_mass 105.658
+Use it:
+  PropertyDouble Energy (200.**2.+$mu_mass**2.)**0.5 MeV
+
+* New option for repeating mice modules - RepeatModule2, passes the
+number of the repeat as a parameter. This powerful tool can be used to
+quickly set up adiabatic tapers, etc
+
+* Optics application (currently a beta release): can now quickly push
+beam envelopes through an arbitrary lattice without tracking individual
+particles. See the documentation in MiceModules.
+
+* General speed improvement, especially when handling long or
+complicated lattices.
+
+* Improvements to the stability of AnalysisGUI application.
+
+* Improved algorithm for calculating weight inside an amplitude in
+Analysis application
+
+* Polynomial weighting algorithm added to CovarianceMatrix.hh (only
+available as a C++ library function right now)
+
+* Option to check for GEANT4 physical volume overlaps in datacards
+
+* Extra options added to Virtual planes - radial cut, make output
+relative to virtual plane position
+
+* A few further bug fixes and stability improvements
+
+Chris Rogers, April 2010
+
+
+---------------------  Release Notes for G4MICE 1.2  ---------------------
+
+Release 1.2 builds on the transition to the new persistency and applications
+scheme of release 1.1 and adds Digitisation functionality for the Scintillating
+Fibre tracker, Electromagnetic Calorimeter and Time Of Flight stations.
+
+A number of minor changes have been made to prepare the way for migration to g++
+4.0.2 without compile warnings due to G4MICE code.
+
+The Applications area now contains:
+
+Analysis - The analysis executable used for emittance calculation.
+Digitization - The digitisation executable reads in persistent Monte Carlo truth
+               hits and creates the corresponding digits.
+EventDisplay - The prototype Event Display developed for the KEK beam test in
+               2005, requires the libsx library to compile.
+FileSplitter - A utility to take one file generated with the new persistency
+               scheme and extract a subset of the events from it.
+KekOct2005 - Sample code for analysing the data produced in the test beam at KEK
+             in 2005.
+Optics - A program to perform Optics calculations and eventually attempt beam
+         line optimisations.
+PawHistograms - Reads in persistent classes and generate PAW histograms in an
+                HBOOK file.
+PawNtuples - Reads in persistent classes and generates a PAW ntuple.
+RootEvent - An example application used for EmCal studies that generates a ROOT
+            tree.
+RootHistograms - Reads in persistent classes and generates ROOT histograms.
+RootTrees - Reads in persistent classes and generates a simple ROOT tree.
+Simulation - The simulation executable for MICE.
+
+Malcolm Ellis, 10th March, 2006
+
+
+---------------------  Release Notes for G4MICE 1.0  ---------------------
+
+This release (cvs tag mice-1-0) of the MICE software distribution includes
+a full simulation of the experiment with
+
+o A modular set of package libraries with documentation and unit tests for
+  most packages and subsystems
+
+o A chain of user applications for
+
+  - energy deposition in particle detectors (Simulation)
+
+  - raw data output from detector electronics (Digitization)
+
+  - pattern recognition and track reconstruction (Reconstruction)
+
+  - emittance calculation (Analysis)
+
+  and a complete set of tools for building and running them
+
+o Muon beam options including
+
+  - an internal model with choice of sign and adjustable parameters for
+    position and time offsets, energy, transverse size, bunch length,
+    energy spread as well as contamination levels from electrons, pions,
+    protons and kaons
+
+  - externally generated track sets from programs G4BeamLine, ICOOL,
+    TURTLE and G4MICE itself as well as the HEPEvt format
+
+  - generation of track sets with user-defined phase space distribution
+
+o A model of the downstream portion of the MICE beamline around the MICE
+  detectors (after the last bend) which currently consists of the final
+  two quadrupole triplets with their materials and magnetic fields
+  including fringe effects and the beam diffuser
+
+o A model for the rf induced background from the cavities using electron
+  and/or photon sources with adjustable position, size and energy
+  distributions as well as support for an externally generated set of
+  background tracks
+
+o A model of the nominal (stage VI) MICE cooling channel including
+
+  - magnetic fields constructed from individual coils and support for an
+    external field map as well as a constant field
+
+  - electromagnetic fields with proper time and spatial dependence and
+    support for constant static field within the rf cavities
+
+  - liquid hydrogen absorber vessels with curved windows (spherical and
+    torispherical shells) and support for simpler cylindrical versions
+
+  - the magnetic shields at the outer ends
+
+o A model of tracking and particle identification detectors including
+
+  - scintillating fiber tracker (SciFi) geometry with individual fibers,
+    planes, stations and support frames and glue
+
+  - time projection chamber with GEM readout (TPG) geometry including
+    active and high voltage gas and membranes, hexaboard and GEM plate
+    layers
+
+  - 3 time-of-flight walls (TOF) with 2-plane scintillator slab geometry
+
+  - 2 aerogel Cherenkov detectors (Ckov) with radiators, mirrors and windows
+
+  - Electromagnetic calorimeter (EMCal) with lead-scintillator spaghetti
+    geometry including individual fibers
+
+  - Analysis planes (Virtual detectors) to record the Monte Carlo truth
+    information
+
+o A model of the readout electronics for all the detectors including
+
+  - Light generation and transport (TOF, SciFi, Ckov, EMCal): scintillation
+    and trapping efficiency, attenuation, transmission loss at connectors,
+    reflectivity at mirror surfaces
+
+  - Light detection: quantum efficiency of VLPC and PMT detectors, gain
+
+  - Generation and transport of electron clusters (TPG)
+
+  - Gain and electronics noise
+
+  - Dead channels
+
+o Track reconstruction including
+
+  - Pattern recognition for hit clusters in the SciFi tracker
+
+  - Space points in SciFi and TOF
+
+  - Road finding and extraction of optimal track parameters for the 2 SciFi
+    trackers through a Kalman filter
+
+  - Matching of SciFi tracks to TOF space points
+
+o Calculation of beam dynamics quantities for physics analysis including
+
+  - 2, 4, and 6-dimensional emittance in longitudinal (time-energy) and
+    transverse (x-px, y-py) coordinates
+
+  - Moments and covariance matrices
+
+  - Kinematic cuts and statistical weighting
+
+Yagmur Torun, February 12, 2005
+
+
+---------------------  Release Notes for G4MICE 0.9  ---------------------
+
+This release (cvs tag mice-0-9) of the MICE software distribution
+includes bug fixes and updates:
+
+o Kalman:
+  - implemented unit test with reference output (M. Ellis)
+
+o Interface:
+  - added/modified TPG digitization parameters in dataCards (R. Sandstrom)
+
+o Config:
+  - fixed memory leak in EmCalGeometry (L. Tong)
+  - updated SpecialGeomParameters (S. Kahn)
+
+o Calib:
+  - updated TpgDigitsParameters (R. Sandstrom)
+
+o DetModel:
+  - updated TpgHits and TpgSensitiveDetector (R. Sandstrom)
+  - updated SpecialVirtualSD, SpecialVirtualStation, SpecialHit (S. Kahn)
+
+o Recon:
+  - fixed memory leak in SciFiTrack (L. Tong)
+  - fixed divide by zero in SciFiTrack (A. Tapper)
+
+o DetResp:
+  - fixed memory leak in EmCalDigits (L. Tong)
+  - updated TpgDigits (R. Sandstrom)
+  - added SpecialVirtual to digitization event loop (S. Kahn)
+
+September 30, 2003
+
+
+---------------------  Release Notes for G4MICE 0.8  ---------------------
+
+This release (cvs tag mice-0-8) of the MICE software distribution
+includes bug fixes and updates:
+
+o setup
+
+o Documentation:
+  - added/updated parameter descriptions in dataCards for
+    * SciFi (A. Tapper)
+    * TPG (R. Sandstrom)
+
+o GEANT4
+  - a patch to 5.2 is now available and should be used as the new default
+
+o STL:
+  - updated language constructs to modern versions in various files under
+    BeamTools, EngModel (Y. Torun)
+
+o Interface:
+  - changed default coil geometry/currents to those presented by R. Palmer
+    at the August 27 video conference (Y. Torun)
+  - added/updated TPG gas mixture and GEM parameters (R. Sandstrom)
+
+o Config:
+  - updated geometry/material parameters in TpgTrackerGeometry (R. Sandstrom)
+
+o DetModel:
+  - updated gas initialization in TpgTracker (R. Sandstrom)
+
+o Recon:
+  - fixed memory leak in SciFiDoubletCluster (L. Tong)
+
+o Analysis:
+  - updated EMCal blocks in mice2root (H. Wilson)
+
+o Tests: still none
+
+September 17, 2003
+
+
+---------------------  Release Notes for G4MICE 0.7  ---------------------
+
+This release (cvs tag mice-0-7) of the MICE software distribution
+includes bug fixes, updates and source for a new package:
+
+o setup
+  - added floating point initialization to all executables with strict
+    default handling (Y. Torun)
+    You can control the mode by setting the GSL_IEEE_MODE environment
+    variable before running an executable (eg. GSL_IEEE_MODE='mask-all'
+    to ignore all problems)
+
+o Documentation:
+  - added/updated parameter descriptions in dataCards for
+    * TPG (R. Sandstrom)
+    * EMCal (A. Tonazzo)
+
+o STL:
+  - gcc3 is now mandatory
+  - updated language constructs to modern versions in various files under
+    BeamTools, Interface, DetResp, Recon, Analysis (Y. Torun)
+
+o Kalman:
+  - committed modified package source and makefile (M. Ellis)
+    Since it's not used yet, the package is not compiled by default in
+    the global Makefile, you can make under Kalman/mgr if you want to test
+    compilation.
+
+o Interface:
+  - added more EMCal geometry parameters to dataCards (A. Tonazzo)
+  - added more TPG geometry parameters to dataCards (R. Sandstrom)
+
+o Config:
+  - updated parameter class EmCalGeometry (A. Tonazzo)
+  - updated parameter class TpgTrackerGeometry (R. Sandstrom)
+
+o DetModel:
+  - updated EMCal construction implementing variable Pb/fiber ratio
+    and correct layering (A. Tonazzo)
+  - updated TPG construction implementing correct geometry including
+    hexaboard, high voltage plane, GEMs, gas mixtures and isolation
+    layers (R. Sandstrom)
+
+o Analysis:
+  - added Recon blocks to mice2root header (H. Wilson)
+
+o DetResp:
+  - added TPG and EMCal to digitization event loop (Y. Torun)
+
+o Tests: still none
+
+September 4, 2003
+
+
+---------------------  Release Notes for G4MICE 0.6  ---------------------
+
+This release (cvs tag mice-0-6) of the MICE software distribution
+includes bug fixes and updates:
+
+o setup
+
+o Makefiles:
+  - fixed bug related to object files under mgr directories (Y. Torun)
+  - enabled debug option for main() in executables (Y. Torun)
+
+o Documentation:
+  - added/updated parameter descriptions in dataCards for
+    * absorbers, beam, rf, rf background, SciFi (Y. Torun)
+    * Ckov1 (R. Godang)
+    * TOF, Ckov2, Virtual (S. Kahn)
+    * TPG (R. Sandstrom)
+
+o BeamTools:
+  - added access method for coil physical volume in BTSolenoidPhysVol
+    class (Y. Torun)
+
+o Interface:
+  - updated VirtualHitBank, implemented SpecialHitBank for partitioned
+    Virtual detectors(S. Kahn)
+  - added parameters for magnetic field map output (Y. Torun)
+  - updated file interfaces for detector HitBank classes (Y. Torun)
+
+o Config:
+  - implemented parameter class for partitioned Virtual detectors
+    and updated Virtual parameter class (S. Kahn)
+
+o Calib:
+  - language cleanup (Y. Torun)
+
+o EngModel:
+
+  - added access to coil and absorber names and logical volumes
+    in AbsorberVessel and MICESFoFoConstruct (Y. Torun)
+
+o DetModel:
+  - implemented partitioned Virtual detector class for energy deposition
+    calculation in coils and absorbers (S. Kahn)
+  - updated file interfaces for detector SD classes (Y. Torun)
+
+o Recon:
+  - updated multiple hit handling in TOF reconstruction (S. Kahn)
+  - moved TofReconParams from Calib to here (Y. Torun)
+  - updated file interfaces for detector Recon classes (Y. Torun)
+
+o Analysis:
+  - updated mice2root header (Y. Torun)
+  - updated file interface for Event class (Y. Torun)
+
+o Simulation:
+  - updated Virtual detector access in MICEDetectorConstruction (S. Kahn)
+  - added partitioned Virtual absorber and coil instrumentation to
+    MICEDetectorConstruction (Y. Torun)
+  - added magnetic field map output option (Y. Torun)
+  - implemented MICERunAction, updated MICEEventAction (Y. Torun)
+  - updated output file interface to single global ofstream (Y. Torun)
+ 
+o DetResp:
+  - implemented SpecialDigits for partitioned Virtual detectors (S. Kahn)
+  - updated file interfaces for detector digits classes (Y. Torun)
+
+o Tests: still none
+
+August 20, 2003
+
+
+------------------  Release Notes for G4MICE 0.5  ----------------------
+
+This release (cvs tag mice-0-5) of the MICE software distribution
+includes bug fixes and updates:
+
+o setup
+
+o Makefiles
+
+o Documentation: filled in parameter descriptions in dataCards (Y. Torun)
+
+o GEANT4: we are now using version 5.2
+
+o ROOT: move to the latest production version (3.05/07)
+
+o BeamTools
+
+o Kalman
+
+o Interface:
+  - added EMCal and TPG geometry parameters to dataCards (V. Grichine)
+  - added Ckov1 geometry parameters to dataCards (R. Godang)
+
+o Config:
+  - updated geometry parameters for EMCal and TPG (V. Grichine)
+  - updated geometry parameters for Ckov1 (R. Godang)
+
+o Calib:
+  - updated digitization parameters for EMCal and TPG (V. Grichine)
+
+o EngModel
+
+o DetModel:
+  - fixed null detector output problem (Y. Torun)
+  - extended Virtual detectors to support coils and absorbers (S. Kahn)
+
+o Recon:
+
+o Analysis:
+  - new mice2root tool to generate ROOT format output (H. Wilson)
+
+o Simulation:
+  - fixed null generator output problem (Y. Torun)
+  - added interactive menu with dataCards get-value command (H. Wilson)
+  - fixed uninitialized pionGun bug (Y. Torun)
+
+o DetResp:
+  - fixed divide-by-zero bug in Ckov2 (S. Kahn)
+
+o Tests: still none
+
+August 6, 2003
+
+
+------------------  Release Notes for G4MICE 0.4  ----------------------
+
+This release (cvs tag mice-0-4) of the MICE software distribution
+includes lots of new functionality and has the following updates:
+
+o setup: pointed CVSROOT to new alias (mice.iit.edu)
+
+o Makefiles: added support for
+  - another Analysis executable (S. Kahn)
+  - static linking (E. McKigney)
+
+o Documentation: added POD (perl) type manual to dataCards (Y. Torun)
+
+o STL: The code now compiles with gcc-3.x gcc-2.95 should still work
+  but users of G4MICE should migrate to gcc3
+
+o GEANT4: We are now compatible with the 4.5.1.p01 patchlevel, move
+  to this version right away
+
+o ROOT: Some problems were reported with earlier versions, move to
+  the latest production release (3.04/02)
+
+o BeamTools: upgraded to the 1.50 release by D. Elvira, modified for
+  G4MICE and cleaned up for compilation by gcc3 (Y. Torun)
+
+o Kalman: no change
+
+o Interface:
+  - added hit bank for Ckov1 (R. Godang)
+  - added hit bank for Ckov2 and Analysis (S. Kahn)
+  - updated TOF and Virtual hit bank (S. Kahn)
+  - language cleanup for gcc3
+
+o Config:
+  - updated geometry parameters for SciFi (E. McKigney)
+  - updated geometry parameters for EMCal and TPG (V. Grichine)
+  - updated parameters for beam, absorber and rf background (Y. Torun)
+  - added geometry parameters for Ckov1 (R. Godang)
+  - added geometry parameters for Ckov2 (S. Kahn)
+  - language cleanup (Y. Torun)
+
+o Calib:
+  - added analysis and downstream Ckov digitization parameters (S. Kahn)
+  - added upstream Ckov digitization parameters (R. Godang)
+  - added new downstream Ckov digitization parameters (S. Kahn)
+  - updated TOF digitization parameters (S. Kahn)
+  - updated SciFi digitization, reconstruction parameters (E. McKigney)
+
+o EngModel: cleaned up cooling channel implementation, added vacuum
+  and safety windows, simplified interface to BeamTools (Y. Torun)
+
+o DetModel:
+  - added Ckov2 (new downstream Cerenkov) implementation (S. Kahn)
+  - added Ckov1 (upstream Cerenkov) implementation (R. Godang)
+  - updated Virtual hit output (S. Kahn, Y. Torun)
+  - language cleanup (Y. Torun)
+
+o Recon:
+  - added support for multiplexing, track fitting with five stations
+    and dead channels to SciFi (E. McKigney)
+  - added TOF reconstruction classes (S. Kahn)
+  - added reconstruction output for Virtual (S. Kahn)
+
+o Analysis:
+  - added new classes for standard emittance calculation (S. Kahn)
+  - language cleanup (Y. Torun)
+
+o Simulation:
+  - fixed misfeature in stacking action (S. Kahn)
+  - updated rf background model, added photon gun, enabled support for
+    uniform electron and photon background (Y. Torun)
+  - updated primary generator, enabled support for contamination in
+    the beam (Y. Torun)
+  - language cleanup (Y. Torun)
+
+o DetResp:
+  - added multiplexing and dead channels to SciFi (E. McKigney)
+  - added digitization for Ckov1 (R. Godang)
+  - added digitization for Ckov2 (S. Kahn)
+  - added Virtual digits (S. Kahn)
+
+o Tests: no change
+
+May 29, 2003
+
+
+------------------  Release Notes for G4MICE 0.3  ----------------------
+
+This release (cvs tag mice-0-3) of the MICE software distribution is
+intended for preproduction testing. It has the following updates:
+
+o setup: no changes
+
+o Makefiles: added support for Digitization, Reconstruction and Analysis
+  executables (Y. Torun, E. McKigney), debugging and optimization
+  options (Y. Torun)
+
+o Documentation: is limited to this file
+
+o BeamTools: cleanup to remove compilation warnings (Y. Torun)
+
+o Kalman: no change
+
+o Interface: added support for RF background parameters (V. Grichine),
+  updated input parameters for Virtual (S. Kahn) and rf (Y. Torun) and
+  hit output for TOF (S. Kahn, Y. Torun)
+
+o Config: added class for RF background parameters (V. Grichine),
+  updates to TOF (S. Kahn) and rf parameters (Y. Torun)
+
+o Calib: update to SciFi (E. McKigney)
+
+o EngModel: 
+
+o DetModel: bug fix in Ckov implementation (R. Godang, Y. Torun), bug
+  fixes and updates to TOF and Virtual (S. Kahn, Y. Torun), support for
+  unified hit output (E. McKigney)
+
+o Recon: update to SciFi (E. McKigney), bugfix in main (Y. Torun)
+
+o Analysis: added executable, updated  (E. McKigney)
+
+o Simulation: added simple RF background model (V. Grichine), Virtual
+  detector placement, generated track output and fixed field no cooling
+  run mode (Y. Torun)
+
+o DetResp: updates to support single textfile interface (E. McKigney)
+
+o Tests: all the test subdirectories are still empty, here is how you can
+  test the system (assuming bash)
+
+  - Move any existing MICE source tree out of the way to avoid problems
+
+  - Check out the source
+
+    export CVSROOT=:pserver:anonymous@hep04.phys.iit.edu:/home/mice/cvsroot
+    cvs co -r mice-0-3 MICE
+
+  - Set up your environment
+
+    edit MICE/setup/micesetup.sh
+    . MICE/setup/micesetup.sh
+
+    If you want visualization, set the relevant G4 variable, eg.
+
+    export G4VIS_USE_OPENGLX=1
+
+    which is the only one I have tested so far
+
+  - Compile
+
+    cd $MICESRC/mgr; make
+
+    If all goes well, you should get the following executables
+
+    $MICESRC/Simulation/object/$MICEPLATFORM/Simulation
+    $MICESRC/DetResp/object/$MICEPLATFORM/Digitization
+    $MICESRC/Recon/object/$MICEPLATFORM/Reconstruction
+    $MICESRC/Analysisobject/$MICEPLATFORM/Analysis
+
+  - Run the chain
+
+    * Hits
+
+      touch dummy.in; Simulation dummy.in
+
+      which will generate an output file named Sim.out
+
+    * Digits
+
+      Digitization dummy.in
+
+      which will generate an output file named Digits.out
+
+    * Tracks
+
+      Reconstruction dummy.in
+
+      which will generate Rec.out
+
+    This will track 100 muons through a fixed 4T field, generate raw
+    data and reconstruct tracks from the SciFi data.
+
+    You can also try running with visualization as
+
+       Simulation dummy.in 1
+
+    (note the extra argument) which will start an interactive session.
+
+  - If anything goes wrong during any of these steps, report the problem
+    right away
+
+December 5, 2002
+
+
+------------------  Release Notes for G4MICE 0.2  ----------------------
+
+This release (cvs tag mice-0-2) of the MICE software distribution is
+intended to be the first working system. It has the following updates:
+
+o setup: no changes
+
+o Makefiles: a bug in the subpackage makefile has been fixed, support
+  for visualization is included and a Simulation executable has been
+  added (Y. Torun)
+
+o Documentation: is limited to this file
+
+o BeamTools: no changes
+
+o Kalman: no change
+
+o Interface: added support for TPG, EMCal (V. Grichine), TOF, Virtual
+  detector (S. Kahn), Ckov (R. Godang), magnet, absorber and RF system
+  (Y. Torun) parameters
+
+o Configuration: added classes for TPG, EMCal (V. Grichine), TOF, Virtual
+  (S. Kahn), Ckov (R. Godang), magnet, absorber, RF and beam (Y. Torun)
+  parameters
+
+o Calibration: added digitization parameters for TPG, EMCal (V. Grichine),
+  TOF (S. Kahn), Ckov (R. Godang)
+
+o EngModel: moved magnetic and electric fields, coil, absorber and cavity
+  construction from Simulation to this package (Y. Torun). Coil geometry
+  now follows MICE-Note 9 by Palmer and Fernow
+
+o DetModel: added support for TPG, EMCal (V. Grichine), TOF, Virtual
+  (S. Kahn), Ckov (R. Godang)
+
+o Recon: added executable main() and event model (E. McKigney)
+
+o Analysis: no change
+
+o Simulation: MICEDetectorConstruction class now does the physical
+  placement of the cooling channel and detector volumes and initializes
+  sensitive detectors, also added executable main() (Y. Torun)
+
+o DetResp: added executable main() and event model (E. McKigney)
+
+o Tests: all the test subdirectories are empty but you can do something
+  like this to test the system (assuming bash)
+
+  - Check out the source
+
+    export CVSROOT=:pserver:anonymous@hep04.phys.iit.edu:/home/mice/cvsroot
+    cvs co -r mice-0-2 MICE
+
+  - Set up your environment
+
+    edit MICE/setup/micesetup.sh
+    . MICE/setup/micesetup.sh
+
+    If you want visualization, set the relevant G4 variable, eg.
+
+    export G4VIS_USE_OPENGLX=1
+
+    which is the only one I have tested so far
+
+  - Compile
+
+    cd $MICESRC/mgr; make
+
+    If all goes well, you should get a Simulation executable under
+    $MICESRC/Simulation/object/$MICEPLATFORM
+
+  - Play
+
+    Run the program on an empty input file to generate the field maps
+
+    touch dummy.in
+    Simulation dummy.in 1
+
+    This should create a few files named Focus.dat, Coupling.dat, etc.
+    After that, you can insert the line
+
+    SolDataFiles useFiles
+
+    into the input file and the program will read the field maps from the
+    files for quick startup
+
+November 18, 2002
+
+
+---------------  Release Notes for MICE release 0.1  -------------------
+
+This release (cvs tag mice-0-1) of the MICE software distribution is
+intended just to get things rolling. It has the following functionality:
+
+- Environment: a shell script is provided in two flavors (bash and tcsh)
+  under the setup toplevel directory to generate the appropriate shell
+  environment for development work (Y. Torun)
+
+- Makefiles: a basic build system is provided as makefiles under the mgr
+  subdirectories to generate package libraries and also maintain a local
+  site installation if desired (Y. Torun)
+
+  There's no support for building executables (this release doesn't
+  contain any) or shared objects. The next update will include these and
+  other features. The makefiles assume gnumake and gcc/g++
+
+- Documentation: is limited to this file and a README file located in the
+  toplevel doc subdirectory that contains instructions for getting and
+  compiling the code
+
+- BeamTools: this package now contains the latest version of the package
+  from Fermilab (D. Elvira) that works with standard GEANT4 (no need for
+  patches to GEANT4 source to get correct tracking in time varying
+  electromagnetic fields). Some modifications were necessary to make it
+  fit into our framework (Y. Torun)
+
+- Kalman: is just a placeholder with a makefile
+
+- Interface: the MICE Interface Library was adapted from BeamTools classes
+  and now has support for SciFi calibration and configuration parameters
+  (E. McKigney)
+
+- Configuration: has SciFi parameters implemented (E. McKigney)
+
+- Calibration: has SciFi parameters implemented (E. McKigney)
+
+- EngModel: is also a placeholder for now, some of the code that is
+  currently under Simulation will be moved to this package later
+
+- DetModel: has full SciFi implementation (E. McKigney)
+
+- Recon: has SciFi reconstruction classes implemented (E. McKigney)
+
+- Analysis: has a basic emittance calculation class (E. McKigney)
+
+- Simulation: a basic Super-FOFO channel implementation with coils, RF
+  cavities, absorbers and the experimental hall is included (Y. Torun)
+
+- DetResp: has SciFi digits and hits fully implemented (E. McKigney)
+
+- Tests: all the test subdirectories are empty but you can do something
+  like this to test the build system (assuming bash)
+
+  export CVSROOT=:pserver:anonymous@hep04.phys.iit.edu:/home/mice/cvsroot
+  cvs co -r mice-0-1 MICE
+  edit MICE/setup/micesetup.sh to set up the environment correctly
+  . MICE/setup/micesetup.sh
+  mkdir sitetest; cd sitetest; cvs co siteobj
+  cd $MICESRC/mgr; make; make install; make siteinstall
+
+  If all goes well, you should get the following libraries under
+  $MICESRC/object/$MICEPLATFORM and $MICEROOT/object/$MICEPLATFORM
+
+  libAnalysis.a, libBeamTools.a, libCalib.a, libConfig.a, libInterface.a,
+  libKalman.a, libSciFiDetModel.a, libSciFiDetResp.a, libSciFiRecon.a,
+  libSimulation.a
+
+  some of which will be empty
+
+August 26, 2002
+

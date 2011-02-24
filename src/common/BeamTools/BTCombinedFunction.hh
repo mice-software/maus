@@ -9,48 +9,55 @@
 #include "BTField.hh"
 #include "BTMultipole.hh"
 
+/// 
 
-class BTCombinedFunction : public BTField
-{
+class BTCombinedFunction : public BTField {
 public:
-	//length is the length along the midpoint
-	//to make a straight multipole, set radiusOfCurvature = 0.
-	BTCombinedFunction(double By, double fieldIndex, double length, double radiusOfCurvature, double height, double width, int maxPole, 
-	                   std::string curvature="");
-	BTCombinedFunction(double By, double fieldIndex, double length, double radiusOfCurvature, double height, double width, int maxPole,
-	                   double effectiveWidth, double endLength, int endPole, std::vector<double> engeParameters, std::string curvature="");
-	~BTCombinedFunction() {;}
+  /// Generate a BTCombinedFunction from dipole field and index
+  BTCombinedFunction(int maxPole, double By, double fieldIndex,
+              double length, double height, double width,
+              std::string curvature, double radiusVariable,
+              const BTMultipole::EndFieldModel* endfield, int endPole);
+  /// Destructor (nothing to destruct)
+  ~BTCombinedFunction() {;}
 
-	void Print(std::ostream &out) const;
+  /// Print a summary of the combined function magnet
+  void Print(std::ostream &out) const;
 
-	//Physics methods
-	void GetFieldValue( const double Point[4], double *EMfield ) const
-	{
-		for(unsigned int i=0; i<_fields.size(); i++)
-		{ 
-			double field[6] = {0,0,0,0,0,0};
-			_fields[i].GetFieldValue(Point, field);
-			for(int i=0; i<6; i++) EMfield[i] += field[i];
-		}
-	}
-	BTCombinedFunction * Clone() const {return new BTCombinedFunction(*this);}
-	void SetMomentumBased();
+  /// Return the sum of fields in the CF magnet
+  void GetFieldValue( const double Point[4], double *EMfield ) const {
+    for(unsigned int i=0; i<_fields.size(); i++)
+    { 
+      double field[6] = {0,0,0,0,0,0};
+      _fields[i]->GetFieldValue(Point, field);
+      for(int i=0; i<6; i++) EMfield[i] += field[i];
+    }
+  }
+  /// Copy constructor
+  BTCombinedFunction * Clone() const {return new BTCombinedFunction(*this);}
 
-	CLHEP::HepLorentzVector GetVectorPotential(CLHEP::HepLorentzVector Point) const;
-	CLHEP::Hep3Vector       GetExternalPoint() const;
+  /// Calculate radius of curvature if bending model is MomentumBased
+  void SetMomentumBased();
 
-	void   GetReferenceTrajectory(std::vector<double>& x, std::vector<double>& z, std::vector<double>& angle, std::vector<double>& s); 
+  /// Return the vector potential - NOT IMPLEMENTED
+  CLHEP::HepLorentzVector GetVectorPotential(CLHEP::HepLorentzVector Point) const;
+
+  /// ??
+  CLHEP::Hep3Vector       GetExternalPoint() const;
+
+  /// Return the reference trajectory if bending model is "momentum based"
+  void   GetReferenceTrajectory(std::vector<double>& x, std::vector<double>& z, std::vector<double>& angle, std::vector<double>& s); 
 
 private:
-	std::vector<BTMultipole>   _fields;
-	double                     _by;
-	double                     _fieldIndex;
-	double                     _length;
-	double                     _radiusOfCurvature;
-	double                     _height;
-	double                     _width;
+  std::vector<BTMultipole*>   _fields;
+  double                     _by;
+  double                     _fieldIndex;
+  double                     _length;
+  double                     _radiusOfCurvature;
+  double                     _height;
+  double                     _width;
 
-	double GetFieldAtPoleTip(int pole);// {if(pole == 1) return _by; else return 0;}
+  double GetFieldAtPoleTip(int pole);// {if(pole == 1) return _by; else return 0;}
 };
 
 #endif
