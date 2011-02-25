@@ -202,7 +202,7 @@ def set_gtest(conf, env):
   env.Append(LIBPATH = os.path.join((gtest), 'lib', '.lib'))
   if not conf.CheckLib('gtest', language='c++') or\
      not conf.CheckCXXHeader('gtest/gtest.h'):
-      Exit(1)
+      raise EnvironmentError('Could not find gtests with $GTEST_ROOT='+str(gtest))
 
 # Setup the environment.  NOTE: SHLIBPREFIX means that shared libraries don't
 # have a 'lib' prefix, which is needed for python to find SWIG generated libraries
@@ -277,7 +277,6 @@ if not env.GetOption('clean'):
   set_clhep(conf, env)
   set_geant4(conf, env)
   set_recpack(conf, env)
-  set_gtest(conf, env)
 
   # check types size!!!
   env = conf.Finish()
@@ -297,9 +296,13 @@ if not env.GetOption('clean'):
 
     env.Append(LIBPATH = 'src/common/')
     env.Append(CPPPATH = os.environ.get('MAUS_ROOT_DIR'))
-    testCppFiles = glob.glob("tests/cpp_unit/*/*cpp")+glob.glob("tests/cpp_unit/*cpp")
-    testmain = env.Program(target = 'tests/cpp_unit/test_cpp_unit', source = testCppFiles, LIBS=['recpack'] +  env['LIBS']+['simulate'])
-    env.Install('build', ['tests/cpp_unit/test_cpp_unit'])
+    try:
+      set_gtest(conf, env)
+      testCppFiles = glob.glob("tests/cpp_unit/*/*cpp")+glob.glob("tests/cpp_unit/*cpp")
+      testmain = env.Program(target = 'tests/cpp_unit/test_cpp_unit', source = testCppFiles, LIBS=['recpack'] +  env['LIBS']+['simulate'])
+      env.Install('build', ['tests/cpp_unit/test_cpp_unit'])
+    except:
+      print 'Failed to build cpp unit tests'
 
   directories = []
   types = ["input", "map", "reduce", "output"]
