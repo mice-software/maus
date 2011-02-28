@@ -163,9 +163,9 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      # x-boa requires this
      #export ROOTSYS="\${MAUS_ROOT_DIR}/third_party/install"
 
-     if [ -f \${MAUS_ROOT_DIR}/third_party/build/root_v5.26.00e/config/thisroot.sh ]
+     if [ -f \${MAUS_ROOT_DIR}/third_party/build/root_v5.26.00e/bin/thisroot.sh ]
      then
-          source \${MAUS_ROOT_DIR}/third_party/build/root_v5.26.00e/config/thisroot.sh
+          source \${MAUS_ROOT_DIR}/third_party/build/root_v5.26.00e/bin/thisroot.sh
      fi
 
      # ROOT specific garbage
@@ -237,16 +237,21 @@ else
           setenv LD_LIBRARY_PATH "\${MAUS_ROOT_DIR}/third_party/install/lib" # intiailize it
      endif
 
+     if( ! -e \${MAUS_ROOT_DIR}/third_party/build/root_v5.26.00e/bin/thisroot.csh ) then 
+          source \${MAUS_ROOT_DIR}/third_party/build/root_v5.26.00e/bin/thisroot.csh        
+     endif 
+
+
      # x-boa requires this
-     setenv ROOTSYS "\${MAUS_ROOT_DIR}/third_party/install"  
+     #setenv ROOTSYS "\${MAUS_ROOT_DIR}/third_party/install"  
 
      # ROOT specific garbage
-     setenv LD_LIBRARY_PATH "\${MAUS_ROOT_DIR}/third_party/install/lib/root:\${LD_LIBRARY_PATH}"
-     if ({\$?PYTHONPATH}) then
-          setenv PYTHONPATH "\${MAUS_ROOT_DIR}/third_party/install/lib/root:\${PYTHONPATH}" # else add it
-     else
-          setenv PYTHONPATH "\${MAUS_ROOT_DIR}/third_party/install/lib/root" # intiailize it
-     endif
+     #setenv LD_LIBRARY_PATH "\${MAUS_ROOT_DIR}/third_party/install/lib/root:\${LD_LIBRARY_PATH}"
+     #if ({\$?PYTHONPATH}) then
+     #     setenv PYTHONPATH "\${MAUS_ROOT_DIR}/third_party/install/lib/root:\${PYTHONPATH}" # else add it
+     #else
+     #     setenv PYTHONPATH "\${MAUS_ROOT_DIR}/third_party/install/lib/root" # intiailize it
+     #endif
 
      # maus workers
      setenv PYTHONPATH "\$MAUS_ROOT_DIR/build:\$PYTHONPATH"
