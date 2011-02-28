@@ -285,6 +285,7 @@ if not env.GetOption('clean'):
   #specify all of the sub-projects in the section
   if env['USE_G4'] and env['USE_ROOT']:
     env.Append(CCFLAGS=['-g','-pg'])
+    env.Append(LINKFLAGS='-pg')
     
     commonCppFiles = glob.glob("src/common/*/*cc") + glob.glob("src/common/*/*/*cc") + glob.glob("src/common/*/*cpp") + glob.glob("src/common/*/*/*cpp")
     simulate = env.SharedLibrary(target = 'src/common/libsimulate', source = commonCppFiles, LIBS=['recpack'] +  env['LIBS'])
