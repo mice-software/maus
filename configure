@@ -161,15 +161,17 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      fi
 
      # x-boa requires this
-     export ROOTSYS="\${MAUS_ROOT_DIR}/third_party/install"
+     #export ROOTSYS="\${MAUS_ROOT_DIR}/third_party/install"
+
+     source \${MAUS_ROOT_DIR}/third_party/build/root_v5.26.00e/config/thisroot.sh
 
      # ROOT specific garbage
-     export LD_LIBRARY_PATH="\${MAUS_ROOT_DIR}/third_party/install/lib/root:\${LD_LIBRARY_PATH}"
-     if [ -z "\${PYTHONPATH}" ]; then  # see if the variable exists yet
-          export PYTHONPATH="\${MAUS_ROOT_DIR}/third_party/install/lib/root" # intiailize it
-     else
-          export PYTHONPATH="\${MAUS_ROOT_DIR}/third_party/install/lib/root:\${PYTHONPATH}" # else add it
-     fi
+     #export LD_LIBRARY_PATH="\${MAUS_ROOT_DIR}/third_party/install/lib/root:\${LD_LIBRARY_PATH}"
+     #if [ -z "\${PYTHONPATH}" ]; then  # see if the variable exists yet
+     #     export PYTHONPATH="\${MAUS_ROOT_DIR}/third_party/install/lib/root" # intiailize it
+     #else
+     #     export PYTHONPATH="\${MAUS_ROOT_DIR}/third_party/install/lib/root:\${PYTHONPATH}" # else add it
+     #fi
 
      # maus workers
      export PYTHONPATH="\$MAUS_ROOT_DIR/build:\$PYTHONPATH"
