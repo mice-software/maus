@@ -1,5 +1,5 @@
 from SCons.Script.SConscript import SConsEnvironment
-import glob, os
+import glob, os, sys
 
 #this is our catch-all Dev class
 class Dev:
@@ -194,19 +194,23 @@ def set_recpack(conf, env):
       Exit(1)
 
 def set_gtest(conf, env):
-  gtest = os.environ.get('GTEST_ROOT')
-  if gtest == None:
-    raise EnvironmentError('$GTEST_ROOT not set')
-  env.Append(CPPPATH = os.path.join((gtest), 'include'))
-  env.Append(LIBPATH = os.path.join((gtest), 'lib'))
-  env.Append(LIBPATH = os.path.join((gtest), 'lib', '.lib'))
-  if not conf.CheckLib('gtest', language='c++') or\
-     not conf.CheckCXXHeader('gtest/gtest.h'):
-      raise EnvironmentError('Could not find gtests with $GTEST_ROOT='+str(gtest))
+#  if 'GTEST_ROOT' not in os.environ or (not os.path.exists(os.environ.get('GTEST_ROOT'))):
+#    print "Cound't find gtest lib."
+#    Exit(1)
+#  gtest = os.environ.get('GTEST_ROOT')
+#  env.Append(CPPPATH = [os.path.join(gtest, 'include')])
+#  env.Append(LIBPATH = [os.path.join(gtest, 'lib')])
+#  env.Append(LIBPATH = [os.path.join(gtest, 'lib', '.lib')])
+  print 'CPPPATH:',env['CPPPATH']
+  print 'LIBPATH:',env['LIBPATH']
+  if not conf.CheckLib('gtest', language='c++'):
+      Exit(1)
+  if not conf.CheckCXXHeader('gtest/gtest.h'):
+      Exit(1)
 
 # Setup the environment.  NOTE: SHLIBPREFIX means that shared libraries don't
 # have a 'lib' prefix, which is needed for python to find SWIG generated libraries
-env = Environment(SHLIBPREFIX="") 
+env = Environment(SHLIBPREFIX="")
 
 if os.path.isfile('.use_llvm_with_maus'):
   env['CC'] = "llvm-gcc"
@@ -277,6 +281,11 @@ if not env.GetOption('clean'):
   set_clhep(conf, env)
   set_geant4(conf, env)
   set_recpack(conf, env)
+  make_test = True
+  try:
+    set_gtest(conf, env)
+  except:
+    make_test = False
 
   # check types size!!!
   env = conf.Finish()
@@ -296,13 +305,12 @@ if not env.GetOption('clean'):
 
     env.Append(LIBPATH = 'src/common/')
     env.Append(CPPPATH = os.environ.get('MAUS_ROOT_DIR'))
-    try:
-      set_gtest(conf, env)
+    if make_test:
       testCppFiles = glob.glob("tests/cpp_unit/*/*cpp")+glob.glob("tests/cpp_unit/*cpp")
       testmain = env.Program(target = 'tests/cpp_unit/test_cpp_unit', source = testCppFiles, LIBS=['recpack'] +  env['LIBS']+['simulate'])
       env.Install('build', ['tests/cpp_unit/test_cpp_unit'])
-    except:
-      print 'Failed to build cpp unit tests'
+    else:
+      print 'gtest not found - cpp unit testst will not be built'
 
   directories = []
   types = ["input", "map", "reduce", "output"]
