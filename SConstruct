@@ -194,15 +194,6 @@ def set_recpack(conf, env):
       Exit(1)
 
 def set_gtest(conf, env):
-#  if 'GTEST_ROOT' not in os.environ or (not os.path.exists(os.environ.get('GTEST_ROOT'))):
-#    print "Cound't find gtest lib."
-#    Exit(1)
-#  gtest = os.environ.get('GTEST_ROOT')
-#  env.Append(CPPPATH = [os.path.join(gtest, 'include')])
-#  env.Append(LIBPATH = [os.path.join(gtest, 'lib')])
-#  env.Append(LIBPATH = [os.path.join(gtest, 'lib', '.lib')])
-  print 'CPPPATH:',env['CPPPATH']
-  print 'LIBPATH:',env['LIBPATH']
   if not conf.CheckLib('gtest', language='c++'):
       Exit(1)
   if not conf.CheckCXXHeader('gtest/gtest.h'):
@@ -281,11 +272,7 @@ if not env.GetOption('clean'):
   set_clhep(conf, env)
   set_geant4(conf, env)
   set_recpack(conf, env)
-  make_test = True
-  try:
-    set_gtest(conf, env)
-  except:
-    make_test = False
+  set_gtest(conf, env)
 
   # check types size!!!
   env = conf.Finish()
@@ -305,12 +292,10 @@ if not env.GetOption('clean'):
 
     env.Append(LIBPATH = 'src/common/')
     env.Append(CPPPATH = os.environ.get('MAUS_ROOT_DIR'))
-    if make_test:
-      testCppFiles = glob.glob("tests/cpp_unit/*/*cpp")+glob.glob("tests/cpp_unit/*cpp")
-      testmain = env.Program(target = 'tests/cpp_unit/test_cpp_unit', source = testCppFiles, LIBS=['recpack'] +  env['LIBS']+['simulate'])
-      env.Install('build', ['tests/cpp_unit/test_cpp_unit'])
-    else:
-      print 'gtest not found - cpp unit testst will not be built'
+
+    testCppFiles = glob.glob("tests/cpp_unit/*/*cpp")+glob.glob("tests/cpp_unit/*cpp")
+    testmain = env.Program(target = 'tests/cpp_unit/test_cpp_unit', source = testCppFiles, LIBS=['recpack'] +  env['LIBS']+['simulate'])
+    env.Install('build', ['tests/cpp_unit/test_cpp_unit'])
 
   directories = []
   types = ["input", "map", "reduce", "output"]
