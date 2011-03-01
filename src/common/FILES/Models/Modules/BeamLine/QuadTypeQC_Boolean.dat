@@ -23,22 +23,18 @@ Module QuadTypeQC_Boolean
   Module QCField
   {
     Volume None
-    Position 0.0 0.0 -5.633106e+02/2. mm
-  //Field model
-    PropertyString FieldType           Multipole
-    PropertyInt    Pole                2 //Quad field
-    PropertyInt    MaxEndPole          6 //Simulate end field up to octupole order
-    PropertyDouble Magnitude           -2.237294e-04     //normalised to Opera Field map
-    PropertyDouble Height              0.54     m
-    PropertyDouble Width               0.54     m     
-    PropertyDouble Length              5.633106e+02  mm
-    PropertyDouble EndLength           1.772302e+02
-    PropertyString EndFieldType        Enge
-    PropertyDouble EffectiveWidth      1.538410e+01  mm
-    PropertyDouble Enge1               1.075890e-01 
-    PropertyDouble Enge2               5.710438e-02 
-    PropertyDouble Enge3               2.734375e-06 
-    PropertyDouble Enge4               1.367187e-08
+    Position 0.0 0.0 -1.0 m
+    //Field model
+    PropertyString FieldType Multipole
+    PropertyDouble Height 0.5 m
+    PropertyDouble Width  0.5 m
+    PropertyDouble Length 2.0 m
+    PropertyDouble FieldStrength 1. T/m //1. T at x-max
+    PropertyInt Pole 2
+    PropertyInt MaxEndPole 4
+    PropertyString EndFieldType Tanh
+    PropertyDouble EndLength 0.12528 m
+    PropertyDouble CentreLength 0.330899 m
   }
 
 //Geometry model

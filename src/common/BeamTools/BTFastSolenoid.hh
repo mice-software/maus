@@ -67,7 +67,7 @@ private:
   double               _zStep;
 }; // class BTFastSolenoid
 
-namespace Tanh
+namespace Tanh2
 {
 
 //d^(n)tanh[(x-x0)/lambda]/dx^(n) 

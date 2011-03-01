@@ -17,6 +17,8 @@
 #include <iostream>
 #include <cctype>
 
+#include "Squeal.hh"
+
 class MICEUnits
 {
 public :

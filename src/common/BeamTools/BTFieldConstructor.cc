@@ -2,21 +2,20 @@
 //Abstract Base Class
 //Has simply a GetFieldValue method
 
-
-#include "BTFieldConstructor.hh"
-#include "BTMultipole.hh"
-#include "BTFastSolenoid.hh"
-#include "BTSolenoid.hh"
-#include "BTFieldGroup.hh"
-#include "BTPhaser.hh"
-#include "BTMagFieldMap.hh"
-#include "BTConstantField.hh"
-#include "BTCombinedFunction.hh"
-#include "BT3dFieldMap.hh"
-#include "BTPillBox.hh"
-#include "BTRFFieldMap.hh"
-
 #include "Config/MiceModule.hh"
+
+#include "BeamTools/BTFieldConstructor.hh"
+#include "BeamTools/BTMultipole.hh"
+#include "BeamTools/BTFastSolenoid.hh"
+#include "BeamTools/BTSolenoid.hh"
+#include "BeamTools/BTFieldGroup.hh"
+#include "BeamTools/BTPhaser.hh"
+#include "BeamTools/BTMagFieldMap.hh"
+#include "BeamTools/BTConstantField.hh"
+#include "BeamTools/BTCombinedFunction.hh"
+#include "BeamTools/BT3dFieldMap.hh"
+#include "BeamTools/BTPillBox.hh"
+#include "BeamTools/BTRFFieldMap.hh"
 
 std::string       BTFieldConstructor::_defaultSolenoidMode = "";
 const int         BTFieldConstructor::_numberOfFieldTypes  = 13;
@@ -125,14 +124,10 @@ BTField * BTFieldConstructor::GetField(const MiceModule * theModule)
 		return GetRFCavity(theModule);
 	else if(field == "MagneticFieldMap")
 		return GetMagFieldMap(theModule);
-	else if(field == "Quadrupole")
-		return GetQuadrupole(theModule);
 	else if(field == "RFFieldMap")
 		return GetRFCavity(theModule);
 	else if(field == "RectangularField" || field == "CylindricalField")
 		return GetConstantField(theModule);
-	else if(field == "Dipole1" || field == "Dipole2")
-		return GetDipole(theModule);
 	else if(field == "Multipole")
 		return GetMultipole(theModule);
 	else if(field == "CombinedFunction")
@@ -297,52 +292,6 @@ BTField * BTFieldConstructor::GetMagFieldMap(const MiceModule * theModule)
 	return new BTMagFieldMap(filename, filetype, "interpolation");
 }
 
-BTField * BTFieldConstructor::GetQuadrupole(const MiceModule * theModule)
-{
-	//Require four parameters
-	double width  = theModule->propertyDoubleThis("Width");
-	double height = width;
-	double length = theModule->propertyDoubleThis("Length");
-	double field  = 0.;
-	if(theModule->propertyExistsThis("FieldAtPoleTip", "double") )
-		field           = theModule->propertyDoubleThis("FieldAtPoleTip")/theModule->propertyDoubleThis("PoleTipRadius") * width/2.;
-	else if(theModule->propertyExistsThis("FieldGradient", "double") )
-		field           = theModule->propertyDoubleThis("FieldGradient") * width/2.;
-	else
-		field           = theModule->propertyDoubleThis("Magnitude");
-	int    pole = 2;
-
-	if(!theModule->propertyExistsThis("EndFieldType", "string"))
-		return new BTMultipole(pole, field, length, 0., height, width, "");
-	else if(!theModule->propertyExistsThis("EndFieldType", "string"))
-		return new BTMultipole(pole, field, length, 0., height, width, "");
-	else if(theModule->propertyStringThis("EndFieldType") == "Enge")
-	{
-		double effectiveWidth = theModule->propertyDoubleThis("EffectiveWidth");
-    double endLength      = 0.;
-    if(!theModule->propertyExistsThis("EndLength", "double"))
-  		endLength           = theModule->propertyDouble("EndLength");
-		int    endPole        = theModule->propertyIntThis("MaxEndPole") - pole;
-		if(endPole < 0) throw(Squeal(Squeal::recoverable, "MaxEndPole must be >= pole", "BTFieldConstructor::GetMultipole(MiceModule*)"));
-		vector<double> enge;
-		bool propertyExists = true;
-		int  engeNumber     = 0;
-		while(propertyExists)
-		{
-			engeNumber++;
-			std::stringstream property;
-			property << "Enge" << engeNumber;
-			if(theModule->propertyExistsThis(property.str(), "double"))
-				enge.push_back( theModule->propertyDoubleThis(property.str()) );
-			else propertyExists = false;
-		}
-		if(engeNumber == 1) enge = MagnetParameters::getInstance()->QuadrupoleFringeParameters();
-		return new BTMultipole(pole, field, length, 0., height, width, effectiveWidth, endLength, endPole, enge, "");
-	}
-	else
-		throw(Squeal(Squeal::recoverable, "Did not recognise field type", "BTFieldConstructor::GetMultipole(const MiceModule*)"));
-}
-
 BTField * BTFieldConstructor::GetConstantField(const MiceModule * theModule)
 {
 	CLHEP::Hep3Vector field = theModule->propertyHep3VectorThis("ConstantField");
@@ -362,148 +311,183 @@ BTField * BTFieldConstructor::GetConstantField(const MiceModule * theModule)
 	
 }
 
-BTField * BTFieldConstructor::GetDipole(const MiceModule * theModule)
-{
+BTField * BTFieldConstructor::GetMultipole(const MiceModule * theModule) {
 	double height  = theModule->propertyDoubleThis("Height");
 	double width   = theModule->propertyDoubleThis("Width");
-	double length  = theModule->propertyDoubleThis("Length"); //length along reference trajectory
-
-	if(theModule->propertyString("FieldType") == "Dipole1")
-	{
-		double field             = theModule->propertyDoubleThis("DipoleField");
-		double radiusOfCurvature = theModule->propertyDoubleThis("ReferenceCurvature");
-		return new BTMultipole(1, field, length, radiusOfCurvature, height, width);
-	}
-	else if(theModule->propertyString("FieldType") == "Dipole2")
-	{
-		double momentum  = theModule->propertyDoubleThis("ReferenceMomentum");
-		double angle     = theModule->propertyDoubleThis("BendingAngle");
-		return new BTMultipole(BTMultipole::DipoleFromMomentum(momentum, length, angle, height, width));
-	}
-	else
-	{
-		Squeak::mout(Squeak::error) << "Unexpected error in BTFieldConstructor::GetDipole" << std::endl;
-		exit(1);
-	}
-
-}
-
-BTField * BTFieldConstructor::GetMultipole(const MiceModule * theModule)
-{
-	double height  = theModule->propertyDoubleThis("Height");
-	double width   = theModule->propertyDoubleThis("Width");
-	double length  = theModule->propertyDoubleThis("Length"); //length along reference trajectory
-
-	int    pole               = theModule->propertyIntThis("Pole");
-	std::string geometry = ""; 
+	double length  = theModule->propertyDoubleThis("Length");
+	int    pole    = theModule->propertyIntThis("Pole");
+  double field   = 0.;
+	std::string geometry = "";
 	if(theModule->propertyExistsThis("CurvatureModel", "string"))
 		geometry  = theModule->propertyStringThis("CurvatureModel");
+  if (geometry != "MomentumBased")
+    field   = theModule->propertyDoubleThis("FieldStrength");
 
+  if (height <= 0) 
+    throw(Squeal(Squeal::recoverable,
+        "Multipole height must be more than 0 in module "+theModule->fullName(), 
+        "BTFieldConstructor::GetMultipole"));
+  if (width <= 0) 
+    throw(Squeal(Squeal::recoverable,
+         "Multipole width must be more than 0 in module "+theModule->fullName(), 
+         "BTFieldConstructor::GetMultipole"));
+  if (length <= 0) 
+    throw(Squeal(Squeal::recoverable,
+        "Multipole length must be more than 0 in module "+theModule->fullName(),
+        "BTFieldConstructor::GetMultipole"));
+  if (pole <= 0) 
+    throw(Squeal(Squeal::recoverable,
+          "Multipole pole must be more than 0 in module "+theModule->fullName(),
+          "BTFieldConstructor::GetMultipole"));
+  // MaxEndPole is also called in end field calculation
+  int    max_p   = 0;
+  if (theModule->propertyExistsThis("MaxEndPole", "int"))
+  	max_p = theModule->propertyIntThis("MaxEndPole") - pole;
+  BTMultipole::EndFieldModel* ef = GetEndFieldModel(theModule, pole);
+  // curvature model
 	double radiusVariable  = 0;
-	double field           = 0;
 	if(theModule->propertyExistsThis("ReferenceCurvature", "double"))
 		radiusVariable = theModule->propertyDoubleThis("ReferenceCurvature");
-	if(theModule->propertyExistsThis("Magnitude", "double"))
-		field          = theModule->propertyDoubleThis("Magnitude");
 	if(geometry=="MomentumBased")
 	{
-		if(theModule->propertyExistsThis("ReferenceMomentum", "double")) 
+		if(theModule->propertyExistsThis("ReferenceMomentum", "double"))
 			radiusVariable = theModule->propertyDoubleThis("ReferenceMomentum");
 		else 
-			throw(Squeal(Squeal::nonRecoverable, "Did not define multipole reference momentum", "BTFieldConstructor::GetMultipole(const MiceModule*)") );
-		if(theModule->propertyExistsThis("BendingAngle", "double")) 
+			throw(Squeal(Squeal::nonRecoverable, 
+                   "Did not define multipole reference momentum",
+                   "BTFieldConstructor::GetMultipole(const MiceModule*)"));
+		if(theModule->propertyExistsThis("BendingAngle", "double"))
 			field          = theModule->propertyDoubleThis("BendingAngle");
 		else 
-			throw(Squeal(Squeal::nonRecoverable, "Did not define multipole bending angle", "BTFieldConstructor::GetMultipole(const MiceModule*)") );
+			throw(Squeal(Squeal::nonRecoverable,
+                   "Did not define multipole bending angle",
+                   "BTFieldConstructor::GetMultipole(const MiceModule*)"));
 	}
-
-	if(!theModule->propertyExistsThis("EndFieldType", "string"))
-		return new BTMultipole(pole, field, length, radiusVariable, height, width, geometry);
-	else if(theModule->propertyStringThis("EndFieldType") == "HardEdged")
-		return new BTMultipole(pole, field, length, radiusVariable, height, width, geometry);
-	else if(theModule->propertyStringThis("EndFieldType") == "Enge")
-	{
-		double effectiveWidth = theModule->propertyDoubleThis("EffectiveWidth");
-		double endLength      = theModule->propertyDoubleThis("Length");//theModule->propertyDouble("EndLength"); I think force this to 0 and just use length
-		int    endPole        = theModule->propertyIntThis("MaxEndPole") - pole;
-		if(endPole < 0) throw(Squeal(Squeal::recoverable, "MaxEndPole must be >= pole", "BTFieldConstructor::GetMultipole(MiceModule*)"));
-		vector<double> enge;
-		bool propertyExists = true;
-		int  engeNumber     = 0;
-		while(propertyExists)
-		{
-			engeNumber++;
-			std::stringstream property;
-			property << "Enge" << engeNumber;
-			if(theModule->propertyExistsThis(property.str(), "double"))
-				enge.push_back( theModule->propertyDoubleThis(property.str()) );
-			else propertyExists = false;
-		}
-		if(engeNumber == 1) enge = MagnetParameters::getInstance()->QuadrupoleFringeParameters();
-		return new BTMultipole(pole, field, length, radiusVariable, height, width, effectiveWidth, endLength, endPole, enge, geometry);
-	}
-	else
-		throw(Squeal(Squeal::recoverable, "Did not recognise field type", "BTFieldConstructor::GetMultipole(const MiceModule*)"));
+	BTMultipole* m = new BTMultipole();
+  m->Init(pole, field, length, height, width, geometry,
+                                                     radiusVariable, ef, max_p);   
+  return m;
 }
 
-BTField * BTFieldConstructor::GetCombinedFunction(const MiceModule * theModule)
-{
+BTField * BTFieldConstructor::GetCombinedFunction
+                                                (const MiceModule * theModule) {
 	double height  = theModule->propertyDoubleThis("Height");
 	double width   = theModule->propertyDoubleThis("Width");
-	double length  = theModule->propertyDoubleThis("Length"); //length along reference trajectory
+	double length  = theModule->propertyDoubleThis("Length");
+  double field   = theModule->propertyDoubleThis("BendingField");
+	int    pole    = theModule->propertyIntThis("Pole");
+  double index   = theModule->propertyDoubleThis("FieldIndex");
 
-	int    maxPole            = theModule->propertyIntThis("MaximumPole");
-	double fieldIndex         = theModule->propertyDoubleThis("FieldIndex");
-	double radiusVariable     = 0;
-	double field              = 0;
-	std::string geometry      = "";
+  if (height <= 0) 
+    throw(Squeal(Squeal::recoverable,
+        "CombinedFunction Height must be more than 0 in module "+theModule->fullName(), 
+        "BTFieldConstructor::GetCombinedFunction"));
+  if (width <= 0) 
+    throw(Squeal(Squeal::recoverable,
+         "CombinedFunction Width must be more than 0 in module "+theModule->fullName(), 
+         "BTFieldConstructor::GetCombinedFunction"));
+  if (length <= 0) 
+    throw(Squeal(Squeal::recoverable,
+        "CombinedFunction Length must be more than 0 in module "+theModule->fullName(),
+        "BTFieldConstructor::GetCombinedFunction"));
+  if (pole <= 0) 
+    throw(Squeal(Squeal::recoverable,
+          "CombinedFunction Pole must be more than 0 in module "+theModule->fullName(),
+          "BTFieldConstructor::GetCombinedFunction"));
+  if (index <= 0) 
+    throw(Squeal(Squeal::recoverable,
+          "CombinedFunction FieldIndex must be more than 0 in module "+theModule->fullName(),
+          "BTFieldConstructor::GetCombinedFunction"));
+
+  // MaxEndPole is also called in end field calculation
+  int max_p = 0;
+  if (theModule->propertyExistsThis("MaxEndPole", "int"))
+  	max_p = theModule->propertyIntThis("MaxEndPole") - pole;
+  BTMultipole::EndFieldModel* ef = GetEndFieldModel(theModule, pole);
+  // curvature model
+	std::string geometry = "";
+	double radiusVariable  = 0;
 	if(theModule->propertyExistsThis("CurvatureModel", "string"))
 		geometry  = theModule->propertyStringThis("CurvatureModel");
-
+	if(theModule->propertyExistsThis("ReferenceCurvature", "double"))
+		radiusVariable = theModule->propertyDoubleThis("ReferenceCurvature");
 	if(geometry=="MomentumBased")
 	{
-		if(theModule->propertyExistsThis("ReferenceMomentum", "double")) 
+		if(theModule->propertyExistsThis("ReferenceMomentum", "double"))
 			radiusVariable = theModule->propertyDoubleThis("ReferenceMomentum");
 		else 
-			throw(Squeal(Squeal::nonRecoverable, "Did not define multipole reference momentum", "BTFieldConstructor::GetMultipole(const MiceModule*)") );
+			throw(Squeal(Squeal::nonRecoverable,
+                   "Did not define multipole reference momentum",
+                   "BTFieldConstructor::GetMultipole(const MiceModule*)"));
 		if(theModule->propertyExistsThis("BendingAngle", "double")) 
 			field          = theModule->propertyDoubleThis("BendingAngle");
 		else 
-			throw(Squeal(Squeal::nonRecoverable, "Did not define multipole bending angle", "BTFieldConstructor::GetMultipole(const MiceModule*)") );
+			throw(Squeal(Squeal::nonRecoverable,
+                   "Did not define multipole bending angle",
+                   "BTFieldConstructor::GetMultipole(const MiceModule*)"));
 	}
-	else
-	{
-		radiusVariable = theModule->propertyDoubleThis("ReferenceCurvature");
-		field          = theModule->propertyDoubleThis("BendingField");
-	}
+	return new BTCombinedFunction(pole, field, index, length, height, width,
+                                geometry, radiusVariable, ef, max_p);
+}
 
-	if(!theModule->propertyExistsThis("EndFieldType", "string"))
-		return new BTCombinedFunction(field, fieldIndex, length, radiusVariable, height, width, maxPole, geometry);
-	else if(theModule->propertyStringThis("EndFieldType") == "HardEdged")
-		return new BTCombinedFunction(field, fieldIndex, length, radiusVariable, height, width, maxPole, geometry);
-	else if(theModule->propertyStringThis("EndFieldType") == "Enge")
-	{
-		double effectiveWidth = theModule->propertyDoubleThis("EffectiveWidth");
-		double endLength      = theModule->propertyDoubleThis("Length");
-		int    endPole        = theModule->propertyIntThis("EndPole");
-		vector<double> enge;
+BTMultipole::EndFieldModel* BTFieldConstructor::GetEndFieldModel
+                                             (const MiceModule* mod, int pole) {
+  if (!mod->propertyExistsThis("EndFieldType", "string")) return NULL;
+  if (mod->propertyStringThis("EndFieldType") == "HardEdged") return NULL;
+  if (mod->propertyStringThis("EndFieldType") == "Tanh") {
+    double l     = mod->propertyDoubleThis("EndLength");
+    double x0    = mod->propertyDoubleThis("CentreLength");
+    int    max_p = mod->propertyIntThis("MaxEndPole")-pole;
+    if (l <= 0)
+      throw(Squeal(Squeal::recoverable,
+        "Tanh EndLength must be more than 0 in module "+mod->fullName(), 
+        "BTFieldConstructor::GetEndFieldModel"));
+    if (x0 <= 0)
+      throw(Squeal(Squeal::recoverable,
+       "Tanh CentreLength must be more than 0 in module "+mod->fullName(), 
+       "BTFieldConstructor::GetEndFieldModel"));
+    if (max_p < 0)
+      throw(Squeal(Squeal::recoverable,
+       "Tanh MaxEndPole must be >= Pole in module "+mod->fullName(),
+       "BTFieldConstructor::GetEndFieldModel"));
+    return new BTMultipole::TanhEndField(x0, l, max_p);
+  }
+  if (mod->propertyStringThis("EndFieldType") == "Enge") {
+		double l     = mod->propertyDoubleThis("EndLength");
+		double x0    = mod->propertyDoubleThis("CentreLength");
+		int    max_p = mod->propertyIntThis("MaxEndPole") - pole;
+    if (l <= 0)
+      throw(Squeal(Squeal::recoverable,
+        "Enge EndLength must be more than 0 in module "+mod->fullName(), 
+        "BTFieldConstructor::GetEndFieldModel"));
+    if (x0 <= 0)
+      throw(Squeal(Squeal::recoverable,
+       "Enge CentreLength must be more than 0 in module "+mod->fullName(),
+       "BTFieldConstructor::GetEndFieldModel"));
+    if (max_p < 0)
+      throw(Squeal(Squeal::recoverable,
+       "Enge MaxEndPole must be >= Pole in module "+mod->fullName(),
+       "BTFieldConstructor::GetEndFieldModel"));
+    std::vector<double> enge;
 		bool propertyExists = true;
 		int  engeNumber     = 0;
-		while(propertyExists)
-		{
-			engeNumber++;
+		while(propertyExists) {
+			++engeNumber;
 			std::stringstream property;
 			property << "Enge" << engeNumber;
-			if(theModule->propertyExistsThis(property.str(), "double"))
-				enge.push_back( theModule->propertyDoubleThis(property.str()) );
+			if(mod->propertyExistsThis(property.str(), "double"))
+				enge.push_back( mod->propertyDoubleThis(property.str()) );
 			else propertyExists = false;
 		}
-		if(engeNumber == 1) enge = MagnetParameters::getInstance()->QuadrupoleFringeParameters();
-		return new BTCombinedFunction(field, fieldIndex, length, radiusVariable, height, width, maxPole, effectiveWidth, endLength, 
-		                              endPole, enge, geometry);
-	}
-	else
-		throw(Squeal(Squeal::recoverable, "Did not recognise end field type", "BTFieldConstructor::GetCombinedFunction(const MiceModule*)"));
+		if (engeNumber == 1)
+      enge = MagnetParameters::getInstance()->QuadrupoleFringeParameters();
+		return new BTMultipole::EngeEndField
+                                       (enge, x0, l, max_p);
+  }
+  throw(Squeal(Squeal::recoverable,
+          "Failed to recognise EndFieldModel "+
+          mod->propertyStringThis("EndFieldType")+" in module "+mod->fullName(),
+          "BTFieldConstructor::GetEndFieldModel"));
 }
 
 BTField * BTFieldConstructor::GetFastSolenoid(const MiceModule * theModule)

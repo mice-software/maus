@@ -8,6 +8,8 @@
 #include <cstdlib>
 #include <sstream>
 #include <vector>
+#include <iostream>
+
 #include "Config/MiceModule.hh"
 #include "Config/ModuleTextFileIO.hh"
 #include "Interface/Squeal.hh"
@@ -17,6 +19,8 @@
 using CLHEP::HepRotationX;
 using CLHEP::HepRotationY;
 using CLHEP::HepRotationZ;
+using std::cout;
+using std::endl;
 
 MICEUnits          ModuleTextFileIO::_units;
 HepTool::Evaluator ModuleTextFileIO::_evaluator;
@@ -32,7 +36,7 @@ ModuleTextFileIO::ModuleTextFileIO(MiceModule* parent, std::string name, std::is
 	_this = new MiceModule(parent, stripDirs(name));
 	parent->addDaughter(_this);
 
-	readModule(name, input);
+        readModule(name, input);
 
 	std::string a="", b="";//nonsense to remove compiler warning
 	parseString(a,b);
@@ -41,7 +45,6 @@ ModuleTextFileIO::ModuleTextFileIO(MiceModule* parent, std::string name, std::is
 ModuleTextFileIO::ModuleTextFileIO( std::string fname ) : _this(NULL), _hasFile("")
 {
 	_this = new MiceModule(NULL, stripDirs(fname));
-	_this->setVolumeType("Box");
 	if(getenv( "MICEFILES" ) == NULL) 
 		throw(Squeal(Squeal::recoverable, "Error - MICEFILES environment variable was not defined", "ModuleTextFileIO::ModuleTextFileIO"));
 	std::string fnam = std::string(getenv( "MICEFILES" )) + "/Models/Configurations/" + fname;
@@ -219,6 +222,10 @@ void ModuleTextFileIO::stripFile(std::ostream& out, std::istream& in)
 	}
 }
 
+void ModuleTextFileIO::readDimensions(std::string lineIn) {
+  readDimensions(_this->volType(), lineIn);
+}
+
 void ModuleTextFileIO::readDimensions(std::string volumeType, std::string lineIn)
 {
       Hep3Vector        _dimensions;
@@ -232,8 +239,8 @@ void ModuleTextFileIO::readDimensions(std::string volumeType, std::string lineIn
         std::stringstream dimStream;
         std::string radius, length, units;
         ist >> radius >> length >> units;
-        //for consistency I force 3rd element to really be -1 independent of units - but this is just fluff
-        dimStream << radius << " " << length << " " << -1/_units.GetUnits(units) << " " << units; 
+        //Note that here the third element actually ends up being -1.*units
+        dimStream << radius << " " << length << " " << -1 << " " << units; 
         _this->addPropertyHep3Vector("Dimensions", dimStream.str());
       }
       else if( volumeType == "Box" || volumeType == "Wedge" || volumeType == "Tube"  || volumeType == "EllipticalCone")
@@ -246,37 +253,43 @@ void ModuleTextFileIO::readDimensions(std::string volumeType, std::string lineIn
       }
       else if( volumeType == "Multipole" || volumeType == "Quadrupole" 
                || volumeType == "None" || volumeType == "Boolean")
-        _this->setDimensions(CLHEP::Hep3Vector(0,0,0));
+        _this->addPropertyHep3Vector("Dimensions", CLHEP::Hep3Vector(0,0,0));
       else throw(Squeal(Squeal::recoverable, "Did not recognise volume type "+volumeType+" in module "+_this->fullName()+_hasFile, "MiceModule::setDimensions(std::string)"));
 }
 
-template <class Temp> Temp ModuleTextFileIO::fromString(const std::string& source)
+template <class Temp> Temp        ModuleTextFileIO::fromString(const std::string& source)
 {
   Temp target;
   parseString(source, target);
   return target;
 }
 
-
-void ModuleTextFileIO::parseString(const std::string& source, int&                out)
-{
-  std::stringstream ss(source);
-  ss >> out;
-}
-
-void ModuleTextFileIO::parseString(const std::string& source, double&             out)
+void ModuleTextFileIO::parseString(const std::string& source, int& out)
 {
   std::string value="", units="";
   std::stringstream ss(source);
   ss >> value >> units;
-  substitute(value, "$$", "MI_"); //Evaluator can't do $$ so I alias it to MI_ (for internal mice variables)
+  MI_alias(value);
+  out = _evaluator.evaluate(value.c_str());
+  if(_evaluator.status() != HepTool::Evaluator::OK && _evaluator.status())
+      throw(Squeal(Squeal::recoverable, "Could not convert "+source+" to an int", "ModuleTextFileIO::parseString(const std::string&, int&)"));
+  out *= _units.GetUnits(units);
+}
+
+void ModuleTextFileIO::parseString(const std::string& source, double& out)
+{
+  std::string value="", units="";
+  std::stringstream ss(source);
+  ss >> value >> units;
+
+  MI_alias(value);
   out = _evaluator.evaluate(value.c_str());
   if(_evaluator.status() != HepTool::Evaluator::OK && _evaluator.status())
       throw(Squeal(Squeal::recoverable, "Could not convert "+source+" to a double", "ModuleTextFileIO::parseString(const std::string&, double&)"));
   out *= _units.GetUnits(units);
 }
 
-void ModuleTextFileIO::parseString(const std::string& source, bool&               out)
+void ModuleTextFileIO::parseString(const std::string& source, bool& out)
 {
   std::string source_lower = source;
   for(unsigned int i=0; i<source.size(); i++) source_lower[i] = std::tolower(source[i]);
@@ -291,14 +304,31 @@ void ModuleTextFileIO::parseString(const std::string& source, std::string&      
 { out = source;}
 
 
+std::string VectorConvert(std::string in, char wspace, char o_brace, char c_brace, size_t nsep, char sep)
+{
+  std::string out = in;
+  if   (out[0] != o_brace || out[out.length()-1]!=c_brace) return out;
+  out = out.substr(1, in.length()-2); 
+  for(size_t i=0; i<nsep; i++) {
+    size_t found = out.find(sep);
+    if(found == std::string::npos) return in;
+    out[found] = ' ';
+  }
+  if(out.find(sep) != std::string::npos) return in;
+  return out;
+}
+
 void ModuleTextFileIO::parseString(const std::string& source, CLHEP::Hep3Vector&  out)
 {
-  std::stringstream ss(source);
+  std::string h3v_parsed = VectorConvert(source, ' ', '(', ')', 2, ',');
+  std::stringstream ss(h3v_parsed);
   std::string eval="", units="";
   for(int i=0; i<3; i++)
   {
     ss >> eval;
     parseString(eval, out[i]); //will call evaluator on each in turn
+    if(!ss)
+      throw(Squeal(Squeal::recoverable, "Failed to parse "+source+" as Hep3Vector", "ModuleTextFileIO::parseString(string, Hep3Vector)"));
   }
   ss >> units;
   out *= _units.GetUnits(units);
@@ -316,7 +346,7 @@ void ModuleTextFileIO::readProperty(std::string lineIn)
     else if( key == "PropertyBool" )
       _this->addPropertyBool( propName, fromString<bool>(prop) );
     else if( key == "PropertyInt" )
-      _this->addPropertyInt( propName, fromString<int>(prop) );
+      _this->addPropertyInt( propName, prop);//, fromString<int>(prop) );
     else if( key == "PropertyString")
       _this->addPropertyString( propName, prop );
     else if( key == "PropertyDouble" )
@@ -346,6 +376,8 @@ void ModuleTextFileIO::findSubs(std::ostream& out, std::istream& in)
       linestream >> name >> value;
       if(!linestream)
         throw(Squeal(Squeal::recoverable, "Failed to parse substitution "+line, "ModuleTextFileIO::findSubs"));
+      if(value.find("$$") != std::string::npos)
+        throw(Squeal(Squeal::recoverable, "Value "+value+" for Substitution "+name+" contains reserved character $", "ModuleTextFileIO::findSubs"));
       if(name[0] != '$')
         throw(Squeal(Squeal::recoverable, "Substitution name "+name+" must start with $", "ModuleTextFileIO::findSubs"));
       if(name[1] == '$')
@@ -399,18 +431,18 @@ void ModuleTextFileIO::repeatModule (MiceModule* first, Hep3Vector translation, 
 void ModuleTextFileIO::repeatModule2 (MiceModule* first, int numberOfRepeats)
 {
   MiceModule * mod = NULL;
-  first->addParameter("$$RepeatNumber", 0);
+  first->addParameter("@RepeatNumber", 0);
   if(numberOfRepeats > 0) 
   {
     mod = MiceModule::deepCopy(*first, true);
-    mod->addParameter("$$RepeatNumber", 1);
+    mod->addParameter("@RepeatNumber", 1);
   }
   for(double i=1; i<numberOfRepeats; i++)
   {
     std::stringstream istr;
     istr << i+1;
     mod = MiceModule::deepCopy(*mod, true);
-    mod->addParameter("$$RepeatNumber", i+1);
+    mod->addParameter("@RepeatNumber", i+1);
   }
 }
 
@@ -421,13 +453,21 @@ void ModuleTextFileIO::setEvaluator(std::map<std::string, double> parameters)
   for(std::map<std::string, double>::iterator it=parameters.begin(); it!=parameters.end(); it++)
   {
     std::string name  = it->first;
+    MI_alias(name);
     double      value = it->second;
-    substitute(name, "$$", "MI_"); //evaluator can't do $$ so I alias it to MI_ (for internal variables)
     _evaluator.setVariable(name.c_str(), value);
     if(_evaluator.status() != _evaluator.OK)
       throw(Squeal(Squeal::recoverable, "Failed to parse variable "+it->first+" from MiceModules", "ModuleTextFileIO::setEvaluator"));
   }
 }
 
-
+void ModuleTextFileIO::MI_alias(std::string& value) {
+    static bool warned = false;
+    if(value.find("$$") != std::string::npos && !warned) {
+      Squeak::mout(Squeak::warning) << "Warning - please use @ for internal variables. $$ is now deprecated." << std::endl;
+      warned = true;
+    }
+    substitute(value, "$$", "MI_"); //evaluator can't do $$ so I alias it to MI_ (for internal variables)
+    substitute(value, "@", "MI_"); //evaluator can't do $$ so I alias it to MI_ (for internal variables)
+}
 

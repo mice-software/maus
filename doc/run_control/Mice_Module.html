@@ -1,0 +1,4800 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<TITLE>Mice Modules documentation</TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 2.3  (Linux)">
+	<META NAME="CREATED" CONTENT="20060804;10330300">
+	<META NAME="CHANGED" CONTENT="20110215;10300800">
+	<STYLE TYPE="text/css">
+	<!--
+		@page { size: 21.59cm 27.94cm; margin: 2cm }
+		P { margin-bottom: 0.21cm }
+		P.western { so-language: en-US }
+		H1 { margin-bottom: 0.21cm }
+		H1.western { font-family: "Luxi Sans", sans-serif; font-size: 16pt; so-language: en-US }
+		H1.cjk { font-family: "Luxi Sans"; font-size: 16pt }
+		H1.ctl { font-family: "Luxi Sans"; font-size: 16pt }
+		H2 { margin-bottom: 0.21cm }
+		H2.western { font-family: "Luxi Sans", sans-serif; font-size: 14pt; so-language: en-US; font-style: italic }
+		H2.cjk { font-family: "Luxi Sans"; font-size: 14pt; font-style: italic }
+		H2.ctl { font-family: "Luxi Sans"; font-size: 14pt; font-style: italic }
+		H3 { margin-bottom: 0.21cm }
+		H3.western { font-family: "Luxi Sans", sans-serif; so-language: en-US }
+		H3.cjk { font-family: "Luxi Sans" }
+		H3.ctl { font-family: "Luxi Sans" }
+		TD P { margin-bottom: 0cm }
+		TD P.western { so-language: en-US }
+		TH P { margin-bottom: 0cm }
+		TH P.western { so-language: en-US; font-style: italic }
+		TH P.cjk { font-style: italic }
+		TH P.ctl { font-style: italic }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1 CLASS="western">Mice Module Documentation</H1>
+<P CLASS="western">This document documents the main functionality of
+the Mice Modules that control geometry and fields of G4MICE. The
+document is divided into three parts. Part 1 gives an overview of the
+basic usage of Mice Modules. Part 2 gives details on how to implement
+different geometry models in G4MICE. Part 3 gives details on how to
+implement different electromagnetic field models in G4MICE.</P>
+<H2 CLASS="western">How to Use this document</H2>
+<P CLASS="western">This document is best used in conjunction with the
+various examples than can be found in any installation of G4MICE. If
+you are familiar with Mice Modules already, the first part can be
+omitted and the latter two parts used as reference materials.</P>
+<P CLASS="western">Any problems or omissions should be emailed to the
+document author, chris.rogers@stfc.ac.uk. I really like to get
+feedback on what is annoying in the documentation, what doesn't make
+sense and what is just wrong – so I encourage you to hassle me!</P>
+<P CLASS="western" STYLE="page-break-before: always"><BR><BR>
+</P>
+<DIV ID="Table of Contents1" DIR="LTR">
+	<DIV ID="Table of Contents1_Head" DIR="LTR">
+		<P STYLE="margin-top: 0.42cm; page-break-after: avoid"><FONT FACE="Luxi Sans, sans-serif"><FONT SIZE=4 STYLE="font-size: 16pt"><B>Table
+		of Contents</B></FONT></FONT></P>
+	</DIV>
+	<P STYLE="margin-bottom: 0cm">Mice Module Documentation	1</P>
+	<P STYLE="margin-left: 0.5cm; margin-bottom: 0cm">How to Use this
+	document	1</P>
+	<P STYLE="margin-bottom: 0cm">Overview	4</P>
+	<P STYLE="margin-left: 0.5cm; margin-bottom: 0cm">Configuration
+	File	4</P>
+	<P STYLE="margin-left: 1cm; margin-bottom: 0cm">Substitutions	5</P>
+	<P STYLE="margin-left: 1cm; margin-bottom: 0cm">Expressions	5</P>
+	<P STYLE="margin-left: 1cm; margin-bottom: 0cm">Expression
+	Substitutions	5</P>
+	<P STYLE="margin-left: 0.5cm; margin-bottom: 0cm">Module Files	5</P>
+	<P STYLE="margin-left: 0.5cm; margin-bottom: 0cm">Volume and
+	Dimensions	6</P>
+	<P STYLE="margin-left: 0.5cm; margin-bottom: 0cm">Properties	7</P>
+	<P STYLE="margin-left: 0.5cm; margin-bottom: 0cm">Child Modules	7</P>
+	<P STYLE="margin-left: 0.5cm; margin-bottom: 0cm">Module Hierarchy
+	and GEANT4 Physical Volumes	8</P>
+	<P STYLE="margin-left: 0.5cm; margin-bottom: 0cm">A Sample
+	Configuration File	9</P>
+	<P STYLE="margin-left: 0.5cm; margin-bottom: 0cm">A Sample Child
+	Module File	10</P>
+	<P STYLE="margin-bottom: 0cm">Geometry and Tracking Properties	11</P>
+	<P STYLE="margin-left: 0.5cm; margin-bottom: 0cm">General
+	Properties	11</P>
+	<P STYLE="margin-left: 0.5cm; margin-bottom: 0cm">Sensitive
+	Detectors	11</P>
+	<P STYLE="margin-left: 1cm; margin-bottom: 0cm">Scintillating Fibre
+	Detector (SciFi)	12</P>
+	<P STYLE="margin-left: 1cm; margin-bottom: 0cm">Cerenkov Detector
+	(CKOV)	12</P>
+	<P STYLE="margin-left: 1cm; margin-bottom: 0cm">Time Of Flight
+	Counter (TOF)	12</P>
+	<P STYLE="margin-left: 1cm; margin-bottom: 0cm">Special Virtual
+	Detectors	12</P>
+	<P STYLE="margin-left: 1cm; margin-bottom: 0cm">Virtual Detectors	12</P>
+	<P STYLE="margin-left: 1cm; margin-bottom: 0cm">Envelope
+	Detectors	13</P>
+	<P STYLE="margin-left: 0.5cm; margin-bottom: 0cm">Unconventional
+	Volumes	14</P>
+	<P STYLE="margin-left: 1cm; margin-bottom: 0cm">Volume Wedge	15</P>
+	<P STYLE="margin-left: 1cm; margin-bottom: 0cm">Volume Polycone	15</P>
+	<P STYLE="margin-left: 1cm; margin-bottom: 0cm">Volume Quadrupole	15</P>
+	<P STYLE="margin-left: 1cm; margin-bottom: 0cm">Volume Multipole	16</P>
+	<P STYLE="margin-left: 1cm; margin-bottom: 0cm">Volume Boolean	16</P>
+	<P STYLE="margin-left: 0.5cm; margin-bottom: 0cm">Repeating
+	Modules	17</P>
+	<P STYLE="margin-left: 0.5cm; margin-bottom: 0cm">Beam Definition
+	and Beam Envelopes	19</P>
+	<P STYLE="margin-left: 0.5cm; margin-bottom: 0cm">Optimiser	23</P>
+	<P STYLE="margin-bottom: 0cm">Field Properties	25</P>
+	<P STYLE="margin-left: 0.5cm; margin-bottom: 0cm">FieldType
+	CylindricalField	25</P>
+	<P STYLE="margin-left: 0.5cm; margin-bottom: 0cm">FieldType
+	RectangularField	25</P>
+	<P STYLE="margin-left: 0.5cm; margin-bottom: 0cm">FieldType
+	Solenoid	25</P>
+	<P STYLE="margin-left: 0.5cm; margin-bottom: 0cm">FieldType
+	FieldAmalgamation	27</P>
+	<P STYLE="margin-left: 0.5cm; margin-bottom: 0cm">FieldType
+	FastSolenoid	28</P>
+	<P STYLE="margin-left: 0.5cm; margin-bottom: 0cm">Phasing Models	28</P>
+	<P STYLE="margin-left: 0.5cm; margin-bottom: 0cm">Tracking Stability
+	Around RF Cavities	29</P>
+	<P STYLE="margin-left: 0.5cm; margin-bottom: 0cm">FieldType
+	PillBox	29</P>
+	<P STYLE="margin-left: 0.5cm; margin-bottom: 0cm">FieldType
+	RFFieldMap	30</P>
+	<P STYLE="margin-left: 0.5cm; margin-bottom: 0cm">FieldType
+	Multipole	31</P>
+	<P STYLE="margin-left: 0.5cm; margin-bottom: 0cm">FieldType
+	CombinedFunction	32</P>
+	<P STYLE="margin-left: 0.5cm; margin-bottom: 0cm">EndFieldTypes	33</P>
+	<P STYLE="margin-left: 0.5cm; margin-bottom: 0cm">FieldType
+	MagneticFieldMap	34</P>
+	<P STYLE="margin-left: 1cm; margin-bottom: 0cm">g4micetext Field Map
+	Format	35</P>
+	<P STYLE="margin-left: 1cm; margin-bottom: 0cm">g4bl3dGrid Field Map
+	Format	35</P>
+</DIV>
+<P CLASS="western"><BR><BR>
+</P>
+<H1 CLASS="western" STYLE="page-break-before: always">Overview</H1>
+<P CLASS="western">Mice Modules are the objects that control the
+geometry and fields that are simulated in G4MICE. They are used in
+conjunction with a datacard file, which provides global run control
+parameters. Mice Modules are created by reading in a series of text
+files when G4MICE applications are run. All Mice Module files must be
+in a subdirectory of the directory defined by the environment
+variable <I>${MICEFILES}</I>.</P>
+<P CLASS="western">This geometry information is used primarily by the
+Simulation application for tracking of particles through magnetic
+fields. A few commands are specific to detector Reconstruction and
+accelerator beam Optics applications.</P>
+<P CLASS="western">The Mice Modules are created in a tree structure.
+Each module is a parent of any number of child modules. Typically the
+parent module will describe a physical volume, and child modules will
+describe physical volumes that sit inside the parent module. Modules
+cannot be used to describe volumes that do not sit at least partially
+inside the volume if the parent module.</P>
+<P CLASS="western">Each Mice Module file consists of a series of
+lines of text. Firstly the Module name is defined. This is followed
+by an opening curly bracket, then the description of the module and
+the placement of any child modules, and finally a closing curly
+bracket. Commands, curly brackets etc must be separated by an end of
+line character.</P>
+<P CLASS="western">Comments are indicated using either two slashes or
+an exclamation mark. Characters placed after a comment on a line are
+ignored.</P>
+<P CLASS="western">G4MICE operates in a right handed coordinate
+system <I>(x,y,z)</I>. In the absence of any rotation, lengths are
+considered to be extent along the <I>z</I>-axis, widths to be extent
+along the <I>x</I>-axis and heights to be extent along the <I>y</I>-axis.
+Rotations (<FONT FACE="Standard Symbols L">q</FONT><SUB>x</SUB>, <FONT FACE="Standard Symbols L">q</FONT><SUB>y</SUB>,
+<FONT FACE="Standard Symbols L">q</FONT><SUB>z</SUB>) are defined as
+a rotation about the z-axis through <FONT FACE="Standard Symbols L">q</FONT><SUB>z</SUB>,
+followed by a rotation about the y-axis through <FONT FACE="Standard Symbols L">q</FONT><SUB>y</SUB>,
+followed by a rotation about the x-axis through <FONT FACE="Standard Symbols L">q</FONT><SUB>x</SUB>.</P>
+<H2 CLASS="western">Configuration File</H2>
+<P CLASS="western">The Configuration file places the top level
+objects in MICE. The location of the file is controlled by the
+datacard <I>MiceModel</I><SPAN STYLE="font-style: normal">. G4MICE
+looks for the configuration file in the first instance in the
+directory</SPAN></P>
+<P CLASS="western"><SPAN STYLE="font-style: normal">	$</SPAN><I>{MICEFILES}/Models/Configuration/&lt;MiceModel&gt;</I></P>
+<P CLASS="western">where <I>${MICEFILES}</I> is a user-defined
+environment variable. If G4MICE fails to find the file it searches
+the local directory.</P>
+<P CLASS="western">The world volume is defined in the Configuration
+file and any children of the world volume are referenced by the
+Configuration file. The Configuration file looks like:</P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>	Configuration
+<I>&lt;Configuration Name&gt;</I></FONT></FONT></P>
+<P CLASS="western" STYLE="font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2>	{</FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2><I>		</I><SPAN STYLE="font-style: normal">Dimensions	</SPAN><I>&lt;x&gt;
+&lt;y&gt; &lt;z&gt; &lt;Units&gt;</I></FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2><I>		&lt;Properties&gt;</I></FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2><I>		&lt;Child
+Modules&gt;</I></FONT></FONT></P>
+<P CLASS="western" STYLE="font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2>	}</FONT></FONT></P>
+<P CLASS="western"><I>&lt;Configuration Name&gt;</I> is the name of
+the configuration. Typically the Configuration file name is given by
+<I>&lt;Configuration Name&gt;</I><SPAN STYLE="font-style: normal">.dat.
+The world volume is always a rectangular box centred on (0,0,0) with
+x, y, and z extent set by the Dimensions. Properties and Child
+Modules are described below and added as in any Module.</SPAN></P>
+<H3 CLASS="western">Substitutions</H3>
+<P CLASS="western">It is possible to make keyword substitutions that
+substitutes all instances of &lt;name&gt; with &lt;value&gt; in all
+Modules. The syntax is</P>
+<P CLASS="western"><FONT FACE="Courier, monospace">	Substitution
+&lt;name&gt; &lt;value&gt;</FONT></P>
+<P CLASS="western">&lt;name&gt; must start with a single $ sign.
+Substitutions must be defined in the Configuration file. Note this is
+a direct text substitution in the MiceModules before the modules are
+parsed properly. So for example,</P>
+<P CLASS="western"><FONT FACE="Courier, monospace">	Substitution $Sub
+SomeText</FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace">	PropertyString
+FieldType $Sub</FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace">	PropertyDouble
+$SubValue 10</FONT></P>
+<P CLASS="western">would be parsed as G4MICE like</P>
+<P CLASS="western"><FONT FACE="Courier, monospace">	PropertyString
+FieldType     SomeText</FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace">	PropertyDouble
+SomeTextValue 10</FONT></P>
+<H3 CLASS="western">Expressions</H3>
+<P CLASS="western">The use of equations in properties of type double
+and Hep3Vector is also allowed in place of a single value. So, for
+example, 
+</P>
+<P CLASS="western">	<FONT FACE="Courier, monospace">PropertyDouble
+FieldStrength 0.5*2 T</FONT></P>
+<P CLASS="western"><FONT FACE="Nimbus Roman No9 L, serif">would
+result in a FieldStrength property of 1 Tesla.</FONT><FONT FACE="Courier, monospace">
+</FONT>
+</P>
+<H3 CLASS="western">Expression Substitutions</H3>
+<P CLASS="western">Some additional variables can be defined in
+specific cases by G4MICE itself for substitution into experssions, in
+which case they will start with @ symbol. For these variable
+substitutions, it is only possible to make the substitution into
+expressions. So for example,</P>
+<P CLASS="western"><FONT FACE="Courier, monospace">	PropertyDouble
+ScaleFactor 2*@RepeatNumber</FONT></P>
+<P CLASS="western">Would substitute @RepeatNumber  into the
+expression. @RepeatNumber  is defined by G4MICE when repeating
+modules are used (see RepeatModule2, below). Note the following code
+is not valid</P>
+<P CLASS="western"><FONT FACE="Courier, monospace">	PropertyString
+FileName File@RepeatNumber //NOT VALID</FONT></P>
+<P CLASS="western">This is because Expression Substitutions can only
+be used in an expression (i.e. an equation).</P>
+<H2 CLASS="western">Module Files</H2>
+<P CLASS="western">Children of the top level Mice Module are defined
+by Modules. G4MICE will attempt to find a module in an external file.
+The location of the file is controlled by the parent Module.
+Initially G4MICE looks in the directory</P>
+<P CLASS="western"><SPAN STYLE="font-style: normal">	$</SPAN><I>{MICEFILES}/Models/Modules/&lt;Module&gt;</I></P>
+<P CLASS="western">If the Mice Module cannot be found, G4MICE
+searches the local directory. If the module file still cannot be
+found, G4MICE will issue a warning and proceed.</P>
+<P CLASS="western">The Module description is similar in structure to
+the Configuration file:</P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>	Module
+<I>&lt;Module Name&gt;</I></FONT></FONT></P>
+<P CLASS="western" STYLE="font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2>	{</FONT></FONT></P>
+<P CLASS="western" STYLE="font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2>		Volume	<I>&lt;Volume
+Type&gt;</I></FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2><I>		</I><SPAN STYLE="font-style: normal">Dimensions	</SPAN><I>&lt;Dimension1&gt;
+&lt;Dimension2&gt; &lt;Dimension3&gt; &lt;Units&gt;</I></FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2><I>		&lt;Properties&gt;</I></FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2><I>		&lt;Child
+Modules&gt;</I></FONT></FONT></P>
+<P CLASS="western" STYLE="font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2>	}</FONT></FONT></P>
+<P CLASS="western"><I>&lt;Module Name&gt;</I> is the name of the
+module. Typically the Module file name is given by <I>&lt;Module
+Name&gt;</I><SPAN STYLE="font-style: normal">.dat.</SPAN></P>
+<P CLASS="western" STYLE="font-style: normal">The definition of
+Volume, Dimensions, Properties and Child Modules are described below.</P>
+<H2 CLASS="western">Volume and Dimensions</H2>
+<P CLASS="western">The volume described by the MiceModule can be one
+of several types. Replace <I>&lt;Volume Type&gt;</I> with the
+appropriate volume below. Cylinder, Box and Tube define cylindrical
+and cuboidal volumes. Polycone defines an arbitrary volume of
+rotation and is described in detail below. Wedge describes a wedge
+with a triangular projection in the y-z plane and rectangular
+projections in x-z and x-y planes. Quadrupole defines an aperture
+with four cylindrical pole tips.</P>
+<P CLASS="western">In general, the physical volumes that scrape the
+beam are defined independently of the field maps. This is the more
+versatile way to do things, but there are some pitfalls which such an
+implementation introduces. For example, in hard-edged fields like
+pillboxes, tracking errors can be introduced when G4MICE steps into
+the field region. This can be avoided by adding windows (probably
+made of vacuum material) to force GEANT4 to stop tracking, make a
+small step over the field boundary, and then restart tracking inside
+the field. However, such details are left for the user to implement.</P>
+<TABLE WIDTH=873 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=5 CELLSPACING=0>
+	<COL WIDTH=131>
+	<COL WIDTH=214>
+	<COL WIDTH=226>
+	<COL WIDTH=259>
+	<THEAD>
+		<TR VALIGN=TOP>
+			<TH WIDTH=131>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Volume</B></P>
+			</TH>
+			<TH WIDTH=214>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Dimension1</B></P>
+			</TH>
+			<TH WIDTH=226>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Dimension2</B></P>
+			</TH>
+			<TH WIDTH=259>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Dimension3</B></P>
+			</TH>
+		</TR>
+	</THEAD>
+	<TBODY>
+		<TR VALIGN=TOP>
+			<TD WIDTH=131>
+				<P CLASS="western" STYLE="font-style: normal">None</P>
+			</TD>
+			<TD COLSPAN=3 WIDTH=720>
+				<P CLASS="western">No dimensions required. Note cannot define
+				daughter Modules for this volume type.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=131>
+				<P CLASS="western" STYLE="font-style: normal">Cylinder</P>
+			</TD>
+			<TD WIDTH=214>
+				<P CLASS="western">Radius</P>
+			</TD>
+			<TD WIDTH=226>
+				<P CLASS="western">Length in z</P>
+			</TD>
+			<TD WIDTH=259>
+				<P CLASS="western">Not used (leave blank)</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=131>
+				<P CLASS="western" STYLE="font-style: normal">Box</P>
+			</TD>
+			<TD WIDTH=214>
+				<P CLASS="western">Width in x</P>
+			</TD>
+			<TD WIDTH=226>
+				<P CLASS="western">Height in y</P>
+			</TD>
+			<TD WIDTH=259>
+				<P CLASS="western">Length along z</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=131>
+				<P CLASS="western" STYLE="font-style: normal">Tube</P>
+			</TD>
+			<TD WIDTH=214>
+				<P CLASS="western">Inner Radius</P>
+			</TD>
+			<TD WIDTH=226>
+				<P CLASS="western">Outer Radius</P>
+			</TD>
+			<TD WIDTH=259>
+				<P CLASS="western">Length in z</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=131>
+				<P CLASS="western" STYLE="font-style: normal">Polycone</P>
+			</TD>
+			<TD COLSPAN=3 WIDTH=720>
+				<P CLASS="western">No dimensions required. Volume defined from
+				external file.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=131>
+				<P CLASS="western" STYLE="font-style: normal">Wedge</P>
+			</TD>
+			<TD COLSPAN=3 WIDTH=720>
+				<P CLASS="western">See documentation below.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=131>
+				<P CLASS="western" STYLE="font-style: normal">Quadrupole</P>
+			</TD>
+			<TD COLSPAN=3 WIDTH=720>
+				<P CLASS="western">No dimensions required. Dimensions defined
+				from module properties.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=131>
+				<P CLASS="western" STYLE="font-style: normal">Multipole</P>
+			</TD>
+			<TD COLSPAN=3 WIDTH=720>
+				<P CLASS="western">No dimensions required. Dimensions defined
+				from module properties.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=131>
+				<P CLASS="western" STYLE="font-style: normal">Boolean</P>
+			</TD>
+			<TD COLSPAN=3 WIDTH=720>
+				<P CLASS="western">No dimensions required. Dimensions defined
+				from module properties.</P>
+			</TD>
+		</TR>
+	</TBODY>
+</TABLE>
+<H2 CLASS="western" STYLE="page-break-before: always">Properties</H2>
+<P CLASS="western">Many of the features of G4MICE that can be enabled
+in a module are described using properties. For example, properties
+enable the user to define detectors and fields. Properties can be
+either of several types: PropertyDouble, PropertyString,
+PropertyBool, PropertyHep3Vector or PropertyInt. A property is
+declared via</P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2><I>		&lt;Property
+Type&gt; &lt;Property Name&gt; &lt;Value&gt; &lt;Units if
+appropriate&gt;</I></FONT></FONT></P>
+<P CLASS="western">Different properties that can be enabled for Mice
+Modules are described elsewhere in this document. Properties of type
+PropertyDouble and PropertyHep3Vector can have units. Units are
+defined in the CLHEP library. Units are case sensitive; G4MICE will
+return an error message if it fails to parse units. Combinations of
+units such as T/m or N*m can be defined using '*' and '/' as
+appropriate. Properties cannot be defined more than once within the
+same module.</P>
+<H2 CLASS="western">Child Modules</H2>
+<P CLASS="western">Child Modules are defined with a position,
+rotation and scale factor. This places, and rotates, the child volume
+and any fields present relative to the parent volume. Scale factor
+scales fields defined in the child module and any of its children.
+Scale factors are recursively multiplicative; that is the field
+generated by a child module will be scaled by the product of the
+scale factor defined in the parent module and all of its parents.</P>
+<P CLASS="western">The child module definition looks like:</P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>	Module
+<I>&lt;Module File Name&gt;</I></FONT></FONT></P>
+<P CLASS="western" STYLE="font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2>	{</FONT></FONT></P>
+<P CLASS="western" STYLE="font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2>		Position	<I>&lt;x
+position&gt; &lt;y position&gt; &lt;z position&gt; &lt;Units&gt;</I></FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2><I>		</I><SPAN STYLE="font-style: normal">Rotation	</SPAN><I>&lt;x
+rotation&gt; &lt;y rotation&gt; &lt;z rotation&gt; &lt;Units&gt;</I></FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2><I>		</I><SPAN STYLE="font-style: normal">ScaleFactor	</SPAN><I>&lt;Value&gt;</I></FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2><I>		&lt;Define
+volume, dimensions and properties for this instance only&gt;</I></FONT></FONT></P>
+<P CLASS="western" STYLE="font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2>	}</FONT></FONT></P>
+<P CLASS="western"><I>&lt;Module File Name&gt;</I><SPAN STYLE="font-style: normal">
+is defined relative to the folder </SPAN><I>${MICEFILES}/Models/Modules/</I><SPAN STYLE="font-style: normal">.</SPAN>
+The position and rotation default to 0 0 0 and the scale factor
+defaults to 1.</P>
+<UL>
+	<LI><P CLASS="western">Volume, Dimension and Properties of the child
+	module can be defined at the level of the parent; in this case these
+	values will be used only for this instance of the module.</P>
+</UL>
+<UL>
+	<LI><P CLASS="western">If no file can be found, G4MICE will press on
+	regardless, attempting to build a geometry using the information
+	defined in the parent volume.</P>
+</UL>
+<H2 CLASS="western">Module Hierarchy and GEANT4 Physical Volumes</H2>
+<P CLASS="western"><IMG SRC="sources/geant4_volume_hierarchy.gif" ALIGN=LEFT><BR CLEAR=LEFT>G4MICE
+enables users to place arbitrary physical volumes in a GEANT4
+geometry. The formatting of G4MICE is such that users are encouraged
+to use the GEANT4 tree structure for placing physical volumes. This
+is a double-edged sword, in that it provides users with a convenient
+interface for building geometries, but it is not a terribly safe
+interface.</P>
+<P CLASS="western">Consider the cartoon of physical volumes shown
+above. Here there is a blue volume sitting inside a red volume
+sitting inside the black world volume. For the volumes to be
+represented properly, the module that represents the blue volume MUST
+be a child of the module that represents the red volume. The module
+that represents the red volume MUST, in turn, be a child of the
+module that represents the black volume, in this case the
+Configuration file.</P>
+<P CLASS="western">What would happen if we placed the blue volume
+directly into the Black volume, i.e. the Configuration file? GEANT4
+would silently ignore the blue volume, or the red volume, depending
+on the order in which they are added into the GEANT4 geometry. What
+would happen if we placed the blue volume overlapping the red and
+black volumes? The behaviour of GEANT4 is not clear in this case.</P>
+<UL>
+	<LI><P CLASS="western">Never allow a volume to overlap any part of
+	another volume that is not it's direct parent.</P>
+</UL>
+<P CLASS="western">It is possible to check for overlaps by setting
+the datacard <I>CheckVolumeOverlaps</I><SPAN STYLE="font-style: normal">
+to 1.</SPAN></P>
+<H2 CLASS="western"></H2>
+<H2 CLASS="western" STYLE="page-break-before: always">A Sample
+Configuration File</H2>
+<P CLASS="western">Below is listed a sample configuration file, which
+is likely to be included in the file <I>ExampleConfiguration.dat;</I>
+the actual name is specified by the datacard MiceModel.</P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>	Configuration
+ExampleConfiguration</FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>	{</FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>		Dimensions
+1500.0 1000.0 5000.0 cm</FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>		PropertyString
+Material AIR</FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>		Substitution
+  $MyRedColour 0.75</FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>		Module
+BeamLine/SolMag.dat</FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>		{</FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>			Position
+140.0 0.0 -2175.0 cm</FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>			Rotation
+0.0 30.0 0.0 degree</FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>			ScaleFactor
+1.</FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>		}</FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>		Module
+BeamLine/BendMag.dat</FONT></FONT></P>
+<P CLASS="western">  <FONT FACE="Courier, monospace"><FONT SIZE=2>		{</FONT></FONT></P>
+<P CLASS="western">  <FONT FACE="Courier, monospace"><FONT SIZE=2>			Position
+0.0 0.0 -1935.0 cm</FONT></FONT></P>
+<P CLASS="western">  <FONT FACE="Courier, monospace"><FONT SIZE=2>			Rotation
+0.0 15.0 0.0 degree</FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>			ScaleFactor
+1.</FONT></FONT></P>
+<P CLASS="western">  <FONT FACE="Courier, monospace"><FONT SIZE=2>		}</FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>		Module
+NoFile_Box1</FONT></FONT></P>
+<P CLASS="western">  <FONT FACE="Courier, monospace"><FONT SIZE=2>		{</FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>			Volume
+   Box</FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>			Dimension
+1.0 1.0 1.0</FONT></FONT></P>
+<P CLASS="western">  <FONT FACE="Courier, monospace"><FONT SIZE=2>			Position
+0.0 0.0  200.0 cm</FONT></FONT></P>
+<P CLASS="western">  <FONT FACE="Courier, monospace"><FONT SIZE=2>			Rotation
+0.0 15.0 0.0 degree</FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>			PropertyString
+Material Galactic</FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>			PropertyDouble
+RedColour $MyRedColour</FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>			Module
+NoFile_Box2</FONT></FONT></P>
+<P CLASS="western">  <FONT FACE="Courier, monospace"><FONT SIZE=2>			{</FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>				Volume
+   Box</FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>				Dimension
+0.5 0.5 0.5*3 m //z length = 0.5*3 = 1.5 m</FONT></FONT></P>
+<P CLASS="western">  <FONT FACE="Courier, monospace"><FONT SIZE=2>				Rotation
+ 0.0 15.0 0.0 degree //Rotation relative to parent</FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>				PropertyString
+Material Galactic</FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>				PropertyDouble
+RedColour $MyRedColour</FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>			}</FONT></FONT></P>
+<P CLASS="western">  <FONT FACE="Courier, monospace"><FONT SIZE=2>		}</FONT></FONT></P>
+<P CLASS="western">	}</P>
+<H2 CLASS="western" STYLE="page-break-before: always">A Sample Child
+Module File</H2>
+<P CLASS="western">Below is listed a sample module file, which is
+likely to be included in the file <I>SolMag.dat</I><SPAN STYLE="font-style: normal">;
+the actual location is specified by the module or configuration that
+calls FCoil. The module contains a number of properties that define
+the field.</SPAN></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>	Module
+SolMag</FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>	{</FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>		Volume
+Tube </FONT></FONT>
+</P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>		Dimensions
+263.0 347.0 210.0 mm</FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>		PropertyString
+Material Al</FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>		PropertyDouble
+BlueColour 0.75</FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>		PropertyDouble
+GreenColour 0.75</FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>		//field</FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>		PropertyString
+FieldType       Solenoid</FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>		PropertyString
+FileName        focus.dat</FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>		PropertyDouble
+CurrentDensity      1.</FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>		PropertyDouble
+Length            210. mm</FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>		PropertyDouble
+Thickness          84. mm</FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>		PropertyDouble
+InnerRadius       263. mm</FONT></FONT></P>
+<P CLASS="western"><FONT FACE="Courier, monospace"><FONT SIZE=2>	}</FONT></FONT></P>
+<H2 CLASS="western"></H2>
+<H1 CLASS="western" STYLE="page-break-before: always">Geometry and
+Tracking Properties</H1>
+<P CLASS="western">Properties for various aspects of the physical and
+engineering model of the simulation are described below. This
+includes properties for sensitive detectors.</P>
+<H2 CLASS="western">General Properties</H2>
+<P CLASS="western">There are a number of properties that are
+applicable to any MiceModule.</P>
+<TABLE WIDTH=873 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=5 CELLSPACING=0>
+	<COL WIDTH=181>
+	<COL WIDTH=63>
+	<COL WIDTH=597>
+	<THEAD>
+		<TR VALIGN=TOP>
+			<TH WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Property</B></P>
+			</TH>
+			<TH WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Type</B></P>
+			</TH>
+			<TH WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Description</B></P>
+			</TH>
+		</TR>
+	</THEAD>
+	<TBODY>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" STYLE="font-style: normal">Material</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">string</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">The material that the volume is made up from</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Invisible</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT>bool</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT>Set to 1 to make the object
+				invisible in visualisation, or 0 to make the object visible.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">RedColour</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+			<TD ROWSPAN=3 WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT>Alter the colour of objects as they
+				are visualised</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">GreenColour</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">BlueColour</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">G4StepMax</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT>The maximum step length that Geant4
+				can make in the volume. Inherits values from the parent volumes.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">G4TrackMax</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+			<TD ROWSPAN=2 WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT>The maximum track length and
+				particle time of a track. Tracks outside this bound are killed.
+				Inherits values from the parent volumes.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">G4TimeMax</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">G4KinMin</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT>The minimum kinetic energy of a
+				track. Tracks outside this bound are killed. Inherits values from
+				the parent volumes.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">SensitiveDetector</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT>string</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT>Set to the type of sensitive
+				detector required. Possible sensitive detectors are <I>TOF</I>,
+				<I>SciFi</I>, <I>CKOV</I>, <I>SpecialVirtual, Virtual, Envelope</I>
+				or <I>EMCAL</I>.</P>
+			</TD>
+		</TR>
+	</TBODY>
+</TABLE>
+<H2 CLASS="western">Sensitive Detectors</H2>
+<P CLASS="western">A sensitive detector (one in which hits are
+recorded) can be defined by including the SensitiveDetector property.
+When a volume is set to be a sensitive detector G4MICE will
+automatically record tracks entering, exiting and crossing the
+volume. Details such as the energy deposited by the track are
+sometimes also recorded in order to enable subsequent modelling of
+the detector response.</P>
+<P CLASS="western">Some sensitive detectors use extra properties.</P>
+<H3 CLASS="western">Scintillating Fibre Detector (SciFi)</H3>
+<H3 CLASS="western">Cerenkov Detector (CKOV)</H3>
+<H3 CLASS="western">Time Of Flight Counter (TOF)</H3>
+<H3 CLASS="western">Special Virtual Detectors</H3>
+<P CLASS="western">Special virtual detectors are used to monitor
+tracking through a particular physical volume. Normally particle
+tracks are written in the global coordinate system, although an
+alternate coordinate system can be defined. Additional properties can
+be used to parameterise special virtual detectors.</P>
+<TABLE WIDTH=873 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=5 CELLSPACING=0>
+	<COL WIDTH=181>
+	<COL WIDTH=67>
+	<COL WIDTH=593>
+	<THEAD>
+		<TR VALIGN=TOP>
+			<TH WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Property</B></P>
+			</TH>
+			<TH WIDTH=67>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Type</B></P>
+			</TH>
+			<TH WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Description</B></P>
+			</TH>
+		</TR>
+	</THEAD>
+	<TBODY>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" STYLE="font-style: normal">ZSegmentation</P>
+			</TD>
+			<TD WIDTH=67>
+				<P CLASS="western">int</P>
+			</TD>
+			<TD ROWSPAN=3 WIDTH=593>
+				<P CLASS="western">Set the number of segments in the detector in
+				Z, R or <FONT FACE="Standard Symbols L">f</FONT>. Defaults to 1.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">PhiSegmentation</P>
+			</TD>
+			<TD WIDTH=67>
+				<P CLASS="western" ALIGN=LEFT>int</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">RSegmentation</P>
+			</TD>
+			<TD WIDTH=67>
+				<P CLASS="western" ALIGN=LEFT>int</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">SteppingThrough</P>
+			</TD>
+			<TD WIDTH=67>
+				<P CLASS="western" ALIGN=LEFT>bool</P>
+			</TD>
+			<TD ROWSPAN=4 WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT>Set to true to record tracks
+				stepping through, into, out of or across the volume. Defaults to
+				true.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">SteppingInto</P>
+			</TD>
+			<TD WIDTH=67>
+				<P CLASS="western" ALIGN=LEFT>bool</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">SteppingOutOf</P>
+			</TD>
+			<TD WIDTH=67>
+				<P CLASS="western" ALIGN=LEFT>bool</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">SteppingAcross</P>
+			</TD>
+			<TD WIDTH=67>
+				<P CLASS="western" ALIGN=LEFT>bool</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Station</P>
+			</TD>
+			<TD WIDTH=67>
+				<P CLASS="western" ALIGN=LEFT>int</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT>Define an integer that is written
+				to the output file to identify the station. Defaults to a unique
+				integer identifier chosen by G4MICE, which will be different each
+				time the same Special Virtual is placed.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">LocalRefRotation</P>
+			</TD>
+			<TD WIDTH=67>
+				<P CLASS="western" ALIGN=LEFT>Hep3</P>
+				<P CLASS="western" ALIGN=LEFT>Vector</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT>If set, record hits relative to a
+				reference rotation in the coordinate system of the SpecialVirtual
+				detector.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">GlobalRefRotation</P>
+			</TD>
+			<TD WIDTH=67>
+				<P CLASS="western" ALIGN=LEFT>Hep3</P>
+				<P CLASS="western" ALIGN=LEFT>Vector</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT>If set, record hits relative to a
+				reference rotation in the coordinate system of the Configuration.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">LocalRefPosition</P>
+			</TD>
+			<TD WIDTH=67>
+				<P CLASS="western" ALIGN=LEFT>Hep3</P>
+				<P CLASS="western" ALIGN=LEFT>Vector</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT>If set, record hits relative to a
+				reference position in the coordinate system of the SpecialVirtual
+				detector.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">GlobalRefPosition</P>
+			</TD>
+			<TD WIDTH=67>
+				<P CLASS="western" ALIGN=LEFT>Hep3</P>
+				<P CLASS="western" ALIGN=LEFT>Vector</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT>If set, record hits relative to a
+				reference position in the coordinate system of the Configuration.</P>
+			</TD>
+		</TR>
+	</TBODY>
+</TABLE>
+<H3 CLASS="western">Virtual Detectors</H3>
+<P CLASS="western">Virtual detectors are used to extract all particle
+data at a particular plane, irrespective of geometry. Virtual
+detectors do not need to have a physical volume. The <I>plane</I><SPAN STYLE="font-style: normal">
+can be a plane in z, time, proper time, or a physical plane with some
+arbitrary rotation and translation.</SPAN></P>
+<TABLE WIDTH=873 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=5 CELLSPACING=0>
+	<COL WIDTH=181>
+	<COL WIDTH=67>
+	<COL WIDTH=593>
+	<THEAD>
+		<TR VALIGN=TOP>
+			<TH WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Property</B></P>
+			</TH>
+			<TH WIDTH=67>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Type</B></P>
+			</TH>
+			<TH WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Description</B></P>
+			</TH>
+		</TR>
+	</THEAD>
+	<TBODY>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT><I>IndependentVariable</I></P>
+			</TD>
+			<TD WIDTH=67>
+				<P CLASS="western" ALIGN=LEFT>String</P>
+			</TD>
+			<TD WIDTH=593>
+				<UL>
+					<LI><P CLASS="western" ALIGN=LEFT><SPAN STYLE="font-style: normal">If
+					set to </SPAN><I>t</I><SPAN STYLE="font-style: normal">,
+					particle data will be written for particles at the time defined
+					by the </SPAN><I>PlaneTime</I><SPAN STYLE="font-style: normal">
+					property. </SPAN>
+					</P>
+				</UL>
+				<UL>
+					<LI><P CLASS="western" ALIGN=LEFT><SPAN STYLE="font-style: normal">If
+					set to </SPAN><I>tau</I><SPAN STYLE="font-style: normal">,</SPAN><I>
+					</I><SPAN STYLE="font-style: normal">particle data will be
+					written for particles at the </SPAN><SPAN STYLE="font-style: normal">proper
+					time defined by the PlaneTime property. </SPAN>
+					</P>
+				</UL>
+				<UL>
+					<LI><P CLASS="western" ALIGN=LEFT><SPAN STYLE="font-style: normal">If
+					set to </SPAN><I>z</I><SPAN STYLE="font-style: normal">,
+					particle data will be written for particles crossing the
+					module's z-position. </SPAN>
+					</P>
+				</UL>
+				<UL>
+					<LI><P CLASS="western" ALIGN=LEFT><SPAN STYLE="font-style: normal">If
+					set to </SPAN><I>u</I><SPAN STYLE="font-style: normal">,
+					particle data will be written for particles crossing a plane
+					extending in </SPAN><I>x</I><SPAN STYLE="font-style: normal">
+					and </SPAN><I>y</I><SPAN STYLE="font-style: normal">.</SPAN></P>
+				</UL>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT><I>PlaneTime</I></P>
+			</TD>
+			<TD WIDTH=67>
+				<P CLASS="western" ALIGN=LEFT>Double</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT>If <I>IndependentVariable</I> is <I>t
+				</I><SPAN STYLE="font-style: normal">or </SPAN><I>tau,</I><SPAN STYLE="font-style: normal">
+				particle data will be written out at this time. Mandatory if
+				</SPAN><I>IndependentVariable</I><SPAN STYLE="font-style: normal">
+				is </SPAN><I>t</I><SPAN STYLE="font-style: normal"> or </SPAN><I>tau</I><SPAN STYLE="font-style: normal">.</SPAN></P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">RadialExtent</P>
+			</TD>
+			<TD WIDTH=67>
+				<P CLASS="western" ALIGN=LEFT>Double</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">If set,
+				particles outside this radius in the plane of the detector will
+				not be recorded by the Virtual detector.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">GlobalCoordinates</P>
+			</TD>
+			<TD WIDTH=67>
+				<P CLASS="western" ALIGN=LEFT>Bool</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">If set
+				to 0, particle data is written in the coordinate system of the
+				module. Otherwise particle data is written in global coordinates.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">MultiplePasses</P>
+			</TD>
+			<TD WIDTH=67>
+				<P CLASS="western" ALIGN=LEFT>String</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Set how
+				the VirtualPlane handles particles that pass through more than
+				once. If set to Ignore, particles will be ignored on second and
+				subsequent passes. If set to SameStation, particles will be
+				registered with the same station number. If set to NewStation,
+				particles will be registered with a NewStation number given by
+				the <I>(total number of stations) + (this plane's station
+				number)</I>, i.e. a new station number appropriate for a ring
+				geometry.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">AllowBackwards</P>
+			</TD>
+			<TD WIDTH=67>
+				<P CLASS="western" ALIGN=LEFT>Bool</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Set to
+				true to record backwards-going particles. Default is false.</P>
+			</TD>
+		</TR>
+	</TBODY>
+</TABLE>
+<H3 CLASS="western">Envelope Detectors</H3>
+<P CLASS="western">Envelope detectors are a type of Virtual detector
+that take all of the properties listed under virtual detectors,
+above. In addition, in the optics application they can be used to
+interact with the beam envelope in a special way. The following
+properties can be defined for Envelope Detectors <I>in addition to</I><SPAN STYLE="font-style: normal">
+the properties specified above for virtual detectors.</SPAN></P>
+<P CLASS="western" STYLE="font-style: normal">The The EnvelopeOut
+properties are used to make output from the envelope for use in the
+Optics optimiser.</P>
+<TABLE WIDTH=873 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=5 CELLSPACING=0>
+	<COL WIDTH=181>
+	<COL WIDTH=67>
+	<COL WIDTH=593>
+	<THEAD>
+		<TR VALIGN=TOP>
+			<TH WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Property</B></P>
+			</TH>
+			<TH WIDTH=67>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Type</B></P>
+			</TH>
+			<TH WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Description</B></P>
+			</TH>
+		</TR>
+	</THEAD>
+	<TBODY>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT><I>EnvelopeOut1_Name</I></P>
+			</TD>
+			<TD WIDTH=67>
+				<P CLASS="western" ALIGN=LEFT>String</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Defines
+				the variable name that can be used as an expression substitution
+				at the end of each iteration, typically substituted into the
+				Score parameters in the optimiser (see optimiser, below).</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT><I>EnvelopeOut1_Type</I></P>
+			</TD>
+			<TD WIDTH=67>
+				<P CLASS="western" ALIGN=LEFT>String</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Defines
+				the type of variable that will be calculated for the
+				substitution. Options are</P>
+				<UL>
+					<LI><P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Mean</P>
+					<LI><P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Covariance</P>
+					<LI><P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Standard_Deviation</P>
+					<LI><P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Correlation</P>
+					<LI><P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Bunch_Parameter</P>
+				</UL>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT><I>EnvelopeOut1_Variable</I></P>
+			</TD>
+			<TD WIDTH=67>
+				<P CLASS="western" ALIGN=LEFT>String</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT>Defines the variable that will be
+				calculated for the substitution. Options are for Bunch_Parameter</P>
+				<UL>
+					<UL>
+						<LI><P CLASS="western" ALIGN=LEFT><I>emit_6d </I><SPAN STYLE="font-style: normal">:
+						6d emittance</SPAN></P>
+						<LI><P CLASS="western" ALIGN=LEFT><I>emit_4d:</I><SPAN STYLE="font-style: normal">
+						4d emittance (in x-y space)</SPAN></P>
+						<LI><P CLASS="western" ALIGN=LEFT><I>emit_t:</I><SPAN STYLE="font-style: normal">
+						2d emittance (in time space)</SPAN></P>
+						<LI><P CLASS="western" ALIGN=LEFT><I>emit_x:</I><SPAN STYLE="font-style: normal">
+						2d emittance (in x space)</SPAN></P>
+						<LI><P CLASS="western" ALIGN=LEFT><I>emit_y:</I><SPAN STYLE="font-style: normal">
+						2d emittance (in y space)</SPAN></P>
+						<LI><P CLASS="western" ALIGN=LEFT><I>beta_4d:</I><SPAN STYLE="font-style: normal">
+						4d transverse beta function</SPAN></P>
+						<LI><P CLASS="western" ALIGN=LEFT><I>beta_t:</I><SPAN STYLE="font-style: normal">
+						2d longitudinal beta function</SPAN></P>
+						<LI><P CLASS="western" ALIGN=LEFT><I>beta_x: </I><SPAN STYLE="font-style: normal">2d
+						beta function (in(x space)</SPAN></P>
+						<LI><P CLASS="western" ALIGN=LEFT><I>beta_y: </I><SPAN STYLE="font-style: normal">2d
+						beta function (in y space)</SPAN></P>
+						<LI><P CLASS="western" ALIGN=LEFT><I>alpha_4d:</I><SPAN STYLE="font-style: normal">
+						4d transverse alpha function</SPAN></P>
+						<LI><P CLASS="western" ALIGN=LEFT><I>alpha_t:</I><SPAN STYLE="font-style: normal">
+						2d longitudinal alpha function</SPAN></P>
+						<LI><P CLASS="western" ALIGN=LEFT><I>alpha_x: </I><SPAN STYLE="font-style: normal">2d
+						alpha function (in(x space)</SPAN></P>
+						<LI><P CLASS="western" ALIGN=LEFT><I>alpha_y: </I><SPAN STYLE="font-style: normal">2d
+						alpha function (in y space)</SPAN></P>
+						<LI><P CLASS="western" ALIGN=LEFT><I>gamma_4d:</I><SPAN STYLE="font-style: normal">
+						4d transverse gamma function</SPAN></P>
+						<LI><P CLASS="western" ALIGN=LEFT><I>gamma_t:</I><SPAN STYLE="font-style: normal">
+						2d longitudinal gamma function</SPAN></P>
+						<LI><P CLASS="western" ALIGN=LEFT><I>gamma_x: </I><SPAN STYLE="font-style: normal">2d
+						gamma function (in(x space)</SPAN></P>
+						<LI><P CLASS="western" ALIGN=LEFT><I>gamma_y: </I><SPAN STYLE="font-style: normal">2d
+						gamma function (in y space)</SPAN></P>
+						<LI><P CLASS="western" ALIGN=LEFT><I>disp_x:</I><SPAN STYLE="font-style: normal">
+						x-dispersion</SPAN></P>
+						<LI><P CLASS="western" ALIGN=LEFT><I>disp_y:</I><SPAN STYLE="font-style: normal">
+						y-dispersion</SPAN></P>
+						<LI><P CLASS="western" ALIGN=LEFT><I>ltwiddle:</I><SPAN STYLE="font-style: normal">
+						normalised angular momentum</SPAN></P>
+						<LI><P CLASS="western" ALIGN=LEFT><I>lkin:</I><SPAN STYLE="font-style: normal">
+						standard angular momentum</SPAN></P>
+					</UL>
+				</UL>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">For
+				Mean, Standard_Deviation, Covariance and Correlation, variables
+				should be selected from the options</P>
+				<UL>
+					<LI><P CLASS="western" ALIGN=LEFT><I>x: x-</I><SPAN STYLE="font-style: normal">position</SPAN></P>
+					<LI><P CLASS="western" ALIGN=LEFT><I>y:y-position</I></P>
+					<LI><P CLASS="western" ALIGN=LEFT><I>t: </I><SPAN STYLE="font-style: normal">time</SPAN></P>
+					<LI><P CLASS="western" ALIGN=LEFT><I>px:</I><SPAN STYLE="font-style: normal">
+					x-momentum</SPAN></P>
+					<LI><P CLASS="western" ALIGN=LEFT><I>py:</I><SPAN STYLE="font-style: normal">
+					y-momentum</SPAN></P>
+					<LI><P CLASS="western" ALIGN=LEFT><I>E:</I><SPAN STYLE="font-style: normal">
+					energy</SPAN></P>
+				</UL>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">For
+				Mean, a single variable should be selected and value
+				corresponding to the reference trajectory will be returned.</P>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">For
+				Standard_Deviation, a single variable should be selected and the
+				1 sigma beam size will be returned.</P>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">For
+				Covariance and Correlation, two variables should be selected
+				separated by a comma.</P>
+			</TD>
+		</TR>
+	</TBODY>
+</TABLE>
+<H2 CLASS="western">Unconventional Volumes</H2>
+<P CLASS="western">It is possible to define a number of volumes that
+use properties rather than the Dimensions keyword to define the
+volume size.</P>
+<H3 CLASS="western">Volume Wedge</H3>
+<P CLASS="western"><IMG SRC="sources/wedge_picture.png" NAME="graphics1" ALIGN=LEFT WIDTH=693 HEIGHT=416 BORDER=0><BR CLEAR=LEFT>A
+<SPAN STYLE="font-style: normal">wedge is a triangular prism as shown
+in the diagram. Here the blue line extends along the positive z-axis
+and the red line extends along the x-axis.</SPAN></P>
+<TABLE WIDTH=873 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=5 CELLSPACING=0>
+	<COL WIDTH=181>
+	<COL WIDTH=63>
+	<COL WIDTH=597>
+	<THEAD>
+		<TR VALIGN=TOP>
+			<TH WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Property</B></P>
+			</TH>
+			<TH WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Type</B></P>
+			</TH>
+			<TH WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Description</B></P>
+			</TH>
+		</TR>
+	</THEAD>
+	<TBODY>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" STYLE="font-style: normal">Dimensions</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">Hep3</P>
+				<P CLASS="western">Vector</P>
+			</TD>
+			<TD WIDTH=597>
+				<OL>
+					<LI><P CLASS="western">Width of the prism in x</P>
+					<LI><P CLASS="western">Open end height of the prism in y</P>
+					<LI><P CLASS="western">Length of the prism in z</P>
+				</OL>
+			</TD>
+		</TR>
+	</TBODY>
+</TABLE>
+<H3 CLASS="western">Volume Polycone</H3>
+<P CLASS="western">A polycone is a volume of rotation, defined by a
+number of points in <SPAN STYLE="font-style: normal">r</SPAN> and <SPAN STYLE="font-style: normal">z.
+The volume is found by a </SPAN><SPAN STYLE="font-style: normal">linear
+interpolation of the points.</SPAN></P>
+<TABLE WIDTH=873 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=5 CELLSPACING=0>
+	<COL WIDTH=181>
+	<COL WIDTH=63>
+	<COL WIDTH=597>
+	<THEAD>
+		<TR VALIGN=TOP>
+			<TH WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Property</B></P>
+			</TH>
+			<TH WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Type</B></P>
+			</TH>
+			<TH WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Description</B></P>
+			</TH>
+		</TR>
+	</THEAD>
+	<TBODY>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" STYLE="font-style: normal">PolyconeType</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">string</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">Set to Fill to define a solid volume of
+				rotation. Set to Cone to define a shell volume of rotation with
+				an inner and outer surface.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">FieldMapMode</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT>string</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT>The name of the file that contains
+				the polycone data.</P>
+			</TD>
+		</TR>
+	</TBODY>
+</TABLE>
+<H3 CLASS="western">Volume Quadrupole</H3>
+<P CLASS="western">Quadrupoles are defined by an empty cylinder with
+four further cylinders that are approximations to pole tips.</P>
+<TABLE WIDTH=873 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=5 CELLSPACING=0>
+	<COL WIDTH=181>
+	<COL WIDTH=63>
+	<COL WIDTH=597>
+	<THEAD>
+		<TR VALIGN=TOP>
+			<TH WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Property</B></P>
+			</TH>
+			<TH WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Type</B></P>
+			</TH>
+			<TH WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Description</B></P>
+			</TH>
+		</TR>
+	</THEAD>
+	<TBODY>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" STYLE="font-style: normal">PhysicalLength</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">The length of the quadrupole container.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">QuadRadius</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT>The distance from the quad centre
+				to the outside of the quad.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">PoleTipRadius</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT>The distance from the quad centre
+				to the pole tip.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">CoilRadius</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT> 
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">CoilHalfWidth</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">BeamlineMaterial</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT>string</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT>The material from which the
+				beamline volume is made.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">QuadMaterial</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT>string</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT>The material from which the
+				quadrupole volume is made.</P>
+			</TD>
+		</TR>
+	</TBODY>
+</TABLE>
+<H3 CLASS="western">Volume Multipole</H3>
+<P CLASS="western">Multipoles are defined by an empty box with an
+arbitrary number of cylinders that are approximations to pole tips.
+Poles are placed around the centre of the box with n-fold symmetry.
+Multipoles can be curved, in which case poles cannot be defined –
+only a curved rectangular aperture will be present.</P>
+<TABLE WIDTH=873 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=5 CELLSPACING=0>
+	<COL WIDTH=192>
+	<COL WIDTH=66>
+	<COL WIDTH=583>
+	<THEAD>
+		<TR VALIGN=TOP>
+			<TH WIDTH=192>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Property</B></P>
+			</TH>
+			<TH WIDTH=66>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Type</B></P>
+			</TH>
+			<TH WIDTH=583>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Description</B></P>
+			</TH>
+		</TR>
+	</THEAD>
+	<TBODY>
+		<TR VALIGN=TOP>
+			<TD WIDTH=192>
+				<P CLASS="western"><I>ApertureCurvature</I></P>
+			</TD>
+			<TD WIDTH=66>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=583>
+				<P CLASS="western">Radius of curvature of the multipole aperture.
+				For now curved apertures cannot have poles. Set to 0 for a
+				straight aperture.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=192>
+				<P CLASS="western" ALIGN=LEFT><I>ApertureLength</I></P>
+			</TD>
+			<TD WIDTH=66>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+			<TD WIDTH=583>
+				<P CLASS="western" ALIGN=LEFT>Length of the multipole aperture.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=192>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">NumberOfPoles</P>
+			</TD>
+			<TD WIDTH=66>
+				<P CLASS="western">int</P>
+			</TD>
+			<TD WIDTH=583>
+				<P CLASS="western" ALIGN=LEFT>Number of poles.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=192>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">PoleCentreRadius</P>
+			</TD>
+			<TD WIDTH=66>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+			<TD WIDTH=583>
+				<P CLASS="western" ALIGN=LEFT>The distance from the centre of the
+				aperture to the centre of the cylindrical pole.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=192>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">PoleTipRadius</P>
+			</TD>
+			<TD WIDTH=66>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=583>
+				<P CLASS="western" ALIGN=LEFT>The distance from the centre of the
+				aperture to the tip of the cylindrical pole.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=192>
+				<P CLASS="western" ALIGN=LEFT><I>ApertureInnerHeight</I></P>
+			</TD>
+			<TD WIDTH=66>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+			<TD WIDTH=583>
+				<P CLASS="western" ALIGN=LEFT>The inner full height of the
+				aperture.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=192>
+				<P CLASS="western" ALIGN=LEFT><I>ApertureInnerWidth</I></P>
+			</TD>
+			<TD WIDTH=66>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=583>
+				<P CLASS="western" ALIGN=LEFT>The inner full width of the
+				aperture.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=192>
+				<P CLASS="western" ALIGN=LEFT><I>AppertureOuterHeight</I></P>
+			</TD>
+			<TD WIDTH=66>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+			<TD WIDTH=583>
+				<P CLASS="western" ALIGN=LEFT>The outer full height of the
+				aperture.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=192>
+				<P CLASS="western" ALIGN=LEFT><I>ApertureOuterWidth</I></P>
+			</TD>
+			<TD WIDTH=66>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+			<TD WIDTH=583>
+				<P CLASS="western" ALIGN=LEFT>The outer full width of the
+				aperture.</P>
+			</TD>
+		</TR>
+	</TBODY>
+</TABLE>
+<H3 CLASS="western">Volume Boolean</H3>
+<P CLASS="western">Boolean volumes enable several volumes to be
+combined to make very sophisticated shapes from a number of elements.
+Elements can be combined either by union, intersection or subtraction
+operations. A union creates a volume that is the sum of two elements;
+an intersection creates a volume that covers the region where two
+volumes intersect each other; and a subtraction creates a volume that
+contains all of one volume except the region that another volume sits
+in.</P>
+<P CLASS="western">Boolean volumes combine volumes modelled by other
+MiceModules (submodules), controlled using the properties listed
+below. Only the volume shape is used; position, rotation and field
+models etc are ignored. Materials, colours and other relevant
+properties are all taken only from the Boolean Volume's properties.</P>
+<P CLASS="western">Note that unlike in other parts of G4MICE,
+submodules for use in Booleans (BaseModule, BooleanModule1,
+BooleanModule2 ...) must be defined in a separate file, either
+defined in $MICEFILES/Models/Modules or in the working directory.</P>
+<P CLASS="western">Also note that visualisation of boolean volumes is
+rather unreliable. Unfortunately this is a feature of GEANT4. An
+alternative technique is to use special virtual detectors to examine
+hits in boolean volumes.</P>
+<TABLE WIDTH=873 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=5 CELLSPACING=0>
+	<COL WIDTH=192>
+	<COL WIDTH=66>
+	<COL WIDTH=583>
+	<THEAD>
+		<TR VALIGN=TOP>
+			<TH WIDTH=192>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Property</B></P>
+			</TH>
+			<TH WIDTH=66>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Type</B></P>
+			</TH>
+			<TH WIDTH=583>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Description</B></P>
+			</TH>
+		</TR>
+	</THEAD>
+	<TBODY>
+		<TR VALIGN=TOP>
+			<TD WIDTH=192>
+				<P CLASS="western"><I>BaseModule</I></P>
+			</TD>
+			<TD WIDTH=66>
+				<P CLASS="western">string</P>
+			</TD>
+			<TD WIDTH=583>
+				<P CLASS="western">Name of the physical volume that the
+				BooleanVolume is based on. This volume will be placed at (0,0,0)
+				with no rotation, and all subsequent volumes will be added,
+				subtracted or intersected with this one.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=192>
+				<P CLASS="western" ALIGN=LEFT><I>BooleanModule1</I></P>
+			</TD>
+			<TD WIDTH=66>
+				<P CLASS="western" ALIGN=LEFT>string</P>
+			</TD>
+			<TD WIDTH=583>
+				<P CLASS="western" ALIGN=LEFT>The first module to add. G4MICE
+				will search for the MiceModule with path
+				$MICEFILES/Models/Modules/&lt;BooleanModule1&gt;.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=192>
+				<P CLASS="western" ALIGN=LEFT><I>BooleanModule1Type</I></P>
+			</TD>
+			<TD WIDTH=66>
+				<P CLASS="western">string</P>
+			</TD>
+			<TD WIDTH=583>
+				<P CLASS="western" ALIGN=LEFT>The type of boolean operation to
+				apply, either “Union”, “Intersection” or “Subtraction”.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=192>
+				<P CLASS="western" ALIGN=LEFT><I>BooleanModule1Pos</I></P>
+			</TD>
+			<TD WIDTH=66>
+				<P CLASS="western">Hep3</P>
+				<P CLASS="western">Vector</P>
+			</TD>
+			<TD WIDTH=583>
+				<P CLASS="western" ALIGN=LEFT>The position of the new volume with
+				respect to the Base volume.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=192>
+				<P CLASS="western" ALIGN=LEFT><I>BooleanModule1Rot</I></P>
+			</TD>
+			<TD WIDTH=66>
+				<P CLASS="western">Hep3</P>
+				<P CLASS="western">Vector</P>
+			</TD>
+			<TD WIDTH=583>
+				<P CLASS="western" ALIGN=LEFT>The rotation of the new volume with
+				respect to the Base volume.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=192>
+				<P CLASS="western" ALIGN=LEFT><I>BooleanModuleN</I></P>
+			</TD>
+			<TD WIDTH=66>
+				<P CLASS="western" ALIGN=LEFT>string</P>
+			</TD>
+			<TD ROWSPAN=4 WIDTH=583>
+				<P CLASS="western" ALIGN=LEFT>Add extra modules as required.
+				Replace “N” with the module number. N must be a continuous
+				series incrementing by 1 for each new module. Note that the order
+				in which modules are added is important – (A-B) <FONT FACE="Arial, sans-serif">U
+				</FONT>C is different to A-(B <FONT FACE="Arial, sans-serif">U
+				</FONT>C).</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=192>
+				<P CLASS="western" ALIGN=LEFT><I>BooleanModuleNType</I></P>
+			</TD>
+			<TD WIDTH=66>
+				<P CLASS="western">string</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=192>
+				<P CLASS="western" ALIGN=LEFT><I>BooleanModuleNPos</I></P>
+			</TD>
+			<TD WIDTH=66>
+				<P CLASS="western">Hep3</P>
+				<P CLASS="western">Vector</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=192>
+				<P CLASS="western" ALIGN=LEFT><I>BooleanModuleNRot</I></P>
+			</TD>
+			<TD WIDTH=66>
+				<P CLASS="western">Hep3</P>
+				<P CLASS="western">Vector</P>
+			</TD>
+		</TR>
+	</TBODY>
+</TABLE>
+<H2 CLASS="western">Repeating Modules</H2>
+<P CLASS="western">It is possible to set up a repeating structure for
+e.g. a repeating magnet lattice. The RepeatModule property enables
+the user to specify that a particular module will be repeated a
+number of times, with all properties passed onto the child module,
+but with a new position, orientation and scale factor. Each
+successive repetition will be given a translation and a rotation
+relative to the coordinate system of the previous repetition,
+enabling the construction of circular and straight accelerator
+lattices. Additionally, successive repetitions can have fields scaled
+relative to previous repetitions, enabling for example alternating
+lattices.</P>
+<TABLE WIDTH=873 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=5 CELLSPACING=0>
+	<COL WIDTH=192>
+	<COL WIDTH=66>
+	<COL WIDTH=583>
+	<THEAD>
+		<TR VALIGN=TOP>
+			<TH WIDTH=192>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Property</B></P>
+			</TH>
+			<TH WIDTH=66>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Type</B></P>
+			</TH>
+			<TH WIDTH=583>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Description</B></P>
+			</TH>
+		</TR>
+	</THEAD>
+	<TBODY>
+		<TR VALIGN=TOP>
+			<TD WIDTH=192>
+				<P CLASS="western"><I>RepeatModule</I></P>
+			</TD>
+			<TD WIDTH=66>
+				<P CLASS="western">bool</P>
+			</TD>
+			<TD WIDTH=583>
+				<P CLASS="western">Set to 1 to enable repeats in this module.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=192>
+				<P CLASS="western" ALIGN=LEFT><I>NumberOfRepeats</I></P>
+			</TD>
+			<TD WIDTH=66>
+				<P CLASS="western" ALIGN=LEFT>int</P>
+			</TD>
+			<TD WIDTH=583>
+				<P CLASS="western" ALIGN=LEFT>Number of times the module will be
+				repeated in addition to the initial placement.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=192>
+				<P CLASS="western" ALIGN=LEFT><I>RepeatTranslation</I></P>
+			</TD>
+			<TD WIDTH=66>
+				<P CLASS="western">Hep3</P>
+				<P CLASS="western">Vector</P>
+			</TD>
+			<TD WIDTH=583>
+				<P CLASS="western" ALIGN=LEFT>Translation applied to successive
+				repeats, applied in the coordinate system of the previous
+				repetition.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=192>
+				<P CLASS="western" ALIGN=LEFT><I>RepeatRotation</I></P>
+			</TD>
+			<TD WIDTH=66>
+				<P CLASS="western">Hep3</P>
+				<P CLASS="western">Vector</P>
+			</TD>
+			<TD WIDTH=583>
+				<P CLASS="western" ALIGN=LEFT>Rotation applied to successive
+				repeats, applied in the coordinate system of the previous
+				repetition.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=192>
+				<P CLASS="western" ALIGN=LEFT><I>RepeatScaleFactor</I></P>
+			</TD>
+			<TD WIDTH=66>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=583>
+				<P CLASS="western" ALIGN=LEFT>ScaleFactor applied to successive
+				repeats, applied relative to previous repetition's scale factor.</P>
+			</TD>
+		</TR>
+	</TBODY>
+</TABLE>
+<P CLASS="western">The RepeatModule2 property also enables the user
+to specify that a particular module will be repeated a number of
+times. In this case, G4MICE will set a substitution variable
+@RepeatNumber that holds an index between 0 and NumberOfRepeats. This
+can be used in an expression in to provide a versatile interface
+between user and accelerator lattice.</P>
+<TABLE WIDTH=873 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=5 CELLSPACING=0>
+	<COL WIDTH=192>
+	<COL WIDTH=66>
+	<COL WIDTH=583>
+	<THEAD>
+		<TR VALIGN=TOP>
+			<TH WIDTH=192>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Property</B></P>
+			</TH>
+			<TH WIDTH=66>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Type</B></P>
+			</TH>
+			<TH WIDTH=583>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Description</B></P>
+			</TH>
+		</TR>
+	</THEAD>
+	<TBODY>
+		<TR VALIGN=TOP>
+			<TD WIDTH=192>
+				<P CLASS="western"><I>RepeatModule2</I></P>
+			</TD>
+			<TD WIDTH=66>
+				<P CLASS="western">bool</P>
+			</TD>
+			<TD WIDTH=583>
+				<P CLASS="western">Set to 1 to enable repeats in this module.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=192>
+				<P CLASS="western" ALIGN=LEFT><I>NumberOfRepeats</I></P>
+			</TD>
+			<TD WIDTH=66>
+				<P CLASS="western" ALIGN=LEFT>int</P>
+			</TD>
+			<TD WIDTH=583>
+				<P CLASS="western" ALIGN=LEFT>Number of times the module will be
+				repeated in addition to the initial placement.</P>
+			</TD>
+		</TR>
+	</TBODY>
+</TABLE>
+<H2 CLASS="western"></H2>
+<H2 CLASS="western" STYLE="page-break-before: always">Beam Definition
+and Beam Envelopes</H2>
+<P CLASS="western">The Optics application can be used to track a
+trajectory and associated beam envelope through the accelerator
+structure. Optics works by finding the Jacobian around some arbitrary
+trajectory using a numerical differentiation. This is used to define
+a linear mapping about this trajectory, which can then be used to
+transport the beam envelope.</P>
+<P CLASS="western">The Simulation application can be used to generate
+a random particle beam with a Gaussian distribution and RMS
+parameters defined in the same way as the Optics beam envelope.
+Alternatively, pencil beams and beams from some input file can also
+be defined here.</P>
+<P CLASS="western">A beam envelope is defined by a reference
+trajectory and a beam ellipse. The reference trajectory takes its
+position and direction from the position and rotation of the module.
+No rotation builds a reference trajectory along the z-axis. The
+magnitude of the momentum and the initial time of the reference
+trajectory is defined by properties. RF cavities are phased using the
+reference trajectory defined here.</P>
+<P CLASS="western">The beam ellipse is represented by a matrix, which
+can either be set using 
+</P>
+<UL>
+	<LI><P CLASS="western">Twiss-style parameters in (x,px),(y,py) and
+	(t,E) spaces.</P>
+	<LI><P CLASS="western">Twiss-style parameters in (t,E) space and
+	Penn-style parameters in a cylindrically symmetric (x,px,y,py)
+	space.</P>
+	<LI><P CLASS="western">A 6x6 beam ellipse matrix where the ellipse
+	equation is given by <B>X</B><SPAN STYLE="font-weight: medium">.</SPAN><B>T</B>()
+	<B>M</B> <B>X</B><SPAN STYLE="font-weight: medium"> = 1.</SPAN></P>
+</UL>
+<P CLASS="western" STYLE="font-weight: medium">The Penn ellipse
+matrix is given by</P>
+<P CLASS="western" STYLE="font-weight: medium"><IMG SRC="sources/penn_beam_matrix.gif" NAME="Object6" HSPACE=10 WIDTH=900 HEIGHT=345></P>
+<P CLASS="western"><SPAN STYLE="font-weight: medium">Here L is a
+normalised canonical angular momentum, </SPAN><I><SPAN STYLE="font-weight: medium">q</SPAN></I><SPAN STYLE="font-weight: medium">
+is the reference particle charge, </SPAN><I><SPAN STYLE="font-weight: medium">B</SPAN></I><SUB><I><SPAN STYLE="font-weight: medium">z</SPAN></I></SUB><SPAN STYLE="font-weight: medium">
+is the nominal on-axis magnetic field, </SPAN><I><SPAN STYLE="font-weight: medium">p</SPAN></I><SPAN STYLE="font-weight: medium">
+is the reference momentum, </SPAN><I><SPAN STYLE="font-weight: medium">m</SPAN></I><SPAN STYLE="font-weight: medium">
+is the reference mass, </SPAN><FONT FACE="Standard Symbols L"><SPAN STYLE="font-weight: medium">e</SPAN></FONT><SUB><SPAN STYLE="font-weight: medium">T</SPAN></SUB><SPAN STYLE="font-weight: medium">
+is the transverse emittance, </SPAN><FONT FACE="Standard Symbols L"><SPAN STYLE="font-weight: medium">b</SPAN></FONT><SUB><SPAN STYLE="font-weight: medium">T</SPAN></SUB><SPAN STYLE="font-weight: medium">
+and </SPAN><FONT FACE="Standard Symbols L"><SPAN STYLE="font-weight: medium">a</SPAN></FONT><SUB><SPAN STYLE="font-weight: medium">T</SPAN></SUB><SPAN STYLE="font-weight: medium">
+are the transverse Twiss-like functions, </SPAN><FONT FACE="Standard Symbols L"><SPAN STYLE="font-weight: medium">e</SPAN></FONT><SUB><SPAN STYLE="font-weight: medium">L</SPAN></SUB><SPAN STYLE="font-weight: medium">
+is the longitudinal emittance and </SPAN><FONT FACE="Standard Symbols L"><SPAN STYLE="font-weight: medium">b</SPAN></FONT><SUB><SPAN STYLE="font-weight: medium">L</SPAN></SUB><SPAN STYLE="font-weight: medium">
+and </SPAN><FONT FACE="Standard Symbols L"><SPAN STYLE="font-weight: medium">a</SPAN></FONT><SUB><SPAN STYLE="font-weight: medium">L</SPAN></SUB><SPAN STYLE="font-weight: medium">
+are the longitudinal Twiss-like functions. Additionally D</SPAN><SUB><SPAN STYLE="font-weight: medium">x</SPAN></SUB><SPAN STYLE="font-weight: medium">,
+D</SPAN><SUB><SPAN STYLE="font-weight: medium">y</SPAN></SUB><SPAN STYLE="font-weight: medium">,
+D'</SPAN><SUB><SPAN STYLE="font-weight: medium">x</SPAN></SUB><SPAN STYLE="font-weight: medium">,
+D'</SPAN><SUB><SPAN STYLE="font-weight: medium">y</SPAN></SUB><SPAN STYLE="font-weight: medium">
+are the dispersions and their derivatives with respect to z and V(E)
+is the variance of energy (given by the (2,2) term in the matrix
+above).</SPAN></P>
+<P CLASS="western" STYLE="font-weight: medium">The Twiss ellipse
+matrix is given by</P>
+<P CLASS="western" STYLE="font-weight: medium"><IMG SRC="sources/twiss_beam_matrix.gif" NAME="Object7" HSPACE=10 WIDTH=705 HEIGHT=312></P>
+<P CLASS="western"><SPAN STYLE="font-weight: medium">Here </SPAN><I><SPAN STYLE="font-weight: medium">p</SPAN></I><SPAN STYLE="font-weight: medium">
+is the reference momentum, </SPAN><I><SPAN STYLE="font-weight: medium">m</SPAN></I><SPAN STYLE="font-weight: medium">
+is the reference mass, </SPAN><FONT FACE="Standard Symbols L"><SPAN STYLE="font-weight: medium">e</SPAN></FONT><SUB><FONT FACE="Nimbus Roman No9 L, serif"><SPAN STYLE="font-weight: medium">i</SPAN></FONT></SUB><SPAN STYLE="font-weight: medium">,
+</SPAN><FONT FACE="Standard Symbols L"><SPAN STYLE="font-weight: medium">b</SPAN></FONT><SUB><FONT FACE="Nimbus Roman No9 L, serif"><SPAN STYLE="font-weight: medium">i</SPAN></FONT></SUB><SPAN STYLE="font-weight: medium">
+and </SPAN><FONT FACE="Standard Symbols L"><SPAN STYLE="font-weight: medium">a</SPAN></FONT><SUB><FONT FACE="Nimbus Roman No9 L, serif"><SPAN STYLE="font-weight: medium">i</SPAN></FONT></SUB><SPAN STYLE="font-weight: medium">
+are the emittances and Twiss functions in the (t,E), (x,p</SPAN><SUB><SPAN STYLE="font-weight: medium">x</SPAN></SUB><SPAN STYLE="font-weight: medium">)
+and (y,p</SPAN><SUB><SPAN STYLE="font-weight: medium">y</SPAN></SUB><SPAN STYLE="font-weight: medium">)
+planes respectively, D</SPAN><SUB><SPAN STYLE="font-weight: medium">x</SPAN></SUB><SPAN STYLE="font-weight: medium">,
+D</SPAN><SUB><SPAN STYLE="font-weight: medium">y</SPAN></SUB><SPAN STYLE="font-weight: medium">,
+D'</SPAN><SUB><SPAN STYLE="font-weight: medium">x</SPAN></SUB><SPAN STYLE="font-weight: medium">,
+D'</SPAN><SUB><SPAN STYLE="font-weight: medium">y</SPAN></SUB><SPAN STYLE="font-weight: medium">
+are the dispersions and their derivatives with respect to z and V(E)
+is the variance of energy (given by the (2,2) term in the matrix
+above).</SPAN></P>
+<TABLE WIDTH=848 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=5 CELLSPACING=0 STYLE="page-break-before: always">
+	<COL WIDTH=164>
+	<COL WIDTH=60>
+	<COL WIDTH=593>
+	<THEAD>
+		<TR VALIGN=TOP>
+			<TH WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Property</B></P>
+			</TH>
+			<TH WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Type</B></P>
+			</TH>
+			<TH WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Description</B></P>
+			</TH>
+		</TR>
+	</THEAD>
+	<TBODY>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western"><I>EnvelopeType</I></P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western">string</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western">Set to <I>TrackingDerivative</I> to evolve a
+				beam envelope in the Optics application.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western"><I>BeamType</I></P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western">string</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western">Set to <I>Random</I> to generate a beam using
+				the parameters below for the Simulation application. Set to
+				<I>Pencil </I><SPAN STYLE="font-style: normal">to generate a
+				pencil beam (with no random distribution). Set to </SPAN><I>ICOOL</I><SPAN STYLE="font-style: normal">,
+				</SPAN><I>Turtle, G4MICE_PrimaryGenHit</I><SPAN STYLE="font-style: normal">
+				or </SPAN><I>G4BeamLine</I><SPAN STYLE="font-style: normal"> to
+				use a beam file</SPAN>.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT><I>Pid</I></P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT>int</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT>The particle ID of particles in the
+				envelope or beam.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT><I>Longitudinal</I></P>
+				<P CLASS="western" ALIGN=LEFT><I>Variable</I></P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT>string</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT>Set the longitudinal variable used
+				to define the reference trajectory momentum. Options are <I>Energy</I><SPAN STYLE="font-style: normal">,
+				</SPAN><I>KineticEnergy, Momentum</I><SPAN STYLE="font-style: normal">
+				and</SPAN><I> ZMomentum.</I></P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Energy</P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+			<TD ROWSPAN=4 WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT>Define the value of the
+				longitudinal variable used to calculate the mean momentum and
+				energy. The usual relationship E<SUP>2</SUP>+p<SUP>2</SUP>c<SUP>2</SUP>=m<SUP>2</SUP>c<SUP>4</SUP>
+				applies. Kinetic energy E<SUB>k</SUB> is related to energy E by
+				E<SUB>k</SUB>+m=E.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">KineticEnergy</P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Momentum</P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">ZMomentum</P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT><I>EllipseDefinition</I></P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT>string</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT>Define the beam ellipse that will
+				be used in calculating the evolution of the Envelope, or used to
+				generate a beam for BeamType <I>Random</I>. Options are <I>Twiss,
+				Penn</I><SPAN STYLE="font-style: normal"> and</SPAN><I> Matrix</I><SPAN STYLE="font-style: normal">.</SPAN></P>
+			</TD>
+		</TR>
+		<TR>
+			<TD COLSPAN=3 WIDTH=836 VALIGN=TOP>
+				<P CLASS="western" ALIGN=LEFT><I>The following properties are
+				only used if EllipseDefinition is set to Twiss</I></P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT><I>Emittance_X</I></P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+			<TD ROWSPAN=3 WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT>Emittance in each 2d subspace,
+				(x,px), (y,py) and (t,E).</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT><I>Emittance_Y</I></P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT><I>Emittance_L</I></P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT><I>Beta_X</I></P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+			<TD ROWSPAN=3 WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT>Twiss <FONT FACE="Standard Symbols L">b</FONT>
+				function in each 2d subspace, (x,px), (y,py) and (t,E).</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT><I>Beta_Y</I></P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT><I>Beta_L</I></P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT><I>Alpha_X</I></P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+			<TD ROWSPAN=3 WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT>Twiss <FONT FACE="Standard Symbols L">a</FONT>
+				function in each 2d subspace, (x,px), (y,py) and (t,E).</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT><I>Alpha_Y</I></P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT><I>Alpha_L</I></P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+		</TR>
+		<TR>
+			<TD COLSPAN=3 WIDTH=836 VALIGN=TOP>
+				<P CLASS="western" ALIGN=LEFT><I>The following properties are
+				only used if EllipseDefinition is set to Matrix</I></P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT><I>Covariance(t,t)</I></P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+			<TD ROWSPAN=5 WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT>Set the 6x6 matrix that will be
+				used in the to define the beam ellipse. Covariances should be
+				covariances of elements of the matrix (x,Px,y,Py,t,E).</P>
+				<P CLASS="western" ALIGN=LEFT> This must be a positive definite
+				matrix, i.e. determinant &gt; 0. Note that this means that at
+				least the 6 terms on the diagonal must be defined. Other terms
+				default to 0.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT><I>Covariance(t,E)</I></P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT><I>Covariance(t,x)</I></P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT><I>...</I></P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT><I>Covariance(Py,Py)</I></P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+		</TR>
+		<TR>
+			<TD COLSPAN=3 WIDTH=836 VALIGN=TOP>
+				<P CLASS="western"><I>The following properties are only used if
+				EllipseDefinition is set to Penn</I></P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT><I>Emittance_T</I></P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">double</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Transverse
+				emittance for the 4d (x,px,y,py) subspace.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT><I>Emittance_L</I></P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">double</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Longitudinal
+				emittance for the 2d (t,E) subspace.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT><I>Beta_T</I></P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">double</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Transverse
+				beta for the 4d (x,px,y,py) subspace.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT><I>Beta_L</I></P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">double</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Longitudinal
+				beta for the 2d (t,E) subspace.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT><I>Alpha_T</I></P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">double</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Transverse
+				alpha for the 4d (x,px,y,py) subspace.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT><I>Alpha_L</I></P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">double</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Longitudinal
+				alpha for the 2d (t,E) subspace.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT><I>Normalised</I></P>
+				<P CLASS="western" ALIGN=LEFT><I>AngularMomentu</I></P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">double</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Normalised
+				angular momentum for the transverse phase space.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Bz</P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">double</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Nominal
+				magnetic field on the reference particle.</P>
+			</TD>
+		</TR>
+		<TR>
+			<TD COLSPAN=3 WIDTH=836 VALIGN=TOP>
+				<P CLASS="western" ALIGN=LEFT><I>The following properties are
+				used if EllipseDefinition is set to Penn or Twiss</I></P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Dispersion_X</P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">double</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Dispersion
+				in x (x-energy correlation).</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Dispersion_Y</P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">double</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Dispersion
+				in y (y-energy correlation).</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">DispersionPrime_X</P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">double</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">D' in x
+				(Px-energy correlation).</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">DispersionPrime_Y</P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">double</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">D' in y
+				(Py-energy correlation).</P>
+			</TD>
+		</TR>
+		<TR>
+			<TD COLSPAN=3 WIDTH=836 VALIGN=TOP>
+				<P CLASS="western" ALIGN=LEFT><I>The following properties are
+				only relevant for generating a beam envelope</I></P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">RootOutput</P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">string</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Output
+				file name for writing output beam envelope in ROOT binary format.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">LongTextOutput</P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">string</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Output
+				file name for writing output beam envelope in string format.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">ShortTextOutput</P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">string</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Output
+				file name for writing output beam envelope in string format. This
+				abbreviated output omits some of the fields that are present in
+				LongTextOutput files.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">BeamOutput</P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">string</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">If a
+				BeamType is defined, this property controls the file name to
+				which beam data is written.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Delta_t</P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">double</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Offset
+				in time used for calculating numerical derivatives. Default is
+				0.1 ns.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Delta_E</P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">double</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Offset
+				in energy used for calculating numerical derivatives. Default is
+				1 MeV.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Delta_x</P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">double</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Offset
+				in x position used for calculating numerical derivatives. Default
+				is 1 mm.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Delta_Px</P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">double</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Offset
+				in x momentum used for calculating numerical derivatives. Default
+				is 1 MeV/c.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Delta_y</P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">double</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Offset
+				in y position used for calculating numerical derivatives. Default
+				is 1 mm.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Delta_Py</P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">double</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Offset
+				in y momentum used for calculating numerical derivatives. Default
+				is 1 MeV/c.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Max_Delta_t</P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">double</P>
+			</TD>
+			<TD ROWSPAN=6 WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Maximum
+				offsets when polyfit algorithm is used. In some cases the offset
+				can keep increasing without limit unless these maximum offsets
+				are defined. Default is no limit.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Max_Delta_E</P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">double</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Max_Delta_x</P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">double</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Max_Delta_Px</P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">double</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Max_Delta_y</P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">double</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Max_Delta_Py</P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">double</P>
+			</TD>
+		</TR>
+		<TR>
+			<TD COLSPAN=3 WIDTH=836 VALIGN=TOP>
+				<P CLASS="western" ALIGN=LEFT><I>The following properties are
+				only relevant for generating a particle beam</I></P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">UseAsReference</P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT>Bool</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT>If set to true <SPAN STYLE="font-weight: medium">and</SPAN>
+				the datacard <I>FirstParticleIsReference</I><SPAN STYLE="font-style: normal">
+				is set to 0</SPAN>, the first event in the Module will be used as
+				the reference particle that sets cavity phases. This particle
+				will then have the mean trajectory (i.e. no gaussian
+				distribution).</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT><I>BeamFile</I></P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT>string</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT>If the BeamType is <I>ICOOL</I>,
+				<I>Turtle, G4MICE_PrimaryGenHit</I> or <I>G4BeamLine</I>, this
+				property defines the name of the file containing tracks for
+				G4MICE.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">NumberOfEvents</P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT>int</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT>Set the maximum number of events to
+				take from this module. If other modules are defined, G4MICE will
+				iterate over the modules until it the datacard <I>numEvts</I> is
+				reached or all modules have been run to <I>NumberOfEvents</I>.
+				Default is for G4MICE to keep tracking from the first module it
+				finds until <I>numEvts</I> is reached.</P>
+			</TD>
+		</TR>
+	</TBODY>
+</TABLE>
+<H2 CLASS="western">Optimiser</H2>
+<P CLASS="western">It is possible to define an optimiser for use in
+the Optics application. The optimiser enables the user to vary
+parameters in the MiceModule file and try to find some optimum
+setting. For each value of the parameters, G4MICE Optics will
+calculate a score; the optimiser attempts to find a minimum value for
+this score.</P>
+<TABLE WIDTH=848 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=5 CELLSPACING=0>
+	<COL WIDTH=164>
+	<COL WIDTH=60>
+	<COL WIDTH=593>
+	<THEAD>
+		<TR VALIGN=TOP>
+			<TH WIDTH=164>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Property</B></P>
+			</TH>
+			<TH WIDTH=60>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Type</B></P>
+			</TH>
+			<TH WIDTH=593>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Description</B></P>
+			</TH>
+		</TR>
+	</THEAD>
+	<TBODY>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western"><I>Optimiser</I></P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western">string</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western">Controls the function used for optimising. For
+				now Minuit is the only available option.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western"><I>Algorithm</I></P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western">string</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western">For <I>Minuit</I> optimiser, controls the
+				<I>Minuit</I> algorithm used.<SPAN STYLE="font-style: normal"> In
+				general Simplex is a good option to use here. An alternative is
+				Migrad. See Minuit documentation (for example at
+				http://root.cern.ch/root/html/TMinuit.html) for further
+				information. Minuit attempts to minimise the score function
+				defined by the Score properties.</SPAN></P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western"><I>NumberOfTries</I></P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western">int</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western">Maximum number of iterations G4MICE will make
+				in order to find the optimum value.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western"><I>StartError</I></P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western">Guess at the initial error in the score.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western"><I>EndError</I></P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western">Required final error in the score for the
+				optimisation to converge successfully.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" STYLE="font-style: normal">RebuildSimulation</P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western">bool</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western">Set to False to tell G4MICE not to rebuild the
+				simulation on each iteration. This should be used to speed up the
+				optimiser when a parameter is used that does not change the field
+				maps. Default is true.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western"><I>Parameter1_Start</I></P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western">Seed value for the parameter, that is used in
+				the first iteration.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western"><I>Parameter1_Name</I></P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western">string</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western">Name of the parameter. This name is used as an
+				expression substitution variable elsewhere in the code and should
+				start with @. See Expression Substitutions above for details on
+				usage of expression substitutions.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" STYLE="font-style: normal">Parameter1_Delta</P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western">Estimated initial error on the parameter.
+				Default is 1.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" STYLE="font-style: normal">Parameter1_Fixed</P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western">bool</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western">Set to true to fix the parameter (so that it
+				is excluded from the optimisation). Default is false.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" STYLE="font-style: normal">Parameter1_Min</P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western">If required, set to the minimum value that the
+				parameter can hold.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" STYLE="font-style: normal">Parameter1_Max</P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=593>
+				<P CLASS="western">If required, set to the maximum value that the
+				parameter can hold.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" STYLE="font-style: normal">Parameter2_Start</P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western">...</P>
+			</TD>
+			<TD ROWSPAN=3 WIDTH=593 HEIGHT=95>
+				<P CLASS="western">Define an arbitrary number of parameters.
+				Parameters must be numbered consecutively, and each parameter
+				must have at least the start value and name defined.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" STYLE="font-style: normal">...</P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western">...</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" STYLE="font-style: normal">Parameter2_Max</P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western">...</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western"><I>Score1</I></P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD ROWSPAN=3 WIDTH=593 HEIGHT=94>
+				<P CLASS="western">The optimiser will attempt to optimise against
+				a score that is calculated by summing the Score1, Score2,...
+				parameters on each iteration.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" STYLE="font-style: normal">Score2</P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western">...</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=164>
+				<P CLASS="western" STYLE="font-style: normal">...</P>
+			</TD>
+			<TD WIDTH=60>
+				<P CLASS="western">...</P>
+			</TD>
+		</TR>
+	</TBODY>
+</TABLE>
+<H1 CLASS="western" STYLE="page-break-before: always">Field
+Properties</H1>
+<P CLASS="western">Invoke a field using PropertyString FieldType
+&lt;fieldtype&gt;. The field will be placed, normally centred on the
+MiceModule Position and with the appropriate Rotation. Further
+options for each field type are specified below, and relevant
+datacards are also given. If a fieldtype is specified some other
+properties must also be specified, while others may be optional,
+usually taking their value from defaults specified in the datacards.
+Only one fieldtype can be specified per module. However, fields from
+multiple modules are superimposed, each transformed according to the
+MiceModule specification. This enables many different field
+configurations to be simulated using G4MICE.</P>
+<P CLASS="western">To use BeamTools fields, datacard FieldMode Full
+must be set. This is the default.</P>
+<TABLE WIDTH=873 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=5 CELLSPACING=0>
+	<COL WIDTH=181>
+	<COL WIDTH=63>
+	<COL WIDTH=597>
+	<THEAD>
+		<TR VALIGN=TOP>
+			<TH WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Property</B></P>
+			</TH>
+			<TH WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Type</B></P>
+			</TH>
+			<TH WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Description</B></P>
+			</TH>
+		</TR>
+	</THEAD>
+	<TBODY>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western"><I>FieldType</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">string</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">Set the field type of the MiceModule.</P>
+			</TD>
+		</TR>
+	</TBODY>
+</TABLE>
+<H2 CLASS="western">FieldType CylindricalField</H2>
+<P CLASS="western">Sets a constant magnetic field in a cylindrical
+region symmetric about the z-axis of the module.</P>
+<TABLE WIDTH=873 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=5 CELLSPACING=0>
+	<COL WIDTH=181>
+	<COL WIDTH=63>
+	<COL WIDTH=597>
+	<THEAD>
+		<TR VALIGN=TOP>
+			<TH WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Property</B></P>
+			</TH>
+			<TH WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Type</B></P>
+			</TH>
+			<TH WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Description</B></P>
+			</TH>
+		</TR>
+	</THEAD>
+	<TBODY>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western"><I>ConstantField</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">Hep3</P>
+				<P CLASS="western">Vector</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">The magnetic field that will be placed in the
+				region.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western"><I>Length</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD ROWSPAN=2 WIDTH=597>
+				<P CLASS="western">The physical extent of the region.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western"><I>Radius</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">double</P>
+			</TD>
+		</TR>
+	</TBODY>
+</TABLE>
+<H2 CLASS="western">FieldType RectangularField</H2>
+<P CLASS="western">Sets a constant magnetic field in a rectangular
+region.</P>
+<TABLE WIDTH=873 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=5 CELLSPACING=0>
+	<COL WIDTH=181>
+	<COL WIDTH=63>
+	<COL WIDTH=597>
+	<THEAD>
+		<TR VALIGN=TOP>
+			<TH WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Property</B></P>
+			</TH>
+			<TH WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Type</B></P>
+			</TH>
+			<TH WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Description</B></P>
+			</TH>
+		</TR>
+	</THEAD>
+	<TBODY>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western"><I>ConstantField</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">Hep3</P>
+				<P CLASS="western">Vector</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">The magnetic field that will be placed in the
+				region.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western"><I>Length</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD ROWSPAN=3 WIDTH=597>
+				<P CLASS="western">The physical extent of the region.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western"><I>Width</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">double</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western"><I>Height</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">double</P>
+			</TD>
+		</TR>
+	</TBODY>
+</TABLE>
+<H2 CLASS="western">FieldType Solenoid</H2>
+<P CLASS="western">G4MICE simulates solenoids using a series of
+current sheets. The field for each solenoid is written to a field map
+on a rectangular grid and can then be reused. The field from each
+current sheet is calculated using the formula for current sheets
+detailed in MUCOOL Note 281, <I>Modeling solenoids using coil, sheet
+and block conductors</I>.</P>
+<TABLE WIDTH=873 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=5 CELLSPACING=0>
+	<COL WIDTH=181>
+	<COL WIDTH=63>
+	<COL WIDTH=597>
+	<THEAD>
+		<TR VALIGN=TOP>
+			<TH WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Property</B></P>
+			</TH>
+			<TH WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Type</B></P>
+			</TH>
+			<TH WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Description</B></P>
+			</TH>
+		</TR>
+	</THEAD>
+	<TBODY>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western"><I>FileName</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">string</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">Read or write solenoid data to the filename.
+				If different modules have the same filename, G4MICE assumes they
+				are the same.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT>FieldMapMode</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT>string</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT>If set to Read, G4MICE will attempt
+				to read existing data from the FileName. If set to Write, G4MICE
+				will generate new data and write it to the FileName. If set to
+				Analytic, G4MICE will calculate fields directly without
+				interpolating. If set to WriteDynamic acts as in Write except the
+				grid extent and grid spacing at each point is chosen dynamically
+				to some tolerance defined in the FieldTolerance property. Takes
+				default from datacard SolDataFiles (Write).</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT><I>Length</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+			<TD ROWSPAN=4 WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT>Coil physical parameters. Only used
+				in Write/Analytic mode where they are mandatory.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT><I>Thickness</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT><I>InnerRadius</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT><I>CurrentDensity</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT>ZExtentFactor</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT>Field map extends to length +
+				ZExtentFactor*innerRadius in Write mode. Takes default from
+				datacard SolzMapExtendFactor (10.). Map size is chosen
+				dynamically in WriteDynamic mode.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT>RExtentFactor</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT>Field map extends to radius
+				RExtentFactor*innerRadius in Write mode. Takes default from
+				datacard SolrMapExtendFactor (2.018...). Avoid allowing grid
+				nodes to fall on sheets.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT>NumberOfZCoords</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT>int</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT>Number of coordinates in <I>z</I>
+				in field map grid in Write mode. Takes default from datacard
+				NumberNodesZGrid (500).</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT>NumberOfRCoords</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT>int</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT>Number of coordintes in <I>r</I> in
+				field map grid in Write mode. Takes default from datacard
+				NumberNodesRGrid (100).</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT>NumberOfSheets</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT>int</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT>Number of sheets used to calculate
+				the field. Takes default from datacard DefaultNumberOfSheets
+				(10).</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT><I>FieldTolerance </I>
+				</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT>Mandatory when FieldMapMode is
+				WriteDynamic. If field map mode is write dynamic, this datacard
+				controls the tolerance on errors in the field with which the
+				field grid and the grid extent will be chosen. 
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Interpolation</P>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Algorithm</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT>string</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT>Choose the interpolation algorithm.
+				Options are BiLinear for a linear interpolation in <I>r</I><SPAN STYLE="font-style: normal">
+				and </SPAN><I>z</I>, or LinearCubic  for a linear interpolation
+				in <I>r</I><SPAN STYLE="font-style: normal"> and a cubic spline
+				in </SPAN><I>z</I>. Default is LinearCubic.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">IsAmalgamated</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT>bool</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT>Set to 1 to add the coil to
+				CoilAmalgamtion parent field (see below).</P>
+			</TD>
+		</TR>
+	</TBODY>
+</TABLE>
+<H2 CLASS="western"></H2>
+<H2 CLASS="western" STYLE="page-break-before: always">FieldType
+FieldAmalgamation</H2>
+<P CLASS="western">During tracking, G4MICE stores a list of fields
+and for each one G4MICE checks to see if tracking is performed
+through a particular field map's bounding box. This can be slow if a
+large number of fields are present. One way to speed this up is to
+store contributions from many coils in a single CoilAmalgamation. A
+CoilAmalgamation searches through child modules for solenoids with
+PropertyBool IsAmalgamated set to true. If it finds such a coil, it
+will add the field generated by the solenoid to its own field map and
+disable the coil.</P>
+<TABLE WIDTH=873 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=5 CELLSPACING=0>
+	<COL WIDTH=181>
+	<COL WIDTH=63>
+	<COL WIDTH=597>
+	<THEAD>
+		<TR VALIGN=TOP>
+			<TH WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Property</B></P>
+			</TH>
+			<TH WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Type</B></P>
+			</TH>
+			<TH WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Description</B></P>
+			</TH>
+		</TR>
+	</THEAD>
+	<TBODY>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western"><I>Length</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">The Length of the field map generated by the
+				CoilAmalgamation.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT><I>RMax</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT>The maximum radius of the field map
+				generated by the CoilAmalgamation.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Interpolation</P>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Algorithm</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT>string</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT>Choose the interpolation algorithm.
+				Options are BiLinear for a linear interpolation in <I>r</I><SPAN STYLE="font-style: normal">
+				and </SPAN><I>z</I>, or LinearCubic  for a linear interpolation
+				in <I>r</I><SPAN STYLE="font-style: normal"> and a cubic spline
+				in </SPAN><I>z</I>. Default is LinearCubic.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT><I>ZStep</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+			<TD ROWSPAN=2 WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT>Step size of the field map
+				generated by the CoilAmalgamation.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT><I>RStep</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+		</TR>
+	</TBODY>
+</TABLE>
+<P CLASS="western" STYLE="margin-bottom: 0cm"><BR>
+</P>
+<H2 CLASS="western" STYLE="page-break-before: always">FieldType
+FastSolenoid</H2>
+<P CLASS="western" STYLE="font-style: normal">This is an alternative
+field model for solenoids that uses a power law expansion of the
+on-axis magnetic field and its derivatives, and an exponential
+fall-off for the fringe field (tanh).</P>
+<TABLE WIDTH=873 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=5 CELLSPACING=0>
+	<COL WIDTH=181>
+	<COL WIDTH=63>
+	<COL WIDTH=597>
+	<THEAD>
+		<TR VALIGN=TOP>
+			<TH WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Property</B></P>
+			</TH>
+			<TH WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Type</B></P>
+			</TH>
+			<TH WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Description</B></P>
+			</TH>
+		</TR>
+	</THEAD>
+	<TBODY>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western"><I>PeakField</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">Nominal peak field of the solenoid.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT><I>EFoldLength</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT>The fall-off length for the fringe
+				field.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT><I>CentreLength</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT>Nominal length for the peak field
+				region.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT><I>Order</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT>int</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT>Order to which the field will be
+				calculated.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT>FieldTolerance</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT>double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT>If positive, G4MICE will abort
+				tracking if a particle crosses through a field with estimated
+				error &gt; FieldTolerance. G4MICE estimates the error as the
+				field value calculated at highest order. Default is -1 (i.e.
+				inactive).</P>
+			</TD>
+		</TR>
+	</TBODY>
+</TABLE>
+<H2 CLASS="western">Phasing Models</H2>
+<P CLASS="western">G4MICE has a number of sophisticated models for
+phasing RF cavities. These powerful models can make setting up RF
+cavities with realistic fields both quick and easy.</P>
+<P CLASS="western">When CavityMode is Unphased, G4MICE attempts to
+phase the cavity itself. When using CavityMode Unphased G4MICE needs
+to know when particles enter, cross the middle, and leave cavities.
+This means that:</P>
+<UL>
+	<LI><P CLASS="western">The cavity must sit in a rectangular or
+	cylindrical physical volume.</P>
+	<LI><P CLASS="western">No other physical volumes may overlap or sit
+	within the physical volume of the cavity.</P>
+</UL>
+<P CLASS="western">If these conditions are not met the phasing
+algorithm is likely to fail.</P>
+<P CLASS="western">To phase a cavity, G4MICE builds a volume in the
+centre of the cavity that is used for phasing and then fires a
+reference particle through the system. Stochastic processes are
+always disabled during this process, while mean energy loss can be
+disabled using the datacard ReferenceEnergyLossModel. If a reference
+particle crosses a plane through the centre of a cavity, it sets the
+phase of the cavity to the time at which the particle crosses. 
+</P>
+<P CLASS="western">The field of the cavity during phasing is
+controlled by the property FieldDuringPhasing. There are four modes:</P>
+<UL>
+	<LI><P CLASS="western"><I>None</I>: Cavity fields are disabled
+	during phasing</P>
+	<LI><P CLASS="western"><I>Electrostatic</I>: An electrostatic field
+	with no positional dependence given by
+	PeakEField*sin(ReferenceParticlePhase) is enabled during phasing.</P>
+	<LI><P CLASS="western"><I>TimeVarying</I>: A standard time varying
+	field is applied during phasing, initially with arbitrary phase
+	relative to the reference particle. G4MICE uses a Newton-Raphson
+	method to find the appropriate reference phase iteratively, with
+	tolerance set by the datacard PhaseTolerance.</P>
+	<LI><P CLASS="western"><I>EnergyGainOptimised</I>: A standard time
+	varying field is applied during phasing, initially with arbitrary
+	phase and peak field relative to the reference particle. G4MICE uses
+	a 2D Newton-Raphson method to find the appropriate reference phase
+	and peak field iteratively, so that the reference particle crosses
+	the cavity centre with phase given by property
+	ReferenceParticlePhase and gains energy over the whole cavity given
+	by property EnergyGain with tolerances set by the datacards
+	PhaseTolerance and RFDeltaEnergyTolerance.</P>
+</UL>
+<H2 CLASS="western">Tracking Stability Around RF Cavities</H2>
+<P CLASS="western">Usually RF cavities have little or no fringe
+field, and this can lead to some instability in the tracking
+algorithms. When G4MICE makes a step into an RF cavity volume, the
+tracking algorithms tend to smooth out a field in a non-physical way.
+This can be prevented by either (i) making the step size rather small
+in the RF cavity or (ii) forcing G4MICE to stop tracking by adding a
+physical volume at the entrance of the RF cavity (a window, typically
+made of vacuum). Doing this should improve stability of tracking.</P>
+<H2 CLASS="western">FieldType PillBox</H2>
+<P CLASS="western">Sets a PillBox field in a particular region.
+G4MICE represents pillboxes using a sinusoidally varying TM010 pill
+box field, with non-zero field vector elements given by</P>
+<P CLASS="western"><IMG SRC="sources/cavity_bessel.gif" NAME="Object5" ALIGN=ABSMIDDLE HSPACE=10 WIDTH=210 HEIGHT=57></P>
+<P CLASS="western">Here J<SUB>n</SUB> are Bessel functions and k<SUB>r</SUB>
+is a constant. See, for example, SY Lee VI.1. All other fields are 0.</P>
+<TABLE WIDTH=873 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=5 CELLSPACING=0>
+	<COL WIDTH=181>
+	<COL WIDTH=63>
+	<COL WIDTH=597>
+	<THEAD>
+		<TR VALIGN=TOP>
+			<TH WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Property</B></P>
+			</TH>
+			<TH WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Type</B></P>
+			</TH>
+			<TH WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Description</B></P>
+			</TH>
+		</TR>
+	</THEAD>
+	<TBODY>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western"><I>Length</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">Length of the region in which the field is
+				present.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western"><I>CavityMode</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">string</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">Phasing mode of the cavity - options are
+				Phased, Unphased and Electrostatic.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western"><I>FieldDuringPhasing</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">string</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">Controls the field during cavity phasing –
+				options are None, Electrostatic, TimeVarying and
+				EnergyGainOptimised.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western"><I>EnergyGain</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">WhenFieldDuringPhasing is set to
+				EnergyGainOptimised, controls the peak electric field.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western"><I>Frequency</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">The cavity frequency.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western"><I>PeakEField</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">The peak field of the cavity. Not used when
+				the FieldDuringPhasing is EnergyGainOptimised.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western"><I>TimeDelay</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">In Phased mode the time delay (absolute time)
+				of the cavity.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" STYLE="font-style: normal">PhasingVolume</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">string</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">Set to SpecialVirtual to make the central
+				volume a special virtual.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" STYLE="font-style: normal">ReferenceParticle</P>
+				<P CLASS="western" STYLE="font-style: normal">Energy</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD ROWSPAN=2 WIDTH=597>
+				<P CLASS="western">In Electrostatic mode, G4MICE calculates the
+				peak field and the field the reference particle sees using a
+				combination of the reference particle energy, charge and phase.
+				Take defaults from datacards NominalKineticEnergy and MuonCharge 
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" STYLE="font-style: normal">ReferenceParticle</P>
+				<P CLASS="western" STYLE="font-style: normal">Charge</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">double</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" STYLE="font-style: normal">ReferenceParticle</P>
+				<P CLASS="western" STYLE="font-style: normal">Phase</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">G4MICE tries to phase the field so that the
+				reference particle crosses the cavity at ReferenceParticlePhase
+				(units are angular). 0<SUP>o</SUP> corresponds to no energy gain,
+				90<SUP>o</SUP> corresponds to operation on-crest. Default from
+				datacard rfAcclerationPhase.</P>
+			</TD>
+		</TR>
+	</TBODY>
+</TABLE>
+<H2 CLASS="western">FieldType RFFieldMap</H2>
+<P CLASS="western">Sets a cavity with an RF field map in a particular
+region. RFFieldMap uses the same phasing algorithm as described
+above.</P>
+<TABLE WIDTH=873 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=5 CELLSPACING=0>
+	<COL WIDTH=181>
+	<COL WIDTH=63>
+	<COL WIDTH=597>
+	<THEAD>
+		<TR VALIGN=TOP>
+			<TH WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Property</B></P>
+			</TH>
+			<TH WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Type</B></P>
+			</TH>
+			<TH WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Description</B></P>
+			</TH>
+		</TR>
+	</THEAD>
+	<TBODY>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western"><I>Length</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">Length of the region in which the field is
+				present.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western"><I>CavityMode</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">string</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">Phasing mode of the cavity - options are
+				Phased and Unphased. RFFieldMaps cannot operated in Electrostatic
+				mode.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western"><I>FieldDuringPhasing</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">string</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">Controls the field during cavity phasing –
+				options are None, Electrostatic, TimeVarying and
+				EnergyGainOptimised.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western"><I>EnergyGain</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">WhenFieldDuringPhasing is set to
+				EnergyGainOptimised, controls the peak electric field.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western"><I>Frequency</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">The cavity frequency.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western"><I>PeakEField</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">The peak field of the cavity. Not used when
+				the FieldDuringPhasing is EnergyGainOptimised.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western"><I>TimeDelay</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">In Phased mode the time delay (absolute time)
+				of the cavity.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" STYLE="font-style: normal">PhasingVolume</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">string</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">Set to SpecialVirtual to make the central
+				volume a special virtual.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" STYLE="font-style: normal">ReferenceParticle</P>
+				<P CLASS="western" STYLE="font-style: normal">Energy</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD ROWSPAN=2 WIDTH=597>
+				<P CLASS="western">In Electrostatic mode, G4MICE calculates the
+				peak. field and the field the reference particle sees using a
+				combination of the reference particle energy, charge and phase.
+				Take defaults from datacards NominalKineticEnergy and MuonCharge 
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" STYLE="font-style: normal">ReferenceParticle</P>
+				<P CLASS="western" STYLE="font-style: normal">Charge</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">double</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" STYLE="font-style: normal">ReferenceParticle</P>
+				<P CLASS="western" STYLE="font-style: normal">Phase</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">G4MICE tries to phase the field so that the
+				reference particle crosses the cavity at ReferenceParticlePhase
+				(units are angular). 0<SUP>o</SUP> corresponds to no energy gain,
+				90<SUP>o</SUP> corresponds to operation on-crest. Default from
+				datacard rfAcclerationPhase.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western"><I>FileName</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">string</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">The file name of the field map file.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western"><I>FileType</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">string</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">The file type of the field map. Only supported
+				option is SuperFishSF7.</P>
+			</TD>
+		</TR>
+	</TBODY>
+</TABLE>
+<H2 CLASS="western"></H2>
+<H2 CLASS="western" STYLE="page-break-before: always">FieldType
+Multipole</H2>
+<P CLASS="western">Creates a multipole of arbitrary order. Fields are
+generated using either a hard edged model, with no fringe fields at
+all; or an Enge model similar to ZGoubi and COSY. In the former case
+fields are calculated using a simple polynomial expansion. In the
+latter case fields are calculated using the polynomial expansion with
+an additional exponential drop off. Fields can be superimposed onto a
+bent coordinate system to generate a sector multipole with arbitrary
+fixed radius of curvature.</P>
+<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">Unlike most
+other field models in G4MICE, the zero position corresponds to the
+center of the entrance of the multipole; and the multipole extends in
+the +z direction.</P>
+<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">The method
+to define end fields is described in the section EndFieldTypes below</P>
+<TABLE WIDTH=873 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=5 CELLSPACING=0>
+	<COL WIDTH=182>
+	<COL WIDTH=62>
+	<COL WIDTH=597>
+	<THEAD>
+		<TR VALIGN=TOP>
+			<TH WIDTH=182>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Property</B></P>
+			</TH>
+			<TH WIDTH=62>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Type</B></P>
+			</TH>
+			<TH WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Description</B></P>
+			</TH>
+		</TR>
+	</THEAD>
+	<TBODY>
+		<TR VALIGN=TOP>
+			<TD WIDTH=182>
+				<P CLASS="western"><I>Pole</I></P>
+			</TD>
+			<TD WIDTH=62>
+				<P CLASS="western">int</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">The reference pole of the magnet. 1=dipole,
+				2=quadrupole, 3=sextupole etc.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=182>
+				<P CLASS="western"><I>Magnitude</I></P>
+			</TD>
+			<TD WIDTH=62>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">The field at the position (x,y,z) = (Width/2,
+				0, Length/2) in the multipole coordinate system. This corresponds
+				to the position at the edge of the field map at the centre of the
+				magnet in z. Note that this is mandatory in all cases except
+				where CurvatureModel is MomentumBased, when the BendingAngle is
+				used to calculate the peak (dipole) field instead.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=182>
+				<P CLASS="western"><I>Height</I></P>
+			</TD>
+			<TD WIDTH=62>
+				<P CLASS="western" STYLE="font-style: normal">double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">Height of the field region.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=182>
+				<P CLASS="western"><I>Width</I></P>
+			</TD>
+			<TD WIDTH=62>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">Width or delta radius of the field region.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=182>
+				<P CLASS="western"><I>Length</I></P>
+			</TD>
+			<TD WIDTH=62>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">Length of the field along the bent trajectory.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=182>
+				<P CLASS="western" STYLE="font-style: normal">EndFieldType</P>
+			</TD>
+			<TD WIDTH=62>
+				<P CLASS="western">string</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">Set to HardEdged to disable fringe fields. Set
+				to Enge or Tanh to use those models, as described elsewhere.
+				Default is HardEdged.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=182>
+				<P CLASS="western" STYLE="font-style: normal">CurvatureModel</P>
+			</TD>
+			<TD WIDTH=62>
+				<P CLASS="western">string</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">Choose the model for curvature. Straight
+				forces no curvature. Constant gives a constant radius of
+				curvature; StraightEnds gives a constant radius of curvature
+				along the length of the multipole with straight end fields beyond
+				this length. MomentumBased gives radius of curvature determined
+				by a momentum and a total bending angle.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=182>
+				<P CLASS="western" STYLE="font-style: normal">ReferenceCurvature</P>
+			</TD>
+			<TD WIDTH=62>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">Radius of curvature of the magnet in Constant
+				or StraightEnds mode. Set to 0 for a straight magnet. Default is
+				0.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=182>
+				<P CLASS="western" STYLE="font-style: normal">ReferenceMomentum</P>
+			</TD>
+			<TD WIDTH=62>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">Reference momentum used to calculate the
+				radius of curvature of a dipole in MomentumBased mode. Default is
+				0.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=182>
+				<P CLASS="western"><I>BendingAngle</I></P>
+			</TD>
+			<TD WIDTH=62>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">The angle used to calculate the radius of
+				curvature of a dipole in MomentumBased mode. Note that this is
+				mandatory in MomentumBased mode.</P>
+			</TD>
+		</TR>
+	</TBODY>
+</TABLE>
+<P CLASS="western" STYLE="margin-bottom: 0cm"><BR>
+</P>
+<H2 CLASS="western" STYLE="page-break-before: always">FieldType
+CombinedFunction</H2>
+<P CLASS="western">This creates superimposed dipole, quadrupole and
+sextupole fields with a common radius of curvature. The field is
+intended to mimic the first few terms in a multipole expansion of a
+field like</P>
+<P CLASS="western" ALIGN=CENTER><IMG SRC="sources/combined_function_bfield.gif" NAME="Object1" ALIGN=ABSMIDDLE HSPACE=10 WIDTH=181 HEIGHT=64></P>
+<P CLASS="western">The field index is a user defined parameter, while
+the dipole field and radius of curvature can either be defined
+directly by the user or defined in terms of a reference momentum and
+total bending angle. Fields are calculated as in the multipole field
+type defined above.</P>
+<TABLE WIDTH=873 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=5 CELLSPACING=0>
+	<COL WIDTH=182>
+	<COL WIDTH=62>
+	<COL WIDTH=597>
+	<THEAD>
+		<TR VALIGN=TOP>
+			<TH WIDTH=182>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Property</B></P>
+			</TH>
+			<TH WIDTH=62>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Type</B></P>
+			</TH>
+			<TH WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Description</B></P>
+			</TH>
+		</TR>
+	</THEAD>
+	<TBODY>
+		<TR VALIGN=TOP>
+			<TD WIDTH=182>
+				<P CLASS="western"><I>Pole</I></P>
+			</TD>
+			<TD WIDTH=62>
+				<P CLASS="western">int</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">The reference pole of the magnet. 1=dipole,
+				2=quadrupole, 3=sextupole etc.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=182>
+				<P CLASS="western"><I>BendingField</I></P>
+			</TD>
+			<TD WIDTH=62>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">The nominal dipole field <I>B</I><SUB><I>0</I></SUB>.
+				Note that this is mandatory in all cases except where
+				CurvatureModel is MomentumBased, when the BendingAngle and
+				ReferenceMomentum is used to calculate the  dipole field instead.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=182>
+				<P CLASS="western"><I>FieldIndex</I></P>
+			</TD>
+			<TD WIDTH=62>
+				<P CLASS="western" STYLE="font-style: normal">double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">The field index <I>k</I>.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=182>
+				<P CLASS="western"><I>Height</I></P>
+			</TD>
+			<TD WIDTH=62>
+				<P CLASS="western" STYLE="font-style: normal">double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">Height of the field region.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=182>
+				<P CLASS="western"><I>Width</I></P>
+			</TD>
+			<TD WIDTH=62>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">Width or delta radius of the field region.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=182>
+				<P CLASS="western"><I>Length</I></P>
+			</TD>
+			<TD WIDTH=62>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">Length of the field along the bent trajectory.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=182>
+				<P CLASS="western" STYLE="font-style: normal">EndFieldType</P>
+			</TD>
+			<TD WIDTH=62>
+				<P CLASS="western">string</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">Set to HardEdged to disable fringe fields. Set
+				to Enge or Tanh to use those models, as described elsewhere.
+				Default is HardEdged.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=182>
+				<P CLASS="western" STYLE="font-style: normal">CurvatureModel</P>
+			</TD>
+			<TD WIDTH=62>
+				<P CLASS="western">string</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">Choose the model for curvature. Straight
+				forces no curvature. Constant gives a constant radius of
+				curvature; StraightEnds gives a constant radius of curvature
+				along the length of the multipole with straight end fields beyond
+				this length. MomentumBased gives radius of curvature determined
+				by a momentum and a total bending angle.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=182>
+				<P CLASS="western" STYLE="font-style: normal">ReferenceCurvature</P>
+			</TD>
+			<TD WIDTH=62>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">Radius of curvature of the magnet in Constant
+				or StraightEnds mode. Set to 0 for a straight magnet. Default is
+				0.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=182>
+				<P CLASS="western" STYLE="font-style: normal">ReferenceMomentum</P>
+			</TD>
+			<TD WIDTH=62>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">Reference momentum used to calculate the
+				radius of curvature of a dipole in MomentumBased mode. Default is
+				0.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=182>
+				<P CLASS="western"><I>BendingAngle</I></P>
+			</TD>
+			<TD WIDTH=62>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">The angle used to calculate the radius of
+				curvature of a dipole in MomentumBased mode. Note that this is
+				mandatory in MomentumBased mode.</P>
+			</TD>
+		</TR>
+	</TBODY>
+</TABLE>
+<H2 CLASS="western" STYLE="page-break-before: always">EndFieldTypes</H2>
+<P CLASS="western">In the absence of current sources, t<SPAN STYLE="font-style: normal">he
+magnetic field can be calculated from a scalar potential using the
+standard relation</SPAN></P>
+<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">				<IMG SRC="sources/div_v.gif" NAME="Object4" ALIGN=ABSMIDDLE HSPACE=10 WIDTH=87 HEIGHT=30></P>
+<P CLASS="western">The scalar magnetic potential of the n<SUP>th</SUP>-order
+multipole field is given by</P>
+<P CLASS="western" ALIGN=LEFT>				<IMG SRC="sources/quad_scalar_mag_potential.gif" NAME="Object2" ALIGN=ABSMIDDLE HSPACE=10 WIDTH=430 HEIGHT=85></P>
+<P CLASS="western" ALIGN=LEFT>where <I>G(s)</I><SPAN STYLE="font-style: normal">
+is either the double Enge function,</SPAN></P>
+<P CLASS="western" ALIGN=LEFT><SPAN STYLE="font-style: normal">				<IMG SRC="sources/double_enge.gif" NAME="Object8" ALIGN=ABSMIDDLE HSPACE=10 WIDTH=361 HEIGHT=28></SPAN></P>
+<P CLASS="western" ALIGN=LEFT><SPAN STYLE="font-style: normal">with</SPAN></P>
+<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">				<IMG SRC="sources/enge_function.gif" NAME="Object3" ALIGN=ABSMIDDLE HSPACE=10 WIDTH=342 HEIGHT=62></P>
+<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">or G(s) is
+the double tanh function,</P>
+<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">				<IMG SRC="sources/double_tanh.gif" NAME="Object9" ALIGN=ABSMIDDLE HSPACE=10 WIDTH=402 HEIGHT=28></P>
+<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal">and <I>(r,
+y, s)</I> is the position vector in the rotating coordinate system.
+Note that here s is the distance from the nominal end of the field
+map.</P>
+<TABLE WIDTH=873 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=5 CELLSPACING=0>
+	<COL WIDTH=182>
+	<COL WIDTH=62>
+	<COL WIDTH=597>
+	<THEAD>
+		<TR VALIGN=TOP>
+			<TH WIDTH=182>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Property</B></P>
+			</TH>
+			<TH WIDTH=62>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Type</B></P>
+			</TH>
+			<TH WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Description</B></P>
+			</TH>
+		</TR>
+	</THEAD>
+	<TBODY>
+		<TR VALIGN=TOP>
+			<TD WIDTH=182>
+				<P CLASS="western" STYLE="font-style: normal">EndFieldType</P>
+			</TD>
+			<TD WIDTH=62>
+				<P CLASS="western">string</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">Set to HardEdged to disable fringe fields. Set
+				to Enge or Tanh to use those models, as described elsewhere.
+				Default is HardEdged.</P>
+			</TD>
+		</TR>
+		<TR>
+			<TD COLSPAN=3 WIDTH=861 VALIGN=TOP>
+				<P CLASS="western"><I>The following properties are used for
+				EndFieldType Tanh</I></P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=182>
+				<P CLASS="western" STYLE="font-style: normal">EndLength</P>
+			</TD>
+			<TD WIDTH=62>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">Set the <FONT FACE="Standard Symbols L">l</FONT>
+				parameter that defines the rapidity of the field fall off.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=182>
+				<P CLASS="western" STYLE="font-style: normal">CentreLength</P>
+			</TD>
+			<TD WIDTH=62>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">Set the <I>x</I><SUB><I>0</I></SUB> parameter
+				that defines the length of the flat field region.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=182>
+				<P CLASS="western" STYLE="font-style: normal">MaxEndPole</P>
+			</TD>
+			<TD WIDTH=62>
+				<P CLASS="western">int</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">Set the maximum pole that will be calculated –
+				should be larger than the multipole pole.</P>
+			</TD>
+		</TR>
+		<TR>
+			<TD COLSPAN=3 WIDTH=861 VALIGN=TOP>
+				<P CLASS="western"><I>The following properties are used for
+				EndFieldType Enge</I></P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=182>
+				<P CLASS="western" STYLE="font-style: normal">EndLength</P>
+			</TD>
+			<TD WIDTH=62>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">Set the <FONT FACE="Standard Symbols L">l</FONT>
+				parameter that defines the rapidity of the field fall off.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=182>
+				<P CLASS="western" STYLE="font-style: normal">CentreLength</P>
+			</TD>
+			<TD WIDTH=62>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">Set the <I>x</I><SUB><I>0</I></SUB> parameter
+				that defines the length of the flat field region.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=182>
+				<P CLASS="western" STYLE="font-style: normal">MaxEndPole</P>
+			</TD>
+			<TD WIDTH=62>
+				<P CLASS="western">int</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">Set the maximum pole that will be calculated –
+				should be larger than the multipole pole.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=182>
+				<P CLASS="western" STYLE="font-style: normal">Enge1</P>
+			</TD>
+			<TD WIDTH=62>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD ROWSPAN=4 WIDTH=597>
+				<P CLASS="western">Set the parameters C<SUB>i</SUB> as defined in
+				the Enge function above.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=182>
+				<P CLASS="western" STYLE="font-style: normal">Enge2</P>
+			</TD>
+			<TD WIDTH=62>
+				<P CLASS="western">double</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=182>
+				<P CLASS="western" STYLE="font-style: normal">...</P>
+			</TD>
+			<TD WIDTH=62>
+				<P CLASS="western">double</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=182>
+				<P CLASS="western" STYLE="font-style: normal">EngeN</P>
+			</TD>
+			<TD WIDTH=62>
+				<P CLASS="western">double</P>
+			</TD>
+		</TR>
+	</TBODY>
+</TABLE>
+<H2 CLASS="western">FieldType MagneticFieldMap</H2>
+<P CLASS="western">Reads or writes a magnetic field map in a
+particular region. Two sorts of field maps are supported; either a 2d
+field map, in which cylindrical symmetry is assumed, or a 3d field
+map. 
+</P>
+<P CLASS="western">For 2d field maps, G4MICE reads or writes a file
+that contains information about the radial and longitudinal field
+components. This is intended for solenoidal field maps where only
+radial and longitudinal field components are present. Note that in
+write mode, G4MICE <SPAN STYLE="font-style: normal">assumes
+cylindrical symmetry of the fields. In this case, G4MICE writes the </SPAN><I>x</I><SPAN STYLE="font-style: normal">
+and </SPAN><I>z</I><SPAN STYLE="font-style: normal"> components of
+the magnetic field at points on a grid in </SPAN><I>x</I><SPAN STYLE="font-style: normal">
+and </SPAN><I>z</I><SPAN STYLE="font-style: normal">. Fields with an
+electric component are excluded from this summation.</SPAN></P>
+<P CLASS="western" STYLE="font-style: normal">For 3d field maps,
+G4MICE reads a file that contains the position and field in cartesian
+coordinates and performs a linear interpolation. This requires quite
+large field map files; the file size can be slightly reduced by using
+certain symmetries, as described below. It is currently not possible
+to write 3d field maps.</P>
+<TABLE WIDTH=873 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=5 CELLSPACING=0>
+	<COL WIDTH=181>
+	<COL WIDTH=63>
+	<COL WIDTH=597>
+	<THEAD>
+		<TR VALIGN=TOP>
+			<TH WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Property</B></P>
+			</TH>
+			<TH WIDTH=63>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Type</B></P>
+			</TH>
+			<TH WIDTH=597>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Description</B></P>
+			</TH>
+		</TR>
+	</THEAD>
+	<TBODY>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western"><I>FieldMapMode</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">string</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">Set to Read to read a field map; and Write to
+				write a field map.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western"><I>FileName</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">string</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">The file name that is used for reading or
+				writing.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" STYLE="font-style: normal">FileType</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western" STYLE="font-style: normal">string</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">The file format. Supported options in Read
+				mode are g4micetext, g4micebinary, g4beamline, icool, g4bl3dGrid.
+				Only g4micetext is supported in Write mode. Default is
+				g4micetext.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" STYLE="font-style: normal">Symmetry</P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western" STYLE="font-style: normal">string</P>
+			</TD>
+			<TD WIDTH=597>
+				<P CLASS="western">Symmetry option for g4bl3dGrid file type.
+				Options are None, Dipole or Quadrupole. None uses the field map
+				as is, while Dipole and Quadrupole reflect <SPAN STYLE="font-style: normal">the
+				octant between the positive </SPAN><I>x</I><SPAN STYLE="font-style: normal">,
+				</SPAN><I>y</I><SPAN STYLE="font-style: normal"> and </SPAN><I><SPAN STYLE="text-decoration: none">z</SPAN></I><SPAN STYLE="font-style: normal"><SPAN STYLE="text-decoration: none">
+				axes</SPAN></SPAN> to give an appropriate field for a dipole or
+				quadrupole.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western"><I>ZStep</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD ROWSPAN=2 WIDTH=597>
+				<P CLASS="western">Step size in <I>z</I> and <I>r</I>. Mandatory
+				in Write mode but not used in Read mode (where step size comes
+				from the map file).</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western"><I>RStep</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">double</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western"><I>ZMin</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD ROWSPAN=4 WIDTH=597>
+				<P CLASS="western">Upper and lower bounds in <I>z</I> and <I>r</I>.
+				Mandatory in Write mode but not used in Read mode (where
+				boundaries come from the map file).</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western"><I>ZMax</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">double</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western"><I>RMin</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">double</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western"><I>RMax</I></P>
+			</TD>
+			<TD WIDTH=63>
+				<P CLASS="western">double</P>
+			</TD>
+		</TR>
+	</TBODY>
+</TABLE>
+<P CLASS="western" STYLE="font-style: normal">Some file formats are
+described below. I am working towards making the file format more
+generic and hence possibly easier to use, but backwards compatibility
+will hopefully be maintained. 
+</P>
+<H3 CLASS="western" STYLE="font-style: normal; page-break-before: always">
+g4micetext Field Map Format</H3>
+<P CLASS="western" STYLE="font-style: normal">The native field map
+format used by g4mice in text mode is described below.</P>
+<P CLASS="western" STYLE="margin-left: 1.01cm"><FONT FACE="Courier, monospace"><FONT SIZE=2><SPAN STYLE="font-style: normal">#
+GridType = Uniform N = </SPAN><SPAN STYLE="font-style: normal"><B>number_rows</B></SPAN></FONT></FONT></P>
+<P CLASS="western" STYLE="margin-left: 1.01cm"><FONT FACE="Courier, monospace"><FONT SIZE=2><SPAN STYLE="font-style: normal">#
+Z1 = </SPAN><SPAN STYLE="font-style: normal"><B>z_start</B></SPAN><SPAN STYLE="font-style: normal">
+Z2 = </SPAN><SPAN STYLE="font-style: normal"><B>z_end</B></SPAN><SPAN STYLE="font-style: normal">
+dZ = </SPAN><SPAN STYLE="font-style: normal"><B>z_step</B></SPAN></FONT></FONT></P>
+<P CLASS="western" STYLE="margin-left: 1.01cm"><FONT FACE="Courier, monospace"><FONT SIZE=2><SPAN STYLE="font-style: normal">#
+R1 = </SPAN><SPAN STYLE="font-style: normal"><B>r_start</B></SPAN><SPAN STYLE="font-style: normal">
+R2 = </SPAN><SPAN STYLE="font-style: normal"><B>r_end</B></SPAN><SPAN STYLE="font-style: normal">
+dR = </SPAN><SPAN STYLE="font-style: normal"><B>r_step</B></SPAN></FONT></FONT></P>
+<P CLASS="western" STYLE="margin-left: 1.01cm; font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2><B>Bz_Values	Br_Values</B></FONT></FONT></P>
+<P CLASS="western" STYLE="margin-left: 1.01cm; font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2><B>...		...</B></FONT></FONT></P>
+<P CLASS="western" STYLE="margin-left: 1.01cm; font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2><B>&lt;Repeat
+as necessary&gt;</B></FONT></FONT></P>
+<P CLASS="western" STYLE="font-style: normal">In this mode, field
+maps are represented by field values on a regular 2d grid that is
+assumed to have solenoidal symmetry, i.e. cylindrical symmetry with
+no tangential component.</P>
+<TABLE WIDTH=873 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=5 CELLSPACING=0>
+	<COL WIDTH=181>
+	<COL WIDTH=114>
+	<COL WIDTH=546>
+	<THEAD>
+		<TR VALIGN=TOP>
+			<TH WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Name</B></P>
+			</TH>
+			<TH WIDTH=114>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Type</B></P>
+			</TH>
+			<TH WIDTH=546>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Description</B></P>
+			</TH>
+		</TR>
+	</THEAD>
+	<TBODY>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" STYLE="font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2><B>number_rows</B></FONT></FONT></P>
+			</TD>
+			<TD WIDTH=114>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=546>
+				<P CLASS="western">Number of rows in the field map file.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" STYLE="font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2><B>z_start</B></FONT></FONT></P>
+			</TD>
+			<TD WIDTH=114>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=546>
+				<P CLASS="western">Position of the grid start along the <I>z</I>
+				axis.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" STYLE="font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2><B>z_end</B></FONT></FONT></P>
+			</TD>
+			<TD WIDTH=114>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=546>
+				<P CLASS="western">Position of the grid end along the <I>z</I>
+				axis.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" STYLE="font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2><B>z_step</B></FONT></FONT></P>
+			</TD>
+			<TD WIDTH=114>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=546>
+				<P CLASS="western">Step size in <I>z</I>.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" STYLE="font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2><B>r_start</B></FONT></FONT></P>
+			</TD>
+			<TD WIDTH=114>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=546>
+				<P CLASS="western">Position of the grid start along the <I>r</I>
+				axis.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" STYLE="font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2><B>r_end</B></FONT></FONT></P>
+			</TD>
+			<TD WIDTH=114>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=546>
+				<P CLASS="western">Position of the grid end along the <I>r</I>
+				axis.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" STYLE="font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2><B>r_step</B></FONT></FONT></P>
+			</TD>
+			<TD WIDTH=114>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=546>
+				<P CLASS="western">Step size in <I>r</I>.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" STYLE="font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2><B>Bz_Values</B></FONT></FONT></P>
+			</TD>
+			<TD WIDTH=114>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=546>
+				<P CLASS="western"><I>Bz</I> field value.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" STYLE="font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2><B>Br_Values</B></FONT></FONT></P>
+			</TD>
+			<TD WIDTH=114>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=546>
+				<P CLASS="western"><I>Br</I> field value.</P>
+			</TD>
+		</TR>
+	</TBODY>
+</TABLE>
+<H3 CLASS="western" STYLE="font-style: normal">g4bl3dGrid Field Map
+Format</H3>
+<P CLASS="western" STYLE="font-style: normal">The file format for 3d
+field maps is a slightly massaged version of a file format used by
+another code, g4beamline. In this mode, field maps are represented by
+field values on a regular cartesian 3d grid.</P>
+<P CLASS="western" STYLE="margin-left: 1.03cm; font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2><B>number_x_points
+number_y_points number_z_points global_scale</B></FONT></FONT></P>
+<P CLASS="western" STYLE="margin-left: 1.03cm; font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2>1
+X [<B>x_scale</B>]</FONT></FONT></P>
+<P CLASS="western" STYLE="margin-left: 1.03cm; font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2>2
+Y [<B>y_scale</B>]</FONT></FONT></P>
+<P CLASS="western" STYLE="margin-left: 1.03cm; font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2>3
+Z [<B>z_scale</B>]</FONT></FONT></P>
+<P CLASS="western" STYLE="margin-left: 1.03cm; font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2>4
+BX [<B>bx_scale</B>]</FONT></FONT></P>
+<P CLASS="western" STYLE="margin-left: 1.03cm; font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2>5
+BY [<B>by_scale</B>]</FONT></FONT></P>
+<P CLASS="western" STYLE="margin-left: 1.03cm; font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2>6
+BZ [<B>bz_scale</B>]</FONT></FONT></P>
+<P CLASS="western" STYLE="margin-left: 1.03cm; font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2>0</FONT></FONT></P>
+<P CLASS="western" STYLE="margin-left: 1.03cm; font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2><B>X_Values
+	Y_Values	Z_Values	Bx_values	By_values	Bz_values</B></FONT></FONT></P>
+<P CLASS="western" STYLE="margin-left: 1.03cm; font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2><B>...		...		...		...		...		...</B></FONT></FONT></P>
+<P CLASS="western" STYLE="margin-left: 1.01cm; font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2><B>&lt;Repeat
+as necessary&gt;</B></FONT></FONT></P>
+<P CLASS="western" STYLE="font-style: normal">where text in bold
+indicates a value described in the following table</P>
+<TABLE WIDTH=873 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=5 CELLSPACING=0>
+	<COL WIDTH=181>
+	<COL WIDTH=114>
+	<COL WIDTH=546>
+	<THEAD>
+		<TR VALIGN=TOP>
+			<TH WIDTH=181>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Name</B></P>
+			</TH>
+			<TH WIDTH=114>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Type</B></P>
+			</TH>
+			<TH WIDTH=546>
+				<P CLASS="western" ALIGN=LEFT STYLE="font-style: normal"><B>Description</B></P>
+			</TH>
+		</TR>
+	</THEAD>
+	<TBODY>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" STYLE="font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2><B>number_x_points</B></FONT></FONT></P>
+			</TD>
+			<TD WIDTH=114>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=546>
+				<P CLASS="western">Number of points along x axis.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" STYLE="font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2><B>number_y_points</B></FONT></FONT></P>
+			</TD>
+			<TD WIDTH=114>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=546>
+				<P CLASS="western">Number of points along y axis.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" STYLE="font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2><B>number_z_points</B></FONT></FONT></P>
+			</TD>
+			<TD WIDTH=114>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=546>
+				<P CLASS="western">Number of points along z axis.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" STYLE="font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2><B>global_scale</B></FONT></FONT></P>
+			</TD>
+			<TD WIDTH=114>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=546>
+				<P CLASS="western">Global scale factor applied to all x, y, z and
+				Bx, By, Bz values.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" STYLE="font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2><B>x_scale</B></FONT></FONT></P>
+			</TD>
+			<TD WIDTH=114>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=546>
+				<P CLASS="western">Scale factor applied to all x values.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" STYLE="font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2><B>y_scale</B></FONT></FONT></P>
+			</TD>
+			<TD WIDTH=114>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=546>
+				<P CLASS="western">Scale factor applied to all y values.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" STYLE="font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2><B>z_scale</B></FONT></FONT></P>
+			</TD>
+			<TD WIDTH=114>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=546>
+				<P CLASS="western">Scale factor applied to all z values.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" STYLE="font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2><B>bx_scale</B></FONT></FONT></P>
+			</TD>
+			<TD WIDTH=114>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=546>
+				<P CLASS="western">Scale factor applied to all Bx values.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" STYLE="font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2><B>by_scale</B></FONT></FONT></P>
+			</TD>
+			<TD WIDTH=114>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=546>
+				<P CLASS="western">Scale factor applied to all By values.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" STYLE="font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2><B>bz_scale</B></FONT></FONT></P>
+			</TD>
+			<TD WIDTH=114>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=546>
+				<P CLASS="western">Scale factor applied to all Bz values.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" STYLE="font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2><B>X_Values</B></FONT></FONT></P>
+			</TD>
+			<TD WIDTH=114>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=546>
+				<P CLASS="western">List (column) of each x value.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" STYLE="font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2><B>Y_Values</B></FONT></FONT></P>
+			</TD>
+			<TD WIDTH=114>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=546>
+				<P CLASS="western">List (column) of each y value.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" STYLE="font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2><B>Z_Values</B></FONT></FONT></P>
+			</TD>
+			<TD WIDTH=114>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=546>
+				<P CLASS="western">List (column) of each z value.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" STYLE="font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2><B>Bx_Values</B></FONT></FONT></P>
+			</TD>
+			<TD WIDTH=114>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=546>
+				<P CLASS="western">List (column) of each Bx value.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" STYLE="font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2><B>By_Values</B></FONT></FONT></P>
+			</TD>
+			<TD WIDTH=114>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=546>
+				<P CLASS="western">List (column) of each By value.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=181>
+				<P CLASS="western" STYLE="font-style: normal"><FONT FACE="Courier, monospace"><FONT SIZE=2><B>Bz_Values</B></FONT></FONT></P>
+			</TD>
+			<TD WIDTH=114>
+				<P CLASS="western">double</P>
+			</TD>
+			<TD WIDTH=546>
+				<P CLASS="western">List (column) of each Bz value.</P>
+			</TD>
+		</TR>
+	</TBODY>
+</TABLE>
+<P CLASS="western" STYLE="margin-bottom: 0cm; font-style: normal"><BR>
+</P>
+</BODY>
+</HTML>

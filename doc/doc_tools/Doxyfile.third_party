@@ -30,7 +30,7 @@ PROJECT_NUMBER         =
 # If a relative path is entered, it will be relative to the location 
 # where doxygen was started. If left blank the current directory will be used.
 
-OUTPUT_DIRECTORY       = doc
+OUTPUT_DIRECTORY       = $(MAUS_ROOT_DIR)/doc/doxygen_third_party/
 
 # If the CREATE_SUBDIRS tag is set to YES, then doxygen will create 
 # 4096 sub-directories (in 2 levels) under the output directory of each output 
@@ -330,25 +330,25 @@ SORT_BY_SCOPE_NAME     = YES
 # disable (NO) the todo list. This list is created by putting \todo 
 # commands in the documentation.
 
-GENERATE_TODOLIST      = YES
+GENERATE_TODOLIST      = NO
 
 # The GENERATE_TESTLIST tag can be used to enable (YES) or 
 # disable (NO) the test list. This list is created by putting \test 
 # commands in the documentation.
 
-GENERATE_TESTLIST      = YES
+GENERATE_TESTLIST      = NO
 
 # The GENERATE_BUGLIST tag can be used to enable (YES) or 
 # disable (NO) the bug list. This list is created by putting \bug 
 # commands in the documentation.
 
-GENERATE_BUGLIST       = YES
+GENERATE_BUGLIST       = NO
 
 # The GENERATE_DEPRECATEDLIST tag can be used to enable (YES) or 
 # disable (NO) the deprecated list. This list is created by putting 
 # \deprecated commands in the documentation.
 
-GENERATE_DEPRECATEDLIST= YES
+GENERATE_DEPRECATEDLIST= NO
 
 # The ENABLED_SECTIONS tag can be used to enable conditional 
 # documentation sections, marked by \if sectionname ... \endif.
@@ -427,7 +427,7 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                  = commonCpp
+INPUT                  = $(MAUS_ROOT_DIR)/third_party
 
 # If the value of the INPUT tag contains directories, you can use the 
 # FILE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp 
@@ -812,7 +812,7 @@ RTF_EXTENSIONS_FILE    =
 # If the GENERATE_MAN tag is set to YES (the default) Doxygen will 
 # generate man pages
 
-GENERATE_MAN           = YES
+GENERATE_MAN           = NO
 
 # The MAN_OUTPUT tag is used to specify where the man pages will be put. 
 # If a relative path is entered the value of OUTPUT_DIRECTORY will be 
@@ -1003,7 +1003,7 @@ TAGFILES               =
 # When a file name is specified after GENERATE_TAGFILE, doxygen will create 
 # a tag file that is based on the input files it reads.
 
-GENERATE_TAGFILE       = doc/commonCpp.tag
+GENERATE_TAGFILE       = $(MAUS_ROOT_DIR)/doc/doxygen_third_party/third_party.tag
 
 # If the ALLEXTERNALS tag is set to YES all external classes will be listed 
 # in the class index. If set to NO only the inherited external classes 
@@ -1148,7 +1148,7 @@ MAX_DOT_GRAPH_DEPTH    = 0
 # generate a legend page explaining the meaning of the various boxes and 
 # arrows in the dot generated graphs.
 
-GENERATE_LEGEND        = YES
+GENERATE_LEGEND        = NO
 
 # If the DOT_CLEANUP tag is set to YES (the default) Doxygen will 
 # remove the intermediate dot files that are used to generate 

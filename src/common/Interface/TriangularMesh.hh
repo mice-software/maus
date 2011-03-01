@@ -2,63 +2,106 @@
 #define TriangularMesh_hh
 
 #include "Mesh.hh"
+
+#include <map>
 #include <list>
 #include <string>
 #include <math.h>
 
-//Creates a Triangulation of a set of points in dim dimensions
+//! Creates a Triangulation of a set of points in dim dimensions
+
+//! TriangularMesh is a set of functions to work with triangular meshing of a set of arbitrary points. 
+//! For 2D stuff, we can use exact delaunay triangulation to make the mesh. For higher dimensions (or 
+//! 2D) we import either from Voronoi.hh or read output from QHull code.
+//! 
+//! Triangular mesh is made up of points which make a simplex (triangle) which make a hull (arbitrary 
+//! polygon). So Point, Simplex, Hull are also subclasses of TriangularMesh.
+//! 
+//! The triangulation is represented in a hierarchy structure, where we have big triangles containing
+//! little triangles. Note that the relationship is not a simple tree structure - we can have branches
+//! joining and unjoining. That's just in the nature of the Delaunay algorithm.
+//!
+
 class TriangularMesh : public Mesh
 {
 public:
 	class Point; //n-dimensional point
 	class Simplex; //n-dimensional triangle
 	class Hull; //n-dimensional polygon
-	//read in data from a qhull output file
+	/// Read in data from a qhull output file with the specified name
+  //! QHullFileType can be one of "points", "mesh", "tessellation"
 	TriangularMesh(std::string qHullFileName, std::string qHullFileType);
-	//points is 2d array points[numberOfPoints][nDim] TriangularMesh takes ownership of points memory
+	/// Build a mesh from a set of points.
+  //! Points is 2d array points[numberOfPoints][nDim] where nDim is the dimension of the space in which
+  //! the meshing takes place. TriangularMesh takes ownership of points's memory. gridMin and gridMax
+  //! are arrays of length nDim that contain the upper and lower corner of the grid.
 	TriangularMesh(int numberOfPoints, int numberOfDimensions, double ** points, double* gridMin, double* gridMax);
-	//collect the points and write input for qhull to qHullFileName
+	/// Collect the points and write input for qhull to qHullFileName
+  //! qhull input is written to qHullFileName. thePoints is a 2d array with size 
+  //! thePoints[numberOfPoints][numberOfDimensions] where nDim is the dimension of each point.
 	TriangularMesh(std::string qHullFileName, int numberOfPoints, int numberOfDimensions, double ** thePoints);
+  /// Destructor
 	~TriangularMesh();
-	//Begin and End of the mesh for stdlib-style iteration
+	/// Begin of the mesh for stdlib-style iteration
 	Mesh::Iterator Begin() const {return Mesh::Iterator(std::vector<int>(1,0), this);}
+	/// End of the mesh for stdlib-style iteration
 	Mesh::Iterator End()   const {return Mesh::Iterator(std::vector<int>(1,points.size()), this);}
 
-	//QHull Interface
-	//Read
+  //QHull Interface
+	/// Read just a list of points written in QHull style
 	void            ReadPointsFromQHull(std::string fileName); //read in a list of points
-	void            ReadMeshFromQHull  (std::string fileName); //read in a triangulation e.g. from qdelaunay i < inp > out
+	/// Read a mesh (points and neighbours) written in QHull style
+  //! Generate the list using  e.g. qdelaunay i < inp > out.
+	void            ReadMeshFromQHull  (std::string fileName); //read in a triangulation
+	/// Write a list of just points in QHull style
 	void            WriteQHullInput    (std::string fileName); //write a list of points
+	/// Read in a tesselation of hulls written in QHull style
+  //! Generate the list using e.g. qvoronoi o < inp > out
 	void            ReadTessFromQHull  (std::string fileName); //read in a tesselation of hulls e.g. from qvoronoi o < inp > out
 
-	//Position accessors
+  /// Get the dimension of points on the mesh
 	inline int      PositionDimension() const {return nDims;} //dimension of the mesh
+  /// Get the position of mesh point corresponding to iterator it
 	void            Position(const Mesh::Iterator& it, double * position) const;
-	static void     BarycentricCoordinates(Point& test, Point& apex, Point& end0, Point& end1, double coords[2]);
+  /// 2D only - convert test to barycentric coordinates in triangle (apex,end0,end1) and put resulting coordinates in coords
+	static void     BarycentricCoordinates(const Point& test, const Point& apex, const Point& end0, const Point& end1, double coords[2]);
 
-	//Data reads
+  /// Get the list of all points
 	std::vector< Point* >    GetPoints()    const {return points;}
+  /// Get the list of all simplices - note this only returns "leaf" simplexes, i.e. those with no children in the mesh
 	std::list  < Simplex* >  GetSimplices() const;
+  /// Get a vector of all convex hulls
 	std::vector< Hull* >     GetHulls()     const {return hulls;}
 
-	//Data writes
-	//Set all points from std::vector<double*>
-	void                     SetPoints( std::vector< double* > points );
-	//Add or remove individual Simplex
-	//nb this should be called by simplex and is used for memory management
-	//to add an arbitrary simplex to the triangulation use simplices.insert()
+	/// Add individual Simplex
+	/// nb this should be called by simplex and is used for memory management
+	/// to add an arbitrary simplex to the triangulation use simplices.insert()
 	void                     AddSimplex   (Simplex* tri) {allSimplices.push_back(tri);}
+	/// Remove individual Simplex
+	/// nb this should be called by simplex and is used for memory management
+	/// to add an arbitrary simplex to the triangulation use simplices.insert()
 	void                     RemoveSimplex(Simplex* tri);
-	//Add a point - I now control memory allocated to point
+  /// Dumb add a point; this will add a point but does not guarantee anything about nearest neighbours
+  /// so you can end up with very long thin triangles
 	void                     AddPoint_NoChecking(double * point); //Make triangles but don't check them - 2D only (I think)
-	void                     AddPoint_Delaunay(double * point);   //Delaunay algorithm - 2D only 
+  /// Clever add a point; this will add a point and then check that connecting points are indeed
+  /// "nearest neighbours" so that the triangulation is well conditioned for e.g. numerical
+  /// interpolation. For now this only works in 2D
+	void                     AddPoint_Delaunay  (double * point);   //Delaunay algorithm - 2D only 
+  /// Add a point but don't change the simplex set up... so point won't be included in the
+  /// mesh properly.
 	void                     AddPoint_NoTriangulation(double * point); //no triangulation
 
-  //Inherited from Mesh; performs deep copy
+  /// Find the points connected to point by looking at connecting simplices
+  std::vector<Point*>      ConnectedPoints(Point* point);
+  /// Deep copy of the mesh (obeying inheritance tree) 
   Mesh*          Clone() {return new TriangularMesh(*this);}
-  Mesh*          Dual()  {return NULL;} //non-trivial and not implemented
+  /// Not implemented - returns NULL
+  Mesh*          Dual()  {return NULL;}
+  /// Convert iterator it to an integer, such that Begin() gives 0 and End() gives the length of the Mesh
   int            ToInteger(const Mesh::Iterator& it) const {return it._state[0];}
-  Mesh::Iterator Nearest  (const double* nearest)    const {return Begin();} //non-trivial and not implemented yet
+  /// Not implemented - returns Mesh::Begin()
+  Mesh::Iterator Nearest  (const double* nearest)    const {return Begin();}
 
 protected:
 	Mesh::Iterator& AddEquals(Mesh::Iterator& lhs, int difference) const {lhs._state[0] += difference; return lhs;}
@@ -108,7 +151,7 @@ public:
 	//recursively search for leaf
 	Simplex&              FindLeaf(Point & test);
 	std::list<Simplex*>   GetLeaves();
-	bool                   IsLeaf()               const {return f_children.size()==0;}
+	bool                  IsLeaf()               const {return f_children.size()==0;}
 
 	void    AddPoint(Point& test);
 	void    AddPointNoChecking(Point& newPoint);

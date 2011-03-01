@@ -1,0 +1,92 @@
+#!/usr/bin/perl
+
+use strict;
+use FileHandle;
+
+#Algorithm for extracting documentation from datacards. Somewhat shonky but better than nothing
+#Only reads in data between $docBoundsIn[0] and $docBoundsIn[1]
+#Algorithm is to 
+#(i)   take text between $formatOpeningIn[$i] and $formatClosingIn[$i]; 
+#(ii)  do a regular expression find and replace of $replaceIn[$i] to $replaceOut[$i]
+#(iii) print it into a text file, adding prefix and suffix $formatOpeningOut[$i] and $formatClosingOut[$i]
+#This has been set up to produce an html table in this way with every datacard named, type and default value listed, and any comments extracted as notes
+
+
+#location of datacards file
+my $headerInfo      = "<html><header><title>Datacard Documentation</title></header>\n".
+                      "<body text=\"#000000\" bgcolor=\"#DEE1F5\" link=\"#0000EE\" vlink=\"#551A8B\" alink=\"#FF0000\"><h1><font color=\"#FF0000\">Datacard Documentation</font></h1>\n".
+                      "<p>G4MICE applications are controlled by a datacard file invoked on the command line when an application is run, for example by typing <i>ApplicationName CardFileName</i>. Datacards can contain many control variables all of which listed below. Datacards are specified by a name, followed by its value, followed by a unit if appropriate. If a datacard is not listed, the default will be used instead, as specified below. Use an exclamation mark to comment out a line in the datacard file. Example datacard files can be found in several application areas. A few datacards require vector entries. Here, the entry should be specified by an integer for the number of entries, followed by space separated values, followed by units.</p>\n";
+my $footerInfo      = "</body></html>\n\n";
+my $micesrc         = $ENV{'MICESRC'};
+my $datacardsFile   = "$micesrc/Interface/src/dataCards.cc";
+
+my $columns         = "<tr><td><i>Card</i><td><i>Type</i><td><i>Default Value</i><td><i>Description</i>";
+
+#input formatting information (determines what comes out of the datacards file)
+my @docBoundsIn     = ("***Start Doc Script***","***End Doc Script***");
+my @formatOpeningIn = ("<head>",  "ci[",  "cd[",  "cs[", "fillVector(",    "=",   "//" );
+my @formatClosingIn = ("</head>",   "]",    "]",    "]",           ",",    ";",   "\n" );
+my @replaceIn       = (       "",  "\"",   "\"",   "\"",          "\"",   "\"",     "" );
+my @replaceOut      = (       "",    " ",     " ",     " ",            " ",    " ",     "" );
+
+#output formatting information (for html file)
+#should consider using proper xml parser but I'm too lazy right now
+my @docBoundsOut     = ("$headerInfo<table border=\"1\">","</table>$footerInfo");
+my @formatOpeningOut = ( "<tr><th colspan=\"4\">", "<tr><th align=\"left\">", "<tr><th align=\"left\">", "<tr><th align=\"left\">", "<tr><th align=\"left\">",  "<td>",   "<td>");
+my @formatClosingOut = (   "$columns",   "<td>integer",  "<td>float",  "<td>string",  "<td>vector",     "&nbsp;", "</tr>");
+
+#internal variables
+my $finished = 0;
+
+#open file
+my $datacards = new FileHandle;
+$datacards->open("$datacardsFile") || die("Could not open $datacardsFile - exiting");
+print "$docBoundsOut[0]";
+while( <$datacards> )
+{
+	if(&isStart($_)) {&doLine($_);}
+}
+print "$docBoundsOut[1]";
+
+
+#//////////////Do a text substitution for line/////////////////
+
+sub doLine
+{
+	my $line = $_;
+	for(my $i=0; $i<@formatOpeningIn; $i++)
+	{
+		if(index($line, $formatOpeningIn[$i]) > -1)
+		{
+			my $fragment = substr($line, index($line, $formatOpeningIn[$i])+length($formatOpeningIn[$i]), 
+			                            -index($line, $formatOpeningIn[$i])-length($formatOpeningIn[$i])+index($line, $formatClosingIn[$i]));
+			$fragment =~ s/$replaceIn[$i]/$replaceOut[$i]/g; 
+			print("$formatOpeningOut[$i]$fragment$formatClosingOut[$i]\n");
+			$line = substr($line, index($line, $formatClosingIn[$i])+length($formatClosingIn[$i]));
+		}
+	}
+}
+
+#//////////////Check to see if I should have started yet or I am finished/////////////////
+my $started = 0;
+sub isStart
+{
+	if(index($_, $docBoundsIn[0]) > -1) 
+	{
+		if($started eq 1) {die "WARNING script started twice!";}
+		$started = 1;
+		return "";
+	}
+	if(index($_, $docBoundsIn[1]) > -1) 
+	{
+		if($finished eq 1) {die "WARNING script finished twice!";}
+		$finished = 1;
+		return "";
+	}
+	if($started eq 1 && $finished eq 0) {return 1;}
+	return "";
+}
+
+
+
+

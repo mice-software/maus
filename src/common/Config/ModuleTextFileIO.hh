@@ -13,6 +13,8 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <iomanip>
+#include <sstream>
 
 #include "CLHEP/Vector/ThreeVector.h"
 #include "CLHEP/Vector/Rotation.h"
@@ -22,6 +24,8 @@
 #include "Interface/MICEUnits.hh"
 #include "Interface/Squeak.hh"
 #include "Interface/Memory.hh" 
+
+class MiceModule;
 
 class ModuleTextFileIO
 {
@@ -50,22 +54,29 @@ class ModuleTextFileIO
     static void substitute(std::ostream& out, std::istream& in);
     //substitute all instances of string s1 with string s2 in string target
     static void substitute(std::string& target, std::string s1, std::string s2);
+    //alias $$ and @ to MI_ (in place substitution); this is because evaluator can't handle
+    //special characters
+    static void MI_alias(std::string& value);
 
+    //convert from a value to a string
+    template <class Temp> static std::string toString  (Temp value, int precision);
     //fill target with data from source; class Temp must have a parseString method (below) defined
-    template <class Temp> static Temp fromString(const std::string& source);
+    template <class Temp> static Temp        fromString(const std::string& source);
     static void parseString(const std::string& source, int&                out);
     static void parseString(const std::string& source, bool&               out);
     static void parseString(const std::string& source, std::string&        out);
     static void parseString(const std::string& source, CLHEP::Hep3Vector&  out);
     static void parseString(const std::string& source, double&             out);
+
+
     static void setEvaluator(std::map<std::string, double> parameters);
+    static void setEvaluator(std::map<std::string, int> parametersInt);
 
     //Repeat module first numberOfRepeats times, applying translation, rotation, scalefactor etc
-    void        repeatModule (MiceModule* first, Hep3Vector translation, HepRotation rotation, double scaleFactor, int numberOfRepeats);
+    void        repeatModule (MiceModule* first, CLHEP::Hep3Vector translation, CLHEP::HepRotation rotation, double scaleFactor, int numberOfRepeats);
     //Repeat module first numberOfRepeats times, loading a variable $$RepeatNumber to the MiceModule each time for evaluation each time
     //$$RepeatNumber starts at 0 and ends at numberOfRepeats
     void        repeatModule2 (MiceModule* first, int numberOfRepeats);
-
 
   private :
     // Construct a module from input stream; input stream *must* contain position, rotation information
@@ -75,7 +86,7 @@ class ModuleTextFileIO
     //read components
     void readProperty(std::string lineIn);
     void readDimensions(std::string volumeType, std::string lineIn);
-    void readDimensions(std::string lineIn) {readDimensions(_this->volType(), lineIn);}
+    void readDimensions(std::string lineIn);
     void readPosition(std::string lineIn);
     void readRotation(std::string lineIn);
     void readScaleFactor(std::string lineIn);
@@ -93,6 +104,12 @@ class ModuleTextFileIO
   
 };
 
+template <class Temp> std::string ModuleTextFileIO::toString  (Temp value, int precision) {
+  std::stringstream ss;
+  ss << std::setprecision(precision);
+  ss << value;
+  return ss.str();
+}
 
 
 

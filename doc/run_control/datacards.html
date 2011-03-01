@@ -1,0 +1,650 @@
+<html><header><title>Datacard Documentation</title></header>
+<body text="#000000" bgcolor="#DEE1F5" link="#0000EE" vlink="#551A8B" alink="#FF0000"><h1><font color="#FF0000">Datacard Documentation</font></h1>
+<p>G4MICE applications are controlled by a datacard file invoked on the command line when an application is run, for example by typing <i>ApplicationName CardFileName</i>. Datacards can contain many control variables all of which listed below. Datacards are specified by a name, followed by its value, followed by a unit if appropriate. If a datacard is not listed, the default will be used instead, as specified below. Use an exclamation mark to comment out a line in the datacard file. Example datacard files can be found in several application areas. A few datacards require vector entries. Here, the entry should be specified by an integer for the number of entries, followed by space separated values, followed by units.</p>
+<table border="1"><tr><th colspan="4">Global run control<tr><td><i>Card</i><td><i>Type</i><td><i>Default Value</i><td><i>Description</i>
+<tr><th align="left"> numEvts <td>integer
+<td> 100&nbsp;
+<td> Number of events in the run</tr>
+<tr><th align="left"> runNumber <td>integer
+<td> 1&nbsp;
+<td> Run number listed in header of some output files</tr>
+<tr><th align="left"> Description <td>string
+<td>  G4MICE events &nbsp;
+<td> Description of the run listed in the header of some output files</tr>
+<tr><th align="left"> VerboseLevel <td>integer
+<td> 1&nbsp;
+<td>Set to minimum level of error that will be output by G4MICE. 0=debug 1=info 2=warning 3=error 4=fatal >4=silent</tr>
+<tr><th align="left"> DataType <td>string
+<td>  TextFile &nbsp;
+<td>The data type of the dataCards file, set by user and used in global reader, TextFileReader etc</tr>
+<tr><th colspan="4">Modelling and Configuration<tr><td><i>Card</i><td><i>Type</i><td><i>Default Value</i><td><i>Description</i>
+<tr><th align="left"> MiceModel <td>string
+<td>  MICEStage6/Stage6.dat &nbsp;
+<td> The MiceModel, as defined in $MICEFILES/Models/Configurations/<MiceModel></tr>
+<tr><th align="left"> SciFiCalib <td>string
+<td>   &nbsp;
+<td>SciFi detector calibration file, found in ${MICEFILES}/Calibration/<SciFiCalib></tr>
+<tr><th align="left"> TofCalib <td>string
+<td>  tofcalib &nbsp;
+<td>TOF detector calibration file, found in ${MICEFILES}/Calibration/<TofCalib></tr>
+<tr><th align="left"> SciFiCable <td>string
+<td>   &nbsp;
+<td>SciFi detector cabling file, found in ${MICEFILES}/Cabling/SciFi/<SciFiCable></tr>
+<tr><th align="left"> SciFiCableType <td>string
+<td>   &nbsp;
+<td>Set to "Imperial" or "Osaka" for different cabling types</tr>
+<tr><th align="left"> TofCable <td>string
+<td>  tofcabling.txt &nbsp;
+<td>Tof detector cabling file, found in ${MICEFILES}/Cabling/<TofCable></tr>
+<tr><th align="left"> FieldGridX <td>integer
+<td> 2&nbsp;
+<td>Number of points in the field grid in x. As an optimisation, G4MICE divides the world into a grid. At each step, G4MICE only looks at fields in the local grid. The number of points in each dimension should roughly match the size of the problem in each dimension for a reasonable option, and FieldGridX*FieldGridY*FieldGridZ should be small, say<1e6.</tr>
+<tr><th align="left"> FieldGridY <td>integer
+<td> 2&nbsp;
+<td>Number of points in the field grid in y</tr>
+<tr><th align="left"> FieldGridZ <td>integer
+<td> 100&nbsp;
+<td>Number of points in the field grid in z</tr>
+<tr><th colspan="4">Simulation Application run control<tr><td><i>Card</i><td><i>Type</i><td><i>Default Value</i><td><i>Description</i>
+<tr><th align="left"> MaxRadiusInChannel <td>float
+<td> 1.e9 * mm&nbsp;
+<td> Events with r = sqrt(x^2 + y^2) > MaxRadius in global coordinates are killed</tr>
+<tr><th align="left"> MaxZInChannel <td>float
+<td> 1.e9 * mm&nbsp;
+<td> Events with z > MaxZ are killed in Simulation</tr>
+<tr><th align="left"> MaxTimeAllowed <td>float
+<td> 1. * ms&nbsp;
+<td> Events with t > MaxT are killed in Simulation</tr>
+<tr><th align="left"> RandomSeed <td>integer
+<td> 0&nbsp;
+<td> Random seed for stochastic algorithms</tr>
+<tr><th align="left"> PhysicsModel <td>string
+<td>  QGSP_BERT &nbsp;
+<td>Physics package loaded by G4MICE to set default values; modifications can be made as per following</tr>
+<tr><th align="left"> MultipleScatteringModel <td>string
+<td>  mcs &nbsp;
+<td>"mcs" (multiple coulomb scattering) or "none"</tr>
+<tr><th align="left"> EnergyLossModel <td>string
+<td>  estrag &nbsp;
+<td>"estrag" (full energy loss), "ionisation" (mean energy loss only) or "none"</tr>
+<tr><th align="left"> HadronicModel <td>string
+<td>  All &nbsp;
+<td>"All" (All hadronic interactions) or "None" (no hadronic interactions)</tr>
+<tr><th align="left"> MuonDecay <td>string
+<td>   &nbsp;
+<td>Deprecated; please use ParticleDecay datacard</tr>
+<tr><th align="left"> ParticleDecay <td>string
+<td>  True &nbsp;
+<td>Set to "True" or "False" to determine whether muons decay</tr>
+<tr><th align="left"> ReferenceEnergyLossModel <td>string
+<td>  ionisation &nbsp;
+<td>Energy loss model of reference particle; set to "none" or "ionisation". Reference particle can never have stochastic processes (e.g. estrag, mcs) enabled.</tr>
+<tr><th align="left"> ReferenceG4UIScript <td>string
+<td>   &nbsp;
+<td>If a filename is given, G4MICE will run this as a macro to G4UI after setting up ReferenceEnergyLossModel but before firing the reference particle. Enables any extra set-up that may be required.</tr>
+<tr><th align="left"> BeginOfRunG4UIScript <td>string
+<td>   &nbsp;
+<td>If a filename is given, G4MICE will run this as a macro to G4UI after firing the reference particle but before firing the beam. Enables any extra set-up that may be required.</tr>
+<tr><th align="left"> EverythingSpecialVirtual <td>string
+<td>   &nbsp;
+<td>Set to "true" to make every physical volume a special virtual detector</tr>
+<tr><th align="left"> WriteReferenceParticle <td>integer
+<td> 0&nbsp;
+<td> Set to 1 to write reference particle hits during simulation; or 0 to ignore them</tr>
+<tr><th align="left"> ProductionThreshold <td>float
+<td> 0.5 * mm&nbsp;
+<td>I *think* threshold for delta ray production</tr>
+<tr><th align="left"> MuonHalfTime <td>float
+<td> -1 * ns&nbsp;
+<td>Set the muon half life; use g4 default if negative.</tr>
+<tr><th align="left"> ChargedPionHalfTime <td>float
+<td> -1 * ns&nbsp;
+<td>Set the pi+ and pi- half life; use g4 default if negative.</tr>
+<tr><th align="left"> TrackOnlyMuons <td>string
+<td>  False &nbsp;
+<td>Set to true to kill non-muons on production</tr>
+<tr><th align="left"> MaxStepsWOELoss <td>integer
+<td> 2000&nbsp;
+<td>Maximum number of steps GEANT4 will take without energy loss. Subsequently, assumes particle is stuck and kills it</tr>
+<tr><th align="left"> StepStatisticsOutput <td>integer
+<td> 0&nbsp;
+<td>I *think* set to 1 to see physics processes output</tr>
+<tr><th align="left"> StepStatisticsVolume <td>string
+<td>  All &nbsp;
+<td>I *think* selects which volumes to write physics processes output from</tr>
+<tr><th align="left"> CheckVolumeOverlaps <td>integer
+<td> 0&nbsp;
+<td>Set to 1 to check for volume overlaps in GEANT4 physical volumes</tr>
+<tr><th colspan="4">Simulation Application beam control<tr><td><i>Card</i><td><i>Type</i><td><i>Default Value</i><td><i>Description</i>
+<tr><th align="left"> BeamType <td>string
+<td>  Pencil &nbsp;
+<td>Type of beam; "Pencil" generates a pencil beam using parameters below, "Gaussian" generates a beam with gaussian distribution using parameters below, "ICOOL", "G4BeamLine", "TURTLE",  "G4MICE_PrimaryGenHit" set G4MICE to read from a beam file with the appropriate format and file name defined in datacard "InputBeamFileName"; "MiceModule" uses the beam definition taken from MiceModules (see mice module docs), and allows arbitrary placement of beams with arbitrary multivariate gaussian distributions; in general, MiceModules are the preferred method for setting up beams. The reference particle is the first particle created. If BeamType is Random, the first particle will have no random distribution.</tr>
+<tr><th align="left"> BeamMomentum <td>float
+<td> 200.0 * MeV&nbsp;
+<td>When BeamType is Pencil or Random, controls momentum of the beam</tr>
+<tr><th align="left"> ZOffsetStart <td>float
+<td> -6011. * mm&nbsp;
+<td>Z-position of input beam when not in MiceModule mode. x and y are 0. Added to any z-position in beam file.</tr>
+<tr><th align="left"> BeamPid <td>integer
+<td> -13&nbsp;
+<td>Particle ID of pencil beam and TURTLE beam (11 is e-, -13 is mu+, 211 is pi+, 2212 is proton)</tr>
+<tr><th align="left"> InputBeamFileName <td>string
+<td>  none &nbsp;
+<td>Name of beam file for BeamTypes that use files, as specified in BeamType above</tr>
+<tr><th align="left"> SigmaX <td>float
+<td> 0.*mm&nbsp;
+<td>If beam type is "Gaussian", set RMS of x</tr>
+<tr><th align="left"> SigmaXPrime <td>float
+<td> 0.&nbsp;
+<td>If beam type is "Gaussian", set RMS of x' (px/p)</tr>
+<tr><th align="left"> SigmaY <td>float
+<td> 0.*mm&nbsp;
+<td>If beam type is "Gaussian", set RMS of y</tr>
+<tr><th align="left"> SigmaYPrime <td>float
+<td> 0.&nbsp;
+<td>If beam type is "Gaussian", set RMS of y' (py/p)</tr>
+<tr><th align="left"> SigmaT <td>float
+<td> 0.*ns&nbsp;
+<td>If beam type is "Gaussian", set RMS of time distribution</tr>
+<tr><th align="left"> SigmaEOverE <td>float
+<td> 0.&nbsp;
+<td>If beam type is "Gaussian", set RMS of (E-E_ref)/E_ref where E is total energy and E_ref is total energy corresponding to BeamMomentum</tr>
+<tr><th colspan="4">Beam Matcher Application Control<tr><td><i>Card</i><td><i>Type</i><td><i>Default Value</i><td><i>Description</i>
+<tr><th align="left"> MatchAlgorithm <td>string
+<td>  EigenvalueSeed &nbsp;
+<td>The algorithm used for matching; "Eigenvalue" calculates the transfer map and then attempts to automatically derive the matched covariance matrix; "EigenvalueSeed" uses this automatic calculation as the seed for a numerical for a periodic solution, including e.g. some effects of material; "UserDefined" uses user input for the Twiss parameters at the LatticeStart; "UserDefinedSeed" uses user input for the seed Twiss parameters, and then iterates through an optimisation algorithm to find a periodic solution.</tr>
+<tr><th align="left"> NormalisedCanonicalAngularMomentum <td>float
+<td> 0&nbsp;
+<td>Normalised canonical angular momentum of beam at lattice start</tr>
+<tr><th align="left"> LatticeStart <td>float
+<td> -2750 * mm&nbsp;
+<td>Start of lattice over which beta is periodic</tr>
+<tr><th align="left"> LatticeEnd <td>float
+<td> 2750 * mm&nbsp;
+<td>End of lattice over which beta is periodic</tr>
+<tr><th align="left"> EnergyAtLatticeStart <td>float
+<td> 226 * MeV&nbsp;
+<td>Desired energy at start of the lattice</tr>
+<tr><th align="left"> AlphaBetaScaleFactor <td>float
+<td> 11/0.05&nbsp;
+<td>Weighting factor between alpha and beta for "Seed" algorithms</tr>
+<tr><th align="left"> TransverseEmittance <td>float
+<td> 6 * mm&nbsp;
+<td>Transverse emittance of generated beam</tr>
+<tr><th align="left"> LongitudinalEmittance <td>float
+<td> 0.1 * ns&nbsp;
+<td>Longitudinal emittance of generated beam</tr>
+<tr><th align="left"> AmplitudeMomentumCorrelation <td>float
+<td> 0.&nbsp;
+<td>amplitude momentum correlation introduces factor like p *= (1+(A-<A>)*corr) to matched beam</tr>
+<tr><th align="left"> NumberOfEnergyCoordinates <td>integer
+<td> 1&nbsp;
+<td> Calculate matched beta function for various energies</tr>
+<tr><th align="left"> EnergyRange <td>float
+<td> 0. * MeV&nbsp;
+<td> full energy range over which the multiple beta functions will be calculated</tr>
+<tr><th align="left"> LongitudinalBeta <td>float
+<td> 10.&nbsp;
+<td>longitudinal beta at z = LatticeStart; set to < 0. to auto-detect</tr>
+<tr><th align="left"> LongitudinalAlpha <td>float
+<td> 0.&nbsp;
+<td>longitudinal alpha at z = LatticeStart; only used if auto-detect is off</tr>
+<tr><th align="left"> TransverseBeta <td>float
+<td> 420. * mm&nbsp;
+<td>transverse beta at z = LatticeStart; set to < 0. to auto-detect</tr>
+<tr><th align="left"> TransverseAlpha <td>float
+<td> 0.&nbsp;
+<td>transverse alpha at z = LatticeStart; only used if auto-detect is off</tr>
+<tr><th align="left"> DispersionX <td>float
+<td> 0. * mm&nbsp;
+<td>Future development: x dispersion at z = LatticeStart for matcher</tr>
+<tr><th align="left"> DispersionY <td>float
+<td> 0. * mm&nbsp;
+<td>Future development: y dispersion at z = LatticeStart for matcher</tr>
+<tr><th colspan="4">Solenoids Field Controls<tr><td><i>Card</i><td><i>Type</i><td><i>Default Value</i><td><i>Description</i>
+<tr><th align="left"> FieldMode <td>string
+<td>  Full &nbsp;
+<td>"Full" = use G4MICE field definitions; "Constant" = use G4 constant fields</tr>
+<tr><th align="left"> SolDataFiles <td>string
+<td>  Write &nbsp;
+<td>"Write" = write solenoid field maps; "Read" = read solenoid field maps</tr>
+<tr><th align="left"> NumberNodesZGrid <td>integer
+<td> 100&nbsp;
+<td>Default number of nodes in Z in the solenoid field map grid</tr>
+<tr><th align="left"> NumberNodesRGrid <td>integer
+<td> 150&nbsp;
+<td>Default number of nodes in R in the solenoid field map grid</tr>
+<tr><th align="left"> SolzMapExtendFactor <td>float
+<td> 10.0&nbsp;
+<td> Set the Z extent of the solenoid field maps; z_extent of the field map = coil_length + z_factor*coil_inner_radius</tr>
+<tr><th align="left"> SolrMapExtendFactor <td>float
+<td> 2.01828182845905&nbsp;
+<td> Set the radial extent of solenoid field maps; r_extent of the field map = r_factor * coil_inner_radius</tr>
+<tr><th align="left"> DefaultNumberOfSheets <td>integer
+<td> 10&nbsp;
+<td> number of sheets for solenoids.</tr>
+<tr><th colspan="4">Quadrupole Field Controls<tr><td><i>Card</i><td><i>Type</i><td><i>Default Value</i><td><i>Description</i>
+<tr><th align="left"> QuadrupoleFringeMaxZFactor <td>float
+<td> 5.&nbsp;
+<td>Maximum z extent of quadrupole fringe fields (as a fraction of quad length)</tr>
+<tr><th align="left"> QuadrupoleUseFringeFields <td>integer
+<td> 1&nbsp;
+<td>Set to 1 to use fringe fields in quadrupoles</tr>
+<tr><th align="left"> QuadrupoleFringeParameters <td>vector
+<td> {0.296471, 4.533219, -2.270982, 1.068627, -0.036391, 0.022261}&nbsp;
+<td>Default parameters for Enge function, that controls multipole fringe fields</tr>
+<tr><th colspan="4">RF Cavity Field Controls<tr><td><i>Card</i><td><i>Type</i><td><i>Default Value</i><td><i>Description</i>
+<tr><th align="left"> rfAccelerationPhase <td>float
+<td> 1.57 * rad&nbsp;
+<td>Default RF phase of all cavities. May go buggy if this is > pi/2 so be careful</tr>
+<tr><th align="left"> OpticsRfFrequency <td>float
+<td> 201.25 * megahertz&nbsp;
+<td>Global RF frequency assumed by optics module.</tr>
+<tr><th align="left"> PhaseTolerance <td>float
+<td> 1e-5 * ns&nbsp;
+<td>Tolerance on RF phase</tr>
+<tr><th align="left"> RFDeltaEnergyTolerance <td>float
+<td> 1e-5 * MeV&nbsp;
+<td>Tolerance on RF energy gain (peak field)</tr>
+<tr><th colspan="4">Simulation Application stepping parameters<tr><td><i>Card</i><td><i>Type</i><td><i>Default Value</i><td><i>Description</i>
+<tr><th align="left"> DeltaOneStep <td>float
+<td>  1. * mm&nbsp;
+<td> Estimate of error in end point in free space</tr>
+<tr><th align="left"> DeltaIntersection <td>float
+<td>  1.e-3 * mm&nbsp;
+<td> Estimate of error in step end point when a track intersects a new physical volume</tr>
+<tr><th align="left"> EpsilonMin <td>float
+<td>  1.e-10 * mm&nbsp;
+<td> Minimum on DeltaOneStep? (unclear in G4 docs)</tr>
+<tr><th align="left"> EpsilonMax <td>float
+<td>  1.e+10 * mm&nbsp;
+<td> Maximum on DeltaOneStep? (unclear in G4 docs)</tr>
+<tr><th align="left"> MissDistance <td>float
+<td>  1.e-2 * mm&nbsp;
+<td> Maximum miss distance when a track passes near a physical volume</tr>
+<tr><th align="left"> FieldTrackStepper <td>string
+<td>  Classic &nbsp;
+<td> Set the integration algorithm for tracking. Options are for electromagnetic: "Classic" (= "ClassicalRK4"); "SimpleHeum"; "ImplicitEuler"; "SimpleRunge"; "ExplicitEuler"; and for magnetic only: "CashKarpRKF45"; "HelixImplicitEuler"; "HelixHeum"; "HelixSimpleRunge"; "HelixExplicitEuler".  see G4 documentation for further details.</tr>
+<tr><th align="left"> VirtualRelativeError <td>float
+<td> 1.e-4&nbsp;
+<td>Relative error for virtual detector stepping</tr>
+<tr><th align="left"> VirtualAbsoluteError <td>float
+<td> 1.e-4&nbsp;
+<td>Absolute error for virtual detector stepping</tr>
+<tr><th align="left"> MaxStepSizeInChannel <td>float
+<td> 10000.0 * mm&nbsp;
+<td>Deprecated - does nothing</tr>
+<tr><th colspan="4">Simulation Application RF induced background controls - Deprecated do not use<tr><td><i>Card</i><td><i>Type</i><td><i>Default Value</i><td><i>Description</i>
+<tr><th align="left"> rfBGMode <td>string
+<td>  none &nbsp;
+<td>Deprecated - does nothing</tr>
+<tr><th align="left"> rfBGSource <td>string
+<td>  none &nbsp;
+<td>Deprecated - does nothing</tr>
+<tr><th align="left"> rfBGElectronModel <td>string
+<td>  Simple &nbsp;
+<td>Deprecated - does nothing</tr>
+<tr><th align="left"> rfBGPhotonModel <td>string
+<td>  Uniform &nbsp;
+<td>Deprecated - does nothing</tr>
+<tr><th align="left"> rfBGEmitterMode <td>string
+<td>  Random &nbsp;
+<td>Deprecated - does nothing</tr>
+<tr><th align="left"> rfBGNumberOfEmitters <td>integer
+<td> 10&nbsp;
+<td>Deprecated - does nothing</tr>
+<tr><th align="left"> rfBGNumberOfElectrons <td>integer
+<td> 1&nbsp;
+<td>Deprecated - does nothing</tr>
+<tr><th align="left"> rfBGNumberOfPhotons <td>integer
+<td> 1&nbsp;
+<td>Deprecated - does nothing</tr>
+<tr><th align="left"> rfBGDirection <td>integer
+<td> 0&nbsp;
+<td>Deprecated - does nothing</tr>
+<tr><th align="left"> rfBGElectronEnergy <td>float
+<td> .01 * MeV&nbsp;
+<td>Deprecated - does nothing</tr>
+<tr><th align="left"> rfBGPhotonEnergy <td>float
+<td> .1 * MeV&nbsp;
+<td>Deprecated - does nothing</tr>
+<tr><th align="left"> rfBGElectronEnergyWidth <td>float
+<td> .001 * MeV&nbsp;
+<td>Deprecated - does nothing</tr>
+<tr><th align="left"> rfBGPhotonEnergyWidth <td>float
+<td> .01 * MeV&nbsp;
+<td>Deprecated - does nothing</tr>
+<tr><th align="left"> rfBGElectronSpectrum <td>string
+<td>  Fixed &nbsp;
+<td>Deprecated - does nothing</tr>
+<tr><th align="left"> rfBGPhotonSpectrum <td>string
+<td>  Fixed &nbsp;
+<td>Deprecated - does nothing</tr>
+<tr><th align="left"> rfBGElectronSpectrumFile <td>string
+<td>   &nbsp;
+<td>Deprecated - does nothing</tr>
+<tr><th align="left"> rfBGPhotonSpectrumFile <td>string
+<td>   &nbsp;
+<td>Deprecated - does nothing</tr>
+<tr><th align="left"> rfBGMultipleSpectraFile <td>string
+<td>  None &nbsp;
+<td>Deprecated - does nothing</tr>
+<tr><th align="left"> rfBGBankFile <td>string
+<td>  None &nbsp;
+<td>Deprecated - does nothing</tr>
+<tr><th align="left"> rfBGSamplingMode <td>string
+<td>  Loop &nbsp;
+<td>Deprecated - does nothing</tr>
+<tr><th align="left"> rfBGTimeWindow <td>float
+<td> 0.2 * ns&nbsp;
+<td>Deprecated - does nothing</tr>
+<tr><th align="left"> rfBGTimeDelay <td>float
+<td> 0.0 * ns&nbsp;
+<td>Deprecated - does nothing</tr>
+<tr><th align="left"> rfBGZstart <td>float
+<td> 0.0 * ns&nbsp;
+<td>Deprecated - does nothing</tr>
+<tr><th align="left"> rfBGRadius <td>float
+<td> 150.0 * mm&nbsp;
+<td>Deprecated - does nothing</tr>
+<tr><th align="left"> rfBGScaleFactor <td>float
+<td> 1.0&nbsp;
+<td>Deprecated - does nothing</tr>
+<tr><th colspan="4">Digitization Application Calorimeter Controls<tr><td><i>Card</i><td><i>Type</i><td><i>Default Value</i><td><i>Description</i>
+<tr><th align="left"> EMCalAttLengthLong <td>float
+<td> 2400.0 * mm&nbsp;
+<td>The EM Calorimeter models the number of photoelectrons entering the PMT using Interface/src/EMCalDigit.cc</tr>
+<tr><th align="left"> EMCalAttLengthShort <td>float
+<td>  200.0 * mm&nbsp;
+<tr><th align="left"> EMCalAttLengthLongNorm <td>float
+<td> 0.655 * mm&nbsp;
+<tr><th align="left"> EMCalAttLengthShortNorm <td>float
+<td> 0.345 * mm&nbsp;
+<tr><th align="left"> EMCalLightCollectionEff <td>float
+<td> 0.031&nbsp;
+<tr><th align="left"> EMCalEnergyPerPhoton <td>float
+<td> 0.125 * keV&nbsp;
+<tr><th align="left"> EMCalLightSpeed <td>float
+<td>  170.0 * mm / ns&nbsp;
+<tr><th align="left"> EMCalLightGuideEff <td>float
+<td>  0.85&nbsp;
+<tr><th align="left"> EMCalQuantumEff <td>float
+<td>  0.18&nbsp;
+<tr><th align="left"> EMCalAmplificationCof <td>float
+<td>1000000.&nbsp;
+<tr><th align="left"> EMCalAmplificationFluct <td>float
+<td> 1000.&nbsp;
+<tr><th align="left"> EMCalAdcConversionFactor <td>float
+<td>  0.25*1e-12*coulomb&nbsp;
+<td> pC per count</tr>
+<tr><th align="left"> EMCalTdcConversionFactor <td>float
+<td> 0.025 * ns&nbsp;
+<tr><th align="left"> EMCalAdcThreshold <td>integer
+<td>     2&nbsp;
+<td> adc counts</tr>
+<tr><th align="left"> EMCalTdcThreshold <td>float
+<td>  1.84*1e-12*coulomb&nbsp;
+<td> pC</tr>
+<tr><th align="left"> EMCalTdcResolution <td>float
+<td>  0.05 * ns&nbsp;
+<tr><th align="left"> EMCalTdcBits <td>integer
+<td>    12&nbsp;
+<tr><th align="left"> EMCalHardCodedTrigger <td>string
+<td>  False &nbsp;
+<tr><th align="left"> EMCalSamplingTimeStart <td>float
+<td>  100.0 * ns&nbsp;
+<tr><th align="left"> EMCalSamplingTimeWindow <td>float
+<td>  100.0 * ns&nbsp;
+<tr><th align="left"> EMCalElectronicsDecayTime <td>float
+<td>    8.0 * ns&nbsp;
+<tr><th colspan="4">Digitization Application SciFi controls<tr><td><i>Card</i><td><i>Type</i><td><i>Default Value</i><td><i>Description</i>
+<tr><th align="left"> SciFiDeadChanFName <td>string
+<td>   &nbsp;
+<tr><th align="left"> SciFiMUXNum <td>integer
+<td> 7&nbsp;
+<tr><th align="left"> SciFiFiberDecayConst <td>float
+<td> 2.7&nbsp;
+<tr><th align="left"> SciFiFiberConvFactor <td>float
+<td>  3047.1&nbsp;
+<tr><th align="left"> SciFiFiberRefractiveIndex <td>float
+<td> 1.6&nbsp;
+<tr><th align="left"> SciFiFiberCriticalAngle <td>float
+<td> 0.4782 * rad&nbsp;
+<tr><th align="left"> SciFiFiberTrappingEff <td>float
+<td> 0.056&nbsp;
+<tr><th align="left"> SciFiFiberMirrorEff <td>float
+<td> 0.6&nbsp;
+<tr><th align="left"> SciFiFiberTransmissionEff <td>float
+<td> 0.8&nbsp;
+<tr><th align="left"> SciFiMUXTransmissionEff <td>float
+<td> 1.0&nbsp;
+<tr><th align="left"> SciFiFiberRunLength <td>float
+<td> 5000.0 * mm&nbsp;
+<td>ME this number is wrong</tr>
+<tr><th align="left"> SciFivlpcQE <td>float
+<td> 0.8&nbsp;
+<tr><th align="left"> SciFivlpcEnergyRes <td>float
+<td> 4.0 * MeV&nbsp;
+<tr><th align="left"> SciFivlpcTimeRes <td>float
+<td> 0.2 * ns&nbsp;
+<tr><th align="left"> SciFiadcBits <td>integer
+<td> 8&nbsp;
+<tr><th align="left"> SciFiadcFactor <td>float
+<td> 6.0&nbsp;
+<tr><th align="left"> SciFitdcBits <td>integer
+<td> 16&nbsp;
+<tr><th align="left"> SciFitdcFactor <td>float
+<td> 1.0&nbsp;
+<tr><th align="left"> SciFinElecChanPerPlane <td>integer
+<td> 1429&nbsp;
+<tr><th align="left"> SciFinPlanes <td>integer
+<td> 3&nbsp;
+<tr><th align="left"> SciFinStations <td>integer
+<td> 5&nbsp;
+<tr><th align="left"> SciFinTrackers <td>integer
+<td> 2&nbsp;
+<tr><th colspan="4">Digitization Application TOF controls<tr><td><i>Card</i><td><i>Type</i><td><i>Default Value</i><td><i>Description</i>
+<tr><th align="left"> TOFconversionFactor <td>float
+<td> 10 * keV&nbsp;
+<tr><th align="left"> TOFpmtTimeResolution <td>float
+<td> 100.0 * picosecond&nbsp;
+<tr><th align="left"> TOFattenuationLength <td>float
+<td> 140 * cm&nbsp;
+<tr><th align="left"> TOFadcConversionFactor <td>float
+<td> 0.125&nbsp;
+<tr><th align="left"> TOFtdcConversionFactor <td>float
+<td> 25.0 * picosecond&nbsp;
+<tr><th align="left"> TOFpmtQuantumEfficiency <td>float
+<td> 0.25&nbsp;
+<tr><th align="left"> TOFscintLightSpeed <td>float
+<td>  170.0 * mm / ns&nbsp;
+<tr><th colspan="4">Digitization Application Ckov controls<tr><td><i>Card</i><td><i>Type</i><td><i>Default Value</i><td><i>Description</i>
+<tr><th align="left"> CKOVadcConversionFactor <td>float
+<td> 0.125&nbsp;
+<tr><th align="left"> CKOVtdcConversionFactor <td>float
+<td> 25.0 * picosecond&nbsp;
+<tr><th align="left"> CKOVpmtTimeResolution <td>float
+<td> 100.0 * picosecond&nbsp;
+<tr><th colspan="4">Reconstruction Application controls<tr><td><i>Card</i><td><i>Type</i><td><i>Default Value</i><td><i>Description</i>
+<tr><th align="left"> BeamCharge <td>float
+<td> 1.0&nbsp;
+<tr><th align="left"> SciFiTrackRecStatusCut <td>float
+<td> 2.0&nbsp;
+<tr><th align="left"> SciFiTrackRecRCut <td>float
+<td> 0.0&nbsp;
+<tr><th align="left"> SciFiTrackRecNHitCut <td>float
+<td> 4.0&nbsp;
+<tr><th align="left"> SciFiTrackRecNPECut <td>float
+<td> 2.0&nbsp;
+<tr><th align="left"> SciFiTrackRecChi2Cut <td>float
+<td> 10.0&nbsp;
+<tr><th align="left"> SciFiTripletChi2Cut <td>float
+<td> 10.0&nbsp;
+<tr><th align="left"> SciFiadcFactor <td>float
+<td> 6.0&nbsp;
+<tr><th align="left"> SciFitdcFactor <td>float
+<td> 1.0&nbsp;
+<tr><th align="left"> SciFiCombineWidth <td>float
+<td> 0.0 * mm&nbsp;
+<tr><th align="left"> SciFiCombineTime <td>float
+<td> 2.0 * ns&nbsp;
+<tr><th align="left"> SciFiCombineRadius <td>float
+<td> 1.5 * mm&nbsp;
+<tr><th align="left"> RecP <td>float
+<td> -1 * MeV&nbsp;
+<tr><th align="left"> DBServerHostName <td>string
+<td>  micewww.pp.rl.ac.uk &nbsp;
+<td>Database server host name</tr>
+<tr><th align="left"> DBServerPort <td>integer
+<td> 4443&nbsp;
+<td>Database server port</tr>
+<tr><th align="left"> TofTriggerStation <td>integer
+<td> 1&nbsp;
+<td> The Station which is giving the trigger</tr>
+<tr><th align="left"> RecLevel <td>integer
+<td> 5&nbsp;
+<td> 1 = clusters, 2 = points, 3 = tracks, 4 = matching, 5 = pid</tr>
+<tr><th align="left"> TofRecLevel <td>integer
+<td> 1&nbsp;
+<td> 1 = standard track reconstruction</tr>
+<tr><th align="left"> TofCalibrationMode <td>integer
+<td> 0&nbsp;
+<td> 0 = reconstruct data, 1 = calculate calibration</tr>
+<tr><th align="left"> BeamMakerMode <td>integer
+<td> 1&nbsp;
+<td>Matched in tracker/trace ellipse of constant amplitude/uniform distribution... see application for details</tr>
+<tr><th align="left"> BeamMakerPID <td>integer
+<td> +2&nbsp;
+<td>1=e, 2=mu, 3=pi, 4=K, 5=p, sign=charge (same as ICOOL for003.dat definition)</tr>
+<tr><th align="left"> ZStart <td>float
+<td> 0.&nbsp;
+<td>Initial z (absolute) for the BeamMaker application</tr>
+<tr><th align="left"> Q7Gradient <td>float
+<td> 1.&nbsp;
+<td>|g0| in T/m for Quadrupole 7 (assumed focussing in x)</tr>
+<tr><th align="left"> Q8Gradient <td>float
+<td> 1.&nbsp;
+<td>|g0| in T/m for Quadrupole 8 (assumed defocussing in x)</tr>
+<tr><th align="left"> Q9Gradient <td>float
+<td> 1.&nbsp;
+<td>|g0| in T/m for Quadrupole 9 (assumed focussing in x)</tr>
+<tr><th align="left"> Q7Current <td>float
+<td> 174.09&nbsp;
+<td>|I| in Amps for Quadrupole 7 (assumed focussing in x, default implies |g0| = 1 T/m)</tr>
+<tr><th align="left"> Q8Current <td>float
+<td> 174.09&nbsp;
+<td>|I| in Amps for Quadrupole 8 (assumed defocussing in x, default implies |g0| = 1 T/m)</tr>
+<tr><th align="left"> Q9Current <td>float
+<td> 174.09&nbsp;
+<td>|I| in Amps for Quadrupole 9 (assumed focussing in x, default implies |g0| = 1 T/m)</tr>
+<tr><th align="left"> Iperg0 <td>float
+<td> 174.09&nbsp;
+<td>The current required to get a central gradient of 1 T/m in Quadrupoles 7, 8, and 9</tr>
+<tr><th align="left"> PlotFrequency <td>integer
+<td> 100&nbsp;
+<td>For applications which plot histograms to the screen: how many events between updating the plots on the screen?</tr>
+<tr><th align="left"> MinimumTOF <td>float
+<td> 0. * ns&nbsp;
+<td>Temporary PID</tr>
+<tr><th align="left"> MaximumTOF <td>float
+<td> 100. * ns&nbsp;
+<td>Temporary PID</tr>
+<tr><th align="left"> UseRecCuts <td>integer
+<td> 0&nbsp;
+<td>If set to 0, do not use the reconstruction cuts defined below. Otherwise assume all events outside cuts are bad.</tr>
+<tr><th align="left"> RecMinPX <td>float
+<td> -200 * MeV&nbsp;
+<td>Cut value for reconstructed x momentum</tr>
+<tr><th align="left"> RecMaxPX <td>float
+<td>  200 * MeV&nbsp;
+<td>Cut value for reconstructed x momentum</tr>
+<tr><th align="left"> RecMinPY <td>float
+<td> -200 * MeV&nbsp;
+<td>Cut value for reconstructed y momentum</tr>
+<tr><th align="left"> RecMaxPY <td>float
+<td>  200 * MeV&nbsp;
+<td>Cut value for reconstructed y momentum</tr>
+<tr><th align="left"> RecMinPT <td>float
+<td>    0 * MeV&nbsp;
+<td>Cut value for reconstructed transverse momentum</tr>
+<tr><th align="left"> RecMaxPT <td>float
+<td>  200 * MeV&nbsp;
+<td>Cut value for reconstructed transverse momentum</tr>
+<tr><th align="left"> RecMinPZ <td>float
+<td>   50 * MeV&nbsp;
+<td>Cut value for reconstructed z momentum</tr>
+<tr><th align="left"> RecMaxPZ <td>float
+<td>  500 * MeV&nbsp;
+<td>Cut value for reconstructed z momentum</tr>
+<tr><th align="left"> WriteDST <td>integer
+<td> 0&nbsp;
+<td>Set to 1 to write only TOF data and Zustand vectors after recontruction. Else write everything.</tr>
+<tr><th align="left"> NavigatorVerbosity <td>integer
+<td> 0&nbsp;
+<td>Set Kalman verbosity level</tr>
+<tr><th align="left"> FitterVerbosity <td>integer
+<td> 0&nbsp;
+<td>Set Kalman verbosity level</tr>
+<tr><th align="left"> SetupVerbosity <td>integer
+<td> 0&nbsp;
+<td>Set Kalman verbosity level</tr>
+<tr><th align="left"> ModelVerbosity <td>integer
+<td> 0&nbsp;
+<td>Set Kalman verbosity level</tr>
+<tr><th align="left"> MatchingVerbosity <td>integer
+<td> 0&nbsp;
+<td>Set Kalman verbosity level</tr>
+<tr><th align="left"> KalmanStepSize <td>float
+<td> 10. * cm&nbsp;
+<td>Step size for Kalman fitter; used if fields are not constant</tr>
+<tr><th align="left"> KalmanUseFieldMap <td>integer
+<td> 0&nbsp;
+<td>Set to 0 to use a constant field for track fits; set to 1 to use BeamTools (real) fields for reconstruction</tr>
+<tr><th colspan="4">Analysis Application controls<tr><td><i>Card</i><td><i>Type</i><td><i>Default Value</i><td><i>Description</i>
+<tr><th align="left"> AnalysisParametersFile <td>string
+<td>  AnaParams.dat &nbsp;
+<td>Auxiliary file for analysis; see $MICESRC/Analysis/doc/</tr>
+<tr><th align="left"> ICOOLfor003StyleFile <td>string
+<td>  for003.dat &nbsp;
+<td>icool beam input data file</tr>
+<tr><th align="left"> ICOOLfor009StyleFile <td>string
+<td>  for009.dat &nbsp;
+<td>icool beam output data file</tr>
+<tr><th align="left"> AnalysisParticlePdgId <td>integer
+<td> -13&nbsp;
+<td>PDG Particle ID; other events will not be used in the analysis</tr>
+<tr><th align="left"> StartEvent <td>integer
+<td> 0&nbsp;
+<td>Start event - ignores events before this</tr>
+<tr><th align="left"> TransferMapAbsoluteError <td>float
+<td> 1e-5&nbsp;
+<td>Absolute error when Optics package calculates transfer maps</tr>
+<tr><th align="left"> TransferMapRelativeError <td>float
+<td> 1e-5&nbsp;
+<td>Relative error when Optics package calculates transfer maps</tr>
+<tr><th align="left"> OpticsStepSize <td>float
+<td> 100 * mm&nbsp;
+<td>Step size for Optics package</tr>
+<tr><th align="left"> OpticsFileName <td>string
+<td>  Optics.out &nbsp;
+<td>Output file name for Optics package</tr>
+<tr><th align="left"> OpticsdEdXModel <td>string
+<td>  BetheBloch &nbsp;
+<td>dEdx model for optics package; "MinimumIonising" or "BetheBloch"</tr>
+<tr><th align="left"> OpticsCalculationOrder <td>integer
+<td> 1&nbsp;
+<td>Default order for calculation of optics transfer maps (>1 still doesn't work I'm afraid)</tr>
+<tr><th align="left"> PidInputFile <td>string
+<td>  nnReadStage6.root &nbsp;
+<td>Input PID data file for PIDAnalysis application</tr>
+<tr><th align="left"> PidTreeName <td>string
+<td>  eventTree&nbsp;
+<td>Input Tree name for PIDAnalysis application</tr>
+<tr><th align="left"> PidBGWeight <td>float
+<td> 1.&nbsp;
+<td> Weighting given to background events in PidAnalysis application</tr>
+<tr><th align="left"> PidAnalysisPlanes <td>integer
+<td> 1&nbsp;
+<td> Planes used in PidAnalysis application 1 = tracker ref, 2 = tof ref central, 3 = tof ref outer, negative = same with smearing</tr>
+</table></body></html>
+

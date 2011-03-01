@@ -1,60 +1,54 @@
-#include "Squeal.hh"
-#include "Squeak.hh"
-
-#include <ostream>
-#include <sstream>
+// Copyright 2007-2011 Chris Rogers
+//
+// This file is a part of G4MICE
+//
+// G4MICE is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// G4MICE is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with G4MICE in the doc folder.  If not, see
+// <http://www.gnu.org/licenses/>.
 
 #ifndef NO_STACKTRACE
 #include <stdlib.h>
 #include <execinfo.h>
 #endif
 
+#include <ostream>
+#include <sstream>
 
-std::ostream * Squeal::_debOut       = NULL;
-std::ostream * Squeal::_recOut       = NULL;
-std::ostream * Squeal::_nonRecOut    = NULL;
+#include "Interface/Squeal.hh"
+#include "Interface/Squeak.hh"
+
 const size_t   Squeal::_maxStackSize = 100;
 
-Squeal::Squeal() throw()
-{Squeak::mout();} //make sure we initialise Squeak otherwise can get segv
-
-Squeal::Squeal(exceptionLevel level, std::string errorMessage, std::string location) throw()
-      : exception(), _message(errorMessage), _location(location), _stacktrace(MakeStackTrace(2)), _level(level)
-{Squeak::mout();} //make sure we initialise Squeak otherwise can get segv
-
-void Squeal::Print()
-{
-	mout(int(_level)) << _message << "\n";
-	mout(-1)          << "Error at " << _location << "\n";
-  if(_stacktrace != "")
-    mout(-1)          << "Stack trace\n" << GetStackTrace() << "\n";
+Squeal::Squeal() throw() {
+  Squeak::mout();
 }
 
-
-std::ostream&  Squeal::mout   (int level)
-{
-  switch( level )
-  {
-    case int(Squeal::recoverable):    return *_recOut;
-    case int(Squeal::nonRecoverable): return *_nonRecOut;
-    default:                          return *_debOut;
-  }
+Squeal::Squeal(exceptionLevel level, std::string errorMessage,
+                                                   std::string location) throw()
+      : exception(), _message(errorMessage), _location(location),
+                                 _stacktrace(MakeStackTrace(2)), _level(level) {
+  Squeak::mout();  // make sure we initialise Squeak otherwise can get segv
 }
 
-void Squeal::setOutput(int level, std::ostream& out)
-{
-  switch( level )
-  {
-    case int(Squeal::recoverable):    _recOut    = &out;
-    case int(Squeal::nonRecoverable): _nonRecOut = &out;
-    default:                          _debOut    = &out;
-  }
-
+void Squeal::Print() {
+  Squeak::mout(_level) << _message << "\n";
+  Squeak::mout(Squeak::debug) << "Error at " << _location << "\n";
+  if (_stacktrace != "")
+    Squeak::mout(Squeak::debug) << "Stack trace\n" << GetStackTrace() << "\n";
 }
 
 #ifndef NO_STACKTRACE
-std::string Squeal::MakeStackTrace(size_t skipTrace) 
-{
+std::string Squeal::MakeStackTrace(size_t skipTrace) {
   size_t stackSize;
   void * stackAddress[_maxStackSize];
   char **stackNames;
@@ -63,7 +57,8 @@ std::string Squeal::MakeStackTrace(size_t skipTrace)
   stackSize  = backtrace(stackAddress, _maxStackSize);
   stackNames = backtrace_symbols(stackAddress, stackSize);
 
-  for (size_t i = skipTrace; i < stackSize; i++) sstr << stackNames[i] << std::endl;
+  for (size_t i = skipTrace; i < stackSize; i++) sstr << stackNames[i]
+                                                                   << std::endl;
   free(stackNames);
   return sstr.str();
 }
@@ -72,3 +67,4 @@ std::string Squeal::MakeStackTrace(size_t skipTrace)
 #ifdef NO_STACKTRACE
 std::string Squeal::MakeStackTrace() {return "";}
 #endif
+

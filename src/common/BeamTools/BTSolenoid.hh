@@ -39,9 +39,10 @@
 
 #include "BTField.hh"
 #include "BTSheet.hh"
-#include "Interface/SplineInterpolator.hh"
 #include "Interface/MagFieldMap.hh"
 #include "Interface/Squeak.hh"
+
+#include "Interface/SplineInterpolator.hh"
 
 class BTSolenoid: public BTField
 {

@@ -3,9 +3,11 @@
 # This script creates a local .tar.gz copy
 # of the redmine wiki of MAUS. -Tunnell
 #
-rm -Rf wiki
-mkdir wiki
-cd wiki
+# edit: make it location independent; 
+rm -Rf ${MAUS_ROOT_DIR}/doc/wiki
+mkdir ${MAUS_ROOT_DIR}/doc/wiki
+cd ${MAUS_ROOT_DIR}/doc/wiki
 wget --no-directories --html-extension --level=1 --recursive --convert-links --no-parent -p http://micewww.pp.rl.ac.uk/projects/maus/wiki/Page_index
-cd ..
-tar cvfz wiki.tar.gz wiki
+tar cvfz wiki.tar.gz ${MAUS_ROOT_DIR}/doc/wiki
+
+

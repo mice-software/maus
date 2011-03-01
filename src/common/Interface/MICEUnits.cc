@@ -11,27 +11,25 @@ using CLHEP::candela;
 
 //HepTool::Evaluator  MICEUnits::_evaluator;
 
-MICEUnits::MICEUnits() : _default(1.), _units()
+MICEUnits::MICEUnits() : _default(1.), _units(), _evaluator()
 {
 	SetUnits();
 }
 
 double MICEUnits::GetUnits(const std::string unitString)
 {
-        if( unitString == "none" )
-           return 1.;
+  if( unitString == "none" )
+     return 1.;
 
 	double unitsMultiplier = 1;
 	std::string localString=unitString;
-//	for(unsigned int i=0; i<localString.size(); i++)
-//		localString[i] = tolower(localString[i]);
 
 	unitsMultiplier = _evaluator.evaluate(localString.c_str());
 
 	if(_evaluator.status() != HepTool::Evaluator::OK && _evaluator.status() != HepTool::Evaluator::WARNING_BLANK_STRING)
 	{
-		std::cerr << "Error in unit " << unitString << ". ";
 		_evaluator.print_error();
+		throw(Squeal(Squeal::recoverable, "Error parsing unit "+unitString, "MICEUnits::GetUnits") );
 	}
 	if(_evaluator.status() != HepTool::Evaluator::OK && _evaluator.status())
 		return _default;

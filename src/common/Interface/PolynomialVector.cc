@@ -481,7 +481,7 @@ PolynomialVector* PolynomialVector::Chi2SweepingLeastSquaresFit
     while(chi2 < chi2Max && step < maxNumberOfSteps) {
       in.push_back(std::vector<double>(delta.size(), 0.));
       step++;
-      std::vector<std::vector<double> > in_mod = PointShell(delta, i_order+1);
+      std::vector<std::vector<double> > in_mod = PointBox(delta, i_order+1);
       for(size_t i=0; i<in_mod.size(); i++) in.push_back(in_mod[i]);
       vec.FAppend(in, out);
       if(pvec2 != NULL && pvec1 != NULL) delete  pvec2;
@@ -514,7 +514,7 @@ PolynomialVector* PolynomialVector::Chi2SweepingLeastSquaresFitVariableWalls
         if(chi2 < chi2Max)
           delta[i] *= deltaFactor;
         step++;
-        std::vector<std::vector<double> > in = PointShell(delta, i_order+1);
+        std::vector<std::vector<double> > in = PointBox(delta, i_order+1);
         in.push_back(std::vector<double>(delta.size(), 0.));
         std::vector<std::vector<double> > out;
         vec.FAppend(in, out);
@@ -592,7 +592,7 @@ double PolynomialVector::GetAvgChi2OfDifference(std::vector< std::vector<double>
 //so that it will always define a polynomial of order i_order (one point +ve, one -ve hence factor 2)
 //Require evenly spaced points, sometimes this means I make more points on the shell
 static const double PI = atan(1)*4.;
-std::vector< std::vector<double> > PolynomialVector::PointShell(std::vector<double> delta, int i_order)
+std::vector< std::vector<double> > PolynomialVector::PointBox(std::vector<double> delta, int i_order)
 {
   int min_size         = 3*NumberOfPolynomialCoefficients(i_order, delta.size());
   int n_points_per_dim = 2;
@@ -617,6 +617,20 @@ std::vector< std::vector<double> > PolynomialVector::PointShell(std::vector<doub
     }
   }
   return pos;
+}
+
+//Algorithm - take the PointBox output and scale so that length is 1 in scale_matrix coordinate system
+std::vector< std::vector<double> > PolynomialVector::PointShell(MMatrix<double> scale_matrix, int i_order) {
+  size_t          point_dim = scale_matrix.num_row();
+  MMatrix<double> scale_inv = scale_matrix.inverse();
+  std::vector<std::vector<double> > point_box = PointBox(std::vector<double>(point_dim, 1.), i_order);
+  for(size_t i=0; i<point_box.size(); i++) {
+    MVector<double> point(&point_box[i][0], &point_box[i][0]+point_dim);
+    double scale  = (point.T()*scale_inv*point)(1);
+    point        /= pow(scale, double(point_dim));
+    for(size_t j=0; j<point_dim; j++) point_box[i][j]=point(j+1); 
+  }
+  return point_box;
 }
 ////////// POLYNOMIALVECTOR END ////////////
 
