@@ -3,9 +3,6 @@ directory=gtest-1.5.0
 filename=${directory}.tar.gz
 url=http://googletest.googlecode.com/files/${filename}
 
-my_install_dir = ${MAUS_ROOT_DIR}/third_party/install/${directory}
-my_lib_install = ${my_install_dir}/lib
-
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
     if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ]
@@ -36,15 +33,15 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
       tar xvfz ${MAUS_ROOT_DIR}/third_party/source/${filename} -C ${MAUS_ROOT_DIR}/third_party/build > /dev/null
       cd ${MAUS_ROOT_DIR}/third_party/build/${directory}
 
-	    echo
-	    echo "INFO: Configuring"
-	    echo
+      echo
+      echo "INFO: Configuring"
+      echo
       ./configure --prefix=${MAUS_ROOT_DIR}/third_party/install
-	    echo
-	    echo "INFO: Making"
-	    echo
-	    make
-	    echo
+      echo
+      echo "INFO: Making"
+      echo
+      make
+      echo
       echo "INFO: Installing within MAUS's third party directory:"
 	    echo
       make install
