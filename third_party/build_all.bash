@@ -39,6 +39,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     ${MAUS_ROOT_DIR}/third_party/bash/26xboa.bash
     ${MAUS_ROOT_DIR}/third_party/bash/27recpack.bash
     ${MAUS_ROOT_DIR}/third_party/bash/28gtest.bash
+    ${MAUS_ROOT_DIR}/third_party/bash/29gunit.bash
 else
 echo
 echo "FATAL: MAUS_ROOT_DIR is not set, which is required to" >&2
