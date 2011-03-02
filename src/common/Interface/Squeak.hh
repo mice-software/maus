@@ -74,7 +74,7 @@ class Squeak {
   ///   * if verboseLevel > int(Squeak::debug), set std::cout to /dev/null
   ///   * if verboseLevel > int(Squeak::info), set std::clog to /dev/null
   ///   * if verboseLevel > int(Squeak::warning), set std::cerr to /dev/null
-  ///
+  ///   * if verboseLevel < 0, take default from int datacard "VerboseLevel"
   /// GEANT4 has very verbose output that hides important run control info, so
   /// we can just turn it off by redirecting std::cout here.
   static void setStandardOutputs(int verboseLevel=-1);

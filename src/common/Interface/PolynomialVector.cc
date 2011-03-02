@@ -608,6 +608,7 @@ std::vector< std::vector<double> > PolynomialVector::PointBox(std::vector<double
   std::vector<double> grid_spacing(delta);
   for(size_t i=0; i<grid_spacing.size(); i++) grid_spacing[i] *= 2./double(n_points_per_dim-1);
   for(size_t i=0; i<grid_min    .size(); i++) grid_min    [i] *= -1.;
+
   NDGrid grid(dim, &grid_size[0], &grid_spacing[0], &grid_min[0]);
   for(Mesh::Iterator it=grid.Begin(); it<grid.End(); it++) {
     std::vector<int> place = it.State();
@@ -617,20 +618,6 @@ std::vector< std::vector<double> > PolynomialVector::PointBox(std::vector<double
     }
   }
   return pos;
-}
-
-//Algorithm - take the PointBox output and scale so that length is 1 in scale_matrix coordinate system
-std::vector< std::vector<double> > PolynomialVector::PointShell(MMatrix<double> scale_matrix, int i_order) {
-  size_t          point_dim = scale_matrix.num_row();
-  MMatrix<double> scale_inv = scale_matrix.inverse();
-  std::vector<std::vector<double> > point_box = PointBox(std::vector<double>(point_dim, 1.), i_order);
-  for(size_t i=0; i<point_box.size(); i++) {
-    MVector<double> point(&point_box[i][0], &point_box[i][0]+point_dim);
-    double scale  = (point.T()*scale_inv*point)(1);
-    point        /= pow(scale, double(point_dim));
-    for(size_t j=0; j<point_dim; j++) point_box[i][j]=point(j+1); 
-  }
-  return point_box;
 }
 ////////// POLYNOMIALVECTOR END ////////////
 

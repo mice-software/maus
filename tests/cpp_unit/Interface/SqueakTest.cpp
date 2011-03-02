@@ -21,6 +21,7 @@
 
 #include "gtest/gtest.h"
 
+#include "src/common/Interface/MICERun.hh"
 #include "src/common/Interface/Squeak.hh"
 #include "src/common/Interface/Squeal.hh"
 
@@ -65,6 +66,8 @@ TEST(SqueakTest, SqueakMoutDefaultTest) {
 }
 
 void __TestStdOutputs(int i) {
+    if (i < 0)
+      i = MICERun::getInstance()->DataCards->fetchValueInt("VerboseLevel");
     if (i > static_cast<int>(Squeak::debug)) {
       EXPECT_EQ(std::cout.rdbuf(), Squeak::nullOut().rdbuf()) << i << " "
                                              << static_cast<int>(Squeak::debug);

@@ -51,7 +51,6 @@ void BTTracker::integrate(double target_indie, double* y, const BTField* field, 
   //Probably not the most efficient, but only does it once per integrate call
   _absoluteError = MICERun::getInstance()->DataCards->fetchValueDouble("VirtualAbsoluteError");
   _relativeError = MICERun::getInstance()->DataCards->fetchValueDouble("VirtualRelativeError");
-  _maxNSteps     = MICERun::getInstance()->DataCards->fetchValueInt   ("MaxStepsWOELoss");
 
   double indie  = 0.;
   switch (indep)
@@ -93,7 +92,7 @@ void BTTracker::integrate(double target_indie, double* y, const BTField* field, 
     if(nsteps > _maxNSteps)
     {
       std::stringstream ios;
-      ios << "Killing tracking with step size " << h << " at step " << nsteps << "\n" 
+      ios << "Killing tracking with step size " << h << " at step " << nsteps << " of " << _maxNSteps << "\n" 
           << "t: " << y[0] << " pos: " << y[1] << " " << y[2] << " " << y[3] << "\n"
           << "E: " << y[4] << " mom: " << y[5] << " " << y[6] << " " << y[7] << std::endl; 
       throw(Squeal(Squeal::recoverable, ios.str()+" Exceeded maximum number of steps\n", "BTTracker::integrate") );
@@ -213,7 +212,7 @@ int BTTracker::u_equations_motion  (double z, const double x[8], double dxdz[8],
   p_in             = _rot*p_in;
   double field[6]  = {bfield[0],bfield[1],bfield[2],efield[0],efield[1],efield[2]};
   if(fabs(p_in[2]) < 1e-9) return GSL_ERANGE;
-  double dir    = fabs(p_in[2])/p_in[2]; //direction of motion
+  double dir    = 1.;//p_in[2])/p_in[2]; //direction of motion
 
   double q_c    = _q;
   double dtdz   = x[4]/p_in[2];
