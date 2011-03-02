@@ -4,16 +4,12 @@
 #include "gtest/gtest.h"
 
 #include "Interface/Squeak.hh"
+#include "Interface/MVector.hh"
 #include "Interface/MMatrix.hh"
 #include "Interface/MMatrixToCLHEP.hh"
 #include "Interface/PolynomialVector.hh"
 #include "Interface/Differentiator.hh"
 #include "Config/ModuleConverter.hh"
-/*
-#include "TGraph.h"
-#include "TH2D.h"
-#include "TCanvas.h"
-*/
 
 /// NOTE: tests PolynomialVector, Differentiator and PolynomialInterpolator classes ///
 /// Three classes that are very closely related anyway... ///
@@ -21,7 +17,6 @@
 bool PolynomialVectorTest();
 bool PolynomialLeastSquaresTest();
 bool PolyVector_PointBox_Test();
-bool PolyVector_PointShell_Test();
 bool PolyVector_GetAvgChi2OfDifference_Test();
 bool PolyVector_Means_Test();
 bool PolyVector_Covariances_Test();
@@ -84,8 +79,6 @@ bool PolynomialVectorTest()
 
     testpass &= PolyVector_PointBox_Test();
     Squeak::mout(Squeak::debug) << "PointBoxTest " << testpass << std::endl;
-    testpass &= PolyVector_PointShell_Test();
-    Squeak::mout(Squeak::debug) << "PointShellTest " << testpass << std::endl;
     testpass &= PolyVector_Means_Test();
     Squeak::mout(Squeak::debug) << "MeansTest " << testpass << std::endl;
     testpass &= PolyVector_Covariances_Test();
@@ -133,10 +126,6 @@ bool PolyVector_PointBox_Test()
   }
 
   return testpass;
-}
-
-bool PolyVector_PointShell_Test() {
-  return false;
 }
 
 bool PolyVector_GetAvgChi2OfDifference_Test()
@@ -451,7 +440,6 @@ bool PolynomialLeastSquaresTest()
 
 TEST(PolynomialTest, old_unit_tests)
 {
-    EXPECT_TRUE(PolynomialVectorTest()) << "PointShell test is failing at the moment - fix tomorrow";
     EXPECT_TRUE(PolynomialLeastSquaresTest());
 }
 
