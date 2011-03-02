@@ -262,65 +262,64 @@ Export('env')
 #  unit = env.Command('does_not_exist2', 'build', '%s -m unittest discover -b -v build' % python_executable)
 #  env.Alias('unittest', [unit])
 
-if not env.GetOption('clean'):
-  print "Configuring..."
-  conf = Configure(env, custom_tests = {'CheckCommand' : CheckCommand})
-  set_cpp(conf, env)
-  set_python(conf, env)
-  set_gsl(conf, env)
-  set_root(conf, env)
-  set_clhep(conf, env)
-  set_geant4(conf, env)
-  set_recpack(conf, env)
-  set_gtest(conf, env)
+print "Configuring..."
+conf = Configure(env, custom_tests = {'CheckCommand' : CheckCommand})
+set_cpp(conf, env)
+set_python(conf, env)
+set_gsl(conf, env)
+set_root(conf, env)
+set_clhep(conf, env)
+set_geant4(conf, env)
+set_recpack(conf, env)
+set_gtest(conf, env)
 
-  # check types size!!!
-  env = conf.Finish()
-  if 'configure' in COMMAND_LINE_TARGETS:
-    Exit(0)
+# check types size!!!
+env = conf.Finish()
+if 'configure' in COMMAND_LINE_TARGETS:
+  Exit(0)
 
 
-  # NOTE: do this after configure!  So we know if we have ROOT/geant4
-  # TODO: this should be a loop that discovers stuff
-  #specify all of the sub-projects in the section
-  if env['USE_G4'] and env['USE_ROOT']:
-    env.Append(CCFLAGS=['-g','-pg'])
-    env.Append(LINKFLAGS='-pg')
+# NOTE: do this after configure!  So we know if we have ROOT/geant4
+# TODO: this should be a loop that discovers stuff
+#specify all of the sub-projects in the section
+if env['USE_G4'] and env['USE_ROOT']:
+  env.Append(CCFLAGS=['-g','-pg'])
+  env.Append(LINKFLAGS='-pg')
     
-    commonCppFiles = glob.glob("src/common/*/*cc") + glob.glob("src/common/*/*/*cc") + glob.glob("src/common/*/*cpp") + glob.glob("src/common/*/*/*cpp")
-    simulate = env.SharedLibrary(target = 'src/common/libsimulate', source = commonCppFiles, LIBS=['recpack'] +  env['LIBS'])
-    env.Install("build", simulate)
+  commonCppFiles = glob.glob("src/common/*/*cc") + glob.glob("src/common/*/*/*cc") + glob.glob("src/common/*/*cpp") + glob.glob("src/common/*/*/*cpp")
+  simulate = env.SharedLibrary(target = 'src/common/libsimulate', source = commonCppFiles, LIBS=['recpack'] +  env['LIBS'])
+  env.Install("build", simulate)
 
-    env.Append(LIBPATH = 'src/common/')
-    env.Append(CPPPATH = os.environ.get('MAUS_ROOT_DIR'))
+  env.Append(LIBPATH = 'src/common/')
+  env.Append(CPPPATH = os.environ.get('MAUS_ROOT_DIR'))
 
-    testCppFiles = glob.glob("tests/cpp_unit/*/*cpp")+glob.glob("tests/cpp_unit/*cpp")
-    testmain = env.Program(target = 'tests/cpp_unit/test_cpp_unit', source = testCppFiles, LIBS=['recpack'] +  env['LIBS']+['simulate'])
-    env.Install('build', ['tests/cpp_unit/test_cpp_unit'])
+  testCppFiles = glob.glob("tests/cpp_unit/*/*cpp")+glob.glob("tests/cpp_unit/*cpp")
+  testmain = env.Program(target = 'tests/cpp_unit/test_cpp_unit', source = testCppFiles, LIBS=['recpack'] +  env['LIBS']+['simulate'])
+  env.Install('build', ['tests/cpp_unit/test_cpp_unit'])
 
-  directories = []
-  types = ["input", "map", "reduce", "output"]
-  for type in types:
-    directories += glob.glob("src/%s/*" % type)
+directories = []
+types = ["input", "map", "reduce", "output"]
+for type in types:
+  directories += glob.glob("src/%s/*" % type)
 
-  for directory in directories:
-    parts = directory.split("/")
-    assert len(parts) == 3
-    assert parts[0] == 'src'
-    assert parts[1] in types
+for directory in directories:
+  parts = directory.split("/")
+  assert len(parts) == 3
+  assert parts[0] == 'src'
+  assert parts[1] in types
     
-    if 'Py' in parts[2] and 'Cpp' not in parts[2]:
-      print 'Found Python input: %s' % parts[2]
-      files = glob.glob('%s/test_*.py' % directory) +  ["%s/%s.py" % (directory, parts[2])]
-      env.Install("build", files)   
+  if 'Py' in parts[2] and 'Cpp' not in parts[2]:
+    print 'Found Python input: %s' % parts[2]
+    files = glob.glob('%s/test_*.py' % directory) +  ["%s/%s.py" % (directory, parts[2])]
+    env.Install("build", files)   
 
-    if parts[2][0:6] == 'MapCpp':
-      print 'Found C++ mapper: %s' % parts[2] 
-      env.jDev.Subproject(directory)
+  if parts[2][0:6] == 'MapCpp':
+    print 'Found C++ mapper: %s' % parts[2] 
+    env.jDev.Subproject(directory)
 
     
-  files = glob.glob('tests/unit/test_*')
-  env.Install("build", files)
+files = glob.glob('tests/unit/test_*')
+env.Install("build", files)
 
-  env.Alias('install', ['%s/build' % os.environ.get('MAUS_ROOT_DIR')])
+env.Alias('install', ['%s/build' % os.environ.get('MAUS_ROOT_DIR')])
 

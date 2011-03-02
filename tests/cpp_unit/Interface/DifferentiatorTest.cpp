@@ -220,7 +220,7 @@ bool TestF(PolynomialInterpolator* pInt, double tolerance)
     return funcpass;
 }
 
-TEST(DifferentiatorTest, test_all) {
+TEST(DifferentiatorTest, old_unit_tests) {
     EXPECT_TRUE( DifferentiatorTest());
 }
 

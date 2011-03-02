@@ -160,15 +160,14 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
           export LD_LIBRARY_PATH="\${MAUS_ROOT_DIR}/third_party/install/lib:\${LD_LIBRARY_PATH}" # else add it
      fi
 
-     # x-boa requires this
-     export ROOTSYS="\${MAUS_ROOT_DIR}/third_party/install"
-
      # ROOT specific garbage
-     export LD_LIBRARY_PATH="\${MAUS_ROOT_DIR}/third_party/install/lib/root:\${LD_LIBRARY_PATH}"
+     export ROOTSYS="\${MAUS_ROOT_DIR}/third_party/build/root_v5.26.00e"   
+     export PATH="\${ROOTSYS}/bin:\${PATH}"
+     export LD_LIBRARY_PATH="\${ROOTSYS}/lib:\${LD_LIBRARY_PATH}"
      if [ -z "\${PYTHONPATH}" ]; then  # see if the variable exists yet
-          export PYTHONPATH="\${MAUS_ROOT_DIR}/third_party/install/lib/root" # intiailize it
+          export PYTHONPATH="\${ROOTSYS}/lib" # intiailize it
      else
-          export PYTHONPATH="\${MAUS_ROOT_DIR}/third_party/install/lib/root:\${PYTHONPATH}" # else add it
+          export PYTHONPATH="\${ROOTSYS}/lib:\${PYTHONPATH}" # else add it
      fi
 
      # maus workers
@@ -232,15 +231,18 @@ else
           setenv LD_LIBRARY_PATH "\${MAUS_ROOT_DIR}/third_party/install/lib" # intiailize it
      endif
 
-     # x-boa requires this
-     setenv ROOTSYS "\${MAUS_ROOT_DIR}/third_party/install"  
+     if( ! -e \${MAUS_ROOT_DIR}/third_party/build/root_v5.26.00e/bin/thisroot.csh ) then 
+          source \${MAUS_ROOT_DIR}/third_party/build/root_v5.26.00e/bin/thisroot.csh        
+     endif 
 
      # ROOT specific garbage
-     setenv LD_LIBRARY_PATH "\${MAUS_ROOT_DIR}/third_party/install/lib/root:\${LD_LIBRARY_PATH}"
+     setenv ROOTSYS "\${MAUS_ROOT_DIR}/third_party/build/root_v5.26.00e"
+     setenvt PATH "\${ROOTSYS}/bin:\${PATH}"
+     setenv LD_LIBRARY_PATH "\${ROOTSYS}/lib:\${LD_LIBRARY_PATH}"
      if ({\$?PYTHONPATH}) then
-          setenv PYTHONPATH "\${MAUS_ROOT_DIR}/third_party/install/lib/root:\${PYTHONPATH}" # else add it
+          setenv PYTHONPATH "\${ROOTSYS}/lib:\${PYTHONPATH}" # else add it
      else
-          setenv PYTHONPATH "\${MAUS_ROOT_DIR}/third_party/install/lib/root" # intiailize it
+          setenv PYTHONPATH "\${ROOTSYS}/lib" # intiailize it
      endif
 
      # maus workers
