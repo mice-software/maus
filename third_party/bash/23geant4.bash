@@ -17,7 +17,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 	wget --directory-prefix=${MAUS_ROOT_DIR}/third_party/source ${url}
 	wget --directory-prefix=${MAUS_ROOT_DIR}/third_party/source http://micewww.pp.rl.ac.uk:8080/attachments/download/92/geant_config.tar.gz # TODO fixme
 	wget --directory-prefix=${MAUS_ROOT_DIR}/third_party/source http://micewww.pp.rl.ac.uk:8080/attachments/download/81/geant_data.tar.gz  # TODO fixme
-	wget --directory-prefix=${MAUS_ROOT_DIR}/third_party/source http://micewww.pp.rl.ac.uk:8080/attachments/download/98/Configure # todo fixme
+	#wget --directory-prefix=${MAUS_ROOT_DIR}/third_party/source http://micewww.pp.rl.ac.uk:8080/attachments/download/98/Configure # todo fixme
 
     fi
    
@@ -65,14 +65,13 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 	echo
         sleep 1
 
-	bash Configure -f .config/bin/Linux-g++/config.sh -d -e -build
-	bash Configure -install
+	./Configure -f .config/bin/Linux-g++/config.sh -d -e -build
 
-	#echo
-        #echo "INFO: Installing:"
-	#echo
-        #sleep 1
-	#./Configure -install
+	echo
+        echo "INFO: Installing:"
+	echo
+        sleep 1
+	./Configure -install
 	            ################################################## 
 	echo
         echo "INFO: The package should be locally build now in your"
