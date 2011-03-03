@@ -221,6 +221,7 @@ env.Append(LIBPATH =  libs.split(':') + ["%s/build" % os.environ.get('MAUS_ROOT_
 
 env.Append(CPPPATH=["%s/third_party/install/include" % os.environ.get('MAUS_ROOT_DIR'), \
                       "%s/third_party/install/include/python2.7" % os.environ.get('MAUS_ROOT_DIR'), \
+                      "%s/third_party/install/include/root" % os.environ.get('MAUS_ROOT_DIR'), \
                       "%s/src/common" % os.environ.get('MAUS_ROOT_DIR'), ""])
 
 env['USE_G4'] = False
