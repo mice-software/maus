@@ -278,7 +278,7 @@ TEST_F(BTMultipoleTest, GetFieldValueTest_TanhQuad) {
                                      ((i == 2 && j == 2) || (i == 1 && j == 3)))
           ASSERT_NEAR(differentials(i, j),
                       _tanh_end_straight_quad->GetMagnitude()*
-                      _tanh.Function(z-_length/2, 1e-6), 1e-6 )
+                      _tanh.Function(z-_length/2, 0), 1e-6 )
                           << i << " " << j << " " << z;
         else
           ASSERT_NEAR(differentials(i, j), 0., 1e-12)
