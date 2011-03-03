@@ -147,6 +147,12 @@ root_version=root_v5.28.00a
 
 cat > env.sh <<EOF
 #/bin/sh
+
+if [ -f \${MAUS_ROOT_DIR}/third_party/build/$root_version/bin/thisroot.sh ]                                                                                                     
+then                                                                                                                                                                            
+     source \${MAUS_ROOT_DIR}/third_party/build/$root_version/bin/thisroot.sh                                                                                                   
+fi    
+
 if [ -z "\$MAUS_ROOT_DIR" ]; then
      export MAUS_ROOT_DIR="${maus_root_dir}"
 
@@ -160,11 +166,6 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
           export LD_LIBRARY_PATH="\${MAUS_ROOT_DIR}/third_party/install/lib" # intiailize it
      else
           export LD_LIBRARY_PATH="\${MAUS_ROOT_DIR}/third_party/install/lib:\${LD_LIBRARY_PATH}" # else add it
-     fi
-
-     if [ -f \${MAUS_ROOT_DIR}/third_party/build/$root_version/bin/thisroot.sh ]
-     then
-          source \${MAUS_ROOT_DIR}/third_party/build/$root_version/bin/thisroot.sh
      fi
 
      export PATH="\${ROOTSYS}/bin:\${PATH}"
@@ -182,12 +183,6 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      # maus core
      export PYTHONPATH="\$MAUS_ROOT_DIR/src/core:\$PYTHONPATH"
      export LD_LIBRARY_PATH="\$MAUS_ROOT_DIR/src/core:\$LD_LIBRARY_PATH"
-
-     # disco
-#     export DISCO_HOME="\$MAUS_ROOT_DIR/third_party/build/tuulos-disco-742e814"
-#     export PATH="\$DISCO_HOME/bin:\$PATH"
-#     export PYTHONPATH="\$DISCO_HOME/lib:\$PYTHONPATH"
-#     export LD_LIBRARY_PATH="\$DISCO_HOME/lib:\$LD_LIBRARY_PATH"
 
      export G4DEBUG=1
      export G4VERS=geant4.9.2.p04
@@ -212,15 +207,20 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
 
      echo "SUCCESS: MAUS setup"
 else
-     echo "ERROR: MAUS already setup"
+     echo "WARNING: MAUS already setup"
 fi
 
 EOF
 
 cat > env.csh <<EOF
 #/bin/csh
+
+if( ! -e \${MAUS_ROOT_DIR}/third_party/build/$root_version/bin/thisroot.csh ) then                                                                                              
+     source \${MAUS_ROOT_DIR}/third_party/build/$root_version/bin/thisroot.csh                                                                                                  
+endif   
+
 if ({\$?MAUS_ROOT_DIR}) then
-     echo "ERROR: MAUS already setup"
+     echo "WARNING: MAUS already setup"
 else
      setenv MAUS_ROOT_DIR "${maus_root_dir}"
 
@@ -235,10 +235,6 @@ else
      else
           setenv LD_LIBRARY_PATH "\${MAUS_ROOT_DIR}/third_party/install/lib" # intiailize it
      endif
-
-     if( ! -e \${MAUS_ROOT_DIR}/third_party/build/$root_version/bin/thisroot.csh ) then 
-          source \${MAUS_ROOT_DIR}/third_party/build/$root_version/bin/thisroot.csh        
-     endif 
 
      # ROOT specific garbage
      setenvt PATH "\${ROOTSYS}/bin:\${PATH}"
@@ -256,12 +252,6 @@ else
      # maus core
      setenv PYTHONPATH "\$MAUS_ROOT_DIR/src/core:\$PYTHONPATH"
      setenv LD_LIBRARY_PATH "\$MAUS_ROOT_DIR/src/core:\$LD_LIBRARY_PATH"
-
-     # disco
-#     setenv DISCO_HOME "\$MAUS_ROOT_DIR/third_party/build/tuulos-disco-742e814"
-#     setenv PATH "\$DISCO_HOME/bin:\$PATH"
-#     setenv PYTHONPATH "\$DISCO_HOME/lib:\$PYTHONPATH"
-#     setenv LD_LIBRARY_PATH "\$DISCO_HOME/lib:\$LD_LIBRARY_PATH"
 
      setenv G4DEBUG 1
      setenv G4VERS geant4.9.2.p04
