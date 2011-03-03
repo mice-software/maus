@@ -152,7 +152,7 @@ std::vector<CLHEP::Hep3Vector> BTFieldGroup::GetBBVertices(int index)
   loc_bb[0] = _fields[index]->BoundingBoxMin();
   loc_bb[1] = _fields[index]->BoundingBoxMax();
 //  std::cout << loc_bb[0][0] << " " << loc_bb[0][1] << " " << loc_bb[0][2] << " ** " << loc_bb[0][0] << " " << loc_bb[1][1] << " " << loc_bb[1][2] << std::endl;
-  double perms[24] = {1,1,1, 1,1,0, 1,0,1, 0,1,1, 0,0,1, 0,1,0, 1,0,0, 0,0,0}; //permutations (or combinations or whatever)
+  int perms[24] = {1,1,1, 1,1,0, 1,0,1, 0,1,1, 0,0,1, 0,1,0, 1,0,0, 0,0,0}; //permutations (or combinations or whatever)
   for(int j=0; j<8; j++) 
   {
     int p0=perms[j*3], p1=perms[j*3+1], p2=perms[j*3+2];

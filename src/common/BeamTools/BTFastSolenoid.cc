@@ -203,7 +203,7 @@ void AddTanhDiffIndex(int n)
   {
     tdi.push_back(std::vector<int>(1,0));
     tdi.push_back(std::vector<int>(2,0));
-    tdi.back()[1] = 1.;
+    tdi.back()[1] = 1;
   }
   while(size_t(n) >= tdi.size() )
   {
