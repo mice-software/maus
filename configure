@@ -141,6 +141,8 @@ type -P scons &>/dev/null || {
     echo "FATAL:";
     exit 1;}
 
+root_version=root_v5.28.00a
+
 ### Create environment files
 
 cat > env.sh <<EOF
@@ -160,8 +162,11 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
           export LD_LIBRARY_PATH="\${MAUS_ROOT_DIR}/third_party/install/lib:\${LD_LIBRARY_PATH}" # else add it
      fi
 
-     # ROOT specific garbage
-     export ROOTSYS="\${MAUS_ROOT_DIR}/third_party/build/root_v5.26.00e"   
+     if [ -f \${MAUS_ROOT_DIR}/third_party/build/$root_version/bin/thisroot.sh ]
+     then
+          source \${MAUS_ROOT_DIR}/third_party/build/$root_version/bin/thisroot.sh
+     fi
+
      export PATH="\${ROOTSYS}/bin:\${PATH}"
      export LD_LIBRARY_PATH="\${ROOTSYS}/lib:\${LD_LIBRARY_PATH}"
      if [ -z "\${PYTHONPATH}" ]; then  # see if the variable exists yet
@@ -231,12 +236,11 @@ else
           setenv LD_LIBRARY_PATH "\${MAUS_ROOT_DIR}/third_party/install/lib" # intiailize it
      endif
 
-     if( ! -e \${MAUS_ROOT_DIR}/third_party/build/root_v5.26.00e/bin/thisroot.csh ) then 
-          source \${MAUS_ROOT_DIR}/third_party/build/root_v5.26.00e/bin/thisroot.csh        
+     if( ! -e \${MAUS_ROOT_DIR}/third_party/build/$root_version/bin/thisroot.csh ) then 
+          source \${MAUS_ROOT_DIR}/third_party/build/$root_version/bin/thisroot.csh        
      endif 
 
      # ROOT specific garbage
-     setenv ROOTSYS "\${MAUS_ROOT_DIR}/third_party/build/root_v5.26.00e"
      setenvt PATH "\${ROOTSYS}/bin:\${PATH}"
      setenv LD_LIBRARY_PATH "\${ROOTSYS}/lib:\${LD_LIBRARY_PATH}"
      if ({\$?PYTHONPATH}) then
