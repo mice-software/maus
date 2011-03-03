@@ -266,14 +266,13 @@ template <class Temp> Temp        ModuleTextFileIO::fromString(const std::string
 
 void ModuleTextFileIO::parseString(const std::string& source, int& out)
 {
-  std::string value="", units="";
+  std::string value="";
   std::stringstream ss(source);
-  ss >> value >> units;
+  ss >> value;
   MI_alias(value);
-  out = _evaluator.evaluate(value.c_str());
+  out = static_cast<int>(_evaluator.evaluate(value.c_str()));
   if(_evaluator.status() != HepTool::Evaluator::OK && _evaluator.status())
       throw(Squeal(Squeal::recoverable, "Could not convert "+source+" to an int", "ModuleTextFileIO::parseString(const std::string&, int&)"));
-  out *= _units.GetUnits(units);
 }
 
 void ModuleTextFileIO::parseString(const std::string& source, double& out)
