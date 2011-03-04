@@ -17,7 +17,7 @@ Differentiator::Differentiator (VectorMap* in, std::vector<double> delta, std::v
         _factKey.push_back(1);
         std::vector<int> powerKey = PolynomialVector::IndexByPower(i,_inSize);
         for(int j=0; j<int(powerKey.size()); j++) 
-            _factKey[i] *= gsl_sf_fact(powerKey[j]);
+            _factKey[i] *= static_cast<int>(gsl_sf_fact(powerKey[j]));
     }
 }
 

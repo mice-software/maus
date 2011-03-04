@@ -166,7 +166,7 @@ unsigned int PolynomialVector::NumberOfPolynomialCoefficients(int pointDimension
     int n=0;
     if(order<=0) return 0;
     for(int i=1; i<order; i++)
-        n += gsl_sf_choose(pointDimension+i-1, i);
+        n += static_cast<int>(gsl_sf_choose(pointDimension+i-1, i));
     return n+1;
 }
 

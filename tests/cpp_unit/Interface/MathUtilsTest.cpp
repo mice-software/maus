@@ -207,7 +207,7 @@ TEST_F(EngeTest, HNTest) {
 // few x values and then compare numerical and analytical derivatives
 TEST_F(EngeTest, GNTest) {
   for (double x = -10; x < 11; x++) {
-    EXPECT_DOUBLE_EQ(_enge.GN(x, 0), 1+exp(_enge.HN(x, 0.)));
+    EXPECT_DOUBLE_EQ(_enge.GN(x, 0), 1+exp(_enge.HN(x, 0)));
   }
   test_deriv(_enge, &Enge::GN, 1e-6, -10., 10., 1e-6, 9);
 }
@@ -216,7 +216,7 @@ TEST_F(EngeTest, GNTest) {
 // a few x values and then compare numerical and analytical derivatives
 TEST_F(EngeTest, GetEngeTest) {
   for (double x = -10; x < 11; x++)
-    EXPECT_DOUBLE_EQ(_enge.GetEnge(x, 0), 1./(_enge.GN(x, 0.)));
+    EXPECT_DOUBLE_EQ(_enge.GetEnge(x, 0), 1./(_enge.GN(x, 0)));
   test_deriv(_enge, &Enge::GetEnge, 1e-9, -10., 10., 1e-6, 9);
 }
 
@@ -290,8 +290,8 @@ TEST_F(TanhTest, GetNegTanhTest) {
 // sum of tanh and neg tanh
 TEST_F(TanhTest, GetDoubleTanhTest) {
   for (double x = -20.; x < 21; x++)
-    ASSERT_EQ(2.*_d_tanh.GetDoubleTanh(x, 0),
-              tanh((x+_x0)/_lambda)-tanh((x-_x0)/_lambda));
+    ASSERT_NEAR(2.*_d_tanh.GetDoubleTanh(x, 0),
+              tanh((x+_x0)/_lambda)-tanh((x-_x0)/_lambda), 1e-12);
   test_deriv(_d_tanh, &Tanh::GetTanh, 1e-6, -100., 100., 1e-6, 6);
 }
 }

@@ -152,7 +152,7 @@ std::vector<CLHEP::Hep3Vector> BTFieldGroup::GetBBVertices(int index)
   loc_bb[0] = _fields[index]->BoundingBoxMin();
   loc_bb[1] = _fields[index]->BoundingBoxMax();
 //  std::cout << loc_bb[0][0] << " " << loc_bb[0][1] << " " << loc_bb[0][2] << " ** " << loc_bb[0][0] << " " << loc_bb[1][1] << " " << loc_bb[1][2] << std::endl;
-  double perms[24] = {1,1,1, 1,1,0, 1,0,1, 0,1,1, 0,0,1, 0,1,0, 1,0,0, 0,0,0}; //permutations (or combinations or whatever)
+  int perms[24] = {1,1,1, 1,1,0, 1,0,1, 0,1,1, 0,0,1, 0,1,0, 1,0,0, 0,0,0}; //permutations (or combinations or whatever)
   for(int j=0; j<8; j++) 
   {
     int p0=perms[j*3], p1=perms[j*3+1], p2=perms[j*3+2];
@@ -382,8 +382,8 @@ void BTFieldAmalgamation::AmalgamateAll()
 
 void BTFieldAmalgamation::AmalgamateThis()
 {
-  int numberOfXCoords = r_max/r_step+1;
-  int numberOfYCoords = z_length/z_step+1;
+  int numberOfXCoords = static_cast<int>(r_max/r_step)+1;
+  int numberOfYCoords = static_cast<int>(z_length/z_step)+1;
   TwoDGrid* myGrid = new TwoDGrid(r_step, z_step, 0., -z_length/2., numberOfXCoords, numberOfYCoords);
   double**  Br = new double*[numberOfXCoords];
   double**  Bz = new double*[numberOfXCoords];
