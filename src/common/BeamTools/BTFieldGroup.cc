@@ -382,8 +382,8 @@ void BTFieldAmalgamation::AmalgamateAll()
 
 void BTFieldAmalgamation::AmalgamateThis()
 {
-  int numberOfXCoords = r_max/r_step+1;
-  int numberOfYCoords = z_length/z_step+1;
+  int numberOfXCoords = static_cast<int>(r_max/r_step)+1;
+  int numberOfYCoords = static_cast<int>(z_length/z_step)+1;
   TwoDGrid* myGrid = new TwoDGrid(r_step, z_step, 0., -z_length/2., numberOfXCoords, numberOfYCoords);
   double**  Br = new double*[numberOfXCoords];
   double**  Bz = new double*[numberOfXCoords];
