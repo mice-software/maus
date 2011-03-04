@@ -290,8 +290,8 @@ TEST_F(TanhTest, GetNegTanhTest) {
 // sum of tanh and neg tanh
 TEST_F(TanhTest, GetDoubleTanhTest) {
   for (double x = -20.; x < 21; x++)
-    ASSERT_EQ(2.*_d_tanh.GetDoubleTanh(x, 0),
-              tanh((x+_x0)/_lambda)-tanh((x-_x0)/_lambda));
+    ASSERT_NEAR(2.*_d_tanh.GetDoubleTanh(x, 0),
+              tanh((x+_x0)/_lambda)-tanh((x-_x0)/_lambda), 1e-12);
   test_deriv(_d_tanh, &Tanh::GetTanh, 1e-6, -100., 100., 1e-6, 6);
 }
 }
