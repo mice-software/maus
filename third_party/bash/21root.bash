@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-directory=root_v5.26.00e
+directory=root_v5.28.00a
 filename=${directory}.source.tar.gz 
 url=ftp://root.cern.ch/root/${filename}
 
@@ -39,7 +39,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 	echo
 	sleep 1
 
-	./configure --enable-roofit --disable-fftw3 --disable-xrootd --disable-krb5 --build=debug --with-gsl-incdir=${MAUS_ROOT_DIR}/third_party/install/include --with-gsl-libdir=${MAUS_ROOT_DIR}/third_party/install/lib && echo && echo && echo "INFO: Making:" && echo && sleep 1 && make || { echo "FAIL: Failed to configure/make";exit 1; }
+	./configure --with-gsl-incdir=${MAUS_ROOT_DIR}/third_party/install/include --with-gsl-libdir=${MAUS_ROOT_DIR}/third_party/install/lib && echo && echo && echo "INFO: Making:" && echo && sleep 1 && make || { echo "FAIL: Failed to configure/make";exit 1; }
 
 	            ################################################## 
 	echo
