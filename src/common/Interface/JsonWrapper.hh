@@ -190,24 +190,31 @@ class JsonWrapper::JsonObject {
  *  @authors Chris Rogers <chris.rogers@stfc.ac.uk>
  */
 class JsonWrapper::JsonTree {
-  public:
-    JsonTree() {}
-    ~JsonTree() {}
-    void Initialise(Json::Value encodedTree);
-    Json::Value EncodeTree();
-    Json::Value EncodeNode(std::string node_name);
-    void PrintWiki(std::ostream& out);
-    bool CheckTree(Json::Value json_input);
-    bool HasChild(std::string) {throw("Not implemented");}
-    JsonTree& GetChild(std::string) {throw("Not implemented");}
-    std::vector<Json::Value> ChildrenAsValue();
-    std::string DocString(std::string node_name) {throw("Not implemented");}
+ public:
+  JsonTree() {}
+  ~JsonTree() {}
+  /// Initialise tree from some Json data stream
+  void Initialise(Json::Value encodedTree);
+  /// Encode from tree to flat Json stream
+  Json::Value EncodeTree();
+  /// Encode a single node to a flat Json stream
+  Json::Value EncodeNode(std::string node_name);
+  /// Write as a wiki format
+  void PrintWiki(std::ostream& out);
+  /// Check the json tree
+  bool CheckTree(Json::Value json_input);
+  /// Get children - note there is a one to many relationship between name and the allowed types
+  std::vector<JsonTree> GetChildren(std::string name) {throw("Not implemented");}
+  /// Get children encoded as a list of values
+  std::vector<Json::Value> ChildrenAsValue();
+  /// Check to see if there is a doc string associated with the node name
+  std::string DocString(std::string node_name) {throw("Not implemented");}
  private:
   // ------------- KDTree -------------- //
   std::vector<JsonTree> children;
   JsonObject leaf;
 
-  std::string to_string(int i) {throw("Not implemented");} 
+  std::string to_string(int i) {throw("Not implemented");}
 
   // ------------- Formatting information ------------- //
 

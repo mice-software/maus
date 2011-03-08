@@ -125,24 +125,21 @@ bool JsonWrapper::JsonTree::CheckTree(Json::Value val) {
   // if value is iterable (Json::array or Json::object) then iterate over
   // children and return result. Else just return true (we already checked this
   // lead)
+  MList ml;
   switch (val.type()) {
-    case Json::objectValue: { // stupid C++ scoping problem so need braces
-      MList ml = val.getMemberNames();
-      for (MList::iterator it = ml.begin(); it != ml.end(); ++it) {
-        if (!HasChild(*it)) return false;
-        else testpass &= GetChild(*it).CheckTree(val[*it]);
-      }
+    case Json::objectValue: // stupid C++ scoping problem so need braces
+      ml = val.getMemberNames();
       break;
-    }
     case Json::arrayValue: // CHECK - what do I want to put here?
-      for (size_t i = 0; i < val.size(); ++i) {
-        std::string i_str = to_string(i);
-        if (!HasChild(i_str)) return false;
-        else testpass &= GetChild(i_str).CheckTree(val[i]);
-      }
+      ml = std::vector<std::string>(1, array_name);
       break;
     default: // not an iterable type so no need to check children
       return true;
+  }
+  for (MList::iterator it = ml.begin(); it != ml.end(); ++it) {
+    std::vector<JsonTree> children = GetChildren(*it);
+    if (children.size() == 0) return false; // no children of that type -> illegal
+    throw("ERROR - Not implemented"); // Need to add loop over children and check
   }
   return testpass;
 }
