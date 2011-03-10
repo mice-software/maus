@@ -1,9 +1,11 @@
 # json schema to define (and validate) a json schema. Hack draft-03 to make it
-# consistent with validator
+# consistent with validator. Based on json validation version 0.3
 
 # CHANGES (Rogers):
 #  * capitalise true, false to make it pythonic
 #  * Remove unsupported tags: uniqueItems, $schema, additionalProperties, $ref 
+#  * Add new tag: optionalItems (doesnt seem any way to do variable length 
+#                arrays that I found)
 
 schema = {
 	"id" : "http://json-schema.org/draft-03/schema#",

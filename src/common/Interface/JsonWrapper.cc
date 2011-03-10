@@ -18,12 +18,12 @@
 
 #include <algorithm>
 
-#include <json/json.h>
+#include "json/json.h"
 
-#include "Squeal.hh"
-#include "JsonWrapper.hh"
+#include "src/common/Interface/Squeal.hh"
+#include "src/common/Interface/JsonWrapper.hh"
 
-Json::Value JsonWrapper::StringToJson(std::string json_in) throw (Squeal) {
+Json::Value JsonWrapper::StringToJson(std::string json_in) throw(Squeal) {
   Json::Reader reader;
   Json::Value  json_out;
   bool parsingSuccessful = reader.parse(json_in, json_out);
@@ -37,7 +37,7 @@ Json::Value JsonWrapper::StringToJson(std::string json_in) throw (Squeal) {
 }
 
 Json::Value JsonWrapper::GetItem
-   (Json::Value array, size_t value_index, JsonType value_type) throw (Squeal) {
+    (Json::Value array, size_t value_index, JsonType value_type) throw(Squeal) {
   if (array.type() != Json::arrayValue) {
     throw(Squeal(Squeal::recoverable,
                  "Attempting to find Json item but not an array",
@@ -64,9 +64,9 @@ Json::Value JsonWrapper::GetProperty
                  "JsonWrapper::GetPropertyStrict"));
   }
   if (object.isMember(name))
-    if(SimilarType(ValueTypeToJsonType(object[name].type()), value_type))
+    if (SimilarType(ValueTypeToJsonType(object[name].type()), value_type)) {
       return object[name];
-    else {
+    } else {
       throw(Squeal(Squeal::recoverable,
                    "Property "+name+"  had wrong type in Json object lookup",
                    "JsonWrapper::GetPropertyStrict"));
@@ -90,8 +90,8 @@ JsonWrapper::JsonType JsonWrapper::ValueTypeToJsonType(Json::ValueType tp) {
   }
 }
 
-Json::ValueType JsonWrapper::JsonTypeToValueType(JsonWrapper::JsonType tp) 
-                                                                throw (Squeal) {
+Json::ValueType JsonWrapper::JsonTypeToValueType(JsonWrapper::JsonType tp)
+                                                                throw(Squeal) {
   switch (tp) {
     case nullValue:    return Json::nullValue;
     case intValue:     return Json::intValue;
@@ -101,15 +101,15 @@ Json::ValueType JsonWrapper::JsonTypeToValueType(JsonWrapper::JsonType tp)
     case booleanValue: return Json::booleanValue;
     case arrayValue:   return Json::arrayValue;
     case objectValue:  return Json::objectValue;
-    case anyValue:     
-      throw(Squeal(Squeal::recoverable, 
+    case anyValue:
+      throw(Squeal(Squeal::recoverable,
                    "Could not convert anyValue to Json ValueType",
                    "JsonWrapper::JsonTypeToValueType"));
   }
 }
 
 
-bool JsonWrapper::SimilarType(JsonWrapper::JsonType jt1, 
+bool JsonWrapper::SimilarType(JsonWrapper::JsonType jt1,
                               JsonWrapper::JsonType jt2) {
   return (jt1 == jt2 || jt1 == JsonWrapper::anyValue
                      || jt2 == JsonWrapper::anyValue);

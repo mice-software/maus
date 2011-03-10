@@ -1,4 +1,6 @@
-/* This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
+/* Copyright Chris Rogers 2011
+ *
+ * This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
  *
  * MAUS is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +33,9 @@
 
 #ifndef INTERFACE_JSONWRAPPER_HH
 
-#include <json/json.h>
+#include <string>
+
+#include "json/json.h"
 
 #include "src/common/Interface/STLUtils.hh"
 #include "src/common/Interface/Squeal.hh"
@@ -46,15 +50,15 @@ class JsonWrapper {
    *  Note Json always assumes integers are signed
    */
   enum JsonType {
-    nullValue,    //  'null' value
-    uintValue,    //  unsigned integer value;
-    intValue,     //  signed integer value
-    realValue,    //    double value
-    stringValue,  //   UTF-8 string value.
-    booleanValue, //  bool value
-    arrayValue,   //  array value (ordered list)
-    objectValue,  //  object value (collection of name/value pairs).
-    anyValue      //  object value (collection of name/value pairs).
+    nullValue,     // 'null' value
+    uintValue,     // unsigned integer value;
+    intValue,      // signed integer value
+    realValue,     // double value
+    stringValue,   // UTF-8 string value.
+    booleanValue,  // bool value
+    arrayValue,    // array value (ordered list)
+    objectValue,   // object value (collection of name/value pairs).
+    anyValue       // object value (collection of name/value pairs).
   };
 
   /** \brief Convert a string to a Json::Value tree 
@@ -65,7 +69,7 @@ class JsonWrapper {
    *  fails to parse the string. The configuration is a dict of Json::Value,
    *  which is in itself a Json::Value.
    */
-  static Json::Value StringToJson(std::string json_in) throw (Squeal);
+  static Json::Value StringToJson(std::string json_in) throw(Squeal);
 
   /** \brief Get an item from a Json array (variable length array)
    *
@@ -77,7 +81,7 @@ class JsonWrapper {
    *  failure
    */
   static Json::Value GetItem(Json::Value array, size_t value_index,
-                                            JsonType value_type) throw (Squeal);
+                                            JsonType value_type) throw(Squeal);
 
   /** \brief Get a property from a Json object (hash)
    *
@@ -91,7 +95,7 @@ class JsonWrapper {
    */
   static Json::Value GetProperty
      (Json::Value object, std::string value_name,
-                          JsonType value_type) throw (Squeal);
+                          JsonType value_type) throw(Squeal);
 
 
   /** \brief Convert from Json::ValueType to JsonType

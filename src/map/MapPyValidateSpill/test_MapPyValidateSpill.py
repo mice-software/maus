@@ -2,7 +2,7 @@ import MapPyValidateSpill
 from MapPyValidateSpill import MapPyValidateSpill
 import json
 import unittest
-import validator
+import Validator
 import SpillSchema
 import SchemaSchema
 
@@ -12,7 +12,7 @@ class MapPyValidateSpillTestCase(unittest.TestCase):
     mapper.Birth()
 
   def __test_validate_schema(self):
-    val = validator.JSONSchemaValidator(interactive_mode=False)
+    val = Validator.JSONSchemaValidator(interactive_mode=False)
     val.validate(SpillSchema.three_vec_schema, SchemaSchema.schema)
     val.validate(SpillSchema.mc_track_hit_schema, SchemaSchema.schema)
     val.validate(SpillSchema.mc_particle_schema, SchemaSchema.schema)
