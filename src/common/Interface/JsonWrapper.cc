@@ -1,149 +1,117 @@
+// Copyright 2011 Chris Rogers
+//
+// This file is a part of MAUS
+//
+// MAUS is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// MAUS is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with MAUS in the doc folder.  If not, see
+// <http://www.gnu.org/licenses/>.
+
+#include <algorithm>
+
 #include <json/json.h>
 
 #include "Squeal.hh"
 #include "JsonWrapper.hh"
 
-Json::Value JsonWrapper::ReadConfiguration(std::string configuration_in) 
-                                                                throw (Squeal) {
+Json::Value JsonWrapper::StringToJson(std::string json_in) throw (Squeal) {
   Json::Reader reader;
-  Json::Value  configuration_out;
-  bool parsingSuccessful = reader.parse(configuration_in, configuration_out);
+  Json::Value  json_out;
+  bool parsingSuccessful = reader.parse(json_in, json_out);
   if (!parsingSuccessful) {
     throw(Squeal(Squeal::recoverable,
-          "Failed to parse Json configuration",
-          "JsonWrapper::ReadConfiguration()"));
+          "Failed to parse Json configuration. Json reports\n"
+                                      +reader.getFormatedErrorMessages(),
+          "JsonWrapper::StringToJson()"));
   }
-  return configuration_out;
+  return json_out;
 }
 
-Json::Value GetValue(const Json::Value& value_list, std::string value_name)
+Json::Value JsonWrapper::GetItem
+   (Json::Value array, size_t value_index, JsonType value_type) throw (Squeal) {
+  if (array.type() != Json::arrayValue) {
+    throw(Squeal(Squeal::recoverable,
+                 "Attempting to find Json item but not an array",
+                 "JsonWrapper::GetPropertyStrict"));
+  }
+  if (value_index >= array.size()) {
+    throw(Squeal(Squeal::recoverable,
+                         "Index out of range "+STLUtils::ToString(value_index)
+                                                      +" in Json array lookup",
+                         "JsonWrapper::GetItemStrict"));
+  }
+  if (SimilarType(ValueTypeToJsonType(array[value_index].type()), value_type))
+    return array[value_index];
+  throw(Squeal(Squeal::recoverable,
+               "Value of wrong type in Json array lookup",
+               "JsonWrapper::GetItemStrict"));
+}
+
+Json::Value JsonWrapper::GetProperty
+     (Json::Value object, std::string name, JsonType value_type) throw(Squeal) {
+  if (object.type() != Json::objectValue) {
+    throw(Squeal(Squeal::recoverable,
+                 "Attempting to find Json property "+name+" but not an object",
+                 "JsonWrapper::GetPropertyStrict"));
+  }
+  if (object.isMember(name))
+    if(SimilarType(ValueTypeToJsonType(object[name].type()), value_type))
+      return object[name];
+    else {
+      throw(Squeal(Squeal::recoverable,
+                   "Property "+name+"  had wrong type in Json object lookup",
+                   "JsonWrapper::GetPropertyStrict"));
+
+    throw(Squeal(Squeal::recoverable,
+                 "Property "+name+"  not found in Json object lookup",
+                 "JsonWrapper::GetPropertyStrict"));
+  }
+}
+
+JsonWrapper::JsonType JsonWrapper::ValueTypeToJsonType(Json::ValueType tp) {
+  switch (tp) {
+    case Json::nullValue: return nullValue;
+    case Json::intValue: return intValue;
+    case Json::uintValue: return uintValue;
+    case Json::realValue: return realValue;
+    case Json::stringValue: return stringValue;
+    case Json::booleanValue: return booleanValue;
+    case Json::arrayValue: return arrayValue;
+    case Json::objectValue: return objectValue;
+  }
+}
+
+Json::ValueType JsonWrapper::JsonTypeToValueType(JsonWrapper::JsonType tp) 
                                                                 throw (Squeal) {
-  if (!value_list.isMember(value_name)) {
-    throw(Squeal(Squeal::recoverable,
-                 "Failed to find "+value_name+" in Json value list",
-                 "JsonWrapper::GetValue"));
-  }
-  return value_list[value_name];
-}
-
-Json::Value JsonWrapper::ReadData(std::string data_in) throw (Squeal) {
-  Json::Reader reader;
-  Json::Value  data_out;
-  bool parsingSuccessful = reader.parse(data_in, data_out);
-  if (!parsingSuccessful) {
-    throw(Squeal(Squeal::recoverable,
-          "Failed to parse Json data",
-          "JsonWrapper::ReadData()"));
-  }
-  return data_out;
-}
-
-bool JsonWrapper::GetChild
-        (Json::Value data, JsonObject object, int max_depth, Json::Value& val) {
-  if (data.isMember(object.GetName()) && 
-      data[object.GetName()].type() == object.GetType()) {
-    val = data[object.GetName()];
-    return true;
-  }
-  if (max_depth > 1 or max_depth < 0)
-    for (Json::Value::iterator it = data.begin(); it != data.end(); ++it) {
-      return GetChild(*it, object, max_depth-1, val);
-    }
-  return false;
-}
-
-
-Json::Value JsonWrapper::GetChildStrict
-           (Json::Value data, JsonObject object, int max_depth) throw (Squeal) {
-  // nb we don't want the exception in the recursion so we only make exceptions
-  // at the top level
-  Json::Value value;
-  if(!GetChild(data, object, max_depth, value)) {
-    throw(Squeal(Squeal::recoverable, "Failed to get value "+
-                  object.GetName()+" from json tree", 
-                  "JsonWrapper::GetChildStrict"));
-  }
-  return value;  
-}
-
-bool JsonWrapper::IsChild
-                        (Json::Value parent, JsonObject object, int max_depth) {
-  if (parent.isMember(object.GetName()) && 
-      parent[object.GetName()].type() == object.GetType()) return true;
-  if (max_depth > 1 or max_depth < 0)
-    for (Json::Value::iterator it = parent.begin(); it != parent.end(); ++it) {
-      return IsChild(*it, object, max_depth-1);
-    }
-  return false;
-}
-
-/*
-void JsonWrapper::JsonTree::Initialise(Json::Value encodedTree) {
-  for ();
-}
-
-Json::Value JsonWrapper::JsonTree::
-  EncodeTree(Json::Value val, std::string ancestors) {
-  for (std::vector<JsonObject>::iterator it = children.begin();
-                                                   it != children.end(); ++it) {
-    (*it)->
+  switch (tp) {
+    case nullValue:    return Json::nullValue;
+    case intValue:     return Json::intValue;
+    case uintValue:    return Json::uintValue;
+    case realValue:    return Json::realValue;
+    case stringValue:  return Json::stringValue;
+    case booleanValue: return Json::booleanValue;
+    case arrayValue:   return Json::arrayValue;
+    case objectValue:  return Json::objectValue;
+    case anyValue:     
+      throw(Squeal(Squeal::recoverable, 
+                   "Could not convert anyValue to Json ValueType",
+                   "JsonWrapper::JsonTypeToValueType"));
   }
 }
 
-  for (Json::Members::iterator it = member_list.begin(); 
-                                              it != member_list.end() ++it) {
-    std::string new_ancestor = ancestors+spacer+(*it);
-    if (ancestors == "") new_ancestor = (*it); // no spacer for top level
-    ConvertToString(val[*it], new_ancestor, spacer);
-  }
+
+bool JsonWrapper::SimilarType(JsonWrapper::JsonType jt1, 
+                              JsonWrapper::JsonType jt2) {
+  return (jt1 == jt2 || jt1 == JsonWrapper::anyValue
+                     || jt2 == JsonWrapper::anyValue);
 }
-*/
-
-Json::Value JsonWrapper::JsonTree::EncodeNode(std::string node_name) {
-
-  Json::Value node(Json::objectValue);
-  node[type_id] = Json::Value(leaf.GetType());
-  node[docs_id] = Json::Value(DocString(node_name));
-  if (leaf.GetType() == Json::objectValue) {
-    Json::Value val(Json::arrayValue);
-    for (size_t i=0; i<children.size(); ++i) {
-      val[i] = Json::Value(children[i].leaf.GetName());
-    }
-    node[children_id] = val;
-  } else if (leaf.GetType() == Json::arrayValue) {
-    Json::Value val(Json::arrayValue);
-    val[static_cast<unsigned int>(0)] = Json::Value(array_name);
-    node[children_id] = val;
-  }
-  return node;
-}
-
-bool JsonWrapper::JsonTree::CheckTree(Json::Value val) {
-  typedef Json::Value::Members MList; // is a std::vector<std::string>
-  if (val.type() != leaf.GetType()) return false;
-  bool testpass = true;
-  // if value is iterable (Json::array or Json::object) then iterate over
-  // children and return result. Else just return true (we already checked this
-  // lead)
-  MList ml;
-  switch (val.type()) {
-    case Json::objectValue: // stupid C++ scoping problem so need braces
-      ml = val.getMemberNames();
-      break;
-    case Json::arrayValue: // CHECK - what do I want to put here?
-      ml = std::vector<std::string>(1, array_name);
-      break;
-    default: // not an iterable type so no need to check children
-      return true;
-  }
-  for (MList::iterator it = ml.begin(); it != ml.end(); ++it) {
-    std::vector<JsonTree> children = GetChildren(*it);
-    if (children.size() == 0) return false; // no children of that type -> illegal
-    throw("ERROR - Not implemented"); // Need to add loop over children and check
-  }
-  return testpass;
-}
-
-
-
 

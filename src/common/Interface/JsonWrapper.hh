@@ -22,234 +22,96 @@
  *  and requires lots of error checking etc. I wrap the Json function calls here
  *  in order to reduce verbosity.
  *
- *  I am also working up some functions for hard coding the Json tree - to
- *  provide some "default" structure with as much as possible checked at compile
- *  time. Here I am worried that e.g. one guy uses "mc" branch and another guy
- *  uses e.g. "MC" branch and we end up in a mess (more likely one guy uses "px"
- *  branch and another guy uses "p_x" branch and then we have to write a whole
- *  load of converters from _this data type to _that data type - we end up in a
- *  mess.
- *
- *  Also then we can start working up to automated documentation of the
- *  "default" tree structure...
- *
- *  Nb: Json "object" is like a map<std::string, Json::Value>
+ *  Nb jargon:
+ *  * Json "object" is like a map<std::string, Json::Value>.
+ *  * Json "array" is a dynamic length array
  *
  *  @authors Chris Rogers <chris.rogers@stfc.ac.uk>
  */
 
+#ifndef INTERFACE_JSONWRAPPER_HH
+
 #include <json/json.h>
 
-#include "Interface/STLUtils.hh"
-
-template <class T> class KDTree
-{
- private:
-  std::vector< KDTree<T> > children;
-  T& leaf;
-};
+#include "src/common/Interface/STLUtils.hh"
+#include "src/common/Interface/Squeal.hh"
 
 class JsonWrapper {
  public:
   /** \brief List of data types allowed by json
+   *
+   *  List of data types allowed by json, with additional type "anyValue" for
+   *  when we don't care.
+   *
+   *  Note Json always assumes integers are signed
    */
-  typedef Json::ValueType JsonType;
+  enum JsonType {
+    nullValue,    //  'null' value
+    uintValue,    //  unsigned integer value;
+    intValue,     //  signed integer value
+    realValue,    //    double value
+    stringValue,  //   UTF-8 string value.
+    booleanValue, //  bool value
+    arrayValue,   //  array value (ordered list)
+    objectValue,  //  object value (collection of name/value pairs).
+    anyValue      //  object value (collection of name/value pairs).
+  };
 
-  /** \brief Defines a name-type pair that defines a Json Value
+  /** \brief Convert a string to a Json::Value tree 
+   *
+   *  \param json_in raw string holding the configuration information
+   *
+   *  Read in a string and return as a Json value. Throw a Squeal if the reader
+   *  fails to parse the string. The configuration is a dict of Json::Value,
+   *  which is in itself a Json::Value.
    */
-  class JsonObject;
+  static Json::Value StringToJson(std::string json_in) throw (Squeal);
 
-  /** \brief Defines a KDTree of JsonObjects that defines a Json tree
+  /** \brief Get an item from a Json array (variable length array)
+   *
+   *  \param value_list array of values from which we want to get a value
+   *  \param value_index index of the value we want to get
+   *  \param value_type type of the value we want to get
+   *
+   *  Returns the Json::Value on success. Throws an exception of type Squeal on
+   *  failure
    */
-  class JsonTree;
+  static Json::Value GetItem(Json::Value array, size_t value_index,
+                                            JsonType value_type) throw (Squeal);
 
-  /** \brief Read the Json configuration (global run controls)
-   *
-   *  \param configuration_in raw string holding the configuration information
-   *
-   *  Read in the configuration information and return as a Json value. Throw a
-   *  Squeal if the reader fails to parse the configuration. The configuration
-   *  is a dict of Json::Value, which is in itself a Json::Value.
-   */
-  static Json::Value ReadConfiguration(std::string configuration_in)
-                                                                 throw (Squeal);
-
-  /** \brief Get a value from a list of values
-   *
-   *  \param value_list list of values from which we want to find a particular
-   *                    datum
-   *  \param value_name name of the datum we want to get
-   *
-   *  Read in the configuration information and return as a Json value. Throw a
-   *  Squeal if the value does not exist.
-   */
-  static Json::Value GetValue
-         (const Json::Value& value_list, std::string value_name) throw (Squeal);
-
-  /** \brief Read the Json data structure (hits, etc)
-   *
-   *  \param data_in raw string holding the configuration information
-   *
-   *  Read in the data information and return as a Json::Value. Throw a Squeal
-   *  if the reader fails to parse the data. The configuration is a dict of
-   *  Json::Value, which is in itself a Json::Value.
-   */
-  static Json::Value ReadData(std::string data_in) throw (Squeal);
-
-  /** \brief Get a child branch from the Json data structure
-   *
-   *  \param data the Json data tree
-   *  \param branch_name raw string holding the name of the branch you want
-   *
-   *  Attempt to access a branch from Json. If the branch does not exist, throw
-   *  a Squeal.
-   */
-  static Json::Value GetChild
-      (Json::Value data, std::string datum_name, int max_depth) throw (Squeal);
-
-  /** \brief Get a branch from the Json data structure
+  /** \brief Get a property from a Json object (hash)
    *
    *  \param parent the Json data tree
    *  \param branch_type enumeration holding the name of the branch you want
-   *  \param max_depth maximum depth to search for the branch
+   *  \param max_depth maximum depth to search for the branch. Set to negative
+   *                   to search the whole tree.
    *
-   *  Attempt to access a branch from Json and put in value. Return true if the
-   *  branch was found else false.
+   *  Attempt to access a branch from Json. If the branch is not found, throw a
+   *  Squeal.
    */
-  static bool GetChild
- (Json::Value parent, JsonObject datum_object, int max_depth, Json::Value& val);
+  static Json::Value GetProperty
+     (Json::Value object, std::string value_name,
+                          JsonType value_type) throw (Squeal);
 
-  /** \brief Get a branch from the Json data structure
-   *
-   *  \param parent the Json data tree
-   *  \param branch_type enumeration holding the name of the branch you want
-   *  \param max_depth maximum depth to search for the branch
-   *
-   *  Attempt to access a branch from Json. If the branch does not exist, throw
-   *  a Squeal.
+
+  /** \brief Convert from Json::ValueType to JsonType
    */
-  static Json::Value GetChildStrict
-     (Json::Value parent, JsonObject datum_object, int max_depth) throw (Squeal);
+  static JsonType ValueTypeToJsonType(Json::ValueType tp);
 
-
-  /** \brief Return true if object is in the tree below parent
-   *
-   *  \param parent look for object here
-   *  \param object look for parent here
-   *  \param depth search the tree to a maximum depth (e.g. max_depth = 1 will
-   *         only search the children of parent). If max_depth is < 0, will
-   *         continue until the tree is exhausted.
-   *
-   *  Recursively searches the tree looking for object.
+  /** \brief Convert from JsonType to Json::ValueType
    */
-  static bool IsChild(Json::Value parent, JsonObject object, int max_depth);
+  static Json::ValueType JsonTypeToValueType(JsonType tp) throw(Squeal);
 
-  /** \brief Return true if the tree is reflected in the json input
-   *
-   *  \param json_input input tree from json
-   *  \param tree input KDTree that encodes the actual structure in the tree
-   *
+  /** \brief Return true if types are equal or anyValue
    */
-  static bool CheckTree(Json::Value json_input, JsonTree tree);
+  static bool SimilarType(JsonType jt1, JsonType jt2);
 
-  static bool isIterable(Json::ValueType val);
  private:
+  JsonWrapper();
   ~JsonWrapper();
-
   DISALLOW_COPY_AND_ASSIGN(JsonWrapper);
 };
 
-/** @class JsonObject
- *  \brief encode mapping of json value name to a particular type
- *
- *  To encode the json tree, we want to write down the permitted value names and
- *  associated types at each step of the tree
- *
- *  @authors Chris Rogers <chris.rogers@stfc.ac.uk>
- */
-class JsonWrapper::JsonObject {
- public:
-  JsonObject() : _name(""), _type(Json::nullValue) {;}
-  JsonObject(std::string name, JsonType type) : _name(name), _type(type) {}
-  ~JsonObject() {}
-  std::string GetName() {return _name;}
-  JsonType    GetType() {return _type;}
- private:
-  std::string _name;
-  JsonType    _type;
-  void operator=(const JsonObject&);
-};
-
-/** @class JsonTree
- *  \brief encode json tree structure
- *
- *  Encodes the permitted value names and types at each step of the tree. At
- *  each level we want to remember:- the value name, value type, any children.
- *  We flatten the JsonTree and encode it as a Json::Value
- *
- *  @authors Chris Rogers <chris.rogers@stfc.ac.uk>
- */
-class JsonWrapper::JsonTree {
- public:
-  JsonTree() {}
-  ~JsonTree() {}
-  /// Initialise tree from some Json data stream
-  void Initialise(Json::Value encodedTree);
-  /// Encode from tree to flat Json stream
-  Json::Value EncodeTree();
-  /// Encode a single node to a flat Json stream
-  Json::Value EncodeNode(std::string node_name);
-  /// Write as a wiki format
-  void PrintWiki(std::ostream& out);
-  /// Check the json tree
-  bool CheckTree(Json::Value json_input);
-  /// Get children - note there is a one to many relationship between name and the allowed types
-  std::vector<JsonTree> GetChildren(std::string name) {throw("Not implemented");}
-  /// Get children encoded as a list of values
-  std::vector<Json::Value> ChildrenAsValue();
-  /// Check to see if there is a doc string associated with the node name
-  std::string DocString(std::string node_name) {throw("Not implemented");}
- private:
-  // ------------- KDTree -------------- //
-  std::vector<JsonTree> children;
-  JsonObject leaf;
-
-  std::string to_string(int i) {throw("Not implemented");}
-
-  // ------------- Formatting information ------------- //
-
-  std::string anc_id; // string that ids the Json Value that stores ancestors
-  std::string type_id;  // string that ids the Json Value as a value type
-  std::string children_id;  // string that ids the Json Value as a list of
-                            // permitted children
-  std::string docs_id;  // string that ids the Json Value as documentation
-  std::string array_name; //name to put in place of array names
-
-  const std::map<std::string, std::string> doc_strings;
-  // e.g. a tree like mc -> tracks (array) -> (array of steps) -> (object) \
-  //                                                -> x y z px py pz (floats)
-  //                     -> errors (object) -> bad_type (string)
-  // would be encoded as
-  // mc                       | object | tracks, errors | Monte Carlo output
-  // mc::tracks               | array  | int            | Array of MC tracks
-  // mc::tracks::int          | array  | int            | Array of track steps
-  // mc::tracks::int::int     | array  | x y z px py pz | Track step pos/mom
-  // mc::tracks::int::int::x  | float  |                | x position
-  // mc::tracks::int::int::y  | float  |                | y position
-  // mc::tracks::int::int::z  | float  |                | z position
-  // mc::tracks::int::int::px | float  |                | x momentum
-  // mc::tracks::int::int::py | float  |                | y momentum
-  // mc::tracks::int::int::pz | float  |                | z momentum
-  // mc::errors               | object | bad_type       | Allowed errors
-  // mc::errors::bad_type     | string |                | Bad type found in Json
-  //
-  // Two issues:
-  // * If a parameter name has ancestor_spacer in it then we throw an exception
-  // * If a Value can take two different child types to the same parameter the
-  //   parameter will be just repeated with the different child types also
-  //   repeated - e.g. if mc::tracks can be an array or an object then we do:
-  // mc::tracks               | array  | int             | Array of MC tracks
-  // mc::tracks::int          | object | some_name       | Object of MC tracks
-};
+#endif
 
 

@@ -51,5 +51,22 @@ TEST_F(STLUtilsTest, IterableEqualityTest) {
     EXPECT_FALSE(STLUtils::IterableEquality(b, a));
   }
 }
+
+TEST_F(STLUtilsTest, ToStringTest) {
+  EXPECT_EQ(STLUtils::ToString(1), std::string("1"))
+                                                << STLUtils::ToString(1);
+  EXPECT_EQ(STLUtils::ToString("string"), std::string("string"))
+                                                << STLUtils::ToString("string");
+  EXPECT_EQ(STLUtils::ToString(3.142), std::string("3.142"))
+                                                << STLUtils::ToString(3.142);
+
+  EXPECT_EQ(STLUtils::ToStringP(1001, 3), std::string("1001"))
+                                       << STLUtils::ToStringP(1001, 3);
+  EXPECT_EQ(STLUtils::ToStringP("string", 3), std::string("string"))
+                                       << STLUtils::ToString("string");
+  EXPECT_EQ(STLUtils::ToStringP(13.14159265359, 3), std::string("13.1"))
+                                      << STLUtils::ToStringP(13.14159265359, 3);
+}
+
 }
 

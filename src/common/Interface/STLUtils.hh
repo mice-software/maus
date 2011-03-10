@@ -1,4 +1,4 @@
-// Copyright 2010 Chris Rogers
+// Copyright 2010-2011 Chris Rogers
 //
 // This file is a part of G4MICE
 //
@@ -18,6 +18,9 @@
 
 #ifndef STLUtils_HH
 #define STLUtils_HH
+
+#include <sstream>
+#include <iomanip>
 
 /// STLUtils namespace contains useful utility functions for the STL.
 
@@ -77,6 +80,28 @@ bool IterableEquality(TEMP_ITER a_begin, TEMP_ITER a_end,
 template <class TEMP_CLASS>
 inline bool IterableEquality(const TEMP_CLASS& a, const TEMP_CLASS& b);
 
+/// Convert value to a std::string.
+
+/// Convert from Temp type to a string type. If the Temp type is a floating
+/// point then precision sets the std::precision that will be used in the
+/// conversion.
+///
+/// The following operations must be defined for TEMP_CLASS
+///   - std::ostream& operator<<(Temp, std::ostream&)
+///
+template <class TEMP_CLASS> 
+std::string ToStringP(TEMP_CLASS value, int precision);
+
+/// Convert value to a std::string.
+
+/// Convert from Temp type to a string type.
+///
+/// The following operations must be defined for TEMP_CLASS
+///   - std::ostream& operator<<(Temp, std::ostream&)
+///
+template <class TEMP_CLASS> 
+std::string ToString(TEMP_CLASS value);
+
 }  // STLUtils namespace end
 
 // Function definitions for inline and templates
@@ -99,6 +124,23 @@ bool IterableEquality(TEMP_ITER a_begin, TEMP_ITER a_end, TEMP_ITER b_begin,
   if ( a_it != a_end || b_it != b_end ) return false;
   return true;
 }
+
+template <class TEMP_CLASS> std::string ToStringP
+                                             (TEMP_CLASS value, int precision) {
+  std::stringstream ss;
+  ss << std::setprecision(precision);
+  ss << value;
+  return ss.str();
+}
+
+
+template <class TEMP_CLASS> std::string ToString
+                                             (TEMP_CLASS value) {
+  std::stringstream ss;
+  ss << value;
+  return ss.str();
+}
+
 }
 
 /// A macro to disallow the copy constructor and operator= functions
