@@ -24,7 +24,7 @@
 #
 #  @author Chris Rogers <chris.rogers@stfc.ac.uk> 
 
-
+import ErrorHandler
 import SpillSchema
 import Validator
 import json
@@ -49,54 +49,12 @@ class MapPyValidateSpill:
       self.__val.validate(spill_doc, SpillSchema.spill)
       return json.dumps(spill_doc)
     except:
-      return json.dumps(self.ExceptionHandler(spill_doc))
+      return json.dumps(ErrorHandler.HandleException(spill_doc, self))
 
   ## Does nothing
   def Death(self):
     pass
 
-  ## Exception handler controls how errors are managed by the map
 
-  #  \param doc json document for dumping errors
-
-  #  Handle error according to error handling tags.
-  #  * if __error_to_console is true, send errors to std::out
-  #  * if __error_to_json is true, send errors to the json tree
-  #  * if __halt_on_error is true, call sys.exit() on error
-  #
-  #  TODO: option to throw on error (i.e. raise the exception again)
-  def ExceptionHandler(self, doc):
-    if self.__error_to_console:
-      self.ErrorsToUser()
-    if self.__error_to_json:
-      self.ErrorsToJson(doc)
-    if self.__halt_on_error:
-      sys.exit()
-    return doc
-  
-  ## Prints the exception (using sys.excepthook)
-  def ErrorsToUser(self):
-    sys.excepthook(*sys.exc_info())
-
-  ## Puts the exception into the json stream
-  #
-  #  \param doc the json document
-  #
-  #  ErrorsToJson sends error messages into the json document. ErrorsToJson puts
-  #  errors into the doc["error"]["<classname>"] property of the root object,
-  #  where <classname> is found dynamically at runtime. The error branch is
-  #  filled with <exception type>: <exception message>.
-  def ErrorsToJson(self, doc):
-    class_name = self.__class__.__name__
-    if not 'errors' in doc:
-      doc['errors'] = {}
-    if not class_name in doc['errors']:
-      doc['errors'][class_name] = []
-    doc['errors'][class_name].append(str(sys.exc_info()[0])+": "+str(sys.exc_info()[1]))
-    return doc
-
-  __error_to_console = False
-  __error_to_json    = True
-  __halt_on_error    = False
 
 
