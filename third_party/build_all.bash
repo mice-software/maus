@@ -12,7 +12,7 @@ set -e
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     filename="third_party_source_v3.tar.gz"
-    wget http://micewww.pp.rl.ac.uk:8080/attachments/download/202/${filename} -O ${MAUS_ROOT_DIR}/third_party/source/${filename}
+    wget http://micewww.pp.rl.ac.uk:8080/attachments/download/211/${filename} -O ${MAUS_ROOT_DIR}/third_party/source/${filename}
 
     cd ${MAUS_ROOT_DIR}/third_party/source
     filename=${filename} 
