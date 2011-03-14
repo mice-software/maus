@@ -26,7 +26,8 @@
 
 import ErrorHandler
 import SpillSchema
-import Validator
+import validictory
+
 import json
 import io
 import sys
@@ -35,18 +36,18 @@ import sys
 class MapPyValidateSpill:
   ## Initialisate empty map
   def __init__(self):
-    self.__val = None
+    pass
 
   ## Sets up the validator.
   def Birth(self):
-    self.__val = Validator.JSONSchemaValidator(interactive_mode=False)
+    pass
 
   ## Process the spill and enter the exception handler if an error is found.
   def Process(self, spill_data):
     try:
       spill_doc = {} #default if we fail to loads spill_data
       spill_doc = json.loads(spill_data)
-      self.__val.validate(spill_doc, SpillSchema.spill)
+      validictory.validate(spill_doc, SpillSchema.spill, required_by_default=False)
       return json.dumps(spill_doc)
     except:
       return json.dumps(ErrorHandler.HandleException(spill_doc, self))
@@ -54,7 +55,4 @@ class MapPyValidateSpill:
   ## Does nothing
   def Death(self):
     pass
-
-
-
 

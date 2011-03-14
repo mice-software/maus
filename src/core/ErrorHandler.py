@@ -46,6 +46,8 @@ class ExceptionHandler:
         sys.exit(1)
     elif self.on_error == 'raise':
         raise
+    else:
+        raise KeyError('Did not recognise on error directive '+str(self.on_error))
     return doc
 
   def ErrorsToUser(self):
@@ -74,6 +76,9 @@ class ExceptionHandler:
     return doc
 
 __default_handler = ExceptionHandler()
+
+def DefaultHandler():
+  return __default_handler
 
 def HandleException(doc, caller):
   """
