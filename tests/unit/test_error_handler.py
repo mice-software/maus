@@ -119,6 +119,9 @@ class ErrorHandlerTestCase(unittest.TestCase):
       doc = error_handler.HandleException(doc, self)  
 
   def test_DefaultHandler(self):
+    ErrorHandler.DefaultHandler().error_to_stderr = False
+    ErrorHandler.DefaultHandler().error_to_json = True
+    ErrorHandler.DefaultHandler().on_error = 'none'
     doc = {}
     try:
       raise RuntimeError("Test error 1")
