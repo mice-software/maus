@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 directory=setuptools-0.6c11
-filename=${directory}-py2.7.egg#md5=fe1f997bc722265116870bc7919059ea
+filename=${directory}-py2.7.egg
 url=http://pypi.python.org/packages/2.7/s/setuptools/${filename}
 
 my_prefix=/install
@@ -31,7 +31,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         echo
         echo "INFO: Building:"
         echo
-        sh setuptools_0.6c11-py2.7.egg
+        sh ${MAUS_ROOT_DIR}/third_party/source/setuptools-0.6c11-py2.7.egg
     fi
 
 else
