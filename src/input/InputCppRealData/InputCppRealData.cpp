@@ -15,14 +15,14 @@
  *
  */
 
-#include "InputCppRealData.hpp"
+#include "InputCppRealData.h"
 
 #include <json/json.h>
 
 #include <string>
 #include <iostream>
 
-#include "UnpackEventLib.hpp"
+#include "UnpackEventLib.h"
 
 
 InputCppRealData::InputCppRealData() {

@@ -15,7 +15,7 @@
  *
  */
 
-#include "UnpackEventLib.hpp"
+#include "UnpackEventLib.h"
 
 #include <stdint.h>
 

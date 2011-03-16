@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef _MAUS_INPUTCPPREALDATA_UNPACKEVENTLIB_HPP__
-#define _MAUS_INPUTCPPREALDATA_UNPACKEVENTLIB_HPP__
+#ifndef _MAUS_INPUTCPPREALDATA_UNPACKEVENTLIB_H__
+#define _MAUS_INPUTCPPREALDATA_UNPACKEVENTLIB_H__
 
 #include "stdint.h"
 #include <json/json.h>
@@ -126,4 +126,4 @@ public
                       Json::Value &pDoc);
 };
 
-#endif  // _MAUS_INPUTCPPREALDATA_UNPACKEVENTLIB_HPP__
+#endif  // _MAUS_INPUTCPPREALDATA_UNPACKEVENTLIB_H__

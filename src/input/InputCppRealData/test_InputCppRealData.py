@@ -1,4 +1,5 @@
 import os
+import md5
 import json
 import unittest
 
@@ -45,11 +46,20 @@ class InputCppRealDataTestCase(unittest.TestCase):
     self.assertTrue(self.mapper.Birth(self._datapath, \
                                       self._datafile))
     evntCount = 0
+
+    # We can try md5'ing the whole dataset
+    digester = md5.new()
+
     for i in self.mapper.Emitter():
+      digester.update(i)
       evntCount = evntCount + 1
 
     # We should now have processed 26 events
     self.assertTrue(evntCount == 26)
+
+    # Check the md5 sum matches the expected value
+    self.assertTrue(digester.hexdigest() == '3c6f14d25d0254056efe082541a56664')
+
     self.assertTrue(self.mapper.Death())
 
   @classmethod
