@@ -12,7 +12,7 @@ class Dev:
       SConscript(env.jDev.SPath(project), exports=['project'])
 
   #sets up the build for a given project
-  def Buildit(self, localenv, project, use_root, use_g4):
+  def Buildit(self, localenv, project, use_root, use_g4, use_unpacker = False):
     if use_root and not env['USE_ROOT']:
       if not env.GetOption('clean'):
         print "The worker", project, "requires ROOT which is disabled. Skipping..."
@@ -20,6 +20,10 @@ class Dev:
     if use_g4 and not env['USE_G4']:
       if not env.GetOption('clean'):
         print "The worker", project, "requires Geant4 which is disabled. Skipping..."
+      return
+    if use_unpacker and not env['USE_UNPACKER']:
+      if not env.GetOption('clean'):
+        print "The worker", project, "requires Unpacker which is disabled. Skipping..."
       return
 
 
@@ -199,6 +203,16 @@ def set_gtest(conf, env):
   if not conf.CheckCXXHeader('gtest/gtest.h'):
       Exit(1)
 
+def set_unpacker(conf, env):
+  if (not conf.CheckLib('MDunpack', language='c++') or \
+      not  conf.CheckCXXHeader('MDevent.h')):
+    print
+    print "!! Unpacker module not found, you will not be able to use the RealData module."
+    print
+  else:
+    env["USE_UNPACKER"] = True
+
+
 # Setup the environment.  NOTE: SHLIBPREFIX means that shared libraries don't
 # have a 'lib' prefix, which is needed for python to find SWIG generated libraries
 env = Environment(SHLIBPREFIX="")
@@ -226,6 +240,7 @@ env.Append(CPPPATH=["%s/third_party/install/include" % os.environ.get('MAUS_ROOT
 
 env['USE_G4'] = False
 env['USE_ROOT'] = False
+env['USE_UNPACKER'] = False
 
 #put all .sconsign files in one place
 env.SConsignFile()
@@ -264,6 +279,8 @@ Export('env')
 #  env.Alias('unittest', [unit])
 
 print "Configuring..."
+# Must have long32 & long64 for the unpacking library
+env.Append(CCFLAGS=["""-Dlong32='int'""", """-Dlong64='long long'"""])
 conf = Configure(env, custom_tests = {'CheckCommand' : CheckCommand})
 set_cpp(conf, env)
 set_python(conf, env)
@@ -273,6 +290,7 @@ set_clhep(conf, env)
 set_geant4(conf, env)
 set_recpack(conf, env)
 set_gtest(conf, env)
+set_unpacker(conf, env)
 
 # check types size!!!
 env = conf.Finish()
@@ -310,12 +328,12 @@ for directory in directories:
   assert parts[1] in types
     
   if 'Py' in parts[2] and 'Cpp' not in parts[2]:
-    print 'Found Python input: %s' % parts[2]
+    print 'Found Python module: %s' % parts[2]
     files = glob.glob('%s/test_*.py' % directory) +  ["%s/%s.py" % (directory, parts[2])]
     env.Install("build", files)   
 
-  if parts[2][0:6] == 'MapCpp':
-    print 'Found C++ mapper: %s' % parts[2] 
+  if (parts[2][0:6] == 'MapCpp') or (parts[2][0:8] == 'InputCpp'):
+    print 'Found C++ module: %s' % parts[2] 
     env.jDev.Subproject(directory)
 
     
