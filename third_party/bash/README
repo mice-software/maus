@@ -1,0 +1,7 @@
+Bash scripts starting with 0 and 1 are CRITICAL and build using:
+
+third_party/build_essential.bash
+
+Whilst one should be able to run without scripts that start with 2.  Those scripts are built with:
+
+third_party/build_all.bash
