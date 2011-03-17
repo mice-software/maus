@@ -14,7 +14,7 @@
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
 
-## @class InputPyJSON.InputPyJSON 
+## @package InputPyJSON
 #  InputPyJSON reads JSON documents from files/sockets
 #
 #  This class inputs from a python file object that
