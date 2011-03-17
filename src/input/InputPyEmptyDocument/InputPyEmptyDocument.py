@@ -14,7 +14,7 @@
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
 class InputPyEmptyDocument:
-    """InputPyEmptyDocument lets MAUS start with empty spills
+    """Lets MAUS start with empty spills
     
     This class is useful for either debugging or for simulating
     spills since it loads the mostly empty JSON document into

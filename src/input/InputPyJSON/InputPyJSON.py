@@ -16,7 +16,7 @@
 import json
 
 class InputPyJSON:
-    """InputPyJSON reads JSON documents from files/sockets
+    """Reads JSON documents from files/sockets
 
     This class inputs from a python file object that
     is passed as the only argument 'arg_file' to the
