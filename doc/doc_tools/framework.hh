@@ -4,7 +4,7 @@ Welcome to the MAUS framework documentation!  This documentation documents the c
 
 These pages are made hourly by running <a href="http://www.stack.nl/~dimitri/doxygen">Doxygen</a> . To learn how to write comments within MAUS such that <a href="http://www.stack.nl/~dimitri/doxygen">Doxygen</a>  picks then up you can either see the <a href="http://www.stack.nl/~dimitri/doxygen">Doxygen</a>  homepage or look at other sources files within MAUS.
 
-@authors G4MICE Developers <g4mice-devs@jiscmail.ac.uk>
+@authors MAUS Developers <maus-dev@jiscmail.ac.uk>
 
 
 */

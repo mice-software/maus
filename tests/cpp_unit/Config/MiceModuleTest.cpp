@@ -17,6 +17,7 @@
 //! Testing getListOfProperties<T> in MiceModules
 #include <limits>
 #include <math.h>
+#include <stdlib.h>
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -175,7 +176,21 @@ protected:
                   << "  PropertyDouble RedColour 1.0\n"
                   << "}\n";
 
-    test_module_name = "_delete_mice_module_test.dat";
+    //    if (std::getenv("MAUS_ROOT_DIR") == NULL) {
+    //      std::cout<<"no found mausrootdir"<<std::endl;
+      test_module_name = "_delete_mice_module_test.dat";
+      //    }
+      //    else {
+      //      std::cout<<"found mausrootdir"<<std::endl;
+
+      //      std::stringstream test_module_absolute_filename;
+      //      test_module_absolute_filename << std::getenv("MAUS_ROOT_DIR")
+      //                                    << "/tmp/_delete_mice_module_test.dat";
+
+      //      test_module_name = test_module_absolute_filename.str();
+      //      std::cout<<"filename is:"<< test_module_absolute_filename.str()<<std::endl;
+      //    }
+
     std::ofstream fout(test_module_name.c_str());
     fout << mice_mod_test.str();
     fout.close();
