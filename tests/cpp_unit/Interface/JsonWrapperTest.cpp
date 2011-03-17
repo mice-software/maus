@@ -36,9 +36,15 @@ TEST(JsonWrapper, GetItemTest) {
       JsonWrapper::GetItem(good_val, i, JsonWrapper::intValue));
     EXPECT_EQ(Json::Value(static_cast<int>(i+2)),
       JsonWrapper::GetItem(good_val, i, JsonWrapper::anyValue));
-    EXPECT_THROW(
+    EXPECT_THROW( // bad type
      JsonWrapper::GetItem(good_val, i, JsonWrapper::stringValue), Squeal);
   }
+  Json::Value empty_array =  JsonWrapper::StringToJson("[]");
+  EXPECT_THROW( // empty value
+    JsonWrapper::GetItem(empty_array, 0, JsonWrapper::anyValue), Squeal);
+  EXPECT_THROW( // out of range item
+    JsonWrapper::GetItem(good_val, 4, JsonWrapper::anyValue), Squeal);
+
 }
 
 TEST(JsonWrapper, GetPropertyTest) {
@@ -71,7 +77,9 @@ TEST(JsonWrapper, GetPropertyTest) {
                    JsonWrapper::GetProperty(good_val, gets[4], types[4]));
   EXPECT_EQ(Json::Value(Json::arrayValue), 
                    JsonWrapper::GetProperty(good_val, gets[5], types[5]));
-
+  Json::Value emptyProp =  JsonWrapper::StringToJson("{}");
+  EXPECT_THROW( // non-existent property
+    JsonWrapper::GetProperty(emptyProp, "a", JsonWrapper::anyValue), Squeal);
 }
 
 TEST(JsonWrapper, TypeConversionTest) {
