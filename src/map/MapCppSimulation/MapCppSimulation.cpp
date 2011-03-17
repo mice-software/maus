@@ -1,66 +1,99 @@
+#include "Interface/CppErrorHandler.hh"
+#include "Interface/Squeal.hh"
+#include "Interface/JsonWrapper.hh"
+
 #include "MapCppSimulation.h"
 
 //  This stuff is *still* needed until persistency move is done
 dataCards MyDataCards("Simulation");
 MICEEvent simEvent;
 
-bool MapCppSimulation::Birth(std::string argJsonConfigDocument) {
-  //  JsonCpp setup
-  Json::Value configJSON;   //  this will contain the configuration
-  Json::Reader reader;
-
+bool MapCppSimulation::Birth(std::string configuration) {
   // Check if the JSON document can be parsed, else return error only
-  bool parsingSuccessful = reader.parse(argJsonConfigDocument, configJSON);
-  if (!parsingSuccessful) {
-    Squeak::mout(Squeak::fatal) << "MapCppSimulation: could not parse argJsonConfigDocument!\n";
-    return false;
-  }
-  
   try {
+    SetConfiguration(configuration);
+    SetGeant4();
+    return true;  // Sucessful completion
+    // Normal session, no visualization
+  } catch(Squeal squee) {
+    CppErrorHandler::HandleSquealNoJson(squee, _classname);
+  } catch(std::exception exc) {
+    CppErrorHandler::HandleStdExcNoJson(exc, _classname);
+  }
+  return false;
+}
 
-    MICERun& simRun = *MICERun::getInstance();
-
-    //if (MyDataCards.readKeys(inputFileDataCard) == 0) {
-    //Squeak::mout(Squeak::fatal) << " *** DataCard File " << inputFileDataCard
-    //<< " not found ***" << endl;
-    //exit(2);
-    //}
-
-    simRun.DataCards = & MyDataCards;
-    // Next function disables std::cout, std::clog,
-    // std::cerr depending on VerboseLevel
-    Squeak::setStandardOutputs();
-
-    // Materials
-    simRun.miceMaterials = new MiceMaterials();
-
-    // MICE Model setup
-    MiceModule* module;
-    if (!configJSON.isMember("simulation_geometry_filename")) {
-      Squeak::mout(Squeak::fatal) << "MapCppSimulation: could not find 'simulation_geometry_filename'!\n";
-      return false;
+std::string MapCppSimulation::Process(std::string document) {
+  std::string output = 
+     "{[\"errors\"][\"bad_json_document\"][\"Failed to parse input document\"]}";
+  try {
+    Json::Value spill = JsonWrapper::StringToJson(document);
+    Json::Value mc   = JsonWrapper::GetProperty
+                                         (spill, "mc", JsonWrapper::arrayValue);
+    for (int mc_particle_i = 0; mc_particle_i < mc.size(); ++mc_particle_i) {
+      Json::Value particle = JsonWrapper::GetItem
+                                  (mc, mc_particle_i, JsonWrapper::objectValue);
+      SetNextParticle(particle);
+      // Fire single muon.  There is about a 0.5 s slowdown here since
+      // geant4 will have to open and close the geometry. 
+      _runManager->BeamOn(1);
+      StoreTracking(particle);
+      spill["mc"][mc_particle_i] = particle;
     }
-    module = new MiceModule(configJSON["simulation_geometry_filename"].asString());
+    Json::FastWriter writer;
+    output = writer.write(spill);
+  }
+  catch(Squeal squee) {
+    CppErrorHandler::HandleSquealNoJson(squee, _classname);
+  } catch(std::exception exc) {
+    CppErrorHandler::HandleStdExcNoJson(exc, _classname);
+  }
+  return output;
+}
 
-    if (module == NULL) {
-      Squeak::mout(Squeak::fatal) << "MapCppSimulation: could not create MiceModule!\n";
-      return false;
-    }
-    
-    simRun.miceModule = module;
+bool MapCppSimulation::Death() {
+  // User actions, physics_list, the detector are all owned
+  // and deleted by the run manager and should not be deleted
+  // here!!!  -With love, Tunnell 2010
+  delete _runManager;
+  return true;  // successful
+}
 
-    // G4 Materials
-    fillMaterials(simRun);
+void MapCppSimulation::SetNextParticle(Json::Value particle) {
+  Json::Value pos = JsonWrapper::GetProperty
+                             (particle, "position", JsonWrapper::objectValue);
+  Json::Value mom = JsonWrapper::GetProperty
+                             (particle, "momentum", JsonWrapper::objectValue);
+  int pid = JsonWrapper::GetProperty
+                       (particle, "particle_id", JsonWrapper::intValue).asInt();
+  int seed = JsonWrapper::GetProperty
+                       (particle, "random_seed", JsonWrapper::intValue).asInt();
+  double x,y,z,px,py,pz,energy;
+  x = JsonWrapper::GetProperty(pos, "x", JsonWrapper::realValue).asDouble();
+  y = JsonWrapper::GetProperty(pos, "y", JsonWrapper::realValue).asDouble();
+  z = JsonWrapper::GetProperty(pos, "z", JsonWrapper::realValue).asDouble();
+  px = JsonWrapper::GetProperty(mom, "x", JsonWrapper::realValue).asDouble();
+  py = JsonWrapper::GetProperty(mom, "y", JsonWrapper::realValue).asDouble();
+  pz = JsonWrapper::GetProperty(mom, "z", JsonWrapper::realValue).asDouble();
+  energy = JsonWrapper::GetProperty
+                 (particle, "particle_id", JsonWrapper::realValue).asDouble();
+  _primary->SetNextPositionVector(x, y, z);
+  _primary->SetNextMomentumUnitVector(x, y, z);
+  _primary->SetNextParticleID(pid);
+  _primary->SetNextEnergy(energy);
+  CLHEP::HepRandom::setTheSeed(static_cast<unsigned int>(seed));
+}
 
+void MapCppSimulation::SetGeant4() {
     _runManager = new G4RunManager;
-    _detector = new MICEDetectorConstruction(simRun);
+    _detector   = new MICEDetectorConstruction(*MICERun::getInstance());
     _runManager->SetUserInitialization(_detector);
 
     _physList = MICEPhysicsList::GetMICEPhysicsList();
     _runManager->SetUserInitialization(_physList);
 
     _primary  = new MAUSPrimaryGeneratorAction;
-    _stepAct = new MAUSSteppingAction;
+    _stepAct  = new MAUSSteppingAction;
     _eventAct = new MAUSEventAction;
     _trackAct = new MAUSTrackingAction;
     _runManager->SetUserAction(_primary);
@@ -79,147 +112,49 @@ bool MapCppSimulation::Birth(std::string argJsonConfigDocument) {
     else {
       UI->ApplyCommand("/tracking/storeTrajectory 0");
     }
-
-    // Normal session, no visualization
-  } catch(Squeal squee) {
-    squee.Print();
-    Squeak::mout(Squeak::fatal) <<
-        "Attempting to rescue simulated data" << std::endl;
-    Squeak::mout(Squeak::fatal) << "Exiting" << std::endl;
-    return false;
-  } catch(std::exception exc) {
-    Squeak::mout(Squeak::fatal) << "std::exception in G4MICE - " <<
-        "probably while trying to do some file" <<
-        "IO or string manipulation - reported as:" << std::endl;
-    Squeak::mout(Squeak::fatal) << std::string(exc.what()) << std::endl;
-    Squeak::mout(Squeak::fatal)
-        << "Attempting to rescue simulated data" << std::endl;
-    Squeak::mout(Squeak::fatal) << "Exiting" << std::endl;
-    return false;
-  } catch(...) {
-    Squeak::mout(Squeak::fatal) << "Unknown error in G4MICE" << std::endl;
-    Squeak::mout(Squeak::fatal) <<
-        "Attempting to rescue simulated data" << std::endl;
-    Squeak::mout(Squeak::fatal) << "Exiting" << std::endl;
-    return false;
-  }
-
-  return true;  // Sucessful completion
 }
 
-std::string MapCppSimulation::Process(std::string document) {
-  //  JsonCpp setup
-  Json::Value root;   // will contains the root value after parsing.
-  Json::Reader reader;
-  Json::FastWriter writer;
+void MapCppSimulation::SetConfiguration(std::string json_configuration) {
+  MICERun& simRun = *MICERun::getInstance();
+  simRun.jsonConfiguration = new Json::Value
+                                (JsonWrapper::StringToJson(json_configuration));
+  Json::Value& config = *simRun.jsonConfiguration;
+  simRun.DataCards = &MyDataCards;
+  // Next function disables std::cout, std::clog,
+  // std::cerr depending on VerboseLevel
+  Squeak::setStandardOutputs();
+  // Materials
+  simRun.miceMaterials = new MiceMaterials();
+  // MICE Model setup
+  Json::Value modname = JsonWrapper::GetProperty
+             (config, "simulation_geometry_filename", JsonWrapper::stringValue);
+  simRun.miceModule = new MiceModule(modname.asString());
+  // G4 Materials
+  fillMaterials(simRun);
+}
 
-  // Check if the JSON document can be parsed, else return error only
-  bool parsingSuccessful = reader.parse(document, root);
-  if (!parsingSuccessful) {
-    Json::Value errors;
-    std::stringstream ss;
-    ss << _classname << " says:" << reader.getFormatedErrorMessages();
-    errors["bad_json_document"] = ss.str();
-    root["errors"] = errors;
-    return writer.write(root);
-  }
-
-  // Check if the JSON document has a 'mc' branch, else return error
-  if (!root.isMember("mc")) {
-    Json::Value errors;
-    std::stringstream ss;
-    ss << _classname << " says:" << "I need an MC branch to simulate.";
-    errors["missing_branch"] = ss.str();
-    root["errors"] = errors;
-    return writer.write(root);
-  }
-
-  Json::Value mc = root.get("mc", 0);
-
-  // Check if JSON document is of the right type, else return error
-  if (!mc.isArray()) {
-    Json::Value errors;
-    std::stringstream ss;
-    ss << _classname << " says:" << "MC branch isn't an array";
-    errors["bad_type"] = ss.str();
-    root["errors"] = errors;
-    return writer.write(root);
-  }
-
-  for (int mc_particle_i = 0; mc_particle_i < mc.size(); mc_particle_i++) {
-    Json::Value particle = mc[mc_particle_i];
-
-    // geant4 pid
-    _primary->SetNextParticleID(particle.get("particle_id", -13).asInt());
-
-    //  If the position isn't set, make a fake one since defaults will get found
-    if (!particle.isMember("position")) {
-      particle["position"] = Json::Value();
-    }
-
-    // Units is 'mm'
-    _primary->SetNextPositionVector(
-        particle["position"].get("x", 0.0).asDouble(),
-        particle["position"].get("y", 0.0).asDouble(),
-        particle["position"].get("z", -5000.0).asDouble());
-
-    //  If the momentum isn't set, make a fake one
-    // since defaults will get found.
-    if (!particle.isMember("unit_momentum")) {
-      particle["unit_momentum"] = Json::Value();
-    }
-
-    _primary->SetNextMomentumUnitVector(
-        particle["unit_momentum"].get("x", 0.0).asDouble(),   // unit vector
-        particle["unit_momentum"].get("y", 0.0).asDouble(),   // unit vector
-        particle["unit_momentum"].get("z", 1.0).asDouble());  // unit vector
-
-    _primary->SetNextEnergy(particle.get("energy", 200.0).asDouble());
-
-    //stepAct->_track.clear();
-
-    CLHEP::HepRandom::setTheSeed(particle.get("random_seed", 0.0).asUInt());
-    
-    // Fire single muon.  There is about a 0.5 s slowdown here since
-    // geant4 will have to open and close the geometry. 
-    _runManager->BeamOn(1);
-
-    //  Loop over detectors to fetch hits
-    if (_detector->GetSDSize() > 0) {
-      //  For each detector i
-      for (int i = 0; i < _detector->GetSDSize(); i++) {
-        //  Retrieve detector i's hits
-        vector<Json::Value> hits = _detector->GetSDHits(i);
-
-        // Ensure there are hits in this detector
-        if (hits.size() == 0) {
-          continue;
-        }
-
-        // If there are hits, loop over and append to particle
-        for (int j = 0; j < hits.size(); j++) {
-          if (!hits[j].isNull()) {
-            particle["hits"].append(hits[j]);
-          }
+void MapCppSimulation::StoreTracking(Json::Value particle) {
+  //  Loop over detectors to fetch hits
+  if (_detector->GetSDSize() > 0) {
+    //  For each detector i
+    for (int i = 0; i < _detector->GetSDSize(); i++) {
+      //  Retrieve detector i's hits
+      vector<Json::Value> hits = _detector->GetSDHits(i);
+      // Ensure there are hits in this detector
+      if (hits.size() == 0) {
+        continue;
+      }
+      // If there are hits, loop over and append to particle
+      for (int j = 0; j < hits.size(); j++) {
+        if (!hits[j].isNull()) {
+          particle["hits"].append(hits[j]);
         }
       }
     }
-
-    if (_storeTracks) {
-      particle["tracks"] =  _stepAct->_track;
-    }
-
-    root["mc"][mc_particle_i] = particle;
   }
 
-  return writer.write(root);
-}
+  if (_storeTracks) {
+    particle["tracks"] =  _stepAct->_track;
+  }
 
-bool MapCppSimulation::Death() {
-  // User actions, physics_list, the detector are all owned
-  // and deleted by the run manager and should not be deleted
-  // here!!!  -With love, Tunnell 2010
-  delete _runManager;
-  return true;  // successful
 }
-

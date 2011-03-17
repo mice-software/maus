@@ -23,7 +23,7 @@
  *
  *  @authors Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>,
  *  Malcolm Ellis <Malcolm.Ellis@brunel.ac.uk>,
- *  Christopher Rogers <chris.rogers@stfc.ac.uk>,
+ *  Chris Rogers <chris.rogers@stfc.ac.uk>,
  *  Yagmur Torun <torun@iit.edu>
  */
 
@@ -84,10 +84,9 @@ public:
    *  while.  Be sure that you do not run Birth() after
    *  death due to Geant4 slopiness.
    *
-   *  \param argJsonConfigDocument a JSON document with
-   *         the configuration.
+   *  \param config a JSON document with the configuration.
    */
-  bool Birth(std::string argJsonConfigDocument);
+  bool Birth(std::string configuration);
 
   /** Shutdowns the Simulation by closing files
    *
@@ -104,11 +103,42 @@ public:
    */
   std::string Process(std::string document);
 
-  std::string GetGeometryFilename() { return _geometry; }
-  void SetGeometryFilename(std::string argGeometry) { _geometry = argGeometry; }
+  /** Store tracking information in the particle
+   *  
+   *  \param particle Json value where the information is stored
+   *
+   *  stores:
+   *    sensitive detector hits registered in the detectors (from 
+   *      MICEDetectorConstruction::GetSDHits())
+   *    tracks (list of step points) if _storeTracks is set (from
+   *      MAUSSteppingAction::GetTrack())
+   */
+  void StoreTracking(Json::Value particle);
 
-  void DisableStoredTracks() { _storeTracks = false; }
-  void EnableStoredTracks() { _storeTracks= true; }
+  /** Store tracking information in the particle
+   *  
+   *  \param particle Json value where the information is stored
+   *
+   *  stores:
+   *    sensitive detector hits registered in the detectors (from 
+   *      MICEDetectorConstruction::GetSDHits())
+   *    tracks (list of step points) if _storeTracks is set (from
+   *      MAUSSteppingAction::GetTrack())
+   */
+  void SetNextParticle(Json::Value particle);
+
+  /** Set up GEANT4 from the configuration information
+   *  
+   *  Sets up GEANT4 default runManager, MICEPhysicsList, 
+   *  MICEDetectorConstruction (for geometry and fields), MAUSSteppingAction,
+   *  MAUSEventAction, MAUSTrackingAction
+   */
+  void SetGeant4();
+  /** Set up configuration information on the MICERun
+   *  
+   *  Sets up
+   */
+  void SetConfiguration(std::string);
 
  private:
   std::string _jsonConfigDocument;
@@ -124,5 +154,7 @@ public:
   MAUSTrackingAction*          _trackAct;
   MICEDetectorConstruction* _detector;
 };  // Don't forget this trailing colon!!!!
+
+
 
 #endif  // _COMPONENTS_MAP_MAPCPPSIMULATION_H_
