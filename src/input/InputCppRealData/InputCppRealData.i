@@ -7,7 +7,7 @@
 %include "std_string.i"
 
 %feature("shadow") InputCppRealData::Emitter() %{
-def Emitter(self):
+def emitter(self):
   while (self.readNextEvent()):
     yield self.getCurEvent()
 %}

@@ -32,7 +32,7 @@ InputCppRealData::InputCppRealData() {
 }
 
 
-bool InputCppRealData::Birth(std::string pDataPath,
+bool InputCppRealData::birth(std::string pDataPath,
                              std::string pFilename) {
   if (_inputFile)
     return false;  // Fail because file is open
@@ -264,7 +264,7 @@ void InputCppRealData::processHits(void *pPartEvntPtr,
 }
 
 
-bool InputCppRealData::Death() {
+bool InputCppRealData::death() {
   if (_inputFile) {
     delete _inputFile;
     _inputFile = NULL;

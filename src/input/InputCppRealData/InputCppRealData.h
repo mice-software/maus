@@ -97,7 +97,7 @@ public
   * \param[in] pFilename The filename to read from the pDataPath directory
   * \return True if the file was open sucessfully.
   */
-  bool Birth(std::string pDataPath,
+  bool birth(std::string pDataPath,
              std::string pFilename);
 
 /** Read the next event from the file into memory.
@@ -126,7 +126,7 @@ public
   *
   * \return True if successful.
   */
-  bool Death();
+  bool death();
 
   ~InputCppRealData();
 
@@ -143,7 +143,7 @@ public
   *
   * \return An empty string from C++.
   */
-  std::string Emitter() {
+  std::string emitter() {
      return "";
   };
 };
