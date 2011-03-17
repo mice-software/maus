@@ -28,13 +28,12 @@
 
 namespace {
 
-
 // TODO(Rogers):
 // * would be better to pass micemodules a string stream (istream ref) - current
 //   implementation is dangerous
 
 /////////////// MiceModule Tests ///////////////
-
+/*
 //Fixture - allows to set up some default sets of data
 //for testing against
 class MiceModuleTest : public ::testing::Test {
@@ -197,4 +196,8 @@ protected:
     fout.close();
     moduleTest = new MiceModule(test_module_name);
   }
+*/
 } //namespace
+
+
+
