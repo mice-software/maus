@@ -27,15 +27,16 @@ public :
   static MICERun* getInstance()    {if(instance == NULL) instance=new MICERun(1); return instance;}
   static void     deleteInstance() {if(instance != NULL) delete instance; instance = NULL;}
 
-  MiceModule*				miceModule;
-  MiceMaterials*			miceMaterials;
-  VlpcCable*				vlpcCable;
-  TofCable*				tofCable;
-  VlpcCalib*				vlpcCalib;
-  TofCalib*				tofCalib;
-  dataCards*				DataCards;
-  TrajectoryManager*			trajectoryManager;
-  BTFieldConstructor*			btFieldConstructor;
+  MiceModule*         miceModule;
+  MiceMaterials*      miceMaterials;
+  VlpcCable*          vlpcCable;
+  TofCable*           tofCable;
+  VlpcCalib*          vlpcCalib;
+  TofCalib*           tofCalib;
+  dataCards*          DataCards;
+  TrajectoryManager*  trajectoryManager;
+  BTFieldConstructor* btFieldConstructor;
+  Json::Value*        jsonConfiguration;
 
   MICERun()
   {
@@ -70,7 +71,7 @@ private :
   };
 
 
-  static MICERun*			instance;
+  static MICERun*      instance;
 
 };
 
