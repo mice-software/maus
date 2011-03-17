@@ -32,11 +32,13 @@ class MAUSSteppingAction : public G4UserSteppingAction {
     return _self;
   }
 
-  //  todo add get/set
-  Json::Value _track;
+  Json::Value GetTrack() {return _track;}
+
+  Json::Value GetTrack(Json::Value track) {_track = track;}
 
  private:
   static MAUSSteppingAction* _self;
+  Json::Value _track;
 };
 
 }  //  ends MAUS namespace
