@@ -1,13 +1,5 @@
-# json schema to define (and validate) a json schema. Hack draft-03 to make it
-# consistent with validator. Based on json validation version 0.3
-
-# CHANGES (Rogers):
-#  * capitalise true, false to make it pythonic
-#  * Remove unsupported tags: uniqueItems, $schema, additionalProperties, $ref 
-#  * Add new tag: optionalItems (doesnt seem any way to do variable length 
-#                arrays that I found)
-
 schema = {
+	"$schema" : "http://json-schema.org/draft-03/schema#",
 	"id" : "http://json-schema.org/draft-03/schema#",
 	"type" : "object",
 	
@@ -15,41 +7,54 @@ schema = {
 		"type" : {
 			"type" : ["string", "array"],
 			"items" : {
-				"type" : ["string"]
+				"type" : ["string", {"$ref" : "#"}]
 			},
+			"uniqueItems" : True,
 			"default" : "any"
 		},
 		
 		"properties" : {
 			"type" : "object",
+			"additionalProperties" : {"$ref" : "#"},
 			"default" : {}
 		},
 		
 		"patternProperties" : {
 			"type" : "object",
+			"additionalProperties" : {"$ref" : "#"},
+			"default" : {}
+		},
+		
+		"additionalProperties" : {
+			"type" : [{"$ref" : "#"}, "boolean"],
 			"default" : {}
 		},
 		
 		"items" : {
-			"type" : ["array"],
-			"items" : {},
+			"type" : [{"$ref" : "#"}, "array"],
+			"items" : {"$ref" : "#"},
 			"default" : {}
 		},
 		
 		"additionalItems" : {
-			"type" : ["boolean"],
+			"type" : [{"$ref" : "#"}, "boolean"],
 			"default" : {}
 		},
-
-
-    "optionalItems" : {
-      "type" : ["array"],
-      "default": {}
-    },
 		
 		"required" : {
 			"type" : "boolean",
 			"default" : False
+		},
+		
+		"dependencies" : {
+			"type" : "object",
+			"additionalProperties" : {
+				"type" : ["string", "array", {"$ref" : "#"}],
+				"items" : {
+					"type" : "string"
+				}
+			},
+			"default" : {}
 		},
 		
 		"minimum" : {
@@ -58,6 +63,11 @@ schema = {
 		
 		"maximum" : {
 			"type" : "number"
+		},
+		
+		"exclusiveMinimum" : {
+			"type" : "boolean",
+			"default" : False
 		},
 		
 		"exclusiveMaximum" : {
@@ -74,6 +84,11 @@ schema = {
 		"maxItems" : {
 			"type" : "integer",
 			"minimum" : 0
+		},
+		
+		"uniqueItems" : {
+			"type" : "boolean",
+			"default" : False
 		},
 		
 		"pattern" : {
@@ -94,6 +109,7 @@ schema = {
 		"enum" : {
 			"type" : "array",
 			"minItems" : 1,
+			"uniqueItems" : True
 		},
 		
 		"default" : {
@@ -115,19 +131,21 @@ schema = {
 		"divisibleBy" : {
 			"type" : "number",
 			"minimum" : 0,
+			"exclusiveMinimum" : True,
 			"default" : 1
 		},
 		
 		"disallow" : {
 			"type" : ["string", "array"],
 			"items" : {
-				"type" : ["string"]
+				"type" : ["string", {"$ref" : "#"}]
 			},
+			"uniqueItems" : True
 		},
 		
 		"extends" : {
-			"type" : ["array"],
-			"items" : {},
+			"type" : [{"$ref" : "#"}, "array"],
+			"items" : {"$ref" : "#"},
 			"default" : {}
 		},
 		
@@ -136,8 +154,21 @@ schema = {
 			"format" : "uri"
 		},
 		
+		"$ref" : {
+			"type" : "string",
+			"format" : "uri"
+		},
+		
+		"$schema" : {
+			"type" : "string",
+			"format" : "uri"
+		}
+	},
+	
+	"dependencies" : {
+		"exclusiveMinimum" : "minimum",
+		"exclusiveMaximum" : "maximum"
 	},
 	
 	"default" : {}
 }
-

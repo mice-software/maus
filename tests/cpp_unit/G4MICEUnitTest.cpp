@@ -22,7 +22,9 @@ int main(int argc, char **argv) {
   MICERun::getInstance()->DataCards = &MyDataCards;
   Squeak::setOutput(Squeak::debug, Squeak::nullOut());
   ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
+  int test_out = RUN_ALL_TESTS();
+  std::cerr << "WARNING - MiceModule test was disabled - see #368" << std::endl;
+  return test_out;
 }
 
 

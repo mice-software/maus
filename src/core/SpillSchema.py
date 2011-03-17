@@ -2,7 +2,7 @@
 # I haven't filled it in really because I think it will probably change...
 
 three_vec = {
-  "type":"object","minimum":0,"properties":{
+  "type":"object","properties":{
     "x":{"type":"number"},
     "y":{"type":"number"},
     "z":{"type":"number"}

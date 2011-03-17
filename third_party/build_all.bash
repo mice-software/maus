@@ -11,8 +11,8 @@
 set -e
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
-    filename="third_party_source_v2.tar.gz"
-    wget http://micewww.pp.rl.ac.uk:8080/attachments/download/202/${filename} -O ${MAUS_ROOT_DIR}/third_party/source/${filename}
+    filename="third_party_source_v3.tar.gz"
+    wget http://micewww.pp.rl.ac.uk:8080/attachments/download/211/${filename} -O ${MAUS_ROOT_DIR}/third_party/source/${filename}
 
     cd ${MAUS_ROOT_DIR}/third_party/source
     filename=${filename} 
@@ -30,6 +30,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
 
     ${MAUS_ROOT_DIR}/third_party/build_essential.bash
+    ${MAUS_ROOT_DIR}/third_party/bash/12setuptools.bash
     ${MAUS_ROOT_DIR}/third_party/bash/20gsl.bash
     ${MAUS_ROOT_DIR}/third_party/bash/21root.bash
     ${MAUS_ROOT_DIR}/third_party/bash/22clhep.bash
@@ -39,6 +40,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     ${MAUS_ROOT_DIR}/third_party/bash/26xboa.bash
     ${MAUS_ROOT_DIR}/third_party/bash/27recpack.bash
     ${MAUS_ROOT_DIR}/third_party/bash/28gtest.bash
+    ${MAUS_ROOT_DIR}/third_party/bash/29validictory.bash
 
 else
 echo
