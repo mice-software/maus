@@ -1,7 +1,3 @@
-"""
-Tests of InputPyEmptyDocument through InputPyEmptyDocumentTestCase
-"""
-
 import json
 import unittest
 

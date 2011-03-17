@@ -13,11 +13,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-"""asdfkjasdf
-@package InputPyEmptyDocument
-Package that contains the class InputPyEmptyDocument
-"""
-
 class InputPyEmptyDocument:
     """InputPyEmptyDocument lets MAUS start with empty spills
     
