@@ -163,14 +163,6 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
           export LD_LIBRARY_PATH="\${MAUS_ROOT_DIR}/third_party/install/lib:\${LD_LIBRARY_PATH}" # else add it
      fi
 
-     #export PATH="\${ROOTSYS}/bin:\${PATH}"
-     #export LD_LIBRARY_PATH="\${ROOTSYS}/lib:\${LD_LIBRARY_PATH}"
-     #if [ -z "\${PYTHONPATH}" ]; then  # see if the variable exists yet
-     #     export PYTHONPATH="\${ROOTSYS}/lib" # intiailize it
-     #else
-     #     export PYTHONPATH="\${ROOTSYS}/lib:\${PYTHONPATH}" # else add it
-     #fi
-
      # maus workers
      export PYTHONPATH="\$MAUS_ROOT_DIR/build:\$PYTHONPATH"
      export LD_LIBRARY_PATH="\$MAUS_ROOT_DIR/build:\$LD_LIBRARY_PATH"
@@ -205,6 +197,7 @@ else
      echo "WARNING: MAUS already setup"
 fi
 
+# setup ROOT
 if [ -f \${MAUS_ROOT_DIR}/third_party/build/$root_version/bin/thisroot.sh ]
 then
      source \${MAUS_ROOT_DIR}/third_party/build/$root_version/bin/thisroot.sh
@@ -231,15 +224,6 @@ else
      else
           setenv LD_LIBRARY_PATH "\${MAUS_ROOT_DIR}/third_party/install/lib" # intiailize it
      endif
-
-     # ROOT specific garbage
-     #setenvt PATH "\${ROOTSYS}/bin:\${PATH}"
-     #setenv LD_LIBRARY_PATH "\${ROOTSYS}/lib:\${LD_LIBRARY_PATH}"
-     #if ({\$?PYTHONPATH}) then
-     #     setenv PYTHONPATH "\${ROOTSYS}/lib:\${PYTHONPATH}" # else add it
-     #else
-     #     setenv PYTHONPATH "\${ROOTSYS}/lib" # intiailize it
-     #endif
 
      # maus workers
      setenv PYTHONPATH "\$MAUS_ROOT_DIR/build:\$PYTHONPATH"
@@ -273,6 +257,7 @@ else
      echo "SUCCESS: MAUS setup"
 endif
 
+# setup ROOT
 if( ! -e \${MAUS_ROOT_DIR}/third_party/build/$root_version/bin/thisroot.csh ) then
      source \${MAUS_ROOT_DIR}/third_party/build/$root_version/bin/thisroot.csh
 endif
