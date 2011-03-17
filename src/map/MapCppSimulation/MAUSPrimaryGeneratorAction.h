@@ -46,7 +46,7 @@ class MAUSPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
     updated = true; }
 
   void SetNextMomentumUnitVector(double argPxu, double argPyu, double argPzu)
-  { Pxu = argPxu;  // NOTE: UNIT VECTOR!
+  { Pxu = argPxu;  // NOTE: UNIT VECTOR! (Rogers: G4 normalises so okay)
     Pyu = argPyu;  // NOTE: UNIT VECTOR!
     Pzu = argPzu;  // NOTE: UNIT VECTOR!
     updated = true; }
