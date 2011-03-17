@@ -88,8 +88,8 @@ class Go:
         ######  Input Phase  ######
         ####                  #####
         print("INPUT: Reading some input")
-        self.input.Birth()
-        emitter = self.input.Emitter()
+        self.input.birth()
+        emitter = self.input.emitter()
         mapBuffer = self.BufferInput(emitter)
 
         ####                 ####
@@ -106,8 +106,10 @@ class Go:
                 tempFile.write('%s\n' % result)
             mapBuffer = self.BufferInput(emitter)
 
-        print("MAP: Closing mappers")
+        print("MAP: Closing input and mappers")
+        self.input.death()
         self.mapper.Death()
+        
 
         
         tempFile.close()
