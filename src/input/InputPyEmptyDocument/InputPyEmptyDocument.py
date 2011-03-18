@@ -52,7 +52,7 @@ class InputPyEmptyDocument:
                 self._current_spill = self._current_spill + 1
         else: # the finite case
             for i in range(self._number_of_events):
-                yield """{ "spill_number" : %d }""" % self._current_spill
+                yield """{ "spill_number" : %d }""" % i
                 self._current_spill = i
 
     def death(self):

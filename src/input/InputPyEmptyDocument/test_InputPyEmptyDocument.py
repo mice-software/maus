@@ -50,7 +50,7 @@ class InputPyEmptyDocumentTestCase(unittest.TestCase):
         """
         Test to make sure that if the input is done spitting out documents, then you can't get more documents from it
         """
-        my_input = InputPyEmptyDocument(argNumberOfEvents=5)
+        my_input = InputPyEmptyDocument(arg_number_of_events=5)
         my_input.birth()
 
         some_value = my_input.emitter()

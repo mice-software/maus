@@ -1,0 +1,7 @@
+YOU MUST PASS STYLE GUIDES AND STATIC CODE ANALYZERS TO COMMIT IN THIS FOLDER AND SUBFOLDERS
+
+All input components were clean as of March 17th, 2011:
+
+OutputPyDoNothing  OutputPyJSON 
+
+So a strick style guide applies to this folder
