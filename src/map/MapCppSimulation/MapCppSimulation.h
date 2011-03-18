@@ -134,11 +134,13 @@ public:
    *  MAUSEventAction, MAUSTrackingAction
    */
   void SetGeant4();
+
   /** Set up configuration information on the MICERun
    *  
-   *  Sets up
+   *  Sets the datacards, json configuration, Squeak standard outputs,
+   *  and MiceModules
    */
-  void SetConfiguration(std::string);
+  void SetConfiguration(std::string config);
 
  private:
   std::string _jsonConfigDocument;
