@@ -5,10 +5,12 @@
 
 import ROOT
 
-canvas_number = 0
+CANVAS_NUMBER = 0
 
-def MakeCanvas():
-    global canvas_number
+def make_canvas():
+    """Creates a plot according to the ATLAS style guide
+    """
+    global CANVAS_NUMBER
 
     # Setup all the ROOT pretty-ing options
     ROOT.gROOT.SetStyle("Plain")
@@ -34,7 +36,7 @@ def MakeCanvas():
 #    ROOT.gStyle.SetHistFillColor(1)
 #    ROOT.gStyle.SetHistFillStyle(3001)
 
-    tsize=0.05
+    tsize = 0.05
     ROOT.gStyle.SetTextSize(tsize)
     ROOT.gStyle.SetLabelSize(tsize,"xyz")
     ROOT.gStyle.SetTitleSize(tsize,"xyz")
@@ -45,7 +47,7 @@ def MakeCanvas():
     #ROOT.gStyle.SetTitleOffset(1.03, "x")
     ROOT.gStyle.SetTitleOffset(1.46, "y")
 
-    ROOT.gStyle.SetPaperSize(20,26)
+    ROOT.gStyle.SetPaperSize(20, 26)
     ROOT.gStyle.SetPadTopMargin(0.05)
     ROOT.gStyle.SetPadRightMargin(0.05)
     ROOT.gStyle.SetPadBottomMargin(0.16)
@@ -59,12 +61,13 @@ def MakeCanvas():
     ROOT.gStyle.SetPadTickX(1)
     ROOT.gStyle.SetPadTickY(1)
 
-    c1 = ROOT.TCanvas("c1_n%d" % canvas_number, "c1",0,44,800,602)
-    c1.Range(66.32653,-678.7319,91.31868,3835.625)
-            
-    c1.SetFrameBorderMode(0)
-    c1.SetBorderSize(0)
+    canvas1 = ROOT.TCanvas("canvas1_n%d" % CANVAS_NUMBER, \
+                               "canvas1", 0, 44, 800, 602)
+    canvas1.Range(66.32653, -678.7319, 91.31868, 3835.625)
 
-    canvas_number += 1
-                                                                
-    return c1
+    canvas1.SetFrameBorderMode(0)
+    canvas1.SetBorderSize(0)
+
+    CANVAS_NUMBER += 1
+
+    return canvas1
