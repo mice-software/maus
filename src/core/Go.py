@@ -149,11 +149,11 @@ class Go:
         ######  Output Phase  ######
         ####                   #####
 
-        self.output.Birth()
+        self.output.birth()
         
-        self.output.Save(reduceResult)
+        self.output.save(reduceResult)
                 
-        self.output.Death()
+        self.output.death()
             
 
     def BufferInput(self, theEmitter):
