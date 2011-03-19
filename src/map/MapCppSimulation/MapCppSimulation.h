@@ -70,11 +70,7 @@ class MapCppSimulation {
 public:
   /** Sets up the worker
    */
-  MapCppSimulation() {
-    _classname = "MapCppSimulation";
-    _geometry = "Stage6.dat";
-    _storeTracks = true;
-  }
+  MapCppSimulation();
   
   /** Begin the startup procedure for Simulation
    *

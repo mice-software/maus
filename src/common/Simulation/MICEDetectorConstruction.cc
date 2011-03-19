@@ -85,6 +85,7 @@ MICEDetectorConstruction::MICEDetectorConstruction( MICERun& run ) : _simRun(*MI
   _model = run.miceModule;
   _materials = run.miceMaterials;
   _checkVolumes = (_simRun.DataCards->fetchValueInt("CheckVolumeOverlaps") == 1);
+  _hasBTFields = false;
 
   magField = new G4UniformMagField( 0., 0., 0. );
 }

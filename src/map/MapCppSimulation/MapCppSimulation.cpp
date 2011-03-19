@@ -4,6 +4,20 @@
 dataCards MyDataCards("Simulation");
 MICEEvent simEvent;
 
+MapCppSimulation::MapCppSimulation() {
+  _classname = "MapCppSimulation";
+  _geometry = "Stage6.dat";
+  bool _storeTracks = True;
+
+  _runManager = NULL;
+  _physList   = NULL;
+  _primary    = NULL;
+  _stepAct    = NULL;
+  _eventAct   = NULL;
+  _trackAct   = NULL;
+  _detector   = NULL;
+}
+
 bool MapCppSimulation::Birth(std::string argJsonConfigDocument) {
   //  JsonCpp setup
   Json::Value configJSON;   //  this will contain the configuration
@@ -15,7 +29,7 @@ bool MapCppSimulation::Birth(std::string argJsonConfigDocument) {
     Squeak::mout(Squeak::fatal) << "MapCppSimulation: could not parse argJsonConfigDocument!\n";
     return false;
   }
-  
+
   try {
 
     MICERun& simRun = *MICERun::getInstance();
@@ -46,7 +60,7 @@ bool MapCppSimulation::Birth(std::string argJsonConfigDocument) {
       Squeak::mout(Squeak::fatal) << "MapCppSimulation: could not create MiceModule!\n";
       return false;
     }
-    
+
     simRun.miceModule = module;
 
     // G4 Materials
@@ -179,9 +193,9 @@ std::string MapCppSimulation::Process(std::string document) {
     //stepAct->_track.clear();
 
     CLHEP::HepRandom::setTheSeed(particle.get("random_seed", 0.0).asUInt());
-    
+
     // Fire single muon.  There is about a 0.5 s slowdown here since
-    // geant4 will have to open and close the geometry. 
+    // geant4 will have to open and close the geometry.
     _runManager->BeamOn(1);
 
     //  Loop over detectors to fetch hits

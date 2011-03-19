@@ -26,6 +26,16 @@ MAUSPrimaryGeneratorAction::MAUSPrimaryGeneratorAction() {
 
   gun = new G4ParticleGun();
   updated = false;
+
+  //  Initialize stored values to zero
+  pid    = 0.0;
+  X      = 0.0;
+  Y      = 0.0;
+  Z      = 0.0;
+  Energy = 0.0;
+  Pxu    = 0.0;
+  Pyu    = 0.0;
+  Pzu    = 0.0;
 }
 
 void MAUSPrimaryGeneratorAction::GeneratePrimaries(G4Event* argEvent) {
