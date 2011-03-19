@@ -7,7 +7,7 @@ MICEEvent simEvent;
 MapCppSimulation::MapCppSimulation() {
   _classname = "MapCppSimulation";
   _geometry = "Stage6.dat";
-  bool _storeTracks = True;
+  bool _storeTracks = true;
 
   _runManager = NULL;
   _physList   = NULL;
