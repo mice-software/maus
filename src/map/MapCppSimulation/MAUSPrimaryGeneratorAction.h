@@ -13,61 +13,42 @@
  *
  */
 
-#ifndef _COMPONENTS_MAP_MAUSPRIMARYGENERATORACTION_H_
-#define _COMPONENTS_MAP_MAUSPRIMARYGENERATORACTION_H_
+#ifndef _SRC_MAP_MAUSPRIMARYGENERATORACTION_H_
+#define _SRC_MAP_MAUSPRIMARYGENERATORACTION_H_
+
+#include <string>
+#include <queue>
 
 #include <G4ParticleGun.hh>
 #include <G4ParticleTable.hh>
 #include <G4VUserPrimaryGeneratorAction.hh>  // inherit from
-#include <string>
+
 #include "Interface/Squeak.hh"
 
 namespace MAUS {
 
 class MAUSPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
  public:
+  class PGParticle {
+   public:
+    double x, y, z, time, px, py, pz, energy, pid, seed;
+  };
+
   MAUSPrimaryGeneratorAction();
 
   void GeneratePrimaries(G4Event * argEvent);  // generate primary particles
 
   // Set next event that generate primaries gives
-  void SetNextParticleID(int argPid)
-  { pid = argPid;  // geant4 particle number
-    updated = true; }
-
-  void SetNextPositionVector(double argX, double argY, double argZ)
-  { X = argX;  // mm
-    Y = argY;  // mm
-    Z = argZ;  // mm
-    updated = true; }
-
-  void SetNextEnergy(double argEnergy)
-  { Energy = argEnergy;  // MeV/c^2
-    updated = true; }
-
-  void SetNextMomentumUnitVector(double argPxu, double argPyu, double argPzu)
-  { Pxu = argPxu;  // NOTE: UNIT VECTOR! (Rogers: G4 normalises so okay)
-    Pyu = argPyu;  // NOTE: UNIT VECTOR!
-    Pzu = argPzu;  // NOTE: UNIT VECTOR!
-    updated = true; }
+  void Push(PGParticle particle) {_part_q.push(particle);}
 
  protected:
   G4ParticleGun*          gun;
   static MAUSPrimaryGeneratorAction* self;
 
-  int pid;               // Geant4 particle ID
-  double X, Y, Z;        // Position vector (mm)
-  double Energy;         // Energy (MeV)
-  double Pxu, Pyu, Pzu;  // Momentum unit vector
-
  private:
-  /// State of class if update
-  //
-  //  This variable is checked during GeneratePrimaries
-  //  to ensure that the program has given new set values,
-  //  and will complain otherwise.
-  bool updated;
+  std::queue<PGParticle> _part_q;
 };
+
 
 }  // ends MAUS namespace
 

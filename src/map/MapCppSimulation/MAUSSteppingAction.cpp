@@ -1,31 +1,31 @@
-#include "MAUSSteppingAction.h"
 #include <iostream>
+
+#include "Interface/Squeak.hh"
+#include "Interface/Squeal.hh"
+
+#include "MAUSSteppingAction.h"
+
 namespace MAUS {
 
 MAUSSteppingAction*
 MAUSSteppingAction::_self = 0;
 
 MAUSSteppingAction::MAUSSteppingAction() {
+  _maxNSteps = 1000000; // BUG - how to access _maxNSteps?
   if (_self == 0) {
     _self = this;
   } else {
-    G4Exception("Error.  You may only have one MAUSSteppinAction");
+    throw Squeal(Squeal::recoverable,
+                 "Error.  You may only have one MAUSSteppingAction",
+                 "MAUSSteppingAction()");
   }
 }
 
 void MAUSSteppingAction::UserSteppingAction(const G4Step * aStep) {
   G4Track* aTrack = aStep->GetTrack();
-  if (!aTrack)
-    return;
-
   G4StepPoint* postStep = aStep->GetPostStepPoint();
-  if (!postStep)
-    return;
-
-  if (abs(aTrack->GetDefinition()->GetPDGEncoding()) != 13){
-    aTrack->SetTrackStatus(fStopAndKill);
-    return;
-  }
+  if (!aTrack) return;
+  if (!postStep) return;
 
   Json::Value step;
 
@@ -47,19 +47,20 @@ void MAUSSteppingAction::UserSteppingAction(const G4Step * aStep) {
   ss << "track";
   ss << aTrack->GetTrackID();
 
-  if (!_track.isMember(ss.str())) {  //  new track, then
-    _track[ss.str()] = Json::Value();
-    _track[ss.str()]["steps"] = Json::Value(Json::arrayValue);
+  if (!_tracks.isMember(ss.str())) {  //  new track, then
+    _tracks[ss.str()] = Json::Value();
+    _tracks[ss.str()]["steps"] = Json::Value(Json::arrayValue);
   }
 
-  _track[ss.str()]["steps"].append(step);
+  _tracks[ss.str()]["steps"].append(step);
 
 
-  std::cout<<"hi "<<postStep->GetPosition().z()<<" "<<_track[ss.str()]["steps"].size()<<std::endl;
-  
-  if (_track[ss.str()]["steps"].size() > 100000) {
+  if (_tracks[ss.str()]["steps"].size() > _maxNSteps) {
+    std::stringstream ss2;
+    ss2 << _tracks[ss.str()]["steps"].size() <<  " steps greater than maximum "
+        << _maxNSteps << " - suspected of looping";
+    _tracks[ss.str()]["KillReason"] = Json::Value(ss2.str());
     aTrack->SetTrackStatus(fStopAndKill);
-    std::cout<<"killing"<<std::endl;
   }
 }
 

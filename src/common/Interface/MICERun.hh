@@ -7,6 +7,9 @@
 // Standard C++ includes
 #include <vector>
 #include <map>
+
+#include <json/json.h>
+
 #include "Interface/dataCards.hh"
 
 // Forward declarations

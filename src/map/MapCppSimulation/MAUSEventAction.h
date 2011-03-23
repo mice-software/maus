@@ -2,6 +2,7 @@
  *  Geant4 calls this class before and after each event
  *
  *  @author Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+ *  @author Chris Rogers <chris.rogers@stfc.ac.uk>
  *
  *  MICEEventAction controls what happens at the beginning
  *  and end of every event. GEANT4 calls BeginOfEventAction
@@ -31,7 +32,12 @@ namespace MAUS {
 class MAUSEventAction : public G4UserEventAction
 {
  public:
-  void BeginOfEventAction(const G4Event* currentEvent);
+  /** @brief Sets the SteppingAction track to empty JsonValue (called by G4)
+   */
+  void BeginOfEventAction(const G4Event* currentEvent) {};
+
+  /** @brief Called by GEANT4 at the end of the event - does nothing
+   */
   void EndOfEventAction(const G4Event* currentEvent) {}
   
 };

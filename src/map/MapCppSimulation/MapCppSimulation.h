@@ -27,8 +27,8 @@
  *  Yagmur Torun <torun@iit.edu>
  */
 
-#ifndef _COMPONENTS_MAP_MAPCPPSIMULATION_H_
-#define _COMPONENTS_MAP_MAPCPPSIMULATION_H_
+#ifndef _SRC_MAP_MAPCPPSIMULATION_H_
+#define _SRC_MAP_MAPCPPSIMULATION_H_
 
 // C headers
 #include <stdlib.h>

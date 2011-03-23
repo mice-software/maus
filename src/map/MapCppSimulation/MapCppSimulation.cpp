@@ -25,8 +25,11 @@ bool MapCppSimulation::Birth(std::string configuration) {
 
 std::string MapCppSimulation::Process(std::string document) {
   std::string output = 
-     "{[\"errors\"][\"bad_json_document\"][\"Failed to parse input document\"]}";
+    "{[\"errors\"][\"bad_json_document\"][\"Failed to parse input document\"]}";
   try {
+    MAUSSteppingAction* stepAct = MAUSSteppingAction::GetSteppingAction();
+    stepAct->SetTracks( Json::Value() );
+
     Json::Value spill = JsonWrapper::StringToJson(document);
     Json::Value mc   = JsonWrapper::GetProperty
                                          (spill, "mc", JsonWrapper::arrayValue);
@@ -34,8 +37,6 @@ std::string MapCppSimulation::Process(std::string document) {
       Json::Value particle = JsonWrapper::GetItem
                                   (mc, mc_particle_i, JsonWrapper::objectValue);
       SetNextParticle(particle);
-      // Fire single muon.  There is about a 0.5 s slowdown here since
-      // geant4 will have to open and close the geometry. 
       _runManager->BeamOn(1);
       StoreTracking(particle);
       spill["mc"][mc_particle_i] = particle;
@@ -64,24 +65,22 @@ void MapCppSimulation::SetNextParticle(Json::Value particle) {
                              (particle, "position", JsonWrapper::objectValue);
   Json::Value mom = JsonWrapper::GetProperty
                              (particle, "momentum", JsonWrapper::objectValue);
-  int pid = JsonWrapper::GetProperty
+  MAUSPrimaryGeneratorAction::PGParticle p;
+  p.pid = JsonWrapper::GetProperty
                        (particle, "particle_id", JsonWrapper::intValue).asInt();
-  int seed = JsonWrapper::GetProperty
+  p.seed = JsonWrapper::GetProperty
                        (particle, "random_seed", JsonWrapper::intValue).asInt();
-  double x,y,z,px,py,pz,energy;
-  x = JsonWrapper::GetProperty(pos, "x", JsonWrapper::realValue).asDouble();
-  y = JsonWrapper::GetProperty(pos, "y", JsonWrapper::realValue).asDouble();
-  z = JsonWrapper::GetProperty(pos, "z", JsonWrapper::realValue).asDouble();
-  px = JsonWrapper::GetProperty(mom, "x", JsonWrapper::realValue).asDouble();
-  py = JsonWrapper::GetProperty(mom, "y", JsonWrapper::realValue).asDouble();
-  pz = JsonWrapper::GetProperty(mom, "z", JsonWrapper::realValue).asDouble();
-  energy = JsonWrapper::GetProperty
-                 (particle, "particle_id", JsonWrapper::realValue).asDouble();
-  _primary->SetNextPositionVector(x, y, z);
-  _primary->SetNextMomentumUnitVector(x, y, z);
-  _primary->SetNextParticleID(pid);
-  _primary->SetNextEnergy(energy);
-  CLHEP::HepRandom::setTheSeed(static_cast<unsigned int>(seed));
+  p.x = JsonWrapper::GetProperty(pos, "x", JsonWrapper::realValue).asDouble();
+  p.y = JsonWrapper::GetProperty(pos, "y", JsonWrapper::realValue).asDouble();
+  p.z = JsonWrapper::GetProperty(pos, "z", JsonWrapper::realValue).asDouble();
+  p.px = JsonWrapper::GetProperty(mom, "x", JsonWrapper::realValue).asDouble();
+  p.py = JsonWrapper::GetProperty(mom, "y", JsonWrapper::realValue).asDouble();
+  p.pz = JsonWrapper::GetProperty(mom, "z", JsonWrapper::realValue).asDouble();
+  p.energy = JsonWrapper::GetProperty
+                        (particle, "energy", JsonWrapper::realValue).asDouble();
+  p.time = JsonWrapper::GetProperty
+                        (particle, "time", JsonWrapper::realValue).asDouble();
+  _primary->Push(p);
 }
 
 void MapCppSimulation::SetGeant4() {
@@ -154,7 +153,7 @@ void MapCppSimulation::StoreTracking(Json::Value particle) {
   }
 
   if (_storeTracks) {
-    particle["tracks"] =  _stepAct->_track;
+    particle["tracks"] =  _stepAct->GetTracks();
   }
 
 }

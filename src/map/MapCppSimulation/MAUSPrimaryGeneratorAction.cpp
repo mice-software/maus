@@ -1,9 +1,13 @@
-#include "MAUSPrimaryGeneratorAction.h"
+#include <queue>
 
 #include <G4Event.hh>
 #include <G4PrimaryVertex.hh>
 #include <G4Track.hh>
 #include <G4ios.hh>
+
+#include <CLHEP/Random/Random.h>
+
+#include "MAUSPrimaryGeneratorAction.h"
 
 namespace MAUS {
 
@@ -12,39 +16,28 @@ MAUSPrimaryGeneratorAction*
 MAUSPrimaryGeneratorAction::self = 0;
 
 MAUSPrimaryGeneratorAction::MAUSPrimaryGeneratorAction() {
-  if (self == 0) {
-    self = this;
-  } else {
-    G4Exception(
-        "Error, more than one MAUSPrimaryGeneratorAction instantiated.\n"
-        "Sorry, but this is a no-no because MAUSSteppingAction relies on\n"
-        "MAUSPrimaryGeneratorAction::GetTheMAUSPrimaryGeneratorAction().\n"
-        "This is yucky, I know -- please rewrite MAUSSteppingAction AND\n"
-        "all main() programs so that constructor accepts a pointer to\n"
-        "the MAUSPrimaryGeneratorAction you really want them to use.");
-  }
-
   gun = new G4ParticleGun();
-  updated = false;
 }
 
 void MAUSPrimaryGeneratorAction::GeneratePrimaries(G4Event* argEvent) {
-  if (updated == false) {
-    std::cout << "WARNING MAUSPrimaryGeneratorAction: not updated" << std::endl;
-  }
-
-  G4ParticleTable*      particleTable = G4ParticleTable::GetParticleTable();
-  G4ParticleDefinition* particle      = particleTable->FindParticle(pid);
+  if (_part_q.size() == 0)
+    throw(Squeal(Squeal::recoverable,
+                 "Run out of primary particles",
+                 "MAUSPrimaryGeneratorAction::GeneratePrimaries"));
+  PGParticle part = _part_q.front();
+  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
+  G4ParticleDefinition* particle = particleTable->FindParticle(part.pid);
   gun->SetParticleDefinition(particle);
 
   // Get this class' variables to define next event.
-  gun->SetParticlePosition(G4ThreeVector(X, Y, Z));
-  gun->SetParticleEnergy(Energy);
-  gun->SetParticleMomentumDirection(G4ThreeVector(Pxu, Pyu, Pzu));
-
+  gun->SetParticlePosition(G4ThreeVector
+                                    (part.x, part.y, part.z));
+  gun->SetParticleEnergy(part.energy); //BUG? IIRC that is Kinetic Energy
+  gun->SetParticleMomentumDirection(G4ThreeVector
+                                 (part.px, part.py, part.pz));
   gun->GeneratePrimaryVertex(argEvent);
-
-  updated = false;
+  CLHEP::HepRandom::setTheSeed(static_cast<unsigned int>(part.seed));
+  _part_q.pop();
 }
 
 }  // ends MAUS namespace
