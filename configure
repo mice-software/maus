@@ -163,8 +163,12 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
           export LD_LIBRARY_PATH="\${MAUS_ROOT_DIR}/third_party/install/lib:\${LD_LIBRARY_PATH}" # else add it
      fi
 
-     # maus workers
-     export PYTHONPATH="\$MAUS_ROOT_DIR/build:\$PYTHONPATH"
+     if [ -z "\${PYTHONPATH}" ]; then  # see if the variable exists yet
+          export PYTHONPATH="\$MAUS_ROOT_DIR/build" #initialize it
+     else
+          export PYTHONPATH="\$MAUS_ROOT_DIR/build:\$PYTHONPATH" # else add it
+     fi
+
      export LD_LIBRARY_PATH="\$MAUS_ROOT_DIR/build:\$LD_LIBRARY_PATH"
 
      # maus core
@@ -225,8 +229,13 @@ else
           setenv LD_LIBRARY_PATH "\${MAUS_ROOT_DIR}/third_party/install/lib" # intiailize it
      endif
 
+     if ({\$?PYTHONPATH}) then
+          setenv PYTHONPATH "\$MAUS_ROOT_DIR/build:\$PYTHONPATH" # else add it
+     else
+          setenv PYTHONPATH "\$MAUS_ROOT_DIR/build"  # intiailize it
+     endif
+
      # maus workers
-     setenv PYTHONPATH "\$MAUS_ROOT_DIR/build:\$PYTHONPATH"
      setenv LD_LIBRARY_PATH "\$MAUS_ROOT_DIR/build:\$LD_LIBRARY_PATH"
 
      # maus core
