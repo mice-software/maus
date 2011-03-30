@@ -251,6 +251,21 @@ void ModuleTextFileIO::readDimensions(std::string volumeType, std::string lineIn
         dimStream << x1 << " " << x2 << " " << x3 << " " << units;
         _this->addPropertyHep3Vector("Dimensions", dimStream.str());
       }
+      else if( ( volumeType == "Trapezoid" ) || ( volumeType == "Trd" ) ){
+    	  std::stringstream dimStream;
+    	  double x1, x2, y1, y2, z;
+    	  std::string units;
+    	  ist >> x1 >> x2 >> y1 >> y2 >> z >> units;
+    	  //Fake dimensions
+    	  //dimStream << x1 << " " << y1 << " " << z << " " << units;
+    	  _this->addPropertyHep3Vector( "Dimensions", dimStream.str() );
+    	  //TODO: check dimensions
+    	  _this->addPropertyDouble( "TrapezoidWidthX1", x1 * _units.GetUnits( units ) );
+    	  _this->addPropertyDouble( "TrapezoidWidthX2", x2 * _units.GetUnits( units ) );
+    	  _this->addPropertyDouble( "TrapezoidHeightY1", y1 * _units.GetUnits( units ) );
+    	  _this->addPropertyDouble( "TrapezoidHeightY2", y2 * _units.GetUnits( units ) );
+    	  _this->addPropertyDouble( "TrapezoidHeightZ", z * _units.GetUnits( units ) );
+      }
       else if( volumeType == "Multipole" || volumeType == "Quadrupole" 
                || volumeType == "None" || volumeType == "Boolean")
         _this->addPropertyHep3Vector("Dimensions", CLHEP::Hep3Vector(0,0,0));

@@ -79,6 +79,40 @@ TEST_F(MiceModToG4SolidTest, buildWedgeTest) {
   ASSERT_THROW   ( sol = MiceModToG4Solid::buildWedge(&mod), Squeal );
 }
 
+MiceModule trapezoid_module( double aX1, double aX2, double aY1, double aY2, double aZ ) {
+  MiceModule mod;
+  try{
+	  mod.setProperty<CLHEP::Hep3Vector>("Dimensions",CLHEP::Hep3Vector(10.,20.,30.) );
+  	  mod.addPropertyDouble( "TrapezoidWidthX1", aX1 );
+  	  mod.addPropertyDouble( "TrapezoidWidthX2", aX2 );
+  	  mod.addPropertyDouble( "TrapezoidHeightY1", aY1 );
+  	  mod.addPropertyDouble( "TrapezoidHeightY2", aY2 );
+  	  mod.addPropertyDouble( "TrapezoidLengthZ", aZ );
+  	  return mod;
+  } catch( Squeal squee ){
+	  std::string error = squee.GetMessage();
+	  std::cerr << "Exception in trapezoid_module: " << error << std::endl;
+	  throw( Squeal( Squeal::recoverable, "Error in MiceModToG4Test: " + error + "\'", "trapezoid_module"));
+  }
+}
+
+TEST_F(MiceModToG4SolidTest, buildTrapezoidTest) {
+//
+  double x1 = 1.0, x2 = 2.0, y1 = 3.0, y2 = 4.0, z = 5.0;
+  MiceModule mod = trapezoid_module( x1, x2, y1, y2, z );
+  G4VSolid* sol=NULL;
+
+  ASSERT_NO_THROW( sol = MiceModToG4Solid::buildTrapezoid( &mod ) );
+  ASSERT_FALSE(sol==NULL);
+  EXPECT_DOUBLE_EQ(((G4Trd*)sol)->GetXHalfLength1(), x1 );
+  EXPECT_DOUBLE_EQ(((G4Trd*)sol)->GetXHalfLength2(), x2 );
+  EXPECT_DOUBLE_EQ(((G4Trd*)sol)->GetYHalfLength1(), y1 );
+  EXPECT_DOUBLE_EQ(((G4Trd*)sol)->GetYHalfLength2(), y2 );
+  EXPECT_DOUBLE_EQ(((G4Trd*)sol)->GetZHalfLength (), z );
+  if (sol!=NULL) delete sol; sol=NULL;
+}
+
+
 TEST_F(MiceModToG4SolidTest, buildBoxTest) {
   MiceModule mod;
   mod.setProperty<CLHEP::Hep3Vector>("Dimensions",CLHEP::Hep3Vector(1.,2.,3.) );

@@ -19,6 +19,7 @@
 #include "EngModel/Polycone.hh"
 #include "EngModel/MultipoleAperture.hh"
 #include "EngModel/MiceModToG4Solid.hh"
+#include <exception>
 
 namespace MiceModToG4Solid
 {
@@ -139,19 +140,20 @@ namespace MiceModToG4Solid
 
 	G4VSolid * buildTrapezoid    ( MiceModule* mod ) //should have x1, x2, y1, y2, z
 	{ 	
-		double widthX1    = mod->propertyDoubleThis("TrapezoidWidthX1");
-		double widthX2    = mod->propertyDoubleThis("TrapezoidWidthX2");
-		double heightY1   = mod->propertyDoubleThis("TrapezoidHeightY1");
-		double heightY2   = mod->propertyDoubleThis("TrapezoidHeightY2");
-		double lengthZ    = mod->propertyDoubleThis("TrapezoidLengthZ");
-
-		if(widthX1 < 0. || widthX2 < 0. || heightY1 < 0. || heightY2 < 0. || lengthZ < 0. )    throw(Squeal(Squeal::recoverable, "Negative parameter for dimension in  "+mod->fullName(), "MiceModToG4Solid::buildTrapezoid"));
-		if(widthX1 == 0. || widthX2 == 0. || heightY1 == 0. || heightY2 == 0. || lengthZ == 0. ) 
-		{ 
-			std::cout << "Just to warn you, there is a parameter = 0 in " << mod->fullName()   << std::endl;
+		double widthX1, widthX2, heightY1, heightY2, lengthZ;
+		try{
+			double widthX1    = mod->propertyDouble( "TrapezoidWidthX1" );
+			double widthX2    = mod->propertyDouble( "TrapezoidWidthX2" );
+			double heightY1   = mod->propertyDouble( "TrapezoidHeightY1" );
+			double heightY2   = mod->propertyDouble( "TrapezoidHeightY2" );
+			double lengthZ    = mod->propertyDouble( "TrapezoidLengthZ" );
+			if( widthX1 < 0. || widthX2 < 0. || heightY1 < 0. || heightY2 < 0. || lengthZ < 0. )  throw( Squeal( Squeal::recoverable, "Negative parameter for dimension in  "+mod->fullName(), "MiceModToG4Solid::buildTrapezoid"));
+			return new G4Trd( mod->name() + "Trapezoid", widthX1, widthX2, heightY1, heightY2, lengthZ );
 		}
-
-		return new G4Trd( mod->name() + "Trapezoid", widthX1, widthX2, heightY1, heightY2, lengthZ );
+		catch(Squeal squee){
+		      std::string error = squee.GetMessage();
+		      throw(Squeal(Squeal::recoverable, "Error building a trapezoid: " + error + "\'", "MiceModToG4Solid::buildTrapezoid"));
+		}
 	}
 
 
