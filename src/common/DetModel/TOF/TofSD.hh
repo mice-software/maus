@@ -22,7 +22,7 @@ class MiceModule;
 
 class TofSD : public MAUSSD {
  public:
-  TofSD( MiceModule* , bool dEdxCut);
+  TofSD( MiceModule* );
 
   void Initialize(G4HCofThisEvent*);
   G4bool ProcessHits(G4Step*, G4TouchableHistory*);

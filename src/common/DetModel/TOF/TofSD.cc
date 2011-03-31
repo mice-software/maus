@@ -13,11 +13,10 @@
 #include <cstring>
 #include "Interface/MICEEvent.hh"
 #include "Config/MiceModule.hh"
-#include "Interface/TofHit.hh"
 #include <iostream>
 
-TofSD::TofSD( MiceModule* mod, bool dEdxCut )
-    : MAUSSD(mod, dEdxCut)
+TofSD::TofSD( MiceModule* mod)
+    : MAUSSD(mod)
 {
 }
 
@@ -43,7 +42,7 @@ void TofSD::Initialize(G4HCofThisEvent* HCE)
 G4bool TofSD::ProcessHits(G4Step* aStep, G4TouchableHistory* History)
 {
   G4double edep = aStep->GetTotalEnergyDeposit();
-  if( edep == 0. && _dEdxCut )  return true;
+  if( edep == 0. )  return true;
 
   G4double length = aStep->GetStepLength();
 
@@ -91,7 +90,7 @@ G4bool TofSD::ProcessHits(G4Step* aStep, G4TouchableHistory* History)
 
 void TofSD::EndOfEvent(G4HCofThisEvent* HCE)
 {
-  if( !(_hits[0]["energy_deposited"] == 0. && _dEdxCut) && _hits[0]["path_length"] != 0.){ 
+  if( !(_hits[0]["energy_deposited"] == 0.) && _hits[0]["path_length"] != 0.){ 
     _isHit = true;
   }
  

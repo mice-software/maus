@@ -23,7 +23,7 @@ David Adey - Modified October 19, 2010
 #include "Interface/MICEEvent.hh"
 #include "Config/MiceModule.hh"
 
-SciFiSD::SciFiSD( MiceModule* mod, bool dEdxCut ) : MAUSSD(mod, dEdxCut)
+SciFiSD::SciFiSD( MiceModule* mod) : MAUSSD(mod)
 {
 
 }
@@ -35,7 +35,7 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep,G4TouchableHistory* ROhist)
   
   G4double edep = aStep->GetTotalEnergyDeposit();
 
-  if( edep == 0. && _dEdxCut ) return false;
+  if( edep == 0. ) return false;
   else if( edep == 0. ) edep = 1.0 * MeV;	// fake energy deposit just so that we get some photons digitised out of this hit!
 
   // determine the fibre number based on the position in the tracker and the

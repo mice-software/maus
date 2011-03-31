@@ -230,14 +230,14 @@ void    MICEDetectorConstruction::addDaughter( MiceModule* mod, G4VPhysicalVolum
       cut = false;
     if( sdName == "TOF" )
     {
-      TofSD* tofSD = new TofSD( mod, cut );
+      TofSD* tofSD = new TofSD( mod );
       MICESDMan->AddNewDetector( tofSD );
       logic->SetSensitiveDetector( tofSD );
       _SDs.push_back(tofSD);
     }
     else if( sdName == "SciFi" )
     {
-      SciFiSD* sciFiSD = new SciFiSD( mod, cut );
+      SciFiSD* sciFiSD = new SciFiSD( mod );
       MICESDMan->AddNewDetector( sciFiSD );
       logic->SetSensitiveDetector( sciFiSD );
       _SDs.push_back(sciFiSD); 

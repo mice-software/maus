@@ -18,7 +18,7 @@ namespace MAUS {
 
 class MAUSSD : public G4VSensitiveDetector {
  public:
-  MAUSSD(MiceModule* , bool dEdxCut);
+  MAUSSD(MiceModule*);
 
   bool isHit() { return _isHit; }
   int GetNHits() { return _hits.size(); }
@@ -30,7 +30,6 @@ class MAUSSD : public G4VSensitiveDetector {
 
   MiceModule* _module;
 
-  bool            _dEdxCut;
 };
 
 }  //  ends MAUS namespace
