@@ -1,0 +1,18 @@
+
+    // FILES/Models/Modules/EMR/EMRLayer6Bar39.dat
+    //
+    Module EMRLayer6Bar39
+    {
+      Volume Trapezoid
+      Dimensions 55.00 55.00 0.00 1.65 0.85 cm
+      PropertyInt Layer 6
+      PropertyInt Cell 39
+      PropertyInt numPMTs 2
+      PropertyDouble BlueColour 1.0 
+      Module EMR/EMRLayer6Bar39Sci.dat
+      {
+        Position 0.0 0.0 0.0 mm
+        Rotation 0.0 0.0 0.0 degree
+      }
+    }
+    

@@ -1,0 +1,16 @@
+
+    // FILES/Models/Modules/EMR/EMRLayer7Bar11Sci.dat
+    //
+    
+    Module EMRLayer7Bar11Sci
+    {
+      Volume Trapezoid
+      Dimensions 55.00 55.00 0.00 1.65 0.85 cm
+      PropertyInt Layer 7
+      PropertyInt Cell 11
+      PropertyString SensitiveDetector EMR
+      PropertyString Material POLYSTYRENE
+      PropertyDouble GreenColour 1.0
+      PropertyDouble RedColour 1.0
+    }
+    

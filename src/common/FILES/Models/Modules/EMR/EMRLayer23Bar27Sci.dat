@@ -1,0 +1,16 @@
+
+    // FILES/Models/Modules/EMR/EMRLayer23Bar27Sci.dat
+    //
+    
+    Module EMRLayer23Bar27Sci
+    {
+      Volume Trapezoid
+      Dimensions 55.00 55.00 0.00 1.65 0.85 cm
+      PropertyInt Layer 23
+      PropertyInt Cell 27
+      PropertyString SensitiveDetector EMR
+      PropertyString Material POLYSTYRENE
+      PropertyDouble GreenColour 1.0
+      PropertyDouble RedColour 1.0
+    }
+    
