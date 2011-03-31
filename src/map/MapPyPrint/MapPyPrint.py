@@ -20,8 +20,6 @@
 #  This class is meant to mimick MapCppPrint and output in
 #  a human readable format each spill.  It's also useful to
 #  look at to figure out how MAUS mappers work.
-#
-#  @author Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
 
 import json
 

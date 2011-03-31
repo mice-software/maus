@@ -23,7 +23,6 @@
 #  thing, but this processor tries to do the reduction of tracks such that not
 #  much room is used on the disk.  
 #
-#  @author Christopher Tunnell <c.tunnell1@physics.ox.ac.uk> 
 import json
 import types
 import os

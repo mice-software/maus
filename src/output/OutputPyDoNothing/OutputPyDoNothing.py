@@ -21,7 +21,6 @@ class OutputPyDoNothing:
     which is useful for running forever in the control
     room and also for load tests.
 
-    @author Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
     """
 
     def birth(self):

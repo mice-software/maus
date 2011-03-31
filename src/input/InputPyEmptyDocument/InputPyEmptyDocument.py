@@ -22,7 +22,6 @@ class InputPyEmptyDocument:
     mapper is used to create all the data.  The documents this
     yields contain only the spill number.
 
-    @author Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
     """
 
     def __init__(self, arg_number_of_events=10000):

@@ -1,15 +1,11 @@
 /** @class  MAUSPrimaryGeneratorAction
  *  Geant4 calls this class to determine next event
  *
- *  @author Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
- *
  *  This class gets called as the primary event generator for
  *  geant4.  When setting up geant4, you can use this but must
  *  be sure to call the 'Set' methods of this class to tell
  *  it what the next event to simulate is.  Otherwise, it'll
  *  simulate the last event.
- *
- *  Copyright 2010 c.tunnell1@physics.ox.ac.uk
  *
  */
 

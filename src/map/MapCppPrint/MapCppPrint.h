@@ -19,8 +19,6 @@
  *
  *  This class is meant to be a debugging and simple example class
  *  to illustrate using JSON from within C++.    
- *
- * @author Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
  */
 
 #ifndef _COMPONENTS_MAP_MAPCPPPRINT_H_

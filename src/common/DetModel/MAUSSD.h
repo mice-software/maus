@@ -1,13 +1,9 @@
 /** @class MAUSSD
  *  Generic class for MICE special detectors within the MC.
  *
- *  @author Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
- *
  *  Generic class for MICE special detectors.  Each special
  *  detector will produce a JSON::Value hit and also set
  *  a boolean flag as whether it was hit.
- *
- *  Copyright 2010 c.tunnell1@physics.ox.ac.uk
  *
  */
 #ifndef _COMMONCPP_DETMODEL_MAUSSD_H_

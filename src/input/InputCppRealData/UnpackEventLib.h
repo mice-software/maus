@@ -27,7 +27,6 @@
   * This class unpacks a V830 (scalar) board hit.
   * This is based on the original MICE RealData Module.
   *
-  * \author Simon Fayer <sf105@ic.ac.uk>
  */
 class V830Hit {
 public
@@ -50,7 +49,6 @@ public
   * This class unpacks a V1290 (TDC) board hit.
   * This is based on the original MICE RealData Module.
   *
-  * \author Simon Fayer <sf105@ic.ac.uk>
  */
 class V1290Hit {
 public
@@ -73,7 +71,6 @@ public
   * This class unpacks a V1724 (ADC) board hit.
   * This is based on the original MICE RealData Module.
   *
-  * \author Simon Fayer <sf105@ic.ac.uk>
  */
 class V1724Hit {
 private
@@ -109,7 +106,6 @@ public
   * This class unpacks a V1731 (ADC) board hit.
   * This is based on the original MICE RealData Module.
   *
-  * \author Simon Fayer <sf105@ic.ac.uk>
  */
 class V1731Hit {
 public

@@ -33,7 +33,6 @@
 #  group.Append(MapPyGlobalRecon())
 #  \endcode
 #
-#  @author Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
 
 from types import ListType,InstanceType,MethodType
 import inspect

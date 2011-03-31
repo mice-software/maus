@@ -21,10 +21,6 @@
  *  This class is meant to be a debugging and simple example class
  *  to illustrate using JSON from within C++.
  *
- *  @authors Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>,
- *  Malcolm Ellis <Malcolm.Ellis@brunel.ac.uk>,
- *  Christopher Rogers <chris.rogers@stfc.ac.uk>,
- *  Yagmur Torun <torun@iit.edu>
  */
 
 #ifndef _COMPONENTS_MAP_MAPCPPSIMULATION_H_

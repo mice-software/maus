@@ -1,6 +1,4 @@
-/* Copyright Chris Rogers 2011
- *
- * This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
+/* This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
  *
  * MAUS is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,8 +25,6 @@
  *  Nb jargon:
  *  * Json "object" is like a map<std::string, Json::Value>.
  *  * Json "array" is a dynamic length array
- *
- *  @authors Chris Rogers <chris.rogers@stfc.ac.uk>
  */
 
 #ifndef INTERFACE_JSONWRAPPER_HH

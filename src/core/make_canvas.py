@@ -1,6 +1,4 @@
-# Author: Christopher Tunnell <tunnell@hep.uchicago.edu>
-#
-# March 04, 2009
+#  Create TCanvas() according to ATLAS style guide
 #
 
 import ROOT

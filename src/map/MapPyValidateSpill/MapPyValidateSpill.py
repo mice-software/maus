@@ -22,7 +22,6 @@
 #
 #  Useful for debugging.
 #
-#  @author Chris Rogers <chris.rogers@stfc.ac.uk> 
 
 import ErrorHandler
 import SpillSchema

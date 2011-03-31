@@ -31,7 +31,6 @@
   * This class is a prototype "RealData" module for MAUS.
   * This is based on the original MICE RealData Module.
   *
-  * \author Simon Fayer <sf105@ic.ac.uk>
   */
 class InputCppRealData {
 private

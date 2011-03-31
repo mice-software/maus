@@ -20,7 +20,6 @@
 #  please load your own overriding configuration by
 #  consulting the documentation.
 #
-#  @author Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
 
 map_reduce_type = "native_python" # can also be "native_python_profiling" using cProfile in python
 

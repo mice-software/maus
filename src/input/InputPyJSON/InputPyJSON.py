@@ -38,7 +38,6 @@ class InputPyJSON:
     - etc...
     .
 
-    @author Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
     """
 
     def __init__(self, arg_file=None, arg_number_of_events=-1):

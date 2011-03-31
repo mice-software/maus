@@ -1,15 +1,11 @@
 /** @class  MAUSEventAction
  *  Geant4 calls this class before and after each event
  *
- *  @author Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
- *
  *  MICEEventAction controls what happens at the beginning
  *  and end of every event. GEANT4 calls BeginOfEventAction
  *  and EndOfEventAction at the beginning and end of the event,
  *  respectively.  At present, this class mainly just stores
  *  the primary track per event.
- *
- *  Copyright 2010 c.tunnell1@physics.ox.ac.uk
  *
  */
 

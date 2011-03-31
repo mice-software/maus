@@ -1,9 +1,10 @@
-# Tunnell - script to check for changes between G4MICE and MAUS and make patches
+# Script to check for changes between G4MICE and MAUS and make patches
 #
-# Rogers - list differences between the file tree (missing files from either
-#          side)
-#        - add filter function
-#        - push to arbitrary depth recursion
+# Added later:
+#     - list differences between the file tree (missing files from either
+#       side)
+#     - add filter function
+#     - push to arbitrary depth recursion
 
 import os
 import copy

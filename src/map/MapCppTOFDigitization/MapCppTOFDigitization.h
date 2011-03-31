@@ -18,8 +18,6 @@
 /** @class MapCppTOFDigitization 
  *  Digitize events by running TOF electronics simulation.
  *
- *  @authors Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>,
- *  Yordan Karadzhov <yordan@phys.uni-sofia.bg>
  */
 
 #ifndef _COMPONENTS_MAP_MAPCPPTOFDIGITIZATION_H_

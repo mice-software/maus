@@ -20,8 +20,6 @@
 #  ReducePyDoNothing takes the string representation
 #  of two JSON documents and concatenates them with
 #  a line break between them.
-#
-#  @author Christopher Tunnell <c.tunnell1@physics.ox.ac.uk> 
 import json
 import types
 

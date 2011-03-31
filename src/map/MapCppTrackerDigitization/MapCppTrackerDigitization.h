@@ -18,8 +18,6 @@
 /** @class MapCppTrackerDigitization 
  *  Digitize events by running Tracker electronics simulation.
  *
- *  @authors Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>,
- *  Ed McKigney <e.mckigney@ic.ac.uk>
  */
 
 #ifndef _COMPONENTS_MAP_MAPCPPTRACKERDIGITIZATION_H_

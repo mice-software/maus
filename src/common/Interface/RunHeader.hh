@@ -3,8 +3,6 @@
  *
  * Add run header to output file and provide method to read in run header.
  *
- * @author Alex Tapper 
- *  
  */
 
 #ifndef RunHeader_h

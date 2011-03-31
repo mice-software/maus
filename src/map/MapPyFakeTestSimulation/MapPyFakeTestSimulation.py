@@ -21,7 +21,6 @@
 #  This is useful for testing mappers that work on simulation
 #  data or doing load testing.  
 #
-#  @author Christopher Tunnell <c.tunnell1@physics.ox.ac.uk> 
 import json
 import types
 import os

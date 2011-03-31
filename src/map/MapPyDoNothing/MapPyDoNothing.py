@@ -19,7 +19,6 @@
 #
 #  Useful for debugging.
 #
-#  @author Christopher Tunnell <c.tunnell1@physics.ox.ac.uk> 
 import json
 
 class MapPyDoNothing:

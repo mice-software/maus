@@ -1,11 +1,7 @@
 /** @class  MAUSSteppingAction
  *  Geant4 calls this class per track step
  *
- *  @author Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
- *
  *  This will add the steps of tracks to the datastructure
- *
- *  Copyright 2010 c.tunnell1@physics.ox.ac.uk
  *
  */
 

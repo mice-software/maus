@@ -28,7 +28,6 @@
 #   - native single-threaded python
 #   .
 #
-#  @author Christopher Tunnell <c.tunnell1@physics.ox.ac.uk> 
 import gzip
 import os
 import types
