@@ -59,6 +59,12 @@ Configuration Stage6
     Rotation 0. 0. 0. degree
   }
 
+  Module EMR/Calorimeter.dat
+  {
+    Position 0. 0. 7.0495 m
+    Rotation 0. 0. 0. degree
+  }
+
   Module CoilConfig/Stage6CoilCurrents.dat
   {
   }

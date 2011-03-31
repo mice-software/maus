@@ -264,7 +264,7 @@ void ModuleTextFileIO::readDimensions(std::string volumeType, std::string lineIn
     	  _this->addPropertyDouble( "TrapezoidWidthX2", x2 * _units.GetUnits( units ) );
     	  _this->addPropertyDouble( "TrapezoidHeightY1", y1 * _units.GetUnits( units ) );
     	  _this->addPropertyDouble( "TrapezoidHeightY2", y2 * _units.GetUnits( units ) );
-    	  _this->addPropertyDouble( "TrapezoidHeightZ", z * _units.GetUnits( units ) );
+    	  _this->addPropertyDouble( "TrapezoidLengthZ", z * _units.GetUnits( units ) );
       }
       else if( volumeType == "Multipole" || volumeType == "Quadrupole" 
                || volumeType == "None" || volumeType == "Boolean")
