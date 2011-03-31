@@ -21,7 +21,7 @@
 #include <cstring>
 #include <iostream>
 
-EMRSD::EMRSD( MiceModule* mod, bool dEdxCut ) : MAUSSD( mod, dEdxCut )
+EMRSD::EMRSD( MiceModule* mod) : MAUSSD( mod )
 {
 }
 

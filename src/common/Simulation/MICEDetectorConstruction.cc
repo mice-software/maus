@@ -250,7 +250,7 @@ void    MICEDetectorConstruction::addDaughter( MiceModule* mod, G4VPhysicalVolum
     }
     else if( sdName == "EMR" )
     {
-      EMRSD* emrSD = new EMRSD( mod, cut );
+      EMRSD* emrSD = new EMRSD( mod );
       MICESDMan->AddNewDetector( emrSD );
       logic->SetSensitiveDetector( emrSD );
       _SDs.push_back( emrSD );

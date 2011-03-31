@@ -30,7 +30,7 @@ class EMRSD : public MAUSSD {
   public:
 
       //! Constructor
-      EMRSD( MiceModule*, bool dEdxCut );
+      EMRSD( MiceModule*);
 
       //! Default destructor
      ~EMRSD();
