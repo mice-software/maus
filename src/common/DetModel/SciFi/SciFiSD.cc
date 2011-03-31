@@ -79,9 +79,9 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep,G4TouchableHistory* ROhist)
 
   //_hits[hit_i]["volume_name"] = aStep->GetPreStepPoint()->GetPhysicalVolume()->GetName();
   
-  channel_id["tracker_number"] = _module->propertyInt( "Tracker" );
-  channel_id["station_number"] = _module->propertyInt( "Station" );
-  channel_id["plane_number"] = _module->propertyInt( "Plane" );
+  channel_id[ "tracker_number" ] = _module->propertyInt( "Tracker" );
+  channel_id[ "station_number" ] = _module->propertyInt( "Station" );
+  channel_id[ "plane_number" ] = _module->propertyInt( "Plane" );
   _hits[hit_i]["channel_id"] = channel_id;
 
   if (nChans == 2) {
