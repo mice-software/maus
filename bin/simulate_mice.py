@@ -30,8 +30,8 @@ myInput = InputPyJSON(documentFile)
 # with the functionality you want to use.
 myMap = MapPyGroup()
 myMap.append(MapCppSimulation())  #  geant4 simulation 
-myMap.append(MapCppTOFDigitization())  #  TOF detector digitization
-myMap.append(MapCppTrackerDigitization())  #  tracker detector digitization
+#myMap.append(MapCppTOFDigitization())  #  TOF detector digitization
+#myMap.append(MapCppTrackerDigitization())  #  tracker detector digitization
 
 #  The Go() drives all the components you pass in, then check the file
 #  'mausput' for the output

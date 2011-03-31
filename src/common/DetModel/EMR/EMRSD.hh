@@ -24,6 +24,8 @@ class MiceModule;
 * EMR calorimeter simulation.
 **/
 
+using namespace MAUS;
+
 class EMRSD : public MAUSSD {
   public:
 
@@ -42,8 +44,6 @@ class EMRSD : public MAUSSD {
       //! code that is called at the end of processing of an event
       void EndOfEvent( G4HCofThisEvent* );
 
-  private:
-        MiceModule*     _module;
 };
 
 #endif
