@@ -22,8 +22,6 @@
 #  The tracks can take up significant amounts of space,
 #  so this is a good idea. Or you can just tell the
 #  Simulation() not to create tracks.
-#
-#  @author Christopher Tunnell <c.tunnell1@physics.ox.ac.uk> 
 import json
 import types
 
