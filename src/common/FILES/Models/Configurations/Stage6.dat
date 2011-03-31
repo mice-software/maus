@@ -58,7 +58,7 @@ Configuration Stage6
     Position 0. 0. 6.5245 m
     Rotation 0. 0. 0. degree
   }
-  Module EmCal/Calorimeter.dat
+  Module EMR/Calorimeter.dat
   {
     Position 0. 0. 7.0495 m
     Rotation 0. 0. 0. degree

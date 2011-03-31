@@ -35,4 +35,4 @@ myMap.append(MapCppTrackerDigitization())  #  tracker detector digitization
 
 #  The Go() drives all the components you pass in, then check the file
 #  'mausput' for the output
-Go(myInput, myMap, ReducePyDoNothing(), OutputPyJSON(), io.StringIO(u"keep_tracks = True"))
+Go(myInput, myMap, ReducePyDoNothing(), OutputPyJSON(), io.StringIO(u"keep_tracks = False"))
