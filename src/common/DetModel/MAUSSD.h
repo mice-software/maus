@@ -22,7 +22,7 @@ class MAUSSD : public G4VSensitiveDetector {
 
   bool isHit() { return _isHit; }
   int GetNHits() { return _hits.size(); }
-  std::vector<Json::Value> GetHits() { return _hits; }
+  std::vector<Json::Value> GetHits() { _hits.clear(); return _hits; }
 
  protected:
   std::vector<Json::Value> _hits;
