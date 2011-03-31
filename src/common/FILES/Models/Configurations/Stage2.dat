@@ -20,10 +20,5 @@ Configuration Stage2
     Position 0. 0. -2.49 m
     Rotation 0. 0. 0. degree
   }
-  Module EmCal/Calorimeter.dat
-  {
-    Position 0. 0. -2.45 m
-    Rotation 0. 0. 0. degree
-  }
 }
 

@@ -253,29 +253,6 @@ void dataCards::fillCards(int app)
     cd["rfBGRadius"] = 150.0 * mm; //Deprecated - does nothing
     cd["rfBGScaleFactor"] = 1.0; //Deprecated - does nothing
 
-    // <head>Digitization Application Calorimeter Controls</head>
-    cd["EMCalAttLengthLong"]          = 2400.0 * mm; //The EM Calorimeter models the number of photoelectrons entering the PMT using Interface/src/EMCalDigit.cc
-    cd["EMCalAttLengthShort"]         =  200.0 * mm;
-    cd["EMCalAttLengthLongNorm"]      = 0.655 * mm;
-    cd["EMCalAttLengthShortNorm"]     = 0.345 * mm;
-    cd["EMCalLightCollectionEff"]     = 0.031;
-    cd["EMCalEnergyPerPhoton"]        = 0.125 * keV;
-    cd["EMCalLightSpeed"]             =  170.0 * mm / ns;
-    cd["EMCalLightGuideEff"]          =  0.85;
-    cd["EMCalQuantumEff"]             =  0.18;
-    cd["EMCalAmplificationCof"]       =1000000.;
-    cd["EMCalAmplificationFluct"]     = 1000.;
-    cd["EMCalAdcConversionFactor"]    =  0.25*1e-12*coulomb;  // pC per count
-    cd["EMCalTdcConversionFactor"]    = 0.025 * ns;
-    ci["EMCalAdcThreshold"]           =     2;    // adc counts
-    cd["EMCalTdcThreshold"]           =  1.84*1e-12*coulomb;  // pC
-    cd["EMCalTdcResolution"]          =  0.05 * ns;
-    ci["EMCalTdcBits"]                =    12;
-    cs["EMCalHardCodedTrigger"]       = "False";
-    cd["EMCalSamplingTimeStart"]      =  100.0 * ns;
-    cd["EMCalSamplingTimeWindow"]     =  100.0 * ns;
-    cd["EMCalElectronicsDecayTime"]   =    8.0 * ns;
-
     // <head>Digitization Application SciFi controls</head>
     cs["SciFiDeadChanFName"] = "";
     ci["SciFiMUXNum"] = 7;
