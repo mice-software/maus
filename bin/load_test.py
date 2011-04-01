@@ -21,7 +21,7 @@ def run():
     """
     map_group = MapPyGroup()
 
-    big_number = 1000
+    big_number = 10000
 
     if len(sys.argv) == 3:
         print 'Using only empty events'

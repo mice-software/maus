@@ -156,16 +156,16 @@ class Go:
             
 
     def BufferInput(self, theEmitter):
-        buffer = []
+        my_buffer = []
         
         for i in range(1024):
             try:
                 value = next(theEmitter)  
-                buffer.append(value.encode('ascii'))
+                my_buffer.append(value.encode('ascii'))
             except StopIteration:
-                return buffer
+                return my_buffer
 
-        return buffer
+        return my_buffer
                 
 
 
