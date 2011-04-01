@@ -21,7 +21,7 @@
 #  consulting the documentation.
 #
 
-map_reduce_type = "native_python" # can also be "native_python_profiling" using cProfile in python
+map_reduce_type = "native_python" # can also be "native_python_profile" using cProfile in python
 
 # Used by MapPyRemoveTracks.
 keep_only_muon_tracks = False 
