@@ -1,5 +1,12 @@
 from SCons.Script.SConscript import SConsEnvironment
-import glob, os, sys
+import glob
+import os
+
+maus_root_dir = os.environ.get('MAUS_ROOT_DIR')
+if maus_root_dir == "":
+    print('!! Could not find the $MAUS_ROOT_DIR environmental variable')
+    print('!! Did you try running: "source env.sh"?')
+    Exit(1)
 
 #this is our catch-all Dev class
 class Dev:
@@ -12,23 +19,23 @@ class Dev:
         SConscript(env.jDev.SPath(project), exports=['project'])
 
     #sets up the build for a given project
-    def Buildit(self, localenv, project,\
+    def Buildit(self, localenv, project, \
                     use_root, use_g4, use_unpacker = False):
         if use_root and not env['USE_ROOT']:
             if not env.GetOption('clean'):
-                print "The worker", project,\
+                print "The worker", project, \
                     "requires ROOT which is disabled. Skipping..."
             return False
 
         if use_g4 and not env['USE_G4']:
             if not env.GetOption('clean'):
-                print "The worker", project,\
+                print "The worker", project, \
                     "requires Geant4 which is disabled. Skipping..."
             return False
 
         if use_unpacker and not env['USE_UNPACKER']:
             if not env.GetOption('clean'):
-                print "The worker", project,\
+                print "The worker", project, \
                     "requires Unpacker which is disabled. Skipping..."
             return False
 
@@ -48,13 +55,15 @@ class Dev:
 
         srclst = map(lambda x: builddir + '/' + x, glob.glob('*.cpp'))
         srclst += map(lambda x: builddir + '/' + x, glob.glob('*.i'))
-        pgm = localenv.SharedLibrary(targetpath, source=srclst)#, LIBS=['simulate'])
+        pgm = localenv.SharedLibrary(targetpath, source=srclst)
 
         tests = glob.glob('test_*.py')
 
-        env.Install(os.path.join(os.environ.get('MAUS_ROOT_DIR'), builddir) , "build/%s.py" % name)
-        env.Install(os.path.join(os.environ.get('MAUS_ROOT_DIR'), builddir) , pgm)
-        env.Install(os.path.join(os.environ.get('MAUS_ROOT_DIR'), builddir) , tests)
+        full_build_dir = os.path.join(maus_root_dir, builddir)
+
+        env.Install(full_build_dir, "build/%s.py" % name)
+        env.Install(full_build_dir, pgm)
+        env.Install(full_build_dir, tests)
         env.Alias('all', pgm)  #note: not localenv
 
         return True
@@ -77,22 +86,25 @@ def set_cpp(conf, env):
     """
     Sanity checks that the compiler is installed correctly
     """
-    # ---- check for compiler and do sanity checks
+
     if not conf.CheckCXX():
-        print('!! Your compiler and/or environment is not correctly configured.')
+        print('!! Your compiler or environment is not correctly configured.')
         Exit(1)
 
-    if not conf.CheckLib( "json" , language='C++') or not conf.CheckCXXHeader('json/json.h'):
-        print( "can't find jsoncpp which is needed" )
+    if not conf.CheckLib( "json" , language='C++') or\
+            not conf.CheckCXXHeader('json/json.h'):
+
+        print( "!! Can't find jsoncpp which is needed." )
         print ( "You may install it by running:")
-        print ("     MAUS_ROOT_DIR=%s ./third_party/bash/11jsoncpp.bash" % os.environ.get('MAUS_ROOT_DIR'))
+        print ("     MAUS_ROOT_DIR=%s ./third_party/bash/11jsoncpp.bash"\
+                   % maus_root_dir)
         Exit(1)
 
     if not conf.CheckLib( "stdc++" , language='C++'):
         Exit(1)
 
     if not conf.CheckFunc('printf'):
-        print('!! Your compiler and/or environment is not correctly configured.')
+        print('!! Your compiler or environment is not correctly configured.')
         Exit(1)
 
     if not conf.CheckHeader('math.h'):
@@ -105,7 +117,7 @@ def set_cpp(conf, env):
         Exit(1)
 
 def set_python(conf, env):
-    EnsurePythonVersion(2,7)
+    EnsurePythonVersion(2, 7)
 
     if not conf.CheckCommand('python'):
         Exit(1)
@@ -113,36 +125,67 @@ def set_python(conf, env):
     if not conf.CheckCXXHeader('Python.h'):
         print "You need 'Python.h' to compile this program"
         print "If you want to install python locally, run:"
-        print ("     MAUS_ROOT_DIR=%s ./third_party/bash/03python.bash" % os.environ.get('MAUS_ROOT_DIR'))
+        print ("     MAUS_ROOT_DIR=%s ./third_party/bash/03python.bash" \
+                   % maus_root_dir)
         Exit(1)
 
     if not conf.CheckCommand('swig'):
         print "Cound't find swig.  If you want it, then run:"
-        print ("     MAUS_ROOT_DIR=%s ./third_party/bash/10swig.bash" % os.environ.get('MAUS_ROOT_DIR'))
+        print ("     MAUS_ROOT_DIR=%s ./third_party/bash/10swig.bash" \
+                   % maus_root_dir)
         Exit(1)
 
 def set_gsl(conf, env):
     if not conf.CheckLib('gslcblas'):
         print "Cound't find GSL (required for ROOT).  If you want it, then run:"
-        print ("      MAUS_ROOT_DIR=%s ./third_party/bash/20gsl.bash" % os.environ.get('MAUS_ROOT_DIR'))
+        print ("     MAUS_ROOT_DIR=%s ./third_party/bash/20gsl.bash" \
+                   % maus_root_dir)
         Exit(1)
     else:
         conf.env.Append(LIBS = ['gslcblas'])
 
     if not conf.CheckLib('gsl'):
         print "Cound't find GSL (required for ROOT).  If you want it, then run:"
-        print ("      MAUS_ROOT_DIR=%s ./third_party/bash/20gsl.bash" % os.environ.get('MAUS_ROOT_DIR'))
+        print ("     MAUS_ROOT_DIR=%s ./third_party/bash/20gsl.bash" \
+                   % maus_root_dir)
         Exit(1)
+
+def get_root_libs():
+    """ROOT libs
+
+    Important libraries for ROOT to run.  Worth checking for.  The list is not
+    exhaustive but just for sanity checks.
+    """
+    return ['Cint', \
+                'Core', \
+                'Gpad', \
+                'Graf', \
+                'Graf3d', \
+                'Hist', \
+                'MathCore', \
+                'Matrix', \
+                'Minuit', \
+                'Net', \
+                'Physics', \
+                'Postscript', \
+                'RIO', \
+                'Rint', \
+                'Thread', \
+                'Tree', \
+                'dl', \
+                'm', \
+                'pthread']
 
 def set_root(conf, env):
     if not conf.CheckCommand('root'):
-        print "Cound't find root.  If you want it, after installing GSL, then run:"
-        print ("      MAUS_ROOT_DIR=%s ./third_party/bash/21root.bash" % os.environ.get('MAUS_ROOT_DIR'))
+        print "Cound't find root.  If you want it, after installing GSL, run:"
+        print ("     MAUS_ROOT_DIR=%s ./third_party/bash/21root.bash" \
+                   % maus_root_dir)
         Exit(1)
 
     else:
         print
-        print "!! Found the program 'root', so assume you want to use it with MAUS."
+        print "!! Found the program 'root', so MAUS will use it."
         print
         env['USE_ROOT'] = True
 
@@ -151,7 +194,7 @@ def set_root(conf, env):
 
         conf.env.ParseConfig("root-config --cflags --ldflags --libs")
 
-        root_libs = ['Core', 'Cint', 'RIO', 'Net', 'Hist', 'Graf', 'Graf3d', 'Gpad', 'Tree', 'Rint', 'Postscript', 'Matrix', 'Physics', 'MathCore', 'Thread', 'pthread', 'm', 'dl', 'Minuit']  # the important libraries I've found by looking at root-config output
+        root_libs = get_root_libs()
 
         for lib in root_libs:
             if not conf.CheckLib(lib, language='c++'):
@@ -166,17 +209,126 @@ def set_root(conf, env):
 def set_clhep(conf, env):
     if not conf.CheckLib('CLHEP', language='c++'):
         print "Cound't find CLHEP (required for geant4).  If you want it, then run:"
-        print ("      MAUS_ROOT_DIR=%s ./third_party/bash/22clhep.bash" % os.environ.get('MAUS_ROOT_DIR'))
+        print ("      MAUS_ROOT_DIR=%s ./third_party/bash/22clhep.bash" % maus_root_dir)
         Exit(1)
 
-def g4_libs():
-    return ['G4error_propagation', 'G4mctruth', 'G4readout', 'G4phys_lists', 'G4gflash', 'G4phys_builders', 'G4visHepRep', 'G4biasing', 'G4geomtext', 'G4FR', 'G4brep', 'G4RayTracer', 'G4Tree', 'G4VRML', 'G4visXXX', 'G4vis_management', 'G4geomBoolean', 'G4hadronic_radioactivedecay', 'G4decay', 'G4UIbasic', 'G4UIGAG', 'G4UIcommon', 'G4emhighenergy', 'G4partadj', 'G4muons', 'G4empolar', 'G4emlowenergy', 'G4xrays', 'G4hadronic_coherent_elastic', 'G4emstandard', 'G4hadronic_binary', 'G4partutils', 'G4run', 'G4had_theo_max', 'G4had_muon_nuclear', 'G4scoring', 'G4hadronic_interface_ci', 'G4hadronic_abrasion', 'G4transportation', 'G4hadronic_bert_cascade', 'G4hadronic_hetcpp_evaporation', 'G4hadronic_proc', 'G4hadronic_stop', 'G4hadronic_em_dissociation', 'G4hadronic_mgt', 'G4hadronic_qmd', 'G4hadronic_hetcpp_utils', 'G4hadronic_iso', 'G4hadronic_ablation', 'G4optical', 'G4had_preequ_exciton', 'G4hadronic_incl_cascade', 'G4hadronic_deex_handler', 'G4had_lll_fis', 'G4hadronic_deex_evaporation', 'G4had_neu_hp', 'G4had_string_diff', 'G4hadronic_leading_particle', 'G4hadronic_deex_gem_evaporation', 'G4hadronic_deex_fission', 'G4hadronic_deex_fermi_breakup', 'G4detutils', 'G4hadronic_deex_photon_evaporation', 'G4hadronic_deex_multifragmentation', 'G4had_string_frag', 'G4hadronic_HE', 'G4parameterisation', 'G4hadronic_qgstring', 'G4had_string_man', 'G4had_im_r_matrix', 'G4hadronic_deex_management', 'G4hadronic_LE', 'G4hadronic_body_ci', 'G4hadronic_RPG', 'G4hadronic_deex_util', 'G4shortlived', 'G4geomdivision', 'G4hadronic_xsect', 'G4had_mod_util', 'G4detscorer', 'G4had_mod_man', 'G4hadronic_util', 'G4modeling', 'G4event', 'G4geombias', 'G4specsolids', 'G4mesons', 'G4tracking', 'G4emutils', 'G4leptons', 'G4bosons', 'G4ions', 'G4baryons', 'G4cuts', 'G4procman', 'G4csg', 'G4digits', 'G4detector', 'G4hepnumerics', 'G4track', 'G4hits', 'G4navigation', 'G4magneticfield', 'G4partman', 'G4volumes', 'G4geometrymng', 'G4materials', 'G4graphics_reps', 'G4intercoms', 'G4globman']
+def get_g4_libs():
+    return [ 'G4FR', \
+             'G4RayTracer', \
+             'G4Tree', \
+             'G4UIGAG', \
+             'G4UIbasic', \
+             'G4UIcommon', \
+             'G4VRML', \
+             'G4baryons', \
+             'G4biasing', \
+             'G4bosons', \
+             'G4brep', \
+             'G4csg', \
+             'G4cuts', \
+             'G4decay', \
+             'G4detector', \
+             'G4detscorer', \
+             'G4detutils', \
+             'G4digits', \
+             'G4emhighenergy', \
+             'G4emlowenergy', \
+             'G4empolar', \
+             'G4emstandard', \
+             'G4emutils', \
+             'G4error_propagation', \
+             'G4event', \
+             'G4geomBoolean', \
+             'G4geombias', \
+             'G4geomdivision', \
+             'G4geometrymng', \
+             'G4geomtext', \
+             'G4gflash', \
+             'G4globman', \
+             'G4graphics_reps', \
+             'G4had_im_r_matrix', \
+             'G4had_lll_fis', \
+             'G4had_mod_man', \
+             'G4had_mod_util', \
+             'G4had_muon_nuclear', \
+             'G4had_neu_hp', \
+             'G4had_preequ_exciton', \
+             'G4had_string_diff', \
+             'G4had_string_frag', \
+             'G4had_string_man', \
+             'G4had_theo_max', \
+             'G4hadronic_HE', \
+             'G4hadronic_LE', \
+             'G4hadronic_RPG', \
+             'G4hadronic_ablation', \
+             'G4hadronic_abrasion', \
+             'G4hadronic_bert_cascade', \
+             'G4hadronic_binary', \
+             'G4hadronic_body_ci', \
+             'G4hadronic_coherent_elastic', \
+             'G4hadronic_deex_evaporation', \
+             'G4hadronic_deex_fermi_breakup', \
+             'G4hadronic_deex_fission', \
+             'G4hadronic_deex_gem_evaporation', \
+             'G4hadronic_deex_handler', \
+             'G4hadronic_deex_management', \
+             'G4hadronic_deex_multifragmentation', \
+             'G4hadronic_deex_photon_evaporation', \
+             'G4hadronic_deex_util', \
+             'G4hadronic_em_dissociation', \
+             'G4hadronic_hetcpp_evaporation', \
+             'G4hadronic_hetcpp_utils', \
+             'G4hadronic_incl_cascade', \
+             'G4hadronic_interface_ci', \
+             'G4hadronic_iso', \
+             'G4hadronic_leading_particle', \
+             'G4hadronic_mgt', \
+             'G4hadronic_proc', \
+             'G4hadronic_qgstring', \
+             'G4hadronic_qmd', \
+             'G4hadronic_radioactivedecay', \
+             'G4hadronic_stop', \
+             'G4hadronic_util', \
+             'G4hadronic_xsect', \
+             'G4hepnumerics', \
+             'G4hits', \
+             'G4intercoms', \
+             'G4ions', \
+             'G4leptons', \
+             'G4magneticfield', \
+             'G4materials', \
+             'G4mctruth', \
+             'G4mesons', \
+             'G4modeling', \
+             'G4muons', \
+             'G4navigation', \
+             'G4optical', \
+             'G4parameterisation', \
+             'G4partadj', \
+             'G4partman', \
+             'G4partutils', \
+             'G4phys_builders', \
+             'G4phys_lists', \
+             'G4procman', \
+             'G4readout', \
+             'G4run', \
+             'G4scoring', \
+             'G4shortlived', \
+             'G4specsolids', \
+             'G4track', \
+             'G4tracking', \
+             'G4transportation', \
+             'G4visHepRep', \
+             'G4visXXX', \
+             'G4vis_management', \
+             'G4volumes', \
+             'G4xrays']
 
 
 def set_geant4(conf, env):
     if 'G4INSTALL' not in os.environ or (not os.path.exists(os.environ.get('G4INSTALL'))):
         print "Cound't find geant4.  If you want it, after installing CLHEP, then run:"
-        print ("      MAUS_ROOT_DIR=%s ./third_party/bash/23geant4.bash" % os.environ.get('MAUS_ROOT_DIR'))
+        print ("      MAUS_ROOT_DIR=%s ./third_party/bash/23geant4.bash" % maus_root_dir)
         Exit(1)
     else:
         print
@@ -194,9 +346,9 @@ def set_geant4(conf, env):
         #    conf.env.ParseConfig('%s/liblist -m %s < %s/libname.map'.replace('%s', os.path.join(os.environ.get('G4LIB'), os.environ.get('G4SYSTEM'))))
 
 
-        env.Append(LIBS=g4_libs())
+        env.Append(LIBS=get_g4_libs())
 
-        for lib in g4_libs():
+        for lib in get_g4_libs():
             if not conf.CheckLib(lib, language='c++'):
                 Exit(1)
 
@@ -229,22 +381,22 @@ if os.path.isfile('.use_llvm_with_maus'):
     env['CC'] = "llvm-gcc"
     env['CXX'] = "llvm-g++"
 
-env.Tool('swig', '%s/third_party/swig-2.0.1' % os.environ.get('MAUS_ROOT_DIR'))
+env.Tool('swig', '%s/third_party/swig-2.0.1' % maus_root_dir)
 env.Append(SWIGFLAGS=['-python', '-c++']) # tell SWIG to make python bindings for C++
 
-#env.Append(PATH="%s/third_party/install/bin" % os.environ.get('MAUS_ROOT_DIR'))
+#env.Append(PATH="%s/third_party/install/bin" % maus_root_dir)
 env['ENV']['PATH'] =  os.environ.get('PATH')  # useful to set for root-config
 env['ENV']['LD_LIBRARY_PATH'] = os.environ.get('LD_LIBRARY_PATH')
 
 libs = os.environ.get('LD_LIBRARY_PATH')
 
 # to find third party libs, includes
-env.Append(LIBPATH =  libs.split(':') + ["%s/build" % os.environ.get('MAUS_ROOT_DIR')])
+env.Append(LIBPATH =  libs.split(':') + ["%s/build" % maus_root_dir])
 
-env.Append(CPPPATH=["%s/third_party/install/include" % os.environ.get('MAUS_ROOT_DIR'), \
-                      "%s/third_party/install/include/python2.7" % os.environ.get('MAUS_ROOT_DIR'), \
-                      "%s/third_party/install/include/root" % os.environ.get('MAUS_ROOT_DIR'), \
-                      "%s/src/common" % os.environ.get('MAUS_ROOT_DIR'), ""])
+env.Append(CPPPATH=["%s/third_party/install/include" % maus_root_dir, \
+                      "%s/third_party/install/include/python2.7" % maus_root_dir, \
+                      "%s/third_party/install/include/root" % maus_root_dir, \
+                      "%s/src/common" % maus_root_dir, ""])
 
 env['USE_G4'] = False
 env['USE_ROOT'] = False
@@ -281,7 +433,7 @@ Export('env')
 #                  'doxygen doc/Doxyfile && cd doc/html')
 #env.Alias('doc', [dox])
 
-#python_executable = '%s/third_party/install/bin/python' % os.environ.get('MAUS_ROOT_DIR')
+#python_executable = '%s/third_party/install/bin/python' % maus_root_dir
 #if os.path.isfile(python_executable):
 #  unit = env.Command('does_not_exist2', 'build', '%s -m unittest discover -b -v build' % python_executable)
 #  env.Alias('unittest', [unit])
@@ -312,21 +464,31 @@ if env['USE_G4'] and env['USE_ROOT']:
     env.Append(CCFLAGS=['-g','-pg'])
     env.Append(LINKFLAGS='-pg')
 
-    commonCppFiles = glob.glob("src/common/*/*cc") + glob.glob("src/common/*/*/*cc") + glob.glob("src/common/*/*cpp") + glob.glob("src/common/*/*/*cpp")
-    simulate = env.SharedLibrary(target = 'src/common/libsimulate', source = commonCppFiles, LIBS=['recpack'] +  env['LIBS'])
+    common_cpp_files = glob.glob("src/common/*/*cc") + \
+        glob.glob("src/common/*/*/*cc") + \
+        glob.glob("src/common/*/*cpp") + \
+        glob.glob("src/common/*/*/*cpp")
+
+    simulate = env.SharedLibrary(target = 'src/common/libsimulate',
+                                 source = common_cpp_files,
+                                 LIBS=env['LIBS'] + ['recpack'])
     env.Install("build", simulate)
 
     env.Append(LIBPATH = 'src/common/')
-    env.Append(CPPPATH = os.environ.get('MAUS_ROOT_DIR'))
+    env.Append(CPPPATH = maus_root_dir)
 
-    testCppFiles = glob.glob("tests/cpp_unit/*/*cpp")+glob.glob("tests/cpp_unit/*cpp")
-    testmain = env.Program(target = 'tests/cpp_unit/test_cpp_unit', source = testCppFiles, LIBS=['recpack'] +  env['LIBS']+['simulate'])
+    test_cpp_files = glob.glob("tests/cpp_unit/*/*cpp")+\
+        glob.glob("tests/cpp_unit/*cpp")
+
+    testmain = env.Program(target = 'tests/cpp_unit/test_cpp_unit', \
+                               source = test_cpp_files, \
+                               LIBS= env['LIBS'] + ['recpack'] + ['simulate'])
     env.Install('build', ['tests/cpp_unit/test_cpp_unit'])
 
 directories = []
 types = ["input", "map", "reduce", "output"]
-for type in types:
-    directories += glob.glob("src/%s/*" % type)
+for my_type in types:
+    directories += glob.glob("src/%s/*" % my_type)
 
 for directory in directories:
     parts = directory.split("/")
@@ -347,4 +509,4 @@ for directory in directories:
 files = glob.glob('tests/unit/test_*')
 env.Install("build", files)
 
-env.Alias('install', ['%s/build' % os.environ.get('MAUS_ROOT_DIR')])
+env.Alias('install', ['%s/build' % maus_root_dir])
