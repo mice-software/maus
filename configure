@@ -97,25 +97,23 @@ fi
 
 # check for SCons
 type -P scons &>/dev/null || {
-    echo "FATAL: Scons is required. It's weird that it's not" >&2;
-    echo "FATAL: since it ships within MAUS.  Is your MAUS ROOT" >&2;
-    echo "FATAL: directory correct?." >&2;
-    echo "FATAL:" >&2;
-    echo "FATAL: To reinstall within MAUS, set the MAUS_ROOT_DIR" >&2;
-    echo "FATAL: environmental variable.  For Bourne-compatible" >&2;
-    echo "FATAL: shells like 'bash', run:" >&2;
-    echo "FATAL:" >&2;
-    echo "FATAL:      export MAUS_ROOT_DIR=\"${maus_root_dir}\"" >&2;
-    echo "FATAL:" >&2;
-    echo "FATAL: whilst for C-compatible shells like 'csh', run:" >&2;
-    echo "FATAL:" >&2;
-    echo "FATAL:      setenv MAUS_ROOT_DIR \"${maus_root_dir}\"" >&2;
-    echo "FATAL:" >&2;
-    echo "FATAL: then run the following to install Scons:" >&2;
-    echo "FATAL:" >&2;
-    echo "FATAL:      ./third_party/bash/40python_extras.bash";
-    echo "FATAL:";
-    exit 1;}
+    echo "WARNING: Scons is required to proceed after this step"
+    echo "WARNING:"
+    echo "WARNING: To install within MAUS, set the MAUS_ROOT_DIR";
+    echo "WARNING: environmental variable.  For Bourne-compatible";
+    echo "WARNING: shells like 'bash', run:";
+    echo "WARNING: ";
+    echo "WARNING:       export MAUS_ROOT_DIR=\"${maus_root_dir}\"";
+    echo "WARNING: ";
+    echo "WARNING:  whilst for C-compatible shells like 'csh', run:";
+    echo "WARNING: ";
+    echo "WARNING:       setenv MAUS_ROOT_DIR \"${maus_root_dir}\"";
+    echo "WARNING: ";
+    echo "WARNING: then run the following to install Scons:" >&2;
+    echo "WARNING:" >&2;
+    echo "WARNING:      ./third_party/bash/40python_extras.bash";
+    echo "WARNING:";
+    }
 
 root_version=root_v5.28.00a
 
