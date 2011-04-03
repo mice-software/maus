@@ -113,9 +113,23 @@ type -P scons &>/dev/null || {
     echo "WARNING:" >&2;
     echo "WARNING:      ./third_party/bash/40python_extras.bash";
     echo "WARNING:";
+    echo
     }
 
+
 root_version=root_v5.28.00a
+
+if [ ! -f "env.sh" ]
+then
+    echo "RECOMMENDATION:  This appears to be your first time running MAUS."
+    echo "RECOMMENDATION:  If you want to install all the external dependencies"
+    echo "RECOMMENDATION:  automatically (takes an hour or so since geant is big)"
+    echo "RECOMMENDATION:  then run the following command:"
+    echo "RECOMMENDATION:"
+    echo "RECOMMENDATION:       ./tests/integration/install_then_build_then_test.bash"
+    echo "RECOMMENDATION:"
+    echo
+fi
 
 ### Create environment files
 
@@ -259,3 +273,4 @@ echo "SUCCESS:      source env.csh"
 echo "SUCCESS:"
 echo "SUCCESS: which can be added to your respective shell's"
 echo "SUCCESS: startup scripts.  Example: ~/.bashrc for 'bash'."
+
