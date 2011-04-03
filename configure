@@ -22,22 +22,6 @@ echo
 # Check for g++ ##################################################
 (type -P gcc &>/dev/null && type -P g++ &>/dev/null) || {
     echo "FATAL: gcc/g++ is required to compile code." >&2;
-    echo "FATAL:" >&2;
-    echo "FATAL: To install within MAUS, set the MAUS_ROOT_DIR" >&2;
-    echo "FATAL: environmental variable.  For Bourne-compatible" >&2;
-    echo "FATAL: shells like 'bash', run:" >&2;
-    echo "FATAL:" >&2;
-    echo "FATAL:      export MAUS_ROOT_DIR=\"${maus_root_dir}\"" >&2;
-    echo "FATAL:" >&2;
-    echo "FATAL: whilst for C-compatible shells like 'csh', run:" >&2;
-    echo "FATAL:" >&2;
-    echo "FATAL:      setenv MAUS_ROOT_DIR \"${maus_root_dir}\"" >&2;
-    echo "FATAL:" >&2;
-    echo "FATAL: then run the following two commands to install" >&2;
-    echo "FATAL: the GCC compiler and it's dependency MPFR:" >&2;
-    echo "FATAL:" >&2;
-    echo "FATAL:      ./third_party/bash/01mpfr.bash" >&2;
-    echo "FATAL:      ./third_party/bash/02gcc.bash" >&2;
     exit 1; }
 
 # Find where MAUS is installed
@@ -50,16 +34,6 @@ then
     echo "FATAL: See:" >&2;
     echo "FATAL:" >&2;
     echo "FATAL: http://micewww.pp.rl.ac.uk:8080/issues/306" >&2;
-    echo "FATAL:" >&2;
-    echo "FATAL:      export MAUS_ROOT_DIR=\"${maus_root_dir}\"" >&2;
-    echo "FATAL:" >&2;
-    echo "FATAL: whilst for C-compatible shells like 'csh', run:" >&2;
-    echo "FATAL:" >&2;
-    echo "FATAL:      setenv MAUS_ROOT_DIR \"${maus_root_dir}\"" >&2;
-    echo "FATAL:" >&2;
-    echo "FATAL: then run the following to install Python 2.7:" >&2;
-    echo "FATAL:" >&2;
-    echo "FATAL:      ./third_party/bash/03python.bash" >&2;
     exit 1;
 fi
 
@@ -93,7 +67,7 @@ type -P python &>/dev/null || {
     echo "FATAL:" >&2;
     echo "FATAL: then run the following to install Python 2.7:" >&2;
     echo "FATAL:" >&2;
-    echo "FATAL:      ./third_party/bash/03python.bash" >&2;
+    echo "FATAL:      ./third_party/bash/01python.bash" >&2;
     exit 1; }
 
 python_version=`LD_LIBRARY_PATH=./third_party/install/lib python -V 2>&1`
@@ -101,7 +75,9 @@ python_version=`LD_LIBRARY_PATH=./third_party/install/lib python -V 2>&1`
 if [ "${python_version}" != "Python 2.7" ]
 then               ##################################################
     echo "WARNING: Unsupported python version (You are using ${python_version}),";
-    echo "WARNING: so using Python 2.7 is recommended";
+    echo "WARNING: so using Python 2.7 is recommended.  MAUS will install extra";
+    echo "WARNING: packages in this location like numpy and xboa and currently";
+    echo "WARNING: the way we go about this is having our own Python install.";
     echo "WARNING: ";
     echo "WARNING: To install within MAUS, set the MAUS_ROOT_DIR";
     echo "WARNING: environmental variable.  For Bourne-compatible";
@@ -115,7 +91,7 @@ then               ##################################################
     echo "WARNING: ";
     echo "WARNING: then run the following to install Python 2.7:"
     echo "WARNING: ";
-    echo "WARNING:       ./third_party/bash/03python.bash";
+    echo "WARNING:       ./third_party/bash/01python.bash";
     echo
 fi
 
@@ -137,7 +113,7 @@ type -P scons &>/dev/null || {
     echo "FATAL:" >&2;
     echo "FATAL: then run the following to install Scons:" >&2;
     echo "FATAL:" >&2;
-    echo "FATAL:      ./third_party/bash/01scons.bash";
+    echo "FATAL:      ./third_party/bash/40python_extras.bash";
     echo "FATAL:";
     exit 1;}
 
