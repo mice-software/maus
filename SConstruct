@@ -96,7 +96,7 @@ def set_cpp(conf, env):
 
         print( "!! Can't find jsoncpp which is needed." )
         print ( "You may install it by running:")
-        print ("     MAUS_ROOT_DIR=%s ./third_party/bash/11jsoncpp.bash"\
+        print ("     MAUS_ROOT_DIR=%s ./third_party/bash/03jsoncpp.bash"\
                    % maus_root_dir)
         Exit(1)
 
@@ -125,13 +125,13 @@ def set_python(conf, env):
     if not conf.CheckCXXHeader('Python.h'):
         print "You need 'Python.h' to compile this program"
         print "If you want to install python locally, run:"
-        print ("     MAUS_ROOT_DIR=%s ./third_party/bash/03python.bash" \
+        print ("     MAUS_ROOT_DIR=%s ./third_party/bash/01python.bash" \
                    % maus_root_dir)
         Exit(1)
 
     if not conf.CheckCommand('swig'):
         print "Cound't find swig.  If you want it, then run:"
-        print ("     MAUS_ROOT_DIR=%s ./third_party/bash/10swig.bash" \
+        print ("     MAUS_ROOT_DIR=%s ./third_party/bash/02swig.bash" \
                    % maus_root_dir)
         Exit(1)
 
@@ -181,6 +181,9 @@ def set_root(conf, env):
         print "Cound't find root.  If you want it, after installing GSL, run:"
         print ("     MAUS_ROOT_DIR=%s ./third_party/bash/21root.bash" \
                    % maus_root_dir)
+        print ("where you can install GSL by running:")
+        print ("     MAUS_ROOT_DIR=%s ./third_party/bash/20gsl.bash" \
+                   % maus_root_dir)
         Exit(1)
 
     else:
@@ -209,7 +212,7 @@ def set_root(conf, env):
 def set_clhep(conf, env):
     if not conf.CheckLib('CLHEP', language='c++'):
         print "Cound't find CLHEP (required for geant4).  If you want it, then run:"
-        print ("      MAUS_ROOT_DIR=%s ./third_party/bash/22clhep.bash" % maus_root_dir)
+        print ("      MAUS_ROOT_DIR=%s ./third_party/bash/30clhep.bash" % maus_root_dir)
         Exit(1)
 
 def get_g4_libs():
@@ -328,7 +331,7 @@ def get_g4_libs():
 def set_geant4(conf, env):
     if 'G4INSTALL' not in os.environ or (not os.path.exists(os.environ.get('G4INSTALL'))):
         print "Cound't find geant4.  If you want it, after installing CLHEP, then run:"
-        print ("      MAUS_ROOT_DIR=%s ./third_party/bash/23geant4.bash" % maus_root_dir)
+        print ("      MAUS_ROOT_DIR=%s ./third_party/bash/31geant4.bash" % maus_root_dir)
         Exit(1)
     else:
         print
