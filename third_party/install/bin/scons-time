@@ -1,5 +1,0 @@
-#!/home/tunnell/mice/maus-tunnell/third_party/install/bin/python2.7
-# EASY-INSTALL-SCRIPT: 'scons==2.1.0.alpha.20101125','scons-time'
-__requires__ = 'scons==2.1.0.alpha.20101125'
-import pkg_resources
-pkg_resources.run_script('scons==2.1.0.alpha.20101125', 'scons-time')
