@@ -96,7 +96,7 @@ def set_cpp(conf, env):
 
         print( "!! Can't find jsoncpp which is needed." )
         print ( "You may install it by running:")
-        print ("     MAUS_ROOT_DIR=%s ./third_party/bash/03jsoncpp.bash"\
+        print ("     MAUS_ROOT_DIR=%s ./third_party/bash/52jsoncpp.bash"\
                    % maus_root_dir)
         Exit(1)
 

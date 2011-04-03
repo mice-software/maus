@@ -36,7 +36,6 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
     ${MAUS_ROOT_DIR}/third_party/bash/01python.bash
     ${MAUS_ROOT_DIR}/third_party/bash/02swig.bash
-    ${MAUS_ROOT_DIR}/third_party/bash/03jsoncpp.bash
     ${MAUS_ROOT_DIR}/third_party/bash/10setuptools.bash
     ${MAUS_ROOT_DIR}/third_party/bash/11gtest.bash
     ${MAUS_ROOT_DIR}/third_party/bash/20gsl.bash
@@ -46,6 +45,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     ${MAUS_ROOT_DIR}/third_party/bash/40python_extras.bash
     ${MAUS_ROOT_DIR}/third_party/bash/50cloc.bash
     ${MAUS_ROOT_DIR}/third_party/bash/51xboas.bash
+    ${MAUS_ROOT_DIR}/third_party/bash/52jsoncpp.bash
     ${MAUS_ROOT_DIR}/third_party/bash/60recpack.bash
 
 else
