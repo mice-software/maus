@@ -168,15 +168,12 @@ build/scons-2.0.1
 build/swig-2.0.1
 build/xboa-0.10.0
 build
-configure
-COPYING
 doc
 env.csh
 ignore
 Makefile
 mausput
 README
-SConstruct
 SConstruct~
 SConstruct.~1~
 src
