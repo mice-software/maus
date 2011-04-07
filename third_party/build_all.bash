@@ -37,12 +37,14 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     ${MAUS_ROOT_DIR}/third_party/bash/24cloc.bash
     ${MAUS_ROOT_DIR}/third_party/bash/25numpy.bash
     ${MAUS_ROOT_DIR}/third_party/bash/26xboa.bash
-    ${MAUS_ROOT_DIR}/third_party/bash/27recpack.bash
+    if [ `uname -s` != "Darwin" ]; then
+	${MAUS_ROOT_DIR}/third_party/bash/27recpack.bash
+    fi
     ${MAUS_ROOT_DIR}/third_party/bash/28gtest.bash
     ${MAUS_ROOT_DIR}/third_party/bash/29validictory.bash
-    ${MAUS_ROOT_DIR}/third_party/bash/30pylint.py
+    ${MAUS_ROOT_DIR}/third_party/bash/30pylint.bash
     ${MAUS_ROOT_DIR}/third_party/bash/31pychecker.bash
-
+    
 else
 echo
 echo "FATAL: MAUS_ROOT_DIR is not set, which is required to" >&2

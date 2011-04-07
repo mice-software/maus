@@ -57,7 +57,9 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         echo "INFO: Unpacking config"
         echo
         tar xvfz ${MAUS_ROOT_DIR}/third_party/source/geant_config.tar.gz > /dev/null
-	maus_geant4_setup.py ${MAUS_ROOT_DIR}/third_party/build/${directory}/.config/bin/Linux-g++ ${MAUS_ROOT_DIR}/third_party/build/${directory} ${MAUS_ROOT_DIR}/third_party/install
+	mkdir ${MAUS_ROOT_DIR}/third_party/build/${directory}/.config/bin/Darwin-g++
+	sed 's/Linux/Darwin/g' < ${MAUS_ROOT_DIR}/third_party/build/${directory}/.config/bin/Linux-g++/config.sh.old > ${MAUS_ROOT_DIR}/third_party/build/${directory}/.config/bin/Darwin-g++/config.sh.old
+	maus_geant4_setup.py ${MAUS_ROOT_DIR}/third_party/build/${directory}/.config/bin/`uname -s`-g++ ${MAUS_ROOT_DIR}/third_party/build/${directory} ${MAUS_ROOT_DIR}/third_party/install
 	cp ${MAUS_ROOT_DIR}/third_party/source/Configure .
 	
 	echo
@@ -65,7 +67,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 	echo
         sleep 1
 
-	./Configure -f .config/bin/Linux-g++/config.sh -d -e -build
+	./Configure -f .config/bin/`uname -s`-g++/config.sh -d -e -build
 
 	echo
         echo "INFO: Installing:"
