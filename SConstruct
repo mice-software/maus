@@ -482,6 +482,9 @@ if env['USE_G4'] and env['USE_ROOT']:
     env.Append(LIBPATH = 'src/common/')
     env.Append(CPPPATH = maus_root_dir)
 
+    if 'Darwin' in os.environ.get('G4SYSTEM'):
+       env.Append(LINKFLAGS=['-undefined','suppress','-flat_namespace'])       
+
     test_cpp_files = glob.glob("tests/cpp_unit/*/*cpp")+\
         glob.glob("tests/cpp_unit/*cpp")
 

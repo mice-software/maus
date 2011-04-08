@@ -9,8 +9,6 @@
 #include <string>
 #include "Interface/dataCards.hh"
 
-dataCards MyDataCards;
-
 const double AnaParams::m_mu = 105.65836;
 const double AnaParams::m_pi = 139.57018;
 const double AnaParams::m_p  = 938.27203;

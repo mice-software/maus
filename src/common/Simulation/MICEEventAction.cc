@@ -22,7 +22,6 @@ using std::endl;
 #include "BeamTools/BTPhaser.hh"
 
 extern MICEEvent simEvent;
-MICEEvent simEvent;
 
 //extern void writeEvent();
 
