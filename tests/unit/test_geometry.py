@@ -38,11 +38,12 @@ class MapCppSimulationTestCase(unittest.TestCase):
             p.wait()
             self.assertEqual(p.returncode, 0)
 
-    def test_bad_geometry(self):
-        args = ['python', '%s/tests/unit/test_geometry.py' %  os.environ.get("MAUS_ROOT_DIR"), '/dev/null']
-        p = subprocess.Popen(args)
-        p.wait()
-        self.assertNotEqual(p.returncode, 0)
+    # disabled since confusing people with G4Exception to stdout
+    #def test_bad_geometry(self):
+    #        args = ['python', '%s/tests/unit/test_geometry.py' %  os.environ.get("MAUS_ROOT_DIR"), '/dev/null']
+    #    p = subprocess.Popen(args)
+    #    p.wait()
+    #    self.assertNotEqual(p.returncode, 0)
 
 
 if __name__ == '__main__':
