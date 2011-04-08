@@ -7,6 +7,18 @@
 ######################################################################
 
 
+architecture=`uname -s`
+
+if [ "${architecture}" == "Darwin" ]
+then              ##################################################                                                                          
+    echo "FATAL: Mac OS X is not supported at the moment.  Mainly" >&2;
+    echo "FATAL: because external dependencies like recpack' don't" >&2;
+    echo "FATAL: appear to work.  You can see the following issue:" >&2;
+    echo "FATAL:" >&2;  
+    echo "FATAL:   http://micewww.pp.rl.ac.uk/issues/407" >&2;  
+    exit 1; 
+fi
+
             ##################################################
 echo "INFO: This is the './configure' script.  You should only"
 echo "INFO: run this once. The purpose of me is to:"
