@@ -55,7 +55,7 @@ class InputCppRealDataTestCase(unittest.TestCase):
       evntCount = evntCount + 1
 
     # We should now have processed 26 events
-    self.assertTrue(evntCount == 26)
+    self.assertEqual(evntCount,26)
 
     # Check the md5 sum matches the expected value
     self.assertTrue(digester.hexdigest() == '3c6f14d25d0254056efe082541a56664')

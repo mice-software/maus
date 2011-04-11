@@ -6,7 +6,7 @@
  %}
 %include "std_string.i"
 
-%feature("shadow") InputCppRealData::Emitter() %{
+%feature("shadow") InputCppRealData::emitter() %{
 def emitter(self):
   while (self.readNextEvent()):
     yield self.getCurEvent()
