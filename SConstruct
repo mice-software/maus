@@ -3,7 +3,7 @@ import glob
 import os
 
 maus_root_dir = os.environ.get('MAUS_ROOT_DIR')
-if maus_root_dir == "":
+if not maus_root_dir:
     print('!! Could not find the $MAUS_ROOT_DIR environmental variable')
     print('!! Did you try running: "source env.sh"?')
     Exit(1)
