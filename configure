@@ -9,9 +9,19 @@
 
 arch=`uname -s`
 
-DYLIB_VAR=LD_LIBRARY_PATH
+DYLIB_VAR=LD_LIBRARY_PATH  # DYLIB_VAR is LD_LIBRARY_PATH for Linux.  Substituted into env.sh.
 if [ "$arch" = "Darwin" ]; then
-    DYLIB_VAR=DYLD_LIBRARY_PATH
+    DYLIB_VAR=DYLD_LIBRARY_PATH  # else for Mac OSX it's DYLD_LIBRARY_PATH
+
+    echo "WARNING: You are using Mac OSX.  However, the version that MICE uses";
+    echo "WARNING: of Recpack does not work on Mac OSX.  Please consult the";
+    echo "WARNING: following link to install a Mac OSX version of Recpack:";
+    echo "WARNING:";
+    echo "WARNING:   http://micewww.pp.rl.ac.uk/projects/maus/wiki/InstallMacOSX";
+    echo "WARNING:";
+    echo "WARNING: and realize that you may not publish results with unoffical";
+    echo "WARNING: versions of Recpack.";
+    echo "WARNING: ";
 fi
 
             ##################################################
