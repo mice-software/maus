@@ -139,6 +139,8 @@ def set_python(conf, env):
                    % maus_root_dir)
         Exit(1)
 
+    conf.env.Append(LIBS = ['python2.7'])
+
 def set_gsl(conf, env):
     if not conf.CheckLib('gslcblas'):
         print "Cound't find GSL (required for ROOT).  If you want it, then run:"
@@ -218,6 +220,8 @@ def set_clhep(conf, env):
         print "Cound't find CLHEP (required for geant4).  If you want it, then run:"
         print ("      MAUS_ROOT_DIR=%s ./third_party/bash/30clhep.bash" % maus_root_dir)
         Exit(1)
+
+    conf.env.Append(LIBS = ['CLHEP'])
 
 def get_g4_libs():
     return [ 'G4FR', \
@@ -394,8 +398,9 @@ env.Append(SWIGFLAGS=['-python', '-c++']) # tell SWIG to make python bindings fo
 #env.Append(PATH="%s/third_party/install/bin" % maus_root_dir)
 env['ENV']['PATH'] =  os.environ.get('PATH')  # useful to set for root-config
 env['ENV']['LD_LIBRARY_PATH'] = os.environ.get('LD_LIBRARY_PATH')
+env['ENV']['DYLD_LIBRARY_PATH'] = os.environ.get('DYLD_LIBRARY_PATH')
 
-libs = os.environ.get('LD_LIBRARY_PATH')
+libs = str(os.environ.get('LD_LIBRARY_PATH'))+':'+str(os.environ.get('DYLD_LIBRARY_PATH'))
 
 # to find third party libs, includes
 env.Append(LIBPATH =  libs.split(':') + ["%s/build" % maus_root_dir])
@@ -483,6 +488,9 @@ if env['USE_G4'] and env['USE_ROOT']:
 
     env.Append(LIBPATH = 'src/common/')
     env.Append(CPPPATH = maus_root_dir)
+
+    if 'Darwin' in os.environ.get('G4SYSTEM'):
+       env.Append(LINKFLAGS=['-undefined','suppress','-flat_namespace'])       
 
     test_cpp_files = glob.glob("tests/cpp_unit/*/*cpp")+\
         glob.glob("tests/cpp_unit/*cpp")

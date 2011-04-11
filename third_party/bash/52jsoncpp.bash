@@ -43,8 +43,10 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         mkdir -p ${MAUS_ROOT_DIR}/third_party/install/bin
         mkdir -p ${MAUS_ROOT_DIR}/third_party/install/lib/
         find ${MAUS_ROOT_DIR}/third_party/build/${directory}/libs | grep "\.so" | xargs -i cp {} ${MAUS_ROOT_DIR}/third_party/install/lib/ # libjson.so
+        find ${MAUS_ROOT_DIR}/third_party/build/${directory}/libs | grep "\.dylib" | xargs -i cp {} ${MAUS_ROOT_DIR}/third_party/install/lib/ # libjson.dylib
         find ${MAUS_ROOT_DIR}/third_party/build/${directory}/libs | grep "\.a" | xargs -i cp {} ${MAUS_ROOT_DIR}/third_party/install/lib/ # libjson.a
         find ${MAUS_ROOT_DIR}/third_party/build/${directory}/libs | grep "\.so" | xargs -i cp {} ${MAUS_ROOT_DIR}/third_party/install/lib/libjson.so
+        find ${MAUS_ROOT_DIR}/third_party/build/${directory}/libs | grep "\.dylib" | xargs -i cp {} ${MAUS_ROOT_DIR}/third_party/install/lib/libjson.dylib
         find ${MAUS_ROOT_DIR}/third_party/build/${directory}/libs | grep "\.a" | xargs -i cp {} ${MAUS_ROOT_DIR}/third_party/install/lib/libjson.a
         find ${MAUS_ROOT_DIR}/third_party/build/${directory}/bin -type f | xargs -i cp {} ${MAUS_ROOT_DIR}/third_party/install/bin/
         cp -r ${MAUS_ROOT_DIR}/third_party/build/${directory}/include/json ${MAUS_ROOT_DIR}/third_party/install/include

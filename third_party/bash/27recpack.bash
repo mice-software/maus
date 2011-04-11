@@ -45,13 +45,15 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 	echo
 	echo "INFO: Automake and autoconf"
 	echo
+	export AUTOCONF=`which autoconf`
+	export AUTOHEADER=`which autoheader`
 	./autogen.sh
 	./autogen.sh
 	echo
         echo "INFO: Configuring"
 	echo
         sleep 1
-	./configure --prefix=${MAUS_ROOT_DIR}/third_party/install --with-pic --enable-shared
+	./configure --prefix=${MAUS_ROOT_DIR}/third_party/install --with-pic --enable-shared 
 	echo 
 	echo "INFO: Making"
 	echo

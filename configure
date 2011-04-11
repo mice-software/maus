@@ -7,16 +7,11 @@
 ######################################################################
 
 
-architecture=`uname -s`
+arch=`uname -s`
 
-if [ "${architecture}" == "Darwin" ]
-then              ##################################################                                                                          
-    echo "FATAL: Mac OS X is not supported at the moment.  Mainly" >&2;
-    echo "FATAL: because external dependencies like recpack' don't" >&2;
-    echo "FATAL: appear to work.  You can see the following issue:" >&2;
-    echo "FATAL:" >&2;  
-    echo "FATAL:   http://micewww.pp.rl.ac.uk/issues/407" >&2;  
-    exit 1; 
+DYLIB_VAR=LD_LIBRARY_PATH
+if [ "$arch" = "Darwin" ]; then
+    DYLIB_VAR=DYLD_LIBRARY_PATH
 fi
 
             ##################################################
@@ -51,16 +46,16 @@ fi
 
 # Temporarily setup the environment (this gets repeated in the env.sh output)
 #      PATH says where the binaries are
-#      LD_LIBRARY_PATH says where your shared libraries are
+#      $DYLIB_VAR says where your shared libraries are
 if [ -z "${PATH}" ]; then  # see if the variable exists yet
     PATH="${maus_root_dir}/third_party/install/bin"       # if not, initialize it
 else
     PATH="${maus_root_dir}/third_party/install/bin:$PATH" # else add to it
 fi
-if [ -z "${LD_LIBRARY_PATH}" ]; then  # see if the variable exists yet
-    LD_LIBRARY_PATH="${maus_root_dir}/third_party/install/lib"                  # if not, initialize it
+if [ -z "${$DYLIB_VAR}" ]; then  # see if the variable exists yet
+    $DYLIB_VAR="${maus_root_dir}/third_party/install/lib"                  # if not, initialize it
 else
-    LD_LIBRARY_PATH="${maus_root_dir}/third_party/install/lib:$LD_LIBRARY_PATH" # else add to to it
+    $DYLIB_VAR="${maus_root_dir}/third_party/install/lib:$$DYLIB_VAR" # else add to to it
 fi
 
 # Check for Python
@@ -82,7 +77,7 @@ type -P python &>/dev/null || {
     echo "FATAL:      ./third_party/bash/01python.bash" >&2;
     exit 1; }
 
-python_version=`LD_LIBRARY_PATH=./third_party/install/lib python -V 2>&1`
+python_version=`$DYLIB_VAR=./third_party/install/lib python -V 2>&1`
 ## Check for supported python version
 if [ "${python_version}" != "Python 2.7" ]
 then               ##################################################
@@ -157,10 +152,10 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
          export PATH="\${MAUS_ROOT_DIR}/third_party/install/bin:\${PATH}" # else add it
      fi
 
-     if [ -z "\${LD_LIBRARY_PATH}" ]; then  # see if the variable exists yet
-          export LD_LIBRARY_PATH="\${MAUS_ROOT_DIR}/third_party/install/lib" # intiailize it
+     if [ -z "\${$DYLIB_VAR}" ]; then  # see if the variable exists yet
+          export $DYLIB_VAR="\${MAUS_ROOT_DIR}/third_party/install/lib" # intiailize it
      else
-          export LD_LIBRARY_PATH="\${MAUS_ROOT_DIR}/third_party/install/lib:\${LD_LIBRARY_PATH}" # else add it
+          export $DYLIB_VAR="\${MAUS_ROOT_DIR}/third_party/install/lib:\${$DYLIB_VAR}" # else add it
      fi
 
      if [ -z "\${PYTHONPATH}" ]; then  # see if the variable exists yet
@@ -169,18 +164,18 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
           export PYTHONPATH="\$MAUS_ROOT_DIR/build:\$PYTHONPATH" # else add it
      fi
 
-     export LD_LIBRARY_PATH="\$MAUS_ROOT_DIR/build:\$LD_LIBRARY_PATH"
+     export $DYLIB_VAR="\$MAUS_ROOT_DIR/build:\$$DYLIB_VAR"
 
      # maus core
      export PYTHONPATH="\$MAUS_ROOT_DIR/src/core:\$PYTHONPATH"
-     export LD_LIBRARY_PATH="\$MAUS_ROOT_DIR/src/core:\$LD_LIBRARY_PATH"
+     export $DYLIB_VAR="\$MAUS_ROOT_DIR/src/core:\$$DYLIB_VAR"
 
      export G4DEBUG=1
      export G4VERS=geant4.9.2.p04
-     export G4SYSTEM=Linux-g++
+     export G4SYSTEM=$arch-g++
      export G4INSTALL="\${MAUS_ROOT_DIR}/third_party/build/\${G4VERS}"
      export G4LIB="\${G4INSTALL}/lib"
-     export LD_LIBRARY_PATH="\${G4LIB}/\${G4SYSTEM}:\${LD_LIBRARY_PATH}"
+     export $DYLIB_VAR="\${G4LIB}/\${G4SYSTEM}:\${$DYLIB_VAR}"
      export G4INCLUDE="\${G4INSTALL}/include/"
      export G4TMP="\${G4INSTALL}"
      export G4VIS_BUILD_DAWNFILE_DRIVER=1
@@ -223,10 +218,10 @@ else
           setenv PATH "\${MAUS_ROOT_DIR}/third_party/install/bin" # initialize it
      endif
 
-     if ({\$?LD_LIBRARY_PATH}) then
-          setenv LD_LIBRARY_PATH "\${MAUS_ROOT_DIR}/third_party/install/lib:\${LD_LIBRARY_PATH}" # else add it
+     if ({\$?$DYLIB_VAR}) then
+          setenv $DYLIB_VAR "\${MAUS_ROOT_DIR}/third_party/install/lib:\${$DYLIB_VAR}" # else add it
      else
-          setenv LD_LIBRARY_PATH "\${MAUS_ROOT_DIR}/third_party/install/lib" # intiailize it
+          setenv $DYLIB_VAR "\${MAUS_ROOT_DIR}/third_party/install/lib" # intiailize it
      endif
 
      if ({\$?PYTHONPATH}) then
@@ -236,18 +231,18 @@ else
      endif
 
      # maus workers
-     setenv LD_LIBRARY_PATH "\$MAUS_ROOT_DIR/build:\$LD_LIBRARY_PATH"
+     setenv $DYLIB_VAR "\$MAUS_ROOT_DIR/build:\$$DYLIB_VAR"
 
      # maus core
      setenv PYTHONPATH "\$MAUS_ROOT_DIR/src/core:\$PYTHONPATH"
-     setenv LD_LIBRARY_PATH "\$MAUS_ROOT_DIR/src/core:\$LD_LIBRARY_PATH"
+     setenv $DYLIB_VAR "\$MAUS_ROOT_DIR/src/core:\$$DYLIB_VAR"
 
      setenv G4DEBUG 1
      setenv G4VERS geant4.9.2.p04
      setenv G4SYSTEM Linux-g++
      setenv G4INSTALL "\${MAUS_ROOT_DIR}/third_party/build/\${G4VERS}"
      setenv G4LIB "\${G4INSTALL}/lib"
-     setenv LD_LIBRARY_PATH "\${G4LIB}/\${G4SYSTEM}:\${LD_LIBRARY_PATH}"
+     setenv $DYLIB_VAR "\${G4LIB}/\${G4SYSTEM}:\${$DYLIB_VAR}"
      setenv G4INCLUDE "\${G4INSTALL}/include/"
      setenv G4TMP "\${G4INSTALL}"
      setenv G4VIS_BUILD_DAWNFILE_DRIVER 1

@@ -228,7 +228,7 @@ void VirtualPlaneManager::ConstructVirtualPlanes(BTField* field, MiceModule* mod
   std::vector<const MiceModule*> modules   = model->findModulesByPropertyString("SensitiveDetector", "Virtual");
   std::vector<const MiceModule*> envelopes = model->findModulesByPropertyString("SensitiveDetector", "Envelope");
   modules.insert(modules.end(), envelopes.begin(), envelopes.end());
-  for(uint i=0; i<modules.size(); i++)
+  for(unsigned int i=0; i<modules.size(); i++)
   {
     _planes.push_back(new VirtualPlane( ConstructFromModule(modules[i]) ) );
     _mods[_planes.back()] = modules[i];
