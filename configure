@@ -62,10 +62,11 @@ if [ -z "${PATH}" ]; then  # see if the variable exists yet
 else
     PATH="${maus_root_dir}/third_party/install/bin:$PATH" # else add to it
 fi
-if [ -z "${$DYLIB_VAR}" ]; then  # see if the variable exists yet
-    $DYLIB_VAR="${maus_root_dir}/third_party/install/lib"                  # if not, initialize it
+
+if [ -z "${!DYLIB_VAR}" ]; then  # see if the variable exists yet
+    eval ${DYLIB_VAR}="${maus_root_dir}/third_party/install/lib"                  # if not, initialize it
 else
-    $DYLIB_VAR="${maus_root_dir}/third_party/install/lib:$$DYLIB_VAR" # else add to to it
+    eval ${DYLIB_VAR}="${maus_root_dir}/third_party/install/lib:${!DYLIB_VAR}" # else add to to it
 fi
 
 # Check for Python
@@ -87,7 +88,7 @@ type -P python &>/dev/null || {
     echo "FATAL:      ./third_party/bash/01python.bash" >&2;
     exit 1; }
 
-python_version=`$DYLIB_VAR=./third_party/install/lib python -V 2>&1`
+python_version=`env $DYLIB_VAR=./third_party/install/lib python -V 2>&1`
 ## Check for supported python version
 if [ "${python_version}" != "Python 2.7" ]
 then               ##################################################
