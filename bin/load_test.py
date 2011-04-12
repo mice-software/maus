@@ -21,12 +21,13 @@ def run():
     """
     map_group = MapPyGroup()
 
-    big_number = 10000
+    big_number = 100
 
     if len(sys.argv) == 3:
         print 'Using only empty events'
         map_group.append(MapPyDoNothing())
     else:
+        big_number = 1000
         print 'Using fake simulation data'
         map_group.append(MapPyFakeTestSimulation())
         
