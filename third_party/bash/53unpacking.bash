@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+
+# require python extras for scons
+
 directory=unpacking-maus
 filename=${directory}.tar.gz
 

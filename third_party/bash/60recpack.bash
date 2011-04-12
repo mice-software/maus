@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+
+# require CLHEP
+
 directory=recpack
 filename=${directory}.src.20090424.tgz
 url=http://micewww.pp.rl.ac.uk:8080/attachments/download/34/${filename}
