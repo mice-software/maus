@@ -35,8 +35,8 @@ class InputCppRealDataTestCase(unittest.TestCase):
     # Get a single event and check it's the right size
     self.assertTrue(self.mapper.readNextEvent())
     data = self.mapper.getCurEvent()
-    # Data shold be 15 (an empty spill, first event is start of burst)
-    self.assertTrue(len(data) == 15)
+    # Data shold be 18 (an empty spill, first event is start of burst)
+    self.assertEqual(len(data), 18)
     self.assertTrue(self.mapper.death())
     return
 
@@ -58,7 +58,7 @@ class InputCppRealDataTestCase(unittest.TestCase):
     self.assertEqual(evntCount,26)
 
     # Check the md5 sum matches the expected value
-    self.assertTrue(digester.hexdigest() == '3c6f14d25d0254056efe082541a56664')
+    self.assertTrue(digester.hexdigest() == '11a26d16291662e76f23c9d5cdf1fb02')
 
     self.assertTrue(self.mapper.death())
 
