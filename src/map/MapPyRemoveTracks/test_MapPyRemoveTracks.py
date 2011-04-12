@@ -26,29 +26,29 @@ class MapPyRemoveTracksTestCase(unittest.TestCase):
         mapper = MapPyRemoveTracks()
 
         c = Configuration()
-        success = mapper.Birth(c.getConfigJSON())
+        success = mapper.birth(c.getConfigJSON())
         self.assertTrue(success)
 
-        result = mapper.Process("")
+        result = mapper.process("")
         doc = json.loads(result)
         self.assertTrue("errors" in doc)
         self.assertTrue("bad_json_document" in doc["errors"])
 
-        mapper.Death()
+        mapper.death()
 
     def test_no_mc_branch(self):
         mapper = MapPyRemoveTracks()
 
         c = Configuration()
-        success = mapper.Birth(c.getConfigJSON())
+        success = mapper.birth(c.getConfigJSON())
         self.assertTrue(success)
 
-        result = mapper.Process("{}")
+        result = mapper.process("{}")
         doc = json.loads(result)
         self.assertTrue("errors" in doc)
         self.assertTrue("missing_branch" in doc["errors"])
 
-        mapper.Death()
+        mapper.death()
 
     def test_removes_tracks(self):
         mapper = MapPyRemoveTracks()
@@ -56,17 +56,17 @@ class MapPyRemoveTracksTestCase(unittest.TestCase):
         c = Configuration()
         myConfig = io.StringIO(u"keep_only_muon_tracks = False")
 
-        success = mapper.Birth(c.getConfigJSON(myConfig))
+        success = mapper.birth(c.getConfigJSON(myConfig))
         self.assertTrue(success)
 
         for testString in [self.testString1, self.testString2]:
-            result = mapper.Process(testString)
+            result = mapper.process(testString)
             doc = json.loads(result)
             self.assertFalse("errors" in doc)
             for particle in doc["mc"]:
                 self.assertFalse("tracks" in particle)
 
-        mapper.Death()
+        mapper.death()
 
     def test_remove_non_muon(self):
         mapper = MapPyRemoveTracks()
@@ -74,12 +74,12 @@ class MapPyRemoveTracksTestCase(unittest.TestCase):
         c = Configuration()
         myConfig = io.StringIO(u"keep_only_muon_tracks = True")
 
-        success = mapper.Birth(c.getConfigJSON(myConfig))
+        success = mapper.birth(c.getConfigJSON(myConfig))
 
         self.assertTrue(success)
 
         found = False
-        result = mapper.Process(self.testString1)
+        result = mapper.process(self.testString1)
         doc = json.loads(result)
         self.assertFalse("errors" in doc)
         for particle in doc["mc"]:
@@ -91,7 +91,7 @@ class MapPyRemoveTracksTestCase(unittest.TestCase):
 
         self.assertTrue(found)
 
-        mapper.Death()
+        mapper.death()
 
 
 

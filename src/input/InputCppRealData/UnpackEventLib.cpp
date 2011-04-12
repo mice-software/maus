@@ -64,7 +64,7 @@ void V1290Hit::getJSON(void *pPartEvntPtr,
 
   if (xV1290Evnt.IsValid()) {
     // Put static data into the Json
-    pDoc["ttt"] = xV1290Evnt.GetTriggerTimeTag();
+    pDoc["trigger_time_tag"] = xV1290Evnt.GetTriggerTimeTag();
     pDoc["geo"] = xV1290Evnt.GetGeo();
 
     // Loop over all the channels
@@ -92,10 +92,10 @@ void V1290Hit::getJSON(void *pPartEvntPtr,
         int xBunchID = xV1290Evnt.GetBunchID(i / 8);
 
         Json::Value xTdcHit;
-        xTdcHit["bid"] = xBunchID;
+        xTdcHit["bunch_id"] = xBunchID;
         xTdcHit["channel"] = i;
-        xTdcHit["lt"] = xLT;
-        xTdcHit["tt"] = xTT;
+        xTdcHit["leading_time"] = xLT;
+        xTdcHit["trailing_time"] = xTT;
 
         pDoc["hits"].append(xTdcHit);
       }
@@ -113,7 +113,7 @@ void V1724Hit::getJSON(void *pPartEvntPtr,
 
   if (xV1724Evnt.IsValid()) {
     // Put static data into the Json
-    pDoc["ttt"] = xV1724Evnt.GetTriggerTimeTag();
+    pDoc["trigger_time_tag"] = xV1724Evnt.GetTriggerTimeTag();
     pDoc["geo"] = xV1724Evnt.GetGeo();
 
     // Now work out various parameters

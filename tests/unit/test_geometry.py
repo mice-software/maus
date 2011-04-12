@@ -56,9 +56,9 @@ if __name__ == '__main__':
         
         configFile = io.StringIO(u"simulation_geometry_filename = '%s'\n" % file)
         c = Configuration()
-        success = map.Birth(c.getConfigJSON(configFile))
+        success = map.birth(c.getConfigJSON(configFile))
 
         if not success:
             sys.exit(-1)
         
-        map.Death()        
+        map.death()        

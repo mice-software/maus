@@ -13,8 +13,8 @@ import SchemaSchema
 class MapPyValidateSpillTestCase(unittest.TestCase):
   def test_birth(self): #dumb check that nothing crashes during birth or death
     mapper = MapPyValidateSpill()
-    mapper.Birth()
-    mapper.Death()
+    mapper.birth()
+    mapper.death()
 
   def __test_validate_schema(self):
     ### DISABLED due to valedictory bug (fails to parse "dependencies" object) ###
@@ -27,8 +27,8 @@ class MapPyValidateSpillTestCase(unittest.TestCase):
 
   def __test_spill(self, spill, raisesError=False):
     mapper = MapPyValidateSpill()
-    mapper.Birth()
-    out = json.loads(mapper.Process(spill))
+    mapper.birth()
+    out = json.loads(mapper.process(spill))
     map_name = mapper.__class__.__name__ 
     ErrorHandler.DefaultHandler().on_error = "raise"
   

@@ -1,15 +1,15 @@
 #include "MapCppPrint.h"
 
-bool MapCppPrint::Birth(std::string argJsonConfigDocument) {
+bool MapCppPrint::birth(std::string argJsonConfigDocument) {
   _classname = "MapCppPrint";
   return true;
 }
 
-bool MapCppPrint::Death() {
+bool MapCppPrint::death() {
   return true;
 }
 
-std::string  MapCppPrint::Process(std::string document) {
+std::string  MapCppPrint::process(std::string document) {
   Json::Value root;   // will contains the root value after parsing.
   Json::Reader reader;
   bool parsingSuccessful = reader.parse(document, root);

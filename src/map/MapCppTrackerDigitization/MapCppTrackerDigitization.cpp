@@ -4,7 +4,7 @@
 dataCards MyDataCards("Digitization");
 MICEEvent simEvent;
 
-bool MapCppTrackerDigitization::Birth(std::string argJsonConfigDocument) {
+bool MapCppTrackerDigitization::birth(std::string argJsonConfigDocument) {
   _classname = "MapCppTrackerDigitization";
 
   //  JsonCpp string -> JSON::Value converer
@@ -19,11 +19,11 @@ bool MapCppTrackerDigitization::Birth(std::string argJsonConfigDocument) {
   return true;
 }
 
-bool MapCppTrackerDigitization::Death() {
+bool MapCppTrackerDigitization::death() {
   return true;
 }
 
-std::string MapCppTrackerDigitization::Process(std::string document){
+std::string MapCppTrackerDigitization::process(std::string document){
   //  JsonCpp setup
   Json::Value root;   // will contains the root value after parsing.
   Json::Reader reader;

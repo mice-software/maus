@@ -13,34 +13,34 @@ class MapPyVirtualPlanesTestCase(unittest.TestCase):
     def test_birth_bad_config(self):
         self.mapper = MapPyVirtualPlanes()
         with self.assertRaises(ValueError):
-            success = self.mapper.Birth("")
+            success = self.mapper.birth("")
 
     def test_birth_empty_json(self):
         self.mapper = MapPyVirtualPlanes()
-        success = self.mapper.Birth("{}")
+        success = self.mapper.birth("{}")
         self.assertFalse(success)
 
     def test_birth_default_config(self):
         self.mapper = MapPyVirtualPlanes()
         c = Configuration()
-        success = self.mapper.Birth(c.getConfigJSON())
+        success = self.mapper.birth(c.getConfigJSON())
         self.assertTrue(success)
 
     def test_process_empty_json(self):
         self.mapper = MapPyVirtualPlanes()
         c = Configuration()
-        success = self.mapper.Birth(c.getConfigJSON())
+        success = self.mapper.birth(c.getConfigJSON())
         self.assertTrue(success) 
-        result = json.loads(self.mapper.Process("{}"))
+        result = json.loads(self.mapper.process("{}"))
         self.assertTrue("errors" in result)
         self.assertTrue("MapPyVirtualPlanes" in result["errors"])
 
     def test_process_empty(self):
         self.mapper = MapPyVirtualPlanes()
         c = Configuration()
-        success = self.mapper.Birth(c.getConfigJSON())
+        success = self.mapper.birth(c.getConfigJSON())
         self.assertTrue(success)
-        result = json.loads(self.mapper.Process(""))
+        result = json.loads(self.mapper.process(""))
         self.assertTrue("errors" in result)
         self.assertTrue("MapPyVirtualPlanes" in result["errors"])
 
@@ -51,19 +51,19 @@ class MapPyVirtualPlanesTestCase(unittest.TestCase):
         
         c = Configuration()
 
-        success = self.preMapper.Birth(c.getConfigJSON())
+        success = self.preMapper.birth(c.getConfigJSON())
         self.assertTrue(success)
 
         myConfig = io.StringIO(u"keep_only_muon_tracks = True")
-        success = self.preMapper2.Birth(c.getConfigJSON(myConfig))
+        success = self.preMapper2.birth(c.getConfigJSON(myConfig))
         self.assertTrue(success)
                 
-        success = self.mapper.Birth(c.getConfigJSON())
+        success = self.mapper.birth(c.getConfigJSON())
         self.assertTrue(success)
 
-        resultStr = self.preMapper.Process("{}")
-        resultStr = self.preMapper2.Process(resultStr)
-        result = json.loads(self.mapper.Process(resultStr))
+        resultStr = self.preMapper.process("{}")
+        resultStr = self.preMapper2.process(resultStr)
+        result = json.loads(self.mapper.process(resultStr))
 
         self.assertFalse("errors" in result)
 

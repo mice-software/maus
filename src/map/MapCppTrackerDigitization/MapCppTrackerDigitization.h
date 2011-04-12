@@ -52,20 +52,20 @@ class MapCppTrackerDigitization
    *  \param argJsonConfigDocument a JSON document with
    *         the configuration.
    */
-  bool Birth(std::string argJsonConfigDocument);
+  bool birth(std::string argJsonConfigDocument);
 
   /** Shutdowns the worker
    *
    *  This takes no arguments and does nothing
    */
-  bool Death();
+  bool death();
  
-  /** Process JSON document
+  /** process JSON document
    *
    *  Receive a document with MC hits and return
    *  a document with digits
    */
-  std::string Process(std::string document);
+  std::string process(std::string document);
 
  private:
   /// This should be the classname

@@ -38,11 +38,11 @@ class MapPyValidateSpill:
     pass
 
   ## Sets up the validator.
-  def Birth(self):
+  def birth(self):
     pass
 
-  ## Process the spill and enter the exception handler if an error is found.
-  def Process(self, spill_data):
+  ## process the spill and enter the exception handler if an error is found.
+  def process(self, spill_data):
     try:
       spill_doc = {} #default if we fail to loads spill_data
       spill_doc = json.loads(spill_data)
@@ -52,6 +52,6 @@ class MapPyValidateSpill:
       return json.dumps(ErrorHandler.HandleException(spill_doc, self))
 
   ## Does nothing
-  def Death(self):
+  def death(self):
     pass
 

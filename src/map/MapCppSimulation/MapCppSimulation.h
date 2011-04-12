@@ -73,19 +73,19 @@ public:
    *  This takes one arument.  This constructs the geometry
    *  and prepares geant4 for being able to run beamOn(1).
    *  This process also builds the fields and can take a
-   *  while.  Be sure that you do not run Birth() after
+   *  while.  Be sure that you do not run birth() after
    *  death due to Geant4 slopiness.
    *
    *  \param argJsonConfigDocument a JSON document with
    *         the configuration.
    */
-  bool Birth(std::string argJsonConfigDocument);
+  bool birth(std::string argJsonConfigDocument);
 
   /** Shutdowns the Simulation by closing files
    *
    *  This takes no arguments
    */
-  bool Death();
+  bool death();
 
   /** Simulate JSON input and return new document
    *
@@ -94,7 +94,7 @@ public:
    *
    * \param document a JSON document for a spill
    */
-  std::string Process(std::string document);
+  std::string process(std::string document);
 
   std::string GetGeometryFilename() { return _geometry; }
   void SetGeometryFilename(std::string argGeometry) { _geometry = argGeometry; }

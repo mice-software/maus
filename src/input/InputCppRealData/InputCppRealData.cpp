@@ -26,7 +26,7 @@
 
 
 InputCppRealData::InputCppRealData() {
-  _debug = true;
+  _debug = false;
   _eventPtr = NULL;
   _inputFile = NULL;
 }
@@ -80,7 +80,8 @@ std::string InputCppRealData::getCurEvent() {
   Json::Value xDocSpill;
 
   if (xEvent.IsSuperEvent()) {
-    std::cerr << "Processing a super event." << std::endl;
+    if (_debug)
+      std::cerr << "Processing a super event." << std::endl;
     // Process all the events in a spill
     unsigned int xSubEvntCount = xEvent.GetNSubEvents();
     for (unsigned int i = 0; i < xSubEvntCount; i++) {
@@ -89,14 +90,16 @@ std::string InputCppRealData::getCurEvent() {
       this->processLDCEvent(&xSubEvent, xDocSpill);
     }
   } else {
-    std::cerr << "This event isn't super." << std::endl;
+    if (_debug)
+      std::cerr << "This event isn't super." << std::endl;
     this->processLDCEvent(&xEvent, xDocSpill);
   }
 
   // Finally attach the spill to the document root
-  xDocRoot["spill"] = xDocSpill;
+  xDocRoot["daq_data"] = xDocSpill;
 
-  std::cerr << "Writing JSON..." << std::endl;
+  if (_debug)
+    std::cerr << "Writing JSON..." << std::endl;
   return xJSONWr.write(xDocRoot);
 }
 

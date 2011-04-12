@@ -18,7 +18,7 @@ MapCppSimulation::MapCppSimulation() {
   _detector   = NULL;
 }
 
-bool MapCppSimulation::Birth(std::string argJsonConfigDocument) {
+bool MapCppSimulation::birth(std::string argJsonConfigDocument) {
   //  JsonCpp setup
   Json::Value configJSON;   //  this will contain the configuration
   Json::Reader reader;
@@ -121,7 +121,7 @@ bool MapCppSimulation::Birth(std::string argJsonConfigDocument) {
   return true;  // Sucessful completion
 }
 
-std::string MapCppSimulation::Process(std::string document) {
+std::string MapCppSimulation::process(std::string document) {
   //  JsonCpp setup
   Json::Value root;   // will contains the root value after parsing.
   Json::Reader reader;
@@ -229,7 +229,7 @@ std::string MapCppSimulation::Process(std::string document) {
   return writer.write(root);
 }
 
-bool MapCppSimulation::Death() {
+bool MapCppSimulation::death() {
   // User actions, physics_list, the detector are all owned
   // and deleted by the run manager and should not be deleted
   // here!!!  -With love, Tunnell 2010

@@ -26,7 +26,7 @@ import types
 import os
 
 class MapPyFakeTestSimulation:
-    def Birth(self, configJSON):
+    def birth(self, configJSON):
         config = json.loads(configJSON)
         
         root_dir = os.environ.get("MAUS_ROOT_DIR")
@@ -42,9 +42,9 @@ class MapPyFakeTestSimulation:
         
         return True
 
-    def Process(self, str):
+    def process(self, str):
         return self._document
 
-    def Death(self):
+    def death(self):
         return True
 

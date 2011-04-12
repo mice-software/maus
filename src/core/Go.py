@@ -95,19 +95,19 @@ class Go:
         ######  Map Phase  ######
         ####                #####
         print("MAP: Setting up mappers")
-        self.mapper.Birth(self.jsonConfigDocument)
+        self.mapper.birth(self.jsonConfigDocument)
 
         while len(mapBuffer) != 0:
             print(("MAP: Processing %d events" % len(mapBuffer)))
             #self.mapper.Process(mapBuffer[0])
-            mapResults = list(list(map(self.mapper.Process, mapBuffer)))
+            mapResults = list(list(map(self.mapper.process, mapBuffer)))
             for result in mapResults:
                 tempFile.write('%s\n' % result)
             mapBuffer = self.BufferInput(emitter)
 
         print("MAP: Closing input and mappers")
         self.input.death()
-        self.mapper.Death()
+        self.mapper.death()
         
 
         

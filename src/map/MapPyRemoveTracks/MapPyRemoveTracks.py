@@ -26,7 +26,7 @@ import json
 import types
 
 class MapPyRemoveTracks:
-    def Birth(self, argJsonConfigDocument):
+    def birth(self, argJsonConfigDocument):
         self._keep_only_muons = False
         configDoc = json.loads(argJsonConfigDocument)
 
@@ -38,7 +38,7 @@ class MapPyRemoveTracks:
 
         return True
 
-    def Process(self, str):
+    def process(self, str):
         try:
             doc = json.loads(str)
         except ValueError:
@@ -71,7 +71,7 @@ class MapPyRemoveTracks:
 
         return json.dumps(doc)
 
-    def Death(self):
+    def death(self):
         return True
 
 
