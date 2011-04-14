@@ -1,10 +1,12 @@
 #include <iostream>
 
-#include "MAUSTrackingAction.h"
+#include "MAUSGeant4Manager.hh"
+#include "MAUSTrackingAction.hh"
 
 namespace MAUS {
+
 void MAUSTrackingAction::PreUserTrackingAction(const G4Track* aTrack) {
-  MAUSSteppingAction* stepAct = MAUSSteppingAction::GetSteppingAction();
+  MAUSSteppingAction* stepAct = MAUSGeant4Manager::GetInstance()->GetStepping();
   if (!stepAct) return;
   if (!aTrack) return;
 
@@ -35,7 +37,7 @@ void MAUSTrackingAction::PreUserTrackingAction(const G4Track* aTrack) {
 }
 
 void MAUSTrackingAction::PostUserTrackingAction(const G4Track* aTrack) {
-  MAUSSteppingAction* stepAct = MAUSSteppingAction::GetSteppingAction();
+  MAUSSteppingAction* stepAct = MAUSGeant4Manager::GetInstance()->GetStepping();
   if (!stepAct) return;
   if (!aTrack) return;
 

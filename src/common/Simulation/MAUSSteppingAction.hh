@@ -28,11 +28,10 @@
  *
  */
 
-// TODO (Rogers): BUG _maxNSteps is hardcoded at 100000
 //                Make into a proper singleton class
 
-#ifndef _COMPONENTS_MAP_MAUSSTEPPINGACTION_H_
-#define _COMPONENTS_MAP_MAUSSTEPPINGACTION_H_
+#ifndef _SRC_MAP_MAUSSTEPPINGACTION_HH_
+#define _SRC_MAP_MAUSSTEPPINGACTION_HH_
 
 #include <cmath>
 #include <sstream>
@@ -48,24 +47,27 @@ namespace MAUS {
 
 class MAUSSteppingAction : public G4UserSteppingAction {
  public:
-  MAUSSteppingAction();
-
   void UserSteppingAction(const G4Step*);
 
-  static MAUSSteppingAction* GetSteppingAction() {
-    return _self;
-  }
-
-  Json::Value GetTracks() {return _tracks;}
-
+  Json::Value GetTracks() const {return _tracks;}
   void SetTracks(Json::Value tracks) {_tracks = tracks;}
 
+  void SetKeepTracks(bool willKeepTracks) {_keepTracks = willKeepTracks;}
+  bool GetKeepTracks() const {return _keepTracks;}
+
+  Json::Value StepPointToJson(const G4Step* point, bool prestep) const;
+
  private:
-  static MAUSSteppingAction* _self;
+  friend class MAUSGeant4Manager;
+
+  MAUSSteppingAction();
+
   Json::Value _tracks;
+  bool _keepTracks;
   int _maxNSteps;
+  int _currentNSteps;
 };
 
 }  //  ends MAUS namespace
 
-#endif  //  _COMPONENTS_MAP_MAUSSTEPPINGACTION_H_
+#endif  //  _SRC_COMMON_MAUSSTEPPINGACTION_HH_

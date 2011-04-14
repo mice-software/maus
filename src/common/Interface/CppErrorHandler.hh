@@ -11,45 +11,45 @@
 class CppErrorHandler {
 
  public:
-  /** \brief Call default Cpp exception handler
-   *
-   *  \param val Json document that will take any error
-   *  \param exc the (MAUS Squeal) exception
+  /** @brief Call default Cpp exception handler
    *
    *  For now this just calls Squeal::Print(), but at some point I intend to
    *  do something more sophisticated (mimicing or even using PyErrorHandler 
    *  functionality).
+   *
+   *  @param val Json document that will take any error
+   *  @param exc the (MAUS Squeal) exception
    */
   static Json::Value HandleSqueal
                           (Json::Value val, Squeal exc, std::string class_name);
 
-  /** \brief Call default Cpp exception handler
-   *
-   *  \param exc the (MAUS Squeal) exception
+  /** @brief Call default Cpp exception handler
    *
    *  For now this just calls Squeal::Print(), but at some point I intend to
    *  do something more sophisticated (mimicing or even using PyErrorHandler 
    *  functionality).
+   *
+   *  @param exc the (MAUS Squeal) exception
    */
   static void HandleSquealNoJson(Squeal exc, std::string class_name);
 
-  /** \brief Call default Cpp exception handler
-   *
-   *  \param val Json document that will take any error
-   *  \param exc the std::exception
+  /** @brief Call default Cpp exception handler
    *
    *  For now this just prints std::exception::what(), but at some point I
    *  intend to do something more sophisticated.
+   *
+   *  @param val Json document that will take any error
+   *  @param exc the std::exception
    */
   static Json::Value HandleStdExc
                   (Json::Value val, std::exception exc, std::string class_name);
 
-  /** \brief Call default Cpp exception handler when Json not initialised
-   *
-   *  \param exc the std::exception
+  /** @brief Call default Cpp exception handler when Json not initialised
    *
    *  For now this just prints std::exception::what(), but at some point I
    *  intend to do something more sophisticated.
+   *
+   *  @param exc the std::exception
    */
   static void HandleStdExcNoJson(std::exception exc, std::string class_name);
 

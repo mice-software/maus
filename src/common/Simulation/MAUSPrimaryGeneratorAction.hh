@@ -31,7 +31,9 @@ class MAUSPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
  public:
   class PGParticle {
    public:
-    double x, y, z, time, px, py, pz, energy, pid, seed;
+    double x, y, z, time, px, py, pz, energy;
+    int pid;
+    long int seed;
   };
 
   MAUSPrimaryGeneratorAction();
@@ -40,6 +42,7 @@ class MAUSPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
 
   // Set next event that generate primaries gives
   void Push(PGParticle particle) {_part_q.push(particle);}
+  PGParticle Pop();
 
  protected:
   G4ParticleGun*          gun;
@@ -49,7 +52,6 @@ class MAUSPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
   std::queue<PGParticle> _part_q;
 };
 
-
 }  // ends MAUS namespace
 
-#endif  // _COMPONENTS_MAP_MAUSPRIMARYGENERATORACTION_H_
+#endif  // _SRC_MAP_MAUSPRIMARYGENERATORACTION_H_

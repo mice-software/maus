@@ -1,0 +1,21 @@
+// Dummy configuration for most unit tests
+//
+// For testing details of MiceModules, tracking, field maps, detector models you
+// will want obviously something more sophisticated.
+
+Configuration Test
+{
+  Dimensions 1. 1. 1. m
+  PropertyString Material AIR
+  PropertyDouble G4StepMax 1.0 mm
+  Module Box
+  {
+    PropertyHep3Vector Position 0. 0. 0. mm
+    PropertyHep3Vector Rotation 0. 0. 0. mm
+    PropertyString     Volume   Box
+    PropertyHep3Vector Dimensions 1. 1. 1. cm
+    PropertyString Material lH2
+  }
+
+}
+

@@ -215,67 +215,74 @@ EOF
 cat > env.csh <<EOF
 #/bin/csh
 
+if ({\$?MAUS_ROOT_DIR}) then
+     echo "WARNING: MAUS already setup - rerunning script"
+endif
+
+setenv MAUS_ROOT_DIR "${maus_root_dir}"
+
 if( ! -e \${MAUS_ROOT_DIR}/third_party/build/$root_version/bin/thisroot.csh ) then                                                                                              
-     source \${MAUS_ROOT_DIR}/third_party/build/$root_version/bin/thisroot.csh                                                                                                  
+    source \${MAUS_ROOT_DIR}/third_party/build/$root_version/bin/thisroot.csh                                                                                                  
 endif   
 
-if ({\$?MAUS_ROOT_DIR}) then
-     echo "WARNING: MAUS already setup"
+if ({\$?PATH}) then
+    setenv PATH "\${MAUS_ROOT_DIR}/third_party/install/bin:\${PATH}" # else add it
 else
-     setenv MAUS_ROOT_DIR "${maus_root_dir}"
-
-     if ({\$?PATH}) then
-          setenv PATH "\${MAUS_ROOT_DIR}/third_party/install/bin:\${PATH}" # else add it
-     else
-          setenv PATH "\${MAUS_ROOT_DIR}/third_party/install/bin" # initialize it
-     endif
-
-     if ({\$?LD_LIBRARY_PATH}) then
-          setenv LD_LIBRARY_PATH "\${MAUS_ROOT_DIR}/third_party/install/lib:\${LD_LIBRARY_PATH}" # else add it
-     else
-          setenv LD_LIBRARY_PATH "\${MAUS_ROOT_DIR}/third_party/install/lib" # intiailize it
-     endif
-
-     # ROOT specific garbage
-     setenvt PATH "\${ROOTSYS}/bin:\${PATH}"
-     setenv LD_LIBRARY_PATH "\${ROOTSYS}/lib:\${LD_LIBRARY_PATH}"
-     if ({\$?PYTHONPATH}) then
-          setenv PYTHONPATH "\${ROOTSYS}/lib:\${PYTHONPATH}" # else add it
-     else
-          setenv PYTHONPATH "\${ROOTSYS}/lib" # intiailize it
-     endif
-
-     # maus workers
-     setenv PYTHONPATH "\$MAUS_ROOT_DIR/build:\$PYTHONPATH"
-     setenv LD_LIBRARY_PATH "\$MAUS_ROOT_DIR/build:\$LD_LIBRARY_PATH"
-
-     # maus core
-     setenv PYTHONPATH "\$MAUS_ROOT_DIR/src/core:\$PYTHONPATH"
-     setenv LD_LIBRARY_PATH "\$MAUS_ROOT_DIR/src/core:\$LD_LIBRARY_PATH"
-
-     setenv G4DEBUG 1
-     setenv G4VERS geant4.9.2.p04
-     setenv G4SYSTEM Linux-g++
-     setenv G4INSTALL "\${MAUS_ROOT_DIR}/third_party/build/\${G4VERS}"
-     setenv G4LIB "\${G4INSTALL}/lib"
-     setenv LD_LIBRARY_PATH "\${G4LIB}/\${G4SYSTEM}:\${LD_LIBRARY_PATH}"
-     setenv G4INCLUDE "\${G4INSTALL}/include/"
-     setenv G4TMP "\${G4INSTALL}"
-     setenv G4VIS_BUILD_DAWNFILE_DRIVER 1
-     setenv G4VIS_USE_DAWNFILE 1
-     setenv G4VIS_USE 0
-     setenv G4OPTIMISE 2
-     setenv OGLHOME /usr/X11R6
-     setenv G4LEDATA "\${G4INSTALL}/data/G4EMLOW6.2/"
-     setenv G4ABLADATA "\${G4INSTALL}/data/G4ABLA3.0/"
-     setenv G4NEUTRONDATA "\${G4INSTALL}/data/G4NDL3.13/"
-     setenv G4LEVELGAMMADATA "\${G4INSTALL}/data/PhotonEvaporation2.0/"
-     setenv G4RADIOACTIVEDATA "\${G4INSTALL}/data/RadioactiveDecay3.2/"
-
-     setenv MICEFILES "\${MAUS_ROOT_DIR}/src/common/FILES"
-
-     echo "SUCCESS: MAUS setup"
+    setenv PATH "\${MAUS_ROOT_DIR}/third_party/install/bin" # initialize it
 endif
+
+if ({\$?LD_LIBRARY_PATH}) then
+    setenv LD_LIBRARY_PATH "\${MAUS_ROOT_DIR}/third_party/install/lib:\${LD_LIBRARY_PATH}" # else add it
+else
+    setenv LD_LIBRARY_PATH "\${MAUS_ROOT_DIR}/third_party/install/lib" # intiailize it
+endif
+
+# ROOT specific garbage
+if ({\$?ROOTSYS}) then
+    setenv PATH "\${ROOTSYS}/bin:\${PATH}"
+    setenv LD_LIBRARY_PATH "\${ROOTSYS}/lib:\${LD_LIBRARY_PATH}"
+    if ({\$?PYTHONPATH}) then
+         setenv PYTHONPATH "\${ROOTSYS}/lib:\${PYTHONPATH}" # else add it
+    else
+         setenv PYTHONPATH "\${ROOTSYS}/lib" # intiailize it
+    endif
+endif
+
+
+# maus workers
+setenv LD_LIBRARY_PATH "\$MAUS_ROOT_DIR/build:\$LD_LIBRARY_PATH"
+
+# maus core
+if ({\$?PYTHONPATH}) then
+    setenv PYTHONPATH "\$MAUS_ROOT_DIR/src/core:\$PYTHONPATH"
+else
+    setenv PYTHONPATH "\$MAUS_ROOT_DIR/src/core" # intiailize it
+endif
+
+setenv LD_LIBRARY_PATH "\$MAUS_ROOT_DIR/src/core:\$LD_LIBRARY_PATH"
+
+setenv G4DEBUG 1
+setenv G4VERS geant4.9.2.p04
+setenv G4SYSTEM Linux-g++
+setenv G4INSTALL "\${MAUS_ROOT_DIR}/third_party/build/\${G4VERS}"
+setenv G4LIB "\${G4INSTALL}/lib"
+setenv LD_LIBRARY_PATH "\${G4LIB}/\${G4SYSTEM}:\${LD_LIBRARY_PATH}"
+setenv G4INCLUDE "\${G4INSTALL}/include/"
+setenv G4TMP "\${G4INSTALL}"
+setenv G4VIS_BUILD_DAWNFILE_DRIVER 1
+setenv G4VIS_USE_DAWNFILE 1
+setenv G4VIS_USE 0
+setenv G4OPTIMISE 2
+setenv OGLHOME /usr/X11R6
+setenv G4LEDATA "\${G4INSTALL}/data/G4EMLOW6.2/"
+setenv G4ABLADATA "\${G4INSTALL}/data/G4ABLA3.0/"
+setenv G4NEUTRONDATA "\${G4INSTALL}/data/G4NDL3.13/"
+setenv G4LEVELGAMMADATA "\${G4INSTALL}/data/PhotonEvaporation2.0/"
+setenv G4RADIOACTIVEDATA "\${G4INSTALL}/data/RadioactiveDecay3.2/"
+
+setenv MICEFILES "\${MAUS_ROOT_DIR}/src/common/FILES"
+
+echo "SUCCESS: MAUS setup"
 
 EOF
 

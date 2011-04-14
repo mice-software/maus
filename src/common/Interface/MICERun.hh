@@ -22,7 +22,6 @@ class TofCalib;
 class TrajectoryManager;
 class BTFieldConstructor;
 
-
 class MICERun
 {
 public :

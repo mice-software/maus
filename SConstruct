@@ -294,7 +294,7 @@ if env['USE_G4'] and env['USE_ROOT']:
   env.Append(LIBPATH = 'src/common/')
   env.Append(CPPPATH = os.environ.get('MAUS_ROOT_DIR'))
 
-  testCppFiles = glob.glob("tests/cpp_unit/*/*cpp")+glob.glob("tests/cpp_unit/*cpp")
+  testCppFiles = glob.glob("tests/cpp_unit/*/*/*cpp")+glob.glob("tests/cpp_unit/*/*cpp")+glob.glob("tests/cpp_unit/*cpp")
   testmain = env.Program(target = 'tests/cpp_unit/test_cpp_unit', source = testCppFiles, LIBS=['recpack'] +  env['LIBS']+['simulate'])
   env.Install('build', ['tests/cpp_unit/test_cpp_unit'])
 
