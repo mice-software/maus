@@ -1,5 +1,3 @@
-// Copyright 2011 Chris Rogers
-//
 // This file is a part of MAUS
 //
 // MAUS is free software: you can redistribute it and/or modify
@@ -15,6 +13,15 @@
 // You should have received a copy of the GNU General Public License
 // along with MAUS in the doc folder.  If not, see
 // <http://www.gnu.org/licenses/>.
+
+/** @class MAUSGeant4Manager
+ *
+ *  Manage Geant4 setup - singleton class that controls the interface with
+ *  geant4. This has to be a singleton class so that we can't accidentally set
+ *  up geant4 twice.
+ *
+ *  @authors Chris Rogers <chris.rogers@stfc.ac.uk>,
+ */
 
 #ifndef _SRC_COMMON_MAUSGEANT4MANAGER_HH_
 #define _SRC_COMMON_MAUSGEANT4MANAGER_HH_
@@ -37,15 +44,43 @@ namespace MAUS {
 
 class MAUSGeant4Manager {
 public:
+    /** @brief Get the singleton MAUSGeant4Manager
+     *
+     *  Get the instance of the MAUSGeant4Manager. This will construct the
+     *  MAUSGeant4Manager if required.
+     */
     static MAUSGeant4Manager* GetInstance();
 
+    /** @brief Get the G4RunManager
+     */
     G4RunManager* GetRunManager() const {return _runManager;}
+
+    /** @brief Get the MAUSSteppingAction
+     */
     MAUSSteppingAction* GetStepping() const {return _stepAct;}
+
+    /** @brief Get the MAUSSteppingAction
+     */
     MAUSTrackingAction* GetTracking() const {return _trackAct;}
+
+    /** @brief Get the MAUSSteppingAction
+     */
     MAUSPrimaryGeneratorAction* GetPrimaryGenerator() const {return _primary;}
+
+    /** @brief Get the Geometry
+     */
     MICEDetectorConstruction* GetGeometry() const {return _detector;}
 
+    /** @brief Control whether step data is stored for each track
+     *
+     *  @params willStoreTracks Set to true to store every step for each track
+     *          in the Json track. Set to false to only store initial and final
+     *          position and momentum
+     */
     void SetStoreTracks(bool willStoreTracks) {_storeTracks = willStoreTracks;}
+
+    /** @brief Get the flag controlling whether step data is stored
+     */
     bool GetStoreTracks() {return _storeTracks;}
 
 private:

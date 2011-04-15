@@ -24,11 +24,10 @@
  *  This class adds steps to the mc/particle/track branch. Also kills any 
  *  particles that take more than MaxNSteps (suspect looping in this case).
  *
- *  Copyright 2010-2011 c.tunnell1@physics.ox.ac.uk, chris.rogers@stfc.ac.uk
- *
  */
 
-//                Make into a proper singleton class
+// TODO(Rogers): The tracks should be stored on the run action (and cleared at
+//               runaction time)
 
 #ifndef _SRC_MAP_MAUSSTEPPINGACTION_HH_
 #define _SRC_MAP_MAUSSTEPPINGACTION_HH_
@@ -47,12 +46,34 @@ namespace MAUS {
 
 class MAUSSteppingAction : public G4UserSteppingAction {
  public:
-  void UserSteppingAction(const G4Step*);
+  /** @brief Cuts on step number and put steps into the track if requested
+   *
+   *  Called by Geant4 on every step. This will kill particles if they exceed
+   *  MaxNumberOfSteps (set status to fStopAndKill). If KeepTracks flag is set,
+   *  stores each step in "steps" branch of the track.
+   *
+   *  @params step the geant4 step that will be acted on
+   */
+  void UserSteppingAction(const G4Step* step);
 
+  /** @brief Return the tracks for this spill
+   *
+   *  The track data for each spill are stored on the stepping action.
+   *
+   *  @returns the track data for the entire spill
+   */
   Json::Value GetTracks() const {return _tracks;}
+
+  /** @brief Set the tracks for this spill
+   */
   void SetTracks(Json::Value tracks) {_tracks = tracks;}
 
+  /** @brief Set to true to store every step (rather verbose)
+   */
   void SetKeepTracks(bool willKeepTracks) {_keepTracks = willKeepTracks;}
+
+  /** @brief Return the value of the KeepTracks flag
+   */
   bool GetKeepTracks() const {return _keepTracks;}
 
   Json::Value StepPointToJson(const G4Step* point, bool prestep) const;

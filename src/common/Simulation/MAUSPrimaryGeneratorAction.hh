@@ -1,16 +1,28 @@
+// This file is a part of MAUS
+//
+// MAUS is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// MAUS is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with MAUS in the doc folder.  If not, see
+// <http://www.gnu.org/licenses/>.
+
 /** @class  MAUSPrimaryGeneratorAction
- *  Geant4 calls this class to determine next event
+ *  Geant4 calls this class to determine the events in the spill
  *
+ *  @author Chris Rogers <chris.rogers@stfc.ac.uk>
  *  @author Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
  *
- *  This class gets called as the primary event generator for
- *  geant4.  When setting up geant4, you can use this but must
- *  be sure to call the 'Set' methods of this class to tell
- *  it what the next event to simulate is.  Otherwise, it'll
- *  simulate the last event.
- *
- *  Copyright 2010 c.tunnell1@physics.ox.ac.uk
- *
+ *  This is just a FIFO (First In First Out) std::queue of hits. Hits can be
+ *  loaded using Push(...) and unloaded using Pop(). GeneratePrimaries(...)
+ *  will fire hits until the queue is empty.
  */
 
 #ifndef _SRC_MAP_MAUSPRIMARYGENERATORACTION_H_
@@ -29,6 +41,17 @@ namespace MAUS {
 
 class MAUSPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
  public:
+  /** @class PGParticle
+   *
+   *  Simple subclass to store collection of data associated with a 
+   *  MAUSPrimaryGeneratorAction event. 
+   *  (x,y,z) is initial position in Cartesian coordinates
+   *  (px,py,pz) is initial momentum direction in Cartesian coordinates
+   *  energy is initial total energy
+   *  time is initial global time
+   *  pid is the pdg number of the particle
+   *  seed is the random seed
+   */
   class PGParticle {
    public:
     double x, y, z, time, px, py, pz, energy;
@@ -36,12 +59,32 @@ class MAUSPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
     long int seed;
   };
 
+  /** @brief Construct the MAUSPrimaryGeneratorAction
+   */
   MAUSPrimaryGeneratorAction();
 
-  void GeneratePrimaries(G4Event * argEvent);  // generate primary particles
+  /** @brief Destruct the MAUSPrimaryGeneratorAction
+   */
+  ~MAUSPrimaryGeneratorAction();
 
-  // Set next event that generate primaries gives
+  /** @brief Pop the particle
+   *  
+   *  Take the first event loaded using Push() and put the value into argEvent.
+   *  Remove that event from the queue. Throw an exception if I run out of
+   *  events, the PID is not recognised or the energy is non-physical.
+   *
+   *  @params argEvent Load the particle into this event
+   */
+  void GeneratePrimaries(G4Event * argEvent);
+
+  /** @brief Push a particle onto the back of the queue
+   */
   void Push(PGParticle particle) {_part_q.push(particle);}
+
+  /** @brief Remove the particle from the front of the queue
+   *
+   *  @returns the value of the particle on the front of the queue
+   */
   PGParticle Pop();
 
  protected:

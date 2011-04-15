@@ -24,6 +24,9 @@
  *  Yagmur Torun <torun@iit.edu>
  */
 
+// TODO(Rogers): a lot of the functionality here should be pushed to the
+//               RunAction (which does not exist)
+
 #ifndef _SRC_MAP_MAPCPPSIMULATION_H_
 #define _SRC_MAP_MAPCPPSIMULATION_H_
 
@@ -54,7 +57,6 @@
 #include "Interface/SpecialHit.hh"  // needed by persist
 #include "Interface/Squeak.hh"
 #include "Interface/ZustandVektor.hh"  // needed by persist
-
 
 class MapCppSimulation {
 public:

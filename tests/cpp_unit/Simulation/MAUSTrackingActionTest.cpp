@@ -39,6 +39,9 @@ class MAUSTrackingActionTest : public ::testing::Test {
                         new G4DynamicParticle(pd, G4ThreeVector(12., 13., 14.));
     start = new G4Track(dyn_start, 7., G4ThreeVector(4., 5., 6.));
     end = new G4Track(dyn_end, 8., G4ThreeVector(9., 10., 11.));
+    start->SetTrackID(3);
+    start->SetParentID(12);
+    end->SetTrackID(3);
   }
   virtual ~MAUSTrackingActionTest() {}
   virtual void SetUp() {}
@@ -48,9 +51,53 @@ class MAUSTrackingActionTest : public ::testing::Test {
 
 };
 
-TEST_F(MAUSTrackingActionTest, doesNothing) {
-  EXPECT_TRUE(false) << "Need to write MAUSTrackingActionTest" << std::endl;
+TEST_F(MAUSTrackingActionTest, PreUserTrackingActionTest) {
+    MAUSGeant4Manager::GetInstance()->GetStepping()->SetTracks(Json::Value());
+    tracking->PreUserTrackingAction(start);
+    Json::Value json_track = MAUSGeant4Manager::GetInstance()->GetStepping()
+                                                        ->GetTracks()["track3"];
+    ASSERT_EQ(json_track.type(), Json::objectValue);
+    EXPECT_DOUBLE_EQ(json_track["initial_position"]["x"].asDouble(), 4.);
+    EXPECT_DOUBLE_EQ(json_track["initial_position"]["y"].asDouble(), 5.);
+    EXPECT_DOUBLE_EQ(json_track["initial_position"]["z"].asDouble(), 6.);
+    EXPECT_NEAR(json_track["initial_momentum"]["x"].asDouble(), 1., 1e-6);
+    EXPECT_NEAR(json_track["initial_momentum"]["y"].asDouble(), 2., 1e-6);
+    EXPECT_NEAR(json_track["initial_momentum"]["z"].asDouble(), 3., 1e-6);
+    EXPECT_EQ(json_track["particle_id"].asInt(), -13);
+    EXPECT_EQ(json_track["track_id"].asInt(), 3);
+    EXPECT_EQ(json_track["parent_track_id"].asInt(), 12);
 
+    start->SetTrackID(2);
+    tracking->PreUserTrackingAction(start);
+    json_track = MAUSGeant4Manager::GetInstance()->GetStepping()->GetTracks();
+    ASSERT_EQ(json_track["track2"].type(), Json::objectValue);
+    ASSERT_EQ(json_track["track3"].type(), Json::objectValue);
+
+    EXPECT_THROW(tracking->PreUserTrackingAction(start), Squeal);
+    EXPECT_THROW(tracking->PreUserTrackingAction(NULL), Squeal);
+}
+
+TEST_F(MAUSTrackingActionTest, PostUserTrackingActionTest) {
+    tracking->PostUserTrackingAction(end);
+    Json::Value json_track = MAUSGeant4Manager::GetInstance()->GetStepping()
+                                                        ->GetTracks()["track3"];
+    ASSERT_EQ(json_track.type(), Json::objectValue);
+    EXPECT_DOUBLE_EQ(json_track["final_position"]["x"].asDouble(), 9.);
+    EXPECT_DOUBLE_EQ(json_track["final_position"]["y"].asDouble(), 10.);
+    EXPECT_DOUBLE_EQ(json_track["final_position"]["z"].asDouble(), 11.);
+    EXPECT_NEAR(json_track["final_momentum"]["x"].asDouble(), 12., 1e-6);
+    EXPECT_NEAR(json_track["final_momentum"]["y"].asDouble(), 13., 1e-6);
+    EXPECT_NEAR(json_track["final_momentum"]["z"].asDouble(), 14., 1e-6);
+ 
+    end->SetTrackID(2);
+    tracking->PostUserTrackingAction(end);
+    json_track = MAUSGeant4Manager::GetInstance()->GetStepping()->GetTracks();
+    ASSERT_EQ(json_track["track2"]["final_position"].type(), Json::objectValue);
+    ASSERT_EQ(json_track["track3"]["final_position"].type(), Json::objectValue);
+
+    end->SetTrackID(4);    
+    EXPECT_THROW(tracking->PostUserTrackingAction(end), Squeal);
+    EXPECT_THROW(tracking->PostUserTrackingAction(NULL), Squeal);
 }
 
 } // namespace

@@ -19,11 +19,10 @@
  *  Geant4 calls this class before/after tracks propogated
  *
  *  @author Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+ *  @author Chris Rogers <chris.rogers@stfc.ac.uk>
  *
  *  Collect the steps from MAUSSteppingAction, then create
  *  tracks in the datastructure.
- *
- *  Copyright 2010 c.tunnell1@physics.ox.ac.uk
  *
  */
 
@@ -44,7 +43,14 @@ namespace MAUS {
 
 class MAUSTrackingAction : public G4UserTrackingAction {
  public:
+    /** @brief Add a new track to the stepping action and fill with some
+     *         track data
+     */
     void PreUserTrackingAction(const G4Track*);
+
+    /** @brief Add a new track to the stepping action and fill with some
+     *         track data
+     */
     void PostUserTrackingAction(const G4Track*);
 };
 
