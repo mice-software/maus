@@ -81,6 +81,9 @@ run_cpplint.__doc__ += str(cpplint_suffixes)
 print run_cpplint.__doc__
 
 class test_cpp_style(unittest.TestCase):
+    """
+    @brief Interface to unittest module
+    """
     def test_cpp_style(self):
         """
         @brief Walk the directory structure and look for errors in cpplint

@@ -62,9 +62,9 @@ MMatrix<double> Differentiator::SetupMatrixOut(std::vector< std::vector<double> 
     double* out = new double[_y->ValueDimension()];
     for(unsigned int i=0; i<_diffKey.size(); i++)
     {
-        for(uint j=0; j<_y->ValueDimension(); j++) out[j] = 0.;
+        for(unsigned int j=0; j<_y->ValueDimension(); j++) out[j] = 0.;
         Y(&inVector[i][0], out);
-        for(uint j=0; j<_y->ValueDimension(); j++) matrixOut(i+1,j+1) = out[j];
+        for(unsigned int j=0; j<_y->ValueDimension(); j++) matrixOut(i+1,j+1) = out[j];
     }
     delete [] out;
     return matrixOut;

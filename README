@@ -2,12 +2,24 @@
 
 Welcome to MAUS (MICE Analysis User Software).  This open-source software project is hosted at:
 
-http://micewww.pp.rl.ac.uk:8080/projects/maus
+http://micewww.pp.rl.ac.uk/projects/maus
+
+where one can look at the installation instructions here:
+
+http://micewww.pp.rl.ac.uk/projects/maus/wiki/Install
+
+2. Citing MAUS
+
+TBD
 
 2. License
 
-License information can be found in COPYING. Licensing information for libraries distributed with MAUS can be found in third_party/license.
+License information for MAUS can be found in COPYING. The authors agreeing to this license can be found in AUTHORS.  This license does not apply to programs and libraries you download in the third party area.
 
 3. IRC channel
 
 Support and developer chat can be had at irc.freenode.net in channel #maus.  This is accessible via: http://webchat.freenode.net.
+
+4. Coverity
+
+We thank Coverity for providing static code analysis.

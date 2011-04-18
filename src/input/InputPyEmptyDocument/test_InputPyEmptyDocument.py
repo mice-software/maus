@@ -4,47 +4,64 @@ import unittest
 from InputPyEmptyDocument import InputPyEmptyDocument
 
 class InputPyEmptyDocumentTestCase(unittest.TestCase):
+    """
+    Test class for InputPyEmptyDocument
+    """
+    
     def test_read100(self):
-        input = InputPyEmptyDocument(100)
-        input.Birth()
+        """
+        Read 100 events only
+        """
+        my_input = InputPyEmptyDocument(100)
+        my_input.birth()
 
-        testDoc = json.loads("{}")
+        test_doc = json.loads("{}")
         i = 0
-        for doc in input.Emitter():
-            testDoc = json.loads("""{"spill_number" : %d }""" % i)
-            jsonDoc = json.loads(doc)
-            self.assertEqual(jsonDoc, testDoc)
+        for doc in my_input.emitter():
+            test_doc = json.loads("""{"spill_number" : %d }""" % i)
+            json_doc = json.loads(doc)
+            self.assertEqual(json_doc, test_doc)
             i += 1
         self.assertEqual(i, 100)
 
     def test_forever_nearly(self):
+        """
+        Test runnig forever by trying to get 10000 empty documents
+        """
         big_number = 10000
-        input = InputPyEmptyDocument()
-        input.Birth()
+        my_input = InputPyEmptyDocument()
+        my_input.birth()
 
         i = 0
-        for doc in input.Emitter():
+        for doc in my_input.emitter():
+            test_doc = json.loads("""{"spill_number" : %d }""" % i)
+            json_doc = json.loads(doc)
+            self.assertEqual(json_doc, test_doc)
+
             if i == big_number:
                 break
 
             i += 1
 
         self.assertEqual(i, big_number)
-            
+
 
     def test_twice(self):
-        input = InputPyEmptyDocument(argNumberOfEvents=5)
-        input.Birth()
+        """
+        Test to make sure that if the input is done spitting out documents, then you can't get more documents from it
+        """
+        my_input = InputPyEmptyDocument(arg_number_of_events=5)
+        my_input.birth()
 
-        y = input.Emitter()
-        next(y)
-        next(y)
-        next(y)
-        next(y)
-        next(y)
+        some_value = my_input.emitter()
+        next(some_value)
+        next(some_value)
+        next(some_value)
+        next(some_value)
+        next(some_value)
 
         with self.assertRaises(StopIteration):
-            next(y)
+            next(some_value)
 
 
 if __name__ == '__main__':

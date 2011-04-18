@@ -1,0 +1,14 @@
+import glob, os
+
+require_root = False
+require_g4 = False
+require_unpacker = True
+
+#get environment and project
+Import('env', 'project')
+localenv = env.Clone()
+
+dir = 'Interface'
+srclst = map(lambda x: os.path.join(dir, x), glob.glob(os.path.join(project,dir, '*.cc')))
+
+env.jDev.Buildit(localenv, project, require_root, require_g4, require_unpacker)

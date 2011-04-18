@@ -26,12 +26,12 @@
 dataCards MyDataCards("Simulation");
 MICEEvent simEvent;
 
-bool MapCppSimulation::Birth(std::string configuration) {
+bool MapCppSimulation::birth(std::string argJsonConfigDocument) {
   // Check if the JSON document can be parsed, else return error only
   try {
-    SetConfiguration(configuration);
+    SetConfiguration(argJsonConfigDocument);
     return true;  // Sucessful completion
-    // Normal session, no visualization
+  // Normal session, no visualization
   } catch(Squeal squee) {
     CppErrorHandler::HandleSquealNoJson(squee, _classname);
   } catch(std::exception exc) {
@@ -40,7 +40,7 @@ bool MapCppSimulation::Birth(std::string configuration) {
   return false;
 }
 
-std::string MapCppSimulation::Process(std::string document) {
+std::string MapCppSimulation::process(std::string document) {
   Json::Value spill;
   try {spill = JsonWrapper::StringToJson(document);}
   catch(...) {
@@ -71,7 +71,7 @@ std::string MapCppSimulation::Process(std::string document) {
   return output;
 }
 
-bool MapCppSimulation::Death() {
+bool MapCppSimulation::death() {
   return true;  // successful
 }
 

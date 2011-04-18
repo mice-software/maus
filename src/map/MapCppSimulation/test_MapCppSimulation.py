@@ -9,7 +9,7 @@ class MapCppSimulationTestCase(unittest.TestCase):
     def setUpClass(self):
         self.float_tolerance = 1e-9
         self.mapper = MapCppSimulation()
-        success = self.mapper.Birth("""{"simulation_geometry_filename":"Test.dat", "maximum_number_of_steps":1000}""")
+        success = self.mapper.birth("""{"simulation_geometry_filename":"Test.dat", "maximum_number_of_steps":1000}""")
         self.particle = {
                 "position":{"x":1.,"y":2.,"z":3.},
                 "momentum":{"x":4.,"y":5.,"z":6.},
@@ -24,26 +24,27 @@ class MapCppSimulationTestCase(unittest.TestCase):
 
     @classmethod
     def tearDownClass(self):
-        success = self.mapper.Death()
+        success = self.mapper.death()
         if not success:
             raise Exception('InitializeFail', 'Could not start worker')
         self.mapper = None
 
     ######## tests on Process #########
     def test_empty(self):
-        result = self.mapper.Process("")
+        result = self.mapper.process("")
         doc = json.loads(result)
         self.assertIn("errors", doc)
         self.assertIn("bad_json_document", doc["errors"])
 
+
     def test_no_mc_branch(self): #mc should exist
-        result = self.mapper.Process("{}")
+        result = self.mapper.process("{}")
         doc = json.loads(result)
         self.assertIn("errors", doc)
         self.assertIn("MapCppSimulation", doc["errors"])
 
     def test_mc_bad_type(self): #mc should be a dict
-        result = self.mapper.Process("""{"mc" : 0.0}""")
+        result = self.mapper.process("""{"mc" : 0.0}""")
         doc = json.loads(result)
         self.assertIn("errors", doc)
         self.assertIn("MapCppSimulation", doc["errors"])
@@ -52,7 +53,7 @@ class MapCppSimulationTestCase(unittest.TestCase):
         good_event = {
             "mc":[self.particle,self.particle]
         }
-        result = self.mapper.Process(json.dumps(good_event))
+        result = self.mapper.process(json.dumps(good_event))
         doc = json.loads(result)
         self.assertNotIn("errors", doc)
         ev_0 = doc["mc"][0]["tracks"]["track1"]

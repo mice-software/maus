@@ -19,8 +19,6 @@
  *
  *  This class is meant to be a debugging and simple example class
  *  to illustrate using JSON from within C++.    
- *
- * @author Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
  */
 
 #ifndef _COMPONENTS_MAP_MAPCPPPRINT_H_
@@ -38,19 +36,19 @@ class MapCppPrint {
    *  \param argJsonConfigDocument a JSON document with
    *         the configuration.
    */
-  bool Birth(std::string argJsonConfigDocument);
+  bool birth(std::string argJsonConfigDocument);
 
   /** Shutdowns the worker
    *
    *  This takes no arguments and does nothing
    */
-  bool Death();
+  bool death();
 
-  /** Process and print JSON input
+  /** process and print JSON input
    *
    *  \param document JSON spill to send to std::out
    */
-  std::string Process(std::string document);
+  std::string process(std::string document);
 
  private:
   std::string _classname;

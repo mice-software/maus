@@ -68,9 +68,6 @@ class Memory
     static const std::string VmefAdcHit;
     static const std::string VmeTdcHit;
     static const std::string VmeScalerData;
-    static const std::string EmCalHit;
-    static const std::string EmCalDigit;
-    static const std::string EmCalTrack;
     static const std::string VirtualHit;
     static const std::string SpecialHit;
     static const std::string MCParticle;
@@ -93,7 +90,6 @@ class Memory
     static const std::string VirtualGeomParameters;
     static const std::string VlpcCableImperial;
     static const std::string VlpcCableOsaka;
-    static const std::string PidFits;
 
     // DetModel classes
 
@@ -102,9 +98,6 @@ class Memory
     static const std::string KLFiber;
     static const std::string KLGlue;
     static const std::string KLSD;
-    static const std::string EmCalKLFiber;
-    static const std::string EmCalKLGlue;
-    static const std::string EmCalSD;
     static const std::string DoubletFiberParam;
     static const std::string SciFiPlane;
     static const std::string SciFiSD;
@@ -147,9 +140,6 @@ class Memory
     static const std::string VmeTdcHitTextFileIo;
     static const std::string VmeScalerDataTextFileIo;
     static const std::string KLHitTextFileIo;
-    static const std::string EmCalHitTextFileIo;
-    static const std::string EmCalDigitTextFileIo;
-    static const std::string EmCalTrackTextFileIo;
     static const std::string VirtualHitTextFileIo;
     static const std::string SpecialHitTextFileIo;
     static const std::string MCParticleTextFileIo;

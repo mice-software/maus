@@ -33,7 +33,6 @@
 #  group.Append(MapPyGlobalRecon())
 #  \endcode
 #
-#  @author Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
 
 from types import ListType,InstanceType,MethodType
 import inspect
@@ -52,36 +51,36 @@ class MapPyGroup:
 
 
     def append(self, argWorker):
-        assert hasattr(argWorker, 'Birth')
-        x = len(inspect.getargspec(argWorker.Process).args) == 2 # for python
-        y = inspect.getargspec(argWorker.Process).varargs != None # for swig
+        assert hasattr(argWorker, 'birth')
+        x = len(inspect.getargspec(argWorker.process).args) == 2 # for python
+        y = inspect.getargspec(argWorker.process).varargs != None # for swig
         assert x ^ y # exclusive or
 
-        assert hasattr(argWorker, 'Process')
-        x = len(inspect.getargspec(argWorker.Process).args) == 2 # for python
-        y = inspect.getargspec(argWorker.Process).varargs != None # for swig
+        assert hasattr(argWorker, 'process')
+        x = len(inspect.getargspec(argWorker.process).args) == 2 # for python
+        y = inspect.getargspec(argWorker.process).varargs != None # for swig
         assert x ^ y # exclusive or
 
-        assert hasattr(argWorker, 'Death')
-        assert len(inspect.getargspec(argWorker.Death).args) == 1 # self only
+        assert hasattr(argWorker, 'death')
+        assert len(inspect.getargspec(argWorker.death).args) == 1 # self only
 
         self._workers.append(argWorker)
 
-    def Birth(self, argJsonConfigDocument):
+    def birth(self, argJsonConfigDocument):
         for worker in self._workers:
-            worker.Birth(argJsonConfigDocument)
+            worker.birth(argJsonConfigDocument)
 
-    def Process(self, x):
+    def process(self, x):
         for worker in self._workers:
-            x = worker.Process(x)
+            x = worker.process(x)
         return x
 
-    def Death(self):
+    def death(self):
         pass
 
     def __del__(self):
         for worker in self._workers:
-            worker.Death()
+            worker.death()
 
 
 

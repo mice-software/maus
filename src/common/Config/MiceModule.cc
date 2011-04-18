@@ -2,8 +2,6 @@
 //
 // Class that describes the shape, size, position, orientation and other properties of a module of the MICE experiment,
 // or a subcomponent.
-//
-// 15/5/2006 M.Ellis
 
 #include <cstdlib>
 #include <sstream>
@@ -801,7 +799,7 @@ void MiceModule::ithBool( int i, std::string& name, bool& val ) const
     {
       name = it->first;
       val = propertyBool(it->first);
-      it = _bools.end();
+      break;
     }
     ++count;
   }
@@ -817,7 +815,7 @@ void MiceModule::ithInt( int i, std::string& name, int& val ) const
     {
       name = it->first;
       val = propertyInt(name);
-      it = _ints.end();
+      break;
     }
     ++count;
   }
@@ -833,7 +831,7 @@ void MiceModule::ithDouble( int i, std::string& name, double& val ) const
     {
       name = it->first;
       val = propertyDouble(name);
-      it = _doubles.end();
+      break;
     }
     ++count;
   }
@@ -849,7 +847,7 @@ void MiceModule::ithString( int i, std::string& name, std::string& val ) const
     {
       name = it->first;
       val = it->second;
-      it = _strings.end();
+      break;
     }
     ++count;
   }
@@ -865,7 +863,7 @@ void MiceModule::ithHep3Vector( int i, std::string& name, Hep3Vector& val ) cons
     {
       name = it->first;
       val = propertyHep3Vector(name);
-      it = _hep3vectors.end();
+      break;
     }
     ++count;
   }

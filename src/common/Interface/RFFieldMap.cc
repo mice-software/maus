@@ -159,6 +159,9 @@ void RFFieldMap::ReadSuperFishSF7Map(std::ifstream &fin)
 		delete[] ezVec[i];
 	}
 
+        delete[] z;
+        delete[] r;
+
 }
 
 //Do the linear interpolation across splines

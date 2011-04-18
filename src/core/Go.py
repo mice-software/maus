@@ -28,7 +28,6 @@
 #   - native single-threaded python
 #   .
 #
-#  @author Christopher Tunnell <c.tunnell1@physics.ox.ac.uk> 
 import gzip
 import os
 import types
@@ -88,26 +87,28 @@ class Go:
         ######  Input Phase  ######
         ####                  #####
         print("INPUT: Reading some input")
-        self.input.Birth()
-        emitter = self.input.Emitter()
+        self.input.birth()
+        emitter = self.input.emitter()
         mapBuffer = self.BufferInput(emitter)
 
         ####                 ####
         ######  Map Phase  ######
         ####                #####
         print("MAP: Setting up mappers")
-        self.mapper.Birth(self.jsonConfigDocument)
+        self.mapper.birth(self.jsonConfigDocument)
 
         while len(mapBuffer) != 0:
             print(("MAP: Processing %d events" % len(mapBuffer)))
             #self.mapper.Process(mapBuffer[0])
-            mapResults = list(list(map(self.mapper.Process, mapBuffer)))
+            mapResults = list(list(map(self.mapper.process, mapBuffer)))
             for result in mapResults:
                 tempFile.write('%s\n' % result)
             mapBuffer = self.BufferInput(emitter)
 
-        print("MAP: Closing mappers")
-        self.mapper.Death()
+        print("MAP: Closing input and mappers")
+        self.input.death()
+        self.mapper.death()
+        
 
         
         tempFile.close()
@@ -147,24 +148,24 @@ class Go:
         ######  Output Phase  ######
         ####                   #####
 
-        self.output.Birth()
+        self.output.birth()
         
-        self.output.Save(reduceResult)
+        self.output.save(reduceResult)
                 
-        self.output.Death()
+        self.output.death()
             
 
     def BufferInput(self, theEmitter):
-        buffer = []
+        my_buffer = []
         
         for i in range(1024):
             try:
                 value = next(theEmitter)  
-                buffer.append(value.encode('ascii'))
+                my_buffer.append(value.encode('ascii'))
             except StopIteration:
-                return buffer
+                return my_buffer
 
-        return buffer
+        return my_buffer
                 
 
 

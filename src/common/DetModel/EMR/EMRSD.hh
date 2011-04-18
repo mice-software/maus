@@ -5,8 +5,11 @@
 */
 #ifndef EMRSD_h
 #define EMRSD_h 1
-
+// MAUS
+#include "DetModel/MAUSSD.h"
+// Geant 4
 #include "G4VSensitiveDetector.hh"
+
 #include "Interface/EMRHit.hh"
 
 #include "Interface/Memory.hh" 
@@ -21,12 +24,13 @@ class MiceModule;
 * EMR calorimeter simulation.
 **/
 
-class EMRSD : public G4VSensitiveDetector
-{
+using namespace MAUS;
+
+class EMRSD : public MAUSSD {
   public:
 
       //! Constructor
-      EMRSD(  MICEEvent*, MiceModule* );
+      EMRSD( MiceModule*);
 
       //! Default destructor
      ~EMRSD();
@@ -40,11 +44,6 @@ class EMRSD : public G4VSensitiveDetector
       //! code that is called at the end of processing of an event
       void EndOfEvent( G4HCofThisEvent* );
 
-  private:
-
-        MICEEvent*      _event;
-
-        MiceModule*     _module;
 };
 
 #endif

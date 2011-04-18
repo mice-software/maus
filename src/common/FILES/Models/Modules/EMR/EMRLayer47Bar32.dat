@@ -1,0 +1,18 @@
+
+    // FILES/Models/Modules/EMR/EMRLayer47Bar32.dat
+    //
+    Module EMRLayer47Bar32
+    {
+      Volume Trapezoid
+      Dimensions 55.00 55.00 0.00 1.65 0.85 cm
+      PropertyInt Layer 47
+      PropertyInt Cell 32
+      PropertyInt numPMTs 2
+      PropertyDouble BlueColour 1.0 
+      Module EMR/EMRLayer47Bar32Sci.dat
+      {
+        Position 0.0 0.0 0.0 mm
+        Rotation 0.0 0.0 0.0 degree
+      }
+    }
+    

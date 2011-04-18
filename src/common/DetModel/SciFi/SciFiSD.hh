@@ -22,7 +22,7 @@ class SciFiSD : public MAUSSD
   public:
 
       //! Constructor
-      SciFiSD(  MiceModule*, bool dEdxcut );
+  SciFiSD(  MiceModule*);
 
       //! process all hits in this detector
       G4bool ProcessHits( G4Step*, G4TouchableHistory* );

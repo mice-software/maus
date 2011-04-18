@@ -19,7 +19,6 @@
 #  set themselves up.  This is meant to be a replacement
 #  for the old G4MICE datacards.
 #
-#  @author Christopher Tunnell <c.tunnell1@physics.ox.ac.uk> 
 import os
 import json
 

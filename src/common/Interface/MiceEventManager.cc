@@ -20,9 +20,6 @@
 #include "Interface/VmefAdcHit.hh"
 #include "Interface/VmeAdcHit.hh"
 #include "Interface/VmeTdcHit.hh"
-#include "Interface/EmCalHit.hh"
-#include "Interface/EmCalDigit.hh"
-#include "Interface/EmCalTrack.hh"
 #include "Interface/KLHit.hh"
 #include "Interface/KLDigit.hh"
 #include "Recon/KL/KLCellHit.hh"
@@ -89,9 +86,6 @@ void    clearEvent( MICEEvent& event )
   deleteVector<VmeTdcHit>           (event.vmeTdcHits);
   deleteVector<CkovDigit>           (event.ckovDigits);
   deleteVector<CkovHit>             (event.ckovHits);
-  deleteVector<EmCalTrack>          (event.emCalTracks);
-  deleteVector<EmCalDigit>          (event.emCalDigits);
-  deleteVector<EmCalHit>            (event.emCalHits);
   deleteVector<KLHit>               (event.klHits);
   deleteVector<KLDigit>             (event.klDigits);
   deleteVector<KLCellHit>           (event.klCellHits);
@@ -135,9 +129,6 @@ MICEEvent* deepCopyEvent(MICEEvent& event)
   ev_out->vmeTdcHits        = deepCopyVector<VmeTdcHit>           (event.vmeTdcHits);
   ev_out->ckovDigits        = deepCopyVector<CkovDigit>           (event.ckovDigits);
   ev_out->ckovHits          = deepCopyVector<CkovHit>             (event.ckovHits);
-  ev_out->emCalTracks       = deepCopyVector<EmCalTrack>          (event.emCalTracks);
-  ev_out->emCalDigits       = deepCopyVector<EmCalDigit>          (event.emCalDigits);
-  ev_out->emCalHits         = deepCopyVector<EmCalHit>            (event.emCalHits);
   ev_out->klHits            = deepCopyVector<KLHit>               (event.klHits);
   ev_out->klDigits          = deepCopyVector<KLDigit>             (event.klDigits);
   ev_out->klCellHits        = deepCopyVector<KLCellHit>           (event.klCellHits);

@@ -182,7 +182,7 @@ void MICEBGPlane::ReadHistogram()
     pE[index] = pEArray[index];
   }
   m_eSpectrum = new CLHEP::RandGeneral(pE, m_nE, m_samplingMode);
-  delete pE;
+  delete[] pE;
 }
 
 

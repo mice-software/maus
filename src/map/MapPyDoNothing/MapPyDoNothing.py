@@ -19,15 +19,14 @@
 #
 #  Useful for debugging.
 #
-#  @author Christopher Tunnell <c.tunnell1@physics.ox.ac.uk> 
 import json
 
 class MapPyDoNothing:
-    def Birth(self, argJsonConfigDocument):
+    def birth(self, argJsonConfigDocument):
         return True
 
-    ## Process to pass input to output
-    def Process(self, str):
+    ## process to pass input to output
+    def process(self, str):
         # check if valid document
         try:
             doc = json.loads(str)
@@ -36,7 +35,7 @@ class MapPyDoNothing:
 
         return json.dumps(doc)
 
-    def Death(self):
+    def death(self):
         return True
 
 

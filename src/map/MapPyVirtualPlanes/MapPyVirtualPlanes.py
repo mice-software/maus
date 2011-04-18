@@ -23,13 +23,12 @@
 #  thing, but this processor tries to do the reduction of tracks such that not
 #  much room is used on the disk.  
 #
-#  @author Christopher Tunnell <c.tunnell1@physics.ox.ac.uk> 
 import json
 import types
 import os
 
 class MapPyVirtualPlanes:
-    def Birth(self, argJsonConfigDocument):
+    def birth(self, argJsonConfigDocument):
         configJSON = json.loads(argJsonConfigDocument)
 
         if 'VirtualPlanes_z' in configJSON and\
@@ -38,7 +37,7 @@ class MapPyVirtualPlanes:
             return True
         return False
 
-    def Process(self, str):
+    def process(self, str):
         ##
         ## Sanity checks
         ##
@@ -86,7 +85,7 @@ class MapPyVirtualPlanes:
         doc["virtual_planes"] = virtualPlanes
         return json.dumps(doc)
 
-    def Death(self):
+    def death(self):
         return True
 
 

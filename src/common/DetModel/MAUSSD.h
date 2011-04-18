@@ -1,13 +1,9 @@
 /** @class MAUSSD
  *  Generic class for MICE special detectors within the MC.
  *
- *  @author Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
- *
  *  Generic class for MICE special detectors.  Each special
  *  detector will produce a JSON::Value hit and also set
  *  a boolean flag as whether it was hit.
- *
- *  Copyright 2010 c.tunnell1@physics.ox.ac.uk
  *
  */
 #ifndef _COMMONCPP_DETMODEL_MAUSSD_H_
@@ -22,11 +18,11 @@ namespace MAUS {
 
 class MAUSSD : public G4VSensitiveDetector {
  public:
-  MAUSSD(MiceModule* , bool dEdxCut);
+  MAUSSD(MiceModule*);
 
   bool isHit() { return _isHit; }
   int GetNHits() { return _hits.size(); }
-  std::vector<Json::Value> GetHits() { return _hits; }
+  std::vector<Json::Value> GetHits() { _hits.clear(); return _hits; }
 
  protected:
   std::vector<Json::Value> _hits;
@@ -34,7 +30,6 @@ class MAUSSD : public G4VSensitiveDetector {
 
   MiceModule* _module;
 
-  bool            _dEdxCut;
 };
 
 }  //  ends MAUS namespace

@@ -13,12 +13,12 @@ class MapPyFakeTestSimulationTestCase(unittest.TestCase):
 
     def test_sha_tracks(self):
         mapper = MapPyFakeTestSimulation()
-        success = mapper.Birth("{}")
+        success = mapper.birth("{}")
         self.assertTrue(success)
-        result = mapper.Process("")
+        result = mapper.process("")
         shaSum = hashlib.sha1(result).hexdigest()
         self.assertEqual(shaSum, self.expectedShaSumTracks)
-        mapper.Death()
+        mapper.death()
         
 
 if __name__ == '__main__':

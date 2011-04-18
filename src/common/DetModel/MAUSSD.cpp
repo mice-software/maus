@@ -2,9 +2,8 @@
 
 namespace MAUS {
 
-MAUSSD::MAUSSD(MiceModule* mod, bool dEdxCut)
+MAUSSD::MAUSSD(MiceModule* mod)
     : G4VSensitiveDetector(mod->fullName()) {
-  _dEdxCut = dEdxCut;
   _module  = mod;
   _isHit = false;
 }

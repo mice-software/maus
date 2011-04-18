@@ -3,11 +3,8 @@
 // International Muon Ionization Cooling Experiment setup based on
 // Neutrino Factory Feasibility Study II SFOFO channel components
 //
-// Yagmur Torun
-//
 // Modified May 2006 - Use MiceModules and MiceMaterials
 //
-// Malcolm Ellis
 
 #include "MICEDetectorConstruction.hh"
 #include "Interface/dataCards.hh"
@@ -64,8 +61,6 @@
 #include "DetModel/SciFi/SciFiPlane.hh"
 #include "DetModel/KL/KLGlue.hh"
 #include "DetModel/KL/KLFiber.hh"
-#include "DetModel/EMCal/EmCalKLGlue.hh"
-#include "DetModel/EMCal/EmCalKLFiber.hh"
 #include "DetModel/Ckov/CkovMirror.hh"
 
 #include "DetModel/TOF/TofSD.hh"
@@ -74,7 +69,6 @@
 #include "DetModel/EMR/EMRSD.hh"
 #include "DetModel/KL/KLSD.hh"
 #include "DetModel/Virtual/SpecialVirtualSD.hh"
-#include "DetModel/EMCal/EmCalSD.hh"
 #include "BeamTools/BTPhaser.hh"
 
 const double MICEDetectorConstruction::_pillBoxSpecialVirtualLength = 1.e-6*mm;
@@ -89,6 +83,7 @@ MICEDetectorConstruction::MICEDetectorConstruction( MICERun& run ) : _simRun(*MI
                  "Failed to acquire datacards",
                  "MiceDetectorConstruction::MiceDetectorConstruction()"));
   _checkVolumes = (_simRun.DataCards->fetchValueInt("CheckVolumeOverlaps") == 1);
+  _hasBTFields = false;
 
   if (_model == NULL)
     throw(Squeal(Squeal::recoverable,
@@ -165,18 +160,6 @@ void    MICEDetectorConstruction::addDaughter( MiceModule* mod, G4VPhysicalVolum
       SciFiPlane* plane = new SciFiPlane( mod, mat, moth );
       logic = plane->logicalCore();
       place = plane->placementCore();
-    }
-    else if ( detector == "EmCalKLGlue" )
-    {
-      EmCalKLGlue* glue = new EmCalKLGlue( mod, mat, moth);
-      logic = glue->logicalStrip();
-      place = glue->placementStrip();
-    }
-    else if ( detector == "EmCalKLFiber" )
-    {
-      EmCalKLFiber* fiber = new EmCalKLFiber( mod, mat, moth);
-      logic = fiber->logicalFiber();
-      place = fiber->placementFiber();
     }
     else if ( detector == "KLGlue" )
     {
@@ -260,14 +243,14 @@ void    MICEDetectorConstruction::addDaughter( MiceModule* mod, G4VPhysicalVolum
       cut = false;
     if( sdName == "TOF" )
     {
-      TofSD* tofSD = new TofSD( mod, cut );
+      TofSD* tofSD = new TofSD( mod );
       MICESDMan->AddNewDetector( tofSD );
       logic->SetSensitiveDetector( tofSD );
       _SDs.push_back(tofSD);
     }
     else if( sdName == "SciFi" )
     {
-      SciFiSD* sciFiSD = new SciFiSD( mod, cut );
+      SciFiSD* sciFiSD = new SciFiSD( mod );
       MICESDMan->AddNewDetector( sciFiSD );
       logic->SetSensitiveDetector( sciFiSD );
       _SDs.push_back(sciFiSD); 
@@ -280,9 +263,10 @@ void    MICEDetectorConstruction::addDaughter( MiceModule* mod, G4VPhysicalVolum
     }
     else if( sdName == "EMR" )
     {
-      EMRSD* emrSD = new EMRSD( _event, mod );
+      EMRSD* emrSD = new EMRSD( mod );
       MICESDMan->AddNewDetector( emrSD );
       logic->SetSensitiveDetector( emrSD );
+      _SDs.push_back( emrSD );
     }
     else if( sdName == "KL" )
     {
@@ -295,12 +279,6 @@ void    MICEDetectorConstruction::addDaughter( MiceModule* mod, G4VPhysicalVolum
       SpecialVirtualSD * specVirtSD = new SpecialVirtualSD(_event, mod);
       MICESDMan->AddNewDetector( specVirtSD );
       logic->SetSensitiveDetector( specVirtSD );
-    }
-    else if ( sdName == "EMCAL" ) 
-    {
-      EmCalSD* emCalSD = new EmCalSD(_event, mod);
-      MICESDMan->AddNewDetector( emCalSD );
-      logic->SetSensitiveDetector( emCalSD );
     }
     else if( sdName != "Virtual" && sdName != "Envelope") //note these are special cases
       std::cerr << "Error in volume " << mod->fullName() << " do not have an SD definition for " << sdName << std::  endl;

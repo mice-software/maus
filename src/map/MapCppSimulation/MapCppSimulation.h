@@ -18,10 +18,6 @@
 /** @class MapCppSimulation
  *  Simulate the JSON input and return JSON input
  *
- *  @authors Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>,
- *  Malcolm Ellis <Malcolm.Ellis@brunel.ac.uk>,
- *  Chris Rogers <chris.rogers@stfc.ac.uk>,
- *  Yagmur Torun <torun@iit.edu>
  */
 
 // TODO(Rogers): Error is that we use wrong geant4 devices for this stuff.
@@ -75,18 +71,18 @@ public:
    *  This takes one argument.  This constructs the geometry
    *  and prepares geant4 for being able to run beamOn(1).
    *  This process also builds the fields and can take a
-   *  while.  Be sure that you do not run Birth() after
+   *  while.  Be sure that you do not run birth() after
    *  death due to Geant4 slopiness.
    *
    *  @param config a JSON document with the configuration.
    */
-  bool Birth(std::string configuration);
+  bool birth(std::string argJsonConfigDocument);
 
   /** @brief Shuts down the Simulation by closing files
    *
    *  This takes no arguments
    */
-  bool Death();
+  bool death();
 
   /** @brief Simulate JSON input and return new document
    *
@@ -95,7 +91,7 @@ public:
    *
    * @param document a JSON document for a spill
    */
-  std::string Process(std::string document);
+  std::string process(std::string document);
 
   /** @brief Store tracking information in the particle
    *

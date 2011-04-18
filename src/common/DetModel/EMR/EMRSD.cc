@@ -15,57 +15,91 @@
 #include <fstream>
 
 #include "Interface/MICEEvent.hh"
+#include "Interface/dataCards.hh"
 #include "Config/MiceModule.hh"
+#include <G4StepStatus.hh>
+#include <cstring>
+#include <iostream>
 
-EMRSD::EMRSD( MICEEvent* event, MiceModule* mod ) : G4VSensitiveDetector( mod->fullName() )
+EMRSD::EMRSD( MiceModule* mod) : MAUSSD( mod )
 {
-  miceMemory.addNew( Memory::EMRSD );
-	
-  _event = event;
-  _module = mod;
 }
 
 EMRSD::~EMRSD()
 {
-  miceMemory.addDelete( Memory::EMRSD );
 }
 
 void EMRSD::Initialize(G4HCofThisEvent* HCE)
 {
-  if( HCE ) ;
+/*
+	//_hits.push_back(Json::Value());
+	Json::Value channel_id;
+
+	channel_id[ "type" ] = "EMR";
+	channel_id[ "layer" ] =  _module->propertyInt( "Layer" ) ;
+	channel_id[ "bar" ] =  _module->propertyInt( "Cell" ) ;
+	_hits[ 0 ][ "channel_id" ] = channel_id;
+    _hits[ 0 ][ "energy_deposited" ] = 0.0;
+	_hits[ 0 ][ "path_length" ] = 0.0;
+	_isHit = false;
+*/
 }
 
 G4bool EMRSD::ProcessHits(G4Step* aStep,G4TouchableHistory* ROhist)
 {
-  G4Track* aTrack = aStep->GetTrack();
-  G4double edep = aStep->GetTotalEnergyDeposit();
-  G4double stepl = aTrack->GetStepLength();
+	std::cout << _module->fullName() << std::endl;
+	/*
+	Json::Value hit;
+    G4double length = aStep->GetStepLength();
 
+	if( _hits[ 0 ].get( "path_length", 0.0 ).asDouble() == 0 ) {
+		G4Track* track = aStep->GetTrack();
+	        //        _hits[0]["volume_name"] = _module->fullName();
+        Json::Value threeVectorValue;
 
-  if ((edep == 0.) && (stepl == 0.) ) return false;
-  if(edep == 0) return true; 
+        //Set hit position
+        threeVectorValue[ "x" ] = aStep->GetPreStepPoint()->GetPosition().x();
+        threeVectorValue[ "y" ] = aStep->GetPreStepPoint()->GetPosition().y();
+        threeVectorValue[ "z" ] = aStep->GetPreStepPoint()->GetPosition().z();
+        _hits[ 0 ][ "position" ] = threeVectorValue;
 
-  // ME - unused G4VPhysicalVolume* physVol = aStep->GetTrack()->GetVolume();
+        //Set hit momentum
+	    threeVectorValue[ "x" ] = track->GetMomentum().x();
+	    threeVectorValue[ "y" ] = track->GetMomentum().y();
+	    threeVectorValue[ "z" ] = track->GetMomentum().z();
+        _hits[ 0 ][ "momentum"] = threeVectorValue;
 
-  EMRHit* hitEMR = new EMRHit();
+        //Set hit time, charge, mass, pdg code, total energy, track id and deposited energy
+        _hits[ 0 ][ "time" ] = aStep->GetPreStepPoint()->GetGlobalTime();
+        _hits[ 0 ][ "charge" ] = track->GetDefinition()->GetPDGCharge();
+	    _hits[ 0 ][ "mass" ] = track->GetDefinition()->GetPDGMass();
+	    _hits[ 0 ][ "particle_id" ] = track->GetDefinition()->GetPDGEncoding();
+	    _hits[ 0 ][ "energy" ] = track->GetTotalEnergy();
+	    _hits[ 0 ][ "track_id" ] = aStep->GetTrack()->GetTrackID();
+	    _hits[ 0 ][ "energy_deposited" ] = aStep->GetTotalEnergyDeposit();
 
-  //ME - probably other stuff needed here!
-  hitEMR->SetEdep     (edep);
-  hitEMR->SetPosition (aTrack->GetPosition() );
-  hitEMR->SetMomentum (aTrack->GetMomentum());
-  hitEMR->SetTime     (aTrack->GetGlobalTime());
-  hitEMR->SetEnergy   (aTrack->GetTotalEnergy());
-  hitEMR->SetTrackID  (aTrack->GetTrackID());
-  hitEMR->SetPID      (aTrack->GetDefinition()->GetPDGEncoding());
-  hitEMR->SetCharge   (aTrack->GetDefinition()->GetPDGCharge() );
-  hitEMR->SetMass     (aTrack->GetDefinition()->GetPDGMass() );
+	    Json::StyledWriter writer;
+	    // Make a new JSON document for the configuration. Preserve original comments.
+	    for (int i=0; i< _hits.size(); ++i ){
+	      std::string outputConfig = writer.write( _hits[ i ] );
+	      std::cout << "doc[" << i << "]: "<< outputConfig << std::endl;
+	    }
+	  }
 
-  _event->emrHits.push_back( hitEMR );
+	  _hits[ 0 ][ "energy_deposited" ] = _hits[0].get("energy_deposited", 0 ).asDouble() + Edep;
+	  _hits[ 0 ][ "path_length" ] = _hits[ 0 ].get( "path_length", 0 ).asDouble() + length;
+	  //ME - probably other stuff needed here!
+		_hits.push_back( hit );
 
-  return true;
+	  return true;
+*/
 }
 
-void EMRSD::EndOfEvent(G4HCofThisEvent* HCE)
+void EMRSD::EndOfEvent( G4HCofThisEvent* HCE )
 {
-  if( HCE ) ;
+	/*
+	if( !( ( _hits[ 0 ][ "energy_deposited" ] == 0. ) ) && _hits[ 0 ][ "path_length" ] != 0. ){
+	    _isHit = true;
+	}
+	*/
 }

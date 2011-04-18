@@ -262,7 +262,7 @@ PolynomialVector* PolynomialVector::PolynomialLeastSquaresFit(const std::vector<
   else
   {
     std::vector<double> weights(points.size());
-    for(uint i=0; i<points.size(); i++) weightFunction->F(&points[i][0], &weights[i]);
+    for(unsigned int i=0; i<points.size(); i++) weightFunction->F(&points[i][0], &weights[i]);
     return PolynomialLeastSquaresFit(points, values, polynomialOrder, weights);
   }
 }
