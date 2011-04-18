@@ -16,39 +16,38 @@
  */
 
 /** @class MapCppSimulation
- *  Simulation out the JSON input and return JSON input
- *
- *  This class is meant to be a debugging and simple example class
- *  to illustrate using JSON from within C++.
+ *  Simulate the JSON input and return JSON input
  *
  */
 
-#ifndef _COMPONENTS_MAP_MAPCPPSIMULATION_H_
-#define _COMPONENTS_MAP_MAPCPPSIMULATION_H_
+// TODO(Rogers): Error is that we use wrong geant4 devices for this stuff.
+//               Really we should use EventAction to control per spill stuff and
+//               stick multiple tracks from the spill into the same primary
+
+
+#ifndef _SRC_MAP_MAPCPPSIMULATION_H_
+#define _SRC_MAP_MAPCPPSIMULATION_H_
 
 // C headers
 #include <stdlib.h>
-#include <json/json.h>
-#include <G4RunManager.hh>
-#include <G4SDManager.hh>
-
-#include "globals.hh" // temp
 
 // C++ headers
 #include <string>
 #include <sstream>
 #include <vector>
 
+// external libraries
+#include <json/json.h>
+
+#include "globals.hh" // temp
+
 //  MAUS code
-#include "MAUSEventAction.h"
-#include "MAUSPrimaryGeneratorAction.h"
-#include "MAUSTrackingAction.h"
+#include "Simulation/MAUSGeant4Manager.hh"
 
 // G4MICE from commonCpp
 #include "BeamTools/BTPhaser.hh"
 #include "Config/MiceModule.hh"
 #include "DetModel/MAUSSD.h"  //  non-G4MICE addition
-#include "Interface/dataCards.hh"
 #include "Interface/MICEEvent.hh"
 #include "Interface/MiceEventManager.hh"
 #include "Interface/MiceMaterials.hh"
@@ -56,65 +55,83 @@
 #include "Interface/SpecialHit.hh"  // needed by persist
 #include "Interface/Squeak.hh"
 #include "Interface/ZustandVektor.hh"  // needed by persist
-#include "Simulation/FillMaterials.hh"
-#include "Simulation/MICEDetectorConstruction.hh"
-#include "Simulation/MICEPhysicsList.hh"
-#include "Simulation/MICERunAction.hh"
-#include "Simulation/MICESteppingAction.hh"
 
 class MapCppSimulation {
 public:
-  /** Sets up the worker
+  /** @brief Sets up the worker
    */
-  MapCppSimulation();
+  MapCppSimulation() :_g4manager(NULL) {
+    _classname = "MapCppSimulation";
+    _geometry = "Stage6.dat";
+    _storeTracks = true;
+  }
   
-  /** Begin the startup procedure for Simulation
+  /** @brief Begin the startup procedure for Simulation
    *
-   *  This takes one arument.  This constructs the geometry
+   *  This takes one argument.  This constructs the geometry
    *  and prepares geant4 for being able to run beamOn(1).
    *  This process also builds the fields and can take a
    *  while.  Be sure that you do not run birth() after
    *  death due to Geant4 slopiness.
    *
-   *  \param argJsonConfigDocument a JSON document with
-   *         the configuration.
+   *  @param config a JSON document with the configuration.
    */
   bool birth(std::string argJsonConfigDocument);
 
-  /** Shutdowns the Simulation by closing files
+  /** @brief Shuts down the Simulation by closing files
    *
    *  This takes no arguments
    */
   bool death();
 
-  /** Simulate JSON input and return new document
+  /** @brief Simulate JSON input and return new document
    *
    *  This function will simulate a single spill defined
    *  in JSON format.
    *
-   * \param document a JSON document for a spill
+   * @param document a JSON document for a spill
    */
   std::string process(std::string document);
 
-  std::string GetGeometryFilename() { return _geometry; }
-  void SetGeometryFilename(std::string argGeometry) { _geometry = argGeometry; }
+  /** @brief Store tracking information in the particle
+   *
+   *  stores:
+   *    sensitive detector hits registered in the detectors (from 
+   *      MICEDetectorConstruction::GetSDHits())
+   *    tracks (list of step points) if _storeTracks is set (from
+   *      MAUSSteppingAction::GetTrack())
+   *  
+   *  @param particle Json value where the information is stored
+   */
+  Json::Value StoreTracking(Json::Value particle);
 
-  void DisableStoredTracks() { _storeTracks = false; }
-  void EnableStoredTracks() { _storeTracks= true; }
+  /** @brief Store tracking information in the particle
+   *
+   *  stores:
+   *    sensitive detector hits registered in the detectors (from 
+   *      MICEDetectorConstruction::GetSDHits())
+   *    tracks (list of step points) if _storeTracks is set (from
+   *      MAUSSteppingAction::GetTrack())
+   *  
+   *  @param particle Json value where the information is stored
+   */
+  void SetNextParticle(Json::Value particle);
+
+  /** @brief Set up configuration information on the MICERun
+   *  
+   *  Sets the datacards, json configuration, Squeak standard outputs,
+   *  and MiceModules
+   */
+  void SetConfiguration(std::string config);
 
  private:
+  MAUSGeant4Manager* _g4manager;
   std::string _jsonConfigDocument;
   std::string _classname;
   std::string _geometry;
   bool _storeTracks;
-
-  G4RunManager* _runManager;
-  MICEPhysicsList* _physList;
-  MAUSPrimaryGeneratorAction* _primary;
-  MAUSSteppingAction*          _stepAct;
-  MAUSEventAction*             _eventAct;
-  MAUSTrackingAction*          _trackAct;
-  MICEDetectorConstruction* _detector;
 };  // Don't forget this trailing colon!!!!
 
-#endif  // _COMPONENTS_MAP_MAPCPPSIMULATION_H_
+
+
+#endif  // _SRC_MAP_MAPCPPSIMULATION_H_

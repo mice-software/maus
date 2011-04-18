@@ -38,7 +38,7 @@
 
 class JsonWrapper {
  public:
-  /** \brief List of data types allowed by json
+  /** @brief List of data types allowed by json
    *
    *  List of data types allowed by json, with additional type "anyValue" for
    *  when we don't care.
@@ -57,9 +57,9 @@ class JsonWrapper {
     anyValue       // object value (collection of name/value pairs).
   };
 
-  /** \brief Convert a string to a Json::Value tree 
+  /** @brief Convert a string to a Json::Value tree 
    *
-   *  \param json_in raw string holding the configuration information
+   *  @param json_in raw string holding the configuration information
    *
    *  Read in a string and return as a Json value. Throw a Squeal if the reader
    *  fails to parse the string. The configuration is a dict of Json::Value,
@@ -67,11 +67,11 @@ class JsonWrapper {
    */
   static Json::Value StringToJson(std::string json_in) throw(Squeal);
 
-  /** \brief Get an item from a Json array (variable length array)
+  /** @brief Get an item from a Json array (variable length array)
    *
-   *  \param value_list array of values from which we want to get a value
-   *  \param value_index index of the value we want to get
-   *  \param value_type type of the value we want to get
+   *  @param value_list array of values from which we want to get a value
+   *  @param value_index index of the value we want to get
+   *  @param value_type type of the value we want to get
    *
    *  Returns the Json::Value on success. Throws an exception of type Squeal on
    *  failure
@@ -79,11 +79,11 @@ class JsonWrapper {
   static Json::Value GetItem(Json::Value array, size_t value_index,
                                             JsonType value_type) throw(Squeal);
 
-  /** \brief Get a property from a Json object (hash)
+  /** @brief Get a property from a Json object (hash)
    *
-   *  \param parent the Json data tree
-   *  \param branch_type enumeration holding the name of the branch you want
-   *  \param max_depth maximum depth to search for the branch. Set to negative
+   *  @param parent the Json data tree
+   *  @param branch_type enumeration holding the name of the branch you want
+   *  @param max_depth maximum depth to search for the branch. Set to negative
    *                   to search the whole tree.
    *
    *  Attempt to access a branch from Json. If the branch is not found, throw a
@@ -94,15 +94,15 @@ class JsonWrapper {
                           JsonType value_type) throw(Squeal);
 
 
-  /** \brief Convert from Json::ValueType to JsonType
+  /** @brief Convert from Json::ValueType to JsonType
    */
   static JsonType ValueTypeToJsonType(Json::ValueType tp);
 
-  /** \brief Convert from JsonType to Json::ValueType
+  /** @brief Convert from JsonType to Json::ValueType
    */
   static Json::ValueType JsonTypeToValueType(JsonType tp) throw(Squeal);
 
-  /** \brief Return true if types are equal or anyValue
+  /** @brief Return true if types are equal or anyValue
    */
   static bool SimilarType(JsonType jt1, JsonType jt2);
 

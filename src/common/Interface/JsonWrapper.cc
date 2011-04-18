@@ -63,14 +63,15 @@ Json::Value JsonWrapper::GetProperty
                  "Attempting to find Json property "+name+" but not an object",
                  "JsonWrapper::GetPropertyStrict"));
   }
-  if (object.isMember(name))
+  if (object.isMember(name)) {
     if (SimilarType(ValueTypeToJsonType(object[name].type()), value_type)) {
       return object[name];
-    } else {
+    } else {  // type incorrect
       throw(Squeal(Squeal::recoverable,
                    "Property "+name+"  had wrong type in Json object lookup",
                    "JsonWrapper::GetPropertyStrict"));
-
+    }
+  } else {  // not a member
     throw(Squeal(Squeal::recoverable,
                  "Property "+name+"  not found in Json object lookup",
                  "JsonWrapper::GetPropertyStrict"));

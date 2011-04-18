@@ -124,7 +124,7 @@ void dataCards::fillCards(int app)
     cs["DataType"] = "TextFile"; //The data type of the dataCards file, set by user and used in global reader, TextFileReader etc
 
     // <head>Modelling and Configuration</head>
-    cs["MiceModel"] = "MICEStage6/Stage6.dat"; // The MiceModel, as defined in $MICEFILES/Models/Configurations/<MiceModel>
+    cs["MiceModel"] = "Stage6.dat"; // The MiceModel, as defined in $MICEFILES/Models/Configurations/<MiceModel>
     cs["SciFiCalib"] = ""; //SciFi detector calibration file, found in ${MICEFILES}/Calibration/<SciFiCalib>
     cs["TofCalib"] = "tofcalib"; //TOF detector calibration file, found in ${MICEFILES}/Calibration/<TofCalib>
     cs["SciFiCable"] = "";  //SciFi detector cabling file, found in ${MICEFILES}/Cabling/SciFi/<SciFiCable>

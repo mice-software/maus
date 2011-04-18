@@ -78,8 +78,21 @@ MICEDetectorConstruction::MICEDetectorConstruction( MICERun& run ) : _simRun(*MI
   _event = new MICEEvent();
   _model = run.miceModule;
   _materials = run.miceMaterials;
+  if (_simRun.DataCards == NULL)
+    throw(Squeal(Squeal::recoverable,
+                 "Failed to acquire datacards",
+                 "MiceDetectorConstruction::MiceDetectorConstruction()"));
   _checkVolumes = (_simRun.DataCards->fetchValueInt("CheckVolumeOverlaps") == 1);
   _hasBTFields = false;
+
+  if (_model == NULL)
+    throw(Squeal(Squeal::recoverable,
+                 "Failed to acquire MiceModule",
+                 "MiceDetectorConstruction::MiceDetectorConstruction()"));
+  if (_materials == NULL)
+    throw(Squeal(Squeal::recoverable,
+                 "Failed to acquire MiceMaterials",
+                 "MiceDetectorConstruction::MiceDetectorConstruction()"));
 
   magField = new G4UniformMagField( 0., 0., 0. );
 }
