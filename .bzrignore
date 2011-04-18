@@ -247,3 +247,12 @@ build/test_MapPyVirtualPlanes.pyc
 build/test_OutputPyDoNothing.py
 build/test_OutputPyJSON.py
 build/test_OutputPyJSON.pyc
+build/MAUS.py
+build/MapPyValidateSpill.py
+build/test_MapPyValidateSpill.py
+build/test_cpp_unit.py
+build/test_error_handler.py
+build/test_root_plot.py
+tests/cpp_unit/test_cpp_unit
+gmon.out
+
