@@ -6,7 +6,7 @@
 Json::Value CppErrorHandler::HandleSqueal
                          (Json::Value val, Squeal exc, std::string class_name) {
   exc.Print();
-  val["errors"][class_name] = exc.GetLocation()+": "+exc.GetMessage();
+  val["errors"][class_name] = exc.GetMessage()+": "+exc.GetLocation();
   return val;
 }
 
