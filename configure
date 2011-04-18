@@ -7,6 +7,23 @@
 ######################################################################
 
 
+arch=`uname -s`
+
+DYLIB_VAR=LD_LIBRARY_PATH  # DYLIB_VAR is LD_LIBRARY_PATH for Linux.  Substituted into env.sh.
+if [ "$arch" = "Darwin" ]; then
+    DYLIB_VAR=DYLD_LIBRARY_PATH  # else for Mac OSX it's DYLD_LIBRARY_PATH
+
+    echo "WARNING: You are using Mac OSX.  However, the version that MICE uses";
+    echo "WARNING: of Recpack does not work on Mac OSX.  Please consult the";
+    echo "WARNING: following link to install a Mac OSX version of Recpack:";
+    echo "WARNING:";
+    echo "WARNING:   http://micewww.pp.rl.ac.uk/projects/maus/wiki/InstallMacOSX";
+    echo "WARNING:";
+    echo "WARNING: and realize that you may not publish results with unoffical";
+    echo "WARNING: versions of Recpack.";
+    echo "WARNING: ";
+fi
+
             ##################################################
 echo "INFO: This is the './configure' script.  You should only"
 echo "INFO: run this once. The purpose of me is to:"
@@ -22,22 +39,6 @@ echo
 # Check for g++ ##################################################
 (type -P gcc &>/dev/null && type -P g++ &>/dev/null) || {
     echo "FATAL: gcc/g++ is required to compile code." >&2;
-    echo "FATAL:" >&2;
-    echo "FATAL: To install within MAUS, set the MAUS_ROOT_DIR" >&2;
-    echo "FATAL: environmental variable.  For Bourne-compatible" >&2;
-    echo "FATAL: shells like 'bash', run:" >&2;
-    echo "FATAL:" >&2;
-    echo "FATAL:      export MAUS_ROOT_DIR=\"${maus_root_dir}\"" >&2;
-    echo "FATAL:" >&2;
-    echo "FATAL: whilst for C-compatible shells like 'csh', run:" >&2;
-    echo "FATAL:" >&2;
-    echo "FATAL:      setenv MAUS_ROOT_DIR \"${maus_root_dir}\"" >&2;
-    echo "FATAL:" >&2;
-    echo "FATAL: then run the following two commands to install" >&2;
-    echo "FATAL: the GCC compiler and it's dependency MPFR:" >&2;
-    echo "FATAL:" >&2;
-    echo "FATAL:      ./third_party/bash/01mpfr.bash" >&2;
-    echo "FATAL:      ./third_party/bash/02gcc.bash" >&2;
     exit 1; }
 
 # Find where MAUS is installed
@@ -50,31 +51,22 @@ then
     echo "FATAL: See:" >&2;
     echo "FATAL:" >&2;
     echo "FATAL: http://micewww.pp.rl.ac.uk:8080/issues/306" >&2;
-    echo "FATAL:" >&2;
-    echo "FATAL:      export MAUS_ROOT_DIR=\"${maus_root_dir}\"" >&2;
-    echo "FATAL:" >&2;
-    echo "FATAL: whilst for C-compatible shells like 'csh', run:" >&2;
-    echo "FATAL:" >&2;
-    echo "FATAL:      setenv MAUS_ROOT_DIR \"${maus_root_dir}\"" >&2;
-    echo "FATAL:" >&2;
-    echo "FATAL: then run the following to install Python 2.7:" >&2;
-    echo "FATAL:" >&2;
-    echo "FATAL:      ./third_party/bash/03python.bash" >&2;
     exit 1;
 fi
 
 # Temporarily setup the environment (this gets repeated in the env.sh output)
 #      PATH says where the binaries are
-#      LD_LIBRARY_PATH says where your shared libraries are
+#      $DYLIB_VAR says where your shared libraries are
 if [ -z "${PATH}" ]; then  # see if the variable exists yet
     PATH="${maus_root_dir}/third_party/install/bin"       # if not, initialize it
 else
     PATH="${maus_root_dir}/third_party/install/bin:$PATH" # else add to it
 fi
-if [ -z "${LD_LIBRARY_PATH}" ]; then  # see if the variable exists yet
-    LD_LIBRARY_PATH="${maus_root_dir}/third_party/install/lib"                  # if not, initialize it
+
+if [ -z "${!DYLIB_VAR}" ]; then  # see if the variable exists yet
+    eval ${DYLIB_VAR}="${maus_root_dir}/third_party/install/lib"                  # if not, initialize it
 else
-    LD_LIBRARY_PATH="${maus_root_dir}/third_party/install/lib:$LD_LIBRARY_PATH" # else add to to it
+    eval ${DYLIB_VAR}="${maus_root_dir}/third_party/install/lib:${!DYLIB_VAR}" # else add to to it
 fi
 
 # Check for Python
@@ -93,15 +85,17 @@ type -P python &>/dev/null || {
     echo "FATAL:" >&2;
     echo "FATAL: then run the following to install Python 2.7:" >&2;
     echo "FATAL:" >&2;
-    echo "FATAL:      ./third_party/bash/03python.bash" >&2;
+    echo "FATAL:      ./third_party/bash/01python.bash" >&2;
     exit 1; }
 
-python_version=`LD_LIBRARY_PATH=./third_party/install/lib python -V 2>&1`
+python_version=`env $DYLIB_VAR=./third_party/install/lib python -V 2>&1`
 ## Check for supported python version
 if [ "${python_version}" != "Python 2.7" ]
 then               ##################################################
     echo "WARNING: Unsupported python version (You are using ${python_version}),";
-    echo "WARNING: so using Python 2.7 is recommended";
+    echo "WARNING: so using Python 2.7 is recommended.  MAUS will install extra";
+    echo "WARNING: packages in this location like numpy and xboa and currently";
+    echo "WARNING: the way we go about this is having our own Python install.";
     echo "WARNING: ";
     echo "WARNING: To install within MAUS, set the MAUS_ROOT_DIR";
     echo "WARNING: environmental variable.  For Bourne-compatible";
@@ -115,43 +109,50 @@ then               ##################################################
     echo "WARNING: ";
     echo "WARNING: then run the following to install Python 2.7:"
     echo "WARNING: ";
-    echo "WARNING:       ./third_party/bash/03python.bash";
+    echo "WARNING:       ./third_party/bash/01python.bash";
     echo
 fi
 
 # check for SCons
 type -P scons &>/dev/null || {
-    echo "FATAL: Scons is required. It's weird that it's not" >&2;
-    echo "FATAL: since it ships within MAUS.  Is your MAUS ROOT" >&2;
-    echo "FATAL: directory correct?." >&2;
-    echo "FATAL:" >&2;
-    echo "FATAL: To reinstall within MAUS, set the MAUS_ROOT_DIR" >&2;
-    echo "FATAL: environmental variable.  For Bourne-compatible" >&2;
-    echo "FATAL: shells like 'bash', run:" >&2;
-    echo "FATAL:" >&2;
-    echo "FATAL:      export MAUS_ROOT_DIR=\"${maus_root_dir}\"" >&2;
-    echo "FATAL:" >&2;
-    echo "FATAL: whilst for C-compatible shells like 'csh', run:" >&2;
-    echo "FATAL:" >&2;
-    echo "FATAL:      setenv MAUS_ROOT_DIR \"${maus_root_dir}\"" >&2;
-    echo "FATAL:" >&2;
-    echo "FATAL: then run the following to install Scons:" >&2;
-    echo "FATAL:" >&2;
-    echo "FATAL:      ./third_party/bash/01scons.bash";
-    echo "FATAL:";
-    exit 1;}
+    echo "WARNING: Scons is required to proceed after this step"
+    echo "WARNING:"
+    echo "WARNING: To install within MAUS, set the MAUS_ROOT_DIR";
+    echo "WARNING: environmental variable.  For Bourne-compatible";
+    echo "WARNING: shells like 'bash', run:";
+    echo "WARNING: ";
+    echo "WARNING:       export MAUS_ROOT_DIR=\"${maus_root_dir}\"";
+    echo "WARNING: ";
+    echo "WARNING:  whilst for C-compatible shells like 'csh', run:";
+    echo "WARNING: ";
+    echo "WARNING:       setenv MAUS_ROOT_DIR \"${maus_root_dir}\"";
+    echo "WARNING: ";
+    echo "WARNING: then run the following to install Scons:" >&2;
+    echo "WARNING:" >&2;
+    echo "WARNING:      ./third_party/bash/40python_extras.bash";
+    echo "WARNING:";
+    echo
+    }
+
 
 root_version=root_v5.28.00a
+
+if [ ! -f "env.sh" ]
+then
+    echo "RECOMMENDATION:  This appears to be your first time running MAUS."
+    echo "RECOMMENDATION:  If you want to install all the external dependencies"
+    echo "RECOMMENDATION:  automatically (takes an hour or so since geant is big)"
+    echo "RECOMMENDATION:  then run the following command:"
+    echo "RECOMMENDATION:"
+    echo "RECOMMENDATION:       ./tests/integration/install_then_build_then_test.bash"
+    echo "RECOMMENDATION:"
+    echo
+fi
 
 ### Create environment files
 
 cat > env.sh <<EOF
 #/bin/sh
-
-if [ -f \${MAUS_ROOT_DIR}/third_party/build/$root_version/bin/thisroot.sh ]                                                                                                     
-then                                                                                                                                                                            
-     source \${MAUS_ROOT_DIR}/third_party/build/$root_version/bin/thisroot.sh                                                                                                   
-fi    
 
 if [ -z "\$MAUS_ROOT_DIR" ]; then
      export MAUS_ROOT_DIR="${maus_root_dir}"
@@ -162,34 +163,30 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
          export PATH="\${MAUS_ROOT_DIR}/third_party/install/bin:\${PATH}" # else add it
      fi
 
-     if [ -z "\${LD_LIBRARY_PATH}" ]; then  # see if the variable exists yet
-          export LD_LIBRARY_PATH="\${MAUS_ROOT_DIR}/third_party/install/lib" # intiailize it
+     if [ -z "\${$DYLIB_VAR}" ]; then  # see if the variable exists yet
+          export $DYLIB_VAR="\${MAUS_ROOT_DIR}/third_party/install/lib" # intiailize it
      else
-          export LD_LIBRARY_PATH="\${MAUS_ROOT_DIR}/third_party/install/lib:\${LD_LIBRARY_PATH}" # else add it
+          export $DYLIB_VAR="\${MAUS_ROOT_DIR}/third_party/install/lib:\${$DYLIB_VAR}" # else add it
      fi
 
-     export PATH="\${ROOTSYS}/bin:\${PATH}"
-     export LD_LIBRARY_PATH="\${ROOTSYS}/lib:\${LD_LIBRARY_PATH}"
      if [ -z "\${PYTHONPATH}" ]; then  # see if the variable exists yet
-          export PYTHONPATH="\${ROOTSYS}/lib" # intiailize it
+          export PYTHONPATH="\$MAUS_ROOT_DIR/build" #initialize it
      else
-          export PYTHONPATH="\${ROOTSYS}/lib:\${PYTHONPATH}" # else add it
+          export PYTHONPATH="\$MAUS_ROOT_DIR/build:\$PYTHONPATH" # else add it
      fi
 
-     # maus workers
-     export PYTHONPATH="\$MAUS_ROOT_DIR/build:\$PYTHONPATH"
-     export LD_LIBRARY_PATH="\$MAUS_ROOT_DIR/build:\$LD_LIBRARY_PATH"
+     export $DYLIB_VAR="\$MAUS_ROOT_DIR/build:\$$DYLIB_VAR"
 
      # maus core
      export PYTHONPATH="\$MAUS_ROOT_DIR/src/core:\$PYTHONPATH"
-     export LD_LIBRARY_PATH="\$MAUS_ROOT_DIR/src/core:\$LD_LIBRARY_PATH"
+     export $DYLIB_VAR="\$MAUS_ROOT_DIR/src/core:\$$DYLIB_VAR"
 
      export G4DEBUG=1
      export G4VERS=geant4.9.2.p04
-     export G4SYSTEM=Linux-g++
+     export G4SYSTEM=$arch-g++
      export G4INSTALL="\${MAUS_ROOT_DIR}/third_party/build/\${G4VERS}"
      export G4LIB="\${G4INSTALL}/lib"
-     export LD_LIBRARY_PATH="\${G4LIB}/\${G4SYSTEM}:\${LD_LIBRARY_PATH}"
+     export $DYLIB_VAR="\${G4LIB}/\${G4SYSTEM}:\${$DYLIB_VAR}"
      export G4INCLUDE="\${G4INSTALL}/include/"
      export G4TMP="\${G4INSTALL}"
      export G4VIS_BUILD_DAWNFILE_DRIVER=1
@@ -210,80 +207,75 @@ else
      echo "WARNING: MAUS already setup"
 fi
 
+# setup ROOT
+if [ -f \${MAUS_ROOT_DIR}/third_party/build/$root_version/bin/thisroot.sh ]
+then
+     source \${MAUS_ROOT_DIR}/third_party/build/$root_version/bin/thisroot.sh
+fi
+
 EOF
 
 cat > env.csh <<EOF
 #/bin/csh
 
 if ({\$?MAUS_ROOT_DIR}) then
-     echo "WARNING: MAUS already setup - rerunning script"
-endif
-
-setenv MAUS_ROOT_DIR "${maus_root_dir}"
-
-if( ! -e \${MAUS_ROOT_DIR}/third_party/build/$root_version/bin/thisroot.csh ) then                                                                                              
-    source \${MAUS_ROOT_DIR}/third_party/build/$root_version/bin/thisroot.csh                                                                                                  
-endif   
-
-if ({\$?PATH}) then
-    setenv PATH "\${MAUS_ROOT_DIR}/third_party/install/bin:\${PATH}" # else add it
+     echo "WARNING: MAUS already setup"
 else
-    setenv PATH "\${MAUS_ROOT_DIR}/third_party/install/bin" # initialize it
+     setenv MAUS_ROOT_DIR "${maus_root_dir}"
+
+     if ({\$?PATH}) then
+          setenv PATH "\${MAUS_ROOT_DIR}/third_party/install/bin:\${PATH}" # else add it
+     else
+          setenv PATH "\${MAUS_ROOT_DIR}/third_party/install/bin" # initialize it
+     endif
+
+     if ({\$?$DYLIB_VAR}) then
+          setenv $DYLIB_VAR "\${MAUS_ROOT_DIR}/third_party/install/lib:\${$DYLIB_VAR}" # else add it
+     else
+          setenv $DYLIB_VAR "\${MAUS_ROOT_DIR}/third_party/install/lib" # intiailize it
+     endif
+
+     if ({\$?PYTHONPATH}) then
+          setenv PYTHONPATH "\$MAUS_ROOT_DIR/build:\$PYTHONPATH" # else add it
+     else
+          setenv PYTHONPATH "\$MAUS_ROOT_DIR/build"  # intiailize it
+     endif
+
+     # maus workers
+     setenv $DYLIB_VAR "\$MAUS_ROOT_DIR/build:\$$DYLIB_VAR"
+
+     # maus core
+     setenv PYTHONPATH "\$MAUS_ROOT_DIR/src/core:\$PYTHONPATH"
+     setenv $DYLIB_VAR "\$MAUS_ROOT_DIR/src/core:\$$DYLIB_VAR"
+
+     setenv G4DEBUG 1
+     setenv G4VERS geant4.9.2.p04
+     setenv G4SYSTEM Linux-g++
+     setenv G4INSTALL "\${MAUS_ROOT_DIR}/third_party/build/\${G4VERS}"
+     setenv G4LIB "\${G4INSTALL}/lib"
+     setenv $DYLIB_VAR "\${G4LIB}/\${G4SYSTEM}:\${$DYLIB_VAR}"
+     setenv G4INCLUDE "\${G4INSTALL}/include/"
+     setenv G4TMP "\${G4INSTALL}"
+     setenv G4VIS_BUILD_DAWNFILE_DRIVER 1
+     setenv G4VIS_USE_DAWNFILE 1
+     setenv G4VIS_USE 0
+     setenv G4OPTIMISE 2
+     setenv OGLHOME /usr/X11R6
+     setenv G4LEDATA "\${G4INSTALL}/data/G4EMLOW6.2/"
+     setenv G4ABLADATA "\${G4INSTALL}/data/G4ABLA3.0/"
+     setenv G4NEUTRONDATA "\${G4INSTALL}/data/G4NDL3.13/"
+     setenv G4LEVELGAMMADATA "\${G4INSTALL}/data/PhotonEvaporation2.0/"
+     setenv G4RADIOACTIVEDATA "\${G4INSTALL}/data/RadioactiveDecay3.2/"
+
+     setenv MICEFILES "\${MAUS_ROOT_DIR}/src/common/FILES"
+
+     echo "SUCCESS: MAUS setup"
 endif
 
-if ({\$?LD_LIBRARY_PATH}) then
-    setenv LD_LIBRARY_PATH "\${MAUS_ROOT_DIR}/third_party/install/lib:\${LD_LIBRARY_PATH}" # else add it
-else
-    setenv LD_LIBRARY_PATH "\${MAUS_ROOT_DIR}/third_party/install/lib" # intiailize it
+# setup ROOT
+if( ! -e \${MAUS_ROOT_DIR}/third_party/build/$root_version/bin/thisroot.csh ) then
+     source \${MAUS_ROOT_DIR}/third_party/build/$root_version/bin/thisroot.csh
 endif
-
-# ROOT specific garbage
-if (! {\$?ROOTSYS} ) then
-    setenv ROOTSYS "\${MAUS_ROOT_DIR}/third_party/build/root_v5.28.00a/"
-endif
-
-setenv PATH "\${ROOTSYS}/bin:\${PATH}"
-setenv LD_LIBRARY_PATH "\${ROOTSYS}/lib:\${LD_LIBRARY_PATH}"
-if ({\$?PYTHONPATH}) then
-     setenv PYTHONPATH "\${ROOTSYS}/lib:\${PYTHONPATH}" # else add it
-else
-     setenv PYTHONPATH "\${ROOTSYS}/lib" # intiailize it
-endif
-
-
-
-# maus workers
-setenv LD_LIBRARY_PATH "\$MAUS_ROOT_DIR/build:\$LD_LIBRARY_PATH"
-setenv PYTHONPATH      "\$MAUS_ROOT_DIR/build:\$PYTHONPATH"
-
-# maus core
-setenv PYTHONPATH "\$MAUS_ROOT_DIR/src/core:\$PYTHONPATH"
-setenv PYTHONPATH "\$MAUS_ROOT_DIR/third_party/install/lib:\$PYTHONPATH"
-
-setenv LD_LIBRARY_PATH "\$MAUS_ROOT_DIR/src/core:\$LD_LIBRARY_PATH"
-
-setenv G4DEBUG 1
-setenv G4VERS geant4.9.2.p04
-setenv G4SYSTEM Linux-g++
-setenv G4INSTALL "\${MAUS_ROOT_DIR}/third_party/build/\${G4VERS}"
-setenv G4LIB "\${G4INSTALL}/lib"
-setenv LD_LIBRARY_PATH "\${G4LIB}/\${G4SYSTEM}:\${LD_LIBRARY_PATH}"
-setenv G4INCLUDE "\${G4INSTALL}/include/"
-setenv G4TMP "\${G4INSTALL}"
-setenv G4VIS_BUILD_DAWNFILE_DRIVER 1
-setenv G4VIS_USE_DAWNFILE 1
-setenv G4VIS_USE 0
-setenv G4OPTIMISE 2
-setenv OGLHOME /usr/X11R6
-setenv G4LEDATA "\${G4INSTALL}/data/G4EMLOW6.2/"
-setenv G4ABLADATA "\${G4INSTALL}/data/G4ABLA3.0/"
-setenv G4NEUTRONDATA "\${G4INSTALL}/data/G4NDL3.13/"
-setenv G4LEVELGAMMADATA "\${G4INSTALL}/data/PhotonEvaporation2.0/"
-setenv G4RADIOACTIVEDATA "\${G4INSTALL}/data/RadioactiveDecay3.2/"
-
-setenv MICEFILES "\${MAUS_ROOT_DIR}/src/common/FILES"
-
-echo "SUCCESS: MAUS setup"
 
 EOF
 
@@ -299,3 +291,4 @@ echo "SUCCESS:      source env.csh"
 echo "SUCCESS:"
 echo "SUCCESS: which can be added to your respective shell's"
 echo "SUCCESS: startup scripts.  Example: ~/.bashrc for 'bash'."
+
