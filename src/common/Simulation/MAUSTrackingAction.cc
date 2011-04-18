@@ -63,7 +63,7 @@ void MAUSTrackingAction::PreUserTrackingAction(const G4Track* aTrack) {
 
 void MAUSTrackingAction::PostUserTrackingAction(const G4Track* aTrack) {
   MAUSSteppingAction* stepAct = MAUSGeant4Manager::GetInstance()->GetStepping();
-  if (!stepAct || !aTrack) 
+  if (!stepAct || !aTrack)
     throw(Squeal(Squeal::nonRecoverable,
                  "Failed to get tracking",
                  "MAUSTrackingAction::PostUserTrackingAction"));

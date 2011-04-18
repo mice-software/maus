@@ -48,8 +48,7 @@ class MAUSTrackingAction : public G4UserTrackingAction {
      */
     void PreUserTrackingAction(const G4Track*);
 
-    /** @brief Add a new track to the stepping action and fill with some
-     *         track data
+    /** @brief Put the final momentum of the track into the spill data
      */
     void PostUserTrackingAction(const G4Track*);
 };

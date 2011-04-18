@@ -77,7 +77,7 @@ TEST_F(MAUSSteppingActionTest, GetSetTest) {
 TEST_F(MAUSSteppingActionTest, UserSteppingActionMaxNStepsTest) {
   Json::Value& conf = *MICERun::getInstance()->jsonConfiguration;
   int maxNSteps = JsonWrapper::GetProperty
-                      (conf, "MaxNumberOfSteps", JsonWrapper::intValue).asInt();
+                      (conf, "maximum_number_of_steps", JsonWrapper::intValue).asInt();
   stepping->SetTracks(JsonWrapper::StringToJson("{\"track0\":{}}"));
   stepping->UserSteppingAction(step);
   EXPECT_TRUE(stepping->GetTracks()["track0"].type() == Json::objectValue);

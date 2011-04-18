@@ -24,7 +24,7 @@ MICEEvent simEvent;
 /////////// Needed until I clean up legacy tests to gtest framework //////////
 
 std::string jsonconfig = 
-"{\"MaxNumberOfSteps\":10000}";
+"{\"maximum_number_of_steps\":10000}";
 
 
 int main(int argc, char **argv) {

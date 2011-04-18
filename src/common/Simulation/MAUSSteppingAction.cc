@@ -29,7 +29,7 @@ namespace MAUS {
 MAUSSteppingAction::MAUSSteppingAction() : _keepTracks(false) {
   Json::Value& conf = *MICERun::getInstance()->jsonConfiguration;
   _maxNSteps = JsonWrapper::GetProperty
-                      (conf, "MaxNumberOfSteps", JsonWrapper::intValue).asInt();
+               (conf, "maximum_number_of_steps", JsonWrapper::intValue).asInt();
 }
 
 void MAUSSteppingAction::UserSteppingAction(const G4Step * aStep) {

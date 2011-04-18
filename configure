@@ -238,26 +238,27 @@ else
 endif
 
 # ROOT specific garbage
-if ({\$?ROOTSYS}) then
-    setenv PATH "\${ROOTSYS}/bin:\${PATH}"
-    setenv LD_LIBRARY_PATH "\${ROOTSYS}/lib:\${LD_LIBRARY_PATH}"
-    if ({\$?PYTHONPATH}) then
-         setenv PYTHONPATH "\${ROOTSYS}/lib:\${PYTHONPATH}" # else add it
-    else
-         setenv PYTHONPATH "\${ROOTSYS}/lib" # intiailize it
-    endif
+if (! {\$?ROOTSYS} ) then
+    setenv ROOTSYS "\${MAUS_ROOT_DIR}/third_party/build/root_v5.28.00a/"
 endif
+
+setenv PATH "\${ROOTSYS}/bin:\${PATH}"
+setenv LD_LIBRARY_PATH "\${ROOTSYS}/lib:\${LD_LIBRARY_PATH}"
+if ({\$?PYTHONPATH}) then
+     setenv PYTHONPATH "\${ROOTSYS}/lib:\${PYTHONPATH}" # else add it
+else
+     setenv PYTHONPATH "\${ROOTSYS}/lib" # intiailize it
+endif
+
 
 
 # maus workers
 setenv LD_LIBRARY_PATH "\$MAUS_ROOT_DIR/build:\$LD_LIBRARY_PATH"
+setenv PYTHONPATH      "\$MAUS_ROOT_DIR/build:\$PYTHONPATH"
 
 # maus core
-if ({\$?PYTHONPATH}) then
-    setenv PYTHONPATH "\$MAUS_ROOT_DIR/src/core:\$PYTHONPATH"
-else
-    setenv PYTHONPATH "\$MAUS_ROOT_DIR/src/core" # intiailize it
-endif
+setenv PYTHONPATH "\$MAUS_ROOT_DIR/src/core:\$PYTHONPATH"
+setenv PYTHONPATH "\$MAUS_ROOT_DIR/third_party/install/lib:\$PYTHONPATH"
 
 setenv LD_LIBRARY_PATH "\$MAUS_ROOT_DIR/src/core:\$LD_LIBRARY_PATH"
 

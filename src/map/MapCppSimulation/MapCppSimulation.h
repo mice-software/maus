@@ -24,8 +24,10 @@
  *  Yagmur Torun <torun@iit.edu>
  */
 
-// TODO(Rogers): a lot of the functionality here should be pushed to the
-//               RunAction (which does not exist)
+// TODO(Rogers): Error is that we use wrong geant4 devices for this stuff.
+//               Really we should use EventAction to control per spill stuff and
+//               stick multiple tracks from the spill into the same primary
+
 
 #ifndef _SRC_MAP_MAPCPPSIMULATION_H_
 #define _SRC_MAP_MAPCPPSIMULATION_H_
@@ -62,7 +64,7 @@ class MapCppSimulation {
 public:
   /** @brief Sets up the worker
    */
-  MapCppSimulation() :_g4manager(MAUSGeant4Manager::GetInstance()) {
+  MapCppSimulation() :_g4manager(NULL) {
     _classname = "MapCppSimulation";
     _geometry = "Stage6.dat";
     _storeTracks = true;
@@ -105,7 +107,7 @@ public:
    *  
    *  @param particle Json value where the information is stored
    */
-  void StoreTracking(Json::Value particle);
+  Json::Value StoreTracking(Json::Value particle);
 
   /** @brief Store tracking information in the particle
    *
@@ -118,14 +120,6 @@ public:
    *  @param particle Json value where the information is stored
    */
   void SetNextParticle(Json::Value particle);
-
-  /** @brief Set up GEANT4 from the configuration information
-   *  
-   *  Sets up GEANT4 default runManager, MICEPhysicsList, 
-   *  MICEDetectorConstruction (for geometry and fields), MAUSSteppingAction,
-   *  MAUSEventAction, MAUSTrackingAction
-   */
-  void SetGeant4();
 
   /** @brief Set up configuration information on the MICERun
    *  

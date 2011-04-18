@@ -23,13 +23,13 @@ import ErrorHandler
 
 class ErrorHandlerTestCase(unittest.TestCase):
   def test_ErrorHandler(self):
-      error_handler = ErrorHandler.ExceptionHandler()
+      error_handler = ErrorHandler.ErrorHandler()
       assert(error_handler.error_to_stderr == False)
       assert(error_handler.error_to_json == True)
       assert(error_handler.on_error == 'none')
 
   def test_ErrorsToJson(self):
-    error_handler = ErrorHandler.ExceptionHandler()
+    error_handler = ErrorHandler.ErrorHandler()
     doc = {}
     try:
       raise RuntimeError("Test error 1")
@@ -48,7 +48,7 @@ class ErrorHandlerTestCase(unittest.TestCase):
     stderr = sys.stderr
     test_err = StringIO.StringIO(u'')
     sys.stderr = test_err
-    error_handler = ErrorHandler.ExceptionHandler()
+    error_handler = ErrorHandler.ErrorHandler()
     doc = {}
     try:
       raise RuntimeError("Test error 1")
@@ -59,7 +59,7 @@ class ErrorHandlerTestCase(unittest.TestCase):
     sys.stderr = stderr
 
   def test_HandleException_Json(self):
-    error_handler = ErrorHandler.ExceptionHandler()
+    error_handler = ErrorHandler.ErrorHandler()
     error_handler.error_to_json = True
     doc = {}
     try:
@@ -88,7 +88,7 @@ class ErrorHandlerTestCase(unittest.TestCase):
     ])
 
   def test_HandleException_User(self):
-    error_handler = ErrorHandler.ExceptionHandler()
+    error_handler = ErrorHandler.ErrorHandler()
     doc = {}
     error_handler.error_to_stderr = True
     stderr = sys.stderr
@@ -109,7 +109,7 @@ class ErrorHandlerTestCase(unittest.TestCase):
     sys.stderr = stderr
 
   def test_HandleException_On_Error(self):
-    error_handler = ErrorHandler.ExceptionHandler()
+    error_handler = ErrorHandler.ErrorHandler()
     doc = {}
     error_handler.on_error = 'halt'
     try:

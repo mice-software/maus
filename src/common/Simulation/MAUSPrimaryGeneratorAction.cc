@@ -49,7 +49,7 @@ MAUSPrimaryGeneratorAction::PGParticle MAUSPrimaryGeneratorAction::Pop() {
 void MAUSPrimaryGeneratorAction::GeneratePrimaries(G4Event* argEvent) {
   if (_part_q.size() == 0)
     throw(Squeal(Squeal::recoverable,
-                 "Run out of primary particles",
+                 "No primary particles",
                  "MAUSPrimaryGeneratorAction::GeneratePrimaries"));
   PGParticle part = Pop();
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
@@ -76,7 +76,6 @@ void MAUSPrimaryGeneratorAction::GeneratePrimaries(G4Event* argEvent) {
     throw(Squeal(Squeal::recoverable,
                  "Random seed out of range",
                  "MAUSPrimaryGeneratorAction::GeneratePrimaries"));
-    
   }
 
   CLHEP::HepRandom::setTheSeed(static_cast<unsigned int>(part.seed));

@@ -30,7 +30,6 @@ bool MapCppSimulation::Birth(std::string configuration) {
   // Check if the JSON document can be parsed, else return error only
   try {
     SetConfiguration(configuration);
-    SetGeant4();
     return true;  // Sucessful completion
     // Normal session, no visualization
   } catch(Squeal squee) {
@@ -50,16 +49,15 @@ std::string MapCppSimulation::Process(std::string document) {
   try {
     MAUSSteppingAction* stepAct = MAUSGeant4Manager::GetInstance()->
                                                                   GetStepping();
-    stepAct->SetTracks(Json::Value());
-
     Json::Value mc   = JsonWrapper::GetProperty
-                                         (spill, "mc", JsonWrapper::arrayValue);
+                                        (spill, "mc", JsonWrapper::arrayValue);
     for (int mc_particle_i = 0; mc_particle_i < mc.size(); ++mc_particle_i) {
+      stepAct->SetTracks(Json::Value());
       Json::Value particle = JsonWrapper::GetItem
                                   (mc, mc_particle_i, JsonWrapper::objectValue);
       SetNextParticle(particle);
       _g4manager->GetRunManager()->BeamOn(1);
-      StoreTracking(particle);
+      particle = StoreTracking(particle);
       spill["mc"][mc_particle_i] = particle;
     }
   }
@@ -100,9 +98,6 @@ void MapCppSimulation::SetNextParticle(Json::Value particle) {
   _g4manager->GetPrimaryGenerator()->Push(p);
 }
 
-void MapCppSimulation::SetGeant4() {
-}
-
 void MapCppSimulation::SetConfiguration(std::string json_configuration) {
   MICERun& simRun = *MICERun::getInstance();
   simRun.jsonConfiguration = new Json::Value
@@ -120,9 +115,10 @@ void MapCppSimulation::SetConfiguration(std::string json_configuration) {
   simRun.miceModule = new MiceModule(modname.asString());
   // G4 Materials
   fillMaterials(simRun);
+  _g4manager = MAUSGeant4Manager::GetInstance();
 }
 
-void MapCppSimulation::StoreTracking(Json::Value particle) {
+Json::Value MapCppSimulation::StoreTracking(Json::Value particle) {
     //  For each detector i
     for (int i = 0; i < _g4manager->GetGeometry()->GetSDSize(); i++) {
       //  Retrieve detector i's hits
@@ -138,9 +134,6 @@ void MapCppSimulation::StoreTracking(Json::Value particle) {
         }
       }
     }
-
-  if (_g4manager->GetStoreTracks()) {
     particle["tracks"] =  _g4manager->GetStepping()->GetTracks();
-  }
-
+    return particle;
 }
