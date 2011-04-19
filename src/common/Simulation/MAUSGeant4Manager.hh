@@ -24,7 +24,6 @@
  *  per primary. This is actually incorrect - really we should be making several
  *  tracks on each Geant4 event - i.e. the spill should be the Geant4 event.
  *
- *  @authors Chris Rogers <chris.rogers@stfc.ac.uk>
  */
 
 #ifndef _SRC_COMMON_MAUSGEANT4MANAGER_HH_

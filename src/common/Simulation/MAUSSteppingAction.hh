@@ -18,9 +18,6 @@
 /** @class  MAUSSteppingAction
  *  Geant4 calls this class per track step
  *
- *  @author Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
- *  @author Chris Rogers <chris.rogers@stfc.ac.uk>
- *
  *  This class adds steps to the mc/particle/track branch. Also kills any 
  *  particles that take more than MaxNSteps (suspect looping in this case).
  *

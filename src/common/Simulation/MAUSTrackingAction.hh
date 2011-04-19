@@ -18,9 +18,6 @@
 /** @class  MAUSTrackingAction
  *  Geant4 calls this class before/after tracks propogated
  *
- *  @author Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
- *  @author Chris Rogers <chris.rogers@stfc.ac.uk>
- *
  *  Collect the steps from MAUSSteppingAction, then create
  *  tracks in the datastructure.
  *
