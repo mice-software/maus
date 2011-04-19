@@ -1,0 +1,28 @@
+Done processing /home/cr67/G4MICE/MAUS/maus_rogers/tests/style/cpplint_test/should_pass.hh
+/home/cr67/G4MICE/MAUS/maus_rogers/tests/style/cpplint_test/force_fail_2.cc:4:  Should have a space between // and comment  [whitespace/comments] [4]
+/home/cr67/G4MICE/MAUS/maus_rogers/tests/style/cpplint_test/force_fail_2.cc:6:  Line ends in whitespace.  Consider deleting these extra spaces.  [whitespace/end_of_line] [4]
+Done processing /home/cr67/G4MICE/MAUS/maus_rogers/tests/style/cpplint_test/force_fail_2.cc
+/home/cr67/G4MICE/MAUS/maus_rogers/tests/style/cpplint_test/force_fail.cc:1:  Line ends in whitespace.  Consider deleting these extra spaces.  [whitespace/end_of_line] [4]
+/home/cr67/G4MICE/MAUS/maus_rogers/tests/style/cpplint_test/force_fail.cc:1:  Lines should very rarely be longer than 100 characters  [whitespace/line_length] [4]
+Done processing /home/cr67/G4MICE/MAUS/maus_rogers/tests/style/cpplint_test/force_fail.cc
+Done processing /home/cr67/G4MICE/MAUS/maus_rogers/tests/style/cpplint_test/should_pass.cc
+/home/cr67/G4MICE/MAUS/maus_rogers/tests/style/cpplint_test/cpplint_test_exclude_dir/force_fail.cc:0:  No copyright message found.  You should have a line: "Copyright [year] <Copyright Owner>"  [legal/copyright] [5]
+/home/cr67/G4MICE/MAUS/maus_rogers/tests/style/cpplint_test/cpplint_test_exclude_dir/force_fail.cc:1:  Line ends in whitespace.  Consider deleting these extra spaces.  [whitespace/end_of_line] [4]
+/home/cr67/G4MICE/MAUS/maus_rogers/tests/style/cpplint_test/cpplint_test_exclude_dir/force_fail.cc:1:  Lines should very rarely be longer than 100 characters  [whitespace/line_length] [4]
+Done processing /home/cr67/G4MICE/MAUS/maus_rogers/tests/style/cpplint_test/cpplint_test_exclude_dir/force_fail.cc
+Ignoring /home/cr67/G4MICE/MAUS/maus_rogers/src/map/MapCppVirtualPlanes/MapCppVirtualPlanes.h; not a .cc or .hh file
+Done processing /home/cr67/G4MICE/MAUS/maus_rogers/src/map/MapCppVirtualPlanes/MapCppVirtualPlanes.h
+Ignoring /home/cr67/G4MICE/MAUS/maus_rogers/src/map/MapCppSimulation/MapCppSimulation.h; not a .cc or .hh file
+Done processing /home/cr67/G4MICE/MAUS/maus_rogers/src/map/MapCppSimulation/MapCppSimulation.h
+/home/cr67/G4MICE/MAUS/maus_rogers/src/map/MapCppSimulation/MapCppSimulation.cpp:0:  No copyright message found.  You should have a line: "Copyright [year] <Copyright Owner>"  [legal/copyright] [5]
+/home/cr67/G4MICE/MAUS/maus_rogers/src/map/MapCppSimulation/MapCppSimulation.cpp:101:  Add #include <string> for string  [build/include_what_you_use] [4]
+/home/cr67/G4MICE/MAUS/maus_rogers/src/map/MapCppSimulation/MapCppSimulation.cpp:125:  Add #include <vector> for vector<>  [build/include_what_you_use] [4]
+Done processing /home/cr67/G4MICE/MAUS/maus_rogers/src/map/MapCppSimulation/MapCppSimulation.cpp
+/home/cr67/G4MICE/MAUS/maus_rogers/src/input/InputCppRealData/InputCppRealData.cpp:0:  No copyright message found.  You should have a line: "Copyright [year] <Copyright Owner>"  [legal/copyright] [5]
+Done processing /home/cr67/G4MICE/MAUS/maus_rogers/src/input/InputCppRealData/InputCppRealData.cpp
+Ignoring /home/cr67/G4MICE/MAUS/maus_rogers/src/input/InputCppRealData/UnpackEventLib.h; not a .cc or .hh file
+Done processing /home/cr67/G4MICE/MAUS/maus_rogers/src/input/InputCppRealData/UnpackEventLib.h
+/home/cr67/G4MICE/MAUS/maus_rogers/src/input/InputCppRealData/UnpackEventLib.cpp:0:  No copyright message found.  You should have a line: "Copyright [year] <Copyright Owner>"  [legal/copyright] [5]
+Done processing /home/cr67/G4MICE/MAUS/maus_rogers/src/input/InputCppRealData/UnpackEventLib.cpp
+Ignoring /home/cr67/G4MICE/MAUS/maus_rogers/src/input/InputCppRealData/InputCppRealData.h; not a .cc or .hh file
+Done processing /home/cr67/G4MICE/MAUS/maus_rogers/src/input/InputCppRealData/InputCppRealData.h
