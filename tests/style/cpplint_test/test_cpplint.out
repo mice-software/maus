@@ -6,6 +6,7 @@ Done processing /home/cr67/G4MICE/MAUS/maus_rogers/tests/style/cpplint_test/forc
 /home/cr67/G4MICE/MAUS/maus_rogers/tests/style/cpplint_test/force_fail.cc:2:  Line ends in whitespace.  Consider deleting these extra spaces.  [whitespace/end_of_line] [4]
 /home/cr67/G4MICE/MAUS/maus_rogers/tests/style/cpplint_test/force_fail.cc:2:  Lines should very rarely be longer than 100 characters  [whitespace/line_length] [4]
 /home/cr67/G4MICE/MAUS/maus_rogers/tests/style/cpplint_test/force_fail.cc:4:  Should have a space between // and comment  [whitespace/comments] [4]
+/home/cr67/G4MICE/MAUS/maus_rogers/tests/style/cpplint_test/force_fail.cc:5:  Should have a space between // and comment  [whitespace/comments] [4]
 Done processing /home/cr67/G4MICE/MAUS/maus_rogers/tests/style/cpplint_test/force_fail.cc
 Done processing /home/cr67/G4MICE/MAUS/maus_rogers/tests/style/cpplint_test/should_pass.cc
 /home/cr67/G4MICE/MAUS/maus_rogers/tests/style/cpplint_test/cpplint_test_exclude_dir/force_fail.cc:0:  No copyright message found.  You should have a line: "Copyright [year] <Copyright Owner>"  [legal/copyright] [5]
