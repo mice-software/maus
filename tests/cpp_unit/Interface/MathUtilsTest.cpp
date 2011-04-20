@@ -1,24 +1,25 @@
-// Copyright 2011 Chris Rogers
-//
-// This file is a part of G4MICE
-//
-// G4MICE is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// G4MICE is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with G4MICE in the doc folder.  If not, see
-// <http://www.gnu.org/licenses/>.
-
-#include "gtest/gtest.h" 
+/* This file is part of MAUS: http://micewww.pp.rl.ac.uk/projects/maus
+ *
+ * MAUS is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MAUS is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
 #include <math.h>
+
+#include <vector>
+
+#include "gtest/gtest.h"
 
 #include "src/common/Interface/MathUtils.hh"
 #include "src/common/Interface/STLUtils.hh"
@@ -96,8 +97,8 @@ class EngeTest : public ::testing::Test {
 // compare numerical derivative with analytical derivative
 
 // check that f' < tolerance in the range xmin -> xmax, for all derivatives up to
-// max_n (where n=1 is the first derivative). (n+1)th numerical derivative is 
-// calculated from nth analytical derivative using standard formula 
+// max_n (where n=1 is the first derivative). (n+1)th numerical derivative is
+// calculated from nth analytical derivative using standard formula
 // f' = ( f(x+dx)-f(x-dx) )/2dx
 // Deal with two cases:
 // * where f is large, requiring large tolerance on numerical derivative
@@ -111,9 +112,9 @@ void test_deriv(T object, double (T::*function)(double, int) const, double dx,
     for (double x = xmin; x < xmax; x += (xmax-xmin)/100.) {
       double y = (object.*function)(x, n);
       if (y*dy_tol > dy_tol) dy_tol = y*dy_tol;
-      ASSERT_NEAR( y,
-                  ((object.*function)(x+dx, n-1)
-                  -(object.*function)(x-dx, n-1))/2./dx, dy_tol) << n << " " << x;
+      ASSERT_NEAR(y,
+                 ((object.*function)(x+dx, n-1)
+                 -(object.*function)(x-dx, n-1))/2./dx, dy_tol) << n << " " << x;
     }
   }
 }
@@ -191,7 +192,7 @@ TEST_F(EngeTest, SetEngeDiffIndicesTest) {
   ASSERT_EQ(htv.size(), size_t(0));
 }
 
-// check that we calculate d^n/dx^n h correctly - calculate explicitly h for a 
+// check that we calculate d^n/dx^n h correctly - calculate explicitly h for a
 // values and then compare numerical and analytical derivatives
 TEST_F(EngeTest, HNTest) {
   for (double x = -10.; x < 11; x++) {
@@ -203,7 +204,7 @@ TEST_F(EngeTest, HNTest) {
   test_deriv(_enge, &Enge::HN, 1e-3, -10., 10., 1e-6, 9);
 }
 
-// check that we calculate d^n/dx^n g correctly - calculate explicitly g for a 
+// check that we calculate d^n/dx^n g correctly - calculate explicitly g for a
 // few x values and then compare numerical and analytical derivatives
 TEST_F(EngeTest, GNTest) {
   for (double x = -10; x < 11; x++) {
@@ -212,7 +213,7 @@ TEST_F(EngeTest, GNTest) {
   test_deriv(_enge, &Enge::GN, 1e-6, -10., 10., 1e-6, 9);
 }
 
-// check that we calculate d^n/dx^n enge correctly - calculate explicitly g for 
+// check that we calculate d^n/dx^n enge correctly - calculate explicitly g for
 // a few x values and then compare numerical and analytical derivatives
 TEST_F(EngeTest, GetEngeTest) {
   for (double x = -10; x < 11; x++)

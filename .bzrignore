@@ -10,6 +10,8 @@ config.log
 .sconsign.dblite
 mausput
 gmon.out
+list.prof
+unit_test
 tmp/*
 src/map/*/build
 tests/style/cpplint_test/test_cpplint_out.out
