@@ -1,3 +1,4 @@
 cpp_unit - stores C++ unit tests and former G4MICE tests
 integration - stores tests ran by the Jenkins (formerly Hudson) integration test platform
 unit - stores python native unit tests
+style - stores tests against style guide

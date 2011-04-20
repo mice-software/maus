@@ -17,9 +17,6 @@
 /** @class  MAUSPrimaryGeneratorAction
  *  Geant4 calls this class to determine the events in the spill
  *
- *  @author Chris Rogers <chris.rogers@stfc.ac.uk>
- *  @author Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
- *
  *  This is just a FIFO (First In First Out) std::queue of hits. Hits can be
  *  loaded using Push(...) and unloaded using Pop(). GeneratePrimaries(...)
  *  will fire hits until the queue is empty.

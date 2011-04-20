@@ -497,6 +497,7 @@ class _CppLintState(object):
     self.filters = _DEFAULT_FILTERS[:]
     self.counting = 'total'  # In what way are we counting errors?
     self.errors_by_category = {}  # string to int dict storing error counts
+    self.output_handle = sys.stderr # io object for writing errors
 
     # output format:
     # "emacs" - format that emacs can parse (default)
@@ -516,6 +517,10 @@ class _CppLintState(object):
   def SetCountingStyle(self, counting_style):
     """Sets the module's counting options."""
     self.counting = counting_style
+
+  def SetOutputHandler(self, file_handle):
+    """Sets the module's handler for error messages"""
+    self.output_handle = file_handle
 
   def SetFilters(self, filters):
     """Sets the error-message filters.
@@ -560,9 +565,9 @@ class _CppLintState(object):
   def PrintErrorCounts(self):
     """Print a summary of errors by category, and the total."""
     for category, count in self.errors_by_category.iteritems():
-      sys.stderr.write('Category \'%s\' errors found: %d\n' %
+      _cpplint_state.output_handle.write('Category \'%s\' errors found: %d\n' %
                        (category, count))
-    sys.stderr.write('Total errors found: %d\n' % self.error_count)
+    _cpplint_state.output_handle.write('Total errors found: %d\n' % self.error_count)
 
 _cpplint_state = _CppLintState()
 
@@ -812,10 +817,10 @@ def Error(filename, linenum, category, confidence, message):
   if _ShouldPrintError(category, confidence, linenum):
     _cpplint_state.IncrementErrorCount(category)
     if _cpplint_state.output_format == 'vs7':
-      sys.stderr.write('%s(%s):  %s  [%s] [%d]\n' % (
+      _cpplint_state.output_handle.write('%s(%s):  %s  [%s] [%d]\n' % (
           filename, linenum, message, category, confidence))
     else:
-      sys.stderr.write('%s:%s:  %s  [%s] [%d]\n' % (
+      _cpplint_state.output_handle.write('%s:%s:  %s  [%s] [%d]\n' % (
           filename, linenum, message, category, confidence))
 
 
@@ -3007,7 +3012,7 @@ def ProcessFile(filename, vlevel):
         carriage_return_found = True
 
   except IOError:
-    sys.stderr.write(
+    _cpplint_state.output_handle.write(
         "Skipping input '%s': Can't open for reading\n" % filename)
     return
 
@@ -3018,7 +3023,7 @@ def ProcessFile(filename, vlevel):
   # should rely on the extension.
   if (filename != '-' and file_extension != 'cc' and file_extension != 'hh'
       and file_extension != 'cpp'):
-    sys.stderr.write('Ignoring %s; not a .cc or .hh file\n' % filename)
+    _cpplint_state.output_handle.write('Ignoring %s; not a .cc or .hh file\n' % filename)
   else:
     ProcessFileData(filename, file_extension, lines, Error)
     if carriage_return_found and os.linesep != '\r\n':
@@ -3028,7 +3033,7 @@ def ProcessFile(filename, vlevel):
             'One or more unexpected \\r (^M) found;'
             'better to use only a \\n')
 
-  sys.stderr.write('Done processing %s\n' % filename)
+  _cpplint_state.output_handle.write('Done processing %s\n' % filename)
 
 
 def PrintUsage(message):
@@ -3037,7 +3042,7 @@ def PrintUsage(message):
   Args:
     message: The optional error message.
   """
-  sys.stderr.write(_USAGE)
+  _cpplint_state.output_handle.write(_USAGE)
   if message:
     sys.exit('\nFATAL ERROR: ' + message)
   else:
@@ -3049,7 +3054,7 @@ def PrintCategories():
 
   These are the categories used to filter messages via --filter.
   """
-  sys.stderr.write(''.join('  %s\n' % cat for cat in _ERROR_CATEGORIES))
+  _cpplint_state.output_handle.write(''.join('  %s\n' % cat for cat in _ERROR_CATEGORIES))
   sys.exit(0)
 
 
@@ -3110,7 +3115,7 @@ def main():
 
   # Change stderr to write with replacement characters so we don't die
   # if we try to print something containing non-ASCII characters.
-  sys.stderr = codecs.StreamReaderWriter(sys.stderr,
+  _cpplint_state.output_handle = codecs.StreamReaderWriter(_cpplint_state.output_handle,
                                          codecs.getreader('utf8'),
                                          codecs.getwriter('utf8'),
                                          'replace')

@@ -524,7 +524,7 @@ for directory in directories:
 
 file_to_import.close()
 
-files = glob.glob('tests/unit/test_*')
+files = glob.glob('tests/unit/test_*')+glob.glob('tests/style/*.py')
 env.Install("build", files)
 
 env.Alias('install', ['%s/build' % maus_root_dir])
