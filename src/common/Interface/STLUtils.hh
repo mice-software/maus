@@ -18,6 +18,7 @@
 #ifndef STLUtils_HH
 #define STLUtils_HH
 
+#include <string>
 #include <sstream>
 #include <iomanip>
 
@@ -40,8 +41,8 @@ namespace STLUtils {
 ///     std::vector<int> a,b;\n
 ///     bool test_equal = IterableEquality(a.begin(), a.end(), b.begin(),
 ///                       b.end());\n
-/// 
-/// Can give a segmentation fault if a.begin() is not between a.begin() and 
+///
+/// Can give a segmentation fault if a.begin() is not between a.begin() and
 /// a.end() (inclusive)
 template <class TEMP_ITER>
 bool IterableEquality(TEMP_ITER a_begin, TEMP_ITER a_end,
@@ -88,7 +89,7 @@ inline bool IterableEquality(const TEMP_CLASS& a, const TEMP_CLASS& b);
 /// The following operations must be defined for TEMP_CLASS
 ///   - std::ostream& operator<<(Temp, std::ostream&)
 ///
-template <class TEMP_CLASS> 
+template <class TEMP_CLASS>
 std::string ToStringP(TEMP_CLASS value, int precision);
 
 /// Convert value to a std::string.
@@ -98,7 +99,7 @@ std::string ToStringP(TEMP_CLASS value, int precision);
 /// The following operations must be defined for TEMP_CLASS
 ///   - std::ostream& operator<<(Temp, std::ostream&)
 ///
-template <class TEMP_CLASS> 
+template <class TEMP_CLASS>
 std::string ToString(TEMP_CLASS value);
 
 }  // STLUtils namespace end
@@ -139,7 +140,6 @@ template <class TEMP_CLASS> std::string ToString
   ss << value;
   return ss.str();
 }
-
 }
 
 /// A macro to disallow the copy constructor and operator= functions
