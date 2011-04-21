@@ -125,10 +125,8 @@ void VirtualPlane::FillKinematics(VirtualHit * aHit, const G4Step * aStep) const
   delete [] x_from_end;
 }
 
-double   VirtualPlane::GetIndependentVariable(G4StepPoint* aPoint) const
-{
-  switch (_planeType)
-  {
+double   VirtualPlane::GetIndependentVariable(G4StepPoint* aPoint) const {
+  switch (_planeType) {
     case BTTracker::z: return aPoint->GetPosition()[2];
     case BTTracker::t: return aPoint->GetGlobalTime();
     case BTTracker::symplectic_tau1: return aPoint->GetProperTime();
@@ -204,9 +202,9 @@ void VirtualPlaneManager::VirtualPlanesSteppingAction(const G4Step* aStep)
     {//if I go round e.g. a ring, station number should be (number_of_passes * number_of_stations) + i
       if(_nHits[i]>0)
       {
-        if(_planes[i]->MultipassAlgorithm() == VirtualPlane::new_station)
+        if(_planes[i]->GetMultipassAlgorithm() == VirtualPlane::new_station)
           _planes[i]->BuildNewHit(aStep, _planes.size()*_nHits[i]+i+1);
-        if(_planes[i]->MultipassAlgorithm() == VirtualPlane::same_station)
+        if(_planes[i]->GetMultipassAlgorithm() == VirtualPlane::same_station)
           _planes[i]->BuildNewHit(aStep, i+1);
       }
       else

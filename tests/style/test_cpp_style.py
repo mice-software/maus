@@ -286,7 +286,7 @@ os.path.join('src', 'map', 'MapCppTrackerDigitization'),
 os.path.join('src', 'map', 'MapCppPrint'),
 os.path.join('tests', 'cpp_unit'),
 os.path.join('tests', 'style'),
-]+glob_maus_root_dir(os.path.join('src', '*', '*', 'build')+ \
+]+glob_maus_root_dir(os.path.join('src', '*', '*', 'build')
 )
 
 # exclude_files are files that are explicitly excluded from the style check,

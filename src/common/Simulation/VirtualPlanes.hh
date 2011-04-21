@@ -73,8 +73,8 @@ class VirtualPlane
    *  @params globalCoordinates set to True to record output in
    *          globalCoordinates; set to False to record output in the translated
    *          and rotated frame of the Virtual
-   *  @params independent variable (z, t, tau, u) at which the VirtualPlane will
-   *          register hits
+   *  @params independent variable (z, t, tau_field, u) at which the
+   *          VirtualPlane will register hits
    *  @params type independent variable type; either z (z-axis position), t
    *          (time), tau (proper time), u (position in rotated coordinates)
    *  @params multipass_handler set how we handle multiple passes. If set to
@@ -87,25 +87,38 @@ class VirtualPlane
   static VirtualPlane BuildVirtualPlane (CLHEP::HepRotation rot, CLHEP::Hep3Vector pos, double radialExtent, bool globalCoordinates, 
                                          double indie, BTTracker::var type, multipass_handler mp, bool allowBackwards);
 
+  /** @brief Return the independent variable for the point
+   *
+   *  Calculate the independent variable for aPoint; either the time, proper
+   *  time, z-position, or z-position in the rotated coordinate system
+   */
+  double GetIndependentVariable(G4StepPoint* aPoint) const;
+
+  /** @brief Return true if aStep steps over the virtual plane
+   *
+   *  Calculate the independent variable for aStep pre and post points; return
+   *  true if the points straddle the virtual plane; note that if allow
+   *  backwards is "false" then we also have condition that post point has to be
+   *  after the virtual plane and pre point has to be before the virtual plane 
+   */
   bool SteppingOver(const G4Step* aStep) const;
   //Fill data into the Hit
   void BuildNewHit (const G4Step * aStep, int station) const;
   //Algorithm for handling of multiple passes
-  multipass_handler MultipassAlgorithm() {return _multipass;}
+  multipass_handler GetMultipassAlgorithm() {return _multipass;}
 
   static bool ComparePosition(VirtualPlane* p1, VirtualPlane* p2) {return p1->_independentVariable < p2->_independentVariable;}
+
+  bool InRadialCut   (CLHEP::Hep3Vector position) const;
 
 private:
   //Build a new hit and send it to the MICEEvent
   void FillBField    (VirtualHit * aHit, const G4Step * aStep) const;
   void FillStaticData(VirtualHit * aHit, const G4Step * aStep) const;
   void FillKinematics(VirtualHit * aHit, const G4Step * aStep) const;
-  bool InRadialCut   (CLHEP::Hep3Vector position) const;
 
   double*   Integrate       (G4StepPoint* aPoint) const;
   double*   ExtractPointData(G4StepPoint* aPoint) const;
-
-  double    GetIndependentVariable(G4StepPoint* aPoint) const; //extract the value of the point's independent variable, z,u or t
 
   BTTracker::var     _planeType;
   int                _numberOfPasses;
