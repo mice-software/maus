@@ -284,9 +284,10 @@ exclude_dirs = [
 os.path.join('src', 'map', 'MapCppTOFDigitization'),
 os.path.join('src', 'map', 'MapCppTrackerDigitization'),
 os.path.join('src', 'map', 'MapCppPrint'),
-#os.path.join('tests', 'cpp_unit'),
+os.path.join('tests', 'cpp_unit'),
 os.path.join('tests', 'style'),
-]+glob_maus_root_dir(os.path.join('src', 'map', '*', 'build'))
+]+glob_maus_root_dir(os.path.join('src', '*', '*', 'build')+ \
+)
 
 # exclude_files are files that are explicitly excluded from the style check,
 # usually legacy code that hasn't been cleaned up yet. Note you MUST get
