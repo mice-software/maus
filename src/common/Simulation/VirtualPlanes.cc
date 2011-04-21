@@ -38,10 +38,16 @@ VirtualPlane VirtualPlane::BuildVirtualPlane(CLHEP::HepRotation rot, CLHEP::Hep3
   vp._position  = pos;
   vp._rotation  = rot;
   vp._independentVariable  = indie; //maybe! should be the same as GetIndependentVariable(...) for u
-  vp._radialExtent         = radialExtent; //maybe! should be the same as GetIndependentVariable(...) for u
+  vp._radialExtent         = radialExtent;
   vp._globalCoordinates    = globalCoordinates;
   vp._multipass            = pass;
   vp._allowBackwards       = allowBackwards;
+  if (type != BTTracker::tau_field && type != BTTracker::u && 
+      type != BTTracker::z && type != BTTracker::t) {
+    throw(Squeal(Squeal::recoverable, 
+                 "Virtual plane type not implemented",
+                 "VirtualPlane::BuildVirtualPlane(...)"));
+  }
   return vp;
 }
 
@@ -129,9 +135,9 @@ double   VirtualPlane::GetIndependentVariable(G4StepPoint* aPoint) const {
   switch (_planeType) {
     case BTTracker::z: return aPoint->GetPosition()[2];
     case BTTracker::t: return aPoint->GetGlobalTime();
-    case BTTracker::symplectic_tau1: return aPoint->GetProperTime();
+    case BTTracker::tau_field: return aPoint->GetProperTime();
     case BTTracker::u: return ( _rotation*(aPoint->GetPosition() - _position)  )[2]; //update RotatedVirtualPlane(...) if this changes
-    default:           return 0.;
+    default: return 0.;
   }
 }
 
