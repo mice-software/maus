@@ -33,17 +33,60 @@ class MiceModule;
 
 class VirtualPlane
 {
-public:
-  //Somewhat experimental, trying static initialisers instead of constructors
-  //The problem is that if I have several constructors that need the same initialisation object(s), there is no elegant way to distinguish
+  /** @class VirtualPlane
+   *
+   *  Looks for steps in the geant4 data that straddle one of our virtual 
+   *  planes. Then integrate (track) off the plane to the virtual plane. We
+   *  track from both the PreStepPoint forwards and the PostStepPoint backwards.
+   *  We take the  average (thus getting average of any stochastic processes on
+   *  the step).
+   */
+
+ public:
+  /** enumeration to control how VirtualPlane handles the interpolation between
+   *  step start and end
+   */
   enum stepping{integrate, linear_interpolate};
+
+  /** enumeration to control how VirtualPlane handles multiple hits on the same
+   *  station
+   */
   enum multipass_handler{ignore, new_station, same_station};
 
+  /** @brief Default constructor initialises to 0. 
+   */
   VirtualPlane ();
+
+  /** @brief Destructor; no memory allocated so does nothing. 
+   */
   ~VirtualPlane() {}
+
+  // BUG - do constructor then init function - more "standard"
+
+  /** @brief Set up a VirtualPlane 
+   *
+   *  @params rot Rotation of the VirtualPlane
+   *  @params pos Position of the VirtualPlane used to calculate independent
+   *          variable and apply radial cuts
+   *  @params radialExtent radial extent of the virtual plane; set to negative
+   *          to make no radial cut
+   *  @params globalCoordinates set to True to record output in
+   *          globalCoordinates; set to False to record output in the translated
+   *          and rotated frame of the Virtual
+   *  @params independent variable (z, t, tau, u) at which the VirtualPlane will
+   *          register hits
+   *  @params type independent variable type; either z (z-axis position), t
+   *          (time), tau (proper time), u (position in rotated coordinates)
+   *  @params multipass_handler set how we handle multiple passes. If set to
+   *          ignore, only first hit is registered; if set to new_station, we
+   *          make a new station with station = N(stations)*N(hits)+station; if
+   *          set to same_station, just record the hit as normal
+   *  @params allowBackwards; set to True to register hits for backwards going
+   *          particles as well as forwards going particles.
+   */
   static VirtualPlane BuildVirtualPlane (CLHEP::HepRotation rot, CLHEP::Hep3Vector pos, double radialExtent, bool globalCoordinates, 
                                          double indie, BTTracker::var type, multipass_handler mp, bool allowBackwards);
-  //return true if the step is stepping over this plane
+
   bool SteppingOver(const G4Step* aStep) const;
   //Fill data into the Hit
   void BuildNewHit (const G4Step * aStep, int station) const;
@@ -80,24 +123,84 @@ private:
   friend class VirtualPlaneManager;
 };
 
+/** @class VirtualPlaneManager
+ *
+ *  Manages the VirtualPlanes - handles interface with MiceModules and mapping
+ *  from station number to MiceModule* (used by Optics optimiser for example).
+ */
+
 class VirtualPlaneManager
 {
 public:
+  // BUG leaks virtual planes and potentially _field
+  // BUG can leave floating _instance; should set _instance to NULL if this==_instance
+
+  /** @brief Destructor - Does nothing
+   */
   ~VirtualPlaneManager()      {;}
+
+  // BUG can we call this getInstance
+
+  /** @brief Call the singleton VirtualPlaneManager
+   *
+   *  Return a pointer to the VirtualPlaneManager. If the VirtualPlaneManager
+   *  does not exist, this will new the VirtualPlaneManager; but need to call
+   *  ConstructVirtualPlanes(...) to set up VirtualPlanes.
+   */
   static VirtualPlaneManager* getVirtualPlaneManager();
 
-  //read in a step, see if it has crossed a plane
-  //this wants to be quick!
+  /** @brief Construct the VirtualPlanes
+   *
+   *  Looks through the MiceModules for VirtualPlanes and builds them.
+   *
+   *  @params field pointer to the global field group. If this is NULL, will
+   *          make an empty field.
+   *  @params model pointer to the global model. Will construct virtual planes
+   *          off any Module with "PropertyString SensitiveDetector Envelope" or
+   *          "PropertyString SensitiveDetector Virtual"
+   */
   static void ConstructVirtualPlanes(BTField* field, MiceModule* model);
+
+  /** @brief Check to see if a step straddles a VirtualPlane
+   *
+   *  Looks through the list of virtual planes and checks if the step straddles
+   *  the plane
+   *
+   *  @params aStep Check whether presteppoint and poststeppoint sit on either
+   *          side of one (or more) virtual planes; try to find the VirtualHit
+   *          if this is the case
+   */
   static void VirtualPlanesSteppingAction(const G4Step * aStep);
+
+  /** @brief Clear record of Virtual Hits for the next track
+   *
+   *  Each VirtualPlane stores an index of the number of hits. This is used e.g.
+   * to allocate station number and reject hits if the multipass_handler is set
+   * to 0.
+   */
   static void StartOfEvent();
 
+  // BUG rename to GetField()
+  /** @brief Return a pointer to the field object used for tracking
+   */
   static BTField* Field()               { return _field;}
+
+  // BUG rename to SetField()
+  /** @brief Set the pointer to the field object used for tracking
+   */
   static BTField* Field(BTField* field) {_field = field; VirtualPlane::_field = field; return _field;}
 
-  static std::string         ModuleName   (int stationNumber); //map from module name to station number
-  static const MiceModule*   Module       (int stationNumber); //map from module name to station number
-  static int                 StationNumber(const MiceModule* module); //map from station number to module name
+  /** @brief Get a string that stores the MiceModule based on StationNumber
+   */
+  static std::string         ModuleName   (int stationNumber);
+
+  /** @brief Get a pointer to the MiceModule based on StationNumber
+   */
+  static const MiceModule*   Module       (int stationNumber);
+
+  /** @brief Get the StationNumber based on a pointer to the MiceModule
+   */
+  static int                 StationNumber(const MiceModule* module);
 private:
   VirtualPlaneManager() {;}
   static VirtualPlane ConstructFromModule(const MiceModule* mod);

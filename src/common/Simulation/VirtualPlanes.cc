@@ -24,7 +24,6 @@ VirtualPlane::VirtualPlane()
   _planeType      = BTTracker::z;
   _numberOfPasses = 0;
   _step           = 0.1;
-  _field          = NULL;
   _position       = CLHEP::Hep3Vector(0.,0.,0.);
   _rotation       = CLHEP::HepRotation();
   _radialExtent   = -1;
@@ -189,7 +188,7 @@ std::map<VirtualPlane*, const MiceModule*>  VirtualPlaneManager::_mods;
 
 VirtualPlaneManager* VirtualPlaneManager::getVirtualPlaneManager()
 {
-  if(_instance == NULL) 
+  if(_instance == NULL)
   {
     _instance = new VirtualPlaneManager(); //MUST CALL ConstructVirtualPlanes to do anything useful!
     return _instance;

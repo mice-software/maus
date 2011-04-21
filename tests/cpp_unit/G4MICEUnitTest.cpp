@@ -57,7 +57,6 @@ int main(int argc, char **argv) {
 
   ::testing::InitGoogleTest(&argc, argv);
   int test_out = RUN_ALL_TESTS();
-  std::cerr << "WARNING - MiceModule test was disabled - see #368" << std::endl;
   return test_out;
 }
 
