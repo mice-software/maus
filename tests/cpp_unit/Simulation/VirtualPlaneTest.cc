@@ -17,26 +17,34 @@
 
 #include "gtest/gtest.h"
 
+#include "G4Step.hh"
 #include "G4StepPoint.hh"
+#include "G4ParticleTable.hh"
 
 #include "CLHEP/Vector/Rotation.h"
 #include "CLHEP/Vector/ThreeVector.h"
 
 #include "src/common/Simulation/VirtualPlanes.hh"
+#include "src/common/Config/MiceModule.hh"
+#include "src/common/BeamTools/BTConstantField.hh"
 #include "src/common/Interface/Squeal.hh"
+#include "src/common/Interface/VirtualHit.hh"
+
+// FORCE G4 setup first so that we can make G4 particle table ok
+#include "tests/cpp_unit/Simulation/MAUSGeant4ManagerTest.cpp"
 
 namespace {
 class VirtualPlaneTest : public ::testing::Test {
  protected:
   VirtualPlaneTest() : pos(1., -2., 6.) {
     rot.set(CLHEP::Hep3Vector(-1.,-1.,-1.), 235./360.*2.*CLHEP::pi);
-    vp_z = VirtualPlane::BuildVirtualPlane(rot, pos, 1., true, 5., BTTracker::z,
+    vp_z = VirtualPlane::BuildVirtualPlane(rot, pos, 100., true, 5., BTTracker::z,
                                                     VirtualPlane::ignore, true);
-    vp_u = VirtualPlane::BuildVirtualPlane(rot, pos, 1., true, 5., BTTracker::u,
+    vp_u = VirtualPlane::BuildVirtualPlane(rot, pos, 100., true, 5., BTTracker::u,
                                                     VirtualPlane::ignore, true);
-    vp_t = VirtualPlane::BuildVirtualPlane(rot, pos, 1., true, 5., BTTracker::t,
+    vp_t = VirtualPlane::BuildVirtualPlane(rot, pos, 100., true, 5., BTTracker::t,
                                                     VirtualPlane::ignore, true);
-    vp_tau = VirtualPlane::BuildVirtualPlane(rot, pos, 1., true, 5.,
+    vp_tau = VirtualPlane::BuildVirtualPlane(rot, pos, 100., true, 5.,
                               BTTracker::tau_field, VirtualPlane::ignore, true);
   }
   virtual ~VirtualPlaneTest() {}
@@ -67,28 +75,94 @@ TEST_F(VirtualPlaneTest, GetIndependentVariableZTest) {
   EXPECT_NEAR(vp_t.GetIndependentVariable(&point1), 4., 1e-3);
   EXPECT_NEAR(vp_tau.GetIndependentVariable(&point1), 5., 1e-3);
 
-  CLHEP::Hep3Vector particle_vec = xyz-pos; //vector from plane to point
-  CLHEP::Hep3Vector plane_normal = rot.inverse()*CLHEP::Hep3Vector(0,0,1); //BUG just a bit worried that this is rot.inverse()
+  CLHEP::Hep3Vector particle_vec = xyz-pos; // vector from plane to point
+  CLHEP::Hep3Vector plane_normal = rot.inverse()*CLHEP::Hep3Vector(0,0,1); // BUG just a bit worried that this is rot.inverse()
   
-  EXPECT_NEAR(vp_u.GetIndependentVariable(&point1), plane_normal.dot(particle_vec), 1e-3);
+  EXPECT_NEAR(vp_u.GetIndependentVariable(&point1), plane_normal.dot(particle_vec), 1e-3); 
 }
 
 TEST_F(VirtualPlaneTest, SteppingOverTest) {
-  G4StepPoint point[] = {G4StepPoint, G4StepPoint, G4StepPoint};
-  for (int i = 0; i < 3; ++i) {
-    G4Step step
-    CLHEP::Hep3Vector xyz(1,2,3);
-    point[1.SetPosition(xyz*(i+1.));
-    point1.SetGlobalTime(scale*(i+1.));
-    point1.SetProperTime(scale*(i+1.));
-  }
-  EXPECT_TRUE(vp_z.SteppingOver(&point[0], ));
-
-  CLHEP::Hep3Vector particle_vec = xyz-pos; //vector from plane to point
-  CLHEP::Hep3Vector plane_normal = rot.inverse()*CLHEP::Hep3Vector(0,0,1); //BUG just a bit worried that this is rot.inverse()
-  EXPECT_NEAR(vp_u.GetIndependentVariable(&point1), plane_normal.dot(particle_vec), 1e-3);
-
+  G4Step step;
+  step.SetPreStepPoint(new G4StepPoint()); // deleted by step
+  step.SetPostStepPoint(new G4StepPoint());
+  step.GetPreStepPoint()->SetGlobalTime(4.);
+  step.GetPostStepPoint()->SetGlobalTime(6.);
+  EXPECT_TRUE(vp_t.SteppingOver(&step));
+  step.GetPreStepPoint()->SetGlobalTime(6.);
+  step.GetPostStepPoint()->SetGlobalTime(4.);
+  EXPECT_TRUE(vp_t.SteppingOver(&step));
+  vp_t = VirtualPlane::BuildVirtualPlane(rot, pos, 1., true, 5., BTTracker::t,
+                                                  VirtualPlane::ignore, false);
+  EXPECT_FALSE(vp_t.SteppingOver(&step));
+  step.GetPreStepPoint()->SetGlobalTime(3.);
+  step.GetPostStepPoint()->SetGlobalTime(4.);
+  EXPECT_FALSE(vp_t.SteppingOver(&step));
+  step.GetPreStepPoint()->SetGlobalTime(6.);
+  step.GetPostStepPoint()->SetGlobalTime(7.);
+  EXPECT_FALSE(vp_t.SteppingOver(&step));
+  step.GetPreStepPoint()->SetGlobalTime(5.);
+  step.GetPostStepPoint()->SetGlobalTime(6.);
+  EXPECT_TRUE(vp_t.SteppingOver(&step));
+  step.GetPreStepPoint()->SetGlobalTime(4.); // don't record these ones twice
+  step.GetPostStepPoint()->SetGlobalTime(5.);
+  EXPECT_FALSE(vp_t.SteppingOver(&step));
 }
+
+TEST_F(VirtualPlaneTest, BuildNewHitTest) {
+  BTConstantField field(10., 100., CLHEP::Hep3Vector(0, 0, 0.001)); // 1 Tesla
+  MiceModule mod;
+  VirtualPlaneManager::ConstructVirtualPlanes(&field, MICERun::getInstance()->miceModule);
+  G4ParticleDefinition* pd = 
+                       G4ParticleTable::GetParticleTable()->FindParticle(-13);
+  G4DynamicParticle* dyn =
+                      new G4DynamicParticle(pd, G4ThreeVector(1., 2., 3.));
+  G4Track* track = new G4Track(dyn, 7., G4ThreeVector(4., 5., 6.));
+  G4Step*  step  = new G4Step();
+  track->SetStep(step);
+  step->SetTrack(track);
+  step->SetPreStepPoint(new G4StepPoint());
+  step->SetPostStepPoint(new G4StepPoint());
+  track->SetTrackID(10);
+
+  step->GetPreStepPoint()->SetGlobalTime(1.);
+  step->GetPreStepPoint()->SetPosition(CLHEP::Hep3Vector(2.,3.,4.));
+  step->GetPreStepPoint()->SetMass(dyn->GetMass());
+  step->GetPreStepPoint()->SetKineticEnergy(100.);
+  step->GetPreStepPoint()->SetMomentumDirection(CLHEP::Hep3Vector(0.,0.1,1.)/sqrt(1.01));
+
+  step->GetPostStepPoint()->SetGlobalTime(2.);
+  step->GetPostStepPoint()->SetPosition(CLHEP::Hep3Vector(3.,4.,8.));
+  step->GetPostStepPoint()->SetMass(dyn->GetMass());
+  step->GetPostStepPoint()->SetKineticEnergy(110.);
+  step->GetPostStepPoint()->SetMomentumDirection(CLHEP::Hep3Vector(0., 0.1, 1.)/sqrt(1.01));
+
+  VirtualHit hit = vp_z.BuildNewHit(step, 99);
+
+  EXPECT_NEAR(hit.GetPos().x(), 2.25, 1e-2);
+  EXPECT_NEAR(hit.GetPos().y(), 3.25, 1e-2);
+  EXPECT_NEAR(hit.GetPos().z(), 5.,  1e-6);
+  CLHEP::Hep3Vector p = hit.GetMomentum();
+  EXPECT_NEAR(hit.GetEnergy(), 102.5+dyn->GetMass(),  1e-1);
+  double p_tot = sqrt(hit.GetEnergy()*hit.GetEnergy()-dyn->GetMass()*dyn->GetMass());
+  // transport through B-field should conserve ptrans and pz
+  EXPECT_NEAR(sqrt(p.x()*p.x()+p.y()*p.y()), p_tot*0.1/sqrt(1.01), 1e-2);
+  EXPECT_NEAR(p.z(), p_tot*1./sqrt(1.01),  1e-6);
+  EXPECT_EQ(hit.GetStationNumber(), 99);
+  EXPECT_EQ(hit.GetTrackID(), 10);
+  EXPECT_NEAR(hit.GetTime(), 1.25, 1e-3); // not quite as v_z b4/after is different - but near enough
+  EXPECT_EQ(hit.GetPID(), -13);
+  EXPECT_EQ(hit.GetMass(), dyn->GetMass());
+  EXPECT_NEAR(hit.GetBField().x(), 0, 1e-9);
+  EXPECT_NEAR(hit.GetBField().y(), 0, 1e-9);
+  EXPECT_NEAR(hit.GetBField().z(), 1e-3, 1e-9);
+  EXPECT_NEAR(hit.GetEField().x(), 0, 1e-9);
+  EXPECT_NEAR(hit.GetEField().y(), 0, 1e-9);
+  EXPECT_NEAR(hit.GetEField().z(), 0, 1e-9);
+
+  EXPECT_TRUE(false) << "Check radial cut, global coordinates next" << std::endl;
+}
+
+
 
 }
 

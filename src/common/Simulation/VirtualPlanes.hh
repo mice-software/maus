@@ -102,8 +102,26 @@ class VirtualPlane
    *  after the virtual plane and pre point has to be before the virtual plane 
    */
   bool SteppingOver(const G4Step* aStep) const;
-  //Fill data into the Hit
-  void BuildNewHit (const G4Step * aStep, int station) const;
+
+  /** @brief Use the stepping data to build a new hit.
+   *
+   *  Builds a new hit using stepping data. If _stepping is set to integrate,
+   *  uses BTTracker routines and integrates Lorentz equation (or whatever) to
+   *  the plane in z or other independent variable. Then takes the average of
+   *  the tracked pre-step or post-step point, to take account of any tracking
+   *  errors or physics processes (other than basic tracking)
+   *
+   *  If _stepping is set to linear_interpolate, just takes the linear
+   *  interpolation from the pre-step point to the post-step point.
+   *
+   *  If _globalCoordinates is true, builds a hit with coordinates in the global
+   *  system; if false, builds a hit with coordinates relative to the position
+   *  and rotation of the virtual plane.
+   *
+   *  If _radialExtent is positive checks radius of particles (cylindrical
+   *  type radius, in coordinate system of the Virtual Plane).
+   */
+  VirtualHit BuildNewHit (const G4Step * aStep, int station) const;
   //Algorithm for handling of multiple passes
   multipass_handler GetMultipassAlgorithm() {return _multipass;}
 

@@ -27,7 +27,7 @@ VirtualPlane::VirtualPlane()
   _position       = CLHEP::Hep3Vector(0.,0.,0.);
   _rotation       = CLHEP::HepRotation();
   _radialExtent   = -1;
-  _independentVariable = 0.; 
+  _independentVariable = 0.;
   _globalCoordinates   = false;
 }
 
@@ -163,22 +163,20 @@ double * VirtualPlane::Integrate(G4StepPoint* aPoint) const
   return x_in;
 }
 // 
-void VirtualPlane::BuildNewHit(const G4Step * aStep, int station) const
+VirtualHit VirtualPlane::BuildNewHit(const G4Step * aStep, int station) const
 {
-  try
-  {
-    VirtualHit * aHit = new VirtualHit();
-    simEvent.virtualHits.push_back(aHit);
-    FillStaticData(aHit, aStep);
-    FillKinematics(aHit, aStep);
-    FillBField    (aHit, aStep);
-    aHit->SetStationNumber(station);
+  VirtualHit aHit;
+  try {
+    FillStaticData(&aHit, aStep);
+    FillKinematics(&aHit, aStep);
+    FillBField    (&aHit, aStep);
+    aHit.SetStationNumber(station);
   }
-  catch(Squeal squee) 
-  {
-    if(squee.GetErrorLevel()==Squeal::nonRecoverable) throw squee; 
-    else {delete simEvent.virtualHits.back(); simEvent.virtualHits.pop_back();}
+  catch(Squeal squee) {
+    if(squee.GetErrorLevel()==Squeal::nonRecoverable) throw squee;
+    throw squee;
   } //catch e.g. tracking errors; don't record a hit in this case
+  return aHit;
 }
 
 //////////////////////// VirtualPlaneManager //////////////////////////
