@@ -83,7 +83,7 @@ TEST_F(VirtualPlaneTest, GetIndependentVariableZTest) {
 
 TEST_F(VirtualPlaneTest, SteppingOverTest) {
   G4Step step;
-  step.SetPreStepPoint(new G4StepPoint()); // deleted by step
+  step.SetPreStepPoint(new G4StepPoint());  // deleted by step
   step.SetPostStepPoint(new G4StepPoint());
   step.GetPreStepPoint()->SetGlobalTime(4.);
   step.GetPostStepPoint()->SetGlobalTime(6.);
@@ -103,21 +103,18 @@ TEST_F(VirtualPlaneTest, SteppingOverTest) {
   step.GetPreStepPoint()->SetGlobalTime(5.);
   step.GetPostStepPoint()->SetGlobalTime(6.);
   EXPECT_TRUE(vp_t.SteppingOver(&step));
-  step.GetPreStepPoint()->SetGlobalTime(4.); // don't record these ones twice
+  step.GetPreStepPoint()->SetGlobalTime(4.);  // don't record these ones twice
   step.GetPostStepPoint()->SetGlobalTime(5.);
   EXPECT_FALSE(vp_t.SteppingOver(&step));
 }
 
-TEST_F(VirtualPlaneTest, BuildNewHitTest) {
-  BTConstantField field(10., 100., CLHEP::Hep3Vector(0, 0, 0.001)); // 1 Tesla
-  MiceModule mod;
-  VirtualPlaneManager::ConstructVirtualPlanes(&field, MICERun::getInstance()->miceModule);
+G4Track* SetG4TrackAndStep(G4Step* step) {
   G4ParticleDefinition* pd = 
                        G4ParticleTable::GetParticleTable()->FindParticle(-13);
   G4DynamicParticle* dyn =
                       new G4DynamicParticle(pd, G4ThreeVector(1., 2., 3.));
   G4Track* track = new G4Track(dyn, 7., G4ThreeVector(4., 5., 6.));
-  G4Step*  step  = new G4Step();
+
   track->SetStep(step);
   step->SetTrack(track);
   step->SetPreStepPoint(new G4StepPoint());
@@ -135,15 +132,27 @@ TEST_F(VirtualPlaneTest, BuildNewHitTest) {
   step->GetPostStepPoint()->SetMass(dyn->GetMass());
   step->GetPostStepPoint()->SetKineticEnergy(110.);
   step->GetPostStepPoint()->SetMomentumDirection(CLHEP::Hep3Vector(0., 0.1, 1.)/sqrt(1.01));
+  return track;
+}
 
+TEST_F(VirtualPlaneTest, BuildNewHitTest) {  // sorry this is a long one...
+  VirtualPlane vp_z_local = VirtualPlane::BuildVirtualPlane(rot, pos, 100.,
+                          false, 5., BTTracker::z, VirtualPlane::ignore, true);
+
+  BTConstantField field(10., 100., CLHEP::Hep3Vector(0, 0, 0.001)); // 1 Tesla
+  MiceModule mod;
+  VirtualPlaneManager::ConstructVirtualPlanes(&field, MICERun::getInstance()->miceModule);
+  G4Step*  step  = new G4Step();
+  G4Track* track = SetG4TrackAndStep(step);
   VirtualHit hit = vp_z.BuildNewHit(step, 99);
+  double     mass = step->GetPreStepPoint()->GetMass();
 
   EXPECT_NEAR(hit.GetPos().x(), 2.25, 1e-2);
   EXPECT_NEAR(hit.GetPos().y(), 3.25, 1e-2);
   EXPECT_NEAR(hit.GetPos().z(), 5.,  1e-6);
   CLHEP::Hep3Vector p = hit.GetMomentum();
-  EXPECT_NEAR(hit.GetEnergy(), 102.5+dyn->GetMass(),  1e-1);
-  double p_tot = sqrt(hit.GetEnergy()*hit.GetEnergy()-dyn->GetMass()*dyn->GetMass());
+  EXPECT_NEAR(hit.GetEnergy(), 102.5+mass,  1e-1);
+  double p_tot = sqrt(hit.GetEnergy()*hit.GetEnergy()-mass*mass);
   // transport through B-field should conserve ptrans and pz
   EXPECT_NEAR(sqrt(p.x()*p.x()+p.y()*p.y()), p_tot*0.1/sqrt(1.01), 1e-2);
   EXPECT_NEAR(p.z(), p_tot*1./sqrt(1.01),  1e-6);
@@ -151,7 +160,7 @@ TEST_F(VirtualPlaneTest, BuildNewHitTest) {
   EXPECT_EQ(hit.GetTrackID(), 10);
   EXPECT_NEAR(hit.GetTime(), 1.25, 1e-3); // not quite as v_z b4/after is different - but near enough
   EXPECT_EQ(hit.GetPID(), -13);
-  EXPECT_EQ(hit.GetMass(), dyn->GetMass());
+  EXPECT_EQ(hit.GetMass(), mass);
   EXPECT_NEAR(hit.GetBField().x(), 0, 1e-9);
   EXPECT_NEAR(hit.GetBField().y(), 0, 1e-9);
   EXPECT_NEAR(hit.GetBField().z(), 1e-3, 1e-9);
@@ -159,11 +168,49 @@ TEST_F(VirtualPlaneTest, BuildNewHitTest) {
   EXPECT_NEAR(hit.GetEField().y(), 0, 1e-9);
   EXPECT_NEAR(hit.GetEField().z(), 0, 1e-9);
 
-  EXPECT_TRUE(false) << "Check radial cut, global coordinates next" << std::endl;
+  step->GetPreStepPoint()->SetPosition(CLHEP::Hep3Vector(2e6, 3., 4.));
+  EXPECT_THROW(vp_z.BuildNewHit(step, 99), Squeal); //outside radial cut
+  step->GetPreStepPoint()->SetPosition(CLHEP::Hep3Vector(2, 3., 4.));
+
+  VirtualHit hit_l = vp_z_local.BuildNewHit(step, 99);
+
+  CLHEP::Hep3Vector h_pos = rot*(hit.GetPos() - pos);
+  CLHEP::Hep3Vector h_mom = rot*hit.GetMomentum();
+  CLHEP::Hep3Vector h_b   = rot*hit.GetBField();
+  EXPECT_NEAR(hit_l.GetPos().x(), h_pos.x(), 1e-6);
+  EXPECT_NEAR(hit_l.GetPos().y(), h_pos.y(), 1e-6);
+  EXPECT_NEAR(hit_l.GetPos().z(), h_pos.z(), 1e-6);
+
+  EXPECT_NEAR(hit_l.GetMomentum().x(), h_mom.x(), 1e-6);
+  EXPECT_NEAR(hit_l.GetMomentum().y(), h_mom.y(), 1e-6);
+  EXPECT_NEAR(hit_l.GetMomentum().z(), h_mom.z(), 1e-6);
+
+  EXPECT_NEAR(hit_l.GetBField().x(), h_b.x(), 1e-6);
+  EXPECT_NEAR(hit_l.GetBField().y(), h_b.y(), 1e-6);
+  EXPECT_NEAR(hit_l.GetBField().z(), h_b.z(), 1e-6);
 }
 
+TEST_F(VirtualPlaneTest, ComparePositionTest) {
+  VirtualPlane vp_z_1 = VirtualPlane::BuildVirtualPlane(rot, pos, 100.,
+                          false, 5., BTTracker::z, VirtualPlane::ignore, true);
+  VirtualPlane vp_z_2 = VirtualPlane::BuildVirtualPlane(rot, pos, 100.,
+                          false, 5.1, BTTracker::z, VirtualPlane::ignore, true);
 
-
+  EXPECT_TRUE(VirtualPlane::ComparePosition(&vp_z_1, &vp_z_2));
 }
 
+TEST_F(VirtualPlaneTest, InRadialCutTest) {
+  VirtualPlane vp_z_no_cut = VirtualPlane::BuildVirtualPlane(rot, pos, 0.,
+                          false, 5., BTTracker::z, VirtualPlane::ignore, true);
+  // position in local coords
+  CLHEP::Hep3Vector pos_in(99./sqrt(2), 99./sqrt(2), 0.);
+  CLHEP::Hep3Vector pos_out(100.1/sqrt(2), 100.1/sqrt(2), 0.);
+  pos_in  = rot.inverse()*pos_in+pos;
+  pos_out = rot.inverse()*pos_out+pos;
+  EXPECT_TRUE(vp_z.InRadialCut(pos_in));
+  EXPECT_TRUE(!vp_z.InRadialCut(pos_out));
+  EXPECT_TRUE(vp_z_no_cut.InRadialCut(pos_out));
+}
+
+}  // namespace
 

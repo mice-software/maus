@@ -89,12 +89,16 @@ class VirtualPlane
 
   /** @brief Return the independent variable for the point
    *
+   *  @params aPoint calculate independent variable for this StepPoint
+   *
    *  Calculate the independent variable for aPoint; either the time, proper
    *  time, z-position, or z-position in the rotated coordinate system
    */
   double GetIndependentVariable(G4StepPoint* aPoint) const;
 
   /** @brief Return true if aStep steps over the virtual plane
+   *
+   *  @params aStep check if plane is between Pre and Post step
    *
    *  Calculate the independent variable for aStep pre and post points; return
    *  true if the points straddle the virtual plane; note that if allow
@@ -104,6 +108,10 @@ class VirtualPlane
   bool SteppingOver(const G4Step* aStep) const;
 
   /** @brief Use the stepping data to build a new hit.
+   *
+   *  @params aStep interpolate between Pre and Post step to find the hit
+   *  @params station set the station number (station number is handled by the
+   *          VirtualPlaneManager right now)
    *
    *  Builds a new hit using stepping data. If _stepping is set to integrate,
    *  uses BTTracker routines and integrates Lorentz equation (or whatever) to
@@ -116,17 +124,31 @@ class VirtualPlane
    *
    *  If _globalCoordinates is true, builds a hit with coordinates in the global
    *  system; if false, builds a hit with coordinates relative to the position
-   *  and rotation of the virtual plane.
+   *  and rotation of the virtual plane (position, momentum, fields)
    *
    *  If _radialExtent is positive checks radius of particles (cylindrical
    *  type radius, in coordinate system of the Virtual Plane).
    */
   VirtualHit BuildNewHit (const G4Step * aStep, int station) const;
-  //Algorithm for handling of multiple passes
+
+  /** @brief returns the algorithm used for handling multiple passes
+   */
   multipass_handler GetMultipassAlgorithm() {return _multipass;}
 
+  /** @brief Comparator for sorting by independent variable
+   */
   static bool ComparePosition(VirtualPlane* p1, VirtualPlane* p2) {return p1->_independentVariable < p2->_independentVariable;}
 
+  /** @brief Return true if a position is inside the radial cut
+   *
+   *  @params position transform to local coordinates and use the radius (given
+   *          by r**2 = x**2+y**2) to perform a cut
+   *
+   *  Uses the _radialExtent to perform the cut; if _radialExtent <= 0., does
+   *  nothing,
+   *
+   *  @returns true if the particle is in the cut
+   */
   bool InRadialCut   (CLHEP::Hep3Vector position) const;
 
 private:
@@ -134,6 +156,8 @@ private:
   void FillBField    (VirtualHit * aHit, const G4Step * aStep) const;
   void FillStaticData(VirtualHit * aHit, const G4Step * aStep) const;
   void FillKinematics(VirtualHit * aHit, const G4Step * aStep) const;
+
+  void TransformToLocalCoordinates(VirtualHit* aHit) const;
 
   double*   Integrate       (G4StepPoint* aPoint) const;
   double*   ExtractPointData(G4StepPoint* aPoint) const;

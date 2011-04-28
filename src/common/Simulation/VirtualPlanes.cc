@@ -1,6 +1,22 @@
+/* This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
+ *
+ * MAUS is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MAUS is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "Simulation/VirtualPlanes.hh"
 #include "Interface/VirtualHit.hh"
-#include "Interface/MICEEvent.hh"
 #include "Config/MiceModule.hh"
 #include "Interface/Squeal.hh"
 
@@ -11,8 +27,6 @@
 #include "G4Track.hh"
 #include "G4Step.hh"
 #include "G4StepPoint.hh"
-
-extern MICEEvent simEvent;
 
 BTField*               VirtualPlane::_field    = NULL;
 VirtualPlane::stepping VirtualPlane::_stepping = VirtualPlane::integrate;
@@ -76,8 +90,8 @@ void VirtualPlane::FillBField(VirtualHit * aHit, const G4Step * aStep) const
   G4double point[4] = {aHit->GetPos()[0], aHit->GetPos()[1], aHit->GetPos()[2], aHit->GetTime()};
   G4double field[6] = {0., 0., 0., 0., 0., 0.};
   _field->GetFieldValue(point, field);
-  aHit->SetBField(ThreeVector(field[0], field[1], field[2]));
-  aHit->SetEField(ThreeVector(field[3], field[4], field[5]));
+  aHit->SetBField(CLHEP::Hep3Vector(field[0], field[1], field[2]));
+  aHit->SetEField(CLHEP::Hep3Vector(field[3], field[4], field[5]));
 }
 
 bool VirtualPlane::InRadialCut(CLHEP::Hep3Vector position) const
@@ -113,22 +127,28 @@ void VirtualPlane::FillKinematics(VirtualHit * aHit, const G4Step * aStep) const
   for(int i=0; i<8; i++)
     x[i] = (x_from_end[i] - x_from_beginning[i])/(indep_end-indep_beg)*(_independentVariable-indep_beg)+x_from_beginning[i];
 
-  if(!InRadialCut(CLHEP::Hep3Vector(x[1],x[2],x[3]))) throw(Squeal(Squeal::recoverable, "Hit outside radial cut", "VirtualPlane::FillKinematics"));
-  CLHEP::Hep3Vector position(x[1],x[2],x[3]);
-  CLHEP::Hep3Vector momentum(x[5],x[6],x[7]);
-  if(!_globalCoordinates) 
-  {
-    position = _rotation*(position - _position);
-    momentum = _rotation*momentum;
-  }
-  aHit->SetPos     (position);
-  aHit->SetMomentum(momentum);
+  aHit->SetPos     (CLHEP::Hep3Vector(x[1],x[2],x[3]));
+  aHit->SetMomentum(CLHEP::Hep3Vector(x[5],x[6],x[7]));
+
   double mass = aStep->GetPostStepPoint()->GetMass();
-  x[4] = sqrt(x[5]*x[5]+x[6]*x[6]+x[7]*x[7]+mass*mass); // FORCE mass shell condition
-  aHit->SetEnergy  (x[4]);
-  aHit->SetTime    (x[0]);
+  x[4] = sqrt(x[5]*x[5]+x[6]*x[6]+x[7]*x[7]+mass*mass);  // FORCE mass shell condition
+  aHit->SetEnergy(x[4]);
+  aHit->SetTime  (x[0]);
   delete [] x_from_beginning;
   delete [] x_from_end;
+
+  if(!InRadialCut(CLHEP::Hep3Vector(x[1],x[2],x[3])))
+    throw(Squeal(Squeal::recoverable, "Hit outside radial cut",  // appropriate?
+                                  "VirtualPlane::FillKinematics"));
+
+}
+
+void VirtualPlane::TransformToLocalCoordinates(VirtualHit* aHit) const {
+  aHit->SetPos( _rotation*(aHit->GetPos() - _position) );
+  aHit->SetMomentum( _rotation*aHit->GetMomentum() );
+  aHit->SetBField( _rotation*aHit->GetBField() );
+  aHit->SetEField( _rotation*aHit->GetEField() );
+  
 }
 
 double   VirtualPlane::GetIndependentVariable(G4StepPoint* aPoint) const {
@@ -171,6 +191,7 @@ VirtualHit VirtualPlane::BuildNewHit(const G4Step * aStep, int station) const
     FillKinematics(&aHit, aStep);
     FillBField    (&aHit, aStep);
     aHit.SetStationNumber(station);
+    if(!_globalCoordinates) TransformToLocalCoordinates(&aHit);
   }
   catch(Squeal squee) {
     if(squee.GetErrorLevel()==Squeal::nonRecoverable) throw squee;
