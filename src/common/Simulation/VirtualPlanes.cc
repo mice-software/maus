@@ -203,16 +203,21 @@ VirtualHit VirtualPlane::BuildNewHit(const G4Step * aStep, int station) const
 //////////////////////// VirtualPlaneManager //////////////////////////
 
 BTField*             VirtualPlaneManager::_field            = NULL;
-VirtualPlaneManager* VirtualPlaneManager::_instance         = VirtualPlaneManager::getVirtualPlaneManager();
+VirtualPlaneManager* VirtualPlaneManager::_instance         = NULL;
 bool                 VirtualPlaneManager::_useVirtualPlanes = false;
 std::vector<VirtualPlane*> VirtualPlaneManager::_planes      = std::vector<VirtualPlane*>(0);
 std::vector<int>           VirtualPlaneManager::_nHits       = std::vector<int>(0); //initialised in StartOfEvent
 std::map<VirtualPlane*, const MiceModule*>  VirtualPlaneManager::_mods;
 
-VirtualPlaneManager* VirtualPlaneManager::getVirtualPlaneManager()
+VirtualPlaneManager::~VirtualPlaneManager() {
+  if (this == _instance) _instance = NULL;
+  for (size_t i = 0; i < _planes.size(); ++i) delete _planes[i];
+  _planes = std::vector<VirtualPlane*>();
+}
+
+VirtualPlaneManager* VirtualPlaneManager::getInstance()
 {
-  if(_instance == NULL)
-  {
+  if(_instance == NULL) {
     _instance = new VirtualPlaneManager(); //MUST CALL ConstructVirtualPlanes to do anything useful!
     return _instance;
   }
@@ -245,8 +250,7 @@ void VirtualPlaneManager::StartOfEvent()
 
 void VirtualPlaneManager::ConstructVirtualPlanes(BTField* field, MiceModule* model)
 {
-  if(_instance == NULL) _instance = new VirtualPlaneManager();
-  _field = field;
+  VirtualPlaneManager::getInstance();
   std::vector<const MiceModule*> modules   = model->findModulesByPropertyString("SensitiveDetector", "Virtual");
   std::vector<const MiceModule*> envelopes = model->findModulesByPropertyString("SensitiveDetector", "Envelope");
   modules.insert(modules.end(), envelopes.begin(), envelopes.end());
@@ -257,7 +261,7 @@ void VirtualPlaneManager::ConstructVirtualPlanes(BTField* field, MiceModule* mod
   }
   sort(_planes.begin(), _planes.end(), VirtualPlane::ComparePosition);
   _useVirtualPlanes = _planes.size() > 0;
-  if(_field == NULL) _field = new BTFieldGroup();
+  _field = field;
   VirtualPlane::_field = _field;
 }
 
@@ -277,18 +281,21 @@ VirtualPlane VirtualPlaneManager::ConstructFromModule(const MiceModule* mod)
     VirtualPlane::multipass_handler pass = VirtualPlane::ignore;
     if(mod->propertyExistsThis("MultiplePasses", "string"))
     {
-      /**/ if(mod->propertyString("MultiplePasses") == "Ignore")      pass = VirtualPlane::ignore;
-      else if(mod->propertyString("MultiplePasses") == "SameStation") pass = VirtualPlane::same_station;
-      else if(mod->propertyString("MultiplePasses") == "NewStation")  pass = VirtualPlane::new_station;
-      else throw(Squeal(Squeal::recoverable, "Did not recognise MultiplePasses option "+mod->propertyStringThis("MultiplePasses")+" in VirtualPlane module "+mod->fullName(), 
-                                             "VirtualPlaneManager::ConstructFromModule") );
+      std::string m_pass = mod->propertyString("MultiplePasses");
+      /**/ if(m_pass == "Ignore")      pass = VirtualPlane::ignore;
+      else if(m_pass == "SameStation") pass = VirtualPlane::same_station;
+      else if(m_pass == "NewStation")  pass = VirtualPlane::new_station;
+      else throw(Squeal(Squeal::recoverable,
+                 "Did not recognise MultiplePasses option "+m_pass, 
+                 "VirtualPlaneManager::ConstructFromModule") );
     }
     if(mod->propertyExistsThis("AllowBackwards", "bool"))
       allowBackwards = mod->propertyBoolThis("AllowBackwards");
 
     BTTracker::var var_enum  = BTTracker::z;
 
-    for(unsigned int i=0; i<variable.size(); i++) variable[i] = tolower(variable[i]);
+    for(unsigned int i=0; i<variable.size(); i++)
+      variable[i] = tolower(variable[i]);
     if     (variable == "time" || variable == "t")
     {
       indie = mod->propertyDoubleThis("PlaneTime");

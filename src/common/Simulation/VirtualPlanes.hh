@@ -188,13 +188,13 @@ class VirtualPlaneManager
 {
 public:
   // BUG leaks virtual planes and potentially _field
-  // BUG can leave floating _instance; should set _instance to NULL if this==_instance
 
-  /** @brief Destructor - Does nothing
+  /** @brief Destructor
+   *
+   *  Sets instance to NULL if this is instance. Does not delete MiceModules or
+   *  field - this is controlled from elsewhere.
    */
-  ~VirtualPlaneManager()      {;}
-
-  // BUG can we call this getInstance
+  ~VirtualPlaneManager();
 
   /** @brief Call the singleton VirtualPlaneManager
    *
@@ -202,7 +202,10 @@ public:
    *  does not exist, this will new the VirtualPlaneManager; but need to call
    *  ConstructVirtualPlanes(...) to set up VirtualPlanes.
    */
-  static VirtualPlaneManager* getVirtualPlaneManager();
+  static VirtualPlaneManager* getInstance();
+  /** @deprecated (synonym for getInstance())
+   */
+  static VirtualPlaneManager* getVirtualPlaneManager() {return getInstance();}
 
   /** @brief Construct the VirtualPlanes
    *
@@ -235,15 +238,13 @@ public:
    */
   static void StartOfEvent();
 
-  // BUG rename to GetField()
   /** @brief Return a pointer to the field object used for tracking
    */
-  static BTField* Field()               { return _field;}
+  static BTField* GetField()               { return _field;}
 
-  // BUG rename to SetField()
   /** @brief Set the pointer to the field object used for tracking
    */
-  static BTField* Field(BTField* field) {_field = field; VirtualPlane::_field = field; return _field;}
+  static BTField* SetField(BTField* field) {_field = field; VirtualPlane::_field = field; return _field;}
 
   /** @brief Get a string that stores the MiceModule based on StationNumber
    */

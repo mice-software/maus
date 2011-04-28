@@ -210,7 +210,56 @@ TEST_F(VirtualPlaneTest, InRadialCutTest) {
   EXPECT_TRUE(vp_z.InRadialCut(pos_in));
   EXPECT_TRUE(!vp_z.InRadialCut(pos_out));
   EXPECT_TRUE(vp_z_no_cut.InRadialCut(pos_out));
+  EXPECT_TRUE(false) << "Check - weird error in MAUSStepping from this test";
 }
+
+class VirtualPlaneManagerTest : public ::testing::Test {
+ protected:
+  VirtualPlaneManagerTest() {}
+  virtual ~VirtualPlaneManagerTest() {}
+  virtual void SetUp() {}
+  virtual void TearDown() {}
+};
+
+TEST_F(VirtualPlaneManagerTest, getInstanceTest) {
+  VirtualPlaneManager* vpm = VirtualPlaneManager::getInstance();
+  ASSERT_TRUE(vpm != NULL);
+  ASSERT_EQ(vpm, VirtualPlaneManager::getInstance());
+  delete vpm;
+
+}
+
+TEST_F(VirtualPlaneManagerTest, ConstructVirtualPlanes) {
+  std::string vplane_name[] = {"Envelope", "Virtual"};
+  for(size_t i = 0; i < 2; ++i) {
+    MiceModule mod;
+    mod.addPropertyString("SensitiveDetector", vplane_name[i]);
+    VirtualPlaneManager::ConstructVirtualPlanes(NULL, &mod);
+//    EXPECT
+  }
+
+//  variable = mod->propertyStringThis("IndependentVariable"); //default z; throw if not valid
+//  radialExtent = mod->propertyDoubleThis("RadialExtent"); //default -1
+//  globalCoordinates = mod->propertyBoolThis("GlobalCoordinates"); //default true
+//  mod->propertyString("MultiplePasses") // default ignore; throw if not valid
+//  allowBackwards = mod->propertyBoolThis("AllowBackwards"); // default true
+}
+
+TEST_F(VirtualPlaneManagerTest, ConstructFromModules) {
+  MiceModule mod;
+  std::string variables[] = {"z", "tAU", "time", "u"};
+  std::string multipass[] = {"ignore", "sameSTation", "Newstation"};
+  mod.addPropertyHep3Vector("Position", CLHEP::Hep3Vector(0,0,1));
+  mod.addPropertyHep3Vector("Rotation", "0. 45. 0. degree");
+
+//  variable = mod->propertyStringThis("IndependentVariable"); //default z; throw if not valid
+//  radialExtent = mod->propertyDoubleThis("RadialExtent"); //default -1
+//  globalCoordinates = mod->propertyBoolThis("GlobalCoordinates"); //default true
+//  mod->propertyString("MultiplePasses") // default ignore; throw if not valid
+//  allowBackwards = mod->propertyBoolThis("AllowBackwards"); // default true
+}
+
+
 
 }  // namespace
 
