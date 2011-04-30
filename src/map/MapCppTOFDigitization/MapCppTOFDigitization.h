@@ -15,7 +15,7 @@
  *
  */
 
-/** @class MapCppTOFDigitization 
+/** @class MapCppTOFDigitization
  *  Digitize events by running TOF electronics simulation.
  *
  */
@@ -25,30 +25,25 @@
 // C headers
 #include <assert.h>
 #include <json/json.h>
+#include <CLHEP/Random/RandPoisson.h>  //  from old file?
+#include <CLHEP/Random/RandGauss.h>  //  from old file?
+#include <CLHEP/Random/RandExponential.h>  //  from old file?
+#include <CLHEP/Units/PhysicalConstants.h>  //  from old file?
 
-// C++ headers  
+// C++ headers
+#include <cmath>  //  from old file?
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <vector>
 
 // G4MICE from commonCpp
 #include "Interface/dataCards.hh"
 #include "Interface/MICEEvent.hh"
+#include "Config/MiceModule.hh"  //  from old file?
 
-// from old file
-//#include "TofDigits.hh"
-//#include "TofHit.hh"
-//#include "TofDigit.hh"
-#include "Config/MiceModule.hh"
-#include <CLHEP/Random/RandPoisson.h>
-#include <CLHEP/Random/RandGauss.h>
-#include <CLHEP/Random/RandExponential.h>
-#include <CLHEP/Units/PhysicalConstants.h>
-#include <cmath>
-
-class MapCppTOFDigitization
-{
- public: 
+class MapCppTOFDigitization {
+ public:
   /** Sets up the worker
    *
    *  \param argJsonConfigDocument a JSON document with
@@ -61,7 +56,7 @@ class MapCppTOFDigitization
    *  This takes no arguments and does nothing
    */
   bool death();
- 
+
   /** process JSON document
    *
    *  Receive a document with MC hits and return
