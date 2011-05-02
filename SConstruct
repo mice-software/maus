@@ -16,8 +16,6 @@ if not maus_root_dir:
     print('!! Did you try running: "source env.sh"?')
     my_exit(1)
 
-file_to_import = open('%s/build/MAUS.py' % maus_root_dir, 'w')
-
 #this is our catch-all Dev class
 class Dev:
     cflags = ''
@@ -74,8 +72,6 @@ class Dev:
         env.Install(full_build_dir, pgm)
         env.Install(full_build_dir, tests)
         env.Alias('all', pgm)  #note: not localenv
-
-        file_to_import.write('from %s import %s\n' % (name, name))
 
         return True
 
@@ -512,6 +508,7 @@ types = ["input", "map", "reduce", "output"]
 for my_type in types:
     directories += glob.glob("src/%s/*" % my_type)
 
+stuff_to_import = []
 
 for directory in directories:
     parts = directory.split("/")
@@ -522,12 +519,23 @@ for directory in directories:
     if 'Py' in parts[2] and 'Cpp' not in parts[2]:
         print 'Found Python module: %s' % parts[2]
         files = glob.glob('%s/test_*.py' % directory) +  ["%s/%s.py" % (directory, parts[2])]
-        file_to_import.write('from %s import %s\n' % (parts[2],parts[2]))
         env.Install("build", files)
+
+        stuff_to_import.append(parts[2])
 
     if (parts[2][0:6] == 'MapCpp') or (parts[2][0:8] == 'InputCpp'):
         print 'Found C++ module: %s' % parts[2]
         env.jDev.Subproject(directory)
+        stuff_to_import.append(parts[2])
+
+file_to_import = open('%s/build/MAUS.py' % maus_root_dir, 'w')
+
+for single_stuff in stuff_to_import:
+    file_to_import.write("try:\n")
+    file_to_import.write("     from %s import %s\n" % (single_stuff, single_stuff))
+    file_to_import.write("except ImportError:\n")
+    file_to_import.write("     print 'failed to import %s'\n" % single_stuff)
+    file_to_import.write("\n")
 
 file_to_import.close()
 
