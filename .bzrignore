@@ -12,7 +12,7 @@ mausput
 gmon.out
 tmp/*
 src/map/*/build
-tests/style/cpplint_test/test_cpplint_out.out
+tests/style/cpplint_test/test_cpplint.out
 tests/cpp_unit/test_cpp_unit
 third_party/home
 third_party/build/*
