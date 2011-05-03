@@ -248,7 +248,7 @@ class test_cpp_style(unittest.TestCase):
         """
         #First we make some errors
         style_dir = os.path.join(maus_root_dir,'tests','style', 'cpplint_test')
-        file_name = os.path.join(style_dir, 'test_cpplint.out')
+        file_name = os.path.join(maus_root_dir, 'tmp', 'test_cpplint.out')
         test_result = walker(style_dir, [], [], file_name)
         # now we try to postprocess
         test_exceptions = {'tests/style/cpplint_test/force_fail.cc':[
@@ -256,7 +256,7 @@ class test_cpp_style(unittest.TestCase):
                 ('//                                                                               more than 80 lines and space at end - should fail ', 'Deliberately broken for testing', 'Chris Rogers')
             ]
         }
-        n_errors = cpplint_postprocessor().process(file_name, test_exceptions, os.path.join(style_dir, 'test_cpplint_out.out'))
+        n_errors = cpplint_postprocessor().process(file_name, test_exceptions, os.path.join(maus_root_dir, 'tmp', 'test_cpplint_out.out'))
         self.assertEqual(n_errors, 6)
 
     def test_cpp_style(self):
