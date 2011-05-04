@@ -44,23 +44,31 @@ class VirtualPlaneTest : public ::testing::Test {
                                                     VirtualPlane::ignore, true);
     vp_t = VirtualPlane::BuildVirtualPlane(rot, pos, 100., true, 5., BTTracker::t,
                                                     VirtualPlane::ignore, true);
-    vp_tau = VirtualPlane::BuildVirtualPlane(rot, pos, 100., true, 5.,
-                              BTTracker::tau_field, VirtualPlane::ignore, true);
+    vp_tau = VirtualPlane::BuildVirtualPlane(rot, pos, 100., false, 5.,
+                        BTTracker::tau_field, VirtualPlane::new_station, false);
   }
   virtual ~VirtualPlaneTest() {}
   virtual void SetUp() {}
   virtual void TearDown() {}
 
+  MiceModule mod;
   CLHEP::HepRotation rot;
   CLHEP::Hep3Vector pos;
   VirtualPlane vp_z, vp_u, vp_t, vp_tau;
 };
 
-TEST_F(VirtualPlaneTest, ConstructorTest) {
-  EXPECT_EQ(vp_z.GetMultipassAlgorithm(), VirtualPlane::ignore);
-  EXPECT_EQ(vp_t.GetMultipassAlgorithm(), VirtualPlane::ignore);
-  EXPECT_EQ(vp_tau.GetMultipassAlgorithm(), VirtualPlane::ignore);
-  EXPECT_EQ(vp_u.GetMultipassAlgorithm(), VirtualPlane::ignore);
+TEST_F(VirtualPlaneTest, ConstructorTest) {  // tests most Get functions also
+  EXPECT_EQ(vp_tau.GetMultipassAlgorithm(), VirtualPlane::new_station);
+  EXPECT_EQ(vp_tau.GetPlaneIndependentVariableType(), BTTracker::tau_field);
+  EXPECT_NEAR(vp_tau.GetPlaneIndependentVariable(), 5., 1e-9);
+  EXPECT_NEAR(vp_tau.GetRadialExtent(), 100., 1e-9);
+  EXPECT_EQ(vp_tau.GetGlobalCoordinates(), false);
+  EXPECT_EQ(vp_tau.GetAllowBackwards(), false);
+  for (size_t i = 0; i <3; ++i)
+    EXPECT_NEAR(vp_tau.GetPosition()[i], pos[i], 1e-9);
+  EXPECT_NEAR(vp_tau.GetRotation().phiX(), rot.phiX(), 1e-9);
+  EXPECT_NEAR(vp_tau.GetRotation().phiY(), rot.phiY(), 1e-9);
+  EXPECT_NEAR(vp_tau.GetRotation().phiZ(), rot.phiZ(), 1e-9);
   EXPECT_THROW( VirtualPlane::BuildVirtualPlane(rot, pos, 1., true, 5.,
                  BTTracker::tau_potential, VirtualPlane::ignore, true), Squeal);
 }
@@ -140,7 +148,6 @@ TEST_F(VirtualPlaneTest, BuildNewHitTest) {  // sorry this is a long one...
                           false, 5., BTTracker::z, VirtualPlane::ignore, true);
 
   BTConstantField field(10., 100., CLHEP::Hep3Vector(0, 0, 0.001)); // 1 Tesla
-  MiceModule mod;
   VirtualPlaneManager::ConstructVirtualPlanes(&field, MICERun::getInstance()->miceModule);
   G4Step*  step  = new G4Step();
   G4Track* track = SetG4TrackAndStep(step);
@@ -215,51 +222,142 @@ TEST_F(VirtualPlaneTest, InRadialCutTest) {
 
 class VirtualPlaneManagerTest : public ::testing::Test {
  protected:
-  VirtualPlaneManagerTest() {}
+  VirtualPlaneManagerTest() {
+    mod.addPropertyString("SensitiveDetector", "Virtual");
+    mod.addPropertyHep3Vector("Position", "0 0 1 m");
+    mod.addPropertyHep3Vector("Rotation", "0. 45. 0. degree");
+  }
   virtual ~VirtualPlaneManagerTest() {}
   virtual void SetUp() {}
   virtual void TearDown() {}
+
+  MiceModule mod;
+
 };
 
-TEST_F(VirtualPlaneManagerTest, getInstanceTest) {
-  VirtualPlaneManager* vpm = VirtualPlaneManager::getInstance();
+TEST_F(VirtualPlaneManagerTest, GetInstanceTest) {
+  VirtualPlaneManager* vpm = VirtualPlaneManager::GetInstance();
   ASSERT_TRUE(vpm != NULL);
-  ASSERT_EQ(vpm, VirtualPlaneManager::getInstance());
+  ASSERT_EQ(vpm, VirtualPlaneManager::GetInstance());
   delete vpm;
-
 }
 
-TEST_F(VirtualPlaneManagerTest, ConstructVirtualPlanes) {
-  std::string vplane_name[] = {"Envelope", "Virtual"};
-  for(size_t i = 0; i < 2; ++i) {
-    MiceModule mod;
-    mod.addPropertyString("SensitiveDetector", vplane_name[i]);
-    VirtualPlaneManager::ConstructVirtualPlanes(NULL, &mod);
-//    EXPECT
-  }
-
-//  variable = mod->propertyStringThis("IndependentVariable"); //default z; throw if not valid
-//  radialExtent = mod->propertyDoubleThis("RadialExtent"); //default -1
-//  globalCoordinates = mod->propertyBoolThis("GlobalCoordinates"); //default true
-//  mod->propertyString("MultiplePasses") // default ignore; throw if not valid
-//  allowBackwards = mod->propertyBoolThis("AllowBackwards"); // default true
+TEST_F(VirtualPlaneManagerTest, GetSetFieldTest) {
+  delete VirtualPlaneManager::GetInstance();
+  BTFieldGroup* group = NULL;
+  EXPECT_EQ(VirtualPlaneManager::GetInstance()->GetField(), group);
+  group = new BTFieldGroup();
+  VirtualPlaneManager::GetInstance()->SetField(group);
+  EXPECT_EQ(VirtualPlaneManager::GetInstance()->GetField(), group);
+  delete group;
 }
 
-TEST_F(VirtualPlaneManagerTest, ConstructFromModules) {
-  MiceModule mod;
-  std::string variables[] = {"z", "tAU", "time", "u"};
-  std::string multipass[] = {"ignore", "sameSTation", "Newstation"};
-  mod.addPropertyHep3Vector("Position", CLHEP::Hep3Vector(0,0,1));
-  mod.addPropertyHep3Vector("Rotation", "0. 45. 0. degree");
+TEST_F(VirtualPlaneManagerTest, ConstructVirtualPlanes) {  // also GetPlanes()
+  delete VirtualPlaneManager::GetInstance();
+  MiceModule mod1, mod2, mod3;
+  mod1.addPropertyString("SensitiveDetector", "Envelope");
+  VirtualPlaneManager::ConstructVirtualPlanes(NULL, &mod1);
+  EXPECT_EQ(VirtualPlaneManager::StationNumber(&mod1), 1);
 
-//  variable = mod->propertyStringThis("IndependentVariable"); //default z; throw if not valid
-//  radialExtent = mod->propertyDoubleThis("RadialExtent"); //default -1
-//  globalCoordinates = mod->propertyBoolThis("GlobalCoordinates"); //default true
-//  mod->propertyString("MultiplePasses") // default ignore; throw if not valid
-//  allowBackwards = mod->propertyBoolThis("AllowBackwards"); // default true
+  mod2.addPropertyString("SensitiveDetector", "Virtual");
+  VirtualPlaneManager::ConstructVirtualPlanes(NULL, &mod2);
+  EXPECT_EQ(VirtualPlaneManager::StationNumber(&mod2), 2);
+
+  mod3.addPropertyString("SensitiveDetector", "");
+  VirtualPlaneManager::ConstructVirtualPlanes(NULL, &mod3);
+  EXPECT_THROW(VirtualPlaneManager::StationNumber(&mod3), Squeal);
+
+  EXPECT_EQ(VirtualPlaneManager::GetInstance()->GetPlanes().size(), 2);
+  delete VirtualPlaneManager::GetInstance();
+
+  VirtualPlaneManager::ConstructVirtualPlanes(NULL, &mod2);
+  double point[] = {0,0,0,0};
+  double f[] = {0,0,0,0,0,0};
+  VirtualPlaneManager::GetField()->GetFieldValue(point, f);
+  EXPECT_NEAR(f[0]*f[0]+f[1]*f[1]+f[2]*f[2], 0., 1e-9);
+
+  BTFieldGroup* fg = new BTFieldGroup();
+  VirtualPlaneManager::ConstructVirtualPlanes(fg, &mod2);
+  EXPECT_EQ(fg, VirtualPlaneManager::GetField());
+  delete fg;
+}
+
+void __test_indep(std::string indep_string, 
+                      BTTracker::var indep_enum,
+                      double indep_var,
+                      MiceModule mod) {
+  mod.setProperty<std::string>("IndependentVariable", indep_string);
+  delete VirtualPlaneManager::GetInstance();
+  VirtualPlaneManager* vpm = VirtualPlaneManager::GetInstance();
+  VirtualPlaneManager::ConstructVirtualPlanes(NULL, &mod);
+  EXPECT_EQ(vpm->GetPlanes().back()->GetPlaneIndependentVariableType(),
+            indep_enum);
+  EXPECT_NEAR
+     (vpm->GetPlanes().back()->GetPlaneIndependentVariable(), indep_var, 1e-9);
 }
 
 
+TEST_F(VirtualPlaneManagerTest, ConstructFromModule_IndepVariableTest) {
+  VirtualPlaneManager* vpm = VirtualPlaneManager::GetInstance();
+  VirtualPlaneManager::ConstructVirtualPlanes(NULL, &mod);
+
+  __test_indep("z", BTTracker::z, 1000., mod);
+  __test_indep("u", BTTracker::u, 0., mod);
+
+  // throw unless PlaneTime is set
+  EXPECT_THROW(__test_indep("t", BTTracker::t, 0., mod), Squeal);
+  EXPECT_THROW(__test_indep("tau", BTTracker::t, 0., mod), Squeal);
+  EXPECT_THROW(__test_indep("time", BTTracker::t, 0., mod), Squeal);
+  mod.setProperty<double>("PlaneTime", -1.);
+  __test_indep("t", BTTracker::t, -1., mod);
+  __test_indep("time", BTTracker::t, -1., mod);
+  __test_indep("tau", BTTracker::tau_field, -1., mod);
+}
+
+void __test_multipass(std::string mp_string, 
+                      VirtualPlane::multipass_handler mp_enum,
+                      MiceModule mod) {
+  mod.setProperty<std::string>("MultiplePasses", mp_string);
+  delete VirtualPlaneManager::GetInstance();
+  VirtualPlaneManager* vpm = VirtualPlaneManager::GetInstance();
+  VirtualPlaneManager::ConstructVirtualPlanes(NULL, &mod);
+  EXPECT_EQ(vpm->GetPlanes().back()->GetMultipassAlgorithm(), mp_enum);
+}
+
+TEST_F(VirtualPlaneManagerTest, ConstructFromModule_MultiplePassesTest) {
+  __test_multipass("SameStation",  VirtualPlane::same_station, mod);
+  __test_multipass("NewStation",  VirtualPlane::new_station, mod);
+  __test_multipass("Ignore",  VirtualPlane::ignore, mod);
+  EXPECT_THROW(__test_multipass("X",  VirtualPlane::ignore, mod), Squeal);
+}
+
+TEST_F(VirtualPlaneManagerTest, ConstructFromModule_OtherStuffTest) {
+  mod.setProperty<double>("RadialExtent", 1);
+  mod.setProperty<bool>("GlobalCoordinates", false);
+  mod.setProperty<bool>("AllowBackwards", false);
+  delete VirtualPlaneManager::GetInstance();
+  VirtualPlaneManager::ConstructVirtualPlanes(NULL, &mod);
+  VirtualPlane* vp =  VirtualPlaneManager::GetInstance()->GetPlanes().back();
+  EXPECT_NEAR( vp->GetRadialExtent(), 1., 1e-9);
+  EXPECT_TRUE( !vp->GetGlobalCoordinates());
+  EXPECT_TRUE( !vp->GetAllowBackwards());
+}
+
+TEST_F(VirtualPlaneManagerTest, StartOfEventTest) {
+  EXPECT_TRUE(false);
+}
+
+TEST_F(VirtualPlaneManagerTest, ModuleNameTest) {
+  EXPECT_TRUE(false);
+}
+
+TEST_F(VirtualPlaneManagerTest, ModuleTest) {
+  EXPECT_TRUE(false);
+}
+
+TEST_F(VirtualPlaneManagerTest, StationNumberTest) {
+  EXPECT_TRUE(false);
+}
 
 }  // namespace
 

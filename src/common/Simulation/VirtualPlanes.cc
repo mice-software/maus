@@ -22,7 +22,6 @@
 
 #include "BeamTools/BTField.hh"
 #include "BeamTools/BTTracker.hh"
-#include "BeamTools/BTFieldGroup.hh"
 
 #include "G4Track.hh"
 #include "G4Step.hh"
@@ -210,12 +209,18 @@ std::vector<int>           VirtualPlaneManager::_nHits       = std::vector<int>(
 std::map<VirtualPlane*, const MiceModule*>  VirtualPlaneManager::_mods;
 
 VirtualPlaneManager::~VirtualPlaneManager() {
-  if (this == _instance) _instance = NULL;
+  if (this == _instance) {
+    _instance = NULL;
+    _field = NULL;
+    _useVirtualPlanes = false;
+    _nHits = std::vector<int>();
+    _mods = std::map<VirtualPlane*, const MiceModule*>();
+  }
   for (size_t i = 0; i < _planes.size(); ++i) delete _planes[i];
   _planes = std::vector<VirtualPlane*>();
 }
 
-VirtualPlaneManager* VirtualPlaneManager::getInstance()
+VirtualPlaneManager* VirtualPlaneManager::GetInstance()
 {
   if(_instance == NULL) {
     _instance = new VirtualPlaneManager(); //MUST CALL ConstructVirtualPlanes to do anything useful!
@@ -250,7 +255,7 @@ void VirtualPlaneManager::StartOfEvent()
 
 void VirtualPlaneManager::ConstructVirtualPlanes(BTField* field, MiceModule* model)
 {
-  VirtualPlaneManager::getInstance();
+  VirtualPlaneManager::GetInstance();
   std::vector<const MiceModule*> modules   = model->findModulesByPropertyString("SensitiveDetector", "Virtual");
   std::vector<const MiceModule*> envelopes = model->findModulesByPropertyString("SensitiveDetector", "Envelope");
   modules.insert(modules.end(), envelopes.begin(), envelopes.end());
@@ -262,6 +267,7 @@ void VirtualPlaneManager::ConstructVirtualPlanes(BTField* field, MiceModule* mod
   sort(_planes.begin(), _planes.end(), VirtualPlane::ComparePosition);
   _useVirtualPlanes = _planes.size() > 0;
   _field = field;
+  if (_field == NULL) _field = &_instance->_default_field;
   VirtualPlane::_field = _field;
 }
 

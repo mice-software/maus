@@ -19,6 +19,7 @@
 #define _VIRTUALPLANES_HH_
 
 #include "BeamTools/BTTracker.hh"
+#include "BeamTools/BTFieldGroup.hh"
 
 #include <vector>
 #include <map>
@@ -131,10 +132,6 @@ class VirtualPlane
    */
   VirtualHit BuildNewHit (const G4Step * aStep, int station) const;
 
-  /** @brief returns the algorithm used for handling multiple passes
-   */
-  multipass_handler GetMultipassAlgorithm() {return _multipass;}
-
   /** @brief Comparator for sorting by independent variable
    */
   static bool ComparePosition(VirtualPlane* p1, VirtualPlane* p2) {return p1->_independentVariable < p2->_independentVariable;}
@@ -150,6 +147,40 @@ class VirtualPlane
    *  @returns true if the particle is in the cut
    */
   bool InRadialCut   (CLHEP::Hep3Vector position) const;
+
+  /** @brief return the type of independent variable of the plane
+   */
+  BTTracker::var GetPlaneIndependentVariableType() const { return _planeType; }
+
+  /** @brief return the value of independent variable of the plane
+   */
+  double GetPlaneIndependentVariable() const { return _independentVariable; }
+
+  /** @brief return the Radial Extent (radius cut) of the plane
+   */
+  double GetRadialExtent() const { return _radialExtent; }
+
+  /** @brief return true if the plane outputs in global coordinates; false if
+   *         the plane outputs in local coordinate system
+   */
+  bool GetGlobalCoordinates() const { return _globalCoordinates; }
+
+  /** @brief returns the algorithm used for handling multiple passes
+   */
+  multipass_handler GetMultipassAlgorithm() {return _multipass;}
+
+  /** @brief returns the plane rotation
+   */
+  CLHEP::HepRotation GetRotation() {return _rotation;}
+
+  /** @brief returns the plane position
+   */
+  CLHEP::Hep3Vector GetPosition() {return _position;}
+
+  /** @brief return true if backwards going particles are registered on the
+   *         plane; false otherwise
+   */
+  bool GetAllowBackwards() {return _allowBackwards;}
 
 private:
   //Build a new hit and send it to the MICEEvent
@@ -187,8 +218,6 @@ private:
 class VirtualPlaneManager
 {
 public:
-  // BUG leaks virtual planes and potentially _field
-
   /** @brief Destructor
    *
    *  Sets instance to NULL if this is instance. Does not delete MiceModules or
@@ -202,10 +231,9 @@ public:
    *  does not exist, this will new the VirtualPlaneManager; but need to call
    *  ConstructVirtualPlanes(...) to set up VirtualPlanes.
    */
-  static VirtualPlaneManager* getInstance();
-  /** @deprecated (synonym for getInstance())
-   */
-  static VirtualPlaneManager* getVirtualPlaneManager() {return getInstance();}
+  static VirtualPlaneManager* GetInstance();
+  /** @deprecated */
+  static VirtualPlaneManager* getVirtualPlaneManager() {return GetInstance();}
 
   /** @brief Construct the VirtualPlanes
    *
@@ -232,9 +260,9 @@ public:
 
   /** @brief Clear record of Virtual Hits for the next track
    *
-   *  Each VirtualPlane stores an index of the number of hits. This is used e.g.
+   * Each VirtualPlane stores an index of the number of hits. This is used e.g.
    * to allocate station number and reject hits if the multipass_handler is set
-   * to 0.
+   * to ignore.
    */
   static void StartOfEvent();
 
@@ -244,9 +272,13 @@ public:
 
   /** @brief Set the pointer to the field object used for tracking
    */
-  static BTField* SetField(BTField* field) {_field = field; VirtualPlane::_field = field; return _field;}
+  static BTField* SetField(BTField* field) {
+    _field = field;
+    VirtualPlane::_field = field;
+    return _field;
+  }
 
-  /** @brief Get a string that stores the MiceModule based on StationNumber
+  /** @brief Get the name of the MiceModule based on StationNumber
    */
   static std::string         ModuleName   (int stationNumber);
 
@@ -257,11 +289,16 @@ public:
   /** @brief Get the StationNumber based on a pointer to the MiceModule
    */
   static int                 StationNumber(const MiceModule* module);
+
+  /** @brief Return a vector of planes controlled by the plane manager
+   */
+  static std::vector<VirtualPlane*> GetPlanes() {return _instance->_planes;}
 private:
-  VirtualPlaneManager() {;}
+  VirtualPlaneManager() {}
   static VirtualPlane ConstructFromModule(const MiceModule* mod);
 
   static BTField*                  _field;
+  BTFieldGroup                     _default_field; // _field defaults to this
   static VirtualPlaneManager*      _instance;
   static bool                      _useVirtualPlanes;
   static std::vector<VirtualPlane*> _planes;
