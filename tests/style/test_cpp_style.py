@@ -284,7 +284,6 @@ exclude_dirs = [
 os.path.join('src', 'map', 'MapCppTOFDigitization'),
 os.path.join('src', 'map', 'MapCppTrackerDigitization'),
 os.path.join('src', 'map', 'MapCppPrint'),
-os.path.join('tests', 'cpp_unit'),
 os.path.join('tests', 'style'),
 ]+glob_maus_root_dir(os.path.join('src', '*', '*', 'build')
 )
@@ -317,11 +316,11 @@ beamtools_files = [
 ]
 
 simulation_files = [
-'MICEPhysicsList.cc', 'VirtualPlanes.cc', 'MAUSPrimaryGeneratorAction.hh', 'MiceMessenger.cc', 'MICERunAction.hh', 'StripSpecialHits.cc', 'MICEBGPlane.hh', 'MAUSTrackingAction.hh', 'MICEVisManager.hh', 'MiceMessenger.hh', 'MICEDetectorConstruction.hh', 'FillMaterials.cc', 'MICEStepStatistics.hh', 'MICEPrimaryGeneratorAction.hh', 'MICESteppingAction.cc', 'MICEPhysicsList.hh', 'VirtualPlanes.hh', 'MAUSSteppingAction.hh', 'MICEVisManager.cc', 'FillMaterials.hh', 'MICEBGPlane.cc', 'MICEStepStatistics.cc', 'MAUSSteppingAction.cc', 'StripSpecialHits.hh', 'MAUSPrimaryGeneratorAction.cc', 'MICEEventAction.hh', 'MICESteppingAction.hh', 'MAUSTrackingAction.cc', 'MICERunAction.cc', 'MICEDetectorConstruction.cc', 'MICEEventAction.cc', 'MAUSGeant4Manager.hh', 
+'MICEPhysicsList.cc', 'MAUSPrimaryGeneratorAction.hh', 'MiceMessenger.cc', 'MICERunAction.hh', 'StripSpecialHits.cc', 'MICEBGPlane.hh', 'MAUSTrackingAction.hh', 'MICEVisManager.hh', 'MiceMessenger.hh', 'MICEDetectorConstruction.hh', 'FillMaterials.cc', 'MICEStepStatistics.hh', 'MICEPrimaryGeneratorAction.hh', 'MICESteppingAction.cc', 'MICEPhysicsList.hh', 'MAUSSteppingAction.hh', 'MICEVisManager.cc', 'FillMaterials.hh', 'MICEBGPlane.cc', 'MICEStepStatistics.cc', 'MAUSSteppingAction.cc', 'StripSpecialHits.hh', 'MAUSPrimaryGeneratorAction.cc', 'MICEEventAction.hh', 'MICESteppingAction.hh', 'MAUSTrackingAction.cc', 'MICERunAction.cc', 'MICEDetectorConstruction.cc', 'MICEEventAction.cc', 'MAUSGeant4Manager.hh', 
 ]
 
 recon_files = [
-'SciFiDoubletCluster.cc', 'SciFiClusterRec.hh', 'TriggerKey.hh', 'TofPid.cc', 'KLChannelMap.hh', 'SciFiSeed.cc', 'Extrapolation.cc', 'TofRec.cc', 'PmtKey.cc', 'SciFiCMN.hh', 'SciFiTrack.hh', 'MousePid.hh', 'CkovChannelMap.hh', 'SciFiFieldMap.cc', 'SciFiNtupleFill.hh', 'SciFiPointRec.hh', 'SciFiDigitRec.hh', 'TofChannelMap.cc', 'KLCellHit.hh', 'KLRec.hh', 'TofCalibrationMap.hh', 'MouseTrack.hh', 'SciFiStraightTrackRec.cc', 'GlobalRec.hh', 'SciFiBadChans.cc', 'TofChannelMap.hh', 'TofTrigger.hh', 'PmtKey.hh', 'SciFiSeed.hh', 'TofSpacePoint.cc', 'SciFiDoubletCluster.hh', 'TofSpacePoint.hh', 'TriggerKey.cc', 'TofTrack.cc', 'SciFiRec.cc', 'EMRRec.cc', 'TofPid.hh', 'KalmanSeed.hh', 'SciFiKalTrack.cc', 'FProjector.cc', 'SciFiHelixTrackRec.cc', 'SciFiBadChans.hh', 'SciFiExtrap.hh', 'GlobalRec.cc', 'TofCalibrationMap.cc', 'SciFiHelixTrackRec.hh', 'TofTrack.hh', 'SciFiNtuple.hh', 'SciFiPointRec.cc', 'SciFiKalTrack.hh', 'SetupKalmanRec.hh', 'VirtualRec.cc', 'TofTrigger.cc', 'MouseTrack.cc', 'Extrapolation.hh', 'SciFiTrack.cc', 'SciFiCMN.cc', 'CkovChannelMap.cc', 'TofSlabHit.cc', 'SciFiStraightTrackRec.hh', 'SciFiDoubletMeas.hh', 'SciFiDigitRec.cc', 'CkovRec.cc', 'KLChannelMap.cc', 'TofRec.hh', 'TofSlabHit.hh', 'CkovRec.hh', 'KLCellHit.cc', 'EMRRec.hh', 'SciFiExtrap.cc', 'SciFiClusterRec.cc', 'SciFiRec.hh', 'KLRec.cc', 'SciFiSpacePoint.cc', 'SciFiDoubletMeas.cc', 'SciFiSpacePoint.hh', 'VirtualRec.hh', 'SetupKalmanRec.cc', 'SciFiFieldMap.hh', 'FProjector.hh', 
+'SciFiDoubletCluster.cc', 'SciFiClusterRec.hh', 'TriggerKey.hh', 'TofPid.cc', 'KLChannelMap.hh', 'SciFiSeed.cc', 'Extrapolation.cc', 'TofRec.cc', 'PmtKey.cc', 'SciFiCMN.hh', 'SciFiTrack.hh', 'MousePid.hh', 'CkovChannelMap.hh', 'SciFiFieldMap.cc', 'SciFiNtupleFill.hh', 'SciFiPointRec.hh', 'SciFiDigitRec.hh', 'TofChannelMap.cc', 'KLCellHit.hh', 'KLRec.hh', 'TofCalibrationMap.hh', 'MouseTrack.hh', 'SciFiStraightTrackRec.cc', 'GlobalRec.hh', 'SciFiBadChans.cc', 'TofChannelMap.hh', 'TofTrigger.hh', 'PmtKey.hh', 'SciFiSeed.hh', 'TofSpacePoint.cc', 'SciFiDoubletCluster.hh', 'TofSpacePoint.hh', 'TriggerKey.cc', 'TofTrack.cc', 'SciFiRec.cc', 'EMRRec.cc', 'TofPid.hh', 'KalmanSeed.hh', 'SciFiKalTrack.cc', 'FProjector.cc', 'SciFiHelixTrackRec.cc', 'SciFiBadChans.hh', 'SciFiExtrap.hh', 'GlobalRec.cc', 'TofCalibrationMap.cc', 'SciFiHelixTrackRec.hh', 'TofTrack.hh', 'SciFiNtuple.hh', 'SciFiPointRec.cc', 'SciFiKalTrack.hh', 'SetupKalmanRec.hh', 'TofTrigger.cc', 'MouseTrack.cc', 'Extrapolation.hh', 'SciFiTrack.cc', 'SciFiCMN.cc', 'CkovChannelMap.cc', 'TofSlabHit.cc', 'SciFiStraightTrackRec.hh', 'SciFiDoubletMeas.hh', 'SciFiDigitRec.cc', 'CkovRec.cc', 'KLChannelMap.cc', 'TofRec.hh', 'TofSlabHit.hh', 'CkovRec.hh', 'KLCellHit.cc', 'EMRRec.hh', 'SciFiExtrap.cc', 'SciFiClusterRec.cc', 'SciFiRec.hh', 'KLRec.cc', 'SciFiSpacePoint.cc', 'SciFiDoubletMeas.cc', 'SciFiSpacePoint.hh', 'SetupKalmanRec.cc', 'SciFiFieldMap.hh', 'FProjector.hh', 
 ]
 
 detmodel_files = [
@@ -333,7 +332,7 @@ calib_files = [
 ]
 
 config_files = [
-'BeamlineParameters.cc', 'ModuleTextFileIO.hh', 'SciFiCableManager.hh', 'CoolingChannelGeom.cc', 'VlpcCableOsaka2.cc', 'TofCable.cc', 'ModuleConverter.cc', 'ModuleConverter.hh', 'VlpcCableOsaka3.cc', 'RFBackgroundParameters.cc', 'TofCable.hh', 'BeamlineGeometry.hh', 'BeamlineGeometry.cc', 'VlpcCableOsaka.hh', 'SciFiCableManager.cc', 'RFParameters.hh', 'MagnetParameters.hh', 'BeamlineParameters.hh', 'VirtualGeomParameters.hh', 'BeamParameters.cc', 'MiceModule.hh', 'VlpcCableOsaka2.hh', 'CoolingChannelGeom.hh', 'VlpcCableImperial.hh', 'VirtualGeomParameters.cc', 'MagnetParameters.cc', 'ModuleTextFileIO.cc', 'VlpcCableImperial.cc', 'BeamParameters.hh', 'RFParameters.cc', 'VlpcCable.hh', 'VlpcCableOsaka3.hh', 'RFBackgroundParameters.hh', 'VlpcCableOsaka.cc', 'MiceModule.cc', 
+'BeamlineParameters.cc', 'ModuleTextFileIO.hh', 'SciFiCableManager.hh', 'CoolingChannelGeom.cc', 'VlpcCableOsaka2.cc', 'TofCable.cc', 'ModuleConverter.cc', 'ModuleConverter.hh', 'VlpcCableOsaka3.cc', 'RFBackgroundParameters.cc', 'TofCable.hh', 'BeamlineGeometry.hh', 'BeamlineGeometry.cc', 'VlpcCableOsaka.hh', 'SciFiCableManager.cc', 'RFParameters.hh', 'MagnetParameters.hh', 'BeamlineParameters.hh', 'BeamParameters.cc', 'MiceModule.hh', 'VlpcCableOsaka2.hh', 'CoolingChannelGeom.hh', 'VlpcCableImperial.hh', 'MagnetParameters.cc', 'ModuleTextFileIO.cc', 'VlpcCableImperial.cc', 'BeamParameters.hh', 'RFParameters.cc', 'VlpcCable.hh', 'VlpcCableOsaka3.hh', 'RFBackgroundParameters.hh', 'VlpcCableOsaka.cc', 'MiceModule.cc', 
 ]
 
 cpp_unit_files = [
@@ -341,11 +340,13 @@ cpp_unit_files = [
 ]
 
 cp = os.path.join('src', 'common')
+test = os.path.join('tests', 'cpp_unit')
 
+# glob files here because of 
 glob_files = []
 glob_files += file_append(os.path.join(cp, 'Recon', '*'), recon_files)
 glob_files += file_append(os.path.join(cp, 'DetModel', '*'), detmodel_files)
-glob_files += file_append(os.path.join('tests', 'cpp_unit', '*'), cpp_unit_files)
+glob_files += file_append(os.path.join(test, '*'), cpp_unit_files)
 
 for f in glob_files:
     exclude_files += glob_maus_root_dir(f)
@@ -359,7 +360,4 @@ exclude_files += file_append(os.path.join(cp, 'Config'), config_files)
 
 if __name__=="__main__":
   unittest.main()
-
-
-
 

@@ -15,28 +15,28 @@
  *
  */
 
-#ifndef _VIRTUALPLANES_HH_
-#define _VIRTUALPLANES_HH_
-
-#include "BeamTools/BTTracker.hh"
-#include "BeamTools/BTFieldGroup.hh"
+#ifndef _SRC_COMMON_INTERFACE_VIRTUALPLANES_HH_
+#define _SRC_COMMON_INTERFACE_VIRTUALPLANES_HH_
 
 #include <vector>
 #include <map>
+
+#include "src/common/Interface/VirtualHit.hh"
+
+#include "src/common/BeamTools/BTTracker.hh"
+#include "src/common/BeamTools/BTFieldGroup.hh"
 
 class G4Step;
 class G4StepPoint;
 
 class VirtualPlane;
 class VirtualPlaneManager;
-class VirtualHit;
 class MiceModule;
 
-class VirtualPlane
-{
+class VirtualPlane {
   /** @class VirtualPlane
    *
-   *  Looks for steps in the geant4 data that straddle one of our virtual 
+   *  Looks for steps in the geant4 data that straddle one of our virtual
    *  planes. Then integrate (track) off the plane to the virtual plane. We
    *  track from both the PreStepPoint forwards and the PostStepPoint backwards.
    *  We take the  average (thus getting average of any stochastic processes on
@@ -47,24 +47,24 @@ class VirtualPlane
   /** enumeration to control how VirtualPlane handles the interpolation between
    *  step start and end
    */
-  enum stepping{integrate, linear_interpolate};
+  enum stepping {integrate, linear_interpolate};
 
   /** enumeration to control how VirtualPlane handles multiple hits on the same
    *  station
    */
-  enum multipass_handler{ignore, new_station, same_station};
+  enum multipass_handler {ignore, new_station, same_station};
 
-  /** @brief Default constructor initialises to 0. 
+  /** @brief Default constructor initialises to 0.
    */
-  VirtualPlane ();
+  VirtualPlane();
 
-  /** @brief Destructor; no memory allocated so does nothing. 
+  /** @brief Destructor; no memory allocated so does nothing.
    */
   ~VirtualPlane() {}
 
   // BUG - do constructor then init function - more "standard"
 
-  /** @brief Set up a VirtualPlane 
+  /** @brief Set up a VirtualPlane
    *
    *  @params rot Rotation of the VirtualPlane
    *  @params pos Position of the VirtualPlane used to calculate independent
@@ -85,8 +85,10 @@ class VirtualPlane
    *  @params allowBackwards; set to True to register hits for backwards going
    *          particles as well as forwards going particles.
    */
-  static VirtualPlane BuildVirtualPlane (CLHEP::HepRotation rot, CLHEP::Hep3Vector pos, double radialExtent, bool globalCoordinates, 
-                                         double indie, BTTracker::var type, multipass_handler mp, bool allowBackwards);
+  static VirtualPlane BuildVirtualPlane(CLHEP::HepRotation rot,
+                      CLHEP::Hep3Vector pos, double radialExtent,
+                      bool globalCoordinates, double indie, BTTracker::var type,
+                      multipass_handler mp, bool allowBackwards);
 
   /** @brief Return the independent variable for the point
    *
@@ -104,7 +106,7 @@ class VirtualPlane
    *  Calculate the independent variable for aStep pre and post points; return
    *  true if the points straddle the virtual plane; note that if allow
    *  backwards is "false" then we also have condition that post point has to be
-   *  after the virtual plane and pre point has to be before the virtual plane 
+   *  after the virtual plane and pre point has to be before the virtual plane
    */
   bool SteppingOver(const G4Step* aStep) const;
 
@@ -130,11 +132,13 @@ class VirtualPlane
    *  If _radialExtent is positive checks radius of particles (cylindrical
    *  type radius, in coordinate system of the Virtual Plane).
    */
-  VirtualHit BuildNewHit (const G4Step * aStep, int station) const;
+  VirtualHit BuildNewHit(const G4Step * aStep, int station) const;
 
   /** @brief Comparator for sorting by independent variable
    */
-  static bool ComparePosition(VirtualPlane* p1, VirtualPlane* p2) {return p1->_independentVariable < p2->_independentVariable;}
+  static bool ComparePosition(VirtualPlane* p1, VirtualPlane* p2) {
+    return p1->_independentVariable < p2->_independentVariable;
+  }
 
   /** @brief Return true if a position is inside the radial cut
    *
@@ -146,7 +150,7 @@ class VirtualPlane
    *
    *  @returns true if the particle is in the cut
    */
-  bool InRadialCut   (CLHEP::Hep3Vector position) const;
+  bool InRadialCut(CLHEP::Hep3Vector position) const;
 
   /** @brief return the type of independent variable of the plane
    */
@@ -182,19 +186,18 @@ class VirtualPlane
    */
   bool GetAllowBackwards() {return _allowBackwards;}
 
-private:
-  //Build a new hit and send it to the MICEEvent
-  void FillBField    (VirtualHit * aHit, const G4Step * aStep) const;
+ private:
+  // Build a new hit and send it to the MICEEvent
+  void FillBField(VirtualHit * aHit, const G4Step * aStep) const;
   void FillStaticData(VirtualHit * aHit, const G4Step * aStep) const;
   void FillKinematics(VirtualHit * aHit, const G4Step * aStep) const;
 
   void TransformToLocalCoordinates(VirtualHit* aHit) const;
 
-  double*   Integrate       (G4StepPoint* aPoint) const;
+  double*   Integrate(G4StepPoint* aPoint) const;
   double*   ExtractPointData(G4StepPoint* aPoint) const;
 
   BTTracker::var     _planeType;
-  int                _numberOfPasses;
   double             _independentVariable;
   double             _step;
   double             _radialExtent;
@@ -203,25 +206,31 @@ private:
   static BTField*    _field;
   static stepping    _stepping;
 
-  CLHEP::Hep3Vector  _position; //if var is u, then this will give origin
-  CLHEP::HepRotation _rotation; //if var is u, then this will give rotation
+  CLHEP::Hep3Vector  _position;  // if var is u, then this will give origin
+  CLHEP::HepRotation _rotation;  // if var is u, then this will give rotation
   bool               _allowBackwards;
   friend class VirtualPlaneManager;
 };
 
 /** @class VirtualPlaneManager
  *
- *  Manages the VirtualPlanes - handles interface with MiceModules and mapping
- *  from station number to MiceModule* (used by Optics optimiser for example).
+ *  Manages the VirtualPlanes\n
+ *   - handles interface with MiceModules used to build
+ *     VirtualPlanes\n
+ *   - gives mapping from station number to MiceModule* (used by Optics
+ *     optimiser for example).\n
+ *   - enables setting/getting of field map used to integrate the virtual plane.
+ *   - handles multipass logic to decide whether to allocate a step\n
  */
+// BUG - multipass logic should be handled in the plane itself
 
-class VirtualPlaneManager
-{
-public:
+class VirtualPlaneManager {
+ public:
   /** @brief Destructor
    *
-   *  Sets instance to NULL if this is instance. Does not delete MiceModules or
-   *  field - this is controlled from elsewhere.
+   *  delete constructed virtual planes. If this is instance, resets all the
+   *  static variables to 0. Does not delete MiceModules or field - this is
+   *  controlled from elsewhere.
    */
   ~VirtualPlaneManager();
 
@@ -237,7 +246,8 @@ public:
 
   /** @brief Construct the VirtualPlanes
    *
-   *  Looks through the MiceModules for VirtualPlanes and builds them.
+   *  Looks through the MiceModules for VirtualPlanes and builds them. Planes
+   *  are automatically sorted by independent variable.
    *
    *  @params field pointer to the global field group. If this is NULL, will
    *          make an empty field.
@@ -250,17 +260,20 @@ public:
   /** @brief Check to see if a step straddles a VirtualPlane
    *
    *  Looks through the list of virtual planes and checks if the step straddles
-   *  the plane
+   *  the plane. If so, makes a hit.
    *
    *  @params aStep Check whether presteppoint and poststeppoint sit on either
    *          side of one (or more) virtual planes; try to find the VirtualHit
    *          if this is the case
-   */
-  static void VirtualPlanesSteppingAction(const G4Step * aStep);
-
-  /** @brief Clear record of Virtual Hits for the next track
    *
-   * Each VirtualPlane stores an index of the number of hits. This is used e.g.
+   *  @returns vector of created hits.
+   */
+  static std::vector<VirtualHit> VirtualPlanesSteppingAction
+                                                         (const G4Step * aStep);
+
+  /** @brief Clear count of Virtual Hits for the next track
+   *
+   * Each VirtualPlane stores a count of the number of hits. This is used e.g.
    * to allocate station number and reject hits if the multipass_handler is set
    * to ignore.
    */
@@ -278,32 +291,35 @@ public:
     return _field;
   }
 
-  /** @brief Get the name of the MiceModule based on StationNumber
-   */
-  static std::string         ModuleName   (int stationNumber);
-
   /** @brief Get a pointer to the MiceModule based on StationNumber
    */
-  static const MiceModule*   Module       (int stationNumber);
+  static const MiceModule*   GetModuleFromStationNumber(int stationNumber);
 
-  /** @brief Get the StationNumber based on a pointer to the MiceModule
+  /** @brief Get the primary StationNumber based on a pointer to the MiceModule
    */
-  static int                 StationNumber(const MiceModule* module);
+  static int GetStationNumberFromModule(const MiceModule* module);
 
   /** @brief Return a vector of planes controlled by the plane manager
    */
   static std::vector<VirtualPlane*> GetPlanes() {return _instance->_planes;}
-private:
+
+  /** @brief Get the number of hits recorded on a station based on the primary
+   *         station number.
+   */
+  static int GetNumberOfHits(int stationNumber);
+
+ private:
   VirtualPlaneManager() {}
   static VirtualPlane ConstructFromModule(const MiceModule* mod);
 
   static BTField*                  _field;
-  BTFieldGroup                     _default_field; // _field defaults to this
+  BTFieldGroup                     _default_field;  // _field defaults to this
   static VirtualPlaneManager*      _instance;
   static bool                      _useVirtualPlanes;
   static std::vector<VirtualPlane*> _planes;
-  static std::map<VirtualPlane*, const MiceModule*>  _mods; //associate MiceModule with each plane in _planes
-  static std::vector<int>          _nHits; //numberOfHits in each plane
+  // associate MiceModule with each plane in _planes
+  static std::map<VirtualPlane*, const MiceModule*>  _mods;
+  static std::vector<int>          _nHits;  // numberOfHits in each plane
 };
 
 #endif
