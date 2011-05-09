@@ -29,7 +29,7 @@ class InputPyEmptyDocumentTestCase(unittest.TestCase):
         Test runnig forever by trying to get 10000 empty documents
         """
         big_number = 10000
-        my_input = InputPyEmptyDocument()
+        my_input = InputPyEmptyDocument(arg_number_of_events = -1)
         my_input.birth()
 
         i = 0
