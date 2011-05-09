@@ -2,7 +2,7 @@
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
-    easy_install pylint suds validictory scons readline ipython doxypy # numpy pychecker matplotlib
+    easy_install pylint suds validictory nose coverage scons readline ipython doxypy # numpy pychecker matplotlib
     
     echo "INFO: The package should be locally build now in your"
     echo "INFO: third_party directory, which the rest of MAUS will"
