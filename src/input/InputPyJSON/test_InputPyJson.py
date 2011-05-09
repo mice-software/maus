@@ -25,6 +25,7 @@ class InputPyJSONTestCase(unittest.TestCase):
 
         my_file = io.StringIO(100*unicode(test_string1))
         my_input = InputPyJSON(my_file)
+        self.assertTrue(my_input.birth())
         test_doc = json.loads(test_string1)
         i = 0
         for doc in my_input.emitter():
@@ -32,14 +33,18 @@ class InputPyJSONTestCase(unittest.TestCase):
             self.assertTrue(json_doc == test_doc)
             i += 1
         self.assertEqual(i, 100)
+        self.assertTrue(my_input.death())
 
     def test_bad(self):
         """test bad file content
         """
         my_file = io.StringIO(u"AFJKLAFJKALKF")
         my_input = InputPyJSON(my_file)
+        self.assertTrue(my_input.birth())
         with self.assertRaises(ValueError):
             next(my_input.emitter())
+
+        self.assertTrue(my_input.death())
 
     def test_counter_lt(self):
         """test internal counter lt
@@ -49,10 +54,13 @@ class InputPyJSONTestCase(unittest.TestCase):
         my_input = InputPyJSON(my_file, arg_number_of_events=5)
 
         i = 0
+        self.assertTrue(my_input.birth())
         for doc in my_input.emitter():
             i += 1
 
         self.assertEqual(i, 5)
+
+        self.assertTrue(my_input.death())
 
     def test_counter_gt(self):
         """test internal counter gt
@@ -62,22 +70,44 @@ class InputPyJSONTestCase(unittest.TestCase):
         my_input = InputPyJSON(my_file, arg_number_of_events=10)
 
         i = 0
+        self.assertTrue(my_input.birth())
         for doc in my_input.emitter():
             i += 1
 
         self.assertEqual(i, 5)
+
+        self.assertTrue(my_input.death())
 
     def test_twice(self):
         """test trying to read twice gives nothing
         """
         my_file = io.StringIO(10*u"""{"test": 4}\n""")
         my_input = InputPyJSON(my_file, arg_number_of_events=5)
-
+        self.assertTrue(my_input.birth())
         for doc in my_input.emitter():
             pass
 
         with self.assertRaises(StopIteration):
             next(my_input.emitter())
+
+        self.assertTrue(my_input.death())
+
+    def test_eof_whitespace(self):
+        """test what happens if there is one line with some spaces
+        """
+        my_file = io.StringIO(u"""{"test": 4}\n    """)
+        my_input = InputPyJSON(my_file)
+
+        self.assertTrue(my_input.birth())
+        for doc in my_input.emitter():
+            pass
+
+        with self.assertRaises(StopIteration):
+            next(my_input.emitter())
+
+        self.assertTrue(my_input.death())
+
+
             
 
 

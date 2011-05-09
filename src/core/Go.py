@@ -87,7 +87,7 @@ class Go:
         ######  Input Phase  ######
         ####                  #####
         print("INPUT: Reading some input")
-        self.input.birth()
+        assert(self.input.birth() == True)
         emitter = self.input.emitter()
         mapBuffer = self.BufferInput(emitter)
 
