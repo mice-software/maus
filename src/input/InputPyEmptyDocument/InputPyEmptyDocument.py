@@ -40,6 +40,7 @@ class InputPyEmptyDocument:
         birth() does nothing
         """
         self._current_spill = 0
+        return True
 
     def emitter(self):
         """
@@ -58,4 +59,4 @@ class InputPyEmptyDocument:
         """
         death() does nothing
         """
-        pass
+        return True

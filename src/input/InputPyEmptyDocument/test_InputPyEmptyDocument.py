@@ -13,7 +13,7 @@ class InputPyEmptyDocumentTestCase(unittest.TestCase):
         Read 100 events only
         """
         my_input = InputPyEmptyDocument(100)
-        my_input.birth()
+        self.assertTrue(my_input.birth())
 
         test_doc = json.loads("{}")
         i = 0
@@ -23,6 +23,7 @@ class InputPyEmptyDocumentTestCase(unittest.TestCase):
             self.assertEqual(json_doc, test_doc)
             i += 1
         self.assertEqual(i, 100)
+        self.assertTrue(my_input.death())
 
     def test_forever_nearly(self):
         """
@@ -30,7 +31,7 @@ class InputPyEmptyDocumentTestCase(unittest.TestCase):
         """
         big_number = 10000
         my_input = InputPyEmptyDocument(arg_number_of_events = -1)
-        my_input.birth()
+        self.assertTrue(my_input.birth())
 
         i = 0
         for doc in my_input.emitter():
@@ -45,13 +46,14 @@ class InputPyEmptyDocumentTestCase(unittest.TestCase):
 
         self.assertEqual(i, big_number)
 
+        self.assertTrue(my_input.death())
 
     def test_twice(self):
         """
         Test to make sure that if the input is done spitting out documents, then you can't get more documents from it
         """
         my_input = InputPyEmptyDocument(arg_number_of_events=5)
-        my_input.birth()
+        self.assertTrue(my_input.birth())
 
         some_value = my_input.emitter()
         next(some_value)
@@ -62,6 +64,8 @@ class InputPyEmptyDocumentTestCase(unittest.TestCase):
 
         with self.assertRaises(StopIteration):
             next(some_value)
+
+        self.assertTrue(my_input.death())
 
 
 if __name__ == '__main__':
