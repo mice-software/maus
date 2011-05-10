@@ -5,11 +5,9 @@ import unittest
 
 from Configuration import Configuration
 
+import MAUS
 
-from InputCppRealData import InputCppRealData
-from MapPyTOFCalibration import MapPyTOFCalibration
-
-class MapPyTOFCalibrationTestCase(unittest.TestCase):
+class MapPyTOFCablingTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         if not os.environ.get("MAUS_ROOT_DIR"):
@@ -21,14 +19,15 @@ class MapPyTOFCalibrationTestCase(unittest.TestCase):
         self._datafile = '02873.003'
 
     def test_something(self):
-        inputter = InputCppRealData()
-        inputter.birth(self._datapath, self._datafile)
+        inputter = MAUS.InputCppRealData(self._datapath, self._datafile)
+        inputter.birth("{}")
 
-        mapper = MapPyTOFCalibration()
+        mapper = MAUS.MapPyTOFCabling()
         success = mapper.birth("{}")
         self.assertTrue(success)
 
         for data in inputter.emitter():
+            return
             data = json.loads(data)
             if data['daq_data'] is None:
                 continue

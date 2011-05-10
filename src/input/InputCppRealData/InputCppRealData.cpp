@@ -240,6 +240,7 @@ void InputCppRealData::processHits(void *pPartEvntPtr,
     case VmeTdc: {
       V1290Hit::getJSON(pPartEvntPtr,
                         pDoc["tdc"]);
+      pDoc["tdc"]["ldc_id"] = pLdcId;
       break;
     }
 
