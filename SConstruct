@@ -530,6 +530,12 @@ for directory in directories:
 
 file_to_import = open('%s/build/MAUS.py' % maus_root_dir, 'w')
 
+file_to_import.write("try:\n")
+file_to_import.write("     from Go import Go\n")
+file_to_import.write("except ImportError:\n")
+file_to_import.write("     print 'failed to import Go'\n")
+file_to_import.write("\n")
+
 for single_stuff in stuff_to_import:
     file_to_import.write("try:\n")
     file_to_import.write("     from %s import %s\n" % (single_stuff, single_stuff))

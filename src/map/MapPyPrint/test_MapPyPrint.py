@@ -1,30 +1,23 @@
 import json
 import unittest
 
-from MapCppPrint import MapCppPrint
+from MapPyPrint import MapPyPrint
 
-class MapCppPrintTestCase(unittest.TestCase):
-    @classmethod
-    def setUpClass(self):
-        self.mapper = MapCppPrint()
-        success = self.mapper.birth("{}")
-        if not success:
-            raise Exception('InitializeFail', 'Could not start worker')
-
+class MapPyPrintTestCase(unittest.TestCase):
     def test_empty(self):
-        result = self.mapper.process("")
+        mapper = MapPyPrint()
+        self.assertTrue(mapper.birth("{}"))
+        result = mapper.process("")
         doc = json.loads(result)
+        self.assertTrue("errors" in doc)
+        self.assertTrue(mapper.death())
 
     def test_return(self):
-        result = self.mapper.process("{}")  
+        mapper = MapPyPrint()
+        self.assertTrue(mapper.birth("{}"))
+        result = mapper.process("{}")  
         self.assertEqual(result, "{}")
-
-    @classmethod
-    def tearDownClass(self):
-        success = self.mapper.death()
-        if not success:
-            raise Exception('InitializeFail', 'Could not start worker')
-        self.mapper = None
+        self.assertTrue(mapper.death())
 
 if __name__ == '__main__':
     unittest.main()

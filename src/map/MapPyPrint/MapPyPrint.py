@@ -27,14 +27,21 @@ class MapPyPrint:
     def birth(self, argJsonConfigDocument):
         self._sortKeys = True
         self._indent = 4
-        return true
+        return True
 
     def process(self, x):
-        print json.dumps(x, sort_keys=self._sortKeys, indent=self._indent)  #  print spill
+        try:
+            print json.dumps(json.loads(x), sort_keys=self._sortKeys, indent=self._indent)  #  print spill
+        except:
+            y = {}
+            y["errors"] = {}
+            y["errors"]["bad_json_document"] = "MapPyPrint couldn't parse the input"
+            print y
+            return json.dumps(y)
         return x
 
 
     def death(self):
-        return false
+        return True
 
 
