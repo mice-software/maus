@@ -31,7 +31,9 @@ class MapPyPrint:
 
     def process(self, x):
         try:
-            print json.dumps(json.loads(x), sort_keys=self._sortKeys, indent=self._indent)  #  print spill
+            x_dict = json.loads(x)
+            print "MapPyPrint output:"
+            print json.dumps(x_dict, sort_keys=self._sortKeys, indent=self._indent)  #  print spill
         except:
             y = {}
             y["errors"] = {}
