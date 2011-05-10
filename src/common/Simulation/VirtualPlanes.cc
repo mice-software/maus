@@ -18,6 +18,8 @@
 #include <string>
 #include <algorithm>
 
+#include "json/json.h"
+
 #include "G4Track.hh"
 #include "G4Step.hh"
 #include "G4StepPoint.hh"
@@ -83,7 +85,6 @@ bool VirtualPlane::SteppingOver(const G4Step* aStep) const {
 void VirtualPlane::FillStaticData
                                (VirtualHit * aHit, const G4Step * aStep) const {
   G4Track * theTrack = aStep->GetTrack();
-
   aHit->SetTrackID(theTrack->GetTrackID());
   aHit->SetPID(theTrack->GetDynamicParticle()
                                           ->GetDefinition()->GetPDGEncoding());
@@ -142,10 +143,10 @@ void VirtualPlane::FillKinematics
   aHit->SetTime(x[0]);
   delete [] x_from_beginning;
   delete [] x_from_end;
-
   if (!InRadialCut(CLHEP::Hep3Vector(x[1], x[2], x[3])))
     throw(Squeal(Squeal::recoverable, "Hit outside radial cut",  // appropriate?
                                   "VirtualPlane::FillKinematics"));
+
 }
 
 void VirtualPlane::TransformToLocalCoordinates(VirtualHit* aHit) const {
@@ -188,16 +189,11 @@ double * VirtualPlane::Integrate(G4StepPoint* aPoint) const {
 
 VirtualHit VirtualPlane::BuildNewHit(const G4Step * aStep, int station) const {
   VirtualHit aHit;
-  try {
-    FillStaticData(&aHit, aStep);
-    FillKinematics(&aHit, aStep);
-    FillBField(&aHit, aStep);
-    aHit.SetStationNumber(station);
-    if (!_globalCoordinates) TransformToLocalCoordinates(&aHit);
-  }
-  catch(Squeal squee) {
-    if (squee.GetErrorLevel() == Squeal::nonRecoverable) throw squee;
-  }  // catch e.g. tracking errors; don't record a hit in this case
+  FillStaticData(&aHit, aStep);
+  FillKinematics(&aHit, aStep);
+  FillBField(&aHit, aStep);
+  aHit.SetStationNumber(station);
+  if (!_globalCoordinates) TransformToLocalCoordinates(&aHit);
   return aHit;
 }
 
@@ -235,28 +231,35 @@ VirtualPlaneManager* VirtualPlaneManager::GetInstance() {
 
 // Point here is if I go round e.g. a ring, station number should be
 // (number_of_passes * number_of_stations) + i
-std::vector<VirtualHit> VirtualPlaneManager::VirtualPlanesSteppingAction
-                                                         (const G4Step* aStep) {
-  std::vector<VirtualHit> hits;
-  if (!_useVirtualPlanes) return hits;
+void VirtualPlaneManager::VirtualPlanesSteppingAction
+                                    (const G4Step* aStep, Json::Value* tracks) {
+  if (!_useVirtualPlanes) return;
+  if (tracks == NULL || !tracks->isObject())
+    throw(Squeal(Squeal::recoverable,
+                 "Json value must be initialised to object type",
+                 "VirtualPlaneManager::Writehit"));
   for (unsigned int i = 0; i < _planes.size(); i++)
-    if (_planes[i]->SteppingOver(aStep)) {
-      if (_nHits[i]>0) {
-        if (_planes[i]->GetMultipassAlgorithm() == VirtualPlane::new_station) {
-          hits.push_back
-              (_planes[i]->BuildNewHit(aStep, _planes.size()*_nHits[i]+i+1));
+    try {
+      if (_planes[i]->SteppingOver(aStep)) {
+        VirtualPlane::multipass_handler mp =
+                                            _planes[i]->GetMultipassAlgorithm();
+        if (_nHits[i]>0) {
+          if (mp == VirtualPlane::new_station) {
+            WriteHit(_planes[i]->BuildNewHit(aStep,
+                                         _planes.size()*_nHits[i]+i+1), tracks);
+            _nHits[i]++;
+          }
+          if (mp == VirtualPlane::same_station) {
+            WriteHit(_planes[i]->BuildNewHit(aStep, i+1), tracks);
+            _nHits[i]++;
+          }
+        } else {
+          WriteHit(_planes[i]->BuildNewHit(aStep, i+1), tracks);
           _nHits[i]++;
         }
-        if (_planes[i]->GetMultipassAlgorithm() == VirtualPlane::same_station) {
-          hits.push_back(_planes[i]->BuildNewHit(aStep, i+1));
-          _nHits[i]++;
-        }
-      } else {
-        hits.push_back(_planes[i]->BuildNewHit(aStep, i+1));
-        _nHits[i]++;
       }
-    }
-  return hits;
+    } catch (Squeal squee) {}  // do nothing - just dont make a hit
+
 }
 
 void VirtualPlaneManager::StartOfEvent() {
@@ -350,8 +353,7 @@ const MiceModule*  VirtualPlaneManager::GetModuleFromStationNumber
   return _mods[ _planes[stationNumber-1] ];
 }
 
-int VirtualPlaneManager::GetStationNumberFromModule
-                                                    (const MiceModule* module) {
+int VirtualPlaneManager::GetStationNumberFromModule(const MiceModule* module) {
   if (_planes.size() == 0)
     throw(Squeal(Squeal::recoverable,
           "No Virtual planes initialised",
@@ -374,5 +376,37 @@ int VirtualPlaneManager::GetNumberOfHits(int stationNumber) {
               "Station number out of range",
               "VirtualPlaneManager::GetNumberOfHits"));
     return _nHits[stationNumber-1];
-  }
+}
+
+
+void VirtualPlaneManager::WriteHit(VirtualHit hit, Json::Value* value) {
+    Json::Value hit_v = Json::Value(Json::objectValue);
+    hit_v["station_id"] = hit.GetStationNumber();
+    hit_v["time"] = hit.GetTime();
+    hit_v["particle_id"] = hit.GetPID();
+    hit_v["track_id"] = hit.GetTrackID();
+    hit_v["mass"] = hit.GetMass();
+    hit_v["charge"] = hit.GetCharge();
+    hit_v["position"] = Json::Value(Json::objectValue);
+    hit_v["position"]["x"] = hit.GetPos().x();
+    hit_v["position"]["y"] = hit.GetPos().y();
+    hit_v["position"]["z"] = hit.GetPos().z();
+    hit_v["momentum"] = Json::Value(Json::objectValue);
+    hit_v["momentum"]["x"] = hit.GetMomentum().x();
+    hit_v["momentum"]["y"] = hit.GetMomentum().y();
+    hit_v["momentum"]["z"] = hit.GetMomentum().z();
+    hit_v["proper_time"] = hit.GetProperTime();
+    hit_v["path_length"] = hit.GetPathLength();
+    hit_v["b_field"] = Json::Value(Json::objectValue);
+    hit_v["b_field"]["x"] = hit.GetBField().x();
+    hit_v["b_field"]["y"] = hit.GetBField().y();
+    hit_v["b_field"]["z"] = hit.GetBField().z();
+    hit_v["e_field"] = Json::Value(Json::objectValue);
+    hit_v["e_field"]["x"] = hit.GetEField().x();
+    hit_v["e_field"]["y"] = hit.GetEField().y();
+    hit_v["e_field"]["z"] = hit.GetEField().z();
+    if ((*value)["virtual_hits"].isNull())
+        (*value)["virtual_hits"] = Json::Value(Json::arrayValue);
+    (*value)["virtual_hits"].append(hit_v);
+}
 

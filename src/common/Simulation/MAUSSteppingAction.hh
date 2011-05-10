@@ -26,8 +26,8 @@
 // TODO(Rogers): The tracks should be stored on the run action (and cleared at
 //               runaction time)
 
-#ifndef _SRC_MAP_MAUSSTEPPINGACTION_HH_
-#define _SRC_MAP_MAUSSTEPPINGACTION_HH_
+#ifndef _SRC_COMMON_SIMULATION_MAUSSTEPPINGACTION_HH_
+#define _SRC_COMMON_SIMULATION_MAUSSTEPPINGACTION_HH_
 
 #include <cmath>
 #include <sstream>

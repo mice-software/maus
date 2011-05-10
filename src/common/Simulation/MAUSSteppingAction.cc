@@ -17,12 +17,13 @@
 
 #include <iostream>
 
-#include "Interface/Squeak.hh"
-#include "Interface/Squeal.hh"
-#include "Interface/MICERun.hh"
-#include "Interface/JsonWrapper.hh"
+#include "src/common/Interface/Squeak.hh"
+#include "src/common/Interface/Squeal.hh"
+#include "src/common/Interface/MICERun.hh"
+#include "src/common/Interface/JsonWrapper.hh"
 
-#include "MAUSSteppingAction.hh"
+#include "src/common/Simulation/MAUSSteppingAction.hh"
+#include "src/common/Simulation/VirtualPlanes.hh"
 
 namespace MAUS {
 
@@ -58,6 +59,9 @@ void MAUSSteppingAction::UserSteppingAction(const G4Step * aStep) {
         _tracks[ss.str()]["KillReason"] = Json::Value(ss2.str());
         aTrack->SetTrackStatus(fStopAndKill);
     }
+
+    // find and append any virtual planes
+    VirtualPlaneManager::VirtualPlanesSteppingAction(aStep, &_tracks);
 }
 
 Json::Value MAUSSteppingAction::StepPointToJson

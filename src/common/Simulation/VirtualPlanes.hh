@@ -15,11 +15,16 @@
  *
  */
 
+// TODO(rogers) - multipass logic should be handled in the plane itself; at the
+//                moment it's handled in the manager
+
 #ifndef _SRC_COMMON_INTERFACE_VIRTUALPLANES_HH_
 #define _SRC_COMMON_INTERFACE_VIRTUALPLANES_HH_
 
 #include <vector>
 #include <map>
+
+#include "json/json.h"
 
 #include "src/common/Interface/VirtualHit.hh"
 
@@ -222,7 +227,6 @@ class VirtualPlane {
  *   - enables setting/getting of field map used to integrate the virtual plane.
  *   - handles multipass logic to decide whether to allocate a step\n
  */
-// BUG - multipass logic should be handled in the plane itself
 
 class VirtualPlaneManager {
  public:
@@ -265,11 +269,12 @@ class VirtualPlaneManager {
    *  @params aStep Check whether presteppoint and poststeppoint sit on either
    *          side of one (or more) virtual planes; try to find the VirtualHit
    *          if this is the case
+   *  @params track puts tracks into the "Virtual" branch of the track
    *
-   *  @returns vector of created hits.
+   *  @returns Json::Value with VirtualPlanes hits appended
    */
-  static std::vector<VirtualHit> VirtualPlanesSteppingAction
-                                                         (const G4Step * aStep);
+  static void VirtualPlanesSteppingAction
+                                     (const G4Step * aStep, Json::Value* track);
 
   /** @brief Clear count of Virtual Hits for the next track
    *
@@ -307,6 +312,10 @@ class VirtualPlaneManager {
    *         station number.
    */
   static int GetNumberOfHits(int stationNumber);
+
+  /** @brief Write the hit to the Json::Value
+   */
+  static void WriteHit(VirtualHit hit, Json::Value* value);
 
  private:
   VirtualPlaneManager() {}

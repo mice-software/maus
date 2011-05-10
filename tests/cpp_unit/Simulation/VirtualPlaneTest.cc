@@ -17,6 +17,8 @@
 
 #include "gtest/gtest.h"
 
+#include "json/json.h"
+
 #include "G4Step.hh"
 #include "G4StepPoint.hh"
 #include "G4ParticleTable.hh"
@@ -34,6 +36,9 @@
 #include "tests/cpp_unit/Simulation/MAUSGeant4ManagerTest.cpp"
 
 namespace {
+
+/////////////////////// VIRTUALPLANE /////////////////////////////////////////
+
 class VirtualPlaneTest : public ::testing::Test {
  protected:
   VirtualPlaneTest() : pos(1., -2., 6.) {
@@ -179,7 +184,7 @@ TEST_F(VirtualPlaneTest, BuildNewHitTest) {  // sorry this is a long one...
   EXPECT_NEAR(hit.GetEField().y(), 0, 1e-9);
   EXPECT_NEAR(hit.GetEField().z(), 0, 1e-9);
 
-  step->GetPreStepPoint()->SetPosition(CLHEP::Hep3Vector(2e6, 3., 4.));
+  step->GetPreStepPoint()->SetPosition(CLHEP::Hep3Vector(2e6, 3.e6, 4.));
   EXPECT_THROW(vp_z.BuildNewHit(step, 99), Squeal);  // outside radial cut
   step->GetPreStepPoint()->SetPosition(CLHEP::Hep3Vector(2, 3., 4.));
 
@@ -222,6 +227,15 @@ TEST_F(VirtualPlaneTest, InRadialCutTest) {
   EXPECT_TRUE(!vp_z.InRadialCut(pos_out));
   EXPECT_TRUE(vp_z_no_cut.InRadialCut(pos_out));
 }
+
+/////////////////////// VIRTUALPLANE END //////////////////////////////////
+//
+//
+//
+//
+//
+//
+/////////////////////// VIRTUALPLANE MANAGER //////////////////////////////////
 
 class VirtualPlaneManagerTest : public ::testing::Test {
  protected:
@@ -361,13 +375,17 @@ TEST_F(VirtualPlaneManagerTest, VirtualPlanesSteppingActionTest) {
   G4Step*  step  = new G4Step();
   SetG4TrackAndStep(step);
 
-  std::vector<VirtualHit> hits = vpm->VirtualPlanesSteppingAction(step);
+  Json::Value json_bad(Json::intValue);  // must be of object type
+  Json::Value json(Json::objectValue);
+  EXPECT_THROW(vpm->VirtualPlanesSteppingAction(step, NULL), Squeal);
+  EXPECT_THROW(vpm->VirtualPlanesSteppingAction(step, &json_bad), Squeal);
+  vpm->VirtualPlanesSteppingAction(step, &json);
   EXPECT_EQ(vpm->GetNumberOfHits(1), 0);
   for (size_t i = 2; i <= 4; ++i)
     EXPECT_EQ(vpm->GetNumberOfHits(i), 1) << "Failed on station " << i;
-  EXPECT_EQ(hits.size(), 3);
-  for (size_t i = 0; i < hits.size(); ++i)
-    EXPECT_EQ(hits[i].GetStationNumber(), i+2);
+  EXPECT_EQ(json["virtual_hits"].size(), 3);
+  for (size_t i = 0; i < json["virtual_hits"].size(); ++i)
+    EXPECT_EQ(json["virtual_hits"][i]["station_id"].asInt(), i+2);
   EXPECT_EQ(vpm->GetNumberOfHits(5), 0);
   EXPECT_THROW(vpm->GetNumberOfHits(0), Squeal);
   EXPECT_THROW(vpm->GetNumberOfHits(6), Squeal);
@@ -399,34 +417,36 @@ TEST_F(VirtualPlaneManagerTest, VirtualPlanesSteppingActionMultipassTest) {
 
   G4Step*  step  = new G4Step();
   SetG4TrackAndStep(step);
-
-  std::vector<VirtualHit> hits1 = vpm->VirtualPlanesSteppingAction(step);
-  std::vector<VirtualHit> hits2 = vpm->VirtualPlanesSteppingAction(step);
-  std::vector<VirtualHit> hits3 = vpm->VirtualPlanesSteppingAction(step);
+  
+  Json::Value json1(Json::objectValue), json2(Json::objectValue),
+              json3(Json::objectValue), json4(Json::objectValue);
+  vpm->VirtualPlanesSteppingAction(step, &json1);
+  vpm->VirtualPlanesSteppingAction(step, &json2);
+  vpm->VirtualPlanesSteppingAction(step, &json3);
 
   EXPECT_EQ(vpm->GetNumberOfHits(1), 1);
   EXPECT_EQ(vpm->GetNumberOfHits(2), 3);
   EXPECT_EQ(vpm->GetNumberOfHits(3), 3);
 
-  ASSERT_EQ(hits1.size(), 3);
+  ASSERT_EQ(json1["virtual_hits"].size(), 3);
   for (size_t i = 0; i < 3; ++i)
-    EXPECT_EQ(hits1[i].GetStationNumber(), i+1);
+    EXPECT_EQ(json1["virtual_hits"][i]["station_id"].asInt(), i+1);
 
-  ASSERT_EQ(hits2.size(), 2);
-  EXPECT_EQ(hits2[0].GetStationNumber(), 2);
-  EXPECT_EQ(hits2[1].GetStationNumber(), 6);
+  ASSERT_EQ(json2["virtual_hits"].size(), 2);
+  EXPECT_EQ(json2["virtual_hits"][Json::UInt(0)]["station_id"].asInt(), 2);
+  EXPECT_EQ(json2["virtual_hits"][1]["station_id"].asInt(), 6);
 
-  ASSERT_EQ(hits3.size(), 2);
-  EXPECT_EQ(hits3[0].GetStationNumber(), 2);
-  EXPECT_EQ(hits3[1].GetStationNumber(), 9);
+  ASSERT_EQ(json3["virtual_hits"].size(), 2);
+  EXPECT_EQ(json3["virtual_hits"][Json::UInt(0)]["station_id"].asInt(), 2);
+  EXPECT_EQ(json3["virtual_hits"][1]["station_id"].asInt(), 9);
 
   VirtualPlaneManager::StartOfEvent();
 
-  std::vector<VirtualHit> hits4 = vpm->VirtualPlanesSteppingAction(step);
+  vpm->VirtualPlanesSteppingAction(step, &json4);
 
-  ASSERT_EQ(hits4.size(), 3);
+  ASSERT_EQ(json4["virtual_hits"].size(), 3);
   for (size_t i = 0; i < 3; ++i) {
-    EXPECT_EQ(hits4[i].GetStationNumber(), i+1);
+    EXPECT_EQ(json4["virtual_hits"][i]["station_id"].asInt(), i+1);
     EXPECT_EQ(vpm->GetNumberOfHits(i+1), 1);
   }
 
@@ -465,6 +485,51 @@ TEST_F(VirtualPlaneManagerTest, GetStationNumberFromModuleTest) {
   EXPECT_EQ(vpm->GetStationNumberFromModule(&mod), 1);
   EXPECT_EQ(vpm->GetStationNumberFromModule(&mod_alt), 2);
 }
+
+TEST_F(VirtualPlaneManagerTest, WriteHitTest) {
+  Json::Value val(Json::objectValue);
+  VirtualHit hit;
+  hit.SetTrackID(1);
+  hit.SetStationNumber(2);
+  hit.SetPos(CLHEP::Hep3Vector(10, 11, 12));
+  hit.SetMomentum(CLHEP::Hep3Vector(13, 14, 15));
+  hit.SetTime(3);
+  hit.SetEnergy(4);
+  hit.SetPID(5);
+  hit.SetMass(6);
+  hit.SetCharge(7);
+  hit.SetBField(CLHEP::Hep3Vector(16, 17, 18));
+  hit.SetEField(CLHEP::Hep3Vector(19, 20, 21));
+  hit.SetProperTime(8);
+  hit.SetPathLength(9);
+  VirtualPlaneManager::WriteHit(hit, &val);
+  Json::Value vh = val["virtual_hits"][Json::UInt(0)];
+  EXPECT_EQ(vh["station_id"].asInt(), hit.GetStationNumber());
+  EXPECT_EQ(vh["track_id"].asInt(), hit.GetTrackID());
+  EXPECT_EQ(vh["particle_id"].asInt(), hit.GetPID());
+  EXPECT_NEAR(vh["mass"].asDouble(), hit.GetMass(), 1e-12);
+  EXPECT_NEAR(vh["charge"].asDouble(), hit.GetCharge(), 1e-12);
+  EXPECT_NEAR(vh["time"].asDouble(), hit.GetTime(), 1e-12);
+  EXPECT_NEAR(vh["proper_time"].asDouble(), hit.GetProperTime(), 1e-12);
+  EXPECT_NEAR(vh["path_length"].asDouble(), hit.GetPathLength(), 1e-12);
+
+  EXPECT_NEAR(vh["position"]["x"].asDouble(), hit.GetPos().x(), 1e-12);
+  EXPECT_NEAR(vh["position"]["y"].asDouble(), hit.GetPos().y(), 1e-12);
+  EXPECT_NEAR(vh["position"]["z"].asDouble(), hit.GetPos().z(), 1e-12);
+
+  EXPECT_NEAR(vh["momentum"]["x"].asDouble(), hit.GetMomentum().x(), 1e-12);
+  EXPECT_NEAR(vh["momentum"]["y"].asDouble(), hit.GetMomentum().y(), 1e-12);
+  EXPECT_NEAR(vh["momentum"]["z"].asDouble(), hit.GetMomentum().z(), 1e-12);
+
+  EXPECT_NEAR(vh["b_field"]["x"].asDouble(), hit.GetBField().x(), 1e-12);
+  EXPECT_NEAR(vh["b_field"]["y"].asDouble(), hit.GetBField().y(), 1e-12);
+  EXPECT_NEAR(vh["b_field"]["z"].asDouble(), hit.GetBField().z(), 1e-12);
+  EXPECT_NEAR(vh["e_field"]["x"].asDouble(), hit.GetEField().x(), 1e-12);
+  EXPECT_NEAR(vh["e_field"]["y"].asDouble(), hit.GetEField().y(), 1e-12);
+  EXPECT_NEAR(vh["e_field"]["z"].asDouble(), hit.GetEField().z(), 1e-12);
+}
+
+/////////////////////// VIRTUALPLANE MANAGER END //////////////////////////////
 
 }  // namespace
 
