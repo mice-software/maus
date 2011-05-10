@@ -24,26 +24,27 @@
 
 #include "UnpackEventLib.h"
 
-
-InputCppRealData::InputCppRealData() {
+InputCppRealData::InputCppRealData(std::string pDataPath,
+                                   std::string pFilename) {
   _debug = false;
   _eventPtr = NULL;
   _inputFile = NULL;
+  _dataPath = pDataPath;
+  _filename = pFilename;
 }
 
 
-bool InputCppRealData::birth(std::string pDataPath,
-                             std::string pFilename) {
+bool InputCppRealData::birth() {
   if (_inputFile)
     return false;  // Fail because file is open
 
   if (_debug)
-    std::cerr << "Data file = " << pFilename << " ("
-              << pDataPath << ")" << std::endl;
+    std::cerr << "Data file = " << _filename << " ("
+              << _dataPath << ")" << std::endl;
 
 
-  _inputFile = new MDdateFile(pFilename,
-                              pDataPath);
+  _inputFile = new MDdateFile(_filename,
+                              _dataPath);
 
   // Actually try opening the file
   if (_inputFile->OpenFile() != DATE_FILE_OK) {

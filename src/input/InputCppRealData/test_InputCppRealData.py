@@ -18,20 +18,19 @@ class InputCppRealDataTestCase(unittest.TestCase):
     self._datafile = '02873.003'
 
   def test_init(self):
-    self.mapper = InputCppRealData()
-    self.assertTrue(self.mapper.birth(self._datapath, \
-                                      self._datafile))
+    self.mapper = InputCppRealData(self._datapath, \
+                                   self._datafile)
+    self.assertTrue(self.mapper.birth())
     # Check re-init without closing fails
-    self.assertFalse(self.mapper.birth(self._datapath, \
-                                       self._datafile))
+    self.assertFalse(self.mapper.birth())
     self.assertTrue(self.mapper.death())
     return
 
   # Test a single event
   def test_single(self):
-    self.mapper = InputCppRealData()
-    self.assertTrue(self.mapper.birth(self._datapath, \
-                                      self._datafile))
+    self.mapper = InputCppRealData(self._datapath, \
+                                   self._datafile)
+    self.assertTrue(self.mapper.birth()
     # Get a single event and check it's the right size
     self.assertTrue(self.mapper.readNextEvent())
     data = self.mapper.getCurEvent()
@@ -42,9 +41,9 @@ class InputCppRealDataTestCase(unittest.TestCase):
 
   # Test reading the whole file
   def test_multi(self):
-    self.mapper = InputCppRealData()
-    self.assertTrue(self.mapper.birth(self._datapath, \
-                                      self._datafile))
+    self.mapper = InputCppRealData(self._datapath, \
+                                   self._datafile)
+    self.assertTrue(self.mapper.birth()
     evntCount = 0
 
     # We can try md5'ing the whole dataset
