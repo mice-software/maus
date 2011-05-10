@@ -41,9 +41,31 @@ exceptions[os.path.join(tst, 'Simulation', 'VirtualPlaneTest.cc')] = [
 ('#include "G4StepPoint.hh"', 'cpplint confused with maus header', 'rogers')
 ]
 
+exceptions[os.path.join(cm, 'Simulation','MAUSPrimaryGeneratorAction.hh')] = [
+('#include "G4ParticleGun.hh"', 'cpplint confused with maus header', 'rogers'),
+('#include "G4ParticleTable.hh"', 'cpplint confused with maus header', 'rogers'),
+('#include "G4VUserPrimaryGeneratorAction.hh"  // inherit from', 'cpplint confused with maus header', 'rogers'),
+('    long int seed;', 'CLHEP also uses long int for its random seed - if we want to be compatible we should follow their lead', 'rogers'),
+('#include "G4Track.hh"  //  arg to tracking action', '', ''),
+('#include "G4UserTrackingAction.hh"  //  inherit from', '', '')
+]
 
+exceptions[os.path.join(cm, 'Simulation','MAUSPrimaryGeneratorAction.cc')] = [
+('#include "G4Event.hh"', '', ''),
+('#include "G4PrimaryVertex.hh"', '', ''),
+('#include "G4Track.hh"', '', ''),
+('#include "G4ios.hh"', '', '')
+]
 
-#include "G4Step.hh"
-#include "G4StepPoint.hh"
-#include "G4ParticleTable.hh"
+exceptions[os.path.join(cm, 'Simulation','MAUSSteppingAction.hh')] = [
+('#include "G4Step.hh"', '', ''),
+('#include "G4StepPoint.hh"', '', ''),
+('#include "G4Track.hh"', '', ''),
+('#include "G4UserSteppingAction.hh"', '', ''),
+]
+
+exceptions[os.path.join(cm, 'Simulation','MAUSTrackingAction.hh')] = [
+('#include "G4Track.hh"  //  arg to tracking action', '', ''),
+('#include "G4UserTrackingAction.hh"  //  inherit from', '', '')
+]
 

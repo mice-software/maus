@@ -18,11 +18,11 @@
 #include <string>
 #include <algorithm>
 
-#include "json/json.h"
-
 #include "G4Track.hh"
 #include "G4Step.hh"
 #include "G4StepPoint.hh"
+
+#include "json/json.h"
 
 #include "src/common/Simulation/VirtualPlanes.hh"
 #include "src/common/Interface/VirtualHit.hh"
@@ -146,7 +146,6 @@ void VirtualPlane::FillKinematics
   if (!InRadialCut(CLHEP::Hep3Vector(x[1], x[2], x[3])))
     throw(Squeal(Squeal::recoverable, "Hit outside radial cut",  // appropriate?
                                   "VirtualPlane::FillKinematics"));
-
 }
 
 void VirtualPlane::TransformToLocalCoordinates(VirtualHit* aHit) const {
@@ -258,8 +257,7 @@ void VirtualPlaneManager::VirtualPlanesSteppingAction
           _nHits[i]++;
         }
       }
-    } catch (Squeal squee) {}  // do nothing - just dont make a hit
-
+    } catch(Squeal squee) {}  // do nothing - just dont make a hit
 }
 
 void VirtualPlaneManager::StartOfEvent() {

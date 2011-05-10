@@ -70,7 +70,7 @@ Json::Value MAUSSteppingAction::StepPointToJson
     G4StepPoint* point = aStep->GetPostStepPoint();
     if (prestep) point = aStep->GetPreStepPoint();
     if (!aTrack || !point || !aStep)
-        throw(Squeal(Squeal::recoverable, 
+        throw(Squeal(Squeal::recoverable,
                      "Failed to resolve step point",
                      "MAUSSteppingAction::StepPointToJson"));
     Json::Value step;

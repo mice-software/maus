@@ -316,7 +316,7 @@ beamtools_files = [
 ]
 
 simulation_files = [
-'MICEPhysicsList.cc', 'MAUSPrimaryGeneratorAction.hh', 'MiceMessenger.cc', 'MICERunAction.hh', 'StripSpecialHits.cc', 'MICEBGPlane.hh', 'MAUSTrackingAction.hh', 'MICEVisManager.hh', 'MiceMessenger.hh', 'MICEDetectorConstruction.hh', 'FillMaterials.cc', 'MICEStepStatistics.hh', 'MICEPrimaryGeneratorAction.hh', 'MICESteppingAction.cc', 'MICEPhysicsList.hh', 'MAUSSteppingAction.hh', 'MICEVisManager.cc', 'FillMaterials.hh', 'MICEBGPlane.cc', 'MICEStepStatistics.cc', 'MAUSSteppingAction.cc', 'StripSpecialHits.hh', 'MAUSPrimaryGeneratorAction.cc', 'MICEEventAction.hh', 'MICESteppingAction.hh', 'MAUSTrackingAction.cc', 'MICERunAction.cc', 'MICEDetectorConstruction.cc', 'MICEEventAction.cc', 'MAUSGeant4Manager.hh', 
+'MICEPhysicsList.cc', 'MiceMessenger.cc', 'MICERunAction.hh', 'StripSpecialHits.cc', 'MICEBGPlane.hh', 'MICEVisManager.hh', 'MiceMessenger.hh', 'MICEDetectorConstruction.hh', 'FillMaterials.cc', 'MICEStepStatistics.hh', 'MICEPrimaryGeneratorAction.hh', 'MICESteppingAction.cc', 'MICEPhysicsList.hh', 'MICEVisManager.cc', 'FillMaterials.hh', 'MICEBGPlane.cc', 'MICEStepStatistics.cc', 'StripSpecialHits.hh', 'MICEEventAction.hh', 'MICESteppingAction.hh', 'MICERunAction.cc', 'MICEDetectorConstruction.cc', 'MICEEventAction.cc', 
 ]
 
 recon_files = [

@@ -32,12 +32,12 @@
 #include <cmath>
 #include <sstream>
 
-#include <json/json.h>
+#include "json/json.h"
 
-#include <G4Step.hh>
-#include <G4StepPoint.hh>
-#include <G4Track.hh>
-#include <G4UserSteppingAction.hh>
+#include "G4Step.hh"
+#include "G4StepPoint.hh"
+#include "G4Track.hh"
+#include "G4UserSteppingAction.hh"
 
 namespace MAUS {
 

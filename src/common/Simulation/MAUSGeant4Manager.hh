@@ -47,7 +47,7 @@ class MICEPhysicsList;
 namespace MAUS {
 
 class MAUSGeant4Manager {
-public:
+ public:
     /** @brief Get the singleton MAUSGeant4Manager
      *
      *  Get the instance of the MAUSGeant4Manager. This will construct the
@@ -87,9 +87,9 @@ public:
      */
     bool GetStoreTracks() {return _storeTracks;}
 
-private:
+ private:
     MAUSGeant4Manager();
-    ~MAUSGeant4Manager(); 
+    ~MAUSGeant4Manager();
 
     G4RunManager* _runManager;
     MICEPhysicsList* _physList;

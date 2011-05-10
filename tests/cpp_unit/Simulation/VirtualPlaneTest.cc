@@ -417,7 +417,7 @@ TEST_F(VirtualPlaneManagerTest, VirtualPlanesSteppingActionMultipassTest) {
 
   G4Step*  step  = new G4Step();
   SetG4TrackAndStep(step);
-  
+
   Json::Value json1(Json::objectValue), json2(Json::objectValue),
               json3(Json::objectValue), json4(Json::objectValue);
   vpm->VirtualPlanesSteppingAction(step, &json1);
