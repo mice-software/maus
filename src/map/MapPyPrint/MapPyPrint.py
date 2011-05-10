@@ -27,12 +27,14 @@ class MapPyPrint:
     def birth(self, argJsonConfigDocument):
         self._sortKeys = True
         self._indent = 4
+        return true
 
     def process(self, x):
         print json.dumps(x, sort_keys=self._sortKeys, indent=self._indent)  #  print spill
+        return x
 
 
     def death(self):
-        pass  #  do nothing when shutting down
+        return false
 
 
