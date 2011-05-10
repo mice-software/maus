@@ -14,11 +14,6 @@ from OutputPyJSON import *
 from Go import Go
 
 class GoTestCase(unittest.TestCase):
-    def test_type_none(self):
-        with self.assertRaises(AssertionError):
-            Go(None,None,None,None)
-
-
     def test_map_reduce_type(self):
         inputer = InputPyEmptyDocument(1)
         mapper = MapPyDoNothing()

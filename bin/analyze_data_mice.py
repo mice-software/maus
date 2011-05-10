@@ -30,7 +30,7 @@ def run(number_of_events, data_path, data_file):
     # Create an empty array of mappers, then populate it
     # with the functionality you want to use.
     my_map = MAUS.MapPyGroup()
-    my_map.append(MAUS.MapPyPrint)
+    my_map.append(MAUS.MapPyPrint())
     
     #  The Go() drives all the components you pass in, then check the file
     #  'mausput' for the output

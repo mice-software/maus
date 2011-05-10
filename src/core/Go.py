@@ -46,9 +46,6 @@ from Configuration import Configuration
 
 class Go:
     def __init__(self, argInput, argMapper, argReducer, argOutput, argConfigFile = None):
-        for component in [argInput, argMapper, argReducer, argOutput]:
-            assert isinstance(component, types.InstanceType)
-
         self.input = argInput
         self.mapper = argMapper
         self.reducer = argReducer
@@ -87,7 +84,7 @@ class Go:
         ######  Input Phase  ######
         ####                  #####
         print("INPUT: Reading some input")
-        assert(self.input.birth() == True)
+        assert(self.input.birth(self.jsonConfigDocument) == True)
         emitter = self.input.emitter()
         mapBuffer = self.BufferInput(emitter)
 

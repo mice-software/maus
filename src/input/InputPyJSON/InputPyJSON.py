@@ -57,7 +57,7 @@ class InputPyJSON:
         self._number_of_events = arg_number_of_events
         self._current_event = 0
 
-    def birth(self):
+    def birth(self, json_config = "{}"):
         """
         birth() does nothing
         """
