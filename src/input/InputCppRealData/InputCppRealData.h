@@ -47,6 +47,12 @@ private
 /** Pointer to the start of the current event. */
   unsigned char *_eventPtr;
 
+  /** Path to the data. */
+  std::string _dataPath;
+
+  /** Filename within _dataPath. */
+  std::string _filename;
+
 /** Process an event.
   *
   * This function processes an MDevent into parts,

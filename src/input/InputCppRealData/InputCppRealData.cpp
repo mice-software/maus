@@ -34,7 +34,7 @@ InputCppRealData::InputCppRealData(std::string pDataPath,
 }
 
 
-bool InputCppRealData::birth() {
+bool InputCppRealData::birth(std::string jsonDataCards) {
   if (_inputFile)
     return false;  // Fail because file is open
 

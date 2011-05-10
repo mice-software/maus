@@ -20,9 +20,9 @@ class InputCppRealDataTestCase(unittest.TestCase):
   def test_init(self):
     self.mapper = InputCppRealData(self._datapath, \
                                    self._datafile)
-    self.assertTrue(self.mapper.birth())
+    self.assertTrue(self.mapper.birth("{}"))
     # Check re-init without closing fails
-    self.assertFalse(self.mapper.birth())
+    self.assertFalse(self.mapper.birth("{}"))
     self.assertTrue(self.mapper.death())
     return
 
@@ -30,7 +30,7 @@ class InputCppRealDataTestCase(unittest.TestCase):
   def test_single(self):
     self.mapper = InputCppRealData(self._datapath, \
                                    self._datafile)
-    self.assertTrue(self.mapper.birth()
+    self.assertTrue(self.mapper.birth("{}"))
     # Get a single event and check it's the right size
     self.assertTrue(self.mapper.readNextEvent())
     data = self.mapper.getCurEvent()
@@ -43,7 +43,7 @@ class InputCppRealDataTestCase(unittest.TestCase):
   def test_multi(self):
     self.mapper = InputCppRealData(self._datapath, \
                                    self._datafile)
-    self.assertTrue(self.mapper.birth()
+    self.assertTrue(self.mapper.birth("{}"))
     evntCount = 0
 
     # We can try md5'ing the whole dataset
