@@ -3,11 +3,13 @@ test_cpp_style can allow exceptions in certain circumstances:
 
 * exceptions dict is a dict like 
   exceptions = { 
-    exception:["line where exception occurs"] #reason for exception
+    file_name:[
+      ("text of line where exception occurs", "reason for exception", "name")
+    ]
   }
   I enumerate exceptions using the line where the exception occurs so that if
   someone moves code around the exception is still valid. If the actual line 
-  where the exception occurs moves, we have to re-enter the exception.
+  where the exception occurs changes, we have to re-enter the exception.
 
   Please use these exceptions in moderation - i.e. try to work within the style
   guide wherever possible. In general, we make exceptions only when there is a
@@ -24,4 +26,46 @@ import glob
 exceptions = {
 }
 
+cm = os.path.join('src','common')
+tst = os.path.join('tests', 'cpp_unit')
+
+exceptions[os.path.join(cm, 'Simulation','VirtualPlanes.cc')] = [
+('#include "G4Track.hh"', 'cpplint confused with maus header', 'rogers'),
+('#include "G4Step.hh"', 'cpplint confused with maus header', 'rogers'),
+('#include "G4StepPoint.hh"', 'cpplint confused with maus header', 'rogers')
+]
+
+exceptions[os.path.join(tst, 'Simulation', 'VirtualPlaneTest.cc')] = [
+('#include "G4ParticleTable.hh"', 'cpplint confused with maus header', 'rogers'),
+('#include "G4Step.hh"', 'cpplint confused with maus header', 'rogers'),
+('#include "G4StepPoint.hh"', 'cpplint confused with maus header', 'rogers')
+]
+
+exceptions[os.path.join(cm, 'Simulation','MAUSPrimaryGeneratorAction.hh')] = [
+('#include "G4ParticleGun.hh"', 'cpplint confused with maus header', 'rogers'),
+('#include "G4ParticleTable.hh"', 'cpplint confused with maus header', 'rogers'),
+('#include "G4VUserPrimaryGeneratorAction.hh"  // inherit from', 'cpplint confused with maus header', 'rogers'),
+('    long int seed;', 'CLHEP also uses long int for its random seed - if we want to be compatible we should follow their lead', 'rogers'),
+('#include "G4Track.hh"  //  arg to tracking action', '', ''),
+('#include "G4UserTrackingAction.hh"  //  inherit from', '', '')
+]
+
+exceptions[os.path.join(cm, 'Simulation','MAUSPrimaryGeneratorAction.cc')] = [
+('#include "G4Event.hh"', '', ''),
+('#include "G4PrimaryVertex.hh"', '', ''),
+('#include "G4Track.hh"', '', ''),
+('#include "G4ios.hh"', '', '')
+]
+
+exceptions[os.path.join(cm, 'Simulation','MAUSSteppingAction.hh')] = [
+('#include "G4Step.hh"', '', ''),
+('#include "G4StepPoint.hh"', '', ''),
+('#include "G4Track.hh"', '', ''),
+('#include "G4UserSteppingAction.hh"', '', ''),
+]
+
+exceptions[os.path.join(cm, 'Simulation','MAUSTrackingAction.hh')] = [
+('#include "G4Track.hh"  //  arg to tracking action', '', ''),
+('#include "G4UserTrackingAction.hh"  //  inherit from', '', '')
+]
 

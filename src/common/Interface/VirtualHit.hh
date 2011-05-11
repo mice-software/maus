@@ -26,18 +26,14 @@ class VirtualHit : public MCHit
     int          _stationNumber;  //  ID assigned to location
     ThreeVector  _bField;         //  magnetic field
     ThreeVector  _eField;         //  electric field
+    double       _l;              //  path length
+    double       _tau;            //  proper time
 
   public:
 
     VirtualHit();
 
     ~VirtualHit() 		{ miceMemory.addDelete( Memory::VirtualHit); };
-
-    VirtualHit(const VirtualHit& rhs);
-
-    const VirtualHit& operator=(const VirtualHit& rhs);
-    int operator==(const VirtualHit& rhs) const;
-
 
     void SetTrackID   (int tid)        { setTrackID( tid ); }
     void SetStationNumber (int sn)         { _stationNumber = sn; }
@@ -52,6 +48,8 @@ class VirtualHit : public MCHit
     void SetBField     ( double b[3]) { _bField.setX( b[0] ); _bField.setY( b[1] ); _bField.setZ( b[2] ); };
     void SetEField     (Hep3Vector e)  {  _eField = e; }
     void SetEField     ( double e[3]) { _eField.setX( e[0] ); _eField.setY( e[1] ); _eField.setZ( e[2] ); };
+    void SetProperTime (double tau) { _tau = tau; }
+    void SetPathLength (double l) { _l = l; }
 
     int GetTrackID() const     { return trackID(); }
     int GetStationNumber() const   { return _stationNumber; }
@@ -64,6 +62,8 @@ class VirtualHit : public MCHit
     double GetCharge() const   { return charge(); }
     Hep3Vector GetBField() const {  return _bField; }
     Hep3Vector GetEField() const {  return _eField; }
+    double GetProperTime() const { return _tau; }
+    double GetPathLength() const { return _l; }
 
 };
 #endif

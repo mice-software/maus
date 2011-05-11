@@ -19,6 +19,7 @@
 #include "gtest/gtest.h"
 
 #include "G4Step.hh"
+#include "G4ParticleTable.hh"
 
 #include "src/common/Interface/JsonWrapper.hh"
 #include "src/common/Interface/MICERun.hh"
@@ -30,7 +31,12 @@ namespace {
 class MAUSSteppingActionTest : public ::testing::Test {
  protected:
   MAUSSteppingActionTest() : stepping(MAUSGeant4Manager::GetInstance()->GetStepping()) {
-    track = new G4Track();
+    G4ParticleDefinition* pd =
+                         G4ParticleTable::GetParticleTable()->FindParticle(-13);
+    G4DynamicParticle* dyn =
+                        new G4DynamicParticle(pd, G4ThreeVector(1., 2., 3.));
+    track = new G4Track(dyn, 7., G4ThreeVector(4., 5., 6.));
+
     step = new G4Step(); // memory leak?
     point = new G4StepPoint();
     post = new G4StepPoint();
@@ -107,6 +113,7 @@ TEST_F(MAUSSteppingActionTest, UserSteppingActionWriteStepsTest) {
   EXPECT_EQ(stepping->GetTracks()["track0"]["steps"].size(), 3);
 }
 
+// test that we write to json correctly
 TEST_F(MAUSSteppingActionTest, StepToJsonTest) {
   Json::Value out = stepping->StepPointToJson(step, true);
   EXPECT_DOUBLE_EQ(out["position"]["x"].asDouble(), 2.);
@@ -125,6 +132,53 @@ TEST_F(MAUSSteppingActionTest, StepToJsonTest) {
   EXPECT_DOUBLE_EQ(out["time"].asDouble(), -10.);
 }
 
+G4Track* SetG4TrackAndStep(G4Step* step) {
+  G4ParticleDefinition* pd =
+                       G4ParticleTable::GetParticleTable()->FindParticle(-13);
+  G4DynamicParticle* dyn =
+                      new G4DynamicParticle(pd, G4ThreeVector(1., 2., 3.));
+  G4Track* track = new G4Track(dyn, 7., G4ThreeVector(4., 5., 6.));
+
+  track->SetStep(step);
+  step->SetTrack(track);
+  step->SetPreStepPoint(new G4StepPoint());
+  step->SetPostStepPoint(new G4StepPoint());
+  track->SetTrackID(10);
+
+  step->GetPreStepPoint()->SetGlobalTime(-1.);
+  step->GetPreStepPoint()->SetPosition(CLHEP::Hep3Vector(2., 3., 4.));
+  step->GetPreStepPoint()->SetMass(dyn->GetMass());
+  step->GetPreStepPoint()->SetKineticEnergy(100.);
+  step->GetPreStepPoint()->SetMomentumDirection
+                                    (CLHEP::Hep3Vector(0., 0.1, 1.)/sqrt(1.01));
+
+  step->GetPostStepPoint()->SetGlobalTime(1.);
+  step->GetPostStepPoint()->SetPosition(CLHEP::Hep3Vector(3., 4., 8.));
+  step->GetPostStepPoint()->SetMass(dyn->GetMass());
+  step->GetPostStepPoint()->SetKineticEnergy(110.);
+  step->GetPostStepPoint()->SetMomentumDirection
+                                    (CLHEP::Hep3Vector(0., 0.1, 1.)/sqrt(1.01));
+  return track;
+}
+
+// test that we do virtual stepping correctly
+TEST_F(MAUSSteppingActionTest, UserSteppingActionVirtualTest) {
+  MiceModule mod;
+  mod.setProperty<double>("PlaneTime", 0.);
+  mod.setProperty<std::string>("SensitiveDetector", "Virtual");
+  mod.setProperty<std::string>("IndependentVariable", "time");
+  mod.setProperty<std::string>("MultiplePasses", "NewStation");
+  VirtualPlaneManager::ConstructVirtualPlanes(NULL, &mod);
+  VirtualPlaneManager::ConstructVirtualPlanes(NULL, &mod);
+
+  G4Step*  step  = new G4Step();
+  G4Track* track = SetG4TrackAndStep(step);
+
+  stepping->UserSteppingAction(step);
+  stepping->UserSteppingAction(step);
+  Json::FastWriter writer;
+  EXPECT_EQ(stepping->GetTracks()["virtual_hits"].size(), 4);
+}
 
 } //namespace end
 

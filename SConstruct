@@ -497,6 +497,8 @@ if env['USE_G4'] and env['USE_ROOT']:
 
     test_cpp_files = glob.glob("tests/cpp_unit/*/*cpp")+\
         glob.glob("tests/cpp_unit/*cpp")
+    test_cpp_files += glob.glob("tests/cpp_unit/*/*cc")+\
+        glob.glob("tests/cpp_unit/*cc")
 
     testmain = env.Program(target = 'tests/cpp_unit/test_cpp_unit', \
                                source = test_cpp_files, \

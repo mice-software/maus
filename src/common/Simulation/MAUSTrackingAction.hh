@@ -28,13 +28,12 @@
 
 #include <sstream>  //  combining strings and numbers
 
-#include <json/json.h>  // for datastructure
+#include "json/json.h"  // for datastructure
 
-#include <G4Track.hh>  //  arg to tracking action
-#include <G4UserTrackingAction.hh>  //  inherit from
+#include "G4Track.hh"  //  arg to tracking action
+#include "G4UserTrackingAction.hh"  //  inherit from
 
-#include "MAUSSteppingAction.hh"  // static method to grab steps
-
+#include "src/common/Simulation/MAUSSteppingAction.hh"
 
 namespace MAUS {
 

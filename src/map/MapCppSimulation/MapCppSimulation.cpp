@@ -15,6 +15,9 @@
  *
  */
 
+#include <vector>
+#include <string>
+
 #include "Interface/CppErrorHandler.hh"
 #include "Interface/Squeal.hh"
 #include "Interface/JsonWrapper.hh"
