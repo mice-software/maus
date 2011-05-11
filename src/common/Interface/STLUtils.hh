@@ -1,24 +1,24 @@
-// Copyright 2010-2011 Chris Rogers
-//
-// This file is a part of G4MICE
-//
-// G4MICE is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// G4MICE is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with G4MICE in the doc folder.  If not, see
-// <http://www.gnu.org/licenses/>.
+/* This file is part of MAUS: http://micewww.pp.rl.ac.uk/projects/maus
+ *
+ * MAUS is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MAUS is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
 #ifndef STLUtils_HH
 #define STLUtils_HH
 
+#include <string>
 #include <sstream>
 #include <iomanip>
 
@@ -41,8 +41,8 @@ namespace STLUtils {
 ///     std::vector<int> a,b;\n
 ///     bool test_equal = IterableEquality(a.begin(), a.end(), b.begin(),
 ///                       b.end());\n
-/// 
-/// Can give a segmentation fault if a.begin() is not between a.begin() and 
+///
+/// Can give a segmentation fault if a.begin() is not between a.begin() and
 /// a.end() (inclusive)
 template <class TEMP_ITER>
 bool IterableEquality(TEMP_ITER a_begin, TEMP_ITER a_end,
@@ -89,7 +89,7 @@ inline bool IterableEquality(const TEMP_CLASS& a, const TEMP_CLASS& b);
 /// The following operations must be defined for TEMP_CLASS
 ///   - std::ostream& operator<<(Temp, std::ostream&)
 ///
-template <class TEMP_CLASS> 
+template <class TEMP_CLASS>
 std::string ToStringP(TEMP_CLASS value, int precision);
 
 /// Convert value to a std::string.
@@ -99,7 +99,7 @@ std::string ToStringP(TEMP_CLASS value, int precision);
 /// The following operations must be defined for TEMP_CLASS
 ///   - std::ostream& operator<<(Temp, std::ostream&)
 ///
-template <class TEMP_CLASS> 
+template <class TEMP_CLASS>
 std::string ToString(TEMP_CLASS value);
 
 }  // STLUtils namespace end
@@ -140,7 +140,6 @@ template <class TEMP_CLASS> std::string ToString
   ss << value;
   return ss.str();
 }
-
 }
 
 /// A macro to disallow the copy constructor and operator= functions

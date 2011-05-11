@@ -10,9 +10,10 @@ config.log
 .sconsign.dblite
 mausput
 gmon.out
+list.prof
+unit_test
 tmp/*
 src/map/*/build
-tests/style/cpplint_test/test_cpplint.out
 tests/cpp_unit/test_cpp_unit
 third_party/home
 third_party/build/*

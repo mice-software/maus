@@ -65,7 +65,7 @@ void MICESteppingAction::UserSteppingAction(const G4Step * aStep)
   G4String particleName = aTrack->GetDefinition()->GetParticleName();
   //Check whether I am stepping over a virtual plane; if "yes", set Virtual plane information
   //Nb: put before tracks are killed to make sure get output even on final step
-  theVirtualPlanes->VirtualPlanesSteppingAction(aStep); 
+//  theVirtualPlanes->VirtualPlanesSteppingAction(aStep);  comment out to make it compile
 
   // Readout code, special for debugging physicslist and cuts.
   // AssignElement must be called before the "return" command,

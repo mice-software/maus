@@ -58,7 +58,6 @@ MAUS-v0.0.1 (http://micewww.pp.rl.ac.uk/versions/show/1):
 	Feature #144: should json be linked to everything
 	Feature #146: add scons config check for gsl (mainly with -fPIC so ROOT can happen too)
 	Feature #153: Hudson v.s. buildbot
-	Feature #156: disco project usage (add checks in configure and build script)
 	Feature #165: rewrite g4mice build system
 	Feature #166: buildscript for recpack
 	Feature #174: remove commoncpp/sim/MiceMessenger
