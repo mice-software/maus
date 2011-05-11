@@ -219,8 +219,11 @@ class MapPyTOFCabling:
                  for hit in subsubdata['hits']:
                      if hit['channel'] == 0:
                          print hit
-                         assert(trigger_time == None)
+                         #assert(trigger_time == None)
                          trigger_time = hit['leading_time']
+
+
+                 print 'found triggers'
 
                  for hit in subsubdata['hits']:
                      del hit['trailing_time']

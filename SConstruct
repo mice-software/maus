@@ -548,4 +548,7 @@ file_to_import.close()
 files = glob.glob('tests/unit/test_*')+glob.glob('tests/style/*.py')
 env.Install("build", files)
 
+env.Install("build", "tests/unit/test_cdb")
+env.Install("build", "tests/unit/suds")
+
 env.Alias('install', ['%s/build' % maus_root_dir])
