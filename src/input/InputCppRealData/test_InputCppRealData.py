@@ -1,6 +1,5 @@
 import os
 import md5
-import json
 import unittest
 
 from InputCppRealData import InputCppRealData
@@ -57,7 +56,7 @@ class InputCppRealDataTestCase(unittest.TestCase):
         self.assertEqual(event_count, 26)
 
         # Check the md5 sum matches the expected value
-        self.assertEqual(digester.hexdigest(), 'f2ff5a5c7d6e15d095d1ea1f6a074824')
+        self.assertEqual(digester.hexdigest(), '16999cfce60f78cd0545724abfc23768')
 
         self.assertTrue(self.mapper.death())
 

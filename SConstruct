@@ -476,8 +476,8 @@ if 'configure' in COMMAND_LINE_TARGETS: # pylint: disable-msg=E0602
 # NOTE: do this after configure!  So we know if we have ROOT/geant4
 #specify all of the sub-projects in the section
 if env['USE_G4'] and env['USE_ROOT']:
-    env.Append(CCFLAGS=['-g','-pg'])
-    env.Append(LINKFLAGS='-pg')
+    #env.Append(CCFLAGS=['-g','-pg'])
+    #env.Append(LINKFLAGS='-pg')
 
     common_cpp_files = glob.glob("src/common/*/*cc") + \
         glob.glob("src/common/*/*/*cc") + \
