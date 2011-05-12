@@ -193,8 +193,8 @@ void InputCppRealData::processLDCEvent(MDevent *pEvent,
         // Check if the equipment type is one we can process
         // (TDC, fADC or Scalar hits apparently...)
         if ((xEquipType == VmeTdc) ||
-            (xEquipType == VmefAdc1724) ||
-            (xEquipType == VmefAdc1731) ||
+            //(xEquipType == VmefAdc1724) ||
+            //(xEquipType == VmefAdc1731) ||
             (xEquipType == VmeScaler)) {
           xEvntFrag.InitPartEventVector();
           // Each fragment is made up of a series of parts
