@@ -14,7 +14,7 @@
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
 
-## @class MapPyPrint
+## @class MapPyPrint.MapPyPrint
 #  MapPyPrint prints out events
 #
 #  This class is meant to mimick MapCppPrint and output in
