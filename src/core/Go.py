@@ -46,6 +46,15 @@ from Configuration import Configuration
 
 class Go:
     def __init__(self, argInput, argMapper, argReducer, argOutput, argConfigFile = None):
+        maus_root_dir = os.environ.get('MAUS_ROOT_DIR')
+        current_dir = os.getcwd()
+
+        if maus_root_dir not in current_dir:
+            print("\nWARNING: YOU ARE RUNNING MAUS OUTSIDE ITS MAUS_ROOT_DIR")
+            print("\tMAUS_ROOT_DIR = %s" % (maus_root_dir))
+            print("\tCURRENT DIRECTORY = %s\n" % (current_dir))
+            
+
         self.input = argInput
         self.mapper = argMapper
         self.reducer = argReducer
