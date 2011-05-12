@@ -11,7 +11,7 @@ import sys # for command line arguments
 import os
 import MAUS 
 
-def run(number_of_events, data_path, data_file):
+def run(data_path, data_file):
     """Analyze data from the MICE experiment
     
     This will read in and process data taken from the MICE experiment. It will
@@ -26,7 +26,7 @@ def run(number_of_events, data_path, data_file):
     # with the functionality you want to use.
     my_map = MAUS.MapPyGroup()
     #my_map.append(MAUS.MapPyPrint())
-    my_map.append(MAUS.MapPyTOFCabling())
+    #my_map.append(MAUS.MapPyTOFCabling())
     
     #  The Go() drives all the components you pass in then put all the output
     #  into a file called 'mausput'
@@ -50,12 +50,8 @@ if __name__ == '__main__':
         data_path = sys.argv[1]
         data_file = sys.argv[2]
 
-    # The number of spills you want to look at
-    number_of_events = 2
-
-    print "Number of events:", number_of_events
     print "Data path:", data_path
     print "Data file", data_file
     print
 
-    run(number_of_events, data_path, data_file)
+    run(data_path, data_file)
