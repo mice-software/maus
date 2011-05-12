@@ -7,9 +7,10 @@ Release Notes
 
 MAUS-0.0.1 summary:
 - Core map-reduce infrastructure
-- Functioning but not complete simulation application
+- Partial implementaton of monte carlo tracking simulation at application level
+-- Port of geometry, fields, geant4 set-up, virtual planes algorithm 
 - Abiity to analyze low-level DAQ data
 - Build system of all dependencies that is tested on a wide range of systems
-- Attempts at porting, testing, and cleaning up legacy code
+- Partial port, testing, and clean up of legacy code
 
 
