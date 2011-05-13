@@ -36,6 +36,15 @@ maximum_number_of_steps = 10000
 # this is used by reconstruction
 reconstruction_geometry_filename = simulation_geometry_filename
 
+#Used by MapPyCreateSpill
+CreateSpill_Nparticles = 2 #55
+
+#Used by MapPyBeamMaker
+emittance4D = 6 #mm
+centralPz = 200 #MeV/c
+sigmaPz = 5 #MeV/c
+sigmaTime = 0 #ns; default: 0
+
 # tof digitization
 TOFconversionFactor = 0.01 # MeV
 TOFpmtTimeResolution = 0.1 # nanosecond
