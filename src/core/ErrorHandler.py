@@ -72,7 +72,7 @@ class ErrorHandler:
         elif self.on_error == 'raise':
             raise
         else:
-            raise KeyError('Did not recognise on error directive '
+            raise KeyError('Did not recognise on_error directive '
                                                             +str(self.on_error))
         return doc
 

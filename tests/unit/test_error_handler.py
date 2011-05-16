@@ -132,6 +132,17 @@ class ErrorHandlerTestCase(unittest.TestCase):
       raise RuntimeError("Test error 1")
     except:
       doc = error_handler.HandleException(doc, self)  
+    error_handler.on_error = 'BAD_STRING'
+    try:
+      raise RuntimeError("Test error 1")
+    except:
+      with self.assertRaises(KeyError):
+        error_handler.HandleException(doc, self)
+
+  def test_SetUp(self):
+    error_handler = ErrorHandler.ErrorHandler()
+    with self.assertRaises(NotImplementedError):
+      error_handler.SetUp('')
 
   def test_DefaultHandler(self):
     ErrorHandler.DefaultHandler().error_to_stderr = False
