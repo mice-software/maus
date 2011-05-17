@@ -391,6 +391,19 @@ def set_unpacker(conf, env):
 # have a 'lib' prefix, which is needed for python to find SWIG generated libraries
 env = Environment(SHLIBPREFIX="") # pylint: disable-msg=E0602
 
+if env.GetOption('clean'):
+    print("In cleaning mode!")
+
+    for root, dirs, files in os.walk('%s/build' % maus_root_dir):
+        for basename in files:
+            filename = os.path.join(root, basename)
+            if os.path.isfile(filename):
+                print 'Removing:', filename
+                os.remove(filename)
+
+            
+    
+
 if os.path.isfile('.use_llvm_with_maus'):
     env['CC'] = "llvm-gcc"
     env['CXX'] = "llvm-g++"
