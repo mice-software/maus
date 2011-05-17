@@ -42,7 +42,7 @@ import cProfile as profile
 import pstats 
 
 # MAUS
-from .Configuration import Configuration
+from Configuration import Configuration
 
 class Go:
     def __init__(self, argInput, argMapper, argReducer, argOutput, argConfigFile = None):
