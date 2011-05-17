@@ -17,14 +17,14 @@
 
 #include <iostream>
 
-#include "MAUSGeant4Manager.hh"
-#include "MAUSTrackingAction.hh"
+#include "src/common/Simulation/MAUSGeant4Manager.hh"
+#include "src/common/Simulation/MAUSTrackingAction.hh"
 
 namespace MAUS {
 
 void MAUSTrackingAction::PreUserTrackingAction(const G4Track* aTrack) {
   MAUSSteppingAction* stepAct = MAUSGeant4Manager::GetInstance()->GetStepping();
-  if (!stepAct || !aTrack) 
+  if (!stepAct || !aTrack)
     throw(Squeal(Squeal::nonRecoverable,
                  "Failed to get tracking",
                  "MAUSTrackingAction::PreUserTrackingAction"));

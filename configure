@@ -171,7 +171,7 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      export $DYLIB_VAR="\$MAUS_ROOT_DIR/build:\$$DYLIB_VAR"
 
      # maus core
-     export PYTHONPATH="\$MAUS_ROOT_DIR/src/core:\$PYTHONPATH"
+     export PYTHONPATH="\$MAUS_ROOT_DIR/src/core:\$MAUS_ROOT_DIR/third_party/install/lib:\$PYTHONPATH"
      export $DYLIB_VAR="\$MAUS_ROOT_DIR/src/core:\$$DYLIB_VAR"
 
      export G4DEBUG=1

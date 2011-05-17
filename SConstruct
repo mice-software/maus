@@ -476,8 +476,8 @@ if 'configure' in COMMAND_LINE_TARGETS: # pylint: disable-msg=E0602
 # NOTE: do this after configure!  So we know if we have ROOT/geant4
 #specify all of the sub-projects in the section
 if env['USE_G4'] and env['USE_ROOT']:
-    env.Append(CCFLAGS=['-g','-pg'])
-    env.Append(LINKFLAGS='-pg')
+    #env.Append(CCFLAGS=['-g','-pg'])
+    #env.Append(LINKFLAGS='-pg')
 
     common_cpp_files = glob.glob("src/common/*/*cc") + \
         glob.glob("src/common/*/*/*cc") + \
@@ -497,6 +497,8 @@ if env['USE_G4'] and env['USE_ROOT']:
 
     test_cpp_files = glob.glob("tests/cpp_unit/*/*cpp")+\
         glob.glob("tests/cpp_unit/*cpp")
+    test_cpp_files += glob.glob("tests/cpp_unit/*/*cc")+\
+        glob.glob("tests/cpp_unit/*cc")
 
     testmain = env.Program(target = 'tests/cpp_unit/test_cpp_unit', \
                                source = test_cpp_files, \
@@ -547,5 +549,8 @@ file_to_import.close()
 
 files = glob.glob('tests/unit/test_*')+glob.glob('tests/style/*.py')
 env.Install("build", files)
+
+env.Install("build", "tests/unit/test_cdb")
+env.Install("build", "tests/unit/suds")
 
 env.Alias('install', ['%s/build' % maus_root_dir])

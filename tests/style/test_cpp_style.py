@@ -1,3 +1,13 @@
+"""
+@brief Check that we obey cpplint portion of the style guide
+
+This walks the directory structure of MAUS and checks for each file of ending
+*.cpp, *.cc, *.h, *.hh that we do indeed obey cpplint. It's possible to set up
+exceptions to the cpplint test, either by line, by file or even by directory.
+Note however that exceptions for entire files or directories need to get the nod
+from the MAUS manager.
+"""
+
 import os
 import sys
 import unittest
@@ -145,9 +155,25 @@ class cpplint_postprocessor:
             print >>fh,'File',f
             for line in key: print >>fh,'   ',line[0]
 
+    def print_files_with_errors(self, file_to_error, fh):
+        """
+        @brief Print list of files that have errors (hack used below to create
+               exclude_files lists)
+        """
+        print >>fh,'['
+        keys = sorted(file_to_error.keys())
+        for key in file_to_error.keys():
+            out_string = key.split('/')[-1]
+            print >>fh,"'"+out_string+"',",
+        print >>fh,'\n]'
+
     def strip_ref_dict(self, ref_dict):
         """
-        @brief strip 
+        @brief strip the comment and name from reference values
+
+        @params ref_dict dict like {filename:[[line, reason, developer]]}
+
+        @returns dict like {filename:[line]}
         """
         ref_dict_2 = {}
         for fname,error_list in ref_dict.iteritems():
@@ -199,11 +225,17 @@ class cpplint_postprocessor:
 class test_cpp_style(unittest.TestCase):
     """@brief Interface to unittest module"""
     def test_glob_maus_root_dir(self):
+        """
+        @brief self check - test the glob_maus_root_dir function (above)
+        """
         self.assertEqual(
             glob_maus_root_dir(os.path.join('tests', 'style', 'cpplint_tes*')),
             [os.path.join('tests', 'style', 'cpplint_test')])
 
     def test_walker_and_path_exclude(self):
+        """
+        @brief self check - test we walk the path correctly, excluding relevant files and directories
+        """
         test_root_dir = os.path.join(maus_root_dir, 'tests', 'style')
         test_exclude_dirs = [os.path.join('cpplint_test', 'cpplint_test_exclude_dir')]
         test_exclude_files = [os.path.join('cpplint_test', 'force_fail.cc')]
@@ -211,9 +243,12 @@ class test_cpp_style(unittest.TestCase):
         self.assertEqual(test_result, 3) #2 errors from force_fail_2.cc
 
     def test_cpplint_postprocessor(self):
+        """
+        @brief self check - test we postprocess cpplint output correctly
+        """
         #First we make some errors
         style_dir = os.path.join(maus_root_dir,'tests','style', 'cpplint_test')
-        file_name = os.path.join(style_dir, 'test_cpplint.out')
+        file_name = os.path.join(maus_root_dir, 'tmp', 'test_cpplint.out')
         test_result = walker(style_dir, [], [], file_name)
         # now we try to postprocess
         test_exceptions = {'tests/style/cpplint_test/force_fail.cc':[
@@ -221,18 +256,18 @@ class test_cpp_style(unittest.TestCase):
                 ('//                                                                               more than 80 lines and space at end - should fail ', 'Deliberately broken for testing', 'Chris Rogers')
             ]
         }
-        n_errors = cpplint_postprocessor().process(file_name, test_exceptions, os.path.join(style_dir, 'test_cpplint_out.out'))
-        self.assertEqual(n_errors, 7)
+        n_errors = cpplint_postprocessor().process(file_name, test_exceptions, os.path.join(maus_root_dir, 'tmp', 'test_cpplint_out.out'))
+        self.assertEqual(n_errors, 6)
 
     def test_cpp_style(self):
         """
-        @brief Walk the directory structure and look for errors in cpplint
+        @brief This is the main test - walks the directory structure and looks for errors using cpplint
         """
         file_name = os.path.join(maus_root_dir,'tmp','cpplint.out')
         walker(maus_root_dir, exclude_dirs, exclude_files, file_name)
         test_result = cpplint_postprocessor().process(file_name, cpplint_exceptions.exceptions, processed_output_filename=file_name)
         self.assertEqual(test_result, 0,
-            msg="Failed cpp style test - output in file:\n"+file_name) 
+            msg="Failed cpp style test - detailed output in file:\n"+file_name)
 
 
 maus_root_dir = os.environ['MAUS_ROOT_DIR']
@@ -246,16 +281,82 @@ exclude_dirs = [
 'build',
 'doc',
 '.sconf_temp',
-'src',
-'tests',
-]+glob_maus_root_dir(os.path.join('src', 'map', '*', 'build'))
+os.path.join('src', 'map', 'MapCppTOFDigitization'),
+os.path.join('src', 'map', 'MapCppTrackerDigitization'),
+os.path.join('src', 'map', 'MapCppPrint'),
+os.path.join('tests', 'style'),
+]+glob_maus_root_dir(os.path.join('src', '*', '*', 'build')
+)
 
 # exclude_files are files that are explicitly excluded from the style check,
 # usually legacy code that hasn't been cleaned up yet. Note you MUST get
 # explicit approval from Chris Rogers before adding something to
 # exclude_files.
-exclude_files = [
+#
+# If you do fix a file, please remove the file from this list (so it is included
+# in future regression tests)
+exclude_files = []
+
+def file_append(path, file_list):
+    exclude_list = []
+    for f in file_list:
+        exclude_list.append(os.path.join(path, f))
+    return exclude_list
+
+interface_files = [
+'Spline1D.cc', 'For003Bank.hh', 'For009Bank.hh', 'MiceEventManager.hh', 'VmeAdcHit.cc', 'MICESpill.hh', 'VirtualHit.cc', 'DataBaseAPI.hh', 'MCParticle.hh', 'Memory.cc', 'VmeTdcHit.hh', 'EventLoader.hh', 'AnalysisPlaneBank.hh', 'Differentiator.hh', 'VlpcEventTime.hh', 'TurtleBank.hh', 'Interpolator.hh', 'MiceEventManager.cc', 'DataBaseReader.cc', 'SplineInterpolator.cc', 'RFFieldMap.cc', 'RunFooter.cc', 'MCVertex.cc', 'EMRHit.hh', 'KLDigit.cc', 'MICESpill.cc', 'Reader.hh', 'VmeBaseHit.hh', 'MCHit.cc', 'SplineInterpolator.hh', 'Interpolator.cc', 'VmefAdcHit.hh', 'VmeBaseHit.cc', 'MICEEvent.cc', 'SciFiHit.hh', 'DataBaseReader.hh', 'VmeScalerData.hh', 'KillHit.hh', 'MVector.hh', 'CkovDigit.hh', 'MICERun.cc', 'dataCards.hh', 'Memory.hh', 'For003Bank.cc', 'MCParticle.cc', 'KLDigit.hh', 'TriangularMesh.cc', 'RFData.hh', 'CkovDigit.cc', 'CppErrorHandler.cc', 'MMatrixToCLHEP.cc', 'MiceMaterials.hh', 'TofHit.cc', 'RunHeader.hh', 'VmeScalerData.cc', 'ThreeDFieldMap.hh', 'AnalysisPlaneBank.cc', 'SpecialHit.hh', 'CkovHit.cc', 'For009Bank.cc', 'VlpcHit.cc', 'VmeAdcHit.hh', 'PolynomialVector.hh', 'EMRDigit.cc', 'TofDigit.hh', 'MICEUnits.cc', 'AnalysisEventBank.hh', 'PolynomialVector.cc', 'ZustandVektor.cc', 'MCHit.hh', 'CkovHit.hh', 'MMatrix.cc', 'MiceMaterials.cc', 'BetaFuncBank.hh', 'SciFiDigit.hh', 'G4BLBank.cc', 'VirtualHit.hh', 'TofHit.hh', 'StagePosition.hh', 'RunFooter.hh', 'KLHit.hh', 'Differentiator.cc', 'MVector.cc', 'XMLMessage.cc', 'Spline1D.hh', 'SciFiHit.cc', 'ZustandVektor.hh', 'RunHeader.cc', 'VlpcHit.hh', 'BetaFuncBank.cc', 'VersionInfo.hh', 'AnalysisEventBank.cc', 'MICEUnits.hh', 'MICERun.hh', 'MMatrixToCLHEP.hh', 'RFData.cc', 'RFFieldMap.hh', 'Mesh.cc', 'CppErrorHandler.hh', 'EMRDigit.hh', 'MCVertex.hh', 'MMatrix.hh', 'EventTime.hh', 'KLHit.cc', 'dataCards.cc', 'TriangularMesh.hh', 'MagFieldMap.cc', 'VersionInfo.cc', 'VmeTdcHit.cc', 'TurtleBank.cc', 'EMRHit.cc', 'ThreeDFieldMap.cc', 'EventTime.cc', 'VmefAdcHit.cc', 'MICEEvent.hh', 'G4BLBank.hh', 'MagFieldMap.hh', 'SciFiDigit.cc', 'SpecialHit.cc', 'Mesh.hh', 'XMLMessage.hh', 'TofDigit.cc', 'DataBaseAPI.cc', 
 ]
+
+engmodel_files = [
+'Polycone.cc', 'MiceElectroMagneticField.hh', 'Q35.cc', 'MultipoleAperture.cc', 'Polycone.hh', 'MultipoleAperture.hh', 'MiceModToG4Solid.hh', 'Q35.hh', 'MiceModToG4Solid.cc', 'MiceMagneticField.hh', 
+]
+
+beamtools_files = [
+'BTConstantField.cc', 'BTPillBox.cc', 'BTMagFieldMap.hh', 'micegsl.cc', 'BT3dFieldMap.hh', 'BTQuad.hh', 'BTSheet.hh', 'BTPillBox.hh', 'BTFieldConstructor.cc', 'BTRFFieldMap.hh', 'BTFastSolenoid.cc', 'BTCombinedFunction.cc', 'BTTracker.cc', 'BTMagFieldMap.cc', 'BTFieldGroup.hh', 'micegsl.hh', 'BTConstantField.hh', 'BTFieldConstructor.hh', 'BTSpaceChargeField.hh', 'BTField.hh', 'BTPhaser.hh', 'BTMidplaneMap.cc', 'BTSheet.cc', 'BTFastSolenoid.hh', 'BTPhaser.cc', 'BTMidplaneMap.hh', 'BTField.cc', 'BTTracker.hh', 'BTCombinedFunction.hh', 'BTFieldGroup.cc', 'BTSpaceChargeField.cc', 'BT3dFieldMap.cc', 'BTQuad.cc', 'BTSolenoid.cc', 'BTRFFieldMap.cc', 'BTSolenoid.hh', 
+]
+
+simulation_files = [
+'MICEPhysicsList.cc', 'MiceMessenger.cc', 'MICERunAction.hh', 'StripSpecialHits.cc', 'MICEBGPlane.hh', 'MICEVisManager.hh', 'MiceMessenger.hh', 'MICEDetectorConstruction.hh', 'FillMaterials.cc', 'MICEStepStatistics.hh', 'MICEPrimaryGeneratorAction.hh', 'MICESteppingAction.cc', 'MICEPhysicsList.hh', 'MICEVisManager.cc', 'FillMaterials.hh', 'MICEBGPlane.cc', 'MICEStepStatistics.cc', 'StripSpecialHits.hh', 'MICEEventAction.hh', 'MICESteppingAction.hh', 'MICERunAction.cc', 'MICEDetectorConstruction.cc', 'MICEEventAction.cc', 
+]
+
+recon_files = [
+'SciFiDoubletCluster.cc', 'SciFiClusterRec.hh', 'TriggerKey.hh', 'TofPid.cc', 'KLChannelMap.hh', 'SciFiSeed.cc', 'Extrapolation.cc', 'TofRec.cc', 'PmtKey.cc', 'SciFiCMN.hh', 'SciFiTrack.hh', 'MousePid.hh', 'CkovChannelMap.hh', 'SciFiFieldMap.cc', 'SciFiNtupleFill.hh', 'SciFiPointRec.hh', 'SciFiDigitRec.hh', 'TofChannelMap.cc', 'KLCellHit.hh', 'KLRec.hh', 'TofCalibrationMap.hh', 'MouseTrack.hh', 'SciFiStraightTrackRec.cc', 'GlobalRec.hh', 'SciFiBadChans.cc', 'TofChannelMap.hh', 'TofTrigger.hh', 'PmtKey.hh', 'SciFiSeed.hh', 'TofSpacePoint.cc', 'SciFiDoubletCluster.hh', 'TofSpacePoint.hh', 'TriggerKey.cc', 'TofTrack.cc', 'SciFiRec.cc', 'EMRRec.cc', 'TofPid.hh', 'KalmanSeed.hh', 'SciFiKalTrack.cc', 'FProjector.cc', 'SciFiHelixTrackRec.cc', 'SciFiBadChans.hh', 'SciFiExtrap.hh', 'GlobalRec.cc', 'TofCalibrationMap.cc', 'SciFiHelixTrackRec.hh', 'TofTrack.hh', 'SciFiNtuple.hh', 'SciFiPointRec.cc', 'SciFiKalTrack.hh', 'SetupKalmanRec.hh', 'TofTrigger.cc', 'MouseTrack.cc', 'Extrapolation.hh', 'SciFiTrack.cc', 'SciFiCMN.cc', 'CkovChannelMap.cc', 'TofSlabHit.cc', 'SciFiStraightTrackRec.hh', 'SciFiDoubletMeas.hh', 'SciFiDigitRec.cc', 'CkovRec.cc', 'KLChannelMap.cc', 'TofRec.hh', 'TofSlabHit.hh', 'CkovRec.hh', 'KLCellHit.cc', 'EMRRec.hh', 'SciFiExtrap.cc', 'SciFiClusterRec.cc', 'SciFiRec.hh', 'KLRec.cc', 'SciFiSpacePoint.cc', 'SciFiDoubletMeas.cc', 'SciFiSpacePoint.hh', 'SetupKalmanRec.cc', 'SciFiFieldMap.hh', 'FProjector.hh', 
+]
+
+detmodel_files = [
+'KLSD.hh', 'DoubletFiberParam.cc', 'SpecialVirtualSD.hh', 'SpecialDummySD.hh', 'EMRSD.cc', 'TofSD.cc', 'CkovMirror.cc', 'CKOVSD.cc', 'SciFiSD.hh', 'KLFiber.cc', 'TofSD.hh', 'KLGlue.hh', 'DoubletFiberParam.hh', 'KLFiber.hh', 'KLSD.cc', 'EMRSD.hh', 'SciFiPlane.cc', 'SpecialVirtualSD.cc', 'KLGlue.cc', 'SciFiSD.cc', 'SciFiPlane.hh', 'CkovMirror.hh', 'CKOVSD.hh', 
+]
+
+calib_files = [
+'TpgDigitsParameters.hh', 'TofCalib.cc', 'VlpcCalib.hh', 'SciFiDigitizationParams.hh', 'VlpcCalib.cc', 'TofReconParams.cc', 'CKOV1DigitsParams.hh', 'TofDigitizationParams.cc', 'TpgReconstructionParams.hh', 'AnaParams.cc', 'CKOV1DigitsParams.cc', 'SciFiReconstructionParams.cc', 'TofDigitizationParams.hh', 'TpgDigitsParameters.cc', 'AnaParams.hh', 'CKOVDigitsParams.hh', 'CKOV2DigitsParams.cc', 'TofCalib.hh', 'TofReconParams.hh', 'SciFiDigitizationParams.cc', 'TpgReconstructionParams.cc', 'SciFiReconstructionParams.hh', 'CKOV2DigitsParams.hh', 'CKOVDigitsParams.cc', 
+]
+
+config_files = [
+'BeamlineParameters.cc', 'ModuleTextFileIO.hh', 'SciFiCableManager.hh', 'CoolingChannelGeom.cc', 'VlpcCableOsaka2.cc', 'TofCable.cc', 'ModuleConverter.cc', 'ModuleConverter.hh', 'VlpcCableOsaka3.cc', 'RFBackgroundParameters.cc', 'TofCable.hh', 'BeamlineGeometry.hh', 'BeamlineGeometry.cc', 'VlpcCableOsaka.hh', 'SciFiCableManager.cc', 'RFParameters.hh', 'MagnetParameters.hh', 'BeamlineParameters.hh', 'BeamParameters.cc', 'MiceModule.hh', 'VlpcCableOsaka2.hh', 'CoolingChannelGeom.hh', 'VlpcCableImperial.hh', 'MagnetParameters.cc', 'ModuleTextFileIO.cc', 'VlpcCableImperial.cc', 'BeamParameters.hh', 'RFParameters.cc', 'VlpcCable.hh', 'VlpcCableOsaka3.hh', 'RFBackgroundParameters.hh', 'VlpcCableOsaka.cc', 'MiceModule.cc', 
+]
+
+cpp_unit_files = [
+'MeshTest.cpp', 'MAUSPrimaryGeneratorActionTest.cpp', 'BTSolenoidTest.cpp', 'JsonWrapperTest.cpp', 'MAUSTrackingActionTest.cpp', 'MAUSGeant4ManagerTest.cpp', 'BTMultipoleTest.cpp', 'MVectorTest.cpp', 'DifferentiatorTest.cpp', 'BTFieldConstructorTest.cpp', 'MMatrixTest.cpp', 'MiceModToG4SolidTest.cpp', 'PolynomialTest.cpp', 'BTTrackerTest.cpp', 'MAUSSteppingActionTest.cpp', 'CppErrorHandlerTest.cpp', 'MiceModuleTest.cpp', 'TriangularMeshTest.cpp', 'dataCardsTest.cpp', 
+]
+
+cp = os.path.join('src', 'common')
+test = os.path.join('tests', 'cpp_unit')
+
+# glob files here because of 
+glob_files = []
+glob_files += file_append(os.path.join(cp, 'Recon', '*'), recon_files)
+glob_files += file_append(os.path.join(cp, 'DetModel', '*'), detmodel_files)
+glob_files += file_append(os.path.join(test, '*'), cpp_unit_files)
+
+for f in glob_files:
+    exclude_files += glob_maus_root_dir(f)
+
+exclude_files += file_append(os.path.join(cp, 'Interface'), interface_files)
+exclude_files += file_append(os.path.join(cp, 'EngModel'), engmodel_files)
+exclude_files += file_append(os.path.join(cp, 'BeamTools'), beamtools_files)
+exclude_files += file_append(os.path.join(cp, 'Simulation'), simulation_files)
+exclude_files += file_append(os.path.join(cp, 'Calib'), calib_files)
+exclude_files += file_append(os.path.join(cp, 'Config'), config_files)
 
 if __name__=="__main__":
   unittest.main()
