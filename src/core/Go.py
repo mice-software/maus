@@ -42,7 +42,7 @@ import cProfile as profile
 import pstats 
 
 # MAUS
-from Configuration import Configuration
+from .Configuration import Configuration
 
 class Go:
     def __init__(self, argInput, argMapper, argReducer, argOutput, argConfigFile = None):
@@ -51,8 +51,8 @@ class Go:
 
         if maus_root_dir not in current_dir:
             print("\nWARNING: YOU ARE RUNNING MAUS OUTSIDE ITS MAUS_ROOT_DIR")
-            print("\tMAUS_ROOT_DIR = %s" % (maus_root_dir))
-            print("\tCURRENT DIRECTORY = %s\n" % (current_dir))
+            print(("\tMAUS_ROOT_DIR = %s" % (maus_root_dir)))
+            print(("\tCURRENT DIRECTORY = %s\n" % (current_dir)))
             
 
         self.input = argInput
@@ -61,9 +61,9 @@ class Go:
         self.output = argOutput
 
         print("Welcome to MAUS:")
-        print("\tProcess ID (PID): %d" % os.getpid())
-        print("\tUniversally Unique ID (UUID): %s" % uuid.uuid4())
-        print("\tProgram Arguments: %s" % str(sys.argv))
+        print(("\tProcess ID (PID): %d" % os.getpid()))
+        print(("\tUniversally Unique ID (UUID): %s" % uuid.uuid4()))
+        print(("\tProgram Arguments: %s" % str(sys.argv)))
 
         self.jsonConfigDocument = Configuration().getConfigJSON(argConfigFile)
         jsonConfigDictionary = json.loads(self.jsonConfigDocument)
