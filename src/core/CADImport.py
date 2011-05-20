@@ -1,8 +1,19 @@
 import os.path
 import libxml2
 import libxslt
+import CADImport
 
 class CADImport:
+    """
+    This class has been designed to parse XML(GDML) files in a number of ways.
+    The first way applies an XSLT stylesheet to a GDML file and re writes the
+    file into MICE module format. The output can be a text file. The second parsing
+    method is where the XSLT stylesheet is applied to two GDMLs and appends the MICE
+    Information of one GDML to the end of the geometry GMDL file, taken from fastRad
+    in order to merge geometrical information and field information needed for G4. This outputs the
+    a GDML file.
+    """
+
     def __init__(self, xmlin1, xsl , xmlin2=None, output=None, mergein=None, mergeout=None):
         """
         @Method Class initialiser
@@ -11,12 +22,13 @@ class CADImport:
         but if one of the latter needs to be initialised a blank "" needs to be placed to set preceeding 
         params to None. All arguments should be file names or paths.
 
-        @param xmlin1,   first xml argument
-        @param xsl,      xslt argument
-        @param xmlin2,   second xml argument, Default None
-        @param output,   output argument, Default None
-        @param mergein,  template XSLT for append, Default Merge.xsl.in
-        @param mergeout, destination for edited XSLT for append, Default Merge.xsl
+        @param xmlin1,   first xml file name/path, used to apply an XSLT to.
+        @param xsl,      xslt file name/path, xslt stylesheet used to re write xml(GDML)
+        @param xmlin2,   second xml file name/path, used to hold the MICE info to append to geometry
+        @param output,   output file name/path
+        @param mergein,  template XSLT for append, this is the file name/path to Merge.xsl.in which is the stylesheet
+                         used to append the MICE info to geometry info. This file must be altered to set the putout file name/path.
+        @param mergeout, file name/path to be inserted into merge.xsl.in.
         """
         #if xmlin1 == None: raise StandardError("xmlin1 must be defined", "CADImport::__init__")
         #else:
@@ -78,10 +90,13 @@ class CADImport:
         #throw error if Merge.xsl.in has been altered
         if found == False: raise StandardError("EDIT not found in Merge.xsl.in, this file has been altered", "CADImport::AppendMerge")
 
+    def main():
+        geometry1 = CADImport("fastradModel.xml", "GDML2G4MICE.xsl", "", "OUTPUTFILE.txt")
+        geometry2 = CADImport("fastradModel.xml", "GDML2G4MICE.xsl")
+        geometry3 = CADImport("fastradModel.xml", "Merge.xsl", "FieldInfoTest.xml")
 
-geometry1 = CADImport("fastradModel.xml", "GDML2G4MICE.xsl", "", "OUTPUTFILE.txt")
-geometry2 = CADImport("fastradModel.xml", "GDML2G4MICE.xsl")
-geometry3 = CADImport("fastradModel.xml", "Merge.xsl", "FieldInfoTest.xml")
+        geometry1.XSLTParse()
+        geometry3.AppendMerge()
 
-geometry1.XSLTParse()
-geometry3.AppendMerge()
+    if __name__ == '__main__':
+        main()
