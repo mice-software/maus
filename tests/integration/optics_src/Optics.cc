@@ -5,8 +5,13 @@
 #include "TFile.h"
 #include "G4VSolid.hh"
 
+#include "json/json.h"
+
 #include "Optics.hh"
 
+#include "src/common/Interface/JsonWrapper.hh"
+#include "src/common/Interface/MiceMaterials.hh"
+#include "src/common/Simulation/MAUSPrimaryGeneratorAction.hh"
 #include "src/common/Simulation/MAUSPrimaryGeneratorAction.hh"
 #include "src/common/BeamTools/BTFieldConstructor.hh"
 #include "src/common/Interface/SpecialHit.hh"
@@ -48,6 +53,11 @@ void SetupSimulation(MiceModule* root, std::vector<CovarianceMatrix> envelope)
 {
   simRun.DataCards     = &MyDataCards;
   simRun.miceModule    = root;
+  simRun.miceMaterials = new MiceMaterials();
+  simRun.jsonConfiguration = new Json::Value
+                                (JsonWrapper::StringToJson("{\"maximum_number_of_steps\":10000}")); // BUG
+  Squeak::setStandardOutputs();
+  fillMaterials(simRun);
 
   g4Manager = MAUSGeant4Manager::GetInstance();
 
@@ -84,6 +94,7 @@ MICEEvent* PhaseCavities(PhaseSpaceVector ref)
 
 MICEEvent* RunSimulation(PhaseSpaceVector psv)
 {
+  MAUSGeant4Manager::GetInstance()->GetStepping()->SetTracks(Json::Value());
   simEvent = MICEEvent();
   BTPhaser::IsRefPart(true);
   if(psv.E()<0) return &simEvent;

@@ -69,7 +69,11 @@ Configuration PhaseTest
     Position 0.0 0.0 -525.0+75.0*@RepeatNumber cm
     PropertyString FieldType      Solenoid
     PropertyString FileName       fs2a_coil.fld
-    PropertyString FieldMapMode   Read
+    PropertyString FieldMapMode   Write
+    PropertyDouble CurrentDensity 1.
+    PropertyDouble Length         150.
+    PropertyDouble Thickness      150.
+    PropertyDouble InnerRadius    350.
     PropertyDouble ScaleFactor    106.66*(-1.)^@RepeatNumber
     PropertyBool   RepeatModule2  true
     PropertyInt    NumberOfRepeats 20
