@@ -25,7 +25,7 @@ import types
 
 class ReducePyDoNothing:
     def Birth(self):
-        pass
+        return True
 
     def Process(self, x, y):
         x = x.rstrip()

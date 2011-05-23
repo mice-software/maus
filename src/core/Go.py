@@ -101,7 +101,7 @@ class Go:
         ######  Map Phase  ######
         ####                #####
         print("MAP: Setting up mappers")
-        self.mapper.birth(self.jsonConfigDocument)
+        assert(self.mapper.birth(self.jsonConfigDocument) == True)
 
         while len(mapBuffer) != 0:
             print(("MAP: Processing %d events" % len(mapBuffer)))
@@ -124,7 +124,7 @@ class Go:
         ######  Reduce Phase  ######
         ####                   ##### 
         print("REDUCE: Setting up reducers")
-        self.reducer.Birth()
+        assert(self.reducer.Birth() == True)
         
         # read back
         fileObj.seek(0) # go to beginning of file
@@ -154,7 +154,7 @@ class Go:
         ######  Output Phase  ######
         ####                   #####
 
-        self.output.birth()
+        assert(self.output.birth() == True)
         
         self.output.save(reduceResult)
                 

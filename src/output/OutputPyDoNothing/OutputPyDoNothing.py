@@ -24,9 +24,9 @@ class OutputPyDoNothing:
     """
 
     def birth(self):
-        """Birth does nothing; no setup required
+        """Birth returns true
         """
-        pass # do nothing
+        return True
 
     def save(self, document):
         """Save single event to nowhere

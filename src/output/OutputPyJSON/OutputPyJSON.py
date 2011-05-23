@@ -52,7 +52,7 @@ class OutputPyJSON:
     def birth(self):
         """Birth does nothing; no setup required
         """
-        pass
+        return True
 
     def save(self, document):
         """Save single event
