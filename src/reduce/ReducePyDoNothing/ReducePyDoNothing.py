@@ -24,7 +24,7 @@ import json
 import types
 
 class ReducePyDoNothing:
-    def birth(self):
+    def birth(self, datacards):
         return True
 
     def process(self, x, y):
