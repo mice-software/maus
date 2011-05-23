@@ -124,7 +124,7 @@ class Go:
         ######  Reduce Phase  ######
         ####                   ##### 
         print("REDUCE: Setting up reducers")
-        assert(self.reducer.birth() == True)
+        assert(self.reducer.birth(self.jsonConfigDocument) == True)
         
         # read back
         fileObj.seek(0) # go to beginning of file
