@@ -24,15 +24,15 @@ import json
 import types
 
 class ReducePyDoNothing:
-    def Birth(self):
+    def birth(self):
         return True
 
-    def Process(self, x, y):
+    def process(self, x, y):
         x = x.rstrip()
         y = y.rstrip()
         return "%s\n%s" % (x,y)
 
-    def Death(self):
+    def death(self):
         pass
 
 

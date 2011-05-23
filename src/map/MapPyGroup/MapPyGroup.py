@@ -68,10 +68,7 @@ class MapPyGroup:
 
     def birth(self, argJsonConfigDocument):
         for worker in self._workers:
-            try:
-                assert worker.birth(argJsonConfigDocument)
-            except:
-                return False
+            assert worker.birth(argJsonConfigDocument)
 
     def process(self, x):
         for worker in self._workers:

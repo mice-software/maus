@@ -124,7 +124,7 @@ class Go:
         ######  Reduce Phase  ######
         ####                   ##### 
         print("REDUCE: Setting up reducers")
-        assert(self.reducer.Birth() == True)
+        assert(self.reducer.birth() == True)
         
         # read back
         fileObj.seek(0) # go to beginning of file
@@ -139,16 +139,16 @@ class Go:
             i = i + 1
             if i % 1000 == 0:
                 print(('REDUCE: Reducing %d events in the %d pass' % (len(reduceBuffer), len(reduced))))
-                reduced.append(reduce(self.reducer.Process, reduceBuffer))
+                reduced.append(reduce(self.reducer.process, reduceBuffer))
                 reduceBuffer = []
 
         print(('REDUCE: Merging %d passes and reducing the %d events left in the buffer' % (len(reduced), len(reduceBuffer))))
-        reduceResult = reduce(self.reducer.Process, reduceBuffer + reduced)
+        reduceResult = reduce(self.reducer.process, reduceBuffer + reduced)
 
         tempFile.close()
         fileObj.close()
 
-        self.reducer.Death()
+        self.reducer.death()
         
         ####                    ####
         ######  Output Phase  ######
