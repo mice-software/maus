@@ -1,7 +1,19 @@
 import os.path
 import libxml2
 import libxslt
-import CADImport
+
+def main():
+    from CADImport import CADImport
+    geometry1 = CADImport("fastradModel.xml", "GDML2G4MICE.xsl", "", "OUTPUTFILE.txt")
+    geometry2 = CADImport("fastradModel.xml", "GDML2G4MICE.xsl")
+    geometry3 = CADImport("fastradModel.xml", "Merge.xsl", "FieldInfoTest.xml")
+    geometry1.XSLTParse()
+    geometry3.AppendMerge()
+    
+
+if __name__ == '__main__':
+    main()
+
 
 class CADImport:
     """
@@ -89,14 +101,3 @@ class CADImport:
                     print >>fout,line
         #throw error if Merge.xsl.in has been altered
         if found == False: raise StandardError("EDIT not found in Merge.xsl.in, this file has been altered", "CADImport::AppendMerge")
-
-    def main():
-        geometry1 = CADImport("fastradModel.xml", "GDML2G4MICE.xsl", "", "OUTPUTFILE.txt")
-        geometry2 = CADImport("fastradModel.xml", "GDML2G4MICE.xsl")
-        geometry3 = CADImport("fastradModel.xml", "Merge.xsl", "FieldInfoTest.xml")
-
-        geometry1.XSLTParse()
-        geometry3.AppendMerge()
-
-    if __name__ == '__main__':
-        main()

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gdml xmlns:gdml="http://cern.ch/2001/Schemas/GDML"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:noNamespaceSchemaLocation="file:/home/matt/Desktop/Matt/CAD2G4/GDML_fastradModel/GDML_3_0_0/schema/gdml.xsd">
+    <define>
+    </define>
+    <materials>
+    </materials>
+    <solids>
+        <cutTube rmax="ID002" deltaphi="ID004" lowX="ID005" lowY="ID006" lowZ="ID007" highX="ID008" highY="ID009" highZ="ID010"
+             name="ID010"/>
+        <arb8 v1x="ID010" v1y="ID010" v2x="ID010" v2y="ID010" v3x="ID010" v3y="ID010" v4x="ID010" v4y="ID010" v5x="ID010"
+             v5y="ID010" v6x="ID010" v6y="ID010" v7x="ID010" v7y="ID010" v8x="ID010" v8y="ID010" dz="ID010"
+             name="ID002"/>
+    </solids>
+    <structure>
+        <assembly name="ID003">
+            <physvol>
+                <file name="http://www.oxygenxml.com/"/>
+            </physvol>
+            <physvol>
+                <volumeref ref="ID010"/>
+            </physvol>
+        </assembly>
+        <assembly name="ID006">
+            <replicavol number="50">
+                <volumeref ref="ID002"/>
+                <replicate_along_axis>
+                    <direction/>
+                    <width value="ID003"/>
+                    <offset value="ID003"/>
+                </replicate_along_axis>
+            </replicavol>
+        </assembly>
+    </structure>
+    <MICE_Information>
+        <FieldType>Big</FieldType>
+        <FieldStrength>40</FieldStrength>
+        <FieldAnythingElse>Quadrapole</FieldAnythingElse>
+    </MICE_Information>
+    <setup name="ID009" version="version1">
+        <world ref="ID001"/>
+    </setup>
+    <setup name="ID000" version="version2">
+        <world ref="ID010"/>
+    </setup>
+</gdml>
