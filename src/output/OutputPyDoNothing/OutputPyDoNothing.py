@@ -23,7 +23,7 @@ class OutputPyDoNothing:
 
     """
 
-    def birth(self):
+    def birth(self, config_doc):
         """Birth returns true
         """
         return True
@@ -42,8 +42,8 @@ class OutputPyDoNothing:
     def death(self):
         """Closes down OutputPyDoNothing
 
-        Does nothing.
+        Does nothing but return true
         """
-        pass  #  do nothing
+        return True
 
 

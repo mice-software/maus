@@ -154,7 +154,7 @@ class Go:
         ######  Output Phase  ######
         ####                   #####
 
-        assert(self.output.birth() == True)
+        assert(self.output.birth(self.jsonConfigDocument) == True)
         
         self.output.save(reduceResult)
                 

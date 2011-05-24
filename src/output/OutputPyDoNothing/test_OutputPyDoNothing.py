@@ -19,9 +19,9 @@ class OutputPyJSONTestCase(unittest.TestCase):
         """
         output = OutputPyDoNothing()
 
-        self.assertTrue(output.birth())
+        self.assertTrue(output.birth("{}"))
         output.save(self.test_string)
-        output.death()
+        self.assertTrue(output.death())
 
 if __name__ == '__main__':
     unittest.main()

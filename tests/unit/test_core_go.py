@@ -14,7 +14,7 @@ from OutputPyJSON import *
 from Go import Go
 
 class FakeMap():
-    def birth(someArg):
+    def birth(self, someArg):
         return False
 
 class GoTestCase(unittest.TestCase):
@@ -29,7 +29,7 @@ class GoTestCase(unittest.TestCase):
 
     def map_birth_test(self):
         inputer = InputPyEmptyDocument(1)
-        mapper = FakeMap
+        mapper = FakeMap()
         reducer = ReducePyDoNothing()
         outputer = OutputPyJSON(open('unit_test', 'w'))  #  this file won't appear since exception
 
@@ -53,7 +53,6 @@ class GoTestCase(unittest.TestCase):
 
         with self.assertRaises(AssertionError):
             Go(inputer, mapper, reducer, outputer)
-
 
 
     def test_map_reduce_type(self):

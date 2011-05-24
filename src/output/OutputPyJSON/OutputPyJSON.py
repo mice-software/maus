@@ -49,7 +49,7 @@ class OutputPyJSON:
         self.file = arg_file
 
 
-    def birth(self):
+    def birth(self, config_document):
         """Birth does nothing; no setup required
         """
         return True
@@ -70,5 +70,6 @@ class OutputPyJSON:
         Closes the file that the class has open 
         """
         self.file.close()
+        return True
 
 

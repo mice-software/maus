@@ -33,7 +33,7 @@ class ReducePyDoNothing:
         return "%s\n%s" % (x,y)
 
     def death(self):
-        pass
+        return True
 
 
 
