@@ -1,6 +1,0 @@
-MiceModel       PolyFitTest.dat
-VerboseLevel    0
-MaxStepsWOELoss 200000
-numEvts         10000
-
-
