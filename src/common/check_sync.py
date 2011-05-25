@@ -63,38 +63,6 @@ def make_patches(maus_list, g4mice_list):
             os.system('%s > /dev/null || %s > patches/patch_%s' %  (diff_string, diff_string, filename))
             my_patches.append('patch_%s' % filename)
 
-    os.system('mkdir -p patches2')
-
-    for patchname in my_patches:
-        if not os.path.exists('patches/%s' % patchname):
-            continue
-
-        my_in_file = open('patches/%s' % patchname, 'r')
-        my_out_file = open('patches2/%s' % patchname, 'w')
-        
-        lines = my_in_file.readlines()
-
-        my_in_file.close()
-
-
-        for i in range(len(lines)):
-            if '#include' in lines[i]:
-                if '<' in lines[i]:
-                    continue
-                split_lines = lines[i].split('"')
-
-                for root, dirnames, filenames in os.walk('.'):
-                    for filename in fnmatch.filter(filenames, split_lines[1]):
-                        lines[i] = '%s #include "%s"\n' % (lines[i][0], os.path.join(root, filename)[2:])
-                        print 'found'
-                        break
-
-        for line in lines:
-            my_out_file.write('%s' % line)
-
-            
-        my_out_file.close()
-            
     
 
 def find_missing_files(maus_list, g4mice_list):
@@ -125,3 +93,5 @@ if __name__ == "__main__":
     g4mice_files = filters(g4mice_files, EXCLUDEDIRS, [])
     make_patches(maus_files, g4mice_files)
     find_missing_files(maus_files, g4mice_files)
+    
+    
