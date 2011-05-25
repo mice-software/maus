@@ -1,0 +1,951 @@
+//============\\
+||   Optics   ||
+\\============//
+Parsing control files
+Warning - failed to open module /home/cr67/G4MICE/MAUS/maus_rogers/src/common/FILES/Models/Modules/Beam - I assume it is not required
+Warning - failed to open module /home/cr67/G4MICE/MAUS/maus_rogers/src/common/FILES/Models/Modules/Virtual - I assume it is not required
+Repeating module Virtual 40 times
+Warning - failed to open module /home/cr67/G4MICE/MAUS/maus_rogers/src/common/FILES/Models/Modules/CoilWrite - I assume it is not required
+Warning - failed to open module /home/cr67/G4MICE/MAUS/maus_rogers/src/common/FILES/Models/Modules/CoilRead - I assume it is not required
+Repeating module CoilRead 20 times
+Building geometry
+
+*************************************************************
+ Geant4 version Name: geant4-09-02-patch-04    (16-September-2010)
+                      Copyright : Geant4 Collaboration
+                      Reference : NIM A 506 (2003), 250-303
+                            WWW : http://cern.ch/geant4
+*************************************************************
+
+
+<<< Geant4 Physics List engine packaging library: PACK 5.4
+<<< Geant4 Physics List simulation engine: QGSP_BERT 3.3
+
+### Adding tracking cuts for neutron  TimeCut(ns)= 10000  KinEnergyCut(MeV)= 0
+Looking for optimisation requests
+Running beam envelope through
+MAT IN ARRGH x: (0,0,-375;0) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+    0.0264146            -0             0             0             0             0 
+           -0       42.2633            -0             0            -0             0 
+            0            -0        3.4339            -0             0            -0 
+            0             0            -0      0.325103             0             0 
+            0            -0             0             0        3.4339            -0 
+            0             0            -0             0            -0      0.325103 
+
+Evaluator : unknown variable
+Evaluator : unknown variable
+Finding TrackingDerivative envelope functions
+Rephasing Cavities with reference particle x: (0,0,-375;0) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+
+phot:   for  gamma    SubType= 12
+      ===== EM models for the G4Region  DefaultRegionForTheWorld ======
+       PhotoElectric :     Emin=          0 eV         Emax=   100 TeV
+
+compt:   for  gamma    SubType= 13
+      Lambda tables from 100 eV  to 100 TeV in 84 bins, spline: 1
+      ===== EM models for the G4Region  DefaultRegionForTheWorld ======
+       Klein-Nishina :     Emin=          0 eV         Emax=   100 TeV
+
+conv:   for  gamma    SubType= 14
+      Lambda tables from 1.022 MeV to 100 TeV in 84 bins, spline: 1
+      ===== EM models for the G4Region  DefaultRegionForTheWorld ======
+       Bethe-Heitler :     Emin=          0 eV         Emax=   100 TeV
+
+msc:   for e-    SubType= 10
+      Lambda tables from 100 eV  to 100 TeV in 84 bins, spline: 1
+      RangeFactor= 0.04, step limit type: 1, lateralDisplacement: 1, skin= 3, geomFactor= 2.5
+      ===== EM models for the G4Region  DefaultRegionForTheWorld ======
+        UrbanMscUni2 :     Emin=          0 eV         Emax=   100 TeV
+
+eIoni:   for  e-    SubType= 2
+      dE/dx and range tables from 100 eV  to 100 TeV in 84 bins
+      Lambda tables from threshold to 100 TeV in 84 bins, spline: 1
+      finalRange(mm)= 1, dRoverRange= 0.2, integral: 1, fluct: 1, linLossLimit= 0.01
+      ===== EM models for the G4Region  DefaultRegionForTheWorld ======
+        MollerBhabha :     Emin=          0 eV         Emax=   100 TeV
+
+eBrem:   for  e-    SubType= 3
+      dE/dx and range tables from 100 eV  to 100 TeV in 84 bins
+      Lambda tables from threshold to 100 TeV in 84 bins, spline: 1
+      LPM flag: 1 for E > 1 GeV
+      ===== EM models for the G4Region  DefaultRegionForTheWorld ======
+               eBrem :     Emin=          0 eV         Emax=   1 GeV
+            eBremRel :     Emin=          1 GeV        Emax=   100 TeV
+
+eIoni:   for  e+    SubType= 2
+      dE/dx and range tables from 100 eV  to 100 TeV in 84 bins
+      Lambda tables from threshold to 100 TeV in 84 bins, spline: 1
+      finalRange(mm)= 1, dRoverRange= 0.2, integral: 1, fluct: 1, linLossLimit= 0.01
+      ===== EM models for the G4Region  DefaultRegionForTheWorld ======
+        MollerBhabha :     Emin=          0 eV         Emax=   100 TeV
+
+eBrem:   for  e+    SubType= 3
+      dE/dx and range tables from 100 eV  to 100 TeV in 84 bins
+      Lambda tables from threshold to 100 TeV in 84 bins, spline: 1
+      LPM flag: 1 for E > 1 GeV
+      ===== EM models for the G4Region  DefaultRegionForTheWorld ======
+               eBrem :     Emin=          0 eV         Emax=   1 GeV
+            eBremRel :     Emin=          1 GeV        Emax=   100 TeV
+
+annihil:   for  e+    SubType= 5
+      Lambda tables from 100 eV  to 100 TeV in 84 bins, spline: 1
+      ===== EM models for the G4Region  DefaultRegionForTheWorld ======
+            eplus2gg :     Emin=          0 eV         Emax=   100 TeV
+
+msc:   for proton    SubType= 10
+      Lambda tables from 100 eV  to 100 TeV in 84 bins, spline: 1
+      RangeFactor= 0.2, step limit type: 0, lateralDisplacement: 1, skin= 3
+      ===== EM models for the G4Region  DefaultRegionForTheWorld ======
+       UrbanMscUni90 :     Emin=          0 eV         Emax=   100 TeV
+
+hIoni:   for  proton    SubType= 2
+      dE/dx and range tables from 100 eV  to 100 TeV in 84 bins
+      Lambda tables from threshold to 100 TeV in 84 bins, spline: 1
+      finalRange(mm)= 1, dRoverRange= 0.2, integral: 1, fluct: 1, linLossLimit= 0.01
+      NuclearStopping= 1
+      ===== EM models for the G4Region  DefaultRegionForTheWorld ======
+               Bragg :     Emin=          0 eV         Emax=   2 MeV
+          BetheBloch :     Emin=          2 MeV        Emax=   100 TeV
+
+hBrems:   for  proton    SubType= 3
+      dE/dx and range tables from 100 eV  to 100 TeV in 84 bins
+      Lambda tables from threshold to 100 TeV in 84 bins, spline: 1
+      ===== EM models for the G4Region  DefaultRegionForTheWorld ======
+               hBrem :     Emin=          0 eV         Emax=   100 TeV
+
+hPairProd:   for  proton    SubType= 4
+      dE/dx and range tables from 100 eV  to 100 TeV in 84 bins
+      Lambda tables from threshold to 100 TeV in 84 bins, spline: 1
+      ===== EM models for the G4Region  DefaultRegionForTheWorld ======
+           hPairProd :     Emin=          0 eV         Emax=   100 TeV
+
+msc:   for GenericIon    SubType= 10
+      RangeFactor= 0.2, step limit type: 0, lateralDisplacement: 0, skin= 3
+      ===== EM models for the G4Region  DefaultRegionForTheWorld ======
+       UrbanMscUni90 :     Emin=          0 eV         Emax=   100 TeV
+
+ionIoni:   for  GenericIon    SubType= 2
+      dE/dx and range tables from 100 eV  to 100 TeV in 84 bins
+      Lambda tables from threshold to 100 TeV in 84 bins, spline: 1
+      finalRange(mm)= 0.1, dRoverRange= 0.1, integral: 1, fluct: 1, linLossLimit= 0.15
+      Stopping Power data for 16 ion/material pairs, nuclearStopping: 1
+      ===== EM models for the G4Region  DefaultRegionForTheWorld ======
+            BraggIon :     Emin=          0 eV         Emax=   2 MeV
+          BetheBloch :     Emin=          2 MeV        Emax=   100 TeV
+
+hIoni:   for  anti_proton    SubType= 2
+      dE/dx and range tables from 100 eV  to 100 TeV in 84 bins
+      Lambda tables from threshold to 100 TeV in 84 bins, spline: 1
+      finalRange(mm)= 1, dRoverRange= 0.2, integral: 1, fluct: 1, linLossLimit= 0.01
+      NuclearStopping= 1
+      ===== EM models for the G4Region  DefaultRegionForTheWorld ======
+               Bragg :     Emin=          0 eV         Emax=   2 MeV
+          BetheBloch :     Emin=          2 MeV        Emax=   100 TeV
+
+hIoni:   for  kaon+    SubType= 2
+      dE/dx and range tables from 100 eV  to 100 TeV in 84 bins
+      Lambda tables from threshold to 100 TeV in 84 bins, spline: 1
+      finalRange(mm)= 1, dRoverRange= 0.2, integral: 1, fluct: 1, linLossLimit= 0.01
+      NuclearStopping= 0
+      ===== EM models for the G4Region  DefaultRegionForTheWorld ======
+               Bragg :     Emin=          0 eV         Emax=   1.05231 MeV
+          BetheBloch :     Emin=    1.05231 MeV        Emax=   100 TeV
+
+hIoni:   for  kaon-    SubType= 2
+      dE/dx and range tables from 100 eV  to 100 TeV in 84 bins
+      Lambda tables from threshold to 100 TeV in 84 bins, spline: 1
+      finalRange(mm)= 1, dRoverRange= 0.2, integral: 1, fluct: 1, linLossLimit= 0.01
+      NuclearStopping= 0
+      ===== EM models for the G4Region  DefaultRegionForTheWorld ======
+               Bragg :     Emin=          0 eV         Emax=   1.05231 MeV
+          BetheBloch :     Emin=    1.05231 MeV        Emax=   100 TeV
+
+msc:   for mu+    SubType= 10
+      Lambda tables from 100 eV  to 100 TeV in 84 bins, spline: 1
+      RangeFactor= 0.2, step limit type: 0, lateralDisplacement: 1, skin= 3
+      ===== EM models for the G4Region  DefaultRegionForTheWorld ======
+       UrbanMscUni90 :     Emin=          0 eV         Emax=   100 TeV
+
+muIoni:   for  mu+    SubType= 2
+      dE/dx and range tables from 100 eV  to 100 TeV in 84 bins
+      Lambda tables from threshold to 100 TeV in 84 bins, spline: 1
+      finalRange(mm)= 1, dRoverRange= 0.2, integral: 1, fluct: 1, linLossLimit= 0.01
+      ===== EM models for the G4Region  DefaultRegionForTheWorld ======
+               Bragg :     Emin=          0 eV         Emax=   200 keV
+          BetheBloch :     Emin=        200 keV        Emax=   1 GeV
+        MuBetheBloch :     Emin=          1 GeV        Emax=   100 TeV
+
+muBrems:   for  mu+    SubType= 3
+      dE/dx and range tables from 100 eV  to 100 TeV in 84 bins
+      Lambda tables from threshold to 100 TeV in 84 bins, spline: 1
+      ===== EM models for the G4Region  DefaultRegionForTheWorld ======
+              MuBrem :     Emin=          0 eV         Emax=   100 TeV
+
+muPairProd:   for  mu+    SubType= 4
+      dE/dx and range tables from 100 eV  to 100 TeV in 84 bins
+      Lambda tables from threshold to 100 TeV in 84 bins, spline: 1
+      ===== EM models for the G4Region  DefaultRegionForTheWorld ======
+          muPairProd :     Emin=          0 eV         Emax=   100 TeV
+
+muIoni:   for  mu-    SubType= 2
+      dE/dx and range tables from 100 eV  to 100 TeV in 84 bins
+      Lambda tables from threshold to 100 TeV in 84 bins, spline: 1
+      finalRange(mm)= 1, dRoverRange= 0.2, integral: 1, fluct: 1, linLossLimit= 0.01
+      ===== EM models for the G4Region  DefaultRegionForTheWorld ======
+               Bragg :     Emin=          0 eV         Emax=   200 keV
+          BetheBloch :     Emin=        200 keV        Emax=   1 GeV
+        MuBetheBloch :     Emin=          1 GeV        Emax=   100 TeV
+
+muBrems:   for  mu-    SubType= 3
+      dE/dx and range tables from 100 eV  to 100 TeV in 84 bins
+      Lambda tables from threshold to 100 TeV in 84 bins, spline: 1
+      ===== EM models for the G4Region  DefaultRegionForTheWorld ======
+              MuBrem :     Emin=          0 eV         Emax=   100 TeV
+
+muPairProd:   for  mu-    SubType= 4
+      dE/dx and range tables from 100 eV  to 100 TeV in 84 bins
+      Lambda tables from threshold to 100 TeV in 84 bins, spline: 1
+      ===== EM models for the G4Region  DefaultRegionForTheWorld ======
+          muPairProd :     Emin=          0 eV         Emax=   100 TeV
+
+hIoni:   for  pi+    SubType= 2
+      dE/dx and range tables from 100 eV  to 100 TeV in 84 bins
+      Lambda tables from threshold to 100 TeV in 84 bins, spline: 1
+      finalRange(mm)= 1, dRoverRange= 0.2, integral: 1, fluct: 1, linLossLimit= 0.01
+      NuclearStopping= 0
+      ===== EM models for the G4Region  DefaultRegionForTheWorld ======
+               Bragg :     Emin=          0 eV         Emax=   297.504 keV
+          BetheBloch :     Emin=    297.504 keV        Emax=   100 TeV
+
+hBrems:   for  pi+    SubType= 3
+      dE/dx and range tables from 100 eV  to 100 TeV in 84 bins
+      Lambda tables from threshold to 100 TeV in 84 bins, spline: 1
+      ===== EM models for the G4Region  DefaultRegionForTheWorld ======
+               hBrem :     Emin=          0 eV         Emax=   100 TeV
+
+hPairProd:   for  pi+    SubType= 4
+      dE/dx and range tables from 100 eV  to 100 TeV in 84 bins
+      Lambda tables from threshold to 100 TeV in 84 bins, spline: 1
+      ===== EM models for the G4Region  DefaultRegionForTheWorld ======
+           hPairProd :     Emin=          0 eV         Emax=   100 TeV
+
+msc:   for pi-    SubType= 10
+      Lambda tables from 100 eV  to 100 TeV in 84 bins, spline: 1
+      RangeFactor= 0.2, step limit type: 0, lateralDisplacement: 1, skin= 3
+      ===== EM models for the G4Region  DefaultRegionForTheWorld ======
+       UrbanMscUni90 :     Emin=          0 eV         Emax=   100 TeV
+
+hIoni:   for  pi-    SubType= 2
+      dE/dx and range tables from 100 eV  to 100 TeV in 84 bins
+      Lambda tables from threshold to 100 TeV in 84 bins, spline: 1
+      finalRange(mm)= 1, dRoverRange= 0.2, integral: 1, fluct: 1, linLossLimit= 0.01
+      NuclearStopping= 0
+      ===== EM models for the G4Region  DefaultRegionForTheWorld ======
+               Bragg :     Emin=          0 eV         Emax=   297.504 keV
+          BetheBloch :     Emin=    297.504 keV        Emax=   100 TeV
+
+hBrems:   for  pi-    SubType= 3
+      dE/dx and range tables from 100 eV  to 100 TeV in 84 bins
+      Lambda tables from threshold to 100 TeV in 84 bins, spline: 1
+      ===== EM models for the G4Region  DefaultRegionForTheWorld ======
+               hBrem :     Emin=          0 eV         Emax=   100 TeV
+
+hPairProd:   for  pi-    SubType= 4
+      dE/dx and range tables from 100 eV  to 100 TeV in 84 bins
+      Lambda tables from threshold to 100 TeV in 84 bins, spline: 1
+      ===== EM models for the G4Region  DefaultRegionForTheWorld ======
+           hPairProd :     Emin=          0 eV         Emax=   100 TeV
+============================================================================================
+             HADRONIC PROCESSES SUMMARY (verbose level 1)
+
+                     Hadronic Processes for <anti_neutron>
+            hElastic  Models:           G4HadronElastic: Emin(GeV)=     0  Emax(GeV)= 100000
+AntiNeutronInelastic  Models:  G4LEAntiNeutronInelastic: Emin(GeV)=     0  Emax(GeV)= 25
+                               G4HEAntiNeutronInelastic: Emin(GeV)=    20  Emax(GeV)= 100000
+
+                     Hadronic Processes for <anti_proton>
+            hElastic  Models:           G4HadronElastic: Emin(GeV)=     0  Emax(GeV)= 100000
+ AntiProtonInelastic  Models:   G4LEAntiProtonInelastic: Emin(GeV)=     0  Emax(GeV)= 25
+                                G4HEAntiProtonInelastic: Emin(GeV)=    20  Emax(GeV)= 100000
+          CHIPSNuclearAbsorptionAtRest
+
+                     Hadronic Processes for <e->
+      ElectroNuclear  Models:                     CHIPS: Emin(GeV)=     0  Emax(GeV)= 30000
+
+                     Hadronic Processes for <gamma>
+     PhotonInelastic  Models:                     CHIPS: Emin(GeV)=     0  Emax(GeV)= 3.5
+                                        TheoFSGenerator: Emin(GeV)=     3  Emax(GeV)= 100000
+
+                     Hadronic Processes for <kaon+>
+            hElastic  Models:           G4HadronElastic: Emin(GeV)=     0  Emax(GeV)= 100000
+   KaonPlusInelastic  Models:                      QGSP: Emin(GeV)=    12  Emax(GeV)= 100000
+                                  G4LEKaonPlusInelastic: Emin(GeV)=   9.5  Emax(GeV)= 25
+                                        Bertini Cascade: Emin(GeV)=     0  Emax(GeV)= 9.9
+
+                     Hadronic Processes for <kaon->
+            hElastic  Models:           G4HadronElastic: Emin(GeV)=     0  Emax(GeV)= 100000
+  KaonMinusInelastic  Models:                      QGSP: Emin(GeV)=    12  Emax(GeV)= 100000
+                                 G4LEKaonMinusInelastic: Emin(GeV)=   9.5  Emax(GeV)= 25
+                                        Bertini Cascade: Emin(GeV)=     0  Emax(GeV)= 9.9
+          CHIPSNuclearAbsorptionAtRest
+
+                     Hadronic Processes for <lambda>
+            hElastic  Models:           G4HadronElastic: Emin(GeV)=     0  Emax(GeV)= 100000
+     LambdaInelastic  Models:       G4LELambdaInelastic: Emin(GeV)=     0  Emax(GeV)= 25
+                                    G4HELambdaInelastic: Emin(GeV)=    20  Emax(GeV)= 100000
+
+                     Hadronic Processes for <mu->
+          muMinusCaptureAtRest
+
+                     Hadronic Processes for <neutron>
+            hElastic  Models:           G4HadronElastic: Emin(GeV)=     0  Emax(GeV)= 100000
+    NeutronInelastic  Models:                      QGSP: Emin(GeV)=    12  Emax(GeV)= 100000
+                                   G4LENeutronInelastic: Emin(GeV)=   9.5  Emax(GeV)= 25
+                                        Bertini Cascade: Emin(GeV)=     0  Emax(GeV)= 9.9
+            nCapture  Models:                G4LCapture: Emin(GeV)=     0  Emax(GeV)= 20000
+            nFission  Models:                G4LFission: Emin(GeV)=     0  Emax(GeV)= 20000
+
+                     Hadronic Processes for <pi+>
+            hElastic  Models:           G4HadronElastic: Emin(GeV)=     0  Emax(GeV)= 100000
+   PionPlusInelastic  Models:                      QGSP: Emin(GeV)=    12  Emax(GeV)= 100000
+                                  G4LEPionPlusInelastic: Emin(GeV)=   9.5  Emax(GeV)= 25
+                                        Bertini Cascade: Emin(GeV)=     0  Emax(GeV)= 9.9
+
+                     Hadronic Processes for <pi->
+            hElastic  Models:           G4HadronElastic: Emin(GeV)=     0  Emax(GeV)= 100000
+  PionMinusInelastic  Models:                      QGSP: Emin(GeV)=    12  Emax(GeV)= 100000
+                                 G4LEPionMinusInelastic: Emin(GeV)=   9.5  Emax(GeV)= 25
+                                        Bertini Cascade: Emin(GeV)=     0  Emax(GeV)= 9.9
+          CHIPSNuclearAbsorptionAtRest
+
+                     Hadronic Processes for <proton>
+            hElastic  Models:           G4HadronElastic: Emin(GeV)=     0  Emax(GeV)= 100000
+     ProtonInelastic  Models:                      QGSP: Emin(GeV)=    12  Emax(GeV)= 100000
+                                    G4LEProtonInelastic: Emin(GeV)=   9.5  Emax(GeV)= 25
+                                        Bertini Cascade: Emin(GeV)=     0  Emax(GeV)= 9.9
+============================================================================================
+TM_OUT SIZE 41
+TRANSPORT 1
+TRANSPORT A 0
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,-375;0) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANSPORT A 1
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,-300;0.282938) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANSPORT A 2
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,-225;0.565876) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANSPORT A 3
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,-150;0.848814) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANSPORT A 4
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,-75;1.13175) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANSPORT A 5
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,1.49233e-14;1.41469) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANSPORT A 6
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,75;1.69763) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANSPORT A 7
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,150;1.98057) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANSPORT A 8
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,225;2.26351) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANSPORT A 9
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,300;2.54644) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANSPORT A 10
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,375;2.82938) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANSPORT A 11
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,450;3.11232) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANSPORT A 12
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,525;3.39526) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANSPORT A 13
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,600;3.6782) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANSPORT A 14
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,675;3.96113) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANSPORT A 15
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,750;4.24407) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANSPORT A 16
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,825;4.52701) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANSPORT A 17
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,900;4.80995) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANSPORT A 18
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,975;5.09289) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANSPORT A 19
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,1050;5.37583) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANSPORT A 20
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,1125;5.65876) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANSPORT A 21
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,1200;5.9417) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANSPORT A 22
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,1275;6.22464) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANSPORT A 23
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,1350;6.50758) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANSPORT A 24
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,1425;6.79052) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANSPORT A 25
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,1500;7.07345) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANSPORT A 26
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,1575;7.35639) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANSPORT A 27
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,1650;7.63933) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANSPORT A 28
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,1725;7.92227) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANSPORT A 29
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,1800;8.20521) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANSPORT A 30
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,1875;8.48814) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANSPORT A 31
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,1950;8.77108) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANSPORT A 32
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,2025;9.05402) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANSPORT A 33
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,2100;9.33696) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANSPORT A 34
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,2175;9.6199) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANSPORT A 35
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,2250;9.90284) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANSPORT A 36
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,2325;10.1858) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANSPORT A 37
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,2400;10.4687) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANSPORT A 38
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,2475;10.7517) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANSPORT A 39
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,2550;11.0346) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANSPORT A 40
+OPERATOR*
+SIMILARITY
+MEAN
+DONE
+x: (0,0,2625;11.3175) p: (0,0,200;226.194) A: (0,0,0;0) B: (0,0,0) E: (0,0,0)
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+            0             0             0             0             0             0 
+
+REALLY DONE
+TRANPOSRT SORT 
+ENV_OUT SIZE 42
+COVARIANCE 0
+COVARIANCE 1
+COVARIANCE 2
+COVARIANCE 3
+COVARIANCE 4
+COVARIANCE 5
+COVARIANCE 6
+COVARIANCE 7
+COVARIANCE 8
+COVARIANCE 9
+COVARIANCE 10
+COVARIANCE 11
+COVARIANCE 12
+COVARIANCE 13
+COVARIANCE 14
+COVARIANCE 15
+COVARIANCE 16
+COVARIANCE 17
+COVARIANCE 18
+COVARIANCE 19
+COVARIANCE 20
+COVARIANCE 21
+COVARIANCE 22
+COVARIANCE 23
+COVARIANCE 24
+COVARIANCE 25
+COVARIANCE 26
+COVARIANCE 27
+COVARIANCE 28
+COVARIANCE 29
+COVARIANCE 30
+COVARIANCE 31
+COVARIANCE 32
+COVARIANCE 33
+COVARIANCE 34
+COVARIANCE 35
+COVARIANCE 36
+COVARIANCE 37
+COVARIANCE 38
+COVARIANCE 39
+COVARIANCE 40
+COVARIANCE 41
+done
+WARNING - Attempt to delete the physical volume store while geometry closed !
+WARNING - Attempt to delete the logical volume store while geometry closed !
+WARNING - Attempt to delete the solid store while geometry closed !
+WARNING - Attempt to delete the region store while geometry closed !
