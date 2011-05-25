@@ -1,3 +1,10 @@
+MAUS-v0.0.2 (http://micewww.pp.rl.ac.uk/versions/show/6):
+  Bug #437: missing test coverage
+  Bug #448: scons does not clean properly some changes
+  Bug #462: Mapper success of birth not checked by Go()
+  Bug #463: Indentation spaces of src/core/ErrorHandler
+  Feature #357: Beam maker
+
 MAUS-v0.0.1 (http://micewww.pp.rl.ac.uk/versions/show/1):
 	Bug #119: remove buildtype from worker builder
 	Bug #122: readd md5sum checks
