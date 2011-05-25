@@ -1,6 +1,6 @@
 import test_CADImport
 import unittest
-import CADImport
+from CADImport import CADImport
 
 class  test_CADImport(unittest.TestCase):
     def setUp(self):
@@ -31,8 +31,6 @@ class  test_CADImport(unittest.TestCase):
             pass
         except:
             self.assertTrue(False, "Should have raised a StandardError")
-
-
 
     #def tearDown(self):
     #    self.foo.dispose()
