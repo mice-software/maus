@@ -28,7 +28,7 @@ def search_replace(pattern):
                             new_filename= os.path.join(root, filename)[2:]
                             print new_filename
                             if not done_already:
-                                my_file.write(new_filename)
+                                my_file.write(line.replace(old_location,new_filename))
                                 done_already = True
 
                     
