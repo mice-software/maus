@@ -4,11 +4,12 @@
 import sys
 import os
 import copy
+import fnmatch
 
 #all_dirs = ['/Interface/', '/Analysis/', '/BeamTools/', '/Config/', '/DetModel/', '/Interface/', '/Persist/', '/Recon/', '/Simulation/', '/Visualization/',
 #'/Applications/',  'Calib', '/DetResp/', '/EngModel/', '/GDML_3_0_0/', '/Optics/', '/RealData/']
-EXCLUDEDIRS = ['Analysis', 'BeamTools', 'Config', 'DetModel', 'Persist', 'Recon', 'Simulation', 'Visualization',
-'Applications',  'Calib', 'DetResp', 'EngModel', 'GDML_3_0_0', 'Optics', 'RealData', 'patches', 'test']
+EXCLUDEDIRS = ['Analysis',  'Persist', 'Simulation', 'Visualization',
+'Applications', 'GDML_3_0_0', 'Optics', 'RealData', 'patches', 'test', 'patches2']
 
 G4MICEROOT = '/tmp'  #  this gets overwritten later
 
@@ -52,12 +53,49 @@ def make_patches(maus_list, g4mice_list):
         key = my_file.split('/')[-1]
         g4mice_files_dict[key] = my_file
 
+    my_patches=[]
+
     os.system('mkdir -p patches')
     for my_file in maus_files:
         if my_file.split('/')[-1] in g4mice_files_dict:
             filename = my_file.split('/')[-1]
-            diff_string = 'diff -up %s %s' % (my_file, g4mice_files_dict[filename])
+            diff_string = 'diff -rp %s %s' % (my_file, g4mice_files_dict[filename])
             os.system('%s > /dev/null || %s > patches/patch_%s' %  (diff_string, diff_string, filename))
+            my_patches.append('patch_%s' % filename)
+
+    os.system('mkdir -p patches2')
+
+    for patchname in my_patches:
+        if not os.path.exists('patches/%s' % patchname):
+            continue
+
+        my_in_file = open('patches/%s' % patchname, 'r')
+        my_out_file = open('patches2/%s' % patchname, 'w')
+        
+        lines = my_in_file.readlines()
+
+        my_in_file.close()
+
+
+        for i in range(len(lines)):
+            if '#include' in lines[i]:
+                if '<' in lines[i]:
+                    continue
+                split_lines = lines[i].split('"')
+
+                for root, dirnames, filenames in os.walk('.'):
+                    for filename in fnmatch.filter(filenames, split_lines[1]):
+                        lines[i] = '%s #include "%s"\n' % (lines[i][0], os.path.join(root, filename)[2:])
+                        print 'found'
+                        break
+
+        for line in lines:
+            my_out_file.write('%s' % line)
+
+            
+        my_out_file.close()
+            
+    
 
 def find_missing_files(maus_list, g4mice_list):
     """
