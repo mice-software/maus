@@ -210,12 +210,11 @@ double CovarianceMatrix::GetLTwiddle() const
 
 void CovarianceMatrix::SetCovariances(HepSymMatrix covariances, double determinant)
 {
-  std::cout << "SETCOVARIANCES " << covariances << "DET " << covariances.determinant() << std::endl;
 	if(determinant < 0) 
 	{
 		_norm    = pow(covariances.determinant(),1./6.);
 		if(_norm>1e-9) _covNorm = covariances/_norm;
-		else        {_covNorm = HepSymMatrix(6,0); _norm = 1; std::cout << *this << std::endl;}
+		else        {_covNorm = HepSymMatrix(6,0); _norm = 1;}
 	}
 	else 
 	{

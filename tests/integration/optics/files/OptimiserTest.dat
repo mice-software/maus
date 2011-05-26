@@ -33,9 +33,8 @@ Configuration PhaseTest
     PropertyDouble NormalisedAngularMomentum 0.
     PropertyDouble Bz             0. T
 
-    PropertyString RootOutput      envelope.root
-    PropertyString LongTextOutput  envelope-long.txt
-    PropertyString ShortTextOutput envelope.txt
+    PropertyString RootOutput      envelope-optimiser.root
+    PropertyString LongTextOutput  envelope-optimiser.txt
 
     PropertyDouble delta_t        0.001 ns
     PropertyDouble delta_E        0.1 MeV
@@ -52,7 +51,8 @@ Configuration PhaseTest
     PropertyInt    NumberOfTries     100
     PropertyDouble StartError        100.
     PropertyDouble EndError          1e-3
-    PropertyBool   RebuildSimulation false
+    PropertyBool   RebuildSimulation false //set to true to rebuild the field map each time (for e.g. optimising fields)
+    PropertyBool   RedoTracking      false //set to true to recalculate transfer matrix each time (for e.g. optimising closed orbit)
 
     PropertyDouble Parameter1_Start   750.
     PropertyDouble Parameter1_Min     10.
@@ -107,10 +107,10 @@ Configuration PhaseTest
     PropertyBool   RepeatModule2  true
     PropertyInt    NumberOfRepeats 40
   } 
-  Module CoilWrite
+  Module Coil
   {
     Volume None
-    Position 0.0 0.0 -600.0 cm
+    Position 0.0 0.0 -525.0+75.0*@RepeatNumber cm
     PropertyString FieldType      Solenoid
     PropertyString FileName       fs2a_coil.fld
     PropertyString FieldMapMode   Write
@@ -118,15 +118,6 @@ Configuration PhaseTest
     PropertyDouble Length         150.
     PropertyDouble Thickness      150.
     PropertyDouble InnerRadius    350.
-    PropertyDouble ScaleFactor    0.
-  } 
-  Module CoilRead
-  {
-    Volume None
-    Position 0.0 0.0 -525.0+75.0*@RepeatNumber cm
-    PropertyString FieldType      Solenoid
-    PropertyString FileName       fs2a_coil.fld
-    PropertyString FieldMapMode   Read
     PropertyDouble ScaleFactor    106.66*(-1.)^@RepeatNumber
     PropertyBool   RepeatModule2  true
     PropertyInt    NumberOfRepeats 20

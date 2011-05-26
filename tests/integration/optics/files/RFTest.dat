@@ -3,6 +3,8 @@
 
 Configuration PhaseTest
 {
+  ERROR THIS GEOMETRY DOES NOT WORK - I HAVENT FIGURED OUT RF CAVITY PHASING IN MAUS YET
+
   Dimensions 1.0 1.0 600 m
   PropertyString Material  Galactic
   PropertyDouble G4StepMax 100 mm
@@ -11,12 +13,11 @@ Configuration PhaseTest
   Substitution $us_pos      1
   Substitution $ds_pos      2
 
-  Module Beam
+  Module Envelope
   {
     Position       0.0 0.0 -37.5 cm
     Volume None
-    PropertyString BeamType       Pencil
-    PropertyString EnvelopeType   Simple
+    PropertyString EnvelopeType   TrackingDerivative
     PropertyInt    Pid            -13
     PropertyString LongitudinalVariable Momentum
     PropertyDouble Momentum       200.
@@ -34,9 +35,8 @@ Configuration PhaseTest
     PropertyDouble NormalisedAngularMomentum 0.
     PropertyDouble Bz             0. T
 
-    PropertyString RootOutput      envelope.root
-    PropertyString LongTextOutput  envelope-long.txt
-    PropertyString ShortTextOutput envelope.txt
+    PropertyString RootOutput      envelope-rftest.root
+    PropertyString LongTextOutput  envelope-rftest.txt
 
     PropertyDouble Delta_t        0.001 ns
     PropertyDouble Delta_E        0.1 MeV

@@ -71,15 +71,15 @@ std::vector<G4VSolid*> MakeCylinderEnvelope(std::vector<CovarianceMatrix> matrix
 
 MICEEvent* PhaseCavities(PhaseSpaceVector ref)
 {
-  Squeak::mout(Squeak::debug) << "Rephasing Cavities with reference particle " << ref << std::endl;
+  Squeak::mout(Squeak::debug) << "Rephasing cavities with reference particle " << ref << std::endl;
   BTPhaser::IsPhaseSet(false); //force to rephase
   simEvent = MICEEvent();
   if(BTPhaser::NumberOfCavities() == 0) return &simEvent;
   int nTries = 0;
   MAUSPrimaryGeneratorAction::PGParticle p = ConvertToPGParticle(ref);
-  g4Manager->GetPrimaryGenerator()->Push(p);
   while(!BTPhaser::IsPhaseSet() && nTries < 5*BTPhaser::NumberOfCavities())  
   {
+    g4Manager->GetPrimaryGenerator()->Push(p);
     g4Manager->GetRunManager()->BeamOn(1);
     nTries++;
     Squeak::mout(Squeak::info) << "." << std::flush;
@@ -136,7 +136,6 @@ CovarianceMatrix EllipseIn(const MiceModule* root)
 void Envelope(const MiceModule* root, std::vector<CovarianceMatrix>& env_out, std::vector<TransferMap*>& tm_out)
 {
   CovarianceMatrix mat = EllipseIn(root);
-  std::cerr << "MAT IN ARRGH " << mat << std::endl;
   g_mean = mat.GetMean();
   CLHEP::HepVector delta = GetDelta(root);
 
@@ -160,11 +159,8 @@ void Envelope(const MiceModule* root, std::vector<CovarianceMatrix>& env_out, st
     tm_out = FieldDerivativeTransferMaps();
   }
   env_out = Transport(tm_out, mat);
-  Squeak::mout(Squeak::debug) << "ENV_OUT SIZE " << env_out.size() << std::endl;
-//  Squeak::mout(Squeak::debug) << "COVARIANCE " << -1 << std::endl;
-//  Squeak::mout(Squeak::debug) << mat << std::endl;
-  for(unsigned int i=0; i<env_out.size(); i++) { Squeak::mout(Squeak::debug) << "COVARIANCE " << i << std::endl;}// Squeak::mout(Squeak::debug) << env_out[i] << std::endl;}
-//  for(unsigned int i=0; i<tm_out.size(); i++)  Squeak::mout(Squeak::debug) << *tm_out[i] << std::endl;
+  for(unsigned int i=0; i<tm_out.size(); i++) Squeak::mout(Squeak::debug) << env_out[i] << std::endl;
+  for(unsigned int i=0; i<tm_out.size(); i++) Squeak::mout(Squeak::debug) << *tm_out[i] << std::endl;
 
 }
 
@@ -247,12 +243,6 @@ void AddHitsToMap(Json::Value Tracks, std::map< StationId,   std::vector<PhaseSp
     int stationNumber = hit_v["station_id"].asInt();
     StationId id(hit_v["station_id"].asInt(), StationId::virt);
     map[id].push_back(psv);
-/*
-    hit_v["particle_id"] = hit.GetPID();
-    hit_v["track_id"] = hit.GetTrackID();
-    hit_v["proper_time"] = hit.GetProperTime();
-    hit_v["path_length"] = hit.GetPathLength();
-*/
   }
 }
 
@@ -432,14 +422,11 @@ bool cov_comp(CovarianceMatrix a, CovarianceMatrix b) {return (a.GetMean().t() <
 
 std::vector<CovarianceMatrix> Transport(std::vector<TransferMap*> maps, CovarianceMatrix ellipse)
 {
-  std::cerr << "TRANSPORT 1" << std::endl;
   std::vector<CovarianceMatrix> covs(1, ellipse);
   for(unsigned int i=0; i<maps.size(); i++)
   {
-    std::cerr << "TRANSPORT A " << i << std::endl;
     covs.push_back((*maps[i])*ellipse);
   }
-  std::cerr << "TRANPOSRT SORT " << std::endl;
   sort(covs.begin(), covs.end(), cov_comp);
   return covs;
 }

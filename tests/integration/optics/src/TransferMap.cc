@@ -70,27 +70,24 @@ void TransferMap::SetFirstOrderMap(HepMatrix firstOrderMap)
 
 HepMatrix TransferMap::GetFirstOrderMap() const
 {
-	if(_polynomial!=NULL) return MMatrix_to_CLHEP( _polynomial->GetCoefficientsAsMatrix().sub(1,6,2,7) );
+	if(_polynomial!=NULL) {
+    return MMatrix_to_CLHEP( _polynomial->GetCoefficientsAsMatrix().sub(1,6,2,7) );
+  }
 	return _firstOrderMap;
 }
 
 
 CovarianceMatrix TransferMap::operator*(const CovarianceMatrix& aCovMatrix) const
 {
-  std::cout << "OPERATOR*" << std::endl;
 	HepSymMatrix in;
 	if(_canonicalMap)  in = aCovMatrix.GetRawNormCanCovariances(_referenceTrajectoryIn);
 	else               in = aCovMatrix.GetKineticCovariances();
 	double     norm = aCovMatrix.GetNormalisation();
-  std::cout << "SIMILARITY" << std::endl;
 	CLHEP::HepSymMatrix aMatrix = in.similarity(GetFirstOrderMap());
-  std::cout << "MEAN" << std::endl;
 	PhaseSpaceVector Mean       = *this*aCovMatrix.GetMean();
 	CovarianceMatrix covOut     = CovarianceMatrix(HepSymMatrix(6,1), Mean, norm, 1, false);
-  std::cout << "DONE" << aMatrix << std::endl;
 	if(_canonicalMap) covOut.SetRawNormCanCovariances(aMatrix, norm, _referenceTrajectoryOut);
 	else              covOut.SetCovariances(aMatrix);
-  std::cout << "REALLY DONE" << std::endl;
 	return covOut;
 }
 

@@ -3,6 +3,8 @@
 
 Configuration PhaseTest
 {
+  ERROR THIS GEOMETRY DOES NOT WORK - I HAVENT FIGURED OUT SINGLE PARTICLE TRANSPORT IN MAUS YET
+
   Dimensions 1.0 1.0 600 m
   PropertyString Material  Galactic
   PropertyDouble G4StepMax 100 mm

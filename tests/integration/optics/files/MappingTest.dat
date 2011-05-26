@@ -20,8 +20,8 @@ Configuration PhaseTest
 
 
     PropertyString EllipseDefinition Penn
-    PropertyDouble Emittance_T    0.01 mm
-    PropertyDouble Emittance_L    0.01 ns
+    PropertyDouble Emittance_T    1. mm
+    PropertyDouble Emittance_L    1. ns
     PropertyDouble Beta_T         650. mm
     PropertyDouble Beta_L         5.   ns
     PropertyDouble Alpha_T        0.
@@ -29,12 +29,11 @@ Configuration PhaseTest
     PropertyDouble NormalisedAngularMomentum 0.
     PropertyDouble Bz             0. T
 
-    PropertyString RootOutput      envelope.root
-    PropertyString LongTextOutput  envelope-long.txt
-    PropertyString ShortTextOutput envelope.txt
+    PropertyString RootOutput      envelope-mapping.root
+    PropertyString LongTextOutput  envelope-mapping.txt
 
-    PropertyDouble Delta_t        0.001 ns
-    PropertyDouble Delta_E        0.1 MeV
+    PropertyDouble Delta_t        0.1 ns
+    PropertyDouble Delta_E        1 MeV
     PropertyDouble Delta_x        0.1 mm
     PropertyDouble Delta_Px       0.1 MeV/c
     PropertyDouble Delta_y        0.1 mm
@@ -50,24 +49,11 @@ Configuration PhaseTest
     PropertyBool   RepeatModule2  true
     PropertyInt    NumberOfRepeats 40
   } 
-  Module CoilWrite
-  {
-    Volume None
-    Position 0.0 0.0 -600.0 cm
-//    PropertyString FieldType      Solenoid
-    PropertyString FileName       fs2a_coil.fld
-    PropertyString FieldMapMode   Write
-    PropertyDouble CurrentDensity 1.
-    PropertyDouble Length         150.
-    PropertyDouble Thickness      150.
-    PropertyDouble InnerRadius    350.
-    PropertyDouble ScaleFactor    0.
-  } 
-  Module CoilRead
+  Module Coil
   {
     Volume None
     Position 0.0 0.0 -525.0+75.0*@RepeatNumber cm
-//    PropertyString FieldType      Solenoid
+    PropertyString FieldType      Solenoid
     PropertyString FileName       fs2a_coil.fld
     PropertyString FieldMapMode   Write
     PropertyDouble CurrentDensity 1.
