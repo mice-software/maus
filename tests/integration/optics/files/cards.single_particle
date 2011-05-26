@@ -1,0 +1,7 @@
+MiceModel    SingleParticleTest.dat
+VerboseLevel 1
+BeamType     MiceModule
+numEvts      10000
+
+
+

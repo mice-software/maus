@@ -69,6 +69,7 @@ void MAUSPrimaryGeneratorAction::GeneratePrimaries(G4Event* argEvent) {
   // Get this class' variables to define next event.
   gun->SetParticlePosition(G4ThreeVector
                                     (part.x, part.y, part.z));
+  gun->SetParticleTime(part.time);
   gun->SetParticleEnergy(part.energy-particle->GetPDGMass());
   gun->SetParticleMomentumDirection(G4ThreeVector
                                  (part.px, part.py, part.pz));

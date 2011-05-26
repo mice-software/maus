@@ -518,6 +518,12 @@ if env['USE_G4'] and env['USE_ROOT']:
                                LIBS= env['LIBS'] + ['recpack'] + ['simulate'])
     env.Install('build', ['tests/cpp_unit/test_cpp_unit'])
 
+    test_optics_files = glob.glob("tests/integration/optics/src/*cc")
+    test_optics = env.Program(target = 'tests/integration/optics/optics', \
+                               source = test_optics_files, \
+                               LIBS= env['LIBS'] + ['simulate'])
+
+
 directories = []
 types = ["input", "map", "reduce", "output"]
 for my_type in types:

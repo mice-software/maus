@@ -1,0 +1,191 @@
+//Test of basic phasing of RF cavities
+//Check that the RF cavity is phased correctly
+
+Configuration PhaseTest
+{
+  ERROR THIS GEOMETRY DOES NOT WORK - I HAVENT FIGURED OUT RF CAVITY PHASING IN MAUS YET
+
+  Dimensions 1.0 1.0 600 m
+  PropertyString Material  Galactic
+  PropertyDouble G4StepMax 100 mm
+
+  Substitution $cell_length 75.0
+  Substitution $us_pos      1
+  Substitution $ds_pos      2
+
+  Module Beam
+  {
+    Position       0.0 0.0 0.0 cm
+    Volume None
+    PropertyString BeamType       Pencil
+    PropertyString EnvelopeType   Simple
+    PropertyInt    Pid            -13
+    PropertyString LongitudinalVariable Momentum
+    PropertyDouble Momentum       200.
+    PropertyDouble Time           0.
+    PropertyBool   UseAsReference true
+
+
+    PropertyString EllipseDefinition Penn
+    PropertyDouble Emittance_T    1.    mm
+    PropertyDouble Emittance_L    1.    ns
+    PropertyDouble Beta_T         @Beta_T mm
+    PropertyDouble Beta_L         @Beta_L ns
+    PropertyDouble Alpha_T        0.
+    PropertyDouble Alpha_L        0.
+    PropertyDouble NormalisedAngularMomentum 0.
+    PropertyDouble Bz             -2.790386849 tesla
+
+    PropertyString RootOutput      envelope-6d.root
+    PropertyString LongTextOutput  envelope-6d.txt
+
+    PropertyDouble Delta_t        0.001 ns
+    PropertyDouble Delta_E        0.1 MeV
+    PropertyDouble Delta_x        0.1 mm
+    PropertyDouble Delta_Px       0.1 MeV/c
+    PropertyDouble Delta_y        0.1 mm
+    PropertyDouble Delta_Py       0.1 MeV/c
+  }
+  Module Optimiser
+  {
+    Volume         None
+    PropertyString Optimiser         Minuit
+    PropertyString Algorithm         simplex
+    PropertyInt    NumberOfTries     100
+    PropertyDouble StartError        100.
+    PropertyDouble EndError          1e-3
+    PropertyBool   RebuildSimulation false
+
+    PropertyDouble Parameter1_Start   7.
+    PropertyDouble Parameter1_Min     1.
+    PropertyDouble Parameter1_Max     10.
+    PropertyDouble Parameter1_Delta   0.1
+    PropertyBool   Parameter1_Fixed   False
+    PropertyString Parameter1_Name    @Beta_L
+
+    PropertyDouble Parameter2_Start   700.
+    PropertyDouble Parameter2_Min     100.
+    PropertyDouble Parameter2_Max     2000.
+    PropertyDouble Parameter2_Delta   100
+    PropertyBool   Parameter2_Fixed   False
+    PropertyString Parameter2_Name    @Beta_T
+
+    PropertyDouble Score1            (@Beta_T_Up-@Beta_T_Down)**2
+    PropertyDouble Score2            ((@Alpha_T_Up-@Alpha_T_Down)*100)**2
+    PropertyDouble Score3            ((@Beta_L_Up-@Beta_L_Down)*100)**2
+    PropertyDouble Score4            ((@Alpha_L_Up-@Alpha_L_Down)*10000)**2
+  }
+  Module UpstreamEnvelope
+  {
+    Volume   None
+    Position 0.0 0.0 $cell_length*$us_pos cm
+
+    PropertyString SensitiveDetector   Envelope
+    PropertyString IndependentVariable Z
+
+    PropertyString     EnvelopeOut1_Name        @Beta_T_Up
+    PropertyString     EnvelopeOut1_Type        Bunch_Parameter
+    PropertyString     EnvelopeOut1_Variable    beta_4d
+
+    PropertyString     EnvelopeOut2_Name        @Alpha_T_Up
+    PropertyString     EnvelopeOut2_Type        Bunch_Parameter
+    PropertyString     EnvelopeOut2_Variable    alpha_4d
+
+    PropertyString     EnvelopeOut3_Name        @Beta_L_Up
+    PropertyString     EnvelopeOut3_Type        Bunch_Parameter
+    PropertyString     EnvelopeOut3_Variable    beta_t
+
+    PropertyString     EnvelopeOut4_Name        @Alpha_L_Up
+    PropertyString     EnvelopeOut4_Type        Bunch_Parameter
+    PropertyString     EnvelopeOut4_Variable    alpha_t
+  }
+  Module DownstreamEnvelope
+  {
+    Volume   None
+    Position 0.0 0.0 $cell_length*$ds_pos cm
+
+    PropertyString SensitiveDetector   Envelope
+    PropertyString IndependentVariable Z
+
+    PropertyString     EnvelopeOut1_Name        @Beta_T_Down
+    PropertyString     EnvelopeOut1_Type        Bunch_Parameter
+    PropertyString     EnvelopeOut1_Variable    beta_t
+
+    PropertyString     EnvelopeOut2_Name        @Alpha_T_Down
+    PropertyString     EnvelopeOut2_Type        Bunch_Parameter
+    PropertyString     EnvelopeOut2_Variable    alpha_t
+
+    PropertyString     EnvelopeOut3_Name        @Beta_L_Down
+    PropertyString     EnvelopeOut3_Type        Bunch_Parameter
+    PropertyString     EnvelopeOut3_Variable    beta_t
+
+    PropertyString     EnvelopeOut4_Name        @Alpha_L_Down
+    PropertyString     EnvelopeOut4_Type        Bunch_Parameter
+    PropertyString     EnvelopeOut4_Variable    alpha_t
+  }
+
+
+  Module Virtual
+  {
+    Volume None
+    Position 0.0 0.0 -37.5+7.50*@RepeatNumber cm
+    PropertyString SensitiveDetector   Virtual
+    PropertyString IndependentVariable Z
+    PropertyBool   RepeatModule2  true
+    PropertyInt    NumberOfRepeats 40
+  } 
+  Module RF
+  {
+    Module Window
+    {
+      Volume Cylinder
+      Position 0.0 0.0 -43.0/2. cm
+      Dimensions 64.0 0.01 cm
+      PropertyString Material           Galactic
+    }
+    Module Window
+    {
+      Volume Cylinder
+      Position   0.0  0.0  +43.0/2. cm
+      Dimensions 64.0 0.01 cm
+      PropertyString Material           Galactic
+    }
+    Volume Cylinder
+    Position 0.0 0.0 75.0*@RepeatNumber cm
+    Dimensions 64.5 43.005 cm
+    PropertyString Material           Galactic
+    PropertyDouble Invisible          1
+    PropertyString FieldType          PillBox
+    PropertyString CavityMode         Unphased
+    PropertyString PhasingVolume      None
+    PropertyDouble Length             43.0    cm
+    PropertyString FieldDuringPhasing TimeVarying
+    PropertyDouble PeakEField         9       MV/m
+    PropertyDouble ReferenceParticlePhase  0
+    PropertyDouble Frequency          0.20125
+    PropertyBool   RepeatModule2  true
+    PropertyInt    NumberOfRepeats 20
+  } 
+  Module Coil
+  {
+    Volume None
+    Position 0.0 0.0 -525.0+75.0*@RepeatNumber cm
+  Module Coil
+  {
+    Volume None
+    Position 0.0 0.0 -525.0+75.0*@RepeatNumber cm
+    PropertyString FieldType      Solenoid
+    PropertyString FileName       fs2a_coil.fld
+    PropertyString FieldMapMode   Write
+    PropertyDouble CurrentDensity 1.
+    PropertyDouble Length         150.
+    PropertyDouble Thickness      150.
+    PropertyDouble InnerRadius    350.
+    PropertyDouble ScaleFactor    106.66*(-1.)^@RepeatNumber
+    PropertyBool   RepeatModule2  true
+    PropertyInt    NumberOfRepeats 20
+  } 
+
+
+}
+

@@ -24,4 +24,6 @@ third_party/install/share/*
 third_party/install/share/man/man3
 third_party/install/share/man/man1/*
 third_party/source/*
-
+tests/integration/optics/log.*
+tests/integration/optics/envelope*
+tests/integration/optics/optics
