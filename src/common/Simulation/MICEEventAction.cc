@@ -40,12 +40,12 @@ void MICEEventAction::EndOfEventAction(const G4Event* currentEvent)
   // take the G4Trajectory information and extract the points, adding them to each MCParticle
 
   G4TrajectoryContainer* trajs = currentEvent->GetTrajectoryContainer();
-  std::cout<<"number of trajs: "<<trajs->entries()<<std::endl;
+
   if( trajs )
     for( G4int i = 0; i < trajs->entries(); ++i )
     {
       G4VTrajectory* traj = (*trajs)[i];
-      std::cout<<traj->GetParticleName()<<endl;
+      
       traj->ShowTrajectory();
       MCParticle* found = NULL;
 
