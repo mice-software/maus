@@ -45,6 +45,7 @@ VirtualPlane::VirtualPlane() {
   _radialExtent   = -1;
   _independentVariable = 0.;
   _globalCoordinates   = false;
+  _multipass = VirtualPlane::ignore;
 }
 
 VirtualPlane VirtualPlane::BuildVirtualPlane(CLHEP::HepRotation rot,

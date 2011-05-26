@@ -7,7 +7,6 @@
 
 #include "DetModel/MAUSSD.h"
 #include "G4VSensitiveDetector.hh"
-#include "Interface/TofHit.hh"
 #include "Interface/Memory.hh"
 
 #include <json/json.h>
