@@ -20,6 +20,7 @@
 #include <execinfo.h>
 #endif
 
+#include <cstring>
 #include <ostream>
 #include <sstream>
 
@@ -35,8 +36,11 @@ Squeal::Squeal() throw() {
 Squeal::Squeal(exceptionLevel level, std::string errorMessage,
                                                    std::string location) throw()
       : exception(), _message(errorMessage), _location(location),
-                                 _stacktrace(MakeStackTrace(2)), _level(level) {
+        _stacktrace(MakeStackTrace(2)), _level(level), _what(NULL) {
   Squeak::mout();  // make sure we initialise Squeak otherwise can get segv
+  std::string what_str = _message+" at "+_location;
+  _what = new char[what_str.size()+1];
+  strcpy (_what, what_str.c_str());
 }
 
 void Squeal::Print() {

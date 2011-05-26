@@ -54,7 +54,7 @@ class Squeal : public std::exception {
   Squeal() throw();
 
   /// destructor - does nothing
-  ~Squeal() throw() {;}
+  ~Squeal() throw() {delete [] _what;}
   /// Return char buffer of  message+" at "+location
   const char* what() const throw() {return (_message+" at "+_location).c_str();}
   /// Print the Message to Squeak::mout(Squeak::error) and Location to
@@ -81,6 +81,7 @@ class Squeal : public std::exception {
   std::string    _message;
   std::string    _location;
   std::string    _stacktrace;
+  char*          _what;
   exceptionLevel _level;
 };
 
