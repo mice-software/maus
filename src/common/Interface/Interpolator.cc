@@ -306,8 +306,8 @@ void Interpolator3dSolenoidalTo3d::F(const Mesh::Iterator& Point, double BField[
 
 Interpolator3dSolenoidalTo3d::~Interpolator3dSolenoidalTo3d() 
 {
-	if(_interpolator) if(_interpolator[0]) delete _interpolator[0]; 
-	if(_interpolator) if(_interpolator[0]) delete _interpolator[1];
+	if(_interpolator[0]) delete _interpolator[0]; 
+	if(_interpolator[1]) delete _interpolator[1];
   if(_coordinates) _coordinates->Remove(this); 
 }
 
