@@ -64,12 +64,12 @@ TEST_F(MAUSPrimaryGeneratorActionTest, PushPopTest) {
 TEST_F(MAUSPrimaryGeneratorActionTest, GeneratePrimariesTest) {
     MAUS::MAUSPrimaryGeneratorAction::PGParticle part_in;
     part_in.x = 1.;
-    part_in.y = 1.;
-    part_in.z = 1.;
-    part_in.time = 1.;
-    part_in.px = 1.;
-    part_in.py = 1.;
-    part_in.pz = 1.;
+    part_in.y = 2.;
+    part_in.z = 3.;
+    part_in.time = 4.;
+    part_in.px = 5.;
+    part_in.py = 6.;
+    part_in.pz = 7.;
     part_in.energy = 200.;
     part_in.seed = 1;
     part_in.pid = -13;
@@ -80,7 +80,7 @@ TEST_F(MAUSPrimaryGeneratorActionTest, GeneratePrimariesTest) {
     part_in.energy = 105.; //non-physical
     primary->Push(part_in);
 
-    part_in.energy = 200.;
+    part_in.energy = 226.;
     part_in.pid = 0; //non-physical?
     primary->Push(part_in);
 
@@ -93,6 +93,23 @@ TEST_F(MAUSPrimaryGeneratorActionTest, GeneratePrimariesTest) {
     G4Event* event = new G4Event();
     for (size_t i=0; i<2; ++i)
         primary->GeneratePrimaries(event);
+    double mu_mass = 105.658;
+    double p_in    = sqrt(200.*200.-mu_mass*mu_mass);
+    double p_scale = 
+        sqrt(part_in.px*part_in.px+part_in.py*part_in.py+part_in.pz*part_in.pz);
+    double p_norm  = p_in/p_scale;
+    EXPECT_NEAR(part_in.x, event->GetPrimaryVertex()->GetX0(), 1e-3);
+    EXPECT_NEAR(part_in.y, event->GetPrimaryVertex()->GetY0(), 1e-3);
+    EXPECT_NEAR(part_in.z, event->GetPrimaryVertex()->GetZ0(), 1e-3);
+    EXPECT_NEAR(part_in.time, event->GetPrimaryVertex()->GetT0(), 1e-3);
+
+    EXPECT_NEAR(part_in.px*p_norm, event->GetPrimaryVertex()->GetPrimary()->GetPx(), 1e-3);
+    EXPECT_NEAR(part_in.py*p_norm, event->GetPrimaryVertex()->GetPrimary()->GetPy(), 1e-3);
+    EXPECT_NEAR(part_in.pz*p_norm, event->GetPrimaryVertex()->GetPrimary()->GetPz(), 1e-3);
+
+    EXPECT_EQ(part_in.seed, CLHEP::HepRandom::);
+    EXPECT_EQ(-13,  event->GetPrimaryVertex()->GetPrimary()->GetPDGcode());
+
     for (size_t i=0; i<5; ++i)
         EXPECT_THROW(primary->GeneratePrimaries(event), Squeal);
     delete event;
