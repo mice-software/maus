@@ -107,7 +107,7 @@ TEST_F(MAUSPrimaryGeneratorActionTest, GeneratePrimariesTest) {
     EXPECT_NEAR(part_in.py*p_norm, event->GetPrimaryVertex()->GetPrimary()->GetPy(), 1e-3);
     EXPECT_NEAR(part_in.pz*p_norm, event->GetPrimaryVertex()->GetPrimary()->GetPz(), 1e-3);
 
-    EXPECT_EQ(part_in.seed, CLHEP::HepRandom::);
+//    EXPECT_EQ(part_in.seed, CLHEP::HepRandom::);
     EXPECT_EQ(-13,  event->GetPrimaryVertex()->GetPrimary()->GetPDGcode());
 
     for (size_t i=0; i<5; ++i)
