@@ -1,27 +1,30 @@
 /* 
 SciFiPointRec - specific code to reconstruct space points in the SciFi tracker
 M.Ellis - April 2005
+D.Adey - Dec 2010
 */
 
 #include <iostream>
 #include <fstream>
 #include <algorithm>
 #include "CLHEP/Vector/ThreeVector.h"
-#include "SciFiRec.hh"
+#include "Recon/SciFi/SciFiRec.hh"
 #include "Interface/SciFiDigit.hh"
 #include "Calib/SciFiReconstructionParams.hh"
-#include "SciFiTrack.hh"
-#include "SciFiKalTrack.hh"
-#include "SciFiSpacePoint.hh"
-#include "SciFiDoubletCluster.hh"
+#include "Recon/SciFi/SciFiTrack.hh"
+#include "Recon/SciFi/SciFiKalTrack.hh"
+#include "Recon/SciFi/SciFiSpacePoint.hh"
+#include "Recon/SciFi/SciFiDoubletCluster.hh"
 #include "Interface/dataCards.hh"
 using std::vector;
 
-#include "SciFiPointRec.hh"
+#include "Recon/SciFi/SciFiPointRec.hh"
+
+bool clustComp(SciFiDoubletCluster* i,SciFiDoubletCluster* j) { return (i->getNPE() < j->getNPE()); }
 
 void SciFiPointRec( struct MICEEvent& theEvent, struct MICERun* run, int& num_trip, int& num_dup )
 {
-  if( theEvent.sciFiClusters.size() > 500 ) // massive event, don't bother trying to make points
+  if( theEvent.sciFiClusters.size() > 100 ) // massive event, don't bother trying to make points
      return;
 
   // first, triplets...
@@ -31,82 +34,84 @@ void SciFiPointRec( struct MICEEvent& theEvent, struct MICERun* run, int& num_tr
   bool made_trips[2][6] = { { false, false, false, false, false, false },
                             { false, false, false, false, false, false } };
 
-  //std::sort(theEvent.sciFiClusters.begin(), theEvent.sciFiClusters.end());
-  for( unsigned int a = 0; a < theEvent.sciFiClusters.size(); ++a ) {
-    // std::cout << theEvent.sciFiClusters[a]->getNPE() << std::endl;
-    if( theEvent.sciFiClusters[a]->getDoubletNo() == 0 && ! theEvent.sciFiClusters[a]->used() )
-    {
-      int tr = theEvent.sciFiClusters[a]->getTrackerNo();
-      int stat = theEvent.sciFiClusters[a]->getStationNo();
+	vector<SciFiDoubletCluster*> clustvect = theEvent.sciFiClusters;;
+ 	sort(clustvect.begin(), clustvect.end(),clustComp);
+  	//reverse(clustvect.begin(), clustvect.end());
+	int clustvectsize = clustvect.size();
+	vector<SciFiDoubletCluster*> clust[2][6][3];	
 
-      for( unsigned int b = 0; b < theEvent.sciFiClusters.size(); ++b )
-        if( theEvent.sciFiClusters[b]->getTrackerNo() == tr &&
-	    theEvent.sciFiClusters[b]->getStationNo() == stat &&
-	    theEvent.sciFiClusters[b]->getDoubletNo() == 1 &&
-	     ! theEvent.sciFiClusters[b]->used() )
-	  for( unsigned int c = 0; c < theEvent.sciFiClusters.size(); ++c )
-	    if( theEvent.sciFiClusters[c]->getTrackerNo() == tr &&
-	        theEvent.sciFiClusters[c]->getStationNo() == stat &&
-		theEvent.sciFiClusters[c]->getDoubletNo() == 2 &&
-	         ! theEvent.sciFiClusters[c]->used() )
-	    {
-	      // write out info for pattern recognition
-	      double t1 = theEvent.sciFiClusters[a]->getTime();
-	      double t2 = theEvent.sciFiClusters[b]->getTime();
-	      double t3 = theEvent.sciFiClusters[c]->getTime();;
+	/*sort clusters into tracker, station, plane*/
 
-              SciFiSpacePoint* point = new SciFiSpacePoint( run, theEvent.sciFiClusters[a], theEvent.sciFiClusters[b], theEvent.sciFiClusters[c] );
-		int clustersok(1);
-		for ( int cs=0; cs <point->getNumClusters(); ++cs) {
-			if (point->getDoubletCluster(cs)->getNPE() < 5) {
-				clustersok = 0;
+	for (unsigned int cla=0; cla<clustvectsize; ++cla) {		
+		SciFiDoubletCluster* first = clustvect[cla];
+		int tr = first->getTrackerNo();
+		int stat = first->getStationNo();
+		int plane = first->getDoubletNo();
+		clust[tr][stat][plane].push_back(first);
+	}
+
+	for (unsigned int t=0; t<2; ++t) {
+		for (unsigned int s=1; s<=5; ++s) {
+			for (unsigned int ca=0; ca<clust[t][s][0].size(); ++ca)  if (! clust[t][s][0][ca]->used() ) {	
+			for (unsigned int cb=0; cb<clust[t][s][1].size(); ++cb)  if (! clust[t][s][1][cb]->used() ) {
+			for (unsigned int cc=0; cc<clust[t][s][2].size(); ++cc)  if (! clust[t][s][2][cc]->used() ) {
+				SciFiSpacePoint* point = new SciFiSpacePoint( run, (clust[t][s][0])[ca], (clust[t][s][1])[cb], (clust[t][s][2])[cc] );
+				int uvwsum(0);
+                		for (unsigned int cs=0; cs <point->getNumClusters(); ++cs) {
+                        		uvwsum += point->getDoubletCluster(cs)->getChanNoW();
+                		}
+				int trk = point->getTrackerNo();
+				int station = point->getStationNo();	
+              			if ((trk == 0 && station == 5 && uvwsum < 322 && uvwsum > 318) || (!(trk == 0 && station == 5) && uvwsum < 321 && uvwsum > 316))
+                		{
+               				point->keep();
+					for (unsigned int j=0; j<point->getNumClusters(); ++j) {
+						point->getDoubletCluster(j)->setInTrip();
+					}
+                			theEvent.sciFiSpacePoints.push_back( point );
+              			}
+				else delete point;
 			}
+			}
+			}
+
+			for (unsigned int dca=0; dca<clust[t][s][0].size(); ++dca)  if (! clust[t][s][0][dca]->used() ) {
+                        for (unsigned int dcb=0; dcb<clust[t][s][1].size(); ++dcb)  if (! clust[t][s][1][dcb]->used() ) {	
+				SciFiSpacePoint* duplet = new SciFiSpacePoint(run, clust[t][s][0][dca], clust[t][s][1][dcb]);
+				if ( duplet->good() ) {
+					theEvent.sciFiSpacePoints.push_back(duplet);
+					 for (unsigned int j=0; j<duplet->getNumClusters(); ++j) {
+                                                duplet->getDoubletCluster(j)->setInDoub();
+                                         }
+				}
+			}
+			}
+			for (unsigned int dcc=0; dcc<clust[t][s][2].size(); ++dcc)  if (! clust[t][s][2][dcc]->used() ) {
+                        for (unsigned int dcb=0; dcb<clust[t][s][1].size(); ++dcb)  if (! clust[t][s][1][dcb]->used() ) {
+                                SciFiSpacePoint* duplet = new SciFiSpacePoint(run, clust[t][s][2][dcc], clust[t][s][1][dcb]);
+                                if ( duplet->good() ) {
+					theEvent.sciFiSpacePoints.push_back(duplet);
+					 for (unsigned int j=0; j<duplet->getNumClusters(); ++j) {
+                                                duplet->getDoubletCluster(j)->setInDoub();
+                                         }
+				}
+                        }
+                        }
+			for (unsigned int dca=0; dca<clust[t][s][0].size(); ++dca)  if (! clust[t][s][0][dca]->used() ) {
+                        for (unsigned int dcc=0; dcc<clust[t][s][2].size(); ++dcc)  if (! clust[t][s][2][dcc]->used() ) {
+                                SciFiSpacePoint* duplet = new SciFiSpacePoint(run, clust[t][s][0][dca], clust[t][s][2][dcc]);
+                                if (duplet->good() ) {
+					theEvent.sciFiSpacePoints.push_back(duplet);
+					 for (unsigned int j=0; j<duplet->getNumClusters(); ++j) {
+                                                duplet->getDoubletCluster(j)->setInDoub();
+                                         }
+				}
+                        }
+                        }
+
 		}
-              if( point->getChi2() < 750.0 && fabs((t1+t3)/2-t2) < 10.0 && clustersok)
-	      {
-		//point->keep();
-                theEvent.sciFiSpacePoints.push_back( point );
-                ++num_trip;
-		//if (clustersok) {
-		  point->keep();
-		made_trips[tr][stat] = true;
-		//		std::cout << theEvent.sciFiSpacePoints.size() << " space points" << std::endl;
-		
-		}
-              else
-	        delete point;
-	    }
-    }
-  }
+	}	
 
-  // now duplets
 
-  num_dup = 0;
 
-  for( unsigned int a = 0; a < theEvent.sciFiClusters.size(); ++a )
-    if(  ! theEvent.sciFiClusters[a]->used() )
-    {
-      int tr = theEvent.sciFiClusters[a]->getTrackerNo();
-      int stat = theEvent.sciFiClusters[a]->getStationNo();
-      int doub = theEvent.sciFiClusters[a]->getDoubletNo();
-
-      if( ! made_trips[tr][stat] )
-      for( unsigned int b = a + 1; b < theEvent.sciFiClusters.size(); ++b )
-        if( theEvent.sciFiClusters[b]->getTrackerNo() == tr &&
-            theEvent.sciFiClusters[b]->getStationNo() == stat &&
-            theEvent.sciFiClusters[b]->getDoubletNo() != doub &&
-            ! theEvent.sciFiClusters[b]->used() &&
-            fabs( theEvent.sciFiClusters[a]->getTime() - theEvent.sciFiClusters[b]->getTime() ) < 10.0 )
-        {
-          SciFiSpacePoint* dup = new SciFiSpacePoint( run, theEvent.sciFiClusters[a], theEvent.sciFiClusters[b] );
-          if( dup->good() )
-          {
-            dup->keep();
-            theEvent.sciFiSpacePoints.push_back( dup );
-            ++num_dup;
-          }
-          else
-            delete dup;
-        }
-    }
 }

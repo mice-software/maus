@@ -8,17 +8,17 @@ M.Ellis - April 2005
 #include <fstream>
 #include <algorithm>
 #include "CLHEP/Vector/ThreeVector.h"
-#include "SciFiRec.hh"
+#include "Recon/SciFi/SciFiRec.hh"
 #include "Interface/SciFiDigit.hh"
 #include "Calib/SciFiReconstructionParams.hh"
-#include "SciFiTrack.hh"
-#include "SciFiKalTrack.hh"
-#include "SciFiSpacePoint.hh"
-#include "SciFiDoubletCluster.hh"
+#include "Recon/SciFi/SciFiTrack.hh"
+#include "Recon/SciFi/SciFiKalTrack.hh"
+#include "Recon/SciFi/SciFiSpacePoint.hh"
+#include "Recon/SciFi/SciFiDoubletCluster.hh"
 #include "Interface/dataCards.hh"
 using std::vector;
 
-#include "SciFiClusterRec.hh"
+#include "Recon/SciFi/SciFiClusterRec.hh"
 
 std::vector<const MiceModule*> modules(0);
 

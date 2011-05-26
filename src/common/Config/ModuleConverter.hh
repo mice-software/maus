@@ -1,6 +1,6 @@
 #include "CLHEP/Matrix/SymMatrix.h"
 #include "Interface/MCHit.hh"
-#include "MiceModule.hh"
+#include "Config/MiceModule.hh"
 
 #ifndef ModuleConverter_hh
 #define ModuleConverter_hh 1

@@ -1,6 +1,6 @@
 
-#include "KLHit.hh"
-#include "KLDigit.hh"
+#include "Interface/KLHit.hh"
+#include "Interface/KLDigit.hh"
 
 //////////////////////////////////////////////////////////////////////////
 

@@ -4,7 +4,7 @@
 #define TOFTRACK_HH
 
 #include<math.h>
-#include"TofSpacePoint.hh"
+#include"Recon/TOF/TofSpacePoint.hh"
 #include"Interface/SpecialHit.hh"
 #include"CLHEP/Vector/ThreeVector.h"
 #include"CLHEP/Units/PhysicalConstants.h"

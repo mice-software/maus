@@ -25,7 +25,7 @@
 #include <vector>
 #include <map>
 #include <fstream>
-#include "VlpcCable.hh"
+#include "Config/VlpcCable.hh"
 
 #include "Interface/Memory.hh"
 

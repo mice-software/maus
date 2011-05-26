@@ -38,7 +38,7 @@
 #include <iostream>
 #include <vector>
 
-#include "Squeal.hh"
+#include "Interface/Squeal.hh"
 
 /////////////// Complex Start //////////////////////
 

@@ -8,7 +8,7 @@ M.Ellis - August 2005
 #include "Interface/VlpcHit.hh"
 #include "Interface/SciFiDigit.hh"
 
-#include "SciFiDigitRec.hh"
+#include "Recon/SciFi/SciFiDigitRec.hh"
 
 void SciFiDigitRec( struct MICEEvent& event, VlpcCalib* calib, VlpcCable* cable )
 {

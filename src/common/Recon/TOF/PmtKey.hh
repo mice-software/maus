@@ -1,6 +1,6 @@
 // PmtKey.hh
-// Mark Rayner, January 2009	
-// A key to identify individual PMTs in maps of calibration constants etc
+// Mark Rayner, January 2009
+
 
 #ifndef PMTKEY_HH
 #define PMTKEY_HH
@@ -8,28 +8,46 @@
 #include <iostream>
 using namespace std;
 
-class PmtKey {
+
+//! A key to identify individual TOF PMTs in maps of calibration constants, cabling etc.
+class PmtKey{
 
 public:
+   //! Default constructor.
+   PmtKey();
+
+	//! Constructor.
 	PmtKey( int station, int plane, int slab, int pmt );
-	bool operator== ( PmtKey key );
+
 	int station() const { return _station; };
 	int plane() const { return _plane; };
 	int slab() const { return _slab; };
 	int pmt() const { return _pmt; };
 
-	//Not a member of the class but a friend
-	//So you need to supply the PmtKey as there is no *this
-	//However as a friend it can reference private data
-	//"std::cout << someKey" prints the st, pl, sl, pm
+	void SetStation(int st) 	{ _station = st; };
+	void SetPlane(int pl)		{ _plane = pl; };
+	void SetSlab(int sl)			{ _slab = sl; };
+	void SetPmt(int pmt)			{ _pmt = pmt; };
+
+	//! Is equal to operator.
+	bool operator== ( PmtKey key );
+
+
 	friend ostream& operator<< ( ostream& stream, PmtKey key );
 
 private:
+	//! TOF station number.
 	int _station;
-	int _plane;
-	int _slab;
-	int _pmt;
 
+	//! X or Y plane.
+	int _plane;
+
+	//! Slab number.
+	int _slab;
+
+	//! PMT number. Can be 0 or 1.
+	int _pmt;
 };
 
 #endif
+

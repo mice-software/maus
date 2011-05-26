@@ -8,16 +8,16 @@ M. Ellis - April, 2005
 #include <fstream>
 #include <algorithm>
 #include "CLHEP/Vector/ThreeVector.h"
-#include "SciFiRec.hh"
+#include "Recon/SciFi/SciFiRec.hh"
 #include "Interface/SciFiDigit.hh"
-#include "SciFiReconstructionParams.hh"
-#include "SciFiTrack.hh"
-#include "SciFiKalTrack.hh"
-#include "SciFiSpacePoint.hh"
-#include "SciFiDoubletCluster.hh"
+#include "Calib/SciFiReconstructionParams.hh"
+#include "Recon/SciFi/SciFiTrack.hh"
+#include "Recon/SciFi/SciFiKalTrack.hh"
+#include "Recon/SciFi/SciFiSpacePoint.hh"
+#include "Recon/SciFi/SciFiDoubletCluster.hh"
 #include "Interface/dataCards.hh"
 using std::vector;
 
-#include "MICEEvent.hh"
+#include "Interface/MICEEvent.hh"
 
 void SciFiNtupleFill( struct MICEEvent&, RecSixDBank&, int&, int& );

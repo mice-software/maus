@@ -4,7 +4,7 @@
 //
 // A. Fish - 12th September 2005
 
-#include "VmeAdcHit.hh"
+#include "Interface/VmeAdcHit.hh"
 
 VmeAdcHit::VmeAdcHit( int crate, int board, std::string type, int chan, int adc ) : 
                     VmeBaseHit( crate, board, type, chan )

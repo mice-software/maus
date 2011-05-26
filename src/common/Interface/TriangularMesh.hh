@@ -1,7 +1,7 @@
 #ifndef TriangularMesh_hh
 #define TriangularMesh_hh
 
-#include "Mesh.hh"
+#include "Interface/Mesh.hh"
 
 #include <map>
 #include <list>

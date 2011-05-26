@@ -16,20 +16,20 @@ A.Fish - November, 2006
 #include "Interface/MICEEvent.hh"
 #include "Interface/MICERun.hh"
 
-#include "KalmanSeed.hh"
-#include "SciFiRec.hh"
+#include "Recon/SciFi/KalmanSeed.hh"
+#include "Recon/SciFi/SciFiRec.hh"
 #include "Interface/SciFiDigit.hh"
-#include "SciFiKalTrack.hh"
-#include "SciFiSpacePoint.hh"
-#include "SciFiDoubletCluster.hh"
+#include "Recon/SciFi/SciFiKalTrack.hh"
+#include "Recon/SciFi/SciFiSpacePoint.hh"
+#include "Recon/SciFi/SciFiDoubletCluster.hh"
 #include "Interface/dataCards.hh"
-#include "SciFiSeed.hh"
+#include "Recon/SciFi/SciFiSeed.hh"
 #include "BeamTools/BTField.hh"
 #include "BeamTools/BTFieldConstructor.hh"
 
 using std::vector;
 
-#include "SciFiStraightTrackRec.hh"
+#include "Recon/SciFi/SciFiStraightTrackRec.hh"
 
 static const int MAXCOMB = 10000; //ME - should make this a data card at some stage if it proves useful
 

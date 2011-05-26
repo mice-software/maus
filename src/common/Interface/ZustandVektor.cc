@@ -1,7 +1,7 @@
 // ZustandVektor.cc
 
-#include "ZustandVektor.hh"
-#include "MCHit.hh"
+#include "Interface/ZustandVektor.hh"
+#include "Interface/MCHit.hh"
 
 ZustandVektor::ZustandVektor()
 {

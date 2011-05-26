@@ -4,7 +4,7 @@
 //
 // A.Fish 5th October 2005
 
-#include "TofCalib.hh"
+#include "Calib/TofCalib.hh"
 
 #include "CLHEP/Units/SystemOfUnits.h"
 

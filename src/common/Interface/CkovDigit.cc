@@ -3,9 +3,9 @@
 ///
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "CkovHit.hh"
-#include "CkovDigit.hh"
-#include "dataCards.hh"
+#include "Interface/CkovHit.hh"
+#include "Interface/CkovDigit.hh"
+#include "Interface/dataCards.hh"
 #include "CLHEP/Random/RandGauss.h"
 using CLHEP::RandGauss;
 #include "CLHEP/Vector/ThreeVector.h"

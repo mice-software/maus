@@ -1,9 +1,9 @@
-#include "EMRDigit.hh"
+#include "Interface/EMRDigit.hh"
 
-#include "MICEEvent.hh"
-#include "dataCards.hh"
-#include "EMRHit.hh"
-#include "VmefAdcHit.hh"
+#include "Interface/MICEEvent.hh"
+#include "Interface/dataCards.hh"
+#include "Interface/EMRHit.hh"
+#include "Interface/VmefAdcHit.hh"
 #include "CLHEP/Random/Randomize.h"
 using CLHEP::RandPoisson;
 using CLHEP::RandGauss;

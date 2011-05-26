@@ -14,42 +14,43 @@
 #include <fstream>
 #include <string>
 
-#include "MCHit.hh"
+#include "Interface/MCHit.hh"
 
-#include "Memory.hh"
+#include "Interface/Memory.hh"
 
 typedef Hep3Vector ThreeVector;
 
+//! TofHit is a description of a simulated hit in a single strip of the TOF detector.
+//! TofHit class is used to hold all information recorded.
 class TofHit : public MCHit
 {
-   	public:
-
+  public:
+	 //! Default constructor.
     TofHit();
 
+	 //! Destructor.
     ~TofHit()		{ miceMemory.addDelete( Memory::TofHit ); };
 
+	 //! Copy constructor.
     TofHit(const TofHit& th);
 
+	 //! Assignment operator.
     const TofHit& operator=(const TofHit& th);
 
+	 //! Uses the volume name to set  _stationNumber, _planeNumber and _stripNumber.
     void DecodeVolumeName();
+
+	 //! Dumps some information about this digit to the standard output
     void Print() ;
 
-    void SetTrackID   (int tid)        { setTrackID( tid ); }
-    void SetStripNo   (int cn)         { _stripNumber = cn; }
-    void SetPlaneNo   (int pn)         { _planeNumber = pn; }
-    void SetStationNo (int sn)         { _stationNumber = sn; }
-    void SetEdep      (double de)      { setEdep( de ); }
-    void SetPathLength(double pl)      { _pathLength = pl; }
-    void SetPosition  (Hep3Vector xyz){ setPosition( xyz ); }
-    void SetMomentum  (Hep3Vector xyz){ setMomentum( xyz ); }
-    void SetVolumeName(std::string vn)      { _volName = vn; }
-    void SetTime      (double ti)      { setTime( ti ); }
-    void SetEnergy    (double en)      { setEnergy( en ); }
-    void SetPID       (int id)         { setPdg( id ); }
-    void SetMass      (double ma)      { setMass( ma ); }
+    void setStripNo   (int cn)         { _stripNumber = cn; }
+    void setPlaneNo   (int pn)         { _planeNumber = pn; }
+    void setStationNo (int sn)         { _stationNumber = sn; }
+    void setPathLength(double pl)      { _pathLength = pl; }
+    void setVolumeName(std::string vn) { _volName = vn; }
+    void setPID       (int id)         { setPdg( id ); }
 
-    void AddEdep      (double);     
+    void AddEdep      (double);
     void AddPathLength(double);
 
     int GetTrackID()      { return trackID(); }
@@ -68,10 +69,19 @@ class TofHit : public MCHit
 
   private :
 
-      int  _stationNumber; //  TOF station
-      int  _planeNumber;   //  x or y plane
-      int  _stripNumber;    // strip number
-      double        _pathLength;
-      std::string        _volName;  // geant volume name
+	 //!  TOF station number.
+	 int  _stationNumber;
+
+	 //!  X or Y plane.
+	 int  _planeNumber;
+
+	 //! Strip number.
+	 int  _stripNumber;
+
+	 //! Path length of the track in the geant4 sensitive detector volume.
+	 double _pathLength;
+
+	 //! Geant4 volume name.
+	 std::string _volName;
 };
 #endif

@@ -7,7 +7,7 @@
 //
 // Malcolm Ellis
 
-#include "FillMaterials.hh"
+#include "Simulation/FillMaterials.hh"
 
 #include "Interface/MiceMaterials.hh"
 #include "Interface/dataCards.hh"

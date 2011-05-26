@@ -5,7 +5,7 @@
 //
 // A. Fish - 12th September 2005
 
-#include "VmeBaseHit.hh"
+#include "Interface/VmeBaseHit.hh"
 
 VmeBaseHit::VmeBaseHit( int crate, int board, std::string type, int chan )
 {

@@ -2,7 +2,7 @@
 // Spill data
 // V.Verguilov 30 January 2009
 
-#include "MICESpill.hh"
+#include "Interface/MICESpill.hh"
 
 
 MICESpill::MICESpill(){

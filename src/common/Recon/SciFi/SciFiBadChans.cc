@@ -4,7 +4,7 @@
 //
 // Code to hold a list of bad channels to be used during reconstruction to mask them from use
 
-#include "SciFiBadChans.hh"
+#include "Recon/SciFi/SciFiBadChans.hh"
 
 SciFiBadChans::SciFiBadChans()
 {

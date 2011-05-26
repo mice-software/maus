@@ -3,7 +3,7 @@
 #ifndef REC_TOFPID_HH
 #define REC_TOFPID_HH
 
-#include "MousePid.hh"
+#include "Recon/Global/MousePid.hh"
 #include "Recon/TOF/TofSpacePoint.hh"
 
 class TofPid : public MousePid

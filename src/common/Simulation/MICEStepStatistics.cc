@@ -1,4 +1,4 @@
-#include "MICEStepStatistics.hh"
+#include "Simulation/MICEStepStatistics.hh"
 
 #include "G4SteppingManager.hh"
 

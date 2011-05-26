@@ -19,10 +19,10 @@
 #ifndef PolynomialVector_hh
 #define PolynomialVector_hh 1
 
-#include "MMatrix.hh"
-#include "MVector.hh"
+#include "Interface/MMatrix.hh"
+#include "Interface/MVector.hh"
 
-#include "Interpolator.hh"
+#include "Interface/Interpolator.hh"
 
 #include <map>
 
@@ -206,6 +206,13 @@ public:
     /// - so that if multiplier >= 1 it will always define a polynomial of order i_order.
     /// Require evenly spaced ito position, sometimes this means I make more points on the shell
     static std::vector< std::vector<double> > PointBox(std::vector<double> delta, int i_order);
+    /// Make a hyperellipsoid of points where magnitude of each vector \f$\vec{u}$\f is chosen such that 
+    /// \f$\vec{u}^T \mathbf{D}^{-1} \vec{u}=1$\f and number of points is at least
+    /// multiplier*NumberOfPolynomialCoefficients(i_order, delta.num_row()) - so that if multiplier >= 1 
+    /// it will always define a polynomial of order i_order. delta should be a symmetric square matrix.
+    /// Note that this is just a correctly scaled version of PointBox, which defines the distribution of
+    /// points on the shell.
+    static std::vector< std::vector<double> > PointShell(MMatrix<double> scale_matrix, int i_order);
     /// Return chi2 of residuals of some set of output variables compared with the polynomial vector of some set of input variables 
     /// Here Chi2 Avg is defined as Sum( v^T M^{-1} v ) where v is the vector of residuals and M is covariance matrix of v
     double GetAvgChi2OfDifference(std::vector< std::vector<double> > in, std::vector< std::vector<double> > out);

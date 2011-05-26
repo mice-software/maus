@@ -6,7 +6,7 @@
 //
 //--------------------------------------------------------------------------
 
-#include "TofHit.hh"
+#include "Interface/TofHit.hh"
 #include <iostream>
 #include <fstream>
 
@@ -26,12 +26,12 @@ TofHit::TofHit()
 TofHit::TofHit(const TofHit& th):MCHit(th)
 {
   miceMemory.addNew( Memory::TofHit );
-        //std::cout << "TofHit copied" << std::endl;
-        _planeNumber =   th._planeNumber;
-        _stripNumber =   th._stripNumber;
-        _stationNumber = th._stationNumber;
-        _pathLength =    th._pathLength;
-        _volName =       th._volName;
+  //std::cout << "TofHit copied" << std::endl;
+  _planeNumber =   th._planeNumber;
+  _stripNumber =   th._stripNumber;
+  _stationNumber = th._stationNumber;
+  _pathLength =    th._pathLength;
+  _volName =       th._volName;
 }
 
 const TofHit& TofHit::operator=(const TofHit& th)
@@ -62,13 +62,13 @@ void TofHit::DecodeVolumeName()
 void TofHit::AddEdep(double moreEdep)
 {
 	double E_dep = GetEdep() + moreEdep;
-	SetEdep(E_dep);
+	setEdep(E_dep);
 }
 
 void TofHit::AddPathLength(double moreLenght)
 {
 	double Path_Length = GetPathLength() + moreLenght;
-	SetPathLength(Path_Length);
+	setPathLength(Path_Length);
 }
 
 void TofHit::Print()

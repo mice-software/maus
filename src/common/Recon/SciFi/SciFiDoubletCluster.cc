@@ -10,8 +10,8 @@
 #include "CLHEP/Vector/ThreeVector.h"
 #include "Interface/SciFiHit.hh"
 #include "Interface/SciFiDigit.hh"
-#include "SciFiDoubletCluster.hh"
-#include "SciFiSpacePoint.hh"
+#include "Recon/SciFi/SciFiDoubletCluster.hh"
+#include "Recon/SciFi/SciFiSpacePoint.hh"
 
 using std::vector;
 

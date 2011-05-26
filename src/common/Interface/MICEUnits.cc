@@ -1,6 +1,6 @@
 // MICEUnits.cc
 
-#include "MICEUnits.hh"
+#include "Interface/MICEUnits.hh"
 using CLHEP::meter;
 using CLHEP::kilogram;
 using CLHEP::second;

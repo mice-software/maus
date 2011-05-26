@@ -7,9 +7,9 @@
 
 #include <vector>
 #include <map>
-#include "dataCards.hh"
-#include "MICEEvent.hh"
-#include "VmeScalerData.hh"
+#include "Interface/dataCards.hh"
+#include "Interface/MICEEvent.hh"
+#include "Interface/VmeScalerData.hh"
 
 typedef std::vector<VmeScalerData*> TScalersVector;
 

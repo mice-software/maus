@@ -1,6 +1,6 @@
 // TofPid.cc - a matching between a track and a TOF space point
 
-#include "TofPid.hh"
+#include "Recon/Global/TofPid.hh"
 
 TofPid::TofPid( Extrapolation e, TofSpacePoint* p )
 {

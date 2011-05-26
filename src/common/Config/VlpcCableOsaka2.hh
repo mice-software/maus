@@ -16,7 +16,7 @@
 #include <sstream>
 
 #include "CLHEP/Units/SystemOfUnits.h"
-#include "VlpcCable.hh"     
+#include "Config/VlpcCable.hh"     
 
 #include "Interface/Memory.hh" 
 

@@ -13,7 +13,7 @@
 #define KLDigit_HH
 #include <vector>
 
-#include "Memory.hh"
+#include "Interface/Memory.hh"
 
 class VmefAdcHit;
 class KLHit;

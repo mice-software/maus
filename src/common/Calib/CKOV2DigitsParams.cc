@@ -6,7 +6,7 @@
 //
 //-----------------------------------------------------------------------
 
-#include "CKOV2DigitsParams.hh"
+#include "Calib/CKOV2DigitsParams.hh"
 #include "Interface/dataCards.hh"
 
 CKOV2DigitsParams::CKOV2DigitsParams()

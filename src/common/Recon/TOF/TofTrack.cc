@@ -3,9 +3,9 @@
 #include<iostream>
 using namespace std;
 
-#include "TofTrack.hh"
-#include "TofSpacePoint.hh"
-#include "Interface/SpecialHit.hh"
+#include"Recon/TOF/TofTrack.hh"
+#include"Recon/TOF/TofSpacePoint.hh"
+#include"Interface/SpecialHit.hh"
 #include "Interface/MICEUnits.hh"
 
 TofTrack::TofTrack() {

@@ -1,6 +1,6 @@
 // SciFiFieldMap.cc - field map description for the Sci FI tracker used by the Kalman package
 
-#include "SciFiFieldMap.hh"
+#include "Recon/SciFi/SciFiFieldMap.hh"
 
 SciFiFieldMap::SciFiFieldMap( BTFieldConstructor* bt )
 {

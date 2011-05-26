@@ -8,9 +8,9 @@
 
 #include "CLHEP/Vector/ThreeVector.h"
 
-#include "MCHit.hh"
+#include "Interface/MCHit.hh"
 
-#include "Memory.hh"
+#include "Interface/Memory.hh"
 
 /**
 * SciFiHit is a description of a simulated hit in a single doublet layer of Scintillating Fibre detector.

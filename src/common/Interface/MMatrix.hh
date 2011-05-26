@@ -32,8 +32,8 @@
 #ifndef MMatrix_h
 #define MMatrix_h
 
-#include "Squeal.hh"
-#include "MVector.hh"
+#include "Interface/Squeal.hh"
+#include "Interface/MVector.hh"
 
 #include <iostream>
 #include <vector>
@@ -41,7 +41,7 @@
 #include "gsl/gsl_matrix.h"
 #include "gsl/gsl_blas.h"
 
-#include "MVector.hh"
+#include "Interface/MVector.hh"
 
 ///////////////// MMatrix     /////////////////
 

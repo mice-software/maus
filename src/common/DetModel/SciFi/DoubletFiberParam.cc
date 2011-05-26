@@ -3,7 +3,7 @@
 ** MICE scintillating fiber tracker for the MICE proposal
 ** Ed McKigney - August 21, 2002
 */
-#include "DoubletFiberParam.hh"
+#include "DetModel/SciFi/DoubletFiberParam.hh"
 
 #include "G4VPhysicalVolume.hh"
 #include "G4ThreeVector.hh"

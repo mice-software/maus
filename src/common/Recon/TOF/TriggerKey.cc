@@ -1,4 +1,4 @@
-#include "TriggerKey.hh"
+#include "Recon/TOF/TriggerKey.hh"
 
 TriggerKey::TriggerKey()
 {}

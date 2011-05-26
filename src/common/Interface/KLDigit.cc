@@ -1,9 +1,9 @@
-#include "KLDigit.hh"
+#include "Interface/KLDigit.hh"
 
-#include "MICEEvent.hh"
-#include "dataCards.hh"
-#include "KLHit.hh"
-#include "VmefAdcHit.hh"
+#include "Interface/MICEEvent.hh"
+#include "Interface/dataCards.hh"
+#include "Interface/KLHit.hh"
+#include "Interface/VmefAdcHit.hh"
 #include "CLHEP/Random/Randomize.h"
 using CLHEP::RandPoisson;
 using CLHEP::RandGauss;

@@ -1,4 +1,4 @@
-#include "KLGlue.hh"
+#include "DetModel/KL/KLGlue.hh"
 
 #include "G4Material.hh"
 #include "G4Tubs.hh"

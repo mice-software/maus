@@ -1,6 +1,6 @@
 // MCParticle.cc
 
-#include "MCParticle.hh"
+#include "Interface/MCParticle.hh"
 
 MCParticle::MCParticle()
 {

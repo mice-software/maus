@@ -4,7 +4,7 @@
 #include <iostream>
 #include <sstream>
 
-#include "CkovHit.hh"
+#include "Interface/CkovHit.hh"
 
 using namespace std;
 using CLHEP::eV;

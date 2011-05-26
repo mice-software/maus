@@ -11,11 +11,11 @@
 #include <iostream>
 #include <vector>
 
-#include "SciFiTrack.hh"
+#include "Recon/SciFi/SciFiTrack.hh"
 
 #include "Recon/Global/MouseTrack.hh"
 
-#include "KalmanSeed.hh"
+#include "Recon/SciFi/KalmanSeed.hh"
 
 #include "Interface/Memory.hh" 
 
@@ -90,6 +90,8 @@ public:
 	void			keep();
 
         std::string		model() const		{ return _model; };
+
+	KalmanSeed                    m_seed;
 
 private:
 

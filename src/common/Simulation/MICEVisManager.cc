@@ -1,6 +1,6 @@
 #ifdef G4VIS_USE
 
-#include "MICEVisManager.hh"
+#include "Simulation/MICEVisManager.hh"
 
 // Supported drivers...
 

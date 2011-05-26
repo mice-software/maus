@@ -1,4 +1,4 @@
-#include "TofChannelMap.hh"
+#include "Recon/TOF/TofChannelMap.hh"
 
 TofChannelMap::TofChannelMap()
 {
@@ -36,6 +36,15 @@ TofChannelMap::TofChannelMap(std::string fileName)
    numchans = 0;
    Initialize(fileName);
 }
+void TofChannelMap::InitializeFromCards(dataCards* cards)
+{
+
+  char* MICEFILES = getenv( "MICEFILES" );
+  string cablingfile = cards->fetchValueString( "TofCable" );
+  string fcable  = string( MICEFILES ) + "/Cabling/TOF/" + cablingfile;
+  Initialize( fcable );
+  //ch_map.Print();
+}
 
 void TofChannelMap::Initialize(std::string fileName)
 {
@@ -72,15 +81,15 @@ void TofChannelMap::Initialize(std::string fileName)
    int chan = 0;
    while( chan < numchans )
    {
-      std::getline(inf, lbuf); 
+      std::getline(inf, lbuf);
       if(lbuf[0] == '#') continue;
 
       int fadc_bd, fadc_crate=0, fadc_ch, tdc_bd, tdc_crate, tdc_ch, st , pl, sl, p, pNum;
       std::string pName;
 
-      ss.str( lbuf );  
+      ss.str( lbuf );
       ss >> fadc_crate >> fadc_bd >>  fadc_ch >> tdc_crate >> tdc_bd >>  tdc_ch >> st >> pl >> sl >> p >> pNum >> pName;
-      ss.clear(); 
+      ss.clear();
 
       fadc_boards[chan] = fadc_bd;
       fadc_crates[chan] = fadc_crate;
@@ -93,8 +102,8 @@ void TofChannelMap::Initialize(std::string fileName)
       slab[chan] = sl;
       pmt[chan] = p;
       pmtNum[chan] = pNum;
-      pmtName[chan] = pName; 
-      //std::cout<<pName<<std::endl; 
+      pmtName[chan] = pName;
+      //std::cout<<pName<<std::endl;
       chan ++;
    }
 
@@ -107,9 +116,10 @@ bool TofChannelMap::isThisTofTdc(VmeTdcHit* theHit)
    int board = theHit->board();
    int chan = theHit->channel();
    for( int j = 0; j < numchans; j++ )
-      if( tdc_crates[j] == crate 
-          && tdc_boards[j] == board 
-          && tdc_channels[j] == chan) 
+      if( tdc_crates[j] == crate
+          && tdc_boards[j] == board
+          && tdc_channels[j] == chan
+			 && pmtName[j] != "GVA")
       {
           return true;
       }
@@ -118,15 +128,45 @@ bool TofChannelMap::isThisTofTdc(VmeTdcHit* theHit)
 
 }
 
+int TofChannelMap::WhatIsThis(VmeTdcHit* theHit)
+{
+   int crate = theHit->crate();
+   int board = theHit->board();
+   int chan = theHit->channel();
+   for( int j = 0; j < numchans; j++ )
+	{
+      if( tdc_crates[j] == crate
+          && tdc_boards[j] == board
+          && tdc_channels[j] == chan)
+      {
+			 //cout<<pmtName[j]<<endl;
+			 if( pmtName[j] != "GVA"
+				  &&  pmtName[j] != "trigger"
+				  &&  pmtName[j] != "triggerRequest")
+				return TOF;
+
+			 if(pmtName[j] == "GVA")
+				return GVA;
+
+			 if(pmtName[j] == "trigger")
+				return TRIGGER;
+
+			 if(pmtName[j] == "triggerRequest")
+				return TRIGGER_R;
+		}
+	}
+	return UNKNOWN;
+}
+
 bool TofChannelMap::isThisTofFadc(VmefAdcHit* theHit)
 {
    int crate = theHit->crate();
    int board = theHit->board();
    int chan = theHit->channel();
    for( int j = 0; j < numchans; j++ )
-      if( fadc_crates[j] == crate 
-          && fadc_boards[j] == board 
-          && fadc_channels[j] == chan) 
+      if( fadc_crates[j] == crate
+          && fadc_boards[j] == board
+          && fadc_channels[j] == chan)
       {
           return true;
       }
@@ -166,8 +206,8 @@ int TofChannelMap::findThePosition(VmeTdcHit* theHit)
    int chan = theHit->channel();
 
    for( int j = 0; j < numchans; j++ )
-      if( tdc_crates[j] == crate 
-          && tdc_boards[j] == board 
+      if( tdc_crates[j] == crate
+          && tdc_boards[j] == board
           && tdc_channels[j] == chan)
       {
           return pmtNum[j];
@@ -185,9 +225,9 @@ int TofChannelMap::findThePosition(VmefAdcHit* theHit, int& st, int& pl, int& sl
    int chan = theHit->channel();
 
    for( int j = 0; j < numchans; j++ )
-      if( fadc_crates[j] == crate 
-          && fadc_boards[j] == board 
-          && fadc_channels[j] == chan) 
+      if( fadc_crates[j] == crate
+          && fadc_boards[j] == board
+          && fadc_channels[j] == chan)
       {
          st = station[j];
          pl = plane[j];
@@ -200,7 +240,7 @@ int TofChannelMap::findThePosition(VmefAdcHit* theHit, int& st, int& pl, int& sl
       }
 
       return -99;
- 
+
 }
 
 int TofChannelMap::findThePosition(VmefAdcHit* theHit)
@@ -210,8 +250,8 @@ int TofChannelMap::findThePosition(VmefAdcHit* theHit)
    int chan = theHit->channel();
 
    for( int j = 0; j < numchans; j++ )
-      if( fadc_crates[j] == crate 
-          && fadc_boards[j] == board 
+      if( fadc_crates[j] == crate
+          && fadc_boards[j] == board
           && fadc_channels[j] == chan)
       {
           return pmtNum[j];

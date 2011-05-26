@@ -7,15 +7,15 @@
 #include <algorithm>
 #include <iomanip>
 #include "CLHEP/Vector/ThreeVector.h"
-#include "KLRec.hh"
+#include "Recon/KL/KLRec.hh"
 #include "Interface/dataCards.hh"
 #include "Interface/MICEEvent.hh"
 #include "Config/MiceModule.hh"
 #include "Interface/MICERun.hh"
 
 #include "Interface/KLDigit.hh"
-#include "KLCellHit.hh"
-#include "KLChannelMap.hh"
+#include "Recon/KL/KLCellHit.hh"
+#include "Recon/KL/KLChannelMap.hh"
 
 KLRec::KLRec( MICEEvent& e, MICERun* run ) : theEvent( e )
 {

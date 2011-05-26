@@ -1,4 +1,4 @@
-#include "MICEEventAction.hh"
+#include "Simulation/MICEEventAction.hh"
 #include "Config/BeamParameters.hh"
 #include "G4Event.hh"
 #include "G4EventManager.hh"

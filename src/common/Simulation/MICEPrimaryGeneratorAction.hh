@@ -31,7 +31,7 @@
 #include "G4ParticleDefinition.hh"
 #include "G4Event.hh"
 #include "Randomize.hh"
-#include "MICEBGPlane.hh"
+#include "Simulation/MICEBGPlane.hh"
 #include "Config/MiceModule.hh"
 #include "Config/ModuleConverter.hh"
 #include "CLHEP/Matrix/SymMatrix.h"

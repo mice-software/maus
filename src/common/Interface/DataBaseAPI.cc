@@ -4,7 +4,7 @@
 //
 // M.Ellis June 2010
 
-#include "DataBaseAPI.hh"
+#include "Interface/DataBaseAPI.hh"
 
 #include <sstream>
 
@@ -71,13 +71,14 @@ DataBaseAPI::DataBaseAPI( const std::string& hostname, const int& portno )
   //openConnection();
 }
 
-XMLMessage   DataBaseAPI::sendQuery( const XMLMessage& query )
+XMLMessage DataBaseAPI::sendQuery( const XMLMessage& query )
 {
   if( !openConnection() ) // then we can't send this query!
   {
+	 connected = false;
 	 return XMLMessage( std::string( "ERROR! No Connection" ) );
   }
-
+  connected = true;
   // send the query to the socket
   HttpMessage mess( _hostname, _portno, query );
   std::string request = mess.completeMessage();
@@ -123,14 +124,15 @@ XMLMessage   DataBaseAPI::sendQuery( const XMLMessage& query )
 DataBaseAPI::~DataBaseAPI()
 {}
 
-void	     DataBaseAPI::setDefault()
+void DataBaseAPI::setDefault()
 {
   _sockfd = -1;
   _hostname = "micewww.pp.rl.ac.uk";
   _portno = 4443;
+  connected = false;
 }
 
-bool 	     DataBaseAPI::openConnection()
+bool DataBaseAPI::openConnection()
 {
   // attempt to open a socket
 
@@ -172,7 +174,7 @@ bool 	     DataBaseAPI::openConnection()
 
   if( connect( _sockfd, (const sockaddr*) &serv_addr, sizeof( serv_addr ) ) < 0 )
   {
-    perror( "Error connecting" );
+    perror( "Error connect" );
     close( _sockfd );
     return false;
   }

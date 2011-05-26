@@ -17,7 +17,7 @@
 #include <strings.h>
 #include <string>
 
-#include "XMLMessage.hh"
+#include "Interface/XMLMessage.hh"
 
 class HttpMessage
 {
@@ -53,6 +53,7 @@ class DataBaseAPI
 
     virtual ~DataBaseAPI();
 
+	 bool IsConnected()	const	{return connected;};
 
 
   private :
@@ -63,6 +64,8 @@ class DataBaseAPI
     std::string 	_hostname;
     int         	_portno;
     struct hostent* 	_server;
+
+	 bool connected;
 };
 
 #endif

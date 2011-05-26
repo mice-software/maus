@@ -10,7 +10,7 @@
 //
 //----------------------------------------------------------------------------
 
-#include "SpecialHit.hh"
+#include "Interface/SpecialHit.hh"
 
 using namespace std;
 

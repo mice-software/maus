@@ -11,7 +11,7 @@
 #include "Interface/MICEEvent.hh"
 #include "Interface/MICERun.hh"
 
-#include "CkovChannelMap.hh"
+#include "Recon/Ckov/CkovChannelMap.hh"
 
 #define REFERENCE_VALUE_CRATE 1
 #define REFERENCE_VALUE_BOARD 2

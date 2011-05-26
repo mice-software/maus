@@ -4,8 +4,8 @@
 //
 // M.Ellis - 17th September 2005
 
-#include "SciFiExtrap.hh"
-#include "SciFiKalTrack.hh"
+#include "Recon/SciFi/SciFiExtrap.hh"
+#include "Recon/SciFi/SciFiKalTrack.hh"
 
 SciFiExtrap::SciFiExtrap( SciFiKalTrack* trk , double z ) : m_track( trk )
 {

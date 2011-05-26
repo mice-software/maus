@@ -6,18 +6,70 @@
 //
 //-----------------------------------------------------------------------------
 
-#include "TofRec.hh"
+#include "Recon/TOF/TofRec.hh"
 
 using namespace std;
 
-TofRec::TofRec( MICEEvent& e ) : theEvent( e ), theRun( NULL )
-{}
-
-TofRec::TofRec( MICEEvent& e, MICERun* r ) : theEvent( e ), theRun( r )
+TofRec::TofRec( MICEEvent& e, MICERun* r )
+: theEvent( e ), theRun( r ), DBReader( NULL )
 {
+  //! Create new TofTrigger object.
+  theTrigger = new TofTrigger();
+
+  //!  Get the trigger station from datacards and set this in the TofTrigger object.
+  int TriggerSt = theRun->DataCards->fetchValueInt( "TofTriggerStation" );
+  theTrigger->SetStation( TriggerSt );
+
+  //! Initialize data members.
+  Initialize();
+
+  //! Initialize the channel map by using the datacards.
+  ch_map.InitializeFromCards( theRun->DataCards );
+
+  //! If we do not run in calibration mode initialize also the calibration map by using datacards.
+  if( !CalibrationMode )
+	 calib_map.InitializeFromCards( theRun->DataCards, tofStationModules );
+}
+
+TofRec::TofRec( MICEEvent& e, MICERun* r, DataBaseReader* dbreader )
+: theEvent( e ), theRun( r ), DBReader( dbreader )
+{
+  //! Create new TofTrigger object. The trigger station is going to be set later in void OnRunBeginReset;
+  theTrigger = new TofTrigger();
+  Initialize();
+
+  //! Initialize the channel map by using the datacards. This has to be changed when CBD is ready to hold cabling.
+  ch_map.InitializeFromCards( theRun->DataCards );
+
+  //! If we do not run in calibration mode initialize also the calibration map by using CDB.
+  if( !CalibrationMode )
+	 calib_map.MakePmtKeys( tofStationModules );
+
+  //reader->SetTofRecCall( OnRunBeginReset );
+}
+
+TofRec::~TofRec()
+{
+  delete theTrigger;
+	//ME - we don't delete objects here, that is handled globally
+}
+
+void TofRec::Initialize()
+{
+  //! Proper value of CurrentRunNum will be set later in void OnRunBeginReset().
+  CurrentRunNum = -1;
+
+  //! If we run in calibration mode the reconstruction is simplified and time is not reconstructed.
+  if( theRun->DataCards->fetchValueInt( "TofCalibrationMode" ) == 0) CalibrationMode = false;
+  else CalibrationMode = true;
+
+  //int tof_rec_level = theRun->DataCards->fetchValueInt( "TofRecLevel" );
+
+  //! Find in the loaded configuration all TOF detectors and all TOF slabs.
   tofStationModules = theRun->miceModule->findModulesByPropertyString( "Detector", "TOF" );
   tofSlabModules = theRun->miceModule->findModulesByPropertyExists( "Hep3Vector", "Pmt1Pos" );
 
+  //! Create structure to hold all necessary information during the reconstruction of the event.
   int nStation = tofStationModules.size();
   int nTracks = nStation -1;
   SpacePoints.resize(nStation);
@@ -47,72 +99,38 @@ TofRec::TofRec( MICEEvent& e, MICERun* r ) : theEvent( e ), theRun( r )
 	 }
   }
 
-  char* MICEFILES = getenv( "MICEFILES" );
-  string calibfile = theRun->DataCards->fetchValueString( "TofCalib" );
-  string cablingfile = theRun->DataCards->fetchValueString( "TofCable" );
+  //! Set some constants.
+  ScintLightSpeed = theRun->DataCards->fetchValueDouble("TOFscintLightSpeed");
 
-  if( MyDataCards.fetchValueInt( "TofCalibrationMode" ) == 0) CalibrationMode = false;
-  else CalibrationMode = true;
-
-  string fcable  = string( MICEFILES ) + "/Cabling/TOF/" + cablingfile;
-  ch_map.Initialize(fcable);
-  //ch_map.Print();
-  string ft0, ftw, ftr;
-  ftw = string( MICEFILES ) + "/Calibration/TOF/" + calibfile + "TW.txt";
-
-  int TriggerSt = MyDataCards.fetchValueInt( "TofTriggerStation" );
-  if(TriggerSt==0)
-  {
-	 ft0 = string( MICEFILES ) + "/Calibration/TOF/" + calibfile + "T0_trTOF0.txt";
-	 ftr = string( MICEFILES ) + "/Calibration/TOF/" + calibfile + "Trigger_trTOF0.txt";
-  }
-  if(TriggerSt==1)
-  {
-	 ft0 = string( MICEFILES ) + "/Calibration/TOF/" + calibfile + "T0_trTOF1.txt";
-	 ftr = string( MICEFILES ) + "/Calibration/TOF/" + calibfile + "Trigger_trTOF1.txt";
-  }
-
-  theTrigger = new TofTrigger();
-  if( !CalibrationMode )
-  {
-	 calib_map.Initialize(ft0, ftw, ftr);
-	 if( TriggerSt == calib_map.GetTriggerStation() )
-	 {
-	 theTrigger->SetStation( TriggerSt );
-	 }else
-	 {
-		cerr << "*** ERROR in TofRec::TofRec ***"<<endl;
-		cerr <<"Trigger in TOF"<< TriggerSt <<endl;
-		cerr <<"Wrong trigger delays file" << ftr << endl;
-		exit(1);
-	 }
-  } else theTrigger->SetStation( TriggerSt );
-
+  //! If you want to set different value for MakeSpacePiontCut use void TofRec::SetSpacePiontCut(double).
   MakeSpacePiontCut = 500.;
+
+  //! If you want to set different value for this FindTriggerPixelCut use void TofRec::SetTriggerCut(double).
   FindTriggerPixelCut = 500.;
+
+
   ResetEfficiency();
   Print();
-}
-
-TofRec::~TofRec()
-{
-  delete theTrigger;
-	//ME - we don't delete objects here, that is handled globally
 }
 
 void TofRec::Print()
 {
   cout<<dec<<"=========== TofRec ============"<<endl;
   cout<<"CalibrationMode "<<CalibrationMode<<endl;
-  cout<<"Trigger from TOF"<< theTrigger->GetStation() <<endl;
+  cout<<"Trigger from - ";
+  if( !DBReader || (DBReader && CurrentRunNum>0) )	 cout<<"TOF"<< theTrigger->GetStation() <<endl;
+  else cout<<"to be set" <<endl;
+
   if(!CalibrationMode)
   {
 	 cout<<"MakeSpacePiontCut = "<<MakeSpacePiontCut<<" ps"<<endl;
 	 cout<<"FindTriggerPixelCut = "<<FindTriggerPixelCut<<" ps"<<endl;
 	 //cout<<"Good = "<<NGoodEvents<<"  NoCalib = "<<NBadEvents_NoCalib<<"  NoTrigger = "<<NBadEvents_NoTrigger<<endl;
-	 cout<<"Reconstruction Efficiency = "<<GetEfficiency()*100.<<"%"<<endl;
-	 cout<<"Reconstruction Inefficiency - No Calibration = "<<GetInefficiency(NoCalibration)*100.<<"%"<<endl;
-	 cout<<"Reconstruction Inefficiency - Unknown Trigger pixel = "<<GetInefficiency(UnknownTrigger)*100.<<"%"<<endl;
+	 if( GetEfficiency() ){
+		cout<<"Reconstruction Efficiency = "<<GetEfficiency()*100.<<"%"<<endl;
+		cout<<"Reconstruction Inefficiency - No Calibration = "<<GetInefficiency(NoCalibration)*100.<<"%"<<endl;
+		cout<<"Reconstruction Inefficiency - Unknown Trigger pixel = "<<GetInefficiency(UnknownTrigger)*100.<<"%"<<endl;
+	 }
   }
   //cout<<"Cabling from "<<fcable<<endl;
   //cout<<"Calibration from "<<endl<<ft0<<endl<<ftw<<endl<<ftr<<endl;
@@ -121,33 +139,38 @@ void TofRec::Print()
 
 bool TofRec::Process()
 {
-  //int tof_rec_level = theRun->DataCards->fetchValueInt( "TofRecLevel" );
-
+  //! Check the data type.
   if( theEvent.tofDigits.size() != 0 )
 	 DataType = MCData;
-  else if( theEvent.tofDigits.size() == 0 && theEvent.vmeAdcHits.size() != 0 && theEvent.vmefAdcHits.size() == 0)
-	 DataType = KEKData;
   else if( theEvent.tofDigits.size() == 0 && theEvent.vmefAdcHits.size() != 0 && theEvent.vmeAdcHits.size() == 0 )
 	 DataType = MICEData;
 
-  Reset();
-
-  if(DataType == KEKData)
-  {
-	 TofCable* cable = theRun->tofCable;
-	 TofCalib* calib = theRun->tofCalib;
-	 if( calib && cable ) makeDigits( calib, cable );
-  }
+  //! Prepare to reconstruct the event.
+  OnEventBeginReset();
 
   if(DataType == MICEData)
   {
+	 // This is for the real data.
+	 if(DBReader)
+	 {
+		if(DBReader->GetCurrentRunNum() != CurrentRunNum )
+		  OnRunBeginReset();
+
+		if( CurrentRunNum<0 )
+		  return false;
+	 }
+
+	 //! Read the trigger times.
 	 theTrigger->Reset();
-	 theTrigger->SetTriggerTimes( theEvent, &ch_map);
+	 theTrigger->SetTriggerTimes( &theEvent, &ch_map);
+	 //theTrigger->Print();
+
 	 makeDigits();
   }
 
   if(DataType == MCData)
   {
+	 // This is for the MonteCarlo data.
 	 sortDigits();
   }
 
@@ -163,8 +186,29 @@ bool TofRec::Process()
   return true;
 }
 
-void TofRec::Reset()
+void TofRec::OnRunBeginReset()
 {
+  CurrentRunNum = DBReader->GetCurrentRunNum();
+  int TriggerSt = DBReader->GetTrigger( CurrentRunNum );
+  if(TriggerSt == -99999)
+  {
+	 cerr << "*** ERROR in TofRec::OnRunBeginReset() ***"<<endl;
+	 cerr << "*** Corrupted comunication with BD server ***"<<endl;
+	 cerr << "*** Unable to set the trigger ***"<<endl;
+	 cerr << "*** exit ***"<< endl;
+	 exit(1);
+  }
+  cout<<"TofRec::OnRunBeginReset() ";
+  cout<<"In Run "<<dec<<CurrentRunNum<<" trigger in TOF"<<TriggerSt<<endl;
+  theTrigger->SetStation( TriggerSt );
+
+  if( !CalibrationMode )
+	 calib_map.InitializeFromDB( DBReader, CurrentRunNum );
+}
+
+void TofRec::OnEventBeginReset()
+{
+  //! Erase the information from the previous event.
   for(unsigned int st=0;st<SpacePoints.size();st++)
   {
 	 SpacePoints[st].resize(0);
@@ -178,10 +222,14 @@ void TofRec::Reset()
 			 Digits[st][pl][sl][pmt].resize(0);
 	 }
   }
+  GVADigits.resize(0);
+  GVASpacePoints.resize(0);
 }
 
 void TofRec::sortDigits()
 {
+  //! In oreder to reconstruct MC data first we have to know how the digits are disributet over the detector.
+  //! The equivalent of this function for the real data is TofRec::makeDigits().
   int digits = theEvent.tofDigits.size();
   for(int i=0;i<digits;i++)
   {
@@ -191,19 +239,21 @@ void TofRec::sortDigits()
 	 int slab = theEvent.tofDigits[i]->slab();
 	 int pmt = theEvent.tofDigits[i]->pmt();
 	 Digits[station][plane][slab][pmt].push_back(i);
+	 //! Later this information will be used to make TofSlabHits.
   }
 }
 
-//This method matches a VmefAdcHit to every VmeTdcHit and makes a TofDigit
 void TofRec::makeDigits()
 {
+  //! This method matches a VmefAdcHit to every VmeTdcHit and makes a TofDigit
   int tdcHits = theEvent.vmeTdcHits.size();
   int fadcHits = theEvent.vmefAdcHits.size();
   int DigitNum = 0;
   for(int i=0; i<tdcHits; i++)
   {
 	 VmeTdcHit* tdchit = theEvent.vmeTdcHits[i];
-	 if( ch_map.isThisTofTdc(tdchit) )
+	 int hitType = ch_map.WhatIsThis(tdchit);
+	 if( hitType == TofChannelMap::TOF )
 	 {
 		int st, plane, slab, pmt, pmtNum;
 		std::string pmtName;
@@ -217,113 +267,47 @@ void TofRec::makeDigits()
 		  {
 			 VmefAdcHit* fadchit = theEvent.vmefAdcHits[k];
 			 //fadchit->Print();
-			 //correct the tdc according the trigger time and create a TofDigit
+
+			 double triggerTime = theTrigger->GetTriggerReq( tdchit->board());
+			 //!Create a TofDigit.
 			 TofDigit* tofDigit =
-				  new TofDigit(fadchit,tdchit,st,plane,slab,pmt,theTrigger->GetTriggerReq( tdchit->board() ),pmtName);
+				  new TofDigit(fadchit, tdchit, st, plane, slab, pmt, triggerTime, pmtName);
 			 //tofDigit->Print();
-			 theEvent.tofDigits.push_back( tofDigit );
-			 if( st < (int)Digits.size()
-				  || plane < (int)Digits[st].size()
+			 //! This TofDigit will be good only if triggerTime is found (the value is positive).
+			 if( tofDigit->isGood() ){
+				theEvent.tofDigits.push_back( tofDigit );
+
+				if( st < (int)Digits.size()
+				    || plane < (int)Digits[st].size()
 				//  || slab << (int)Digits[st][plane].size()
-				)
-				Digits[st][plane][slab][pmt].push_back( DigitNum );
-			 else
-			 {
-				cerr << "*** ERROR in TofRec::makeDigits() ***"<<endl;
-				cerr << "*** Conflict between the configuration file ";
-				cerr << theRun->DataCards->fetchValueString( "MiceModel" ) <<" and the reconstructed data. ***"<<endl;
-				cerr << "*** Counter with signature ";
-				cerr << "(St "<<st<<", Pl "<<plane<<", Slab "<<slab<<") is not presented in the current configuration. ***"<<endl;
-				cerr << "*** exit ***"<< endl;
-				exit(1);
+				  )
+				  Digits[st][plane][slab][pmt].push_back( DigitNum );
+				  //! Later this information will be used to make TofSlabHits.
+				  else
+				  {
+					 cerr << "*** ERROR in TofRec::makeDigits() ***"<<endl;
+					 cerr << "*** Conflict between the configuration file ";
+					 cerr << theRun->DataCards->fetchValueString( "MiceModel" ) <<" and the reconstructed data. ***"<<endl;
+					 cerr << "*** Counter with signature ";
+					 cerr << "(St "<<st<<", Pl "<<plane<<", Slab "<<slab<<") is not presented in the current configuration. ***"<<endl;
+					 cerr << "*** exit ***"<< endl;
+					 exit(1);
+				  }
+				DigitNum ++;
 			 }
-			 DigitNum ++;
 		  }
+	 }
+	 else if( hitType == TofChannelMap::GVA )
+	 {
+		//cout<<dec;
+		//tdchit->Print();
+		TofDigit* tofDigit = new TofDigit(NULL, tdchit, -1,0,0,0, theTrigger->GetTriggerReq( tdchit->board() ), "GVA");
+		theEvent.tofDigits.push_back( tofDigit );
+		GVADigits.push_back( DigitNum );
+		DigitNum ++;
 	 }
   }
 }
-
-//This method matches a VmeAdcHit to every VmeTdcHit and makes a TofDigit
-void TofRec::makeDigits(TofCalib* m_calib, TofCable* m_cable) {
-   int DigitNum = 0;
-	//Loop over each VME TDC hit
-	for( unsigned int tdc = 0; tdc < theEvent.vmeTdcHits.size(); ++tdc ) {
-
-	    	// loop over TofCable and see if we find this channel in the list
-		VmeTdcHit* tdchit = theEvent.vmeTdcHits[tdc];
-		bool found   = false;
-		int TFLN     = -1; // Text File Line Number = (line of cabling text file with this PMT's TDC cable in it) - 1
-		int stat     = -1;
-		int plane    = -1;
-		int pmt      = -1;
-		int slab     = -1;
-		//Loop over each cable (look at 1st line of cabling text file to see how many)
-		for( int i = 0; ! found && i < m_cable->variables(); ++i ) {
-
-			//If you're a TDC cable with the correct module number and channel...
-			if ( m_cable->modType     ( i ) == 1 //i.e. a TDC module
-			  && m_cable->crateNumber ( i ) == tdchit->crate()
-			  && m_cable->moduleNumber( i ) == tdchit->board()
-			  && m_cable->channel     ( i ) == tdchit->channel()
-			) {
-				TFLN = i;
-				found    = true;
-				stat     = m_cable->stationNumber( TFLN );
-				plane    = m_cable->planeNumber  ( TFLN );
-				pmt      = m_cable->pmt          ( TFLN );
-				slab     = m_cable->slab         ( TFLN );
-			}
-
-			if( found ) {
-				//This VmeTdcHit is on a known TDC channel, so find the matching VmeAdcHit
-				// `hit' is a Vme...A...dcHit* --- match it to it's previously found Vme...T...dcHit*
-				VmeAdcHit * hit = NULL;
-
-				//Loop over VME ADC hits and see if one matches
-				for( unsigned int adc = 0; adc < theEvent.vmeAdcHits.size(); ++adc )
-					for( int i = 0; i < m_cable->variables(); ++i )
-						if( m_cable->modType      ( i ) == 2 //i.e. an ADC module
-						 && m_cable->slab         ( i ) == slab
-						 && m_cable->pmt          ( i ) == pmt
-						 && m_cable->stationNumber( i ) == stat
-						 && m_cable->planeNumber  ( i ) == plane
-						 && m_cable->crateNumber  ( i ) == theEvent.vmeAdcHits[adc]->crate()
-						 && m_cable->moduleNumber ( i ) == theEvent.vmeAdcHits[adc]->board()
-						 && m_cable->channel      ( i ) == theEvent.vmeAdcHits[adc]->channel()
-						)
-							hit = theEvent.vmeAdcHits[adc];
-
-				//We have a matching VmeAdc and Tdc hit on a TOF PMT
-				if( hit ) {
-					double ped = m_calib->ped( stat, plane, slab, pmt );
-					double gain = m_calib->gain( stat, plane, slab, pmt );
-					double t2t = m_calib->tdc2time( stat, plane, slab, pmt );
-					std::vector<double> tw = m_calib->timeWalk( stat, plane, slab, pmt );
-					double adcped = (double)hit->adc() - ped;
-					if( adcped > 100. && adcped < 3500 && tdchit->tdc() * t2t < 500. ) {
-						TofDigit* digit = new TofDigit( hit, tdchit, stat, plane, pmt, slab, ped, gain, t2t, tw );
-						theEvent.tofDigits.push_back( digit );
-			         Digits[stat][plane][slab][pmt].push_back( DigitNum );
-			         DigitNum ++;
-					}
-				}
-
-				//No ADC hit was found to match the TDC hit, so make a TofDigit with just the TDC hit
-				else {
-					double ped = m_calib->ped( stat, plane, slab, pmt );
-					double gain = m_calib->gain( stat, plane, slab, pmt );
-					double t2t = m_calib->tdc2time( stat, plane, slab, pmt );
-					std::vector<double> tw = m_calib->timeWalk( stat, plane, slab, pmt );
-					TofDigit* digit = new TofDigit( tdchit, stat, plane, pmt, slab, ped, gain, t2t, tw );
-					theEvent.tofDigits.push_back( digit );
-			      Digits[stat][plane][slab][pmt].push_back( DigitNum );
-			      DigitNum ++;
-				}
-			}
-		}
-	}
-}
-
 
 void TofRec::makeSlabHits()
 {
@@ -343,7 +327,7 @@ void TofRec::makeSlabHits()
 		  {
 			 int nDigit0 = Digits[station][plane][slab][0][0];
 			 int nDigit1 = Digits[station][plane][slab][1][0];
-			 TofSlabHit* hit = new TofSlabHit(theRun, tofSlabModules[i], theEvent.tofDigits[nDigit0], theEvent.tofDigits[ nDigit1 ] );
+			 TofSlabHit* hit = new TofSlabHit(tofSlabModules[i], theEvent.tofDigits[nDigit0], theEvent.tofDigits[ nDigit1 ] );
 
 			 if( hit->isGood() )
 			 {
@@ -353,19 +337,6 @@ void TofRec::makeSlabHits()
 				SlabHits[station][plane].push_back( SlHitNum );
 				SlHitNum ++;
 			 } else delete hit;
-		  }
-		}  else if( numPmts == 1 )
-		{
-		  if( Digits[station][plane][slab][0].size() )
-		  {
-			 int nDigit0 = Digits[station][plane][slab][0][0];
-			 TofSlabHit* hit = new TofSlabHit(theRun, tofSlabModules[i], theEvent.tofDigits[nDigit0] );
-
-			 if( hit->isGood() )
-			 {
-				hit->digit1()->setSlabHit( hit );
-				theEvent.tofSlabHits.push_back( hit );
-			 }
 		  }
 		}
 	 }
@@ -377,8 +348,8 @@ void TofRec::makeSpacePoints()
   int SpPointNum = 0;
   TriggerKey* TrKey;
   if( DataType == MICEData ){
-	 TrKey = theTrigger->ProcessTriggerKey(theEvent, &calib_map, SlabHits[ theTrigger->GetStation() ], FindTriggerPixelCut, CalibrationMode);
-	 //if( theTrigger->GetNumberOfRequests() > 1 )theTrigger->Print();
+	 TrKey = theTrigger->ProcessTriggerKey(&theEvent, &calib_map, SlabHits[ theTrigger->GetStation() ], FindTriggerPixelCut, CalibrationMode);
+	 //theTrigger->Print();
 	 //cout<<GetSlabHits( theTrigger->GetStation() ).size()<<endl;
 	 if(!TrKey)
 	 {
@@ -398,63 +369,50 @@ void TofRec::makeSpacePoints()
 		int station = tofStationModules[m]->propertyInt( "Station" );
 		int numPlanes = tofStationModules[m]->propertyInt( "numPlanes" );
 
-		if( numPlanes == 1 )
+		if( numPlanes == 2 )
 		{
+		  //! Get number of slab hits in  plane 0.
 		  int nx = SlabHits[station][0].size();
-		  for(int x=0;x<nx;x++)
-		  {
-			 TofSlabHit *slA = theEvent.tofSlabHits[ SlabHits[station][0][x] ];
 
-			 if( DataType == MICEData )
-				if( !slA->CalibrateTime(&calib_map,TrKey) ) {slA->Print(); continue;}
-
-			 if( DataType == MCData )
-				if( !slA->CalibrateTime() ) {slA->Print(); continue;}
-
-			 TofSpacePoint* point = new TofSpacePoint(tofStationModules[m], slA);
-			 if( point->isGood() )
-			 {
-				theEvent.tofSpacePoints.push_back( point );
-				SpacePoints[station].push_back( SpPointNum );
-				SpPointNum ++;
-			 }
-		  }
-		}
-		else if( numPlanes == 2 )
-		{
-		  int nx = SlabHits[station][0].size();
+		  //! Get number of slab hits in  plane 1.
 		  int ny = SlabHits[station][1].size();
+
+		  //! Loop over all possible combinations.
 		  for(int x=0;x<nx;x++)
 		  for(int y=0;y<ny;y++)
 		  {
 			 TofSlabHit *slA = theEvent.tofSlabHits[ SlabHits[station][0][x] ];
 			 TofSlabHit *slB = theEvent.tofSlabHits[ SlabHits[station][1][y] ];
 
+			 //! If we run using real data.
 			 if( DataType == MICEData && !CalibrationMode)
 			 {
-				if( !slA->CalibrateTime(&calib_map,TrKey) ) {
-				  //AddBadEvent( NoCalibration );
-				  continue;
-				}
-				if( !slB->CalibrateTime(&calib_map,TrKey) ){
-				  //AddBadEvent( NoCalibration );
-				  continue;
-				}
-				if( fabs(slA->time() - slB->time()) > MakeSpacePiontCut ){
-				   //AddBadEvent( UnknownTrigger );
-					continue;
-				}
+				//! Try to calibrate the value of time in the slab hits.
+				slA->CalibrateTime(&calib_map,TrKey);
+				slB->CalibrateTime(&calib_map,TrKey);
+				//! If the calibration is successful TofSlabHit::m_calibrated is set to be true.
 			 }
 
+			 //! If we run using Monte Carlo data.
 			 if( DataType == MCData )
 			 {
-				if( !slA->CalibrateTime() ) continue;
-				if( !slB->CalibrateTime() ) continue;
+				//! Calibration is always successful in this case.
+				slA->CalibrateTime(ScintLightSpeed);
+				slB->CalibrateTime(ScintLightSpeed);
 			 }
-
+          //slA->Print();slB->Print();
+			 //! Create Space Point.
 			 TofSpacePoint* point = new TofSpacePoint(tofStationModules[m], slA, slB);
-			 if( point->isGood() )
+			 //point->Print();
+			 //! This Space Point will be good only if both slab hits are good end calibrated.
+			 //! If we do not run in calibration mode:
+			 //! Check the difference of the time measured in the slab hits. This difference should not exceed the cut.
+			 //! If we run in calibration mode: just go ahead.
+			 if( CalibrationMode || ( point->isGood() && ( fabs(point->dt()) < MakeSpacePiontCut) ) )
 			 {
+				//! If everything is OK store the space point.
+				slA->SetSpacePoint( point );
+				slB->SetSpacePoint( point );
 				theEvent.tofSpacePoints.push_back( point );
 				SpacePoints[station].push_back( SpPointNum );
 				SpPointNum ++;
@@ -516,7 +474,7 @@ void TofRec::makeTracks() {
 		int TrackNum = 0;
 		if( (DataType == MICEData || DataType == MCData) && !CalibrationMode) {
 			//for(unsigned int t=0; t < (SpacePoints.size() - 1); t++)
-			for(unsigned int t=0; t < SpacePoints.size(); t++) 
+			for(unsigned int t=0; t < SpacePoints.size(); t++)
 			for(unsigned int i=0;i<SpacePoints[t].size();i++)
 			for(unsigned int j=0;j<SpacePoints[t+1].size();j++) {
 				int first_sp = SpacePoints[t][i];
@@ -526,7 +484,7 @@ void TofRec::makeTracks() {
 				TOFTracks[t].push_back( TrackNum );
 				TrackNum++;
 			}
-		
+
 		}
 	}
 
@@ -541,7 +499,7 @@ double TofRec::addUpPe( TofSpacePoint* tsp ) {
 	return s;
 }
 
-vector<int> TofRec::GetSlabHits(int Station)
+vector<int> TofRec::GetSlabHits(int Station) const
 {
   vector<int> slhits = SlabHits[Station][0];
   for(unsigned int i=0;i<SlabHits[Station][1].size();i++)

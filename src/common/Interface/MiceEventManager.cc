@@ -2,7 +2,7 @@
 //
 // M.Ellis 25/8/2005
 
-#include "MiceEventManager.hh"
+#include "Interface/MiceEventManager.hh"
 
 #include "Interface/VlpcHit.hh"
 #include "Interface/VlpcEventTime.hh"

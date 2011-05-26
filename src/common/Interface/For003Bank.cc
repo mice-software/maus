@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <fstream>
 #include "CLHEP/Vector/ThreeVector.h"
-#include "For003Bank.hh"
+#include "Interface/For003Bank.hh"
 #include "CLHEP/Units/SystemOfUnits.h"
 using CLHEP::second;
 using CLHEP::meter;

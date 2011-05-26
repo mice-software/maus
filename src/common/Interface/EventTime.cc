@@ -2,7 +2,7 @@
 //
 // M. Ellis - 20th May 2009
 
-#include "EventTime.hh"
+#include "Interface/EventTime.hh"
 #include "CLHEP/Units/SystemOfUnits.h"
 
 double	EventTime::time() const

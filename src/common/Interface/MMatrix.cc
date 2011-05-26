@@ -25,8 +25,8 @@
 //library
 //
 
-#include "MMatrix.hh"
-#include "Squeal.hh"
+#include "Interface/MMatrix.hh"
+#include "Interface/Squeal.hh"
 
 #include "gsl/gsl_linalg.h"
 #include "gsl/gsl_eigen.h"

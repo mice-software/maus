@@ -10,7 +10,7 @@
 
 #include <vector>
 
-#include "Memory.hh"
+#include "Interface/Memory.hh"
 
 class VlpcHit 
 {

@@ -5,7 +5,7 @@
 // M.Ellis 22/10/2003
 // Imported to G4MICE April 2005
 
-#include "VlpcHit.hh"
+#include "Interface/VlpcHit.hh"
 
 void	clearVlpcHitVector( VlpcHitVector& vect )
 {

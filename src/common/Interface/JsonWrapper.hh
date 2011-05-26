@@ -33,8 +33,8 @@
 
 #include "json/json.h"
 
-#include "src/common/Interface/STLUtils.hh"
-#include "src/common/Interface/Squeal.hh"
+#include "Interface/STLUtils.hh"
+#include "Interface/Squeal.hh"
 
 class JsonWrapper {
  public:

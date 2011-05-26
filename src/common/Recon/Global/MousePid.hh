@@ -3,7 +3,7 @@
 #ifndef REC_MOUSEPID_HH
 #define REC_MOUSEPID_HH
 
-#include "Extrapolation.hh"
+#include "Recon/Global/Extrapolation.hh"
 
 class MousePid
 {

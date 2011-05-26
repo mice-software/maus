@@ -1,4 +1,4 @@
-#include "RFData.hh"
+#include "Interface/RFData.hh"
 
 
 RFData::RFData(Hep3Vector cavityPos, double phase, double peakField, double frequency, double phaseError,

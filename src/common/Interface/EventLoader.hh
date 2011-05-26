@@ -7,7 +7,7 @@
 
 
 
-#include "MICEEvent.hh"
+#include "Interface/MICEEvent.hh"
 
 
 

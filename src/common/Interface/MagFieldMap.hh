@@ -4,7 +4,7 @@
 #include <iostream>
 #include <string>
 
-#include "SplineInterpolator.hh"
+#include "Interface/SplineInterpolator.hh"
 
 class MagFieldMap
 {

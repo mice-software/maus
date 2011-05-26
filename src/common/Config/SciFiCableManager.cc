@@ -6,12 +6,12 @@
 // A.Fish 29/9/2006
 // Modified: M. Ellis 10/2008
 
-#include "SciFiCableManager.hh"
+#include "Config/SciFiCableManager.hh"
 
-#include "VlpcCableImperial.hh"
-#include "VlpcCableOsaka.hh"
-#include "VlpcCableOsaka2.hh"
-#include "VlpcCableOsaka3.hh"
+#include "Config/VlpcCableImperial.hh"
+#include "Config/VlpcCableOsaka.hh"
+#include "Config/VlpcCableOsaka2.hh"
+#include "Config/VlpcCableOsaka3.hh"
 
 void makeVlpcCable( MICERun* run )
 {

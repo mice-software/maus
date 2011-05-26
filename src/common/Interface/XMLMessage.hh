@@ -10,6 +10,7 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <vector>
 
 using namespace std;
 
@@ -24,11 +25,20 @@ class XMLMessage
 
     void		readFile( const std::string& filename );
 	 void		MakeRunInfoRequest(int run);
+	 void		MakeCalibRequest(string v1, string detector);
+	 void		NewTOFCalibRequest(string v1, int trigger, string xml);
+
     string		text() const;
     int			size() const;
 
 	 string  GetValueString(string name, bool raw=false);
 	 string  GetRValueString(string name1, string name2, bool raw=false);
+
+	 string  GetCalibElement(int n, vector<string>& params);
+	 //! The element n is returned. All parameters of this element are pushed in the vector params.
+
+	 string GetCalibHeader(string& name, string& detector);
+	 //! The header of the calibration is returned.
 
 	 int     GetValueInt(string name);
 	 double  GetValueDouble(string name);
@@ -37,7 +47,11 @@ class XMLMessage
 
   private :
 
+	 string beginRequest();
+	 string endRequest();
+
     string _message;
+
 };
 
 #endif

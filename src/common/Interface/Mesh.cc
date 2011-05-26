@@ -1,5 +1,5 @@
-#include "Mesh.hh"
-#include "Squeal.hh"
+#include "Interface/Mesh.hh"
+#include "Interface/Squeal.hh"
 #include <iomanip>
 #include <math.h>
 ///////// Mesh ////////

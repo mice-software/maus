@@ -7,9 +7,9 @@
 #ifndef INTERFACE_VMETDCHIT_H
 #define INTERFACE_VMETDCHIT_H
 
-#include "VmeBaseHit.hh"
+#include "Interface/VmeBaseHit.hh"
 
-#include "Memory.hh"
+#include "Interface/Memory.hh"
 
 class VmeTdcHit : public VmeBaseHit
 {

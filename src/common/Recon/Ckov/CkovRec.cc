@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <iomanip>
 #include "CLHEP/Vector/ThreeVector.h"
-#include "CkovRec.hh"
+#include "Recon/Ckov/CkovRec.hh"
 #include "Interface/dataCards.hh"
 #include "Interface/MICEEvent.hh"
 #include "Interface/MICERun.hh"

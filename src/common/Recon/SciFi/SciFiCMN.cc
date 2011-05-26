@@ -7,7 +7,7 @@ M.Ellis - February 2006
 #include <cmath>
 
 #include "Interface/VlpcHit.hh"
-#include "SciFiCMN.hh"
+#include "Recon/SciFi/SciFiCMN.hh"
 
 CmnCount::CmnCount( int board ) : _board( board )
 {

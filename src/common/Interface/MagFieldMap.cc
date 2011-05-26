@@ -1,7 +1,7 @@
-#include "MagFieldMap.hh"
-#include "SplineInterpolator.hh"
-#include "Squeal.hh"
-#include "Squeak.hh"
+#include "Interface/MagFieldMap.hh"
+#include "Interface/SplineInterpolator.hh"
+#include "Interface/Squeal.hh"
+#include "Interface/Squeak.hh"
 
 #include <string>
 #include <streambuf>

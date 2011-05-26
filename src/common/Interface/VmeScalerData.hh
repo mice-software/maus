@@ -9,9 +9,9 @@
 #define INTERFACE_VMESCALERDATA_H
 
 //Includes
-#include "VmeBaseHit.hh"
+#include "Interface/VmeBaseHit.hh"
 #include <iostream>
-#include "Memory.hh"
+#include "Interface/Memory.hh"
 
 //Interface
 

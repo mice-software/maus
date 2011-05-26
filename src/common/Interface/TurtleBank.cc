@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <fstream>
 #include "CLHEP/Vector/ThreeVector.h"
-#include "TurtleBank.hh"
+#include "Interface/TurtleBank.hh"
 
 
 typedef Hep3Vector ThreeVector;

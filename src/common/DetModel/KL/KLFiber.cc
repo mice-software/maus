@@ -1,4 +1,4 @@
-#include "KLFiber.hh"
+#include "DetModel/KL/KLFiber.hh"
 
 #include "G4Material.hh"
 #include "G4Tubs.hh"

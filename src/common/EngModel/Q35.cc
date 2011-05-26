@@ -13,7 +13,7 @@
 #include "G4Colour.hh"
 #endif
 
-#include "Q35.hh"
+#include "EngModel/Q35.hh"
 
 Q35::Q35(
 	G4Material * BeamlineMaterial,

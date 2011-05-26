@@ -14,8 +14,8 @@
 //along with xboa in the doc folder.  If not, see 
 //<http://www.gnu.org/licenses/>.
 
-#include "MVector.hh"
-#include "MMatrix.hh"
+#include "Interface/MVector.hh"
+#include "Interface/MMatrix.hh"
 
 ///////////////////////// m_complex ////////////////////////////
 

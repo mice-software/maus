@@ -17,7 +17,7 @@ using CLHEP::HepLorentzVector;
 using CLHEP::Hep3Vector;
 #include "CLHEP/Matrix/SymMatrix.h"
 using CLHEP::HepSymMatrix;
-#include "Memory.hh"
+#include "Interface/Memory.hh"
 
 class MCHit;
 

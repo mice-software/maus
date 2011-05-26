@@ -1,7 +1,7 @@
-#include "Interpolator.hh"
-#include "Spline1D.hh"
-#include "MVector.hh"
-#include "MMatrix.hh"
+#include "Interface/Interpolator.hh"
+#include "Interface/Spline1D.hh"
+#include "Interface/MVector.hh"
+#include "Interface/MMatrix.hh"
 
 
 std::string Interpolator3dSolenoidalTo3d::_interpolationAlgorithmString[3]= {"BiCubic", "LinearCubic", "BiLinear"};

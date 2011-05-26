@@ -3,7 +3,7 @@
 //
 // Chris Rogers
 
-#include "Polycone.hh"
+#include "EngModel/Polycone.hh"
 #include "Interface/Squeal.hh"
 #include "Interface/Squeak.hh"
 

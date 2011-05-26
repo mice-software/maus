@@ -28,8 +28,8 @@
 /*--------------------------------------------------------------------*
  * headers
  *--------------------------------------------------------------------*/
-#include "VlpcCableImperial.hh"
-#include "tmUtil.hpp"
+#include "Config/VlpcCableImperial.hh"
+#include "Config/tmUtil.hpp"
 
 /*====================================================================*
  * implementation

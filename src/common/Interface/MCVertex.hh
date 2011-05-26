@@ -6,7 +6,7 @@
 #include <vector>
 #include "CLHEP/Vector/ThreeVector.h"
 using CLHEP::Hep3Vector;
-#include "Memory.hh"
+#include "Interface/Memory.hh"
 
 class MCParticle;
 

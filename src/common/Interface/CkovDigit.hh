@@ -14,14 +14,14 @@
 #define CkovDigit_HH
 #include <vector>
 
-#include "Memory.hh"
-#include "CkovHit.hh"
-#include "MICERun.hh"
-#include "dataCards.hh"
+#include "Interface/Memory.hh"
+#include "Interface/CkovHit.hh"
+#include "Interface/MICERun.hh"
+#include "Interface/dataCards.hh"
 
-#include "VmeAdcHit.hh"
-#include "VmefAdcHit.hh"
-#include "VmeTdcHit.hh"
+#include "Interface/VmeAdcHit.hh"
+#include "Interface/VmefAdcHit.hh"
+#include "Interface/VmeTdcHit.hh"
 
 class CkovDigit
 {

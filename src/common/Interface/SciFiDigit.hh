@@ -9,7 +9,7 @@
 #include "CLHEP/Vector/ThreeVector.h"
 #include <fstream>
 
-#include "Memory.hh"
+#include "Interface/Memory.hh"
 
 /**
 * SciFiDigit is a class to handle the digitisation of hits in the Scintillating

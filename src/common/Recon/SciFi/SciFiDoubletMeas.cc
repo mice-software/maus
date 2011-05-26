@@ -4,8 +4,8 @@
 
 #include <vector>
 #include "CLHEP/Vector/ThreeVector.h"
-#include "SciFiDoubletMeas.hh"
-#include "SciFiSpacePoint.hh"
+#include "Recon/SciFi/SciFiDoubletMeas.hh"
+#include "Recon/SciFi/SciFiSpacePoint.hh"
 
 #ifdef REINSTATEATHISCLASS
 

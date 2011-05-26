@@ -1,10 +1,10 @@
 // FProjector.cpp
 
-#include "FProjector.hh"
+#include "Recon/SciFi/FProjector.hh"
 
 #ifdef USE_FPROJECTOR
 
-#include "SciFiDoubletMeas.hh"
+#include "Recon/SciFi/SciFiDoubletMeas.hh"
 
 //****************************************************************************
 EMatrix FProjector::HMatrix( const IState& st, const IMeasurement& meas )

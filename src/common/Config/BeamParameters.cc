@@ -4,7 +4,7 @@
 //
 //  Yagmur Torun 
 
-#include "BeamParameters.hh"
+#include "Config/BeamParameters.hh"
 #include "Interface/dataCards.hh"
 
 BeamParameters::BeamParameters() {

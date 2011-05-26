@@ -18,11 +18,11 @@
 #include <vector>
 #include "CLHEP/Vector/ThreeVector.h"
 
-#include "Memory.hh"
+#include "Interface/Memory.hh"
 
 #include <iostream>
 
-#include "MCHit.hh"
+#include "Interface/MCHit.hh"
 
 class KLDigit;
 

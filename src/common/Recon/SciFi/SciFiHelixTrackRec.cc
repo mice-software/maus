@@ -16,20 +16,20 @@ M.Ellis - April, 2005
 #include "Interface/MICEEvent.hh"
 #include "Interface/MICERun.hh"
 
-#include "KalmanSeed.hh"
-#include "SciFiRec.hh"
+#include "Recon/SciFi/KalmanSeed.hh"
+#include "Recon/SciFi/SciFiRec.hh"
 #include "Interface/SciFiDigit.hh"
-#include "SciFiKalTrack.hh"
-#include "SciFiSpacePoint.hh"
-#include "SciFiDoubletCluster.hh"
+#include "Recon/SciFi/SciFiKalTrack.hh"
+#include "Recon/SciFi/SciFiSpacePoint.hh"
+#include "Recon/SciFi/SciFiDoubletCluster.hh"
 #include "Interface/dataCards.hh"
-#include "SciFiSeed.hh"
+#include "Recon/SciFi/SciFiSeed.hh"
 #include "BeamTools/BTField.hh"
 #include "BeamTools/BTFieldConstructor.hh"
 
 using std::vector;
 
-#include "SciFiHelixTrackRec.hh"
+#include "Recon/SciFi/SciFiHelixTrackRec.hh"
 
 double solvePT( std::vector<SciFiSpacePoint*>&, double );
 

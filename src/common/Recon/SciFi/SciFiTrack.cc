@@ -9,7 +9,7 @@
 #include <vector>
 #include "CLHEP/Vector/ThreeVector.h"
 #include "Calib/SciFiReconstructionParams.hh"
-#include "SciFiTrack.hh"
+#include "Recon/SciFi/SciFiTrack.hh"
 
 //#include "TFitter.h"
 //#include "TVirtualFitter.h"

@@ -14,8 +14,8 @@
 #include <time.h>
 #include <cstdlib>
 
-#include "RunHeader.hh"
-#include "dataCards.hh"
+#include "Interface/RunHeader.hh"
+#include "Interface/dataCards.hh"
 
 using namespace std;
 

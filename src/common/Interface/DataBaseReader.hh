@@ -4,9 +4,9 @@
 #ifndef DBREADER_H
 #define DBREADER_H 1
 
-#include "XMLMessage.hh"
-#include "DataBaseAPI.hh"
-#include "dataCards.hh"
+#include "Interface/XMLMessage.hh"
+#include "Interface/DataBaseAPI.hh"
+#include "Interface/dataCards.hh"
 
 #include <iostream>
 #include <string>
@@ -26,6 +26,8 @@ class DataBaseReader
 	 DataBaseAPI* GetDataBaseAPI() const 		{ return db_api; };
 
 	 XMLMessage GetRunInfo(int run);
+	 XMLMessage GetTofCalibration(int run, string detector);
+
 	 int GetTrigger(int run);
 	 int GetCurrentRunNum()	const	{return CurrentRun;};
 
@@ -35,6 +37,7 @@ class DataBaseReader
 
 	 DataBaseAPI* db_api;
 	 map<int, XMLMessage> RunInfos;
+	 map<string,XMLMessage> TofCalibrations;
 
 	 int CurrentRun;  // to be set every time whene DATEReader starts a new run
 

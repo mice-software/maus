@@ -16,8 +16,8 @@
 #include <sstream>
 
 #include "CLHEP/Units/SystemOfUnits.h"
-#include "VlpcCable.hh"     
-#include "VlpcCableOsaka2.hh"
+#include "Config/VlpcCable.hh"     
+#include "Config/VlpcCableOsaka2.hh"
 #include "Interface/Memory.hh" 
 
 class VlpcCableOsaka3: public VlpcCable

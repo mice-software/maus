@@ -1,6 +1,6 @@
 
-#include "EMRHit.hh"
-#include "EMRDigit.hh"
+#include "Interface/EMRHit.hh"
+#include "Interface/EMRDigit.hh"
 
 //////////////////////////////////////////////////////////////////////////
 

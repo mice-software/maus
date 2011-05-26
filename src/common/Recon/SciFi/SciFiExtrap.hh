@@ -7,7 +7,7 @@
 #ifndef RECON_SCIFIEXTRAP_H
 #define RECON_SCIFIEXTRAP_H 1
 
-#include "SciFiKalTrack.hh"
+#include "Recon/SciFi/SciFiKalTrack.hh"
 
 #include "Interface/Memory.hh" 
 

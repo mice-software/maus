@@ -1,5 +1,5 @@
-#include "TriangularMesh.hh"
-#include "Squeal.hh"
+#include "Interface/TriangularMesh.hh"
+#include "Interface/Squeal.hh"
 
 #include <iostream>
 #include <fstream>

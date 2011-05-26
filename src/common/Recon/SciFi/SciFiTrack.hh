@@ -12,8 +12,8 @@
 #include <iostream>
 #include <vector>
 
-#include "SciFiSpacePoint.hh"
-#include "SciFiDoubletCluster.hh"
+#include "Recon/SciFi/SciFiSpacePoint.hh"
+#include "Recon/SciFi/SciFiDoubletCluster.hh"
 #include "Calib/SciFiReconstructionParams.hh"
 
 #include "Interface/Memory.hh" 

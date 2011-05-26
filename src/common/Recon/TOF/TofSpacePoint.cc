@@ -7,7 +7,7 @@
 //
 //----------------------------------------------------------------------------
 
-#include "TofSpacePoint.hh"
+#include "Recon/TOF/TofSpacePoint.hh"
 #include "Interface/TofDigit.hh"
 #include "CLHEP/Vector/ThreeVector.h"
 #include "CLHEP/Matrix/Matrix.h"
@@ -15,7 +15,7 @@
 using namespace std;
 using CLHEP::Hep3Vector;
 
-TofSpacePoint::TofSpacePoint() 
+TofSpacePoint::TofSpacePoint()
 {
   miceMemory.addNew( Memory::TofSpacePoint );
 
@@ -34,9 +34,10 @@ TofSpacePoint::TofSpacePoint( const MiceModule* station,  TofSlabHit* a )
   _hitb = NULL;
   _good = false;
 
-  const MiceModule* slabA = findSlabModule( _hita, station );
+  //const MiceModule* slabA = findSlabModule( _hita, station );
+  const MiceModule* slabA = a->GetModule();
 
-  if( slabA )
+  if( slabA && _hita->isCalibrated() )
   {
     _pos = slabA->globalPosition();
     _posE = Hep3Vector( 10. * CLHEP::cm, 10. * CLHEP::cm, 0. );
@@ -54,10 +55,13 @@ TofSpacePoint::TofSpacePoint( const MiceModule* station,  TofSlabHit* a, TofSlab
   _hitb = b;
   _good = false;
 
-  const MiceModule* slabA = findSlabModule( _hita, station );
-  const MiceModule* slabB = findSlabModule( _hitb, station );
+  //const MiceModule* slabA = findSlabModule( _hita, station );
+  const MiceModule* slabA = a->GetModule();
 
-  if( slabA && slabB )
+  //const MiceModule* slabB = findSlabModule( _hitb, station );
+  const MiceModule* slabB = b->GetModule();
+
+  if( slabA && slabB && _hita->isCalibrated() && _hitb->isCalibrated() )
   {
     Hep3Vector posa1 = getSlabEndPos( slabA, +1. );
     Hep3Vector posa2 = getSlabEndPos( slabA, -1. );
@@ -127,7 +131,7 @@ Hep3Vector      TofSpacePoint::getSlabEndPos( const MiceModule* slab, double dir
      norm = Hep3Vector( dir * dx / 2., 0., 0. );
   else if( dy > dx && dy > dz )
      norm = Hep3Vector( 0., dir * dy / 2., 0. );
-  else 
+  else
      norm = Hep3Vector( 0., 0., dir * dz / 2. );
 
   Hep3Vector pos = slab->globalPosition() + slab->globalRotation() * norm;

@@ -7,8 +7,8 @@
 #ifndef INTERFACE_VMEADCHIT_H
 #define INTERFACE_VMEADCHIT_H
 
-#include "VmeBaseHit.hh"
-#include "Memory.hh" 
+#include "Interface/VmeBaseHit.hh"
+#include "Interface/Memory.hh" 
 
 class VmeAdcHit : public VmeBaseHit
 {

@@ -5,7 +5,7 @@
 //
 // V. Verguilov 30 January 2009
 
-#include "VmeScalerData.hh"
+#include "Interface/VmeScalerData.hh"
 
 #include <iostream>
 //#include <fstream>

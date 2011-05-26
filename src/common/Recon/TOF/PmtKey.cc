@@ -1,8 +1,14 @@
 // PmtKey.cc
-// Mark Rayner, January 2009	
-// A key to identify individual PMTs in maps of calibration constants etc
+// Mark Rayner, January 2009
 
-#include "PmtKey.hh"
+
+#include "Recon/TOF/PmtKey.hh"
+PmtKey::PmtKey() {
+	_station = -99999;
+	_plane = -99999;
+	_slab = -99999;
+	_pmt = -99999;
+}
 
 PmtKey::PmtKey( int station, int plane, int slab, int pmt ) {
 	_station = station;

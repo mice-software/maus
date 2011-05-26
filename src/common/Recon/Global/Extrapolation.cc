@@ -1,7 +1,7 @@
 // Extrapolation.cc - stores all information about the extrapolation of a MouseTrack
 // to somewhere in MICE using the Kalman package
 
-#include "Extrapolation.hh"
+#include "Recon/Global/Extrapolation.hh"
 
 /*
 Extrapolation::Extrapolation( IState* st, TrajectoryManager* man )

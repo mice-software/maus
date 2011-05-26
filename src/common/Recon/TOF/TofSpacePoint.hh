@@ -3,8 +3,6 @@
 //----------------------------------------------------------------------------
 //
 //     File :        TofSpacePoint.hh
-//     Purpose :     Serve the "reconstructed" point information for the
-//                   TOF.
 //     Created :     3-DEC-2002  by Steve Kahn
 //
 //----------------------------------------------------------------------------
@@ -13,32 +11,43 @@
 #include <iostream>
 #include <algorithm>
 
-#include "TofSlabHit.hh"
+#include "Recon/TOF/TofSlabHit.hh"
 #include "Config/MiceModule.hh"
 
-#include "Interface/Memory.hh" 
+#include "Interface/Memory.hh"
 
+//! The class holds the information for the reconstructed point in the TOF detectors.
+//! TofSpacePoint objects are created from two TofSlabHit objects.
 class  TofSpacePoint
 {
    public:
+	 //! Default constructor.
+	 TofSpacePoint();
 
-	TofSpacePoint();
-	TofSpacePoint( const MiceModule*, TofSlabHit* );
-	TofSpacePoint( const MiceModule*, TofSlabHit*, TofSlabHit* );
-	~TofSpacePoint() 	{ miceMemory.addDelete( Memory::TofSpacePoint ); };
-	
+	 //! Constructor.
+	 TofSpacePoint( const MiceModule*, TofSlabHit* );
+
+	 //! Constructor.
+	 TofSpacePoint( const MiceModule*, TofSlabHit*, TofSlabHit* );
+
+	 //! Destructor.
+	 ~TofSpacePoint() 	{ miceMemory.addDelete( Memory::TofSpacePoint ); };
+
+	 //! Dumps some information about this space point to the standard output.
+	 void			Print( int verbosity = 1 );
+
 	const MiceModule*     stat() const                    { return _station; }
-
-	void			Print( int verbosity = 1 );
 	TofSlabHit*		hitA() const			{ return _hita; }
 	TofSlabHit*		hitB() const			{ return _hitb; }
 	TofSlabHit*		hit( int const plane ) const ;
-	bool			isGood() const			{ return _good; }
+	bool				isGood() const			{ return _good; }
 	Hep3Vector		position() const 		{ return _pos; }
 	Hep3Vector		posE() const	 		{ return _posE; }
 	double			time() const 			{ return _time; }
 	double			pe() const;
 	int			station() const			{ return _hita->station(); };
+
+	//! Returns the difference between the times of the two slab hits.
 	double      dt()                    { return hitA()->time() - hitB()->time(); };
 
 	void 			SetTime( double t )				{ _time = t; }
@@ -56,15 +65,24 @@ class  TofSpacePoint
 	Hep3Vector		getSlabEndPos( const MiceModule*, double ) const;
 	Hep3Vector		crossingPos( Hep3Vector, Hep3Vector, Hep3Vector, Hep3Vector ) const;
 
+	//! True if this space point is good.
 	bool		_good;
 
 	const MiceModule*     _station;
 
+	//! Pointer to the first TofSlabHit used to create this space point.
 	TofSlabHit*	_hita;
+
+	//! Pointer to the second TofSlabHit used to create this space point.
 	TofSlabHit*	_hitb;
 
+	//! Position of the space point.
 	Hep3Vector	_pos;
+
+	//! Position error of the space point.
 	Hep3Vector	_posE;
+
+	//! Time of the space point.
 	double		_time;
 
 };

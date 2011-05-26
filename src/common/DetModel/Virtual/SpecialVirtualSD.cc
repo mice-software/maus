@@ -11,7 +11,7 @@
 #include <iostream>
 #include <string>
 #include <sstream>
-#include "SpecialVirtualSD.hh"
+#include "DetModel/Virtual/SpecialVirtualSD.hh"
 #include "G4SDManager.hh"
 #include "G4TransportationManager.hh"
 #include "G4FieldManager.hh"

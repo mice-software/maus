@@ -11,9 +11,9 @@
 #include <math.h>
 #include <vector>
 
-#include "Squeal.hh"
-#include "Mesh.hh"
-#include "Spline1D.hh"
+#include "Interface/Squeal.hh"
+#include "Interface/Mesh.hh"
+#include "Interface/Spline1D.hh"
 
 #include "gsl/gsl_sf_gamma.h"
 

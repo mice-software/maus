@@ -1,6 +1,6 @@
 // MouseTrack.cc - highest level track (from any potential tracker) in MICE
 
-#include "MouseTrack.hh"
+#include "Recon/Global/MouseTrack.hh"
 
 MouseTrack::~MouseTrack()
 {

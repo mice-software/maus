@@ -11,7 +11,7 @@
 //! Modified to add std::vector support - Steve Kahn Nov 12 2002
 #ifndef dataCards_h
 #define dataCards_h 1
-#include "MICEUnits.hh"
+#include "Interface/MICEUnits.hh"
 #include <string>
 #include <map>
 #include <vector>

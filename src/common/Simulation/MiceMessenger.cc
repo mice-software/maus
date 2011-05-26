@@ -4,7 +4,7 @@
  * Implementation of the MiceMessenger class.
  */
 
-#include "MiceMessenger.hh"
+#include "Simulation/MiceMessenger.hh"
 #include "Interface/dataCards.hh"
 #include "G4UIdirectory.hh"
 #include "G4ios.hh"

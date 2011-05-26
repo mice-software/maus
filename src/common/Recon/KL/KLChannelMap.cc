@@ -1,4 +1,4 @@
-#include "KLChannelMap.hh"
+#include "Recon/KL/KLChannelMap.hh"
 
 KLChannelMap::KLChannelMap()
 {

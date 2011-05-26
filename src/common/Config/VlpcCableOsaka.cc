@@ -5,8 +5,8 @@
 //
 // M.Ellis 28/8/2005
 
-#include "VlpcCableOsaka.hh"
-#include "tmUtil.hpp"
+#include "Config/VlpcCableOsaka.hh"
+#include "Config/tmUtil.hpp"
 
 ViewCable::ViewCable( std::ifstream& inf )
 {

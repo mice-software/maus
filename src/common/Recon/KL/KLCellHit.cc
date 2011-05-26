@@ -4,7 +4,7 @@
 
 #include "Interface/KLDigit.hh"
 #include "Interface/VmefAdcHit.hh"
-#include "KLCellHit.hh"
+#include "Recon/KL/KLCellHit.hh"
 #include "Interface/MICERun.hh"
 #include "Config/MiceModule.hh"
 

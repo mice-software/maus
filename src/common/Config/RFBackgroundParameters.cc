@@ -4,7 +4,7 @@
 //
 //  V. Grichine 22.11.02
 
-#include "RFBackgroundParameters.hh"
+#include "Config/RFBackgroundParameters.hh"
 #include "Interface/dataCards.hh"
 
 

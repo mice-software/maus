@@ -4,7 +4,7 @@
 //
 //  Tom Roberts
 
-#include "BeamlineParameters.hh"
+#include "Config/BeamlineParameters.hh"
 #include "Interface/dataCards.hh"
 
 BeamlineParameters::BeamlineParameters() {

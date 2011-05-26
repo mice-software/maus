@@ -4,7 +4,7 @@
 //
 // M.Ellis October 2008
 
-#include "VlpcCableOsaka2.hh"     
+#include "Config/VlpcCableOsaka2.hh"     
 
 VlpcCableOsaka2::VlpcCableOsaka2( std::string fname )
 {

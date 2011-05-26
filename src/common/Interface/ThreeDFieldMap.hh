@@ -1,8 +1,8 @@
 #ifndef ThreeDFieldMap_hh
 #define ThreeDFieldMap_hh
 
-#include "Mesh.hh"
-#include "Interpolator.hh"
+#include "Interface/Mesh.hh"
+#include "Interface/Interpolator.hh"
 
 class ThreeDFieldMap
 {

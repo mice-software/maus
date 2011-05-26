@@ -7,7 +7,7 @@
 using CLHEP::Hep3Vector;
 
 #include <vector>
-#include "Memory.hh"
+#include "Interface/Memory.hh"
 
 class MCVertex;
 

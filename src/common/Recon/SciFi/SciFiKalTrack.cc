@@ -4,9 +4,9 @@
 //
 // Takes a normal SciFiTrack and refits it using the Kalman Filter
 
-#include "SciFiKalTrack.hh"
-#include "SciFiSpacePoint.hh"
-#include "SciFiDoubletCluster.hh"
+#include "Recon/SciFi/SciFiKalTrack.hh"
+#include "Recon/SciFi/SciFiSpacePoint.hh"
+#include "Recon/SciFi/SciFiDoubletCluster.hh"
 #include "Interface/dataCards.hh"
 
 #include "CLHEP/Random/RandGauss.h"
@@ -62,9 +62,10 @@ SciFiKalTrack::SciFiKalTrack( std::vector<SciFiSpacePoint*>& points, KalmanSeed 
   // now add space points as (x,y,z) measurements..
 
   m_points.resize( points.size() );
-
+	m_seed = kalSeed;
   for( unsigned int i = 0; i < points.size(); ++i )
   {
+
     EVector x( 2, 0 );
     EVector posV( 3, 0 );
     EMatrix C( 2, 2, 0 );
@@ -74,6 +75,8 @@ SciFiKalTrack::SciFiKalTrack( std::vector<SciFiSpacePoint*>& points, KalmanSeed 
     m_points[i] = pt;
 
     Hep3Vector pos = pt->getPos();
+	
+
 
     x[0] = pos.x();
     x[1] = pos.y();

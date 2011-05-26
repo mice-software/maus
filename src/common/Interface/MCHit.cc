@@ -1,6 +1,6 @@
 // MCHit.cc
 
-#include "MCHit.hh"
+#include "Interface/MCHit.hh"
 
 MCHit::MCHit()
 {

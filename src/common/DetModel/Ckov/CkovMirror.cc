@@ -3,7 +3,7 @@
  * 
  * (2007/01/11) Hideyuki Sakamoto
 */ 
-#include "CkovMirror.hh"
+#include "DetModel/Ckov/CkovMirror.hh"
 
 CkovMirror::~CkovMirror()
 {

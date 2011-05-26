@@ -4,7 +4,7 @@
 //
 //  Yagmur Torun
 
-#include "MagnetParameters.hh"
+#include "Config/MagnetParameters.hh"
 #include "Interface/dataCards.hh"
 
 MagnetParameters::MagnetParameters()

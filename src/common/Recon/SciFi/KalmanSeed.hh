@@ -17,6 +17,7 @@ class KalmanSeed
 {
   public :
 
+	KalmanSeed() {};
     KalmanSeed( Hep3Vector pos, Hep3Vector posE, Hep3Vector mom, Hep3Vector momE, double q )
     {
       _pos = pos; _posE = posE; _mom = mom; _momE = momE; _q = q; 

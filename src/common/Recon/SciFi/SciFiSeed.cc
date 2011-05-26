@@ -10,7 +10,7 @@
 
 #include "CLHEP/Matrix/Matrix.h"
 
-#include "SciFiSeed.hh"
+#include "Recon/SciFi/SciFiSeed.hh"
 
 using CLHEP::Hep3Vector;
 

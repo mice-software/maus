@@ -4,7 +4,7 @@
 //
 //  Yagmur Torun
 
-#include "CoolingChannelGeom.hh"
+#include "Config/CoolingChannelGeom.hh"
 #include "Interface/dataCards.hh"
 
 CoolingChannelGeom::CoolingChannelGeom()

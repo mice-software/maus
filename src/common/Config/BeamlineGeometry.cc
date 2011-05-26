@@ -4,7 +4,7 @@
 //
 //  Yagmur Torun
 
-#include "BeamlineGeometry.hh"
+#include "Config/BeamlineGeometry.hh"
 #include "Interface/dataCards.hh"
 
 BeamlineGeometry::BeamlineGeometry() {

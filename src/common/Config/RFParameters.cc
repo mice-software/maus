@@ -4,7 +4,7 @@
 //
 //  Yagmur Torun
 
-#include "RFParameters.hh"
+#include "Config/RFParameters.hh"
 #include "Interface/dataCards.hh"
 
 RFParameters::RFParameters()

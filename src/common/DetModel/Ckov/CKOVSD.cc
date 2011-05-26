@@ -1,6 +1,6 @@
 /* CKOVSD.cc
 */
-#include "CKOVSD.hh"
+#include "DetModel/Ckov/CKOVSD.hh"
 
 #include "G4TransportationManager.hh"
 #include "G4FieldManager.hh"

@@ -7,7 +7,7 @@
 
 #include "CLHEP/Vector/ThreeVector.h"
 #include <iostream>
-#include "SciFiDoubletCluster.hh"
+#include "Recon/SciFi/SciFiDoubletCluster.hh"
 
 
 /**

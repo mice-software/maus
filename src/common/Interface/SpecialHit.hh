@@ -14,10 +14,10 @@
 #include <string>
 #include <string.h>
 
-#include "MCHit.hh"
+#include "Interface/MCHit.hh"
 #include <iostream>
 
-#include "Memory.hh"
+#include "Interface/Memory.hh"
 
 class SpecialHit : public MCHit
 {

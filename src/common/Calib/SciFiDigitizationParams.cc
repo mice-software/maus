@@ -5,7 +5,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "SciFiDigitizationParams.hh"
+#include "Calib/SciFiDigitizationParams.hh"
 
 #include "Interface/dataCards.hh"
 

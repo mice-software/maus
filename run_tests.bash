@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e
 
+if [ -z "${MAUS_ROOT_DIR}" ]; then  # see if the variable exists yet
+    echo "ERROR: \$MAUS_ROOT_DIR not set"
+    exit 1;
+fi
+
 echo "Your current directory is:"
 pwd
 echo

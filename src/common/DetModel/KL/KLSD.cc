@@ -3,7 +3,7 @@
 ** MICE scintillating fiber tracker for the MICE proposal
 ** Ed McKigney - August 21, 2002
 */
-#include "KLSD.hh"
+#include "DetModel/KL/KLSD.hh"
 
 #include "G4HCofThisEvent.hh"
 #include "G4Step.hh"

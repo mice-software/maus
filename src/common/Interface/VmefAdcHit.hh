@@ -7,12 +7,12 @@
 #ifndef INTERFACE_VMEFADCHIT_H
 #define INTERFACE_VMEFADCHIT_H
 
-#include "VmeBaseHit.hh"
+#include "Interface/VmeBaseHit.hh"
 #include <algorithm>
 #include <iostream>
 #include <limits.h>
 
-#include "Memory.hh"
+#include "Interface/Memory.hh"
 
 enum ChargeEstimationAlgorithm { ceaMinMax = 0, //Simplest algorithm 
 				 ceaFractionDescriminatorThreshold = 1, ceaPedMax };

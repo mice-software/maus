@@ -8,7 +8,7 @@
 //
 //----------------------------------------------------------------------------
 
-#include "TofDigitizationParams.hh"
+#include "Calib/TofDigitizationParams.hh"
 #include "CLHEP/Vector/ThreeVector.h"
 
 typedef CLHEP::Hep3Vector ThreeVector;

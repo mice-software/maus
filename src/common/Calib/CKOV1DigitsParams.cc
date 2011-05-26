@@ -8,7 +8,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "CKOV1DigitsParams.hh"
+#include "Calib/CKOV1DigitsParams.hh"
 #include "Interface/dataCards.hh"
 
 CKOV1DigitsParams::CKOV1DigitsParams()

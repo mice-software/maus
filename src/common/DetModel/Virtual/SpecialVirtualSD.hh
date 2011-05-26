@@ -12,7 +12,7 @@
 #include "Interface/SpecialHit.hh"
 #include "Config/MiceModule.hh"
 #include "Interface/MICEEvent.hh"
-//#include "BTPhaser.hh"
+//#include "BeamTools/BTPhaser.hh"
 
 #include "Interface/Memory.hh" 
 

@@ -6,7 +6,7 @@
 //
 //----------------------------------------------------------------------------
 
-#include "TofReconParams.hh"
+#include "Calib/TofReconParams.hh"
 #include "Interface/dataCards.hh"
 #include "CLHEP/Units/SystemOfUnits.h"
 

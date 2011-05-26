@@ -1,8 +1,8 @@
 #ifndef Differentiator_hh
 #define Differentiator_hh 1
 
-#include "Interpolator.hh"
-#include "PolynomialVector.hh"
+#include "Interface/Interpolator.hh"
+#include "Interface/PolynomialVector.hh"
 #include <map>
 
 
@@ -93,7 +93,7 @@ public:
     //return map value; vectors NOT checked for size
     void  F    (const double*   point,       double* value)              const;
     void  F    (const Mesh::Iterator& point, double* value)              const //overload if mesh::pointdimension != vectormap::pointdimension 
-    {double* PointA = new double[this->PointDimension()]; point.Position(PointA); F(PointA, value); delete[] PointA;}
+    {double* PointA = new double[this->PointDimension()]; point.Position(PointA); F(PointA, value); delete PointA;}
     //Tell me the required dimension of the input point and output value
     unsigned int PointDimension()         const {return _inSize;}
     unsigned int ValueDimension()         const {return _outSize;}

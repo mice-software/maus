@@ -7,7 +7,7 @@
 #include <iostream>
 #include <sstream>
 
-#include "SciFiHit.hh"
+#include "Interface/SciFiHit.hh"
 
 //G4Allocator<SciFiHit> SciFiHitAllocator;
 

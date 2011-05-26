@@ -1,7 +1,7 @@
 // MCVertex.cc
 
-#include "MCVertex.hh"
-#include "MCParticle.hh"
+#include "Interface/MCVertex.hh"
+#include "Interface/MCParticle.hh"
 
 MCVertex::MCVertex()
 {

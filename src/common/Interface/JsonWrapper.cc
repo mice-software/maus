@@ -19,8 +19,8 @@
 
 #include "json/json.h"
 
-#include "src/common/Interface/Squeal.hh"
-#include "src/common/Interface/JsonWrapper.hh"
+#include "Interface/Squeal.hh"
+#include "Interface/JsonWrapper.hh"
 
 Json::Value JsonWrapper::StringToJson(std::string json_in) throw(Squeal) {
   Json::Reader reader;

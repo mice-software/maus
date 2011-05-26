@@ -7,7 +7,7 @@
 
 #include "Interface/dataCards.hh"
 #include "Interface/MICERun.hh"
-#include "MICEPhysicsList.hh"
+#include "Simulation/MICEPhysicsList.hh"
 #include "Interface/Squeak.hh"
 
 

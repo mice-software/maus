@@ -3,10 +3,10 @@
 
 #include "globals.hh"
 #include "G4UserSteppingAction.hh"
-#include "MICEStepStatistics.hh"
-#include "VirtualPlanes.hh"
-#include "MICEPrimaryGeneratorAction.hh"
-#include "MICEEventAction.hh"
+#include "Simulation/MICEStepStatistics.hh"
+#include "Simulation/VirtualPlanes.hh"
+#include "Simulation/MICEPrimaryGeneratorAction.hh"
+#include "Simulation/MICEEventAction.hh"
 
 class MICESteppingAction : public G4UserSteppingAction
 {

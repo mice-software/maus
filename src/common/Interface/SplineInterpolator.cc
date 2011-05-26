@@ -1,8 +1,8 @@
 //Created November 2004 Chris Rogers
 
 #include <vector>
-#include "SplineInterpolator.hh"
-#include "Spline1D.hh"
+#include "Interface/SplineInterpolator.hh"
+#include "Interface/Spline1D.hh"
 #include <cmath>
 
 using std::vector;

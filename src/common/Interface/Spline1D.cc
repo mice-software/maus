@@ -40,7 +40,7 @@ are supplied, instead the spline uses second derivatives at the endpoints.
 
 #endif
 
-#include "Spline1D.hh"
+#include "Interface/Spline1D.hh"
 #include <iostream>
 #include <cstdlib>
 

@@ -6,7 +6,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "TpgDigitsParameters.hh"
+#include "Calib/TpgDigitsParameters.hh"
 #include "CLHEP/Random/RandFlat.h"
 #include "CLHEP/Units/PhysicalConstants.h"
 #include "Interface/dataCards.hh"

@@ -3,7 +3,7 @@
 // Struct to encapsulate hits/digits/recon in a G4Mice event
 
 
-#include "MICEEvent.hh"
+#include "Interface/MICEEvent.hh"
 
 MICEEvent::MICEEvent()
 {
@@ -30,6 +30,9 @@ MICEEvent::MICEEvent()
     vmeAdcHits.resize(0);
     vmefAdcHits.resize(0);
     vmeTdcHits.resize(0);
+    emCalHits.resize(0);
+    emCalDigits.resize(0);
+    emCalTracks.resize(0);
     virtualHits.resize(0);
     specialHits.resize(0);
     mcParticles.resize(0);
@@ -71,6 +74,10 @@ void MICEEvent::Print() {
     std::cout << " - Cherenkov..... ";
     std::cout << ckovDigits.size() << " digits" << std::endl;
 
+    std::cout << " - EmCal......... ";
+    std::cout << emCalDigits.size() << " digits, ";
+    std::cout << emCalTracks.size() << " tracks" << std::endl;
+
     std::cout << " - KL......... ";
     std::cout << klHits.size() << " hits, ";
     std::cout << klDigits.size() << " digits, ";
@@ -84,5 +91,6 @@ void MICEEvent::Print() {
     std::cout << sciFiHits.size() << " Tracker hits, ";
     std::cout << tofHits.size() << " TOF hits, ";
     std::cout << ckovHits.size() << " Cherenkov hits, ";
+    std::cout << emCalHits.size() << " EmCal hits" << std::endl;
     std::cout << pgHits.size()   << " PG hits" << std::endl;
 }

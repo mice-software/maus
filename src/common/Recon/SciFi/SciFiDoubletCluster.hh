@@ -11,7 +11,7 @@
 #include "CLHEP/Vector/ThreeVector.h"
 #include <iostream>
 #include "Calib/SciFiReconstructionParams.hh"
-#include "SciFiSpacePoint.hh"
+#include "Recon/SciFi/SciFiSpacePoint.hh"
 
 #include "Interface/SciFiDigit.hh"
 
@@ -151,6 +151,12 @@ public:
 
       	void	setInTrack() { m_in_track = true; };
 
+	void    setInTrip() { m_in_trip = true; };
+	bool 	inTrip() const { return m_in_trip; };
+
+	 void    setInDoub() { m_in_doub = true; };
+        bool    inDoub() const { return m_in_doub; };
+
 private:
 
 	SciFiDigit*	seed;
@@ -174,7 +180,8 @@ private:
 	Hep3Vector	_direction;
 
 	bool m_used;
-
+	bool m_in_trip;
+	bool m_in_doub;
 	bool m_in_track;
 
 	const MiceModule* _module;

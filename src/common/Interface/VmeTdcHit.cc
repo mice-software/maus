@@ -4,7 +4,7 @@
 //
 // A. Fish - 12th September 2005
 
-#include "VmeTdcHit.hh"
+#include "Interface/VmeTdcHit.hh"
 #include <iostream>
 #include <fstream>
 

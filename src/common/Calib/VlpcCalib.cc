@@ -6,7 +6,7 @@
 
 #include <cmath>
 
-#include "VlpcCalib.hh"
+#include "Calib/VlpcCalib.hh"
 
 BoardCalib::BoardCalib( std::ifstream& inf )
 {

@@ -1,4 +1,4 @@
-#include "Differentiator.hh"
+#include "Interface/Differentiator.hh"
 
 #include <iomanip>
 #include <sstream>
@@ -17,7 +17,7 @@ Differentiator::Differentiator (VectorMap* in, std::vector<double> delta, std::v
         _factKey.push_back(1);
         std::vector<int> powerKey = PolynomialVector::IndexByPower(i,_inSize);
         for(int j=0; j<int(powerKey.size()); j++) 
-            _factKey[i] *= static_cast<int>(gsl_sf_fact(powerKey[j]));
+            _factKey[i] *= gsl_sf_fact(powerKey[j]);
     }
 }
 
@@ -62,9 +62,9 @@ MMatrix<double> Differentiator::SetupMatrixOut(std::vector< std::vector<double> 
     double* out = new double[_y->ValueDimension()];
     for(unsigned int i=0; i<_diffKey.size(); i++)
     {
-        for(unsigned int j=0; j<_y->ValueDimension(); j++) out[j] = 0.;
+        for(uint j=0; j<_y->ValueDimension(); j++) out[j] = 0.;
         Y(&inVector[i][0], out);
-        for(unsigned int j=0; j<_y->ValueDimension(); j++) matrixOut(i+1,j+1) = out[j];
+        for(uint j=0; j<_y->ValueDimension(); j++) matrixOut(i+1,j+1) = out[j];
     }
     delete [] out;
     return matrixOut;

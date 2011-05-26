@@ -8,7 +8,7 @@
 //
 //A.Fish 3rd October 2005
 
- #include "TofCable.hh"
+ #include "Config/TofCable.hh"
 
  #include <iostream>
 

@@ -11,8 +11,8 @@
 #include <fstream>
 #include <sstream>
 #include <cmath>
-#include "MiceMaterials.hh"
-#include "Squeal.hh"
+#include "Interface/MiceMaterials.hh"
+#include "Interface/Squeal.hh"
 #include "CLHEP/Units/SystemOfUnits.h"
 using CLHEP::mm;
 using CLHEP::cm2;
@@ -145,7 +145,7 @@ G4Material*	MiceMaterials::materialByName( std::string mat ) const
 
   if( ! matter ) // can't find this material!
   {
-    std::cerr << "Unable to find material: " << mat << " vaccum is being substituted instead!" << std::endl;
+    throw(Squeal(Squeal::recoverable, "Unable to find material "+mat, "MiceMaterials::materialByName") );
     matter = _materials.find( "Galactic" )->second;
   }
 

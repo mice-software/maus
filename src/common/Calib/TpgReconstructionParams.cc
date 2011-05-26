@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "TpgReconstructionParams.hh"
+#include "Calib/TpgReconstructionParams.hh"
 #include "Interface/dataCards.hh"
 
 TpgReconstructionParams* TpgReconstructionParams::m_instance = (TpgReconstructionParams*) NULL;

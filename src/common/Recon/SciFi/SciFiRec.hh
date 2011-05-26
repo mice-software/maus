@@ -15,12 +15,12 @@
 
 #include "Interface/SciFiDigit.hh"
 #include "Calib/SciFiReconstructionParams.hh"
-#include "SciFiTrack.hh"
-#include "SciFiKalTrack.hh"
-#include "SciFiSpacePoint.hh"
+#include "Recon/SciFi/SciFiTrack.hh"
+#include "Recon/SciFi/SciFiKalTrack.hh"
+#include "Recon/SciFi/SciFiSpacePoint.hh"
 
 // This is needed to use the Kalman Filter Package
-#include "SetupKalmanRec.hh"
+#include "Recon/SciFi/SetupKalmanRec.hh"
 
 class VlpcCable;
 class VlpcCalib;

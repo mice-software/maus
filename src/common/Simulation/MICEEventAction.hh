@@ -3,7 +3,7 @@
 
 #include "globals.hh"
 #include "G4UserEventAction.hh"
-#include "VirtualPlanes.hh"
+#include "Simulation/VirtualPlanes.hh"
 
 //MICEEventAction controls what happens at the beginning and end of every event
 //GEANT4 calls BeginOfEventAction and EndOfEventAction at the beginning and end of the event

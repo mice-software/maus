@@ -5,11 +5,11 @@
 #include <fstream>
 #include <algorithm>
 #include "CLHEP/Vector/ThreeVector.h"
-#include "GlobalRec.hh"
+#include "Recon/Global/GlobalRec.hh"
 
 using std::vector;
 
-#include "MouseTrack.hh"
+#include "Recon/Global/MouseTrack.hh"
 #include "Recon/SciFi/SciFiKalTrack.hh"
 #include "Recon/TOF/TofSpacePoint.hh"
 

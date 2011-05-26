@@ -10,9 +10,9 @@
 #include "CLHEP/Random/RandPoisson.h"
 #include <stdio.h>
 #include <fstream>
-#include "SciFiDigit.hh"
-#include "SciFiHit.hh"
-#include "VlpcHit.hh"
+#include "Interface/SciFiDigit.hh"
+#include "Interface/SciFiHit.hh"
+#include "Interface/VlpcHit.hh"
 
 SciFiDigit::SciFiDigit()
 {

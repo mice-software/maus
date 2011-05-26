@@ -1,8 +1,8 @@
-#include "PolynomialVector.hh"
-#include "Squeal.hh"
-#include "MMatrix.hh"
-#include "MVector.hh"
-#include "Mesh.hh"
+#include "Interface/PolynomialVector.hh"
+#include "Interface/Squeal.hh"
+#include "Interface/MMatrix.hh"
+#include "Interface/MVector.hh"
+#include "Interface/Mesh.hh"
 
 #include <iomanip>
 #include <sstream>
@@ -166,7 +166,7 @@ unsigned int PolynomialVector::NumberOfPolynomialCoefficients(int pointDimension
     int n=0;
     if(order<=0) return 0;
     for(int i=1; i<order; i++)
-        n += static_cast<int>(gsl_sf_choose(pointDimension+i-1, i));
+        n += gsl_sf_choose(pointDimension+i-1, i);
     return n+1;
 }
 
@@ -262,7 +262,7 @@ PolynomialVector* PolynomialVector::PolynomialLeastSquaresFit(const std::vector<
   else
   {
     std::vector<double> weights(points.size());
-    for(unsigned int i=0; i<points.size(); i++) weightFunction->F(&points[i][0], &weights[i]);
+    for(uint i=0; i<points.size(); i++) weightFunction->F(&points[i][0], &weights[i]);
     return PolynomialLeastSquaresFit(points, values, polynomialOrder, weights);
   }
 }
@@ -608,7 +608,6 @@ std::vector< std::vector<double> > PolynomialVector::PointBox(std::vector<double
   std::vector<double> grid_spacing(delta);
   for(size_t i=0; i<grid_spacing.size(); i++) grid_spacing[i] *= 2./double(n_points_per_dim-1);
   for(size_t i=0; i<grid_min    .size(); i++) grid_min    [i] *= -1.;
-
   NDGrid grid(dim, &grid_size[0], &grid_spacing[0], &grid_min[0]);
   for(Mesh::Iterator it=grid.Begin(); it<grid.End(); it++) {
     std::vector<int> place = it.State();
@@ -618,6 +617,20 @@ std::vector< std::vector<double> > PolynomialVector::PointBox(std::vector<double
     }
   }
   return pos;
+}
+
+//Algorithm - take the PointBox output and scale so that length is 1 in scale_matrix coordinate system
+std::vector< std::vector<double> > PolynomialVector::PointShell(MMatrix<double> scale_matrix, int i_order) {
+  size_t          point_dim = scale_matrix.num_row();
+  MMatrix<double> scale_inv = scale_matrix.inverse();
+  std::vector<std::vector<double> > point_box = PointBox(std::vector<double>(point_dim, 1.), i_order);
+  for(size_t i=0; i<point_box.size(); i++) {
+    MVector<double> point(&point_box[i][0], &point_box[i][0]+point_dim);
+    double scale  = (point.T()*scale_inv*point)(1);
+    point        /= pow(scale, double(point_dim));
+    for(size_t j=0; j<point_dim; j++) point_box[i][j]=point(j+1); 
+  }
+  return point_box;
 }
 ////////// POLYNOMIALVECTOR END ////////////
 

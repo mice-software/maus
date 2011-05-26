@@ -2,8 +2,8 @@
 #ifndef SPLINEINTERPOLATOR_HH
 #define SPLINEINTERPOLATOR_HH
 #include <vector>
-#include "Spline1D.hh"
-#include "Interpolator.hh"
+#include "Interface/Spline1D.hh"
+#include "Interface/Interpolator.hh"
 
 using std::vector;
 

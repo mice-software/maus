@@ -1,15 +1,6 @@
-//------------------------------------------------------
-//
-// $Id: CKOVDigitsParams.cc,v 1.2 2002-11-04 21:42:00 torun Exp $
-// GEANT4 tag $Name:  $
-// 
-// Created: 9/30/02 Romulus Godang
-//
-//------------------------------------------------------
-
 #include <stdlib.h>
 #include <stdio.h>
-#include "CKOVDigitsParams.hh"
+#include "Calib/CKOVDigitsParams.hh"
 #include "Interface/dataCards.hh"
 
 CKOVDigitsParams::CKOVDigitsParams()

@@ -8,7 +8,7 @@
 #include <algorithm>
 
 
-#include "SetupKalmanRec.hh"
+#include "Recon/SciFi/SetupKalmanRec.hh"
 
 
 #include "Interface/dataCards.hh"
@@ -17,7 +17,7 @@
 #include "Interface/MiceMaterials.hh"
 #include "BeamTools/BTField.hh"
 #include "BeamTools/BTFieldConstructor.hh"
-#include "SciFiFieldMap.hh"
+#include "Recon/SciFi/SciFiFieldMap.hh"
 
 
 #include "recpack/string_tools.h"

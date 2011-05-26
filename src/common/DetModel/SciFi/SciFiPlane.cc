@@ -14,14 +14,14 @@ SciFiPlane - Specific parameterisation of the SciFi station to be called by the 
 
 #include "G4ios.hh"
 
-#include "SciFiPlane.hh"
+#include "DetModel/SciFi/SciFiPlane.hh"
 
 #include "G4ThreeVector.hh"
 #include "G4RotationMatrix.hh"
 #include "globals.hh"
 
-#include "SciFiSD.hh"
-#include "DoubletFiberParam.hh"
+#include "DetModel/SciFi/SciFiSD.hh"
+#include "DetModel/SciFi/DoubletFiberParam.hh"
 #include "G4SDManager.hh"
 
 SciFiPlane::SciFiPlane( MiceModule* mod, G4Material* mater, G4VPhysicalVolume *mlv )

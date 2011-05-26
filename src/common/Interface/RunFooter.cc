@@ -14,8 +14,8 @@
 #include <time.h>
 #include <cstdlib>
 
-#include "RunFooter.hh"
-#include "dataCards.hh"
+#include "Interface/RunFooter.hh"
+#include "Interface/dataCards.hh"
 
 using namespace std;
 

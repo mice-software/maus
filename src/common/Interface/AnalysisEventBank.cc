@@ -4,7 +4,7 @@
 
 
 #include <fstream>
-#include "AnalysisEventBank.hh"
+#include "Interface/AnalysisEventBank.hh"
 
 using namespace std;
 

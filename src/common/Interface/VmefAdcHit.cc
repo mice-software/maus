@@ -4,7 +4,7 @@
 //
 // Y. Karadzhov April 2008
 
-#include "VmefAdcHit.hh"
+#include "Interface/VmefAdcHit.hh"
 
 #include <iostream>
 #include <fstream>
@@ -57,17 +57,9 @@ void VmefAdcHit::SetPedestal()
 
 int VmefAdcHit::ChargeMinMax()
 {
-  int min, max, d;
-  d = -99;
-  max = LONG_MIN;
-  min = LONG_MAX;
-  for( unsigned int i = 0; i < data.size(); ++i ){
-    d = data[ i ];
-    min = ( min > d )? d : min;
-    max = ( max > d )? max : d;
-  }
-
- return max - min;
+  vector<int>::iterator max = max_element( data.begin(), data.end() );
+  vector<int>::iterator min = min_element( data.begin(), data.end() );
+  return (*max) - (*min);
 }
 
 int VmefAdcHit::GetSignalArea(int& pos)

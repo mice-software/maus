@@ -1,5 +1,5 @@
-#include "ThreeDFieldMap.hh"
-#include "Squeak.hh"
+#include "Interface/ThreeDFieldMap.hh"
+#include "Interface/Squeak.hh"
 #include <iostream>
 #include <sstream>
 #include <map>

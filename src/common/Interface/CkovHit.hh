@@ -6,9 +6,9 @@
 #include "CLHEP/Vector/ThreeVector.h"
 #include "CLHEP/Units/SystemOfUnits.h"
 
-#include "MCHit.hh"
+#include "Interface/MCHit.hh"
 
-#include "Memory.hh"
+#include "Interface/Memory.hh"
 
 /**
 * CkoviHit is a description of a simulated hit in  the aerogel radiator of the CKOV detector

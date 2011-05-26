@@ -6,7 +6,7 @@
 //
 //---------------------------------------------------------------------------
 
-#include "TofDigitizationParams.hh"
+#include "Calib/TofDigitizationParams.hh"
 #include "Interface/dataCards.hh"
 #include "globals.hh"
 
