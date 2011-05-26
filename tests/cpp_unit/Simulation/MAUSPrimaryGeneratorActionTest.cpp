@@ -22,6 +22,8 @@
 
 #include "G4Event.hh"
 
+#include "CLHEP/Random/Random.h"
+
 #include "src/common/Simulation/MAUSGeant4Manager.hh"
 #include "src/common/Simulation/MAUSPrimaryGeneratorAction.hh"
 
@@ -71,7 +73,7 @@ TEST_F(MAUSPrimaryGeneratorActionTest, GeneratePrimariesTest) {
     part_in.py = 6.;
     part_in.pz = 7.;
     part_in.energy = 200.;
-    part_in.seed = 1;
+    part_in.seed = 27;
     part_in.pid = -13;
 
     primary->Push(part_in);
@@ -107,7 +109,7 @@ TEST_F(MAUSPrimaryGeneratorActionTest, GeneratePrimariesTest) {
     EXPECT_NEAR(part_in.py*p_norm, event->GetPrimaryVertex()->GetPrimary()->GetPy(), 1e-3);
     EXPECT_NEAR(part_in.pz*p_norm, event->GetPrimaryVertex()->GetPrimary()->GetPz(), 1e-3);
 
-    EXPECT_EQ(part_in.seed, CLHEP::HepRandom::);
+    EXPECT_EQ(27, CLHEP::HepRandom::getTheSeed());
     EXPECT_EQ(-13,  event->GetPrimaryVertex()->GetPrimary()->GetPDGcode());
 
     for (size_t i=0; i<5; ++i)

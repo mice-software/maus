@@ -46,8 +46,14 @@ from Configuration import Configuration
 
 class Go:
     def __init__(self, argInput, argMapper, argReducer, argOutput, argConfigFile = None):
-        for component in [argInput, argMapper, argReducer, argOutput]:
-            assert isinstance(component, types.InstanceType)
+        maus_root_dir = os.environ.get('MAUS_ROOT_DIR')
+        current_dir = os.getcwd()
+
+        if maus_root_dir not in current_dir:
+            print("\nWARNING: YOU ARE RUNNING MAUS OUTSIDE ITS MAUS_ROOT_DIR")
+            print(("\tMAUS_ROOT_DIR = %s" % (maus_root_dir)))
+            print(("\tCURRENT DIRECTORY = %s\n" % (current_dir)))
+            
 
         self.input = argInput
         self.mapper = argMapper
@@ -55,9 +61,9 @@ class Go:
         self.output = argOutput
 
         print("Welcome to MAUS:")
-        print("\tProcess ID (PID): %d" % os.getpid())
-        print("\tUniversally Unique ID (UUID): %s" % uuid.uuid4())
-        print("\tProgram Arguments: %s" % str(sys.argv))
+        print(("\tProcess ID (PID): %d" % os.getpid()))
+        print(("\tUniversally Unique ID (UUID): %s" % uuid.uuid4()))
+        print(("\tProgram Arguments: %s" % str(sys.argv)))
 
         self.jsonConfigDocument = Configuration().getConfigJSON(argConfigFile)
         jsonConfigDictionary = json.loads(self.jsonConfigDocument)
@@ -87,7 +93,7 @@ class Go:
         ######  Input Phase  ######
         ####                  #####
         print("INPUT: Reading some input")
-        self.input.birth()
+        assert(self.input.birth(self.jsonConfigDocument) == True)
         emitter = self.input.emitter()
         mapBuffer = self.BufferInput(emitter)
 
@@ -95,7 +101,7 @@ class Go:
         ######  Map Phase  ######
         ####                #####
         print("MAP: Setting up mappers")
-        self.mapper.birth(self.jsonConfigDocument)
+        assert(self.mapper.birth(self.jsonConfigDocument) == True)
 
         while len(mapBuffer) != 0:
             print(("MAP: Processing %d events" % len(mapBuffer)))
@@ -118,7 +124,7 @@ class Go:
         ######  Reduce Phase  ######
         ####                   ##### 
         print("REDUCE: Setting up reducers")
-        self.reducer.Birth()
+        assert(self.reducer.birth(self.jsonConfigDocument) == True)
         
         # read back
         fileObj.seek(0) # go to beginning of file
@@ -133,22 +139,22 @@ class Go:
             i = i + 1
             if i % 1000 == 0:
                 print(('REDUCE: Reducing %d events in the %d pass' % (len(reduceBuffer), len(reduced))))
-                reduced.append(reduce(self.reducer.Process, reduceBuffer))
+                reduced.append(reduce(self.reducer.process, reduceBuffer))
                 reduceBuffer = []
 
         print(('REDUCE: Merging %d passes and reducing the %d events left in the buffer' % (len(reduced), len(reduceBuffer))))
-        reduceResult = reduce(self.reducer.Process, reduceBuffer + reduced)
+        reduceResult = reduce(self.reducer.process, reduceBuffer + reduced)
 
         tempFile.close()
         fileObj.close()
 
-        self.reducer.Death()
+        self.reducer.death()
         
         ####                    ####
         ######  Output Phase  ######
         ####                   #####
 
-        self.output.birth()
+        assert(self.output.birth(self.jsonConfigDocument) == True)
         
         self.output.save(reduceResult)
                 

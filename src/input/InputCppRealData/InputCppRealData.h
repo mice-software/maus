@@ -47,6 +47,12 @@ private
 /** Pointer to the start of the current event. */
   unsigned char *_eventPtr;
 
+  /** Path to the data. */
+  std::string _dataPath;
+
+  /** Filename within _dataPath. */
+  std::string _filename;
+
 /** Process an event.
   *
   * This function processes an MDevent into parts,
@@ -84,20 +90,22 @@ private
 public
 :
 
-  InputCppRealData();
-
-/** Initialise the Unpacker.
+/** Create an instance of InputCppRealData.
   * 
-  * This prepares the unpacker to read the file.
-  * A directory path and filename to read within that path:
-  * i.e. /home/user/micedata and runnumber.000
+  * This is the constructor for InputCppRealData.
   *
   * \param[in] pDataPath The (directory) path to read the data from
   * \param[in] pFilename The filename to read from the pDataPath directory
-  * \return True if the file was open sucessfully.
   */
-  bool birth(std::string pDataPath,
-             std::string pFilename);
+  InputCppRealData(std::string pDataPath = "", std::string pFilename = "");
+
+/** Initialise the Unpacker.
+  * 
+  * This prepares the unpacker to read the file given in the constructor.
+  *
+  * \return True if the file was opened sucessfully.
+  */
+  bool birth(std::string pJSONConfig);
 
 /** Read the next event from the file into memory.
   *

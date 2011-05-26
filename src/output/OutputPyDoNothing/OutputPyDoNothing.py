@@ -23,10 +23,10 @@ class OutputPyDoNothing:
 
     """
 
-    def birth(self):
-        """Birth does nothing; no setup required
+    def birth(self, config_doc):
+        """Birth returns true
         """
-        pass # do nothing
+        return True
 
     def save(self, document):
         """Save single event to nowhere
@@ -42,8 +42,8 @@ class OutputPyDoNothing:
     def death(self):
         """Closes down OutputPyDoNothing
 
-        Does nothing.
+        Does nothing but return true
         """
-        pass  #  do nothing
+        return True
 
 

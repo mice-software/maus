@@ -24,26 +24,27 @@
 
 #include "UnpackEventLib.h"
 
-
-InputCppRealData::InputCppRealData() {
+InputCppRealData::InputCppRealData(std::string pDataPath,
+                                   std::string pFilename) {
   _debug = false;
   _eventPtr = NULL;
   _inputFile = NULL;
+  _dataPath = pDataPath;
+  _filename = pFilename;
 }
 
 
-bool InputCppRealData::birth(std::string pDataPath,
-                             std::string pFilename) {
+bool InputCppRealData::birth(std::string jsonDataCards) {
   if (_inputFile)
     return false;  // Fail because file is open
 
   if (_debug)
-    std::cerr << "Data file = " << pFilename << " ("
-              << pDataPath << ")" << std::endl;
+    std::cerr << "Data file = " << _filename << " ("
+              << _dataPath << ")" << std::endl;
 
 
-  _inputFile = new MDdateFile(pFilename,
-                              pDataPath);
+  _inputFile = new MDdateFile(_filename,
+                              _dataPath);
 
   // Actually try opening the file
   if (_inputFile->OpenFile() != DATE_FILE_OK) {
@@ -192,8 +193,8 @@ void InputCppRealData::processLDCEvent(MDevent *pEvent,
         // Check if the equipment type is one we can process
         // (TDC, fADC or Scalar hits apparently...)
         if ((xEquipType == VmeTdc) ||
-            (xEquipType == VmefAdc1724) ||
-            (xEquipType == VmefAdc1731) ||
+            //  (xEquipType == VmefAdc1724) ||
+            //  (xEquipType == VmefAdc1731) ||
             (xEquipType == VmeScaler)) {
           xEvntFrag.InitPartEventVector();
           // Each fragment is made up of a series of parts
@@ -239,6 +240,7 @@ void InputCppRealData::processHits(void *pPartEvntPtr,
     case VmeTdc: {
       V1290Hit::getJSON(pPartEvntPtr,
                         pDoc["tdc"]);
+      pDoc["tdc"]["ldc_id"] = pLdcId;
       break;
     }
 

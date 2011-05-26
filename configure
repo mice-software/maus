@@ -31,8 +31,7 @@ echo "INFO:"
 echo "INFO:     1. Check that you have a compiler"
 echo "INFO:     2. Check that you have Python"
 echo "INFO:     3. Check your version of Python is supported"
-echo "INFO:     4. Create files called 'env.sh' and 'env.csh'"
-echo "INFO:        that store your environmental variables"
+echo "INFO:     4. Create a file called 'env.sh'"
 echo "INFO:"
 echo
 
@@ -79,10 +78,6 @@ type -P python &>/dev/null || {
     echo "FATAL:" >&2;
     echo "FATAL:      export MAUS_ROOT_DIR=\"${maus_root_dir}\"" >&2;
     echo "FATAL:" >&2;
-    echo "FATAL: whilst for C-compatible shells like 'csh', run:" >&2;
-    echo "FATAL:" >&2;
-    echo "FATAL:      setenv MAUS_ROOT_DIR \"${maus_root_dir}\"" >&2;
-    echo "FATAL:" >&2;
     echo "FATAL: then run the following to install Python 2.7:" >&2;
     echo "FATAL:" >&2;
     echo "FATAL:      ./third_party/bash/01python.bash" >&2;
@@ -92,46 +87,44 @@ python_version=`env $DYLIB_VAR=./third_party/install/lib python -V 2>&1`
 ## Check for supported python version
 if [ "${python_version}" != "Python 2.7" ]
 then               ##################################################
-    echo "WARNING: Unsupported python version (You are using ${python_version}),";
-    echo "WARNING: so using Python 2.7 is recommended.  MAUS will install extra";
-    echo "WARNING: packages in this location like numpy and xboa and currently";
-    echo "WARNING: the way we go about this is having our own Python install.";
-    echo "WARNING: ";
-    echo "WARNING: To install within MAUS, set the MAUS_ROOT_DIR";
-    echo "WARNING: environmental variable.  For Bourne-compatible";
-    echo "WARNING: shells like 'bash', run:";
-    echo "WARNING: ";
-    echo "WARNING:       export MAUS_ROOT_DIR=\"${maus_root_dir}\"";
-    echo "WARNING: ";
-    echo "WARNING:  whilst for C-compatible shells like 'csh', run:";
-    echo "WARNING: ";
-    echo "WARNING:       setenv MAUS_ROOT_DIR \"${maus_root_dir}\"";
-    echo "WARNING: ";
-    echo "WARNING: then run the following to install Python 2.7:"
-    echo "WARNING: ";
-    echo "WARNING:       ./third_party/bash/01python.bash";
-    echo
+    if [ ! -f "env.sh" ]
+    then
+	echo "WARNING: Unsupported python version (You are using ${python_version}),";
+	echo "WARNING: so using Python 2.7 is recommended.  MAUS will install extra";
+	echo "WARNING: packages in this location like numpy and xboa and currently";
+	echo "WARNING: the way we go about this is having our own Python install.";
+	echo "WARNING: ";
+	echo "WARNING: To install within MAUS, set the MAUS_ROOT_DIR";
+	echo "WARNING: environmental variable.  For Bourne-compatible";
+	echo "WARNING: shells like 'bash', run:";
+	echo "WARNING: ";
+	echo "WARNING:       export MAUS_ROOT_DIR=\"${maus_root_dir}\"";
+	echo "WARNING: ";
+	echo "WARNING: then run the following to install Python 2.7:"
+	echo "WARNING: ";
+	echo "WARNING:       ./third_party/bash/01python.bash";
+	echo
+    fi
 fi
 
 # check for SCons
 type -P scons &>/dev/null || {
-    echo "WARNING: Scons is required to proceed after this step"
-    echo "WARNING:"
-    echo "WARNING: To install within MAUS, set the MAUS_ROOT_DIR";
-    echo "WARNING: environmental variable.  For Bourne-compatible";
-    echo "WARNING: shells like 'bash', run:";
-    echo "WARNING: ";
-    echo "WARNING:       export MAUS_ROOT_DIR=\"${maus_root_dir}\"";
-    echo "WARNING: ";
-    echo "WARNING:  whilst for C-compatible shells like 'csh', run:";
-    echo "WARNING: ";
-    echo "WARNING:       setenv MAUS_ROOT_DIR \"${maus_root_dir}\"";
-    echo "WARNING: ";
-    echo "WARNING: then run the following to install Scons:" >&2;
-    echo "WARNING:" >&2;
-    echo "WARNING:      ./third_party/bash/40python_extras.bash";
-    echo "WARNING:";
-    echo
+    if [ ! -f "env.sh" ]
+    then
+	echo "WARNING: Scons is required to proceed after this step"
+	echo "WARNING:"
+	echo "WARNING: To install within MAUS, set the MAUS_ROOT_DIR";
+	echo "WARNING: environmental variable.  For Bourne-compatible";
+	echo "WARNING: shells like 'bash', run:";
+	echo "WARNING: ";
+	echo "WARNING:       export MAUS_ROOT_DIR=\"${maus_root_dir}\"";
+	echo "WARNING: ";
+	echo "WARNING: then run the following to install Scons:" >&2;
+	echo "WARNING:" >&2;
+	echo "WARNING:      ./third_party/bash/40python_extras.bash";
+	echo "WARNING:";
+	echo
+    fi
     }
 
 
@@ -215,80 +208,11 @@ fi
 
 EOF
 
-cat > env.csh <<EOF
-#/bin/csh
-
-if ({\$?MAUS_ROOT_DIR}) then
-     echo "WARNING: MAUS already setup"
-else
-     setenv MAUS_ROOT_DIR "${maus_root_dir}"
-
-     if ({\$?PATH}) then
-          setenv PATH "\${MAUS_ROOT_DIR}/third_party/install/bin:\${PATH}" # else add it
-     else
-          setenv PATH "\${MAUS_ROOT_DIR}/third_party/install/bin" # initialize it
-     endif
-
-     if ({\$?$DYLIB_VAR}) then
-          setenv $DYLIB_VAR "\${MAUS_ROOT_DIR}/third_party/install/lib:\${$DYLIB_VAR}" # else add it
-     else
-          setenv $DYLIB_VAR "\${MAUS_ROOT_DIR}/third_party/install/lib" # intiailize it
-     endif
-
-     if ({\$?PYTHONPATH}) then
-          setenv PYTHONPATH "\$MAUS_ROOT_DIR/build:\$PYTHONPATH" # else add it
-     else
-          setenv PYTHONPATH "\$MAUS_ROOT_DIR/build"  # intiailize it
-     endif
-
-     # maus workers
-     setenv $DYLIB_VAR "\$MAUS_ROOT_DIR/build:\$$DYLIB_VAR"
-
-     # maus core
-     setenv PYTHONPATH "\$MAUS_ROOT_DIR/src/core:\$PYTHONPATH"
-     setenv $DYLIB_VAR "\$MAUS_ROOT_DIR/src/core:\$$DYLIB_VAR"
-
-     setenv G4DEBUG 1
-     setenv G4VERS geant4.9.2.p04
-     setenv G4SYSTEM Linux-g++
-     setenv G4INSTALL "\${MAUS_ROOT_DIR}/third_party/build/\${G4VERS}"
-     setenv G4LIB "\${G4INSTALL}/lib"
-     setenv $DYLIB_VAR "\${G4LIB}/\${G4SYSTEM}:\${$DYLIB_VAR}"
-     setenv G4INCLUDE "\${G4INSTALL}/include/"
-     setenv G4TMP "\${G4INSTALL}"
-     setenv G4VIS_BUILD_DAWNFILE_DRIVER 1
-     setenv G4VIS_USE_DAWNFILE 1
-     setenv G4VIS_USE 0
-     setenv G4OPTIMISE 2
-     setenv OGLHOME /usr/X11R6
-     setenv G4LEDATA "\${G4INSTALL}/data/G4EMLOW6.2/"
-     setenv G4ABLADATA "\${G4INSTALL}/data/G4ABLA3.0/"
-     setenv G4NEUTRONDATA "\${G4INSTALL}/data/G4NDL3.13/"
-     setenv G4LEVELGAMMADATA "\${G4INSTALL}/data/PhotonEvaporation2.0/"
-     setenv G4RADIOACTIVEDATA "\${G4INSTALL}/data/RadioactiveDecay3.2/"
-
-     setenv MICEFILES "\${MAUS_ROOT_DIR}/src/common/FILES"
-
-     echo "SUCCESS: MAUS setup"
-endif
-
-# setup ROOT
-if( ! -e \${MAUS_ROOT_DIR}/third_party/build/$root_version/bin/thisroot.csh ) then
-     source \${MAUS_ROOT_DIR}/third_party/build/$root_version/bin/thisroot.csh
-endif
-
-EOF
-
 echo "SUCCESS: Whenever you want to use MAUS, you must 'source'"
 echo "SUCCESS: the environmental variables file.  For Bourne-"
 echo "SUCCESS: compatible shells like 'bash', run:"
 echo "SUCCESS:"
 echo "SUCCESS:      source env.sh"
 echo "SUCCESS:"
-echo "SUCCESS: and for C-compatible shells, run:"
-echo "SUCCESS:"
-echo "SUCCESS:      source env.csh"
-echo "SUCCESS:"
 echo "SUCCESS: which can be added to your respective shell's"
 echo "SUCCESS: startup scripts.  Example: ~/.bashrc for 'bash'."
-

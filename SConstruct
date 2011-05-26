@@ -1,24 +1,29 @@
-from SCons.Script.SConscript import SConsEnvironment
+from SCons.Script.SConscript import SConsEnvironment # pylint: disable-msg=F0401
 import glob
 import os
+
+def my_exit(code = 1):
+    """Internal routine to exit
+
+    Currently this is its own function to allow easy disabling or a pylint
+    warning.
+    """
+    Exit(code) # pylint: disable-msg=E0602
 
 maus_root_dir = os.environ.get('MAUS_ROOT_DIR')
 if not maus_root_dir:
     print('!! Could not find the $MAUS_ROOT_DIR environmental variable')
     print('!! Did you try running: "source env.sh"?')
-    Exit(1)
-
-file_to_import = open('%s/build/MAUS.py' % maus_root_dir, 'w')
+    my_exit(1)
 
 #this is our catch-all Dev class
 class Dev:
     cflags = ''
     ecflags = ''
 
-    #---
     # sets up the sconscript file for a given sub-project
     def Subproject(self, project):
-        SConscript(env.jDev.SPath(project), exports=['project'])
+        SConscript(env.jDev.SPath(project), exports=['project']) # pylint: disable-msg=E0602
 
     #sets up the build for a given project
     def Buildit(self, localenv, project, \
@@ -68,8 +73,6 @@ class Dev:
         env.Install(full_build_dir, tests)
         env.Alias('all', pgm)  #note: not localenv
 
-        file_to_import.write('from %s import %s\n' % (name, name))
-
         return True
 
     #---- PRIVATE ----
@@ -81,7 +84,7 @@ class Dev:
 
 def CheckCommand(context, cmd):
     context.Message('Checking for %s command... ' % cmd)
-    result = WhereIs(cmd)
+    result = WhereIs(cmd) # pylint: disable-msg=E0602
     context.Result(result is not None)
     return result
 
@@ -93,7 +96,7 @@ def set_cpp(conf, env):
 
     if not conf.CheckCXX():
         print('!! Your compiler or environment is not correctly configured.')
-        Exit(1)
+        my_exit(1)
 
     if not conf.CheckLib( "json" , language='C++') or\
             not conf.CheckCXXHeader('json/json.h'):
@@ -102,42 +105,42 @@ def set_cpp(conf, env):
         print ( "You may install it by running:")
         print ("     MAUS_ROOT_DIR=%s ./third_party/bash/52jsoncpp.bash"\
                    % maus_root_dir)
-        Exit(1)
+        my_exit(1)
 
     if not conf.CheckLib( "stdc++" , language='C++'):
-        Exit(1)
+        my_exit(1)
 
     if not conf.CheckFunc('printf'):
         print('!! Your compiler or environment is not correctly configured.')
-        Exit(1)
+        my_exit(1)
 
     if not conf.CheckHeader('math.h'):
-        Exit(1)
+        my_exit(1)
 
     if not conf.CheckCHeader('stdlib.h'):
-        Exit(1)
+        my_exit(1)
 
     if not conf.CheckCXXHeader('iostream', '<>'):
-        Exit(1)
+        my_exit(1)
 
 def set_python(conf, env):
-    EnsurePythonVersion(2, 7)
+    EnsurePythonVersion(2, 7) # pylint: disable-msg=E0602
 
     if not conf.CheckCommand('python'):
-        Exit(1)
+        my_exit(1)
 
     if not conf.CheckCXXHeader('Python.h'):
         print "You need 'Python.h' to compile this program"
         print "If you want to install python locally, run:"
         print ("     MAUS_ROOT_DIR=%s ./third_party/bash/01python.bash" \
                    % maus_root_dir)
-        Exit(1)
+        my_exit(1)
 
     if not conf.CheckCommand('swig'):
         print "Cound't find swig.  If you want it, then run:"
         print ("     MAUS_ROOT_DIR=%s ./third_party/bash/02swig.bash" \
                    % maus_root_dir)
-        Exit(1)
+        my_exit(1)
 
     conf.env.Append(LIBS = ['python2.7'])
 
@@ -146,7 +149,7 @@ def set_gsl(conf, env):
         print "Cound't find GSL (required for ROOT).  If you want it, then run:"
         print ("     MAUS_ROOT_DIR=%s ./third_party/bash/20gsl.bash" \
                    % maus_root_dir)
-        Exit(1)
+        my_exit(1)
     else:
         conf.env.Append(LIBS = ['gslcblas'])
 
@@ -154,7 +157,7 @@ def set_gsl(conf, env):
         print "Cound't find GSL (required for ROOT).  If you want it, then run:"
         print ("     MAUS_ROOT_DIR=%s ./third_party/bash/20gsl.bash" \
                    % maus_root_dir)
-        Exit(1)
+        my_exit(1)
 
 def get_root_libs():
     """ROOT libs
@@ -190,7 +193,7 @@ def set_root(conf, env):
         print ("where you can install GSL by running:")
         print ("     MAUS_ROOT_DIR=%s ./third_party/bash/20gsl.bash" \
                    % maus_root_dir)
-        Exit(1)
+        my_exit(1)
 
     else:
         print
@@ -199,7 +202,7 @@ def set_root(conf, env):
         env['USE_ROOT'] = True
 
         if not conf.CheckCommand('root-config'):
-            Exit(1)
+            my_exit(1)
 
         conf.env.ParseConfig("root-config --cflags --ldflags --libs")
 
@@ -207,19 +210,19 @@ def set_root(conf, env):
 
         for lib in root_libs:
             if not conf.CheckLib(lib, language='c++'):
-                Exit(1)
+                my_exit(1)
 
         if not conf.CheckCXXHeader('TH1F.h'):
-            Exit(1)
+            my_exit(1)
 
         if not conf.CheckCXXHeader('TMinuit.h'):
-            Exit(1)
+            my_exit(1)
 
 def set_clhep(conf, env):
     if not conf.CheckLib('CLHEP', language='c++'):
         print "Cound't find CLHEP (required for geant4).  If you want it, then run:"
         print ("      MAUS_ROOT_DIR=%s ./third_party/bash/30clhep.bash" % maus_root_dir)
-        Exit(1)
+        my_exit(1)
 
     conf.env.Append(LIBS = ['CLHEP'])
 
@@ -340,7 +343,7 @@ def set_geant4(conf, env):
     if 'G4INSTALL' not in os.environ or (not os.path.exists(os.environ.get('G4INSTALL'))):
         print "Cound't find geant4.  If you want it, after installing CLHEP, then run:"
         print ("      MAUS_ROOT_DIR=%s ./third_party/bash/31geant4.bash" % maus_root_dir)
-        Exit(1)
+        my_exit(1)
     else:
         print
         print "!! Found the package 'geant4', so assume you want to use it with MAUS."
@@ -351,7 +354,7 @@ def set_geant4(conf, env):
         env.Append(CPPPATH=[os.environ.get("G4INCLUDE")])
 
         if not conf.CheckCXXHeader('G4EventManager.hh'):
-            Exit(1)
+            my_exit(1)
 
         # removing this line (and using the append(libs) one below, because this is messy and breaks/seg-faults.
         #    conf.env.ParseConfig('%s/liblist -m %s < %s/libname.map'.replace('%s', os.path.join(os.environ.get('G4LIB'), os.environ.get('G4SYSTEM'))))
@@ -361,18 +364,18 @@ def set_geant4(conf, env):
 
         for lib in get_g4_libs():
             if not conf.CheckLib(lib, language='c++'):
-                Exit(1)
+                my_exit(1)
 
 def set_recpack(conf, env):
     if not conf.CheckLib('recpack', language='c++') or\
        not conf.CheckCXXHeader('recpack/RecpackManager.h'):
-        Exit(1)
+        my_exit(1)
 
 def set_gtest(conf, env):
     if not conf.CheckLib('gtest', language='c++'):
-        Exit(1)
+        my_exit(1)
     if not conf.CheckCXXHeader('gtest/gtest.h'):
-        Exit(1)
+        my_exit(1)
 
 def set_unpacker(conf, env):
     if (not conf.CheckLib('MDunpack', language='c++') or \
@@ -386,7 +389,20 @@ def set_unpacker(conf, env):
 
 # Setup the environment.  NOTE: SHLIBPREFIX means that shared libraries don't
 # have a 'lib' prefix, which is needed for python to find SWIG generated libraries
-env = Environment(SHLIBPREFIX="")
+env = Environment(SHLIBPREFIX="") # pylint: disable-msg=E0602
+
+if env.GetOption('clean'):
+    print("In cleaning mode!")
+
+    for root, dirs, files in os.walk('%s/build' % maus_root_dir):
+        for basename in files:
+            filename = os.path.join(root, basename)
+            if os.path.isfile(filename):
+                print 'Removing:', filename
+                os.remove(filename)
+
+            
+    
 
 if os.path.isfile('.use_llvm_with_maus'):
     env['CC'] = "llvm-gcc"
@@ -423,12 +439,12 @@ SConsEnvironment.jDev = Dev()
 
 #get the mode flag from the command line
 #default to 'release' if the user didn't specify
-env.jDev.mymode = ARGUMENTS.get('mode', 'release')   #holds current mode
+env.jDev.mymode = ARGUMENTS.get('mode', 'release')  # pylint: disable-msg=E0602
 
 #check if the user has been naughty: only 'debug' or 'release' allowed
 if not (env.jDev.mymode in ['debug', 'release']):
     print "Error: expected 'debug' or 'release', found: " + env.jDev.mymode
-    Exit(1)
+    my_exit(1)
 
 #tell the user what we're doing
 print '**** Compiling in ' + env.jDev.mymode + ' mode...'
@@ -438,7 +454,7 @@ env.jDev.releasecflags = ['-O2', '-DNDEBUG',]         #extra compile flags for r
 
 #make sure the sconscripts can get to the variables
 #don't need to export anything but 'env'
-Export('env')
+Export('env') # pylint: disable-msg=E0602
 
 #### Target: Documentation
 #dox = env.Command('does_not_exist3', 'doc/Doxyfile',
@@ -453,7 +469,7 @@ Export('env')
 print "Configuring..."
 # Must have long32 & long64 for the unpacking library
 env.Append(CCFLAGS=["""-Dlong32='int'""", """-Dlong64='long long'"""])
-conf = Configure(env, custom_tests = {'CheckCommand' : CheckCommand})
+conf = Configure(env, custom_tests = {'CheckCommand' : CheckCommand}) # pylint: disable-msg=E0602
 set_cpp(conf, env)
 set_python(conf, env)
 set_gsl(conf, env)
@@ -466,15 +482,15 @@ set_unpacker(conf, env)
 
 # check types size!!!
 env = conf.Finish()
-if 'configure' in COMMAND_LINE_TARGETS:
-    Exit(0)
+if 'configure' in COMMAND_LINE_TARGETS: # pylint: disable-msg=E0602
+    my_exit(0)
 
 
 # NOTE: do this after configure!  So we know if we have ROOT/geant4
 #specify all of the sub-projects in the section
 if env['USE_G4'] and env['USE_ROOT']:
-    env.Append(CCFLAGS=['-g','-pg'])
-    env.Append(LINKFLAGS='-pg')
+    #env.Append(CCFLAGS=['-g','-pg'])
+    #env.Append(LINKFLAGS='-pg')
 
     common_cpp_files = glob.glob("src/common/*/*cc") + \
         glob.glob("src/common/*/*/*cc") + \
@@ -490,7 +506,7 @@ if env['USE_G4'] and env['USE_ROOT']:
     env.Append(CPPPATH = maus_root_dir)
 
     if 'Darwin' in os.environ.get('G4SYSTEM'):
-       env.Append(LINKFLAGS=['-undefined','suppress','-flat_namespace'])       
+       env.Append(LINKFLAGS=['-undefined','suppress','-flat_namespace'])
 
     test_cpp_files = glob.glob("tests/cpp_unit/*/*cpp")+\
         glob.glob("tests/cpp_unit/*cpp")
@@ -513,6 +529,7 @@ types = ["input", "map", "reduce", "output"]
 for my_type in types:
     directories += glob.glob("src/%s/*" % my_type)
 
+stuff_to_import = []
 
 for directory in directories:
     parts = directory.split("/")
@@ -523,16 +540,36 @@ for directory in directories:
     if 'Py' in parts[2] and 'Cpp' not in parts[2]:
         print 'Found Python module: %s' % parts[2]
         files = glob.glob('%s/test_*.py' % directory) +  ["%s/%s.py" % (directory, parts[2])]
-        file_to_import.write('from %s import %s\n' % (parts[2],parts[2]))
         env.Install("build", files)
+
+        stuff_to_import.append(parts[2])
 
     if (parts[2][0:6] == 'MapCpp') or (parts[2][0:8] == 'InputCpp'):
         print 'Found C++ module: %s' % parts[2]
         env.jDev.Subproject(directory)
+        stuff_to_import.append(parts[2])
+
+file_to_import = open('%s/build/MAUS.py' % maus_root_dir, 'w')
+
+file_to_import.write("try:\n")
+file_to_import.write("     from Go import Go\n")
+file_to_import.write("except ImportError:\n")
+file_to_import.write("     print 'failed to import Go'\n")
+file_to_import.write("\n")
+
+for single_stuff in stuff_to_import:
+    file_to_import.write("try:\n")
+    file_to_import.write("     from %s import %s\n" % (single_stuff, single_stuff))
+    file_to_import.write("except ImportError:\n")
+    file_to_import.write("     print 'failed to import %s'\n" % single_stuff)
+    file_to_import.write("\n")
 
 file_to_import.close()
 
 files = glob.glob('tests/unit/test_*')+glob.glob('tests/style/*.py')
 env.Install("build", files)
+
+env.Install("build", "tests/unit/test_cdb")
+env.Install("build", "tests/unit/suds")
 
 env.Alias('install', ['%s/build' % maus_root_dir])

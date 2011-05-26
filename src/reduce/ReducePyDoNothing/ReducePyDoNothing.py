@@ -24,16 +24,16 @@ import json
 import types
 
 class ReducePyDoNothing:
-    def Birth(self):
-        pass
+    def birth(self, datacards):
+        return True
 
-    def Process(self, x, y):
+    def process(self, x, y):
         x = x.rstrip()
         y = y.rstrip()
         return "%s\n%s" % (x,y)
 
-    def Death(self):
-        pass
+    def death(self):
+        return True
 
 
 

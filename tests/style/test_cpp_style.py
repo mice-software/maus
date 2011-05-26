@@ -285,6 +285,7 @@ os.path.join('src', 'map', 'MapCppTOFDigitization'),
 os.path.join('src', 'map', 'MapCppTrackerDigitization'),
 os.path.join('src', 'map', 'MapCppPrint'),
 os.path.join('tests', 'style'),
+os.path.join('tests', 'integration', 'optics', 'src'),
 ]+glob_maus_root_dir(os.path.join('src', '*', '*', 'build')
 )
 

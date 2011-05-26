@@ -50,18 +50,18 @@ class InputPyJSON:
         the end of the file.
         <b>Default: -1</b>
         """
-        if arg_file == None:
+        if arg_file == None: # pragma: no cover
             arg_file = open('mausput','r')
         self._file = arg_file
 
         self._number_of_events = arg_number_of_events
         self._current_event = 0
 
-    def birth(self):
+    def birth(self, json_config = "{}"):
         """
         birth() does nothing
         """
-        pass
+        return True
 
     def emitter(self):
         """Emit JSON documents
@@ -81,8 +81,7 @@ class InputPyJSON:
             next_value = next_value.rstrip()
 
             # see if EOF is reached
-            if not next_value:
-                self._file.close()
+            if next_value == '':
                 return
 
             # check that it's a valid JSON document
@@ -104,4 +103,5 @@ class InputPyJSON:
         death() closes input file
         """
         self._file.close()
+        return True
 

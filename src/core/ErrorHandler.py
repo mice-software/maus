@@ -1,15 +1,15 @@
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
-# 
+#
 #  MAUS is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-# 
+#
 #  MAUS is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-# 
+#
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -62,11 +62,11 @@ class ErrorHandler:
         @returns the datastream
         """
         if self.error_to_stderr:
-          self.ErrorsToUser()
+            self.ErrorsToUser()
         if self.error_to_json:
-          self.ErrorsToJson(doc, caller)
+            self.ErrorsToJson(doc, caller)
         if self.on_error == 'none':
-          pass
+            pass
         elif self.on_error == 'halt':
             sys.exit(1)
         elif self.on_error == 'raise':
@@ -93,11 +93,11 @@ class ErrorHandler:
         if doc == None: doc = {}
         class_name = "<unknown caller>"
         if caller != None:
-          class_name = caller.__class__.__name__
+            class_name = caller.__class__.__name__
         if not 'errors' in doc:
-          doc['errors'] = {}
+            doc['errors'] = {}
         if not class_name in doc['errors']:
-          doc['errors'][class_name] = []
+            doc['errors'][class_name] = []
         doc['errors'][class_name].append(str(sys.exc_info()[0])+": "
                                                         +str(sys.exc_info()[1]))
         return doc
@@ -105,19 +105,17 @@ class ErrorHandler:
 __default_handler = ErrorHandler()
 
 def DefaultHandler():
-  """
-  Returns the default handler object
-  """
-  return __default_handler
+    """
+    Returns the default handler object
+    """
+    return __default_handler
 
 def HandleException(doc, caller):
-  """
-  Handle an exception with the default exception handler
-  @param doc the json data stream
-  @param caller the object that called the ExceptionHandler (determines which
-             branch to use in the data stream)
-  @returns the datastream
-  """
-  return __default_handler.HandleException(doc, caller)
-
-
+    """
+    Handle an exception with the default exception handler
+    @param doc the json data stream
+    @param caller the object that called the ExceptionHandler (determines which
+               branch to use in the data stream)
+    @returns the datastream
+    """
+    return __default_handler.HandleException(doc, caller)

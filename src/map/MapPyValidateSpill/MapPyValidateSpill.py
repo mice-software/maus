@@ -13,7 +13,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-## @class MapPyValidateSpill
+## @class MapPyValidateSpill.MapPyValidateSpill
 #
 #  MapPyValidateSpill checks the format of the spill against some the schema
 #  defined in SpillSchema. Throws an exception if it finds an error, which can

@@ -14,7 +14,7 @@
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
 
-## @class MapPyPrint
+## @class MapPyPrint.MapPyPrint
 #  MapPyPrint prints out events
 #
 #  This class is meant to mimick MapCppPrint and output in
@@ -27,12 +27,23 @@ class MapPyPrint:
     def birth(self, argJsonConfigDocument):
         self._sortKeys = True
         self._indent = 4
+        return True
 
     def process(self, x):
-        print json.dumps(x, sort_keys=self._sortKeys, indent=self._indent)  #  print spill
+        try:
+            x_dict = json.loads(x)
+            print "MapPyPrint output:"
+            print json.dumps(x_dict, sort_keys=self._sortKeys, indent=self._indent)  #  print spill
+        except:
+            y = {}
+            y["errors"] = {}
+            y["errors"]["bad_json_document"] = "MapPyPrint couldn't parse the input"
+            print y
+            return json.dumps(y)
+        return x
 
 
     def death(self):
-        pass  #  do nothing when shutting down
+        return True
 
 

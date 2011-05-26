@@ -1,4 +1,4 @@
-.o
+*.o
 *.os
 *~
 *.tmp
@@ -15,8 +15,6 @@ unit_test
 tmp/*
 src/map/*/build
 tests/cpp_unit/test_cpp_unit
-doc/doxygen_backend
-doc/doxygen_framework
 third_party/home
 third_party/build/*
 third_party/install/bin/*
