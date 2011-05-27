@@ -45,7 +45,6 @@ MICESteppingAction::MICESteppingAction(): m_StepStatistics(NULL)
   this->maxZGlobal = MyDataCards.fetchValueDouble("MaxZInChannel");
   this->maxTGlobal = MyDataCards.fetchValueDouble("MaxTimeAllowed");
   theVirtualPlanes = VirtualPlaneManager::getVirtualPlaneManager();
-  ihTraces = NULL;
 
   // added by rikard to debug steps and physicslist
   if (MyDataCards.fetchValueInt("StepStatisticsOutput"))

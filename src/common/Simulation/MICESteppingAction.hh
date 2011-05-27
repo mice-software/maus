@@ -28,11 +28,6 @@ class MICESteppingAction : public G4UserSteppingAction
    double maxRadSqGlobal;
    double maxTGlobal;
    double maxZGlobal;
-   int numTraceDef;
-   int *ihTraces;
-   int ihTraces100[100];
-   int ihTraceRefPart;
-   int ih_ELossTarget, ih_ELossAll, ih_ELossCSol, ih_ELossEndDecay;
 
    MICEStepStatistics* m_StepStatistics;
   //   MICEPrimaryGeneratorAction* m_generator;
