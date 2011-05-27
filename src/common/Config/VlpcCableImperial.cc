@@ -44,7 +44,6 @@ VlpcCableImperial::VlpcCableImperial(const std::string configFileName)
       : isValid_(false),
         configFileName_(configFileName)
 {
-  miceMemory.addNew( Memory::VlpcCableImperial ); 
   // add the MICEFILES path to the configFileName
 
   configFileName_ = std::string( getenv( "MICEFILES" ) ) + "/Cabling/SciFi/" + configFileName;
@@ -61,7 +60,6 @@ VlpcCableImperial::VlpcCableImperial(const std::string configFileName)
 void
 VlpcCableImperial::setConfigFileName(const std::string& name)
 {
-  miceMemory.addNew( Memory::VlpcCableImperial ); 
   // add the MICEFILES path to the configFileName
 
   configFileName_ = std::string( getenv( "MICEFILES" ) ) + "/Cabling/SciFi/" + name;

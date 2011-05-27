@@ -8,7 +8,6 @@
 
 #include "G4VSolid.hh"
 #include "Config/MiceModule.hh"
-#include "Interface/Memory.hh" 
 
 class MultipoleAperture
 {

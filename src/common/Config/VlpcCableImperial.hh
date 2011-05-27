@@ -27,8 +27,6 @@
 #include <fstream>
 #include "Config/VlpcCable.hh"
 
-#include "Interface/Memory.hh"
-
 /*--------------------------------------------------------------------*
  * constants
  *--------------------------------------------------------------------*/
@@ -60,7 +58,6 @@ class VlpcCableImperial: public VlpcCable
     // -----------------------------------------------------------------
     VlpcCableImperial() {};
     VlpcCableImperial(const std::string configFileName);
-    virtual ~VlpcCableImperial() { miceMemory.addDelete( Memory::VlpcCableImperial ); };
 
     // -----------------------------------------------------------------
     // Setter methods

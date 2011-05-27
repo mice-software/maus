@@ -1,17 +1,16 @@
 
 #include "Interface/KLHit.hh"
-#include "Interface/KLDigit.hh"
 
 //////////////////////////////////////////////////////////////////////////
 
 KLHit::KLHit()
 {
-  miceMemory.addNew( Memory::KLHit );
+
 }
 
 //////////////////////////////////////////////////////////////////////////
 
 KLHit::~KLHit()
 {
-  miceMemory.addDelete( Memory::KLHit );
+
 }

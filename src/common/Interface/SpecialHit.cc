@@ -16,8 +16,6 @@ using namespace std;
 
 SpecialHit::SpecialHit()
 {
-miceMemory.addNew( Memory::SpecialHit ); 
-
 	_stationNumber = 0;
 	_cellNumber    = 0;
 	_volName       = "";
@@ -38,7 +36,6 @@ miceMemory.addNew( Memory::SpecialHit );
 
 SpecialHit::SpecialHit(const SpecialHit& th)
 {
-miceMemory.addNew( Memory::SpecialHit ); 
 	if(&th != this) *this = th;
 }
 

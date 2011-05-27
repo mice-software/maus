@@ -6,7 +6,6 @@
 #include "G4VSensitiveDetector.hh"
 #include "Interface/CkovHit.hh"
 #include "CLHEP/Vector/ThreeVector.h"
-#include "Interface/Memory.hh" 
 
 class G4Step;
 class G4HCofThisEvent;
@@ -23,9 +22,6 @@ class CkovSD : public G4VSensitiveDetector
 
       //! Constructor
       CkovSD(  MICEEvent*, MiceModule*, bool dEdxCut );
-
-      //! Default destructor
-     ~CkovSD();
 
       //! Initialise this this instance with the G4 event information
       void Initialize( G4HCofThisEvent* );

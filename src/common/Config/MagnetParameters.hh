@@ -11,8 +11,6 @@
 #include <vector>
 #include "CLHEP/Units/SystemOfUnits.h"
 
-#include "Interface/Memory.hh" 
-
 class MagnetParameters {
 
   // Field map generation
@@ -89,7 +87,7 @@ public:
 
   static MagnetParameters* getInstance();
   MagnetParameters();
-  ~MagnetParameters()		{ miceMemory.addDelete( Memory::MagnetParameters ); };
+  ~MagnetParameters(){};
   
   std::string  SolDataFiles() { return fSolDataFiles; }
   std::string  MagneticFieldMap() { return fMagneticFieldMap; }

@@ -2,15 +2,9 @@
 //
 //  MICE beam parameters
 //
-//  Yagmur Torun 
 
 #include "Config/BeamParameters.hh"
 #include "Interface/dataCards.hh"
-
-BeamParameters::BeamParameters() {
-  miceMemory.addNew( Memory::BeamParameters );
-}
-
 
 BeamParameters* BeamParameters::fInstance = (BeamParameters*) NULL;
 

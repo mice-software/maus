@@ -19,8 +19,6 @@
 #include "globals.hh"
 #include "Config/MiceModule.hh"
 
-#include "Interface/Memory.hh" 
-
 class G4LogicalVolume;
 class G4VPhysicalVolume;
 class G4PVPlacement;

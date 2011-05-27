@@ -23,7 +23,6 @@
 
 #include "Interface/MICEUnits.hh"
 #include "Interface/Squeak.hh"
-#include "Interface/Memory.hh" 
 
 class MiceModule;
 

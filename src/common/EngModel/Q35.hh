@@ -10,8 +10,6 @@
 
 #include "G4LogicalVolume.hh"
 
-#include "Interface/Memory.hh" 
-
 /**	class Q35 implements a Q35 quadrupole magnet
  **/
 class Q35 {
@@ -37,9 +35,6 @@ public:
 	G4double CoilHalfwidth,
 	G4Material * IronMaterial
 	);
-
-	~Q35() 		{ miceMemory.addDelete( Memory::Q35 ); };
-	
 	/// buildQ35() returns the LogicalVolume of the magnet
 	G4LogicalVolume *buildQ35();
 

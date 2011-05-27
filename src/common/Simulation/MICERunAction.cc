@@ -8,8 +8,6 @@
 #include "G4TrajectoryContainer.hh"
 #include "G4Trajectory.hh"
 #include "Interface/dataCards.hh"
-#include "Interface/RunHeader.hh"
-#include "Interface/RunFooter.hh"
 #include <iostream>
 #include <fstream>
 using namespace std;

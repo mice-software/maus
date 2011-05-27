@@ -9,7 +9,6 @@
 
 MagnetParameters::MagnetParameters()
 {
-  miceMemory.addNew( Memory::MagnetParameters );
   // Field map generation
   fSolDataFiles          = MyDataCards.fetchValueString("SolDataFiles");
   fNumberNodesZGrid      = MyDataCards.fetchValueInt("NumberNodesZGrid");

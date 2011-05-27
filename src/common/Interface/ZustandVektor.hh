@@ -17,7 +17,6 @@ using CLHEP::HepLorentzVector;
 using CLHEP::Hep3Vector;
 #include "CLHEP/Matrix/SymMatrix.h"
 using CLHEP::HepSymMatrix;
-#include "Interface/Memory.hh"
 
 class MCHit;
 
@@ -29,7 +28,7 @@ class ZustandVektor
 
     ZustandVektor( MCHit* );
  
-    ~ZustandVektor() { miceMemory.addDelete( Memory::ZustandVektor); };
+  ~ZustandVektor(){};
 
   private :
 

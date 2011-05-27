@@ -13,8 +13,6 @@ using CLHEP::Hep3Vector;
 
 #include <string>
 
-#include "Interface/Memory.hh" 
-
 /**	BeamlineGeometry defines the layout of the MICE beamline
 	Only the portion of the beamline implemented in MICE is included;
 	that is, Q4 - Q9, and detectors within them.
@@ -33,7 +31,6 @@ public:
 public:
 	static BeamlineGeometry* getInstance();
 	BeamlineGeometry();
-	~BeamlineGeometry() 	{ miceMemory.addDelete( Memory::BeamlineGeometry ); };
 	
 	std::string	BeamlineMaterial()	{ return fBeamlineMaterial; }
 	Hep3Vector	Q4Position()		{ return fQ4Position; }

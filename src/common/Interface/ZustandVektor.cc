@@ -5,8 +5,6 @@
 
 ZustandVektor::ZustandVektor()
 {
-  miceMemory.addNew( Memory::ZustandVektor );
-	
   _xLorentz.set(0.,0.,0.,0.);
   _pLorentz.set(0.,0.,0.,0.);
   _matrix = HepSymMatrix(8,0); // 8x8 initialized to zero
@@ -16,8 +14,6 @@ ZustandVektor::ZustandVektor()
 
 ZustandVektor::ZustandVektor( MCHit* aHit)
 {
-  miceMemory.addNew( Memory::ZustandVektor );
-  
   SetPosition(aHit->position());
   SetTime(aHit->time());
   SetMomentum(aHit->momentum());

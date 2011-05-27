@@ -17,15 +17,12 @@
 #include "Interface/MCHit.hh"
 #include <iostream>
 
-#include "Interface/Memory.hh"
 
 class SpecialHit : public MCHit
 {
   public:
 
       SpecialHit();
-
-      ~SpecialHit()		{ miceMemory.addDelete( Memory::SpecialHit ); };
 
       SpecialHit(const SpecialHit&);
 

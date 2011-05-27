@@ -31,7 +31,6 @@
 #include "G4ParticleDefinition.hh"
 #include "G4Event.hh"
 #include "Randomize.hh"
-#include "Simulation/MICEBGPlane.hh"
 #include "Config/MiceModule.hh"
 #include "Config/ModuleConverter.hh"
 #include "CLHEP/Matrix/SymMatrix.h"
@@ -86,7 +85,6 @@ private:
   //RF background ///////////////////
   bool hasRF;
   G4bool fRF_BACKGROUND_ON;
-  std::vector<MICEBGPlane*> bgGuns;
   G4ParticleGun* rfElectronGun;
   G4ParticleGun* rfPhotonGun;
   BeamParameters* fBP;

@@ -11,8 +11,6 @@
 #include "Interface/MICERun.hh"     
 #include "Interface/dataCards.hh"     
 
-#include "Interface/Memory.hh" 
-
 void makeVlpcCable( MICERun* );
 
 #endif

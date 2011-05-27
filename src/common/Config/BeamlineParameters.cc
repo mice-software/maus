@@ -8,8 +8,6 @@
 #include "Interface/dataCards.hh"
 
 BeamlineParameters::BeamlineParameters() {
-  miceMemory.addNew( Memory::BeamlineParameters ); 
-	
   fBeamlineMaterial	= MyDataCards.fetchValueString("BeamlineMaterial");
   fQ35FieldLength	= MyDataCards.fetchValueDouble("Q35FieldLength");
   fQ35IronLength	= MyDataCards.fetchValueDouble("Q35IronLength");

@@ -17,15 +17,11 @@
 #include <cstdio>
 #include <cstdlib>
 
-#include "Interface/Memory.hh" 
-
 class TofCable
 {
   public :
 
     TofCable( std::string );
-    ~TofCable() 	{ miceMemory.addDelete( Memory::TofCable ); };
-    
     int			variables() const 		{ return numVariables; };
 
     int			modType      ( int i ) const	{ return moduleType[i]; };

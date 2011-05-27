@@ -10,8 +10,6 @@
 #include <string>
 #include "CLHEP/Units/SystemOfUnits.h"
 
-#include "Interface/Memory.hh"
-
 class CoolingChannelGeom {
 public:
   std::string  fFieldTrackStepper;
@@ -48,7 +46,6 @@ public:
 
   static CoolingChannelGeom* getInstance();
   CoolingChannelGeom();
-  ~CoolingChannelGeom()		{ miceMemory.addDelete( Memory::CoolingChannelGeom ); }; 
 
   std::string  FieldTrackStepper()      { return fFieldTrackStepper; }
   double  DeltaOneStep()                { return fDeltaOneStep; }

@@ -2,7 +2,7 @@
 //
 // Code to read in latest decoding format from Hideyuki for debugging tracker 1 readout
 //
-// M.Ellis October 2008
+// October 2008
 
 #ifndef VLPCCABLEOSAKA2_HH
 #define VLPCCABLEOSAKA2_HH
@@ -17,8 +17,6 @@
 
 #include "CLHEP/Units/SystemOfUnits.h"
 #include "Config/VlpcCable.hh"     
-
-#include "Interface/Memory.hh" 
 
 class VlpcCableOsaka2: public VlpcCable
 {

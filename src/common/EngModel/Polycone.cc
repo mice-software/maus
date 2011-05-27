@@ -1,7 +1,6 @@
 //
 // Polycone class reads in a file of doubles and creates a polycone
 //
-// Chris Rogers
 
 #include "EngModel/Polycone.hh"
 #include "Interface/Squeal.hh"
@@ -14,8 +13,6 @@ const double Polycone::_phiEnd = 360*degree;
 //Constructor with only one material
 Polycone::Polycone(MiceModule *theModule) : _zCoordinates(NULL), _rInner(NULL), _rOuter(NULL)
 {
-	miceMemory.addNew( Memory::Polycone ); 
-	
 	std::string fileName = theModule->propertyStringThis("FileName");
 
         std::string fullFileName = replaceVariables( fileName );
@@ -38,8 +35,6 @@ Polycone::Polycone() : _zCoordinates(NULL), _rInner(NULL), _rOuter(NULL)
 
 Polycone::~Polycone()
 {
-	miceMemory.addDelete( Memory::Polycone ); 
-	
 	if(_zCoordinates!= NULL) delete [] _zCoordinates;
 	if(_rInner!= NULL) delete [] _rInner;
 	if(_rOuter!= NULL) delete [] _rOuter;

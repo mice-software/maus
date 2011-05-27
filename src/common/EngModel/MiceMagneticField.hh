@@ -9,15 +9,13 @@
 #include "BeamTools/BTFieldConstructor.hh"
 #include "G4MagneticField.hh"
 
-#include "Interface/Memory.hh" 
-
 class MiceMagneticField : public G4MagneticField
 {
 public:
 	MiceMagneticField(BTFieldConstructor * theField) : _magField(theField->GetMagneticField())
-	{ miceMemory.addNew( Memory::MiceMagneticField); };
+  {};
 
-	MiceMagneticField()	{ miceMemory.addDelete( Memory::MiceMagneticField ); }; 
+  MiceMagneticField()	{};
 	
 	//BUG - should be inlined!
 	void GetFieldValue(const double Point[4], double * bfield) const

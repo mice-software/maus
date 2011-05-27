@@ -34,7 +34,6 @@ SpecialVirtualSD::SpecialVirtualSD(MICEEvent * _event, MiceModule * mod )
                    _steppingThrough(true), _steppingInto(true), _steppingOutOf(true), _steppingAcross(true),
                    _localRotation(), _globalRotation(), _localPosition(), _globalPosition()
 {
-  miceMemory.addNew( Memory::SpecialVirtualSD ); 
   _module = mod;
   simEvent = _event;
   _tname = _module->fullName() + intToString(_uniqueID);
@@ -90,11 +89,6 @@ void SpecialVirtualSD::SetStepping(bool SteppingThrough, bool SteppingInto, bool
   _steppingAcross  = SteppingAcross;
 }
 
-SpecialVirtualSD::~SpecialVirtualSD()
-{
-  //  delete _cellID;
-  miceMemory.addDelete( Memory::SpecialVirtualSD ); 
-}
 
 void SpecialVirtualSD::Initialize(G4HCofThisEvent* HCE)
 {
@@ -102,22 +96,6 @@ void SpecialVirtualSD::Initialize(G4HCofThisEvent* HCE)
 
   if( HCE ) ;
 
-/*
-        int id = idFromName();
-
-  if(id < 0)
-    {
-      cerr << "SpecialVirtualSD::Initialize : cant find type " <<
-        _tname.c_str() << endl;
-      abort();
-    }
-
-  for( int iz=0; iz<_numberCellsInZ; iz++)
-    for( int iphi=0; iphi<_numberCellsInPhi; iphi++)
-      for( int ir = 0; ir<_numberCellsInR; ir++)
-        {  _cellID[index(iz, iphi, ir)] = -1;
-        }
-*/
 }
 
 G4bool SpecialVirtualSD::ProcessHits(G4Step* aStep, G4TouchableHistory*
@@ -226,16 +204,7 @@ int  SpecialVirtualSD::index(int iz, int iphi, int ir)
 {   int indx = iz + _numberCellsInZ*(iphi + _numberCellsInPhi*ir);
     return indx;
 }
-/*
-bool SpecialVirtualSD::isSpecial(G4String& vn) const
-{   const char *vnc = vn.c_str();
 
-  if(vnc[0] != 'S' && vnc[0] != 's') return false;
-  if(vnc[1] != 'P' && vnc[1] != 'p') return false;
-  if(vnc[2] != 'E' && vnc[2] != 'e') return false;
-  return true;
-}
-*/
 void SpecialVirtualSD::clear()  {}
 
 void SpecialVirtualSD::DrawAll() {}

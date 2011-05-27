@@ -13,8 +13,6 @@ using CLHEP::Hep3Vector;
 
 #include <string>
 
-#include "Interface/Memory.hh" 
-
 /**	class BeamlineParameters defines the parameters for the beamline
 	Only the portion of the beamline implemented in MICE is included;
 	that is, Q4 - Q9, and detectors within them.
@@ -51,7 +49,6 @@ public:
 public:
 	static BeamlineParameters* getInstance();
 	BeamlineParameters();
-	~BeamlineParameters()	{ miceMemory.addDelete( Memory::BeamlineParameters ); };
 	
 	std::string	BeamlineMaterial()	{ return fBeamlineMaterial; }
 	double	Q35FieldLength()	{ return fQ35FieldLength; }

@@ -2,8 +2,7 @@
 //
 // Class that describes the shape, size, position, orientation and other properties of a module of the MICE experiment,
 // or a subcomponent.
-//
-// 15/5/2006 M.Ellis
+// 2006
 
 #include <cstdlib>
 #include <sstream>

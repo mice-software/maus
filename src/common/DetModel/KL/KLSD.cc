@@ -19,15 +19,8 @@
 
 KLSD::KLSD( MICEEvent* event, MiceModule* mod ) : G4VSensitiveDetector( mod->fullName() )
 {
-  miceMemory.addNew( Memory::KLSD );
-	
   _event = event;
   _module = mod;
-}
-
-KLSD::~KLSD()
-{
-  miceMemory.addDelete( Memory::KLSD );
 }
 
 void KLSD::Initialize(G4HCofThisEvent* HCE)

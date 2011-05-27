@@ -19,7 +19,6 @@
 #include "CLHEP/Geometry/Transform3D.h"
 
 #include "Interface/MICEUnits.hh"
-#include "Interface/Memory.hh" 
 
 #include "Config/ModuleTextFileIO.hh"
 

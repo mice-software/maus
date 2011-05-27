@@ -19,8 +19,6 @@
 #include "CLHEP/Units/SystemOfUnits.h"
 #include "Config/VlpcCable.hh"     
 
-#include "Interface/Memory.hh" 
-
 class ViewCable
 {
   public :
@@ -70,8 +68,6 @@ class VlpcCableOsaka: public VlpcCable
    VlpcCableOsaka( std::string );
 
    VlpcCableOsaka( std::string, bool );
-
-   ~VlpcCableOsaka() { miceMemory.addDelete( Memory::VlpcCableOsaka ); };
 
    int			cassettes() const 			{ return numCassettes; };
    int			cassetteNum( int i ) const		{ return cassette[i]; };

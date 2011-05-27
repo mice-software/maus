@@ -3,7 +3,7 @@
 // Code to read in the connection information to allow the decoding of hit information
 // from channel space (AFE board, MCM, channel) into physical space (station, plane, fibre)
 //
-// M.Ellis 28/8/2005
+// 28/8/2005
 
 #include "Config/VlpcCableOsaka.hh"
 #include "Config/tmUtil.hpp"
@@ -65,7 +65,6 @@ StationCable::StationCable( std::ifstream& inf )
 
 VlpcCableOsaka::VlpcCableOsaka( std::string cable_file )
 {
-  miceMemory.addNew( Memory::VlpcCableOsaka ); 
   // first get the environment variable MICEFILES as this is where the model files are kept
 
   char* MICEFILES = getenv( "MICEFILES" );
@@ -143,7 +142,6 @@ VlpcCableOsaka::VlpcCableOsaka( std::string cable_file )
 
 VlpcCableOsaka::VlpcCableOsaka( std::string cable_file, bool o )
 {
-  miceMemory.addNew( Memory::VlpcCableOsaka ); 
   // first get the environment variable MICEFILES as this is where the model files are kept
 
   char* MICEFILES = getenv( "MICEFILES" );

@@ -9,7 +9,6 @@
 
 CoolingChannelGeom::CoolingChannelGeom()
 {
-  miceMemory.addNew( Memory::CoolingChannelGeom ); 
   //Stepping parameters
   fDeltaOneStep          = MyDataCards.fetchValueDouble("DeltaOneStep");
 	fDeltaIntersection     = MyDataCards.fetchValueDouble("DeltaIntersection");

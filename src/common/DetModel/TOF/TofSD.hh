@@ -1,14 +1,12 @@
 /*
 ** MICE Time-of-Flight detector for the MICE proposal
-** Steve Kahn - 14 Sep, 2002
+** 14 Sep, 2002
 */
 #ifndef _TOFSD_HH_
 #define _TOFSD_HH_ 1
 
 #include "DetModel/MAUSSD.h"
 #include "G4VSensitiveDetector.hh"
-#include "Interface/Memory.hh"
-
 #include <json/json.h>
 #include <string>
 

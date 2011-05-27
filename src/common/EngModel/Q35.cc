@@ -33,7 +33,6 @@ Q35::Q35(
 	fQ35CoilHalfwidth(CoilHalfwidth),
 	fQ35IronMaterial(IronMaterial)
 {
-  miceMemory.addNew( Memory::Q35 );
 }
 
 G4LogicalVolume *Q35::buildQ35()

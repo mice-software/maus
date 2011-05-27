@@ -10,8 +10,6 @@
 #include <string>
 #include "CLHEP/Units/SystemOfUnits.h"
 
-#include "Interface/Memory.hh"
-
 class RFBackgroundParameters 
 {
 public:

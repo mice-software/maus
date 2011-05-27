@@ -8,8 +8,6 @@
 
 #include "Interface/MCHit.hh"
 
-#include "Interface/Memory.hh"
-
 /**
 * CkoviHit is a description of a simulated hit in  the aerogel radiator of the CKOV detector
 **/
@@ -19,10 +17,10 @@ class CkovHit : public MCHit
   public:
 
       //! Default constructor
-      CkovHit()		{ miceMemory.addNew( Memory::CkovHit ); };
+  CkovHit()		{};
 
       //! Default destructor
-     ~CkovHit()		{ miceMemory.addDelete( Memory::CkovHit ); };
+  ~CkovHit()		{};
 
       //! Copy constructor
       CkovHit(const CkovHit&);

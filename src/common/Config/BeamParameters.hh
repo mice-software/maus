@@ -2,15 +2,12 @@
 //
 //  MICE beam parameters
 //
-//  Yagmur Torun 
 
 #ifndef BEAMPARAMETERS_H
 #define BEAMPARAMETERS_H 1
 
 #include <string>
 #include "CLHEP/Units/SystemOfUnits.h"
-
-#include "Interface/Memory.hh" 
 
 class BeamParameters {
 
@@ -50,8 +47,6 @@ class BeamParameters {
 public:
 
   static BeamParameters* getInstance();
-  BeamParameters();
-  ~BeamParameters() 		{ miceMemory.addDelete( Memory::BeamParameters ); };  
   int RandomSeed() {return 0;}
   int RandomSeed( int eventNumber) {return eventNumber;}
   

@@ -15,8 +15,6 @@ DoubletFiberParam::DoubletFiberParam(
 		G4double pOuterDiameter, G4double pInnerDiameter,
 		G4double pFiberDiameter, G4double pFiberPitch)
 {
-  	miceMemory.addDelete( Memory::DoubletFiberParam );
-	
 	sensitiveRadius = pSensitiveRadius;
 	activeRadius = pActiveRadius;
 	outerDiameter = pOuterDiameter;
@@ -27,10 +25,7 @@ DoubletFiberParam::DoubletFiberParam(
 	coreRotation = new G4RotationMatrix(CLHEP::HepRotationX(90.0*deg)); 
 }
 
-DoubletFiberParam::~DoubletFiberParam()
-{
-  miceMemory.addDelete( Memory::DoubletFiberParam );
-}
+
 
 void DoubletFiberParam::ComputeTransformation
 (const G4int copyNo, G4VPhysicalVolume* physVol) const

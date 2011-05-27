@@ -14,8 +14,6 @@
 
 TofCable::TofCable( std::string file )
 {
-  miceMemory.addNew( Memory::TofCable ); 	
-	
   // first get the environment variable MICEFILES as this is where the model files are kept
   char* MICEFILES = getenv( "MICEFILES" );
 

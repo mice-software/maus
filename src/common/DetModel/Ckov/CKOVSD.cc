@@ -22,16 +22,11 @@
 
 CkovSD::CkovSD( MICEEvent* event, MiceModule* mod, bool dEdxCut ) : G4VSensitiveDetector( mod->fullName() )
 {
-  miceMemory.addNew( Memory::CKOVSD );
   _dEdxCut = dEdxCut;
   _event   = event;
   _module  = mod;
 }
 
-CkovSD::~CkovSD()
-{
-  miceMemory.addDelete( Memory::CKOVSD );
-}
 
 void CkovSD::Initialize(G4HCofThisEvent* HCE)
 {

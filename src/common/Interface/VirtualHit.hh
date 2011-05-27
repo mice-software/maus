@@ -13,8 +13,6 @@
 #include <fstream>
 #include <string>
 
-#include "Memory.hh"
-
 #include "MCHit.hh"
 
 typedef Hep3Vector  ThreeVector;
@@ -33,7 +31,7 @@ class VirtualHit : public MCHit
 
     VirtualHit();
 
-    ~VirtualHit() 		{ miceMemory.addDelete( Memory::VirtualHit); };
+  ~VirtualHit() 	{};
 
     void SetTrackID   (int tid)        { setTrackID( tid ); }
     void SetStationNumber (int sn)         { _stationNumber = sn; }

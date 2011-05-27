@@ -2,7 +2,6 @@
 //
 //  MICE RF parameters
 //
-//  Yagmur Torun
 
 #ifndef RFPARAMETERS_H
 #define RFPARAMETERS_H 1
@@ -10,8 +9,6 @@
 #include <string>
 #include <vector>
 #include "CLHEP/Units/SystemOfUnits.h"
-
-#include "Interface/Memory.hh" 
 
 class RFParameters {
 
@@ -53,7 +50,6 @@ public:
 
   static RFParameters* getInstance();
   RFParameters();
-  ~RFParameters() 	{ miceMemory.addDelete( Memory::RFParameters ); }; 
   
   double  rfAccelerationPhase()  { return frfAccelerationPhase; }
   double  opticsRfFrequency()    { return frfFrequency; }

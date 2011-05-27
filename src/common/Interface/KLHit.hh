@@ -18,8 +18,6 @@
 #include <vector>
 #include "CLHEP/Vector/ThreeVector.h"
 
-#include "Interface/Memory.hh"
-
 #include <iostream>
 
 #include "Interface/MCHit.hh"

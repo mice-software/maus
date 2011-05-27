@@ -13,16 +13,6 @@
 RFBackgroundParameters::RFBackgroundParameters()
 {
   SetRFBackgroundParameters();
-  miceMemory.addNew( Memory::RFBackgroundParameters );
-}
-
-///////////////////////////////////////////////////////////////////////
-
-RFBackgroundParameters::~RFBackgroundParameters()
-{
-
-  miceMemory.addDelete( Memory::RFBackgroundParameters );
-
 }
 
 

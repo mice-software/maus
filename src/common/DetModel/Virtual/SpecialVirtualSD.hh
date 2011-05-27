@@ -1,7 +1,7 @@
 //-----------------------------------------------------------------------------
 /*
 ** MICE Special Virtual detector for the MICE proposal
-** Steve Kahn - 12 Aug 2003
+** 12 Aug 2003
 */
 //-----------------------------------------------------------------------------
 
@@ -12,9 +12,6 @@
 #include "Interface/SpecialHit.hh"
 #include "Config/MiceModule.hh"
 #include "Interface/MICEEvent.hh"
-//#include "BeamTools/BTPhaser.hh"
-
-#include "Interface/Memory.hh" 
 
 class G4Step;
 class G4HCofThisEvent;
@@ -22,12 +19,9 @@ class G4HCofThisEvent;
 class SpecialVirtualSD : public G4VSensitiveDetector
 {
   public:
-      //SpecialVirtualSD(G4String tname);
       SpecialVirtualSD(MICEEvent* , MiceModule* );
 
-     ~SpecialVirtualSD();
-
-      void Initialize(G4HCofThisEvent*);
+  void Initialize(G4HCofThisEvent*);
       G4bool ProcessHits(G4Step*, G4TouchableHistory*);
       void EndOfEvent(G4HCofThisEvent*);
       void clear();

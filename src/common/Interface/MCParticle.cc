@@ -4,13 +4,11 @@
 
 MCParticle::MCParticle()
 {
-  miceMemory.addNew( Memory::MCParticle );
   _points.resize(0);
 }
 
 MCParticle::MCParticle( int trackid, double charge, int pdg, double mass, double ike, double fke, Hep3Vector ipos, Hep3Vector fpos, Hep3Vector imom, Hep3Vector fmom, double it, double ft , bool isRef)
 {
-  miceMemory.addNew( Memory::MCParticle );
   
   m_trackID = trackid;
   m_charge = charge;

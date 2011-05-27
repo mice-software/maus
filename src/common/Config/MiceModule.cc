@@ -22,7 +22,6 @@ const int MiceModule::precision = 100;
 MiceModule::MiceModule( std::string filename )
           : _isroot(true), _mother(NULL), _rotation()
 {
-  miceMemory.addNew( Memory::MiceModule ); 
   addPropertyString("Volume",  "Box");
   ModuleTextFileIO io(filename);
   *this = *io.getModule();
@@ -32,13 +31,11 @@ MiceModule::MiceModule( std::string filename )
 MiceModule::MiceModule( )
           : _isroot(true), _name(""), _mother(NULL), _rotation()
 {
-  miceMemory.addNew( Memory::MiceModule ); 
 }
 
 MiceModule::MiceModule( MiceModule* parent, std::string name )
           : _isroot(parent==NULL), _name(name), _mother(parent), _rotation()
 {
-  miceMemory.addNew( Memory::MiceModule ); 
   if(isRoot()) addPropertyString("Volume",  "Box");
 }
 
@@ -106,8 +103,6 @@ void	MiceModule::checkNames()
 
 MiceModule::~MiceModule()
 {
-  miceMemory.addDelete( Memory::MiceModule ); 
-	
   for( unsigned int i = 0; i < _daughters.size(); ++i )
     delete _daughters[i];
 }

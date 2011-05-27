@@ -18,7 +18,6 @@
 #include "CLHEP/Units/SystemOfUnits.h"
 #include "Config/VlpcCable.hh"     
 #include "Config/VlpcCableOsaka2.hh"
-#include "Interface/Memory.hh" 
 
 class VlpcCableOsaka3: public VlpcCable
 {

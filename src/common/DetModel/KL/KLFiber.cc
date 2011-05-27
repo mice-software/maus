@@ -27,8 +27,6 @@
 
 KLFiber::~KLFiber()
 {
-  miceMemory.addDelete( Memory::KLFiber ); 
-	
   if(fSolidFiber)       delete fSolidFiber;
   if(fLogicFiber)       delete fLogicFiber;
 }
@@ -39,8 +37,6 @@ KLFiber::~KLFiber()
 //
 KLFiber::KLFiber(MiceModule* mod, G4Material* mater, G4VPhysicalVolume *mlv )
 {
-  miceMemory.addNew( Memory::KLFiber ); 
-  
   G4double zStart, zStep, z, yStart, yStep, y;
 
 //   G4double cellX = mod->dimensions().x();

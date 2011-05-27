@@ -26,8 +26,6 @@ SciFiPlane - Specific parameterisation of the SciFi station to be called by the 
 
 SciFiPlane::SciFiPlane( MiceModule* mod, G4Material* mater, G4VPhysicalVolume *mlv )
 {
-  miceMemory.addNew( Memory::SciFiPlane ); 
-	
   G4double tr = mod->dimensions().x();
   G4double fd = mod->propertyDouble( "FibreDiameter" );
   G4double fp = mod->propertyDouble( "Pitch" );
@@ -66,8 +64,6 @@ SciFiPlane::SciFiPlane( MiceModule* mod, G4Material* mater, G4VPhysicalVolume *m
 
 SciFiPlane::~SciFiPlane()
 {
-  	miceMemory.addDelete( Memory::SciFiPlane ); 
-	
 	delete solidDoublet;
 	delete logicDoublet;
 	delete physiDoublet;
