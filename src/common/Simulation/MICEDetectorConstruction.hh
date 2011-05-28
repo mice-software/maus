@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // @(#) $Id: MICEDetectorConstruction.hh,v 1.28 2009-08-25 13:32:08 rogers Exp $  $Name:  $
 //
 //  Super-FOFO channel based on Neutrino Factory Feasibility Study II

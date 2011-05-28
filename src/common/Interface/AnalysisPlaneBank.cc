@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 
 #include <fstream>
 #include "Interface/AnalysisPlaneBank.hh"

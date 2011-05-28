@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 /*
 SciFiPlane - Specific parameterisation of the SciFi station to be called by the generic MICE detector construction code
 */

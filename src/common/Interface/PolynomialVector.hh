@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // Copyright 2010-2011 Chris Rogers
 // 
 // This file is a part of G4MICE

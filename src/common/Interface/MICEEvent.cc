@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // @(#) $Id: MICEEvent.cc,v 1.12 2010-03-08 16:39:02 rogers Exp $ $Name:  $
 // Definition of struct MICEEvent
 // Struct to encapsulate hits/digits/recon in a G4Mice event

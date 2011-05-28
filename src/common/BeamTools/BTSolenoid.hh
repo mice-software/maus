@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // @(#) $Id: BTSolenoid.hh,v 1.18 2008-02-29 15:01:41 rogers Exp $  $Name:  $
 //
 // ********************************************************************

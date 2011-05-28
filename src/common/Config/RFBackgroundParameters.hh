@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // @(#) $Id: RFBackgroundParameters.hh,v 1.9 2006-11-03 20:01:57 hart Exp $  $Name:  $
 //
 //  MICE RF parameters

@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #include "CLHEP/Matrix/SymMatrix.h"
 #include "Interface/MCHit.hh"
 #include "Config/MiceModule.hh"

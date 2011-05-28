@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 //Created November 2004 Chris Rogers
 
 #include <vector>

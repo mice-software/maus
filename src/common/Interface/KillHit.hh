@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // KillHit.hh
 
 #ifndef INTERFACE_KILLHIT_HH

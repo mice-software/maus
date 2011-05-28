@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 //! Data Cards : clone from Geant3 data cards, except:
 //! Only user data cards: i.e. specific to the problem.
 //! No generic and mysterious "geom" array. One must define

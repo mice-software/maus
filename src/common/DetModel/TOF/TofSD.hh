@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 /*
 ** MICE Time-of-Flight detector for the MICE proposal
 ** 14 Sep, 2002

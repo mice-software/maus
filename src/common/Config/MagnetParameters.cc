@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // @(#) $Id: MagnetParameters.cc,v 1.12 2009-12-10 09:18:06 rogers Exp $  $Name:  $
 //
 //  MICE magnetic lattice parameters

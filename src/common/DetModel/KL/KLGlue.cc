@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #include "DetModel/KL/KLGlue.hh"
 
 #include "G4Material.hh"

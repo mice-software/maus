@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #include "Interface/MagFieldMap.hh"
 #include "Interface/SplineInterpolator.hh"
 #include "Interface/Squeal.hh"

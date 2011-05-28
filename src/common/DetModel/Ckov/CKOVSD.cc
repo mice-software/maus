@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 /* CKOVSD.cc
 */
 #include "DetModel/Ckov/CKOVSD.hh"

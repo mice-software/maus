@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 using namespace std;
 
 #include "BTFieldGroup.hh"

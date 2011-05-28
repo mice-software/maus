@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // MICEUnits.hh
 //
 // Set units for MICE datacards from the datacard input file

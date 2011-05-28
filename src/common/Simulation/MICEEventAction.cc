@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #include "Simulation/MICEEventAction.hh"
 #include "Config/BeamParameters.hh"
 #include "G4Event.hh"

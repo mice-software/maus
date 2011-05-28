@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 //
 // Polycone class reads in a file of doubles and creates a polycone
 //

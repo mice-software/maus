@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 //-----------------------------------------------------------------------------
 /*
 ** MICE special virual detector for the MICE proposal

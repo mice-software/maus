@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #ifndef TriangularMesh_hh
 #define TriangularMesh_hh
 

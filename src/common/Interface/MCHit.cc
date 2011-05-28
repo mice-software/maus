@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // MCHit.cc
 
 #include "Interface/MCHit.hh"

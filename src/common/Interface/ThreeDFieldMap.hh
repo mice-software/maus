@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #ifndef ThreeDFieldMap_hh
 #define ThreeDFieldMap_hh
 

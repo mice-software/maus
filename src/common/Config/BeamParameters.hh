@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // @(#) $Id: BeamParameters.hh,v 1.12 2010-03-10 08:14:10 rogers Exp $  $Name:  $
 //
 //  MICE beam parameters

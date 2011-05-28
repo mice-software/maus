@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // FillMaterials.cc
 //
 // Code to create G4Material instances for each material needed in MICE and store them in the MiceMaterial object

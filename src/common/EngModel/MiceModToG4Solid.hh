@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #ifndef MiceModToG4Solid_hh
 #define MiceModToG4Solid_hh 1
 

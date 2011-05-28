@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #ifdef G4VIS_USE
 
 #include "Simulation/MICEVisManager.hh"

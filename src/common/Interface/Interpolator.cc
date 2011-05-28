@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #include "Interface/Interpolator.hh"
 #include "Interface/Spline1D.hh"
 #include "Interface/MVector.hh"

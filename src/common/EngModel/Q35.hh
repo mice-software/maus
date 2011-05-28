@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // @(#) $Id: Q35.hh,v 1.6 2006-11-03 20:01:09 hart Exp $  $Name:  $
 //
 // Q35 - implement a Q35 quadrupole magnet

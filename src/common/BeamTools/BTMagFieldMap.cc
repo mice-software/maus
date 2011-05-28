@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // @(#) $Id: BTMagFieldMap.cc,v 1.26 2010-03-08 09:50:21 rogers Exp $  $Name:  $
 // Gutted and rewritten by CTR, October 2005
 

@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // @(#) $Id: MICEPrimaryGeneratorAction.hh,v 1.36 2010-09-17 09:50:31 rogers Exp $  $Name:  $
 // Primary generator for MICE
 // Yagmur Torun

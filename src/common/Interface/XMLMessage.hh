@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // XMLMessage.hh
 //
 // Interface to handle the XML messages that will travel between G4MICE and the Configuration DB's API

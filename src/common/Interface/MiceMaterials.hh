@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // MiceMaterials.hh
 //
 // A map of G4Material pointers to strings which can be accessed through the MICE Run for use in the

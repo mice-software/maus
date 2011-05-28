@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #include "TofSD.hh"
 #include "Interface/dataCards.hh"
 #include <G4StepStatus.hh>

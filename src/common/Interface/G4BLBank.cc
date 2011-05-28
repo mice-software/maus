@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #include <stdio.h>
 #include <fstream>
 #include "CLHEP/Vector/ThreeVector.h"

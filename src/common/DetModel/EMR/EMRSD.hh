@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #ifndef EMRSD_h
 #define EMRSD_h 1
 // MAUS

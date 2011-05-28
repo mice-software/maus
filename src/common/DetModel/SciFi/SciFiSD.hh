@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #ifndef SciFiSD_h
 #define SciFiSD_h 1
 

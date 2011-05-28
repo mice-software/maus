@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // MCParticle.cc
 
 #include "Interface/MCParticle.hh"

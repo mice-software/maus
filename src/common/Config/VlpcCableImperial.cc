@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 /**
  * @author      Takashi Matsushita
  * @date        $Date: 2007-05-29 01:55:09 $

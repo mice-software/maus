@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #include <vector>
 #include <fstream>
 #include <iostream>

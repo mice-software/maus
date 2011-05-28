@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // MICEUnits.cc
 
 #include "Interface/MICEUnits.hh"

@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // VlpcCable.hh
 //
 // Code to read in the connection information to allow the decoding of hit information

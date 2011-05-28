@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 /* CKOVSD.hh
 */
 #ifndef CKOVSD_h

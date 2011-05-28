@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 //	Q35.cc
 
 #include "G4Tubs.hh"

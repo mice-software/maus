@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #include "BTField.hh"
 #include "Interface/Differentiator.hh"
 #include "Interface/Interpolator.hh"

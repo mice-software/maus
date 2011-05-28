@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 /*
  * Conical Mirror for Upstream Cherenckov
  * 

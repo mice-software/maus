@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 //BTField is the parent of all fields in the beamtools package
 //Abstract Base Class
 //Has simply a GetFieldValue method

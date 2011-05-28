@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #include "Interface/PolynomialVector.hh"
 #include "Interface/Squeal.hh"
 #include "Interface/MMatrix.hh"

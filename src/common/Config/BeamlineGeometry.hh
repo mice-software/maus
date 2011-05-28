@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // @(#) $Id: BeamlineGeometry.hh,v 1.4 2008-03-20 17:04:27 torun Exp $  $Name:  $
 //
 //  MICE beamline geometry parameters

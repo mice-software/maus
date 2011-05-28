@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #include "BTConstantField.hh"
 
 BTConstantField::BTConstantField(double length, double radius, CLHEP::Hep3Vector field) 

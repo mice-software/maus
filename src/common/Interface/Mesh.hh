@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #ifndef Mesh_hh
 #define Mesh_hh
 

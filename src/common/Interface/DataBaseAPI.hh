@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // DataBaseAPI.hh
 //
 // Interface to handle the network connection to the Configuration Database API

@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // @(#) $Id: MICEDetectorConstruction.cc,v 1.98 2010-09-03 10:07:22 rogers Exp $  $Name:  $
 //
 // International Muon Ionization Cooling Experiment setup based on

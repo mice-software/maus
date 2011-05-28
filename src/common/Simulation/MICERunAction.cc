@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #include "Simulation/MICERunAction.hh"
 #include "G4Event.hh"
 #include "G4EventManager.hh"

@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #include "Simulation/MICESteppingAction.hh"
 #include "G4SteppingManager.hh"
 #include "G4TransportationManager.hh"

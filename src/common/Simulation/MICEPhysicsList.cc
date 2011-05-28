@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #include "globals.hh"
 
 #include "G4UImanager.hh"

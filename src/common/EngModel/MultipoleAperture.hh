@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 //Multipole aperture
 //Currently - builds a box inside another box, with straight or curved geometry
 //Eventually - add arbitrary number of poles and square or circular cross sections

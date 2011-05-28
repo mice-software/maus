@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 /*
 ** Modified example 1 from the GEANT4 distribution to simulate the
 ** MICE scintillating fiber tracker for the MICE proposal

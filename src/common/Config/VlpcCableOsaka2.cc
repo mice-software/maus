@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // VlpcCableOsaka2.cc
 //
 // Code to read in latest decoding format from Hideyuki for debugging tracker 1 readout

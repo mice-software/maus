@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 //Chris Rogers April 05
 //AnalysisEventBank.cc
 //

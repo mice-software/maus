@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 //This file is a part of G4MICE and xboa
 //
 //G4MICE is free software: you can redistribute it and/or modify

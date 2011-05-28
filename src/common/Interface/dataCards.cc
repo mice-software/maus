@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // @(#) $Id: dataCards.cc,v 1.307 2011-05-20 14:28:40 reid Exp $  $Name:  $
 /*
 ** modified from Yagmur Torun's MICE simulation package

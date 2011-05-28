@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #ifndef MICESteppingAction_h
 #define MICESteppingAction_h 1
 

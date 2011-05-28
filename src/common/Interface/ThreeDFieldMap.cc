@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #include "Interface/ThreeDFieldMap.hh"
 #include "Interface/Squeak.hh"
 #include <iostream>

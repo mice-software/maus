@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // @(#) $Id: RFParameters.cc,v 1.18 2010-03-10 08:14:10 rogers Exp $  $Name:  $
 //
 //  MICE RF parameters

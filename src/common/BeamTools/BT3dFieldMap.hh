@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 //block=X row=Z col=Y nX=1 dX=330.2 nY=77 dY=1.0 nZ=1001 dZ=1.0 extendX=1 extendY=1 extendZ=-1 omitBx=1
 
 #ifndef BT3DFIELDMAP_HH

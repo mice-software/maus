@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #ifndef MICEPhysicsList_h
 #define MICEPhysicsList_h 1
 

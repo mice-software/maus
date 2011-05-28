@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 /* Ckovhit.hh
 */
 #ifndef CkovHit_h

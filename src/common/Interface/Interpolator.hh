@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 //Interpolator definitions
 //A robust framework for arbitrary interpolation
 //Thinking about field maps but should be extensible to other interpolation types

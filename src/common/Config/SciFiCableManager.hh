@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // SciFiCableManager.hh
 //
 // Code to allow Datacards to read which SciFiCableType to use, 

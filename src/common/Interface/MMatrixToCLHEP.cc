@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #include "Interface/MMatrixToCLHEP.hh"
 
 #include "CLHEP/Matrix/Matrix.h"

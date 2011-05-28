@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 //
 //  Y.Karadzhov  Sep 2010
 //

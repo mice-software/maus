@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #include <cmath>
 #include "Interface/Squeal.hh"
 #include "Interface/RFFieldMap.hh"

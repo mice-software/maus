@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // @(#) $Id: EventLoader.hh,v 1.1 2004-11-28 22:48:41 torun Exp $ $Name:  $
 // Declaration of abstract class EventLoader
 

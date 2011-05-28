@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 //RFFieldMap
 //Revamped pill box class to use new slick phasing
 

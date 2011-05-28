@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // @(#) $Id: CoolingChannelGeom.hh,v 1.7 2006-11-03 20:01:57 hart Exp $  $Name:  $
 //
 //  MICE magnetic lattice parameters

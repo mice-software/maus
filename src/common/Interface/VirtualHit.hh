@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #ifndef _VIRTUALHIT_HH_
 #define _VIRTUALHIT_HH_
 //----------------------------------------------------------------------------

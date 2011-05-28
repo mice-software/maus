@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #ifndef Differentiator_hh
 #define Differentiator_hh 1
 
