@@ -1,4 +1,3 @@
-#include "Interface/ZustandVektor.hh"
 #include "Config/MiceModule.hh"
 #include "Interface/Squeal.hh"
 #include "Config/ModuleConverter.hh"
