@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 /*
 ** Modified example 1 from the GEANT4 distribution to simulate the
 ** MICE scintillating fiber tracker for the MICE proposal
@@ -9,8 +10,6 @@
 #include "G4RotationMatrix.hh"
 #include "globals.hh"
 #include "G4VPVParameterisation.hh"
-
-#include "Interface/Memory.hh" 
 
 class G4VPhysicalVolume;
 class G4Tubs;
@@ -25,9 +24,6 @@ public:
 	//! Constructor taking the parameters that define the doublet planes
 	DoubletFiberParam(G4double, G4double, G4double, G4double, G4double, 
 			  G4double);
-
-	//! Default destructor
-	virtual ~DoubletFiberParam();
 
 	//! Calculate the transformations needed to instantiate an instance of the SciFi doublet in a certain G4 physical volume
 	void ComputeTransformation (const G4int copyNo,

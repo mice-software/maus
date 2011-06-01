@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #include "Interface/Squeal.hh"
 #include "Interface/Mesh.hh"
 #include "Interface/Interpolator.hh"

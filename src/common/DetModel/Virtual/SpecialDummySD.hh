@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 //
 // ********************************************************************
 // * DISCLAIMER                                                       *
@@ -30,7 +31,7 @@
 
 #include "G4VSensitiveDetector.hh"
 
-#include "Memory.hh" 
+#include "Interface/Memory.hh" 
 
 class G4Step;
 

@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 /**
  * @author      Takashi Matsushita
  * @date        $Date: 2007-05-29 01:55:09 $
@@ -28,8 +29,8 @@
 /*--------------------------------------------------------------------*
  * headers
  *--------------------------------------------------------------------*/
-#include "VlpcCableImperial.hh"
-#include "tmUtil.hpp"
+#include "Config/VlpcCableImperial.hh"
+#include "Config/tmUtil.hpp"
 
 /*====================================================================*
  * implementation
@@ -44,7 +45,6 @@ VlpcCableImperial::VlpcCableImperial(const std::string configFileName)
       : isValid_(false),
         configFileName_(configFileName)
 {
-  miceMemory.addNew( Memory::VlpcCableImperial ); 
   // add the MICEFILES path to the configFileName
 
   configFileName_ = std::string( getenv( "MICEFILES" ) ) + "/Cabling/SciFi/" + configFileName;
@@ -61,7 +61,6 @@ VlpcCableImperial::VlpcCableImperial(const std::string configFileName)
 void
 VlpcCableImperial::setConfigFileName(const std::string& name)
 {
-  miceMemory.addNew( Memory::VlpcCableImperial ); 
   // add the MICEFILES path to the configFileName
 
   configFileName_ = std::string( getenv( "MICEFILES" ) ) + "/Cabling/SciFi/" + name;

@@ -1,10 +1,11 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // @(#) $Id: RFBackgroundParameters.cc,v 1.11 2006-11-03 20:01:57 hart Exp $  $Name:  $
 //
 //  MICE RF parameters
 //
 //  V. Grichine 22.11.02
 
-#include "RFBackgroundParameters.hh"
+#include "Config/RFBackgroundParameters.hh"
 #include "Interface/dataCards.hh"
 
 
@@ -13,16 +14,6 @@
 RFBackgroundParameters::RFBackgroundParameters()
 {
   SetRFBackgroundParameters();
-  miceMemory.addNew( Memory::RFBackgroundParameters );
-}
-
-///////////////////////////////////////////////////////////////////////
-
-RFBackgroundParameters::~RFBackgroundParameters()
-{
-
-  miceMemory.addDelete( Memory::RFBackgroundParameters );
-
 }
 
 

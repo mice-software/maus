@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #include "BTField.hh"
 #include "BTTracker.hh"
 #include "Interface/Squeal.hh"

@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 //PillBox
 //Revamped pill box class to use new slick phasing
 #include "CLHEP/Units/PhysicalConstants.h"

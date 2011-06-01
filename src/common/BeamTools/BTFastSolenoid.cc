@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #include "BeamTools/BTFastSolenoid.hh"
 #include "Interface/Squeak.hh"
 

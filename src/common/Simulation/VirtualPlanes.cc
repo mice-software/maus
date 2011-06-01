@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 /* This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
  *
  * MAUS is free software: you can redistribute it and/or modify
@@ -45,6 +46,7 @@ VirtualPlane::VirtualPlane() {
   _radialExtent   = -1;
   _independentVariable = 0.;
   _globalCoordinates   = false;
+  _multipass = VirtualPlane::ignore;
 }
 
 VirtualPlane VirtualPlane::BuildVirtualPlane(CLHEP::HepRotation rot,

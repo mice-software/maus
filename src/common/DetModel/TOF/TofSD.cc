@@ -1,12 +1,4 @@
-//-----------------------------------------------------------------------------
-//
-//     File :     TofSD.cc
-//     Purpose :  MICE Time-of-Flight detector for the MICE proposal. Sensitive
-//                detector definition.
-//     Created :  14-Sep-2002  by Steve Kahn
-//
-//-----------------------------------------------------------------------------
-
+// MAUS WARNING: THIS IS LEGACY CODE.
 #include "TofSD.hh"
 #include "Interface/dataCards.hh"
 #include <G4StepStatus.hh>

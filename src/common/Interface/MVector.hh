@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 //This file is a part of G4MICE
 //
 //G4MICE is free software: you can redistribute it and/or modify
@@ -38,7 +39,7 @@
 #include <iostream>
 #include <vector>
 
-#include "Squeal.hh"
+#include "Interface/Squeal.hh"
 
 /////////////// Complex Start //////////////////////
 

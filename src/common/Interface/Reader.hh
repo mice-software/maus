@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // Reader.hh
 //
 // Interface for classes that will read data from any source

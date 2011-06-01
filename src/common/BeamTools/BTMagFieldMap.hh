@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 //Gutted and rewritten by CTR, October 2005
 
 #ifndef BTMAGFIELDMAP_HH

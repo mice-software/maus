@@ -1,14 +1,9 @@
-/*
-** Modified example 1 from the GEANT4 distribution to simulate the
-** MICE scintillating fiber tracker for the MICE proposal
-** Ed McKigney - August 21, 2002
-*/
+// MAUS WARNING: THIS IS LEGACY CODE.
 #ifndef SciFiSD_h
 #define SciFiSD_h 1
 
 #include <json/json.h>
 #include "DetModel/MAUSSD.h"
-#include "Interface/SciFiHit.hh"
 
 using namespace MAUS;
 

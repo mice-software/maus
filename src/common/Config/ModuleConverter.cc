@@ -1,7 +1,7 @@
-#include "Interface/ZustandVektor.hh"
-#include "MiceModule.hh"
+// MAUS WARNING: THIS IS LEGACY CODE.
+#include "Config/MiceModule.hh"
 #include "Interface/Squeal.hh"
-#include "ModuleConverter.hh"
+#include "Config/ModuleConverter.hh"
 #include "Interface/Squeak.hh"
 
 #include <sstream>

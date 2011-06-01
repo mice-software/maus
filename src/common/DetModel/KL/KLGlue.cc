@@ -1,4 +1,5 @@
-#include "KLGlue.hh"
+// MAUS WARNING: THIS IS LEGACY CODE.
+#include "DetModel/KL/KLGlue.hh"
 
 #include "G4Material.hh"
 #include "G4Tubs.hh"
@@ -27,8 +28,6 @@
 
 KLGlue::~KLGlue()
 {
-  miceMemory.addDelete( Memory::KLGlue ); 
-  
   if(fSolidGlueStrip)       delete fSolidGlueStrip;
   if(fLogicGlueStrip)       delete fLogicGlueStrip;
 
@@ -42,8 +41,6 @@ KLGlue::~KLGlue()
 //
 KLGlue::KLGlue(MiceModule* mod, G4Material* mater, G4VPhysicalVolume *mlv )
 {
-  miceMemory.addNew( Memory::KLGlue ); 
-	
   G4double zStart, zStep, z, yStart, yStep, y;
 
 //   G4double cellX = mod->dimensions().x();

@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // @(#) $Id: MagnetParameters.hh,v 1.12 2009-12-10 09:18:06 rogers Exp $  $Name:  $
 //
 //  MICE magnetic lattice parameters
@@ -10,8 +11,6 @@
 #include <string>
 #include <vector>
 #include "CLHEP/Units/SystemOfUnits.h"
-
-#include "Interface/Memory.hh" 
 
 class MagnetParameters {
 
@@ -89,7 +88,7 @@ public:
 
   static MagnetParameters* getInstance();
   MagnetParameters();
-  ~MagnetParameters()		{ miceMemory.addDelete( Memory::MagnetParameters ); };
+  ~MagnetParameters(){};
   
   std::string  SolDataFiles() { return fSolDataFiles; }
   std::string  MagneticFieldMap() { return fMagneticFieldMap; }

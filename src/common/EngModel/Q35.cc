@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 //	Q35.cc
 
 #include "G4Tubs.hh"
@@ -13,7 +14,7 @@
 #include "G4Colour.hh"
 #endif
 
-#include "Q35.hh"
+#include "EngModel/Q35.hh"
 
 Q35::Q35(
 	G4Material * BeamlineMaterial,
@@ -33,7 +34,6 @@ Q35::Q35(
 	fQ35CoilHalfwidth(CoilHalfwidth),
 	fQ35IronMaterial(IronMaterial)
 {
-  miceMemory.addNew( Memory::Q35 );
 }
 
 G4LogicalVolume *Q35::buildQ35()

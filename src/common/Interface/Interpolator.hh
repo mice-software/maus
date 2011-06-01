@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 //Interpolator definitions
 //A robust framework for arbitrary interpolation
 //Thinking about field maps but should be extensible to other interpolation types
@@ -11,9 +12,9 @@
 #include <math.h>
 #include <vector>
 
-#include "Squeal.hh"
-#include "Mesh.hh"
-#include "Spline1D.hh"
+#include "Interface/Squeal.hh"
+#include "Interface/Mesh.hh"
+#include "Interface/Spline1D.hh"
 
 #include "gsl/gsl_sf_gamma.h"
 

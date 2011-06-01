@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // @(#) $Id: Polycone.hh,v 1.4 2008-08-08 08:24:43 rogers Exp $  $Name:  $
 //
 // Polycone class reads in a file of doubles and creates a polycone

@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 /* Ckovhit.hh
 */
 #ifndef CkovHit_h
@@ -6,9 +7,7 @@
 #include "CLHEP/Vector/ThreeVector.h"
 #include "CLHEP/Units/SystemOfUnits.h"
 
-#include "MCHit.hh"
-
-#include "Memory.hh"
+#include "Interface/MCHit.hh"
 
 /**
 * CkoviHit is a description of a simulated hit in  the aerogel radiator of the CKOV detector
@@ -19,10 +18,10 @@ class CkovHit : public MCHit
   public:
 
       //! Default constructor
-      CkovHit()		{ miceMemory.addNew( Memory::CkovHit ); };
+  CkovHit()		{};
 
       //! Default destructor
-     ~CkovHit()		{ miceMemory.addDelete( Memory::CkovHit ); };
+  ~CkovHit()		{};
 
       //! Copy constructor
       CkovHit(const CkovHit&);

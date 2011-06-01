@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // VlpcCableOsaka.hh
 //
 // Code to read in the connection information to allow the decoding of hit information
@@ -17,9 +18,7 @@
 #include <sstream>
 
 #include "CLHEP/Units/SystemOfUnits.h"
-#include "VlpcCable.hh"     
-
-#include "Interface/Memory.hh" 
+#include "Config/VlpcCable.hh"     
 
 class ViewCable
 {
@@ -70,8 +69,6 @@ class VlpcCableOsaka: public VlpcCable
    VlpcCableOsaka( std::string );
 
    VlpcCableOsaka( std::string, bool );
-
-   ~VlpcCableOsaka() { miceMemory.addDelete( Memory::VlpcCableOsaka ); };
 
    int			cassettes() const 			{ return numCassettes; };
    int			cassetteNum( int i ) const		{ return cassette[i]; };

@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 //BTSolenoid.cc
 //Solenoid modelling for the G4MICE BeamTools package
 

@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 //TofCable.cc
 //
 //Code to read in the connection information to allow the decoding of hit information 
@@ -8,14 +9,12 @@
 //
 //A.Fish 3rd October 2005
 
- #include "TofCable.hh"
+ #include "Config/TofCable.hh"
 
  #include <iostream>
 
 TofCable::TofCable( std::string file )
 {
-  miceMemory.addNew( Memory::TofCable ); 	
-	
   // first get the environment variable MICEFILES as this is where the model files are kept
   char* MICEFILES = getenv( "MICEFILES" );
 

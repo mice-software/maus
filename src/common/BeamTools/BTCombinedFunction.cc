@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #include "BTCombinedFunction.hh"
 #include "Interface/Squeal.hh"
 #include "Interface/Squeak.hh"

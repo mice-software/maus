@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // @(#) $Id: BeamlineParameters.hh,v 1.5 2008-03-20 17:04:27 torun Exp $  $Name:  $
 //
 //  MICE beam parameters
@@ -12,8 +13,6 @@ using CLHEP::Hep3Vector;
 #include "CLHEP/Units/SystemOfUnits.h"
 
 #include <string>
-
-#include "Interface/Memory.hh" 
 
 /**	class BeamlineParameters defines the parameters for the beamline
 	Only the portion of the beamline implemented in MICE is included;
@@ -51,7 +50,6 @@ public:
 public:
 	static BeamlineParameters* getInstance();
 	BeamlineParameters();
-	~BeamlineParameters()	{ miceMemory.addDelete( Memory::BeamlineParameters ); };
 	
 	std::string	BeamlineMaterial()	{ return fBeamlineMaterial; }
 	double	Q35FieldLength()	{ return fQ35FieldLength; }

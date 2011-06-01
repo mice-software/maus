@@ -1,6 +1,7 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 /* CKOVSD.cc
 */
-#include "CKOVSD.hh"
+#include "DetModel/Ckov/CKOVSD.hh"
 
 #include "G4TransportationManager.hh"
 #include "G4FieldManager.hh"
@@ -22,16 +23,11 @@
 
 CkovSD::CkovSD( MICEEvent* event, MiceModule* mod, bool dEdxCut ) : G4VSensitiveDetector( mod->fullName() )
 {
-  miceMemory.addNew( Memory::CKOVSD );
   _dEdxCut = dEdxCut;
   _event   = event;
   _module  = mod;
 }
 
-CkovSD::~CkovSD()
-{
-  miceMemory.addDelete( Memory::CKOVSD );
-}
 
 void CkovSD::Initialize(G4HCofThisEvent* HCE)
 {

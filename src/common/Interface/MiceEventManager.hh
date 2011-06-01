@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // MiceEventManager.hh
 //
 // M.Ellis 25/8/2005

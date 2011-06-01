@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 //This file is a part of G4MICE
 //
 //G4MICE is free software: you can redistribute it and/or modify
@@ -14,8 +15,8 @@
 //along with xboa in the doc folder.  If not, see 
 //<http://www.gnu.org/licenses/>.
 
-#include "MVector.hh"
-#include "MMatrix.hh"
+#include "Interface/MVector.hh"
+#include "Interface/MMatrix.hh"
 
 ///////////////////////// m_complex ////////////////////////////
 

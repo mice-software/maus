@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // @(#) $Id: VersionInfo.hh,v 1.1 2004-11-28 22:41:19 torun Exp $ $Name:  $
 // Declaration of classes for versioning
 

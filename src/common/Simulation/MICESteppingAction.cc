@@ -1,4 +1,5 @@
-#include "MICESteppingAction.hh"
+// MAUS WARNING: THIS IS LEGACY CODE.
+#include "Simulation/MICESteppingAction.hh"
 #include "G4SteppingManager.hh"
 #include "G4TransportationManager.hh"
 #include "G4Track.hh"
@@ -36,7 +37,7 @@
 
 extern MICEEvent simEvent;
 
-MICESteppingAction::MICESteppingAction():m_StepStatistics(NULL)
+MICESteppingAction::MICESteppingAction(): m_StepStatistics(NULL)
 {
   std::string rfType = "none"; //ME MyDataCards.fetchValueString("rfCellType");
   this->hasRF = (rfType  != "none");

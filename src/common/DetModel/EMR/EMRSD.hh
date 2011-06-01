@@ -1,18 +1,10 @@
-/*
-** Modified example 1 from the GEANT4 distribution to simulate the
-** MICE scintillating fiber tracker for the MICE proposal
-** Ed McKigney - August 21, 2002
-*/
+// MAUS WARNING: THIS IS LEGACY CODE.
 #ifndef EMRSD_h
 #define EMRSD_h 1
 // MAUS
 #include "DetModel/MAUSSD.h"
 // Geant 4
 #include "G4VSensitiveDetector.hh"
-
-#include "Interface/EMRHit.hh"
-
-#include "Interface/Memory.hh" 
 
 class G4Step;
 class G4HCofThisEvent;

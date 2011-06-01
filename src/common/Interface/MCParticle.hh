@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // MCParticle.hh
 
 #ifndef INTERFACE_MCPARTICLE_HH
@@ -7,7 +8,6 @@
 using CLHEP::Hep3Vector;
 
 #include <vector>
-#include "Memory.hh"
 
 class MCVertex;
 
@@ -19,8 +19,6 @@ class MCParticle
 
   MCParticle( int, double, int, double, double, double, Hep3Vector, Hep3Vector, Hep3Vector, Hep3Vector, double, double, 
               bool isRef);
-
-  ~MCParticle() { miceMemory.addDelete( Memory::MCParticle ); };
 
   void      SetVertices( MCVertex* ini_vertex, MCVertex* fin_vertex );
 

@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // CTR - 05/02/05
 
 #ifndef BetaFuncBank_h

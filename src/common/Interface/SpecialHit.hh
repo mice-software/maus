@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 //-----------------------------------------------------------------------------
 /*
 ** MICE special virual detector for the MICE proposal
@@ -14,18 +15,15 @@
 #include <string>
 #include <string.h>
 
-#include "MCHit.hh"
+#include "Interface/MCHit.hh"
 #include <iostream>
 
-#include "Memory.hh"
 
 class SpecialHit : public MCHit
 {
   public:
 
       SpecialHit();
-
-      ~SpecialHit()		{ miceMemory.addDelete( Memory::SpecialHit ); };
 
       SpecialHit(const SpecialHit&);
 

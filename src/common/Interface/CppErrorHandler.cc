@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #include "json/json.h"
 
 #include "Interface/CppErrorHandler.hh"

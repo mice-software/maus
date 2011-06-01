@@ -1,9 +1,10 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 //
 //  Y.Karadzhov  Sep 2010
 //
 
 
-#include "DataBaseReader.hh"
+#include "Interface/DataBaseReader.hh"
 
 
 DataBaseReader::DataBaseReader(dataCards* theCards)
@@ -11,6 +12,7 @@ DataBaseReader::DataBaseReader(dataCards* theCards)
   string host = theCards->fetchValueString( "DBServerHostName" );
   int port = theCards->fetchValueInt( "DBServerPort" );
   db_api = new DataBaseAPI(host, port);
+  CurrentRun = -1;
 }
 
 DataBaseReader::~DataBaseReader()
@@ -20,23 +22,28 @@ DataBaseReader::~DataBaseReader()
 
 XMLMessage DataBaseReader::GetRunInfo(int run)
 {
-  //firs chack do we have the information for this run
+  //! Firs chack do we have the information for this run.
   if( RunInfos.count(run) )
 	 return RunInfos[run];
 
-  //if we do not have the information ask DB
+  //! If we do not have the information ask DB.
   XMLMessage request, response;
 
-  // generate your question
+  //! Generate your question.
   request.MakeRunInfoRequest(run);
 
-  // get your answare
+  //! Get your answare.
   response = db_api->sendQuery( request );
 
-  //store the information
+  //! Store the information
   RunInfos[run] = response;
 
   return response;
+}
+
+XMLMessage GetTofCalibration(int run, string detector)
+{
+  return XMLMessage( string("not implemented") );
 }
 
 int DataBaseReader::GetTrigger(int run)

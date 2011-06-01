@@ -1,15 +1,14 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // @(#) $Id: BeamlineGeometry.cc,v 1.2 2006-11-03 20:01:57 hart Exp $  $Name:  $
 //
 //  MICE beamline geometry parameters
 //
 //  Yagmur Torun
 
-#include "BeamlineGeometry.hh"
+#include "Config/BeamlineGeometry.hh"
 #include "Interface/dataCards.hh"
 
 BeamlineGeometry::BeamlineGeometry() {
-  miceMemory.addNew( Memory::BeamlineGeometry ); 
-	
   fBeamlineMaterial	= MyDataCards.fetchValueString("BeamlineMaterial");
   fQ4Position		= MyDataCards.fetchValue3Vector("Q4Position");
   fQ5Position		= MyDataCards.fetchValue3Vector("Q5Position");

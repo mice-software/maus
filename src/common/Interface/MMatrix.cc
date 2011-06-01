@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 //This file is a part of G4MICE
 //
 //G4MICE is free software: you can redistribute it and/or modify
@@ -25,8 +26,8 @@
 //library
 //
 
-#include "MMatrix.hh"
-#include "Squeal.hh"
+#include "Interface/MMatrix.hh"
+#include "Interface/Squeal.hh"
 
 #include "gsl/gsl_linalg.h"
 #include "gsl/gsl_eigen.h"

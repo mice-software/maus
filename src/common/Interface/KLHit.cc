@@ -1,17 +1,17 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 
-#include "KLHit.hh"
-#include "KLDigit.hh"
+#include "Interface/KLHit.hh"
 
 //////////////////////////////////////////////////////////////////////////
 
 KLHit::KLHit()
 {
-  miceMemory.addNew( Memory::KLHit );
+
 }
 
 //////////////////////////////////////////////////////////////////////////
 
 KLHit::~KLHit()
 {
-  miceMemory.addDelete( Memory::KLHit );
+
 }

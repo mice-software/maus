@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // MICEUnits.hh
 //
 // Set units for MICE datacards from the datacard input file
@@ -17,7 +18,7 @@
 #include <iostream>
 #include <cctype>
 
-#include "Squeal.hh"
+#include "Interface/Squeal.hh"
 
 class MICEUnits
 {

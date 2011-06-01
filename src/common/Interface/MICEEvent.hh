@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // @(#) $Id: MICEEvent.hh,v 1.21 2010-03-08 16:39:02 rogers Exp $ $Name:  $
 // Declaration of struct MICEEvent
 // Struct to encapsulate hits/digits/recon in a G4Mice event
@@ -35,6 +36,9 @@ class TofTrack;
 class VmeAdcHit;
 class VmefAdcHit;
 class VmeTdcHit;
+class EmCalHit;
+class EmCalDigit;
+class EmCalTrack;
 class VirtualHit;
 class SpecialHit;
 class MCParticle;
@@ -84,6 +88,9 @@ class MICEEvent
   std::vector<VmeAdcHit*>           vmeAdcHits;
   std::vector<VmefAdcHit*>          vmefAdcHits;
   std::vector<VmeTdcHit*>           vmeTdcHits;
+  std::vector<EmCalHit*>            emCalHits;
+  std::vector<EmCalDigit*>          emCalDigits;
+  std::vector<EmCalTrack*>          emCalTracks;
   std::vector<VirtualHit*>          virtualHits;
   std::vector<SpecialHit*>          specialHits;
   std::vector<MCParticle*>          mcParticles;

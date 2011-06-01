@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #ifndef _VIRTUALHIT_HH_
 #define _VIRTUALHIT_HH_
 //----------------------------------------------------------------------------
@@ -12,8 +13,6 @@
 #include "CLHEP/Vector/ThreeVector.h"
 #include <fstream>
 #include <string>
-
-#include "Memory.hh"
 
 #include "MCHit.hh"
 
@@ -33,7 +32,7 @@ class VirtualHit : public MCHit
 
     VirtualHit();
 
-    ~VirtualHit() 		{ miceMemory.addDelete( Memory::VirtualHit); };
+  ~VirtualHit() 	{};
 
     void SetTrackID   (int tid)        { setTrackID( tid ); }
     void SetStationNumber (int sn)         { _stationNumber = sn; }

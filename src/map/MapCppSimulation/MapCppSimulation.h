@@ -54,7 +54,6 @@
 #include "Interface/MICERun.hh"
 #include "Interface/SpecialHit.hh"  // needed by persist
 #include "Interface/Squeak.hh"
-#include "Interface/ZustandVektor.hh"  // needed by persist
 
 class MapCppSimulation {
 public:

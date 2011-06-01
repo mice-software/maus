@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 /**
  * @author      Takashi Matsushita
  * @date        $Date: 2006-11-03 20:01:57 $
@@ -25,9 +26,7 @@
 #include <vector>
 #include <map>
 #include <fstream>
-#include "VlpcCable.hh"
-
-#include "Interface/Memory.hh"
+#include "Config/VlpcCable.hh"
 
 /*--------------------------------------------------------------------*
  * constants
@@ -60,7 +59,6 @@ class VlpcCableImperial: public VlpcCable
     // -----------------------------------------------------------------
     VlpcCableImperial() {};
     VlpcCableImperial(const std::string configFileName);
-    virtual ~VlpcCableImperial() { miceMemory.addDelete( Memory::VlpcCableImperial ); };
 
     // -----------------------------------------------------------------
     // Setter methods

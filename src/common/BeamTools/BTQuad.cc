@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 //	BTQuad.cc
 
 #include "BTQuad.hh"

@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #include "BTMidplaneMap.hh"
 #include <stdlib.h>
 #include <stdio.h>

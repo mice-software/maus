@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // VlpcCableOsaka3.hh
 //
 // Code to read in decoding format from Hideyuki for debugging tracker 2 readout
@@ -16,9 +17,8 @@
 #include <sstream>
 
 #include "CLHEP/Units/SystemOfUnits.h"
-#include "VlpcCable.hh"     
-#include "VlpcCableOsaka2.hh"
-#include "Interface/Memory.hh" 
+#include "Config/VlpcCable.hh"     
+#include "Config/VlpcCableOsaka2.hh"
 
 class VlpcCableOsaka3: public VlpcCable
 {

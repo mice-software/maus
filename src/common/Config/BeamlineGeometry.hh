@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // @(#) $Id: BeamlineGeometry.hh,v 1.4 2008-03-20 17:04:27 torun Exp $  $Name:  $
 //
 //  MICE beamline geometry parameters
@@ -12,8 +13,6 @@ using CLHEP::Hep3Vector;
 #include "CLHEP/Units/SystemOfUnits.h"
 
 #include <string>
-
-#include "Interface/Memory.hh" 
 
 /**	BeamlineGeometry defines the layout of the MICE beamline
 	Only the portion of the beamline implemented in MICE is included;
@@ -33,7 +32,6 @@ public:
 public:
 	static BeamlineGeometry* getInstance();
 	BeamlineGeometry();
-	~BeamlineGeometry() 	{ miceMemory.addDelete( Memory::BeamlineGeometry ); };
 	
 	std::string	BeamlineMaterial()	{ return fBeamlineMaterial; }
 	Hep3Vector	Q4Position()		{ return fQ4Position; }

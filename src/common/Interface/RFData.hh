@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #ifndef RFDATA_HH
 #define RFDATA_HH
 

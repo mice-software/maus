@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // @(#) $Id: CoolingChannelGeom.hh,v 1.7 2006-11-03 20:01:57 hart Exp $  $Name:  $
 //
 //  MICE magnetic lattice parameters
@@ -9,8 +10,6 @@
 
 #include <string>
 #include "CLHEP/Units/SystemOfUnits.h"
-
-#include "Interface/Memory.hh"
 
 class CoolingChannelGeom {
 public:
@@ -48,7 +47,6 @@ public:
 
   static CoolingChannelGeom* getInstance();
   CoolingChannelGeom();
-  ~CoolingChannelGeom()		{ miceMemory.addDelete( Memory::CoolingChannelGeom ); }; 
 
   std::string  FieldTrackStepper()      { return fFieldTrackStepper; }
   double  DeltaOneStep()                { return fDeltaOneStep; }

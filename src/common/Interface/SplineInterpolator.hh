@@ -1,9 +1,10 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 //Created November 2004 Chris Rogers
 #ifndef SPLINEINTERPOLATOR_HH
 #define SPLINEINTERPOLATOR_HH
 #include <vector>
-#include "Spline1D.hh"
-#include "Interpolator.hh"
+#include "Interface/Spline1D.hh"
+#include "Interface/Interpolator.hh"
 
 using std::vector;
 

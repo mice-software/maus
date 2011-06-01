@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // @(#) $Id: BTQuad.hh,v 1.2 2006-09-17 09:43:31 rogers Exp $  $Name:  $
 //
 // BTQuad - implement a Quadrupole field

@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #ifndef MICERunAction_H
 #define MICERunAction_H 1
 

@@ -1,7 +1,8 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #include <vector>
 #include <fstream>
 #include <iostream>
-#include "BetaFuncBank.hh"
+#include "Interface/BetaFuncBank.hh"
 
 using namespace std;
 

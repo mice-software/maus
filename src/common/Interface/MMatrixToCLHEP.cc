@@ -1,10 +1,11 @@
-#include "MMatrixToCLHEP.hh"
+// MAUS WARNING: THIS IS LEGACY CODE.
+#include "Interface/MMatrixToCLHEP.hh"
 
 #include "CLHEP/Matrix/Matrix.h"
 #include "CLHEP/Matrix/Vector.h"
 
-#include "MMatrix.hh"
-#include "MVector.hh"
+#include "Interface/MMatrix.hh"
+#include "Interface/MVector.hh"
 
 CLHEP::HepMatrix MMatrix_to_CLHEP(MMatrix<double> mm)
 {

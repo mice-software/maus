@@ -1,8 +1,9 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // VlpcCableOsaka2.hh
 //
 // Code to read in latest decoding format from Hideyuki for debugging tracker 1 readout
 //
-// M.Ellis October 2008
+// October 2008
 
 #ifndef VLPCCABLEOSAKA2_HH
 #define VLPCCABLEOSAKA2_HH
@@ -16,9 +17,7 @@
 #include <sstream>
 
 #include "CLHEP/Units/SystemOfUnits.h"
-#include "VlpcCable.hh"     
-
-#include "Interface/Memory.hh" 
+#include "Config/VlpcCable.hh"     
 
 class VlpcCableOsaka2: public VlpcCable
 {

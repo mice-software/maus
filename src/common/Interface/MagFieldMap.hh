@@ -1,10 +1,11 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #ifndef MAGFIELDMAP_HH
 #define MAGFIELDMAP_HH
 
 #include <iostream>
 #include <string>
 
-#include "SplineInterpolator.hh"
+#include "Interface/SplineInterpolator.hh"
 
 class MagFieldMap
 {

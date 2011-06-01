@@ -1,6 +1,7 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #include <cmath>
-#include "Squeal.hh"
-#include "RFFieldMap.hh"
+#include "Interface/Squeal.hh"
+#include "Interface/RFFieldMap.hh"
 
 // Constructor to read in a RF cavity field map
 // Only supported filetype is "SuperFishSF7" at the moment
@@ -158,9 +159,6 @@ void RFFieldMap::ReadSuperFishSF7Map(std::ifstream &fin)
 		delete[] erVec[i];
 		delete[] ezVec[i];
 	}
-
-        delete[] z;
-        delete[] r;
 
 }
 

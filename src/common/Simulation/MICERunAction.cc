@@ -1,4 +1,5 @@
-#include "MICERunAction.hh"
+// MAUS WARNING: THIS IS LEGACY CODE.
+#include "Simulation/MICERunAction.hh"
 #include "G4Event.hh"
 #include "G4EventManager.hh"
 #include "G4SDManager.hh"
@@ -8,8 +9,6 @@
 #include "G4TrajectoryContainer.hh"
 #include "G4Trajectory.hh"
 #include "Interface/dataCards.hh"
-#include "Interface/RunHeader.hh"
-#include "Interface/RunFooter.hh"
 #include <iostream>
 #include <fstream>
 using namespace std;

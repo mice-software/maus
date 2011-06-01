@@ -1,12 +1,13 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #ifndef MICESteppingAction_h
 #define MICESteppingAction_h 1
 
 #include "globals.hh"
 #include "G4UserSteppingAction.hh"
-#include "MICEStepStatistics.hh"
-#include "VirtualPlanes.hh"
-#include "MICEPrimaryGeneratorAction.hh"
-#include "MICEEventAction.hh"
+#include "Simulation/MICEStepStatistics.hh"
+#include "Simulation/VirtualPlanes.hh"
+#include "Simulation/MICEPrimaryGeneratorAction.hh"
+#include "Simulation/MICEEventAction.hh"
 
 class MICESteppingAction : public G4UserSteppingAction
 {
@@ -28,11 +29,6 @@ class MICESteppingAction : public G4UserSteppingAction
    double maxRadSqGlobal;
    double maxTGlobal;
    double maxZGlobal;
-   int numTraceDef;
-   int *ihTraces;
-   int ihTraces100[100];
-   int ihTraceRefPart;
-   int ih_ELossTarget, ih_ELossAll, ih_ELossCSol, ih_ELossEndDecay;
 
    MICEStepStatistics* m_StepStatistics;
   //   MICEPrimaryGeneratorAction* m_generator;

@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // SciFiCableManager.hh
 //
 // Code to allow Datacards to read which SciFiCableType to use, 
@@ -10,8 +11,6 @@
 
 #include "Interface/MICERun.hh"     
 #include "Interface/dataCards.hh"     
-
-#include "Interface/Memory.hh" 
 
 void makeVlpcCable( MICERun* );
 

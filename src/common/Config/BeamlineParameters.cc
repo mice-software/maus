@@ -1,15 +1,14 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // @(#) $Id: BeamlineParameters.cc,v 1.3 2006-11-03 20:01:57 hart Exp $  $Name:  $
 //
 //  MICE beamline parameters
 //
 //  Tom Roberts
 
-#include "BeamlineParameters.hh"
+#include "Config/BeamlineParameters.hh"
 #include "Interface/dataCards.hh"
 
 BeamlineParameters::BeamlineParameters() {
-  miceMemory.addNew( Memory::BeamlineParameters ); 
-	
   fBeamlineMaterial	= MyDataCards.fetchValueString("BeamlineMaterial");
   fQ35FieldLength	= MyDataCards.fetchValueDouble("Q35FieldLength");
   fQ35IronLength	= MyDataCards.fetchValueDouble("Q35IronLength");

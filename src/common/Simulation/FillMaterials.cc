@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // FillMaterials.cc
 //
 // Code to create G4Material instances for each material needed in MICE and store them in the MiceMaterial object
@@ -7,7 +8,7 @@
 //
 // Malcolm Ellis
 
-#include "FillMaterials.hh"
+#include "Simulation/FillMaterials.hh"
 
 #include "Interface/MiceMaterials.hh"
 #include "Interface/dataCards.hh"

@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 /* This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
  *
  * MAUS is free software: you can redistribute it and/or modify
@@ -33,8 +34,8 @@
 
 #include "json/json.h"
 
-#include "src/common/Interface/STLUtils.hh"
-#include "src/common/Interface/Squeal.hh"
+#include "Interface/STLUtils.hh"
+#include "Interface/Squeal.hh"
 
 class JsonWrapper {
  public:

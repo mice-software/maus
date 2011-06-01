@@ -1,12 +1,13 @@
-// @(#) $Id: dataCards.cc,v 1.302 2011-02-11 15:56:42 rogers Exp $  $Name:  $
+// MAUS WARNING: THIS IS LEGACY CODE.
+// @(#) $Id: dataCards.cc,v 1.307 2011-05-20 14:28:40 reid Exp $  $Name:  $
 /*
 ** modified from Yagmur Torun's MICE simulation package
 ** Ed McKigney - Aug 21 2002
 */
 
-#include "dataCards.hh"
-#include "Squeak.hh"
-#include "Squeal.hh"
+#include "Interface/dataCards.hh"
+#include "Interface/Squeak.hh"
+#include "Interface/Squeal.hh"
 #include "CLHEP/Units/SystemOfUnits.h"
 using CLHEP::ms;
 using CLHEP::mm;
@@ -124,7 +125,12 @@ void dataCards::fillCards(int app)
     cs["DataType"] = "TextFile"; //The data type of the dataCards file, set by user and used in global reader, TextFileReader etc
 
     // <head>Modelling and Configuration</head>
-    cs["MiceModel"] = "Stage6.dat"; // The MiceModel, as defined in $MICEFILES/Models/Configurations/<MiceModel>
+    cs["GeometrySchema"] = "http://service-spi.web.cern.ch/service-spi/app/releases/GDML/GDML_3_0_0/schema/gdml.xsd";
+    // GDML schema (built-in default will be used if not found)
+    cs["ReadGeometryURL"]  = "http://rgma19.pp.rl.ac.uk:8080/cdb/geometry";  // To be overridden
+    cs["WriteGeometryURL"] = "http://rgma19.pp.rl.ac.uk:8080/cdb/geometrySuperMouse";  // ...so it can be different
+    cs["GeometrySource"] = "MiceModelTextFile"; //Or "RunNumber", "CurrentGeometry", "GeometryID", "GDMLTextFile"
+    cs["MiceModel"] = "MICEStage6/Stage6.dat"; // The MiceModel, as defined in $MICEFILES/Models/Configurations/<MiceModel>
     cs["SciFiCalib"] = ""; //SciFi detector calibration file, found in ${MICEFILES}/Calibration/<SciFiCalib>
     cs["TofCalib"] = "tofcalib"; //TOF detector calibration file, found in ${MICEFILES}/Calibration/<TofCalib>
     cs["SciFiCable"] = "";  //SciFi detector cabling file, found in ${MICEFILES}/Cabling/SciFi/<SciFiCable>
@@ -154,8 +160,7 @@ void dataCards::fillCards(int app)
     cd["MuonHalfTime"]           = -1 * ns;  //Set the muon half life; use g4 default if negative.
     cd["ChargedPionHalfTime"]    = -1 * ns;  //Set the pi+ and pi- half life; use g4 default if negative.
     cs["TrackOnlyMuons"]         = "False"; //Set to true to kill non-muons on production
-    ci["MaxStepsWOELoss"]        = -1;  //Deprecated - please use LoopCheck
-    ci["LoopMaxSteps"]           = 2000;  //Check every #LoopCheck steps to look for particle progression. If particle has not advanced, kill it.
+    ci["MaxStepsWOELoss"]        = 2000;  //Maximum number of steps taken without energy loss - particles killed afterwards
     ci["StepStatisticsOutput"]   = 0; //I *think* set to 1 to see physics processes output
     cs["StepStatisticsVolume"]   = "All"; //I *think* selects which volumes to write physics processes output from
     ci["CheckVolumeOverlaps"]    = 0; //Set to 1 to check for volume overlaps in GEANT4 physical volumes
@@ -252,6 +257,29 @@ void dataCards::fillCards(int app)
     cd["rfBGZstart"] = 0.0 * ns; //Deprecated - does nothing
     cd["rfBGRadius"] = 150.0 * mm; //Deprecated - does nothing
     cd["rfBGScaleFactor"] = 1.0; //Deprecated - does nothing
+
+    // <head>Digitization Application Calorimeter Controls</head>
+    cd["EMCalAttLengthLong"]          = 2400.0 * mm; //The EM Calorimeter models the number of photoelectrons entering the PMT using Interface/src/EMCalDigit.cc
+    cd["EMCalAttLengthShort"]         =  200.0 * mm;
+    cd["EMCalAttLengthLongNorm"]      = 0.655 * mm;
+    cd["EMCalAttLengthShortNorm"]     = 0.345 * mm;
+    cd["EMCalLightCollectionEff"]     = 0.031;
+    cd["EMCalEnergyPerPhoton"]        = 0.125 * keV;
+    cd["EMCalLightSpeed"]             =  170.0 * mm / ns;
+    cd["EMCalLightGuideEff"]          =  0.85;
+    cd["EMCalQuantumEff"]             =  0.18;
+    cd["EMCalAmplificationCof"]       =1000000.;
+    cd["EMCalAmplificationFluct"]     = 1000.;
+    cd["EMCalAdcConversionFactor"]    =  0.25*1e-12*coulomb;  // pC per count
+    cd["EMCalTdcConversionFactor"]    = 0.025 * ns;
+    ci["EMCalAdcThreshold"]           =     2;    // adc counts
+    cd["EMCalTdcThreshold"]           =  1.84*1e-12*coulomb;  // pC
+    cd["EMCalTdcResolution"]          =  0.05 * ns;
+    ci["EMCalTdcBits"]                =    12;
+    cs["EMCalHardCodedTrigger"]       = "False";
+    cd["EMCalSamplingTimeStart"]      =  100.0 * ns;
+    cd["EMCalSamplingTimeWindow"]     =  100.0 * ns;
+    cd["EMCalElectronicsDecayTime"]   =    8.0 * ns;
 
     // <head>Digitization Application SciFi controls</head>
     cs["SciFiDeadChanFName"] = "";

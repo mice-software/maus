@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // @(#) $Id: Q35.hh,v 1.6 2006-11-03 20:01:09 hart Exp $  $Name:  $
 //
 // Q35 - implement a Q35 quadrupole magnet
@@ -9,8 +10,6 @@
 #define Q35_H 1
 
 #include "G4LogicalVolume.hh"
-
-#include "Interface/Memory.hh" 
 
 /**	class Q35 implements a Q35 quadrupole magnet
  **/
@@ -37,9 +36,6 @@ public:
 	G4double CoilHalfwidth,
 	G4Material * IronMaterial
 	);
-
-	~Q35() 		{ miceMemory.addDelete( Memory::Q35 ); };
-	
 	/// buildQ35() returns the LogicalVolume of the magnet
 	G4LogicalVolume *buildQ35();
 

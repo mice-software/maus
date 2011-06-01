@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 ///////////////////////////////////////////////////////////////////////////////
 /// KLHit
 ///
@@ -18,11 +19,9 @@
 #include <vector>
 #include "CLHEP/Vector/ThreeVector.h"
 
-#include "Memory.hh"
-
 #include <iostream>
 
-#include "MCHit.hh"
+#include "Interface/MCHit.hh"
 
 class KLDigit;
 

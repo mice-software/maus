@@ -1,10 +1,11 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 //Chris Rogers April 05
 //AnalysisEventBank.cc
 //
 
 
 #include <fstream>
-#include "AnalysisEventBank.hh"
+#include "Interface/AnalysisEventBank.hh"
 
 using namespace std;
 

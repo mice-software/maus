@@ -1,15 +1,15 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // @(#) $Id: CoolingChannelGeom.cc,v 1.8 2006-11-03 20:01:57 hart Exp $  $Name:  $
 //
 //  MICE magnetic lattice geometry
 //
 //  Yagmur Torun
 
-#include "CoolingChannelGeom.hh"
+#include "Config/CoolingChannelGeom.hh"
 #include "Interface/dataCards.hh"
 
 CoolingChannelGeom::CoolingChannelGeom()
 {
-  miceMemory.addNew( Memory::CoolingChannelGeom ); 
   //Stepping parameters
   fDeltaOneStep          = MyDataCards.fetchValueDouble("DeltaOneStep");
 	fDeltaIntersection     = MyDataCards.fetchValueDouble("DeltaIntersection");

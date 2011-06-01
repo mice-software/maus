@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 /*
 SciFiPlane - Specific parameterisation of the SciFi station to be called by the generic MICE detector construction code
 */
@@ -14,20 +15,18 @@ SciFiPlane - Specific parameterisation of the SciFi station to be called by the 
 
 #include "G4ios.hh"
 
-#include "SciFiPlane.hh"
+#include "DetModel/SciFi/SciFiPlane.hh"
 
 #include "G4ThreeVector.hh"
 #include "G4RotationMatrix.hh"
 #include "globals.hh"
 
-#include "SciFiSD.hh"
-#include "DoubletFiberParam.hh"
+#include "DetModel/SciFi/SciFiSD.hh"
+#include "DetModel/SciFi/DoubletFiberParam.hh"
 #include "G4SDManager.hh"
 
 SciFiPlane::SciFiPlane( MiceModule* mod, G4Material* mater, G4VPhysicalVolume *mlv )
 {
-  miceMemory.addNew( Memory::SciFiPlane ); 
-	
   G4double tr = mod->dimensions().x();
   G4double fd = mod->propertyDouble( "FibreDiameter" );
   G4double fp = mod->propertyDouble( "Pitch" );
@@ -66,8 +65,6 @@ SciFiPlane::SciFiPlane( MiceModule* mod, G4Material* mater, G4VPhysicalVolume *m
 
 SciFiPlane::~SciFiPlane()
 {
-  	miceMemory.addDelete( Memory::SciFiPlane ); 
-	
 	delete solidDoublet;
 	delete logicDoublet;
 	delete physiDoublet;

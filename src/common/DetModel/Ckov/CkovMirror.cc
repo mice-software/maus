@@ -1,9 +1,10 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 /*
  * Conical Mirror for Upstream Cherenckov
  * 
  * (2007/01/11) Hideyuki Sakamoto
 */ 
-#include "CkovMirror.hh"
+#include "DetModel/Ckov/CkovMirror.hh"
 
 CkovMirror::~CkovMirror()
 {

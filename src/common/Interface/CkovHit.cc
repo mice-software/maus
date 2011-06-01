@@ -1,10 +1,11 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 /* CkovHit.cc
 */
 
 #include <iostream>
 #include <sstream>
 
-#include "CkovHit.hh"
+#include "Interface/CkovHit.hh"
 
 using namespace std;
 using CLHEP::eV;

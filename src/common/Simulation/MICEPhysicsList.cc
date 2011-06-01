@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #include "globals.hh"
 
 #include "G4UImanager.hh"
@@ -7,7 +8,7 @@
 
 #include "Interface/dataCards.hh"
 #include "Interface/MICERun.hh"
-#include "MICEPhysicsList.hh"
+#include "Simulation/MICEPhysicsList.hh"
 #include "Interface/Squeak.hh"
 
 

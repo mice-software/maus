@@ -1,7 +1,8 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #include <stdio.h>
 #include <fstream>
 #include "CLHEP/Vector/ThreeVector.h"
-#include "G4BLBank.hh"
+#include "Interface/G4BLBank.hh"
 #include "CLHEP/Units/SystemOfUnits.h"
 using CLHEP::ns;
 using CLHEP::mm;

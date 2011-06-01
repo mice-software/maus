@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // @(#) $Id: micegsl.cc,v 1.3 2005-10-28 11:38:33 rogers Exp $  $Name:  $
 //
 // Simple C++ interface to GNU Scientific Library

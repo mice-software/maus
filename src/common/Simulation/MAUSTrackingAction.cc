@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 /* This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
  *
  * MAUS is free software: you can redistribute it and/or modify
@@ -17,8 +18,8 @@
 
 #include <iostream>
 
-#include "src/common/Simulation/MAUSGeant4Manager.hh"
-#include "src/common/Simulation/MAUSTrackingAction.hh"
+#include "Simulation/MAUSGeant4Manager.hh"
+#include "Simulation/MAUSTrackingAction.hh"
 
 namespace MAUS {
 

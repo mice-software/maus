@@ -1,15 +1,14 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 /*
 ** Modified example 1 from the GEANT4 distribution to simulate the
 ** MICE scintillating fiber tracker for the MICE proposal
-** Ed McKigney - August 21, 2002
+** August 21, 2002
 */
 #ifndef KLSD_h
 #define KLSD_h 1
 
 #include "G4VSensitiveDetector.hh"
 #include "Interface/KLHit.hh"
-
-#include "Interface/Memory.hh" 
 
 class G4Step;
 class G4HCofThisEvent;
@@ -27,9 +26,6 @@ class KLSD : public G4VSensitiveDetector
 
       //! Constructor
       KLSD(  MICEEvent*, MiceModule* );
-
-      //! Default destructor
-     ~KLSD();
 
       //! Initialise this this instance with the G4 event information
       void Initialize( G4HCofThisEvent* );

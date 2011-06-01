@@ -1,15 +1,15 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // @(#) $Id: MagnetParameters.cc,v 1.12 2009-12-10 09:18:06 rogers Exp $  $Name:  $
 //
 //  MICE magnetic lattice parameters
 //
 //  Yagmur Torun
 
-#include "MagnetParameters.hh"
+#include "Config/MagnetParameters.hh"
 #include "Interface/dataCards.hh"
 
 MagnetParameters::MagnetParameters()
 {
-  miceMemory.addNew( Memory::MagnetParameters );
   // Field map generation
   fSolDataFiles          = MyDataCards.fetchValueString("SolDataFiles");
   fNumberNodesZGrid      = MyDataCards.fetchValueInt("NumberNodesZGrid");

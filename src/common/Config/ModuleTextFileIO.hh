@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // MiceModule.hh
 //
 // Class that describes the shape, size, position, orientation and other properties of a module of the MICE experiment,
@@ -23,7 +24,6 @@
 
 #include "Interface/MICEUnits.hh"
 #include "Interface/Squeak.hh"
-#include "Interface/Memory.hh" 
 
 class MiceModule;
 

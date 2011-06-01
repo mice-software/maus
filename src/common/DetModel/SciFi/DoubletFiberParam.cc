@@ -1,9 +1,10 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 /*
 ** Modified example 1 from the GEANT4 distribution to simulate the
 ** MICE scintillating fiber tracker for the MICE proposal
 ** Ed McKigney - August 21, 2002
 */
-#include "DoubletFiberParam.hh"
+#include "DetModel/SciFi/DoubletFiberParam.hh"
 
 #include "G4VPhysicalVolume.hh"
 #include "G4ThreeVector.hh"
@@ -15,8 +16,6 @@ DoubletFiberParam::DoubletFiberParam(
 		G4double pOuterDiameter, G4double pInnerDiameter,
 		G4double pFiberDiameter, G4double pFiberPitch)
 {
-  	miceMemory.addDelete( Memory::DoubletFiberParam );
-	
 	sensitiveRadius = pSensitiveRadius;
 	activeRadius = pActiveRadius;
 	outerDiameter = pOuterDiameter;
@@ -27,10 +26,7 @@ DoubletFiberParam::DoubletFiberParam(
 	coreRotation = new G4RotationMatrix(CLHEP::HepRotationX(90.0*deg)); 
 }
 
-DoubletFiberParam::~DoubletFiberParam()
-{
-  miceMemory.addDelete( Memory::DoubletFiberParam );
-}
+
 
 void DoubletFiberParam::ComputeTransformation
 (const G4int copyNo, G4VPhysicalVolume* physVol) const

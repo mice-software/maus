@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // @(#) $Id: Spline1D.cc,v 1.1 2005-10-28 08:22:43 rogers Exp $  $Name:  $
 //
 // ********************************************************************
@@ -40,7 +41,7 @@ are supplied, instead the spline uses second derivatives at the endpoints.
 
 #endif
 
-#include "Spline1D.hh"
+#include "Interface/Spline1D.hh"
 #include <iostream>
 #include <cstdlib>
 

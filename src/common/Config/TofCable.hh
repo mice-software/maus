@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // TofCable.hh
 //
 // Code to read in the connection information to allow the decoding of hit information
@@ -17,15 +18,11 @@
 #include <cstdio>
 #include <cstdlib>
 
-#include "Interface/Memory.hh" 
-
 class TofCable
 {
   public :
 
     TofCable( std::string );
-    ~TofCable() 	{ miceMemory.addDelete( Memory::TofCable ); };
-    
     int			variables() const 		{ return numVariables; };
 
     int			modType      ( int i ) const	{ return moduleType[i]; };

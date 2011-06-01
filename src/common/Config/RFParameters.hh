@@ -1,8 +1,8 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // @(#) $Id: RFParameters.hh,v 1.16 2010-03-10 08:14:10 rogers Exp $  $Name:  $
 //
 //  MICE RF parameters
 //
-//  Yagmur Torun
 
 #ifndef RFPARAMETERS_H
 #define RFPARAMETERS_H 1
@@ -10,8 +10,6 @@
 #include <string>
 #include <vector>
 #include "CLHEP/Units/SystemOfUnits.h"
-
-#include "Interface/Memory.hh" 
 
 class RFParameters {
 
@@ -53,7 +51,6 @@ public:
 
   static RFParameters* getInstance();
   RFParameters();
-  ~RFParameters() 	{ miceMemory.addDelete( Memory::RFParameters ); }; 
   
   double  rfAccelerationPhase()  { return frfAccelerationPhase; }
   double  opticsRfFrequency()    { return frfFrequency; }

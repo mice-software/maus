@@ -1,5 +1,6 @@
-#include "TriangularMesh.hh"
-#include "Squeal.hh"
+// MAUS WARNING: THIS IS LEGACY CODE.
+#include "Interface/TriangularMesh.hh"
+#include "Interface/Squeal.hh"
 
 #include <iostream>
 #include <fstream>

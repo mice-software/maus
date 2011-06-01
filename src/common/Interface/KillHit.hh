@@ -1,9 +1,10 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // KillHit.hh
 
 #ifndef INTERFACE_KILLHIT_HH
 #define INTERFACE_KILLHIT_HH 1
 
-#include "MCHit.hh"
+#include "Interface/MCHit.hh"
 #include "CLHEP/Vector/ThreeVector.h"
 using CLHEP::Hep3Vector;
 

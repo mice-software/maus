@@ -1,7 +1,8 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // @(#) $Id: VersionInfo.cc,v 1.1 2004-11-28 22:41:19 torun Exp $ $Name:  $
 // Definition of class VersionInfo
 
-#include "VersionInfo.hh"
+#include "Interface/VersionInfo.hh"
 
 #include <string>
 #include <map>

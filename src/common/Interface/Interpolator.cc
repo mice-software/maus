@@ -1,7 +1,8 @@
-#include "Interpolator.hh"
-#include "Spline1D.hh"
-#include "MVector.hh"
-#include "MMatrix.hh"
+// MAUS WARNING: THIS IS LEGACY CODE.
+#include "Interface/Interpolator.hh"
+#include "Interface/Spline1D.hh"
+#include "Interface/MVector.hh"
+#include "Interface/MMatrix.hh"
 
 
 std::string Interpolator3dSolenoidalTo3d::_interpolationAlgorithmString[3]= {"BiCubic", "LinearCubic", "BiLinear"};
@@ -306,8 +307,8 @@ void Interpolator3dSolenoidalTo3d::F(const Mesh::Iterator& Point, double BField[
 
 Interpolator3dSolenoidalTo3d::~Interpolator3dSolenoidalTo3d() 
 {
-	if(_interpolator) if(_interpolator[0]) delete _interpolator[0]; 
-	if(_interpolator) if(_interpolator[0]) delete _interpolator[1];
+	if(_interpolator[0]) delete _interpolator[0]; 
+	if(_interpolator[1]) delete _interpolator[1];
   if(_coordinates) _coordinates->Remove(this); 
 }
 

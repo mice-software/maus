@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 //Contains algorithms to solve for the self-induced space charge for some set of particles
 //
 //Space charge solvers inherit from BTSpaceChargeField, either sum over all particles (assume point particles) or

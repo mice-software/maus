@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 //BTField is the parent of all fields in the beamtools package
 //Abstract Base Class
 //Has simply a GetFieldValue method
@@ -10,15 +11,12 @@
 #include "BeamTools/BTField.hh"
 #include "G4ElectroMagneticField.hh"
 
-#include "Interface/Memory.hh" 
-
 class MiceElectroMagneticField : public G4ElectroMagneticField
 {
 public:
 	MiceElectroMagneticField(BTFieldConstructor * theField) : _emField(theField->GetElectroMagneticField())
-	{ miceMemory.addNew( Memory::MiceElectroMagneticField); };
+  {};
 
-	~MiceElectroMagneticField() 	{ miceMemory.addDelete( Memory::MiceElectroMagneticField); }; 
 	
 	//BUG - should be inlined!
 	inline void GetFieldValue(const double Point[4], double * bfield) const

@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 //BTFieldGroup contains and places groups of fields
 //Generic but intended to hold field data for e.g. a module in MICE
 

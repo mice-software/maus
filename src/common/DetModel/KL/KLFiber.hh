@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 ///////////////////////////////////////////////////////////////////////////////
 /// KLFiber
 ///
@@ -18,8 +19,6 @@
 #include "G4ThreeVector.hh"
 #include "globals.hh"
 #include "Config/MiceModule.hh"
-
-#include "Interface/Memory.hh" 
 
 class G4LogicalVolume;
 class G4VPhysicalVolume;

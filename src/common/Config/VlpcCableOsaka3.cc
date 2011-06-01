@@ -1,10 +1,11 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // VlpcCableOsaka3.cc
 //
 // Code to read in decoding format from Hideyuki for debugging tracker 2 readout
 //
 // M.Ellis October 2009
 
-#include "VlpcCableOsaka3.hh"     
+#include "Config/VlpcCableOsaka3.hh"     
 
 VlpcCableOsaka3::VlpcCableOsaka3( std::string fname )
 {

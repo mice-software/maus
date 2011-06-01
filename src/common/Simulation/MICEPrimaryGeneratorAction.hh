@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 // @(#) $Id: MICEPrimaryGeneratorAction.hh,v 1.36 2010-09-17 09:50:31 rogers Exp $  $Name:  $
 // Primary generator for MICE
 // Yagmur Torun
@@ -31,7 +32,6 @@
 #include "G4ParticleDefinition.hh"
 #include "G4Event.hh"
 #include "Randomize.hh"
-#include "MICEBGPlane.hh"
 #include "Config/MiceModule.hh"
 #include "Config/ModuleConverter.hh"
 #include "CLHEP/Matrix/SymMatrix.h"
@@ -86,7 +86,6 @@ private:
   //RF background ///////////////////
   bool hasRF;
   G4bool fRF_BACKGROUND_ON;
-  std::vector<MICEBGPlane*> bgGuns;
   G4ParticleGun* rfElectronGun;
   G4ParticleGun* rfPhotonGun;
   BeamParameters* fBP;

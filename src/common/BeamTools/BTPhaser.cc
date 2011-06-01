@@ -1,3 +1,4 @@
+// MAUS WARNING: THIS IS LEGACY CODE.
 #include "BTPhaser.hh"
 #include "Interface/Squeak.hh"
 
