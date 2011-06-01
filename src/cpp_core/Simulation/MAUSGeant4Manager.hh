@@ -99,7 +99,7 @@ class MAUSGeant4Manager {
     bool                         _storeTracks;
 };
 
-} // namespace MAUS
+}  // namespace MAUS
 
-#endif //_SRC_CPP_CORE_SIMULATION_MAUSGEANT4MANAGER_HH_
+#endif  // _SRC_CPP_CORE_SIMULATION_MAUSGEANT4MANAGER_HH_
 

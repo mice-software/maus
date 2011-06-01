@@ -24,20 +24,21 @@
  *  eventually handing the error up to python error handler.
  */
 
+#include <string>
 
 #include "json/json.h"
 
 #include "Interface/Squeal.hh"
 
-#ifndef _SRC_CPP_CORE_CPPERRORHANDLER_HH 
-#define _SRC_CPP_CORE_CPPERRORHANDLER_HH 
+#ifndef _SRC_CPP_CORE_CPPERRORHANDLER_HH
+#define _SRC_CPP_CORE_CPPERRORHANDLER_HH
 
 // TODO (Rogers): If I am worried about bad memory allocation I may not want to
 //                pass by value...
 //                Also would be nice to raise to python error handler (common
 //                interface)
 //                Need to think about how we handle "non recoverable" (meaning
-//                memory leak in the Squeal) 
+//                memory leak in the Squeal)
 
 class CppErrorHandler {
 
@@ -87,7 +88,6 @@ class CppErrorHandler {
  private:
   CppErrorHandler();
   ~CppErrorHandler();
-  
 };
 
 #endif

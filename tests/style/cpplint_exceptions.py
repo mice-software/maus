@@ -26,10 +26,11 @@ import glob
 exceptions = {
 }
 
+core = os.path.join('src','cpp_core')
 cm = os.path.join('src','common')
 tst = os.path.join('tests', 'cpp_unit')
 
-exceptions[os.path.join(cm, 'Simulation','VirtualPlanes.cc')] = [
+exceptions[os.path.join(core, 'Simulation','VirtualPlanes.cc')] = [
 ('#include "G4Track.hh"', 'cpplint confused with maus header', 'rogers'),
 ('#include "G4Step.hh"', 'cpplint confused with maus header', 'rogers'),
 ('#include "G4StepPoint.hh"', 'cpplint confused with maus header', 'rogers')
@@ -41,7 +42,7 @@ exceptions[os.path.join(tst, 'Simulation', 'VirtualPlaneTest.cc')] = [
 ('#include "G4StepPoint.hh"', 'cpplint confused with maus header', 'rogers')
 ]
 
-exceptions[os.path.join(cm, 'Simulation','MAUSPrimaryGeneratorAction.hh')] = [
+exceptions[os.path.join(core, 'Simulation','MAUSPrimaryGeneratorAction.hh')] = [
 ('#include "G4ParticleGun.hh"', 'cpplint confused by g4 header', 'rogers'),
 ('#include "G4ParticleTable.hh"', 'cpplint confused by g4 header', 'rogers'),
 ('#include "G4VUserPrimaryGeneratorAction.hh"  // inherit from', 'cpplint confused with maus header', 'rogers'),
@@ -50,21 +51,21 @@ exceptions[os.path.join(cm, 'Simulation','MAUSPrimaryGeneratorAction.hh')] = [
 ('#include "G4UserTrackingAction.hh"  //  inherit from', 'cpplint confused by g4 header', 'rogers')
 ]
 
-exceptions[os.path.join(cm, 'Simulation','MAUSPrimaryGeneratorAction.cc')] = [
+exceptions[os.path.join(core, 'Simulation','MAUSPrimaryGeneratorAction.cc')] = [
 ('#include "G4Event.hh"', 'cpplint confused by g4 header', 'rogers'),
 ('#include "G4PrimaryVertex.hh"', 'cpplint confused by g4 header', 'rogers'),
 ('#include "G4Track.hh"', 'cpplint confused by g4 header', 'rogers'),
 ('#include "G4ios.hh"', 'cpplint confused by g4 header', 'rogers')
 ]
 
-exceptions[os.path.join(cm, 'Simulation','MAUSSteppingAction.hh')] = [
+exceptions[os.path.join(core, 'Simulation','MAUSSteppingAction.hh')] = [
 ('#include "G4Step.hh"', 'cpplint confused by g4 header', 'rogers'),
 ('#include "G4StepPoint.hh"', 'cpplint confused by g4 header', 'rogers'),
 ('#include "G4Track.hh"', 'cpplint confused by g4 header', 'rogers'),
 ('#include "G4UserSteppingAction.hh"', 'cpplint confused by g4 header', 'rogers'),
 ]
 
-exceptions[os.path.join(cm, 'Simulation','MAUSTrackingAction.hh')] = [
+exceptions[os.path.join(core, 'Simulation','MAUSTrackingAction.hh')] = [
 ('#include "G4Track.hh"  //  arg to tracking action', 'cpplint confused by g4 header', 'rogers'),
 ('#include "G4UserTrackingAction.hh"  //  inherit from', 'cpplint confused by g4 header', 'rogers')
 ]
