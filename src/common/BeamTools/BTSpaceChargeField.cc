@@ -103,7 +103,7 @@ BTPIC_SC::~BTPIC_SC()
 {
   if(_grid != NULL)          delete _grid;
   if(_bInterpolator != NULL) delete _bInterpolator;
-  if(_eInterpolator != NULL) delete _bInterpolator;
+  if(_eInterpolator != NULL) delete _eInterpolator;
   for(int i=0; i<int(_aInterpolator.size()); i++)
     if(_aInterpolator[i] != NULL) delete _aInterpolator[i];
 }
