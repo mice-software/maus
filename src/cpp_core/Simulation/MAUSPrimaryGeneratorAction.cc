@@ -26,7 +26,7 @@
 
 #include "CLHEP/Random/Random.h"
 
-#include "src/common/Simulation/MAUSPrimaryGeneratorAction.hh"
+#include "src/cpp_core/Simulation/MAUSPrimaryGeneratorAction.hh"
 
 namespace MAUS {
 

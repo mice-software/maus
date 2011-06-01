@@ -16,9 +16,9 @@
  *
  */
 
-#include "Simulation/MAUSGeant4Manager.hh"
+#include "src/cpp_core/Simulation/MAUSGeant4Manager.hh"
 
-#include "Simulation/MICEPhysicsList.hh"
+#include "src/common/Simulation/MICEPhysicsList.hh"
 
 namespace MAUS {
 

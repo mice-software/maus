@@ -27,7 +27,7 @@
 #include "src/common/Interface/dataCards.hh"
 #include "src/common/Interface/MICEEvent.hh"
 #include "src/common/Interface/MICERun.hh"
-#include "src/common/Interface/JsonWrapper.hh"
+#include "src/cpp_core/Utils/JsonWrapper.hh"
 
 
 #include "src/common/Config/MiceModule.hh"

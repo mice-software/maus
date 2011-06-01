@@ -14,7 +14,7 @@
 #include "EngModel/Polycone.hh"
 #include "EngModel/MultipoleAperture.hh"
 #include "EngModel/MiceModToG4Solid.hh"
-#include "VirtualPlanes.hh"
+#include "src/cpp_core/Simulation/VirtualPlanes.hh"
 
 #include "G4VSolid.hh"
 #include "G4Material.hh"

@@ -21,7 +21,7 @@
 #include <G4RunManager.hh>
 #include <G4SDManager.hh>
 
-#include "src/common/Simulation/MAUSGeant4Manager.hh"
+#include "src/cpp_core/Simulation/MAUSGeant4Manager.hh"
 
 namespace {
 

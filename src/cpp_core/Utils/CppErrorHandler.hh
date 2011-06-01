@@ -1,10 +1,9 @@
-// MAUS WARNING: THIS IS LEGACY CODE.
 #include "json/json.h"
 
 #include "Interface/Squeal.hh"
 
-#ifndef CppErrorHandler_h 
-#define CppErrorHandler_h 1
+#ifndef _SRC_CPP_CORE_CPPERRORHANDLER_HH 
+#define _SRC_CPP_CORE_CPPERRORHANDLER_HH 
 
 // TODO (Rogers): If I am worried about bad memory allocation I may not want to
 //                pass by value...

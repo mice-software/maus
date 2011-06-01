@@ -1,4 +1,3 @@
-// MAUS WARNING: THIS IS LEGACY CODE.
 /* This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
  *
  * MAUS is free software: you can redistribute it and/or modify
@@ -24,8 +23,8 @@
  *
  */
 
-#ifndef _SRC_COMMON_SIMULATION_MAUSTRACKINGACTION_H_
-#define _SRC_COMMON_SIMULATION_MAUSTRACKINGACTION_H_
+#ifndef _SRC_CPP_CORE_SIMULATION_MAUSTRACKINGACTION_HH_
+#define _SRC_CPP_CORE_SIMULATION_MAUSTRACKINGACTION_HH_
 
 #include <sstream>  //  combining strings and numbers
 
@@ -34,7 +33,7 @@
 #include "G4Track.hh"  //  arg to tracking action
 #include "G4UserTrackingAction.hh"  //  inherit from
 
-#include "src/common/Simulation/MAUSSteppingAction.hh"
+#include "src/cpp_core/Simulation/MAUSSteppingAction.hh"
 
 namespace MAUS {
 
@@ -52,4 +51,4 @@ class MAUSTrackingAction : public G4UserTrackingAction {
 
 }  //  ends MAUS namespace
 
-#endif  // _SRC_COMMON_SIMULATION_MAUSTRACKINGACTION_H_
+#endif  // _SRC_CPP_CORE_SIMULATION_MAUSTRACKINGACTION_HH_

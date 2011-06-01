@@ -5,7 +5,7 @@
 #include "globals.hh"
 #include "G4UserSteppingAction.hh"
 #include "Simulation/MICEStepStatistics.hh"
-#include "Simulation/VirtualPlanes.hh"
+#include "src/cpp_core/Simulation/VirtualPlanes.hh"
 #include "Simulation/MICEPrimaryGeneratorAction.hh"
 #include "Simulation/MICEEventAction.hh"
 

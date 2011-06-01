@@ -1,4 +1,3 @@
-// MAUS WARNING: THIS IS LEGACY CODE.
 /* This file is part of MAUS: http://micewww.pp.rl.ac.uk/projects/maus
  *
  * MAUS is free software: you can redistribute it and/or modify
@@ -21,7 +20,7 @@
 #include "json/json.h"
 
 #include "Interface/Squeal.hh"
-#include "Interface/JsonWrapper.hh"
+#include "src/cpp_core/Utils/JsonWrapper.hh"
 
 Json::Value JsonWrapper::StringToJson(std::string json_in) throw(Squeal) {
   Json::Reader reader;

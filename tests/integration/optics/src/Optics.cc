@@ -9,10 +9,10 @@
 
 #include "Optics.hh"
 
-#include "src/common/Interface/JsonWrapper.hh"
+#include "src/cpp_core/Utils/JsonWrapper.hh"
 #include "src/common/Interface/MiceMaterials.hh"
-#include "src/common/Simulation/MAUSPrimaryGeneratorAction.hh"
-#include "src/common/Simulation/MAUSPrimaryGeneratorAction.hh"
+#include "src/cpp_core/Simulation/MAUSPrimaryGeneratorAction.hh"
+#include "src/cpp_core/Simulation/MAUSPrimaryGeneratorAction.hh"
 #include "src/common/BeamTools/BTFieldConstructor.hh"
 #include "src/common/Interface/SpecialHit.hh"
 #include "src/common/Interface/MiceEventManager.hh"

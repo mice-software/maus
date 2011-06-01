@@ -1,7 +1,6 @@
-// MAUS WARNING: THIS IS LEGACY CODE.
 #include "json/json.h"
 
-#include "Interface/CppErrorHandler.hh"
+#include "src/cpp_core/Utils/CppErrorHandler.hh"
 #include "Interface/Squeak.hh"
 
 Json::Value CppErrorHandler::HandleSqueal

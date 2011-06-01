@@ -42,7 +42,7 @@
 #include "globals.hh" // temp
 
 //  MAUS code
-#include "Simulation/MAUSGeant4Manager.hh"
+#include "src/cpp_core/Simulation/MAUSGeant4Manager.hh"
 
 // G4MICE from commonCpp
 #include "BeamTools/BTPhaser.hh"

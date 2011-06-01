@@ -18,9 +18,10 @@
 #include <vector>
 #include <string>
 
-#include "Interface/CppErrorHandler.hh"
+#include "src/cpp_core/Utils/JsonWrapper.hh"
+#include "src/cpp_core/Utils/CppErrorHandler.hh"
+
 #include "Interface/Squeal.hh"
-#include "Interface/JsonWrapper.hh"
 #include "Interface/dataCards.hh"
 
 #include "MapCppSimulation.h"

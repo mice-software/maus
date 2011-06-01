@@ -1,4 +1,3 @@
-// MAUS WARNING: THIS IS LEGACY CODE.
 /* This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
  *
  * MAUS is free software: you can redistribute it and/or modify
@@ -24,8 +23,8 @@
  *  will fire hits until the queue is empty.
  */
 
-#ifndef _SRC_MAP_MAUSPRIMARYGENERATORACTION_H_
-#define _SRC_MAP_MAUSPRIMARYGENERATORACTION_H_
+#ifndef _SRC_CPP_CORE_SIMULATION_MAUSPRIMARYGENERATORACTION_HH_
+#define _SRC_CPP_CORE_SIMULATION_MAUSPRIMARYGENERATORACTION_HH_
 
 #include <string>
 #include <queue>
@@ -34,7 +33,7 @@
 #include "G4ParticleTable.hh"
 #include "G4VUserPrimaryGeneratorAction.hh"  // inherit from
 
-#include "Interface/Squeak.hh"
+#include "src/common/Interface/Squeak.hh"
 
 namespace MAUS {
 
@@ -96,4 +95,4 @@ class MAUSPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
 
 }  // ends MAUS namespace
 
-#endif  // _SRC_MAP_MAUSPRIMARYGENERATORACTION_H_
+#endif  // _SRC_CPP_CORE_SIMULATION_MAUSPRIMARYGENERATORACTION_HH_

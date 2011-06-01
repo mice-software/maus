@@ -1,4 +1,3 @@
-// MAUS WARNING: THIS IS LEGACY CODE.
 /* This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
  *
  * MAUS is free software: you can redistribute it and/or modify
@@ -27,8 +26,8 @@
 // TODO(Rogers): The tracks should be stored on the run action (and cleared at
 //               runaction time)
 
-#ifndef _SRC_COMMON_SIMULATION_MAUSSTEPPINGACTION_HH_
-#define _SRC_COMMON_SIMULATION_MAUSSTEPPINGACTION_HH_
+#ifndef _SRC_CPP_CORE_SIMULATION_MAUSSTEPPINGACTION_HH_
+#define _SRC_CPP_CORE_SIMULATION_MAUSSTEPPINGACTION_HH_
 
 #include <cmath>
 #include <sstream>
@@ -89,4 +88,4 @@ class MAUSSteppingAction : public G4UserSteppingAction {
 
 }  //  ends MAUS namespace
 
-#endif  //  _SRC_COMMON_MAUSSTEPPINGACTION_HH_
+#endif  //  _SRC_CPP_CORE_SIMULATION_MAUSSTEPPINGACTION_HH_

@@ -18,8 +18,8 @@
 
 #include <iostream>
 
-#include "Simulation/MAUSGeant4Manager.hh"
-#include "Simulation/MAUSTrackingAction.hh"
+#include "src/cpp_core/Simulation/MAUSGeant4Manager.hh"
+#include "src/cpp_core/Simulation/MAUSTrackingAction.hh"
 
 namespace MAUS {
 

@@ -20,11 +20,11 @@
 
 #include "G4Step.hh"
 
-#include "src/common/Interface/JsonWrapper.hh"
-#include "src/common/Interface/MICERun.hh"
+#include "src/cpp_core/Utils/JsonWrapper.hh"
+#include "src/cpp_core/Simulation/MAUSGeant4Manager.hh"
+#include "src/cpp_core/Simulation/MAUSTrackingAction.hh"
 
-#include "src/common/Simulation/MAUSGeant4Manager.hh"
-#include "src/common/Simulation/MAUSTrackingAction.hh"
+#include "src/common/Interface/MICERun.hh"
 
 namespace {
 class MAUSTrackingActionTest : public ::testing::Test {

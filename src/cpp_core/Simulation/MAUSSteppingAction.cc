@@ -1,4 +1,3 @@
-// MAUS WARNING: THIS IS LEGACY CODE.
 /* This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
  *
  * MAUS is free software: you can redistribute it and/or modify
@@ -21,10 +20,10 @@
 #include "Interface/Squeak.hh"
 #include "Interface/Squeal.hh"
 #include "Interface/MICERun.hh"
-#include "Interface/JsonWrapper.hh"
 
-#include "Simulation/MAUSSteppingAction.hh"
-#include "Simulation/VirtualPlanes.hh"
+#include "src/cpp_core/Utils/JsonWrapper.hh"
+#include "src/cpp_core/Simulation/MAUSSteppingAction.hh"
+#include "src/cpp_core/Simulation/VirtualPlanes.hh"
 
 namespace MAUS {
 

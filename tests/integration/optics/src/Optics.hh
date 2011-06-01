@@ -3,7 +3,7 @@
 #include <sstream>
 #include <cstdlib>
 
-#include "src/common/Simulation/MAUSGeant4Manager.hh"
+#include "src/cpp_core/Simulation/MAUSGeant4Manager.hh"
 
 #include "src/common/Config/MiceModule.hh"
 

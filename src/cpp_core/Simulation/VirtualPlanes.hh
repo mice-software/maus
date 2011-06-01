@@ -19,8 +19,8 @@
 // TODO(rogers) - multipass logic should be handled in the plane itself; at the
 //                moment it's handled in the manager
 
-#ifndef _SRC_COMMON_INTERFACE_VIRTUALPLANES_HH_
-#define _SRC_COMMON_INTERFACE_VIRTUALPLANES_HH_
+#ifndef _SRC_CPP_CORE_INTERFACE_VIRTUALPLANES_HH_
+#define _SRC_CPP_CORE_INTERFACE_VIRTUALPLANES_HH_
 
 #include <vector>
 #include <map>

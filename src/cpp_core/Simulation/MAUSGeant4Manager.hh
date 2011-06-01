@@ -1,4 +1,3 @@
-// MAUS WARNING: THIS IS LEGACY CODE.
 /* This file is part of MAUS: http://micewww.pp.rl.ac.uk/projects/maus
  *
  * MAUS is free software: you can redistribute it and/or modify
@@ -27,20 +26,20 @@
  *  tracks on each Geant4 event - i.e. the spill should be the Geant4 event.
  */
 
-#ifndef _SRC_COMMON_MAUSGEANT4MANAGER_HH_
-#define _SRC_COMMON_MAUSGEANT4MANAGER_HH_
+#ifndef _SRC_CPP_CORE_SIMULATION_MAUSGEANT4MANAGER_HH_
+#define _SRC_CPP_CORE_SIMULATION_MAUSGEANT4MANAGER_HH_
 
 #include <G4RunManager.hh>
 #include <G4SDManager.hh>
 
 // should all be forward declarations?
-#include "Simulation/MICERunAction.hh"
-#include "Simulation/MICESteppingAction.hh"
-#include "Simulation/FillMaterials.hh"
-#include "Simulation/MICEDetectorConstruction.hh"
-#include "Simulation/MAUSPrimaryGeneratorAction.hh"
-#include "Simulation/MAUSSteppingAction.hh"
-#include "Simulation/MAUSTrackingAction.hh"
+#include "src/common/Simulation/MICERunAction.hh"
+#include "src/common/Simulation/MICESteppingAction.hh"
+#include "src/common/Simulation/FillMaterials.hh"
+#include "src/common/Simulation/MICEDetectorConstruction.hh"
+#include "src/cpp_core/Simulation/MAUSPrimaryGeneratorAction.hh"
+#include "src/cpp_core/Simulation/MAUSSteppingAction.hh"
+#include "src/cpp_core/Simulation/MAUSTrackingAction.hh"
 
 class MICEPhysicsList;
 
@@ -102,5 +101,5 @@ class MAUSGeant4Manager {
 
 } // namespace MAUS
 
-#endif
+#endif //_SRC_CPP_CORE_SIMULATION_MAUSGEANT4MANAGER_HH_
 

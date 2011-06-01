@@ -26,7 +26,7 @@
 #include "CLHEP/Vector/Rotation.h"
 #include "CLHEP/Vector/ThreeVector.h"
 
-#include "src/common/Simulation/VirtualPlanes.hh"
+#include "src/cpp_core/Simulation/VirtualPlanes.hh"
 #include "src/common/Config/MiceModule.hh"
 #include "src/common/BeamTools/BTConstantField.hh"
 #include "src/common/Interface/Squeal.hh"

@@ -25,7 +25,7 @@
 
 #include "json/json.h"
 
-#include "src/common/Simulation/VirtualPlanes.hh"
+#include "src/cpp_core/Simulation/VirtualPlanes.hh"
 #include "src/common/Interface/VirtualHit.hh"
 #include "src/common/Config/MiceModule.hh"
 #include "src/common/Interface/Squeal.hh"
