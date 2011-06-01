@@ -1,4 +1,3 @@
-// MAUS WARNING: THIS IS LEGACY CODE.
 /* This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
  *
  * MAUS is free software: you can redistribute it and/or modify
