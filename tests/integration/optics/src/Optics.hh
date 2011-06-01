@@ -5,14 +5,14 @@
 
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 
-#include "src/legacy/Config/MiceModule.hh"
+#include "src/common/Config/MiceModule.hh"
 
-#include "src/legacy/Interface/dataCards.hh"
-#include "src/legacy/Interface/Squeak.hh"
+#include "src/common/Interface/dataCards.hh"
+#include "src/common/Interface/Squeak.hh"
 
-#include "src/legacy/Optics/CovarianceMatrix.hh"
-#include "src/legacy/Optics/TransferMap.hh"
-#include "src/legacy/Optics/TransportManager.hh"
+#include "src/common/Optics/CovarianceMatrix.hh"
+#include "src/common/Optics/TransferMap.hh"
+#include "src/common/Optics/TransportManager.hh"
 
 #include "G4RunManager.hh"
 
