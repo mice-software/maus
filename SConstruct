@@ -424,7 +424,7 @@ env.Append(LIBPATH =  libs.split(':') + ["%s/build" % maus_root_dir])
 env.Append(CPPPATH=["%s/third_party/install/include" % maus_root_dir, \
                       "%s/third_party/install/include/python2.7" % maus_root_dir, \
                       "%s/third_party/install/include/root" % maus_root_dir, \
-                      "%s/src/common" % maus_root_dir, ""])
+                      "%s/src/legacy" % maus_root_dir, ""])
 
 env['USE_G4'] = False
 env['USE_ROOT'] = False
@@ -493,18 +493,18 @@ if env['USE_G4'] and env['USE_ROOT']:
     #env.Append(CCFLAGS=['-g','-pg'])
     #env.Append(LINKFLAGS='-pg')
 
-    common_cpp_files = glob.glob("src/common/*/*cc") + \
-        glob.glob("src/common/*/*/*cc") + \
-        glob.glob("src/common/*/*cpp") + \
-        glob.glob("src/common/*/*/*cpp") + \
-        glob.glob("src/cpp_core/*/*cc")
+    common_cpp_files = glob.glob("src/legacy/*/*cc") + \
+        glob.glob("src/legacy/*/*/*cc") + \
+        glob.glob("src/legacy/*/*cpp") + \
+        glob.glob("src/legacy/*/*/*cpp") + \
+        glob.glob("src/common_cpp/*/*cc")
 
-    simulate = env.SharedLibrary(target = 'src/common/libsimulate',
+    simulate = env.SharedLibrary(target = 'src/legacy/libsimulate',
                                  source = common_cpp_files,
                                  LIBS=env['LIBS'] + ['recpack'])
     env.Install("build", simulate)
 
-    env.Append(LIBPATH = 'src/common/')
+    env.Append(LIBPATH = 'src/legacy/')
     env.Append(CPPPATH = maus_root_dir)
 
     if 'Darwin' in os.environ.get('G4SYSTEM'):
@@ -568,10 +568,10 @@ for single_stuff in stuff_to_import:
 
 file_to_import.close()
 
-files = glob.glob('tests/unit/test_*')+glob.glob('tests/style/*.py')
+files = glob.glob('tests/py_unit/test_*')+glob.glob('tests/style/*.py')
 env.Install("build", files)
 
-env.Install("build", "tests/unit/test_cdb")
-env.Install("build", "tests/unit/suds")
+env.Install("build", "tests/py_unit/test_cdb")
+env.Install("build", "tests/py_unit/suds")
 
 env.Alias('install', ['%s/build' % maus_root_dir])

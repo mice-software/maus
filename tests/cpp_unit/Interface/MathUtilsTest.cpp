@@ -21,8 +21,8 @@
 
 #include "gtest/gtest.h"
 
-#include "src/common/Interface/MathUtils.hh"
-#include "src/common/Interface/STLUtils.hh"
+#include "src/legacy/Interface/MathUtils.hh"
+#include "src/legacy/Interface/STLUtils.hh"
 
 namespace {
 

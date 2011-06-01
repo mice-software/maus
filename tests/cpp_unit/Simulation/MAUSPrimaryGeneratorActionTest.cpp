@@ -24,8 +24,8 @@
 
 #include "CLHEP/Random/Random.h"
 
-#include "src/cpp_core/Simulation/MAUSGeant4Manager.hh"
-#include "src/cpp_core/Simulation/MAUSPrimaryGeneratorAction.hh"
+#include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
+#include "src/common_cpp/Simulation/MAUSPrimaryGeneratorAction.hh"
 
 namespace {
 class MAUSPrimaryGeneratorActionTest : public ::testing::Test {

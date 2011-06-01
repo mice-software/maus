@@ -24,21 +24,21 @@
 #include "gtest/gtest.h"
 
 /////////// Needed until persistency move is done /////////////
-#include "src/common/Interface/dataCards.hh"
-#include "src/common/Interface/MICEEvent.hh"
-#include "src/common/Interface/MICERun.hh"
-#include "src/cpp_core/Utils/JsonWrapper.hh"
+#include "src/legacy/Interface/dataCards.hh"
+#include "src/legacy/Interface/MICEEvent.hh"
+#include "src/legacy/Interface/MICERun.hh"
+#include "src/common_cpp/Utils/JsonWrapper.hh"
 
 
-#include "src/common/Config/MiceModule.hh"
-#include "src/common/Interface/MiceMaterials.hh"
-#include "src/common/Simulation/FillMaterials.hh"
+#include "src/legacy/Config/MiceModule.hh"
+#include "src/legacy/Interface/MiceMaterials.hh"
+#include "src/legacy/Simulation/FillMaterials.hh"
 dataCards MyDataCards(0);
 MICEEvent simEvent;
 /////////// Needed until persistency move is done //////////////
 
 /////////// Needed until I clean up legacy tests to gtest framework //////////
-#include "src/common/Interface/Squeak.hh"
+#include "src/legacy/Interface/Squeak.hh"
 /////////// Needed until I clean up legacy tests to gtest framework //////////
 
 std::string jsonconfig =

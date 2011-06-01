@@ -3,16 +3,16 @@
 #include <sstream>
 #include <cstdlib>
 
-#include "src/cpp_core/Simulation/MAUSGeant4Manager.hh"
+#include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 
-#include "src/common/Config/MiceModule.hh"
+#include "src/legacy/Config/MiceModule.hh"
 
-#include "src/common/Interface/dataCards.hh"
-#include "src/common/Interface/Squeak.hh"
+#include "src/legacy/Interface/dataCards.hh"
+#include "src/legacy/Interface/Squeak.hh"
 
-#include "CovarianceMatrix.hh"
-#include "TransferMap.hh"
-#include "TransportManager.hh"
+#include "src/legacy/Optics/CovarianceMatrix.hh"
+#include "src/legacy/Optics/TransferMap.hh"
+#include "src/legacy/Optics/TransportManager.hh"
 
 #include "G4RunManager.hh"
 

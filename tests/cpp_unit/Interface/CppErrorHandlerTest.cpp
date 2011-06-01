@@ -5,7 +5,7 @@
 #include "json/json.h"
 
 #include "Interface/Squeal.hh"
-#include "src/cpp_core/Utils/CppErrorHandler.hh"
+#include "src/common_cpp/Utils/CppErrorHandler.hh"
 
 namespace {
 

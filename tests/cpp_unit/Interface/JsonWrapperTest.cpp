@@ -18,7 +18,7 @@
 
 #include "gtest/gtest.h"
 
-#include "src/cpp_core/Utils/JsonWrapper.hh"
+#include "src/common_cpp/Utils/JsonWrapper.hh"
 
 TEST(JsonWrapper, StringToJson) {
   std::string good_json = "{}";

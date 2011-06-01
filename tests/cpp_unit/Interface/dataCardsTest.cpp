@@ -16,8 +16,8 @@
 
 #include "gtest/gtest.h" 
 
-#include "src/common/Interface/dataCards.hh"
-#include "src/common/Interface/Squeal.hh"
+#include "src/legacy/Interface/dataCards.hh"
+#include "src/legacy/Interface/Squeal.hh"
 
 #include <sstream>
 

@@ -18,8 +18,8 @@
 #include <vector>
 #include <string>
 
-#include "src/cpp_core/Utils/JsonWrapper.hh"
-#include "src/cpp_core/Utils/CppErrorHandler.hh"
+#include "src/common_cpp/Utils/JsonWrapper.hh"
+#include "src/common_cpp/Utils/CppErrorHandler.hh"
 
 #include "Interface/Squeal.hh"
 #include "Interface/dataCards.hh"

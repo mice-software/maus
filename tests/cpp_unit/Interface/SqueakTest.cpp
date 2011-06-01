@@ -19,9 +19,9 @@
 
 #include "gtest/gtest.h"
 
-#include "src/common/Interface/MICERun.hh"
-#include "src/common/Interface/Squeak.hh"
-#include "src/common/Interface/Squeal.hh"
+#include "src/legacy/Interface/MICERun.hh"
+#include "src/legacy/Interface/Squeak.hh"
+#include "src/legacy/Interface/Squeal.hh"
 
 namespace {
 

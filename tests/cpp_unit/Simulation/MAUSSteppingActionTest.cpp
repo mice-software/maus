@@ -21,11 +21,11 @@
 #include "G4Step.hh"
 #include "G4ParticleTable.hh"
 
-#include "src/cpp_core/Utils/JsonWrapper.hh"
-#include "src/cpp_core/Simulation/MAUSGeant4Manager.hh"
-#include "src/cpp_core/Simulation/MAUSSteppingAction.hh"
+#include "src/common_cpp/Utils/JsonWrapper.hh"
+#include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
+#include "src/common_cpp/Simulation/MAUSSteppingAction.hh"
 
-#include "src/common/Interface/MICERun.hh"
+#include "src/legacy/Interface/MICERun.hh"
 
 namespace {
 class MAUSSteppingActionTest : public ::testing::Test {

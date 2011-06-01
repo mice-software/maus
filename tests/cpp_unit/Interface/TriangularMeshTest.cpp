@@ -19,7 +19,7 @@
 
 #include <math.h>
 
-#include "src/common/Interface/TriangularMesh.hh"
+#include "src/legacy/Interface/TriangularMesh.hh"
 
 namespace {
 

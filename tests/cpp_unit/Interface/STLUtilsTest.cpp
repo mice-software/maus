@@ -20,7 +20,7 @@
 
 #include "gtest/gtest.h"
 
-#include "src/common/Interface/STLUtils.hh"
+#include "src/legacy/Interface/STLUtils.hh"
 
 namespace {
 
