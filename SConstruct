@@ -54,7 +54,7 @@ class Dev:
         #assume debugcflags and releasecflags are defined
         localenv.Append(CCFLAGS=self.cflags)
         if use_root and use_g4:
-            localenv.Append(LIBS=['simulate'])
+            localenv.Append(LIBS=['MausCpp'])
 
         #specify the build directory
         localenv.VariantDir(variant_dir=builddir, src_dir='.', duplicate=0)
@@ -499,10 +499,10 @@ if env['USE_G4'] and env['USE_ROOT']:
         glob.glob("src/legacy/*/*/*cpp") + \
         glob.glob("src/common_cpp/*/*cc")
 
-    simulate = env.SharedLibrary(target = 'src/legacy/libsimulate',
+    maus_cpp = env.SharedLibrary(target = 'src/legacy/libMausCpp',
                                  source = common_cpp_files,
                                  LIBS=env['LIBS'] + ['recpack'])
-    env.Install("build", simulate)
+    env.Install("build", maus_cpp)
 
     env.Append(LIBPATH = 'src/legacy/')
     env.Append(CPPPATH = maus_root_dir)
@@ -517,13 +517,13 @@ if env['USE_G4'] and env['USE_ROOT']:
 
     testmain = env.Program(target = 'tests/cpp_unit/test_cpp_unit', \
                                source = test_cpp_files, \
-                               LIBS= env['LIBS'] + ['recpack'] + ['simulate'])
+                               LIBS= env['LIBS'] + ['recpack'] + ['MausCpp'])
     env.Install('build', ['tests/cpp_unit/test_cpp_unit'])
 
     test_optics_files = glob.glob("tests/integration/optics/src/*cc")
     test_optics = env.Program(target = 'tests/integration/optics/optics', \
                                source = test_optics_files, \
-                               LIBS= env['LIBS'] + ['simulate'])
+                               LIBS= env['LIBS'] + ['MausCpp'])
 
 
 directories = []

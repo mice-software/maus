@@ -33,7 +33,7 @@ class MapCppSimulationTestCase(unittest.TestCase):
         print files
 
         for file in files:
-            args = ['python', '%s/tests/unit/test_geometry.py' %  os.environ.get("MAUS_ROOT_DIR"), file]
+            args = ['python', '%s/tests/py_unit/test_geometry.py' %  os.environ.get("MAUS_ROOT_DIR"), file]
             p = subprocess.Popen(args)
             p.wait()
             self.assertEqual(p.returncode, 0)
