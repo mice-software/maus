@@ -3,7 +3,7 @@
 #define SciFiSD_h 1
 
 #include <json/json.h>
-#include "DetModel/MAUSSD.h"
+#include "DetModel/MAUSSD.hh"
 
 using namespace MAUS;
 

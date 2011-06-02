@@ -47,7 +47,7 @@
 // G4MICE from commonCpp
 #include "BeamTools/BTPhaser.hh"
 #include "Config/MiceModule.hh"
-#include "DetModel/MAUSSD.h"  //  non-G4MICE addition
+#include "DetModel/MAUSSD.hh"  //  non-G4MICE addition
 #include "Interface/MICEEvent.hh"
 #include "Interface/MiceEventManager.hh"
 #include "Interface/MiceMaterials.hh"

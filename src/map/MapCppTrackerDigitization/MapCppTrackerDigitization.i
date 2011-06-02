@@ -1,9 +1,9 @@
 %module MapCppTrackerDigitization
  %{
  /* Includes the header in the wrapper code */
- #include "MapCppTrackerDigitization.h"
+ #include "MapCppTrackerDigitization.hh"
  %}
 %include "std_string.i"
  
-%include "MapCppTrackerDigitization.h"
+%include "MapCppTrackerDigitization.hh"
 

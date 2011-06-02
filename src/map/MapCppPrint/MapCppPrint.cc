@@ -1,4 +1,4 @@
-#include "MapCppPrint.h"
+#include "MapCppPrint.hh"
 
 bool MapCppPrint::birth(std::string argJsonConfigDocument) {
   _classname = "MapCppPrint";

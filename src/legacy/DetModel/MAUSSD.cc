@@ -16,7 +16,7 @@
  *
  */
 
-#include "MAUSSD.h"
+#include "MAUSSD.hh"
 
 namespace MAUS {
 

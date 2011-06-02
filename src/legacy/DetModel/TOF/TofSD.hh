@@ -6,7 +6,7 @@
 #ifndef _TOFSD_HH_
 #define _TOFSD_HH_ 1
 
-#include "DetModel/MAUSSD.h"
+#include "DetModel/MAUSSD.hh"
 #include "G4VSensitiveDetector.hh"
 #include <json/json.h>
 #include <string>

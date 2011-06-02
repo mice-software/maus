@@ -1,4 +1,4 @@
-#include "MapCppTrackerDigitization.h"
+#include "MapCppTrackerDigitization.hh"
 
 //  This stuff is *still* needed until persistency move is done
 dataCards MyDataCards("Digitization");

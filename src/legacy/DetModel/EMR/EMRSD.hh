@@ -2,7 +2,7 @@
 #ifndef EMRSD_h
 #define EMRSD_h 1
 // MAUS
-#include "DetModel/MAUSSD.h"
+#include "DetModel/MAUSSD.hh"
 // Geant 4
 #include "G4VSensitiveDetector.hh"
 

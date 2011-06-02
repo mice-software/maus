@@ -60,7 +60,7 @@ class Dev:
         localenv.VariantDir(variant_dir=builddir, src_dir='.', duplicate=0)
         localenv.Append(CPPPATH='.')
 
-        srclst = map(lambda x: builddir + '/' + x, glob.glob('*.cpp'))
+        srclst = map(lambda x: builddir + '/' + x, glob.glob('*.cc'))
         srclst += map(lambda x: builddir + '/' + x, glob.glob('*.i'))
         pgm = localenv.SharedLibrary(targetpath, source=srclst)
 
@@ -495,8 +495,6 @@ if env['USE_G4'] and env['USE_ROOT']:
 
     common_cpp_files = glob.glob("src/legacy/*/*cc") + \
         glob.glob("src/legacy/*/*/*cc") + \
-        glob.glob("src/legacy/*/*cpp") + \
-        glob.glob("src/legacy/*/*/*cpp") + \
         glob.glob("src/common_cpp/*/*cc")
 
     maus_cpp = env.SharedLibrary(target = 'src/legacy/libMausCpp',
@@ -510,9 +508,7 @@ if env['USE_G4'] and env['USE_ROOT']:
     if 'Darwin' in os.environ.get('G4SYSTEM'):
        env.Append(LINKFLAGS=['-undefined','suppress','-flat_namespace'])
 
-    test_cpp_files = glob.glob("tests/cpp_unit/*/*cpp")+\
-        glob.glob("tests/cpp_unit/*cpp")
-    test_cpp_files += glob.glob("tests/cpp_unit/*/*cc")+\
+    test_cpp_files = glob.glob("tests/cpp_unit/*/*cc")+\
         glob.glob("tests/cpp_unit/*cc")
 
     testmain = env.Program(target = 'tests/cpp_unit/test_cpp_unit', \
