@@ -1,8 +1,8 @@
 %module MapCppPrint
  %{
- #include "MapCppPrint.h"
+ #include "MapCppPrint.hh"
  %}
 %include "std_string.i"
  
-%include "MapCppPrint.h"
+%include "MapCppPrint.hh"
 

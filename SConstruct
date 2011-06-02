@@ -54,13 +54,13 @@ class Dev:
         #assume debugcflags and releasecflags are defined
         localenv.Append(CCFLAGS=self.cflags)
         if use_root and use_g4:
-            localenv.Append(LIBS=['simulate'])
+            localenv.Append(LIBS=['MausCpp'])
 
         #specify the build directory
         localenv.VariantDir(variant_dir=builddir, src_dir='.', duplicate=0)
         localenv.Append(CPPPATH='.')
 
-        srclst = map(lambda x: builddir + '/' + x, glob.glob('*.cpp'))
+        srclst = map(lambda x: builddir + '/' + x, glob.glob('*.cc'))
         srclst += map(lambda x: builddir + '/' + x, glob.glob('*.i'))
         pgm = localenv.SharedLibrary(targetpath, source=srclst)
 
@@ -424,7 +424,7 @@ env.Append(LIBPATH =  libs.split(':') + ["%s/build" % maus_root_dir])
 env.Append(CPPPATH=["%s/third_party/install/include" % maus_root_dir, \
                       "%s/third_party/install/include/python2.7" % maus_root_dir, \
                       "%s/third_party/install/include/root" % maus_root_dir, \
-                      "%s/src/common" % maus_root_dir, ""])
+                      "%s/src/legacy" % maus_root_dir, ""])
 
 env['USE_G4'] = False
 env['USE_ROOT'] = False
@@ -468,7 +468,7 @@ Export('env') # pylint: disable-msg=E0602
 
 print "Configuring..."
 # Must have long32 & long64 for the unpacking library
-env.Append(CCFLAGS=["""-Dlong32='int'""", """-Dlong64='long long'"""]) # , '-g', """-fprofile-arcs""", """-ftest-coverage""",])
+env.Append(CCFLAGS=["""-Dlong32='int'""", """-Dlong64='long long'"""]) # , '-g', """-fprofile-arcs""", """-ftest-coverage""", """-fno-inline""", """-fno-default-inline"""])
 env.Append(LIBS=['gcov'])
 conf = Configure(env, custom_tests = {'CheckCommand' : CheckCommand}) # pylint: disable-msg=E0602
 set_cpp(conf, env)
@@ -493,36 +493,33 @@ if env['USE_G4'] and env['USE_ROOT']:
     #env.Append(CCFLAGS=['-g','-pg'])
     #env.Append(LINKFLAGS='-pg')
 
-    common_cpp_files = glob.glob("src/common/*/*cc") + \
-        glob.glob("src/common/*/*/*cc") + \
-        glob.glob("src/common/*/*cpp") + \
-        glob.glob("src/common/*/*/*cpp")
+    common_cpp_files = glob.glob("src/legacy/*/*cc") + \
+        glob.glob("src/legacy/*/*/*cc") + \
+        glob.glob("src/common_cpp/*/*cc")
 
-    simulate = env.SharedLibrary(target = 'src/common/libsimulate',
+    maus_cpp = env.SharedLibrary(target = 'src/legacy/libMausCpp',
                                  source = common_cpp_files,
                                  LIBS=env['LIBS'] + ['recpack'])
-    env.Install("build", simulate)
+    env.Install("build", maus_cpp)
 
-    env.Append(LIBPATH = 'src/common/')
+    env.Append(LIBPATH = 'src/legacy/')
     env.Append(CPPPATH = maus_root_dir)
 
     if 'Darwin' in os.environ.get('G4SYSTEM'):
        env.Append(LINKFLAGS=['-undefined','suppress','-flat_namespace'])
 
-    test_cpp_files = glob.glob("tests/cpp_unit/*/*cpp")+\
-        glob.glob("tests/cpp_unit/*cpp")
-    test_cpp_files += glob.glob("tests/cpp_unit/*/*cc")+\
+    test_cpp_files = glob.glob("tests/cpp_unit/*/*cc")+\
         glob.glob("tests/cpp_unit/*cc")
 
     testmain = env.Program(target = 'tests/cpp_unit/test_cpp_unit', \
                                source = test_cpp_files, \
-                               LIBS= env['LIBS'] + ['recpack'] + ['simulate'])
+                               LIBS= env['LIBS'] + ['recpack'] + ['MausCpp'])
     env.Install('build', ['tests/cpp_unit/test_cpp_unit'])
 
     test_optics_files = glob.glob("tests/integration/optics/src/*cc")
     test_optics = env.Program(target = 'tests/integration/optics/optics', \
                                source = test_optics_files, \
-                               LIBS= env['LIBS'] + ['simulate'])
+                               LIBS= env['LIBS'] + ['MausCpp'])
 
 
 directories = []
@@ -567,10 +564,10 @@ for single_stuff in stuff_to_import:
 
 file_to_import.close()
 
-files = glob.glob('tests/unit/test_*')+glob.glob('tests/style/*.py')
+files = glob.glob('tests/py_unit/test_*')+glob.glob('tests/style/*.py')
 env.Install("build", files)
 
-env.Install("build", "tests/unit/test_cdb")
-env.Install("build", "tests/unit/suds")
+env.Install("build", "tests/py_unit/test_cdb")
+env.Install("build", "tests/py_unit/suds")
 
 env.Alias('install', ['%s/build' % maus_root_dir])

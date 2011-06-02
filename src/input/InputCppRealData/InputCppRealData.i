@@ -1,7 +1,7 @@
 %module InputCppRealData
  %{
  /* Includes the header in the wrapper code */
- #include "InputCppRealData.h"
+ #include "InputCppRealData.hh"
 
  %}
 %include "std_string.i"
@@ -12,5 +12,5 @@ def emitter(self):
     yield self.getCurEvent()
 %}
 
-%include "InputCppRealData.h"
+%include "InputCppRealData.hh"
 

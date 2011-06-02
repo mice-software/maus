@@ -170,9 +170,9 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
 
      export $DYLIB_VAR="\$MAUS_ROOT_DIR/build:\$$DYLIB_VAR"
 
-     # maus core
-     export PYTHONPATH="\$MAUS_ROOT_DIR/src/core:\$MAUS_ROOT_DIR/third_party/install/lib:\$PYTHONPATH"
-     export $DYLIB_VAR="\$MAUS_ROOT_DIR/src/core:\$$DYLIB_VAR"
+     # maus common
+     export PYTHONPATH="\$MAUS_ROOT_DIR/src/common_py:\$MAUS_ROOT_DIR/third_party/install/lib:\$PYTHONPATH"
+     export $DYLIB_VAR="\$MAUS_ROOT_DIR/src/common_py:\$$DYLIB_VAR"
 
      export G4DEBUG=1
      export G4VERS=geant4.9.2.p04
@@ -193,7 +193,7 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      export G4LEVELGAMMADATA"=\${G4INSTALL}/data/PhotonEvaporation2.0/"
      export G4RADIOACTIVEDATA"=\${G4INSTALL}/data/RadioactiveDecay3.2/"
 
-     export MICEFILES="\${MAUS_ROOT_DIR}/src/common/FILES"
+     export MICEFILES="\${MAUS_ROOT_DIR}/src/legacy/FILES"
 
      echo "SUCCESS: MAUS setup"
 else

@@ -1,3 +1,6 @@
+*.gcov
+*.gcda
+*.gcno
 *.o
 *.os
 *~
@@ -27,3 +30,6 @@ third_party/source/*
 tests/integration/optics/log.*
 tests/integration/optics/envelope*
 tests/integration/optics/optics
+doc/doxygen_backend/
+doc/doxygen_framework/
+

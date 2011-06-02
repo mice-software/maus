@@ -9,15 +9,15 @@
 
 #include "Optics.hh"
 
-#include "src/common/Interface/JsonWrapper.hh"
-#include "src/common/Interface/MiceMaterials.hh"
-#include "src/common/Simulation/MAUSPrimaryGeneratorAction.hh"
-#include "src/common/Simulation/MAUSPrimaryGeneratorAction.hh"
-#include "src/common/BeamTools/BTFieldConstructor.hh"
-#include "src/common/Interface/SpecialHit.hh"
-#include "src/common/Interface/MiceEventManager.hh"
-#include "TransferMap.hh"
-#include "src/common/Interface/MMatrixToCLHEP.hh"
+#include "src/common_cpp/Utils/JsonWrapper.hh"
+#include "src/legacy/Interface/MiceMaterials.hh"
+#include "src/common_cpp/Simulation/MAUSPrimaryGeneratorAction.hh"
+#include "src/common_cpp/Simulation/MAUSPrimaryGeneratorAction.hh"
+#include "src/legacy/BeamTools/BTFieldConstructor.hh"
+#include "src/legacy/Interface/SpecialHit.hh"
+#include "src/legacy/Interface/MiceEventManager.hh"
+#include "src/legacy/Optics/TransferMap.hh"
+#include "src/legacy/Interface/MMatrixToCLHEP.hh"
 
 void  writeEvent() {throw Squeal(Squeal::recoverable, "Not implemented", "writeEvent()");}
 std::vector<MICEEvent*> ReadLoop( std::string filename, std::vector<std::string> classesToProcess ) 
