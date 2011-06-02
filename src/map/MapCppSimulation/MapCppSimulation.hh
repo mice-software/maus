@@ -39,8 +39,6 @@
 // external libraries
 #include "json/json.h"
 
-//#include "globals.hh" // temp
-
 //  MAUS code
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 
