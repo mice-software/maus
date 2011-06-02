@@ -34,7 +34,6 @@
 
 // should all be forward declarations?
 #include "src/legacy/Simulation/MICERunAction.hh"
-#include "src/legacy/Simulation/MICESteppingAction.hh"
 #include "src/legacy/Simulation/FillMaterials.hh"
 #include "src/legacy/Simulation/MICEDetectorConstruction.hh"
 #include "src/common_cpp/Simulation/MAUSPrimaryGeneratorAction.hh"
