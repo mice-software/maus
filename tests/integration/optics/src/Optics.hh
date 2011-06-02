@@ -3,11 +3,14 @@
 #include <sstream>
 #include <cstdlib>
 
+#include "src/common_cpp/Simulation/VirtualPlanes.hh"
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 
 #include "src/legacy/Config/MiceModule.hh"
+#include "src/legacy/Config/ModuleConverter.hh"
 
 #include "src/legacy/Interface/dataCards.hh"
+#include "src/legacy/Interface/MICEEvent.hh"
 #include "src/legacy/Interface/Squeak.hh"
 
 #include "src/legacy/Optics/CovarianceMatrix.hh"

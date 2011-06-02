@@ -10,7 +10,6 @@
 #include "MICEDetectorConstruction.hh"
 #include "Interface/dataCards.hh"
 #include "Config/CoolingChannelGeom.hh"
-#include "EngModel/Q35.hh"
 #include "EngModel/Polycone.hh"
 #include "EngModel/MultipoleAperture.hh"
 #include "EngModel/MiceModToG4Solid.hh"
@@ -182,12 +181,6 @@ void    MICEDetectorConstruction::addDaughter( MiceModule* mod, G4VPhysicalVolum
     }
     else
       std::cerr << "ERROR unknown G4Detector type " << detector << " crashing shortly..." << std::endl;
-  }
-  else if(mod->volType() == "Quadrupole")
-  {
-    logic = BuildQ35(mod); //Care about memory management - buildQ35 creates a new LogicalVolume
-    place = new G4PVPlacement( (G4RotationMatrix*) mod->rotationPointer(), mod->position(),
-                                  mod->name(), logic, moth, false, 0, _checkVolumes);
   }
   else if( mod->volType() == "None" )
   {
@@ -506,20 +499,6 @@ void MICEDetectorConstruction::SetPhasingVolume(MiceModule * cavityModule, G4VPh
     }
 
   if(PhasePlace);
-}
-
-G4LogicalVolume * MICEDetectorConstruction::BuildQ35(MiceModule * mod)
-{
-  G4Material * BeamlineMaterial = _materials->materialByName( mod->propertyStringThis( "BeamlineMaterial" ) );
-  G4Material * QuadMaterial     = _materials->materialByName( mod->propertyStringThis( "QuadMaterial" ) );
-  G4double QuadLength     = mod->propertyDoubleThis("PhysicalLength");
-  G4double QuadRadius     = mod->propertyDoubleThis("QuadRadius");
-  G4double PoleTipRadius  = mod->propertyDoubleThis("PoleTipRadius");
-  G4double CoilRadius     = mod->propertyDoubleThis("CoilRadius");
-  G4double CoilHalfwidth  = mod->propertyDoubleThis("CoilHalfWidth");
-
-  Q35 Quad(BeamlineMaterial, QuadLength, QuadRadius, -1., PoleTipRadius, CoilRadius, CoilHalfwidth, QuadMaterial);
-  return Quad.buildQ35();
 }
 
 std::vector<Json::Value> MICEDetectorConstruction::GetSDHits(int i){

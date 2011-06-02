@@ -5,9 +5,12 @@
 
 #include "Config/RFParameters.hh"
 #include "Interface/dataCards.hh"
+#include "Interface/MICERun.hh"
 
 RFParameters::RFParameters()
 {
+  dataCards& MyDataCards = *(MICERun::getInstance()->DataCards);
+
   frfAccelerationPhase  = MyDataCards.fetchValueDouble("rfAccelerationPhase");
 
   fphaseModel           = MyDataCards.fetchValueString("EnergyLossModel");

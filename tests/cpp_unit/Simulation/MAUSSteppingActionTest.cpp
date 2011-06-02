@@ -24,6 +24,7 @@
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 #include "src/common_cpp/Simulation/MAUSSteppingAction.hh"
+#include "src/common_cpp/Simulation/VirtualPlanes.hh"
 
 #include "src/legacy/Interface/MICERun.hh"
 

@@ -1,10 +1,11 @@
 #include "Tensor.hh"
 #include "Tensor3.hh"
 
+/*
 const Squeal Tensor::_outOfRange = Squeal(Squeal::recoverable, "Tensor index out of range",       "Tensor::Tensor");
 const Squeal Tensor::_outOfRank  = Squeal(Squeal::recoverable, "Tensor rank out of range",        "Tensor::Tensor");
 const Squeal Tensor::_lowRank    = Squeal(Squeal::recoverable, "Do not use Tensor for rank <= 3", "Tensor::Tensor");
-
+*/
 
 Tensor::Tensor(std::vector<int> size, double val) : _data(NULL), _size(size)
 {
@@ -33,7 +34,7 @@ Tensor::~Tensor()
 void Tensor::SetTensor(std::vector<int> size, double val)
 {
 	_size = size;
-	if(size.size() < 4) throw(_lowRank);
+	if(size.size() < 4) throw( Squeal(Squeal::recoverable, "Do not use Tensor for rank <= 3", "Tensor::Tensor"));
 	else if(size.size() == 4)
 	{
 		_data = new Tensor*[size[0]];

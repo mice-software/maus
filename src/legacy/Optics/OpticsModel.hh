@@ -31,7 +31,7 @@ public:
 	OpticsModel(MiceModule * rootModule) : _data(RFParameters::getInstance())
 	{ BuildModel(rootModule); }
 	OpticsModel() : _data(NULL)
-	{_theField = new BTFieldConstructor();}
+	{_theField = new BTFieldGroup();}
 	OpticsModel(BTField * aField) : _data(RFParameters::getInstance())
 	{_theField = aField;}
 	~OpticsModel() {;} //delete _theField;} this should be active

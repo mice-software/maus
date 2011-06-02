@@ -126,8 +126,9 @@ void MICEPhysicsList::SetDecay(bool decay)
 
 void MICEPhysicsList::SetEnergyLoss(eloss eLossModel)
 { 
+  dataCards& dc = *MICERun::getInstance()->DataCards;
   G4UImanager* UI        = G4UImanager::GetUIpointer();
-  double       cutDouble = MyDataCards.fetchValueDouble("ProductionThreshold");
+  double       cutDouble = dc.fetchValueDouble("ProductionThreshold");
   std::stringstream cutStream;
   std::string  elossActive = "activate";
   std::string  flucActive  = "true";
@@ -135,7 +136,7 @@ void MICEPhysicsList::SetEnergyLoss(eloss eLossModel)
     case energyStraggling:
       elossActive = "activate";
       flucActive  = "true";
-      cutDouble   = MyDataCards.fetchValueDouble("ProductionThreshold");
+      cutDouble   = dc.fetchValueDouble("ProductionThreshold");
       break;
     case dedx:
       elossActive = "activate";

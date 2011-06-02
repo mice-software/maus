@@ -7,9 +7,11 @@
 
 #include "Config/MagnetParameters.hh"
 #include "Interface/dataCards.hh"
+#include "Interface/MICERun.hh"
 
 MagnetParameters::MagnetParameters()
 {
+  dataCards& MyDataCards = *(MICERun::getInstance()->DataCards);
   // Field map generation
   fSolDataFiles          = MyDataCards.fetchValueString("SolDataFiles");
   fNumberNodesZGrid      = MyDataCards.fetchValueInt("NumberNodesZGrid");

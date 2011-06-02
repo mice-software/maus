@@ -103,6 +103,4 @@ class dataCards
     std::string client;
 };
 
-extern dataCards MyDataCards;
-
 #endif

@@ -7,9 +7,12 @@
 
 #include "Config/CoolingChannelGeom.hh"
 #include "Interface/dataCards.hh"
+#include "Interface/MICERun.hh"
 
 CoolingChannelGeom::CoolingChannelGeom()
 {
+  dataCards& MyDataCards = *(MICERun::getInstance()->DataCards);
+
   //Stepping parameters
   fDeltaOneStep          = MyDataCards.fetchValueDouble("DeltaOneStep");
 	fDeltaIntersection     = MyDataCards.fetchValueDouble("DeltaIntersection");

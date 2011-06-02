@@ -86,9 +86,6 @@ private:
 
 	Tensor**            _data;
 	std::vector<int>    _size;
-	static const Squeal _outOfRange;
-	static const Squeal _outOfRank;
-	static const Squeal _lowRank;
 };
 
 //implemented:
