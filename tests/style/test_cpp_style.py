@@ -336,11 +336,16 @@ config_files = [
 'BeamlineParameters.cc', 'ModuleTextFileIO.hh', 'SciFiCableManager.hh', 'CoolingChannelGeom.cc', 'VlpcCableOsaka2.cc', 'TofCable.cc', 'ModuleConverter.cc', 'ModuleConverter.hh', 'VlpcCableOsaka3.cc', 'RFBackgroundParameters.cc', 'TofCable.hh', 'BeamlineGeometry.hh', 'BeamlineGeometry.cc', 'VlpcCableOsaka.hh', 'SciFiCableManager.cc', 'RFParameters.hh', 'MagnetParameters.hh', 'BeamlineParameters.hh', 'BeamParameters.cc', 'MiceModule.hh', 'VlpcCableOsaka2.hh', 'CoolingChannelGeom.hh', 'VlpcCableImperial.hh', 'MagnetParameters.cc', 'ModuleTextFileIO.cc', 'VlpcCableImperial.cc', 'BeamParameters.hh', 'RFParameters.cc', 'VlpcCable.hh', 'VlpcCableOsaka3.hh', 'RFBackgroundParameters.hh', 'VlpcCableOsaka.cc', 'MiceModule.cc', 
 ]
 
+optics_files = [
+'AnalysisPlaneBank.cc', 'CovarianceMatrix.cc', 'Material.cc', 'MICEStackingAction.cc', 'MICETrackingAction.cc', 'OpticsModel.cc', 'PhaseSpaceVector.cc', 'Tensor3.cc', 'Tensor.cc', 'TransferMapCalculator.cc', 'TransferMap.cc', 'TransportManager.cc',
+'AnalysisPlaneBank.hh', 'CovarianceMatrix.hh', 'Material.hh', 'MICEStackingAction.hh', 'MICETrackingAction.hh', 'OpticsModel.hh', 'PhaseSpaceVector.hh', 'Tensor3.hh', 'Tensor.hh', 'TransferMapCalculator.hh', 'TransferMap.hh', 'TransportManager.hh',
+]
+
 cpp_unit_files = [
 'MeshTest.cpp', 'MAUSPrimaryGeneratorActionTest.cpp', 'BTSolenoidTest.cpp', 'JsonWrapperTest.cpp', 'MAUSTrackingActionTest.cpp', 'MAUSGeant4ManagerTest.cpp', 'BTMultipoleTest.cpp', 'MVectorTest.cpp', 'DifferentiatorTest.cpp', 'BTFieldConstructorTest.cpp', 'MMatrixTest.cpp', 'MiceModToG4SolidTest.cpp', 'PolynomialTest.cpp', 'BTTrackerTest.cpp', 'MAUSSteppingActionTest.cpp', 'CppErrorHandlerTest.cpp', 'MiceModuleTest.cpp', 'TriangularMeshTest.cpp', 'dataCardsTest.cpp', 
 ]
 
-cp = os.path.join('src', 'common')
+cp = os.path.join('src', 'legacy')
 test = os.path.join('tests', 'cpp_unit')
 
 # glob files here because of 
@@ -358,6 +363,7 @@ exclude_files += file_append(os.path.join(cp, 'BeamTools'), beamtools_files)
 exclude_files += file_append(os.path.join(cp, 'Simulation'), simulation_files)
 exclude_files += file_append(os.path.join(cp, 'Calib'), calib_files)
 exclude_files += file_append(os.path.join(cp, 'Config'), config_files)
+exclude_files += file_append(os.path.join(cp, 'Optics'), optics_files)
 
 if __name__=="__main__":
   unittest.main()
