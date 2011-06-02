@@ -33,7 +33,7 @@
 #include "src/legacy/Interface/VirtualHit.hh"
 
 // FORCE G4 setup first so that we can make G4 particle table ok
-#include "tests/cpp_unit/Simulation/MAUSGeant4ManagerTest.cpp"
+#include "tests/cpp_unit/Simulation/MAUSGeant4ManagerTest.cc"
 
 namespace {
 
