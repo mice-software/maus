@@ -427,7 +427,7 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                  = $(MAUS_ROOT_DIR)/doc/doc_tools/backend.hh $(MAUS_ROOT_DIR)/src/common
+INPUT                  = $(MAUS_ROOT_DIR)/doc/doc_tools/backend.hh $(MAUS_ROOT_DIR)/src/legacy
 
 # If the value of the INPUT tag contains directories, you can use the 
 # FILE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp 
