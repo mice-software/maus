@@ -15,11 +15,12 @@
  *
  */
 
-#ifndef _MAUS_INPUTCPPREALDATA_UNPACKEVENTLIB_H__
-#define _MAUS_INPUTCPPREALDATA_UNPACKEVENTLIB_H__
+#ifndef _MAUS_INPUTCPPREALDATA_UNPACKEVENTLIB_HH_
+#define _MAUS_INPUTCPPREALDATA_UNPACKEVENTLIB_HH_
 
-#include "stdint.h"
-#include <json/json.h>
+#include <stdint.h>
+
+#include "json/json.h"
 
 /** \class V830Hit
   * 

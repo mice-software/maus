@@ -24,7 +24,7 @@
 #include "Interface/Squeal.hh"
 #include "Interface/dataCards.hh"
 
-#include "MapCppSimulation.hh"
+#include "src/map/MapCppSimulation/MapCppSimulation.hh"
 
 //  This stuff is *still* needed until persistency move is done
 dataCards MyDataCards("Simulation");

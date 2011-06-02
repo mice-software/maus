@@ -25,8 +25,8 @@
 //               stick multiple tracks from the spill into the same primary
 
 
-#ifndef _SRC_MAP_MAPCPPSIMULATION_H_
-#define _SRC_MAP_MAPCPPSIMULATION_H_
+#ifndef _SRC_MAP_MAPCPPSIMULATION_HH_
+#define _SRC_MAP_MAPCPPSIMULATION_HH_
 
 // C headers
 #include <stdlib.h>
@@ -37,9 +37,9 @@
 #include <vector>
 
 // external libraries
-#include <json/json.h>
+#include "json/json.h"
 
-#include "globals.hh" // temp
+//#include "globals.hh" // temp
 
 //  MAUS code
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
@@ -56,7 +56,7 @@
 #include "Interface/Squeak.hh"
 
 class MapCppSimulation {
-public:
+ public:
   /** @brief Sets up the worker
    */
   MapCppSimulation() :_g4manager(NULL) {
@@ -64,7 +64,7 @@ public:
     _geometry = "Stage6.dat";
     _storeTracks = true;
   }
-  
+
   /** @brief Begin the startup procedure for Simulation
    *
    *  This takes one argument.  This constructs the geometry
@@ -133,4 +133,4 @@ public:
 
 
 
-#endif  // _SRC_MAP_MAPCPPSIMULATION_H_
+#endif  // _SRC_MAP_MAPCPPSIMULATION_HH_

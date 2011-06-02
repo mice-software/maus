@@ -15,14 +15,14 @@
  *
  */
 
-#include "InputCppRealData.hh"
+#include "src/input/InputCppRealData/InputCppRealData.hh"
 
 #include <json/json.h>
 
 #include <string>
 #include <iostream>
 
-#include "UnpackEventLib.hh"
+#include "src/input/InputCppRealData/UnpackEventLib.hh"
 
 InputCppRealData::InputCppRealData(std::string pDataPath,
                                    std::string pFilename) {
