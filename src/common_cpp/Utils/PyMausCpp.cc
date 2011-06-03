@@ -8,6 +8,7 @@ static PyMethodDef MausCpp_methods[] = {
 };
 
 PyObject* CppErrorHandler_SetHandleExceptionFunction(PyObject *dummy, PyObject *args) {
+  std::cerr << "SetHandleExcveptionFunction" << std::endl;
   PyObject* err_handler = CppErrorHandler::GetPyErrorHandler();
   if (err_handler != NULL) {
     PyErr_SetString(PyExc_TypeError, "Attempt to set HandleExceptionFunction when it was already set previously");

@@ -24,21 +24,16 @@
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "Interface/Squeak.hh"
 
-CppErrorHandler* CppErrorHandler::instance = new CppErrorHandler();
+CppErrorHandler* CppErrorHandler::instance = NULL;
 
 Json::Value CppErrorHandler::HandleSqueal
                          (Json::Value val, Squeal exc, std::string class_name) {
-  exc.Print();
-  val["errors"][class_name] = exc.GetMessage()+": "+exc.GetLocation();
-  return val;
+  return getInstance()->ExceptionToPython(exc.what(), val, class_name);
 }
 
 Json::Value CppErrorHandler::HandleStdExc
                  (Json::Value val, std::exception exc, std::string class_name) {
-  Squeak::mout(Squeak::error) << std::string(exc.what()) << std::endl;
-  val["errors"][class_name]
-                         = "Unhandled std::exception: "+std::string(exc.what());
-  return val;
+  return getInstance()->ExceptionToPython(exc.what(), val, class_name);
 }
 
 void CppErrorHandler::HandleSquealNoJson(Squeal exc, std::string class_name) {
@@ -50,8 +45,9 @@ void CppErrorHandler::HandleStdExcNoJson
   HandleStdExc(Json::Value(), exc, class_name);
 }
 
-Json::Value ExceptionToPython
+Json::Value CppErrorHandler::ExceptionToPython
            (std::string what, Json::Value json_value, std::string class_name) {
+  CppErrorHandler::getInstance();
   PyErr_SetString(PyExc_Exception, what.c_str());
   Json::FastWriter writer;
   std::string json_in_cpp = writer.write(json_value);
@@ -64,7 +60,18 @@ Json::Value ExceptionToPython
 }
 
 CppErrorHandler::CppErrorHandler() : HandleExceptionFunction(NULL) {
-  // sets HandleExceptionFunction using call back
-  PyImport_ImportModule("ErrorHandler");
+  std::cerr << "CppErrorHandler ctor" << std::endl;
+  const char* error_handler_name = "sys";
+  PyEval_InitThreads;
+  // why do I get a segmentation fault when I attempt to import sys?
+  PyObject* error_handler_module = PyImport_ImportModule(error_handler_name);
+  if (error_handler_module == NULL) std::cerr << "ERROR_HANDLER_NOT_SET" << std::endl;
+  std::cerr << "CppErrorHandler ctor done" << std::endl;
 }
+
+CppErrorHandler* CppErrorHandler::getInstance() {
+  if (instance == NULL) instance = new CppErrorHandler();
+  return instance;
+}
+
 

@@ -86,17 +86,21 @@ class CppErrorHandler {
    */
   static void HandleStdExcNoJson(std::exception exc, std::string class_name);
 
+  /** @brief Set function that is called to pass errors to python
+   */
   static void SetPyErrorHandler(PyObject* fn) {
     instance->HandleExceptionFunction = fn;
   }
 
+  /** @brief Get function that is called to pass errors to python
+   */
   static PyObject* GetPyErrorHandler() {
     return instance->HandleExceptionFunction;
   }
 
 
  private:
-
+  static CppErrorHandler* getInstance();
   static CppErrorHandler* instance;
   PyObject* HandleExceptionFunction;
 

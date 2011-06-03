@@ -18,6 +18,8 @@
 #  Error handler handles errors in a globally managed way
 #  @author Chris Rogers <chris.rogers@stfc.ac.uk>
 
+print 'Import ErrorHandler'
+
 import sys
 import libMausCpp
 
@@ -127,5 +129,9 @@ def HandleException(doc, caller):
     """
     return __default_handler.HandleException(doc, caller)
 
+# Here we set the function call for CppErrorHandler stuff. If not set, assume we
+# don't use python error handler
+print 'Making call back'
 libMausCpp.SetHandleException(HandleException)
+print 'call back done'
 
