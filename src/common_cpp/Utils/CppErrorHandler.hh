@@ -15,6 +15,9 @@
  *
  */
 
+#ifndef _SRC_COMMON_CPP_CPPERRORHANDLER_HH_
+#define _SRC_COMMON_CPP_CPPERRORHANDLER_HH_
+
 /** @class CppErrorHandler
  *  \brief Handler for c plus plus errors
  *
@@ -27,11 +30,9 @@
 #include <string>
 
 #include "json/json.h"
+#include "Python.h"
 
-#include "Interface/Squeal.hh"
-
-#ifndef _SRC_CPP_CORE_CPPERRORHANDLER_HH
-#define _SRC_CPP_CORE_CPPERRORHANDLER_HH
+#include "src/legacy/Interface/Squeal.hh"
 
 // TODO (Rogers): If I am worried about bad memory allocation I may not want to
 //                pass by value...
@@ -85,7 +86,23 @@ class CppErrorHandler {
    */
   static void HandleStdExcNoJson(std::exception exc, std::string class_name);
 
+  static void SetPyErrorHandler(PyObject* fn) {
+    instance->HandleExceptionFunction = fn;
+  }
+
+  static PyObject* GetPyErrorHandler() {
+    return instance->HandleExceptionFunction;
+  }
+
+
  private:
+
+  static CppErrorHandler* instance;
+  PyObject* HandleExceptionFunction;
+
+  Json::Value ExceptionToPython
+             (std::string what, Json::Value json_value, std::string class_name);
+
   CppErrorHandler();
   ~CppErrorHandler();
 };

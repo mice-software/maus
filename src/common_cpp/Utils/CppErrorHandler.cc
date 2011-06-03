@@ -18,9 +18,13 @@
 #include <string>
 
 #include "json/json.h"
+#include "Python.h"
 
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
+#include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "Interface/Squeak.hh"
+
+CppErrorHandler* CppErrorHandler::instance = new CppErrorHandler();
 
 Json::Value CppErrorHandler::HandleSqueal
                          (Json::Value val, Squeal exc, std::string class_name) {
@@ -44,5 +48,23 @@ void CppErrorHandler::HandleSquealNoJson(Squeal exc, std::string class_name) {
 void CppErrorHandler::HandleStdExcNoJson
                                   (std::exception exc, std::string class_name) {
   HandleStdExc(Json::Value(), exc, class_name);
+}
+
+Json::Value ExceptionToPython
+           (std::string what, Json::Value json_value, std::string class_name) {
+  PyErr_SetString(PyExc_Exception, what.c_str());
+  Json::FastWriter writer;
+  std::string json_in_cpp = writer.write(json_value);
+  PyObject* py_args = Py_BuildValue("ss", json_in_cpp.c_str(), class_name.c_str());
+  PyObject* json_out_py = PyEval_CallObject(CppErrorHandler::GetPyErrorHandler(), py_args);
+  PyErr_Clear();
+  char* json_string;
+  PyArg_ParseTuple(json_out_py, "s", json_string);
+  Json::Value json_out_cpp =  JsonWrapper::StringToJson(std::string(json_string));
+}
+
+CppErrorHandler::CppErrorHandler() : HandleExceptionFunction(NULL) {
+  // sets HandleExceptionFunction using call back
+  PyImport_ImportModule("ErrorHandler");
 }
 

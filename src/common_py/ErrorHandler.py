@@ -19,6 +19,7 @@
 #  @author Chris Rogers <chris.rogers@stfc.ac.uk>
 
 import sys
+import libMausCpp
 
 class ErrorHandler:
     """
@@ -58,7 +59,9 @@ class ErrorHandler:
         streams etc.
         @param doc the json data stream
         @param caller the object that called the ExceptionHandler (determines
-                      which branch to use in the data stream)
+                      which branch to use in the data stream). If a string is
+                      used, then errors go into the branch with name like that
+                      string.
         @returns the datastream
         """
         if self.error_to_stderr:
@@ -92,7 +95,11 @@ class ErrorHandler:
         """
         if doc == None: doc = {}
         class_name = "<unknown caller>"
-        if caller != None:
+        if caller == None:
+            pass
+        elif type(caller) == type(''):
+            class_name = caller
+        else:
             class_name = caller.__class__.__name__
         if not 'errors' in doc:
             doc['errors'] = {}
@@ -119,3 +126,6 @@ def HandleException(doc, caller):
     @returns the datastream
     """
     return __default_handler.HandleException(doc, caller)
+
+libMausCpp.SetHandleException(HandleException)
+
