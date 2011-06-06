@@ -89,13 +89,13 @@ class CppErrorHandler {
   /** @brief Set function that is called to pass errors to python
    */
   static void SetPyErrorHandler(PyObject* fn) {
-    instance->HandleExceptionFunction = fn;
+    getInstance()->HandleExceptionFunction = fn;
   }
 
   /** @brief Get function that is called to pass errors to python
    */
   static PyObject* GetPyErrorHandler() {
-    return instance->HandleExceptionFunction;
+    return getInstance()->HandleExceptionFunction;
   }
 
 

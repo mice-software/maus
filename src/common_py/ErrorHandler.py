@@ -18,10 +18,17 @@
 #  Error handler handles errors in a globally managed way
 #  @author Chris Rogers <chris.rogers@stfc.ac.uk>
 
-print 'Import ErrorHandler'
 
 import sys
+import json
 import libMausCpp
+
+class CppError(Exception):
+  def __init__(self, message):
+    self.args = (str(message), )
+
+  def __repr__(self):
+    return self.args
 
 class ErrorHandler:
     """
@@ -127,11 +134,26 @@ def HandleException(doc, caller):
                branch to use in the data stream)
     @returns the datastream
     """
-    return __default_handler.HandleException(doc, caller)
+    out = __default_handler.HandleException(doc, caller)
+    return out
+
+def HandleExceptionStrings(doc, caller, error_message):
+    """
+    Handle an exception with the default exception handler
+    @param doc string representation of the json data stream
+    @param string representation of the object that called the ExceptionHandler
+               (determines which branch to use in the data stream)
+    @returns the datastream
+    """
+    json_doc = json.loads(doc)
+    try:
+      raise(CppError(error_message))
+    except:
+      out = json.dumps(__default_handler.HandleException(json_doc, caller))
+    return out
+
 
 # Here we set the function call for CppErrorHandler stuff. If not set, assume we
 # don't use python error handler
-print 'Making call back'
-libMausCpp.SetHandleException(HandleException)
-print 'call back done'
+libMausCpp.SetHandleException(HandleExceptionStrings)
 

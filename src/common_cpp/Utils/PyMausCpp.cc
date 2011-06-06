@@ -8,26 +8,21 @@ static PyMethodDef MausCpp_methods[] = {
 };
 
 PyObject* CppErrorHandler_SetHandleExceptionFunction(PyObject *dummy, PyObject *args) {
-  std::cerr << "SetHandleExcveptionFunction" << std::endl;
-  PyObject* err_handler = CppErrorHandler::GetPyErrorHandler();
-  if (err_handler != NULL) {
-    PyErr_SetString(PyExc_TypeError, "Attempt to set HandleExceptionFunction when it was already set previously");
-    return NULL;
-  }
-
-  if (PyArg_ParseTuple(args, "O:HandleExceptionFunction", &err_handler)) {
-    if (!PyCallable_Check(err_handler)) {
+  PyObject* temp = NULL;
+  if (PyArg_ParseTuple(args, "O:HandleExceptionFunction", &temp)) {
+    if (!PyCallable_Check(temp)) {
         PyErr_SetString(PyExc_TypeError, "Attempt to set HandleExceptionFunction to non-callable PyObject");
         return NULL;
     }
-    Py_XINCREF(err_handler);
+    Py_XINCREF(temp);
+    CppErrorHandler::SetPyErrorHandler(temp);
   }
   Py_INCREF(Py_None);
   return Py_None;
 }
 
-PyMODINIT_FUNC initlibMausCpp(void)
-{
+PyMODINIT_FUNC initlibMausCpp(void) {
+  Py_Initialize();
   PyObject* m = Py_InitModule("libMausCpp", MausCpp_methods);
   if (m == NULL) return;
 }
