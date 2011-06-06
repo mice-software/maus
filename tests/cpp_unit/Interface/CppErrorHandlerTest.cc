@@ -9,39 +9,39 @@
 
 namespace {
 
-class MyException: public std::exception {
- public:
-  virtual const char* what() const throw() {
-    return "Some exception";
+using namespace MAUS;
+class CppErrorHandlerTest : public ::testing::Test {
+protected:
+  CppErrorHandlerTest() : obj(Json::objectValue), 
+                          squee(Squeal::recoverable, "a_test", "exc::test"),
+                          std_exc(&squee) {
   }
+  virtual ~CppErrorHandlerTest() {}
+  Json::Value obj;
+  Squeal      squee;
+  std::exception* std_exc;  
 };
 
-TEST(CppErrorHandlerTest, HandleSquealTest) {
-  Json::Value obj = Json::Value(Json::objectValue);
-  Squeal squee1(Squeal::recoverable, "a_test", "exc::test");
-  Json::Value value  = CppErrorHandler::HandleSqueal(obj, squee1, "exc_test");
-  CppErrorHandler::HandleSquealNoJson(squee1, "exc_test");
-  EXPECT_EQ(value["errors"]["exc_test"], Json::Value("a_test: exc::test"));
-  Squeal squee2(Squeal::nonRecoverable, "a_test", "exc::test");
-  CppErrorHandler::HandleSqueal(obj, squee2, "exc_test");
-  CppErrorHandler::HandleSquealNoJson(squee2, "exc_test");
+TEST_F(CppErrorHandlerTest, HandleSquealTest) {
+  Json::Value value = CppErrorHandler::HandleSqueal(obj, squee, "exc_test");
+  EXPECT_EQ(value["errors"]["exc_test"][Json::UInt(0)],
+           Json::Value("<class 'ErrorHandler.CppError'>: a_test at exc::test"));
 }
 
-class Base {virtual void Member(){}};
-class Derived : Base {};
+TEST_F(CppErrorHandlerTest, HandleStdExcTest) {
+  Json::Value value = CppErrorHandler::HandleStdExc(obj, *std_exc, "exc_test");
+  EXPECT_EQ(value["errors"]["exc_test"][Json::UInt(0)],
+           Json::Value("<class 'ErrorHandler.CppError'>: std::exception"));
+}
 
-TEST(CppErrorHandlerTest, HandleStdExcTest) {
-  try {
-    Base* b;
-    Derived* rd = dynamic_cast<Derived*>(b);
-  } catch (std::exception e) {
-      Json::Value obj = Json::Value(Json::objectValue);
-      Json::Value value  = CppErrorHandler::HandleStdExc(obj, e, "exc_test");
-      EXPECT_EQ(value["Errors"]["exc_test"], 
-             Json::Value("Unhandled std::exception: "+std::string(e.what())));
-      CppErrorHandler::HandleStdExcNoJson(e, "exc_test");
-  }
+TEST_F(CppErrorHandlerTest, HandleStdExcNoJsonTest) {
+  CppErrorHandler::HandleStdExcNoJson(*std_exc, "exc_test");
+  // not much to be done here... could check stderr or so?
+}
+
+TEST_F(CppErrorHandlerTest, HandleSquealNoJsonTest) {
+  CppErrorHandler::HandleSquealNoJson(squee, "exc_test");
+  // not much to be done here... could check stderr or so?
 }
 
 }
-

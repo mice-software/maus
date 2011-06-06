@@ -23,13 +23,6 @@ import sys
 import json
 import libMausCpp
 
-class CppError(Exception):
-  def __init__(self, message):
-    self.args = (str(message), )
-
-  def __repr__(self):
-    return self.args
-
 class ErrorHandler:
     """
     @class ErrorHandler
@@ -118,6 +111,17 @@ class ErrorHandler:
                                                         +str(sys.exc_info()[1]))
         return doc
 
+class CppError(Exception):
+  """
+  Error that is raised by MAUS C++ code. Takes simply an error message as
+  argument, which is printed when the error is raised.
+  """
+  def __init__(self, message):
+    self.args = (str(message), )
+
+  def __repr__(self):
+    return self.args[0]
+
 __default_handler = ErrorHandler()
 
 def DefaultHandler():
@@ -137,7 +141,7 @@ def HandleException(doc, caller):
     out = __default_handler.HandleException(doc, caller)
     return out
 
-def HandleExceptionStrings(doc, caller, error_message):
+def HandleCppException(doc, caller, error_message):
     """
     Handle an exception with the default exception handler
     @param doc string representation of the json data stream
@@ -152,8 +156,8 @@ def HandleExceptionStrings(doc, caller, error_message):
       out = json.dumps(__default_handler.HandleException(json_doc, caller))
     return out
 
-
 # Here we set the function call for CppErrorHandler stuff. If not set, assume we
-# don't use python error handler
-libMausCpp.SetHandleException(HandleExceptionStrings)
+# don't use python error handler; libMausCpp is defined in 
+#   src/common_cpp/Utils/PyMausCpp.hh
+libMausCpp.SetHandleException(HandleCppException)
 

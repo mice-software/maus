@@ -27,12 +27,15 @@
  *  eventually handing the error up to python error handler.
  */
 
+#include <Python.h>
+
 #include <string>
 
 #include "json/json.h"
-#include "Python.h"
 
 #include "src/legacy/Interface/Squeal.hh"
+
+namespace MAUS {
 
 // TODO (Rogers): If I am worried about bad memory allocation I may not want to
 //                pass by value...
@@ -89,6 +92,8 @@ class CppErrorHandler {
   /** @brief Set function that is called to pass errors to python
    */
   static void SetPyErrorHandler(PyObject* fn) {
+    if (getInstance()->HandleExceptionFunction != NULL)
+      Py_XDECREF(getInstance()->HandleExceptionFunction);
     getInstance()->HandleExceptionFunction = fn;
   }
 
@@ -102,7 +107,7 @@ class CppErrorHandler {
  private:
   static CppErrorHandler* getInstance();
   static CppErrorHandler* instance;
-  PyObject* HandleExceptionFunction;
+  PyObject* HandleExceptionFunction;  // set by callback defined in PyMausCpp
 
   Json::Value ExceptionToPython
              (std::string what, Json::Value json_value, std::string class_name);
@@ -110,6 +115,8 @@ class CppErrorHandler {
   CppErrorHandler();
   ~CppErrorHandler();
 };
+
+}  // namespace MAUS
 
 #endif
 

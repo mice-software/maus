@@ -15,7 +15,7 @@
  *
  */
 
-#include "Python.h"
+#include <Python.h>
 
 #include <string>
 
@@ -24,6 +24,8 @@
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "Interface/Squeak.hh"
+
+namespace MAUS {
 
 CppErrorHandler* CppErrorHandler::instance = NULL;
 
@@ -52,16 +54,18 @@ Json::Value CppErrorHandler::ExceptionToPython
   Json::FastWriter writer;
   std::string json_in_cpp = writer.write(json_value);
   char* sss = "sss";
-  PyObject* json_out_py = PyObject_CallFunction(CppErrorHandler::GetPyErrorHandler(), sss, json_in_cpp.c_str(), class_name.c_str(), what.c_str());
+  PyObject* json_out_py = PyObject_CallFunction
+                (CppErrorHandler::GetPyErrorHandler(), sss, json_in_cpp.c_str(),
+                                              class_name.c_str(), what.c_str());
   const char* json_str;
   if (!json_out_py) {
-    Squeak::mout(Squeak::error) << "Failed to handle error:" << std::endl;
+    Squeak::mout(Squeak::error) << "ERROR: Failed to handle error:" << std::endl;
     PyErr_Print();
     return Json::Value();
   }
   int ok = PyArg_Parse(json_out_py, "s", &json_str);
   if (!ok) {
-    Squeak::mout(Squeak::error) << "Failed to parse return value" << std::endl;
+    Squeak::mout(Squeak::error) << "ERROR: Failed to parse return value from error:" << std::endl;
     PyErr_Print();
     return Json::Value();
   }
@@ -70,7 +74,6 @@ Json::Value CppErrorHandler::ExceptionToPython
 }
 
 CppErrorHandler::CppErrorHandler() : HandleExceptionFunction(NULL) {
-
 }
 
 CppErrorHandler* CppErrorHandler::getInstance() {
@@ -80,11 +83,12 @@ CppErrorHandler* CppErrorHandler::getInstance() {
     PyImport_ImportModule("ErrorHandler");
     PyErr_Clear();
     if (CppErrorHandler::GetPyErrorHandler() == 0) {
-      Squeak::mout(Squeak::warning)
+      Squeak::mout(Squeak::error)
          << "Error - failed to get python error handler" << std::endl;
     }
   }
   return instance;
 }
 
+}  // namespace MAUS
 
