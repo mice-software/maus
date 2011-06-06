@@ -18,14 +18,6 @@
 #ifndef _SRC_COMMON_CPP_CPPERRORHANDLER_HH_
 #define _SRC_COMMON_CPP_CPPERRORHANDLER_HH_
 
-/** @class CppErrorHandler
- *  \brief Handler for c plus plus errors
- *
- *  In MAUS we typically have two sorts of errors - Squeals (which are specific
- *  to MAUS) and std::exceptions (which are more generic). In both cases we want
- *  to catch the error and handle it in some user-defined way; probably
- *  eventually handing the error up to python error handler.
- */
 
 #include <Python.h>
 
@@ -44,28 +36,40 @@ namespace MAUS {
 //                Need to think about how we handle "non recoverable" (meaning
 //                memory leak in the Squeal)
 
+/** @class CppErrorHandler
+ *  \brief Handler for c++ errors
+ *
+ *  In MAUS we typically have two sorts of errors - Squeals (which are specific
+ *  to MAUS) and std::exceptions (which are more generic). These static
+ *  functions are used to handle the errors, by default handing them up to the
+ *  PyErrorHandler (See src/common_py/ErrorHandler).
+ *
+ *  Interface with python is defined by a callback function
+ *  HandleExceptionFunction that is set through PyMausCpp.hh python interface.
+ */
+
 class CppErrorHandler {
 
  public:
   /** @brief Call default Cpp exception handler
    *
-   *  For now this just calls Squeal::Print(), but at some point I intend to
-   *  do something more sophisticated (mimicing or even using PyErrorHandler 
-   *  functionality).
+   * This makes a python exception of type CppError and hands it to the Python
+   * error handler.
    *
    *  @param val Json document that will take any error
    *  @param exc the (MAUS Squeal) exception
+   *  @param class_name the name of the class that generated the error
    */
   static Json::Value HandleSqueal
                           (Json::Value val, Squeal exc, std::string class_name);
 
   /** @brief Call default Cpp exception handler
    *
-   *  For now this just calls Squeal::Print(), but at some point I intend to
-   *  do something more sophisticated (mimicing or even using PyErrorHandler 
-   *  functionality).
+   * This makes a python exception of type CppError and hands it to the Python
+   * error handler.
    *
-   *  @param exc the (MAUS Squeal) exception
+   *  @param exc the (std) exception
+   *  @param class_name the name of the class that generated the error
    */
   static void HandleSquealNoJson(Squeal exc, std::string class_name);
 
@@ -76,6 +80,7 @@ class CppErrorHandler {
    *
    *  @param val Json document that will take any error
    *  @param exc the std::exception
+   *  @param class_name name of the class that generated the error
    */
   static Json::Value HandleStdExc
                   (Json::Value val, std::exception exc, std::string class_name);
@@ -86,6 +91,7 @@ class CppErrorHandler {
    *  intend to do something more sophisticated.
    *
    *  @param exc the std::exception
+   *  @param class_name name of the class that generated the error
    */
   static void HandleStdExcNoJson(std::exception exc, std::string class_name);
 
