@@ -31,10 +31,8 @@ namespace MAUS {
 
 // TODO (Rogers): If I am worried about bad memory allocation I may not want to
 //                pass by value...
-//                Also would be nice to raise to python error handler (common
-//                interface)
 //                Need to think about how we handle "non recoverable" (meaning
-//                memory leak in the Squeal)
+//                memory problem or something - should exit)
 
 /** @class CppErrorHandler
  *  \brief Handler for c++ errors
