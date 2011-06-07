@@ -15,26 +15,28 @@
  *
  */
 
+#include <Python.h>
+
 #include <string>
 
 #include "json/json.h"
 
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
+#include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "Interface/Squeak.hh"
+
+namespace MAUS {
+
+CppErrorHandler* CppErrorHandler::instance = NULL;
 
 Json::Value CppErrorHandler::HandleSqueal
                          (Json::Value val, Squeal exc, std::string class_name) {
-  exc.Print();
-  val["errors"][class_name] = exc.GetMessage()+": "+exc.GetLocation();
-  return val;
+  return getInstance()->ExceptionToPython(exc.what(), val, class_name);
 }
 
 Json::Value CppErrorHandler::HandleStdExc
                  (Json::Value val, std::exception exc, std::string class_name) {
-  Squeak::mout(Squeak::error) << std::string(exc.what()) << std::endl;
-  val["errors"][class_name]
-                         = "Unhandled std::exception: "+std::string(exc.what());
-  return val;
+  return getInstance()->ExceptionToPython(exc.what(), val, class_name);
 }
 
 void CppErrorHandler::HandleSquealNoJson(Squeal exc, std::string class_name) {
@@ -45,4 +47,48 @@ void CppErrorHandler::HandleStdExcNoJson
                                   (std::exception exc, std::string class_name) {
   HandleStdExc(Json::Value(), exc, class_name);
 }
+
+Json::Value CppErrorHandler::ExceptionToPython
+           (std::string what, Json::Value json_value, std::string class_name) {
+  PyErr_Clear();
+  Json::FastWriter writer;
+  std::string json_in_cpp = writer.write(json_value);
+  char* sss = "sss";
+  PyObject* json_out_py = PyObject_CallFunction
+                (CppErrorHandler::GetPyErrorHandler(), sss, json_in_cpp.c_str(),
+                                              class_name.c_str(), what.c_str());
+  const char* json_str;
+  if (!json_out_py) {
+    Squeak::mout(Squeak::error) << "ERROR: Failed to handle error:" << std::endl;
+    PyErr_Print();
+    return Json::Value();
+  }
+  int ok = PyArg_Parse(json_out_py, "s", &json_str);
+  if (!ok) {
+    Squeak::mout(Squeak::error) << "ERROR: Failed to parse return value from error:" << std::endl;
+    PyErr_Print();
+    return Json::Value();
+  }
+  Json::Value json_out_cpp =  JsonWrapper::StringToJson(std::string(json_str));
+  return json_out_cpp;
+}
+
+CppErrorHandler::CppErrorHandler() : HandleExceptionFunction(NULL) {
+}
+
+CppErrorHandler* CppErrorHandler::getInstance() {
+  if (instance == NULL) {
+    instance = new CppErrorHandler();
+    Py_Initialize();
+    PyImport_ImportModule("ErrorHandler");
+    PyErr_Clear();
+    if (CppErrorHandler::GetPyErrorHandler() == 0) {
+      Squeak::mout(Squeak::error)
+         << "Error - failed to get python error handler" << std::endl;
+    }
+  }
+  return instance;
+}
+
+}  // namespace MAUS
 

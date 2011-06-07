@@ -18,7 +18,10 @@
 #  Error handler handles errors in a globally managed way
 #  @author Chris Rogers <chris.rogers@stfc.ac.uk>
 
+
 import sys
+import json
+import libMausCpp
 
 class ErrorHandler:
     """
@@ -58,7 +61,9 @@ class ErrorHandler:
         streams etc.
         @param doc the json data stream
         @param caller the object that called the ExceptionHandler (determines
-                      which branch to use in the data stream)
+                      which branch to use in the data stream). If a string is
+                      used, then errors go into the branch with name like that
+                      string.
         @returns the datastream
         """
         if self.error_to_stderr:
@@ -92,7 +97,11 @@ class ErrorHandler:
         """
         if doc == None: doc = {}
         class_name = "<unknown caller>"
-        if caller != None:
+        if caller == None:
+            pass
+        elif type(caller) == type(''):
+            class_name = caller
+        else:
             class_name = caller.__class__.__name__
         if not 'errors' in doc:
             doc['errors'] = {}
@@ -101,6 +110,17 @@ class ErrorHandler:
         doc['errors'][class_name].append(str(sys.exc_info()[0])+": "
                                                         +str(sys.exc_info()[1]))
         return doc
+
+class CppError(Exception):
+  """
+  Error that is raised by MAUS C++ code. Takes simply an error message as
+  argument, which is printed when the error is raised.
+  """
+  def __init__(self, message):
+    self.args = (str(message), )
+
+  def __repr__(self):
+    return self.args[0]
 
 __default_handler = ErrorHandler()
 
@@ -118,4 +138,26 @@ def HandleException(doc, caller):
                branch to use in the data stream)
     @returns the datastream
     """
-    return __default_handler.HandleException(doc, caller)
+    out = __default_handler.HandleException(doc, caller)
+    return out
+
+def HandleCppException(doc, caller, error_message):
+    """
+    Handle an exception with the default exception handler
+    @param doc string representation of the json data stream
+    @param string representation of the object that called the ExceptionHandler
+               (determines which branch to use in the data stream)
+    @returns the datastream
+    """
+    json_doc = json.loads(doc)
+    try:
+      raise(CppError(error_message))
+    except:
+      out = json.dumps(__default_handler.HandleException(json_doc, caller))
+    return out
+
+# Here we set the function call for CppErrorHandler stuff. If not set, assume we
+# don't use python error handler; libMausCpp is defined in 
+#   src/common_cpp/Utils/PyMausCpp.hh
+libMausCpp.SetHandleException(HandleCppException)
+

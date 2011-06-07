@@ -17,9 +17,15 @@ import StringIO
 import sys
 import string
 
+import json
 import unittest
 
 import ErrorHandler
+import libMausCpp
+
+def _test_function():
+  pass
+
 
 class ErrorHandlerTestCase(unittest.TestCase):
   def test_ErrorHandler(self):
@@ -156,7 +162,29 @@ class ErrorHandlerTestCase(unittest.TestCase):
     assert(doc["errors"]["ErrorHandlerTestCase"] == [
         "<type 'exceptions.RuntimeError'>: Test error 1",
     ])
-    
+    try:
+      raise RuntimeError("Test error 2")
+    except:
+      doc = json.loads(ErrorHandler.HandleCppException(json.dumps(doc), "some caller", "Test error 3"))
+    assert(doc["errors"]["some caller"] == [
+        "<class 'ErrorHandler.CppError'>: Test error 3",
+    ])
+
+  def test_CppError(self):
+    my_error = ErrorHandler.CppError("Some message")
+    assert(my_error.args == ("Some message",))
+    assert(repr(my_error) == "Some message")
+
+  def test_SetHandleException(self):
+    try:
+      libMausCpp.SetHandleException(1)  # should fail gracefully
+      assert(False)
+    except:
+       pass
+    refcount = sys.getrefcount(ErrorHandler.HandleCppException)
+    for i in range(100):
+      libMausCpp.SetHandleException(ErrorHandler.HandleCppException)  # should decref correctly
+    assert(refcount == sys.getrefcount(ErrorHandler.HandleCppException))
 
 if __name__ == '__main__':
     unittest.main()
