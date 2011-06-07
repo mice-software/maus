@@ -53,7 +53,7 @@ Json::Value CppErrorHandler::ExceptionToPython
   PyErr_Clear();
   Json::FastWriter writer;
   std::string json_in_cpp = writer.write(json_value);
-  char sss[4] = {'s','s','s', '\0'};  // gotta love C
+  char sss[4] = {'s', 's', 's', '\0'};  // gotta love C
   PyObject* json_out_py = PyObject_CallFunction
                 (CppErrorHandler::GetPyErrorHandler(), &sss[0], json_in_cpp.c_str(),
                                               class_name.c_str(), what.c_str());
