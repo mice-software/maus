@@ -30,8 +30,8 @@ TEST_F(CppErrorHandlerTest, HandleSquealTest) {
 
 TEST_F(CppErrorHandlerTest, HandleStdExcTest) {
   Json::Value value = CppErrorHandler::HandleStdExc(obj, *std_exc, "exc_test");
-  EXPECT_EQ(value["errors"]["exc_test"][Json::UInt(0)],
-           Json::Value("<class 'ErrorHandler.CppError'>: std::exception"));
+  std::string err = value["errors"]["exc_test"][Json::UInt(0)].asString();
+  EXPECT_EQ(err.substr(0, 33), "<class 'ErrorHandler.CppError'>: ");
 }
 
 TEST_F(CppErrorHandlerTest, HandleStdExcNoJsonTest) {
