@@ -11,13 +11,11 @@ if __name__ == "__main__":
 
 class packer:
     """
-    This class will read in a text file containing a list of GDML files which need to be zipped
-    in order to upload them to the CDB. First the file contents need to be writen into one file
-    of string format. This file is then zipped.
+    This class collects the files needed to be uploaded and zips them.
     """
     def __init__(self, filelist):
         """
-        @Method Class Initialiser
+        @Method Class Constructor
 
         This method is the class initialiser and takes two parameters.
         The first parameter is the file name/path of the text file containing the file names/paths
@@ -25,7 +23,7 @@ class packer:
         to call the file which will be placed in the zip file.
 
         @Param filelist, file name/path of the file containing the list of GDML files to be zipped.
-        @Param zipfile,  the name of the file which will be zipped.
+        @Param zipfile,  the name of the zip file.
         """
         list = []
         self.List = list

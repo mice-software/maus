@@ -3,7 +3,7 @@
 
 version=1.1.22
 directory=libxslt-${version}
-filename=${directory}.tgz
+filename=${directory}.tar.gz
 url=http://xmlsoft.org/sources/${filename}
 
 
@@ -35,8 +35,6 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         rm -Rf ${MAUS_ROOT_DIR}/third_party/build/${directory}
         sleep 1
         tar xvfz ${MAUS_ROOT_DIR}/third_party/source/${filename} -C ${MAUS_ROOT_DIR}/third_party/build > /dev/null
-	mv ${MAUS_ROOT_DIR}/third_party/build/${version}/CLHEP ${MAUS_ROOT_DIR}/third_party/build/${directory}
-	rmdir ${MAUS_ROOT_DIR}/third_party/build/${version}
         cd ${MAUS_ROOT_DIR}/third_party/build/${directory}
 	echo
         echo "INFO: Configuring:"
