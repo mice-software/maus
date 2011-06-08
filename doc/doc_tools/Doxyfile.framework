@@ -427,7 +427,7 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                  = $(MAUS_ROOT_DIR)/doc/doc_tools/framework.hh $(MAUS_ROOT_DIR)/src/core  $(MAUS_ROOT_DIR)/src/input  $(MAUS_ROOT_DIR)/src/map  $(MAUS_ROOT_DIR)/src/output  $(MAUS_ROOT_DIR)/src/reduce
+INPUT                  = $(MAUS_ROOT_DIR)/doc/doc_tools/framework.hh $(MAUS_ROOT_DIR)/src/common_cpp $(MAUS_ROOT_DIR)/src/common_py  $(MAUS_ROOT_DIR)/src/input  $(MAUS_ROOT_DIR)/src/map  $(MAUS_ROOT_DIR)/src/output  $(MAUS_ROOT_DIR)/src/reduce
 
 # If the value of the INPUT tag contains directories, you can use the 
 # FILE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp 
@@ -448,7 +448,7 @@ RECURSIVE              = YES
 # excluded from the INPUT source files. This way you can easily exclude a 
 # subdirectory from a directory tree whose root is specified with the INPUT tag.
 
-EXCLUDE                =  core/__init__.py 
+EXCLUDE                =  common_py/__init__.py 
 
 # The EXCLUDE_SYMLINKS tag can be used select whether or not files or directories 
 # that are symbolic links (a Unix filesystem feature) are excluded from the input.
@@ -573,7 +573,7 @@ COLS_IN_ALPHA_INDEX    = 5
 # The IGNORE_PREFIX tag can be used to specify one or more prefixes that 
 # should be ignored while generating the index headers.
 
-IGNORE_PREFIX          = cheprep HEPREP unittest
+IGNORE_PREFIX          = cheprep HEPREP unittest _
 
 #---------------------------------------------------------------------------
 # configuration options related to the HTML output

@@ -12,11 +12,11 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     else  
 	echo "INFO: Source archive doesn't exist.  Downloading..."
 
-	rm -f ${MAUS_ROOT_DIR}/third_party/source/geant_config.tar.gz 
-	rm -f ${MAUS_ROOT_DIR}/third_party/source/geant_data.tar.gz 
+	#rm -f ${MAUS_ROOT_DIR}/third_party/source/geant_config.tar.gz 
+	#rm -f ${MAUS_ROOT_DIR}/third_party/source/geant_data.tar.gz 
 	wget --directory-prefix=${MAUS_ROOT_DIR}/third_party/source ${url}
-	wget --directory-prefix=${MAUS_ROOT_DIR}/third_party/source http://micewww.pp.rl.ac.uk:8080/attachments/download/92/geant_config.tar.gz # TODO fixme
-	wget --directory-prefix=${MAUS_ROOT_DIR}/third_party/source http://micewww.pp.rl.ac.uk:8080/attachments/download/81/geant_data.tar.gz  # TODO fixme
+	#wget --directory-prefix=${MAUS_ROOT_DIR}/third_party/source http://micewww.pp.rl.ac.uk:8080/attachments/download/92/geant_config.tar.gz # TODO fixme
+	#wget --directory-prefix=${MAUS_ROOT_DIR}/third_party/source http://micewww.pp.rl.ac.uk:8080/attachments/download/81/geant_data.tar.gz  # TODO fixme
 	#wget --directory-prefix=${MAUS_ROOT_DIR}/third_party/source http://micewww.pp.rl.ac.uk:8080/attachments/download/98/Configure # todo fixme
 
     fi

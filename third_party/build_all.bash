@@ -11,18 +11,6 @@
 set -e
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
-    filename="third_party_source_v4.tar.gz"
-    wget http://micewww.pp.rl.ac.uk:8080/attachments/download/212/${filename} -O ${MAUS_ROOT_DIR}/third_party/source/${filename}
-
-    cd ${MAUS_ROOT_DIR}/third_party/source
-    filename=${filename} 
-    md5sum -c ${filename}.md5 || { echo "FATAL: Failed to download:" >&2; echo "FATAL: ${filename}." >&2; echo "FATAL: MD5 checksum failed.">&2; echo "FATAL: Try rerunning this\
- command to redownload, or check" >&2; echo "FATAL: internet connection"  >&2; rm -f ${filename}; exit 1; }
-
-    cd ${MAUS_ROOT_DIR}
-    tar xvfz third_party/source/${filename}
-    
-
     # One could do the xargs line below, but the problem is error codes.  Xargs doesn't exit nicely
     # (at least the xargs on most machines) if one of the many commands die.  Not using find
     # also happens to make the code a little more readable

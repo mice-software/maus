@@ -285,6 +285,7 @@ os.path.join('src', 'map', 'MapCppTOFDigitization'),
 os.path.join('src', 'map', 'MapCppTrackerDigitization'),
 os.path.join('src', 'map', 'MapCppPrint'),
 os.path.join('tests', 'style'),
+os.path.join('tests', 'integration', 'optics', 'src'),
 ]+glob_maus_root_dir(os.path.join('src', '*', '*', 'build')
 )
 
@@ -324,7 +325,7 @@ recon_files = [
 ]
 
 detmodel_files = [
-'KLSD.hh', 'DoubletFiberParam.cc', 'SpecialVirtualSD.hh', 'SpecialDummySD.hh', 'EMRSD.cc', 'TofSD.cc', 'CkovMirror.cc', 'CKOVSD.cc', 'SciFiSD.hh', 'KLFiber.cc', 'TofSD.hh', 'KLGlue.hh', 'DoubletFiberParam.hh', 'KLFiber.hh', 'KLSD.cc', 'EMRSD.hh', 'SciFiPlane.cc', 'SpecialVirtualSD.cc', 'KLGlue.cc', 'SciFiSD.cc', 'SciFiPlane.hh', 'CkovMirror.hh', 'CKOVSD.hh', 
+'MAUSSD.hh', 'MAUSSD.cc', 'KLSD.hh', 'DoubletFiberParam.cc', 'SpecialVirtualSD.hh', 'SpecialDummySD.hh', 'EMRSD.cc', 'TofSD.cc', 'CkovMirror.cc', 'CKOVSD.cc', 'SciFiSD.hh', 'KLFiber.cc', 'TofSD.hh', 'KLGlue.hh', 'DoubletFiberParam.hh', 'KLFiber.hh', 'KLSD.cc', 'EMRSD.hh', 'SciFiPlane.cc', 'SpecialVirtualSD.cc', 'KLGlue.cc', 'SciFiSD.cc', 'SciFiPlane.hh', 'CkovMirror.hh', 'CKOVSD.hh', 
 ]
 
 calib_files = [
@@ -335,16 +336,22 @@ config_files = [
 'BeamlineParameters.cc', 'ModuleTextFileIO.hh', 'SciFiCableManager.hh', 'CoolingChannelGeom.cc', 'VlpcCableOsaka2.cc', 'TofCable.cc', 'ModuleConverter.cc', 'ModuleConverter.hh', 'VlpcCableOsaka3.cc', 'RFBackgroundParameters.cc', 'TofCable.hh', 'BeamlineGeometry.hh', 'BeamlineGeometry.cc', 'VlpcCableOsaka.hh', 'SciFiCableManager.cc', 'RFParameters.hh', 'MagnetParameters.hh', 'BeamlineParameters.hh', 'BeamParameters.cc', 'MiceModule.hh', 'VlpcCableOsaka2.hh', 'CoolingChannelGeom.hh', 'VlpcCableImperial.hh', 'MagnetParameters.cc', 'ModuleTextFileIO.cc', 'VlpcCableImperial.cc', 'BeamParameters.hh', 'RFParameters.cc', 'VlpcCable.hh', 'VlpcCableOsaka3.hh', 'RFBackgroundParameters.hh', 'VlpcCableOsaka.cc', 'MiceModule.cc', 
 ]
 
-cpp_unit_files = [
-'MeshTest.cpp', 'MAUSPrimaryGeneratorActionTest.cpp', 'BTSolenoidTest.cpp', 'JsonWrapperTest.cpp', 'MAUSTrackingActionTest.cpp', 'MAUSGeant4ManagerTest.cpp', 'BTMultipoleTest.cpp', 'MVectorTest.cpp', 'DifferentiatorTest.cpp', 'BTFieldConstructorTest.cpp', 'MMatrixTest.cpp', 'MiceModToG4SolidTest.cpp', 'PolynomialTest.cpp', 'BTTrackerTest.cpp', 'MAUSSteppingActionTest.cpp', 'CppErrorHandlerTest.cpp', 'MiceModuleTest.cpp', 'TriangularMeshTest.cpp', 'dataCardsTest.cpp', 
+optics_files = [
+'AnalysisPlaneBank.cc', 'CovarianceMatrix.cc', 'Material.cc', 'MICEStackingAction.cc', 'MICETrackingAction.cc', 'OpticsModel.cc', 'PhaseSpaceVector.cc', 'Tensor3.cc', 'Tensor.cc', 'TransferMapCalculator.cc', 'TransferMap.cc', 'TransportManager.cc',
+'AnalysisPlaneBank.hh', 'CovarianceMatrix.hh', 'Material.hh', 'MICEStackingAction.hh', 'MICETrackingAction.hh', 'OpticsModel.hh', 'PhaseSpaceVector.hh', 'Tensor3.hh', 'Tensor.hh', 'TransferMapCalculator.hh', 'TransferMap.hh', 'TransportManager.hh',
 ]
 
-cp = os.path.join('src', 'common')
+cpp_unit_files = [
+'MeshTest.cc', 'MAUSPrimaryGeneratorActionTest.cc', 'BTSolenoidTest.cc', 'JsonWrapperTest.cc', 'MAUSTrackingActionTest.cc', 'MAUSGeant4ManagerTest.cc', 'BTMultipoleTest.cc', 'MVectorTest.cc', 'DifferentiatorTest.cc', 'BTFieldConstructorTest.cc', 'MMatrixTest.cc', 'MiceModToG4SolidTest.cc', 'PolynomialTest.cc', 'BTTrackerTest.cc', 'MAUSSteppingActionTest.cc', 'CppErrorHandlerTest.cc', 'MiceModuleTest.cc', 'TriangularMeshTest.cc', 'dataCardsTest.cc', 
+]
+
+cp = os.path.join('src', 'legacy')
 test = os.path.join('tests', 'cpp_unit')
 
 # glob files here because of 
 glob_files = []
 glob_files += file_append(os.path.join(cp, 'Recon', '*'), recon_files)
+glob_files += file_append(os.path.join(cp, 'DetModel'), detmodel_files)
 glob_files += file_append(os.path.join(cp, 'DetModel', '*'), detmodel_files)
 glob_files += file_append(os.path.join(test, '*'), cpp_unit_files)
 
@@ -357,6 +364,7 @@ exclude_files += file_append(os.path.join(cp, 'BeamTools'), beamtools_files)
 exclude_files += file_append(os.path.join(cp, 'Simulation'), simulation_files)
 exclude_files += file_append(os.path.join(cp, 'Calib'), calib_files)
 exclude_files += file_append(os.path.join(cp, 'Config'), config_files)
+exclude_files += file_append(os.path.join(cp, 'Optics'), optics_files)
 
 if __name__=="__main__":
   unittest.main()

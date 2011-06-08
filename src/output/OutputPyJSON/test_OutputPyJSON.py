@@ -20,9 +20,9 @@ class OutputPyJSONTestCase(unittest.TestCase):
         filename = tempfile.mkstemp()[1]
         output = OutputPyJSON(open(filename,'w'))
 
-        output.birth()
+        self.assertTrue(output.birth("{}"))
         output.save(self.test_string)
-        output.death()
+        self.assertTrue(output.death())
 
         test_doc = json.loads(self.test_string)
 

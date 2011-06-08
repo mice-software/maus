@@ -1,0 +1,147 @@
+//Test of basic phasing of RF cavities
+//Check that the RF cavity is phased correctly
+
+Configuration PhaseTest
+{
+  ERROR THIS GEOMETRY DOES NOT WORK - I HAVENT FIGURED OUT RF CAVITY PHASING IN MAUS YET
+
+  Dimensions 1.0 1.0 600 m
+  PropertyString Material  Galactic
+  PropertyDouble G4StepMax 100 mm
+
+  Substitution $cell_length 75.0
+  Substitution $us_pos      1
+  Substitution $ds_pos      2
+
+  Module Envelope
+  {
+    Position       0.0 0.0 -37.5 cm
+    Volume None
+    PropertyString EnvelopeType   TrackingDerivative
+    PropertyInt    Pid            -13
+    PropertyString LongitudinalVariable Momentum
+    PropertyDouble Momentum       200.
+    PropertyDouble Time           0.
+    PropertyBool   UseAsReference true
+
+
+    PropertyString EllipseDefinition Penn
+    PropertyDouble Emittance_T    1.       mm
+    PropertyDouble Emittance_L    1.       ns
+    PropertyDouble Beta_T         1.       mm
+    PropertyDouble Beta_L         @Beta_L ns
+    PropertyDouble Alpha_T        0.
+    PropertyDouble Alpha_L        0.
+    PropertyDouble NormalisedAngularMomentum 0.
+    PropertyDouble Bz             0. T
+
+    PropertyString RootOutput      envelope-rftest.root
+    PropertyString LongTextOutput  envelope-rftest.txt
+
+    PropertyDouble Delta_t        0.001 ns
+    PropertyDouble Delta_E        0.1 MeV
+    PropertyDouble Delta_x        0.1 mm
+    PropertyDouble Delta_Px       0.1 MeV/c
+    PropertyDouble Delta_y        0.1 mm
+    PropertyDouble Delta_Py       0.1 MeV/c
+  }
+  Module Optimiser
+  {
+    Volume         None
+    PropertyString Optimiser         Minuit
+    PropertyString Algorithm         simplex
+    PropertyInt    NumberOfTries     100
+    PropertyDouble StartError        100.
+    PropertyDouble EndError          1e-3
+    PropertyBool   RebuildSimulation false
+
+    PropertyDouble Parameter1_Start   7.
+    PropertyDouble Parameter1_Min     1.
+    PropertyDouble Parameter1_Max     100.
+    PropertyDouble Parameter1_Delta   0.1
+    PropertyBool   Parameter1_Fixed   False
+    PropertyString Parameter1_Name    @Beta_L
+
+    PropertyDouble Score1            (@Beta_Up-@Beta_Down)**2
+    PropertyDouble Score2            ((@Alpha_Up-@Alpha_Down)*100)**2
+  }
+  Module UpstreamEnvelope
+  {
+    Volume   None
+    Position 0.0 0.0 $cell_length*$us_pos cm
+
+    PropertyString SensitiveDetector   Envelope
+    PropertyString IndependentVariable Z
+
+    PropertyString     EnvelopeOut1_Name        @Beta_Up
+    PropertyString     EnvelopeOut1_Type        Bunch_Parameter
+    PropertyString     EnvelopeOut1_Variable    beta_t
+
+    PropertyString     EnvelopeOut2_Name        @Alpha_Up
+    PropertyString     EnvelopeOut2_Type        Bunch_Parameter
+    PropertyString     EnvelopeOut2_Variable    alpha_t
+  }
+  Module DownstreamEnvelope
+  {
+    Volume   None
+    Position 0.0 0.0 $cell_length*$ds_pos cm
+
+    PropertyString SensitiveDetector   Envelope
+    PropertyString IndependentVariable Z
+
+    PropertyString     EnvelopeOut1_Name        @Beta_Down
+    PropertyString     EnvelopeOut1_Type        Bunch_Parameter
+    PropertyString     EnvelopeOut1_Variable    beta_t
+
+    PropertyString     EnvelopeOut2_Name        @Alpha_Down
+    PropertyString     EnvelopeOut2_Type        Bunch_Parameter
+    PropertyString     EnvelopeOut2_Variable    alpha_t
+  }
+
+
+  Module Virtual
+  {
+    Volume None
+    Position 0.0 0.0 -37.5+7.50*@RepeatNumber cm
+    PropertyString SensitiveDetector   Virtual
+    PropertyString IndependentVariable Z
+    PropertyBool   RepeatModule2  true
+    PropertyInt    NumberOfRepeats 40
+  } 
+  Module RF
+  {
+    Module Window
+    {
+      Volume Cylinder
+      Position 0.0 0.0 -43.0/2. cm
+      Dimensions 64.0 0.01 cm
+      PropertyString Material           Galactic
+    }
+    Module Window
+    {
+      Volume Cylinder
+      Position   0.0  0.0  +43.0/2. cm
+      Dimensions 64.0 0.01 cm
+      PropertyString Material           Galactic
+    }
+    Volume Cylinder
+    Position 0.0 0.0 75.0*@RepeatNumber cm
+    Dimensions 64.5 43.005 cm
+    PropertyString Material           Galactic
+    PropertyDouble Invisible          1
+    PropertyString FieldType          PillBox
+    PropertyString CavityMode         Unphased
+    PropertyString PhasingVolume      None
+    PropertyDouble Length             43.0    cm
+    PropertyString FieldDuringPhasing TimeVarying
+    PropertyDouble PeakEField         9       MV/m
+    PropertyDouble ReferenceParticlePhase  0
+    PropertyDouble Frequency          0.20125
+    PropertyBool   RepeatModule2  true
+    PropertyInt    NumberOfRepeats 20
+  } 
+
+
+
+}
+

@@ -10,10 +10,10 @@ import io  #  generic python library for I/O
 
 import MAUS
 
-def run(number_of_events):
+def run(number_of_spills):
     """Simulate the MICE experiment
     
-    This will simulate 'number_of_events' MICE events through the entirity
+    This will simulate 'number_of_spills' MICE events through the entirity
     of MICE using Geant4.  At present, TOF and Tracker hits will be digitized.
     """
 
@@ -24,7 +24,7 @@ def run(number_of_events):
     #
     # where the file format has a JSON document per line.  I just toss the file
     # in here for simplicity.
-    document_file = io.StringIO(number_of_events*u"""{"mc": [{"position": { "x": 0.0, "y": -0.0, "z": -5000 },"particle_id" : 13,"energy" : 210, "random_seed" : 10, "unit_momentum" : { "x":0, "y":0, "z":1 }}]}\n""")
+    document_file = io.StringIO(number_of_spills*u"""{"mc": [{"position": { "x": 0.0, "y": -0.0, "z": -5000 },"particle_id" : 13,"energy" : 210, "random_seed" : 10, "unit_momentum" : { "x":0, "y":0, "z":1 }}]}\n""")
     
     my_input = MAUS.InputPyJSON(document_file)
     
@@ -48,5 +48,5 @@ def run(number_of_events):
 
 
 if __name__ == '__main__':
-    number_of_events = 10
-    run(number_of_events)
+    number_of_spills = 10
+    run(number_of_spills)

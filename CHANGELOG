@@ -1,3 +1,10 @@
+MAUS-v0.0.2 (http://micewww.pp.rl.ac.uk/versions/show/6):
+  Bug #437: missing test coverage
+  Bug #448: scons does not clean properly some changes
+  Bug #462: Mapper success of birth not checked by Go()
+  Bug #463: Indentation spaces of src/core/ErrorHandler
+  Feature #357: Beam maker
+
 MAUS-v0.0.1 (http://micewww.pp.rl.ac.uk/versions/show/1):
 	Bug #119: remove buildtype from worker builder
 	Bug #122: readd md5sum checks
@@ -37,6 +44,7 @@ MAUS-v0.0.1 (http://micewww.pp.rl.ac.uk/versions/show/1):
 	Bug #360: doxygen link fails
 	Bug #363: geant4 install bug
 	Bug #366: MathUtils::Tanh test failing
+	Bug #368: MiceModule tests fail because of bad write
 	Bug #369: MAUSSteppingAction misses first prestep point
 	Bug #370: MAUSSteppingAction kills tracks with more than 100k steps
 	Bug #371: MAUSSteppingAction kills non-muons
@@ -47,7 +55,9 @@ MAUS-v0.0.1 (http://micewww.pp.rl.ac.uk/versions/show/1):
 	Bug #402: pythonpath error if originally unset
 	Bug #404: MiceModule sets iterator to iterator.end() instead of break
 	Bug #413: MapCppTOFDigitization files fails cpplint
+	Bug #415: MAUSSteppingAction, MAUSTrackingAction, etc fail cpplint
 	Bug #416: env.csh broken
+	Bug #431: cpplint from command line
 	Feature #47: finalize datastructure
 	Feature #80: use something like couchDB for datastructure
 	Feature #121: change URL within third_party bash when public
@@ -83,7 +93,9 @@ MAUS-v0.0.1 (http://micewww.pp.rl.ac.uk/versions/show/1):
 	Feature #331: cleanup jenkins builds
 	Feature #336: Add gunit to third_party
 	Feature #338: Add Unit Tests
+	Feature #340: hacking documentation
 	Feature #341: wiki needs hacking
+	Feature #353: Virtual Planes
 	Feature #361: README
 	Feature #372: email new issues to maus-dev
 	Feature #378: realdata moved
@@ -94,5 +106,9 @@ MAUS-v0.0.1 (http://micewww.pp.rl.ac.uk/versions/show/1):
 	Feature #406: remove EMCAL since we have KL/EMR (and not used)
 	Feature #407: Mac OSX support
 	Feature #419: Code review documentation
+	Feature #428: Release 0.6
 	Feature #432: can now do "import MAUS" from control files/macros
 	Feature #441: numpy (and tests) added for Rogers/Carlisle to third_party
+	Feature #446: Configuration DB python interface
+	Feature #451: Test for correct MAUS instance if many installed copies
+

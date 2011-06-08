@@ -5,12 +5,17 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 Release Notes
 =============
 
-MAUS-0.0.1 summary:
+MAUS-v0.0.2 summary
+- Added BeamMaker prototype
+
+MAUS-v0.0.1 summary:
+- Initial version
 - Core map-reduce infrastructure
 - Partial implementaton of monte carlo tracking simulation at application level
 -- Port of geometry, fields, geant4 set-up, virtual planes algorithm 
 - Abiity to analyze low-level DAQ data
 - Build system of all dependencies that is tested on a wide range of systems
 - Partial port, testing, and clean up of legacy code
+- Configuration database interface
 
 
