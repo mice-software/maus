@@ -58,58 +58,61 @@ class CppErrorHandler {
    *  @param exc the (MAUS Squeal) exception
    *  @param class_name the name of the class that generated the error
    */
-  static Json::Value HandleSqueal
-                          (Json::Value val, Squeal exc, std::string class_name);
+  Json::Value HandleSqueal(Json::Value val, Squeal exc, std::string class_name);
+
+  /** @brief Call default Cpp exception handler
+   *
+   * This makes a python exception of type CppError and hands it to the Python
+   * error handler. Any Json return values are discarded.
+   *
+   *  @param exc the (std) exception
+   *  @param class_name the name of the class that generated the error
+   */
+  void HandleSquealNoJson(Squeal exc, std::string class_name);
 
   /** @brief Call default Cpp exception handler
    *
    * This makes a python exception of type CppError and hands it to the Python
    * error handler.
    *
-   *  @param exc the (std) exception
-   *  @param class_name the name of the class that generated the error
-   */
-  static void HandleSquealNoJson(Squeal exc, std::string class_name);
-
-  /** @brief Call default Cpp exception handler
-   *
-   *  For now this just prints std::exception::what(), but at some point I
-   *  intend to do something more sophisticated.
-   *
    *  @param val Json document that will take any error
    *  @param exc the std::exception
    *  @param class_name name of the class that generated the error
    */
-  static Json::Value HandleStdExc
+  Json::Value HandleStdExc
                   (Json::Value val, std::exception exc, std::string class_name);
 
   /** @brief Call default Cpp exception handler when Json not initialised
    *
-   *  For now this just prints std::exception::what(), but at some point I
-   *  intend to do something more sophisticated.
+   * This makes a python exception of type CppError and hands it to the Python
+   * error handler. Any Json return values are discarded.
    *
    *  @param exc the std::exception
    *  @param class_name name of the class that generated the error
    */
-  static void HandleStdExcNoJson(std::exception exc, std::string class_name);
+  void HandleStdExcNoJson(std::exception exc, std::string class_name);
 
   /** @brief Set function that is called to pass errors to python
+   *
+   *  Note that this function INCREFs the input PyObject and DECREFs any
+   *  existing PyObject (i.e. CppErrorHandler owns memory).
    */
-  static void SetPyErrorHandler(PyObject* fn) {
+  void SetPyErrorHandler(PyObject* fn) {
     if (getInstance()->HandleExceptionFunction != NULL)
       Py_XDECREF(getInstance()->HandleExceptionFunction);
+    Py_XINCREF(fn);
     getInstance()->HandleExceptionFunction = fn;
   }
 
   /** @brief Get function that is called to pass errors to python
    */
-  static PyObject* GetPyErrorHandler() {
+  PyObject* GetPyErrorHandler() {
     return getInstance()->HandleExceptionFunction;
   }
 
+  static CppErrorHandler* getInstance();
 
  private:
-  static CppErrorHandler* getInstance();
   static CppErrorHandler* instance;
   PyObject* HandleExceptionFunction;  // set by callback defined in PyMausCpp
 

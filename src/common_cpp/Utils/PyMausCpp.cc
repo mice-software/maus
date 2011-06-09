@@ -35,8 +35,11 @@ PyObject* CppErrorHandler_SetHandleExceptionFunction
              "Attempt to set HandleExceptionFunction to non-callable PyObject");
         return NULL;
     }
-    Py_XINCREF(temp);
-    CppErrorHandler::SetPyErrorHandler(temp);
+    CppErrorHandler::getInstance()->SetPyErrorHandler(temp);
+  } else {
+    PyErr_SetString(PyExc_TypeError,
+         "Failed to recognise arguments to libMausCpp.SetHandleException");
+    return NULL;
   }
   Py_INCREF(Py_None);
   return Py_None;
