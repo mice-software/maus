@@ -35,9 +35,9 @@ MAUSGeant4Manager::MAUSGeant4Manager() : _storeTracks(false) {
     _physList = MICEPhysicsList::GetMICEPhysicsList();
     _runManager->SetUserInitialization(_physList);
 
-    _primary  = new MAUSPrimaryGeneratorAction;
-    _stepAct  = new MAUSSteppingAction;
-    _trackAct = new MAUSTrackingAction;
+    _primary  = new MAUSPrimaryGeneratorAction();
+    _stepAct  = new MAUSSteppingAction();
+    _trackAct = new MAUSTrackingAction();
     _runManager->SetUserAction(_primary);
     _runManager->SetUserAction(_trackAct);
     _runManager->SetUserAction(_stepAct);

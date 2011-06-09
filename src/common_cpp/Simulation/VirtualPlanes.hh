@@ -26,8 +26,9 @@
 
 #include "json/json.h"
 
-#include "src/legacy/Interface/VirtualHit.hh"
+#include "src/common_cpp/Utils/JsonWrapper.hh"
 
+#include "src/legacy/Interface/VirtualHit.hh"
 #include "src/legacy/BeamTools/BTTracker.hh"
 #include "src/legacy/BeamTools/BTFieldGroup.hh"
 
@@ -297,6 +298,8 @@ class VirtualPlaneManager {
   }
 
   /** @brief Get a pointer to the MiceModule based on StationNumber
+   *
+   *  @returns MiceModule or NULL if no MiceModule registered
    */
   static const MiceModule*   GetModuleFromStationNumber(int stationNumber);
 
@@ -317,9 +320,22 @@ class VirtualPlaneManager {
    */
   static void WriteHit(VirtualHit hit, Json::Value* value);
 
+  /** @brief Read the hit from the Json::Value
+   */
+  VirtualHit ReadHit(Json::Value value);
+
+  /** @brief Add plane to the manager by hand
+   *
+   *  @params plane is the plane to be added. Note VirtualPlaneManager now takes
+   *          ownership of this memory.
+   */
+  static void AddPlane(VirtualPlane* plane);
+
  private:
   VirtualPlaneManager() {}
   static VirtualPlane ConstructFromModule(const MiceModule* mod);
+
+  CLHEP::Hep3Vector JsonToThreeVector(Json::Value value, std::string name);
 
   static BTField*                  _field;
   BTFieldGroup                     _default_field;  // _field defaults to this

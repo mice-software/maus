@@ -364,9 +364,7 @@ int VirtualPlaneManager::GetStationNumberFromModule(const MiceModule* module) {
     if (it->second == module) plane = it->first;
   for (size_t i = 0; i < _planes.size(); i++)
     if (plane == _planes[i]) return i+1;
-  throw(Squeal(Squeal::recoverable,
-               "Failed to find VirtualPlane for module "+module->fullName(),
-               "VirtualPlaneManager::ModuleName"));
+  return NULL;
 }
 
 int VirtualPlaneManager::GetNumberOfHits(int stationNumber) {
@@ -377,7 +375,6 @@ int VirtualPlaneManager::GetNumberOfHits(int stationNumber) {
               "VirtualPlaneManager::GetNumberOfHits"));
     return _nHits[stationNumber-1];
 }
-
 
 void VirtualPlaneManager::WriteHit(VirtualHit hit, Json::Value* value) {
     Json::Value hit_v = Json::Value(Json::objectValue);
@@ -408,5 +405,38 @@ void VirtualPlaneManager::WriteHit(VirtualHit hit, Json::Value* value) {
     if ((*value)["virtual_hits"].isNull())
         (*value)["virtual_hits"] = Json::Value(Json::arrayValue);
     (*value)["virtual_hits"].append(hit_v);
+}
+
+VirtualHit VirtualPlaneManager::ReadHit(Json::Value v_hit) {
+    Json::Value stationId = JsonWrapper::GetProperty(v_hit, "station_id", JsonWrapper::intValue);
+    Json::Value trackId = JsonWrapper::GetProperty(v_hit, "track_id", JsonWrapper::intValue);
+    Json::Value pid = JsonWrapper::GetProperty(v_hit, "particle_id", JsonWrapper::intValue);
+
+    Json::Value time = JsonWrapper::GetProperty(v_hit, "time", JsonWrapper::realValue);
+    Json::Value mass = JsonWrapper::GetProperty(v_hit, "mass", JsonWrapper::realValue);
+    Json::Value charge = JsonWrapper::GetProperty(v_hit, "charge", JsonWrapper::realValue);
+    Json::Value tau = JsonWrapper::GetProperty(v_hit, "proper_time", JsonWrapper::realValue);
+    Json::Value len = JsonWrapper::GetProperty(v_hit, "path_length", JsonWrapper::realValue);
+
+    Json::Value pos_v =JsonWrapper::GetProperty(v_hit, "position", JsonWrapper::objectValue);
+    Json::Value mom_v =JsonWrapper::GetProperty(v_hit, "momentum", JsonWrapper::objectValue);
+    Json::Value b_v =JsonWrapper::GetProperty(v_hit, "b_field", JsonWrapper::objectValue);
+    Json::Value e_v =JsonWrapper::GetProperty(v_hit, "e_field", JsonWrapper::objectValue);
+
+    VirtualHit hit;
+    hit.SetStationNumber(stationId.asInt());
+    hit.SetTrackID(trackId.asInt());
+    hit.SetPID(pid.asInt());
+
+    hit.SetTime(time.asDouble());
+    hit.SetMass(mass.asDouble());
+    hit.SetCharge(charge.asDouble());
+    hit.SetProperTime(tau.asDouble());
+    hit.SetPathLength(len.asDouble());
+    
+    hit.SetPos(JsonWrapper::JsonToThreeVector(pos_v));
+    hit.SetMomentum(JsonWrapper::JsonToThreeVector(mom_v));
+    hit.SetBField(JsonWrapper::JsonToThreeVector(b_v));
+    hit.SetEField(JsonWrapper::JsonToThreeVector(e_v));
 }
 

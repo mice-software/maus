@@ -15,6 +15,8 @@
  *
  */
 
+#include <Python.h>
+
 #include <vector>
 #include <string>
 
@@ -138,6 +140,6 @@ Json::Value MapCppSimulation::StoreTracking(Json::Value particle) {
         }
       }
     }
-    particle["tracks"] =  _g4manager->GetStepping()->GetTracks();
+    particle["tracks"] = _g4manager->GetStepping()->GetTracks();
     return particle;
 }

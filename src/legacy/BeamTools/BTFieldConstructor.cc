@@ -94,7 +94,6 @@ void BTFieldConstructor::BuildFields(MiceModule * rootModule)
   _magneticField->Close();
   _electroMagneticField->Close();
 
-	SetPhaser();
 	WriteFieldMaps();
 	if(_amalgamatedFields != ignoredAmalgamated)
 	{
@@ -578,8 +577,7 @@ void BTFieldConstructor::SetDefaults()
 	double AArray[6];
 	if(AVec.size()==0) AVec = vector<double>(6);
 	for(unsigned int i=0; i<6; i++) AArray[i] = AVec[i];
-	BTPhaser::SetPhaseTolerance (RFParams->rfPhaseTolerance());
-	BTPhaser::SetEnergyTolerance(RFParams->rfEnergyTolerance());
+	BTPhaser::GetInstance()->SetPhaseTolerance (RFParams->rfPhaseTolerance());
 	int gridSpace[3] = {MagParams->FieldGridX(),MagParams->FieldGridY(),MagParams->FieldGridZ()};
 	BTFieldGroup::SetGridDefault(std::vector<int>(gridSpace, gridSpace+3));
 }

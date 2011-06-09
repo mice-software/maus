@@ -42,7 +42,7 @@ void MAUSSteppingAction::UserSteppingAction(const G4Step * aStep) {
     ss << aTrack->GetTrackID();
 
     if ( _keepTracks ) {
-        if (!_tracks.isMember(ss.str())) {  //  new track, then
+        if (!_tracks.isMember(ss.str())) {  // new track, then
             _tracks[ss.str()] = Json::Value();
             _tracks[ss.str()]["steps"] = Json::Value(Json::arrayValue);
             _tracks[ss.str()]["steps"].append(StepPointToJson

@@ -34,6 +34,8 @@
 
 #include "json/json.h"
 
+#include "CLHEP/Vector/ThreeVector.h"
+
 #include "Interface/STLUtils.hh"
 #include "Interface/Squeal.hh"
 
@@ -94,6 +96,14 @@ class JsonWrapper {
      (Json::Value object, std::string value_name,
                           JsonType value_type) throw(Squeal);
 
+
+  /** @brief Convert from a json three vector to a CLHEP three vector
+   *
+   *  @param json_vec objectValue with realValue children "x", "y", "z". Throws
+   *         an exception if the conversion fails.
+   */
+  static CLHEP::Hep3Vector JsonToThreeVector
+                                       (Json::Value json_vec) throw(Squeal);
 
   /** @brief Convert from Json::ValueType to JsonType
    */

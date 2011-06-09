@@ -91,7 +91,7 @@ void BTPillBox::GetFieldValue( const double Point[4], double *Bfield ) const
 	Bfield[5] = 0;
 	if(Point[0]*Point[0]+Point[1]*Point[1] > _cavityRadius*_cavityRadius) return;
 	if(fabs(Point[2]) > _fieldLength/2.) return;
-	if(BTPhaser::IsRefPart())
+	if(BTPhaser::GetInstance()->IsRefPart())
 	{
 		switch(_fieldDuringPhasing)
 		{
