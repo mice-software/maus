@@ -1,12 +1,4 @@
 // MAUS WARNING: THIS IS LEGACY CODE.
-/*
-** Modified example 1 from the GEANT4 distribution to simulate the
-** MICE scintillating fiber tracker for the MICE proposal
-** Ed McKigney - August 21, 2002
-
-David Adey - Modified October 19, 2010
-
-*/
 #include "SciFiSD.hh"
 
 #include "G4TransportationManager.hh"
@@ -32,12 +24,13 @@ SciFiSD::SciFiSD( MiceModule* mod) : MAUSSD(mod)
 
 G4bool SciFiSD::ProcessHits(G4Step* aStep,G4TouchableHistory* ROhist)
 {
-  _hits.push_back(Json::Value());
   
   G4double edep = aStep->GetTotalEnergyDeposit();
 
   if( edep == 0. ) return false;
   else if( edep == 0. ) edep = 1.0 * MeV;	// fake energy deposit just so that we get some photons digitised out of this hit!
+
+  _hits.push_back(Json::Value());
 
   // determine the fibre number based on the position in the tracker and the
   // MiceModule information about the fibre orientation and numbering scheme
@@ -103,7 +96,6 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep,G4TouchableHistory* ROhist)
     _hits[_hits.size() - 1]["channel_id"]["fiber_number"] = secondChan;
   }
 
-  _isHit = true;
   return true;
 }
 

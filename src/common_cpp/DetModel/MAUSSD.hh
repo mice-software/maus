@@ -1,4 +1,3 @@
-// MAUS WARNING: THIS IS LEGACY CODE.
 /* This file is part of MAUS: http://micewww.pp.rl.ac.uk/projects/maus
  *
  * MAUS is free software: you can redistribute it and/or modify
@@ -36,18 +35,18 @@ namespace MAUS {
 
 class MAUSSD : public G4VSensitiveDetector {
  public:
-  MAUSSD(MiceModule*);
+  explicit MAUSSD(MiceModule* mod);
 
-  bool isHit() { return _isHit; }
+  bool isHit();
   int GetNHits() { return _hits.size(); }
-  std::vector<Json::Value> GetHits() { _hits.clear(); return _hits; }
+  void ClearHits() { _hits.clear(); }
+  std::vector<Json::Value> GetHits() { return _hits; }
+
 
  protected:
   std::vector<Json::Value> _hits;
-  bool _isHit;
 
   MiceModule* _module;
-
 };
 
 }  //  ends MAUS namespace

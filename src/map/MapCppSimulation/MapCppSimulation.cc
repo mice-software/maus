@@ -126,9 +126,10 @@ void MapCppSimulation::SetConfiguration(std::string json_configuration) {
 
 Json::Value MapCppSimulation::StoreTracking(Json::Value particle) {
     //  For each detector i
-    for (int i = 0; i < _g4manager->GetGeometry()->GetSDSize(); i++) {
+    for (unsigned int i = 0; i < _g4manager->GetGeometry()->GetSDSize(); i++) {
       //  Retrieve detector i's hits
       vector<Json::Value> hits = _g4manager->GetGeometry()->GetSDHits(i);
+
       // Ensure there are hits in this detector
       if (hits.size() == 0) {
         continue;
@@ -140,6 +141,7 @@ Json::Value MapCppSimulation::StoreTracking(Json::Value particle) {
         }
       }
     }
+
     particle["tracks"] =  _g4manager->GetStepping()->GetTracks();
     return particle;
 }

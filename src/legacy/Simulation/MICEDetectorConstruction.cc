@@ -510,4 +510,10 @@ std::vector<Json::Value> MICEDetectorConstruction::GetSDHits(int i){
   std::vector<Json::Value> empty;
   return empty;
 }
+
+void MICEDetectorConstruction::ClearSDHits(){
+  for ( int i = 0; i < _SDs.size(); i++ ) {
+    if (_SDs[i]) _SDs[i]->ClearHits();
+  }
+}
       

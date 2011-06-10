@@ -45,14 +45,15 @@ class MapPyValidateSpillTestCase(unittest.TestCase):
       self.__test_spill(self.bad_particle_pid)
 
 
-  empty_spill    = """{}"""
-  empty_mc       = """{"mc":{}}"""
-  empty_particle = """{"mc":{"particles":{}}}"""
-  empty_particle_hit = """{"mc":{"particles":{"hit":{}}}}"""
-  empty_particle_track = """{"mc":{"particles":{"track":{}}}}"""
-  particle_pid = """{"mc":{"particles":{"particle_id":-13}}}"""
-  bad_particle_pid = """{"mc":{"particles":{"particle_id":-13.1}}}"""
+  empty_spill    = '{}'
+  empty_mc       = '{"mc":{}}'
+  empty_particle = '{"mc":{"particles":{}}}'
+  empty_particle_hit = '{"mc":{"particles":{"hit":{}}}}'
+  empty_particle_track = '{"mc":{"particles":{"track":{}}}}'
+  particle_pid = '{"mc":{"particles":{"particle_id":-13}}}'
+  bad_particle_pid = '{"mc":{"particles":{"particle_id":-13.1}}}'
+"""
 
 if __name__ == '__main__':
     unittest.main()
-"""
+

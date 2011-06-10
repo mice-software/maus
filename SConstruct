@@ -422,9 +422,11 @@ libs = str(os.environ.get('LD_LIBRARY_PATH'))+':'+str(os.environ.get('DYLD_LIBRA
 env.Append(LIBPATH =  libs.split(':') + ["%s/build" % maus_root_dir])
 
 env.Append(CPPPATH=["%s/third_party/install/include" % maus_root_dir, \
-                      "%s/third_party/install/include/python2.7" % maus_root_dir, \
-                      "%s/third_party/install/include/root" % maus_root_dir, \
-                      "%s/src/legacy" % maus_root_dir, ""])
+                        "%s/third_party/install/include/python2.7" % maus_root_dir, \
+                        "%s/third_party/install/include/root" % maus_root_dir, \
+                        "%s/src/legacy" % maus_root_dir, \
+                        "%s/src/common_cpp" % maus_root_dir, \
+                        ""])
 
 env['USE_G4'] = False
 env['USE_ROOT'] = False
@@ -495,14 +497,16 @@ if env['USE_G4'] and env['USE_ROOT']:
 
     common_cpp_files = glob.glob("src/legacy/*/*cc") + \
         glob.glob("src/legacy/*/*/*cc") + \
-        glob.glob("src/common_cpp/*/*cc")
+        glob.glob("src/common_cpp/*/*cc") + \
+        glob.glob("src/common_cpp/*/*/*cc")
 
-    maus_cpp = env.SharedLibrary(target = 'src/legacy/libMausCpp',
+
+    maus_cpp = env.SharedLibrary(target = 'src/common_cpp/libMausCpp',
                                  source = common_cpp_files,
                                  LIBS=env['LIBS'] + ['recpack'])
     env.Install("build", maus_cpp)
 
-    env.Append(LIBPATH = 'src/legacy/')
+    env.Append(LIBPATH = 'src/common_cpp/')
     env.Append(CPPPATH = maus_root_dir)
 
     if 'Darwin' in os.environ.get('G4SYSTEM'):
@@ -564,7 +568,7 @@ for single_stuff in stuff_to_import:
 
 file_to_import.close()
 
-files = glob.glob('tests/py_unit/test_*')+glob.glob('tests/style/*.py')
+files = glob.glob('tests/py_unit/test_*.py')+glob.glob('tests/style/*.py')
 env.Install("build", files)
 
 env.Install("build", "tests/py_unit/test_cdb")
