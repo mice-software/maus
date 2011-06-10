@@ -537,7 +537,7 @@ for directory in directories:
 
     if 'Py' in parts[2] and 'Cpp' not in parts[2]:
         print 'Found Python module: %s' % parts[2]
-        files = glob.glob('%s/test_*.py' % directory) +  ["%s/%s.py" % (directory, parts[2])]
+        files = glob.glob('%s/*.py' % directory) 
         env.Install("build", files)
 
         stuff_to_import.append(parts[2])

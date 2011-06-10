@@ -16,7 +16,6 @@
 
 ## @class ErrorHandler
 #  Error handler handles errors in a globally managed way
-#  @author Chris Rogers <chris.rogers@stfc.ac.uk>
 
 
 import sys
@@ -34,7 +33,6 @@ class ErrorHandler:
     * if __halt_on_error is true, call sys.exit() on error
     Either instantiate a special error handler or (more usually) use the default
     error handler.
-    @author Chris Rogers <chris.rogers@stfc.ac.uk>
     """
     def __init__(self):
         """
@@ -156,7 +154,7 @@ def HandleCppException(doc, caller, error_message):
       out = json.dumps(__default_handler.HandleException(json_doc, caller))
     return out
 
-# Here we set the function call for CppErrorHandler stuff. If not set, assume we
+# Sets the function call for CppErrorHandler. If not set, assume we
 # don't use python error handler; libMausCpp is defined in 
 #   src/common_cpp/Utils/PyMausCpp.hh
 libMausCpp.SetHandleException(HandleCppException)

@@ -30,5 +30,5 @@ mc = {
   },
 }
 
-spill = {"type":"object", "properties":{"mc":mc}}
+spill = {"type":"object", "properties":{"mc_particles":mc}}
 

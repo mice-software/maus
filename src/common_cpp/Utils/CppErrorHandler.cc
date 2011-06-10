@@ -50,22 +50,40 @@ void CppErrorHandler::HandleStdExcNoJson
 
 Json::Value CppErrorHandler::ExceptionToPython
            (std::string what, Json::Value json_value, std::string class_name) {
-  PyErr_Clear();
+  // Logic is:
+  // * Make sure the Python error handler is loaded
+  // * Clear any existing exceptions
+  // * Make json_value into a string
+  // * Hand json_value, class name, description of error to python
+  // * Convert return PyObject to string
+  // * Convert string to json value
+  if (!getInstance()->GetPyErrorHandler()) {
+    // Importing ErrorHandler calls libMausCpp which calls SetPyErrorHandler
+    PyImport_ImportModule("ErrorHandler");
+    PyErr_Clear();
+    if (CppErrorHandler::getInstance()->GetPyErrorHandler() == 0) {
+      Squeak::mout(Squeak::error)
+             << "ERROR: Failed to get python error handler" << std::endl;
+    }
+  }
+
+  PyErr_Clear();  // clear any existing exceptions
   Json::FastWriter writer;
   std::string json_in_cpp = writer.write(json_value);
-  char* sss = "sss";
-  PyObject* json_out_py = PyObject_CallFunction
-                (CppErrorHandler::GetPyErrorHandler(), sss, json_in_cpp.c_str(),
-                                              class_name.c_str(), what.c_str());
+  char sss[4] = {'s', 's', 's', '\0'};  // gotta love C (dodge compiler warning)
+  PyObject* json_out_py = PyObject_CallFunction  // call the Python ErrorHandler
+                (getInstance()->GetPyErrorHandler(), &sss[0],
+                 json_in_cpp.c_str(), class_name.c_str(), what.c_str());
   const char* json_str;
-  if (!json_out_py) {
+  if (!json_out_py) {  // error on python side
     Squeak::mout(Squeak::error) << "ERROR: Failed to handle error:" << std::endl;
     PyErr_Print();
     return Json::Value();
   }
-  int ok = PyArg_Parse(json_out_py, "s", &json_str);
-  if (!ok) {
-    Squeak::mout(Squeak::error) << "ERROR: Failed to parse return value from error:" << std::endl;
+  int ok = PyArg_Parse(json_out_py, "s", &json_str);  // convert to string
+  if (!ok) {  // we didn't get a string back
+    Squeak::mout(Squeak::error)
+              << "ERROR: Failed to parse return value from error:" << std::endl;
     PyErr_Print();
     return Json::Value();
   }
@@ -78,14 +96,10 @@ CppErrorHandler::CppErrorHandler() : HandleExceptionFunction(NULL) {
 
 CppErrorHandler* CppErrorHandler::getInstance() {
   if (instance == NULL) {
+    // Don't initialise PyErrorHandler here - because we can get caught up in
+    // initalisation order issues
     instance = new CppErrorHandler();
     Py_Initialize();
-    PyImport_ImportModule("ErrorHandler");
-    PyErr_Clear();
-    if (CppErrorHandler::GetPyErrorHandler() == 0) {
-      Squeak::mout(Squeak::error)
-         << "Error - failed to get python error handler" << std::endl;
-    }
   }
   return instance;
 }

@@ -39,9 +39,9 @@ bool MapCppSimulation::birth(std::string argJsonConfigDocument) {
     return true;  // Sucessful completion
   // Normal session, no visualization
   } catch(Squeal squee) {
-    CppErrorHandler::HandleSquealNoJson(squee, _classname);
+    CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
   } catch(std::exception exc) {
-    CppErrorHandler::HandleStdExcNoJson(exc, _classname);
+    CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
   }
   return false;
 }
@@ -68,9 +68,11 @@ std::string MapCppSimulation::process(std::string document) {
     }
   }
   catch(Squeal squee) {
-    spill = CppErrorHandler::HandleSqueal(spill, squee, _classname);
+    spill = CppErrorHandler::getInstance()
+                                       ->HandleSqueal(spill, squee, _classname);
   } catch(std::exception exc) {
-    spill = CppErrorHandler::HandleStdExc(spill, exc, _classname);
+    spill = CppErrorHandler::getInstance()
+                                         ->HandleStdExc(spill, exc, _classname);
   }
   Json::FastWriter writer;
   std::string output = writer.write(spill);

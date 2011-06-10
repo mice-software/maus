@@ -23,24 +23,26 @@ protected:
 };
 
 TEST_F(CppErrorHandlerTest, HandleSquealTest) {
-  Json::Value value = CppErrorHandler::HandleSqueal(obj, squee, "exc_test");
+  Json::Value value = 
+           CppErrorHandler::getInstance()->HandleSqueal(obj, squee, "exc_test");
   EXPECT_EQ(value["errors"]["exc_test"][Json::UInt(0)],
            Json::Value("<class 'ErrorHandler.CppError'>: a_test at exc::test"));
 }
 
 TEST_F(CppErrorHandlerTest, HandleStdExcTest) {
-  Json::Value value = CppErrorHandler::HandleStdExc(obj, *std_exc, "exc_test");
-  EXPECT_EQ(value["errors"]["exc_test"][Json::UInt(0)],
-           Json::Value("<class 'ErrorHandler.CppError'>: std::exception"));
+  Json::Value value = 
+        CppErrorHandler::getInstance()->HandleStdExc(obj, *std_exc, "exc_test");
+  std::string err = value["errors"]["exc_test"][Json::UInt(0)].asString();
+  EXPECT_EQ(err.substr(0, 33), "<class 'ErrorHandler.CppError'>: ");
 }
 
 TEST_F(CppErrorHandlerTest, HandleStdExcNoJsonTest) {
-  CppErrorHandler::HandleStdExcNoJson(*std_exc, "exc_test");
+  CppErrorHandler::getInstance()->HandleStdExcNoJson(*std_exc, "exc_test");
   // not much to be done here... could check stderr or so?
 }
 
 TEST_F(CppErrorHandlerTest, HandleSquealNoJsonTest) {
-  CppErrorHandler::HandleSquealNoJson(squee, "exc_test");
+  CppErrorHandler::getInstance()->HandleSquealNoJson(squee, "exc_test");
   // not much to be done here... could check stderr or so?
 }
 
