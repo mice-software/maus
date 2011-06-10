@@ -1,37 +1,22 @@
 // MAUS WARNING: THIS IS LEGACY CODE.
-//This file is a part of G4MICE and xboa
+//This file is a part of MAUS
 //
-//G4MICE is free software: you can redistribute it and/or modify
+//MAUS is free software: you can redistribute it and/or modify
 //it under the terms of the GNU General Public License as published by
 //the Free Software Foundation, either version 3 of the License, or
 //(at your option) any later version.
 //
-//G4MICE is distributed in the hope that it will be useful,
+//MAUS is distributed in the hope that it will be useful,
 //but WITHOUT ANY WARRANTY; without even the implied warranty of
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU General Public License for more details.
 //
 //You should have received a copy of the GNU General Public License
-//along with xboa in the doc folder.  If not, see 
+//along with MAUS in the doc folder.  If not, see 
 //<http://www.gnu.org/licenses/>.
-//
-//! Wrapper for GSL matrix
-//! MMatrix class handles matrix algebra, maths operators and some
-//! higher level calculation like matrix inversion, eigenvector
-//! analysis etc
-//
-//! Use template to define two types:
-//! (i) MMatrix<double> is a matrix of doubles
-//! (ii) MMatrix<m_complex> is a matrix of m_complex
-//
-//! Maths operators and a few others are defined, but maths operators
-//! don't allow operations between types - i.e. you can't multiply
-//! a complex matrix by a double matrix. Instead use interface methods
-//! like real() and complex() to convert between types first
 
-
-#ifndef MMatrix_h
-#define MMatrix_h
+#ifndef _SRC_COMMON_CPP_MATHS_MMATRIX_HH_
+#define _SRC_COMMON_CPP_MATHS_MMATRIX_HH_
 
 #include "Interface/Squeal.hh"
 #include "Interface/MVector.hh"
@@ -46,27 +31,108 @@
 
 ///////////////// MMatrix     /////////////////
 
+/** @class MMatrix C++ wrapper for GSL matrix
+ *  MMatrix class handles matrix algebra, maths operators and some
+ *  higher level calculation like matrix inversion, eigenvector
+ *  analysis etc
+ *
+ *  Use template to define two types:\n
+ *  (i) MMatrix<double> is a matrix of doubles\n
+ *  (ii) MMatrix<m_complex> is a matrix of m_complex\n
+ *
+ *  Maths operators and a few others are defined, but maths operators
+ *  don't allow operations between types - i.e. you can't multiply
+ *  a complex matrix by a double matrix. Instead use interface methods
+ *  like real() and complex() to convert between types first
+ *
+ *  Nb: CLHEP::HepMatrix can also be used but doesn't have any eigenvalue
+ *  analysis. Conversion functions are provided in MMatrixToCLHEP
+ */
 template <class Tmplt>
 class MMatrix
 {
 public:
+  /** @brief default constructor makes an empty MMatrix of size (0,0)
+   */
   MMatrix();
-  MMatrix(const MMatrix<Tmplt>& mv ); //! matrix with dimension i*j, filled with value
-  MMatrix(size_t nrows, size_t ncols, Tmplt* data_beginning ); //! matrix with dimension i*j, filled with data from memory block starting at data_beg
-  MMatrix(size_t nrows, size_t ncols, Tmplt  value    ); //! matrix with dimension i*j, filled with value
-  MMatrix(size_t nrows, size_t ncols); //! matrix with dimension i*j, filled with 0.
-  static MMatrix<Tmplt>  Diagonal(size_t i, Tmplt diag_value, Tmplt off_diag_value); //! matrix with dimension i*i, filled with diag_value on the diagonal and off_diag_value elsewhere
-//  static MMatrix<double> Rotation(size_t dimension, Tmplt* angle_beginning); //arbitrary dimension rotation matrix; angle_beginning is an array of angles; matrix is given by M(t1)*M(t2)*...
+
+  /** @brief Copy constructor makes a deep copy of mv
+   */
+  MMatrix(const MMatrix<Tmplt>& mv );
+
+  /** @brief Construct a matrix and fill with data from memory data_beginning
+   *
+   *  @params nrows number of rows
+   *  @params ncols number of columns
+   *  @params data_beginning pointer to the start of a memory block of size
+   *          nrows*ncols with data laid out <row> <row> <row>. Note MMatrix
+   *          does not take ownership of memory in data_beginning.
+   */
+  MMatrix(size_t nrows, size_t ncols, Tmplt* data_beginning );
+
+  /** @brief Construct a matrix and fill with identical data
+   *
+   *  @params nrows number of rows
+   *  @params ncols number of columns
+   *  @params data variable to be copied into all items in the matrix
+   */
+  MMatrix(size_t nrows, size_t ncols, Tmplt  value);
+
+  /** @brief Construct a matrix and fill all fields with 0
+   *
+   *  @params nrows number of rows
+   *  @params ncols number of columns
+   */
+  MMatrix(size_t nrows, size_t ncols);
+
+  /** @brief Construct a square matrix filling on and off diagonal values
+   *
+   *  @params i number of rows and number of columns
+   *  @params diag_value fill values with row == column (i.e. on the diagonal)
+   *          with this value
+   *  @params off_diag_value fill values with row != column (i.e. off the
+   *          diagonal) with this value
+   */
+  static MMatrix<Tmplt>  Diagonal(size_t i, Tmplt diag_value, Tmplt off_diag_value);
+
+  /** @brief destructor
+   */
   ~MMatrix();
  
-  size_t           num_row()     const; //return number of rows
-  size_t           num_col()     const; //return number of columns
-  Tmplt            trace()       const; //return trace (sum of diagonals)
-  Tmplt            determinant() const; //return matrix determinant
-  MMatrix<Tmplt>   inverse()     const; //returns inverse leaves matrix unchanged
-  void             invert();            //turns matrix into its inverse
-  MMatrix<Tmplt>     T()            const; //return transpose
-//  MMatrix<m_complex> eigenvectors() const; //return matrix of eigenvectors
+  /** @brief returns number of rows in the matrix
+   */
+  size_t           num_row()     const;
+
+  /** @brief returns number of columns in the matrix
+   */
+  size_t           num_col()     const;
+
+  /** @brief returns sum of terms with row == column, even if matrix is not
+   *         square
+   */
+  Tmplt            trace()       const;
+
+  /** @brief returns matrix determinant; throws an exception if matrix is not
+   *         square
+   */
+  Tmplt            determinant() const;
+
+  /** @brief returns matrix inverse leaving this matrix unchanged
+   */
+  MMatrix<Tmplt>   inverse()     const;
+
+  /** @brief turns this matrix into its inverse
+   */
+  void             invert();
+
+  /** @brief returns matrix transpose T (such that M(i,j) = T(j,i))
+   */
+  MMatrix<Tmplt>     T()            const;
+
+  /** @brief returns a vector of eigenvalues. Throws an exception if either this
+   *         matrix is not square or the eigenvalues could not be found (e.g.
+   *         singular matrix or whatever).
+   */
   MVector<m_complex> eigenvalues() const; //return vector of eigenvalues
   std::pair<MVector<m_complex>, MMatrix<m_complex> > 
                      eigenvectors() const; //return pair of eigenvalues, eigenvectors (access using my_pair.first or my_pair.second)
