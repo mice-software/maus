@@ -328,8 +328,12 @@ class VirtualPlaneManager {
    *
    *  @params plane is the plane to be added. Note VirtualPlaneManager now takes
    *          ownership of this memory.
+   *  @params mod is the module which made the plane. If no module, just set
+   *          this to NULL. This is used subsequently to relate stations to the
+   *          originating MiceModule. VirtualPlaneManager does not own this
+   *          memory.
    */
-  static void AddPlane(VirtualPlane* plane);
+  static void AddPlane(VirtualPlane* plane, const MiceModule* mod);
 
  private:
   VirtualPlaneManager() {}

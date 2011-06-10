@@ -38,9 +38,9 @@ bool MapCppSimulation::birth(std::string argJsonConfigDocument) {
     SetConfiguration(argJsonConfigDocument);
     return true;  // Sucessful completion
   // Normal session, no visualization
-  } catch(Squeal squee) {
+  } catch(Squeal& squee) {
     CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
-  } catch(std::exception exc) {
+  } catch(std::exception& exc) {
     CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
   }
   return false;
@@ -124,6 +124,8 @@ void MapCppSimulation::SetConfiguration(std::string json_configuration) {
   // G4 Materials
   fillMaterials(simRun);
   _g4manager = MAUSGeant4Manager::GetInstance();
+  // RF cavity phases
+  _g4manager->SetPhases();
 }
 
 Json::Value MapCppSimulation::StoreTracking(Json::Value particle) {

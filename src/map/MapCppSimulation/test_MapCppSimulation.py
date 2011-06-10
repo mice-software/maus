@@ -26,7 +26,7 @@ class MapCppSimulationTestCase(unittest.TestCase):
     def tearDownClass(self):
         success = self.mapper.death()
         if not success:
-            raise Exception('InitializeFail', 'Could not start worker')
+            raise Exception('DestructFail', 'Could not kill worker')
         self.mapper = None
 
     ######## tests on Process #########

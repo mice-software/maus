@@ -58,10 +58,10 @@ void SetupSimulation(MiceModule* root, std::vector<CovarianceMatrix> envelope)
                                 (JsonWrapper::StringToJson("{\"maximum_number_of_steps\":10000}")); // BUG
   Squeak::setStandardOutputs();
   fillMaterials(simRun);
-
+  
   g4Manager = MAUSGeant4Manager::GetInstance();
 
-  BTPhaser::Print(Squeak::mout(Squeak::info));
+  simRun.btFieldConstructor->Print(Squeak::mout(Squeak::info));
 }
 
 std::vector<G4VSolid*> MakeCylinderEnvelope(std::vector<CovarianceMatrix> matrix, double InterpolationSize)
@@ -71,31 +71,11 @@ std::vector<G4VSolid*> MakeCylinderEnvelope(std::vector<CovarianceMatrix> matrix
 
 MICEEvent* PhaseCavities(PhaseSpaceVector ref)
 {
-  Squeak::mout(Squeak::debug) << "Rephasing cavities with reference particle " << ref << std::endl;
-  BTPhaser::IsPhaseSet(false); //force to rephase
-  simEvent = MICEEvent();
-  if(BTPhaser::NumberOfCavities() == 0) return &simEvent;
-  int nTries = 0;
-  MAUSPrimaryGeneratorAction::PGParticle p = ConvertToPGParticle(ref);
-  while(!BTPhaser::IsPhaseSet() && nTries < 5*BTPhaser::NumberOfCavities())  
-  {
-    g4Manager->GetPrimaryGenerator()->Push(p);
-    g4Manager->GetRunManager()->BeamOn(1);
-    nTries++;
-    Squeak::mout(Squeak::info) << "." << std::flush;
-  }
-  Squeak::mout(Squeak::info) << std::endl;
-  if(!BTPhaser::IsPhaseSet())
-    throw(Squeal(Squeal::recoverable, "Error setting RF cavity phase", "Envelope::RunSimulation"));
-  if(nTries > 1)
-    Squeak::mout(Squeak::debug) << "Cavities were rephased. New fields:\n" << *(BTPhaser::GetGlobalField()) << std::endl;
-  return &simEvent;
 }
 
 MICEEvent* RunSimulation(PhaseSpaceVector psv)
 {
   simEvent = MICEEvent();
-  BTPhaser::IsRefPart(true);
   if(psv.E()<0) return &simEvent;
   MAUSPrimaryGeneratorAction::PGParticle p = ConvertToPGParticle(psv);
   g4Manager->GetPrimaryGenerator()->Push(p);
@@ -760,7 +740,7 @@ namespace Optimiser
     if(g_rebuild_simulation)
     {
       Squeak::mout(Squeak::debug) << "Rebuilding fields" << std::endl;
-      BTFieldConstructor*   field   = (BTFieldConstructor*)BTPhaser::GetGlobalField();
+      BTFieldConstructor*   field   = (BTFieldConstructor*)MICERun::getInstance()->btFieldConstructor;
       BTFieldGroup*         mfield  = (BTFieldGroup*)field->GetMagneticField();
       BTFieldGroup*         emfield = (BTFieldGroup*)field->GetElectroMagneticField();
       std::vector<BTField*> field_v = mfield->GetFields();
@@ -774,7 +754,7 @@ namespace Optimiser
       emfield->Close();
       Squeak::mout(Squeak::debug) << "Deleted fields" << std::endl;
       field->BuildFields(g_root_mod);
-      BTPhaser::Print(Squeak::mout(Squeak::debug)); 
+      MICERun::getInstance()->btFieldConstructor->Print(Squeak::mout(Squeak::debug)); 
     }
     std::vector<double> score = GetScore();
     for(int i=0; i<int(g_parameters.size()); i++)

@@ -4,6 +4,13 @@
 #include "src/legacy/Interface/MICERun.hh"
 #include "src/legacy/BeamTools/BTFieldConstructor.hh"
 
+BTPhaser * BTPhaser::_instance = NULL;
+
+BTPhaser::BTPhaser() : _allPhasesSet(true), 
+                       _phaseTolerance(1e-5), _firingRefs(false), _rfData(), 
+                       _cavities() {
+}
+
 BTPhaser::~BTPhaser()
 {
 	for(int i=0; i<(int)_rfData.size(); i++) delete _rfData[i];
@@ -15,8 +22,7 @@ bool BTPhaser::SetThePhase(Hep3Vector Position, double time)
 	bool   _thisPhaseSet = true;
 	std::string phase    = " succeeded";
 	RFData anRFPhase;
-	if(_hasGlobalField && !IsPhaseSet())
-		anRFPhase = MICERun::getInstance()->btFieldConstructor->SetThePhase(Position, time, 0.);
+	anRFPhase = MICERun::getInstance()->btFieldConstructor->SetThePhase(Position, time, 0.);
 	double dt = anRFPhase.GetPhaseError();
 	if(fabs(dt) < _phaseTolerance) 
 	{
@@ -39,5 +45,9 @@ std::vector<RFData*> BTPhaser::GetRFData()
 	return rfData;
 }
 
-
+BTPhaser* BTPhaser::GetInstance() {
+  if(_instance == NULL) 
+    _instance = new BTPhaser();
+  return _instance;
+}
 

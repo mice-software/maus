@@ -78,4 +78,4 @@ SciFinPlanes = 3
 SciFinStations = 5
 SciFinTrackers = 2
 
-VirtualPlanes_z = [0.0, 1.0] # units: meter.  the 'z' coordinate where the virtual plane exists
+

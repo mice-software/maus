@@ -45,7 +45,7 @@ class MICEPhysicsList;
 namespace MAUS {
 
 class MAUSGeant4Manager {
- public:
+  public:
     /** @brief Get the singleton MAUSGeant4Manager
      *
      *  Get the instance of the MAUSGeant4Manager. This will construct the
@@ -85,7 +85,14 @@ class MAUSGeant4Manager {
      */
     bool GetStoreTracks() {return _storeTracks;}
 
- private:
+    /** @brief Phased fields in the geometry (e.g. RF cavities)
+     *
+     *  If there are unphased fields in the geometry, SetPhases will attempt to
+     *  phase them using FieldPhaser. Throws an exception if the phasing fails.
+     */
+    void SetPhases();
+
+  private:
     MAUSGeant4Manager();
     ~MAUSGeant4Manager();
 

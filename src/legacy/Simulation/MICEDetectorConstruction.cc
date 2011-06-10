@@ -307,7 +307,8 @@ void    MICEDetectorConstruction::setMagneticField( G4LogicalVolume* logic, Mice
 
 void MICEDetectorConstruction::setBTMagneticField(MiceModule* rootModule)
 {
-  _btField = new BTFieldConstructor(rootModule);
+  MICERun::getInstance()->btFieldConstructor = new BTFieldConstructor(rootModule);
+  _btField = MICERun::getInstance()->btFieldConstructor;
   if(_btField->GetNumberOfFields()==0)
   {
     return;
@@ -315,7 +316,6 @@ void MICEDetectorConstruction::setBTMagneticField(MiceModule* rootModule)
 
   _miceMagneticField = new MiceMagneticField(_btField);
   _miceElectroMagneticField = new MiceElectroMagneticField(_btField);
-
   setSteppingAlgorithm();
   setSteppingAccuracy();
 

@@ -20,6 +20,8 @@
 
 #include "src/legacy/Simulation/MICEPhysicsList.hh"
 
+#include "src/common_cpp/Simulation/FieldPhaser.hh"
+
 namespace MAUS {
 
 MAUSGeant4Manager* MAUSGeant4Manager::GetInstance() {
@@ -56,6 +58,11 @@ MAUSGeant4Manager::MAUSGeant4Manager() : _storeTracks(false) {
 
 MAUSGeant4Manager::~MAUSGeant4Manager() {
     delete _runManager;
+}
+
+void MAUSGeant4Manager::SetPhases() {
+  FieldPhaser phaser;
+  phaser.SetPhases();
 }
 
 } // namespace MAUS

@@ -19,6 +19,8 @@
 #ifndef Squeal_hh
 #define Squeal_hh 1
 
+
+
 #include <exception>
 #include <string>
 #include <vector>

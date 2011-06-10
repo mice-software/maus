@@ -20,7 +20,7 @@ public:
 
 	~BTPhaser();
 
-  std::vector<ItemForPhasing*> GetPhasingCavities();
+  std::vector<ItemForPhasing*> GetItemsForPhasing() {return _cavities;}
 
 	//Call this method once the global field has been set
 	bool        SetThePhase(Hep3Vector Position, double time);
@@ -42,9 +42,8 @@ public:
   static BTPhaser* GetInstance();
 
 private:
-  BTPhaser * _instance;
+  static BTPhaser * _instance;
 	BTPhaser();
-	bool      _hasGlobalField;
 	bool      _allPhasesSet;
 	double    _phaseTolerance;
 	bool      _firingRefs;

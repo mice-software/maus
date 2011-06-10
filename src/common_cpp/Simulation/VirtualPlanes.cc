@@ -275,13 +275,9 @@ void VirtualPlaneManager::ConstructVirtualPlanes
             model->findModulesByPropertyString("SensitiveDetector", "Envelope");
   modules.insert(modules.end(), envelopes.begin(), envelopes.end());
   for (unsigned int i = 0; i < modules.size(); i++) {
-    _planes.push_back(new VirtualPlane(ConstructFromModule(modules[i])));
-    _mods[_planes.back()] = modules[i];
+    AddPlane(new VirtualPlane(ConstructFromModule(modules[i])), modules[i]);
   }
-  sort(_planes.begin(), _planes.end(), VirtualPlane::ComparePosition);
-  _useVirtualPlanes = _planes.size() > 0;
   _field = field;
-  _nHits = std::vector<int>(_planes.size(), 0);
   if (_field == NULL) _field = &_instance->_default_field;
   VirtualPlane::_field = _field;
 }
@@ -337,6 +333,17 @@ VirtualPlane VirtualPlaneManager::ConstructFromModule(const MiceModule* mod) {
                          indie, var_enum, pass, allowBackwards);
 }
 
+
+void VirtualPlaneManager::AddPlane(VirtualPlane* newPlane, const MiceModule* mod) {
+  _planes.push_back(newPlane);
+  _mods[newPlane] = mod;
+  sort(_planes.begin(), _planes.end(), VirtualPlane::ComparePosition);
+  _useVirtualPlanes = _planes.size() > 0;
+  _nHits = std::vector<int>(_planes.size(), 0);
+
+}
+
+
 const MiceModule*  VirtualPlaneManager::GetModuleFromStationNumber
                                                            (int stationNumber) {
   if (_planes.size() == 0)
@@ -357,14 +364,19 @@ int VirtualPlaneManager::GetStationNumberFromModule(const MiceModule* module) {
   if (_planes.size() == 0)
     throw(Squeal(Squeal::recoverable,
           "No Virtual planes initialised",
-          "VirtualPlaneManager::ModuleName"));
+          "VirtualPlaneManager::GetStationNumberFromModule"));
   VirtualPlane* plane = NULL;
   typedef std::map<VirtualPlane*, const MiceModule*>::iterator map_it;
   for (map_it it = _mods.begin(); it != _mods.end() && plane == NULL; it++)
-    if (it->second == module) plane = it->first;
+    if (it->second == module) plane = it->first; // find plane from module
+  if (plane == NULL) {
+    throw(Squeal(Squeal::recoverable,
+          "Module "+module->name()+" not found in VirtualPlaneManager",
+          "VirtualPlaneManager::GetStationNumberFromModule"));
+    
+  }
   for (size_t i = 0; i < _planes.size(); i++)
-    if (plane == _planes[i]) return i+1;
-  return NULL;
+    if (plane == _planes[i]) return i+1; // find station from plane
 }
 
 int VirtualPlaneManager::GetNumberOfHits(int stationNumber) {
