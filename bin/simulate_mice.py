@@ -6,7 +6,8 @@
 #################################################################
 
 
-import io  #  generic python library for I/O
+import io   #  generic python library for I/O
+import gzip #  For compressed output
 
 import MAUS
 
@@ -41,10 +42,18 @@ def run(number_of_spills):
     #  want to store your datacards in a file 'datacards.dat' then uncomment:
     # datacards = open('datacards.dat', 'r')
     
+    #  Choose from either a compressed or uncompressed output file
+    #
+    output_file = gzip.GzipFile("mausput.gz", 'w')  #  Uncompressed
+    #output_file = open("mausput.gz", 'w')  #  Compressed
+    #
+    # Then construct a MAUS output component
+    my_output = MAUS.OutputPyJSON(output_file)
+
     #  The Go() drives all the components you pass in, then check the file
     #  'mausput' for the output
     
-    MAUS.Go(my_input, my_map, MAUS.ReducePyDoNothing(), MAUS.OutputPyJSON(), datacards)
+    MAUS.Go(my_input, my_map, MAUS.ReducePyDoNothing(), my_output, datacards)
 
 
 if __name__ == '__main__':

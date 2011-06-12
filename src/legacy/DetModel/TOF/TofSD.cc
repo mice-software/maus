@@ -19,6 +19,9 @@ void TofSD::Initialize(G4HCofThisEvent* HCE)
 
 G4bool TofSD::ProcessHits(G4Step* aStep, G4TouchableHistory* History)
 {
+  G4double edep = aStep->GetTotalEnergyDeposit();
+  G4double length = aStep->GetStepLength();
+
   if( edep == 0. ) return false;
   int hit_i = _hits.size();
   _hits.push_back(Json::Value());
@@ -34,9 +37,6 @@ G4bool TofSD::ProcessHits(G4Step* aStep, G4TouchableHistory* History)
 
   _hits[hit_i]["energy_deposited"] = 0.0;
   _hits[hit_i]["path_length"] = 0.0;
-  
-  G4double edep = aStep->GetTotalEnergyDeposit();
-  G4double length = aStep->GetStepLength();
 
   G4Track* track = aStep->GetTrack();
 
