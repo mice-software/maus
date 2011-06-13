@@ -1,4 +1,3 @@
-// MAUS WARNING: THIS IS LEGACY CODE.
 /* This file is part of MAUS: http://micewww.pp.rl.ac.uk/projects/maus
  *
  * MAUS is free software: you can redistribute it and/or modify
@@ -16,17 +15,20 @@
  *
  */
 
-#include "MAUSSD.hh"
+#include "DetModel/MAUSSD.hh"
 
 namespace MAUS {
 
 MAUSSD::MAUSSD(MiceModule* mod)
     : G4VSensitiveDetector(mod->fullName()) {
   _module  = mod;
-  _isHit = false;
+}
+
+bool MAUSSD::isHit() {
+  if ( _hits.size() > 0 ) {
+    return true;
+  }
+  return false;
 }
 
 }  // ends MAUS namespace
-
-
-

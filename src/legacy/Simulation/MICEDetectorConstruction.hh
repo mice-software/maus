@@ -49,6 +49,8 @@ public:
 
   std::vector<Json::Value> GetSDHits(int i);
 
+  void ClearSDHits();
+
   int GetSDSize() { return _SDs.size(); }
 
 private:
