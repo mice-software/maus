@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"> 
+
+    <xs:complexType name="FieldType">
+        <xs:choice minOccurs="1"/>
+        <xs:attribute name="Field_Info_Goes_here"/>
+    </xs:complexType>
+    <xs:complexType name="FieldStrengthType">
+        <xs:choice minOccurs="1"/>
+        <xs:attribute name="Tesla"/>
+    </xs:complexType>
+<!--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+
+    <xs:element name="MICE_Information">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="FieldType" type="FieldType"/>
+                <xs:element name="FieldStrength" type="FieldStrengthType"/>
+                <xs:element name="FieldAnythingElse"></xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>

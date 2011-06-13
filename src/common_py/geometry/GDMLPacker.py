@@ -27,11 +27,17 @@ class packer:
         """
         list = []
         self.List = list
-        self.FileList = filelist
-        fin = open(self.FileList, 'r')
-        for line in fin.readlines():
-            self.List.append(line.strip())
-        fin.close()
+        if filelist[-4:] != ".txt":
+            raise IOError("input file must be text format", "packer::__init__")
+        else:
+            self.FileList = filelist
+        if os.path.getsize(self.FileList) == 0:
+            raise StandardError("input file does not contain any information", "packer::__init__")
+        else:
+            fin = open(self.FileList, 'r')
+            for line in fin.readlines():
+                self.List.append(line.strip())
+            fin.close()
 
     def zipfile(self):
         """
@@ -43,6 +49,7 @@ class packer:
         fin = open(self.FileList, 'r')
         NumOfFiles = len(fin.readlines())
         for n in range(0, NumOfFiles):
+            file.write(self.FileList, os.path.basename(self.FileList), zipfile.ZIP_DEFLATED)
             file.write(self.List[n], os.path.basename(self.List[n]), zipfile.ZIP_DEFLATED)
         file.close()
         fin.close()

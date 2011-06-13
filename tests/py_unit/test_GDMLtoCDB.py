@@ -1,19 +1,16 @@
-# To change this template, choose Tools | Templates
-# and open the template in the editor.
-
 import unittest
 
 
-class  Test_GDMLUnpackerTestCase(unittest.TestCase):
+class  Test_GDMLtoCDBTestCase(unittest.TestCase):
     #def setUp(self):
-    #    self.foo = Test_GDMLUnpacker()
+    #    self.foo = Test_GDMLtoCDB()
     #
 
     #def tearDown(self):
     #    self.foo.dispose()
     #    self.foo = None
 
-    def test_test_GDMLUnpacker(self):
+    def test_test_GDMLtoCDB(self):
         #assert x != y;
         #self.assertEqual(x, y, "Msg");
         self.fail("TODO: Write test")
