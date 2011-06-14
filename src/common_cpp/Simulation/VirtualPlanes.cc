@@ -449,5 +449,7 @@ VirtualHit VirtualPlaneManager::ReadHit(Json::Value v_hit) {
     hit.SetMomentum(JsonWrapper::JsonToThreeVector(mom_v));
     hit.SetBField(JsonWrapper::JsonToThreeVector(b_v));
     hit.SetEField(JsonWrapper::JsonToThreeVector(e_v));
+
+    return hit;
 }
 

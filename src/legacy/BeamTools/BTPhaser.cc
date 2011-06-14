@@ -6,9 +6,9 @@
 
 BTPhaser * BTPhaser::_instance = NULL;
 
-BTPhaser::BTPhaser() : _allPhasesSet(true), 
+BTPhaser::BTPhaser() : _allPhasesSet(false), 
                        _phaseTolerance(1e-5), _firingRefs(false), _rfData(), 
-                       _cavities() {
+                       _fields() {
 }
 
 BTPhaser::~BTPhaser()
@@ -24,17 +24,21 @@ bool BTPhaser::SetThePhase(Hep3Vector Position, double time)
 	RFData anRFPhase;
 	anRFPhase = MICERun::getInstance()->btFieldConstructor->SetThePhase(Position, time, 0.);
 	double dt = anRFPhase.GetPhaseError();
-	if(fabs(dt) < _phaseTolerance) 
+	if(fabs(dt) < _phaseTolerance)
 	{
 		_thisPhaseSet = true;
 		_rfData.push_back(new RFData(anRFPhase));
 	}
 	else {_thisPhaseSet = false; phase = " failed";}
 
-	Squeak::mout(Squeak::debug) << "Attempt to phase cavity at z=" << Position.z() << " with time " 
+	Squeak::mout(Squeak::debug) << "Attempt to phase cavity at (x,y,z) " << Position << " [mm] with time " 
 	          << time << " dt " << dt << " dt tolerance " << _phaseTolerance 
 	          << phase << std::endl;
 	return _thisPhaseSet;
+}
+
+bool BTPhaser::IsPhaseSet() {
+  return MICERun::getInstance()->btFieldConstructor->IsPhaseSet();
 }
 
 std::vector<RFData*> BTPhaser::GetRFData()

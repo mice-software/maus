@@ -2,6 +2,7 @@
 #include "BTField.hh"
 #include "Interface/RFData.hh"
 #include <iostream>
+#include "Interface/MICERun.hh"
 
 #ifndef BTPHASER_HH
 #define BTPHASER_HH
@@ -10,7 +11,7 @@ class BTPhaser
 {
 public:
 
-  class ItemForPhasing {
+  class FieldForPhasing {
    public:
     std::string name;
     CLHEP::Hep3Vector  plane_position;
@@ -20,16 +21,16 @@ public:
 
 	~BTPhaser();
 
-  std::vector<ItemForPhasing*> GetItemsForPhasing() {return _cavities;}
+  void SetFieldForPhasing(FieldForPhasing* field) {_fields.push_back(field);}
+  std::vector<FieldForPhasing*> GetFieldsForPhasing() {return _fields;}
 
 	//Call this method once the global field has been set
 	bool        SetThePhase(Hep3Vector Position, double time);
-	int         NumberOfCavities()        {return _cavities.size();}
+	int         NumberOfCavities()        {return _fields.size();}
 
 	//IsPhaseSet() tells Simulation whether to try to phase cavities
   //set to true if the last attempt to phase a cavity was successful
-	void        IsPhaseSet(bool set) {_allPhasesSet = set;}
-	bool IsPhaseSet()         {return _allPhasesSet;}
+	bool IsPhaseSet();
 
 	//IsRefPart() tells BeamTools how to generate e.g. RF fields 
 	bool IsRefPart()               {return _firingRefs;}
@@ -48,7 +49,7 @@ private:
 	double    _phaseTolerance;
 	bool      _firingRefs;
 	std::vector<RFData*>     _rfData;
-  std::vector<ItemForPhasing*> _cavities;
+  std::vector<FieldForPhasing*> _fields;
 };
 
 

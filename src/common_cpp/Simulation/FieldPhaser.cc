@@ -24,11 +24,9 @@
 namespace MAUS {
 
 FieldPhaser::FieldPhaser() {
-  SetUp();
 }
 
 FieldPhaser::~FieldPhaser() {
-  TearDown();
 }
 
 void FieldPhaser::SetUp() {
@@ -39,14 +37,14 @@ void FieldPhaser::SetUp() {
   VirtualPlaneManager::ConstructVirtualPlanes(MICERun::getInstance()->btFieldConstructor, &mod);
 
   // set up 
-  std::vector<BTPhaser::ItemForPhasing*> cavities = 
-                                  BTPhaser::GetInstance()->GetItemsForPhasing();
+  std::vector<BTPhaser::FieldForPhasing*> cavities = 
+                                  BTPhaser::GetInstance()->GetFieldsForPhasing();
   for (size_t i = 0; i < cavities.size(); ++i) {
     MakeVirtualPlanes(cavities[i]);
   }
 }
 
-void FieldPhaser::MakeVirtualPlanes(BTPhaser::ItemForPhasing* cavity) {
+void FieldPhaser::MakeVirtualPlanes(BTPhaser::FieldForPhasing* cavity) {
     VirtualPlane plane = VirtualPlane::BuildVirtualPlane(
         cavity->rotation, cavity->plane_position, cavity->radius, true, 0., 
         BTTracker::u, VirtualPlane::ignore, true
@@ -58,25 +56,38 @@ void FieldPhaser::MakeVirtualPlanes(BTPhaser::ItemForPhasing* cavity) {
 }
 
 void FieldPhaser::SetPhases() {
+    SetUp();
+
     MAUSGeant4Manager* mgm = MAUSGeant4Manager::GetInstance();
     MAUSPrimaryGeneratorAction::PGParticle p;
     p.pz = 1.;
     p.energy = 226.;
     p.pid = -13;
+    int n_cavities = BTPhaser::GetInstance()->NumberOfCavities();
+    int n_attempts = 0;
     try {
-      while (!BTPhaser::GetInstance()->IsPhaseSet()) {
-          Json::Value v_hits = JsonWrapper::GetProperty(RunParticle(p), "virtual_hits", JsonWrapper::objectValue);
+      Squeak::mout(Squeak::info) << "Setting the phase " << std::flush;
+      while (n_cavities > 0 &&
+             n_attempts < BTPhaser::GetInstance()->NumberOfCavities()*5) {
+          Squeak::mout(Squeak::info) << "." << std::flush;
+          Json::Value v_hits = JsonWrapper::GetProperty(RunParticle(p), "virtual_hits", JsonWrapper::arrayValue);
           for (int j = 0; j < v_hits.size(); ++j) {
               VirtualHit hit = VirtualPlaneManager::GetInstance()->ReadHit(v_hits[j]);
-              BTPhaser::GetInstance()->SetThePhase(hit.GetPos(), hit.GetTime());
+              if (BTPhaser::GetInstance()->SetThePhase(hit.GetPos(), hit.GetTime()))
+                  --n_cavities;
           }
+          ++n_attempts;
       }
     }
     catch(...) {}
+    Squeak::mout(Squeak::info) << "\nMade " << n_attempts << " attempts and phased "
+            << BTPhaser::GetInstance()->NumberOfCavities()-n_cavities << " of " << BTPhaser::GetInstance()->NumberOfCavities() << " cavities" << std::endl;
     if (!BTPhaser::GetInstance()->IsPhaseSet())
         throw(Squeal(Squeal::recoverable,
               "Failed to phase cavities",
               "FieldPhaser::PhaseCavities"));
+
+    TearDown();
 }
 
 // better in MAUSGeant4Manager

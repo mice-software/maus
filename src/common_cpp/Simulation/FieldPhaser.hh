@@ -31,7 +31,7 @@ class FieldPhaser {
   
   void SetUp();
 
-  void MakeVirtualPlanes(BTPhaser::ItemForPhasing* cavity);
+  void MakeVirtualPlanes(BTPhaser::FieldForPhasing* cavity);
 
   void SetPhases();
 

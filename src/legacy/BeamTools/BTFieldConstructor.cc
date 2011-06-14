@@ -245,6 +245,12 @@ BTField * BTFieldConstructor::GetRFCavity(const MiceModule * theModule)
 		else if(theModule->propertyStringThis("FieldType") == "RFFieldMap")
 			newPillBox = new BTRFFieldMap(frequency, length, energyGain, fieldDuringPhasing, fieldMapFile, fieldMapType);
 		_needsPhases = true;
+    BTPhaser::FieldForPhasing * phase = new BTPhaser::FieldForPhasing();
+    phase->name = theModule->name();
+    phase->plane_position = theModule->globalPosition();
+    phase->rotation = theModule->globalRotation();
+    phase->radius = -1.;  // bug - phasing broken in circular geometry
+    BTPhaser::GetInstance()->SetFieldForPhasing(phase);
 	}
 	else
 	{
