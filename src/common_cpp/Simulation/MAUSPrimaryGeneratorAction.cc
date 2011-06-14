@@ -84,4 +84,8 @@ void MAUSPrimaryGeneratorAction::GeneratePrimaries(G4Event* argEvent) {
   CLHEP::HepRandom::setTheSeed(static_cast<unsigned int>(part.seed));
 }
 
+MAUSPrimaryGeneratorAction::PGParticle::PGParticle() :
+  x(0.), y(0.), z(0.), time(0.), px(0.), py(0.), pz(0.), energy(0.), pid(0),
+  seed(0) {}
+
 }  // ends MAUS namespace

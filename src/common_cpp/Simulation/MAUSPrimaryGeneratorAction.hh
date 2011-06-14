@@ -52,6 +52,7 @@ class MAUSPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
    */
   class PGParticle {
    public:
+    PGParticle();
     double x, y, z, time, px, py, pz, energy;
     int pid;
     long int seed;
