@@ -57,6 +57,7 @@ std::string MapCppSimulation::process(std::string document) {
                                                                   GetStepping();
     Json::Value mc   = JsonWrapper::GetProperty
                                         (spill, "mc", JsonWrapper::arrayValue);
+    Squeak::mout(Squeak::info) << "Spill with " << mc.size() << " primaries" << std::endl;
     for (int mc_particle_i = 0; mc_particle_i < mc.size(); ++mc_particle_i) {
       stepAct->SetTracks(Json::Value());
       Json::Value particle = JsonWrapper::GetItem
@@ -126,6 +127,8 @@ void MapCppSimulation::SetConfiguration(std::string json_configuration) {
   _g4manager = MAUSGeant4Manager::GetInstance();
   // RF cavity phases
   _g4manager->SetPhases();
+  Squeak::mout(Squeak::info) << "Fields:" << std::endl;
+  simRun.btFieldConstructor->Print(Squeak::mout(Squeak::info));
 }
 
 Json::Value MapCppSimulation::StoreTracking(Json::Value particle) {
