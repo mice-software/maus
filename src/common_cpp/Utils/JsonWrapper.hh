@@ -117,6 +117,8 @@ class JsonWrapper {
    */
   static bool SimilarType(JsonType jt1, JsonType jt2);
 
+  static void Print(std::ostream& out, const Json::Value& val);
+
  private:
   JsonWrapper();
   ~JsonWrapper();

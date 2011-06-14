@@ -128,3 +128,9 @@ bool JsonWrapper::SimilarType(JsonWrapper::JsonType jt1,
                      || jt2 == JsonWrapper::anyValue);
 }
 
+void JsonWrapper::Print(std::ostream& out, const Json::Value& val) {
+  Json::FastWriter writer;
+  out << writer.write(val);
+
+}
+
