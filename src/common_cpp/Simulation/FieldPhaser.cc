@@ -69,6 +69,7 @@ void FieldPhaser::SetPhases() {
       Squeak::mout(Squeak::info) << "Setting the phase " << std::flush;
       while (n_cavities > 0 &&
              n_attempts < BTPhaser::GetInstance()->NumberOfCavities()*5) {
+          ++n_attempts;
           Squeak::mout(Squeak::info) << "." << std::flush;
           Json::Value v_hits = JsonWrapper::GetProperty(RunParticle(p), "virtual_hits", JsonWrapper::arrayValue);
           for (int j = 0; j < v_hits.size(); ++j) {
@@ -76,7 +77,6 @@ void FieldPhaser::SetPhases() {
               if (BTPhaser::GetInstance()->SetThePhase(hit.GetPos(), hit.GetTime()))
                   --n_cavities;
           }
-          ++n_attempts;
       }
     }
     catch(...) {}
