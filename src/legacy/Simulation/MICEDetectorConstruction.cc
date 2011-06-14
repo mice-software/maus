@@ -279,17 +279,21 @@ void    MICEDetectorConstruction::addDaughter( MiceModule* mod, G4VPhysicalVolum
 
 void    MICEDetectorConstruction::setUserLimits( G4LogicalVolume* logic, MiceModule* module )
 {
-  double stepMax = 100.*mm;
-  double trackMax = 1.*parsec;
-  double timeMax = 1000.*second;
-  double kinMin = 0.;
+    double stepMax = 100.*mm;
+    double trackMax = 1.*parsec;
+    double timeMax = 1000.*second;
+    double kinMin = 0.;
 
-  try{stepMax  = module->propertyDouble( "G4StepMax" ); } catch(Squeal squee) {}
-  try{trackMax = module->propertyDouble( "G4TrackMax" );} catch(Squeal squee) {}
-  try{timeMax  = module->propertyDouble( "G4TimeMax" ); } catch(Squeal squee) {}
-  try{kinMin   = module->propertyDouble( "G4KinMin" );  } catch(Squeal squee) {}
+    if(module->propertyExistsThis("G4StepMax", "double")) 
+        stepMax  = module->propertyDouble( "G4StepMax" );
+    if(module->propertyExistsThis("G4TrackMax", "double")) 
+        trackMax = module->propertyDouble( "G4TrackMax" );
+    if(module->propertyExistsThis("G4TimeMax", "double")) 
+        timeMax  = module->propertyDouble( "G4TimeMax" );
+    if(module->propertyExistsThis("G4KinMin", "double")) 
+        kinMin   = module->propertyDouble( "G4KinMin" );
 
-  logic->SetUserLimits(  new G4UserLimits( stepMax, trackMax, timeMax, kinMin ) );
+    logic->SetUserLimits(  new G4UserLimits( stepMax, trackMax, timeMax, kinMin ) );
 }
 
 void    MICEDetectorConstruction::setMagneticField( G4LogicalVolume* logic, MiceModule* module )
