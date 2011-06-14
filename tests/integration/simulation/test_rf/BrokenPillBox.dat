@@ -12,8 +12,11 @@ Configuration PillBox
   {
     PropertyString Volume Cylinder
     PropertyHep3Vector Dimensions 600. $WindowThickness+$RFLength 0. mm
-    PropertyHep3Vector Position 0.0 0.0 -500. mm
+    PropertyHep3Vector Position 0.0 0.0 -1500.+1000.*@RepeatNumber mm
     PropertyString Material Galactic
+    PropertyBool   RepeatModule2 1
+    PropertyInt    NumberOfRepeats 100
+
     MiceModule RFWindowUS
     {
       PropertyString Volume Cylinder
@@ -38,6 +41,15 @@ Configuration PillBox
       PropertyHep3Vector Position 0.0 0.0 +$RFLength/2. mm
       PropertyString Material Galactic
     }
+  }
+
+  MiceModule Virtuals
+  {
+    PropertyString Volume None
+    PropertyString SensitiveDetector Virtual
+    PropertyHep3Vector Position 0.0 0.0 200.*@RepeatNumber mm
+    PropertyBool   RepeatModule2 1
+    PropertyInt    NumberOfRepeats 300
   }
 }
 

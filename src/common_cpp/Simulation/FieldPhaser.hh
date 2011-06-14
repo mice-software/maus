@@ -37,10 +37,9 @@ class FieldPhaser {
 
   void TearDown();
 
-  Json::Value RunParticle(MAUSPrimaryGeneratorAction::PGParticle p); // move to MAUSGeant4Manager
+  MAUSPrimaryGeneratorAction::PGParticle VirtualHitToPGParticle(VirtualHit hit);
 
  private:
-
 };
 
 }  // namespace

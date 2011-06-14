@@ -34,6 +34,8 @@
 #include "G4VUserPrimaryGeneratorAction.hh"  // inherit from
 
 #include "src/legacy/Interface/Squeak.hh"
+#include "src/legacy/Interface/VirtualHit.hh"
+#include "src/common_cpp/Utils/JsonWrapper.hh"
 
 namespace MAUS {
 
@@ -53,6 +55,9 @@ class MAUSPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
   class PGParticle {
    public:
     PGParticle();
+    PGParticle(VirtualHit hit);
+    void ReadJson(Json::Value pg_particle);
+    Json::Value WriteJson();
     double x, y, z, time, px, py, pz, energy;
     int pid;
     long int seed;

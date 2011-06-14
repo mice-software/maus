@@ -12,7 +12,8 @@ Configuration PillBox
   {
     PropertyString Volume Cylinder
     PropertyHep3Vector Dimensions 600. $WindowThickness+$RFLength 0. mm
-    PropertyHep3Vector Position 0.0 0.0 500. mm
+    PropertyHep3Vector Position 1000.0 0.0 -1000.0 mm
+    PropertyHep3Vector Rotation 0.0 90.0 0.0 mm
     PropertyString Material Galactic
     MiceModule RFWindowUS
     {

@@ -85,25 +85,8 @@ bool MapCppSimulation::death() {
 }
 
 void MapCppSimulation::SetNextParticle(Json::Value particle) {
-  Json::Value pos = JsonWrapper::GetProperty
-                             (particle, "position", JsonWrapper::objectValue);
-  Json::Value mom = JsonWrapper::GetProperty
-                             (particle, "momentum", JsonWrapper::objectValue);
   MAUSPrimaryGeneratorAction::PGParticle p;
-  p.pid = JsonWrapper::GetProperty
-                       (particle, "particle_id", JsonWrapper::intValue).asInt();
-  p.seed = JsonWrapper::GetProperty
-                       (particle, "random_seed", JsonWrapper::intValue).asInt();
-  p.x = JsonWrapper::GetProperty(pos, "x", JsonWrapper::realValue).asDouble();
-  p.y = JsonWrapper::GetProperty(pos, "y", JsonWrapper::realValue).asDouble();
-  p.z = JsonWrapper::GetProperty(pos, "z", JsonWrapper::realValue).asDouble();
-  p.px = JsonWrapper::GetProperty(mom, "x", JsonWrapper::realValue).asDouble();
-  p.py = JsonWrapper::GetProperty(mom, "y", JsonWrapper::realValue).asDouble();
-  p.pz = JsonWrapper::GetProperty(mom, "z", JsonWrapper::realValue).asDouble();
-  p.energy = JsonWrapper::GetProperty
-                        (particle, "energy", JsonWrapper::realValue).asDouble();
-  p.time = JsonWrapper::GetProperty
-                        (particle, "time", JsonWrapper::realValue).asDouble();
+  p.ReadJson(particle);
   _g4manager->GetPrimaryGenerator()->Push(p);
 }
 

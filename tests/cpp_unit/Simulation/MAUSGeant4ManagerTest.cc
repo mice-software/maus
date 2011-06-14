@@ -43,5 +43,13 @@ TEST(MAUSGeant4ManagerTest, GetSetTest) {
   ASSERT_TRUE(g4man->GetTracking() != NULL);
 }
 
+TEST(MAUSGeant4ManagerTest, GetReferenceParticleTest) {
+  ASSERT_TRUE(false);
+}
+
+TEST(MAUSGeant4ManagerTest, RunParticleTest) {
+  ASSERT_TRUE(false);
+}
+
 }
 

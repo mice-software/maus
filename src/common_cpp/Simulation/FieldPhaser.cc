@@ -57,12 +57,8 @@ void FieldPhaser::MakeVirtualPlanes(BTPhaser::FieldForPhasing* cavity) {
 
 void FieldPhaser::SetPhases() {
     SetUp();
-
     MAUSGeant4Manager* mgm = MAUSGeant4Manager::GetInstance();
-    MAUSPrimaryGeneratorAction::PGParticle p;
-    p.pz = 1.;
-    p.energy = 226.;
-    p.pid = -13;
+    MAUSPrimaryGeneratorAction::PGParticle ref = mgm->GetReferenceParticle();
     int n_cavities = BTPhaser::GetInstance()->NumberOfCavities();
     int n_attempts = 0;
     try {
@@ -71,11 +67,14 @@ void FieldPhaser::SetPhases() {
              n_attempts < BTPhaser::GetInstance()->NumberOfCavities()*5) {
           ++n_attempts;
           Squeak::mout(Squeak::info) << "." << std::flush;
-          Json::Value v_hits = JsonWrapper::GetProperty(RunParticle(p), "virtual_hits", JsonWrapper::arrayValue);
+          Json::Value tracks = mgm->RunParticle(ref);
+          Json::Value v_hits = JsonWrapper::GetProperty(tracks, "virtual_hits", JsonWrapper::arrayValue);
           for (int j = 0; j < v_hits.size(); ++j) {
               VirtualHit hit = VirtualPlaneManager::GetInstance()->ReadHit(v_hits[j]);
-              if (BTPhaser::GetInstance()->SetThePhase(hit.GetPos(), hit.GetTime()))
+              if (BTPhaser::GetInstance()->SetThePhase(hit.GetPos(), hit.GetTime())) {
                   --n_cavities;
+                  ref = MAUSPrimaryGeneratorAction::PGParticle(hit);
+              }
           }
       }
     }
@@ -90,19 +89,11 @@ void FieldPhaser::SetPhases() {
     TearDown();
 }
 
-// better in MAUSGeant4Manager
-Json::Value FieldPhaser::RunParticle(MAUSPrimaryGeneratorAction::PGParticle p) {
-    MAUSGeant4Manager::GetInstance()->GetPrimaryGenerator()->Push(p);
-    MAUSGeant4Manager::GetInstance()->GetRunManager()->BeamOn(1);
-    Json::Value tracks = MAUSGeant4Manager::GetInstance()->GetStepping()->GetTracks();
-    MAUSGeant4Manager::GetInstance()->GetStepping()->SetTracks(Json::Value(Json::objectValue));
-    VirtualPlaneManager::StartOfEvent();  // Should be in EventAction
-    return tracks;
-}
-
 void FieldPhaser::TearDown() {
   delete VirtualPlaneManager::GetInstance();
-  VirtualPlaneManager::ConstructVirtualPlanes(MICERun::getInstance()->btFieldConstructor, MICERun::getInstance()->miceModule);
+  VirtualPlaneManager::ConstructVirtualPlanes
+                  (MICERun::getInstance()->btFieldConstructor,
+                   MICERun::getInstance()->miceModule);
 }
 
 }

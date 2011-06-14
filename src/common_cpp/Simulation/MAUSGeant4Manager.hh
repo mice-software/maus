@@ -92,6 +92,12 @@ class MAUSGeant4Manager {
      */
     void SetPhases();
 
+    /** @brief Get the reference particle from json configuration
+     */
+    MAUSPrimaryGeneratorAction::PGParticle GetReferenceParticle();
+
+    Json::Value RunParticle(MAUSPrimaryGeneratorAction::PGParticle p);
+
   private:
     MAUSGeant4Manager();
     ~MAUSGeant4Manager();

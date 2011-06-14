@@ -43,6 +43,15 @@ Configuration PillBox
       PropertyString Material Galactic
     }
   }
+
+  MiceModule Virtuals
+  {
+    PropertyString Volume None
+    PropertyString SensitiveDetector Virtual
+    PropertyHep3Vector Position 0.0 0.0 200.*@RepeatNumber mm
+    PropertyBool   RepeatModule2 1
+    PropertyInt    NumberOfRepeats 300
+  }
 }
 
 

@@ -10,4 +10,4 @@ def run(input_beam, configuration, out_file):
   
 
 if __name__ == '__main__':
-    run("", "")
+    run("", "", "")

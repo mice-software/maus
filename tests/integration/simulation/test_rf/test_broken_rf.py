@@ -5,6 +5,11 @@ import run_simulation
 import ErrorHandler
 
 class BrokenRFTestCase(unittest.TestCase):
+    """
+    Test that when we have a broken RF set up, simulation fails. In this case
+    the rf cavity is behind the reference particle so never gets crossed.
+    """
+
     def test_single_rf(self):
         my_datacards = """simulation_geometry_filename = "BrokenPillBox.dat" """
         my_input = """{"mc":[{"position":{"x":0.0, "y":-0.0, "z":0.0}, "momentum":{"x":0.0, "y":0.0, "z":1.0}, "particle_id":-13, "energy":210.0, "time":0.0, "random_seed":10}]}"""

@@ -32,6 +32,7 @@ keep_tracks = False
 # This is used by Simulation
 simulation_geometry_filename = "Stage6.dat"
 maximum_number_of_steps = 10000
+simulation_reference_particle = {"position":{"x":0.0, "y":-0.0, "z":-4700.0}, "momentum":{"x":0.0, "y":0.0, "z":1.0}, "particle_id":-13, "energy":226.0, "time":0.0, "random_seed":10}
 
 # this is used by reconstruction
 reconstruction_geometry_filename = simulation_geometry_filename

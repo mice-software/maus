@@ -88,4 +88,61 @@ MAUSPrimaryGeneratorAction::PGParticle::PGParticle() :
   x(0.), y(0.), z(0.), time(0.), px(0.), py(0.), pz(0.), energy(0.), pid(0),
   seed(0) {}
 
+void MAUSPrimaryGeneratorAction::PGParticle::ReadJson(Json::Value particle) {
+  Json::Value pos = JsonWrapper::GetProperty
+                             (particle, "position", JsonWrapper::objectValue);
+  Json::Value mom = JsonWrapper::GetProperty
+                             (particle, "momentum", JsonWrapper::objectValue);
+  pid = JsonWrapper::GetProperty
+                       (particle, "particle_id", JsonWrapper::intValue).asInt();
+  seed = JsonWrapper::GetProperty
+                       (particle, "random_seed", JsonWrapper::intValue).asInt();
+  x = JsonWrapper::GetProperty(pos, "x", JsonWrapper::realValue).asDouble();
+  y = JsonWrapper::GetProperty(pos, "y", JsonWrapper::realValue).asDouble();
+  z = JsonWrapper::GetProperty(pos, "z", JsonWrapper::realValue).asDouble();
+  px = JsonWrapper::GetProperty(mom, "x", JsonWrapper::realValue).asDouble();
+  py = JsonWrapper::GetProperty(mom, "y", JsonWrapper::realValue).asDouble();
+  pz = JsonWrapper::GetProperty(mom, "z", JsonWrapper::realValue).asDouble();
+  energy = JsonWrapper::GetProperty
+                        (particle, "energy", JsonWrapper::realValue).asDouble();
+  time = JsonWrapper::GetProperty
+                        (particle, "time", JsonWrapper::realValue).asDouble();
+}
+
+Json::Value MAUSPrimaryGeneratorAction::PGParticle::WriteJson() {
+  Json::Value pos(Json::objectValue);
+  pos["x"] = Json::Value(x);
+  pos["y"] = Json::Value(y);
+  pos["z"] = Json::Value(z);
+
+  Json::Value mom(Json::objectValue);
+  mom["x"] = Json::Value(px);
+  mom["y"] = Json::Value(py);
+  mom["z"] = Json::Value(pz);
+
+  Json::Value particle(Json::objectValue);
+  particle["position"] = pos;
+  particle["momentum"] = mom;
+  particle["particle_id"] = Json::Value(pid);
+  particle["random_seed"] = Json::Value(Json::Int(seed));
+
+  particle["energy"] = Json::Value(energy);
+  particle["time"] = Json::Value(time);
+  return particle;
+}
+
+
+MAUSPrimaryGeneratorAction::PGParticle::PGParticle(VirtualHit hit) {
+    x = hit.GetPos().x();
+    y = hit.GetPos().y();
+    z = hit.GetPos().z();
+    time = hit.GetTime();
+    px = hit.GetMomentum().x();
+    py = hit.GetMomentum().y();
+    pz = hit.GetMomentum().z();
+    energy = hit.GetEnergy();
+    pid = hit.GetPID();
+    seed = 0;
+}
+
 }  // ends MAUS namespace

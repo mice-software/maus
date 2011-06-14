@@ -117,5 +117,9 @@ TEST_F(MAUSPrimaryGeneratorActionTest, GeneratePrimariesTest) {
     delete event;
 }
 
+TEST_F(MAUSPrimaryGeneratorActionTest, PGParticleTest) {
+  EXPECT_TRUE(false);
+}
+
 } //namespace end
 
