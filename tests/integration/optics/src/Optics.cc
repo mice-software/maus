@@ -238,11 +238,11 @@ std::vector<TransferMap*>      TrackingDerivativeTransferMaps(std::vector<PhaseS
   for(unsigned int j=0; j<hitsIn.size() && (!referenceOnly || j==0); j++)
   {
     MICEEvent* event = Simulation::RunSimulation(hitsIn[j]);
-    AddHitsToMap(MAUSGeant4Manager::GetInstance()->GetStepping()->GetTracks(), g_hits);
+    AddHitsToMap(MAUSGeant4Manager::GetInstance()->GetTracking()->GetTracks(), g_hits);
     event->specialHits    = std::vector<SpecialHit*>();
     event->virtualHits    = std::vector<VirtualHit*>();
     event->zustandVektors = std::vector<ZustandVektor*>();
-    MAUSGeant4Manager::GetInstance()->GetStepping()->SetTracks(Json::Value(Json::objectValue));
+    MAUSGeant4Manager::GetInstance()->GetTracking()->SetTracks(Json::Value(Json::objectValue));
     VirtualPlaneManager::StartOfEvent();
   }
   int order = 2;
@@ -322,10 +322,10 @@ void PolyFitFunction(const double* psv_in, double* psv_out)
   psvIn.setZ(g_mean.z());
   MICEEvent* event = Simulation::RunSimulation(psvIn);
   g_hitsIn.push_back(psvIn);
-  AddHitsToMap(MAUSGeant4Manager::GetInstance()->GetStepping()->GetTracks(), g_hits);
+  AddHitsToMap(MAUSGeant4Manager::GetInstance()->GetTracking()->GetTracks(), g_hits);
   PhaseSpaceVector psvOut = g_hits[g_polyfit_module].back();
   CLHEP::HepVector vecOut = psvOut.getSixVector();
-  MAUSGeant4Manager::GetInstance()->GetStepping()->SetTracks(Json::Value());
+  MAUSGeant4Manager::GetInstance()->GetTracking()->SetTracks(Json::Value());
   for(int i=0; i<vecOut.num_row(); i++) psv_out[i] = vecOut[i] - g_mean.getSixVector()[i];
 }
 

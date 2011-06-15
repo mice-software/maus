@@ -28,6 +28,7 @@ keep_only_muon_tracks = False
 
 # Used by MapCppSimulation
 keep_tracks = False
+keep_steps = False
 
 # This is used by Simulation
 simulation_geometry_filename = "Stage6.dat"

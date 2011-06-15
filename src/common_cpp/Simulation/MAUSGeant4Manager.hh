@@ -15,17 +15,6 @@
  *
  */
 
-/** @class MAUSGeant4Manager
- *
- *  Manage Geant4 setup - singleton class that controls the interface with
- *  geant4. This has to be a singleton class so that we can't accidentally set
- *  up geant4 twice.
- *
- *  So some comments about the Geant4 setup. At the moment, we make one event
- *  per primary. This is actually incorrect - really we should be making several
- *  tracks on each Geant4 event - i.e. the spill should be the Geant4 event.
- */
-
 #ifndef _SRC_CPP_CORE_SIMULATION_MAUSGEANT4MANAGER_HH_
 #define _SRC_CPP_CORE_SIMULATION_MAUSGEANT4MANAGER_HH_
 
@@ -44,6 +33,22 @@ class MICEPhysicsList;
 
 namespace MAUS {
 
+/** MAUSPhysicsList is a synonym for (legacy) MICEPhysicsList
+ */
+typedef MICEPhysicsList MAUSPhysicsList;
+
+/** @class MAUSGeant4Manager
+ *
+ *  @brief Manage Geant4 setup - singleton class that controls the interface with
+ *  geant4.
+ *
+ *  This has to be a singleton class so that we can't accidentally set
+ *  up geant4 twice.
+ *
+ *  So some comments about the Geant4 setup. At the moment, we make one event
+ *  per primary. This is actually incorrect - really we should be making several
+ *  tracks on each Geant4 event - i.e. the spill should be the Geant4 event.
+ */
 class MAUSGeant4Manager {
   public:
     /** @brief Get the singleton MAUSGeant4Manager
@@ -68,6 +73,10 @@ class MAUSGeant4Manager {
     /** @brief Get the MAUSSteppingAction
      */
     MAUSPrimaryGeneratorAction* GetPrimaryGenerator() const {return _primary;}
+
+    /** @brief Get the MAUSPhysicsList
+     */
+    MAUSPhysicsList* GetPhysicsList() const {return _physList;}
 
     /** @brief Get the Geometry
      */
@@ -96,6 +105,8 @@ class MAUSGeant4Manager {
      */
     MAUSPrimaryGeneratorAction::PGParticle GetReferenceParticle();
 
+    /** @brief Run a particle through the simulation
+     */
     Json::Value RunParticle(MAUSPrimaryGeneratorAction::PGParticle p);
 
   private:

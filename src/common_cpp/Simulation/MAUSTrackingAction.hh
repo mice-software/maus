@@ -15,14 +15,6 @@
  *
  */
 
-/** @class  MAUSTrackingAction
- *  Geant4 calls this class before/after tracks propogated
- *
- *  Collect the steps from MAUSSteppingAction, then create
- *  tracks in the datastructure.
- *
- */
-
 #ifndef _SRC_CPP_CORE_SIMULATION_MAUSTRACKINGACTION_HH_
 #define _SRC_CPP_CORE_SIMULATION_MAUSTRACKINGACTION_HH_
 
@@ -37,8 +29,18 @@
 
 namespace MAUS {
 
+/** @class  MAUSTrackingAction
+ *  Geant4 calls this class before/after tracks propogated
+ *
+ *  Collect the steps from MAUSSteppingAction, then create
+ *  tracks in the datastructure.
+ */
 class MAUSTrackingAction : public G4UserTrackingAction {
  public:
+    /** @brief constructor
+     */
+    MAUSTrackingAction();
+
     /** @brief Add a new track to the stepping action and fill with some
      *         track data
      */
@@ -47,6 +49,40 @@ class MAUSTrackingAction : public G4UserTrackingAction {
     /** @brief Put the final momentum of the track into the spill data
      */
     void PostUserTrackingAction(const G4Track*);
+
+    /** @brief Set the tracks; must be a json object
+     */
+    void SetTracks(Json::Value tracks);
+
+    /** @brief Get the tracks
+     */
+    Json::Value GetTracks() {return _tracks;}
+
+    /** @brief Choose whether to store tracks
+     *
+     *  @params willKeepTracks if true will keep initial and final position and
+     *          momentum of tracks and optionally steps, according to the flag
+     *          in MAUSSteppingAction. If false, will keep neither tracks nor
+     *          steps.
+     */
+    void SetWillKeepTracks(bool willKeepTracks) {_keepTracks = willKeepTracks;}
+
+    /** @brief Returns true is tracks are stored.
+     */
+    bool GetWillKeepTracks() {return _keepTracks;}
+
+    /** @brief Return track name for track with given id
+     */
+    std::string TrackName(int id); 
+
+    /** @brief If MAUS kills a particle, give the reason here
+     */
+    void SetKillReason(std::string reason);
+
+ private:
+    Json::Value _tracks;
+    bool _keepTracks;
+    MAUSSteppingAction* _stepping;
 };
 
 }  //  ends MAUS namespace

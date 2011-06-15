@@ -70,14 +70,14 @@ class MAUSSteppingActionTest : public ::testing::Test {
 
 // test get and set work correctly
 TEST_F(MAUSSteppingActionTest, GetSetTest) {
-  stepping->SetKeepTracks(true);
-  EXPECT_EQ(stepping->GetKeepTracks(), true);
-  stepping->SetKeepTracks(false);
-  EXPECT_EQ(stepping->GetKeepTracks(), false);
+  stepping->SetWillKeepSteps(true);
+  EXPECT_EQ(stepping->GetWillKeepSteps(), true);
+  stepping->SetWillKeepSteps(false);
+  EXPECT_EQ(stepping->GetWillKeepSteps(), false);
 
-  stepping->SetTracks(Json::Value("Hello"));
-  EXPECT_EQ(Json::Value("Hello"), stepping->GetTracks());
-  stepping->SetTracks(Json::Value());
+  stepping->SetSteps(Json::Value("Hello"));
+  EXPECT_EQ(Json::Value("Hello"), stepping->GetSteps());
+  stepping->SetSteps(Json::Value());
 }
 
 // test that we set stop and kill if stepping goes more than max n steps
@@ -85,15 +85,15 @@ TEST_F(MAUSSteppingActionTest, UserSteppingActionMaxNStepsTest) {
   Json::Value& conf = *MICERun::getInstance()->jsonConfiguration;
   int maxNSteps = JsonWrapper::GetProperty
                       (conf, "maximum_number_of_steps", JsonWrapper::intValue).asInt();
-  stepping->SetTracks(JsonWrapper::StringToJson("{\"track0\":{}}"));
+  stepping->SetSteps(JsonWrapper::StringToJson("{\"track_0\":{}}"));
   stepping->UserSteppingAction(step);
-  EXPECT_TRUE(stepping->GetTracks()["track0"].type() == Json::objectValue);
-  EXPECT_TRUE(stepping->GetTracks()["track0"]["KillReason"].type() ==
+  EXPECT_TRUE(stepping->GetSteps()["track_0"].type() == Json::objectValue);
+  EXPECT_TRUE(stepping->GetSteps()["track_0"]["KillReason"].type() ==
                                                              Json::nullValue);
   for (size_t i = 0; i < maxNSteps+1; ++i)
     track->IncrementCurrentStepNumber();
   stepping->UserSteppingAction(step);
-  EXPECT_EQ(stepping->GetTracks()["track0"]["KillReason"].type(),
+  EXPECT_EQ(stepping->GetSteps()["track_0"]["KillReason"].type(),
                                                              Json::stringValue);
   EXPECT_EQ(track->GetTrackStatus(), fStopAndKill);
 
@@ -101,17 +101,17 @@ TEST_F(MAUSSteppingActionTest, UserSteppingActionMaxNStepsTest) {
 
 // test that we write steps correctly on each step (or not if flag is false)
 TEST_F(MAUSSteppingActionTest, UserSteppingActionWriteStepsTest) {
-  stepping->SetTracks(JsonWrapper::StringToJson("{\"track0\":{}}"));
-  stepping->SetKeepTracks(false);
-  stepping->SetTracks(Json::Value());
+  stepping->SetSteps(JsonWrapper::StringToJson("{\"track_0\":{}}"));
+  stepping->SetWillKeepSteps(false);
+  stepping->SetSteps(Json::Value());
   stepping->UserSteppingAction(step);
-  EXPECT_EQ(stepping->GetTracks()["track0"]["steps"].type(), Json::nullValue);
-  stepping->SetKeepTracks(true);
+  EXPECT_EQ(stepping->GetSteps()["track_0"]["steps"].type(), Json::nullValue);
+  stepping->SetWillKeepSteps(true);
   stepping->UserSteppingAction(step);
   stepping->UserSteppingAction(step);
-  ASSERT_EQ(stepping->GetTracks()["track0"]["steps"].type(), Json::arrayValue);
+  ASSERT_EQ(stepping->GetSteps()["track_0"]["steps"].type(), Json::arrayValue);
   // we want 3 steps - 2 post steps plus the first one
-  EXPECT_EQ(stepping->GetTracks()["track0"]["steps"].size(), 3);
+  EXPECT_EQ(stepping->GetSteps()["track_0"]["steps"].size(), 3);
 }
 // test that we write to json correctly
 TEST_F(MAUSSteppingActionTest, StepToJsonTest) {
@@ -180,7 +180,7 @@ TEST_F(MAUSSteppingActionTest, UserSteppingActionVirtualTest) {
   stepping->UserSteppingAction(step);
   stepping->UserSteppingAction(step);
   Json::FastWriter writer;
-  EXPECT_EQ(stepping->GetTracks()["virtual_hits"].size(), 4);
+  EXPECT_EQ(stepping->GetSteps()["virtual_hits"].size(), 4);
 }
 
 } //namespace end

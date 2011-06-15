@@ -18,7 +18,7 @@ Configuration PillBox
     MiceModule RFWindowUS
     {
       PropertyString Volume Cylinder
-      PropertyHep3Vector Dimensions 600. $WindowThickness 0. mm
+      PropertyHep3Vector Dimensions 600. 0. $WindowThickness mm
       PropertyHep3Vector Position 0.0 0.0 -$RFLength/2. mm
       PropertyString Material Galactic
     }
@@ -31,6 +31,7 @@ Configuration PillBox
       PropertyString FieldDuringPhasing TimeVarying
       PropertyDouble Frequency 201.25 MHz
       PropertyDouble PeakEField 15 MV/m 
+      PropertyDouble ReferenceParticlePhase 0 degree
     }
     MiceModule RFWindowDS
     {

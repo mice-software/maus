@@ -15,14 +15,6 @@
  *
  */
 
-/** @class  MAUSPrimaryGeneratorAction
- *  Geant4 calls this class to determine the events in the spill
- *
- *  This is just a FIFO (First In First Out) std::queue of hits. Hits can be
- *  loaded using Push(...) and unloaded using Pop(). GeneratePrimaries(...)
- *  will fire hits until the queue is empty.
- */
-
 #ifndef _SRC_CPP_CORE_SIMULATION_MAUSPRIMARYGENERATORACTION_HH_
 #define _SRC_CPP_CORE_SIMULATION_MAUSPRIMARYGENERATORACTION_HH_
 
@@ -39,6 +31,13 @@
 
 namespace MAUS {
 
+/** @class  MAUSPrimaryGeneratorAction
+ *  Geant4 calls this class to determine the events in the spill
+ *
+ *  This is just a FIFO (First In First Out) std::queue of hits. Hits can be
+ *  loaded using Push(...) and unloaded using Pop(). GeneratePrimaries(...)
+ *  will fire hits until the queue is empty.
+ */
 class MAUSPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
  public:
   /** @class PGParticle

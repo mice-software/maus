@@ -110,3 +110,7 @@ TEST(JsonWrapper, SimilarTypeTest) {
     }
 }
 
+TEST(JsonWrapper, PrintTest) {
+  EXPECT_TRUE(false);
+}
+

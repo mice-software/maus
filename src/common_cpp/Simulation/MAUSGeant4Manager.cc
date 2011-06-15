@@ -67,23 +67,27 @@ void MAUSGeant4Manager::SetPhases() {
   phaser.SetPhases();
 }
 
-MAUSPrimaryGeneratorAction::PGParticle MAUSGeant4Manager::GetReferenceParticle() {
+MAUSPrimaryGeneratorAction::PGParticle 
+                                     MAUSGeant4Manager::GetReferenceParticle() {
     MAUSPrimaryGeneratorAction::PGParticle p;
     Json::Value* conf = MICERun::getInstance()->jsonConfiguration;
-    Json::Value ref = JsonWrapper::GetProperty(*conf, "simulation_reference_particle", JsonWrapper::objectValue);
+    Json::Value ref = JsonWrapper::GetProperty
+              (*conf, "simulation_reference_particle", JsonWrapper::objectValue);
     p.ReadJson(ref);
     return p;
 }
 
-Json::Value MAUSGeant4Manager::RunParticle(MAUSPrimaryGeneratorAction::PGParticle p) {
+Json::Value MAUSGeant4Manager::RunParticle
+                                    (MAUSPrimaryGeneratorAction::PGParticle p) {
+    // In fact most stuff should be in EventAction
     Squeak::mout(Squeak::debug) << "Firing particle with ";
     JsonWrapper::Print(Squeak::mout(Squeak::debug), p.WriteJson());
     Squeak::mout(Squeak::debug) << std::endl;
-    MAUSGeant4Manager::GetInstance()->GetPrimaryGenerator()->Push(p);
-    MAUSGeant4Manager::GetInstance()->GetRunManager()->BeamOn(1);
-    Json::Value tracks = MAUSGeant4Manager::GetInstance()->GetStepping()->GetTracks();
-    MAUSGeant4Manager::GetInstance()->GetStepping()->SetTracks(Json::Value(Json::objectValue));
-    VirtualPlaneManager::StartOfEvent();  // Should be in EventAction
+    GetTracking()->SetTracks(Json::Value(Json::objectValue));
+    GetPrimaryGenerator()->Push(p);
+    GetRunManager()->BeamOn(1);
+    Json::Value tracks = GetTracking()->GetTracks();
+    VirtualPlaneManager::StartOfEvent();
     return tracks;
 }
 

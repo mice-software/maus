@@ -486,47 +486,50 @@ TEST_F(VirtualPlaneManagerTest, GetStationNumberFromModuleTest) {
   EXPECT_EQ(vpm->GetStationNumberFromModule(&mod_alt), 2);
 }
 
-TEST_F(VirtualPlaneManagerTest, WriteHitTest) {
-  Json::Value val(Json::objectValue);
-  VirtualHit hit;
-  hit.SetTrackID(1);
-  hit.SetStationNumber(2);
-  hit.SetPos(CLHEP::Hep3Vector(10, 11, 12));
-  hit.SetMomentum(CLHEP::Hep3Vector(13, 14, 15));
-  hit.SetTime(3);
-  hit.SetEnergy(4);
-  hit.SetPID(5);
-  hit.SetMass(6);
-  hit.SetCharge(7);
-  hit.SetBField(CLHEP::Hep3Vector(16, 17, 18));
-  hit.SetEField(CLHEP::Hep3Vector(19, 20, 21));
-  hit.SetProperTime(8);
-  hit.SetPathLength(9);
-  VirtualPlaneManager::WriteHit(hit, &val);
-  Json::Value vh = val["virtual_hits"][Json::UInt(0)];
-  EXPECT_EQ(vh["station_id"].asInt(), hit.GetStationNumber());
-  EXPECT_EQ(vh["track_id"].asInt(), hit.GetTrackID());
-  EXPECT_EQ(vh["particle_id"].asInt(), hit.GetPID());
-  EXPECT_NEAR(vh["mass"].asDouble(), hit.GetMass(), 1e-12);
-  EXPECT_NEAR(vh["charge"].asDouble(), hit.GetCharge(), 1e-12);
-  EXPECT_NEAR(vh["time"].asDouble(), hit.GetTime(), 1e-12);
-  EXPECT_NEAR(vh["proper_time"].asDouble(), hit.GetProperTime(), 1e-12);
-  EXPECT_NEAR(vh["path_length"].asDouble(), hit.GetPathLength(), 1e-12);
+TEST_F(VirtualPlaneManagerTest, ReadWriteHitTest) {
+  Json::Value val1, val2;
+  VirtualHit hit1, hit2;
+  hit1.SetTrackID(1);
+  hit1.SetStationNumber(2);
+  hit1.SetPos(CLHEP::Hep3Vector(10, 11, 12));
+  hit1.SetMomentum(CLHEP::Hep3Vector(13, 14, 15));
+  hit1.SetTime(3);
+  hit1.SetEnergy(4);
+  hit1.SetPID(5);
+  hit1.SetMass(6);
+  hit1.SetCharge(7);
+  hit1.SetBField(CLHEP::Hep3Vector(16, 17, 18));
+  hit1.SetEField(CLHEP::Hep3Vector(19, 20, 21));
+  hit1.SetProperTime(8);
+  hit1.SetPathLength(9);
+  VirtualPlaneManager::WriteHit(hit1, &val1);
+  hit2 = VirtualPlaneManager::GetInstance()->ReadHit(val1["virtual_hits"][Json::UInt(0)]);
+  VirtualPlaneManager::WriteHit(hit2, &val2);
+  Json::Value vh = val2["virtual_hits"][Json::UInt(0)];
+  ASSERT_TRUE(vh.isObject());
+  EXPECT_EQ(vh["station_id"].asInt(), hit1.GetStationNumber());
+  EXPECT_EQ(vh["track_id"].asInt(), hit1.GetTrackID());
+  EXPECT_EQ(vh["particle_id"].asInt(), hit1.GetPID());
+  EXPECT_NEAR(vh["mass"].asDouble(), hit1.GetMass(), 1e-12);
+  EXPECT_NEAR(vh["charge"].asDouble(), hit1.GetCharge(), 1e-12);
+  EXPECT_NEAR(vh["time"].asDouble(), hit1.GetTime(), 1e-12);
+  EXPECT_NEAR(vh["proper_time"].asDouble(), hit1.GetProperTime(), 1e-12);
+  EXPECT_NEAR(vh["path_length"].asDouble(), hit1.GetPathLength(), 1e-12);
 
-  EXPECT_NEAR(vh["position"]["x"].asDouble(), hit.GetPos().x(), 1e-12);
-  EXPECT_NEAR(vh["position"]["y"].asDouble(), hit.GetPos().y(), 1e-12);
-  EXPECT_NEAR(vh["position"]["z"].asDouble(), hit.GetPos().z(), 1e-12);
+  EXPECT_NEAR(vh["position"]["x"].asDouble(), hit1.GetPos().x(), 1e-12);
+  EXPECT_NEAR(vh["position"]["y"].asDouble(), hit1.GetPos().y(), 1e-12);
+  EXPECT_NEAR(vh["position"]["z"].asDouble(), hit1.GetPos().z(), 1e-12);
 
-  EXPECT_NEAR(vh["momentum"]["x"].asDouble(), hit.GetMomentum().x(), 1e-12);
-  EXPECT_NEAR(vh["momentum"]["y"].asDouble(), hit.GetMomentum().y(), 1e-12);
-  EXPECT_NEAR(vh["momentum"]["z"].asDouble(), hit.GetMomentum().z(), 1e-12);
+  EXPECT_NEAR(vh["momentum"]["x"].asDouble(), hit1.GetMomentum().x(), 1e-12);
+  EXPECT_NEAR(vh["momentum"]["y"].asDouble(), hit1.GetMomentum().y(), 1e-12);
+  EXPECT_NEAR(vh["momentum"]["z"].asDouble(), hit1.GetMomentum().z(), 1e-12);
 
-  EXPECT_NEAR(vh["b_field"]["x"].asDouble(), hit.GetBField().x(), 1e-12);
-  EXPECT_NEAR(vh["b_field"]["y"].asDouble(), hit.GetBField().y(), 1e-12);
-  EXPECT_NEAR(vh["b_field"]["z"].asDouble(), hit.GetBField().z(), 1e-12);
-  EXPECT_NEAR(vh["e_field"]["x"].asDouble(), hit.GetEField().x(), 1e-12);
-  EXPECT_NEAR(vh["e_field"]["y"].asDouble(), hit.GetEField().y(), 1e-12);
-  EXPECT_NEAR(vh["e_field"]["z"].asDouble(), hit.GetEField().z(), 1e-12);
+  EXPECT_NEAR(vh["b_field"]["x"].asDouble(), hit1.GetBField().x(), 1e-12);
+  EXPECT_NEAR(vh["b_field"]["y"].asDouble(), hit1.GetBField().y(), 1e-12);
+  EXPECT_NEAR(vh["b_field"]["z"].asDouble(), hit1.GetBField().z(), 1e-12);
+  EXPECT_NEAR(vh["e_field"]["x"].asDouble(), hit1.GetEField().x(), 1e-12);
+  EXPECT_NEAR(vh["e_field"]["y"].asDouble(), hit1.GetEField().y(), 1e-12);
+  EXPECT_NEAR(vh["e_field"]["z"].asDouble(), hit1.GetEField().z(), 1e-12);
 }
 
 /////////////////////// VIRTUALPLANE MANAGER END //////////////////////////////

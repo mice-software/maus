@@ -246,8 +246,6 @@ class VirtualPlaneManager {
    *  ConstructVirtualPlanes(...) to set up VirtualPlanes.
    */
   static VirtualPlaneManager* GetInstance();
-  /** @deprecated */
-  static VirtualPlaneManager* getVirtualPlaneManager() {return GetInstance();}
 
   /** @brief Construct the VirtualPlanes
    *
@@ -334,6 +332,10 @@ class VirtualPlaneManager {
    *          memory.
    */
   static void AddPlane(VirtualPlane* plane, const MiceModule* mod);
+
+
+  /** @deprecated */
+  static VirtualPlaneManager* getVirtualPlaneManager() {return GetInstance();}
 
  private:
   VirtualPlaneManager() {}

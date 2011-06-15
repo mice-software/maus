@@ -28,10 +28,6 @@
 
 #include "src/map/MapCppSimulation/MapCppSimulation.hh"
 
-//  This stuff is *still* needed until persistency move is done
-dataCards MyDataCards("Simulation");
-MICEEvent simEvent;
-
 bool MapCppSimulation::birth(std::string argJsonConfigDocument) {
   // Check if the JSON document can be parsed, else return error only
   try {
@@ -95,7 +91,7 @@ void MapCppSimulation::SetConfiguration(std::string json_configuration) {
   simRun.jsonConfiguration = new Json::Value
                                 (JsonWrapper::StringToJson(json_configuration));
   Json::Value& config = *simRun.jsonConfiguration;
-  simRun.DataCards = &MyDataCards;
+  simRun.DataCards = new dataCards("Simulation");
   // Next function disables std::cout, std::clog,
   // std::cerr depending on VerboseLevel
   Squeak::setStandardOutputs();

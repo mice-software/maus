@@ -9,6 +9,17 @@ Configuration PillBox
   Dimensions 10 10 1000 m
   PropertyString Material Galactic
 
+
+  MiceModule Absorber
+  {
+    PropertyString Volume Cylinder
+    PropertyHep3Vector Dimensions 600. 100. 0. mm
+    PropertyHep3Vector Position 0.0 0.0 100.+1000.*@RepeatNumber mm
+    PropertyString Material Li
+    PropertyBool   RepeatModule2 1
+    PropertyInt    NumberOfRepeats 100
+  }
+
   MiceModule PillBox
   {
     PropertyString Volume Cylinder
@@ -34,6 +45,7 @@ Configuration PillBox
       PropertyString FieldDuringPhasing TimeVarying
       PropertyDouble Frequency 201.25 MHz
       PropertyDouble PeakEField 15 MV/m 
+      PropertyDouble ReferenceParticlePhase 30 degree 
     }
     MiceModule RFWindowDS
     {
