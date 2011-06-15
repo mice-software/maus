@@ -53,7 +53,8 @@ void MAUSSteppingAction::UserSteppingAction(const G4Step * aStep) {
         std::stringstream ss;
         ss << aTrack->GetCurrentStepNumber() <<  " steps greater than maximum "
            << _maxNSteps << " - suspected of looping";
-        MAUSGeant4Manager::GetInstance()->GetTracking()->SetKillReason(ss.str());
+        MAUSGeant4Manager::GetInstance()->GetTracking()
+                  ->SetKillReason(aTrack, ss.str());
         aTrack->SetTrackStatus(fStopAndKill);
     }
 
@@ -91,5 +92,13 @@ Json::Value MAUSSteppingAction::StepToJson
 
     return step;
 }
+
+void  MAUSSteppingAction::SetSteps(Json::Value steps) {
+    if (!steps.isArray())
+        throw(Squeal(Squeal::recoverable, "Attempting to set steps to non-array type",
+              "MAUSSteppingAction::SetSteps()"));
+    _steps = steps;
+}
+
 
 }  //  ends MAUS namespace

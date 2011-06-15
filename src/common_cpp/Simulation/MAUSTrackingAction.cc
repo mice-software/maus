@@ -70,7 +70,7 @@ void MAUSTrackingAction::PreUserTrackingAction(const G4Track* aTrack) {
 }
 
 void MAUSTrackingAction::PostUserTrackingAction(const G4Track* aTrack) {
-    if (_keepTracks) {
+    if (_keepTracks && aTrack) {
         std::string name = TrackName(aTrack->GetTrackID());
         Json::Value json_track = _tracks[name];
         if (json_track.type() == Json::nullValue)
@@ -110,8 +110,9 @@ std::string MAUSTrackingAction::TrackName(int id) {
     return ss.str();
 }
 
-void MAUSTrackingAction::SetKillReason(std::string reason) {
-    _tracks["KillReason"] = Json::Value(reason);
+void MAUSTrackingAction::SetKillReason(G4Track* aTrack, std::string reason) {
+    std::string name = TrackName(aTrack->GetTrackID());
+    _tracks[name]["KillReason"] = Json::Value(reason);
 }
 
 }  //  ends MAUS namespace

@@ -61,7 +61,7 @@ class MAUSSteppingAction : public G4UserSteppingAction {
 
   /** @brief Set the steps for this spill
    */
-  void SetSteps(Json::Value steps) {_steps = steps;}
+  void SetSteps(Json::Value steps);
 
   /** @brief Set to true to store every step (rather verbose)
    */

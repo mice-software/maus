@@ -54,8 +54,9 @@ class MAUSTrackingActionTest : public ::testing::Test {
 TEST_F(MAUSTrackingActionTest, PreUserTrackingActionTest) {
     MAUSGeant4Manager::GetInstance()->GetTracking()->SetTracks(Json::Value());
     tracking->PreUserTrackingAction(start);
+    std::cerr << "OUT 1" << std::endl;
     Json::Value json_track = MAUSGeant4Manager::GetInstance()->GetTracking()
-                                                        ->GetTracks()["track_3"];
+                                                       ->GetTracks()["track_3"];
     ASSERT_EQ(json_track.type(), Json::objectValue);
     EXPECT_DOUBLE_EQ(json_track["initial_position"]["x"].asDouble(), 4.);
     EXPECT_DOUBLE_EQ(json_track["initial_position"]["y"].asDouble(), 5.);
@@ -74,7 +75,7 @@ TEST_F(MAUSTrackingActionTest, PreUserTrackingActionTest) {
     ASSERT_EQ(json_track["track_3"].type(), Json::objectValue);
 
     EXPECT_THROW(tracking->PreUserTrackingAction(start), Squeal);
-    EXPECT_THROW(tracking->PreUserTrackingAction(NULL), Squeal);
+
 }
 
 TEST_F(MAUSTrackingActionTest, PostUserTrackingActionTest) {
@@ -97,7 +98,6 @@ TEST_F(MAUSTrackingActionTest, PostUserTrackingActionTest) {
 
     end->SetTrackID(4);
     EXPECT_THROW(tracking->PostUserTrackingAction(end), Squeal);
-    EXPECT_THROW(tracking->PostUserTrackingAction(NULL), Squeal);
 }
 
 } // namespace
