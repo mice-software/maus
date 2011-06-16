@@ -121,7 +121,7 @@ void dataCards::fillCards(int app)
     ci["numEvts"] = 100; // Number of events in the run
     ci["runNumber"] = 1; // Run number listed in header of some output files
     cs["Description"] = "G4MICE events"; // Description of the run listed in the header of some output files
-    ci["VerboseLevel"] = 2; //Set to minimum level of error that will be output by G4MICE. 0=debug 1=info 2=warning 3=error 4=fatal >4=silent
+    ci["VerboseLevel"] = 1; //Set to minimum level of error that will be output by G4MICE. 0=debug 1=info 2=warning 3=error 4=fatal >4=silent
     cs["DataType"] = "TextFile"; //The data type of the dataCards file, set by user and used in global reader, TextFileReader etc
 
     // <head>Modelling and Configuration</head>

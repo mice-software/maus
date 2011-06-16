@@ -243,7 +243,7 @@ std::vector<TransferMap*>      TrackingDerivativeTransferMaps(std::vector<PhaseS
     event->virtualHits    = std::vector<VirtualHit*>();
     event->zustandVektors = std::vector<ZustandVektor*>();
     MAUSGeant4Manager::GetInstance()->GetTracking()->SetTracks(Json::Value(Json::objectValue));
-    VirtualPlaneManager::StartOfEvent();
+    MAUSGeant4Manager::GetInstance()->GetVirtualPlanes()->StartOfEvent();
   }
   int order = 2;
   if(referenceOnly) order = 1;
@@ -345,7 +345,7 @@ void SetPolyFitModule(const MiceModule* root)
 void  AddStationToMapping(StationId id, TransferMap* map)
 {
   if(id.StationType() != StationId::virt) return;
-  const MiceModule* mod = VirtualPlaneManager::GetModuleFromStationNumber(id.StationNumber());
+  const MiceModule* mod = MAUSGeant4Manager::GetInstance()->GetVirtualPlanes()->GetModuleFromStationNumber(id.StationNumber());
   g_module_to_map[mod] = map;
 }
 
@@ -358,7 +358,7 @@ StationId::StationId(VirtualHit hit) :   _type(virt), _station_number(hit.GetSta
 StationId::StationId(SpecialHit hit) :   _type(special), _station_number(hit.GetStationNo())
 {}
 
-StationId::StationId(const MiceModule& mod) throw(Squeal)       :   _type(virt), _station_number(VirtualPlaneManager::GetStationNumberFromModule(&mod ))
+StationId::StationId(const MiceModule& mod) throw(Squeal)       :   _type(virt), _station_number(MAUSGeant4Manager::GetInstance()->GetVirtualPlanes()->GetStationNumberFromModule(&mod ))
 {
   std::string sd = mod.propertyStringThis("SensitiveDetector");
   if(sd!="Envelope") 
@@ -423,7 +423,7 @@ void AppendPSV(PhaseSpaceVector psv, int trackID, TransferMap& tm, MICEEvent& ev
 {
   typedef std::map<const MiceModule*, TransferMap*> mod_map;
   const MiceModule* mod = map_find_value<TransferMap*, mod_map, mod_map::iterator>(&tm, g_module_to_map)->first;
-  int   stationID       = VirtualPlaneManager::GetStationNumberFromModule(mod);
+  int   stationID       = MAUSGeant4Manager::GetInstance()->GetVirtualPlanes()->GetStationNumberFromModule(mod);
   event.virtualHits.push_back(new VirtualHit( psv.virtualHit(trackID, stationID) ));
 }
 

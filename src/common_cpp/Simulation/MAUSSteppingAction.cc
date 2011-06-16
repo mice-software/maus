@@ -59,7 +59,8 @@ void MAUSSteppingAction::UserSteppingAction(const G4Step * aStep) {
     }
 
     // find and append any virtual planes
-//    VirtualPlaneManager::VirtualPlanesSteppingAction(aStep, &_tracks);
+    MAUSGeant4Manager::GetInstance()->
+                         GetVirtualPlanes()->VirtualPlanesSteppingAction(aStep);
 }
 
 Json::Value MAUSSteppingAction::StepToJson

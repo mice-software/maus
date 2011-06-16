@@ -32,7 +32,7 @@
 #include "src/legacy/BeamTools/BTField.hh"
 #include "src/legacy/BeamTools/BTTracker.hh"
 
-BTField*               VirtualPlane::_field    = NULL;
+const BTField*         VirtualPlane::_field    = NULL;
 VirtualPlane::stepping VirtualPlane::_stepping = VirtualPlane::integrate;
 
 /////////////////////// VirtualPlane //////////////////
@@ -199,45 +199,26 @@ VirtualHit VirtualPlane::BuildNewHit(const G4Step * aStep, int station) const {
 
 //////////////////////// VirtualPlaneManager //////////////////////////
 
-BTField*             VirtualPlaneManager::_field            = NULL;
-VirtualPlaneManager* VirtualPlaneManager::_instance         = NULL;
-bool                 VirtualPlaneManager::_useVirtualPlanes = false;
-std::vector<VirtualPlane*> VirtualPlaneManager::_planes
-                                                = std::vector<VirtualPlane*>(0);
-std::vector<int>           VirtualPlaneManager::_nHits = std::vector<int>(0);
-std::map<VirtualPlane*, const MiceModule*>  VirtualPlaneManager::_mods;
+const BTFieldGroup VirtualPlaneManager::_default_field;
 
-VirtualPlaneManager::~VirtualPlaneManager() {
-  if (this == _instance) {  // always true? leave it here (future proof?)
-    _instance = NULL;
-    _field = NULL;
-    _useVirtualPlanes = false;
-    _nHits = std::vector<int>();
-    _mods = std::map<VirtualPlane*, const MiceModule*>();
-  }
-  for (size_t i = 0; i < _planes.size(); ++i) delete _planes[i];
-  _planes = std::vector<VirtualPlane*>();
+VirtualPlaneManager::VirtualPlaneManager() : _field(NULL), 
+      _useVirtualPlanes(false), _planes(), _mods(), _nHits(0) {
 }
 
-VirtualPlaneManager* VirtualPlaneManager::GetInstance() {
-  // MUST CALL ConstructVirtualPlanes to do anything useful!
-  if (_instance == NULL) {
-    _instance = new VirtualPlaneManager();
-    return _instance;
-  } else {
-    return _instance;
-  }
+VirtualPlaneManager::~VirtualPlaneManager() {
+  _field = NULL;
+  _useVirtualPlanes = false;
+  _nHits = std::vector<int>();
+  _mods = std::map<VirtualPlane*, const MiceModule*>();
+  for (size_t i = 0; i < _planes.size(); ++i) delete _planes[i];
+  _planes = std::vector<VirtualPlane*>();
 }
 
 // Point here is if I go round e.g. a ring, station number should be
 // (number_of_passes * number_of_stations) + i
 void VirtualPlaneManager::VirtualPlanesSteppingAction
-                                    (const G4Step* aStep, Json::Value* tracks) {
+                                    (const G4Step* aStep) {
   if (!_useVirtualPlanes) return;
-  if (tracks == NULL || !tracks->isObject())
-    throw(Squeal(Squeal::recoverable,
-                 "Json value must be initialised to object type",
-                 "VirtualPlaneManager::Writehit"));
   for (unsigned int i = 0; i < _planes.size(); i++)
     try {
       if (_planes[i]->SteppingOver(aStep)) {
@@ -245,16 +226,16 @@ void VirtualPlaneManager::VirtualPlanesSteppingAction
                                             _planes[i]->GetMultipassAlgorithm();
         if (_nHits[i]>0) {
           if (mp == VirtualPlane::new_station) {
-            WriteHit(_planes[i]->BuildNewHit(aStep,
-                                         _planes.size()*_nHits[i]+i+1), tracks);
+            _hits.append(WriteHit(_planes[i]->BuildNewHit(aStep,
+                                         _planes.size()*_nHits[i]+i+1)));
             _nHits[i]++;
           }
           if (mp == VirtualPlane::same_station) {
-            WriteHit(_planes[i]->BuildNewHit(aStep, i+1), tracks);
+            _hits.append(WriteHit(_planes[i]->BuildNewHit(aStep, i+1)));
             _nHits[i]++;
           }
         } else {
-          WriteHit(_planes[i]->BuildNewHit(aStep, i+1), tracks);
+          _hits.append(WriteHit(_planes[i]->BuildNewHit(aStep, i+1)));
           _nHits[i]++;
         }
       }
@@ -266,8 +247,7 @@ void VirtualPlaneManager::StartOfEvent() {
 }
 
 void VirtualPlaneManager::ConstructVirtualPlanes
-                                          (BTField* field, MiceModule* model) {
-  VirtualPlaneManager::GetInstance();
+                                     (const BTField* field, MiceModule* model) {
   std::vector<const MiceModule*> modules   =
              model->findModulesByPropertyString("SensitiveDetector", "Virtual");
   std::vector<const MiceModule*> envelopes =
@@ -277,7 +257,7 @@ void VirtualPlaneManager::ConstructVirtualPlanes
     AddPlane(new VirtualPlane(ConstructFromModule(modules[i])), modules[i]);
   }
   _field = field;
-  if (_field == NULL) _field = &_instance->_default_field;
+  if (_field == NULL) _field = &_default_field;
   VirtualPlane::_field = _field;
 }
 
@@ -387,7 +367,7 @@ int VirtualPlaneManager::GetNumberOfHits(int stationNumber) {
     return _nHits[stationNumber-1];
 }
 
-void VirtualPlaneManager::WriteHit(VirtualHit hit, Json::Value* value) {
+Json::Value VirtualPlaneManager::WriteHit(VirtualHit hit) {
     Json::Value hit_v = Json::Value(Json::objectValue);
     hit_v["station_id"] = hit.GetStationNumber();
     hit_v["time"] = hit.GetTime();
@@ -413,9 +393,7 @@ void VirtualPlaneManager::WriteHit(VirtualHit hit, Json::Value* value) {
     hit_v["e_field"]["x"] = hit.GetEField().x();
     hit_v["e_field"]["y"] = hit.GetEField().y();
     hit_v["e_field"]["z"] = hit.GetEField().z();
-    if ((*value)["virtual_hits"].isNull())
-        (*value)["virtual_hits"] = Json::Value(Json::arrayValue);
-    (*value)["virtual_hits"].append(hit_v);
+    return hit_v;
 }
 
 VirtualHit VirtualPlaneManager::ReadHit(Json::Value v_hit) {

@@ -40,6 +40,8 @@ class FieldPhaser {
   MAUSPrimaryGeneratorAction::PGParticle VirtualHitToPGParticle(VirtualHit hit);
 
  private:
+  VirtualPlaneManager _phaserVirtualPlanes;
+  VirtualPlaneManager* _g4managerVirtualPlanes;
 };
 
 }  // namespace

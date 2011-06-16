@@ -30,18 +30,18 @@ FieldPhaser::~FieldPhaser() {
 }
 
 void FieldPhaser::SetUp() {
-  // clear the virtual planes and reinitialise without virtual planes
-  // should be in MAUSG4Manager?
-  MiceModule mod;
-  delete VirtualPlaneManager::GetInstance();
-  VirtualPlaneManager::ConstructVirtualPlanes(MICERun::getInstance()->btFieldConstructor, &mod);
-
-  // set up 
-  std::vector<BTPhaser::FieldForPhasing*> cavities = 
-                                  BTPhaser::GetInstance()->GetFieldsForPhasing();
-  for (size_t i = 0; i < cavities.size(); ++i) {
-    MakeVirtualPlanes(cavities[i]);
-  }
+    // clear the virtual planes and reinitialise without virtual planes
+    // should be in MAUSG4Manager?
+    MiceModule mod;
+    _phaserVirtualPlanes.ConstructVirtualPlanes(MICERun::getInstance()->btFieldConstructor, &mod);
+    // set up 
+    std::vector<BTPhaser::FieldForPhasing*> cavities = 
+                                    BTPhaser::GetInstance()->GetFieldsForPhasing();
+    for (size_t i = 0; i < cavities.size(); ++i) {
+        MakeVirtualPlanes(cavities[i]);
+    }
+    _g4managerVirtualPlanes = MAUSGeant4Manager::GetInstance()->GetVirtualPlanes();
+    MAUSGeant4Manager::GetInstance()->SetVirtualPlanes(&_phaserVirtualPlanes);
 }
 
 void FieldPhaser::MakeVirtualPlanes(BTPhaser::FieldForPhasing* cavity) {
@@ -52,7 +52,7 @@ void FieldPhaser::MakeVirtualPlanes(BTPhaser::FieldForPhasing* cavity) {
     VirtualPlane* plane_ptr = new VirtualPlane(plane);
   
     // NOTE: VirtualPlaneManager now owns this memory
-    VirtualPlaneManager::AddPlane(plane_ptr, NULL);
+    _phaserVirtualPlanes.AddPlane(plane_ptr, NULL);
 }
 
 void FieldPhaser::SetPhases() {
@@ -70,7 +70,7 @@ void FieldPhaser::SetPhases() {
           Json::Value tracks = mgm->RunParticle(ref);
           Json::Value v_hits = JsonWrapper::GetProperty(tracks, "virtual_hits", JsonWrapper::arrayValue);
           for (int j = 0; j < v_hits.size(); ++j) {
-              VirtualHit hit = VirtualPlaneManager::GetInstance()->ReadHit(v_hits[j]);
+              VirtualHit hit = _phaserVirtualPlanes.ReadHit(v_hits[j]);
               if (BTPhaser::GetInstance()->SetThePhase(hit.GetPos(), hit.GetTime())) {
                   --n_cavities;
                   ref = MAUSPrimaryGeneratorAction::PGParticle(hit);
@@ -90,10 +90,7 @@ void FieldPhaser::SetPhases() {
 }
 
 void FieldPhaser::TearDown() {
-  delete VirtualPlaneManager::GetInstance();
-  VirtualPlaneManager::ConstructVirtualPlanes
-                  (MICERun::getInstance()->btFieldConstructor,
-                   MICERun::getInstance()->miceModule);
+    MAUSGeant4Manager::GetInstance()->SetVirtualPlanes(_g4managerVirtualPlanes);
 }
 
 }

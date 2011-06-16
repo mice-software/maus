@@ -31,7 +31,7 @@ MAUSGeant4Manager* MAUSGeant4Manager::GetInstance() {
   return _instance;
 }
 
-MAUSGeant4Manager::MAUSGeant4Manager() : _storeTracks(false) {
+MAUSGeant4Manager::MAUSGeant4Manager() {
     _runManager = new G4RunManager;
     _detector   = new MICEDetectorConstruction(*MICERun::getInstance());
     _runManager->SetUserInitialization(_detector);
@@ -46,16 +46,14 @@ MAUSGeant4Manager::MAUSGeant4Manager() : _storeTracks(false) {
     _runManager->SetUserAction(_trackAct);
     _runManager->SetUserAction(_stepAct);
     _runManager->SetUserAction(new MICERunAction);
+    _virtPlanes = new VirtualPlaneManager;
+    _virtPlanes->ConstructVirtualPlanes(
+                                  MICERun::getInstance()->btFieldConstructor, 
+                                  MICERun::getInstance()->miceModule);
 
     _runManager->Initialize();
 
     G4UImanager* UI = G4UImanager::GetUIpointer();
-
-    if (_storeTracks) {
-      UI->ApplyCommand("/tracking/storeTrajectory 1");
-    } else {
-      UI->ApplyCommand("/tracking/storeTrajectory 0");
-    }
 }
 
 MAUSGeant4Manager::~MAUSGeant4Manager() {
@@ -83,11 +81,11 @@ Json::Value MAUSGeant4Manager::RunParticle
     Squeak::mout(Squeak::debug) << "Firing particle with ";
     JsonWrapper::Print(Squeak::mout(Squeak::debug), p.WriteJson());
     Squeak::mout(Squeak::debug) << std::endl;
+    _virtPlanes->StartOfEvent();
     GetTracking()->SetTracks(Json::Value(Json::objectValue));
     GetPrimaryGenerator()->Push(p);
     GetRunManager()->BeamOn(1);
     Json::Value tracks = GetTracking()->GetTracks();
-    VirtualPlaneManager::StartOfEvent();
     return tracks;
 }
 

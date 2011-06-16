@@ -124,7 +124,7 @@ TEST_F(MAUSSteppingActionTest, UserSteppingActionWriteStepsTest) {
 TEST_F(MAUSSteppingActionTest, StepToJsonTest) {
   std::cerr << "WARNING - MAUSSteppingActionTest::StepToJsonTest unstable"
             << std::endl;
-  Json::Value out = stepping->StepPointToJson(step, true);
+  Json::Value out = stepping->StepToJson(step, true);
   EXPECT_DOUBLE_EQ(out["position"]["x"].asDouble(), 2.);
   EXPECT_DOUBLE_EQ(out["position"]["y"].asDouble(), 3.);
   EXPECT_DOUBLE_EQ(out["position"]["z"].asDouble(), 4.);
@@ -137,7 +137,7 @@ TEST_F(MAUSSteppingActionTest, StepToJsonTest) {
   EXPECT_DOUBLE_EQ(out["proper_time"].asDouble(), 2.);
   EXPECT_DOUBLE_EQ(out["path_length"].asDouble(), 10.);
 
-  out = stepping->StepPointToJson(step, false);
+  out = stepping->StepToJson(step, false);
   EXPECT_DOUBLE_EQ(out["time"].asDouble(), -10.);
 }
 G4Track* SetG4TrackAndStep(G4Step* step) {
@@ -176,8 +176,8 @@ TEST_F(MAUSSteppingActionTest, UserSteppingActionVirtualTest) {
   mod.setProperty<std::string>("SensitiveDetector", "Virtual");
   mod.setProperty<std::string>("IndependentVariable", "time");
   mod.setProperty<std::string>("MultiplePasses", "NewStation");
-  VirtualPlaneManager::ConstructVirtualPlanes(NULL, &mod);
-  VirtualPlaneManager::ConstructVirtualPlanes(NULL, &mod);
+  MAUSGeant4Manager::GetInstance()->GetVirtualPlanes()->ConstructVirtualPlanes(NULL, &mod);
+  MAUSGeant4Manager::GetInstance()->GetVirtualPlanes()->ConstructVirtualPlanes(NULL, &mod);
 
   G4Step*  step  = new G4Step();
   G4Track* track = SetG4TrackAndStep(step);

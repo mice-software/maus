@@ -12,10 +12,10 @@ Configuration PillBox
 
   MiceModule Absorber
   {
-    PropertyString Volume Cylinder
+    PropertyString Volume None //Cylinder
     PropertyHep3Vector Dimensions 600. 100. 0. mm
     PropertyHep3Vector Position 0.0 0.0 100.+1000.*@RepeatNumber mm
-    PropertyString Material Li
+//    PropertyString Material Li
     PropertyBool   RepeatModule2 1
     PropertyInt    NumberOfRepeats 100
   }

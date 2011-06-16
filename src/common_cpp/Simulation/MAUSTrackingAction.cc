@@ -27,8 +27,9 @@ MAUSTrackingAction::MAUSTrackingAction() : _tracks(), _keepTracks(true),
                                            _stepping(NULL) {
     Json::Value& conf = *MICERun::getInstance()->jsonConfiguration;
     _keepTracks = JsonWrapper::GetProperty
-                 (conf, "keep_tracks", JsonWrapper::booleanValue).asBool();
-
+                 (conf, "keep_tracks", JsonWrapper::booleanValue).asBool() ||
+                  JsonWrapper::GetProperty
+                 (conf, "keep_steps", JsonWrapper::booleanValue).asBool();
 }
 
 

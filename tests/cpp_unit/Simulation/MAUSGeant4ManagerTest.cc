@@ -30,18 +30,13 @@ TEST(MAUSGeant4ManagerTest, GetSetTest) {
     MAUSGeant4Manager* g4man = MAUSGeant4Manager::GetInstance();
     ASSERT_TRUE(g4man != NULL);
 
-    g4man->SetStoreTracks(true);
-    EXPECT_EQ(g4man->GetStoreTracks(), true);
-
-    g4man->SetStoreTracks(false);
-    EXPECT_EQ(g4man->GetStoreTracks(), false);
-
     ASSERT_TRUE(g4man->GetRunManager() != NULL);
     ASSERT_TRUE(g4man->GetStepping() != NULL);
     ASSERT_TRUE(g4man->GetPrimaryGenerator() != NULL);
     ASSERT_TRUE(g4man->GetGeometry() != NULL);
     ASSERT_TRUE(g4man->GetTracking() != NULL);
     ASSERT_TRUE(g4man->GetPhysicsList() != NULL);
+    ASSERT_TRUE(g4man->GetVirtualPlanes() != NULL);
 }
 
 TEST(MAUSGeant4ManagerTest, GetReferenceParticleTest) {
@@ -59,7 +54,9 @@ TEST(MAUSGeant4ManagerTest, GetReferenceParticleTest) {
     EXPECT_EQ(MAUSGeant4Manager::GetInstance()->GetReferenceParticle().pid, 111);
 }
 
-
+TEST(MAUSGeant4ManagerTest, SetPhasesTest) {
+    EXPECT_TRUE(false);
+}
 
 
 TEST(MAUSGeant4ManagerTest, RunParticleTest) {

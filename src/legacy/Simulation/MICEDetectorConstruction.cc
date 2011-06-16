@@ -136,8 +136,6 @@ G4VPhysicalVolume* MICEDetectorConstruction::Construct()
   for( int i = 0; i < _model->daughters(); ++i )
     addDaughter( _model->daughter( i ), MICEExpHall );
 
-  VirtualPlaneManager::ConstructVirtualPlanes(_miceElectroMagneticField->GetField(), _model);
-
   return MICEExpHall;
 }
 

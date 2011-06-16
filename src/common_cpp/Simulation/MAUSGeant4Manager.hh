@@ -28,6 +28,7 @@
 #include "src/common_cpp/Simulation/MAUSPrimaryGeneratorAction.hh"
 #include "src/common_cpp/Simulation/MAUSSteppingAction.hh"
 #include "src/common_cpp/Simulation/MAUSTrackingAction.hh"
+#include "src/common_cpp/Simulation/VirtualPlanes.hh"
 
 class MICEPhysicsList;
 
@@ -82,17 +83,18 @@ class MAUSGeant4Manager {
      */
     MICEDetectorConstruction* GetGeometry() const {return _detector;}
 
-    /** @brief Control whether step data is stored for each track
-     *
-     *  @params willStoreTracks Set to true to store every step for each track
-     *          in the Json track. Set to false to only store initial and final
-     *          position and momentum
+    /** @brief Get the VirtualPlanes
      */
-    void SetStoreTracks(bool willStoreTracks) {_storeTracks = willStoreTracks;}
+    VirtualPlaneManager* GetVirtualPlanes() const {return _virtPlanes;}
 
-    /** @brief Get the flag controlling whether step data is stored
+    /** @brief Set the VirtualPlanes
+     *
+     *  Nb: this loses the pointer to the original virtual planes - so if caller
+     *  don't want to keep them, caller must delete the original virtual planes.
      */
-    bool GetStoreTracks() {return _storeTracks;}
+    void SetVirtualPlanes(VirtualPlaneManager* virt) {_virtPlanes = virt;}
+
+
 
     /** @brief Phased fields in the geometry (e.g. RF cavities)
      *
@@ -119,7 +121,7 @@ class MAUSGeant4Manager {
     MAUSSteppingAction*          _stepAct;
     MAUSTrackingAction*          _trackAct;
     MICEDetectorConstruction*    _detector;
-    bool                         _storeTracks;
+    VirtualPlaneManager*         _virtPlanes;
 };
 
 }  // namespace MAUS
