@@ -7,12 +7,11 @@ from suds.client import Client
 from datetime import datetime
 from base64 import b64encode
 from base64 import b64decode
-import zipfile
 
 def main():
     from GDMLtoCDB import gdmltocdb
     from GDMLtoCDB import downloader
-    geometry1 = gdmltocdb("GDML.zip", 1)
+    geometry1 = gdmltocdb('/home/matt/NetBeansProjects/MAUSConfigPY/src/GDML', 1)
     #geometry1.uploadToCDB()
     dlgeometry = downloader(1)
     dlgeometry.downloadCurrent()
@@ -20,7 +19,7 @@ def main():
 if __name__ == "__main__":
     main()
 
-
+#need to re write comments as functionality has changed!!! and tests!!
 class gdmltocdb:
     """
     @Class gdmltocdb, handles the uploading and downloading of geometries to the CDB>
@@ -30,8 +29,7 @@ class gdmltocdb:
     In order to write to the datbase the geometry files within the zip file are re written into a
     single string and encoded before being uploaded to the CDB. This string is then
     """
-
-    def __init__(self, file, testserver):
+    def __init__(self, filepath, testserver):
         """
         @Method Class constructor
 
@@ -45,20 +43,23 @@ class gdmltocdb:
         filelist = []
         self.GeometryFiles = filelist
         self.ListOfGeometries = None
-        self.File = file
+        self.FilePath = filepath
         if testserver == None:
             self.WSDLURL = "supermouse server"
         elif testserver == 1:
             self.WSDLURL = "http://rgma19.pp.rl.ac.uk:8080/cdb/geometrySuperMouse?wsdl"
         else: raise StandardError("Incorrect input", "upload::__init__")
         self.Geometry = Client(self.WSDLURL).service
-        zfile = zipfile.ZipFile(self.File, 'r')
-        zfile.extractall("GDML")
-        path = "GDML"
-        dirList = os.listdir(path)
-        for fname in dirList:
-            if fname[-4:] == ".txt":
-                self.ListOfGeometries = fname
+        gdmls = os.listdir(self.FilePath)
+        NumOfFiles = len(gdmls)
+        path = self.FilePath + "/FileList.txt"
+        fout = open(path, 'w')
+        for num in range(0, NumOfFiles):
+            filepath = self.FilePath + "/" + gdmls[num]
+            fout.write(filepath)
+            fout.write('\n')
+        fout.close()
+        self.ListOfGeometries = path
         fin = open(self.ListOfGeometries, 'r')
         for line in fin.readlines():
             self.GeometryFiles.append(line.strip())
@@ -89,6 +90,7 @@ class gdmltocdb:
         _dt = datetime.today()
         _gdml = b64encode(self.UploadString)
         self.Geometry.setGDML(_gdml, _dt)
+        print self.Geometry.setGDML(_gdml, _dt)
 
 class downloader:
     """
@@ -144,7 +146,11 @@ class downloader:
         self.GeometryFiles.pop(NumOfGeoms)
         self.GeometryFiles.pop(0)
         for num in range(0, NumOfFiles):
-            path = "Download/" + self.ListOfGeometries[num]
+            str = self.ListOfGeometries[num]
+            str = str.rsplit('/')
+            filepos = len(str) - 1
+            filename = str[filepos]
+            path = "/home/matt/maus_littlefield/src/common_py/geometry/Download/" + filename
             fout = open(path, 'w')
             fout.write(self.GeometryFiles[num])
             fout.close()

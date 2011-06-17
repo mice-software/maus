@@ -1,5 +1,6 @@
 import os.path
 import zipfile
+from datetime import datetime
 
 def main():
     from GDMLPacker import packer
@@ -9,6 +10,7 @@ def main():
 if __name__ == "__main__":
     main()
 
+# need to re write comments and tests as it has been changed
 class packer:
     """
     This class collects the files needed to be uploaded and zips them.
@@ -39,17 +41,20 @@ class packer:
                 self.List.append(line.strip())
             fin.close()
 
-    def zipfile(self):
+    def zipfile(self, path='/home/matt/maus_littlefield/src/common_py/geometry/zippedGeoms'):
         """
         @Method zipfile, takes the collated file, containing all the GDMLs, and zips it.
 
         This method take the collated GDML file and produces a zipped file.
         """
-        file = zipfile.ZipFile("GDML.zip", 'w')
+        #add more notes on new argument
+        dt = str(datetime.today())
+        zippath = path + "/" + dt +".zip"
+        file = zipfile.ZipFile(zippath, 'w')
         fin = open(self.FileList, 'r')
         NumOfFiles = len(fin.readlines())
         for n in range(0, NumOfFiles):
-            file.write(self.FileList, os.path.basename(self.FileList), zipfile.ZIP_DEFLATED)
             file.write(self.List[n], os.path.basename(self.List[n]), zipfile.ZIP_DEFLATED)
+        file.write(self.FileList, os.path.basename(self.FileList), zipfile.ZIP_DEFLATED)
         file.close()
         fin.close()
