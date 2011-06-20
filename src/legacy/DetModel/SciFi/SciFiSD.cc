@@ -28,9 +28,6 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep,G4TouchableHistory* ROhist)
   G4double edep = aStep->GetTotalEnergyDeposit();
 
   if( edep == 0. ) return false;
-  else if( edep == 0. ) edep = 1.0 * MeV;	// fake energy deposit just so that we get some photons digitised out of this hit!
-
-  _hits.push_back(Json::Value());
 
   // determine the fibre number based on the position in the tracker and the
   // MiceModule information about the fibre orientation and numbering scheme
