@@ -111,6 +111,10 @@ TEST(JsonWrapper, SimilarTypeTest) {
 }
 
 TEST(JsonWrapper, PrintTest) {
-  EXPECT_TRUE(false);
+  std::stringstream my_ss;
+  Json::Value val_in("Mary had a little lamb");
+  JsonWrapper::Print(my_ss, val_in);
+  Json::Value val_out = JsonWrapper::StringToJson(my_ss.str());
+  EXPECT_EQ(val_in, val_out);
 }
 

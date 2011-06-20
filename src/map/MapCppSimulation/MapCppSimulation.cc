@@ -49,19 +49,13 @@ std::string MapCppSimulation::process(std::string document) {
     return "{\"errors\":{\"bad_json_document\":\"Failed to parse input document\"}}";
   }
   try {
-    MAUSSteppingAction* stepAct = MAUSGeant4Manager::GetInstance()->
-                                                                  GetStepping();
     Json::Value mc   = JsonWrapper::GetProperty
                                         (spill, "mc", JsonWrapper::arrayValue);
     Squeak::mout(Squeak::info) << "Spill with " << mc.size() << " primaries" << std::endl;
     for (int mc_particle_i = 0; mc_particle_i < mc.size(); ++mc_particle_i) {
-//      stepAct->SetTracks(Json::Value());
       Json::Value particle = JsonWrapper::GetItem
                                   (mc, mc_particle_i, JsonWrapper::objectValue);
-      SetNextParticle(particle);
-      _g4manager->GetRunManager()->BeamOn(1);
-      particle = StoreTracking(particle);
-      spill["mc"][mc_particle_i] = particle;
+      spill["mc"][mc_particle_i] = MAUSGeant4Manager::GetInstance()->RunParticle(particle);
     }
   }
   catch(Squeal squee) {
@@ -78,12 +72,6 @@ std::string MapCppSimulation::process(std::string document) {
 
 bool MapCppSimulation::death() {
   return true;  // successful
-}
-
-void MapCppSimulation::SetNextParticle(Json::Value particle) {
-  MAUSPrimaryGeneratorAction::PGParticle p;
-  p.ReadJson(particle);
-  _g4manager->GetPrimaryGenerator()->Push(p);
 }
 
 void MapCppSimulation::SetConfiguration(std::string json_configuration) {
@@ -105,28 +93,10 @@ void MapCppSimulation::SetConfiguration(std::string json_configuration) {
   fillMaterials(simRun);
   _g4manager = MAUSGeant4Manager::GetInstance();
   // RF cavity phases
+  std::cerr << "Setting phases" << std::endl;
   _g4manager->SetPhases();
+  std::cerr << "Done" << std::endl;
   Squeak::mout(Squeak::info) << "Fields:" << std::endl;
   simRun.btFieldConstructor->Print(Squeak::mout(Squeak::info));
 }
 
-Json::Value MapCppSimulation::StoreTracking(Json::Value particle) {
-    //  For each detector i
-    for (unsigned int i = 0; i < _g4manager->GetGeometry()->GetSDSize(); i++) {
-      //  Retrieve detector i's hits
-      vector<Json::Value> hits = _g4manager->GetGeometry()->GetSDHits(i);
-
-      // Ensure there are hits in this detector
-      if (hits.size() == 0) {
-        continue;
-      }
-      // If there are hits, loop over and append to particle
-      for (int j = 0; j < hits.size(); j++) {
-        if (!hits[j].isNull()) {
-          particle["hits"].append(hits[j]);
-        }
-      }
-    }
-    particle["tracks"] = _g4manager->GetTracking()->GetTracks();
-    return particle;
-}

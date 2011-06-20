@@ -21,6 +21,7 @@
 #ifndef _SRC_CPP_CORE_INTERFACE_VIRTUALPLANES_HH_
 #define _SRC_CPP_CORE_INTERFACE_VIRTUALPLANES_HH_
 
+#include <set>
 #include <vector>
 #include <map>
 
@@ -318,7 +319,7 @@ class VirtualPlaneManager {
    */
   VirtualHit ReadHit(Json::Value value);
 
-  /** @brief Add plane to the manager by hand
+  /** @brief Add plane to the manager
    *
    *  @params plane is the plane to be added. Note VirtualPlaneManager now takes
    *          ownership of this memory.
@@ -328,6 +329,23 @@ class VirtualPlaneManager {
    *          memory.
    */
   void AddPlane(VirtualPlane* plane, const MiceModule* mod);
+
+  /** @brief Remove planes from the manager
+   *
+   *  This takes a vector of stations so that several stations can be removed -
+   *  note that by removing the planes, the station numbers will change (as
+   *  stations are always numbered incrementally from 1)
+   *
+   *  @param station numbers of the plane to be removed
+   */
+  void RemovePlanes(std::set<int> station);
+
+  /** @brief Remove a plane from the manager
+   *
+   *  @param pointer to the plane to be removed. Note that the memory pointed to
+   *         is deleted by this function call.
+   */
+  void RemovePlane(VirtualPlane* plane);
 
   /** @brief Get Json array of all recorded virtual hits since StartOfEvent()
    */
@@ -340,8 +358,19 @@ class VirtualPlaneManager {
    */
   void SetVirtualHits(Json::Value hits);
 
+  /** @brief Get flag to tell whether VirtualPlanes are active
+   *
+   *  Default is to activate VirtualPlanes if they are found in the geometry
+   */
+  bool GetWillUseVirtualPlanes() {return _useVirtualPlanes;}
+
+  /** @brief Set flag to tell whether VirtualPlanes are active
+   */
+  void SetWillUseVirtualPlanes(bool willUse) {_useVirtualPlanes = willUse;}
+
  private:
   VirtualPlane ConstructFromModule(const MiceModule* mod);
+  VirtualPlane* PlaneFromStation(int station);  // get plane from station number
 
   CLHEP::Hep3Vector JsonToThreeVector(Json::Value value, std::string name);
 

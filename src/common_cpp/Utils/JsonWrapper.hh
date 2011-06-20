@@ -117,6 +117,11 @@ class JsonWrapper {
    */
   static bool SimilarType(JsonType jt1, JsonType jt2);
 
+  /** @brief Print the Json value to an ostream
+   *
+   *  Prints in json format to ostream out; so if passed to a stringstream, then
+   *  StringToJson should read back in with no change
+   */
   static void Print(std::ostream& out, const Json::Value& val);
 
  private:

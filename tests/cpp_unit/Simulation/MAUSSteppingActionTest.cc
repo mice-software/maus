@@ -176,16 +176,16 @@ TEST_F(MAUSSteppingActionTest, UserSteppingActionVirtualTest) {
   mod.setProperty<std::string>("SensitiveDetector", "Virtual");
   mod.setProperty<std::string>("IndependentVariable", "time");
   mod.setProperty<std::string>("MultiplePasses", "NewStation");
-  MAUSGeant4Manager::GetInstance()->GetVirtualPlanes()->ConstructVirtualPlanes(NULL, &mod);
-  MAUSGeant4Manager::GetInstance()->GetVirtualPlanes()->ConstructVirtualPlanes(NULL, &mod);
+  VirtualPlaneManager* vpm = MAUSGeant4Manager::GetInstance()->GetVirtualPlanes();
+  vpm->ConstructVirtualPlanes(NULL, &mod);
+  vpm->ConstructVirtualPlanes(NULL, &mod);
 
   G4Step*  step  = new G4Step();
   G4Track* track = SetG4TrackAndStep(step);
 
   stepping->UserSteppingAction(step);
   stepping->UserSteppingAction(step);
-  Json::FastWriter writer;
-  EXPECT_EQ(0, 1); // stepping->GetSteps()["virtual_hits"].size(), 4); DISABLED
+  EXPECT_EQ(vpm->GetVirtualHits().size(), 4);
 }
 
 } //namespace end

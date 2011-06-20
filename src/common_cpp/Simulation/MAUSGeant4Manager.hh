@@ -94,8 +94,6 @@ class MAUSGeant4Manager {
      */
     void SetVirtualPlanes(VirtualPlaneManager* virt) {_virtPlanes = virt;}
 
-
-
     /** @brief Phased fields in the geometry (e.g. RF cavities)
      *
      *  If there are unphased fields in the geometry, SetPhases will attempt to
@@ -108,8 +106,19 @@ class MAUSGeant4Manager {
     MAUSPrimaryGeneratorAction::PGParticle GetReferenceParticle();
 
     /** @brief Run a particle through the simulation
+     *
+     *  @returns a json object with tracking, virtual hits and real hits
      */
     Json::Value RunParticle(MAUSPrimaryGeneratorAction::PGParticle p);
+
+    /** @brief Run a particle through the simulation
+     *
+     *  @returns copy of particle with any tracking output appended
+     *           to the particle. Following branches will be overwritten with
+     *           tracking output from this event:\n
+     *             "tracks", "virtual_hits", "hits"
+     */
+    Json::Value RunParticle(Json::Value particle);
 
   private:
     MAUSGeant4Manager();
@@ -118,10 +127,20 @@ class MAUSGeant4Manager {
     G4RunManager* _runManager;
     MICEPhysicsList* _physList;
     MAUSPrimaryGeneratorAction* _primary;
-    MAUSSteppingAction*          _stepAct;
-    MAUSTrackingAction*          _trackAct;
-    MICEDetectorConstruction*    _detector;
-    VirtualPlaneManager*         _virtPlanes;
+    MAUSSteppingAction*         _stepAct;
+    MAUSTrackingAction*         _trackAct;
+    MICEDetectorConstruction*   _detector;
+    VirtualPlaneManager*        _virtPlanes;
+
+    Json::Value Tracking(MAUSPrimaryGeneratorAction::PGParticle p);
+
+    // Following functions should go in G4UserEventAction derivative class
+    void BeginOfEventAction(const G4Event *anEvent);
+    void EndOfEventAction(const G4Event *anEvent);
+    void SetEvent(Json::Value particle);
+    Json::Value GetEvent() {return _event;}
+    void StoreTracking();
+    Json::Value _event;
 };
 
 }  // namespace MAUS

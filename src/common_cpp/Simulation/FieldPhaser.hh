@@ -22,24 +22,52 @@
 #include "src/common_cpp/Simulation/VirtualPlanes.hh"
 #include "src/legacy/BeamTools/BTPhaser.hh"
 
+// Exceptionally, this class is tested at integration test level only. Really
+// no point in testing at unit level.
+
 namespace MAUS {
+
+/** @class FieldPhaser
+ *
+ *  There are two classes that contribute to setting of the RF phase. BTPhaser
+ *  class handles set up from the field maps. FieldPhaser handles execution of
+ *  phasing routine using Simulation tools.
+ */
 
 class FieldPhaser {
  public:
+  /** @brief Constructor initialises to defaults
+   */
   FieldPhaser();
+
+  /** @brief Destructor - no memory alloc'd
+   */
   ~FieldPhaser();
   
-  void SetUp();
-
-  void MakeVirtualPlanes(BTPhaser::FieldForPhasing* cavity);
-
+  /** @brief Automatic routine to set the phases on RF cavities
+   *
+   *  MAUS can set phases on RF cavities automatically. The idea here is to
+   *  throw particles at the RF cavities and measure when they pass through
+   *  the RF cavities. Measurement is used by making a set of VirtualPlanes one
+   *  for each RF cavity. If the particle passes through an RF cavity with
+   *  difference between cavity phase and particle phase less than some tolerance
+   *  the cavity is considered phased.
+   *
+   *  Some notes:\n
+   *    If the particle fails to phase an RF cavity we throw an exception
+   */
   void SetPhases();
+
+ private:
+  // 
+  void SetUp();
 
   void TearDown();
 
+  void MakeVirtualPlanes(BTPhaser::FieldForPhasing* cavity);
+
   MAUSPrimaryGeneratorAction::PGParticle VirtualHitToPGParticle(VirtualHit hit);
 
- private:
   VirtualPlaneManager _phaserVirtualPlanes;
   VirtualPlaneManager* _g4managerVirtualPlanes;
 };

@@ -334,18 +334,7 @@ void VirtualPlaneManager::AddPlane(VirtualPlane* newPlane, const MiceModule* mod
 
 const MiceModule*  VirtualPlaneManager::GetModuleFromStationNumber
                                                            (int stationNumber) {
-  if (_planes.size() == 0)
-    throw(Squeal(Squeal::recoverable, "No Virtual planes initialised",
-                 "VirtualPlaneManager::Module"));
-  if (stationNumber < 1)
-    throw(Squeal(Squeal::recoverable,
-    "Station number must be > 0",
-    "VirtualPlaneManager::Module"));
-  // map from module name to _planes index; if stationNumber > planes.size, it
-  // means we've gone round twice or more, subtract off
-  while (stationNumber > static_cast<int>(_planes.size()))
-    stationNumber -= static_cast<int>(_planes.size());
-  return _mods[ _planes[stationNumber-1] ];
+  return _mods[ PlaneFromStation(stationNumber) ];
 }
 
 int VirtualPlaneManager::GetStationNumberFromModule(const MiceModule* module) {
@@ -450,4 +439,42 @@ VirtualHit VirtualPlaneManager::ReadHit(Json::Value v_hit) {
     hit.SetEnergy(sqrt(hit.GetMomentum().mag2()+hit.GetMass()*hit.GetMass()));
     return hit;
 }
+
+VirtualPlane* VirtualPlaneManager::PlaneFromStation(int stationNumber) {
+    if (_planes.size() == 0)
+      throw(Squeal(Squeal::recoverable, "No Virtual planes initialised",
+                   "VirtualPlaneManager::PlaneFromStation()"));
+    if (stationNumber < 1)
+      throw(Squeal(Squeal::recoverable,
+      "Station number must be > 0",
+      "VirtualPlaneManager::PlaneFromStation"));
+    // map from module name to _planes index; if stationNumber > planes.size, it
+    // means we've gone round twice or more, subtract off
+    while (stationNumber > static_cast<int>(_planes.size()))
+      stationNumber -= static_cast<int>(_planes.size());
+    return _planes[stationNumber-1];
+}
+
+void VirtualPlaneManager::RemovePlanes(std::set<int> station) {
+    std::set<VirtualPlane*> targets;
+    std::set<int>::iterator it1;
+    for (it1 = station.begin(); it1 != station.end(); ++it1)
+      targets.insert(PlaneFromStation(*it1));
+
+    std::set<VirtualPlane*>::iterator it2;
+    for (it2 = targets.begin(); it2 != targets.end(); ++it2)
+      RemovePlane(*it2);
+}
+
+void VirtualPlaneManager::RemovePlane(VirtualPlane* plane) {
+    std::vector<VirtualPlane*>::iterator it =
+                               std::find(_planes.begin(), _planes.end(), plane);
+    _planes.erase(it);
+    _mods.erase(plane);
+    sort(_planes.begin(), _planes.end(), VirtualPlane::ComparePosition);
+    _useVirtualPlanes = _planes.size() > 0;
+    _nHits = std::vector<int>(_planes.size(), 0);
+    delete plane;
+}
+
 

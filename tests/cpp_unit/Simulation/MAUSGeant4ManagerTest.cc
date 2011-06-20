@@ -22,6 +22,7 @@
 #include <G4SDManager.hh>
 
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
+#include "src/common_cpp/Utils/JsonWrapper.hh"
 
 namespace {
 
@@ -55,11 +56,10 @@ TEST(MAUSGeant4ManagerTest, GetReferenceParticleTest) {
 }
 
 TEST(MAUSGeant4ManagerTest, SetPhasesTest) {
-    EXPECT_TRUE(false);
+    MAUSGeant4Manager::GetInstance()->SetPhases();  // just check it runs
 }
 
-
-TEST(MAUSGeant4ManagerTest, RunParticleTest) {
+TEST(MAUSGeant4ManagerTest, RunParticlePGTest) {
     MAUS::MAUSPrimaryGeneratorAction::PGParticle part_in;
     part_in.x = 1.;
     part_in.y = 2.;
@@ -72,13 +72,58 @@ TEST(MAUSGeant4ManagerTest, RunParticleTest) {
     part_in.seed = 10;
     part_in.pid = -13;
 
+    // test that track is set ok
     Json::Value val = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
-    ASSERT_TRUE(val["tracks"][Json::UInt(0)].isObject());
-    Json::Value track = val["tracks"][Json::UInt(0)];
+    ASSERT_TRUE(val["tracks"].isObject());
+    ASSERT_TRUE(val["tracks"]["track_1"].isObject());
+    Json::Value track = val["tracks"]["track_1"];
     EXPECT_NEAR(track["initial_position"]["x"].asDouble(), 1., 1e-9);
     EXPECT_NEAR(track["initial_position"]["y"].asDouble(), 2., 1e-9);
     EXPECT_NEAR(track["initial_position"]["z"].asDouble(), 3., 1e-9);
+
+    // test that tracks can be switched on and off
+    MAUSGeant4Manager::GetInstance()->GetTracking()->SetWillKeepTracks(false);
+    val = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
+    EXPECT_TRUE(val["tracks"].isNull());
+    MAUSGeant4Manager::GetInstance()->GetTracking()->SetWillKeepTracks(true);
+    val = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
+    EXPECT_EQ(val["tracks"].type(), Json::objectValue);
+
+    // test that steps can be switched on and off
+    MAUSGeant4Manager::GetInstance()->GetStepping()->SetWillKeepSteps(false);
+    val = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
+    EXPECT_TRUE(val["tracks"]["track_1"]["steps"].isNull());
+    MAUSGeant4Manager::GetInstance()->GetStepping()->SetWillKeepSteps(true);
+    val = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
+    EXPECT_EQ(val["tracks"]["track_1"]["steps"].type(), Json::arrayValue);
+
+    // test that virtuals can be switched on and off
+    MAUSGeant4Manager::GetInstance()->
+                             GetVirtualPlanes()->SetWillUseVirtualPlanes(false);
+    val = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
+    EXPECT_TRUE(val["virtual_hits"].isNull());
+    MAUSGeant4Manager::GetInstance()->
+                             GetVirtualPlanes()->SetWillUseVirtualPlanes(true);
+    val = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
+    EXPECT_EQ(val["virtual_hits"].type(), Json::arrayValue);
+}
+
+TEST(MAUSGeant4ManagerTest, RunParticleJsonTest) {
+    std::string pg_string = 
+      "{\"primary\":{\"position\":{\"x\":1.0, \"y\":2.0, \"z\":3.0}, \"momentum\":{\"x\":0.0, \"y\":0.0, \"z\":1.0}, \"particle_id\":-13, \"energy\":226.0, \"time\":0.0, \"random_seed\":10}}";
+    Json::Value pg = JsonWrapper::StringToJson(pg_string);
+    MAUSGeant4Manager::GetInstance()->GetStepping()->SetWillKeepSteps(false);
+    Json::Value out = MAUSGeant4Manager::GetInstance()->RunParticle(pg);
+    Json::Value track = out["tracks"]["track_1"];
+    ASSERT_TRUE(track["initial_position"]["x"].isDouble());
+    EXPECT_NEAR(track["initial_position"]["x"].asDouble(), 1., 1e-9);
+    EXPECT_NEAR(track["initial_position"]["y"].asDouble(), 2., 1e-9);
+    EXPECT_NEAR(track["initial_position"]["z"].asDouble(), 3., 1e-9);
+
+    ASSERT_TRUE(out["primary"]["position"]["x"].isDouble());
+    EXPECT_NEAR(out["primary"]["position"]["x"].asDouble(), 1., 1e-9);
+    EXPECT_NEAR(out["primary"]["position"]["y"].asDouble(), 2., 1e-9);
+    EXPECT_NEAR(out["primary"]["position"]["z"].asDouble(), 3., 1e-9);
 }
 
 }
-

@@ -1,4 +1,3 @@
-// MAUS WARNING: THIS IS LEGACY CODE.
 /* This file is part of MAUS: http://micewww.pp.rl.ac.uk/projects/maus
  *
  * MAUS is free software: you can redistribute it and/or modify
@@ -48,12 +47,10 @@ MAUSGeant4Manager::MAUSGeant4Manager() {
     _runManager->SetUserAction(new MICERunAction);
     _virtPlanes = new VirtualPlaneManager;
     _virtPlanes->ConstructVirtualPlanes(
-                                  MICERun::getInstance()->btFieldConstructor, 
-                                  MICERun::getInstance()->miceModule);
-
+      MICERun::getInstance()->btFieldConstructor, 
+      MICERun::getInstance()->miceModule
+    );
     _runManager->Initialize();
-
-    G4UImanager* UI = G4UImanager::GetUIpointer();
 }
 
 MAUSGeant4Manager::~MAUSGeant4Manager() {
@@ -75,20 +72,64 @@ MAUSPrimaryGeneratorAction::PGParticle
     return p;
 }
 
+Json::Value MAUSGeant4Manager::RunParticle(Json::Value particle) {
+    SetEvent(particle);
+    MAUSPrimaryGeneratorAction::PGParticle p;
+    p.ReadJson(particle["primary"]);
+    return Tracking(p);
+}
+
 Json::Value MAUSGeant4Manager::RunParticle
                                     (MAUSPrimaryGeneratorAction::PGParticle p) {
-    // In fact most stuff should be in EventAction
+    SetEvent(Json::Value(Json::objectValue));
+    return Tracking(p);
+}
+
+Json::Value MAUSGeant4Manager::Tracking
+                                    (MAUSPrimaryGeneratorAction::PGParticle p) {
+    // Some stuff should be in EventAction
     Squeak::mout(Squeak::debug) << "Firing particle with ";
     JsonWrapper::Print(Squeak::mout(Squeak::debug), p.WriteJson());
     Squeak::mout(Squeak::debug) << std::endl;
-    _virtPlanes->StartOfEvent();
-    GetTracking()->SetTracks(Json::Value(Json::objectValue));
     GetPrimaryGenerator()->Push(p);
+    BeginOfEventAction(NULL);
     GetRunManager()->BeamOn(1);
-    Json::Value tracks = GetTracking()->GetTracks();
-    return tracks;
+    EndOfEventAction(NULL);
+    return GetEvent();
+
 }
 
+void MAUSGeant4Manager::BeginOfEventAction(const G4Event *anEvent) {
+    _virtPlanes->StartOfEvent();
+    if (GetTracking()->GetWillKeepTracks())
+        GetTracking()->SetTracks(Json::Value(Json::objectValue));
+    if (GetStepping()->GetWillKeepSteps())
+        GetStepping()->SetSteps(Json::Value(Json::arrayValue));
+}
+
+void MAUSGeant4Manager::EndOfEventAction(const G4Event *anEvent) {
+    //  For each detector i
+    for (unsigned int i = 0; i < GetGeometry()->GetSDSize(); i++) {
+      //  Retrieve detector i's hits
+      std::vector<Json::Value> hits = GetGeometry()->GetSDHits(i);
+      for (size_t j = 0; j < hits.size(); ++j) {
+        if (!hits[j].isNull()) {
+          _event["hits"].append(hits[j]);  // Json cpp just makes a new array?
+        }
+      }
+    }
+    if (GetTracking()->GetWillKeepTracks())
+        _event["tracks"] = GetTracking()->GetTracks();
+    if (GetVirtualPlanes()->GetWillUseVirtualPlanes())
+        _event["virtual_hits"] = GetVirtualPlanes()->GetVirtualHits();
+}
+
+void MAUSGeant4Manager::SetEvent(Json::Value event) {
+    if (!event.isObject())
+        throw(Squeal(Squeal::recoverable, "Particle must be an object value",
+                     "MAUSEventAction::SetEvent"));
+    _event = event;
+}
 
 } // namespace MAUS
 
