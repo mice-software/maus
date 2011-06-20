@@ -38,6 +38,7 @@
 #include "src/legacy/Simulation/MICEDetectorConstruction.hh"
 #include "src/common_cpp/Simulation/MAUSPrimaryGeneratorAction.hh"
 #include "src/common_cpp/Simulation/MAUSSteppingAction.hh"
+#include "src/common_cpp/Simulation/MAUSStackingActionKillNonMuons.hh"
 #include "src/common_cpp/Simulation/MAUSTrackingAction.hh"
 
 class MICEPhysicsList;

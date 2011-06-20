@@ -41,6 +41,7 @@ MAUSGeant4Manager::MAUSGeant4Manager() : _storeTracks(false) {
     _runManager->SetUserAction(_primary);
     _runManager->SetUserAction(_trackAct);
     _runManager->SetUserAction(_stepAct);
+    //_runManager->SetUserAction(new MAUSStackingActionKillNonMuons);
     _runManager->SetUserAction(new MICERunAction);
 
     _runManager->Initialize();

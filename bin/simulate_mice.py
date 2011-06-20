@@ -25,7 +25,7 @@ def run(number_of_spills):
     #
     # where the file format has a JSON document per line.  I just toss the file
     # in here for simplicity.
-    document_file = io.StringIO(number_of_spills*u"""{"mc": [{"position": { "x": 0.0, "y": -0.0, "z": -10000.0 },"particle_id" : 13,"energy" : 210.0, "random_seed" : 10, "momentum" : { "x":0.0, "y":0.0, "z":1.0 }, "time" : 0.0}]}\n""")
+    document_file = io.StringIO(number_of_spills*u"""{"mc": [{"position": { "x": 0.0, "y": -0.0, "z": -5000.0 },"particle_id" : 13,"energy" : 210.0, "random_seed" : 10, "momentum" : { "x":0.0, "y":0.0, "z":1.0 }, "time" : 0.0}]}\n""")
     
     my_input = MAUS.InputPyJSON(document_file)
     
@@ -41,11 +41,15 @@ def run(number_of_spills):
     #  which can either be a StringIO object or a native python file.  If you
     #  want to store your datacards in a file 'datacards.dat' then uncomment:
     # datacards = open('datacards.dat', 'r')
+
+
     
     #  Choose from either a compressed or uncompressed output file
     #
-    output_file = gzip.GzipFile("mausput.gz", 'w')  #  Uncompressed
-    #output_file = open("mausput.gz", 'w')  #  Compressed
+    #output_file = open("mausput", 'w')  #  Compressed 
+    output_file = gzip.GzipFile("mausput.gz", 'wb')  #  Uncompressed
+    
+    #output_file = open("mausput", 'w')  #  Compressed
     #
     # Then construct a MAUS output component
     my_output = MAUS.OutputPyJSON(output_file)
@@ -57,5 +61,5 @@ def run(number_of_spills):
 
 
 if __name__ == '__main__':
-    number_of_spills = 2
+    number_of_spills = 10
     run(number_of_spills)

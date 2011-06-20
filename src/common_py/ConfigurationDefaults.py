@@ -31,7 +31,8 @@ keep_tracks = False
 
 # This is used by Simulation
 simulation_geometry_filename = "Stage6.dat"
-maximum_number_of_steps = 10000
+maximum_number_of_steps = 100000
+track_only_muons = True
 
 # this is used by reconstruction
 reconstruction_geometry_filename = simulation_geometry_filename
