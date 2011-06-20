@@ -506,7 +506,7 @@ if env['USE_G4'] and env['USE_ROOT']:
                                  LIBS=env['LIBS'] + ['recpack'])
     env.Install("build", maus_cpp)
 
-    env.Append(LIBPATH = 'src/common_cpp/')
+    env.Append(LIBPATH = 'src/common_cpp')
     env.Append(CPPPATH = maus_root_dir)
 
     if 'Darwin' in os.environ.get('G4SYSTEM'):
