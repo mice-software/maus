@@ -19,38 +19,43 @@ def main():
 if __name__ == "__main__":
     main()
 
-#need to re write comments as functionality has changed!!! and tests!!
 class gdmltocdb:
     """
-    @Class gdmltocdb, handles the uploading and downloading of geometries to the CDB>
+    @Class gdmltocdb, handles the uploading of geometries to the CDB
 
-    This class writes the geometries to the database. It requires an input of the zipped file of
-    gdmls which also includes a text file which has the names of the gdmls zipped as well.
-    In order to write to the datbase the geometry files within the zip file are re written into a
-    single string and encoded before being uploaded to the CDB. This string is then
+    This class writes the geometries to the database. It requires an input of the directory path which contains the GDML
+    files produce by fastRad. It will search this path and find all the files within it and will write these as a list
+    into a test file. This list of files and the contents of each individual file is then copied into one string
+    and encoded and uploaded to the CDB.
     """
     def __init__(self, filepath, testserver):
         """
         @Method Class constructor
 
         this method sets up the connection to the CDB and also does some preliminary set ups of the
-        list of files etc needed to be uploaded. This is taken from the zip file produced by GDMLPacker
+        list of files etc needed to be uploaded. 
 
-        @Param file name/path of the zip file
+        @Param filepath path of the directory which contains the GDML files
         @Param type 1 to set up the test server leave blank for real server
         """
         self.UploadString = ""
         filelist = []
         self.GeometryFiles = filelist
         self.ListOfGeometries = None
-        self.FilePath = filepath
+        if os.path.exists(filepath) != True:
+            raise IOError("File path does not exist", "gdmltocdb::__init__")
+        else:
+            self.FilePath = filepath
         if testserver == None:
-            self.WSDLURL = "supermouse server"
+            self.WSDLURL = "supermouse server" # super maus wsdl needs to go here
         elif testserver == 1:
             self.WSDLURL = "http://rgma19.pp.rl.ac.uk:8080/cdb/geometrySuperMouse?wsdl"
-        else: raise StandardError("Incorrect input", "upload::__init__")
+        else: raise StandardError("Incorrect input", "gdmltocdb::__init__")
         self.Geometry = Client(self.WSDLURL).service
         gdmls = os.listdir(self.FilePath)
+        for fname in gdmls:
+            if fname[-4:] != '.xml' and fname[-5:] != '.gdml':
+                raise IOError("directory conmtains file which are not XMLs or GDMLs", "gdmltocdb::__init__")
         NumOfFiles = len(gdmls)
         path = self.FilePath + "/FileList.txt"
         fout = open(path, 'w')
@@ -69,8 +74,9 @@ class gdmltocdb:
         """
         @Method uploadtocdb, this method uploads the geometries to the CDB
 
-        this method takes the files with in the zip file and re write them into a single string.
-        this string is then encoded and uploaded to the database with a date stamp.
+        This method write the contents of all the gdmls and the text file which lists the gdmls
+        into one string. This string is then encoded and uploaded to the CDB with a date stamp of
+        when the method is called?.
         """
         NumOfFiles = len(self.GeometryFiles)
         fin1 = open(self.ListOfGeometries, 'r')

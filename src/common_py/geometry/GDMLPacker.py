@@ -2,13 +2,10 @@ import os.path
 import zipfile
 from datetime import datetime
 
-def main():
-    from GDMLPacker import packer
-    filelist1 = packer("geom1.txt")
-    filelist1.zipfile()
+#def main():
 
-if __name__ == "__main__":
-    main()
+#if __name__ == "__main__":
+#    main()
 
 # need to re write comments and tests as it has been changed
 class packer:
@@ -19,13 +16,11 @@ class packer:
         """
         @Method Class Constructor
 
-        This method is the class initialiser and takes two parameters.
-        The first parameter is the file name/path of the text file containing the file names/paths
-        which are needed to be zipped. The second parameter takes the name of which the user would like
-        to call the file which will be placed in the zip file.
+        This method is the class initialiser and takes one paramater.
+        The parameter asks for the file name/path of a text file. This text file must contain
+        the file names and paths of the GDML files which need to be zipped.
 
         @Param filelist, file name/path of the file containing the list of GDML files to be zipped.
-        @Param zipfile,  the name of the zip file.
         """
         list = []
         self.List = list
@@ -45,9 +40,12 @@ class packer:
         """
         @Method zipfile, takes the collated file, containing all the GDMLs, and zips it.
 
-        This method take the collated GDML file and produces a zipped file.
+        This method zips the GDML files and a text file with a list of files present. An argument of the
+        output file is specified. Default is $maus/src/common_py/geometry/zippedGeoms. This method
+        also names the zip file as the time and date when method is called.
+
+        @Param Output Path, specify the output path of the zipfile
         """
-        #add more notes on new argument
         dt = str(datetime.today())
         zippath = path + "/" + dt +".zip"
         file = zipfile.ZipFile(zippath, 'w')

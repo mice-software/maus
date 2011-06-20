@@ -1,3 +1,4 @@
+import os
 import os.path
 import unittest
 from GDMLPacker import packer
@@ -28,9 +29,14 @@ class  Test_GDMLPackerTestCase(unittest.TestCase):
         """
         this test checks to see if the outputted zip file has been written
         """
-        self.GDML_test_case.zipfile()
-        self.assertTrue(os.path.getsize("GDML.zip") != 0, "zipped file size is zero, test_GDMLPacker::test_zipfile")
-        
+        self.GDML_test_case.zipfile(path = '/home/matt/maus_littlefield/tmp')
+        path = '/home/matt/maus_littlefield/tmp'
+        output = os.listdir(path)
+        for fname in output:
+            if fname[-4:] == '.zip':
+                zfile = path + '/' + fname
+        self.assertTrue(os.path.getsize(zfile) != 0, "zipped file size is zero, test_GDMLPacker::test_zipfile")
+        os.remove(zfile)
 
     def tearDown(self):
         self.GDML_test_case = None
