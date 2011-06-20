@@ -21,13 +21,13 @@ def run(number_of_spills):
     # Here we create a pseudo-file with an event in it.  If you were to copy
     # and paste this to a file, then you could also do:
     #
-    #   documentFile = open('myFileName.txt', 'r')
+    #   input_file = open('myFileName.txt', 'r')
     #
     # where the file format has a JSON document per line.  I just toss the file
     # in here for simplicity.
-    document_file = io.StringIO(number_of_spills*u"""{"mc": [{"position": { "x": 0.0, "y": -0.0, "z": -5000.0 },"particle_id" : 13,"energy" : 210.0, "random_seed" : 10, "momentum" : { "x":0.0, "y":0.0, "z":1.0 }, "time" : 0.0}]}\n""")
+    input_file = io.StringIO(number_of_spills*u"""{"mc": [{"position": { "x": 0.0, "y": -0.0, "z": -5000.0 },"particle_id" : 13,"energy" : 210.0, "random_seed" : 10, "momentum" : { "x":0.0, "y":0.0, "z":1.0 }, "time" : 0.0}]}\n""")
     
-    my_input = MAUS.InputPyJSON(document_file)
+    my_input = MAUS.InputPyJSON(input_file)
     
     # Create an empty array of mappers, then populate it
     # with the functionality you want to use.
@@ -42,14 +42,12 @@ def run(number_of_spills):
     #  want to store your datacards in a file 'datacards.dat' then uncomment:
     # datacards = open('datacards.dat', 'r')
 
-
     
     #  Choose from either a compressed or uncompressed output file
     #
-    #output_file = open("mausput", 'w')  #  Compressed 
-    output_file = gzip.GzipFile("mausput.gz", 'wb')  #  Uncompressed
-    
-    #output_file = open("mausput", 'w')  #  Compressed
+    #output_file = open("mausput", 'w')  #  Uncompressed
+    output_file = gzip.GzipFile("mausput.gz", 'wb')  #  Compressed
+
     #
     # Then construct a MAUS output component
     my_output = MAUS.OutputPyJSON(output_file)
