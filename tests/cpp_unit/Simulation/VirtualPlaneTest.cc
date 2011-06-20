@@ -262,6 +262,17 @@ TEST_F(VirtualPlaneManagerTest, GetSetFieldTest) {
   delete group;
 }
 
+TEST_F(VirtualPlaneManagerTest, GetSetHitsTest) {
+  Json::Value not_array(Json::objectValue);
+  EXPECT_THROW(vpm.SetVirtualHits(not_array), Squeal);
+
+  Json::Value array(Json::arrayValue); 
+  array.append(Json::Value("hello"));
+  EXPECT_NO_THROW(vpm.SetVirtualHits(array));
+  EXPECT_EQ(array[Json::UInt(0)], vpm.GetVirtualHits()[Json::UInt(0)]);
+}
+
+
 TEST_F(VirtualPlaneManagerTest, ConstructVirtualPlanes) {  // also GetPlanes()
   MiceModule mod1, mod2, mod3;
   mod1.addPropertyString("SensitiveDetector", "Envelope");
@@ -292,30 +303,36 @@ TEST_F(VirtualPlaneManagerTest, ConstructVirtualPlanes) {  // also GetPlanes()
 void __test_indep(std::string indep_string,
                       BTTracker::var indep_enum,
                       double indep_var,
-                      MiceModule mod, VirtualPlaneManager& vpm) {
+                      MiceModule& mod, VirtualPlaneManager& vpm) {
   mod.setProperty<std::string>("IndependentVariable", indep_string);
   vpm.ConstructVirtualPlanes(NULL, &mod);
   EXPECT_EQ(vpm.GetPlanes().back()->GetPlaneIndependentVariableType(),
-            indep_enum);
+            indep_enum) << "Failed with indie " << indep_string;
   EXPECT_NEAR
-     (vpm.GetPlanes().back()->GetPlaneIndependentVariable(), indep_var, 1e-9);
+     (vpm.GetPlanes().back()->GetPlaneIndependentVariable(), indep_var, 1e-9)
+      << "Failed with indie " << indep_string;
 }
 
 
 TEST_F(VirtualPlaneManagerTest, ConstructFromModule_IndepVariableTest) {
-  vpm.ConstructVirtualPlanes(NULL, &mod);
+  // throw unless PlaneTime is set
+  size_t vpm_size = vpm.GetPlanes().size();
+  EXPECT_THROW(__test_indep("t", BTTracker::t, -4., mod, vpm), Squeal);
+  EXPECT_THROW(__test_indep("tau", BTTracker::t, -4., mod, vpm), Squeal);
+  EXPECT_THROW(__test_indep("time", BTTracker::t, 4., mod, vpm), Squeal);
+  EXPECT_EQ(vpm_size, vpm.GetPlanes().size());  // check no planes alloc'd
 
-  __test_indep("z", BTTracker::z, 1000., mod, vpm);
+  // have to construct in order of indep variable magnitude
+  mod.setProperty<double>("PlaneTime", -3.);
+  __test_indep("t", BTTracker::t, -3., mod, vpm);
+  mod.setProperty<double>("PlaneTime", -2.);
+  __test_indep("time", BTTracker::t, -2., mod, vpm);
+  mod.setProperty<double>("PlaneTime", -1.);
+  __test_indep("tau", BTTracker::tau_field, -1., mod, vpm);
+
   __test_indep("u", BTTracker::u, 0., mod, vpm);
 
-  // throw unless PlaneTime is set
-  EXPECT_THROW(__test_indep("t", BTTracker::t, 0., mod, vpm), Squeal);
-  EXPECT_THROW(__test_indep("tau", BTTracker::t, 0., mod, vpm), Squeal);
-  EXPECT_THROW(__test_indep("time", BTTracker::t, 0., mod, vpm), Squeal);
-  mod.setProperty<double>("PlaneTime", -1.);
-  __test_indep("t", BTTracker::t, -1., mod, vpm);
-  __test_indep("time", BTTracker::t, -1., mod, vpm);
-  __test_indep("tau", BTTracker::tau_field, -1., mod, vpm);
+  __test_indep("z", BTTracker::z, 1000., mod, vpm);
 }
 
 void __test_multipass(std::string mp_string,
@@ -352,32 +369,35 @@ TEST_F(VirtualPlaneManagerTest, VirtualPlanesSteppingActionTest) {
   MiceModule mod_6;
   mod_6.addPropertyString("SensitiveDetector", "Virtual");
   mod_6.addPropertyHep3Vector("Position", "0 0 6.0 mm");
+  MiceModule mod_10;
+  mod_10.addPropertyString("SensitiveDetector", "Virtual");
+  mod_10.addPropertyHep3Vector("Position", "0 0 10.0 mm");
+  vpm.ConstructVirtualPlanes(NULL, &mod_0);
   for (size_t i = 0; i < 3; ++i)
     vpm.ConstructVirtualPlanes(NULL, &mod_6);
-  vpm.ConstructVirtualPlanes(NULL, &mod_0);  // two copies
+  vpm.ConstructVirtualPlanes(NULL, &mod_10);  // two copies
 
   G4Step*  step  = new G4Step();
-  SetG4TrackAndStep(step);
+  SetG4TrackAndStep(step);  // prestep is at z=4 poststep at z=8
 
-  Json::Value json_bad(Json::intValue);  // must be of object type
-  Json::Value json(Json::objectValue);
-  EXPECT_THROW(vpm.VirtualPlanesSteppingAction(step), Squeal);
   vpm.VirtualPlanesSteppingAction(step);
+  EXPECT_THROW(vpm.GetNumberOfHits(0), Squeal);
   EXPECT_EQ(vpm.GetNumberOfHits(1), 0);
   for (size_t i = 2; i <= 4; ++i)
     EXPECT_EQ(vpm.GetNumberOfHits(i), 1) << "Failed on station " << i;
-  EXPECT_EQ(json["virtual_hits"].size(), 3);
-  for (size_t i = 0; i < json["virtual_hits"].size(); ++i)
-    EXPECT_EQ(json["virtual_hits"][i]["station_id"].asInt(), i+2);
   EXPECT_EQ(vpm.GetNumberOfHits(5), 0);
-  EXPECT_THROW(vpm.GetNumberOfHits(0), Squeal);
   EXPECT_THROW(vpm.GetNumberOfHits(6), Squeal);
 
+  Json::Value json = vpm.GetVirtualHits();
+  ASSERT_EQ(json.size(), 3);
+  for (size_t i = 0; i < json.size(); ++i)
+    EXPECT_EQ(json[i]["station_id"].asInt(), i+2);
   delete step;
 }
 
 // Also tests StartOfEvent
 TEST_F(VirtualPlaneManagerTest, VirtualPlanesSteppingActionMultipassTest) {
+  // Remember we are sorting by z value
   MiceModule mod_ignore;
   mod_ignore.addPropertyString("SensitiveDetector", "Virtual");
   mod_ignore.addPropertyHep3Vector("Position", "0 0 5.8 mm");
@@ -399,39 +419,37 @@ TEST_F(VirtualPlaneManagerTest, VirtualPlanesSteppingActionMultipassTest) {
   G4Step*  step  = new G4Step();
   SetG4TrackAndStep(step);
 
-  Json::Value json1(Json::objectValue), json2(Json::objectValue),
-              json3(Json::objectValue), json4(Json::objectValue);
   vpm.VirtualPlanesSteppingAction(step);
-  json1 = vpm.GetVirtualHits();
+  Json::Value json1 = vpm.GetVirtualHits();
   vpm.VirtualPlanesSteppingAction(step);
-  json2 = vpm.GetVirtualHits();
+  Json::Value json2 = vpm.GetVirtualHits();
   vpm.VirtualPlanesSteppingAction(step);
-  json3 = vpm.GetVirtualHits();
+  Json::Value json3 = vpm.GetVirtualHits();
 
   EXPECT_EQ(vpm.GetNumberOfHits(1), 1);
   EXPECT_EQ(vpm.GetNumberOfHits(2), 3);
-  EXPECT_EQ(vpm.GetNumberOfHits(3), 3);
+  EXPECT_EQ(vpm.GetNumberOfHits(3), 3);  // this is the primary station number
 
-  ASSERT_EQ(json1["virtual_hits"].size(), 3);
+  ASSERT_EQ(json1.size(), 3);
   for (size_t i = 0; i < 3; ++i)
-    EXPECT_EQ(json1["virtual_hits"][i]["station_id"].asInt(), i+1);
+    EXPECT_EQ(json1[i]["station_id"].asInt(), i+1);
 
-  ASSERT_EQ(json2["virtual_hits"].size(), 2);
-  EXPECT_EQ(json2["virtual_hits"][Json::UInt(0)]["station_id"].asInt(), 2);
-  EXPECT_EQ(json2["virtual_hits"][1]["station_id"].asInt(), 6);
+  ASSERT_EQ(json2.size(), 5);
+  EXPECT_EQ(json2[3]["station_id"].asInt(), 2);
+  EXPECT_EQ(json2[4]["station_id"].asInt(), 6);
 
-  ASSERT_EQ(json3["virtual_hits"].size(), 2);
-  EXPECT_EQ(json3["virtual_hits"][Json::UInt(0)]["station_id"].asInt(), 2);
-  EXPECT_EQ(json3["virtual_hits"][1]["station_id"].asInt(), 9);
+  ASSERT_EQ(json3.size(), 7);
+  EXPECT_EQ(json3[5]["station_id"].asInt(), 2);
+  EXPECT_EQ(json3[6]["station_id"].asInt(), 9);
 
   vpm.StartOfEvent();
 
   vpm.VirtualPlanesSteppingAction(step);
-  json4 = vpm.GetVirtualHits();
+  Json::Value json4 = vpm.GetVirtualHits();
 
-  ASSERT_EQ(json4["virtual_hits"].size(), 3);
+  ASSERT_EQ(json4.size(), 3);
   for (size_t i = 0; i < 3; ++i) {
-    EXPECT_EQ(json4["virtual_hits"][i]["station_id"].asInt(), i+1);
+    EXPECT_EQ(json4[i]["station_id"].asInt(), i+1);
     EXPECT_EQ(vpm.GetNumberOfHits(i+1), 1);
   }
 
@@ -484,33 +502,31 @@ TEST_F(VirtualPlaneManagerTest, ReadWriteHitTest) {
   hit1.SetProperTime(8);
   hit1.SetPathLength(9);
   val1 = vpm.WriteHit(hit1);
-  hit2 = vpm.ReadHit(val1["virtual_hits"][Json::UInt(0)]);
-  val2 = vpm.WriteHit(hit2);
-  Json::Value vh = val2["virtual_hits"][Json::UInt(0)];
-  ASSERT_TRUE(vh.isObject());
-  EXPECT_EQ(vh["station_id"].asInt(), hit1.GetStationNumber());
-  EXPECT_EQ(vh["track_id"].asInt(), hit1.GetTrackID());
-  EXPECT_EQ(vh["particle_id"].asInt(), hit1.GetPID());
-  EXPECT_NEAR(vh["mass"].asDouble(), hit1.GetMass(), 1e-12);
-  EXPECT_NEAR(vh["charge"].asDouble(), hit1.GetCharge(), 1e-12);
-  EXPECT_NEAR(vh["time"].asDouble(), hit1.GetTime(), 1e-12);
-  EXPECT_NEAR(vh["proper_time"].asDouble(), hit1.GetProperTime(), 1e-12);
-  EXPECT_NEAR(vh["path_length"].asDouble(), hit1.GetPathLength(), 1e-12);
+  hit2 = vpm.ReadHit(val1);
 
-  EXPECT_NEAR(vh["position"]["x"].asDouble(), hit1.GetPos().x(), 1e-12);
-  EXPECT_NEAR(vh["position"]["y"].asDouble(), hit1.GetPos().y(), 1e-12);
-  EXPECT_NEAR(vh["position"]["z"].asDouble(), hit1.GetPos().z(), 1e-12);
+  EXPECT_EQ(hit1.GetStationNumber(), hit2.GetStationNumber());
+  EXPECT_EQ(hit1.GetTrackID(), hit2.GetTrackID());
+  EXPECT_EQ(hit1.GetPID(), hit2.GetPID());
+  EXPECT_NEAR(hit1.GetMass(), hit2.GetMass(), 1e-12);
+  EXPECT_NEAR(hit1.GetCharge(), hit2.GetCharge(), 1e-12);
+  EXPECT_NEAR(hit1.GetTime(), hit2.GetTime(), 1e-12);
+  EXPECT_NEAR(hit1.GetProperTime(), hit2.GetProperTime(), 1e-12);
+  EXPECT_NEAR(hit1.GetPathLength(), hit2.GetPathLength(), 1e-12);
 
-  EXPECT_NEAR(vh["momentum"]["x"].asDouble(), hit1.GetMomentum().x(), 1e-12);
-  EXPECT_NEAR(vh["momentum"]["y"].asDouble(), hit1.GetMomentum().y(), 1e-12);
-  EXPECT_NEAR(vh["momentum"]["z"].asDouble(), hit1.GetMomentum().z(), 1e-12);
+  EXPECT_NEAR(hit1.GetPos().x(), hit2.GetPos().x(), 1e-12);
+  EXPECT_NEAR(hit1.GetPos().y(), hit2.GetPos().y(), 1e-12);
+  EXPECT_NEAR(hit1.GetPos().z(), hit2.GetPos().z(), 1e-12);
 
-  EXPECT_NEAR(vh["b_field"]["x"].asDouble(), hit1.GetBField().x(), 1e-12);
-  EXPECT_NEAR(vh["b_field"]["y"].asDouble(), hit1.GetBField().y(), 1e-12);
-  EXPECT_NEAR(vh["b_field"]["z"].asDouble(), hit1.GetBField().z(), 1e-12);
-  EXPECT_NEAR(vh["e_field"]["x"].asDouble(), hit1.GetEField().x(), 1e-12);
-  EXPECT_NEAR(vh["e_field"]["y"].asDouble(), hit1.GetEField().y(), 1e-12);
-  EXPECT_NEAR(vh["e_field"]["z"].asDouble(), hit1.GetEField().z(), 1e-12);
+  EXPECT_NEAR(hit1.GetMomentum().x(), hit2.GetMomentum().x(), 1e-12);
+  EXPECT_NEAR(hit1.GetMomentum().y(), hit2.GetMomentum().y(), 1e-12);
+  EXPECT_NEAR(hit1.GetMomentum().z(), hit2.GetMomentum().z(), 1e-12);
+
+  EXPECT_NEAR(hit1.GetBField().x(), hit2.GetBField().x(), 1e-12);
+  EXPECT_NEAR(hit1.GetBField().y(), hit2.GetBField().y(), 1e-12);
+  EXPECT_NEAR(hit1.GetBField().z(), hit2.GetBField().z(), 1e-12);
+  EXPECT_NEAR(hit1.GetEField().x(), hit2.GetEField().x(), 1e-12);
+  EXPECT_NEAR(hit1.GetEField().y(), hit2.GetEField().y(), 1e-12);
+  EXPECT_NEAR(hit1.GetEField().z(), hit2.GetEField().z(), 1e-12);
 }
 
 /////////////////////// VIRTUALPLANE MANAGER END //////////////////////////////

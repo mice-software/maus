@@ -60,6 +60,8 @@ class MAUSSteppingAction : public G4UserSteppingAction {
   Json::Value GetSteps() const {return _steps;}
 
   /** @brief Set the steps for this spill
+   *
+   *  @params steps Json value of array type
    */
   void SetSteps(Json::Value steps);
 

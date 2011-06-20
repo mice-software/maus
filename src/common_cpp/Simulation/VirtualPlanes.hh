@@ -246,7 +246,9 @@ class VirtualPlaneManager {
   /** @brief Construct the VirtualPlanes
    *
    *  Looks through the MiceModules for VirtualPlanes and builds them. Planes
-   *  are automatically sorted by independent variable.
+   *  are automatically sorted by independent variable. If ConstructVirtualPlanes
+   *  is called more than once, replaces existing field pointer and appends any
+   *  additional virtual plane definitions.
    *
    *  @params field pointer to the global field group. If this is NULL, will
    *          make an empty field.
@@ -327,9 +329,16 @@ class VirtualPlaneManager {
    */
   void AddPlane(VirtualPlane* plane, const MiceModule* mod);
 
+  /** @brief Get Json array of all recorded virtual hits since StartOfEvent()
+   */
   Json::Value GetVirtualHits() {return _hits;}
 
-  void SetVirtualHits(Json::Value hits) {_hits = hits;}
+  /** @brief Set Json array of virtual hits
+   *
+   *  @params hits array of virtual hits; if hits is not a Json::arrayValue,
+   *          throws an exception
+   */
+  void SetVirtualHits(Json::Value hits);
 
  private:
   VirtualPlane ConstructFromModule(const MiceModule* mod);

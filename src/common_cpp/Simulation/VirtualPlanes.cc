@@ -202,7 +202,8 @@ VirtualHit VirtualPlane::BuildNewHit(const G4Step * aStep, int station) const {
 const BTFieldGroup VirtualPlaneManager::_default_field;
 
 VirtualPlaneManager::VirtualPlaneManager() : _field(NULL), 
-      _useVirtualPlanes(false), _planes(), _mods(), _nHits(0) {
+      _useVirtualPlanes(false), _planes(), _mods(), _nHits(0),
+      _hits(Json::arrayValue) {
 }
 
 VirtualPlaneManager::~VirtualPlaneManager() {
@@ -242,8 +243,16 @@ void VirtualPlaneManager::VirtualPlanesSteppingAction
     } catch(Squeal squee) {}  // do nothing - just dont make a hit
 }
 
+void VirtualPlaneManager::SetVirtualHits(Json::Value hits) {
+  if(!hits.isArray())
+    throw(Squeal(Squeal::recoverable, "Virtual hits must be of array type",
+          "VirtualPlaneManager::SetVirtualHits()"));
+  _hits = hits;
+}
+
 void VirtualPlaneManager::StartOfEvent() {
   _nHits = std::vector<int>(_planes.size(), 0);
+  SetVirtualHits(Json::Value(Json::arrayValue));
 }
 
 void VirtualPlaneManager::ConstructVirtualPlanes

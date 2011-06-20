@@ -55,7 +55,7 @@ std::string MapCppSimulation::process(std::string document) {
                                         (spill, "mc", JsonWrapper::arrayValue);
     Squeak::mout(Squeak::info) << "Spill with " << mc.size() << " primaries" << std::endl;
     for (int mc_particle_i = 0; mc_particle_i < mc.size(); ++mc_particle_i) {
-      stepAct->SetTracks(Json::Value());
+//      stepAct->SetTracks(Json::Value());
       Json::Value particle = JsonWrapper::GetItem
                                   (mc, mc_particle_i, JsonWrapper::objectValue);
       SetNextParticle(particle);
@@ -127,6 +127,6 @@ Json::Value MapCppSimulation::StoreTracking(Json::Value particle) {
         }
       }
     }
-    particle["tracks"] = _g4manager->GetStepping()->GetTracks();
+    particle["tracks"] = _g4manager->GetTracking()->GetTracks();
     return particle;
 }
