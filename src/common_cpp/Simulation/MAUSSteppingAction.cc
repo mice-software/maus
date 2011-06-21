@@ -41,7 +41,7 @@ MAUSSteppingAction::MAUSSteppingAction() : _steps(), _keepSteps(false),
 void MAUSSteppingAction::UserSteppingAction(const G4Step * aStep) {
     // record all step points if keep steps flag is set
     if (_keepSteps) {
-        if(_steps.size() == 0) {
+        if (_steps.size() == 0) {
             _steps.append(StepToJson(aStep, true));
         }
         _steps.append(StepToJson(aStep, false));

@@ -1,5 +1,4 @@
 # sample schema for a Spill
-# I haven't filled it in really because I think it will probably change...
 
 three_vec = {
   "type":"object","properties":{
@@ -9,26 +8,73 @@ three_vec = {
   }
 }
 
-mc_step = {"type":"object", "properties":{}} #needs to be filled out...
+required_three_vec = three_vec
+required_three_vec["required"] = True
 
-mc_track = {"type":"object", "properties":{}} #needs to be filled out...
+class mc:
+  primary = {"type":"object", "required":True, "properties":{
+      "particle_id":{"type":"integer"},
+      "energy":{"type":"number"},
+      "time":{"type":"number"},
+      "position":three_vec,
+      "unit_momentum":three_vec,
+    }
+  }
 
-mc_hit = {"type":"object", "properties":{}} #needs to be filled out...
+  steps = {"type":"array", "items":[{
+    "type":"object", "properties":{
+      "position":required_three_vec,
+      "momentum":required_three_vec,
+      "proper_time":{"type":"number", "required":True},
+      "path_length":{"type":"number", "required":True},
+      "time":{"type":"number", "required":True},
+      "energy":{"type":"number", "required":True},
+      "energy_deposited":{"type":"number", "required":True},
+    }
+  }]} #needs to be filled out...
 
-mc_particles = {"type":"object","properties":{
-  "hits":mc_hit,
-  "tracks":mc_track,
-  "particle_id":{"type":"integer"},
-  "position":three_vec,
-  "unit_momentum":three_vec,
-  "energy":{"type":"number"}
-}}
+  tracks = {"type":"object", "properties":{
+    "steps":steps,
+    "initial_position":required_three_vec,
+    "initial_momentum":required_three_vec,
+    "final_position":required_three_vec,
+    "final_momentum":required_three_vec,
+    "particle_id":{"type":"integer", "required":True},
+    "track_id":{"type":"integer", "required":True},
+    "parent_track_id":{"type":"integer", "required":True},
+  }} #needs to be filled out...
 
-mc = {
-  "type":"object", "properties":{
-    "particles":mc_particles
-  },
-}
+  hits = {"type":"object", "properties":{}} #needs to be filled out...
 
-spill = {"type":"object", "properties":{"mc_particles":mc}}
+  virtual_hits = {"type":"array", "items":[{
+    "type":"object", "properties":{
+      "station_id":{"type":"integer", "required":True},
+      "particle_id":{"type":"integer", "required":True},
+      "track_id":{"type":"integer", "required":True},
+      "time":{"type":"number", "required":True},
+      "mass":{"type":"number", "required":True},
+      "charge":{"type":"number", "required":True},
+      "proper_time":{"type":"number", "required":True},
+      "path_length":{"type":"number", "required":True},
+      "position":required_three_vec,
+      "momentum":required_three_vec,
+      "b_field":required_three_vec,
+      "e_field":required_three_vec
+    }
+  }]}
+
+  particles = {"type":"object", "required":True, "properties":{
+    "primary":primary,
+    "hits":hits,
+    "tracks":tracks,
+    "virtual_hits":virtual_hits
+  }}
+
+  spill = {
+    "type":"object", "properties":{
+      "particles":particles
+    },
+  }
+
+spill = {"type":"object", "properties":{"mc_particles":mc.spill}}
 

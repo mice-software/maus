@@ -470,7 +470,7 @@ Export('env') # pylint: disable-msg=E0602
 
 print "Configuring..."
 # Must have long32 & long64 for the unpacking library
-env.Append(CCFLAGS=["""-Dlong32='int'""", """-Dlong64='long long'""", '-g', """-fprofile-arcs""", """-ftest-coverage""", """-fno-inline""", """-fno-default-inline"""])
+env.Append(CCFLAGS=["""-Dlong32='int'""", """-Dlong64='long long'"""])#, '-g', """-fprofile-arcs""", """-ftest-coverage""", """-fno-inline""", """-fno-default-inline"""])
 env.Append(LIBS=['gcov'])
 conf = Configure(env, custom_tests = {'CheckCommand' : CheckCommand}) # pylint: disable-msg=E0602
 set_cpp(conf, env)

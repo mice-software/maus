@@ -15,13 +15,14 @@
  *
  */
 
-#include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
+#include <vector>
 
-#include "src/legacy/Simulation/MICEPhysicsList.hh"
+#include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 
 #include "src/common_cpp/Simulation/FieldPhaser.hh"
 
 #include "src/legacy/Interface/Squeak.hh"
+#include "src/legacy/Simulation/MICEPhysicsList.hh"
 
 namespace MAUS {
 
@@ -48,7 +49,7 @@ MAUSGeant4Manager::MAUSGeant4Manager() {
     _runManager->SetUserAction(new MICERunAction);
     _virtPlanes = new VirtualPlaneManager;
     _virtPlanes->ConstructVirtualPlanes(
-      MICERun::getInstance()->btFieldConstructor, 
+      MICERun::getInstance()->btFieldConstructor,
       MICERun::getInstance()->miceModule
     );
     _runManager->Initialize();
@@ -63,7 +64,7 @@ void MAUSGeant4Manager::SetPhases() {
   phaser.SetPhases();
 }
 
-MAUSPrimaryGeneratorAction::PGParticle 
+MAUSPrimaryGeneratorAction::PGParticle
                                      MAUSGeant4Manager::GetReferenceParticle() {
     MAUSPrimaryGeneratorAction::PGParticle p;
     Json::Value* conf = MICERun::getInstance()->jsonConfiguration;
@@ -97,7 +98,6 @@ Json::Value MAUSGeant4Manager::Tracking
     GetRunManager()->BeamOn(1);
     EndOfEventAction(NULL);
     return GetEvent();
-
 }
 
 void MAUSGeant4Manager::BeginOfEventAction(const G4Event *anEvent) {
