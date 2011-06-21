@@ -65,7 +65,7 @@ TEST(SqueakTest, SqueakMoutDefaultTest) {
 
 void __TestStdOutputs(int i) {
     if (i < 0)
-      i = MICERun::getInstance()->DataCards->fetchValueInt("VerboseLevel");
+      i = (*MICERun::getInstance()->jsonConfiguration)["verbose_level"].asInt();
     if (i > static_cast<int>(Squeak::debug)) {
       EXPECT_EQ(std::cout.rdbuf(), Squeak::nullOut().rdbuf()) << i << " "
                                              << static_cast<int>(Squeak::debug);

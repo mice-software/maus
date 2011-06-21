@@ -45,6 +45,7 @@ MAUSGeant4Manager::MAUSGeant4Manager() {
     _runManager->SetUserAction(_primary);
     _runManager->SetUserAction(_trackAct);
     _runManager->SetUserAction(_stepAct);
+    //  _runManager->SetUserAction(new MAUSStackingActionKillNonMuons);
     _runManager->SetUserAction(new MICERunAction);
     _virtPlanes = new VirtualPlaneManager;
     _virtPlanes->ConstructVirtualPlanes(

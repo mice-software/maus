@@ -31,7 +31,7 @@ class OutputPyJSON:
     - a gzip-compressed file that can be
     decompressed either with InputPyJSON within
     MAUS or by the Linux tools gunzip/gzip;
-    arg_file=GzipFile('filename', 'w')
+    arg_file=GzipFile('filename', 'wb')
     see http://docs.python.org/library/gzip.html
     - a socket;
     http://docs.python.org/library/socket.html
