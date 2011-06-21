@@ -23,6 +23,16 @@
 
 map_reduce_type = "native_python" # can also be "native_python_profile" using cProfile in python
 
+# Used, for now, to determine what level of c++ log messages are reported to the user
+# 0 = debug info (and std::cout)
+# 1 = run info
+# 2 = warnings
+# 3 = errors
+# 4 = fatal
+# >4 = silent
+# doesnt effect python stuff
+verbose_level = 2
+
 # Used by MapPyRemoveTracks.
 keep_only_muon_tracks = False 
 

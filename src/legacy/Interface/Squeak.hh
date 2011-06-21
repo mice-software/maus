@@ -24,8 +24,10 @@
 #include <fstream>
 #include <map>
 
+#include "json/value.h"
+
+#include "Utils/JsonWrapper.hh"
 #include "Interface/Squeal.hh"
-#include "Interface/dataCards.hh"
 
 /// Squeak class is designed to redirect output to std::out or file
 
@@ -110,6 +112,7 @@ class Squeak {
   static std::ostream& cerrOut();
 
  private:
+  errorLevel GetVerboseLevel();
   // constructor is called by any call to mout
   // defines std::map output
   Squeak();
@@ -128,7 +131,7 @@ class Squeak {
   static Squeak *   getInstance();
   // mout tries to find the datacards in the MICERun, otherwise it operates
   // verbose
-  static dataCards* datacards;
+  static Json::Value* datacards;
   // Set outputs
   static void       initialiseOutputs();
   // Setup Squeal
