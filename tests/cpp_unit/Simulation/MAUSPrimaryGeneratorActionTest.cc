@@ -117,5 +117,54 @@ TEST_F(MAUSPrimaryGeneratorActionTest, GeneratePrimariesTest) {
     delete event;
 }
 
+TEST_F(MAUSPrimaryGeneratorActionTest, PGParticleReadWriteTest) {
+    MAUSPrimaryGeneratorAction::PGParticle part_in, part_out;
+    part_in.x = 1.;
+    part_in.y = 2.;
+    part_in.z = 3.;
+    part_in.time = 4.;
+    part_in.px = 5.;
+    part_in.py = 6.;
+    part_in.pz = 7.;
+    part_in.energy = 200.;
+    part_in.seed = 27;
+    part_in.pid = -13;
+
+    Json::Value val = part_in.WriteJson();
+    part_out.ReadJson(val);
+    EXPECT_NEAR(part_in.x, part_out.x, 1e-6);
+    EXPECT_NEAR(part_in.y, part_out.y, 1e-6);
+    EXPECT_NEAR(part_in.z, part_out.z, 1e-6);
+    EXPECT_NEAR(part_in.px, part_out.px, 1e-6);
+    EXPECT_NEAR(part_in.py, part_out.py, 1e-6);
+    EXPECT_NEAR(part_in.pz, part_out.pz, 1e-6);
+    EXPECT_NEAR(part_in.time, part_out.time, 1e-6);
+    EXPECT_NEAR(part_in.energy, part_out.energy, 1e-6);
+    EXPECT_EQ(part_in.pid, part_out.pid);
+    EXPECT_EQ(part_in.seed, part_out.seed);
+
+}
+
+TEST_F(MAUSPrimaryGeneratorActionTest, PGParticleFromVirtualHitTest) {
+    VirtualHit hit;
+    hit.SetPos(CLHEP::Hep3Vector(1.,2.,3.));
+    hit.SetTime(4.);
+    hit.SetMomentum(CLHEP::Hep3Vector(5.,6.,7.));
+    hit.SetEnergy(200.);
+    hit.SetPID(-13);
+    MAUSPrimaryGeneratorAction::PGParticle part_in(hit);
+    EXPECT_NEAR(part_in.x, 1., 1e-6);
+    EXPECT_NEAR(part_in.y, 2., 1e-6);
+    EXPECT_NEAR(part_in.z, 3., 1e-6);
+    EXPECT_NEAR(part_in.px, 5., 1e-6);
+    EXPECT_NEAR(part_in.py, 6., 1e-6);
+    EXPECT_NEAR(part_in.pz, 7., 1e-6);
+    EXPECT_NEAR(part_in.time, 4., 1e-6);
+    EXPECT_NEAR(part_in.energy, 200., 1e-6);
+    EXPECT_EQ(part_in.pid, -13);
+    EXPECT_EQ(part_in.seed, 0);
+
+}
+
 } //namespace end
 

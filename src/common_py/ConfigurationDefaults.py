@@ -27,12 +27,12 @@ map_reduce_type = "native_python" # can also be "native_python_profile" using cP
 keep_only_muon_tracks = False 
 
 # Used by MapCppSimulation
-keep_tracks = False
-
-# This is used by Simulation
-simulation_geometry_filename = "Stage6.dat"
-maximum_number_of_steps = 100000
-track_only_muons = True
+keep_tracks = False # set to true to keep start and end point of every track
+keep_steps = False # set to true to keep start and end point of every track and
+                   # every step point
+simulation_geometry_filename = "Stage6.dat" # geometry used by simulation
+maximum_number_of_steps = 10000
+simulation_reference_particle = {"position":{"x":0.0, "y":-0.0, "z":-4700.0}, "momentum":{"x":0.0, "y":0.0, "z":1.0}, "particle_id":-13, "energy":226.0, "time":0.0, "random_seed":10}
 
 # this is used by reconstruction
 reconstruction_geometry_filename = simulation_geometry_filename
@@ -79,4 +79,4 @@ SciFinPlanes = 3
 SciFinStations = 5
 SciFinTrackers = 2
 
-VirtualPlanes_z = [0.0, 1.0] # units: meter.  the 'z' coordinate where the virtual plane exists
+

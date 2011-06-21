@@ -58,10 +58,10 @@ void SetupSimulation(MiceModule* root, std::vector<CovarianceMatrix> envelope)
                                 (JsonWrapper::StringToJson("{\"maximum_number_of_steps\":10000}")); // BUG
   Squeak::setStandardOutputs();
   fillMaterials(simRun);
-
+  
   g4Manager = MAUSGeant4Manager::GetInstance();
 
-  BTPhaser::Print(Squeak::mout(Squeak::info));
+  simRun.btFieldConstructor->Print(Squeak::mout(Squeak::info));
 }
 
 std::vector<G4VSolid*> MakeCylinderEnvelope(std::vector<CovarianceMatrix> matrix, double InterpolationSize)
@@ -71,31 +71,11 @@ std::vector<G4VSolid*> MakeCylinderEnvelope(std::vector<CovarianceMatrix> matrix
 
 MICEEvent* PhaseCavities(PhaseSpaceVector ref)
 {
-  Squeak::mout(Squeak::debug) << "Rephasing cavities with reference particle " << ref << std::endl;
-  BTPhaser::IsPhaseSet(false); //force to rephase
-  simEvent = MICEEvent();
-  if(BTPhaser::NumberOfCavities() == 0) return &simEvent;
-  int nTries = 0;
-  MAUSPrimaryGeneratorAction::PGParticle p = ConvertToPGParticle(ref);
-  while(!BTPhaser::IsPhaseSet() && nTries < 5*BTPhaser::NumberOfCavities())  
-  {
-    g4Manager->GetPrimaryGenerator()->Push(p);
-    g4Manager->GetRunManager()->BeamOn(1);
-    nTries++;
-    Squeak::mout(Squeak::info) << "." << std::flush;
-  }
-  Squeak::mout(Squeak::info) << std::endl;
-  if(!BTPhaser::IsPhaseSet())
-    throw(Squeal(Squeal::recoverable, "Error setting RF cavity phase", "Envelope::RunSimulation"));
-  if(nTries > 1)
-    Squeak::mout(Squeak::debug) << "Cavities were rephased. New fields:\n" << *(BTPhaser::GetGlobalField()) << std::endl;
-  return &simEvent;
 }
 
 MICEEvent* RunSimulation(PhaseSpaceVector psv)
 {
   simEvent = MICEEvent();
-  BTPhaser::IsRefPart(true);
   if(psv.E()<0) return &simEvent;
   MAUSPrimaryGeneratorAction::PGParticle p = ConvertToPGParticle(psv);
   g4Manager->GetPrimaryGenerator()->Push(p);
@@ -258,12 +238,12 @@ std::vector<TransferMap*>      TrackingDerivativeTransferMaps(std::vector<PhaseS
   for(unsigned int j=0; j<hitsIn.size() && (!referenceOnly || j==0); j++)
   {
     MICEEvent* event = Simulation::RunSimulation(hitsIn[j]);
-    AddHitsToMap(MAUSGeant4Manager::GetInstance()->GetStepping()->GetTracks(), g_hits);
+    AddHitsToMap(MAUSGeant4Manager::GetInstance()->GetTracking()->GetTracks(), g_hits);
     event->specialHits    = std::vector<SpecialHit*>();
     event->virtualHits    = std::vector<VirtualHit*>();
     event->zustandVektors = std::vector<ZustandVektor*>();
-    MAUSGeant4Manager::GetInstance()->GetStepping()->SetTracks(Json::Value(Json::objectValue));
-    VirtualPlaneManager::StartOfEvent();
+    MAUSGeant4Manager::GetInstance()->GetTracking()->SetTracks(Json::Value(Json::objectValue));
+    MAUSGeant4Manager::GetInstance()->GetVirtualPlanes()->StartOfEvent();
   }
   int order = 2;
   if(referenceOnly) order = 1;
@@ -342,10 +322,10 @@ void PolyFitFunction(const double* psv_in, double* psv_out)
   psvIn.setZ(g_mean.z());
   MICEEvent* event = Simulation::RunSimulation(psvIn);
   g_hitsIn.push_back(psvIn);
-  AddHitsToMap(MAUSGeant4Manager::GetInstance()->GetStepping()->GetTracks(), g_hits);
+  AddHitsToMap(MAUSGeant4Manager::GetInstance()->GetTracking()->GetTracks(), g_hits);
   PhaseSpaceVector psvOut = g_hits[g_polyfit_module].back();
   CLHEP::HepVector vecOut = psvOut.getSixVector();
-  MAUSGeant4Manager::GetInstance()->GetStepping()->SetTracks(Json::Value());
+  MAUSGeant4Manager::GetInstance()->GetTracking()->SetTracks(Json::Value());
   for(int i=0; i<vecOut.num_row(); i++) psv_out[i] = vecOut[i] - g_mean.getSixVector()[i];
 }
 
@@ -365,7 +345,7 @@ void SetPolyFitModule(const MiceModule* root)
 void  AddStationToMapping(StationId id, TransferMap* map)
 {
   if(id.StationType() != StationId::virt) return;
-  const MiceModule* mod = VirtualPlaneManager::GetModuleFromStationNumber(id.StationNumber());
+  const MiceModule* mod = MAUSGeant4Manager::GetInstance()->GetVirtualPlanes()->GetModuleFromStationNumber(id.StationNumber());
   g_module_to_map[mod] = map;
 }
 
@@ -378,7 +358,7 @@ StationId::StationId(VirtualHit hit) :   _type(virt), _station_number(hit.GetSta
 StationId::StationId(SpecialHit hit) :   _type(special), _station_number(hit.GetStationNo())
 {}
 
-StationId::StationId(const MiceModule& mod) throw(Squeal)       :   _type(virt), _station_number(VirtualPlaneManager::GetStationNumberFromModule(&mod ))
+StationId::StationId(const MiceModule& mod) throw(Squeal)       :   _type(virt), _station_number(MAUSGeant4Manager::GetInstance()->GetVirtualPlanes()->GetStationNumberFromModule(&mod ))
 {
   std::string sd = mod.propertyStringThis("SensitiveDetector");
   if(sd!="Envelope") 
@@ -443,7 +423,7 @@ void AppendPSV(PhaseSpaceVector psv, int trackID, TransferMap& tm, MICEEvent& ev
 {
   typedef std::map<const MiceModule*, TransferMap*> mod_map;
   const MiceModule* mod = map_find_value<TransferMap*, mod_map, mod_map::iterator>(&tm, g_module_to_map)->first;
-  int   stationID       = VirtualPlaneManager::GetStationNumberFromModule(mod);
+  int   stationID       = MAUSGeant4Manager::GetInstance()->GetVirtualPlanes()->GetStationNumberFromModule(mod);
   event.virtualHits.push_back(new VirtualHit( psv.virtualHit(trackID, stationID) ));
 }
 
@@ -760,7 +740,7 @@ namespace Optimiser
     if(g_rebuild_simulation)
     {
       Squeak::mout(Squeak::debug) << "Rebuilding fields" << std::endl;
-      BTFieldConstructor*   field   = (BTFieldConstructor*)BTPhaser::GetGlobalField();
+      BTFieldConstructor*   field   = (BTFieldConstructor*)MICERun::getInstance()->btFieldConstructor;
       BTFieldGroup*         mfield  = (BTFieldGroup*)field->GetMagneticField();
       BTFieldGroup*         emfield = (BTFieldGroup*)field->GetElectroMagneticField();
       std::vector<BTField*> field_v = mfield->GetFields();
@@ -774,7 +754,7 @@ namespace Optimiser
       emfield->Close();
       Squeak::mout(Squeak::debug) << "Deleted fields" << std::endl;
       field->BuildFields(g_root_mod);
-      BTPhaser::Print(Squeak::mout(Squeak::debug)); 
+      MICERun::getInstance()->btFieldConstructor->Print(Squeak::mout(Squeak::debug)); 
     }
     std::vector<double> score = GetScore();
     for(int i=0; i<int(g_parameters.size()); i++)

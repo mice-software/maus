@@ -68,8 +68,7 @@ private:
   void		setSteppingAccuracy();
   //Set G4 Stepping Algorithm
   void		setSteppingAlgorithm();
-  //Set up a special virtual for phasing RF cavities if mod is an RF cavity
-  void SetPhasingVolume(MiceModule * cavityModule, G4VPhysicalVolume* cavityVolume);
+
   //Build a Q35 using Q35.hh methods
   G4LogicalVolume* BuildQ35(MiceModule * mod);
 

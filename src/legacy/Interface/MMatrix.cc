@@ -296,7 +296,7 @@ template m_complex MMatrix<m_complex>::trace() const;
 template <class Tmplt>
 MVector<m_complex> MMatrix<Tmplt>::eigenvalues() const
 {
-  if(num_row() != num_col()) throw(Squeal(Squeal::recoverable, "Attempt to get eigenvectors of non-symmetric matrix", "MMatrix<double>::eigenvalues") );
+  if(num_row() != num_col()) throw(Squeal(Squeal::recoverable, "Attempt to get eigenvectors of non-square matrix", "MMatrix<double>::eigenvalues") );
   MMatrix<Tmplt> temp = *this;
   MVector<m_complex> evals(num_row(), m_complex_build(2.,-1.));
   gsl_eigen_nonsymm_workspace * w = gsl_eigen_nonsymm_alloc(num_row());
@@ -311,7 +311,7 @@ template MVector<m_complex> MMatrix<double>   ::eigenvalues() const;
 template <class Tmplt>
 std::pair<MVector<m_complex>, MMatrix<m_complex> > MMatrix<Tmplt>::eigenvectors() const
 {
-  if(num_row() != num_col()) throw(Squeal(Squeal::recoverable, "Attempt to get eigenvectors of non-symmetric matrix", "MMatrix<double>::eigenvectors") );
+  if(num_row() != num_col()) throw(Squeal(Squeal::recoverable, "Attempt to get eigenvectors of non-square matrix", "MMatrix<double>::eigenvectors") );
   MMatrix<Tmplt>     temp = *this;
   MVector<m_complex> evals(num_row());
   MMatrix<m_complex> evecs(num_row(), num_row());

@@ -70,30 +70,37 @@ class MAUSSteppingActionTest : public ::testing::Test {
 
 // test get and set work correctly
 TEST_F(MAUSSteppingActionTest, GetSetTest) {
-  stepping->SetKeepTracks(true);
-  EXPECT_EQ(stepping->GetKeepTracks(), true);
-  stepping->SetKeepTracks(false);
-  EXPECT_EQ(stepping->GetKeepTracks(), false);
+  stepping->SetWillKeepSteps(true);
+  EXPECT_EQ(stepping->GetWillKeepSteps(), true);
+  stepping->SetWillKeepSteps(false);
+  EXPECT_EQ(stepping->GetWillKeepSteps(), false);
 
-  stepping->SetTracks(Json::Value("Hello"));
-  EXPECT_EQ(Json::Value("Hello"), stepping->GetTracks());
-  stepping->SetTracks(Json::Value());
+  EXPECT_THROW(stepping->SetSteps(Json::Value(Json::objectValue)), Squeal);
+  Json::Value array(Json::arrayValue);
+  array.append(Json::Value("Hello"));
+  EXPECT_NO_THROW(stepping->SetSteps(array));
+  EXPECT_EQ(array, stepping->GetSteps());
 }
 
 // test that we set stop and kill if stepping goes more than max n steps
 TEST_F(MAUSSteppingActionTest, UserSteppingActionMaxNStepsTest) {
   Json::Value& conf = *MICERun::getInstance()->jsonConfiguration;
   int maxNSteps = JsonWrapper::GetProperty
-                      (conf, "maximum_number_of_steps", JsonWrapper::intValue).asInt();
-  stepping->SetTracks(JsonWrapper::StringToJson("{\"track0\":{}}"));
+               (conf, "maximum_number_of_steps", JsonWrapper::intValue).asInt();
+  MAUSTrackingAction* tracking = MAUSGeant4Manager::GetInstance()->GetTracking();
+  tracking->SetWillKeepTracks(true);
+  tracking->SetTracks(Json::Value(Json::objectValue));
+  tracking->PreUserTrackingAction(step->GetTrack());
+  stepping->SetSteps(Json::Value(Json::arrayValue));
   stepping->UserSteppingAction(step);
-  EXPECT_TRUE(stepping->GetTracks()["track0"].type() == Json::objectValue);
-  EXPECT_TRUE(stepping->GetTracks()["track0"]["KillReason"].type() ==
+
+  ASSERT_TRUE(tracking->GetTracks()["track_0"].isObject());
+  EXPECT_TRUE(tracking->GetTracks()["track_0"]["KillReason"].type() ==
                                                              Json::nullValue);
   for (size_t i = 0; i < maxNSteps+1; ++i)
     track->IncrementCurrentStepNumber();
   stepping->UserSteppingAction(step);
-  EXPECT_EQ(stepping->GetTracks()["track0"]["KillReason"].type(),
+  EXPECT_EQ(tracking->GetTracks()["track_0"]["KillReason"].type(),
                                                              Json::stringValue);
   EXPECT_EQ(track->GetTrackStatus(), fStopAndKill);
 
@@ -101,24 +108,23 @@ TEST_F(MAUSSteppingActionTest, UserSteppingActionMaxNStepsTest) {
 
 // test that we write steps correctly on each step (or not if flag is false)
 TEST_F(MAUSSteppingActionTest, UserSteppingActionWriteStepsTest) {
-  stepping->SetTracks(JsonWrapper::StringToJson("{\"track0\":{}}"));
-  stepping->SetKeepTracks(false);
-  stepping->SetTracks(Json::Value());
+  stepping->SetSteps(Json::Value(Json::arrayValue));
+  stepping->SetWillKeepSteps(false);
+  stepping->SetSteps(Json::Value(Json::arrayValue));
   stepping->UserSteppingAction(step);
-  EXPECT_EQ(stepping->GetTracks()["track0"]["steps"].type(), Json::nullValue);
-  stepping->SetKeepTracks(true);
+  EXPECT_EQ(stepping->GetSteps()[Json::UInt(0)].type(), Json::nullValue);
+  stepping->SetWillKeepSteps(true);
   stepping->UserSteppingAction(step);
   stepping->UserSteppingAction(step);
-  ASSERT_EQ(stepping->GetTracks()["track0"]["steps"].type(), Json::arrayValue);
+  ASSERT_EQ(stepping->GetSteps().type(), Json::arrayValue);
   // we want 3 steps - 2 post steps plus the first one
-  EXPECT_EQ(stepping->GetTracks()["track0"]["steps"].size(), 3);
+  EXPECT_EQ(stepping->GetSteps().size(), 3);
 }
 // test that we write to json correctly
 TEST_F(MAUSSteppingActionTest, StepToJsonTest) {
-  std::cerr << "WARNING - MAUSSteppingActionTest::StepToJsonTest disabled"
+  std::cerr << "WARNING - MAUSSteppingActionTest::StepToJsonTest unstable"
             << std::endl;
-/* BUG - making intermittent error
-  Json::Value out = stepping->StepPointToJson(step, true);
+  Json::Value out = stepping->StepToJson(step, true);
   EXPECT_DOUBLE_EQ(out["position"]["x"].asDouble(), 2.);
   EXPECT_DOUBLE_EQ(out["position"]["y"].asDouble(), 3.);
   EXPECT_DOUBLE_EQ(out["position"]["z"].asDouble(), 4.);
@@ -131,9 +137,8 @@ TEST_F(MAUSSteppingActionTest, StepToJsonTest) {
   EXPECT_DOUBLE_EQ(out["proper_time"].asDouble(), 2.);
   EXPECT_DOUBLE_EQ(out["path_length"].asDouble(), 10.);
 
-  out = stepping->StepPointToJson(step, false);
+  out = stepping->StepToJson(step, false);
   EXPECT_DOUBLE_EQ(out["time"].asDouble(), -10.);
-*/
 }
 G4Track* SetG4TrackAndStep(G4Step* step) {
   G4ParticleDefinition* pd =
@@ -171,16 +176,16 @@ TEST_F(MAUSSteppingActionTest, UserSteppingActionVirtualTest) {
   mod.setProperty<std::string>("SensitiveDetector", "Virtual");
   mod.setProperty<std::string>("IndependentVariable", "time");
   mod.setProperty<std::string>("MultiplePasses", "NewStation");
-  VirtualPlaneManager::ConstructVirtualPlanes(NULL, &mod);
-  VirtualPlaneManager::ConstructVirtualPlanes(NULL, &mod);
+  VirtualPlaneManager* vpm = MAUSGeant4Manager::GetInstance()->GetVirtualPlanes();
+  vpm->ConstructVirtualPlanes(NULL, &mod);
+  vpm->ConstructVirtualPlanes(NULL, &mod);
 
   G4Step*  step  = new G4Step();
   G4Track* track = SetG4TrackAndStep(step);
 
   stepping->UserSteppingAction(step);
   stepping->UserSteppingAction(step);
-  Json::FastWriter writer;
-  EXPECT_EQ(stepping->GetTracks()["virtual_hits"].size(), 4);
+  EXPECT_EQ(vpm->GetVirtualHits().size(), 4);
 }
 
 } //namespace end

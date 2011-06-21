@@ -1,0 +1,55 @@
+// Pillbox configuration
+
+Configuration PillBox
+{
+  Substitution $WindowThickness 0.1
+  Substitution $RFLength 500.
+
+  Dimensions 10 10 10 m
+  PropertyString Material Galactic
+
+  MiceModule PillBox
+  {
+    PropertyString Volume Cylinder
+    PropertyHep3Vector Dimensions 600. $WindowThickness+$RFLength 0. mm
+    PropertyHep3Vector Position 1000.0 0.0 -1000.0 mm
+    PropertyHep3Vector Rotation 0.0 90.0 0.0 degree
+    PropertyString Material Galactic
+    MiceModule RFWindowUS
+    {
+      PropertyString Volume Cylinder
+      PropertyHep3Vector Dimensions 600. $WindowThickness 0. mm
+      PropertyHep3Vector Position 0.0 0.0 -$RFLength/2. mm
+      PropertyString Material Galactic
+    }
+    MiceModule Field
+    {
+      PropertyString Volume None
+      PropertyString FieldType PillBox
+      PropertyDouble Length 500. mm
+      PropertyString CavityMode Unphased
+      PropertyString FieldDuringPhasing TimeVarying
+      PropertyDouble Frequency 201.25 MHz
+      PropertyDouble PeakEField 15 MV/m 
+      PropertyDouble ReferenceParticlePhase 0 degree
+    }
+    MiceModule RFWindowDS
+    {
+      PropertyString Volume Cylinder
+      PropertyHep3Vector Dimensions 600.  $WindowThickness 0. mm
+      PropertyHep3Vector Position 0.0 0.0 +$RFLength/2. mm
+      PropertyString Material Galactic
+    }
+  }
+
+  MiceModule Virtuals
+  {
+    PropertyString Volume None
+    PropertyString SensitiveDetector Virtual
+    PropertyHep3Vector Position 0.0 0.0 100.*@RepeatNumber mm
+    PropertyBool   RepeatModule2 1
+    PropertyInt    NumberOfRepeats 10
+  }
+}
+
+

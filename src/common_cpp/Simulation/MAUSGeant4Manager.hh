@@ -15,17 +15,6 @@
  *
  */
 
-/** @class MAUSGeant4Manager
- *
- *  Manage Geant4 setup - singleton class that controls the interface with
- *  geant4. This has to be a singleton class so that we can't accidentally set
- *  up geant4 twice.
- *
- *  So some comments about the Geant4 setup. At the moment, we make one event
- *  per primary. This is actually incorrect - really we should be making several
- *  tracks on each Geant4 event - i.e. the spill should be the Geant4 event.
- */
-
 #ifndef _SRC_CPP_CORE_SIMULATION_MAUSGEANT4MANAGER_HH_
 #define _SRC_CPP_CORE_SIMULATION_MAUSGEANT4MANAGER_HH_
 
@@ -40,13 +29,30 @@
 #include "src/common_cpp/Simulation/MAUSSteppingAction.hh"
 #include "src/common_cpp/Simulation/MAUSStackingActionKillNonMuons.hh"
 #include "src/common_cpp/Simulation/MAUSTrackingAction.hh"
+#include "src/common_cpp/Simulation/VirtualPlanes.hh"
 
 class MICEPhysicsList;
 
 namespace MAUS {
 
+/** MAUSPhysicsList is a synonym for (legacy) MICEPhysicsList
+ */
+typedef MICEPhysicsList MAUSPhysicsList;
+
+/** @class MAUSGeant4Manager
+ *
+ *  @brief Manage Geant4 setup - singleton class that controls the interface with
+ *  geant4.
+ *
+ *  This has to be a singleton class so that we can't accidentally set
+ *  up geant4 twice.
+ *
+ *  So some comments about the Geant4 setup. At the moment, we make one event
+ *  per primary. This is actually incorrect - really we should be making several
+ *  tracks on each Geant4 event - i.e. the spill should be the Geant4 event.
+ */
 class MAUSGeant4Manager {
- public:
+  public:
     /** @brief Get the singleton MAUSGeant4Manager
      *
      *  Get the instance of the MAUSGeant4Manager. This will construct the
@@ -70,33 +76,72 @@ class MAUSGeant4Manager {
      */
     MAUSPrimaryGeneratorAction* GetPrimaryGenerator() const {return _primary;}
 
+    /** @brief Get the MAUSPhysicsList
+     */
+    MAUSPhysicsList* GetPhysicsList() const {return _physList;}
+
     /** @brief Get the Geometry
      */
     MICEDetectorConstruction* GetGeometry() const {return _detector;}
 
-    /** @brief Control whether step data is stored for each track
+    /** @brief Get the VirtualPlanes
+     */
+    VirtualPlaneManager* GetVirtualPlanes() const {return _virtPlanes;}
+
+    /** @brief Set the VirtualPlanes
      *
-     *  @params willStoreTracks Set to true to store every step for each track
-     *          in the Json track. Set to false to only store initial and final
-     *          position and momentum
+     *  Nb: this loses the pointer to the original virtual planes - so if caller
+     *  don't want to keep them, caller must delete the original virtual planes.
      */
-    void SetStoreTracks(bool willStoreTracks) {_storeTracks = willStoreTracks;}
+    void SetVirtualPlanes(VirtualPlaneManager* virt) {_virtPlanes = virt;}
 
-    /** @brief Get the flag controlling whether step data is stored
+    /** @brief Phased fields in the geometry (e.g. RF cavities)
+     *
+     *  If there are unphased fields in the geometry, SetPhases will attempt to
+     *  phase them using FieldPhaser. Throws an exception if the phasing fails.
      */
-    bool GetStoreTracks() {return _storeTracks;}
+    void SetPhases();
 
- private:
+    /** @brief Get the reference particle from json configuration
+     */
+    MAUSPrimaryGeneratorAction::PGParticle GetReferenceParticle();
+
+    /** @brief Run a particle through the simulation
+     *
+     *  @returns a json object with tracking, virtual hits and real hits
+     */
+    Json::Value RunParticle(MAUSPrimaryGeneratorAction::PGParticle p);
+
+    /** @brief Run a particle through the simulation
+     *
+     *  @returns copy of particle with any tracking output appended
+     *           to the particle. Following branches will be overwritten with
+     *           tracking output from this event:\n
+     *             "tracks", "virtual_hits", "hits"
+     */
+    Json::Value RunParticle(Json::Value particle);
+
+  private:
     MAUSGeant4Manager();
     ~MAUSGeant4Manager();
 
     G4RunManager* _runManager;
     MICEPhysicsList* _physList;
     MAUSPrimaryGeneratorAction* _primary;
-    MAUSSteppingAction*          _stepAct;
-    MAUSTrackingAction*          _trackAct;
-    MICEDetectorConstruction*    _detector;
-    bool                         _storeTracks;
+    MAUSSteppingAction*         _stepAct;
+    MAUSTrackingAction*         _trackAct;
+    MICEDetectorConstruction*   _detector;
+    VirtualPlaneManager*        _virtPlanes;
+
+    Json::Value Tracking(MAUSPrimaryGeneratorAction::PGParticle p);
+
+    // Following functions should go in G4UserEventAction derivative class
+    void BeginOfEventAction(const G4Event *anEvent);
+    void EndOfEventAction(const G4Event *anEvent);
+    void SetEvent(Json::Value particle);
+    Json::Value GetEvent() {return _event;}
+    void StoreTracking();
+    Json::Value _event;
 };
 
 }  // namespace MAUS

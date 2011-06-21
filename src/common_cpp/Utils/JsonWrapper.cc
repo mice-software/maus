@@ -108,10 +108,29 @@ Json::ValueType JsonWrapper::JsonTypeToValueType(JsonWrapper::JsonType tp)
   }
 }
 
+CLHEP::Hep3Vector JsonWrapper::JsonToThreeVector
+                                       (Json::Value j_vec) throw(Squeal) {
+    if (!j_vec.isObject())
+      throw(Squeal(Squeal::recoverable,
+                  "Could not convert Json value of non-object type to three vector",
+                  "JsonWrapper::JsonToThreeVector(...)"
+            ));
+    CLHEP::Hep3Vector c_vec;
+    c_vec[0] = JsonWrapper::GetProperty(j_vec, "x", JsonWrapper::realValue).asDouble();
+    c_vec[1] = JsonWrapper::GetProperty(j_vec, "y", JsonWrapper::realValue).asDouble();
+    c_vec[2] = JsonWrapper::GetProperty(j_vec, "z", JsonWrapper::realValue).asDouble();
+    return c_vec;
+}
 
 bool JsonWrapper::SimilarType(JsonWrapper::JsonType jt1,
                               JsonWrapper::JsonType jt2) {
   return (jt1 == jt2 || jt1 == JsonWrapper::anyValue
                      || jt2 == JsonWrapper::anyValue);
+}
+
+void JsonWrapper::Print(std::ostream& out, const Json::Value& val) {
+  Json::FastWriter writer;
+  out << writer.write(val);
+
 }
 

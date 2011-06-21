@@ -24,47 +24,46 @@
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Simulation/MAUSSteppingAction.hh"
 #include "src/common_cpp/Simulation/VirtualPlanes.hh"
+#include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
+
 
 namespace MAUS {
 
-MAUSSteppingAction::MAUSSteppingAction() : _keepTracks(false) {
+MAUSSteppingAction::MAUSSteppingAction() : _steps(), _keepSteps(false),
+    _maxNSteps(0) {
   Json::Value& conf = *MICERun::getInstance()->jsonConfiguration;
   _maxNSteps = JsonWrapper::GetProperty
                (conf, "maximum_number_of_steps", JsonWrapper::intValue).asInt();
+  _keepSteps = JsonWrapper::GetProperty
+               (conf, "keep_steps", JsonWrapper::booleanValue).asBool();
 }
 
 void MAUSSteppingAction::UserSteppingAction(const G4Step * aStep) {
-
-    G4Track* aTrack = aStep->GetTrack();
-    if (!aTrack) return;
-    std::stringstream ss;
-    ss << "track";
-    ss << aTrack->GetTrackID();
-
-    if ( _keepTracks ) {
-        if (!_tracks.isMember(ss.str())) {  //  new track, then
-            _tracks[ss.str()] = Json::Value();
-            _tracks[ss.str()]["steps"] = Json::Value(Json::arrayValue);
-            _tracks[ss.str()]["steps"].append(StepPointToJson
-                                                   (aStep, false));
+    // record all step points if keep steps flag is set
+    if (_keepSteps) {
+        if(_steps.size() == 0) {
+            _steps.append(StepToJson(aStep, true));
         }
-        _tracks[ss.str()]["steps"].append(StepPointToJson
-                                                   (aStep, true));
+        _steps.append(StepToJson(aStep, false));
     }
 
+    // kill particles that are looping
+    G4Track* aTrack = aStep->GetTrack();
     if (aTrack->GetCurrentStepNumber() > _maxNSteps) {
-        std::stringstream ss2;
-        ss2 << aTrack->GetCurrentStepNumber() <<  " steps greater than maximum "
-            << _maxNSteps << " - suspected of looping";
-        _tracks[ss.str()]["KillReason"] = Json::Value(ss2.str());
+        std::stringstream ss;
+        ss << aTrack->GetCurrentStepNumber() <<  " steps greater than maximum "
+           << _maxNSteps << " - suspected of looping";
+        MAUSGeant4Manager::GetInstance()->GetTracking()
+                  ->SetKillReason(aTrack, ss.str());
         aTrack->SetTrackStatus(fStopAndKill);
     }
 
     // find and append any virtual planes
-    VirtualPlaneManager::VirtualPlanesSteppingAction(aStep, &_tracks);
+    MAUSGeant4Manager::GetInstance()->
+                         GetVirtualPlanes()->VirtualPlanesSteppingAction(aStep);
 }
 
-Json::Value MAUSSteppingAction::StepPointToJson
+Json::Value MAUSSteppingAction::StepToJson
                                      (const G4Step* aStep, bool prestep) const {
     G4Track* aTrack = aStep->GetTrack();
     G4StepPoint* point = aStep->GetPostStepPoint();
@@ -94,5 +93,13 @@ Json::Value MAUSSteppingAction::StepPointToJson
 
     return step;
 }
+
+void  MAUSSteppingAction::SetSteps(Json::Value steps) {
+    if (!steps.isArray())
+        throw(Squeal(Squeal::recoverable, "Attempting to set steps to non-array type",
+              "MAUSSteppingAction::SetSteps()"));
+    _steps = steps;
+}
+
 
 }  //  ends MAUS namespace
