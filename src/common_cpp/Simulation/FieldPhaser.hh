@@ -43,7 +43,7 @@ class FieldPhaser {
   /** @brief Destructor - no memory alloc'd
    */
   ~FieldPhaser();
-  
+
   /** @brief Automatic routine to set the phases on RF cavities
    *
    *  MAUS can set phases on RF cavities automatically. The idea here is to
@@ -55,11 +55,14 @@ class FieldPhaser {
    *
    *  Some notes:\n
    *    If the particle fails to phase an RF cavity we throw an exception
+   *    We use methods in MAUSGeant4Manager to move virtual planes during the
+   *      execution of the phaser; we move them back at the end
+   *    We use methods in MICEPhysicsList to turn off stochastic processes
+   *      during the execution of the phaser; we turn them on at the end
    */
   void SetPhases();
 
  private:
-  // 
   void SetUp();
 
   void TearDown();

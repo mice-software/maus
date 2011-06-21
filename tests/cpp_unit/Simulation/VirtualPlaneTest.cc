@@ -243,7 +243,7 @@ class VirtualPlaneManagerTest : public ::testing::Test {
   VirtualPlaneManagerTest() : mod(), vpm() {
     mod.addPropertyString("SensitiveDetector", "Virtual");
     mod.addPropertyHep3Vector("Position", "0 0 1 m");
-    mod.addPropertyHep3Vector("Rotation", "0. 45. 0. degree");  
+    mod.addPropertyHep3Vector("Rotation", "0. 45. 0. degree");
   }
   virtual ~VirtualPlaneManagerTest() {}
   virtual void SetUp() {}
@@ -266,7 +266,7 @@ TEST_F(VirtualPlaneManagerTest, GetSetHitsTest) {
   Json::Value not_array(Json::objectValue);
   EXPECT_THROW(vpm.SetVirtualHits(not_array), Squeal);
 
-  Json::Value array(Json::arrayValue); 
+  Json::Value array(Json::arrayValue);
   array.append(Json::Value("hello"));
   EXPECT_NO_THROW(vpm.SetVirtualHits(array));
   EXPECT_EQ(array[Json::UInt(0)], vpm.GetVirtualHits()[Json::UInt(0)]);
@@ -497,25 +497,21 @@ TEST_F(VirtualPlaneManagerTest, RemovePlaneTest) {
   std::set<int> set_1;
   set_1.insert(2);
   vpm.RemovePlanes(set_1);
-  std::cerr << "Removing a" << std::endl;
   EXPECT_NO_THROW(vpm.GetStationNumberFromModule(&mod_a[0]));
   EXPECT_THROW(vpm.GetStationNumberFromModule(&mod_a[1]), Squeal);
   EXPECT_NO_THROW(vpm.GetStationNumberFromModule(&mod_a[2]));
   EXPECT_NO_THROW(vpm.GetStationNumberFromModule(&mod_a[2]));
   EXPECT_NO_THROW(vpm.GetStationNumberFromModule(&mod_a[4]));
-  std::cerr << "Removing b" << std::endl;
 
   std::set<int> set_2;
   set_2.insert(1);
   set_2.insert(4);
   vpm.RemovePlanes(set_2);
-  std::cerr << "Removing c" << std::endl;
   EXPECT_THROW(vpm.GetStationNumberFromModule(&mod_a[0]), Squeal);
   EXPECT_THROW(vpm.GetStationNumberFromModule(&mod_a[1]), Squeal);
   EXPECT_NO_THROW(vpm.GetStationNumberFromModule(&mod_a[2]));
   EXPECT_NO_THROW(vpm.GetStationNumberFromModule(&mod_a[3]));
   EXPECT_THROW(vpm.GetStationNumberFromModule(&mod_a[4]), Squeal);
-  std::cerr << "Removing d" << std::endl;
 }
 
 TEST_F(VirtualPlaneManagerTest, RemovePlanesTest) {

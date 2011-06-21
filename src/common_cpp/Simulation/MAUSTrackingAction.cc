@@ -16,6 +16,7 @@
  *
  */
 
+#include <string>
 #include <iostream>
 
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
@@ -98,8 +99,8 @@ void MAUSTrackingAction::PostUserTrackingAction(const G4Track* aTrack) {
 }
 
 void MAUSTrackingAction::SetTracks(Json::Value tracks) {
-    if (!tracks.isObject()) 
-        throw(Squeal(Squeal::recoverable, 
+    if (!tracks.isObject())
+        throw(Squeal(Squeal::recoverable,
               "Attempt to set tracks to non-object type",
               "MAUSTrackingAction::SetTracks()"));
     _tracks = tracks;

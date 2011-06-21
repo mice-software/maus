@@ -131,6 +131,5 @@ bool JsonWrapper::SimilarType(JsonWrapper::JsonType jt1,
 void JsonWrapper::Print(std::ostream& out, const Json::Value& val) {
   Json::FastWriter writer;
   out << writer.write(val);
-
 }
 

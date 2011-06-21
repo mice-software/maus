@@ -22,7 +22,7 @@ if which lcov >& /dev/null; then
     echo Clearing lcov
     lcov -q -b ${MAUS_ROOT_DIR} --directory src --zerocounters -q
 fi
-nosetests --with-coverage tests/integration/simulation/test_rf # build
+nosetests --with-coverage build
 if which lcov >& /dev/null; then 
     echo Building lcov output
     lcov  -q -b ${MAUS_ROOT_DIR} --directory src --capture --output-file maus.info

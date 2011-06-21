@@ -201,7 +201,7 @@ VirtualHit VirtualPlane::BuildNewHit(const G4Step * aStep, int station) const {
 
 const BTFieldGroup VirtualPlaneManager::_default_field;
 
-VirtualPlaneManager::VirtualPlaneManager() : _field(NULL), 
+VirtualPlaneManager::VirtualPlaneManager() : _field(NULL),
       _useVirtualPlanes(false), _planes(), _mods(), _nHits(0),
       _hits(Json::arrayValue) {
 }
@@ -244,7 +244,7 @@ void VirtualPlaneManager::VirtualPlanesSteppingAction
 }
 
 void VirtualPlaneManager::SetVirtualHits(Json::Value hits) {
-  if(!hits.isArray())
+  if (!hits.isArray())
     throw(Squeal(Squeal::recoverable, "Virtual hits must be of array type",
           "VirtualPlaneManager::SetVirtualHits()"));
   _hits = hits;
@@ -328,7 +328,6 @@ void VirtualPlaneManager::AddPlane(VirtualPlane* newPlane, const MiceModule* mod
   sort(_planes.begin(), _planes.end(), VirtualPlane::ComparePosition);
   _useVirtualPlanes = _planes.size() > 0;
   _nHits = std::vector<int>(_planes.size(), 0);
-
 }
 
 
@@ -350,7 +349,6 @@ int VirtualPlaneManager::GetStationNumberFromModule(const MiceModule* module) {
     throw(Squeal(Squeal::recoverable,
           "Module "+module->name()+" not found in VirtualPlaneManager",
           "VirtualPlaneManager::GetStationNumberFromModule"));
-    
   }
   for (size_t i = 0; i < _planes.size(); i++)
     if (plane == _planes[i]) return i+1; // find station from plane
@@ -395,7 +393,7 @@ Json::Value VirtualPlaneManager::WriteHit(VirtualHit hit) {
 }
 
 VirtualHit VirtualPlaneManager::ReadHit(Json::Value v_hit) {
-    Json::Value stationId = 
+    Json::Value stationId =
          JsonWrapper::GetProperty(v_hit, "station_id", JsonWrapper::intValue);
     Json::Value trackId =
          JsonWrapper::GetProperty(v_hit, "track_id", JsonWrapper::intValue);
@@ -431,7 +429,7 @@ VirtualHit VirtualPlaneManager::ReadHit(Json::Value v_hit) {
     hit.SetCharge(charge.asDouble());
     hit.SetProperTime(tau.asDouble());
     hit.SetPathLength(len.asDouble());
-    
+
     hit.SetPos(JsonWrapper::JsonToThreeVector(pos_v));
     hit.SetMomentum(JsonWrapper::JsonToThreeVector(mom_v));
     hit.SetBField(JsonWrapper::JsonToThreeVector(b_v));

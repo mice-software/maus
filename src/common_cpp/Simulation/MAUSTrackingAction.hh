@@ -18,6 +18,7 @@
 #ifndef _SRC_CPP_CORE_SIMULATION_MAUSTRACKINGACTION_HH_
 #define _SRC_CPP_CORE_SIMULATION_MAUSTRACKINGACTION_HH_
 
+#include <string>
 #include <sstream>  //  combining strings and numbers
 
 #include "json/json.h"  // for datastructure
@@ -73,7 +74,7 @@ class MAUSTrackingAction : public G4UserTrackingAction {
 
     /** @brief Return track name for track with given id
      */
-    std::string TrackName(int id); 
+    std::string TrackName(int id);
 
     /** @brief If MAUS kills a particle, give the reason here
      */
