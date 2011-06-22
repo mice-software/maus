@@ -1,16 +1,16 @@
-%module InputCppRealData
+%module InputCppData
  %{
  /* Includes the header in the wrapper code */
- #include "InputCppRealData.hh"
+ #include "InputCppData.hh"
 
  %}
 %include "std_string.i"
 
-%feature("shadow") InputCppRealData::emitter() %{
+%feature("shadow") InputCppData::emitter() %{
 def emitter(self):
   while (self.readNextEvent()):
     yield self.getCurEvent()
 %}
 
-%include "InputCppRealData.hh"
+%include "InputCppData.hh"
 

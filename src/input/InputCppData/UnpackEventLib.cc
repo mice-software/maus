@@ -15,7 +15,7 @@
  *
  */
 
-#include "src/input/InputCppRealData/UnpackEventLib.hh"
+#include "src/input/InputCppData/UnpackEventLib.hh"
 
 #include <stdint.h>
 

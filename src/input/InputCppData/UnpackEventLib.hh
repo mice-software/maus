@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef _MAUS_INPUTCPPREALDATA_UNPACKEVENTLIB_HH_
-#define _MAUS_INPUTCPPREALDATA_UNPACKEVENTLIB_HH_
+#ifndef _MAUS_INPUTCPPDATA_UNPACKEVENTLIB_HH_
+#define _MAUS_INPUTCPPDATA_UNPACKEVENTLIB_HH_
 
 #include <stdint.h>
 
@@ -26,7 +26,7 @@
   * 
   *
   * This class unpacks a V830 (scalar) board hit.
-  * This is based on the original MICE RealData Module.
+  * This is based on the original MICE Data Module.
   *
  */
 class V830Hit {
@@ -48,7 +48,7 @@ public
   * 
   *
   * This class unpacks a V1290 (TDC) board hit.
-  * This is based on the original MICE RealData Module.
+  * This is based on the original MICE Data Module.
   *
  */
 class V1290Hit {
@@ -70,7 +70,7 @@ public
   * 
   *
   * This class unpacks a V1724 (ADC) board hit.
-  * This is based on the original MICE RealData Module.
+  * This is based on the original MICE Data Module.
   *
  */
 class V1724Hit {
@@ -80,7 +80,7 @@ private
  *
  * This function takes a channel mask and works out
  * how many channels are enabled.
- * Copied from the MICE RealData module.
+ * Copied from the MICE Data module.
  *
  * \param[in] pMask The mask to process.
  * \return The number of channels enabled in the mask.
@@ -105,7 +105,7 @@ public
   * 
   *
   * This class unpacks a V1731 (ADC) board hit.
-  * This is based on the original MICE RealData Module.
+  * This is based on the original MICE Data Module.
   *
  */
 class V1731Hit {
@@ -123,4 +123,4 @@ public
                       Json::Value &pDoc);
 };
 
-#endif  // _MAUS_INPUTCPPREALDATA_UNPACKEVENTLIB_H__
+#endif  // _MAUS_INPUTCPPDATA_UNPACKEVENTLIB_H__

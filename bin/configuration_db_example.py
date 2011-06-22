@@ -1,6 +1,7 @@
+#!/usr/bin/env python
+
 """Configuration database demo macro
 """
-#!/usr/bin/env python
 
 #################################################################
 ###!!! YOU ARE NOT ALLOWED TO MODIFY THIS FILE DIRECTLY    !!!###
@@ -16,7 +17,7 @@ from cdb import Beamline       #  get beamline information for some run
 
 def run():
     """Fetch information from the configuration database
-    
+
     This script will show you how to fetch information from the configuration
     database.  It will run you through many of the steps so you can use this
     within your own macro.
@@ -36,7 +37,7 @@ def run():
     print
     print '\tbeamline = Beamline()'
     beamline = Beamline()
-    
+
     print
     print 'which was easy enough.  You can check that the beamline class was'
     print 'set up correctly by running:'
@@ -63,7 +64,7 @@ def run():
     print run_info.keys()
     print
     print 'where the .keys() stuff only prints the run number since the data-'
-    print 'type is a dictionary.'  
+    print 'type is a dictionary.'
 
     print "Let's say you want the magnet current for a certain run:"
     print
@@ -73,7 +74,7 @@ def run():
     print my_runs[2873]['magnets']['d1']['setCurrent']
 
     print 'Lastly you can search by target pulses:'
-    print 
+    print
     print '\tget_beamlines_for_pulses(565665,565864).keys()'
     print beamline.get_beamlines_for_pulses(565665, 565864).keys()
     print
