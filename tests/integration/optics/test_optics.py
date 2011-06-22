@@ -9,9 +9,7 @@ import os
 
 os.chdir(os.getenv('MAUS_ROOT_DIR')+'/tests/integration/optics')
 for test in ['mapping', 'optimiser', 'rf', '6d', 'polyfit']:
-  run_command = './optics files/cards.'+test+' >& log.'+test
-  print run_command
-  os.system(run_command)
-
-
+    run_command = './optics files/cards.'+test+' >& log.'+test
+    print run_command
+    os.system(run_command)
 
