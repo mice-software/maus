@@ -29,7 +29,7 @@ class test_python_style(unittest.TestCase):
         """
         file_out = os.path.join(maus_root_dir, 'tmp', 'pylint.out')
         fh = open(file_out, 'w')
-        errors = 0
+        error_files = []
         for target_dir in include_dirs:
             target_dir = os.path.join(maus_root_dir, target_dir)
             for root_dir, ls_dirs, ls_files in os.walk(target_dir):
@@ -38,10 +38,9 @@ class test_python_style(unittest.TestCase):
                     maus_dir = root_dir[len(maus_root_dir)+1:] #root_dir relative to maus
                     file_name = os.path.join(maus_dir, file_name)
                     errors = self.run_pylint(file_name, fh)
-                    if errors > 0:
-                        print file_name,errors
-                    if errors > 30:
-                        raise('Too many style errors in file ',file_name)
+                    error_files.append(file_name)
+        if len(error_files) > 0:
+            raise RuntimeError('Style errors in following files (see tmp/pylint.out for details)\n'+str(error_files))
         return 0
 
 include_dirs = ['tests', 'src', 'bin', 'doc']
