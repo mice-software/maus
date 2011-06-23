@@ -2,9 +2,9 @@ import os
 import md5
 import unittest
 
-from InputCppRealData import InputCppRealData
+from InputCppData import InputCppData
 
-class InputCppRealDataTestCase(unittest.TestCase):
+class InputCppDataTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
@@ -12,12 +12,12 @@ class InputCppRealDataTestCase(unittest.TestCase):
             raise Exception('InitializeFail', 'MAUS_ROOT_DIR unset!')
         # Set our data path & filename
         # It would be nicer to test with a smaller data file!
-        self._datapath = '%s/src/input/InputCppRealData' % \
+        self._datapath = '%s/src/input/InputCppData' % \
                             os.environ.get("MAUS_ROOT_DIR")
         self._datafile = '02873.003'
 
     def test_init(self):
-        self.mapper = InputCppRealData(self._datapath, \
+        self.mapper = InputCppData(self._datapath, \
                                        self._datafile)
         self.assertTrue(self.mapper.birth("{}"))
         # Check re-init without closing fails
@@ -27,7 +27,7 @@ class InputCppRealDataTestCase(unittest.TestCase):
 
     # Test a single event
     def test_single(self):
-        self.mapper = InputCppRealData(self._datapath, \
+        self.mapper = InputCppData(self._datapath, \
                                        self._datafile)
         self.assertTrue(self.mapper.birth("{}"))
         # Get a single event and check it's the right size
@@ -40,7 +40,7 @@ class InputCppRealDataTestCase(unittest.TestCase):
 
     # Test reading the whole file
     def test_multi(self):
-        self.mapper = InputCppRealData(self._datapath, \
+        self.mapper = InputCppData(self._datapath, \
                                        self._datafile)
         self.assertTrue(self.mapper.birth("{}"))
         event_count = 0

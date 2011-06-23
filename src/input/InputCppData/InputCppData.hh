@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef _MAUS_INPUTCPPREALDATA_INPUTCPPREALDATA_H__
-#define _MAUS_INPUTCPPREALDATA_INPUTCPPREALDATA_H__
+#ifndef _MAUS_INPUTCPPDATA_INPUTCPPDATA_H__
+#define _MAUS_INPUTCPPDATA_INPUTCPPDATA_H__
 
 #include <json/json.h>
 #include <MDdateFile.h>
@@ -25,14 +25,16 @@
 #include <string>
 
 
-/** \class InputCppRealData
+/** \class InputCppData
   * Load MICE raw data and unpack it into a JSON stream.
   *
-  * This class is a prototype "RealData" module for MAUS.
-  * This is based on the original MICE RealData Module.
+  * This module reads data in the format of the MICE DAQ.  It drives the
+  * 'unpacker' library to do this conversion.  The end result is the MICE data
+  * in JSON format.  The data includes TDC and flash ADC values, so this
+  * information is low-level.
   *
   */
-class InputCppRealData {
+class InputCppData {
 private
 :
 /** Debug flag,
@@ -90,14 +92,14 @@ private
 public
 :
 
-/** Create an instance of InputCppRealData.
+/** Create an instance of InputCppData.
   * 
-  * This is the constructor for InputCppRealData.
+  * This is the constructor for InputCppData.
   *
   * \param[in] pDataPath The (directory) path to read the data from
   * \param[in] pFilename The filename to read from the pDataPath directory
   */
-  InputCppRealData(std::string pDataPath = "", std::string pFilename = "");
+  InputCppData(std::string pDataPath = "", std::string pFilename = "");
 
 /** Initialise the Unpacker.
   * 
@@ -135,10 +137,10 @@ public
   */
   bool death();
 
-  ~InputCppRealData();
+  ~InputCppData();
 
   /* Functions for python use only! 
-   * They are written in InputCppRealData.i so that they
+   * They are written in InputCppData.i so that they
    * can use pure python code in the python bindings!
    */
 
@@ -155,4 +157,4 @@ public
   };
 };
 
-#endif  // _MAUS_INPUTCPPREALDATA_INPUTCPPREALDATA_H__
+#endif  // _MAUS_INPUTCPPDATA_INPUTCPPDATA_H__

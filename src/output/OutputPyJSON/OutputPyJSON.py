@@ -40,13 +40,16 @@ class OutputPyJSON:
 
     """
 
-    def __init__(self, arg_file = gzip.GzipFile("mausput.gz", 'w')):
+    def __init__(self, arg_file = None):
         """OutputPyJSON constructor
 
         \param arg_file arg_file is a file object.
-        The default is to write uncompressed
-        to the filename 'mausput'.
+        The default is to write compressed
+        to the filename 'output.gz'.
         """
+
+        if arg_file == None:
+            arg_file = gzip.GzipFile("output.gz", 'w')
         assert not isinstance(arg_file, str)
         self.file = arg_file
 

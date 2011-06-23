@@ -44,7 +44,6 @@ Squeal::Squeal(exceptionLevel level, std::string errorMessage,
   std::string what_str = _message+" at "+_location;
   _what = std::vector<char>(what_str.size()+1);
   snprintf(&_what[0], what_str.size()+1, "%s", what_str.c_str());
-  Print();
 }
 
 void Squeal::Print() {

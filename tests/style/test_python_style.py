@@ -37,14 +37,13 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
         counting the number of lines in the pylint summary file. If this
         increases, throws an error.
         """
-        current_n_python_errors = 2434 # Rogers, 23/06/2011
+        current_n_python_errors = 1959 # Rogers, 23/06/2011
         file_out = os.path.join(self.maus_root_dir, 'tmp', 'pylint.out')
         fout = open(file_out, 'w')
         error_files = []
         for target_dir in self.include_dirs:
             target_dir = os.path.join(self.maus_root_dir, target_dir)
             for root_dir, dummy, ls_files in os.walk(target_dir):
-#                if (ls_dirs): pass
                 ls_files = [f for f in ls_files if f[-3:] == '.py']
                 for file_name in ls_files:
                     #maus_dir is root_dir relative to maus

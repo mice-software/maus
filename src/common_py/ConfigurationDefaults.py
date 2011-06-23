@@ -27,10 +27,10 @@ map_reduce_type = "native_python" # can also be "native_python_profile" using cP
 # 0 = debug info (and std::cout)
 # 1 = run info
 # 2 = warnings
-# 3 = errors
+# 3 = errors (and std::cerr)
 # 4 = fatal
 # >4 = silent
-# doesnt effect python stuff
+# Doesnt effect python
 verbose_level = 2
 
 # Used by MapPyRemoveTracks.

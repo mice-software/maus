@@ -90,7 +90,7 @@ void __TestStdOutputs(int i) {
 }
 
 TEST(SqueakTest, GetOutputsTest) {
-  __TestStdOutputs(0);
+  __TestStdOutputs(2);  // update to follow default verbose level
 }
 
 TEST(SqueakTest, ActivateCoutTest) {

@@ -15,16 +15,16 @@
  *
  */
 
-#include "src/input/InputCppRealData/InputCppRealData.hh"
+#include "src/input/InputCppData/InputCppData.hh"
 
 #include <json/json.h>
 
 #include <string>
 #include <iostream>
 
-#include "src/input/InputCppRealData/UnpackEventLib.hh"
+#include "src/input/InputCppData/UnpackEventLib.hh"
 
-InputCppRealData::InputCppRealData(std::string pDataPath,
+InputCppData::InputCppData(std::string pDataPath,
                                    std::string pFilename) {
   _debug = false;
   _eventPtr = NULL;
@@ -34,7 +34,7 @@ InputCppRealData::InputCppRealData(std::string pDataPath,
 }
 
 
-bool InputCppRealData::birth(std::string jsonDataCards) {
+bool InputCppData::birth(std::string jsonDataCards) {
   if (_inputFile)
     return false;  // Fail because file is open
 
@@ -57,7 +57,7 @@ bool InputCppRealData::birth(std::string jsonDataCards) {
 }
 
 
-bool InputCppRealData::readNextEvent() {
+bool InputCppData::readNextEvent() {
   _eventPtr = _inputFile->GetNextEvent();
   if (!_eventPtr)
     return false;
@@ -65,7 +65,7 @@ bool InputCppRealData::readNextEvent() {
 }
 
 
-std::string InputCppRealData::getCurEvent() {
+std::string InputCppData::getCurEvent() {
   Json::Value xDocRoot;  // Root of the event
   Json::FastWriter xJSONWr;
 
@@ -105,7 +105,7 @@ std::string InputCppRealData::getCurEvent() {
 }
 
 
-void InputCppRealData::processLDCEvent(MDevent *pEvent,
+void InputCppData::processLDCEvent(MDevent *pEvent,
                                        Json::Value &pDoc) {
   // Decide what to do with this type of event
   switch (*(pEvent->EventTypePtr())) {
@@ -226,7 +226,7 @@ void InputCppRealData::processLDCEvent(MDevent *pEvent,
 }
 
 
-void InputCppRealData::processHits(void *pPartEvntPtr,
+void InputCppData::processHits(void *pPartEvntPtr,
                                    unsigned int pEquipType,
                                    unsigned int pLdcId,
                                    Json::Value &pDoc) {
@@ -269,7 +269,7 @@ void InputCppRealData::processHits(void *pPartEvntPtr,
 }
 
 
-bool InputCppRealData::death() {
+bool InputCppData::death() {
   if (_inputFile) {
     delete _inputFile;
     _inputFile = NULL;
@@ -278,7 +278,7 @@ bool InputCppRealData::death() {
 }
 
 
-InputCppRealData::~InputCppRealData() {
+InputCppData::~InputCppData() {
   return;
 }
 
