@@ -11,10 +11,10 @@ from base64 import b64decode
 def main():
     from GDMLtoCDB import gdmltocdb
     from GDMLtoCDB import downloader
-    geometry1 = gdmltocdb('/home/matt/NetBeansProjects/MAUSConfigPY/src/GDML', 1)
-    #geometry1.uploadToCDB()
+    geometry1 = gdmltocdb('/home/matt/NetBeansProjects/MAUSConfigPY/src/GDML', "test geometry case", 1)
+    geometry1.uploadToCDB()
     dlgeometry = downloader(1)
-    dlgeometry.downloadCurrent()
+    #dlgeometry.downloadCurrent()
     
 if __name__ == "__main__":
     main()
@@ -28,7 +28,7 @@ class gdmltocdb:
     into a test file. This list of files and the contents of each individual file is then copied into one string
     and encoded and uploaded to the CDB.
     """
-    def __init__(self, filepath, testserver):
+    def __init__(self, filepath, notes, testserver):
         """
         @Method Class constructor
 
@@ -38,6 +38,11 @@ class gdmltocdb:
         @Param filepath path of the directory which contains the GDML files
         @Param type 1 to set up the test server leave blank for real server
         """
+        #change unit tests
+        if type(notes) != str:
+            raise IOError('the note describing the geometry must be filled in', 'gdmltocdb::__init__')
+        else:
+            self.Notes = notes
         self.UploadString = ""
         filelist = []
         self.GeometryFiles = filelist
@@ -55,7 +60,7 @@ class gdmltocdb:
         gdmls = os.listdir(self.FilePath)
         for fname in gdmls:
             if fname[-4:] != '.xml' and fname[-5:] != '.gdml':
-                raise IOError("directory conmtains file which are not XMLs or GDMLs", "gdmltocdb::__init__")
+                raise IOError("directory contains files which are not XMLs or GDMLs", "gdmltocdb::__init__")
         NumOfFiles = len(gdmls)
         path = self.FilePath + "/FileList.txt"
         fout = open(path, 'w')
@@ -95,8 +100,8 @@ class gdmltocdb:
         fin2.close()
         _dt = datetime.today()
         _gdml = b64encode(self.UploadString)
-        self.Geometry.setGDML(_gdml, _dt)
-        print self.Geometry.setGDML(_gdml, _dt)
+        self.Geometry.setGDML(_gdml, _dt, self.Notes)
+        print self.Geometry.setGDML(_gdml, _dt, self.Notes)
 
 class downloader:
     """
