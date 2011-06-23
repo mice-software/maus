@@ -67,7 +67,7 @@ class MapCppSimulationTestCase(unittest.TestCase):
             self.assertIn("final_position", ev)
 
     configuration = """{
-      "verbose_level":0,
+      "verbose_level":2,
       "simulation_geometry_filename":"Test.dat",
       "maximum_number_of_steps":1000,
       "keep_steps":true,

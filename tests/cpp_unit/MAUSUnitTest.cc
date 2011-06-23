@@ -41,14 +41,14 @@
 
 std::string jsonconfig =
   std::string("{\"maximum_number_of_steps\":10000, \"keep_tracks\":true, ")+
-  std::string("\"keep_steps\":true, \"verbose_level\":1}");
+  std::string("\"keep_steps\":true, \"verbose_level\":2}");
 
 
 int main(int argc, char **argv) {
   ///// Try to keep static set up to a minimum (not very unit testy)
-  dataCards MyDataCards(0);
   MICERun::getInstance()->jsonConfiguration =
     new Json::Value(JsonWrapper::StringToJson(jsonconfig)); // delete me!
+  dataCards MyDataCards(0);
   MICERun::getInstance()->DataCards = &MyDataCards;
   MICERun::getInstance()->miceModule = new MiceModule("Test.dat"); // delete me!
   MICERun::getInstance()->miceMaterials = new MiceMaterials(); // delete me!
