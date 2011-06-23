@@ -54,7 +54,7 @@ int main(int argc, char **argv) {
   MICERun::getInstance()->miceMaterials = new MiceMaterials(); // delete me!
   fillMaterials(*MICERun::getInstance());
   Squeak::setOutput(Squeak::debug, Squeak::nullOut());
-
+  Squeak::setStandardOutputs();
   ::testing::InitGoogleTest(&argc, argv);
   int test_out = RUN_ALL_TESTS();
   return test_out;
