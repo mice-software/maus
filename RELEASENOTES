@@ -5,6 +5,11 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 Release Notes
 =============
 
+MAUS-v0.0.3 summary
+- Added RF cavity phasing routine
+- Added a test to check for python style
+- Streamlined the routines for handling errors between python and C++
+
 MAUS-v0.0.2 summary
 - Added BeamMaker prototype
 
