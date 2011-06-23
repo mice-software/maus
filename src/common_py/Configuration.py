@@ -29,7 +29,9 @@ class Configuration:
     #  then (if applicable) values are added/replaced
     #  by the passed file.  A JSON file is returned.
     #
-    #  \param configFile (optional) overriding configuration
+    #  \param configFile (optional) overriding configuration.  If None then this
+    #                    argument is ignored. If it is a python file handle (ie.
+    #                    open('my_config.dat','r') ) then that file is read.
     def getConfigJSON(self, configFile = None):
         MAUSRootDir = os.environ.get('MAUS_ROOT_DIR')
         assert MAUSRootDir != None
