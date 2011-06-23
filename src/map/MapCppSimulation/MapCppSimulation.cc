@@ -93,9 +93,7 @@ void MapCppSimulation::SetConfiguration(std::string json_configuration) {
   fillMaterials(simRun);
   _g4manager = MAUSGeant4Manager::GetInstance();
   // RF cavity phases
-  std::cerr << "Setting phases" << std::endl;
   _g4manager->SetPhases();
-  std::cerr << "Done" << std::endl;
   Squeak::mout(Squeak::info) << "Fields:" << std::endl;
   simRun.btFieldConstructor->Print(Squeak::mout(Squeak::info));
 }

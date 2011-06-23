@@ -33,8 +33,6 @@
 #include "src/legacy/Config/MiceModule.hh"
 #include "src/legacy/Interface/MiceMaterials.hh"
 #include "src/legacy/Simulation/FillMaterials.hh"
-dataCards MyDataCards(0);
-MICEEvent simEvent;
 /////////// Needed until persistency move is done //////////////
 
 /////////// Needed until I clean up legacy tests to gtest framework //////////
@@ -48,12 +46,13 @@ std::string jsonconfig =
 
 int main(int argc, char **argv) {
   ///// Try to keep static set up to a minimum (not very unit testy)
+  dataCards MyDataCards(0);
+  MICERun::getInstance()->jsonConfiguration =
+    new Json::Value(JsonWrapper::StringToJson(jsonconfig)); // delete me!
   MICERun::getInstance()->DataCards = &MyDataCards;
   MICERun::getInstance()->miceModule = new MiceModule("Test.dat"); // delete me!
   MICERun::getInstance()->miceMaterials = new MiceMaterials(); // delete me!
   fillMaterials(*MICERun::getInstance());
-  MICERun::getInstance()->jsonConfiguration =
-    new Json::Value(JsonWrapper::StringToJson(jsonconfig)); // delete me!
   Squeak::setOutput(Squeak::debug, Squeak::nullOut());
 
   ::testing::InitGoogleTest(&argc, argv);

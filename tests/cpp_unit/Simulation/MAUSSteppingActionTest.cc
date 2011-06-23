@@ -40,7 +40,15 @@ class MAUSSteppingActionTest : public ::testing::Test {
 
     step = new G4Step(); // memory leak?
     point = new G4StepPoint();
+    point->SetPosition(G4ThreeVector(1., 2., 3.));
+    point->SetMass(pd->GetPDGMass());
+    point->SetMomentumDirection(G4ThreeVector(0., sqrt(0.5), sqrt(0.5)));
+    point->SetKineticEnergy(100.);
     post = new G4StepPoint();
+    post->SetPosition(G4ThreeVector(7., 8., 9.));
+    post->SetMass(pd->GetPDGMass());
+    post->SetMomentumDirection(G4ThreeVector(sqrt(1./3.), sqrt(1./3.), sqrt(1./3.)));
+    post->SetKineticEnergy(110.);
     post->SetGlobalTime(-10.);
     track->SetStep(step);
     step->SetTrack(track);
@@ -122,23 +130,21 @@ TEST_F(MAUSSteppingActionTest, UserSteppingActionWriteStepsTest) {
 }
 // test that we write to json correctly
 TEST_F(MAUSSteppingActionTest, StepToJsonTest) {
-  std::cerr << "WARNING - MAUSSteppingActionTest::StepToJsonTest unstable"
-            << std::endl;
   Json::Value out = stepping->StepToJson(step, true);
-  EXPECT_DOUBLE_EQ(out["position"]["x"].asDouble(), 2.);
-  EXPECT_DOUBLE_EQ(out["position"]["y"].asDouble(), 3.);
-  EXPECT_DOUBLE_EQ(out["position"]["z"].asDouble(), 4.);
-  EXPECT_DOUBLE_EQ(out["momentum"]["x"].asDouble(), 9.);
-  EXPECT_DOUBLE_EQ(out["momentum"]["y"].asDouble(), 18.);
-  EXPECT_DOUBLE_EQ(out["momentum"]["z"].asDouble(), 27.);
+  EXPECT_DOUBLE_EQ(out["position"]["x"].asDouble(), point->GetPosition().x());
+  EXPECT_DOUBLE_EQ(out["position"]["y"].asDouble(), point->GetPosition().y());
+  EXPECT_DOUBLE_EQ(out["position"]["z"].asDouble(), point->GetPosition().z());
+  EXPECT_DOUBLE_EQ(out["momentum"]["x"].asDouble(), point->GetMomentum().x());
+  EXPECT_DOUBLE_EQ(out["momentum"]["y"].asDouble(), point->GetMomentum().y());
+  EXPECT_DOUBLE_EQ(out["momentum"]["z"].asDouble(), point->GetMomentum().z());
   EXPECT_DOUBLE_EQ(out["energy_deposited"].asDouble(), 8.);
-  EXPECT_DOUBLE_EQ(out["energy"].asDouble(), 9.);
-  EXPECT_DOUBLE_EQ(out["time"].asDouble(), 1.);
-  EXPECT_DOUBLE_EQ(out["proper_time"].asDouble(), 2.);
-  EXPECT_DOUBLE_EQ(out["path_length"].asDouble(), 10.);
+  EXPECT_DOUBLE_EQ(out["energy"].asDouble(), point->GetTotalEnergy());
+  EXPECT_DOUBLE_EQ(out["time"].asDouble(), point->GetGlobalTime());
+  EXPECT_DOUBLE_EQ(out["proper_time"].asDouble(), point->GetProperTime());
+  EXPECT_DOUBLE_EQ(out["path_length"].asDouble(), track->GetTrackLength());
 
   out = stepping->StepToJson(step, false);
-  EXPECT_DOUBLE_EQ(out["time"].asDouble(), -10.);
+  EXPECT_DOUBLE_EQ(out["time"].asDouble(), post->GetGlobalTime());
 }
 G4Track* SetG4TrackAndStep(G4Step* step) {
   G4ParticleDefinition* pd =
