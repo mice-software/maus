@@ -70,11 +70,11 @@ Squeak * Squeak::getInstance() {
 }
 
 Squeak::Squeak() {
-  // verboseLevel defaults to debug if datacards not defined (safest)
-  int verboseLevel = 0;
+  // verboseLevel defaults to warning if datacards not defined (config default)
+  int verboseLevel = 2;
   if (datacards != NULL) {
-    // note defaults to 0 (null)
-    verboseLevel = (*datacards)["verbose_level"].asInt();
+    if (!((*datacards)["verbose_level"].isNull()))
+      verboseLevel = (*datacards)["verbose_level"].asInt();
   }
   initialiseOutputs();
 
