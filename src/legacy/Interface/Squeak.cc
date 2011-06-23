@@ -72,9 +72,10 @@ Squeak * Squeak::getInstance() {
 Squeak::Squeak() {
   // verboseLevel defaults to debug if datacards not defined (safest)
   int verboseLevel = 0;
-  if (datacards != NULL)
-    verboseLevel = JsonWrapper::GetProperty(*datacards, "verbose_level", 
-                            JsonWrapper::intValue).asInt();
+  if (datacards != NULL) {
+    // note defaults to 0 (null)
+    verboseLevel = (*datacards)["verbose_level"].asInt();
+  }
   initialiseOutputs();
 
   for (int i = 0; i <= fatal; ++i) {
@@ -87,8 +88,7 @@ Squeak::Squeak() {
 void Squeak::setStandardOutputs(int verboseLevel) {
   getInstance();
   if (verboseLevel < 0 && instance->datacards != NULL) {
-    verboseLevel = JsonWrapper::GetProperty(*datacards, "verbose_level", 
-                            JsonWrapper::intValue).asInt();
+    verboseLevel = (*datacards)["verbose_level"].asInt();
   }
   activateCout(verboseLevel <= Squeak::debug);
   activateClog(verboseLevel <= Squeak::info);
