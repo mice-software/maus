@@ -1,7 +1,7 @@
 import os.path
 import os
 import sys
-lib_path = os.path.abspath('../../../argparse-1.2.1')
+lib_path = os.path.abspath('../../../../argparse-1.2.1')
 sys.path.append(lib_path)
 import argparse
 from GDMLPacker import packer

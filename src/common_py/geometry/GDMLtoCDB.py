@@ -1,7 +1,7 @@
 import os.path
 import os
 import sys
-lib_path = os.path.abspath('../../../suds-0.3.9/')
+lib_path = os.path.abspath('../../../../suds-0.3.9/')
 sys.path.append(lib_path)
 from suds.client import Client
 from datetime import datetime

@@ -62,7 +62,7 @@ class formatter:
                      self.OldLine = line
             fin.close()
             path = self.Path + File
-            fin = open(path, 'r')
+            fin = open(File, 'r')
             for lines in fin.readlines():
                 self.Text += lines
             fin.close()

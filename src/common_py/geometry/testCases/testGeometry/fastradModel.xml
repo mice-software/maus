@@ -1,19 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!DOCTYPE gdml [
-<!ENTITY materials SYSTEM "/home/matt/Desktop/Matt/CAD2G4/GDML_fastradModel/fastradModel_materials.xml">
-]>
-
-<!--   GDML translation from the Fastrad file : "fastradModel.ray"
+<!ENTITY materials SYSTEM "/home/matt/maus_littlefield/src/common_py/geometry/testCases/testGeometry/fastradModel_materials.xml"><!--   GDML translation from the Fastrad file : "fastradModel.ray"
 	Processed the 2011/01/14 at 10h17 by the GDML module of Fastrad 3.1.0.2
 	Result file : "fastradModel.gdml"
 -->
 
 <gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- xsi:noNamespaceSchemaLocation="GDML_3_0_0/schema/gdml.xsd"
- xmlns:gdml="http://cern.ch/2001/Schemas/GDML">
-
-
+xsi:noNamespaceSchemaLocation="GDML_3_0_0/schema/gdml.xsd" xmlns:gdml="http://cern.ch/2001/Schemas/GDML">
 <define>
 	<constant name="HALFPI" value="pi/2."/>
 	<constant name="PI" value="1.*pi"/>
