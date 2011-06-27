@@ -2,10 +2,13 @@ import os.path
 import zipfile
 from datetime import datetime
 
-#def main():
+def main():
+    from GDMLPacker import packer
+    zip = packer("GDML/FileList.txt")
+    zip.zipfile()
 
-#if __name__ == "__main__":
-#    main()
+if __name__ == "__main__":
+    main()
 
 # need to re write comments and tests as it has been changed
 class packer:
@@ -47,6 +50,14 @@ class packer:
         @Param Output Path, specify the output path of the zipfile
         """
         dt = str(datetime.today())
+        dt = dt.replace('', 'Year', 1)
+        dt = dt.replace('-', 'Mon', 1)
+        dt = dt.replace('-', 'Day', 1)
+        dt = dt.replace(' ', 'Hour', 1)
+        dt = dt.replace(':', 'Min', 1)
+        end = dt.find(':')
+        dt = dt[0:end]
+        print dt
         zippath = path + "/" + dt +".zip"
         file = zipfile.ZipFile(zippath, 'w')
         fin = open(self.FileList, 'r')

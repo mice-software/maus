@@ -1,7 +1,7 @@
 import os.path
 import os
 import sys
-lib_path = os.path.abspath('../../../../suds-0.3.9/')
+lib_path = os.path.abspath('../../../suds-0.3.9/')
 sys.path.append(lib_path)
 from suds.client import Client
 from datetime import datetime
@@ -36,6 +36,7 @@ class gdmltocdb:
         list of files etc needed to be uploaded. 
 
         @Param filepath path of the directory which contains the GDML files
+        @Param notes must be a string briefly describing the geometry
         @Param type 1 to set up the test server leave blank for real server
         """
         #change unit tests
@@ -88,15 +89,15 @@ class gdmltocdb:
         for lines in fin1.readlines():
             str = lines
             self.UploadString += str
-            self.UploadString += "<-file name->\n"
+            self.UploadString += "<!--  File Name  -->\n"
         fin1.close()
-        self.UploadString += "\nThis line is the file seperator!!\n"
+        self.UploadString += "\n<!--  End of File  -->\n"
         for num in range(0, NumOfFiles):
             fin2 = open(self.GeometryFiles[num], 'r')
             for lines in fin2.readlines():
                 str = lines
                 self.UploadString += str
-            self.UploadString += "\nThis line is the file seperator!!\n"
+            self.UploadString += "\n<!--  End of File  -->\n"
         fin2.close()
         _dt = datetime.today()
         _gdml = b64encode(self.UploadString)
@@ -137,7 +138,7 @@ class downloader:
         to the related gdml files and write the contents to these files. 
         """
         downloadedfile = b64decode(self.Geometry.getCurrentGDML())
-        files = downloadedfile.rsplit("<-file name->")
+        files = downloadedfile.rsplit("<!--  File Name  -->")
         self.ListOfGeometries = files
         Num = len(self.GeometryFiles)
         Num = Num -1
@@ -150,7 +151,7 @@ class downloader:
             if str.startswith('\n'):
                 str = str.lstrip('\n')
             self.ListOfGeometries[n] = str
-        geometries = downloadedfile.rsplit("This line is the file seperator!!")
+        geometries = downloadedfile.rsplit("<!--  End of File  -->")
         NumOfGeoms = len(geometries)
         NumOfGeoms = NumOfGeoms - 1
         self.GeometryFiles = geometries

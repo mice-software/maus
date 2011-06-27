@@ -1,3 +1,4 @@
+import os
 import libxml2
 import libxslt
 
@@ -5,9 +6,9 @@ def main():
     from CADImport import CADImport
     #geometry1 = CADImport("fastradModel.xml", "GDML2G4MICE.xsl", "", "OUTPUTFILE.txt")
     #geometry2 = CADImport("fastradModel.xml", "GDML2G4MICE.xsl")
-    geometry3 = CADImport("fastradModel.xml", "Merge.xsl", "FieldInfoTest.xml", "theMerged.txt")
+    #geometry3 = CADImport("fastradModel.xml", "Merge.xsl", "FieldInfoTest.xml", "theMerged.txt")
     #geometry1.XSLTParse()
-    geometry3.AppendMerge()
+    #geometry3.AppendMerge()
 
 if __name__ == '__main__':
     main()
@@ -15,6 +16,8 @@ if __name__ == '__main__':
 
 class CADImport:
     """
+    @Class CADImport, GDML parser class.
+    
     This class has been designed to parse XML(GDML) files in a number of ways.
     The first way applies an XSLT stylesheet to a GDML file and re writes the
     file into MICE module format. The output can be a text file. The second parsing
@@ -26,7 +29,7 @@ class CADImport:
 
     def __init__(self, xmlin1, xsl , xmlin2=None, output=None, mergein=None, mergeout=None):
         """
-        @Method Class initialiser
+        @Method Class constructor
 
         This method initialises the class and takes 7 parameters. The later 4 parameters are optional
         but if one of the latter needs to be initialised a blank "" needs to be placed to set preceeding 
@@ -41,40 +44,40 @@ class CADImport:
         @param mergeout, file name/path to be inserted into merge.xsl.in.
         """
         if type(xmlin1) != str:
-            raise TypeError("first xml "+xmlin1+" must be a string(file name/path)", "CADImport::__init__")
+            raise TypeError("first xml " + xmlin1 + " must be a string(file name/path)", "CADImport::__init__")
         if xmlin1[-4:] != '.xml' and xmlin1[-5:] != '.gdml':
-            raise IOError("file "+xmlin1+" must be an xml or gdml file", "CADImport::__init__")
+            raise IOError("file " + xmlin1 + " must be an xml or gdml file", "CADImport::__init__")
         else: self.XMLIn1 = xmlin1
         
         if type(xsl) != str:
-            raise TypeError("xsl "+xsl+" must be a string(file name/path", "CADImport::__init__")
+            raise TypeError("xsl " + xsl + " must be a string(file name/path", "CADImport::__init__")
         if xsl[-4:] != '.xsl':
-            raise IOError("file "+xsl+" must be an xml or gdml file", "CADImport::__init__")
+            raise IOError("file " + xsl + " must be an xml or gdml file", "CADImport::__init__")
         else: self.XSL = xsl
         
         if xmlin2 == None: self.XMLIn2 = None
         elif type(xmlin2) != str:
-            raise TypeError("second xml "+xmlin2+" must be a string(file name/path)", "CADImport::__init__")
+            raise TypeError("second xml " + xmlin2 + " must be a string(file name/path)", "CADImport::__init__")
         elif xmlin2[-4:] != '.xml' and self.XMLIn2[-5:] != '.gdml':
-            raise IOError("file "+xmlin2+" must be an xml or gdml file", "CADImport::__init__")
+            raise IOError("file " + xmlin2 + " must be an xml or gdml file", "CADImport::__init__")
         else: self.XMLIn2 = xmlin2
             
         if output == None: self.Output = None
         elif type(output) != str:
-            raise TypeError("output "+output+" must be a string(file name/path)", "CADImport::__init__")
+            raise TypeError("output " + output + " must be a string(file name/path)", "CADImport::__init__")
         else: self.Output = output
 
         if mergein == None: self.MergeIn = 'Merge.xsl.in'
         elif type(mergein) != str:
-            raise TypeError("merge "+mergein+" input must be a string(file name/path)", "CADImport::__init__")
+            raise TypeError("merge " + mergein + " input must be a string(file name/path)", "CADImport::__init__")
         else: self.MergeIn = mergein
 
         if mergeout == None: self.MergeOut = 'Merge.xsl'
         elif type(mergeout) != str:
-            raise TypeError("merge "+mergout+" output must be a string(file name/path)", "CADImport::__init__")
+            raise TypeError("merge " + mergeout + " output must be a string(file name/path)", "CADImport::__init__")
         elif mergeout[-4:] != '.xsl':
-            raise IOError("file "+mergout+" must be an xsl file", "CADImport::__init__")
-        else: mergeout = mergeout
+            raise IOError("file " + mergeout + " must be an xsl file", "CADImport::__init__")
+        else: self.MergeOut = mergeout
 
     def XSLTParse(self):
         """
