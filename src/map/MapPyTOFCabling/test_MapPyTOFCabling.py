@@ -14,12 +14,12 @@ class MapPyTOFCablingTestCase(unittest.TestCase):
             raise Exception('InitializeFail', 'MAUS_ROOT_DIR unset!')
         # Set our data path & filename
         # It would be nicer to test with a smaller data file!
-        self._datapath = '%s/src/input/InputCppRealData' % \
+        self._datapath = '%s/src/input/InputCppData' % \
                             os.environ.get("MAUS_ROOT_DIR")
         self._datafile = '02873.003'
 
     def test_something(self):
-        inputter = MAUS.InputCppRealData(self._datapath, self._datafile)
+        inputter = MAUS.InputCppData(self._datapath, self._datafile)
         inputter.birth("{}")
 
         mapper = MAUS.MapPyTOFCabling()

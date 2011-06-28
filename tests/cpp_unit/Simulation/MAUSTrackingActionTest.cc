@@ -54,7 +54,6 @@ class MAUSTrackingActionTest : public ::testing::Test {
 TEST_F(MAUSTrackingActionTest, PreUserTrackingActionTest) {
     MAUSGeant4Manager::GetInstance()->GetTracking()->SetTracks(Json::Value());
     tracking->PreUserTrackingAction(start);
-    std::cerr << "OUT 1" << std::endl;
     Json::Value json_track = MAUSGeant4Manager::GetInstance()->GetTracking()
                                                        ->GetTracks()["track_3"];
     ASSERT_EQ(json_track.type(), Json::objectValue);
