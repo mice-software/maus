@@ -57,7 +57,6 @@ class packer:
         dt = dt.replace(':', 'Min', 1)
         end = dt.find(':')
         dt = dt[0:end]
-        print dt
         zippath = path + "/" + dt +".zip"
         file = zipfile.ZipFile(zippath, 'w')
         fin = open(self.FileList, 'r')

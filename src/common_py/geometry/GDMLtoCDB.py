@@ -12,7 +12,7 @@ def main():
     from GDMLtoCDB import gdmltocdb
     from GDMLtoCDB import downloader
     geometry1 = gdmltocdb('/home/matt/NetBeansProjects/MAUSConfigPY/src/GDML', "test geometry case", 1)
-    geometry1.uploadToCDB()
+    #geometry1.uploadToCDB()
     dlgeometry = downloader(1)
     #dlgeometry.downloadCurrent()
     
@@ -40,6 +40,8 @@ class gdmltocdb:
         @Param type 1 to set up the test server leave blank for real server
         """
         #change unit tests
+        self.TextFile = None
+        self.Text = ""
         if type(notes) != str:
             raise IOError('the note describing the geometry must be filled in', 'gdmltocdb::__init__')
         else:
@@ -59,22 +61,35 @@ class gdmltocdb:
         else: raise StandardError("Incorrect input", "gdmltocdb::__init__")
         self.Geometry = Client(self.WSDLURL).service
         gdmls = os.listdir(self.FilePath)
-        for fname in gdmls:
-            if fname[-4:] != '.xml' and fname[-5:] != '.gdml':
-                raise IOError("directory contains files which are not XMLs or GDMLs", "gdmltocdb::__init__")
         NumOfFiles = len(gdmls)
-        path = self.FilePath + "/FileList.txt"
-        fout = open(path, 'w')
-        for num in range(0, NumOfFiles):
-            filepath = self.FilePath + "/" + gdmls[num]
-            fout.write(filepath)
-            fout.write('\n')
-        fout.close()
-        self.ListOfGeometries = path
-        fin = open(self.ListOfGeometries, 'r')
-        for line in fin.readlines():
-            self.GeometryFiles.append(line.strip())
-        fin.close()
+        count = 0
+        for fname in gdmls:
+            if fname[-4:] == '.txt':
+                gdmls.remove(fname)
+                NumCheck = len(gdmls)
+                self.TextFile = fname
+                path = self.FilePath + "/" + self.TextFile
+                fin = open(path, 'r')
+                for lines in fin.readlines():
+                    self.Text += lines
+                for num in range(0, NumCheck):
+                    if self.Text.find(gdmls[num]) >= 0:
+                        count += 1
+                if NumCheck != count:
+                    raise IOError("The text file in the gdml directory should list all files in this directory.Please remove this file or write the full path locations of all the files within the directory", "gdmltocdb:__init__")
+        if self.TextFile == None:
+            path = self.FilePath + "/FileList.txt"
+            fout = open(path, 'w')
+            for num in range(0, NumOfFiles):
+                filepath = self.FilePath + "/" + gdmls[num]
+                fout.write(filepath)
+                fout.write('\n')
+            fout.close()
+            self.ListOfGeometries = path
+            fin = open(self.ListOfGeometries, 'r')
+            for line in fin.readlines():
+                self.GeometryFiles.append(line.strip())
+            fin.close()
 
     def uploadToCDB(self):
         """
