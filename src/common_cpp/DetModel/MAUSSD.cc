@@ -21,7 +21,6 @@ namespace MAUS {
 
 MAUSSD::MAUSSD(MiceModule* mod)
     : G4VSensitiveDetector(mod->fullName()) {
-  _module  = mod;
 }
 
 bool MAUSSD::isHit() {
