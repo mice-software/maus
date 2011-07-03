@@ -5,7 +5,7 @@ import os
 import io
 
 
-class MapPyTOFCabling:
+class MapPyScalersAnalysis:
     def birth(self, configJSON):
         return True
 
