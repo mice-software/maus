@@ -24,7 +24,7 @@
 map_reduce_type = "native_python" # can also be "native_python_profile" using cProfile in python
 
 # Used by MapPyRemoveTracks.
-keep_only_muon_tracks = False 
+keep_only_muon_tracks = False
 
 # Used by MapCppSimulation
 keep_tracks = False
@@ -79,3 +79,20 @@ SciFinStations = 5
 SciFinTrackers = 2
 
 VirtualPlanes_z = [0.0, 1.0] # units: meter.  the 'z' coordinate where the virtual plane exists
+
+# this is used by ImputCppRealData
+Enable_V1290_Unpacking = True
+Enable_V1731_Unpacking = True
+Enable_V1724_Unpacking = True
+Enable_V830_Unpacking = True
+Enable_VLSB_Unpacking = False
+Do_V1731_Zero_Suppression = False
+Do_V1724_Zero_Suppression = True
+Enable_TOF = True
+Enable_EMR = True
+Enable_KL = True
+Enable_CKOV = True
+DAQ_cabling_file = "/src/input/InputCppRealData/DAQChannelMap.txt"
+
+# this is used by ImputCppTOFReconstruction
+TOF_cabling_file = "/src/map/MapCppTOFReconstruction/TOFChannelMap.txt"

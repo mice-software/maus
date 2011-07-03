@@ -17,145 +17,292 @@
 
 #include "src/input/InputCppRealData/UnpackEventLib.hh"
 
-#include <stdint.h>
+int V1290DataProcessor::Process(MDdataContainer* aPartEventPtr){
+  // Cast the argument to structure it points to.
+  // This process should be called only with MDfragmentV1290 argument
+  if ( typeid(*aPartEventPtr) != typeid(MDpartEventV1290) )  return CastError;
+  MDpartEventV1290* xV1290Evnt=static_cast<MDpartEventV1290*>(aPartEventPtr);
 
-#include <string>
-#include <vector>
-#include <sstream>
-
-#include "MDpartEventV830.h"
-#include "MDpartEventV1290.h"
-#include "MDpartEventV1724.h"
-#include "MDpartEventV1731.h"
-
-// do not increment inside following macro! (e.g.: MAX( ++a, ++b );
-#define MAX(a, b) (((a) > (b)) ? (a) : (b))
-
-void V830Hit::getJSON(void *pPartEvntPtr,
-                      Json::Value &pDoc) {
-  // Create the event object
-  MDpartEventV830 xV830Evnt;
-  xV830Evnt.SetDataPtr(pPartEvntPtr);
-
-  // Put static data into the Json
-  pDoc["geo"] = Json::Value(xV830Evnt.GetGeo());
-
-  pDoc["channels"] = Json::Value();
-
-  unsigned int xChannels = xV830Evnt.GetWordCount();
-  // Last channel is "channel -1", so don't process it!
-  for (unsigned int i = 0; i < (xChannels-1); i++) {
-    int xChan = xV830Evnt.GetChannel(i);
-    int xValue = xV830Evnt.GetMeasurement(i);
-
-    // Convert the channel number into a channel number string!
-    std::stringstream xConv;
-    xConv << xChan;
-
-    pDoc["channels"][xConv.str()] = Json::Value(xValue);
-  }
-}
-
-void V1290Hit::getJSON(void *pPartEvntPtr,
-                       Json::Value &pDoc) {
-  // Create the event object
-  MDpartEventV1290 xV1290Evnt;
-  xV1290Evnt.SetDataPtr(pPartEvntPtr);
-
-  if (xV1290Evnt.IsValid()) {
+  Json::Value pBoardDoc;
+  Json::Value pTdcHit;
+  int xLdc, xGeo, xEquip, xPartEv;
+  string xDetector = "unknown";
+  if (xV1290Evnt->IsValid()) {
     // Put static data into the Json
-    pDoc["trigger_time_tag"] = xV1290Evnt.GetTriggerTimeTag();
-    pDoc["geo"] = xV1290Evnt.GetGeo();
-
+    pBoardDoc["ldc_id"]       = xLdc = this->GetLdcId();
+		pBoardDoc["equip_type"] = xEquip = this->GetEquipmentType();
+    pBoardDoc["time_stamp"]          = this->GetTimeStamp();
+    pBoardDoc["phys_event_number"]   = this->GetPhysEventNumber();
+    pBoardDoc["part_event_number"] = xPartEv = this->GetPartEventNumber();
+    pBoardDoc["geo"]          = xGeo = xV1290Evnt->GetGeo();
+    pBoardDoc["trigger_time_tag"]    = xV1290Evnt->GetTriggerTimeTag();
     // Loop over all the channels
-    for (unsigned int i = 0; i < V1290_NCHANNELS; i++) {
-      int xHitsL = xV1290Evnt.GetNHits(i, 'l');
-      int xHitsT = xV1290Evnt.GetNHits(i, 't');
+    for (unsigned int xCh = 0; xCh < V1290_NCHANNELS; xCh++) {
+			pTdcHit = pBoardDoc;
+      int xHitsL = xV1290Evnt->GetNHits(xCh, 'l');
+      int xHitsT = xV1290Evnt->GetNHits(xCh, 't');
       int xMaxHits = MAX(xHitsL, xHitsT);
 
       // Loop over each possible hit
       int xLT, xTT;  // Lead and Trail times?
       for (unsigned int j = 0; j < xMaxHits; j++) {
         if (j < xHitsL)
-          xLT = xV1290Evnt.GetHitMeasurement(j,  // Hit ID
-                                             i,  // Channel ID
+          xLT = xV1290Evnt->GetHitMeasurement(j,  // Hit ID
+                                             xCh,  // Channel ID
                                              'l');
         else
           xLT = -99;
 
-        if (j < xHitsT) xTT = xV1290Evnt.GetHitMeasurement(j,  // Hit ID
-                                                           i,  // Channel ID
+        if (j < xHitsT) xTT = xV1290Evnt->GetHitMeasurement(j,  // Hit ID
+                                                           xCh,  // Channel ID
                                                            't');
         else
           xTT = -99;
-        // Why Channel ID / 8?, I don't know.
-        int xBunchID = xV1290Evnt.GetBunchID(i / 8);
+
+        int xBunchID = xV1290Evnt->GetBunchID( xCh/8 );
 
         Json::Value xTdcHit;
-        xTdcHit["bunch_id"] = xBunchID;
-        xTdcHit["channel"] = i;
-        xTdcHit["leading_time"] = xLT;
-        xTdcHit["trailing_time"] = xTT;
+        pTdcHit["bunch_id"]      = xBunchID;
+        pTdcHit["channel"]       = xCh;
+        pTdcHit["leading_time"]  = xLT;
+        pTdcHit["trailing_time"] = xTT;
+				DAQChannelKey* xKey = _chMap->find(xLdc,xGeo,xCh,xEquip);
+				if(xKey){
+				  pTdcHit["channel_key"] = xKey->str();
+				  xDetector = xKey->detector();
+          pTdcHit["detector"] = xDetector;
+        } else pTdcHit["detector"] = xDetector = "unknown";
 
-        pDoc["hits"].append(xTdcHit);
+			( *_docSpill )[xDetector][ xPartEv ][_equipment.c_str()].append(pTdcHit);
       }
     }
-  } else {
-    pDoc = Json::Value();
-  }
+  }else cout<<"MDpartEventV1290 is not valid"<<endl;
+
+  return OK;
 }
 
-void V1724Hit::getJSON(void *pPartEvntPtr,
-                       Json::Value &pDoc) {
-  // Create the event object
-  MDpartEventV1724 xV1724Evnt;
-  xV1724Evnt.SetDataPtr(pPartEvntPtr);
+//////////////////////////////////////////////////////////////////////////////////////////////
 
-  if (xV1724Evnt.IsValid()) {
+int V1724DataProcessor::Process(MDdataContainer* aPartEventPtr){
+  // Cast the argument to structure it points to.
+  // This process should be called only with MDfragmentV1724 argument.
+  if ( typeid(*aPartEventPtr) != typeid(MDpartEventV1724) )  return CastError;
+  MDpartEventV1724* xV1724Evnt=static_cast<MDpartEventV1724*>(aPartEventPtr);
+
+  Json::Value pBoardDoc;
+	Json::Value xfAdcHit;
+  int xLdc, xGeo, xEquip, xPartEv;
+  string xDetector = "unknown";
+  if (xV1724Evnt->IsValid()) {
     // Put static data into the Json
-    pDoc["trigger_time_tag"] = xV1724Evnt.GetTriggerTimeTag();
-    pDoc["geo"] = xV1724Evnt.GetGeo();
-
-    // Now work out various parameters
-    //// Number of channels
-    unsigned int xChannels =
-        V1724Hit::getNumberOfChannels(xV1724Evnt.GetChannelMask());
-    //// Word count
-    int xWordCount = xV1724Evnt.GetWordCount();
-    //// Samples per channel
-    //// Magic code from V1724DATEFileOut.cc
-    int xSamplesPerChan = ((xWordCount * 2) / xChannels) - 1;
-
-    // Actually process the events
-    for (unsigned int i = 0; i < V1724_NCHANNELS; i++) {
-      std::vector<int> xData;
-      for (unsigned int j = 0; j < xSamplesPerChan; j++) {
-        int xSample = xV1724Evnt.GetSampleData(i,  // Channel ID
+    pBoardDoc["ldc_id"]       = xLdc = this->GetLdcId();
+    pBoardDoc["equip_type"] = xEquip = this->GetEquipmentType();
+    pBoardDoc["time_stamp"]          = this->GetTimeStamp();
+    pBoardDoc["phys_event_number"]   = this->GetPhysEventNumber();
+    pBoardDoc["part_event_number"] = xPartEv = this->GetPartEventNumber();
+    pBoardDoc["geo"]          = xGeo = xV1724Evnt->GetGeo();
+    pBoardDoc["trigger_time_tag"]    = xV1724Evnt->GetTriggerTimeTag();
+    // Loop over all the channels
+    for (unsigned int xCh = 0; xCh < V1724_NCHANNELS; xCh++) {
+      unsigned int xSamples = ( xV1724Evnt->GetLength(xCh) )*V1724_SAMPLES_PER_WORD;
+      for (unsigned int j = 0; j < xSamples; j++) {
+        int sample = xV1724Evnt->GetSampleData(xCh,  // Channel ID
                                                j);  // Sample ID
-        xData.push_back(xSample);
+        data.push_back( sample );
       }
-      // Convert the channel number to a string
-      std::stringstream xConv;
-      xConv << i;
+      xfAdcHit = pBoardDoc;
+      this->SetPedestal();
+      int charge_mm = this->GetCharge(ceaMinMax);
+      if(charge_mm>100){
+        xfAdcHit["charge_mm"]    = charge_mm;
+        xfAdcHit["charge_pm"]    = this->GetCharge(ceaPedMax);
+        xfAdcHit["position_max"] = this->GetMaxPosition();
+        xfAdcHit["pedestals"]    = this->GetPedestal();
+				DAQChannelKey* xKey = _chMap->find(xLdc,xGeo,xCh,xEquip);
+				if(xKey){
+				  xDetector = xKey->detector();
+				  xfAdcHit["channel_key"]   = xKey->str();
+          xfAdcHit["detector"]      = xDetector;
+        } else xfAdcHit["detector"] = xDetector = "unknown";
+				xfAdcHit["channel"]        = xCh;
 
-      std::vector<int>::iterator xIt;
-      for (xIt = xData.begin(); xIt < xData.end(); xIt++) {
-        Json::Value xValue(*xIt);
-        pDoc["hits"][xConv.str()].append(xValue);
-      }
+				( *_docSpill )[xDetector][ xPartEv ][_equipment].append(xfAdcHit);
+			}
+      data.resize(0);
     }
-  } else {
-    pDoc = Json::Value();
   }
+
+  return OK;
 }
 
-int V1724Hit::getNumberOfChannels(uint32_t pMask) {
-  unsigned int n = pMask;
-  n = (n & 0x55555555) + ((n & 0xAAAAAAAA) >> 1);
-  n = (n & 0x33333333) + ((n & 0xCCCCCCCC) >> 2);
-  n = (n + (n >> 4)) & 0x0F0F0F0F;
-  n = (n + (n >> 16));
-  n = (n + (n >> 8)) & 0x3F;
-  return static_cast<int>(n);
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+int V1731DataProcessor::Process(MDdataContainer* aPartEventPtr){
+  // Cast the argument to structure it points to.
+  // This process should be called only with MDfragmentV1731 argument.
+  if ( typeid(*aPartEventPtr) != typeid(MDpartEventV1731) )  return CastError;
+  MDpartEventV1731* xV1731Evnt=static_cast<MDpartEventV1731*>(aPartEventPtr);
+
+  Json::Value pBoardDoc;
+	Json::Value xfAdcHit;
+  int xLdc, xGeo, xEquip, xPartEv;
+  string xDetector = "unknown";
+  if (xV1731Evnt->IsValid()) {
+    // Put static data into the Json
+    pBoardDoc["ldc_id"]       = xLdc = this->GetLdcId();
+    pBoardDoc["equip_type"] = xEquip = this->GetEquipmentType();
+    pBoardDoc["time_stamp"]          = this->GetTimeStamp();
+    pBoardDoc["phys_event_number"]   = this->GetPhysEventNumber();
+    pBoardDoc["part_event_number"] = xPartEv = this->GetPartEventNumber();
+    pBoardDoc["geo"]          = xGeo = xV1731Evnt->GetGeo();
+    pBoardDoc["trigger_time_tag"]    = xV1731Evnt->GetTriggerTimeTag();
+    // Loop over all the channels
+    for (unsigned int xCh = 0; xCh < V1724_NCHANNELS; xCh++) {
+      unsigned int xSamples = ( xV1731Evnt->GetLength(xCh) )*V1731_SAMPLES_PER_WORD;
+      for (unsigned int j = 0; j < xSamples; j++) {
+        int sample = xV1731Evnt->GetSampleData(xCh,  // Channel ID
+                                               j);  // Sample ID
+        data.push_back( sample );
+      }
+      xfAdcHit = pBoardDoc;
+      this->SetPedestal();
+      int charge_mm = this->GetCharge(ceaMinMax);
+      if(charge_mm>100){
+        xfAdcHit["charge_mm"]    = charge_mm;
+        xfAdcHit["charge_pm"]    = this->GetCharge(ceaPedMax);
+        xfAdcHit["position_max"] = this->GetMaxPosition();
+        xfAdcHit["pedestals"]    = this->GetPedestal();
+				DAQChannelKey* xKey = _chMap->find(xLdc,xGeo,xCh,xEquip);
+				if(xKey){
+				  xDetector = xKey->detector();
+				  xfAdcHit["channel_key"]   = xKey->str();
+          xfAdcHit["detector"]      = xDetector;
+        } else xfAdcHit["detector"] = xDetector = "unknown";
+				xfAdcHit["channel"]        = xCh;
+
+				( *_docSpill )[xDetector][ xPartEv ][_equipment].append(xfAdcHit);
+			}
+      data.resize(0);
+    }
+  }
+
+  return OK;
 }
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+int V830DataProcessor::Process(MDdataContainer* aFragPtr){
+  // Cast the argument to structure it points to.
+  // This process should be called only with MDfragmentV830 argument.
+  if ( typeid(*aFragPtr) != typeid(MDfragmentV830) ) return CastError;
+  MDfragmentV830* xV830Fragment = static_cast<MDfragmentV830*>(aFragPtr);
+
+  Json::Value pBoardDoc;
+  if (xV830Fragment->IsValid()) {
+    pBoardDoc["ldc_id"]              = this->GetLdcId();
+    pBoardDoc["equip_type"]          = this->GetEquipmentType();
+    pBoardDoc["time_stamp"]          = this->GetTimeStamp();
+    pBoardDoc["phys_event_number"]   = this->GetPhysEventNumber();
+    pBoardDoc["channels"] = Json::Value();
+
+    unsigned int * ptr = xV830Fragment->Get32bWordPtr(0);
+    MDdataWordV830 dw(ptr) ;
+    unsigned int wc(0);
+
+    while (wc < xV830Fragment->GetWordCount() ) {
+      uint32_t dt= dw.GetDataType();
+      switch ( dt ) {
+        case DWV830_Measurement:
+        {
+		      // Convert the channel number into a channel number string!
+          std::stringstream xConv;
+          xConv <<  "ch" << dw.GetChannel();
+					unsigned int xValue = dw.GetMeasurement();
+					pBoardDoc["channels"][xConv.str()] = Json::Value(xValue);
+	        break;
+        }
+        case DWV830_Header:
+        {
+           pBoardDoc["geo"] = Json::Value( dw.GetGeo() );
+           break;
+        }
+      }
+      wc++;
+      dw.SetDataPtr( ++ptr );
+    }
+	}
+
+	(*_docSpill)[_equipment].append(pBoardDoc);
+
+  return OK;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+int VLSBDataProcessor::Process(MDdataContainer* aFragPtr){
+  // Cast the argument to structure it points to.
+  // This process should be called only with MDfragmentVLSB_C argument.
+  if ( typeid(*aFragPtr) != typeid(MDfragmentVLSB_C) ) return CastError;
+  MDfragmentVLSB_C* xVLSBFragment = static_cast<MDfragmentVLSB_C*>(aFragPtr);
+
+  Json::Value pBoardDoc;
+  if( xVLSBFragment->IsValid()) {
+    int xLdc, xGeo, xEquip;
+    // Put static data into the Json
+    pBoardDoc["ldc_id"]       = xLdc = this->GetLdcId();
+    pBoardDoc["equip_type"] = xEquip = this->GetEquipmentType();
+    pBoardDoc["time_stamp"]          = this->GetTimeStamp();
+    pBoardDoc["phys_event_number"]   = this->GetPhysEventNumber();
+    pBoardDoc["part_event_number"]   = this->GetPartEventNumber();
+    pBoardDoc["geo"]          = xGeo = xVLSBFragment->GetGeo();
+    for (int ib=0; ib<4; ib++){
+		// Convert the bank number into a bank number string!
+      std::stringstream xConv;
+      xConv << "bank_length_" << ib;
+      pBoardDoc[ib] = xVLSBFragment->GetBankLength(ib);
+    }
+  }
+
+  (*_docSpill)[_equipment].append(pBoardDoc);
+
+  return OK;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+int DBBDataProcessor::Process(MDdataContainer* aFragPtr){
+  // Cast the argument to structure it points to.
+  // This process should be called only with MDfragmentDBB argument.
+  if ( typeid(*aFragPtr) != typeid(MDfragmentDBB) ) return CastError;
+  MDfragmentDBB* xDBBFragment = static_cast<MDfragmentDBB*>(aFragPtr);
+
+  Json::Value pBoardDoc;
+  Json::Value pDBBHit;
+  int xLdc, xGeo, xEquip, xPartEv;
+  string xDetector = "unknown";
+  if (xDBBFragment->IsValid()) {
+    // Put static data into the Json
+    pBoardDoc["ldc_id"]       = xLdc = this->GetLdcId();
+    pBoardDoc["equip_type"] = xEquip = this->GetEquipmentType();
+    pBoardDoc["time_stamp"]          = this->GetTimeStamp();
+    pBoardDoc["spill_number"]        = xDBBFragment->GetSpillNumber();
+    pBoardDoc["spill_width"]         = xDBBFragment->GetSpillWidth();
+    pBoardDoc["geo"]          = xGeo = xDBBFragment->GetGeo();
+    pBoardDoc["trigger_count"]       = xDBBFragment->GetTriggerCount();
+    pBoardDoc["hit_count"]           = xDBBFragment->GetHitCount();
+  }
+
+  return OK;
+}
+
+
+
+
+
+
+
+
+
+
+
 

@@ -19,11 +19,16 @@
 #define _MAUS_INPUTCPPREALDATA_INPUTCPPREALDATA_H__
 
 #include <json/json.h>
+#include <event.h>
 #include <MDdateFile.h>
 #include <MDevent.h>
+#include <MDfileManager.h>
+#include <MDprocessManager.h>
 
 #include <string>
-
+#include <iostream>
+#include "UnpackEventLib.hh"
+#include "RawDataProcessing.hh"
 
 /** \class InputCppRealData
   * Load MICE raw data and unpack it into a JSON stream.
@@ -36,13 +41,40 @@ class InputCppRealData {
 private
 :
 /** Debug flag,
-  * 
+  *
   * When set to true, "random" debugging strings will be sent to cerr!
   */
   bool _debug;
 
+
 /** Pointer to open file object. */
   MDdateFile *_inputFile;
+
+/** Process manager object. */
+  MDprocessManager _dataProcessManager;
+
+/** File manager object. */
+  MDfileManager _dataFileManager;
+
+/** The DAQ channel map object.
+* It is used to group all channels belonging to a given detector.*/
+  DAQChannelMap map;
+
+/** Processor for TDC particle event data. */
+  V1290DataProcessor*  _v1290PartEventProc;
+
+/** Processor for fADC V1724 particle event data. */
+  V1724DataProcessor*  _v1724PartEventProc;
+
+/** Processor for fADC V1731 particle event data. */
+  V1731DataProcessor*  _v1731PartEventProc;
+
+/** Processor for scaler data. */
+  V830DataProcessor*  _v830FragmentProc;
+
+/** Processor for VLSB cosmic data. */
+  VLSBDataProcessor* _vLSBFragmentProc;
+
 
 /** Pointer to the start of the current event. */
   unsigned char *_eventPtr;
@@ -51,56 +83,35 @@ private
   std::string _dataPath;
 
   /** Filename within _dataPath. */
-  std::string _filename;
+  std::string _runNum;
 
-/** Process an event.
-  *
-  * This function processes an MDevent into parts,
-  * returning the relevant JSON sub-tree in pDoc.
-  *
-  * \param[in,out] pEvent The event to unpack.
-  * \param[in,out] pDoc A reference to the JSON (sub)root node to fill.
-  */
-  void processLDCEvent(MDevent *pEvent,
-                       Json::Value &pDoc);
-
-/** Process a detector specific event fragment.
-  *
-  * This function simply unpacks a single piece of event,
-  * using the UnpackEventLib classes.
-  *
-  * \param[in,out] pPartEvntPtr The event part to process.
-  * \param[in] pEquipType The equipment type ID.
-  * \param[in] pLdcId The crate number the event came from (I think).
-  * \param[in,out] pDoc A reference to the JSON (sub)root node to fill.
-  */
-  void processHits(void *pPartEvntPtr,
-                   unsigned int pEquipType,
-                   unsigned int pLdcId,
-                   Json::Value &pDoc);
-
-  /* Enum of event types */
+  /** Enum of event types */
   enum {
     VmeTdc = 102,
     VmefAdc1724 = 120,
     VmefAdc1731 = 121,
-    VmeScaler = 111
+    VmeScaler = 111,
   };
+
+	/** Convert the DAQ event type (as coded in DATE) into string
+	* \param[in] pType The type of the event to be converted
+	*/
+  string event_type_to_str(int pType);
 
 public
 :
 
 /** Create an instance of InputCppRealData.
-  * 
+  *
   * This is the constructor for InputCppRealData.
   *
   * \param[in] pDataPath The (directory) path to read the data from
   * \param[in] pFilename The filename to read from the pDataPath directory
   */
-  InputCppRealData(std::string pDataPath = "", std::string pFilename = "");
+  InputCppRealData(std::string pDataPath = "", std::string pRunNum = "");
 
 /** Initialise the Unpacker.
-  * 
+  *
   * This prepares the unpacker to read the file given in the constructor.
   *
   * \return True if the file was opened sucessfully.
@@ -126,8 +137,15 @@ public
   */
   std::string getCurEvent();
 
+/** Disable one equipment type.
+  * This disables the unpacking of the data produced by all equipment
+	* with the specified type.
+	*/
+	void disableEquipment(std::string pEquipType)
+	{ _dataProcessManager.Disable(pEquipType);};
+
 /** Close the file and free memory.
-  * 
+  *
   * This function frees all resources allocated by Birth().
   * It is unlikely this will ever fail!
   *
@@ -135,15 +153,13 @@ public
   */
   bool death();
 
-  ~InputCppRealData();
-
-  /* Functions for python use only! 
+  /* Functions for python use only!
    * They are written in InputCppRealData.i so that they
    * can use pure python code in the python bindings!
    */
 
 /** Internal emitter function.
-  * 
+  *
   * When called from C++, this function does nothing.
   * From python (where it is overriden by the bindings,
   * it returns an iterable result which allows access to all events.
