@@ -29,6 +29,7 @@
 #include <iostream>
 #include "UnpackEventLib.hh"
 #include "RawDataProcessing.hh"
+#include "DAQChannelMap.hh"
 
 /** \class InputCppRealData
   * Load MICE raw data and unpack it into a JSON stream.
@@ -37,7 +38,7 @@
   * This is based on the original MICE RealData Module.
   *
   */
-class InputCppRealData {
+class InputCppRealData{
 private
 :
 /** Debug flag,
@@ -76,6 +77,8 @@ private
   VLSBDataProcessor* _vLSBFragmentProc;
 
 
+  DBBDataProcessor* _DBBFragmentProc;
+
 /** Pointer to the start of the current event. */
   unsigned char *_eventPtr;
 
@@ -91,6 +94,7 @@ private
     VmefAdc1724 = 120,
     VmefAdc1731 = 121,
     VmeScaler = 111,
+		DBB = 141
   };
 
 	/** Convert the DAQ event type (as coded in DATE) into string

@@ -37,6 +37,7 @@
 #include "MDequipMap.h"
 
 #include "RawDataProcessing.hh"
+#include "DAQChannelMap.hh"
 
 using namespace std;
 
@@ -121,6 +122,11 @@ class V1724DataProcessor : public MDprocessor, public fADCDataProcessor, public 
 	* Will be casted to MDpartEventV1724.
   */
   virtual int Process(MDdataContainer* dc);
+
+  void set_zero_supression(bool zs) { _zero_suppression = zs; }
+
+ private:
+  bool _zero_suppression;
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -145,6 +151,11 @@ class V1731DataProcessor : public MDprocessor, public fADCDataProcessor, public 
 	* Will be casted to MDpartEventV1731.
   */
   virtual int Process(MDdataContainer* dc);
+
+  void set_zero_supression(bool zs) { _zero_suppression = zs; }
+
+ private:
+  bool _zero_suppression;
 };
 
 /** On Fragment Event V830

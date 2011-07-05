@@ -30,6 +30,7 @@ InputCppRealData::InputCppRealData(std::string pDataPath,
   _v1731PartEventProc = NULL;
   _v830FragmentProc = NULL;
 	_vLSBFragmentProc = NULL;
+  _DBBFragmentProc = NULL;
 }
 
 
@@ -67,6 +68,8 @@ bool InputCppRealData::birth(std::string jsonDataCards) {
   if( configJSON["Enable_V1724_Unpacking"].asBool() ){
     _v1724PartEventProc = new V1724DataProcessor();
     _v1724PartEventProc->set_DAQ_map( &map );
+    bool zs = configJSON["Do_V1724_Zero_Suppression"].asBool();
+    _v1724PartEventProc->set_zero_supression( zs );
     _dataProcessManager.SetPartEventProc("V1724",_v1724PartEventProc);
   }
   else  this->disableEquipment("V1724");
@@ -75,6 +78,8 @@ bool InputCppRealData::birth(std::string jsonDataCards) {
   if( configJSON["Enable_V1731_Unpacking"].asBool() ){
     _v1731PartEventProc = new V1731DataProcessor();
     _v1731PartEventProc->set_DAQ_map( &map );
+    bool zs = configJSON["Do_V1731_Zero_Suppression"].asBool();
+    _v1731PartEventProc->set_zero_supression( zs );
     _dataProcessManager.SetPartEventProc("V1731",_v1731PartEventProc);
   }
   else  this->disableEquipment("V1731");
@@ -95,7 +100,15 @@ bool InputCppRealData::birth(std::string jsonDataCards) {
   }
   else  this->disableEquipment("VLSB_C");
 
-  _eventPtr = _dataFileManager.GetNextEvent();
+  assert(configJSON.isMember("Enable_DBB_Unpacking"));
+  if( configJSON["Enable_DBB_Unpacking"].asBool() ){
+    _DBBFragmentProc = new DBBDataProcessor();
+    _DBBFragmentProc->set_DAQ_map( &map );
+    _dataProcessManager.SetFragmentProc("DBB",_DBBFragmentProc);
+  }
+  else  this->disableEquipment("DBB");
+
+  //_eventPtr = _dataFileManager.GetNextEvent();
 
   if (_debug)
     std::cerr << nfiles << "files loaded for Run " << _runNum << " ("
@@ -136,6 +149,9 @@ std::string InputCppRealData::getCurEvent() {
   if( _vLSBFragmentProc )
     _vLSBFragmentProc->set_JSON_doc( &xDocSpill );
 
+  if( _DBBFragmentProc )
+    _DBBFragmentProc->set_JSON_doc( &xDocSpill );
+
   try {
     _dataProcessManager.Process(_eventPtr);
   }
@@ -170,6 +186,8 @@ bool InputCppRealData::death()
   if(_v1731PartEventProc) delete _v1731PartEventProc;
   if(_v830FragmentProc) delete _v830FragmentProc;
   if(_vLSBFragmentProc) delete _vLSBFragmentProc;
+  if(_DBBFragmentProc) delete _DBBFragmentProc;
+
   return true;
 }
 

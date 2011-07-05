@@ -33,7 +33,7 @@ int V1290DataProcessor::Process(MDdataContainer* aPartEventPtr){
 		pBoardDoc["equip_type"] = xEquip = this->GetEquipmentType();
     pBoardDoc["time_stamp"]          = this->GetTimeStamp();
     pBoardDoc["phys_event_number"]   = this->GetPhysEventNumber();
-    pBoardDoc["part_event_number"] = xPartEv = this->GetPartEventNumber();
+    pBoardDoc["part_event_number"] = xPartEv = xV1290Evnt->GetEventCount();
     pBoardDoc["geo"]          = xGeo = xV1290Evnt->GetGeo();
     pBoardDoc["trigger_time_tag"]    = xV1290Evnt->GetTriggerTimeTag();
     // Loop over all the channels
@@ -66,14 +66,14 @@ int V1290DataProcessor::Process(MDdataContainer* aPartEventPtr){
         pTdcHit["channel"]       = xCh;
         pTdcHit["leading_time"]  = xLT;
         pTdcHit["trailing_time"] = xTT;
-				DAQChannelKey* xKey = _chMap->find(xLdc,xGeo,xCh,xEquip);
-				if(xKey){
-				  pTdcHit["channel_key"] = xKey->str();
-				  xDetector = xKey->detector();
+        DAQChannelKey* xKey = _chMap->find(xLdc,xGeo,xCh,xEquip);
+        if(xKey){
+          pTdcHit["channel_key"] = xKey->str();
+          xDetector = xKey->detector();
           pTdcHit["detector"] = xDetector;
         } else pTdcHit["detector"] = xDetector = "unknown";
 
-			( *_docSpill )[xDetector][ xPartEv ][_equipment.c_str()].append(pTdcHit);
+        ( *_docSpill )[xDetector][ xPartEv ][_equipment.c_str()].append(pTdcHit);
       }
     }
   }else cout<<"MDpartEventV1290 is not valid"<<endl;
@@ -99,7 +99,7 @@ int V1724DataProcessor::Process(MDdataContainer* aPartEventPtr){
     pBoardDoc["equip_type"] = xEquip = this->GetEquipmentType();
     pBoardDoc["time_stamp"]          = this->GetTimeStamp();
     pBoardDoc["phys_event_number"]   = this->GetPhysEventNumber();
-    pBoardDoc["part_event_number"] = xPartEv = this->GetPartEventNumber();
+    pBoardDoc["part_event_number"] = xPartEv = xV1724Evnt->GetEventCount();
     pBoardDoc["geo"]          = xGeo = xV1724Evnt->GetGeo();
     pBoardDoc["trigger_time_tag"]    = xV1724Evnt->GetTriggerTimeTag();
     // Loop over all the channels
@@ -113,21 +113,21 @@ int V1724DataProcessor::Process(MDdataContainer* aPartEventPtr){
       xfAdcHit = pBoardDoc;
       this->SetPedestal();
       int charge_mm = this->GetCharge(ceaMinMax);
-      if(charge_mm>100){
+      if(!_zero_suppression || charge_mm>100){
         xfAdcHit["charge_mm"]    = charge_mm;
         xfAdcHit["charge_pm"]    = this->GetCharge(ceaPedMax);
         xfAdcHit["position_max"] = this->GetMaxPosition();
         xfAdcHit["pedestals"]    = this->GetPedestal();
-				DAQChannelKey* xKey = _chMap->find(xLdc,xGeo,xCh,xEquip);
-				if(xKey){
-				  xDetector = xKey->detector();
-				  xfAdcHit["channel_key"]   = xKey->str();
+        DAQChannelKey* xKey = _chMap->find(xLdc,xGeo,xCh,xEquip);
+        if(xKey){
+          xDetector = xKey->detector();
+          xfAdcHit["channel_key"]   = xKey->str();
           xfAdcHit["detector"]      = xDetector;
         } else xfAdcHit["detector"] = xDetector = "unknown";
-				xfAdcHit["channel"]        = xCh;
+        xfAdcHit["channel"]        = xCh;
 
-				( *_docSpill )[xDetector][ xPartEv ][_equipment].append(xfAdcHit);
-			}
+        ( *_docSpill )[xDetector][ xPartEv ][_equipment].append(xfAdcHit);
+      }
       data.resize(0);
     }
   }
@@ -153,7 +153,7 @@ int V1731DataProcessor::Process(MDdataContainer* aPartEventPtr){
     pBoardDoc["equip_type"] = xEquip = this->GetEquipmentType();
     pBoardDoc["time_stamp"]          = this->GetTimeStamp();
     pBoardDoc["phys_event_number"]   = this->GetPhysEventNumber();
-    pBoardDoc["part_event_number"] = xPartEv = this->GetPartEventNumber();
+    pBoardDoc["part_event_number"] = xPartEv = xV1731Evnt->GetEventCount();
     pBoardDoc["geo"]          = xGeo = xV1731Evnt->GetGeo();
     pBoardDoc["trigger_time_tag"]    = xV1731Evnt->GetTriggerTimeTag();
     // Loop over all the channels
@@ -167,21 +167,21 @@ int V1731DataProcessor::Process(MDdataContainer* aPartEventPtr){
       xfAdcHit = pBoardDoc;
       this->SetPedestal();
       int charge_mm = this->GetCharge(ceaMinMax);
-      if(charge_mm>100){
+      if(!_zero_suppression || charge_mm>100){
         xfAdcHit["charge_mm"]    = charge_mm;
         xfAdcHit["charge_pm"]    = this->GetCharge(ceaPedMax);
         xfAdcHit["position_max"] = this->GetMaxPosition();
         xfAdcHit["pedestals"]    = this->GetPedestal();
-				DAQChannelKey* xKey = _chMap->find(xLdc,xGeo,xCh,xEquip);
-				if(xKey){
-				  xDetector = xKey->detector();
-				  xfAdcHit["channel_key"]   = xKey->str();
+        DAQChannelKey* xKey = _chMap->find(xLdc,xGeo,xCh,xEquip);
+        if(xKey){
+          xDetector = xKey->detector();
+          xfAdcHit["channel_key"]   = xKey->str();
           xfAdcHit["detector"]      = xDetector;
         } else xfAdcHit["detector"] = xDetector = "unknown";
-				xfAdcHit["channel"]        = xCh;
+        xfAdcHit["channel"]        = xCh;
 
-				( *_docSpill )[xDetector][ xPartEv ][_equipment].append(xfAdcHit);
-			}
+        ( *_docSpill )[xDetector][ xPartEv ][_equipment].append(xfAdcHit);
+      }
       data.resize(0);
     }
   }
@@ -232,7 +232,7 @@ int V830DataProcessor::Process(MDdataContainer* aFragPtr){
     }
 	}
 
-	(*_docSpill)[_equipment].append(pBoardDoc);
+	(*_docSpill)[_equipment] = pBoardDoc;
 
   return OK;
 }
@@ -253,7 +253,7 @@ int VLSBDataProcessor::Process(MDdataContainer* aFragPtr){
     pBoardDoc["equip_type"] = xEquip = this->GetEquipmentType();
     pBoardDoc["time_stamp"]          = this->GetTimeStamp();
     pBoardDoc["phys_event_number"]   = this->GetPhysEventNumber();
-    pBoardDoc["part_event_number"]   = this->GetPartEventNumber();
+    //pBoardDoc["part_event_number"]   = this->GetPartEventNumber();
     pBoardDoc["geo"]          = xGeo = xVLSBFragment->GetGeo();
     for (int ib=0; ib<4; ib++){
 		// Convert the bank number into a bank number string!
@@ -277,9 +277,10 @@ int DBBDataProcessor::Process(MDdataContainer* aFragPtr){
   MDfragmentDBB* xDBBFragment = static_cast<MDfragmentDBB*>(aFragPtr);
 
   Json::Value pBoardDoc;
-  Json::Value pDBBHit;
+  Json::Value xDBBHit;
   int xLdc, xGeo, xEquip, xPartEv;
-  string xDetector = "unknown";
+  string xDetector = "emr";
+
   if (xDBBFragment->IsValid()) {
     // Put static data into the Json
     pBoardDoc["ldc_id"]       = xLdc = this->GetLdcId();
@@ -290,6 +291,42 @@ int DBBDataProcessor::Process(MDdataContainer* aFragPtr){
     pBoardDoc["geo"]          = xGeo = xDBBFragment->GetGeo();
     pBoardDoc["trigger_count"]       = xDBBFragment->GetTriggerCount();
     pBoardDoc["hit_count"]           = xDBBFragment->GetHitCount();
+
+    // Loop over all the channels
+    for (unsigned int xCh = 0; xCh < V1290_NCHANNELS; xCh++) {
+      int xHitsL = xDBBFragment->GetNLeadingEdgeHits(xCh);
+      int xHitsT = xDBBFragment->GetNTrailingEdgeHits(xCh);
+      int xMaxHits = MAX(xHitsL, xHitsT);
+
+      // Loop over each possible hit
+      int xLT, xTT;  // Lead and Trail times?
+      for (unsigned int j = 0; j < xMaxHits; j++) {
+        if (j < xHitsL)
+          xLT = xDBBFragment->GetHitMeasurement(j,  // Hit ID
+                                             xCh,  // Channel ID
+                                             'l');
+        else
+          xLT = -99;
+
+        if (j < xHitsT) xTT = xDBBFragment->GetHitMeasurement(j,  // Hit ID
+                                                           xCh,  // Channel ID
+                                                           't');
+        else
+          xTT = -99;
+
+        xDBBHit["channel"]       = xCh;
+        xDBBHit["leading_time"]  = xLT;
+        xDBBHit["trailing_time"] = xTT;
+        DAQChannelKey* xKey = _chMap->find(xLdc,xGeo,xCh,xEquip);
+        if(xKey){
+          xDetector = xKey->detector();
+          xDBBHit["channel_key"]   = xKey->str();
+          xDBBHit["detector"]      = xDetector;
+        } else xDBBHit["detector"] = xDetector = "unknown";
+        pBoardDoc["hits"].append(xDBBHit);
+      }
+    }
+    ( *_docSpill )[xDetector][_equipment].append(pBoardDoc);
   }
 
   return OK;
