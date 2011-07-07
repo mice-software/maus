@@ -8,10 +8,6 @@
 // C headers
 #include <assert.h>
 #include <json/json.h>
-#include <CLHEP/Random/RandPoisson.h>  //  from old file?
-#include <CLHEP/Random/RandGauss.h>  //  from old file?
-#include <CLHEP/Random/RandExponential.h>  //  from old file?
-#include <CLHEP/Units/PhysicalConstants.h>  //  from old file?
 
 // C++ headers
 #include <cmath>  //  from old file?
@@ -21,13 +17,12 @@
 #include <vector>
 
 // G4MICE from commonCpp
-#include "Interface/dataCards.hh"
-#include "Interface/MICEEvent.hh"
 #include "Config/MiceModule.hh"  //  from old file?
 
-#include "TOFDataProcessing.hh"
 
-typedef map<TOFChannelKey*, Json::Value> TofPmtHitMap;
+#include "Utils/TOFChannelMap.hh"
+#include "Utils/DAQChannelMap.hh"
+
 using namespace std;
 
 class MapCppTOFReconstruction {

@@ -29,7 +29,7 @@
 #include <iostream>
 #include "UnpackEventLib.hh"
 #include "RawDataProcessing.hh"
-#include "DAQChannelMap.hh"
+#include "Utils/DAQChannelMap.hh"
 
 /** \class InputCppRealData
   * Load MICE raw data and unpack it into a JSON stream.
@@ -46,7 +46,6 @@ private
   * When set to true, "random" debugging strings will be sent to cerr!
   */
   bool _debug;
-
 
 /** Pointer to open file object. */
   MDdateFile *_inputFile;

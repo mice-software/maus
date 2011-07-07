@@ -16,7 +16,7 @@ class MapPyTOFCablingTestCase(unittest.TestCase):
         # It would be nicer to test with a smaller data file!
         self._datapath = '%s/src/input/InputCppRealData' % \
                             os.environ.get("MAUS_ROOT_DIR")
-        self._datafile = '02873.003'
+        self._datafile = '02873'
 
     def test_something(self):
         inputter = MAUS.InputCppRealData(self._datapath, self._datafile)
@@ -47,8 +47,8 @@ class MapPyTOFCablingTestCase(unittest.TestCase):
                         del hit['trailing_time']
                         new_hits.append(hit)
                     print new_hits[0-4]
-                    
-                    
+
+
               #result = mapper.process("")
               #shaSum = hashlib.sha1(result).hexdigest()
               #self.assertEqual(shaSum, self.expectedShaSumTracks)

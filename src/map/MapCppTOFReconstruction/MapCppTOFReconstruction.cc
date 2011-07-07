@@ -1,8 +1,5 @@
 #include "MapCppTOFReconstruction.hh"
 
-dataCards MyDataCards("Digitization");
-MICEEvent simEvent;
-
 bool MapCppTOFReconstruction::birth(std::string argJsonConfigDocument)
 {
 	cout<<"MapCppTOFReconstruction::birth"<<endl;
@@ -85,7 +82,7 @@ std::string  MapCppTOFReconstruction::process(std::string document)
   level2_recon(xLevel1Rec["tof0"], xLevel2Rec["tof0"]);
   level2_recon(xLevel1Rec["tof1"], xLevel2Rec["tof1"]);
   level2_recon(xLevel1Rec["tof2"], xLevel2Rec["tof2"]);
-  cout << xLevel1Rec << endl;
+  cout << xLevel2Rec << endl;
 
   return writer.write(root);
 }

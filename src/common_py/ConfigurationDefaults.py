@@ -86,13 +86,14 @@ Enable_V1731_Unpacking = True
 Enable_V1724_Unpacking = True
 Enable_V830_Unpacking = True
 Enable_VLSB_Unpacking = False
+Enable_DBB_Unpacking = True
 Do_V1731_Zero_Suppression = False
 Do_V1724_Zero_Suppression = True
 Enable_TOF = True
 Enable_EMR = True
 Enable_KL = True
 Enable_CKOV = True
-DAQ_cabling_file = "/src/input/InputCppRealData/DAQChannelMap.txt"
+DAQ_cabling_file = "/src/common_cpp/Utils/DAQChannelMap.txt"
 
 # this is used by ImputCppTOFReconstruction
-TOF_cabling_file = "/src/map/MapCppTOFReconstruction/TOFChannelMap.txt"
+TOF_cabling_file = "/src/common_cpp/Utils/TOFChannelMap.txt"

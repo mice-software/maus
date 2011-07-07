@@ -42,7 +42,7 @@ class MapPyScalersAnalysis:
         self._hits = scalers['channels']
         event = scalers['phys_event_number']
         time = scalers['time_stamp']
-        print 'Event Num  : ', event, '  time : ', time, '\n'
+        print 'Spill Num  : ', event, '  time : ', time, '\n'
         if self.add(self._hits) :
             self.dump()
 

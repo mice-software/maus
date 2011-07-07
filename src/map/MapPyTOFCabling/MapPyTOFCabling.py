@@ -167,10 +167,10 @@ class MapPyTOFCabling:
             line = line.rstrip()
             if not line:  # skip starting and ending empty lines
                 continue
-            
+
             line_parts = line.split()
             assert(len(line_parts) == 12)
-            
+
             [tdc_crate, tdc_board, tdc_channel]  = map(int, line_parts[3:6])
 
             channel_id = {}
@@ -187,7 +187,7 @@ class MapPyTOFCabling:
             channel_id['tof_pmt_num'] = pmt_num
 
             self.cabling.append(channel_id)
-        
+
         return True
 
     def process(self, str):
@@ -195,7 +195,7 @@ class MapPyTOFCabling:
 
         if 'daq_data' not in spill:
             return str
-        
+
         if spill['daq_data'] is None:
             return str
 
@@ -213,7 +213,7 @@ class MapPyTOFCabling:
                  #print 'ttt', subsubdata['trigger_time_tag']
 
                  new_hits = []
-                 
+
                  # find triggers
                  trigger_time = None
                  for hit in subsubdata['hits']:
@@ -231,7 +231,7 @@ class MapPyTOFCabling:
 
                      print subsubdata['ldc_id'], subsubdata['geo'], hit['channel'], hit['leading_time'] - trigger_time
 
-        
+
 
         return json.dumps(spill)
 

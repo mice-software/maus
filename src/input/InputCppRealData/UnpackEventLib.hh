@@ -37,7 +37,7 @@
 #include "MDequipMap.h"
 
 #include "RawDataProcessing.hh"
-#include "DAQChannelMap.hh"
+#include "Utils/DAQChannelMap.hh"
 
 using namespace std;
 

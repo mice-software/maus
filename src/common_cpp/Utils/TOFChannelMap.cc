@@ -1,9 +1,4 @@
-
-
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#include "TOFDataProcessing.hh"
+#include "TOFChannelMap.hh"
 
 TOFChannelMap::~TOFChannelMap()
 {
@@ -78,6 +73,17 @@ bool TOFChannelKey::operator== ( TOFChannelKey const key ) {
   else return false;
 }
 
+bool TOFChannelKey::operator!= ( TOFChannelKey const key ) {
+  if ( _station == key._station &&
+       _plane == key._plane &&
+       _slab == key._slab &&
+       _pmt == key._pmt &&
+       _detector == key._detector) {
+		return false;
+  }
+  else return true;
+}
+
 ostream& operator<<( ostream& stream, TOFChannelKey key ) {
 	stream << "TOFChannelKey " << key._station;
 	stream << " " << key._plane;
@@ -101,36 +107,3 @@ string TOFChannelKey::str()
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
-
-bool DAQChannelKey::operator== ( DAQChannelKey const key ) {
-  if ( _ldcId == key._ldcId &&
-       _geo == key._geo &&
-       _channel == key._channel &&
-       _eqType == key._eqType &&
-       _detector == key._detector) {
-		return true;
-  }
-  else return false;
-}
-
-ostream& operator<<( ostream& stream, DAQChannelKey key ) {
-	stream << "DAQChannelKey " << key._ldcId;
-	stream << " " << key._geo;
-	stream << " " << key._channel;
-	stream << " " << key._eqType;
-	stream << " " << key._detector;
-	return stream;
-}
-
-istream& operator>>( istream& stream, DAQChannelKey &key ) {
-	string xLabel;
-	stream >> xLabel >> key._ldcId >> key._geo >> key._channel >> key._eqType >> key._detector;
-	return stream;
-}
-
-string DAQChannelKey::str()
-{
-	stringstream xConv;
-	xConv<<(*this);
-	return xConv.str();
-}

@@ -424,7 +424,8 @@ env.Append(LIBPATH =  libs.split(':') + ["%s/build" % maus_root_dir])
 env.Append(CPPPATH=["%s/third_party/install/include" % maus_root_dir, \
                       "%s/third_party/install/include/python2.7" % maus_root_dir, \
                       "%s/third_party/install/include/root" % maus_root_dir, \
-                      "%s/src/legacy" % maus_root_dir, ""])
+                      "%s/src/legacy" % maus_root_dir,
+			"%s/src/common_cpp" % maus_root_dir, ""])
 
 env['USE_G4'] = False
 env['USE_ROOT'] = False
