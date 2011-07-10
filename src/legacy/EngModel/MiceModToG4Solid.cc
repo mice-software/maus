@@ -141,7 +141,7 @@ namespace MiceModToG4Solid
 
 	G4VSolid * buildTrapezoid    ( MiceModule* mod ) //should have x1, x2, y1, y2, z
 	{ 	
-		double widthX1, widthX2, heightY1, heightY2, lengthZ;
+          
 		try{
 			double widthX1    = mod->propertyDouble( "TrapezoidWidthX1" );
 			double widthX2    = mod->propertyDouble( "TrapezoidWidthX2" );
