@@ -106,7 +106,6 @@ G4bool SpecialVirtualSD::ProcessHits(G4Step* aStep, G4TouchableHistory*
 
   G4StepPoint* thePrePoint  = aStep->GetPreStepPoint();
   G4StepPoint* thePostPoint = aStep->GetPostStepPoint();
-  G4Track* aTrack = aStep->GetTrack();
   G4VPhysicalVolume* thePrePV  = thePrePoint->GetPhysicalVolume();
   G4String preName  = thePrePV->GetName();
 
@@ -141,11 +140,6 @@ G4bool SpecialVirtualSD::ProcessHits(G4Step* aStep, G4TouchableHistory*
     _iCellR = 0;
     _iCellPhi = 0;
   }
-  int copyNumber = thePrePV->GetCopyNo();
-
-  // obtain magnetic field
-  G4FieldManager* fieldMgr = G4TransportationManager::GetTransportationManager()->GetFieldManager();
-  G4Field* aField = (G4Field*) fieldMgr->GetDetectorField();
 
   //int indx = index(copyIDinZ, copyIDinPhi, copyIDinR);
   //  if(_cellID[indx] =  -1)
