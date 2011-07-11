@@ -73,10 +73,10 @@ class ModuleTextFileIO
     static void setEvaluator(std::map<std::string, int> parametersInt);
 
     //Repeat module first numberOfRepeats times, applying translation, rotation, scalefactor etc
-    void        repeatModule (MiceModule* first, CLHEP::Hep3Vector translation, CLHEP::HepRotation rotation, double scaleFactor, int numberOfRepeats);
+    void        repeatModule (MiceModule* first, CLHEP::Hep3Vector translation, CLHEP::HepRotation rotation, double scaleFactor, unsigned int numberOfRepeats);
     //Repeat module first numberOfRepeats times, loading a variable $$RepeatNumber to the MiceModule each time for evaluation each time
     //$$RepeatNumber starts at 0 and ends at numberOfRepeats
-    void        repeatModule2 (MiceModule* first, int numberOfRepeats);
+    void        repeatModule2 (MiceModule* first, unsigned int numberOfRepeats);
 
   private :
     // Construct a module from input stream; input stream *must* contain position, rotation information

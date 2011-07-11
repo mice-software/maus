@@ -439,21 +439,6 @@ env.SConsignFile()
 #we must watch out for name clashes.
 SConsEnvironment.jDev = Dev()
 
-#get the mode flag from the command line
-#default to 'release' if the user didn't specify
-env.jDev.mymode = ARGUMENTS.get('mode', 'release')  # pylint: disable-msg=E0602
-
-#check if the user has been naughty: only 'debug' or 'release' allowed
-if not (env.jDev.mymode in ['debug', 'release']):
-    print "Error: expected 'debug' or 'release', found: " + env.jDev.mymode
-    my_exit(1)
-
-#tell the user what we're doing
-print '**** Compiling in ' + env.jDev.mymode + ' mode...'
-
-env.jDev.debugcflags = [ '-W1', '-GX', '-D_DEBUG']   #extra compile flags for debug
-env.jDev.releasecflags = ['-O2', '-DNDEBUG',]         #extra compile flags for release
-
 #make sure the sconscripts can get to the variables
 #don't need to export anything but 'env'
 Export('env') # pylint: disable-msg=E0602
@@ -470,7 +455,7 @@ Export('env') # pylint: disable-msg=E0602
 
 print "Configuring..."
 # Must have long32 & long64 for the unpacking library
-env.Append(CCFLAGS=["""-Dlong32='int'""", """-Dlong64='long long'"""])#, '-g', """-fprofile-arcs""", """-ftest-coverage""", """-fno-inline""", """-fno-default-inline"""])
+env.Append(CCFLAGS=["""-Wall""", """-Dlong32='int'""", """-Dlong64='long long'"""])#, '-g', """-fprofile-arcs""", """-ftest-coverage""", """-fno-inline""", """-fno-default-inline"""])
 env.Append(LIBS=['gcov'])
 conf = Configure(env, custom_tests = {'CheckCommand' : CheckCommand}) # pylint: disable-msg=E0602
 set_cpp(conf, env)
