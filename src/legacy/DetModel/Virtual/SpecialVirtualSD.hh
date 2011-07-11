@@ -13,11 +13,17 @@
 #include "Interface/SpecialHit.hh"
 #include "Config/MiceModule.hh"
 #include "Interface/MICEEvent.hh"
+#include "src/common_cpp/DetModel/MAUSSD.hh"
 
 class G4Step;
 class G4HCofThisEvent;
 
-class SpecialVirtualSD : public G4VSensitiveDetector
+// TODO(rogers):
+//         * remove "fake" geometry information
+//         * add field information to output
+//         * do we want to keep the local/global rotation stuff?
+
+class SpecialVirtualSD : public MAUS::MAUSSD
 {
   public:
       SpecialVirtualSD(MICEEvent* , MiceModule* );

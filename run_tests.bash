@@ -22,7 +22,7 @@ echo "These should agree"
 #    echo Clearing lcov
 #    lcov -q -b ${MAUS_ROOT_DIR} --directory src --zerocounters -q
 #fi
-nosetests --with-coverage build
+nosetests --with-coverage -v build
 #if which lcov >& /dev/null; then 
 #    echo Building lcov output
 #    lcov  -q -b ${MAUS_ROOT_DIR} --directory src --capture --output-file maus.info

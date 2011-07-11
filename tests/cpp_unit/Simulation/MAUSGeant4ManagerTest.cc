@@ -67,10 +67,10 @@ TEST(MAUSGeant4ManagerTest, RunParticlePGTest) {
     part_in.time = 4.;
     part_in.px = 5.;
     part_in.py = 6.;
-    part_in.pz = 7.;
+    part_in.pz = 100.;
     part_in.energy = 200.;
     part_in.seed = 10;
-    part_in.pid = -13;
+    part_in.pid = -11; // e- so no decays etc
 
     // test that track is set ok
     Json::Value val = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
@@ -106,6 +106,14 @@ TEST(MAUSGeant4ManagerTest, RunParticlePGTest) {
                              GetVirtualPlanes()->SetWillUseVirtualPlanes(true);
     val = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
     EXPECT_EQ(val["virtual_hits"].type(), Json::arrayValue);
+
+    // test that we make a sensitive detector hit
+    // note dependency on random seed (require we get the same hit twice)
+    Json::Value val_sd_1 = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
+    Json::Value val_sd_2 = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
+    EXPECT_TRUE(val_sd_1["hits"].isArray());
+    EXPECT_TRUE(val_sd_1["hits"].size() > 0);
+    EXPECT_EQ(val_sd_1["hits"].size(), val_sd_2["hits"].size());
 }
 
 TEST(MAUSGeant4ManagerTest, RunParticleJsonTest) {

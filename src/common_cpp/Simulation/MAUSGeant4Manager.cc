@@ -106,10 +106,12 @@ void MAUSGeant4Manager::BeginOfEventAction(const G4Event *anEvent) {
         GetTracking()->SetTracks(Json::Value(Json::objectValue));
     if (GetStepping()->GetWillKeepSteps())
         GetStepping()->SetSteps(Json::Value(Json::arrayValue));
+    GetGeometry()->ClearSDHits();
 }
 
 void MAUSGeant4Manager::EndOfEventAction(const G4Event *anEvent) {
     //  For each detector i
+    _event["hits"] = Json::Value(Json::arrayValue);
     for (unsigned int i = 0; i < GetGeometry()->GetSDSize(); i++) {
       //  Retrieve detector i's hits
       std::vector<Json::Value> hits = GetGeometry()->GetSDHits(i);
