@@ -267,6 +267,7 @@ void    MICEDetectorConstruction::addDaughter( MiceModule* mod, G4VPhysicalVolum
       SpecialVirtualSD * specVirtSD = new SpecialVirtualSD(_event, mod);
       MICESDMan->AddNewDetector( specVirtSD );
       logic->SetSensitiveDetector( specVirtSD );
+      _SDs.push_back( specVirtSD );
     }
     else if( sdName != "Virtual" && sdName != "Envelope") //note these are special cases
       std::cerr << "Error in volume " << mod->fullName() << " do not have an SD definition for " << sdName << std::  endl;

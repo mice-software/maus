@@ -31,7 +31,7 @@ class mc:
       "energy":{"type":"number", "required":True},
       "energy_deposited":{"type":"number", "required":True},
     }
-  }]} #needs to be filled out...
+  }]}
 
   tracks = {"type":"object", "properties":{
     "steps":steps,
@@ -42,7 +42,7 @@ class mc:
     "particle_id":{"type":"integer", "required":True},
     "track_id":{"type":"integer", "required":True},
     "parent_track_id":{"type":"integer", "required":True},
-  }} #needs to be filled out...
+  }}
 
   hits = {"type":"object", "properties":{}} #needs to be filled out...
 
@@ -71,10 +71,8 @@ class mc:
   }}
 
   spill = {
-    "type":"object", "properties":{
-      "particles":particles
-    },
+    "type":"array", "items":[particles],
   }
 
-spill = {"type":"object", "properties":{"mc_particles":mc.spill}}
+spill = {"type":"object", "properties":{"mc":mc.spill}}
 
