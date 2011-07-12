@@ -72,7 +72,7 @@ class JsonWrapper {
 
   /** @brief Get an item from a Json array (variable length array)
    *
-   *  @param value_list array of values from which we want to get a value
+   *  @param array array of values from which we want to get a value
    *  @param value_index index of the value we want to get
    *  @param value_type type of the value we want to get
    *
@@ -84,10 +84,9 @@ class JsonWrapper {
 
   /** @brief Get a property from a Json object (hash)
    *
-   *  @param parent the Json data tree
-   *  @param branch_type enumeration holding the name of the branch you want
-   *  @param max_depth maximum depth to search for the branch. Set to negative
-   *                   to search the whole tree.
+   *  @param object the Json data tree
+   *  @param value_name name of the branch you want
+   *  @param value_type type of value
    *
    *  Attempt to access a branch from Json. If the branch is not found, throw a
    *  Squeal.
