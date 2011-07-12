@@ -1,8 +1,24 @@
-#include "TOFChannelMap.hh"
+/* This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
+ *
+ * MAUS is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MAUS is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
-TOFChannelMap::~TOFChannelMap()
-{
-  for(unsigned int i=0;i<_tofKey.size();i++){
+#include "Utils/TOFChannelMap.hh"
+
+TOFChannelMap::~TOFChannelMap() {
+  for (unsigned int i = 0;i < _tofKey.size();i++) {
     delete _tofKey[i];
     delete _tdcKey[i];
     delete _fadcKey[i];
@@ -10,14 +26,11 @@ TOFChannelMap::~TOFChannelMap()
   _tdcKey.resize(0);
   _fadcKey.resize(0);
   _tofKey.resize(0);
-
 }
 
-void TOFChannelMap::InitFromFile(string filename)
-{
-  ifstream stream( filename.c_str() );
-  if( !stream )
-  {
+void TOFChannelMap::InitFromFile(string filename) {
+  ifstream stream(filename.c_str());
+  if ( !stream ) {
     cerr << "Can't TOF open cabling file " << filename << endl;
     exit(1);
   }
@@ -26,7 +39,7 @@ void TOFChannelMap::InitFromFile(string filename)
 	DAQChannelKey* tdckey;
 	DAQChannelKey* fadckey;
 
-  while ( ! stream.eof() ){
+  while (!stream.eof()) {
 		tofkey = new TOFChannelKey();
 		tdckey = new DAQChannelKey();
 		fadckey = new DAQChannelKey();
@@ -37,51 +50,51 @@ void TOFChannelMap::InitFromFile(string filename)
 	}
 }
 
-void TOFChannelMap::InitFromCDB()
-{}
+void TOFChannelMap::InitFromCDB() {}
 
-TOFChannelKey* TOFChannelMap::find(DAQChannelKey *daqch)
-{
-	if(daqch->eqType()==102)
-	for(unsigned int i=0;i<_tofKey.size();i++)
-    if( _tdcKey[i]->ldc()     == daqch->ldc() &&
+TOFChannelKey* TOFChannelMap::find(DAQChannelKey *daqch) {
+	if (daqch->eqType() == 102)
+	for (unsigned int i = 0;i < _tofKey.size();i++)
+    if ( _tdcKey[i]->ldc()     == daqch->ldc() &&
         _tdcKey[i]->geo()     == daqch->geo() &&
-        _tdcKey[i]->channel() == daqch->channel() ){
+        _tdcKey[i]->channel() == daqch->channel() ) {
       return _tofKey[i];
     }
 
-	if(daqch->eqType()==120)
-	for(unsigned int i=0;i<_tofKey.size();i++)
-    if( _fadcKey[i]->ldc()     == daqch->ldc() &&
+	if (daqch->eqType() == 120)
+	for (unsigned int i = 0;i < _tofKey.size();i++)
+    if ( _fadcKey[i]->ldc()     == daqch->ldc() &&
         _fadcKey[i]->geo()     == daqch->geo() &&
-        _fadcKey[i]->channel() == daqch->channel() ){
+        _fadcKey[i]->channel() == daqch->channel() ) {
       return _tofKey[i];
     }
   return NULL;
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
 
-bool TOFChannelKey::operator== ( TOFChannelKey const key ) {
+bool TOFChannelKey::operator==( TOFChannelKey const key ) {
   if ( _station == key._station &&
        _plane == key._plane &&
        _slab == key._slab &&
        _pmt == key._pmt &&
        _detector == key._detector) {
 		return true;
+  } else {
+    return false;
   }
-  else return false;
 }
 
-bool TOFChannelKey::operator!= ( TOFChannelKey const key ) {
+bool TOFChannelKey::operator!=( TOFChannelKey const key ) {
   if ( _station == key._station &&
        _plane == key._plane &&
        _slab == key._slab &&
        _pmt == key._pmt &&
        _detector == key._detector) {
 		return false;
+  } else {
+    return true;
   }
-  else return true;
 }
 
 ostream& operator<<( ostream& stream, TOFChannelKey key ) {
@@ -99,11 +112,10 @@ istream& operator>>( istream& stream, TOFChannelKey &key ) {
 	return stream;
 }
 
-string TOFChannelKey::str()
-{
+string TOFChannelKey::str() {
 	stringstream xConv;
-	xConv<<(*this);
+	xConv << (*this);
 	return xConv.str();
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////
+

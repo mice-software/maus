@@ -17,11 +17,11 @@
 
 #include "src/input/InputCppRealData/UnpackEventLib.hh"
 
-int V1290DataProcessor::Process(MDdataContainer* aPartEventPtr){
+int V1290DataProcessor::Process(MDdataContainer* aPartEventPtr) {
   // Cast the argument to structure it points to.
   // This process should be called only with MDfragmentV1290 argument
   if ( typeid(*aPartEventPtr) != typeid(MDpartEventV1290) )  return CastError;
-  MDpartEventV1290* xV1290Evnt=static_cast<MDpartEventV1290*>(aPartEventPtr);
+  MDpartEventV1290* xV1290Evnt = static_cast<MDpartEventV1290*>(aPartEventPtr);
 
   Json::Value pBoardDoc;
   Json::Value pTdcHit;
@@ -33,7 +33,7 @@ int V1290DataProcessor::Process(MDdataContainer* aPartEventPtr){
 		pBoardDoc["equip_type"] = xEquip = this->GetEquipmentType();
     pBoardDoc["time_stamp"]          = this->GetTimeStamp();
     pBoardDoc["phys_event_number"]   = this->GetPhysEventNumber();
-    pBoardDoc["part_event_number"] = xPartEv = xV1290Evnt->GetEventCount();
+    pBoardDoc["part_event_number"] = xPartEv = this->GetPartEventNumber();
     pBoardDoc["geo"]          = xGeo = xV1290Evnt->GetGeo();
     pBoardDoc["trigger_time_tag"]    = xV1290Evnt->GetTriggerTimeTag();
     // Loop over all the channels
@@ -46,48 +46,52 @@ int V1290DataProcessor::Process(MDdataContainer* aPartEventPtr){
       // Loop over each possible hit
       int xLT, xTT;  // Lead and Trail times?
       for (unsigned int j = 0; j < xMaxHits; j++) {
-        if (j < xHitsL)
+        if (j < xHitsL) {
           xLT = xV1290Evnt->GetHitMeasurement(j,  // Hit ID
                                              xCh,  // Channel ID
                                              'l');
-        else
+        } else {
           xLT = -99;
+        }
 
-        if (j < xHitsT) xTT = xV1290Evnt->GetHitMeasurement(j,  // Hit ID
-                                                           xCh,  // Channel ID
-                                                           't');
-        else
+        if (j < xHitsT) {
+          xTT = xV1290Evnt->GetHitMeasurement(j,  // Hit ID
+                                              xCh,  // Channel ID
+                                             't');
+        } else {
           xTT = -99;
+        }
 
-        int xBunchID = xV1290Evnt->GetBunchID( xCh/8 );
+        int xBunchID = xV1290Evnt->GetBunchID(xCh/8);
 
         Json::Value xTdcHit;
         pTdcHit["bunch_id"]      = xBunchID;
         pTdcHit["channel"]       = xCh;
         pTdcHit["leading_time"]  = xLT;
         pTdcHit["trailing_time"] = xTT;
-        DAQChannelKey* xKey = _chMap->find(xLdc,xGeo,xCh,xEquip);
-        if(xKey){
+        DAQChannelKey* xKey = _chMap->find(xLdc, xGeo, xCh, xEquip);
+        if (xKey) {
           pTdcHit["channel_key"] = xKey->str();
           xDetector = xKey->detector();
           pTdcHit["detector"] = xDetector;
-        } else pTdcHit["detector"] = xDetector = "unknown";
-
+        } else {
+          pTdcHit["detector"] = xDetector = "unknown";
+        }
         ( *_docSpill )[xDetector][ xPartEv ][_equipment.c_str()].append(pTdcHit);
       }
     }
-  }else cout<<"MDpartEventV1290 is not valid"<<endl;
+  }
 
   return OK;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 
-int V1724DataProcessor::Process(MDdataContainer* aPartEventPtr){
+int V1724DataProcessor::Process(MDdataContainer* aPartEventPtr) {
   // Cast the argument to structure it points to.
   // This process should be called only with MDfragmentV1724 argument.
   if ( typeid(*aPartEventPtr) != typeid(MDpartEventV1724) )  return CastError;
-  MDpartEventV1724* xV1724Evnt=static_cast<MDpartEventV1724*>(aPartEventPtr);
+  MDpartEventV1724* xV1724Evnt = static_cast<MDpartEventV1724*>(aPartEventPtr);
 
   Json::Value pBoardDoc;
 	Json::Value xfAdcHit;
@@ -99,7 +103,7 @@ int V1724DataProcessor::Process(MDdataContainer* aPartEventPtr){
     pBoardDoc["equip_type"] = xEquip = this->GetEquipmentType();
     pBoardDoc["time_stamp"]          = this->GetTimeStamp();
     pBoardDoc["phys_event_number"]   = this->GetPhysEventNumber();
-    pBoardDoc["part_event_number"] = xPartEv = xV1724Evnt->GetEventCount();
+    pBoardDoc["part_event_number"] = xPartEv = this->GetPartEventNumber();
     pBoardDoc["geo"]          = xGeo = xV1724Evnt->GetGeo();
     pBoardDoc["trigger_time_tag"]    = xV1724Evnt->GetTriggerTimeTag();
     // Loop over all the channels
@@ -108,27 +112,30 @@ int V1724DataProcessor::Process(MDdataContainer* aPartEventPtr){
       for (unsigned int j = 0; j < xSamples; j++) {
         int sample = xV1724Evnt->GetSampleData(xCh,  // Channel ID
                                                j);  // Sample ID
-        data.push_back( sample );
+        _data.push_back(sample);
       }
       xfAdcHit = pBoardDoc;
-      this->SetPedestal();
-      int charge_mm = this->GetCharge(ceaMinMax);
-      if(!_zero_suppression || charge_mm>100){
+      this->set_pedestal();
+      int charge_mm = this->get_charge(ceaMinMax);
+      if ( !_zero_suppression ||
+           (_zero_suppression && charge_mm>_zs_threshold) ) {
         xfAdcHit["charge_mm"]    = charge_mm;
-        xfAdcHit["charge_pm"]    = this->GetCharge(ceaPedMax);
-        xfAdcHit["position_max"] = this->GetMaxPosition();
-        xfAdcHit["pedestals"]    = this->GetPedestal();
-        DAQChannelKey* xKey = _chMap->find(xLdc,xGeo,xCh,xEquip);
-        if(xKey){
+        xfAdcHit["charge_pm"]    = this->get_charge(ceaPedMax);
+        xfAdcHit["position_max"] = this->get_max_position();
+        xfAdcHit["pedestals"]    = this->get_pedestal();
+        DAQChannelKey* xKey = _chMap->find(xLdc, xGeo, xCh, xEquip);
+        if (xKey) {
           xDetector = xKey->detector();
           xfAdcHit["channel_key"]   = xKey->str();
           xfAdcHit["detector"]      = xDetector;
-        } else xfAdcHit["detector"] = xDetector = "unknown";
+        } else {
+          xfAdcHit["detector"] = xDetector = "unknown";
+        }
         xfAdcHit["channel"]        = xCh;
 
         ( *_docSpill )[xDetector][ xPartEv ][_equipment].append(xfAdcHit);
       }
-      data.resize(0);
+      _data.resize(0);
     }
   }
 
@@ -137,11 +144,11 @@ int V1724DataProcessor::Process(MDdataContainer* aPartEventPtr){
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 
-int V1731DataProcessor::Process(MDdataContainer* aPartEventPtr){
+int V1731DataProcessor::Process(MDdataContainer* aPartEventPtr) {
   // Cast the argument to structure it points to.
   // This process should be called only with MDfragmentV1731 argument.
   if ( typeid(*aPartEventPtr) != typeid(MDpartEventV1731) )  return CastError;
-  MDpartEventV1731* xV1731Evnt=static_cast<MDpartEventV1731*>(aPartEventPtr);
+  MDpartEventV1731* xV1731Evnt = static_cast<MDpartEventV1731*>(aPartEventPtr);
 
   Json::Value pBoardDoc;
 	Json::Value xfAdcHit;
@@ -153,7 +160,7 @@ int V1731DataProcessor::Process(MDdataContainer* aPartEventPtr){
     pBoardDoc["equip_type"] = xEquip = this->GetEquipmentType();
     pBoardDoc["time_stamp"]          = this->GetTimeStamp();
     pBoardDoc["phys_event_number"]   = this->GetPhysEventNumber();
-    pBoardDoc["part_event_number"] = xPartEv = xV1731Evnt->GetEventCount();
+    pBoardDoc["part_event_number"] = xPartEv = this->GetPartEventNumber();
     pBoardDoc["geo"]          = xGeo = xV1731Evnt->GetGeo();
     pBoardDoc["trigger_time_tag"]    = xV1731Evnt->GetTriggerTimeTag();
     // Loop over all the channels
@@ -162,27 +169,30 @@ int V1731DataProcessor::Process(MDdataContainer* aPartEventPtr){
       for (unsigned int j = 0; j < xSamples; j++) {
         int sample = xV1731Evnt->GetSampleData(xCh,  // Channel ID
                                                j);  // Sample ID
-        data.push_back( sample );
+        _data.push_back(sample);
       }
       xfAdcHit = pBoardDoc;
-      this->SetPedestal();
-      int charge_mm = this->GetCharge(ceaMinMax);
-      if(!_zero_suppression || charge_mm>100){
+      this->set_pedestal();
+      int charge_mm = this->get_charge(ceaMinMax);
+      if ( !_zero_suppression ||
+          (_zero_suppression && charge_mm>_zs_threshold) ) {
         xfAdcHit["charge_mm"]    = charge_mm;
-        xfAdcHit["charge_pm"]    = this->GetCharge(ceaPedMax);
-        xfAdcHit["position_max"] = this->GetMaxPosition();
-        xfAdcHit["pedestals"]    = this->GetPedestal();
-        DAQChannelKey* xKey = _chMap->find(xLdc,xGeo,xCh,xEquip);
-        if(xKey){
+        xfAdcHit["charge_pm"]    = this->get_charge(ceaPedMax);
+        xfAdcHit["position_max"] = this->get_max_position();
+        xfAdcHit["pedestals"]    = this->get_pedestal();
+        DAQChannelKey* xKey = _chMap->find(xLdc, xGeo, xCh, xEquip);
+        if (xKey) {
           xDetector = xKey->detector();
           xfAdcHit["channel_key"]   = xKey->str();
           xfAdcHit["detector"]      = xDetector;
-        } else xfAdcHit["detector"] = xDetector = "unknown";
+        } else {
+          xfAdcHit["detector"] = xDetector = "unknown";
+        }
         xfAdcHit["channel"]        = xCh;
 
         ( *_docSpill )[xDetector][ xPartEv ][_equipment].append(xfAdcHit);
       }
-      data.resize(0);
+      _data.resize(0);
     }
   }
 
@@ -191,7 +201,7 @@ int V1731DataProcessor::Process(MDdataContainer* aPartEventPtr){
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 
-int V830DataProcessor::Process(MDdataContainer* aFragPtr){
+int V830DataProcessor::Process(MDdataContainer* aFragPtr) {
   // Cast the argument to structure it points to.
   // This process should be called only with MDfragmentV830 argument.
   if ( typeid(*aFragPtr) != typeid(MDfragmentV830) ) return CastError;
@@ -206,16 +216,17 @@ int V830DataProcessor::Process(MDdataContainer* aFragPtr){
     pBoardDoc["channels"] = Json::Value();
 
     unsigned int * ptr = xV830Fragment->Get32bWordPtr(0);
-    MDdataWordV830 dw(ptr) ;
+    MDdataWordV830 dw(ptr);
     unsigned int wc(0);
 
-    while (wc < xV830Fragment->GetWordCount() ) {
+    // Loop over all the channels
+    while ( wc < xV830Fragment->GetWordCount() ) {
       uint32_t dt= dw.GetDataType();
       switch ( dt ) {
         case DWV830_Measurement:
         {
 		      // Convert the channel number into a channel number string!
-          std::stringstream xConv;
+          stringstream xConv;
           xConv <<  "ch" << dw.GetChannel();
 					unsigned int xValue = dw.GetMeasurement();
 					pBoardDoc["channels"][xConv.str()] = Json::Value(xValue);
@@ -223,12 +234,12 @@ int V830DataProcessor::Process(MDdataContainer* aFragPtr){
         }
         case DWV830_Header:
         {
-           pBoardDoc["geo"] = Json::Value( dw.GetGeo() );
+           pBoardDoc["geo"] = Json::Value(dw.GetGeo());
            break;
         }
       }
       wc++;
-      dw.SetDataPtr( ++ptr );
+      dw.SetDataPtr(++ptr);
     }
 	}
 
@@ -239,25 +250,25 @@ int V830DataProcessor::Process(MDdataContainer* aFragPtr){
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 
-int VLSBDataProcessor::Process(MDdataContainer* aFragPtr){
+int VLSBDataProcessor::Process(MDdataContainer* aFragPtr) {
   // Cast the argument to structure it points to.
   // This process should be called only with MDfragmentVLSB_C argument.
   if ( typeid(*aFragPtr) != typeid(MDfragmentVLSB_C) ) return CastError;
   MDfragmentVLSB_C* xVLSBFragment = static_cast<MDfragmentVLSB_C*>(aFragPtr);
 
   Json::Value pBoardDoc;
-  if( xVLSBFragment->IsValid()) {
+  if ( xVLSBFragment->IsValid() ) {
     int xLdc, xGeo, xEquip;
     // Put static data into the Json
     pBoardDoc["ldc_id"]       = xLdc = this->GetLdcId();
     pBoardDoc["equip_type"] = xEquip = this->GetEquipmentType();
     pBoardDoc["time_stamp"]          = this->GetTimeStamp();
     pBoardDoc["phys_event_number"]   = this->GetPhysEventNumber();
-    //pBoardDoc["part_event_number"]   = this->GetPartEventNumber();
+    pBoardDoc["part_event_number"]   = this->GetPartEventNumber();
     pBoardDoc["geo"]          = xGeo = xVLSBFragment->GetGeo();
-    for (int ib=0; ib<4; ib++){
+    for (int ib = 0; ib < 4; ib++) {
 		// Convert the bank number into a bank number string!
-      std::stringstream xConv;
+      stringstream xConv;
       xConv << "bank_length_" << ib;
       pBoardDoc[ib] = xVLSBFragment->GetBankLength(ib);
     }
@@ -270,7 +281,7 @@ int VLSBDataProcessor::Process(MDdataContainer* aFragPtr){
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 
-int DBBDataProcessor::Process(MDdataContainer* aFragPtr){
+int DBBDataProcessor::Process(MDdataContainer* aFragPtr) {
   // Cast the argument to structure it points to.
   // This process should be called only with MDfragmentDBB argument.
   if ( typeid(*aFragPtr) != typeid(MDfragmentDBB) ) return CastError;
@@ -301,28 +312,33 @@ int DBBDataProcessor::Process(MDdataContainer* aFragPtr){
       // Loop over each possible hit
       int xLT, xTT;  // Lead and Trail times?
       for (unsigned int j = 0; j < xMaxHits; j++) {
-        if (j < xHitsL)
+        if (j < xHitsL) {
           xLT = xDBBFragment->GetHitMeasurement(j,  // Hit ID
                                              xCh,  // Channel ID
                                              'l');
-        else
+        } else {
           xLT = -99;
+        }
 
-        if (j < xHitsT) xTT = xDBBFragment->GetHitMeasurement(j,  // Hit ID
-                                                           xCh,  // Channel ID
-                                                           't');
-        else
+        if (j < xHitsT) {
+          xTT = xDBBFragment->GetHitMeasurement(j,  // Hit ID
+                                                xCh,  // Channel ID
+                                                't');
+        } else {
           xTT = -99;
+        }
 
         xDBBHit["channel"]       = xCh;
         xDBBHit["leading_time"]  = xLT;
         xDBBHit["trailing_time"] = xTT;
-        DAQChannelKey* xKey = _chMap->find(xLdc,xGeo,xCh,xEquip);
-        if(xKey){
+        DAQChannelKey* xKey = _chMap->find(xLdc, xGeo, xCh, xEquip);
+        if (xKey) {
           xDetector = xKey->detector();
           xDBBHit["channel_key"]   = xKey->str();
           xDBBHit["detector"]      = xDetector;
-        } else xDBBHit["detector"] = xDetector = "unknown";
+        } else {
+          xDBBHit["detector"] = xDetector = "unknown";
+        }
         pBoardDoc["hits"].append(xDBBHit);
       }
     }
@@ -332,8 +348,119 @@ int DBBDataProcessor::Process(MDdataContainer* aFragPtr){
   return OK;
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+int fADCDataProcessor::get_area() {
+  int area = 0;
+  for ( unsigned int ich = 0; ich < _data.size(); ich++)
+    area += abs(_data[ich] - _pedestal);
+
+  return area;
+}
 
 
+void fADCDataProcessor::set_pedestal() {
+  int area = 0;
+  unsigned int pedBins = 20;
+	if (_data.size() > pedBins) {
+    for (unsigned int i = 0; i < pedBins; i++) {
+       area += _data[i];
+    }
+  }
+  _pedestal = area/pedBins;
+}
+
+int fADCDataProcessor::chargeMinMax() {
+  int min, max, d;
+  d = -99;
+  max = LONG_MIN;
+  min = LONG_MAX;
+  for ( unsigned int i = 0; i < _data.size(); ++i ) {
+    d = _data[ i ];
+    min = ( min > d )? d : min;
+    max = ( max > d )? max : d;
+  }
+
+  return max - min;
+}
+
+int fADCDataProcessor::get_signal_area(int& pos) {
+	vector<int>::iterator it = _data.begin();
+	vector<int>::iterator max;
+	int area = 0;
+
+	max = max_element(_data.begin(), _data.end());
+	pos = distance(_data.begin(), max);
+
+	if(pos > 10) it = max - 10;
+
+	while(it < max+20) {
+		area += *it - _pedestal;
+		it++;
+	}
+
+	return area;
+}
+
+int fADCDataProcessor::get_pedestal_area(int& pos) {
+	vector<int>::iterator it = _data.begin();
+	vector<int>::iterator max;
+	int pedareaminus = 0;
+	int pedareaplus = 0;
+
+	max = max_element(_data.begin(), _data.end());
+	pos = distance(_data.begin(), max);
+
+	if(pos > 30 && pos < 97) {
+		it = max - 30;
+		while(it < max-10) {
+			pedareaminus += *it - _pedestal;
+			it++;
+		}
+
+		it = max + 20;
+		while(it < max+30) {
+			pedareaplus += *it - _pedestal;
+			it++;
+		}
+	}
+
+	return pedareaminus + pedareaplus;
+}
+
+
+int fADCDataProcessor::get_max_position() {
+	int pos = 0;
+	vector<int>::iterator max;
+	max = max_element(_data.begin(), _data.end());
+	pos = distance(_data.begin(), max);
+
+	return pos;
+}
+
+
+int fADCDataProcessor::chargePedMax() {
+  int max = 0;
+  max = *max_element(_data.begin(), _data.end());
+  return max - _pedestal;
+}
+
+int fADCDataProcessor::get_charge(int Algorithm) {
+  int charge;
+	switch( Algorithm ) {
+  case ceaMinMax:
+    charge = chargeMinMax();
+    break;
+  case ceaPedMax:
+    charge = chargePedMax();
+    break;
+   default:
+    charge = -99;
+    break;
+  }
+
+  return charge;
+}
 
 
 

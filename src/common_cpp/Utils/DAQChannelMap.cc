@@ -1,6 +1,24 @@
-#include "DAQChannelMap.hh"
+/* This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
+ *
+ * MAUS is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MAUS is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include "Utils/DAQChannelMap.hh"
+
+////////////////////////////////////////////////////////////
 
 bool DAQChannelKey::operator== ( DAQChannelKey const key ) {
   if ( _ldcId == key._ldcId &&
@@ -9,8 +27,9 @@ bool DAQChannelKey::operator== ( DAQChannelKey const key ) {
        _eqType == key._eqType &&
        _detector == key._detector) {
 		return true;
-  }
-  else return false;
+  } else {
+    return false;
+	}
 }
 
 bool DAQChannelKey::operator!= ( DAQChannelKey const key ) {
@@ -20,8 +39,9 @@ bool DAQChannelKey::operator!= ( DAQChannelKey const key ) {
        _eqType == key._eqType &&
        _detector == key._detector) {
 		return false;
+  } else {
+    return true;
   }
-  else return true;
 }
 
 ostream& operator<<( ostream& stream, DAQChannelKey key ) {
@@ -39,51 +59,43 @@ istream& operator>>( istream& stream, DAQChannelKey &key ) {
 	return stream;
 }
 
-string DAQChannelKey::str()
-{
+string DAQChannelKey::str() {
 	stringstream xConv;
-	xConv<<(*this);
+	xConv << (*this);
 	return xConv.str();
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
 
-
-
-DAQChannelMap::~DAQChannelMap()
-{
-  for(unsigned int i=0;i<_chKey.size();i++)
+DAQChannelMap::~DAQChannelMap() {
+  for (unsigned int i = 0;i < _chKey.size();i++)
     delete _chKey[i];
 
   _chKey.resize(0);
 }
 
-void DAQChannelMap::InitFromFile(string filename)
-{
+void DAQChannelMap::InitFromFile(string filename) {
 
-  ifstream stream( filename.c_str() );
-  if( !stream )
-  {
-    std::cerr << "Can't DAQ open cabling file " << filename << std::endl;
+  ifstream stream(filename.c_str());
+  if ( !stream ) {
+    cerr << "Can't DAQ open cabling file " << filename << endl;
     exit(1);
   }
 	stringstream key_s;
 	DAQChannelKey* key;
 
-  while ( ! stream.eof() ){
+  while ( !stream.eof() ) {
 		key = new DAQChannelKey();
 		stream >> *key;
 		_chKey.push_back(key);
 	}
 }
 
-void DAQChannelMap::InitFromCDB()
-{}
+void DAQChannelMap::InitFromCDB() {}
 
-DAQChannelKey* DAQChannelMap::find(int ldc, int geo, int ch, int eqType)
-{
-	for(unsigned int i=0;i<_chKey.size();i++)
-    if( _chKey[i]->ldc() == ldc &&
+DAQChannelKey* DAQChannelMap::find(int ldc, int geo, int ch, int eqType) {
+	for (unsigned int i = 0;i < _chKey.size();i++)
+    if ( _chKey[i]->ldc() == ldc &&
         _chKey[i]->geo() == geo &&
         _chKey[i]->channel() == ch &&
         _chKey[i]->eqType() == eqType )
@@ -92,10 +104,9 @@ DAQChannelKey* DAQChannelMap::find(int ldc, int geo, int ch, int eqType)
   return NULL;
 }
 
-string DAQChannelMap::detector(int ldc, int geo, int ch, int eqType)
-{
+string DAQChannelMap::detector(int ldc, int geo, int ch, int eqType) {
   DAQChannelKey* key = find(ldc, geo, ch, eqType);
-  if( key )
+  if ( key )
     return key->detector();
 
   return "unknown";

@@ -27,9 +27,10 @@
 
 #include <string>
 #include <iostream>
-#include "UnpackEventLib.hh"
-#include "RawDataProcessing.hh"
+
+#include "src/input/InputCppRealData/UnpackEventLib.hh"
 #include "Utils/DAQChannelMap.hh"
+
 
 /** \class InputCppRealData
   * Load MICE raw data and unpack it into a JSON stream.
@@ -38,7 +39,7 @@
   * This is based on the original MICE RealData Module.
   *
   */
-class InputCppRealData{
+class InputCppRealData {
 private
 :
 /** Debug flag,
@@ -144,8 +145,9 @@ public
   * This disables the unpacking of the data produced by all equipment
 	* with the specified type.
 	*/
-	void disableEquipment(std::string pEquipType)
-	{ _dataProcessManager.Disable(pEquipType);};
+	void disableEquipment(std::string pEquipType) {
+    _dataProcessManager.Disable(pEquipType);
+  }
 
 /** Close the file and free memory.
   *

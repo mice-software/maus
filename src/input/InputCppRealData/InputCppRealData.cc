@@ -35,9 +35,13 @@ InputCppRealData::InputCppRealData(std::string pDataPath,
 
 
 bool InputCppRealData::birth(std::string jsonDataCards) {
-  unsigned int nfiles = _dataFileManager.AddRun( _runNum.c_str(), _dataPath.c_str() );
-  if(!nfiles){
-    std::cerr<<"Unable to load any data files. Check your run number and data path."<<std::endl;
+  if ( _dataFileManager.GetNFiles() ) {
+     return false;  // Faile because files are already open
+  }
+
+  unsigned int nfiles = _dataFileManager.AddRun(_runNum.c_str(), _dataPath.c_str());
+  if (!nfiles) {
+    std::cerr << "Unable to load any data files. Check your run number and data path." << std::endl;
 	  exit(0);
   }
 
@@ -51,76 +55,96 @@ bool InputCppRealData::birth(std::string jsonDataCards) {
     return false;
   }
 
-  assert( configJSON.isMember("DAQ_cabling_file") );
+  assert(configJSON.isMember("DAQ_cabling_file"));
 	string map_file_name = configJSON["DAQ_cabling_file"].asString();
-  char* pMAUS_ROOT_DIR = getenv( "MAUS_ROOT_DIR" );
-  map.InitFromFile( string( pMAUS_ROOT_DIR ) + map_file_name );
+  char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
+  map.InitFromFile(string(pMAUS_ROOT_DIR) + map_file_name);
 
+  // Comfigure the V1290 (TDC) data processor.
   assert(configJSON.isMember("Enable_V1290_Unpacking"));
-  if( configJSON["Enable_V1290_Unpacking"].asBool() ){
+  if ( configJSON["Enable_V1290_Unpacking"].asBool() ) {
     _v1290PartEventProc = new V1290DataProcessor();
-    _v1290PartEventProc->set_DAQ_map( &map );
-    _dataProcessManager.SetPartEventProc("V1290",_v1290PartEventProc);
+    _v1290PartEventProc->set_DAQ_map(&map);
+    _dataProcessManager.SetPartEventProc("V1290", _v1290PartEventProc);
+  } else {
+    this->disableEquipment("V1290");
   }
-  else  this->disableEquipment("V1290");
 
+  // Comfigure the V1724 (fADC) data processor.
   assert(configJSON.isMember("Enable_V1724_Unpacking"));
-  if( configJSON["Enable_V1724_Unpacking"].asBool() ){
+  if ( configJSON["Enable_V1724_Unpacking"].asBool() ) {
     _v1724PartEventProc = new V1724DataProcessor();
-    _v1724PartEventProc->set_DAQ_map( &map );
+    _v1724PartEventProc->set_DAQ_map(&map);
     bool zs = configJSON["Do_V1724_Zero_Suppression"].asBool();
-    _v1724PartEventProc->set_zero_supression( zs );
-    _dataProcessManager.SetPartEventProc("V1724",_v1724PartEventProc);
+    _v1724PartEventProc->set_zero_supression(zs);
+    unsigned int zs_threshold = configJSON["V1724_Zero_Suppressio_Threshold"].asInt();
+    _v1724PartEventProc->set_zs_threshold(zs_threshold);
+    _dataProcessManager.SetPartEventProc("V1724", _v1724PartEventProc);
+  } else {
+    this->disableEquipment("V1724");
   }
-  else  this->disableEquipment("V1724");
 
+
+  // Comfigure the V1731 (fADC) data processor.
   assert(configJSON.isMember("Enable_V1731_Unpacking"));
-  if( configJSON["Enable_V1731_Unpacking"].asBool() ){
+  if ( configJSON["Enable_V1731_Unpacking"].asBool() ) {
     _v1731PartEventProc = new V1731DataProcessor();
-    _v1731PartEventProc->set_DAQ_map( &map );
+    _v1731PartEventProc->set_DAQ_map(&map);
     bool zs = configJSON["Do_V1731_Zero_Suppression"].asBool();
-    _v1731PartEventProc->set_zero_supression( zs );
-    _dataProcessManager.SetPartEventProc("V1731",_v1731PartEventProc);
+    _v1731PartEventProc->set_zero_supression(zs);
+    unsigned int zs_threshold = configJSON["V1731_Zero_Suppressio_Threshold"].asInt();
+    _v1731PartEventProc->set_zs_threshold(zs_threshold);
+    _dataProcessManager.SetPartEventProc("V1731", _v1731PartEventProc);
+  } else {
+    this->disableEquipment("V1731");
   }
-  else  this->disableEquipment("V1731");
 
+
+  // Comfigure the V830 (scaler) data processor.
   assert(configJSON.isMember("Enable_V830_Unpacking"));
-  if( configJSON["Enable_V830_Unpacking"].asBool() ){
+  if ( configJSON["Enable_V830_Unpacking"].asBool() ) {
     _v830FragmentProc = new V830DataProcessor();
-    _v830FragmentProc->set_DAQ_map( &map );
-    _dataProcessManager.SetFragmentProc("V830",_v830FragmentProc);
+    _v830FragmentProc->set_DAQ_map(&map);
+    _dataProcessManager.SetFragmentProc("V830", _v830FragmentProc);
+  } else {
+    this->disableEquipment("V830");
   }
-  else  this->disableEquipment("V830");
 
+
+  // Comfigure the VLSB (tracker board) data processor.
   assert(configJSON.isMember("Enable_VLSB_Unpacking"));
-  if( configJSON["Enable_VLSB_Unpacking"].asBool() ){
+  if (configJSON["Enable_VLSB_Unpacking"].asBool()) {
     _vLSBFragmentProc = new VLSBDataProcessor();
-    _vLSBFragmentProc->set_DAQ_map( &map );
-    _dataProcessManager.SetFragmentProc("VLSB_C",_vLSBFragmentProc);
+    _vLSBFragmentProc->set_DAQ_map(&map);
+    _dataProcessManager.SetFragmentProc("VLSB", _vLSBFragmentProc);
+  } else {
+    this->disableEquipment("VLSB");
   }
-  else  this->disableEquipment("VLSB_C");
 
+
+  // Comfigure the DBB (EMR board) data processor.
   assert(configJSON.isMember("Enable_DBB_Unpacking"));
-  if( configJSON["Enable_DBB_Unpacking"].asBool() ){
+  if ( configJSON["Enable_DBB_Unpacking"].asBool() ) {
     _DBBFragmentProc = new DBBDataProcessor();
-    _DBBFragmentProc->set_DAQ_map( &map );
-    _dataProcessManager.SetFragmentProc("DBB",_DBBFragmentProc);
+    _DBBFragmentProc->set_DAQ_map(&map);
+    _dataProcessManager.SetFragmentProc("DBB", _DBBFragmentProc);
+  } else {
+    this->disableEquipment("DBB");
   }
-  else  this->disableEquipment("DBB");
 
-  //_eventPtr = _dataFileManager.GetNextEvent();
-
-  if (_debug)
+  if (_debug) {
     std::cerr << nfiles << "files loaded for Run " << _runNum << " ("
               << _dataPath << ")" << std::endl;
+  }
 
-	_dataProcessManager.DumpProcessors();
+  // _dataProcessManager.DumpProcessors();
 
   return true;
 }
 
 
 bool InputCppRealData::readNextEvent() {
+	// Use the MDfileManager object to get the next event.
 	_eventPtr = _dataFileManager.GetNextEvent();
   if (!_eventPtr)
     return false;
@@ -128,35 +152,37 @@ bool InputCppRealData::readNextEvent() {
   return true;
 }
 
-
 std::string InputCppRealData::getCurEvent() {
+	// Create new Json documents.
 	Json::Value xDocRoot;  // Root of the event
   Json::FastWriter xJSONWr;
   Json::Value xDocSpill;
 
-  if( _v1290PartEventProc )
-	  _v1290PartEventProc->set_JSON_doc( &xDocSpill );
+  // Order all processor classes to fill in xDocSpill.
+  if (_v1290PartEventProc)
+    _v1290PartEventProc->set_JSON_doc(&xDocSpill);
 
-	if( _v1724PartEventProc )
-	  _v1724PartEventProc->set_JSON_doc( &xDocSpill );
+	if (_v1724PartEventProc)
+    _v1724PartEventProc->set_JSON_doc(&xDocSpill);
 
-  if( _v1731PartEventProc )
-    _v1731PartEventProc->set_JSON_doc( &xDocSpill );
+  if (_v1731PartEventProc)
+    _v1731PartEventProc->set_JSON_doc(&xDocSpill);
 
-  if( _v830FragmentProc )
-    _v830FragmentProc->set_JSON_doc( &xDocSpill );
+  if (_v830FragmentProc)
+    _v830FragmentProc->set_JSON_doc(&xDocSpill);
 
-  if( _vLSBFragmentProc )
-    _vLSBFragmentProc->set_JSON_doc( &xDocSpill );
+  if (_vLSBFragmentProc)
+    _vLSBFragmentProc->set_JSON_doc(&xDocSpill);
 
-  if( _DBBFragmentProc )
-    _DBBFragmentProc->set_JSON_doc( &xDocSpill );
+  if (_DBBFragmentProc)
+    _DBBFragmentProc->set_JSON_doc(&xDocSpill);
 
+  // Now do the loop over the binary DAQ data.
   try {
     _dataProcessManager.Process(_eventPtr);
   }
   // Deal with exceptions
-  catch ( MDexception & lExc) {
+  catch(MDexception & lExc) {
     cerr << "Unpacking exception,  DAQ Event skipped" << std::endl;
     cerr <<  lExc.GetDescription() << endl;
   }
@@ -171,60 +197,60 @@ std::string InputCppRealData::getCurEvent() {
   // Finally attach the spill to the document root
   xDocRoot["daq_data"] = xDocSpill;
   xDocRoot["spill_num"] = _dataProcessManager.GetSpillNumber();
-	xDocRoot["daq_event_type"] = event_type_to_str( _dataProcessManager.GetEventType() );
-	//cout<<xDocRoot<<endl;
+  unsigned int event_type = _dataProcessManager.GetEventType();
+	xDocRoot["daq_event_type"] = event_type_to_str(event_type);
+	// cout<<xDocRoot<<endl;
   if (_debug)
     std::cerr << "Writing JSON..." << std::endl;
-  return xJSONWr.write(xDocRoot);
 
+  return xJSONWr.write(xDocRoot);
 }
 
-bool InputCppRealData::death()
-{
-  if(_v1290PartEventProc) delete _v1290PartEventProc;
-  if(_v1724PartEventProc) delete _v1724PartEventProc;
-  if(_v1731PartEventProc) delete _v1731PartEventProc;
-  if(_v830FragmentProc) delete _v830FragmentProc;
-  if(_vLSBFragmentProc) delete _vLSBFragmentProc;
-  if(_DBBFragmentProc) delete _DBBFragmentProc;
+bool InputCppRealData::death() {
+	// Free the memory.
+  if (_v1290PartEventProc) delete _v1290PartEventProc;
+  if (_v1724PartEventProc) delete _v1724PartEventProc;
+  if (_v1731PartEventProc) delete _v1731PartEventProc;
+  if (_v830FragmentProc) delete _v830FragmentProc;
+  if (_vLSBFragmentProc) delete _vLSBFragmentProc;
+  if (_DBBFragmentProc) delete _DBBFragmentProc;
 
   return true;
 }
 
-string InputCppRealData::event_type_to_str(int pType)
-{
+string InputCppRealData::event_type_to_str(int pType) {
   string event_type;
-  switch(pType){
-		case START_OF_BURST :
-			event_type = "start_of_burst";
-			break;
+  switch (pType) {
+    case START_OF_BURST :
+      event_type = "start_of_burst";
+      break;
 
-		case  END_OF_BURST:
+    case  END_OF_BURST:
       event_type = "end_of_burst";
       break;
 
-		case PHYSICS_EVENT :
-			event_type = "physics_event";
-			break;
+    case PHYSICS_EVENT :
+      event_type = "physics_event";
+      break;
 
-		case CALIBRATION_EVENT :
+    case CALIBRATION_EVENT :
       event_type = "calibration_event";
       break;
 
-		case START_OF_RUN :
-			event_type = "start_of_run";
-			break;
+    case START_OF_RUN :
+      event_type = "start_of_run";
+      break;
 
-		case  END_OF_RUN:
+    case  END_OF_RUN:
       event_type = "end_of_run";
       break;
 
-		default :
-			stringstream xConv;
-			xConv<<pType<<" (unknown)";
+    default :
+      stringstream xConv;
+      xConv << pType << " (unknown)";
       event_type = xConv.str();
       break;
-	}
+  }
   return event_type;
 }
 
