@@ -73,7 +73,7 @@ class JsonWrapper {
   /** @brief Get an item from a Json array (variable length array)
    *
    *  @param array array of values from which we want to get a value
-   *  @param value_index index of the value we want to get
+   *  @param value_index index of the value in the array
    *  @param value_type type of the value we want to get
    *
    *  Returns the Json::Value on success. Throws an exception of type Squeal on
@@ -85,8 +85,8 @@ class JsonWrapper {
   /** @brief Get a property from a Json object (hash)
    *
    *  @param object the Json data tree
-   *  @param value_name name of the branch you want
-   *  @param value_type type of value
+   *  @param value_name name of the branch we want to get
+   *  @param value_type type of the value we want to get
    *
    *  Attempt to access a branch from Json. If the branch is not found, throw a
    *  Squeal.
