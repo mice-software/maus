@@ -21,11 +21,12 @@
 bool MapCppTOFReconstruction::birth(string argJsonConfigDocument) {
 	cout << "MapCppTOFReconstruction::birth" << endl;
   _classname = "MapCppTOFReconstruction";
-
+/*
   //  JsonCpp setup
   Json::Value configJSON;   //  this will contain the configuration
   Json::Reader reader;
-	  // Check if the JSON document can be parsed, else return error only
+
+  // Check if the JSON document can be parsed, else return error only
   bool parsingSuccessful = reader.parse(argJsonConfigDocument, configJSON);
   if (!parsingSuccessful) {
     return false;
@@ -35,7 +36,7 @@ bool MapCppTOFReconstruction::birth(string argJsonConfigDocument) {
 	string map_file_name = configJSON["TOF_cabling_file"].asString();
 	char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
   map.InitFromFile(string(pMAUS_ROOT_DIR) + map_file_name);
-
+*/
   return true;
 }
 
@@ -47,6 +48,7 @@ bool MapCppTOFReconstruction::death() {
 
 
 string  MapCppTOFReconstruction::process(string document) {
+/*
   // Check if the JSON document can be parsed, else return error only
   bool parsingSuccessful = reader.parse(document, root);
   if (!parsingSuccessful) {
@@ -98,8 +100,8 @@ string  MapCppTOFReconstruction::process(string document) {
   level2_recon(xLevel1Rec["tof0"], xLevel2Rec["tof0"]);
   level2_recon(xLevel1Rec["tof1"], xLevel2Rec["tof1"]);
   level2_recon(xLevel1Rec["tof2"], xLevel2Rec["tof2"]);
-  // cout << xLevel2Rec << endl;
-
+  cout << xLevel2Rec << endl;
+*/
   return writer.write(root);
 }
 
@@ -180,21 +182,21 @@ bool MapCppTOFReconstruction::level2_recon(Json::Value xDocLevel1Recon,
         string key = xDocLevel1Recon[PartEvCount]["key_list"][channelCount].asString();
         ///  Get the number of measurements for this PMT
         int n_hits_in_ch = xDocPartEvent[key].size();
-				  if (n_hits_in_ch == 2) {
-						Json::Value xDigit;
-						for (int i = 0; i < n_hits_in_ch; i++) {
-              ///  Get the measurement.
-							Json::Value measurmet = xDocPartEvent[key][i];
-						  if (measurmet["equip_type"].asInt() == 102) {
-							  xDigit["time"] = measurmet["leading_time"].asInt();
-                xDigit["part_event_number"] = measurmet["part_event_number"].asInt();
-              }
-						  if (measurmet["equip_type"].asInt() == 120)
-							  xDigit["charge"] = measurmet["charge_mm"].asInt();
-						}
-						xDocLevel2Recon[PartEvCount][key] = xDigit;
-					  xDocLevel2Recon[PartEvCount]["key_list"].append(key);
-					}
+        if (n_hits_in_ch == 2) {
+          Json::Value xDigit;
+          for (int i = 0; i < n_hits_in_ch; i++) {
+            ///  Get the measurement.
+            Json::Value measurmet = xDocPartEvent[key][i];
+						if (measurmet["equip_type"].asInt() == 102) {
+              xDigit["time"] = measurmet["leading_time"].asInt();
+              xDigit["part_event_number"] = measurmet["part_event_number"].asInt();
+            }
+						if (measurmet["equip_type"].asInt() == 120)
+              xDigit["charge"] = measurmet["charge_mm"].asInt();
+          }
+          xDocLevel2Recon[PartEvCount][key] = xDigit;
+          xDocLevel2Recon[PartEvCount]["key_list"].append(key);
+        }
       }
     }
   }

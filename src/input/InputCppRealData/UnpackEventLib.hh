@@ -152,7 +152,7 @@ class fADCDataProcessor : public MDarranger {
 
 
   void set_zero_supression(bool zs) { _zero_suppression = zs; }
-	void set_zs_threshold(bool zst)   { _zs_threshold = zst; }
+	void set_zs_threshold(int zst)    { _zs_threshold = zst; }
 
  protected:
 
@@ -164,7 +164,7 @@ class fADCDataProcessor : public MDarranger {
   bool _zero_suppression;
 
   /// Value of the threshold used for zero suppression */
-	unsigned int _zs_threshold;
+	int _zs_threshold;
 
   /// vector of samples (measurements) */
   vector<int> _data;

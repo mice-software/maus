@@ -77,7 +77,7 @@ bool InputCppRealData::birth(std::string jsonDataCards) {
     _v1724PartEventProc->set_DAQ_map(&map);
     bool zs = configJSON["Do_V1724_Zero_Suppression"].asBool();
     _v1724PartEventProc->set_zero_supression(zs);
-    unsigned int zs_threshold = configJSON["V1724_Zero_Suppressio_Threshold"].asInt();
+    int zs_threshold = configJSON["V1724_Zero_Suppressio_Threshold"].asInt();
     _v1724PartEventProc->set_zs_threshold(zs_threshold);
     _dataProcessManager.SetPartEventProc("V1724", _v1724PartEventProc);
   } else {
@@ -92,7 +92,7 @@ bool InputCppRealData::birth(std::string jsonDataCards) {
     _v1731PartEventProc->set_DAQ_map(&map);
     bool zs = configJSON["Do_V1731_Zero_Suppression"].asBool();
     _v1731PartEventProc->set_zero_supression(zs);
-    unsigned int zs_threshold = configJSON["V1731_Zero_Suppressio_Threshold"].asInt();
+    int zs_threshold = configJSON["V1731_Zero_Suppressio_Threshold"].asInt();
     _v1731PartEventProc->set_zs_threshold(zs_threshold);
     _dataProcessManager.SetPartEventProc("V1731", _v1731PartEventProc);
   } else {
@@ -199,7 +199,7 @@ std::string InputCppRealData::getCurEvent() {
   xDocRoot["spill_num"] = _dataProcessManager.GetSpillNumber();
   unsigned int event_type = _dataProcessManager.GetEventType();
 	xDocRoot["daq_event_type"] = event_type_to_str(event_type);
-	// cout<<xDocRoot<<endl;
+	cout<<xDocRoot<<endl;
   if (_debug)
     std::cerr << "Writing JSON..." << std::endl;
 

@@ -118,7 +118,7 @@ int V1724DataProcessor::Process(MDdataContainer* aPartEventPtr) {
       this->set_pedestal();
       int charge_mm = this->get_charge(ceaMinMax);
       if ( !_zero_suppression ||
-           (_zero_suppression && charge_mm>_zs_threshold) ) {
+           (_zero_suppression && charge_mm > _zs_threshold) ) {
         xfAdcHit["charge_mm"]    = charge_mm;
         xfAdcHit["charge_pm"]    = this->get_charge(ceaPedMax);
         xfAdcHit["position_max"] = this->get_max_position();
@@ -175,7 +175,7 @@ int V1731DataProcessor::Process(MDdataContainer* aPartEventPtr) {
       this->set_pedestal();
       int charge_mm = this->get_charge(ceaMinMax);
       if ( !_zero_suppression ||
-          (_zero_suppression && charge_mm>_zs_threshold) ) {
+          (_zero_suppression && charge_mm > _zs_threshold) ) {
         xfAdcHit["charge_mm"]    = charge_mm;
         xfAdcHit["charge_pm"]    = this->get_charge(ceaPedMax);
         xfAdcHit["position_max"] = this->get_max_position();
