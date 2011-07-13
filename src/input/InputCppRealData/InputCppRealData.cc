@@ -199,7 +199,7 @@ std::string InputCppRealData::getCurEvent() {
   xDocRoot["spill_num"] = _dataProcessManager.GetSpillNumber();
   unsigned int event_type = _dataProcessManager.GetEventType();
 	xDocRoot["daq_event_type"] = event_type_to_str(event_type);
-	cout<<xDocRoot<<endl;
+	//cout<<xDocRoot<<endl;
   if (_debug)
     std::cerr << "Writing JSON..." << std::endl;
 

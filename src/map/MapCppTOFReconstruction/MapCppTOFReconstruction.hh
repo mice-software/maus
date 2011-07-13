@@ -42,7 +42,7 @@
 
 #include "Utils/TOFChannelMap.hh"
 #include "Utils/DAQChannelMap.hh"
-
+using std::string;
 
 class MapCppTOFReconstruction {
  public:
@@ -81,10 +81,6 @@ class MapCppTOFReconstruction {
 * with the TOF notations of the PMTs.*/
   TOFChannelMap map;
 
-  //  JsonCpp setup
-  Json::Value root;   // will contains the root value after parsing.
-  Json::Reader reader;
-  Json::FastWriter writer;
 
   MiceModule* _module;
 };  // Don't forget this trailing colon!!!!
