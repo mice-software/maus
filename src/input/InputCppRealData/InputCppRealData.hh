@@ -48,9 +48,6 @@ private
   */
   bool _debug;
 
-/** Pointer to open file object. */
-  MDdateFile *_inputFile;
-
 /** Process manager object. */
   MDprocessManager _dataProcessManager;
 
@@ -58,7 +55,7 @@ private
   MDfileManager _dataFileManager;
 
 /** The DAQ channel map object.
-* It is used to group all channels belonging to a given detector.*/
+* It is used to group all measurements belonging to a given detector.*/
   DAQChannelMap map;
 
 /** Processor for TDC particle event data. */
@@ -73,20 +70,25 @@ private
 /** Processor for scaler data. */
   V830DataProcessor*  _v830FragmentProc;
 
-/** Processor for VLSB cosmic data. */
+/** Processor for VLSB data. */
   VLSBDataProcessor* _vLSBFragmentProc;
 
-
+/** Processor for DBB data. */
   DBBDataProcessor* _DBBFragmentProc;
 
 /** Pointer to the start of the current event. */
   unsigned char *_eventPtr;
 
-  /** Path to the data. */
-  std::string _dataPath;
+  /** Paths to the data.
+	* This string has to contain one or more space separated paths.
+	*/
+  std::string _dataPaths;
 
-  /** Filename within _dataPath. */
-  std::string _runNum;
+  /** File and run names within _dataPaths.
+  * This string has to contain one or more space separated
+  * file names or run numbers.
+  */
+  std::string _datafiles;
 
   /** Enum of event types */
   enum {
@@ -97,8 +99,9 @@ private
 		DBB = 141
   };
 
-	/** Convert the DAQ event type (as coded in DATE) into string
-	* \param[in] pType The type of the event to be converted
+	/** Convert the DAQ event type (as coded in DATE) into string.
+	* \param[in] pType The type of the event to be converted.
+  * \return The type of the event as string.
 	*/
   string event_type_to_str(int pType);
 
@@ -116,9 +119,9 @@ public
 
 /** Initialise the Unpacker.
   *
-  * This prepares the unpacker to read the file given in the constructor.
+  * This prepares the unpacker to read the files given in the constructor.
   *
-  * \return True if the file was opened sucessfully.
+  * \return True if at least one file was opened sucessfully.
   */
   bool birth(std::string pJSONConfig);
 

@@ -21,9 +21,8 @@ InputCppRealData::InputCppRealData(std::string pDataPath,
                                    std::string pRunNum) {
   _debug = false;
   _eventPtr = NULL;
-  _inputFile = NULL;
-  _dataPath = pDataPath;
-  _runNum = pRunNum;
+  _dataPaths = pDataPath;
+  _datafiles = pRunNum;
 
   _v1290PartEventProc = NULL;
   _v1724PartEventProc = NULL;
@@ -39,7 +38,11 @@ bool InputCppRealData::birth(std::string jsonDataCards) {
      return false;  // Faile because files are already open
   }
 
-  unsigned int nfiles = _dataFileManager.AddRun(_runNum.c_str(), _dataPath.c_str());
+  //
+  _dataFileManager.SetList(_datafiles);
+  _dataFileManager.SetPath(_dataPaths);
+  _dataFileManager.OpenFile();
+  unsigned int nfiles = _dataFileManager.GetNFiles();
   if (!nfiles) {
     std::cerr << "Unable to load any data files. Check your run number and data path." << std::endl;
 	  exit(0);
@@ -133,8 +136,8 @@ bool InputCppRealData::birth(std::string jsonDataCards) {
   }
 
   if (_debug) {
-    std::cerr << nfiles << "files loaded for Run " << _runNum << " ("
-              << _dataPath << ")" << std::endl;
+    std::cerr << nfiles << "files loaded for Run(s) " << _datafiles << " ("
+              << _dataPaths << ")" << std::endl;
   }
 
   // _dataProcessManager.DumpProcessors();
@@ -199,7 +202,7 @@ std::string InputCppRealData::getCurEvent() {
   xDocRoot["spill_num"] = _dataProcessManager.GetSpillNumber();
   unsigned int event_type = _dataProcessManager.GetEventType();
 	xDocRoot["daq_event_type"] = event_type_to_str(event_type);
-	//cout<<xDocRoot<<endl;
+	// cout<<xDocRoot<<endl;
   if (_debug)
     std::cerr << "Writing JSON..." << std::endl;
 

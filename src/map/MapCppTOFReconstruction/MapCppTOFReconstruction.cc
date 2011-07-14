@@ -105,7 +105,7 @@ string  MapCppTOFReconstruction::process(string document) {
   level2_recon(xLevel1Rec["tof0"], xLevel2Rec["tof0"]);
   level2_recon(xLevel1Rec["tof1"], xLevel2Rec["tof1"]);
   level2_recon(xLevel1Rec["tof2"], xLevel2Rec["tof2"]);
-  cout << xLevel2Rec << endl;
+  // cout << xLevel2Rec << endl;
 
   return writer.write(root);
 }

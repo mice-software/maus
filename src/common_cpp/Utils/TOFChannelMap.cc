@@ -31,7 +31,7 @@ TOFChannelMap::~TOFChannelMap() {
 void TOFChannelMap::InitFromFile(string filename) {
   ifstream stream(filename.c_str());
   if ( !stream ) {
-    cerr << "Can't TOF open cabling file " << filename << endl;
+    cerr << "Can't open TOF cabling file " << filename << endl;
     exit(1);
   }
 	stringstream key_s;

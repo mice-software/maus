@@ -51,26 +51,30 @@ class DAQChannelKey {
 
   DAQChannelKey(int l, int g, int ch, int e, string d)
   :_ldcId(l), _geo(g), _channel(ch), _eqType(e), _detector(d) {}
-	virtual ~DAQChannelKey() {}
+  virtual ~DAQChannelKey() {}
 
   bool operator==( DAQChannelKey key );
-	bool operator!=( DAQChannelKey key );
+  bool operator!=( DAQChannelKey key );
 
   friend ostream& operator<< ( ostream& stream, DAQChannelKey key );
   friend istream& operator>> ( istream& stream, DAQChannelKey &key );
 
-	string detector() {return _detector;}
+  string detector() {return _detector;}
 
-  /// This function converts the DAQChannelKey into string.
-	string str();
+  /** This function converts the DAQChannelKey into string.
+  * \return String identifier.
+  */
+  string str();
 
   int ldc()     {return _ldcId;}
   int geo()     {return _geo;}
   int channel() {return _channel;}
   int eqType()  {return _eqType;}
 
-  ///  This function creates unique integer identifier.
-	int make_DAQChannelKey_id() { return _ldcId*1e7 + _geo*1e5 + _channel*1e3 + _eqType; }
+  /**  This function creates unique integer identifier.
+  * \return Integer identifier.
+  */
+  int make_DAQChannelKey_id() { return _ldcId*1e7 + _geo*1e5 + _channel*1e3 + _eqType; }
 
   /// Id number of the Local Data Concentrator (DAQ computer).
   int _ldcId;
@@ -85,7 +89,7 @@ class DAQChannelKey {
   int _eqType;
 
   /// Name of the detector connected to this channel.
-	string _detector;
+  string _detector;
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -98,18 +102,19 @@ class DAQChannelMap {
   DAQChannelMap() {}
   virtual ~DAQChannelMap();
 
-  /// Initialize the map from text file
+  /// Initialize the map from text file.
   void InitFromFile(string filename);
 
-	/// Not implemented
+	/// Not implemented.
   void InitFromCDB();
 
  /** Return pointer to the key.
  * This function returns pointer to the key for the required DAQ channel.
- * \param[in] ldc  Id number of the Local Data Concentrator (computer).
- * \param[in] geo Id number of the board.
- * \param[in] ch Channel number.
- * \param[in] eqType Type of the equipement as coded in DATE.
+ * \param[in] ldc     Id number of the Local Data Concentrator (computer).
+ * \param[in] geo     Id number of the board.
+ * \param[in] ch      Channel number.
+ * \param[in] eqType  Type of the equipement as coded in DATE.
+ * \return The key of the DAQ channel.
  */
   DAQChannelKey* find(int ldc, int geo, int ch, int eqType);
 
