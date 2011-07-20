@@ -1,13 +1,7 @@
-import os.path
+import xml.dom
 import os
-
-def main():
-    from GDMLFormatter import formatter
-    gdmls = formatter('GDML')
-    gdmls.format()
-
-if __name__ == '__main__':
-    main()
+import os.path
+from xml.dom import minidom
 
 class formatter:
         """
@@ -23,15 +17,16 @@ class formatter:
 
             @Param Path The path to the directory which contains the fastrad outputted GDML files
             """
-            self.NewLine = ""
-            self.OldLine = ""
-            self.Text = ""
+            self.TextFile = ""
             self.ConfigurationFile = None
             self.MaterialFile = None
             self.MaterialFilePath = None
             list = []
             self.StepFiles = list
-            self.Path = path
+            if type(path) != str:
+                raise IOError('path must be a string to the directory which holds the GDMLs', 'GDMLFormatter::__init__')
+            else:
+                self.Path = path
             gdmls = os.listdir(self.Path)
             for fname in gdmls:
                 if fname.find('materials') >= 0:
@@ -41,18 +36,94 @@ class formatter:
                 if fname.find('fastrad') >= 0 and fname != self.MaterialFile:
                     file = self.Path + '/' + fname
                     self.ConfigurationFile = file
-                if fname.find('Step') >= 0:
+                if fname != self.ConfigurationFile  and fname != self.MaterialFile:
                     file = self.Path + '/' + fname
                     self.StepFiles.append(file)
+            length = len(self.StepFiles)
+            for num in range(0, length):
+                if self.StepFiles[num] == self.ConfigurationFile:
+                    file1 = self.StepFiles[num]
+                if self.StepFiles[num] == self.MaterialFile:
+                    file2 = self.StepFiles[num]
+                if self.StepFiles[num][-4:] == '.txt':
+                    self.StepFiles.remove(num)
+                else:
+                    self.TextFile = None
+            self.StepFiles.remove(file1)
+            self.StepFiles.remove(file2)
+            if self.TextFile != None:
+                self.StepFiles.remove(self.TextFile)
+        
 
-        def lineReplace(self, file, oldline, newline):
+        def formatSchemaLocation(self, file):
+            xmldoc = minidom.parse(file)
+            for node in xmldoc.getElementsByTagName("gdml"):
+                if node.hasAttribute("xsi:noNamespaceSchemaLocation"):
+                    node.attributes['xsi:noNamespaceSchemaLocation'] = "/home/matt/Desktop/Matt/CAD2G4/GDML_fastradModel/GDML_3_0_0/schema/gdml.xsd"
+            os.remove(file)
+            fout = open(file, 'w')
+            xmldoc.writexml(fout)
+            fout.close()
+
+        def formatMaterials(self, file):
+            Materials = minidom.parse(self.MaterialFile)
+            Config = minidom.parse(file)
+            for node in Materials.getElementsByTagName("materials"):
+                MaterialsDef = node
+            for node in Config.getElementsByTagName("gdml"):
+                for node2 in Config.getElementsByTagName("define"):
+                    Define = node2
+                for node3 in Config.getElementsByTagName("solids"):
+                    Solids = node3
+                for node4 in Config.getElementsByTagName("structure"):
+                    Structure = node4
+                fin = open(file, 'r')
+                for lines in fin.readlines():
+                    if lines.find("setup") >= 0:
+                        for node5 in Config.getElementsByTagName("setup"):
+                            Setup = node5
+            uri = xml.dom.XML_NAMESPACE
+            NewDoc = minidom.DOMImplementation.createDocument(uri, "gdml")
+            print NewDoc.toxml()
             """
+            impl = minidom.getDOMImplementation()
+            newdoc = impl.createDocument(None, "gdml", None)
+            top_element = newdoc.documentElement
+            text = newdoc.createTextNode('Some textual content.')
+            xmldoc = minidom.parse(file)
+            for node in xmldoc.getElementsByTagName("gdml"):
+                text = node
+            top_element.appendChild(text)
+            xmldoc = minidom.parse(self.MaterialFile)
+            for node in xmldoc.getElementsByTagName("material"):
+                text = node
+            top_element.appendChild(text)
+            print newdoc.toprettyxml()
+            """
+
+            
+
+        def format(self):
+            self.formatMaterials(self.ConfigurationFile)
+            self.formatSchemaLocation(self.ConfigurationFile)
+            NoOfStepFiles = len(self.StepFiles)
+            #for num in range(0, NoOfStepFiles):
+             #   self.formatSchemaLocation(self.StepFiles[num])
+            
+
+
+
+
+
+"""
+            def lineReplace(self, file, oldline, newline):
+            
             @Method Line Replace, this method opens the file and finds the line of interest and replaces that line with the new line
 
             @Param File, name of the file which the line will be replaced in
             @Param oldline, name of the string which is in the line needed to be replaced
             @Param newline, the new string to be placed in the file
-            """
+            
             self.OldLine = oldline
             self.NewLine = newline
             File = file
@@ -61,7 +132,6 @@ class formatter:
                 if line.find(self.OldLine) >= 0:
                      self.OldLine = line
             fin.close()
-            path = self.Path + File
             fin = open(File, 'r')
             for lines in fin.readlines():
                 self.Text += lines
@@ -71,20 +141,26 @@ class formatter:
             self.Text = ""
             fout.close()
 
+
         def format(self):
-            """
+
             @Method format, this method formats the GDML files by replacing the paths of the materials file and GDML schema with the correct paths
-            """
-            newline1 = '<!ENTITY materials SYSTEM "'+ self.MaterialFilePath +'">'
+   
+            newline1 = '<!ENTITY materials SYSTEM "'+ self.MaterialFilePath +'">]>'
             self.lineReplace(self.ConfigurationFile, "ENTITY materials SYSTEM", newline1)
-            newline2 = 'xsi:noNamespaceSchemaLocation="GDML_3_0_0/schema/gdml.xsd" xmlns:gdml="http://cern.ch/2001/Schemas/GDML">'
+            newline2 = 'xsi:noNamespaceSchemaLocation="/home/matt/Desktop/Matt/CAD2G4/GDML_fastradModel/GDML_3_0_0/schema/gdml.xsd" >'
             self.lineReplace(self.ConfigurationFile, "xsi:noNamespaceSchemaLocation=", newline2)
             NumOfStepFiles = len(self.StepFiles)
             for num in range(0, NumOfStepFiles):
                 newline3 = '<!ENTITY materials SYSTEM "'+ self.MaterialFilePath +'">'
                 self.lineReplace(self.StepFiles[num], "ENTITY materials SYSTEM", newline3)
-                newline4 = 'xsi:noNamespaceSchemaLocation="GDML_3_0_0/schema/gdml.xsd" xmlns:gdml="http://cern.ch/2001/Schemas/GDML">'
+                newline4 = 'xsi:noNamespaceSchemaLocation="GDML_3_0_0/schema/gdml.xsd">'
                 self.lineReplace(self.StepFiles[num], "xsi:noNamespaceSchemaLocation=", newline4)
+    """
 
+def main():
+    gdmls = formatter('/home/matt/NetBeansProjects/MAUSConfigPY/src/GDML')
+    gdmls.format()
 
-
+if __name__ == '__main__':
+    main()

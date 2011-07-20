@@ -1,6 +1,6 @@
 import os.path
 import unittest
-from CADImport import CADImport
+from geometry.CADImport import CADImport
 
 class  test_CADImport(unittest.TestCase):
     def setUp(self):
