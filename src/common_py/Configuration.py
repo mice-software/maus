@@ -21,6 +21,8 @@
 #
 import os
 import json
+import argparse
+import operator
 
 class Configuration:
     ## Returns JSON config document
@@ -40,11 +42,22 @@ class Configuration:
         defaultFilename = '%s/src/common_py/ConfigurationDefaults.py' % MAUSRootDir
         exec(open(defaultFilename,'r').read(), globals(), configDict)
 
+   #	loops over keywords and their associated values in configDict.  
+   #	the argparse function uses these keywords to accept new values
+   #	to the default configDict values
+	parser = argparse.ArgumentParser()
+        for key, value in configDict.iteritems():
+		parser.add_argument('-'+key, action='store', dest=key, default=value)
+	results = parser.parse_args()
+	for key in configDict.iterkeys():
+		configDict[key]=getattr(results, key)
+
         if configFile != None:
             assert not isinstance(configFile, str)
             exec(configFile.read(), globals(), configDict)
 
         configJSONStr = json.JSONEncoder().encode(configDict)
+
 
         return configJSONStr
     
