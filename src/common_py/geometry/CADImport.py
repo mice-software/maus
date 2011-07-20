@@ -1,4 +1,8 @@
+import os.path
 import os
+import sys
+lib_path = os.path.abspath('/home/matt/maus_littlefield/third_party/build/libxml2-2.7.7')
+sys.path.append(lib_path)
 import libxml2
 import libxslt
 

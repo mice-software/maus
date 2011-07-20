@@ -1,0 +1,10 @@
+// MAUS Geometry Uploader Configuration File
+// This File is an example of the parameters which can be included in the config file which is passed to UploadGeometry.py
+
+// Argument below MUST be included
+GeometryDirectory   = "/home/matt/maus_littlefield/src/common_py/geometry/testCases/testGeometry"
+GeometryDescription = "This is a test geometry of a simple cooling channel"
+
+// Optional Arguments 1 = yes, 0 = no
+ZipFile          = 1
+Delete Originals = 0
