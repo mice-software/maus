@@ -1,9 +1,0 @@
-/home/matt/maus_littlefield/src/common_py/geometry/testCases/testGeometry/Step_0.gdml
-/home/matt/maus_littlefield/src/common_py/geometry/testCases/testGeometry/Step_1.gdml
-/home/matt/maus_littlefield/src/common_py/geometry/testCases/testGeometry/Step_2.gdml
-/home/matt/maus_littlefield/src/common_py/geometry/testCases/testGeometry/Step_3.gdml
-/home/matt/maus_littlefield/src/common_py/geometry/testCases/testGeometry/Step_4.gdml
-/home/matt/maus_littlefield/src/common_py/geometry/testCases/testGeometry/Step_5.gdml
-/home/matt/maus_littlefield/src/common_py/geometry/testCases/testGeometry/fastradModel_materials.xml
-/home/matt/maus_littlefield/src/common_py/geometry/testCases/testGeometry/fastradModel.xml
-/home/matt/maus_littlefield/src/common_py/geometry/testCases/testGeometry/FieldInfoTest.xml

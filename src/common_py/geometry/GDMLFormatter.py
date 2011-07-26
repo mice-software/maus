@@ -33,13 +33,14 @@ class formatter:
                     file = self.Path + '/' + fname
                     self.MaterialFile = file
                     self.MaterialFilePath = os.path.abspath(self.MaterialFile)
-                if fname.find('fastrad') >= 0 and fname != self.MaterialFile:
+                if fname.find('fastrad') >= 0:
                     file = self.Path + '/' + fname
-                    self.ConfigurationFile = file
+                    if file != self.MaterialFile:
+                        self.ConfigurationFile = file
                 if fname != self.ConfigurationFile  and fname != self.MaterialFile:
                     file = self.Path + '/' + fname
                     self.StepFiles.append(file)
-            length = len(self.StepFiles)
+            """length = len(self.StepFiles)
             for num in range(0, length):
                 if self.StepFiles[num] == self.ConfigurationFile:
                     file1 = self.StepFiles[num]
@@ -53,6 +54,7 @@ class formatter:
             self.StepFiles.remove(file2)
             if self.TextFile != None:
                 self.StepFiles.remove(self.TextFile)
+                """
         
 
         def formatSchemaLocation(self, file):
@@ -67,11 +69,16 @@ class formatter:
 
         def formatMaterials(self, file):
             Materials = minidom.parse(self.MaterialFile)
-            Config = minidom.parse(file)
             for node in Materials.getElementsByTagName("materials"):
                 MaterialsDef = node
-            for node in Config.getElementsByTagName("gdml"):
-                for node2 in Config.getElementsByTagName("define"):
+            Config = minidom.parse(file)
+            x = Config.createElement("materials")
+            #Config.childNodes[1].childNodes[1].appendChild(x)
+            #for node in Config.getElementsByTagName("define"):
+                #gdml.appendChild(MaterialsDef)
+            print Config.toxml()
+            """
+            for node2 in Config.getElementsByTagName("define"):
                     Define = node2
                 for node3 in Config.getElementsByTagName("solids"):
                     Solids = node3
@@ -82,9 +89,18 @@ class formatter:
                     if lines.find("setup") >= 0:
                         for node5 in Config.getElementsByTagName("setup"):
                             Setup = node5
-            uri = xml.dom.XML_NAMESPACE
-            NewDoc = minidom.DOMImplementation.createDocument(uri, "gdml")
-            print NewDoc.toxml()
+                
+            doc = minidom.Document()
+            gdml = doc.createElement("gdml")
+            doc.appendChild(gdml)
+            define = doc.createElement("define")
+            gdml.appendChild(Define)
+            print doc.toxml()
+            """                               
+            #uri = xml.dom.XML_NAMESPACE
+            #xmldoc = minidom.getDOMImplementation()
+            #NewDoc = minidom.DOMImplementation.createDocument(xml.dom.XML_NAMESPACE)
+            #print NewDoc.toxml()
             """
             impl = minidom.getDOMImplementation()
             newdoc = impl.createDocument(None, "gdml", None)
@@ -159,7 +175,7 @@ class formatter:
     """
 
 def main():
-    gdmls = formatter('/home/matt/NetBeansProjects/MAUSConfigPY/src/GDML')
+    gdmls = formatter('/home/matt/workspace/Maus/testCases/testGeometry')
     gdmls.format()
 
 if __name__ == '__main__':
