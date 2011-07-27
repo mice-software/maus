@@ -16,7 +16,7 @@ class formatter:
 
             @Param Path The path to the directory which contains the fastrad outputted GDML files
             """
-            self.TextFile = ""
+            self.txtfile = ""
             self.ConfigurationFile = None
             self.MaterialFile = None
             self.MaterialFilePath = None
@@ -40,21 +40,17 @@ class formatter:
                 if fname != self.ConfigurationFile  and fname != self.MaterialFile:
                     file = self.Path + '/' + fname
                     self.StepFiles.append(file)
-            """length = len(self.StepFiles)
+            length = len(self.StepFiles)
             for num in range(0, length):
                 if self.StepFiles[num] == self.ConfigurationFile:
                     file1 = self.StepFiles[num]
                 if self.StepFiles[num] == self.MaterialFile:
                     file2 = self.StepFiles[num]
-                if self.StepFiles[num][-4:] == '.txt':
-                    self.StepFiles.remove(num)
-                else:
-                    self.TextFile = None
             self.StepFiles.remove(file1)
             self.StepFiles.remove(file2)
-            if self.TextFile != None:
-                self.StepFiles.remove(self.TextFile)
-                """
+                
+        def formatCheck(self):
+            fin = open(self.ConfigurationFile)
         
 
         def formatSchemaLocation(self, file):
@@ -67,7 +63,8 @@ class formatter:
             xmldoc.writexml(fout)
             fout.close()
 
-        def formatMaterials(self, file): 
+        def formatMaterials(self, file):
+            self.txtfile = "" 
             impl = minidom.getDOMImplementation()
             str = 'gdml [<!ENTITY materials SYSTEM "' + self.MaterialFile + '">]'
             docType = impl.createDocumentType(str, None, None)
@@ -78,29 +75,39 @@ class formatter:
             for node2 in NewDoc.getElementsByTagName("MAUS"):
                 OldEle = node2
             NewDoc.replaceChild(RootEle, OldEle)
-            os.remove(file)
-            fout = open(file, 'w')
+            self.txtfile = file[:-5] + '.txt' #NEED to change for gdmls
+            fout = open(self.txtfile, 'w')
             NewDoc.writexml(fout)
             fout.close()
+            os.remove(file)
             
         def insertMaterialsRef(self, file):
             fin = open(file, 'r')
-            LinesInFile = []
-            for lines in fin.readlines():
-                if lines.find('')
-
-                
-                        
+            gdmlfile = file[:-4] + '.gdml'
+            fout = open(gdmlfile, 'w')
+            for line in fin.readlines():
+                if line.find('<!-- Materials definition CallBack -->')>=0:
+                    new_line = line.replace('<!-- Materials definition CallBack -->', '<!-- Materials definition CallBack --> &materials;')
+                    print >>fout,new_line
+                else:
+                    print >>fout,line
+            print >>fout, '<!-- Formatted for MAUS -->'
+            fin.close()
+            fout.close
+            os.remove(file)
+            
         def format(self):
-            self.formatMaterials(self.ConfigurationFile)
             self.formatSchemaLocation(self.ConfigurationFile)
-            self.insertMaterialsRef(self.ConfigurationFile)
+            self.formatMaterials(self.ConfigurationFile)
+            self.insertMaterialsRef(self.txtfile)
             NoOfStepFiles = len(self.StepFiles)
-            #for num in range(0, NoOfStepFiles):
-             #   self.formatSchemaLocation(self.StepFiles[num])
+            for num in range(0, NoOfStepFiles):
+                self.formatSchemaLocation(self.StepFiles[num])
+                self.formatMaterials(self.StepFiles[num])
+                self.insertMaterialsRef(self.txtfile)
             
 def main():
-    gdmls = formatter('/home/matt/workspace/Maus/testCases/testGeometry')
+    gdmls = formatter('/home/matt/workspace/Maus/testCases/GDML_fastradModel')
     gdmls.format()
 
 if __name__ == '__main__':
