@@ -1,23 +1,12 @@
 import os.path
 import os
 import sys
-lib_path = os.path.abspath('../../../suds-0.3.9/')
-sys.path.append(lib_path)
+#lib_path = os.path.abspath('/home/matt/maus-littlefield/build/suds')
+#sys.path.append(lib_path)
 from suds.client import Client
 from datetime import datetime
 from base64 import b64encode
 from base64 import b64decode
-
-def main():
-    from GDMLtoCDB import gdmltocdb
-    from GDMLtoCDB import downloader
-    geometry1 = gdmltocdb('/home/matt/NetBeansProjects/MAUSConfigPY/src/GDML', "test geometry case", 1)
-    #geometry1.uploadToCDB()
-    dlgeometry = downloader(1)
-    #dlgeometry.downloadCurrent()
-    
-if __name__ == "__main__":
-    main()
 
 class gdmltocdb:
     """
@@ -61,6 +50,8 @@ class gdmltocdb:
         else: raise StandardError("Incorrect input", "gdmltocdb::__init__")
         self.Geometry = Client(self.WSDLURL).service
         gdmls = os.listdir(self.FilePath)
+        # check if there is an existing textfile with the lis of geomtries in it
+        # if there is a text file but with no geometries raise error
         NumOfFiles = len(gdmls)
         count = 0
         for fname in gdmls:
@@ -77,6 +68,14 @@ class gdmltocdb:
                         count += 1
                 if NumCheck != count:
                     raise IOError("The text file in the gdml directory should list all files in this directory.Please remove this file or write the full path locations of all the files within the directory", "gdmltocdb:__init__")
+                else:
+                    # if one does exist and its correct create the list of files
+                    self.ListOfGeometries = path
+                    fin = open(self.ListOfGeometries, 'r')
+                    for line in fin.readlines():
+                        self.GeometryFiles.append(line.strip())
+                    fin.close()
+        # if there is no text file create one and fill it with the geometries.
         if self.TextFile == None:
             path = self.FilePath + "/FileList.txt"
             fout = open(path, 'w')
@@ -90,6 +89,7 @@ class gdmltocdb:
             for line in fin.readlines():
                 self.GeometryFiles.append(line.strip())
             fin.close()
+        
 
     def uploadToCDB(self):
         """
@@ -177,7 +177,18 @@ class downloader:
             str = str.rsplit('/')
             filepos = len(str) - 1
             filename = str[filepos]
-            path = "/home/matt/maus_littlefield/src/common_py/geometry/Download/" + filename
+            path = "/home/matt/maus-littlefield/src/common_py/geometry/Download/" + filename
             fout = open(path, 'w')
             fout.write(self.GeometryFiles[num])
             fout.close()
+            
+def main():
+ #   from GDMLtoCDB import gdmltocdb
+#    from GDMLtoCDB import downloader
+    geometry1 = gdmltocdb('/home/matt/workspace/Maus/testCases/GDML_fastradModel', "test geometry case", 1)
+    geometry1.uploadToCDB()
+    #dlgeometry = downloader(1)
+    #dlgeometry.downloadCurrent()
+    
+if __name__ == "__main__":
+    main()

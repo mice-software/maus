@@ -1,8 +1,6 @@
 import os.path
 import os
 import sys
-lib_path = os.path.abspath('../../../argparse-1.2.1')
-sys.path.append(lib_path)
 import argparse
 from GDMLPacker import packer
 from GDMLtoCDB import gdmltocdb
@@ -21,8 +19,9 @@ def main():
     path = inputfile.GDMLDir + '/FileList.txt'
     #zip the files and store them locally if selected
     if inputfile.ZipFile == True:
-        zfile = packer(path)
-        zfile.zipfile()
+        zfile = packer(path)#
+        zippath = os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/zippedGeoms'
+        zfile.zipfile(zippath)
     #delete original GDML files as they are now zipped if selected
     if inputfile.DeleteOriginals == True:
         gdmls = os.listdir(inputfile.GDMLDir)

@@ -48,10 +48,6 @@ class formatter:
                     file2 = self.StepFiles[num]
             self.StepFiles.remove(file1)
             self.StepFiles.remove(file2)
-                
-        def formatCheck(self):
-            fin = open(self.ConfigurationFile)
-        
 
         def formatSchemaLocation(self, file):
             xmldoc = minidom.parse(file)
@@ -97,15 +93,27 @@ class formatter:
             os.remove(file)
             
         def format(self):
-            self.formatSchemaLocation(self.ConfigurationFile)
-            self.formatMaterials(self.ConfigurationFile)
-            self.insertMaterialsRef(self.txtfile)
+            fin = open(self.ConfigurationFile, 'r')
+            for lines in fin.readlines():
+                if lines.find('<!-- Formatted for MAUS -->'):
+                    #raise StandardError(self.ConfigurationFile + ' file already formatted!')
+                    return self.ConfigurationFile
+                else:
+                    self.formatSchemaLocation(self.ConfigurationFile)
+                    self.formatMaterials(self.ConfigurationFile)
+                    self.insertMaterialsRef(self.txtfile)
             NoOfStepFiles = len(self.StepFiles)
-            for num in range(0, NoOfStepFiles):
-                self.formatSchemaLocation(self.StepFiles[num])
-                self.formatMaterials(self.StepFiles[num])
-                self.insertMaterialsRef(self.txtfile)
-            
+            fin = open(self.StepFiles[num], 'r')
+            for lines in fin.readlines():
+                if lines.find('<!-- Formatted for MAUS -->'):
+                    #raise StandardError(self.StepFiles[num] + ' file already formatted!')
+                    return self.StepFiles[num]
+                else:        
+                    for num in range(0, NoOfStepFiles):
+                        self.formatSchemaLocation(self.StepFiles[num])
+                        self.formatMaterials(self.StepFiles[num])
+                        self.insertMaterialsRef(self.txtfile)
+                    
 def main():
     gdmls = formatter('/home/matt/workspace/Maus/testCases/GDML_fastradModel')
     gdmls.format()
