@@ -2,9 +2,10 @@
 
 """
 from geometry.CADImport import CADImport
+from geometry.GDMLFormatter import formatter
 
 
-__all__ = ["CADImport"]
+__all__ = ["CADImport", "formatter"]
 """
 from cdb._exceptions import CdbError
 from cdb._exceptions import CdbPermanentError

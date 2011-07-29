@@ -1,17 +1,7 @@
 import os.path
 import os
 import sys
-lib_path = os.path.abspath('../../../argparse-1.2.1')
-sys.path.append(lib_path)
 import argparse
-
-def main():
-    from ConfigReader import configreader
-    file = configreader()
-    file.readconfig()
-
-if __name__ == "__main__":
-    main()
 
 class configreader():
 
@@ -20,8 +10,6 @@ class configreader():
         self.GeometryNotes = ""
         self.ZipFile = None
         self.DeleteOriginals = None
-
-
 
     def readconfig(self):
         parser = argparse.ArgumentParser(description='The file name/path of the configuration File')
@@ -57,3 +45,11 @@ class configreader():
         return self.GeometryNotes
         return self.ZipFile
         return self.DeleteOriginals
+
+def main():
+    from ConfigReader import configreader
+    file = configreader()
+    file.readconfig()
+
+if __name__ == "__main__":
+    main()

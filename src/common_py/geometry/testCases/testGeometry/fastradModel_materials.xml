@@ -1,25 +1,30 @@
-<?xml version="1.0" ?><!--   GDML materials definition from the Fastrad file : "fastradModel.ray"
-	Processed the 14/01/2011 at 10h17 by the GDML module of Fastrad 3.1.0.2 --><materials>
-	<element Z="1" formula="VACUUM" name="videRef">
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--   GDML materials definition from the Fastrad file : "fastradModel.ray"
+	Processed the 14/01/2011 at 10h17 by the GDML module of Fastrad 3.1.0.2 -->
+
+<materials>
+	<element name="videRef" formula="VACUUM" Z="1">
 		<atom value="1"/>
 	</element>
-	<element Z="13" formula="Al" name="aluminum">
+	<element name="aluminum" formula="Al" Z="13">
 		<atom value="26.9815"/>
 	</element>
-	<element Z="14" formula="Si" name="silicon">
+	<element name="silicon" formula="Si" Z="14">
 		<atom value="28.0855"/>
 	</element>
 
-	<material formula="Vacuum" name="Vacuum">
-		<D unit="g/cm3" value="1E-25"/>
+	<material name="Vacuum" formula="Vacuum">
+		<D value ="1E-25" unit="g/cm3"/>
 		<fraction n="1.0" ref="videRef"/>
 	</material>
-	<material formula="ALUMINUM" name="ALUMINUM">
-		<D unit="g/cm3" value="2.7000"/>
+	<material name="ALUMINUM" formula="ALUMINUM">
+		<D value ="2.7000" unit="g/cm3"/>
 		<fraction n="1.0000" ref="aluminum"/>
 	</material>
-	<material formula="SILICON" name="SILICON">
-		<D unit="g/cm3" value="2.3300"/>
+	<material name="SILICON" formula="SILICON">
+		<D value ="2.3300" unit="g/cm3"/>
 		<fraction n="1.0000" ref="silicon"/>
 	</material>
 </materials>
+

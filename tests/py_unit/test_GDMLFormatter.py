@@ -1,10 +1,13 @@
 import unittest
-from GDMLFormatter import formatter
+import shutil
+import os
+from geometry.GDMLFormatter import formatter
 
 class  test_GDMLFormatter(unittest.TestCase):
     def setUp(self):
         self.Constructor = None
-        self.GDML = formatter('/home/matt/maus_littlefield/src/common_py/geometry/testCases/testFormatter')
+        testCase = os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testFormatter'
+        self.GDML = formatter(testCase)
 
     def test_Constructor(self):
         try:
@@ -15,7 +18,12 @@ class  test_GDMLFormatter(unittest.TestCase):
         
     def test_test_GDMLFormatter(self):
         self.GDML.format()
-        fin = open(self.GDML.ConfigurationFile)
+        fout = os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testFormatter'
+        shutil.copy(self.GDML.ConfigurationFile, fout)
+        shutil.copy(self.GDML.MaterialFile, fout)
+        length = len(self.GDML.StepFiles)
+        for num in range(0, length):
+            shutil.copy(self.GDML.StepFiles[num], fout)
 
     #def tearDown(self):
     #    self.foo.dispose()
@@ -23,4 +31,3 @@ class  test_GDMLFormatter(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
