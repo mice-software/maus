@@ -34,28 +34,24 @@ class gdmltomaus():
             self.StepFiles.remove(file1)
             self.StepFiles.remove(file2)
 
-        def converttomaus(self):
-            outputlocation = '/home/matt/Desktop/FastRad/Step4Maus/ConfigurationFile.txt'
-            ConfigFile = CADImport(xmlin1 = self.ConfigurationFile, xsl = "GDML2G4MICE.xsl", output = outputlocation)
+        def converttomaus(self, output):
+            outputfile = output + "/Configuration.txt"
+            configurationxsl = os.environ["MAUS_ROOT_DIR"] + "/src/common_py/geometry/xsltScripts/GDML2G4MICE.xsl"
+            ConfigFile = CADImport(xmlin1 = self.ConfigurationFile, xsl = configurationxsl, output = outputfile)
             ConfigFile.XSLTParse()
             length = len(self.StepFiles)
             for num in range(0, length):
                 file = str(self.StepFiles[num])
+                print file
                 file = file.strip(self.Path)
                 file = file[0:-5]
-                outputlocation2 = '/home/matt/Desktop/FastRad/Step4Maus/' + file + '.txt'
-                StepFile = CADImport(xmlin1 = self.StepFiles[num], xsl = "MMTranslation.xsl", output = outputlocation2)
-                #StepFile.XSLTParse()
-            xml = "/home/matt/Desktop/FastRad/Step4_Light_version/TDm1055m0150.gdml"
-            StepFile = CADImport(xmlin1 = self.StepFiles[num], xsl = "MMTranslation.xsl", output = outputlocation2)
-            StepFile.XSLTParse()
-
-
-
-
+                outputfile = output + file + '.txt'
+                MMxsl = os.environ["MAUS_ROOT_DIR"] + "/src/common_py/geometry/xsltScripts/MMTranslation.xsl"
+                StepFile = CADImport(xmlin1 = self.StepFiles[num], xsl = MMxsl, output = outputfile)
+                StepFile.XSLTParse()
 
 def main():
-    file = gdmltomaus('/home/matt/NetBeansProjects/MAUSConfigPY/src/GDML')
-    file.converttomaus()
+    file = gdmltomaus('/home/matt/maus-littlefield/src/common_py/geometry/testCases/testGeometry')
+    file.converttomaus('/home/matt/maus-littlefield/src/common_py/geometry/Download/MM')
 if __name__ == "__main__":
     main()

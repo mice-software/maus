@@ -1,8 +1,8 @@
 import os.path
 import os
 import sys
-#lib_path = os.path.abspath('/home/matt/maus-littlefield/build/suds')
-#sys.path.append(lib_path)
+lib_path = os.path.abspath('/home/matt/maus-littlefield/build/suds')
+sys.path.append(lib_path)
 from suds.client import Client
 from datetime import datetime
 from base64 import b64encode
@@ -144,7 +144,7 @@ class downloader:
         else: raise StandardError("Incorrect input", "upload::__init__")
         self.Geometry = Client(self.WSDLURL).service
         
-    def downloadCurrent(self):
+    def downloadCurrent(self, downloadPath):
         """
         @Method downloadcurrent, this method downloads the current valid geometry and writes the files
 
@@ -177,7 +177,7 @@ class downloader:
             str = str.rsplit('/')
             filepos = len(str) - 1
             filename = str[filepos]
-            path = "/home/matt/maus-littlefield/src/common_py/geometry/Download/" + filename
+            path = downloadPath + "/" + filename
             fout = open(path, 'w')
             fout.write(self.GeometryFiles[num])
             fout.close()

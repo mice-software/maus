@@ -95,8 +95,8 @@ class formatter:
         def format(self):
             fin = open(self.ConfigurationFile, 'r')
             for lines in fin.readlines():
-                if lines.find('<!-- Formatted for MAUS -->'):
-                    #raise StandardError(self.ConfigurationFile + ' file already formatted!')
+                if lines.find('<!-- Formatted for MAUS -->') >= 0:
+                    raise StandardError(self.ConfigurationFile + ' file already formatted!')
                     return self.ConfigurationFile
                 else:
                     self.formatSchemaLocation(self.ConfigurationFile)
@@ -105,17 +105,18 @@ class formatter:
             NoOfStepFiles = len(self.StepFiles)
             fin = open(self.StepFiles[num], 'r')
             for lines in fin.readlines():
-                if lines.find('<!-- Formatted for MAUS -->'):
-                    #raise StandardError(self.StepFiles[num] + ' file already formatted!')
+                if lines.find('<!-- Formatted for MAUS -->') >= 0:
+                    raise StandardError(self.StepFiles[num] + ' file already formatted!')
                     return self.StepFiles[num]
                 else:        
                     for num in range(0, NoOfStepFiles):
                         self.formatSchemaLocation(self.StepFiles[num])
                         self.formatMaterials(self.StepFiles[num])
                         self.insertMaterialsRef(self.txtfile)
+            print "Format Complete!"
                     
 def main():
-    gdmls = formatter('/home/matt/workspace/Maus/testCases/GDML_fastradModel')
+    gdmls = formatter('/home/matt/maus-littlefield/src/common_py/geometry/testCases/testGeometry')
     gdmls.format()
 
 if __name__ == '__main__':

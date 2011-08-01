@@ -1,22 +1,8 @@
 import os.path
 import os
 import sys
-lib_path = os.path.abspath('/home/matt/maus_littlefield/third_party/build/libxml2-2.7.7')
-sys.path.append(lib_path)
 import libxml2
 import libxslt
-
-def main():
-    from CADImport import CADImport
-    #geometry1 = CADImport("fastradModel.xml", "GDML2G4MICE.xsl", "", "OUTPUTFILE.txt")
-    #geometry2 = CADImport("fastradModel.xml", "GDML2G4MICE.xsl")
-    #geometry3 = CADImport("fastradModel.xml", "Merge.xsl", "FieldInfoTest.xml", "theMerged.txt")
-    #geometry1.XSLTParse()
-    #geometry3.AppendMerge()
-
-if __name__ == '__main__':
-    main()
-
 
 class CADImport:
     """
@@ -118,3 +104,15 @@ class CADImport:
                     print >>fout,new_line
                 else:
                     print >>fout,line
+
+
+def main():
+    from CADImport import CADImport
+    #geometry1 = CADImport("fastradModel.xml", "GDML2G4MICE.xsl", "", "OUTPUTFILE.txt")
+    #geometry2 = CADImport("fastradModel.xml", "GDML2G4MICE.xsl")
+    #geometry3 = CADImport("fastradModel.xml", "Merge.xsl", "FieldInfoTest.xml", "theMerged.txt")
+    #geometry1.XSLTParse()
+    #geometry3.AppendMerge()
+
+if __name__ == '__main__':
+    main()

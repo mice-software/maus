@@ -1,7 +1,6 @@
 import os.path
 import os
 import sys
-import argparse
 from GDMLPacker import packer
 from GDMLtoCDB import gdmltocdb
 from GDMLFormatter import formatter

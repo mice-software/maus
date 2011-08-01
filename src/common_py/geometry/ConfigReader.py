@@ -4,12 +4,12 @@ import sys
 import argparse
 
 class configreader():
-
     def __init__(self):
         self.GDMLDir = ""
         self.GeometryNotes = ""
         self.ZipFile = None
         self.DeleteOriginals = None
+        self.DownloadDir = ""
 
     def readconfig(self):
         parser = argparse.ArgumentParser(description='The file name/path of the configuration File')
@@ -41,10 +41,16 @@ class configreader():
                     self.DeleteOriginals = True
                 else:
                     self.DeleteOriginals = False
+            if lines.find('DownloadDir') >= 0:
+                varStart = lines.find('=') + 1
+                self.DownloadDir = lines[varStart:]
+                self.DownloadDir = self.DownloadDir.replace('"', '')
+                self.DownloadDir = self.DownloadDir.strip()
         return self.GDMLDir
         return self.GeometryNotes
         return self.ZipFile
         return self.DeleteOriginals
+        return self.DownloadDir
 
 def main():
     from ConfigReader import configreader
