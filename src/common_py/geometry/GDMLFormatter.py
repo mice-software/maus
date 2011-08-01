@@ -119,11 +119,6 @@ class formatter:
                     self.insertMaterialsRef(self.txtfile)
             print "Format Complete!"
             
-            self.formatCheck(self.ConfigurationFile)
-            NoOfStepFiles = len(self.StepFiles)
-            for num in range(0, NoOfStepFiles):
-                self.formatCheck(self.StepFiles[num])
-            
                     
 def main():
     gdmls = formatter('/home/matt/maus-littlefield/src/common_py/geometry/testCases/testGeometry')
