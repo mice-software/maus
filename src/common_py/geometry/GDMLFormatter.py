@@ -16,6 +16,7 @@ class formatter:
 
             @Param Path The path to the directory which contains the fastrad outputted GDML files
             """
+            self.Formatted = False
             self.txtfile = ""
             self.ConfigurationFile = None
             self.MaterialFile = None
@@ -89,31 +90,40 @@ class formatter:
                     print >>fout,line
             print >>fout, '<!-- Formatted for MAUS -->'
             fin.close()
-            fout.close
+            fout.close()
             os.remove(file)
             
+        def formatCheck(self, file):
+            self.Formatted = False
+            fin = open(file, 'r')
+            for lines in fin.readlines():
+                if lines.find('<!-- Formatted for MAUS -->') >= 0:
+                    print file + ' already formatted! No formatting will be done.'
+                    self.Formatted = True
+            fin.close()
+        
+            
         def format(self):
-            fin = open(self.ConfigurationFile, 'r')
-            for lines in fin.readlines():
-                if lines.find('<!-- Formatted for MAUS -->') >= 0:
-                    raise StandardError(self.ConfigurationFile + ' file already formatted!')
-                    return self.ConfigurationFile
-                else:
-                    self.formatSchemaLocation(self.ConfigurationFile)
-                    self.formatMaterials(self.ConfigurationFile)
-                    self.insertMaterialsRef(self.txtfile)
+            self.formatCheck(self.ConfigurationFile)
+            if self.Formatted == False:
+                self.formatSchemaLocation(self.ConfigurationFile)
+                self.formatMaterials(self.ConfigurationFile)
+                self.insertMaterialsRef(self.txtfile)
+            
             NoOfStepFiles = len(self.StepFiles)
-            fin = open(self.StepFiles[num], 'r')
-            for lines in fin.readlines():
-                if lines.find('<!-- Formatted for MAUS -->') >= 0:
-                    raise StandardError(self.StepFiles[num] + ' file already formatted!')
-                    return self.StepFiles[num]
-                else:        
-                    for num in range(0, NoOfStepFiles):
-                        self.formatSchemaLocation(self.StepFiles[num])
-                        self.formatMaterials(self.StepFiles[num])
-                        self.insertMaterialsRef(self.txtfile)
+            for num in range(0, NoOfStepFiles):
+                self.formatCheck(self.StepFiles[num])
+                if self.Formatted == False:
+                    self.formatSchemaLocation(self.StepFiles[num])
+                    self.formatMaterials(self.StepFiles[num])
+                    self.insertMaterialsRef(self.txtfile)
             print "Format Complete!"
+            
+            self.formatCheck(self.ConfigurationFile)
+            NoOfStepFiles = len(self.StepFiles)
+            for num in range(0, NoOfStepFiles):
+                self.formatCheck(self.StepFiles[num])
+            
                     
 def main():
     gdmls = formatter('/home/matt/maus-littlefield/src/common_py/geometry/testCases/testGeometry')
