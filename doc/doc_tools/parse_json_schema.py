@@ -8,7 +8,7 @@ import Queue
 import json
 import SpillSchema
 
-LIST_BEGIN = '\\begin{itemize}[itemsep=0pt]'
+LIST_BEGIN = '\\begin{itemize}' #[itemsep=0pt] -- latex2html cant do this
 LIST_END = '\\end{itemize}'
 UNPARSED = Queue.Queue()
 
