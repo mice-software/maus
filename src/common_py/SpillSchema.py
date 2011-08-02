@@ -14,7 +14,7 @@ required_three_vec["required"] = True
 #some common documentation definitions
 pdg_pid_doc = "Identifies the particle type according to the PDG indexing system (http://hepdata.cedar.ac.uk/lbl/2011/reviews/rpp2011-rev-naming-scheme-hadrons.pdf)"
 
-units = {"position":"[mm]", "momentum":"[MeV/c]", "energy":"[MeV]", "mass":"[MeV/c^2]", "e_field":"[MV/mm]", "b_field":"[kT]", "time":"[ns]", "charge":"[e+ charge]"}
+units = {"position":"[mm]", "momentum":"[MeV/c]", "energy":"[MeV]", "mass":"[MeV/c$^{2}$]", "e_field":"[MV/mm]", "b_field":"[kT]", "time":"[ns]", "charge":"[e$^{+}$ charge]"}
 
 
 def dict_merge(dict_a, dict_b):
@@ -27,7 +27,7 @@ def dict_merge(dict_a, dict_b):
   return dict(dict_a.items()+dict_b.items())
 
 class mc:
-  primary = {"type":"object", "description":"Describes the initial particle that is used as an input into the Monte Carlo simulation", "required":True, "properties":{
+  primary = {"type":"object", "breakdoc":True, "description":"Describes the initial particle that is used as an input into the Monte Carlo simulation", "required":True, "properties":{
       "particle_id":{"type":"integer"},
       "energy":{"type":"number"},
       "time":{"type":"number"},
@@ -36,7 +36,7 @@ class mc:
     }
   }
 
-  steps = {"type":"array", "description":"Stores information on each step in the tracking. Enabled by 'keep_steps' datacard", "items":[{
+  steps = {"type":"array", "breakdoc":True, "description":"Stores information on each step in the tracking. Enabled by 'keep_steps' datacard", "items":[{
     "type":"object", "properties":{
       "position":dict_merge(required_three_vec, {"description":"Position of the step "+units["position"]}),
       "momentum":dict_merge(required_three_vec, {"description":"Momentum of the track that made the step "+units["momentum"]}),
@@ -48,7 +48,7 @@ class mc:
     }
   }]}
 
-  tracks = {"type":"object", "description":"Stores information on stepping information, initial and final position of the track. Enabled by 'keep_tracks' datacard", "properties":{
+  tracks = {"type":"object", "breakdoc":True, "description":"Stores information on stepping information, initial and final position of the track. Enabled by 'keep_tracks' datacard", "properties":{
     "steps":steps,
     "initial_position":dict_merge(required_three_vec, {"description":"Initial position of the track "+units["position"]}),
     "initial_momentum":dict_merge(required_three_vec, {"description":"Initial momentum of the track "+units["momentum"]}),
@@ -59,9 +59,9 @@ class mc:
     "parent_track_id":{"type":"integer", "required":True},
   }}
 
-  hits = {"type":"object", "description":"Stores information on interactions of particles with sensitive detectors", "properties":{}} #needs to be filled out...
+  hits = {"type":"object", "breakdoc":True, "description":"Stores information on interactions of particles with sensitive detectors", "properties":{}} #needs to be filled out...
 
-  virtual_hits = {"type":"array", "description":"Virtual hits store information on all particles as they cross a user-defined plane in space, time or proper time", "items":[{
+  virtual_hits = {"type":"array", "breakdoc":True, "description":"Virtual hits store information on all particles as they cross a user-defined plane in space, time or proper time", "items":[{
     "type":"object", "properties":{
       "station_id":{"type":"integer", "required":True, "description":"ID for the virtual plane that registered this hit. See MiceModules docs for options on how stations are numbered."},
       "particle_id":{"type":"integer", "required":True, "description":pdg_pid_doc},
