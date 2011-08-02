@@ -118,6 +118,8 @@ class gdmltocdb:
         _gdml = b64encode(self.UploadString)
         self.Geometry.setGDML(_gdml, _dt, self.Notes)
         print self.Geometry.setGDML(_gdml, _dt, self.Notes)
+	print 'Geometry Uploaded'
+	
 
 class downloader:
     """

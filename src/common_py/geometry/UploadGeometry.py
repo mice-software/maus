@@ -22,6 +22,7 @@ def main():
         zippath = os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/zippedGeoms'
         zfile.zipfile(zippath)
     #delete original GDML files as they are now zipped if selected
+    os.remove(path)
     if inputfile.DeleteOriginals == True:
         gdmls = os.listdir(inputfile.GDMLDir)
         for fname in gdmls:
