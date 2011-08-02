@@ -8,9 +8,6 @@ def main():
     inputfile.readconfig()
     CurrentGeometry = downloader(1)
     CurrentGeometry.downloadCurrent(inputfile.DownloadDir)
-    gdmls = formatter(inputfile.DownloadDir)
-    gdmls.format()
-    
     #MausModules = gdmltomaus(inputfile.DownloadDir)
     #MausModules.converttomaus("location")
     

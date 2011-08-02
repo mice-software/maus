@@ -42,13 +42,15 @@ class gdmltomaus():
             length = len(self.StepFiles)
             for num in range(0, length):
                 file = str(self.StepFiles[num])
-                print file
                 file = file.strip(self.Path)
-                file = file[0:-5]
-                outputfile = output + file + '.txt'
+                outputfile = output + '/' + file + 'txt'
                 MMxsl = os.environ["MAUS_ROOT_DIR"] + "/src/common_py/geometry/xsltScripts/MMTranslation.xsl"
-                StepFile = CADImport(xmlin1 = self.StepFiles[num], xsl = MMxsl, output = outputfile)
+                StepFile = CADImport(xmlin1 = '/home/matt/maus-littlefield/src/common_py/geometry/testCases/testGeometry/Step_2.gdml', xsl = '/home/matt/maus-littlefield/src/common_py/geometry/xsltScripts/MMTranslation.xsl', output = outputfile)
                 StepFile.XSLTParse()
+                StepFile = None
+            StepFile = CADImport(xmlin1 = self.StepFiles[num], xsl = MMxsl, output = outputfile)
+            StepFile.XSLTParse()
+            
 
 def main():
     file = gdmltomaus('/home/matt/maus-littlefield/src/common_py/geometry/testCases/testGeometry')

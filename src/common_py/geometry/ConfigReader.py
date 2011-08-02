@@ -1,61 +1,94 @@
-import os.path
-import os
-import sys
+"""
+Configuration Text File Reader Class
+M. Littlefield 02/08/11 
+"""
 import argparse
 
-class configreader():
+class Configreader():
+    """
+    @class configreader, Configuration File Reader Class
+    
+    This class reads the information in the Configuration Text File and translates
+    this into variables which can be passed between the other classes. It does 
+    this using argparse.
+    """
     def __init__(self):
-        self.GDMLDir = ""
-        self.GeometryNotes = ""
-        self.ZipFile = None
-        self.DeleteOriginals = None
-        self.DownloadDir = ""
+        """
+        @method Class Constructor
+        
+        This sets up the blank variables ready to be filled by the information
+        contained in the Configuration text file.
+        """
+        self.gdmldir = ""
+        self.geometrynotes = ""
+        self.zipfile = None
+        self.deleteoriginals = None
+        self.downloaddir = ""
 
     def readconfig(self):
-        parser = argparse.ArgumentParser(description='The file name/path of the configuration File')
-        parser.add_argument('Config File', help = 'The file name/path of the configuration File')
-        #set arguments into dict so we can use them
+        """
+        @method readconfig
+        
+        This method reads the Configuration Text File and takes the information needed from the
+        file which has certain tags. This information is then stored into variables which can be
+        passed between classes. The tags are,
+        
+        GeometryDirectory   = "This is where the directory to the fastrad outputted geometry goes"
+        GeometryDescription = "This is where the description of the geometry goes"
+        ZipFile          = "Choose 1 to create a zipfile of the geometry. 0 to do nothing"
+        Delete Originals = "Choose 1 to delete the original geometry files. 0 to do nothing"
+        DownloadDir = "This is where the directory which the user wishes to download geometries
+                       from the CDB to goes"
+                       
+        These tags must be in the Configuration Text File otherwise this class will not read them.  
+        """
+        explanation = 'The file name/path of the configuration File'
+        parser = argparse.ArgumentParser(description= explanation)
+        helpexplanation = 'The file name/path of the configuration File'
+        parser.add_argument('Config File', help = helpexplanation)
         config_file = parser.parse_args()
         config_file = config_file.__dict__
         fin = open(config_file['Config File'], 'r')
         for lines in fin.readlines():
             if lines.find('GeometryDirectory') >= 0:
-                varStart = lines.find('=') + 1
-                self.GDMLDir = lines[varStart:]
-                self.GDMLDir = self.GDMLDir.replace('"', '')
-                self.GDMLDir = self.GDMLDir.strip()
+                varstart = lines.find('=') + 1
+                self.gdmldir = lines[varstart:]
+                self.gdmldir = self.gdmldir.replace('"', '')
+                self.gdmldir = self.gdmldir.strip()
             if lines.find('GeometryDescription') >= 0:
-                varStart = lines.find('=') + 1
-                self.GeometryNotes = lines[varStart:]
-                self.GeometryNotes = self.GeometryNotes.replace('"', '')
-                self.GeometryNotes = self.GeometryNotes.strip()
+                varstart = lines.find('=') + 1
+                self.geometrynotes = lines[varstart:]
+                self.geometrynotes = self.geometrynotes.replace('"', '')
+                self.geometrynotes = self.geometrynotes.strip()
             if lines.find('ZipFile') >= 0:
                 zipfile = lines
                 if zipfile.find('1') >= 0:
-                    self.ZipFile = True
+                    self.zipfile = True
                 else:
-                    self.ZipFile = False
+                    self.zipfile = False
             if lines.find('Delete Originals') >= 0:
                 deleteoriginals = lines
                 if deleteoriginals.find('1') >= 0:
-                    self.DeleteOriginals = True
+                    self.deleteoriginals = True
                 else:
-                    self.DeleteOriginals = False
+                    self.deleteoriginals = False
             if lines.find('DownloadDir') >= 0:
-                varStart = lines.find('=') + 1
-                self.DownloadDir = lines[varStart:]
-                self.DownloadDir = self.DownloadDir.replace('"', '')
-                self.DownloadDir = self.DownloadDir.strip()
-        return self.GDMLDir
-        return self.GeometryNotes
-        return self.ZipFile
-        return self.DeleteOriginals
-        return self.DownloadDir
+                varstart = lines.find('=') + 1
+                self.downloaddir = lines[varstart:]
+                self.downloaddir = self.downloaddir.replace('"', '')
+                self.downloaddir = self.downloaddir.strip()
+        return self.gdmldir
+        return self.geometrynotes
+        return self.zipfile
+        return self.deleteoriginals
+        return self.downloaddir
 
 def main():
-    from ConfigReader import configreader
-    file = configreader()
-    file.readconfig()
+    """
+    Main Function
+    """
+    cfile = Configreader()
+    cfile.readconfig()
 
 if __name__ == "__main__":
     main()
