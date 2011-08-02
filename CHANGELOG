@@ -1,3 +1,12 @@
+MAUS-v0.0.4 (http://micewww.pp.rl.ac.uk/versions/show/11)
+  Bug #536: Trunk broken
+	Bug #537: Segmentation fault in SciFiSD
+	Bug #565: pylint checks traverse swig auto-generated python
+	Bug #566: Memory leak?
+	Feature #519: Release 0.0.3
+	Feature #567: SpecialVirtual detectors
+	Feature #579: Move to next XBOA version
+
 MAUS-v0.0.3 (http://micewww.pp.rl.ac.uk/versions/show/9)
   Bug #328: No page number in MiceMods doc
 	Bug #334: energy deposited when no energy deposited in tracker special detector

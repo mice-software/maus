@@ -386,6 +386,25 @@ def set_unpacker(conf, env):
     else:
         env["USE_UNPACKER"] = True
 
+def cpp_extras(env):
+  """
+  Sets compilation to include coverage, debugger, profiler depending on 
+  environment variable flags. Following controls are enabled:
+      if maus_lcov is set, sets gcov flags (for subsequent use in lcov); also
+      disables inlining
+      if maus_debug is set, sets debug flag -g
+      if maus_gprof is set, sets profiling flag -pg
+  """
+  if 'maus_lcov' in os.environ and os.environ['maus_lcov'] != '0':
+    env.Append(LIBS=['gcov'])
+    env.Append(CCFLAGS=["""-fprofile-arcs""", """-ftest-coverage""", """-fno-inline""", """-fno-default-inline"""])
+
+  if 'maus_debug' in os.environ and os.environ['maus_debug'] != '0':
+    env.Append(CCFLAGS=["""-g"""])
+
+  if 'maus_gprof' in os.environ and os.environ['maus_gprof'] != '0':
+    env.Append(CCFLAGS=["""-pg"""])
+
 
 # Setup the environment.  NOTE: SHLIBPREFIX means that shared libraries don't
 # have a 'lib' prefix, which is needed for python to find SWIG generated libraries
@@ -455,8 +474,9 @@ Export('env') # pylint: disable-msg=E0602
 
 print "Configuring..."
 # Must have long32 & long64 for the unpacking library
-env.Append(CCFLAGS=["""-Wall""", """-Dlong32='int'""", """-Dlong64='long long'"""])#, '-g', """-fprofile-arcs""", """-ftest-coverage""", """-fno-inline""", """-fno-default-inline"""])
-env.Append(LIBS=['gcov'])
+env.Append(CCFLAGS=["""-Wall""", """-Dlong32='int'""", """-Dlong64='long long'"""])#, '-g', 
+cpp_extras(env)
+
 conf = Configure(env, custom_tests = {'CheckCommand' : CheckCommand}) # pylint: disable-msg=E0602
 set_cpp(conf, env)
 set_python(conf, env)
