@@ -23,6 +23,7 @@ import os
 import json
 import argparse
 import operator
+import sys
 
 class Configuration:
     ## Returns JSON config document
@@ -35,6 +36,7 @@ class Configuration:
     #                    argument is ignored. If it is a python file handle (ie.
     #                    open('my_config.dat','r') ) then that file is read.
     def getConfigJSON(self, configFile = None):
+        """Accepts changes to default values from ConfigurationDefaults.py and returns values"""
         MAUSRootDir = os.environ.get('MAUS_ROOT_DIR')
         assert MAUSRootDir != None
 
@@ -42,22 +44,18 @@ class Configuration:
         defaultFilename = '%s/src/common_py/ConfigurationDefaults.py' % MAUSRootDir
         exec(open(defaultFilename,'r').read(), globals(), configDict)
 
-   #	loops over keywords and their associated values in configDict.  
-   #	the argparse function uses these keywords to accept new values
-   #	to the default configDict values
-	parser = argparse.ArgumentParser()
+        parser = argparse.ArgumentParser()
         for key, value in configDict.iteritems():
-		parser.add_argument('-'+key, action='store', dest=key, default=value)
-	results = parser.parse_args()
-	for key in configDict.iterkeys():
-		configDict[key]=getattr(results, key)
+            parser.add_argument('-'+key, action='store', dest=key, default=value)
+        results = parser.parse_args()
+        for key in configDict.iterkeys():
+            configDict[key]=getattr(results, key)
 
         if configFile != None:
             assert not isinstance(configFile, str)
             exec(configFile.read(), globals(), configDict)
 
         configJSONStr = json.JSONEncoder().encode(configDict)
-
 
         return configJSONStr
     
