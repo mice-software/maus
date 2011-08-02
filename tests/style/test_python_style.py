@@ -24,6 +24,8 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
 
         @returns exit status of the pylint call
         """
+        if file_name_in in TestPythonStyle.ignore_files:
+            return 0
         my_args = ['pylint', file_name_in, '--rcfile='+self.pylintrc]
         errors = subprocess.call(args=my_args, stdout=fout, \
                                  stderr=subprocess.STDOUT)
@@ -71,6 +73,7 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
     include_dirs = ['tests', 'src', 'bin', 'doc']
     maus_root_dir = os.environ['MAUS_ROOT_DIR']
     pylintrc = os.path.join(maus_root_dir, 'tests', 'style', 'pylintrc')
+    ignore_files = ['src/common_py/SpillSchema.py'] # schema is a data file
 
 if __name__ == '__main__':
     unittest.main()
