@@ -1,8 +1,11 @@
-import os
+"""
+GDML Formatting Class
+M. Littlefield 02/08/11 
+"""
 import os.path
 from xml.dom import minidom
 
-class formatter:
+class Formatter:
     """
     @Class formatter this class formats the raw outputted fastrad files so there schema material file paths are correct
 
@@ -16,112 +19,163 @@ class formatter:
 
         @Param Path The path to the directory which contains the fastrad outputted GDML files
         """
-        self.Formatted = False
+        self.formatted = False
         self.txtfile = ""
-        self.ConfigurationFile = None
-        self.MaterialFile = None
-        self.MaterialFilePath = None
-        self.Schema = os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/gdmlSchema/GDML_3_0_0/schema/gdml.xsd'
-        list = []
-        self.StepFiles = list
+        self.configurationfile = None
+        self.materialfile = None
+        self.materialfilepath = None
+        schema = '/src/common_py/geometry/gdmlSchema/GDML_3_0_0/schema/gdml.xsd'
+        self.schema = os.environ['MAUS_ROOT_DIR'] + schema
+        filelist = []
+        self.stepfiles = filelist
         if type(path) != str:
-            raise IOError('path must be a string to the directory which holds the GDMLs', 'GDMLFormatter::__init__')
+            raise IOError('path must be a string', 'GDMLFormatter::__init__')
         else:
-            self.Path = path
-        gdmls = os.listdir(self.Path)
+            self.path = path
+        gdmls = os.listdir(self.path)
         for fname in gdmls:
             if fname.find('materials') >= 0:
-                file = self.Path + '/' + fname
-                self.MaterialFile = file
-                self.MaterialFilePath = os.path.abspath(self.MaterialFile)
+                materialfile = self.path + '/' + fname
+                self.materialfile = materialfile
+                self.materialfilepath = os.path.abspath(self.materialfile)
             if fname.find('fastrad') >= 0:
-                file = self.Path + '/' + fname
-                if file != self.MaterialFile:
-                    self.ConfigurationFile = file
-            if fname != self.ConfigurationFile  and fname != self.MaterialFile:
-                file = self.Path + '/' + fname
-                self.StepFiles.append(file)
-        length = len(self.StepFiles)
+                configfile = self.path + '/' + fname
+                if file != self.materialfile:
+                    self.configurationfile = configfile
+            if fname != self.configurationfile  and fname != self.materialfile:
+                stepfile = self.path + '/' + fname
+                self.stepfiles.append(stepfile)
+        length = len(self.stepfiles)
         for num in range(0, length):
-            if self.StepFiles[num] == self.ConfigurationFile:
-                file1 = self.StepFiles[num]
-            if self.StepFiles[num] == self.MaterialFile:
-                file2 = self.StepFiles[num]
-        self.StepFiles.remove(file1)
-        self.StepFiles.remove(file2)
+            if self.stepfiles[num] == self.configurationfile:
+                file1 = self.stepfiles[num]
+            if self.stepfiles[num] == self.materialfile:
+                file2 = self.stepfiles[num]
+        self.stepfiles.remove(file1)
+        self.stepfiles.remove(file2)
 
-    def formatSchemaLocation(self, file):
-        xmldoc = minidom.parse(file)
+    def format_schema_location(self, gdmlfile):
+        """
+        @method format_schema_location
+        
+        This method parses the GDML file into memory and alters the location of 
+        the schema location. It then rewrites the GDML with the valid schema.
+        
+        @param GDMLFile The name of the file which will have its schema location altered.
+        """
+        xmldoc = minidom.parse(gdmlfile)
         for node in xmldoc.getElementsByTagName("gdml"):
             if node.hasAttribute("xsi:noNamespaceSchemaLocation"):
-                node.attributes['xsi:noNamespaceSchemaLocation'] = self.Schema
-        os.remove(file)
-        fout = open(file, 'w')
+                node.attributes['xsi:noNamespaceSchemaLocation'] = self.schema
+        os.remove(gdmlfile)
+        fout = open(gdmlfile, 'w')
         xmldoc.writexml(fout)
-        fout.close()
 
-    def formatMaterials(self, file):
+    def format_materials(self, gdmlfile):
+        """
+        @method Format Materials
+        
+        This method opens a new GDML file in memory and creates a new Document
+        Type Definition (DTD) which contains the correct location of the materials
+        reference file produced by fastRad.
+       
+        @param GDMLFile The name of the file which will have its materials reference file location altered.
+        """
         self.txtfile = "" 
         impl = minidom.getDOMImplementation()
-        str = 'gdml [<!ENTITY materials SYSTEM "' + self.MaterialFile + '">]'
-        docType = impl.createDocumentType(str, None, None)
-        NewDoc = impl.createDocument(None, "MAUS", docType)
-        Config = minidom.parse(file)
-        for node in Config.getElementsByTagName("gdml"):
-            RootEle = node
-        for node2 in NewDoc.getElementsByTagName("MAUS"):
-            OldEle = node2
-        NewDoc.replaceChild(RootEle, OldEle)
-        self.txtfile = file[:-5] + '.txt' #NEED to change for gdmls
+        docstr = 'gdml [<!ENTITY materials SYSTEM "' + self.materialfile + '">]'
+        doctype = impl.createDocumentType(docstr, None, None)
+        newdoc = impl.createDocument(None, "MAUS", doctype)
+        config = minidom.parse(gdmlfile)
+        for node in config.getElementsByTagName("gdml"):
+            rootelement = node
+        for node2 in newdoc.getElementsByTagName("MAUS"):
+            oldelement = node2
+        newdoc.replaceChild(rootelement, oldelement)
+        self.txtfile = gdmlfile[:-5] + '.txt' #NEED to change for gdmls
         fout = open(self.txtfile, 'w')
-        NewDoc.writexml(fout)
+        newdoc.writexml(fout)
         fout.close()
-        os.remove(file)
+        os.remove(gdmlfile)
         
-    def insertMaterialsRef(self, file):
-        fin = open(file, 'r')
-        gdmlfile = file[:-4] + '.gdml'
+    def insert_materials_ref(self, gdmlfile):
+        """
+        @method Insert Materials Reference
+        
+        This method opens the GDML file and replaces the materials file
+        reference call which is lost during the parsing of the GDML's
+        in other methods.
+        
+        @param GDMLFile The name of the file which will have its materials reference replaced.
+        """
+        fin = open(gdmlfile, 'r')
+        gdmlfile = gdmlfile[:-4] + '.gdml'
         fout = open(gdmlfile, 'w')
         for line in fin.readlines():
             if line.find('<!-- Materials definition CallBack -->')>=0:
-                new_line = line.replace('<!-- Materials definition CallBack -->', '<!-- Materials definition CallBack --> &materials;')
-                print >>fout,new_line
+                matdef = '<!-- Materials definition CallBack -->'
+                new_line = line.replace(matdef, matdef+'&materials;')
+                print >> fout, new_line
             else:
-                print >>fout,line
-        print >>fout, '<!-- Formatted for MAUS -->'
+                print >> fout, line
+        print >> fout, '<!-- Formatted for MAUS -->'
         fin.close()
         fout.close()
-        os.remove(file)
+        os.remove(gdmlfile)
         
-    def formatCheck(self, file):
-        self.Formatted = False
-        fin = open(file, 'r')
+    def format_check(self, gdmlfile):
+        """
+        @method Format Check
+        
+        This method checks to see whether the file passed to it
+        has already been formatted but looking for the string
+        <!-- Formatted for MAUS --> which will have been put in the file
+        if it had already been formatted. This is to stop multiple 
+        materials reference calls being added as it cannot be added by parsing
+        the GDML.
+        
+        @param GDML File The file to be checked.
+        """
+        self.formatted = False
+        fin = open(gdmlfile, 'r')
         for lines in fin.readlines():
             if lines.find('<!-- Formatted for MAUS -->') >= 0:
-                print file + ' already formatted! No formatting will be done.'
-                self.Formatted = True
+                print gdmlfile + ' already formatted!'
+                self.formatted = True
         fin.close()
     
         
     def format(self):
-        self.formatCheck(self.ConfigurationFile)
-        if self.Formatted == False:
-            self.formatSchemaLocation(self.ConfigurationFile)
-            self.formatMaterials(self.ConfigurationFile)
-            self.insertMaterialsRef(self.txtfile)
+        """
+        @method Format
         
-        NoOfStepFiles = len(self.StepFiles)
-        for num in range(0, NoOfStepFiles):
-            self.formatCheck(self.StepFiles[num])
-            if self.Formatted == False:
-                self.formatSchemaLocation(self.StepFiles[num])
-                self.formatMaterials(self.StepFiles[num])
-                self.insertMaterialsRef(self.txtfile)
+        This method calls all the other methods to format the 
+        necessary parts of the file. It will run through all of the
+        fastRad outputted files within the folder location given to
+        the class constructor.
+        """
+        self.format_check(self.configurationfile)
+        if self.formatted == False:
+            self.format_schema_location(self.configurationfile)
+            self.format_materials(self.configurationfile)
+            self.insert_materials_ref(self.txtfile)
+        
+        noofstepfiles = len(self.stepfiles)
+        for num in range(0, noofstepfiles):
+            self.format_check(self.stepfiles[num])
+            if self.formatted == False:
+                self.format_schema_location(self.stepfiles[num])
+                self.format_materials(self.stepfiles[num])
+                self.insert_materials_ref(self.txtfile)
         print "Format Complete!"
             
                     
 def main():
-    gdmls = formatter('/home/matt/maus-littlefield/src/common_py/geometry/testCases/testGeometry')
+    """
+    Main Function
+    """
+    location = '/src/common_py/geometry/testCases/testGeometry'
+    gdmls = Formatter(os.environ['MAUS_ROOT_DIR']+location)
     gdmls.format()
 
 if __name__ == '__main__':
