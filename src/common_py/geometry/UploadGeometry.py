@@ -21,8 +21,8 @@ def main():
     inputfile = Configreader()
     inputfile.readconfig()
     #format the GDMLs so the paths to the schema and materials file are correct
-    gdmls = Formatter(inputfile.gdmldir)
-    gdmls.format()
+    #gdmls = Formatter(inputfile.gdmldir) format after download is probably better
+    #gdmls.format()
     #upload the geometry
     uploadgeometry = GDMLtocdb(inputfile.gdmldir, inputfile.geometrynotes, 1)
     uploadgeometry.upload_to_cdb()

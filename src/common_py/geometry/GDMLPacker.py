@@ -8,6 +8,7 @@ from datetime import datetime
 
 # need to re write comments and tests as it has been changed
 class Packer:
+    #pylint: disable = R0903
     """
     This class collects the files needed to be uploaded and zips them.
     """

@@ -11,4 +11,4 @@ Delete Originals = 0
 
 //Donwloading of geometries
 
-DownloadDir = "/home/matt/maus-littlefield/src/common_py/geometry/Download/TestDownload"
+DownloadDir = "/home/matt/maus-littlefield/src/common_py/geometry/Download/"

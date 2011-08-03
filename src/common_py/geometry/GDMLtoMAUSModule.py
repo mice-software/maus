@@ -1,7 +1,7 @@
 import os
 from CADImport import CADImport
 
-class gdmltomaus():
+class GDMLtomaus():
         
         def __init__(self, path):
             self.ConfigurationFile = None
@@ -34,7 +34,7 @@ class gdmltomaus():
             self.StepFiles.remove(file1)
             self.StepFiles.remove(file2)
 
-        def converttomaus(self, output):
+        def convert_to_maus(self, output):
             outputfile = output + "/Configuration.txt"
             configurationxsl = os.environ["MAUS_ROOT_DIR"] + "/src/common_py/geometry/xsltScripts/GDML2G4MICE.xsl"
             ConfigFile = CADImport(xmlin1 = self.ConfigurationFile, xsl = configurationxsl, output = outputfile)
@@ -48,12 +48,10 @@ class gdmltomaus():
                 StepFile = CADImport(xmlin1 = '/home/matt/maus-littlefield/src/common_py/geometry/testCases/testGeometry/Step_2.gdml', xsl = '/home/matt/maus-littlefield/src/common_py/geometry/xsltScripts/MMTranslation.xsl', output = outputfile)
                 StepFile.XSLTParse()
                 StepFile = None
-            StepFile = CADImport(xmlin1 = self.StepFiles[num], xsl = MMxsl, output = outputfile)
-            StepFile.XSLTParse()
             
 
 def main():
-    file = gdmltomaus('/home/matt/maus-littlefield/src/common_py/geometry/testCases/testGeometry')
-    file.converttomaus('/home/matt/maus-littlefield/src/common_py/geometry/Download/MM')
+    file = GDMLtomaus('/home/matt/maus-littlefield/src/common_py/geometry/testCases/testGeometry')
+    file.convert_to_maus('/home/matt/maus-littlefield/src/common_py/geometry/Download/MM')
 if __name__ == "__main__":
     main()
