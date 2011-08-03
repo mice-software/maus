@@ -51,12 +51,7 @@ std::string MapCppSimulation::process(std::string document) {
   try {
     Json::Value mc   = JsonWrapper::GetProperty
                                         (spill, "mc", JsonWrapper::arrayValue);
-    Squeak::mout(Squeak::info) << "Spill with " << mc.size() << " primaries" << std::endl;
-    for (int mc_particle_i = 0; mc_particle_i < mc.size(); ++mc_particle_i) {
-      Json::Value particle = JsonWrapper::GetItem
-                                  (mc, mc_particle_i, JsonWrapper::objectValue);
-      spill["mc"][mc_particle_i] = MAUSGeant4Manager::GetInstance()->RunParticle(particle);
-    }
+      spill["mc"] = MAUSGeant4Manager::GetInstance()->RunManyParticles(mc);
   }
   catch(Squeal squee) {
     spill = CppErrorHandler::getInstance()

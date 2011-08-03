@@ -42,9 +42,11 @@ MAUSGeant4Manager::MAUSGeant4Manager() {
     _primary  = new MAUSPrimaryGeneratorAction();
     _stepAct  = new MAUSSteppingAction();
     _trackAct = new MAUSTrackingAction();
+    _eventAct = new MAUSEventAction();
     _runManager->SetUserAction(_primary);
     _runManager->SetUserAction(_trackAct);
     _runManager->SetUserAction(_stepAct);
+    _runManager->SetUserAction(_eventAct);
     //  _runManager->SetUserAction(new MAUSStackingActionKillNonMuons);
     _runManager->SetUserAction(new MICERunAction);
     _virtPlanes = new VirtualPlaneManager;
@@ -74,8 +76,22 @@ MAUSPrimaryGeneratorAction::PGParticle
     return p;
 }
 
+Json::Value MAUSGeant4Manager::RunManyParticles(Json::Value particle_array) {
+    _eventAct->SetEvents(particle_array);  // checks type
+    for (size_t i = 0; i < particle_array.size(); ++i) {
+        MAUSPrimaryGeneratorAction::PGParticle primary;
+        Json::Value event = JsonWrapper::GetItem
+                                  (particle_array, i, JsonWrapper::objectValue);
+        Json::Value primary_json = JsonWrapper::GetProperty
+                                  (event, "primary", JsonWrapper::objectValue);
+        primary.ReadJson(primary_json);
+        GetPrimaryGenerator()->Push(primary);
+    }
+    GetRunManager()->BeamOn(particle_array.size());
+    return _eventAct->GetEvents();
+}
+
 Json::Value MAUSGeant4Manager::RunParticle(Json::Value particle) {
-    SetEvent(particle);
     MAUSPrimaryGeneratorAction::PGParticle p;
     p.ReadJson(particle["primary"]);
     return Tracking(p);
@@ -83,56 +99,24 @@ Json::Value MAUSGeant4Manager::RunParticle(Json::Value particle) {
 
 Json::Value MAUSGeant4Manager::RunParticle
                                     (MAUSPrimaryGeneratorAction::PGParticle p) {
-    SetEvent(Json::Value(Json::objectValue));
     return Tracking(p);
 }
 
+
 Json::Value MAUSGeant4Manager::Tracking
                                     (MAUSPrimaryGeneratorAction::PGParticle p) {
-    // Some stuff should be in EventAction
     Squeak::mout(Squeak::debug) << "Firing particle with ";
     JsonWrapper::Print(Squeak::mout(Squeak::debug), p.WriteJson());
     Squeak::mout(Squeak::debug) << std::endl;
+
     GetPrimaryGenerator()->Push(p);
-    BeginOfEventAction(NULL);
+    Json::Value event_array = Json::Value(Json::arrayValue);
+    Json::Value event(Json::objectValue);
+    event["primary"] = p.WriteJson();
+    event_array.append(event);
+    _eventAct->SetEvents(event_array);
     GetRunManager()->BeamOn(1);
-    EndOfEventAction(NULL);
-    return GetEvent();
+    return _eventAct->GetEvents()[Json::Value::UInt(0)];
 }
-
-void MAUSGeant4Manager::BeginOfEventAction(const G4Event *anEvent) {
-    _virtPlanes->StartOfEvent();
-    if (GetTracking()->GetWillKeepTracks())
-        GetTracking()->SetTracks(Json::Value(Json::objectValue));
-    if (GetStepping()->GetWillKeepSteps())
-        GetStepping()->SetSteps(Json::Value(Json::arrayValue));
-    GetGeometry()->ClearSDHits();
-}
-
-void MAUSGeant4Manager::EndOfEventAction(const G4Event *anEvent) {
-    //  For each detector i
-    _event["hits"] = Json::Value(Json::arrayValue);
-    for (unsigned int i = 0; i < GetGeometry()->GetSDSize(); i++) {
-      //  Retrieve detector i's hits
-      std::vector<Json::Value> hits = GetGeometry()->GetSDHits(i);
-      for (size_t j = 0; j < hits.size(); ++j) {
-        if (!hits[j].isNull()) {
-          _event["hits"].append(hits[j]);  // Json cpp just makes a new array?
-        }
-      }
-    }
-    if (GetTracking()->GetWillKeepTracks())
-        _event["tracks"] = GetTracking()->GetTracks();
-    if (GetVirtualPlanes()->GetWillUseVirtualPlanes())
-        _event["virtual_hits"] = GetVirtualPlanes()->GetVirtualHits();
-}
-
-void MAUSGeant4Manager::SetEvent(Json::Value event) {
-    if (!event.isObject())
-        throw(Squeal(Squeal::recoverable, "Particle must be an object value",
-                     "MAUSEventAction::SetEvent"));
-    _event = event;
-}
-
 } // namespace MAUS
 
