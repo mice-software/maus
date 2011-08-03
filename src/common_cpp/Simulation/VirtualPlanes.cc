@@ -32,6 +32,8 @@
 #include "src/legacy/BeamTools/BTField.hh"
 #include "src/legacy/BeamTools/BTTracker.hh"
 
+namespace MAUS {
+
 const BTField*         VirtualPlane::_field    = NULL;
 VirtualPlane::stepping VirtualPlane::_stepping = VirtualPlane::integrate;
 
@@ -352,10 +354,14 @@ int VirtualPlaneManager::GetStationNumberFromModule(const MiceModule* module) {
   }
   for (size_t i = 0; i < _planes.size(); i++)
     if (plane == _planes[i]) return i+1; // find station from plane
+  throw(Squeal(Squeal::recoverable,
+        "Module "+module->name()+" not found in VirtualPlaneManager",
+        "VirtualPlaneManager::GetStationNumberFromModule"));
 }
 
 int VirtualPlaneManager::GetNumberOfHits(int stationNumber) {
-    if (stationNumber-1 >= _nHits.size() || stationNumber-1 < 0)
+    if (stationNumber-1 >= static_cast<int>(_nHits.size()) ||
+        stationNumber-1 < 0)
       throw(Squeal(
               Squeal::recoverable,
               "Station number out of range",
@@ -474,5 +480,5 @@ void VirtualPlaneManager::RemovePlane(VirtualPlane* plane) {
     _nHits = std::vector<int>(_planes.size(), 0);
     delete plane;
 }
-
+}
 

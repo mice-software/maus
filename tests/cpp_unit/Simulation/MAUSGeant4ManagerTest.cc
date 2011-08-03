@@ -38,6 +38,7 @@ TEST(MAUSGeant4ManagerTest, GetSetTest) {
     ASSERT_TRUE(g4man->GetTracking() != NULL);
     ASSERT_TRUE(g4man->GetPhysicsList() != NULL);
     ASSERT_TRUE(g4man->GetVirtualPlanes() != NULL);
+    ASSERT_TRUE(g4man->GetEventAction() != NULL);
 }
 
 TEST(MAUSGeant4ManagerTest, GetReferenceParticleTest) {
@@ -134,4 +135,29 @@ TEST(MAUSGeant4ManagerTest, RunParticleJsonTest) {
     EXPECT_NEAR(out["primary"]["position"]["z"].asDouble(), 3., 1e-9);
 }
 
+TEST(MAUSGeant4ManagerTest, RunManyParticlesTest) {
+    std::string pg_string =
+      "{\"primary\":{\"position\":{\"x\":1.0, \"y\":2.0, \"z\":3.0}, \"momentum\":{\"x\":0.0, \"y\":0.0, \"z\":1.0}, \"particle_id\":-13, \"energy\":226.0, \"time\":0.0, \"random_seed\":10}}";
+    std::string pg_array_string = "["+pg_string+","+pg_string+","+pg_string+"]";
+    Json::Value pg = JsonWrapper::StringToJson(pg_array_string);
+    MAUSGeant4Manager::GetInstance()->GetStepping()->SetWillKeepSteps(false);
+    Json::Value out = MAUSGeant4Manager::GetInstance()->RunManyParticles(pg);
+    for (size_t i = 0; i < out.size(); ++i) {
+      Json::Value track = out[i]["tracks"]["track_1"];
+      ASSERT_TRUE(out.isArray());
+      ASSERT_TRUE(out[i].isObject());
+      ASSERT_TRUE(out[i]["tracks"].isObject());
+      ASSERT_TRUE(out[i]["tracks"]["track_1"].isObject());
+      ASSERT_TRUE(track["initial_position"]["x"].isDouble());
+      EXPECT_NEAR(track["initial_position"]["x"].asDouble(), 1., 1e-9);
+      EXPECT_NEAR(track["initial_position"]["y"].asDouble(), 2., 1e-9);
+      EXPECT_NEAR(track["initial_position"]["z"].asDouble(), 3., 1e-9);
+
+      ASSERT_TRUE(out[i]["primary"].isObject());
+      ASSERT_TRUE(out[i]["primary"]["position"]["x"].isDouble());
+      EXPECT_NEAR(out[i]["primary"]["position"]["x"].asDouble(), 1., 1e-9);
+      EXPECT_NEAR(out[i]["primary"]["position"]["y"].asDouble(), 2., 1e-9);
+      EXPECT_NEAR(out[i]["primary"]["position"]["z"].asDouble(), 3., 1e-9);
+    }
+}
 }

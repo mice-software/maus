@@ -70,3 +70,7 @@ exceptions[os.path.join(cpp_cm, 'Simulation','MAUSTrackingAction.hh')] = [
 ('#include "G4UserTrackingAction.hh"  //  inherit from', 'cpplint confused by g4 header', 'rogers')
 ]
 
+exceptions[os.path.join(cpp_cm, 'Simulation','MAUSEventAction.hh')] = [
+('#include "G4UserEventAction.hh"', 'cpplint confused by g4 header', 'rogers'),
+
+]

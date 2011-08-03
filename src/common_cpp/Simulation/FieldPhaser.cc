@@ -76,7 +76,7 @@ void FieldPhaser::SetPhases() {
                               (tracks, "virtual_hits", JsonWrapper::arrayValue);
             if (v_hits.size() == 0) break;
             std::set<int> phased_stations;
-            for (int j = 0; j < v_hits.size(); ++j) {
+            for (unsigned int j = 0; j < v_hits.size(); ++j) {
                 VirtualHit hit = _phaserVirtualPlanes.ReadHit(v_hits[j]);
                 if (BTPhaser::GetInstance()->
                                      SetThePhase(hit.GetPos(), hit.GetTime())) {
