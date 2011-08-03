@@ -5,7 +5,7 @@ M. Littlefield 02/08/11
 import os.path
 from GDMLPacker import packer
 from GDMLtoCDB import gdmltocdb
-from GDMLFormatter import formatter
+from GDMLFormatter import Formatter
 from ConfigReader import Configreader
 
 def main():
@@ -21,11 +21,11 @@ def main():
     inputfile = Configreader()
     inputfile.readconfig()
     #format the GDMLs so the paths to the schema and materials file are correct
-    gdmls = formatter(inputfile.gdmldir)
+    gdmls = Formatter(inputfile.gdmldir)
     gdmls.format()
     #upload the geometry
-    uploadgeometry = gdmltocdb(inputfile.gdmldir, inputfile.geometrynotes, 1)
-    uploadgeometry.uploadToCDB()
+    uploadgeometry = GDMLtocdb(inputfile.gdmldir, inputfile.geometrynotes, 1)
+    uploadgeometry.upload_to_cdb()
     #delete the text file produced by uploadtoCDB()
     path = inputfile.gdmldir + '/FileList.txt'
     #zip the files and store them locally if selected
