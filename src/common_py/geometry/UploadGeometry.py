@@ -3,8 +3,8 @@ Executable file to upload geometries to the CDB
 M. Littlefield 02/08/11 
 """
 import os.path
-from GDMLPacker import packer
-from GDMLtoCDB import gdmltocdb
+from GDMLPacker import Packer
+from GDMLtoCDB import GDMLtocdb
 from GDMLFormatter import Formatter
 from ConfigReader import Configreader
 
@@ -26,7 +26,6 @@ def main():
     #upload the geometry
     uploadgeometry = GDMLtocdb(inputfile.gdmldir, inputfile.geometrynotes, 1)
     uploadgeometry.upload_to_cdb()
-    #delete the text file produced by uploadtoCDB()
     path = inputfile.gdmldir + '/FileList.txt'
     #zip the files and store them locally if selected
     if inputfile.zipfile == True:
@@ -34,8 +33,9 @@ def main():
         zippedgeoms = '/src/common_py/geometry/zippedGeoms'
         zippath = os.environ['MAUS_ROOT_DIR'] + zippedgeoms
         zfile.zipfile(zippath)
-    #delete original GDML files as they are now zipped if selected
+    #delete the text file produced by uploadtoCDB()
     os.remove(path)
+    #delete original GDML files as they are now zipped if selected
     if inputfile.deleteoriginals == True:
         gdmls = os.listdir(inputfile.gdmldir)
         for fname in gdmls:
