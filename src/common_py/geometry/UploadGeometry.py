@@ -30,7 +30,7 @@ def main():
     path = inputfile.gdmldir + '/FileList.txt'
     #zip the files and store them locally if selected
     if inputfile.zipfile == True:
-        zfile = packer(path)
+        zfile = Packer(path)
         zippedgeoms = '/src/common_py/geometry/zippedGeoms'
         zippath = os.environ['MAUS_ROOT_DIR'] + zippedgeoms
         zfile.zipfile(zippath)

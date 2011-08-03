@@ -1,9 +1,13 @@
+"""
+GDML Packer class
+M. Littlefield 02/08/11 
+"""
 import os.path
 import zipfile
 from datetime import datetime
 
 # need to re write comments and tests as it has been changed
-class packer:
+class Packer:
     """
     This class collects the files needed to be uploaded and zips them.
     """
@@ -17,18 +21,18 @@ class packer:
 
         @Param filelist, file name/path of the file containing the list of GDML files to be zipped.
         """
-        list = []
-        self.List = list
+        alist = []
+        self.list = alist
         if filelist[-4:] != ".txt":
-            raise IOError("input file must be text format", "packer::__init__")
+            raise IOError("input file must be text format", "Packer::__init__")
         else:
-            self.FileList = filelist
-        if os.path.getsize(self.FileList) == 0:
-            raise StandardError("input file does not contain any information", "packer::__init__")
+            self.filelist = filelist
+        if os.path.getsize(self.filelist) == 0:
+            raise StandardError("input file is blank", "Packer::__init__")
         else:
-            fin = open(self.FileList, 'r')
+            fin = open(self.filelist, 'r')
             for line in fin.readlines():
-                self.List.append(line.strip())
+                self.list.append(line.strip())
             fin.close()
 
     def zipfile(self, path):
@@ -41,28 +45,35 @@ class packer:
 
         @Param Output Path, specify the output path of the zipfile
         """
-        dt = str(datetime.today())
-        dt = dt.replace('', 'Year', 1)
-        dt = dt.replace('-', 'Mon', 1)
-        dt = dt.replace('-', 'Day', 1)
-        dt = dt.replace(' ', 'Hour', 1)
-        dt = dt.replace(':', 'Min', 1)
-        end = dt.find(':')
-        dt = dt[0:end]
-        zippath = path + "/" + dt +".zip"
-        file = zipfile.ZipFile(zippath, 'w')
-        fin = open(self.FileList, 'r')
-        NumOfFiles = len(fin.readlines())
-        for n in range(0, NumOfFiles):
-            file.write(self.List[n], os.path.basename(self.List[n]), zipfile.ZIP_DEFLATED)
-        file.write(self.FileList, os.path.basename(self.FileList), zipfile.ZIP_DEFLATED)
-        file.close()
+        timenow = str(datetime.today())
+        timenow = timenow.replace('', 'Year', 1)
+        timenow = timenow.replace('-', 'Mon', 1)
+        timenow = timenow.replace('-', 'Day', 1)
+        timenow = timenow.replace(' ', 'Hour', 1)
+        timenow = timenow.replace(':', 'Min', 1)
+        end = timenow.find(':')
+        timenow = timenow[0:end]
+        zippath = path + "/" + timenow +".zip"
+        zfile = zipfile.ZipFile(zippath, 'w')
+        fin = open(self.filelist, 'r')
+        numoffiles = len(fin.readlines())
+        for num in range(0, numoffiles):
+            geomlist = self.list[num]
+            base = os.path.basename(self.list[num])
+            zfile.write(geomlist, base, zipfile.ZIP_DEFLATED)
+        base = os.path.basename(self.filelist)
+        zfile.write(self.filelist, base, zipfile.ZIP_DEFLATED)
+        zfile.close()
         fin.close()
 
 def main():
-    from GDMLPacker import packer
-    zip = packer("/home/matt/workspace/Maus/testCases/GDML_fastradModel/FileList.txt")
-    zip.zipfile()
+    """
+    Main Function
+    """
+    test = "/home/matt/workspace/Maus/testCases/GDML_fastradModel/FileList.txt"
+    filetozip = Packer(test)
+    path = '/home/matt/maus-littlefield/src/common_py/geometry/zippedGeoms'
+    filetozip.zipfile(path)
 
 if __name__ == "__main__":
     main()
