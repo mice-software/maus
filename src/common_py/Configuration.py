@@ -44,9 +44,15 @@ class Configuration:
             assert not isinstance(configFile, str)
             exec(configFile.read(), globals(), configDict)
 
+        configDict['maus_version'] = self.getVersion()
         configJSONStr = json.JSONEncoder().encode(configDict)
 
         return configJSONStr
     
-
-
+    def getVersion(self):
+        """
+        Version is taken as the first line in $MAUS_ROOT_DIR/README
+        """
+        readme = open(os.path.join(os.environ['MAUS_ROOT_DIR'], 'README'))
+        version = readme.readline().rstrip('\n')
+        return version

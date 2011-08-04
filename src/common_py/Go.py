@@ -68,6 +68,8 @@ class Go:
         self.jsonConfigDocument = Configuration().getConfigJSON(argConfigFile)
         jsonConfigDictionary = json.loads(self.jsonConfigDocument)
         mapReduceType = jsonConfigDictionary['map_reduce_type']
+        version = jsonConfigDictionary["maus_version"]
+        print ("\tVersion: %s" % version)
 
         # Be sure to add other assertions here when new
         # map reduce implementations get put in.
