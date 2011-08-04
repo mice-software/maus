@@ -92,7 +92,7 @@ class Formatter:
         for node2 in newdoc.getElementsByTagName("MAUS"):
             oldelement = node2
         newdoc.replaceChild(rootelement, oldelement)
-        self.txtfile = gdmlfile[:-5] + '.txt' #NEED to change for gdmls
+        self.txtfile = gdmlfile[:-5] + '.txt'
         fout = open(self.txtfile, 'w')
         newdoc.writexml(fout)
         fout.close()
@@ -111,6 +111,7 @@ class Formatter:
         fin = open(gdmlfile, 'r')
         gdmlfile = gdmlfile[:-4] + '.gdml'
         fout = open(gdmlfile, 'w')
+        contents = []
         for line in fin.readlines():
             if line.find('<!-- Materials definition CallBack -->')>=0:
                 matdef = '<!-- Materials definition CallBack -->'
@@ -174,7 +175,7 @@ def main():
     """
     Main Function
     """
-    location = '/src/common_py/geometry/testCases/testGeometry'
+    location = '/src/common_py/geometry/Download'
     gdmls = Formatter(os.environ['MAUS_ROOT_DIR']+location)
     gdmls.format()
 

@@ -184,6 +184,26 @@ class Downloader:
             fout = open(path, 'w')
             fout.write(self.geometryfiles[num])
             fout.close()
+        
+    def remove_first_line(self, file_path):
+        contents = []
+        fin = open(file_path, 'r')
+        for line in fin.readlines():
+            if line:
+                contents.append(line)
+        fin.close()
+        contents.pop(0)
+        #os.remove(file_path)
+        fout = open(file_path, 'w')
+        length = len(contents)
+        stringout = str(contents)
+        print type(stringout)
+        print stringout
+        print stringout
+        fout.write(stringout)
+        fout.close()
+        
+        
             
 def main():
     """
@@ -191,11 +211,11 @@ def main():
     """
  #   from GDMLtoCDB import gdmltocdb
 #    from GDMLtoCDB import Downloader
-    test = '/home/matt/workspace/Maus/testCases/GDML_fastradModel'
-    geometry1 = GDMLtocdb(test, "test geometry case", 1)
-    geometry1.upload_to_cdb()
-    #dlgeometry = Downloader(1)
+    #test = '/home/matt/workspace/Maus/testCases/GDML_fastradModel'
+    #geometry1 = GDMLtocdb(test, "test geometry case", 1)
+    #geometry1.upload_to_cdb()
+    dlgeometry = Downloader(1)
     #dlgeometry.download_current()
-    
+    dlgeometry.remove_first_line('/home/matt/maus-littlefield/src/common_py/geometry/Download/fastradModel.gdml')
 if __name__ == "__main__":
     main()

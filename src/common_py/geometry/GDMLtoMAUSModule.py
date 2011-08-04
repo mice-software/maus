@@ -51,7 +51,7 @@ class GDMLtomaus():
             
 
 def main():
-    file = GDMLtomaus('/home/matt/maus-littlefield/src/common_py/geometry/testCases/testGeometry')
-    file.convert_to_maus('/home/matt/maus-littlefield/src/common_py/geometry/Download/MM')
+    file = GDMLtomaus('/home/matt/maus-littlefield/src/common_py/geometry/Download')
+    file.convert_to_maus('/home/matt/maus-littlefield/src/common_py/geometry/Download/')
 if __name__ == "__main__":
     main()
