@@ -25,7 +25,7 @@ if [ $maus_lcov ]; then
         fi
     fi
 fi
-nosetests --with-coverage build
+nosetests --with-coverage -v build
 if [ $maus_lcov ]; then
     if [ $maus_lcov -ne "0" ]; then
         echo Building lcov output
