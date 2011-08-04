@@ -30,7 +30,7 @@ import cProfile
 import pstats 
 
 # MAUS
-import Configuration
+from Configuration import Configuration
 
 class Go:
     """
@@ -77,7 +77,7 @@ class Go:
         print(("\tProgram Arguments: %s" % str(sys.argv)))
 
         self.json_config_document = \
-                                  Configuration.get_config_json(arg_config_file)
+                                  Configuration().getConfigJSON(arg_config_file)
         json_config_dictionary = json.loads(self.json_config_document)
         map_reduce_type = json_config_dictionary['map_reduce_type']
         version = json_config_dictionary["maus_version"]
@@ -90,7 +90,7 @@ class Go:
         if map_reduce_type == "native_python":
             self.native_python_map_reduce()
         elif map_reduce_type == "native_python_profile":
-            cProfile.runctx('self.NativePythonMapReduce()', globals(), \
+            cProfile.runctx('self.native_python_map_reduce()', globals(), \
                            locals(), 'list.prof')
             profile = pstats.Stats('list.prof') 
             profile.strip_dirs().sort_stats('time').print_stats() 
@@ -180,11 +180,11 @@ class Go:
             
 
     def buffer_input(self, the_emitter):
-        my_buffer = [0]*1024
+        my_buffer = []
         for i in range(1024):
             try:
                 value = next(the_emitter)  
-                my_buffer[i] = value.encode('ascii')
+                my_buffer.append(value.encode('ascii'))
             except StopIteration:
                 return my_buffer
 

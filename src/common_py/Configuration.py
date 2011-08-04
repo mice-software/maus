@@ -22,40 +22,51 @@ for the old G4MICE datacards.
 import os
 import json
 
-def get_config_json(config_file = None):
+class Configuration:
     """
-    Returns JSON config document
-
-    The defaults are read from ConfigurationDefaults
-    then (if applicable) values are added/replaced
-    by the passed file.  A JSON file is returned.
-
-    \param config_file (optional) overriding configuration file handle.  If
-                      None then this argument is ignored. If it is a python
-                      file handle (ie. open('my_config.dat','r') ) then that
-                      file is read.
+    Configuration class is responsible for holding and parsing configuration
+    default information and converting it to json
     """
-    maus_root_dir = os.environ.get('MAUS_ROOT_DIR')
-    assert maus_root_dir != None
+    def __init__(self):
+        """
+        Initialise path to readme file
+        """        
+        self.readme = os.path.join(os.environ['MAUS_ROOT_DIR'], 'README')
 
-    config_dict = {}
-    defaults = open(maus_root_dir+"/src/common_py/ConfigurationDefaults.py") 
-    exec(defaults, globals(), config_dict) # pylint: disable=W0122
+    def getConfigJSON(self, config_file = None):
+        """
+        Returns JSON config document
 
-    if config_file != None:
-        assert not isinstance(config_file, str)
-        exec(config_file.read(), globals(), config_dict) # pylint: disable=W0122
+        The defaults are read from ConfigurationDefaults
+        then (if applicable) values are added/replaced
+        by the passed file.  A JSON file is returned.
 
-    config_dict['maus_version'] = get_version_from_readme()
-    config_json_str = json.JSONEncoder().encode(config_dict)
+        \param config_file (optional) overriding configuration file handle.  If
+                          None then this argument is ignored. If it is a python
+                          file handle (ie. open('my_config.dat','r') ) then that
+                          file is read.
+        """
+        maus_root_dir = os.environ.get('MAUS_ROOT_DIR')
+        assert maus_root_dir != None
 
-    return config_json_str
-    
-def get_version_from_readme():
-    """
-    Version is taken as the first line in $MAUS_ROOT_DIR/README
-    """
-    readme = open(os.path.join(os.environ['MAUS_ROOT_DIR'], 'README'))
-    version = readme.readline().rstrip('\n')
-    return version
+        config_dict = {}
+        defaults = open(maus_root_dir+"/src/common_py/ConfigurationDefaults.py")
+        exec(defaults, globals(), config_dict) # pylint: disable=W0122
+
+        if config_file != None:
+            assert not isinstance(config_file, str)
+            exec(config_file.read(), globals(), config_dict) # pylint: disable=W0122,C0301
+
+        config_dict['maus_version'] = self.get_version_from_readme()
+        config_json_str = json.JSONEncoder().encode(config_dict)
+
+        return config_json_str
+        
+    def get_version_from_readme(self):
+        """
+        Version is taken as the first line in $MAUS_ROOT_DIR/README
+        """
+        readme = open(self.readme)
+        version = readme.readline().rstrip('\n')
+        return version
 
