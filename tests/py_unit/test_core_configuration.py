@@ -27,6 +27,10 @@ class ConfigurationTestCase(unittest.TestCase):
         ## compare
         self.assertEqual(value, configJSONStr)
 
+    def test_version(self):
+        value = c.getConfigJSON(stringFile)
+
+
     def test_new_value(self):
         ## actual data
         stringFile = io.StringIO(u"test = 4")
