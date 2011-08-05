@@ -30,7 +30,8 @@ class Configuration:
     #
     #  The defaults are read from ConfigurationDefaults
     #  then (if applicable) values are added/replaced
-    #  by the passed file.  A JSON file is returned.
+    #  by the passed file or entered from command line.  
+    #  A JSON file is returned.
     #
     #  \param configFile (optional) overriding configuration.  If None then this
     #                    argument is ignored. If it is a python file handle (ie.
@@ -47,9 +48,22 @@ class Configuration:
         parser = argparse.ArgumentParser()
         for key, value in configDict.iteritems():
             parser.add_argument('-'+key, action='store', dest=key, default=value)
+        parser.add_argument('-card', action='store', dest='card', default=None)
         results = parser.parse_args()
-        for key in configDict.iterkeys():
-            configDict[key]=getattr(results, key)
+
+        for key, value in configDict.iteritems():
+            if isinstance (value, bool):
+                configDict[key] = bool(getattr(results,key))
+            elif isinstance (value, int):
+                configDict[key] = int(getattr(results,key))
+            elif isinstance (value, float):
+                configDict[key] = float(getattr(results,key))
+            else:
+                configDict[key] = getattr(results,key)
+
+        if results.card != None:
+            add_file = results.card
+            exec(open(add_file, 'r').read(), globals(), configDict)
 
         if configFile != None:
             assert not isinstance(configFile, str)
