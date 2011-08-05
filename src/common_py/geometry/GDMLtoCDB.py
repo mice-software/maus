@@ -147,16 +147,8 @@ class Downloader:
             self.wsdlurl = twsdl 
         else: raise StandardError("Incorrect input", "upload::__init__")
         self.geometry = Client(self.wsdlurl).service
-        
-    def download_current(self, downloadpath):
-        """
-        @Method download_current, this method downloads the current valid geometry and writes the files
 
-        this method decodes the uploaded geometry and acquires fromt the string this list of files contained
-        within the upload. It then opens files in the ~/maus/src/common_py/geometries/Download which correspond
-        to the related gdml files and write the contents to these files. 
-        """
-        downloadedfile = b64decode(self.geometry.getCurrentGDML())
+    def unpack(self, downloadedfile, downloadpath):
         files = downloadedfile.rsplit("<!--  File Name  -->")
         self.listofgeometries = files
         num = len(self.geometryfiles)
@@ -186,6 +178,27 @@ class Downloader:
             fout.write(self.geometryfiles[num])
             fout.close()
             self.remove_first_line(path)
+ 
+        
+    def download_current(self, downloadpath):
+        """
+        @Method download_current, this method downloads the current valid geometry and writes the files
+
+        this method decodes the uploaded geometry and acquires fromt the string this list of files contained
+        within the upload. It then opens files in the ~/maus/src/common_py/geometries/Download which correspond
+        to the related gdml files and write the contents to these files. 
+        """
+        downloadedfile = b64decode(self.geometry.getCurrentGDML())
+        self.unpack(downloadedfile, downloadpath)
+
+    def download_geometry_for_id(self, id, downloadpath):
+        downloadedfile = b64decode(self.geometry.getGDMLForId(id))
+        self.unpack(downloadedfile, downloadpath)
+
+    def download_geometry_for_run(self, runid, downloadpath):
+        downloadedfile = b64decode(self.geometry.getGDMLForRun(runid))
+        self.unpack(downloadedfile, downloadpath)
+
         
     def remove_first_line(self, file_path):
         fin = open(file_path, 'r')
