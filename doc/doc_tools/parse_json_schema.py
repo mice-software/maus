@@ -12,7 +12,6 @@ LIST_BEGIN = '\\begin{itemize}' #[itemsep=0pt] -- latex2html cant do this
 LIST_END = '\\end{itemize}'
 UNPARSED = Queue.Queue()
 
-
 def parse_json_schema(my_json_schema, my_ancestors, file_handle, separator="/"):
     """
     Parse json schema description fields into a latex document. 
@@ -106,12 +105,19 @@ def __parse_json_schema_recursive(my_schema, my_ancestors_, \
                          (value, my_ancestors_+[key], file_handle, depth+1)
         print >> file_handle, ' '*depth, LIST_END
 
+def head_matter(file_handle, schema_name):
+    """
+    Make a header based on the schema name
+    """
+    print >> file_handle, "\chapter{"+schema_name+"}"
+
 def main():
     """
     Run the main program - creates documentation for:
     * SpillSchema.py
     """
     spill_schema_fh = open('spill_schema.tex', 'w')
+    head_matter(spill_schema_fh, "Spill data structure")
     json_schema = __parse_schema(SpillSchema.spill)
     parse_json_schema(json_schema, ["spill"], spill_schema_fh)
     while not UNPARSED.empty():
