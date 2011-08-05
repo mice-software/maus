@@ -1,0 +1,4 @@
+test_integer = 15
+test_string = 'testing'
+test_Dict = {"test_position":{"x":0.0, "y":-0.0, "z":-8000.0}, "random_seed":6995}
+simulation_reference_particle = {"position":{"x":0.0, "y":-0.0, "z":-9700.0}, "momentum":{"x":0.0, "y":0.0, "z":1.0}, "particle_id":-13, "energy":226.0, "time":0.0, "random_seed":10}
