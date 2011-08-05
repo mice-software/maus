@@ -136,6 +136,7 @@ class Downloader:
 
         @Param testserver, If an argument of 1 is entered this will set a connection to the test CDB if left blank write to the actual CDB
         """
+        self.filestr =""
         filelist = []
         self.geometryfiles = filelist
         self.listofgeometries = filelist
@@ -184,26 +185,20 @@ class Downloader:
             fout = open(path, 'w')
             fout.write(self.geometryfiles[num])
             fout.close()
+            self.remove_first_line(path)
         
     def remove_first_line(self, file_path):
-        contents = []
         fin = open(file_path, 'r')
-        for line in fin.readlines():
-            if line:
-                contents.append(line)
+        for lines in fin.readlines():
+            self.filestr += lines
+        self.filestr = self.filestr.lstrip()
         fin.close()
-        contents.pop(0)
-        #os.remove(file_path)
         fout = open(file_path, 'w')
-        length = len(contents)
-        stringout = str(contents)
-        print type(stringout)
-        print stringout
-        print stringout
-        fout.write(stringout)
+        fout.write(self.filestr)
         fout.close()
+        self.filestr =""
         
-        
+            
             
 def main():
     """

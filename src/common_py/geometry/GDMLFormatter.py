@@ -98,7 +98,7 @@ class Formatter:
         fout.close()
         os.remove(gdmlfile)
         
-    def insert_materials_ref(self, gdmlfile):
+    def insert_materials_ref(self, inputfile):
         """
         @method Insert Materials Reference
         
@@ -108,8 +108,8 @@ class Formatter:
         
         @param GDMLFile The name of the file which will have its materials reference replaced.
         """
-        fin = open(gdmlfile, 'r')
-        gdmlfile = gdmlfile[:-4] + '.gdml'
+        fin = open(inputfile, 'r')
+        gdmlfile = inputfile[:-4] + '.gdml'
         fout = open(gdmlfile, 'w')
         contents = []
         for line in fin.readlines():
@@ -122,7 +122,7 @@ class Formatter:
         print >> fout, '<!-- Formatted for MAUS -->'
         fin.close()
         fout.close()
-        os.remove(gdmlfile)
+        os.remove(inputfile)
         
     def format_check(self, gdmlfile):
         """

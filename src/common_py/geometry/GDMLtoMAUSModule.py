@@ -48,8 +48,9 @@ class GDMLtomaus():
                 StepFile = CADImport(xmlin1 = '/home/matt/maus-littlefield/src/common_py/geometry/testCases/testGeometry/Step_2.gdml', xsl = '/home/matt/maus-littlefield/src/common_py/geometry/xsltScripts/MMTranslation.xsl', output = outputfile)
                 StepFile.XSLTParse()
                 StepFile = None
+                os.remove(self.StepFiles[num])
+            os.remove(self.ConfigurationFile)
             
-
 def main():
     file = GDMLtomaus('/home/matt/maus-littlefield/src/common_py/geometry/Download')
     file.convert_to_maus('/home/matt/maus-littlefield/src/common_py/geometry/Download/')
