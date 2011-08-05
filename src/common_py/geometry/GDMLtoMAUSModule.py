@@ -45,7 +45,7 @@ class GDMLtomaus():
                 file = file.strip(self.Path)
                 outputfile = output + '/' + file + 'txt'
                 MMxsl = os.environ["MAUS_ROOT_DIR"] + "/src/common_py/geometry/xsltScripts/MMTranslation.xsl"
-                StepFile = CADImport(xmlin1 = '/home/matt/maus-littlefield/src/common_py/geometry/testCases/testGeometry/Step_2.gdml', xsl = '/home/matt/maus-littlefield/src/common_py/geometry/xsltScripts/MMTranslation.xsl', output = outputfile)
+                StepFile = CADImport(xmlin1 = self.StepFiles[num], xsl = '/home/matt/maus-littlefield/src/common_py/geometry/xsltScripts/MMTranslation.xsl', output = outputfile)
                 StepFile.XSLTParse()
                 StepFile = None
                 os.remove(self.StepFiles[num])
