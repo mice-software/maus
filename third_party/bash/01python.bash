@@ -42,7 +42,15 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
 	echo "HACK: Enabling zlib (again?)"
         sleep 1
-        echo "zlib zlibmodule.c -I/usr/include -L/usr/lib -lz" >> Modules/Setup
+
+
+	if [ "$(uname -m)" = "x86_64" ]; then
+	    echo "     This is an x86_64 Linux"
+	    echo "zlib zlibmodule.c -I/usr/include -L/usr/lib64 -lz" >> Modules/Setup
+	else
+	    echo "     This is NOT an x86_64 Linux"
+	    echo "zlib zlibmodule.c -I/usr/include -L/usr/lib -lz" >> Modules/Setup
+	fi
 
         echo "INFO: Making:"
         sleep 1
