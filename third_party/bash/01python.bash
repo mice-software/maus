@@ -32,13 +32,17 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         sleep 1
         tar xvfz "${MAUS_ROOT_DIR}/third_party/source/${filename}" -C "${MAUS_ROOT_DIR}/third_party/build" > /dev/null
         cd "${MAUS_ROOT_DIR}/third_party/build/${directory}"
-        echo "INFO: Configuring:"
+	#echo "HACK: Enabling zlib"
+	#sleep 1
+	#echo "zlib zlibmodule.c -I\$(prefix)/include -L\$(exec_prefix)/lib -lz" >> Modules/Setup
+
+	echo "INFO: Configuring:"
         sleep 1
         ./configure --enable-shared --prefix="${MAUS_ROOT_DIR}/third_party/install"
 
-	echo "HACK: Enabling zlib"
-
-	echo "zlib zlibmodule.c -I\$(prefix)/include -L\$(exec_prefix)/lib -lz" >> Modules/Setup
+	echo "HACK: Enabling zlib (again?)"
+        sleep 1
+        echo "zlib zlibmodule.c -I/usr/include -L/usr/lib -lz" >> Modules/Setup
 
         echo "INFO: Making:"
         sleep 1
