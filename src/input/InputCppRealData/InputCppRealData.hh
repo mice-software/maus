@@ -30,7 +30,7 @@
 
 #include "src/input/InputCppRealData/UnpackEventLib.hh"
 #include "Utils/DAQChannelMap.hh"
-
+#include "Interface/Squeak.hh"
 
 /** \class InputCppRealData
   * Load MICE raw data and unpack it into a JSON stream.
@@ -40,73 +40,8 @@
   *
   */
 class InputCppRealData {
-private
-:
-/** Debug flag,
-  *
-  * When set to true, "random" debugging strings will be sent to cerr!
-  */
-  bool _debug;
 
-/** Process manager object. */
-  MDprocessManager _dataProcessManager;
-
-/** File manager object. */
-  MDfileManager _dataFileManager;
-
-/** The DAQ channel map object.
-* It is used to group all measurements belonging to a given detector.*/
-  DAQChannelMap map;
-
-/** Processor for TDC particle event data. */
-  V1290DataProcessor*  _v1290PartEventProc;
-
-/** Processor for fADC V1724 particle event data. */
-  V1724DataProcessor*  _v1724PartEventProc;
-
-/** Processor for fADC V1731 particle event data. */
-  V1731DataProcessor*  _v1731PartEventProc;
-
-/** Processor for scaler data. */
-  V830DataProcessor*  _v830FragmentProc;
-
-/** Processor for VLSB data. */
-  VLSBDataProcessor* _vLSBFragmentProc;
-
-/** Processor for DBB data. */
-  DBBDataProcessor* _DBBFragmentProc;
-
-/** Pointer to the start of the current event. */
-  unsigned char *_eventPtr;
-
-  /** Paths to the data.
-	* This string has to contain one or more space separated paths.
-	*/
-  std::string _dataPaths;
-
-  /** File and run names within _dataPaths.
-  * This string has to contain one or more space separated
-  * file names or run numbers.
-  */
-  std::string _datafiles;
-
-  /** Enum of event types */
-  enum {
-    VmeTdc = 102,
-    VmefAdc1724 = 120,
-    VmefAdc1731 = 121,
-    VmeScaler = 111,
-		DBB = 141
-  };
-
-	/** Convert the DAQ event type (as coded in DATE) into string.
-	* \param[in] pType The type of the event to be converted.
-  * \return The type of the event as string.
-	*/
-  string event_type_to_str(int pType);
-
-public
-:
+public:
 
 /** Create an instance of InputCppRealData.
   *
@@ -166,7 +101,7 @@ public
    * can use pure python code in the python bindings!
    */
 
-/** Internal emitter function.
+ /** Internal emitter function.
   *
   * When called from C++, this function does nothing.
   * From python (where it is overriden by the bindings,
@@ -177,6 +112,67 @@ public
   std::string emitter() {
      return "";
   };
+
+private:
+
+/** Process manager object. */
+  MDprocessManager _dataProcessManager;
+
+/** File manager object. */
+  MDfileManager _dataFileManager;
+
+/** The DAQ channel map object.
+* It is used to group all measurements belonging to a given detector.*/
+  DAQChannelMap _map;
+
+/** Processor for TDC particle event data. */
+  V1290DataProcessor*  _v1290PartEventProc;
+
+/** Processor for fADC V1724 particle event data. */
+  V1724DataProcessor*  _v1724PartEventProc;
+
+/** Processor for fADC V1731 particle event data. */
+  V1731DataProcessor*  _v1731PartEventProc;
+
+/** Processor for scaler data. */
+  V830DataProcessor*  _v830FragmentProc;
+
+/** Processor for VLSB data. */
+  VLSBDataProcessor* _vLSBFragmentProc;
+
+/** Processor for DBB data. */
+  DBBDataProcessor* _DBBFragmentProc;
+
+/** Pointer to the start of the current event. */
+  unsigned char *_eventPtr;
+
+  /** Paths to the data.
+  * This string has to contain one or more space separated paths.
+  */
+  std::string _dataPaths;
+
+  /** File and run names within _dataPaths.
+  * This string has to contain one or more space separated
+  * file names or run numbers.
+  */
+  std::string _datafiles;
+
+  /** Enum of event types */
+  enum {
+    VmeTdc = 102,
+    VmefAdc1724 = 120,
+    VmefAdc1731 = 121,
+    VmeScaler = 111,
+    DBB = 141,
+    VLSB_C = 80
+  };
+
+  /** Convert the DAQ event type (as coded in DATE) into string.
+  * \param[in] pType The type of the event to be converted.
+  * \return The type of the event as string.
+  */
+  std::string event_type_to_str(int pType);
+
 };
 
 #endif  // _MAUS_INPUTCPPREALDATA_INPUTCPPREALDATA_H__

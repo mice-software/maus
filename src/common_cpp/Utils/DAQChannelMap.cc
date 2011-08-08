@@ -15,7 +15,7 @@
  *
  */
 
-
+#include "Interface/Squeak.hh"
 #include "Utils/DAQChannelMap.hh"
 
 ////////////////////////////////////////////////////////////
@@ -26,10 +26,10 @@ bool DAQChannelKey::operator== ( DAQChannelKey const key ) {
        _channel == key._channel &&
        _eqType == key._eqType &&
        _detector == key._detector) {
-		return true;
+    return true;
   } else {
     return false;
-	}
+  }
 }
 
 bool DAQChannelKey::operator!= ( DAQChannelKey const key ) {
@@ -38,31 +38,31 @@ bool DAQChannelKey::operator!= ( DAQChannelKey const key ) {
        _channel == key._channel &&
        _eqType == key._eqType &&
        _detector == key._detector) {
-		return false;
+    return false;
   } else {
     return true;
   }
 }
 
-ostream& operator<<( ostream& stream, DAQChannelKey key ) {
-	stream << "DAQChannelKey " << key._ldcId;
-	stream << " " << key._geo;
-	stream << " " << key._channel;
-	stream << " " << key._eqType;
-	stream << " " << key._detector;
-	return stream;
+std::ostream& operator<<( std::ostream& stream, const DAQChannelKey key ) {
+  stream << "DAQChannelKey " << key._ldcId;
+  stream << " " << key._geo;
+  stream << " " << key._channel;
+  stream << " " << key._eqType;
+  stream << " " << key._detector;
+  return stream;
 }
 
-istream& operator>>( istream& stream, DAQChannelKey &key ) {
-	string xLabel;
-	stream >> xLabel >> key._ldcId >> key._geo >> key._channel >> key._eqType >> key._detector;
-	return stream;
+std::istream& operator>>( std::istream& stream, DAQChannelKey &key ) {
+  std::string xLabel;
+  stream >> xLabel >> key._ldcId >> key._geo >> key._channel >> key._eqType >> key._detector;
+  return stream;
 }
 
-string DAQChannelKey::str() {
-	stringstream xConv;
-	xConv << (*this);
-	return xConv.str();
+std::string DAQChannelKey::str() {
+  std::stringstream xConv;
+  xConv << (*this);
+  return xConv.str();
 }
 
 ////////////////////////////////////////////////////////////
@@ -74,27 +74,32 @@ DAQChannelMap::~DAQChannelMap() {
   _chKey.resize(0);
 }
 
-void DAQChannelMap::InitFromFile(string filename) {
-
-  ifstream stream(filename.c_str());
+bool DAQChannelMap::InitFromFile(std::string filename) {
+  std::ifstream stream(filename.c_str());
   if ( !stream ) {
-    cerr << "Can't DAQ open cabling file " << filename << endl;
-    exit(1);
+    Squeak::mout(Squeak::error) << "Can't DAQ open cabling file. " << filename << std::endl;
+    return false;
   }
-	stringstream key_s;
-	DAQChannelKey* key;
+  std::stringstream key_s;
+  DAQChannelKey* key;
 
   while ( !stream.eof() ) {
-		key = new DAQChannelKey();
-		stream >> *key;
-		_chKey.push_back(key);
-	}
+    key = new DAQChannelKey();
+    stream >> *key;
+    _chKey.push_back(key);
+  }
+  if(_chKey.size()==0){
+    Squeak::mout(Squeak::error) << "No DAQ Channel Keys loaded. " << filename << std::endl;
+    return false;
+  }
+  return true;
 }
 
-void DAQChannelMap::InitFromCDB() {}
+bool DAQChannelMap::InitFromCDB() {}
 
 DAQChannelKey* DAQChannelMap::find(int ldc, int geo, int ch, int eqType) {
-	for (unsigned int i = 0;i < _chKey.size();i++)
+  // To be optimised !!!
+  for (unsigned int i = 0;i < _chKey.size();i++)
     if ( _chKey[i]->ldc() == ldc &&
         _chKey[i]->geo() == geo &&
         _chKey[i]->channel() == ch &&
@@ -104,7 +109,7 @@ DAQChannelKey* DAQChannelMap::find(int ldc, int geo, int ch, int eqType) {
   return NULL;
 }
 
-string DAQChannelMap::detector(int ldc, int geo, int ch, int eqType) {
+std::string DAQChannelMap::detector(int ldc, int geo, int ch, int eqType) {
   DAQChannelKey* key = find(ldc, geo, ch, eqType);
   if ( key )
     return key->detector();

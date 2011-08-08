@@ -58,7 +58,7 @@ class InputCppRealDataTestCase(unittest.TestCase):
         self.assertEqual(event_count, 26)
 
         # Check the md5 sum matches the expected value
-        self.assertEqual(digester.hexdigest(), '52a4a8021cfdef2d6e220c39c679970b')
+        self.assertEqual(digester.hexdigest(), '808b39ed52f5ec72528722a4429f5988')
 
         self.assertTrue(self.mapper.death())
 

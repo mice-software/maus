@@ -82,15 +82,15 @@ VirtualPlanes_z = [0.0, 1.0] # units: meter.  the 'z' coordinate where the virtu
 
 # this is used by ImputCppRealData
 Enable_V1290_Unpacking = True
-Enable_V1731_Unpacking = False
+Enable_V1731_Unpacking = True
 Enable_V1724_Unpacking = True
 Enable_V830_Unpacking = True
-Enable_VLSB_Unpacking = False
+Enable_VLSB_Unpacking = True
 Enable_DBB_Unpacking = True
 Do_V1731_Zero_Suppression = False
-V1731_Zero_Suppressio_Threshold = 100
+V1731_Zero_Suppression_Threshold = 100
 Do_V1724_Zero_Suppression = True
-V1724_Zero_Suppressio_Threshold = 100
+V1724_Zero_Suppression_Threshold = 100
 Enable_TOF = True
 Enable_EMR = True
 Enable_KL = True

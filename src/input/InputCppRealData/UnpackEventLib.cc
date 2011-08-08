@@ -30,7 +30,7 @@ int V1290DataProcessor::Process(MDdataContainer* aPartEventPtr) {
   if (xV1290Evnt->IsValid()) {
     // Put static data into the Json
     pBoardDoc["ldc_id"]       = xLdc = this->GetLdcId();
-		pBoardDoc["equip_type"] = xEquip = this->GetEquipmentType();
+    pBoardDoc["equip_type"] = xEquip = this->GetEquipmentType();
     pBoardDoc["time_stamp"]          = this->GetTimeStamp();
     pBoardDoc["phys_event_number"]   = this->GetPhysEventNumber();
     pBoardDoc["part_event_number"] = xPartEv = this->GetPartEventNumber();
@@ -38,19 +38,25 @@ int V1290DataProcessor::Process(MDdataContainer* aPartEventPtr) {
     pBoardDoc["trigger_time_tag"]    = xV1290Evnt->GetTriggerTimeTag();
     // Loop over all the channels
     for (unsigned int xCh = 0; xCh < V1290_NCHANNELS; xCh++) {
-			pTdcHit = pBoardDoc;
+      pTdcHit = pBoardDoc;
+      // Get the number of leading edge hits.
       int xHitsL = xV1290Evnt->GetNHits(xCh, 'l');
+      // Get the number of trailing edge hits.
       int xHitsT = xV1290Evnt->GetNHits(xCh, 't');
+      
+      // By definition the number of the leading edge hits has to be equal
+      // to the number of the trailing edge hits but some times this is not true. 
       int xMaxHits = MAX(xHitsL, xHitsT);
 
-      // Loop over each possible hit
-      int xLT, xTT;  // Lead and Trail times?
+      // Loop over all leading and trailing hits in this channel.
+      int xLT, xTT;  // Lead and Trail times
       for (unsigned int j = 0; j < xMaxHits; j++) {
         if (j < xHitsL) {
           xLT = xV1290Evnt->GetHitMeasurement(j,  // Hit ID
                                              xCh,  // Channel ID
                                              'l');
         } else {
+          // If no leading edge hit set the value og time to -99.
           xLT = -99;
         }
 
@@ -59,6 +65,7 @@ int V1290DataProcessor::Process(MDdataContainer* aPartEventPtr) {
                                               xCh,  // Channel ID
                                              't');
         } else {
+          // If no trailing edge hit set the value og time to -99.
           xTT = -99;
         }
 
@@ -94,7 +101,7 @@ int V1724DataProcessor::Process(MDdataContainer* aPartEventPtr) {
   MDpartEventV1724* xV1724Evnt = static_cast<MDpartEventV1724*>(aPartEventPtr);
 
   Json::Value pBoardDoc;
-	Json::Value xfAdcHit;
+  Json::Value xfAdcHit;
   int xLdc, xGeo, xEquip, xPartEv;
   string xDetector = "unknown";
   if (xV1724Evnt->IsValid()) {
@@ -122,7 +129,7 @@ int V1724DataProcessor::Process(MDdataContainer* aPartEventPtr) {
         xfAdcHit["charge_mm"]    = charge_mm;
         xfAdcHit["charge_pm"]    = this->get_charge(ceaPedMax);
         xfAdcHit["position_max"] = this->get_max_position();
-        xfAdcHit["pedestals"]    = this->get_pedestal();
+        xfAdcHit["pedestal"]     = this->get_pedestal();
         DAQChannelKey* xKey = _chMap->find(xLdc, xGeo, xCh, xEquip);
         if (xKey) {
           xDetector = xKey->detector();
@@ -164,7 +171,7 @@ int V1731DataProcessor::Process(MDdataContainer* aPartEventPtr) {
     pBoardDoc["geo"]          = xGeo = xV1731Evnt->GetGeo();
     pBoardDoc["trigger_time_tag"]    = xV1731Evnt->GetTriggerTimeTag();
     // Loop over all the channels
-    for (unsigned int xCh = 0; xCh < V1724_NCHANNELS; xCh++) {
+    for (unsigned int xCh = 0; xCh < V1731_NCHANNELS; xCh++) {
       unsigned int xSamples = ( xV1731Evnt->GetLength(xCh) )*V1731_SAMPLES_PER_WORD;
       for (unsigned int j = 0; j < xSamples; j++) {
         int sample = xV1731Evnt->GetSampleData(xCh,  // Channel ID
@@ -179,7 +186,7 @@ int V1731DataProcessor::Process(MDdataContainer* aPartEventPtr) {
         xfAdcHit["charge_mm"]    = charge_mm;
         xfAdcHit["charge_pm"]    = this->get_charge(ceaPedMax);
         xfAdcHit["position_max"] = this->get_max_position();
-        xfAdcHit["pedestals"]    = this->get_pedestal();
+        xfAdcHit["pedestal"]    = this->get_pedestal();
         DAQChannelKey* xKey = _chMap->find(xLdc, xGeo, xCh, xEquip);
         if (xKey) {
           xDetector = xKey->detector();
@@ -215,7 +222,7 @@ int V830DataProcessor::Process(MDdataContainer* aFragPtr) {
     pBoardDoc["phys_event_number"]   = this->GetPhysEventNumber();
     pBoardDoc["channels"] = Json::Value();
 
-    unsigned int * ptr = xV830Fragment->Get32bWordPtr(0);
+    uint32_t * ptr = xV830Fragment->Get32bWordPtr(0);
     MDdataWordV830 dw(ptr);
     unsigned int wc(0);
 
@@ -225,12 +232,12 @@ int V830DataProcessor::Process(MDdataContainer* aFragPtr) {
       switch ( dt ) {
         case DWV830_Measurement:
         {
-		      // Convert the channel number into a channel number string!
+          // Convert the channel number into a channel number string!
           stringstream xConv;
           xConv <<  "ch" << dw.GetChannel();
-					unsigned int xValue = dw.GetMeasurement();
-					pBoardDoc["channels"][xConv.str()] = Json::Value(xValue);
-	        break;
+          unsigned int xValue = dw.GetMeasurement();
+          pBoardDoc["channels"][xConv.str()] = Json::Value(xValue);
+          break;
         }
         case DWV830_Header:
         {
@@ -241,9 +248,9 @@ int V830DataProcessor::Process(MDdataContainer* aFragPtr) {
       wc++;
       dw.SetDataPtr(++ptr);
     }
-	}
+  }
 
-	(*_docSpill)[_equipment] = pBoardDoc;
+  (*_docSpill)[_equipment] = pBoardDoc;
 
   return OK;
 }
@@ -304,19 +311,25 @@ int DBBDataProcessor::Process(MDdataContainer* aFragPtr) {
     pBoardDoc["hit_count"]           = xDBBFragment->GetHitCount();
 
     // Loop over all the channels
-    for (unsigned int xCh = 0; xCh < V1290_NCHANNELS; xCh++) {
+    for (unsigned int xCh = 0; xCh < DBB_NCHANNELS; xCh++) {
+      // Get the number of leading edge hits.      
       int xHitsL = xDBBFragment->GetNLeadingEdgeHits(xCh);
+      // Get the number of trailing edge hits.
       int xHitsT = xDBBFragment->GetNTrailingEdgeHits(xCh);
+      
+      // By definition the number of the leading edge hits has to be equal
+      // to the number of the trailing edge hits but some times this is not true.       
       int xMaxHits = MAX(xHitsL, xHitsT);
 
-      // Loop over each possible hit
-      int xLT, xTT;  // Lead and Trail times?
+      // Loop over all leading and trailing hits in this channel.
+      int xLT, xTT;  // Lead and Trail times
       for (unsigned int j = 0; j < xMaxHits; j++) {
         if (j < xHitsL) {
           xLT = xDBBFragment->GetHitMeasurement(j,  // Hit ID
                                              xCh,  // Channel ID
                                              'l');
         } else {
+          // If no trailing edge hit set the value og time to -99.
           xLT = -99;
         }
 
@@ -325,6 +338,7 @@ int DBBDataProcessor::Process(MDdataContainer* aFragPtr) {
                                                 xCh,  // Channel ID
                                                 't');
         } else {
+          // If no trailing edge hit set the value og time to -99.
           xTT = -99;
         }
 
@@ -358,7 +372,6 @@ int fADCDataProcessor::get_area() {
   return area;
 }
 
-
 void fADCDataProcessor::set_pedestal() {
   int area = 0;
   unsigned int pedBins = 20;
@@ -373,8 +386,8 @@ void fADCDataProcessor::set_pedestal() {
 int fADCDataProcessor::chargeMinMax() {
   int min, max, d;
   d = -99;
-  max = LONG_MIN;
-  min = LONG_MAX;
+  max = INT_MIN;
+  min = INT_MAX;
   for ( unsigned int i = 0; i < _data.size(); ++i ) {
     d = _data[ i ];
     min = ( min > d )? d : min;
@@ -385,57 +398,56 @@ int fADCDataProcessor::chargeMinMax() {
 }
 
 int fADCDataProcessor::get_signal_area(int& pos) {
-	vector<int>::iterator it = _data.begin();
-	vector<int>::iterator max;
-	int area = 0;
+  vector<int>::iterator it = _data.begin();
+  vector<int>::iterator max;
+  int area = 0;
 
-	max = max_element(_data.begin(), _data.end());
-	pos = distance(_data.begin(), max);
+  max = max_element(_data.begin(), _data.end());
+  pos = distance(_data.begin(), max);
 
-	if(pos > 10) it = max - 10;
+  if(pos > 10) it = max - 10;
 
-	while(it < max+20) {
-		area += *it - _pedestal;
-		it++;
-	}
+  while(it < max+20) {
+    area += *it - _pedestal;
+    it++;
+  }
 
-	return area;
+  return area;
 }
 
 int fADCDataProcessor::get_pedestal_area(int& pos) {
-	vector<int>::iterator it = _data.begin();
-	vector<int>::iterator max;
-	int pedareaminus = 0;
-	int pedareaplus = 0;
+  vector<int>::iterator it = _data.begin();
+  vector<int>::iterator max;
+  int pedareaminus = 0;
+  int pedareaplus = 0;
 
-	max = max_element(_data.begin(), _data.end());
-	pos = distance(_data.begin(), max);
+  max = max_element(_data.begin(), _data.end());
+  pos = distance(_data.begin(), max);
 
-	if(pos > 30 && pos < 97) {
-		it = max - 30;
-		while(it < max-10) {
-			pedareaminus += *it - _pedestal;
-			it++;
-		}
+  if(pos > 30 && pos < 97) {
+    it = max - 30;
+    while(it < max-10) {
+      pedareaminus += *it - _pedestal;
+      it++;
+    }
 
-		it = max + 20;
-		while(it < max+30) {
-			pedareaplus += *it - _pedestal;
-			it++;
-		}
-	}
+    it = max + 20;
+    while(it < max+30) {
+      pedareaplus += *it - _pedestal;
+      it++;
+    }
+  }
 
-	return pedareaminus + pedareaplus;
+  return pedareaminus + pedareaplus;
 }
 
-
 int fADCDataProcessor::get_max_position() {
-	int pos = 0;
-	vector<int>::iterator max;
-	max = max_element(_data.begin(), _data.end());
-	pos = distance(_data.begin(), max);
+  int pos = 0;
+  vector<int>::iterator max;
+  max = max_element(_data.begin(), _data.end());
+  pos = distance(_data.begin(), max);
 
-	return pos;
+  return pos;
 }
 
 

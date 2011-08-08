@@ -29,18 +29,7 @@
 #include <algorithm>
 #include <fstream>
 
-using std::string;
-using std::ostream;
-using std::istream;
-using std::ifstream;
-using std::cout;
-using std::endl;
-using std::vector;
-using std::stringstream;
-using std::cerr;
-
-
-/** Identifier for  a single DAQ channel.
+/** Identifier for a single DAQ channel.
  * This class is used to hold and manage all the information needed
  * to identifiy one DAQ Channel.
  */
@@ -49,22 +38,22 @@ class DAQChannelKey {
   DAQChannelKey()
   :_ldcId(-999), _geo(-999), _channel(-999), _eqType(-999), _detector("unknown") {}
 
-  DAQChannelKey(int l, int g, int ch, int e, string d)
+  DAQChannelKey(int l, int g, int ch, int e, std::string d)
   :_ldcId(l), _geo(g), _channel(ch), _eqType(e), _detector(d) {}
   virtual ~DAQChannelKey() {}
 
   bool operator==( DAQChannelKey key );
   bool operator!=( DAQChannelKey key );
 
-  friend ostream& operator<< ( ostream& stream, DAQChannelKey key );
-  friend istream& operator>> ( istream& stream, DAQChannelKey &key );
+  friend std::ostream& operator<< ( std::ostream& stream, DAQChannelKey key );
+  friend std::istream& operator>> ( std::istream& stream, DAQChannelKey &key );
 
-  string detector() {return _detector;}
+  std::string detector() {return _detector;}
 
   /** This function converts the DAQChannelKey into string.
   * \return String identifier.
   */
-  string str();
+  std::string str();
 
   int ldc()     {return _ldcId;}
   int geo()     {return _geo;}
@@ -74,8 +63,9 @@ class DAQChannelKey {
   /**  This function creates unique integer identifier.
   * \return Integer identifier.
   */
-  int make_DAQChannelKey_id() { return _ldcId*1e7 + _geo*1e5 + _channel*1e3 + _eqType; }
+  int make_DAQChannelKey_id() { return _ldcId*1e8 + _geo*1e6 + _channel*1e3 + _eqType; }
 
+ private:
   /// Id number of the Local Data Concentrator (DAQ computer).
   int _ldcId;
 
@@ -89,7 +79,7 @@ class DAQChannelKey {
   int _eqType;
 
   /// Name of the detector connected to this channel.
-  string _detector;
+  std::string _detector;
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -102,11 +92,14 @@ class DAQChannelMap {
   DAQChannelMap() {}
   virtual ~DAQChannelMap();
 
-  /// Initialize the map from text file.
-  void InitFromFile(string filename);
+ /** Initialize the map from text file.
+ * \param[in] filename name of the text file.
+ * \returns true if the map is initialized successfully.
+ */
+  bool InitFromFile(std::string filename);
 
-	/// Not implemented.
-  void InitFromCDB();
+  /// Not implemented.
+  bool InitFromCDB();
 
  /** Return pointer to the key.
  * This function returns pointer to the key for the required DAQ channel.
@@ -119,11 +112,11 @@ class DAQChannelMap {
   DAQChannelKey* find(int ldc, int geo, int ch, int eqType);
 
   /// Return the name of the detectro conected to this DAQ channel.
-  string detector(int ldc, int geo, int ch, int eqType);
+  std::string detector(int ldc, int geo, int ch, int eqType);
 
  private:
   /// vector holding DAQChannelKeys for all channels of the MICE DAQ system
-  vector<DAQChannelKey*> _chKey;
+  std::vector<DAQChannelKey*> _chKey;
 };
 
 

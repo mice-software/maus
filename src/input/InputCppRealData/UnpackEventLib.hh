@@ -61,13 +61,13 @@ class MDarranger : public MDprocessor {
 
  protected:
   /** The JSON node to put the data under.
-	* It is created at the beginning of the spill.
-	**/
+ * It is created at the beginning of the spill.
+ **/
   Json::Value* _docSpill;
 
   /** The DAQ channel map.
-	* It is used to group all channels belonging to a given detector.
-	**/
+  * It is used to group all channels belonging to a given detector.
+  **/
   DAQChannelMap* _chMap;
   string _equipment;
 };
@@ -124,7 +124,7 @@ class fADCDataProcessor : public MDarranger {
  /** Return the measured value for the given sample
  * \param[in] i The number of the sample.
  */
-  int	get_point(int i) const { return _data[i]; }
+  int get_point(int i) const { return _data[i]; }
 
   /// Return the vector of samples
   vector<int> get_data() const { return _data; }
@@ -152,7 +152,7 @@ class fADCDataProcessor : public MDarranger {
 
 
   void set_zero_supression(bool zs) { _zero_suppression = zs; }
-	void set_zs_threshold(int zst)    { _zs_threshold = zst; }
+  void set_zs_threshold(int zst)    { _zs_threshold = zst; }
 
  protected:
 
@@ -164,7 +164,7 @@ class fADCDataProcessor : public MDarranger {
   bool _zero_suppression;
 
   /// Value of the threshold used for zero suppression */
-	int _zs_threshold;
+  int _zs_threshold;
 
   /// vector of samples (measurements) */
   vector<int> _data;
