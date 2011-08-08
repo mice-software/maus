@@ -9,6 +9,7 @@ from base64 import b64encode
 from base64 import b64decode
 
 class GDMLtocdb:
+    #pylint: disable = R0902, R0914, R0912, R0915, R0903
     """
     @Class gdmltocdb, handles the uploading of geometries to the CDB
 
@@ -136,7 +137,7 @@ class Downloader:
 
         @Param testserver, If an argument of 1 is entered this will set a connection to the test CDB if left blank write to the actual CDB
         """
-        self.filestr =""
+        self.filestr = ""
         filelist = []
         self.geometryfiles = filelist
         self.listofgeometries = filelist
@@ -149,6 +150,15 @@ class Downloader:
         self.geometry = Client(self.wsdlurl).service
 
     def unpack(self, downloadedfile, downloadpath):
+        """
+        @method unpack
+        
+        This method take the downloaded string from the CDB and unpacks it,
+        to the location specified, into the correct files.
+        
+        @param downloadedfile This needs to be the string download from the CDB.
+        @param downloadedpath The path location where the files will be unpacked to. 
+        """
         files = downloadedfile.rsplit("<!--  File Name  -->")
         self.listofgeometries = files
         num = len(self.geometryfiles)
@@ -186,21 +196,62 @@ class Downloader:
 
         this method decodes the uploaded geometry and acquires fromt the string this list of files contained
         within the upload. It then opens files in the ~/maus/src/common_py/geometries/Download which correspond
-        to the related gdml files and write the contents to these files. 
+        to the related gdml files and write the contents to these files.
+        
+        @param  downloadedpath The path location where the files will be unpacked to. 
         """
         downloadedfile = b64decode(self.geometry.getCurrentGDML())
         self.unpack(downloadedfile, downloadpath)
 
-    def download_geometry_for_id(self, id, downloadpath):
-        downloadedfile = b64decode(self.geometry.getGDMLForId(id))
+    def download_geometry_for_id(self, idnum, downloadpath):
+        """
+        @Method download geometry for ID 
+
+        This method gets the geometry, for the given ID, from the database then passes the 
+        string to the unpack method which unpacks it.
+        
+        @param  id The integer ID number for the desired geometry.
+        @param  downloadedpath The path location where the files will be unpacked to. 
+        """
+        downloadedfile = b64decode(self.geometry.getGDMLForId(idnum))
         self.unpack(downloadedfile, downloadpath)
 
     def download_geometry_for_run(self, runid, downloadpath):
+        """
+        @Method download geometry for run 
+
+        This method gets the geometry, for the given run number, from the database then passes the 
+        string to the unpack method which unpacks it.
+        
+        @param  id The long ID run number for the desired geometry.
+        @param  downloadedpath The path location where the files will be unpacked to. 
+        """
         downloadedfile = b64decode(self.geometry.getGDMLForRun(runid))
         self.unpack(downloadedfile, downloadpath)
 
+    def get_ids(self, start_time, stop_time=None):
+        """
+        @method get IDs
+        
+        This method queries the database for the list of geometries and prints
+        to the screen their ID numbers and their descriptions.
+        
+        @param start_time The datetime of which you wish the query to start must be in UTC.
+        @param stop_time The datetime of which you wish the query to stop must be in UTC. Can be blank.
+        """
+        print self.geometry.getIds(start_time, stop_time)
         
     def remove_first_line(self, file_path):
+        """
+        @method remove first line
+        
+        This method removes the first line from the file passed to it. This is because
+        after the download it is found that the first line of each file is blank. This
+        blank line produces an error when formatting the GDMLs as they are not well formed
+        documents with the first blank line included therefore it is removed.
+        
+        @param file_path The name of the file which will have its first line removed.
+        """
         fin = open(file_path, 'r')
         for lines in fin.readlines():
             self.filestr += lines
@@ -209,7 +260,7 @@ class Downloader:
         fout = open(file_path, 'w')
         fout.write(self.filestr)
         fout.close()
-        self.filestr =""
+        self.filestr = ""
         
             
             
@@ -217,13 +268,16 @@ def main():
     """
     Main function
     """
- #   from GDMLtoCDB import gdmltocdb
-#    from GDMLtoCDB import Downloader
     #test = '/home/matt/workspace/Maus/testCases/GDML_fastradModel'
     #geometry1 = GDMLtocdb(test, "test geometry case", 1)
     #geometry1.upload_to_cdb()
     dlgeometry = Downloader(1)
+    test2 = '/home/matt/maus-littlefield/src/common_py/geometry/Download'
+    dlgeometry.download_geometry_for_id(287, test2)
+    #print datetime.today()
+    #dlgeometry.get_ids('2011-08-08 09:00:00')
     #dlgeometry.download_current()
-    dlgeometry.remove_first_line('/home/matt/maus-littlefield/src/common_py/geometry/Download/fastradModel.gdml')
+    #test3 = 'src/common_py/geometry/Download/fastradModel.gdml'
+    #dlgeometry.remove_first_line(test3)
 if __name__ == "__main__":
     main()

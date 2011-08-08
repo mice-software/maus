@@ -5,6 +5,7 @@ M. Littlefield 02/08/11
 import argparse
 
 class Configreader():
+    #pylint: disable = W0101, R0903
     """
     @class configreader, Configuration File Reader Class
     
