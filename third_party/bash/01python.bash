@@ -35,6 +35,11 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         echo "INFO: Configuring:"
         sleep 1
         ./configure --enable-shared --prefix="${MAUS_ROOT_DIR}/third_party/install"
+
+	echo "HACK: Enabling zlib"
+
+	echo "zlib zlibmodule.c -I\$(prefix)/include -L\$(exec_prefix)/lib -lz" >> Modules/Setup
+
         echo "INFO: Making:"
         sleep 1
         make
