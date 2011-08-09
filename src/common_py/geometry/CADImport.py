@@ -1,8 +1,12 @@
-import os.path
+"""
+CAD Import Class
+M Littlefield
+"""
 import os
-import sys
 import libxml2
 import libxslt
+
+#pylint: disable = C0301, R0913, R0912
 
 class CADImport:
     """
@@ -34,59 +38,68 @@ class CADImport:
         @param mergeout, file name/path to be inserted into merge.xsl.in.
         """
         if type(xmlin1) != str:
-            raise TypeError("first xml " + xmlin1 + " must be a string(file name/path)", "CADImport::__init__")
+            raise TypeError(xmlin1 + " must be a string(file name/path)")
         if xmlin1[-4:] != '.xml' and xmlin1[-5:] != '.gdml':
-            raise IOError("file " + xmlin1 + " must be an xml or gdml file", "CADImport::__init__")
-        else: self.XMLIn1 = xmlin1
+            raise IOError(xmlin1 + " must be an xml or gdml file")
+        else: self.xml_in_1 = xmlin1
         
         if type(xsl) != str:
-            raise TypeError("xsl " + xsl + " must be a string(file name/path", "CADImport::__init__")
+            raise TypeError(xsl + " must be a string(file name/path")
         if xsl[-4:] != '.xsl':
-            raise IOError("file " + xsl + " must be an xml or gdml file", "CADImport::__init__")
-        else: self.XSL = xsl
+            raise IOError(xsl + " must be an xml or gdml file")
+        else: self.xsl = xsl
         
-        if xmlin2 == None: self.XMLIn2 = None
+        if xmlin2 == None: 
+            self.xml_in_2 = None
         elif type(xmlin2) != str:
-            raise TypeError("second xml " + xmlin2 + " must be a string(file name/path)", "CADImport::__init__")
-        elif xmlin2[-4:] != '.xml' and self.XMLIn2[-5:] != '.gdml':
-            raise IOError("file " + xmlin2 + " must be an xml or gdml file", "CADImport::__init__")
-        else: self.XMLIn2 = xmlin2
+            raise TypeError(xmlin2 + " must be a string(file name/path)")
+        elif xmlin2[-4:] != '.xml' and self.xml_in_2[-5:] != '.gdml':
+            raise IOError(xmlin2 + " must be an xml or gdml file")
+        else: 
+            self.xml_in_2 = xmlin2
             
-        if output == None: self.Output = None
+        if output == None: 
+            self.output = None
         elif type(output) != str:
-            raise TypeError("output " + output + " must be a string(file name/path)", "CADImport::__init__")
-        else: self.Output = output
+            raise TypeError(output + " must be a string(file name/path)")
+        else: 
+            self.output = output
 
-        if mergein == None: self.MergeIn = 'Merge.xsl.in'
+        if mergein == None: 
+            maus_root = os.environ['MAUS_ROOT_DIR'] 
+            self.merge_in = maus_root + '/src/common_py/geometry/xsltScripts/Merge.xsl.in'
         elif type(mergein) != str:
-            raise TypeError("merge " + mergein + " input must be a string(file name/path)", "CADImport::__init__")
-        else: self.MergeIn = mergein
+            raise TypeError(mergein + " input must be a string(file name/path)")
+        else: 
+            self.merge_in = mergein
 
-        if mergeout == None: self.MergeOut = 'Merge.xsl'
+        if mergeout == None: 
+            self.merge_out = 'Merge.xsl'
         elif type(mergeout) != str:
-            raise TypeError("merge " + mergeout + " output must be a string(file name/path)", "CADImport::__init__")
+            raise TypeError(mergeout + "output must be a string filename/path)")
         elif mergeout[-4:] != '.xsl':
-            raise IOError("file " + mergeout + " must be an xsl file", "CADImport::__init__")
-        else: self.MergeOut = mergeout
+            raise IOError(mergeout + " must be an xsl file")
+        else: 
+            self.merge_out = mergeout
 
-    def XSLTParse(self):
+    def parse_xslt(self):
         """
-        @Method XSLTParse, to parse an XML(GDML) to text or another XML(GDML)
+        @Method parse_xslt, to parse an XML(GDML) to text or another XML(GDML)
 
         This method will execute an XSLT stylesheet and produce either a text
         or another XML(GDML) according to the request.
 
         """
-        styledoc = libxml2.parseFile(self.XSL)
+        styledoc = libxml2.parseFile(self.xsl)
         style = libxslt.parseStylesheetDoc(styledoc)
-        doc = libxml2.parseFile(self.XMLIn1)
+        doc = libxml2.parseFile(self.xml_in_1)
         result = style.applyStylesheet(doc, None)
-        style.saveResultToFilename(self.Output, result, 0)
+        style.saveResultToFilename(self.output, result, 0)
         style.freeStylesheet()
         doc.freeDoc()
         result.freeDoc()
 
-    def AppendMerge(self):
+    def append_merge(self):
         """
         @Method which appends the MICE info to GDML
 
@@ -96,23 +109,21 @@ class CADImport:
 
         @param Parameter 1 intialised in class intialiser (2nd xml input)
         """
-        fin = open(self.MergeIn, 'r')
-        fout = open(self.MergeOut, 'w')
+        fin = open(self.merge_in, 'r')
+        fout = open(self.merge_out, 'w')
         for line in fin.readlines():
-                if line.find('EDIT')>=0:
-                    new_line = line.replace('EDIT', self.XMLIn2)
-                    print >>fout,new_line
-                else:
-                    print >>fout,line
+            if line.find('EDIT')>=0:
+                new_line = line.replace('EDIT', self.xml_in_2)
+                print >> fout, new_line
+            else:
+                print >> fout, line
 
 
 def main():
-    from CADImport import CADImport
-    #geometry1 = CADImport("fastradModel.xml", "GDML2G4MICE.xsl", "", "OUTPUTFILE.txt")
-    #geometry2 = CADImport("fastradModel.xml", "GDML2G4MICE.xsl")
-    #geometry3 = CADImport("fastradModel.xml", "Merge.xsl", "FieldInfoTest.xml", "theMerged.txt")
-    #geometry1.XSLTParse()
-    #geometry3.AppendMerge()
+    """
+    Main Function
+    """
+    print 'Main Function to be written'
 
 if __name__ == '__main__':
     main()
