@@ -2,7 +2,6 @@ import os
 from CADImport import CADImport
 
 class GDMLtomaus():
-        
         def __init__(self, path):
             self.ConfigurationFile = None
             self.MaterialFile = None
@@ -23,8 +22,8 @@ class GDMLtomaus():
                     file = self.Path + '/' + fname
                     self.ConfigurationFile = file
                 if fname.find('materials') < 0 and fname.find('fastrad') < 0 :
-                    stepfile = self.path + '/' + fname
-                    self.stepfiles.append(stepfile)
+                    stepfile = self.Path + '/' + fname
+                    self.StepFiles.append(stepfile)
 
         def convert_to_maus(self, output):
             outputfile = output + "/Configuration.txt"
