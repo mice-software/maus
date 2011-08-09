@@ -51,6 +51,10 @@ class Configuration:
         parser.add_argument('-card', action='store', dest='card', default=None)
         results = parser.parse_args()
 
+        if configDict['simulation_reference_particle']!=results.simulation_reference_particle:
+            print '\nUnable to modify variable simulation_reference_particle \nThis feature has not yet been implemented into code.\n'
+            sys.exit()
+
         for key, value in configDict.iteritems():
             if isinstance (value, bool):
                 configDict[key] = bool(getattr(results,key))
