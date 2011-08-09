@@ -26,56 +26,75 @@ import operator
 import sys
 
 class Configuration:
-    ## Returns JSON config document
-    #
-    #  The defaults are read from ConfigurationDefaults
-    #  then (if applicable) values are added/replaced
-    #  by the passed file or entered from command line.  
-    #  A JSON file is returned.
-    #
-    #  \param configFile (optional) overriding configuration.  If None then this
-    #                    argument is ignored. If it is a python file handle (ie.
-    #                    open('my_config.dat','r') ) then that file is read.
-    def getConfigJSON(self, configFile = None):
-        """Accepts changes to default values from ConfigurationDefaults.py and returns values"""
-        MAUSRootDir = os.environ.get('MAUS_ROOT_DIR')
-        assert MAUSRootDir != None
+    """
+    Configuration class is responsible for holding and parsing configuration
+    default information and converting it to json
+    """
+    def __init__(self):
+        """
+        Initialise path to readme file
+        """        
+        self.readme = os.path.join(os.environ['MAUS_ROOT_DIR'], 'README')
 
-        configDict = {}
-        defaultFilename = '%s/src/common_py/ConfigurationDefaults.py' % MAUSRootDir
-        exec(open(defaultFilename,'r').read(), globals(), configDict)
+
+    def getConfigJSON(self, config_file = None):
+        """
+        Returns JSON config document
+
+        The defaults are read from ConfigurationDefaults
+        then (if applicable) values are added/replaced
+        by the passed file.  A JSON file is returned.
+
+        \param config_file (optional) overriding configuration file handle.  If
+                          None then this argument is ignored. If it is a python
+                          file handle (ie. open('my_config.dat','r') ) then that
+                          file is read.
+        """
+        maus_root_dir = os.environ.get('MAUS_ROOT_DIR')
+        assert maus_root_dir != None
+
+        config_dict = {}
+        defaults = open(maus_root_dir+"/src/common_py/ConfigurationDefaults.py")
+        exec(defaults, globals(), config_dict) # pylint: disable=W0122
 
         parser = argparse.ArgumentParser()
-        for key, value in configDict.iteritems():
+        for key, value in config_dict.iteritems():
             parser.add_argument('-'+key, action='store', dest=key, default=value)
         parser.add_argument('-card', action='store', dest='card', default=None)
         results = parser.parse_args()
 
-        if configDict['simulation_reference_particle']!=results.simulation_reference_particle:
+        if config_dict['simulation_reference_particle']!=results.simulation_reference_particle:
             print '\nUnable to modify variable simulation_reference_particle \nThis feature has not yet been implemented into code.\n'
             sys.exit()
 
-        for key, value in configDict.iteritems():
+        for key, value in config_dict.iteritems():
             if isinstance (value, bool):
-                configDict[key] = bool(getattr(results,key))
+                config_dict[key] = bool(getattr(results,key))
             elif isinstance (value, int):
-                configDict[key] = int(getattr(results,key))
+                config_dict[key] = int(getattr(results,key))
             elif isinstance (value, float):
-                configDict[key] = float(getattr(results,key))
+                config_dict[key] = float(getattr(results,key))
             else:
-                configDict[key] = getattr(results,key)
+                config_dict[key] = getattr(results,key)
 
         if results.card != None:
             add_file = results.card
-            exec(open(add_file, 'r').read(), globals(), configDict)
+            exec(open(add_file, 'r').read(), globals(), config_dict)
 
-        if configFile != None:
-            assert not isinstance(configFile, str)
-            exec(configFile.read(), globals(), configDict)
+        if config_file != None:
+            assert not isinstance(config_file, str)
+            exec(config_file.read(), globals(), config_dict) # pylint: disable=W0122,C0301
 
-        configJSONStr = json.JSONEncoder().encode(configDict)
+        config_dict['maus_version'] = self.get_version_from_readme()
+        config_json_str = json.JSONEncoder().encode(config_dict)
 
-        return configJSONStr
+        return config_json_str
     
-
+    def get_version_from_readme(self):
+        """
+        Version is taken as the first line in $MAUS_ROOT_DIR/README
+        """
+        readme = open(self.readme)
+        version = readme.readline().rstrip('\n')
+        return version
 
