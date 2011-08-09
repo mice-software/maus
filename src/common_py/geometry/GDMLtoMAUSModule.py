@@ -22,17 +22,9 @@ class GDMLtomaus():
                 if fname.find('fastrad') >= 0 and fname != self.MaterialFile:
                     file = self.Path + '/' + fname
                     self.ConfigurationFile = file
-                if fname != self.ConfigurationFile  and fname != self.MaterialFile:
-                    file = self.Path + '/' + fname
-                    self.StepFiles.append(file)
-            length = len(self.StepFiles)
-            for num in range(0, length):
-                if self.StepFiles[num] == self.ConfigurationFile:
-                    file1 = self.StepFiles[num]
-                if self.StepFiles[num] == self.MaterialFile:
-                    file2 = self.StepFiles[num]
-            self.StepFiles.remove(file1)
-            self.StepFiles.remove(file2)
+                if fname.find('materials') < 0 and fname.find('fastrad') < 0 :
+                    stepfile = self.path + '/' + fname
+                    self.stepfiles.append(stepfile)
 
         def convert_to_maus(self, output):
             outputfile = output + "/Configuration.txt"

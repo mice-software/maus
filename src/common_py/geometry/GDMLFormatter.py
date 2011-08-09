@@ -34,6 +34,8 @@ class Formatter:
             self.path = path
         gdmls = os.listdir(self.path)
         for fname in gdmls:
+            if fname[-5:] != '.gdml' and fname[-4:] != '.xml':
+                raise IOError('Files are not GDMLs or XMLs', 'GDMLFormatter::__init__')
             if fname.find('materials') >= 0:
                 materialfile = self.path + '/' + fname
                 self.materialfile = materialfile
@@ -42,17 +44,9 @@ class Formatter:
                 configfile = self.path + '/' + fname
                 if file != self.materialfile:
                     self.configurationfile = configfile
-            if fname != self.configurationfile  and fname != self.materialfile:
+            if fname.find('materials') < 0 and fname.find('fastrad') < 0 :
                 stepfile = self.path + '/' + fname
                 self.stepfiles.append(stepfile)
-        length = len(self.stepfiles)
-        for num in range(0, length):
-            if self.stepfiles[num] == self.configurationfile:
-                file1 = self.stepfiles[num]
-            if self.stepfiles[num] == self.materialfile:
-                file2 = self.stepfiles[num]
-        self.stepfiles.remove(file1)
-        self.stepfiles.remove(file2)
 
     def format_schema_location(self, gdmlfile):
         """
@@ -175,7 +169,7 @@ def main():
     """
     Main Function
     """
-    location = '/src/common_py/geometry/Download'
+    location = '/src/common_py/geometry/testCases/testGeometry'
     gdmls = Formatter(os.environ['MAUS_ROOT_DIR']+location)
     gdmls.format()
 
