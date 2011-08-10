@@ -204,6 +204,7 @@ class Downloader:
         self.unpack(downloadedfile, downloadpath)
 
     def download_geometry_for_id(self, start_time, downloadpath, stop_time=None):
+        #change notes!
         """
         @Method download geometry for ID 
 
@@ -217,7 +218,7 @@ class Downloader:
         downloadedfile = b64decode(self.geometry.getGDMLForId(id_num))
         self.unpack(downloadedfile, downloadpath)
 
-    def download_geometry_for_run(self, start_time, downloadpath, stop_time=None):
+    def download_geometry_for_run(self, run_id, downloadpath):
         """
         @Method download geometry for run 
 
@@ -227,7 +228,7 @@ class Downloader:
         @param  id The long ID run number for the desired geometry.
         @param  downloadedpath The path location where the files will be unpacked to. 
         """        
-        downloadedfile = b64decode(self.geometry.getGDMLForRun(self.valid_id))
+        downloadedfile = b64decode(self.geometry.getGDMLForRun(run_id))
         self.unpack(downloadedfile, downloadpath)
 
     def get_ids(self, start_time, stop_time):

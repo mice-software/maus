@@ -10,5 +10,9 @@ ZipFile          = 1
 Delete Originals = 0
 
 //Donwloading of geometries
-
+// Below, name the directory where the geometry will be downloaded.
 DownloadDir = "/home/matt/maus-littlefield/src/common_py/geometry/Download/"
+//Download Geometry for a specific ID
+//Name the start and stop time for which the geometry was valid. Stop time is optional
+StartTime = "2011-08-08 09:00:00"
+StopTime  = None

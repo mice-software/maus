@@ -25,6 +25,8 @@ class Configreader():
         self.zipfile = None
         self.deleteoriginals = None
         self.downloaddir = ""
+        self.starttime = ""
+        self.stoptime = ""
 
     def readconfig(self):
         """
@@ -78,11 +80,23 @@ class Configreader():
                 self.downloaddir = lines[varstart:]
                 self.downloaddir = self.downloaddir.replace('"', '')
                 self.downloaddir = self.downloaddir.strip()
+            if lines.find('StartTime') >= 0:
+                varstart = lines.find('=') + 1
+                self.starttime = lines[varstart:]
+                self.starttime = self.starttime.replace('"', '')
+                self.starttime = self.starttime.strip()
+            if lines.find('StopTime') >= 0:
+                varstart = lines.find('=') + 1
+                self.stoptime = lines[varstart:]
+                self.stoptime = self.stoptime.replace('"', '')
+                self.stoptime = self.stoptime.strip()
         return self.gdmldir
         return self.geometrynotes
         return self.zipfile
         return self.deleteoriginals
         return self.downloaddir
+        return self.starttime
+        return self.stoptime
 
 def main():
     """
