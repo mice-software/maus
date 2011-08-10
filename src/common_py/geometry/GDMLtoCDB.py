@@ -203,7 +203,7 @@ class Downloader:
         downloadedfile = b64decode(self.geometry.getCurrentGDML())
         self.unpack(downloadedfile, downloadpath)
 
-    def download_geometry_for_id(self, idnum, downloadpath):
+    def download_geometry_for_id(self, start_time, downloadpath, stop_time=None):
         """
         @Method download geometry for ID 
 
@@ -213,10 +213,11 @@ class Downloader:
         @param  id The integer ID number for the desired geometry.
         @param  downloadedpath The path location where the files will be unpacked to. 
         """
-        downloadedfile = b64decode(self.geometry.getGDMLForId(idnum))
+        id_num = self.get_ids(start_time, stop_time)
+        downloadedfile = b64decode(self.geometry.getGDMLForId(id_num))
         self.unpack(downloadedfile, downloadpath)
 
-    def download_geometry_for_run(self, runid, downloadpath):
+    def download_geometry_for_run(self, start_time, downloadpath, stop_time=None):
         """
         @Method download geometry for run 
 
@@ -225,11 +226,11 @@ class Downloader:
         
         @param  id The long ID run number for the desired geometry.
         @param  downloadedpath The path location where the files will be unpacked to. 
-        """
-        downloadedfile = b64decode(self.geometry.getGDMLForRun(runid))
+        """        
+        downloadedfile = b64decode(self.geometry.getGDMLForRun(self.valid_id))
         self.unpack(downloadedfile, downloadpath)
 
-    def get_ids(self, start_time, stop_time=None):
+    def get_ids(self, start_time, stop_time):
         """
         @method get IDs
         
@@ -239,7 +240,24 @@ class Downloader:
         @param start_time The datetime of which you wish the query to start must be in UTC.
         @param stop_time The datetime of which you wish the query to stop must be in UTC. Can be blank.
         """
-        print self.geometry.getIds(start_time, stop_time)
+        id_list = self.geometry.getIds(start_time, stop_time)
+        ids = id_list.split(' ')
+        length = len(ids)
+        temp = ""
+        for num in range(0, length):
+            temp = str(ids[num])
+            if temp.find('name=') >= 0:
+                id_nums = []
+                id_nums.append(temp)
+            temp = ""
+        last_id = len(id_nums)
+        valid_id = str(id_nums[last_id-1])
+        valid_id = valid_id.strip('name=')
+        valid_id_list = eval(valid_id)
+        valid_id = int(valid_id_list)
+        return valid_id
+        
+        
         
     def remove_first_line(self, file_path):
         """
@@ -273,7 +291,7 @@ def main():
     #geometry1.upload_to_cdb()
     dlgeometry = Downloader(1)
     test2 = '/home/matt/maus-littlefield/src/common_py/geometry/Download'
-    dlgeometry.download_geometry_for_id(287, test2)
+    dlgeometry.download_geometry_for_id('2011-08-08 09:00:00', test2)
     #print datetime.today()
     #dlgeometry.get_ids('2011-08-08 09:00:00')
     #dlgeometry.download_current()
