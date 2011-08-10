@@ -62,7 +62,7 @@ class Dev:
 
         srclst = map(lambda x: builddir + '/' + x, glob.glob('*.cc'))
         srclst += map(lambda x: builddir + '/' + x, glob.glob('*.i'))
-        pgm = localenv.SharedLibrary(targetpath, source=srclst)
+        pgm = localenv.LoadableModule(targetpath, source=srclst)
 
         tests = glob.glob('test_*.py')
 
@@ -422,6 +422,16 @@ def cpp_extras(env):
 # have a 'lib' prefix, which is needed for python to find SWIG generated libraries
 env = Environment(SHLIBPREFIX="") # pylint: disable-msg=E0602
 
+(sysname, nodename, release, version, machine) = os.uname()
+
+# Darwin defaults to no prefix or suffix. All others default to "lib" prefix
+# and .so suffix. We want no suffix and .so prefix for all systems by default.
+if (sysname == 'Darwin'):
+  env.Append(LDMODULESUFFIX=".so")
+else:
+  env.Append(LDMODULEPREFIX="")
+
+
 if env.GetOption('clean'):
     print("In cleaning mode!")
 
@@ -517,11 +527,19 @@ if env['USE_G4'] and env['USE_ROOT']:
         glob.glob("src/common_cpp/*/*cc") + \
         glob.glob("src/common_cpp/*/*/*cc")
 
-
-    maus_cpp = env.SharedLibrary(target = 'src/common_cpp/libMausCpp',
-                                 source = common_cpp_files,
-                                 LIBS=env['LIBS'] + ['recpack'])
+    #SharedLibrary is identical to LoadableModule on non-Darwin systems, so
+    #only do SharedLibrary if we have to to get a dylib in addition to a bundle
+    if (sysname == 'Darwin'):
+      maus_cpp = env.SharedLibrary(target = 'src/common_cpp/libMausCpp',
+                                   source = common_cpp_files,
+                                   LIBS=env['LIBS'] + ['recpack'])
     env.Install("build", maus_cpp)
+
+
+    maus_cpp_so = env.LoadableModule(target = 'src/common_cpp/libMausCpp',
+                                     source = common_cpp_files,
+                                     LIBS=env['LIBS'] + ['recpack'])
+    env.Install("build", maus_cpp_so)
 
     env.Append(LIBPATH = 'src/common_cpp')
     env.Append(CPPPATH = maus_root_dir)
