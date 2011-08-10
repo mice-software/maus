@@ -37,9 +37,9 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     ${MAUS_ROOT_DIR}/third_party/bash/52jsoncpp.bash
     ${MAUS_ROOT_DIR}/third_party/bash/53unpacking.bash
 
-    if [ `uname -s` != "Darwin" ]; then
+    #if [ `uname -s` != "Darwin" ]; then
         ${MAUS_ROOT_DIR}/third_party/bash/60recpack.bash
-    fi
+    #fi
 
 else
 echo
