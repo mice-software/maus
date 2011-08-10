@@ -78,7 +78,6 @@ class Configuration:
 #    and attempts to return the parsed values to orginal or similar type.  
 #    Currently does not work for dict type arguments
         for key, value in config_dict.iteritems():
-            print '\n', key, ' = ', config_dict[key]
             if config_dict[key] == getattr(results,key):
                 continue
 
@@ -126,7 +125,6 @@ class Configuration:
 #    If there are any changes to the default string values this statement will catch them
             else:
                 config_dict[key] = getattr(results,key)
-            print key, ' = ', config_dict[key]
 
 #   If a data card is specified this will read in the file and either modify the arguements in
 #   ConfigurationDefaults.py or add new arguments to config_dict
