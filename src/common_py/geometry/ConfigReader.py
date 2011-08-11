@@ -86,10 +86,14 @@ class Configreader():
                 self.starttime = self.starttime.replace('"', '')
                 self.starttime = self.starttime.strip()
             if lines.find('StopTime') >= 0:
-                varstart = lines.find('=') + 1
-                self.stoptime = lines[varstart:]
-                self.stoptime = self.stoptime.replace('"', '')
-                self.stoptime = self.stoptime.strip()
+                stop_time = lines 
+                if stop_time.find('None') >= 0 :
+                    self.stoptime = None
+                else:
+                    varstart = lines.find('=') + 1
+                    self.stoptime = lines[varstart:]
+                    self.stoptime = self.stoptime.replace('"', '')
+                    self.stoptime = self.stoptime.strip()
         return self.gdmldir
         return self.geometrynotes
         return self.zipfile

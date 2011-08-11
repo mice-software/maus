@@ -137,6 +137,7 @@ class Downloader:
 
         @Param testserver, If an argument of 1 is entered this will set a connection to the test CDB if left blank write to the actual CDB
         """
+        self.id_nums = []
         self.filestr = ""
         filelist = []
         self.geometryfiles = filelist
@@ -203,7 +204,7 @@ class Downloader:
         downloadedfile = b64decode(self.geometry.getCurrentGDML())
         self.unpack(downloadedfile, downloadpath)
 
-    def download_geometry_for_id(self, start_time, downloadpath, stop_time=None):
+    def download_geometry_for_id(self, id_num, downloadpath):
         #change notes!
         """
         @Method download geometry for ID 
@@ -214,24 +215,10 @@ class Downloader:
         @param  id The integer ID number for the desired geometry.
         @param  downloadedpath The path location where the files will be unpacked to. 
         """
-        id_num = self.get_ids(start_time, stop_time)
         downloadedfile = b64decode(self.geometry.getGDMLForId(id_num))
         self.unpack(downloadedfile, downloadpath)
 
-    def download_geometry_for_run(self, run_id, downloadpath):
-        """
-        @Method download geometry for run 
-
-        This method gets the geometry, for the given run number, from the database then passes the 
-        string to the unpack method which unpacks it.
-        
-        @param  id The long ID run number for the desired geometry.
-        @param  downloadedpath The path location where the files will be unpacked to. 
-        """        
-        downloadedfile = b64decode(self.geometry.getGDMLForRun(run_id))
-        self.unpack(downloadedfile, downloadpath)
-
-    def get_ids(self, start_time, stop_time):
+    def get_ids(self, start_time, stop_time = None):
         """
         @method get IDs
         
@@ -248,15 +235,28 @@ class Downloader:
         for num in range(0, length):
             temp = str(ids[num])
             if temp.find('name=') >= 0:
-                id_nums = []
-                id_nums.append(temp)
+                self.id_nums.append(temp)
             temp = ""
-        last_id = len(id_nums)
-        valid_id = str(id_nums[last_id-1])
+        last_id = len(self.id_nums)
+        valid_id = str(self.id_nums[last_id-1])
         valid_id = valid_id.strip('name=')
         valid_id_list = eval(valid_id)
         valid_id = int(valid_id_list)
         return valid_id
+        
+    def download_geometry_for_run(self, run_id, downloadpath):
+        """
+        @Method download geometry for run 
+
+        This method gets the geometry, for the given run number, from the database then passes the 
+        string to the unpack method which unpacks it.
+        
+        @param  id The long ID run number for the desired geometry.
+        @param  downloadedpath The path location where the files will be unpacked to. 
+        """        
+        downloadedfile = b64decode(self.geometry.getGDMLForRun(run_id))
+        self.unpack(downloadedfile, downloadpath)
+
         
         
         
@@ -292,7 +292,7 @@ def main():
     #geometry1.upload_to_cdb()
     dlgeometry = Downloader(1)
     test2 = '/home/matt/maus-littlefield/src/common_py/geometry/Download'
-    dlgeometry.download_geometry_for_id('2011-08-08 09:00:00', test2)
+    dlgeometry.download_geometry_for_id('2011-08-08 09:00:00', test2, None)
     #print datetime.today()
     #dlgeometry.get_ids('2011-08-08 09:00:00')
     #dlgeometry.download_current()

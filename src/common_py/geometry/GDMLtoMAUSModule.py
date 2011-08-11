@@ -29,7 +29,7 @@ class GDMLtomaus():
             outputfile = output + "/Configuration.txt"
             configurationxsl = os.environ["MAUS_ROOT_DIR"] + "/src/common_py/geometry/xsltScripts/GDML2G4MICE.xsl"
             ConfigFile = CADImport(xmlin1 = self.ConfigurationFile, xsl = configurationxsl, output = outputfile)
-            ConfigFile.XSLTParse()
+            ConfigFile.parse_xslt()
             length = len(self.StepFiles)
             for num in range(0, length):
                 file = str(self.StepFiles[num])
@@ -37,7 +37,7 @@ class GDMLtomaus():
                 outputfile = output + '/' + file + 'txt'
                 MMxsl = os.environ["MAUS_ROOT_DIR"] + "/src/common_py/geometry/xsltScripts/MMTranslation.xsl"
                 StepFile = CADImport(xmlin1 = self.StepFiles[num], xsl = '/home/matt/maus-littlefield/src/common_py/geometry/xsltScripts/MMTranslation.xsl', output = outputfile)
-                StepFile.XSLTParse()
+                StepFile.parse_xslt()
                 StepFile = None
                 os.remove(self.StepFiles[num])
             os.remove(self.ConfigurationFile)

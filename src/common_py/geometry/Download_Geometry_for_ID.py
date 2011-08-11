@@ -8,7 +8,12 @@ def main():
     inputfile = Configreader()
     inputfile.readconfig()
     CurrentGeometry = Downloader(1)
-    CurrentGeometry.download_geometry_for_run(inputfile.starttime, inputfile.downloaddir)
+    if inputfile.stoptime == None:
+        id_num = CurrentGeometry.get_ids(inputfile.starttime)
+        CurrentGeometry.download_geometry_for_id(id_num, inputfile.downloaddir)
+    else:
+        id_num = CurrentGeometry.get_ids(inputfile.starttime, inputfile.stoptime)
+        CurrentGeometry.download_geometry_for_id(id_num, inputfile.downloaddir)
     gdmls = Formatter(inputfile.downloaddir)
     gdmls.format()
     MausModules = GDMLtomaus(inputfile.downloaddir)
