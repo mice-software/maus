@@ -142,6 +142,7 @@ then
     echo
 fi
 
+
 ### Create environment files
 
 cat > env.sh <<EOF
@@ -150,10 +151,15 @@ cat > env.sh <<EOF
 if [ -z "\$MAUS_ROOT_DIR" ]; then
      export MAUS_ROOT_DIR="${maus_root_dir}"
 
+     maus_bin_dir="\${MAUS_ROOT_DIR}/third_party/install/bin"
+     if [ `uname -s` == "Darwin" ]; then
+         maus_bin_dir="\${MAUS_ROOT_DIR}/third_party/install/Python.framework/Versions/2.7/bin:\${maus_bin_dir}"
+     fi
+
      if [ -z "\${PATH}" ]; then  # see if the variable exists yet
-         export PATH="\${MAUS_ROOT_DIR}/third_party/install/bin" # initialize it
+         export PATH="\${maus_bin_dir}" # initialize it
      else
-         export PATH="\${MAUS_ROOT_DIR}/third_party/install/bin:\${PATH}" # else add it
+         export PATH="\${maus_bin_dir}:\${PATH}" # else add it
      fi
 
      if [ -z "\${$DYLIB_VAR}" ]; then  # see if the variable exists yet

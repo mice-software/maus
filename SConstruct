@@ -48,13 +48,14 @@ class Dev:
 
         name = project.split('/')[-1]
         builddir = 'build'
-        targetpath = os.path.join('build', '_%s' % name)
+        targetpath = os.path.join('build', '_%s.so' % name)
 
         #append the user's additional compile flags
         #assume debugcflags and releasecflags are defined
         localenv.Append(CCFLAGS=self.cflags)
         if use_root and use_g4:
             localenv.Append(LIBS=['MausCpp'])
+            localenv.Append(LIBPATH = "%s/src/common_cpp" % maus_root_dir)
 
         #specify the build directory
         localenv.VariantDir(variant_dir=builddir, src_dir='.', duplicate=0)
@@ -62,7 +63,8 @@ class Dev:
 
         srclst = map(lambda x: builddir + '/' + x, glob.glob('*.cc'))
         srclst += map(lambda x: builddir + '/' + x, glob.glob('*.i'))
-        pgm = localenv.LoadableModule(targetpath, source=srclst)
+        pgm = localenv.SharedLibrary(targetpath, source=srclst)
+        Depends(pgm, maus_cpp_dylib)
 
         tests = glob.glob('test_*.py')
 
@@ -420,17 +422,12 @@ def cpp_extras(env):
 
 # Setup the environment.  NOTE: SHLIBPREFIX means that shared libraries don't
 # have a 'lib' prefix, which is needed for python to find SWIG generated libraries
-env = Environment(SHLIBPREFIX="") # pylint: disable-msg=E0602
+env = Environment(SHLIBPREFIX="",SHLIBSUFFIX="") # pylint: disable-msg=E0602
 
 (sysname, nodename, release, version, machine) = os.uname()
 
 # Darwin defaults to no prefix or suffix. All others default to "lib" prefix
 # and .so suffix. We want no suffix and .so prefix for all systems by default.
-if (sysname == 'Darwin'):
-  env.Append(LDMODULESUFFIX=".so")
-else:
-  env.Append(LDMODULEPREFIX="")
-
 
 if env.GetOption('clean'):
     print("In cleaning mode!")
@@ -527,19 +524,19 @@ if env['USE_G4'] and env['USE_ROOT']:
         glob.glob("src/common_cpp/*/*cc") + \
         glob.glob("src/common_cpp/*/*/*cc")
 
-    #SharedLibrary is identical to LoadableModule on non-Darwin systems, so
-    #only do SharedLibrary if we have to to get a dylib in addition to a bundle
-    if (sysname == 'Darwin'):
-      maus_cpp = env.SharedLibrary(target = 'src/common_cpp/libMausCpp',
-                                   source = common_cpp_files,
-                                   LIBS=env['LIBS'] + ['recpack'])
+    targetpath = 'src/common_cpp/libMausCpp.so'
+    maus_cpp = env.SharedLibrary(target = targetpath,
+                                 source = common_cpp_files,
+                                 LIBS=env['LIBS'] + ['recpack'])
     env.Install("build", maus_cpp)
 
+    #Build an extra copy with the .dylib extension for linking on OS X
+    if (sysname == 'Darwin'):
+      targetpath = 'src/common_cpp/libMausCpp.dylib'
+      maus_cpp_dylib = env.SharedLibrary(target = targetpath,
+                                         source = common_cpp_files,
+                                         LIBS=env['LIBS'] + ['recpack'])
 
-    maus_cpp_so = env.LoadableModule(target = 'src/common_cpp/libMausCpp',
-                                     source = common_cpp_files,
-                                     LIBS=env['LIBS'] + ['recpack'])
-    env.Install("build", maus_cpp_so)
 
     env.Append(LIBPATH = 'src/common_cpp')
     env.Append(CPPPATH = maus_root_dir)

@@ -34,7 +34,11 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         cd "${MAUS_ROOT_DIR}/third_party/build/${directory}"
         echo "INFO: Configuring:"
         sleep 1
+  if [ `uname -s` == "Darwin" ]; then
+        ./configure --enable-framework --prefix="${MAUS_ROOT_DIR}/third_party/install"
+  else
         ./configure --enable-shared --prefix="${MAUS_ROOT_DIR}/third_party/install"
+  fi
 
 	echo "HACK: Enabling zlib"
 
@@ -46,7 +50,16 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         sleep 1
         make
         echo "INFO: Installing within MAUS's third party directory:"
-        make install
+        if [ `uname -s` == "Darwin" ]; then
+          make frameworkinstallstructure
+          altinstall
+          bininstall
+          maninstall
+          frameworkinstallmaclib
+          frameworkinstallunixtools
+        else
+          make install
+        fi
 	echo
         echo "INFO: The package should be locally build now in your"
         echo "INFO: third_party directory, which the rest of MAUS will"
