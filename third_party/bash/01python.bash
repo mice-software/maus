@@ -38,7 +38,9 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
 	echo "HACK: Enabling zlib"
 
-	echo "zlib zlibmodule.c -I\$(prefix)/include -L\$(exec_prefix)/lib -lz" >> Modules/Setup
+  if [ `uname -s` != "Darwin" ]; then
+	  echo "zlib zlibmodule.c -I\$(prefix)/include -L\$(exec_prefix)/lib -lz" >> Modules/Setup
+  fi
 
         echo "INFO: Making:"
         sleep 1
