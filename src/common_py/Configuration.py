@@ -21,6 +21,7 @@ for the old G4MICE datacards.
 
 import os
 import json
+import ErrorHandler
 
 class Configuration:
     """
@@ -58,6 +59,7 @@ class Configuration:
             exec(config_file.read(), globals(), config_dict) # pylint: disable=W0122,C0301
 
         config_dict['maus_version'] = self.get_version_from_readme()
+        self.configuration_to_error_handler(config_dict)
         config_json_str = json.JSONEncoder().encode(config_dict)
 
         return config_json_str
@@ -69,4 +71,11 @@ class Configuration:
         readme = open(self.readme)
         version = readme.readline().rstrip('\n')
         return version
+
+    def configuration_to_error_handler(self, config_dict):
+        """
+        Hand configuration parameters to the error handler, so it can set itself
+        up
+        """
+        ErrorHandler.DefaultHandler().ConfigurationToErrorHandler(config_dict)
 

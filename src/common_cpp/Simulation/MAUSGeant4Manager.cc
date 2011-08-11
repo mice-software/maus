@@ -23,6 +23,7 @@
 
 #include "src/legacy/Interface/Squeak.hh"
 #include "src/legacy/Simulation/MICEPhysicsList.hh"
+#include "src/common_cpp/Simulation/MAUSVisManager.hh"
 
 namespace MAUS {
 
@@ -32,6 +33,8 @@ MAUSGeant4Manager* MAUSGeant4Manager::GetInstance() {
 }
 
 MAUSGeant4Manager::MAUSGeant4Manager() {
+    _visManager = NULL;  // set by GetVisManager
+    SetVisManager();
     _runManager = new G4RunManager;
     _detector   = new MICEDetectorConstruction(*MICERun::getInstance());
     _runManager->SetUserInitialization(_detector);
@@ -52,13 +55,15 @@ MAUSGeant4Manager::MAUSGeant4Manager() {
     _virtPlanes = new VirtualPlaneManager;
     _virtPlanes->ConstructVirtualPlanes(
       MICERun::getInstance()->btFieldConstructor,
-      MICERun::getInstance()->miceModule
-    );
+      MICERun::getInstance()->miceModule);
     _runManager->Initialize();
 }
 
 MAUSGeant4Manager::~MAUSGeant4Manager() {
     delete _runManager;
+    if (_visManager != NULL) {
+        delete _visManager;
+    }
 }
 
 void MAUSGeant4Manager::SetPhases() {
@@ -71,7 +76,7 @@ MAUSPrimaryGeneratorAction::PGParticle
     MAUSPrimaryGeneratorAction::PGParticle p;
     Json::Value* conf = MICERun::getInstance()->jsonConfiguration;
     Json::Value ref = JsonWrapper::GetProperty
-              (*conf, "simulation_reference_particle", JsonWrapper::objectValue);
+             (*conf, "simulation_reference_particle", JsonWrapper::objectValue);
     p.ReadJson(ref);
     return p;
 }
@@ -118,5 +123,17 @@ Json::Value MAUSGeant4Manager::Tracking
     GetRunManager()->BeamOn(1);
     return _eventAct->GetEvents()[Json::Value::UInt(0)];
 }
-} // namespace MAUS
+
+void MAUSGeant4Manager::SetVisManager() {
+  if (_visManager != NULL) delete _visManager;
+  _visManager = NULL;
+  // if _visManager == NULL, attempt to build it
+  Json::Value& conf = *MICERun::getInstance()->jsonConfiguration;
+  if (JsonWrapper::GetProperty
+           (conf, "geant4_visualisation", JsonWrapper::booleanValue).asBool()) {
+      _visManager = new MAUSVisManager;
+      _visManager->Initialize();
+  }
+}
+}  // namespace MAUS
 

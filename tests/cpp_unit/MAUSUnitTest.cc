@@ -23,6 +23,8 @@
 
 #include "gtest/gtest.h"
 
+#include "json/value.h"
+
 /////////// Needed until persistency move is done /////////////
 #include "src/legacy/Interface/dataCards.hh"
 #include "src/legacy/Interface/MICEEvent.hh"
@@ -39,19 +41,23 @@
 #include "src/legacy/Interface/Squeak.hh"
 /////////// Needed until I clean up legacy tests to gtest framework //////////
 
-std::string jsonconfig =
-  std::string("{\"maximum_number_of_steps\":10000, \"keep_tracks\":true, ")+
-  std::string("\"keep_steps\":true, \"verbose_level\":2}");
-
+Json::Value SetupConfig() {
+  Json::Value config(Json::objectValue);
+  config["maximum_number_of_steps"] = 10000;
+  config["keep_tracks"] = true;
+  config["keep_steps"] = true;
+  config["verbose_level"] = 2;
+  config["geant4_visualisation"] = false;
+  return config;
+}
 
 int main(int argc, char **argv) {
   ///// Try to keep static set up to a minimum (not very unit testy)
-  MICERun::getInstance()->jsonConfiguration =
-    new Json::Value(JsonWrapper::StringToJson(jsonconfig)); // delete me!
+  MICERun::getInstance()->jsonConfiguration = new Json::Value(SetupConfig());
   dataCards MyDataCards(0);
   MICERun::getInstance()->DataCards = &MyDataCards;
-  MICERun::getInstance()->miceModule = new MiceModule("Test.dat"); // delete me!
-  MICERun::getInstance()->miceMaterials = new MiceMaterials(); // delete me!
+  MICERun::getInstance()->miceModule = new MiceModule("Test.dat");  // delete
+  MICERun::getInstance()->miceMaterials = new MiceMaterials();  // delete
   fillMaterials(*MICERun::getInstance());
   Squeak::setOutput(Squeak::debug, Squeak::nullOut());
   Squeak::setStandardOutputs();

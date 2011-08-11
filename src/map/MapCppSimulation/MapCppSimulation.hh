@@ -103,6 +103,7 @@ class MapCppSimulation {
   std::string _classname;
   std::string _geometry;
   bool _storeTracks;
+  bool _doVis;
 };  // Don't forget this trailing colon!!!!
 
 

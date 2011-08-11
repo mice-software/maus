@@ -36,6 +36,8 @@ class MICEPhysicsList;
 
 namespace MAUS {
 
+class MAUSVisManager;
+
 /** MAUSPhysicsList is a synonym for (legacy) MICEPhysicsList
  */
 typedef MICEPhysicsList MAUSPhysicsList;
@@ -136,6 +138,13 @@ class MAUSGeant4Manager {
      */
     Json::Value RunManyParticles(Json::Value particle_array);
 
+    /** @brief Get the visualisation manager or return NULL if vis is inactive
+     *
+     *  Visualisation requires use_visualisation configuration variable set
+     */
+    MAUSVisManager* GetVisManager() {return _visManager;}
+
+
   private:
     MAUSGeant4Manager();
     ~MAUSGeant4Manager();
@@ -148,6 +157,9 @@ class MAUSGeant4Manager {
     MAUSEventAction*            _eventAct;
     MICEDetectorConstruction*   _detector;
     VirtualPlaneManager*        _virtPlanes;
+    MAUSVisManager*             _visManager;
+
+    void SetVisManager();
 
     Json::Value Tracking(MAUSPrimaryGeneratorAction::PGParticle p);
 };
