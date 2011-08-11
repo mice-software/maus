@@ -25,16 +25,18 @@ namespace {
 
 TEST(MAUSVisManagerTest, TestVis) {
     // there is another test at map level that checks we actually make a file
-    MAUS::MAUSVisManager* vis = new MAUS::MAUSVisManager ();
-    vis->Initialize();
     Json::Value& config = *MICERun::getInstance()->jsonConfiguration;
     config["geant4_visualisation"] = true;
     config["visualisation_viewer"] = "VRML2FILE";
     config["visualisation_theta"] = 90.;
     config["visualisation_phi"] = 90.;
     config["visualisation_zoom"] = 2.;
+
+    MAUS::MAUSVisManager* vis = new MAUS::MAUSVisManager ();
+    vis->Initialize();
     vis->SetupRun();
     vis->TearDownRun();
+    vis->Disable();
 }
 
 }

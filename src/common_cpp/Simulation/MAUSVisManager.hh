@@ -27,6 +27,7 @@ class MAUSVisManager: public G4VisManager {
   /** Constructor does nothing
    */
   MAUSVisManager();
+  ~MAUSVisManager();
 
   /** @brief Set up visualisation for a particular beamOn command
    *
@@ -40,6 +41,14 @@ class MAUSVisManager: public G4VisManager {
    *  Doesn't do anything right now.
    */
   void TearDownRun();
+
+  /** @brief Enable the visualisation
+   */
+  void Enable();
+
+  /** @brief Disable the visualisation
+   */
+  void Disable();
 
  private:
   void RegisterGraphicsSystems();

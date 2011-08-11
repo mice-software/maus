@@ -67,7 +67,24 @@
 
 namespace MAUS {
 
-MAUSVisManager::MAUSVisManager() { }
+MAUSVisManager::MAUSVisManager() {
+  Json::Value& conf = *MICERun::getInstance()->jsonConfiguration;
+  std::string viewer = JsonWrapper::GetProperty
+           (conf, "visualisation_viewer", JsonWrapper::stringValue).asString();
+  G4UImanager::GetUIpointer()->ApplyCommand("/vis/open "+viewer);
+}
+
+MAUSVisManager::~MAUSVisManager() {
+}
+
+void MAUSVisManager::Enable() {
+  G4UImanager::GetUIpointer()->ApplyCommand("/vis/enable");
+}
+
+void MAUSVisManager::Disable() {
+  G4UImanager::GetUIpointer()->ApplyCommand("/vis/disable");
+}
+
 
 void MAUSVisManager::RegisterGraphicsSystems() {
   RegisterGraphicsSystem(new G4HepRepFile);
@@ -140,7 +157,6 @@ void MAUSVisManager::SetupRun() {
       // verbose_level > 4 (which quietens std::cerr) instead
       UI->ApplyCommand("/vis/verbose 0");
   }
-  UI->ApplyCommand("/vis/open "+viewer);
   UI->ApplyCommand("/vis/viewer/reset");
   UI->ApplyCommand("/vis/viewer/zoomTo "+STLUtils::ToString(zoom));
   UI->ApplyCommand("/vis/viewer/set/viewpointThetaPhi "+
