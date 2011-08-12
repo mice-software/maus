@@ -103,7 +103,7 @@ TEST_F(MAUSSteppingActionTest, UserSteppingActionMaxNStepsTest) {
   ASSERT_TRUE(tracking->GetTracks()["track_0"].isObject());
   EXPECT_TRUE(tracking->GetTracks()["track_0"]["KillReason"].type() ==
                                                              Json::nullValue);
-  for (size_t i = 0; i < maxNSteps+1; ++i)
+  for (int i = 0; i < maxNSteps+1; ++i)
     track->IncrementCurrentStepNumber();
   stepping->UserSteppingAction(step);
   EXPECT_EQ(tracking->GetTracks()["track_0"]["KillReason"].type(),
@@ -124,7 +124,7 @@ TEST_F(MAUSSteppingActionTest, UserSteppingActionWriteStepsTest) {
   stepping->UserSteppingAction(step);
   ASSERT_EQ(stepping->GetSteps().type(), Json::arrayValue);
   // we want 3 steps - 2 post steps plus the first one
-  EXPECT_EQ(stepping->GetSteps().size(), 3);
+  EXPECT_EQ(stepping->GetSteps().size(), static_cast<unsigned int>(3));
 }
 // test that we write to json correctly
 TEST_F(MAUSSteppingActionTest, StepToJsonTest) {
@@ -180,16 +180,19 @@ TEST_F(MAUSSteppingActionTest, UserSteppingActionVirtualTest) {
   mod.setProperty<std::string>("SensitiveDetector", "Virtual");
   mod.setProperty<std::string>("IndependentVariable", "time");
   mod.setProperty<std::string>("MultiplePasses", "NewStation");
+
   VirtualPlaneManager* vpm = MAUSGeant4Manager::GetInstance()->GetVirtualPlanes();
+  vpm->SetVirtualHits(Json::Value(Json::arrayValue));
   vpm->ConstructVirtualPlanes(NULL, &mod);
   vpm->ConstructVirtualPlanes(NULL, &mod);
 
   G4Step*  step  = new G4Step();
   G4Track* track = SetG4TrackAndStep(step);
+  if(track) {}
 
   stepping->UserSteppingAction(step);
   stepping->UserSteppingAction(step);
-  EXPECT_EQ(vpm->GetVirtualHits().size(), 4);
+  EXPECT_EQ(vpm->GetVirtualHits().size(), static_cast<unsigned int>(4));
 }
 
 } //namespace end
