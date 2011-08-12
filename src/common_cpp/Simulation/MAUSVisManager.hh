@@ -42,14 +42,6 @@ class MAUSVisManager: public G4VisManager {
    */
   void TearDownRun();
 
-  /** @brief Enable the visualisation
-   */
-  void Enable();
-
-  /** @brief Disable the visualisation
-   */
-  void Disable();
-
  private:
   void RegisterGraphicsSystems();
 };

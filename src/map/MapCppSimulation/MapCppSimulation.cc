@@ -52,8 +52,9 @@ std::string MapCppSimulation::process(std::string document) {
            std::string("\"Failed to parse input document\"}}");
   }
   try {
-    if (_doVis)
+    if (_doVis) {
         MAUSGeant4Manager::GetInstance()->GetVisManager()->SetupRun();
+    }
     Json::Value mc   = JsonWrapper::GetProperty
                                         (spill, "mc", JsonWrapper::arrayValue);
     spill["mc"] = MAUSGeant4Manager::GetInstance()->RunManyParticles(mc);

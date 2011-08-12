@@ -24,6 +24,8 @@ import glob
 import os
 import json
 import unittest
+import subprocess
+import sys
 
 from MapCppSimulation import MapCppSimulation
 
@@ -58,8 +60,10 @@ class MapCppSimulationVisualisationTestCase(unittest.TestCase):
     ######## tests on Process #########
     def test_mc_vrml2file(self):  # should make a vrml file
         """
-        Check we can make a vrml file. Only supported option right now is vrml
-        as we need this to feed into the event viewer.
+        Check we can make a vrml file
+        
+        Only supported option right now is vrml as we need this to feed into the
+        event viewer.
         """
         good_event = {
             "mc":[self.particle,self.particle]
@@ -72,8 +76,26 @@ class MapCppSimulationVisualisationTestCase(unittest.TestCase):
         for filename in glob.glob('g4_*.wrl'):
             os.rename(filename, os.environ['MAUS_ROOT_DIR']+'/tmp/'+filename) 
 
+    def test_mc_vrml2file_no_event(self):  # should make a vrml file
+        """
+        Check we can make a vrml file even when there is no G4 event.
+
+        Only supported option right now is vrml as we need this to feed into the
+        event viewer.
+        """
+        good_event = {
+            "mc":[]
+        }
+        result = self.mapper.process(json.dumps(good_event))
+        if "errors" in result:
+            raise Exception('test_mc_vis made an error')
+        if len(glob.glob('g4_*.wrl')) < 1:
+            raise Exception('test_mc_vis_no_event failed to make a VRML file')
+        for filename in glob.glob('g4_*.wrl'):
+            os.rename(filename, os.environ['MAUS_ROOT_DIR']+'/tmp/'+filename) 
+
     configuration = {
-      "verbose_level":2,
+      "verbose_level":5,
       "simulation_geometry_filename":"Test.dat",
       "maximum_number_of_steps":1000,
       "keep_steps":True,
@@ -93,6 +115,26 @@ class MapCppSimulationVisualisationTestCase(unittest.TestCase):
       "visualisation_zoom":1.,
     }
 
+#AAAAAAAAAAAAAAAA NOSETESTS HATES GEANT4
 if __name__ == '__main__':
-    unittest.main()
+    if len(sys.argv) < 2 or \
+       sys.argv[1] != 'test_mc_vrml2file':
+        args = ['python',
+          os.environ.get("MAUS_ROOT_DIR")+\
+                         '/build/test_MapCppSimulationVisualisation.py', 
+                         'test_mc_vrml2file',
+                         'test_mc_vrml2file_no_event'
+               ]
+        p = subprocess.Popen(args)
+        p.wait()
+        print p.returncode
+        assert(p.returncode == 0)
+    else:
+        try:
+            unittest.main()
+            sys.exit(0)
+        except:
+            sys.excepthook(*sys.exc_info())
+            sys.exit(1)
+
 

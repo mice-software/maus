@@ -23,6 +23,10 @@
 
 namespace {
 
+// Test disabled - no way to get G4 to stop visualising once it's turned on
+// (at least none that I could see)
+// tested instead in MapCppSimulationVisualisation
+/*
 TEST(MAUSVisManagerTest, TestVis) {
     // there is another test at map level that checks we actually make a file
     Json::Value& config = *MICERun::getInstance()->jsonConfiguration;
@@ -32,12 +36,26 @@ TEST(MAUSVisManagerTest, TestVis) {
     config["visualisation_phi"] = 90.;
     config["visualisation_zoom"] = 2.;
 
-    MAUS::MAUSVisManager* vis = new MAUS::MAUSVisManager ();
+    MAUS::MAUSVisManager* vis = new MAUS::MAUSVisManager();
+
+    // I never check that isEnabled actually disables stuff. Really I only put
+    // the flag in to stop tests producing loads of .wrl files 
+    vis->SetIsEnabled( false );
+    EXPECT_TRUE(!vis->GetIsEnabled());
+    vis->SetIsEnabled( true );
+    EXPECT_TRUE(vis->GetIsEnabled());
+
+    // Check that we can run visualisation
     vis->Initialize();
     vis->SetupRun();
     vis->TearDownRun();
-    vis->Disable();
+
+    // Switch it off (don't want the other tests making spurious g4_??.wrl
+    vis->SetIsEnabled( false );
+    config["geant4_visualisation"] = false;
 }
+*/
+
 
 }
 
