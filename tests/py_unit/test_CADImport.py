@@ -4,8 +4,13 @@ from geometry.CADImport import CADImport
 
 class  test_CADImport(unittest.TestCase):
     def setUp(self):
+        self.maus_root = os.environ['MAUS_ROOT_DIR']
         self.Constructor = None
-        self.CADImport_two_xml = CADImport(xmlin1 = "fastradModel.xml", xsl = "GDML2G4MICE.xsl", xmlin2 = "FieldInfoTest.xml", output = "OUTPUTFILE.txt")
+        xml_in_1 = self.maus_root + '/src/common_py/geometry/testCases/testGeometry/fastradModel.gdml'
+        xml_in_2 = self.maus_root + '/src/common_py/geometry/testCases/testGeometry/FieldInfoTest.xml'
+        x_s_l = self.maus_root + '/src/common_py/geometry/xsltScripts/GDML2G4MICE.xsl'
+        out_put = self.maus_root + '/src/common_py/geometry/testCases/OUTPUTFILE.txt'
+        self.CADImport_two_xml = CADImport(xmlin1 = xml_in_1, xsl = x_s_l, xmlin2 = xml_in_2, output = out_put)
 
     def test_Constructor(self):
         """
@@ -113,12 +118,12 @@ class  test_CADImport(unittest.TestCase):
             pass
 
 
-    def test_XSLTParse(self):
+    def test_parse_xslt(self):
         """
         Test to check that the outputted file has got information within it
         """
-        self.CADImport_two_xml.XSLTParse()
-        OutputFile = self.CADImport_two_xml.Output
+        self.CADImport_two_xml.parse_xslt()
+        OutputFile = self.CADImport_two_xml.output
         self.assertTrue( os.path.getsize(OutputFile) != 0)
         """
         Test to check that the information within the outputted file is of MAUS Module format
@@ -126,19 +131,20 @@ class  test_CADImport(unittest.TestCase):
         count = 0
         fin = open(OutputFile, 'r')
         for lines in fin.readlines():
+            #line below needs to be reviewed as each file is different
             if lines.find('Configuration') >= 0 or lines.find('Dimensions') >= 0 or lines.find('Position') >= 0 or lines.find('Rotation') >= 0:
                 count += 1
         if count == 0:
             self.assertTrue(False, "output file is not of MAUS Module format")
 
-    def test_AppendMerge(self):
-        self.CADImport_two_xml.AppendMerge()
+    def test_append_merge(self):
+        self.CADImport_two_xml.append_merge()
         """
         this test check to see if the word EDIT was replaced in Merge.xsl.in by
         checking the output file Merge.xsl for the word EDIT
         """
         count1 = 0
-        fout = open(self.CADImport_two_xml.MergeOut, 'r')
+        fout = open(self.CADImport_two_xml.merge_out, 'r')
         for line in fout.readlines():
             if line.find('EDIT')>=0:
                 count1 += 1
@@ -147,7 +153,7 @@ class  test_CADImport(unittest.TestCase):
         this tests to make sure there is only on EDIT in the Merge.xsl.in file
         """
         count2 = 0
-        fin = open(self.CADImport_two_xml.MergeIn, 'r')
+        fin = open(self.CADImport_two_xml.merge_in, 'r')
         for line in fin.readlines():
             if line.find('EDIT')>=0:
                 count2 += 1

@@ -1,7 +1,7 @@
 import os
 import os.path
 import unittest
-from GDMLPacker import Packer
+from geometry.GDMLPacker import Packer
 
 
 class  Test_GDMLPackerTestCase(unittest.TestCase):

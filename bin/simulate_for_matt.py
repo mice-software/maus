@@ -38,7 +38,7 @@ def run(number_of_spills):
     my_map.append(MAUS.MapCppTOFDigitization())  #  TOF electronics model
     my_map.append(MAUS.MapCppTrackerDigitization())  #   SCiFi electronics model
 
-    datacards = io.StringIO(u"keep_tracks = False")
+    datacards = io.StringIO(u"keep_tracks = True")
     #  You may specify datacards if you wish.  To do so you create a file object
     #  which can either be a StringIO object or a native python file.  If you
     #  want to store your datacards in a file 'datacards.dat' then uncomment:
@@ -61,5 +61,5 @@ def run(number_of_spills):
 
 
 if __name__ == '__main__':
-    NUMBER_OF_SPILLS = 10
+    NUMBER_OF_SPILLS = 1
     run(NUMBER_OF_SPILLS)

@@ -41,7 +41,7 @@ class ErrorHandler:
         * errors are passed to json
         * does not halt on error
         """
-        self.error_to_stderr = False
+        self.error_to_stderr = True
         self.error_to_json = True
         self.on_error = 'none'
 

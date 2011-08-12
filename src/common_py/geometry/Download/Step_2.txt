@@ -1,7 +1,7 @@
 Module Step_2
                 {
                 Volume TessellatedSolid
-                PropertyString Material Galactic
+                PropertyString Material AIR
                 PropertyDouble BlueColour 0.75
                 PropertyDouble GreenColour 0.3
                 PropertyDouble RedColour 0.75
