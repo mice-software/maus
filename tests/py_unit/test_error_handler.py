@@ -15,7 +15,6 @@
 
 import StringIO
 import sys
-import string
 
 import json
 import unittest
@@ -26,11 +25,10 @@ import libMausCpp
 def _test_function():
   pass
 
-
 class ErrorHandlerTestCase(unittest.TestCase):
   def test_ErrorHandler(self):
       error_handler = ErrorHandler.ErrorHandler()
-      assert(error_handler.error_to_stderr == False)
+      assert(error_handler.error_to_stderr == True)
       assert(error_handler.error_to_json == True)
       assert(error_handler.on_error == 'none')
 
