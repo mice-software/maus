@@ -27,6 +27,9 @@ class MAUSVisManager: public G4VisManager {
   /** Constructor does nothing
    */
   MAUSVisManager();
+
+  /** Destructor does nothing
+   */
   ~MAUSVisManager();
 
   /** @brief Set up visualisation for a particular beamOn command
@@ -38,7 +41,7 @@ class MAUSVisManager: public G4VisManager {
 
   /** @brief Clear up anything that needs clearing from the run setup
    *
-   *  Doesn't do anything right now.
+   *  Flushes the viewer buffer (force to write a graphics file).
    */
   void TearDownRun();
 
