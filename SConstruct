@@ -358,13 +358,13 @@ def set_geant4(conf, env):
 
         # removing this line (and using the append(libs) one below, because this is messy and breaks/seg-faults.
         #    conf.env.ParseConfig('%s/liblist -m %s < %s/libname.map'.replace('%s', os.path.join(os.environ.get('G4LIB'), os.environ.get('G4SYSTEM'))))
-
-
         env.Append(LIBS=get_g4_libs())
 
         for lib in get_g4_libs():
             if not conf.CheckLib(lib, language='c++'):
                 my_exit(1)
+
+        geant4_extras(env)
 
 def set_recpack(conf, env):
     if not conf.CheckLib('recpack', language='c++') or\
@@ -417,6 +417,29 @@ def cpp_extras(env):
 
   if not (lcov or debug or gprof) and optimise:
     env.Append(CCFLAGS=["""-O3"""])        
+
+def geant4_extras(env):
+  """
+  Sets compilation to include geant4 opengl bindings
+
+  If maus_opengl environment variable is set and is not equal to 0, add
+  G4VIS_USE_OPENGLX and G4VIS_USE_OPENGLXM to the CCFLAGS and G4OpenGL to
+  the libraries. Note that these libraries are not built by default.
+  """
+  opengl = 'maus_opengl' in os.environ and os.environ['maus_opengl'] != '0'
+  if opengl:
+    env.Append(CCFLAGS=["""-DG4VIS_USE_OPENGLX"""])
+    env.Append(CCFLAGS=["""-DG4VIS_USE_OPENGLXM"""])
+  geant_vis = 'G4OpenGL'
+  env.Append(LIBS=[geant_vis])
+  if not conf.CheckLib(geant_vis, language='c++'):
+      print """
+        Could not find G4OpenGL library. Build this library using
+        $MAUS_ROOT_DIR/third_party/bash/32geant4_extras.bash
+        Note that you need to have valid open gl and open gl xm development
+        libraries installed.
+        """
+      my_exit(1)
 
 # Setup the environment.  NOTE: SHLIBPREFIX means that shared libraries don't
 # have a 'lib' prefix, which is needed for python to find SWIG generated libraries
@@ -511,7 +534,6 @@ if 'configure' in COMMAND_LINE_TARGETS: # pylint: disable-msg=E0602
 if env['USE_G4'] and env['USE_ROOT']:
     #env.Append(CCFLAGS=['-g','-pg'])
     #env.Append(LINKFLAGS='-pg')
-
     common_cpp_files = glob.glob("src/legacy/*/*cc") + \
         glob.glob("src/legacy/*/*/*cc") + \
         glob.glob("src/common_cpp/*/*cc") + \

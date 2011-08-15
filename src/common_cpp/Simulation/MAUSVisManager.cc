@@ -21,7 +21,6 @@
 #include <G4VRML2File.hh>
 #include <G4HepRepFile.hh>
 #include <G4DAWNFILE.hh>
-#include <G4UImanager.hh>
 
 #ifdef G4VIS_USE_DAWN
 #include <G4FukuiRenderer.hh>
@@ -136,24 +135,23 @@ void MAUSVisManager::SetupRun() {
   int verbose = JsonWrapper::GetProperty
            (conf, "verbose_level", JsonWrapper::intValue).asInt();
 
-  G4UImanager* UI = G4UImanager::GetUIpointer();
   if (verbose > 0) {
       // doesnt seem to work - writes to std::cerr regardless... set
       // verbose_level > 4 (which quietens std::cerr) instead
-      UI->ApplyCommand("/vis/verbose 0");
+      ApplyCommand("/vis/verbose 0");
   }
-  UI->ApplyCommand("/vis/open "+viewer);
-  UI->ApplyCommand("/vis/viewer/reset");
-  UI->ApplyCommand("/vis/viewer/zoomTo "+STLUtils::ToString(zoom));
-  UI->ApplyCommand("/vis/viewer/set/viewpointThetaPhi "+
+  ApplyCommand("/vis/open "+viewer);
+  ApplyCommand("/vis/viewer/reset");
+  ApplyCommand("/vis/viewer/zoomTo "+STLUtils::ToString(zoom));
+  ApplyCommand("/vis/viewer/set/viewpointThetaPhi "+
                    STLUtils::ToString(theta)+" "+STLUtils::ToString(phi));
-  UI->ApplyCommand("/vis/drawVolume");
-  UI->ApplyCommand("/tracking/storeTrajectory 1");
-  UI->ApplyCommand("/vis/scene/add/trajectories");
+  ApplyCommand("/vis/drawVolume");
+  ApplyCommand("/tracking/storeTrajectory 1");
+  ApplyCommand("/vis/scene/add/trajectories");
 }
 
 void MAUSVisManager::TearDownRun() {
-  G4UImanager::GetUIpointer()->ApplyCommand("/vis/viewer/flush");
+  ApplyCommand("/vis/viewer/flush");
   // make eps here?
 }
 }
