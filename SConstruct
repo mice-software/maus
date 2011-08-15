@@ -559,8 +559,8 @@ if env['USE_G4'] and env['USE_ROOT']:
                                LIBS= env['LIBS'] + ['recpack'] + ['MausCpp'])
     env.Install('build', ['tests/cpp_unit/test_cpp_unit'])
 
-    test_optics_files = glob.glob("tests/integration/optics/src/*cc")
-    test_optics = env.Program(target = 'tests/integration/optics/optics', \
+    test_optics_files = glob.glob("tests/integration/test_optics/src/*cc")
+    test_optics = env.Program(target = 'tests/integration/test_optics/optics', \
                                source = test_optics_files, \
                                LIBS= env['LIBS'] + ['MausCpp'])
 
