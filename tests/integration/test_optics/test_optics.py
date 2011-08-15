@@ -14,7 +14,7 @@ def run_optics(test):
     """
     Runs optics application and produces some output
     """
-    os.chdir(os.getenv('MAUS_ROOT_DIR')+'/tests/integration/optics')
+    os.chdir(os.getenv('MAUS_ROOT_DIR')+'/tests/integration/test_optics')
     run_command = './optics files/cards.'+test+' >& log.'+test
     print run_command
     os.system(run_command)
@@ -37,7 +37,7 @@ def get_data(test):
             line = fin.readline()
     return (z_out, beta)
 
-def plot_data(test, z_out, beta):
+def plot_data(test, z_out, beta, plot_dir):
     """
     Plots optics data
     """
@@ -48,7 +48,12 @@ def plot_data(test, z_out, beta):
     hist.Draw()
     graph.Draw()
     canvas.Update()
-    canvas.Print(test+'_optics.png')
+    plot_dir = os.path.join(plot_dir, 'optics')
+    try:
+        os.mkdir(plot_dir)
+    except:
+        pass # dir already exists
+    canvas.Print(os.path.join(plot_dir, test+'_optics.png'))
 
 class TestOptics(unittest.TestCase): # pylint: disable=R0904
     """
@@ -57,13 +62,15 @@ class TestOptics(unittest.TestCase): # pylint: disable=R0904
 
     def test_optics(self):
         """
-        Check that we can calculate beta function correctly; plot output beta
-        function.
+        Check that we can calculate optics beta function correctly; plot output
+        beta function.
         """
         for test in TEST_NAMES:
             run_optics(test)
             (z_out, beta) = get_data(test)
-            plot_data(test, z_out, beta)
+            if 'MAUS_TEST_PLOT_DIR' in os.environ:
+                plot_data(test, z_out, beta, os.environ['MAUS_TEST_PLOT_DIR'])
+            #Common.clear_root()
             self.assertAlmostEqual(TARGET_BETA[test], beta[-1], 3)
 
 if __name__ == '__main__':
