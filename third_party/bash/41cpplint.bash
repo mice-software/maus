@@ -2,7 +2,7 @@
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
-    mv ${MAUS_ROOT_DIR}/third_party/source/cpplint.py ${MAUS_ROOT_DIR}/third_party/install/lib/python2.7/site-packages/cpplint.py
+    cp ${MAUS_ROOT_DIR}/third_party/source/cpplint.py ${MAUS_ROOT_DIR}/third_party/install/lib/python2.7/site-packages/cpplint.py
     
     echo "INFO: The package should be locally build now in your"
     echo "INFO: third_party directory, which the rest of MAUS will"
