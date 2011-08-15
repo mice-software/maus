@@ -31,7 +31,7 @@ map_reduce_type = "native_python" # can also be "native_python_profile" using cP
 # 4 = fatal
 # >4 = silent
 # Doesnt effect python
-verbose_level = 2
+verbose_level = 4
 errors_to_stderr = verbose_level < 4
 errors_to_json = True
 on_error = 'none' # halt or raise

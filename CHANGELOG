@@ -1,3 +1,12 @@
+MAUS-v0.0.5 (http://micewww.pp.rl.ac.uk/versions/show/12)
+  Bug #574: doxygen on webserver not updating
+  Bug #607: Simulation runs too slow
+  Bug #611: maus_per_commit_gcc bzr lock as root
+  Feature #155: bzr doesn't support natively keywords
+  Feature #409: Simulation update
+  Feature #605: Extra compile flags controlled by env variables
+  Feature #606: Automatic generation of documentation from json schema
+
 MAUS-v0.0.4 (http://micewww.pp.rl.ac.uk/versions/show/11)
   Bug #536: Trunk broken
 	Bug #537: Segmentation fault in SciFiSD

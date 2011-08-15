@@ -4,6 +4,10 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v0.0.5
+- Added some new compile flags to control C++ optimisation, profiling, debugging, code coverage
+- Added documentation for the Monte Carlo data structure (doc/run_control/spill.pdf)
+- Better testing and speed optimisation in Simulation
 
 MAUS-v0.0.4
 - Added SpecialVirtual detectors
