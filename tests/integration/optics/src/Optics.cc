@@ -49,12 +49,18 @@ dataCards* LoadDataCards(int argc, char** argv)
   return &MyDataCards;
 }
 
+void  PhaseCavities(PhaseSpaceVector ref) {
+    (*simRun.jsonConfiguration)["simulation_reference_particle"] =  ConvertToPGParticle(ref).WriteJson();   
+    MAUSGeant4Manager::GetInstance()->SetPhases();
+}
+
 void SetupSimulation(MiceModule* root, std::vector<CovarianceMatrix> envelope)
 {
   simRun.DataCards     = &MyDataCards;
   simRun.miceModule    = root;
   simRun.miceMaterials = new MiceMaterials();
   simRun.jsonConfiguration = new Json::Value(Json::objectValue);
+  (*simRun.jsonConfiguration)["verbose_level"] = Json::Value(1);
   (*simRun.jsonConfiguration)["maximum_number_of_steps"] = Json::Value(10000);
   (*simRun.jsonConfiguration)["geant4_visualisation"] = Json::Value(false);
   (*simRun.jsonConfiguration)["keep_steps"] = Json::Value(false);
@@ -72,17 +78,11 @@ std::vector<G4VSolid*> MakeCylinderEnvelope(std::vector<CovarianceMatrix> matrix
   return std::vector<G4VSolid*>();
 }
 
-MICEEvent* PhaseCavities(PhaseSpaceVector ref)
-{
-}
-
 MICEEvent* RunSimulation(PhaseSpaceVector psv)
 {
   simEvent = MICEEvent();
-  if(psv.E()<0) return &simEvent;
-  MAUSPrimaryGeneratorAction::PGParticle p = ConvertToPGParticle(psv);
-  g4Manager->GetPrimaryGenerator()->Push(p);
-  g4Manager->GetRunManager()->BeamOn(1);
+  if(psv.E() < psv.mass()) return &simEvent;
+  g4Manager->RunParticle(ConvertToPGParticle(psv));
   return &simEvent;
 }
 
@@ -127,8 +127,11 @@ void Envelope(const MiceModule* root, std::vector<CovarianceMatrix>& env_out, st
   if(env_type == "Simple" || env_type == "TrackingDerivative")
   {
     Squeak::mout(Squeak::info) << "Finding TrackingDerivative envelope functions" << std::endl;
+    std::cerr << "Buildhits" << std::endl;
     std::vector<PhaseSpaceVector> hits = BuildHitsIn(g_mean, delta);
+    std::cerr << "TMOUT" << std::endl;
     tm_out = TrackingDerivativeTransferMaps(hits, false);
+    std::cerr << "DONE" << std::endl;
     Squeak::mout(Squeak::debug) << "TM_OUT SIZE " << tm_out.size() << std::endl;
   }
   else if(env_type == "PolyFit")
@@ -200,32 +203,32 @@ std::vector<PhaseSpaceVector> BuildHitsIn(PhaseSpaceVector ref, CLHEP::HepVector
   return hitsIn;
 }
 
-void AddHitsToMap(Json::Value Tracks, std::map< StationId,   std::vector<PhaseSpaceVector> >& map)
+void AddHitsToMap(Json::Value Events, std::map< StationId,   std::vector<PhaseSpaceVector> >& map)
 {
-  Json::Value VHits = Tracks["virtual_hits"];
-  for(size_t i=0; i<VHits.size(); i++) {
-    Json::Value hit_v = VHits[i];
-    PhaseSpaceVector psv;
-    psv.setT(hit_v["time"].asDouble());
-    psv.setQ(hit_v["charge"].asDouble());
-    psv.setX(hit_v["position"]["x"].asDouble());    
-    psv.setY(hit_v["position"]["y"].asDouble());    
-    psv.setZ(hit_v["position"]["z"].asDouble());    
-    psv.setPx(hit_v["momentum"]["x"].asDouble());    
-    psv.setPy(hit_v["momentum"]["y"].asDouble());    
-    psv.setPz(hit_v["momentum"]["z"].asDouble());    
-    psv.setBx(hit_v["b_field"]["x"].asDouble());    
-    psv.setBy(hit_v["b_field"]["y"].asDouble());    
-    psv.setBz(hit_v["b_field"]["z"].asDouble());    
-    psv.setEx(hit_v["e_field"]["x"].asDouble());    
-    psv.setEy(hit_v["e_field"]["y"].asDouble());    
-    psv.setEz(hit_v["e_field"]["z"].asDouble());
-    double mass = hit_v["mass"].asDouble();
-    psv.setE(sqrt(psv.P()*psv.P()+mass*mass));
-
-    int stationNumber = hit_v["station_id"].asInt();
-    StationId id(hit_v["station_id"].asInt(), StationId::virt);
-    map[id].push_back(psv);
+  for (size_t ev = 0; ev < Events.size(); ++ev) {
+    Json::Value VHits = Events[ev]["virtual_hits"];
+    for(size_t i=0; i<VHits.size(); i++) {
+      Json::Value hit_v = VHits[i];
+      PhaseSpaceVector psv;
+      psv.setT(hit_v["time"].asDouble());
+      psv.setQ(hit_v["charge"].asDouble());
+      psv.setX(hit_v["position"]["x"].asDouble());    
+      psv.setY(hit_v["position"]["y"].asDouble());    
+      psv.setZ(hit_v["position"]["z"].asDouble());    
+      psv.setPx(hit_v["momentum"]["x"].asDouble());    
+      psv.setPy(hit_v["momentum"]["y"].asDouble());    
+      psv.setPz(hit_v["momentum"]["z"].asDouble());    
+      psv.setBx(hit_v["b_field"]["x"].asDouble());    
+      psv.setBy(hit_v["b_field"]["y"].asDouble());    
+      psv.setBz(hit_v["b_field"]["z"].asDouble());    
+      psv.setEx(hit_v["e_field"]["x"].asDouble());    
+      psv.setEy(hit_v["e_field"]["y"].asDouble());    
+      psv.setEz(hit_v["e_field"]["z"].asDouble());
+      double mass = hit_v["mass"].asDouble();
+      psv.setE(sqrt(psv.P()*psv.P()+mass*mass));
+      StationId id(hit_v["station_id"].asInt(), StationId::virt);
+      map[id].push_back(psv);
+    }
   }
 }
 
@@ -241,12 +244,10 @@ std::vector<TransferMap*>      TrackingDerivativeTransferMaps(std::vector<PhaseS
   for(unsigned int j=0; j<hitsIn.size() && (!referenceOnly || j==0); j++)
   {
     MICEEvent* event = Simulation::RunSimulation(hitsIn[j]);
-    AddHitsToMap(MAUSGeant4Manager::GetInstance()->GetTracking()->GetTracks(), g_hits);
+    AddHitsToMap(MAUSGeant4Manager::GetInstance()->GetEventAction()->GetEvents(), g_hits);
     event->specialHits    = std::vector<SpecialHit*>();
     event->virtualHits    = std::vector<VirtualHit*>();
     event->zustandVektors = std::vector<ZustandVektor*>();
-    MAUSGeant4Manager::GetInstance()->GetTracking()->SetTracks(Json::Value(Json::objectValue));
-    MAUSGeant4Manager::GetInstance()->GetVirtualPlanes()->StartOfEvent();
   }
   int order = 2;
   if(referenceOnly) order = 1;
@@ -323,9 +324,9 @@ void PolyFitFunction(const double* psv_in, double* psv_out)
   double     mass  = ModuleConverter::PdgPidToMass(Simulation::g_pid);
   PhaseSpaceVector psvIn(vec, mass);
   psvIn.setZ(g_mean.z());
-  MICEEvent* event = Simulation::RunSimulation(psvIn);
+  Simulation::RunSimulation(psvIn);
   g_hitsIn.push_back(psvIn);
-  AddHitsToMap(MAUSGeant4Manager::GetInstance()->GetTracking()->GetTracks(), g_hits);
+  AddHitsToMap(MAUSGeant4Manager::GetInstance()->GetEventAction()->GetEvents(), g_hits);
   PhaseSpaceVector psvOut = g_hits[g_polyfit_module].back();
   CLHEP::HepVector vecOut = psvOut.getSixVector();
   MAUSGeant4Manager::GetInstance()->GetTracking()->SetTracks(Json::Value());
@@ -877,7 +878,9 @@ int main(int argc, char **argv)
   Squeak::mout(Squeak::info) << "Running beam envelope through" << std::endl;
   std::vector<CovarianceMatrix>  envelope;
   std::vector<TransferMap*>      tms;
+  std::cerr << "EBVELOPE" << std::endl;
   Optics::Envelope(root, envelope, tms);
+  std::cerr << "EBVELOPE DONE" << std::endl;
   //Write output
   Output::MakeOutput(envelope, tms, root->findModulesByPropertyExists("string", "EnvelopeType")[0]);
   
