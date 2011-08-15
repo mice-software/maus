@@ -96,7 +96,8 @@ Json::Value MAUSSteppingAction::StepToJson
 
 void  MAUSSteppingAction::SetSteps(Json::Value steps) {
     if (!steps.isArray())
-        throw(Squeal(Squeal::recoverable, "Attempting to set steps to non-array type",
+        throw(Squeal(Squeal::recoverable,
+              "Attempting to set steps to non-array type",
               "MAUSSteppingAction::SetSteps()"));
     _steps = steps;
 }

@@ -22,11 +22,13 @@
 
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
+#include "src/common_cpp/Simulation/MAUSVisManager.hh"
 
 #include "Interface/Squeal.hh"
 #include "Interface/dataCards.hh"
 
 #include "src/map/MapCppSimulation/MapCppSimulation.hh"
+
 
 bool MapCppSimulation::birth(std::string argJsonConfigDocument) {
   // Check if the JSON document can be parsed, else return error only
@@ -34,9 +36,9 @@ bool MapCppSimulation::birth(std::string argJsonConfigDocument) {
     SetConfiguration(argJsonConfigDocument);
     return true;  // Sucessful completion
   // Normal session, no visualization
-  } catch(Squeal& squee) {
+  } catch(Squeal squee) {
     CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
-  } catch(std::exception& exc) {
+  } catch(std::exception exc) {
     CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
   }
   return false;
@@ -46,12 +48,18 @@ std::string MapCppSimulation::process(std::string document) {
   Json::Value spill;
   try {spill = JsonWrapper::StringToJson(document);}
   catch(...) {
-    return "{\"errors\":{\"bad_json_document\":\"Failed to parse input document\"}}";
+    return std::string("{\"errors\":{\"bad_json_document\":")+
+           std::string("\"Failed to parse input document\"}}");
   }
   try {
+    if (_doVis) {
+        MAUSGeant4Manager::GetInstance()->GetVisManager()->SetupRun();
+    }
     Json::Value mc   = JsonWrapper::GetProperty
                                         (spill, "mc", JsonWrapper::arrayValue);
-      spill["mc"] = MAUSGeant4Manager::GetInstance()->RunManyParticles(mc);
+    spill["mc"] = MAUSGeant4Manager::GetInstance()->RunManyParticles(mc);
+    if (_doVis)
+        MAUSGeant4Manager::GetInstance()->GetVisManager()->TearDownRun();
   }
   catch(Squeal squee) {
     spill = CppErrorHandler::getInstance()
@@ -91,5 +99,7 @@ void MapCppSimulation::SetConfiguration(std::string json_configuration) {
   _g4manager->SetPhases();
   Squeak::mout(Squeak::info) << "Fields:" << std::endl;
   simRun.btFieldConstructor->Print(Squeak::mout(Squeak::info));
+  _doVis = JsonWrapper::GetProperty
+           (config, "geant4_visualisation", JsonWrapper::booleanValue).asBool();
 }
 
