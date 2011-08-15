@@ -54,8 +54,11 @@ void SetupSimulation(MiceModule* root, std::vector<CovarianceMatrix> envelope)
   simRun.DataCards     = &MyDataCards;
   simRun.miceModule    = root;
   simRun.miceMaterials = new MiceMaterials();
-  simRun.jsonConfiguration = new Json::Value
-                                (JsonWrapper::StringToJson("{\"maximum_number_of_steps\":10000}")); // BUG
+  simRun.jsonConfiguration = new Json::Value(Json::objectValue);
+  (*simRun.jsonConfiguration)["maximum_number_of_steps"] = Json::Value(10000);
+  (*simRun.jsonConfiguration)["geant4_visualisation"] = Json::Value(false);
+  (*simRun.jsonConfiguration)["keep_steps"] = Json::Value(false);
+  (*simRun.jsonConfiguration)["keep_tracks"] = Json::Value(false);
   Squeak::setStandardOutputs();
   fillMaterials(simRun);
   
