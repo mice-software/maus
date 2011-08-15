@@ -18,7 +18,10 @@
 #ifndef SRC_COMMON_CPP_SIMULATION_MAUSVISMANAGER_HH
 #define SRC_COMMON_CPP_SIMULATION_MAUSVISMANAGER_HH
 
-#include "G4VisManager.hh"
+#include <G4VisManager.hh>
+#include <G4UImanager.hh>
+
+#include "src/legacy/Interface/Squeak.hh"
 
 namespace MAUS {
 
@@ -47,6 +50,11 @@ class MAUSVisManager: public G4VisManager {
 
  private:
   void RegisterGraphicsSystems();
+  void ApplyCommand(std::string cmd) {
+    Squeak::mout(Squeak::debug) << "g4ui> " << cmd << std::endl;
+    G4UImanager::GetUIpointer()->ApplyCommand(cmd);
+  }
+
 };
 }
 
