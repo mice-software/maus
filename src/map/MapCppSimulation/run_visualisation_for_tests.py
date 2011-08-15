@@ -83,6 +83,8 @@ class MapCppSimulationVisualisationTestCase(unittest.TestCase):
         Only supported option right now is vrml as we need this to feed into the
         event viewer.
         """
+        for filename in glob.glob('g4_*.wrl'):
+            os.rename(filename, os.environ['MAUS_ROOT_DIR']+'/tmp/'+filename) 
         good_event = {
             "mc":[]
         }
@@ -115,26 +117,5 @@ class MapCppSimulationVisualisationTestCase(unittest.TestCase):
       "visualisation_zoom":1.,
     }
 
-#AAAAAAAAAAAAAAAA NOSETESTS HATES GEANT4
 if __name__ == '__main__':
-    if len(sys.argv) < 2 or \
-       sys.argv[1] != 'test_mc_vrml2file':
-        args = ['python',
-          os.environ.get("MAUS_ROOT_DIR")+\
-                         '/build/test_MapCppSimulationVisualisation.py', 
-                         'test_mc_vrml2file',
-                         'test_mc_vrml2file_no_event'
-               ]
-        p = subprocess.Popen(args)
-        p.wait()
-        print p.returncode
-        assert(p.returncode == 0)
-    else:
-        try:
-            unittest.main()
-            sys.exit(0)
-        except:
-            sys.excepthook(*sys.exc_info())
-            sys.exit(1)
-
-
+    unittest.main()

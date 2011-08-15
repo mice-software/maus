@@ -21,6 +21,9 @@ Test for MapCppSimulation - note also separate tests for visualisation
 
 import json
 import unittest
+import os
+import subprocess
+import sys  
 
 from MapCppSimulation import MapCppSimulation
 
@@ -115,6 +118,13 @@ class MapCppSimulationTestCase(unittest.TestCase):
             self.assertIn("final_momentum", event)
             self.assertIn("final_position", event)
         
+
+    def test_visualisation(self):
+        test = os.path.join(os.environ['MAUS_ROOT_DIR'], 'src', 'map',\
+                           'MapCppSimulation', 'run_visualisation_for_tests.py')
+        ps = subprocess.Popen(['python', test])
+        ps.wait()
+        self.assertEqual(ps.returncode, 0)
 
     configuration = {
       "verbose_level":2,
