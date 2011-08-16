@@ -32,9 +32,9 @@ map_reduce_type = "native_python" # can also be "native_python_profile" using cP
 # >4 = silent
 # Doesnt effect python
 verbose_level = 4
-errors_to_stderr = verbose_level < 4
+errors_to_stderr = None # None = from verbose_level; else True or False
 errors_to_json = True
-on_error = 'none' # halt or raise
+on_error = 'none' # none, halt or raise
 
 # Used by MapPyRemoveTracks.
 keep_only_muon_tracks = False 

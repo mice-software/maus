@@ -46,14 +46,6 @@ class ErrorHandler:
         self.error_to_json = True
         self.on_error = 'none'
 
-    def SetUp(self, cards_doc):
-        """
-        Set up the error handler with errors from datacards (Not implemented)
-        """
-        if (cards_doc): pass
-        raise NotImplementedError()
-
-
     def HandleException(self, doc=None, caller=None):
         """
         Handle a raised exception - put the error message in the right IO
@@ -119,7 +111,10 @@ class ErrorHandler:
                     errors_to_stderr,
                     errors_to_json
         """
-        self.error_to_stderr = bool(config['errors_to_stderr'])
+        if config['errors_to_stderr'] == None:
+            self.error_to_stderr = config['verbose_level'] < 4
+        else:
+            self.error_to_stderr = bool(config['errors_to_stderr'])
         self.error_to_json = bool(config['errors_to_json'])
         self.on_error = str(config['on_error']).lower()
 

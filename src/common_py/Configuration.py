@@ -21,6 +21,7 @@ for the old G4MICE datacards.
 
 import os
 import json
+import copy
 import ErrorHandler
 
 class Configuration:
@@ -59,6 +60,7 @@ class Configuration:
             exec(config_file.read(), globals(), config_dict) # pylint: disable=W0122,C0301
 
         config_dict['maus_version'] = self.get_version_from_readme()
+        config_dict = self.check_config_dict(config_dict)
         self.configuration_to_error_handler(config_dict)
         config_json_str = json.JSONEncoder().encode(config_dict)
 
@@ -78,4 +80,20 @@ class Configuration:
         up
         """
         ErrorHandler.DefaultHandler().ConfigurationToErrorHandler(config_dict)
+
+    def check_config_dict(self, config_dict):
+        """
+        @brief Check to see if config_dict can be encoded into json
+        @params config_dict dictionary to be checked
+        @returns Copy of config_dict with non-encodable items stripped out
+        """
+        dict_copy = {}
+        for key, value in config_dict.iteritems():
+            try:
+                json.JSONEncoder().encode({key:value})
+                dict_copy[key] = value
+            except:
+                print 'Failed to encode',str(key)+':'+str(value),'as json object'
+        return dict_copy
+        
 
