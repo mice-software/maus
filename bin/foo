@@ -1,0 +1,5197 @@
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (524,0,12)
+P1 = (524,0,12)
+P2 = (-524,0,12)
+Side lengths = P0->P10
+Side lengths = P0->P21048
+Side lengths = P1->P21048
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (524,0,12)
+P[1]      = (524,0,12)
+P[2]      = (-524,0,12)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (-1048,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (524,0,12)
+P1 = (524,0,12)
+P2 = (-524,0,12)
+Side lengths = P0->P10
+Side lengths = P0->P21048
+Side lengths = P1->P21048
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (524,0,12)
+P[1]      = (524,0,12)
+P[2]      = (-524,0,12)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (-1048,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (524,0,12)
+P1 = (524,0,12)
+P2 = (-524,0,12)
+Side lengths = P0->P10
+Side lengths = P0->P21048
+Side lengths = P1->P21048
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (524,0,12)
+P[1]      = (524,0,12)
+P[2]      = (-524,0,12)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (-1048,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (524,0,12)
+P1 = (525,0,10.9997)
+P2 = (524,0,12)
+Side lengths = P0->P11.41464
+Side lengths = P0->P20
+Side lengths = P1->P21.41464
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (524,0,12)
+P[1]      = (525,0,10.9997)
+P[2]      = (524,0,12)
+RELATIVE VECTORS = 
+E[1]      = (1.0003,0,-1.0003)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (525,0,10.9997)
+P1 = (524,0,12)
+P2 = (524,0,12)
+Side lengths = P0->P11.41464
+Side lengths = P0->P21.41464
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (525,0,10.9997)
+P[1]      = (524,0,12)
+P[2]      = (524,0,12)
+RELATIVE VECTORS = 
+E[1]      = (-1.0003,0,1.0003)
+E[2]      = (-1.0003,0,1.0003)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (525,0,10.9997)
+P1 = (524,0,12)
+P2 = (524,0,12)
+Side lengths = P0->P11.41464
+Side lengths = P0->P21.41464
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (525,0,10.9997)
+P[1]      = (524,0,12)
+P[2]      = (524,0,12)
+RELATIVE VECTORS = 
+E[1]      = (-1.0003,0,1.0003)
+E[2]      = (-1.0003,0,1.0003)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (524,0,12)
+P1 = (524,0,12)
+P2 = (-524,0,12)
+Side lengths = P0->P10
+Side lengths = P0->P21048
+Side lengths = P1->P21048
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (524,0,12)
+P[1]      = (524,0,12)
+P[2]      = (-524,0,12)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (-1048,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (524,0,12)
+P1 = (524,0,12)
+P2 = (-524,0,12)
+Side lengths = P0->P10
+Side lengths = P0->P21048
+Side lengths = P1->P21048
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (524,0,12)
+P[1]      = (524,0,12)
+P[2]      = (-524,0,12)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (-1048,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (524,0,12)
+P1 = (524,0,12)
+P2 = (-524,0,12)
+Side lengths = P0->P10
+Side lengths = P0->P21048
+Side lengths = P1->P21048
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (524,0,12)
+P[1]      = (524,0,12)
+P[2]      = (-524,0,12)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (-1048,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (524,0,12)
+P1 = (525,0,10.9997)
+P2 = (524,0,12)
+Side lengths = P0->P11.41464
+Side lengths = P0->P20
+Side lengths = P1->P21.41464
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (524,0,12)
+P[1]      = (525,0,10.9997)
+P[2]      = (524,0,12)
+RELATIVE VECTORS = 
+E[1]      = (1.0003,0,-1.0003)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (525,0,10.9997)
+P1 = (524,0,12)
+P2 = (524,0,12)
+Side lengths = P0->P11.41464
+Side lengths = P0->P21.41464
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (525,0,10.9997)
+P[1]      = (524,0,12)
+P[2]      = (524,0,12)
+RELATIVE VECTORS = 
+E[1]      = (-1.0003,0,1.0003)
+E[2]      = (-1.0003,0,1.0003)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (525,0,10.9997)
+P1 = (524,0,12)
+P2 = (524,0,12)
+Side lengths = P0->P11.41464
+Side lengths = P0->P21.41464
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (525,0,10.9997)
+P[1]      = (524,0,12)
+P[2]      = (524,0,12)
+RELATIVE VECTORS = 
+E[1]      = (-1.0003,0,1.0003)
+E[2]      = (-1.0003,0,1.0003)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (524,0,12)
+P1 = (524,0,12)
+P2 = (-524,0,12)
+Side lengths = P0->P10
+Side lengths = P0->P21048
+Side lengths = P1->P21048
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (524,0,12)
+P[1]      = (524,0,12)
+P[2]      = (-524,0,12)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (-1048,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (524,0,12)
+P1 = (524,0,12)
+P2 = (-524,0,12)
+Side lengths = P0->P10
+Side lengths = P0->P21048
+Side lengths = P1->P21048
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (524,0,12)
+P[1]      = (524,0,12)
+P[2]      = (-524,0,12)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (-1048,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (524,0,12)
+P1 = (524,0,12)
+P2 = (-524,0,12)
+Side lengths = P0->P10
+Side lengths = P0->P21048
+Side lengths = P1->P21048
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (524,0,12)
+P[1]      = (524,0,12)
+P[2]      = (-524,0,12)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (-1048,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (524,0,12)
+P1 = (525,0,10.9997)
+P2 = (524,0,12)
+Side lengths = P0->P11.41464
+Side lengths = P0->P20
+Side lengths = P1->P21.41464
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (524,0,12)
+P[1]      = (525,0,10.9997)
+P[2]      = (524,0,12)
+RELATIVE VECTORS = 
+E[1]      = (1.0003,0,-1.0003)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (525,0,10.9997)
+P1 = (524,0,12)
+P2 = (524,0,12)
+Side lengths = P0->P11.41464
+Side lengths = P0->P21.41464
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (525,0,10.9997)
+P[1]      = (524,0,12)
+P[2]      = (524,0,12)
+RELATIVE VECTORS = 
+E[1]      = (-1.0003,0,1.0003)
+E[2]      = (-1.0003,0,1.0003)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (525,0,10.9997)
+P1 = (524,0,12)
+P2 = (524,0,12)
+Side lengths = P0->P11.41464
+Side lengths = P0->P21.41464
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (525,0,10.9997)
+P[1]      = (524,0,12)
+P[2]      = (524,0,12)
+RELATIVE VECTORS = 
+E[1]      = (-1.0003,0,1.0003)
+E[2]      = (-1.0003,0,1.0003)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (524,0,12)
+P1 = (524,0,12)
+P2 = (-524,0,12)
+Side lengths = P0->P10
+Side lengths = P0->P21048
+Side lengths = P1->P21048
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (524,0,12)
+P[1]      = (524,0,12)
+P[2]      = (-524,0,12)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (-1048,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (524,0,12)
+P1 = (524,0,12)
+P2 = (-524,0,12)
+Side lengths = P0->P10
+Side lengths = P0->P21048
+Side lengths = P1->P21048
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (524,0,12)
+P[1]      = (524,0,12)
+P[2]      = (-524,0,12)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (-1048,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (524,0,12)
+P1 = (524,0,12)
+P2 = (-524,0,12)
+Side lengths = P0->P10
+Side lengths = P0->P21048
+Side lengths = P1->P21048
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (524,0,12)
+P[1]      = (524,0,12)
+P[2]      = (-524,0,12)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (-1048,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (524,0,12)
+P1 = (525,0,10.9997)
+P2 = (524,0,12)
+Side lengths = P0->P11.41464
+Side lengths = P0->P20
+Side lengths = P1->P21.41464
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (524,0,12)
+P[1]      = (525,0,10.9997)
+P[2]      = (524,0,12)
+RELATIVE VECTORS = 
+E[1]      = (1.0003,0,-1.0003)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (525,0,10.9997)
+P1 = (524,0,12)
+P2 = (524,0,12)
+Side lengths = P0->P11.41464
+Side lengths = P0->P21.41464
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (525,0,10.9997)
+P[1]      = (524,0,12)
+P[2]      = (524,0,12)
+RELATIVE VECTORS = 
+E[1]      = (-1.0003,0,1.0003)
+E[2]      = (-1.0003,0,1.0003)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (525,0,10.9997)
+P1 = (524,0,12)
+P2 = (524,0,12)
+Side lengths = P0->P11.41464
+Side lengths = P0->P21.41464
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (525,0,10.9997)
+P[1]      = (524,0,12)
+P[2]      = (524,0,12)
+RELATIVE VECTORS = 
+E[1]      = (-1.0003,0,1.0003)
+E[2]      = (-1.0003,0,1.0003)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,6,0)
+P1 = (-13.4742,-14,7.6449)
+P2 = (0,6,0)
+Side lengths = P0->P125.2982
+Side lengths = P0->P20
+Side lengths = P1->P225.2982
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,6,0)
+P[1]      = (-13.4742,-14,7.6449)
+P[2]      = (0,6,0)
+RELATIVE VECTORS = 
+E[1]      = (-13.4742,-20,7.6449)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,118.5,0)
+P1 = (0,118.5,0)
+P2 = (-13.0174,108.157,7.3857)
+Side lengths = P0->P10
+Side lengths = P0->P218.1929
+Side lengths = P1->P218.1929
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,118.5,0)
+P[1]      = (0,118.5,0)
+P[2]      = (-13.0174,108.157,7.3857)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (-13.0174,-10.3431,7.3857)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,6,0)
+P1 = (-13.4742,-14,7.6449)
+P2 = (0,6,0)
+Side lengths = P0->P125.2982
+Side lengths = P0->P20
+Side lengths = P1->P225.2982
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,6,0)
+P[1]      = (-13.4742,-14,7.6449)
+P[2]      = (0,6,0)
+RELATIVE VECTORS = 
+E[1]      = (-13.4742,-20,7.6449)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,118.5,0)
+P1 = (0,118.5,0)
+P2 = (-13.0174,108.157,7.3857)
+Side lengths = P0->P10
+Side lengths = P0->P218.1929
+Side lengths = P1->P218.1929
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,118.5,0)
+P[1]      = (0,118.5,0)
+P[2]      = (-13.0174,108.157,7.3857)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (-13.0174,-10.3431,7.3857)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,6,0)
+P1 = (-13.4742,-14,7.6449)
+P2 = (0,6,0)
+Side lengths = P0->P125.2982
+Side lengths = P0->P20
+Side lengths = P1->P225.2982
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,6,0)
+P[1]      = (-13.4742,-14,7.6449)
+P[2]      = (0,6,0)
+RELATIVE VECTORS = 
+E[1]      = (-13.4742,-20,7.6449)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,118.5,0)
+P1 = (0,118.5,0)
+P2 = (-13.0174,108.157,7.3857)
+Side lengths = P0->P10
+Side lengths = P0->P218.1929
+Side lengths = P1->P218.1929
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,118.5,0)
+P[1]      = (0,118.5,0)
+P[2]      = (-13.0174,108.157,7.3857)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (-13.0174,-10.3431,7.3857)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (1.6378,25.0501,0.5144)
+P1 = (-0.0379,24.9718,-0.4299)
+P2 = (-0.0379,24.9718,-0.4299)
+Side lengths = P0->P11.92505
+Side lengths = P0->P21.92505
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (1.6378,25.0501,0.5144)
+P[1]      = (-0.0379,24.9718,-0.4299)
+P[2]      = (-0.0379,24.9718,-0.4299)
+RELATIVE VECTORS = 
+E[1]      = (-1.6757,-0.0783,-0.9443)
+E[2]      = (-1.6757,-0.0783,-0.9443)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (8.38,-19.0285,-2.8013)
+P1 = (0.1667,-19.0285,1.8587)
+P2 = (8.38,-19.0285,-2.8013)
+Side lengths = P0->P19.44319
+Side lengths = P0->P20
+Side lengths = P1->P29.44319
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (8.38,-19.0285,-2.8013)
+P[1]      = (0.1667,-19.0285,1.8587)
+P[2]      = (8.38,-19.0285,-2.8013)
+RELATIVE VECTORS = 
+E[1]      = (-8.2133,0,4.66)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (8.38,-19.0285,-2.8013)
+P1 = (8.38,-19.0285,-2.8013)
+P2 = (0.1667,-19.0285,1.8587)
+Side lengths = P0->P10
+Side lengths = P0->P29.44319
+Side lengths = P1->P29.44319
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (8.38,-19.0285,-2.8013)
+P[1]      = (8.38,-19.0285,-2.8013)
+P[2]      = (0.1667,-19.0285,1.8587)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (-8.2133,0,4.66)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (8.38,-19.0285,-2.8013)
+P1 = (8.38,-19.0285,-2.8013)
+P2 = (0.1667,-19.0285,1.8587)
+Side lengths = P0->P10
+Side lengths = P0->P29.44319
+Side lengths = P1->P29.44319
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (8.38,-19.0285,-2.8013)
+P[1]      = (8.38,-19.0285,-2.8013)
+P[2]      = (0.1667,-19.0285,1.8587)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (-8.2133,0,4.66)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (2.8092,-24.8935,2.5791)
+P1 = (1.1336,-24.9718,1.6349)
+P2 = (1.1336,-24.9718,1.6349)
+Side lengths = P0->P11.92491
+Side lengths = P0->P21.92491
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (2.8092,-24.8935,2.5791)
+P[1]      = (1.1336,-24.9718,1.6349)
+P[2]      = (1.1336,-24.9718,1.6349)
+RELATIVE VECTORS = 
+E[1]      = (-1.6756,-0.0783,-0.9442)
+E[2]      = (-1.6756,-0.0783,-0.9442)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (8.38,-19.0285,-2.8013)
+P1 = (8.38,-19.0285,-2.8013)
+P2 = (10.5698,-19.6975,-4.0072)
+Side lengths = P0->P10
+Side lengths = P0->P22.58785
+Side lengths = P1->P22.58785
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (8.38,-19.0285,-2.8013)
+P[1]      = (8.38,-19.0285,-2.8013)
+P[2]      = (10.5698,-19.6975,-4.0072)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (2.1898,-0.669,-1.2059)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (8.38,-19.0285,-2.8013)
+P1 = (8.38,-19.0285,-2.8013)
+P2 = (10.5698,-19.6975,-4.0072)
+Side lengths = P0->P10
+Side lengths = P0->P22.58785
+Side lengths = P1->P22.58785
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (8.38,-19.0285,-2.8013)
+P[1]      = (8.38,-19.0285,-2.8013)
+P[2]      = (10.5698,-19.6975,-4.0072)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (2.1898,-0.669,-1.2059)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (8.38,-19.0285,-2.8013)
+P1 = (8.38,-19.0285,-2.8013)
+P2 = (10.5698,-19.6975,-4.0072)
+Side lengths = P0->P10
+Side lengths = P0->P22.58785
+Side lengths = P1->P22.58785
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (8.38,-19.0285,-2.8013)
+P[1]      = (8.38,-19.0285,-2.8013)
+P[2]      = (10.5698,-19.6975,-4.0072)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (2.1898,-0.669,-1.2059)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (5.7311,35,-4.6345)
+P1 = (4.0546,35,-5.5803)
+P2 = (5.7311,35,-4.6345)
+Side lengths = P0->P11.92489
+Side lengths = P0->P20
+Side lengths = P1->P21.92489
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (5.7311,35,-4.6345)
+P[1]      = (4.0546,35,-5.5803)
+P[2]      = (5.7311,35,-4.6345)
+RELATIVE VECTORS = 
+E[1]      = (-1.6765,0,-0.9458)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-1.5683,-28.57,-0.4929)
+P1 = (6.5226,-28.57,-5.0835)
+P2 = (-1.5683,-28.57,-0.4929)
+Side lengths = P0->P19.30249
+Side lengths = P0->P20
+Side lengths = P1->P29.30249
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-1.5683,-28.57,-0.4929)
+P[1]      = (6.5226,-28.57,-5.0835)
+P[2]      = (-1.5683,-28.57,-0.4929)
+RELATIVE VECTORS = 
+E[1]      = (8.0909,0,-4.5906)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-1.5683,-28.57,-0.4929)
+P1 = (-1.5683,-28.57,-0.4929)
+P2 = (6.5226,-28.57,-5.0835)
+Side lengths = P0->P10
+Side lengths = P0->P29.30249
+Side lengths = P1->P29.30249
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-1.5683,-28.57,-0.4929)
+P[1]      = (-1.5683,-28.57,-0.4929)
+P[2]      = (6.5226,-28.57,-5.0835)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (8.0909,0,-4.5906)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-1.5683,-28.57,-0.4929)
+P1 = (-1.5683,-28.57,-0.4929)
+P2 = (6.5226,-28.57,-5.0835)
+Side lengths = P0->P10
+Side lengths = P0->P29.30249
+Side lengths = P1->P29.30249
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-1.5683,-28.57,-0.4929)
+P[1]      = (-1.5683,-28.57,-0.4929)
+P[2]      = (6.5226,-28.57,-5.0835)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (8.0909,0,-4.5906)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (5.7311,-35,-4.6345)
+P1 = (4.0546,-35,-5.5803)
+P2 = (5.7311,-35,-4.6345)
+Side lengths = P0->P11.92489
+Side lengths = P0->P20
+Side lengths = P1->P21.92489
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (5.7311,-35,-4.6345)
+P[1]      = (4.0546,-35,-5.5803)
+P[2]      = (5.7311,-35,-4.6345)
+RELATIVE VECTORS = 
+E[1]      = (-1.6765,0,-0.9458)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-1.5683,-28.57,-0.4929)
+P1 = (-1.5683,-28.57,-0.4929)
+P2 = (-3.7418,-29.2396,0.7402)
+Side lengths = P0->P10
+Side lengths = P0->P22.58708
+Side lengths = P1->P22.58708
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-1.5683,-28.57,-0.4929)
+P[1]      = (-1.5683,-28.57,-0.4929)
+P[2]      = (-3.7418,-29.2396,0.7402)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (-2.1735,-0.6696,1.2331)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-1.5683,-28.57,-0.4929)
+P1 = (-1.5683,-28.57,-0.4929)
+P2 = (-3.7418,-29.2396,0.7402)
+Side lengths = P0->P10
+Side lengths = P0->P22.58708
+Side lengths = P1->P22.58708
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-1.5683,-28.57,-0.4929)
+P[1]      = (-1.5683,-28.57,-0.4929)
+P[2]      = (-3.7418,-29.2396,0.7402)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (-2.1735,-0.6696,1.2331)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-1.5683,-28.57,-0.4929)
+P1 = (-1.5683,-28.57,-0.4929)
+P2 = (-3.7418,-29.2396,0.7402)
+Side lengths = P0->P10
+Side lengths = P0->P22.58708
+Side lengths = P1->P22.58708
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-1.5683,-28.57,-0.4929)
+P[1]      = (-1.5683,-28.57,-0.4929)
+P[2]      = (-3.7418,-29.2396,0.7402)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (-2.1735,-0.6696,1.2331)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (5.7311,35,-4.6345)
+P1 = (4.0546,35,-5.5803)
+P2 = (5.7311,35,-4.6345)
+Side lengths = P0->P11.92489
+Side lengths = P0->P20
+Side lengths = P1->P21.92489
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (5.7311,35,-4.6345)
+P[1]      = (4.0546,35,-5.5803)
+P[2]      = (5.7311,35,-4.6345)
+RELATIVE VECTORS = 
+E[1]      = (-1.6765,0,-0.9458)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-1.5683,-28.57,-0.4929)
+P1 = (6.5226,-28.57,-5.0835)
+P2 = (-1.5683,-28.57,-0.4929)
+Side lengths = P0->P19.30249
+Side lengths = P0->P20
+Side lengths = P1->P29.30249
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-1.5683,-28.57,-0.4929)
+P[1]      = (6.5226,-28.57,-5.0835)
+P[2]      = (-1.5683,-28.57,-0.4929)
+RELATIVE VECTORS = 
+E[1]      = (8.0909,0,-4.5906)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-1.5683,-28.57,-0.4929)
+P1 = (-1.5683,-28.57,-0.4929)
+P2 = (6.5226,-28.57,-5.0835)
+Side lengths = P0->P10
+Side lengths = P0->P29.30249
+Side lengths = P1->P29.30249
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-1.5683,-28.57,-0.4929)
+P[1]      = (-1.5683,-28.57,-0.4929)
+P[2]      = (6.5226,-28.57,-5.0835)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (8.0909,0,-4.5906)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-1.5683,-28.57,-0.4929)
+P1 = (-1.5683,-28.57,-0.4929)
+P2 = (6.5226,-28.57,-5.0835)
+Side lengths = P0->P10
+Side lengths = P0->P29.30249
+Side lengths = P1->P29.30249
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-1.5683,-28.57,-0.4929)
+P[1]      = (-1.5683,-28.57,-0.4929)
+P[2]      = (6.5226,-28.57,-5.0835)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (8.0909,0,-4.5906)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (5.7311,-35,-4.6345)
+P1 = (4.0546,-35,-5.5803)
+P2 = (5.7311,-35,-4.6345)
+Side lengths = P0->P11.92489
+Side lengths = P0->P20
+Side lengths = P1->P21.92489
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (5.7311,-35,-4.6345)
+P[1]      = (4.0546,-35,-5.5803)
+P[2]      = (5.7311,-35,-4.6345)
+RELATIVE VECTORS = 
+E[1]      = (-1.6765,0,-0.9458)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-1.5683,-28.57,-0.4929)
+P1 = (-1.5683,-28.57,-0.4929)
+P2 = (-3.7418,-29.2396,0.7402)
+Side lengths = P0->P10
+Side lengths = P0->P22.58708
+Side lengths = P1->P22.58708
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-1.5683,-28.57,-0.4929)
+P[1]      = (-1.5683,-28.57,-0.4929)
+P[2]      = (-3.7418,-29.2396,0.7402)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (-2.1735,-0.6696,1.2331)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-1.5683,-28.57,-0.4929)
+P1 = (-1.5683,-28.57,-0.4929)
+P2 = (-3.7418,-29.2396,0.7402)
+Side lengths = P0->P10
+Side lengths = P0->P22.58708
+Side lengths = P1->P22.58708
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-1.5683,-28.57,-0.4929)
+P[1]      = (-1.5683,-28.57,-0.4929)
+P[2]      = (-3.7418,-29.2396,0.7402)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (-2.1735,-0.6696,1.2331)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-1.5683,-28.57,-0.4929)
+P1 = (-1.5683,-28.57,-0.4929)
+P2 = (-3.7418,-29.2396,0.7402)
+Side lengths = P0->P10
+Side lengths = P0->P22.58708
+Side lengths = P1->P22.58708
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-1.5683,-28.57,-0.4929)
+P[1]      = (-1.5683,-28.57,-0.4929)
+P[2]      = (-3.7418,-29.2396,0.7402)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (-2.1735,-0.6696,1.2331)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (40.3918,34.9605,-26.0797)
+P1 = (42.0674,35.0389,-25.1354)
+P2 = (40.3918,34.9605,-26.0797)
+Side lengths = P0->P11.92496
+Side lengths = P0->P20
+Side lengths = P1->P21.92496
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (40.3918,34.9605,-26.0797)
+P[1]      = (42.0674,35.0389,-25.1354)
+P[2]      = (40.3918,34.9605,-26.0797)
+RELATIVE VECTORS = 
+E[1]      = (1.6756,0.0784,0.9443)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (42.0318,-34.9605,-23.1891)
+P1 = (43.7074,-34.8822,-22.2448)
+P2 = (42.0318,-34.9605,-23.1891)
+Side lengths = P0->P11.92496
+Side lengths = P0->P20
+Side lengths = P1->P21.92496
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (42.0318,-34.9605,-23.1891)
+P[1]      = (43.7074,-34.8822,-22.2448)
+P[2]      = (42.0318,-34.9605,-23.1891)
+RELATIVE VECTORS = 
+E[1]      = (1.6756,0.0783,0.9443)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (47.841,28.5378,-29.9552)
+P1 = (39.6279,28.5378,-25.2953)
+P2 = (47.841,28.5378,-29.9552)
+Side lengths = P0->P19.44297
+Side lengths = P0->P20
+Side lengths = P1->P29.44297
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (47.841,28.5378,-29.9552)
+P[1]      = (39.6279,28.5378,-25.2953)
+P[2]      = (47.841,28.5378,-29.9552)
+RELATIVE VECTORS = 
+E[1]      = (-8.2131,0,4.6599)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (47.841,28.5378,-29.9552)
+P1 = (47.841,28.5378,-29.9552)
+P2 = (39.6279,28.5378,-25.2953)
+Side lengths = P0->P10
+Side lengths = P0->P29.44297
+Side lengths = P1->P29.44297
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (47.841,28.5378,-29.9552)
+P[1]      = (47.841,28.5378,-29.9552)
+P[2]      = (39.6279,28.5378,-25.2953)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (-8.2131,0,4.6599)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (47.841,28.5378,-29.9552)
+P1 = (47.841,28.5378,-29.9552)
+P2 = (39.6279,28.5378,-25.2953)
+Side lengths = P0->P10
+Side lengths = P0->P29.44297
+Side lengths = P1->P29.44297
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (47.841,28.5378,-29.9552)
+P[1]      = (47.841,28.5378,-29.9552)
+P[2]      = (39.6279,28.5378,-25.2953)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (-8.2131,0,4.6599)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (47.841,28.5378,-29.9552)
+P1 = (47.841,28.5378,-29.9552)
+P2 = (47.841,28.5378,-29.9552)
+Side lengths = P0->P10
+Side lengths = P0->P20
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (47.841,28.5378,-29.9552)
+P[1]      = (47.841,28.5378,-29.9552)
+P[2]      = (47.841,28.5378,-29.9552)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (47.841,28.5378,-29.9552)
+P1 = (49.9996,29.2069,-31.2165)
+P2 = (47.841,28.5378,-29.9552)
+Side lengths = P0->P12.58807
+Side lengths = P0->P20
+Side lengths = P1->P22.58807
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (47.841,28.5378,-29.9552)
+P[1]      = (49.9996,29.2069,-31.2165)
+P[2]      = (47.841,28.5378,-29.9552)
+RELATIVE VECTORS = 
+E[1]      = (2.1586,0.6691,-1.2613)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (47.841,28.5378,-29.9552)
+P1 = (49.9996,29.2069,-31.2165)
+P2 = (47.841,28.5378,-29.9552)
+Side lengths = P0->P12.58807
+Side lengths = P0->P20
+Side lengths = P1->P22.58807
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (47.841,28.5378,-29.9552)
+P[1]      = (49.9996,29.2069,-31.2165)
+P[2]      = (47.841,28.5378,-29.9552)
+RELATIVE VECTORS = 
+E[1]      = (2.1586,0.6691,-1.2613)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-2179.09,152.213,1240.61)
+P1 = (-2178.82,154.172,1236.2)
+P2 = (-2178.82,154.172,1236.2)
+Side lengths = P0->P14.83597
+Side lengths = P0->P24.83597
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-2179.09,152.213,1240.61)
+P[1]      = (-2178.82,154.172,1236.2)
+P[2]      = (-2178.82,154.172,1236.2)
+RELATIVE VECTORS = 
+E[1]      = (0.2766,1.9598,-4.4124)
+E[2]      = (0.2766,1.9598,-4.4124)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (2146.86,-146.558,-1236.63)
+P1 = (2140.5,-150.238,-1239.75)
+P2 = (2140.5,-150.238,-1239.75)
+Side lengths = P0->P17.98755
+Side lengths = P0->P27.98755
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (2146.86,-146.558,-1236.63)
+P[1]      = (2140.5,-150.238,-1239.75)
+P[2]      = (2140.5,-150.238,-1239.75)
+RELATIVE VECTORS = 
+E[1]      = (-6.364,-3.68,-3.1238)
+E[2]      = (-6.364,-3.68,-3.1238)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (2081.22,57.8248,-1344.23)
+P1 = (2084.2,50.979,-1347.07)
+P2 = (2081.22,57.8248,-1344.23)
+Side lengths = P0->P17.9876
+Side lengths = P0->P20
+Side lengths = P1->P27.9876
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (2081.22,57.8248,-1344.23)
+P[1]      = (2084.2,50.979,-1347.07)
+P[2]      = (2081.22,57.8248,-1344.23)
+RELATIVE VECTORS = 
+E[1]      = (2.9836,-6.8458,-2.8346)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (2095.06,89.0841,-1327.93)
+P1 = (2092.07,95.9299,-1325.1)
+P2 = (2092.07,95.9299,-1325.1)
+Side lengths = P0->P17.9876
+Side lengths = P0->P27.9876
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (2095.06,89.0841,-1327.93)
+P[1]      = (2092.07,95.9299,-1325.1)
+P[2]      = (2092.07,95.9299,-1325.1)
+RELATIVE VECTORS = 
+E[1]      = (-2.9837,6.8458,2.8345)
+E[2]      = (-2.9837,6.8458,2.8345)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-2117.28,-77.5794,1349.57)
+P1 = (-2113.43,-75.3276,1351.45)
+P2 = (-2113.43,-75.3276,1351.45)
+Side lengths = P0->P14.83588
+Side lengths = P0->P24.83588
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-2117.28,-77.5794,1349.57)
+P[1]      = (-2113.43,-75.3276,1351.45)
+P[2]      = (-2113.43,-75.3276,1351.45)
+RELATIVE VECTORS = 
+E[1]      = (3.8455,2.2518,1.8781)
+E[2]      = (3.8455,2.2518,1.8781)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-2244.2,-75.3276,1120.96)
+P1 = (-2246.39,-71.1429,1122.01)
+P2 = (-2244.2,-75.3276,1120.96)
+Side lengths = P0->P14.83576
+Side lengths = P0->P20
+Side lengths = P1->P24.83576
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-2244.2,-75.3276,1120.96)
+P[1]      = (-2246.39,-71.1429,1122.01)
+P[2]      = (-2244.2,-75.3276,1120.96)
+RELATIVE VECTORS = 
+E[1]      = (-2.1845,4.1847,1.0492)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (2210.63,95.9299,-1116.14)
+P1 = (2210.63,95.9299,-1116.14)
+P2 = (2211.12,99.2973,-1123.37)
+Side lengths = P0->P10
+Side lengths = P0->P27.98754
+Side lengths = P1->P27.98754
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (2210.63,95.9299,-1116.14)
+P[1]      = (2210.63,95.9299,-1116.14)
+P[2]      = (2211.12,99.2973,-1123.37)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (0.4919,3.3674,-7.2263)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (2221.49,57.8248,-1097.01)
+P1 = (2221.49,57.8248,-1097.01)
+P2 = (2221.98,61.1922,-1104.23)
+Side lengths = P0->P10
+Side lengths = P0->P27.98771
+Side lengths = P1->P27.98771
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (2221.49,57.8248,-1097.01)
+P[1]      = (2221.49,57.8248,-1097.01)
+P[2]      = (2221.98,61.1922,-1104.23)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (0.4917,3.3674,-7.2265)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (2168.57,-146.558,-1198.36)
+P1 = (2162.21,-150.238,-1201.48)
+P2 = (2162.21,-150.238,-1201.48)
+Side lengths = P0->P17.98775
+Side lengths = P0->P27.98775
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (2168.57,-146.558,-1198.36)
+P[1]      = (2162.21,-150.238,-1201.48)
+P[2]      = (2162.21,-150.238,-1201.48)
+RELATIVE VECTORS = 
+E[1]      = (-6.3643,-3.68,-3.1237)
+E[2]      = (-6.3643,-3.68,-3.1237)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (62.6716,-125.8,110.459)
+P1 = (62.6716,-125.8,110.459)
+P2 = (62.0795,-127,109.416)
+Side lengths = P0->P10
+Side lengths = P0->P21.69702
+Side lengths = P1->P21.69702
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (62.6716,-125.8,110.459)
+P[1]      = (62.6716,-125.8,110.459)
+P[2]      = (62.0795,-127,109.416)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (-0.5921,-1.2,-1.0437)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (62.6716,-125.8,110.459)
+P1 = (76.0217,127,101.734)
+P2 = (62.6716,-125.8,110.459)
+Side lengths = P0->P1253.303
+Side lengths = P0->P20
+Side lengths = P1->P2253.303
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (62.6716,-125.8,110.459)
+P[1]      = (76.0217,127,101.734)
+P[2]      = (62.6716,-125.8,110.459)
+RELATIVE VECTORS = 
+E[1]      = (13.3501,252.8,-8.7258)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-143.355,-1,-252.665)
+P1 = (-142.121,-2.5022,-250.49)
+P2 = (-142.121,-2.5022,-250.49)
+Side lengths = P0->P12.91661
+Side lengths = P0->P22.91661
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-143.355,-1,-252.665)
+P[1]      = (-142.121,-2.5022,-250.49)
+P[2]      = (-142.121,-2.5022,-250.49)
+RELATIVE VECTORS = 
+E[1]      = (1.2337,-1.5022,2.1744)
+E[2]      = (1.2337,-1.5022,2.1744)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-287.992,-2.5022,-2.1644)
+P1 = (-289.226,-1,-4.3388)
+P2 = (-287.992,-2.5022,-2.1644)
+Side lengths = P0->P12.91661
+Side lengths = P0->P20
+Side lengths = P1->P22.91661
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-287.992,-2.5022,-2.1644)
+P[1]      = (-289.226,-1,-4.3388)
+P[2]      = (-287.992,-2.5022,-2.1644)
+RELATIVE VECTORS = 
+E[1]      = (-1.2337,1.5022,-2.1744)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-145.87,-2.5022,248.326)
+P1 = (-147.104,-1,246.152)
+P2 = (-145.87,-2.5022,248.326)
+Side lengths = P0->P12.91657
+Side lengths = P0->P20
+Side lengths = P1->P22.91657
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-145.87,-2.5022,248.326)
+P[1]      = (-147.104,-1,246.152)
+P[2]      = (-145.87,-2.5022,248.326)
+RELATIVE VECTORS = 
+E[1]      = (-1.2336,1.5022,-2.1744)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-290.937,1,24.2261)
+P1 = (-292.171,2.5022,22.0517)
+P2 = (-292.171,2.5022,22.0517)
+Side lengths = P0->P12.91661
+Side lengths = P0->P22.91661
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-290.937,1,24.2261)
+P[1]      = (-292.171,2.5022,22.0517)
+P[2]      = (-292.171,2.5022,22.0517)
+RELATIVE VECTORS = 
+E[1]      = (-1.2337,1.5022,-2.1744)
+E[2]      = (-1.2337,1.5022,-2.1744)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (140.888,-1,248.316)
+P1 = (142.121,-2.5022,250.49)
+P2 = (142.121,-2.5022,250.49)
+Side lengths = P0->P12.91661
+Side lengths = P0->P22.91661
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (140.888,-1,248.316)
+P[1]      = (142.121,-2.5022,250.49)
+P[2]      = (142.121,-2.5022,250.49)
+RELATIVE VECTORS = 
+E[1]      = (1.2337,-1.5022,2.1744)
+E[2]      = (1.2337,-1.5022,2.1744)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (287.992,-2.5022,2.1644)
+P1 = (286.758,-1,-0.01)
+P2 = (287.992,-2.5022,2.1644)
+Side lengths = P0->P12.91661
+Side lengths = P0->P20
+Side lengths = P1->P22.91661
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (287.992,-2.5022,2.1644)
+P[1]      = (286.758,-1,-0.01)
+P[2]      = (287.992,-2.5022,2.1644)
+RELATIVE VECTORS = 
+E[1]      = (-1.2337,1.5022,-2.1744)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-247.449,1,-0.4478)
+P1 = (-248.683,2.5022,-2.6222)
+P2 = (-248.683,2.5022,-2.6222)
+Side lengths = P0->P12.91661
+Side lengths = P0->P22.91661
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-247.449,1,-0.4478)
+P[1]      = (-248.683,2.5022,-2.6222)
+P[2]      = (-248.683,2.5022,-2.6222)
+RELATIVE VECTORS = 
+E[1]      = (-1.2337,1.5022,-2.1744)
+E[2]      = (-1.2337,1.5022,-2.1744)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-167.568,1,241.666)
+P1 = (-168.801,2.5022,239.491)
+P2 = (-168.801,2.5022,239.491)
+Side lengths = P0->P12.91661
+Side lengths = P0->P22.91661
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-167.568,1,241.666)
+P[1]      = (-168.801,2.5022,239.491)
+P[2]      = (-168.801,2.5022,239.491)
+RELATIVE VECTORS = 
+E[1]      = (-1.2337,1.5022,-2.1744)
+E[2]      = (-1.2337,1.5022,-2.1744)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-124.08,1,216.992)
+P1 = (-125.313,2.5022,214.817)
+P2 = (-125.313,2.5022,214.817)
+Side lengths = P0->P12.91661
+Side lengths = P0->P22.91661
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-124.08,1,216.992)
+P[1]      = (-125.313,2.5022,214.817)
+P[2]      = (-125.313,2.5022,214.817)
+RELATIVE VECTORS = 
+E[1]      = (-1.2337,1.5022,-2.1744)
+E[2]      = (-1.2337,1.5022,-2.1744)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (145.87,-2.5022,-248.326)
+P1 = (144.637,-1,-250.5)
+P2 = (145.87,-2.5022,-248.326)
+Side lengths = P0->P12.91661
+Side lengths = P0->P20
+Side lengths = P1->P22.91661
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (145.87,-2.5022,-248.326)
+P[1]      = (144.637,-1,-250.5)
+P[2]      = (145.87,-2.5022,-248.326)
+RELATIVE VECTORS = 
+E[1]      = (-1.2337,1.5022,-2.1744)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-31.0427,-29.0839,-65.8975)
+P1 = (-28.5025,-29.0839,-64.4643)
+P2 = (-28.5025,-29.0839,-64.4643)
+Side lengths = P0->P12.91662
+Side lengths = P0->P22.91662
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-31.0427,-29.0839,-65.8975)
+P[1]      = (-28.5025,-29.0839,-64.4643)
+P[2]      = (-28.5025,-29.0839,-64.4643)
+RELATIVE VECTORS = 
+E[1]      = (2.5402,0,1.4332)
+E[2]      = (2.5402,0,1.4332)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-8.2053,-70.2148,-28.6904)
+P1 = (-10.7455,-70.2148,-30.1235)
+P2 = (-8.2053,-70.2148,-28.6904)
+Side lengths = P0->P12.91657
+Side lengths = P0->P20
+Side lengths = P1->P22.91657
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-8.2053,-70.2148,-28.6904)
+P[1]      = (-10.7455,-70.2148,-30.1235)
+P[2]      = (-8.2053,-70.2148,-28.6904)
+RELATIVE VECTORS = 
+E[1]      = (-2.5402,0,-1.4331)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-20.3726,-53.7401,-50.1353)
+P1 = (-22.9128,-53.7401,-51.5684)
+P2 = (-20.3726,-53.7401,-50.1353)
+Side lengths = P0->P12.91657
+Side lengths = P0->P20
+Side lengths = P1->P22.91657
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-20.3726,-53.7401,-50.1353)
+P[1]      = (-22.9128,-53.7401,-51.5684)
+P[2]      = (-20.3726,-53.7401,-50.1353)
+RELATIVE VECTORS = 
+E[1]      = (-2.5402,0,-1.4331)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (16.9837,-47.5151,45.093)
+P1 = (21.8084,-35.1126,53.5967)
+P2 = (21.8084,-35.1126,53.5967)
+Side lengths = P0->P115.7928
+Side lengths = P0->P215.7928
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (16.9837,-47.5151,45.093)
+P[1]      = (21.8084,-35.1126,53.5967)
+P[2]      = (21.8084,-35.1126,53.5967)
+RELATIVE VECTORS = 
+E[1]      = (4.8247,12.4025,8.5037)
+E[2]      = (4.8247,12.4025,8.5037)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (22.6416,-33.75,54.4573)
+P1 = (21.8084,-35.1126,53.5967)
+P2 = (21.8084,-35.1126,53.5967)
+Side lengths = P0->P11.81426
+Side lengths = P0->P21.81426
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (22.6416,-33.75,54.4573)
+P[1]      = (21.8084,-35.1126,53.5967)
+P[2]      = (21.8084,-35.1126,53.5967)
+RELATIVE VECTORS = 
+E[1]      = (-0.8332,-1.3626,-0.8606)
+E[2]      = (-0.8332,-1.3626,-0.8606)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (26.6953,0,62.2099)
+P1 = (25.7789,15.6887,60.5948)
+P2 = (26.6953,0,62.2099)
+Side lengths = P0->P115.7982
+Side lengths = P0->P20
+Side lengths = P1->P215.7982
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (26.6953,0,62.2099)
+P[1]      = (25.7789,15.6887,60.5948)
+P[2]      = (26.6953,0,62.2099)
+RELATIVE VECTORS = 
+E[1]      = (-0.9164,15.6887,-1.6151)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (26.6953,0,62.2099)
+P1 = (26.6953,0,62.2099)
+P2 = (26.2869,-10.5144,61.4901)
+Side lengths = P0->P10
+Side lengths = P0->P210.5469
+Side lengths = P1->P210.5469
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (26.6953,0,62.2099)
+P[1]      = (26.6953,0,62.2099)
+P[2]      = (26.2869,-10.5144,61.4901)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (-0.4084,-10.5144,-0.7198)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-34.7412,35.1126,-46.0725)
+P1 = (-34.7412,35.1126,-46.0725)
+P2 = (-35.0525,33.75,-47.2292)
+Side lengths = P0->P10
+Side lengths = P0->P21.81426
+Side lengths = P1->P21.81426
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-34.7412,35.1126,-46.0725)
+P[1]      = (-34.7412,35.1126,-46.0725)
+P[2]      = (-35.0525,33.75,-47.2292)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (-0.3113,-1.3626,-1.1567)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-34.7412,35.1126,-46.0725)
+P1 = (-34.7412,35.1126,-46.0725)
+P2 = (-29.9165,47.5151,-37.5689)
+Side lengths = P0->P10
+Side lengths = P0->P215.7927
+Side lengths = P1->P215.7927
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-34.7412,35.1126,-46.0725)
+P[1]      = (-34.7412,35.1126,-46.0725)
+P[2]      = (-29.9165,47.5151,-37.5689)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (4.8247,12.4025,8.5036)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-33.8975,0,-70.9292)
+P1 = (-31.3573,0,-69.496)
+P2 = (-31.3573,0,-69.496)
+Side lengths = P0->P12.91662
+Side lengths = P0->P22.91662
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-33.8975,0,-70.9292)
+P[1]      = (-31.3573,0,-69.496)
+P[2]      = (-31.3573,0,-69.496)
+RELATIVE VECTORS = 
+E[1]      = (2.5402,0,1.4332)
+E[2]      = (2.5402,0,1.4332)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-31.0427,29.0839,-65.8975)
+P1 = (-28.5025,29.0839,-64.4643)
+P2 = (-28.5025,29.0839,-64.4643)
+Side lengths = P0->P12.91662
+Side lengths = P0->P22.91662
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-31.0427,29.0839,-65.8975)
+P[1]      = (-28.5025,29.0839,-64.4643)
+P[2]      = (-28.5025,29.0839,-64.4643)
+RELATIVE VECTORS = 
+E[1]      = (2.5402,0,1.4332)
+E[2]      = (2.5402,0,1.4332)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (38.2562,-29.0839,56.2425)
+P1 = (40.7964,-29.0839,57.6756)
+P2 = (40.7964,-29.0839,57.6756)
+Side lengths = P0->P12.91657
+Side lengths = P0->P22.91657
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (38.2562,-29.0839,56.2425)
+P[1]      = (40.7964,-29.0839,57.6756)
+P[2]      = (40.7964,-29.0839,57.6756)
+RELATIVE VECTORS = 
+E[1]      = (2.5402,0,1.4331)
+E[2]      = (2.5402,0,1.4331)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (41.1111,0,61.2741)
+P1 = (43.6513,0,62.7073)
+P2 = (43.6513,0,62.7073)
+Side lengths = P0->P12.91662
+Side lengths = P0->P22.91662
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (41.1111,0,61.2741)
+P[1]      = (43.6513,0,62.7073)
+P[2]      = (43.6513,0,62.7073)
+RELATIVE VECTORS = 
+E[1]      = (2.5402,0,1.4332)
+E[2]      = (2.5402,0,1.4332)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (32.6665,-53.7401,43.3465)
+P1 = (30.1263,-53.7401,41.9134)
+P2 = (32.6665,-53.7401,43.3465)
+Side lengths = P0->P12.91657
+Side lengths = P0->P20
+Side lengths = P1->P22.91657
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (32.6665,-53.7401,43.3465)
+P[1]      = (30.1263,-53.7401,41.9134)
+P[2]      = (32.6665,-53.7401,43.3465)
+RELATIVE VECTORS = 
+E[1]      = (-2.5402,0,-1.4331)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-20.3726,53.7401,-50.1353)
+P1 = (-22.9128,53.7401,-51.5684)
+P2 = (-20.3726,53.7401,-50.1353)
+Side lengths = P0->P12.91657
+Side lengths = P0->P20
+Side lengths = P1->P22.91657
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-20.3726,53.7401,-50.1353)
+P[1]      = (-22.9128,53.7401,-51.5684)
+P[2]      = (-20.3726,53.7401,-50.1353)
+RELATIVE VECTORS = 
+E[1]      = (-2.5402,0,-1.4331)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-10.7455,70.2148,-30.1235)
+P1 = (-8.2053,70.2148,-28.6904)
+P2 = (-8.2053,70.2148,-28.6904)
+Side lengths = P0->P12.91657
+Side lengths = P0->P22.91657
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-10.7455,70.2148,-30.1235)
+P[1]      = (-8.2053,70.2148,-28.6904)
+P[2]      = (-8.2053,70.2148,-28.6904)
+RELATIVE VECTORS = 
+E[1]      = (2.5402,0,1.4331)
+E[2]      = (2.5402,0,1.4331)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (17.959,70.2148,20.4685)
+P1 = (20.4992,70.2148,21.9016)
+P2 = (20.4992,70.2148,21.9016)
+Side lengths = P0->P12.91657
+Side lengths = P0->P22.91657
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (17.959,70.2148,20.4685)
+P[1]      = (20.4992,70.2148,21.9016)
+P[2]      = (20.4992,70.2148,21.9016)
+RELATIVE VECTORS = 
+E[1]      = (2.5402,0,1.4331)
+E[2]      = (2.5402,0,1.4331)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (3.6068,76,-4.8275)
+P1 = (6.147,76,-3.3944)
+P2 = (6.147,76,-3.3944)
+Side lengths = P0->P12.91657
+Side lengths = P0->P22.91657
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (3.6068,76,-4.8275)
+P[1]      = (6.147,76,-3.3944)
+P[2]      = (6.147,76,-3.3944)
+RELATIVE VECTORS = 
+E[1]      = (2.5402,0,1.4331)
+E[2]      = (2.5402,0,1.4331)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (32.6665,53.7401,43.3465)
+P1 = (30.1263,53.7401,41.9134)
+P2 = (32.6665,53.7401,43.3465)
+Side lengths = P0->P12.91657
+Side lengths = P0->P20
+Side lengths = P1->P22.91657
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (32.6665,53.7401,43.3465)
+P[1]      = (30.1263,53.7401,41.9134)
+P[2]      = (32.6665,53.7401,43.3465)
+RELATIVE VECTORS = 
+E[1]      = (-2.5402,0,-1.4331)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (38.2562,29.0839,56.2425)
+P1 = (40.7964,29.0839,57.6756)
+P2 = (40.7964,29.0839,57.6756)
+Side lengths = P0->P12.91657
+Side lengths = P0->P22.91657
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (38.2562,29.0839,56.2425)
+P[1]      = (40.7964,29.0839,57.6756)
+P[2]      = (40.7964,29.0839,57.6756)
+RELATIVE VECTORS = 
+E[1]      = (2.5402,0,1.4331)
+E[2]      = (2.5402,0,1.4331)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (17.959,-70.2148,20.4685)
+P1 = (20.4992,-70.2148,21.9016)
+P2 = (20.4992,-70.2148,21.9016)
+Side lengths = P0->P12.91657
+Side lengths = P0->P22.91657
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (17.959,-70.2148,20.4685)
+P[1]      = (20.4992,-70.2148,21.9016)
+P[2]      = (20.4992,-70.2148,21.9016)
+RELATIVE VECTORS = 
+E[1]      = (2.5402,0,1.4331)
+E[2]      = (2.5402,0,1.4331)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (3.6068,-76,-4.8275)
+P1 = (6.147,-76,-3.3944)
+P2 = (6.147,-76,-3.3944)
+Side lengths = P0->P12.91657
+Side lengths = P0->P22.91657
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (3.6068,-76,-4.8275)
+P[1]      = (6.147,-76,-3.3944)
+P[2]      = (6.147,-76,-3.3944)
+RELATIVE VECTORS = 
+E[1]      = (2.5402,0,1.4331)
+E[2]      = (2.5402,0,1.4331)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (391.453,879.878,-198.966)
+P1 = (366.956,861.141,-242.143)
+P2 = (366.956,861.141,-242.143)
+Side lengths = P0->P153.0604
+Side lengths = P0->P253.0604
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (391.453,879.878,-198.966)
+P[1]      = (366.956,861.141,-242.143)
+P[2]      = (366.956,861.141,-242.143)
+RELATIVE VECTORS = 
+E[1]      = (-24.4972,-18.7369,-43.1766)
+E[2]      = (-24.4972,-18.7369,-43.1766)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (386.091,861.141,-252.998)
+P1 = (366.956,861.141,-242.143)
+P2 = (366.956,861.141,-242.143)
+Side lengths = P0->P121.9999
+Side lengths = P0->P221.9999
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (386.091,861.141,-252.998)
+P[1]      = (366.956,861.141,-242.143)
+P[2]      = (366.956,861.141,-242.143)
+RELATIVE VECTORS = 
+E[1]      = (-19.1355,-0.0009,10.8549)
+E[2]      = (-19.1355,-0.0009,10.8549)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,4.8296,-1.2941)
+P1 = (0,4.3301,-2.5)
+P2 = (0,4.8296,-1.2941)
+Side lengths = P0->P11.30526
+Side lengths = P0->P20
+Side lengths = P1->P21.30526
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,4.8296,-1.2941)
+P[1]      = (0,4.3301,-2.5)
+P[2]      = (0,4.8296,-1.2941)
+RELATIVE VECTORS = 
+E[1]      = (0,-0.4995,-1.2059)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,-4.3301,-2.5)
+P1 = (0,-4.3301,-2.5)
+P2 = (0,-4.8296,-1.2941)
+Side lengths = P0->P10
+Side lengths = P0->P21.30526
+Side lengths = P1->P21.30526
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,-4.3301,-2.5)
+P[1]      = (0,-4.3301,-2.5)
+P[2]      = (0,-4.8296,-1.2941)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (0,-0.4995,1.2059)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,-4.8296,-1.2941)
+P1 = (0,-5,0)
+P2 = (0,-4.8296,-1.2941)
+Side lengths = P0->P11.30527
+Side lengths = P0->P20
+Side lengths = P1->P21.30527
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,-4.8296,-1.2941)
+P[1]      = (0,-5,0)
+P[2]      = (0,-4.8296,-1.2941)
+RELATIVE VECTORS = 
+E[1]      = (0,-0.1704,1.2941)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,4.8296,-1.2941)
+P1 = (0,5,0)
+P2 = (0,5,0)
+Side lengths = P0->P11.30527
+Side lengths = P0->P21.30527
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,4.8296,-1.2941)
+P[1]      = (0,5,0)
+P[2]      = (0,5,0)
+RELATIVE VECTORS = 
+E[1]      = (0,0.1704,1.2941)
+E[2]      = (0,0.1704,1.2941)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,4.3301,-2.5)
+P1 = (0,4.3301,-2.5)
+P2 = (0,4.8296,-1.2941)
+Side lengths = P0->P10
+Side lengths = P0->P21.30526
+Side lengths = P1->P21.30526
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,4.3301,-2.5)
+P[1]      = (0,4.3301,-2.5)
+P[2]      = (0,4.8296,-1.2941)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (0,0.4995,1.2059)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,0,5)
+P1 = (0,4.3301,-2.5)
+P2 = (0,4.3301,-2.5)
+Side lengths = P0->P18.66024
+Side lengths = P0->P28.66024
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,0,5)
+P[1]      = (0,4.3301,-2.5)
+P[2]      = (0,4.3301,-2.5)
+RELATIVE VECTORS = 
+E[1]      = (0,4.3301,-7.5)
+E[2]      = (0,4.3301,-7.5)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,4.8296,-1.2941)
+P1 = (0,4.8296,-1.2941)
+P2 = (0,5,0)
+Side lengths = P0->P10
+Side lengths = P0->P21.30527
+Side lengths = P1->P21.30527
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,4.8296,-1.2941)
+P[1]      = (0,4.8296,-1.2941)
+P[2]      = (0,5,0)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (0,0.1704,1.2941)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,-5,0)
+P1 = (0,-4.8296,-1.2941)
+P2 = (0,-5,0)
+Side lengths = P0->P11.30527
+Side lengths = P0->P20
+Side lengths = P1->P21.30527
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,-5,0)
+P[1]      = (0,-4.8296,-1.2941)
+P[2]      = (0,-5,0)
+RELATIVE VECTORS = 
+E[1]      = (0,0.1704,-1.2941)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,-4.8296,-1.2941)
+P1 = (0,-4.3301,-2.5)
+P2 = (0,-4.8296,-1.2941)
+Side lengths = P0->P11.30526
+Side lengths = P0->P20
+Side lengths = P1->P21.30526
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,-4.8296,-1.2941)
+P[1]      = (0,-4.3301,-2.5)
+P[2]      = (0,-4.8296,-1.2941)
+RELATIVE VECTORS = 
+E[1]      = (0,0.4995,-1.2059)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,-4.3301,-2.5)
+P1 = (0,0,5)
+P2 = (0,-4.3301,-2.5)
+Side lengths = P0->P18.66024
+Side lengths = P0->P20
+Side lengths = P1->P28.66024
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,-4.3301,-2.5)
+P[1]      = (0,0,5)
+P[2]      = (0,-4.3301,-2.5)
+RELATIVE VECTORS = 
+E[1]      = (0,4.3301,7.5)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,4.8296,-1.2941)
+P1 = (0,4.3301,-2.5)
+P2 = (0,4.8296,-1.2941)
+Side lengths = P0->P11.30526
+Side lengths = P0->P20
+Side lengths = P1->P21.30526
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,4.8296,-1.2941)
+P[1]      = (0,4.3301,-2.5)
+P[2]      = (0,4.8296,-1.2941)
+RELATIVE VECTORS = 
+E[1]      = (0,-0.4995,-1.2059)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,-4.3301,-2.5)
+P1 = (0,-4.3301,-2.5)
+P2 = (0,-4.8296,-1.2941)
+Side lengths = P0->P10
+Side lengths = P0->P21.30526
+Side lengths = P1->P21.30526
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,-4.3301,-2.5)
+P[1]      = (0,-4.3301,-2.5)
+P[2]      = (0,-4.8296,-1.2941)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (0,-0.4995,1.2059)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,-4.8296,-1.2941)
+P1 = (0,-5,0)
+P2 = (0,-4.8296,-1.2941)
+Side lengths = P0->P11.30527
+Side lengths = P0->P20
+Side lengths = P1->P21.30527
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,-4.8296,-1.2941)
+P[1]      = (0,-5,0)
+P[2]      = (0,-4.8296,-1.2941)
+RELATIVE VECTORS = 
+E[1]      = (0,-0.1704,1.2941)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,4.8296,-1.2941)
+P1 = (0,5,0)
+P2 = (0,5,0)
+Side lengths = P0->P11.30527
+Side lengths = P0->P21.30527
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,4.8296,-1.2941)
+P[1]      = (0,5,0)
+P[2]      = (0,5,0)
+RELATIVE VECTORS = 
+E[1]      = (0,0.1704,1.2941)
+E[2]      = (0,0.1704,1.2941)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,4.3301,-2.5)
+P1 = (0,4.3301,-2.5)
+P2 = (0,4.8296,-1.2941)
+Side lengths = P0->P10
+Side lengths = P0->P21.30526
+Side lengths = P1->P21.30526
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,4.3301,-2.5)
+P[1]      = (0,4.3301,-2.5)
+P[2]      = (0,4.8296,-1.2941)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (0,0.4995,1.2059)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,0,5)
+P1 = (0,4.3301,-2.5)
+P2 = (0,4.3301,-2.5)
+Side lengths = P0->P18.66024
+Side lengths = P0->P28.66024
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,0,5)
+P[1]      = (0,4.3301,-2.5)
+P[2]      = (0,4.3301,-2.5)
+RELATIVE VECTORS = 
+E[1]      = (0,4.3301,-7.5)
+E[2]      = (0,4.3301,-7.5)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,4.8296,-1.2941)
+P1 = (0,4.8296,-1.2941)
+P2 = (0,5,0)
+Side lengths = P0->P10
+Side lengths = P0->P21.30527
+Side lengths = P1->P21.30527
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,4.8296,-1.2941)
+P[1]      = (0,4.8296,-1.2941)
+P[2]      = (0,5,0)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (0,0.1704,1.2941)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,-5,0)
+P1 = (0,-4.8296,-1.2941)
+P2 = (0,-5,0)
+Side lengths = P0->P11.30527
+Side lengths = P0->P20
+Side lengths = P1->P21.30527
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,-5,0)
+P[1]      = (0,-4.8296,-1.2941)
+P[2]      = (0,-5,0)
+RELATIVE VECTORS = 
+E[1]      = (0,0.1704,-1.2941)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,-4.8296,-1.2941)
+P1 = (0,-4.3301,-2.5)
+P2 = (0,-4.8296,-1.2941)
+Side lengths = P0->P11.30526
+Side lengths = P0->P20
+Side lengths = P1->P21.30526
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,-4.8296,-1.2941)
+P[1]      = (0,-4.3301,-2.5)
+P[2]      = (0,-4.8296,-1.2941)
+RELATIVE VECTORS = 
+E[1]      = (0,0.4995,-1.2059)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,-4.3301,-2.5)
+P1 = (0,0,5)
+P2 = (0,-4.3301,-2.5)
+Side lengths = P0->P18.66024
+Side lengths = P0->P20
+Side lengths = P1->P28.66024
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,-4.3301,-2.5)
+P[1]      = (0,0,5)
+P[2]      = (0,-4.3301,-2.5)
+RELATIVE VECTORS = 
+E[1]      = (0,4.3301,7.5)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,4.8296,-1.2941)
+P1 = (0,4.3301,-2.5)
+P2 = (0,4.8296,-1.2941)
+Side lengths = P0->P11.30526
+Side lengths = P0->P20
+Side lengths = P1->P21.30526
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,4.8296,-1.2941)
+P[1]      = (0,4.3301,-2.5)
+P[2]      = (0,4.8296,-1.2941)
+RELATIVE VECTORS = 
+E[1]      = (0,-0.4995,-1.2059)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,-4.3301,-2.5)
+P1 = (0,-4.3301,-2.5)
+P2 = (0,-4.8296,-1.2941)
+Side lengths = P0->P10
+Side lengths = P0->P21.30526
+Side lengths = P1->P21.30526
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,-4.3301,-2.5)
+P[1]      = (0,-4.3301,-2.5)
+P[2]      = (0,-4.8296,-1.2941)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (0,-0.4995,1.2059)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,-4.8296,-1.2941)
+P1 = (0,-5,0)
+P2 = (0,-4.8296,-1.2941)
+Side lengths = P0->P11.30527
+Side lengths = P0->P20
+Side lengths = P1->P21.30527
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,-4.8296,-1.2941)
+P[1]      = (0,-5,0)
+P[2]      = (0,-4.8296,-1.2941)
+RELATIVE VECTORS = 
+E[1]      = (0,-0.1704,1.2941)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,4.8296,-1.2941)
+P1 = (0,5,0)
+P2 = (0,5,0)
+Side lengths = P0->P11.30527
+Side lengths = P0->P21.30527
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,4.8296,-1.2941)
+P[1]      = (0,5,0)
+P[2]      = (0,5,0)
+RELATIVE VECTORS = 
+E[1]      = (0,0.1704,1.2941)
+E[2]      = (0,0.1704,1.2941)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,4.3301,-2.5)
+P1 = (0,4.3301,-2.5)
+P2 = (0,4.8296,-1.2941)
+Side lengths = P0->P10
+Side lengths = P0->P21.30526
+Side lengths = P1->P21.30526
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,4.3301,-2.5)
+P[1]      = (0,4.3301,-2.5)
+P[2]      = (0,4.8296,-1.2941)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (0,0.4995,1.2059)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,0,5)
+P1 = (0,4.3301,-2.5)
+P2 = (0,4.3301,-2.5)
+Side lengths = P0->P18.66024
+Side lengths = P0->P28.66024
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,0,5)
+P[1]      = (0,4.3301,-2.5)
+P[2]      = (0,4.3301,-2.5)
+RELATIVE VECTORS = 
+E[1]      = (0,4.3301,-7.5)
+E[2]      = (0,4.3301,-7.5)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,4.8296,-1.2941)
+P1 = (0,4.8296,-1.2941)
+P2 = (0,5,0)
+Side lengths = P0->P10
+Side lengths = P0->P21.30527
+Side lengths = P1->P21.30527
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,4.8296,-1.2941)
+P[1]      = (0,4.8296,-1.2941)
+P[2]      = (0,5,0)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (0,0.1704,1.2941)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,-5,0)
+P1 = (0,-4.8296,-1.2941)
+P2 = (0,-5,0)
+Side lengths = P0->P11.30527
+Side lengths = P0->P20
+Side lengths = P1->P21.30527
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,-5,0)
+P[1]      = (0,-4.8296,-1.2941)
+P[2]      = (0,-5,0)
+RELATIVE VECTORS = 
+E[1]      = (0,0.1704,-1.2941)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,-4.8296,-1.2941)
+P1 = (0,-4.3301,-2.5)
+P2 = (0,-4.8296,-1.2941)
+Side lengths = P0->P11.30526
+Side lengths = P0->P20
+Side lengths = P1->P21.30526
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,-4.8296,-1.2941)
+P[1]      = (0,-4.3301,-2.5)
+P[2]      = (0,-4.8296,-1.2941)
+RELATIVE VECTORS = 
+E[1]      = (0,0.4995,-1.2059)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,-4.3301,-2.5)
+P1 = (0,0,5)
+P2 = (0,-4.3301,-2.5)
+Side lengths = P0->P18.66024
+Side lengths = P0->P20
+Side lengths = P1->P28.66024
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,-4.3301,-2.5)
+P[1]      = (0,0,5)
+P[2]      = (0,-4.3301,-2.5)
+RELATIVE VECTORS = 
+E[1]      = (0,4.3301,7.5)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,4.8296,-1.2941)
+P1 = (0,4.3301,-2.5)
+P2 = (0,4.8296,-1.2941)
+Side lengths = P0->P11.30526
+Side lengths = P0->P20
+Side lengths = P1->P21.30526
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,4.8296,-1.2941)
+P[1]      = (0,4.3301,-2.5)
+P[2]      = (0,4.8296,-1.2941)
+RELATIVE VECTORS = 
+E[1]      = (0,-0.4995,-1.2059)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,-4.3301,-2.5)
+P1 = (0,-4.3301,-2.5)
+P2 = (0,-4.8296,-1.2941)
+Side lengths = P0->P10
+Side lengths = P0->P21.30526
+Side lengths = P1->P21.30526
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,-4.3301,-2.5)
+P[1]      = (0,-4.3301,-2.5)
+P[2]      = (0,-4.8296,-1.2941)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (0,-0.4995,1.2059)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,-4.8296,-1.2941)
+P1 = (0,-5,0)
+P2 = (0,-4.8296,-1.2941)
+Side lengths = P0->P11.30527
+Side lengths = P0->P20
+Side lengths = P1->P21.30527
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,-4.8296,-1.2941)
+P[1]      = (0,-5,0)
+P[2]      = (0,-4.8296,-1.2941)
+RELATIVE VECTORS = 
+E[1]      = (0,-0.1704,1.2941)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,4.8296,-1.2941)
+P1 = (0,5,0)
+P2 = (0,5,0)
+Side lengths = P0->P11.30527
+Side lengths = P0->P21.30527
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,4.8296,-1.2941)
+P[1]      = (0,5,0)
+P[2]      = (0,5,0)
+RELATIVE VECTORS = 
+E[1]      = (0,0.1704,1.2941)
+E[2]      = (0,0.1704,1.2941)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,4.3301,-2.5)
+P1 = (0,4.3301,-2.5)
+P2 = (0,4.8296,-1.2941)
+Side lengths = P0->P10
+Side lengths = P0->P21.30526
+Side lengths = P1->P21.30526
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,4.3301,-2.5)
+P[1]      = (0,4.3301,-2.5)
+P[2]      = (0,4.8296,-1.2941)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (0,0.4995,1.2059)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,0,5)
+P1 = (0,4.3301,-2.5)
+P2 = (0,4.3301,-2.5)
+Side lengths = P0->P18.66024
+Side lengths = P0->P28.66024
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,0,5)
+P[1]      = (0,4.3301,-2.5)
+P[2]      = (0,4.3301,-2.5)
+RELATIVE VECTORS = 
+E[1]      = (0,4.3301,-7.5)
+E[2]      = (0,4.3301,-7.5)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,4.8296,-1.2941)
+P1 = (0,4.8296,-1.2941)
+P2 = (0,5,0)
+Side lengths = P0->P10
+Side lengths = P0->P21.30527
+Side lengths = P1->P21.30527
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,4.8296,-1.2941)
+P[1]      = (0,4.8296,-1.2941)
+P[2]      = (0,5,0)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (0,0.1704,1.2941)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,-5,0)
+P1 = (0,-4.8296,-1.2941)
+P2 = (0,-5,0)
+Side lengths = P0->P11.30527
+Side lengths = P0->P20
+Side lengths = P1->P21.30527
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,-5,0)
+P[1]      = (0,-4.8296,-1.2941)
+P[2]      = (0,-5,0)
+RELATIVE VECTORS = 
+E[1]      = (0,0.1704,-1.2941)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,-4.8296,-1.2941)
+P1 = (0,-4.3301,-2.5)
+P2 = (0,-4.8296,-1.2941)
+Side lengths = P0->P11.30526
+Side lengths = P0->P20
+Side lengths = P1->P21.30526
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,-4.8296,-1.2941)
+P[1]      = (0,-4.3301,-2.5)
+P[2]      = (0,-4.8296,-1.2941)
+RELATIVE VECTORS = 
+E[1]      = (0,0.4995,-1.2059)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,-4.3301,-2.5)
+P1 = (0,0,5)
+P2 = (0,-4.3301,-2.5)
+Side lengths = P0->P18.66024
+Side lengths = P0->P20
+Side lengths = P1->P28.66024
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,-4.3301,-2.5)
+P[1]      = (0,0,5)
+P[2]      = (0,-4.3301,-2.5)
+RELATIVE VECTORS = 
+E[1]      = (0,4.3301,7.5)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-6.4705,24.1481,0)
+P1 = (-12.5,21.6506,0)
+P2 = (-6.4705,24.1481,0)
+Side lengths = P0->P16.52628
+Side lengths = P0->P20
+Side lengths = P1->P26.52628
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-6.4705,24.1481,0)
+P[1]      = (-12.5,21.6506,0)
+P[2]      = (-6.4705,24.1481,0)
+RELATIVE VECTORS = 
+E[1]      = (-6.0295,-2.4975,0)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-12.5,-21.6506,0)
+P1 = (-12.5,-21.6506,0)
+P2 = (-6.4705,-24.1481,0)
+Side lengths = P0->P10
+Side lengths = P0->P26.52628
+Side lengths = P1->P26.52628
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-12.5,-21.6506,0)
+P[1]      = (-12.5,-21.6506,0)
+P[2]      = (-6.4705,-24.1481,0)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (6.0295,-2.4975,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-6.4705,-24.1481,0)
+P1 = (0,-25,0)
+P2 = (-6.4705,-24.1481,0)
+Side lengths = P0->P16.52634
+Side lengths = P0->P20
+Side lengths = P1->P26.52634
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-6.4705,-24.1481,0)
+P[1]      = (0,-25,0)
+P[2]      = (-6.4705,-24.1481,0)
+RELATIVE VECTORS = 
+E[1]      = (6.4705,-0.8519,0)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-6.4705,24.1481,0)
+P1 = (0,25,0)
+P2 = (0,25,0)
+Side lengths = P0->P16.52634
+Side lengths = P0->P26.52634
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-6.4705,24.1481,0)
+P[1]      = (0,25,0)
+P[2]      = (0,25,0)
+RELATIVE VECTORS = 
+E[1]      = (6.4705,0.8519,0)
+E[2]      = (6.4705,0.8519,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-12.5,21.6506,0)
+P1 = (-12.5,21.6506,0)
+P2 = (-6.4705,24.1481,0)
+Side lengths = P0->P10
+Side lengths = P0->P26.52628
+Side lengths = P1->P26.52628
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-12.5,21.6506,0)
+P[1]      = (-12.5,21.6506,0)
+P[2]      = (-6.4705,24.1481,0)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (6.0295,2.4975,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (25,0,0)
+P1 = (-12.5,21.6506,0)
+P2 = (-12.5,21.6506,0)
+Side lengths = P0->P143.3013
+Side lengths = P0->P243.3013
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (25,0,0)
+P[1]      = (-12.5,21.6506,0)
+P[2]      = (-12.5,21.6506,0)
+RELATIVE VECTORS = 
+E[1]      = (-37.5,21.6506,0)
+E[2]      = (-37.5,21.6506,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-6.4705,24.1481,0)
+P1 = (-6.4705,24.1481,0)
+P2 = (0,25,0)
+Side lengths = P0->P10
+Side lengths = P0->P26.52634
+Side lengths = P1->P26.52634
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-6.4705,24.1481,0)
+P[1]      = (-6.4705,24.1481,0)
+P[2]      = (0,25,0)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (6.4705,0.8519,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,-25,0)
+P1 = (-6.4705,-24.1481,0)
+P2 = (0,-25,0)
+Side lengths = P0->P16.52634
+Side lengths = P0->P20
+Side lengths = P1->P26.52634
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,-25,0)
+P[1]      = (-6.4705,-24.1481,0)
+P[2]      = (0,-25,0)
+RELATIVE VECTORS = 
+E[1]      = (-6.4705,0.8519,0)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-6.4705,-24.1481,0)
+P1 = (-12.5,-21.6506,0)
+P2 = (-6.4705,-24.1481,0)
+Side lengths = P0->P16.52628
+Side lengths = P0->P20
+Side lengths = P1->P26.52628
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-6.4705,-24.1481,0)
+P[1]      = (-12.5,-21.6506,0)
+P[2]      = (-6.4705,-24.1481,0)
+RELATIVE VECTORS = 
+E[1]      = (-6.0295,2.4975,0)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-12.5,-21.6506,0)
+P1 = (25,0,0)
+P2 = (-12.5,-21.6506,0)
+Side lengths = P0->P143.3013
+Side lengths = P0->P20
+Side lengths = P1->P243.3013
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-12.5,-21.6506,0)
+P[1]      = (25,0,0)
+P[2]      = (-12.5,-21.6506,0)
+RELATIVE VECTORS = 
+E[1]      = (37.5,21.6506,0)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-6.4705,24.1481,0)
+P1 = (-12.5,21.6506,0)
+P2 = (-6.4705,24.1481,0)
+Side lengths = P0->P16.52628
+Side lengths = P0->P20
+Side lengths = P1->P26.52628
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-6.4705,24.1481,0)
+P[1]      = (-12.5,21.6506,0)
+P[2]      = (-6.4705,24.1481,0)
+RELATIVE VECTORS = 
+E[1]      = (-6.0295,-2.4975,0)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-12.5,-21.6506,0)
+P1 = (-12.5,-21.6506,0)
+P2 = (-6.4705,-24.1481,0)
+Side lengths = P0->P10
+Side lengths = P0->P26.52628
+Side lengths = P1->P26.52628
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-12.5,-21.6506,0)
+P[1]      = (-12.5,-21.6506,0)
+P[2]      = (-6.4705,-24.1481,0)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (6.0295,-2.4975,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-6.4705,-24.1481,0)
+P1 = (0,-25,0)
+P2 = (-6.4705,-24.1481,0)
+Side lengths = P0->P16.52634
+Side lengths = P0->P20
+Side lengths = P1->P26.52634
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-6.4705,-24.1481,0)
+P[1]      = (0,-25,0)
+P[2]      = (-6.4705,-24.1481,0)
+RELATIVE VECTORS = 
+E[1]      = (6.4705,-0.8519,0)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-6.4705,24.1481,0)
+P1 = (0,25,0)
+P2 = (0,25,0)
+Side lengths = P0->P16.52634
+Side lengths = P0->P26.52634
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-6.4705,24.1481,0)
+P[1]      = (0,25,0)
+P[2]      = (0,25,0)
+RELATIVE VECTORS = 
+E[1]      = (6.4705,0.8519,0)
+E[2]      = (6.4705,0.8519,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-12.5,21.6506,0)
+P1 = (-12.5,21.6506,0)
+P2 = (-6.4705,24.1481,0)
+Side lengths = P0->P10
+Side lengths = P0->P26.52628
+Side lengths = P1->P26.52628
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-12.5,21.6506,0)
+P[1]      = (-12.5,21.6506,0)
+P[2]      = (-6.4705,24.1481,0)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (6.0295,2.4975,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (25,0,0)
+P1 = (-12.5,21.6506,0)
+P2 = (-12.5,21.6506,0)
+Side lengths = P0->P143.3013
+Side lengths = P0->P243.3013
+Side lengths = P1->P20
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (25,0,0)
+P[1]      = (-12.5,21.6506,0)
+P[2]      = (-12.5,21.6506,0)
+RELATIVE VECTORS = 
+E[1]      = (-37.5,21.6506,0)
+E[2]      = (-37.5,21.6506,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-6.4705,24.1481,0)
+P1 = (-6.4705,24.1481,0)
+P2 = (0,25,0)
+Side lengths = P0->P10
+Side lengths = P0->P26.52634
+Side lengths = P1->P26.52634
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-6.4705,24.1481,0)
+P[1]      = (-6.4705,24.1481,0)
+P[2]      = (0,25,0)
+RELATIVE VECTORS = 
+E[1]      = (0,0,0)
+E[2]      = (6.4705,0.8519,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (0,-25,0)
+P1 = (-6.4705,-24.1481,0)
+P2 = (0,-25,0)
+Side lengths = P0->P16.52634
+Side lengths = P0->P20
+Side lengths = P1->P26.52634
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (0,-25,0)
+P[1]      = (-6.4705,-24.1481,0)
+P[2]      = (0,-25,0)
+RELATIVE VECTORS = 
+E[1]      = (-6.4705,0.8519,0)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-6.4705,-24.1481,0)
+P1 = (-12.5,-21.6506,0)
+P2 = (-6.4705,-24.1481,0)
+Side lengths = P0->P16.52628
+Side lengths = P0->P20
+Side lengths = P1->P26.52628
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-6.4705,-24.1481,0)
+P[1]      = (-12.5,-21.6506,0)
+P[2]      = (-6.4705,-24.1481,0)
+RELATIVE VECTORS = 
+E[1]      = (-6.0295,2.4975,0)
+E[2]      = (0,0,0)
+*********************************************************************
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TriangularFacet::G4TriangularFacet()
+Length of sides of facet are too small.
+*** This is just a warning message.
+
+P0 = (-12.5,-21.6506,0)
+P1 = (25,0,0)
+P2 = (-12.5,-21.6506,0)
+Side lengths = P0->P143.3013
+Side lengths = P0->P20
+Side lengths = P1->P243.3013
+
+
+*** G4Exception : InvalidSetup
+      issued by : G4TessellatedSolid::AddFacet()
+Attempt to add facet not properly defined.
+*** This is just a warning message.
+Facet attributes:
+
+*********************************************************************
+FACET TYPE       = G4TriangularFacet
+ABSOLUTE VECTORS = 
+P0               = (-12.5,-21.6506,0)
+P[1]      = (25,0,0)
+P[2]      = (-12.5,-21.6506,0)
+RELATIVE VECTORS = 
+E[1]      = (37.5,21.6506,0)
+E[2]      = (0,0,0)
+*********************************************************************
+
+Welcome to MAUS:
+	Process ID (PID): 7966
+	Universally Unique ID (UUID): 13a49f9d-3ff3-4056-992f-e43193a828b8
+	Program Arguments: ['simulate_for_matt.py']
+INPUT: Reading some input
+MAP: Setting up mappers
+Traceback (most recent call last):
+  File "/home/matt/maus-littlefield/src/common_py/ErrorHandler.py", line 152, in HandleCppException
+    raise(CppError(error_message))
+ErrorHandler.CppError: Dimension x in module Configuration.txt/Tessellated_Shape_8.txt out of range at MiceModToG4Solid::checkDim
+Traceback (most recent call last):
+  File "simulate_for_matt.py", line 65, in <module>
+    run(NUMBER_OF_SPILLS)
+  File "simulate_for_matt.py", line 60, in run
+    MAUS.Go(my_input, my_map, MAUS.ReducePyDoNothing(), my_output, datacards)
+  File "/home/matt/maus-littlefield/src/common_py/Go.py", line 77, in __init__
+    self.NativePythonMapReduce()
+  File "/home/matt/maus-littlefield/src/common_py/Go.py", line 104, in NativePythonMapReduce
+    assert(self.mapper.birth(self.jsonConfigDocument) == True)
+AssertionError

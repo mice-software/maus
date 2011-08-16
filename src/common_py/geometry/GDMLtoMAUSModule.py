@@ -41,7 +41,7 @@ class GDMLtomaus():
                 StepFile.parse_xslt()
                 StepFile = None
                 os.remove(self.StepFiles[num])
-                print "Formatted " + str(num+1) + " of " + str(length) + "Geometry Files"
+                print "Converting " + str(num+1) + " of " + str(length) + " Geometry Files"
  
             os.remove(self.ConfigurationFile)
             

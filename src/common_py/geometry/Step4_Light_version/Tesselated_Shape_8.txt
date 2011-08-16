@@ -157,6 +157,4 @@ Module Tesselated_Shape_8
                 PropertyString TFacet93 16 49 17
                 PropertyString TFacet94 49 24 19
                 PropertyString TFacet95 49 26 24
-                PropertyString TFacet96 34 49 37
-                    
-                
+                PropertyString TFacet96 34 49 
