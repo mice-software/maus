@@ -5,6 +5,7 @@
 *.os
 *~
 *.tmp
+.coverage
 build/*
 env.sh
 env.csh
@@ -33,4 +34,10 @@ tests/integration/optics/envelope*
 tests/integration/optics/optics
 doc/doxygen_backend/
 doc/doxygen_framework/
-
+tests/integration/test_optics/*.*
+tests/integration/test_optics/*.root
+tests/integration/test_optics/*.txt
+tests/integration/test_optics/log.*
+tests/integration/test_optics/*.dat
+tests/integration/test_optics/optics
+tests/integration/plots/*

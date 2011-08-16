@@ -21,6 +21,8 @@
 #include <G4VisManager.hh>
 #include <G4UImanager.hh>
 
+#include <string>
+
 #include "src/legacy/Interface/Squeak.hh"
 
 namespace MAUS {
@@ -54,7 +56,6 @@ class MAUSVisManager: public G4VisManager {
     Squeak::mout(Squeak::debug) << "g4ui> " << cmd << std::endl;
     G4UImanager::GetUIpointer()->ApplyCommand(cmd);
   }
-
 };
 }
 

@@ -117,7 +117,6 @@ class MapCppSimulationTestCase(unittest.TestCase):
                                     energy, msg=str(event), delta = 0.01 )
             self.assertIn("final_momentum", event)
             self.assertIn("final_position", event)
-        
 
     def test_visualisation(self):
         test = os.path.join(os.environ['MAUS_ROOT_DIR'], 'src', 'map',\

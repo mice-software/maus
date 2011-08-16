@@ -430,16 +430,16 @@ def geant4_extras(env):
   if opengl:
     env.Append(CCFLAGS=["""-DG4VIS_USE_OPENGLX"""])
     env.Append(CCFLAGS=["""-DG4VIS_USE_OPENGLXM"""])
-  geant_vis = 'G4OpenGL'
-  env.Append(LIBS=[geant_vis])
-  if not conf.CheckLib(geant_vis, language='c++'):
-      print """
-        Could not find G4OpenGL library. Build this library using
-        $MAUS_ROOT_DIR/third_party/bash/32geant4_extras.bash
-        Note that you need to have valid open gl and open gl xm development
-        libraries installed.
-        """
-      my_exit(1)
+    geant_vis = 'G4OpenGL'
+    env.Append(LIBS=[geant_vis])
+    if not conf.CheckLib(geant_vis, language='c++'):
+        print """
+          Could not find G4OpenGL library. Build this library using
+          $MAUS_ROOT_DIR/third_party/bash/32geant4_extras.bash
+          Note that you need to have valid open gl and open gl xm development
+          libraries installed.
+          """
+        my_exit(1)
 
 # Setup the environment.  NOTE: SHLIBPREFIX means that shared libraries don't
 # have a 'lib' prefix, which is needed for python to find SWIG generated libraries
@@ -559,8 +559,8 @@ if env['USE_G4'] and env['USE_ROOT']:
                                LIBS= env['LIBS'] + ['recpack'] + ['MausCpp'])
     env.Install('build', ['tests/cpp_unit/test_cpp_unit'])
 
-    test_optics_files = glob.glob("tests/integration/optics/src/*cc")
-    test_optics = env.Program(target = 'tests/integration/optics/optics', \
+    test_optics_files = glob.glob("tests/integration/test_optics/src/*cc")
+    test_optics = env.Program(target = 'tests/integration/test_optics/optics', \
                                source = test_optics_files, \
                                LIBS= env['LIBS'] + ['MausCpp'])
 
