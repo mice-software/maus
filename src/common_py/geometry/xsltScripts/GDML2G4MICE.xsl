@@ -18,7 +18,7 @@
                 <title>Configuration <xsl:value-of select="structure/volume/@name"/>
                 
                 {
-                Dimensions <!-- <xsl:if test="solids/sphere/@name, WorldSphereRef">15000.0 10000.0 50000.0 mm</xsl:if> --> 
+                Dimensions 15000.0 10000.0 50000.0 mm <!-- <xsl:if test="solids/sphere/@name, WorldSphereRef">15000.0 10000.0 50000.0 mm</xsl:if> --> 
                 PropertyString Material AIR
                 PropertyDouble G4StepMax 5.0 mm
                 </title>
@@ -28,7 +28,7 @@
                 Module BeamLine/<xsl:value-of select="translate(file/@name, 'gdml', 'dat')"/> 
                 {
                 Position <xsl:value-of select="position/@x"/><xsl:text> </xsl:text><xsl:value-of select="position/@y"/><xsl:text> </xsl:text><xsl:value-of select="position/@z"/> mm
-                Rotation <!-- <xsl:if test="rotationref/@ref, identity"> 0.0 0.0 0.0 degree</xsl:if> -->    
+                Rotation 0.0 0.0 0.0 deg <!-- <xsl:if test="rotationref/@ref, identity"> 0.0 0.0 0.0 deg</xsl:if> -->    
                 }
                 </xsl:for-each>
                 }

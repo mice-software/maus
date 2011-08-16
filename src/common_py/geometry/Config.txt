@@ -2,11 +2,11 @@
 // This File is an example of the parameters which can be included in the config file which is passed to UploadGeometry.py
 
 // Argument below MUST be included
-GeometryDirectory   = "/home/matt/GDML_fastradModel"
-GeometryDescription = "This is a test geometry of a simple cooling channel"
+GeometryDirectory   = "/home/matt/Step4_Light_version"
+GeometryDescription = "This is the initial geometry for Step 4 It is large and will test the system as well as the geometry"
 
 // Optional Arguments 1 = yes, 0 = no
-ZipFile          = 1
+ZipFile          = 0
 Delete Originals = 0
 
 //Donwloading of geometries

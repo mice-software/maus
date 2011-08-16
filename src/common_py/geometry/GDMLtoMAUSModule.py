@@ -30,6 +30,7 @@ class GDMLtomaus():
             configurationxsl = os.environ["MAUS_ROOT_DIR"] + "/src/common_py/geometry/xsltScripts/GDML2G4MICE.xsl"
             ConfigFile = CADImport(xmlin1 = self.ConfigurationFile, xsl = configurationxsl, output = outputfile)
             ConfigFile.parse_xslt()
+            print "Configuration File Converted"
             length = len(self.StepFiles)
             for num in range(0, length):
                 file = str(self.StepFiles[num])
@@ -40,10 +41,12 @@ class GDMLtomaus():
                 StepFile.parse_xslt()
                 StepFile = None
                 os.remove(self.StepFiles[num])
+                print "Formatted " + str(num+1) + " of " + str(length) + "Geometry Files"
+ 
             os.remove(self.ConfigurationFile)
             
 def main():
-    file = GDMLtomaus('/home/matt/maus-littlefield/src/common_py/geometry/Download')
-    file.convert_to_maus('/home/matt/maus-littlefield/src/common_py/geometry/Download/')
+    file = GDMLtomaus('/home/matt/maus-littlefield/src/common_py/geometry/Step4_Light_version/')
+    file.convert_to_maus('/home/matt/maus-littlefield/src/common_py/geometry/Step4_Light_version/')
 if __name__ == "__main__":
     main()

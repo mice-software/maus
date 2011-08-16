@@ -1,0 +1,36 @@
+Module TDm1152m0252
+                {
+                Volume TessellatedSolid
+                PropertyString Material Galactic
+                PropertyDouble BlueColour 0.75
+                PropertyDouble GreenColour 0.3
+                PropertyDouble RedColour 0.75
+                PropertyInt noOfVertices 8
+                PropertyInt noOfTFacets 12
+                PropertyInt noOfQFacets 0
+                    
+                
+                PropertyHep3Vector Vector1 -343.0000 -28.2843 0.0000
+                PropertyHep3Vector Vector2 -343.0000 28.2843 -56.5685
+                PropertyHep3Vector Vector3 -343.0000 0.0000 0.0000
+                PropertyHep3Vector Vector4 -343.0000 28.2843 56.5685
+                PropertyHep3Vector Vector5 343.0000 28.2843 56.5685
+                PropertyHep3Vector Vector6 343.0000 -28.2843 0.0000
+                PropertyHep3Vector Vector7 343.0000 28.2843 -56.5685
+                PropertyHep3Vector Vector8 343.0000 0.0000 0.0000
+                    
+                
+                PropertyString TFacet1 0 1 2
+                PropertyString TFacet2 2 3 0
+                PropertyString TFacet3 3 2 1
+                PropertyString TFacet4 4 3 0
+                PropertyString TFacet5 0 5 4
+                PropertyString TFacet6 5 0 6
+                PropertyString TFacet7 1 6 0
+                PropertyString TFacet8 5 6 7
+                PropertyString TFacet9 7 4 5
+                PropertyString TFacet10 4 7 6
+                PropertyString TFacet11 6 1 4
+                PropertyString TFacet12 3 4 1
+                    
+                

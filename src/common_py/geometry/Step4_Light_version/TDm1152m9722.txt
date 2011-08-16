@@ -1,0 +1,96 @@
+Module TDm1152m9722
+                {
+                Volume TessellatedSolid
+                PropertyString Material Galactic
+                PropertyDouble BlueColour 0.75
+                PropertyDouble GreenColour 0.3
+                PropertyDouble RedColour 0.75
+                PropertyInt noOfVertices 28
+                PropertyInt noOfTFacets 52
+                PropertyInt noOfQFacets 0
+                    
+                
+                PropertyHep3Vector Vector1 37.5000 -422.1906 -46.7529
+                PropertyHep3Vector Vector2 -37.5000 -422.1906 -46.7529
+                PropertyHep3Vector Vector3 37.5000 351.0007 204.4722
+                PropertyHep3Vector Vector4 -37.5000 351.0007 204.4722
+                PropertyHep3Vector Vector5 -37.5000 -422.1906 -204.4722
+                PropertyHep3Vector Vector6 -37.5000 422.1906 69.8839
+                PropertyHep3Vector Vector7 -37.5000 -1.2361 -63.4899
+                PropertyHep3Vector Vector8 -37.5000 420.6477 72.1834
+                PropertyHep3Vector Vector9 -37.5000 419.1136 74.4889
+                PropertyHep3Vector Vector10 -37.5000 417.5885 76.8003
+                PropertyHep3Vector Vector11 -37.5000 -422.1906 -196.0605
+                PropertyHep3Vector Vector12 -37.5000 351.9974 201.9914
+                PropertyHep3Vector Vector13 29.5000 354.0185 197.0410
+                PropertyHep3Vector Vector14 -37.5000 353.0033 199.5143
+                PropertyHep3Vector Vector15 -37.5000 354.0185 197.0410
+                PropertyHep3Vector Vector16 37.5000 371.5266 157.9628
+                PropertyHep3Vector Vector17 29.5000 372.6545 155.6448
+                PropertyHep3Vector Vector18 29.5000 393.8729 115.5109
+                PropertyHep3Vector Vector19 29.5000 417.5885 76.8003
+                PropertyHep3Vector Vector20 37.5000 395.2964 113.0247
+                PropertyHep3Vector Vector21 37.5000 422.1906 69.8839
+                PropertyHep3Vector Vector22 -37.5000 -422.1906 -55.1646
+                PropertyHep3Vector Vector23 -37.5000 -35.3221 74.7425
+                PropertyHep3Vector Vector24 29.5000 -422.1906 -55.1646
+                PropertyHep3Vector Vector25 29.5000 -422.1906 -196.0605
+                PropertyHep3Vector Vector26 37.5000 -422.1906 -204.4722
+                PropertyHep3Vector Vector27 29.5000 -23.0052 4.0907
+                PropertyHep3Vector Vector28 37.5000 -23.1763 4.0351
+                    
+                
+                PropertyString TFacet1 0 1 2
+                PropertyString TFacet2 3 2 1
+                PropertyString TFacet3 4 5 6
+                PropertyString TFacet4 6 5 7
+                PropertyString TFacet5 8 9 6
+                PropertyString TFacet6 6 10 4
+                PropertyString TFacet7 10 6 9
+                PropertyString TFacet8 8 6 7
+                PropertyString TFacet9 3 11 12
+                PropertyString TFacet10 13 14 12
+                PropertyString TFacet11 11 13 12
+                PropertyString TFacet12 2 12 15
+                PropertyString TFacet13 12 2 3
+                PropertyString TFacet14 15 16 17
+                PropertyString TFacet15 16 15 12
+                PropertyString TFacet16 9 8 18
+                PropertyString TFacet17 7 5 18
+                PropertyString TFacet18 8 7 18
+                PropertyString TFacet19 17 19 15
+                PropertyString TFacet20 19 17 18
+                PropertyString TFacet21 18 20 19
+                PropertyString TFacet22 20 18 5
+                PropertyString TFacet23 21 14 22
+                PropertyString TFacet24 22 14 13
+                PropertyString TFacet25 11 3 22
+                PropertyString TFacet26 22 1 21
+                PropertyString TFacet27 1 22 3
+                PropertyString TFacet28 11 22 13
+                PropertyString TFacet29 21 23 14
+                PropertyString TFacet30 12 14 23
+                PropertyString TFacet31 10 9 18
+                PropertyString TFacet32 18 24 10
+                PropertyString TFacet33 0 23 24
+                PropertyString TFacet34 23 0 1
+                PropertyString TFacet35 25 24 4
+                PropertyString TFacet36 24 25 0
+                PropertyString TFacet37 1 21 23
+                PropertyString TFacet38 10 4 24
+                PropertyString TFacet39 26 24 18
+                PropertyString TFacet40 26 18 17
+                PropertyString TFacet41 16 12 26
+                PropertyString TFacet42 26 23 24
+                PropertyString TFacet43 23 26 12
+                PropertyString TFacet44 16 26 17
+                PropertyString TFacet45 5 4 25
+                PropertyString TFacet46 25 20 5
+                PropertyString TFacet47 19 20 27
+                PropertyString TFacet48 15 19 27
+                PropertyString TFacet49 27 25 0
+                PropertyString TFacet50 25 27 20
+                PropertyString TFacet51 0 2 27
+                PropertyString TFacet52 27 2 15
+                    
+                

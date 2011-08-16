@@ -154,6 +154,7 @@ class Formatter:
             self.format_schema_location(self.configurationfile)
             self.format_materials(self.configurationfile)
             self.insert_materials_ref(self.txtfile)
+        print "Formatted Configuration File"
         
         noofstepfiles = len(self.stepfiles)
         for num in range(0, noofstepfiles):
@@ -162,6 +163,7 @@ class Formatter:
                 self.format_schema_location(self.stepfiles[num])
                 self.format_materials(self.stepfiles[num])
                 self.insert_materials_ref(self.txtfile)
+            print "Formatted " + str(num+1) + " of " + str(noofstepfiles) + " Geometry Files"
         print "Format Complete!"
             
                     
@@ -169,7 +171,7 @@ def main():
     """
     Main Function
     """
-    location = '/src/common_py/geometry/testCases/testGeometry'
+    location = '/src/common_py/geometry/Step4_Light_version'
     gdmls = Formatter(os.environ['MAUS_ROOT_DIR']+location)
     gdmls.format()
 

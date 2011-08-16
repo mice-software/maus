@@ -51,6 +51,8 @@ class GDMLtocdb:
             self.wsdlurl = twsdl 
         else: raise StandardError("Incorrect input", "gdmltocdb::__init__")
         self.geometry = Client(self.wsdlurl).service
+        print "Configuration Database Status"
+        print self.geometry.getStatus()
         gdmls = os.listdir(self.filepath)
         # check if there is an existing textfile with the lis of geomtries in it
         # if there is a text file but with no geometries raise error
@@ -116,6 +118,7 @@ class GDMLtocdb:
                 filestr = lines
                 self.uploadstring += filestr
             self.uploadstring += "\n<!--  End of File  -->\n"
+            print "Loading file " + str(num) + " of " + str(numoffiles) 
         fin2.close()
         _dt = datetime.today()
         _gdml = b64encode(self.uploadstring)
@@ -257,9 +260,6 @@ class Downloader:
         downloadedfile = b64decode(self.geometry.getGDMLForRun(run_id))
         self.unpack(downloadedfile, downloadpath)
 
-        
-        
-        
     def remove_first_line(self, file_path):
         """
         @method remove first line

@@ -1,0 +1,66 @@
+Module TDm1152m0377
+                {
+                Volume TessellatedSolid
+                PropertyString Material Galactic
+                PropertyDouble BlueColour 0.75
+                PropertyDouble GreenColour 0.3
+                PropertyDouble RedColour 0.75
+                PropertyInt noOfVertices 18
+                PropertyInt noOfTFacets 32
+                PropertyInt noOfQFacets 0
+                    
+                
+                PropertyHep3Vector Vector1 4419.6001 -1663.7000 -7315.2002
+                PropertyHep3Vector Vector2 -0.0000 -1663.7000 -0.0000
+                PropertyHep3Vector Vector3 4419.6001 -1663.7000 7315.1997
+                PropertyHep3Vector Vector4 -4368.7998 -1663.7000 1168.4000
+                PropertyHep3Vector Vector5 -4419.6001 -1663.7000 -7315.1997
+                PropertyHep3Vector Vector6 -4368.7998 -1663.7000 3098.8000
+                PropertyHep3Vector Vector7 -4419.6001 -1663.7000 3098.8000
+                PropertyHep3Vector Vector8 -4419.6001 -1663.7000 7315.2002
+                PropertyHep3Vector Vector9 -4419.6001 -1663.7000 1168.4000
+                PropertyHep3Vector Vector10 -4419.6001 -1588.7000 1168.4000
+                PropertyHep3Vector Vector11 -4368.7998 -1588.7000 1168.4000
+                PropertyHep3Vector Vector12 -4368.7998 -1588.7000 3098.8000
+                PropertyHep3Vector Vector13 -4419.6001 -1588.7000 3098.8000
+                PropertyHep3Vector Vector14 -4419.6001 -0.0000 0.0001
+                PropertyHep3Vector Vector15 -4419.6001 1663.7000 -7315.1997
+                PropertyHep3Vector Vector16 -4419.6001 1663.7000 7315.2002
+                PropertyHep3Vector Vector17 4419.6001 1663.7000 -7315.2002
+                PropertyHep3Vector Vector18 4419.6001 1663.7000 7315.1997
+                    
+                
+                PropertyString TFacet1 0 1 2
+                PropertyString TFacet2 3 1 4
+                PropertyString TFacet3 5 1 3
+                PropertyString TFacet4 1 5 2
+                PropertyString TFacet5 1 0 4
+                PropertyString TFacet6 5 6 7
+                PropertyString TFacet7 5 7 2
+                PropertyString TFacet8 8 3 4
+                PropertyString TFacet9 8 9 3
+                PropertyString TFacet10 10 3 9
+                PropertyString TFacet11 3 10 11
+                PropertyString TFacet12 11 5 3
+                PropertyString TFacet13 12 9 10
+                PropertyString TFacet14 10 11 12
+                PropertyString TFacet15 5 11 12
+                PropertyString TFacet16 12 6 5
+                PropertyString TFacet17 4 8 13
+                PropertyString TFacet18 14 13 15
+                PropertyString TFacet19 13 14 4
+                PropertyString TFacet20 8 9 13
+                PropertyString TFacet21 6 7 12
+                PropertyString TFacet22 12 15 13
+                PropertyString TFacet23 15 12 7
+                PropertyString TFacet24 12 13 9
+                PropertyString TFacet25 16 0 14
+                PropertyString TFacet26 4 14 0
+                PropertyString TFacet27 17 2 0
+                PropertyString TFacet28 0 16 17
+                PropertyString TFacet29 15 7 2
+                PropertyString TFacet30 2 17 15
+                PropertyString TFacet31 17 16 15
+                PropertyString TFacet32 14 15 16
+                    
+                
