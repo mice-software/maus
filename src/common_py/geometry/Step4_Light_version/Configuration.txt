@@ -1,7 +1,7 @@
 Configuration Structure_10212104
                 
                 {
-                Dimensions 150000.0 100000.0 500000.0 mm  
+                Dimensions 1000000.0 1000000.0 1000000.0 mm  
                 PropertyString Material AIR
                 PropertyDouble G4StepMax 5.0 mm
                 
@@ -26975,29 +26975,8 @@ Configuration Structure_10212104
                 Rotation 0.0 0.0 0.0 deg     
                 }
                 
-                Module /home/matt/maus-littlefield/src/common_py/geometry/Step4_Light_version/Tessellated_Shape_8.txt 
-                {
-                Position 51865.7947 -138.0000 -17814.8410 mm
-                Rotation 0.0 0.0 0.0 deg     
-                }
+
                 
-                Module /home/matt/maus-littlefield/src/common_py/geometry/Step4_Light_version/Tessellated_Shape_7.txt 
-                {
-                Position 51891.8244 -138.0000 -17814.8410 mm
-                Rotation 0.0 0.0 0.0 deg     
-                }
-                
-                Module /home/matt/maus-littlefield/src/common_py/geometry/Step4_Light_version/Tessellated_Shape_6.txt 
-                {
-                Position 49553.7947 -138.0000 -17814.8410 mm
-                Rotation 0.0 0.0 0.0 deg     
-                }
-                
-                Module /home/matt/maus-littlefield/src/common_py/geometry/Step4_Light_version/Tessellated_Shape_5.txt 
-                {
-                Position 49579.8244 -138.0000 -17814.8410 mm
-                Rotation 0.0 0.0 0.0 deg     
-                }
                 
                 Module /home/matt/maus-littlefield/src/common_py/geometry/Step4_Light_version/TDm1152m2238.txt 
                 {
@@ -27707,17 +27686,7 @@ Configuration Structure_10212104
                 Rotation 0.0 0.0 0.0 deg     
                 }
                 
-                Module /home/matt/maus-littlefield/src/common_py/geometry/Step4_Light_version/Tessellated_Shape_4.txt 
-                {
-                Position 48901.2680 335.9387 -18325.6145 mm
-                Rotation 0.0 0.0 0.0 deg     
-                }
                 
-                Module /home/matt/maus-littlefield/src/common_py/geometry/Step4_Light_version/Tessellated_Shape_3.txt 
-                {
-                Position 49088.8592 27.3986 -17744.0728 mm
-                Rotation 0.0 0.0 0.0 deg     
-                }
                 
                 Module /home/matt/maus-littlefield/src/common_py/geometry/Step4_Light_version/TDm1152m9701.txt 
                 {
@@ -29237,17 +29206,7 @@ Configuration Structure_10212104
                 Rotation 0.0 0.0 0.0 deg     
                 }
                 
-                Module /home/matt/maus-littlefield/src/common_py/geometry/Step4_Light_version/Tessellated_Shape_2.txt 
-                {
-                Position -187.5912 -473.9387 510.7735 mm
-                Rotation 0.0 0.0 0.0 deg     
-                }
-                
-                Module /home/matt/maus-littlefield/src/common_py/geometry/Step4_Light_version/Tessellated_Shape_1.txt 
-                {
-                Position 0.0000 -165.3986 -70.7682 mm
-                Rotation 0.0 0.0 0.0 deg     
-                }
+               
                 
                 Module /home/matt/maus-littlefield/src/common_py/geometry/Step4_Light_version/TDm1152m9701.txt 
                 {

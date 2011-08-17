@@ -106,10 +106,13 @@ class GDMLtocdb:
         """
         numoffiles = len(self.geometryfiles)
         fin1 = open(self.listofgeometries, 'r')
+        fout = open('/home/matt/maus-littlefield/src/common_py/geometry/Upload.txt', 'w')
         for lines in fin1.readlines():
             filestr = lines
             self.uploadstring += filestr
             self.uploadstring += "<!--  File Name  -->\n"
+            fout.write(self.uploadstring)
+            self.uploadstring = ""
         fin1.close()
         self.uploadstring += "\n<!--  End of File  -->\n"
         for num in range(0, numoffiles):
@@ -118,12 +121,21 @@ class GDMLtocdb:
                 filestr = lines
                 self.uploadstring += filestr
             self.uploadstring += "\n<!--  End of File  -->\n"
-            print "Loading file " + str(num) + " of " + str(numoffiles) 
+            fout.write(self.uploadstring)
+            self.uploadstring = ""
+            print "Loading file " + str(num + 1) + " of " + str(numoffiles) 
         fin2.close()
+        fout.close()
+        fin = open('/home/matt/maus-littlefield/src/common_py/geometry/Upload.txt', 'r')
+        for lines in fin.readlines():
+            self.uploadstring += lines
+        fin.close()
+        print self.uploadstring
         _dt = datetime.today()
         _gdml = b64encode(self.uploadstring)
-        self.geometry.setGDML(_gdml, _dt, self.notes)
+        #self.geometry.setGDML(_gdml, _dt, self.notes)
         print self.geometry.setGDML(_gdml, _dt, self.notes)
+        os.remove('/home/matt/maus-littlefield/src/common_py/geometry/Upload.txt')
 
 class Downloader:
     """

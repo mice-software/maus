@@ -24,19 +24,19 @@ def main():
     uploadgeometry.upload_to_cdb()
     path = inputfile.gdmldir + '/FileList.txt'
     #zip the files and store them locally if selected
-    if inputfile.zipfile == True:
-        zfile = Packer(path)
-        zippedgeoms = '/src/common_py/geometry/zippedGeoms'
-        zippath = os.environ['MAUS_ROOT_DIR'] + zippedgeoms
-        zfile.zipfile(zippath)
+#    if inputfile.zipfile == True:
+ #       zfile = Packer(path)
+  #      zippedgeoms = '/src/common_py/geometry/zippedGeoms'
+   #     zippath = os.environ['MAUS_ROOT_DIR'] + zippedgeoms
+    #    zfile.zipfile(zippath)
     #delete the text file produced by uploadtoCDB()
-    os.remove(path)
+   # os.remove(path)
     #delete original GDML files as they are now zipped if selected
-    if inputfile.deleteoriginals == True:
-        gdmls = os.listdir(inputfile.gdmldir)
-        for fname in gdmls:
-            path = inputfile.gdmldir + '/' +fname
-            os.remove(path)
+#    if inputfile.deleteoriginals == True:
+ #       gdmls = os.listdir(inputfile.gdmldir)
+  #      for fname in gdmls:
+   #         path = inputfile.gdmldir + '/' +fname
+    #        os.remove(path)
 
 
 if __name__ == "__main__":
