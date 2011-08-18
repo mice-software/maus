@@ -127,11 +127,8 @@ void Envelope(const MiceModule* root, std::vector<CovarianceMatrix>& env_out, st
   if(env_type == "Simple" || env_type == "TrackingDerivative")
   {
     Squeak::mout(Squeak::info) << "Finding TrackingDerivative envelope functions" << std::endl;
-    std::cerr << "Buildhits" << std::endl;
     std::vector<PhaseSpaceVector> hits = BuildHitsIn(g_mean, delta);
-    std::cerr << "TMOUT" << std::endl;
     tm_out = TrackingDerivativeTransferMaps(hits, false);
-    std::cerr << "DONE" << std::endl;
     Squeak::mout(Squeak::debug) << "TM_OUT SIZE " << tm_out.size() << std::endl;
   }
   else if(env_type == "PolyFit")
@@ -878,9 +875,7 @@ int main(int argc, char **argv)
   Squeak::mout(Squeak::info) << "Running beam envelope through" << std::endl;
   std::vector<CovarianceMatrix>  envelope;
   std::vector<TransferMap*>      tms;
-  std::cerr << "EBVELOPE" << std::endl;
   Optics::Envelope(root, envelope, tms);
-  std::cerr << "EBVELOPE DONE" << std::endl;
   //Write output
   Output::MakeOutput(envelope, tms, root->findModulesByPropertyExists("string", "EnvelopeType")[0]);
   
