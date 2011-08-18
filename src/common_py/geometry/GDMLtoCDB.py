@@ -7,6 +7,7 @@ from suds.client import Client
 from datetime import datetime
 from base64 import b64encode
 from base64 import b64decode
+from geometry.GDMLPacker import Packer
 
 class GDMLtocdb:
     #pylint: disable = R0902, R0914, R0912, R0915, R0903
@@ -96,7 +97,7 @@ class GDMLtocdb:
             fin.close()
         
 
-    def upload_to_cdb(self):
+    def upload_to_cdb(self, zipped_file):
         """
         @Method upload_to_cdb, this method uploads the geometries to the CDB
 
@@ -104,7 +105,14 @@ class GDMLtocdb:
         into one string. This string is then encoded and uploaded to the CDB with a date stamp of
         when the method is called?.
         """
-        numoffiles = len(self.geometryfiles)
+        _dt = datetime.today()
+        f = open(zipped_file, 'r')
+        f_contents = f.read()
+        _gdml = b64encode(f_contents)
+        self.geometry.setGDML(_gdml, _dt, self.notes)
+        print self.geometry.setGDML(_gdml, _dt, self.notes)
+        
+        """numoffiles = len(self.geometryfiles)
         fin1 = open(self.listofgeometries, 'r')
         fout = open('/home/matt/maus-littlefield/src/common_py/geometry/Upload.txt', 'w')
         for lines in fin1.readlines():
@@ -133,10 +141,10 @@ class GDMLtocdb:
         print self.uploadstring
         _dt = datetime.today()
         _gdml = b64encode(self.uploadstring)
-        #self.geometry.setGDML(_gdml, _dt, self.notes)
+        self.geometry.setGDML(_gdml, _dt, self.notes)
         print self.geometry.setGDML(_gdml, _dt, self.notes)
         os.remove('/home/matt/maus-littlefield/src/common_py/geometry/Upload.txt')
-
+        """
 class Downloader:
     """
     @Class Downloader, this class downloads geometries from the CDB
@@ -217,7 +225,9 @@ class Downloader:
         @param  downloadedpath The path location where the files will be unpacked to. 
         """
         downloadedfile = b64decode(self.geometry.getCurrentGDML())
-        self.unpack(downloadedfile, downloadpath)
+        fout = ('/home/matt/maus-littlefield/src/common_py/geometry/Download/Geom.zip', 'w')
+        fout.write(downloadedfile)
+        #self.unpack(downloadedfile, downloadpath)
 
     def download_geometry_for_id(self, id_num, downloadpath):
         #change notes!
@@ -299,12 +309,12 @@ def main():
     """
     Main function
     """
-    #test = '/home/matt/workspace/Maus/testCases/GDML_fastradModel'
-    #geometry1 = GDMLtocdb(test, "test geometry case", 1)
-    #geometry1.upload_to_cdb()
-    dlgeometry = Downloader(1)
-    test2 = '/home/matt/maus-littlefield/src/common_py/geometry/Download'
-    dlgeometry.download_geometry_for_id('2011-08-08 09:00:00', test2, None)
+    test = '/home/matt/maus-littlefield/src/common_py/geometry/Step4_Light_version'
+    geometry1 = GDMLtocdb(test, "Step 4 test geometry case", 1)
+    geometry1.upload_to_cdb()
+    #dlgeometry = Downloader(1)
+    #test2 = '/home/matt/maus-littlefield/src/common_py/geometry/Download'
+    #dlgeometry.download_geometry_for_id('2011-08-08 09:00:00', test2, None)
     #print datetime.today()
     #dlgeometry.get_ids('2011-08-08 09:00:00')
     #dlgeometry.download_current()

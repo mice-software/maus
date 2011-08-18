@@ -21,8 +21,13 @@ def main():
     inputfile.readconfig()
     #upload the geometry
     uploadgeometry = GDMLtocdb(inputfile.gdmldir, inputfile.geometrynotes, 1)
-    uploadgeometry.upload_to_cdb()
     path = inputfile.gdmldir + '/FileList.txt'
+    zfile = Packer(path)
+    zippedgeoms = '/src/common_py/geometry/zippedGeoms'
+    zippath = os.environ['MAUS_ROOT_DIR'] + zippedgeoms
+    upload_file = zfile.zipfile(zippath)
+    uploadgeometry.upload_to_cdb(upload_file)
+    
     #zip the files and store them locally if selected
 #    if inputfile.zipfile == True:
  #       zfile = Packer(path)

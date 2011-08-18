@@ -66,6 +66,7 @@ class Packer:
         zfile.write(self.filelist, base, zipfile.ZIP_DEFLATED)
         zfile.close()
         fin.close()
+        return zippath
 
 def main():
     """
