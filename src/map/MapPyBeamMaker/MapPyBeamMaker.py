@@ -14,181 +14,127 @@
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
 
-## @class MappyBeamMaker.MappyBeamMaker
-"""BeamMaker generates a matched beam suitable for
-intput in the upstream tracker in ICOOL format beam file"""
+"""
+BeamMaker generates beams for input into MAUS"""
 
-
-# @authors  Timothy Carlisle <t.carlisle1@physics.ox.ac.uk>
-#& based on work by Mark Rayner <m.rayner1@physics.ox.ac.uk> for G4MICE
 
 import json
-#import types
+import ErrorHandler
 import math
 import random
 import numpy
 import numbers
+import xboa.Common
+import xboa.Bunch
+import xboa.Hit
+import copy
+import Beam
 
 class MapPyBeamMaker:
-    """__"""
-
+    """
+    """
+    
     def __init__(self):
-        self._emittance4d = 0
-        self._central_pz = 0
-        self._sigma_pz = 0
-        self._sigma_time = 0
+        '''  Constructor, initiate parameters
+                  
+        '''
+        self.beams = []
+        self.particle_generator = None
+        self.overwrite_existing = False
+        self.binomial_n = 0
+        self.binomial_p = 0.5
+        self.seed = 0
         
+
     def birth(self, argJsonConfigDocument):
-        """Get DataCards"""
-        configDoc = json.loads(argJsonConfigDocument)
-       
-        key = "emittance4D"
-        result = True
-        if key in configDoc:
-            assert isinstance(configDoc[key], numbers.Real)
-            self._emittance4d = configDoc[key]
-        else:
-            result = False
-
-        key = "centralPz"
-
-        if key in configDoc:
-            assert isinstance(configDoc[key],numbers.Real)
-            self._central_pz = configDoc[key]
-        else:
-            result = False
-            #return False
-
-        key = "sigmaPz"
-
-        if key in configDoc:
-            assert isinstance(configDoc[key],numbers.Real)
-            self._sigma_pz = configDoc[key]
-        else:
-            result = False
-            #return False
-
-        key = "sigmaTime"
-
-        if key in configDoc:
-            assert isinstance(configDoc[key], numbers.Real)
-            self._sigma_time = configDoc[key]
-        else:
-            result = False
-            #return False
-
-  
-        return result #true
-
-
-    def process(self, str):
-        """Generate beam covariance matrix, particles & coordinates"""
+        """
+        Read in datacards from supplied cards file and configuration defaults
+        """
         try:
-            spill = json.loads(str)
-        except ValueError:
-            spill = {"errors": {"bad_json_document":
-                                "unable to do json.loads on input"} }
-            return json.dumps(spill)
-               
-        
-        if "mc" not in spill:
-            if 'errors' not in spill:
-                spill['errors'] = {}
-            spill['errors']['no spill'] = 'no spill'
-            return json.dumps(spill)
-               
-        if "particle_id" in  spill: #or "particle_id"
-            if 'errors' not in spill:
-                spill['errors'] = {}
-            spill['errors']['pre-existing_branch'] = 'pre-existing MC branch'
-            return json.dumps(spill)
-   
-      
-        b_z = 4.#  Tesla
-        kappa =  0.15 * ( (b_z) / ( self._central_pz ) ) # m^-1
-        beta = 1. / math.fabs( kappa )
-        gamma = 2. / beta
-       # print "beta = " + str(beta*100)  + " mm" 
-        mass = 105.658367 # MeV/c              ## defined centrally?
+            config_doc = json.loads(argJsonConfigDocument)
+            self.particle_generator = config_doc["beam"]["particle_generator"]
+            self.__birth_empty_particles(config_doc["beam"])
+            for beam_def in config_doc["beam"]["definitions"]:
+                beam = Beam.Beam()
+                beam.birth(beam_def, self.particle_generator, self.seed)
+                self.beams.append(beam)
+            return True
+        except:
+            ErrorHandler.HandleException({}, self)
+            return False
 
-        s_xx = self._emittance4d * beta * mass / self._central_pz
-        s_pp = self._emittance4d * gamma * mass * self._central_pz
-        cross_term = mass * self._emittance4d
 
-        # build 4x4 beam covariance matrix
-        s_matrix = numpy.matrix([ [s_xx, 0, 0, - cross_term],
-                 [0, s_pp, cross_term, 0],
-                          [0, cross_term, s_xx, 0],
-                                  [ - cross_term, 0, 0, s_pp] ])
+    def __birth_empty_particles(self, beam_def):
+        """
+        """
+        self.seed = beam_def["random_seed"]
+        numpy.random.seed(self.seed)
+        if beam_def["particle_generator"] not in ["binomial", "counter", "overwrite_existing"]:
+            raise KeyError("Did not recognise particle_generator "+str(beam_def["particle_generator"]))
+        self.particle_generator = beam_def["particle_generator"]
+        if beam_def["particle_generator"] == "binomial":
+            self.binomial_n == int(beam_def["binomial_n"])
+            self.binomial_p == float(beam_def["binomial_p"])
+            if self.binomial_p > 1. or self.binomial_p <= 0.:
+                raise KeyError("Beam binomial_p "+str(self.binomial_p)+" should be > 0. and <= 1.")
 
-        det_s = numpy.linalg.det(s_matrix)
- 
-        s_inv = s_matrix.I
+    def process(self, json_spill_doc):
+        """Generate beam covariance matrix, particles & coordinates
 
-        #What are our limits?
-        _xmax = 5. * math.sqrt( s_xx )
-        _pmax = 5. * math.sqrt( s_pp )
-        
-        #Calculate mean transverse amplitude (c.f. Penn pp. 5)
-        _mean_transverse_amp = (4. * mass * self._emittance4d)/ self._central_pz
-        
-        #now loop over particles
-        for i in range (0, len(spill["mc"]), 1): 
-            particle = {}
-            done = False
-    
-            # Consult for the format:
-            # http://micewww.pp.rl.ac.uk/projects/
-            # maus/wiki/DataStructure#MC-Particles
-            while ( done == False ):
-            
-                _xpos = random.uniform(-_xmax, _xmax)
-                _ypos  = random.uniform(-_xmax, _xmax)
-
-                _px = random.uniform(-_pmax, _pmax)
-                _py = random.uniform(-_pmax, _pmax)
-
-                _time = random.gauss(0., self._sigma_time)
-                _pz = random.gauss(self._central_pz, self._sigma_pz)
-               
-                zeta = numpy.matrix( [_xpos, _px, _ypos, _py] )
-#          
-                argument = (zeta * s_inv * zeta.T)
-
-                if (math.exp(- 0.5 * argument ) > random.uniform(0., 1.)):
-                    done = True
-                         
-            position = {}
-            position["x"] = _xpos
-            position["y"] = _ypos
-
-            # ZoffSet?
-            position["z"] = 0.
-          
-            particle["position"] = position
-            
-            unit_momentum = {}   
-            unit_momentum["x"] =  _px #random.uniform(-_pmax, _pmax) 
-            unit_momentum["y"] =  _py #random.uniform(-_pmax, _pmax)
-            unit_momentum["z"] =  _pz #random.gauss(_central_pz, _sigma_pz)
-
-            total_momentum = math.sqrt(pow(_px,2) + pow(_py,2) + pow(_pz,2))
-            
-            particle["unit_momentum"] = unit_momentum
-            
-            particle["energy"] =  math.sqrt(math.pow(total_momentum,2) + math.pow(mass,2))
-            # MeV
-            
-            particle["particle_id"] = 13# PDG PID
-          
-            spill["mc"][i]= particle
-            #print spill
-        return json.dumps(spill)
+        @return Returns an array containing a spill of particles, with
+                position: x,y,z and momentum: Px,Py,Pz
+                Energy
+                & ICOOL pid
                 
+        """
+        spill = {}
+        try:
+            spill = json.loads(json_spill_doc)
+            self.__process_check_spill(spill)
+            new_particles = self.__process_generate_multiple_primaries(spill)
+            for index, particle in enumerate(new_particles):
+                a_beam = self.__process_choose_beam(index)
+                particle["primary"] = a_beam.make_one_primary()
+        except:
+            ErrorHandler.HandleException(spill, self)
+        return json.dumps(spill)
+            
+    def __process_check_spill(self, spill):
+        if "mc" not in spill:
+            raise KeyError("Need mc branch for processing spill")
+        if type(spill["mc"]) != type([]):
+            raise KeyError("mc branch should be an array type")
+
+    def __process_generate_multiple_primaries(self, spill):
+        spill_length = len(spill["mc"])
+        if self.particle_generator == "overwrite_existing":
+            return spill["mc"]
+        elif self.particle_generator == "binomial":
+            n_p = numpy.random.binomial(self.binomial_n, self.binomial_p)
+            for i in range(n_p):
+                spill["mc"].append({"primary":{}})
+        elif self.particle_generator == "counter":
+            for beam in self.beams:
+                for i in range(beam.n_particles_per_spill):
+                    spill["mc"].append({"primary":{}})
+        else:
+            raise RuntimeError("Didn't recognise particle_generator command "+str(self.particle_generator))
+        return spill["mc"][spill_length:]
+
+    def __process_choose_beam(self, index):
+        if self.particle_generator == "counter":
+            for beam in self.beams:
+                index -= beam.n_particles_per_spill
+                if index < 0:
+                    return beam
+        else:
+            weights = [0.]
+            for i, beam in enumerate(self.beams):
+                weights.append(weights[i]+beam["weight"])
+            dice = numpy.random.uniform(0., weights[-1])
+            return self.beams[bisect.bisect_left(weights, dice)]
+
     def death(self):
-        """DEATH"""
-    
-        
-
-
+        """ does nothing """
+        return True
 

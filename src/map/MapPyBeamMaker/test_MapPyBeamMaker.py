@@ -1,166 +1,106 @@
-"""Script to test the BeamMaker App"""
+"""Script to test the BeamMaker Application"""
+
 
 import json
 import unittest
+import ErrorHandler
+import numbers
 
 from Configuration import Configuration
-import io
 from MapPyBeamMaker import MapPyBeamMaker
 
+import xboa.Common as Common
+
+CHARGE_SPECIES = +1
+JSON_SAMPLE = {
+    "beam":{
+        "particle_generator":"counter",
+        "random_seed":2,
+        "definitions":[{
+            "n_particles_per_spill":9,
+            "reference":{
+                "position":{"x":0.0, "y":-0.0, "z":-4700.0},
+                "momentum":{"x":0.0, "y":0.0, "z":1.0},
+                "particle_id":-13*CHARGE_SPECIES,
+                "energy":235.0,
+                "time":0.0,
+                "random_seed":0
+            },
+            "transverse":{
+                "transverse_mode":"penn",
+                "emittance_4d":6.*Common.units["mm"],
+                "beta_4d":333.*Common.units["mm"],
+                "alpha_4d":0.,
+                "normalised_angular_momentum":0.,
+                "bz":4.*Common.units["T"]
+            },
+            "longitudinal":{
+                "longitudinal_mode":"sawtooth_time",
+                "t_start":0.,
+                "t_end":1.e6,
+                "momentum_defined_by":"p",
+                "sigma_p":20.*Common.units["MeV/c"]
+            },
+            "coupling":{
+                "coupling_mode":"none"
+            }
+        },{
+            "n_particles_per_spill":2,
+            "reference":{
+                "position":{"x":0.0, "y":-0.0, "z":-4700.0},
+                "momentum":{"x":0.0, "y":0.0, "z":1.0},
+                "particle_id":211*CHARGE_SPECIES,
+                "energy":207.0,
+                "time":0.0,
+                "random_seed":0
+            },
+            "transverse":{
+                "transverse_mode":"penn",
+                "emittance_4d":6.*Common.units["mm"],
+                "beta_4d":333.*Common.units["mm"],
+                "alpha_4d":0.,
+                "normalised_angular_momentum":0.,
+                "bz":4.*Common.units["T"]
+            },
+            "longitudinal":{
+                "longitudinal_mode":"sawtooth_time",
+                "t_start":0.,
+                "t_end":1.e6,
+                "momentum_defined_by":"p",
+                "sigma_p":20.*Common.units["MeV/c"]
+            },
+            "coupling":{
+                "coupling_mode":"none"
+            }                                       
+        }]
+    }
+}
+
+
 class MapPyBeamMakerTestCase(unittest.TestCase):
-    """Class or something"""
+    """ set of tests for MapPyBeamMaker """
     @classmethod
-    def setUpClass(self):
-        """bla"""
-        testJson2 = {}
-        testJson2['mc'] = []
-        testJson2['mc'].append({})
-        testJson2['mc'].append({})
-       # testJson2['mc'].append({})
-        self.good_spill = json.dumps(testJson2)
+    def setUpClass(cls):
+        pass
 
-        testJson = {}
-        testJson['mc'] = []
-        testJson['mc'].append({})
-        testJson['mc'][0] = {'particle_id' : 13}
-        testJson['mc'][0] = {'x' : -1.032}
-        testJson['mc'][0]['hits'] = {}
-      #  testJson['mc'].append(testJson['mc'][0])
-        #testJson['mc'].append({})
-        self.testString1 = json.dumps(testJson)
-      
-        
-    def test_junk(self):
-        '''test with junk input'''
-
-        mapper = MapPyBeamMaker()
-
-        c = Configuration()
-  
-        success = mapper.birth(c.getConfigJSON())
-        self.assertTrue(success)
-
-        result = mapper.process("asdghakfdh")
-        doc = json.loads(result)
-        self.assertTrue("errors" in doc)
-        self.assertTrue("bad_json_document" in doc["errors"])
-        mapper.death()
-
-    def test_good_datacards(self):
-         '''test with sensible datacards'''
-         mapper = MapPyBeamMaker()
-
-         c = {}
-         c["emittance4D"] = 6.0
-         c["centralPz"] = 200.0
-         c["sigmaPz"] = 1.0
-         c["sigmaTime"] = 0.0
-   
-         success = mapper.birth(json.dumps(c))
-         self.assertTrue(success)
-         
-         result = mapper.process(self.good_spill)
-         doc = json.loads(result)
-        
-         self.assertFalse("errors" in doc)
-       #  self.assertTrue(len(doc["mc"]) == 10)
-
-#       "x" in doc["mc"][1]) #[0]
-         
-         mapper.death()
-         
-             
-     
-        #len(doc["mc"]) == 10
-        #"x" in doc["mc"][0]
-        #"y" in doc....
-        
-      #  print doc["mc"][0]["x"]
-       
-    def test_bad_datacards(self):
-        '''test with duff datacards'''
-
-        mapper = MapPyBeamMaker()
-
-        c = {}
-        c["emittance4D"] = 1.0
-        c["centralPz"] = 1.0
-        c["sigmaPz"] = 1.0
-        c["sigmaTime"] = 1.0
-            
-        for key in c.keys():
-            new_c = c.copy()
-            new_c[key] = "duff"
-
-            with self.assertRaises(AssertionError):
-                success = mapper.birth(json.dumps(new_c))
-
-            del new_c[key]
-            success = mapper.birth(json.dumps(new_c))
-            self.assertFalse(success)
-
-        for key in c.keys():
-            new_c = c.copy()
-            new_c[key] = "-1.0"
-
-            with self.assertRaises(AssertionError):
-                success = mapper.birth(json.dumps(new_c))
-        
-        mapper.death()
-    
-    def test_empty(self):
-        """empty input - no spill structure"""
-        mapper = MapPyBeamMaker()
-
-        c = Configuration()
-        success = mapper.birth(c.getConfigJSON())
-        self.assertTrue(success)
-
-        result = mapper.process("{}")
-        doc = json.loads(result)
-        self.assertTrue("errors" in doc)
-        self.assertTrue("no spill" in doc["errors"])
-
-        mapper.death()
-
-##     def test_return(self):
-##         """Test with existing mc"""
-##         mapper = MapPyBeamMaker()
-
-##         c = Configuration()
-  
-##         success = mapper.birth(c.getConfigJSON())
-##         self.assertTrue(success)
-
-##         result = mapper.process(self.testString1)
-##         doc = json.loads(result)
-##         self.assertTrue("errors" in doc)
-##         self.assertTrue("pre-existing_branch" in doc["errors"])
-##         mapper.death()
-        
+    @classmethod
+    def tearDownClass(cls):
+        pass
  
-    
-    def test_BeamMakerCards(self):
-        """Check sensible DataCards have been provided by the user"""
-        mapper = MapPyBeamMaker()
-        
-        c = Configuration()
-        success = mapper.birth(c.getConfigJSON())
-        self.assertTrue(success)
+    def test_init(self):
+        MapPyBeamMaker()
 
-      #  N = mapper._CreateNparticles
-      #  self.assertGreater(N,0,"Positive N required")
-        
-     
-        self.assertGreater(mapper._emittance4d, 0, "negative emittance4d supplied")
-        self.assertGreater(mapper._central_pz, 0, "negative central Pz supplied")
+    def test_integration(self):
+        """
+        Check the whole flow works to produce a set of primaries
+        """
+        beam_maker = MapPyBeamMaker()
+        beam_maker.birth(json.dumps(JSON_SAMPLE))
+        for i in range(2):
+            spill = beam_maker.process( json.dumps({"mc":[]}) )
+            print spill
 
-        self.assertGreater(mapper._sigma_pz, 0, "negative sigmaPz supplied")
-
-        self.assertGreaterEqual( mapper._sigma_time, 0, "negative sigmaTime supplied")
-
-        mapper.death()
-        
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
+
 
