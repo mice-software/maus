@@ -30,7 +30,7 @@ def arg_parser():
     parser.add_argument('-D', '--delete', help="Delete human readable file before program exit", dest='delete', action='store_true', default=True)
     parser.add_argument('-d', '--no_delete', help="Don't delete human readable file before program exit", dest='delete', action='store_false', default=True)
     parser.add_argument('--start_line', help="First line to parse, counting from 1. Issues an error if --start-line is > number of lines", type=int, default=1)
-    parser.add_argument('--end_line', help="Last line to parse, counting from 1. Ignored if < 1.", type=int, default=0)
+    parser.add_argument('--end_line', help="Last line to parse, counting from 1. Ignored if < 1", type=int, default=0)
     return parser
 
 def write_json(sys_args):
@@ -43,14 +43,15 @@ def write_json(sys_args):
             line_number += 1
             if line == "":
                 raise IOError("File finished before reaching start_line at line "+str(line_number))
-        while (line_number <= sys_args.end_line or sys_args.end_line < 0) \
+        while (line_number <= sys_args.end_line or sys_args.end_line < 1) \
               and line != '':
             line = fin.readline()
             try:
                 json_in = json.loads(line)
                 json_out = json.dumps(json_in, indent=sys_args.indent)
             except:
-                raise IOError("Input file could not be parsed into json format at line "+str(line_number))
+                if line != "\n" and line != "":
+                    raise IOError("Input file could not be parsed into json format at line "+str(line_number))  
             print >>fout, json_out
             line_number += 1
         fout.close() # force to clear any buffer
