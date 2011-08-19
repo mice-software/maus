@@ -40,10 +40,16 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         ./configure --enable-shared --prefix="${MAUS_ROOT_DIR}/third_party/install"
   fi
 
-	echo "HACK: Enabling zlib"
+  echo "HACK: Enabling zlib (again?)"
+        sleep 1
 
-  if [ `uname -s` != "Darwin" ]; then
-	  echo "zlib zlibmodule.c -I\$(prefix)/include -L\$(exec_prefix)/lib -lz" >> Modules/Setup
+
+  if [ "$(uname -m)" = "x86_64" ]; then
+      echo "     This is an x86_64 Linux"
+      echo "zlib zlibmodule.c -I/usr/include -L/usr/lib64 -lz" >> Modules/Setup
+  elif [ `uname -s` != "Darwin" ]; then
+      echo "     This is NOT an x86_64 Linux"
+      echo "zlib zlibmodule.c -I/usr/include -L/usr/lib -lz" >> Modules/Setup
   fi
 
         echo "INFO: Making:"
