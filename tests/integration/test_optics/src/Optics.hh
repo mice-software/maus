@@ -25,7 +25,7 @@
 #include "TMinuit.h"
 
 dataCards                MyDataCards("Simulation");
-MICEEvent                simEvent   = MICEEvent();
+MICEEvent                simEvent   = MICEEvent(); // Dead legacy datastructure - needs to be purged
 bool                     settingRF;
 
 void  writeEvent();
@@ -39,7 +39,7 @@ namespace Simulation
   //Setup geometry etc; will add ellipses using matrix, make it a std::vector<CovarianceMatrix>() to ignore
   void                   SetupSimulation(MiceModule* root, std::vector<CovarianceMatrix> matrix);
   //Phase cavities
-  MICEEvent*             PhaseCavities  (PhaseSpaceVector ref);
+  void                   PhaseCavities  (PhaseSpaceVector ref);
   //Run an event through the simulation
   MICEEvent*             RunSimulation  (PhaseSpaceVector psv);
   //Make a set of elliptical cylinders using the matrix RMS x,y and correlations - for visualisation

@@ -1,3 +1,11 @@
+MAUS-v0.0.6 (http://micewww.pp.rl.ac.uk/versions/show/14)
+  Bug #563: Installation of Maus
+  Bug #599: root build fails when conflicting python2.7 already installed
+  Bug #604: Maus installation on Fedora 15 - 64 bit
+  Bug #613: Root not being installed
+  Feature #291: digitization cleanup: create value getting function
+  Feature #356: Implement G4 inline visualisation
+
 MAUS-v0.0.5 (http://micewww.pp.rl.ac.uk/versions/show/12)
   Bug #574: doxygen on webserver not updating
   Bug #607: Simulation runs too slow

@@ -324,7 +324,8 @@ VirtualPlane VirtualPlaneManager::ConstructFromModule(const MiceModule* mod) {
 }
 
 
-void VirtualPlaneManager::AddPlane(VirtualPlane* newPlane, const MiceModule* mod) {
+void VirtualPlaneManager::AddPlane
+                               (VirtualPlane* newPlane, const MiceModule* mod) {
   _planes.push_back(newPlane);
   _mods[newPlane] = mod;
   sort(_planes.begin(), _planes.end(), VirtualPlane::ComparePosition);
@@ -346,14 +347,14 @@ int VirtualPlaneManager::GetStationNumberFromModule(const MiceModule* module) {
   VirtualPlane* plane = NULL;
   typedef std::map<VirtualPlane*, const MiceModule*>::iterator map_it;
   for (map_it it = _mods.begin(); it != _mods.end() && plane == NULL; it++)
-    if (it->second == module) plane = it->first; // find plane from module
+    if (it->second == module) plane = it->first;  // find plane from module
   if (plane == NULL) {
     throw(Squeal(Squeal::recoverable,
           "Module "+module->name()+" not found in VirtualPlaneManager",
           "VirtualPlaneManager::GetStationNumberFromModule"));
   }
   for (size_t i = 0; i < _planes.size(); i++)
-    if (plane == _planes[i]) return i+1; // find station from plane
+    if (plane == _planes[i]) return i+1;  // find station from plane
   throw(Squeal(Squeal::recoverable,
         "Module "+module->name()+" not found in VirtualPlaneManager",
         "VirtualPlaneManager::GetStationNumberFromModule"));
