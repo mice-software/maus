@@ -5,11 +5,14 @@ import linecache
 import subprocess
 import os
 
+TEMP_FILE='json_to_human_readable_out.tmp'
+
 DESCRIPTION=\
 """
 Convert json output to human readable format. 
 
-By default, output is piped to 'more'. Optionally can save the output to a
+By default, output is written to """+TEMP_FILE+""" and piped to 'more'; then
+deleted at the end of the session. Optionally can save the output to a
 user-specified file for browsing in your favourite text editor.
 """
 
@@ -21,14 +24,12 @@ def arg_parser():
                         help='Read in json file with this name', required=True)
     parser.add_argument('--output_file', dest='output_file', \
                         help='Write reformatted output to file with this name, overwriting any existing files', \
-                        default='json_to_human_readable_out.tmp')
+                        default=TEMP_FILE)
     parser.add_argument('--indent', dest='indent', \
                         help='Specify the number of spaces to indent each level of the data tree', \
                         default=2, type=int)
     parser.add_argument('-M', '--more', help='Run more on output file after parsing', dest='more', action='store_true', default=True)
     parser.add_argument('-m', '--no_more', help="Don't run more on output file after parsing", dest='more', action='store_false', default=True)
-    parser.add_argument('-D', '--delete', help="Delete human readable file before program exit", dest='delete', action='store_true', default=True)
-    parser.add_argument('-d', '--no_delete', help="Don't delete human readable file before program exit", dest='delete', action='store_false', default=True)
     parser.add_argument('--start_line', help="First line to parse, counting from 1. Issues an error if --start-line is > number of lines", type=int, default=1)
     parser.add_argument('--end_line', help="Last line to parse, counting from 1. Ignored if < 1", type=int, default=0)
     return parser
@@ -63,7 +64,7 @@ def main(argv):
     if args_in.more:
         ps = subprocess.Popen(['more', args_in.output_file], stdout=sys.stdout)
         ps.wait()
-    if args_in.delete:
+    if args_in.output_file == TEMP_FILE:
         os.remove(args_in.output_file)
 
 if __name__ == "__main__":
