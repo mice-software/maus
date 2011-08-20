@@ -555,6 +555,7 @@ if env['USE_G4'] and env['USE_ROOT']:
     #Build an extra copy with the .dylib extension for linking on OS X
     if (sysname == 'Darwin'):
       targetpath = 'src/common_cpp/libMausCpp.dylib'
+      global maus_cpp_dylib
       maus_cpp_dylib = env.SharedLibrary(target = targetpath,
                                          source = common_cpp_files,
                                          LIBS=env['LIBS'] + ['recpack'])
