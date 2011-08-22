@@ -225,8 +225,10 @@ class Downloader:
         @param  downloadedpath The path location where the files will be unpacked to. 
         """
         downloadedfile = b64decode(self.geometry.getCurrentGDML())
-        fout = ('/home/matt/maus-littlefield/src/common_py/geometry/Download/Geom.zip', 'w')
+        zip_path = downloadpath + '/Geometry.zip'
+        fout = open(zip_path, 'w')
         fout.write(downloadedfile)
+        fout.close()
         #self.unpack(downloadedfile, downloadpath)
 
     def download_geometry_for_id(self, id_num, downloadpath):

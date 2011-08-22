@@ -26,7 +26,7 @@ class GDMLtomaus():
                     self.StepFiles.append(stepfile)
 
         def convert_to_maus(self, output):
-            outputfile = output + "/Configuration.txt"
+            outputfile = output + "/ParentGeometryFile.txt"
             configurationxsl = os.environ["MAUS_ROOT_DIR"] + "/src/common_py/geometry/xsltScripts/GDML2G4MICE.xsl"
             ConfigFile = CADImport(xmlin1 = self.ConfigurationFile, xsl = configurationxsl, output = outputfile)
             ConfigFile.parse_xslt()

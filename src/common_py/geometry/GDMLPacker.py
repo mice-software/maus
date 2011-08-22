@@ -67,6 +67,16 @@ class Packer:
         zfile.close()
         fin.close()
         return zippath
+    
+class Unpacker:
+    def __init__(self, file, extract_path):
+        #may need a little test
+        self.file = file
+        self.extract_path = extract_path
+    
+    def unzip_file(self):
+        zfile = zipfile.ZipFile(self.file)
+        zfile.extractall(self.extract_path)
 
 def main():
     """
