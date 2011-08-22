@@ -13,7 +13,7 @@ class CADImport:
     @Class CADImport, GDML parser class.
     
     This class has been designed to parse XML(GDML) files in a number of ways.
-    The first way applies an XSLT stylesheet to a GDML file and re writes the
+    The first way applies an XSLT stylesheet to a GDML file which re writes the
     file into MICE module format. The output can be a text file. The second parsing
     method is where the XSLT stylesheet is applied to two GDMLs and appends the MICE
     Information of one GDML to the end of the geometry GMDL file, taken from fastRad
@@ -25,17 +25,16 @@ class CADImport:
         """
         @Method Class constructor
 
-        This method initialises the class and takes 7 parameters. The later 4 parameters are optional
-        but if one of the latter needs to be initialised a blank "" needs to be placed to set preceeding 
-        params to None. All arguments should be file names or paths.
+        This method initialises the class and takes 6 parameters. The later 4 parameters are optional.
+        All arguments should be file names or paths.
 
-        @param xmlin1,   first xml file name/path, used to apply an XSLT to.
-        @param xsl,      xslt file name/path, xslt stylesheet used to re write xml(GDML)
-        @param xmlin2,   second xml file name/path, used to hold the MICE info to append to geometry
-        @param output,   output file name/path
-        @param mergein,  template XSLT for append, this is the file name/path to Merge.xsl.in which is the stylesheet
+        @param xmlin1   first xml file name/path, used to apply an XSLT to.
+        @param xsl      xslt file name/path, xslt stylesheet used to re write xml(GDML)
+        @param xmlin2   second xml file name/path, used to hold the MICE info to append to geometry
+        @param output   output file name/path
+        @param mergein  template XSLT for append, this is the file name/path to Merge.xsl.in which is the stylesheet
                          used to append the MICE info to geometry info. This file must be altered to set the putout file name/path.
-        @param mergeout, file name/path to be inserted into merge.xsl.in.
+        @param mergeout file name/path to be inserted into merge.xsl.in.
         """
         if type(xmlin1) != str:
             raise TypeError(xmlin1 + " must be a string(file name/path)")
@@ -74,7 +73,8 @@ class CADImport:
             self.merge_in = mergein
 
         if mergeout == None: 
-            self.merge_out = 'Merge.xsl'
+            path = os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/xsltScripts/Merge.xsl'
+            self.merge_out = path
         elif type(mergeout) != str:
             raise TypeError(mergeout + "output must be a string filename/path)")
         elif mergeout[-4:] != '.xsl':
@@ -84,11 +84,10 @@ class CADImport:
 
     def parse_xslt(self):
         """
-        @Method parse_xslt, to parse an XML(GDML) to text or another XML(GDML)
+        @Method parse_xslt to parse an XML(GDML) to text or another XML(GDML)
 
         This method will execute an XSLT stylesheet and produce either a text
         or another XML(GDML) according to the request.
-
         """
         styledoc = libxml2.parseFile(self.xsl)
         style = libxslt.parseStylesheetDoc(styledoc)
@@ -104,10 +103,9 @@ class CADImport:
         @Method which appends the MICE info to GDML
 
         This method reads in Merge.xsl.in, used to append the MICE info onto the end of
-        a config file, and replaces the text EDIT with the name of the file from which the MICE
-        info comes from. Outputs a new file, Merge.xsl, ready to be parse.
-
-        @param Parameter 1 intialised in class intialiser (2nd xml input)
+        a config file, and replaces the text 'EDIT' with the name of the file from which the MICE
+        info comes from. Outputs a new file, Merge.xsl, ready to be run the XSLT(merge.xsl) over
+        the original GDML.
         """
         fin = open(self.merge_in, 'r')
         fout = open(self.merge_out, 'w')

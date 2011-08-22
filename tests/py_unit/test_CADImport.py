@@ -9,8 +9,8 @@ class  test_CADImport(unittest.TestCase):
         xml_in_1 = self.maus_root + '/src/common_py/geometry/testCases/testGeometry/fastradModel.gdml'
         xml_in_2 = self.maus_root + '/src/common_py/geometry/testCases/testGeometry/FieldInfoTest.xml'
         x_s_l = self.maus_root + '/src/common_py/geometry/xsltScripts/GDML2G4MICE.xsl'
-        out_put = self.maus_root + '/src/common_py/geometry/testCases/OUTPUTFILE.txt'
-        self.CADImport_two_xml = CADImport(xmlin1 = xml_in_1, xsl = x_s_l, xmlin2 = xml_in_2, output = out_put)
+        self.out_put = self.maus_root + '/src/common_py/geometry/testCases/OUTPUTFILE.txt'
+        self.CADImport_two_xml = CADImport(xmlin1 = xml_in_1, xsl = x_s_l, xmlin2 = xml_in_2, output = self.out_put)
 
     def test_Constructor(self):
         """
@@ -19,12 +19,12 @@ class  test_CADImport(unittest.TestCase):
         second,  test it raises an error when it isn't an xml or gdml file
         """
         try:
-            self.Constructor = CADImport(xsl = "GDML2G4MICE.xsl")
+            self.Constructor = CADImport(xsl = x_s_l)
             self.assertTrue(False, "should have raised an exception")
         except:
             pass
         try:
-            self.Constructor = CADImport(xmlin1 = "fastradModel.not_xml", xsl = "GDML2G4MICE.xsl")
+            self.Constructor = CADImport(xmlin1 = "fastradModel.not_xml", xsl = x_s_l)
             self.assertTrue(False, "Should have raised an exception")
         except:
             pass
@@ -34,12 +34,12 @@ class  test_CADImport(unittest.TestCase):
         second,  test it raises an error when it isn't an xsl file
         """
         try:
-            self.Constructor = CADImport(xmlin1 = "fastradModel.xml")
+            self.Constructor = CADImport(xmlin1 = xml_in_1)
             self.assertTrue(False, "Should have raised an exception")
         except:
             pass
         try:
-            self.Constructor = CADImport(xmlin1 = "fastradModel.xml", xsl = "GDML2G4MICE.not_xsl")
+            self.Constructor = CADImport(xmlin1 = xml_in_1, xsl = "GDML2G4MICE.not_xsl")
             self.assertTrue(False, "Should have raised an exception")
         except:
             pass
@@ -50,17 +50,17 @@ class  test_CADImport(unittest.TestCase):
         third,   test it raises an error when it isn't an xml or gdml file
         """
         try:
-            self.Constructor = CADImport(xmlin1 = "fastradModel.xml", xsl = "GDML2G4MICE.xsl")
+            self.Constructor = CADImport(xmlin1 = xml_in_1, xsl = x_s_l)
             self.assertEqual(self.Constructor.XMLIn2, None, "default is not None")
         except:
             pass
         try:
-            self.Constructor = CADImport(xmlin1 = "fastradModel.xml", xsl = "GDML2G4MICE.xsl", xmlin2 = 1)
+            self.Constructor = CADImport(xmlin1 = xml_in_1, xsl = x_s_l, xmlin2 = 1)
             self.assertTrue(False, "Should have raised an exception")
         except:
             pass
         try:
-            self.Constructor = CADImport(xmlin1 = "fastradModel.xml", xsl = "GDML2G4MICE.xsl", xmlin2 = "FieldInfoTest.not_xml")
+            self.Constructor = CADImport(xmlin1 = xml_in_1, xsl = x_s_l, xmlin2 = "FieldInfoTest.not_xml")
             self.assertTrue(False, "Should have raised an exception")
         except:
             pass
@@ -70,12 +70,12 @@ class  test_CADImport(unittest.TestCase):
         second,  test it raises an error when it isn't a string
         """
         try:
-            self.Constructor = CADImport(xmlin1 = "fastradModel.xml", xsl = "GDML2G4MICE.xsl")
+            self.Constructor = CADImport(xmlin1 = xml_in_1, xsl = x_s_l)
             self.assertEqual(self.Constructor.Output, None, "default is not None")
         except:
             pass
         try:
-            self.Constructor = CADImport(xmlin1 = "fastradModel.xml", xsl = "GDML2G4MICE.xsl", output = 1)
+            self.Constructor = CADImport(xmlin1 = xml_in_1, xsl = x_s_l, output = 1)
             self.assertTrue(False, "Should have raised an exception")
         except:
             pass
@@ -85,13 +85,13 @@ class  test_CADImport(unittest.TestCase):
         second,  test it raises an error when it isn't a string
         """
         try:
-            self.Constructor = CADImport(xmlin1 = "fastradModel.xml", xsl = "GDML2G4MICE.xsl", mergein = "something else")
+            self.Constructor = CADImport(xmlin1 = xml_in_1, xsl = x_s_l, mergein = "something else")
             self.assertEqual(self.Constructor.MergeIn, "Merge.xsl.in", "default is not Merge.xsl.in")
         except:
             pass
         
-        try:
-            self.Constructor = CADImport(xmlin1 = "fastradModel.xml", xsl = "GDML2G4MICE.xsl", mergin = 1)
+        try :
+            self.Constructor = CADImport(xmlin1 = xml_in_1, xsl = x_s_l, mergin = 1)
             self.assertTrue(False, "Should have raised an exception")
         except:
             pass
@@ -102,17 +102,17 @@ class  test_CADImport(unittest.TestCase):
         third,   test it raises an error when it isn't an xsl
         """
         try:
-            self.Constructor = CADImport(xmlin1 = "fastradModel.xml", xsl = "GDML2G4MICE.xsl")
+            self.Constructor = CADImport(xmlin1 = xml_in_1, xsl = x_s_l)
             self.assertEqual(self.Constructor.MergeOut, "Merge.xsl", "default is not Merge.xsl")
         except:
             pass
         try:
-            self.Constructor = CADImport(xmlin1 = "fastradModel.xml", xsl = "GDML2G4MICE.xsl", mergout = 1)
+            self.Constructor = CADImport(xmlin1 = xml_in_1, xsl = x_s_l, mergout = 1)
             self.assertTrue(False, "Should have raised an exception")
         except:
             pass
         try:
-            self.Constructor = CADImport(xmlin1 = "fastradModel.xml", xsl = "GDML2G4MICE.xsl", mergeout = "MergedOut.not_xsl")
+            self.Constructor = CADImport(xmlin1 = xml_in_1, xsl = x_s_l, mergeout = "MergedOut.not_xsl")
             self.assertTrue(False, "Should have raised an exception")
         except:
             pass
@@ -136,6 +136,7 @@ class  test_CADImport(unittest.TestCase):
                 count += 1
         if count == 0:
             self.assertTrue(False, "output file is not of MAUS Module format")
+        os.remove(self.out_put)
 
     def test_append_merge(self):
         self.CADImport_two_xml.append_merge()
@@ -158,9 +159,15 @@ class  test_CADImport(unittest.TestCase):
             if line.find('EDIT')>=0:
                 count2 += 1
         self.assertTrue(count2 == 1, "More than one EDIT found in Merge.xsl.in")
+        os.remove(self.CADImport_two_xml.merge_out)
         
     def tearDown(self):
         self.CADImport_two_xml = None
+        xml_in_1 = None
+        xml_in_2 = None
+        x_s_l = None
+        out_put = None
+        
     
 if __name__ == '__main__':
     unittest.main()

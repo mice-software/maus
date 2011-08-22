@@ -1,5 +1,7 @@
-<?xml version="1.0" ?><!--   GDML materials definition from the Fastrad file : "fastradModel.ray"
-	Processed the 14/01/2011 at 10h17 by the GDML module of Fastrad 3.1.0.2 --><materials>
+<?xml version="1.0" encoding="UTF-8"?><!--   GDML materials definition from the Fastrad file : "fastradModel.ray"
+Processed the 14/01/2011 at 10h17 by the GDML module of Fastrad 3.1.0.2 -->
+
+<materials>
 	<element Z="1" formula="VACUUM" name="videRef">
 		<atom value="1"/>
 	</element>
