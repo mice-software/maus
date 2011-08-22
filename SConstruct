@@ -358,13 +358,13 @@ def set_geant4(conf, env):
 
         # removing this line (and using the append(libs) one below, because this is messy and breaks/seg-faults.
         #    conf.env.ParseConfig('%s/liblist -m %s < %s/libname.map'.replace('%s', os.path.join(os.environ.get('G4LIB'), os.environ.get('G4SYSTEM'))))
-
-
         env.Append(LIBS=get_g4_libs())
 
         for lib in get_g4_libs():
             if not conf.CheckLib(lib, language='c++'):
                 my_exit(1)
+
+        geant4_extras(env)
 
 def set_recpack(conf, env):
     if not conf.CheckLib('recpack', language='c++') or\
@@ -386,6 +386,60 @@ def set_unpacker(conf, env):
     else:
         env["USE_UNPACKER"] = True
 
+def cpp_extras(env):
+  """
+  Sets compilation to include coverage, debugger, profiler depending on 
+  environment variable flags. Following controls are enabled:
+      if maus_lcov is set, sets gcov flags (for subsequent use in lcov); also
+      disables inlining
+      if maus_debug is set, sets debug flag -g
+      if maus_gprof is set, sets profiling flag -pg
+      if maus_no_optimize is not set and none of the others are set, sets
+          optimise flag -O3
+  """
+  lcov = 'maus_lcov' in os.environ and os.environ['maus_lcov'] != '0'
+  debug = 'maus_debug' in os.environ and os.environ['maus_debug'] != '0'
+  gprof = 'maus_gprof' in os.environ and os.environ['maus_gprof'] != '0'
+  optimise = not ('maus_no_optimize' in os.environ 
+                and os.environ['maus_no_optimize'] != '0') # optimise by default
+  
+  if lcov:
+    env.Append(LIBS=['gcov'])
+    env.Append(CCFLAGS=["""-fprofile-arcs""", """-ftest-coverage""",
+                        """-fno-inline""", """-fno-default-inline"""])
+
+  if debug:
+    env.Append(CCFLAGS=["""-g"""])
+
+  if gprof: # only works on pure c code (i.e. unit tests)
+    env.Append(CCFLAGS=["""-pg"""])
+    env.Append(LINKFLAGS=["""-pg"""])
+
+  if not (lcov or debug or gprof) and optimise:
+    env.Append(CCFLAGS=["""-O3"""])        
+
+def geant4_extras(env):
+  """
+  Sets compilation to include geant4 opengl bindings
+
+  If maus_opengl environment variable is set and is not equal to 0, add
+  G4VIS_USE_OPENGLX and G4VIS_USE_OPENGLXM to the CCFLAGS and G4OpenGL to
+  the libraries. Note that these libraries are not built by default.
+  """
+  opengl = 'maus_opengl' in os.environ and os.environ['maus_opengl'] != '0'
+  if opengl:
+    env.Append(CCFLAGS=["""-DG4VIS_USE_OPENGLX"""])
+    env.Append(CCFLAGS=["""-DG4VIS_USE_OPENGLXM"""])
+    geant_vis = 'G4OpenGL'
+    env.Append(LIBS=[geant_vis])
+    if not conf.CheckLib(geant_vis, language='c++'):
+        print """
+          Could not find G4OpenGL library. Build this library using
+          $MAUS_ROOT_DIR/third_party/bash/32geant4_extras.bash
+          Note that you need to have valid open gl and open gl xm development
+          libraries installed.
+          """
+        my_exit(1)
 
 # Setup the environment.  NOTE: SHLIBPREFIX means that shared libraries don't
 # have a 'lib' prefix, which is needed for python to find SWIG generated libraries
@@ -455,8 +509,9 @@ Export('env') # pylint: disable-msg=E0602
 
 print "Configuring..."
 # Must have long32 & long64 for the unpacking library
-env.Append(CCFLAGS=["""-Wall""", """-Dlong32='int'""", """-Dlong64='long long'"""])#, '-g', """-fprofile-arcs""", """-ftest-coverage""", """-fno-inline""", """-fno-default-inline"""])
-env.Append(LIBS=['gcov'])
+env.Append(CCFLAGS=["""-Wall""", """-Dlong32='int'""", """-Dlong64='long long'"""])
+cpp_extras(env)
+
 conf = Configure(env, custom_tests = {'CheckCommand' : CheckCommand}) # pylint: disable-msg=E0602
 set_cpp(conf, env)
 set_python(conf, env)
@@ -479,7 +534,6 @@ if 'configure' in COMMAND_LINE_TARGETS: # pylint: disable-msg=E0602
 if env['USE_G4'] and env['USE_ROOT']:
     #env.Append(CCFLAGS=['-g','-pg'])
     #env.Append(LINKFLAGS='-pg')
-
     common_cpp_files = glob.glob("src/legacy/*/*cc") + \
         glob.glob("src/legacy/*/*/*cc") + \
         glob.glob("src/common_cpp/*/*cc") + \
@@ -505,8 +559,8 @@ if env['USE_G4'] and env['USE_ROOT']:
                                LIBS= env['LIBS'] + ['recpack'] + ['MausCpp'])
     env.Install('build', ['tests/cpp_unit/test_cpp_unit'])
 
-    test_optics_files = glob.glob("tests/integration/optics/src/*cc")
-    test_optics = env.Program(target = 'tests/integration/optics/optics', \
+    test_optics_files = glob.glob("tests/integration/test_optics/src/*cc")
+    test_optics = env.Program(target = 'tests/integration/test_optics/optics', \
                                source = test_optics_files, \
                                LIBS= env['LIBS'] + ['MausCpp'])
 

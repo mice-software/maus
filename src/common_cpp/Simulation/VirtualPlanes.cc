@@ -32,6 +32,8 @@
 #include "src/legacy/BeamTools/BTField.hh"
 #include "src/legacy/BeamTools/BTTracker.hh"
 
+namespace MAUS {
+
 const BTField*         VirtualPlane::_field    = NULL;
 VirtualPlane::stepping VirtualPlane::_stepping = VirtualPlane::integrate;
 
@@ -322,7 +324,8 @@ VirtualPlane VirtualPlaneManager::ConstructFromModule(const MiceModule* mod) {
 }
 
 
-void VirtualPlaneManager::AddPlane(VirtualPlane* newPlane, const MiceModule* mod) {
+void VirtualPlaneManager::AddPlane
+                               (VirtualPlane* newPlane, const MiceModule* mod) {
   _planes.push_back(newPlane);
   _mods[newPlane] = mod;
   sort(_planes.begin(), _planes.end(), VirtualPlane::ComparePosition);
@@ -344,18 +347,22 @@ int VirtualPlaneManager::GetStationNumberFromModule(const MiceModule* module) {
   VirtualPlane* plane = NULL;
   typedef std::map<VirtualPlane*, const MiceModule*>::iterator map_it;
   for (map_it it = _mods.begin(); it != _mods.end() && plane == NULL; it++)
-    if (it->second == module) plane = it->first; // find plane from module
+    if (it->second == module) plane = it->first;  // find plane from module
   if (plane == NULL) {
     throw(Squeal(Squeal::recoverable,
           "Module "+module->name()+" not found in VirtualPlaneManager",
           "VirtualPlaneManager::GetStationNumberFromModule"));
   }
   for (size_t i = 0; i < _planes.size(); i++)
-    if (plane == _planes[i]) return i+1; // find station from plane
+    if (plane == _planes[i]) return i+1;  // find station from plane
+  throw(Squeal(Squeal::recoverable,
+        "Module "+module->name()+" not found in VirtualPlaneManager",
+        "VirtualPlaneManager::GetStationNumberFromModule"));
 }
 
 int VirtualPlaneManager::GetNumberOfHits(int stationNumber) {
-    if (stationNumber-1 >= _nHits.size() || stationNumber-1 < 0)
+    if (stationNumber-1 >= static_cast<int>(_nHits.size()) ||
+        stationNumber-1 < 0)
       throw(Squeal(
               Squeal::recoverable,
               "Station number out of range",
@@ -474,5 +481,5 @@ void VirtualPlaneManager::RemovePlane(VirtualPlane* plane) {
     _nHits = std::vector<int>(_planes.size(), 0);
     delete plane;
 }
-
+}
 

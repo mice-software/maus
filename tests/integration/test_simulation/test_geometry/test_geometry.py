@@ -9,6 +9,8 @@ import io
 from MapCppSimulation import MapCppSimulation
 from Configuration import Configuration
 
+TEST_DIR = '/tests/integration/test_simulation/test_geometry/test_geometry.py'
+
 class MapCppSimulationTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(self):
@@ -33,7 +35,7 @@ class MapCppSimulationTestCase(unittest.TestCase):
         print files
 
         for file in files:
-            args = ['python', '%s/tests/py_unit/test_geometry.py' %  os.environ.get("MAUS_ROOT_DIR"), file]
+            args = ['python', os.environ.get("MAUS_ROOT_DIR")+TEST_DIR, file]
             p = subprocess.Popen(args)
             p.wait()
             self.assertEqual(p.returncode, 0)

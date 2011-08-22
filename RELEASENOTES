@@ -4,16 +4,27 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v0.0.6
+- Added calls to geant4 inline visualisation
 
-MAUS-v0.0.3 summary
+MAUS-v0.0.5
+- Added some new compile flags to control C++ optimisation, profiling, debugging, code coverage
+- Added documentation for the Monte Carlo data structure (doc/run_control/spill.pdf)
+- Better testing and speed optimisation in Simulation
+
+MAUS-v0.0.4
+- Added SpecialVirtual detectors
+- Updated to xboa-0.11.0
+
+MAUS-v0.0.3:
 - Added RF cavity phasing routine
 - Added a test to check for python style
 - Streamlined the routines for handling errors between python and C++
 
-MAUS-v0.0.2 summary
+MAUS-v0.0.2:
 - Added BeamMaker prototype
 
-MAUS-v0.0.1 summary:
+MAUS-v0.0.1:
 - Initial version
 - Core map-reduce infrastructure
 - Partial implementaton of monte carlo tracking simulation at application level

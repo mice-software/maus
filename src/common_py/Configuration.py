@@ -1,3 +1,9 @@
+"""
+The Configuration tells MAUS and its processors how to
+set themselves up.  This is meant to be a replacement
+for the old G4MICE datacards.
+"""
+
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 # 
 #  MAUS is free software: you can redistribute it and/or modify
@@ -13,40 +19,63 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-
-## @class Configuration
-#  The Configuration tells MAUS and its processors how to
-#  set themselves up.  This is meant to be a replacement
-#  for the old G4MICE datacards.
-#
 import os
 import json
+import ErrorHandler
 
 class Configuration:
-    ## Returns JSON config document
-    #
-    #  The defaults are read from ConfigurationDefaults
-    #  then (if applicable) values are added/replaced
-    #  by the passed file.  A JSON file is returned.
-    #
-    #  \param configFile (optional) overriding configuration.  If None then this
-    #                    argument is ignored. If it is a python file handle (ie.
-    #                    open('my_config.dat','r') ) then that file is read.
-    def getConfigJSON(self, configFile = None):
-        MAUSRootDir = os.environ.get('MAUS_ROOT_DIR')
-        assert MAUSRootDir != None
+    """
+    Configuration class is responsible for holding and parsing configuration
+    default information and converting it to json
+    """
+    def __init__(self):
+        """
+        Initialise path to readme file
+        """        
+        self.readme = os.path.join(os.environ['MAUS_ROOT_DIR'], 'README')
 
-        configDict = {}
-        defaultFilename = '%s/src/common_py/ConfigurationDefaults.py' % MAUSRootDir
-        exec(open(defaultFilename,'r').read(), globals(), configDict)
+    def getConfigJSON(self, config_file = None):
+        """
+        Returns JSON config document
 
-        if configFile != None:
-            assert not isinstance(configFile, str)
-            exec(configFile.read(), globals(), configDict)
+        The defaults are read from ConfigurationDefaults
+        then (if applicable) values are added/replaced
+        by the passed file.  A JSON file is returned.
 
-        configJSONStr = json.JSONEncoder().encode(configDict)
+        \param config_file (optional) overriding configuration file handle.  If
+                          None then this argument is ignored. If it is a python
+                          file handle (ie. open('my_config.dat','r') ) then that
+                          file is read.
+        """
+        maus_root_dir = os.environ.get('MAUS_ROOT_DIR')
+        assert maus_root_dir != None
 
-        return configJSONStr
-    
+        config_dict = {}
+        defaults = open(maus_root_dir+"/src/common_py/ConfigurationDefaults.py")
+        exec(defaults, globals(), config_dict) # pylint: disable=W0122
 
+        if config_file != None:
+            assert not isinstance(config_file, str)
+            exec(config_file.read(), globals(), config_dict) # pylint: disable=W0122,C0301
+
+        config_dict['maus_version'] = self.get_version_from_readme()
+        self.configuration_to_error_handler(config_dict)
+        config_json_str = json.JSONEncoder().encode(config_dict)
+
+        return config_json_str
+        
+    def get_version_from_readme(self):
+        """
+        Version is taken as the first line in $MAUS_ROOT_DIR/README
+        """
+        readme = open(self.readme)
+        version = readme.readline().rstrip('\n')
+        return version
+
+    def configuration_to_error_handler(self, config_dict):
+        """
+        Hand configuration parameters to the error handler, so it can set itself
+        up
+        """
+        ErrorHandler.DefaultHandler().ConfigurationToErrorHandler(config_dict)
 

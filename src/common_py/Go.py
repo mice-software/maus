@@ -1,3 +1,7 @@
+"""
+Go controls the running of executables - map reduce functionality etc.
+"""
+
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 # 
 #  MAUS is free software: you can redistribute it and/or modify
@@ -13,39 +17,46 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-
-## @class Go
-#  The Go class will handle the map-reduce and
-#  gets passed an:
-#   - input
-#   - map
-#   - reduce
-#   - output
-#   .
-#
-#  and has many different ways to do the map-
-#  reduce.  For example:
-#   - native single-threaded python
-#   .
-#
 import gzip
 import os
-import types
 import tempfile
 import json
 import uuid
 import sys
-from functools import reduce
+import functools
 
 # For profiling
-import cProfile as profile
+import cProfile
 import pstats 
 
 # MAUS
 from Configuration import Configuration
 
 class Go:
-    def __init__(self, argInput, argMapper, argReducer, argOutput, argConfigFile = None):
+    """
+    @class Go
+    The Go class will handle the map-reduce and
+    gets passed an:
+      - input
+      - map
+      - reduce
+      - output
+    and has many different ways to do the map-
+    reduce.  For example:
+      - native single-threaded python
+    """
+
+    def __init__(self, arg_input, arg_mapper, arg_reducer, \
+                 arg_output, arg_config_file = None): # pylint: disable=R0201
+        """
+        Initialise the configuration dictionary, input, mapper, reducer and
+        output
+        @param arg_input Inputter that defines inputs to the map reduce
+        @param arg_mapper Mapper that defines the map that is acted on the input
+        @param arg_reducer Reducer that defines reduce that is acted on map
+                           output
+        @param arg_config_file Configuration file
+        """
         maus_root_dir = os.environ.get('MAUS_ROOT_DIR')
         current_dir = os.getcwd()
 
@@ -55,98 +66,105 @@ class Go:
             print(("\tCURRENT DIRECTORY = %s\n" % (current_dir)))
             
 
-        self.input = argInput
-        self.mapper = argMapper
-        self.reducer = argReducer
-        self.output = argOutput
+        self.input = arg_input
+        self.mapper = arg_mapper
+        self.reducer = arg_reducer
+        self.output = arg_output
 
         print("Welcome to MAUS:")
         print(("\tProcess ID (PID): %d" % os.getpid()))
         print(("\tUniversally Unique ID (UUID): %s" % uuid.uuid4()))
         print(("\tProgram Arguments: %s" % str(sys.argv)))
 
-        self.jsonConfigDocument = Configuration().getConfigJSON(argConfigFile)
-        jsonConfigDictionary = json.loads(self.jsonConfigDocument)
-        mapReduceType = jsonConfigDictionary['map_reduce_type']
+        self.json_config_document = \
+                                  Configuration().getConfigJSON(arg_config_file)
+        json_config_dictionary = json.loads(self.json_config_document)
+        map_reduce_type = json_config_dictionary['map_reduce_type']
+        version = json_config_dictionary["maus_version"]
+        print ("\tVersion: %s" % version)
 
         # Be sure to add other assertions here when new
         # map reduce implementations get put in.
-        assert mapReduceType in ["native_python" , "native_python_profile"]
+        assert map_reduce_type in ["native_python" , "native_python_profile"]
         
-        if mapReduceType == "native_python":
-            self.NativePythonMapReduce()
-        elif mapReduceType == "native_python_profile":
-            profile.runctx('self.NativePythonMapReduce()', globals(), locals(), 'list.prof')
-            p = pstats.Stats('list.prof') 
-            p.strip_dirs().sort_stats('time').print_stats() 
+        if map_reduce_type == "native_python":
+            self.native_python_map_reduce()
+        elif map_reduce_type == "native_python_profile":
+            cProfile.runctx('self.native_python_map_reduce()', globals(), \
+                           locals(), 'list.prof')
+            profile = pstats.Stats('list.prof') 
+            profile.strip_dirs().sort_stats('time').print_stats() 
         else:
             # for future methods.  Be sure to add to assertion above
             pass
 
 
-    def NativePythonMapReduce(self):
+    def native_python_map_reduce(self):
+        """
+        Map-reduce algorithm using own, single threaded, input-map-reduce
+        routine
+        """
         # write intermediary step to disk
-        fileObj = tempfile.SpooledTemporaryFile(max_size=524288) # 512 MB
-        tempFile = gzip.GzipFile(filename='temp', mode='wb', fileobj=fileObj)
+        file_obj = tempfile.SpooledTemporaryFile(max_size=524288) # 512 MB
+        temp_file = gzip.GzipFile(filename='temp', mode='wb', fileobj=file_obj)
 
         ####                   ####
         ######  Input Phase  ######
         ####                  #####
         print("INPUT: Reading some input")
-        assert(self.input.birth(self.jsonConfigDocument) == True)
+        assert(self.input.birth(self.json_config_document) == True)
         emitter = self.input.emitter()
-        mapBuffer = self.BufferInput(emitter)
+        map_buffer = self.buffer_input(emitter)
 
         ####                 ####
         ######  Map Phase  ######
         ####                #####
         print("MAP: Setting up mappers")
-        assert(self.mapper.birth(self.jsonConfigDocument) == True)
+        assert(self.mapper.birth(self.json_config_document) == True)
 
-        while len(mapBuffer) != 0:
-            print(("MAP: Processing %d events" % len(mapBuffer)))
+        while len(map_buffer) != 0:
+            print(("MAP: Processing %d events" % len(map_buffer)))
             #self.mapper.Process(mapBuffer[0])
-            mapResults = list(list(map(self.mapper.process, mapBuffer)))
-            for result in mapResults:
-                tempFile.write('%s\n' % result)
-            mapBuffer = self.BufferInput(emitter)
+            map_results = list(list(map(self.mapper.process, map_buffer)))
+            for result in map_results:
+                temp_file.write('%s\n' % result)
+            map_buffer = self.buffer_input(emitter)
 
         print("MAP: Closing input and mappers")
         self.input.death()
         self.mapper.death()
-        
-
-        
-        tempFile.close()
+        temp_file.close()
         
         
         ####                    ####
         ######  Reduce Phase  ######
         ####                   ##### 
         print("REDUCE: Setting up reducers")
-        assert(self.reducer.birth(self.jsonConfigDocument) == True)
+        assert(self.reducer.birth(self.json_config_document) == True)
         
         # read back
-        fileObj.seek(0) # go to beginning of file
-        tempFile = gzip.GzipFile(filename='temp', mode='rb', fileobj=fileObj)
+        file_obj.seek(0) # go to beginning of file
+        temp_file = gzip.GzipFile(filename='temp', mode='rb', fileobj=file_obj)
         i = 0
-        reduceBuffer = []
+        reduce_buffer = []
         reduced = []
-        for line in tempFile:
+        for line in temp_file:
             if line.rstrip() == "":
                 continue
-            reduceBuffer.append(line)
+            reduce_buffer.append(line)
             i = i + 1
             if i % 1000 == 0:
-                print(('REDUCE: Reducing %d events in the %d pass' % (len(reduceBuffer), len(reduced))))
-                reduced.append(reduce(self.reducer.process, reduceBuffer))
-                reduceBuffer = []
+                print(('REDUCE: Reducing %d events in the %d pass' % \
+                       (len(reduce_buffer), len(reduced))))
+                reduced.append(reduce(self.reducer.process, reduce_buffer))
+                reduce_buffer = []
 
-        print(('REDUCE: Merging %d passes and reducing the %d events left in the buffer' % (len(reduced), len(reduceBuffer))))
-        reduceResult = reduce(self.reducer.process, reduceBuffer + reduced)
+        print(('REDUCE: Merging %d passes and reducing the %d events left in the buffer' % (len(reduced), len(reduce_buffer)))) # pylint: disable=C0301
+        reduce_result = functools.reduce \
+                                (self.reducer.process, reduce_buffer + reduced)
 
-        tempFile.close()
-        fileObj.close()
+        temp_file.close()
+        file_obj.close()
 
         self.reducer.death()
         
@@ -154,19 +172,18 @@ class Go:
         ######  Output Phase  ######
         ####                   #####
 
-        assert(self.output.birth(self.jsonConfigDocument) == True)
+        assert(self.output.birth(self.json_config_document) == True)
         
-        self.output.save(reduceResult)
+        self.output.save(reduce_result)
                 
         self.output.death()
             
 
-    def BufferInput(self, theEmitter):
+    def buffer_input(self, the_emitter):
         my_buffer = []
-        
         for i in range(1024):
             try:
-                value = next(theEmitter)  
+                value = next(the_emitter)  
                 my_buffer.append(value.encode('ascii'))
             except StopIteration:
                 return my_buffer

@@ -53,8 +53,7 @@ void FieldPhaser::SetUp() {
 void FieldPhaser::MakeVirtualPlanes(BTPhaser::FieldForPhasing* cavity) {
     VirtualPlane plane = VirtualPlane::BuildVirtualPlane(
         cavity->rotation, cavity->plane_position, cavity->radius, true, 0.,
-        BTTracker::u, VirtualPlane::ignore, true
-    );
+        BTTracker::u, VirtualPlane::ignore, true);
     VirtualPlane* plane_ptr = new VirtualPlane(plane);
     // NOTE: VirtualPlaneManager now owns this memory
     _phaserVirtualPlanes.AddPlane(plane_ptr, NULL);
@@ -76,7 +75,7 @@ void FieldPhaser::SetPhases() {
                               (tracks, "virtual_hits", JsonWrapper::arrayValue);
             if (v_hits.size() == 0) break;
             std::set<int> phased_stations;
-            for (int j = 0; j < v_hits.size(); ++j) {
+            for (unsigned int j = 0; j < v_hits.size(); ++j) {
                 VirtualHit hit = _phaserVirtualPlanes.ReadHit(v_hits[j]);
                 if (BTPhaser::GetInstance()->
                                      SetThePhase(hit.GetPos(), hit.GetTime())) {
@@ -88,9 +87,11 @@ void FieldPhaser::SetPhases() {
         }
     }
     catch(...) {}
-    Squeak::mout(Squeak::info) << "\nMade " << n_attempts << " attempts to phase "
+    Squeak::mout(Squeak::info) << "\nMade " << n_attempts
+          << " attempts to phase "
           << BTPhaser::GetInstance()->NumberOfCavities() << " cavities with "
-          << _phaserVirtualPlanes.GetPlanes().size() << " remaining" << std::endl;
+          << _phaserVirtualPlanes.GetPlanes().size() << " remaining"
+          << std::endl;
     if (_phaserVirtualPlanes.GetPlanes().size() > 0) {
         TearDown();
         throw(Squeal(Squeal::recoverable, "Failed to phase cavities",

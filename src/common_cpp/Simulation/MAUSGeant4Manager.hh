@@ -15,13 +15,13 @@
  *
  */
 
-#ifndef _SRC_CPP_CORE_SIMULATION_MAUSGEANT4MANAGER_HH_
-#define _SRC_CPP_CORE_SIMULATION_MAUSGEANT4MANAGER_HH_
+#ifndef _SRC_COMMON_CPP_SIMULATION_MAUSGEANT4MANAGER_HH_
+#define _SRC_COMMON_CPP_SIMULATION_MAUSGEANT4MANAGER_HH_
 
 #include <G4RunManager.hh>
 #include <G4SDManager.hh>
 
-// should all be forward declarations?
+// should all be forward declarations? yes - but be careful about namespace
 #include "src/legacy/Simulation/MICERunAction.hh"
 #include "src/legacy/Simulation/FillMaterials.hh"
 #include "src/legacy/Simulation/MICEDetectorConstruction.hh"
@@ -29,11 +29,14 @@
 #include "src/common_cpp/Simulation/MAUSSteppingAction.hh"
 #include "src/common_cpp/Simulation/MAUSStackingActionKillNonMuons.hh"
 #include "src/common_cpp/Simulation/MAUSTrackingAction.hh"
+#include "src/common_cpp/Simulation/MAUSEventAction.hh"
 #include "src/common_cpp/Simulation/VirtualPlanes.hh"
 
 class MICEPhysicsList;
 
 namespace MAUS {
+
+class MAUSVisManager;
 
 /** MAUSPhysicsList is a synonym for (legacy) MICEPhysicsList
  */
@@ -47,9 +50,8 @@ typedef MICEPhysicsList MAUSPhysicsList;
  *  This has to be a singleton class so that we can't accidentally set
  *  up geant4 twice.
  *
- *  So some comments about the Geant4 setup. At the moment, we make one event
- *  per primary. This is actually incorrect - really we should be making several
- *  tracks on each Geant4 event - i.e. the spill should be the Geant4 event.
+ *  Geant4 setup:
+ *  We have a few different classes 
  */
 class MAUSGeant4Manager {
   public:
@@ -71,6 +73,10 @@ class MAUSGeant4Manager {
     /** @brief Get the MAUSSteppingAction
      */
     MAUSTrackingAction* GetTracking() const {return _trackAct;}
+
+    /** @brief Get the MAUSEventAction
+     */
+    MAUSEventAction* GetEventAction() const {return _eventAct;}
 
     /** @brief Get the MAUSSteppingAction
      */
@@ -121,6 +127,24 @@ class MAUSGeant4Manager {
      */
     Json::Value RunParticle(Json::Value particle);
 
+    /** @brief Run an array of particles through the simulation
+     *
+     *  @param particle_array should conform to spill schema for spill->mc
+     *         branch (so array of Json values containing objects, each of which
+     *         has a primary branch containing the primary particle data)
+     *
+     *  @returns an array of particles with any new hits, virtual_hits or tracks
+     *  appended
+     */
+    Json::Value RunManyParticles(Json::Value particle_array);
+
+    /** @brief Get the visualisation manager or return NULL if vis is inactive
+     *
+     *  Visualisation requires use_visualisation configuration variable set
+     */
+    MAUSVisManager* GetVisManager() {return _visManager;}
+
+
   private:
     MAUSGeant4Manager();
     ~MAUSGeant4Manager();
@@ -130,18 +154,14 @@ class MAUSGeant4Manager {
     MAUSPrimaryGeneratorAction* _primary;
     MAUSSteppingAction*         _stepAct;
     MAUSTrackingAction*         _trackAct;
+    MAUSEventAction*            _eventAct;
     MICEDetectorConstruction*   _detector;
     VirtualPlaneManager*        _virtPlanes;
+    MAUSVisManager*             _visManager;
+
+    void SetVisManager();
 
     Json::Value Tracking(MAUSPrimaryGeneratorAction::PGParticle p);
-
-    // Following functions should go in G4UserEventAction derivative class
-    void BeginOfEventAction(const G4Event *anEvent);
-    void EndOfEventAction(const G4Event *anEvent);
-    void SetEvent(Json::Value particle);
-    Json::Value GetEvent() {return _event;}
-    void StoreTracking();
-    Json::Value _event;
 };
 
 }  // namespace MAUS

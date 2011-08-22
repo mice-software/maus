@@ -36,10 +36,12 @@
 
 class G4Step;
 class G4StepPoint;
+class MiceModule;
+
+namespace MAUS {
 
 class VirtualPlane;
 class VirtualPlaneManager;
-class MiceModule;
 
 class VirtualPlane {
   /** @class VirtualPlane
@@ -385,5 +387,5 @@ class VirtualPlaneManager {
 
   static const BTFieldGroup       _default_field;  // _field defaults to this
 };
-
+}
 #endif
