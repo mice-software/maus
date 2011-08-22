@@ -5,6 +5,8 @@ M. Littlefield 02/08/11
 import os.path
 from xml.dom import minidom
 
+#pylint: disable = C0301, R0902, R0201 
+
 class Formatter:
     """
     @Class formatter this class formats the raw outputted fastrad files so there schema material file paths are correct
@@ -47,6 +49,9 @@ class Formatter:
             if fname.find('materials') < 0 and fname.find('fastrad') < 0 :
                 stepfile = self.path + '/' + fname
                 self.stepfiles.append(stepfile)
+            if fname.find('FieldInforTest.xml') >= 0:
+                field_file = self.path + '/' + fname
+                self.stepfiles.remove(field_file)
 
     def format_schema_location(self, gdmlfile):
         """
@@ -105,7 +110,6 @@ class Formatter:
         fin = open(inputfile, 'r')
         gdmlfile = inputfile[:-4] + '.gdml'
         fout = open(gdmlfile, 'w')
-        contents = []
         for line in fin.readlines():
             if line.find('<!-- Materials definition CallBack -->')>=0:
                 matdef = '<!-- Materials definition CallBack -->'
@@ -171,7 +175,7 @@ def main():
     """
     Main Function
     """
-    location = '/src/common_py/geometry/Step4_Light_version'
+    location = '/src/common_py/geometry/testCases/testGeometry'
     gdmls = Formatter(os.environ['MAUS_ROOT_DIR']+location)
     gdmls.format()
 
