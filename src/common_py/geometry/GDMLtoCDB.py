@@ -7,37 +7,42 @@ from suds.client import Client
 from datetime import datetime
 from base64 import b64encode
 from base64 import b64decode
-from geometry.GDMLPacker import Packer
+
+#pylint: disable = C0301, R0902
 
 class GDMLtocdb:
-    #pylint: disable = R0902, R0914, R0912, R0915, R0903
     """
-    @Class gdmltocdb, handles the uploading of geometries to the CDB
+    @Class GDMLtocdb handles the uploading of geometries to the CDB
 
     This class writes the geometries to the database. It requires an input of the directory path which contains the GDML
     files produce by fastRad. It will search this path and find all the files within it and will write these as a list
-    into a test file. This list of files and the contents of each individual file is then copied into one string
-    and encoded and uploaded to the CDB.
+    into a test file. This list of files and the contents of each individual file is saved to a zip file by another class
+    and then encoded and uploaded to the CDB.
     """
-    def __init__(self, filepath, notes, testserver):
+    def __init__(self, filepath, notes, testserver = None):
         """
-        @Method Class constructor
+        @Method Class constructor This method sets up the necessaries to upload to the database
 
-        this method sets up the connection to the CDB and also does some preliminary set ups of the
-        list of files etc needed to be uploaded. 
+        This method sets up some class variables and then calls other methods which set up
+        the connection to the database and also organise the GDMLs into an order ready to
+        upload.
 
         @Param filepath path of the directory which contains the GDML files
-        @Param notes must be a string briefly describing the geometry
-        @Param type 1 to set up the test server leave blank for real server
+        @Param notes must be a string which briefly describes the geometry
+        @Param testserver enter 1 to set up the test server leave blank for real server
         """
-        #change unit tests
+        self.wsdlurl = None
+        self.geometry = None
         self.textfile = None
         self.text = ""
+        if type(testserver) != int:
+            raise IOError('Test Server argument must be 1 or 0 or None', 'GDMLtocdb::__init__')
+        else: 
+            self.testserver = testserver
         if type(notes) != str:
-            raise IOError('Geom desciprtion missing!', 'gdmltocdb::__init__')
+            raise IOError('Geom desciprtion missing!', 'GDMLtocdb::__init__')
         else:
             self.notes = notes
-            self.uploadstring = ""
         filelist = []
         self.geometryfiles = filelist
         self.listofgeometries = None
@@ -45,19 +50,40 @@ class GDMLtocdb:
             raise IOError("File path does not exist", "gdmltocdb::__init__")
         else:
             self.filepath = filepath
-        if testserver == None:
+        self.set_up_server()
+        self.check_file_list()
+        self.create_file_list()
+        
+    def set_up_server(self):
+        """
+        @method set_up_server This method sets up the connection to the CDB
+        
+        This method sets up a connection to either the supermouse server or
+        the test server depending on whether this is specified by __init__.
+        """
+        if self.testserver == None:
             self.wsdlurl = "supermouse server" # actual wsdl
-        elif testserver == 1:
+        elif self.testserver == 1:
             twsdl = "http://rgma19.pp.rl.ac.uk:8080/cdb/geometrySuperMouse?wsdl"
             self.wsdlurl = twsdl 
-        else: raise StandardError("Incorrect input", "gdmltocdb::__init__")
+        else: 
+            raise StandardError("Incorrect input", "gdmltocdb::__init__")
         self.geometry = Client(self.wsdlurl).service
-        print "Configuration Database Status"
+        print "Configuration Database Status is"
         print self.geometry.getStatus()
+    
+    def check_file_list(self):
+        """
+        @method check_file_list This method searches the designated path for a text file and checks if it contains the list of geometries.
+        
+        This method goes through the designated path given by __init__ and 
+        checks to see if there is a text file. It then checks this file to
+        if it contains a list of the geometries also in the designated path.
+        It raises an error if they don't match. If there isn't a text file
+        it stores the files within the path in a list ready for the text
+        file to be created.
+        """
         gdmls = os.listdir(self.filepath)
-        # check if there is an existing textfile with the lis of geomtries in it
-        # if there is a text file but with no geometries raise error
-        numoffiles = len(gdmls)
         count = 0
         for fname in gdmls:
             if fname[-4:] == '.txt':
@@ -75,13 +101,24 @@ class GDMLtocdb:
                     errormsg = "Text file doesnt list fastrad files"
                     raise IOError(errormsg, "gdmltocdb:__init__")
                 else:
-                    # if one does exist and its correct create the list of files
                     self.listofgeometries = path
                     fin = open(self.listofgeometries, 'r')
                     for line in fin.readlines():
                         self.geometryfiles.append(line.strip())
                     fin.close()
+    
+    def create_file_list(self):
+        """
+        @method create_file_list This method creates a text file which contains a list of geometries.
+        
+        This method will create a text file which contains a list
+        of the GDMLs in the path given by __init__. This is in 
+        preparation for uploading. If there is already a text file
+        it does nothing. 
+        """
         # if there is no text file create one and fill it with the geometries.
+        gdmls = os.listdir(self.filepath)
+        numoffiles = len(gdmls)
         if self.textfile == None:
             path = self.filepath + "/FileList.txt"
             fout = open(path, 'w')
@@ -103,48 +140,15 @@ class GDMLtocdb:
 
         This method write the contents of all the gdmls and the file which lists the gdmls
         into one string. This string is then encoded and uploaded to the CDB with a date stamp of
-        when the method is called?.
+        when the method is called.
         """
         _dt = datetime.today()
-        f = open(zipped_file, 'r')
-        f_contents = f.read()
+        fin = open(zipped_file, 'r')
+        f_contents = fin.read()
         _gdml = b64encode(f_contents)
         self.geometry.setGDML(_gdml, _dt, self.notes)
         print self.geometry.setGDML(_gdml, _dt, self.notes)
         
-        """numoffiles = len(self.geometryfiles)
-        fin1 = open(self.listofgeometries, 'r')
-        fout = open('/home/matt/maus-littlefield/src/common_py/geometry/Upload.txt', 'w')
-        for lines in fin1.readlines():
-            filestr = lines
-            self.uploadstring += filestr
-            self.uploadstring += "<!--  File Name  -->\n"
-            fout.write(self.uploadstring)
-            self.uploadstring = ""
-        fin1.close()
-        self.uploadstring += "\n<!--  End of File  -->\n"
-        for num in range(0, numoffiles):
-            fin2 = open(self.geometryfiles[num], 'r')
-            for lines in fin2.readlines():
-                filestr = lines
-                self.uploadstring += filestr
-            self.uploadstring += "\n<!--  End of File  -->\n"
-            fout.write(self.uploadstring)
-            self.uploadstring = ""
-            print "Loading file " + str(num + 1) + " of " + str(numoffiles) 
-        fin2.close()
-        fout.close()
-        fin = open('/home/matt/maus-littlefield/src/common_py/geometry/Upload.txt', 'r')
-        for lines in fin.readlines():
-            self.uploadstring += lines
-        fin.close()
-        print self.uploadstring
-        _dt = datetime.today()
-        _gdml = b64encode(self.uploadstring)
-        self.geometry.setGDML(_gdml, _dt, self.notes)
-        print self.geometry.setGDML(_gdml, _dt, self.notes)
-        os.remove('/home/matt/maus-littlefield/src/common_py/geometry/Upload.txt')
-        """
 class Downloader:
     """
     @Class Downloader, this class downloads geometries from the CDB
@@ -173,46 +177,7 @@ class Downloader:
         else: raise StandardError("Incorrect input", "upload::__init__")
         self.geometry = Client(self.wsdlurl).service
 
-    def unpack(self, downloadedfile, downloadpath):
-        """
-        @method unpack
-        
-        This method take the downloaded string from the CDB and unpacks it,
-        to the location specified, into the correct files.
-        
-        @param downloadedfile This needs to be the string download from the CDB.
-        @param downloadedpath The path location where the files will be unpacked to. 
-        """
-        files = downloadedfile.rsplit("<!--  File Name  -->")
-        self.listofgeometries = files
-        num = len(self.geometryfiles)
-        num = num -1
-        self.listofgeometries.pop(num)
-        numoffiles = len(self.listofgeometries)
-        for gfile in range(0, numoffiles):
-            filestr = self.listofgeometries[gfile]
-            if filestr.endswith('\n'):
-                filestr = filestr.rstrip('\n')
-            if filestr.startswith('\n'):
-                filestr = filestr.lstrip('\n')
-            self.listofgeometries[gfile] = filestr
-        geometries = downloadedfile.rsplit("<!--  End of File  -->")
-        numofgeoms = len(geometries)
-        numofgeoms = numofgeoms - 1
-        self.geometryfiles = geometries
-        self.geometryfiles.pop(numofgeoms)
-        self.geometryfiles.pop(0)
-        for num in range(0, numoffiles):
-            filestr = self.listofgeometries[num]
-            filestr = filestr.rsplit('/')
-            filepos = len(filestr) - 1
-            filename = filestr[filepos]
-            path = downloadpath + "/" + filename
-            fout = open(path, 'w')
-            fout.write(self.geometryfiles[num])
-            fout.close()
-            self.remove_first_line(path)
- 
+    
         
     def download_current(self, downloadpath):
         """
@@ -229,10 +194,8 @@ class Downloader:
         fout = open(zip_path, 'w')
         fout.write(downloadedfile)
         fout.close()
-        #self.unpack(downloadedfile, downloadpath)
 
     def download_geometry_for_id(self, id_num, downloadpath):
-        #change notes!
         """
         @Method download geometry for ID 
 
@@ -243,8 +206,11 @@ class Downloader:
         @param  downloadedpath The path location where the files will be unpacked to. 
         """
         downloadedfile = b64decode(self.geometry.getGDMLForId(id_num))
-        self.unpack(downloadedfile, downloadpath)
-
+        zip_path = downloadpath + '/Geometry.zip'
+        fout = open(zip_path, 'w')
+        fout.write(downloadedfile)
+        fout.close()
+        
     def get_ids(self, start_time, stop_time = None):
         """
         @method get IDs
@@ -282,45 +248,15 @@ class Downloader:
         @param  downloadedpath The path location where the files will be unpacked to. 
         """        
         downloadedfile = b64decode(self.geometry.getGDMLForRun(run_id))
-        self.unpack(downloadedfile, downloadpath)
-
-    def remove_first_line(self, file_path):
-        """
-        @method remove first line
-        
-        This method removes the first line from the file passed to it. This is because
-        after the download it is found that the first line of each file is blank. This
-        blank line produces an error when formatting the GDMLs as they are not well formed
-        documents with the first blank line included therefore it is removed.
-        
-        @param file_path The name of the file which will have its first line removed.
-        """
-        fin = open(file_path, 'r')
-        for lines in fin.readlines():
-            self.filestr += lines
-        self.filestr = self.filestr.lstrip()
-        fin.close()
-        fout = open(file_path, 'w')
-        fout.write(self.filestr)
+        zip_path = downloadpath + '/Geometry.zip'
+        fout = open(zip_path, 'w')
+        fout.write(downloadedfile)
         fout.close()
-        self.filestr = ""
         
-            
             
 def main():
     """
     Main function
     """
-    test = '/home/matt/maus-littlefield/src/common_py/geometry/Step4_Light_version'
-    geometry1 = GDMLtocdb(test, "Step 4 test geometry case", 1)
-    geometry1.upload_to_cdb()
-    #dlgeometry = Downloader(1)
-    #test2 = '/home/matt/maus-littlefield/src/common_py/geometry/Download'
-    #dlgeometry.download_geometry_for_id('2011-08-08 09:00:00', test2, None)
-    #print datetime.today()
-    #dlgeometry.get_ids('2011-08-08 09:00:00')
-    #dlgeometry.download_current()
-    #test3 = 'src/common_py/geometry/Download/fastradModel.gdml'
-    #dlgeometry.remove_first_line(test3)
 if __name__ == "__main__":
     main()
