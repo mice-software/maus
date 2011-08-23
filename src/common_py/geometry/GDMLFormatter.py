@@ -62,13 +62,16 @@ class Formatter:
         
         @param GDMLFile The name of the file which will have its schema location altered.
         """
-        xmldoc = minidom.parse(gdmlfile)
-        for node in xmldoc.getElementsByTagName("gdml"):
-            if node.hasAttribute("xsi:noNamespaceSchemaLocation"):
-                node.attributes['xsi:noNamespaceSchemaLocation'] = self.schema
-        os.remove(gdmlfile)
-        fout = open(gdmlfile, 'w')
-        xmldoc.writexml(fout)
+        if gdmlfile[-5:] != '.gdml' and gdmlfile[-4:] != '.xml':
+            raise IOError(gdmlfile + ' is not a gdml or xml', 'Formatter::format_schema_location')
+        else:
+            xmldoc = minidom.parse(gdmlfile)
+            for node in xmldoc.getElementsByTagName("gdml"):
+                if node.hasAttribute("xsi:noNamespaceSchemaLocation"):
+                    node.attributes['xsi:noNamespaceSchemaLocation'] = self.schema
+            os.remove(gdmlfile)
+            fout = open(gdmlfile, 'w')
+            xmldoc.writexml(fout)
 
     def format_materials(self, gdmlfile):
         """
@@ -80,23 +83,26 @@ class Formatter:
        
         @param GDMLFile The name of the file which will have its materials reference file location altered.
         """
-        self.txtfile = "" 
-        impl = minidom.getDOMImplementation()
-        docstr = 'gdml [<!ENTITY materials SYSTEM "' + self.materialfile + '">]'
-        doctype = impl.createDocumentType(docstr, None, None)
-        newdoc = impl.createDocument(None, "MAUS", doctype)
-        config = minidom.parse(gdmlfile)
-        for node in config.getElementsByTagName("gdml"):
-            rootelement = node
-        for node2 in newdoc.getElementsByTagName("MAUS"):
-            oldelement = node2
-        newdoc.replaceChild(rootelement, oldelement)
-        self.txtfile = gdmlfile[:-5] + '.txt'
-        fout = open(self.txtfile, 'w')
-        newdoc.writexml(fout)
-        fout.close()
-        os.remove(gdmlfile)
-        
+        if gdmlfile[-5:] != '.gdml' and gdmlfile[-4:] != '.xml':
+            raise IOError(gdmlfile + ' is not a gdml or xml', 'Formatter::format_materials')
+        else:
+            self.txtfile = "" 
+            impl = minidom.getDOMImplementation()
+            docstr = 'gdml [<!ENTITY materials SYSTEM "' + self.materialfile + '">]'
+            doctype = impl.createDocumentType(docstr, None, None)
+            newdoc = impl.createDocument(None, "MAUS", doctype)
+            config = minidom.parse(gdmlfile)
+            for node in config.getElementsByTagName("gdml"):
+                rootelement = node
+            for node2 in newdoc.getElementsByTagName("MAUS"):
+                oldelement = node2
+            newdoc.replaceChild(rootelement, oldelement)
+            self.txtfile = gdmlfile[:-5] + '.txt'
+            fout = open(self.txtfile, 'w')
+            newdoc.writexml(fout)
+            fout.close()
+            os.remove(gdmlfile)
+            
     def insert_materials_ref(self, inputfile):
         """
         @method Insert Materials Reference
@@ -107,21 +113,24 @@ class Formatter:
         
         @param GDMLFile The name of the file which will have its materials reference replaced.
         """
-        fin = open(inputfile, 'r')
-        gdmlfile = inputfile[:-4] + '.gdml'
-        fout = open(gdmlfile, 'w')
-        for line in fin.readlines():
-            if line.find('<!-- Materials definition CallBack -->')>=0:
-                matdef = '<!-- Materials definition CallBack -->'
-                new_line = line.replace(matdef, matdef+'&materials;')
-                print >> fout, new_line
-            else:
-                print >> fout, line
-        print >> fout, '<!-- Formatted for MAUS -->'
-        fin.close()
-        fout.close()
-        os.remove(inputfile)
-        
+        if inputfile[-5:] != '.gdml' and inputfile[-4:] != '.xml':
+            raise IOError(inputfile + ' is not a gdml or xml', 'Formatter::insert_materials_ref')
+        else:
+            fin = open(inputfile, 'r')
+            gdmlfile = inputfile[:-4] + '.gdml'
+            fout = open(gdmlfile, 'w')
+            for line in fin.readlines():
+                if line.find('<!-- Materials definition CallBack -->')>=0:
+                    matdef = '<!-- Materials definition CallBack -->'
+                    new_line = line.replace(matdef, matdef+'&materials;')
+                    print >> fout, new_line
+                else:
+                    print >> fout, line
+            print >> fout, '<!-- Formatted for MAUS -->'
+            fin.close()
+            fout.close()
+            os.remove(inputfile)
+            
     def format_check(self, gdmlfile):
         """
         @method Format Check
@@ -135,14 +144,17 @@ class Formatter:
         
         @param GDML File The file to be checked.
         """
-        self.formatted = False
-        fin = open(gdmlfile, 'r')
-        for lines in fin.readlines():
-            if lines.find('<!-- Formatted for MAUS -->') >= 0:
-                print gdmlfile + ' already formatted!'
-                self.formatted = True
-        fin.close()
-    
+        if gdmlfile[-5:] != '.gdml' and gdmlfile[-4:] != '.xml':
+            raise IOError(gdmlfile + ' is not a gdml or xml', 'Formatter::format_check')
+        else:
+            self.formatted = False
+            fin = open(gdmlfile, 'r')
+            for lines in fin.readlines():
+                if lines.find('<!-- Formatted for MAUS -->') >= 0:
+                    print gdmlfile + ' already formatted!'
+                    self.formatted = True
+            fin.close()
+        
         
     def format(self):
         """

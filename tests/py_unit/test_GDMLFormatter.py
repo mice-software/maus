@@ -23,6 +23,34 @@ class  test_GDMLFormatter(unittest.TestCase):
         except:
             pass
         
+    def test_format_schema_location(self):
+        try:
+            self.GDML.format_schema_location('Gemoetry.not_gdml')
+            self.assertTrue(False, 'Should have raised an error')
+        except:
+            pass
+    
+    def test_format_materials(self):
+        try:
+            self.GDML.format_materials('Gemoetry.not_gdml')
+            self.assertTrue(False, 'Should have raised an error')
+        except:
+            pass
+
+    def test_insert_materials_ref(self):
+        try:
+            self.GDML.insert_materials_ref('Gemoetry.not_gdml')
+            self.assertTrue(False, 'Should have raised an error')
+        except:
+            pass    
+
+    def test_format_check(self):
+        try:
+            self.GDML.format_check('Gemoetry.not_gdml')
+            self.assertTrue(False, 'Should have raised an error')
+        except:
+            pass
+                
     def test_format(self):
         self.GDML.format()
         count = 0
