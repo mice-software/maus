@@ -73,8 +73,11 @@ class GDMLtomaus():
             length = len(self.step_files)
             for num in range(0, length):
                 found_file = str(self.step_files[num])
-                found_file = found_file.strip(self.path)
-                outputfile = output + '/' + found_file + 'txt'
+                new_string = found_file.split('/')
+                num_of_splits = len(new_string)
+                file_name = num_of_splits - 1
+                file_name = new_string[file_name]
+                outputfile = output + '/' + file_name[:-4] + 'txt'
                 mm_xsl = os.environ["MAUS_ROOT_DIR"] + "/src/common_py/geometry/xsltScripts/MMTranslation.xsl"
                 step_file = CADImport(xmlin1 = self.step_files[num], xsl = mm_xsl, output = outputfile)
                 step_file.parse_xslt()
