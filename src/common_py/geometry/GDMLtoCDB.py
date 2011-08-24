@@ -66,11 +66,10 @@ class GDMLtocdb:
         elif self.testserver == 1:
             twsdl = "http://rgma19.pp.rl.ac.uk:8080/cdb/geometrySuperMouse?wsdl"
             self.wsdlurl = twsdl 
-        else: 
-            raise StandardError("Incorrect input", "gdmltocdb::__init__")
         self.geometry = Client(self.wsdlurl).service
         print "Configuration Database Status is"
         print self.geometry.getStatus()
+        return self.wsdlurl
     
     def check_file_list(self):
         """
@@ -142,13 +141,16 @@ class GDMLtocdb:
         into one string. This string is then encoded and uploaded to the CDB with a date stamp of
         when the method is called.
         """
-        _dt = datetime.today()
-        fin = open(zipped_file, 'r')
-        f_contents = fin.read()
-        _gdml = b64encode(f_contents)
-        self.geometry.setGDML(_gdml, _dt, self.notes)
-        print self.geometry.setGDML(_gdml, _dt, self.notes)
-        
+        if zipped_file[-4:] != '.zip':
+            raise IOError('Argument is not a zip file', 'GDMLtocdb::upload_to_cdb')
+        else:
+            _dt = datetime.today()
+            fin = open(zipped_file, 'r')
+            f_contents = fin.read()
+            _gdml = b64encode(f_contents)
+            self.geometry.setGDML(_gdml, _dt, self.notes)
+            print self.geometry.setGDML(_gdml, _dt, self.notes)
+            
 class Downloader:
     """
     @Class Downloader, this class downloads geometries from the CDB
@@ -174,7 +176,8 @@ class Downloader:
         elif testserver == 1:
             twsdl = "http://rgma19.pp.rl.ac.uk:8080/cdb/geometrySuperMouse?wsdl"
             self.wsdlurl = twsdl 
-        else: raise StandardError("Incorrect input", "upload::__init__")
+        else: 
+            raise StandardError("Incorrect input", "upload::__init__")
         self.geometry = Client(self.wsdlurl).service
 
     
@@ -252,7 +255,8 @@ class Downloader:
         fout = open(zip_path, 'w')
         fout.write(downloadedfile)
         fout.close()
-        
+
+#Need to think of ways to test the downloading of geometries without downloading geomtries.        
             
 def main():
     """

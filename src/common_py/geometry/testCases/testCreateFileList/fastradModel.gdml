@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE gdml [
+<!ENTITY materials SYSTEM "/home/matt/maus-littlefield/src/common_py/geometry/testCases/testGeometry/fastradModel_materials.xml">
+]>
+
+
+<gdml xmlns:gdml="http://cern.ch/2001/Schemas/GDML"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="/home/matt/maus-littlefield/src/common_py/geometry/gdmlSchema/GDML_3_0_0/schema/gdml.xsd">
+
+	<define>
+
+		<constant name="HALFPI" value="pi/2."/>
+
+		<constant name="PI" value="1.*pi"/>
+
+		<constant name="TWOPI" value="2.*pi"/>
+
+		<position name="center"/>
+
+		<rotation name="identity"/>
+
+		<rotation name="aligneSurX" y="HALFPI"/>
+
+		<rotation name="aligneSurY" x="HALFPI"/>
+
+	</define>
+
+
+
+	<!-- Materials definition CallBack --> 
+	
+	&materials; 
+	
+	<solids>
+
+		<sphere deltaphi="6.2832" deltatheta="3.1416" name="WorldSphereRef" rmax="2307.8626"
+			rmin="0." startphi="0.0000" starttheta="0.0000"/>
+
+	</solids>
+
+
+
+	<structure>
+
+
+
+		<volume name="Structure_225373016">
+
+			<materialref ref="Vacuum"/>
+
+			<solidref ref="WorldSphereRef"/>
+
+
+
+			<physvol>
+
+				<file name="Step_0.gdml"/>
+
+				<position name="posRef_1" x="0.0000" y="0.0000" z="0.0000"/>
+
+				<rotationref ref="identity"/>
+
+			</physvol>
+
+			<physvol>
+
+				<file name="Step_1.gdml"/>
+
+				<position name="posRef_2" x="0.0000" y="0.0000" z="0.0000"/>
+
+				<rotationref ref="identity"/>
+
+			</physvol>
+
+			<physvol>
+
+				<file name="Step_2.gdml"/>
+
+				<position name="posRef_3" x="-0.0000" y="-0.0000" z="-1207.5000"/>
+
+				<rotationref ref="identity"/>
+
+			</physvol>
+
+			<physvol>
+
+				<file name="Step_3.gdml"/>
+
+				<position name="posRef_4" x="0.0000" y="0.0000" z="0.0000"/>
+
+				<rotationref ref="identity"/>
+
+			</physvol>
+
+			<physvol>
+
+				<file name="Step_4.gdml"/>
+
+				<position name="posRef_5" x="0.0000" y="0.0000" z="0.0000"/>
+
+				<rotationref ref="identity"/>
+
+			</physvol>
+
+			<physvol>
+
+				<file name="Step_5.gdml"/>
+
+				<position name="posRef_6" x="-0.0000" y="-0.0000" z="757.5000"/>
+
+				<rotationref ref="identity"/>
+
+			</physvol>
+
+		</volume>
+
+	</structure>
+
+
+
+	<setup name="Default" version="1.0">
+
+		<world ref="Structure_225373016"/>
+
+	</setup>
+
+
+
+</gdml>
+<!-- Formatted for MAUS -->
