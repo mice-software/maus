@@ -1,8 +1,11 @@
 import unittest
 import Beam
 import xboa.Hit
+import xboa.Common
 import copy
 import numpy
+
+MU_MASS = xboa.Common.pdg_pid_to_mass[13]
 
 TEST_PRIM_P = {
     "position":{"x":1.0, "y":2.0, "z":3.0},
@@ -117,7 +120,6 @@ TEST_BIRTH = {
   "coupling":{"coupling_mode":"none"}
 }
 
-
 class test_Beam(unittest.TestCase):
     @classmethod
     def setUp(cls):
@@ -184,19 +186,26 @@ class test_Beam(unittest.TestCase):
         self.assertEqual( self.beam.transverse_mode, "pencil" )
 
     def test_birth_transverse_penn(self):
+        test = \
+        [[1.05668599e+03, -6.33950201e+02,  0.00000000e+00,  3.77222626e-01],
+         [-6.33950201e+02, 7.60666714e+02, -3.77222626e-01,  0.00000000e+00],
+         [0.00000000e+00, -3.77222626e-01,  1.05668599e+03, -6.33950201e+02],
+         [3.77222626e-01,  0.00000000e+00, -6.33950201e+02,  7.60666714e+02]]
+        test_array = numpy.array(test)
         self.beam._Beam__birth_transverse_ellipse(TEST_PENN)
         self.assertRaises(ValueError,
               self.beam._Beam__birth_transverse_ellipse, TEST_PENN_F1)
         self.assertRaises(ValueError,
               self.beam._Beam__birth_transverse_ellipse, TEST_PENN_F2)
         self.assertEqual( self.beam.transverse_mode, "penn" )
-        self.assertTrue(False) # check beam ellipse is correct (I think not)
+        for i in test.shape[0]:
+            for j in test.shape[1]:
+                self.assertAlmostEqual(test[i, j] == \
+                                       self.beam.beam_matrix[i, j])
 
     def test_birth_transverse_const_sol(self):
         #self.beam._Beam__birth_transverse_ellipse(TEST_CONSTANT_SOL)
         self.assertTrue(False) # check beam ellipse is correct (I think not)
-
-
 
     def test_birth_transverse_twiss(self):
         self.assertRaises(ValueError, 
