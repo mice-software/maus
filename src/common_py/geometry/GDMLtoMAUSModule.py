@@ -1,52 +1,91 @@
+"""
+Class which converts formatted GDML files to MAUS modules
+M.Littlefield
+"""
 import os
 from CADImport import CADImport
 
-class GDMLtomaus():
-        def __init__(self, path):
-            self.ConfigurationFile = None
-            self.MaterialFile = None
-            self.MaterialFilePath = None
-            list = []
-            self.StepFiles = list
-            if type(path) != str:
-                raise IOError('path must be a string to the directory which holds the GDMLs', 'GDMLFormatter::__init__')
-            else:
-                self.Path = path
-            gdmls = os.listdir(self.Path)
-            for fname in gdmls:
-                if fname.find('materials') >= 0:
-                    file = self.Path + '/' + fname
-                    self.MaterialFile = file
-                    self.MaterialFilePath = os.path.abspath(self.MaterialFile)
-                if fname.find('fastrad') >= 0 and fname != self.MaterialFile:
-                    file = self.Path + '/' + fname
-                    self.ConfigurationFile = file
-                if fname.find('materials') < 0 and fname.find('fastrad') < 0 :
-                    stepfile = self.Path + '/' + fname
-                    self.StepFiles.append(stepfile)
+#pylint: disable = C0301, R0903
 
-        def convert_to_maus(self, output):
-            outputfile = output + "/ParentGeometryFile.txt"
-            configurationxsl = os.environ["MAUS_ROOT_DIR"] + "/src/common_py/geometry/xsltScripts/GDML2G4MICE.xsl"
-            ConfigFile = CADImport(xmlin1 = self.ConfigurationFile, xsl = configurationxsl, output = outputfile)
-            ConfigFile.parse_xslt()
-            print "Configuration File Converted"
-            length = len(self.StepFiles)
-            for num in range(0, length):
-                file = str(self.StepFiles[num])
-                file = file.strip(self.Path)
-                outputfile = output + '/' + file + 'txt'
-                MMxsl = os.environ["MAUS_ROOT_DIR"] + "/src/common_py/geometry/xsltScripts/MMTranslation.xsl"
-                StepFile = CADImport(xmlin1 = self.StepFiles[num], xsl = '/home/matt/maus-littlefield/src/common_py/geometry/xsltScripts/MMTranslation.xsl', output = outputfile)
-                StepFile.parse_xslt()
-                StepFile = None
-                os.remove(self.StepFiles[num])
-                print "Converting " + str(num+1) + " of " + str(length) + " Geometry Files"
- 
-            os.remove(self.ConfigurationFile)
+class GDMLtomaus():
+    """
+    @class GDMLtomaus This class converts GDMLs to MAUS Modules
+    
+    This class converts GDMLs to MAUS Modules by applying a pre written
+    XSLT over the GDML. This produces the necessary MAUS Modules and the 
+    original GDMLs are then deleted.
+    """
+    def __init__(self, path):
+        """
+        @method Class Constructor This is the class constructor which gets the file ready to be converted.
             
+        This method searches through the path, given by the argument, 
+        and sorts out the files within the path into variables which 
+        are then used by the next method to convert them to MAUS
+        Modules.
+            
+        @param Path This is the path to the folder which contains the GDMLS to be converted.            
+        """
+        self.config_file = None
+        self.material_file = None
+        self.material_file_path = None
+        file_list = []
+        self.step_files = file_list
+        if os.path.exists(path) == False:
+            errmsg = 'Path does not exist'
+            raise IOError(errmsg, 'GDMLFormatter::__init__')
+        else:
+            self.path = path
+        gdmls = os.listdir(self.path)
+        for fname in gdmls:
+            if fname.find('materials') >= 0:
+                found_file = self.path + '/' + fname
+                self.material_file = found_file
+                self.material_file_path = os.path.abspath(self.material_file)
+            if fname.find('fastrad') >= 0 and fname != self.material_file:
+                found_file = self.path + '/' + fname
+                self.config_file = found_file
+            if fname.find('materials') < 0 and fname.find('fastrad') < 0 :
+                stepfile = self.path + '/' + fname
+                self.step_files.append(stepfile)
+
+    def convert_to_maus(self, output):
+        """
+        @method convert_to_maus This method converts the GDMLs to MAUS Modules.
+        
+        This method applies the necessary XSLT scripts to the GDMLs.
+        The configuration file uses the GDML2G4MICE.xsl and the individual
+        component files use MMTranslation.xsl XSLTs to convert to the correct
+        MAUS Modules.
+        
+        @param Output This is the path to the directory where you wish the MAUS Modules to be placed. 
+        """
+        if os.path.exists(output) == False:
+            errmsg = 'Output argument doesnt exist'
+            raise IOError(errmsg, 'GDMLtomaus::convert_to_maus')
+        else:
+            outputfile = output + "/ParentGeometryFile.txt"
+            maus = os.environ["MAUS_ROOT_DIR"] + '/src/common_py/geometry/'
+            configxsl = maus  + 'xsltScripts/GDML2G4MICE.xsl'
+            config_file = CADImport(xmlin1 = self.config_file, xsl = configxsl, output = outputfile)
+            config_file.parse_xslt()
+            print "Configuration File Converted"
+            length = len(self.step_files)
+            for num in range(0, length):
+                found_file = str(self.step_files[num])
+                found_file = found_file.strip(self.path)
+                outputfile = output + '/' + found_file + 'txt'
+                mm_xsl = os.environ["MAUS_ROOT_DIR"] + "/src/common_py/geometry/xsltScripts/MMTranslation.xsl"
+                step_file = CADImport(xmlin1 = self.step_files[num], xsl = mm_xsl, output = outputfile)
+                step_file.parse_xslt()
+                step_file = None
+                os.remove(self.step_files[num])
+                print "Converting " + str(num+1) + " of " + str(length) + " Geometry Files"
+            os.remove(self.config_file)
+
 def main():
-    file = GDMLtomaus('/home/matt/maus-littlefield/src/common_py/geometry/Step4_Light_version/')
-    file.convert_to_maus('/home/matt/maus-littlefield/src/common_py/geometry/Step4_Light_version/')
+    """
+    Main Function.
+    """
 if __name__ == "__main__":
     main()
