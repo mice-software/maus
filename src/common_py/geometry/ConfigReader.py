@@ -2,10 +2,11 @@
 Configuration Text File Reader Class
 M. Littlefield 02/08/11 
 """
-import argparse
+from Configuration import Configuration
+import json
 
 class Configreader():
-    #pylint: disable = W0101, R0903
+    #pylint: disable = W0101, R0903, R0911
     """
     @class configreader, Configuration File Reader Class
     
@@ -27,12 +28,12 @@ class Configreader():
         self.downloaddir = ""
         self.starttime = ""
         self.stoptime = ""
-
+        
     def readconfig(self):
         """
         @method readconfig
         
-        This method reads the Configuration Text File and takes the information needed from the
+        This method reads the ConfigurationDefaults File and takes the information needed from the
         file which has certain tags. This information is then stored into variables which can be
         passed between classes. The tags are,
         
@@ -41,59 +42,18 @@ class Configreader():
         ZipFile          = "Choose 1 to create a zipfile of the geometry. 0 to do nothing"
         Delete Originals = "Choose 1 to delete the original geometry files. 0 to do nothing"
         DownloadDir = "This is where the directory which the user wishes to download geometries
-                       from the CDB to goes"
-                       
-        These tags must be in the Configuration Text File otherwise this class will not read them.  
+                       from the CDB to goes"                      
         """
-        explanation = 'The file name/path of the configuration File'
-        parser = argparse.ArgumentParser(description= explanation)
-        helpexplanation = 'The file name/path of the configuration File'
-        parser.add_argument('Config File', help = helpexplanation)
-        config_file = parser.parse_args()
-        config_file = config_file.__dict__
-        fin = open(config_file['Config File'], 'r')
-        for lines in fin.readlines():
-            if lines.find('GeometryDirectory') >= 0:
-                varstart = lines.find('=') + 1
-                self.gdmldir = lines[varstart:]
-                self.gdmldir = self.gdmldir.replace('"', '')
-                self.gdmldir = self.gdmldir.strip()
-            if lines.find('GeometryDescription') >= 0:
-                varstart = lines.find('=') + 1
-                self.geometrynotes = lines[varstart:]
-                self.geometrynotes = self.geometrynotes.replace('"', '')
-                self.geometrynotes = self.geometrynotes.strip()
-            if lines.find('ZipFile') >= 0:
-                zipfile = lines
-                if zipfile.find('1') >= 0:
-                    self.zipfile = True
-                else:
-                    self.zipfile = False
-            if lines.find('Delete Originals') >= 0:
-                deleteoriginals = lines
-                if deleteoriginals.find('1') >= 0:
-                    self.deleteoriginals = True
-                else:
-                    self.deleteoriginals = False
-            if lines.find('DownloadDir') >= 0:
-                varstart = lines.find('=') + 1
-                self.downloaddir = lines[varstart:]
-                self.downloaddir = self.downloaddir.replace('"', '')
-                self.downloaddir = self.downloaddir.strip()
-            if lines.find('StartTime') >= 0:
-                varstart = lines.find('=') + 1
-                self.starttime = lines[varstart:]
-                self.starttime = self.starttime.replace('"', '')
-                self.starttime = self.starttime.strip()
-            if lines.find('StopTime') >= 0:
-                stop_time = lines 
-                if stop_time.find('None') >= 0 :
-                    self.stoptime = None
-                else:
-                    varstart = lines.find('=') + 1
-                    self.stoptime = lines[varstart:]
-                    self.stoptime = self.stoptime.replace('"', '')
-                    self.stoptime = self.stoptime.strip()
+        inputs = Configuration().getConfigJSON()
+        config_dict          = json.loads(inputs)
+        self.gdmldir         = config_dict['GeometryDirectory']
+        self.geometrynotes   = config_dict['GeometryDescription']
+        self.zipfile         = config_dict['Zip_File']
+        self.deleteoriginals = config_dict['Delete_Originals']
+        self.downloaddir     = config_dict['DownloadDir']
+        self.starttime       = config_dict['StartTime']
+        self.stoptime        = config_dict['StopTime']
+        
         return self.gdmldir
         return self.geometrynotes
         return self.zipfile

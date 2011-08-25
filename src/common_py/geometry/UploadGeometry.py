@@ -28,9 +28,12 @@ def main():
     upload_file = zfile.zipfile(zippath)
     uploadgeometry.upload_to_cdb(upload_file)
     #delete the text file produced by uploadtoCDB()
-    #os.remove(path)
+    os.remove(path)
+    #delete zip file if specified
+    if inputfile.zipfile == 0:
+        os.remove(upload_file)
     #delete original GDML files as they are now zipped if selected
-    if inputfile.deleteoriginals == True:
+    if inputfile.deleteoriginals == 1:
         gdmls = os.listdir(inputfile.gdmldir)
         for fname in gdmls:
             path = inputfile.gdmldir + '/' +fname
