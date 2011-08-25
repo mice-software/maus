@@ -2,6 +2,7 @@ import numpy
 import xboa
 import xboa.Hit
 import xboa.Bunch
+import xboa.Common
 import sys
 
 class Beam():
@@ -45,7 +46,7 @@ class Beam():
         try:
             self.reference = xboa.Hit.Hit.new_from_maus_object('maus_primary', beam_definition['reference'], 0)
         except:
-            #sys.excepthook(*sys.exc_info())
+            sys.excepthook(*sys.exc_info())
             raise ValueError("Failed to parse reference particle "+str(beam_definition['reference']))
 
     def __birth_transverse_ellipse(self, beam_def):
@@ -65,13 +66,17 @@ class Beam():
                 beam_def['normalised_angular_momentum'],
                 beam_def['bz'], ref['charge'])
         elif self.transverse_mode == "twiss":
-            self.__birth_twiss_ellipse(beam_def)
+            trans_matrix = self.__birth_twiss_ellipse(beam_def)
         elif self.transverse_mode == "constant_solenoid":
             # k_s is solenoid focussing strength: cite Penn MUCOOL note 71
-            k_s = (ref['charge']*Common.units['c_light']/2.*ref['bz']/ref['p'])
+            k_s = (ref['charge']*xboa.Common.constants['c_light']/2.*beam_def['bz']/ref['p'])
+            if k_s < 1e-9:
+                raise ZeroDivisionError(\
+                      "Cannot define constant_solenoid beam for "+\
+                      "solenoid with 0. focussing strength")
             beta_4d = (1.+beam_def['normalised_angular_momentum'])**0.5/k_s
             alpha_4d = 0.
-            trans_matrix = xboa.Bunch.build_penn_ellipse(
+            trans_matrix = xboa.Bunch.Bunch.build_penn_ellipse(
               beam_def['emittance_4d'], ref['mass'], beta_4d, alpha_4d,
               ref['p'], beam_def['normalised_angular_momentum'], beam_def['bz'],
               ref['charge'])
@@ -183,9 +188,6 @@ class Beam():
         elif longitudinal_variable == "energy":
             hit["energy"] = particle_array[5]
             hit.mass_shell_condition("pz")
-        else:
-            raise KeyError("Did not recognise longitudinal variable "+\
-                           str(longitudinal_variable))
         primary = hit.get_maus_dict('maus_primary')[0]
         primary["position"]["z"] = self.reference["z"]
         primary["random_seed"] = self.seed

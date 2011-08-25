@@ -45,15 +45,18 @@ TEST_PRIM_F2 = {
 
 TEST_REF = {'local_weight': 1.0, 'energy': 1000.0, 'pid': 2212, 'ey': 0.0, 
 'ex': 0.0, 'ez': 0.0, 'e_dep': 0.0, 'pz': 236.51264524548657, 'event_number': 0,
-'px': 157.67509683032438, 'py': 197.09387103790547, 'charge': 0.0, 'station': 0,
+'px': 157.67509683032438, 'py': 197.09387103790547, 'charge': 1.0, 'station': 0,
 'global_weight': 1.0, 'status': 0, 'proper_time': 0.0, 'path_length': 0.0,
 'particleNumber': 0, 'particle_number': 0, 'bx': 0.0, 'by': 0.0, 'bz': 0.0,
 'sz': 0.0, 'sy': 0.0, 'sx': 0.0, 'eventNumber': 0, 'mass': 938.271996, 't': 2.0,
 'y': 2.0, 'x': 1.0, 'z': 3.0}
 
 TEST_PENN = {"transverse_mode":"penn", "emittance_4d":6., "beta_4d":333.,
-             "alpha_4d":1., "normalised_angular_momentum":1.,
+             "alpha_4d":1., "normalised_angular_momentum":2.,
              "bz":4.e-3}
+
+TEST_CONSTANT_SOL = {"transverse_mode":"constant_solenoid", "emittance_4d":6.,
+             "normalised_angular_momentum":2., "bz":4.e-3}
 
 TEST_PENN_F1 = {"transverse_mode":"penn", "emittance_4d":-6., "beta_4d":333.,
              "alpha_4d":1., "normalised_angular_momentum":1.,
@@ -187,10 +190,10 @@ class test_Beam(unittest.TestCase):
 
     def test_birth_transverse_penn(self):
         test = \
-        [[1.05668599e+03, -6.33950201e+02,  0.00000000e+00,  3.77222626e-01],
-         [-6.33950201e+02, 7.60666714e+02, -3.77222626e-01,  0.00000000e+00],
-         [0.00000000e+00, -3.77222626e-01,  1.05668599e+03, -6.33950201e+02],
-         [3.77222626e-01,  0.00000000e+00, -6.33950201e+02,  7.60666714e+02]]
+        [[1.05668599e+03, -6.33950201e+02,  0.00000000e+00,  6.34327423e+02],
+         [-6.33950201e+02, 1.14145263e+03, -6.34327423e+02,  0.00000000e+00],
+         [0.00000000e+00, -6.34327423e+02,  1.05668599e+03, -6.33950201e+02],
+         [6.34327423e+02,  0.00000000e+00, -6.33950201e+02,  1.14145263e+03]]
         test_array = numpy.array(test)
         self.beam._Beam__birth_transverse_ellipse(TEST_PENN)
         self.assertRaises(ValueError,
@@ -198,22 +201,41 @@ class test_Beam(unittest.TestCase):
         self.assertRaises(ValueError,
               self.beam._Beam__birth_transverse_ellipse, TEST_PENN_F2)
         self.assertEqual( self.beam.transverse_mode, "penn" )
-        for i in test.shape[0]:
-            for j in test.shape[1]:
-                self.assertAlmostEqual(test[i, j] == \
-                                       self.beam.beam_matrix[i, j])
+        msg="\nGenerated:\n"+str(self.beam.beam_matrix[0:4, 0:4])+\
+            "\nReference:\n"+str(test_array)
+        for i in range(test_array.shape[0]):
+            for j in range(test_array.shape[1]):
+                self.assertAlmostEqual(test_array[i, j], 
+                                       self.beam.beam_matrix[i, j], 3, msg)
 
     def test_birth_transverse_const_sol(self):
-        #self.beam._Beam__birth_transverse_ellipse(TEST_CONSTANT_SOL)
-        self.assertTrue(False) # check beam ellipse is correct (I think not)
+        self.beam._Beam__birth_transverse_ellipse(TEST_CONSTANT_SOL)
+        matrix_const_sol = self.beam.beam_matrix[0:4, 0:4]
+        penn_mod = copy.deepcopy(TEST_PENN)
+        penn_mod["alpha_4d"] = 0.
+        self.beam._Beam__birth_transverse_ellipse(penn_mod)
+        matrix_penn = self.beam.beam_matrix[0:4, 0:4]
+        msg="\nReference:\n"+str(matrix_penn)+\
+            "\nGenerated:\n"+str(matrix_const_sol)
+        for i in range(matrix_const_sol.shape[0]):
+            for j in range(matrix_const_sol.shape[1]):
+                self.assertAlmostEqual(matrix_const_sol[i, j], 
+                                       matrix_penn[i, j], 3, msg)
 
     def test_birth_transverse_twiss(self):
+        self.beam._Beam__birth_transverse_ellipse(TEST_TWISS)
+        test_matrix = self.beam.beam_matrix[0:4, 0:4]
+        test_ref = numpy.array(
+                  [[1.05668599e+03, -6.33950201e+02, 0.00000000e+00, 0.00e+00], 
+                   [-6.33950201e+02, 7.60666579e+02, 0.00000000e+00, 0.00e+00], 
+                   [0.000e+00, 0.00000000e+00, 2.11548746e+02, 2.11316734e+02], 
+                   [0.000e+00, 0.00000000e+00, 2.11316734e+02, 4.22169951e+02]])
+        self.__cmp_matrix(test_ref, test_matrix)
         self.assertRaises(ValueError, 
               self.beam._Beam__birth_transverse_ellipse, TEST_TWISS_F1)
         self.assertRaises(ValueError, 
               self.beam._Beam__birth_transverse_ellipse, TEST_TWISS_F2)
         self.assertEqual( self.beam.transverse_mode, "twiss" )
-        self.assertTrue(False) # check beam ellipse is correct
 
     def test_birth_longitudinal_no_mode(self):
         self.assertRaises( KeyError,
@@ -239,13 +261,15 @@ class test_Beam(unittest.TestCase):
     def test_birth_longitudinal_twiss(self):
         self.beam._Beam__birth_longitudinal_ellipse(TEST_TWISS_L)
         self.assertEqual( self.beam.longitudinal_mode, "twiss" )
+        ref_matrix = numpy.array([[+5.28871865e-01, +1.05658367e+01],
+                                   [+1.05658367e+01, +4.22169951e+02]])
+        self.__cmp_matrix(ref_matrix, self.beam.beam_matrix[4:, 4:])
         self.assertRaises(ValueError,
                           self.beam._Beam__birth_longitudinal_ellipse,
                           TEST_TWISS_L_F1)
         self.assertRaises(ValueError,
                           self.beam._Beam__birth_longitudinal_ellipse,
                           TEST_TWISS_L_F2)
-        self.assertTrue(False) # check beam ellipse is correct
 
     def test_birth_longitudinal_gaussian(self):
         self.beam._Beam__birth_longitudinal_ellipse(TEST_GAUSSIAN_L)
@@ -389,6 +413,17 @@ class test_Beam(unittest.TestCase):
             self.assertLess(hit['t'], TEST_UNIFORM_T["t_end"])
             self.assertGreater(hit['energy'], xboa.Common.pdg_pid_to_mass[13])
             hit.check()
+
+    def __cmp_matrix(self, ref_matrix, test_matrix):
+        self.assertEqual(ref_matrix.shape, test_matrix.shape)
+        msg="\nReference:\n"+str(ref_matrix)+\
+            "\nIn Test:\n"+str(test_matrix)
+        for i in range(ref_matrix.shape[0]):
+            for j in range(test_matrix.shape[1]):
+                self.assertAlmostEqual(ref_matrix[i, j], 
+                                       test_matrix[i, j], 3, msg)
+
+
 
     beam = Beam.Beam()
     beam_no_ref = Beam.Beam()
