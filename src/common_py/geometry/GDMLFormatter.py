@@ -113,23 +113,23 @@ class Formatter:
         
         @param GDMLFile The name of the file which will have its materials reference replaced.
         """
-        if inputfile[-5:] != '.gdml' and inputfile[-4:] != '.xml':
-            raise IOError(inputfile + ' is not a gdml or xml', 'Formatter::insert_materials_ref')
-        else:
-            fin = open(inputfile, 'r')
-            gdmlfile = inputfile[:-4] + '.gdml'
-            fout = open(gdmlfile, 'w')
-            for line in fin.readlines():
-                if line.find('<!-- Materials definition CallBack -->')>=0:
-                    matdef = '<!-- Materials definition CallBack -->'
-                    new_line = line.replace(matdef, matdef+'&materials;')
-                    print >> fout, new_line
-                else:
-                    print >> fout, line
-            print >> fout, '<!-- Formatted for MAUS -->'
-            fin.close()
-            fout.close()
-            os.remove(inputfile)
+        #if inputfile[-5:] != '.txt':
+        #    raise IOError(inputfile + ' is not a txt file', 'Formatter::insert_materials_ref')
+        #else:
+        fin = open(inputfile, 'r')
+        gdmlfile = inputfile[:-4] + '.gdml'
+        fout = open(gdmlfile, 'w')
+        for line in fin.readlines():
+            if line.find('<!-- Materials definition CallBack -->')>=0:
+                matdef = '<!-- Materials definition CallBack -->'
+                new_line = line.replace(matdef, matdef+'&materials;')
+                print >> fout, new_line
+            else:
+                print >> fout, line
+        print >> fout, '<!-- Formatted for MAUS -->'
+        fin.close()
+        fout.close()
+        os.remove(inputfile)
             
     def format_check(self, gdmlfile):
         """
@@ -187,7 +187,7 @@ def main():
     """
     Main Function
     """
-    location = '/src/common_py/geometry/testCases/testGeometry'
+    location = '/src/common_py/geometry/Download'
     gdmls = Formatter(os.environ['MAUS_ROOT_DIR']+location)
     gdmls.format()
 
