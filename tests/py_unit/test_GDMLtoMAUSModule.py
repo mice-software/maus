@@ -48,10 +48,11 @@ class  test_GDML_to_MAUSModule(unittest.TestCase):
             os.remove(path)
         
         
-#    def tearDown(self):
- #       self.testcase = None
-  #      self.testnote = None
-   #     self.test_gdml_to_cdb =None
+    def tearDown(self):
+        self.testcase = None
+        self.file_source = None
+        self.copy_files = None
+        self.test_conversion = None
 
 if __name__ == '__main__':
     unittest.main()
