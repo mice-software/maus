@@ -60,7 +60,7 @@ void SetupSimulation(MiceModule* root, std::vector<CovarianceMatrix> envelope)
   simRun.miceModule    = root;
   simRun.miceMaterials = new MiceMaterials();
   simRun.jsonConfiguration = new Json::Value(Json::objectValue);
-  (*simRun.jsonConfiguration)["verbose_level"] = Json::Value(1);
+  (*simRun.jsonConfiguration)["verbose_level"] = Json::Value(0);
   (*simRun.jsonConfiguration)["maximum_number_of_steps"] = Json::Value(10000);
   (*simRun.jsonConfiguration)["geant4_visualisation"] = Json::Value(false);
   (*simRun.jsonConfiguration)["keep_steps"] = Json::Value(false);
@@ -128,7 +128,7 @@ void Envelope(const MiceModule* root, std::vector<CovarianceMatrix>& env_out, st
   {
     Squeak::mout(Squeak::info) << "Finding TrackingDerivative envelope functions" << std::endl;
     std::vector<PhaseSpaceVector> hits = BuildHitsIn(g_mean, delta);
-    tm_out = TrackingDerivativeTransferMaps(hits, false);
+    tm_out = TrackingDerivativeTransferMaps(hits, false, true);
     Squeak::mout(Squeak::debug) << "TM_OUT SIZE " << tm_out.size() << std::endl;
   }
   else if(env_type == "PolyFit")
@@ -229,9 +229,9 @@ void AddHitsToMap(Json::Value Events, std::map< StationId,   std::vector<PhaseSp
   }
 }
 
-std::vector<TransferMap*>      TrackingDerivativeTransferMaps(std::vector<PhaseSpaceVector> hitsIn, bool referenceOnly)
+std::vector<TransferMap*>      TrackingDerivativeTransferMaps(std::vector<PhaseSpaceVector> hitsIn, bool referenceOnly, bool rephaseCavities)
 {
-  Simulation::PhaseCavities(hitsIn[0]);
+  if (rephaseCavities) Simulation::PhaseCavities(hitsIn[0]);
   g_hitsIn = hitsIn;
   g_hits   = std::map<Optics::StationId, std::vector<PhaseSpaceVector> >();
 
@@ -247,7 +247,7 @@ std::vector<TransferMap*>      TrackingDerivativeTransferMaps(std::vector<PhaseS
     event->zustandVektors = std::vector<ZustandVektor*>();
   }
   int order = 2;
-  if(referenceOnly) order = 1;
+  if(referenceOnly) order = 0;
   return MakePolyfitMaps(hitsIn, g_hits, order);
 }
 
@@ -273,7 +273,7 @@ std::vector<TransferMap*> MakePolyfitMaps(std::vector<PhaseSpaceVector> hitsIn, 
   typedef std::map< StationId, std::vector<PhaseSpaceVector> >::iterator vec_it;
   std::vector<TransferMap*> maps;
   for(vec_it it = hits.begin(); it!=hits.end(); it++) {
-    if( it->second.size() != hitsIn.size() ) 
+    if( it->second.size() != hitsIn.size() && order > 0)
       Squeak::mout(Squeak::warning) << "Warning - derivatives may be screwy. I only got " << it->second.size() << " hits in station " << it->first << std::endl;
     else {
       try { 
@@ -795,7 +795,8 @@ namespace Optimiser
     if(g_transfer_maps.size() < 1 || g_redo_tracking) //if the field map could have changed or the tms are not yet defined
     {
       Optics::g_module_to_map = std::map<const MiceModule*, TransferMap*>();
-      g_transfer_maps = Optics::TrackingDerivativeTransferMaps( Optics::BuildHitsIn(ellipse_in.GetMean(), Optics::GetDelta(g_root_mod)), referenceOnly );
+      bool phase_cavities = g_transfer_maps.size() < 1 || g_rebuild_simulation;
+      g_transfer_maps = Optics::TrackingDerivativeTransferMaps( Optics::BuildHitsIn(ellipse_in.GetMean(), Optics::GetDelta(g_root_mod)), referenceOnly, phase_cavities  );
     }
     std::map<std::string, double> scores;
     for(int i=0; i<int(g_score_mod.size()); i++)
