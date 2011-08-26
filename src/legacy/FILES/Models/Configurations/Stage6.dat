@@ -6,8 +6,6 @@ Configuration Stage6
   PropertyString Material AIR
   PropertyDouble G4StepMax 1.0 mm
 
-mode
-
   Module BeamLine/BeamLine.dat
   {
     Position 0. 0. -10.283 m
