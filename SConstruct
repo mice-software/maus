@@ -16,6 +16,9 @@ if not maus_root_dir:
     print('!! Did you try running: "source env.sh"?')
     my_exit(1)
 
+# Needed by Depends() to force correct ordering of SharedLibrary() execution
+global maus_cpp_dylib
+
 #this is our catch-all Dev class
 class Dev:
     cflags = ''
@@ -535,7 +538,6 @@ env = conf.Finish()
 if 'configure' in COMMAND_LINE_TARGETS: # pylint: disable-msg=E0602
     my_exit(0)
 
-
 # NOTE: do this after configure!  So we know if we have ROOT/geant4
 #specify all of the sub-projects in the section
 if env['USE_G4'] and env['USE_ROOT']:
@@ -555,7 +557,6 @@ if env['USE_G4'] and env['USE_ROOT']:
     #Build an extra copy with the .dylib extension for linking on OS X
     if (sysname == 'Darwin'):
       targetpath = 'src/common_cpp/libMausCpp.dylib'
-      global maus_cpp_dylib
       maus_cpp_dylib = env.SharedLibrary(target = targetpath,
                                          source = common_cpp_files,
                                          LIBS=env['LIBS'] + ['recpack'])
