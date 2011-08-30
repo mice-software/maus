@@ -1,24 +1,74 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"> 
-
-    <xs:complexType name="FieldType">
-        <xs:choice minOccurs="1"/>
-        <xs:attribute name="Field_Info_Goes_here"/>
+<!--++++++++++++++++++++++++++++++++++BASE TYPES+++++++++++++++++++++++++++++++++++++++++-->
+    <xs:complexType name="ProtonAbsorberType">
+        <xs:attribute name="Thickness"/>
+        <xs:attribute name="Unit" default="mm"/>
     </xs:complexType>
-    <xs:complexType name="FieldStrengthType">
-        <xs:choice minOccurs="1"/>
-        <xs:attribute name="Tesla"/>
+    <xs:complexType name="DiffuserType">
+        <xs:attribute name="Size"/>
+        <xs:attribute name = "Unit" default="mm"/>
     </xs:complexType>
-<!--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
-
+    <xs:complexType name="AbsorberTypeType">
+        <xs:attribute name="Type"/>
+        <xs:attribute name="Thickness" use="optional"/>
+        <xs:attribute name="Unit" default="mm" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="MagnetType">
+        <xs:attribute name="Name"/>
+        <xs:attribute name="Type"/>
+        <xs:attribute name="File_Location"/>        
+    </xs:complexType>
+    <xs:complexType name="TOFType">
+        <xs:attribute name="TOF"/>
+    </xs:complexType>
+    <xs:complexType name="KLType">
+        <xs:attribute name="KL"/>
+    </xs:complexType>
+    <xs:complexType name="CherenkovType">
+        <xs:attribute name="Cherenkov"/>        
+    </xs:complexType>
+    <xs:complexType name="TrackerType">
+        <xs:attribute name="Tracker"/>
+    </xs:complexType>    
+<!--+++++++++++++++++++++++++++++++++++MIDDLE TYPES++++++++++++++++++++++++++++++++++++++++-->
+    <xs:complexType name="Beam_InformationType">
+        <xs:sequence>
+            <xs:element name="Proton_Absorber" type="ProtonAbsorberType"/>
+            <xs:element name="Diffuser" type="DiffuserType"/>
+            <xs:element name="Absorber" type="AbsorberTypeType"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="Field_InformationType">
+        <xs:sequence>
+            <xs:element name="Magnet" type="MagnetType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="Detector_InformationType">
+        <xs:sequence>
+            <xs:element name="TOF" maxOccurs="3"/>
+            <xs:element name="KL"/>
+            <xs:element name="Cherenkov"/>
+            <xs:element name="Tracker" type="TrackerType" maxOccurs="2"/>
+        </xs:sequence>
+    </xs:complexType>
+<!--++++++++++++++++++++++++++++++++++TOP TYPES+++++++++++++++++++++++++++++++++++++++++-->
     <xs:element name="MICE_Information">
+        <xs:annotation>
+            <xs:documentation>
+                This Information is need for the MICE experiment. It is
+                translated through the CAD to Software translation system
+                and is need for simulations. Some of this information comes
+                direct from the control room and some is stored in MAUS 
+                and combined with geometrical information from CADs.
+            </xs:documentation>
+        </xs:annotation>
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="FieldType" type="FieldType"/>
-                <xs:element name="FieldStrength" type="FieldStrengthType"/>
-                <xs:element name="FieldAnythingElse"></xs:element>
+                <xs:element name="Beam_Information" type="Beam_InformationType"/>
+                <xs:element name="Field_Information" type="Field_InformationType"/>
+                <xs:element name="Detector_Information" type="Detector_InformationType" minOccurs="0"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-
 </xs:schema>
