@@ -1,6 +1,7 @@
 from SCons.Script.SConscript import SConsEnvironment # pylint: disable-msg=F0401
 import glob
 import os
+import shutil
 
 def my_exit(code = 1):
     """Internal routine to exit
@@ -9,6 +10,14 @@ def my_exit(code = 1):
     warning.
     """
     Exit(code) # pylint: disable-msg=E0602
+
+def duplicate_dylib_as_so(target, source, env):
+    print "Duplicating %s as %s." % (source[0], target[0])
+    shutil.copyfile(str(source[0]), str(target[0]))
+    return None
+
+dylib2so = Builder(action = duplicate_dylib_as_so, suffix = '.so',
+                   src_suffix = '.dylib')
 
 maus_root_dir = os.environ.get('MAUS_ROOT_DIR')
 if not maus_root_dir:
@@ -48,7 +57,7 @@ class Dev:
 
         name = project.split('/')[-1]
         builddir = 'build'
-        targetpath = os.path.join('build', '_%s.so' % name)
+        targetpath = os.path.join('build', '_%s' % name)
 
         #append the user's additional compile flags
         #assume debugcflags and releasecflags are defined
@@ -61,13 +70,18 @@ class Dev:
         localenv.VariantDir(variant_dir=builddir, src_dir='.', duplicate=0)
         localenv.Append(CPPPATH='.')
 
+        full_build_dir = os.path.join(maus_root_dir, builddir)
+
         srclst = map(lambda x: builddir + '/' + x, glob.glob('*.cc'))
         srclst += map(lambda x: builddir + '/' + x, glob.glob('*.i'))
         pgm = localenv.SharedLibrary(targetpath, source=srclst)
 
-        tests = glob.glob('test_*.py')
+        if (sysname == 'Darwin'):
+          lib_so = env.Dylib2SO(targetpath)
+          Depends(lib_so, pgm)
+          env.Install(full_build_dir, lib_so)
 
-        full_build_dir = os.path.join(maus_root_dir, builddir)
+        tests = glob.glob('test_*.py')
 
         env.Install(full_build_dir, "build/%s.py" % name)
         env.Install(full_build_dir, pgm)
@@ -443,13 +457,12 @@ def geant4_extras(env):
         my_exit(1)
 
 # Setup the environment.  NOTE: SHLIBPREFIX means that shared libraries don't
-# have a 'lib' prefix, which is needed for python to find SWIG generated libraries
-env = Environment(SHLIBPREFIX="",SHLIBSUFFIX="") # pylint: disable-msg=E0602
+# have a 'lib' prefix, which is needed for python to find SWIG generated
+# libraries
+#env = Environment(SHLIBPREFIX="",SHLIBSUFFIX="") # pylint: disable-msg=E0602
+env = Environment(SHLIBPREFIX="", BUILDERS = {'Dylib2SO' : dylib2so}) # pylint: disable-msg=E0602
 
 (sysname, nodename, release, version, machine) = os.uname()
-
-# Darwin defaults to no prefix or suffix. All others default to "lib" prefix
-# and .so suffix. We want no suffix and .so prefix for all systems by default.
 
 if env.GetOption('clean'):
     print("In cleaning mode!")
@@ -544,7 +557,7 @@ if env['USE_G4'] and env['USE_ROOT']:
         glob.glob("src/common_cpp/*/*cc") + \
         glob.glob("src/common_cpp/*/*/*cc")
 
-    targetpath = 'src/common_cpp/libMausCpp.so'
+    targetpath = 'src/common_cpp/libMausCpp'
     maus_cpp = env.SharedLibrary(target = targetpath,
                                  source = common_cpp_files,
                                  LIBS=env['LIBS'] + ['recpack'])
@@ -552,10 +565,13 @@ if env['USE_G4'] and env['USE_ROOT']:
 
     #Build an extra copy with the .dylib extension for linking on OS X
     if (sysname == 'Darwin'):
-      targetpath = 'src/common_cpp/libMausCpp.dylib'
-      maus_cpp_dylib = env.SharedLibrary(target = targetpath,
-                                         source = common_cpp_files,
-                                         LIBS=env['LIBS'] + ['recpack'])
+      maus_cpp_so = env.Dylib2SO(targetpath)
+      Depends(maus_cpp_so, maus_cpp)
+      env.Install("build", maus_cpp_so)
+      #targetpath = 'src/common_cpp/libMausCpp.dylib'
+      #maus_cpp_dylib = env.SharedLibrary(target = targetpath,
+                                         #source = common_cpp_files,
+                                         #LIBS=env['LIBS'] + ['recpack'])
 
 
     env.Append(LIBPATH = 'src/common_cpp')
