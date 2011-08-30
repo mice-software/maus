@@ -16,9 +16,6 @@ if not maus_root_dir:
     print('!! Did you try running: "source env.sh"?')
     my_exit(1)
 
-# Needed by Depends() to force correct ordering of SharedLibrary() execution
-global maus_cpp_dylib
-
 #this is our catch-all Dev class
 class Dev:
     cflags = ''
@@ -67,7 +64,6 @@ class Dev:
         srclst = map(lambda x: builddir + '/' + x, glob.glob('*.cc'))
         srclst += map(lambda x: builddir + '/' + x, glob.glob('*.i'))
         pgm = localenv.SharedLibrary(targetpath, source=srclst)
-        Depends(pgm, maus_cpp_dylib)
 
         tests = glob.glob('test_*.py')
 
