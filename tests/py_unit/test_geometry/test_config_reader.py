@@ -15,7 +15,7 @@ class test_config_reader(unittest.TestCase):
     the info available for the geometry files. This test
     ensures it is doing what it is expected to.
     """
-    def set_up(self):
+    def setUp(self):
         """
         method set_up This method creates a Configreader
         object ready to test

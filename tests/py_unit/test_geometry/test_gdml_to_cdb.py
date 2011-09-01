@@ -1,17 +1,43 @@
+"""
+This test the classes of GDMLtoCDB.py
+M. Littlefield
+"""
 import unittest
 import os
 from geometry.GDMLtoCDB import GDMLtocdb
 from geometry.GDMLtoCDB import Downloader
 
-class  Test_GDMLtoCDB(unittest.TestCase):
+#pylint: disable = C0301, C0103, W0702, R0904, W0201
+#I'm not sure what these errors mean will
+#need to check with someone (Littlefield)
+
+class  test_gdml_to_cdb(unittest.TestCase):
+    """
+    class test_gdml_to_cdb
     
+    This class tests the uploading class
+    (GDMLtocdb) of GDMLtoCDB.
+    """
     def setUp(self):
+        """
+        method set_up
+        
+        This method sets up GDMLtoCDB objects 
+        ready for testing.
+        """
         self.constructor = None
         self.testcase = os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testGeometry'
         self.testnote = 'This is the unit test'
         self.test_gdml_to_cdb = GDMLtocdb(self.testcase, self.testnote, 1)
         
     def test_constructor(self):
+        """
+        method test_constructor
+        
+        This method tests the constructor by inputting
+        invalid arguments and tests whether errors are 
+        raised.
+        """
         try:
             self.constructor = GDMLtocdb(self.testcase, self.testnote, 'this is not an int')
             self.assertTrue(False, 'Should have raised an error')
@@ -31,11 +57,22 @@ class  Test_GDMLtoCDB(unittest.TestCase):
             pass
         
     def test_set_up_server(self):
+        """
+        method test_set_upserver
+        
+        This method ensures the server is set up.
+        """
         wsdl_url = self.test_gdml_to_cdb.set_up_server()
         self.assertEqual(wsdl_url, 'http://rgma19.pp.rl.ac.uk:8080/cdb/geometrySuperMouse?wsdl', 'WSDL URL not set up, test_gdmltocdb::test_set_up_server')
         #write the same for actual server
         
     def test_check_file_list(self):
+        """
+        method test_check_file_list
+        
+        This method ensures an error is raised when
+        an invalid argument is passed.
+        """
         test_file_list = os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testGDMLtoCDB'
         try:
             self.constructor = GDMLtocdb(test_file_list, self.testnote, 1)
@@ -44,6 +81,14 @@ class  Test_GDMLtoCDB(unittest.TestCase):
             pass
         
     def test_create_file_list(self):
+        """
+        method test_create_file_list
+        
+        This method ensures that a file list is created
+        when this method is called. The file list is the text
+        file which lists the names of the files to be
+        uploaded. In this case it is the test geometry.
+        """
         test_create_file_list = os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testCreateFileList'
         self.constructor = GDMLtocdb(test_create_file_list, self.testnote, 1)
         find_file = os.listdir(test_create_file_list)
@@ -55,6 +100,13 @@ class  Test_GDMLtoCDB(unittest.TestCase):
         os.remove(path)
         
     def test_upload_to_cdb(self):
+        """
+        method test_upload_to_cdb
+        
+        This method tests the upload_to_cdb method
+        and check to make sure the test geometry
+        is uploaded. 
+        """
         test_upload = os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testUpload.not_zip'
         try:
             self.test_gdml_to_cdb.upload_to_cdb(test_upload)
@@ -62,27 +114,53 @@ class  Test_GDMLtoCDB(unittest.TestCase):
         except:
             pass
         
+    def tearDown(self):
+        """
+        method tearDown
+        
+        This method removes the FileList.txt which
+        is created in setUp. This file causes problems for
+        other tests.
+        """
+        path = os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testGeometry/FileList.txt' 
+        os.remove(path) 
+        
+        
         #should figure out some more test to mock suds and check calls are being made.
     
-    def tearDown(self):
-        self.testcase = None
-        self.testnote = None
-        self.test_gdml_to_cdb =None
-
-class test_Downloader(unittest.TestCase):
+class test_downloader(unittest.TestCase):
+    """
+    class test_downloader
     
-    def setUp(self):
+    This class tests the Downloader class from
+    GDMLtoCDB.py.
+    """
+    def set_up(self):
+        """
+        method set_up
+        
+        This method creates a Downloader object
+        ready for testing.
+        """
         self.constructor = None
         self.test_downloader = Downloader(1)
         
     def test_constructor(self):
+        """
+        method test_constructor
+        
+        This method test the constructor by passing
+        invalid arguments and seeing if errors are raised 
+        as they should be. 
+        """
         try:
             self.constructor = Downloader('not an int')
             self.assertTrue(False, 'Should have raised an error')
         except:
             pass
         
+        #More tests needed? Need to figure these out as the class
+        #needs to talk to the cdb to test!?
 
 if __name__ == '__main__':
     unittest.main()
-

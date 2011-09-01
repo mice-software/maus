@@ -13,7 +13,7 @@ class  test_gdml_formatter(unittest.TestCase):
     class test_gdml_formatter This ensures that 
     GDMLFormatter.py is working as expected.
     """
-    def set_up(self):
+    def setUp(self):
         """
         method set_up
         

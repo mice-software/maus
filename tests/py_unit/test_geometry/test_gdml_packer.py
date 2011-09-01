@@ -1,23 +1,45 @@
+"""
+This class test the GDMLPacker module
+M. Littlefield
+"""
 import os
-import os.path
 import unittest
 from geometry.GDMLPacker import Packer
 from geometry.GDMLPacker import Unpacker
 
+#pylint: disable = C0301, C0103, W0702, R0904, W0201
+#I'm not sure what these errors mean will
+#need to check with someone (Littlefield)
 
-class  Test_Packer(unittest.TestCase):
+class  test_packer(unittest.TestCase):
+    """
+    class test_packer 
+    
+    This class tests the packer class from the
+    GDMLPacker.py file to ensure it is
+    working correctly.
+    """
     def setUp(self):
+        """
+        method set_up
+        
+        This method set up a Packer object
+        ready for testing.
+        """
         self.constructor_test = None
         testcase = os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testPacker/FileList.txt'
         self.gdml_test_case = Packer(testcase)
     
     def test_constructor(self):
         """
-        this test will check the constructor raises appropriate errors.
+        method test_constructor
+        
+        This method tests the constructor by passing argument 
+        which are not valid and seeing if errors are raised.
         """
         try:
             self.constructor_test = Packer("geometry.not_txt")
-            self.asserttrue(False, "should have raised an exception, test_GDMLPacker::test_constructor")
+            self.assertTrue(False, "should have raised an exception, test_GDMLPacker::test_constructor")
         except:
             pass
 
@@ -30,7 +52,11 @@ class  Test_Packer(unittest.TestCase):
 
     def test_zipfile(self):
         """
-        this test checks to see if the outputted zip file has been written
+        mehod test_zipfile
+        
+        This method tests the zipfile method by 
+        calling the method and checking the file size
+        i.e. make sure its not empty.
         """
         zippath = os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testPacker'
         self.gdml_test_case.zipfile(path = zippath)
@@ -40,35 +66,56 @@ class  Test_Packer(unittest.TestCase):
                 zfile = zippath + '/' + fname
         self.assertTrue(os.path.getsize(zfile) != 0, "zipped file size is zero, test_GDMLPacker::test_zipfile")
 
-    def tearDown(self):
-        self.GDML_test_case = None
-        
-class Test_Unpacker(unittest.TestCase):
+class test_unpacker(unittest.TestCase):
+    """
+    class test_unpacker
     
+    This class test the unpacker class
+    from GDMLPacker.py 
+    """
     def setUp(self):
+        """
+        method set_up
+        
+        This method sets up an Unpacker
+        object ready for testing.
+        """
         self.constructor_test = None
         zippath = os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testPacker'
         output = os.listdir(zippath)
         for fname in output:
             if fname[-4:] == '.zip':
                 zfile = zippath + '/' + fname
-        testpath = os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases'
-        self.extraction_test = Unpacker(zfile, testpath)
+        self.testpath = os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases'
+        self.extraction_test = Unpacker(zfile, self.testpath)
         
     def test_constructor(self):
+        """
+        method test_constructor
+        
+        This method tests the constructor by passing argument 
+        which are not valid and seeing if errors are raised.
+        """
         try:
-            self.constructor_test = Unpacker('Geometry.not_zip', testpath)
+            self.constructor_test = Unpacker('Geometry.not_zip', self.testpath)
             self.assertTrue(False, 'Should have raised an error, Test_Unpacker::test_constructor')
         except:
             pass
         
         try: 
-            self.constructor_test = Unpacker(testcase, 'Not_a_path')
+            self.constructor_test = Unpacker(self.testpath, 'Not_a_path')
             self.assertTrue(False, 'Should have raised an error, Test_Unpacker::test_constructor')
         except:
             pass
         
     def test_unzip_file(self):
+        """
+        method test_unzip_file
+        
+        This method test the unzip_file method. It does this
+        by unzipping the testcase zipfile and checking that the 
+        correct files are there.
+        """
         self.extraction_test.unzip_file()
         output = os.listdir(self.extraction_test.extract_path)
         for fname in output:

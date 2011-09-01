@@ -10,14 +10,14 @@ from geometry.CADImport import CADImport
 # Some of these disabled errors I don't understand need to look
 # at them with someone who has experience. (Littlefield)
 
-class TEST_cad_import(unittest.TestCase):
+class test_cad_import(unittest.TestCase):
     """
     class test_cad_import This class tests CADImport.py
     
     This is the unit test which verifies CADImport.py
     is working correctly.
     """
-    def set_up(self):
+    def setUp(self):
         """
         method set_up This sets some variable for the coming tests
         

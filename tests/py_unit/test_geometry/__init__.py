@@ -8,12 +8,12 @@
 import unittest
 import sys
 
-import test_geometry.test_CADImport
-import test_geometry.test_ConfigReader
-import test_geometry.test_GDMLFormatter
-import test_geometry.test_GDMLPacker
-import test_geometry.test_GDMLtoCDB
-import test_geometry.test_GDMLtoMAUSModule
+import test_geometry.test_cad_import
+import test_geometry.test_config_reader
+import test_geometry.test_gdml_formatter
+import test_geometry.test_gdml_packer
+import test_geometry.test_gdml_to_cdb
+import test_geometry.test_gdml_to_maus_module
 
 
 if __name__ == '__main__':
