@@ -158,7 +158,7 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
 
      maus_bin_dirs="\${MAUS_ROOT_DIR}/third_party/install/bin"
      if [ "$arch" == "Darwin" ]; then
-         maus_bin_dirs="\${MAUS_ROOT_DIR}/third_party/install/Python.framework/Versions/2.7/bin:\${maus_bin_dir}"
+         maus_bin_dirs="\${MAUS_ROOT_DIR}/third_party/install/Python.framework/Versions/2.7/bin:\${maus_bin_dirs}"
      fi
 
      if [ -z "\${PATH}" ]; then  # see if the variable exists yet
@@ -169,7 +169,7 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
 
      maus_lib_dirs="\${MAUS_ROOT_DIR}/third_party/install/lib"
      if [ "$arch" == "Darwin" ]; then
-         maus_lib_dirs="\${MAUS_ROOT_DIR}/third_party/install/Python.framework/Versions/2.7/bin:\${maus_lib_dir}"
+         maus_lib_dirs="\${MAUS_ROOT_DIR}/third_party/install/Python.framework/Versions/2.7/lib:\${maus_lib_dirs}"
      fi
 
      if [ -z "\${$DYLIB_VAR}" ]; then  # see if the variable exists yet
