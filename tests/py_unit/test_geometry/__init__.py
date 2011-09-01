@@ -1,7 +1,9 @@
 "cdb test module."
 
 # Disable reimport warning since we want to do that if this is the main function
-# pylint: disable=W0404
+# pylint: disable=W0404, E1101
+#This has been copied from test_cdb to get the geometry test to work
+#needs to be looked at by someone who knows what to do. (Littlefield)
 
 import unittest
 import sys

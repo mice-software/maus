@@ -21,6 +21,10 @@
 #  consulting the documentation.
 #
 
+# This is a copied file to test geometry information
+#which will be added to the defaults later
+#pylint: disable = C0103, C0301, C0111
+
 map_reduce_type = "native_python" # can also be "native_python_profile" using cProfile in python
 
 # Used, for now, to determine what level of c++ log messages are reported to the user

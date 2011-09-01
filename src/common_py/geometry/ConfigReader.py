@@ -5,8 +5,9 @@ M. Littlefield 02/08/11
 from Configuration import Configuration
 import json
 
+#pylint: disable = R0903
+
 class Configreader():
-    #pylint: disable = W0101, R0903, R0911
     """
     @class configreader, Configuration File Reader Class
     
@@ -53,14 +54,6 @@ class Configreader():
         self.downloaddir     = config_dict['DownloadDir']
         self.starttime       = config_dict['StartTime']
         self.stoptime        = config_dict['StopTime']
-        
-        return self.gdmldir
-        return self.geometrynotes
-        return self.zipfile
-        return self.deleteoriginals
-        return self.downloaddir
-        return self.starttime
-        return self.stoptime
 
 def main():
     """

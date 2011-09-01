@@ -10,5 +10,6 @@ from geometry.GDMLtoCDB import GDMLtocdb
 from geometry.GDMLtoCDB import Downloader
 from geometry.GDMLtoMAUSModule import GDMLtomaus
 
-__all__ = ["CADImport", "Configreader", "Formatter", "Packer", "Unpacker", "GDMLtocdb", "Downloader", "GDMLtomaus"]
+__all__ = ["CADImport", "Configreader", "Formatter", 
+           "Packer", "Unpacker", "GDMLtocdb", "Downloader", "GDMLtomaus"]
 

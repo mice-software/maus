@@ -3,9 +3,9 @@ Executable file to upload geometries to the CDB
 M. Littlefield 02/08/11 
 """
 import os.path
-from GDMLPacker import Packer
-from GDMLtoCDB import GDMLtocdb
-from ConfigReader import Configreader
+from geometry.GDMLPacker import Packer
+from geometry.GDMLtoCDB import GDMLtocdb
+from geometry.ConfigReader import Configreader
 
 def main():
     """

@@ -6,7 +6,8 @@ import os
 import libxml2
 import libxslt
 
-#pylint: disable = C0301, R0913, R0912
+#pylint: disable = C0301, R0913, R0912, F0401
+#F0401 refers to libxml2 not being imported which it is?
 
 class CADImport:
     """

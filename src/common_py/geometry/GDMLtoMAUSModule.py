@@ -3,7 +3,7 @@ Class which converts formatted GDML files to MAUS modules
 M.Littlefield
 """
 import os
-from CADImport import CADImport
+from geometry.CADImport import CADImport
 
 #pylint: disable = C0301, R0903
 
