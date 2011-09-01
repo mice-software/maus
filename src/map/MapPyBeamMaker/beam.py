@@ -1,3 +1,18 @@
+#  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
+# 
+#  MAUS is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+# 
+#  MAUS is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+# 
+#  You should have received a copy of the GNU General Public License
+#  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
+
 """
 Responsible for initialising parent distribution and sampling single particles
 for beam generation.
@@ -45,6 +60,8 @@ or Twiss, where the ellipse is defined by
 Additionally, as mentioned above we can override the beam ellipse definition
 with explicit time distributions.
 """
+
+# NEED TO TEST RANDOM SEED routine
 
 import numpy
 import xboa
@@ -97,7 +114,8 @@ class Beam(): # pylint: disable=R0902
         self.t_start = 0.
         self.t_end = 0.
         self.momentum_defined_by = "energy"
-        self.seed = 0
+        self.beam_seed = 0
+        self.particle_seed_algorithm = ""
 
     def birth(self, beam_def, particle_generator, random_seed):
         """
@@ -109,8 +127,9 @@ class Beam(): # pylint: disable=R0902
             - random_seed seed used for the random number generator. Note that
             beam doesn't set the seed; this has to be done at a higher level as
             numpy only stores one seed.
+            - particle_seed seed used for the random number generator.
         """
-        self.seed = random_seed
+        self.beam_seed = random_seed
         self.__birth_particle_generator(beam_def, particle_generator)
         self.__birth_reference_particle(beam_def)
         self.__birth_transverse_ellipse(beam_def["transverse"])
@@ -131,6 +150,13 @@ class Beam(): # pylint: disable=R0902
             self.weight = beam_def["weight"]
             if self.weight <= 0.:
                 raise ValueError("Weight of a beam must be > 0.")
+        self.particle_seed_algorithm = beam_def["random_seed_algorithm"]
+        if self.particle_seed_algorithm == "incrementing_random":
+            self.beam_seed = self.__random_unsigned()
+        if self.particle_seed_algorithm not in self.seed_keys:
+            raise ValueError("random_seed_algorithm "+\
+                  self.particle_seed_algorithm+" should be one of "+\
+                  str(self.seed_keys))
 
     def __birth_reference_particle(self, beam_definition):
         """Setup the reference particle - of type maus_primary"""
@@ -311,9 +337,39 @@ class Beam(): # pylint: disable=R0902
             hit.mass_shell_condition("pz")
         primary = hit.get_maus_dict('maus_primary')[0]
         primary["position"]["z"] = self.reference["z"]
-        primary["random_seed"] = self.seed
+        primary["random_seed"] = self.__process_get_seed()
         return primary
+
+    def __process_get_seed(self):
+        """
+        Get the random seed for the next particle
+
+        - if particle_seed = beam_seed, use beam_seed for all particles
+        - if particle_seed = random, assign seed as a random unsigned int
+        - if particle_seed = incrementing or incrementing_random, assign
+                             beam_seed to the first particle, beam_seed+1 to the
+                             second particle, etc 
+        """
+        if self.particle_seed_algorithm == "beam_seed":
+            return self.beam_seed
+        if self.particle_seed_algorithm == "random":
+            return self.__random_unsigned()
+        if self.particle_seed_algorithm == "incrementing" or \
+           self.particle_seed_algorithm == "incrementing_random":
+            random_seed = self.beam_seed
+            self.beam_seed += 1
+            return random_seed
 
     array_keys = ["x", "px", "y", "py", "t"]
     momentum_keys = ['p', 'pz', 'energy']
+    seed_keys = ["beam_seed", "random", "incrementing", "incrementing_random"]
+
+
+    def __random_unsigned(self):
+        """
+        Return a random unsigned int
+        """
+        return numpy.random.randint(0, 4294967295)
+
+
 

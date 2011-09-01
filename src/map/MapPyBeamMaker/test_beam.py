@@ -1,3 +1,18 @@
+#  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
+# 
+#  MAUS is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+# 
+#  MAUS is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+# 
+#  You should have received a copy of the GNU General Public License
+#  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
+
 """
 Tests the Beam class
 """
@@ -124,6 +139,7 @@ TEST_UNIFORM_T_F1 = {"longitudinal_mode":"uniform_time",
 TEST_BIRTH = {
   "weight":0.5,
   "random_seed":10,
+  "random_seed_algorithm":"incrementing_random",
   "reference":TEST_PRIM_MU,
   "transverse":TEST_PENN,
   "longitudinal":TEST_TWISS_L,
@@ -141,13 +157,19 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
 
     def test_birth_part_gen_1(self):
         """Test __birth_particle_generator for counter mode"""
-        self._beam._Beam__birth_particle_generator({"n_particles_per_spill":1},
-                                             "counter")       
+        self._beam._Beam__birth_particle_generator(
+                        {"n_particles_per_spill":1, 
+                         "random_seed_algorithm":"incrementing_random"},
+                         "counter")
         self.assertRaises(ValueError, 
                           self._beam._Beam__birth_particle_generator,
-                          {"n_particles_per_spill":0}, "counter")
-        self._beam._Beam__birth_particle_generator({"n_particles_per_spill":1},
-                                                                      "counter")
+                          {"n_particles_per_spill":0,
+                          "random_seed_algorithm":"incrementing_random"}, 
+                          "counter")
+        self._beam._Beam__birth_particle_generator({
+                    "n_particles_per_spill":1,
+                    "random_seed_algorithm":"incrementing_random"},
+                    "counter")
         self.assertEqual(self._beam.n_particles_per_spill, 1)
 
     def test_birth_part_gen_2(self):
@@ -158,8 +180,24 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
         self.assertRaises(ValueError,
                           self._beam._Beam__birth_particle_generator,
                           {"weight":-1.}, "overwrite_existing")
-        self._beam._Beam__birth_particle_generator({"weight":2.}, "binomial")
+        self._beam._Beam__birth_particle_generator({"weight":2.,
+                     "random_seed_algorithm":"incrementing_random"}, "binomial")
         self.assertAlmostEqual(self._beam.weight, 2.)
+
+    def test_birth_part_gen_2(self):
+        """Test __birth_particle_generator for random number assignment"""
+        seed = self._beam.beam_seed
+        self._beam._Beam__birth_particle_generator({
+                    "n_particles_per_spill":1,
+                    "random_seed_algorithm":"incrementing_random"},
+                    "counter")
+        self.assertTrue(abs(self._beam.beam_seed-seed) > 5)
+
+        self.assertRaises( ValueError, 
+                    self._beam._Beam__birth_particle_generator, 
+                    {"n_particles_per_spill":1,
+                    "random_seed_algorithm":"bob"},
+                    "counter")
 
 
     def test_birth_reference_particle(self):
@@ -334,7 +372,8 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
         """Check function that converts from an array to a primary particle"""
         mean = numpy.array([10., 20., 30., 40., 50., 600.])
         mass = xboa.Common.pdg_pid_to_mass[13]
-        self._beam.seed = 10
+        self._beam.beam_seed = 10
+        self._beam.particle_seed_algorithm = "beam_seed"
         primary = self._beam._Beam__process_array_to_primary(mean, 13, 'p')
         self.assertAlmostEqual(primary["position"]["x"], 10.)
         self.assertAlmostEqual(primary["position"]["y"], 30.)
@@ -378,6 +417,7 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
         test_birth = {
           "weight":0.5,
           "random_seed":10,
+          "random_seed_algorithm":"incrementing_random",
           "reference":TEST_PRIM_MU,
           "transverse":{"transverse_mode":"pencil"},
           "longitudinal":{"longitudinal_mode":"pencil","momentum_variable":"p"},
@@ -395,6 +435,7 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
         test_birth = {
           "weight":0.5,
           "random_seed":10,
+          "random_seed_algorithm":"incrementing_random",
           "reference":TEST_PRIM_MU,
           "transverse":{"transverse_mode":"pencil"},
           "longitudinal":TEST_SAWTOOTH_T,
@@ -415,6 +456,7 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
         test_birth = {
           "weight":0.5,
           "random_seed":10,
+          "random_seed_algorithm":"incrementing_random",
           "reference":TEST_PRIM_MU,
           "transverse":{"transverse_mode":"pencil"},
           "longitudinal":TEST_UNIFORM_T,
@@ -428,6 +470,31 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
             self.assertLess(hit['t'], TEST_UNIFORM_T["t_end"])
             self.assertGreater(hit['energy'], xboa.Common.pdg_pid_to_mass[13])
             self.assertTrue(hit.check())
+
+    def test_process_get_seed(self):
+        """Check we generate the seed correctly"""
+        self._beam.beam_seed = 9
+        self._beam.particle_seed_algorithm = "beam_seed"
+        self.assertEqual(self._beam._Beam__process_get_seed(), 
+                         self._beam.beam_seed)
+
+        self._beam.particle_seed_algorithm = "random"
+        self.assertNotEqual(self._beam._Beam__process_get_seed(), 
+                            self._beam._Beam__process_get_seed())
+        self.assertTrue(abs(self._beam._Beam__process_get_seed()-\
+                            self._beam._Beam__process_get_seed()) > 5)
+
+        self._beam.beam_seed = 9
+        self._beam.particle_seed_algorithm = "incrementing"
+        self.assertEqual(self._beam._Beam__process_get_seed(), 9)
+        self.assertEqual(self._beam._Beam__process_get_seed(), 10)
+        self.assertEqual(self._beam._Beam__process_get_seed(), 11)
+        # assigns beam_seed to random number elsewhere
+        self._beam.particle_seed_algorithm = "incrementing_random"
+        self.assertEqual(self._beam._Beam__process_get_seed(), 12)
+        self.assertEqual(self._beam._Beam__process_get_seed(), 13)
+        self.assertEqual(self._beam._Beam__process_get_seed(), 14)
+
 
     def __cmp_matrix(self, ref_matrix, test_matrix):
         """Compare to numpy matrices"""
