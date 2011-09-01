@@ -39,7 +39,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 	echo "INFO: Configuring:"
         sleep 1
   if [ `uname -s` == "Darwin" ]; then
-        ./configure --enable-framework --prefix="${MAUS_ROOT_DIR}/third_party/install"
+        ./configure --enable-framework="${MAUS_ROOT_DIR}/third_party/install" --prefix="${MAUS_ROOT_DIR}/third_party/install"
   else
         ./configure --enable-shared --prefix="${MAUS_ROOT_DIR}/third_party/install"
   fi
@@ -61,12 +61,12 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         make
         echo "INFO: Installing within MAUS's third party directory:"
         if [ `uname -s` == "Darwin" ]; then
-          make frameworkinstallstructure
-          altinstall
-          bininstall
-          maninstall
-          frameworkinstallmaclib
-          frameworkinstallunixtools
+          make frameworkinstallstructure \
+               altinstall \
+               bininstall \
+               maninstall \
+               frameworkinstallmaclib \
+               frameworkinstallunixtools
         else
           make install
         fi
