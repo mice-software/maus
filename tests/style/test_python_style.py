@@ -75,7 +75,6 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
     pylintrc = os.path.join(maus_root_dir, 'tests', 'style', 'pylintrc')
 
     ignore_files = ['src/common_py/SpillSchema.py'] # schema is data file
-    ignore_files.append('bin/publications/ipac_maus_2011.py') # made pretty for publication
 
 
 if __name__ == '__main__':
