@@ -73,7 +73,10 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
     include_dirs = ['tests', 'src', 'bin', 'doc']
     maus_root_dir = os.environ['MAUS_ROOT_DIR']
     pylintrc = os.path.join(maus_root_dir, 'tests', 'style', 'pylintrc')
-    ignore_files = ['src/common_py/SpillSchema.py'] # schema is a data file
+
+    ignore_files = ['src/common_py/SpillSchema.py'] # schema is data file
+    ignore_files.append('bin/publications/ipac_maus_2011.py') # made pretty for publication
+
 
 if __name__ == '__main__':
     unittest.main()
