@@ -21,6 +21,7 @@ class Formatter:
 
         @Param Path The path to the directory which contains the fastrad outputted GDML files
         """
+        self.field_file = None
         self.formatted = False
         self.txtfile = ""
         self.configurationfile = None
@@ -46,13 +47,13 @@ class Formatter:
                 configfile = self.path + '/' + fname
                 if file != self.materialfile:
                     self.configurationfile = configfile
-            if fname.find('materials') < 0 and fname.find('fastrad') < 0 :
+            if fname.find('Field') >= 0 or fname.find('field') >= 0:
+                found_file = self.path + '/' + fname
+                self.field_file = found_file
+            if fname.find('materials') < 0 and fname.find('fastrad') < 0 and fname.find('Field') < 0 :
                 stepfile = self.path + '/' + fname
                 self.stepfiles.append(stepfile)
-            if fname.find('FieldInforTest.xml') >= 0:
-                field_file = self.path + '/' + fname
-                self.stepfiles.remove(field_file)
-
+            
     def format_schema_location(self, gdmlfile):
         """
         @method format_schema_location

@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:noNamespaceSchemaLocation="file:/home/matt/maus-littlefield/src/common_py/geometry/gdmlSchema/GDML_3_0_0/schema/gdml.xsd">
+    xsi:noNamespaceSchemaLocation="file:Something">
 <MICE_Information>
     <Configuration_Information>
         <Proton_Absorber Thickness="10" Unit="mm"/>

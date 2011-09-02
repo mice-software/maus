@@ -118,6 +118,6 @@ Delete_Originals = 0
 DownloadDir = "/home/matt/maus-littlefield/src/common_py/geometry/Download/"
 #Download Geometry for a specific ID
 #Name the start and stop time for which the geometry was valid. Stop time is optional
-StartTime = "2011-08-25 09:00:00"
+StartTime = "2011-09-02 09:00:00"
 StopTime  = None
 

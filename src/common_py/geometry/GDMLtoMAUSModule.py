@@ -26,6 +26,7 @@ class GDMLtomaus():
             
         @param Path This is the path to the folder which contains the GDMLS to be converted.            
         """
+        self.field_file = None
         self.config_file = None
         self.material_file = None
         self.material_file_path = None
@@ -45,7 +46,10 @@ class GDMLtomaus():
             if fname.find('fastrad') >= 0 and fname != self.material_file:
                 found_file = self.path + '/' + fname
                 self.config_file = found_file
-            if fname.find('materials') < 0 and fname.find('fastrad') < 0 :
+            if fname.find('Field') >= 0:
+                found_file = self.path + '/' + fname
+                self.field_file = found_file
+            if fname.find('materials') < 0 and fname.find('fastrad') < 0 and fname.find('Field') < 0:
                 stepfile = self.path + '/' + fname
                 self.step_files.append(stepfile)
 
