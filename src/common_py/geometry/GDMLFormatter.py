@@ -4,6 +4,7 @@ M. Littlefield 02/08/11
 """
 import os.path
 from xml.dom import minidom
+from geometry.CADImport import CADImport
 
 #pylint: disable = C0301, R0902, R0201 
 
@@ -114,6 +115,7 @@ class Formatter:
         
         @param GDMLFile The name of the file which will have its materials reference replaced.
         """
+        #check this
         #if inputfile[-5:] != '.txt':
         #    raise IOError(inputfile + ' is not a txt file', 'Formatter::insert_materials_ref')
         #else:
@@ -156,6 +158,17 @@ class Formatter:
                     self.formatted = True
             fin.close()
         
+    def merge_field_info(self):
+        """
+        @method merge_field_info
+        
+        This method adds the field information
+        to the configuration GDML.
+        """
+        #NEW METHOD WRITE TEST
+        merge = CADImport(xmlin1 = self.configurationfile, xmlin2 = self.field_file)
+        merge.append_merge()
+        os.remove(merge.merge_out)
         
     def format(self):
         """
@@ -168,6 +181,7 @@ class Formatter:
         """
         self.format_check(self.configurationfile)
         if self.formatted == False:
+            self.merge_field_info()
             self.format_schema_location(self.configurationfile)
             self.format_materials(self.configurationfile)
             self.insert_materials_ref(self.txtfile)

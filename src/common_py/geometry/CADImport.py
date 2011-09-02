@@ -22,7 +22,7 @@ class CADImport:
     a GDML file.
     """
 
-    def __init__(self, xmlin1, xsl , xmlin2=None, output=None, mergein=None, mergeout=None):
+    def __init__(self, xmlin1, xsl=None, xmlin2=None, output=None, mergein=None, mergeout=None):
         """
         @Method Class constructor
 
@@ -41,19 +41,24 @@ class CADImport:
             raise TypeError(xmlin1 + " must be a string(file name/path)")
         if xmlin1[-4:] != '.xml' and xmlin1[-5:] != '.gdml':
             raise IOError(xmlin1 + " must be an xml or gdml file")
-        else: self.xml_in_1 = xmlin1
-        
-        if type(xsl) != str:
+        else: 
+            self.xml_in_1 = xmlin1
+
+        #New code write test
+        if xsl == None: 
+            self.xsl = None        
+        elif type(xsl) != str:
             raise TypeError(xsl + " must be a string(file name/path")
-        if xsl[-4:] != '.xsl':
-            raise IOError(xsl + " must be an xml or gdml file")
-        else: self.xsl = xsl
+        elif xsl[-4:] != '.xsl':
+            raise IOError(xsl + " must be an xsl file")
+        else: 
+            self.xsl = xsl
         
         if xmlin2 == None: 
             self.xml_in_2 = None
         elif type(xmlin2) != str:
             raise TypeError(xmlin2 + " must be a string(file name/path)")
-        elif xmlin2[-4:] != '.xml' and self.xml_in_2[-5:] != '.gdml':
+        elif xmlin2[-4:] != '.xml' and xmlin2[-5:] != '.gdml':
             raise IOError(xmlin2 + " must be an xml or gdml file")
         else: 
             self.xml_in_2 = xmlin2
@@ -116,6 +121,11 @@ class CADImport:
                 print >> fout, new_line
             else:
                 print >> fout, line
+        fin.close()
+        fout.close()
+        if self.xsl == None:
+            self.xsl = self.merge_out
+        self.parse_xslt()
 
 
 def main():
