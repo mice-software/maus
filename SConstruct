@@ -459,7 +459,6 @@ def geant4_extras(env):
 # Setup the environment.  NOTE: SHLIBPREFIX means that shared libraries don't
 # have a 'lib' prefix, which is needed for python to find SWIG generated
 # libraries
-#env = Environment(SHLIBPREFIX="",SHLIBSUFFIX="") # pylint: disable-msg=E0602
 env = Environment(SHLIBPREFIX="", BUILDERS = {'Dylib2SO' : dylib2so}) # pylint: disable-msg=E0602
 
 (sysname, nodename, release, version, machine) = os.uname()
@@ -484,7 +483,6 @@ if os.path.isfile('.use_llvm_with_maus'):
 env.Tool('swig', '%s/third_party/swig-2.0.1' % maus_root_dir)
 env.Append(SWIGFLAGS=['-python', '-c++']) # tell SWIG to make python bindings for C++
 
-#env.Append(PATH="%s/third_party/install/bin" % maus_root_dir)
 env['ENV']['PATH'] =  os.environ.get('PATH')  # useful to set for root-config
 env['ENV']['LD_LIBRARY_PATH'] = os.environ.get('LD_LIBRARY_PATH')
 env['ENV']['DYLD_LIBRARY_PATH'] = os.environ.get('DYLD_LIBRARY_PATH')
@@ -554,8 +552,6 @@ if 'configure' in COMMAND_LINE_TARGETS: # pylint: disable-msg=E0602
 # NOTE: do this after configure!  So we know if we have ROOT/geant4
 #specify all of the sub-projects in the section
 if env['USE_G4'] and env['USE_ROOT']:
-    #env.Append(CCFLAGS=['-g','-pg'])
-    #env.Append(LINKFLAGS='-pg')
     common_cpp_files = glob.glob("src/legacy/*/*cc") + \
         glob.glob("src/legacy/*/*/*cc") + \
         glob.glob("src/common_cpp/*/*cc") + \
@@ -572,11 +568,6 @@ if env['USE_G4'] and env['USE_ROOT']:
       maus_cpp_so = env.Dylib2SO(targetpath)
       Depends(maus_cpp_so, maus_cpp)
       env.Install("build", maus_cpp_so)
-      #targetpath = 'src/common_cpp/libMausCpp.dylib'
-      #maus_cpp_dylib = env.SharedLibrary(target = targetpath,
-                                         #source = common_cpp_files,
-                                         #LIBS=env['LIBS'] + ['recpack'])
-
 
     env.Append(LIBPATH = 'src/common_cpp')
     env.Append(CPPPATH = maus_root_dir)
