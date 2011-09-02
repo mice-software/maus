@@ -32,7 +32,7 @@
         <xs:attribute name="Tracker"/>
     </xs:complexType>    
 <!--+++++++++++++++++++++++++++++++++++MIDDLE TYPES++++++++++++++++++++++++++++++++++++++++-->
-    <xs:complexType name="Beam_InformationType">
+    <xs:complexType name="Configuration_InformationType">
         <xs:sequence>
             <xs:element name="Proton_Absorber" type="ProtonAbsorberType"/>
             <xs:element name="Diffuser" type="DiffuserType"/>
@@ -65,7 +65,7 @@
         </xs:annotation>
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="Beam_Information" type="Beam_InformationType"/>
+                <xs:element name="Configuration_Information" type="Configuration_InformationType"/>
                 <xs:element name="Field_Information" type="Field_InformationType"/>
                 <xs:element name="Detector_Information" type="Detector_InformationType" minOccurs="0"/>
             </xs:sequence>

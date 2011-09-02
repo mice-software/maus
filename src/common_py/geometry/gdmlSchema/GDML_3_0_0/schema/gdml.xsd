@@ -168,15 +168,16 @@
   <xs:element name="gdml">
     <xs:complexType>
       <xs:sequence>
-        <xs:element ref="define"/>
-        <xs:element ref="materials"/>
-        <xs:element ref="solids"/>
-        <xs:element ref="structure"/>
+        <xs:element ref="define" minOccurs="0"/>
+        <xs:element ref="materials" minOccurs="0"/>
+        <xs:element ref="solids" minOccurs="0"/>
+        <xs:element ref="structure" minOccurs="0"/>
         <xs:element ref="MICE_Information" minOccurs="0"/>
-        <xs:element maxOccurs="unbounded" name="setup">
+        <xs:element maxOccurs="unbounded" minOccurs="0" name="setup">
           <xs:annotation>
             <xs:documentation>Geometry setup representing the particular geometry hierarchy by
-              refferring to a given volume which becomes the top level volume</xs:documentation>
+              refferring to a given volume which becomes the top level volume. This schema has been
+              altered to suit the purpose of MICE use.</xs:documentation>
           </xs:annotation>
           <xs:complexType>
             <xs:sequence>

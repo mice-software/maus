@@ -16,17 +16,22 @@ def main():
     download directory. It will download the geometry from the
     database and translates the geometry into MAUS Module format.
     """
+    #Read Config Arguments
     inputfile = Configreader()
     inputfile.readconfig()
+    #Download file
     current_geometry = Downloader(1)
     current_geometry.download_current(inputfile.downloaddir)
+    #Unzip file
     path = inputfile.downloaddir + '/Geometry.zip'
     zipped_geom = Unpacker(path, inputfile.downloaddir)
     zipped_geom.unzip_file()
     os.remove(path)
     os.remove(inputfile.downloaddir + '/FileList.txt')
+    #Format Files
     gdmls = Formatter(inputfile.downloaddir)
     gdmls.format()
+    #Convert to MAUS Modules
     maus_modules = GDMLtomaus(inputfile.downloaddir)
     maus = os.environ['MAUS_ROOT_DIR']
     outputlocation = maus + '/src/common_py/geometry/Download' 

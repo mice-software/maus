@@ -1,11 +1,12 @@
 <?xml version="1.0" ?>
-<MICE_Information xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:noNamespaceSchemaLocation="file:/home/matt/maus-littlefield/src/common_py/geometry/gdmlSchema/GDML_3_0_0/schema/GDML_MICE.xsd">
-    <Beam_Information>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="file:/home/matt/maus-littlefield/src/common_py/geometry/gdmlSchema/GDML_3_0_0/schema/gdml.xsd">
+<MICE_Information>
+    <Configuration_Information>
         <Proton_Absorber Thickness="10" Unit="mm"/>
         <Diffuser Size="50" Unit="mm"/>
         <Absorber Type="Wedge" Thickness="40" Unit="mm"/>
-    </Beam_Information>
+    </Configuration_Information>
     <Field_Information>
         <Magnet Name="Quad 1 to 3" Type="QC" File_Location="/home/QCFieldMap.txt"/>
         <Magnet Name="D1" Type="Dipole" File_Location="/home/Dipole.txt"/>
@@ -20,3 +21,4 @@
         <Tracker Tracker="One"/>
     </Detector_Information>
 </MICE_Information>
+</gdml>
