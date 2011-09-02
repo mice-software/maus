@@ -17,13 +17,14 @@
 Tests the Beam class
 """
 
+#warning/error associated with access to privates
 #pylint: disable = W0212
+#erroneous complaint because python changes private function names
 #pylint: disable = E1101
 
 import unittest
 import beam
 import xboa.Hit
-import xboa.Common
 import copy
 import numpy
 
@@ -184,7 +185,7 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
                      "random_seed_algorithm":"incrementing_random"}, "binomial")
         self.assertAlmostEqual(self._beam.weight, 2.)
 
-    def test_birth_part_gen_2(self):
+    def test_birth_part_gen_3(self):
         """Test __birth_particle_generator for random number assignment"""
         seed = self._beam.beam_seed
         self._beam._Beam__birth_particle_generator({

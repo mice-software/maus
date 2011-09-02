@@ -65,10 +65,12 @@ with explicit time distributions.
 
 import numpy
 import xboa
-import xboa.Hit
-import xboa.Bunch
-import xboa.Common
+import xboa.Bunch #pylint: disable=W0404
 import sys
+
+# 32 bit long; note that CLHEP max for the seed is a 32 bit unsigned int which
+# goes to 4294967295 in both 32 bit and 64 bit.
+NUMPY_RAND_MAX = 2147483647 
 
 class Beam(): # pylint: disable=R0902
     """
@@ -365,11 +367,11 @@ class Beam(): # pylint: disable=R0902
     seed_keys = ["beam_seed", "random", "incrementing", "incrementing_random"]
 
 
-    def __random_unsigned(self):
+    def __random_unsigned(self): # pylint: disable=R0201
         """
         Return a random unsigned int
         """
-        return numpy.random.randint(0, 4294967295)
+        return numpy.random.randint(0, 2147483647)
 
 
 

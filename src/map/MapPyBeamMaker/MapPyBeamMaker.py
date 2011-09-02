@@ -15,28 +15,36 @@
 
 
 """
-BeamMaker generates beams for input into MAUS"""
+BeamMaker generates beams for input into MAUS
+"""
 
 
 import json
 import ErrorHandler
-import math
-import random
 import numpy
-import numbers
-import xboa.Common
-import xboa.Bunch
-import xboa.Hit
-import copy
+import bisect
 import beam
 
 class MapPyBeamMaker:
     """
+    MapPyBeamMaker generates primaries for simulation in Geant4
+
+    MapPyBeamMaker creates a set of primary particles depending on the
+    particle_generator field of the beam branch of the json configuration
+    document
+    - binomial creates a set of particles according to the binomial distribution
+    and samples from random parent distributions according to the 'weight' field
+    in each beam
+    - counter samples a fixed number of particles from each beam
+    - overwrite_existing overwrites existing particles and samples from random
+    parent distributions with probability of a given parent distribution
+    assigned by 'weight' field
+
+    Each beam is defined in the "definitions" array of the beam branch.
     """
-    
     def __init__(self):
         """
-        Constructor, initiate parameters          
+        Constructor; initialises parameters to 0        
         """
         self.beams = []
         self.particle_generator = None
@@ -46,28 +54,14 @@ class MapPyBeamMaker:
         self.seed = 0
         self.particle_seed = "random"
 
-    def birth(self, argJsonConfigDocument):
+    def birth(self, json_configuration):
         """
-        Read in datacards from supplied cards file and configuration defaults
-        """
-        try:
-            config_doc = json.loads(argJsonConfigDocument)
-            self.__birth_empty_particles(config_doc["beam"])
-            self.beams = []
-            for beam_def in config_doc["beam"]["definitions"]:
-                a_beam = beam.Beam()
-                a_beam.birth(beam_def, self.particle_generator, self.seed)
-                self.beams.append(a_beam)
-            return True
-        except:
-            ErrorHandler.HandleException({}, self)
-            return False
+        Read in datacards from supplied cards file and configuration defaults.
 
+        @param json_configuration unicode string containing the json
+        configuration
 
-    def __birth_empty_particles(self, beam_def):
-        """
-        Get variables for generating empty particles to be filled with primaries
-        later. Several options available:
+        Several options available:
         - binomial uses binomial_n, binomial_p to generate a random number of
         particles according to the binomial distribution. Uses the weight
         field in each beam to randomly select from multiple beam distributions.
@@ -76,6 +70,25 @@ class MapPyBeamMaker:
         - overwrite_existing overwrites the primary branch of any existing
         particles in mc branch, regardless of existing values. Uses the weight
         field in each beam to randomly select from multiple beam distributions.
+        """
+        try:
+            config_doc = json.loads(json_configuration)
+            self.__birth_empty_particles(config_doc["beam"])
+            self.beams = []
+            for beam_def in config_doc["beam"]["definitions"]:
+                a_beam = beam.Beam()
+                a_beam.birth(beam_def, self.particle_generator, self.seed)
+                self.beams.append(a_beam)
+            return True
+        except Exception: #pylint: disable=W0703
+            ErrorHandler.HandleException({}, self)
+            return False
+
+
+    def __birth_empty_particles(self, beam_def):
+        """
+        Get variables for generating empty particles to be filled with primaries
+        later. 
         """
         self.seed = beam_def["random_seed"]
         numpy.random.seed(self.seed)
@@ -97,25 +110,30 @@ class MapPyBeamMaker:
     def process(self, json_spill_doc):
         """
         Generate primary particles for a spill.
+
+        @param json_spill_doc unicode string containing the json spill
+
         - In counter mode, iterates over each beam and samples required number 
         of particles from the parent distribution.
         - In overwrite_existing or binomial mode, randomly samples from each of
         the available beam distributions according to the relative weight of
         each beam.
+
+        @returns a string with the json spill
         """
         spill = {}
         try:
             spill = json.loads(json_spill_doc)
             self.__process_check_spill(spill)
-            new_particles = self.__process_generate_multiple_primaries(spill)
+            new_particles = self.__process_gen_empty(spill)
             for index, particle in enumerate(new_particles):
                 a_beam = self.__process_choose_beam(index)
                 particle["primary"] = a_beam.make_one_primary()
-        except:
+        except Exception: #pylint: disable=W0703
             ErrorHandler.HandleException(spill, self)
         return json.dumps(spill)
             
-    def __process_check_spill(self, spill):
+    def __process_check_spill(self, spill): #pylint: disable=R0201
         """
         Check that the spill has a mc branch and that it is an array type
         """
@@ -125,25 +143,32 @@ class MapPyBeamMaker:
             raise KeyError("mc branch should be an array type")
         return True
 
-    def __process_generate_multiple_primaries(self, spill):
+    def __process_gen_empty(self, spill):
         """
+        Generate empty primaries
         """
         spill_length = len(spill["mc"])
         if self.particle_generator == "overwrite_existing":
+            for particle in spill["mc"]:
+                particle["primary"] = {}
             return spill["mc"]
         elif self.particle_generator == "binomial":
             n_p = numpy.random.binomial(self.binomial_n, self.binomial_p)
-            for i in range(n_p):
+            for i in range(n_p): #pylint: disable=W0612
                 spill["mc"].append({"primary":{}})
         elif self.particle_generator == "counter":
             for a_beam in self.beams:
                 for i in range(a_beam.n_particles_per_spill):
                     spill["mc"].append({"primary":{}})
         else:
-            raise RuntimeError("Didn't recognise particle_generator command "+str(self.particle_generator))
+            raise RuntimeError("Didn't recognise particle_generator command "+\
+                               str(self.particle_generator))
         return spill["mc"][spill_length:]
 
     def __process_choose_beam(self, index):
+        """
+        Choose the beam from which to sample
+        """
         if self.particle_generator == "counter":
             for a_beam in self.beams:
                 index -= a_beam.n_particles_per_spill
@@ -151,13 +176,13 @@ class MapPyBeamMaker:
                     return a_beam
         else:
             weights = [0.]
-            for i, beam in enumerate(self.beams):
-                weights.append(weights[i]+beam["weight"])
+            for i, a_beam in enumerate(self.beams):
+                weights.append(weights[i]+a_beam.weight)
             dice = numpy.random.uniform(0., weights[-1])
-            return self.beams[bisect.bisect_left(weights, dice)]
+            return self.beams[bisect.bisect_left(weights, dice)-1]
 
-    def death(self):
-        """ does nothing """
+    def death(self): #pylint: disable=R0201
+        """Does nothing (nothing to clean up); returns true"""
         return True
 
     gen_keys = ["binomial", "counter", "overwrite_existing"]
