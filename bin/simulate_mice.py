@@ -34,6 +34,7 @@ def run(number_of_spills):
     # Create an empty array of mappers, then populate it
     # with the functionality you want to use.
     my_map = MAUS.MapPyGroup()
+    my_map.append(MAUS.MapCppBeamMaker()) # beam construction
     my_map.append(MAUS.MapCppSimulation())  #  geant4 simulation
     my_map.append(MAUS.MapCppTOFDigitization())  #  TOF electronics model
     my_map.append(MAUS.MapCppTrackerDigitization())  #   SCiFi electronics model

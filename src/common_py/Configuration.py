@@ -23,6 +23,7 @@ import os
 import json
 import copy
 import ErrorHandler
+import argparse
 
 class Configuration:
     """
@@ -55,16 +56,91 @@ class Configuration:
         defaults = open(maus_root_dir+"/src/common_py/ConfigurationDefaults.py")
         exec(defaults, globals(), config_dict) # pylint: disable=W0122
 
+        self.command_line_arguments(config_dict)
+
+        if config_dict["configuration_file"] != "":
+            cmd_line_config_file = open(config_dict["configuration_file"])
+            exec(cmd_line_config_file.read(), globals(), config_dict) # pylint: disable=W0122,C0301
+
         if config_file != None:
             assert not isinstance(config_file, str)
             exec(config_file.read(), globals(), config_dict) # pylint: disable=W0122,C0301
 
+        if config_dict['maus_version'] != "":
+            raise ValueError("MAUS version cannot be changed by the user")
         config_dict['maus_version'] = self.get_version_from_readme()
         config_dict = self.check_config_dict(config_dict)
         self.configuration_to_error_handler(config_dict)
         config_json_str = json.JSONEncoder().encode(config_dict)
 
         return config_json_str
+
+    def command_line_arguments(self, config_dict):
+        """
+        Parse arguments from the command line
+
+        Use argparse module to control command line arguments. First add the
+        arguments to the file taken from ConfigurationDefaults; force the 
+        arguments into the right type; and then push them to config_dict.
+
+        @returns the modified config_dict
+        """
+        # Argparse allows for a command line parser with keywords given by 
+        # ConfigurationDefaults.p Additionally a keyword command has been
+        # created to store the path and filename to a datacard
+        parser = argparse.ArgumentParser()
+        for key, value in config_dict.iteritems():
+            parser.add_argument('-'+key, action='store', dest=key, 
+                                default=value)
+        results = parser.parse_args()
+
+        # All parsed values are input as string types, this checks the type in
+        # ConfigurationDefaults.py and attempts to return the parsed values to
+        # orginal or similar type. Currently does not work for dict type
+        # arguments
+        for key, def_value in config_dict.iteritems(): # value is from defaults
+            ap_value = getattr(results,key)
+            if def_value == ap_value:
+                continue
+            elif isinstance (def_value, str):
+                config_dict[key] = ap_value # shouldn't throw
+            elif isinstance (def_value, bool):
+                try:
+                    config_dict[key] = self.string_to_bool(ap_value)
+                except ValueError:
+                    raise ValueError('Could not convert command line argument '\
+                          +str(key)+' with value '+ap_value+\
+                          ' to a boolean')
+
+            # Checks if the default is an integer, if it is, it will try to
+            # force the parsed argument back into int type, failing that, it
+            # will try to force it into float type.  If the argument is no
+            # longer a number an exception is raised.
+            elif isinstance (def_value, int):
+                try:
+                    config_dict[key] = int(ap_value)
+                except ValueError:
+                    raise ValueError('Could not convert command line '+\
+                          'argument '+str(key)+' with value '+\
+                          str(ap_value)+' to an int')
+
+            # Checks if the default is a float, if it is, this will try and
+            # force the parsed argument back into float type.  If the argument
+            # is no longer a number an exception is raised.
+            elif isinstance (def_value, float):
+                try:
+                    config_dict[key] = float(ap_value)
+                except ValueError:
+                    raise ValueError('Could not convert command line argument '\
+                          +str(key)+' with value '+ap_value+\
+                          ' to a float')
+            # If attempt to modify something that was neither int, bool, string,
+            # float; raise NotImplementedError (json allows dict and arrays)
+            else:
+                raise NotImplementedError("Could not convert command line "+\
+                "argument "+str(key)+" of type "+str(type(def_value))+\
+                ". Can only parse string, int, bool, float types.")
+        return config_dict
         
     def get_version_from_readme(self):
         """
@@ -92,8 +168,24 @@ class Configuration:
             try:
                 json.JSONEncoder().encode({key:value})
                 dict_copy[key] = value
-            except:
-                print 'Failed to encode',str(key)+':'+str(value),'as json object'
+            except TypeError:
+                print 'Failed to encode',str(key)+':'+str(value),
+                print 'as json object'
         return dict_copy
-        
+    
+    def string_to_bool(self, string_in):
+        """
+        Convert from a string to a boolean value
+
+        @params string_in if string_in is any one of true, 1, yes, y, t returns
+                 true. Case insensitive.
+
+        @returns boolean True or False
+        """
+        if str.lower(string_in) in ["true", "1", "yes", "y", "t"]:
+            return True
+        elif str.lower(string_in) in ["false", "0", "no", "n", "f"]:
+            return False
+        else:
+            raise ValueError("Could not parse "+string_in+" as a boolean")
 
