@@ -1,21 +1,29 @@
+"""
+Tests for core configuration (datacards)
+"""
+
 import json
 import unittest
-import subprocess
-import glob
 import os
 import sys
 import io
 
 from Configuration import Configuration
 
-class ConfigurationTestCase(unittest.TestCase):
+class ConfigurationTestCase(unittest.TestCase): #pylint: disable = R0904
+    """
+    Tests for core configuration (datacards)
+    """
+
     @classmethod
-    def setUp(cls):
+    def setUp(cls): # pylint: disable=C0103
+        """Move system args out of the way"""
         cls.temp_argv = sys.argv
         sys.argv = [""]
 
     @classmethod
-    def tearDown(cls):
+    def tearDown(cls): # pylint: disable=C0103
+        """Put system args back"""
         sys.argv = cls.temp_argv
 
     def test_defaults(self):
@@ -24,18 +32,20 @@ class ConfigurationTestCase(unittest.TestCase):
         maus_config = json.loads(a_config.getConfigJSON())
 
         ## test setup
-        MAUSRootDir = os.environ.get('MAUS_ROOT_DIR')
-        self.assertNotEqual(MAUSRootDir,  None)
+        maus_root_dir = os.environ.get('MAUS_ROOT_DIR')
+        self.assertNotEqual(maus_root_dir,  None)
 
-        configDict = {}
-        defaultFilename = '%s/src/common_py/ConfigurationDefaults.py' % MAUSRootDir
-        exec(open(defaultFilename,'r').read(), globals(), configDict)
+        config_dict = {}
+        default_filename = \
+                    '%s/src/common_py/ConfigurationDefaults.py' % maus_root_dir
+        exec(open(default_filename,'r').read(), globals(), #pylint:disable=W0122
+                                              config_dict) #pylint:disable=W0122
 
         # compare; note we are allowed additional entries in maus_config that
         # are hard coded (e.g. version number)
-        for key in configDict.keys():
+        for key in config_dict.keys():
             if key != "maus_version": # changed at runtime, tested below
-                self.assertEqual(configDict[key], maus_config[key])
+                self.assertEqual(config_dict[key], maus_config[key])
 
     def test_version(self):
         """Check that the version is defined correctly"""
@@ -46,25 +56,28 @@ class ConfigurationTestCase(unittest.TestCase):
         self.assertEqual(words[2], 'version')
         numbers = words[-1].split('.')
         self.assertEqual(len(numbers), 3)
-        for num in numbers: int(num) # should be able to convert to number
+        for num in numbers:
+            int(num) # should be able to convert to number
 
     def test_new_value(self):
         """Test that we can create a configuration value from an input file"""
-        stringFile = io.StringIO(u"test = 4")
-        c = Configuration()
-        value = c.getConfigJSON(stringFile)
+        string_file = io.StringIO(u"test = 4")
+        config = Configuration()
+        value = config.getConfigJSON(string_file)
 
-        jsonValue = json.loads(value)
-        self.assertEqual(jsonValue["test"], 4)
+        json_value = json.loads(value)
+        self.assertEqual(json_value["test"], 4)
 
     def test_overwrite_value(self):
         """Test that we can overwrite configuration value from an input file"""
-        stringFile = io.StringIO(u"simulation_geometry_filename = 'Stage4Something.dat'")
+        string_file = io.StringIO\
+                       (u"simulation_geometry_filename = 'Stage4Something.dat'")
         conf = Configuration()
-        value = conf.getConfigJSON(stringFile)
+        value = conf.getConfigJSON(string_file)
 
-        jsonValue = json.loads(value)
-        self.assertEqual(jsonValue["simulation_geometry_filename"], 'Stage4Something.dat')
+        json_value = json.loads(value)
+        self.assertEqual(json_value["simulation_geometry_filename"],
+                         'Stage4Something.dat')
 
     def test_string_to_bool(self):
         """Test conversion from string to boolean type"""
@@ -75,7 +88,7 @@ class ConfigurationTestCase(unittest.TestCase):
         self.assertRaises(ValueError, Configuration().string_to_bool, "bob")
         self.assertRaises(TypeError, Configuration().string_to_bool, 0)
 
-    def test_command_line_arguments_str(self):
+    def test_command_line_args_str(self):
         """Test parsing string from command line to configuration"""
         sys.argv = ["", "-input_string", "test_in"]
         test_out = Configuration().command_line_arguments({
@@ -83,7 +96,7 @@ class ConfigurationTestCase(unittest.TestCase):
         self.assertEqual(test_out["input_string"], "test_in")
 
 
-    def test_command_line_arguments_number(self):
+    def test_command_line_args_number(self):
         """Test parsing number from command line to configuration"""
         sys.argv = ["", "-input_int", "10"] # int as int okay
         test_out = Configuration().command_line_arguments({
@@ -105,7 +118,7 @@ class ConfigurationTestCase(unittest.TestCase):
                                                       "input_float":0.})
         self.assertAlmostEqual(test_out["input_float"], 10.)
 
-    def test_command_line_arguments_bool(self):
+    def test_command_line_args_bool(self):
         """Test parsing bool from command line to configuration"""
         sys.argv = ["", "-input_bool", "yEs"]
         test_out = Configuration().command_line_arguments({
@@ -116,7 +129,7 @@ class ConfigurationTestCase(unittest.TestCase):
         self.assertRaises(ValueError, Configuration().command_line_arguments, 
                                                            {"input_bool":True})
 
-    def test_command_line_arguments_dict(self):
+    def test_command_line_args_dict(self):
         """Test parsing bool from command line to configuration"""
         sys.argv = ["", "-input_dict", "{}"]
         self.assertRaises(NotImplementedError, 

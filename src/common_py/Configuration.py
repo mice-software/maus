@@ -21,7 +21,6 @@ for the old G4MICE datacards.
 
 import os
 import json
-import copy
 import ErrorHandler
 import argparse
 
@@ -36,7 +35,7 @@ class Configuration:
         """        
         self.readme = os.path.join(os.environ['MAUS_ROOT_DIR'], 'README')
 
-    def getConfigJSON(self, config_file = None):
+    def getConfigJSON(self, config_file = None, command_line_args = False):
         """
         Returns JSON config document
 
@@ -44,10 +43,13 @@ class Configuration:
         then (if applicable) values are added/replaced
         by the passed file.  A JSON file is returned.
 
-        \param config_file (optional) overriding configuration file handle.  If
+        @param config_file (optional) overriding configuration file handle.  If
                           None then this argument is ignored. If it is a python
                           file handle (ie. open('my_config.dat','r') ) then that
                           file is read.
+        @param command_line_args if set to True, take arguments from the command
+               line. Can produce undesirable results if you are running the main
+               process from e.g. nosetests so disabled by default.
         """
         maus_root_dir = os.environ.get('MAUS_ROOT_DIR')
         assert maus_root_dir != None
@@ -56,7 +58,8 @@ class Configuration:
         defaults = open(maus_root_dir+"/src/common_py/ConfigurationDefaults.py")
         exec(defaults, globals(), config_dict) # pylint: disable=W0122
 
-        self.command_line_arguments(config_dict)
+        if command_line_args:
+            config_dict = self.command_line_arguments(config_dict)
 
         if config_dict["configuration_file"] != "":
             cmd_line_config_file = open(config_dict["configuration_file"])
@@ -99,7 +102,7 @@ class Configuration:
         # orginal or similar type. Currently does not work for dict type
         # arguments
         for key, def_value in config_dict.iteritems(): # value is from defaults
-            ap_value = getattr(results,key)
+            ap_value = getattr(results, key)
             if def_value == ap_value:
                 continue
             elif isinstance (def_value, str):
@@ -150,14 +153,14 @@ class Configuration:
         version = readme.readline().rstrip('\n')
         return version
 
-    def configuration_to_error_handler(self, config_dict):
+    def configuration_to_error_handler(self, config_dict): #pylint:disable=R0201
         """
         Hand configuration parameters to the error handler, so it can set itself
         up
         """
         ErrorHandler.DefaultHandler().ConfigurationToErrorHandler(config_dict)
 
-    def check_config_dict(self, config_dict):
+    def check_config_dict(self, config_dict): #pylint:disable=R0201
         """
         @brief Check to see if config_dict can be encoded into json
         @params config_dict dictionary to be checked
@@ -169,11 +172,11 @@ class Configuration:
                 json.JSONEncoder().encode({key:value})
                 dict_copy[key] = value
             except TypeError:
-                print 'Failed to encode',str(key)+':'+str(value),
+                print 'Failed to encode', str(key)+':'+str(value),
                 print 'as json object'
         return dict_copy
     
-    def string_to_bool(self, string_in):
+    def string_to_bool(self, string_in): #pylint:disable=R0201
         """
         Convert from a string to a boolean value
 
