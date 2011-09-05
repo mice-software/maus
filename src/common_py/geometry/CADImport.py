@@ -104,35 +104,11 @@ class CADImport:
         doc.freeDoc()
         result.freeDoc()
 
-    def append_merge(self):
-        """
-        @Method which appends the MICE info to GDML
-
-        This method reads in Merge.xsl.in, used to append the MICE info onto the end of
-        a config file, and replaces the text 'EDIT' with the name of the file from which the MICE
-        info comes from. Outputs a new file, Merge.xsl, ready to be run the XSLT(merge.xsl) over
-        the original GDML.
-        """
-        fin = open(self.merge_in, 'r')
-        fout = open(self.merge_out, 'w')
-        for line in fin.readlines():
-            if line.find('EDIT')>=0:
-                new_line = line.replace('EDIT', self.xml_in_2)
-                print >> fout, new_line
-            else:
-                print >> fout, line
-        fin.close()
-        fout.close()
-        if self.xsl == None:
-            self.xsl = self.merge_out
-        self.parse_xslt()
-
-
 def main():
     """
     Main Function
     """
-    print 'Main Function to be written'
-
+    merge = CADImport(xmlin1 = '/home/matt/fastradModel.gdml', xmlin2 = '/home/matt/Field.gdml')
+    merge.append_merge()
 if __name__ == '__main__':
     main()

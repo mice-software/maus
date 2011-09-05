@@ -54,6 +54,8 @@ class Formatter:
             if fname.find('materials') < 0 and fname.find('fastrad') < 0 and fname.find('Field') < 0 :
                 stepfile = self.path + '/' + fname
                 self.stepfiles.append(stepfile)
+            if self.field_file == None:
+                raise IOError('Please write a Field.gdml file which contains MAUS_info see README for details')
             
     def format_schema_location(self, gdmlfile):
         """
@@ -74,7 +76,27 @@ class Formatter:
             os.remove(gdmlfile)
             fout = open(gdmlfile, 'w')
             xmldoc.writexml(fout)
-
+       
+    def merge_field_info(self, gdmlfile):
+        """
+        @method merge_field_info
+        
+        This method adds the field information
+        to the configuration GDML.
+        """
+        #NEW METHOD WRITE TEST
+        self.txtfile = ""
+        impl = minidom.getDOMImplementation()
+        config = minidom.parse(gdmlfile)
+        field = minidom.parse(self.field_file)
+        for node in field.getElementsByTagName("MICE_Information"):
+            maus_info = node
+        root_node = config.childNodes[2]
+        root_node.insertBefore(maus_info, root_node.childNodes[9])
+        fout = open(gdmlfile, 'w')
+        root_node.writexml(fout)
+        fout.close()
+ 
     def format_materials(self, gdmlfile):
         """
         @method Format Materials
@@ -87,8 +109,7 @@ class Formatter:
         """
         if gdmlfile[-5:] != '.gdml' and gdmlfile[-4:] != '.xml':
             raise IOError(gdmlfile + ' is not a gdml or xml', 'Formatter::format_materials')
-        else:
-            self.txtfile = "" 
+        else: 
             impl = minidom.getDOMImplementation()
             docstr = 'gdml [<!ENTITY materials SYSTEM "' + self.materialfile + '">]'
             doctype = impl.createDocumentType(docstr, None, None)
@@ -104,7 +125,7 @@ class Formatter:
             newdoc.writexml(fout)
             fout.close()
             os.remove(gdmlfile)
-            
+               
     def insert_materials_ref(self, inputfile):
         """
         @method Insert Materials Reference
@@ -115,24 +136,23 @@ class Formatter:
         
         @param GDMLFile The name of the file which will have its materials reference replaced.
         """
-        #check this
-        #if inputfile[-5:] != '.txt':
-        #    raise IOError(inputfile + ' is not a txt file', 'Formatter::insert_materials_ref')
-        #else:
-        fin = open(inputfile, 'r')
-        gdmlfile = inputfile[:-4] + '.gdml'
-        fout = open(gdmlfile, 'w')
-        for line in fin.readlines():
-            if line.find('<!-- Materials definition CallBack -->')>=0:
-                matdef = '<!-- Materials definition CallBack -->'
-                new_line = line.replace(matdef, matdef+'&materials;')
-                print >> fout, new_line
-            else:
-                print >> fout, line
-        print >> fout, '<!-- Formatted for MAUS -->'
-        fin.close()
-        fout.close()
-        os.remove(inputfile)
+        if inputfile[-4:] != '.txt':
+            raise IOError(inputfile + ' is not a txt file', 'Formatter::insert_materials_ref')
+        else:
+            fin = open(inputfile, 'r')
+            gdmlfile = inputfile[:-4] + '.gdml'
+            fout = open(gdmlfile, 'w')
+            for line in fin.readlines():
+                if line.find('<!-- Materials definition CallBack -->')>=0:
+                    matdef = '<!-- Materials definition CallBack -->'
+                    new_line = line.replace(matdef, matdef+'&materials;')
+                    print >> fout, new_line
+                else:
+                    print >> fout, line
+            print >> fout, '<!-- Formatted for MAUS -->'
+            fin.close()
+            fout.close()
+            os.remove(inputfile)
             
     def format_check(self, gdmlfile):
         """
@@ -158,18 +178,7 @@ class Formatter:
                     self.formatted = True
             fin.close()
         
-    def merge_field_info(self):
-        """
-        @method merge_field_info
-        
-        This method adds the field information
-        to the configuration GDML.
-        """
-        #NEW METHOD WRITE TEST
-        merge = CADImport(xmlin1 = self.configurationfile, xmlin2 = self.field_file)
-        merge.append_merge()
-        os.remove(merge.merge_out)
-        
+            
     def format(self):
         """
         @method Format
@@ -181,8 +190,8 @@ class Formatter:
         """
         self.format_check(self.configurationfile)
         if self.formatted == False:
-            self.merge_field_info()
             self.format_schema_location(self.configurationfile)
+            self.merge_field_info(self.configurationfile)
             self.format_materials(self.configurationfile)
             self.insert_materials_ref(self.txtfile)
         print "Formatted Configuration File"

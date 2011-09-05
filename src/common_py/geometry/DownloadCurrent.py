@@ -32,10 +32,10 @@ def main():
     gdmls = Formatter(inputfile.downloaddir)
     gdmls.format()
     #Convert to MAUS Modules
-    #maus_modules = GDMLtomaus(inputfile.downloaddir)
-    #maus = os.environ['MAUS_ROOT_DIR']
-    #outputlocation = maus + '/src/common_py/geometry/Download' 
-    #maus_modules.convert_to_maus(outputlocation)
+    maus_modules = GDMLtomaus(inputfile.downloaddir)
+    maus = os.environ['MAUS_ROOT_DIR']
+    outputlocation = maus + '/src/common_py/geometry/Download' 
+    maus_modules.convert_to_maus(outputlocation)
     print "Download Complete!"
 
 if __name__ == "__main__":
