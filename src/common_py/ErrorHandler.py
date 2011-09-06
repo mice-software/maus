@@ -13,10 +13,8 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-
 ## @class ErrorHandler
 #  Error handler handles errors in a globally managed way
-
 
 import sys
 import json

@@ -143,11 +143,6 @@ class ErrorHandlerTestCase(unittest.TestCase):
       with self.assertRaises(KeyError):
         error_handler.HandleException(doc, self)
 
-  def test_SetUp(self):
-    error_handler = ErrorHandler.ErrorHandler()
-    with self.assertRaises(NotImplementedError):
-      error_handler.SetUp('')
-
   def test_DefaultHandler(self):
     ErrorHandler.DefaultHandler().error_to_stderr = False
     ErrorHandler.DefaultHandler().error_to_json = True
@@ -183,6 +178,30 @@ class ErrorHandlerTestCase(unittest.TestCase):
     for i in range(100):
       libMausCpp.SetHandleException(ErrorHandler.HandleCppException)  # should decref correctly
     assert(refcount == sys.getrefcount(ErrorHandler.HandleCppException))
+
+  def test_ConfigurationToErrorHandler(self):
+    config_test = {'verbose_level':0, 'errors_to_stderr':None, 
+                   'errors_to_json':True, 'on_error':'none'}
+
+    error_handler = ErrorHandler.ErrorHandler()
+    error_handler.ConfigurationToErrorHandler(config_test)
+    self.assertTrue(error_handler.error_to_stderr)
+
+    config_test['verbose_level'] = 4
+    error_handler.ConfigurationToErrorHandler(config_test)
+    self.assertFalse(error_handler.error_to_stderr)
+
+    self.assertTrue(error_handler.error_to_json)
+    self.assertEqual(error_handler.on_error, 'none')
+
+    config_test = {'verbose_level':4, 'errors_to_stderr':True,
+                  'errors_to_json':False, 'on_error':'raise'}
+
+    error_handler.ConfigurationToErrorHandler(config_test)
+    self.assertTrue(error_handler.error_to_stderr)
+    self.assertFalse(error_handler.error_to_json)
+    self.assertEqual(error_handler.on_error, 'raise')
+
 
 if __name__ == '__main__':
     unittest.main()
