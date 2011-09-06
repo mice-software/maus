@@ -4,6 +4,9 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v0.0.6
+- Added calls to geant4 inline visualisation
+
 MAUS-v0.0.5
 - Added some new compile flags to control C++ optimisation, profiling, debugging, code coverage
 - Added documentation for the Monte Carlo data structure (doc/run_control/spill.pdf)

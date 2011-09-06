@@ -44,15 +44,22 @@ class MapPyBeamMaker:
     """
     def __init__(self):
         """
-        Constructor; initialises parameters to 0        
+        Constructor; initialises parameters to 0. Member data as follows:
+        - beams list of Beam classes
+        - particle_generator string that controls the way particles are
+        generated
+        - binomial_n, binomial_p control binomial distribution; define binomial
+        distribution asthe discrete probability distribution of the number of
+        successes in a sequence of binomial_n independent yes/no experiments,
+        each of which yields success with probability p.
+        - seed random seed used for generating particles (and generating monte
+        carlo seeds in some instances)
         """
         self.beams = []
         self.particle_generator = None
-        self.overwrite_existing = False
         self.binomial_n = 0
         self.binomial_p = 0.5
         self.seed = 0
-        self.particle_seed = "random"
 
     def birth(self, json_configuration):
         """
