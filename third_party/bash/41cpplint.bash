@@ -2,7 +2,11 @@
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
-    cp ${MAUS_ROOT_DIR}/third_party/source/cpplint.py ${MAUS_ROOT_DIR}/third_party/install/lib/python2.7/site-packages/cpplint.py
+    if [ `uname -s` == "Darwin" ]; then
+      cp ${MAUS_ROOT_DIR}/third_party/source/cpplint.py ${MAUS_ROOT_DIR}/third_party/install/Python.framework/Versions/2.7/lib/python2.7/site-packages/cpplint.py
+    else
+      cp ${MAUS_ROOT_DIR}/third_party/source/cpplint.py ${MAUS_ROOT_DIR}/third_party/install/lib/python2.7/site-packages/cpplint.py
+    fi
     
     echo "INFO: The package should be locally build now in your"
     echo "INFO: third_party directory, which the rest of MAUS will"

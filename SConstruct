@@ -1,6 +1,7 @@
 from SCons.Script.SConscript import SConsEnvironment # pylint: disable-msg=F0401
 import glob
 import os
+import shutil
 
 def my_exit(code = 1):
     """Internal routine to exit
@@ -9,6 +10,14 @@ def my_exit(code = 1):
     warning.
     """
     Exit(code) # pylint: disable-msg=E0602
+
+def duplicate_dylib_as_so(target, source, env):
+    print "Duplicating %s as %s." % (source[0], target[0])
+    shutil.copyfile(str(source[0]), str(target[0]))
+    return None
+
+dylib2so = Builder(action = duplicate_dylib_as_so, suffix = '.so',
+                   src_suffix = '.dylib')
 
 maus_root_dir = os.environ.get('MAUS_ROOT_DIR')
 if not maus_root_dir:
@@ -55,18 +64,24 @@ class Dev:
         localenv.Append(CCFLAGS=self.cflags)
         if use_root and use_g4:
             localenv.Append(LIBS=['MausCpp'])
+            localenv.Append(LIBPATH = "%s/src/common_cpp" % maus_root_dir)
 
         #specify the build directory
         localenv.VariantDir(variant_dir=builddir, src_dir='.', duplicate=0)
         localenv.Append(CPPPATH='.')
 
+        full_build_dir = os.path.join(maus_root_dir, builddir)
+
         srclst = map(lambda x: builddir + '/' + x, glob.glob('*.cc'))
         srclst += map(lambda x: builddir + '/' + x, glob.glob('*.i'))
         pgm = localenv.SharedLibrary(targetpath, source=srclst)
 
-        tests = glob.glob('test_*.py')
+        if (sysname == 'Darwin'):
+          lib_so = env.Dylib2SO(targetpath)
+          Depends(lib_so, pgm)
+          env.Install(full_build_dir, lib_so)
 
-        full_build_dir = os.path.join(maus_root_dir, builddir)
+        tests = glob.glob('test_*.py')
 
         env.Install(full_build_dir, "build/%s.py" % name)
         env.Install(full_build_dir, pgm)
@@ -442,8 +457,11 @@ def geant4_extras(env):
         my_exit(1)
 
 # Setup the environment.  NOTE: SHLIBPREFIX means that shared libraries don't
-# have a 'lib' prefix, which is needed for python to find SWIG generated libraries
-env = Environment(SHLIBPREFIX="") # pylint: disable-msg=E0602
+# have a 'lib' prefix, which is needed for python to find SWIG generated
+# libraries
+env = Environment(SHLIBPREFIX="", BUILDERS = {'Dylib2SO' : dylib2so}) # pylint: disable-msg=E0602
+
+(sysname, nodename, release, version, machine) = os.uname()
 
 if env.GetOption('clean'):
     print("In cleaning mode!")
@@ -465,7 +483,6 @@ if os.path.isfile('.use_llvm_with_maus'):
 env.Tool('swig', '%s/third_party/swig-2.0.1' % maus_root_dir)
 env.Append(SWIGFLAGS=['-python', '-c++']) # tell SWIG to make python bindings for C++
 
-#env.Append(PATH="%s/third_party/install/bin" % maus_root_dir)
 env['ENV']['PATH'] =  os.environ.get('PATH')  # useful to set for root-config
 env['ENV']['LD_LIBRARY_PATH'] = os.environ.get('LD_LIBRARY_PATH')
 env['ENV']['DYLD_LIBRARY_PATH'] = os.environ.get('DYLD_LIBRARY_PATH')
@@ -476,11 +493,15 @@ libs = str(os.environ.get('LD_LIBRARY_PATH'))+':'+str(os.environ.get('DYLD_LIBRA
 env.Append(LIBPATH =  libs.split(':') + ["%s/build" % maus_root_dir])
 
 env.Append(CPPPATH=["%s/third_party/install/include" % maus_root_dir, \
-                        "%s/third_party/install/include/python2.7" % maus_root_dir, \
-                        "%s/third_party/install/include/root" % maus_root_dir, \
-                        "%s/src/legacy" % maus_root_dir, \
-                        "%s/src/common_cpp" % maus_root_dir, \
-                        ""])
+                    "%s/third_party/install/include/root" % maus_root_dir, \
+                    "%s/src/legacy" % maus_root_dir, \
+                    "%s/src/common_cpp" % maus_root_dir, \
+                    ""])
+
+if (sysname == 'Darwin'):
+  env.Append(CPPPATH=["%s/third_party/install/Python.framework/Versions/2.7/include/python2.7" % maus_root_dir])
+else:
+  env.Append(CPPPATH=["%s/third_party/install/include/python2.7" % maus_root_dir])
 
 env['USE_G4'] = False
 env['USE_ROOT'] = False
@@ -528,22 +549,25 @@ env = conf.Finish()
 if 'configure' in COMMAND_LINE_TARGETS: # pylint: disable-msg=E0602
     my_exit(0)
 
-
 # NOTE: do this after configure!  So we know if we have ROOT/geant4
 #specify all of the sub-projects in the section
 if env['USE_G4'] and env['USE_ROOT']:
-    #env.Append(CCFLAGS=['-g','-pg'])
-    #env.Append(LINKFLAGS='-pg')
     common_cpp_files = glob.glob("src/legacy/*/*cc") + \
         glob.glob("src/legacy/*/*/*cc") + \
         glob.glob("src/common_cpp/*/*cc") + \
         glob.glob("src/common_cpp/*/*/*cc")
 
-
-    maus_cpp = env.SharedLibrary(target = 'src/common_cpp/libMausCpp',
+    targetpath = 'src/common_cpp/libMausCpp'
+    maus_cpp = env.SharedLibrary(target = targetpath,
                                  source = common_cpp_files,
                                  LIBS=env['LIBS'] + ['recpack'])
     env.Install("build", maus_cpp)
+
+    #Build an extra copy with the .dylib extension for linking on OS X
+    if (sysname == 'Darwin'):
+      maus_cpp_so = env.Dylib2SO(targetpath)
+      Depends(maus_cpp_so, maus_cpp)
+      env.Install("build", maus_cpp_so)
 
     env.Append(LIBPATH = 'src/common_cpp')
     env.Append(CPPPATH = maus_root_dir)

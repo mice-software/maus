@@ -56,7 +56,7 @@ def run(number_of_spills):
     my_output = MAUS.OutputPyJSON(output_file)
 
     #  The Go() drives all the components you pass in, then check the file
-    #  'mausput' for the output
+    #  'simulation.out' for the output
 
     MAUS.Go(my_input, my_map, MAUS.ReducePyDoNothing(), my_output, datacards)
 
