@@ -18,7 +18,7 @@
                 <text>
                 {</text>
                 Volume TessellatedSolid
-                PropertyString Material Galactic
+                PropertyString Material <xsl:value-of select="structure/volume/materialref/@ref"/>
                 PropertyDouble BlueColour 0.75
                 PropertyDouble GreenColour 0.3
                 PropertyDouble RedColour 0.75

@@ -106,8 +106,8 @@ SciFinTrackers = 2
 # geometry upload/download information
 #Upload
 # Arguments below MUST be included
-GeometryDirectory   = "/home/matt/StepFiles/Quad/GDML_fastradModel"
-GeometryDescription = "This geometry is an accurate QUADRUPOLE"
+GeometryDirectory   = "/home/matt/maus-littlefield/src/common_py/geometry/testCases/testGeometry"
+GeometryDescription = "Test Module"
 # Optional Arguments 1 = yes, 0 = no
 Zip_File         = 1
 Delete_Originals = 0

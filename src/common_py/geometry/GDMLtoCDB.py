@@ -172,13 +172,14 @@ class Downloader:
         self.geometryfiles = filelist
         self.listofgeometries = filelist
         if testserver == None:
-            self.wsdlurl = None
+            self.wsdlurl = "http://cdb.mice.rl.ac.uk"
         elif testserver == 1:
             twsdl = "http://rgma19.pp.rl.ac.uk:8080/cdb/geometrySuperMouse?wsdl"
             self.wsdlurl = twsdl 
         else: 
             raise StandardError("Incorrect input", "upload::__init__")
         self.geometry = Client(self.wsdlurl).service
+        print self.geometry.getStatus()
         
     def download_current(self, downloadpath):
         """
@@ -262,7 +263,7 @@ def main():
     Main function
     """
     maus = os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/Download/'
-    download = Downloader(1)
-    download.download_geometry_for_run(1, maus)
+    download = Downloader()
+    #download.download_geometry_for_run(1, maus)
 if __name__ == "__main__":
     main()

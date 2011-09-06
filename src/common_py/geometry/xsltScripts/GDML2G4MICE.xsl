@@ -9,8 +9,6 @@
         </xd:desc>
     </xd:doc>
 
-
-
     <xsl:output method="text"/>
     <xsl:template match="gdml">
         <html>
@@ -28,10 +26,12 @@
                 Module BeamLine/<xsl:value-of select="translate(file/@name, 'gdml', 'dat')"/> 
                 {
                 Position <xsl:value-of select="position/@x"/><xsl:text> </xsl:text><xsl:value-of select="position/@y"/><xsl:text> </xsl:text><xsl:value-of select="position/@z"/> mm
-                Rotation 0.0 0.0 0.0 deg <!-- <xsl:if test="rotationref/@ref, identity"> 0.0 0.0 0.0 deg</xsl:if> -->    
+                Rotation <xsl:if test="rotationref/@ref = 'identity'"> 0.0 0.0 0.0 deg</xsl:if>    
                 }
                 </xsl:for-each>
                 }
+                
+                //<xsl:value-of select="MICE_Information"/>
                 
             </body>
         </html>
