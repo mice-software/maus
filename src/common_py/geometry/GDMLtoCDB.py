@@ -158,7 +158,7 @@ class Downloader:
     This class downloads the information from the CDB and decodes and unpacks the
     information.
     """
-    def __init__(self, testserver):
+    def __init__(self, testserver = None):
         """
         @Method Class constructor
 
@@ -172,15 +172,13 @@ class Downloader:
         self.geometryfiles = filelist
         self.listofgeometries = filelist
         if testserver == None:
-            self.wsdlurl = "supermouse server"
+            self.wsdlurl = None
         elif testserver == 1:
             twsdl = "http://rgma19.pp.rl.ac.uk:8080/cdb/geometrySuperMouse?wsdl"
             self.wsdlurl = twsdl 
         else: 
             raise StandardError("Incorrect input", "upload::__init__")
         self.geometry = Client(self.wsdlurl).service
-
-    
         
     def download_current(self, downloadpath):
         """
@@ -250,11 +248,12 @@ class Downloader:
         @param  id The long ID run number for the desired geometry.
         @param  downloadedpath The path location where the files will be unpacked to. 
         """        
-        downloadedfile = b64decode(self.geometry.getGDMLForRun(run_id))
-        zip_path = downloadpath + '/Geometry.zip'
-        fout = open(zip_path, 'w')
-        fout.write(downloadedfile)
-        fout.close()
+        downloadedfile = b64decode(self.geometry.get_beamline_for_run_xml(run_id))
+        print downloadedfile
+        #zip_path = downloadpath + '/Geometry.zip'
+        #fout = open(zip_path, 'w')
+        #fout.write(downloadedfile)
+        #fout.close()
 
 #Need to think of ways to test the downloading of geometries without downloading geomtries.        
             
@@ -262,5 +261,8 @@ def main():
     """
     Main function
     """
+    maus = os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/Download/'
+    download = Downloader(1)
+    download.download_geometry_for_run(1, maus)
 if __name__ == "__main__":
     main()
