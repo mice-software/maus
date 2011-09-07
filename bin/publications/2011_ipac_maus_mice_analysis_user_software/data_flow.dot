@@ -1,0 +1,48 @@
+digraph G {
+
+node [label="Input"] start
+node [label="Ouput"] end
+
+{node [label="Simulation"] a0;b0;}
+{node [label="Digitization"] a1;b1;}
+{node [label="Reconstruction"] a2;b2;}
+
+node [label="Histogram"] hist;
+
+	subgraph cluster_0 {
+		 style=filled;
+			color=lightgrey;
+				node [style=filled,color=white];
+				     a0 -> a1 -> a2;
+				     	label = "Map: Spill #1";
+					}
+
+					subgraph cluster_1 {
+					                 style=filled;
+                        color=lightgrey;
+                                node [style=filled,color=white];
+						      b0 -> b1 -> b2;
+						      	 label = "Map: Spill #2";
+
+							       }
+							       start -> a0;
+							       start -> b0;
+							       
+							       
+							       
+							       a2 -> hist;
+							       b2 -> hist;
+
+							       start [shape=Mdiamond];
+							       end [shape=Msquare];
+							       
+        subgraph cluster_2 {
+                 style=filled;
+                        color=lightgrey;
+                                node [style=filled,color=white];
+				hist
+                                        label = "Reduce: All Spills";
+                                        }
+
+							       hist -> end
+}
