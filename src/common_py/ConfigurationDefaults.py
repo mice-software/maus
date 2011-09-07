@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 #
 #  MAUS is free software: you can redistribute it and/or modify
@@ -75,28 +76,30 @@ TOFtdcConversionFactor = 0.025 # nanosecond
 TOFpmtQuantumEfficiency = 0.25
 TOFscintLightSpeed =  170.0 # mm/ns
 
-# scifi tracker digitization
+# scifi tracker
 #SciFiDeadChanFName = ""
-SciFiMUXNum = 7
-SciFiFiberDecayConst = 2.7
+#SciFiMUXNum = 7 # not used
+#SciFiFiberDecayConst = 2.7 # not used
 SciFiFiberConvFactor =  3047.1
-SciFiFiberRefractiveIndex = 1.6
-SciFiFiberCriticalAngle = 0.4782 # rad
+#SciFiFiberRefractiveIndex = 1.6 # not used
+#SciFiFiberCriticalAngle = 0.4782 # rad # not used
 SciFiFiberTrappingEff = 0.056
 SciFiFiberMirrorEff = 0.6
 SciFiFiberTransmissionEff = 0.8
 SciFiMUXTransmissionEff = 1.0
-SciFiFiberRunLength = 5000.0 # mm
+#SciFiFiberRunLength = 5000.0 # mm  # not used
 SciFivlpcQE = 0.8
 SciFivlpcEnergyRes = 4.0 # MeV
 SciFivlpcTimeRes = 0.2 # ns
-SciFiadcBits = 8
+#SciFiadcBits = 8 # not used
 SciFiadcFactor = 6.0
 SciFitdcBits = 16
 SciFitdcFactor = 1.0
-SciFinElecChanPerPlane = 1429
+#SciFinElecChanPerPlane = 1429 # not used
 SciFinPlanes = 3
 SciFinStations = 5
 SciFinTrackers = 2
-
+SciFiNPECut = 2.0 # photoelectrons
+SciFiClustExcept = 100 # number of clusters per event above which an exception is thrown
+#SciFiTimeResolution = 2 # ns
 
