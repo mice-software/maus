@@ -29,8 +29,10 @@ class Configreader():
         self.downloaddir = ""
         self.starttime = ""
         self.stoptime = ""
+        self.runnum = ""
         
     def readconfig(self):
+        #New test for run num 
         """
         @method readconfig
         
@@ -54,6 +56,7 @@ class Configreader():
         self.downloaddir     = config_dict['DownloadDir']
         self.starttime       = config_dict['StartTime']
         self.stoptime        = config_dict['StopTime']
+        self.runnum          = config_dict['RunNum']
 
 def main():
     """

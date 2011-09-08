@@ -3,13 +3,14 @@ Configuration Database Upload/Download Classes
 M. Littlefield 02/08/11 
 """
 import os
-from suds.client import Client
+from cdb import Beamline
+from cdb import GeometrySuperMouse
+from cdb import Geometry
 from datetime import datetime
-from base64 import b64encode
-from base64 import b64decode
 
 #pylint: disable = C0301, R0902
 
+#change notes no longer encode decode
 class GDMLtocdb:
     """
     @Class GDMLtocdb handles the uploading of geometries to the CDB
@@ -32,7 +33,7 @@ class GDMLtocdb:
         @Param testserver enter 1 to set up the test server leave blank for real server
         """
         self.wsdlurl = None
-        self.geometry = None
+        self.geometry_cdb = GeometrySuperMouse()
         self.textfile = None
         self.text = ""
         if type(testserver) != int:
@@ -62,13 +63,15 @@ class GDMLtocdb:
         the test server depending on whether this is specified by __init__.
         """
         if self.testserver == None:
-            self.wsdlurl = "supermouse server" # actual wsdl
+            self.wsdlurl = "http://cdb.mice.rl.ac.uk/cdb/geometry?wsdl"
         elif self.testserver == 1:
             twsdl = "http://rgma19.pp.rl.ac.uk:8080/cdb/geometrySuperMouse?wsdl"
             self.wsdlurl = twsdl 
-        self.geometry = Client(self.wsdlurl).service
-        print "Configuration Database Status is"
-        print self.geometry.getStatus()
+        self.geometry_cdb.set_url(self.wsdlurl)
+        if self.testserver == 1:
+            print "Test server status is " + self.geometry_cdb.get_status()
+        else:
+            print "Production Server status is " + self.geometry_cdb.get_status()
         return self.wsdlurl
     
     def check_file_list(self):
@@ -147,9 +150,9 @@ class GDMLtocdb:
             _dt = datetime.today()
             fin = open(zipped_file, 'r')
             f_contents = fin.read()
-            _gdml = b64encode(f_contents)
-            self.geometry.setGDML(_gdml, _dt, self.notes)
-            print self.geometry.setGDML(_gdml, _dt, self.notes)
+            _gdml = f_contents
+            self.geometry_cdb.set_gdml(_gdml, _dt, self.notes)
+            print self.geometry_cdb.set_gdml(_gdml, _dt, self.notes)
             
 class Downloader:
     """
@@ -166,21 +169,36 @@ class Downloader:
 
         @Param testserver, If an argument of 1 is entered this will set a connection to the test CDB if left blank write to the actual CDB
         """
+        #Has been changed alter tests
+        self.times = []
         self.id_nums = []
         self.filestr = ""
         filelist = []
         self.geometryfiles = filelist
         self.listofgeometries = filelist
-        if testserver == None:
-            self.wsdlurl = "http://cdb.mice.rl.ac.uk"
-        elif testserver == 1:
+        self.geometry_cdb = Geometry()
+        if type(testserver) != int:
+            raise IOError('Test Server argument must be 1 or 0 or None', 'GDMLtocdb::__init__')
+        else: 
+            self.testserver = testserver
+        if self.testserver == None:
+            self.wsdlurl = "http://cdb.mice.rl.ac.uk/cdb/geometry?wsdl"
+        elif self.testserver == 1:
             twsdl = "http://rgma19.pp.rl.ac.uk:8080/cdb/geometrySuperMouse?wsdl"
             self.wsdlurl = twsdl 
         else: 
             raise StandardError("Incorrect input", "upload::__init__")
-        self.geometry = Client(self.wsdlurl).service
-        print self.geometry.getStatus()
-        
+        self.geometry_cdb.set_url(self.wsdlurl)
+        if self.testserver == 1:
+            print "Test server status is " + self.geometry_cdb.get_status()
+        else:
+            print "Production Server status is " + self.geometry_cdb.get_status()
+        """
+        cdb = Beamline()
+        cdb.set_url('http://cdb.mice.rl.ac.uk/cdb/beamline?wsdl')
+        print cdb.get_status()
+        print cdb.get_beamline_for_run_xml(1 )
+        """
     def download_current(self, downloadpath):
         """
         @Method download_current, this method downloads the current valid geometry and writes the files
@@ -191,7 +209,7 @@ class Downloader:
         
         @param  downloadedpath The path location where the files will be unpacked to. 
         """
-        downloadedfile = b64decode(self.geometry.getCurrentGDML())
+        downloadedfile = self.geometry_cdb.get_current_gdml()
         zip_path = downloadpath + '/Geometry.zip'
         fout = open(zip_path, 'w')
         fout.write(downloadedfile)
@@ -207,7 +225,7 @@ class Downloader:
         @param  id The integer ID number for the desired geometry.
         @param  downloadedpath The path location where the files will be unpacked to. 
         """
-        downloadedfile = b64decode(self.geometry.getGDMLForId(id_num))
+        downloadedfile = self.geometry_cdb.get_gdml_for_id(id_num)
         zip_path = downloadpath + '/Geometry.zip'
         fout = open(zip_path, 'w')
         fout.write(downloadedfile)
@@ -223,23 +241,15 @@ class Downloader:
         @param start_time The datetime of which you wish the query to start must be in UTC.
         @param stop_time The datetime of which you wish the query to stop must be in UTC. Can be blank.
         """
-        id_list = self.geometry.getIds(start_time, stop_time)
-        ids = id_list.split(' ')
-        length = len(ids)
-        temp = ""
-        for num in range(0, length):
-            temp = str(ids[num])
-            if temp.find('name=') >= 0:
-                self.id_nums.append(temp)
-            temp = ""
-        last_id = len(self.id_nums)
-        valid_id = str(self.id_nums[last_id-1])
-        valid_id = valid_id.strip('name=')
-        valid_id_list = eval(valid_id)
-        valid_id = int(valid_id_list)
-        return valid_id
-        
-    def download_geometry_for_run(self, run_id, downloadpath):
+        #This may need to be checked in the future because a validFrom evaluation may be needed.
+        id_dict = self.geometry_cdb.get_ids(start_time, stop_time)
+        ids = id_dict.keys()
+        length = len(ids) - 1
+        id = ids[length]
+        print "Using geometry ID " + str(ids[length]) + " valid from " + str(id_dict[id]['validFrom'])
+        return str(ids[length])
+    
+    def download_beamline_for_run(self, run_id, downloadpath):
         """
         @Method download geometry for run 
 
@@ -249,21 +259,22 @@ class Downloader:
         @param  id The long ID run number for the desired geometry.
         @param  downloadedpath The path location where the files will be unpacked to. 
         """        
-        downloadedfile = b64decode(self.geometry.get_beamline_for_run_xml(run_id))
-        print downloadedfile
-        #zip_path = downloadpath + '/Geometry.zip'
-        #fout = open(zip_path, 'w')
-        #fout.write(downloadedfile)
-        #fout.close()
-
+        beamline_cdb = Beamline()
+        downloadedfile = beamline_cdb.get_beamline_for_run_xml(run_id)
+        path = downloadpath + '/Beamline.gdml'
+        fout = open(path, 'w')
+        fout.write(downloadedfile)
+        fout.close()
+        dfile = beamline_cdb.get_beamline_for_run(run_id)
+        self.times.append(str(dfile[1L]['startTime']))
+        self.times.append(str(dfile[1L]['endTime']))
+        
+    
 #Need to think of ways to test the downloading of geometries without downloading geomtries.        
             
 def main():
     """
     Main function
     """
-    maus = os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/Download/'
-    download = Downloader()
-    #download.download_geometry_for_run(1, maus)
 if __name__ == "__main__":
     main()
