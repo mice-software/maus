@@ -2,18 +2,15 @@
 <gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="file:Something">
 <MICE_Information>
-    <Configuration_Information>
-        <Proton_Absorber Thickness="10" Unit="mm"/>
-        <Diffuser Size="50" Unit="mm"/>
-        <Absorber Type="Wedge" Thickness="40" Unit="mm"/>
-    </Configuration_Information>
-    <Field_Information>
-        <Magnet Name="Quad 1 to 3" Type="QC" File_Location="/home/QCFieldMap.txt"/>
-        <Magnet Name="D1" Type="Dipole" File_Location="/home/Dipole.txt"/>
-        <Magnet Name="Quad 4 to 6" Type="IV" File_Location="/home/IVFieldMap.txt"/>
-        <Magnet Name="D2" Type="Dipole" File_Location="/home/Dipole.txt"/>
-        <Magnet Name="Decay Solenoid" Type="DS" File_Location="/home/DS.txt"/>
-    </Field_Information>
+    <Configuration_information>
+    </Configuration_information>
+    <G4Field_Information>
+        <G4Magnet_info File_Location="/home/QCFieldMap.txt" Name="Quad 1 to 3" Type="QC"/>
+        <G4Magnet_info File_Location="/home/Dipole.txt" Name="D1" Type="Dipole"/>
+        <G4Magnet_info File_Location="/home/IVFieldMap.txt" Name="Quad 4 to 6" Type="IV"/>
+        <G4Magnet_info File_Location="/home/Dipole.txt" Name="D2" Type="Dipole"/>
+        <G4Magnet_info File_Location="/home/DS.txt" Name="Decay Solenoid" Type="DS"/>    
+    </G4Field_Information>
     <Detector_Information>
         <TOF></TOF>
         <KL></KL>

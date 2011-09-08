@@ -1,20 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"> 
 <!--++++++++++++++++++++++++++++++++++BASE TYPES+++++++++++++++++++++++++++++++++++++++++-->
-    <xs:complexType name="ProtonAbsorberType">
-        <xs:attribute name="Thickness"/>
-        <xs:attribute name="Unit" default="mm"/>
-    </xs:complexType>
-    <xs:complexType name="DiffuserType">
-        <xs:attribute name="Size"/>
-        <xs:attribute name = "Unit" default="mm"/>
-    </xs:complexType>
-    <xs:complexType name="AbsorberTypeType">
-        <xs:attribute name="Type"/>
-        <xs:attribute name="Thickness" use="optional"/>
-        <xs:attribute name="Unit" default="mm" use="optional"/>
-    </xs:complexType>
-    <xs:complexType name="MagnetType">
+    <xs:complexType name="G4MagnetType">
         <xs:attribute name="Name"/>
         <xs:attribute name="Type"/>
         <xs:attribute name="File_Location"/>        
@@ -30,18 +17,50 @@
     </xs:complexType>
     <xs:complexType name="TrackerType">
         <xs:attribute name="Tracker"/>
-    </xs:complexType>    
+    </xs:complexType>
+    <xs:complexType name="runMagnetType">
+        <xs:attribute name="name" use="required" type="xs:NCName"/>
+        <xs:attribute name="polarity" use="required" type="xs:NCName"/>
+        <xs:attribute name="setCurrent" use="required" type="xs:decimal"/>
+    </xs:complexType>
 <!--+++++++++++++++++++++++++++++++++++MIDDLE TYPES++++++++++++++++++++++++++++++++++++++++-->
-    <xs:complexType name="Configuration_InformationType">
+    <xs:complexType name ="configurationType">
         <xs:sequence>
-            <xs:element name="Proton_Absorber" type="ProtonAbsorberType"/>
-            <xs:element name="Diffuser" type="DiffuserType"/>
-            <xs:element name="Absorber" type="AbsorberTypeType"/>
+            <xs:element name="run">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="magnet" type="runMagnetType" minOccurs="0"/>                        
+                    </xs:sequence>
+                    <xs:attribute name="daqGateWidth" use="required" type="xs:decimal"/>
+                    <xs:attribute name="daqTrigger" use="required" type="xs:integer"/>
+                    <xs:attribute name="daqVersion" use="required" type="xs:decimal"/>
+                    <xs:attribute name="endTime" use="required"/>
+                    <xs:attribute name="isisBeamPositionX" use="required" type="xs:NCName"/>
+                    <xs:attribute name="isisBeamPositionY" use="required" type="xs:NCName"/>
+                    <xs:attribute name="isisNominalBeamCurrent" use="required" type="xs:decimal"/>
+                    <xs:attribute name="isisNominalBeamLoss" use="required" type="xs:decimal"/>
+                    <xs:attribute name="isisRepRate" use="required" type="xs:decimal"/>
+                    <xs:attribute name="isisTargetFrequency" use="required" type="xs:integer"/>
+                    <xs:attribute name="notes" use="required"/>
+                    <xs:attribute name="optics" use="required" type="xs:NCName"/>
+                    <xs:attribute name="protonAbsorberThickness" use="required" type="xs:NCName"/>
+                    <xs:attribute name="pulseEnd" use="required" type="xs:integer"/>
+                    <xs:attribute name="pulseStart" use="required" type="xs:integer"/>
+                    <xs:attribute name="runNumber" use="required" type="xs:integer"/>
+                    <xs:attribute name="runType" use="required" type="xs:NCName"/>
+                    <xs:attribute name="startTime" use="required"/>
+                    <xs:attribute name="status" use="required" type="xs:boolean"/>
+                    <xs:attribute name="step" use="required" type="xs:decimal"/>
+                    <xs:attribute name="targetDelay" use="required" type="xs:decimal"/>
+                    <xs:attribute name="targetDepth" use="required" type="xs:decimal"/>
+                    <xs:attribute name="targetDriveVoltage" use="required" type="xs:decimal"/>
+                </xs:complexType>
+            </xs:element>
         </xs:sequence>
     </xs:complexType>
-    <xs:complexType name="Field_InformationType">
+    <xs:complexType name="G4Field_InformationType">
         <xs:sequence>
-            <xs:element name="Magnet" type="MagnetType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="G4Magnet_info" type="G4MagnetType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="Detector_InformationType">
@@ -65,8 +84,9 @@
         </xs:annotation>
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="Configuration_Information" type="Configuration_InformationType"/>
-                <xs:element name="Field_Information" type="Field_InformationType"/>
+                <xs:element name="Configuration_Information" type="configurationType" minOccurs="0">
+                </xs:element>
+                <xs:element name="G4Field_Information" type="G4Field_InformationType" minOccurs="0"/>
                 <xs:element name="Detector_Information" type="Detector_InformationType" minOccurs="0"/>
             </xs:sequence>
         </xs:complexType>

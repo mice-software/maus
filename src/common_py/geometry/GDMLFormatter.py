@@ -22,6 +22,7 @@ class Formatter:
 
         @Param Path The path to the directory which contains the fastrad outputted GDML files
         """
+        self.beamline_file = None
         self.field_file = None
         self.formatted = False
         self.txtfile = ""
@@ -51,7 +52,10 @@ class Formatter:
             if fname.find('Field') >= 0 or fname.find('field') >= 0:
                 found_file = self.path + '/' + fname
                 self.field_file = found_file
-            if fname.find('materials') < 0 and fname.find('fastrad') < 0 and fname.find('Field') < 0 :
+            if fname.find('Beamline') >= 0:
+                found_file = self.path + '/' + fname
+                self.beamline_file = found_file
+            if fname.find('materials') < 0 and fname.find('fastrad') < 0 and fname.find('Field') < 0 and fname.find('Beamline') < 0 :
                 stepfile = self.path + '/' + fname
                 self.stepfiles.append(stepfile)
             if self.field_file == None:
@@ -77,15 +81,14 @@ class Formatter:
             fout = open(gdmlfile, 'w')
             xmldoc.writexml(fout)
        
-    def merge_field_info(self, gdmlfile):
+    def merge_maus_info(self, gdmlfile):
         """
-        @method merge_field_info
+        @method merge_maus_info
         
         This method adds the field information
         to the configuration GDML.
         """
         #NEW METHOD WRITE TEST
-        self.txtfile = ""
         impl = minidom.getDOMImplementation()
         config = minidom.parse(gdmlfile)
         field = minidom.parse(self.field_file)
@@ -96,6 +99,27 @@ class Formatter:
         fout = open(gdmlfile, 'w')
         root_node.writexml(fout)
         fout.close()
+    
+    def merge_run_info(self, gdmlfile):
+        """
+        @method merge_maus_info
+        
+        This method adds the field information
+        to the configuration GDML.
+        """
+        #NEW METHOD WRITE TEST    
+        impl = minidom.getDOMImplementation()
+        field = minidom.parse(gdmlfile)
+        beamline = minidom.parse(self.beamline_file)
+        for node in beamline.getElementsByTagName("run"):
+            maus_info = node
+        root_node = field.childNodes[0].childNodes[1].childNodes[1]
+        root_node.insertBefore(maus_info, root_node.childNodes[0])
+        fout = open(gdmlfile, 'w')
+        field.writexml(fout)
+        fout.close()
+        os.remove(self.beamline_file)
+ 
  
     def format_materials(self, gdmlfile):
         """
@@ -191,7 +215,9 @@ class Formatter:
         self.format_check(self.configurationfile)
         if self.formatted == False:
             self.format_schema_location(self.configurationfile)
-            self.merge_field_info(self.configurationfile)
+            if self.beamline_file != None:
+                self.merge_run_info(self.field_file)
+            self.merge_maus_info(self.configurationfile)
             self.format_materials(self.configurationfile)
             self.insert_materials_ref(self.txtfile)
         print "Formatted Configuration File"
