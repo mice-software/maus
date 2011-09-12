@@ -193,12 +193,7 @@ class Downloader:
             print "Test server status is " + self.geometry_cdb.get_status()
         else:
             print "Production Server status is " + self.geometry_cdb.get_status()
-        """
-        cdb = Beamline()
-        cdb.set_url('http://cdb.mice.rl.ac.uk/cdb/beamline?wsdl')
-        print cdb.get_status()
-        print cdb.get_beamline_for_run_xml(1 )
-        """
+            
     def download_current(self, downloadpath):
         """
         @Method download_current, this method downloads the current valid geometry and writes the files
@@ -209,11 +204,14 @@ class Downloader:
         
         @param  downloadedpath The path location where the files will be unpacked to. 
         """
-        downloadedfile = self.geometry_cdb.get_current_gdml()
-        zip_path = downloadpath + '/Geometry.zip'
-        fout = open(zip_path, 'w')
-        fout.write(downloadedfile)
-        fout.close()
+        if os.path.exists(downloadpath) == False:
+            raise IOError('Path does not exist!, Downloader::download_current')
+        else:
+            downloadedfile = self.geometry_cdb.get_current_gdml()
+            zip_path = downloadpath + '/Geometry.zip'
+            fout = open(zip_path, 'w')
+            fout.write(downloadedfile)
+            fout.close()
 
     def download_geometry_for_id(self, id_num, downloadpath):
         """
@@ -225,12 +223,17 @@ class Downloader:
         @param  id The integer ID number for the desired geometry.
         @param  downloadedpath The path location where the files will be unpacked to. 
         """
-        downloadedfile = self.geometry_cdb.get_gdml_for_id(id_num)
-        zip_path = downloadpath + '/Geometry.zip'
-        fout = open(zip_path, 'w')
-        fout.write(downloadedfile)
-        fout.close()
-        
+        if os.path.exists(downloadpath) == False:
+            raise IOError('Path does not exist!, Downloader::download_current')
+        elif type(id_num) != str:
+            raise IOError('ID number not obtained, Downloader::download_current')
+        else:
+            downloadedfile = self.geometry_cdb.get_gdml_for_id(id_num)
+            zip_path = downloadpath + '/Geometry.zip'
+            fout = open(zip_path, 'w')
+            fout.write(downloadedfile)
+            fout.close()
+            
     def get_ids(self, start_time, stop_time = None):
         """
         @method get IDs
@@ -241,12 +244,12 @@ class Downloader:
         @param start_time The datetime of which you wish the query to start must be in UTC.
         @param stop_time The datetime of which you wish the query to stop must be in UTC. Can be blank.
         """
-        #This may need to be checked in the future because a validFrom evaluation may be needed.
+        #This may need to be checked in the future because a validFrom evaluation may be needed. How to test date times?
         id_dict = self.geometry_cdb.get_ids(start_time, stop_time)
         ids = id_dict.keys()
         length = len(ids) - 1
-        id = ids[length]
-        print "Using geometry ID " + str(ids[length]) + " valid from " + str(id_dict[id]['validFrom'])
+        id_num = ids[length]
+        print "Using geometry ID " + str(ids[length]) + " valid from " + str(id_dict[id_num]['validFrom'])
         return str(ids[length])
     
     def download_beamline_for_run(self, run_id, downloadpath):
@@ -258,18 +261,22 @@ class Downloader:
         
         @param  id The long ID run number for the desired geometry.
         @param  downloadedpath The path location where the files will be unpacked to. 
-        """        
-        beamline_cdb = Beamline()
-        downloadedfile = beamline_cdb.get_beamline_for_run_xml(run_id)
-        path = downloadpath + '/Beamline.gdml'
-        fout = open(path, 'w')
-        fout.write(downloadedfile)
-        fout.close()
-        dfile = beamline_cdb.get_beamline_for_run(run_id)
-        self.times.append(str(dfile[1L]['startTime']))
-        self.times.append(str(dfile[1L]['endTime']))
-        
-    
+        """
+        if os.path.exists(downloadpath) == False:
+            raise IOError('Path does not exist!, Downloader::download_beamline_for_run')
+        elif type(run_id) != int:
+            raise IOError('ID number not obtained, Downloader::download_beamline_for_run')
+        else:        
+            beamline_cdb = Beamline()
+            downloadedfile = beamline_cdb.get_beamline_for_run_xml(run_id)
+            path = downloadpath + '/Beamline.gdml'
+            fout = open(path, 'w')
+            fout.write(downloadedfile)
+            fout.close()
+            dfile = beamline_cdb.get_beamline_for_run(run_id)
+            self.times.append(str(dfile[1L]['startTime']))
+            self.times.append(str(dfile[1L]['endTime']))
+                
 #Need to think of ways to test the downloading of geometries without downloading geomtries.        
             
 def main():

@@ -50,12 +50,12 @@ class test_cad_import(unittest.TestCase):
             self.assertTrue(False, "Should have raised an exception")
         except:
             pass
-        #Test xslin1 parameter,
+        #Test xsl parameter,
         #first,   test it raises an error when there is no input
         #second,  test it raises an error when it isn't an xsl file
         try:
             self.constuctor = CADImport(xmlin1 = self.xml_in_1)
-            self.assertTrue(False, "Should have raised an exception")
+            self.assertEqual(self.constuctor.xsl, None, "Should have raised an exception")
         except:
             pass
         try:
@@ -146,31 +146,7 @@ class test_cad_import(unittest.TestCase):
                 count += 1
         if count == 0:
             self.assertTrue(False, "output file is not of MAUS Module format")
-        os.remove(self.out_put)
-
-    def test_append_merge(self):
-        """
-        This method test append_merge
-        """
-        self.cadimport_two_xml.append_merge()
-        #this test check to see if the word EDIT was replaced in Merge.xsl.in by
-        #checking the output file Merge.xsl for the word EDIT
-        count1 = 0
-        fout = open(self.cadimport_two_xml.merge_out, 'r')
-        for line in fout.readlines():
-            if line.find('EDIT')>=0:
-                count1 += 1
-        self.assertTrue(count1 == 0, "EDIT was not replaced in Merge.xsl")
-        #this tests to make sure there is only on EDIT in the Merge.xsl.in file
-        count2 = 0
-        fin = open(self.cadimport_two_xml.merge_in, 'r')
-        for line in fin.readlines():
-            if line.find('EDIT')>=0:
-                count2 += 1
-        self.assertTrue(count2 == 1, "More than one EDIT found in Merge.xsl.in")
-        os.remove(self.cadimport_two_xml.merge_out)
-        
-        
+        os.remove(self.out_put)      
     
 if __name__ == '__main__':
     unittest.main()

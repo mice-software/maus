@@ -9,6 +9,8 @@ from geometry.ConfigReader import Configreader
 from geometry.GDMLFormatter import Formatter
 from geometry.GDMLPacker import Unpacker
 
+#pylint: disable = C0301
+
 def main():
     """
     This Executable downloads the geometry for 

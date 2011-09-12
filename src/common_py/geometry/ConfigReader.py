@@ -5,7 +5,7 @@ M. Littlefield 02/08/11
 from Configuration import Configuration
 import json
 
-#pylint: disable = R0903
+#pylint: disable = R0903, R0902
 
 class Configreader():
     """
@@ -32,7 +32,6 @@ class Configreader():
         self.runnum = ""
         
     def readconfig(self):
-        #New test for run num 
         """
         @method readconfig
         

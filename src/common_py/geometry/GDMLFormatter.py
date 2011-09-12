@@ -4,7 +4,6 @@ M. Littlefield 02/08/11
 """
 import os.path
 from xml.dom import minidom
-from geometry.CADImport import CADImport
 
 #pylint: disable = C0301, R0902, R0201 
 
@@ -88,18 +87,19 @@ class Formatter:
         This method adds the field information
         to the configuration GDML.
         """
-        #NEW METHOD WRITE TEST
-        impl = minidom.getDOMImplementation()
-        config = minidom.parse(gdmlfile)
-        field = minidom.parse(self.field_file)
-        for node in field.getElementsByTagName("MICE_Information"):
-            maus_info = node
-        root_node = config.childNodes[2]
-        root_node.insertBefore(maus_info, root_node.childNodes[9])
-        fout = open(gdmlfile, 'w')
-        root_node.writexml(fout)
-        fout.close()
-    
+        if gdmlfile[-5:] != '.gdml' and gdmlfile[-4:] != '.xml':
+            raise IOError(gdmlfile + ' is not a gdml or xml', 'Formatter::format_schema_location')
+        else:
+            config = minidom.parse(gdmlfile)
+            field = minidom.parse(self.field_file)
+            for node in field.getElementsByTagName("MICE_Information"):
+                maus_info = node
+            root_node = config.childNodes[2]
+            root_node.insertBefore(maus_info, root_node.childNodes[9])
+            fout = open(gdmlfile, 'w')
+            root_node.writexml(fout)
+            fout.close()
+        
     def merge_run_info(self, gdmlfile):
         """
         @method merge_maus_info
@@ -107,20 +107,20 @@ class Formatter:
         This method adds the field information
         to the configuration GDML.
         """
-        #NEW METHOD WRITE TEST    
-        impl = minidom.getDOMImplementation()
-        field = minidom.parse(gdmlfile)
-        beamline = minidom.parse(self.beamline_file)
-        for node in beamline.getElementsByTagName("run"):
-            maus_info = node
-        root_node = field.childNodes[0].childNodes[1].childNodes[1]
-        root_node.insertBefore(maus_info, root_node.childNodes[0])
-        fout = open(gdmlfile, 'w')
-        field.writexml(fout)
-        fout.close()
-        os.remove(self.beamline_file)
- 
- 
+        if gdmlfile[-5:] != '.gdml' and gdmlfile[-4:] != '.xml':
+            raise IOError(gdmlfile + ' is not a gdml or xml', 'Formatter::format_schema_location')
+        else:    
+            field = minidom.parse(gdmlfile)
+            beamline = minidom.parse(self.beamline_file)
+            for node in beamline.getElementsByTagName("run"):
+                maus_info = node
+            root_node = field.childNodes[0].childNodes[1].childNodes[1]
+            root_node.insertBefore(maus_info, root_node.childNodes[0])
+            fout = open(gdmlfile, 'w')
+            field.writexml(fout)
+            fout.close()
+            os.remove(self.beamline_file)
+     
     def format_materials(self, gdmlfile):
         """
         @method Format Materials

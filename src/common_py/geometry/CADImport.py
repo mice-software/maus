@@ -6,7 +6,7 @@ import os
 import libxml2
 import libxslt
 
-#pylint: disable = C0301, R0913, R0912, F0401
+#pylint: disable = C0301, R0913, R0912, F0401, R0903
 #F0401 refers to libxml2 not being imported which it is?
 
 class CADImport:
@@ -44,7 +44,6 @@ class CADImport:
         else: 
             self.xml_in_1 = xmlin1
 
-        #New code write test
         if xsl == None: 
             self.xsl = None        
         elif type(xsl) != str:
@@ -108,7 +107,5 @@ def main():
     """
     Main Function
     """
-    merge = CADImport(xmlin1 = '/home/matt/fastradModel.gdml', xmlin2 = '/home/matt/Field.gdml')
-    merge.append_merge()
 if __name__ == '__main__':
     main()

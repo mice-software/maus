@@ -107,7 +107,7 @@ SciFinTrackers = 2
 #Upload
 # Arguments below MUST be included
 GeometryDirectory   = "/home/matt/maus-littlefield/src/common_py/geometry/testCases/testGeometry"
-GeometryDescription = "Test Module"
+GeometryDescription = "This is a standard note It uses the standard test case"
 # Optional Arguments 1 = yes, 0 = no
 Zip_File         = 0
 Delete_Originals = 0

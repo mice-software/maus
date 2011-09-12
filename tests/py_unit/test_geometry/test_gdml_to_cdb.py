@@ -159,6 +159,61 @@ class test_downloader(unittest.TestCase):
         except:
             pass
         
+    def test_download_current(self):
+        """
+        method test_download_current
+        
+        This method checks to see if errors are raised 
+        when false arguments are entered.
+        """
+        try:
+            self.test_downloader.download_current('Not a Path')
+            self.assertTrue(False, 'Should have raised an error')
+        except:
+            pass
+    
+    def test_download_geometry_for_id(self):
+        """
+        method test_download_geomtry_for_id
+        
+        This method checks to see if errors are raised 
+        when false arguments are entered.
+        """
+        try:
+            num = str(14)
+            self.test_downloader.download_geometry_for_id(num, 'Not a Path')
+            self.assertTrue(False, 'Should have raised an error')
+        except:
+            pass
+        try:
+            num = int(14)
+            maus = os.environ['MAUS_ROOT_DIR']
+            self.test_downloader.download_geometry_for_id(num, maus)
+            self.assertTrue(False, 'Should have raised an error')
+        except:
+            pass
+        
+    def test_download_beamline_for_run(self):
+        """
+        method test_beamline_geomtry_for_run
+        
+        This method checks to see if errors are raised 
+        when false arguments are entered.
+        """
+        try:
+            num = str(14)
+            self.test_downloader.download_beamline_for_run(num, 'Not a Path')
+            self.assertTrue(False, 'Should have raised an error')
+        except:
+            pass
+        try:
+            num = int(14)
+            maus = os.environ['MAUS_ROOT_DIR']
+            self.test_downloader.download_beamline_for_run(num, maus)
+            self.assertTrue(False, 'Should have raised an error')
+        except:
+            pass    
+        
         #More tests needed? Need to figure these out as the class
         #needs to talk to the cdb to test!?
 

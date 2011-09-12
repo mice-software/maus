@@ -62,6 +62,35 @@ class  test_gdml_formatter(unittest.TestCase):
             self.assertTrue(False, 'Should have raised an error')
         except:
             pass
+        
+    def test_merge_maus_info(self):
+        """
+        method test_merge_maus_info
+        
+        This method tests merge maus info by 
+        checking to see if errors are raised
+        when false arguments are entered.
+        """
+        try:
+            self.gdml.merge_maus_info('Gemoetry.not_gdml')
+            self.assertTrue(False, 'Should have raised an error')
+        except:
+            pass
+
+    def test_merge_run_info(self):
+        """
+        method test_merge_run_info
+        
+        This method tests merge maus info by 
+        checking to see if errors are raised
+        when false arguments are entered.
+        """
+        try:
+            self.gdml.merge_run_info('Gemoetry.not_gdml')
+            self.assertTrue(False, 'Should have raised an error')
+        except:
+            pass
+             
     
     def test_format_materials(self):
         """
@@ -145,6 +174,5 @@ class  test_gdml_formatter(unittest.TestCase):
             count = 0
             fin.close()
         
-
 if __name__ == '__main__':
     unittest.main()
