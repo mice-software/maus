@@ -32,6 +32,14 @@ bool MapCppTrackerDigitization::birth(std::string argJsonConfigDocument) {
     return false;
   }
 
+  // Get the tracker modules; they will be necessary
+  // for the channel number calculation
+  assert(_configJSON.isMember("reconstruction_geometry_filename"));
+  std::string filename;
+  filename = _configJSON["reconstruction_geometry_filename"].asString();
+  _module = new MiceModule(filename);
+  modules = _module->findModulesByPropertyString("SensitiveDetector", "SciFi");
+
   return true;
 }
 
@@ -43,30 +51,18 @@ std::string MapCppTrackerDigitization::process(std::string document) {
   // writes a line in the JSON document
   Json::FastWriter writer;
 
-  // Get the tracker modules; they will be necessary
-  // for the channel number calculation
-  assert(_configJSON.isMember("reconstruction_geometry_filename"));
-  std::string filename;
-  filename = _configJSON["reconstruction_geometry_filename"].asString();
-  _module = new MiceModule(filename);
-  modules = _module->findModulesByPropertyString("SensitiveDetector", "SciFi");
-
   // check sanity of json input file and mc brach
   if ( !check_sanity_mc(document) ) {
     // if bad, write error file
     return writer.write(root);
   }
 
-  Squeak::mout(Squeak::info) << "yahoooooo!!!" << std::endl;
-
   // start processing the mc hits
   std::vector<Json::Value> _alldigits;
   _alldigits.push_back(Json::Value());
   Json::Value tracker_event;
 
-  // after writing a line, reset object
-  tracker_event.clear();
-
+  // ==========================================================
   //  Loop over particles and hits
   for ( int i = 0; i < mc.size(); i++ ) {  //  i-th particle
     Json::Value particle = mc[i];
@@ -74,39 +70,51 @@ std::string MapCppTrackerDigitization::process(std::string document) {
     if ( !particle.isMember("hits") ) {
       continue; // if there are no MC hits, skip
     }
+    // "_hits" contains all mc hits for this event 
+    Json::Value _hits = particle["hits"];
 
-    Json::Value hits = particle["hits"];
+    std::cout << "D: Event with " << _hits.size() << " hits." << "\n";
+
+    // reset the digits array for each new event/particle
     _alldigits.clear();
-    _alldigits = make_all_digits(hits);
+    // for each fiber-hit, make a digit
+    _alldigits = make_all_digits(_hits);
 
-  // sum bundle of 7 fibers
-  tracker_event = make_bundle(_alldigits);
+    // sum bundle of 7 fibers
+    tracker_event.clear();
+    tracker_event = make_bundle(_alldigits);
 
-  Json::Value digits;
-  root["digits"].append(tracker_event);
+    std::cout << "D: Event with " << tracker_event.size() << " digits." << "\n";
+
+    //Json::Value digits; think this is not necessary.....
+    root["digits"].append(tracker_event);
   } // end for with var 'i' to loop particles
+  // ==========================================================
 
   return writer.write(root);
 }
 
 std::vector<Json::Value> MapCppTrackerDigitization::make_all_digits(Json::Value hits) {
-  std::vector<Json::Value> _alldigits;
-  _alldigits.clear();
+  std::vector<Json::Value> _digits;
+  _digits.clear();
+
   for ( int j = 0; j < hits.size(); j++ ) {  //  j-th hit
-      Json::StyledWriter writer;
+      //Json::StyledWriter writer;
+      // picking one hit at a time
       Json::Value hit = hits[j];
 
-      // sanity check
+      // a sanity check
       assert(hit.isMember("channel_id"));
       Json::Value channel_id = hit["channel_id"];
 
+      // assert this is a tracker hit
       assert(channel_id.isMember("type"));
       if (channel_id["type"].asString() != "Tracker") {
         continue;
       }
 
       assert(hit.isMember("energy_deposited"));
-      edep = hit["energy_deposited"].asDouble();
+      double edep = hit["energy_deposited"].asDouble();
 
       // get nPE from this hit
       double nPE = getNPE(edep);
@@ -144,9 +152,9 @@ std::vector<Json::Value> MapCppTrackerDigitization::make_all_digits(Json::Value 
       adigit["mc_position"]=hit["hit_position"];
       adigit["isUsed"] = 0;
 
-      _alldigits.push_back(adigit);
+      _digits.push_back(adigit);
     }  //  end for with var 'j' to loop hits
-    return _alldigits;
+    return _digits;
 }
 
 bool MapCppTrackerDigitization::check_sanity_mc(std::string document) {
@@ -185,20 +193,21 @@ bool MapCppTrackerDigitization::check_sanity_mc(std::string document) {
 }
 
 int MapCppTrackerDigitization::getTDCcounts(Json::Value ahit) {
-      assert(_configJSON.isMember("SciFivlpcTimeRes"));
-      assert(_configJSON.isMember("SciFitdcFactor"));
-      tmpcounts = CLHEP::RandGauss::shoot(ahit["time"].asDouble(),
-                                           _configJSON["SciFivlpcTimeRes"].asDouble())*
-                                           _configJSON["SciFitdcFactor"].asDouble();
+  double tmpcounts;
+  assert(_configJSON.isMember("SciFivlpcTimeRes"));
+  assert(_configJSON.isMember("SciFitdcFactor"));
+  tmpcounts = CLHEP::RandGauss::shoot(ahit["time"].asDouble(),
+                                      _configJSON["SciFivlpcTimeRes"].asDouble())*
+                                      _configJSON["SciFitdcFactor"].asDouble();
 
-      // Check for saturation of TDCs
-      assert(_configJSON.isMember("SciFitdcBits"));
-      if ( tmpcounts > pow(2.0, _configJSON["SciFitdcBits"].asDouble()) - 1.0 ) {
-        tmpcounts = pow(2.0, _configJSON["SciFitdcBits"].asDouble()) - 1.0;
-      }
+  // Check for saturation of TDCs
+  assert(_configJSON.isMember("SciFitdcBits"));
+  if ( tmpcounts > pow(2.0, _configJSON["SciFitdcBits"].asDouble()) - 1.0 ) {
+    tmpcounts = pow(2.0, _configJSON["SciFitdcBits"].asDouble()) - 1.0;
+  }
 
-      int tdcCounts = (int) floor(tmpcounts);
-      return tdcCounts;
+  int tdcCounts = (int) floor(tmpcounts);
+  return tdcCounts;
 }
 
 int MapCppTrackerDigitization::getChanNo(Json::Value ahit) {
@@ -240,48 +249,46 @@ int MapCppTrackerDigitization::getChanNo(Json::Value ahit) {
 double MapCppTrackerDigitization::getNPE(double edep) {
       // implement dead channels
       assert(_configJSON.isMember("SciFiFiberConvFactor"));
-      double nPE = _configJSON["SciFiFiberConvFactor"].asDouble() * edep;
+      double numbPE = _configJSON["SciFiFiberConvFactor"].asDouble() * edep;
 
       assert(_configJSON.isMember("SciFiFiberTrappingEff"));
-      nPE *= _configJSON["SciFiFiberTrappingEff"].asDouble();
+      numbPE *= _configJSON["SciFiFiberTrappingEff"].asDouble();
 
       assert(_configJSON.isMember("SciFiFiberMirrorEff"));
-      nPE *= ( 1.0 + _configJSON["SciFiFiberMirrorEff"].asDouble());
+      numbPE *= ( 1.0 + _configJSON["SciFiFiberMirrorEff"].asDouble());
 
       assert(_configJSON.isMember("SciFiFiberTransmissionEff"));
-      nPE *= _configJSON["SciFiFiberTransmissionEff"].asDouble();
+      numbPE *= _configJSON["SciFiFiberTransmissionEff"].asDouble();
 
       assert(_configJSON.isMember("SciFiMUXTransmissionEff"));
-      nPE *= _configJSON["SciFiMUXTransmissionEff"].asDouble();
+      numbPE *= _configJSON["SciFiMUXTransmissionEff"].asDouble();
 
       assert(_configJSON.isMember("SciFivlpcQE"));
-      nPE *= _configJSON["SciFivlpcQE"].asDouble();
+      numbPE *= _configJSON["SciFivlpcQE"].asDouble();
 
-      return nPE;
+      return numbPE;
 }
 
 int MapCppTrackerDigitization::compute_adcCounts(double numb_pe) {
-   //  Throw the dice and generate the ADC count value for the energy summed for each channel
-      assert(_configJSON.isMember("SciFivlpcEnergyRes"));
-      if ( edep == 0 ) {
-        tmpcounts = 0.;
-      } else {
-        // get adc count by generating a gaussian distribution with mean "numb_pe"
-        tmpcounts = CLHEP::RandGauss::shoot((double)numb_pe,
-                                            _configJSON["SciFivlpcEnergyRes"].asDouble());
-      }
+  double tmpcounts;
+  //  Throw the dice and generate the ADC count value for the energy summed for each channel
+  assert(_configJSON.isMember("SciFivlpcEnergyRes"));
 
-      assert(_configJSON.isMember("SciFiadcFactor"));
-      tmpcounts *= _configJSON["SciFiadcFactor"].asDouble();
+  // get adc count by generating a gaussian distribution with mean "numb_pe"
+  tmpcounts = CLHEP::RandGauss::shoot((double)numb_pe,
+                                       _configJSON["SciFivlpcEnergyRes"].asDouble());
 
-      // Check for saturation of ADCs 
-      assert(_configJSON.isMember("SciFitdcBits"));
-      if ( tmpcounts > pow(2.0, _configJSON["SciFitdcBits"].asDouble()) - 1.0 ) {
-        tmpcounts = pow(2.0, _configJSON["SciFitdcBits"].asDouble()) - 1.0;
-      }
+  assert(_configJSON.isMember("SciFiadcFactor"));
+  tmpcounts *= _configJSON["SciFiadcFactor"].asDouble();
 
-      int adcCounts = (int) floor(tmpcounts);
-      return adcCounts;
+  // Check for saturation of ADCs
+  assert(_configJSON.isMember("SciFitdcBits"));
+  if ( tmpcounts > pow(2.0, _configJSON["SciFitdcBits"].asDouble()) - 1.0 ) {
+    tmpcounts = pow(2.0, _configJSON["SciFitdcBits"].asDouble()) - 1.0;
+  }
+
+  int adcCounts = (int) floor(tmpcounts);
+  return adcCounts;
 }
 
 Json::Value MapCppTrackerDigitization::make_bundle(std::vector<Json::Value> _alldigits) {
@@ -289,7 +296,7 @@ Json::Value MapCppTrackerDigitization::make_bundle(std::vector<Json::Value> _all
   double npe;
   // pick an element of the array
   for (unsigned int digit_i = 0; digit_i < _alldigits.size(); digit_i++) {
-    if ( _alldigits[digit_i]["isUsed"] == 0 ) {
+    if ( _alldigits[digit_i]["isUsed"].asInt() == 0 ) {
       npe = _alldigits[digit_i]["number_photoelectrons"].asDouble();
       // loop over all the others
       for ( unsigned int digit_j = digit_i; digit_j < _alldigits.size(); digit_j++ ) {
@@ -326,12 +333,28 @@ bool MapCppTrackerDigitization::Check_param(Json::Value* hit1, Json::Value* hit2
   int plane2   = (*hit2)["channel_id"]["plane_number"].asInt();
   double chan1 = (*hit1)["channel_id"]["channel_number"].asDouble();
   double chan2 = (*hit2)["channel_id"]["channel_number"].asDouble();
-
+  int hit_is_used = (*hit2)["isUsed"].asInt();
+  
   // check whether the hits belong to the same tracker, station, plane and channel
   if ( tracker1 == tracker2 && station1 == station2 &&
-       plane1 == plane2 && chan1 == chan2 && !(*hit2)["isUsed"] ) {
+       plane1 == plane2 && chan1 == chan2 && !hit_is_used ) {
     return true;
   } else {
     return false;
   }
+}
+
+Json::Value MapCppTrackerDigitization::ConvertToJson (std::string jsonString) {
+  Json::Value newJson;
+  //  JsonCpp string -> JSON::Value converter
+  Json::Reader reader;
+
+  newJson = JsonWrapper::StringToJson(jsonString);
+  return newJson;
+}
+
+std::string MapCppTrackerDigitization::JsonToString(Json::Value json_in){
+  std::stringstream ss_io;
+  JsonWrapper::Print(ss_io, json_in);
+  return ss_io.str();
 }

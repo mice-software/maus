@@ -102,4 +102,7 @@ SciFinTrackers = 2
 SciFiNPECut = 2.0 # photoelectrons
 SciFiClustExcept = 100 # number of clusters per event above which an exception is thrown
 #SciFiTimeResolution = 2 # ns
-
+SciFi_sigma_tracker0_station5 = 0.4298; # mm
+SciFi_sigma_triplet = 0.3844; # mm
+SciFi_sigma_z = 0.081; # mm
+SciFi_sigma_duplet =  0.6197;# mm

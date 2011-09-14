@@ -46,7 +46,7 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
 
   double pid = aStep->GetTrack()->GetDefinition()->GetPDGEncoding();
 
-  if ( edep == 0. ) return false;
+  if ( edep == 0. || pid != 13) return false;
 
   int old_chanNo = legacy_chanNo(aStep);
 

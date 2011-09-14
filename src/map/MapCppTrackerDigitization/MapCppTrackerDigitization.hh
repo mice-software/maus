@@ -118,6 +118,14 @@ class MapCppTrackerDigitization
    */
   bool Check_param(Json::Value* hit1, Json::Value* hit2);
 
+  /** a wrapper function that converts a string to a Json Value
+  */
+  Json::Value ConvertToJson(std::string jsonString);
+
+  /** a wrapper function that converts a Json value to a string
+  */
+  std::string JsonToString(Json::Value json_in);
+
  private:
   /// This is the Mice Module
   MiceModule*      _module;
@@ -133,10 +141,6 @@ class MapCppTrackerDigitization
   Json::Value mc;
   /// a digit to be appended to the JSON file
   Json::Value digit;
-  /// a temporary object, usefull for some calculations
-  double tmpcounts;
-  /// the energy deposition of the hit is called across several functions
-  double edep;
 
   std::vector<const MiceModule*> modules;
 };  // Don't forget this trailing colon!!!!

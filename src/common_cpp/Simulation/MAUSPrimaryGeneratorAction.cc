@@ -28,6 +28,7 @@
 
 #include "src/common_cpp/Simulation/MAUSPrimaryGeneratorAction.hh"
 
+#include <time.h>
 namespace MAUS {
 
 /// Define static location of generator action
@@ -96,8 +97,8 @@ void MAUSPrimaryGeneratorAction::PGParticle::ReadJson(Json::Value particle) {
                              (particle, "momentum", JsonWrapper::objectValue);
   pid = JsonWrapper::GetProperty
                        (particle, "particle_id", JsonWrapper::intValue).asInt();
-  seed = JsonWrapper::GetProperty
-                       (particle, "random_seed", JsonWrapper::intValue).asInt();
+  seed =  floor(clock()); // JsonWrapper::GetProperty
+         //              (particle, "random_seed", JsonWrapper::intValue).asInt();
   x = JsonWrapper::GetProperty(pos, "x", JsonWrapper::realValue).asDouble();
   y = JsonWrapper::GetProperty(pos, "y", JsonWrapper::realValue).asDouble();
   z = JsonWrapper::GetProperty(pos, "z", JsonWrapper::realValue).asDouble();
