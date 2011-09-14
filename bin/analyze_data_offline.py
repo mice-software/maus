@@ -44,6 +44,9 @@ if __name__ == '__main__':
     # Check command line arguments for path to data and file name
     if len(sys.argv) == 1:
         print
+        print "WARNING: You did not pass in arguments.  I will pick"
+        print "WARNING: a run for you..."
+        print "WARNING:"
         print "WARNING: Usage: %s data_path data_file" % sys.argv[0]
         print
     elif len(sys.argv) == 3:

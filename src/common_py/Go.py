@@ -124,8 +124,8 @@ class Go:
 
         while len(map_buffer) != 0:
             print(("MAP: Processing %d events" % len(map_buffer)))
-            #self.mapper.Process(mapBuffer[0])
-            map_results = list(list(map(self.mapper.process, map_buffer)))
+
+            map_results = map(self.mapper.process, map_buffer)
             for result in map_results:
                 temp_file.write('%s\n' % result)
             map_buffer = self.buffer_input(emitter)
