@@ -21,7 +21,11 @@
 #  portions of the spill or just non-muon tracks.
 #  The tracks can take up significant amounts of space,
 #  so this is a good idea. Or you can just tell the
-#  Simulation() not to create tracks.
+#  MapCppSimulation() not to create tracks by adding the
+#  following datacard when calling Go():
+#
+#      keep_only_muon_tracks = False 
+#
 import json
 import types
 
