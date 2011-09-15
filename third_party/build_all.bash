@@ -36,12 +36,9 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     ${MAUS_ROOT_DIR}/third_party/bash/51xboas.bash
     ${MAUS_ROOT_DIR}/third_party/bash/52jsoncpp.bash
     ${MAUS_ROOT_DIR}/third_party/bash/53unpacking.bash
-<<<<<<< TREE
     ${MAUS_ROOT_DIR}/third_party/bash/xxlibxml2.bash
     ${MAUS_ROOT_DIR}/third_party/bash/xxlibxslt.bash
-=======
     ${MAUS_ROOT_DIR}/third_party/bash/60recpack.bash
->>>>>>> MERGE-SOURCE
 
 
 else
