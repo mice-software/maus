@@ -1,0 +1,36 @@
+Module TDm1152m9320moa10
+                {
+                Volume TessellatedSolid
+                PropertyString Material ALUMINUM
+                PropertyDouble BlueColour 0.75
+                PropertyDouble GreenColour 0.3
+                PropertyDouble RedColour 0.75
+                PropertyInt noOfVertices 8
+                PropertyInt noOfTFacets 12
+                PropertyInt noOfQFacets 0
+                    
+                
+                PropertyHep3Vector Vector1 60.0000 180.0950 -22.5000
+                PropertyHep3Vector Vector2 -60.0000 180.0950 -22.5000
+                PropertyHep3Vector Vector3 -60.0000 -180.0950 -22.5000
+                PropertyHep3Vector Vector4 60.0000 -180.0950 -22.5000
+                PropertyHep3Vector Vector5 60.0000 180.0950 22.5000
+                PropertyHep3Vector Vector6 60.0000 -180.0950 22.5000
+                PropertyHep3Vector Vector7 -60.0000 180.0950 22.5000
+                PropertyHep3Vector Vector8 -60.0000 -180.0950 22.5000
+                    
+                
+                PropertyString TFacet1 0 1 2
+                PropertyString TFacet2 2 3 0
+                PropertyString TFacet3 3 0 4
+                PropertyString TFacet4 4 5 3
+                PropertyString TFacet5 6 1 0
+                PropertyString TFacet6 0 4 6
+                PropertyString TFacet7 5 7 6
+                PropertyString TFacet8 6 4 5
+                PropertyString TFacet9 5 3 2
+                PropertyString TFacet10 2 7 5
+                PropertyString TFacet11 2 1 6
+                PropertyString TFacet12 6 7 2
+                    
+                

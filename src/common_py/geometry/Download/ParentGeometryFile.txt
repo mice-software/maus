@@ -1,0 +1,263 @@
+Configuration Structure_3068680
+                
+                {
+                Dimensions 15000.0 10000.0 50000.0 mm  
+                PropertyString Material AIR
+                PropertyDouble G4StepMax 5.0 mm
+                
+                Module BeamLine/TDt1152t9323toa16.dat 
+                {
+                Position 403.0000 -455.0232 -455.0232 mm
+                Rotation  0.0 0.0 0.0 deg    
+                }
+                
+                Module BeamLine/TDt1152t9323.dat 
+                {
+                Position 403.0000 455.0232 455.0232 mm
+                Rotation  0.0 0.0 0.0 deg    
+                }
+                
+                Module BeamLine/TDt1152t9323.dat 
+                {
+                Position 403.0000 455.0232 -455.0232 mm
+                Rotation  0.0 0.0 0.0 deg    
+                }
+                
+                Module BeamLine/TDt1152t9323toa15.dat 
+                {
+                Position 403.0000 -455.0232 455.0232 mm
+                Rotation  0.0 0.0 0.0 deg    
+                }
+                
+                Module BeamLine/TDt1152t9328.dat 
+                {
+                Position 0.0000 -479.0474 0.0000 mm
+                Rotation  0.0 0.0 0.0 deg    
+                }
+                
+                Module BeamLine/TDt1152t9328.dat 
+                {
+                Position 0.0000 0.0000 -479.0474 mm
+                Rotation  0.0 0.0 0.0 deg    
+                }
+                
+                Module BeamLine/TDt1152t9328.dat 
+                {
+                Position 0.0000 479.0474 0.0000 mm
+                Rotation  0.0 0.0 0.0 deg    
+                }
+                
+                Module BeamLine/TDt1152t9328.dat 
+                {
+                Position 0.0000 0.0000 479.0474 mm
+                Rotation  0.0 0.0 0.0 deg    
+                }
+                
+                Module BeamLine/TDt1152t9321.dat 
+                {
+                Position -403.0000 -482.8123 0.0000 mm
+                Rotation  0.0 0.0 0.0 deg    
+                }
+                
+                Module BeamLine/TDt1152t9321.dat 
+                {
+                Position -403.0000 482.8123 0.0000 mm
+                Rotation  0.0 0.0 0.0 deg    
+                }
+                
+                Module BeamLine/TDt1152t9321.dat 
+                {
+                Position -403.0000 -0.0000 482.8123 mm
+                Rotation  0.0 0.0 0.0 deg    
+                }
+                
+                Module BeamLine/TDt1152t9321.dat 
+                {
+                Position -403.0000 0.0000 -482.8123 mm
+                Rotation  0.0 0.0 0.0 deg    
+                }
+                
+                Module BeamLine/TDt1152t9321toa13.dat 
+                {
+                Position 403.0000 0.0000 482.8123 mm
+                Rotation  0.0 0.0 0.0 deg    
+                }
+                
+                Module BeamLine/TDt1152t9321toa12.dat 
+                {
+                Position 403.0000 0.0000 -482.8123 mm
+                Rotation  0.0 0.0 0.0 deg    
+                }
+                
+                Module BeamLine/TDt1152t9321toa11.dat 
+                {
+                Position 403.0000 -482.8123 0.0000 mm
+                Rotation  0.0 0.0 0.0 deg    
+                }
+                
+                Module BeamLine/TDt1152t9321.dat 
+                {
+                Position 403.0000 482.8123 0.0000 mm
+                Rotation  0.0 0.0 0.0 deg    
+                }
+                
+                Module BeamLine/TDt1152t9327.dat 
+                {
+                Position -0.0000 362.5000 -362.5000 mm
+                Rotation  0.0 0.0 0.0 deg    
+                }
+                
+                Module BeamLine/TDt1152t9327.dat 
+                {
+                Position -0.0000 -362.5000 362.5000 mm
+                Rotation  0.0 0.0 0.0 deg    
+                }
+                
+                Module BeamLine/TDt1152t9327.dat 
+                {
+                Position -0.0000 -362.5000 -362.5000 mm
+                Rotation  0.0 0.0 0.0 deg    
+                }
+                
+                Module BeamLine/TDt1152t9327.dat 
+                {
+                Position -0.0000 362.5000 362.5000 mm
+                Rotation  0.0 0.0 0.0 deg    
+                }
+                
+                Module BeamLine/TDt1152t9325toa18.dat 
+                {
+                Position 429.0000 0.0000 0.0000 mm
+                Rotation  0.0 0.0 0.0 deg    
+                }
+                
+                Module BeamLine/TDt1152t9325toa18.dat 
+                {
+                Position 377.0000 0.0000 0.0000 mm
+                Rotation  0.0 0.0 0.0 deg    
+                }
+                
+                Module BeamLine/TDt1152t9320toa10.dat 
+                {
+                Position 403.0000 0.0000 -702.5000 mm
+                Rotation  0.0 0.0 0.0 deg    
+                }
+                
+                Module BeamLine/TDt1152t9320toa9.dat 
+                {
+                Position 403.0000 0.0000 702.5000 mm
+                Rotation  0.0 0.0 0.0 deg    
+                }
+                
+                Module BeamLine/TDt1152t9320.dat 
+                {
+                Position 403.0000 702.5000 0.0000 mm
+                Rotation  0.0 0.0 0.0 deg    
+                }
+                
+                Module BeamLine/TDt1152t9320toa8.dat 
+                {
+                Position 403.0000 -702.5000 0.0000 mm
+                Rotation  0.0 0.0 0.0 deg    
+                }
+                
+                Module BeamLine/TDt1152t9318toa7.dat 
+                {
+                Position 15.0000 235.3275 235.3275 mm
+                Rotation  0.0 0.0 0.0 deg    
+                }
+                
+                Module BeamLine/TDt1152t9318toa6.dat 
+                {
+                Position 0.0000 -235.3275 -235.3275 mm
+                Rotation  0.0 0.0 0.0 deg    
+                }
+                
+                Module BeamLine/TDt1152t9318toa5.dat 
+                {
+                Position 15.0000 -235.3275 235.3275 mm
+                Rotation  0.0 0.0 0.0 deg    
+                }
+                
+                Module BeamLine/TDt1152t9318toa4.dat 
+                {
+                Position 15.0000 235.3275 -235.3275 mm
+                Rotation  0.0 0.0 0.0 deg    
+                }
+                
+                Module BeamLine/TDt1152t9315toa3.dat 
+                {
+                Position -403.0000 -405.1416 405.1416 mm
+                Rotation  0.0 0.0 0.0 deg    
+                }
+                
+                Module BeamLine/TDt1152t9315toa2.dat 
+                {
+                Position -403.0000 -405.1416 -405.1416 mm
+                Rotation  0.0 0.0 0.0 deg    
+                }
+                
+                Module BeamLine/TDt1152t9315.dat 
+                {
+                Position -403.0000 405.1416 -405.1416 mm
+                Rotation  0.0 0.0 0.0 deg    
+                }
+                
+                Module BeamLine/TDt1152t9315.dat 
+                {
+                Position -403.0000 405.1416 405.1416 mm
+                Rotation  0.0 0.0 0.0 deg    
+                }
+                
+                Module BeamLine/TDt1152t9314toa1.dat 
+                {
+                Position -493.0000 -0.0000 -0.0000 mm
+                Rotation  0.0 0.0 0.0 deg    
+                }
+                
+                Module BeamLine/TDt1152t9314toa0.dat 
+                {
+                Position 493.0000 0.0000 -0.0000 mm
+                Rotation  0.0 0.0 0.0 deg    
+                }
+                
+                }
+                
+                //
+
+    
+
+        
+
+        
+
+        
+
+    
+
+    
+
+        
+
+        
+
+        
+
+        
+
+        
+
+    
+
+    
+
+        
+
+        
+
+        
+
+        
+
+    
+

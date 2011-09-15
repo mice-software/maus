@@ -51,7 +51,7 @@ class Configuration:
         assert maus_root_dir != None
 
         config_dict = {}
-        defaults = open(maus_root_dir+"/src/common_py/ConfigurationDefaultsGeometry.py")
+        defaults = open(maus_root_dir+"/src/common_py/Configuration.py")
         exec(defaults, globals(), config_dict) # pylint: disable=W0122
 
         if config_file != None:
