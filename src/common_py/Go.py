@@ -61,9 +61,14 @@ class Go:
         current_dir = os.getcwd()
 
         if maus_root_dir not in current_dir:
-            print("\nWARNING: YOU ARE RUNNING MAUS OUTSIDE ITS MAUS_ROOT_DIR")
-            print(("\tMAUS_ROOT_DIR = %s" % (maus_root_dir)))
-            print(("\tCURRENT DIRECTORY = %s\n" % (current_dir)))
+            exception_string = "ERROR: "
+            exception_string = "YOU ARE RUNNING MAUS OUTSIDE ITS MAUS_ROOT_DIR."
+            exception_string += " MAUS_ROOT_DIR is %s but " % maus_root_dir
+            exception_string += "your current directory is %s" % current_dir
+
+            print("\n%s" % exception_string)
+            raise EnvironmentError('BAD MAUS_ROOT_DIR', exception_string)
+            
             
 
         self.input = arg_input
@@ -124,8 +129,8 @@ class Go:
 
         while len(map_buffer) != 0:
             print(("MAP: Processing %d events" % len(map_buffer)))
-            #self.mapper.Process(mapBuffer[0])
-            map_results = list(list(map(self.mapper.process, map_buffer)))
+
+            map_results = map(self.mapper.process, map_buffer)
             for result in map_results:
                 temp_file.write('%s\n' % result)
             map_buffer = self.buffer_input(emitter)
