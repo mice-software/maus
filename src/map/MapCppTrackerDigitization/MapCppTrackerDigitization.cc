@@ -73,7 +73,7 @@ std::string MapCppTrackerDigitization::process(std::string document) {
     // "_hits" contains all mc hits for this event 
     Json::Value _hits = particle["hits"];
 
-    std::cout << "D: Event with " << _hits.size() << " hits." << "\n";
+   // std::cout << "D: Event with " << _hits.size() << " hits." << "\n";
 
     // reset the digits array for each new event/particle
     _alldigits.clear();
@@ -84,7 +84,7 @@ std::string MapCppTrackerDigitization::process(std::string document) {
     tracker_event.clear();
     tracker_event = make_bundle(_alldigits);
 
-    std::cout << "D: Event with " << tracker_event.size() << " digits." << "\n";
+  //  std::cout << "D: Event with " << tracker_event.size() << " digits." << "\n";
 
     //Json::Value digits; think this is not necessary.....
     root["digits"].append(tracker_event);
