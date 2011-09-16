@@ -77,7 +77,7 @@ class Go:
         print(("\tProgram Arguments: %s" % str(sys.argv)))
 
         self.json_config_document = \
-                                  Configuration().getConfigJSON(arg_config_file)
+                                  Configuration().getConfigJSON(arg_config_file, True)
         json_config_dictionary = json.loads(self.json_config_document)
         map_reduce_type = json_config_dictionary['map_reduce_type']
         version = json_config_dictionary["maus_version"]
