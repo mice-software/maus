@@ -8,7 +8,7 @@ Module TrackerSolenoid1
 {
   Volume Cylinder
   Dimensions 702.0 2733.0 mm
-  PropertyHep3Vector MagneticField 0.0 0.0 0.0 tesla
+  PropertyHep3Vector MagneticField 0.0 0.0 4.0 tesla
   PropertyString Material Galactic
   PropertyBool Invisible 1
   PropertyInt KalmanSolenoid 1
