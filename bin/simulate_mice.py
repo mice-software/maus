@@ -27,19 +27,19 @@ def run(number_of_spills):
     #
     # where the file format has a JSON document per line.  I just toss the file
     # in here for simplicity.
-    input_file = io.StringIO(number_of_spills*u"""{"mc": [{"primary":{"position": { "x": 0.0, "y": -0.0, "z": -5000.0 },"particle_id" : 13,"energy" : 210.0, "random_seed" : 10, "momentum" : { "x":0.0, "y":0.0, "z":1.0 }, "time" : 0.0}}]}\n""") # pylint: disable=C0301  
+    input_file = io.StringIO(number_of_spills*u"""{"mc": []}\n""") # pylint: disable=C0301  
 
     my_input = MAUS.InputPyJSON(input_file)
 
     # Create an empty array of mappers, then populate it
     # with the functionality you want to use.
     my_map = MAUS.MapPyGroup()
-    my_map.append(MAUS.MapCppBeamMaker()) # beam construction
+    my_map.append(MAUS.MapPyBeamMaker()) # beam construction
     my_map.append(MAUS.MapCppSimulation())  #  geant4 simulation
     my_map.append(MAUS.MapCppTOFDigitization())  #  TOF electronics model
-    my_map.append(MAUS.MapCppTrackerDigitization())  #   SCiFi electronics model
+    my_map.append(MAUS.MapCppTrackerDigitization())  # SciFi electronics model
 
-    datacards = io.StringIO(u"keep_tracks = False")
+    datacards = io.StringIO(u"")
     #  You may specify datacards if you wish.  To do so you create a file object
     #  which can either be a StringIO object or a native python file.  If you
     #  want to store your datacards in a file 'datacards.dat' then uncomment:
