@@ -271,6 +271,8 @@ double MapCppTrackerDigitization::getNPE(double edep) {
 
 int MapCppTrackerDigitization::compute_adcCounts(double numb_pe) {
   double tmpcounts;
+  if ( numb_pe == 0 ) return 0;
+
   //  Throw the dice and generate the ADC count value for the energy summed for each channel
   assert(_configJSON.isMember("SciFivlpcEnergyRes"));
 

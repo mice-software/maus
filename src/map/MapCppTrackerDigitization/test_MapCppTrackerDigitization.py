@@ -93,12 +93,12 @@ class MapCppTrackerDigitizationTestCase(unittest.TestCase):
     def test_computeADC(self): #Test the compute_adcCounts function
         numb_pe = 0
         edep = 0
-        self.assertEqual(self.mapper.compute_adcCounts(numb_pe, edep), 0)
+        self.assertEqual(self.mapper.compute_adcCounts(numb_pe),0)
         edep = random.uniform(0, 200) #Generate a random value for edep
         numb_peNZ = random.uniform(0, 30) #Generate a random value for numb_peNZ
         #Expect the generated ADC count to be greater or equal to 0 and less than or equal to 256
-        self.assertTrue((self.mapper.compute_adcCounts(numb_peNZ, edep) <= 256) | (self.mapper.compute_adcCounts(numb_peNZ,edep) >= 0)) 
-        print "Generate ADC count is:", self.mapper.compute_adcCounts(numb_peNZ, edep)
+        self.assertTrue((self.mapper.compute_adcCounts(numb_peNZ) <= 256) | (self.mapper.compute_adcCounts(numb_peNZ) >= 0)) 
+        print "Generate ADC count is:", self.mapper.compute_adcCounts(numb_peNZ)
         
     def test_makeBundle(self): #Test make_bundle function
         testlist1 = []
