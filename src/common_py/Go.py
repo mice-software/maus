@@ -62,8 +62,8 @@ class Go:
 
         if maus_root_dir not in current_dir:
             print("\nWARNING: YOU ARE RUNNING MAUS OUTSIDE ITS MAUS_ROOT_DIR")
-            print(("\tMAUS_ROOT_DIR = %s" % (maus_root_dir)))
-            print(("\tCURRENT DIRECTORY = %s\n" % (current_dir)))
+            print("WARNING:\tMAUS_ROOT_DIR = %s" % (maus_root_dir))
+            print("WARNING:\tCURRENT DIRECTORY = %s\n" % (current_dir))
             
 
         self.input = arg_input
