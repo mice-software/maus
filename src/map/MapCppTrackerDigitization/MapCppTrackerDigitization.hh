@@ -119,10 +119,12 @@ class MapCppTrackerDigitization
   bool Check_param(Json::Value* hit1, Json::Value* hit2);
 
   /** a wrapper function that converts a string to a Json Value
+   * Introduced for testing purposes.
   */
   Json::Value ConvertToJson(std::string jsonString);
 
   /** a wrapper function that converts a Json value to a string
+   * Introduced for testing purposes.
   */
   std::string JsonToString(Json::Value json_in);
 
@@ -141,7 +143,7 @@ class MapCppTrackerDigitization
   Json::Value mc;
   /// a digit to be appended to the JSON file
   Json::Value digit;
-
+  /// an array contaning all MiceModules
   std::vector<const MiceModule*> modules;
 };  // Don't forget this trailing colon!!!!
 

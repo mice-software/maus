@@ -112,17 +112,7 @@ class MapCppTrackerDigitizationTestCase(unittest.TestCase):
                             "fiber_number": 750,
                             "channel_number": 77
                             },
-                        "true_mom": {
-                            "y": -1.902576503668894, 
-                            "x": 23.42979974447424, 
-                            "z": 149.5779364814894
-                            },
                         "time": 100,
-                        "mc_position": { 
-                            "y": -10.88859959922152, 
-                            "x": -19.00686266219806, 
-                            "z": -4650.554758310462
-                            },
                         "isUsed": 0
                         }"""
         test1 = self.mapper.ConvertToJson(testJson1)

@@ -46,8 +46,8 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
 
   double pid = aStep->GetTrack()->GetDefinition()->GetPDGEncoding();
 
-  if ( edep == 0. || pid != 13) return false;
-
+  if ( edep == 0. ) return false;
+  // the old chanNo, held for comparison
   int old_chanNo = legacy_chanNo(aStep);
 
   int hit_i = _hits.size();
@@ -59,26 +59,25 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
   G4ThreeVector Mom = aStep->GetTrack()->GetMomentum();        // true momentum
 
   Json::Value channel_id;
-  channel_id["type"]             = "Tracker";
-  channel_id["fiber_number"]     = fiberNumber;
+  channel_id["type"]           = "Tracker";
+  channel_id["fiber_number"]   = fiberNumber;
   channel_id["tracker_number"] = _module->propertyInt("Tracker");
   channel_id["station_number"] = _module->propertyInt("Station");
   channel_id["plane_number"]   = _module->propertyInt("Plane");
 
   _hits[hit_i]["channel_id"] = channel_id;
-  _hits[hit_i]["track_id"] = aStep->GetTrack()->GetTrackID();
-  _hits[hit_i]["energy"]  = aStep->GetTrack()->GetTotalEnergy();
-  _hits[hit_i]["charge"]  =  aStep->GetTrack()->GetDefinition()->GetPDGCharge();
-  _hits[hit_i]["pid"] = pid;
-  _hits[hit_i]["mass"]= aStep->GetTrack()->GetDefinition()->GetPDGMass();
-  _hits[hit_i]["time"]= aStep->GetPreStepPoint()->GetGlobalTime();
+  _hits[hit_i]["track_id"]   = aStep->GetTrack()->GetTrackID();
+  _hits[hit_i]["energy"]     = aStep->GetTrack()->GetTotalEnergy();
+  _hits[hit_i]["charge"]     = aStep->GetTrack()->GetDefinition()->GetPDGCharge();
+  _hits[hit_i]["pid"]        = pid;
+  _hits[hit_i]["time"]       = aStep->GetPreStepPoint()->GetGlobalTime();
   _hits[hit_i]["energy_deposited"] = edep;
-  _hits[hit_i]["momentum"]["x"]=Mom.x();
-  _hits[hit_i]["momentum"]["y"]=Mom.y();
-  _hits[hit_i]["momentum"]["z"]=Mom.z();
-  _hits[hit_i]["hit_position"]["x"]=Pos.x();
-  _hits[hit_i]["hit_position"]["y"]=Pos.y();
-  _hits[hit_i]["hit_position"]["z"]=Pos.z();
+  _hits[hit_i]["momentum"]["x"]    = Mom.x();
+  _hits[hit_i]["momentum"]["y"]    = Mom.y();
+  _hits[hit_i]["momentum"]["z"]    = Mom.z();
+  _hits[hit_i]["position"]["x"]= Pos.x();
+  _hits[hit_i]["position"]["y"]= Pos.y();
+  _hits[hit_i]["position"]["z"]= Pos.z();
 
   int chanNo;
   int numbFibres = 7*2*(_module->propertyDouble("CentralFibre")+0.5);
