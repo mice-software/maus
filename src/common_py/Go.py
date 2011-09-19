@@ -46,8 +46,8 @@ class Go:
       - native single-threaded python
     """
 
-    def __init__(self, arg_input, arg_mapper, arg_reducer, \
-                 arg_output, arg_config_file = None): # pylint: disable=R0201
+    def __init__(self, arg_input, arg_mapper, arg_reducer,  # pylint: disable=R0913,C0301
+                 arg_output, arg_config_file = None):
         """
         Initialise the configuration dictionary, input, mapper, reducer and
         output
@@ -125,7 +125,7 @@ class Go:
         while len(map_buffer) != 0:
             print(("MAP: Processing %d events" % len(map_buffer)))
 
-            map_results = map(self.mapper.process, map_buffer)
+            map_results = map(self.mapper.process, map_buffer)  # pylint: disable=W0141,C0301
             for result in map_results:
                 temp_file.write('%s\n' % result)
             map_buffer = self.buffer_input(emitter)
@@ -179,9 +179,13 @@ class Go:
         self.output.death()
             
 
-    def buffer_input(self, the_emitter):
+    def buffer_input(self, the_emitter):  # pylint: disable=R0201
+        """
+        Buffer the input stream by only reading the first
+        1024 spills into memory.  Returns an array of spills.
+        """
         my_buffer = []
-        for i in range(1024):
+        for i in range(1024):  # pylint: disable=W0612
             try:
                 value = next(the_emitter)  
                 my_buffer.append(value.encode('ascii'))
