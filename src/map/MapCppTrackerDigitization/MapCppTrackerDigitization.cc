@@ -141,10 +141,10 @@ std::vector<Json::Value> MapCppTrackerDigitization::make_all_digits(Json::Value 
       adigit["channel_id"] = hit["channel_id"];
       // introducing the Channel Number calculated from the fibre number
       adigit["channel_id"]["channel_number"]=chanNo;
-	adigit["memory"] = j;
-     // adigit["true_mom"] = hit["momentum"];
+	//adigit["memory"] = j;
+      adigit["true_mom"] = hit["momentum"];
       adigit["time"] = hit["time"];
-     // adigit["mc_position"]=hit["hit_position"];
+      adigit["mc_position"]=hit["position"];
       adigit["isUsed"] = 0;
 
       _digits.push_back(adigit);
