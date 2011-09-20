@@ -72,8 +72,6 @@ class SciFiPlaneTest : public ::testing::Test {
 };
 
 TEST_F(SciFiPlaneTest, Test_num_fibres_in_all_planes) {
-  std::vector<const MiceModule*> modules;
-  MiceModule*      _module;
   std::string filename;
   filename = "Stage6.dat";
 
@@ -82,6 +80,8 @@ TEST_F(SciFiPlaneTest, Test_num_fibres_in_all_planes) {
       for ( int planeNo = 0; planeNo < 3; planeNo++ ) {
         // finding the module here is time consuming...
         // but if it is done outside the for loops, we hit a seg fault (eventually).
+        std::vector<const MiceModule*> modules;
+        MiceModule*      _module;
         _module = new MiceModule(filename);
         modules = _module->findModulesByPropertyString("SensitiveDetector", "SciFi");
         const MiceModule* this_plane = NULL;
@@ -109,6 +109,11 @@ TEST_F(SciFiPlaneTest, Test_num_fibres_in_all_planes) {
           EXPECT_EQ(SciFiPlane::SciFi_numFibres, 214*7);
         if ( planeNo == 1 && !(trackerNo == 0 && stationNo == 5) )
           EXPECT_EQ(SciFiPlane::SciFi_numFibres, 212*7);
+
+        modules.clear();
+        delete _module;
+        delete this_plane;
+        delete aplane;
       }
     }
   }
