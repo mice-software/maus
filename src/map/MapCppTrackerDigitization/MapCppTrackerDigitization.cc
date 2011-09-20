@@ -308,7 +308,7 @@ Json::Value MapCppTrackerDigitization::make_bundle(std::vector<Json::Value> _all
       digit["number_photoelectrons"] = npe;
       digit["channel_id"] = _alldigits[digit_i]["channel_id"];
       digit["mc_position"] = _alldigits[digit_i]["mc_position"];
-      assert(_alldigits[digit_i].isMember("true_mom"));
+      //assert(_alldigits[digit_i].isMember("true_mom"));
       digit["true_mom"] = _alldigits[digit_i]["true_mom"];
       digit["time"] = _alldigits[digit_i]["time"];
       digit["adc_counts"] = compute_adcCounts(npe);
