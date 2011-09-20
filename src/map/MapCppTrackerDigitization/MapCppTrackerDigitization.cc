@@ -307,9 +307,9 @@ Json::Value MapCppTrackerDigitization::make_bundle(std::vector<Json::Value> _all
       digit["tdc_counts"] = _alldigits[digit_i]["tdc_counts"];
       digit["number_photoelectrons"] = npe;
       digit["channel_id"] = _alldigits[digit_i]["channel_id"];
-     // digit["mc_position"] = _alldigits[digit_i]["mc_position"];
-     // assert(_alldigits[digit_i].isMember("true_mom"));
-     // digit["true_mom"] = _alldigits[digit_i]["true_mom"];
+      digit["mc_position"] = _alldigits[digit_i]["mc_position"];
+      assert(_alldigits[digit_i].isMember("true_mom"));
+      digit["true_mom"] = _alldigits[digit_i]["true_mom"];
       digit["time"] = _alldigits[digit_i]["time"];
       digit["adc_counts"] = compute_adcCounts(npe);
       tracker_event.append(digit);
