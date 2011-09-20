@@ -29,6 +29,8 @@
 #include <algorithm>
 #include <fstream>
 
+#include "Interface/Squeal.hh"
+
 /** Identifier for a single DAQ channel.
  * This class is used to hold and manage all the information needed
  * to identifiy one DAQ Channel.
@@ -40,13 +42,16 @@ class DAQChannelKey {
 
   DAQChannelKey(int l, int g, int ch, int e, std::string d)
   :_ldcId(l), _geo(g), _channel(ch), _eqType(e), _detector(d) {}
+  
+  DAQChannelKey(std::string keyStr) throw(Squeal);
+
   virtual ~DAQChannelKey() {}
 
   bool operator==( DAQChannelKey key );
   bool operator!=( DAQChannelKey key );
 
   friend std::ostream& operator<< ( std::ostream& stream, DAQChannelKey key );
-  friend std::istream& operator>> ( std::istream& stream, DAQChannelKey &key );
+  friend std::istream& operator>> ( std::istream& stream, DAQChannelKey &key )  throw(Squeal);
 
   std::string detector() {return _detector;}
 
@@ -110,6 +115,13 @@ class DAQChannelMap {
  * \return The key of the DAQ channel.
  */
   DAQChannelKey* find(int ldc, int geo, int ch, int eqType);
+  
+ /** Return pointer to the key.
+ * This function returns pointer to the key for the required DAQ channel.
+ * \param[in] daqKeyStr the required key coded as string.
+ * \return The key of the DAQ channel.
+ */  
+  DAQChannelKey* find(std::string daqKeyStr);
 
   /// Return the name of the detectro conected to this DAQ channel.
   std::string detector(int ldc, int geo, int ch, int eqType);

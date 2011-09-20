@@ -141,9 +141,9 @@ bool InputCppRealData::birth(std::string jsonDataCards) {
     _vLSBFragmentProc = new VLSBDataProcessor();
     _vLSBFragmentProc->set_DAQ_map(&_map);
     
-    _dataProcessManager.SetFragmentProc("VLSB", _vLSBFragmentProc);
+    _dataProcessManager.SetFragmentProc("VLSB_C", _vLSBFragmentProc);
   } else {
-    this->disableEquipment("VLSB");
+    this->disableEquipment("VLSB_C");
   }
 
 

@@ -42,7 +42,7 @@ bool MapCppTOFReconstruction::birth(string argJsonConfigDocument) {
 }
 
 bool MapCppTOFReconstruction::death() {
-	cout << "MapCppTOFReconstruction::death" << endl;
+  cout << "MapCppTOFReconstruction::death" << endl;
 
   return true;
 }

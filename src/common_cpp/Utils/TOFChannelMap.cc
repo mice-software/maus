@@ -28,50 +28,137 @@ TOFChannelMap::~TOFChannelMap() {
   _tofKey.resize(0);
 }
 
-void TOFChannelMap::InitFromFile(string filename) {
+bool TOFChannelMap::InitFromFile(string filename) {
   ifstream stream(filename.c_str());
+  
   if ( !stream ) {
-    cerr << "Can't open TOF cabling file " << filename << endl;
-    exit(1);
+    Squeak::mout(Squeak::error) << "Error in TOFChannelMap::InitFromFile. Can't open TOF cabling file " << filename << endl;
+    return false;
   }
-	stringstream key_s;
-	TOFChannelKey* tofkey;
-	DAQChannelKey* tdckey;
-	DAQChannelKey* fadckey;
 
-  while (!stream.eof()) {
-		tofkey = new TOFChannelKey();
-		tdckey = new DAQChannelKey();
-		fadckey = new DAQChannelKey();
-		stream >> *tofkey >> *fadckey >> *tdckey;
-		_tofKey.push_back(tofkey);
-		_tdcKey.push_back(tdckey);
-		_fadcKey.push_back(fadckey);
-	}
+  TOFChannelKey* tofkey;
+  DAQChannelKey* tdckey;
+  DAQChannelKey* fadckey;
+
+  try {
+    while (!stream.eof()) {
+      tofkey = new TOFChannelKey();
+      tdckey = new DAQChannelKey();
+      fadckey = new DAQChannelKey();
+      stream >> *tofkey >> *fadckey >> *tdckey;
+      _tofKey.push_back(tofkey);
+      _tdcKey.push_back(tdckey);
+      _fadcKey.push_back(fadckey);
+    }
+  } catch(Squeal e) {
+    Squeak::mout(Squeak::error) << "Error in TOFChannelMap::InitFromFile. Error during loading." << std::endl;
+    return false;
+  }
+
+  if(_tofKey.size()==0){
+    Squeak::mout(Squeak::error) << "Error in TOFChannelMap::InitFromFile. Nothing is loaded. "  << std::endl;
+    return false;
+  }
+
+  return true;
 }
 
 void TOFChannelMap::InitFromCDB() {}
 
-TOFChannelKey* TOFChannelMap::find(DAQChannelKey *daqch) {
-	if (daqch->eqType() == 102)
-	for (unsigned int i = 0;i < _tofKey.size();i++)
-    if ( _tdcKey[i]->ldc()     == daqch->ldc() &&
-        _tdcKey[i]->geo()     == daqch->geo() &&
-        _tdcKey[i]->channel() == daqch->channel() ) {
-      return _tofKey[i];
+TOFChannelKey* TOFChannelMap::find(DAQChannelKey *daqKey) {
+  if (daqKey->eqType() == 102)
+    for (unsigned int i = 0;i < _tofKey.size();i++) {
+      if ( _tdcKey[i]->ldc()     == daqKey->ldc() &&
+           _tdcKey[i]->geo()     == daqKey->geo() &&
+           _tdcKey[i]->channel() == daqKey->channel() ) {
+        return _tofKey[i];
+      }
     }
 
-	if (daqch->eqType() == 120)
-	for (unsigned int i = 0;i < _tofKey.size();i++)
-    if ( _fadcKey[i]->ldc()     == daqch->ldc() &&
-        _fadcKey[i]->geo()     == daqch->geo() &&
-        _fadcKey[i]->channel() == daqch->channel() ) {
-      return _tofKey[i];
+  if (daqKey->eqType() == 120)
+    for (unsigned int i = 0;i < _tofKey.size();i++) {
+      if ( _fadcKey[i]->ldc()     == daqKey->ldc() &&
+           _fadcKey[i]->geo()     == daqKey->geo() &&
+           _fadcKey[i]->channel() == daqKey->channel() ) {
+        return _tofKey[i];
+      }
     }
+    
+  return NULL;
+}
+
+TOFChannelKey* TOFChannelMap::find(std::string daqKeyStr) {
+  DAQChannelKey xDaqKey;
+  stringstream xConv;
+  try {
+    xConv << daqKeyStr;
+    xConv >> xDaqKey;
+  }catch(Squeal e) {
+    throw(Squeal(Squeal::recoverable,
+                 std::string("corrupted DAQ Channel Key"),
+                 "TOFChannelMap::find(std::string)"));
+  }
+  TOFChannelKey* xTofKey = find(&xDaqKey);
+  return xTofKey;
+}
+
+DAQChannelKey* TOFChannelMap::findfAdcKey(std::string tdcKeyStr) {
+  DAQChannelKey xDaqKey;
+  stringstream xConv;
+  try {
+    xConv << tdcKeyStr;
+    xConv >> xDaqKey;
+  }catch(Squeal e) {
+    throw(Squeal(Squeal::recoverable,
+                 std::string("corrupted DAQ Channel Key"),
+                 "TOFChannelMap::findfAdcKey(std::string)"));
+  }
+  
+  if (xDaqKey.eqType() == 102) {
+    for (unsigned int i = 0;i < _tofKey.size();i++) {
+      if ( *(_tdcKey[i]) == xDaqKey ) {
+        return _fadcKey[i];
+      }
+    }    
+  }
+  return NULL;  
+}
+
+DAQChannelKey* TOFChannelMap::findTdcKey(std::string adcKeyStr) {
+  DAQChannelKey xDaqKey;
+  stringstream xConv;
+  try {
+    xConv << adcKeyStr;
+    xConv >> xDaqKey;
+  }catch(Squeal e) {
+    throw(Squeal(Squeal::recoverable,
+                 std::string("corrupted DAQ Channel Key"),
+                 "TOFChannelMap::findTdcKey(std::string)"));
+  }
+  
+  if (xDaqKey.eqType() == 120) {  
+    for (unsigned int i = 0;i < _tofKey.size();i++) {
+      if ( *(_fadcKey[i])     == xDaqKey ) {
+        return _tdcKey[i];
+      }
+    }  
+  }
   return NULL;
 }
 
 //////////////////////////////////////////////////////////////////////////
+
+TOFChannelKey::TOFChannelKey(string keyStr) throw(Squeal) {
+  std::stringstream xConv;
+  try {
+    xConv << keyStr;
+    xConv >> (*this);
+  }catch(Squeal e) {
+    throw(Squeal(Squeal::recoverable,
+                 std::string("corrupted TOF Channel Key"),
+                 "TOFChannelKey::TOFChannelKey(std::string)"));
+  }
+}
 
 bool TOFChannelKey::operator==( TOFChannelKey const key ) {
   if ( _station == key._station &&
@@ -79,7 +166,7 @@ bool TOFChannelKey::operator==( TOFChannelKey const key ) {
        _slab == key._slab &&
        _pmt == key._pmt &&
        _detector == key._detector) {
-		return true;
+    return true;
   } else {
     return false;
   }
@@ -91,31 +178,38 @@ bool TOFChannelKey::operator!=( TOFChannelKey const key ) {
        _slab == key._slab &&
        _pmt == key._pmt &&
        _detector == key._detector) {
-		return false;
+    return false;
   } else {
     return true;
   }
 }
 
 ostream& operator<<( ostream& stream, TOFChannelKey key ) {
-	stream << "TOFChannelKey " << key._station;
-	stream << " " << key._plane;
-	stream << " " << key._slab;
-	stream << " " << key._pmt;
-	stream << " " << key._detector;
-	return stream;
+  stream << "TOFChannelKey " << key._station;
+  stream << " " << key._plane;
+  stream << " " << key._slab;
+  stream << " " << key._pmt;
+  stream << " " << key._detector;
+  return stream;
 }
 
-istream& operator>>( istream& stream, TOFChannelKey &key ) {
-	string xLabel;
-	stream >> xLabel >> key._station >> key._plane >> key._slab >> key._pmt >> key._detector;
-	return stream;
+istream& operator>>( istream& stream, TOFChannelKey &key ) throw(Squeal) {
+  string xLabel;
+  stream >> xLabel >> key._station >> key._plane >> key._slab >> key._pmt >> key._detector;
+
+  if(xLabel!="TOFChannelKey") {
+    throw(Squeal(Squeal::recoverable,
+                 std::string("corrupted TOF Channel Key"),
+                 "istream& operator>>(istream& stream, TOFChannelKey)"));
+  }
+
+  return stream;
 }
 
 string TOFChannelKey::str() {
-	stringstream xConv;
-	xConv << (*this);
-	return xConv.str();
+  stringstream xConv;
+  xConv << (*this);
+  return xConv.str();
 }
 
 

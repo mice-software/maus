@@ -20,6 +20,18 @@
 
 ////////////////////////////////////////////////////////////
 
+DAQChannelKey::DAQChannelKey(std::string keyStr) throw(Squeal) {
+  std::stringstream xConv;
+  try {
+    xConv << keyStr;
+    xConv >> (*this);
+  }catch(Squeal e) {
+    throw(Squeal(Squeal::recoverable,
+                 std::string("corrupted DAQ Channel Key"),
+                 "DAQChannelKey::DAQChannelKey(std::string)"));
+  }
+}
+
 bool DAQChannelKey::operator== ( DAQChannelKey const key ) {
   if ( _ldcId == key._ldcId &&
        _geo == key._geo &&
@@ -53,9 +65,15 @@ std::ostream& operator<<( std::ostream& stream, const DAQChannelKey key ) {
   return stream;
 }
 
-std::istream& operator>>( std::istream& stream, DAQChannelKey &key ) {
+std::istream& operator>>( std::istream& stream, DAQChannelKey &key ) throw(Squeal) {
   std::string xLabel;
   stream >> xLabel >> key._ldcId >> key._geo >> key._channel >> key._eqType >> key._detector;
+
+  if(xLabel!="DAQChannelKey") {
+    throw(Squeal(Squeal::recoverable,
+                 std::string("corrupted DAQ Channel Key"),
+                 "istream& operator>>(istream& stream, DAQChannelKey)"));
+  }
   return stream;
 }
 
@@ -77,19 +95,25 @@ DAQChannelMap::~DAQChannelMap() {
 bool DAQChannelMap::InitFromFile(std::string filename) {
   std::ifstream stream(filename.c_str());
   if ( !stream ) {
-    Squeak::mout(Squeak::error) << "Can't DAQ open cabling file. " << filename << std::endl;
+    Squeak::mout(Squeak::error) << "Error in DAQChannelMap::InitFromFile. Can't DAQ open cabling file. " << filename << std::endl;
     return false;
   }
   std::stringstream key_s;
   DAQChannelKey* key;
 
-  while ( !stream.eof() ) {
-    key = new DAQChannelKey();
-    stream >> *key;
-    _chKey.push_back(key);
+  try {
+    while ( !stream.eof() ) {
+      key = new DAQChannelKey();
+      stream >> *key;
+      _chKey.push_back(key);
+    }
+  }catch(Squeal e) {
+    Squeak::mout(Squeak::error) << "Error in DAQChannelMap::InitFromFile. Error during loading." << std::endl;
+    return false;
   }
+
   if(_chKey.size()==0){
-    Squeak::mout(Squeak::error) << "No DAQ Channel Keys loaded. " << filename << std::endl;
+    Squeak::mout(Squeak::error) << "Error in DAQChannelMap::InitFromFile. No DAQ Channel Keys loaded. "  << std::endl;
     return false;
   }
   return true;
@@ -107,6 +131,21 @@ DAQChannelKey* DAQChannelMap::find(int ldc, int geo, int ch, int eqType) {
       return _chKey[i];
 
   return NULL;
+}
+
+DAQChannelKey* DAQChannelMap::find(std::string daqKeyStr) {
+  DAQChannelKey xKey;
+  std::stringstream xKeyConv;
+  try {
+    xKeyConv << daqKeyStr;
+    xKeyConv >> xKey;
+  }catch(Squeal e) {
+    throw(Squeal(Squeal::recoverable,
+                 std::string("corrupted DAQ Channel Key"),
+                 "DAQChannelKey::DAQChannelKey(std::string)"));
+  }
+  
+  return find(xKey.ldc(), xKey.geo(), xKey.channel(), xKey.eqType());
 }
 
 std::string DAQChannelMap::detector(int ldc, int geo, int ch, int eqType) {
