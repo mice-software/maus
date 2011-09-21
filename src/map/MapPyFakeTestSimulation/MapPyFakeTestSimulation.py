@@ -28,13 +28,14 @@ import os
 
 class MapPyFakeTestSimulation:
     def birth(self, configJSON):
+        """ Setting env variables and prototype json file """
         config = json.loads(configJSON)
  
         root_dir = os.environ.get("MAUS_ROOT_DIR")
         assert root_dir != None
         assert os.path.isdir(root_dir)
 
-        self._filename = '%s/src/map/MapPyFakeTestSimulation/mausput_digits'  % root_dir
+        self._filename = '%s/src/map/MapPyFakeTestSimulation/mausput_digits'
         assert os.path.isfile(self._filename)
 
         self._file = open(self._filename, 'r')
@@ -44,8 +45,10 @@ class MapPyFakeTestSimulation:
         return True
 
     def process(self, str):
+        """ The process """
         return self._document
 
     def death(self):
+        """ Destructor """
         return True
 
