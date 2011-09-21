@@ -29,7 +29,7 @@ import os
 class MapPyFakeTestSimulation:
     def birth(self, configJSON):
         config = json.loads(configJSON)
-        
+ 
         root_dir = os.environ.get("MAUS_ROOT_DIR")
         assert root_dir != None
         assert os.path.isdir(root_dir)
@@ -40,7 +40,7 @@ class MapPyFakeTestSimulation:
         self._file = open(self._filename, 'r')
         self._document = self._file.readline().rstrip()
         self._file.close()
-        
+
         return True
 
     def process(self, str):
