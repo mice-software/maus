@@ -131,7 +131,6 @@ private:
 	BTFieldGroup * _magneticField;
 	BTFieldGroup * _electroMagneticField;
 	//Tell the Phaser where to go to set the phase
-	void SetPhaser() {BTPhaser::SetGlobalField(this, _needsPhases);}
 	bool                           _needsPhases;
 	static       std::string       _defaultSolenoidMode;
 	static const std::string       _fieldTypes[];

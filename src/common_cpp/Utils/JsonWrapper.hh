@@ -34,6 +34,8 @@
 
 #include "json/json.h"
 
+#include "CLHEP/Vector/ThreeVector.h"
+
 #include "Interface/STLUtils.hh"
 #include "Interface/Squeal.hh"
 
@@ -70,8 +72,8 @@ class JsonWrapper {
 
   /** @brief Get an item from a Json array (variable length array)
    *
-   *  @param value_list array of values from which we want to get a value
-   *  @param value_index index of the value we want to get
+   *  @param array array of values from which we want to get a value
+   *  @param value_index index of the value in the array
    *  @param value_type type of the value we want to get
    *
    *  Returns the Json::Value on success. Throws an exception of type Squeal on
@@ -82,10 +84,9 @@ class JsonWrapper {
 
   /** @brief Get a property from a Json object (hash)
    *
-   *  @param parent the Json data tree
-   *  @param branch_type enumeration holding the name of the branch you want
-   *  @param max_depth maximum depth to search for the branch. Set to negative
-   *                   to search the whole tree.
+   *  @param object the Json data tree
+   *  @param value_name name of the branch we want to get
+   *  @param value_type type of the value we want to get
    *
    *  Attempt to access a branch from Json. If the branch is not found, throw a
    *  Squeal.
@@ -94,6 +95,14 @@ class JsonWrapper {
      (Json::Value object, std::string value_name,
                           JsonType value_type) throw(Squeal);
 
+
+  /** @brief Convert from a json three vector to a CLHEP three vector
+   *
+   *  @param json_vec objectValue with realValue children "x", "y", "z". Throws
+   *         an exception if the conversion fails.
+   */
+  static CLHEP::Hep3Vector JsonToThreeVector
+                                       (Json::Value json_vec) throw(Squeal);
 
   /** @brief Convert from Json::ValueType to JsonType
    */
@@ -106,6 +115,13 @@ class JsonWrapper {
   /** @brief Return true if types are equal or anyValue
    */
   static bool SimilarType(JsonType jt1, JsonType jt2);
+
+  /** @brief Print the Json value to an ostream
+   *
+   *  Prints in json format to ostream out; so if passed to a stringstream, then
+   *  StringToJson should read back in with no change
+   */
+  static void Print(std::ostream& out, const Json::Value& val);
 
  private:
   JsonWrapper();

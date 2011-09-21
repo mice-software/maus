@@ -1,3 +1,62 @@
+MAUS-v0.0.6 (http://micewww.pp.rl.ac.uk/versions/show/14)
+  Bug #563: Installation of Maus
+  Bug #599: root build fails when conflicting python2.7 already installed
+  Bug #604: Maus installation on Fedora 15 - 64 bit
+  Bug #613: Root not being installed
+  Feature #291: digitization cleanup: create value getting function
+  Feature #356: Implement G4 inline visualisation
+
+MAUS-v0.0.5 (http://micewww.pp.rl.ac.uk/versions/show/12)
+  Bug #574: doxygen on webserver not updating
+  Bug #607: Simulation runs too slow
+  Bug #611: maus_per_commit_gcc bzr lock as root
+  Feature #155: bzr doesn't support natively keywords
+  Feature #409: Simulation update
+  Feature #605: Extra compile flags controlled by env variables
+  Feature #606: Automatic generation of documentation from json schema
+
+MAUS-v0.0.4 (http://micewww.pp.rl.ac.uk/versions/show/11)
+  Bug #536: Trunk broken
+	Bug #537: Segmentation fault in SciFiSD
+	Bug #565: pylint checks traverse swig auto-generated python
+	Bug #566: Memory leak?
+	Feature #519: Release 0.0.3
+	Feature #567: SpecialVirtual detectors
+	Feature #579: Move to next XBOA version
+
+MAUS-v0.0.3 (http://micewww.pp.rl.ac.uk/versions/show/9)
+  Bug #328: No page number in MiceMods doc
+	Bug #334: energy deposited when no energy deposited in tracker special detector
+	Bug #388: Mice_Module-2-4-1.pdf does not document Volume Type "Sphere"
+	Bug #434: Root build fails on ubuntu 11.04
+	Bug #436: Missing documentation for mice-2-4-1
+	Bug #452: Flash ADC samples increase datastructure size; slow to write to disk again
+	Bug #468: indents and hardcoded homedir path in src/core/common/check_sync.py
+	Bug #470: unpacker fails with GCC 4.5.2 (or rather modern Ubuntu Linux)
+	Bug #472: MAUSPrimaryGeneratorAction fails to set the time
+	Bug #473: Instability in MAUSSteppingActionTest
+	Bug #501: SciFiSD creates fake hits
+	Bug #502: uint to unsigned int for Mac compatability
+	Bug #516: simulate_mice.py makes spurious mangled mausput.gz
+	Feature #31: Some Code infrastructure questions
+	Feature #302: every process should maybe have a 'key' to split detector/accelerator stuff
+	Feature #347: Split Interface into sub domains
+	Feature #351: RF Cavity phasing
+	Feature #352: Optics code
+	Feature #385: Filter for pylint
+	Feature #418: Convert file endings to cc hh
+	Feature #442: review coverity information
+	Feature #457: Cpp exception interface with python
+	Feature #474: Redo merge of MAUS code and legecay G4MICE code
+	Feature #494: Dead code purge of src/common
+	Feature #495: Disclaimer in src/common area for legacy code
+	Feature #496: Updated directory structure
+	Feature #503: Verbosity datacard
+	Feature #520: Clarify some names: RealData, etc.
+	Support #433: Code review for MiceModuleConfigDB stuff
+	Support #444: "Property momentum not found in Json object lookup"
+	Support #497: Memory allocation failed in MDdateFile
+
 MAUS-v0.0.2 (http://micewww.pp.rl.ac.uk/versions/show/6):
   Bug #437: missing test coverage
   Bug #448: scons does not clean properly some changes

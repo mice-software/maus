@@ -7,15 +7,15 @@ Configuration Test
 {
   Dimensions 1. 1. 1. m
   PropertyString Material Galactic
-  PropertyDouble G4StepMax 1.0 mm
+  PropertyDouble G4StepMax 100.0 mm
   Module Box
   {
     PropertyHep3Vector Position 0. 0. 0. mm
     PropertyHep3Vector Rotation 0. 0. 0. mm
     PropertyString     Volume   Box
-    PropertyHep3Vector Dimensions 1. 1. 1. cm
+    PropertyHep3Vector Dimensions 10. 10. 10. cm
     PropertyString Material lH2
+    PropertyString SensitiveDetector SpecialVirtual
   }
-
 }
 

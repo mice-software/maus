@@ -1,4 +1,3 @@
-// MAUS WARNING: THIS IS LEGACY CODE.
 /* This file is part of MAUS: http://micewww.pp.rl.ac.uk/projects/maus
  *
  * MAUS is free software: you can redistribute it and/or modify
@@ -16,9 +15,15 @@
  *
  */
 
+#include <vector>
+
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 
+#include "src/common_cpp/Simulation/FieldPhaser.hh"
+
+#include "src/legacy/Interface/Squeak.hh"
 #include "src/legacy/Simulation/MICEPhysicsList.hh"
+#include "src/common_cpp/Simulation/MAUSVisManager.hh"
 
 namespace MAUS {
 
@@ -27,7 +32,9 @@ MAUSGeant4Manager* MAUSGeant4Manager::GetInstance() {
   return _instance;
 }
 
-MAUSGeant4Manager::MAUSGeant4Manager() : _storeTracks(false) {
+MAUSGeant4Manager::MAUSGeant4Manager() {
+    _visManager = NULL;  // set by GetVisManager
+    SetVisManager();
     _runManager = new G4RunManager;
     _detector   = new MICEDetectorConstruction(*MICERun::getInstance());
     _runManager->SetUserInitialization(_detector);
@@ -35,28 +42,98 @@ MAUSGeant4Manager::MAUSGeant4Manager() : _storeTracks(false) {
     _physList = MICEPhysicsList::GetMICEPhysicsList();
     _runManager->SetUserInitialization(_physList);
 
-    _primary  = new MAUSPrimaryGeneratorAction;
-    _stepAct  = new MAUSSteppingAction;
-    _trackAct = new MAUSTrackingAction;
+    _primary  = new MAUSPrimaryGeneratorAction();
+    _stepAct  = new MAUSSteppingAction();
+    _trackAct = new MAUSTrackingAction();
+    _eventAct = new MAUSEventAction();
     _runManager->SetUserAction(_primary);
     _runManager->SetUserAction(_trackAct);
     _runManager->SetUserAction(_stepAct);
+    _runManager->SetUserAction(_eventAct);
+    //  _runManager->SetUserAction(new MAUSStackingActionKillNonMuons);
     _runManager->SetUserAction(new MICERunAction);
-
+    _virtPlanes = new VirtualPlaneManager;
+    _virtPlanes->ConstructVirtualPlanes(
+      MICERun::getInstance()->btFieldConstructor,
+      MICERun::getInstance()->miceModule);
     _runManager->Initialize();
-
-    G4UImanager* UI = G4UImanager::GetUIpointer();
-
-    if (_storeTracks) {
-      UI->ApplyCommand("/tracking/storeTrajectory 1");
-    } else {
-      UI->ApplyCommand("/tracking/storeTrajectory 0");
-    }
 }
 
 MAUSGeant4Manager::~MAUSGeant4Manager() {
     delete _runManager;
+    if (_visManager != NULL) {
+        delete _visManager;
+    }
 }
 
-} // namespace MAUS
+void MAUSGeant4Manager::SetPhases() {
+  FieldPhaser phaser;
+  phaser.SetPhases();
+}
+
+MAUSPrimaryGeneratorAction::PGParticle
+                                     MAUSGeant4Manager::GetReferenceParticle() {
+    MAUSPrimaryGeneratorAction::PGParticle p;
+    Json::Value* conf = MICERun::getInstance()->jsonConfiguration;
+    Json::Value ref = JsonWrapper::GetProperty
+             (*conf, "simulation_reference_particle", JsonWrapper::objectValue);
+    p.ReadJson(ref);
+    return p;
+}
+
+Json::Value MAUSGeant4Manager::RunManyParticles(Json::Value particle_array) {
+    _eventAct->SetEvents(particle_array);  // checks type
+    for (size_t i = 0; i < particle_array.size(); ++i) {
+        MAUSPrimaryGeneratorAction::PGParticle primary;
+        Json::Value event = JsonWrapper::GetItem
+                                  (particle_array, i, JsonWrapper::objectValue);
+        Json::Value primary_json = JsonWrapper::GetProperty
+                                  (event, "primary", JsonWrapper::objectValue);
+        primary.ReadJson(primary_json);
+        GetPrimaryGenerator()->Push(primary);
+    }
+    GetRunManager()->BeamOn(particle_array.size());
+    return _eventAct->GetEvents();
+}
+
+Json::Value MAUSGeant4Manager::RunParticle(Json::Value particle) {
+    MAUSPrimaryGeneratorAction::PGParticle p;
+    p.ReadJson(particle["primary"]);
+    return Tracking(p);
+}
+
+Json::Value MAUSGeant4Manager::RunParticle
+                                    (MAUSPrimaryGeneratorAction::PGParticle p) {
+    return Tracking(p);
+}
+
+
+Json::Value MAUSGeant4Manager::Tracking
+                                    (MAUSPrimaryGeneratorAction::PGParticle p) {
+    Squeak::mout(Squeak::debug) << "Firing particle with ";
+    JsonWrapper::Print(Squeak::mout(Squeak::debug), p.WriteJson());
+    Squeak::mout(Squeak::debug) << std::endl;
+
+    GetPrimaryGenerator()->Push(p);
+    Json::Value event_array = Json::Value(Json::arrayValue);
+    Json::Value event(Json::objectValue);
+    event["primary"] = p.WriteJson();
+    event_array.append(event);
+    _eventAct->SetEvents(event_array);
+    GetRunManager()->BeamOn(1);
+    return _eventAct->GetEvents()[Json::Value::UInt(0)];
+}
+
+void MAUSGeant4Manager::SetVisManager() {
+  if (_visManager != NULL) delete _visManager;
+  _visManager = NULL;
+  // if _visManager == NULL, attempt to build it
+  Json::Value& conf = *MICERun::getInstance()->jsonConfiguration;
+  if (JsonWrapper::GetProperty
+           (conf, "geant4_visualisation", JsonWrapper::booleanValue).asBool()) {
+      _visManager = new MAUSVisManager;
+      _visManager->Initialize();
+  }
+}
+}  // namespace MAUS
 

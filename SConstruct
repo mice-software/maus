@@ -1,6 +1,7 @@
 from SCons.Script.SConscript import SConsEnvironment # pylint: disable-msg=F0401
 import glob
 import os
+import shutil
 
 def my_exit(code = 1):
     """Internal routine to exit
@@ -9,6 +10,14 @@ def my_exit(code = 1):
     warning.
     """
     Exit(code) # pylint: disable-msg=E0602
+
+def duplicate_dylib_as_so(target, source, env):
+    print "Duplicating %s as %s." % (source[0], target[0])
+    shutil.copyfile(str(source[0]), str(target[0]))
+    return None
+
+dylib2so = Builder(action = duplicate_dylib_as_so, suffix = '.so',
+                   src_suffix = '.dylib')
 
 maus_root_dir = os.environ.get('MAUS_ROOT_DIR')
 if not maus_root_dir:
@@ -55,18 +64,24 @@ class Dev:
         localenv.Append(CCFLAGS=self.cflags)
         if use_root and use_g4:
             localenv.Append(LIBS=['MausCpp'])
+            localenv.Append(LIBPATH = "%s/src/common_cpp" % maus_root_dir)
 
         #specify the build directory
         localenv.VariantDir(variant_dir=builddir, src_dir='.', duplicate=0)
         localenv.Append(CPPPATH='.')
 
+        full_build_dir = os.path.join(maus_root_dir, builddir)
+
         srclst = map(lambda x: builddir + '/' + x, glob.glob('*.cc'))
         srclst += map(lambda x: builddir + '/' + x, glob.glob('*.i'))
         pgm = localenv.SharedLibrary(targetpath, source=srclst)
 
-        tests = glob.glob('test_*.py')
+        if (sysname == 'Darwin'):
+          lib_so = env.Dylib2SO(targetpath)
+          Depends(lib_so, pgm)
+          env.Install(full_build_dir, lib_so)
 
-        full_build_dir = os.path.join(maus_root_dir, builddir)
+        tests = glob.glob('test_*.py')
 
         env.Install(full_build_dir, "build/%s.py" % name)
         env.Install(full_build_dir, pgm)
@@ -358,13 +373,13 @@ def set_geant4(conf, env):
 
         # removing this line (and using the append(libs) one below, because this is messy and breaks/seg-faults.
         #    conf.env.ParseConfig('%s/liblist -m %s < %s/libname.map'.replace('%s', os.path.join(os.environ.get('G4LIB'), os.environ.get('G4SYSTEM'))))
-
-
         env.Append(LIBS=get_g4_libs())
 
         for lib in get_g4_libs():
             if not conf.CheckLib(lib, language='c++'):
                 my_exit(1)
+
+        geant4_extras(env)
 
 def set_recpack(conf, env):
     if not conf.CheckLib('recpack', language='c++') or\
@@ -386,10 +401,67 @@ def set_unpacker(conf, env):
     else:
         env["USE_UNPACKER"] = True
 
+def cpp_extras(env):
+  """
+  Sets compilation to include coverage, debugger, profiler depending on 
+  environment variable flags. Following controls are enabled:
+      if maus_lcov is set, sets gcov flags (for subsequent use in lcov); also
+      disables inlining
+      if maus_debug is set, sets debug flag -g
+      if maus_gprof is set, sets profiling flag -pg
+      if maus_no_optimize is not set and none of the others are set, sets
+          optimise flag -O3
+  """
+  lcov = 'maus_lcov' in os.environ and os.environ['maus_lcov'] != '0'
+  debug = 'maus_debug' in os.environ and os.environ['maus_debug'] != '0'
+  gprof = 'maus_gprof' in os.environ and os.environ['maus_gprof'] != '0'
+  optimise = not ('maus_no_optimize' in os.environ 
+                and os.environ['maus_no_optimize'] != '0') # optimise by default
+  
+  if lcov:
+    env.Append(LIBS=['gcov'])
+    env.Append(CCFLAGS=["""-fprofile-arcs""", """-ftest-coverage""",
+                        """-fno-inline""", """-fno-default-inline"""])
+
+  if debug:
+    env.Append(CCFLAGS=["""-g"""])
+
+  if gprof: # only works on pure c code (i.e. unit tests)
+    env.Append(CCFLAGS=["""-pg"""])
+    env.Append(LINKFLAGS=["""-pg"""])
+
+  if not (lcov or debug or gprof) and optimise:
+    env.Append(CCFLAGS=["""-O3"""])        
+
+def geant4_extras(env):
+  """
+  Sets compilation to include geant4 opengl bindings
+
+  If maus_opengl environment variable is set and is not equal to 0, add
+  G4VIS_USE_OPENGLX and G4VIS_USE_OPENGLXM to the CCFLAGS and G4OpenGL to
+  the libraries. Note that these libraries are not built by default.
+  """
+  opengl = 'maus_opengl' in os.environ and os.environ['maus_opengl'] != '0'
+  if opengl:
+    env.Append(CCFLAGS=["""-DG4VIS_USE_OPENGLX"""])
+    env.Append(CCFLAGS=["""-DG4VIS_USE_OPENGLXM"""])
+    geant_vis = 'G4OpenGL'
+    env.Append(LIBS=[geant_vis])
+    if not conf.CheckLib(geant_vis, language='c++'):
+        print """
+          Could not find G4OpenGL library. Build this library using
+          $MAUS_ROOT_DIR/third_party/bash/32geant4_extras.bash
+          Note that you need to have valid open gl and open gl xm development
+          libraries installed.
+          """
+        my_exit(1)
 
 # Setup the environment.  NOTE: SHLIBPREFIX means that shared libraries don't
-# have a 'lib' prefix, which is needed for python to find SWIG generated libraries
-env = Environment(SHLIBPREFIX="") # pylint: disable-msg=E0602
+# have a 'lib' prefix, which is needed for python to find SWIG generated
+# libraries
+env = Environment(SHLIBPREFIX="", BUILDERS = {'Dylib2SO' : dylib2so}) # pylint: disable-msg=E0602
+
+(sysname, nodename, release, version, machine) = os.uname()
 
 if env.GetOption('clean'):
     print("In cleaning mode!")
@@ -411,7 +483,6 @@ if os.path.isfile('.use_llvm_with_maus'):
 env.Tool('swig', '%s/third_party/swig-2.0.1' % maus_root_dir)
 env.Append(SWIGFLAGS=['-python', '-c++']) # tell SWIG to make python bindings for C++
 
-#env.Append(PATH="%s/third_party/install/bin" % maus_root_dir)
 env['ENV']['PATH'] =  os.environ.get('PATH')  # useful to set for root-config
 env['ENV']['LD_LIBRARY_PATH'] = os.environ.get('LD_LIBRARY_PATH')
 env['ENV']['DYLD_LIBRARY_PATH'] = os.environ.get('DYLD_LIBRARY_PATH')
@@ -438,21 +509,6 @@ env.SConsignFile()
 #we must watch out for name clashes.
 SConsEnvironment.jDev = Dev()
 
-#get the mode flag from the command line
-#default to 'release' if the user didn't specify
-env.jDev.mymode = ARGUMENTS.get('mode', 'release')  # pylint: disable-msg=E0602
-
-#check if the user has been naughty: only 'debug' or 'release' allowed
-if not (env.jDev.mymode in ['debug', 'release']):
-    print "Error: expected 'debug' or 'release', found: " + env.jDev.mymode
-    my_exit(1)
-
-#tell the user what we're doing
-print '**** Compiling in ' + env.jDev.mymode + ' mode...'
-
-env.jDev.debugcflags = [ '-W1', '-GX', '-D_DEBUG']   #extra compile flags for debug
-env.jDev.releasecflags = ['-O2', '-DNDEBUG',]         #extra compile flags for release
-
 #make sure the sconscripts can get to the variables
 #don't need to export anything but 'env'
 Export('env') # pylint: disable-msg=E0602
@@ -469,8 +525,9 @@ Export('env') # pylint: disable-msg=E0602
 
 print "Configuring..."
 # Must have long32 & long64 for the unpacking library
-env.Append(CCFLAGS=["""-Dlong32='int'""", """-Dlong64='long long'"""]) # , '-g', """-fprofile-arcs""", """-ftest-coverage""", """-fno-inline""", """-fno-default-inline"""])
-env.Append(LIBS=['gcov'])
+env.Append(CCFLAGS=["""-Wall""", """-Dlong32='int'""", """-Dlong64='long long'"""])
+cpp_extras(env)
+
 conf = Configure(env, custom_tests = {'CheckCommand' : CheckCommand}) # pylint: disable-msg=E0602
 set_cpp(conf, env)
 set_python(conf, env)
@@ -487,23 +544,27 @@ env = conf.Finish()
 if 'configure' in COMMAND_LINE_TARGETS: # pylint: disable-msg=E0602
     my_exit(0)
 
-
 # NOTE: do this after configure!  So we know if we have ROOT/geant4
 #specify all of the sub-projects in the section
 if env['USE_G4'] and env['USE_ROOT']:
-    #env.Append(CCFLAGS=['-g','-pg'])
-    #env.Append(LINKFLAGS='-pg')
-
     common_cpp_files = glob.glob("src/legacy/*/*cc") + \
         glob.glob("src/legacy/*/*/*cc") + \
-        glob.glob("src/common_cpp/*/*cc")
+        glob.glob("src/common_cpp/*/*cc") + \
+        glob.glob("src/common_cpp/*/*/*cc")
 
-    maus_cpp = env.SharedLibrary(target = 'src/legacy/libMausCpp',
+    targetpath = 'src/common_cpp/libMausCpp'
+    maus_cpp = env.SharedLibrary(target = targetpath,
                                  source = common_cpp_files,
                                  LIBS=env['LIBS'] + ['recpack'])
     env.Install("build", maus_cpp)
 
-    env.Append(LIBPATH = 'src/legacy/')
+    #Build an extra copy with the .dylib extension for linking on OS X
+    if (sysname == 'Darwin'):
+      maus_cpp_so = env.Dylib2SO(targetpath)
+      Depends(maus_cpp_so, maus_cpp)
+      env.Install("build", maus_cpp_so)
+
+    env.Append(LIBPATH = 'src/common_cpp')
     env.Append(CPPPATH = maus_root_dir)
 
     if 'Darwin' in os.environ.get('G4SYSTEM'):
@@ -517,8 +578,8 @@ if env['USE_G4'] and env['USE_ROOT']:
                                LIBS= env['LIBS'] + ['recpack'] + ['MausCpp'])
     env.Install('build', ['tests/cpp_unit/test_cpp_unit'])
 
-    test_optics_files = glob.glob("tests/integration/optics/src/*cc")
-    test_optics = env.Program(target = 'tests/integration/optics/optics', \
+    test_optics_files = glob.glob("tests/integration/test_optics/src/*cc")
+    test_optics = env.Program(target = 'tests/integration/test_optics/optics', \
                                source = test_optics_files, \
                                LIBS= env['LIBS'] + ['MausCpp'])
 
@@ -565,7 +626,7 @@ for single_stuff in stuff_to_import:
 
 file_to_import.close()
 
-files = glob.glob('tests/py_unit/test_*')+glob.glob('tests/style/*.py')
+files = glob.glob('tests/py_unit/test_*.py')+glob.glob('tests/style/*.py')
 env.Install("build", files)
 
 env.Install("build", "tests/py_unit/test_cdb")

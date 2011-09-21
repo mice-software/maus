@@ -31,7 +31,7 @@ using namespace std;
 int SpecialVirtualSD::_uniqueID=0;
 
 SpecialVirtualSD::SpecialVirtualSD(MICEEvent * _event, MiceModule * mod )
-                 : G4VSensitiveDetector( mod->fullName() + intToString(_uniqueID) ),
+                 : MAUSSD( mod ),
                    _steppingThrough(true), _steppingInto(true), _steppingOutOf(true), _steppingAcross(true),
                    _localRotation(), _globalRotation(), _localPosition(), _globalPosition()
 {
@@ -106,7 +106,6 @@ G4bool SpecialVirtualSD::ProcessHits(G4Step* aStep, G4TouchableHistory*
 
   G4StepPoint* thePrePoint  = aStep->GetPreStepPoint();
   G4StepPoint* thePostPoint = aStep->GetPostStepPoint();
-  G4Track* aTrack = aStep->GetTrack();
   G4VPhysicalVolume* thePrePV  = thePrePoint->GetPhysicalVolume();
   G4String preName  = thePrePV->GetName();
 
@@ -141,63 +140,23 @@ G4bool SpecialVirtualSD::ProcessHits(G4Step* aStep, G4TouchableHistory*
     _iCellR = 0;
     _iCellPhi = 0;
   }
-  int copyNumber = thePrePV->GetCopyNo();
-
-  // obtain magnetic field
-  G4FieldManager* fieldMgr = G4TransportationManager::GetTransportationManager()->GetFieldManager();
-  G4Field* aField = (G4Field*) fieldMgr->GetDetectorField();
 
   //int indx = index(copyIDinZ, copyIDinPhi, copyIDinR);
   //  if(_cellID[indx] =  -1)
-  SpecialHit* hit = new SpecialHit();
-  hit->SetVolumeName(preName);
-  hit->SetCellNo(copyNumber);
-  hit->SetCellNo(copyIDinZ, copyIDinPhi, copyIDinR);
-  hit->SetStationNo( _stationNumber );
-  hit->SetPosition(_localRotation*(_globalRotation*(thePostPoint->GetPosition()-_globalPosition)-_localPosition));
-  hit->SetTrackID(aTrack->GetTrackID());
-  hit->SetParenTrackID(aTrack->GetParentID());
-        //ME another aInfo check
-  hit->SetMomentum(_localRotation*_globalRotation*thePostPoint->GetMomentum());
-  hit->SetTime(thePostPoint->GetGlobalTime());
-  hit->SetEnergy(thePostPoint->GetTotalEnergy());
-  hit->SetPID(aTrack->GetDefinition()->GetPDGEncoding());
-  double mv = aTrack->GetDefinition()->GetPDGMass();
-  hit->SetMass(mv);
-        hit->SetCharge(aTrack->GetDefinition()->GetPDGCharge());
-  hit->SetEdep(edep);
-  double point[4], bfield[6];
-  point[0] = hit->GetPosition().x();
-  point[1] = hit->GetPosition().y();
-  point[2] = hit->GetPosition().z();
-  point[3] = hit->GetTime();
-  aField->GetFieldValue(point, bfield);
-  hit->SetBField(bfield);
-        hit->SetEField(bfield+3);
-  hit->SetVtxPosition(aTrack->GetVertexPosition());
-  hit->SetVtxTime(aTrack->GetLocalTime());
-  double kv = aTrack->GetVertexKineticEnergy();
-  double pv = sqrt(kv * (kv + 2 * mv));
-  G4ThreeVector vP = (aTrack->GetVertexMomentumDirection());
-  vP *= pv;
-  hit->SetVtxMomentum(vP);
-  hit->SetStepType(istat);
-  hit->SetStepLength(aTrack->GetStepLength());
-  hit->SetPathLength(aTrack->GetTrackLength());
-  hit->SetProperTime(aTrack->GetProperTime());
+  Json::Value hit_i, channel_id;
+  channel_id["type"] = "SpecialVirtual";
+  hit_i["track_id"] = aStep->GetTrack()->GetTrackID();
+  channel_id[ "station_number" ] = _stationNumber;
+  hit_i["channel_id"] = channel_id;
+  hit_i["energy_deposited"] = edep;
   
-  if( (_steppingThrough && istat ==  0) || ( _steppingInto   && istat == 1) ||
-      (_steppingOutOf   && istat == -1) || ( _steppingAcross && istat == 2) ) 
-    simEvent->specialHits.push_back(hit);
+  hit_i["time"] = aStep->GetPostStepPoint()->GetGlobalTime();
+  hit_i["energy"] = aStep->GetTrack()->GetTotalEnergy();
+  hit_i["pid"] = aStep->GetTrack()->GetDefinition()->GetPDGEncoding();
+  hit_i["charge"] =  aStep->GetTrack()->GetDefinition()->GetPDGCharge();
+  hit_i["mass"] = aStep->GetTrack()->GetDefinition()->GetPDGMass();
 
-//int icell = specialCollection->insert(hit);
-  //_cellID[indx] = icell -1;
-  if(verboseLevel>0)
-  {
-    cout << "New Hit " << copyIDinZ << "  " << copyIDinPhi
-    << "  " << copyIDinR << endl;
-  }
-
+  _hits.push_back(hit_i);
   return true;
 }
 

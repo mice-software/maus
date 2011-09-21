@@ -13,6 +13,8 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+import gzip
+
 class OutputPyJSON:
     """OutputPyJSON writes JSON files to python files
 
@@ -29,7 +31,7 @@ class OutputPyJSON:
     - a gzip-compressed file that can be
     decompressed either with InputPyJSON within
     MAUS or by the Linux tools gunzip/gzip;
-    arg_file=GzipFile('filename', 'w')
+    arg_file=GzipFile('filename', 'wb')
     see http://docs.python.org/library/gzip.html
     - a socket;
     http://docs.python.org/library/socket.html
@@ -38,13 +40,16 @@ class OutputPyJSON:
 
     """
 
-    def __init__(self, arg_file = open("mausput", 'w')):
+    def __init__(self, arg_file = None):
         """OutputPyJSON constructor
 
         \param arg_file arg_file is a file object.
-        The default is to write uncompressed
-        to the filename 'mausput'.
+        The default is to write compressed
+        to the filename 'output.gz'.
         """
+
+        if arg_file == None:
+            arg_file = gzip.GzipFile("output.gz", 'w')
         assert not isinstance(arg_file, str)
         self.file = arg_file
 

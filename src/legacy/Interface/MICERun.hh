@@ -53,6 +53,7 @@ public :
     DataCards = NULL;
     trajectoryManager = NULL;
     btFieldConstructor = NULL;
+    jsonConfiguration = NULL;
   };
 
 
@@ -71,6 +72,7 @@ private :
     DataCards = NULL;
     trajectoryManager = NULL;
     btFieldConstructor = NULL;
+    jsonConfiguration = NULL;
   };
 
 

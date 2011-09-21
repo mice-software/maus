@@ -81,7 +81,7 @@ TransferMap TransferMapCalculator::GetPolynomialTransferMap(std::vector<PhaseSpa
   {
     HepVector inSixVec  = in [i].getSixVector()-in [0].getSixVector();
     HepVector outSixVec = out[i].getSixVector()-out[0].getSixVector();
-    for(uint j=0; j<6; j++)
+    for(unsigned int j=0; j<6; j++)
     {
       in_v [i][j] = inSixVec [j];
       out_v[i][j] = outSixVec[j];

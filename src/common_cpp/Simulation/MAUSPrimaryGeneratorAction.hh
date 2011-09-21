@@ -15,14 +15,6 @@
  *
  */
 
-/** @class  MAUSPrimaryGeneratorAction
- *  Geant4 calls this class to determine the events in the spill
- *
- *  This is just a FIFO (First In First Out) std::queue of hits. Hits can be
- *  loaded using Push(...) and unloaded using Pop(). GeneratePrimaries(...)
- *  will fire hits until the queue is empty.
- */
-
 #ifndef _SRC_CPP_CORE_SIMULATION_MAUSPRIMARYGENERATORACTION_HH_
 #define _SRC_CPP_CORE_SIMULATION_MAUSPRIMARYGENERATORACTION_HH_
 
@@ -34,9 +26,18 @@
 #include "G4VUserPrimaryGeneratorAction.hh"  // inherit from
 
 #include "src/legacy/Interface/Squeak.hh"
+#include "src/legacy/Interface/VirtualHit.hh"
+#include "src/common_cpp/Utils/JsonWrapper.hh"
 
 namespace MAUS {
 
+/** @class  MAUSPrimaryGeneratorAction
+ *  Geant4 calls this class to determine the events in the spill
+ *
+ *  This is just a FIFO (First In First Out) std::queue of hits. Hits can be
+ *  loaded using Push(...) and unloaded using Pop(). GeneratePrimaries(...)
+ *  will fire hits until the queue is empty.
+ */
 class MAUSPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
  public:
   /** @class PGParticle
@@ -52,6 +53,10 @@ class MAUSPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
    */
   class PGParticle {
    public:
+    PGParticle();
+    explicit PGParticle(VirtualHit hit);
+    void ReadJson(Json::Value pg_particle);
+    Json::Value WriteJson();
     double x, y, z, time, px, py, pz, energy;
     int pid;
     long int seed;

@@ -21,22 +21,27 @@
 #ifndef _SRC_CPP_CORE_INTERFACE_VIRTUALPLANES_HH_
 #define _SRC_CPP_CORE_INTERFACE_VIRTUALPLANES_HH_
 
+#include <set>
 #include <vector>
 #include <map>
+#include <string>
 
 #include "json/json.h"
 
-#include "src/legacy/Interface/VirtualHit.hh"
+#include "src/common_cpp/Utils/JsonWrapper.hh"
 
+#include "src/legacy/Interface/VirtualHit.hh"
 #include "src/legacy/BeamTools/BTTracker.hh"
 #include "src/legacy/BeamTools/BTFieldGroup.hh"
 
 class G4Step;
 class G4StepPoint;
+class MiceModule;
+
+namespace MAUS {
 
 class VirtualPlane;
 class VirtualPlaneManager;
-class MiceModule;
 
 class VirtualPlane {
   /** @class VirtualPlane
@@ -208,7 +213,7 @@ class VirtualPlane {
   double             _radialExtent;
   bool               _globalCoordinates;
   multipass_handler  _multipass;
-  static BTField*    _field;
+  static const BTField*    _field;
   static stepping    _stepping;
 
   CLHEP::Hep3Vector  _position;  // if var is u, then this will give origin
@@ -230,6 +235,10 @@ class VirtualPlane {
 
 class VirtualPlaneManager {
  public:
+  /** @brief Constructor
+   */
+  VirtualPlaneManager();
+
   /** @brief Destructor
    *
    *  delete constructed virtual planes. If this is instance, resets all the
@@ -238,20 +247,12 @@ class VirtualPlaneManager {
    */
   ~VirtualPlaneManager();
 
-  /** @brief Call the singleton VirtualPlaneManager
-   *
-   *  Return a pointer to the VirtualPlaneManager. If the VirtualPlaneManager
-   *  does not exist, this will new the VirtualPlaneManager; but need to call
-   *  ConstructVirtualPlanes(...) to set up VirtualPlanes.
-   */
-  static VirtualPlaneManager* GetInstance();
-  /** @deprecated */
-  static VirtualPlaneManager* getVirtualPlaneManager() {return GetInstance();}
-
   /** @brief Construct the VirtualPlanes
    *
    *  Looks through the MiceModules for VirtualPlanes and builds them. Planes
-   *  are automatically sorted by independent variable.
+   *  are automatically sorted by independent variable. If ConstructVirtualPlanes
+   *  is called more than once, replaces existing field pointer and appends any
+   *  additional virtual plane definitions.
    *
    *  @params field pointer to the global field group. If this is NULL, will
    *          make an empty field.
@@ -259,7 +260,7 @@ class VirtualPlaneManager {
    *          off any Module with "PropertyString SensitiveDetector Envelope" or
    *          "PropertyString SensitiveDetector Virtual"
    */
-  static void ConstructVirtualPlanes(BTField* field, MiceModule* model);
+  void ConstructVirtualPlanes(const BTField* field, MiceModule* model);
 
   /** @brief Check to see if a step straddles a VirtualPlane
    *
@@ -273,8 +274,7 @@ class VirtualPlaneManager {
    *
    *  @returns Json::Value with VirtualPlanes hits appended
    */
-  static void VirtualPlanesSteppingAction
-                                     (const G4Step * aStep, Json::Value* track);
+  void VirtualPlanesSteppingAction(const G4Step * aStep);
 
   /** @brief Clear count of Virtual Hits for the next track
    *
@@ -282,53 +282,110 @@ class VirtualPlaneManager {
    * to allocate station number and reject hits if the multipass_handler is set
    * to ignore.
    */
-  static void StartOfEvent();
+  void StartOfEvent();
 
   /** @brief Return a pointer to the field object used for tracking
    */
-  static BTField* GetField()               { return _field;}
+  const BTField* GetField() { return _field;}
 
   /** @brief Set the pointer to the field object used for tracking
    */
-  static BTField* SetField(BTField* field) {
+  void SetField(const BTField* field) {
     _field = field;
     VirtualPlane::_field = field;
-    return _field;
   }
 
   /** @brief Get a pointer to the MiceModule based on StationNumber
+   *
+   *  @returns MiceModule or NULL if no MiceModule registered
    */
-  static const MiceModule*   GetModuleFromStationNumber(int stationNumber);
+  const MiceModule*   GetModuleFromStationNumber(int stationNumber);
 
   /** @brief Get the primary StationNumber based on a pointer to the MiceModule
    */
-  static int GetStationNumberFromModule(const MiceModule* module);
+  int GetStationNumberFromModule(const MiceModule* module);
 
   /** @brief Return a vector of planes controlled by the plane manager
    */
-  static std::vector<VirtualPlane*> GetPlanes() {return _instance->_planes;}
+  std::vector<VirtualPlane*> GetPlanes() {return _planes;}
 
   /** @brief Get the number of hits recorded on a station based on the primary
    *         station number.
    */
-  static int GetNumberOfHits(int stationNumber);
+  int GetNumberOfHits(int stationNumber);
 
   /** @brief Write the hit to the Json::Value
    */
-  static void WriteHit(VirtualHit hit, Json::Value* value);
+  Json::Value WriteHit(VirtualHit hit);
+
+  /** @brief Read the hit from the Json::Value
+   */
+  VirtualHit ReadHit(Json::Value value);
+
+  /** @brief Add plane to the manager
+   *
+   *  @params plane is the plane to be added. Note VirtualPlaneManager now takes
+   *          ownership of this memory.
+   *  @params mod is the module which made the plane. If no module, just set
+   *          this to NULL. This is used subsequently to relate stations to the
+   *          originating MiceModule. VirtualPlaneManager does not own this
+   *          memory.
+   */
+  void AddPlane(VirtualPlane* plane, const MiceModule* mod);
+
+  /** @brief Remove planes from the manager
+   *
+   *  This takes a vector of stations so that several stations can be removed -
+   *  note that by removing the planes, the station numbers will change (as
+   *  stations are always numbered incrementally from 1)
+   *
+   *  @param station numbers of the plane to be removed
+   */
+  void RemovePlanes(std::set<int> station);
+
+  /** @brief Remove a plane from the manager
+   *
+   *  @param pointer to the plane to be removed. Note that the memory pointed to
+   *         is deleted by this function call.
+   */
+  void RemovePlane(VirtualPlane* plane);
+
+  /** @brief Get Json array of all recorded virtual hits since StartOfEvent()
+   */
+  Json::Value GetVirtualHits() {return _hits;}
+
+  /** @brief Set Json array of virtual hits
+   *
+   *  @params hits array of virtual hits; if hits is not a Json::arrayValue,
+   *          throws an exception
+   */
+  void SetVirtualHits(Json::Value hits);
+
+  /** @brief Get flag to tell whether VirtualPlanes are active
+   *
+   *  Default is to activate VirtualPlanes if they are found in the geometry
+   */
+  bool GetWillUseVirtualPlanes() {return _useVirtualPlanes;}
+
+  /** @brief Set flag to tell whether VirtualPlanes are active
+   */
+  void SetWillUseVirtualPlanes(bool willUse) {_useVirtualPlanes = willUse;}
 
  private:
-  VirtualPlaneManager() {}
-  static VirtualPlane ConstructFromModule(const MiceModule* mod);
+  VirtualPlane ConstructFromModule(const MiceModule* mod);
+  VirtualPlane* PlaneFromStation(int station);  // get plane from station number
 
-  static BTField*                  _field;
-  BTFieldGroup                     _default_field;  // _field defaults to this
-  static VirtualPlaneManager*      _instance;
-  static bool                      _useVirtualPlanes;
-  static std::vector<VirtualPlane*> _planes;
+  CLHEP::Hep3Vector JsonToThreeVector(Json::Value value, std::string name);
+
+  const BTField*            _field;
+  bool                      _useVirtualPlanes;
+  std::vector<VirtualPlane*> _planes;
   // associate MiceModule with each plane in _planes
-  static std::map<VirtualPlane*, const MiceModule*>  _mods;
-  static std::vector<int>          _nHits;  // numberOfHits in each plane
-};
+  std::map<VirtualPlane*, const MiceModule*>  _mods;
+  std::vector<int>          _nHits;  // numberOfHits in each plane
+  Json::Value               _hits;
 
+  static const BTFieldGroup       _default_field;  // _field defaults to this
+};
+}
 #endif

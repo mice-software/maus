@@ -35,8 +35,8 @@ Json::Value CppErrorHandler::HandleSqueal
 }
 
 Json::Value CppErrorHandler::HandleStdExc
-                 (Json::Value val, std::exception exc, std::string class_name) {
-  return getInstance()->ExceptionToPython(exc.what(), val, class_name);
+                 (Json::Value val, std::exception& exc, std::string class_name) {
+  return getInstance()->ExceptionToPython((&exc)->what(), val, class_name);
 }
 
 void CppErrorHandler::HandleSquealNoJson(Squeal exc, std::string class_name) {
@@ -44,7 +44,7 @@ void CppErrorHandler::HandleSquealNoJson(Squeal exc, std::string class_name) {
 }
 
 void CppErrorHandler::HandleStdExcNoJson
-                                  (std::exception exc, std::string class_name) {
+                                  (std::exception& exc, std::string class_name) {
   HandleStdExc(Json::Value(), exc, class_name);
 }
 

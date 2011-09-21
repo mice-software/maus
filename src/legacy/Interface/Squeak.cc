@@ -19,7 +19,6 @@
 #include <sstream>
 
 #include "Interface/Squeak.hh"
-#include "Interface/dataCards.hh"
 #include "Interface/MICERun.hh"
 
 std::ostream*                               Squeak::stdout    = NULL;
@@ -27,7 +26,7 @@ std::ostream*                               Squeak::stdlog    = NULL;
 std::ostream*                               Squeak::stderr    = NULL;
 std::ostream*                               Squeak::voidout   = NULL;
 std::map<Squeak::errorLevel, std::ostream*> Squeak::output;
-dataCards*                                  Squeak::datacards = NULL;
+Json::Value*                                Squeak::datacards = NULL;
 Squeak *                                    Squeak::instance  = NULL;
 
 std::ostream & Squeak::mout() {
@@ -60,7 +59,7 @@ Squeak * Squeak::getInstance() {
   // defined, should still work; but then re-initialise once datacards defined
   // to set the verbose level properly
   if (datacards == NULL) {  // keep trying to find datacards
-    datacards = MICERun::getInstance()->DataCards;
+    datacards = MICERun::getInstance()->jsonConfiguration;
     if (datacards != NULL && instance != NULL) {
       delete instance;
       instance = new Squeak();
@@ -71,10 +70,12 @@ Squeak * Squeak::getInstance() {
 }
 
 Squeak::Squeak() {
-  // verboseLevel defaults to debug if datacards not defined (safest)
-  errorLevel verboseLevel = debug;
-  if (datacards != NULL)
-    verboseLevel = errorLevel(datacards->fetchValueInt("VerboseLevel"));
+  // verboseLevel defaults to warning if datacards not defined (config default)
+  int verboseLevel = 2;
+  if (datacards != NULL) {
+    if (!((*datacards)["verbose_level"].isNull()))
+      verboseLevel = (*datacards)["verbose_level"].asInt();
+  }
   initialiseOutputs();
 
   for (int i = 0; i <= fatal; ++i) {
@@ -86,8 +87,9 @@ Squeak::Squeak() {
 
 void Squeak::setStandardOutputs(int verboseLevel) {
   getInstance();
-  if (verboseLevel < 0 && datacards != NULL)
-    verboseLevel = datacards->fetchValueInt("VerboseLevel");
+  if (verboseLevel < 0 && instance->datacards != NULL) {
+    verboseLevel = (*datacards)["verbose_level"].asInt();
+  }
   activateCout(verboseLevel <= Squeak::debug);
   activateClog(verboseLevel <= Squeak::info);
   activateCerr(verboseLevel <= Squeak::warning);

@@ -23,15 +23,36 @@
 
 map_reduce_type = "native_python" # can also be "native_python_profile" using cProfile in python
 
+# Used, for now, to determine what level of c++ log messages are reported to the user
+# 0 = debug info (and std::cout)
+# 1 = run info
+# 2 = warnings
+# 3 = errors (and std::cerr)
+# 4 = fatal
+# >4 = silent
+# Doesnt effect python
+verbose_level = 4
+errors_to_stderr = verbose_level < 4
+errors_to_json = True
+on_error = 'none' # halt or raise
+
 # Used by MapPyRemoveTracks.
 keep_only_muon_tracks = False
 
 # Used by MapCppSimulation
-keep_tracks = False
-
-# This is used by Simulation
-simulation_geometry_filename = "Stage6.dat"
+keep_tracks = False # set to true to keep start and end point of every track
+keep_steps = False # set to true to keep start and end point of every track and
+                   # every step point
+simulation_geometry_filename = "Stage6.dat" # geometry used by simulation
 maximum_number_of_steps = 10000
+simulation_reference_particle = {"position":{"x":0.0, "y":-0.0, "z":-4700.0}, "momentum":{"x":0.0, "y":0.0, "z":1.0}, "particle_id":-13, "energy":226.0, "time":0.0, "random_seed":10}
+
+# geant4 visualisation (not event display)
+geant4_visualisation = False
+visualisation_viewer = "VRML2FILE"  # only supported option
+visualisation_theta = 90.
+visualisation_phi = 90.
+visualisation_zoom = 1.
 
 # this is used by reconstruction
 reconstruction_geometry_filename = simulation_geometry_filename
@@ -99,3 +120,4 @@ DAQ_cabling_file = "/src/common_cpp/Utils/DAQChannelMap.txt"
 
 # this is used by ImputCppTOFReconstruction
 TOF_cabling_file = "/src/common_cpp/Utils/TOFChannelMap.txt"
+

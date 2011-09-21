@@ -433,16 +433,19 @@ void ModuleTextFileIO::substitute(std::string& target, std::string s1, std::stri
   }
 }
 
-void ModuleTextFileIO::repeatModule (MiceModule* first, Hep3Vector translation, HepRotation rotation, double scaleFactor, int numberOfRepeats)
+void ModuleTextFileIO::repeatModule (MiceModule* first, Hep3Vector translation, HepRotation rotation, double scaleFactor, unsigned int numberOfRepeats)
 {
   MiceModule * mod = NULL;
   if(numberOfRepeats > 0) 
     mod = first->copyDisplaced(translation, rotation, scaleFactor);
+
+  // This for loop can't happen (due to unsigned int) unless numberOfRepeats is greater than 1
   for(double i=1; i<numberOfRepeats; i++)
     mod = mod->copyDisplaced(translation, rotation, scaleFactor);
+  
 }
 
-void ModuleTextFileIO::repeatModule2 (MiceModule* first, int numberOfRepeats)
+void ModuleTextFileIO::repeatModule2 (MiceModule* first, unsigned int numberOfRepeats)
 {
   MiceModule * mod = NULL;
   first->addParameter("@RepeatNumber", 0);
@@ -451,6 +454,8 @@ void ModuleTextFileIO::repeatModule2 (MiceModule* first, int numberOfRepeats)
     mod = MiceModule::deepCopy(*first, true);
     mod->addParameter("@RepeatNumber", 1);
   }
+
+  // This for loop can't happen (due to unsigned int) unless numberOfRepeats is greater than 1   
   for(double i=1; i<numberOfRepeats; i++)
   {
     std::stringstream istr;

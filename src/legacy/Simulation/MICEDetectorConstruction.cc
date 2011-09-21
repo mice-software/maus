@@ -69,7 +69,6 @@
 #include "DetModel/EMR/EMRSD.hh"
 #include "DetModel/KL/KLSD.hh"
 #include "DetModel/Virtual/SpecialVirtualSD.hh"
-#include "BeamTools/BTPhaser.hh"
 
 const double MICEDetectorConstruction::_pillBoxSpecialVirtualLength = 1.e-6*mm;
 
@@ -137,8 +136,6 @@ G4VPhysicalVolume* MICEDetectorConstruction::Construct()
   for( int i = 0; i < _model->daughters(); ++i )
     addDaughter( _model->daughter( i ), MICEExpHall );
 
-  VirtualPlaneManager::ConstructVirtualPlanes(_miceElectroMagneticField->GetField(), _model);
-
   return MICEExpHall;
 }
 
@@ -194,9 +191,6 @@ void    MICEDetectorConstruction::addDaughter( MiceModule* mod, G4VPhysicalVolum
     logic = new G4LogicalVolume( solid, mat, mod->name() + "Logic", 0, 0, 0 );
     place = new G4PVPlacement( (G4RotationMatrix*) mod->rotationPointer(), mod->position(), mod->name(), logic, moth, false, 0, _checkVolumes);
   }
-
-  //Set a volume in cavity centre for phasing
-  SetPhasingVolume(mod, place);
 
   if(!_hasBTFields)
     setMagneticField( logic, mod );
@@ -273,6 +267,7 @@ void    MICEDetectorConstruction::addDaughter( MiceModule* mod, G4VPhysicalVolum
       SpecialVirtualSD * specVirtSD = new SpecialVirtualSD(_event, mod);
       MICESDMan->AddNewDetector( specVirtSD );
       logic->SetSensitiveDetector( specVirtSD );
+      _SDs.push_back( specVirtSD );
     }
     else if( sdName != "Virtual" && sdName != "Envelope") //note these are special cases
       std::cerr << "Error in volume " << mod->fullName() << " do not have an SD definition for " << sdName << std::  endl;
@@ -283,17 +278,21 @@ void    MICEDetectorConstruction::addDaughter( MiceModule* mod, G4VPhysicalVolum
 
 void    MICEDetectorConstruction::setUserLimits( G4LogicalVolume* logic, MiceModule* module )
 {
-  double stepMax = 100.*mm;
-  double trackMax = 1.*parsec;
-  double timeMax = 1000.*second;
-  double kinMin = 0.;
+    double stepMax = 100.*mm;
+    double trackMax = 1.*parsec;
+    double timeMax = 1000.*second;
+    double kinMin = 0.;
 
-  try{stepMax  = module->propertyDouble( "G4StepMax" ); } catch(Squeal squee) {}
-  try{trackMax = module->propertyDouble( "G4TrackMax" );} catch(Squeal squee) {}
-  try{timeMax  = module->propertyDouble( "G4TimeMax" ); } catch(Squeal squee) {}
-  try{kinMin   = module->propertyDouble( "G4KinMin" );  } catch(Squeal squee) {}
+    if(module->propertyExistsThis("G4StepMax", "double")) 
+        stepMax  = module->propertyDouble( "G4StepMax" );
+    if(module->propertyExistsThis("G4TrackMax", "double")) 
+        trackMax = module->propertyDouble( "G4TrackMax" );
+    if(module->propertyExistsThis("G4TimeMax", "double")) 
+        timeMax  = module->propertyDouble( "G4TimeMax" );
+    if(module->propertyExistsThis("G4KinMin", "double")) 
+        kinMin   = module->propertyDouble( "G4KinMin" );
 
-  logic->SetUserLimits(  new G4UserLimits( stepMax, trackMax, timeMax, kinMin ) );
+    logic->SetUserLimits(  new G4UserLimits( stepMax, trackMax, timeMax, kinMin ) );
 }
 
 void    MICEDetectorConstruction::setMagneticField( G4LogicalVolume* logic, MiceModule* module )
@@ -311,7 +310,8 @@ void    MICEDetectorConstruction::setMagneticField( G4LogicalVolume* logic, Mice
 
 void MICEDetectorConstruction::setBTMagneticField(MiceModule* rootModule)
 {
-  _btField = new BTFieldConstructor(rootModule);
+  MICERun::getInstance()->btFieldConstructor = new BTFieldConstructor(rootModule);
+  _btField = MICERun::getInstance()->btFieldConstructor;
   if(_btField->GetNumberOfFields()==0)
   {
     return;
@@ -319,7 +319,6 @@ void MICEDetectorConstruction::setBTMagneticField(MiceModule* rootModule)
 
   _miceMagneticField = new MiceMagneticField(_btField);
   _miceElectroMagneticField = new MiceElectroMagneticField(_btField);
-
   setSteppingAlgorithm();
   setSteppingAccuracy();
 
@@ -443,64 +442,6 @@ void MICEDetectorConstruction::setSteppingAccuracy()
     fieldMgr->SetMaximumEpsilonStep( epsilonMax );
 }
 
-void MICEDetectorConstruction::SetPhasingVolume(MiceModule * cavityModule, G4VPhysicalVolume* cavityVolume)
-{
-  //if I am an Unphased cavity, set up a sensitive detector in the centre
-  //BUG what if someone tries to put something in the cavity centre?
-  if (!(   cavityModule->propertyExistsThis("CavityMode", "string")
-        && cavityModule->propertyExistsThis("FieldType", "string")   ))
-    return;
-
-  if(!(   cavityModule->propertyStringThis("CavityMode") == "Unphased"
-       && (cavityModule->propertyStringThis("FieldType")  == "PillBox"
-       ||  cavityModule->propertyStringThis("FieldType")  == "RFFieldMap")  ))
-    return;
-
-
-  G4Material* PhaseMat = _materials->materialByName( cavityModule->propertyStringThis( "Material" ) );
-
-  G4VSolid* PhaseSolid = NULL;
-  G4String name;
-  stringstream namestr;
-  stringstream namestr2;
-
-  namestr2 << cavityModule->name();
-  namestr2 >> name;
-  BTPhaser::AddCavityName(name); //I want this to match the cavity volume name. Not unique.
-
-  namestr << cavityModule->fullName();
-  namestr >> name;
-  name = name+"DetMiddle";
-  BTPhaser::AddCavityDetectorName(name); //I want this to be unique... but that means using fullName
-
-  if( cavityModule->volType() == "Box" )
-    PhaseSolid = new G4Box( name, cavityModule->dimensions().x() / 2.,
-                         cavityModule->dimensions().y() / 2., _pillBoxSpecialVirtualLength / 2. );
-  else if( cavityModule->volType() == "Cylinder" )
-    PhaseSolid = new G4Tubs( name, 0., cavityModule->dimensions().x(),
-                         _pillBoxSpecialVirtualLength / 2., 0. * deg, 360. * deg );
-  else
-    std::cerr << "ERROR - Unphased cavity can't have Volume " << cavityModule->volType() << std::endl;
-
-  G4LogicalVolume* PhaseLogic = new G4LogicalVolume( PhaseSolid, PhaseMat, name, 0, 0, 0 );
-  G4VisAttributes* visAttInv = new G4VisAttributes(false);
-  PhaseLogic->SetVisAttributes(visAttInv);
-  G4PVPlacement*   PhasePlace = new G4PVPlacement( (G4RotationMatrix*) cavityModule->rotationPointer(),
-                                 G4ThreeVector(0,0,0), name, PhaseLogic,
-                                 cavityVolume, false, 0, _checkVolumes);
-
-  G4SDManager *MICESDMan = G4SDManager::GetSDMpointer();
-  if(cavityModule->propertyExistsThis("PhasingVolume", "string"))
-    if(cavityModule->propertyStringThis("PhasingVolume") == "SpecialVirtual")
-    { 
-      SpecialVirtualSD * specVirtSD = new SpecialVirtualSD(_event, cavityModule);
-      MICESDMan->AddNewDetector( specVirtSD );
-      PhaseLogic->SetSensitiveDetector( specVirtSD );
-    }
-
-  if(PhasePlace);
-}
-
 std::vector<Json::Value> MICEDetectorConstruction::GetSDHits(int i){
   if (i >= 0 and i < _SDs.size() and _SDs[i]){
     if (_SDs[i]->isHit()) {
@@ -509,5 +450,11 @@ std::vector<Json::Value> MICEDetectorConstruction::GetSDHits(int i){
   }
   std::vector<Json::Value> empty;
   return empty;
+}
+
+void MICEDetectorConstruction::ClearSDHits(){
+  for ( int i = 0; i < _SDs.size(); i++ ) {
+    if (_SDs[i]) _SDs[i]->ClearHits();
+  }
 }
       

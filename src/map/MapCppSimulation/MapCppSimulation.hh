@@ -90,30 +90,6 @@ class MapCppSimulation {
    */
   std::string process(std::string document);
 
-  /** @brief Store tracking information in the particle
-   *
-   *  stores:
-   *    sensitive detector hits registered in the detectors (from 
-   *      MICEDetectorConstruction::GetSDHits())
-   *    tracks (list of step points) if _storeTracks is set (from
-   *      MAUSSteppingAction::GetTrack())
-   *  
-   *  @param particle Json value where the information is stored
-   */
-  Json::Value StoreTracking(Json::Value particle);
-
-  /** @brief Store tracking information in the particle
-   *
-   *  stores:
-   *    sensitive detector hits registered in the detectors (from 
-   *      MICEDetectorConstruction::GetSDHits())
-   *    tracks (list of step points) if _storeTracks is set (from
-   *      MAUSSteppingAction::GetTrack())
-   *  
-   *  @param particle Json value where the information is stored
-   */
-  void SetNextParticle(Json::Value particle);
-
   /** @brief Set up configuration information on the MICERun
    *  
    *  Sets the datacards, json configuration, Squeak standard outputs,
@@ -127,6 +103,7 @@ class MapCppSimulation {
   std::string _classname;
   std::string _geometry;
   bool _storeTracks;
+  bool _doVis;
 };  // Don't forget this trailing colon!!!!
 
 

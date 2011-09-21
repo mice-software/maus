@@ -80,7 +80,7 @@ class CppErrorHandler {
    *  @param class_name name of the class that generated the error
    */
   Json::Value HandleStdExc
-                  (Json::Value val, std::exception exc, std::string class_name);
+                  (Json::Value val, std::exception& exc, std::string class_name);
 
   /** @brief Call default Cpp exception handler when Json not initialised
    *
@@ -90,7 +90,7 @@ class CppErrorHandler {
    *  @param exc the std::exception
    *  @param class_name name of the class that generated the error
    */
-  void HandleStdExcNoJson(std::exception exc, std::string class_name);
+  void HandleStdExcNoJson(std::exception& exc, std::string class_name);
 
   /** @brief Set function that is called to pass errors to python
    *
