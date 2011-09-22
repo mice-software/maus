@@ -33,12 +33,11 @@
 #include "Utils/DAQChannelMap.hh"
 #include "Interface/Squeal.hh"
 #include "Interface/Squeak.hh"
+
 using std::string;
 using std::ostream;
 using std::istream;
 using std::ifstream;
-using std::cout;
-using std::endl;
 using std::stringstream;
 
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -59,6 +58,16 @@ class TOFChannelKey {
 
   bool operator==( TOFChannelKey key );
   bool operator!=( TOFChannelKey key );
+  
+  /** Return true only if the given TOF channel is connected 
+  * to the the opposit side of the slab.
+  */
+  bool inSameSlab(TOFChannelKey key);
+  
+  /** Return true only if the given TOF channel coded as 
+  * string is connected to the opposit side of the slab.
+  */  
+  bool inSameSlab(string keyStr);
 
   friend ostream& operator<<( ostream& stream, TOFChannelKey key );
   friend istream& operator>>( istream& stream, TOFChannelKey &key ) throw(Squeal);
@@ -123,21 +132,21 @@ class TOFChannelMap {
  * \param[in] daqch DAQ channel to search for, coded as string.
  * \return The key of the TOF channel connected to the given DAQ channel.
  */  
-  TOFChannelKey* find(std::string daqKeyStr);
+  TOFChannelKey* find(string daqKeyStr);
   
  /** Return pointer to the fADC DAQ key.
  * This function returns pointer to the fADC DAQ channel key coupled to the required TDC channel.
  * \param[in] daqch TDC channel to search for, coded as string.
  * \return The key of the fADC channel coupled to the given TDC channel.
  */   
-  DAQChannelKey* findfAdcKey(std::string tdcKeyStr);
+  DAQChannelKey* findfAdcKey(string tdcKeyStr);
   
  /** Return pointer to the TDC DAQ key.
  * This function returns pointer to the TDC DAQ channel key coupled to the required fADC channel.
  * \param[in] daqch fADC channel to search for, coded as string.
  * \return The key of the TDC channel coupled to the given fADC channel.
  */   
-  DAQChannelKey* findTdcKey(std::string adcKeyStr);
+  DAQChannelKey* findTdcKey(string adcKeyStr);
   
  private:
   std::vector<TOFChannelKey*> _tofKey;

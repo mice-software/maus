@@ -1,14 +1,9 @@
 import os
 import md5
 import unittest
-<<<<<<< TREE
 import json
 from Configuration import Configuration
-from InputCppRealData import InputCppRealData
-=======
-
 from InputCppData import InputCppData
->>>>>>> MERGE-SOURCE
 
 class InputCppDataTestCase(unittest.TestCase):
 

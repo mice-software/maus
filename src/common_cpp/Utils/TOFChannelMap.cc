@@ -32,7 +32,8 @@ bool TOFChannelMap::InitFromFile(string filename) {
   ifstream stream(filename.c_str());
   
   if ( !stream ) {
-    Squeak::mout(Squeak::error) << "Error in TOFChannelMap::InitFromFile. Can't open TOF cabling file " << filename << endl;
+    Squeak::mout(Squeak::error) << "Error in TOFChannelMap::InitFromFile. Can't open TOF cabling file " 
+    << filename << std::endl;
     return false;
   }
 
@@ -182,6 +183,24 @@ bool TOFChannelKey::operator!=( TOFChannelKey const key ) {
   } else {
     return true;
   }
+}
+
+bool TOFChannelKey::inSameSlab(TOFChannelKey key)
+{
+  if(this->station() == key.station() &&
+     this->plane() == key.plane() &&
+     this->slab() == key.slab() &&
+     this->detector() == key.detector()&&
+     this->pmt() != key.pmt())
+    return true;
+  
+  return false;
+}
+  
+bool TOFChannelKey::inSameSlab(string keyStr)
+{
+  TOFChannelKey key(keyStr);
+  return this->inSameSlab(key);  
 }
 
 ostream& operator<<( ostream& stream, TOFChannelKey key ) {
