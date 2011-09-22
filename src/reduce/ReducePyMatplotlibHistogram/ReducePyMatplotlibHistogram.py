@@ -31,6 +31,7 @@ import json
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 import matplotlib.mlab as mlab
+import os
 import uuid
 
 class ReducePyMatplotlibHistogram:
@@ -62,6 +63,14 @@ class ReducePyMatplotlibHistogram:
             self._filePrefix = uuid.uuid4()
         print "Histogram file prefix: %s" % self._filePrefix
 
+        key = "histogram_directory"
+        if key in configDoc:
+            self._directory = configDoc[key]
+            if not os.path.exists(self._directory): 
+                os.makedirs(self._directory) 
+	else:
+            self._directory = os.getcwd()
+        print "Histogram directory: %s" % self._directory
         # Number of files saved so far.
         self._fileCount = 0
         return True
@@ -73,7 +82,7 @@ class ReducePyMatplotlibHistogram:
             print "Bad JSON document"
             jsonDoc = {"errors": {"bad_json_document":
                                 "unable to do json.loads on input"} }
-            return self.returnJSON(ignore, json.dumps(jsonDoc))
+            return self.returnJSON(ignore, json.dumps(jsonDoc))        
         if "digits" not in jsonDoc:
             print "No digits in JSON document"
             if 'errors' not in jsonDoc:
@@ -83,7 +92,7 @@ class ReducePyMatplotlibHistogram:
         digits = jsonDoc['digits']
         print "Number of digits: %d" % len(digits)
         # TODO alternatively filter and TDC/ADC count extraction in one
-        # list traversal?
+        # list traversal? Otherwise, digit index may get out of synch.
         trackerdigits = filter(self.filtertrackers, digits)
         print "Number of tracker digits: %d" % len(trackerdigits)
 	tdc_counts = [self.get_counts(digit, 'tdc_counts') 
@@ -104,19 +113,21 @@ class ReducePyMatplotlibHistogram:
         return "%s\n%s" % (jsonStrings.rstrip(), jsonString.rstrip())
 
     def filtertrackers(self, digit):
-        # TODO existence check
-        return digit['channel_id']['type'] == 'Tracker'
+        if "channel_id" not in digit:
+            return False
+        if "type" not in digit["channel_id"]:
+            return False
+        else:
+            return digit['channel_id']['type'] == 'Tracker'
 
     def get_counts(self, digit, type):
         if type in digit:
             return digit[type]
         else:
-            # TODO confirm this behaviour is OK.
             return 0
 
     def histogram(self, tdc_counts, adc_counts): 
         print "About to histogram..."
-	# TODO make this configurable?
         figure = Figure(figsize=(6, 6))
         canvas = FigureCanvas(figure)
         axes = figure.add_subplot(111)
@@ -124,6 +135,10 @@ class ReducePyMatplotlibHistogram:
         axes.set_xlabel('Digit', fontsize=12)
         axes.set_ylabel('Count', fontsize=12)
         axes.grid(True,linestyle='-', color='0.75')
+#        if (len(tdc_counts) > 0):
+#            axes.scatter(range(0, len(tdc_counts)), tdc_counts, 10, 'r', label='TDC counts')
+#        if (len(adc_counts) > 0):
+#            axes.scatter(range(0, len(adc_counts)), adc_counts, 10, 'b', label='ADC counts')        
         axes.plot(tdc_counts, 'r', label='TDC counts') 
         axes.plot(adc_counts, 'b', label='ADC counts') 
         axes.legend()
@@ -139,8 +154,9 @@ class ReducePyMatplotlibHistogram:
             datetime.datetime.now().strftime("%Y%m%d%H%M%S"), 
             self._fileCount,
             self._imageType)
-        print "Saving in " + fileName
+        file = os.path.join(self._directory, fileName)
+        print "Saving in " + file
         # File extension determines format. Default if omitted is .png.
-        canvas.print_figure(fileName, dpi=500)
+        canvas.print_figure(file, dpi=500)
         self._fileCount += 1
         print "Saved!"
