@@ -115,7 +115,7 @@ bool InputCppData::birth(std::string jsonDataCards) {
     _v1731PartEventProc->set_zero_supression(zs);
 
     assert(configJSON.isMember("V1731_Zero_Suppression_Threshold"));
-    int zs_threshold = configJSON["V1731_Zero_Suppression_Threshold"].asInt();   
+    int zs_threshold = configJSON["V1731_Zero_Suppression_Threshold"].asInt();
     _v1731PartEventProc->set_zs_threshold(zs_threshold);
 
     _dataProcessManager.SetPartEventProc("V1731", _v1731PartEventProc);

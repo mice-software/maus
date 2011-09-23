@@ -95,14 +95,14 @@ DAQChannelMap::~DAQChannelMap() {
 bool DAQChannelMap::InitFromFile(std::string filename) {
   std::ifstream stream(filename.c_str());
   if ( !stream ) {
-    Squeak::mout(Squeak::error) 
+    Squeak::mout(Squeak::error)
     << "Error in DAQChannelMap::InitFromFile. Can't DAQ open cabling file. "
     << filename << std::endl;
     return false;
   }
   std::stringstream key_s;
   DAQChannelKey* key;
-  
+
   try {
     while ( !stream.eof() ) {
       key = new DAQChannelKey();
@@ -110,15 +110,15 @@ bool DAQChannelMap::InitFromFile(std::string filename) {
       _chKey.push_back(key);
     }
   }catch(Squeal e) {
-    Squeak::mout(Squeak::error) 
-    << "Error in DAQChannelMap::InitFromFile. Error during loading." 
+    Squeak::mout(Squeak::error)
+    << "Error in DAQChannelMap::InitFromFile. Error during loading."
     << std::endl;
     return false;
   }
-  
+
   if (_chKey.size() == 0) {
-    Squeak::mout(Squeak::error) 
-    << "Error in DAQChannelMap::InitFromFile. No DAQ Channel Keys loaded. " 
+    Squeak::mout(Squeak::error)
+    << "Error in DAQChannelMap::InitFromFile. No DAQ Channel Keys loaded. "
     << std::endl;
     return false;
   }
