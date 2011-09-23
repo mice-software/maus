@@ -43,11 +43,11 @@ def run(image_type = None, file_prefix = None, directory_path = None):
 
     data_cards = []
     if (image_type != None):
-        data_cards.append("histogram_image_type='%s'\n" % image_type)
+        data_cards.append("image_type='%s'\n" % image_type)
     if (file_prefix != None):
-        data_cards.append("histogram_file_prefix='%s'\n" % file_prefix)
+        data_cards.append("image_file_prefix='%s'\n" % file_prefix)
     if (directory_path != None):
-        data_cards.append("histogram_directory='%s'\n" % directory_path)
+        data_cards.append("image_directory='%s'\n" % directory_path)
     data_cards_file = io.StringIO(unicode("".join(data_cards)))
 
     input_worker = MAUS.InputPyJSON(input_file)
@@ -67,6 +67,6 @@ if __name__ == "__main__":
     directory_path = None
     if len(sys.argv) == 4:
         image_type = sys.argv[1]
-        file_prefix = sys.argv[2]
-        directory_path = sys.argv[3]
+        directory_path = sys.argv[2]
+        file_prefix = sys.argv[3]
     run(image_type, file_prefix, directory_path)

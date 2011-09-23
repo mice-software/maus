@@ -18,28 +18,74 @@ OutputPyImage saves image files held in a set of JSON documents.
 
 import io
 import json
+import os
+import uuid
 
 class OutputPyImage:
     """
     OutputPyImage saves image files held in a set of JSON documents.
+
+    The input is a sequence of JSON documents separated by line
+    breaks e.g.:
+
+    {"images": [{"content":"TDC and ADC counts for spill 2",
+                 "tag": "spill",
+                 "image_type": "eps", 
+                 "data": "..."},
+                {"content":"Total TDC and ADC counts to spill 2",
+                 "tag": "spills",
+                 "image_type": "eps", 
+                 "data": "..." }]}
+
+    If there are no such entries in a document then it skips to the
+    next.
+
+    The caller can configure the worker and specify:
+
+    -File prefix ("image_file_prefix"). Default: auto-generated
+     UUID. 
+    -Directory for files ("image_directory"). Default: current
+     working directory. If the given directory does not exist it
+     will be created.
+
+    Each image is saved in the directory in a file named using the
+    concatenation of the image file prefix and "tag".
     """
 
-    def __init__(self, arg_file = None):
-        """
-        A no-op
-        """
+    def __init__(self):
+        self._file_prefix = ""
+        self._directory = os.getcwd()
 
-    def birth(self, config_document):
+    def birth(self, config_json):
         """
-        A no-op
+        Configure worker from data cards.
+        @param self Object reference.
+        @param config_json JSON document string.
         @returns True
         """
+        config_doc = json.loads(config_json)
+
+        key = "image_file_prefix"
+        if key in config_doc:
+            self._file_prefix = config_doc[key]
+        else:
+            self._file_prefix = uuid.uuid4()
+        print "Image file prefix: %s" % self._file_prefix
+
+        key = "image_directory"
+        if key in config_doc:
+            self._directory = config_doc[key]
+            if not os.path.exists(self._directory): 
+                os.makedirs(self._directory) 
+        else:
+            self._directory = os.getcwd()
+        print "Image directory: %s" % self._directory
+
         return True
 
     def save(self, document):
         """
         Save image files held in a set of JSON documents.
-        TODO document 
         @param document List of JSON documents separated by newline.
         """
         document_file = io.StringIO(unicode(document))
@@ -48,11 +94,13 @@ class OutputPyImage:
             next_value = next_value.rstrip()
             if next_value != "":
                 json_doc = json.loads(next_value)
-                if "histograms" in json_doc:
-                    for entry in json_doc["histograms"]:
+                if "images" in json_doc:
+                    for entry in json_doc["images"]:
+                        file_path = self.get_file_path(entry["tag"], 
+                                                       entry["image_type"])
                         print "Saving %s to %s" \
-                            % (entry["content"], entry["file_path"])
-                        data_file = open(entry["file_path"], "w")
+                            % (entry["content"], file_path)
+                        data_file = open(file_path, "w")
                         data_file.write(entry["data"])
                         data_file.close()
             next_value = document_file.readline()
@@ -63,3 +111,19 @@ class OutputPyImage:
         @returns True
         """
         return True
+
+    def get_file_path(self, tag, image_type):
+        """
+        Get file path, derived from the directory, file name prefix,
+        tag and using image_type as the file extension.
+        @param self Object reference.
+        @param tag File name tag.
+        @param image_type Image type.
+        @returns file path.
+        """
+        file_name = "%s%s.%s" % (
+            self._file_prefix, 
+            tag,
+            image_type)
+        file_path = os.path.join(self._directory, file_name)
+        return file_path

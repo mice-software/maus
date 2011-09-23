@@ -20,9 +20,7 @@ spills and histograms summarising all spills to date.
 import json
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
-import os
 import StringIO
-import uuid
 
 class ReducePyMatplotlibHistogram:
     """
@@ -33,21 +31,28 @@ class ReducePyMatplotlibHistogram:
     It uses the "adc_counts" and "tdc_counts" for each digit within a
     "digits" list. 
 
-    The caller can configure the reducer and specify:
+    The caller can configure the worker and specify:
+
     -Image type ("histogram_image_type"). Must be one of those
      supported by matplot lib (currently "svg", "ps", "emf", "rgba",
      "raw", "svgz", "pdf", "eps", "png"). Default: "eps".
-    -File prefix ("histogram_file_prefix"). Default: auto-generated
-     UUID. 
-    -Directory for files ("histogram_directory"). Default: current
-     working directory. If the given directory does not exist it
-     will be created.
+
     The output is a sequence of JSON documents separated by line
-    breaks, where each document has a "histograms" element e.g. 
-    {"histograms": [{"content": ["TDC and ADC counts for spill 0"], 
-                     "image_type": "eps", 
-                     "data": "..." 
-                     "file_path": "/home/maus/outputs/examplespills.eps"}]}
+    breaks e.g.:
+
+    {"images": [{"content":"TDC and ADC counts for spill 2",
+                 "tag": "spill2",
+                 "image_type": "eps", 
+                 "data": "..."},
+                {"content":"Total TDC and ADC counts to spill 2",
+                 "tag": "spills2",
+                 "image_type": "eps", 
+                 "data": "..." }]}
+
+    The "tag" allows the types of histogram to be discriminated. The
+    N (e.g. 2) means that the histograms were produced during processing
+    of the Nth spill (N = 0..)
+
     In case of errors the output document is just the input document
     with an "errors" field.
     """
@@ -55,13 +60,13 @@ class ReducePyMatplotlibHistogram:
     def __init__(self):
         self._summary_histogram = None
         self._image_type = "eps"
-        self._file_prefix = ""
-        self._directory = os.getcwd()
         self._spill_count = 0
+        self._max_adc_count = 1
+        self._max_tdc_count = 1
 
     def birth(self, config_json):
         """
-        Configure reducer from data cards.
+        Configure worker from data cards.
         @param self Object reference.
         @param config_json JSON document string.
         @returns True
@@ -90,23 +95,9 @@ class ReducePyMatplotlibHistogram:
             print error
             raise ValueError(error)
 
-        key = "histogram_file_prefix"
-        if key in config_doc:
-            self._file_prefix = config_doc[key]
-        else:
-            self._file_prefix = uuid.uuid4()
-        print "Histogram file prefix: %s" % self._file_prefix
-
-        key = "histogram_directory"
-        if key in config_doc:
-            self._directory = config_doc[key]
-            if not os.path.exists(self._directory): 
-                os.makedirs(self._directory) 
-        else:
-            self._directory = os.getcwd()
-        print "Histogram directory: %s" % self._directory
-
         self._spill_count = 0
+        self._max_adc_count = 1
+        self._max_tdc_count = 1
         return True
 
     def process(self, json_strings, json_string):
@@ -137,6 +128,7 @@ class ReducePyMatplotlibHistogram:
         trackerdigits = \
             [digit for digit in digits if self.filter_trackers(digit)]
         print "Number of tracker digits: %d" % len(trackerdigits)
+
         # Get the TDC and ADC counts.    
         tdc_counts = [self.get_counts(digit, "tdc_counts") 
                       for digit in trackerdigits]
@@ -144,7 +136,12 @@ class ReducePyMatplotlibHistogram:
         adc_counts = [self.get_counts(digit, "adc_counts") 
                       for digit in trackerdigits]
         print "adc_counts: %s" % adc_counts
-   
+        # Calculate maximums for axis rescaling.
+        spill_max_tdc_count = max(tdc_counts)
+        self._max_tdc_count = max(self._max_tdc_count, spill_max_tdc_count)
+        spill_max_adc_count = max(adc_counts)
+        self._max_adc_count = max(self._max_adc_count, spill_max_adc_count)
+
         # Create a FigureCanvas for a histogram for the current spill.
         histogram = self.create_histogram(
             "TDC and ADC counts for spill %d" % self._spill_count,
@@ -152,27 +149,37 @@ class ReducePyMatplotlibHistogram:
 
         json_doc = {}
         json_histograms = []
-        json_doc["histograms"] = json_histograms
+        json_doc["images"] = json_histograms
 
-        file_path = self.get_histogram_path("spill")
         histogram_title = "TDC and ADC counts for spill %d" \
                            % self._spill_count
-        data = self.histogram(histogram,  histogram_title,
-                              tdc_counts, adc_counts)
-        json_histograms.append({"content":histogram_title,
-                                "image_type": self._image_type,
-                                "file_path":file_path,
-                                "data":data})
+        self.histogram(histogram,  histogram_title,
+                       tdc_counts, adc_counts)
+        # Rescale axis so 0 is always visible.
+        histogram.figure.get_axes()[0].set_xlim([0, spill_max_tdc_count])
+        histogram.figure.get_axes()[0].set_ylim([0, spill_max_adc_count])
 
-        file_path = self.get_histogram_path("spills")
+        data = self.convert_to_binary(histogram)
+        json_histograms.append({"content": histogram_title,
+                                "tag": "%dspill" % self._spill_count,
+                                "image_type": self._image_type,
+                                "data": data})
+
         histogram_title = "Total TDC and ADC counts to spill %d" \
                           % self._spill_count
-        data = self.histogram(self._summary_histogram,  histogram_title,
-                              tdc_counts, adc_counts)
-        json_histograms.append({"content":histogram_title,
+        self.histogram(self._summary_histogram,  histogram_title,
+                       tdc_counts, adc_counts)
+        # Rescale axis so 0 is always visible.
+        self._summary_histogram.figure.get_axes()[0].set_xlim( \
+            [0, self._max_tdc_count])
+        self._summary_histogram.figure.get_axes()[0].set_ylim( \
+            [0, self._max_adc_count])
+        data = self.convert_to_binary(self._summary_histogram)
+
+        json_histograms.append({"content": histogram_title,
+                                "tag": "%dspills" % self._spill_count,
                                 "image_type": self._image_type,
-                                "file_path":file_path,
-                                "data":data})
+                                "data": data})
 
         self._spill_count += 1
         return self.return_json(json_strings, json.dumps(json_doc))
@@ -192,7 +199,6 @@ class ReducePyMatplotlibHistogram:
         @returns String of JSON documents with a line break and the 
         current one appended.
         """
-        # Replicate ReducePyDoNothing for now.
         return "%s\n%s" % (json_strings.rstrip(), json_string.rstrip())
 
     def filter_trackers(self, digit):
@@ -248,13 +254,20 @@ class ReducePyMatplotlibHistogram:
         @param title Title.
         @param tdc_counts List of TDC counts.
         @param adc_counts List of ADC counts.
-        @returns representation of histogram in image type format.
         """
-        print "About to histogram..."
+        print "About to histogram %s..." % title
         histogram.figure.get_axes()[0].set_title(title, fontsize=14)
         if (len(tdc_counts) > 0):
             histogram.figure.get_axes()[0].scatter(tdc_counts, 
                                                    adc_counts, 10, "b")
+
+    def convert_to_binary(self, histogram): 
+        """
+        Convert histogram to binary format.
+        @param self Object reference.
+        @param histogram matplotlib FigureCanvas representing the histogram.
+        @returns representation of histogram in image type format.
+        """
         print "Converting to binary format..."
         data_file = StringIO.StringIO() 
         histogram.print_figure(data_file, dpi=500, format=self._image_type)
@@ -262,20 +275,3 @@ class ReducePyMatplotlibHistogram:
         data = data_file.read()
         print "Converted"
         return data
-
-    def get_histogram_path(self, histogram_type):
-        """
-        Get histogram file path, derived from file name prefix, spill
-        count, histogram type and image type.
-        @param self Object reference.
-        @param histogram_type String containing histogram type
-        (e.g. "spill" or "spills") to add to file name.
-        @returns histogram file path.
-        """
-        file_name = "%s%s%s.%s" % (
-            self._file_prefix, 
-            self._spill_count,
-            histogram_type,
-            self._image_type)
-        file_path = os.path.join(self._directory, file_name)
-        return file_path
