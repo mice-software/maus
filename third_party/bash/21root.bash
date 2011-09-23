@@ -39,7 +39,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 	echo
 	sleep 1
 
-	./configure --disable-xrootd --with-gsl-incdir=${MAUS_ROOT_DIR}/third_party/install/include --with-gsl-libdir=${MAUS_ROOT_DIR}/third_party/install/lib && echo && echo && echo "INFO: Making:" && echo && sleep 1 && make || { echo "FAIL: Failed to configure/make";exit 1; }
+	./configure --disable-xrootd --with-gsl-incdir=${MAUS_ROOT_DIR}/third_party/install/include --with-gsl-libdir=${MAUS_ROOT_DIR}/third_party/install/lib --disable-xft && echo && echo && echo "INFO: Making:" && echo && sleep 1 && make || { echo "FAIL: Failed to configure/make";exit 1; }
 
 	            ################################################## 
 	echo
