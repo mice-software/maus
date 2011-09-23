@@ -53,7 +53,7 @@ class TOFChannelKey {
   TOFChannelKey(int l, int g, int ch, int e, string d)
   :_station(l), _plane(g), _slab(ch), _pmt(e), _detector(d) {}
 
-  TOFChannelKey(string keyStr) throw(Squeal);
+  explicit TOFChannelKey(string keyStr) throw(Squeal);
   virtual ~TOFChannelKey() {}
 
   bool operator==( TOFChannelKey key );

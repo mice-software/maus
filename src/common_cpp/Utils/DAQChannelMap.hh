@@ -43,7 +43,7 @@ class DAQChannelKey {
   DAQChannelKey(int l, int g, int ch, int e, std::string d)
   :_ldcId(l), _geo(g), _channel(ch), _eqType(e), _detector(d) {}
 
-  DAQChannelKey(std::string keyStr) throw(Squeal);
+  explicit DAQChannelKey(std::string keyStr) throw(Squeal);
 
   virtual ~DAQChannelKey() {}
 
