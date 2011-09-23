@@ -1,16 +1,24 @@
 #!/usr/bin/env python
-"""Simple example showing use of ReducePyMatplotlibHistogram."""
+"""
+Simple example showing use of ReducePyMatplotlibHistogram and
+OutputPyImage.
+"""
 
-from Configuration import Configuration
 import json
 import io
 import MAUS
+import sys
 
-def run():
-    """Create a JSON document and create a histogram."""
+def run(image_type = None, file_prefix = None, directory_path = None):
+    """
+    Create a JSON document and create a histogram.
+    @param image_type Image type.
+    @param file_prefix Prefix for file names.
+    @param directory_path Directory for files.
+    """
 
-    json_strs = []
-    for i in range(1, 4):
+    input_docs = []
+    for i in range(0, 4):
         json_doc = {}
         json_doc["digits"] = []
         for j in range(1, 10):
@@ -29,37 +37,36 @@ def run():
                      "tracker_number":0, "type":"Tracker"},
                      "tdc_counts":j}
             json_doc["digits"].append(digit)
-        json_strs.append(json.dumps(json_doc))
+        input_docs.append(json.dumps(json_doc))
+        input_docs.append("\n")
+    input_file = io.StringIO(unicode("".join(input_docs)))
 
-    reducer = MAUS.ReducePyMatplotlibHistogram()
-    config = Configuration()
-    config_json = json.loads(config.getConfigJSON())
-    config_json["histogram_image_type"] = "eps"
-    config_json["histogram_file_prefix"] = "plot"
-    config_json["histogram_directory"] = "test_plots"
+    data_cards = []
+    if (image_type != None):
+        data_cards.append("histogram_image_type='%s'\n" % image_type)
+    if (file_prefix != None):
+        data_cards.append("histogram_file_prefix='%s'\n" % file_prefix)
+    if (directory_path != None):
+        data_cards.append("histogram_directory='%s'\n" % directory_path)
+    data_cards_file = io.StringIO(unicode("".join(data_cards)))
 
-    reducer.birth(json.dumps(config_json))
+    input_worker = MAUS.InputPyJSON(input_file)
+    map_worker = MAUS.MapPyGroup()
+    map_worker.append(MAUS.MapPyDoNothing())  
+    output_worker = MAUS.OutputPyImage()
 
-    output = ""
-    for json_str in json_strs:
-        output = reducer.process(output, json_str)
-
-    reducer.death()
-
-    output_file = io.StringIO(unicode(output))
-    next_value = output_file.readline()
-    while next_value != "":
-        next_value = next_value.rstrip()
-        if next_value != "":
-            json_doc = json.loads(next_value)
-            if "histograms" in json_doc:
-                for entry in json_doc["histograms"]:
-                    print "Saving %s to %s" \
-                        % (entry["content"], entry["file_path"])
-                    data_file = open(entry["file_path"], "w")
-                    data_file.write(entry["data"])
-                    data_file.close()
-        next_value = output_file.readline()
+    MAUS.Go(input_worker, 
+            map_worker, 
+            MAUS.ReducePyMatplotlibHistogram(), 
+            output_worker, 
+            data_cards_file)
 
 if __name__ == "__main__":
-    run()
+    image_type = None
+    file_prefix = None
+    directory_path = None
+    if len(sys.argv) == 4:
+        image_type = sys.argv[1]
+        file_prefix = sys.argv[2]
+        directory_path = sys.argv[3]
+    run(image_type, file_prefix, directory_path)
