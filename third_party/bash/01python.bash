@@ -61,9 +61,14 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         echo "INFO: Installing within MAUS's third party directory:"
         if [ `uname -s` == "Darwin" ]; then
           make frameworkinstallstructure \
-               altinstall \
                bininstall \
                maninstall \
+               altbininstall \
+               libinstall \
+               inclinstall \
+               libainstall \
+               sharedinstall \
+               oldsharedinstall \
                frameworkinstallmaclib \
                frameworkinstallunixtools
         else
