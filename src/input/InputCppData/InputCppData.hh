@@ -44,7 +44,7 @@
 
 class InputCppData {
 
-public:
+ public:
 
 /** Create an instance of InputCppData.
   * 
@@ -116,7 +116,7 @@ public:
      return "";
   };
 
-private:
+ private:
 
 /** Process manager object. */
   MDprocessManager _dataProcessManager;
@@ -175,7 +175,6 @@ private:
   * \return The type of the event as string.
   */
   std::string event_type_to_str(int pType);
-
 };
 
 #endif  // _MAUS_INPUTCPPDATA_INPUTCPPDATA_H__

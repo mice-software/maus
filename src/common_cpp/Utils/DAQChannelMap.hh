@@ -42,7 +42,7 @@ class DAQChannelKey {
 
   DAQChannelKey(int l, int g, int ch, int e, std::string d)
   :_ldcId(l), _geo(g), _channel(ch), _eqType(e), _detector(d) {}
-  
+
   DAQChannelKey(std::string keyStr) throw(Squeal);
 
   virtual ~DAQChannelKey() {}
@@ -115,7 +115,7 @@ class DAQChannelMap {
  * \return The key of the DAQ channel.
  */
   DAQChannelKey* find(int ldc, int geo, int ch, int eqType);
-  
+
  /** Return pointer to the key.
  * This function returns pointer to the key for the required DAQ channel.
  * \param[in] daqKeyStr the required key coded as string.

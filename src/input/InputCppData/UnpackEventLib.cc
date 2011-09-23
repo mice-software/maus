@@ -43,9 +43,9 @@ int V1290DataProcessor::Process(MDdataContainer* aPartEventPtr) {
       int xHitsL = xV1290Evnt->GetNHits(xCh, 'l');
       // Get the number of trailing edge hits.
       int xHitsT = xV1290Evnt->GetNHits(xCh, 't');
-      
+
       // By definition the number of the leading edge hits has to be equal
-      // to the number of the trailing edge hits but some times this is not true. 
+      // to the number of the trailing edge hits but some times this is not true.
       int xMaxHits = MAX(xHitsL, xHitsT);
 
       // Loop over all leading and trailing hits in this channel.
@@ -312,13 +312,13 @@ int DBBDataProcessor::Process(MDdataContainer* aFragPtr) {
 
     // Loop over all the channels
     for (unsigned int xCh = 0; xCh < DBB_NCHANNELS; xCh++) {
-      // Get the number of leading edge hits.      
+      // Get the number of leading edge hits.
       int xHitsL = xDBBFragment->GetNLeadingEdgeHits(xCh);
       // Get the number of trailing edge hits.
       int xHitsT = xDBBFragment->GetNTrailingEdgeHits(xCh);
-      
+
       // By definition the number of the leading edge hits has to be equal
-      // to the number of the trailing edge hits but some times this is not true.       
+      // to the number of the trailing edge hits but some times this is not true.
       int xMaxHits = MAX(xHitsL, xHitsT);
 
       // Loop over all leading and trailing hits in this channel.
@@ -405,9 +405,9 @@ int fADCDataProcessor::get_signal_area(int& pos) {
   max = max_element(_data.begin(), _data.end());
   pos = distance(_data.begin(), max);
 
-  if(pos > 10) it = max - 10;
+  if (pos > 10) it = max - 10;
 
-  while(it < max+20) {
+  while (it < max+20) {
     area += *it - _pedestal;
     it++;
   }
@@ -424,15 +424,15 @@ int fADCDataProcessor::get_pedestal_area(int& pos) {
   max = max_element(_data.begin(), _data.end());
   pos = distance(_data.begin(), max);
 
-  if(pos > 30 && pos < 97) {
+  if (pos > 30 && pos < 97) {
     it = max - 30;
-    while(it < max-10) {
+    while (it < max-10) {
       pedareaminus += *it - _pedestal;
       it++;
     }
 
     it = max + 20;
-    while(it < max+30) {
+    while (it < max+30) {
       pedareaplus += *it - _pedestal;
       it++;
     }

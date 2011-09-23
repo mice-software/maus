@@ -52,18 +52,18 @@ class TOFChannelKey {
 
   TOFChannelKey(int l, int g, int ch, int e, string d)
   :_station(l), _plane(g), _slab(ch), _pmt(e), _detector(d) {}
-  
+
   TOFChannelKey(string keyStr) throw(Squeal);
   virtual ~TOFChannelKey() {}
 
   bool operator==( TOFChannelKey key );
   bool operator!=( TOFChannelKey key );
-  
+
   /** Return true only if the given TOF channel is connected 
   * to the the opposit side of the slab.
   */
   bool inSameSlab(TOFChannelKey key);
-  
+
   /** Return true only if the given TOF channel coded as 
   * string is connected to the opposit side of the slab.
   */  
@@ -111,7 +111,7 @@ class TOFChannelKey {
  */
 class TOFChannelMap {
  public:
-  TOFChannelMap() {};
+  TOFChannelMap() {}
   virtual ~TOFChannelMap();
 
   /// Initialize the map from text file.
@@ -126,28 +126,28 @@ class TOFChannelMap {
  * \return The key of the TOF channel connected to the given DAQ channel.
  */
   TOFChannelKey* find(DAQChannelKey* daqKey);
-  
+
  /** Return pointer to the TOF key.
  * This function returns pointer to the TOF channel key for the required DAQ channel.
  * \param[in] daqch DAQ channel to search for, coded as string.
  * \return The key of the TOF channel connected to the given DAQ channel.
  */  
   TOFChannelKey* find(string daqKeyStr);
-  
+
  /** Return pointer to the fADC DAQ key.
  * This function returns pointer to the fADC DAQ channel key coupled to the required TDC channel.
  * \param[in] daqch TDC channel to search for, coded as string.
  * \return The key of the fADC channel coupled to the given TDC channel.
  */   
   DAQChannelKey* findfAdcKey(string tdcKeyStr);
-  
+
  /** Return pointer to the TDC DAQ key.
  * This function returns pointer to the TDC DAQ channel key coupled to the required fADC channel.
  * \param[in] daqch fADC channel to search for, coded as string.
  * \return The key of the TDC channel coupled to the given fADC channel.
  */   
   DAQChannelKey* findTdcKey(string adcKeyStr);
-  
+
  private:
   std::vector<TOFChannelKey*> _tofKey;
   std::vector<DAQChannelKey*> _tdcKey;

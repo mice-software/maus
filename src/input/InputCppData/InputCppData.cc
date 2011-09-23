@@ -44,10 +44,10 @@ bool InputCppData::birth(std::string jsonDataCards) {
   unsigned int nfiles = _dataFileManager.GetNFiles();
   if (!nfiles) {
     Squeak::mout(Squeak::error) << "Unable to load any data files." << std::endl;
-    Squeak::mout(Squeak::error) << "Check your run number (or file name) and data path." << std::endl;
+    Squeak::mout(Squeak::error) << "Check your run number (or file name) and data path."
+    << std::endl;
     return false;
   }
-
   //  JsonCpp setup
   Json::Value configJSON;   //  this will contain the configuration
   Json::Reader reader;
@@ -61,24 +61,25 @@ bool InputCppData::birth(std::string jsonDataCards) {
   assert(configJSON.isMember("DAQ_cabling_file"));
   std::string map_file_name = configJSON["DAQ_cabling_file"].asString();
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
-  if(!pMAUS_ROOT_DIR) {
-    Squeak::mout(Squeak::error) << "Could not find the $MAUS_ROOT_DIR environmental variable." << std::endl;
+  if (!pMAUS_ROOT_DIR) {
+    Squeak::mout(Squeak::error) << "Could not find the $MAUS_ROOT_DIR environmental variable."
+    << std::endl;
     Squeak::mout(Squeak::error) << "Did you try running: source env.sh ?" << std::endl;
     return false;
   }
-  
+
   // Initialize the map by using text file.
   bool loaded = _map.InitFromFile(std::string(pMAUS_ROOT_DIR) + map_file_name);
-  if(!loaded){
+  if (!loaded) {
     return false;
   }
-  
+
   // Comfigure the V1290 (TDC) data processor.
   assert(configJSON.isMember("Enable_V1290_Unpacking"));
   if ( configJSON["Enable_V1290_Unpacking"].asBool() ) {
     _v1290PartEventProc = new V1290DataProcessor();
     _v1290PartEventProc->set_DAQ_map(&_map);
-    
+
     _dataProcessManager.SetPartEventProc("V1290", _v1290PartEventProc);
   } else {
     this->disableEquipment("V1290");
@@ -89,15 +90,15 @@ bool InputCppData::birth(std::string jsonDataCards) {
   if ( configJSON["Enable_V1724_Unpacking"].asBool() ) {
     _v1724PartEventProc = new V1724DataProcessor();
     _v1724PartEventProc->set_DAQ_map(&_map);
-    
+
     assert(configJSON.isMember("Do_V1724_Zero_Suppression"));
     bool zs = configJSON["Do_V1724_Zero_Suppression"].asBool();
     _v1724PartEventProc->set_zero_supression(zs);
-    
+
     assert(configJSON.isMember("V1724_Zero_Suppression_Threshold"));
     int zs_threshold = configJSON["V1724_Zero_Suppression_Threshold"].asInt();
     _v1724PartEventProc->set_zs_threshold(zs_threshold);
-    
+
     _dataProcessManager.SetPartEventProc("V1724", _v1724PartEventProc);
   } else {
     this->disableEquipment("V1724");
@@ -108,51 +109,48 @@ bool InputCppData::birth(std::string jsonDataCards) {
   if ( configJSON["Enable_V1731_Unpacking"].asBool() ) {
     _v1731PartEventProc = new V1731DataProcessor();
     _v1731PartEventProc->set_DAQ_map(&_map);
-    
+
     assert(configJSON.isMember("Do_V1731_Zero_Suppression"));
     bool zs = configJSON["Do_V1731_Zero_Suppression"].asBool();
     _v1731PartEventProc->set_zero_supression(zs);
-    
+
     assert(configJSON.isMember("V1731_Zero_Suppression_Threshold"));
     int zs_threshold = configJSON["V1731_Zero_Suppression_Threshold"].asInt();   
     _v1731PartEventProc->set_zs_threshold(zs_threshold);
-    
+
     _dataProcessManager.SetPartEventProc("V1731", _v1731PartEventProc);
   } else {
     this->disableEquipment("V1731");
   }
-
 
   // Comfigure the V830 (scaler) data processor.
   assert(configJSON.isMember("Enable_V830_Unpacking"));
   if ( configJSON["Enable_V830_Unpacking"].asBool() ) {
     _v830FragmentProc = new V830DataProcessor();
     _v830FragmentProc->set_DAQ_map(&_map);
-    
+
     _dataProcessManager.SetFragmentProc("V830", _v830FragmentProc);
   } else {
     this->disableEquipment("V830");
   }
-
 
   // Comfigure the VLSB (tracker board) data processor.
   assert(configJSON.isMember("Enable_VLSB_Unpacking"));
   if (configJSON["Enable_VLSB_Unpacking"].asBool()) {
     _vLSBFragmentProc = new VLSBDataProcessor();
     _vLSBFragmentProc->set_DAQ_map(&_map);
-    
+
     _dataProcessManager.SetFragmentProc("VLSB_C", _vLSBFragmentProc);
   } else {
     this->disableEquipment("VLSB_C");
   }
-
 
   // Comfigure the DBB (EMR board) data processor.
   assert(configJSON.isMember("Enable_DBB_Unpacking"));
   if ( configJSON["Enable_DBB_Unpacking"].asBool() ) {
     _DBBFragmentProc = new DBBDataProcessor();
     _DBBFragmentProc->set_DAQ_map(&_map);
-    
+
     _dataProcessManager.SetFragmentProc("DBB", _DBBFragmentProc);
   } else {
     this->disableEquipment("DBB");
@@ -220,7 +218,7 @@ std::string InputCppData::getCurEvent() {
   xDocRoot["spill_num"] = _dataProcessManager.GetSpillNumber();
   unsigned int event_type = _dataProcessManager.GetEventType();
   xDocRoot["daq_event_type"] = event_type_to_str(event_type);
-  //cout<<xDocRoot<<endl;
+  // cout<<xDocRoot<<endl;
 
   return xJSONWr.write(xDocRoot);
 }
