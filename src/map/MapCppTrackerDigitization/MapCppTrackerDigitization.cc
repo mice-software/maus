@@ -15,7 +15,7 @@
  *
  */
 
-#include "MapCppTrackerDigitization.hh"
+#include "src/map/MapCppTrackerDigitization/MapCppTrackerDigitization.hh"
 #include "Config/MiceModule.hh"
 
 #include "Interface/Squeak.hh"
@@ -64,13 +64,13 @@ std::string MapCppTrackerDigitization::process(std::string document) {
 
   // ==========================================================
   //  Loop over particles and hits
-  for ( int i = 0; i < mc.size(); i++ ) {  //  i-th particle
+  for ( unsigned int i = 0; i < mc.size(); i++ ) {  //  i-th particle
     Json::Value particle = mc[i];
 
     if ( !particle.isMember("hits") ) {
       continue; // if there are no MC hits, skip
     }
-    // "_hits" contains all mc hits for this event 
+    // "_hits" contains all mc hits for this event
     Json::Value _hits = particle["hits"];
 
     // reset the digits array for each new event/particle
@@ -92,8 +92,8 @@ std::vector<Json::Value> MapCppTrackerDigitization::make_all_digits(Json::Value 
   std::vector<Json::Value> _digits;
   _digits.clear();
 
-  for ( int j = 0; j < hits.size(); j++ ) {  //  j-th hit
-      //Json::StyledWriter writer;
+  for ( unsigned int j = 0; j < hits.size(); j++ ) {  //  j-th hit
+      // Json::StyledWriter writer;
       // picking one hit at a time
       Json::Value hit = hits[j];
 
@@ -111,14 +111,15 @@ std::vector<Json::Value> MapCppTrackerDigitization::make_all_digits(Json::Value 
       double edep = hit["energy_deposited"].asDouble();
 
       // get nPE from this hit
-      double nPE = getNPE(edep);
+      double nPE = get_npe(edep);
 
       // compute tdc count
-      int tdcCounts = getTDCcounts(hit);
+      int tdcCounts = get_tdc_counts(hit);
 
       assert(_configJSON.isMember("SciFiNPECut"));
       double SciFiNPECut = _configJSON["SciFiNPECut"].asDouble();
-      // check whether the energy deposited is below the threshold - if it is, skip this hit
+      // check whether the energy deposited is below the threshold;
+      // if it is, skip this hit.
       if ( nPE < SciFiNPECut ) {
         continue;
       }
@@ -129,11 +130,11 @@ std::vector<Json::Value> MapCppTrackerDigitization::make_all_digits(Json::Value 
       assert(root["digits"].isArray());
 
       assert(hit.isMember("channel_id"));
-     // assert(hit.isMember("momentum"));
+      assert(hit.isMember("momentum"));
       assert(hit.isMember("time"));
-     // assert(hit.isMember("hit_position"));
+      // assert(hit.isMember("position"));
 
-      int chanNo = getChanNo(hit);
+      int chanNo = get_chan_no(hit);
 
       Json::Value adigit;
       adigit["tdc_counts"] = tdcCounts;
@@ -141,14 +142,13 @@ std::vector<Json::Value> MapCppTrackerDigitization::make_all_digits(Json::Value 
       adigit["channel_id"] = hit["channel_id"];
       // introducing the Channel Number calculated from the fibre number
       adigit["channel_id"]["channel_number"]=chanNo;
-	//adigit["memory"] = j;
-      adigit["true_mom"] = hit["momentum"];
+      adigit["mc_mom"] = hit["momentum"];
       adigit["time"] = hit["time"];
       adigit["mc_position"]=hit["position"];
       adigit["isUsed"] = 0;
 
       _digits.push_back(adigit);
-    }  //  end for with var 'j' to loop hits
+    }  //  ends 'for' loop over hits
     return _digits;
 }
 
@@ -187,7 +187,7 @@ bool MapCppTrackerDigitization::check_sanity_mc(std::string document) {
   return true;
 }
 
-int MapCppTrackerDigitization::getTDCcounts(Json::Value ahit) {
+int MapCppTrackerDigitization::get_tdc_counts(Json::Value ahit) {
   double tmpcounts;
   assert(_configJSON.isMember("SciFivlpcTimeRes"));
   assert(_configJSON.isMember("SciFitdcFactor"));
@@ -201,11 +201,11 @@ int MapCppTrackerDigitization::getTDCcounts(Json::Value ahit) {
     tmpcounts = pow(2.0, _configJSON["SciFitdcBits"].asDouble()) - 1.0;
   }
 
-  int tdcCounts = (int) floor(tmpcounts);
+  int tdcCounts = static_cast <int> (floor(tmpcounts));
   return tdcCounts;
 }
 
-int MapCppTrackerDigitization::getChanNo(Json::Value ahit) {
+int MapCppTrackerDigitization::get_chan_no(Json::Value ahit) {
   assert(ahit.isMember("channel_id"));
   Json::Value channel_id = ahit["channel_id"];
 
@@ -241,7 +241,7 @@ int MapCppTrackerDigitization::getChanNo(Json::Value ahit) {
   return _chanNo;
 }
 
-double MapCppTrackerDigitization::getNPE(double edep) {
+double MapCppTrackerDigitization::get_npe(double edep) {
       // implement dead channels
       assert(_configJSON.isMember("SciFiFiberConvFactor"));
       double numbPE = _configJSON["SciFiFiberConvFactor"].asDouble() * edep;
@@ -264,16 +264,17 @@ double MapCppTrackerDigitization::getNPE(double edep) {
       return numbPE;
 }
 
-int MapCppTrackerDigitization::compute_adcCounts(double numb_pe) {
+int MapCppTrackerDigitization::compute_adc_counts(double numb_pe) {
   double tmpcounts;
   if ( numb_pe == 0 ) return 0;
 
-  //  Throw the dice and generate the ADC count value for the energy summed for each channel
+  // Throw the dice and generate the ADC count
+  // value for the energy summed for each channel
   assert(_configJSON.isMember("SciFivlpcEnergyRes"));
 
   // get adc count by generating a gaussian distribution with mean "numb_pe"
-  tmpcounts = CLHEP::RandGauss::shoot((double)numb_pe,
-                                       _configJSON["SciFivlpcEnergyRes"].asDouble());
+  tmpcounts = CLHEP::RandGauss::shoot(numb_pe,
+                                      _configJSON["SciFivlpcEnergyRes"].asDouble());
 
   assert(_configJSON.isMember("SciFiadcFactor"));
   tmpcounts *= _configJSON["SciFiadcFactor"].asDouble();
@@ -284,7 +285,7 @@ int MapCppTrackerDigitization::compute_adcCounts(double numb_pe) {
     tmpcounts = pow(2.0, _configJSON["SciFitdcBits"].asDouble()) - 1.0;
   }
 
-  int adcCounts = (int) floor(tmpcounts);
+  int adcCounts = static_cast <int> (floor(tmpcounts));
   return adcCounts;
 }
 
@@ -297,7 +298,7 @@ Json::Value MapCppTrackerDigitization::make_bundle(std::vector<Json::Value> _all
       npe = _alldigits[digit_i]["number_photoelectrons"].asDouble();
       // loop over all the others
       for ( unsigned int digit_j = digit_i; digit_j < _alldigits.size(); digit_j++ ) {
-        if ( Check_param( &(_alldigits[digit_i]), &(_alldigits[digit_j]) ) ) {
+        if ( check_param(&(_alldigits[digit_i]), &(_alldigits[digit_j])) ) {
           npe += _alldigits[digit_j]["number_photoelectrons"].asDouble();
           _alldigits[digit_j]["isUsed"]=1;
         } // if-statement
@@ -308,10 +309,10 @@ Json::Value MapCppTrackerDigitization::make_bundle(std::vector<Json::Value> _all
       digit["number_photoelectrons"] = npe;
       digit["channel_id"] = _alldigits[digit_i]["channel_id"];
       digit["mc_position"] = _alldigits[digit_i]["mc_position"];
-      //assert(_alldigits[digit_i].isMember("true_mom"));
-      digit["true_mom"] = _alldigits[digit_i]["true_mom"];
+      // assert((_alldigits[digit_i]).isMember("mc_mom"));
+      digit["mc_mom"] = _alldigits[digit_i]["mc_mom"];
       digit["time"] = _alldigits[digit_i]["time"];
-      digit["adc_counts"] = compute_adcCounts(npe);
+      digit["adc_counts"] = compute_adc_counts(npe);
       tracker_event.append(digit);
       _alldigits[digit_i]["isUsed"]=1;
     } // ends if-statement
@@ -319,8 +320,8 @@ Json::Value MapCppTrackerDigitization::make_bundle(std::vector<Json::Value> _all
   return tracker_event;
 }
 
-bool MapCppTrackerDigitization::Check_param(Json::Value* hit1, Json::Value* hit2) {
-  // two hits passed to the Check_param function
+bool MapCppTrackerDigitization::check_param(Json::Value* hit1, Json::Value* hit2) {
+  // two hits passed to the check_param function
   int tracker1 = (*hit1)["channel_id"]["tracker_number"].asInt();
   int tracker2 = (*hit2)["channel_id"]["tracker_number"].asInt();
   int station1 = (*hit1)["channel_id"]["station_number"].asInt();
@@ -330,7 +331,7 @@ bool MapCppTrackerDigitization::Check_param(Json::Value* hit1, Json::Value* hit2
   double chan1 = (*hit1)["channel_id"]["channel_number"].asDouble();
   double chan2 = (*hit2)["channel_id"]["channel_number"].asDouble();
   int hit_is_used = (*hit2)["isUsed"].asInt();
-  
+
   // check whether the hits belong to the same tracker, station, plane and channel
   if ( tracker1 == tracker2 && station1 == station2 &&
        plane1 == plane2 && chan1 == chan2 && !hit_is_used ) {
@@ -341,7 +342,7 @@ bool MapCppTrackerDigitization::Check_param(Json::Value* hit1, Json::Value* hit2
 }
 
 // the following two functions are added for testing purposes only
-Json::Value MapCppTrackerDigitization::ConvertToJson (std::string jsonString) {
+Json::Value MapCppTrackerDigitization::ConvertToJson(std::string jsonString) {
   Json::Value newJson;
   // JsonCpp string -> JSON::Value converter
   Json::Reader reader;
@@ -350,7 +351,7 @@ Json::Value MapCppTrackerDigitization::ConvertToJson (std::string jsonString) {
   return newJson;
 }
 
-std::string MapCppTrackerDigitization::JsonToString(Json::Value json_in){
+std::string MapCppTrackerDigitization::JsonToString(Json::Value json_in) {
   std::stringstream ss_io;
   JsonWrapper::Print(ss_io, json_in);
   return ss_io.str();

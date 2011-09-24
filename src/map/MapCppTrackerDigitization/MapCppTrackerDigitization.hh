@@ -26,6 +26,11 @@
 #include <assert.h>
 #include <json/json.h>
 
+#include <CLHEP/Random/RandPoisson.h>
+#include <CLHEP/Random/RandGauss.h>
+#include <CLHEP/Random/RandExponential.h>
+#include <CLHEP/Units/PhysicalConstants.h>
+
 // C++ headers
 #include <cmath>
 #include <iostream>
@@ -33,15 +38,9 @@
 #include <sstream>
 #include <vector>
 
-// from old file
 #include "Config/MiceModule.hh"
-#include <CLHEP/Random/RandPoisson.h>
-#include <CLHEP/Random/RandGauss.h>
-#include <CLHEP/Random/RandExponential.h>
-#include <CLHEP/Units/PhysicalConstants.h>
 
-class MapCppTrackerDigitization
-{
+class MapCppTrackerDigitization {
  public:
   /** Sets up the worker
    *
@@ -74,7 +73,7 @@ class MapCppTrackerDigitization
    *
    *  Computes tdc counts for a particular hit
    */ 
-  int getTDCcounts(Json::Value ahit);
+  int get_tdc_counts(Json::Value ahit);
 
   /** computes npe from a hit
    *
@@ -82,14 +81,14 @@ class MapCppTrackerDigitization
    *  and calculates the corresponding 
    *  number of photoelectrons
    */
-  double getNPE(double edep);
+  double get_npe(double edep);
 
   /** computes the channel where the hit occured
    *
    *  the ChanNo is computed from the fiber number
    *  of the hit
    */
-  int getChanNo(Json::Value ahit);
+  int get_chan_no(Json::Value ahit);
 
   /** a list of temporary "digits"
    *
@@ -112,11 +111,11 @@ class MapCppTrackerDigitization
 
   /** computes the adc count 
    */
-  int compute_adcCounts(double nPE);
+  int compute_adc_counts(double nPE);
 
   /** tests if hits belong to the same channel
    */
-  bool Check_param(Json::Value* hit1, Json::Value* hit2);
+  bool check_param(Json::Value* hit1, Json::Value* hit2);
 
   /** a wrapper function that converts a string to a Json Value
    * Introduced for testing purposes.
