@@ -144,6 +144,8 @@ void VirtualPlane::FillKinematics
   x[4] = sqrt(x[5]*x[5]+x[6]*x[6]+x[7]*x[7]+mass*mass);
   aHit->SetEnergy(x[4]);
   aHit->SetTime(x[0]);
+  aHit->SetProperTime(0.);
+  aHit->SetPathLength(0.);
   delete [] x_from_beginning;
   delete [] x_from_end;
   if (!InRadialCut(CLHEP::Hep3Vector(x[1], x[2], x[3])))
