@@ -47,7 +47,7 @@ class Go:
     """
 
     def __init__(self, arg_input, arg_mapper, arg_reducer,  # pylint: disable=R0913,C0301
-                 arg_output, arg_config_file = None):
+                 arg_output, arg_config_file = None, command_line_args = True):
         """
         Initialise the configuration dictionary, input, mapper, reducer and
         output
@@ -65,7 +65,6 @@ class Go:
             print("WARNING:\tMAUS_ROOT_DIR = %s" % (maus_root_dir))
             print("WARNING:\tCURRENT DIRECTORY = %s\n" % (current_dir))
             
-
         self.input = arg_input
         self.mapper = arg_mapper
         self.reducer = arg_reducer
@@ -73,11 +72,11 @@ class Go:
 
         print("Welcome to MAUS:")
         print(("\tProcess ID (PID): %d" % os.getpid()))
-        print(("\tUniversally Unique ID (UUID): %s" % uuid.uuid4()))
+#        print(("\tUniversally Unique ID (UUID): %s" % uuid.uuid4()))
         print(("\tProgram Arguments: %s" % str(sys.argv)))
 
         self.json_config_document = \
-                                  Configuration().getConfigJSON(arg_config_file, True)
+               Configuration().getConfigJSON(arg_config_file, command_line_args)
         json_config_dictionary = json.loads(self.json_config_document)
         map_reduce_type = json_config_dictionary['map_reduce_type']
         version = json_config_dictionary["maus_version"]

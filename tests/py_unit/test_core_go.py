@@ -24,7 +24,7 @@ class GoTestCase(unittest.TestCase):
         reducer = ReducePyDoNothing()
         outputer = OutputPyJSON(open('unit_test', 'w'))  #  this file won't appear since exception
         with self.assertRaises(AssertionError):
-            Go(inputer, mapper, reducer, outputer)
+            Go(inputer, mapper, reducer, outputer, command_line_args = False)
 
 
     def map_birth_test(self):
@@ -34,7 +34,7 @@ class GoTestCase(unittest.TestCase):
         outputer = OutputPyJSON(open('unit_test', 'w'))  #  this file won't appear since exception
 
         with self.assertRaises(AssertionError):
-            Go(inputer, mapper, reducer, outputer)
+            Go(inputer, mapper, reducer, outputer, command_line_args = False)
 
     def reduce_birth_test(self):
         inputer = InputPyEmptyDocument(1)
@@ -43,7 +43,7 @@ class GoTestCase(unittest.TestCase):
         outputer = OutputPyJSON(open('unit_test', 'w'))  #  this file won't appear since exception
 
         with self.assertRaises(AssertionError):
-            Go(inputer, mapper, reducer, outputer)
+            Go(inputer, mapper, reducer, outputer, command_line_args = False)
 
     def output_birth_test(self):
         inputer = InputPyEmptyDocument(1)
@@ -52,7 +52,7 @@ class GoTestCase(unittest.TestCase):
         outputer = FakeMap()
 
         with self.assertRaises(AssertionError):
-            Go(inputer, mapper, reducer, outputer)
+            Go(inputer, mapper, reducer, outputer, command_line_args = False)
 
 
     def test_map_reduce_type(self):
@@ -64,7 +64,7 @@ class GoTestCase(unittest.TestCase):
         configFile = StringIO(u"""map_reduce_type="bad_type" """)
 
         with self.assertRaises(AssertionError):
-            Go(inputer, mapper, reducer, outputer, configFile)
+            Go(inputer, mapper, reducer, outputer, configFile, command_line_args = False)
 
 
     def test_map_reduce_type(self):
@@ -75,7 +75,7 @@ class GoTestCase(unittest.TestCase):
         for MapRedType in ["native_python", "native_python_profile"]:
             configFile = StringIO(u"""map_reduce_type="%s" """ % MapRedType)
 
-        Go(inputer, mapper, reducer, outputer, configFile)
+        Go(inputer, mapper, reducer, outputer, configFile, command_line_args = False)
 
 
 
