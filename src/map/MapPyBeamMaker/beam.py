@@ -16,59 +16,6 @@
 """
 Responsible for initialising parent distribution and sampling single particles
 for beam generation.
-
-A beam is typically defined by a reference trajectory, which is the beam
-centroid; and a beam ellipse that defines the alignment of the beam in 
-position-momentum space around the beam. Additional functions are provided for 
-"pencil" beams, i.e. those with no distribution and special "uniform" and 
-"sawtooth" time distributions, that are intended to more realistically reflect 
-the time distribution of the MICE beam.
-
-Beam holds the methods to set up the centroid of the beam (reference trajectory)
-and the associated distributions; and to make primary particles. Also stores
-either number of particles that will be created or relative likelihood that this
-beam will fire a particle, depending on how multiple beams are sampled (set in
-MapPyBeamMaker class).
-
-When sampling from a multivariate Gaussian distribution, the beam is defined by
-a beam ellipse \f$\mathbf{B}\f$ that is the locus of points 
-\f[\vec{u}\mathbf{B}^{-1} \vec{u}^{T} = 1\f]
-where \f$\vec{u}\f$ is a vector going like \f$(x, px, y, py, time, \cal{p})\f$
-relative to the mean. \cal{p} is a momentum-type variable. Either total
-momentum, energy or pz are allowed here depending on the variable
-momentum_defined_by.
-
-The matrix \f$\mathbf{B}\f$ is then a 6x6 matrix known (for gaussian
-distributions) as the covariance matrix as the resultant distribution will have
-covariances given by
-\f[Cov(u_i, u_j) = B_{ij}\f]
-We allow the beam ellipse to be defined in a number of ways. For transverse
-modes we have either Twiss, where the ellipse is defined by
-Penn, where the ellipse is defined 
-\f[\mathbf{B_\perp} = m\epsilon_\perp \left(\begin{array}{cccc}
-\beta_\perp/p   & -\alpha_\perp & 0 & -\mathcal{L}+\beta_\perp B_0/2p \\
--\alpha_\perp & \gamma_\perp p  & \mathcal{L}-\beta_\perp B_0/2p & 0 \\
-0 & \mathcal{L}-\beta_\perp B_0/2p  & \beta_\perp/p  & -\alpha_\perp \\
--\mathcal{L}+\beta_\perp B_0/2p & 0 & -\alpha_\perp & \gamma_\perp p \\
-\end{array}\right),\f]
-or constant_solenoid, where the ellipse is defined as in Penn above, except with
-\f$\alpha_\perp=0\f$ and 
-\f[\beta_\perp(1.+beam_def['normalised_angular_momentum'])**0.5/k_s\f]
-where \f$k_s\f$ is the focussing strength in a solenoid, given by
-\f[k_s = \frac{qc}{2 b_z p}\f]
-This final mode gives a beam with constant beam ellipse in a constantly
-focussing solenoid.
-
-In longitudinal phase space we have either Gaussian, where the ellipse is
-defined by 
-\f[\mathbf{B} = \f]
-or Twiss, where the ellipse is defined by
-\f[\mathbf{B} = \f]
-Additionally, as mentioned above we can override the beam ellipse definition
-with explicit time distributions.
-
-Coupling between longitudinal and transverse (e.g. dispersion) has yet to be 
-implemented
 """
 
 # NEED TO TEST RANDOM SEED routine
@@ -86,7 +33,74 @@ class Beam(): # pylint: disable=R0902
     """
     @brief Beam holds functions necessary to make a single MAUS beam and add
     particles to the spill.
+
+    A beam is typically defined by a reference trajectory, which is the beam
+    centroid; and a beam ellipse that defines the alignment of the beam in 
+    position-momentum space around the beam. Additional functions are provided
+    for "pencil" beams, i.e. those with no distribution and special "uniform"
+    and "sawtooth" time distributions, that are intended to more realistically
+    reflect the time distribution of the MICE beam.
+
+    Beam holds the methods to set up the centroid of the beam (reference
+    trajectory) and the associated distributions; and to make primary particles.
+    Also stores either number of particles that will be created or relative
+    likelihood that this beam will fire a particle, depending on how multiple
+    beams are sampled (set in MapPyBeamMaker class).
+
+    When sampling from a multivariate Gaussian distribution, the beam is defined
+    by a beam ellipse \f$\mathbf{B}\f$ that is the locus of points 
+    \f[\vec{u}\mathbf{B}^{-1} \vec{u}^{T} = 1\f]
+    where \f$\vec{u}\f$ is a vector going like 
+    \f$(x, px, y, py, time, \mathcal{P})\f$
+    relative to the mean. \f$\mathcal{P}\f$ is a momentum-type variable. Either
+    total momentum, energy or pz are allowed here depending on the variable
+    momentum_defined_by.
+
+    The matrix \f$\mathbf{B}\f$ is then a 6x6 matrix known (for gaussian
+    distributions) as the covariance matrix as the resultant distribution will 
+    have covariances given by
+    \f[Cov(u_i, u_j) = B_{ij}\f]
+    We allow the beam ellipse to be defined in a number of ways. For transverse
+    modes we have either Twiss, where the ellipse is defined by
+    \f[\mathbf{B_\perp} = m \left(\begin{array}{cccc}
+    \epsilon_x \beta_x/p   & -\epsilon_x\alpha_x & 0 & 0 \\
+    -\epsilon_x\alpha_x & \epsilon_x\gamma_x p  & 0 & 0 \\
+    0 & 0  & \epsilon_y\beta_y/p  & -\epsilon_y\alpha_y \\
+    0 & 0 & -\epsilon_y\alpha_y & \epsilon_y\gamma_y p \\
+    \end{array}\right),\f]
+    Penn, where the ellipse is defined 
+    \f[\mathbf{B_\perp} = m\epsilon_\perp \left(\begin{array}{cccc}
+    \beta_\perp/p   & -\alpha_\perp & 0 & -\mathcal{L}+\beta_\perp B_0/2p \\
+    -\alpha_\perp & \gamma_\perp p  & \mathcal{L}-\beta_\perp B_0/2p & 0 \\
+    0 & \mathcal{L}-\beta_\perp B_0/2p  & \beta_\perp/p  & -\alpha_\perp \\
+    -\mathcal{L}+\beta_\perp B_0/2p & 0 & -\alpha_\perp & \gamma_\perp p \\
+    \end{array}\right),\f]
+    or constant_solenoid, where the ellipse is defined as in Penn above, except
+    with
+    \f$\alpha_\perp=0\f$ and 
+    \f[\frac{\beta_\perp}{k_s}\sqrt{1+\mathcal{L}}\f]
+    where \f$k_s\f$ is the focussing strength in a solenoid, given by
+    \f[k_s = \frac{qc}{2 b_z p}\f]
+    This final mode gives a beam with constant beam ellipse in a constantly
+    focussing solenoid.
+
+    In longitudinal phase space we have either Gaussian, where the ellipse is
+    defined by 
+    \f[\mathbf{B_l} = \left(\begin{array}{cc}
+    \sigma_t^2   & 0\\
+    0 & \sigma_\mathcal{P}^2 \\
+    \end{array}\right),\f]    or Twiss, where the ellipse is defined by
+    \f[\mathbf{B_l} = m\epsilon_l \left(\begin{array}{cc}
+    \beta_l/p   & -\alpha_l\\
+    -\alpha_l & \gamma_l p \\
+    \end{array}\right).\f]
+    Additionally, as mentioned above we can override the beam ellipse definition
+    with explicit time distributions.
+
+    Coupling between longitudinal and transverse (e.g. dispersion) has yet to be 
+    implemented.
     """
+
     def __init__(self):
         """
         Initialises to empty settings - pencil beam and no particles. Member
