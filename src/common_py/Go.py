@@ -56,6 +56,11 @@ class Go:
         @param arg_reducer Reducer that defines reduce that is acted on map
                            output
         @param arg_config_file Configuration file
+        @param command_line_args If set to true, use command line arguments to
+               handle configuration and throw a SystemExit exception if
+               invalid arguments are passed. (Note some third party items, e.g.
+               nosetests, have their own command line arguments that are
+               incompatible with MAUS's)
         """
         maus_root_dir = os.environ.get('MAUS_ROOT_DIR')
         current_dir = os.getcwd()
@@ -72,7 +77,9 @@ class Go:
 
         print("Welcome to MAUS:")
         print(("\tProcess ID (PID): %d" % os.getpid()))
-#        print(("\tUniversally Unique ID (UUID): %s" % uuid.uuid4()))
+        # following line is disabled for http://bugs.python.org/issue6059
+        # probably not an issue once patched and line can be available
+        # print(("\tUniversally Unique ID (UUID): %s" % uuid.uuid4()))
         print(("\tProgram Arguments: %s" % str(sys.argv)))
 
         self.json_config_document = \
