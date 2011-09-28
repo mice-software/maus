@@ -16,20 +16,12 @@ import gzip #  For compressed output # pylint: disable=W0611
 
 import MAUS
 
-def run(number_of_spills):
+def run():
     """ Run the macro
     """
 
-    # Here we create a pseudo-file with an event in it.  If you were to copy
-    # and paste this to a file, then you could also do:
-    #
-    #   input_file = open('myFileName.txt', 'r')
-    #
-    # where the file format has a JSON document per line.  I just toss the file
-    # in here for simplicity.
-    input_file = io.StringIO(number_of_spills*u"""{"mc": []}\n""") # pylint: disable=C0301  
-
-    my_input = MAUS.InputPyJSON(input_file)
+    # This input generates empty spills, to be filled by the beam maker later on
+    my_input = MAUS.InputPySpillGenerator()
 
     # Create an empty array of mappers, then populate it
     # with the functionality you want to use.
@@ -60,7 +52,5 @@ def run(number_of_spills):
 
     MAUS.Go(my_input, my_map, MAUS.ReducePyDoNothing(), my_output, datacards)
 
-
 if __name__ == '__main__':
-    NUMBER_OF_SPILLS = 10
-    run(NUMBER_OF_SPILLS)
+    run()
