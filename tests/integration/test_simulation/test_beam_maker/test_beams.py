@@ -3,6 +3,7 @@ import os
 import subprocess
 
 import ROOT
+import numpy
 
 import xboa.Bunch
 from xboa.Bunch import Bunch
@@ -82,6 +83,17 @@ class beam_test(unittest.TestCase):
             self.assertLess(abs(weight - WEIGHTS_TO_PID[pid]*sum_weights), \
                             sum_weights**0.5 )
 
+    def __cmp_matrix(self, ref_matrix, test_matrix):
+        """Compare to numpy matrices"""
+        self.assertEqual(ref_matrix.shape, test_matrix.shape)
+        msg = "\nReference:\n"+str(ref_matrix)+\
+              "\nIn Test:\n"+str(test_matrix)
+        for i in range(ref_matrix.shape[0]):
+            for j in range(test_matrix.shape[1]):
+                self.assertAlmostEqual(ref_matrix[i, j], 
+                                       test_matrix[i, j], 0, msg)
+
+
     def test_gaussian(self):
         """
         Check that the weight of each sub-beam is close to the expected weight
@@ -89,8 +101,18 @@ class beam_test(unittest.TestCase):
         # make a dict of bunches of xboa.Hits separated by event (spill) number
         bunch = Bunch.new_dict_from_read_builtin('maus_primary', \
                           'simulation_binomial.out', 'pid')[-13]
-        for key, value in {'energy':285.0, ''}.iteritems():
-        bunch.mean()
+        for key, value in {'energy':226.0, 'z':3.0, 'x':0., 'y':0., \
+                           'px':0., 'py':0.}.iteritems():
+            sigma = 5.*bunch.moment([key, key])**0.5/float(bunch.bunch_weight())**0.5
+            self.assertLess(abs(bunch.mean([key])[key]-value), sigma+1.)
+        covs = bunch.covariance_matrix(['x','px',  'y', 'py'])
+        test = numpy.array(\
+        [[1.05668599e+03, -6.33950201e+02,  0.00000000e+00,  6.34327423e+02],
+         [-6.33950201e+02, 1.14145263e+03, -6.34327423e+02,  0.00000000e+00],
+         [0.00000000e+00, -6.34327423e+02,  1.05668599e+03, -6.33950201e+02],
+         [6.34327423e+02,  0.00000000e+00, -6.33950201e+02,  1.14145263e+03]])
+        #self.__cmp_matrix(covs, test)
+        
 
     def test_sawtooth_time(self):
         pass
@@ -116,6 +138,6 @@ def run_simulations():
     os.rename('simulation.out', 'simulation_binomial.out')
 
 if __name__ == "__main__":
-    #run_simulations()
+    run_simulations()
     unittest.main()
 

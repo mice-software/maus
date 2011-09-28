@@ -10,24 +10,30 @@ beam = {
     ##### MUONS #######
     {
        "reference":{
-           "position":{"x":0.0, "y":-0.0, "z":-5500.0},
-           "momentum":{"x":0.0, "y":0.0, "z":1.0},
-           "particle_id":211, "energy":285.0, "time":0.0, "random_seed":10
-       }, # reference particle
+            "position":{"x":0.0, "y":0.0, "z":3.0},
+            "momentum":{"x":0.0, "y":0.0, "z":1.0},
+            "particle_id":-13,
+            "energy":226.0,
+            "time":0.0,
+            "random_seed":0
+        }, # reference particle
        "random_seed_algorithm":"incrementing_random", # algorithm for seeding MC
        "weight":90., # probability of generating a particle
        "transverse":{
-          "transverse_mode":"constant_solenoid", # transverse distribution matched to constant solenoid field
-          "emittance_4d":6., # 4d emittance
-          "normalised_angular_momentum":0.1, # angular momentum from diffuser
-          "bz":4.e-3 # magnetic field strength for angular momentum calculation
-       },
-       "longitudinal":{"longitudinal_mode":"sawtooth_time", # longitudinal distribution sawtooth in time
-                   "momentum_variable":"p", # Gaussian in total momentum (options energy, pz)
-                   "sigma_p":25., # RMS total momentum
-                   "t_start":-1.e6, # start time of sawtooth
-                   "t_end":+1.e6}, # end time of sawtooth
-       "coupling":{"coupling_mode":"none"} # no dispersion
+            "transverse_mode":"penn", 
+            "emittance_4d":6., 
+            "beta_4d":333.,
+            "alpha_4d":1., 
+            "normalised_angular_momentum":2.,
+            "bz":4.e-3
+        },
+        "longitudinal":{
+            "longitudinal_mode":"sawtooth_time",
+                   "momentum_variable":"p",
+                   "sigma_p":25.,
+                   "t_start":-1.e6,
+                   "t_end":+1.e6},
+       "coupling":{"coupling_mode":"none"}
     },
     ##### PIONS #####
     { # as above...
