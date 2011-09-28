@@ -44,11 +44,18 @@ covariances given by
 \f[Cov(u_i, u_j) = B_{ij}\f]
 We allow the beam ellipse to be defined in a number of ways. For transverse
 modes we have either Twiss, where the ellipse is defined by
-\f[\mathbf{B} = \f]
 Penn, where the ellipse is defined 
-\f[\mathbf{B} = \f]
-or constant_solenoid, where the ellipse is defined by
-\f[\mathbf{B} = \f]
+\f[\mathbf{B_\perp} = m\epsilon_\perp \left(\begin{array}{cccc}
+\beta_\perp/p   & -\alpha_\perp & 0 & -\mathcal{L}+\beta_\perp B_0/2p \\
+-\alpha_\perp & \gamma_\perp p  & \mathcal{L}-\beta_\perp B_0/2p & 0 \\
+0 & \mathcal{L}-\beta_\perp B_0/2p  & \beta_\perp/p  & -\alpha_\perp \\
+-\mathcal{L}+\beta_\perp B_0/2p & 0 & -\alpha_\perp & \gamma_\perp p \\
+\end{array}\right),\f]
+or constant_solenoid, where the ellipse is defined as in Penn above, except with
+\f$\alpha_\perp=0\f$ and 
+\f[\beta_\perp(1.+beam_def['normalised_angular_momentum'])**0.5/k_s\f]
+where \f$k_s\f$ is the focussing strength in a solenoid, given by
+\f[k_s = \frac{qc}{2 b_z p}\f]
 This final mode gives a beam with constant beam ellipse in a constantly
 focussing solenoid.
 
@@ -59,6 +66,9 @@ or Twiss, where the ellipse is defined by
 \f[\mathbf{B} = \f]
 Additionally, as mentioned above we can override the beam ellipse definition
 with explicit time distributions.
+
+Coupling between longitudinal and transverse (e.g. dispersion) has yet to be 
+implemented
 """
 
 # NEED TO TEST RANDOM SEED routine
