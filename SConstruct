@@ -631,7 +631,8 @@ for single_stuff in stuff_to_import:
 
 file_to_import.close()
 
-files = glob.glob('tests/py_unit/test_*.py')+glob.glob('tests/style/*.py')
+files = glob.glob('tests/py_unit/*/test_*.py')+\
+        glob.glob('tests/py_unit/test_*.py')+glob.glob('tests/style/*.py')
 env.Install("build", files)
 
 env.Install("build", "tests/py_unit/test_cdb")

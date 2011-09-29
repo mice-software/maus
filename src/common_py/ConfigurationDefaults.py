@@ -43,12 +43,12 @@ keep_only_muon_tracks = False
 keep_tracks = False # set to true to keep start and end point of every track
 keep_steps = False # set to true to keep start and end point of every track and
                    # every step point
-simulation_geometry_filename = "Stage6.dat" # geometry used by simulation
+simulation_geometry_filename = "/home/matt/maus-littlefield/src/common_py/geometry/Download/ParentGeometryFile.dat" # geometry used by simulation
 maximum_number_of_steps = 10000
 simulation_reference_particle = {"position":{"x":0.0, "y":-0.0, "z":-4700.0}, "momentum":{"x":0.0, "y":0.0, "z":1.0}, "particle_id":-13, "energy":226.0, "time":0.0, "random_seed":10}
 
 # geant4 visualisation (not event display)
-geant4_visualisation = False
+geant4_visualisation = True
 visualisation_viewer = "VRML2FILE"  # only supported option
 visualisation_theta = 90.
 visualisation_phi = 90.

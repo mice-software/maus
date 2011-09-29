@@ -5,217 +5,217 @@ Configuration Structure_3068680
                 PropertyString Material AIR
                 PropertyDouble G4StepMax 5.0 mm
                 
-                Module BeamLine/TDt1152t9323toa16.dat 
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDt1152t9323toa16.txt 
                 {
                 Position 403.0000 -455.0232 -455.0232 mm
                 Rotation  0.0 0.0 0.0 deg    
                 }
                 
-                Module BeamLine/TDt1152t9323.dat 
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDt1152t9323.txt 
                 {
                 Position 403.0000 455.0232 455.0232 mm
                 Rotation  0.0 0.0 0.0 deg    
                 }
                 
-                Module BeamLine/TDt1152t9323.dat 
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDt1152t9323.txt 
                 {
                 Position 403.0000 455.0232 -455.0232 mm
                 Rotation  0.0 0.0 0.0 deg    
                 }
                 
-                Module BeamLine/TDt1152t9323toa15.dat 
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDt1152t9323toa15.txt 
                 {
                 Position 403.0000 -455.0232 455.0232 mm
                 Rotation  0.0 0.0 0.0 deg    
                 }
                 
-                Module BeamLine/TDt1152t9328.dat 
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDt1152t9328.txt 
                 {
                 Position 0.0000 -479.0474 0.0000 mm
                 Rotation  0.0 0.0 0.0 deg    
                 }
                 
-                Module BeamLine/TDt1152t9328.dat 
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDt1152t9328.txt 
                 {
                 Position 0.0000 0.0000 -479.0474 mm
                 Rotation  0.0 0.0 0.0 deg    
                 }
                 
-                Module BeamLine/TDt1152t9328.dat 
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDt1152t9328.txt 
                 {
                 Position 0.0000 479.0474 0.0000 mm
                 Rotation  0.0 0.0 0.0 deg    
                 }
                 
-                Module BeamLine/TDt1152t9328.dat 
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDt1152t9328.txt 
                 {
                 Position 0.0000 0.0000 479.0474 mm
                 Rotation  0.0 0.0 0.0 deg    
                 }
                 
-                Module BeamLine/TDt1152t9321.dat 
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDt1152t9321.txt 
                 {
                 Position -403.0000 -482.8123 0.0000 mm
                 Rotation  0.0 0.0 0.0 deg    
                 }
                 
-                Module BeamLine/TDt1152t9321.dat 
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDt1152t9321.txt 
                 {
                 Position -403.0000 482.8123 0.0000 mm
                 Rotation  0.0 0.0 0.0 deg    
                 }
                 
-                Module BeamLine/TDt1152t9321.dat 
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDt1152t9321.txt 
                 {
                 Position -403.0000 -0.0000 482.8123 mm
                 Rotation  0.0 0.0 0.0 deg    
                 }
                 
-                Module BeamLine/TDt1152t9321.dat 
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDt1152t9321.txt 
                 {
                 Position -403.0000 0.0000 -482.8123 mm
                 Rotation  0.0 0.0 0.0 deg    
                 }
                 
-                Module BeamLine/TDt1152t9321toa13.dat 
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDt1152t9321toa13.txt 
                 {
                 Position 403.0000 0.0000 482.8123 mm
                 Rotation  0.0 0.0 0.0 deg    
                 }
                 
-                Module BeamLine/TDt1152t9321toa12.dat 
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDt1152t9321toa12.txt 
                 {
                 Position 403.0000 0.0000 -482.8123 mm
                 Rotation  0.0 0.0 0.0 deg    
                 }
                 
-                Module BeamLine/TDt1152t9321toa11.dat 
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDt1152t9321toa11.txt 
                 {
                 Position 403.0000 -482.8123 0.0000 mm
                 Rotation  0.0 0.0 0.0 deg    
                 }
                 
-                Module BeamLine/TDt1152t9321.dat 
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDt1152t9321.txt 
                 {
                 Position 403.0000 482.8123 0.0000 mm
                 Rotation  0.0 0.0 0.0 deg    
                 }
                 
-                Module BeamLine/TDt1152t9327.dat 
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDt1152t9327.txt 
                 {
                 Position -0.0000 362.5000 -362.5000 mm
                 Rotation  0.0 0.0 0.0 deg    
                 }
                 
-                Module BeamLine/TDt1152t9327.dat 
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDt1152t9327.txt 
                 {
                 Position -0.0000 -362.5000 362.5000 mm
                 Rotation  0.0 0.0 0.0 deg    
                 }
                 
-                Module BeamLine/TDt1152t9327.dat 
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDt1152t9327.txt 
                 {
                 Position -0.0000 -362.5000 -362.5000 mm
                 Rotation  0.0 0.0 0.0 deg    
                 }
                 
-                Module BeamLine/TDt1152t9327.dat 
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDt1152t9327.txt 
                 {
                 Position -0.0000 362.5000 362.5000 mm
                 Rotation  0.0 0.0 0.0 deg    
                 }
                 
-                Module BeamLine/TDt1152t9325toa18.dat 
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDt1152t9325toa18.txt 
                 {
                 Position 429.0000 0.0000 0.0000 mm
                 Rotation  0.0 0.0 0.0 deg    
                 }
                 
-                Module BeamLine/TDt1152t9325toa18.dat 
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDt1152t9325toa18.txt 
                 {
                 Position 377.0000 0.0000 0.0000 mm
                 Rotation  0.0 0.0 0.0 deg    
                 }
                 
-                Module BeamLine/TDt1152t9320toa10.dat 
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDt1152t9320toa10.txt 
                 {
                 Position 403.0000 0.0000 -702.5000 mm
                 Rotation  0.0 0.0 0.0 deg    
                 }
                 
-                Module BeamLine/TDt1152t9320toa9.dat 
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDt1152t9320toa9.txt 
                 {
                 Position 403.0000 0.0000 702.5000 mm
                 Rotation  0.0 0.0 0.0 deg    
                 }
                 
-                Module BeamLine/TDt1152t9320.dat 
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDt1152t9320.txt 
                 {
                 Position 403.0000 702.5000 0.0000 mm
                 Rotation  0.0 0.0 0.0 deg    
                 }
                 
-                Module BeamLine/TDt1152t9320toa8.dat 
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDt1152t9320toa8.txt 
                 {
                 Position 403.0000 -702.5000 0.0000 mm
                 Rotation  0.0 0.0 0.0 deg    
                 }
                 
-                Module BeamLine/TDt1152t9318toa7.dat 
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDt1152t9318toa7.txt 
                 {
                 Position 15.0000 235.3275 235.3275 mm
                 Rotation  0.0 0.0 0.0 deg    
                 }
                 
-                Module BeamLine/TDt1152t9318toa6.dat 
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDt1152t9318toa6.txt 
                 {
                 Position 0.0000 -235.3275 -235.3275 mm
                 Rotation  0.0 0.0 0.0 deg    
                 }
                 
-                Module BeamLine/TDt1152t9318toa5.dat 
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDt1152t9318toa5.txt 
                 {
                 Position 15.0000 -235.3275 235.3275 mm
                 Rotation  0.0 0.0 0.0 deg    
                 }
                 
-                Module BeamLine/TDt1152t9318toa4.dat 
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDt1152t9318toa4.txt 
                 {
                 Position 15.0000 235.3275 -235.3275 mm
                 Rotation  0.0 0.0 0.0 deg    
                 }
                 
-                Module BeamLine/TDt1152t9315toa3.dat 
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDt1152t9315toa3.txt 
                 {
                 Position -403.0000 -405.1416 405.1416 mm
                 Rotation  0.0 0.0 0.0 deg    
                 }
                 
-                Module BeamLine/TDt1152t9315toa2.dat 
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDt1152t9315toa2.txt 
                 {
                 Position -403.0000 -405.1416 -405.1416 mm
                 Rotation  0.0 0.0 0.0 deg    
                 }
                 
-                Module BeamLine/TDt1152t9315.dat 
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDt1152t9315.txt 
                 {
                 Position -403.0000 405.1416 -405.1416 mm
                 Rotation  0.0 0.0 0.0 deg    
                 }
                 
-                Module BeamLine/TDt1152t9315.dat 
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDt1152t9315.txt 
                 {
                 Position -403.0000 405.1416 405.1416 mm
                 Rotation  0.0 0.0 0.0 deg    
                 }
                 
-                Module BeamLine/TDt1152t9314toa1.dat 
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDt1152t9314toa1.txt 
                 {
                 Position -493.0000 -0.0000 -0.0000 mm
                 Rotation  0.0 0.0 0.0 deg    
                 }
                 
-                Module BeamLine/TDt1152t9314toa0.dat 
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDt1152t9314toa0.txt 
                 {
                 Position 493.0000 0.0000 -0.0000 mm
                 Rotation  0.0 0.0 0.0 deg    
