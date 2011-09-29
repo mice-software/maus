@@ -21,7 +21,6 @@ import gzip
 import os
 import tempfile
 import json
-import uuid
 import sys
 import functools
 
@@ -78,7 +77,7 @@ class Go:
 
         print("Welcome to MAUS:")
         print(("\tProcess ID (PID): %d" % os.getpid()))
-        print(("\tUniversally Unique ID (UUID): %s" % uuid.uuid4()))
+#        print(("\tUniversally Unique ID (UUID): %s" % uuid.uuid4()))
         print(("\tProgram Arguments: %s" % str(sys.argv)))
 
         self.json_config_document = \
