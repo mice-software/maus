@@ -18,8 +18,8 @@ class MapCppTrackerDigitizationTestCase(unittest.TestCase):
     - bool check_sanity_mc(std::string document); Y
     - int get_tdc_counts(Json::Value ahit); Y
     - double get_npe(double edep); Y
-    - int get_chan_no(Json::Value ahit); No - how to call MiceModules?
-    - std::vector<Json::Value> make_all_digits(Json::Value hits); No
+    - int get_chan_no(Json::Value ahit);
+    - std::vector<Json::Value> make_all_digits(Json::Value hits); Not really an elementary function - calls others.
     - Json::Value make_bundle(std::vector<Json::Value> _alldigits); Y
     - int compute_adc_counts(double nPE); Y
     - bool check_param(Json::Value* hit1, Json::Value* hit2); Y
@@ -92,6 +92,7 @@ class MapCppTrackerDigitizationTestCase(unittest.TestCase):
     def test_compute_adc(self):
         """ Test the compute_adc_counts function """
         numb_pe = 0
+        # Assert that if npe = 0, the adc count is 0
         self.assertEqual(self.mapper.compute_adc_counts(numb_pe), 0)
         # Generate a random value for my_npe
         my_npe = random.uniform(0, 30)
@@ -147,6 +148,27 @@ class MapCppTrackerDigitizationTestCase(unittest.TestCase):
         self.assertTrue("adc_counts" in doc)
         # Expect the "isUsed" entry to be erased from the input Json file
         self.assertFalse("isUsed" in doc)
+
+    def test_get_chan_no(self):
+        """ The MiceModules are loaded and
+            the channel number is calculated,
+            given the copy number of the fiber were the hit was found.
+            This calculation is more properly tested by comparing its result
+            with the legacy computation in SciFiSD.
+            This is done for each single tracker hit during run time
+            (assertion at line 91).
+        """
+        a_hit_string = """{ "channel_id": {
+                            "tracker_number": 0,
+                            "station_number": 1,
+                            "type": "Tracker",
+                            "plane_number": 0,
+                            "fiber_number": 700
+                            }
+                          }"""
+        a_hit = self.mapper.ConvertToJson(a_hit_string)
+        channel_output = self.mapper.get_chan_no(a_hit)
+        self.assertTrue( channel_output < 215 and channel_output > 0 )
 
     def test_check_param(self):
         """ test the Check_param function """

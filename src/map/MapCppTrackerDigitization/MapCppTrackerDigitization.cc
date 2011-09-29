@@ -32,8 +32,7 @@ bool MapCppTrackerDigitization::birth(std::string argJsonConfigDocument) {
     return false;
   }
 
-  // Get the tracker modules; they will be necessary
-  // for the channel number calculation
+  // Get the tracker modules;
   assert(_configJSON.isMember("reconstruction_geometry_filename"));
   std::string filename;
   filename = _configJSON["reconstruction_geometry_filename"].asString();
@@ -290,7 +289,7 @@ int MapCppTrackerDigitization::compute_adc_counts(double numb_pe) {
 }
 
 Json::Value MapCppTrackerDigitization::make_bundle(std::vector<Json::Value> _alldigits) {
-  Json::Value tracker_event;
+  Json::Value a_tracker_event;
   double npe;
   // pick an element of the array
   for (unsigned int digit_i = 0; digit_i < _alldigits.size(); digit_i++) {
@@ -313,11 +312,11 @@ Json::Value MapCppTrackerDigitization::make_bundle(std::vector<Json::Value> _all
       digit["mc_mom"] = _alldigits[digit_i]["mc_mom"];
       digit["time"] = _alldigits[digit_i]["time"];
       digit["adc_counts"] = compute_adc_counts(npe);
-      tracker_event.append(digit);
+      a_tracker_event.append(digit);
       _alldigits[digit_i]["isUsed"]=1;
     } // ends if-statement
   } // ends k-loop
-  return tracker_event;
+  return a_tracker_event;
 }
 
 bool MapCppTrackerDigitization::check_param(Json::Value* hit1, Json::Value* hit2) {
