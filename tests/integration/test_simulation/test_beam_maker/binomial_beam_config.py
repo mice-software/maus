@@ -1,5 +1,12 @@
-simulation_geometry_filename = "BeamTest.dat"
+import os
+mrd = os.environ["MAUS_ROOT_DIR"]
+
+simulation_geometry_filename = os.path.join(
+  mrd, "tests", "integration", "test_simulation", "test_beam_maker", 
+  "BeamTest.dat"
+)
 spill_generator_number_of_spills = 1000
+verbose_level = 1
 beam = {
     "particle_generator":"binomial", # routine for generating empty primaries
     "binomial_n":20, # number of coin tosses
