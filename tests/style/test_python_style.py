@@ -5,6 +5,7 @@ This walks the directory structure of MAUS and checks for each file of ending
 *.py,. It's possible to set up exceptions to the pylint test by 
 """
 
+import io
 import unittest
 import subprocess
 import os
@@ -42,6 +43,8 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
                 #maus_dir is root_dir relative to maus
                 maus_dir = root_dir[len(self.maus_root_dir)+1:]
                 ignore = False
+                if file_name in self.exclude_files:
+                    ignore = True
                 for a_dir in self.exclude_dirs:
                     if a_dir in maus_dir.split('/'):
                         ignore = True
@@ -85,7 +88,12 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
 
     # folders in maus_root_dir to look at
     include_dirs = ['tests', 'src', 'bin', 'doc']
+    # exclude if dir path includes one of the following
     exclude_dirs = ['build']
+    # exclude if filename includes one of the following
+    exclude_files = [
+        'test_cdb__init__.py', # makes pylint error
+    ]
     maus_root_dir = os.environ['MAUS_ROOT_DIR']
     pylintrc = os.path.join(maus_root_dir, 'tests', 'style', 'pylintrc')
 
