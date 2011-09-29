@@ -98,3 +98,23 @@ SciFinElecChanPerPlane = 1429
 SciFinPlanes = 3
 SciFinStations = 5
 SciFinTrackers = 2
+
+# geometry upload/download information
+#Upload
+# Arguments below MUST be included
+GeometryDirectory   = "/home/matt/maus-littlefield/src/common_py/geometry/testCases/testGeometry"
+GeometryDescription = "This is a standard note It uses the standard test case"
+# Optional Arguments 1 = yes, 0 = no
+Zip_File         = 0
+Delete_Originals = 0
+
+#Download
+#Donwloading of geometries
+#Below, name the directory where the geometry will be downloaded.
+DownloadDir = "/home/matt/maus-littlefield/src/common_py/geometry/Download/"
+#Download Geometry for a specific ID
+#Name the start and stop time for which the geometry was valid. Stop time is optional
+StartTime = "2011-09-08 09:00:00"
+StopTime  = None
+#Download Geometry for a specific Run Num
+RunNum = 1
