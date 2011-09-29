@@ -1,3 +1,25 @@
+#  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
+#
+#  MAUS is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  MAUS is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
+
+"""
+Configuration to generate a beam distribution with binomial distribution in
+the spill and various distributions for difference particle types
+"""
+
+#pylint: disable = C0103, R0801
+
 import os
 mrd = os.environ["MAUS_ROOT_DIR"]
 
@@ -21,7 +43,7 @@ beam = {
             "momentum":{"x":0.0, "y":0.0, "z":1.0},
             "particle_id":-13,
             "energy":226.0,
-            "time":0.0,
+            "time":2.e6,
             "random_seed":0
         }, # reference particle
        "random_seed_algorithm":"incrementing_random", # algorithm for seeding MC
@@ -71,10 +93,10 @@ beam = {
         "weight":8.,
        "transverse":{"transverse_mode":"constant_solenoid", "emittance_4d":6.,
             "normalised_angular_momentum":0.1, "bz":4.e-3},
-       "longitudinal":{"longitudinal_mode":"sawtooth_time",
+       "longitudinal":{"longitudinal_mode":"uniform_time",
                    "momentum_variable":"p",
                    "sigma_p":25.,
-                   "t_start":-1.e6,
+                   "t_start":-2.e6,
                    "t_end":+1.e6},
         "coupling":{"coupling_mode":"none"}
     }]
