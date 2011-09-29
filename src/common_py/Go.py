@@ -21,7 +21,6 @@ import gzip
 import os
 import tempfile
 import json
-import uuid
 import sys
 import functools
 
