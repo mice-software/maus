@@ -131,7 +131,7 @@ class MapPyBeamMaker:
         spill = {}
         try:
             spill = json.loads(json_spill_doc)
-            self.__process_check_spill(spill)
+            spill = self.__process_check_spill(spill)
             new_particles = self.__process_gen_empty(spill)
             for index, particle in enumerate(new_particles):
                 a_beam = self.__process_choose_beam(index)
@@ -142,13 +142,15 @@ class MapPyBeamMaker:
             
     def __process_check_spill(self, spill): #pylint: disable=R0201
         """
-        Check that the spill has a mc branch and that it is an array type
+        Check that the spill has a mc branch and that it is an array type. If
+        no branch, make one. If branch is of wrong type, raise a KeyError.
+        Returns a copy of the spill
         """
         if "mc" not in spill:
-            raise KeyError("Need mc branch for processing spill")
+            spill["mc"] = []
         if type(spill["mc"]) != type([]):
             raise KeyError("mc branch should be an array type")
-        return True
+        return spill
 
     def __process_gen_empty(self, spill):
         """
