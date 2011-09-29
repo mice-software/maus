@@ -77,9 +77,6 @@ class Go:
 
         print("Welcome to MAUS:")
         print(("\tProcess ID (PID): %d" % os.getpid()))
-        # following line is disabled for http://bugs.python.org/issue6059
-        # probably not an issue once patched and line can be available
-        # print(("\tUniversally Unique ID (UUID): %s" % uuid.uuid4()))
         print(("\tProgram Arguments: %s" % str(sys.argv)))
 
         self.json_config_document = \
