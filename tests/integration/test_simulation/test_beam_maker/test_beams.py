@@ -10,10 +10,14 @@ from xboa.Bunch import Bunch
 import xboa.Common as Common
 
 MAUS_ROOT_DIR = os.getenv("MAUS_ROOT_DIR")
+TMP_PATH = os.path.join(MAUS_ROOT_DIR, "tmp")
 SIM_PATH = os.path.join(MAUS_ROOT_DIR, "bin", "simulate_mice.py")
 PLOT_DIR = os.path.join(MAUS_ROOT_DIR, "tests", "integration", \
                                     "plots", "beam_maker")
-
+TEST_DIR = os.path.join(MAUS_ROOT_DIR, "tests", "integration", \
+                        "test_simulation", "test_beam_maker")
+DEF_SIM = os.path.join(TMP_PATH, 'simulation_defaults.out')
+BIN_SIM = os.path.join(TMP_PATH, 'simulation_binomial.out')
 BIN_P = 0.1
 BIN_N = 20
 N_SPILLS = 1000
@@ -30,7 +34,7 @@ class beam_test(unittest.TestCase):
         Check that the default beam parameters run and produce some number of
         primary hits > 0
         """
-        bunch = Bunch.new_from_read_builtin('maus_primary', 'simulation_defaults.out')
+        bunch = Bunch.new_from_read_builtin('maus_primary', DEF_SIM)
         self.assertTrue(len(bunch) > 0)
 
     def test_binomial(self):
@@ -39,7 +43,7 @@ class beam_test(unittest.TestCase):
         """
         # make a dict of bunches of xboa.Hits separated by event (spill) number
         bunch_dict = Bunch.new_dict_from_read_builtin('maus_primary', \
-                          'simulation_binomial.out', 'event_number')
+                          BIN_SIM, 'event_number')
         bunch_weights = []
         ref_binomial_x = []
         ref_binomial_y = []
@@ -72,7 +76,7 @@ class beam_test(unittest.TestCase):
         """
         # make a dict of bunches of xboa.Hits separated by event (spill) number
         bunch_dict = Bunch.new_dict_from_read_builtin('maus_primary', \
-                          'simulation_binomial.out', 'pid')
+                          BIN_SIM, 'pid')
         test_weights = {}
         sum_weights = 0
         for pid, bunch in bunch_dict.iteritems():
@@ -100,7 +104,7 @@ class beam_test(unittest.TestCase):
         """
         # make a dict of bunches of xboa.Hits separated by event (spill) number
         bunch = Bunch.new_dict_from_read_builtin('maus_primary', \
-                          'simulation_binomial.out', 'pid')[-13]
+                          BIN_SIM, 'pid')[-13]
         for key, value in {'energy':226.0, 'z':3.0, 'x':0., 'y':0., \
                            'px':0., 'py':0.}.iteritems():
             sigma = 5.*bunch.moment([key, key])**0.5/float(bunch.bunch_weight())**0.5
@@ -128,14 +132,14 @@ def run_simulations():
         pass # dir already exists
 
     ps = subprocess.Popen([SIM_PATH, '-configuration_file', \
-                           'default_beam_config.py'])
+                           os.path.join(TEST_DIR, 'default_beam_config.py')])
     ps.wait()
-    os.rename('simulation.out', 'simulation_defaults.out')
+    os.rename('simulation.out', DEF_SIM)
 
     ps = subprocess.Popen([SIM_PATH, '-configuration_file', \
-                           'binomial_beam_config.py'])
+                           os.path.join(TEST_DIR, 'binomial_beam_config.py')])
     ps.wait()
-    os.rename('simulation.out', 'simulation_binomial.out')
+    os.rename('simulation.out', BIN_SIM)
 
 if __name__ == "__main__":
     run_simulations()
