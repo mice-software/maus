@@ -208,6 +208,6 @@ def run_simulations():
     os.rename('simulation.out', BIN_SIM)
 
 if __name__ == "__main__":
-    #run_simulations()
+    run_simulations()
     unittest.main()
 
