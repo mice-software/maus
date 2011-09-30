@@ -47,8 +47,6 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         sleep 1
         make
 	make install
-	#this is a small hack
-	cp ${MAUS_ROOT_DIR}/third_party/build/libxml2-2.7.7/python/libxml2.py ${MAUS_ROOT_DIR}/third_party/install/lib/python2.7/site-packages/libxml2.py
 	            ################################################## 
 	echo
         echo "INFO: The package should be locally build now in your"
