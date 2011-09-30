@@ -13,12 +13,17 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+Generate empty spills
+"""
+
 import json
 import ErrorHandler
 
 class InputPySpillGenerator:
     """
-    Generates a user defined number of empty spills
+    Generates a user defined number of empty spills, defined by the
+    spill_generator_number_of_spills. Empty spill is just an empty dict.
     """
 
     def __init__(self):

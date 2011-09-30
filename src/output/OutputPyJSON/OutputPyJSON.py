@@ -13,6 +13,9 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+"""Module to write output to disk
+"""
+
 import gzip
 import json
 
