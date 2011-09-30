@@ -1,3 +1,5 @@
+
+import os
 import json
 import unittest
 import  tempfile
@@ -18,16 +20,16 @@ class OutputPyJSONTestCase(unittest.TestCase):
     def test_save_single_uncompressed(self):
         """Try saving one spill in uncompressed fashion
         """
-        filename = tempfile.mkstemp()[1]
-        output = OutputPyJSON(open(filename,'w'))
+        output = OutputPyJSON(open(self.tmp_file,'w'))
 
         self.assertTrue(output.birth("{}"))
-        output.save(self.test_string)
+        self.assertTrue(output.save(self.test_string))
         self.assertTrue(output.death())
-
+        self.assertFalse(output.save(self.test_string)) # attempting to write to
+                                                        # closed file
         test_doc = json.loads(self.test_string)
 
-        my_file = open(filename, 'r')
+        my_file = open(self.tmp_file, 'r')
         read_doc = json.loads(my_file.readline())
         self.assertEqual(read_doc, test_doc)
         my_file.close()
@@ -35,20 +37,61 @@ class OutputPyJSONTestCase(unittest.TestCase):
     def test_save_single_compressed(self):
         """Try saving one spill using compressed gzip
         """
-        filename = tempfile.mkstemp()[1]
-        output = OutputPyJSON(gzip.GzipFile(filename, 'w'))
+        output = OutputPyJSON(gzip.GzipFile(self.tmp_file, 'w'))
 
         self.assertTrue(output.birth("{}"))
         output.save(self.test_string)
         self.assertTrue(output.death())
+        self.assertFalse(output.save(self.test_string)) # attempting to write to
+                                                        # closed file
 
         test_doc = json.loads(self.test_string)
 
-        my_file = gzip.GzipFile(filename, 'r')
+        my_file = gzip.GzipFile(self.tmp_file, 'r')
         read_doc = json.loads(my_file.readline())
         self.assertEqual(read_doc, test_doc)
         my_file.close()
 
+    def test_birth_text_format(self):
+        """Test OutputPyJson loads a text file from datacards correctly."""
+        output = OutputPyJSON()
+        json_doc = json.dumps({"output_json_file_name":self.tmp_file,
+                               "output_json_file_type":"text"})
+        output.birth(json_doc)
+        self.assertTrue(output.save(self.test_string))
+        self.assertTrue(output.death())
+
+        my_file = open(self.tmp_file, 'r')
+        read_doc = json.loads(my_file.readline())
+        self.assertEqual(read_doc, json.loads(self.test_string))
+        my_file.close()
+
+    def test_birth_gzip_format(self):
+        """Test OutputPyJson loads a gzip file from datacards correctly."""
+        output = OutputPyJSON()
+        json_doc = json.dumps({"output_json_file_name":self.tmp_file,
+                               "output_json_file_type":"gzip"})
+        output.birth(json_doc)
+        self.assertTrue(output.save(self.test_string))
+        self.assertTrue(output.death())
+
+        my_file = gzip.GzipFile(self.tmp_file, 'r')
+        line = my_file.readline()
+        read_doc = json.loads(line)
+        self.assertEqual(read_doc, json.loads(self.test_string))
+        my_file.close()
+
+
+    def test_death(self):
+        """Test OutputPyJson handles exceptions on bad death()."""
+        output = OutputPyJSON(gzip.GzipFile(self.tmp_file, 'w'))
+
+        self.assertTrue(output.birth("{}"))
+        self.assertTrue(output.death())
+        self.assertTrue(output.death()) #close() on closed is a no-op
+
+    tmp_file = os.path.join(os.environ["MAUS_ROOT_DIR"], "tmp", \
+                            "OutputPyJSON.tmp")
 
 if __name__ == '__main__':
     unittest.main()

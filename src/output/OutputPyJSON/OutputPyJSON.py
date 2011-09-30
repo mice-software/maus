@@ -14,6 +14,9 @@
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
 import gzip
+import json
+
+import ErrorHandler
 
 class OutputPyJSON:
     """OutputPyJSON writes JSON files to python files
@@ -44,20 +47,30 @@ class OutputPyJSON:
         """OutputPyJSON constructor
 
         \param arg_file arg_file is a file object.
-        The default is to write compressed
-        to the filename 'output.gz'.
+        The default is to take inputs from configuration at birth.
         """
-
-        if arg_file == None:
-            arg_file = gzip.GzipFile("output.gz", 'w')
-        assert not isinstance(arg_file, str)
         self.file = arg_file
 
 
     def birth(self, config_document):
-        """Birth does nothing; no setup required
+        """If file is not defined, take file from config_document
+
+        \param config_document json configuration. Reads output_json_file_type
+        to define type and output_json_file_name to define file name. Possible
+        types are "gzip" or "text"
         """
-        return True
+        try:
+            if self.file == None:
+                config = json.loads(config_document)
+                fname = config["output_json_file_name"]
+                if config["output_json_file_type"] == "gzip":
+                    self.file = gzip.GzipFile(fname, 'w')
+                if config["output_json_file_type"] == "text":
+                    self.file = open(fname, 'w')
+            return True
+        except Exception: #pylint: disable=W0703
+            ErrorHandler.HandleException({}, self)
+            return False
 
     def save(self, document):
         """Save single event
@@ -67,14 +80,22 @@ class OutputPyJSON:
 
         \param document JSON document to be saved
         """
-        self.file.write(document + '\n')
+        try:
+            self.file.write(document + '\n')
+            return True
+        except Exception: #pylint: disable=W0703
+            ErrorHandler.HandleException({}, self)
+            return False
 
     def death(self):
         """Closes down OutputPyJSON
         
         Closes the file that the class has open 
         """
-        self.file.close()
-        return True
-
+        try:
+            self.file.close() # can this make an exception? Catch anyway...
+            return True
+        except Exception: #pylint: disable=W0703
+            ErrorHandler.HandleException({}, self)
+            return False
 
