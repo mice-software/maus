@@ -1,3 +1,17 @@
+MAUS-v0.0.7 (http://micewww.pp.rl.ac.uk/versions/show/15)
+Bug #700: SCons version 2.1.0 fails in build system, easy_install automatically grabs it
+Bug #713: Segmentation fault in UUID python module
+Bug #714: pylint style checker checks SWIG generated files
+Bug #717: Pylint generates exceptions/errors
+Feature #454: Review beam maker code
+Feature #461: Passing of arguments (e.g. configuration, datacards)
+Feature #678: ErrorHandler tweak
+Feature #679: Permit non-json stuff in Configuration
+Feature #692: Merge of Mac OSX support
+Feature #715: InputPySpillGenerator
+Feature #716: Empty spill generator
+Feature #721: OutputPyJSON should take file name and type from datacards
+
 MAUS-v0.0.6 (http://micewww.pp.rl.ac.uk/versions/show/14)
   Bug #563: Installation of Maus
   Bug #599: root build fails when conflicting python2.7 already installed
