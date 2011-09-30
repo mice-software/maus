@@ -41,7 +41,7 @@ using std::ifstream;
 using std::stringstream;
 
 //////////////////////////////////////////////////////////////////////////////////////////////
-/** Identifier for  a single TOF channel.
+/** Identifier for a single TOF channel.
  * This class is used to hold and manage all the information needed
  * to identifiy one channel in the TOF detectors.
  */
@@ -50,8 +50,8 @@ class TOFChannelKey {
   TOFChannelKey()
   :_station(-999), _plane(-999), _slab(-999), _pmt(-999), _detector("unknown") {}
 
-  TOFChannelKey(int l, int g, int ch, int e, string d)
-  :_station(l), _plane(g), _slab(ch), _pmt(e), _detector(d) {}
+  TOFChannelKey(int st, int pl, int sl, int pmt, string d)
+  :_station(st), _plane(pl), _slab(sl), _pmt(pmt), _detector(d) {}
 
   explicit TOFChannelKey(string keyStr) throw(Squeal);
   virtual ~TOFChannelKey() {}
@@ -69,6 +69,9 @@ class TOFChannelKey {
   */  
   bool inSameSlab(string keyStr);
 
+  TOFChannelKey GetOppositeSidePMT();
+  string GetOppositeSidePMTStr();
+
   friend ostream& operator<<( ostream& stream, TOFChannelKey key );
   friend istream& operator>>( istream& stream, TOFChannelKey &key ) throw(Squeal);
 
@@ -79,10 +82,16 @@ class TOFChannelKey {
   */
   string str();
 
-  int station()     {return _station;}
+  int station()   {return _station;}
   int plane()     {return _plane;}
-  int slab() {return _slab;}
-  int pmt()  {return _pmt;}
+  int slab()      {return _slab;}
+  int pmt()       {return _pmt;}
+
+  void SetStation(int xStation)       {_station = xStation;}
+  void SetPlane(int xPlane)           {_plane = xPlane;}
+  void SetSlab(int xSlab)             {_slab = xSlab;}
+  void SetPmt(int xPmt)               {_pmt = xPmt;}
+  void SetDetector(string xDetector)  {_detector = xDetector;}
 
   /** This function creates unique integer identifier.
   * \return Integer identifier.

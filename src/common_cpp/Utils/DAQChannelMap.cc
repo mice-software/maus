@@ -72,7 +72,7 @@ std::istream& operator>>( std::istream& stream, DAQChannelKey &key ) throw(Squea
   if (xLabel != "DAQChannelKey") {
     throw(Squeal(Squeal::recoverable,
                  std::string("corrupted DAQ Channel Key"),
-                 "istream& operator>>(istream& stream, DAQChannelKey)"));
+                 "istream& operator>>(istream&, DAQChannelKey)"));
   }
   return stream;
 }
@@ -96,7 +96,7 @@ bool DAQChannelMap::InitFromFile(std::string filename) {
   std::ifstream stream(filename.c_str());
   if ( !stream ) {
     Squeak::mout(Squeak::error)
-    << "Error in DAQChannelMap::InitFromFile. Can't DAQ open cabling file. "
+    << "Error in DAQChannelMap::InitFromFile. Can't open DAQ cabling file. "
     << filename << std::endl;
     return false;
   }
@@ -111,8 +111,8 @@ bool DAQChannelMap::InitFromFile(std::string filename) {
     }
   }catch(Squeal e) {
     Squeak::mout(Squeak::error)
-    << "Error in DAQChannelMap::InitFromFile. Error during loading."
-    << std::endl;
+    << "Error in DAQChannelMap::InitFromFile. Error during loading." << std::endl
+    << e.GetMessage() << std::endl;
     return false;
   }
 

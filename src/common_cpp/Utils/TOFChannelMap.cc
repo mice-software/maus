@@ -52,7 +52,8 @@ bool TOFChannelMap::InitFromFile(string filename) {
     }
   } catch(Squeal e) {
     Squeak::mout(Squeak::error)
-    << "Error in TOFChannelMap::InitFromFile. Error during loading." << std::endl;
+    << "Error in TOFChannelMap::InitFromFile. Error during loading." << std::endl
+    << e.GetMessage() << std::endl;
     return false;
   }
 
@@ -199,6 +200,23 @@ bool TOFChannelKey::inSameSlab(TOFChannelKey key) {
 bool TOFChannelKey::inSameSlab(string keyStr) {
   TOFChannelKey key(keyStr);
   return this->inSameSlab(key);
+}
+
+TOFChannelKey TOFChannelKey::GetOppositeSidePMT() {
+  TOFChannelKey key;
+  key.SetStation(this->station());
+  key.SetPlane(this->plane());
+  key.SetSlab(this->slab());
+  key.SetDetector(this->detector());
+  if (this->pmt() == 0) key.SetPmt(1);
+  if (this->pmt() == 1) key.SetPmt(0);
+
+  return key;
+}
+
+string TOFChannelKey::GetOppositeSidePMTStr() {
+  TOFChannelKey key = this->GetOppositeSidePMT();
+  return key.str();
 }
 
 ostream& operator<<( ostream& stream, TOFChannelKey key ) {
