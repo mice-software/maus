@@ -45,12 +45,48 @@ BIN_N = 20
 N_SPILLS = 1000
 WEIGHTS_TO_PID = {-11:0.08, 211:0.02, -13:0.90}
 
+SETUP_DONE = False
+
+def make_plot_dir():
+    """
+    Make a directory to contain plots from this test
+    """
+    try:
+        os.mkdir(PLOT_DIR)
+    except OSError:
+        pass # dir already exists
+
+def run_simulations():
+    """
+    Run simulation to generate some data. We only want to do this once, so I
+    pull it out into a separate part of the test.
+    """
+    subproc = subprocess.Popen([SIM_PATH, '-configuration_file', \
+                           os.path.join(TEST_DIR, 'default_beam_config.py')])
+    subproc.wait()
+    os.rename('simulation.out', DEF_SIM)
+
+    subproc = subprocess.Popen([SIM_PATH, '-configuration_file', \
+                           os.path.join(TEST_DIR, 'binomial_beam_config.py')])
+    subproc.wait()
+    os.rename('simulation.out', BIN_SIM)
+
 class BeamMakerTest(unittest.TestCase): # pylint: disable = R0904
     """
     Some tests on beam we push up to the high level integration tests - this
     checks that we can parse the beam configuration through all the simulation
     bureaucracy correctly and also that the generated distributions are correct.
     """
+    def setUp(self):
+        """
+        run tests the first time the class is instantiated
+        """
+        global SETUP_DONE
+        if not SETUP_DONE:
+            make_plot_dir()
+            run_simulations()
+            SETUP_DONE = True
+
     def test_defaults(self):
         """
         Check that the default beam parameters run and produce some number of
@@ -106,7 +142,7 @@ class BeamMakerTest(unittest.TestCase): # pylint: disable = R0904
                             sum_weights**0.5 )
 
     def __cmp_matrix(self, ref_matrix, test_matrix):
-        """Compare to numpy matrices"""
+        """Compare two numpy matrices"""
         self.assertEqual(ref_matrix.shape, test_matrix.shape)
         msg = "\nReference:\n"+str(ref_matrix)+\
               "\nIn Test:\n"+str(test_matrix)
@@ -115,7 +151,7 @@ class BeamMakerTest(unittest.TestCase): # pylint: disable = R0904
                 ref = ref_matrix[i, j]/(ref_matrix[i, i]/ref_matrix[j, j])**0.5
                 tst = test_matrix[i, j]/(ref_matrix[i, i]/ref_matrix[j, j])**0.5
                 msg_ = msg+"\n "+str(i)+" "+str(j)+" "+str(ref)+" "+str(tst)
-                diff = ref/tst < 0.1 or 2.*abs(ref-tst)/(ref+tst) < 0.1
+                diff = ref/tst-1 < 0.1 or 2.*abs(ref-tst)/(ref+tst) < 0.1
                 self.assertTrue(diff, msg_)
 
 
@@ -187,27 +223,6 @@ class BeamMakerTest(unittest.TestCase): # pylint: disable = R0904
         canvas.Update()
         canvas.Print(PLOT_DIR+"/uniform_time_distribution_test.png")
 
-def run_simulations():
-    """
-    Run simulation to generate some data. We only want to do this once, so I
-    pull it out into a separate part of the test.
-    """
-    try:
-        os.mkdir(PLOT_DIR)
-    except OSError:
-        pass # dir already exists
-
-    subproc = subprocess.Popen([SIM_PATH, '-configuration_file', \
-                           os.path.join(TEST_DIR, 'default_beam_config.py')])
-    subproc.wait()
-    os.rename('simulation.out', DEF_SIM)
-
-    subproc = subprocess.Popen([SIM_PATH, '-configuration_file', \
-                           os.path.join(TEST_DIR, 'binomial_beam_config.py')])
-    subproc.wait()
-    os.rename('simulation.out', BIN_SIM)
-
 if __name__ == "__main__":
-    run_simulations()
     unittest.main()
 
