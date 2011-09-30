@@ -233,9 +233,9 @@ int MapCppTrackerDigitization::get_chan_no(Json::Value ahit) {
 
   if ( channel_id["tracker_number"].asInt() == 0 ) {
     // start counting from the other end
-    _chanNo = floor((numberFibres-fiberNumber)/7.0);
+    _chanNo = floor((numberFibres-fiberNumber)/7);
   } else {
-       _chanNo = floor(fiberNumber/7.0);
+       _chanNo = floor(fiberNumber/7);
   }
   return _chanNo;
 }

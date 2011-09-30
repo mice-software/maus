@@ -82,9 +82,9 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
   int chanNo;
   int numbFibres = 7*2*(_module->propertyDouble("CentralFibre")+0.5);
   if ( _module->propertyInt("Tracker") == 0 ) {
-    chanNo = floor((numbFibres-fiberNumber)/7.0);
+    chanNo = floor((numbFibres-fiberNumber)/7);
   } else {
-    chanNo = floor(fiberNumber/7.0);
+    chanNo = floor(fiberNumber/7);
   }
 
   // assert agreement on chanNo with legacy calculation
