@@ -200,13 +200,16 @@ class TestMapPyBeamMaker(unittest.TestCase): # pylint: disable = R0904
         Check that we throw an error if the spill is bad
         """
         self.assertRaises(KeyError,
-               self.beam_maker._MapPyBeamMaker__process_check_spill, {})
-        self.assertRaises(KeyError,
                self.beam_maker._MapPyBeamMaker__process_check_spill, {"mc":""})
-        self.assertTrue(
-               self.beam_maker._MapPyBeamMaker__process_check_spill({"mc":[]}))
-        self.assertTrue(
-              self.beam_maker._MapPyBeamMaker__process_check_spill({"mc":[""]}))
+        self.assertEqual( \
+                self.beam_maker._MapPyBeamMaker__process_check_spill({}),\
+                {"mc":[]})
+        self.assertEqual(
+               self.beam_maker._MapPyBeamMaker__process_check_spill({"mc":[]}),\
+               {"mc":[]} )
+        self.assertEqual(
+             self.beam_maker._MapPyBeamMaker__process_check_spill({"mc":[""]}),\
+             {"mc":[""]})
 
     def test_process_gen_empty_ovrwrt(self):
         """

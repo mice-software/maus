@@ -14,6 +14,7 @@ OUT_FILE_2 = os.path.join(os.environ["MAUS_ROOT_DIR"], "tmp", \
                         "test_json_browser_2.json")
 BROWSER = os.path.join(os.environ["MAUS_ROOT_DIR"], "bin", "utilities", \
                        "json_browser.py")
+SLEEP_TIME = 1
 
 class TestJsonBrowser(unittest.TestCase): #pylint: disable=R0904
     """
@@ -39,7 +40,7 @@ class TestJsonBrowser(unittest.TestCase): #pylint: disable=R0904
         fout.close()
         subprocess.Popen(["python", BROWSER, "--input-file", OUT_FILE_1, \
                          "--output-file", OUT_FILE_2, "-l", "--indent", "3"])
-        time.sleep(0.1)
+        time.sleep(SLEEP_TIME)
         fin = open(OUT_FILE_2)
         json_test_out = fin.readlines()
 
@@ -60,7 +61,7 @@ class TestJsonBrowser(unittest.TestCase): #pylint: disable=R0904
         subprocess.Popen(["python", BROWSER, "--input-file", OUT_FILE_1,
                          "--output-file", OUT_FILE_2, "-l", "--start-line",
                          "5"])
-        time.sleep(0.1)
+        time.sleep(SLEEP_TIME)
         fin = open(OUT_FILE_2)
         line = fin.readline()
         self.assertEqual(line, '"\\"5\\":\\"a\\""\n')
@@ -69,7 +70,7 @@ class TestJsonBrowser(unittest.TestCase): #pylint: disable=R0904
         subprocess.Popen(["python", BROWSER, "--input-file", OUT_FILE_1,
                          "--output-file", OUT_FILE_2, "-l", "--start-line",
                          "6"])
-        time.sleep(0.1)
+        time.sleep(SLEEP_TIME)
         fin = open(OUT_FILE_2)
         line = fin.readline()
         self.assertEqual(line, "")
@@ -78,7 +79,7 @@ class TestJsonBrowser(unittest.TestCase): #pylint: disable=R0904
         subprocess.Popen(["python", BROWSER, "--input-file", OUT_FILE_1, \
                          "--output-file", OUT_FILE_2, "-l", "--start-line", "3",
                          "--end-line", "4"])
-        time.sleep(0.1)
+        time.sleep(SLEEP_TIME)
         fin = open(OUT_FILE_2)
         line = fin.readline()
         self.assertEqual(line, '"\\"3\\":\\"a\\""\n')
@@ -96,7 +97,7 @@ class TestJsonBrowser(unittest.TestCase): #pylint: disable=R0904
         out = open(OUT_FILE_2, "w")
         proc = subprocess.Popen(["python", BROWSER, "--input-file", OUT_FILE_1],
                              stdin=subprocess.PIPE, stdout=out)
-        time.sleep(1)
+        time.sleep(SLEEP_TIME)
         out.close()
         proc.poll()
         self.assertEqual(proc.returncode, 0)

@@ -456,6 +456,18 @@ def geant4_extras(env):
           """
         my_exit(1)
 
+def install_python_tests():
+    files = glob.glob('tests/py_unit/test_*.py')+glob.glob('tests/style/*.py')
+    env.Install("build", files)
+
+    env.Install("build", "tests/py_unit/test_cdb")
+    test_cdb_files = glob.glob('tests/py_unit/test_cdb/*.py')
+    env.Install("build/test_cdb", test_cdb_files) 
+    env.Install("build", "tests/py_unit/suds")
+    suds_files = glob.glob('tests/py_unit/suds/*.py')
+    env.Install("build/suds", suds_files) 
+
+
 # Setup the environment.  NOTE: SHLIBPREFIX means that shared libraries don't
 # have a 'lib' prefix, which is needed for python to find SWIG generated
 # libraries
@@ -472,8 +484,7 @@ if env.GetOption('clean'):
             if os.path.isfile(filename):
                 print 'Removing:', filename
                 os.remove(filename)
-
-            
+          
     
 
 if os.path.isfile('.use_llvm_with_maus'):
@@ -630,11 +641,6 @@ for single_stuff in stuff_to_import:
     file_to_import.write("\n")
 
 file_to_import.close()
-
-files = glob.glob('tests/py_unit/test_*.py')+glob.glob('tests/style/*.py')
-env.Install("build", files)
-
-env.Install("build", "tests/py_unit/test_cdb")
-env.Install("build", "tests/py_unit/suds")
+install_python_tests()
 
 env.Alias('install', ['%s/build' % maus_root_dir])
