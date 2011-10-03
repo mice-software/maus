@@ -4,6 +4,20 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v0.0.7
+- New functions to generate input beam
+-- Multivariate gaussian in x, px, y, py, time, energy
+-- Additionally sawtooth or uniform distribution in time
+-- Either fixed number of particles or selected from binomial distribution per spill
+-- Multiple distributions can be generated with difference particle types, etc
+- simulate_mice run control is now entirely through datacards
+-- Number of spills input and output filenames can all be selected in datacards
+- datacards can be specified on the command line or in an external file
+-- -configuration_file <file> specifies the python file to use for datacards
+
+MAUS-v0.0.6
+- Added calls to geant4 inline visualisation
+
 MAUS-v0.0.5
 - Added some new compile flags to control C++ optimisation, profiling, debugging, code coverage
 - Added documentation for the Monte Carlo data structure (doc/run_control/spill.pdf)

@@ -13,10 +13,8 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-
 ## @class ErrorHandler
 #  Error handler handles errors in a globally managed way
-
 
 import sys
 import json
@@ -30,7 +28,8 @@ class ErrorHandler:
     Handle error according to error handling tags.
     * if __error_to_stderr is true, send errors to std::err
     * if __error_to_json is true, send errors to the json tree
-    * if __halt_on_error is true, call sys.exit() on error
+    * if __on_error is 'halt', call sys.exit() on error; if on_error is 'raise',
+      raise the error; if on_error is 'none', ignore errors.
     Either instantiate a special error handler or (more usually) use the default
     error handler.
     """
@@ -41,17 +40,9 @@ class ErrorHandler:
         * errors are passed to json
         * does not halt on error
         """
-        self.error_to_stderr = False
+        self.error_to_stderr = True
         self.error_to_json = True
         self.on_error = 'none'
-
-    def SetUp(self, cards_doc):
-        """
-        Set up the error handler with errors from datacards (Not implemented)
-        """
-        if (cards_doc): pass
-        raise NotImplementedError()
-
 
     def HandleException(self, doc=None, caller=None):
         """
@@ -108,6 +99,22 @@ class ErrorHandler:
         doc['errors'][class_name].append(str(sys.exc_info()[0])+": "
                                                         +str(sys.exc_info()[1]))
         return doc
+
+    def ConfigurationToErrorHandler(self, config):
+        """
+        Hand configuration information to the default handler
+          @param config json configuration information default handler.
+                 ErrorHandler will take:
+                    on_error,
+                    errors_to_stderr,
+                    errors_to_json
+        """
+        if config['errors_to_stderr'] == None:
+            self.error_to_stderr = config['verbose_level'] < 4
+        else:
+            self.error_to_stderr = bool(config['errors_to_stderr'])
+        self.error_to_json = bool(config['errors_to_json'])
+        self.on_error = str(config['on_error']).lower()
 
 class CppError(Exception):
   """

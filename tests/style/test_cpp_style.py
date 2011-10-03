@@ -120,7 +120,10 @@ class cpplint_postprocessor:
             words = line.split(' ')
             if words[0] != 'Done' and words[0] != 'Ignoring' and words[0] != 'File':
                 file_path = words[0][0:-1] #words[0] = file_path:line_number:
-                line_number = int(file_path[file_path.rfind(':')+1:])
+                try:
+                    line_number = int(file_path[file_path.rfind(':')+1:])
+                except:
+                    raise IOError(str(line)+' not in file '+filename)
                 file_path = file_path[len(maus_root_dir)+1:file_path.rfind(':')]
                 if file_path not in file_to_error: file_to_error[file_path] = []
                 file_to_error[file_path].append([line, line_number, ''])
@@ -285,7 +288,7 @@ os.path.join('src', 'map', 'MapCppTOFDigitization'),
 os.path.join('src', 'map', 'MapCppTrackerDigitization'),
 os.path.join('src', 'map', 'MapCppPrint'),
 os.path.join('tests', 'style'),
-os.path.join('tests', 'integration', 'optics', 'src'),
+os.path.join('tests', 'integration', 'test_optics', 'src'),
 ]+glob_maus_root_dir(os.path.join('src', '*', '*', 'build')
 )
 

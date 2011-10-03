@@ -1,0 +1,5 @@
+MiceModel       files/PolyFitTest.dat
+MaxStepsWOELoss 200000
+numEvts         10000
+
+

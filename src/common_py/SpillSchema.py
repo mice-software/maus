@@ -33,6 +33,7 @@ class mc:
       "time":{"type":"number"},
       "position":three_vec,
       "momentum":three_vec,
+      "random_seed":{"type":"number"},
     }
   }
 
