@@ -74,44 +74,47 @@ class SciFiPlaneTest : public ::testing::Test {
 TEST_F(SciFiPlaneTest, Test_num_fibres_in_all_planes) {
   std::string filename;
   filename = "Stage6.dat";
+  int trackerNo = 0;
+  int stationNo = 1;
+  int planeNo = 0;
 
-  for ( int trackerNo = 0; trackerNo < 2; trackerNo++ ) {
-    for ( int stationNo = 1; stationNo < 6; stationNo++ ) {
-      for ( int planeNo = 0; planeNo < 3; planeNo++ ) {
+  // for ( int trackerNo = 0; trackerNo < 2; trackerNo++ ) {
+    // for ( int stationNo = 1; stationNo < 6; stationNo++ ) {
+     // for ( int planeNo = 0; planeNo < 3; planeNo++ ) {
         // get the SciFi Modules
-        std::vector<const MiceModule*> modules;
-        MiceModule*      _module;
-        _module = new MiceModule(filename);
-        modules = _module->findModulesByPropertyString("SensitiveDetector", "SciFi");
+  std::vector<const MiceModule*> modules;
+  MiceModule*      _module;
+  _module = new MiceModule(filename);
+  modules = _module->findModulesByPropertyString("SensitiveDetector", "SciFi");
 
-        const MiceModule* this_plane = NULL;
-        for ( unsigned int j = 0; !this_plane && j < modules.size(); ++j ) {
-          // find the module corresponding to this plane
-          if ( modules[j]->propertyExists("Tracker", "int") &&
-               modules[j]->propertyExists("Station", "int") &&
-               modules[j]->propertyExists("Plane", "int") &&
-               modules[j]->propertyInt("Tracker") == trackerNo &&
-               modules[j]->propertyInt("Station") == stationNo &&
-               modules[j]->propertyInt("Plane") == planeNo )
-            // save the module
-            this_plane = modules[j];
-        }
-        assert(this_plane != NULL);
-
-        // arguments are the plane module, material and mother physical volume
-        MiceModule* aplane = const_cast < MiceModule* > (this_plane);
-        SciFiPlane(aplane, mat, tracker);
-
-        // plane 0 (view v), plane 1 (view x), plane 2 (view w)
-        if ( trackerNo == 0 && stationNo == 5 && planeNo == 1 )
-          EXPECT_EQ(SciFiPlane::SciFi_numFibres, 215*7);
-        if ( planeNo == 0 || planeNo == 2 )
-          EXPECT_EQ(SciFiPlane::SciFi_numFibres, 214*7);
-        if ( planeNo == 1 && !(trackerNo == 0 && stationNo == 5) )
-          EXPECT_EQ(SciFiPlane::SciFi_numFibres, 212*7);
-      }
-    }
+  const MiceModule* this_plane = NULL;
+  for ( unsigned int j = 0; !this_plane && j < modules.size(); ++j ) {
+  // find the module corresponding to this plane
+    if ( modules[j]->propertyExists("Tracker", "int") &&
+         modules[j]->propertyExists("Station", "int") &&
+         modules[j]->propertyExists("Plane", "int") &&
+         modules[j]->propertyInt("Tracker") == trackerNo &&
+         modules[j]->propertyInt("Station") == stationNo &&
+         modules[j]->propertyInt("Plane") == planeNo )
+      // save the module
+      this_plane = modules[j];
   }
+  assert(this_plane != NULL);
+
+  // arguments are the plane module, material and mother physical volume
+  MiceModule* aplane = const_cast < MiceModule* > (this_plane);
+  SciFiPlane(aplane, mat, tracker);
+
+  // plane 0 (view v), plane 1 (view x), plane 2 (view w)
+  if ( trackerNo == 0 && stationNo == 5 && planeNo == 1 )
+    EXPECT_EQ(SciFiPlane::SciFi_numFibres, 215*7);
+  if ( planeNo == 0 || planeNo == 2 )
+    EXPECT_EQ(SciFiPlane::SciFi_numFibres, 214*7);
+  if ( planeNo == 1 && !(trackerNo == 0 && stationNo == 5) )
+    EXPECT_EQ(SciFiPlane::SciFi_numFibres, 212*7);
+  // }
+  // }
+  // }
 }
 
 } // namespace
