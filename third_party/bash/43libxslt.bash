@@ -47,6 +47,9 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         sleep 1
         make
 	make install
+  # workaround for bug in libxml2; that there is a libxslt.so and a libxslt.py
+  # and python gets confused... rm the libxslt library, then import to build the
+  # .pyc file, then add the xslt library again
   rm ${MAUS_ROOT_DIR}/third_party/install/lib/libxslt.so
   python -m libxslt
   ln -s ${MAUS_ROOT_DIR}/third_party/install/lib/libslt.so.${version} ${MAUS_ROOT_DIR}/third_party/install/lib/lixslt.so

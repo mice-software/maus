@@ -47,6 +47,9 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         sleep 1
         make
 	make install
+  # workaround for bug in libxml2; that there is a libxml2.so and a libxml2.py
+  # and python gets confused... rm the libxml2 library, then import to build the
+  # .pyc file, then add the xml2 library again
   rm ${MAUS_ROOT_DIR}/third_party/install/lib/libxml2.so
   python -m libxml2
   ln -s ${MAUS_ROOT_DIR}/third_party/install/lib/libxml2.so.${version} ${MAUS_ROOT_DIR}/third_party/install/lib/libxml2.so
