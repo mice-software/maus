@@ -68,7 +68,7 @@ class GDMLtomaus():
             errmsg = 'Output argument doesnt exist'
             raise IOError(errmsg, 'GDMLtomaus::convert_to_maus')
         else:
-            outputfile = output + "/ParentGeometryFile.txt"
+            outputfile = output + "/ParentGeometryFile.dat"
             maus = os.environ["MAUS_ROOT_DIR"] + '/src/common_py/geometry/'
             configxsl = maus  + 'xsltScripts/GDML2G4MICE.xsl'
             config_file = CADImport(xmlin1 = self.config_file, xsl = configxsl, output = outputfile)
@@ -81,7 +81,7 @@ class GDMLtomaus():
                 num_of_splits = len(new_string)
                 file_name = num_of_splits - 1
                 file_name = new_string[file_name]
-                outputfile = output + '/' + file_name[:-4] + 'txt'
+                outputfile = output + '/' + file_name[:-4] + 'dat'
                 mm_xsl = os.environ["MAUS_ROOT_DIR"] + "/src/common_py/geometry/xsltScripts/MMTranslation.xsl"
                 step_file = CADImport(xmlin1 = self.step_files[num], xsl = mm_xsl, output = outputfile)
                 step_file.parse_xslt()
