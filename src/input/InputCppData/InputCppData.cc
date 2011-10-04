@@ -33,21 +33,6 @@ InputCppData::InputCppData(std::string pDataPath,
 
 
 bool InputCppData::birth(std::string jsonDataCards) {
-  if ( _dataFileManager.GetNFiles() ) {
-     return false;  // Faile because files are already open
-  }
-
-  //
-  _dataFileManager.SetList(_datafiles);
-  _dataFileManager.SetPath(_dataPaths);
-  _dataFileManager.OpenFile();
-  unsigned int nfiles = _dataFileManager.GetNFiles();
-  if (!nfiles) {
-    Squeak::mout(Squeak::error) << "Unable to load any data files." << std::endl;
-    Squeak::mout(Squeak::error) << "Check your run number (or file name) and data path."
-    << std::endl;
-    return false;
-  }
   //  JsonCpp setup
   Json::Value configJSON;   //  this will contain the configuration
   Json::Reader reader;
@@ -58,6 +43,29 @@ bool InputCppData::birth(std::string jsonDataCards) {
     return false;
   }
 
+  if ( _dataFileManager.GetNFiles() ) {
+     return false;  // Faile because files are already open
+  }
+
+  //
+  if (_dataPaths == "") {
+      assert(configJSON.isMember("daq_data_path"));
+      _dataPaths = configJSON["daq_data_path"].asString();
+  }
+  if (_datafiles == "") {
+      assert(configJSON.isMember("daq_data_file"));
+      _datafiles = configJSON["daq_data_file"].asString();
+  }
+  _dataFileManager.SetList(_datafiles);
+  _dataFileManager.SetPath(_dataPaths);
+  _dataFileManager.OpenFile();
+  unsigned int nfiles = _dataFileManager.GetNFiles();
+  if (!nfiles) {
+    Squeak::mout(Squeak::error) << "Unable to load any data files from "
+          << "daq_data_path " <<_dataPaths << " and daq_data_file "
+          <<  _datafiles << std::endl;
+    return false;
+  }
   assert(configJSON.isMember("DAQ_cabling_file"));
   std::string map_file_name = configJSON["DAQ_cabling_file"].asString();
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");

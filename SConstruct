@@ -394,7 +394,7 @@ def set_gtest(conf, env):
 
 def set_unpacker(conf, env):
     if (not conf.CheckLib('MDunpack', language='c++') or \
-        not  conf.CheckCXXHeader('MDevent.h')):
+        not  conf.CheckCXXHeader('unpacking/MDevent.h')):
         print
         print "!! Unpacker module not found, you will not be able to use the RealData module."
         print

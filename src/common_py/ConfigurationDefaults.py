@@ -20,6 +20,7 @@
 #  please load your own overriding configuration by
 #  consulting the documentation.
 #
+import os
 
 output_json_file_name = "simulation.out"
 output_json_file_type = "text"
@@ -166,14 +167,6 @@ SciFinPlanes = 3
 SciFinStations = 5
 SciFinTrackers = 2
 
-<<<<<<< TREE
-maus_version = "" # set at runtime - do not edit this (changes are ignored)
-configuration_file = "" # should be set on the command line only (else ignored)
-
-
-=======
-VirtualPlanes_z = [0.0, 1.0] # units: meter.  the 'z' coordinate where the virtual plane exists
-
 # this is used by ImputCppRealData
 Enable_V1290_Unpacking = True
 Enable_V1731_Unpacking = True
@@ -190,9 +183,10 @@ Enable_EMR = True
 Enable_KL = True
 Enable_CKOV = True
 DAQ_cabling_file = "/files/cabling/DAQChannelMap.txt"
+daq_data_path = '%s/src/input/InputCppData' % os.environ.get("MAUS_ROOT_DIR") # path to daq data
+daq_data_file = '02873.003' # file name for daq data
 
-# this is used by the reconstuction of the TOF detectors
-TOF_cabling_file = "/files/cabling/TOFChannelMap.txt"
-TOF_TW_calibration_file = "/files/calibration/tofcalibTW.txt"
-TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF1.txt"
-TOF_Trigger_calibration_file = "/files/calibration/tofcalibTrigger_trTOF1.txt">>>>>>> MERGE-SOURCE
+maus_version = "" # set at runtime - do not edit this (changes are ignored)
+configuration_file = "" # should be set on the command line only (else ignored)
+
+
