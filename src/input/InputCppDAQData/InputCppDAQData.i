@@ -1,16 +1,16 @@
-%module InputCppData
+%module InputCppDAQData
  %{
  /* Includes the header in the wrapper code */
- #include "InputCppData.hh"
+ #include "InputCppDAQData.hh"
 
  %}
 %include "std_string.i"
 
-%feature("shadow") InputCppData::emitter() %{
+%feature("shadow") InputCppDAQData::emitter() %{
 def emitter(self):
   while (self.readNextEvent()):
     yield self.getCurEvent()
 %}
 
-%include "InputCppData.hh"
+%include "InputCppDAQData.hh"
 

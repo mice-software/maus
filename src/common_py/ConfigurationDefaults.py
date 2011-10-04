@@ -20,6 +20,7 @@
 #  please load your own overriding configuration by
 #  consulting the documentation.
 #
+import os
 
 output_json_file_name = "simulation.out"
 output_json_file_type = "text"
@@ -40,7 +41,7 @@ errors_to_json = True
 on_error = 'none' # none, halt or raise
 
 # Used by MapPyRemoveTracks.
-keep_only_muon_tracks = False 
+keep_only_muon_tracks = False
 
 # Used by MapCppSimulation
 keep_tracks = False # set to true to keep start and end point of every track
@@ -165,6 +166,25 @@ SciFinElecChanPerPlane = 1429
 SciFinPlanes = 3
 SciFinStations = 5
 SciFinTrackers = 2
+
+# this is used by ImputCppRealData
+Enable_V1290_Unpacking = True
+Enable_V1731_Unpacking = True
+Enable_V1724_Unpacking = True
+Enable_V830_Unpacking = True
+Enable_VLSB_Unpacking = True
+Enable_DBB_Unpacking = True
+Do_V1731_Zero_Suppression = False
+V1731_Zero_Suppression_Threshold = 100
+Do_V1724_Zero_Suppression = True
+V1724_Zero_Suppression_Threshold = 100
+Enable_TOF = True
+Enable_EMR = True
+Enable_KL = True
+Enable_CKOV = True
+DAQ_cabling_file = "/files/cabling/DAQChannelMap.txt"
+daq_data_path = '%s/src/input/InputCppDAQData' % os.environ.get("MAUS_ROOT_DIR") # path to daq data
+daq_data_file = '02873.003' # file name for daq data
 
 maus_version = "" # set at runtime - do not edit this (changes are ignored)
 configuration_file = "" # should be set on the command line only (else ignored)

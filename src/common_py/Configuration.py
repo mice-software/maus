@@ -1,3 +1,9 @@
+"""
+The Configuration tells MAUS and its processors how to
+set themselves up.  This is meant to be a replacement
+for the old G4MICE datacards.
+"""
+
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 # 
 #  MAUS is free software: you can redistribute it and/or modify
@@ -13,17 +19,10 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-
-## @class Configuration
-#  The Configuration tells MAUS and its processors how to
-#  set themselves up.  This is meant to be a replacement
-#  for the old G4MICE datacards.
-#
 import os
 import json
+import ErrorHandler
 import argparse
-import operator
-import sys
 
 class Configuration:
     """
@@ -36,112 +35,116 @@ class Configuration:
         """        
         self.readme = os.path.join(os.environ['MAUS_ROOT_DIR'], 'README')
 
-
-    def getConfigJSON(self, config_file = None):
+    def getConfigJSON(self, config_file = None, command_line_args = False):
         """
         Returns JSON config document
 
         The defaults are read from ConfigurationDefaults
         then (if applicable) values are added/replaced
-        by the passed file or command line input.  A JSON 
-        file is returned.
+        by the passed file.  A JSON file is returned.
 
-        Command line arguments are parsed from 
-        ConfigurationDefaults as -sigmaPz 25. The command
-        line can also be used to enter new arguments or 
-        modify the default arguments from a data card as 
-        -card /location/file
-         
-
-        \param config_file (optional) overriding configuration file handle.  If
+        @param config_file (optional) overriding configuration file handle.  If
                           None then this argument is ignored. If it is a python
                           file handle (ie. open('my_config.dat','r') ) then that
                           file is read.
+        @param command_line_args if set to True, take arguments from the command
+               line. Can produce undesirable results if you are running the main
+               process from e.g. nosetests so disabled by default.
         """
         maus_root_dir = os.environ.get('MAUS_ROOT_DIR')
         assert maus_root_dir != None
 
-#   config_dict is initialized to the values stored in ConfigurationDefaults.py
         config_dict = {}
-        ex_dict = {}
         defaults = open(maus_root_dir+"/src/common_py/ConfigurationDefaults.py")
         exec(defaults, globals(), config_dict) # pylint: disable=W0122
 
-#   Argparse allows for a command line parser with keywords given by ConfigurationDefaults.py
-#   Additionally a keyword command has been created to store the path and filename to a datacard
-        parser = argparse.ArgumentParser(add_help = False)
-        for key, value in sorted(config_dict.iteritems(), key=lambda x: x[0].lower()):
-            parser.add_argument('--'+key, action='store', dest=key, default=value)
-        parser.add_argument('--card', action='store', dest='card', default=None)
-        results = parser.parse_args()
+        if command_line_args:
+            config_dict = self.command_line_arguments(config_dict)
 
-#    All parsed values are input as string types, this checks the type in ConfigurationDefaults.py
-#    and attempts to return the parsed values to orginal or similar type.  
-#    Currently does not work for dict type arguments
-        for key, value in config_dict.iteritems():
-            if config_dict[key] == getattr(results,key):
-                continue
-
-#    Checks if the default is boolean, if it is, checks for values true or false and enters
-#    values accordingly.  If true or false are not entered an exception is raised.
-            elif isinstance (value, bool):
-                if getattr(results,key) == 'True' or getattr(results,key) == 'true':
-                    config_dict[key] = True
-                elif getattr(results,key) == 'False' or getattr(results,key) == 'false':
-                    config_dict[key] = False
-                else:
-                    print key, ' needs to be a boolean value.'
-                    raise ValueError ('Please enter a boolean value.')
-
-#    Checks if the default is an integer, if it is, it will try and force the parsed argument
-#    back into int type, failing that, it will try to force it into float type.  If the argument
-#    is no longer a number an exception is raised.
-            elif isinstance (value, int):
-                try:
-                    config_dict[key] = int(getattr(results,key))
-                except ValueError:
-                    try:
-                        config_dict[key] = float(getattr(results,key))
-                    except ValueError:
-                        print key, ' needs to be a number.'
-                        raise ValueError ('Please enter a number.')
-
-#    Checks if the default is a float, if it is, this will try and force the parsed argument
-#    back into float type.  If the argument is no longer a number an exception is raised.
-            elif isinstance (value, float):
-                try:
-                    config_dict[key] = float(getattr(results,key))
-                except ValueError:
-                    print key, ' needs to be a number.'
-                    raise ValueError ('Please enter a number.')
-
-#    Checks if a change has been made to any of the dictionary arguments, if any change has occured
-#    an exception is raised.
-            elif isinstance (value, dict):
-                if config_dict[key]!=getattr(results,key):
-                    raise NotImplementedError("Unable to parse complex types. See issue #461.")
-                else:
-                    config_dict[key] = getattr(results,key)
-
-#    If there are any changes to the default string values this statement will catch them
-            else:
-                config_dict[key] = getattr(results,key)
-
-#   If a data card is specified this will read in the file and either modify the arguements in
-#   ConfigurationDefaults.py or add new arguments to config_dict
-        if results.card != None:
-            add_file = results.card
-            exec(open(add_file, 'r').read(), globals(), config_dict)
+        if config_dict["configuration_file"] != "":
+            cmd_line_config_file = open(config_dict["configuration_file"])
+            exec(cmd_line_config_file.read(), globals(), config_dict) # pylint: disable=W0122,C0301
 
         if config_file != None:
             assert not isinstance(config_file, str)
             exec(config_file.read(), globals(), config_dict) # pylint: disable=W0122,C0301
 
+        if config_dict['maus_version'] != "":
+            raise ValueError("MAUS version cannot be changed by the user")
         config_dict['maus_version'] = self.get_version_from_readme()
+        config_dict = self.check_config_dict(config_dict)
+        self.configuration_to_error_handler(config_dict)
         config_json_str = json.JSONEncoder().encode(config_dict)
 
         return config_json_str
-    
+
+    def command_line_arguments(self, config_dict):
+        """
+        Parse arguments from the command line
+
+        Use argparse module to control command line arguments. First add the
+        arguments to the file taken from ConfigurationDefaults; force the 
+        arguments into the right type; and then push them to config_dict.
+
+        @returns the modified config_dict
+        """
+        # Argparse allows for a command line parser with keywords given by 
+        # ConfigurationDefaults.p Additionally a keyword command has been
+        # created to store the path and filename to a datacard
+        parser = argparse.ArgumentParser()
+        for key, value in config_dict.iteritems():
+            parser.add_argument('-'+key, action='store', dest=key, 
+                                default=value)
+        results = parser.parse_args()
+
+        # All parsed values are input as string types, this checks the type in
+        # ConfigurationDefaults.py and attempts to return the parsed values to
+        # orginal or similar type. Currently does not work for dict type
+        # arguments
+        for key, def_value in config_dict.iteritems(): # value is from defaults
+            ap_value = getattr(results, key)
+            if def_value == ap_value:
+                continue
+            elif isinstance (def_value, str):
+                config_dict[key] = ap_value # shouldn't throw
+            elif isinstance (def_value, bool):
+                try:
+                    config_dict[key] = self.string_to_bool(ap_value)
+                except ValueError:
+                    raise ValueError('Could not convert command line argument '\
+                          +str(key)+' with value '+ap_value+\
+                          ' to a boolean')
+
+            # Checks if the default is an integer, if it is, it will try to
+            # force the parsed argument back into int type, failing that, it
+            # will try to force it into float type.  If the argument is no
+            # longer a number an exception is raised.
+            elif isinstance (def_value, int):
+                try:
+                    config_dict[key] = int(ap_value)
+                except ValueError:
+                    raise ValueError('Could not convert command line '+\
+                          'argument '+str(key)+' with value '+\
+                          str(ap_value)+' to an int')
+
+            # Checks if the default is a float, if it is, this will try and
+            # force the parsed argument back into float type.  If the argument
+            # is no longer a number an exception is raised.
+            elif isinstance (def_value, float):
+                try:
+                    config_dict[key] = float(ap_value)
+                except ValueError:
+                    raise ValueError('Could not convert command line argument '\
+                          +str(key)+' with value '+ap_value+\
+                          ' to a float')
+            # If attempt to modify something that was neither int, bool, string,
+            # float; raise NotImplementedError (json allows dict and arrays)
+            else:
+                raise NotImplementedError("Could not convert command line "+\
+                "argument "+str(key)+" of type "+str(type(def_value))+\
+                ". Can only parse string, int, bool, float types.")
+        return config_dict
+        
     def get_version_from_readme(self):
         """
         Version is taken as the first line in $MAUS_ROOT_DIR/README
@@ -149,4 +152,43 @@ class Configuration:
         readme = open(self.readme)
         version = readme.readline().rstrip('\n')
         return version
+
+    def configuration_to_error_handler(self, config_dict): #pylint:disable=R0201
+        """
+        Hand configuration parameters to the error handler, so it can set itself
+        up
+        """
+        ErrorHandler.DefaultHandler().ConfigurationToErrorHandler(config_dict)
+
+    def check_config_dict(self, config_dict): #pylint:disable=R0201
+        """
+        @brief Check to see if config_dict can be encoded into json
+        @params config_dict dictionary to be checked
+        @returns Copy of config_dict with non-encodable items stripped out
+        """
+        dict_copy = {}
+        for key, value in config_dict.iteritems():
+            try:
+                json.JSONEncoder().encode({key:value})
+                dict_copy[key] = value
+            except TypeError:
+                print 'Failed to encode', str(key)+':'+str(value),
+                print 'as json object'
+        return dict_copy
+    
+    def string_to_bool(self, string_in): #pylint:disable=R0201
+        """
+        Convert from a string to a boolean value
+
+        @params string_in if string_in is any one of true, 1, yes, y, t returns
+                 true. Case insensitive.
+
+        @returns boolean True or False
+        """
+        if str.lower(string_in) in ["true", "1", "yes", "y", "t"]:
+            return True
+        elif str.lower(string_in) in ["false", "0", "no", "n", "f"]:
+            return False
+        else:
+            raise ValueError("Could not parse "+string_in+" as a boolean")
 

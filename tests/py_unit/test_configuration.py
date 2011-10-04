@@ -43,8 +43,12 @@ class ConfigurationTestCase(unittest.TestCase): #pylint: disable = R0904
 
         # compare; note we are allowed additional entries in maus_config that
         # are hard coded (e.g. version number)
+        exclusions = [
+          "maus_version", # changed at runtime, tested below 
+          "os", # module needed to use environment variables
+        ]
         for key in config_dict.keys():
-            if key != "maus_version": # changed at runtime, tested below
+            if key not in exclusions:
                 self.assertEqual(config_dict[key], maus_config[key])
 
     def test_version(self):

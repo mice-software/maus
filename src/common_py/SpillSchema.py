@@ -90,5 +90,11 @@ class mc:
     "type":"array", "items":[particles],
   }
 
+class daq_data:
+  """
+  Data output from the InputCppDAQData
+  """
+  
+
 spill = {"type":"object", "properties":{"mc":mc.spill}}
 
