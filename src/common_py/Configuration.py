@@ -172,8 +172,7 @@ class Configuration:
                 json.JSONEncoder().encode({key:value})
                 dict_copy[key] = value
             except TypeError:
-                print 'Failed to encode', str(key)+':'+str(value),
-                print 'as json object'
+                pass
         return dict_copy
     
     def string_to_bool(self, string_in): #pylint:disable=R0201
