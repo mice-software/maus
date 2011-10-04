@@ -19,11 +19,18 @@
 #define _MAUS_INPUTCPPDATA_INPUTCPPDATA_H__
 
 #include <json/json.h>
+#include <event.h>
 #include <MDdateFile.h>
 #include <MDevent.h>
+#include <MDfileManager.h>
+#include <MDprocessManager.h>
 
 #include <string>
+#include <iostream>
 
+#include "src/input/InputCppData/UnpackEventLib.hh"
+#include "Utils/DAQChannelMap.hh"
+#include "Interface/Squeak.hh"
 
 /** \class InputCppData
   * Load MICE raw data and unpack it into a JSON stream.
@@ -34,63 +41,10 @@
   * information is low-level.
   *
   */
+
 class InputCppData {
-private
-:
-/** Debug flag,
-  * 
-  * When set to true, "random" debugging strings will be sent to cerr!
-  */
-  bool _debug;
 
-/** Pointer to open file object. */
-  MDdateFile *_inputFile;
-
-/** Pointer to the start of the current event. */
-  unsigned char *_eventPtr;
-
-  /** Path to the data. */
-  std::string _dataPath;
-
-  /** Filename within _dataPath. */
-  std::string _filename;
-
-/** Process an event.
-  *
-  * This function processes an MDevent into parts,
-  * returning the relevant JSON sub-tree in pDoc.
-  *
-  * \param[in,out] pEvent The event to unpack.
-  * \param[in,out] pDoc A reference to the JSON (sub)root node to fill.
-  */
-  void processLDCEvent(MDevent *pEvent,
-                       Json::Value &pDoc);
-
-/** Process a detector specific event fragment.
-  *
-  * This function simply unpacks a single piece of event,
-  * using the UnpackEventLib classes.
-  *
-  * \param[in,out] pPartEvntPtr The event part to process.
-  * \param[in] pEquipType The equipment type ID.
-  * \param[in] pLdcId The crate number the event came from (I think).
-  * \param[in,out] pDoc A reference to the JSON (sub)root node to fill.
-  */
-  void processHits(void *pPartEvntPtr,
-                   unsigned int pEquipType,
-                   unsigned int pLdcId,
-                   Json::Value &pDoc);
-
-  /* Enum of event types */
-  enum {
-    VmeTdc = 102,
-    VmefAdc1724 = 120,
-    VmefAdc1731 = 121,
-    VmeScaler = 111
-  };
-
-public
-:
+ public:
 
 /** Create an instance of InputCppData.
   * 
@@ -102,10 +56,10 @@ public
   InputCppData(std::string pDataPath = "", std::string pFilename = "");
 
 /** Initialise the Unpacker.
-  * 
-  * This prepares the unpacker to read the file given in the constructor.
   *
-  * \return True if the file was opened sucessfully.
+  * This prepares the unpacker to read the files given in the constructor.
+  *
+  * \return True if at least one file was opened sucessfully.
   */
   bool birth(std::string pJSONConfig);
 
@@ -128,8 +82,16 @@ public
   */
   std::string getCurEvent();
 
+/** Disable one equipment type.
+  * This disables the unpacking of the data produced by all equipment
+	* with the specified type.
+	*/
+	void disableEquipment(std::string pEquipType) {
+    _dataProcessManager.Disable(pEquipType);
+  }
+
 /** Close the file and free memory.
-  * 
+  *
   * This function frees all resources allocated by Birth().
   * It is unlikely this will ever fail!
   *
@@ -137,15 +99,13 @@ public
   */
   bool death();
 
-  ~InputCppData();
-
-  /* Functions for python use only! 
+  /* Functions for python use only!
    * They are written in InputCppData.i so that they
    * can use pure python code in the python bindings!
    */
 
-/** Internal emitter function.
-  * 
+ /** Internal emitter function.
+  *
   * When called from C++, this function does nothing.
   * From python (where it is overriden by the bindings,
   * it returns an iterable result which allows access to all events.
@@ -155,6 +115,66 @@ public
   std::string emitter() {
      return "";
   };
+
+ private:
+
+/** Process manager object. */
+  MDprocessManager _dataProcessManager;
+
+/** File manager object. */
+  MDfileManager _dataFileManager;
+
+/** The DAQ channel map object.
+* It is used to group all measurements belonging to a given detector.*/
+  DAQChannelMap _map;
+
+/** Processor for TDC particle event data. */
+  V1290DataProcessor*  _v1290PartEventProc;
+
+/** Processor for fADC V1724 particle event data. */
+  V1724DataProcessor*  _v1724PartEventProc;
+
+/** Processor for fADC V1731 particle event data. */
+  V1731DataProcessor*  _v1731PartEventProc;
+
+/** Processor for scaler data. */
+  V830DataProcessor*  _v830FragmentProc;
+
+/** Processor for VLSB data. */
+  VLSBDataProcessor* _vLSBFragmentProc;
+
+/** Processor for DBB data. */
+  DBBDataProcessor* _DBBFragmentProc;
+
+/** Pointer to the start of the current event. */
+  unsigned char *_eventPtr;
+
+  /** Paths to the data.
+  * This string has to contain one or more space separated paths.
+  */
+  std::string _dataPaths;
+
+  /** File and run names within _dataPaths.
+  * This string has to contain one or more space separated
+  * file names or run numbers.
+  */
+  std::string _datafiles;
+
+  /** Enum of event types */
+  enum {
+    VmeTdc = 102,
+    VmefAdc1724 = 120,
+    VmefAdc1731 = 121,
+    VmeScaler = 111,
+    DBB = 141,
+    VLSB_C = 80
+  };
+
+  /** Convert the DAQ event type (as coded in DATE) into string.
+  * \param[in] pType The type of the event to be converted.
+  * \return The type of the event as string.
+  */
+  std::string event_type_to_str(int pType);
 };
 
 #endif  // _MAUS_INPUTCPPDATA_INPUTCPPDATA_H__

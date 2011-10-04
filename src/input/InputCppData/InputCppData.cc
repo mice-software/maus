@@ -17,268 +17,263 @@
 
 #include "src/input/InputCppData/InputCppData.hh"
 
-#include <json/json.h>
-
-#include <string>
-#include <iostream>
-
-#include "src/input/InputCppData/UnpackEventLib.hh"
-
 InputCppData::InputCppData(std::string pDataPath,
-                                   std::string pFilename) {
-  _debug = false;
+                                   std::string pRunNum) {
   _eventPtr = NULL;
-  _inputFile = NULL;
-  _dataPath = pDataPath;
-  _filename = pFilename;
+  _dataPaths = pDataPath;
+  _datafiles = pRunNum;
+
+  _v1290PartEventProc = NULL;
+  _v1724PartEventProc = NULL;
+  _v1731PartEventProc = NULL;
+  _v830FragmentProc = NULL;
+  _vLSBFragmentProc = NULL;
+  _DBBFragmentProc = NULL;
 }
 
 
 bool InputCppData::birth(std::string jsonDataCards) {
-  if (_inputFile)
-    return false;  // Fail because file is open
+  if ( _dataFileManager.GetNFiles() ) {
+     return false;  // Faile because files are already open
+  }
 
-  if (_debug)
-    std::cerr << "Data file = " << _filename << " ("
-              << _dataPath << ")" << std::endl;
-
-
-  _inputFile = new MDdateFile(_filename,
-                              _dataPath);
-
-  // Actually try opening the file
-  if (_inputFile->OpenFile() != DATE_FILE_OK) {
-    if (_debug)
-      std::cerr << "File Error." << std::endl;
+  //
+  _dataFileManager.SetList(_datafiles);
+  _dataFileManager.SetPath(_dataPaths);
+  _dataFileManager.OpenFile();
+  unsigned int nfiles = _dataFileManager.GetNFiles();
+  if (!nfiles) {
+    Squeak::mout(Squeak::error) << "Unable to load any data files." << std::endl;
+    Squeak::mout(Squeak::error) << "Check your run number (or file name) and data path."
+    << std::endl;
     return false;
   }
+  //  JsonCpp setup
+  Json::Value configJSON;   //  this will contain the configuration
+  Json::Reader reader;
+
+  // Check if the JSON document can be parsed, else return error only
+  bool parsingSuccessful = reader.parse(jsonDataCards, configJSON);
+  if (!parsingSuccessful) {
+    return false;
+  }
+
+  assert(configJSON.isMember("DAQ_cabling_file"));
+  std::string map_file_name = configJSON["DAQ_cabling_file"].asString();
+  char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
+  if (!pMAUS_ROOT_DIR) {
+    Squeak::mout(Squeak::error) << "Could not find the $MAUS_ROOT_DIR environmental variable."
+    << std::endl;
+    Squeak::mout(Squeak::error) << "Did you try running: source env.sh ?" << std::endl;
+    return false;
+  }
+
+  // Initialize the map by using text file.
+  bool loaded = _map.InitFromFile(std::string(pMAUS_ROOT_DIR) + map_file_name);
+  if (!loaded) {
+    return false;
+  }
+
+  // Comfigure the V1290 (TDC) data processor.
+  assert(configJSON.isMember("Enable_V1290_Unpacking"));
+  if ( configJSON["Enable_V1290_Unpacking"].asBool() ) {
+    _v1290PartEventProc = new V1290DataProcessor();
+    _v1290PartEventProc->set_DAQ_map(&_map);
+
+    _dataProcessManager.SetPartEventProc("V1290", _v1290PartEventProc);
+  } else {
+    this->disableEquipment("V1290");
+  }
+
+  // Comfigure the V1724 (fADC) data processor.
+  assert(configJSON.isMember("Enable_V1724_Unpacking"));
+  if ( configJSON["Enable_V1724_Unpacking"].asBool() ) {
+    _v1724PartEventProc = new V1724DataProcessor();
+    _v1724PartEventProc->set_DAQ_map(&_map);
+
+    assert(configJSON.isMember("Do_V1724_Zero_Suppression"));
+    bool zs = configJSON["Do_V1724_Zero_Suppression"].asBool();
+    _v1724PartEventProc->set_zero_supression(zs);
+
+    assert(configJSON.isMember("V1724_Zero_Suppression_Threshold"));
+    int zs_threshold = configJSON["V1724_Zero_Suppression_Threshold"].asInt();
+    _v1724PartEventProc->set_zs_threshold(zs_threshold);
+
+    _dataProcessManager.SetPartEventProc("V1724", _v1724PartEventProc);
+  } else {
+    this->disableEquipment("V1724");
+  }
+
+  // Comfigure the V1731 (fADC) data processor.
+  assert(configJSON.isMember("Enable_V1731_Unpacking"));
+  if ( configJSON["Enable_V1731_Unpacking"].asBool() ) {
+    _v1731PartEventProc = new V1731DataProcessor();
+    _v1731PartEventProc->set_DAQ_map(&_map);
+
+    assert(configJSON.isMember("Do_V1731_Zero_Suppression"));
+    bool zs = configJSON["Do_V1731_Zero_Suppression"].asBool();
+    _v1731PartEventProc->set_zero_supression(zs);
+
+    assert(configJSON.isMember("V1731_Zero_Suppression_Threshold"));
+    int zs_threshold = configJSON["V1731_Zero_Suppression_Threshold"].asInt();
+    _v1731PartEventProc->set_zs_threshold(zs_threshold);
+
+    _dataProcessManager.SetPartEventProc("V1731", _v1731PartEventProc);
+  } else {
+    this->disableEquipment("V1731");
+  }
+
+  // Comfigure the V830 (scaler) data processor.
+  assert(configJSON.isMember("Enable_V830_Unpacking"));
+  if ( configJSON["Enable_V830_Unpacking"].asBool() ) {
+    _v830FragmentProc = new V830DataProcessor();
+    _v830FragmentProc->set_DAQ_map(&_map);
+
+    _dataProcessManager.SetFragmentProc("V830", _v830FragmentProc);
+  } else {
+    this->disableEquipment("V830");
+  }
+
+  // Comfigure the VLSB (tracker board) data processor.
+  assert(configJSON.isMember("Enable_VLSB_Unpacking"));
+  if (configJSON["Enable_VLSB_Unpacking"].asBool()) {
+    _vLSBFragmentProc = new VLSBDataProcessor();
+    _vLSBFragmentProc->set_DAQ_map(&_map);
+
+    _dataProcessManager.SetFragmentProc("VLSB_C", _vLSBFragmentProc);
+  } else {
+    this->disableEquipment("VLSB_C");
+  }
+
+  // Comfigure the DBB (EMR board) data processor.
+  assert(configJSON.isMember("Enable_DBB_Unpacking"));
+  if ( configJSON["Enable_DBB_Unpacking"].asBool() ) {
+    _DBBFragmentProc = new DBBDataProcessor();
+    _DBBFragmentProc->set_DAQ_map(&_map);
+
+    _dataProcessManager.SetFragmentProc("DBB", _DBBFragmentProc);
+  } else {
+    this->disableEquipment("DBB");
+  }
+
+  // _dataProcessManager.DumpProcessors();
 
   return true;
 }
 
 
 bool InputCppData::readNextEvent() {
-  _eventPtr = _inputFile->GetNextEvent();
+  // Use the MDfileManager object to get the next event.
+  _eventPtr = _dataFileManager.GetNextEvent();
   if (!_eventPtr)
     return false;
+
   return true;
 }
 
-
 std::string InputCppData::getCurEvent() {
+  // Create new Json documents.
   Json::Value xDocRoot;  // Root of the event
   Json::FastWriter xJSONWr;
-
-  MDevent xEvent;
-
-  if (!_eventPtr)
-    return xJSONWr.write(xDocRoot);  // Return an empty doc
-
-  xEvent.SetDataPtr(_eventPtr);
-  // We can dump the event here as a test
-  // xEvent.Dump();
-
   Json::Value xDocSpill;
 
-  if (xEvent.IsSuperEvent()) {
-    if (_debug)
-      std::cerr << "Processing a super event." << std::endl;
-    // Process all the events in a spill
-    unsigned int xSubEvntCount = xEvent.GetNSubEvents();
-    for (unsigned int i = 0; i < xSubEvntCount; i++) {
-      MDevent xSubEvent;
-      xSubEvent.SetDataPtr(xEvent.GetSubEventPtr(i));
-      this->processLDCEvent(&xSubEvent, xDocSpill);
-    }
-  } else {
-    if (_debug)
-      std::cerr << "This event isn't super." << std::endl;
-    this->processLDCEvent(&xEvent, xDocSpill);
+  // Order all processor classes to fill in xDocSpill.
+  if (_v1290PartEventProc)
+    _v1290PartEventProc->set_JSON_doc(&xDocSpill);
+
+  if (_v1724PartEventProc)
+    _v1724PartEventProc->set_JSON_doc(&xDocSpill);
+
+  if (_v1731PartEventProc)
+    _v1731PartEventProc->set_JSON_doc(&xDocSpill);
+
+  if (_v830FragmentProc)
+    _v830FragmentProc->set_JSON_doc(&xDocSpill);
+
+  if (_vLSBFragmentProc)
+    _vLSBFragmentProc->set_JSON_doc(&xDocSpill);
+
+  if (_DBBFragmentProc)
+    _DBBFragmentProc->set_JSON_doc(&xDocSpill);
+
+  // Now do the loop over the binary DAQ data.
+  try {
+    _dataProcessManager.Process(_eventPtr);
+  }
+  // Deal with exceptions
+  catch(MDexception & lExc) {
+    Squeak::mout(Squeak::error) << "Unpacking exception,  DAQ Event skipped" << std::endl;
+    Squeak::mout(Squeak::error) <<  lExc.GetDescription() << endl;
+  }
+  catch(std::exception & lExc) {
+    Squeak::mout(Squeak::error) << "Standard exception" << std::endl;
+    Squeak::mout(Squeak::error) << lExc.what() << std::endl;
+  }
+  catch(...) {
+    Squeak::mout(Squeak::error) << "Unknown exception occurred..." << std::endl;
   }
 
   // Finally attach the spill to the document root
   xDocRoot["daq_data"] = xDocSpill;
+  xDocRoot["spill_num"] = _dataProcessManager.GetSpillNumber();
+  unsigned int event_type = _dataProcessManager.GetEventType();
+  xDocRoot["daq_event_type"] = event_type_to_str(event_type);
+  // cout<<xDocRoot<<endl;
 
-  if (_debug)
-    std::cerr << "Writing JSON..." << std::endl;
   return xJSONWr.write(xDocRoot);
 }
 
-
-void InputCppData::processLDCEvent(MDevent *pEvent,
-                                       Json::Value &pDoc) {
-  // Decide what to do with this type of event
-  switch (*(pEvent->EventTypePtr())) {
-    case START_OF_RUN: {
-      if (_debug)
-        std::cerr << "====> Start of run <====" << std::endl;
-      break;
-    }
-
-    case END_OF_RUN: {
-      if (_debug)
-        std::cerr << "====> End of run <====" << std::endl;
-      break;
-    }
-
-    case START_OF_RUN_FILES: {
-      if (_debug)
-        std::cerr << "====> Start of run files <====" << std::endl;
-      break;
-    }
-
-    case END_OF_RUN_FILES: {
-      if (_debug)
-        std::cerr << "====> End of run files <====" << std::endl;
-      break;
-    }
-
-    case START_OF_BURST: {
-      if (_debug)
-        std::cerr << "====> Start of burst <====" << std::endl;
-      break;
-    }
-
-    case END_OF_BURST: {
-      if (_debug)
-        std::cerr << "====> End of burst <====" << std::endl;
-      break;
-    }
-
-    case EVENT_FORMAT_ERROR: {
-      if (_debug)
-        std::cerr << "====> Event format error! <====" << std::endl;
-      break;
-    }
-
-    case START_OF_DATA: {
-      if (_debug)
-        std::cerr << "====> Start of data <====" << std::endl;
-      break;
-    }
-
-    case END_OF_DATA: {
-      if (_debug)
-        std::cerr << "====> End of data <====" << std::endl;
-      break;
-    }
-
-    case DETECTOR_SOFTWARE_TRIGGER_EVENT: {
-      if (_debug)
-        std::cerr << "====> Detector software trigger <====" << std::endl;
-      break;
-    }
-
-    case PHYSICS_EVENT:
-    case CALIBRATION_EVENT: {
-      if (_debug)
-        std::cerr << "====> Physics or Calib. data <====" << std::endl;
-
-      // Get the LdcId
-      unsigned int xLdcId = pEvent->LdcId();
-
-      // Break the event into its fragments
-      unsigned int xFragCount = pEvent->GetNFragments();
-
-      for (unsigned int i = 0; i < xFragCount; i++) {
-        // Each fragment needs a part in the output
-        Json::Value xDocFragment;
-
-        MDeventFragment xEvntFrag(pEvent->GetFragmentPtr(i));
-        // Is this step actually needed?
-        xEvntFrag.SetDataPtr(pEvent->GetFragmentPtr(i));
-
-        unsigned int xEquipType = *(xEvntFrag.EquipmentTypePtr());
-
-        // Check if the equipment type is one we can process
-        // (TDC, fADC or Scalar hits apparently...)
-        if ((xEquipType == VmeTdc) ||
-            //  (xEquipType == VmefAdc1724) ||
-            //  (xEquipType == VmefAdc1731) ||
-            (xEquipType == VmeScaler)) {
-          xEvntFrag.InitPartEventVector();
-          // Each fragment is made up of a series of parts
-          unsigned int xPartCounts = xEvntFrag.GetNPartEvents();
-          for (unsigned int j = 0; j < xPartCounts; j++) {
-            // Actually process the hits from the event
-            void *xPartPtr = xEvntFrag.GetPartEventPtr(j);
-            this->processHits(xPartPtr,
-                              xEquipType,
-                              xLdcId,
-                              xDocFragment);
-          }
-        }
-
-        // Attach the fragment to the spill...
-        pDoc.append(xDocFragment);
-      }
-
-      break;
-    }
-
-    default:
-    {
-      if (_debug)
-        std::cerr << "====> UNKNOWN EVENT! <====" << std::endl;
-      break;
-    }
-  }
-}
-
-
-void InputCppData::processHits(void *pPartEvntPtr,
-                                   unsigned int pEquipType,
-                                   unsigned int pLdcId,
-                                   Json::Value &pDoc) {
-  if (!pPartEvntPtr) {
-    if (_debug)
-      std::cerr << "Error: Bad pointer passed to processHits()?" << std::endl;
-    return;
-  }
-
-  switch (pEquipType) {
-    case VmeTdc: {
-      V1290Hit::getJSON(pPartEvntPtr,
-                        pDoc["tdc"]);
-      pDoc["tdc"]["ldc_id"] = pLdcId;
-      break;
-    }
-
-    case VmefAdc1724: {
-      V1724Hit::getJSON(pPartEvntPtr,
-                        pDoc["adc1724"]);
-      break;
-    }
-
-    case VmefAdc1731: {
-      pDoc["adc1731"] = Json::Value(8);
-      break;
-    }
-
-    case VmeScaler: {
-      V830Hit::getJSON(pPartEvntPtr,
-                       pDoc["scaler"]);
-      break;
-    }
-
-    default: {
-      pDoc["unknown"] = Json::Value();
-      break;
-    }
-  }
-}
-
-
 bool InputCppData::death() {
-  if (_inputFile) {
-    delete _inputFile;
-    _inputFile = NULL;
-  }
+	// Free the memory.
+  if (_v1290PartEventProc) delete _v1290PartEventProc;
+  if (_v1724PartEventProc) delete _v1724PartEventProc;
+  if (_v1731PartEventProc) delete _v1731PartEventProc;
+  if (_v830FragmentProc) delete _v830FragmentProc;
+  if (_vLSBFragmentProc) delete _vLSBFragmentProc;
+  if (_DBBFragmentProc) delete _DBBFragmentProc;
+
   return true;
 }
 
+std::string InputCppData::event_type_to_str(int pType) {
+  std::string event_type;
+  switch (pType) {
+    case START_OF_BURST :
+      event_type = "start_of_burst";
+      break;
 
-InputCppData::~InputCppData() {
-  return;
+    case  END_OF_BURST:
+      event_type = "end_of_burst";
+      break;
+
+    case PHYSICS_EVENT :
+      event_type = "physics_event";
+      break;
+
+    case CALIBRATION_EVENT :
+      event_type = "calibration_event";
+      break;
+
+    case START_OF_RUN :
+      event_type = "start_of_run";
+      break;
+
+    case  END_OF_RUN:
+      event_type = "end_of_run";
+      break;
+
+    default :
+      std::stringstream xConv;
+      xConv << pType << " (unknown)";
+      event_type = xConv.str();
+      break;
+  }
+  return event_type;
 }
+
+
+
+
+
+
 

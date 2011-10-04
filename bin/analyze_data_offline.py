@@ -9,25 +9,26 @@
 import io  #  generic python library for I/O
 import sys # for command line arguments
 import os
-import MAUS 
+import MAUS
 
-def run(data_path, data_file):
+def run(data_path, run_num):
     """Analyze data from the MICE experiment
-    
+
     This will read in and process data taken from the MICE experiment. It will
     eventually include things like cabling information, calibrations, and fits.
     """
 
     # Here you specify the path to the data and also the file you want to
     # analyze.
+
     my_input = MAUS.InputCppData(data_path, data_file)
-    
+
     # Create an empty array of mappers, then populate it
     # with the functionality you want to use.
     my_map = MAUS.MapPyGroup()
     #my_map.append(MAUS.MapPyPrint())
     #my_map.append(MAUS.MapPyTOFCabling())
-    
+
     #  The Go() drives all the components you pass in then put all the output
     #  into a file called 'mausput'
     MAUS.Go(my_input, my_map, MAUS.ReducePyDoNothing(), MAUS.OutputPyJSON())
@@ -38,6 +39,7 @@ if __name__ == '__main__':
         raise Exception('InitializeFail', 'MAUS_ROOT_DIR unset!')
 
     # Temporary values for the data path and data file
+
     data_path = '%s/src/input/InputCppData' % os.environ.get("MAUS_ROOT_DIR")
     data_file = '02873.003'
     
