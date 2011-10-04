@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef _MAUS_INPUTCPPDATA_INPUTCPPDATA_H__
-#define _MAUS_INPUTCPPDATA_INPUTCPPDATA_H__
+#ifndef _MAUS_SRC_INPUT_INPUTCPPDAQDATA_INPUTCPPDAQDATA_H__
+#define _MAUS_SRC_INPUT_INPUTCPPDAQDATA_INPUTCPPDAQDATA_H__
 
 #include <string>
 #include <iostream>
@@ -29,11 +29,11 @@
 #include "unpacking/MDfileManager.h"
 #include "unpacking/MDprocessManager.h"
 
-#include "src/input/InputCppData/UnpackEventLib.hh"
+#include "src/input/InputCppDAQData/UnpackEventLib.hh"
 #include "Utils/DAQChannelMap.hh"
 #include "Interface/Squeak.hh"
 
-/** \class InputCppData
+/** \class InputCppDAQData
 * Load MICE raw data and unpack it into a JSON stream.
 *
 * This module reads data in the format of the MICE DAQ.  It drives the
@@ -43,18 +43,18 @@
 *
 */
 
-class InputCppData {
+class InputCppDAQData {
 
  public:
 
-  /** Create an instance of InputCppData.
+  /** Create an instance of InputCppDAQData.
   * 
-  * This is the constructor for InputCppData.
+  * This is the constructor for InputCppDAQData.
   *
   * \param[in] pDataPath The (directory) path to read the data from
   * \param[in] pFilename The filename to read from the pDataPath directory
   */
-  InputCppData(std::string pDataPath = "", std::string pFilename = "");
+  InputCppDAQData(std::string pDataPath = "", std::string pFilename = "");
 
   /** Initialise the Unpacker.
   *
@@ -101,7 +101,7 @@ class InputCppData {
   bool death();
 
   /* Functions for python use only!
-   * They are written in InputCppData.i so that they
+   * They are written in InputCppDAQData.i so that they
    * can use pure python code in the python bindings!
    */
 
@@ -178,4 +178,4 @@ class InputCppData {
   std::string event_type_to_str(int pType);
 };
 
-#endif  // _MAUS_INPUTCPPDATA_INPUTCPPDATA_H__
+#endif  // _MAUS_INPUTCPPDAQDATA_INPUTCPPDAQDATA_H__

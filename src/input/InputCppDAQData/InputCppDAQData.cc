@@ -15,9 +15,9 @@
  *
  */
 
-#include "src/input/InputCppData/InputCppData.hh"
+#include "src/input/InputCppDAQData/InputCppDAQData.hh"
 
-InputCppData::InputCppData(std::string pDataPath,
+InputCppDAQData::InputCppDAQData(std::string pDataPath,
                                    std::string pRunNum) {
   _eventPtr = NULL;
   _dataPaths = pDataPath;
@@ -32,7 +32,7 @@ InputCppData::InputCppData(std::string pDataPath,
 }
 
 
-bool InputCppData::birth(std::string jsonDataCards) {
+bool InputCppDAQData::birth(std::string jsonDataCards) {
   //  JsonCpp setup
   Json::Value configJSON;   //  this will contain the configuration
   Json::Reader reader;
@@ -170,7 +170,7 @@ bool InputCppData::birth(std::string jsonDataCards) {
 }
 
 
-bool InputCppData::readNextEvent() {
+bool InputCppDAQData::readNextEvent() {
   // Use the MDfileManager object to get the next event.
   _eventPtr = _dataFileManager.GetNextEvent();
   if (!_eventPtr)
@@ -179,7 +179,7 @@ bool InputCppData::readNextEvent() {
   return true;
 }
 
-std::string InputCppData::getCurEvent() {
+std::string InputCppDAQData::getCurEvent() {
   // Create new Json documents.
   Json::Value xDocRoot;  // Root of the event
   Json::FastWriter xJSONWr;
@@ -231,7 +231,7 @@ std::string InputCppData::getCurEvent() {
   return xJSONWr.write(xDocRoot);
 }
 
-bool InputCppData::death() {
+bool InputCppDAQData::death() {
 	// Free the memory.
   if (_v1290PartEventProc) delete _v1290PartEventProc;
   if (_v1724PartEventProc) delete _v1724PartEventProc;
@@ -243,7 +243,7 @@ bool InputCppData::death() {
   return true;
 }
 
-std::string InputCppData::event_type_to_str(int pType) {
+std::string InputCppDAQData::event_type_to_str(int pType) {
   std::string event_type;
   switch (pType) {
     case START_OF_BURST :

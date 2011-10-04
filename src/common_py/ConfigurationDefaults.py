@@ -183,7 +183,7 @@ Enable_EMR = True
 Enable_KL = True
 Enable_CKOV = True
 DAQ_cabling_file = "/files/cabling/DAQChannelMap.txt"
-daq_data_path = '%s/src/input/InputCppData' % os.environ.get("MAUS_ROOT_DIR") # path to daq data
+daq_data_path = '%s/src/input/InputCppDAQData' % os.environ.get("MAUS_ROOT_DIR") # path to daq data
 daq_data_file = '02873.003' # file name for daq data
 
 maus_version = "" # set at runtime - do not edit this (changes are ignored)

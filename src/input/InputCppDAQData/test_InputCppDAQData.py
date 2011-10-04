@@ -24,9 +24,9 @@ import md5
 import unittest
 
 from Configuration import Configuration
-from InputCppData import InputCppData
+from InputCppDAQData import InputCppDAQData
 
-class InputCppDataTestCase(unittest.TestCase): #pylint: disable = R0904
+class InputCppDAQDataTestCase(unittest.TestCase): #pylint: disable = R0904
     """
     We test input cpp data by checking unpacked files using an md5sum. Note that
     this is rather quick and dirty...
@@ -40,16 +40,16 @@ class InputCppDataTestCase(unittest.TestCase): #pylint: disable = R0904
             raise Exception('InitializeFail', 'MAUS_ROOT_DIR unset!')
         # Set our data path & filename
         # It would be nicer to test with a smaller data file!
-        cls._datapath = '%s/src/input/InputCppData' % \
+        cls._datapath = '%s/src/input/InputCppDAQData' % \
                             os.environ.get("MAUS_ROOT_DIR")
         cls._datafile = '02873'
         cls._c = Configuration()
 
     def setUp(self):
         """
-        Setup the InputCppData mapper
+        Setup the InputCppDAQData mapper
         """
-        self.mapper = InputCppData(self._datapath, self._datafile)
+        self.mapper = InputCppDAQData(self._datapath, self._datafile)
 
     def test_init(self):
         """

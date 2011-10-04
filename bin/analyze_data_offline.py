@@ -19,7 +19,7 @@ def run():
     """
 
     # Set up the input that reads from DAQ
-    my_input = MAUS.InputCppData()
+    my_input = MAUS.InputCppDAQData()
 
     # Create an empty array of mappers, then populate it
     # with the functionality you want to use.

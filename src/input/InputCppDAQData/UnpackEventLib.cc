@@ -15,7 +15,7 @@
  *
  */
 
-#include "src/input/InputCppData/UnpackEventLib.hh"
+#include "src/input/InputCppDAQData/UnpackEventLib.hh"
 
 int V1290DataProcessor::Process(MDdataContainer* aPartEventPtr) {
   // Cast the argument to structure it points to.
