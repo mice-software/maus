@@ -13,6 +13,10 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+Tests for the offline analysis exe
+"""
+
 import os
 import subprocess
 import unittest
@@ -27,7 +31,7 @@ class AnalyzeOfflineTest(unittest.TestCase): # pylint: disable = R0904
     Tests for the offline analysis exe
     """
 
-    def test_default_running(self):
+    def test_default_running(self): #pylint: disable=R0201
         """
         Check that the default parameters produce sensible output
         """
