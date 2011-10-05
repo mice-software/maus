@@ -76,7 +76,6 @@ class OutputPyImage:
             self.file_prefix = config_doc[key]
         else:
             self.file_prefix = uuid.uuid4()
-        print "Image file prefix: %s" % self.file_prefix
 
         key = "image_directory"
         if key in config_doc:
@@ -85,7 +84,6 @@ class OutputPyImage:
                 os.makedirs(self.directory) 
         else:
             self.directory = os.getcwd()
-        print "Image directory: %s" % self.directory
 
         return True
 
@@ -113,8 +111,6 @@ class OutputPyImage:
                             raise ValueError("Missing data in %s")
                         file_path = self.__get_file_path(entry["tag"], 
                                                          entry["image_type"])
-                        print "Saving %s to %s" \
-                            % (entry["content"], file_path)
                         data_file = open(file_path, "w")
                         decoded_data = base64.b64decode(entry["data"])
                         data_file.write(decoded_data)

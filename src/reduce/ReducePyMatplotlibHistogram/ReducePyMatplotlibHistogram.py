@@ -93,7 +93,6 @@ class ReducePyMatplotlibHistogram:
             self.image_type = config_doc[key]
         else:
             self.image_type = "eps"
-        print "Histogram image type: %s" % self.image_type
 
         if self.image_type not in \
             self.__summary_histogram.get_supported_filetypes().keys():
@@ -101,7 +100,6 @@ class ReducePyMatplotlibHistogram:
                     % (
                     self.image_type, 
                     self.__summary_histogram.get_supported_filetypes().keys())
-            print error
             raise ValueError(error)
 
         self.spill_count = 0
@@ -120,31 +118,25 @@ class ReducePyMatplotlibHistogram:
         try:
             json_doc = json.loads(json_string.rstrip())
         except ValueError:
-            print "Bad JSON document"
             json_doc = {"errors": {"bad_json_document":
                                 "unable to do json.loads on input"} }
             return self.__return_json(json_strings, json.dumps(json_doc))
         if "digits" not in json_doc:
-            print "No digits in JSON document"
             if "errors" not in json_doc:
                 json_doc["errors"] = {}
             json_doc["errors"]["no_digits"] = "no digits"
             return self.__return_json(json_strings, json.dumps(json_doc))
         digits = json_doc["digits"]
-        print "Number of digits: %d" % len(digits)
 
         # Extract just those that are for the Tracker.
         trackerdigits = \
             [digit for digit in digits if self.__filter_trackers(digit)]
-        print "Number of tracker digits: %d" % len(trackerdigits)
 
         # Get the TDC and ADC counts.    
         tdc_counts = [self.__get_counts(digit, "tdc_counts") 
                       for digit in trackerdigits]
-        print "tdc_counts: %s" % tdc_counts
         adc_counts = [self.__get_counts(digit, "adc_counts") 
                       for digit in trackerdigits]
-        print "adc_counts: %s" % adc_counts
         # Calculate maximums for axis rescaling.
         spill_max_tdc_count = 0
         if (len(tdc_counts) > 0):
@@ -169,8 +161,11 @@ class ReducePyMatplotlibHistogram:
         self.__histogram(histogram,  histogram_title,
                          tdc_counts, adc_counts)
         # Rescale axis so 0 is always visible.
-        histogram.figure.get_axes()[0].set_xlim([0, spill_max_tdc_count])
-        histogram.figure.get_axes()[0].set_ylim([0, spill_max_adc_count])
+        # +0.5 are fudge factors to avoid matplotlib warning about
+        # "Attempting to set identical bottom==top" which arises if
+        # the axes are set to be exactly the maximum of the data.
+        histogram.figure.get_axes()[0].set_xlim([0, spill_max_tdc_count + 0.5])
+        histogram.figure.get_axes()[0].set_ylim([0, spill_max_adc_count + 0.5])
 
         data = self.__convert_to_binary(histogram)
         json_histograms.append({"content": histogram_title,
@@ -184,9 +179,9 @@ class ReducePyMatplotlibHistogram:
                          tdc_counts, adc_counts)
         # Rescale axis so 0 is always visible.
         self.__summary_histogram.figure.get_axes()[0].set_xlim( \
-            [0, self.__max_tdc_count])
+            [0, self.__max_tdc_count + 0.5])
         self.__summary_histogram.figure.get_axes()[0].set_ylim( \
-            [0, self.__max_adc_count])
+            [0, self.__max_adc_count + 0.5])
         data = self.__convert_to_binary(self.__summary_histogram)
 
         json_histograms.append({"content": histogram_title,
@@ -268,7 +263,6 @@ class ReducePyMatplotlibHistogram:
         @param tdc_counts List of TDC counts.
         @param adc_counts List of ADC counts.
         """
-        print "About to histogram %s..." % title
         histogram.figure.get_axes()[0].set_title(title, fontsize=14)
         if (len(tdc_counts) > 0):
             histogram.figure.get_axes()[0].scatter(tdc_counts, 
@@ -282,10 +276,8 @@ class ReducePyMatplotlibHistogram:
         @returns representation of histogram in base 64-encoded image 
         type format.
         """
-        print "Converting to binary format..."
         data_file = StringIO.StringIO() 
         histogram.print_figure(data_file, dpi=500, format=self.image_type)
         data_file.seek(0)
         data = data_file.read()
-        print "Converted"
         return base64.b64encode(data)

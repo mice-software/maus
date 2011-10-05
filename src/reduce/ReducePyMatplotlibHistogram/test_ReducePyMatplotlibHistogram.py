@@ -22,8 +22,7 @@ import unittest
 
 from ReducePyMatplotlibHistogram import ReducePyMatplotlibHistogram
 
-class ReducePyMatplotlibHistogramTestCase(
-    unittest.TestCase): # pylint: disable=C0103, R0904
+class ReducePyMatplotlibHistogramTestCase(unittest.TestCase): # pylint: disable=C0103, R0904, C0301
 
     @classmethod
     def setUpClass(self): # pylint: disable=C0103, C0202
