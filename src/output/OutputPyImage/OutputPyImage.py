@@ -28,6 +28,7 @@ class OutputPyImage:
     The input is a sequence of JSON documents separated by line
     breaks e.g.:
 
+    @verbatim
     {"images": [{"content":"TDC and ADC counts for spill 2",
                  "tag": "spill",
                  "image_type": "eps", 
@@ -36,6 +37,7 @@ class OutputPyImage:
                  "tag": "spills",
                  "image_type": "eps", 
                  "data": "..." }]}
+    @endverbatim
 
     If there are no such entries in a document then it skips to the
     next.
@@ -46,19 +48,22 @@ class OutputPyImage:
      UUID. 
     -Directory for files ("image_directory"). Default: current
      working directory. If the given directory does not exist it
-     will be created.
+     will be created. This can be absolute or relative.
 
     Each image is saved in the directory in a file named using the
-    concatenation of the image file prefix and "tag".
+    concatenation of the image file prefix and "tag". This class
+    does not ensure that the file names are unique - it's up to
+    the input provider to ensure that the tags are unique.
     """
 
     def __init__(self):
-        self._file_prefix = ""
-        self._directory = os.getcwd()
+        self.file_prefix = ""
+        self.directory = os.getcwd()
 
     def birth(self, config_json):
         """
-        Configure worker from data cards.
+        Configure worker from data cards. An OSError is thrown if
+        there are any problems in creating the directory.
         @param self Object reference.
         @param config_json JSON document string.
         @returns True
@@ -67,25 +72,27 @@ class OutputPyImage:
 
         key = "image_file_prefix"
         if key in config_doc:
-            self._file_prefix = config_doc[key]
+            self.file_prefix = config_doc[key]
         else:
-            self._file_prefix = uuid.uuid4()
-        print "Image file prefix: %s" % self._file_prefix
+            self.file_prefix = uuid.uuid4()
+        print "Image file prefix: %s" % self.file_prefix
 
         key = "image_directory"
         if key in config_doc:
-            self._directory = config_doc[key]
-            if not os.path.exists(self._directory): 
-                os.makedirs(self._directory) 
+            self.directory = config_doc[key]
+            if not os.path.exists(self.directory): 
+                os.makedirs(self.directory) 
         else:
-            self._directory = os.getcwd()
-        print "Image directory: %s" % self._directory
+            self.directory = os.getcwd()
+        print "Image directory: %s" % self.directory
 
         return True
 
     def save(self, document):
         """
-        Save image files held in a set of JSON documents.
+        Save image files held in a set of JSON documents. A ValueError
+        is thrown if a document is found that is not valid JSON or
+        that has missing "data", "tag" or "image_type" entries.
         @param document List of JSON documents separated by newline.
         """
         document_file = io.StringIO(unicode(document))
@@ -96,8 +103,15 @@ class OutputPyImage:
                 json_doc = json.loads(next_value)
                 if "images" in json_doc:
                     for entry in json_doc["images"]:
-                        file_path = self.get_file_path(entry["tag"], 
-                                                       entry["image_type"])
+                        if ((not "tag" in entry) or (entry["tag"] == "")):
+                            raise ValueError("Missing tag in %s")
+                        if ((not "image_type" in entry) or 
+                            (entry["image_type"] == "")):
+                            raise ValueError("Missing image_type in %s")
+                        if (not "data" in entry):
+                            raise ValueError("Missing data in %s")
+                        file_path = self.__get_file_path(entry["tag"], 
+                                                         entry["image_type"])
                         print "Saving %s to %s" \
                             % (entry["content"], file_path)
                         data_file = open(file_path, "w")
@@ -112,7 +126,7 @@ class OutputPyImage:
         """
         return True
 
-    def get_file_path(self, tag, image_type):
+    def __get_file_path(self, tag, image_type):
         """
         Get file path, derived from the directory, file name prefix,
         tag and using image_type as the file extension.
@@ -122,8 +136,8 @@ class OutputPyImage:
         @returns file path.
         """
         file_name = "%s%s.%s" % (
-            self._file_prefix, 
+            self.file_prefix, 
             tag,
             image_type)
-        file_path = os.path.join(self._directory, file_name)
+        file_path = os.path.join(self.directory, file_name)
         return file_path
