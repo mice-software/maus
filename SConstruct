@@ -394,7 +394,7 @@ def set_gtest(conf, env):
 
 def set_unpacker(conf, env):
     if (not conf.CheckLib('MDunpack', language='c++') or \
-        not  conf.CheckCXXHeader('MDevent.h')):
+        not  conf.CheckCXXHeader('unpacking/MDevent.h')):
         print
         print "!! Unpacker module not found, you will not be able to use the RealData module."
         print
@@ -456,6 +456,23 @@ def geant4_extras(env):
           """
         my_exit(1)
 
+def install_python_tests():
+    files = glob.glob('tests/py_unit/test_*.py')+glob.glob('tests/style/*.py')
+    env.Install("build", files)
+
+    env.Install("build", "tests/py_unit/test_cdb")
+    test_cdb_files = glob.glob('tests/py_unit/test_cdb/*.py')
+    env.Install("build/test_cdb", test_cdb_files) 
+
+    env.Install("build", "tests/py_unit/suds")
+    suds_files = glob.glob('tests/py_unit/suds/*.py')
+    env.Install("build/suds", suds_files) 
+
+    env.Install("build", "tests/py_unit/test_geometry")
+    test_geometry_files = glob.glob('tests/py_unit/test_geometry/*.py')
+    env.Install("build/test_geometry", test_geometry_files) 
+
+
 # Setup the environment.  NOTE: SHLIBPREFIX means that shared libraries don't
 # have a 'lib' prefix, which is needed for python to find SWIG generated
 # libraries
@@ -472,8 +489,7 @@ if env.GetOption('clean'):
             if os.path.isfile(filename):
                 print 'Removing:', filename
                 os.remove(filename)
-
-            
+          
     
 
 if os.path.isfile('.use_llvm_with_maus'):
@@ -493,15 +509,10 @@ libs = str(os.environ.get('LD_LIBRARY_PATH'))+':'+str(os.environ.get('DYLD_LIBRA
 env.Append(LIBPATH =  libs.split(':') + ["%s/build" % maus_root_dir])
 
 env.Append(CPPPATH=["%s/third_party/install/include" % maus_root_dir, \
-                    "%s/third_party/install/include/root" % maus_root_dir, \
-                    "%s/src/legacy" % maus_root_dir, \
-                    "%s/src/common_cpp" % maus_root_dir, \
-                    ""])
-
-if (sysname == 'Darwin'):
-  env.Append(CPPPATH=["%s/third_party/install/Python.framework/Versions/2.7/include/python2.7" % maus_root_dir])
-else:
-  env.Append(CPPPATH=["%s/third_party/install/include/python2.7" % maus_root_dir])
+                      "%s/third_party/install/include/python2.7" % maus_root_dir, \
+                      "%s/third_party/install/include/root" % maus_root_dir, \
+                      "%s/src/legacy" % maus_root_dir,
+			"%s/src/common_cpp" % maus_root_dir, ""])
 
 env['USE_G4'] = False
 env['USE_ROOT'] = False
@@ -630,12 +641,6 @@ for single_stuff in stuff_to_import:
     file_to_import.write("\n")
 
 file_to_import.close()
-
-files = glob.glob('tests/py_unit/*/test_*.py')+\
-        glob.glob('tests/py_unit/test_*.py')+glob.glob('tests/style/*.py')
-env.Install("build", files)
-
-env.Install("build", "tests/py_unit/test_cdb")
-env.Install("build", "tests/py_unit/suds")
+install_python_tests()
 
 env.Alias('install', ['%s/build' % maus_root_dir])

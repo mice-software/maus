@@ -45,8 +45,8 @@ class Go:
       - native single-threaded python
     """
 
-    def __init__(self, arg_input, arg_mapper, arg_reducer, \
-                 arg_output, arg_config_file = None): # pylint: disable=R0201
+    def __init__(self, arg_input, arg_mapper, arg_reducer,  # pylint: disable=R0913,C0301
+                 arg_output, arg_config_file = None, command_line_args = True):
         """
         Initialise the configuration dictionary, input, mapper, reducer and
         output
@@ -55,21 +55,20 @@ class Go:
         @param arg_reducer Reducer that defines reduce that is acted on map
                            output
         @param arg_config_file Configuration file
+        @param command_line_args If set to true, use command line arguments to
+               handle configuration and throw a SystemExit exception if
+               invalid arguments are passed. (Note some third party items, e.g.
+               nosetests, have their own command line arguments that are
+               incompatible with MAUS's)
         """
         maus_root_dir = os.environ.get('MAUS_ROOT_DIR')
         current_dir = os.getcwd()
 
         if maus_root_dir not in current_dir:
-            exception_string = "ERROR: "
-            exception_string = "YOU ARE RUNNING MAUS OUTSIDE ITS MAUS_ROOT_DIR."
-            exception_string += " MAUS_ROOT_DIR is %s but " % maus_root_dir
-            exception_string += "your current directory is %s" % current_dir
-
-            print("\n%s" % exception_string)
-            raise EnvironmentError('BAD MAUS_ROOT_DIR', exception_string)
+            print("\nWARNING: YOU ARE RUNNING MAUS OUTSIDE ITS MAUS_ROOT_DIR")
+            print("WARNING:\tMAUS_ROOT_DIR = %s" % (maus_root_dir))
+            print("WARNING:\tCURRENT DIRECTORY = %s\n" % (current_dir))
             
-            
-
         self.input = arg_input
         self.mapper = arg_mapper
         self.reducer = arg_reducer
@@ -77,11 +76,10 @@ class Go:
 
         print("Welcome to MAUS:")
         print(("\tProcess ID (PID): %d" % os.getpid()))
-#        print(("\tUniversally Unique ID (UUID): %s" % uuid.uuid4()))
         print(("\tProgram Arguments: %s" % str(sys.argv)))
 
         self.json_config_document = \
-                                  Configuration().getConfigJSON(arg_config_file)
+               Configuration().getConfigJSON(arg_config_file, command_line_args)
         json_config_dictionary = json.loads(self.json_config_document)
         map_reduce_type = json_config_dictionary['map_reduce_type']
         version = json_config_dictionary["maus_version"]
@@ -129,7 +127,7 @@ class Go:
         while len(map_buffer) != 0:
             print(("MAP: Processing %d events" % len(map_buffer)))
 
-            map_results = map(self.mapper.process, map_buffer)
+            map_results = map(self.mapper.process, map_buffer)  # pylint: disable=W0141,C0301
             for result in map_results:
                 temp_file.write('%s\n' % result)
             map_buffer = self.buffer_input(emitter)
@@ -183,9 +181,13 @@ class Go:
         self.output.death()
             
 
-    def buffer_input(self, the_emitter):
+    def buffer_input(self, the_emitter):  # pylint: disable=R0201
+        """
+        Buffer the input stream by only reading the first
+        1024 spills into memory.  Returns an array of spills.
+        """
         my_buffer = []
-        for i in range(1024):
+        for i in range(1024):  # pylint: disable=W0612
             try:
                 value = next(the_emitter)  
                 my_buffer.append(value.encode('ascii'))

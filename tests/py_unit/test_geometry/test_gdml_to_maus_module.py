@@ -75,7 +75,7 @@ class  test_gdml_to_maus_module(unittest.TestCase):
         config_mm = False
         step_files = 0
         for fname in outputs:
-            if fname == 'ParentGeometryFile.txt':
+            if fname == 'ParentGeometryFile.dat':
                 config_mm = True
             if fname.find('Step') >= 0:
                 step_files += 1

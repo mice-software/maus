@@ -41,3 +41,8 @@ tests/integration/test_optics/log.*
 tests/integration/test_optics/*.dat
 tests/integration/test_optics/optics
 tests/integration/plots/*
+doc/doc_src/*.aux
+doc/doc_src/*.log
+doc/doc_src/detectors/*.aux
+doc/doc_src/detectors/*.log
+
