@@ -62,7 +62,7 @@ namespace Optics
   //Build set of vectors \vec{v_i} = \vec{ref}+(0,0,...,delta_i,0.,0,...)
   std::vector<PhaseSpaceVector> BuildHitsIn(PhaseSpaceVector ref, CLHEP::HepVector delta); 
   //Transport hitsIn through lattice; calculate Jacobian d(u_out)/d(u_in); build maps
-  std::vector<TransferMap*>     TrackingDerivativeTransferMaps(std::vector<PhaseSpaceVector> hitsIn, bool referenceOnly); 
+  std::vector<TransferMap*>     TrackingDerivativeTransferMaps(std::vector<PhaseSpaceVector> hitsIn, bool referenceOnly, bool phaseCavities); 
   //Polynomial fit transfer maps
   std::vector<TransferMap*>     PolynomialFitTransferMaps(PhaseSpaceVector reference, const MiceModule* root);
   //Transport hitsIn through lattice; calculate Jacobian d(u_out)/d(u_in); build maps
