@@ -17,6 +17,7 @@ spills and histograms summarising all spills to date.
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+import base64
 import json
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
@@ -44,11 +45,11 @@ class ReducePyMatplotlibHistogram:
     {"images": [{"content":"TDC and ADC counts for spill 2",
                  "tag": "spill2",
                  "image_type": "eps", 
-                 "data": "..."},
+                 "data": "...base 64 encoded image..."},
                 {"content":"Total TDC and ADC counts to spill 2",
                  "tag": "spills2",
                  "image_type": "eps", 
-                 "data": "..." }]}
+                 "data": "...base 64 encoded image..."}]}
     @endverbatim
 
     The "tag" allows the types of histogram to be discriminated. The
@@ -278,7 +279,8 @@ class ReducePyMatplotlibHistogram:
         Convert histogram to binary format.
         @param self Object reference.
         @param histogram matplotlib FigureCanvas representing the histogram.
-        @returns representation of histogram in image type format.
+        @returns representation of histogram in base 64-encoded image 
+        type format.
         """
         print "Converting to binary format..."
         data_file = StringIO.StringIO() 
@@ -286,4 +288,4 @@ class ReducePyMatplotlibHistogram:
         data_file.seek(0)
         data = data_file.read()
         print "Converted"
-        return data
+        return base64.b64encode(data)

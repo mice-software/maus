@@ -16,12 +16,14 @@ Test class for ReducePyMatplotlibHistogram.
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+import base64
 import json
 import unittest
 
 from ReducePyMatplotlibHistogram import ReducePyMatplotlibHistogram
 
-class ReducePyMatplotlibHistogramTestCase(unittest.TestCase):  # pylint: disable=C0103, R0904
+class ReducePyMatplotlibHistogramTestCase(
+    unittest.TestCase): # pylint: disable=C0103, R0904
 
     @classmethod
     def setUpClass(self): # pylint: disable=C0103, C0202
@@ -39,17 +41,17 @@ class ReducePyMatplotlibHistogramTestCase(unittest.TestCase):  # pylint: disable
             "Unexpected reducer.image_type")
 
     def test_birth_file_type(self):
-        reducer = ReducePyMatplotlibHistogram()
-        success = reducer.birth("""{"histogram_image_type":"png"}""")
+        self.__reducer = ReducePyMatplotlibHistogram()
+        success = self.__reducer.birth("""{"histogram_image_type":"png"}""")
         self.assertTrue(success, "reducer.birth() failed")
-        self.assertEquals("png", reducer.image_type, 
+        self.assertEquals("png", self.__reducer.image_type, 
             "Unexpected reducer.image_type")
 
     def test_birth_bad_file_type(self):
-        reducer = ReducePyMatplotlibHistogram()
+        self.__reducer = ReducePyMatplotlibHistogram()
         with self.assertRaisesRegexp(ValueError,
             ".*Unsupported histogram image type.*"):
-            reducer.birth(
+            self.__reducer.birth(
                 """{"histogram_image_type":"no_such_extension"}""")
 
     def test_invalid_json(self):
@@ -66,75 +68,102 @@ class ReducePyMatplotlibHistogramTestCase(unittest.TestCase):  # pylint: disable
             "No no_digits field")        
 
     def test_empty_spill(self):
-        result = self.__process({"digits":{}})
-        self.__validate_result(0, 1, result)
+        json_doc = {"digits":{}}
+        result = self.__process(json_doc)
+        self.__check_result(0, 1, result)
 
     def test_no_channel_id(self):
-        result = self.__process({"digits": {"ac_counts":22, "tc_counts":22}})
-        self.__validate_result(0, 1, result)
+        json_doc = {"digits": {"ac_counts":22, "tc_counts":22}}
+        result = self.__process(json_doc)
+        self.__check_result(0, 1, result)
 
     def test_no_tracker(self):
-        json_doc = {"digits":[]}
-        digit = {"adc_counts":1, "channel_id":{}, "tdc_counts":1}
-        json_doc["digits"].append(digit)
+        json_doc = {"digits":[{"adc_counts":1, 
+            "channel_id":{}, "tdc_counts":1}]}
         result = self.__process(json_doc)
-        self.__validate_result(0, 1, result)
+        self.__check_result(0, 1, result)
 
     def test_no_matching_tracker(self):
-        json_doc = {"digits":[]}
-        digit = {"adc_counts":1,
-                 "channel_id":{"type":"UnknownTracker"}, 
-                 "tdc_counts":1}
-        json_doc["digits"].append(digit)
+        json_doc = {"digits":[{"adc_counts":1,
+             "channel_id":{"type":"UnknownTracker"}, "tdc_counts":1}]}
         result = self.__process(json_doc)
-        self.__validate_result(0, 1, result)
+        self.__check_result(0, 1, result)
 
     def test_adc_only(self):
-        json_doc = {"digits":[]}
-        digit = {"adc_counts":1, "channel_id":{"type":"Tracker"}}
-        json_doc["digits"].append(digit)
+        json_doc = {"digits":[{"adc_counts":1, 
+            "channel_id":{"type":"Tracker"}}]}
         result = self.__process(json_doc)
-        self.__validate_result(0, 1, result)
+        self.__check_result(0, 1, result)
 
     def test_tdc_only(self):
-        json_doc = {"digits":[]}
-        digit = {"tdc_counts":1, "channel_id":{"type":"Tracker"}}
-        json_doc["digits"].append(digit)
+        json_doc = {"digits": [{"tdc_counts":1, 
+            "channel_id":{"type":"Tracker"}}]}
         result = self.__process(json_doc)
-        self.__validate_result(0, 1, result)
+        self.__check_result(0, 1, result)
 
-    def test_spills(self):
+    def test_multiple_spills_digits(self):
         for i in range(0, 4):
             json_doc = {"digits":[]}
             for j in range(0, 10):
-                digit = {"adc_counts":j,
-                          "channel_id":{"type":"Tracker"},
-                          "tdc_counts":j}
-                json_doc["digits"].append(digit)
+                json_doc["digits"].append(self.__get_digit(j, j))
             result = self.__process(json_doc)
-            self.__validate_result(i, i + 1, result)
+            self.__check_result(i, i + 1, result)
+
+    def test_svg(self):
+        self.__test_image_type("svg")
+
+    def test_svgz(self):
+        self.__test_image_type("svgz")
+
+    def test_ps(self):
+        self.__test_image_type("ps")
+
+    def test_rgba(self):
+        self.__test_image_type("rgba")
+
+    def test_raw(self):
+        self.__test_image_type("raw")
+
+    def test_pdf(self):
+        self.__test_image_type("pdf")
+
+    def test_png(self):
+        self.__test_image_type("png")
+
+    def __get_digit(self, adc, tdc):
+        return {"adc_counts":adc, 
+                "channel_id":{"type":"Tracker"}, 
+                "tdc_counts":tdc}
+
+    def __test_image_type(self, image_type):
+        self.__reducer = ReducePyMatplotlibHistogram()
+        success = self.__reducer.birth(
+            """{"histogram_image_type":"%s"}""" % image_type)
+        self.assertTrue(success, "reducer.birth() failed")
+        self.__process({"digits":[self.__get_digit(1, 1)]})
 
     def __process(self, json_doc):
         json_str = json.dumps(json_doc)
         result_str = self.__reducer.process("", json_str)
         return json.loads(result_str)
 
-    def __validate_result(self, spill_id, spill_count, result):
+    def __check_result(self, spill_id, spill_count, result):
         self.assertEquals(spill_count, self.__reducer.spill_count,
             "Unexpected reducer.spill_count")
         self.assertTrue("images" in result, "No images field")
         self.assertEquals(2, len(result["images"]),
             "Unexpected number of images")
-        self.__validate_image(result["images"][0], "%dspill" % spill_id)
-        self.__validate_image(result["images"][1], "%dspills" % spill_id)
+        self.__check_image(result["images"][0], "%dspill" % spill_id)
+        self.__check_image(result["images"][1], "%dspills" % spill_id)
 
-    def __validate_image(self, image, tag):
+    def __check_image(self, image, tag):
         self.assertEquals(self.__reducer.image_type, image["image_type"],
             "Unexpected image_type")
         self.assertEquals(tag, image["tag"], "Unexpected tag")
         self.assertTrue("content" in image, "No content field")
         self.assertTrue("data" in image, "No data field")
-        self.assertTrue(image["data"].find("EPS") != -1,
+        decoded_data = base64.b64decode(image["data"])
+        self.assertTrue(decoded_data.find("EPS") != -1,
             "Unexpected image data")
 
     def tearDown(self): # pylint: disable=C0103

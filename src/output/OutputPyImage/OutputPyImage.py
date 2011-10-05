@@ -16,6 +16,7 @@ OutputPyImage saves image files held in a set of JSON documents.
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+import base64
 import io
 import json
 import os
@@ -32,11 +33,11 @@ class OutputPyImage:
     {"images": [{"content":"TDC and ADC counts for spill 2",
                  "tag": "spill",
                  "image_type": "eps", 
-                 "data": "..."},
+                 "data": "...base 64 encoded image..."},
                 {"content":"Total TDC and ADC counts to spill 2",
                  "tag": "spills",
                  "image_type": "eps", 
-                 "data": "..." }]}
+                 "data": "...base 64 encoded image..."}]}
     @endverbatim
 
     If there are no such entries in a document then it skips to the
@@ -115,7 +116,8 @@ class OutputPyImage:
                         print "Saving %s to %s" \
                             % (entry["content"], file_path)
                         data_file = open(file_path, "w")
-                        data_file.write(entry["data"])
+                        decoded_data = base64.b64decode(entry["data"])
+                        data_file.write(decoded_data)
                         data_file.close()
             next_value = document_file.readline()
 
