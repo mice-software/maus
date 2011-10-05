@@ -1,0 +1,24 @@
+\documentclass[a4paper, 10pt] {report}
+\begin{document}
+
+\chapter{Running for the First Time}
+\include{first_time_running}
+
+\chapter{Detector Description}
+\include{detectors/tof}
+\include{detectors/tracker}
+\include{detectors/emr}
+\include{detectors/ckov}
+\include{detectors/kl}
+
+\chapter{Setting up a Geometry}
+\include{geometry_definitions} % 
+
+\chapter{Appendix A: Run Control Variables}
+\include{run_controls} % automatically constructed by build script
+
+\chapter{Appendix B: Spill Structure}
+\include{spill_schema} % automatically constructed by build script
+
+\end{document}
+
