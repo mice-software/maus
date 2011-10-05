@@ -109,7 +109,7 @@ def head_matter(file_handle, schema_name):
     """
     Make a header based on the schema name
     """
-    print >> file_handle, "\chapter{"+schema_name+"}"
+    pass
 
 def main():
     """
