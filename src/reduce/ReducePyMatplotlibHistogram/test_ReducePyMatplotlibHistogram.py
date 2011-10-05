@@ -25,17 +25,17 @@ class ReducePyMatplotlibHistogramTestCase(unittest.TestCase):  # pylint: disable
 
     @classmethod
     def setUpClass(self): # pylint: disable=C0103, C0202
-        self.reducer = ReducePyMatplotlibHistogram()
+        self.__reducer = ReducePyMatplotlibHistogram()
 
     def setUp(self): # pylint: disable=C0103
-        success = self.reducer.birth("{}")
+        success = self.__reducer.birth("{}")
         if not success:
             raise Exception('Test setUp failed', 'reducer.birth() failed')
 
     def test_birth_default(self):
-        self.assertEquals(0, self.reducer.spill_count, 
+        self.assertEquals(0, self.__reducer.spill_count, 
             "Unexpected reducer.spill_count")
-        self.assertEquals("eps", self.reducer.image_type, 
+        self.assertEquals("eps", self.__reducer.image_type, 
             "Unexpected reducer.image_type")
 
     def test_birth_file_type(self):
@@ -49,12 +49,11 @@ class ReducePyMatplotlibHistogramTestCase(unittest.TestCase):  # pylint: disable
         reducer = ReducePyMatplotlibHistogram()
         with self.assertRaisesRegexp(ValueError,
             ".*Unsupported histogram image type.*"):
-            success = reducer.birth(
+            reducer.birth(
                 """{"histogram_image_type":"no_such_extension"}""")
-            self.assertTrue(success, "reducer.birth() failed")
 
     def test_invalid_json(self):
-        result_str = self.reducer.process("", "{")
+        result_str = self.__reducer.process("", "{")
         result = json.loads(result_str)
         self.assertTrue("errors" in result, "No errors field")
         self.assertTrue("bad_json_document" in result["errors"],
@@ -117,11 +116,11 @@ class ReducePyMatplotlibHistogramTestCase(unittest.TestCase):  # pylint: disable
 
     def __process(self, json_doc):
         json_str = json.dumps(json_doc)
-        result_str = self.reducer.process("", json_str)
+        result_str = self.__reducer.process("", json_str)
         return json.loads(result_str)
 
     def __validate_result(self, spill_id, spill_count, result):
-        self.assertEquals(spill_count, self.reducer.spill_count,
+        self.assertEquals(spill_count, self.__reducer.spill_count,
             "Unexpected reducer.spill_count")
         self.assertTrue("images" in result, "No images field")
         self.assertEquals(2, len(result["images"]),
@@ -130,7 +129,7 @@ class ReducePyMatplotlibHistogramTestCase(unittest.TestCase):  # pylint: disable
         self.__validate_image(result["images"][1], "%dspills" % spill_id)
 
     def __validate_image(self, image, tag):
-        self.assertEquals(self.reducer.image_type, image["image_type"],
+        self.assertEquals(self.__reducer.image_type, image["image_type"],
             "Unexpected image_type")
         self.assertEquals(tag, image["tag"], "Unexpected tag")
         self.assertTrue("content" in image, "No content field")
@@ -139,13 +138,13 @@ class ReducePyMatplotlibHistogramTestCase(unittest.TestCase):  # pylint: disable
             "Unexpected image data")
 
     def tearDown(self): # pylint: disable=C0103
-        success = self.reducer.death()
+        success = self.__reducer.death()
         if not success:
             raise Exception('Test setUp failed', 'reducer.death() failed')
 
     @classmethod
     def tearDownClass(self): # pylint: disable=C0103, C0202
-        self.reducer = None
+        self.__reducer = None
 
 if __name__ == '__main__':
     unittest.main()

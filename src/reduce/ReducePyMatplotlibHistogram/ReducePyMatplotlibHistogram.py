@@ -40,6 +40,7 @@ class ReducePyMatplotlibHistogram:
     The output is a sequence of JSON documents separated by line
     breaks e.g.:
 
+    @verbatim
     {"images": [{"content":"TDC and ADC counts for spill 2",
                  "tag": "spill2",
                  "image_type": "eps", 
@@ -48,13 +49,19 @@ class ReducePyMatplotlibHistogram:
                  "tag": "spills2",
                  "image_type": "eps", 
                  "data": "..." }]}
+    @endverbatim
 
     The "tag" allows the types of histogram to be discriminated. The
     N (e.g. 2) means that the histograms were produced during processing
     of the Nth spill (N = 0..)
 
     In case of errors the output document is just the input document
-    with an "errors" field.
+    with an "errors" field containing the error e.g.
+
+    @verbatim
+    {"errors": {..., "bad_json_document": "unable to do json.loads on input"}}
+    {"errors": {..., "no_digits": "no digits"}}
+    @endverbatim
     """
 
     def __init__(self):
@@ -66,7 +73,8 @@ class ReducePyMatplotlibHistogram:
 
     def birth(self, config_json):
         """
-        Configure worker from data cards.
+        Configure worker from data cards. If "image_type" is not
+        in those supported then a ValueError is thrown.
         @param self Object reference.
         @param config_json JSON document string.
         @returns True
