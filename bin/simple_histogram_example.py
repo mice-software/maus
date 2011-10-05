@@ -42,7 +42,7 @@ def run():
     # image type must be one of those supported by matplotlib
     # (currently "svg", "ps", "emf", "rgba", "raw", "svgz", "pdf",
     # "eps", "png"). Default: "eps".
-    data_cards_list.append("image_type='%s'\n" % "eps")
+    data_cards_list.append("histogram_image_type='%s'\n" % "eps")
     # Prefix for file names. Default: auto-generated UUID.
     data_cards_list.append("image_file_prefix='%s'\n" % "sample-image")
     # Directory for images. Default: current directory.
