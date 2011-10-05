@@ -59,7 +59,7 @@ def run():
 
     output_worker = MAUS.OutputPyImage()
 
-    # Execute thr workers.
+    # Execute the workers.
     MAUS.Go(input_worker, mappers, reducer, output_worker, data_cards)
 
 if __name__ == "__main__":
