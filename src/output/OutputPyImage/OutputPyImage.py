@@ -64,7 +64,8 @@ class OutputPyImage:
     def birth(self, config_json):
         """
         Configure worker from data cards. An OSError is thrown if
-        there are any problems in creating the directory.
+        there are any problems in creating the directory. A ValueError
+        is thrown if the directory is a file.
         @param self Object reference.
         @param config_json JSON document string.
         @returns True
@@ -79,9 +80,13 @@ class OutputPyImage:
 
         key = "image_directory"
         if key in config_doc:
-            self.directory = config_doc[key]
-            if not os.path.exists(self.directory): 
-                os.makedirs(self.directory) 
+            directory = config_doc[key]
+            if not os.path.exists(directory):
+                os.makedirs(directory) 
+            elif (not os.path.isdir(directory)):
+                raise ValueError("image_directory is a file: %s" % 
+                    directory)
+            self.directory = directory
         else:
             self.directory = os.getcwd()
 

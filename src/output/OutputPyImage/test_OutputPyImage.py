@@ -48,9 +48,14 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=C0103, R0904
 
     def test_birth_bad_dir(self):
         worker = OutputPyImage()
-        with self.assertRaisesRegexp(OSError,
-            ".*Permission denied.*"):
-            worker.birth("""{"image_directory":"/nosuchroot"}""")
+        self.__tmpdir = tempfile.mkdtemp()
+        temp_path = os.path.join(self.__tmpdir, "somefile.txt")
+        temp_file = open(temp_path, 'w')
+        temp_file.write('')
+        temp_file.close()
+        with self.assertRaisesRegexp(ValueError,
+            ".*image_directory is a file.*"):
+            worker.birth("""{"image_directory":"%s"}""" % temp_path)
 
     def test_birth_abs_dir(self):
         worker = OutputPyImage()
