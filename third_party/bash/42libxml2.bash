@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 #http://www.linuxfromscratch.org/blfs/view/cvs/general/libxml2.html
 
-version=2.7.7
+version=2.7.8
 directory=libxml2-${version}
 filename=${directory}.tar.gz
 url=http://xmlsoft.org/sources/${filename}
+python=python2.7
 
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
@@ -43,19 +44,20 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         echo "INFO: Making:"
         echo
         sleep 1
-        ln -s ${MAUS_ROOT_DIR}/third_party/install/libpython2.7.so
+        ln -s ${MAUS_ROOT_DIR}/third_party/install/lib/lib${python}.so
         make
         make install
         cd ${MAUS_ROOT_DIR}/third_party/build/libxml2-2.7.7/python/
+
+        # on some machines make doesn't build/install python module correctly. We try to do it ourselves...
         python setup.py build
         python setup.py install
         cd ${MAUS_ROOT_DIR}
-        # workaround for bug in libxml2; that there is a libxml2.so and a libxml2.py
-        # and python gets confused... rm the libxml2 library, then import to build the
-        # .pyc file, then add the xml2 library again
+        # there is a libxml2.so and a libxml2.py and python sometimes gets 
+        # confused...
         rm ${MAUS_ROOT_DIR}/third_party/install/lib/libxml2.so
-        python -m libxml2
-        ln -s ${MAUS_ROOT_DIR}/third_party/install/lib/libxml2.so.${version} ${MAUS_ROOT_DIR}/third_party/install/lib/libxml2.so
+
+
                 ################################################## 
         echo
         echo "INFO: The package should be locally build now in your"
