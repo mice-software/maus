@@ -47,7 +47,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         ln -s ${MAUS_ROOT_DIR}/third_party/install/lib/lib${python}.so
         make
         make install
-        cd ${MAUS_ROOT_DIR}/third_party/build/libxml2-2.7.7/python/
+        cd ${MAUS_ROOT_DIR}/third_party/build/${directory}/python/
 
         # on some machines make doesn't build/install python module correctly. We try to do it ourselves...
         python setup.py build
