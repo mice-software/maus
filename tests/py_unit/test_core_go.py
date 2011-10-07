@@ -105,7 +105,7 @@ class GoTestCase(unittest.TestCase): #pylint: disable = R0904
 
         config = StringIO(u"""type_of_dataflow="bad_type" """)
 
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(LookupError):
             Go(inputer, transformer, merger, outputer, config, \
                command_line_args = False)
 
