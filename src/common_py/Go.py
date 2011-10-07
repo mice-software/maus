@@ -135,8 +135,6 @@ class Go:  #  pylint: disable=R0921
         #
         #  Enumerate list of possible types of dataflow
         #
-        possible_types_of_dataflow = get_possible_dataflows()
-
         if type_of_dataflow == 'pipeline_single_thread':
             self.pipeline_single_thread()
         elif type_of_dataflow == 'control_room_style':
