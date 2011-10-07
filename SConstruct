@@ -394,7 +394,7 @@ def set_gtest(conf, env):
 
 def set_unpacker(conf, env):
     if (not conf.CheckLib('MDunpack', language='c++') or \
-        not  conf.CheckCXXHeader('MDevent.h')):
+        not  conf.CheckCXXHeader('unpacking/MDevent.h')):
         print
         print "!! Unpacker module not found, you will not be able to use the RealData module."
         print
@@ -504,15 +504,10 @@ libs = str(os.environ.get('LD_LIBRARY_PATH'))+':'+str(os.environ.get('DYLD_LIBRA
 env.Append(LIBPATH =  libs.split(':') + ["%s/build" % maus_root_dir])
 
 env.Append(CPPPATH=["%s/third_party/install/include" % maus_root_dir, \
-                    "%s/third_party/install/include/root" % maus_root_dir, \
-                    "%s/src/legacy" % maus_root_dir, \
-                    "%s/src/common_cpp" % maus_root_dir, \
-                    ""])
-
-if (sysname == 'Darwin'):
-  env.Append(CPPPATH=["%s/third_party/install/Python.framework/Versions/2.7/include/python2.7" % maus_root_dir])
-else:
-  env.Append(CPPPATH=["%s/third_party/install/include/python2.7" % maus_root_dir])
+                      "%s/third_party/install/include/python2.7" % maus_root_dir, \
+                      "%s/third_party/install/include/root" % maus_root_dir, \
+                      "%s/src/legacy" % maus_root_dir,
+			"%s/src/common_cpp" % maus_root_dir, ""])
 
 env['USE_G4'] = False
 env['USE_ROOT'] = False

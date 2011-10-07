@@ -1,7 +1,7 @@
 import glob, os
 
-require_root = False
-require_g4 = False
+require_root = True
+require_g4 = True
 require_unpacker = True
 
 #get environment and project
