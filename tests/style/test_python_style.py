@@ -63,7 +63,7 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
         counting the number of lines in the pylint summary file. If this
         increases, throws an error.
         """
-        current_n_python_errors = 984 # Rogers, 29Sept2011
+        current_n_python_errors = 893 # Tunnell, 7Oct2011. Reduced last-time.
         file_out = os.path.join(self.maus_root_dir, 'tmp', 'pylint.out')
         fout = open(file_out, 'w')
         error_files = []
