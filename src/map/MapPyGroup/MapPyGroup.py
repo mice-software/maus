@@ -80,7 +80,13 @@ class MapPyGroup:
         return x
 
     def death(self):
-        pass
+        try:
+            for worker in self._workers:
+                assert worker.death()
+        except:
+            return False
+
+        return True
 
     def __del__(self):
         for worker in self._workers:
