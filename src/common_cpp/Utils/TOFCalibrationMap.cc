@@ -30,8 +30,10 @@ bool TOFCalibrationMap::InitializeFromCards(std::string json_configuration) {
   Json::Value configJSON = JsonWrapper::StringToJson(json_configuration);
   // this will contain the configuration
 
+  // Fill the vector containing all TOF channel keys.
   this->MakeTOFChannelKeys();
 
+  // Get the calibration text files from the Json document.
   Json::Value t0_file = JsonWrapper::GetProperty(configJSON,
                                                  "TOF_T0_calibration_file",
                                                  JsonWrapper::stringValue);
@@ -55,7 +57,8 @@ bool TOFCalibrationMap::InitializeFromCards(std::string json_configuration) {
   std::string xMapT0File = std::string(pMAUS_ROOT_DIR) + t0_file.asString();
   std::string xMapTWFile = std::string(pMAUS_ROOT_DIR) + tw_file.asString();
   std::string xMapTriggerFile = std::string(pMAUS_ROOT_DIR) + trigger_file.asString();
-  
+
+  // Load the calibration constants.
   bool loaded = this->Initialize(xMapT0File, xMapTWFile, xMapTriggerFile);
   if (!loaded)
     return false;
@@ -107,7 +110,7 @@ bool TOFCalibrationMap::LoadT0File(std::string t0File) {
   std::ifstream stream(t0File.c_str());
   if (!stream) {
     Squeak::mout(Squeak::error)
-    << "Error in TOFCalibrationMap::LoadT0File. Can't open TOF calibration file."
+    << "Error in TOFCalibrationMap::LoadT0File : Can't open TOF calibration file."
     << t0File << std::endl;
     return false;
   }
@@ -126,7 +129,7 @@ bool TOFCalibrationMap::LoadT0File(std::string t0File) {
     }
   } catch(Squeal e) {
     Squeak::mout(Squeak::error)
-    << "Error in TOFCalibrationMap::LoadT0File. Error during loading. " << std::endl
+    << "Error in TOFCalibrationMap::LoadT0File : Error during loading. " << std::endl
     << e.GetMessage() << std::endl;
     return false;
   }
@@ -138,7 +141,7 @@ bool TOFCalibrationMap::LoadTWFile(std::string twFile) {
   std::ifstream stream(twFile.c_str());
   if (!stream) {
     Squeak::mout(Squeak::error)
-    << "Error in TOFCalibrationMap::LoadTWFile. Can't open TOF calibration file. "
+    << "Error in TOFCalibrationMap::LoadTWFile : Can't open TOF calibration file. "
     << twFile << std::endl;
     return false;
   }
@@ -159,7 +162,7 @@ bool TOFCalibrationMap::LoadTWFile(std::string twFile) {
     }
   } catch(Squeal e) {
     Squeak::mout(Squeak::error)
-    << "Error in TOFCalibrationMap::LoadTWFile. Error during loading. " << std::endl
+    << "Error in TOFCalibrationMap::LoadTWFile : Error during loading. " << std::endl
     << e.GetMessage() << std::endl;
     return false;
   }
@@ -191,6 +194,8 @@ bool TOFCalibrationMap::LoadTriggerFile(std::string triggerFile) {
     << e.GetMessage() << std::endl;
     return false;
   }
+  // Use the last readed pixel key to set the number of the trigger station.
+  _triggerStation = Pkey.station();
 
   return true;
 }
@@ -234,7 +239,7 @@ double TOFCalibrationMap::TriggerT0(TOFPixelKey key) {
 
 double TOFCalibrationMap::TW( TOFChannelKey key, int adc ) {
   int n = FindTOFChannelKey( key );
-
+  // See equation 46 in MICE Note 251 "TOF Detectors Time Calibration".
   if ( n != NOCALIB) {
     double x = adc + _twPar[n][0];
     double x2 = x*x;
@@ -245,11 +250,13 @@ double TOFCalibrationMap::TW( TOFChannelKey key, int adc ) {
     if (_twPar[n][0] && _twPar[n][1] && _twPar[n][2] && _twPar[n][3])
       return dt_tw;
   }
+
   // std::cout << "TOFCalibrationMap -> No TW calibration for " << key << std::endl;
   return NOCALIB;
 }
 
 double TOFCalibrationMap::dT(TOFChannelKey Pkey, TOFPixelKey TrKey, int adc) {
+  // See equations 37-40 and 45 in MICE Note 251 "TOF Detectors Time Calibration".
   int reffSlab;
   double tw = TW(Pkey, adc);
   double t0 = T0(Pkey, reffSlab);
@@ -260,32 +267,51 @@ double TOFCalibrationMap::dT(TOFChannelKey Pkey, TOFPixelKey TrKey, int adc) {
     return NOCALIB;
   }
 
-  double dt = tw - t0 + trt0;
-   std::cout << "TOFCalibrationMap -> "<< Pkey << " "<< TrKey << "  tw = " << tw << "  t0 = ";
-   std::cout << -t0 << "  trt0 = " << trt0 << " tot = " << dt << std::endl;
+  double dt = t0 - tw - trt0;
 
-  if (Pkey.station() == TriggerStation) {
+  // If this measurement is in the trigger station we need one additional correction.
+  if (Pkey.station() == _triggerStation) {
     if (Pkey.plane()==0) {
-      TOFPixelKey refTr(TriggerStation, Pkey.slab(), reffSlab, Pkey.detector());
+      TOFPixelKey refTr(_triggerStation, Pkey.slab(), reffSlab, Pkey.detector());
       if (TriggerT0(refTr) == NOCALIB)
         return NOCALIB;
       
-      dt -= TriggerT0(refTr);
+      dt += TriggerT0(refTr);
       // std::cout << refTr << "  dt = " << TriggerT0(refTr) << std::endl;
     }
     else {
-      TOFPixelKey refTr(TriggerStation, reffSlab, Pkey.slab(), Pkey.detector());
+      TOFPixelKey refTr(_triggerStation, reffSlab, Pkey.slab(), Pkey.detector());
       if (TriggerT0(refTr) == NOCALIB)
         return NOCALIB;
  
-      dt -= TriggerT0(refTr);
+      dt += TriggerT0(refTr);
        // std::cout << refTr << "  dt = " << TriggerT0(refTr) << std::endl;
     }
   }
+
   // std::cout << "TOFCalibrationMap -> dT = " << -dt << std::endl;
   return dt*1e-3;
 }
 
+void TOFCalibrationMap::Print()
+{
+  std::cout << "====================== TofCalibrationMap =========================" << std::endl;
+  std::cout << " Name : " << _name << std::endl;
+  std::cout << " Trigger in TOF" << _triggerStation << std::endl;
+  std::cout << " Number of channels : " << _Pkey.size() << std::endl;
+  std::cout << " Number of calibrated pixels in the trigger station : "; 
+  std::cout << _Tkey.size() << std::endl;
+
+  for (unsigned int i=0; i<_Pkey.size(); i++) {
+    std::cout << _Pkey[i] << " T0 :" << _t0[i] << ", " << _reff[i];
+    std::cout << "  TW:  "<< _twPar[i][0] << ", " << _twPar[i][1];
+    std::cout << ", " << _twPar[i][2] << ", " << _twPar[i][3] << std::endl;
+  }
+  for (unsigned int i=0; i<_Tkey.size(); i++)
+   std::cout << _Tkey[i] << "  " << _Trt0[i] << std::endl;
+
+  std::cout<< "===================================================================" << std::endl;
+}
 
 TOFPixelKey::TOFPixelKey(string keyStr) throw(Squeal) {
   std::stringstream xConv;
@@ -294,7 +320,7 @@ TOFPixelKey::TOFPixelKey(string keyStr) throw(Squeal) {
     xConv >> (*this);
   }catch(Squeal e) {
     throw(Squeal(Squeal::recoverable,
-                 std::string("corrupted TOF Channel Key"),
+                 std::string("corrupted TOF Pixel Key"),
                  "TOFPixelKey::TOFPixelKey(std::string)"));
   }
 }

@@ -84,66 +84,101 @@ class TOFPixelKey {
   /// TOF station number.
   int _station;
 
-  /// Number of the horizontal Slab.
+ /** Number of the horizontal Slab. ATTENTION : according to the convention used in 
+  * the cabling file the horizontal slabs are always in plane 0.
+  */   
   int _slabX;
 
-  /// Number of the vertical Slab.
+  /** Number of the vertical Slab. ATTENTION : according to the convention used in 
+  * the cabling file the vertical slabs are always in plane 1.
+  */
   int _slabY;
   
   /// Name of the detector.
   string _detector;
 };
 
-/** Complete map of all calibration constants needed in order to reconstruct 
- * the time measured by the TOF detectors. This class is used to hold and 
- * manage calibration constants and to calculate the calibration corrections.
+/** Complete map of all calibration constants needed in order to reconstruct the time
+ * measured by the TOF detectors. This class is used to hold and manage calibration 
+ * constants and to calculate the calibration corrections. The algorithm, used to calibrate
+ * the time measurements, is described in MICE Note 251 "TOF Detectors Time Calibration".
+ * http://mice.iit.edu/micenotes/public/pdf/MICE0251/MICE0251.pdf
  */
 class TOFCalibrationMap {
  public:
 
   TOFCalibrationMap() {}
   virtual ~TOFCalibrationMap();
-  
+
+ /** Initialize the calibration map by using the text files provided in 
+  * ConfigurationDefaults.py
+  * \param[in] json_configuration Json document containing the configuration.
+  * \returns true if all text files are loaded successfully.
+  */
   bool InitializeFromCards(std::string json_configuration);
-  
+
+  /// Not implemented.
+  bool InitFromCDB();
+
  /** Initialize the map by using the provided text files.
+  * \param[in] t0File name of the text file containing the t0 calibration constants.
+  * \param[in] twFile name of the text file containing the TimeWalk calibration constants.
+  * \param[in] triggerFile name of the text file containing the trigger delay calibration 
+  * constants.
+  * \returns true if all text files are loaded successfully.
   */
   bool Initialize(std::string t0File, std::string twFile, std::string triggerFile);
 
-  /** Return the T0 correction for the channel coded by the key.
-   */
+ /** Return the T0 correction for the channel coded by the key.
+  * \param[in] key the channel of the measurement.
+  * \param[out] r the number of the refference pixel in the slab.
+  * The refference pixel is the pixel where the T0 calibration constant for this channel
+  * has been calculated.
+  * \returns the value of the T0 correction for this channel and sets the number of the 
+  * refference pixel. If no calibration for this channel the function returns NOCALIB (-99999).
+  */
   double T0( TOFChannelKey key ,int &r);
 
-  /** Return the Trigger delay correction for the pixel coded by the key.
-   */
+ /** Return the Trigger delay correction for the pixel coded by the key.
+  * \param[in] key the pixel of the hit that gives the trigger.
+  * \returns the value of the trigger delay correction. If no calibration for this pixel the 
+  * function returns NOCALIB (-99999).
+  */
   double TriggerT0( TOFPixelKey key);
 
-  /** Calculate the TimeWalk correction for the channel coded by the key and for 
-   * given adc value.
-   */
+ /** Calculate the TimeWalk correction for the channel coded by the key and for given adc value.
+  * \param[in] key the channel of the measurement.
+  * \param[in] adc the measured value of the amplitude of the signal.
+  * \returns the value of the time-walk correction. If no calibration for this channel the function
+  * returns NOCALIB (-99999).
+  */
   double TW( TOFChannelKey key, int adc );
 
-  /** Calculate the combined correction for the channel coded by Pkey, trigger 
-   * pixel coded by the Tkey and for given adc value.
-   */
+ /** Calculate the combined correction for the channel coded by Pkey, trigger 
+  * pixel coded by the Tkey and for given adc value.
+  * \param[in] Pkey the channel of the measurement.
+  * \param[in] Tkey the pixel of the hit that gives the trigger.
+  * \param[in] adc the measured value of the amplitude of the signal.
+  */
   double dT(TOFChannelKey Pkey, TOFPixelKey Tkey, int adc);
 
-  /** Return the data member Name.
-   */
-  std::string GetName()        const        {return Name;};
+ /** Return the data member Name.
+  */
+  std::string Name() const {return _name;}
 
-  /** Return the data member Detector.
-   */
-  std::string GetDetector()        const {return Detector;};
+ /** Return the data member _triggerStation.
+  */
+  int TriggerStationNumber() const {return _triggerStation;}
 
-  /**  Print the calibration map;
-   */
+ /** Print the calibration map;
+  * To be used only for debugging.
+  */
   void Print();
 
-  void SetTriggerStation(int station) {TriggerStation = station;}
+  void SetTriggerStation(int station) {_triggerStation = station;}
   enum {
-    /** This value is returned when the correction can not be calculated.
-     */
+   /** This value is returned when the correction can not be calculated.
+    */
     NOCALIB = -99999
   };
 
@@ -180,7 +215,7 @@ class TOFCalibrationMap {
   */
   std::vector<TOFChannelKey> _Pkey;
 
- /** This vector holds the TimeWalk constants.\ IMPORTANT - the order of the entries
+ /** This vector holds the TimeWalk constants. IMPORTANT - the order of the entries
   * here is the same as the order of the entries in _Pkey. 
   * This is used when the constants are read.
   */
@@ -211,15 +246,11 @@ class TOFCalibrationMap {
 
  /** Number of the trigger station. It is automatically set during the initialization.
   */
-  int TriggerStation;
+  int _triggerStation;
 
  /** Name of the calibration as in the CBD.
   */
-  std::string Name;
-
- /** Detector name as in the CBD.
-  */
-  std::string Detector;
+  std::string _name;
 };
 
 #endif

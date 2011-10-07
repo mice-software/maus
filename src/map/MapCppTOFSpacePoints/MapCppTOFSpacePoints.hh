@@ -62,9 +62,16 @@ class MapCppTOFSpacePoints {
 
   TOFCalibrationMap _map;
 
+  std::vector<int> xPlane0Hits;
+  std::vector<int> xPlane1Hits;
+
+  double _makeSpacePiontCut; //nanoseconds
+  double _findTriggerPixelCut; //nanoseconds
+  std::string _triggerStation;
+  
   /// Vector to hold the names of all detectors to be processed.
-  std::vector<std::string> StationKeys;
-  std::vector<TOFPixelKey*> _trigger_pixels;
+  std::vector<std::string> _stationKeys;
+  std::map<int, std::string> _triggerhit_pixels;
 
  /** Load the configuration.
  * \param[in] json_configuration Json document containing the configuration.
@@ -72,15 +79,17 @@ class MapCppTOFSpacePoints {
  */
   bool SetConfiguration(std::string json_configuration);
 
-  Json::Value fillSpacePoint(Json::Value xDocSlabHit0, Json::Value xDocSlabHit1);
-
+  Json::Value fillSpacePoint(Json::Value &xDocSlabHit0, Json::Value &xDocSlabHit1);
+  Json::Value processTOFStation(Json::Value &xSlabHits, std::string detector);
+  std::string findTriggerPixel(Json::Value xDocPartEvent);
   bool calibratePmtHit(TOFPixelKey xPixelKey, Json::Value &xPmtHit, double &time);
-
-  /** @brief makes slab hits
+  bool calibrateSlabHit(TOFPixelKey xPixelKey, Json::Value &xSlabHit, double &time);
+  
+  /** @brief makes space points
    *
    *  @param xDocDetectorData Json document containing slab hits from 
    * one particle event in one individual detector.
    */
-  Json::Value makeSpacePoints(Json::Value xDocPartEvent);
+  Json::Value makeSpacePoints(Json::Value &xDocPartEvent);
 };
 #endif

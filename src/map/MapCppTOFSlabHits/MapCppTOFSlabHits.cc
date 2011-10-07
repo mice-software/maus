@@ -29,6 +29,9 @@
 bool MapCppTOFSlabHits::birth(std::string argJsonConfigDocument) {
   // Check if the JSON document can be parsed, else return error only
   _classname = "MapCppTOFSlabHits";
+  _stationKeys.push_back("tof0");
+  _stationKeys.push_back("tof1");
+  _stationKeys.push_back("tof2");
 
   if (SetConfiguration(argJsonConfigDocument))
     return true;  // Sucessful completion
@@ -62,28 +65,28 @@ std::string MapCppTOFSlabHits::process(std::string document) {
   }
 
   if (xEventType== "physics_event" || xEventType == "calibration_event") {
-    Json::Value digits = JsonWrapper::GetProperty(root, "digits", JsonWrapper::objectValue);
-    StationKeys.push_back("tof0");
-    StationKeys.push_back("tof1");
-    StationKeys.push_back("tof2");
+    if (root.isMember("digits")) {
+      Json::Value digits = JsonWrapper::GetProperty(root, "digits", JsonWrapper::objectValue);
 
-    // Loop over each station.
-    for (unsigned int n_station = 0; n_station < StationKeys.size(); n_station++) {
+      // Loop over each station.
+      for (unsigned int n_station = 0; n_station < _stationKeys.size(); n_station++) {
+        if (digits.isMember(_stationKeys[n_station])) {
+          Json::Value xDocDetectorDigits = JsonWrapper::GetProperty(digits,
+                                                                    _stationKeys[n_station],
+                                                                    JsonWrapper::arrayValue);
 
-      Json::Value xDocDetectorDigits = JsonWrapper::GetProperty(digits,
-                                                                StationKeys[n_station],
-                                                                JsonWrapper::arrayValue);
+          if (xDocDetectorDigits.isArray()) {
+            int n_part_events = xDocDetectorDigits.size();
+            // Loop over the particle events.
+            for (int PartEvent = 0; PartEvent < n_part_events; PartEvent++) {
+              Json::Value xDocPartEvent = JsonWrapper::GetItem(xDocDetectorDigits,
+                                                               PartEvent,
+                                                               JsonWrapper::anyValue);
 
-      if (xDocDetectorDigits.isArray()) {
-        int n_part_events = xDocDetectorDigits.size();
-        // Loop over the particle events.
-        for (int PartEvent = 0; PartEvent < n_part_events; PartEvent++) {
-          Json::Value xDocPartEvent = JsonWrapper::GetItem(xDocDetectorDigits,
-                                                           PartEvent,
-                                                           JsonWrapper::anyValue);
-
-          Json::Value xDocSlabHits = makeSlabHits(xDocPartEvent);
-          root["slab_hits"][StationKeys[n_station]][PartEvent] = xDocSlabHits;
+              Json::Value xDocSlabHits = makeSlabHits(xDocPartEvent);
+              root["slab_hits"][_stationKeys[n_station]][PartEvent] = xDocSlabHits;
+	    }
+          }
         }
       }
     }
@@ -238,8 +241,8 @@ Json::Value MapCppTOFSlabHits::fillSlabHit(Json::Value xDocDigit0, Json::Value x
   xDocPMT1["trigger_request_leading_time"] = xTriggerReqDigit1;
 
   // Calculate the measured value of the time in nanoseconds.
-  double time_digit0 = 25e-3*(double(xTriggerReqDigit0 - xTimeDigit0));
-  double time_digit1 = 25e-3*(double(xTriggerReqDigit1 - xTimeDigit1));
+  double time_digit0 = 25e-3*(double(xTimeDigit0 - xTriggerReqDigit0));
+  double time_digit1 = 25e-3*(double(xTimeDigit1 - xTriggerReqDigit1));
 
   xDocPMT0["raw_time"] = time_digit0;
   xDocPMT1["raw_time"] = time_digit1;

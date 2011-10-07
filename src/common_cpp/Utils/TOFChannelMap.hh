@@ -47,6 +47,7 @@ using std::stringstream;
  */
 class TOFChannelKey {
  public:
+
   TOFChannelKey()
   :_station(-999), _plane(-999), _slab(-999), _pmt(-999), _detector("unknown") {}
 
@@ -75,28 +76,30 @@ class TOFChannelKey {
   friend ostream& operator<<( ostream& stream, TOFChannelKey key );
   friend istream& operator>>( istream& stream, TOFChannelKey &key ) throw(Squeal);
 
-  string detector() {return _detector;}
+  string detector() const {return _detector;}
 
   /** This function converts the DAQChannelKey into string.
   * \return String identifier.
   */
   string str();
 
-  int station()   {return _station;}
-  int plane()     {return _plane;}
-  int slab()      {return _slab;}
-  int pmt()       {return _pmt;}
+  int station() const {return _station;}
+  int plane() const {return _plane;}
+  int slab() const {return _slab;}
+  int pmt() const {return _pmt;}
 
-  void SetStation(int xStation)       {_station = xStation;}
-  void SetPlane(int xPlane)           {_plane = xPlane;}
-  void SetSlab(int xSlab)             {_slab = xSlab;}
-  void SetPmt(int xPmt)               {_pmt = xPmt;}
-  void SetDetector(string xDetector)  {_detector = xDetector;}
+  void SetStation(int xStation) {_station = xStation;}
+  void SetPlane(int xPlane) {_plane = xPlane;}
+  void SetSlab(int xSlab) {_slab = xSlab;}
+  void SetPmt(int xPmt) {_pmt = xPmt;}
+  void SetDetector(string xDetector) {_detector = xDetector;}
 
   /** This function creates unique integer identifier.
   * \return Integer identifier.
   */
   int make_TOFChannelKey_id() { return _station*1e8 + _plane*1e6 + _slab*1e3 + _pmt; }
+
+ private:
 
   /// TOF station number.
   int _station;
@@ -120,6 +123,7 @@ class TOFChannelKey {
  */
 class TOFChannelMap {
  public:
+
   TOFChannelMap() {}
   virtual ~TOFChannelMap();
 
@@ -158,11 +162,11 @@ class TOFChannelMap {
   DAQChannelKey* findTdcKey(string adcKeyStr);
 
  private:
+
   std::vector<TOFChannelKey*> _tofKey;
   std::vector<DAQChannelKey*> _tdcKey;
   std::vector<DAQChannelKey*> _fadcKey;
 };
-
 
 #endif
 

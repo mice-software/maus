@@ -60,7 +60,7 @@ class MapCppTOFSlabHits {
   std::string _classname;
 
   /// Vector to hold the names of all detectors to be processed.
-  std::vector<std::string> StationKeys;
+  std::vector<std::string> _stationKeys;
 
  /** Load the configuration.
  * \param[in] json_configuration Json document containing the configuration.

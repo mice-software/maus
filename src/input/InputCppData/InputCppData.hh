@@ -32,7 +32,7 @@
 #include "Utils/DAQChannelMap.hh"
 #include "Interface/Squeak.hh"
 
-/** \class InputCppData
+ /** \class InputCppData
   * Load MICE raw data and unpack it into a JSON stream.
   *
   * This module reads data in the format of the MICE DAQ.  It drives the
@@ -46,7 +46,7 @@ class InputCppData {
 
  public:
 
-/** Create an instance of InputCppData.
+ /** Create an instance of InputCppData.
   * 
   * This is the constructor for InputCppData.
   *
@@ -55,7 +55,7 @@ class InputCppData {
   */
   InputCppData(std::string pDataPath = "", std::string pFilename = "");
 
-/** Initialise the Unpacker.
+ /** Initialise the Unpacker.
   *
   * This prepares the unpacker to read the files given in the constructor.
   *
@@ -63,7 +63,7 @@ class InputCppData {
   */
   bool birth(std::string pJSONConfig);
 
-/** Read the next event from the file into memory.
+ /** Read the next event from the file into memory.
   *
   * This function simply reads an event into memory,
   * it doesn't unpack the event anymore than required to read it.
@@ -72,7 +72,7 @@ class InputCppData {
   */
   bool readNextEvent();
 
-/** Unpack the current event into JSON.
+ /** Unpack the current event into JSON.
   *
   * This unpacks the current event and returns the JSON data for it.
   * Don't call this until readNextEvent() has been called and returned
@@ -82,7 +82,7 @@ class InputCppData {
   */
   std::string getCurEvent();
 
-/** Disable one equipment type.
+ /** Disable one equipment type.
   * This disables the unpacking of the data produced by all equipment
 	* with the specified type.
 	*/
@@ -90,7 +90,7 @@ class InputCppData {
     _dataProcessManager.Disable(pEquipType);
   }
 
-/** Close the file and free memory.
+ /** Close the file and free memory.
   *
   * This function frees all resources allocated by Birth().
   * It is unlikely this will ever fail!
@@ -118,47 +118,54 @@ class InputCppData {
 
  private:
 
-/** Process manager object. */
+ /** Process manager object. */
   MDprocessManager _dataProcessManager;
 
-/** File manager object. */
+ /** File manager object. */
   MDfileManager _dataFileManager;
 
-/** The DAQ channel map object.
-* It is used to group all measurements belonging to a given detector.*/
+ /** The DAQ channel map object.
+  * It is used to group all measurements belonging to a given detector.
+  */
   DAQChannelMap _map;
 
-/** Processor for TDC particle event data. */
+ /** Processor for TDC particle event data. */
   V1290DataProcessor*  _v1290PartEventProc;
 
-/** Processor for fADC V1724 particle event data. */
+ /** Processor for fADC V1724 particle event data. */
   V1724DataProcessor*  _v1724PartEventProc;
 
-/** Processor for fADC V1731 particle event data. */
+ /** Processor for fADC V1731 particle event data. */
   V1731DataProcessor*  _v1731PartEventProc;
 
-/** Processor for scaler data. */
+ /** Processor for scaler data. */
   V830DataProcessor*  _v830FragmentProc;
 
-/** Processor for VLSB data. */
+ /** Processor for VLSB data. */
   VLSBDataProcessor* _vLSBFragmentProc;
 
-/** Processor for DBB data. */
+ /** Processor for DBB data. */
   DBBDataProcessor* _DBBFragmentProc;
 
-/** Pointer to the start of the current event. */
+ /** Pointer to the start of the current event. */
   unsigned char *_eventPtr;
 
-  /** Paths to the data.
+ /** Paths to the data.
   * This string has to contain one or more space separated paths.
   */
   std::string _dataPaths;
 
-  /** File and run names within _dataPaths.
+ /** File and run names within _dataPaths.
   * This string has to contain one or more space separated
   * file names or run numbers.
   */
   std::string _datafiles;
+
+ /** Max number of DAQ events to be processed.*/ 
+  int _maxNumDaqEvents;
+
+ /** Counter of the DAQ events.*/
+  int _daqEventsCount;
 
   /** Enum of event types */
   enum {

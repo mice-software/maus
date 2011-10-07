@@ -65,12 +65,12 @@ public:
 
 private:
   std::string _classname;
+
   TOFChannelMap _map;
-  MiceModule* module;
 
   // Vector to hold the names of all detectors to be included
   // in the digits.
-  std::vector<std::string> StationKeys; 
+  std::vector<std::string> _stationKeys; 
 
 
   bool SetConfiguration( std::string json_configuration );

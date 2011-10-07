@@ -32,7 +32,7 @@ bool TOFChannelMap::InitFromFile(string filename) {
   ifstream stream(filename.c_str());
   if ( !stream ) {
     Squeak::mout(Squeak::error)
-    << "Error in TOFChannelMap::InitFromFile. Can't open TOF cabling file "
+    << "Error in TOFChannelMap::InitFromFile : Can't open TOF cabling file "
     << filename << std::endl;
     return false;
   }
@@ -52,14 +52,14 @@ bool TOFChannelMap::InitFromFile(string filename) {
     }
   } catch(Squeal e) {
     Squeak::mout(Squeak::error)
-    << "Error in TOFChannelMap::InitFromFile. Error during loading." << std::endl
+    << "Error in TOFChannelMap::InitFromFile : Error during loading." << std::endl
     << e.GetMessage() << std::endl;
     return false;
   }
 
   if (_tofKey.size() == 0) {
     Squeak::mout(Squeak::error)
-    << "Error in TOFChannelMap::InitFromFile. Nothing is loaded. "  << std::endl;
+    << "Error in TOFChannelMap::InitFromFile : Nothing is loaded. "  << std::endl;
     return false;
   }
   return true;

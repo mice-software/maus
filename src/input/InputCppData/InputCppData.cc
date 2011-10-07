@@ -22,7 +22,7 @@ InputCppData::InputCppData(std::string pDataPath,
   _eventPtr = NULL;
   _dataPaths = pDataPath;
   _datafiles = pRunNum;
-
+  _daqEventsCount = 0;
   _v1290PartEventProc = NULL;
   _v1724PartEventProc = NULL;
   _v1731PartEventProc = NULL;
@@ -37,7 +37,6 @@ bool InputCppData::birth(std::string jsonDataCards) {
      return false;  // Faile because files are already open
   }
 
-  //
   _dataFileManager.SetList(_datafiles);
   _dataFileManager.SetPath(_dataPaths);
   _dataFileManager.OpenFile();
@@ -156,6 +155,10 @@ bool InputCppData::birth(std::string jsonDataCards) {
     this->disableEquipment("DBB");
   }
 
+  // Set the number of DAQ events to be processed.
+  assert(configJSON.isMember("Number_of_DAQ_Events"));
+  _maxNumDaqEvents = configJSON["Number_of_DAQ_Events"].asInt();
+
   // _dataProcessManager.DumpProcessors();
 
   return true;
@@ -163,6 +166,12 @@ bool InputCppData::birth(std::string jsonDataCards) {
 
 
 bool InputCppData::readNextEvent() {
+  // Check the max number of DAQ events.
+  // If it is negative, run until the end of the loaded DATE files. 
+  if (_maxNumDaqEvents > -1)
+    if(_daqEventsCount >= _maxNumDaqEvents)
+      return false;  
+  
   // Use the MDfileManager object to get the next event.
   _eventPtr = _dataFileManager.GetNextEvent();
   if (!_eventPtr)
@@ -220,6 +229,7 @@ std::string InputCppData::getCurEvent() {
   xDocRoot["daq_event_type"] = event_type_to_str(event_type);
   // cout<<xDocRoot<<endl;
 
+  _daqEventsCount ++;
   return xJSONWr.write(xDocRoot);
 }
 
@@ -264,7 +274,7 @@ std::string InputCppData::event_type_to_str(int pType) {
 
     default :
       std::stringstream xConv;
-      xConv << pType << " (unknown)";
+      xConv << pType << "unknown";
       event_type = xConv.str();
       break;
   }
