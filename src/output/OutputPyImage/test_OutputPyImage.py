@@ -1,5 +1,5 @@
 """
-Test class for OutputPyImage.
+Tests for OutputPyImage module.
 """
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 # 
@@ -16,6 +16,8 @@ Test class for OutputPyImage.
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+# pylint: disable=C0103
+
 import fnmatch
 import json
 import os
@@ -27,26 +29,46 @@ import unittest
 
 from OutputPyImage import OutputPyImage
 
-class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=C0103, R0904
+class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=R0904
+    """
+    Test class for OutputPyImage.
+    """
 
     @classmethod
-    def setUpClass(self): # pylint: disable=C0103, C0202
+    def setUpClass(self): # pylint: disable=C0202
+        """ 
+        Prepare for test by setting up worker and file extension.
+        @param self Object reference.
+        """
         self.__worker = OutputPyImage()
         self.__file_extension = "outputpyimage"
 
-    def setUp(self): # pylint: disable=C0103
+    def setUp(self):
+        """ 
+        Invoke worker's birth method and check for success. 
+        @param self Object reference.
+        """
         self.__tmpdir = ""
         success = self.__worker.birth("""{"image_file_prefix":"prefix"}""")
         if not success:
             raise Exception('Test setUp failed', 'worker.birth() failed')
 
     def test_birth_default(self):
+        """ 
+        Test worker's default values after birth is called.
+        @param self Object reference.
+        """
         self.assertEquals(os.getcwd(), self.__worker.directory, 
             "Unexpected worker.directory")
         self.assertEquals("prefix", self.__worker.file_prefix, 
             "Unexpected worker.file_prefix")
 
     def test_birth_bad_dir(self):
+        """ 
+        Test worker's birth method throws an exception if given 
+        a file name as an image directory.
+        @param self Object reference.
+      . """
         worker = OutputPyImage()
         self.__tmpdir = tempfile.mkdtemp()
         temp_path = os.path.join(self.__tmpdir, "somefile.txt")
@@ -58,6 +80,11 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=C0103, R0904
             worker.birth("""{"image_directory":"%s"}""" % temp_path)
 
     def test_birth_abs_dir(self):
+        """ 
+        Test worker's birth method with an absolute directory
+        path as an image directory.
+        @param self Object reference.
+      . """
         worker = OutputPyImage()
         self.__tmpdir = tempfile.mkdtemp()
         relative_path = join('a', 'b', 'c', 'd')
@@ -70,6 +97,11 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=C0103, R0904
             "Unexpected worker.image_directory")
 
     def test_birth_relative_dir(self):
+        """ 
+        Test worker's birth method with a relative directory
+        path as an image directory.
+        @param self Object reference.
+      . """
         worker = OutputPyImage()
         relative_path = "test_output_py_image"
         self.__tmpdir = join(os.getcwd(), relative_path)
@@ -81,9 +113,17 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=C0103, R0904
             "Unexpected worker.image_directory")
 
     def test_no_images(self):
+        """ 
+        Test worker's save method with no JSON documents. 
+        @param self Object reference.
+        """
         self.__save({})
 
     def test_image_missing_tag(self):
+        """ 
+        Test worker's save method with a JSON document with no images.
+        @param self Object reference.
+        """
         with self.assertRaisesRegexp(ValueError,
             ".*Missing tag.*"):
             self.__save({"images": [{
@@ -92,6 +132,11 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=C0103, R0904
                 "data": "Data"}]})
 
     def test_image_missing_type(self):
+        """ 
+        Test worker's save method with a JSON document with an image
+        that has no image type.
+        @param self Object reference.
+        """
         with self.assertRaisesRegexp(ValueError,
             ".*Missing image_type.*"):
             self.__save({"images": [{
@@ -100,6 +145,11 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=C0103, R0904
                 "data": "Data"}]})
 
     def test_image_missing_data(self):
+        """ 
+        Test worker's save method with a JSON document with an image
+        that has no image data.
+        @param self Object reference.
+        """
         with self.assertRaisesRegexp(ValueError,
             ".*Missing data.*"):
             self.__save({"images": [{
@@ -108,6 +158,11 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=C0103, R0904
                 "image_type": self.__file_extension}]})
 
     def test_n_images_one_doc(self):
+        """ 
+        Test worker's save method with a JSON document with N
+        image entries.
+        @param self Object reference.
+        """
         for i in range(0, 3):
             self.__save({"images": [{
                 "content":"Content", 
@@ -117,6 +172,11 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=C0103, R0904
         self.__validate_result(3)
 
     def test_n_images_m_docs(self):
+        """ 
+        Test worker's save method with M JSON documents each with N
+        image entries.
+        @param self Object reference.
+        """
         json_str = ""
         for i in range(0, 3):
             json_doc = {"images": [{
@@ -129,10 +189,23 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=C0103, R0904
         self.__validate_result(3)
 
     def __save(self, json_doc):
+        """
+        Convert JSON document to string and pass to worker's save
+        method.
+        @param self Object reference.
+        @param json_doc JSON document.
+        """
         json_str = json.dumps(json_doc)
         self.__worker.save(json_str)
 
     def __validate_result(self, number_of_files):
+        """ 
+        Check that the worker's image directory has a specific
+        number of files with the expected prefix and file
+        extension.
+        @param self Object reference.
+        @param number_of_files Number of files to check for.
+        """
         directory = join(os.getcwd(), self.__worker.directory)
         files = []
         for afile in os.listdir(directory):
@@ -145,7 +218,12 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=C0103, R0904
             self.assertEquals(files[i], "prefixspill%d.%s" % 
                                         (i, self.__file_extension))
 
-    def tearDown(self): # pylint: disable=C0103
+    def tearDown(self):
+        """
+        Invoke worker's death method and remove any temporary 
+        directories and image files.
+        @param self Object reference.
+        """
         success = self.__worker.death()
         if not success:
             raise Exception('Test setUp failed', 'worker.death() failed')
@@ -157,7 +235,11 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=C0103, R0904
                 os.remove(afile)
 
     @classmethod
-    def tearDownClass(self): # pylint: disable=C0103, C0202
+    def tearDownClass(self): # pylint: disable=C0202
+        """ 
+        Set the worker to None. 
+        @param self Object reference.
+        """
         self.__worker = None
 
 if __name__ == '__main__':

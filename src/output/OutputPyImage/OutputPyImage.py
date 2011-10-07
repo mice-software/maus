@@ -122,7 +122,7 @@ class OutputPyImage:
                         data_file.close()
             next_value = document_file.readline()
 
-    def death(self):
+    def death(self): #pylint: disable=R0201
         """
         A no-op
         @returns True

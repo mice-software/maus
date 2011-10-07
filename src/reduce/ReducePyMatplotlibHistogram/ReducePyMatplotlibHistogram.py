@@ -192,14 +192,14 @@ class ReducePyMatplotlibHistogram:
         self.spill_count += 1
         return self.__return_json(json_strings, json.dumps(json_doc))
 
-    def death(self):
+    def death(self): #pylint: disable=R0201
         """
         A no-op
         @returns True
         """
         return True
 
-    def __return_json(self, json_strings, json_string):
+    def __return_json(self, json_strings, json_string): #pylint: disable=R0201
         """
         Add JSON document to list of documents
         @param json_strings String with JSON documents.
@@ -209,7 +209,7 @@ class ReducePyMatplotlibHistogram:
         """
         return "%s\n%s" % (json_strings.rstrip(), json_string.rstrip())
 
-    def __filter_trackers(self, digit):
+    def __filter_trackers(self, digit): #pylint: disable=R0201
         """
         Is the digit a tracker?
         @param self Object reference.
@@ -223,7 +223,7 @@ class ReducePyMatplotlibHistogram:
         else:
             return digit["channel_id"]["type"] == "Tracker"
 
-    def __get_counts(self, digit, digit_key):
+    def __get_counts(self, digit, digit_key): #pylint: disable=R0201
         """
         Return number of counts of the given type in digit.
         @param self Object reference.
@@ -236,7 +236,7 @@ class ReducePyMatplotlibHistogram:
         else:
             return 0
 
-    def __create_histogram(self, title, xlabel, ylabel):
+    def __create_histogram(self, title, xlabel, ylabel): #pylint: disable=R0201
         """
         Create a histogram with the given title and labels.
         @param self Object reference.
@@ -254,21 +254,21 @@ class ReducePyMatplotlibHistogram:
         axes.grid(True, linestyle="-", color="0.75")
         return histogram
 
-    def __histogram(self, histogram, title, tdc_counts, adc_counts): 
+    def __histogram(self, histogram, title, tdcs, adcs): #pylint: disable=R0201
         """
         Plot the TDC/ADC counts on the histogram.
         @param self Object reference.
         @param histogram matplotlib FigureCanvas representing the histogram.
         @param title Title.
-        @param tdc_counts List of TDC counts.
-        @param adc_counts List of ADC counts.
+        @param tdcs List of TDC counts.
+        @param adcs List of ADC counts.
         """
         histogram.figure.get_axes()[0].set_title(title, fontsize=14)
-        if (len(tdc_counts) > 0):
-            histogram.figure.get_axes()[0].scatter(tdc_counts, 
-                                                   adc_counts, 10, "b")
+        if (len(tdcs) > 0):
+            histogram.figure.get_axes()[0].scatter(tdcs, 
+                                                   adcs, 10, "b")
 
-    def __convert_to_binary(self, histogram): 
+    def __convert_to_binary(self, histogram): #pylint: disable=R0201
         """
         Convert histogram to binary format.
         @param self Object reference.
