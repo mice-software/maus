@@ -22,10 +22,11 @@
 #
 import os
 
+type_of_dataflow = 'pipeline_single_thread'
+
 output_json_file_name = "simulation.out"
 output_json_file_type = "text"
 
-map_reduce_type = "native_python" # can also be "native_python_profile" using cProfile in python
 
 # Used, for now, to determine what level of
 # c++ log messages are reported to the user:
