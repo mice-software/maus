@@ -25,6 +25,7 @@ import os
 import subprocess
 import sys  
 
+import Configuration
 from MapCppSimulation import MapCppSimulation
 
 class MapCppSimulationTestCase(unittest.TestCase):
@@ -123,7 +124,7 @@ class MapCppSimulationTestCase(unittest.TestCase):
                            'MapCppSimulation', 'run_visualisation_for_tests.py')
         ps = subprocess.Popen(['python', test])
         ps.wait()
-        self.assertEqual(ps.returncode, 0)
+        self.assertEqual(ps.returncode, 0, msg='Failed to run visualisation')
 
     configuration = {
       "verbose_level":2,
@@ -139,7 +140,18 @@ class MapCppSimulationTestCase(unittest.TestCase):
          "time":0.0,
          "random_seed":10
       },
-      "geant4_visualisation":False
+      "geant4_visualisation":False,
+      "physics_model":"QGSP_BERT",
+      "reference_g4ui_script":"",
+      "reference_energy_loss_model":"ionisation",
+      "begin_of_run_g4ui_script":"",
+      "multiple_scattering_model":"mcs",
+      "energy_loss_model":"estrag",
+      "hadronic_model":"all",
+      "particle_decay":True,
+      "charged_pion_half_time":-1.,
+      "muon_half_time":-1.,
+      "production_threshold":0.5,
     }
 
 

@@ -115,6 +115,17 @@ class MapCppSimulationVisualisationTestCase(unittest.TestCase):
       "visualisation_theta":90.,
       "visualisation_phi":90.,
       "visualisation_zoom":1.,
+      "physics_model":"QGSP_BERT",
+      "reference_g4ui_script":"",
+      "reference_energy_loss_model":"ionisation",
+      "begin_of_run_g4ui_script":"",
+      "multiple_scattering_model":"mcs",
+      "energy_loss_model":"estrag",
+      "hadronic_model":"all",
+      "particle_decay":True,
+      "charged_pion_half_time":-1.,
+      "muon_half_time":-1.,
+      "production_threshold":0.5,
     }
 
 if __name__ == '__main__':

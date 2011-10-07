@@ -95,13 +95,6 @@ class MAUSPhysicsList: public G4VModularPhysicsList
      */
     hadronic HadronicModel  (std::string hadronicModel);
 
-    /** Convert from string to DecayModel
-     *
-     *  Accepts "true", "false" to activate or inactivate decays; case
-     *  insensitive
-     */
-    bool     DecayModel     (std::string decayModel);
-
     /** Set up reference particle physics model according to reference datacards
      */
     void BeginOfReferenceParticleAction();
@@ -113,21 +106,33 @@ class MAUSPhysicsList: public G4VModularPhysicsList
     /** Construct the process table and add any MAUS specific processes 
      */
     void ConstructProcess();
+    
+    /** Does nothing - included to overload pure virtual base class function
+     */
+    void SetCuts() {}
 
+    /** Get all relevant datacards from the json configuration
+     */
+    void Setup();
+
+  private:
     /** Add some specific processes for MAUS
      *
      *  Only add a step limiter
      */
     void SetSpecialProcesses();
 
-    /** Set particle physics model using strings defined elsewhere
+    /** Set g4 particle physics model using strings defined elsewhere
      *
      *  \param scatteringModel transverse scattering model 
      *  \param energyLossModel energy loss model 
      *  \param hadronicModel hadronic process model 
-     *  \param decayModel decay model 
+     *  \param decayModel are decays active 
      */
-    void SetStochastics  (std::string scatteringModel, std::string energyLossModel, std::string hadronicModel, std::string decayModel);
+    void SetStochastics  (std::string scatteringModel,
+                          std::string energyLossModel,
+                          std::string hadronicModel,
+                          bool decayModel);
 
     /** Set pion or muon half life (if specified)
      *
@@ -188,16 +193,24 @@ class MAUSPhysicsList: public G4VModularPhysicsList
      *  \param halfLife half life [ns]
      */
     void SetParticleHalfLife  (std::string particleName, double halfLife);
-    
-    /** Does nothing - included to overload pure virtual base class function
-     */
-    void SetCuts() {}
 
   private:
-    static const std::string scatNames [];
-    static const std::string eLossNames[];
-    static const int         nScatNames;
-    static const int         nELossNames;
+    static const std::string _scatNames [];
+    static const std::string _eLossNames[];
+    static const int         _nScatNames;
+    static const int         _nELossNames;
+
+    std::string _refDEModel;
+    std::string _refScript;
+    std::string _runScript;
+    std::string _msModel;
+    std::string _dEModel;
+    std::string _hadronicModel;
+    bool        _partDecay;
+    double      _piHalfLife;
+    double      _muHalfLife;
+    double      _productionThreshold;
+
 
 };
 
