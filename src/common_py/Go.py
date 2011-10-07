@@ -137,8 +137,6 @@ class Go:  #  pylint: disable=R0921
         #
         possible_types_of_dataflow = get_possible_dataflows()
 
-        assert type_of_dataflow in possible_types_of_dataflow.keys()
-
         if type_of_dataflow == 'pipeline_single_thread':
             self.pipeline_single_thread()
         elif type_of_dataflow == 'control_room_style':
