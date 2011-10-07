@@ -1,10 +1,6 @@
 """Tests for src/common_py/Go.py"""
 
-import json
 import unittest
-import subprocess
-import glob
-import os
 import sys
 import copy
 import tempfile
@@ -26,11 +22,14 @@ class FakeMap(): #pylint: disable = W0232, R0903
 class GoTestCase(unittest.TestCase): #pylint: disable = R0904
     """Tests for src/common_py/Go.py"""
 
-    def setUp(self):
+    def setUp(self): #pylint: disable = C0103
         """Create temp file"""
         self.tmp_file = tempfile.mkstemp()[1]
 
     def dataflows_test(self):
+        """
+        Make sure get_possible_dataflows() doesn't return nonsense
+        """
         keys = get_possible_dataflows().keys()
         self.assertTrue('pipeline_single_thread' in keys)
 
@@ -41,7 +40,7 @@ class GoTestCase(unittest.TestCase): #pylint: disable = R0904
         merger = ReducePyDoNothing()
         outputer = OutputPyJSON(open(self.tmp_file, 'w'))
         with self.assertRaises(AssertionError):
-            Go(inputer, transformer, merger, outputer, command_line_args = False)
+            Go(inputer, transformer, merger, outputer, command_line_args=False)
 
 
     def map_birth_test(self):
@@ -52,7 +51,7 @@ class GoTestCase(unittest.TestCase): #pylint: disable = R0904
         outputer = OutputPyJSON(open(self.tmp_file, 'w'))
 
         with self.assertRaises(AssertionError):
-            Go(inputer, transformer, merger, outputer, command_line_args = False)
+            Go(inputer, transformer, merger, outputer, command_line_args=False)
 
     def reduce_birth_test(self):
         """Check that Go raises error with bad merger"""
@@ -62,7 +61,7 @@ class GoTestCase(unittest.TestCase): #pylint: disable = R0904
         outputer = OutputPyJSON(open(self.tmp_file, 'w'))
 
         with self.assertRaises(AssertionError):
-            Go(inputer, transformer, merger, outputer, command_line_args = False)
+            Go(inputer, transformer, merger, outputer, command_line_args=False)
 
     def output_birth_test(self):
         """Check that Go raises error with bad outputter"""
@@ -72,7 +71,7 @@ class GoTestCase(unittest.TestCase): #pylint: disable = R0904
         outputer = FakeMap()
 
         with self.assertRaises(AssertionError):
-            Go(inputer, transformer, merger, outputer, command_line_args = False)
+            Go(inputer, transformer, merger, outputer, command_line_args=False)
 
     def command_line_args_test(self):
         """Check that Go handles command line args switch correctly"""
@@ -122,7 +121,7 @@ class GoTestCase(unittest.TestCase): #pylint: disable = R0904
             Go(inputer, transformer, merger, outputer, config, \
                    command_line_args = False)
 
-    def test_type_of_dataflow_not_implemented(self):
+    def test_dataflow_not_implemented(self):
         """Check that Go notifies user of unimplemented dataflow"""
         inputer = InputPyEmptyDocument(1)
         transformer = MapPyDoNothing()
