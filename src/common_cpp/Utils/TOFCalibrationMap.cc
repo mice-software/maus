@@ -47,13 +47,13 @@ bool TOFCalibrationMap::InitializeFromCards(std::string json_configuration) {
                                                  JsonWrapper::stringValue);
 
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
-  if(!pMAUS_ROOT_DIR) {
+  if (!pMAUS_ROOT_DIR) {
     Squeak::mout(Squeak::error)
     << "Could not find the $MAUS_ROOT_DIR environmental variable." << std::endl;
     Squeak::mout(Squeak::error) << "Did you try running: source env.sh ?" << std::endl;
     return false;
   }
-  
+
   std::string xMapT0File = std::string(pMAUS_ROOT_DIR) + t0_file.asString();
   std::string xMapTWFile = std::string(pMAUS_ROOT_DIR) + tw_file.asString();
   std::string xMapTriggerFile = std::string(pMAUS_ROOT_DIR) + trigger_file.asString();
@@ -78,30 +78,30 @@ bool TOFCalibrationMap::Initialize(std::string t0File,
   return status;
 }
 
-int TOFCalibrationMap::MakeTOFChannelKeys()
-{
+int TOFCalibrationMap::MakeTOFChannelKeys() {
  /** Makes one TOFChannelKey for each channel of the TOF detector.
   * The size of _t0, _reff and _twPar is set here.
   * ATTENTION : The detector configuration is HARDCODED !!!!
   * TO BE IMPROVED !!!!
   */
+
   int nStation = 3;
   int nPlanes = 2;
-  int nSlabs[] = {10,7,10};
-  
-  for(int st=0;st<nStation;st++) {
+  int nSlabs[] = {10, 7, 10};
+
+  for (int st = 0; st < nStation; st++) {
     stringstream detector;
     detector << "tof" << st;
-    for(int pl=0;pl<nPlanes;pl++)
-      for(int sl=0;sl<nSlabs[st];sl++)
-        for(int pmt=0;pmt<2;pmt++)
+    for (int pl = 0; pl < nPlanes; pl++)
+      for (int sl = 0; sl < nSlabs[st]; sl++)
+        for (int pmt = 0; pmt < 2; pmt++)
           _Pkey.push_back(TOFChannelKey(st, pl, sl, pmt, detector.str()));
   }
-  
+
   int nChannels = _Pkey.size();
-  _t0.resize( nChannels );
-  _reff.resize( nChannels );
-  _twPar.resize( nChannels );
+  _t0.resize(nChannels);
+  _reff.resize(nChannels);
+  _twPar.resize(nChannels);
 
   return nChannels;
 }
@@ -201,25 +201,25 @@ bool TOFCalibrationMap::LoadTriggerFile(std::string triggerFile) {
 }
 
 int TOFCalibrationMap::FindTOFChannelKey(TOFChannelKey key) {
-  for ( unsigned int i=0; i<_Pkey.size(); ++i )
-    if ( _Pkey.at(i) == key )
+  for (unsigned int i = 0; i < _Pkey.size(); ++i )
+    if (_Pkey.at(i) == key)
       return i;
 
   return NOCALIB;
 }
 
 int TOFCalibrationMap::FindTOFPixelKey(TOFPixelKey key) {
-  for ( unsigned int i=0; i<_Tkey.size(); ++i )
-    if  ( _Tkey.at(i) == key )
+  for (unsigned int i = 0; i < _Tkey.size(); ++i )
+    if  (_Tkey.at(i) == key)
       return i;
 
   return NOCALIB;
 }
 
-double TOFCalibrationMap::T0(TOFChannelKey key ,int &r) {
-  int n = FindTOFChannelKey( key );
+double TOFCalibrationMap::T0(TOFChannelKey key, int &r) {
+  int n = FindTOFChannelKey(key);
 
-  if ( n != NOCALIB) {
+  if (n != NOCALIB) {
     r = _reff[n];
     if ( _t0[n] ) return _t0[n];
   }
@@ -229,18 +229,18 @@ double TOFCalibrationMap::T0(TOFChannelKey key ,int &r) {
 }
 
 double TOFCalibrationMap::TriggerT0(TOFPixelKey key) {
-  int n = FindTOFPixelKey( key );
-  if ( n != NOCALIB)
+  int n = FindTOFPixelKey(key);
+  if (n != NOCALIB)
     return _Trt0[n];
 
   // std::cout << "TOFCalibrationMap -> No Trigger calibration for " << key << std::endl;
   return n;
 }
 
-double TOFCalibrationMap::TW( TOFChannelKey key, int adc ) {
-  int n = FindTOFChannelKey( key );
+double TOFCalibrationMap::TW(TOFChannelKey key, int adc) {
+  int n = FindTOFChannelKey(key);
   // See equation 46 in MICE Note 251 "TOF Detectors Time Calibration".
-  if ( n != NOCALIB) {
+  if (n != NOCALIB) {
     double x = adc + _twPar[n][0];
     double x2 = x*x;
     double p1 = _twPar[n][1];
@@ -271,19 +271,18 @@ double TOFCalibrationMap::dT(TOFChannelKey Pkey, TOFPixelKey TrKey, int adc) {
 
   // If this measurement is in the trigger station we need one additional correction.
   if (Pkey.station() == _triggerStation) {
-    if (Pkey.plane()==0) {
+    if (Pkey.plane() == 0) {
       TOFPixelKey refTr(_triggerStation, Pkey.slab(), reffSlab, Pkey.detector());
       if (TriggerT0(refTr) == NOCALIB)
         return NOCALIB;
-      
+
       dt += TriggerT0(refTr);
       // std::cout << refTr << "  dt = " << TriggerT0(refTr) << std::endl;
-    }
-    else {
+    } else {
       TOFPixelKey refTr(_triggerStation, reffSlab, Pkey.slab(), Pkey.detector());
       if (TriggerT0(refTr) == NOCALIB)
         return NOCALIB;
- 
+
       dt += TriggerT0(refTr);
        // std::cout << refTr << "  dt = " << TriggerT0(refTr) << std::endl;
     }
@@ -293,22 +292,22 @@ double TOFCalibrationMap::dT(TOFChannelKey Pkey, TOFPixelKey TrKey, int adc) {
   return dt*1e-3;
 }
 
-void TOFCalibrationMap::Print()
-{
+void TOFCalibrationMap::Print() {
+
   std::cout << "====================== TofCalibrationMap =========================" << std::endl;
   std::cout << " Name : " << _name << std::endl;
   std::cout << " Trigger in TOF" << _triggerStation << std::endl;
   std::cout << " Number of channels : " << _Pkey.size() << std::endl;
-  std::cout << " Number of calibrated pixels in the trigger station : "; 
+  std::cout << " Number of calibrated pixels in the trigger station : ";
   std::cout << _Tkey.size() << std::endl;
 
-  for (unsigned int i=0; i<_Pkey.size(); i++) {
+  for (unsigned int i = 0; i < _Pkey.size(); i++) {
     std::cout << _Pkey[i] << " T0 :" << _t0[i] << ", " << _reff[i];
     std::cout << "  TW:  "<< _twPar[i][0] << ", " << _twPar[i][1];
     std::cout << ", " << _twPar[i][2] << ", " << _twPar[i][3] << std::endl;
   }
-  for (unsigned int i=0; i<_Tkey.size(); i++)
-   std::cout << _Tkey[i] << "  " << _Trt0[i] << std::endl;
+  for (unsigned int i = 0; i < _Tkey.size(); i++)
+    std::cout << _Tkey[i] << "  " << _Trt0[i] << std::endl;
 
   std::cout<< "===================================================================" << std::endl;
 }

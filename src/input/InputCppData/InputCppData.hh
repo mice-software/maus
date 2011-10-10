@@ -118,10 +118,12 @@ class InputCppData {
 
  private:
 
- /** Process manager object. */
+ /** Process manager object.
+  */
   MDprocessManager _dataProcessManager;
 
- /** File manager object. */
+ /** File manager object.
+  */
   MDfileManager _dataFileManager;
 
  /** The DAQ channel map object.
@@ -129,25 +131,32 @@ class InputCppData {
   */
   DAQChannelMap _map;
 
- /** Processor for TDC particle event data. */
+ /** Processor for TDC particle event data.
+  */
   V1290DataProcessor*  _v1290PartEventProc;
 
- /** Processor for fADC V1724 particle event data. */
+ /** Processor for fADC V1724 particle event data.
+  */
   V1724DataProcessor*  _v1724PartEventProc;
 
- /** Processor for fADC V1731 particle event data. */
+ /** Processor for fADC V1731 particle event data.
+  */
   V1731DataProcessor*  _v1731PartEventProc;
 
- /** Processor for scaler data. */
+ /** Processor for scaler data.
+  */
   V830DataProcessor*  _v830FragmentProc;
 
- /** Processor for VLSB data. */
+ /** Processor for VLSB data.
+  */
   VLSBDataProcessor* _vLSBFragmentProc;
 
- /** Processor for DBB data. */
+ /** Processor for DBB data.
+  */
   DBBDataProcessor* _DBBFragmentProc;
 
- /** Pointer to the start of the current event. */
+ /** Pointer to the start of the current event.
+  */
   unsigned char *_eventPtr;
 
  /** Paths to the data.
@@ -161,13 +170,16 @@ class InputCppData {
   */
   std::string _datafiles;
 
- /** Max number of DAQ events to be processed.*/ 
+ /** Max number of DAQ events to be processed.
+  */ 
   int _maxNumDaqEvents;
 
- /** Counter of the DAQ events.*/
+ /** Counter of the DAQ events.
+  */
   int _daqEventsCount;
 
-  /** Enum of event types */
+ /** Enum of event types
+  */
   enum {
     VmeTdc = 102,
     VmefAdc1724 = 120,
@@ -177,7 +189,7 @@ class InputCppData {
     VLSB_C = 80
   };
 
-  /** Convert the DAQ event type (as coded in DATE) into string.
+ /** Convert the DAQ event type (as coded in DATE) into string.
   * \param[in] pType The type of the event to be converted.
   * \return The type of the event as string.
   */

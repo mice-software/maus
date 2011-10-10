@@ -31,64 +31,70 @@ bool MapCppTOFDigits::birth(std::string argJsonConfigDocument) {
   _stationKeys.push_back("tof1");
   _stationKeys.push_back("tof2");
 
-  if( SetConfiguration(argJsonConfigDocument) )
+  if (SetConfiguration(argJsonConfigDocument))
     return true;  // Sucessful completion
 
   return false;
 }
 
 
-bool MapCppTOFDigits::death()  { return true;}
+bool MapCppTOFDigits::death()  {return true;}
 
-std::string MapCppTOFDigits::process( std::string document ) {
+std::string MapCppTOFDigits::process(std::string document) {
 
   //  JsonCpp setup
   Json::FastWriter writer;
 
   // Check if the JSON document can be parsed, else return error only
-  Json::Value root = JsonWrapper::StringToJson( document );
-  Json::Value xEventType = JsonWrapper::GetProperty( root, "daq_event_type", JsonWrapper::stringValue );
+  Json::Value root = JsonWrapper::StringToJson(document);
+  Json::Value xEventType = JsonWrapper::GetProperty(root,
+                                                    "daq_event_type",
+                                                    JsonWrapper::stringValue);
 
-  if(xEventType=="physics_event" || xEventType=="calibration_event" ) {
-    Json::Value xDaqData = JsonWrapper::GetProperty( root, "daq_data", JsonWrapper::objectValue );  
+  if (xEventType == "physics_event" || xEventType == "calibration_event") {
+    Json::Value xDaqData = JsonWrapper::GetProperty(root, "daq_data", JsonWrapper::objectValue);
     Json::Value xDocTrig, xDocTrigReq;
-    if (xDaqData.isMember("trigger") && 
+    if (xDaqData.isMember("trigger") &&
         xDaqData.isMember("trigger_request")) {
 
       xDocTrigReq = JsonWrapper::GetProperty(xDaqData,
                                              "trigger_request",
                                              JsonWrapper::arrayValue);
-    
+
       xDocTrig = JsonWrapper::GetProperty(xDaqData,
                                           "trigger",
                                           JsonWrapper::arrayValue);
 
-      for(unsigned int n_station = 0; n_station < _stationKeys.size(); n_station++ ) {
+      for (unsigned int n_station = 0; n_station < _stationKeys.size(); n_station++) {
         if (xDaqData.isMember(_stationKeys[n_station])) {
           Json::Value xDocDetectorData = JsonWrapper::GetProperty(xDaqData,
                                                                   _stationKeys[n_station],
                                                                   JsonWrapper::arrayValue);
 
-          Json::Value xDocDigits = makeDigits( xDocDetectorData, xDocTrigReq, xDocTrig );
+          Json::Value xDocDigits = makeDigits(xDocDetectorData, xDocTrigReq, xDocTrig);
           root["digits"][_stationKeys[n_station]] = xDocDigits;
         }
       }
     }
   }
-  
-  //std::cout<<root["digits"]<<std::endl;
+
+  // std::cout<<root["digits"]<<std::endl;
   return writer.write(root);
 }
 
 bool MapCppTOFDigits::SetConfiguration(std::string json_configuration) {
   //  JsonCpp setup
-  Json::Value configJSON = JsonWrapper::StringToJson(json_configuration);   //  this will contain the configuration
+  Json::Value configJSON = JsonWrapper::StringToJson(json_configuration);
+  //  this will contain the configuration
 
-  Json::Value map_file_name = JsonWrapper::GetProperty( configJSON, "TOF_cabling_file", JsonWrapper::stringValue);
+  Json::Value map_file_name = JsonWrapper::GetProperty(configJSON,
+                                                       "TOF_cabling_file",
+                                                       JsonWrapper::stringValue);
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
 
-  if(!pMAUS_ROOT_DIR) {
-    Squeak::mout(Squeak::error) << "Could not find the $MAUS_ROOT_DIR environmental variable." << std::endl;
+  if (!pMAUS_ROOT_DIR) {
+    Squeak::mout(Squeak::error)
+    << "Could not find the $MAUS_ROOT_DIR environmental variable." << std::endl;
     Squeak::mout(Squeak::error) << "Did you try running: source env.sh ?" << std::endl;
     return false;
   }
@@ -100,32 +106,40 @@ bool MapCppTOFDigits::SetConfiguration(std::string json_configuration) {
   return true;
 }
 
-Json::Value MapCppTOFDigits::makeDigits( Json::Value xDocDetData, 
-                                         Json::Value xDocTrigReq, 
-                                         Json::Value xDocTrig) {
+Json::Value MapCppTOFDigits::makeDigits(Json::Value xDocDetData,
+                                        Json::Value xDocTrigReq,
+                                        Json::Value xDocTrig) {
   Json::Value xDocDigits;
   // Get number of Particle trigger.
   int n_part_event_triggers = xDocTrig.size();
   xDocDigits.resize(n_part_event_triggers);
 
-  if( xDocDetData.isArray() ) {
-    // Get number of digits in the detector record. It can be different from 
-    // the number of Particle triggers because of the Zero Suppression. 
+  if ( xDocDetData.isArray() ) {
+    // Get number of digits in the detector record. It can be different from
+    // the number of Particle triggers because of the Zero Suppression.
     int n_part_events = xDocDetData.size();
     for ( int PartEvent = 0; PartEvent < n_part_events; PartEvent++ ) {
       // Get the data, trigger and trigger request for this particle event.
-      Json::Value xDocPartEvent_data = JsonWrapper::GetItem( xDocDetData, PartEvent, JsonWrapper::anyValue );
-      Json::Value xDocPartEvent_trigger = JsonWrapper::GetItem( xDocTrig, PartEvent, JsonWrapper::anyValue );
-      Json::Value xDocPartEvent_triggerReq = JsonWrapper::GetItem( xDocTrigReq, PartEvent, JsonWrapper::anyValue );
+      Json::Value xDocPartEvent_data = JsonWrapper::GetItem(xDocDetData,
+                                                            PartEvent,
+                                                            JsonWrapper::anyValue);
+
+      Json::Value xDocPartEvent_trigger = JsonWrapper::GetItem(xDocTrig,
+                                                               PartEvent,
+                                                               JsonWrapper::anyValue );
+
+      Json::Value xDocPartEvent_triggerReq = JsonWrapper::GetItem(xDocTrigReq,
+                                                                  PartEvent,
+                                                                  JsonWrapper::anyValue);
 
       if (xDocPartEvent_data.isMember("V1290") && xDocPartEvent_data.isMember("V1724")) {
-        Json::Value xDocTdc = JsonWrapper::GetProperty(xDocPartEvent_data, 
-                                                       "V1290", 
-                                                       JsonWrapper::arrayValue );
+        Json::Value xDocTdc = JsonWrapper::GetProperty(xDocPartEvent_data,
+                                                       "V1290",
+                                                       JsonWrapper::arrayValue);
 
         Json::Value xDocfAdc = JsonWrapper::GetProperty(xDocPartEvent_data,
                                                         "V1724",
-                                                        JsonWrapper::arrayValue );
+                                                        JsonWrapper::arrayValue);
 
         int n_tdc_hits = xDocTdc.size();
         Json::Value xDocPmtHits;
@@ -134,7 +148,7 @@ Json::Value MapCppTOFDigits::makeDigits( Json::Value xDocDetData,
           // info from any other equipment.
           Json::Value xDocTheDigit = getTdc(xDocTdc[TdcHitCount]);
 
-          // Get flash ADC info and appent it to the digit. The info from the Tdc is 
+          // Get flash ADC info and appent it to the digit. The info from the Tdc is
           // passed as well in order to find the ascosiated adc values.
           getAdc(xDocfAdc, xDocTdc[TdcHitCount], xDocTheDigit);
 
@@ -153,21 +167,21 @@ Json::Value MapCppTOFDigits::makeDigits( Json::Value xDocDetData,
   return xDocDigits;
 }
 
-Json::Value MapCppTOFDigits::getTdc(Json::Value xDocTdcHit){
+Json::Value MapCppTOFDigits::getTdc(Json::Value xDocTdcHit) {
   std::stringstream xConv;
   Json::Value xDocInfo;
 
   DAQChannelKey xTdcDaqKey;
-  
-  std::string xDaqKey_tdc_str = JsonWrapper::GetProperty( xDocTdcHit,
-                                                          "channel_key",
-                                                          JsonWrapper::stringValue).asString();
+
+  std::string xDaqKey_tdc_str = JsonWrapper::GetProperty(xDocTdcHit,
+                                                         "channel_key",
+                                                         JsonWrapper::stringValue).asString();
 
   xConv << xDaqKey_tdc_str;
   xConv >> xTdcDaqKey;
 
   TOFChannelKey* xTofTdcKey = _map.find(&xTdcDaqKey);
-  
+
   if (xTofTdcKey) {
     xDocInfo["tof_key"]           = xTofTdcKey->str();
     xDocInfo["station"]           = xTofTdcKey->station();
@@ -182,32 +196,34 @@ Json::Value MapCppTOFDigits::getTdc(Json::Value xDocTdcHit){
     xDocInfo["trigger_time_tag"]  = xDocTdcHit["trigger_time_tag"];
     xDocInfo["time_stamp"]        = xDocTdcHit["time_stamp"];
   }
-  //std::cout << xDocInfo << std::endl;    
+  // std::cout << xDocInfo << std::endl;
   return xDocInfo;
 }
 
-bool MapCppTOFDigits::getAdc(Json::Value xDocfAdc, Json::Value xDocTdcHit, Json::Value &xDocDigit) {
+bool MapCppTOFDigits::getAdc(Json::Value xDocfAdc,
+                             Json::Value xDocTdcHit,
+                             Json::Value &xDocDigit) {
 
   int n_Adc_hits = xDocfAdc.size();
-  std::string xTofKey_str = JsonWrapper::GetProperty( xDocDigit, 
-                                                          "tof_key", 
-                                                          JsonWrapper::stringValue).asString();
+  std::string xTofKey_str = JsonWrapper::GetProperty(xDocDigit,
+                                                     "tof_key",
+                                                     JsonWrapper::stringValue).asString();
 
   TOFChannelKey xTdcTofKey(xTofKey_str);
 
-  for ( int AdcHitCount = 0; AdcHitCount < n_Adc_hits; AdcHitCount++ ) {
-    std::string xDaqKey_adc_str = JsonWrapper::GetProperty( xDocfAdc[AdcHitCount],
-                                                       "channel_key",
-                                                       JsonWrapper::stringValue).asString();
+  for (int AdcHitCount = 0; AdcHitCount < n_Adc_hits; AdcHitCount++) {
+    std::string xDaqKey_adc_str = JsonWrapper::GetProperty(xDocfAdc[AdcHitCount],
+                                                           "channel_key",
+                                                           JsonWrapper::stringValue).asString();
 
     DAQChannelKey xAdcDaqKey(xDaqKey_adc_str);
     TOFChannelKey* xAdcTofKey = _map.find(&xAdcDaqKey);
-    
-    if ( xTdcTofKey == *xAdcTofKey ){
-      xDocDigit["charge_mm"] = JsonWrapper::GetProperty( xDocfAdc[AdcHitCount],
+
+    if (xTdcTofKey == *xAdcTofKey) {
+      xDocDigit["charge_mm"] = JsonWrapper::GetProperty(xDocfAdc[AdcHitCount],
                                                         "charge_mm",
                                                         JsonWrapper::intValue );
-      xDocDigit["charge_pm"] = JsonWrapper::GetProperty( xDocfAdc[AdcHitCount],
+      xDocDigit["charge_pm"] = JsonWrapper::GetProperty(xDocfAdc[AdcHitCount],
                                                         "charge_pm",
                                                         JsonWrapper::intValue );
       return true;
@@ -217,54 +233,58 @@ bool MapCppTOFDigits::getAdc(Json::Value xDocfAdc, Json::Value xDocTdcHit, Json:
   return false;
 }
 
-bool MapCppTOFDigits::getTrig( Json::Value xDocTrig, Json::Value xDocTdcHit, Json::Value &xDocDigit ) {
-  Json::Value xDocT = JsonWrapper::GetProperty( xDocTrig, "V1290", JsonWrapper::arrayValue);
+bool MapCppTOFDigits::getTrig(Json::Value xDocTrig,
+                              Json::Value xDocTdcHit,
+                              Json::Value &xDocDigit ) {
+  Json::Value xDocT = JsonWrapper::GetProperty(xDocTrig, "V1290", JsonWrapper::arrayValue);
   int HitGeo = JsonWrapper::GetProperty(xDocTdcHit , "geo", JsonWrapper::intValue).asInt();
   int n_count = xDocT.size();
-  //loop over all of the triggers for this particle event.
-  for ( int TrigCount = 0; TrigCount < n_count; TrigCount++ ){
-    Json::Value Trig = JsonWrapper::GetItem( xDocT, TrigCount, JsonWrapper::objectValue);
+  // Loop over all of the triggers for this particle event.
+  for (int TrigCount = 0; TrigCount < n_count; TrigCount++) {
+    Json::Value Trig = JsonWrapper::GetItem(xDocT, TrigCount, JsonWrapper::objectValue);
 
     int TrGeo = JsonWrapper::GetProperty(Trig, "geo", JsonWrapper::intValue).asInt();
-    // If the Geo number of the trigger request matches the Geo number for the TDC then add the 
+    // If the Geo number of the trigger request matches the Geo number for the TDC then add the
     // trigger information to the digit.
-    if ( TrGeo == HitGeo ){
-      xDocDigit["trigger_leading_time"]  = JsonWrapper::GetProperty( Trig,
-                                                                     "leading_time",
-                                                                     JsonWrapper::intValue);
-      xDocDigit["trigger_trailing_time"] = JsonWrapper::GetProperty( Trig,
-                                                                     "trailing_time",
-                                                                     JsonWrapper::intValue);
+    if ( TrGeo == HitGeo ) {
+      xDocDigit["trigger_leading_time"]  = JsonWrapper::GetProperty(Trig,
+                                                                    "leading_time",
+                                                                    JsonWrapper::intValue);
+      xDocDigit["trigger_trailing_time"] = JsonWrapper::GetProperty(Trig,
+                                                                    "trailing_time",
+                                                                    JsonWrapper::intValue);
 
-      return true;  // will break the loop  and return truewhen it finds the first trigger that matches.
+      return true;  // will break the loop and return true it finds the first trigger that matches.
     }
   }
 
-  return false;	
+  return false;
 }
 
-bool MapCppTOFDigits::getTrigReq( Json::Value xDocTrigReq, Json::Value xDocTdcHit, Json::Value &xDocDigit ) {
-  Json::Value xDocTR = JsonWrapper::GetProperty( xDocTrigReq, "V1290", JsonWrapper::arrayValue);
-  int HitGeo = JsonWrapper::GetProperty(xDocTdcHit , "geo", JsonWrapper::intValue).asInt();
+bool MapCppTOFDigits::getTrigReq(Json::Value xDocTrigReq,
+                                 Json::Value xDocTdcHit,
+                                 Json::Value &xDocDigit ) {
+  Json::Value xDocTR = JsonWrapper::GetProperty(xDocTrigReq, "V1290", JsonWrapper::arrayValue);
+  int HitGeo = JsonWrapper::GetProperty(xDocTdcHit, "geo", JsonWrapper::intValue).asInt();
   int n_req_count = xDocTR.size();
 
-  //loop over all of the trigger requests for this particle event.
-  for ( int TrigReqCount = 0; TrigReqCount < n_req_count; TrigReqCount++ ){
-    Json::Value TrigReq = JsonWrapper::GetItem( xDocTR, TrigReqCount, JsonWrapper::objectValue);
+  // Loop over all of the trigger requests for this particle event.
+  for (int TrigReqCount = 0; TrigReqCount < n_req_count; TrigReqCount++) {
+    Json::Value TrigReq = JsonWrapper::GetItem(xDocTR, TrigReqCount, JsonWrapper::objectValue);
 
     int TrReqGeo = JsonWrapper::GetProperty(TrigReq, "geo", JsonWrapper::intValue).asInt();
-    // If the Geo number of the trigger request matches the Geo number for the TDC then add the 
+    // If the Geo number of the trigger request matches the Geo number for the TDC then add the
     // trigger request information to the digit.
-    if ( TrReqGeo == HitGeo ){
-      xDocDigit["trigger_request_leading_time"]  = JsonWrapper::GetProperty( TrigReq,
-                                                                             "leading_time",
-                                                                             JsonWrapper::intValue);
+    if (TrReqGeo == HitGeo) {
+      xDocDigit["trigger_request_leading_time"]  = JsonWrapper::GetProperty(TrigReq,
+                                                                            "leading_time",
+                                                                            JsonWrapper::intValue);
 
-      xDocDigit["trigger_request_trailing_time"] = JsonWrapper::GetProperty( TrigReq,
-                                                                             "trailing_time",
-                                                                             JsonWrapper::intValue);
-      return true;  // will break the loop when it finds the first request that matches. there may be
-      // multiple requests per board but for now we only get the first one.
+      xDocDigit["trigger_request_trailing_time"] = JsonWrapper::GetProperty(TrigReq,
+                                                                            "trailing_time",
+                                                                            JsonWrapper::intValue);
+      return true;  // will break the loop when it finds the first request that matches.
+      // There may be multiple requests per board but for now we only get the first one.
     }
   }
 

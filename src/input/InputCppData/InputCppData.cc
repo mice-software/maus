@@ -167,11 +167,11 @@ bool InputCppData::birth(std::string jsonDataCards) {
 
 bool InputCppData::readNextEvent() {
   // Check the max number of DAQ events.
-  // If it is negative, run until the end of the loaded DATE files. 
+  // If it is negative, run until the end of the loaded DATE files.
   if (_maxNumDaqEvents > -1)
-    if(_daqEventsCount >= _maxNumDaqEvents)
-      return false;  
-  
+    if (_daqEventsCount >= _maxNumDaqEvents)
+      return false;
+
   // Use the MDfileManager object to get the next event.
   _eventPtr = _dataFileManager.GetNextEvent();
   if (!_eventPtr)
@@ -229,7 +229,7 @@ std::string InputCppData::getCurEvent() {
   xDocRoot["daq_event_type"] = event_type_to_str(event_type);
   // cout<<xDocRoot<<endl;
 
-  _daqEventsCount ++;
+  _daqEventsCount++;
   return xJSONWr.write(xDocRoot);
 }
 

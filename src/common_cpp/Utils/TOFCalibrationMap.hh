@@ -93,7 +93,7 @@ class TOFPixelKey {
   * the cabling file the vertical slabs are always in plane 1.
   */
   int _slabY;
-  
+
   /// Name of the detector.
   string _detector;
 };
@@ -137,14 +137,14 @@ class TOFCalibrationMap {
   * \returns the value of the T0 correction for this channel and sets the number of the 
   * refference pixel. If no calibration for this channel the function returns NOCALIB (-99999).
   */
-  double T0( TOFChannelKey key ,int &r);
+  double T0(TOFChannelKey key, int &r);
 
  /** Return the Trigger delay correction for the pixel coded by the key.
   * \param[in] key the pixel of the hit that gives the trigger.
   * \returns the value of the trigger delay correction. If no calibration for this pixel the 
   * function returns NOCALIB (-99999).
   */
-  double TriggerT0( TOFPixelKey key);
+  double TriggerT0(TOFPixelKey key);
 
  /** Calculate the TimeWalk correction for the channel coded by the key and for given adc value.
   * \param[in] key the channel of the measurement.
@@ -152,7 +152,7 @@ class TOFCalibrationMap {
   * \returns the value of the time-walk correction. If no calibration for this channel the function
   * returns NOCALIB (-99999).
   */
-  double TW( TOFChannelKey key, int adc );
+  double TW(TOFChannelKey key, int adc );
 
  /** Calculate the combined correction for the channel coded by Pkey, trigger 
   * pixel coded by the Tkey and for given adc value.
@@ -197,7 +197,7 @@ class TOFCalibrationMap {
 
  /** Load Trigger delay constants from text file.
   */
-  bool LoadTWFile(std::string twFile); 
+  bool LoadTWFile(std::string twFile);
 
  /** Load TimeWalk constants from text file.
   */
@@ -205,11 +205,11 @@ class TOFCalibrationMap {
 
  /** Find the position of the PMT key in the data member _Pkey.
   */
-  int FindTOFChannelKey( TOFChannelKey key );
+  int FindTOFChannelKey(TOFChannelKey key);
 
  /** Find the position of the trigger key in the data member _Tkey.
   */
-  int FindTOFPixelKey( TOFPixelKey key );
+  int FindTOFPixelKey(TOFPixelKey key);
 
  /** This vector holds one TOFChannelKey for each channel of the detector.
   */

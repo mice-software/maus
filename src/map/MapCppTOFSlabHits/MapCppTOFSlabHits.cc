@@ -217,32 +217,34 @@ Json::Value MapCppTOFSlabHits::fillSlabHit(Json::Value xDocDigit0, Json::Value x
   int xTimeDigit0 = JsonWrapper::GetProperty(xDocDigit0,
                                              "leading_time",
                                              JsonWrapper::intValue).asInt();
-
-  xDocPMT0["leading_time"] = xTimeDigit0;
-  xDocPMT0["charge"] = xDocDigit1["charge_mm"];
-
+  int xChargeDigit0 = JsonWrapper::GetProperty(xDocDigit0,
+                                               "charge_mm",
+                                               JsonWrapper::intValue).asInt();
   int xTriggerReqDigit0 = JsonWrapper::GetProperty(xDocDigit0,
                                                    "trigger_request_leading_time",
                                                    JsonWrapper::intValue).asInt();
 
   xDocPMT0["trigger_request_leading_time"] = xTriggerReqDigit0;
+  xDocPMT0["leading_time"] = xTimeDigit0;
+  xDocPMT0["charge"] = xChargeDigit0;
 
   int xTimeDigit1 = JsonWrapper::GetProperty(xDocDigit1,
                                              "leading_time",
                                              JsonWrapper::intValue).asInt();
-
-  xDocPMT1["leading_time"] = xTimeDigit1;
-  xDocPMT1["charge"] = xDocDigit1["charge_mm"];
-
+  int xChargeDigit1 = JsonWrapper::GetProperty(xDocDigit1,
+                                               "charge_mm",
+                                               JsonWrapper::intValue).asInt();
   int xTriggerReqDigit1 = JsonWrapper::GetProperty(xDocDigit1,
                                                    "trigger_request_leading_time",
                                                    JsonWrapper::intValue).asInt();
 
   xDocPMT1["trigger_request_leading_time"] = xTriggerReqDigit1;
+  xDocPMT1["leading_time"] = xTimeDigit1;
+  xDocPMT1["charge"] = xChargeDigit1;
 
   // Calculate the measured value of the time in nanoseconds.
-  double time_digit0 = 25e-3*(double(xTimeDigit0 - xTriggerReqDigit0));
-  double time_digit1 = 25e-3*(double(xTimeDigit1 - xTriggerReqDigit1));
+  double time_digit0 = 25e-3*(static_cast<double>(xTimeDigit0 - xTriggerReqDigit0));
+  double time_digit1 = 25e-3*(static_cast<double>(xTimeDigit1 - xTriggerReqDigit1));
 
   xDocPMT0["raw_time"] = time_digit0;
   xDocPMT1["raw_time"] = time_digit1;
@@ -250,6 +252,8 @@ Json::Value MapCppTOFSlabHits::fillSlabHit(Json::Value xDocDigit0, Json::Value x
   xDocSlabHit["pmt1"] = xDocPMT1;
   double xRawTime = (time_digit0 + time_digit1)/2.;
   xDocSlabHit["raw_time"] = xRawTime;
+  xDocSlabHit["charge"] = xChargeDigit0 + xChargeDigit1;
+  xDocSlabHit["charge_product"] = xChargeDigit0 * xChargeDigit1 / (xChargeDigit0 + xChargeDigit1);
 
   return xDocSlabHit;
 }

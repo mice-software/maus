@@ -65,10 +65,10 @@ class MapCppTOFSpacePoints {
   std::vector<int> xPlane0Hits;
   std::vector<int> xPlane1Hits;
 
-  double _makeSpacePiontCut; //nanoseconds
-  double _findTriggerPixelCut; //nanoseconds
+  double _makeSpacePiontCut; // nanoseconds
+  double _findTriggerPixelCut; // nanoseconds
   std::string _triggerStation;
-  
+
   /// Vector to hold the names of all detectors to be processed.
   std::vector<std::string> _stationKeys;
   std::map<int, std::string> _triggerhit_pixels;
@@ -84,7 +84,7 @@ class MapCppTOFSpacePoints {
   std::string findTriggerPixel(Json::Value xDocPartEvent);
   bool calibratePmtHit(TOFPixelKey xPixelKey, Json::Value &xPmtHit, double &time);
   bool calibrateSlabHit(TOFPixelKey xPixelKey, Json::Value &xSlabHit, double &time);
-  
+
   /** @brief makes space points
    *
    *  @param xDocDetectorData Json document containing slab hits from 

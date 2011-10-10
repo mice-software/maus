@@ -120,7 +120,11 @@ Enable_CKOV = True
 DAQ_cabling_file = "/files/cabling/DAQChannelMap.txt"
 
 # this is used by the reconstuction of the TOF detectors
+TOF_trigger_station = "tof1"
+#TOF_trigger_station = "tof1"
 TOF_cabling_file = "/files/cabling/TOFChannelMap.txt"
 TOF_TW_calibration_file = "/files/calibration/tofcalibTW.txt"
 TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF1.txt"
+#TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF0.txt"
 TOF_Trigger_calibration_file = "/files/calibration/tofcalibTrigger_trTOF1.txt"
+#TOF_Trigger_calibration_file = "/files/calibration/tofcalibTrigger_trTOF0.txt"
