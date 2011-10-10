@@ -89,24 +89,36 @@ void test_processes(CLHEP::Hep3Vector& p_mu_1, CLHEP::Hep3Vector& p_mu_2, CLHEP:
   mgm->GetTracking()->SetWillKeepTracks(keepTracks);
 }
 
-TEST_F( MAUSPhysicsListTest, BeginOfReferenceParticleActionTest) {
+TEST_F( MAUSPhysicsListTest, BeginOfReferenceParticleActionNoDETest) {
   double PI_MASS2 = 139.570*139.570; // charged pion mass 2
   MAUS::MAUSPhysicsList* list = 
                             MAUSGeant4Manager::GetInstance()->GetPhysicsList();
   Json::Value& dc = *MICERun::getInstance()->jsonConfiguration;
-  dc["reference_energy_loss_model"] = "none";
   CLHEP::Hep3Vector p_mu_1, p_mu_2, p_pi;
+
+  dc["reference_energy_loss_model"] = "none";
   list->Setup();
   list->BeginOfReferenceParticleAction();
   test_processes(p_mu_1, p_mu_2, p_pi);
-  EXPECT_LT(fabs(p_pi.mag2() + PI_MASS2) - 300.*300., 1e-1) << p_pi;
-  EXPECT_LT(fabs(p_pi[0]), 1.e-3) << p_pi;
+  EXPECT_LT(fabs(p_pi.mag2() + PI_MASS2) - 300.*300., 1e-1)
+             << "Should be no de " << p_pi;
+  EXPECT_LT(fabs(p_pi[0]), 1.e-3) << "Should be no pt " << p_pi;
+
+}
+
+TEST_F( MAUSPhysicsListTest, BeginOfReferenceParticleActionDETest) {
+  double PI_MASS2 = 139.570*139.570; // charged pion mass 2
+  MAUS::MAUSPhysicsList* list = 
+                            MAUSGeant4Manager::GetInstance()->GetPhysicsList();
+  Json::Value& dc = *MICERun::getInstance()->jsonConfiguration;
+  CLHEP::Hep3Vector p_mu_1, p_mu_2, p_pi;
 
   dc["reference_energy_loss_model"] = "ionisation";
   list->Setup();
   list->BeginOfReferenceParticleAction();
   test_processes(p_mu_1, p_mu_2, p_pi);
-  EXPECT_GT(fabs(p_pi.mag2() + PI_MASS2 - 300.*300.), 1.e-1) << p_pi;
+  EXPECT_GT(fabs(p_pi.mag2() + PI_MASS2 - 300.*300.), 1.e-1)
+              << "Should have change in p - pin: " << sqrt(300.*300.-PI_MASS2) << " pout: " << p_pi;
   EXPECT_LT(fabs(p_mu_1.mag2() - p_mu_2.mag2()), 1.e-1) << p_mu_1 << p_mu_2;
   EXPECT_LT(fabs(p_pi[0]), 1.e-3) << p_pi;
 }
@@ -119,9 +131,10 @@ TEST_F( MAUSPhysicsListTest, BeginOfParticleAction_ELossTest) {
   dc["hadronic_model"] = "none";
   dc["scattering_model"] = "none";
   dc["energy_loss_model"] = "none";
+  dc["decay"] = false;
   CLHEP::Hep3Vector p_mu_1, p_mu_2, p_pi;
   list->Setup();
-  list->BeginOfParticleAction();
+  list->BeginOfRunAction();
   test_processes(p_mu_1, p_mu_2, p_pi);
   EXPECT_LT(fabs(p_pi.mag2() + PI_MASS2) - 300.*300., 1e-1) << p_pi;
   EXPECT_LT(fabs(p_pi[0]), 1.e-3) << p_pi;
@@ -132,7 +145,7 @@ TEST_F( MAUSPhysicsListTest, BeginOfParticleAction_ELossTest) {
   test_processes(p_mu_1, p_mu_2, p_pi);
   EXPECT_GT(fabs(p_pi.mag2() + PI_MASS2 - 300.*300.), 1.e-1) << p_pi;
   EXPECT_LT(fabs(p_mu_1.mag2() - p_mu_2.mag2()), 1.e-3) << p_mu_1 << p_mu_2;
-  EXPECT_LT(fabs(p_pi[0]), 1.e-3) << p_pi;
+  EXPECT_LT(fabs(p_pi[0]), 1.e-3) << p_pi; // no transverse
 
   dc["energy_loss_model"] = "estrag";
   list->Setup();

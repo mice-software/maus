@@ -77,7 +77,7 @@ MAUSPhysicsList* MAUSPhysicsList::GetMAUSPhysicsList() {
 }
 
 void MAUSPhysicsList::BeginOfReferenceParticleAction() {
-  std::cerr //Squeak::mout(Squeak::debug)
+  Squeak::mout(Squeak::debug)
         << "MAUSPhysicsList::BeginOfReferenceParticleAction() with de model "
         << _refDEModel << " script " << _refScript << std::endl;
   SetStochastics("none", _refDEModel, "none", "false");
@@ -154,14 +154,12 @@ void MAUSPhysicsList::SetStochastics(std::string scatteringModel,
 }
 
 void MAUSPhysicsList::SetDecay(bool decay) {
-  G4UImanager* UI                = G4UImanager::GetUIpointer();
-  if(!decay) UI->ApplyCommand("/process/inactivate Decay");
-  else       UI->ApplyCommand("/process/activate   Decay");
+  if(!decay) UIApplyCommand("/process/inactivate Decay");
+  else       UIApplyCommand("/process/activate   Decay");
 }
 
 
 void MAUSPhysicsList::SetEnergyLoss(eloss eLossModel) {
-  G4UImanager* UI        = G4UImanager::GetUIpointer();
   double       cutDouble = _productionThreshold;
   std::stringstream cutStream;
   std::string  elossActive = "activate";
@@ -192,13 +190,12 @@ void MAUSPhysicsList::SetEnergyLoss(eloss eLossModel) {
 
   for(size_t i=0; i<uiCommand.size(); i++) {
     Squeak::mout(Squeak::debug) << "Applying " << uiCommand[i] << std::endl;
-    UI->ApplyCommand(uiCommand[i]);
+    UIApplyCommand(uiCommand[i]);
   }
 }
 
 
 void MAUSPhysicsList::SetScattering(scat scatteringModel) {
-  G4UImanager* UI          = G4UImanager::GetUIpointer();
   std::string activation;
   switch(scatteringModel) {
     case mcs:
@@ -212,7 +209,7 @@ void MAUSPhysicsList::SetScattering(scat scatteringModel) {
   for(int i=0; i<_nScatNames; i++) {
     Squeak::mout(Squeak::debug) << "Applying " << activation+_scatNames[i]
                                 << std::endl;
-    UI->ApplyCommand(activation+_scatNames[i]);
+    UIApplyCommand(activation+_scatNames[i]);
   }
 }
 
@@ -227,13 +224,12 @@ void MAUSPhysicsList::SetHadronic(hadronic hadronicModel) {
       break;
   }
 
-  G4UImanager*       UI    = G4UImanager::GetUIpointer();
   G4ProcessVector*   pvec  = G4ProcessTable::GetProcessTable()->
                                                        FindProcesses(fHadronic);
   for(int i=0; i<pvec->size(); i++) {
     std::string pname = (*pvec)[i]->GetProcessName();
     Squeak::mout(Squeak::debug) << "Applying " << activation+pname << std::endl;
-    UI->ApplyCommand( activation+pname );
+    UIApplyCommand( activation+pname );
   }
 }
 
@@ -253,8 +249,8 @@ void MAUSPhysicsList::SetSpecialProcesses() {
 }
 
 void MAUSPhysicsList::RunUserUICommand(std::string filename) {
-  Squeak::mout(Squeak::debug) << "Executing user macro " << filename
-                              << std::endl;
+  Squeak::mout(Squeak::debug) 
+        << "Executing user macro " << filename << std::endl;
   G4UImanager::GetUIpointer()->ApplyCommand("/control/execute "+filename);
 }
 
@@ -268,8 +264,7 @@ void MAUSPhysicsList::SetHalfLife(double pionHalfLife,  double muonHalfLife) {
 void MAUSPhysicsList::SetParticleHalfLife(std::string particleName,
                                           double halfLife) {
   if(halfLife <= 0.) return;
-  G4UImanager* UI = G4UImanager::GetUIpointer();
-  UI->ApplyCommand("particle/select "+particleName);
+  UIApplyCommand("particle/select "+particleName);
 }
 
 void MAUSPhysicsList::Setup() {
@@ -295,6 +290,12 @@ void MAUSPhysicsList::Setup() {
     _productionThreshold = JsonWrapper::GetProperty(dc, "production_threshold",
                                           JsonWrapper::realValue).asDouble();
 
+}
+
+void MAUSPhysicsList::UIApplyCommand(std::string command) {
+    Squeak::mout(Squeak::debug) 
+      << "Apply G4UI command: " << command << std::endl;
+    G4UImanager::GetUIpointer()->ApplyCommand(command);
 }
 
 }

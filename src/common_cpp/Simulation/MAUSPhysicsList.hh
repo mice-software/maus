@@ -141,6 +141,10 @@ class MAUSPhysicsList: public G4VModularPhysicsList
      */
     void SetHalfLife     (double pionHalfLife,  double muonHalfLife);
 
+    /** Run a UI command, print to debug
+     */
+    void UIApplyCommand(std::string command);
+
     /** Run UI macro with name filename
      *
      *  Can override these settings with a UI macro
