@@ -105,7 +105,7 @@ def __parse_json_schema_recursive(my_schema, my_ancestors_, \
                          (value, my_ancestors_+[key], file_handle, depth+1)
         print >> file_handle, ' '*depth, LIST_END
 
-def head_matter(file_handle, schema_name):
+def head_matter(file_handle, schema_name): #pylint: disable = W0613
     """
     Make a header based on the schema name
     """

@@ -3,57 +3,86 @@ Go controls the running of executables - map reduce functionality etc.
 """
 
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
-# 
+#
 #  MAUS is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-# 
+#
 #  MAUS is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-# 
+#
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
-
-import gzip
 import os
-import tempfile
 import json
 import sys
-import functools
-
-# For profiling
-import cProfile
-import pstats 
 
 # MAUS
 from Configuration import Configuration
 
-class Go:
+def get_possible_dataflows():
+    """
+    Enumerate list of possible types of dataflow
+    """
+    possible_types_of_dataflow = {}
+
+    description  = "Run in a pipeline programming fashion with only a\n"
+    description += "single thread.  See Wikipedia on 'pipeline\n"
+    description += "programming' for more information."
+    possible_types_of_dataflow['pipeline_single_thread'] = description
+
+    description  = "Run MICE how it is run in the control room.  This\n"
+    description += "requires CouchDB and celery to be installed. See\n"
+    description += "the wiki links (where?) on how to do this"
+    possible_types_of_dataflow['control_room_style'] = description
+
+    description  = "Distribute as much work as possible on the local\n"
+    description += "machine using Python's multiprocessing library."
+    possible_types_of_dataflow['many_local_threads'] = description
+
+    return possible_types_of_dataflow
+
+def buffer_input(the_emitter, number_events):
+    """
+    Buffer the input stream by only reading the first
+    1024 spills into memory.  Returns an array of spills.
+    """
+    my_buffer = []
+
+    for i in range(number_events):  # pylint: disable=W0612
+        try:
+            value = next(the_emitter)
+            my_buffer.append(value.encode('ascii'))
+        except StopIteration:
+            return my_buffer
+
+    return my_buffer
+
+class Go:  #  pylint: disable=R0921
     """
     @class Go
-    The Go class will handle the map-reduce and
-    gets passed an:
-      - input
-      - map
-      - reduce
-      - output
-    and has many different ways to do the map-
-    reduce.  For example:
-      - native single-threaded python
+    The Go class will driving other MAUS components.  The types of components
+    are:
+      - input: where does the data come from?
+      - transformer: transform a spill to a new state (stateless)
+      - reduce: process spill based on previous spills (has state)
+      - output: where the data goes
+    and there are different dataflow models:
+      - pipeline_single_thread
     """
 
-    def __init__(self, arg_input, arg_mapper, arg_reducer,  # pylint: disable=R0913,C0301
-                 arg_output, arg_config_file = None, command_line_args = True):
+    def __init__(self, arg_input, arg_transformer, arg_merger,  # pylint: disable=R0913,C0301
+                 arg_outputer, arg_config_file=None, command_line_args = True):
         """
-        Initialise the configuration dictionary, input, mapper, reducer and
-        output
-        @param arg_input Inputter that defines inputs to the map reduce
-        @param arg_mapper Mapper that defines the map that is acted on the input
-        @param arg_reducer Reducer that defines reduce that is acted on map
-                           output
+        Initialise the configuration dictionary, input, mapper, merger and
+        outputer
+        @param arg_input
+        @param arg_mapper
+        @param arg_merger
+        @param arg_outputer
         @param arg_config_file Configuration file
         @param command_line_args If set to true, use command line arguments to
                handle configuration and throw a SystemExit exception if
@@ -61,141 +90,122 @@ class Go:
                nosetests, have their own command line arguments that are
                incompatible with MAUS's)
         """
+        #  Determing what the 'env.sh' has set the user's environment to.  Bail
+        #  otherwise with an exception.
         maus_root_dir = os.environ.get('MAUS_ROOT_DIR')
-        current_dir = os.getcwd()
+        if maus_root_dir == "":
+            raise Exception("MAUS_ROOT_DIR environmental variable not set")
 
-        if maus_root_dir not in current_dir:
+        #  Warn the user that they could be using the wrong version of MAUS.
+        #  os.getcwd() is the current directory from which the script is being
+        #  executed.  This warns the user to many common errors.
+        if maus_root_dir not in os.getcwd():
             print("\nWARNING: YOU ARE RUNNING MAUS OUTSIDE ITS MAUS_ROOT_DIR")
             print("WARNING:\tMAUS_ROOT_DIR = %s" % (maus_root_dir))
-            print("WARNING:\tCURRENT DIRECTORY = %s\n" % (current_dir))
-            
-        self.input = arg_input
-        self.mapper = arg_mapper
-        self.reducer = arg_reducer
-        self.output = arg_output
+            print("WARNING:\tCURRENT DIRECTORY = %s\n" % (os.getcwd()))
 
+        #  Keep copies of the arguments
+        self.input = arg_input
+        self.transformer = arg_transformer
+        self.merger = arg_merger
+        self.outputer = arg_outputer
+
+        #  Get a copy of the configuration JSON document and keep it local
+        conf  = Configuration()
+        c_doc = conf.getConfigJSON(arg_config_file, command_line_args)
+        self.json_config_document = c_doc
+
+        #  Parse the configuration JSON
+        json_config_dictionary = json.loads(self.json_config_document)
+
+        #  How should we 'drive' the components?
+        type_of_dataflow = json_config_dictionary['type_of_dataflow']
+
+        #  Grab version
+        version = json_config_dictionary["maus_version"]
+
+        #  Print some MAUS info... userful for when the user wants to know
+        #  what they ran after the fact.  The PID can be used if you want to
+        #  kill MAUS at the command line: kill -s 9 PID_NUMBER
         print("Welcome to MAUS:")
         print(("\tProcess ID (PID): %d" % os.getpid()))
         print(("\tProgram Arguments: %s" % str(sys.argv)))
-
-        self.json_config_document = \
-               Configuration().getConfigJSON(arg_config_file, command_line_args)
-        json_config_dictionary = json.loads(self.json_config_document)
-        map_reduce_type = json_config_dictionary['map_reduce_type']
-        version = json_config_dictionary["maus_version"]
         print ("\tVersion: %s" % version)
 
-        # Be sure to add other assertions here when new
-        # map reduce implementations get put in.
-        assert map_reduce_type in ["native_python" , "native_python_profile"]
-        
-        if map_reduce_type == "native_python":
-            self.native_python_map_reduce()
-        elif map_reduce_type == "native_python_profile":
-            cProfile.runctx('self.native_python_map_reduce()', globals(), \
-                           locals(), 'list.prof')
-            profile = pstats.Stats('list.prof') 
-            profile.strip_dirs().sort_stats('time').print_stats() 
+        #
+        #  Enumerate list of possible types of dataflow
+        #
+        if type_of_dataflow == 'pipeline_single_thread':
+            self.pipeline_single_thread()
+        elif type_of_dataflow == 'control_room_style':
+            self.control_room_style()  #  not implemented
+        elif type_of_dataflow == 'many_local_threads':
+            self.many_local_threads()  #  not implemented
         else:
-            # for future methods.  Be sure to add to assertion above
-            pass
+            raise LookupError("bad type_of_dataflow: %s" % type_of_dataflow)
 
 
-    def native_python_map_reduce(self):
+    def pipeline_single_thread(self):
         """
-        Map-reduce algorithm using own, single threaded, input-map-reduce
-        routine
+        MAUS pipeline dataflow
+        
+        Drive the MAUS components in a pipeline where each event is passed
+        through transform, merge, and output, then next event is progressed.
         """
-        # write intermediary step to disk
-        file_obj = tempfile.SpooledTemporaryFile(max_size=524288) # 512 MB
-        temp_file = gzip.GzipFile(filename='temp', mode='wb', fileobj=file_obj)
 
-        ####                   ####
-        ######  Input Phase  ######
-        ####                  #####
+
         print("INPUT: Reading some input")
         assert(self.input.birth(self.json_config_document) == True)
         emitter = self.input.emitter()
-        map_buffer = self.buffer_input(emitter)
+        map_buffer = buffer_input(emitter, 1)
 
-        ####                 ####
-        ######  Map Phase  ######
-        ####                #####
-        print("MAP: Setting up mappers")
-        assert(self.mapper.birth(self.json_config_document) == True)
+        print("TRANSFORM: Setting up transformer")
+        assert(self.transformer.birth(self.json_config_document) == True)
 
-        while len(map_buffer) != 0:
-            print(("MAP: Processing %d events" % len(map_buffer)))
+        print("MERGE: Setting up merger")
+        assert(self.merger.birth(self.json_config_document) == True)
 
-            map_results = map(self.mapper.process, map_buffer)  # pylint: disable=W0141,C0301
-            for result in map_results:
-                temp_file.write('%s\n' % result)
-            map_buffer = self.buffer_input(emitter)
+        print("OUTPUT: Setting up outputer")
+        assert(self.outputer.birth(self.json_config_document) == True)
 
-        print("MAP: Closing input and mappers")
-        self.input.death()
-        self.mapper.death()
-        temp_file.close()
-        
-        
-        ####                    ####
-        ######  Reduce Phase  ######
-        ####                   ##### 
-        print("REDUCE: Setting up reducers")
-        assert(self.reducer.birth(self.json_config_document) == True)
-        
-        # read back
-        file_obj.seek(0) # go to beginning of file
-        temp_file = gzip.GzipFile(filename='temp', mode='rb', fileobj=file_obj)
+        print("PIPELINE mode: TRANSFORM, MERGE, OUTPUT, then next event.")
+
+        #  This helps us time how long the setup that sometimes happens in the
+        # first event takes
+        print("HINT: MAUS will process 1 event only at first...")
+
         i = 0
-        reduce_buffer = []
-        reduced = []
-        for line in temp_file:
-            if line.rstrip() == "":
-                continue
-            reduce_buffer.append(line)
-            i = i + 1
-            if i % 1000 == 0:
-                print(('REDUCE: Reducing %d events in the %d pass' % \
-                       (len(reduce_buffer), len(reduced))))
-                reduced.append(reduce(self.reducer.process, reduce_buffer))
-                reduce_buffer = []
+        while len(map_buffer) != 0:
+            #  Not python 3 compatible print()
+            print "TRANSFORM/MERGE/OUTPUT: ",
+            print"Processed %d events so far," % i,
+            print("%d events in buffer." % (len(map_buffer)))
 
-        print(('REDUCE: Merging %d passes and reducing the %d events left in the buffer' % (len(reduced), len(reduce_buffer)))) # pylint: disable=C0301
-        reduce_result = functools.reduce \
-                                (self.reducer.process, reduce_buffer + reduced)
+            for spill in map_buffer:
+                spill = self.transformer.process(spill)
+                spill = self.merger.process(spill)
+                self.outputer.save(spill)
 
-        temp_file.close()
-        file_obj.close()
+            i += len(map_buffer)
+            map_buffer = buffer_input(emitter, 128)
 
-        self.reducer.death()
-        
-        ####                    ####
-        ######  Output Phase  ######
-        ####                   #####
+        print("TRANSFORM: Shutting down transformer")
+        assert(self.transformer.death() == True)
 
-        assert(self.output.birth(self.json_config_document) == True)
-        
-        self.output.save(reduce_result)
-                
-        self.output.death()
-            
+        print("MERGE: Shutting down merger")
+        assert(self.merger.death() == True)
 
-    def buffer_input(self, the_emitter):  # pylint: disable=R0201
+        print("OUTPUT: Shutting down outputer")
+        assert(self.outputer.death() == True)
+
+    def control_room_style(self):
         """
-        Buffer the input stream by only reading the first
-        1024 spills into memory.  Returns an array of spills.
+        Not implemented
         """
-        my_buffer = []
-        for i in range(1024):  # pylint: disable=W0612
-            try:
-                value = next(the_emitter)  
-                my_buffer.append(value.encode('ascii'))
-            except StopIteration:
-                return my_buffer
+        raise NotImplementedError()
 
-        return my_buffer
-                
-
-
-
+    def many_local_threads(self):
+        """
+        Not implemented
+        """
+        raise NotImplementedError()
