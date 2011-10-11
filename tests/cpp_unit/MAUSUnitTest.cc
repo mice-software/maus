@@ -56,8 +56,8 @@ Json::Value SetupConfig() {
   config["energy_loss_model"] = "estrag";
   config["hadronic_model"] = "all";
   config["particle_decay"] = true;
-  config["charged_pion_half_time"] = -1.;
-  config["muon_half_time"] = -1.;
+  config["charged_pion_half_life"] = -1.;
+  config["muon_half_life"] = -1.;
   config["production_threshold"] = 0.5;
   return config;
 }

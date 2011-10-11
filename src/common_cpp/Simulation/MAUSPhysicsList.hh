@@ -72,6 +72,27 @@ class MAUSPhysicsList: public G4VModularPhysicsList
      */
     ~MAUSPhysicsList();
 
+    /** Set up reference particle physics model according to reference datacards
+     */
+    void BeginOfReferenceParticleAction();
+
+    /** Set up particle physics model according to normal datacards
+     */
+    void BeginOfRunAction();
+
+    /** Construct the process table and add any MAUS specific processes 
+     */
+    void ConstructProcess();
+    
+    /** Does nothing - included to overload pure virtual base class function
+     */
+    void SetCuts() {}
+
+    /** Get all relevant datacards from the json configuration
+     */
+    void Setup();
+
+  private:
     /** Convert from string to scat enumeration
      *
      *  "msc", "mcs" for multiple coulomb scattering
@@ -95,27 +116,6 @@ class MAUSPhysicsList: public G4VModularPhysicsList
      */
     hadronic HadronicModel  (std::string hadronicModel);
 
-    /** Set up reference particle physics model according to reference datacards
-     */
-    void BeginOfReferenceParticleAction();
-
-    /** Set up particle physics model according to normal datacards
-     */
-    void BeginOfRunAction();
-
-    /** Construct the process table and add any MAUS specific processes 
-     */
-    void ConstructProcess();
-    
-    /** Does nothing - included to overload pure virtual base class function
-     */
-    void SetCuts() {}
-
-    /** Get all relevant datacards from the json configuration
-     */
-    void Setup();
-
-  private:
     /** Add some specific processes for MAUS
      *
      *  Only add a step limiter
@@ -144,12 +144,6 @@ class MAUSPhysicsList: public G4VModularPhysicsList
     /** Run a UI command, print to debug
      */
     void UIApplyCommand(std::string command);
-
-    /** Run UI macro with name filename
-     *
-     *  Can override these settings with a UI macro
-     */
-    void RunUserUICommand(std::string filename);
 
     /** Set scattering model for electromagnetic scattering processes
      *
@@ -205,8 +199,6 @@ class MAUSPhysicsList: public G4VModularPhysicsList
     static const int         _nELossNames;
 
     std::string _refDEModel;
-    std::string _refScript;
-    std::string _runScript;
     std::string _msModel;
     std::string _dEModel;
     std::string _hadronicModel;

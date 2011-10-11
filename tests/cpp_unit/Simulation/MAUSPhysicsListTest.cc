@@ -32,130 +32,154 @@ class MAUSPhysicsListTest : public ::testing::Test {
   virtual ~MAUSPhysicsListTest() {}
 };
 
-
-/*
-TEST_F( MAUSPhysicsListTest, GetPhysicsListTest) {
-    MAUS::MAUSPhysicsList* list1 = MAUS::MAUSPhysicsList::GetMAUSPhysicsList();
-    delete list1;
-    Json::Value& dc = *MICERun::getInstance()->jsonConfiguration;
-    dc["physics_model"] = "not a physics list";
-    EXPECT_THROW(delete MAUS::MAUSPhysicsList::GetMAUSPhysicsList(), Squeal);
-    dc["physics_model"] = "QGSP_BERT";
-}
-
-TEST_F( MAUSPhysicsListTest, ModelsTest) {
-    EXPECT_EQ(list->ScatteringModel("MCs"), MAUS::MAUSPhysicsList::mcs);
-    EXPECT_EQ(list->ScatteringModel("noNe"), MAUS::MAUSPhysicsList::no_scat);
-    EXPECT_THROW(list->ScatteringModel("bob"), Squeal);
-
-    EXPECT_EQ(list->EnergyLossModel("IoNisation"), MAUS::MAUSPhysicsList::dedx);
-    EXPECT_EQ(list->EnergyLossModel("eStrag"), MAUS::MAUSPhysicsList::energyStraggling);
-    EXPECT_EQ(list->EnergyLossModel("noNe"), MAUS::MAUSPhysicsList::no_eloss);
-    EXPECT_THROW(list->EnergyLossModel("bob"), Squeal);
-
-    EXPECT_EQ(list->HadronicModel("AlL"), MAUS::MAUSPhysicsList::all_hadronic);
-    EXPECT_EQ(list->HadronicModel("noNe"), MAUS::MAUSPhysicsList::no_hadronic);
-    EXPECT_THROW(list->HadronicModel("bob"), Squeal);
-}
-*/
-
-#include "src/common_cpp/Utils/JsonWrapper.hh"
-CLHEP::Hep3Vector mc_track_to_momentum(Json::Value track) {
-  double p0 = track["tracks"]["track_1"]["final_momentum"]["x"].asDouble();
-  double p1 = track["tracks"]["track_1"]["final_momentum"]["y"].asDouble();
-  double p2 = track["tracks"]["track_1"]["final_momentum"]["z"].asDouble();
-  CLHEP::Hep3Vector momentum(p0, p1, p2);
-  return momentum;
-}
-
-void test_processes(CLHEP::Hep3Vector& p_mu_1, CLHEP::Hep3Vector& p_mu_2, CLHEP::Hep3Vector& p_pi) {
-  MAUSGeant4Manager* mgm = MAUSGeant4Manager::GetInstance();
-  bool keepTracks = mgm->GetTracking()->GetWillKeepTracks();
-  mgm->GetTracking()->SetWillKeepTracks(true);
-  MAUS::MAUSPrimaryGeneratorAction::PGParticle prim;
-  prim.pz = 1.;
-  prim.energy = 300.;
-  prim.pid = -13;
-  prim.seed = 0;
-  Json::Value out_mu_1 = mgm->RunParticle(prim);
-  prim.seed = 1;
-  Json::Value out_mu_2 = mgm->RunParticle(prim);
-  prim.seed = 2;
-  prim.pid = 211;
-  Json::Value out_pi = mgm->RunParticle(prim);
-  p_mu_1 =  mc_track_to_momentum(out_mu_1);
-  p_mu_2 =  mc_track_to_momentum(out_mu_2);
-  p_pi =  mc_track_to_momentum(out_pi);
-  mgm->GetTracking()->SetWillKeepTracks(keepTracks);
-}
-
-TEST_F( MAUSPhysicsListTest, BeginOfReferenceParticleActionNoDETest) {
-  double PI_MASS2 = 139.570*139.570; // charged pion mass 2
+TEST_F( MAUSPhysicsListTest, ReferenceEnergyLossModelTest) {
   MAUS::MAUSPhysicsList* list = 
                             MAUSGeant4Manager::GetInstance()->GetPhysicsList();
   Json::Value& dc = *MICERun::getInstance()->jsonConfiguration;
-  CLHEP::Hep3Vector p_mu_1, p_mu_2, p_pi;
-
-  dc["reference_energy_loss_model"] = "none";
+  dc["reference_energy_loss_model"] = "noNe";
   list->Setup();
   list->BeginOfReferenceParticleAction();
-  test_processes(p_mu_1, p_mu_2, p_pi);
-  EXPECT_LT(fabs(p_pi.mag2() + PI_MASS2) - 300.*300., 1e-1)
-             << "Should be no de " << p_pi;
-  EXPECT_LT(fabs(p_pi[0]), 1.e-3) << "Should be no pt " << p_pi;
 
-}
-
-TEST_F( MAUSPhysicsListTest, BeginOfReferenceParticleActionDETest) {
-  double PI_MASS2 = 139.570*139.570; // charged pion mass 2
-  MAUS::MAUSPhysicsList* list = 
-                            MAUSGeant4Manager::GetInstance()->GetPhysicsList();
-  Json::Value& dc = *MICERun::getInstance()->jsonConfiguration;
-  CLHEP::Hep3Vector p_mu_1, p_mu_2, p_pi;
-
-  dc["reference_energy_loss_model"] = "ionisation";
+  dc["reference_energy_loss_model"] = "ioNisation";
   list->Setup();
   list->BeginOfReferenceParticleAction();
-  test_processes(p_mu_1, p_mu_2, p_pi);
-  EXPECT_GT(fabs(p_pi.mag2() + PI_MASS2 - 300.*300.), 1.e-1)
-              << "Should have change in p - pin: " << sqrt(300.*300.-PI_MASS2) << " pout: " << p_pi;
-  EXPECT_LT(fabs(p_mu_1.mag2() - p_mu_2.mag2()), 1.e-1) << p_mu_1 << p_mu_2;
-  EXPECT_LT(fabs(p_pi[0]), 1.e-3) << p_pi;
+
+  dc["reference_energy_loss_model"] = "eStrag";
+  list->Setup();
+  EXPECT_THROW(list->BeginOfReferenceParticleAction(), Squeal);
+
+  dc["reference_energy_loss_model"] = "bob";
+  list->Setup();
+  EXPECT_THROW(list->BeginOfReferenceParticleAction(), Squeal);
+
+  dc["reference_energy_loss_model"] = "ioNisation";
 }
 
-TEST_F( MAUSPhysicsListTest, BeginOfParticleAction_ELossTest) {
-  double PI_MASS2 = 139.570*139.570; // charged pion mass 2
+TEST_F( MAUSPhysicsListTest, ELossModelTest) {
   MAUS::MAUSPhysicsList* list = 
                             MAUSGeant4Manager::GetInstance()->GetPhysicsList();
   Json::Value& dc = *MICERun::getInstance()->jsonConfiguration;
-  dc["hadronic_model"] = "none";
-  dc["scattering_model"] = "none";
-  dc["energy_loss_model"] = "none";
-  dc["decay"] = false;
-  CLHEP::Hep3Vector p_mu_1, p_mu_2, p_pi;
+  dc["energy_loss_model"] = "noNe";
   list->Setup();
   list->BeginOfRunAction();
-  test_processes(p_mu_1, p_mu_2, p_pi);
-  EXPECT_LT(fabs(p_pi.mag2() + PI_MASS2) - 300.*300., 1e-1) << p_pi;
-  EXPECT_LT(fabs(p_pi[0]), 1.e-3) << p_pi;
 
-  dc["energy_loss_model"] = "ionisation";
+  dc["energy_loss_model"] = "ioNization";
   list->Setup();
   list->BeginOfRunAction();
-  test_processes(p_mu_1, p_mu_2, p_pi);
-  EXPECT_GT(fabs(p_pi.mag2() + PI_MASS2 - 300.*300.), 1.e-1) << p_pi;
-  EXPECT_LT(fabs(p_mu_1.mag2() - p_mu_2.mag2()), 1.e-3) << p_mu_1 << p_mu_2;
-  EXPECT_LT(fabs(p_pi[0]), 1.e-3) << p_pi; // no transverse
 
-  dc["energy_loss_model"] = "estrag";
+  dc["energy_loss_model"] = "eStrag";
   list->Setup();
   list->BeginOfRunAction();
-  test_processes(p_mu_1, p_mu_2, p_pi);
-  EXPECT_GT(fabs(p_pi.mag2() + PI_MASS2 - 300.*300.), 1.e-1) << p_pi;
-  EXPECT_GT(fabs(p_mu_1.mag2() - p_mu_2.mag2()), 1.e-3) << p_mu_1 << p_mu_2;
-  EXPECT_LT(fabs(p_pi[0]), 1.e-3) << p_pi;
+
+  dc["energy_loss_model"] = "bob";
+  list->Setup();
+  EXPECT_THROW(list->BeginOfRunAction(), Squeal);
+
+  dc["energy_loss_model"] = "eStrag";
+
 }
 
+TEST_F( MAUSPhysicsListTest, ScatModelTest) {
+  MAUS::MAUSPhysicsList* list = 
+                            MAUSGeant4Manager::GetInstance()->GetPhysicsList();
+  Json::Value& dc = *MICERun::getInstance()->jsonConfiguration;
+  dc["multiple_scattering_model"] = "noNe";
+  list->Setup();
+  list->BeginOfRunAction();
+
+  dc["multiple_scattering_model"] = "mSc";
+  list->Setup();
+  list->BeginOfRunAction();
+
+  dc["multiple_scattering_modell"] = "mCs";
+  list->Setup();
+  list->BeginOfRunAction();
+
+  dc["multiple_scattering_model"] = "bob";
+  list->Setup();
+  EXPECT_THROW(list->BeginOfRunAction(), Squeal);
+
+  dc["multiple_scattering_model"] = "mSc";
+}
+
+TEST_F( MAUSPhysicsListTest, HadronModelTest) {
+  MAUS::MAUSPhysicsList* list = 
+                            MAUSGeant4Manager::GetInstance()->GetPhysicsList();
+  Json::Value& dc = *MICERun::getInstance()->jsonConfiguration;
+  dc["hadronic_model"] = "noNe";
+  list->Setup();
+  list->BeginOfRunAction();
+
+  dc["hadronic_model"] = "aLl";
+  list->Setup();
+  list->BeginOfRunAction();
+
+  dc["hadronic_model"] = "bob";
+  list->Setup();
+  EXPECT_THROW(list->BeginOfRunAction(), Squeal);
+
+  dc["hadronic_model"] = "aLl";
+  list->Setup();
+  list->BeginOfRunAction();
+}
+
+TEST_F( MAUSPhysicsListTest, PartDecayTest) {
+  MAUS::MAUSPhysicsList* list = 
+                            MAUSGeant4Manager::GetInstance()->GetPhysicsList();
+  Json::Value& dc = *MICERun::getInstance()->jsonConfiguration;
+
+  dc["particle_decay"] = "bob";
+  EXPECT_THROW(list->Setup(), Squeal);
+
+  dc["particle_decay"] = Json::Value(false);
+  list->Setup();
+  list->BeginOfRunAction();
+
+  dc["particle_decay"] = Json::Value(true);
+  list->Setup();
+  list->BeginOfRunAction();
+}
+
+TEST_F( MAUSPhysicsListTest, HalfLifeTest) {
+  MAUS::MAUSPhysicsList* list = 
+                            MAUSGeant4Manager::GetInstance()->GetPhysicsList();
+  Json::Value& dc = *MICERun::getInstance()->jsonConfiguration;
+
+  dc["charged_pion_half_life"] = Json::Value("blah");
+  EXPECT_THROW(list->Setup(), Squeal);
+
+  dc["charged_pion_half_life"] = Json::Value(1.5);
+  list->Setup();
+  list->BeginOfRunAction();
+
+  dc["charged_pion_half_life"] = Json::Value(-1.5);
+  list->Setup();
+  list->BeginOfRunAction();
+
+  dc["muon_half_life"] = "blah";
+  EXPECT_THROW(list->Setup(), Squeal);
+
+  dc["muon_half_life"] = Json::Value(1.5);
+  list->Setup();
+  list->BeginOfRunAction();
+
+  dc["muon_half_life"] = Json::Value(-1.5);
+  list->Setup();
+  list->BeginOfRunAction();
+}
+
+TEST_F( MAUSPhysicsListTest, ProductionThresholdTest) {
+  MAUS::MAUSPhysicsList* list = 
+                            MAUSGeant4Manager::GetInstance()->GetPhysicsList();
+  Json::Value& dc = *MICERun::getInstance()->jsonConfiguration;
+
+  dc["production_threshold"] = Json::Value("blah");
+  EXPECT_THROW(list->Setup(), Squeal);
+
+  dc["production_threshold"] = Json::Value(0.5);
+  list->Setup();
+  list->BeginOfRunAction();
+}
 
 }
 

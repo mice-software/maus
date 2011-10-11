@@ -57,15 +57,13 @@ simulation_reference_particle = { # used for setting particle phase
 
 # geant4 physics model
 physics_model = "QGSP_BERT" # Physics package loaded by MAUS to set default values; modifications can be made
-reference_g4ui_script = "" # If a filename is given, G4MICE will run this as a macro to G4UI after setting up ReferenceEnergyLossModel but before firing the reference particle. Enables any extra set-up that may be required.
 reference_energy_loss_model = "ionisation" # Energy loss model of reference particle; set to "none" or "ionisation". Reference particle can never have stochastic processes (e.g. estrag, mcs) enabled.
-begin_of_run_g4ui_script = "" # If a filename is given, G4MICE will run this as a macro to G4UI after firing the reference particle but before firing the beam. Enables any extra set-up that may be required.
 multiple_scattering_model = "mcs" # "mcs" (multiple coulomb scattering) or "none"
 energy_loss_model = "estrag" # "estrag" (full energy loss, including stochastics), "ionisation" (mean energy loss only excluding stochastics) or "none"
 hadronic_model = "all" # "all" (All hadronic interactions) or "none" (no hadronic interactions)
 particle_decay = True # set to true to activate particle decay, or False to inactivate particle decay
-charged_pion_half_time = -1. # set the pi+, pi- half life [ns]. Negative value means use geant4 default
-muon_half_time = -1. # set the mu+, mu- half life [ns]. Negative value means use geant4 default
+charged_pion_half_life = -1. # set the pi+, pi- half life [ns]. Negative value means use geant4 default
+muon_half_life = -1. # set the mu+, mu- half life [ns]. Negative value means use geant4 default
 production_threshold = 0.5 # set the threshold for delta ray production [mm]
 
 # geant4 visualisation (not event display)

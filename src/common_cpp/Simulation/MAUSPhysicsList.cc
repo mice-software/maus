@@ -79,9 +79,14 @@ MAUSPhysicsList* MAUSPhysicsList::GetMAUSPhysicsList() {
 void MAUSPhysicsList::BeginOfReferenceParticleAction() {
   Squeak::mout(Squeak::debug)
         << "MAUSPhysicsList::BeginOfReferenceParticleAction() with de model "
-        << _refDEModel << " script " << _refScript << std::endl;
-  SetStochastics("none", _refDEModel, "none", "false");
-  RunUserUICommand(_refScript);
+        << _refDEModel << std::endl;
+  if (EnergyLossModel(_refDEModel) == energyStraggling) {
+    throw (Squeal(Squeal::recoverable, 
+      "reference_energy_loss_model cannot have energy straggling",
+      "MAUSPhysicsList::BeginOfReferenceParticleAction()"
+    ));
+  }
+  SetStochastics("none", _refDEModel, "none", false);
 }
 
 void MAUSPhysicsList:: BeginOfRunAction() {
@@ -91,11 +96,9 @@ void MAUSPhysicsList:: BeginOfRunAction() {
                               << "\n  hadronic model " << _hadronicModel
                               << "\n  particle decay " << _partDecay
                               << "\n  pi 1/2 life " << _piHalfLife
-                              << "\n  mu 1/2 life " << _muHalfLife
-                              << "\n  script " << _runScript << std::endl;
+                              << "\n  mu 1/2 life " << _muHalfLife << std::endl;
   SetStochastics(_msModel, _dEModel, _hadronicModel, _partDecay);
   SetHalfLife   (_piHalfLife, _muHalfLife);
-  RunUserUICommand(_runScript);
 }
 
 MAUSPhysicsList::scat    MAUSPhysicsList::ScatteringModel
@@ -238,7 +241,6 @@ void MAUSPhysicsList::ConstructProcess() {
     SetSpecialProcesses();
 }
 
-
 void MAUSPhysicsList::SetSpecialProcesses() {
   theParticleIterator->reset(); //from G4VUserPhysicsList
   while( (*theParticleIterator)() ) {
@@ -246,12 +248,6 @@ void MAUSPhysicsList::SetSpecialProcesses() {
                                                             GetProcessManager();
     pmanager->AddProcess( new G4StepLimiter,-1,-1,2);
   }
-}
-
-void MAUSPhysicsList::RunUserUICommand(std::string filename) {
-  Squeak::mout(Squeak::debug) 
-        << "Executing user macro " << filename << std::endl;
-  G4UImanager::GetUIpointer()->ApplyCommand("/control/execute "+filename);
 }
 
 void MAUSPhysicsList::SetHalfLife(double pionHalfLife,  double muonHalfLife) {
@@ -271,10 +267,6 @@ void MAUSPhysicsList::Setup() {
     Json::Value& dc = *MICERun::getInstance()->jsonConfiguration;
     _refDEModel = JsonWrapper::GetProperty(dc, "reference_energy_loss_model",
                                           JsonWrapper::stringValue).asString();
-    _refScript = JsonWrapper::GetProperty(dc, "reference_g4ui_script",
-                                          JsonWrapper::stringValue).asString();
-    _runScript = JsonWrapper::GetProperty(dc, "begin_of_run_g4ui_script",
-                                          JsonWrapper::stringValue).asString();
     _msModel = JsonWrapper::GetProperty(dc, "multiple_scattering_model",
                                           JsonWrapper::stringValue).asString();
     _dEModel = JsonWrapper::GetProperty(dc, "energy_loss_model",
@@ -283,18 +275,17 @@ void MAUSPhysicsList::Setup() {
                                           JsonWrapper::stringValue).asString();
     _partDecay = JsonWrapper::GetProperty(dc, "particle_decay",
                                           JsonWrapper::booleanValue).asBool();
-    _piHalfLife = JsonWrapper::GetProperty(dc, "charged_pion_half_time",
+    _piHalfLife = JsonWrapper::GetProperty(dc, "charged_pion_half_life",
                                           JsonWrapper::realValue).asDouble();
-    _muHalfLife = JsonWrapper::GetProperty(dc, "muon_half_time",
+    _muHalfLife = JsonWrapper::GetProperty(dc, "muon_half_life",
                                           JsonWrapper::realValue).asDouble();
     _productionThreshold = JsonWrapper::GetProperty(dc, "production_threshold",
                                           JsonWrapper::realValue).asDouble();
-
 }
 
 void MAUSPhysicsList::UIApplyCommand(std::string command) {
-    Squeak::mout(Squeak::debug) 
-      << "Apply G4UI command: " << command << std::endl;
+    Squeak::mout(Squeak::debug)
+        << "Apply G4UI command: " << command << std::endl;
     G4UImanager::GetUIpointer()->ApplyCommand(command);
 }
 

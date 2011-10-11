@@ -14,6 +14,9 @@ of MICE using Geant4.  At present, TOF and Tracker hits will be digitized.
 import io   #  generic python library for I/O
 import gzip #  For compressed output # pylint: disable=W0611
 
+import ROOT
+ROOT.PyConfig.IgnoreCommandLineOptions = True
+
 import MAUS
 
 def run():
