@@ -23,7 +23,7 @@
             </head>
             <body>
                 <xsl:for-each select="structure/volume/physvol">
-                Module BeamLine/<xsl:value-of select="translate(file/@name, 'gdml', 'dat')"/> 
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/<xsl:value-of select="substring-before(file/@name, '.')"/>.dat
                 {
                 Position <xsl:value-of select="position/@x"/><xsl:text> </xsl:text><xsl:value-of select="position/@y"/><xsl:text> </xsl:text><xsl:value-of select="position/@z"/> mm
                 Rotation <xsl:if test="rotationref/@ref = 'identity'"> 0.0 0.0 0.0 deg</xsl:if>    
