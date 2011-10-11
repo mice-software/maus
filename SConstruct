@@ -622,6 +622,10 @@ for directory in directories:
 
 file_to_import = open('%s/build/MAUS.py' % maus_root_dir, 'w')
 
+file_to_import.write("import ROOT\n")
+file_to_import.write("ROOT.PyConfig.IgnoreCommandLineOptions = True\n")
+file_to_import.write("\n")
+
 file_to_import.write("try:\n")
 file_to_import.write("     from Go import Go\n")
 file_to_import.write("except ImportError:\n")

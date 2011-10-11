@@ -92,8 +92,8 @@ class Configuration:
         # ConfigurationDefaults.p Additionally a keyword command has been
         # created to store the path and filename to a datacard
         parser = argparse.ArgumentParser()
-        for key, value in config_dict.iteritems():
-            parser.add_argument('-'+key, action='store', dest=key, 
+        for key, value in sorted(config_dict.iteritems(), key=lambda x: x[0].lower()): 
+            parser.add_argument('--'+key, action='store', dest=key, 
                                 default=value)
         results = parser.parse_args()
 
