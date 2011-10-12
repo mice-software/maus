@@ -304,7 +304,7 @@ std::string InputCppDAQData::getNextSpill() {
 
   Json::Value spill(Json::objectValue);
   spill["daq_data"] = Json::Value(Json::arrayValue);
-  if(_next_event.isNull()) { // if first event, call unpack once
+  if (_next_event.isNull()) { // if first event, call unpack once
     getNextEvent();
     if (_next_event.isNull()) {
       return "";
