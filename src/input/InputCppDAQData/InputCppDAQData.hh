@@ -75,21 +75,34 @@ class InputCppDAQData {
 
   /** Unpack the current event into JSON.
   *
-  * This unpacks the current event and returns the JSON data for it.
-  * Don't call this until readNextEvent() has been called and returned
-  * true at least once!
+  * This unpacks the current event into _next_event and returns true on success.
+  * Don't call this until readNextEvent() has been called and returned true at
+  * least once!
   *
-  * \return The current event data in JSON format.
+  * \return Bool indicating that the get was successful.
   */
   bool getCurEvent();
 
+  /** Read the next event from the buffer and put it into _next_event
+   *
+   *  \return string containing the next event; or "" if unsuccessful
+   */
   std::string getNextEvent();
 
   /** Return the spill number for some daq event
   */
   int getSpillNumber(Json::Value daq_event);
 
+  /** Get a string containing the information for the next spill
+  *
+  * Unpacks all daq events in the spill and puts them into a json array. Writes
+  * to string.
+  *
+  * \return string representing a json array containing daq data for all events
+  *         in the spill
+  */
   std::string getNextSpill();
+
   /** Disable one equipment type.
   * This disables the unpacking of the data produced by all equipment
 	* with the specified type.

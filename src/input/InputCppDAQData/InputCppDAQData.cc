@@ -302,7 +302,6 @@ std::string InputCppDAQData::getNextSpill() {
   // on the previous loop, which makes the logic a bit more obscure
   Json::FastWriter xJsonWr;
 
-  std::cerr << "NEXT SPILL" << std::endl;
   Json::Value spill(Json::objectValue);
   spill["daq_data"] = Json::Value(Json::arrayValue);
   if(_next_event.isNull()) { // if first event, call unpack once
@@ -314,26 +313,24 @@ std::string InputCppDAQData::getNextSpill() {
   // next event is always the first event of this spill
   int spill_number = getSpillNumber(_next_event);
   spill["daq_data"].append(_next_event);
-  std::cerr << "SPILL NUMBER " << spill_number << std::endl;
 
   // loop over events; if the spill number changes, then we're done
   bool finished = true;
   while (_eventPtr != NULL) {
     getNextEvent();
-    std::cerr << "NEXT EVENT LOOP" << std::endl;
     finished = false;
     if (getSpillNumber(_next_event) != spill_number) {
       return xJsonWr.write(spill);
     }
-    spill["daq_data"].append(_next_event);
+    if (_eventPtr) {
+      spill["daq_data"].append(_next_event);
+    }
   }
 
-  std::cerr << "SPILL FINISHED" << std::endl;
   // for the last spill, getNextEvent() goes false but spill buffer not empty
   if (!finished) {
     return xJsonWr.write(spill);
   }
-  std::cerr << "RETURN EMPTY" << std::endl;
   return "";
 }
 

@@ -9,9 +9,7 @@
 %feature("shadow") InputCppDAQData::emitter() %{
 def emitter(self):
   spill = self.getNextSpill()
-  print "START WHILE LOOP"
   while ( spill != ""):
-    print "WHILE LOOP"
     yield spill
     spill = self.getNextSpill()
 %}
