@@ -81,8 +81,15 @@ class InputCppDAQData {
   *
   * \return The current event data in JSON format.
   */
-  std::string getCurEvent();
+  bool getCurEvent();
 
+  std::string getNextEvent();
+
+  /** Return the spill number for some daq event
+  */
+  int getSpillNumber(Json::Value daq_event);
+
+  std::string getNextSpill();
   /** Disable one equipment type.
   * This disables the unpacking of the data produced by all equipment
 	* with the specified type.
@@ -176,6 +183,8 @@ class InputCppDAQData {
   * \return The type of the event as string.
   */
   std::string event_type_to_str(int pType);
+
+  Json::Value _next_event;
 };
 
 #endif  // _MAUS_INPUTCPPDAQDATA_INPUTCPPDAQDATA_H__
