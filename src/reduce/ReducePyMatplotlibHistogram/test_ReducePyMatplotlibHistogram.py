@@ -84,7 +84,7 @@ class ReducePyMatplotlibHistogramTestCase(unittest.TestCase): # pylint: disable=
         as an argument string.
         @param self Object reference.
         """
-        result_str = self.__reducer.process("", "{")
+        result_str = self.__reducer.process("{")
         result = json.loads(result_str)
         self.assertTrue("errors" in result, "No errors field")
         self.assertTrue("bad_json_document" in result["errors"],
@@ -264,7 +264,7 @@ class ReducePyMatplotlibHistogramTestCase(unittest.TestCase): # pylint: disable=
         @param json_doc JSON document.
         """
         json_str = json.dumps(json_doc)
-        result_str = self.__reducer.process("", json_str)
+        result_str = self.__reducer.process(json_str)
         return json.loads(result_str)
 
     def __check_result(self, spill_id, result):

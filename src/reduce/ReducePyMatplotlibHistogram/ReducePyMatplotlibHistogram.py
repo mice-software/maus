@@ -107,11 +107,10 @@ class ReducePyMatplotlibHistogram:
         self.__max_tdc_count = 1
         return True
 
-    def process(self, json_strings, json_string):
+    def process(self, json_string):
         """
         Create histogram from data and update summary histogram.
         @param self Object reference.
-        @param json_strings String with JSON documents handled to date.
         @param json_string String with current JSON document.
         @returns String of JSON documents.
         """
@@ -120,12 +119,12 @@ class ReducePyMatplotlibHistogram:
         except ValueError:
             json_doc = {"errors": {"bad_json_document":
                                 "unable to do json.loads on input"} }
-            return self.__return_json(json_strings, json.dumps(json_doc))
+            return json.dumps(json_doc)
         if "digits" not in json_doc:
             if "errors" not in json_doc:
                 json_doc["errors"] = {}
             json_doc["errors"]["no_digits"] = "no digits"
-            return self.__return_json(json_strings, json.dumps(json_doc))
+            return json.dumps(json_doc)
         digits = json_doc["digits"]
 
         # Extract just those that are for the Tracker.
@@ -190,7 +189,7 @@ class ReducePyMatplotlibHistogram:
                                 "data": data})
 
         self.spill_count += 1
-        return self.__return_json(json_strings, json.dumps(json_doc))
+        return json.dumps(json_doc)
 
     def death(self): #pylint: disable=R0201
         """
@@ -198,16 +197,6 @@ class ReducePyMatplotlibHistogram:
         @returns True
         """
         return True
-
-    def __return_json(self, json_strings, json_string): #pylint: disable=R0201
-        """
-        Add JSON document to list of documents
-        @param json_strings String with JSON documents.
-        @param json_string String with current JSON document.
-        @returns String of JSON documents with a line break and the 
-        current one appended.
-        """
-        return "%s\n%s" % (json_strings.rstrip(), json_string.rstrip())
 
     def __filter_trackers(self, digit): #pylint: disable=R0201
         """
