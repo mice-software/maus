@@ -99,7 +99,7 @@ Json::Value MapCppTOFSlabHits::makeSlabHits(Json::Value xDocPartEvent) {
   Json::Value xDocSlabHits;
   if (xDocPartEvent.isArray()) {
     int n_digits = xDocPartEvent.size();
-     //std::cout << xDocPartEvent << std::endl;
+    // std::cout << xDocPartEvent << std::endl;
 
     // Create a map of all hited PMTs.
     std::map<string, int> xDigitPos;
@@ -224,7 +224,7 @@ Json::Value MapCppTOFSlabHits::fillSlabHit(Json::Value xDocDigit0, Json::Value x
   xDocPMT1["trigger_request_leading_time"] = xTriggerReqDigit1;
   xDocPMT1["leading_time"] = xTimeDigit1;
 
-  // Charge of the digit can be unset because of the Zero suppresion of the fADCs. 
+  // Charge of the digit can be unset because of the Zero suppresion of the fADCs.
   if (xDocDigit0.isMember("charge_mm") && xDocDigit1.isMember("charge_mm")) {
     int xChargeDigit0 = JsonWrapper::GetProperty(xDocDigit0,
                                                  "charge_mm",

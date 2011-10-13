@@ -97,7 +97,8 @@ class MapCppTOFDigits {
    *  @param xDocTrigReq Json document with the trigger request for a specific particle event
    *  @param xDocInfo 
    */
-  bool getTrigReq(Json::Value xDocTrigReq, Json::Value xDocTdcHit, Json::Value &xDocDigit) throw(Squeal);
+  bool getTrigReq(Json::Value xDocTrigReq, Json::Value xDocTdcHit,
+                  Json::Value &xDocDigit) throw(Squeal);
 
   /** @brief process JSON document
    *  @param document Receive a document with raw data and return
