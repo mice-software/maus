@@ -177,10 +177,6 @@ class Go:  #  pylint: disable=R0921
         i = 0
         while len(map_buffer) != 0:
             #  Not python 3 compatible print()
-            print "TRANSFORM/MERGE/OUTPUT: ",
-            print"Processed %d events so far," % i,
-            print("%d events in buffer." % (len(map_buffer)))
-
             for spill in map_buffer:
                 spill = self.transformer.process(spill)
                 spill = self.merger.process(spill)
@@ -188,6 +184,10 @@ class Go:  #  pylint: disable=R0921
 
             i += len(map_buffer)
             map_buffer = buffer_input(emitter, 128)
+
+            print "TRANSFORM/MERGE/OUTPUT: ",
+            print"Processed %d events so far," % i,
+            print("%d events in buffer." % (len(map_buffer)))
 
         print("TRANSFORM: Shutting down transformer")
         assert(self.transformer.death() == True)
