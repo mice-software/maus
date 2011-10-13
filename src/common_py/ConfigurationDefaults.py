@@ -104,7 +104,7 @@ VirtualPlanes_z = [0.0, 1.0] # units: meter.  the 'z' coordinate where the virtu
 # this is used by ImputCppRealData
 Number_of_DAQ_Events = -1
 Enable_V1290_Unpacking = True
-Enable_V1731_Unpacking = False
+Enable_V1731_Unpacking = True
 Enable_V1724_Unpacking = True
 Enable_V830_Unpacking = True
 Enable_VLSB_Unpacking = True
@@ -121,7 +121,7 @@ DAQ_cabling_file = "/files/cabling/DAQChannelMap.txt"
 
 # this is used by the reconstuction of the TOF detectors
 TOF_trigger_station = "tof1"
-#TOF_trigger_station = "tof1"
+#TOF_trigger_station = "tof0"
 TOF_cabling_file = "/files/cabling/TOFChannelMap.txt"
 TOF_TW_calibration_file = "/files/calibration/tofcalibTW.txt"
 TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF1.txt"

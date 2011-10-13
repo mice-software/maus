@@ -187,6 +187,7 @@ int V1731DataProcessor::Process(MDdataContainer* aPartEventPtr) {
         xfAdcHit["charge_pm"]    = this->get_charge(ceaPedMax);
         xfAdcHit["position_max"] = this->get_max_position();
         xfAdcHit["pedestal"]    = this->get_pedestal();
+
         DAQChannelKey* xKey = _chMap->find(xLdc, xGeo, xCh, xEquip);
         if (xKey) {
           xDetector = xKey->detector();
@@ -296,7 +297,7 @@ int DBBDataProcessor::Process(MDdataContainer* aFragPtr) {
 
   Json::Value pBoardDoc;
   Json::Value xDBBHit;
-  int xLdc, xGeo, xEquip, xPartEv;
+  int xLdc, xGeo, xEquip;
   string xDetector = "emr";
 
   if (xDBBFragment->IsValid()) {
@@ -345,14 +346,9 @@ int DBBDataProcessor::Process(MDdataContainer* aFragPtr) {
         xDBBHit["channel"]       = xCh;
         xDBBHit["leading_time"]  = xLT;
         xDBBHit["trailing_time"] = xTT;
-        DAQChannelKey* xKey = _chMap->find(xLdc, xGeo, xCh, xEquip);
-        if (xKey) {
-          xDetector = xKey->detector();
-          xDBBHit["channel_key"]   = xKey->str();
-          xDBBHit["detector"]      = xDetector;
-        } else {
-          xDBBHit["detector"] = xDetector = "unknown";
-        }
+        DAQChannelKey xKey(xLdc, xGeo, xCh, xEquip, xDetector);
+        xDBBHit["channel_key"]   = xKey.str();
+        xDBBHit["detector"]      = xDetector;
         pBoardDoc["hits"].append(xDBBHit);
       }
     }

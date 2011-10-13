@@ -118,6 +118,8 @@ class InputCppData {
 
  private:
 
+  std::string _classname;
+
  /** Process manager object.
   */
   MDprocessManager _dataProcessManager;

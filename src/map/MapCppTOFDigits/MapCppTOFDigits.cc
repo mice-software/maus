@@ -44,12 +44,25 @@ std::string MapCppTOFDigits::process(std::string document) {
 
   //  JsonCpp setup
   Json::FastWriter writer;
-
+  Json::Value root;
+  Json::Value xEventType;
   // Check if the JSON document can be parsed, else return error only
-  Json::Value root = JsonWrapper::StringToJson(document);
-  Json::Value xEventType = JsonWrapper::GetProperty(root,
-                                                    "daq_event_type",
-                                                    JsonWrapper::stringValue);
+  try {
+    root = JsonWrapper::StringToJson(document);
+    xEventType = JsonWrapper::GetProperty(root,
+                                          "daq_event_type",
+                                          JsonWrapper::stringValue);
+  }catch(Squeal e) {
+    Squeak::mout(Squeak::error)
+    << "Error in MapCppTOFDigits::process. Bad json document."
+    << std::endl;
+    Json::Value errors;
+    std::stringstream ss;
+    ss << _classname << " says:" << e.GetMessage();
+    errors["bad_json_document"] = ss.str();
+    root["errors"] = errors;
+    return writer.write(root);
+  }
 
   if (xEventType == "physics_event" || xEventType == "calibration_event") {
     Json::Value xDaqData = JsonWrapper::GetProperty(root, "daq_data", JsonWrapper::objectValue);
@@ -78,15 +91,22 @@ std::string MapCppTOFDigits::process(std::string document) {
     }
   }
 
-  // std::cout<<root["digits"]<<std::endl;
+  // if (root.isMember("digits")) std::cout<<root["digits"]<<std::endl;
   return writer.write(root);
 }
 
 bool MapCppTOFDigits::SetConfiguration(std::string json_configuration) {
   //  JsonCpp setup
-  Json::Value configJSON = JsonWrapper::StringToJson(json_configuration);
-  //  this will contain the configuration
-
+  Json::Value configJSON;
+  try {
+    configJSON = JsonWrapper::StringToJson(json_configuration);
+    //  this will contain the configuration
+  }catch(Squeal e) {
+    Squeak::mout(Squeak::error)
+    << "Error in  MapCppTOFDigits::SetConfiguration. Bad json document."
+    << std::endl;
+    return false;
+  }
   Json::Value map_file_name = JsonWrapper::GetProperty(configJSON,
                                                        "TOF_cabling_file",
                                                        JsonWrapper::stringValue);
@@ -196,13 +216,13 @@ Json::Value MapCppTOFDigits::getTdc(Json::Value xDocTdcHit) {
     xDocInfo["trigger_time_tag"]  = xDocTdcHit["trigger_time_tag"];
     xDocInfo["time_stamp"]        = xDocTdcHit["time_stamp"];
   }
-  // std::cout << xDocInfo << std::endl;
+
   return xDocInfo;
 }
 
 bool MapCppTOFDigits::getAdc(Json::Value xDocfAdc,
                              Json::Value xDocTdcHit,
-                             Json::Value &xDocDigit) {
+                             Json::Value &xDocDigit) throw(Squeal) {
 
   int n_Adc_hits = xDocfAdc.size();
   std::string xTofKey_str = JsonWrapper::GetProperty(xDocDigit,
@@ -226,6 +246,18 @@ bool MapCppTOFDigits::getAdc(Json::Value xDocfAdc,
       xDocDigit["charge_pm"] = JsonWrapper::GetProperty(xDocfAdc[AdcHitCount],
                                                         "charge_pm",
                                                         JsonWrapper::intValue );
+
+      if (xDocDigit["part_event_number"] != xDocfAdc[AdcHitCount]["part_event_number"]) {
+        throw(Squeal(Squeal::recoverable,
+              std::string("Wrong part_event_number!"),
+              "MapCppTOFDigits::getAdc"));
+      }
+      if (xDocDigit["phys_event_number"] != xDocfAdc[AdcHitCount]["phys_event_number"]) {
+        throw(Squeal(Squeal::recoverable,
+              std::string("Wrong phys_event_number!"),
+              "MapCppTOFDigits::getAdc"));
+      }
+
       return true;
     }
   }
@@ -235,7 +267,7 @@ bool MapCppTOFDigits::getAdc(Json::Value xDocfAdc,
 
 bool MapCppTOFDigits::getTrig(Json::Value xDocTrig,
                               Json::Value xDocTdcHit,
-                              Json::Value &xDocDigit ) {
+                              Json::Value &xDocDigit ) throw(Squeal) {
   Json::Value xDocT = JsonWrapper::GetProperty(xDocTrig, "V1290", JsonWrapper::arrayValue);
   int HitGeo = JsonWrapper::GetProperty(xDocTdcHit , "geo", JsonWrapper::intValue).asInt();
   int n_count = xDocT.size();
@@ -254,6 +286,17 @@ bool MapCppTOFDigits::getTrig(Json::Value xDocTrig,
                                                                     "trailing_time",
                                                                     JsonWrapper::intValue);
 
+      if (xDocDigit["part_event_number"] != Trig["part_event_number"]) {
+        throw(Squeal(Squeal::recoverable,
+              std::string("Wrong part_event_number!"),
+              "MapCppTOFDigits::getTrig"));
+      }
+      if (xDocDigit["phys_event_number"] != Trig["phys_event_number"]) {
+        throw(Squeal(Squeal::recoverable,
+              std::string("Wrong phys_event_number!"),
+              "MapCppTOFDigits::getTrig"));
+      }
+
       return true;  // will break the loop and return true it finds the first trigger that matches.
     }
   }
@@ -263,7 +306,7 @@ bool MapCppTOFDigits::getTrig(Json::Value xDocTrig,
 
 bool MapCppTOFDigits::getTrigReq(Json::Value xDocTrigReq,
                                  Json::Value xDocTdcHit,
-                                 Json::Value &xDocDigit ) {
+                                 Json::Value &xDocDigit ) throw(Squeal) {
   Json::Value xDocTR = JsonWrapper::GetProperty(xDocTrigReq, "V1290", JsonWrapper::arrayValue);
   int HitGeo = JsonWrapper::GetProperty(xDocTdcHit, "geo", JsonWrapper::intValue).asInt();
   int n_req_count = xDocTR.size();
@@ -283,6 +326,17 @@ bool MapCppTOFDigits::getTrigReq(Json::Value xDocTrigReq,
       xDocDigit["trigger_request_trailing_time"] = JsonWrapper::GetProperty(TrigReq,
                                                                             "trailing_time",
                                                                             JsonWrapper::intValue);
+
+      if (xDocDigit["part_event_number"] != TrigReq["part_event_number"]) {
+        throw(Squeal(Squeal::recoverable,
+              std::string("Wrong part_event_number!"),
+              "MapCppTOFDigits::getTrigReq"));
+      }
+      if (xDocDigit["phys_event_number"] != TrigReq["phys_event_number"]) {
+        throw(Squeal(Squeal::recoverable,
+              std::string("Wrong phys_event_number!"),
+              "MapCppTOFDigits::getTrigReq"));
+      }
       return true;  // will break the loop when it finds the first request that matches.
       // There may be multiple requests per board but for now we only get the first one.
     }

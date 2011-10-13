@@ -33,10 +33,7 @@ bool MapCppTOFSlabHits::birth(std::string argJsonConfigDocument) {
   _stationKeys.push_back("tof1");
   _stationKeys.push_back("tof2");
 
-  if (SetConfiguration(argJsonConfigDocument))
-    return true;  // Sucessful completion
-  else
-    return false;
+  return true;
 }
 
 bool MapCppTOFSlabHits::death()  {return true;}
@@ -91,25 +88,18 @@ std::string MapCppTOFSlabHits::process(std::string document) {
       }
     }
   }
-  // std::cout << root["slab_hits"] << std::endl;
+  // std::cout << "daq : "<< root["daq_data"]["tof1"] << std::endl;
+  // std::cout << "digits : " << root["digits"]["tof1"] << std::endl;
+  // std::cout << root << std::endl;
   return writer.write(root);
-}
-
-bool MapCppTOFSlabHits::SetConfiguration(std::string json_configuration) {
-  //  JsonCpp setup
-  Json::Value configJSON = JsonWrapper::StringToJson(json_configuration);
-  // this will contain the configuration
-
-  return true;
 }
 
 Json::Value MapCppTOFSlabHits::makeSlabHits(Json::Value xDocPartEvent) {
 
   Json::Value xDocSlabHits;
-
   if (xDocPartEvent.isArray()) {
     int n_digits = xDocPartEvent.size();
-    // std::cout << xDocPartEvent << std::endl;
+     //std::cout << xDocPartEvent << std::endl;
 
     // Create a map of all hited PMTs.
     std::map<string, int> xDigitPos;
@@ -127,7 +117,6 @@ Json::Value MapCppTOFSlabHits::makeSlabHits(Json::Value xDocPartEvent) {
                                JsonWrapper::stringValue).asString();
 
       TOFChannelKey xKey(xKeyStr);
-
       // Check if we already have this key in the map. This will mean that there are two
       // digits in the same PMT.
       it = xDigitPos.find(xKeyStr);
@@ -217,30 +206,39 @@ Json::Value MapCppTOFSlabHits::fillSlabHit(Json::Value xDocDigit0, Json::Value x
   int xTimeDigit0 = JsonWrapper::GetProperty(xDocDigit0,
                                              "leading_time",
                                              JsonWrapper::intValue).asInt();
-  int xChargeDigit0 = JsonWrapper::GetProperty(xDocDigit0,
-                                               "charge_mm",
-                                               JsonWrapper::intValue).asInt();
+
   int xTriggerReqDigit0 = JsonWrapper::GetProperty(xDocDigit0,
                                                    "trigger_request_leading_time",
                                                    JsonWrapper::intValue).asInt();
 
   xDocPMT0["trigger_request_leading_time"] = xTriggerReqDigit0;
   xDocPMT0["leading_time"] = xTimeDigit0;
-  xDocPMT0["charge"] = xChargeDigit0;
 
   int xTimeDigit1 = JsonWrapper::GetProperty(xDocDigit1,
                                              "leading_time",
                                              JsonWrapper::intValue).asInt();
-  int xChargeDigit1 = JsonWrapper::GetProperty(xDocDigit1,
-                                               "charge_mm",
-                                               JsonWrapper::intValue).asInt();
   int xTriggerReqDigit1 = JsonWrapper::GetProperty(xDocDigit1,
                                                    "trigger_request_leading_time",
                                                    JsonWrapper::intValue).asInt();
 
   xDocPMT1["trigger_request_leading_time"] = xTriggerReqDigit1;
   xDocPMT1["leading_time"] = xTimeDigit1;
-  xDocPMT1["charge"] = xChargeDigit1;
+
+  // Charge of the digit can be unset because of the Zero suppresion of the fADCs. 
+  if (xDocDigit0.isMember("charge_mm") && xDocDigit1.isMember("charge_mm")) {
+    int xChargeDigit0 = JsonWrapper::GetProperty(xDocDigit0,
+                                                 "charge_mm",
+                                                 JsonWrapper::intValue).asInt();
+
+    int xChargeDigit1 = JsonWrapper::GetProperty(xDocDigit1,
+                                                 "charge_mm",
+                                                 JsonWrapper::intValue).asInt();
+
+    xDocPMT0["charge"] = xChargeDigit0;
+    xDocPMT1["charge"] = xChargeDigit1;
+    xDocSlabHit["charge"] = xChargeDigit0 + xChargeDigit1;
+    xDocSlabHit["charge_product"] = xChargeDigit0 * xChargeDigit1 / (xChargeDigit0 + xChargeDigit1);
+  }
 
   // Calculate the measured value of the time in nanoseconds.
   double time_digit0 = 25e-3*(static_cast<double>(xTimeDigit0 - xTriggerReqDigit0));
@@ -252,8 +250,6 @@ Json::Value MapCppTOFSlabHits::fillSlabHit(Json::Value xDocDigit0, Json::Value x
   xDocSlabHit["pmt1"] = xDocPMT1;
   double xRawTime = (time_digit0 + time_digit1)/2.;
   xDocSlabHit["raw_time"] = xRawTime;
-  xDocSlabHit["charge"] = xChargeDigit0 + xChargeDigit1;
-  xDocSlabHit["charge_product"] = xChargeDigit0 * xChargeDigit1 / (xChargeDigit0 + xChargeDigit1);
 
   return xDocSlabHit;
 }

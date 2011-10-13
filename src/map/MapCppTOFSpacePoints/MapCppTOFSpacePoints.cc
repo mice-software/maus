@@ -38,9 +38,16 @@ bool MapCppTOFSpacePoints::birth(std::string argJsonConfigDocument) {
 
 bool MapCppTOFSpacePoints::SetConfiguration(std::string json_configuration) {
   //  JsonCpp setup
-  Json::Value configJSON = JsonWrapper::StringToJson(json_configuration);
+  Json::Value configJSON;
+  try {
+    configJSON = JsonWrapper::StringToJson(json_configuration);
   // this will contain the configuration
-
+  }catch(Squeal e) {
+    Squeak::mout(Squeak::error)
+    << "Error in  MapCppTOFSlabHits::process. Bad json document."
+    << std::endl;
+    return false;
+  }
   _makeSpacePiontCut = 0.5; // nanoseconds
   _findTriggerPixelCut = 0.5; // nanoseconds
   _triggerStation = JsonWrapper::GetProperty(configJSON,
@@ -108,8 +115,8 @@ std::string MapCppTOFSpacePoints::process(std::string document) {
     }
   }
   // std::cout << root["daq_data"]["tof0"] << root["daq_data"]["tof1"] << std::endl;
-  // std::cout << root["digits"]["tof0"] << root["digits"]["tof1"] << std::endl;
-  // std::cout << root["slab_hits"]["tof0"] << std::endl;
+  // std::cout << root["digits"] << std::endl;
+  // std::cout << root["slab_hits"] << std::endl;
   // std::cout << root["space_points"] << std::endl;
   return writer.write(root);
 }
@@ -315,6 +322,12 @@ Json::Value MapCppTOFSpacePoints::fillSpacePoint(Json::Value &xDocSlabHit_X,
 bool MapCppTOFSpacePoints::calibratePmtHit(TOFPixelKey xTriggerPixelKey,
                                            Json::Value &xPmtHit,
                                            double &time) {
+  int charge;
+  // Charge of the digit can be unset because of the Zero suppresion of the fADCs.
+  if (xPmtHit.isMember("charge"))
+    charge = JsonWrapper::GetProperty(xPmtHit, "charge", JsonWrapper::intValue).asInt();
+  else
+    return  false;
 
   std::string keyStr = JsonWrapper::GetProperty(xPmtHit,
                                                 "tof_key",
@@ -325,9 +338,6 @@ bool MapCppTOFSpacePoints::calibratePmtHit(TOFPixelKey xTriggerPixelKey,
                                               "raw_time",
                                               JsonWrapper::realValue).asDouble();
 
-  int charge = JsonWrapper::GetProperty(xPmtHit,
-                                        "charge",
-                                        JsonWrapper::intValue).asInt();
   // Get the calibration correction.
   double dT = _map.dT(xChannelKey, xTriggerPixelKey, charge);
   if (dT == TOFCalibrationMap::NOCALIB)

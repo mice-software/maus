@@ -19,6 +19,7 @@
 
 InputCppData::InputCppData(std::string pDataPath,
                                    std::string pRunNum) {
+  _classname = "InputCppDAQData";
   _eventPtr = NULL;
   _dataPaths = pDataPath;
   _datafiles = pRunNum;
@@ -211,15 +212,39 @@ std::string InputCppData::getCurEvent() {
   }
   // Deal with exceptions
   catch(MDexception & lExc) {
-    Squeak::mout(Squeak::error) << "Unpacking exception,  DAQ Event skipped" << std::endl;
+    Squeak::mout(Squeak::error) << "InputCppData : Unpacking exception." <<
+    std::endl << "DAQ Event skipped!" << std::endl;
     Squeak::mout(Squeak::error) <<  lExc.GetDescription() << endl;
+    xDocSpill.clear();
+    Json::Value errors;
+    std::stringstream ss;
+    ss << _classname << " says:" << lExc.GetDescription() << "  Phys. Event "
+    << _dataProcessManager.GetPhysEventNumber() << " skipped!";
+    errors["bad_data_input"] = ss.str();
+    xDocRoot["errors"] = errors;
   }
   catch(std::exception & lExc) {
-    Squeak::mout(Squeak::error) << "Standard exception" << std::endl;
+    Squeak::mout(Squeak::error) << "InputCppData : Standard exception."
+    << std::endl << "DAQ Event skipped!" << std::endl;
     Squeak::mout(Squeak::error) << lExc.what() << std::endl;
+    xDocSpill.clear();
+    Json::Value errors;
+    std::stringstream ss;
+    ss << _classname << " says:" << lExc.what() << " Phys. Event "
+    << _dataProcessManager.GetPhysEventNumber() << " skipped!";
+    errors["bad_data_input"] = ss.str();
+    xDocRoot["errors"] = errors;
   }
   catch(...) {
-    Squeak::mout(Squeak::error) << "Unknown exception occurred..." << std::endl;
+    Squeak::mout(Squeak::error) << "InputCppData : Unknown exception occurred."
+    << std::endl << "DAQ Event skipped!" << std::endl;
+    xDocSpill.clear();
+    Json::Value errors;
+    std::stringstream ss;
+    ss << _classname << " says: Unknown exception occurred. Phys. Event "
+    << _dataProcessManager.GetPhysEventNumber() << " skipped!";
+    errors["bad_data_input"] = ss.str();
+    xDocRoot["errors"] = errors;
   }
 
   // Finally attach the spill to the document root

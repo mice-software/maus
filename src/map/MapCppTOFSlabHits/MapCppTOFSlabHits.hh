@@ -66,7 +66,6 @@ class MapCppTOFSlabHits {
  * \param[in] json_configuration Json document containing the configuration.
  * \returns true if configurated successfully.
  */
-  bool SetConfiguration(std::string json_configuration);
 
   Json::Value fillSlabHit(Json::Value xDocDigit0, Json::Value xDocDigit1);
 

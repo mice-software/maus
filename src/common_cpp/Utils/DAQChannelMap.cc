@@ -102,16 +102,18 @@ bool DAQChannelMap::InitFromFile(std::string filename) {
   }
   std::stringstream key_s;
   DAQChannelKey* key;
-
+  int lineNum = 0;
   try {
     while ( !stream.eof() ) {
       key = new DAQChannelKey();
       stream >> *key;
       _chKey.push_back(key);
+      lineNum++;
     }
   }catch(Squeal e) {
     Squeak::mout(Squeak::error)
     << "Error in DAQChannelMap::InitFromFile : Error during loading." << std::endl
+    << "in file : " << filename << " line " << lineNum
     << e.GetMessage() << std::endl;
     return false;
   }

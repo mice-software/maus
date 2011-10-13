@@ -91,19 +91,19 @@ class MapCppTOFDigits {
    *  @param xDocInfo Json document with the TDC digit information. This is needed
    *  so ascosiate the proper ADC data to corresponding TDC data.
    */
-  bool getAdc(Json::Value xDocAdc, Json::Value xDocTdcHit, Json::Value &xDocDigit);
+  bool getAdc(Json::Value xDocAdc, Json::Value xDocTdcHit, Json::Value &xDocDigit) throw(Squeal);
 
   /** @brief process JSON document
    *  @param xDocTrigReq Json document with the trigger request for a specific particle event
    *  @param xDocInfo 
    */
-  bool getTrigReq(Json::Value xDocTrigReq, Json::Value xDocTdcHit, Json::Value &xDocDigit);
+  bool getTrigReq(Json::Value xDocTrigReq, Json::Value xDocTdcHit, Json::Value &xDocDigit) throw(Squeal);
 
   /** @brief process JSON document
    *  @param document Receive a document with raw data and return
    *  a document with digits
    */
-  bool getTrig(Json::Value xDocTrig, Json::Value xDocTdcHit, Json::Value &xDocDigit);
+  bool getTrig(Json::Value xDocTrig, Json::Value xDocTdcHit, Json::Value &xDocDigit) throw(Squeal);
 };
 #endif
 
