@@ -40,7 +40,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         echo "INFO: Configuring:"
         echo
         sleep 1
-        # make sure we can see libpython2.7.so
+        # make sure we can see libpython2.7.so - libxml2 build doesnt seem to see LD_LIBRARY_PATH
         export LDFLAGS=-L${MAUS_ROOT_DIR}/third_party/install/lib 
         ./configure --prefix=${MAUS_ROOT_DIR}/third_party/install --with-python=${MAUS_ROOT_DIR}/third_party/install/
         echo
