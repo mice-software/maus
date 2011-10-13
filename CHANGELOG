@@ -1,3 +1,14 @@
+MAUS-v0.0.9 (http://micewww.pp.rl.ac.uk/versions/show/17)
+  Bug #42: Possible memory leak in MiceModule class
+  Bug #750: OutputPyImage segmentation fault because of bad uuid library
+  Feature #179: docbooks?
+  Feature #698: Pull MICE Physcis List from legacy
+  Feature #702: matplotlib histogram reducer
+  Feature #744: libxml2 build on test server
+  Feature #755: Move example code to bin/user/
+  Feature #757: Fix readme in bin/
+  Feature #763: TOF reconstruction to space points
+
 MAUS-v0.0.8 (http://micewww.pp.rl.ac.uk/versions/show/16)
   Bug #571: test_cdb_alarmhandler fails to import bitarray
   Bug #701: Reducer isn't called if there is only 1 input

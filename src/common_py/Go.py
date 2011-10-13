@@ -131,6 +131,8 @@ class Go:  #  pylint: disable=R0921
         print(("\tProcess ID (PID): %d" % os.getpid()))
         print(("\tProgram Arguments: %s" % str(sys.argv)))
         print ("\tVersion: %s" % version)
+        if json_config_dictionary["verbose_level"] == 0:
+          print "Configuration: ",json.dumps(json_config_dictionary, indent=2)
 
         #
         #  Enumerate list of possible types of dataflow
@@ -159,7 +161,7 @@ class Go:  #  pylint: disable=R0921
         emitter = self.input.emitter()
         map_buffer = buffer_input(emitter, 1)
 
-        print("TRANSFORM: Setting up transformer")
+        print("TRANSFORM: Setting up transformer (this can take a while...)")
         assert(self.transformer.birth(self.json_config_document) == True)
 
         print("MERGE: Setting up merger")
