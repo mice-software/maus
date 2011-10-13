@@ -91,11 +91,11 @@ SciFiPlane::SciFiPlane(MiceModule* mod, G4Material* mater, G4VPhysicalVolume *ml
 }
 
 SciFiPlane::~SciFiPlane() {
-  delete solidDoublet;
+ /* delete solidDoublet;
   delete logicDoublet;
   delete physiDoublet;
 
   delete solidCore;
   delete logicCore;
-  delete physiCore;
+  delete physiCore;*/
 }

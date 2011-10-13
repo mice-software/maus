@@ -74,18 +74,18 @@ class SciFiPlaneTest : public ::testing::Test {
 TEST_F(SciFiPlaneTest, Test_num_fibres_in_all_planes) {
   std::string filename;
   filename = "Stage6.dat";
-  int trackerNo = 0;
-  int stationNo = 1;
-  int planeNo = 0;
-
-  // for ( int trackerNo = 0; trackerNo < 2; trackerNo++ ) {
-    // for ( int stationNo = 1; stationNo < 6; stationNo++ ) {
-     // for ( int planeNo = 0; planeNo < 3; planeNo++ ) {
-        // get the SciFi Modules
+ // int trackerNo = 0;
+ // int stationNo = 1;
+ // int planeNo = 0;
   std::vector<const MiceModule*> modules;
   MiceModule*      _module;
   _module = new MiceModule(filename);
   modules = _module->findModulesByPropertyString("SensitiveDetector", "SciFi");
+
+   for ( int trackerNo = 0; trackerNo < 2; trackerNo++ ) {
+     for ( int stationNo = 1; stationNo < 6; stationNo++ ) {
+      for ( int planeNo = 0; planeNo < 3; planeNo++ ) {
+        // get the SciFi Modules
 
   const MiceModule* this_plane = NULL;
   for ( unsigned int j = 0; !this_plane && j < modules.size(); ++j ) {
@@ -112,9 +112,9 @@ TEST_F(SciFiPlaneTest, Test_num_fibres_in_all_planes) {
     EXPECT_EQ(SciFiPlane::SciFi_numFibres, 214*7);
   if ( planeNo == 1 && !(trackerNo == 0 && stationNo == 5) )
     EXPECT_EQ(SciFiPlane::SciFi_numFibres, 212*7);
-  // }
-  // }
-  // }
+   }
+   }
+   }
 }
 
 } // namespace
