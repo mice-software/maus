@@ -16,6 +16,9 @@
  */
 
 #include <iostream>
+#include <sstream>
+#include <vector>
+#include <string>
 
 #include "json/json.h"
 
@@ -35,7 +38,7 @@
 
 namespace MAUS {
 
-const std::string MAUSPhysicsList::_scatNames [] = {"muBrems", "hBrems",
+const std::string MAUSPhysicsList::_scatNames[] = {"muBrems", "hBrems",
                   "eBrems", "muPairProd", "ePairProd", "hPairProd",
                   "ElectroNuclear", "msc"};
 const std::string MAUSPhysicsList::_eLossNames[] = {"muBrems", "hBrems",
@@ -44,8 +47,8 @@ const std::string MAUSPhysicsList::_eLossNames[] = {"muBrems", "hBrems",
 const int         MAUSPhysicsList::_nScatNames   = 8;
 const int         MAUSPhysicsList::_nELossNames  = 9;
 
-MAUSPhysicsList::MAUSPhysicsList(G4VModularPhysicsList* physList):
-                                                G4VModularPhysicsList(*physList)
+MAUSPhysicsList::MAUSPhysicsList(G4VModularPhysicsList* physList)
+                                              : G4VModularPhysicsList(*physList)
 {}
 
 MAUSPhysicsList::~MAUSPhysicsList()
@@ -56,7 +59,7 @@ MAUSPhysicsList* MAUSPhysicsList::GetMAUSPhysicsList() {
   std::string physModel = JsonWrapper::GetProperty
                      (dc, "physics_model", JsonWrapper::stringValue).asString();
   G4PhysListFactory fact;
-  if(fact.IsReferencePhysList(physModel)) {
+  if (fact.IsReferencePhysList(physModel)) {
     MAUSPhysicsList* mpl =
                      new MAUSPhysicsList(fact.GetReferencePhysList(physModel) );
     try {
@@ -67,8 +70,7 @@ MAUSPhysicsList* MAUSPhysicsList::GetMAUSPhysicsList() {
         delete mpl;
         throw squee;
     }
-  }
-  else {
+  } else {
     throw(Squeal(Squeal::recoverable,
         "Failed to recognise physics list model "+physModel,
         "MAUSPhysicsList::GetMAUSPhysicsList()")
@@ -80,13 +82,7 @@ void MAUSPhysicsList::BeginOfReferenceParticleAction() {
   Squeak::mout(Squeak::debug)
         << "MAUSPhysicsList::BeginOfReferenceParticleAction() with de model "
         << _refDEModel << std::endl;
-  if (EnergyLossModel(_refDEModel) == energyStraggling) {
-    throw (Squeal(Squeal::recoverable, 
-      "reference_energy_loss_model cannot have energy straggling",
-      "MAUSPhysicsList::BeginOfReferenceParticleAction()"
-    ));
-  }
-  SetStochastics("none", _refDEModel, "none", false);
+  SetStochastics(no_scat, _refDEModel, no_hadronic, false);
 }
 
 void MAUSPhysicsList:: BeginOfRunAction() {
@@ -98,67 +94,21 @@ void MAUSPhysicsList:: BeginOfRunAction() {
                               << "\n  pi 1/2 life " << _piHalfLife
                               << "\n  mu 1/2 life " << _muHalfLife << std::endl;
   SetStochastics(_msModel, _dEModel, _hadronicModel, _partDecay);
-  SetHalfLife   (_piHalfLife, _muHalfLife);
+  SetHalfLife(_piHalfLife, _muHalfLife);
 }
 
-MAUSPhysicsList::scat    MAUSPhysicsList::ScatteringModel
-                                                (std::string scatteringModel) {
-  for(size_t i=0; i<scatteringModel.size(); i++) {
-    scatteringModel[i] = tolower(scatteringModel[i]);
-  }
-  if(scatteringModel=="msc" || scatteringModel=="mcs") {
-    return mcs;
-  }
-  if(scatteringModel=="none") {
-    return no_scat;
-  }
-  throw(Squeal(Squeal::recoverable,
-      "Scattering model "+scatteringModel+" not recognised",
-      "MAUSPhysicsList::ScatteringModel(std::string)")
-  );
-}
-
-MAUSPhysicsList::eloss   MAUSPhysicsList::EnergyLossModel
-                                                      (std::string elossModel) {
-  for(size_t i=0; i<elossModel.size(); i++) {
-    elossModel[i] = tolower(elossModel[i]);
-  }
-  if(elossModel=="ionization" || elossModel=="ionisation" || elossModel=="dedx")
-    return dedx;
-  if(elossModel=="estrag")
-    return energyStraggling;
-  if(elossModel=="none")
-    return no_eloss;
-  throw(Squeal(Squeal::recoverable,
-        "Energy loss model "+elossModel+" not recognised",
-        "MAUSPhysicsList::EnergyLossModel(std::string)")
-  );
-}
-
-MAUSPhysicsList::hadronic MAUSPhysicsList::HadronicModel
-                                                   (std::string hadronicModel) {
-  for(size_t i=0; i<hadronicModel.size(); i++)
-    hadronicModel[i] = tolower(hadronicModel[i]);
-  if( hadronicModel=="all" ) return  all_hadronic;
-  if( hadronicModel=="none" ) return no_hadronic;
-  throw(Squeal(Squeal::recoverable,
-        "Did not recognise hadronic model "+hadronicModel,
-        "MAUSPhysicsList::HadronicModel")
-  );
-}
-
-void MAUSPhysicsList::SetStochastics(std::string scatteringModel,
-                      std::string energyLossModel, std::string hadronicModel,
+void MAUSPhysicsList::SetStochastics(scat scatteringModel,
+                      eloss energyLossModel, hadronic hadronicModel,
                       bool decayModel) {
-  SetScattering( ScatteringModel(scatteringModel) );
-  SetEnergyLoss( EnergyLossModel(energyLossModel) );
-  SetHadronic  ( HadronicModel  (hadronicModel  ) );
-  SetDecay     ( decayModel );
+  SetEnergyLoss(energyLossModel);
+  SetScattering(scatteringModel);
+  SetHadronic(hadronicModel);
+  SetDecay(decayModel);
 }
 
 void MAUSPhysicsList::SetDecay(bool decay) {
-  if(!decay) UIApplyCommand("/process/inactivate Decay");
-  else       UIApplyCommand("/process/activate   Decay");
+  if (!decay) UIApplyCommand("/process/inactivate Decay");
+  else        UIApplyCommand("/process/activate   Decay");
 }
 
 
@@ -167,7 +117,7 @@ void MAUSPhysicsList::SetEnergyLoss(eloss eLossModel) {
   std::stringstream cutStream;
   std::string  elossActive = "activate";
   std::string  flucActive  = "true";
-  switch(eLossModel) {
+  switch (eLossModel) {
     case energyStraggling:
       elossActive = "activate";
       flucActive  = "true";
@@ -188,10 +138,10 @@ void MAUSPhysicsList::SetEnergyLoss(eloss eLossModel) {
   std::vector<std::string> uiCommand;
   uiCommand.push_back("/run/setCut "+cutStream.str());
   uiCommand.push_back("/process/eLoss/fluct "+flucActive);
-  for(int i=0; i<_nELossNames; i++)
+  for (int i = 0; i < _nELossNames; i++)
     uiCommand.push_back("/process/"+elossActive+" "+_eLossNames[i]);
 
-  for(size_t i=0; i<uiCommand.size(); i++) {
+  for (size_t i = 0; i < uiCommand.size(); i++) {
     Squeak::mout(Squeak::debug) << "Applying " << uiCommand[i] << std::endl;
     UIApplyCommand(uiCommand[i]);
   }
@@ -200,7 +150,7 @@ void MAUSPhysicsList::SetEnergyLoss(eloss eLossModel) {
 
 void MAUSPhysicsList::SetScattering(scat scatteringModel) {
   std::string activation;
-  switch(scatteringModel) {
+  switch (scatteringModel) {
     case mcs:
       activation  = "/process/activate ";
       break;
@@ -209,7 +159,7 @@ void MAUSPhysicsList::SetScattering(scat scatteringModel) {
       break;
   }
 
-  for(int i=0; i<_nScatNames; i++) {
+  for (int i = 0; i < _nScatNames; i++) {
     Squeak::mout(Squeak::debug) << "Applying " << activation+_scatNames[i]
                                 << std::endl;
     UIApplyCommand(activation+_scatNames[i]);
@@ -218,7 +168,7 @@ void MAUSPhysicsList::SetScattering(scat scatteringModel) {
 
 void MAUSPhysicsList::SetHadronic(hadronic hadronicModel) {
   std::string activation;
-  switch(hadronicModel) {
+  switch (hadronicModel) {
     case all_hadronic:
       activation  = "/process/activate ";
       break;
@@ -229,10 +179,10 @@ void MAUSPhysicsList::SetHadronic(hadronic hadronicModel) {
 
   G4ProcessVector*   pvec  = G4ProcessTable::GetProcessTable()->
                                                        FindProcesses(fHadronic);
-  for(int i=0; i<pvec->size(); i++) {
+  for (int i = 0; i < pvec->size(); i++) {
     std::string pname = (*pvec)[i]->GetProcessName();
     Squeak::mout(Squeak::debug) << "Applying " << activation+pname << std::endl;
-    UIApplyCommand( activation+pname );
+    UIApplyCommand(activation+pname);
   }
 }
 
@@ -242,11 +192,11 @@ void MAUSPhysicsList::ConstructProcess() {
 }
 
 void MAUSPhysicsList::SetSpecialProcesses() {
-  theParticleIterator->reset(); //from G4VUserPhysicsList
-  while( (*theParticleIterator)() ) {
+  theParticleIterator->reset();  // from G4VUserPhysicsList
+  while ( (*theParticleIterator)() ) {
     G4ProcessManager* pmanager = theParticleIterator->value()->
                                                             GetProcessManager();
-    pmanager->AddProcess( new G4StepLimiter,-1,-1,2);
+    pmanager->AddProcess(new G4StepLimiter, -1, -1, 2);
   }
 }
 
@@ -259,20 +209,44 @@ void MAUSPhysicsList::SetHalfLife(double pionHalfLife,  double muonHalfLife) {
 
 void MAUSPhysicsList::SetParticleHalfLife(std::string particleName,
                                           double halfLife) {
-  if(halfLife <= 0.) return;
-  UIApplyCommand("particle/select "+particleName);
+  if (halfLife <= 0.) return;
+  std::stringstream ss_in;
+  ss_in << halfLife;
+  UIApplyCommand("/particle/select "+particleName);
+  UIApplyCommand("/particle/property/lifetime "+ss_in.str()+" ns");
+  UIApplyCommand("/particle/property/dump");
 }
 
 void MAUSPhysicsList::Setup() {
     Json::Value& dc = *MICERun::getInstance()->jsonConfiguration;
-    _refDEModel = JsonWrapper::GetProperty(dc, "reference_energy_loss_model",
+    std::string refPhysicsModel = JsonWrapper::GetProperty(dc,
+            "reference_physics_processes", JsonWrapper::stringValue).asString();
+    std::string physicsModel = JsonWrapper::GetProperty(dc, "physics_processes",
                                           JsonWrapper::stringValue).asString();
-    _msModel = JsonWrapper::GetProperty(dc, "multiple_scattering_model",
-                                          JsonWrapper::stringValue).asString();
-    _dEModel = JsonWrapper::GetProperty(dc, "energy_loss_model",
-                                          JsonWrapper::stringValue).asString();
-    _hadronicModel = JsonWrapper::GetProperty(dc, "hadronic_model",
-                                          JsonWrapper::stringValue).asString();
+
+    if (refPhysicsModel == "none")
+      _refDEModel = no_eloss;
+    if (refPhysicsModel == "mean_energy_loss")
+      _refDEModel = dedx;
+
+    if (physicsModel == "none") {
+      _msModel = no_scat;
+      _dEModel = no_eloss;
+      _hadronicModel = no_hadronic;
+    }
+
+    if (physicsModel == "mean_energy_loss") {
+      _msModel = no_scat;
+      _dEModel = dedx;
+      _hadronicModel = no_hadronic;
+    }
+
+    if (physicsModel == "standard") {
+      _msModel = mcs;
+      _dEModel = energyStraggling;
+      _hadronicModel = all_hadronic;
+    }
+
     _partDecay = JsonWrapper::GetProperty(dc, "particle_decay",
                                           JsonWrapper::booleanValue).asBool();
     _piHalfLife = JsonWrapper::GetProperty(dc, "charged_pion_half_life",
@@ -288,6 +262,5 @@ void MAUSPhysicsList::UIApplyCommand(std::string command) {
         << "Apply G4UI command: " << command << std::endl;
     G4UImanager::GetUIpointer()->ApplyCommand(command);
 }
-
 }
 

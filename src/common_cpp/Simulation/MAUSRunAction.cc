@@ -23,14 +23,11 @@
 
 namespace MAUS {
 
-void MAUSRunAction::BeginOfRunAction(const G4Run* aRun)
-{
-  //Visualization
-  if (G4VVisManager::GetConcreteInstance()) 
-  {
-     G4UImanager::GetUIpointer()->ApplyCommand("/vis/scene/notifyHandlers");    
-  } 
+void MAUSRunAction::BeginOfRunAction(const G4Run* aRun) {
+  // Visualization
+  if (G4VVisManager::GetConcreteInstance()) {
+     G4UImanager::GetUIpointer()->ApplyCommand("/vis/scene/notifyHandlers");
+  }
 }
-
 }
 

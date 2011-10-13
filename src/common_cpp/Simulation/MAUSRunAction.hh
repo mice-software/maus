@@ -21,7 +21,6 @@
 #include "globals.hh"
 #include "G4UserRunAction.hh"
 
-
 namespace MAUS {
 
 /** @class MAUSRunAction
@@ -32,8 +31,7 @@ namespace MAUS {
  *
  *  Nb: nothing to test here so I don't have a unit test
  */
-class MAUSRunAction : public G4UserRunAction
-{
+class MAUSRunAction : public G4UserRunAction {
   public:
     /** Constructor does nothing */
     MAUSRunAction() {;}
@@ -45,9 +43,7 @@ class MAUSRunAction : public G4UserRunAction
 
     /** Does nothing */
     virtual void EndOfRunAction(const G4Run* aRun) {}
-
 };
-
 }
 #endif
 

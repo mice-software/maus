@@ -59,10 +59,8 @@ simulation_reference_particle = { # used for setting particle phase
 
 # geant4 physics model
 physics_model = "QGSP_BERT" # Physics package loaded by MAUS to set default values; modifications can be made
-reference_energy_loss_model = "ionisation" # Energy loss model of reference particle; set to "none" or "ionisation". Reference particle can never have stochastic processes (e.g. estrag, mcs) enabled.
-multiple_scattering_model = "mcs" # "mcs" (multiple coulomb scattering) or "none"
-energy_loss_model = "estrag" # "estrag" (full energy loss, including stochastics), "ionisation" (mean energy loss only excluding stochastics) or "none"
-hadronic_model = "all" # "all" (All hadronic interactions) or "none" (no hadronic interactions)
+reference_physics_processes = "mean_energy_loss"
+physics_processes = "standard"
 particle_decay = True # set to true to activate particle decay, or False to inactivate particle decay
 charged_pion_half_life = -1. # set the pi+, pi- half life [ns]. Negative value means use geant4 default
 muon_half_life = -1. # set the mu+, mu- half life [ns]. Negative value means use geant4 default
