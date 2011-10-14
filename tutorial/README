@@ -1,0 +1,3 @@
+Please run tutorail only after complete installation of MAUS.
+To install MAUS run install_then_build_then_test.bash which
+can be found at, MAUS_directory/test/integration/
