@@ -106,6 +106,7 @@
 					"trigger_trailing_time" : -99
 				}
 			],
+			null,
 			null
 			
 		],
@@ -233,7 +234,8 @@
 					"trigger_time_tag" : 84186274,
 					"trigger_trailing_time" : -99
 				}
-			]
+			],
+			null
 		],
 		"tof2" : 
 		[
@@ -339,7 +341,8 @@
 					"trigger_time_tag" : 109370167,
 					"trigger_trailing_time" : -99
 				}
-			]
+			],
+			null
 		]
 	},
 	"spill_num" : 0

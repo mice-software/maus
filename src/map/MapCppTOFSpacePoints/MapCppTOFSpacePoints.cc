@@ -30,44 +30,53 @@ bool MapCppTOFSpacePoints::birth(std::string argJsonConfigDocument) {
   // Check if the JSON document can be parsed, else return error only
   _classname = "MapCppTOFSpacePoints";
 
-  if (SetConfiguration(argJsonConfigDocument))
-    return true;  // Sucessful completion
-  else
-    return false;
-}
-
-bool MapCppTOFSpacePoints::SetConfiguration(std::string json_configuration) {
-  //  JsonCpp setup
+  // JsonCpp setup
   Json::Value configJSON;
   try {
-    configJSON = JsonWrapper::StringToJson(json_configuration);
+    configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
   // this will contain the configuration
   }catch(Squeal e) {
     Squeak::mout(Squeak::error)
-    << "Error in  MapCppTOFSlabHits::process. Bad json document."
+    << "Error in MapCppTOFSpacePoints::birth. Bad json document."
     << std::endl;
     return false;
   }
-  _makeSpacePiontCut = 0.5; // nanoseconds
-  _findTriggerPixelCut = 0.5; // nanoseconds
+
+  // Load the calibration.
+  bool loaded = _map.InitializeFromCards(configJSON);
+  if (!loaded)
+    return false;
+
+  _makeSpacePiontCut = JsonWrapper::GetProperty(configJSON,
+                                             "TOF_makeSpacePiontCut",
+                                             JsonWrapper::realValue).asDouble(); // nanoseconds
+  _findTriggerPixelCut = JsonWrapper::GetProperty(configJSON,
+                                                  "TOF_findTriggerPixelCut",
+                                                  JsonWrapper::realValue).asDouble(); // nanosec.
+
   _triggerStation = JsonWrapper::GetProperty(configJSON,
                                              "TOF_trigger_station",
                                              JsonWrapper::stringValue).asString();
+
   // The first element of the vectro has to be the trigger station.
   // This is mandatory!!!
   _stationKeys.push_back(_triggerStation);
   if (_triggerStation == "tof1") {
     _stationKeys.push_back("tof0");
     _stationKeys.push_back("tof2");
-  } else {
+  } 
+  else if (_triggerStation == "tof0") {
     _stationKeys.push_back("tof1");
     _stationKeys.push_back("tof2");
   }
+  else {
+    Squeak::mout(Squeak::error)
+    << "Error in MapCppTOFSpacePoints::birth. TOF trigger station is wrong."
+    << "It can be tof1 or tof0. The provided trigger station is : " << _triggerStation
+    << std::endl;
 
-  // Load the calibration.
-  bool loaded = _map.InitializeFromCards(json_configuration);
-  if (!loaded)
     return false;
+  }
 
   return true;
 }
@@ -87,7 +96,7 @@ std::string MapCppTOFSpacePoints::process(std::string document) {
                                           JsonWrapper::stringValue);
   }catch(Squeal e) {
     Squeak::mout(Squeak::error)
-    << "Error in  MapCppTOFSlabHits::process. Bad json document."
+    << "Error in MapCppTOFSpacePoints::process. Bad json document."
     << std::endl;
     Json::Value errors;
     std::stringstream ss;
@@ -97,7 +106,7 @@ std::string MapCppTOFSpacePoints::process(std::string document) {
     return writer.write(root);
   }
 
-  if (xEventType== "physics_event" || xEventType == "calibration_event") {
+  if (xEventType == "physics_event" || xEventType == "calibration_event") {
     if (root.isMember("slab_hits")) {
       _triggerhit_pixels.clear();
 
@@ -114,10 +123,8 @@ std::string MapCppTOFSpacePoints::process(std::string document) {
         root["slab_hits"] = xSlabHits;
     }
   }
-  // std::cout << root["daq_data"]["tof0"] << root["daq_data"]["tof1"] << std::endl;
-  // std::cout << root["digits"] << std::endl;
-  // std::cout << root["slab_hits"] << std::endl;
-  // std::cout << root["space_points"] << std::endl;
+  // if (root.isMember("slab_hits")) std::cout << root["slab_hits"] << std::endl;
+  // if (root.isMember("space_points")) std::cout << root["space_points"] << std::endl;
   return writer.write(root);
 }
 
@@ -172,15 +179,17 @@ Json::Value MapCppTOFSpacePoints::processTOFStation(Json::Value &xSlabHits,
         // std::cout << "processTOFStation " << detector << "  trigger : "
         // << _triggerhit_pixels[PartEvent] <<std::endl;
 
+        Json::Value xDocPartEventSpacePoints;
         // If we do not know the trigger pixel there is no way to reconstruct the time.
         if (_triggerhit_pixels[PartEvent] != "unknown") {
           // Create the space point. Add the calibrated value of the time to the slab hits.
-          xDocSpacePoints[PartEvent] = makeSpacePoints(xDocPartEvent);
+          xDocPartEventSpacePoints = makeSpacePoints(xDocPartEvent);
 
           // The slab hit document is now modified. The calibrated time measurements are added.
           // Save the modifications.
           xSlabHits[detector][PartEvent] = xDocPartEvent;
         }
+        xDocSpacePoints[PartEvent] = xDocPartEventSpacePoints;
       }
     }
   }
@@ -212,6 +221,7 @@ std::string MapCppTOFSpacePoints::findTriggerPixel(Json::Value xDocPartEvent) {
           calibrateSlabHit(xTriggerPixelKey, xSlabHit_Y, t_y)) {
         if (fabs(t_x/2. + t_y/2.) < _findTriggerPixelCut) {
           // The trigger pixel has been found.
+          // std::cout << xTriggerPixelKey << std::endl;
           return xTriggerPixelKey.str();
         }
       }

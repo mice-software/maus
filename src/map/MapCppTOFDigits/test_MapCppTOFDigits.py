@@ -39,7 +39,7 @@ class MapCppTOFDigitsTestCase(unittest.TestCase):
         test2 = '%s/src/map/MapCppTOFDigits/processTest.txt' %os.environ.get("MAUS_ROOT_DIR")
         f = open(test2,'r')
         data = f.read()
-        # test withe some crazy events.
+        # test with some crazy events.
         result = self.mapper.process(data)
         spill_in = json.loads(data)
         spill_out = json.loads(result)

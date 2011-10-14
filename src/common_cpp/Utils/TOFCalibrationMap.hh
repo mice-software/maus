@@ -115,7 +115,7 @@ class TOFCalibrationMap {
   * \param[in] json_configuration Json document containing the configuration.
   * \returns true if all text files are loaded successfully.
   */
-  bool InitializeFromCards(std::string json_configuration);
+  bool InitializeFromCards(Json::Value configJSON);
 
   /// Not implemented.
   bool InitFromCDB();
@@ -251,6 +251,12 @@ class TOFCalibrationMap {
  /** Name of the calibration as in the CBD.
   */
   std::string _name;
+
+ /** Flags for switching On and Off of the different types of calibration corrections.
+  */
+  bool _do_timeWalk_correction;
+  bool _do_triggerDelay_correction;
+  bool _do_t0_correction;
 };
 
 #endif

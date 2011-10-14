@@ -42,36 +42,30 @@ class MapCppTOFSlabHitsTestCase(unittest.TestCase):
         test2 = '%s/src/map/MapCppTOFSlabHits/processTest.txt' %os.environ.get("MAUS_ROOT_DIR")
         f = open(test2,'r')
         data = f.read()
-        # test withe some crazy events.
+        # test with some crazy events.
         result = self.mapper.process(data)
         spill = json.loads(result)
         # test the tof0 output
         n_part_events = len(spill['slab_hits']['tof0'])
-        self.assertEqual(n_part_events,2)
-        # test the calculation of the raw time
-        raw_time_partEv0_slHit0 = (416572-420998+1727593-1731992)/2.*0.025
+        self.assertEqual(n_part_events,3)
+        self.assertFalse(spill['slab_hits']['tof0'][1]) # no slab hits in tof0 partEv0
         n_slab_hits_partEv0_tof0 = len(spill['slab_hits']['tof0'][0])
         self.assertEqual(n_slab_hits_partEv0_tof0,1)
-        no_slab_hits_in_partEv1_tof0 = True
-        if spill['slab_hits']['tof0'][1]:
-          no_slab_hits_in_partEv1_tof0 = False
-        self.assertTrue(no_slab_hits_in_partEv1_tof0)
+        # test the calculation of the raw time
+        raw_time_partEv0_slHit0 = (416572-420998+1727593-1731992)/2.*0.025
         raw_time_partEv0_slHit0_rec = spill['slab_hits']['tof0'][0][0]['raw_time']
         self.assertEqual(raw_time_partEv0_slHit0_rec,raw_time_partEv0_slHit0)
         # test the tof1 output
         n_part_events = len(spill['slab_hits']['tof1'])
-        self.assertEqual(n_part_events,2)
+        self.assertEqual(n_part_events,3)
         n_slab_hits_partEv0_tof1 = len(spill['slab_hits']['tof1'][0])
-        self.assertEqual(n_slab_hits_partEv0_tof1,2)
+        self.assertEqual(n_slab_hits_partEv0_tof1,2) 
         n_slab_hits_partEv1_tof1 = len(spill['slab_hits']['tof1'][1])
         self.assertEqual(n_slab_hits_partEv1_tof1,1)
         # test the tof2 output
         n_part_events = len(spill['slab_hits']['tof1'])
-        self.assertEqual(n_part_events,2)
-        no_slab_hits_in_partEv1_tof2 = True
-        if spill['slab_hits']['tof2'][1]:
-          no_slab_hits_in_partEv1_tof2 = False
-        self.assertTrue(no_slab_hits_in_partEv1_tof2)
+        self.assertEqual(n_part_events,3)
+        self.assertFalse(spill['slab_hits']['tof2'][1]) # no slab hits in tof2 partEv1
 
     @classmethod
     def tearDownClass(self):

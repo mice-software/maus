@@ -128,3 +128,9 @@ TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF1.txt"
 #TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF0.txt"
 TOF_Trigger_calibration_file = "/files/calibration/tofcalibTrigger_trTOF1.txt"
 #TOF_Trigger_calibration_file = "/files/calibration/tofcalibTrigger_trTOF0.txt"
+TOF_findTriggerPixelCut = 0.5 # nanosecond
+TOF_makeSpacePiontCut = 0.5 # nanosecond
+Enable_timeWalk_correction = True
+Enable_triggerDelay_correction = True
+Enable_t0_correction = True
+

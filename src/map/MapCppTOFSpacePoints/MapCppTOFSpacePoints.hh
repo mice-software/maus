@@ -73,12 +73,6 @@ class MapCppTOFSpacePoints {
   std::vector<std::string> _stationKeys;
   std::map<int, std::string> _triggerhit_pixels;
 
- /** Load the configuration.
- * \param[in] json_configuration Json document containing the configuration.
- * \returns true if configurated successfully.
- */
-  bool SetConfiguration(std::string json_configuration);
-
   Json::Value fillSpacePoint(Json::Value &xDocSlabHit0, Json::Value &xDocSlabHit1);
   Json::Value processTOFStation(Json::Value &xSlabHits, std::string detector);
   std::string findTriggerPixel(Json::Value xDocPartEvent);

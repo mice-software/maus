@@ -25,11 +25,7 @@ TOFCalibrationMap::~TOFCalibrationMap() {
   _reff.resize(0);
 }
 
-bool TOFCalibrationMap::InitializeFromCards(std::string json_configuration) {
-  //  JsonCpp setup
-  Json::Value configJSON = JsonWrapper::StringToJson(json_configuration);
-  // this will contain the configuration
-
+bool TOFCalibrationMap::InitializeFromCards(Json::Value configJSON) {
   // Fill the vector containing all TOF channel keys.
   this->MakeTOFChannelKeys();
 
@@ -43,8 +39,19 @@ bool TOFCalibrationMap::InitializeFromCards(std::string json_configuration) {
                                                  JsonWrapper::stringValue);
 
   Json::Value trigger_file = JsonWrapper::GetProperty(configJSON,
-                                                 "TOF_Trigger_calibration_file",
-                                                 JsonWrapper::stringValue);
+                                                      "TOF_Trigger_calibration_file",
+                                                      JsonWrapper::stringValue);
+
+  // Check what needs to be done.
+  _do_timeWalk_correction = JsonWrapper::GetProperty(configJSON,
+                                                     "Enable_timeWalk_correction",
+                                                     JsonWrapper::booleanValue).asBool();
+  _do_triggerDelay_correction = JsonWrapper::GetProperty(configJSON,
+                                                         "Enable_triggerDelay_correction",
+                                                         JsonWrapper::booleanValue).asBool();
+  _do_t0_correction = JsonWrapper::GetProperty(configJSON,
+                                               "Enable_t0_correction",
+                                               JsonWrapper::booleanValue).asBool();
 
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
   if (!pMAUS_ROOT_DIR) {
@@ -69,11 +76,9 @@ bool TOFCalibrationMap::InitializeFromCards(std::string json_configuration) {
 bool TOFCalibrationMap::Initialize(std::string t0File,
                                    std::string twFile,
                                    std::string triggerFile) {
-  bool status = LoadT0File(t0File);
-  if (status)
-    status = LoadTWFile(twFile);
-  if (status)
-    status = LoadTriggerFile(triggerFile);
+  bool status = LoadT0File(t0File) && 
+                LoadTWFile(twFile) &&
+                LoadTriggerFile(triggerFile);
 
   return status;
 }
@@ -217,6 +222,9 @@ int TOFCalibrationMap::FindTOFPixelKey(TOFPixelKey key) {
 }
 
 double TOFCalibrationMap::T0(TOFChannelKey key, int &r) {
+  if (!_do_t0_correction)
+    return 0.;
+
   int n = FindTOFChannelKey(key);
 
   if (n != NOCALIB) {
@@ -229,6 +237,9 @@ double TOFCalibrationMap::T0(TOFChannelKey key, int &r) {
 }
 
 double TOFCalibrationMap::TriggerT0(TOFPixelKey key) {
+  if (!_do_triggerDelay_correction)
+    return 0.;
+
   int n = FindTOFPixelKey(key);
   if (n != NOCALIB)
     return _Trt0[n];
@@ -238,6 +249,9 @@ double TOFCalibrationMap::TriggerT0(TOFPixelKey key) {
 }
 
 double TOFCalibrationMap::TW(TOFChannelKey key, int adc) {
+  if (!_do_timeWalk_correction)
+    return 0.;
+
   int n = FindTOFChannelKey(key);
   // See equation 46 in MICE Note 251 "TOF Detectors Time Calibration".
   if (n != NOCALIB) {
@@ -262,7 +276,7 @@ double TOFCalibrationMap::dT(TOFChannelKey Pkey, TOFPixelKey TrKey, int adc) {
   double t0 = T0(Pkey, reffSlab);
   double trt0 = TriggerT0(TrKey);
   // std::cout << "TOFCalibrationMap -> "<< Pkey << " " << TrKey << "  tw = " << tw;
-  // std::cout << "  t0 = " << -t0 << "  trt0 = " << trt0 << std::endl;
+  // std::cout << "  t0 = " << t0 << "  trt0 = " << trt0 << std::endl;
   if (tw == NOCALIB || t0 == NOCALIB || trt0 == NOCALIB) {
     return NOCALIB;
   }
@@ -288,7 +302,7 @@ double TOFCalibrationMap::dT(TOFChannelKey Pkey, TOFPixelKey TrKey, int adc) {
     }
   }
 
-  // std::cout << "TOFCalibrationMap -> dT = " << -dt << std::endl;
+  // std::cout << "TOFCalibrationMap -> dT = " << dt << std::endl;
   return dt*1e-3;
 }
 

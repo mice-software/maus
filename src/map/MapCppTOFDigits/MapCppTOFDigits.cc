@@ -103,7 +103,7 @@ bool MapCppTOFDigits::SetConfiguration(std::string json_configuration) {
     //  this will contain the configuration
   }catch(Squeal e) {
     Squeak::mout(Squeak::error)
-    << "Error in  MapCppTOFDigits::SetConfiguration. Bad json document."
+    << "Error in MapCppTOFDigits::SetConfiguration. Bad json document."
     << std::endl;
     return false;
   }
