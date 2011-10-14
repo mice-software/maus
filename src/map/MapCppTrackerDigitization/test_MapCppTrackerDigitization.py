@@ -14,7 +14,7 @@ class MapCppTrackerDigitizationTestCase(unittest.TestCase):
 
     - bool birth(std::string argJsonConfigDocument); Y
     - bool death(); Y
-    - std::string process(std::string document); Y - but doesn't really do anything.
+    - std::string process(std::string document); Y
     - bool check_sanity_mc(std::string document); Y
     - int get_tdc_counts(Json::Value ahit); Y
     - double get_npe(double edep); Y
