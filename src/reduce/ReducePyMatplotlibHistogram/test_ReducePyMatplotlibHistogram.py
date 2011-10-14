@@ -1,5 +1,5 @@
 """
-Tests for ReducePyMatplotlibHistogram module.
+Tests for ReducePyHistogramTDCADCCounts module.
 """
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 # 
@@ -22,11 +22,11 @@ import base64
 import json
 import unittest
 
-from ReducePyMatplotlibHistogram import ReducePyMatplotlibHistogram
+from ReducePyHistogramTDCADCCounts import ReducePyHistogramTDCADCCounts
 
-class ReducePyMatplotlibHistogramTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
+class ReducePyHistogramTDCADCCountsTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
     """
-    Test class for ReducePyMatplotlibHistogram.
+    Test class for ReducePyHistogramTDCADCCounts.
     """
 
     @classmethod
@@ -35,7 +35,7 @@ class ReducePyMatplotlibHistogramTestCase(unittest.TestCase): # pylint: disable=
         Prepare for test by setting up worker.
         @param self Object reference.
         """
-        self.__reducer = ReducePyMatplotlibHistogram()
+        self.__reducer = ReducePyHistogramTDCADCCounts()
 
     def setUp(self):
         """ 
@@ -64,7 +64,7 @@ class ReducePyMatplotlibHistogramTestCase(unittest.TestCase): # pylint: disable=
         file type. 
         @param self Object reference.
         """
-        self.__reducer = ReducePyMatplotlibHistogram()
+        self.__reducer = ReducePyHistogramTDCADCCounts()
         success = self.__reducer.birth("""{"histogram_image_type":"png"}""")
         self.assertTrue(success, "reducer.birth() failed")
         self.assertEquals("png", self.__reducer.image_type, 
@@ -76,7 +76,7 @@ class ReducePyMatplotlibHistogramTestCase(unittest.TestCase): # pylint: disable=
         file type. 
         @param self Object reference.
         """
-        self.__reducer = ReducePyMatplotlibHistogram()
+        self.__reducer = ReducePyHistogramTDCADCCounts()
         with self.assertRaisesRegexp(ValueError,
             ".*Unsupported histogram image type.*"):
             self.__reducer.birth(
@@ -88,7 +88,7 @@ class ReducePyMatplotlibHistogramTestCase(unittest.TestCase): # pylint: disable=
         auto-numbering enabled. 
         @param self Object reference.
         """
-        self.__reducer = ReducePyMatplotlibHistogram()
+        self.__reducer = ReducePyHistogramTDCADCCounts()
         success = self.__reducer.birth("""{"histogram_auto_number": true}""")
         self.assertTrue(success, "reducer.birth() failed")
         self.assertTrue(self.__reducer.auto_number, 
@@ -200,7 +200,7 @@ class ReducePyMatplotlibHistogramTestCase(unittest.TestCase): # pylint: disable=
         "digits" entries and with auto-numbering enabled.
         @param self Object reference.
         """
-        self.__reducer = ReducePyMatplotlibHistogram()
+        self.__reducer = ReducePyHistogramTDCADCCounts()
         success = self.__reducer.birth("""{"histogram_auto_number": true}""")
         self.assertTrue(success, "reducer.birth() failed")
         self.assertTrue(self.__reducer.auto_number, 
@@ -281,7 +281,7 @@ class ReducePyMatplotlibHistogramTestCase(unittest.TestCase): # pylint: disable=
         @param image_type Image type e.g. "eps".
         @returns JSON document string from "process".
         """
-        self.__reducer = ReducePyMatplotlibHistogram()
+        self.__reducer = ReducePyHistogramTDCADCCounts()
         success = self.__reducer.birth(
             """{"histogram_image_type":"%s"}""" % image_type)
         self.assertTrue(success, "reducer.birth() failed")

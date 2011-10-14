@@ -60,7 +60,7 @@ def run():
     mappers = MAUS.MapPyGroup()
     mappers.append(MAUS.MapPyDoNothing())  
 
-    reducer = MAUS.ReducePyMatplotlibHistogram()
+    reducer = MAUS.ReducePyHistogramTDCADCCounts()
 
     output_worker = MAUS.OutputPyImage()
 
