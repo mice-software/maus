@@ -35,6 +35,9 @@
 
 #include "CLHEP/Vector/Rotation.h"
 
+// NOTE: not sure how Geant4 deals with the deletion of Logical and Solid Volumes;
+// possible bug in the destructor.
+
 G4int SciFiPlane::SciFi_numFibres = 0;
 
 // SciFiPlane - Specific parameterisation of the SciFi station
@@ -91,11 +94,7 @@ SciFiPlane::SciFiPlane(MiceModule* mod, G4Material* mater, G4VPhysicalVolume *ml
 }
 
 SciFiPlane::~SciFiPlane() {
- /* delete solidDoublet;
-  delete logicDoublet;
   delete physiDoublet;
 
-  delete solidCore;
-  delete logicCore;
-  delete physiCore;*/
+  delete physiCore;
 }

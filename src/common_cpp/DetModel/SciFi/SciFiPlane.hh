@@ -56,11 +56,11 @@ class SciFiPlane {
   G4VPhysicalVolume* physicalCore() const { return physiCore; }
 
   /** @brief The logical volume of the core
-   */  
+   */
   G4LogicalVolume*   logicalCore()  const { return logicCore; }
 
   /** @brief The placement of the core
-   */  
+   */
   G4PVPlacement*    placementCore() const { return placeCore; }
 
   static G4int SciFi_numFibres;
