@@ -37,9 +37,20 @@ class ReducePyMatplotlibHistogram:
     -Image type ("histogram_image_type"). Must be one of those
      supported by matplot lib (currently "svg", "ps", "emf", "rgba",
      "raw", "svgz", "pdf", "eps", "png"). Default: "eps".
+    -Auto-number ("histogram_auto_number"). Default: false.
+     If true then each output image tag has an auto-number appended
+     e.g. "spill0"..."spillN" and "spills1...spillsN" where N is the
+     (N + 1)th spill processed. If false then there is no 
+     auto-numbering of tags. 
+    -Summary only ("histogram_summary_only"). Default: true.
+     If true then this only outputs a single JSON document containing
+     a summary of the counts for the spills processed to date.
+     If false then it also outputs a JSON document containing
+     a histogram of the counts for the current spill.
 
     The output is a sequence of JSON documents separated by line
-    breaks e.g.:
+    breaks e.g.: if "histogram_auto_number" is true and
+    "histogram_summary_only" is false:
 
     @verbatim
     {"images": [{"content":"TDC and ADC counts for spill 2",
@@ -52,9 +63,15 @@ class ReducePyMatplotlibHistogram:
                  "data": "...base 64 encoded image..."}]}
     @endverbatim
 
-    The "tag" allows the types of histogram to be discriminated. The
-    N (e.g. 2) means that the histograms were produced during processing
-    of the Nth spill (N = 0..)
+    breaks e.g.: if "histogram_auto_number" is false and
+    "histogram_summary_only" is true:
+
+    @verbatim
+    {"images": [{"content":"Total TDC and ADC counts to spill 2",
+                 "tag": "spills",
+                 "image_type": "eps", 
+                 "data": "...base 64 encoded image..."}]}
+    @endverbatim
 
     In case of errors the output document is just the input document
     with an "errors" field containing the error e.g.
@@ -70,6 +87,8 @@ class ReducePyMatplotlibHistogram:
         self.spill_count = 0
         self.__max_adc_count = 1
         self.__max_tdc_count = 1
+        self.auto_number = False
+        self.summary_only = True
         self.__summary_histogram = None
 
     def birth(self, config_json):
@@ -87,6 +106,14 @@ class ReducePyMatplotlibHistogram:
 
         # Configure the worker.
         config_doc = json.loads(config_json)
+
+        key = "histogram_auto_number"
+        if key in config_doc:
+            self.auto_number = config_doc[key]
+       
+        key = "histogram_summary_only"
+        if key in config_doc:
+            self.summary_only = config_doc[key]
 
         key = "histogram_image_type"
         if key in config_doc:
@@ -146,31 +173,36 @@ class ReducePyMatplotlibHistogram:
             spill_max_adc_count = max(adc_counts)
         self.__max_adc_count = max(self.__max_adc_count, spill_max_adc_count)
 
-        # Create a FigureCanvas for a histogram for the current spill.
-        histogram = self.__create_histogram(
-            "TDC and ADC counts for spill %d" % self.spill_count,
-            "TDC count", "ADC count")
-
         json_doc = {}
         json_histograms = []
         json_doc["images"] = json_histograms
+        if (self.auto_number):
+            tag = "%dspill" % self.spill_count
+        else:
+            tag = "spill"
+        if (not self.summary_only):
+            # Create a FigureCanvas for a histogram for the current spill.
+            histogram = self.__create_histogram(
+                "TDC and ADC counts for spill %d" % self.spill_count,
+                "TDC count", "ADC count")
 
-        histogram_title = "TDC and ADC counts for spill %d" \
-                           % self.spill_count
-        self.__histogram(histogram,  histogram_title,
-                         tdc_counts, adc_counts)
-        # Rescale axis so 0 is always visible.
-        # +0.5 are fudge factors to avoid matplotlib warning about
-        # "Attempting to set identical bottom==top" which arises if
-        # the axes are set to be exactly the maximum of the data.
-        histogram.figure.get_axes()[0].set_xlim([0, spill_max_tdc_count + 0.5])
-        histogram.figure.get_axes()[0].set_ylim([0, spill_max_adc_count + 0.5])
-
-        data = self.__convert_to_binary(histogram)
-        json_histograms.append({"content": histogram_title,
-                                "tag": "%dspill" % self.spill_count,
-                                "image_type": self.image_type,
-                                "data": data})
+            histogram_title = "TDC and ADC counts for spill %d" \
+                               % self.spill_count
+            self.__histogram(histogram,  histogram_title,
+                             tdc_counts, adc_counts)
+            # Rescale axis so 0 is always visible.
+            # +0.5 are fudge factors to avoid matplotlib warning about
+            # "Attempting to set identical bottom==top" which arises if
+            # the axes are set to be exactly the maximum of the data.
+            histogram.figure.get_axes()[0].set_xlim(
+                [0, spill_max_tdc_count + 0.5])
+            histogram.figure.get_axes()[0].set_ylim(
+                [0, spill_max_adc_count + 0.5])
+            data = self.__convert_to_binary(histogram)
+            json_histograms.append({"content": histogram_title,
+                                    "tag": tag,
+                                    "image_type": self.image_type,
+                                    "data": data})
 
         histogram_title = "Total TDC and ADC counts to spill %d" \
                           % self.spill_count
@@ -182,9 +214,8 @@ class ReducePyMatplotlibHistogram:
         self.__summary_histogram.figure.get_axes()[0].set_ylim( \
             [0, self.__max_adc_count + 0.5])
         data = self.__convert_to_binary(self.__summary_histogram)
-
         json_histograms.append({"content": histogram_title,
-                                "tag": "%dspills" % self.spill_count,
+                                "tag": "%ss" % tag,
                                 "image_type": self.image_type,
                                 "data": data})
 

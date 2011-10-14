@@ -55,6 +55,10 @@ class ReducePyMatplotlibHistogramTestCase(unittest.TestCase): # pylint: disable=
             "Unexpected reducer.spill_count")
         self.assertEquals("eps", self.__reducer.image_type, 
             "Unexpected reducer.image_type")
+        self.assertTrue(self.__reducer.summary_only, 
+            "Unexpected reducer.summary_only")
+        self.assertTrue(not self.__reducer.auto_number, 
+            "Unexpected reducer.auto_number")
 
     def test_birth_file_type(self):
         """
@@ -77,6 +81,30 @@ class ReducePyMatplotlibHistogramTestCase(unittest.TestCase): # pylint: disable=
             ".*Unsupported histogram image type.*"):
             self.__reducer.birth(
                 """{"histogram_image_type":"no_such_extension"}""")
+
+    def test_birth_summary_only(self):
+        """
+        Test worker when birth is called with the histogram_summary_only
+        configuration set to false.
+        @param self Object reference.
+        """
+        self.__reducer = ReducePyMatplotlibHistogram()
+        success = self.__reducer.birth("""{"histogram_summary_only": false}""")
+        self.assertTrue(success, "reducer.birth() failed")
+        self.assertTrue(not self.__reducer.summary_only, 
+            "Unexpected reducer.summary_only")
+
+    def test_birth_auto_number(self):
+        """
+        Test worker when birth is called with the histogram_auto_number
+        configuration set to true.
+        @param self Object reference.
+        """
+        self.__reducer = ReducePyMatplotlibHistogram()
+        success = self.__reducer.birth("""{"histogram_auto_number": true}""")
+        self.assertTrue(success, "reducer.birth() failed")
+        self.assertTrue(self.__reducer.auto_number, 
+            "Unexpected reducer.auto_number")
 
     def test_invalid_json(self):
         """
@@ -173,6 +201,29 @@ class ReducePyMatplotlibHistogramTestCase(unittest.TestCase): # pylint: disable=
         multiple digits entries in multiple JSON documents.
         @param self Object reference.
         """
+        for i in range(0, 4):
+            json_doc = {"digits":[]}
+            for j in range(0, 10):
+                json_doc["digits"].append(self.__get_digit(j, j))
+            result = self.__process(json_doc)
+            self.__check_result(i, result)
+
+    def test_multiple_spills_digits_non_default_settings(self):
+        """
+        Test worker's process method with a JSON document with 
+        multiple digits entries in multiple JSON documents
+        where both summaries and spill-specific histograms are
+        produced.
+        @param self Object reference.
+        """
+        self.__reducer = ReducePyMatplotlibHistogram()
+        success = self.__reducer.birth("""{"histogram_summary_only": false, 
+            "histogram_auto_number": true}""")
+        self.assertTrue(success, "reducer.birth() failed")
+        self.assertTrue(not self.__reducer.summary_only, 
+            "Unexpected reducer.summary_only")
+        self.assertTrue(self.__reducer.auto_number, 
+            "Unexpected reducer.auto_number")
         for i in range(0, 4):
             json_doc = {"digits":[]}
             for j in range(0, 10):
@@ -279,10 +330,19 @@ class ReducePyMatplotlibHistogramTestCase(unittest.TestCase): # pylint: disable=
         self.assertEquals(spill_id + 1, self.__reducer.spill_count,
             "Unexpected reducer.spill_count")
         self.assertTrue("images" in result, "No images field")
-        self.assertEquals(2, len(result["images"]),
-            "Unexpected number of images")
-        self.__check_image(result["images"][0], "%dspill" % spill_id)
-        self.__check_image(result["images"][1], "%dspills" % spill_id)
+        if (self.__reducer.auto_number):
+            tag = "%dspill" % spill_id
+        else:
+            tag = "spill"
+        if (self.__reducer.summary_only):
+            self.assertEquals(1, len(result["images"]),
+                "Unexpected number of images")
+            self.__check_image(result["images"][0], "%ss" % tag) # spill
+        else:
+            self.assertEquals(2, len(result["images"]),
+                "Unexpected number of images")
+            self.__check_image(result["images"][0], "%s" % tag) # spill
+            self.__check_image(result["images"][1], "%ss" % tag) # spills
 
     def __check_image(self, image, tag):
         """
