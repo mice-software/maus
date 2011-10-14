@@ -25,17 +25,17 @@ fi
 # see if libxslt imports okay
 python -m libxslt
 if [ $? == 0 ]; then
-    echo "LIBXML2 IMPORT SUCCESSFUL"
+    echo "LIBXSLT IMPORT SUCCESSFUL"
 else
-    echo "LIBXML2 IMPORT FAILED"
+    echo "LIBXSLT IMPORT FAILED"
 fi
 
 
 # just another way of doing it - just to check
 echo import libxslt | python
 if [ $? == 0 ]; then
-    echo "LIBXML2 IMPORT SUCCESSFUL"
+    echo "LIBXSLT IMPORT SUCCESSFUL"
 else
-    echo "LIBXML2 IMPORT FAILED"
+    echo "LIBXSLT IMPORT FAILED"
 fi
 
