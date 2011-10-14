@@ -56,7 +56,16 @@ SciFiPlane::SciFiPlane(MiceModule* mod, G4Material* mater, G4VPhysicalVolume *ml
   G4String clad1Name = mod->fullName() + "DoubletClad1";
   G4String clad2Name = mod->fullName() + "DoubletClad2";
 
-  // getting the rotations right.
+  /// Getting the rotations right.
+  /// A "z-flip" is a rotation of 180 degrees over the y axis.
+  /// Remember that the rotation matrix for
+  /// a rotation over the y axis is given by:
+  ///
+  ///             [cos(theta)  0    sin(theta)]
+  /// R_y(theta) =[0           1        0     ]
+  ///             [-sin(theta) 0    cos(theta)]
+  ///
+
   CLHEP::HepRotation zflip;
   const Hep3Vector rowx(-1., 0, 0);
   const Hep3Vector rowy(0, 1., 0);

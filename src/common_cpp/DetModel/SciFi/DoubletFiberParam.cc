@@ -43,7 +43,8 @@ void DoubletFiberParam::ComputeTransformation(const G4int copyNo,
   G4double spacing = sqrt(fiberDiameter*fiberDiameter*
                          (1-fiberPitch*fiberPitch/4));
 
-  // these are the coordinates of the fiber placement
+  /// these are the coordinates of the fiber placement
+  // channel numbers run from right to left
   G4double xPos = - copyNo*fiberDiameter*fiberPitch/2
                   + (activeRadius-fiberDiameter/2);
   G4double yPos = 0.0;
