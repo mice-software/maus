@@ -3,6 +3,7 @@
 source env.sh
 ./third_party/bash/01python.bash
 ./third_party/bash/42libxml2.bash
+./third_party/bash/43libxslt.bash
 source env.sh
 python -m libxml2
 # see if libxml2 imports okay
