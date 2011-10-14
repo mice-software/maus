@@ -45,7 +45,7 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=R0904
 
     def setUp(self):
         """ 
-        Invoke worker's birth method and check for success. 
+        Invoke "birth" and check for success.
         @param self Object reference.
         """
         self.__tmpdir = ""
@@ -55,7 +55,7 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=R0904
 
     def test_birth_default(self):
         """ 
-        Test worker's default values after birth is called.
+        Check default configuration after "birth" is called.
         @param self Object reference.
         """
         self.assertEquals(os.getcwd(), self.__worker.directory, 
@@ -65,8 +65,7 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=R0904
 
     def test_birth_bad_dir(self):
         """ 
-        Test worker's birth method throws an exception if given 
-        a file name as an image directory.
+        Test "birth" if given a file name as an image directory.
         @param self Object reference.
       . """
         worker = OutputPyImage()
@@ -81,8 +80,8 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=R0904
 
     def test_birth_abs_dir(self):
         """ 
-        Test worker's birth method with an absolute directory
-        path as an image directory.
+        Test "birth" if given an absolute path to a directory as 
+        an image directory.
         @param self Object reference.
       . """
         worker = OutputPyImage()
@@ -98,8 +97,8 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=R0904
 
     def test_birth_relative_dir(self):
         """ 
-        Test worker's birth method with a relative directory
-        path as an image directory.
+        Test "birth" if given a relative path to a directory as 
+        an image directory.
         @param self Object reference.
       . """
         worker = OutputPyImage()
@@ -112,97 +111,80 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=R0904
         self.assertEquals(relative_path, worker.directory, 
             "Unexpected worker.image_directory")
 
-    def test_no_images(self):
+    def test_save_no_images(self):
         """ 
-        Test worker's save method with no JSON documents. 
+        Test "save" with a JSON document with no "image".
         @param self Object reference.
         """
         self.__save({})
 
-    def test_image_missing_tag(self):
+    def test_save_image_no_tag(self):
         """ 
-        Test worker's save method with a JSON document with no images.
+        Test "save" with a JSON document with no "tag".
         @param self Object reference.
         """
         with self.assertRaisesRegexp(ValueError,
             ".*Missing tag.*"):
-            self.__save({"images": [{
+            self.__save({"image": {
                 "content":"Content", 
                 "image_type": self.__file_extension, 
-                "data": "Data"}]})
+                "data": "Data"}})
 
-    def test_image_missing_type(self):
+    def test_save_image_no_type(self):
         """ 
-        Test worker's save method with a JSON document with an image
-        that has no image type.
+        Test "save" with a JSON document with no "image_type".
         @param self Object reference.
         """
         with self.assertRaisesRegexp(ValueError,
             ".*Missing image_type.*"):
-            self.__save({"images": [{
+            self.__save({"image": {
                 "content":"Content", 
-                "tag": "spill", 
-                "data": "Data"}]})
+                "tag": "tdcadc", 
+                "data": "Data"}})
 
-    def test_image_missing_data(self):
+    def test_save_image_no_data(self):
         """ 
-        Test worker's save method with a JSON document with an image
-        that has no image data.
+        Test "save" with a JSON document with no "image" "data".
         @param self Object reference.
         """
         with self.assertRaisesRegexp(ValueError,
             ".*Missing data.*"):
-            self.__save({"images": [{
+            self.__save({"image": {
                 "content":"Content", 
-                "tag": "spill", 
-                "image_type": self.__file_extension}]})
+                "tag": "tdcadc", 
+                "image_type": self.__file_extension}})
 
-    def test_n_images_one_doc(self):
+    def test_save_images(self):
         """ 
-        Test worker's save method with a JSON document with N
-        image entries.
-        @param self Object reference.
-        """
-        for i in range(0, 3):
-            self.__save({"images": [{
-                "content":"Content", 
-                "tag": "spill%d" % i, 
-                "image_type": self.__file_extension, 
-                "data": ""}]})
-        self.__validate_result(3)
-
-    def test_n_images_m_docs(self):
-        """ 
-        Test worker's save method with M JSON documents each with N
-        image entries.
+        Test "save" with 3 JSON documents each an "image".
         @param self Object reference.
         """
         json_str = ""
         for i in range(0, 3):
-            json_doc = {"images": [{
+            json_doc = {"image": {
                 "content":"Content", 
-                "tag": "spill%d" % i, 
+                "tag": "tdcadc%d" % i, 
                 "image_type": self.__file_extension, 
-                "data": "Data"}]}
+                "data": "Data"}}
             json_str = "%s\n%s" % (json.dumps(json_doc), json_str)
         self.__worker.save(json_str)
-        self.__validate_result(3)
+        self.__check_result(3)
 
     def __save(self, json_doc):
         """
-        Convert JSON document to string and pass to worker's save
-        method.
+        Convert given JSON document to a string and pass to "save".
         @param self Object reference.
         @param json_doc JSON document.
+        @returns JSON document string from "save".
         """
         json_str = json.dumps(json_doc)
         self.__worker.save(json_str)
 
-    def __validate_result(self, number_of_files):
+    def __check_result(self, number_of_files):
         """ 
-        Check that the worker's image directory has a specific
-        number of files with the expected prefix and file
-        extension.
+        Validate results from "save". Check that the image directory
+        has the expected number of files, each with the expected
+        prefix and extension.
         @param self Object reference.
         @param number_of_files Number of files to check for.
         """
@@ -215,13 +197,13 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=R0904
         self.assertEquals(number_of_files, len(files), 
             "Unexpected number of files")
         for i in range(0, number_of_files):
-            self.assertEquals(files[i], "prefixspill%d.%s" % 
+            self.assertEquals(files[i], "prefixtdcadc%d.%s" % 
                                         (i, self.__file_extension))
 
     def tearDown(self):
         """
-        Invoke worker's death method and remove any temporary 
-        directories and image files.
+        Invoke "death" and remove any temporary directories and image
+        files. 
         @param self Object reference.
         """
         success = self.__worker.death()

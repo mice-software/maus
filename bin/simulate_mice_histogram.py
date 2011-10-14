@@ -45,16 +45,10 @@ def run():
     # "eps", "png"). Default: "eps".
     datacards_list.append("histogram_image_type='%s'\n" % "eps")
     # Add auto-numbering to the image tags. If False then each 
-    # set of histograms output by ReducePyMatplotlibHistogram
-    # will have tags "spill" and "spills" and so the end result
-    # will be just two histogram files. If True then there will be
-    # N pairs of files, one for each spill.
+    # histogram output by ReducePyMatplotlibHistogram will have
+    # tags "tdcadc" and so the end result will be just one histogram 
+    # file. If True then there will be N files, one for each spill.
     datacards_list.append("histogram_auto_number=%s\n" % False)
-    # Output a summary histogram only. If True then 
-    # ReducePyMatplotlibHistogram only outputs a summary histogram 
-    # visualising all the spills processed to date. If False it
-    # also outputs a histogram for just the current spill.
-    datacards_list.append("histogram_summary_only=%s\n" % True)
     # Prefix for file names. Default: auto-generated UUID.
     datacards_list.append("image_file_prefix='%s'\n" % "histogram")
     # Directory for images. Default: current directory.
