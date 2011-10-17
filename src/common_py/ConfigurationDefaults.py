@@ -185,7 +185,6 @@ Enable_EMR = True
 Enable_KL = True
 Enable_CKOV = True
 DAQ_cabling_file = "/files/cabling/DAQChannelMap.txt"
-<<<<<<< TREE
 
 # this is used by the reconstuction of the TOF detectors
 TOF_trigger_station = "tof1"
@@ -201,12 +200,9 @@ TOF_makeSpacePiontCut = 0.5 # nanosecond
 Enable_timeWalk_correction = True
 Enable_triggerDelay_correction = True
 Enable_t0_correction = True
-=======
+
 daq_data_path = '%s/src/input/InputCppDAQData' % os.environ.get("MAUS_ROOT_DIR") # path to daq data
 daq_data_file = '02873.003' # file name for daq data
 
 maus_version = "" # set at runtime - do not edit this (changes are ignored)
 configuration_file = "" # should be set on the command line only (else ignored)
-
->>>>>>> MERGE-SOURCE
-
