@@ -36,7 +36,7 @@ def run():
     my_map.append(MAUS.MapCppTrackerDigitization())  # SciFi electronics model
 
     # Create a reducer. Image type specified in datacards below.
-    my_reduce = MAUS.ReducePyMatplotlibHistogram()
+    my_reduce = MAUS.ReducePyHistogramTDCADCCounts()
 
     # Can specify datacards here or by using appropriate command line calls.
     datacards_list = []

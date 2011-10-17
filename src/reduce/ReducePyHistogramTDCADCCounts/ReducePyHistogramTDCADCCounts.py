@@ -70,6 +70,7 @@ class ReducePyHistogramTDCADCCounts(ReducePyMatplotlibHistogram):
         @param self Object reference.
         """
         ReducePyMatplotlibHistogram.__init__(self)
+        # Do initialisation specific to this class.
         self.__max_adc_count = 1
         self.__max_tdc_count = 1
         self._tag = "tdcadc"
@@ -81,15 +82,16 @@ class ReducePyHistogramTDCADCCounts(ReducePyMatplotlibHistogram):
         @param config_doc JSON document.
         @returns True if successful.
         """
-        self.__max_adc_count = 1
-        self.__max_tdc_count = 1
+        # Do configuration specific to this class.
         # Can assume that self._histogram now has a histogram
-        # (matplotlib FigureCanvas) available and can now be
+        # (matplotlib FigureCanvas) available which can now be
         # customised.
         self._histogram.figure.get_axes()[0].set_xlabel(
             "TDC count", fontsize=12)
         self._histogram.figure.get_axes()[0].set_ylabel(
             "ADC count", fontsize=12)
+        self.__max_adc_count = 1
+        self.__max_tdc_count = 1
         return True
 
     def _update_histogram(self, json_doc):
@@ -131,7 +133,7 @@ class ReducePyHistogramTDCADCCounts(ReducePyMatplotlibHistogram):
             spill_max_adc_count = max(adcs)
         self.__max_adc_count = max(self.__max_adc_count, spill_max_adc_count)
 
-        # Set content/title.
+        # Set description of content of histogram and histogram title.
         self._content = \
             "Total TDC and ADC counts to spill %d" % self.spill_count
         self._histogram.figure.get_axes()[0].set_title(
@@ -181,4 +183,5 @@ class ReducePyHistogramTDCADCCounts(ReducePyMatplotlibHistogram):
         @param self Object reference.
         @returns True
         """
+        # Do cleanup specific to this class, none in this case.
         return True
