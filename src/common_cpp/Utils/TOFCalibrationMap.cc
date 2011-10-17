@@ -76,7 +76,7 @@ bool TOFCalibrationMap::InitializeFromCards(Json::Value configJSON) {
 bool TOFCalibrationMap::Initialize(std::string t0File,
                                    std::string twFile,
                                    std::string triggerFile) {
-  bool status = LoadT0File(t0File) && 
+  bool status = LoadT0File(t0File) &&
                 LoadTWFile(twFile) &&
                 LoadTriggerFile(triggerFile);
 

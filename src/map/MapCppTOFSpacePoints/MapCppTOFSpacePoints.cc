@@ -34,7 +34,19 @@ bool MapCppTOFSpacePoints::birth(std::string argJsonConfigDocument) {
   Json::Value configJSON;
   try {
     configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
-  // this will contain the configuration
+    // this will contain the configuration
+    _makeSpacePiontCut =
+    JsonWrapper::GetProperty(configJSON,
+                             "TOF_makeSpacePiontCut",
+                             JsonWrapper::realValue).asDouble(); // nanoseconds
+    _findTriggerPixelCut =
+    JsonWrapper::GetProperty(configJSON,
+                             "TOF_findTriggerPixelCut",
+                             JsonWrapper::realValue).asDouble(); // nanoseconds
+
+    _triggerStation = JsonWrapper::GetProperty(configJSON,
+                                               "TOF_trigger_station",
+                                               JsonWrapper::stringValue).asString();    
   }catch(Squeal e) {
     Squeak::mout(Squeak::error)
     << "Error in MapCppTOFSpacePoints::birth. Bad json document."
@@ -47,29 +59,16 @@ bool MapCppTOFSpacePoints::birth(std::string argJsonConfigDocument) {
   if (!loaded)
     return false;
 
-  _makeSpacePiontCut = JsonWrapper::GetProperty(configJSON,
-                                             "TOF_makeSpacePiontCut",
-                                             JsonWrapper::realValue).asDouble(); // nanoseconds
-  _findTriggerPixelCut = JsonWrapper::GetProperty(configJSON,
-                                                  "TOF_findTriggerPixelCut",
-                                                  JsonWrapper::realValue).asDouble(); // nanosec.
-
-  _triggerStation = JsonWrapper::GetProperty(configJSON,
-                                             "TOF_trigger_station",
-                                             JsonWrapper::stringValue).asString();
-
   // The first element of the vectro has to be the trigger station.
   // This is mandatory!!!
   _stationKeys.push_back(_triggerStation);
   if (_triggerStation == "tof1") {
     _stationKeys.push_back("tof0");
     _stationKeys.push_back("tof2");
-  } 
-  else if (_triggerStation == "tof0") {
+  } else if (_triggerStation == "tof0") {
     _stationKeys.push_back("tof1");
     _stationKeys.push_back("tof2");
-  }
-  else {
+  } else {
     Squeak::mout(Squeak::error)
     << "Error in MapCppTOFSpacePoints::birth. TOF trigger station is wrong."
     << "It can be tof1 or tof0. The provided trigger station is : " << _triggerStation
