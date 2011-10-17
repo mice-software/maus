@@ -463,9 +463,14 @@ def install_python_tests():
     env.Install("build", "tests/py_unit/test_cdb")
     test_cdb_files = glob.glob('tests/py_unit/test_cdb/*.py')
     env.Install("build/test_cdb", test_cdb_files) 
+
     env.Install("build", "tests/py_unit/suds")
     suds_files = glob.glob('tests/py_unit/suds/*.py')
     env.Install("build/suds", suds_files) 
+
+    env.Install("build", "tests/py_unit/test_geometry")
+    test_geometry_files = glob.glob('tests/py_unit/test_geometry/*.py')
+    env.Install("build/test_geometry", test_geometry_files) 
 
 
 # Setup the environment.  NOTE: SHLIBPREFIX means that shared libraries don't

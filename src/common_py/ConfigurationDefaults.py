@@ -57,7 +57,7 @@ simulation_reference_particle = {
 }
 
 # geant4 visualisation (not event display)
-geant4_visualisation = False
+geant4_visualisation = True
 visualisation_viewer = "VRML2FILE"  # only supported option
 visualisation_theta = 90.
 visualisation_phi = 90.
@@ -168,6 +168,26 @@ SciFinPlanes = 3
 SciFinStations = 5
 SciFinTrackers = 2
 
+# geometry upload/download information
+#Upload
+# Arguments below MUST be included
+GeometryDirectory   = "%s/src/common_py/geometry/testCases/testGeometry" % os.environ.get("MAUS_ROOT_DIR")
+GeometryDescription = "This is a standard note It uses the standard test case"
+# Optional Arguments 1 = yes, 0 = no
+Zip_File         = 0
+Delete_Originals = 0
+
+#Download
+#Donwloading of geometries
+#Below, name the directory where the geometry will be downloaded.
+DownloadDir = "%s/src/common_py/geometry/Download/" % os.environ.get("MAUS_ROOT_DIR")
+#Download Geometry for a specific ID
+#Name the start and stop time for which the geometry was valid. Stop time is optional
+StartTime = "2011-09-08 09:00:00"
+StopTime  = None
+#Download Geometry for a specific Run Num
+RunNum = 1
+
 # this is used by ImputCppRealData
 Enable_V1290_Unpacking = True
 Enable_V1731_Unpacking = True
@@ -189,5 +209,4 @@ daq_data_file = '02873.003' # file name for daq data
 
 maus_version = "" # set at runtime - do not edit this (changes are ignored)
 configuration_file = "" # should be set on the command line only (else ignored)
-
 
