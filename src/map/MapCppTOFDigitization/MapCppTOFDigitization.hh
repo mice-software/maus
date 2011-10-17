@@ -42,8 +42,6 @@
 #include "Interface/MICEEvent.hh"
 #include "Config/MiceModule.hh"  //  from old file?
 
-using std::string;
-
 class MapCppTOFDigitization {
  public:
   /** Sets up the worker

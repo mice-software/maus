@@ -33,6 +33,7 @@ class mc:
       "time":{"type":"number"},
       "position":three_vec,
       "momentum":three_vec,
+      "random_seed":{"type":"number"},
     }
   }
 
@@ -88,6 +89,12 @@ class mc:
   spill = {
     "type":"array", "items":[particles],
   }
+
+class daq_data:
+  """
+  Data output from the InputCppDAQData
+  """
+  
 
 spill = {"type":"object", "properties":{"mc":mc.spill}}
 

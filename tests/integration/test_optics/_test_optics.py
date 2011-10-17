@@ -51,7 +51,7 @@ def plot_data(test, z_out, beta, plot_dir):
     plot_dir = os.path.join(plot_dir, 'optics')
     try:
         os.mkdir(plot_dir)
-    except:
+    except OSError:
         pass # dir already exists
     canvas.Print(os.path.join(plot_dir, test+'_optics.png'))
 

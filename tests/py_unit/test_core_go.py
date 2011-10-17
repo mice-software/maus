@@ -1,85 +1,138 @@
-import json
+"""Tests for src/common_py/Go.py"""
+
 import unittest
-import subprocess
-import glob
-import os
 import sys
+import copy
+import tempfile
 from io import StringIO
 
-from InputPyEmptyDocument import *
-from MapPyDoNothing import *
-from ReducePyDoNothing import *
-from OutputPyJSON import *
+from InputPyEmptyDocument import InputPyEmptyDocument
+from MapPyDoNothing import MapPyDoNothing
+from ReducePyDoNothing import ReducePyDoNothing
+from OutputPyJSON import OutputPyJSON
 
-from Go import Go
+from Go import Go, get_possible_dataflows
 
-class FakeMap():
-    def birth(self, someArg):
+class FakeMap(): #pylint: disable = W0232, R0903
+    """Map mock-up that always fails to birth"""
+    def birth(self, some_arg): #pylint: disable = W0613, R0201, R0903
+        """Always return False"""
         return False
 
-class GoTestCase(unittest.TestCase):
+class GoTestCase(unittest.TestCase): #pylint: disable = R0904
+    """Tests for src/common_py/Go.py"""
+
+    def setUp(self): #pylint: disable = C0103
+        """Create temp file"""
+        self.tmp_file = tempfile.mkstemp()[1]
+
+    def dataflows_test(self):
+        """
+        Make sure get_possible_dataflows() doesn't return nonsense
+        """
+        keys = get_possible_dataflows().keys()
+        self.assertTrue('pipeline_single_thread' in keys)
+
     def input_birth_test(self):
+        """Check that Go raises error with bad input"""
         inputer = FakeMap()
-        mapper = MapPyDoNothing()
-        reducer = ReducePyDoNothing()
-        outputer = OutputPyJSON(open('unit_test', 'w'))  #  this file won't appear since exception
+        transformer = MapPyDoNothing()
+        merger = ReducePyDoNothing()
+        outputer = OutputPyJSON(open(self.tmp_file, 'w'))
         with self.assertRaises(AssertionError):
-            Go(inputer, mapper, reducer, outputer)
+            Go(inputer, transformer, merger, outputer, command_line_args=False)
 
 
     def map_birth_test(self):
+        """Check that Go raises error with bad transformer"""
         inputer = InputPyEmptyDocument(1)
-        mapper = FakeMap()
-        reducer = ReducePyDoNothing()
-        outputer = OutputPyJSON(open('unit_test', 'w'))  #  this file won't appear since exception
+        transformer = FakeMap()
+        merger = ReducePyDoNothing()
+        outputer = OutputPyJSON(open(self.tmp_file, 'w'))
 
         with self.assertRaises(AssertionError):
-            Go(inputer, mapper, reducer, outputer)
+            Go(inputer, transformer, merger, outputer, command_line_args=False)
 
     def reduce_birth_test(self):
+        """Check that Go raises error with bad merger"""
         inputer = InputPyEmptyDocument(1)
-        mapper = MapPyDoNothing()
-        reducer = FakeMap()
-        outputer = OutputPyJSON(open('unit_test', 'w'))  #  this file won't appear since exception
+        transformer = MapPyDoNothing()
+        merger = FakeMap()
+        outputer = OutputPyJSON(open(self.tmp_file, 'w'))
 
         with self.assertRaises(AssertionError):
-            Go(inputer, mapper, reducer, outputer)
+            Go(inputer, transformer, merger, outputer, command_line_args=False)
 
     def output_birth_test(self):
+        """Check that Go raises error with bad outputter"""
         inputer = InputPyEmptyDocument(1)
-        mapper = MapPyDoNothing()
-        reducer = ReducePyDoNothing()
+        transformer = MapPyDoNothing()
+        merger = ReducePyDoNothing()
         outputer = FakeMap()
 
         with self.assertRaises(AssertionError):
-            Go(inputer, mapper, reducer, outputer)
+            Go(inputer, transformer, merger, outputer, command_line_args=False)
 
-
-    def test_map_reduce_type(self):
+    def command_line_args_test(self):
+        """Check that Go handles command line args switch correctly"""
         inputer = InputPyEmptyDocument(1)
-        mapper = MapPyDoNothing()
-        reducer = ReducePyDoNothing()
-        outputer = OutputPyJSON(open('unit_test', 'w'))  #  this file won't appear since exception
+        transformer = MapPyDoNothing()
+        merger = ReducePyDoNothing()
+        outputer = OutputPyJSON(open(self.tmp_file, 'w'))
+        arg_temp = copy.deepcopy(sys.argv)
+        sys.argv = [arg_temp[0]]
+    
+        Go(inputer, transformer, merger, outputer, command_line_args = True)
 
-        configFile = StringIO(u"""map_reduce_type="bad_type" """)
+        outputer = OutputPyJSON(open(self.tmp_file, 'w'))
+        arg_temp = copy.deepcopy(sys.argv)
+        sys.argv = [arg_temp[0], "bob"]
+        with self.assertRaises(SystemExit):
+            Go(inputer, transformer, merger, outputer, command_line_args = True)
 
-        with self.assertRaises(AssertionError):
-            Go(inputer, mapper, reducer, outputer, configFile)
+        sys.argv = [arg_temp[0], "-verbose_level", "1"]
+        Go(inputer, transformer, merger, outputer, command_line_args = True)
 
+        sys.argv = arg_temp
 
-    def test_map_reduce_type(self):
+    def test_type_of_dataflow_bad(self):
+        """Check that Go raises error with bad dataflow type"""
         inputer = InputPyEmptyDocument(1)
-        mapper = MapPyDoNothing()
-        reducer = ReducePyDoNothing()
-        outputer = OutputPyJSON(open('unit_test', 'w'))  #  this file won't appear since exception
-        for MapRedType in ["native_python", "native_python_profile"]:
-            configFile = StringIO(u"""map_reduce_type="%s" """ % MapRedType)
+        transformer = MapPyDoNothing()
+        merger = ReducePyDoNothing()
+        outputer = OutputPyJSON(open(self.tmp_file, 'w'))
 
-        Go(inputer, mapper, reducer, outputer, configFile)
+        config = StringIO(u"""type_of_dataflow="bad_type" """)
+
+        with self.assertRaises(LookupError):
+            Go(inputer, transformer, merger, outputer, config, \
+               command_line_args = False)
 
 
+    def test_type_of_dataflow_good(self):
+        """Check that Go executes okay with good dataflow"""
+        inputer = InputPyEmptyDocument(1)
+        transformer = MapPyDoNothing()
+        merger = ReducePyDoNothing()
+        outputer = OutputPyJSON(open(self.tmp_file, 'w'))
+        for map_red_type in ['pipeline_single_thread']:
+            config = StringIO(u"""type_of_dataflow="%s" """ % map_red_type)
 
+            Go(inputer, transformer, merger, outputer, config, \
+                   command_line_args = False)
 
+    def test_dataflow_not_implemented(self):
+        """Check that Go notifies user of unimplemented dataflow"""
+        inputer = InputPyEmptyDocument(1)
+        transformer = MapPyDoNothing()
+        merger = ReducePyDoNothing()
+        outputer = OutputPyJSON(open(self.tmp_file, 'w'))
+        for map_red_type in ['many_local_threads','control_room_style']:
+            config = StringIO(u"""type_of_dataflow="%s" """ % map_red_type)
+            
+            with self.assertRaises(NotImplementedError):
+                Go(inputer, transformer, merger, outputer, config, \
+                       command_line_args = False)
 
 if __name__ == '__main__':
     unittest.main()

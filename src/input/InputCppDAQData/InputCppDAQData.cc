@@ -15,11 +15,11 @@
  *
  */
 
-#include "src/input/InputCppData/InputCppData.hh"
+#include "src/input/InputCppDAQData/InputCppDAQData.hh"
 
-InputCppData::InputCppData(std::string pDataPath,
+InputCppDAQData::InputCppDAQData(std::string pDataPath,
                                    std::string pRunNum) {
-  _classname = "InputCppDAQData";
+  _classname = "";
   _eventPtr = NULL;
   _dataPaths = pDataPath;
   _datafiles = pRunNum;
@@ -33,7 +33,7 @@ InputCppData::InputCppData(std::string pDataPath,
 }
 
 
-bool InputCppData::birth(std::string jsonDataCards) {
+bool InputCppDAQData::birth(std::string jsonDataCards) {
   if ( _dataFileManager.GetNFiles() ) {
      return false;  // Faile because files are already open
   }
@@ -166,7 +166,7 @@ bool InputCppData::birth(std::string jsonDataCards) {
 }
 
 
-bool InputCppData::readNextEvent() {
+bool InputCppDAQData::readNextEvent() {
   // Check the max number of DAQ events.
   // If it is negative, run until the end of the loaded DATE files.
   if (_maxNumDaqEvents > -1)
@@ -181,7 +181,7 @@ bool InputCppData::readNextEvent() {
   return true;
 }
 
-std::string InputCppData::getCurEvent() {
+std::string InputCppDAQData::getCurEvent() {
   // Create new Json documents.
   Json::Value xDocRoot;  // Root of the event
   Json::FastWriter xJSONWr;
@@ -212,7 +212,7 @@ std::string InputCppData::getCurEvent() {
   }
   // Deal with exceptions
   catch(MDexception & lExc) {
-    Squeak::mout(Squeak::error) << "InputCppData : Unpacking exception." <<
+    Squeak::mout(Squeak::error) << "InputCppDAQData : Unpacking exception." <<
     std::endl << "DAQ Event skipped!" << std::endl;
     Squeak::mout(Squeak::error) <<  lExc.GetDescription() << endl;
     xDocSpill.clear();
@@ -224,7 +224,7 @@ std::string InputCppData::getCurEvent() {
     xDocRoot["errors"] = errors;
   }
   catch(std::exception & lExc) {
-    Squeak::mout(Squeak::error) << "InputCppData : Standard exception."
+    Squeak::mout(Squeak::error) << "InputCppDAQData : Standard exception."
     << std::endl << "DAQ Event skipped!" << std::endl;
     Squeak::mout(Squeak::error) << lExc.what() << std::endl;
     xDocSpill.clear();
@@ -236,7 +236,7 @@ std::string InputCppData::getCurEvent() {
     xDocRoot["errors"] = errors;
   }
   catch(...) {
-    Squeak::mout(Squeak::error) << "InputCppData : Unknown exception occurred."
+    Squeak::mout(Squeak::error) << "InputCppDAQData : Unknown exception occurred."
     << std::endl << "DAQ Event skipped!" << std::endl;
     xDocSpill.clear();
     Json::Value errors;
@@ -258,7 +258,7 @@ std::string InputCppData::getCurEvent() {
   return xJSONWr.write(xDocRoot);
 }
 
-bool InputCppData::death() {
+bool InputCppDAQData::death() {
 	// Free the memory.
   if (_v1290PartEventProc) delete _v1290PartEventProc;
   if (_v1724PartEventProc) delete _v1724PartEventProc;
@@ -270,7 +270,7 @@ bool InputCppData::death() {
   return true;
 }
 
-std::string InputCppData::event_type_to_str(int pType) {
+std::string InputCppDAQData::event_type_to_str(int pType) {
   std::string event_type;
   switch (pType) {
     case START_OF_BURST :

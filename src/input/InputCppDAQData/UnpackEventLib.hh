@@ -26,20 +26,19 @@
 
 #include "json/json.h"
 
-#include "MDprocessor.h"
-#include "MDpartEventV1290.h"
-#include "MDpartEventV1724.h"
-
-#include "MDpartEventV1731.h"
-#include "MDfragmentVLSB_C.h"
-#include "MDfragmentV830.h"
-#include "MDfragmentDBB.h"
-#include "MDequipMap.h"
+#include "unpacking/MDprocessor.h"
+#include "unpacking/MDpartEventV1290.h"
+#include "unpacking/MDpartEventV1724.h"
+#include "unpacking/MDpartEventV1731.h"
+#include "unpacking/MDfragmentVLSB_C.h"
+#include "unpacking/MDfragmentV830.h"
+#include "unpacking/MDfragmentDBB.h"
+#include "unpacking/MDequipMap.h"
 
 #include "Utils/DAQChannelMap.hh"
 
 
-//////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 /** MDarranger
  * Simple class to hold and arrange the Json document
@@ -51,11 +50,17 @@ class MDarranger : public MDprocessor {
   MDarranger() {}
   virtual ~MDarranger() {}
 
+  /** Sets the json document to which the MDarranger will write
+   */
   void set_JSON_doc(Json::Value *doc) {_docSpill = doc;}
+
+  /** Gets the json document where DAQ data is written
+   */
   Json::Value* get_JSON_doc() {return _docSpill;}
- /**
+
+  /**
   * This function sets the DAQ map.
-  *\param[in] map The DAQ channel map.
+  * \param[in] map The DAQ channel map.
   */
   void set_DAQ_map(DAQChannelMap* map) {_chMap = map;}
 
@@ -72,7 +77,7 @@ class MDarranger : public MDprocessor {
   string _equipment;
 };
 
-//////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 /** On Particle Event V1290
  * This class unpacks a V1290 (TDC) board hit.
@@ -95,7 +100,7 @@ class V1290DataProcessor : public MDarranger {
 };
 
 
-//////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // do not increment inside following macro! (e.g.: MAX( ++a, ++b );
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 
@@ -105,48 +110,49 @@ class fADCDataProcessor : public MDarranger {
   fADCDataProcessor() {}
   ~fADCDataProcessor() {}
 
- /** Return the position of the maximum.
- * This function returns the number of the sample having maximum amplitude.
- */
+  /** Return the position of the maximum.
+  * This function returns the number of the sample having maximum amplitude.
+  */
   int get_max_position();
 
- /** Return the area of the signal.
- * This function returns the area of the signal. The pedestal is subtracted.
- * The integration is done in window starting 10 samples before the maximum
- * and ending 20 samples after the maximum.
- * \param[out] pos The number of the sample having maximum amplitude.
- */
+  /** Return the area of the signal.
+  * This function returns the area of the signal. The pedestal is subtracted.
+  * The integration is done in window starting 10 samples before the maximum
+  * and ending 20 samples after the maximum.
+  * \param[out] pos The number of the sample having maximum amplitude.
+  */
   int get_signal_area(int &pos);
 
 
   int get_pedestal_area(int &pos);
 
- /** Return the measured value for the given sample
- * \param[in] i The number of the sample.
- */
+  /** Return the measured value for the given sample
+  * \param[in] i The number of the sample.
+  */
   int get_point(int i) const { return _data[i]; }
 
   /// Return the vector of samples
   vector<int> get_data() const { return _data; }
 
- /** Return the area of the signal.
- * This function returns the area of the signal. The pedestal is subtracted.
- * The integration is done using the whole acquisition window.
- */
+  /** Return the area of the signal.
+  * This function returns the area of the signal. The pedestal is subtracted.
+  * The integration is done using the whole acquisition window.
+  */
   int get_area();
 
   /// Return the data member _pedestal
   int get_pedestal() const { return _pedestal; }
 
- /** Return the charge of the signal.
- * This function returns the charge of the signal calculated by the specified algorithm.
- * \param[in] Algorithm identifier of the algorithm.
- */
+  /** Return the charge of the signal.
+  * This function returns the charge of the signal calculated by the specified
+  * algorithm.
+  * \param[in] Algorithm identifier of the algorithm.
+  */
   int get_charge(int Algorithm = ceaPedMax);
 
   enum chargeEstimationAlgorithm {
-    ceaMinMax = 0, // Simplest algorithm
-    ceaFractionDescriminatorThreshold = 1, // not implemented
+    ceaMinMax = 0, /// Simplest algorithm
+    ceaFractionDescriminatorThreshold = 1, /// not implemented
     ceaPedMax = 3
   };
 
@@ -173,7 +179,7 @@ class fADCDataProcessor : public MDarranger {
   int _pedestal;
 };
 
-//////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 /** On Particle Event V1724
  * This class unpacks a V1724 (fADC) board hit.
@@ -184,7 +190,7 @@ class V1724DataProcessor : public fADCDataProcessor {
   V1724DataProcessor() {_equipment="V1724";}
   virtual ~V1724DataProcessor() {}
 
- /** Unpack a single event to JSON.
+  /** Unpack a single event to JSON.
   *
   * This function unpacks a single particle event,
 	* recorded by equipment CAEN V1724 (flash ADC)
@@ -196,7 +202,7 @@ class V1724DataProcessor : public fADCDataProcessor {
   virtual int Process(MDdataContainer* dc);
 };
 
-//////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 /** On Particle Event V1731
  * This class unpacks a V1731 (fADC) board hit.
@@ -244,7 +250,7 @@ class V830DataProcessor : public MDarranger {
   virtual int Process(MDdataContainer* dc);
 };
 
-//////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 /** On Fragment Event VLSB
  * This class unpacks a VLSB (tracker) board hit.
@@ -266,7 +272,7 @@ class VLSBDataProcessor : public MDarranger {
   virtual int Process(MDdataContainer* dc);
 };
 
-//////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 /** On Fragment Event DBB
  * This class unpacks a DBB (EMR) board hit.

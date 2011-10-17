@@ -3,9 +3,9 @@ import md5
 import unittest
 import json
 from Configuration import Configuration
-from InputCppData import InputCppData
+from InputCppDAQData import InputCppDAQData
 
-class InputCppDataTestCase(unittest.TestCase):
+class InputCppDAQDataTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
@@ -13,13 +13,13 @@ class InputCppDataTestCase(unittest.TestCase):
             raise Exception('InitializeFail', 'MAUS_ROOT_DIR unset!')
         # Set our data path & filename
         # It would be nicer to test with a smaller data file!
-        self._datapath = '%s/src/input/InputCppData' % \
+        self._datapath = '%s/src/input/InputCppDAQData' % \
                             os.environ.get("MAUS_ROOT_DIR")
         self._datafile = '02873'
         self._c = Configuration()
 
     def test_init(self):
-        self.mapper = InputCppData(self._datapath, \
+        self.mapper = InputCppDAQData(self._datapath, \
                                        self._datafile)
         self.assertTrue(self.mapper.birth( self._c.getConfigJSON() ))
         # Check re-init without closing fails
@@ -29,7 +29,7 @@ class InputCppDataTestCase(unittest.TestCase):
 
     # Test a single event
     def test_single(self):
-        self.mapper = InputCppData(self._datapath, \
+        self.mapper = InputCppDAQData(self._datapath, \
                                        self._datafile)
         self.assertTrue(self.mapper.birth(self. _c.getConfigJSON() ))
         # Get a single event and check it's the right size
@@ -42,7 +42,7 @@ class InputCppDataTestCase(unittest.TestCase):
 
     # Test reading the whole file
     def test_multi(self):
-        self.mapper = InputCppData(self._datapath, \
+        self.mapper = InputCppDAQData(self._datapath, \
                                        self._datafile)
         self.assertTrue(self.mapper.birth( self._c.getConfigJSON() ))
         event_count = 0

@@ -15,7 +15,7 @@
  *
  */
 
-#include "src/input/InputCppData/UnpackEventLib.hh"
+#include "src/input/InputCppDAQData/UnpackEventLib.hh"
 
 int V1290DataProcessor::Process(MDdataContainer* aPartEventPtr) {
   // Cast the argument to structure it points to.
@@ -45,7 +45,7 @@ int V1290DataProcessor::Process(MDdataContainer* aPartEventPtr) {
       int xHitsT = xV1290Evnt->GetNHits(xCh, 't');
 
       // By definition the number of the leading edge hits has to be equal
-      // to the number of the trailing edge hits but some times this is not true.
+      // to the number of the trailing edge hits but some times this is not true
       int xMaxHits = MAX(xHitsL, xHitsT);
 
       // Loop over all leading and trailing hits in this channel.
@@ -92,7 +92,7 @@ int V1290DataProcessor::Process(MDdataContainer* aPartEventPtr) {
   return OK;
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 int V1724DataProcessor::Process(MDdataContainer* aPartEventPtr) {
   // Cast the argument to structure it points to.
@@ -115,7 +115,8 @@ int V1724DataProcessor::Process(MDdataContainer* aPartEventPtr) {
     pBoardDoc["trigger_time_tag"]    = xV1724Evnt->GetTriggerTimeTag();
     // Loop over all the channels
     for (unsigned int xCh = 0; xCh < V1724_NCHANNELS; xCh++) {
-      unsigned int xSamples = ( xV1724Evnt->GetLength(xCh) )*V1724_SAMPLES_PER_WORD;
+      unsigned int xSamples = ( xV1724Evnt->GetLength(xCh) )*
+                              V1724_SAMPLES_PER_WORD;
       for (unsigned int j = 0; j < xSamples; j++) {
         int sample = xV1724Evnt->GetSampleData(xCh,  // Channel ID
                                                j);  // Sample ID
@@ -149,7 +150,7 @@ int V1724DataProcessor::Process(MDdataContainer* aPartEventPtr) {
   return OK;
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 int V1731DataProcessor::Process(MDdataContainer* aPartEventPtr) {
   // Cast the argument to structure it points to.
@@ -172,7 +173,8 @@ int V1731DataProcessor::Process(MDdataContainer* aPartEventPtr) {
     pBoardDoc["trigger_time_tag"]    = xV1731Evnt->GetTriggerTimeTag();
     // Loop over all the channels
     for (unsigned int xCh = 0; xCh < V1731_NCHANNELS; xCh++) {
-      unsigned int xSamples = ( xV1731Evnt->GetLength(xCh) )*V1731_SAMPLES_PER_WORD;
+      unsigned int xSamples = ( xV1731Evnt->GetLength(xCh) )*
+                              V1731_SAMPLES_PER_WORD;
       for (unsigned int j = 0; j < xSamples; j++) {
         int sample = xV1731Evnt->GetSampleData(xCh,  // Channel ID
                                                j);  // Sample ID
@@ -207,7 +209,7 @@ int V1731DataProcessor::Process(MDdataContainer* aPartEventPtr) {
   return OK;
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 int V830DataProcessor::Process(MDdataContainer* aFragPtr) {
   // Cast the argument to structure it points to.
@@ -256,7 +258,7 @@ int V830DataProcessor::Process(MDdataContainer* aFragPtr) {
   return OK;
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 int VLSBDataProcessor::Process(MDdataContainer* aFragPtr) {
   // Cast the argument to structure it points to.
@@ -287,7 +289,7 @@ int VLSBDataProcessor::Process(MDdataContainer* aFragPtr) {
   return OK;
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 int DBBDataProcessor::Process(MDdataContainer* aFragPtr) {
   // Cast the argument to structure it points to.
