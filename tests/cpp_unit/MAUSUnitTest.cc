@@ -49,12 +49,8 @@ Json::Value SetupConfig() {
   config["verbose_level"] = 2;
   config["geant4_visualisation"] = false;
   config["physics_model"] = "QGSP_BERT";
-  config["reference_g4ui_script"] = "";
-  config["reference_energy_loss_model"] = "ionisation";
-  config["begin_of_run_g4ui_script"] = "";
-  config["multiple_scattering_model"] = "mcs";
-  config["energy_loss_model"] = "estrag";
-  config["hadronic_model"] = "all";
+  config["reference_physics_processes"] = "mean_energy_loss";
+  config["physics_processes"] = "standard";
   config["particle_decay"] = true;
   config["charged_pion_half_life"] = -1.;
   config["muon_half_life"] = -1.;
