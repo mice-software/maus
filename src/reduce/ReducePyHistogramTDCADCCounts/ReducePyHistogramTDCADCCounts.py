@@ -18,12 +18,6 @@ spills are processed.
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-import base64
-import json
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-from matplotlib.figure import Figure
-import StringIO
-
 from ReducePyMatplotlibHistogram import ReducePyMatplotlibHistogram
 
 class ReducePyHistogramTDCADCCounts(ReducePyMatplotlibHistogram):
@@ -80,51 +74,45 @@ class ReducePyHistogramTDCADCCounts(ReducePyMatplotlibHistogram):
         self.__max_tdc_count = 1
         self._tag = "tdcadc"
 
-    def birth(self, config_json):
+    def _configure_at_birth(self, config_doc):
         """
-        Configure worker from data cards.
+        Configure worker from data cards. Overrides super-class method. 
         @param self Object reference.
         @param config_doc JSON document.
-        @returns True if successful, False otherwise.
+        @returns True if successful.
         """
-        # Invoke super-class default_birth method to perform
-        # general configuration.
-        # default_birth returns the JSON document with config_json
-        # if this is needed to extract sub-class-specific
-        # configuration. 
-        ReducePyMatplotlibHistogram._default_birth(self, config_json)
         self.__max_adc_count = 1
         self.__max_tdc_count = 1
-        self._histogram.figure.get_axes()[0].set_xlabel("TDC count", fontsize=12)
-        self._histogram.figure.get_axes()[0].set_ylabel("ADC count", fontsize=12)
+        # Can assume that self._histogram now has a histogram
+        # (matplotlib FigureCanvas) available and can now be
+        # customised.
+        self._histogram.figure.get_axes()[0].set_xlabel(
+            "TDC count", fontsize=12)
+        self._histogram.figure.get_axes()[0].set_ylabel(
+            "ADC count", fontsize=12)
         return True
 
-    def process(self, json_string):
+    def _update_histogram(self, json_doc):
         """
         Update the histogram with data from the current spill
-        and output the histogram.        
+        and output the histogram. Overrides super-class method.
         @param self Object reference.
-        @param json_string String with current JSON document.
-        @returns JSON document containing current histogram.
+        @param json_doc Current spill..
+        @returns None if histogram was created or a JSON document with
+        error messages if there were problems (e.g. information was
+        missing from the spill).
         """
 
-        # Load and validate the JSON document.
-        try:
-            json_doc = json.loads(json_string.rstrip())
-        except ValueError:
-            json_doc = {"errors": {"bad_json_document":
-                                "unable to do json.loads on input"} }
-            return json.dumps(json_doc)
-
-        # Check the data of interest is in the spill.
+        # Do validation specific to this class while getting the
+        # data to be graphed.
         if "digits" not in json_doc:
             if "errors" not in json_doc:
                 json_doc["errors"] = {}
             json_doc["errors"]["no_digits"] = "no digits"
-            return json.dumps(json_doc)
+            return json_doc
         digits = json_doc["digits"]
 
-        # Extract just those that are for the Tracker.
+        # Extract just those digits that are for the Tracker.
         trackerdigits = \
             [digit for digit in digits if self.__filter_trackers(digit)]
         # Get the lists of TDC and ADC counts.    
@@ -133,7 +121,7 @@ class ReducePyHistogramTDCADCCounts(ReducePyMatplotlibHistogram):
         adcs = [self.__get_counts(digit, "adc_counts") 
                 for digit in trackerdigits]
 
-        # Calculate maximums for axis rescaling.
+        # Calculate maximum TDC and ADC counts for axis rescaling.
         spill_max_tdc_count = 0
         if (len(tdcs) > 0):
             spill_max_tdc_count = max(tdcs)
@@ -144,25 +132,21 @@ class ReducePyHistogramTDCADCCounts(ReducePyMatplotlibHistogram):
         self.__max_adc_count = max(self.__max_adc_count, spill_max_adc_count)
 
         # Set content/title.
-        content = "Total TDC and ADC counts to spill %d" % self.spill_count
+        self._content = \
+            "Total TDC and ADC counts to spill %d" % self.spill_count
+        self._histogram.figure.get_axes()[0].set_title(
+            self._content, fontsize=14)
 
         # Plot the data.
-        self._histogram.figure.get_axes()[0].set_title(content, fontsize=14)
         if (len(tdcs) > 0):
             self._histogram.figure.get_axes()[0].scatter(
                 tdcs, adcs, 10, "b")
 
         # Rescale axis so 0 is always visible.
-        # +0.5 are fudge factors to avoid matplotlib warning about
-        # "Attempting to set identical bottom==top" which arises if
-        # the axes are set to be exactly the maximum of the data.
-        self._histogram.figure.get_axes()[0].set_xlim( \
-            [0, self.__max_tdc_count + 0.5])
-        self._histogram.figure.get_axes()[0].set_ylim( \
-            [0, self.__max_adc_count + 0.5])
+        self._rescale_axes(0, self.__max_tdc_count,
+                           0, self.__max_adc_count)
 
-        return ReducePyMatplotlibHistogram._create_image_json(
-            self, content)
+        return None
 
     def __filter_trackers(self, digit): #pylint: disable=R0201
         """
@@ -190,3 +174,11 @@ class ReducePyHistogramTDCADCCounts(ReducePyMatplotlibHistogram):
             return digit[digit_key]
         else:
             return 0
+
+    def _cleanup_at_death(self):
+        """
+        No sub-class-specific cleanup is needed.
+        @param self Object reference.
+        @returns True
+        """
+        return True
