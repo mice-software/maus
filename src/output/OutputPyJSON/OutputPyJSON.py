@@ -84,7 +84,7 @@ class OutputPyJSON:
         \param document JSON document to be saved
         """
         try:
-            self.file.write(document + '\n')
+            self.file.write(document.rstrip() + '\n')
             return True
         except Exception: #pylint: disable=W0703
             ErrorHandler.HandleException({}, self)

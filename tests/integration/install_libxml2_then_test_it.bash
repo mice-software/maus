@@ -1,11 +1,11 @@
 #!/bin/bash
 ./configure
 source env.sh
-./third_party/build_all.bash 
+./third_party/bash/01python.bash
+./third_party/bash/42libxml2.bash
+./third_party/bash/43libxslt.bash
 source env.sh
-scons -c
-scons build || exit 1
-./run_tests.bash || exit 1
+python -m libxml2
 # see if libxml2 imports okay
 python -m libxml2
 if [ $? == 0 ]; then
