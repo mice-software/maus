@@ -84,7 +84,7 @@ class ReducePyHistogramTDCADCCounts(ReducePyMatplotlibHistogram):
         """
         # Do configuration specific to this class.
         # Can assume that self._histogram now has a histogram
-        # (matplotlib FigureCanvas) available which can now be
+        # (matplotlib FigureCanvas object) available which can now be
         # customised.
         self._histogram.figure.get_axes()[0].set_xlabel(
             "TDC count", fontsize=12)
