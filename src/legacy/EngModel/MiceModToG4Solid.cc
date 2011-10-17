@@ -11,6 +11,9 @@
 #include "G4IntersectionSolid.hh"
 #include "G4VSolid.hh"
 #include "G4AffineTransform.hh"
+#include "G4TessellatedSolid.hh"
+#include "G4TriangularFacet.hh"
+#include "G4QuadrangularFacet.hh"
 
 #include "Interface/Squeal.hh"
 
@@ -26,28 +29,80 @@ namespace MiceModToG4Solid
 {
 
 
-	//Build a G4Solid if you don't know the solid type
-	G4VSolid* buildSolid ( MiceModule* mod )
+//Build a G4Solid if you don't know the solid type
+G4VSolid* buildSolid ( MiceModule* mod )
+{
+    std::string volume = mod->volType();
+    for(unsigned int i=0; i<volume.size(); i++) volume[i] = tolower(volume[i]);
+    if(volume == "none")      return NULL;
+    if(volume == "tessellatedsolid") return buildTessellatedSolid  (mod);
+    if(volume == "wedge")     return buildWedge    (mod);
+    if(volume == "box")       return buildBox      (mod);
+    if(volume == "cylinder")  return buildCylinder (mod);
+    if(volume == "tube")      return buildTube     (mod);
+    if(volume == "sphere")    return buildSphere   (mod);
+    if(volume == "polycone")  return buildPolycone (mod);
+    if(volume == "torus")     return buildTorus    (mod);
+    if(volume == "boolean")   return buildBoolean  (mod);
+    if(volume == "multipole") return buildMultipole(mod);
+    if(volume == "ellipticalcone")  return buildEllipticalCone (mod);
+    throw(Squeal(Squeal::recoverable, "Volume "+mod->volType()+" not recognised in module "+mod->fullName(), 
+                                      "MiceModToG4Solid::buildSolid") );
+}
+
+//If you know the solid type, you may prefer to call these methods
+//One for each supported G4Solid
+	G4VSolid * buildTessellatedSolid (MiceModule* mod)
 	{
-		std::string volume = mod->volType();
-		for(unsigned int i=0; i<volume.size(); i++) volume[i] = tolower(volume[i]);
-		if(volume == "none")      return NULL;
-		if(volume == "wedge")     return buildWedge    (mod);
-		if(volume == "box")       return buildBox      (mod);
-		if(volume == "cylinder")  return buildCylinder (mod);
-		if(volume == "tube")      return buildTube     (mod);
-		if(volume == "sphere")    return buildSphere   (mod);
-		if(volume == "polycone")  return buildPolycone (mod);
-		if(volume == "torus")     return buildTorus    (mod);
-		if(volume == "boolean")   return buildBoolean  (mod);
-		if(volume == "multipole") return buildMultipole(mod);
-		if(volume == "trapezoid") return buildTrapezoid(mod);
+	int V, TF, QF, i;
 
-		if(volume == "ellipticalcone")  return buildEllipticalCone (mod);
-		throw(Squeal(Squeal::recoverable, "Volume "+mod->volType()+" not recognised in module "+mod->fullName(), 
-					"MiceModToG4Solid::buildSolid") );
+	G4TessellatedSolid * T = new G4TessellatedSolid(mod->name()); 
+
+	std::ostringstream Buff;
+	std::istringstream IBuff;
+
+	V=mod->propertyIntThis("noOfVertices");
+	TF=mod->propertyIntThis("noOfTFacets");
+	QF=mod->propertyIntThis("noOfQFacets");
+	std::vector<G4ThreeVector> Vert;
+
+	  for (i=1; i<=V; i++)
+	    {
+	     Buff.str("");
+	     Buff.clear();
+	     Buff<<"Vector"<<i;
+	     Vert.push_back(mod->propertyHep3VectorThis(Buff.str()));
+	    }
+
+	  for (i=1; i<=TF; i++)
+	    {
+	     int Vertex1, Vertex2, Vertex3;
+	     Buff.str("");
+	     Buff.clear();
+	     Buff<<"TFacet"<<i;
+	     IBuff.clear();
+	     IBuff.str(mod->propertyStringThis(Buff.str()));
+	     IBuff>>Vertex1>>Vertex2>>Vertex3;
+	     G4TriangularFacet *F = new G4TriangularFacet(Vert[Vertex1], Vert[Vertex2], Vert[Vertex3], ABSOLUTE);
+	     T->AddFacet(F);
+	    }
+
+	  for (i=1; i<=QF; i++)
+	    {
+	     int Vertex1, Vertex2, Vertex3, Vertex4;
+	     Buff.str("");
+	     Buff.clear();
+	     Buff<<"QFacet"<<i;
+	     IBuff.clear();
+	     IBuff.str(mod->propertyStringThis(Buff.str()));
+	     IBuff>>Vertex1>>Vertex2>>Vertex3>>Vertex4;
+	     G4QuadrangularFacet F = G4QuadrangularFacet(Vert[Vertex1], Vert[Vertex2], Vert[Vertex3], Vert[Vertex4], ABSOLUTE);     
+	     T->AddFacet(&F);
+	    }
+
+	T->SetSolidClosed(true);
+	return T;
 	}
-
 
 	//If you know the solid type, you may prefer to call these methods
 	//One for each supported G4Solid

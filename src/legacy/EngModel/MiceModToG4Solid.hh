@@ -29,8 +29,9 @@ namespace MiceModToG4Solid
 {
 	//! Build some G4VSolid. throw a Squeal if it isn't supported.
 	G4VSolid * buildSolid    ( MiceModule* mod );
-
-
+        
+        //! Builds a G4Tessllated solid.
+        G4VSolid * buildTessellatedSolid (MiceModule* mod);
 	//! Builds a G4Trd that is wedge shaped, taking dimensions().x as width, 
 	//! dimensions.z() as height and dimensions().y as length at open end.
 	G4VSolid * buildWedge    ( MiceModule* );
