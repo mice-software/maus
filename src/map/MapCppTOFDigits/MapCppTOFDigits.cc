@@ -98,10 +98,11 @@ std::string MapCppTOFDigits::process(std::string document) {
 bool MapCppTOFDigits::SetConfiguration(std::string json_configuration) {
   //  JsonCpp setup
   Json::Value configJSON;
+  Json::Value map_file_name;
   try {
     configJSON = JsonWrapper::StringToJson(json_configuration);
     //  this will contain the configuration
-    Json::Value map_file_name = JsonWrapper::GetProperty(configJSON,
+    map_file_name = JsonWrapper::GetProperty(configJSON,
                                                          "TOF_cabling_file",
                                                          JsonWrapper::stringValue);
   }catch(Squeal e) {
