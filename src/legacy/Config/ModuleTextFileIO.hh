@@ -98,9 +98,9 @@ class ModuleTextFileIO
   
     MiceModule* _this;
     std::string _hasFile;
-    static MAUS::MAUSEvaluator _units;
     static std::map<std::string, std::string> _substitutions;
-    static MAUS::MAUSEvaluator _evaluator;
+    static MAUS::MAUSEvaluator* _units;
+    static MAUS::MAUSEvaluator* _evaluator;
   
 };
 

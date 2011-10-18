@@ -27,12 +27,12 @@ MAUSEvaluator::MAUSEvaluator() : _evaluator_mod(NULL),
                                  _evaluator(NULL),
                                  _evaluate_func(NULL),
                                  _set_variable_func(NULL)  {
-  Py_Initialize();
-  reset();
+    Py_Initialize();
+    reset();
 }
 
 MAUSEvaluator::~MAUSEvaluator() {
-  clear();
+    clear();
 }
 
 void MAUSEvaluator::set_variable(std::string name, double value) {
@@ -50,6 +50,7 @@ void MAUSEvaluator::set_variable(std::string name, double value) {
     }
     // check for error
     if (py_value == NULL) {
+        PyErr_Clear();
         Py_DECREF(py_arg);
         throw(Squeal(Squeal::recoverable,
                      "Failed to parse variable "+name,
@@ -61,35 +62,36 @@ void MAUSEvaluator::set_variable(std::string name, double value) {
 }
 
 double MAUSEvaluator::evaluate(std::string function) {
-  PyObject *py_arg(NULL), *py_value(NULL);
-  // argument to evalute
-  py_arg = Py_BuildValue("(s)", function.c_str());
-  if (py_arg == NULL) {
-      throw(Squeal(Squeal::recoverable,
-                 "Failed to build function "+function,
-                 "MAUSEvaluator::evaluate"));
-  }
-  // run the evaluator to calculate function value
-  if (_evaluate_func != NULL && PyCallable_Check(_evaluate_func))  {
-      py_value = PyObject_CallObject(_evaluate_func, py_arg);
-  }
-  if (py_value == NULL) {
-      Py_DECREF(py_arg);
-      throw(Squeal(Squeal::recoverable,
-                 "Failed to evaluate expression \""+function+"\"",
-                 "MAUSEvaluator::evaluate"));
-  }
+    PyObject *py_arg(NULL), *py_value(NULL);
+    // argument to evalute
+    py_arg = Py_BuildValue("(s)", function.c_str());
+    if (py_arg == NULL) {
+        throw(Squeal(Squeal::recoverable,
+                   "Failed to build function "+function,
+                   "MAUSEvaluator::evaluate"));
+    }
+    // run the evaluator to calculate function value
+    if (_evaluate_func != NULL && PyCallable_Check(_evaluate_func))  {
+        py_value = PyObject_CallObject(_evaluate_func, py_arg);
+    }
+    if (py_value == NULL) {
+        PyErr_Clear();
+        Py_DECREF(py_arg);
+        throw(Squeal(Squeal::recoverable,
+                   "Failed to evaluate expression \""+function+"\"",
+                   "MAUSEvaluator::evaluate"));
+    }
 
-  // now put transform py_value into C++ double
-  double value = 0.;
-  PyArg_Parse(py_value, "d", &value);
+    // now put transform py_value into C++ double
+    double value = 0.;
+    PyArg_Parse(py_value, "d", &value);
 
-  // clean up
-  Py_DECREF(py_value);
-  Py_DECREF(py_arg);
+    // clean up
+    Py_DECREF(py_value);
+    Py_DECREF(py_arg);
 
-  // return
-  return value;
+    // return
+    return value;
 }
 
 void MAUSEvaluator::clear() {
@@ -138,24 +140,24 @@ void MAUSEvaluator::reset() {
     }
   }
   if (_evaluator == NULL) {
-    std::cerr << "Failed to instantiate evaluator" << std::endl;
     clear();
+    std::cerr << "Failed to instantiate evaluator" << std::endl;
     return;
   }
 
   // get the evaluator object evaluate() function
   _evaluate_func = PyObject_GetAttrString(_evaluator, "evaluate");
   if (_evaluate_func == NULL) {
-    std::cerr << "Failed to find evaluate function" << std::endl;
     clear();
+    std::cerr << "Failed to find evaluate function" << std::endl;
     return;
   }
 
   // get the evaluator object set_variable()() function
   _set_variable_func = PyObject_GetAttrString(_evaluator, "set_variable");
   if (_set_variable_func == NULL) {
-    std::cerr << "Failed to find set_variables function" << std::endl;
     clear();
+    std::cerr << "Failed to find set_variables function" << std::endl;
     return;
   }
 }
