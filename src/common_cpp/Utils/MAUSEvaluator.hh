@@ -34,27 +34,52 @@
 
 namespace MAUS {
 
-/** Wrapper class for ROOT TFormula to make it look like a CLHEP Evaluator
+/** Wrapper class for python evaluator to evaluate expressions
  *
  *  Workaround for memory leak in CLHEP Evaluator (redmine issue #42)
  *
+ *  Note - really doesn't like being initialised statically; will make
+ *  segmentation fault in the destructor - I guess python clean up can happen
+ *  first. Took a while to figure that out!
  */
 class MAUSEvaluator {
   public:
+    /** Initialise python and call reset() to set up parameters
+     */
     MAUSEvaluator();
 
+    /** Calls clear() to Py_DECREF any python objects (and set to NULL)
+     */
     ~MAUSEvaluator();
 
+    /** Set a variable for evaluation in expressions
+     *
+     *  Enables to add a symbol that can be used when evaluating expressions.
+     *  The python interpreter will substitute <value> for <name>. Throw a
+     *  Squeal if the name was not valid.
+     */
     void set_variable(std::string name, double value);
 
+    /** Evaluate the expression
+     *
+     *  Evaluate function. Any python standard operators are allowed in addition
+     *  to the common functions in python math module. Also xboa units are
+     *  allowed. However, all other python global expressions have been 
+     *  disabled.
+     */
     double evaluate(std::string function);
 
+    /** Clear the evaluator and re-initialise
+     *
+     *  Initialises with python math functions and xboa units in the variables
+     *  table. Clears any other variables that have been added with e.g.
+     *  set_variable function
+     */
     void reset();
 
   private:
     void clear();
 
-    std::map<std::string, double> _parameters;
     PyObject* _evaluator_mod;
     PyObject* _evaluator;
     PyObject* _evaluate_func;

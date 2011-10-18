@@ -100,7 +100,6 @@ class dataCards
     InputDataCardsVector cv;
     InputDataCardsInt  ci;
     void fillVector(const char *, const int&, const double*);
-    MAUS::MAUSEvaluator units;
     std::map<std::string,int> appCode;
     std::string client;
 };

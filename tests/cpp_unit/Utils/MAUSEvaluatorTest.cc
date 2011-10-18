@@ -44,7 +44,6 @@ TEST(MAUSEvaluatorTest, EvaluateRawTest) {
     MAUS::MAUSEvaluator my_eval = MAUS::MAUSEvaluator();
     EXPECT_DOUBLE_EQ(my_eval.evaluate("1.+2."), 3);
     EXPECT_DOUBLE_EQ(my_eval.evaluate("1.*cm+2.*m"), 2010.);
-
     EXPECT_THROW(my_eval.evaluate("bob"), Squeal); // unknown variable
 }
 
@@ -57,6 +56,7 @@ TEST(MAUSEvaluatorTest, EvaluateVariableTest) {
     my_eval.set_variable("sin", 4.); // shadows a math func
     EXPECT_DOUBLE_EQ(my_eval.evaluate("1.+sin"), 5);
     EXPECT_DOUBLE_EQ(my_eval.evaluate(""), 1);
+    my_eval.set_variable("test var", 3.); // overwrite
 }
 
 TEST(MAUSEvaluatorTest, ResetTest) {

@@ -31,7 +31,7 @@ using std::cin;
 using std::endl;
 using std::vector;
 
-dataCards::dataCards() : units()
+dataCards::dataCards()
 {
 }
 
@@ -47,7 +47,7 @@ void dataCards::initializeApplicationCodes() {
   appCode["Analysis"]        = 3;
 }
 
-dataCards::dataCards(const std::string& app) : units(), client(app)
+dataCards::dataCards(const std::string& app) : client(app)
 {
   initializeApplicationCodes();
   std::map<std::string,int>::iterator i = appCode.find(client);
@@ -57,7 +57,7 @@ dataCards::dataCards(const std::string& app) : units(), client(app)
   fillCards(i->second);
 }
 
-dataCards::dataCards(int app) : units()
+dataCards::dataCards(int app)
 {
   fillCards(app);
 }
@@ -435,7 +435,6 @@ int dataCards::readKeys(std::istream& in)
   std::string s;
   std::string t;
   std::string c;
-  std::string units;
 
   while (in) {
     c="";
@@ -450,10 +449,8 @@ int dataCards::readKeys(std::istream& in)
     InputDataCardsDouble::iterator i = cd.find(t);
     if ( i != cd.end()) {
       double d;
-      units = "";
-      is >> d >> units;
+      is >> d;
       cd[t] = d;
-      cd[t] *= getUnits(t, units);
       ok = 1;
     }
     if( ok == 0)
@@ -643,9 +640,4 @@ std::ostream& operator<<(std::ostream& o, const dataCards& d)
 
 }
 
-double dataCards::getUnits( std::string dc, std::string u )
-{
-  try   { return units.evaluate(u); }
-  catch(Squeal squee) { throw(Squeal(Squeal::recoverable, "Failed to evaluate units "+u+" in datacard "+dc, "dataCards::readKeys")); }
-}
 

@@ -28,7 +28,7 @@ MAUSEvaluator::MAUSEvaluator() : _evaluator_mod(NULL),
                                  _evaluate_func(NULL),
                                  _set_variable_func(NULL)  {
     Py_Initialize();
-    reset();
+    this->reset();
 }
 
 MAUSEvaluator::~MAUSEvaluator() {
@@ -40,6 +40,7 @@ void MAUSEvaluator::set_variable(std::string name, double value) {
     // argument to set_variable
     py_arg = Py_BuildValue("(sd)", name.c_str(), value);
     if (py_arg == NULL) {
+        PyErr_Clear();
         throw(Squeal(Squeal::recoverable,
               "Failed to resolve arguments to set_variable",
               "MAUSEvaluator::evaluate"));
@@ -66,6 +67,7 @@ double MAUSEvaluator::evaluate(std::string function) {
     // argument to evalute
     py_arg = Py_BuildValue("(s)", function.c_str());
     if (py_arg == NULL) {
+        PyErr_Clear();
         throw(Squeal(Squeal::recoverable,
                    "Failed to build function "+function,
                    "MAUSEvaluator::evaluate"));
@@ -112,15 +114,13 @@ void MAUSEvaluator::clear() {
       Py_DECREF(_evaluator_mod);
       _evaluator_mod = NULL;
   }
-  _parameters = std::map<std::string, double>();
 }
 
 void MAUSEvaluator::reset() {
   // check that we don't have anything allocated already
   clear();
-  // NOTE: I don't throw Squeals here because I'm nervous about 
+  // NOTE: I don't throw Squeals here because I'm nervous about
   // set up/tear down order
-
   // initialise evaluator module
   _evaluator_mod = PyImport_ImportModule("evaluator");
   if (_evaluator_mod == NULL) {
