@@ -159,7 +159,7 @@ class Go:  #  pylint: disable=R0921
         emitter = self.input.emitter()
         map_buffer = buffer_input(emitter, 1)
 
-        print("TRANSFORM: Setting up transformer")
+        print("TRANSFORM: Setting up transformer (this can take a while...)")
         assert(self.transformer.birth(self.json_config_document) == True)
 
         print("MERGE: Setting up merger")
