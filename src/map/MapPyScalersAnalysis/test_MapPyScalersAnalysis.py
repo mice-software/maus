@@ -14,13 +14,13 @@ class MapPyScalersAnalysisTestCase(unittest.TestCase):
             raise Exception('InitializeFail', 'MAUS_ROOT_DIR unset!')
         # Set our data path & filename
         # It would be nicer to test with a smaller data file!
-        self._datapath = '%s/src/input/InputCppData' % \
+        self._datapath = '%s/src/input/InputCppDAQData' % \
                             os.environ.get("MAUS_ROOT_DIR")
         self._datafile = '02873'
         self._c = Configuration()
 
     def test_something(self):
-        inputter = MAUS.InputCppData(self._datapath, self._datafile)
+        inputter = MAUS.InputCppDAQData(self._datapath, self._datafile)
         inputter.birth( self._c.getConfigJSON() )
 
         mapper = MAUS.MapPyScalersAnalysis()

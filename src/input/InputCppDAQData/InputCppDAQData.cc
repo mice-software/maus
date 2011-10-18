@@ -19,7 +19,7 @@
 
 InputCppDAQData::InputCppDAQData(std::string pDataPath,
                                    std::string pRunNum) {
-  _classname = "";
+  _classname = "InputCppDAQData";
   _eventPtr = NULL;
   _dataPaths = pDataPath;
   _datafiles = pRunNum;

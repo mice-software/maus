@@ -25,16 +25,64 @@
 #include "src/map/MapCppTOFDigits/MapCppTOFDigits.hh"
 
 bool MapCppTOFDigits::birth(std::string argJsonConfigDocument) {
-  // Check if the JSON document can be parsed, else return error only
+
   _classname = "MapCppTOFDigits";
   _stationKeys.push_back("tof0");
   _stationKeys.push_back("tof1");
   _stationKeys.push_back("tof2");
 
-  if (SetConfiguration(argJsonConfigDocument))
-    return true;  // Sucessful completion
+  // Check if the JSON document can be parsed, else return error only
 
-  return false;
+  //  JsonCpp setup
+  Json::Value configJSON;
+  Json::Value map_file_name;
+  Json::Value xEnable_V1290_Unpacking;
+  Json::Value xEnable_V1724_Unpacking;
+  try {
+    configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
+    //  this will contain the configuration
+    map_file_name = JsonWrapper::GetProperty(configJSON,
+                                             "TOF_cabling_file",
+                                             JsonWrapper::stringValue);
+    xEnable_V1290_Unpacking = JsonWrapper::GetProperty(configJSON,
+                                                       "Enable_V1290_Unpacking",
+                                                       JsonWrapper::booleanValue);
+    xEnable_V1724_Unpacking = JsonWrapper::GetProperty(configJSON,
+                                                       "Enable_V1724_Unpacking",
+                                                       JsonWrapper::booleanValue);
+  }catch(Squeal e) {
+    Squeak::mout(Squeak::error)
+    << "Error in MapCppTOFDigits::birth. Bad json document."
+    << std::endl;
+    return false;
+  }
+
+  if (!xEnable_V1290_Unpacking.asBool()) {
+    Squeak::mout(Squeak::warning)
+    << "WARNING in MapCppTOFDigits::birth. The unpacking of the TDC V1290 is disabled!!!"
+    << " Are you shure you want this?"
+    << std::endl;
+  }
+  if (!xEnable_V1724_Unpacking.asBool()) {
+    Squeak::mout(Squeak::warning)
+    << "WARNING in MapCppTOFDigits::birth. The unpacking of the flashADC V1724 is disabled!!!"
+    << " Are you shure you want this?"
+    << std::endl;
+  }
+  char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
+
+  if (!pMAUS_ROOT_DIR) {
+    Squeak::mout(Squeak::error)
+    << "Could not find the $MAUS_ROOT_DIR environmental variable." << std::endl;
+    Squeak::mout(Squeak::error) << "Did you try running: source env.sh ?" << std::endl;
+    return false;
+  }
+  std::string xMapFile = std::string(pMAUS_ROOT_DIR) + map_file_name.asString();
+  bool loaded = _map.InitFromFile(xMapFile);
+  if (!loaded)
+    return false;
+
+  return true;
 }
 
 
@@ -96,34 +144,6 @@ std::string MapCppTOFDigits::process(std::string document) {
 }
 
 bool MapCppTOFDigits::SetConfiguration(std::string json_configuration) {
-  //  JsonCpp setup
-  Json::Value configJSON;
-  Json::Value map_file_name;
-  try {
-    configJSON = JsonWrapper::StringToJson(json_configuration);
-    //  this will contain the configuration
-    map_file_name = JsonWrapper::GetProperty(configJSON,
-                                                         "TOF_cabling_file",
-                                                         JsonWrapper::stringValue);
-  }catch(Squeal e) {
-    Squeak::mout(Squeak::error)
-    << "Error in MapCppTOFDigits::SetConfiguration. Bad json document."
-    << std::endl;
-    return false;
-  }
-
-  char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
-
-  if (!pMAUS_ROOT_DIR) {
-    Squeak::mout(Squeak::error)
-    << "Could not find the $MAUS_ROOT_DIR environmental variable." << std::endl;
-    Squeak::mout(Squeak::error) << "Did you try running: source env.sh ?" << std::endl;
-    return false;
-  }
-  std::string xMapFile = std::string(pMAUS_ROOT_DIR) + map_file_name.asString();
-  bool loaded = _map.InitFromFile(xMapFile);
-  if (!loaded)
-    return false;
 
   return true;
 }

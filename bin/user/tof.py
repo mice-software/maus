@@ -21,7 +21,7 @@ def run(data_path, run_num):
     # Here you specify the path to the data and also the file you want to
     # analyze.
 
-    my_input = MAUS.InputCppData(data_path, data_file)
+    my_input = MAUS.InputCppDAQData(data_path, data_file)
 
     # Create an empty array of mappers, then populate it
     # with the functionality you want to use.
@@ -43,7 +43,7 @@ if __name__ == '__main__':
 
     # Temporary values for the data path and data file
 
-    data_path = '%s/src/input/InputCppData' % os.environ.get("MAUS_ROOT_DIR")
+    data_path = '%s/src/input/InputCppDAQData' % os.environ.get("MAUS_ROOT_DIR")
     data_file = '02873.003'
     
     # Check command line arguments for path to data and file name

@@ -46,7 +46,7 @@ bool MapCppTOFSpacePoints::birth(std::string argJsonConfigDocument) {
 
     _triggerStation = JsonWrapper::GetProperty(configJSON,
                                                "TOF_trigger_station",
-                                               JsonWrapper::stringValue).asString();    
+                                               JsonWrapper::stringValue).asString();
   }catch(Squeal e) {
     Squeak::mout(Squeak::error)
     << "Error in MapCppTOFSpacePoints::birth. Bad json document."
