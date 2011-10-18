@@ -23,6 +23,13 @@ import math
 import xboa.Common
 
 class Evaluator:
+    """
+    Evaluator class to evaluate mathematical expressions 
+
+    Able to see many simple math expressions and some common units; the
+    standard geant4 system of units is enabled.
+    """
+
     def __init__(self):
         """
         Initialise the evaluator with math functions and units

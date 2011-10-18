@@ -20,46 +20,46 @@ import unittest
 
 import xboa.Common
 
-import Evaluator
+import evaluator
 
-class test_Evaluator(unittest.TestCase):
+class TestEvaluator(unittest.TestCase): #pylint: disable = R0904
     """test evaluator"""
 
     def test_init(self):
         """Test evaluator initialises with math functions"""
-        evaluator = Evaluator.Evaluator()
-        self.assertIn("sin", evaluator.variables.keys())
-        self.assertIn("mm", evaluator.variables.keys())
+        evaluator_ = evaluator.Evaluator()
+        self.assertIn("sin", evaluator_.variables.keys())
+        self.assertIn("mm", evaluator_.variables.keys())
 
     def test_set_variable(self):
         """Test we can set evaluator variables"""
-        evaluator = Evaluator.Evaluator()
+        evaluator_ = evaluator.Evaluator()
         # check we can assign numbers
-        evaluator.set_variable("x", 21.)
-        self.assertEqual(evaluator.variables["x"], 21.)
+        evaluator_.set_variable("x", 21.)
+        self.assertEqual(evaluator_.variables["x"], 21.)
         # check we throw an error if value can't be overloaded to float 
-        self.assertRaises(ValueError, evaluator.set_variable, "x", "value")
+        self.assertRaises(ValueError, evaluator_.set_variable, "x", "value")
 
     def test_evaluate(self):
         """Test we can evaluate expressions okay"""
-        evaluator = Evaluator.Evaluator()
-        evaluator.set_variable("x", 21.)
-        value = evaluator.evaluate("cos(pi*x)*m")
+        evaluator_ = evaluator.Evaluator()
+        evaluator_.set_variable("x", 21.)
+        value = evaluator_.evaluate("cos(pi*x)*m")
         self.assertAlmostEqual(value, -1.*xboa.Common.units["m"])
-        value = evaluator.evaluate("sin(pi*x)")
+        value = evaluator_.evaluate("sin(pi*x)")
         self.assertAlmostEqual(value, 0.)
-        self.assertRaises(NameError, evaluator.evaluate, "sin(pi*y)")
+        self.assertRaises(NameError, evaluator_.evaluate, "sin(pi*y)")
 
-        value = evaluator.evaluate("sin(pi*x)")
+        value = evaluator_.evaluate("sin(pi*x)")
         self.assertAlmostEqual(value, 0.)
 
     def test_reset(self):
         """Test we can reset okay"""
-        evaluator = Evaluator.Evaluator()
-        evaluator.set_variable("x", 21.)
-        self.assertAlmostEqual(evaluator.evaluate("x"), 21.)
-        evaluator.reset()
-        self.assertRaises(NameError, evaluator.evaluate, "x")
+        evaluator_ = evaluator.Evaluator()
+        evaluator_.set_variable("x", 21.)
+        self.assertAlmostEqual(evaluator_.evaluate("x"), 21.)
+        evaluator_.reset()
+        self.assertRaises(NameError, evaluator_.evaluate, "x")
 
 if __name__ == '__main__':
     unittest.main()
