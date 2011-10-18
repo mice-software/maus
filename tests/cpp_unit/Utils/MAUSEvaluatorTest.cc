@@ -22,6 +22,24 @@
 #include "src/common_cpp/Utils/MAUSEvaluator.hh"
 #include "src/legacy/Interface/Squeal.hh"
 
+TEST(MAUSEvaluatorTest, AllocationTest) {
+    // check alloc dealloc
+    MAUS::MAUSEvaluator* my_eval_1 = new MAUS::MAUSEvaluator();
+    delete my_eval_1;
+
+    // check reverse dealloc order
+    MAUS::MAUSEvaluator* my_eval_4 = new MAUS::MAUSEvaluator();
+    MAUS::MAUSEvaluator* my_eval_5 = new MAUS::MAUSEvaluator();
+    delete my_eval_5;
+    delete my_eval_4;
+
+    // check non-reverse dealloc order
+    MAUS::MAUSEvaluator* my_eval_2 = new MAUS::MAUSEvaluator();
+    MAUS::MAUSEvaluator* my_eval_3 = new MAUS::MAUSEvaluator();
+    delete my_eval_2;
+    delete my_eval_3;
+}
+
 TEST(MAUSEvaluatorTest, EvaluateRawTest) {
     MAUS::MAUSEvaluator my_eval = MAUS::MAUSEvaluator();
     EXPECT_DOUBLE_EQ(my_eval.evaluate("1.+2."), 3);
@@ -38,13 +56,14 @@ TEST(MAUSEvaluatorTest, EvaluateVariableTest) {
     EXPECT_DOUBLE_EQ(my_eval.evaluate("1.+test_var"), 4.);
     my_eval.set_variable("sin", 4.); // shadows a math func
     EXPECT_DOUBLE_EQ(my_eval.evaluate("1.+sin"), 5);
+    EXPECT_DOUBLE_EQ(my_eval.evaluate(""), 1);
 }
 
 TEST(MAUSEvaluatorTest, ResetTest) {
     MAUS::MAUSEvaluator my_eval = MAUS::MAUSEvaluator();
     my_eval.set_variable("test_var", 2.); // basic check
     EXPECT_DOUBLE_EQ(my_eval.evaluate("1.+test_var"), 3.);
-    my_eval.free();
-    EXPECT_THROW(my_eval.evaluate("test_var"), Squeal);
+    my_eval.reset();
+    EXPECT_THROW(my_eval.evaluate("1.+test_var"), Squeal);
 }
 

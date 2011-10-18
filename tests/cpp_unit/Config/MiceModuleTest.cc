@@ -93,7 +93,7 @@ TEST_F(MiceModuleTest, Get3VecTest) {//Hep3Vec test
   EXPECT_EQ(t["Position"], Hep3Vector(100,200,300));
   EXPECT_EQ(t["Rotation"].x(),0.);
   EXPECT_EQ(t["Rotation"].y(),0.);
-  EXPECT_LT(fabs(t["Rotation"].z()-1.570796327),1.e-9);
+  EXPECT_LT(fabs(t["Rotation"].z()-1.5707963267948966),1.e-8);
   EXPECT_EQ(moduleTest->propertyHep3Vector("Dimensions"), Hep3Vector(390,2600,1000));
   EXPECT_EQ(moduleTest->propertyHep3Vector("Position"), Hep3Vector(100,200,300));
   EXPECT_THROW(moduleTest->propertyHep3Vector("NONEXIST_Position"), Squeal);

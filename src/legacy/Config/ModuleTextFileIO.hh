@@ -20,10 +20,10 @@
 #include "CLHEP/Vector/ThreeVector.h"
 #include "CLHEP/Vector/Rotation.h"
 #include "CLHEP/Geometry/Transform3D.h"
-#include "CLHEP/Evaluator/Evaluator.h"
 
-#include "Interface/MICEUnits.hh"
 #include "Interface/Squeak.hh"
+
+#include "src/common_cpp/Utils/MAUSEvaluator.hh"
 
 class MiceModule;
 
@@ -98,9 +98,9 @@ class ModuleTextFileIO
   
     MiceModule* _this;
     std::string _hasFile;
-    static MICEUnits   _units;
+    static MAUS::MAUSEvaluator _units;
     static std::map<std::string, std::string> _substitutions;
-    static HepTool::Evaluator _evaluator;
+    static MAUS::MAUSEvaluator _evaluator;
   
 };
 

@@ -24,6 +24,9 @@ import xboa.Common
 
 class Evaluator:
     def __init__(self):
+        """
+        Initialise the evaluator with math functions and units
+        """
         self.variables = {}
         self.reset()
 
@@ -31,7 +34,9 @@ class Evaluator:
         """
         Evaluate a string expression given by formula
         """
-        out = eval(formula, {"__builtins__":None}, self.variables)
+        out = 1.
+        if formula != "":
+            out = eval(formula, {"__builtins__":None}, self.variables)
         return out
 
     def set_variable(self, name, value):

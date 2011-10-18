@@ -5,6 +5,8 @@
 ** Ed McKigney - Aug 21 2002
 */
 
+#include <Python.h>
+
 #include "Interface/dataCards.hh"
 #include "Interface/Squeak.hh"
 #include "Interface/Squeal.hh"
@@ -643,7 +645,7 @@ std::ostream& operator<<(std::ostream& o, const dataCards& d)
 
 double dataCards::getUnits( std::string dc, std::string u )
 {
-  try   { return units.GetUnits(u); }
+  try   { return units.evaluate(u); }
   catch(Squeal squee) { throw(Squeal(Squeal::recoverable, "Failed to evaluate units "+u+" in datacard "+dc, "dataCards::readKeys")); }
 }
 

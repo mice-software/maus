@@ -12,13 +12,15 @@
 //! Modified to add std::vector support - Steve Kahn Nov 12 2002
 #ifndef dataCards_h
 #define dataCards_h 1
-#include "Interface/MICEUnits.hh"
+
 #include <string>
 #include <map>
 #include <vector>
 #include <cstdlib>
 
 #include "CLHEP/Vector/ThreeVector.h"
+
+#include "src/common_cpp/Utils/MAUSEvaluator.hh"
 using CLHEP::Hep3Vector;
 
 typedef std::map < std::string , double > InputDataCardsDouble;
@@ -98,7 +100,7 @@ class dataCards
     InputDataCardsVector cv;
     InputDataCardsInt  ci;
     void fillVector(const char *, const int&, const double*);
-    MICEUnits units;
+    MAUS::MAUSEvaluator units;
     std::map<std::string,int> appCode;
     std::string client;
 };

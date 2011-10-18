@@ -39,9 +39,9 @@
 
 #include "globals.hh"
 #include "G4Polycone.hh"
-#include "Interface/MICEUnits.hh"
 #include "Interface/Spline1D.hh"
 #include "Config/MiceModule.hh"
+#include "src/common_cpp/Utils/MAUSEvaluator.hh"
 
 class Polycone
 {

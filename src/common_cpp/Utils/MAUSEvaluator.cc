@@ -15,8 +15,6 @@
  *
  */
 
-#include <Python.h>
-
 #include <iostream>
 
 #include "src/legacy/Interface/Squeal.hh"
@@ -25,7 +23,8 @@
 
 namespace MAUS {
 
-MAUSEvaluator::MAUSEvaluator() : _evaluator(NULL),
+MAUSEvaluator::MAUSEvaluator() : _evaluator_mod(NULL),
+                                 _evaluator(NULL),
                                  _evaluate_func(NULL),
                                  _set_variable_func(NULL)  {
   Py_Initialize();
@@ -33,107 +32,131 @@ MAUSEvaluator::MAUSEvaluator() : _evaluator(NULL),
 }
 
 MAUSEvaluator::~MAUSEvaluator() {
-  free();
+  clear();
 }
 
 void MAUSEvaluator::set_variable(std::string name, double value) {
-    bool success = false;
-    PyObject* py_arg = Py_BuildValue("(sd)", name.c_str(), value);
-    if (py_arg != NULL) {
-        if (PyCallable_Check(_set_variable_func)) {
-            PyObject* py_value = PyObject_CallObject(_set_variable_func,
-                                                     py_arg);
-            success = py_value != NULL;
-            if (py_value != NULL) {
-                Py_DECREF(py_value);
-            }
-        }
+    PyObject *py_arg = NULL, *py_value = NULL;
+    // argument to set_variable
+    py_arg = Py_BuildValue("(sd)", name.c_str(), value);
+    if (py_arg == NULL) {
+        throw(Squeal(Squeal::recoverable,
+              "Failed to resolve arguments to set_variable",
+              "MAUSEvaluator::evaluate"));
     }
+    if (_set_variable_func != NULL && PyCallable_Check(_set_variable_func)) {
+        // py_value should be None (return from Evaluator.set_variable)
+        py_value = PyObject_CallObject(_set_variable_func, py_arg);
+    }
+    // check for error
+    if (py_value == NULL) {
+        Py_DECREF(py_arg);
+        throw(Squeal(Squeal::recoverable,
+                     "Failed to parse variable "+name,
+                     "MAUSEvaluator::evaluate"));
+    }
+    // clean up
+    Py_DECREF(py_value);
     Py_DECREF(py_arg);
-    if (!success) {
-      PyErr_Print();
-      throw(Squeal(Squeal::recoverable, "Failed to parse variable "+name,
-                   "MAUSEvaluator::evaluate"));
-    }
 }
 
 double MAUSEvaluator::evaluate(std::string function) {
-  bool success = false;
-  double value = 0.;
-  PyObject* py_arg = Py_BuildValue("(s)", function.c_str());
-  if (py_arg != NULL) {
-    if (PyCallable_Check(_evaluate_func))  {
-        PyObject* py_value = PyObject_CallObject(_evaluate_func, py_arg);
-        if (py_value != NULL) {
-          PyArg_Parse(py_value, "d", &value);
-          success = true;
-          Py_DECREF(py_value);
-        }
-    }
+  PyObject *py_arg(NULL), *py_value(NULL);
+  // argument to evalute
+  py_arg = Py_BuildValue("(s)", function.c_str());
+  if (py_arg == NULL) {
+      throw(Squeal(Squeal::recoverable,
+                 "Failed to build function "+function,
+                 "MAUSEvaluator::evaluate"));
   }
-  Py_DECREF(py_arg);
-  if (!success) {
-    PyErr_Print();
-    throw(Squeal(Squeal::recoverable, "Failed to parse function "+function,
+  // run the evaluator to calculate function value
+  if (_evaluate_func != NULL && PyCallable_Check(_evaluate_func))  {
+      py_value = PyObject_CallObject(_evaluate_func, py_arg);
+  }
+  if (py_value == NULL) {
+      Py_DECREF(py_arg);
+      throw(Squeal(Squeal::recoverable,
+                 "Failed to evaluate expression \""+function+"\"",
                  "MAUSEvaluator::evaluate"));
   }
 
+  // now put transform py_value into C++ double
+  double value = 0.;
+  PyArg_Parse(py_value, "d", &value);
+
+  // clean up
+  Py_DECREF(py_value);
+  Py_DECREF(py_arg);
+
+  // return
   return value;
 }
 
-void MAUSEvaluator::free() {
-  if (_evaluator != NULL) {
-      Py_DECREF(_evaluator);
-      _evaluator = NULL;
+void MAUSEvaluator::clear() {
+  // clear any memory allocations
+  if (_set_variable_func != NULL) {
+      Py_DECREF(_set_variable_func);
+      _set_variable_func = NULL;
   }
   if (_evaluate_func != NULL) {
       Py_DECREF(_evaluate_func);
       _evaluate_func = NULL;
   }
-  if (_set_variable_func != NULL) {
-      Py_DECREF(_set_variable_func);
-      _set_variable_func = NULL;
+  if (_evaluator != NULL) {
+      Py_DECREF(_evaluator);
+      _evaluator = NULL;
+  }
+  if (_evaluator_mod != NULL) {
+      Py_DECREF(_evaluator_mod);
+      _evaluator_mod = NULL;
   }
   _parameters = std::map<std::string, double>();
 }
 
 void MAUSEvaluator::reset() {
-  free();
+  // check that we don't have anything allocated already
+  clear();
+  // NOTE: I don't throw Squeals here because I'm nervous about 
+  // set up/tear down order
 
-  PyObject* evaluator_mod = PyImport_ImportModule("evaluator");
-  if (evaluator_mod != NULL) {
-    // evaluator_mod_dict is a borrowed reference
-    PyObject* evaluator_mod_dict = PyModule_GetDict(evaluator_mod);
-    if (evaluator_mod_dict != NULL) {
-      // evaluator_init is a borrowed reference
-      PyObject* evaluator_init = PyDict_GetItemString(evaluator_mod_dict, "Evaluator");
-      if (PyCallable_Check(evaluator_init))  {
-          _evaluator = PyObject_CallObject(evaluator_init, NULL);
-      }
+  // initialise evaluator module
+  _evaluator_mod = PyImport_ImportModule("evaluator");
+  if (_evaluator_mod == NULL) {
+    std::cerr << "Failed to import evaluator module" << std::endl;
+    return;
+  }
+
+  // initialise an evaluator object
+  // evaluator_mod_dict is evaluator.__dict__ is a borrowed reference
+  PyObject* evaluator_mod_dict = PyModule_GetDict(_evaluator_mod);
+  if (evaluator_mod_dict != NULL) {
+    // evaluator_init is a Evaluator.__init__ borrowed reference
+    PyObject* evaluator_init = PyDict_GetItemString
+                                              (evaluator_mod_dict, "Evaluator");
+    if (PyCallable_Check(evaluator_init)) {
+        _evaluator = PyObject_Call(evaluator_init, NULL, NULL);
     }
-    Py_DECREF(evaluator_mod);
   }
   if (_evaluator == NULL) {
-    throw Squeal(Squeal::recoverable,
-        "Failed to import expression evaluator",
-        "MAUSEvaluator::MAUSEvaluator");
+    std::cerr << "Failed to instantiate evaluator" << std::endl;
+    clear();
+    return;
   }
 
+  // get the evaluator object evaluate() function
   _evaluate_func = PyObject_GetAttrString(_evaluator, "evaluate");
   if (_evaluate_func == NULL) {
-    Py_DECREF(_evaluator);
-    throw Squeal(Squeal::recoverable,
-        "Failed to import expression evaluator",
-        "MAUSEvaluator::MAUSEvaluator");
+    std::cerr << "Failed to find evaluate function" << std::endl;
+    clear();
+    return;
   }
 
+  // get the evaluator object set_variable()() function
   _set_variable_func = PyObject_GetAttrString(_evaluator, "set_variable");
   if (_set_variable_func == NULL) {
-    Py_DECREF(_evaluate_func);
-    Py_DECREF(_evaluator);
-    throw Squeal(Squeal::recoverable,
-        "Failed to import expression evaluator",
-        "MAUSEvaluator::MAUSEvaluator");
+    std::cerr << "Failed to find set_variables function" << std::endl;
+    clear();
+    return;
   }
 }
 

@@ -18,6 +18,15 @@
 #ifndef SRC_COMMON_CPP_UTILS_MAUSEVALUATOR
 #define SRC_COMMON_CPP_UTILS_MAUSEVALUATOR
 
+// These ifdefs are required to avoid cpp compiler warning
+#ifdef _POSIX_C_SOURCE
+#undef _POSIX_C_SOURCE
+#endif
+
+#ifdef _XOPEN_SOURCE
+#undef _XOPEN_SOURCE
+#endif
+
 #include <Python.h>
 
 #include <map>
@@ -42,10 +51,11 @@ class MAUSEvaluator {
 
     void reset();
 
-    void free();
-
   private:
+    void clear();
+
     std::map<std::string, double> _parameters;
+    PyObject* _evaluator_mod;
     PyObject* _evaluator;
     PyObject* _evaluate_func;
     PyObject* _set_variable_func;
