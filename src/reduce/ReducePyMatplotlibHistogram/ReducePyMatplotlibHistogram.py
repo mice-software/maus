@@ -1,294 +1,252 @@
-<?xml version="1.0"?>
+"""
+ReducePyMatplotlibHistogram is a base class for classes that create
+histograms using matplotlib.
+"""
+#  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
+# 
+#  MAUS is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+# 
+#  MAUS is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+# 
+#  You should have received a copy of the GNU General Public License
+#  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
-<meta content="Loggerhead/1.18 Python/2.6.5-r6152 Bazaar/2.5.0dev2-r6152 Paste/1.7.2 PasteDeploy/1.3.3 SimpleTAL/4.1 Pygments/1.4 simplejson/2.1.3" name="generator" />
-<title>~michaelj-h/maus/devel : revision 670</title>
-<link href="/static/css/global.css" rel="stylesheet" />
-<link href="/static/images/favicon.png" rel="shortcut icon" />
+import base64
+import json
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
+import StringIO
 
-<script type="text/javascript">
-var global_path = '/~michaelj-h/maus/devel/';
-var collapsed_icon_path = '/static/images/treeCollapsed.png';
-var expanded_icon_path = '/static/images/treeExpanded.png';
-</script>
-<script src="/static/javascript/yui/build/yui/yui-min.js" type="text/javascript"></script>
-<script src="/static/javascript/yui/build/oop/oop-min.js" type="text/javascript"></script>
-<script src="/static/javascript/yui/build/event/event-min.js" type="text/javascript"></script>
-<script src="/static/javascript/yui/build/attribute/attribute-min.js" type="text/javascript"></script>
-<script src="/static/javascript/yui/build/base/base-min.js" type="text/javascript"></script>
-<script src="/static/javascript/yui/build/dom/dom-min.js" type="text/javascript"></script>
-<script src="/static/javascript/yui/build/node/node-min.js" type="text/javascript"></script>
-<script src="/static/javascript/yui/build/anim/anim-min.js" type="text/javascript"></script>
-<script src="/static/javascript/yui/build/io/io-base-min.js" type="text/javascript"></script>
-<script src="/static/javascript/custom.js" type="text/javascript"></script>
+class ReducePyMatplotlibHistogram: # pylint: disable=R0903 
+    """
+    @class ReducePyMatplotlibHistogram.PyMatplotlibHistogram is 
+    a base class for classes that create histograms using matplotlib. 
+    PyMatplotlibHistogram maintains a histogram created using
+    matplotlib.
 
-<link href="/static/css/diff.css" media="all" type="text/css" rel="stylesheet" />
-<script src="/static/javascript/diff.js" type="text/javascript"></script>
-<script type="text/javascript">
-var link_data = {};
-var specific_path = "src/reduce/ReducePyMatplotlibHistogram/ReducePyMatplotlibHistogram.py";
-var path_to_id = {};
-</script>
+    The histogram output is a JSON document of form:
 
-</head>
-<body>
+    @verbatim
+    {"image": {"content":"...a description of the image...",
+               "tag": TAG,
+               "image_type": "eps", 
+               "data": "...base 64 encoded image..."}}
+    @endverbatim
 
+    where "TAG" is specified by the sub-class. If 
+    "histogram_auto_number" (see below) is "true" then the TAG will
+    have a number N appended where N means that the histogram was
+    produced as a consequence of the (N + 1)th spill processed 
+    by the worker. The number will be zero-padded to form a six digt
+    string e.g. "00000N". If "histogram_auto_number" is false 
+    then no such number is appended.
 
+    In case of errors the output document is just the input document
+    with an "errors" field containing the error e.g.
 
-<div class="black-link">
-<a href="https://code.launchpad.net/~michaelj-h/maus/devel">
-← Back to branch summary
-</a>
-</div>
+    @verbatim
+    {"errors": {..., "bad_json_document": "unable to do json.loads on input"}}
+    {"errors": {..., "no_digits": "no digits"}}
+    @endverbatim
 
+    The caller can configure the worker and specify:
 
-<h1 class="branch-name">
-~michaelj-h/maus/devel
-</h1>
+    -Image type ("histogram_image_type"). Must be one of those
+     supported by matplot lib (currently "svg", "ps", "emf", "rgba",
+     "raw", "svgz", "pdf", "eps", "png"). Default: "eps".
+    -Auto-number ("histogram_auto_number"). Default: false. Flag
+     that determines if the image tag (see above) has the spill count
+     appended to it or not.
 
-<ul id="menuTabs">
+    Sub-classes must override:
 
-<li><a href="/~michaelj-h/maus/devel/changes" title="Changes" id="on">Changes</a></li>
-<li><a href="/~michaelj-h/maus/devel/files" title="Files">Files</a></li>
+    -_configure_at_birth - to extract any additional
+     sub-class-specific configuration from data cards.
+    -_update_histogram. This should update the histogram, axes, scale
+     and make any other desired changes. The _content attribute can
+     be updated with a textual description of the content of the
+     histogram.
+    -_cleanup_at_death - to do any sub-class-specific cleanup.
+    """
 
+    def __init__(self):
+        """
+        Set initial attribute values.
+        @param self Object reference.
+        """
+        self.spill_count = 0 # Number of spills processed to date.
+        self.image_type = "eps"
+        self.auto_number = False
+        self._histogram = None # matplotlib histogram.
+        self._tag = "graph" # Histogram name tag.
+        self._content = "" # Description of histogram content.
 
-</ul>
+    def birth(self, config_json):
+        """
+        Configure worker from data cards. If "image_type" is not
+        in those supported then a ValueError is thrown.
+        @param self Object reference.
+        @param config_json JSON document string.
+        @returns True if configuration succeeded. 
+        """
+        config_doc = json.loads(config_json)
 
-<div id="loggerheadCont">
-<div id="search_terms"></div>
+        self._histogram = self._create_histogram()
 
-<div id="breadcrumbs">
+        key = "histogram_auto_number"
+        if key in config_doc:
+            self.auto_number = config_doc[key]
 
-<a href="https://code.launchpad.net/~michaelj-h/maus/devel">~michaelj-h/maus/devel</a>
+        key = "histogram_image_type"
+        if key in config_doc:
+            self.image_type = config_doc[key]
+        else:
+            self.image_type = "eps"
 
+        if self.image_type not in \
+            self._histogram.get_supported_filetypes().keys():
+            error = "Unsupported histogram image type: %s Expect one of %s" \
+                % (self.image_type, 
+                   self._histogram.get_supported_filetypes().keys())
+            raise ValueError(error)
 
-<span class="breadcrumb">» Revision
+        self.spill_count = 0
+        self._content = ""
 
-<a href="/~michaelj-h/maus/devel/revision/670" title="View changes to all files">670</a>
+        # Do sub-class-specific configuration.
+        return self._configure_at_birth(config_doc)
 
-</span>
-<span class="breadcrumb">
-: <a href="/~michaelj-h/maus/devel/view/670/src/reduce/ReducePyMatplotlibHistogram/ReducePyMatplotlibHistogram.py" title="Annotate src/reduce/ReducePyMatplotlibHistogram/ReducePyMatplotlibHistogram.py">src/reduce/ReducePyMatplotlibHistogram/ReducePyMatplotlibHistogram.py</a>
-</span>
-</div>
+    def _configure_at_birth(self, config_doc):
+        """
+        Perform sub-class-specific configuration from data cards. When
+        this is called a sub-class can assume that self._histogram 
+        points to a matplotlib FigureCanvas that they can then customise.
+        @param self Object reference.
+        @param config_json JSON document.
+        @returns True if configuration succeeded. 
+        """
 
+    def process(self, json_string):
+        """
+        Update the histogram with data from the current spill
+        and output the histogram.        
+        @param self Object reference.
+        @param json_string String with current JSON document.
+        @returns JSON document containing current histogram.
+        """
 
-<p>
-<a href="/~michaelj-h/maus/devel/revision/670">
-« back to all changes in this revision
-</a>
-</p>
-<p>
-Viewing changes to <a href="/~michaelj-h/maus/devel/view/670/src/reduce/ReducePyMatplotlibHistogram/ReducePyMatplotlibHistogram.py" title="Annotate src/reduce/ReducePyMatplotlibHistogram/ReducePyMatplotlibHistogram.py">src/reduce/ReducePyMatplotlibHistogram/ReducePyMatplotlibHistogram.py</a>
-</p>
-<ul id="submenuTabs">
-<li id="first"><a href="/~michaelj-h/maus/devel/files/670" title="browse files at revision 670">browse files at revision 670</a></li>
-<li>
-<a href="/~michaelj-h/maus/devel/revision/670?remember=670" title="compare with another revision">Compare with another revision</a></li>
+        # Load and validate the JSON document.
+        try:
+            json_doc = json.loads(json_string.rstrip())
+        except ValueError:
+            json_doc = {"errors": {"bad_json_document":
+                                "unable to do json.loads on input"} }
+            return json.dumps(json_doc)
 
-<li>
-<a href="/~michaelj-h/maus/devel/diff/670">download diff</a>
+        result = self._update_histogram(json_doc)
+        if (result != None):
+            return json.dumps(result)
 
-</li>
-<li id="last"><a href="/~michaelj-h/maus/devel/changes/670" title="view history from revision 670">view history from revision 670</a></li>
-</ul>
+        return self._create_image_json()
 
-<div class="infoContainer">
-<div id="infTxt">
-<ul>
-<li class="committer">
-<strong>Committer:</strong>
-<span>Mike Jackson</span>
-</li>
+    def _update_histogram(self, json_doc):
+        """
+        Update the histogram with data from the current spill
+        and output the histogram. Sub-classes must define this.
+        @param self Object reference.
+        @param json_doc Current spill..
+        @returns None if histogram was created or a JSON document with
+        error messages if there were problems (e.g. information was
+        missing from the spill).
+        """
 
-<li class="timer">
-<strong>Date:</strong>
-<span>2011-10-19 12:41:22</span>
-</li>
+    def death(self): #pylint: disable=R0201
+        """
+        Invokes _cleanup_at_death().
+        @returns True
+        """
+        return self._cleanup_at_death()
 
+    def _cleanup_at_death(self):
+        """
+        A no-op. Can be overridden by sub-classes for sub-class-specific
+        clean-up at death time.
+        @param self Object reference.
+        @returns True
+        """
+ 
+    def _create_histogram(self): #pylint: disable=R0201
+        """
+        Create a histogram using matplotlib.
+        @param self Object reference.
+        @returns matplotlib FigureCanvas representing the histogram.
+        """
+        figure = Figure(figsize=(6, 6))
+        histogram = FigureCanvas(figure)
+        axes = figure.add_subplot(111)
+        axes.grid(True, linestyle="-", color="0.75")
+        return histogram
 
+    def _rescale_axes(self, xmin, xmax, ymin, ymax, xfudge = 0.5, yfudge = 0.5): #pylint: disable=C0301, R0913
+        """
+        Rescale the X and Y axes of the histogram to show the given
+        axis ranges. Fudge factors are used avoid matplotlib warning
+        about "Attempting to set identical bottom==top" which arises
+        if the axes are set to be exactly the maximum of the data.
+        @param self Object reference.
+        @param xmin Minimum X value.
+        @param xmax Maximum X value.
+        @param ymin Minimum Y value.
+        @param ymin Maximum Y value.
+        @param xfudge X fudge factor.
+        @param yfudge Y fudge factor.
+        @returns matplotlib FigureCanvas representing the histogram.
+        """
+        # Fudge factors are used
+        self._histogram.figure.get_axes()[0].set_xlim( \
+            [xmin, xmax + xfudge])
+        self._histogram.figure.get_axes()[0].set_ylim( \
+            [ymin, ymax + yfudge])
 
-<li class="revid">
-<strong>Revision ID:</strong>
-<span>michaelj@epcc.ed.ac.uk-20111019124122-l32pb1zzh3y5y3m1</span>
-</li>
-</ul>
+    def _create_image_json(self):
+        """
+        Create JSON document for output by the worker with the
+        content description, image type, tag and base-64 encoded
+        data from the histogram.
+        @param self Object reference.
+        @returns JSON document containing current histogram.
+        """
+        json_doc = {}
+        json_doc["image"] = {}
+        if (self.auto_number):
+            tag = "%s%06d" % (self._tag, self.spill_count)
+        else:
+            tag = "%s" % (self._tag)
+        data = self.__convert_to_binary(self._histogram)
+        json_doc["image"]["content"] = self._content
+        json_doc["image"]["tag"] = tag
+        json_doc["image"]["image_type"] = self.image_type
+        json_doc["image"]["data"] = data
+        self.spill_count += 1
+        return json.dumps(json_doc)
 
-
-<div class="clear"></div>
-
-<div class="information">Autonumbered tag is now zero-padded. See #750</div>
-</div>
-<ul id="list-files">
-
-
-
-
-<ul>
-
-<li class="desc">files modified:</li>
-
-<li class="files">
-<a href="/~michaelj-h/maus/devel/revision/670/src/reduce/ReducePyHistogramTDCADCCounts/test_ReducePyHistogramTDCADCCounts.py#src/reduce/ReducePyHistogramTDCADCCounts/test_ReducePyHistogramTDCADCCounts.py" title="View changes to src/reduce/ReducePyHistogramTDCADCCounts/test_ReducePyHistogramTDCADCCounts.py in revision 670">src/reduce/ReducePyHistogramTDCADCCounts/test_ReducePyHistogramTDCADCCounts.py</a>
-</li>
-</ul><ul>
-
-<li class="files">
-<b><a href="#src/reduce/ReducePyMatplotlibHistogram/ReducePyMatplotlibHistogram.py">src/reduce/ReducePyMatplotlibHistogram/ReducePyMatplotlibHistogram.py</a></b>
-</li>
-</ul>
-
-</ul>
-<div class="clear"></div>
-</div>
-
-
-<p class="expand show_if_js"><a href="#" id="toggle_unified_sbs">Show diffs side-by-side</a></p>
-<p class="codin"><img src="/static/images/newCode.gif" alt="added" /> added</p>
-<p class="codin"><img src="/static/images/deleteCode.gif" alt="removed" /> removed</p>
-<div class="clear"></div>
-
-<div>
-
-<div class="diff">
-<div class="diffBox">
-<a href="/~michaelj-h/maus/devel/revision/670/src/reduce/ReducePyMatplotlibHistogram/ReducePyMatplotlibHistogram.py" id="src/reduce/ReducePyMatplotlibHistogram/ReducePyMatplotlibHistogram.py" title="View changes to src/reduce/ReducePyMatplotlibHistogram/ReducePyMatplotlibHistogram.py only" class="the-link">
-<img src="/static/images/treeExpanded.png" class="expand_diff" />
-src/reduce/ReducePyMatplotlibHistogram/ReducePyMatplotlibHistogram.py
-</a>
-</div>
-<div style="overflow: hidden">
-<div class="container">
-<div style="display:none" class="loading">
-<img src="/static/images/spinner.gif" />
-</div>
-<div class="diffinfo">
-<div class="pseudotable unified">
-
-<div class="pseudorow context-row">
-<div class="lineNumber first">43</div>
-<div class="lineNumber second">43</div>
-<div class="code context">&nbsp;&nbsp;&nbsp;&nbsp;&quot;histogram_auto_number&quot;&nbsp;(see&nbsp;below)&nbsp;is&nbsp;&quot;true&quot;&nbsp;then&nbsp;the&nbsp;TAG&nbsp;will</div>
-<div class="clear"></div>
-</div><div class="pseudorow context-row">
-<div class="lineNumber first">44</div>
-<div class="lineNumber second">44</div>
-<div class="code context">&nbsp;&nbsp;&nbsp;&nbsp;have&nbsp;a&nbsp;number&nbsp;N&nbsp;appended&nbsp;where&nbsp;N&nbsp;means&nbsp;that&nbsp;the&nbsp;histogram&nbsp;was</div>
-<div class="clear"></div>
-</div><div class="pseudorow context-row">
-<div class="lineNumber first">45</div>
-<div class="lineNumber second">45</div>
-<div class="code context">&nbsp;&nbsp;&nbsp;&nbsp;produced&nbsp;as&nbsp;a&nbsp;consequence&nbsp;of&nbsp;the&nbsp;(N&nbsp;+&nbsp;1)th&nbsp;spill&nbsp;processed&nbsp;</div>
-<div class="clear"></div>
-</div><div class="pseudorow delete-row">
-<div class="lineNumber first">46</div>
-<div class="lineNumber second">&nbsp;</div>
-<div class="code delete">&nbsp;&nbsp;&nbsp;&nbsp;by&nbsp;the&nbsp;worker.&nbsp;If&nbsp;&quot;histogram_auto_number&quot;&nbsp;is&nbsp;false&nbsp;then&nbsp;no</div>
-<div class="clear"></div>
-</div><div class="pseudorow delete-row">
-<div class="lineNumber first">47</div>
-<div class="lineNumber second">&nbsp;</div>
-<div class="code delete">&nbsp;&nbsp;&nbsp;&nbsp;such&nbsp;number&nbsp;is&nbsp;appended.</div>
-<div class="clear"></div>
-</div><div class="pseudorow insert-row">
-<div class="lineNumber first">&nbsp;</div>
-<div class="lineNumber second">46</div>
-<div class="code insert">&nbsp;&nbsp;&nbsp;&nbsp;by&nbsp;the&nbsp;worker.&nbsp;The&nbsp;number&nbsp;will&nbsp;be&nbsp;zero-padded&nbsp;to&nbsp;form&nbsp;a&nbsp;six&nbsp;digt</div>
-<div class="clear"></div>
-</div><div class="pseudorow insert-row">
-<div class="lineNumber first">&nbsp;</div>
-<div class="lineNumber second">47</div>
-<div class="code insert">&nbsp;&nbsp;&nbsp;&nbsp;string&nbsp;e.g.&nbsp;&quot;00000N&quot;.&nbsp;If&nbsp;&quot;histogram_auto_number&quot;&nbsp;is&nbsp;false&nbsp;</div>
-<div class="clear"></div>
-</div><div class="pseudorow insert-row">
-<div class="lineNumber first">&nbsp;</div>
-<div class="lineNumber second">48</div>
-<div class="code insert">&nbsp;&nbsp;&nbsp;&nbsp;then&nbsp;no&nbsp;such&nbsp;number&nbsp;is&nbsp;appended.</div>
-<div class="clear"></div>
-</div><div class="pseudorow context-row">
-<div class="lineNumber first">48</div>
-<div class="lineNumber second">49</div>
-<div class="code context">&nbsp;</div>
-<div class="clear"></div>
-</div><div class="pseudorow context-row">
-<div class="lineNumber first">49</div>
-<div class="lineNumber second">50</div>
-<div class="code context">&nbsp;&nbsp;&nbsp;&nbsp;In&nbsp;case&nbsp;of&nbsp;errors&nbsp;the&nbsp;output&nbsp;document&nbsp;is&nbsp;just&nbsp;the&nbsp;input&nbsp;document</div>
-<div class="clear"></div>
-</div><div class="pseudorow context-row">
-<div class="lineNumber first">50</div>
-<div class="lineNumber second">51</div>
-<div class="code context">&nbsp;&nbsp;&nbsp;&nbsp;with&nbsp;an&nbsp;&quot;errors&quot;&nbsp;field&nbsp;containing&nbsp;the&nbsp;error&nbsp;e.g.</div>
-<div class="clear"></div>
-</div>
-</div><div class="pseudotable unified">
-
-<div class="pseudorow context-row">
-<div class="lineNumber separate"></div>
-<div class="lineNumber second separate"></div>
-<div class="code separate"></div>
-<div class="clear"></div>
-</div>
-
-<div class="pseudorow context-row">
-<div class="lineNumber first">224</div>
-<div class="lineNumber second">225</div>
-<div class="code context">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;json_doc&nbsp;=&nbsp;{}</div>
-<div class="clear"></div>
-</div><div class="pseudorow context-row">
-<div class="lineNumber first">225</div>
-<div class="lineNumber second">226</div>
-<div class="code context">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;json_doc[&quot;image&quot;]&nbsp;=&nbsp;{}</div>
-<div class="clear"></div>
-</div><div class="pseudorow context-row">
-<div class="lineNumber first">226</div>
-<div class="lineNumber second">227</div>
-<div class="code context">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(self.auto_number):</div>
-<div class="clear"></div>
-</div><div class="pseudorow delete-row">
-<div class="lineNumber first">227</div>
-<div class="lineNumber second">&nbsp;</div>
-<div class="code delete">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tag&nbsp;=&nbsp;&quot;%s%d&quot;&nbsp;%&nbsp;(self._tag,&nbsp;self.spill_count)</div>
-<div class="clear"></div>
-</div><div class="pseudorow insert-row">
-<div class="lineNumber first">&nbsp;</div>
-<div class="lineNumber second">228</div>
-<div class="code insert">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tag&nbsp;=&nbsp;&quot;%s%06d&quot;&nbsp;%&nbsp;(self._tag,&nbsp;self.spill_count)</div>
-<div class="clear"></div>
-</div><div class="pseudorow context-row">
-<div class="lineNumber first">228</div>
-<div class="lineNumber second">229</div>
-<div class="code context">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else:</div>
-<div class="clear"></div>
-</div><div class="pseudorow context-row">
-<div class="lineNumber first">229</div>
-<div class="lineNumber second">230</div>
-<div class="code context">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tag&nbsp;=&nbsp;&quot;%s&quot;&nbsp;%&nbsp;(self._tag)</div>
-<div class="clear"></div>
-</div><div class="pseudorow context-row">
-<div class="lineNumber first">230</div>
-<div class="lineNumber second">231</div>
-<div class="code context">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;data&nbsp;=&nbsp;self.__convert_to_binary(self._histogram)</div>
-<div class="clear"></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-
-
-<ul id="pages">
-
-
-<li class="next">
-<a href="/~michaelj-h/maus/devel/revision/669?start_revid=670">Older </a>
-</li>
-</ul>
-</div>
-<p id="footer" class="fl">Loggerhead 1.18 is a web-based interface for <a href="http://bazaar-vcs.org/">Bazaar</a> branches</p>
-</div>
-</body>
-</html>
+    def __convert_to_binary(self, histogram): #pylint: disable=R0201
+        """
+        Convert histogram to binary format.
+        @param self Object reference.
+        @param histogram matplotlib FigureCanvas representing the
+        histogram. 
+        @returns representation of histogram in base 64-encoded image 
+        type format.
+        """
+        data_file = StringIO.StringIO() 
+        histogram.print_figure(data_file, dpi=500, format=self.image_type)
+        data_file.seek(0)
+        data = data_file.read()
+        return base64.b64encode(data)
