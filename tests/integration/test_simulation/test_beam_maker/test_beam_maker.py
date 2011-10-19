@@ -59,15 +59,19 @@ def run_simulations():
     Run simulation to generate some data. We only want to do this once, so I
     pull it out into a separate part of the test.
     """
+    out = open('test_beam_maker_output.out', 'w')
     subproc = subprocess.Popen([SIM_PATH, '-configuration_file', \
-                           os.path.join(TEST_DIR, 'default_beam_config.py')])
+                           os.path.join(TEST_DIR, 'default_beam_config.py')], \
+                           stdout = out)
     subproc.wait()
     os.rename('simulation.out', DEF_SIM)
 
     subproc = subprocess.Popen([SIM_PATH, '-configuration_file', \
-                           os.path.join(TEST_DIR, 'binomial_beam_config.py')])
+                           os.path.join(TEST_DIR, 'binomial_beam_config.py')], \
+                           stdout = out)
     subproc.wait()
     os.rename('simulation.out', BIN_SIM)
+    out.close()
 
 class BeamMakerTest(unittest.TestCase): # pylint: disable = R0904
     """
