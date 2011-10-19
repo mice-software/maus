@@ -43,6 +43,11 @@ def run():
     # (currently "svg", "ps", "emf", "rgba", "raw", "svgz", "pdf",
     # "eps", "png"). Default: "eps".
     data_cards_list.append("histogram_image_type='%s'\n" % "eps")
+    # Add auto-numbering to the image tags. If False then each 
+    # histogram output by ReducePyMatplotlibHistogram will have
+    # tags "tdcadc" and so the end result will be just one histogram 
+    # file. If True then there will be N files, one for each spill.
+    data_cards_list.append("histogram_auto_number=%s\n" % True)
     # Prefix for file names. Default: auto-generated UUID.
     data_cards_list.append("image_file_prefix='%s'\n" % "sample-image")
     # Directory for images. Default: current directory.
@@ -55,7 +60,7 @@ def run():
     mappers = MAUS.MapPyGroup()
     mappers.append(MAUS.MapPyDoNothing())  
 
-    reducer = MAUS.ReducePyMatplotlibHistogram()
+    reducer = MAUS.ReducePyHistogramTDCADCCounts()
 
     output_worker = MAUS.OutputPyImage()
 
