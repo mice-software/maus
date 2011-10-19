@@ -56,7 +56,8 @@ class MapCppSimulationTestCase(unittest.TestCase): # pylint: disable = R0904
                 '-configuration_file', config_dir+'config.py']
         outname = out_dir+'/test_geometry_'+filename
         my_stdout = open(outname, 'w')
-        proc = subprocess.Popen(args, stdout=my_stdout)
+        proc = subprocess.Popen(args, stdout=my_stdout, \
+                                      stderr=my_stdout)
         proc.wait()
         my_stdout.close()
         self.assertEqual(proc.returncode, 0, 
