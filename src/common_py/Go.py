@@ -45,14 +45,14 @@ def get_possible_dataflows():
 
     return possible_types_of_dataflow
 
-def buffer_input(the_emitter, number_events):
+def buffer_input(the_emitter, number_spills):
     """
     Buffer the input stream by only reading the first
     1024 spills into memory.  Returns an array of spills.
     """
     my_buffer = []
 
-    for i in range(number_events):  # pylint: disable=W0612
+    for i in range(number_spills):  # pylint: disable=W0612
         try:
             value = next(the_emitter)
             my_buffer.append(value.encode('ascii'))
@@ -149,8 +149,8 @@ class Go:  #  pylint: disable=R0921
         """
         MAUS pipeline dataflow
         
-        Drive the MAUS components in a pipeline where each event is passed
-        through transform, merge, and output, then next event is progressed.
+        Drive the MAUS components in a pipeline where each spill is passed
+        through transform, merge, and output, then next spill is progressed.
         """
 
 
@@ -159,7 +159,7 @@ class Go:  #  pylint: disable=R0921
         emitter = self.input.emitter()
         map_buffer = buffer_input(emitter, 1)
 
-        print("TRANSFORM: Setting up transformer")
+        print("TRANSFORM: Setting up transformer (this can take a while...)")
         assert(self.transformer.birth(self.json_config_document) == True)
 
         print("MERGE: Setting up merger")
@@ -168,19 +168,14 @@ class Go:  #  pylint: disable=R0921
         print("OUTPUT: Setting up outputer")
         assert(self.outputer.birth(self.json_config_document) == True)
 
-        print("PIPELINE mode: TRANSFORM, MERGE, OUTPUT, then next event.")
+        print("PIPELINE mode: TRANSFORM, MERGE, OUTPUT, then next spill.")
 
         #  This helps us time how long the setup that sometimes happens in the
-        # first event takes
-        print("HINT: MAUS will process 1 event only at first...")
+        # first spill takes
+        print("HINT: MAUS will process 1 spill only at first...")
 
         i = 0
         while len(map_buffer) != 0:
-            #  Not python 3 compatible print()
-            print "TRANSFORM/MERGE/OUTPUT: ",
-            print"Processed %d events so far," % i,
-            print("%d events in buffer." % (len(map_buffer)))
-
             for spill in map_buffer:
                 spill = self.transformer.process(spill)
                 spill = self.merger.process(spill)
@@ -188,6 +183,11 @@ class Go:  #  pylint: disable=R0921
 
             i += len(map_buffer)
             map_buffer = buffer_input(emitter, 128)
+
+            #  Not python 3 compatible print() due to backward compatability
+            print "TRANSFORM/MERGE/OUTPUT: ",
+            print "Processed %d spills so far," % i,
+            print("%d spills in buffer." % (len(map_buffer)))
 
         print("TRANSFORM: Shutting down transformer")
         assert(self.transformer.death() == True)
