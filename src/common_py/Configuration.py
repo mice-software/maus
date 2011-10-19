@@ -75,7 +75,8 @@ class Configuration:
         config_dict = self.check_config_dict(config_dict)
         self.configuration_to_error_handler(config_dict)
         config_json_str = json.JSONEncoder().encode(config_dict)
-
+        if config_dict["verbose_level"] == 0:
+            print json.dumps(config_dict, indent=2)
         return config_json_str
 
     def command_line_arguments(self, config_dict):

@@ -22,13 +22,6 @@ import unittest
 import subprocess
 import glob
 import os
-import sys
-import io
-
-from MapCppSimulation import MapCppSimulation
-from Configuration import Configuration
-
-TEST_DIR = '/tests/integration/test_simulation/test_geometry/test_geometry.py'
 
 class MapCppSimulationTestCase(unittest.TestCase): # pylint: disable = R0904
     """
@@ -46,6 +39,29 @@ class MapCppSimulationTestCase(unittest.TestCase): # pylint: disable = R0904
         if not os.path.isdir(os.environ.get("MICEFILES")):
             raise Exception('InitializeFail', 'MICEFILES is not a directory')
 
+    def __run_sim(self, filename):
+        """
+        Run the simulation with configuration file given by filename
+
+        \param filename simulation_geometry_filename
+        """
+        maus_root_dir = os.environ.get("MAUS_ROOT_DIR")
+        test_dir = maus_root_dir+'/bin/simulate_mice.py'
+        config_dir = maus_root_dir+\
+                    '/tests/integration/test_simulation/test_geometry/'
+        out_dir = maus_root_dir+'/tmp/'
+
+        args = [test_dir, \
+                '-simulation_geometry_filename', filename, \
+                '-configuration_file', config_dir+'config.py']
+        outname = out_dir+'/test_geometry_'+filename
+        my_stdout = open(outname, 'w')
+        proc = subprocess.Popen(args, stdout=my_stdout)
+        proc.wait()
+        my_stdout.close()
+        self.assertEqual(proc.returncode, 0, 
+            msg="Test geometry failed in "+filename+" with return code "+\
+                str(proc.returncode)+". Output in "+outname)
 
     def test_geometries(self):
         """
@@ -62,38 +78,16 @@ class MapCppSimulationTestCase(unittest.TestCase): # pylint: disable = R0904
                           os.environ.get("MICEFILES"))
         self.assertTrue(len(files) != 0)
 
-        files = [filename.split('/')[-1] for filename in files]
-        print files
+        files = sorted([filename.split('/')[-1] for filename in files])
 
         for my_file in files:
-            args = ['python', os.environ.get("MAUS_ROOT_DIR")+TEST_DIR, my_file]
-            proc = subprocess.Popen(args)
-            proc.wait()
-            self.assertEqual(proc.returncode, 0)
+            self.__run_sim(my_file)
 
 def my_main():
     """
-    Either: if called without arguments, run the tests
-            if called with arguments, read a file and exit with -1 if the file
-            could not be read
-    (Rogers - feels a bit hacky)
+    Attempt to run every geometry with a toy beam
     """
-    if len(sys.argv) == 1:
-        unittest.main()
-    if len(sys.argv) == 2:
-        my_file = str(sys.argv[1])
-        
-        my_map = MapCppSimulation()
-        
-        config_file = io.StringIO(u"simulation_geometry_filename = '%s'\n" \
-                                 % my_file)
-        conf = Configuration()
-        success = my_map.birth(conf.getConfigJSON(config_file))
-
-        if not success:
-            sys.exit(-1)
-        
-        my_map.death()        
+    unittest.main()
 
 if __name__ == '__main__':
     my_main()

@@ -20,7 +20,23 @@ Workaround for memory leak in CLHEP Evaluator (redmine issue #42)
 
 import copy
 import math
-import xboa.Common
+
+UNITS =  {'':1.,
+  'mum':1.e-3, 'mm':1., 'cm':10., 'm':1.e3, 'km':1.e6, 
+  'ns':1., 'mus':1.e3, 'ms':1e6, 's':1.e9, 
+  'eV':1e-6, 'keV':1e-3, 'MeV':1., 'GeV':1.e3, 'TeV':1e6, 
+  'eV/c':1e-6, 'keV/c':1e-3, 'MeV/c':1., 'GeV/c':1.e3, 'TeV/c':1e6, 
+  'eV/c2':1e-6, 'keV/c2':1e-3, 'MeV/c2':1., 'GeV/c2':1.e3, 'TeV/c2':1e6, 
+  'Gauss':1.e-7, 'mT':1.e-6, 'T':1.e-3, 'kT':1.,
+  'V':1.e-6, 'kV':1.e-3, 'MV':1., 'GV':1.e3, 
+  'kHz':1.e-6, 'MHz':1.e-3, 'GHz':1.,
+  'GV/m':1.,'GV/mm':1.e3,
+  'kW':6.24150974e6, 'MW':6.24150974e9, 'GW':6.24150974e12,
+  'degrees':2.*math.pi/360., 'radians':1.,
+  'deg':2.*math.pi/360., 'rad':1., 
+  'degree':2.*math.pi/360., 'radian':1.,
+  'echarge':1., 'Coulomb':6.24150974*10.**18.
+}
 
 class Evaluator:
     """
@@ -61,7 +77,7 @@ class Evaluator:
         Remove all variables and start from scratch
         """
         self.variables = {}
-        self.variables = copy.deepcopy(xboa.Common.units)
+        self.variables = copy.deepcopy(UNITS)
         my_math = ['acos', 'acosh', 'asin', 'asinh', 'atan', 'atan2', 'atanh',
                    'ceil', 'copysign', 'cos', 'cosh', 'degrees', 'e', 'erf',
                    'erfc', 'exp', 'expm1', 'fabs', 'factorial', 'floor',
