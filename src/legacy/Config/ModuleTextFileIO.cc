@@ -5,6 +5,8 @@
 // or a subcomponent.
 // 2006
 
+#include <Python.h>
+
 #include <cstdlib>
 #include <sstream>
 #include <vector>
@@ -22,8 +24,8 @@ using CLHEP::HepRotationZ;
 using std::cout;
 using std::endl;
 
-MICEUnits          ModuleTextFileIO::_units;
-HepTool::Evaluator ModuleTextFileIO::_evaluator;
+MAUS::MAUSEvaluator* ModuleTextFileIO::_units(NULL);
+MAUS::MAUSEvaluator* ModuleTextFileIO::_evaluator(NULL);
 
 std::map<std::string, std::string> ModuleTextFileIO::_substitutions = std::map<std::string, std::string>();
 
@@ -228,6 +230,7 @@ void ModuleTextFileIO::readDimensions(std::string lineIn) {
 
 void ModuleTextFileIO::readDimensions(std::string volumeType, std::string lineIn)
 {
+      if (_units == NULL) _units = new MAUS::MAUSEvaluator();
       Hep3Vector        _dimensions;
       std::stringstream ist(lineIn);
       std::string       dimensions;  
@@ -260,11 +263,11 @@ void ModuleTextFileIO::readDimensions(std::string volumeType, std::string lineIn
     	  //dimStream << x1 << " " << y1 << " " << z << " " << units;
     	  _this->addPropertyHep3Vector( "Dimensions", dimStream.str() );
     	  //TODO: check dimensions
-    	  _this->addPropertyDouble( "TrapezoidWidthX1", x1 * _units.GetUnits( units ) );
-    	  _this->addPropertyDouble( "TrapezoidWidthX2", x2 * _units.GetUnits( units ) );
-    	  _this->addPropertyDouble( "TrapezoidHeightY1", y1 * _units.GetUnits( units ) );
-    	  _this->addPropertyDouble( "TrapezoidHeightY2", y2 * _units.GetUnits( units ) );
-    	  _this->addPropertyDouble( "TrapezoidLengthZ", z * _units.GetUnits( units ) );
+    	  _this->addPropertyDouble( "TrapezoidWidthX1", x1 * _units->evaluate( units ) );
+    	  _this->addPropertyDouble( "TrapezoidWidthX2", x2 * _units->evaluate( units ) );
+    	  _this->addPropertyDouble( "TrapezoidHeightY1", y1 * _units->evaluate( units ) );
+    	  _this->addPropertyDouble( "TrapezoidHeightY2", y2 * _units->evaluate( units ) );
+    	  _this->addPropertyDouble( "TrapezoidLengthZ", z * _units->evaluate( units ) );
       }
       else if( volumeType == "Multipole" || volumeType == "Quadrupole" 
                || volumeType == "None" || volumeType == "Boolean")
@@ -281,26 +284,36 @@ template <class Temp> Temp        ModuleTextFileIO::fromString(const std::string
 
 void ModuleTextFileIO::parseString(const std::string& source, int& out)
 {
+  if (_evaluator == NULL) _evaluator = new MAUS::MAUSEvaluator();
   std::string value="";
   std::stringstream ss(source);
   ss >> value;
   MI_alias(value);
-  out = static_cast<int>(_evaluator.evaluate(value.c_str()));
-  if(_evaluator.status() != HepTool::Evaluator::OK && _evaluator.status())
+  try {
+      out = static_cast<int>(_evaluator->evaluate(value));
+  }
+  catch (Squeal squee) {
       throw(Squeal(Squeal::recoverable, "Could not convert "+source+" to an int", "ModuleTextFileIO::parseString(const std::string&, int&)"));
+  }
 }
 
 void ModuleTextFileIO::parseString(const std::string& source, double& out)
 {
+  if (_evaluator == NULL) _evaluator = new MAUS::MAUSEvaluator();
   std::string value="", units="";
   std::stringstream ss(source);
   ss >> value >> units;
 
   MI_alias(value);
-  out = _evaluator.evaluate(value.c_str());
-  if(_evaluator.status() != HepTool::Evaluator::OK && _evaluator.status())
+  try {
+      out = _evaluator->evaluate(value);
+  }
+  catch (Squeal squee) {
+      squee.Print();
       throw(Squeal(Squeal::recoverable, "Could not convert "+source+" to a double", "ModuleTextFileIO::parseString(const std::string&, double&)"));
-  out *= _units.GetUnits(units);
+  }
+  if (_units == NULL) _units = new MAUS::MAUSEvaluator();
+  out *= _units->evaluate(units);
 }
 
 void ModuleTextFileIO::parseString(const std::string& source, bool& out)
@@ -345,7 +358,8 @@ void ModuleTextFileIO::parseString(const std::string& source, CLHEP::Hep3Vector&
       throw(Squeal(Squeal::recoverable, "Failed to parse "+source+" as Hep3Vector", "ModuleTextFileIO::parseString(string, Hep3Vector)"));
   }
   ss >> units;
-  out *= _units.GetUnits(units);
+  if (_units == NULL) _units = new MAUS::MAUSEvaluator();
+  out *= _units->evaluate(units);
 }
 
 void ModuleTextFileIO::readProperty(std::string lineIn)
@@ -467,16 +481,14 @@ void ModuleTextFileIO::repeatModule2 (MiceModule* first, unsigned int numberOfRe
 
 void ModuleTextFileIO::setEvaluator(std::map<std::string, double> parameters)
 {
-  _evaluator.clear();
-  _evaluator.setStdMath();
+  if (_evaluator == NULL) _evaluator = new MAUS::MAUSEvaluator();
+
   for(std::map<std::string, double>::iterator it=parameters.begin(); it!=parameters.end(); it++)
   {
     std::string name  = it->first;
     MI_alias(name);
     double      value = it->second;
-    _evaluator.setVariable(name.c_str(), value);
-    if(_evaluator.status() != _evaluator.OK)
-      throw(Squeal(Squeal::recoverable, "Failed to parse variable "+it->first+" from MiceModules", "ModuleTextFileIO::setEvaluator"));
+    _evaluator->set_variable(name, value);
   }
 }
 

@@ -19,8 +19,6 @@
 #include "CLHEP/Vector/Rotation.h"
 #include "CLHEP/Geometry/Transform3D.h"
 
-#include "Interface/MICEUnits.hh"
-
 #include "Config/ModuleTextFileIO.hh"
 
 //! MiceModule object handles geometry information and other relevant parameters for G4MICE
