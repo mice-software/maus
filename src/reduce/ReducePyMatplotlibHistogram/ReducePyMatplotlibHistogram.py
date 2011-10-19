@@ -43,8 +43,9 @@ class ReducePyMatplotlibHistogram: # pylint: disable=R0903
     "histogram_auto_number" (see below) is "true" then the TAG will
     have a number N appended where N means that the histogram was
     produced as a consequence of the (N + 1)th spill processed 
-    by the worker. If "histogram_auto_number" is false then no
-    such number is appended.
+    by the worker. The number will be zero-padded to form a six digt
+    string e.g. "00000N". If "histogram_auto_number" is false 
+    then no such number is appended.
 
     In case of errors the output document is just the input document
     with an "errors" field containing the error e.g.
@@ -224,7 +225,7 @@ class ReducePyMatplotlibHistogram: # pylint: disable=R0903
         json_doc = {}
         json_doc["image"] = {}
         if (self.auto_number):
-            tag = "%s%d" % (self._tag, self.spill_count)
+            tag = "%s%06d" % (self._tag, self.spill_count)
         else:
             tag = "%s" % (self._tag)
         data = self.__convert_to_binary(self._histogram)
