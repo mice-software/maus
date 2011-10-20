@@ -29,6 +29,8 @@ InputCppDAQData::InputCppDAQData(std::string pDataPath,
   _v830FragmentProc = NULL;
   _vLSBFragmentProc = NULL;
   _DBBFragmentProc = NULL;
+
+  _next_event = Json::Value();
 }
 
 
@@ -179,7 +181,7 @@ bool InputCppDAQData::readNextEvent() {
   return true;
 }
 
-std::string InputCppDAQData::getCurEvent() {
+bool InputCppDAQData::getCurEvent() {
   // Create new Json documents.
   Json::Value xDocRoot;  // Root of the event
   Json::FastWriter xJSONWr;
@@ -222,13 +224,14 @@ std::string InputCppDAQData::getCurEvent() {
   }
 
   // Finally attach the spill to the document root
-  xDocRoot["daq_data"] = xDocSpill;
+  xDocRoot["event_data"] = xDocSpill;
   xDocRoot["spill_num"] = _dataProcessManager.GetSpillNumber();
   unsigned int event_type = _dataProcessManager.GetEventType();
   xDocRoot["daq_event_type"] = event_type_to_str(event_type);
   // cout<<xDocRoot<<endl;
 
-  return xJSONWr.write(xDocRoot);
+  _next_event = xDocRoot;
+  return true;
 }
 
 bool InputCppDAQData::death() {
@@ -279,9 +282,57 @@ std::string InputCppDAQData::event_type_to_str(int pType) {
   return event_type;
 }
 
+std::string InputCppDAQData::getNextEvent() {
+  Json::FastWriter xJsonWr;
+  if (readNextEvent()) {
+    getCurEvent();
+    return xJsonWr.write(_next_event);
+  }
+  return "";
+}
 
+int InputCppDAQData::getSpillNumber(Json::Value xDocRoot) {
+  assert(xDocRoot.isMember("spill_num"));
+  return xDocRoot["spill_num"].asInt();
+}
 
+std::string InputCppDAQData::getNextSpill() {
+  // we need to check spill number for next event to decide whether it should
+  // be added to the spill; means the first event for the next spill gets filled
+  // on the previous loop, which makes the logic a bit more obscure
+  Json::FastWriter xJsonWr;
 
+  Json::Value spill(Json::objectValue);
+  spill["daq_data"] = Json::Value(Json::arrayValue);
+  if (_next_event.isNull()) { // if first event, call unpack once
+    getNextEvent();
+    if (_next_event.isNull()) {
+      return "";
+    }
+  }
+  // next event is always the first event of this spill
+  int spill_number = getSpillNumber(_next_event);
+  spill["daq_data"].append(_next_event);
+
+  // loop over events; if the spill number changes, then we're done
+  bool finished = true;
+  while (_eventPtr != NULL) {
+    getNextEvent();
+    finished = false;
+    if (getSpillNumber(_next_event) != spill_number) {
+      return xJsonWr.write(spill);
+    }
+    if (_eventPtr) {
+      spill["daq_data"].append(_next_event);
+    }
+  }
+
+  // for the last spill, getNextEvent() goes false but spill buffer not empty
+  if (!finished) {
+    return xJsonWr.write(spill);
+  }
+  return "";
+}
 
 
 

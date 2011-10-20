@@ -34,7 +34,6 @@ protected:
             << key_str << " " << val_str << "\n";
     ss_good  << "!" << bad_key << " " << val_dub << " " << units_dub << "\n"; 
     ss_good  << "#" << bad_key << " " << val_dub << " " << units_dub << "\n"; 
-    ss_bad_units << ss_good.str() << key_dub << " " << val_dub << " " << bad_units_dub; 
     ss_bad_key   << ss_good.str() << bad_key << " " << val_dub << " " << units_dub; 
   }
 
@@ -49,7 +48,6 @@ protected:
 
   std::stringstream ss_good;
   std::stringstream ss_comments;
-  std::stringstream ss_bad_units;
   std::stringstream ss_bad_key;
 };
 
@@ -65,10 +63,8 @@ TEST_F(dataCardsTest, readKeysTest)
   dataCards dc(0);
   EXPECT_NO_THROW(dc.readKeys(ss_good));
   EXPECT_EQ(dc.fetchValueInt   (key_int), val_int);
-  EXPECT_EQ(dc.fetchValueDouble(key_dub), val_dub*1000.); //units of m
+  EXPECT_EQ(dc.fetchValueDouble(key_dub), val_dub);
   EXPECT_EQ(dc.fetchValueString(key_str), val_str);
-
-  EXPECT_THROW(dc.readKeys(ss_bad_units), Squeal);
   EXPECT_THROW(dc.readKeys(ss_bad_key),   Squeal);
 }
 

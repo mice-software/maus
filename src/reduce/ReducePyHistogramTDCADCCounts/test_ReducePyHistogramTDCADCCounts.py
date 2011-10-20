@@ -315,7 +315,7 @@ class ReducePyHistogramTDCADCCountsTestCase(unittest.TestCase): # pylint: disabl
         self.assertEquals(self.__reducer.image_type, image["image_type"],
             "Unexpected image_type")
         if (self.__reducer.auto_number):
-            tag = "tdcadc%d" % spill_id
+            tag = "tdcadc%06d" % spill_id
         else:
             tag = "tdcadc"
         self.assertEquals(tag, image["tag"], "Unexpected tag")

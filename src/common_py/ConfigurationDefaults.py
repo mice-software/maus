@@ -49,12 +49,22 @@ keep_tracks = False # set to true to keep start and end point of every track
 keep_steps = False # set to true to keep start and end point of every track and
                    # every step point
 simulation_geometry_filename = "Stage6.dat" # geometry used by simulation
-maximum_number_of_steps = 10000
-simulation_reference_particle = {
+maximum_number_of_steps = 10000 # particles are killed after this number of
+                                # steps (assumed to be stuck in the fields)
+simulation_reference_particle = { # used for setting particle phase
     "position":{"x":0.0, "y":-0.0, "z":-5500.0},
     "momentum":{"x":0.0, "y":0.0, "z":1.0},
     "particle_id":-13, "energy":226.0, "time":0.0, "random_seed":10
 }
+
+# geant4 physics model
+physics_model = "QGSP_BERT" # Physics package loaded by MAUS to set default values; modifications can be made
+reference_physics_processes = "mean_energy_loss"
+physics_processes = "standard"
+particle_decay = True # set to true to activate particle decay, or False to inactivate particle decay
+charged_pion_half_life = -1. # set the pi+, pi- half life [ns]. Negative value means use geant4 default
+muon_half_life = -1. # set the mu+, mu- half life [ns]. Negative value means use geant4 default
+production_threshold = 0.5 # set the threshold for delta ray production [mm]
 
 # geant4 visualisation (not event display)
 geant4_visualisation = False

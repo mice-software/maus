@@ -22,7 +22,6 @@
 #include <G4SDManager.hh>
 
 // should all be forward declarations? yes - but be careful about namespace
-#include "src/legacy/Simulation/MICERunAction.hh"
 #include "src/legacy/Simulation/FillMaterials.hh"
 #include "src/legacy/Simulation/MICEDetectorConstruction.hh"
 #include "src/common_cpp/Simulation/MAUSPrimaryGeneratorAction.hh"
@@ -32,15 +31,11 @@
 #include "src/common_cpp/Simulation/MAUSEventAction.hh"
 #include "src/common_cpp/Simulation/VirtualPlanes.hh"
 
-class MICEPhysicsList;
 
 namespace MAUS {
 
 class MAUSVisManager;
-
-/** MAUSPhysicsList is a synonym for (legacy) MICEPhysicsList
- */
-typedef MICEPhysicsList MAUSPhysicsList;
+class MAUSPhysicsList;
 
 /** @class MAUSGeant4Manager
  *
@@ -150,7 +145,7 @@ class MAUSGeant4Manager {
     ~MAUSGeant4Manager();
 
     G4RunManager* _runManager;
-    MICEPhysicsList* _physList;
+    MAUSPhysicsList* _physList;
     MAUSPrimaryGeneratorAction* _primary;
     MAUSSteppingAction*         _stepAct;
     MAUSTrackingAction*         _trackAct;
