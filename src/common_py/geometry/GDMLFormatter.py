@@ -28,7 +28,7 @@ class Formatter:
         self.configurationfile = None
         self.materialfile = None
         self.materialfilepath = None
-        schema = '/src/common_py/geometry/gdmlSchema/GDML_3_0_0/schema/gdml.xsd'
+        schema = '/src/common_py/geometry/GDML_3_0_0/schema/gdml.xsd'
         self.schema = os.environ['MAUS_ROOT_DIR'] + schema
         filelist = []
         self.stepfiles = filelist
