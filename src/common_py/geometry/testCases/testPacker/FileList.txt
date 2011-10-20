@@ -1,8 +1,8 @@
-$MAUS_ROOT_DIR + '/src/common_py/geometry/testCases/testGeometry/Step_2.gdml'
-$MAUS_ROOT_DIR +'/src/common_py/geometry/testCases/testGeometry/Step_0.gdml'
-$MAUS_ROOT_DIR +'/src/common_py/geometry/testCases/testGeometry/Step_3.gdml'
-$MAUS_ROOT_DIR +'/src/common_py/geometry/testCases/testGeometry/fastradModel_materials.xml'
-$MAUS_ROOT_DIR +'/src/common_py/geometry/testCases/testGeometry/fastradModel.gdml'
-$MAUS_ROOT_DIR +'/src/common_py/geometry/testCases/testGeometry/Step_1.gdml'
-$MAUS_ROOT_DIR +'/src/common_py/geometry/testCases/testGeometry/Step_4.gdml'
-$MAUS_ROOT_DIR +'/src/common_py/geometry/testCases/testGeometry/Step_5.gdml'
+/home/matt/maus-littlefield/src/common_py/geometry/testCases/testGeometry/Step_0.gdml 
+/home/matt/maus-littlefield/src/common_py/geometry/testCases/testGeometry/Step_1.gdml 
+/home/matt/maus-littlefield/src/common_py/geometry/testCases/testGeometry/Step_2.gdml 
+/home/matt/maus-littlefield/src/common_py/geometry/testCases/testGeometry/Step_3.gdml 
+/home/matt/maus-littlefield/src/common_py/geometry/testCases/testGeometry/Step_4.gdml 
+/home/matt/maus-littlefield/src/common_py/geometry/testCases/testGeometry/Step_5.gdml 
+/home/matt/maus-littlefield/src/common_py/geometry/testCases/testGeometry/fastradModel_materials.xml 
+/home/matt/maus-littlefield/src/common_py/geometry/testCases/testGeometry/fastradModel.gdml 

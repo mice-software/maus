@@ -1,7 +1,18 @@
-"""
-This class test the GDMLPacker module
-M. Littlefield
-"""
+#  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
+# 
+#  MAUS is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+# 
+#  MAUS is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+# 
+#  You should have received a copy of the GNU General Public License
+#  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
+
 import os
 import unittest
 from geometry.GDMLPacker import Packer
@@ -28,6 +39,16 @@ class  test_packer(unittest.TestCase):
         """
         self.constructor_test = None
         testcase = os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testPacker/FileList.txt'
+        fin = open(testcase, 'w')
+        fin.write(os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testGeometry/Step_0.gdml \n')
+        fin.write(os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testGeometry/Step_1.gdml \n')
+        fin.write(os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testGeometry/Step_2.gdml \n')
+        fin.write(os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testGeometry/Step_3.gdml \n')
+        fin.write(os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testGeometry/Step_4.gdml \n')
+        fin.write(os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testGeometry/Step_5.gdml \n')
+        fin.write(os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testGeometry/fastradModel_materials.xml \n')
+        fin.write(os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testGeometry/fastradModel.gdml \n')
+        fin.close()
         self.gdml_test_case = Packer(testcase)
     
     def test_constructor(self):
@@ -112,7 +133,7 @@ class test_unpacker(unittest.TestCase):
         """
         method test_unzip_file
         
-        This method test the unzip_file method. It does this
+        This method tests the unzip_file method. It does this
         by unzipping the testcase zipfile and checking that the 
         correct files are there.
         """
