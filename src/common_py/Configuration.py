@@ -93,8 +93,7 @@ class Configuration:
         # created to store the path and filename to a datacard
         parser = argparse.ArgumentParser()
         for key, value in sorted(config_dict.iteritems(), key=lambda x: x[0].lower()): 
-            parser.add_argument('--'+key, action='store', dest=key, 
-                                default=value)
+            parser.add_argument('--'+key, action='store', dest=key, default=value)
         results = parser.parse_args()
 
         # All parsed values are input as string types, this checks the type in
