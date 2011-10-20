@@ -1,4 +1,4 @@
-<?xml version="1.0" ?><!DOCTYPE gdml [<!ENTITY materials SYSTEM "/home/matt/maus-littlefield/src/common_py/geometry/testCases/testGeometry/fastradModel_materials.xml">]><gdml xmlns:gdml="http://cern.ch/2001/Schemas/GDML" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="/home/matt/maus-littlefield/src/common_py/geometry/gdmlSchema/GDML_3_0_0/schema/gdml.xsd">
+<?xml version="1.0" ?><!DOCTYPE gdml [<!ENTITY materials SYSTEM "/home/matt/maus-littlefield/src/common_py/geometry/testCases/testGeometry/fastradModel_materials.xml">]><gdml xmlns:gdml="http://cern.ch/2001/Schemas/GDML" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="/home/matt/maus-littlefield/src/common_py/geometry/GDML_3_0_0/schema/gdml.xsd">
 
 
 
@@ -54,7 +54,7 @@
 
 		<physvol>
 
-			<file name="Step_0.gdml"/>
+			<file name="Stemmmmp_0.gdml"/>
 
 			<position name="posRef_1" x="0.0000" y="0.0000" z="0.0000"/>
 

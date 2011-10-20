@@ -1,7 +1,18 @@
-"""
-This module test the GDMLFormatter module
-M. Littlefield
-"""
+#  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
+# 
+#  MAUS is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+# 
+#  MAUS is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+# 
+#  You should have received a copy of the GNU General Public License
+#  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
+
 import unittest
 import os
 from geometry.GDMLFormatter import Formatter
@@ -138,7 +149,7 @@ class  test_gdml_formatter(unittest.TestCase):
         """
         method test_format
         
-        This method test the format method.
+        This method tests the format method.
         It does this by firstly calling the 
         format method and then it opens the outputted
         (formatted) files. The input files are known and 
