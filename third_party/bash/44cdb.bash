@@ -38,7 +38,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         echo
         sleep 1
         python setup.py install
-        echo 'import cdba' | python
+        echo 'import cdb' | python
         if [ $? != 0 ]; then
             echo 
             echo "FATAL: The package failed to build. Review the build output"
