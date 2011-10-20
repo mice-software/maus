@@ -33,7 +33,25 @@ bool MapCppTOFSlabHits::birth(std::string argJsonConfigDocument) {
   _stationKeys.push_back("tof1");
   _stationKeys.push_back("tof2");
 
-  return true;
+  // Check if the JSON document can be parsed, else return error only
+  try {
+    //  JsonCpp setup
+    Json::Value configJSON;
+    configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
+    //  this will contain the configuration
+
+    _tdcV1290_conversion_factor = JsonWrapper::GetProperty(configJSON,
+                                                           "TOFtdcConversionFactor",
+                                                           JsonWrapper::realValue).asDouble();
+
+    return true;
+  } catch(Squeal squee) {
+    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
+  } catch(std::exception exc) {
+    MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
+  }
+
+  return false;
 }
 
 bool MapCppTOFSlabHits::death()  {return true;}
@@ -44,53 +62,55 @@ std::string MapCppTOFSlabHits::process(std::string document) {
   Json::Value root;
   Json::Value xEventType;
   // Check if the JSON document can be parsed, else return error only
-  try {
-    root = JsonWrapper::StringToJson(document);
-    xEventType = JsonWrapper::GetProperty(root,
-                                          "daq_event_type",
-                                          JsonWrapper::stringValue);
-  }catch(Squeal e) {
-    Squeak::mout(Squeak::error)
-    << "Error in  MapCppTOFSlabHits::process. Bad json document."
-    << std::endl;
+  try {root = JsonWrapper::StringToJson(document);}
+  catch(...) {
     Json::Value errors;
     std::stringstream ss;
-    ss << _classname << " says:" << e.GetMessage();
+    ss << _classname << " says: Failed to parse input document";
     errors["bad_json_document"] = ss.str();
     root["errors"] = errors;
     return writer.write(root);
   }
 
-  if (xEventType== "physics_event" || xEventType == "calibration_event") {
-    if (root.isMember("digits")) {
-      Json::Value digits = JsonWrapper::GetProperty(root, "digits", JsonWrapper::objectValue);
+  try {
+    xEventType = JsonWrapper::GetProperty(root,
+                                          "daq_event_type",
+                                          JsonWrapper::stringValue);
+    if (xEventType== "physics_event" || xEventType == "calibration_event") {
+      if (root.isMember("digits")) {
+        Json::Value digits = JsonWrapper::GetProperty(root, "digits", JsonWrapper::objectValue);
 
-      // Loop over each station.
-      for (unsigned int n_station = 0; n_station < _stationKeys.size(); n_station++) {
-        if (digits.isMember(_stationKeys[n_station])) {
-          Json::Value xDocDetectorDigits = JsonWrapper::GetProperty(digits,
-                                                                    _stationKeys[n_station],
-                                                                    JsonWrapper::arrayValue);
+        // Loop over each station.
+        for (unsigned int n_station = 0; n_station < _stationKeys.size(); n_station++) {
+          if (digits.isMember(_stationKeys[n_station])) {
+            Json::Value xDocDetectorDigits = JsonWrapper::GetProperty(digits,
+                                                                      _stationKeys[n_station],
+                                                                      JsonWrapper::arrayValue);
 
-          if (xDocDetectorDigits.isArray()) {
-            int n_part_events = xDocDetectorDigits.size();
-            // Loop over the particle events.
-            for (int PartEvent = 0; PartEvent < n_part_events; PartEvent++) {
-              Json::Value xDocPartEvent = JsonWrapper::GetItem(xDocDetectorDigits,
-                                                               PartEvent,
-                                                               JsonWrapper::anyValue);
+            if (xDocDetectorDigits.isArray()) {
+              int n_part_events = xDocDetectorDigits.size();
+              // Loop over the particle events.
+              for (int PartEvent = 0; PartEvent < n_part_events; PartEvent++) {
+                Json::Value xDocPartEvent = JsonWrapper::GetItem(xDocDetectorDigits,
+                                                                 PartEvent,
+                                                                 JsonWrapper::anyValue);
 
-              Json::Value xDocSlabHits = makeSlabHits(xDocPartEvent);
-              root["slab_hits"][_stationKeys[n_station]][PartEvent] = xDocSlabHits;
-	    }
+                Json::Value xDocSlabHits = makeSlabHits(xDocPartEvent);
+                root["slab_hits"][_stationKeys[n_station]][PartEvent] = xDocSlabHits;
+              }
+            }
           }
         }
       }
-    }
+    } 
+  } catch(Squeal squee) {
+    root = MAUS::CppErrorHandler::getInstance()
+                                       ->HandleSqueal(root, squee, _classname);
+  } catch(std::exception exc) {
+    root = MAUS::CppErrorHandler::getInstance()
+                                         ->HandleStdExc(root, exc, _classname);
   }
-  // std::cout << "daq : "<< root["daq_data"]["tof1"] << std::endl;
-  // std::cout << "digits : " << root["digits"]["tof1"] << std::endl;
-  // std::cout << root << std::endl;
+  // if (root.isMember("slab_hits")) std::cout<<root["slab_hits"]<<std::endl;
   return writer.write(root);
 }
 
@@ -241,8 +261,10 @@ Json::Value MapCppTOFSlabHits::fillSlabHit(Json::Value xDocDigit0, Json::Value x
   }
 
   // Calculate the measured value of the time in nanoseconds.
-  double time_digit0 = 25e-3*(static_cast<double>(xTimeDigit0 - xTriggerReqDigit0));
-  double time_digit1 = 25e-3*(static_cast<double>(xTimeDigit1 - xTriggerReqDigit1));
+  double time_digit0 =
+  _tdcV1290_conversion_factor*(static_cast<double>(xTimeDigit0 - xTriggerReqDigit0));
+  double time_digit1 =
+  _tdcV1290_conversion_factor*(static_cast<double>(xTimeDigit1 - xTriggerReqDigit1));
 
   xDocPMT0["raw_time"] = time_digit0;
   xDocPMT1["raw_time"] = time_digit1;

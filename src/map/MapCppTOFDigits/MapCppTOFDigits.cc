@@ -31,44 +31,6 @@ bool MapCppTOFDigits::birth(std::string argJsonConfigDocument) {
   _stationKeys.push_back("tof1");
   _stationKeys.push_back("tof2");
 
-  // Check if the JSON document can be parsed, else return error only
-
-  //  JsonCpp setup
-  Json::Value configJSON;
-  Json::Value map_file_name;
-  Json::Value xEnable_V1290_Unpacking;
-  Json::Value xEnable_V1724_Unpacking;
-  try {
-    configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
-    //  this will contain the configuration
-    map_file_name = JsonWrapper::GetProperty(configJSON,
-                                             "TOF_cabling_file",
-                                             JsonWrapper::stringValue);
-    xEnable_V1290_Unpacking = JsonWrapper::GetProperty(configJSON,
-                                                       "Enable_V1290_Unpacking",
-                                                       JsonWrapper::booleanValue);
-    xEnable_V1724_Unpacking = JsonWrapper::GetProperty(configJSON,
-                                                       "Enable_V1724_Unpacking",
-                                                       JsonWrapper::booleanValue);
-  }catch(Squeal e) {
-    Squeak::mout(Squeak::error)
-    << "Error in MapCppTOFDigits::birth. Bad json document."
-    << std::endl;
-    return false;
-  }
-
-  if (!xEnable_V1290_Unpacking.asBool()) {
-    Squeak::mout(Squeak::warning)
-    << "WARNING in MapCppTOFDigits::birth. The unpacking of the TDC V1290 is disabled!!!"
-    << " Are you shure you want this?"
-    << std::endl;
-  }
-  if (!xEnable_V1724_Unpacking.asBool()) {
-    Squeak::mout(Squeak::warning)
-    << "WARNING in MapCppTOFDigits::birth. The unpacking of the flashADC V1724 is disabled!!!"
-    << " Are you shure you want this?"
-    << std::endl;
-  }
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
 
   if (!pMAUS_ROOT_DIR) {
@@ -77,12 +39,54 @@ bool MapCppTOFDigits::birth(std::string argJsonConfigDocument) {
     Squeak::mout(Squeak::error) << "Did you try running: source env.sh ?" << std::endl;
     return false;
   }
-  std::string xMapFile = std::string(pMAUS_ROOT_DIR) + map_file_name.asString();
-  bool loaded = _map.InitFromFile(xMapFile);
-  if (!loaded)
-    return false;
+
+  // Check if the JSON document can be parsed, else return error only
+  try {
+    //  JsonCpp setup
+    Json::Value configJSON;
+    Json::Value map_file_name;
+    Json::Value xEnable_V1290_Unpacking;
+    Json::Value xEnable_V1724_Unpacking;
+    configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
+    //  this will contain the configuration
+
+    map_file_name = JsonWrapper::GetProperty(configJSON,
+                                             "TOF_cabling_file",
+                                             JsonWrapper::stringValue);
+
+    std::string xMapFile = std::string(pMAUS_ROOT_DIR) + map_file_name.asString();
+    bool loaded = _map.InitFromFile(xMapFile);
+    if (!loaded)
+      return false;
+
+    xEnable_V1290_Unpacking = JsonWrapper::GetProperty(configJSON,
+                                                       "Enable_V1290_Unpacking",
+                                                       JsonWrapper::booleanValue);
+    xEnable_V1724_Unpacking = JsonWrapper::GetProperty(configJSON,
+                                                       "Enable_V1724_Unpacking",
+                                                       JsonWrapper::booleanValue);
+
+    if (!xEnable_V1290_Unpacking.asBool()) {
+      Squeak::mout(Squeak::warning)
+      << "WARNING in MapCppTOFDigits::birth. The unpacking of the TDC V1290 is disabled!!!"
+      << " Are you shure you want this?"
+      << std::endl;
+    }
+    if (!xEnable_V1724_Unpacking.asBool()) {
+      Squeak::mout(Squeak::warning)
+      << "WARNING in MapCppTOFDigits::birth. The unpacking of the flashADC V1724 is disabled!!!"
+      << " Are you shure you want this?"
+      << std::endl;
+    }
 
   return true;
+  } catch(Squeal squee) {
+    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
+  } catch(std::exception exc) {
+    MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
+  }
+
+  return false;
 }
 
 
@@ -95,50 +99,53 @@ std::string MapCppTOFDigits::process(std::string document) {
   Json::Value root;
   Json::Value xEventType;
   // Check if the JSON document can be parsed, else return error only
-  try {
-    root = JsonWrapper::StringToJson(document);
-    xEventType = JsonWrapper::GetProperty(root,
-                                          "daq_event_type",
-                                          JsonWrapper::stringValue);
-  }catch(Squeal e) {
-    Squeak::mout(Squeak::error)
-    << "Error in MapCppTOFDigits::process. Bad json document."
-    << std::endl;
+  try {root = JsonWrapper::StringToJson(document);}
+  catch(...) {
     Json::Value errors;
     std::stringstream ss;
-    ss << _classname << " says:" << e.GetMessage();
+    ss << _classname << " says: Failed to parse input document";
     errors["bad_json_document"] = ss.str();
     root["errors"] = errors;
     return writer.write(root);
   }
 
-  if (xEventType == "physics_event" || xEventType == "calibration_event") {
-    Json::Value xDaqData = JsonWrapper::GetProperty(root, "daq_data", JsonWrapper::objectValue);
-    Json::Value xDocTrig, xDocTrigReq;
-    if (xDaqData.isMember("trigger") &&
-        xDaqData.isMember("trigger_request")) {
+  try {
+    xEventType = JsonWrapper::GetProperty(root,
+                                          "daq_event_type",
+                                          JsonWrapper::stringValue);
+    if (xEventType == "physics_event" || xEventType == "calibration_event") {
+      Json::Value xDaqData = JsonWrapper::GetProperty(root, "daq_data", JsonWrapper::objectValue);
+      Json::Value xDocTrig, xDocTrigReq;
+      if (xDaqData.isMember("trigger") &&
+          xDaqData.isMember("trigger_request")) {
 
-      xDocTrigReq = JsonWrapper::GetProperty(xDaqData,
-                                             "trigger_request",
-                                             JsonWrapper::arrayValue);
+        xDocTrigReq = JsonWrapper::GetProperty(xDaqData,
+                                               "trigger_request",
+                                               JsonWrapper::arrayValue);
 
-      xDocTrig = JsonWrapper::GetProperty(xDaqData,
-                                          "trigger",
-                                          JsonWrapper::arrayValue);
+        xDocTrig = JsonWrapper::GetProperty(xDaqData,
+                                            "trigger",
+                                            JsonWrapper::arrayValue);
 
-      for (unsigned int n_station = 0; n_station < _stationKeys.size(); n_station++) {
-        if (xDaqData.isMember(_stationKeys[n_station])) {
-          Json::Value xDocDetectorData = JsonWrapper::GetProperty(xDaqData,
-                                                                  _stationKeys[n_station],
-                                                                  JsonWrapper::arrayValue);
+        for (unsigned int n_station = 0; n_station < _stationKeys.size(); n_station++) {
+          if (xDaqData.isMember(_stationKeys[n_station])) {
+            Json::Value xDocDetectorData = JsonWrapper::GetProperty(xDaqData,
+                                                                    _stationKeys[n_station],
+                                                                    JsonWrapper::arrayValue);
 
-          Json::Value xDocDigits = makeDigits(xDocDetectorData, xDocTrigReq, xDocTrig);
-          root["digits"][_stationKeys[n_station]] = xDocDigits;
+            Json::Value xDocDigits = makeDigits(xDocDetectorData, xDocTrigReq, xDocTrig);
+            root["digits"][_stationKeys[n_station]] = xDocDigits;
+          }
         }
       }
     }
+  } catch(Squeal squee) {
+    root = MAUS::CppErrorHandler::getInstance()
+                                       ->HandleSqueal(root, squee, _classname);
+  } catch(std::exception exc) {
+    root = MAUS::CppErrorHandler::getInstance()
+                                         ->HandleStdExc(root, exc, _classname);
   }
-
   // if (root.isMember("digits")) std::cout<<root["digits"]<<std::endl;
   return writer.write(root);
 }

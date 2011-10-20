@@ -62,11 +62,6 @@ class MapCppTOFSlabHits {
   /// Vector to hold the names of all detectors to be processed.
   std::vector<std::string> _stationKeys;
 
- /** Load the configuration.
- * \param[in] json_configuration Json document containing the configuration.
- * \returns true if configurated successfully.
- */
-
   Json::Value fillSlabHit(Json::Value xDocDigit0, Json::Value xDocDigit1);
 
   /** @brief makes slab hits
@@ -75,5 +70,7 @@ class MapCppTOFSlabHits {
    * one particle event in one individual detector.
    */
   Json::Value makeSlabHits(Json::Value xDocPartEvent);
+
+  double _tdcV1290_conversion_factor;
 };
 #endif

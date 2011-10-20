@@ -135,15 +135,6 @@ beam = {
 # this is used by reconstruction
 reconstruction_geometry_filename = simulation_geometry_filename
 
-# tof digitization
-TOFconversionFactor = 0.01 # MeV
-TOFpmtTimeResolution = 0.1 # nanosecond
-TOFattenuationLength = 140 * 10 # mm
-TOFadcConversionFactor = 0.125
-TOFtdcConversionFactor = 0.025 # nanosecond
-TOFpmtQuantumEfficiency = 0.25
-TOFscintLightSpeed =  170.0 # mm/ns
-
 # scifi tracker digitization
 #SciFiDeadChanFName = ""
 SciFiMUXNum = 7
@@ -185,6 +176,15 @@ Enable_EMR = True
 Enable_KL = True
 Enable_CKOV = True
 DAQ_cabling_file = "/files/cabling/DAQChannelMap.txt"
+
+# tof digitization
+TOFconversionFactor = 0.01 # MeV
+TOFpmtTimeResolution = 0.1 # nanosecond
+TOFattenuationLength = 140 * 10 # mm
+TOFadcConversionFactor = 0.125
+TOFtdcConversionFactor = 0.025 # nanosecond
+TOFpmtQuantumEfficiency = 0.25
+TOFscintLightSpeed =  170.0 # mm/ns
 
 # this is used by the reconstuction of the TOF detectors
 TOF_trigger_station = "tof1"

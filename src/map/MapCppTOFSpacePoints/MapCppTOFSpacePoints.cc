@@ -35,6 +35,12 @@ bool MapCppTOFSpacePoints::birth(std::string argJsonConfigDocument) {
   try {
     configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
     // this will contain the configuration
+
+    // Load the calibration.
+    bool loaded = _map.InitializeFromCards(configJSON);
+    if (!loaded)
+      return false;
+
     _makeSpacePiontCut =
     JsonWrapper::GetProperty(configJSON,
                              "TOF_makeSpacePiontCut",
@@ -47,37 +53,33 @@ bool MapCppTOFSpacePoints::birth(std::string argJsonConfigDocument) {
     _triggerStation = JsonWrapper::GetProperty(configJSON,
                                                "TOF_trigger_station",
                                                JsonWrapper::stringValue).asString();
-  }catch(Squeal e) {
-    Squeak::mout(Squeak::error)
-    << "Error in MapCppTOFSpacePoints::birth. Bad json document."
-    << std::endl;
-    return false;
-  }
 
-  // Load the calibration.
-  bool loaded = _map.InitializeFromCards(configJSON);
-  if (!loaded)
-    return false;
+    // The first element of the vectro has to be the trigger station.
+    // This is mandatory!!!
+    _stationKeys.push_back(_triggerStation);
+    if (_triggerStation == "tof1") {
+      _stationKeys.push_back("tof0");
+      _stationKeys.push_back("tof2");
+    } else if (_triggerStation == "tof0") {
+      _stationKeys.push_back("tof1");
+      _stationKeys.push_back("tof2");
+    } else {
+      Squeak::mout(Squeak::error)
+      << "Error in MapCppTOFSpacePoints::birth. TOF trigger station is wrong."
+      << "It can be tof1 or tof0. The provided trigger station is : " << _triggerStation
+      << std::endl;
 
-  // The first element of the vectro has to be the trigger station.
-  // This is mandatory!!!
-  _stationKeys.push_back(_triggerStation);
-  if (_triggerStation == "tof1") {
-    _stationKeys.push_back("tof0");
-    _stationKeys.push_back("tof2");
-  } else if (_triggerStation == "tof0") {
-    _stationKeys.push_back("tof1");
-    _stationKeys.push_back("tof2");
-  } else {
-    Squeak::mout(Squeak::error)
-    << "Error in MapCppTOFSpacePoints::birth. TOF trigger station is wrong."
-    << "It can be tof1 or tof0. The provided trigger station is : " << _triggerStation
-    << std::endl;
-
-    return false;
-  }
+      return false;
+    }
 
   return true;
+  } catch(Squeal squee) {
+    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
+  } catch(std::exception exc) {
+    MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
+  }
+
+  return false;
 }
 
 bool MapCppTOFSpacePoints::death()  {return true;}
@@ -88,40 +90,46 @@ std::string MapCppTOFSpacePoints::process(std::string document) {
   Json::Value root;
   Json::Value xEventType;
   // Check if the JSON document can be parsed, else return error only
-  try {
-    root = JsonWrapper::StringToJson(document);
-    xEventType = JsonWrapper::GetProperty(root,
-                                          "daq_event_type",
-                                          JsonWrapper::stringValue);
-  }catch(Squeal e) {
-    Squeak::mout(Squeak::error)
-    << "Error in MapCppTOFSpacePoints::process. Bad json document."
-    << std::endl;
+  try {root = JsonWrapper::StringToJson(document);}
+  catch(...) {
     Json::Value errors;
     std::stringstream ss;
-    ss << _classname << " says:" << e.GetMessage();
+    ss << _classname << " says: Failed to parse input document";
     errors["bad_json_document"] = ss.str();
     root["errors"] = errors;
     return writer.write(root);
   }
+  try {
+    xEventType = JsonWrapper::GetProperty(root,
+                                          "daq_event_type",
+                                          JsonWrapper::stringValue);
+    if (xEventType == "physics_event" || xEventType == "calibration_event") {
+      if (root.isMember("slab_hits")) {
+        _triggerhit_pixels.clear();
 
-  if (xEventType == "physics_event" || xEventType == "calibration_event") {
-    if (root.isMember("slab_hits")) {
-      _triggerhit_pixels.clear();
+        Json::Value xSlabHits = JsonWrapper::GetProperty(root,
+                                                         "slab_hits",
+                                                         JsonWrapper::objectValue);
 
-      Json::Value xSlabHits = JsonWrapper::GetProperty(root, "slab_hits", JsonWrapper::objectValue);
-
-      // Loop over each station starting from the trigger station.
-      for (unsigned int n_station = 0; n_station < _stationKeys.size(); n_station++) {
-        std::string detector = _stationKeys[n_station];
-        if (xSlabHits.isMember(detector))
-          root["space_points"][detector] = processTOFStation(xSlabHits, detector);
-      }
+        // Loop over each station starting from the trigger station.
+        for (unsigned int n_station = 0; n_station < _stationKeys.size(); n_station++) {
+          std::string detector = _stationKeys[n_station];
+          if (xSlabHits.isMember(detector))
+            root["space_points"][detector] = processTOFStation(xSlabHits, detector);
+        }
         // The slab hit document is now modified. The calibrated time measurements are added.
         // Save the modifications.
         root["slab_hits"] = xSlabHits;
+      }
     }
+  } catch(Squeal squee) {
+    root = MAUS::CppErrorHandler::getInstance()
+                                       ->HandleSqueal(root, squee, _classname);
+  } catch(std::exception exc) {
+    root = MAUS::CppErrorHandler::getInstance()
+                                         ->HandleStdExc(root, exc, _classname);
   }
+
   // if (root.isMember("slab_hits")) std::cout << root["slab_hits"] << std::endl;
   // if (root.isMember("space_points")) std::cout << root["space_points"] << std::endl;
   return writer.write(root);

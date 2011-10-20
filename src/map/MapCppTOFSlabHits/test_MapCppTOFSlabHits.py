@@ -16,7 +16,7 @@ class MapCppTOFSlabHitsTestCase(unittest.TestCase):
 
     def test_empty(self):
         result = self.mapper.birth("")
-        self.assertTrue(result)
+        self.assertFalse(result)
         result = self.mapper.process("")
         doc = json.loads(result)
         self.assertTrue("errors" in doc)
