@@ -36,7 +36,7 @@ def run():
     my_map.append(MAUS.MapCppTrackerDigitization())  # SciFi electronics model
 
     # Create a reducer. Image type specified in datacards below.
-    my_reduce = MAUS.ReducePyMatplotlibHistogram()
+    my_reduce = MAUS.ReducePyHistogramTDCADCCounts()
 
     # Can specify datacards here or by using appropriate command line calls.
     datacards_list = []
@@ -44,6 +44,11 @@ def run():
     # (currently "svg", "ps", "emf", "rgba", "raw", "svgz", "pdf",
     # "eps", "png"). Default: "eps".
     datacards_list.append("histogram_image_type='%s'\n" % "eps")
+    # Add auto-numbering to the image tags. If False then each 
+    # histogram output by ReducePyMatplotlibHistogram will have
+    # tags "tdcadc" and so the end result will be just one histogram 
+    # file. If True then there will be N files, one for each spill.
+    datacards_list.append("histogram_auto_number=%s\n" % False)
     # Prefix for file names. Default: auto-generated UUID.
     datacards_list.append("image_file_prefix='%s'\n" % "histogram")
     # Directory for images. Default: current directory.

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MICE_Information xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:noNamespaceSchemaLocation="file:/home/matt/maus-littlefield/src/common_py/geometry/gdmlSchema/GDML_3_0_0/schema/GDML_MICE.xsd">
+    <Configuration_Information>
+        <run daqGateWidth="0" daqTrigger="0" daqVersion="0" endTime="endTime0" isisBeamPositionX="isisBeamPositionX0"
+             isisBeamPositionY="isisBeamPositionY0" isisNominalBeamCurrent="0" isisNominalBeamLoss="0"
+             isisRepRate="0" isisTargetFrequency="0" notes="notes0" optics="optics0" protonAbsorberThickness="protonAbsorberThickness0"
+             pulseEnd="0" pulseStart="0" runNumber="0" runType="runType0" startTime="startTime0" status="false"
+             step="0" targetDelay="0" targetDepth="0" targetDriveVoltage="0">
+            <magnet name="name0" polarity="polarity0" setCurrent="0"/>
+        </run>
+    </Configuration_Information>
+    <G4Field_Information>
+        <G4Magnet_info Name="Name0" Type="Type0" File_Location="File_Location0"/>
+        <G4Magnet_info Name="Name1" Type="Type1" File_Location="File_Location1"/>
+    </G4Field_Information>
+    <Detector_Information>
+        <TOF>
+        </TOF>
+        <TOF>
+        </TOF>
+        <KL>
+        </KL>
+        <Cherenkov>
+        </Cherenkov>
+        <Tracker>
+            <Component name="name1">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Length value="value0" units="units0"/>
+                <Thickness value="value1" units="units1"/>
+                <Material value="value2" units="units2"/>
+                <Tracker value="value3" units="units3"/>
+                <Invisible value="value4" units="units4"/>
+                <Tracker_Element name="name2">
+                    <Position x="0" y="0" z="0"/>
+                    <Rotation x="0" y="0" z="0"/>
+                </Tracker_Element>
+                <Tracker_Element name="name3">
+                    <Position x="0" y="0" z="0"/>
+                    <Rotation x="0" y="0" z="0"/>
+                </Tracker_Element>
+            </Component>
+            <Component name="name4">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Length value="value5" units="units5"/>
+                <Thickness value="value6" units="units6"/>
+                <Material value="value7" units="units7"/>
+                <Tracker value="value8" units="units8"/>
+                <Invisible value="value9" units="units9"/>
+                <Tracker_Element name="name5">
+                    <Position x="0" y="0" z="0"/>
+                    <Rotation x="0" y="0" z="0"/>
+                </Tracker_Element>
+                <Tracker_Element name="name6">
+                    <Position x="0" y="0" z="0"/>
+                    <Rotation x="0" y="0" z="0"/>
+                </Tracker_Element>
+            </Component>
+        </Tracker>
+    </Detector_Information>
+</MICE_Information>

@@ -15,15 +15,47 @@
     <xs:complexType name="CherenkovType">
         <xs:attribute name="Cherenkov"/>        
     </xs:complexType>
-    <xs:complexType name="TrackerType">
-        <xs:attribute name="Tracker"/>
-    </xs:complexType>
     <xs:complexType name="runMagnetType">
         <xs:attribute name="name" use="required" type="xs:NCName"/>
         <xs:attribute name="polarity" use="required" type="xs:NCName"/>
         <xs:attribute name="setCurrent" use="required" type="xs:decimal"/>
     </xs:complexType>
+    <xs:complexType name="PositionType">
+        <xs:attribute name="x" use="required" type="xs:double"/>
+        <xs:attribute name="y" use="required" type="xs:double"/>
+        <xs:attribute name="z" use="required" type="xs:double"/>
+    </xs:complexType>
+    <xs:complexType name="LengthType">
+        <xs:attribute name="value"/>
+        <xs:attribute name="units" use="optional"/>
+    </xs:complexType>
 <!--+++++++++++++++++++++++++++++++++++MIDDLE TYPES++++++++++++++++++++++++++++++++++++++++-->
+    <xs:complexType name="PartType">
+        <xs:sequence>
+            <xs:element name="Position" type="PositionType"/>
+            <xs:element name="Rotation" type="PositionType"/>
+        </xs:sequence>
+        <xs:attribute name="name"/>
+    </xs:complexType>
+    <xs:complexType name="TrackerType">
+        <xs:sequence>
+            <xs:element name="Component" maxOccurs="2">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="Position" type="PositionType"/>
+                        <xs:element name="Rotation" type="PositionType"/>
+                        <xs:element name="Length" type="LengthType"/>
+                        <xs:element name="Thickness" type="LengthType"/>
+                        <xs:element name="Material" type="LengthType"/>
+                        <xs:element name="Tracker" type="LengthType"/>
+                        <xs:element name="Invisible" type="LengthType"/>
+                        <xs:element name="Tracker_Element" type="PartType" maxOccurs="unbounded"></xs:element>
+                    </xs:sequence>
+                    <xs:attribute name="name"/>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
     <xs:complexType name ="configurationType">
         <xs:sequence>
             <xs:element name="run">
@@ -68,7 +100,7 @@
             <xs:element name="TOF" maxOccurs="3"/>
             <xs:element name="KL"/>
             <xs:element name="Cherenkov"/>
-            <xs:element name="Tracker" type="TrackerType" maxOccurs="2"/>
+            <xs:element name="Tracker" type="TrackerType"/>
         </xs:sequence>
     </xs:complexType>
 <!--++++++++++++++++++++++++++++++++++TOP TYPES+++++++++++++++++++++++++++++++++++++++++-->
