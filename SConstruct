@@ -473,10 +473,11 @@ def install_python_tests(maus_root_dir):
     test_subdirs = glob.glob(target+"*")
     for subdir in test_subdirs:
         if os.path.isdir(subdir):
-            pos = len(target)-1
-            subdir_mod = subdir[pos:]    
-            test_files = glob.glob(subdir+"test_*.py")                    
+            pos = len(target)
+            subdir_mod = subdir[pos:]
+            test_files = glob.glob(subdir+"/test_*.py")                   
             env.Install(build+subdir_mod, test_files)
+            print subdir, subdir_mod, test_files
 
 # Setup the environment.  NOTE: SHLIBPREFIX means that shared libraries don't
 # have a 'lib' prefix, which is needed for python to find SWIG generated
@@ -491,11 +492,13 @@ if env.GetOption('clean'):
     for root, dirs, files in os.walk('%s/build' % maus_root_dir):
         for basename in files:
             filename = os.path.join(root, basename)
+            print 'Removing:', filename
             if os.path.isfile(filename):
-                print 'Removing:', filename
                 os.remove(filename)
-          
-    
+        for basename in dirs:
+            dirname = os.path.join(root, basename)
+            if os.path.isdir(dirname):
+                shutil.rmtree(dirname) 
 
 if os.path.isfile('.use_llvm_with_maus'):
     env['CC'] = "llvm-gcc"
