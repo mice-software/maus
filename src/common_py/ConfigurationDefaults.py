@@ -145,15 +145,6 @@ beam = {
 # this is used by reconstruction
 reconstruction_geometry_filename = simulation_geometry_filename
 
-# tof digitization
-TOFconversionFactor = 0.01 # MeV
-TOFpmtTimeResolution = 0.1 # nanosecond
-TOFattenuationLength = 140 * 10 # mm
-TOFadcConversionFactor = 0.125
-TOFtdcConversionFactor = 0.025 # nanosecond
-TOFpmtQuantumEfficiency = 0.25
-TOFscintLightSpeed =  170.0 # mm/ns
-
 # scifi tracker digitization
 #SciFiDeadChanFName = ""
 SciFiMUXNum = 7
@@ -179,6 +170,7 @@ SciFinStations = 5
 SciFinTrackers = 2
 
 # this is used by ImputCppRealData
+Number_of_DAQ_Events = -1
 Enable_V1290_Unpacking = True
 Enable_V1731_Unpacking = True
 Enable_V1724_Unpacking = True
@@ -194,10 +186,33 @@ Enable_EMR = True
 Enable_KL = True
 Enable_CKOV = True
 DAQ_cabling_file = "/files/cabling/DAQChannelMap.txt"
+
+# tof digitization
+TOFconversionFactor = 0.01 # MeV
+TOFpmtTimeResolution = 0.1 # nanosecond
+TOFattenuationLength = 140 * 10 # mm
+TOFadcConversionFactor = 0.125
+TOFtdcConversionFactor = 0.025 # nanosecond
+TOFpmtQuantumEfficiency = 0.25
+TOFscintLightSpeed =  170.0 # mm/ns
+
+# this is used by the reconstuction of the TOF detectors
+TOF_trigger_station = "tof1"
+#TOF_trigger_station = "tof0"
+TOF_cabling_file = "/files/cabling/TOFChannelMap.txt"
+TOF_TW_calibration_file = "/files/calibration/tofcalibTW.txt"
+TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF1.txt"
+#TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF0.txt"
+TOF_Trigger_calibration_file = "/files/calibration/tofcalibTrigger_trTOF1.txt"
+#TOF_Trigger_calibration_file = "/files/calibration/tofcalibTrigger_trTOF0.txt"
+TOF_findTriggerPixelCut = 0.5 # nanosecond
+TOF_makeSpacePiontCut = 0.5 # nanosecond
+Enable_timeWalk_correction = True
+Enable_triggerDelay_correction = True
+Enable_t0_correction = True
+
 daq_data_path = '%s/src/input/InputCppDAQData' % os.environ.get("MAUS_ROOT_DIR") # path to daq data
 daq_data_file = '02873.003' # file name for daq data
 
 maus_version = "" # set at runtime - do not edit this (changes are ignored)
 configuration_file = "" # should be set on the command line only (else ignored)
-
-
