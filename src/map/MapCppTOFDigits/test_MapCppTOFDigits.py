@@ -15,13 +15,15 @@
 
 """Tests for MapCppTOFDigits"""
 
+# pylint: disable = C0103
+
 import os
 import json
 import unittest
 from Configuration import Configuration
 import MAUS
 
-class MapCppTOFDigitsTestCase(unittest.TestCase):
+class MapCppTOFDigitsTestCase(unittest.TestCase): # pylint: disable = R0904
     """Tests for MapCppTOFDigits"""
     @classmethod
     def setUpClass(cls): # pylint: disable = C0103
@@ -54,18 +56,8 @@ class MapCppTOFDigitsTestCase(unittest.TestCase):
         spill_out = json.loads(result)
         self.assertFalse('digits' in spill_out)
 
-    def test_process(self):
-        """Test MapCppTOFDigits process method"""
-        test2 = ('%s/src/map/MapCppTOFDigits/processTest.txt' % 
-                 os.environ.get("MAUS_ROOT_DIR"))
-        fin = open(test2,'r')
-        data = fin.read()
-        # test with some crazy events.
-        result = self.mapper.process(data)
-        spill_in = json.loads(data)
-        spill_out = json.loads(result)
-
-        # test the tof0 output
+    def __test_tof0_digits(self, spill_in, spill_out):
+        """Test tof0 digits"""
         n_part_events = len(spill_out['digits']['tof0'])
         self.assertEqual(n_part_events, 2)
         n_digits_part_ev0 = len(spill_out['digits']['tof0'][0])
@@ -84,7 +76,8 @@ class MapCppTOFDigitsTestCase(unittest.TestCase):
         self.assertEqual(trig_req, digit0_part_ev0_tof0
                                                ['trigger_request_leading_time'])
 
-        # test the tof1 output
+    def __test_tof1_digits(self, spill_out):
+        """Test tof1 digits"""
         n_part_events = len(spill_out['digits']['tof1'])
         self.assertEqual(n_part_events, 2)
         n_digits_part_ev0_tof1 = len(spill_out['digits']['tof1'][0])
@@ -95,11 +88,28 @@ class MapCppTOFDigitsTestCase(unittest.TestCase):
         self.assertFalse('charge_mm' in digit2_part_ev1_tof1)
         self.assertFalse('charge_pm' in digit2_part_ev1_tof1)
 
-        # test the tof2 output
+    def __test_tof2_digits(self, spill_out):
+        """Test tof2 digits"""
         n_part_events = len(spill_out['digits']['tof2'])
         self.assertEqual(n_part_events, 2)
         self.assertFalse(spill_out['digits']['tof2'][0])
         self.assertFalse(spill_out['digits']['tof2'][1])
+
+    def test_process(self):
+        """Test MapCppTOFDigits process method"""
+        test2 = ('%s/src/map/MapCppTOFDigits/processTest.txt' % 
+                 os.environ.get("MAUS_ROOT_DIR"))
+        fin = open(test2,'r')
+        data = fin.read()
+        # test with some crazy events.
+        result = self.mapper.process(data)
+        spill_in = json.loads(data)
+        spill_out = json.loads(result)
+
+        # test the outputs
+        self.__test_tof0_digits(spill_in, spill_out)
+        self.__test_tof1_digits(spill_out)
+        self.__test_tof2_digits(spill_out)
 
     @classmethod
     def tearDownClass(cls): # pylint: disable = C0103
