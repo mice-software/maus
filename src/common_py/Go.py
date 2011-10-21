@@ -239,12 +239,12 @@ class Go:  #  pylint: disable=R0921
 #                    self.json_config_document,
 #                    self.transformer,
 #                    spill)
-#                from maustasks import MausTransformDoNothing
-#                result = \
-#                    MausTransformDoNothing.delay(spill) # pylint:disable=E1101
-                from maustasks import MausTransformSimulate
+                from maustasks import MausTransformDoNothing
                 result = \
-                    MausTransformSimulate.delay(spill) # pylint:disable=E1101
+                    MausTransformDoNothing.delay(spill) # pylint:disable=E1101
+#                from maustasks import MausTransformSimulate
+#                result = \
+#                    MausTransformSimulate.delay(spill) # pylint:disable=E1101
                 # Index results by spill_id so can present
                 # results to merge-output in same order.
                 transform_results[i] = result
