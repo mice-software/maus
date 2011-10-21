@@ -14,6 +14,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     easy_install "validictory==0.7.0"
     easy_install bitarray
     easy_install matplotlib
+    easy_install celery
 
     echo "INFO: The package should be locally build now in your"
     echo "INFO: third_party directory, which the rest of MAUS will"

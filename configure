@@ -190,6 +190,10 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      export PYTHONPATH="\$MAUS_ROOT_DIR/src/common_py:\$PYTHONPATH"
      export $DYLIB_VAR="\$MAUS_ROOT_DIR/src/common_py:\$$DYLIB_VAR"
 
+     export PYTHONPATH="\$MAUS_ROOT_DIR/src/celery:\$PYTHONPATH"
+     export LD_LIBRARY_PATH="\$MAUS_ROOT_DIR/src/celery:\$LD_LIBRARY_PATH"
+     export CELERY_LOADER="mausloader.CeleryLoader"
+
      export G4DEBUG=1
      export G4VERS=geant4.9.2.p04
      export G4SYSTEM=$arch-g++
