@@ -9,6 +9,8 @@ MAUS-v0.0.9
 - Controls for geant4 physics processes added
 - Generalised histogramming functionality for online data quality added
 - Skeleton documentation outline added
+The following third party libraries need to be rerun:
+- 40python_extras.bash
 
 MAUS-v0.0.8
 - Merged DAQ unpacking code
