@@ -31,7 +31,7 @@ class MapCppTOFSlabHitsTestCase(unittest.TestCase):# pylint: disable = R0904
         cls.c = Configuration()
 
     def test_empty(self):
-        """Check that against configuration is empty"""
+        """Check against configuration is empty"""
         result = self.mapper.birth("")
         self.assertFalse(result)
         result = self.mapper.process("")

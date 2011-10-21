@@ -32,7 +32,7 @@ class MapCppTOFDigitsTestCase(unittest.TestCase): # pylint: disable = R0904
         cls.c = Configuration()
 
     def test_empty(self):
-        """Check can handle empty spill"""
+        """Check can handle empty configuration"""
         result = self.mapper.birth("")
         self.assertFalse(result)
         result = self.mapper.process("")
@@ -56,7 +56,7 @@ class MapCppTOFDigitsTestCase(unittest.TestCase): # pylint: disable = R0904
         spill_out = json.loads(result)
         self.assertFalse('digits' in spill_out)
 
-    def __test_tof0_digits(self, spill_in, spill_out):
+    def __test_process_tof0_digits(self, spill_in, spill_out):
         """Test tof0 digits"""
         n_part_events = len(spill_out['digits']['tof0'])
         self.assertEqual(n_part_events, 2)
@@ -76,7 +76,7 @@ class MapCppTOFDigitsTestCase(unittest.TestCase): # pylint: disable = R0904
         self.assertEqual(trig_req, digit0_part_ev0_tof0
                                                ['trigger_request_leading_time'])
 
-    def __test_tof1_digits(self, spill_out):
+    def __test_process_tof1_digits(self, spill_out):
         """Test tof1 digits"""
         n_part_events = len(spill_out['digits']['tof1'])
         self.assertEqual(n_part_events, 2)
@@ -88,7 +88,7 @@ class MapCppTOFDigitsTestCase(unittest.TestCase): # pylint: disable = R0904
         self.assertFalse('charge_mm' in digit2_part_ev1_tof1)
         self.assertFalse('charge_pm' in digit2_part_ev1_tof1)
 
-    def __test_tof2_digits(self, spill_out):
+    def __test_process_tof2_digits(self, spill_out):
         """Test tof2 digits"""
         n_part_events = len(spill_out['digits']['tof2'])
         self.assertEqual(n_part_events, 2)
@@ -107,9 +107,9 @@ class MapCppTOFDigitsTestCase(unittest.TestCase): # pylint: disable = R0904
         spill_out = json.loads(result)
 
         # test the outputs
-        self.__test_tof0_digits(spill_in, spill_out)
-        self.__test_tof1_digits(spill_out)
-        self.__test_tof2_digits(spill_out)
+        self.__test_process_tof0_digits(spill_in, spill_out)
+        self.__test_process_tof1_digits(spill_out)
+        self.__test_process_tof2_digits(spill_out)
 
     @classmethod
     def tearDownClass(cls): # pylint: disable = C0103
