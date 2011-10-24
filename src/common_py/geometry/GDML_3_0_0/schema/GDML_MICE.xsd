@@ -29,14 +29,16 @@
         <xs:attribute name="value"/>
         <xs:attribute name="units" use="optional"/>
     </xs:complexType>
-<!--+++++++++++++++++++++++++++++++++++MIDDLE TYPES++++++++++++++++++++++++++++++++++++++++-->
-    <xs:complexType name="PartType">
+    <xs:complexType name="FileReferenceType">
         <xs:sequence>
             <xs:element name="Position" type="PositionType"/>
             <xs:element name="Rotation" type="PositionType"/>
         </xs:sequence>
-        <xs:attribute name="name"/>
+        <xs:attribute name="name" type="xs:anyURI" use="required"></xs:attribute>
     </xs:complexType>
+<!--++++++++++++++++++++++++++++++++Substitution TYPES+++++++++++++++++++++++++++++++++++++-->
+
+<!--+++++++++++++++++++++++++++++++++++MIDDLE TYPES++++++++++++++++++++++++++++++++++++++++-->
     <xs:complexType name="TrackerType">
         <xs:sequence>
             <xs:element name="Component" maxOccurs="2">
@@ -49,7 +51,7 @@
                         <xs:element name="Material" type="LengthType"/>
                         <xs:element name="Tracker" type="LengthType"/>
                         <xs:element name="Invisible" type="LengthType"/>
-                        <xs:element name="Tracker_Element" type="PartType" maxOccurs="unbounded"></xs:element>
+                        <xs:element name="Tracker_Element" type="FileReferenceType" maxOccurs="unbounded"></xs:element>
                     </xs:sequence>
                     <xs:attribute name="name"/>
                 </xs:complexType>
@@ -97,10 +99,11 @@
     </xs:complexType>
     <xs:complexType name="Detector_InformationType">
         <xs:sequence>
-            <xs:element name="TOF" maxOccurs="3"/>
-            <xs:element name="KL"/>
-            <xs:element name="Cherenkov"/>
-            <xs:element name="Tracker" type="TrackerType"/>
+            <xs:element name="TOF" minOccurs="0" maxOccurs="3"/>
+            <xs:element name="KL" minOccurs="0"/>
+            <xs:element name="Cherenkov" minOccurs="0"/>
+            <xs:element name="Tracker" type="TrackerType" minOccurs="0"/>
+            <xs:element name="Tracker_Part" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
 <!--++++++++++++++++++++++++++++++++++TOP TYPES+++++++++++++++++++++++++++++++++++++++++-->
@@ -124,3 +127,13 @@
         </xs:complexType>
     </xs:element>
 </xs:schema>
+
+
+<xs:element name="Station" substitutionGroup="Tracker_Part">
+    <xs:complexType>
+        <xs:sequence>
+            <xs:element name="Position" type="PositionType"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+</xs:element>

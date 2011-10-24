@@ -18,7 +18,7 @@
                 <text>
                 {</text>
                 Volume TessellatedSolid
-                PropertyString Material <xsl:value-of select="structure/volume/materialref/@ref"/>
+                PropertyString Material <xsl:if test="structure/volume/materialref/@ref = 'ALUMINUM'">Al</xsl:if>
                 PropertyDouble BlueColour 0.75
                 PropertyDouble GreenColour 0.3
                 PropertyDouble RedColour 0.75
@@ -40,6 +40,7 @@
                 <xsl:for-each select="solids/tessellated/quadrangular">
                     PropertyString QFacet<xsl:number/><xsl:text> </xsl:text><xsl:value-of select="translate(@vertex1, 'v', '')"/><xsl:text> </xsl:text><xsl:value-of select="translate(@vertex2, 'v', '')"/><xsl:text> </xsl:text><xsl:value-of select="translate(@vertex3, 'v', '')"/><xsl:text> </xsl:text><xsl:value-of select="translate(@vertex4, 'v', '')"/>
                 </xsl:for-each>
+		}
             </body>            
         </html>
     </xsl:template>
