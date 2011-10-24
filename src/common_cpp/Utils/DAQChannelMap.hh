@@ -37,6 +37,7 @@
  */
 class DAQChannelKey {
  public:
+
   DAQChannelKey()
   :_ldcId(-999), _geo(-999), _channel(-999), _eqType(-999), _detector("unknown") {}
 
@@ -60,10 +61,10 @@ class DAQChannelKey {
   */
   std::string str();
 
-  int ldc()     {return _ldcId;}
-  int geo()     {return _geo;}
-  int channel() {return _channel;}
-  int eqType()  {return _eqType;}
+  int ldc() const {return _ldcId;}
+  int geo() const {return _geo;}
+  int channel() const {return _channel;}
+  int eqType() const {return _eqType;}
 
   /**  This function creates unique integer identifier.
   * \return Integer identifier.
@@ -71,6 +72,7 @@ class DAQChannelKey {
   int make_DAQChannelKey_id() { return _ldcId*1e8 + _geo*1e6 + _channel*1e3 + _eqType; }
 
  private:
+
   /// Id number of the Local Data Concentrator (DAQ computer).
   int _ldcId;
 
@@ -94,6 +96,7 @@ class DAQChannelKey {
  */
 class DAQChannelMap {
  public:
+
   DAQChannelMap() {}
   virtual ~DAQChannelMap();
 

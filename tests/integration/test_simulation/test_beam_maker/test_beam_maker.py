@@ -45,8 +45,6 @@ BIN_N = 20
 N_SPILLS = 1000
 WEIGHTS_TO_PID = {-11:0.08, 211:0.02, -13:0.90}
 
-SETUP_DONE = False
-
 def make_plot_dir():
     """
     Make a directory to contain plots from this test
@@ -61,15 +59,19 @@ def run_simulations():
     Run simulation to generate some data. We only want to do this once, so I
     pull it out into a separate part of the test.
     """
+    out = open('test_beam_maker_output.out', 'w')
     subproc = subprocess.Popen([SIM_PATH, '-configuration_file', \
-                           os.path.join(TEST_DIR, 'default_beam_config.py')])
+                           os.path.join(TEST_DIR, 'default_beam_config.py')], \
+                           stdout = out)
     subproc.wait()
     os.rename('simulation.out', DEF_SIM)
 
     subproc = subprocess.Popen([SIM_PATH, '-configuration_file', \
-                           os.path.join(TEST_DIR, 'binomial_beam_config.py')])
+                           os.path.join(TEST_DIR, 'binomial_beam_config.py')], \
+                           stdout = out)
     subproc.wait()
     os.rename('simulation.out', BIN_SIM)
+    out.close()
 
 class BeamMakerTest(unittest.TestCase): # pylint: disable = R0904
     """
@@ -77,15 +79,14 @@ class BeamMakerTest(unittest.TestCase): # pylint: disable = R0904
     checks that we can parse the beam configuration through all the simulation
     bureaucracy correctly and also that the generated distributions are correct.
     """
-    def setUp(self):
+    def setUp(self): #pylint: disable = C0103
         """
         run tests the first time the class is instantiated
         """
-        global SETUP_DONE
-        if not SETUP_DONE:
+        if not self.setup_done:
             make_plot_dir()
             run_simulations()
-            SETUP_DONE = True
+            self.setup_done = True
 
     def test_defaults(self):
         """
@@ -222,6 +223,8 @@ class BeamMakerTest(unittest.TestCase): # pylint: disable = R0904
         self.assertGreater(ks_value, 1e-3)
         canvas.Update()
         canvas.Print(PLOT_DIR+"/uniform_time_distribution_test.png")
+
+    setup_done = False
 
 if __name__ == "__main__":
     unittest.main()

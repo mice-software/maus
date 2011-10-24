@@ -33,6 +33,8 @@ namespace MAUS {
 //                pass by value...
 //                Need to think about how we handle "non recoverable" (meaning
 //                memory problem or something - should exit)
+//                I think the python interface done in MAUSEvaluator.hh is more
+//                straightforward - worth doing things that way...
 
 /** @class CppErrorHandler
  *  \brief Handler for c++ errors

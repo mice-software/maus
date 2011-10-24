@@ -1,7 +1,0 @@
-YOU MUST PASS STYLE GUIDES AND STATIC CODE ANALYZERS TO COMMIT IN THIS FOLDER AND SUBFOLDERS
-
-All macros were clean as of April 1st, 2011:
-
-load_test.py  simulate_mice.py
-
-So a strick style guide applies to this folder

@@ -19,10 +19,11 @@
 
 InputCppDAQData::InputCppDAQData(std::string pDataPath,
                                    std::string pRunNum) {
+  _classname = "InputCppDAQData";
   _eventPtr = NULL;
   _dataPaths = pDataPath;
   _datafiles = pRunNum;
-
+  _daqEventsCount = 0;
   _v1290PartEventProc = NULL;
   _v1724PartEventProc = NULL;
   _v1731PartEventProc = NULL;
@@ -33,6 +34,20 @@ InputCppDAQData::InputCppDAQData(std::string pDataPath,
 
 
 bool InputCppDAQData::birth(std::string jsonDataCards) {
+  if ( _dataFileManager.GetNFiles() ) {
+     return false;  // Faile because files are already open
+  }
+
+  _dataFileManager.SetList(_datafiles);
+  _dataFileManager.SetPath(_dataPaths);
+  _dataFileManager.OpenFile();
+  unsigned int nfiles = _dataFileManager.GetNFiles();
+  if (!nfiles) {
+    Squeak::mout(Squeak::error) << "Unable to load any data files." << std::endl;
+    Squeak::mout(Squeak::error) << "Check your run number (or file name) and data path."
+    << std::endl;
+    return false;
+  }
   //  JsonCpp setup
   Json::Value configJSON;   //  this will contain the configuration
   Json::Reader reader;
@@ -43,29 +58,6 @@ bool InputCppDAQData::birth(std::string jsonDataCards) {
     return false;
   }
 
-  if ( _dataFileManager.GetNFiles() ) {
-     return false;  // Faile because files are already open
-  }
-
-  //
-  if (_dataPaths == "") {
-      assert(configJSON.isMember("daq_data_path"));
-      _dataPaths = configJSON["daq_data_path"].asString();
-  }
-  if (_datafiles == "") {
-      assert(configJSON.isMember("daq_data_file"));
-      _datafiles = configJSON["daq_data_file"].asString();
-  }
-  _dataFileManager.SetList(_datafiles);
-  _dataFileManager.SetPath(_dataPaths);
-  _dataFileManager.OpenFile();
-  unsigned int nfiles = _dataFileManager.GetNFiles();
-  if (!nfiles) {
-    Squeak::mout(Squeak::error) << "Unable to load any data files from "
-          << "daq_data_path " <<_dataPaths << " and daq_data_file "
-          <<  _datafiles << std::endl;
-    return false;
-  }
   assert(configJSON.isMember("DAQ_cabling_file"));
   std::string map_file_name = configJSON["DAQ_cabling_file"].asString();
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
@@ -164,6 +156,10 @@ bool InputCppDAQData::birth(std::string jsonDataCards) {
     this->disableEquipment("DBB");
   }
 
+  // Set the number of DAQ events to be processed.
+  assert(configJSON.isMember("Number_of_DAQ_Events"));
+  _maxNumDaqEvents = configJSON["Number_of_DAQ_Events"].asInt();
+
   // _dataProcessManager.DumpProcessors();
 
   return true;
@@ -171,6 +167,12 @@ bool InputCppDAQData::birth(std::string jsonDataCards) {
 
 
 bool InputCppDAQData::readNextEvent() {
+  // Check the max number of DAQ events.
+  // If it is negative, run until the end of the loaded DATE files.
+  if (_maxNumDaqEvents > -1)
+    if (_daqEventsCount >= _maxNumDaqEvents)
+      return false;
+
   // Use the MDfileManager object to get the next event.
   _eventPtr = _dataFileManager.GetNextEvent();
   if (!_eventPtr)
@@ -210,15 +212,39 @@ std::string InputCppDAQData::getCurEvent() {
   }
   // Deal with exceptions
   catch(MDexception & lExc) {
-    Squeak::mout(Squeak::error) << "Unpacking exception,  DAQ Event skipped" << std::endl;
+    Squeak::mout(Squeak::error) << "InputCppDAQData : Unpacking exception." <<
+    std::endl << "DAQ Event skipped!" << std::endl;
     Squeak::mout(Squeak::error) <<  lExc.GetDescription() << endl;
+    xDocSpill.clear();
+    Json::Value errors;
+    std::stringstream ss;
+    ss << _classname << " says:" << lExc.GetDescription() << "  Phys. Event "
+    << _dataProcessManager.GetPhysEventNumber() << " skipped!";
+    errors["bad_data_input"] = ss.str();
+    xDocRoot["errors"] = errors;
   }
   catch(std::exception & lExc) {
-    Squeak::mout(Squeak::error) << "Standard exception" << std::endl;
+    Squeak::mout(Squeak::error) << "InputCppDAQData : Standard exception."
+    << std::endl << "DAQ Event skipped!" << std::endl;
     Squeak::mout(Squeak::error) << lExc.what() << std::endl;
+    xDocSpill.clear();
+    Json::Value errors;
+    std::stringstream ss;
+    ss << _classname << " says:" << lExc.what() << " Phys. Event "
+    << _dataProcessManager.GetPhysEventNumber() << " skipped!";
+    errors["bad_data_input"] = ss.str();
+    xDocRoot["errors"] = errors;
   }
   catch(...) {
-    Squeak::mout(Squeak::error) << "Unknown exception occurred..." << std::endl;
+    Squeak::mout(Squeak::error) << "InputCppDAQData : Unknown exception occurred."
+    << std::endl << "DAQ Event skipped!" << std::endl;
+    xDocSpill.clear();
+    Json::Value errors;
+    std::stringstream ss;
+    ss << _classname << " says: Unknown exception occurred. Phys. Event "
+    << _dataProcessManager.GetPhysEventNumber() << " skipped!";
+    errors["bad_data_input"] = ss.str();
+    xDocRoot["errors"] = errors;
   }
 
   // Finally attach the spill to the document root
@@ -228,6 +254,7 @@ std::string InputCppDAQData::getCurEvent() {
   xDocRoot["daq_event_type"] = event_type_to_str(event_type);
   // cout<<xDocRoot<<endl;
 
+  _daqEventsCount++;
   return xJSONWr.write(xDocRoot);
 }
 
@@ -272,7 +299,7 @@ std::string InputCppDAQData::event_type_to_str(int pType) {
 
     default :
       std::stringstream xConv;
-      xConv << pType << " (unknown)";
+      xConv << pType << "unknown";
       event_type = xConv.str();
       break;
   }
