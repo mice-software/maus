@@ -27,7 +27,7 @@ echo "   http://micewww.pp.rl.ac.uk/projects/maus/issues/new"
 echo
 echo "so we can build up a database of errors people have seen and how they"
 echo "solved them.  Be sure to attach the files:"
-echo 
+echo
 echo "   $FILE_STD"
 echo "   $FILE_ERR"
 echo
@@ -51,5 +51,5 @@ echo "Build MAUS"
 scons build || (echo "FAIL! See logs.x" && exit 1)  2>>$FILE_ERR 1>>$FILE_STD
 
 echo "Run the tests"
-./run_tests.bash || (echo "FAIL!  See logs." && exit 1) 2>>$FILE_ERR 1>>$FILE_STD
+./tests/run_tests.bash || (echo "FAIL!  See logs." && exit 1) 2>>$FILE_ERR 1>>$FILE_STD
 
