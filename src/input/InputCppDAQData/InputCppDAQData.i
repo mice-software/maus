@@ -8,10 +8,8 @@
 
 %feature("shadow") InputCppDAQData::emitter() %{
 def emitter(self):
-  spill = self.getNextSpill()
-  while ( spill != ""):
-    yield spill
-    spill = self.getNextSpill()
+  while (self.readNextEvent()):
+    yield self.getCurEvent()
 %}
 
 %include "InputCppDAQData.hh"
