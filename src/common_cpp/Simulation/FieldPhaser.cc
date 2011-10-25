@@ -21,7 +21,7 @@
 #include "src/common_cpp/Simulation/FieldPhaser.hh"
 
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
-#include "src/legacy/Simulation/MICEPhysicsList.hh"
+#include "src/common_cpp/Simulation/MAUSPhysicsList.hh"
 #include "src/legacy/Interface/VirtualHit.hh"
 
 namespace MAUS {

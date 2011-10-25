@@ -48,6 +48,13 @@ Json::Value SetupConfig() {
   config["keep_steps"] = true;
   config["verbose_level"] = 2;
   config["geant4_visualisation"] = false;
+  config["physics_model"] = "QGSP_BERT";
+  config["reference_physics_processes"] = "mean_energy_loss";
+  config["physics_processes"] = "standard";
+  config["particle_decay"] = true;
+  config["charged_pion_half_life"] = -1.;
+  config["muon_half_life"] = -1.;
+  config["production_threshold"] = 0.5;
   return config;
 }
 

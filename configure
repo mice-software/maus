@@ -89,21 +89,21 @@ if [ "${python_version}" != "Python 2.7" ]
 then               ##################################################
     if [ ! -f "env.sh" ]
     then
-	echo "WARNING: Unsupported python version (You are using ${python_version}),";
-	echo "WARNING: so using Python 2.7 is recommended.  MAUS will install extra";
-	echo "WARNING: packages in this location like numpy and xboa and currently";
-	echo "WARNING: the way we go about this is having our own Python install.";
-	echo "WARNING: ";
-	echo "WARNING: To install within MAUS, set the MAUS_ROOT_DIR";
-	echo "WARNING: environmental variable.  For Bourne-compatible";
-	echo "WARNING: shells like 'bash', run:";
-	echo "WARNING: ";
-	echo "WARNING:       export MAUS_ROOT_DIR=\"${maus_root_dir}\"";
-	echo "WARNING: ";
-	echo "WARNING: then run the following to install Python 2.7:"
-	echo "WARNING: ";
-	echo "WARNING:       ./third_party/bash/01python.bash";
-	echo
+        echo "WARNING: Unsupported python version (You are using ${python_version}),";
+        echo "WARNING: so using Python 2.7 is recommended.  MAUS will install extra";
+        echo "WARNING: packages in this location like numpy and xboa and currently";
+        echo "WARNING: the way we go about this is having our own Python install.";
+        echo "WARNING: ";
+        echo "WARNING: To install within MAUS, set the MAUS_ROOT_DIR";
+        echo "WARNING: environmental variable.  For Bourne-compatible";
+        echo "WARNING: shells like 'bash', run:";
+        echo "WARNING: ";
+        echo "WARNING:       export MAUS_ROOT_DIR=\"${maus_root_dir}\"";
+        echo "WARNING: ";
+        echo "WARNING: then run the following to install Python 2.7:"
+        echo "WARNING: ";
+        echo "WARNING:       ./third_party/bash/01python.bash";
+        echo
     fi
 fi
 
@@ -111,19 +111,19 @@ fi
 type -P scons &>/dev/null || {
     if [ ! -f "env.sh" ]
     then
-	echo "WARNING: Scons is required to proceed after this step"
-	echo "WARNING:"
-	echo "WARNING: To install within MAUS, set the MAUS_ROOT_DIR";
-	echo "WARNING: environmental variable.  For Bourne-compatible";
-	echo "WARNING: shells like 'bash', run:";
-	echo "WARNING: ";
-	echo "WARNING:       export MAUS_ROOT_DIR=\"${maus_root_dir}\"";
-	echo "WARNING: ";
-	echo "WARNING: then run the following to install Scons:" >&2;
-	echo "WARNING:" >&2;
-	echo "WARNING:      ./third_party/bash/40python_extras.bash";
-	echo "WARNING:";
-	echo
+        echo "WARNING: Scons is required to proceed after this step"
+        echo "WARNING:"
+        echo "WARNING: To install within MAUS, set the MAUS_ROOT_DIR";
+        echo "WARNING: environmental variable.  For Bourne-compatible";
+        echo "WARNING: shells like 'bash', run:";
+        echo "WARNING: ";
+        echo "WARNING:       export MAUS_ROOT_DIR=\"${maus_root_dir}\"";
+        echo "WARNING: ";
+        echo "WARNING: then run the following to install Scons:" >&2;
+        echo "WARNING:" >&2;
+        echo "WARNING:      ./third_party/bash/40python_extras.bash";
+        echo "WARNING:";
+        echo
     fi
     }
 
@@ -210,6 +210,11 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      export G4RADIOACTIVEDATA"=\${G4INSTALL}/data/RadioactiveDecay3.2/"
 
      export MICEFILES="\${MAUS_ROOT_DIR}/src/legacy/FILES"
+
+     export maus_no_optimize=0 # force gcc not to optimise
+     export maus_lcov=0 # enable cpp coverage - requires lcov
+     export maus_debug=0 # enable debugging
+     export maus_gprof=0 # enable cpp profiling - requires gprof
 
      echo "SUCCESS: MAUS setup"
 else

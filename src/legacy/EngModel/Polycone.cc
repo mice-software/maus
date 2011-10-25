@@ -106,12 +106,12 @@ void Polycone::GetNumberOfCoordinates(std::istream & fin)
 
 void Polycone::GetUnits(std::istream & fin)
 {
-	MICEUnits theUnits;
+	MAUS::MAUSEvaluator theUnits;
 	std::string key="", unitsString="";
 	while(fin && key!="Units")
 		fin >> key;
 	fin >> unitsString;
-	_units = theUnits.GetUnits(unitsString);
+	_units = theUnits.evaluate(unitsString);
 	//skip rest of line
 	std::getline(fin, key);
 	if(!fin) throw(Squeal(Squeal::nonRecoverable, "Error in polycone input", "Polcone.cc::GetUnits()"));
