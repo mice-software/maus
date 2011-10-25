@@ -7,7 +7,7 @@ then
     rm $FILE_STD
 fi
 
-FILE_ERR=install_log_std
+FILE_ERR=install_log_err
 
 if [ -f $FILE_ERR ];
 then
