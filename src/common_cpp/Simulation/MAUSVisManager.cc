@@ -147,6 +147,8 @@ void MAUSVisManager::SetupRun() {
                    STLUtils::ToString(theta)+" "+STLUtils::ToString(phi));
   ApplyCommand("/vis/drawVolume");
   ApplyCommand("/tracking/storeTrajectory 1");
+  ApplyCommand("/vis/scene/endOfEventAction accumulate");
+  ApplyCommand("/vis/scene/endOfRunAction accumulate");
   ApplyCommand("/vis/scene/add/trajectories");
 }
 

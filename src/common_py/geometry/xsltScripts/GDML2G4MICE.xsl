@@ -8,7 +8,7 @@
             <xd:p/>
         </xd:desc>
     </xd:doc>
-
+<!-- this is a comment -->
     <xsl:output method="text"/>
     <xsl:template match="gdml">
         <html>

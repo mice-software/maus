@@ -1,0 +1,52 @@
+
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDm1152m9327.dat
+                {
+                Position -0.0000 362.5000 -362.5000 mm
+                Rotation  90.0 0.0 0.0 deg    
+                }
+                
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDm1152m9327.dat
+                {
+                Position -0.0000 -362.5000 362.5000 mm
+                Rotation  270.0 0.0 0.0 deg    
+                }
+                
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDm1152m9327.dat
+                {
+                Position -0.0000 -362.5000 -362.5000 mm
+                Rotation  180.0 0.0 0.0 deg    
+                }
+                
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDm1152m9327.dat
+                {
+                Position -0.0000 362.5000 362.5000 mm
+                Rotation  0.0 0.0 0.0 deg    
+                }
+
+
+                
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDm1152m9323.dat
+                {
+                Position 403.0000 455.0232 455.0232 mm
+                Rotation  270.0 0.0 0.0 deg    
+                }
+                
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDm1152m9323.dat
+                {
+                Position 403.0000 455.0232 -455.0232 mm
+                Rotation  0.0 0.0 0.0 deg    
+                }
+
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDm1152m9315.dat
+                {
+                Position -403.0000 405.1416 -405.1416 mm
+                Rotation  90.0 0.0 0.0 deg    
+                }
+                
+                Module /home/matt/maus-littlefield/src/common_py/geometry/Download/TDm1152m9323moa15.dat
+                {
+                Position 403.0000 -455.0232 455.0232 mm
+                Rotation  0.0 0.0 0.0 deg    
+                }
+                
+                

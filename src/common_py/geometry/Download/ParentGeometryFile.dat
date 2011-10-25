@@ -1,0 +1,14 @@
+Configuration CAD_Quad
+                
+                {
+                Dimensions 15000.0 1000.0 5000.0 mm 
+                PropertyString Material AIR
+                PropertyDouble G4StepMax 5.0 mm
+                
+		Module /home/matt/maus-littlefield/src/common_py/geometry/Download/Quad.dat
+                {
+                Position  0.0 0.0 0.0 mm
+                Rotation  0.0 0.0 0.0 deg    
+                }
+
+		}
