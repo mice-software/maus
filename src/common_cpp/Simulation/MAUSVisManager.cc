@@ -17,6 +17,8 @@
 
 #include "src/common_cpp/Simulation/MAUSVisManager.hh"
 
+#include <G4TrajectoryDrawByParticleID.hh>
+
 #include <G4VRML1File.hh>
 #include <G4VRML2File.hh>
 #include <G4HepRepFile.hh>
@@ -121,6 +123,20 @@ void MAUSVisManager::RegisterGraphicsSystems() {
   PrintAvailableGraphicsSystems();
 }
 
+G4Color MAUSVisManager::GetColourValues(std::string particle_type, Json::Value conf){
+  Json::Value particle = JsonWrapper::GetProperty
+           (conf, particle_type + "_vis_colour", JsonWrapper::objectValue);
+  double red = JsonWrapper::GetProperty
+           (particle, "red", JsonWrapper::realValue).asDouble();
+  double green = JsonWrapper::GetProperty
+           (particle, "green", JsonWrapper::realValue).asDouble();
+  double blue = JsonWrapper::GetProperty
+           (particle, "blue", JsonWrapper::realValue).asDouble();
+  G4ThreeVector colours(red, green, blue);  
+  return G4Color(colours);
+}
+
+
 // needs error handling
 void MAUSVisManager::SetupRun() {
   Json::Value& conf = *MICERun::getInstance()->jsonConfiguration;
@@ -134,6 +150,8 @@ void MAUSVisManager::SetupRun() {
            (conf, "visualisation_zoom", JsonWrapper::realValue).asDouble();
   int verbose = JsonWrapper::GetProperty
            (conf, "verbose_level", JsonWrapper::intValue).asInt();
+  int accumulate = JsonWrapper::GetProperty
+           (conf, "accumulate_tracks", JsonWrapper::intValue).asInt();
 
   if (verbose > 0) {
       // doesnt seem to work - writes to std::cerr regardless... set
@@ -147,10 +165,32 @@ void MAUSVisManager::SetupRun() {
                    STLUtils::ToString(theta)+" "+STLUtils::ToString(phi));
   ApplyCommand("/vis/drawVolume");
   ApplyCommand("/tracking/storeTrajectory 1");
-  ApplyCommand("/vis/scene/endOfEventAction accumulate");
-  ApplyCommand("/vis/scene/endOfRunAction accumulate");
+  if (accumulate > 0){
+      ApplyCommand("/vis/scene/endOfEventAction accumulate");
+      ApplyCommand("/vis/scene/endOfRunAction accumulate");
+  }
   ApplyCommand("/vis/scene/add/trajectories");
+  
+  //create new drawByParticleID to change particle colours
+  G4TrajectoryDrawByParticleID* model = new G4TrajectoryDrawByParticleID;
+  
+  //configure model
+  model->SetDefault(GetColourValues("default", conf));
+  model->Set("pi+", GetColourValues("pi_plus", conf));
+  model->Set("pi-", GetColourValues("pi_minus", conf));
+  model->Set("mu+", GetColourValues("mu_plus", conf));
+  model->Set("mu-", GetColourValues("mu_minus", conf));
+  model->Set("e+", GetColourValues("e_plus", conf));
+  model->Set("e-", GetColourValues("e_minus", conf));
+  model->Set("gamma", GetColourValues("gamma", conf));
+  model->Set("neutron", GetColourValues("neutron", conf));
+  model->Set("photon", GetColourValues("photon", conf));
+
+  //Register model with visualization manager
+  RegisterModel(model);
+
 }
+ 
 
 void MAUSVisManager::TearDownRun() {
   ApplyCommand("/vis/viewer/flush");
