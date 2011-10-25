@@ -19,35 +19,22 @@
 
 InputCppDAQData::InputCppDAQData(std::string pDataPath,
                                    std::string pRunNum) {
-  _classname = "InputCppDAQData";
   _eventPtr = NULL;
   _dataPaths = pDataPath;
   _datafiles = pRunNum;
-  _daqEventsCount = 0;
+
   _v1290PartEventProc = NULL;
   _v1724PartEventProc = NULL;
   _v1731PartEventProc = NULL;
   _v830FragmentProc = NULL;
   _vLSBFragmentProc = NULL;
   _DBBFragmentProc = NULL;
+
+  _next_event = Json::Value();
 }
 
 
 bool InputCppDAQData::birth(std::string jsonDataCards) {
-  if ( _dataFileManager.GetNFiles() ) {
-     return false;  // Faile because files are already open
-  }
-
-  _dataFileManager.SetList(_datafiles);
-  _dataFileManager.SetPath(_dataPaths);
-  _dataFileManager.OpenFile();
-  unsigned int nfiles = _dataFileManager.GetNFiles();
-  if (!nfiles) {
-    Squeak::mout(Squeak::error) << "Unable to load any data files." << std::endl;
-    Squeak::mout(Squeak::error) << "Check your run number (or file name) and data path."
-    << std::endl;
-    return false;
-  }
   //  JsonCpp setup
   Json::Value configJSON;   //  this will contain the configuration
   Json::Reader reader;
@@ -58,6 +45,29 @@ bool InputCppDAQData::birth(std::string jsonDataCards) {
     return false;
   }
 
+  if ( _dataFileManager.GetNFiles() ) {
+     return false;  // Faile because files are already open
+  }
+
+  //
+  if (_dataPaths == "") {
+      assert(configJSON.isMember("daq_data_path"));
+      _dataPaths = configJSON["daq_data_path"].asString();
+  }
+  if (_datafiles == "") {
+      assert(configJSON.isMember("daq_data_file"));
+      _datafiles = configJSON["daq_data_file"].asString();
+  }
+  _dataFileManager.SetList(_datafiles);
+  _dataFileManager.SetPath(_dataPaths);
+  _dataFileManager.OpenFile();
+  unsigned int nfiles = _dataFileManager.GetNFiles();
+  if (!nfiles) {
+    Squeak::mout(Squeak::error) << "Unable to load any data files from "
+          << "daq_data_path " <<_dataPaths << " and daq_data_file "
+          <<  _datafiles << std::endl;
+    return false;
+  }
   assert(configJSON.isMember("DAQ_cabling_file"));
   std::string map_file_name = configJSON["DAQ_cabling_file"].asString();
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
@@ -156,10 +166,6 @@ bool InputCppDAQData::birth(std::string jsonDataCards) {
     this->disableEquipment("DBB");
   }
 
-  // Set the number of DAQ events to be processed.
-  assert(configJSON.isMember("Number_of_DAQ_Events"));
-  _maxNumDaqEvents = configJSON["Number_of_DAQ_Events"].asInt();
-
   // _dataProcessManager.DumpProcessors();
 
   return true;
@@ -167,12 +173,6 @@ bool InputCppDAQData::birth(std::string jsonDataCards) {
 
 
 bool InputCppDAQData::readNextEvent() {
-  // Check the max number of DAQ events.
-  // If it is negative, run until the end of the loaded DATE files.
-  if (_maxNumDaqEvents > -1)
-    if (_daqEventsCount >= _maxNumDaqEvents)
-      return false;
-
   // Use the MDfileManager object to get the next event.
   _eventPtr = _dataFileManager.GetNextEvent();
   if (!_eventPtr)
@@ -181,7 +181,7 @@ bool InputCppDAQData::readNextEvent() {
   return true;
 }
 
-std::string InputCppDAQData::getCurEvent() {
+bool InputCppDAQData::getCurEvent() {
   // Create new Json documents.
   Json::Value xDocRoot;  // Root of the event
   Json::FastWriter xJSONWr;
@@ -212,50 +212,26 @@ std::string InputCppDAQData::getCurEvent() {
   }
   // Deal with exceptions
   catch(MDexception & lExc) {
-    Squeak::mout(Squeak::error) << "InputCppDAQData : Unpacking exception." <<
-    std::endl << "DAQ Event skipped!" << std::endl;
+    Squeak::mout(Squeak::error) << "Unpacking exception,  DAQ Event skipped" << std::endl;
     Squeak::mout(Squeak::error) <<  lExc.GetDescription() << endl;
-    xDocSpill.clear();
-    Json::Value errors;
-    std::stringstream ss;
-    ss << _classname << " says:" << lExc.GetDescription() << "  Phys. Event "
-    << _dataProcessManager.GetPhysEventNumber() << " skipped!";
-    errors["bad_data_input"] = ss.str();
-    xDocRoot["errors"] = errors;
   }
   catch(std::exception & lExc) {
-    Squeak::mout(Squeak::error) << "InputCppDAQData : Standard exception."
-    << std::endl << "DAQ Event skipped!" << std::endl;
+    Squeak::mout(Squeak::error) << "Standard exception" << std::endl;
     Squeak::mout(Squeak::error) << lExc.what() << std::endl;
-    xDocSpill.clear();
-    Json::Value errors;
-    std::stringstream ss;
-    ss << _classname << " says:" << lExc.what() << " Phys. Event "
-    << _dataProcessManager.GetPhysEventNumber() << " skipped!";
-    errors["bad_data_input"] = ss.str();
-    xDocRoot["errors"] = errors;
   }
   catch(...) {
-    Squeak::mout(Squeak::error) << "InputCppDAQData : Unknown exception occurred."
-    << std::endl << "DAQ Event skipped!" << std::endl;
-    xDocSpill.clear();
-    Json::Value errors;
-    std::stringstream ss;
-    ss << _classname << " says: Unknown exception occurred. Phys. Event "
-    << _dataProcessManager.GetPhysEventNumber() << " skipped!";
-    errors["bad_data_input"] = ss.str();
-    xDocRoot["errors"] = errors;
+    Squeak::mout(Squeak::error) << "Unknown exception occurred..." << std::endl;
   }
 
   // Finally attach the spill to the document root
-  xDocRoot["daq_data"] = xDocSpill;
+  xDocRoot["event_data"] = xDocSpill;
   xDocRoot["spill_num"] = _dataProcessManager.GetSpillNumber();
   unsigned int event_type = _dataProcessManager.GetEventType();
   xDocRoot["daq_event_type"] = event_type_to_str(event_type);
   // cout<<xDocRoot<<endl;
 
-  _daqEventsCount++;
-  return xJSONWr.write(xDocRoot);
+  _next_event = xDocRoot;
+  return true;
 }
 
 bool InputCppDAQData::death() {
@@ -299,16 +275,64 @@ std::string InputCppDAQData::event_type_to_str(int pType) {
 
     default :
       std::stringstream xConv;
-      xConv << pType << "unknown";
+      xConv << pType << " (unknown)";
       event_type = xConv.str();
       break;
   }
   return event_type;
 }
 
+std::string InputCppDAQData::getNextEvent() {
+  Json::FastWriter xJsonWr;
+  if (readNextEvent()) {
+    getCurEvent();
+    return xJsonWr.write(_next_event);
+  }
+  return "";
+}
 
+int InputCppDAQData::getSpillNumber(Json::Value xDocRoot) {
+  assert(xDocRoot.isMember("spill_num"));
+  return xDocRoot["spill_num"].asInt();
+}
 
+std::string InputCppDAQData::getNextSpill() {
+  // we need to check spill number for next event to decide whether it should
+  // be added to the spill; means the first event for the next spill gets filled
+  // on the previous loop, which makes the logic a bit more obscure
+  Json::FastWriter xJsonWr;
 
+  Json::Value spill(Json::objectValue);
+  spill["daq_data"] = Json::Value(Json::arrayValue);
+  if (_next_event.isNull()) { // if first event, call unpack once
+    getNextEvent();
+    if (_next_event.isNull()) {
+      return "";
+    }
+  }
+  // next event is always the first event of this spill
+  int spill_number = getSpillNumber(_next_event);
+  spill["daq_data"].append(_next_event);
+
+  // loop over events; if the spill number changes, then we're done
+  bool finished = true;
+  while (_eventPtr != NULL) {
+    getNextEvent();
+    finished = false;
+    if (getSpillNumber(_next_event) != spill_number) {
+      return xJsonWr.write(spill);
+    }
+    if (_eventPtr) {
+      spill["daq_data"].append(_next_event);
+    }
+  }
+
+  // for the last spill, getNextEvent() goes false but spill buffer not empty
+  if (!finished) {
+    return xJsonWr.write(spill);
+  }
+  return "";
+}
 
 
 
