@@ -90,7 +90,7 @@ class GoTestCase(unittest.TestCase): #pylint: disable = R0904
         with self.assertRaises(SystemExit):
             Go(inputer, transformer, merger, outputer, command_line_args = True)
 
-        sys.argv = [arg_temp[0], "-verbose_level", "1"]
+        sys.argv = [arg_temp[0], "--verbose_level", "1"]
         Go(inputer, transformer, merger, outputer, command_line_args = True)
 
         sys.argv = arg_temp

@@ -94,7 +94,7 @@ class ConfigurationTestCase(unittest.TestCase): #pylint: disable = R0904
 
     def test_command_line_args_str(self):
         """Test parsing string from command line to configuration"""
-        sys.argv = ["", "-input_string", "test_in"]
+        sys.argv = ["", "--input_string", "test_in"]
         test_out = Configuration().command_line_arguments({
                                                       "input_string":""})
         self.assertEqual(test_out["input_string"], "test_in")
@@ -102,44 +102,44 @@ class ConfigurationTestCase(unittest.TestCase): #pylint: disable = R0904
 
     def test_command_line_args_number(self):
         """Test parsing number from command line to configuration"""
-        sys.argv = ["", "-input_int", "10"] # int as int okay
+        sys.argv = ["", "--input_int", "10"] # int as int okay
         test_out = Configuration().command_line_arguments({
                                                       "input_int":0})
         self.assertEqual(test_out["input_int"], 10)
 
-        sys.argv = ["", "-input_float", "10.1"] # float as int -> error
+        sys.argv = ["", "--input_float", "10.1"] # float as int -> error
         self.assertRaises(ValueError, Configuration().command_line_arguments, {
                                                       "input_float":0}) # int
 
-        sys.argv = ["", "-input_float", "10"] # int as float -> float
+        sys.argv = ["", "--input_float", "10"] # int as float -> float
         test_out = Configuration().command_line_arguments({
                                                       "input_float":0.})
         self.assertEqual(type(test_out["input_float"]), type(10.))
         self.assertAlmostEqual(test_out["input_float"], float(10))
 
-        sys.argv = ["", "-input_float", "10."]# float as float -> float
+        sys.argv = ["", "--input_float", "10."]# float as float -> float
         test_out = Configuration().command_line_arguments({
                                                       "input_float":0.})
         self.assertAlmostEqual(test_out["input_float"], 10.)
 
     def test_command_line_args_bool(self):
         """Test parsing bool from command line to configuration"""
-        sys.argv = ["", "-input_bool", "yEs"]
+        sys.argv = ["", "--input_bool", "yEs"]
         test_out = Configuration().command_line_arguments({
                                                       "input_bool":True})
         self.assertEqual(test_out["input_bool"], True)
 
-        sys.argv = ["", "-input_bool", "bob"] 
+        sys.argv = ["", "--input_bool", "bob"] 
         self.assertRaises(ValueError, Configuration().command_line_arguments, 
                                                            {"input_bool":True})
 
     def test_command_line_args_dict(self):
         """Test parsing bool from command line to configuration"""
-        sys.argv = ["", "-input_dict", "{}"]
+        sys.argv = ["", "--input_dict", "{}"]
         self.assertRaises(NotImplementedError, 
                       Configuration().command_line_arguments, {"input_dict":{}})
 
-        sys.argv = ["", "-input_list", "[]"]
+        sys.argv = ["", "--input_list", "[]"]
         self.assertRaises(NotImplementedError,
                       Configuration().command_line_arguments, {"input_list":[]})
 
