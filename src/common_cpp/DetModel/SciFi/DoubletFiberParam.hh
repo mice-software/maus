@@ -32,36 +32,44 @@ class G4Tubs;
  */
 
 class DoubletFiberParam : public G4VPVParameterisation {
-  public:
-    /** @brief Constructor taking the parameters that define the doublet planes
-     *   the parameters are stored at src/Models/Modules/Tracker/
-     */
-    DoubletFiberParam(G4double, G4double, G4double, G4double, G4double, G4double);
+ public:
+  /** @brief Constructor taking the parameters that define the doublet planes
+   *   the parameters are stored at src/Models/Modules/Tracker/
+   */
+  DoubletFiberParam(G4double pSensitiveRadius,
+                    G4double pActiveRadius,
+                    G4double pOuterDiameter,
+                    G4double pInnerDiameter,
+                    G4double pFiberDiameter,
+                    G4double pFiberPitch)
 
-    /** @brief Calculates the transformations needed to instantiate an instance of the SciFi doublet in a certain G4 physical volume
-     */
-    void ComputeTransformation(const G4int copyNo, G4VPhysicalVolume* physVol) const;
+  /** @brief Calculates the transformations needed to instantiate an instance
+      of the SciFi doublet in a certain G4 physical volume
+  */
+  void ComputeTransformation(const G4int copyNo,
+                             G4VPhysicalVolume* physVol) const;
 
-    /** @brief Calculate the dimensions of the fibres that make up a doublet layer
-     */
-    void ComputeDimensions(G4Tubs &, const G4int , const G4VPhysicalVolume*) const;
+  /** @brief Calculate the dimensions of the fibres that make up a doublet layer
+   */
+  void ComputeDimensions(G4Tubs* fiberElement,
+                         const G4int copyNo,
+                         const G4VPhysicalVolume* physVol) const;
 
-    /// the following functions have explicit purpose
-    G4double   getActiveRadius()    const { return activeRadius;  }
-    G4double   getSensitiveRadius() const { return sensitiveRadius; }
-    G4double   getInnerDiameter()   const { return innerDiameter; }
-    G4double   getOuterDiameter()   const { return outerDiameter; }
-    G4double   getFiberDiameter()   const { return fiberDiameter; }
-    G4double   getFiberPitch()      const { return fiberPitch;    }
+  G4double   getActiveRadius()    const { return activeRadius;  }
+  G4double   getSensitiveRadius() const { return sensitiveRadius; }
+  G4double   getInnerDiameter()   const { return innerDiameter; }
+  G4double   getOuterDiameter()   const { return outerDiameter; }
+  G4double   getFiberDiameter()   const { return fiberDiameter; }
+  G4double   getFiberPitch()      const { return fiberPitch;    }
 
-  private:
-    G4double activeRadius;
-    G4double sensitiveRadius;
-    G4double innerDiameter;
-    G4double outerDiameter;
-    G4double fiberDiameter;
-    G4double fiberPitch;
-    G4RotationMatrix* coreRotation;
+ private:
+  G4double activeRadius;
+  G4double sensitiveRadius;
+  G4double innerDiameter;
+  G4double outerDiameter;
+  G4double fiberDiameter;
+  G4double fiberPitch;
+  G4RotationMatrix* coreRotation;
 };
 
 #endif
