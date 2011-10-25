@@ -20,7 +20,6 @@ import base64
 import io
 import json
 import os
-import uuid
 
 class OutputPyImage:
     """
@@ -46,15 +45,14 @@ class OutputPyImage:
 
     The caller can configure the worker and specify:
 
-    -File prefix ("image_file_prefix"). Default: auto-generated
-     UUID. 
+    -File prefix ("image_file_prefix"). Default: "image".
     -Directory for files ("image_directory"). Default: current
      working directory. If the given directory does not exist it
      will be created. This can be absolute or relative.
     """
 
     def __init__(self):
-        self.file_prefix = ""
+        self.file_prefix = "image"
         self.directory = os.getcwd()
 
     def birth(self, config_json):
@@ -71,8 +69,6 @@ class OutputPyImage:
         key = "image_file_prefix"
         if key in config_doc:
             self.file_prefix = config_doc[key]
-        else:
-            self.file_prefix = uuid.uuid4()
 
         key = "image_directory"
         if key in config_doc:

@@ -49,12 +49,22 @@ keep_tracks = False # set to true to keep start and end point of every track
 keep_steps = False # set to true to keep start and end point of every track and
                    # every step point
 simulation_geometry_filename = "Stage6.dat" # geometry used by simulation
-maximum_number_of_steps = 10000
-simulation_reference_particle = {
+maximum_number_of_steps = 10000 # particles are killed after this number of
+                                # steps (assumed to be stuck in the fields)
+simulation_reference_particle = { # used for setting particle phase
     "position":{"x":0.0, "y":-0.0, "z":-5500.0},
     "momentum":{"x":0.0, "y":0.0, "z":1.0},
     "particle_id":-13, "energy":226.0, "time":0.0, "random_seed":10
 }
+
+# geant4 physics model
+physics_model = "QGSP_BERT" # Physics package loaded by MAUS to set default values; modifications can be made
+reference_physics_processes = "mean_energy_loss"
+physics_processes = "standard"
+particle_decay = True # set to true to activate particle decay, or False to inactivate particle decay
+charged_pion_half_life = -1. # set the pi+, pi- half life [ns]. Negative value means use geant4 default
+muon_half_life = -1. # set the mu+, mu- half life [ns]. Negative value means use geant4 default
+production_threshold = 0.5 # set the threshold for delta ray production [mm]
 
 # geant4 visualisation (not event display)
 geant4_visualisation = False
@@ -135,15 +145,6 @@ beam = {
 # this is used by reconstruction
 reconstruction_geometry_filename = simulation_geometry_filename
 
-# tof digitization
-TOFconversionFactor = 0.01 # MeV
-TOFpmtTimeResolution = 0.1 # nanosecond
-TOFattenuationLength = 140 * 10 # mm
-TOFadcConversionFactor = 0.125
-TOFtdcConversionFactor = 0.025 # nanosecond
-TOFpmtQuantumEfficiency = 0.25
-TOFscintLightSpeed =  170.0 # mm/ns
-
 # scifi tracker digitization
 #SciFiDeadChanFName = ""
 SciFiMUXNum = 7
@@ -169,6 +170,7 @@ SciFinStations = 5
 SciFinTrackers = 2
 
 # this is used by ImputCppRealData
+Number_of_DAQ_Events = -1
 Enable_V1290_Unpacking = True
 Enable_V1731_Unpacking = True
 Enable_V1724_Unpacking = True
@@ -184,10 +186,33 @@ Enable_EMR = True
 Enable_KL = True
 Enable_CKOV = True
 DAQ_cabling_file = "/files/cabling/DAQChannelMap.txt"
+
+# tof digitization
+TOFconversionFactor = 0.01 # MeV
+TOFpmtTimeResolution = 0.1 # nanosecond
+TOFattenuationLength = 140 * 10 # mm
+TOFadcConversionFactor = 0.125
+TOFtdcConversionFactor = 0.025 # nanosecond
+TOFpmtQuantumEfficiency = 0.25
+TOFscintLightSpeed =  170.0 # mm/ns
+
+# this is used by the reconstuction of the TOF detectors
+TOF_trigger_station = "tof1"
+#TOF_trigger_station = "tof0"
+TOF_cabling_file = "/files/cabling/TOFChannelMap.txt"
+TOF_TW_calibration_file = "/files/calibration/tofcalibTW.txt"
+TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF1.txt"
+#TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF0.txt"
+TOF_Trigger_calibration_file = "/files/calibration/tofcalibTrigger_trTOF1.txt"
+#TOF_Trigger_calibration_file = "/files/calibration/tofcalibTrigger_trTOF0.txt"
+TOF_findTriggerPixelCut = 0.5 # nanosecond
+TOF_makeSpacePiontCut = 0.5 # nanosecond
+Enable_timeWalk_correction = True
+Enable_triggerDelay_correction = True
+Enable_t0_correction = True
+
 daq_data_path = '%s/src/input/InputCppDAQData' % os.environ.get("MAUS_ROOT_DIR") # path to daq data
 daq_data_file = '02873.003' # file name for daq data
 
 maus_version = "" # set at runtime - do not edit this (changes are ignored)
 configuration_file = "" # should be set on the command line only (else ignored)
-
-
