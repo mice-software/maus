@@ -35,14 +35,17 @@
 
 #include "CLHEP/Vector/Rotation.h"
 
-// NOTE: not sure how Geant4 deals with the deletion of Logical and Solid Volumes;
+// NOTE: not sure how Geant4 deals with the deletion
+// of Logical and Solid Volumes;
 // possible bug in the destructor.
 
 G4int SciFiPlane::SciFi_numFibres = 0;
 
 // SciFiPlane - Specific parameterisation of the SciFi station
 // to be called by the generic MICE detector construction code
-SciFiPlane::SciFiPlane(MiceModule* mod, G4Material* mater, G4VPhysicalVolume *mlv) {
+SciFiPlane::SciFiPlane(MiceModule* mod,
+                       G4Material* mater,
+                       G4VPhysicalVolume *mlv) {
   G4double tr = mod->dimensions().x();
   G4double fd = mod->propertyDouble("FibreDiameter");
   G4double fp = mod->propertyDouble("Pitch");
@@ -56,15 +59,15 @@ SciFiPlane::SciFiPlane(MiceModule* mod, G4Material* mater, G4VPhysicalVolume *ml
   G4String clad1Name = mod->fullName() + "DoubletClad1";
   G4String clad2Name = mod->fullName() + "DoubletClad2";
 
-  /// Getting the rotations right.
-  /// A "z-flip" is a rotation of 180 degrees over the y axis.
-  /// Remember that the rotation matrix for
-  /// a rotation over the y axis is given by:
-  ///
-  ///             [cos(theta)  0    sin(theta)]
-  /// R_y(theta) =[0           1        0     ]
-  ///             [-sin(theta) 0    cos(theta)]
-  ///
+  // Getting the rotations right.
+  // A "z-flip" is a rotation of 180 degrees over the y axis.
+  // Remember that the rotation matrix for
+  // a rotation over the y axis is given by:
+  //
+  //             [cos(theta)  0    sin(theta)]
+  // R_y(theta) =[0           1        0     ]
+  //             [-sin(theta) 0    cos(theta)]
+  //
 
   CLHEP::HepRotation zflip;
   const Hep3Vector rowx(-1., 0, 0);
@@ -77,26 +80,30 @@ SciFiPlane::SciFiPlane(MiceModule* mod, G4Material* mater, G4VPhysicalVolume *ml
   (*trot) = (*trot)*zflip;
 
   // this is a fibre
-  solidDoublet = new G4Tubs(doubletName, 0.0, tr, doubletThickness / 2.0, 0.0 * deg, 360.0 * deg);
+  solidDoublet = new G4Tubs(doubletName, 0.0,
+                            tr, doubletThickness / 2.0,
+                            0.0 * deg, 360.0 * deg);
 
   logicDoublet = new G4LogicalVolume(solidDoublet, mater, doubletName, 0, 0, 0);
 
   physiDoublet = placeCore = new G4PVPlacement(trot, mod->position(),
                                                logicDoublet, doubletName,
-                                               mlv->GetLogicalVolume(), false, 0);
+                                               mlv->GetLogicalVolume(),
+                                               false, 0);
 
-  // lenght of the tube
+  // lenght of the tube of fibre
   G4double tlen = 1.0 * mm;
 
   // the number of fibres to be simulated
-  SciFiPlane::SciFi_numFibres = (G4int)floor(2. * ar / ( 0.5 * fp ));
+  SciFiPlane::SciFi_numFibres = (G4int)floor(2. * ar / (0.5 * fp));
 
   // Beginning of the fiber core definitions
   solidCore = new G4Tubs(coreName, 0.0, cd / 2., tlen, 0.0 * deg, 360.0 * deg);
 
   logicCore = new G4LogicalVolume(solidCore, mater, coreName, 0, 0, 0);
 
-  G4VPVParameterisation* coreParam = new DoubletFiberParam(ar, ar, cd, 0.0, fd, fp / fd);
+  G4VPVParameterisation* coreParam = new DoubletFiberParam(ar, ar, cd,
+                                                           0.0, fd, fp / fd);
 
   physiCore = new G4PVParameterised(coreName, logicCore, physiDoublet,
                                     kUndefined, SciFi_numFibres, coreParam);

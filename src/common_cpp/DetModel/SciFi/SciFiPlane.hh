@@ -45,7 +45,7 @@ class SciFiPlane {
 
   /** @brief Constructor taking information from the SciFiTrackerGeom class
    */
-  SciFiPlane(MiceModule*, G4Material*, G4VPhysicalVolume*);
+  SciFiPlane(MiceModule* mod, G4Material* mater, G4VPhysicalVolume* mlv);
 
   /** @brief Default destructor
    */
