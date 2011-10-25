@@ -1,20 +1,20 @@
-// FILES/Models/Modules/Tracker/TrackerViewV.dat
+// FILES/Models/Modules/Tracker/TrackerViewX.dat
 //
-// The V View of the tracker fibres.
+// The U View of the tracker fibres.
 //
 
-Module TrackerViewV
+Module TrackerViewU
 {
   Volume Cylinder
   Dimensions 18.9 0.06273 cm
   PropertyString Material POLYSTYRENE
   PropertyString SensitiveDetector SciFi
-  PropertyInt Plane 0
-  PropertyDouble ActiveRadius 160. mm
+  PropertyInt Plane 1
+  PropertyDouble ActiveRadius 160.7 mm
   PropertyDouble Pitch 0.427 mm
   PropertyDouble FibreDiameter 0.350 mm
   PropertyDouble CoreDiameter 0.308 mm
-  PropertyDouble CentralFibre 106.5
+  PropertyDouble CentralFibre 107.0
   PropertyBool Invisible 1
   PropertyString G4Detector SciFiPlane
 }
