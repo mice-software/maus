@@ -59,7 +59,7 @@ def run_simulations():
     Run simulation to generate some data. We only want to do this once, so I
     pull it out into a separate part of the test.
     """
-    out = open('test_beam_maker_output.out', 'w')
+    out = open(TMP_PATH+'/test_beam_maker_output.out', 'w')
     subproc = subprocess.Popen([SIM_PATH, '-configuration_file', \
                            os.path.join(TEST_DIR, 'default_beam_config.py')], \
                            stdout = out)
