@@ -41,7 +41,7 @@ class DoubletFiberParam : public G4VPVParameterisation {
                     G4double pOuterDiameter,
                     G4double pInnerDiameter,
                     G4double pFiberDiameter,
-                    G4double pFiberPitch)
+                    G4double pFiberPitch);
 
   /** @brief Calculates the transformations needed to instantiate an instance
       of the SciFi doublet in a certain G4 physical volume
