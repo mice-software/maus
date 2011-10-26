@@ -14,6 +14,16 @@ then
     rm $FILE_ERR
 fi
 
+if [ "${MAUS_ROOT_DIR}" ]; then  # see if the variable exists yet                                                                                                                
+    echo "Your current directory is:"
+    pwd
+    echo
+    echo "Your MAUS_ROOT_DIR is:"
+    echo ${MAUS_ROOT_DIR}
+    echo
+    echo "These should agree"
+fi
+
 echo "   Welcome to the all-in-one MAUS installer script.  This script will"
 echo "take about 1 hour and 7 minutes to run.  You can get the details of the"
 echo "progress (or ensure it is doing something) by running:"
@@ -27,7 +37,7 @@ echo "   http://micewww.pp.rl.ac.uk/projects/maus/issues/new"
 echo
 echo "so we can build up a database of errors people have seen and how they"
 echo "solved them.  Be sure to attach the files:"
-echo 
+echo
 echo "   $FILE_STD"
 echo "   $FILE_ERR"
 echo
@@ -51,5 +61,5 @@ echo "Build MAUS"
 scons build || (echo "FAIL! See logs.x" && exit 1)  2>>$FILE_ERR 1>>$FILE_STD
 
 echo "Run the tests"
-./run_tests.bash || (echo "FAIL!  See logs." && exit 1) 2>>$FILE_ERR 1>>$FILE_STD
+./tests/run_tests.bash || (echo "FAIL!  See logs." && exit 1) 2>>$FILE_ERR 1>>$FILE_STD
 

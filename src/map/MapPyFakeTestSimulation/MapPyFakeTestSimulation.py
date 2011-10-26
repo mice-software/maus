@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 # 
 #  MAUS is free software: you can redistribute it and/or modify
@@ -26,25 +27,30 @@ import types
 import os
 
 class MapPyFakeTestSimulation:
+    """ ___ """ 
     def birth(self, configJSON):
+        """ Setting env variables and prototype json file """
         config = json.loads(configJSON)
-        
+ 
         root_dir = os.environ.get("MAUS_ROOT_DIR")
         assert root_dir != None
         assert os.path.isdir(root_dir)
 
-        self._filename = '%s/src/map/MapPyFakeTestSimulation/mausput_with_tracks'  % root_dir
+        self._filename = \
+        '%s/src/map/MapPyFakeTestSimulation/mausput_digits' % root_dir
         assert os.path.isfile(self._filename)
 
         self._file = open(self._filename, 'r')
         self._document = self._file.readline().rstrip()
         self._file.close()
-        
+
         return True
 
     def process(self, str):
+        """ The process """
         return self._document
 
     def death(self):
+        """ Destructor """
         return True
 
