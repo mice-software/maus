@@ -132,8 +132,8 @@ class  test_gdml_to_cdb(unittest.TestCase): #pylint: disable = C0103, R0904
         except:
             pass #pylint: disable = W0702
         
-        file = '/src/common_py/geometry/testCases/testGeometry.zip'
-        path = os.environ['MAUS_ROOT_DIR'] + file
+        zfile = '/src/common_py/geometry/testCases/testGeometry.zip'
+        path = os.environ['MAUS_ROOT_DIR'] + zfile
         self.test_gdml_to_cdb.upload_to_cdb(path)
         response = self.test_gdml_to_cdb.server_status
         err = "GDML not inserted into CDB"
@@ -216,6 +216,19 @@ class test_downloader(unittest.TestCase): #pylint: disable = C0103, R0904
             self.assertTrue(False, 'Should have raised an error')
         except:
             pass #pylint: disable = W0702
+        
+    def test_get_ids(self):
+        """
+        method test_get_ids
+        
+        This method calls this method 
+        on the testserver and checks that 
+        the correct id num is returned.
+        """
+        result = Downloader(1).get_ids("2011-09-08 09:00:00", \
+                                         "2011-09-09 09:00:00")
+        err = "get_ids did not return the correct id"
+        self.assertEqual(result, "383", err)
         
     def test_download_beamline_for_run(self):
         """

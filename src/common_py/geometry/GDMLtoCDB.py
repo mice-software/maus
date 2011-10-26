@@ -295,8 +295,5 @@ def main():
     """
     Main function
     """
-    download = Downloader(1)
-    result = download.get_ids("2011-09-08 09:00:00", "2011-09-09 09:00:00")
-    print result
 if __name__ == "__main__":
     main()

@@ -1,3 +1,6 @@
+"""
+M. Littlefield
+"""
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 # 
 #  MAUS is free software: you can redistribute it and/or modify
@@ -18,18 +21,14 @@ import unittest
 import shutil
 from geometry.GDMLtoMAUSModule import GDMLtomaus
 
-#pylint: disable = C0301, C0103, W0702, R0904, W0201
-#I'm not sure what these errors mean will
-#need to check with someone (Littlefield)
-
-class  test_gdml_to_maus_module(unittest.TestCase):
+class  test_gdml_to_maus_module(unittest.TestCase):#pylint:disable = C0103,R0904
     """
     class test_gdml_to_maus_module
     
     This class tests GDMLtoMAUSModule 
     to ensure it is working correctly.
     """    
-    def setUp(self):
+    def setUp(self): #pylint: disable = C0103
         """
         method set_up
         
@@ -41,15 +40,21 @@ class  test_gdml_to_maus_module(unittest.TestCase):
         tested and then removed.
         """
         self.constructor = None
-        self.file_source = os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/mausModuleSource'
+        self.file_source = os.environ['MAUS_ROOT_DIR'] + \
+        '/src/common_py/geometry/testCases/mausModuleSource'
         self.copy_files = GDMLtomaus(self.file_source)
-        config_file = os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testGDMLtoMAUSModule/fastradModel.gdml'
+        config_file = os.environ['MAUS_ROOT_DIR'] + \
+        '/src/common_py/geometry/testCases/testGDMLtoMAUSModule' \
+        + '/fastradModel.gdml'
         shutil.copyfile(self.copy_files.config_file, config_file)
         length = len(self.copy_files.step_files)
         for num in range (0, length):
-            step_file = os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testGDMLtoMAUSModule/Step_' + str(num) + '.gdml'
+            step_file = os.environ['MAUS_ROOT_DIR'] + \
+            '/src/common_py/geometry/testCases/testGDMLtoMAUSModule/Step_' + \
+            str(num) + '.gdml'
             shutil.copyfile(self.copy_files.step_files[num], step_file)
-        self.testcase = os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testGDMLtoMAUSModule'
+        self.testcase = os.environ['MAUS_ROOT_DIR'] + \
+        '/src/common_py/geometry/testCases/testGDMLtoMAUSModule'
         self.test_conversion = GDMLtomaus(self.testcase)
         
     def test_constructor(self):
@@ -64,13 +69,15 @@ class  test_gdml_to_maus_module(unittest.TestCase):
             self.constructor = GDMLtomaus('this path doesnt exist')
             self.assertTrue(False, 'should have raised and error')
         except:
-            pass
+            pass #pylint: disable = W0702
         #This next section ensures the constructor has set
         #up the variables correctly.
         config_file = self.testcase + '/fastradModel.gdml'
-        self.assertEqual(self.test_conversion.config_file, config_file, 'Config file wasnt found, test_GDML_to_MAUSModule::test_constructor')
+        self.assertEqual(self.test_conversion.config_file, config_file, \
+        'Config file wasnt found, test_GDML_to_MAUSModule::test_constructor')
         num_of_step_files = len(self.test_conversion.step_files)
-        self.assertEqual(num_of_step_files, 6, 'Step files wasnt found, test_GDML_to_MAUSModule::test_constructor')
+        self.assertEqual(num_of_step_files, 6, \
+        'Step files wasnt found, test_GDML_to_MAUSModule::test_constructor')
         
     def test_convert_to_maus(self):
         """
@@ -90,14 +97,16 @@ class  test_gdml_to_maus_module(unittest.TestCase):
                 config_mm = True
             if fname.find('Step') >= 0:
                 step_files += 1
-        self.assertTrue(config_mm, 'Configuration File not converted, test_GDML_to_MAUSModule::test_convert_to_maus')
-        self.assertEqual(step_files, 6, 'Step Files not converted, test_GDML_to_MAUSModule::test_convert_to_maus')
+        self.assertTrue(config_mm, 'Configuration File not converted')
+        self.assertEqual(step_files, 6, 'Step Files not converted')
         length = len(outputs)
         for num in range(0, length):
             path = self.testcase + '/' + outputs[num]
             os.remove(path)
-        #NB: once the schema and XSLT scripts are finalised more test can be created here
-        #These test can open the files and make sure the maus modules are written
+        #NB: once the schema and XSLT scripts 
+        #are finalised more test can be created here
+        #These test can open the files  
+        #and make sure the maus modules are written
         #correctly.
         
 if __name__ == '__main__':

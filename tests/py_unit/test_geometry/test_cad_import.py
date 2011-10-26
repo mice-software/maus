@@ -1,3 +1,6 @@
+"""
+M. Littlefield
+"""
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 # 
 #  MAUS is free software: you can redistribute it and/or modify
@@ -17,18 +20,14 @@ import os.path
 import unittest
 from geometry.CADImport import CADImport
 
-#pylint: disable = C0301, C0103, W0702, R0912, R0915, R0904, W0201
-# Some of these disabled errors I don't understand need to look
-# at them with someone who has experience. (Littlefield)
-
-class test_cad_import(unittest.TestCase):
+class test_cad_import(unittest.TestCase): #pylint: disable = C0103, R0904
     """
     class test_cad_import This class tests CADImport.py
     
     This is the unit test which verifies CADImport.py
     is working correctly.
     """
-    def setUp(self):
+    def setUp(self): #pylint: disable = C0103
         """
         method set_up This sets some variable for the coming tests
         
@@ -37,13 +36,18 @@ class test_cad_import(unittest.TestCase):
         """
         self.maus = os.environ['MAUS_ROOT_DIR']
         self.constuctor = None
-        self.xml_in_1 = self.maus + '/src/common_py/geometry/testCases/testGeometry/fastradModel.gdml'
-        self.xml_in_2 = self.maus + '/src/common_py/geometry/testCases/testGeometry/FieldInfoTest.xml'
-        self.xslt = self.maus + '/src/common_py/geometry/xsltScripts/GDML2G4MICE.xsl'
-        self.out_put = self.maus + '/src/common_py/geometry/testCases/OUTPUTFILE.txt'
-        self.cadimport_two_xml = CADImport(xmlin1 = self.xml_in_1, xsl = self.xslt, xmlin2 = self.xml_in_2, output = self.out_put)
+        fra = '/src/common_py/geometry/testCases/testGeometry/fastradModel.gdml'
+        mag = '/src/common_py/geometry/testCases/testGeometry/FieldInfoTest.xml'
+        xslt = '/src/common_py/geometry/xsltScripts/GDML2G4MICE.xsl'
+        output = '/src/common_py/geometry/testCases/OUTPUTFILE.txt'
+        self.xml_in_1 = self.maus + fra
+        self.xml_in_2 = self.maus + mag
+        self.xslt = self.maus + xslt
+        self.out_put = self.maus + output
+        self.cadimport_two_xml = CADImport(xmlin1=self.xml_in_1, \
+           xsl=self.xslt, xmlin2=self.xml_in_2, output=self.out_put)
 
-    def test_constructor(self):
+    def test_constructor(self): #pylint: disable = R0912, R0915
         """
         method test_constructor This method test the CADImport constructor
         
@@ -55,90 +59,105 @@ class test_cad_import(unittest.TestCase):
             self.constuctor = CADImport(xsl = self.xslt)
             self.assertTrue(False, "should have raised an exception")
         except:
-            pass
+            pass #pylint: disable = W0702
         try:
-            self.constuctor = CADImport(xmlin1 = "fastradModel.not_xml", xsl = self.xslt)
+            fast = "fastradModel.not_xml"
+            self.constuctor = CADImport(xmlin1 = fast, xsl = self.xslt)
             self.assertTrue(False, "Should have raised an exception")
         except:
-            pass
+            pass #pylint: disable = W0702
         #Test xsl parameter,
         #first,   test it raises an error when there is no input
         #second,  test it raises an error when it isn't an xsl file
         try:
             self.constuctor = CADImport(xmlin1 = self.xml_in_1)
-            self.assertEqual(self.constuctor.xsl, None, "Should have raised an exception")
+            err = "Should have raised an exception"
+            self.assertEqual(self.constuctor.xsl, None, err)
         except:
-            pass
+            pass #pylint: disable = W0702
         try:
-            self.constuctor = CADImport(xmlin1 = self.xml_in_1, xsl = "GDML2G4MICE.not_xsl")
+            xfile = "GDML2G4MICE.not_xsl"
+            self.constuctor = CADImport(xmlin1 = self.xml_in_1, xsl = xfile)
             self.assertTrue(False, "Should have raised an exception")
         except:
-            pass
+            pass #pylint: disable = W0702
         #Test xmlin2 parameter,
         #first,   test its default is none
         #second,  test it raises an error when it isn't a string
         #third,   test it raises an error when it isn't an xml or gdml file
         try:
-            self.constuctor = CADImport(xmlin1 = self.xml_in_1, xsl = self.xslt)
-            self.assertEqual(self.constuctor.xml_in_2, None, "default is not None")
+            self.constuctor = CADImport(xmlin1=self.xml_in_1, xsl = self.xslt)
+            err = "default is not None"
+            self.assertEqual(self.constuctor.xml_in_2, None, err)
         except:
-            pass
+            pass #pylint: disable = W0702
         try:
-            self.constuctor = CADImport(xmlin1 = self.xml_in_1, xsl = self.xslt, xmlin2 = 1)
+            self.constuctor = CADImport(xmlin1=self.xml_in_1, \
+                                        xsl=self.xslt, xmlin2=1)
             self.assertTrue(False, "Should have raised an exception")
         except:
-            pass
+            pass #pylint: disable = W0702
         try:
-            self.constuctor = CADImport(xmlin1 = self.xml_in_1, xsl = self.xslt, xmlin2 = "FieldInfoTest.not_xml")
+            xfile = "FieldInfoTest.not_xml"
+            self.constuctor = CADImport(xmlin1=self.xml_in_1, \
+                                    xsl=self.xslt, xmlin2=xfile)
             self.assertTrue(False, "Should have raised an exception")
         except:
-            pass
+            pass #pylint: disable = W0702
         #Test output parameter,
         #first,   test its default is none
         #second,  test it raises an error when it isn't a string
         try:
             self.constuctor = CADImport(xmlin1 = self.xml_in_1, xsl = self.xslt)
-            self.assertEqual(self.constuctor.output, None, "default is not None")
+            err = "default is not None"
+            self.assertEqual(self.constuctor.output, None, err)
         except:
-            pass
+            pass #pylint: disable = W0702
         try:
-            self.constuctor = CADImport(xmlin1 = self.xml_in_1, xsl = self.xslt, output = 1)
+            self.constuctor = CADImport(xmlin1 = self.xml_in_1, \
+                                      xsl = self.xslt, output = 1)
             self.assertTrue(False, "Should have raised an exception")
         except:
-            pass
+            pass #pylint: disable = W0702
         #Test mergein parameter,
         #first,   test its default is Merge.xsl.in
         #second,  test it raises an error when it isn't a string
         try:
-            self.constuctor = CADImport(xmlin1 = self.xml_in_1, xsl = self.xslt, mergein = "something else")
-            self.assertEqual(self.constuctor.merge_in, "Merge.xsl.in", "default is not Merge.xsl.in")
+            self.constuctor = CADImport(xmlin1 = self.xml_in_1, \
+                     xsl = self.xslt, mergein = "something else")
+            self.assertEqual(self.constuctor.merge_in, \
+                   "Merge.xsl.in", "default is not Merge.xsl.in")
         except:
-            pass
+            pass #pylint: disable = W0702
         
         try :
-            self.constuctor = CADImport(xmlin1 = self.xml_in_1, xsl = self.xslt, mergin = 1)
+            self.constuctor = CADImport(xmlin1 = self.xml_in_1, \
+                                     xsl = self.xslt, mergin = 1)
             self.assertTrue(False, "Should have raised an exception")
         except:
-            pass
+            pass #pylint: disable = W0702
         #Test mergeout parameter,
         #first,   test its default is Merge.xsl
         #second,  test it raises an error when it isn't a string
         #third,   test it raises an error when it isn't an xsl
         try:
             self.constuctor = CADImport(xmlin1 = self.xml_in_1, xsl = self.xslt)
-            self.assertEqual(self.constuctor.merge_out, "Merge.xsl", "default is not Merge.xsl")
+            self.assertEqual(self.constuctor.merge_out, \
+                  "Merge.xsl", "default is not Merge.xsl")
         except:
-            pass
+            pass #pylint: disable = W0702
         try:
-            self.constuctor = CADImport(xmlin1 = self.xml_in_1, xsl = self.xslt, mergout = 1)
+            self.constuctor = CADImport(xmlin1 = self.xml_in_1, \
+                                    xsl = self.xslt, mergout = 1)
             self.assertTrue(False, "Should have raised an exception")
         except:
-            pass
+            pass #pylint: disable = W0702
         try:
-            self.constuctor = CADImport(xmlin1 = self.xml_in_1, xsl = self.xslt, mergeout = "MergedOut.not_xsl")
+            self.constuctor = CADImport(xmlin1 = self.xml_in_1, \
+                 xsl = self.xslt, mergeout = "MergedOut.not_xsl")
             self.assertTrue(False, "Should have raised an exception")
         except:
-            pass
+            pass #pylint: disable = W0702
 
 
     def test_parse_xslt(self):
@@ -148,12 +167,16 @@ class test_cad_import(unittest.TestCase):
         self.cadimport_two_xml.parse_xslt()
         output_file = self.cadimport_two_xml.output
         self.assertTrue( os.path.getsize(output_file) != 0)
-        #Test to check that the information within the outputted file is of MAUS Module format
+        #Test to check that the information 
+        #within the outputted file is of MAUS Module format
         count = 0
         fin = open(output_file, 'r')
         for lines in fin.readlines():
             #line below needs to be reviewed as each file is different
-            if lines.find('Configuration') >= 0 or lines.find('Dimensions') >= 0 or lines.find('Position') >= 0 or lines.find('Rotation') >= 0:
+            if lines.find('Configuration') >= 0 \
+               or lines.find('Dimensions') >= 0 \
+                 or lines.find('Position') >= 0 \
+                  or lines.find('Rotation') >= 0:
                 count += 1
         if count == 0:
             self.assertTrue(False, "output file is not of MAUS Module format")

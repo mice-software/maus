@@ -1,3 +1,6 @@
+"""
+M. Littlefield
+"""
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 # 
 #  MAUS is free software: you can redistribute it and/or modify
@@ -18,11 +21,7 @@ import unittest
 from geometry.GDMLPacker import Packer
 from geometry.GDMLPacker import Unpacker
 
-#pylint: disable = C0301, C0103, W0702, R0904, W0201
-#I'm not sure what these errors mean will
-#need to check with someone (Littlefield)
-
-class  test_packer(unittest.TestCase):
+class  test_packer(unittest.TestCase): #pylint: disable = C0103, R0904
     """
     class test_packer 
     
@@ -30,7 +29,7 @@ class  test_packer(unittest.TestCase):
     GDMLPacker.py file to ensure it is
     working correctly.
     """
-    def setUp(self):
+    def setUp(self): #pylint: disable = C0103
         """
         method set_up
         
@@ -38,16 +37,26 @@ class  test_packer(unittest.TestCase):
         ready for testing.
         """
         self.constructor_test = None
-        testcase = os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testPacker/FileList.txt'
+        testcase = os.environ['MAUS_ROOT_DIR'] + \
+        '/src/common_py/geometry/testCases/testPacker/FileList.txt'
         fin = open(testcase, 'w')
-        fin.write(os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testGeometry/Step_0.gdml \n')
-        fin.write(os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testGeometry/Step_1.gdml \n')
-        fin.write(os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testGeometry/Step_2.gdml \n')
-        fin.write(os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testGeometry/Step_3.gdml \n')
-        fin.write(os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testGeometry/Step_4.gdml \n')
-        fin.write(os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testGeometry/Step_5.gdml \n')
-        fin.write(os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testGeometry/fastradModel_materials.xml \n')
-        fin.write(os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testGeometry/fastradModel.gdml \n')
+        fin.write(os.environ['MAUS_ROOT_DIR'] + \
+        '/src/common_py/geometry/testCases/testGeometry/Step_0.gdml \n')
+        fin.write(os.environ['MAUS_ROOT_DIR'] + \
+        '/src/common_py/geometry/testCases/testGeometry/Step_1.gdml \n')
+        fin.write(os.environ['MAUS_ROOT_DIR'] + \
+        '/src/common_py/geometry/testCases/testGeometry/Step_2.gdml \n')
+        fin.write(os.environ['MAUS_ROOT_DIR'] + \
+        '/src/common_py/geometry/testCases/testGeometry/Step_3.gdml \n')
+        fin.write(os.environ['MAUS_ROOT_DIR'] + \
+        '/src/common_py/geometry/testCases/testGeometry/Step_4.gdml \n')
+        fin.write(os.environ['MAUS_ROOT_DIR'] + \
+        '/src/common_py/geometry/testCases/testGeometry/Step_5.gdml \n')
+        fin.write(os.environ['MAUS_ROOT_DIR'] + \
+        '/src/common_py/geometry/testCases/testGeometry' + \
+        '/fastradModel_materials.xml \n')
+        fin.write(os.environ['MAUS_ROOT_DIR'] + \
+        '/src/common_py/geometry/testCases/testGeometry/fastradModel.gdml \n')
         fin.close()
         self.gdml_test_case = Packer(testcase)
     
@@ -60,16 +69,19 @@ class  test_packer(unittest.TestCase):
         """
         try:
             self.constructor_test = Packer("geometry.not_txt")
-            self.assertTrue(False, "should have raised an exception, test_GDMLPacker::test_constructor")
+            self.assertTrue(False, \
+            "should have raised an exception,test_GDMLPacker::test_constructor")
         except:
-            pass
+            pass #pylint: disable = W0702
 
         try:
-            blank_txt = os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testPacker/test.txt'
+            blank_txt = os.environ['MAUS_ROOT_DIR'] + \
+            '/src/common_py/geometry/testCases/testPacker/test.txt'
             self.constructor_test = Packer(blank_txt)
-            self.assertTrue(False, "should have raised an exception, test_GDMLPacker::test_constructor")
+            self.assertTrue(False, \
+            "should have raised an exception")
         except:
-            pass
+            pass #pylint: disable = W0702
 
     def test_zipfile(self):
         """
@@ -79,22 +91,24 @@ class  test_packer(unittest.TestCase):
         calling the method and checking the file size
         i.e. make sure its not empty.
         """
-        zippath = os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testPacker'
+        zippath = os.environ['MAUS_ROOT_DIR'] + \
+        '/src/common_py/geometry/testCases/testPacker'
         self.gdml_test_case.zipfile(path = zippath)
         output = os.listdir(zippath)
         for fname in output:
             if fname[-4:] == '.zip':
                 zfile = zippath + '/' + fname
-        self.assertTrue(os.path.getsize(zfile) != 0, "zipped file size is zero, test_GDMLPacker::test_zipfile")
+        self.assertTrue(os.path.getsize(zfile) != 0, \
+        "zipped file size is zero, test_GDMLPacker::test_zipfile")
 
-class test_unpacker(unittest.TestCase):
+class test_unpacker(unittest.TestCase): #pylint: disable = C0103, R0904
     """
     class test_unpacker
     
     This class test the unpacker class
     from GDMLPacker.py 
     """
-    def setUp(self):
+    def setUp(self): #pylint: disable = C0103
         """
         method set_up
         
@@ -102,12 +116,14 @@ class test_unpacker(unittest.TestCase):
         object ready for testing.
         """
         self.constructor_test = None
-        zippath = os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testPacker'
+        zippath = os.environ['MAUS_ROOT_DIR'] + \
+        '/src/common_py/geometry/testCases/testPacker'
         output = os.listdir(zippath)
         for fname in output:
             if fname[-4:] == '.zip':
                 zfile = zippath + '/' + fname
-        self.testpath = os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases'
+        self.testpath = os.environ['MAUS_ROOT_DIR'] + \
+                    '/src/common_py/geometry/testCases'
         self.extraction_test = Unpacker(zfile, self.testpath)
         
     def test_constructor(self):
@@ -119,15 +135,17 @@ class test_unpacker(unittest.TestCase):
         """
         try:
             self.constructor_test = Unpacker('Geometry.not_zip', self.testpath)
-            self.assertTrue(False, 'Should have raised an error, Test_Unpacker::test_constructor')
+            self.assertTrue(False, \
+            'Should have raised an error, Test_Unpacker::test_constructor')
         except:
-            pass
+            pass #pylint: disable = W0702
         
         try: 
             self.constructor_test = Unpacker(self.testpath, 'Not_a_path')
-            self.assertTrue(False, 'Should have raised an error, Test_Unpacker::test_constructor')
+            self.assertTrue(False, \
+            'Should have raised an error, Test_Unpacker::test_constructor')
         except:
-            pass
+            pass #pylint: disable = w0702
         
     def test_unzip_file(self):
         """
@@ -149,7 +167,9 @@ class test_unpacker(unittest.TestCase):
             if fname == 'FileList.txt':
                 fname = self.extraction_test.extract_path + '/' + fname
                 text_file = fname
-        self.assertEqual(text_file, os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/FileList.txt', 'File not unzipped, Test_Unpakcer::test_unzip_file')
+        self.assertEqual(text_file, os.environ['MAUS_ROOT_DIR'] + \
+                '/src/common_py/geometry/testCases/FileList.txt', \
+               'File not unzipped, Test_Unpakcer::test_unzip_file')
         os.remove(self.extraction_test.input_file)
         os.remove(text_file)         
 
