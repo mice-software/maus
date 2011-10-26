@@ -1,3 +1,6 @@
+"""
+m. Littlefield
+"""
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 # 
 #  MAUS is free software: you can redistribute it and/or modify
@@ -16,9 +19,7 @@
 from Configuration import Configuration
 import json
 
-#pylint: disable = R0903, R0902
-
-class Configreader():
+class Configreader(): #pylint: disable = R0903, R0902
     """
     @class configreader, Configuration File Reader Class
     

@@ -1,3 +1,6 @@
+"""
+M. Littlefield
+"""
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 # 
 #  MAUS is free software: you can redistribute it and/or modify
@@ -17,10 +20,7 @@ import os
 import libxml2
 import libxslt
 
-#pylint: disable = C0301, R0913, R0912, F0401, R0903
-#F0401 refers to libxml2 not being imported which it is?
-
-class CADImport:
+class CADImport: #pylint: disable = R0903
     """
     @Class CADImport, GDML parser class.
     
@@ -33,7 +33,9 @@ class CADImport:
     a GDML file.
     """
 
-    def __init__(self, xmlin1, xsl=None, xmlin2=None, output=None, mergein=None, mergeout=None):
+    def __init__(self, xmlin1, xsl=None, xmlin2=None, \
+             output=None, mergein=None, mergeout=None): 
+             #pylint: disable = R0912, R0913
         """
         @Method Class constructor
 
@@ -82,14 +84,16 @@ class CADImport:
 
         if mergein == None: 
             maus_root = os.environ['MAUS_ROOT_DIR'] 
-            self.merge_in = maus_root + '/src/common_py/geometry/xsltScripts/Merge.xsl.in'
+            self.merge_in = maus_root + \
+            '/src/common_py/geometry/xsltScripts/Merge.xsl.in'
         elif type(mergein) != str:
             raise TypeError(mergein + " input must be a string(file name/path)")
         else: 
             self.merge_in = mergein
 
         if mergeout == None: 
-            path = os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/xsltScripts/Merge.xsl'
+            path = os.environ['MAUS_ROOT_DIR'] + \
+            '/src/common_py/geometry/xsltScripts/Merge.xsl'
             self.merge_out = path
         elif type(mergeout) != str:
             raise TypeError(mergeout + "output must be a string filename/path)")

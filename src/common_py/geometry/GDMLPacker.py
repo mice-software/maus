@@ -1,3 +1,6 @@
+"""
+M. Littlefield
+"""
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 # 
 #  MAUS is free software: you can redistribute it and/or modify
@@ -17,9 +20,7 @@ import os.path
 import zipfile
 from datetime import datetime
 
-#pylint: disable = R0903
-
-class Packer:
+class Packer: #pylint: disable = R0903
     """
     @Class Packer This class packs the GDMLs into a zip file.
     
@@ -84,7 +85,7 @@ class Packer:
             fin.close()
             return zippath
         
-class Unpacker:
+class Unpacker: #pylint: disable = R0903
     """
     @class Unpacker This class unzips zip files.
     """

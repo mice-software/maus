@@ -1,3 +1,6 @@
+"""
+M. Littlefield
+"""
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 # 
 #  MAUS is free software: you can redistribute it and/or modify
@@ -19,10 +22,8 @@ from cdb import GeometrySuperMouse
 from cdb import Geometry
 from datetime import datetime
 
-#pylint: disable = C0301, R0902
-
 #change notes no longer encode decode
-class GDMLtocdb:
+class GDMLtocdb: #pylint: disable = R0902
     """
     @Class GDMLtocdb handles the uploading of geometries to the CDB
 
@@ -49,7 +50,9 @@ class GDMLtocdb:
         self.textfile = None
         self.text = ""
         if type(testserver) != int:
-            raise IOError('Test Server argument must be 1 or 0 or None', 'GDMLtocdb::__init__')
+            raise IOError(\
+            'Test Server argument must be 1 or 0 or None', \
+            'GDMLtocdb::__init__')
         else: 
             self.testserver = testserver
         if type(notes) != str:
@@ -83,12 +86,13 @@ class GDMLtocdb:
         if self.testserver == 1:
             print "Test server status is " + self.geometry_cdb.get_status()
         else:
-            print "Production Server status is " + self.geometry_cdb.get_status()
+            print "Production Server status is " + \
+            self.geometry_cdb.get_status()
         return self.wsdlurl
     
     def check_file_list(self):
         """
-        @method check_file_list This method searches the designated path for a text file and checks if it contains the list of geometries.
+        @method check_file_list 
         
         This method goes through the designated path given by __init__ and 
         checks to see if there is a text file. It then checks this file to
@@ -157,7 +161,8 @@ class GDMLtocdb:
         when the method is called.
         """
         if zipped_file[-4:] != '.zip':
-            raise IOError('Argument is not a zip file', 'GDMLtocdb::upload_to_cdb')
+            raise IOError('Argument is not a zip file', \
+            'GDMLtocdb::upload_to_cdb')
         else:
             _dt = datetime.today()
             fin = open(zipped_file, 'r')
@@ -165,9 +170,10 @@ class GDMLtocdb:
             _gdml = f_contents
             self.geometry_cdb.set_gdml(_gdml, _dt, self.notes)
             print self.geometry_cdb.set_gdml(_gdml, _dt, self.notes)
-            self.server_status = str(self.geometry_cdb.set_gdml(_gdml, _dt, self.notes))
+            self.server_status = str(self.geometry_cdb.set_gdml \
+            (_gdml, _dt, self.notes))
             
-class Downloader:
+class Downloader: #pylint: disable = R0902
     """
     @Class Downloader, this class downloads geometries from the CDB
 
@@ -190,7 +196,9 @@ class Downloader:
         self.listofgeometries = filelist
         self.geometry_cdb = Geometry()
         if type(testserver) != int:
-            raise IOError('Test Server argument must be 1 or 0 or None', 'GDMLtocdb::__init__')
+            raise IOError( \
+            'Test Server argument must be 1 or 0 or None', \
+            'GDMLtocdb::__init__')
         else: 
             self.testserver = testserver
         if self.testserver == None:
@@ -204,7 +212,8 @@ class Downloader:
         if self.testserver == 1:
             print "Test server status is " + self.geometry_cdb.get_status()
         else:
-            print "Production Server status is " + self.geometry_cdb.get_status()
+            print "Production Server status is " \
+            + self.geometry_cdb.get_status()
             
     def download_current(self, downloadpath):
         """
@@ -238,7 +247,8 @@ class Downloader:
         if os.path.exists(downloadpath) == False:
             raise IOError('Path does not exist!, Downloader::download_current')
         elif type(id_num) != str:
-            raise IOError('ID number not obtained, Downloader::download_current')
+            raise IOError('ID number not obtained, ' + \
+            'Downloader::download_current')
         else:
             downloadedfile = self.geometry_cdb.get_gdml_for_id(id_num)
             zip_path = downloadpath + '/Geometry.zip'
@@ -256,12 +266,12 @@ class Downloader:
         @param start_time The datetime of which you wish the query to start must be in UTC.
         @param stop_time The datetime of which you wish the query to stop must be in UTC. Can be blank.
         """
-        #This may need to be checked in the future because a validFrom evaluation may be needed. How to test date times?
         id_dict = self.geometry_cdb.get_ids(start_time, stop_time)
         ids = id_dict.keys()
         length = len(ids) - 1
         id_num = ids[length]
-        print "Using geometry ID " + str(ids[length]) + " valid from " + str(id_dict[id_num]['validFrom'])
+        print "Using geometry ID " + str(ids[length]) + \
+       " valid from " + str(id_dict[id_num]['validFrom'])
         return str(ids[length])
     
     def download_beamline_for_run(self, run_id, downloadpath):
@@ -275,9 +285,9 @@ class Downloader:
         @param  downloadedpath The path location where the files will be unpacked to. 
         """
         if os.path.exists(downloadpath) == False:
-            raise IOError('Path does not exist!, Downloader::download_beamline_for_run')
+            raise IOError('Path does not exist!')
         elif type(run_id) != int:
-            raise IOError('ID number not obtained, Downloader::download_beamline_for_run')
+            raise IOError('ID number not obtained')
         else:        
             beamline_cdb = Beamline()
             downloadedfile = beamline_cdb.get_beamline_for_run_xml(run_id)
@@ -288,8 +298,6 @@ class Downloader:
             dfile = beamline_cdb.get_beamline_for_run(run_id)
             self.times.append(str(dfile[1L]['startTime']))
             self.times.append(str(dfile[1L]['endTime']))
-                
-#Need to think of ways to test the downloading of geometries without downloading geomtries.        
             
 def main():
     """

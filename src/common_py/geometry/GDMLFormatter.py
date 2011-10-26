@@ -1,3 +1,6 @@
+"""
+M. Littlefield
+"""
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 # 
 #  MAUS is free software: you can redistribute it and/or modify
@@ -16,9 +19,7 @@
 import os.path
 from xml.dom import minidom
 
-#pylint: disable = C0301, R0902, R0201 
-
-class Formatter:
+class Formatter: #pylint: disable = R0902
     """
     @Class formatter this class formats the raw outputted fastrad files so there schema material file paths are correct
 
@@ -50,7 +51,8 @@ class Formatter:
         gdmls = os.listdir(self.path)
         for fname in gdmls:
             if fname[-5:] != '.gdml' and fname[-4:] != '.xml':
-                raise IOError('Files are not GDMLs or XMLs', 'GDMLFormatter::__init__')
+                raise IOError('Files are not GDMLs or XMLs', \
+                                    'GDMLFormatter::__init__')
             if fname.find('materials') >= 0:
                 materialfile = self.path + '/' + fname
                 self.materialfile = materialfile
@@ -65,11 +67,15 @@ class Formatter:
             if fname.find('Beamline') >= 0:
                 found_file = self.path + '/' + fname
                 self.beamline_file = found_file
-            if fname.find('materials') < 0 and fname.find('fastrad') < 0 and fname.find('Field') < 0 and fname.find('Beamline') < 0 :
+            if fname.find('materials') < 0 \
+             and fname.find('fastrad') < 0 \
+               and fname.find('Field') < 0 \
+            and fname.find('Beamline') < 0 :
                 stepfile = self.path + '/' + fname
                 self.stepfiles.append(stepfile)
             if self.field_file == None:
-                raise IOError('Please write a Field.gdml file which contains MAUS_info see README for details')
+                raise IOError('Please write a Field.gdml file which' + \
+                            'contains MAUS_info see README for details')
         
             
     def format_schema_location(self, gdmlfile):
@@ -82,12 +88,14 @@ class Formatter:
         @param GDMLFile The name of the file which will have its schema location altered.
         """
         if gdmlfile[-5:] != '.gdml' and gdmlfile[-4:] != '.xml':
-            raise IOError(gdmlfile + ' is not a gdml or xml', 'Formatter::format_schema_location')
+            raise IOError(gdmlfile + \
+            ' is not a gdml or xml', 'Formatter::format_schema_location')
         else:
             xmldoc = minidom.parse(gdmlfile)
             for node in xmldoc.getElementsByTagName("gdml"):
                 if node.hasAttribute("xsi:noNamespaceSchemaLocation"):
-                    node.attributes['xsi:noNamespaceSchemaLocation'] = self.schema
+                    node.attributes['xsi:noNamespaceSchemaLocation'] \
+                    = self.schema
             os.remove(gdmlfile)
             fout = open(gdmlfile, 'w')
             xmldoc.writexml(fout)
@@ -100,7 +108,8 @@ class Formatter:
         to the configuration GDML.
         """
         if gdmlfile[-5:] != '.gdml' and gdmlfile[-4:] != '.xml':
-            raise IOError(gdmlfile + ' is not a gdml or xml', 'Formatter::merge_maus_info')
+            raise IOError(gdmlfile + \
+            ' is not a gdml or xml', 'Formatter::merge_maus_info')
         else:
             config = minidom.parse(gdmlfile)
             field = minidom.parse(self.field_file)
@@ -120,7 +129,8 @@ class Formatter:
         to the configuration GDML.
         """
         if gdmlfile[-5:] != '.gdml' and gdmlfile[-4:] != '.xml':
-            raise IOError(gdmlfile + ' is not a gdml or xml', 'Formatter::format_schema_location')
+            raise IOError(gdmlfile + \
+            ' is not a gdml or xml', 'Formatter::format_schema_location')
         else:
             run_info = False
             fin = open(gdmlfile, 'r')
@@ -151,10 +161,12 @@ class Formatter:
         @param GDMLFile The name of the file which will have its materials reference file location altered.
         """
         if gdmlfile[-5:] != '.gdml' and gdmlfile[-4:] != '.xml':
-            raise IOError(gdmlfile + ' is not a gdml or xml', 'Formatter::format_materials')
+            raise IOError(gdmlfile + \
+            ' is not a gdml or xml', 'Formatter::format_materials')
         else: 
             impl = minidom.getDOMImplementation()
-            docstr = 'gdml [<!ENTITY materials SYSTEM "' + self.materialfile + '">]'
+            docstr = 'gdml [<!ENTITY materials SYSTEM "' \
+            + self.materialfile + '">]'
             doctype = impl.createDocumentType(docstr, None, None)
             newdoc = impl.createDocument(None, "MAUS", doctype)
             config = minidom.parse(gdmlfile)
@@ -169,7 +181,7 @@ class Formatter:
             fout.close()
             os.remove(gdmlfile)
                
-    def insert_materials_ref(self, inputfile):
+    def insert_materials_ref(self, inputfile): #pylint: disable = R0201
         """
         @method Insert Materials Reference
         
@@ -180,7 +192,8 @@ class Formatter:
         @param GDMLFile The name of the file which will have its materials reference replaced.
         """
         if inputfile[-4:] != '.txt':
-            raise IOError(inputfile + ' is not a txt file', 'Formatter::insert_materials_ref')
+            raise IOError(inputfile + \
+            ' is not a txt file', 'Formatter::insert_materials_ref')
         else:
             fin = open(inputfile, 'r')
             gdmlfile = inputfile[:-4] + '.gdml'
@@ -211,7 +224,8 @@ class Formatter:
         @param GDML File The file to be checked.
         """
         if gdmlfile[-5:] != '.gdml' and gdmlfile[-4:] != '.xml':
-            raise IOError(gdmlfile + ' is not a gdml or xml', 'Formatter::format_check')
+            raise IOError(gdmlfile + \
+            ' is not a gdml or xml', 'Formatter::format_check')
         else:
             self.formatted = False
             fin = open(gdmlfile, 'r')
@@ -248,7 +262,8 @@ class Formatter:
                 self.format_schema_location(self.stepfiles[num])
                 self.format_materials(self.stepfiles[num])
                 self.insert_materials_ref(self.txtfile)
-            print "Formatted " + str(num+1) + " of " + str(noofstepfiles) + " Geometry Files"
+            print "Formatted " + str(num+1) + \
+            " of " + str(noofstepfiles) + " Geometry Files"
         print "Format Complete!"
             
                     
@@ -256,9 +271,5 @@ def main():
     """
     Main Function
     """
-    location = '/src/common_py/geometry/Download'
-    gdmls = Formatter(os.environ['MAUS_ROOT_DIR']+location)
-    gdmls.format()
-
 if __name__ == '__main__':
     main()
