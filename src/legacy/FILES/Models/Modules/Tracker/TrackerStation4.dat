@@ -23,7 +23,7 @@ Module TrackerStation4
     Position 0.0 0.0 0.00125 cm
     Rotation 0.0 0.0 -120.0 degree
   }
-  Module Tracker/TrackerViewX.dat
+  Module Tracker/TrackerViewU.dat
   {
     Position 0.0 0.0 0.6648 mm
     Rotation 0.0 0.0 0.0 degree

@@ -35,11 +35,17 @@ class AnalyzeOfflineTest(unittest.TestCase): # pylint: disable = R0904
         """
         Check that the default parameters produce sensible output
         """
+        try:
+            os.remove(OUT_PATH)
+        except OSError:
+            pass
         subproc = subprocess.Popen([ANA_PATH, "-output_json_file_name",
                                     OUT_PATH])
         subproc.wait()
         fin = open(OUT_PATH)
-        for line in fin.readlines():
+        all_lines = fin.readlines()
+        self.assertGreater(len(all_lines), 0)
+        for line in all_lines:
             json.loads(line)
         fin.close()
 
