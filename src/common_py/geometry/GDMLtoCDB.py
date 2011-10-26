@@ -43,6 +43,7 @@ class GDMLtocdb:
         @Param notes must be a string which briefly describes the geometry
         @Param testserver enter 1 to set up the test server leave blank for real server
         """
+        self.server_status = None
         self.wsdlurl = None
         self.geometry_cdb = GeometrySuperMouse()
         self.textfile = None
@@ -164,6 +165,7 @@ class GDMLtocdb:
             _gdml = f_contents
             self.geometry_cdb.set_gdml(_gdml, _dt, self.notes)
             print self.geometry_cdb.set_gdml(_gdml, _dt, self.notes)
+            self.server_status = str(self.geometry_cdb.set_gdml(_gdml, _dt, self.notes))
             
 class Downloader:
     """
@@ -180,7 +182,6 @@ class Downloader:
 
         @Param testserver, If an argument of 1 is entered this will set a connection to the test CDB if left blank write to the actual CDB
         """
-        #Has been changed alter tests
         self.times = []
         self.id_nums = []
         self.filestr = ""
@@ -294,5 +295,8 @@ def main():
     """
     Main function
     """
+    download = Downloader(1)
+    result = download.get_ids("2011-09-08 09:00:00", "2011-09-09 09:00:00")
+    print result
 if __name__ == "__main__":
     main()

@@ -1,3 +1,6 @@
+"""
+M.Littlefield
+"""
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 # 
 #  MAUS is free software: you can redistribute it and/or modify
@@ -18,18 +21,14 @@ import os
 from geometry.GDMLtoCDB import GDMLtocdb
 from geometry.GDMLtoCDB import Downloader
 
-#pylint: disable = C0301, C0103, W0702, R0904, W0201
-#I'm not sure what these errors mean will
-#need to check with someone (Littlefield)
-
-class  test_gdml_to_cdb(unittest.TestCase):
+class  test_gdml_to_cdb(unittest.TestCase): #pylint: disable = C0103, R0904
     """
     class test_gdml_to_cdb
     
     This class tests the uploading class
     (GDMLtocdb) of GDMLtoCDB.
     """
-    def setUp(self):
+    def setUp(self): #pylint: disable = C0103
         """
         method set_up
         
@@ -37,7 +36,8 @@ class  test_gdml_to_cdb(unittest.TestCase):
         ready for testing.
         """
         self.constructor = None
-        self.testcase = os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testGeometry'
+        path = '/src/common_py/geometry/testCases/testGeometry'
+        self.testcase = os.environ['MAUS_ROOT_DIR'] + path
         self.testnote = 'This is the unit test'
         self.test_gdml_to_cdb = GDMLtocdb(self.testcase, self.testnote, 1)
         
@@ -50,22 +50,23 @@ class  test_gdml_to_cdb(unittest.TestCase):
         raised.
         """
         try:
-            self.constructor = GDMLtocdb(self.testcase, self.testnote, 'this is not an int')
+            err = 'this is not an int'
+            self.constructor = GDMLtocdb(self.testcase, self.testnote, err)
             self.assertTrue(False, 'Should have raised an error')
         except:
-            pass
+            pass #pylint: disable = W0702
         
         try:
             self.constructor = GDMLtocdb(self.testcase, 2, 1)
             self.assertTrue(False, 'Should have raised an error')
         except:
-            pass
+            pass #pylint: disable = W0702
                   
         try:
             self.constructor = GDMLtocdb(2, self.testnote, 1)
             self.assertTrue(False, 'Should have raised an error')
         except:
-            pass
+            pass #pylint: disable = W0702
         
     def test_set_up_server(self):
         """
@@ -74,7 +75,9 @@ class  test_gdml_to_cdb(unittest.TestCase):
         This method ensures the server is set up.
         """
         wsdl_url = self.test_gdml_to_cdb.set_up_server()
-        self.assertEqual(wsdl_url, 'http://rgma19.pp.rl.ac.uk:8080/cdb/geometrySuperMouse?wsdl', 'WSDL URL not set up, test_gdmltocdb::test_set_up_server')
+        wsdl = 'http://rgma19.pp.rl.ac.uk:8080/cdb/geometrySuperMouse?wsdl'
+        err = 'WSDL URL not set up, test_gdmltocdb::test_set_up_server'
+        self.assertEqual(wsdl_url, wsdl, err)
         #write the same for actual server
         
     def test_check_file_list(self):
@@ -84,12 +87,13 @@ class  test_gdml_to_cdb(unittest.TestCase):
         This method ensures an error is raised when
         an invalid argument is passed.
         """
-        test_file_list = os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testGDMLtoCDB'
+        path = '/src/common_py/geometry/testCases/testGDMLtoCDB'
+        test_file_list = os.environ['MAUS_ROOT_DIR'] + path
         try:
             self.constructor = GDMLtocdb(test_file_list, self.testnote, 1)
             self.assertTrue(False, 'should have raised an error')
         except:
-            pass
+            pass #pylint: disable = W0702
         
     def test_create_file_list(self):
         """
@@ -100,13 +104,15 @@ class  test_gdml_to_cdb(unittest.TestCase):
         file which lists the names of the files to be
         uploaded. In this case it is the test geometry.
         """
-        test_create_file_list = os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testCreateFileList'
+        path = '/src/common_py/geometry/testCases/testCreateFileList'
+        test_create_file_list = os.environ['MAUS_ROOT_DIR'] + path
         self.constructor = GDMLtocdb(test_create_file_list, self.testnote, 1)
         find_file = os.listdir(test_create_file_list)
         for fname in find_file:
             if fname == 'FileList.txt':
                 found_file = fname
-        self.assertEqual(found_file, 'FileList.txt', 'FileList.txt not created, test_GDMLtoCDB::test_create_file_list')
+        err = 'FileList.txt not created, test_GDMLtoCDB::test_create_file_list'
+        self.assertEqual(found_file, 'FileList.txt', err)
         path = test_create_file_list + '/FileList.txt'
         os.remove(path)
         
@@ -118,14 +124,22 @@ class  test_gdml_to_cdb(unittest.TestCase):
         and check to make sure the test geometry
         is uploaded. 
         """
-        test_upload = os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testUpload.not_zip'
+        path = '/src/common_py/geometry/testCases/testUpload.not_zip'
+        test_upload = os.environ['MAUS_ROOT_DIR'] + path
         try:
             self.test_gdml_to_cdb.upload_to_cdb(test_upload)
             self.assertTrue(False, 'Should have raised an error')
         except:
-            pass
+            pass #pylint: disable = W0702
         
-    def tearDown(self):
+        file = '/src/common_py/geometry/testCases/testGeometry.zip'
+        path = os.environ['MAUS_ROOT_DIR'] + file
+        self.test_gdml_to_cdb.upload_to_cdb(path)
+        response = self.test_gdml_to_cdb.server_status
+        err = "GDML not inserted into CDB"
+        self.assertEqual(response, "Inserted GDML, 13648 bytes", err)
+        
+    def tearDown(self): #pylint: disable = C0103
         """
         method tearDown
         
@@ -133,13 +147,12 @@ class  test_gdml_to_cdb(unittest.TestCase):
         is created in setUp. This file causes problems for
         other tests.
         """
-        path = os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testGeometry/FileList.txt' 
+        f_path = '/src/common_py/geometry/testCases/testGeometry/FileList.txt'
+        path = os.environ['MAUS_ROOT_DIR'] + f_path
         os.remove(path) 
         
-        
-        #should figure out some more test to mock suds and check calls are being made.
     
-class test_downloader(unittest.TestCase):
+class test_downloader(unittest.TestCase): #pylint: disable = C0103, R0904
     """
     class test_downloader
     
@@ -154,7 +167,7 @@ class test_downloader(unittest.TestCase):
         ready for testing.
         """
         self.constructor = None
-        self.test_downloader = Downloader(1)
+        self.test_downloader = Downloader(1) #pylint: disable = W0201
         
     def test_constructor(self):
         """
@@ -165,10 +178,10 @@ class test_downloader(unittest.TestCase):
         as they should be. 
         """
         try:
-            self.constructor = Downloader('not an int')
+            self.constructor = Downloader('not an int') #pylint: disable = W0201
             self.assertTrue(False, 'Should have raised an error')
         except:
-            pass
+            pass #pylint: disable = W0702
         
     def test_download_current(self):
         """
@@ -181,7 +194,7 @@ class test_downloader(unittest.TestCase):
             self.test_downloader.download_current('Not a Path')
             self.assertTrue(False, 'Should have raised an error')
         except:
-            pass
+            pass #pylint: disable = W0702
     
     def test_download_geometry_for_id(self):
         """
@@ -195,14 +208,14 @@ class test_downloader(unittest.TestCase):
             self.test_downloader.download_geometry_for_id(num, 'Not a Path')
             self.assertTrue(False, 'Should have raised an error')
         except:
-            pass
+            pass #pylint: disable = W0702
         try:
             num = int(14)
             maus = os.environ['MAUS_ROOT_DIR']
             self.test_downloader.download_geometry_for_id(num, maus)
             self.assertTrue(False, 'Should have raised an error')
         except:
-            pass
+            pass #pylint: disable = W0702
         
     def test_download_beamline_for_run(self):
         """
@@ -216,14 +229,14 @@ class test_downloader(unittest.TestCase):
             self.test_downloader.download_beamline_for_run(num, 'Not a Path')
             self.assertTrue(False, 'Should have raised an error')
         except:
-            pass
+            pass #pylint: disable = W0702
         try:
             num = int(14)
             maus = os.environ['MAUS_ROOT_DIR']
             self.test_downloader.download_beamline_for_run(num, maus)
             self.assertTrue(False, 'Should have raised an error')
         except:
-            pass    
+            pass #pylint: disable = W0702   
         
         #More tests needed? Need to figure these out as the class
         #needs to talk to the cdb to test!?

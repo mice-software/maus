@@ -70,6 +70,7 @@ class Formatter:
                 self.stepfiles.append(stepfile)
             if self.field_file == None:
                 raise IOError('Please write a Field.gdml file which contains MAUS_info see README for details')
+        
             
     def format_schema_location(self, gdmlfile):
         """
@@ -115,22 +116,29 @@ class Formatter:
         """
         @method merge_maus_info
         
-        This method adds the field information
+        This method adds the run information
         to the configuration GDML.
         """
         if gdmlfile[-5:] != '.gdml' and gdmlfile[-4:] != '.xml':
             raise IOError(gdmlfile + ' is not a gdml or xml', 'Formatter::format_schema_location')
-        else:    
-            field = minidom.parse(gdmlfile)
-            beamline = minidom.parse(self.beamline_file)
-            for node in beamline.getElementsByTagName("run"):
-                maus_info = node
-            root_node = field.childNodes[0].childNodes[1].childNodes[1]
-            root_node.insertBefore(maus_info, root_node.childNodes[0])
-            fout = open(gdmlfile, 'w')
-            field.writexml(fout)
-            fout.close()
-            os.remove(self.beamline_file)
+        else:
+            run_info = False
+            fin = open(gdmlfile, 'r')
+            for lines in fin.readlines():
+                if lines.find('run') >= 0:
+                    run_info = True
+            fin.close()
+            if run_info == False:
+                field = minidom.parse(gdmlfile)
+                beamline = minidom.parse(self.beamline_file)
+                for node in beamline.getElementsByTagName("run"):
+                    maus_info = node
+                root_node = field.childNodes[0].childNodes[1].childNodes[1]
+                root_node.insertBefore(maus_info, root_node.childNodes[0])
+                fout = open(gdmlfile, 'w')
+                field.writexml(fout)
+                fout.close()
+            print 'Run information merged!'
      
     def format_materials(self, gdmlfile):
         """
@@ -224,10 +232,10 @@ class Formatter:
         the class constructor.
         """
         self.format_check(self.configurationfile)
+        if self.beamline_file != None:
+            self.merge_run_info(self.field_file)
         if self.formatted == False:
             self.format_schema_location(self.configurationfile)
-            if self.beamline_file != None:
-                self.merge_run_info(self.field_file)
             self.merge_maus_info(self.configurationfile)
             self.format_materials(self.configurationfile)
             self.insert_materials_ref(self.txtfile)

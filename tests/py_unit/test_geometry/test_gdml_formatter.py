@@ -113,16 +113,6 @@ class  test_gdml_formatter(unittest.TestCase): #pylint: disable = C0103, R0904
         except:
             pass #pylint: disable = W0702
         
-        #this next section calls format_schema_location
-        #and checks the schema has been entered
-        #self.gdml.merge_maus_info(self.gdml.configurationfile)
-        #fin = open(self.gdml.configurationfile, 'r')
-        #for lines in fin.readlines():
-        #    if lines.find('MICE_Information') >= 0:
-        #        count += 1
-        #self.assertEqual(1, count, 'Formatting not complete')
-        #count = 0
-
     def test_merge_run_info(self):
         """
         method test_merge_run_info
@@ -136,7 +126,15 @@ class  test_gdml_formatter(unittest.TestCase): #pylint: disable = C0103, R0904
             self.assertTrue(False, 'Should have raised an error')
         except:
             pass #pylint: disable = W0702
-             
+
+        fin = open(self.gdml.field_file, 'r')
+        count = 0
+        for lines in fin.readlines():
+            if lines.find('run') >= 0:
+                count += 1
+        self.assertEqual(2, count, 'Formatting not complete')
+        count = 0
+                     
     
     def test_format_materials(self):
         """
