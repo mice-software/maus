@@ -5,17 +5,14 @@
 ###!!! PLEASE MAKE A COPY OF THIS FILE WITH THE CP COMMAND !!!###
 #################################################################
 
-"""Simulate the MICE experiment, saving ADC/TDC counts as histograms
+"""Simulate the MICE experiment
 
 This will simulate 'number_of_spills' MICE events through the entirity
-of MICE using Geant4. At present, TOF and Tracker hits will be digitized.
-This output histograms of TDC against ADC counts for each spill and the
-total spills processed.
+of MICE using Geant4.  At present, TOF and Tracker hits will be digitized.
 """
 
-import io   # Generic python library for I/O.
-import gzip # For compressed output # pylint: disable=W0611
-import os   # For current working directory.
+import io   #  generic python library for I/O
+import gzip #  For compressed output # pylint: disable=W0611
 
 import MAUS
 
@@ -23,8 +20,7 @@ def run():
     """ Run the macro
     """
 
-    # This input generates empty spills, to be filled by the beam maker 
-    # later on.
+    # This input generates empty spills, to be filled by the beam maker later on
     my_input = MAUS.InputPySpillGenerator()
 
     # Create an empty array of mappers, then populate it
@@ -34,34 +30,15 @@ def run():
     my_map.append(MAUS.MapCppSimulation())  #  geant4 simulation
     my_map.append(MAUS.MapCppTOFDigitization())  #  TOF electronics model
     my_map.append(MAUS.MapCppTrackerDigitization())  # SciFi electronics model
+    # can specify datacards here or by using appropriate command line calls
+    datacards = io.StringIO(u"")
+    # Then construct a MAUS output component - filename comes from datacards
+    my_output = MAUS.OutputPyJSON()
 
-    # Create a reducer. Image type specified in datacards below.
-    my_reduce = MAUS.ReducePyHistogramTDCADCCounts()
+    # The Go() drives all the components you pass in, then check the file
+    # (default simulation.out) for output
 
-    # Can specify datacards here or by using appropriate command line calls.
-    datacards_list = []
-    # image type must be one of those supported by matplotlib
-    # (currently "svg", "ps", "emf", "rgba", "raw", "svgz", "pdf",
-    # "eps", "png"). Default: "eps".
-    datacards_list.append("histogram_image_type='%s'\n" % "eps")
-    # Add auto-numbering to the image tags. If False then each 
-    # histogram output by ReducePyMatplotlibHistogram will have
-    # tags "tdcadc" and so the end result will be just one histogram 
-    # file. If True then there will be N files, one for each spill.
-    datacards_list.append("histogram_auto_number=%s\n" % False)
-    # Prefix for file names. Default: auto-generated UUID.
-    datacards_list.append("image_file_prefix='%s'\n" % "histogram")
-    # Directory for images. Default: current directory.
-    datacards_list.append("image_directory='%s'\n" % os.getcwd())
-    datacards = io.StringIO(unicode("".join(datacards_list)))
-
-    # Construct a MAUS output worker - filename and directory
-    # comes from datacards.
-    my_output = MAUS.OutputPyImage()
-
-    # Go() drives all the components you pass in. Histograms
-    # will be placed in the current directory.
-    MAUS.Go(my_input, my_map, my_reduce, my_output, datacards)
+    MAUS.Go(my_input, my_map, MAUS.ReducePyDoNothing(), my_output, datacards)
 
 if __name__ == '__main__':
     run()
