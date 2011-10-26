@@ -1,3 +1,6 @@
+"""
+M.littlefield
+"""
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 # 
 #  MAUS is free software: you can redistribute it and/or modify
@@ -17,22 +20,21 @@ import unittest
 import os
 from geometry.GDMLFormatter import Formatter
 
-#pylint: disable = C0301, W0702, C0103, R0904, W0201
-
-class  test_gdml_formatter(unittest.TestCase):
+class  test_gdml_formatter(unittest.TestCase): #pylint: disable = C0103, R0904
     """
     class test_gdml_formatter This ensures that 
     GDMLFormatter.py is working as expected.
     """
-    def setUp(self):
+    def setUp(self): #pylint: disable = C0103
         """
         method set_up
         
         This method creates a Formatter object ready for testing
         """
         self.constructor = None
-        test_case = os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testGeometry'
-        self.gdml = Formatter(test_case)
+        path = '/src/common_py/geometry/testCases/testGeometry'
+        self.test_case = os.environ['MAUS_ROOT_DIR'] + path
+        self.gdml = Formatter(self.test_case)
 
     def test_constructor(self):
         """
@@ -48,23 +50,36 @@ class  test_gdml_formatter(unittest.TestCase):
             self.constructor = Formatter(1)
             self.assertTrue(False, 'should have raised an exception')
         except:
-            pass
+            pass #pylint: disable = W0702
         
         #Now it tests the Formatter constructor by passing an
         #argument of a file which isn't a GDML. An error
         #should be raised.
         try:
-            test_case = os.environ['MAUS_ROOT_DIR'] + '/src/common_py/geometry/testCases/testFormatter'
+            path = '/src/common_py/geometry/testCases/testFormatter'
+            test_case = os.environ['MAUS_ROOT_DIR'] + path
             self.constructor = Formatter(test_case)
             self.assertTrue(False, 'should have raised an exception')
         except:
-            pass
+            pass #pylint: disable = W0702
+        
+        #this next section tests to make sure 
+        #the class object is created properly
+        err_msg = 'File was not saved as class object'
+        materialfile = self.test_case + '/fastradModel_materials.xml'
+        self.assertEqual(self.gdml.materialfile, materialfile, err_msg)
+        configfile = self.test_case + '/fastradModel.gdml'
+        self.assertEqual(self.gdml.configurationfile, configfile, err_msg)
+        field_file = self.test_case + '/Field.gdml'
+        self.assertEqual(self.gdml.field_file, field_file, err_msg)
+        beamline_file = self.test_case + '/Beamline.gdml'
+        self.assertEqual(self.gdml.beamline_file, beamline_file, err_msg)
         
     def test_format_schema_location(self):
         """
         method test_format_schema_location
         
-        This pass a file which is not a GDML to 
+        This passes a file which is not a GDML to 
         the relating method which should raise an
         error.
         """
@@ -72,7 +87,17 @@ class  test_gdml_formatter(unittest.TestCase):
             self.gdml.format_schema_location('Gemoetry.not_gdml')
             self.assertTrue(False, 'Should have raised an error')
         except:
-            pass
+            pass #pylint: disable = W0702
+        
+        #this next section calls format_schema_location
+        #and checks the schema has been entered
+        fin = open(self.gdml.configurationfile, 'r')
+        count = 0
+        for lines in fin.readlines():
+            if lines.find(self.gdml.schema) >= 0:
+                count += 1
+        self.assertEqual(1, count, 'Formatting not complete')
+        count = 0
         
     def test_merge_maus_info(self):
         """
@@ -86,7 +111,17 @@ class  test_gdml_formatter(unittest.TestCase):
             self.gdml.merge_maus_info('Gemoetry.not_gdml')
             self.assertTrue(False, 'Should have raised an error')
         except:
-            pass
+            pass #pylint: disable = W0702
+        
+        #this next section calls format_schema_location
+        #and checks the schema has been entered
+        #self.gdml.merge_maus_info(self.gdml.configurationfile)
+        #fin = open(self.gdml.configurationfile, 'r')
+        #for lines in fin.readlines():
+        #    if lines.find('MICE_Information') >= 0:
+        #        count += 1
+        #self.assertEqual(1, count, 'Formatting not complete')
+        #count = 0
 
     def test_merge_run_info(self):
         """
@@ -100,7 +135,7 @@ class  test_gdml_formatter(unittest.TestCase):
             self.gdml.merge_run_info('Gemoetry.not_gdml')
             self.assertTrue(False, 'Should have raised an error')
         except:
-            pass
+            pass #pylint: disable = W0702
              
     
     def test_format_materials(self):
@@ -115,7 +150,7 @@ class  test_gdml_formatter(unittest.TestCase):
             self.gdml.format_materials('Gemoetry.not_gdml')
             self.assertTrue(False, 'Should have raised an error')
         except:
-            pass
+            pass #pylint: disable = W0702
 
     def test_insert_materials_ref(self):
         """
@@ -129,7 +164,7 @@ class  test_gdml_formatter(unittest.TestCase):
             self.gdml.insert_materials_ref('Gemoetry.not_gdml')
             self.assertTrue(False, 'Should have raised an error')
         except:
-            pass    
+            pass #pylint: disable = W0702   
 
     def test_format_check(self):
         """
@@ -143,7 +178,7 @@ class  test_gdml_formatter(unittest.TestCase):
             self.gdml.format_check('Gemoetry.not_gdml')
             self.assertTrue(False, 'Should have raised an error')
         except:
-            pass
+            pass #pylint: disable = W0702
                 
     def test_format(self):
         """
@@ -184,6 +219,7 @@ class  test_gdml_formatter(unittest.TestCase):
             self.assertEqual(3, count, 'Formatting not complete')
             count = 0
             fin.close()
+        
         
 if __name__ == '__main__':
     unittest.main()

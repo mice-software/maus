@@ -110,7 +110,7 @@
     <xs:element name="MICE_Information">
         <xs:annotation>
             <xs:documentation>
-                This Information is need for the MICE experiment. It is
+                This Information is needed for the MICE experiment. It is
                 translated through the CAD to Software translation system
                 and is need for simulations. Some of this information comes
                 direct from the control room and some is stored in MAUS 
@@ -129,11 +129,11 @@
 </xs:schema>
 
 
-<xs:element name="Station" substitutionGroup="Tracker_Part">
+<!-- <xs:element name="Station" substitutionGroup="Tracker_Part">
     <xs:complexType>
         <xs:sequence>
             <xs:element name="Position" type="PositionType"/>
         </xs:sequence>
     </xs:complexType>
     
-</xs:element>
+</xs:element> -->

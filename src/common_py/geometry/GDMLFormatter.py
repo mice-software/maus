@@ -99,7 +99,7 @@ class Formatter:
         to the configuration GDML.
         """
         if gdmlfile[-5:] != '.gdml' and gdmlfile[-4:] != '.xml':
-            raise IOError(gdmlfile + ' is not a gdml or xml', 'Formatter::format_schema_location')
+            raise IOError(gdmlfile + ' is not a gdml or xml', 'Formatter::merge_maus_info')
         else:
             config = minidom.parse(gdmlfile)
             field = minidom.parse(self.field_file)
