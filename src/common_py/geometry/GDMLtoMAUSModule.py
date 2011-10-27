@@ -1,3 +1,6 @@
+"""
+M. Littlefield
+"""
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 # 
 #  MAUS is free software: you can redistribute it and/or modify
@@ -16,9 +19,7 @@
 import os
 from geometry.CADImport import CADImport
 
-#pylint: disable = C0301, R0903
-
-class GDMLtomaus():
+class GDMLtomaus(): #pylint: disable = R0903
     """
     @class GDMLtomaus This class converts GDMLs to MAUS Modules
     
@@ -60,7 +61,9 @@ class GDMLtomaus():
             if fname.find('Field') >= 0:
                 found_file = self.path + '/' + fname
                 self.field_file = found_file
-            if fname.find('materials') < 0 and fname.find('fastrad') < 0 and fname.find('Field') < 0:
+            if fname.find('materials') < 0 \
+             and fname.find('fastrad') < 0 \
+               and fname.find('Field') < 0:
                 stepfile = self.path + '/' + fname
                 self.step_files.append(stepfile)
 
@@ -82,7 +85,8 @@ class GDMLtomaus():
             outputfile = output + "/ParentGeometryFile.dat"
             maus = os.environ["MAUS_ROOT_DIR"] + '/src/common_py/geometry/'
             configxsl = maus  + 'xsltScripts/GDML2G4MICE.xsl'
-            config_file = CADImport(xmlin1 = self.config_file, xsl = configxsl, output = outputfile)
+            config_file = CADImport(xmlin1 = self.config_file, \
+                           xsl = configxsl, output = outputfile)
             config_file.parse_xslt()
             print "Configuration File Converted"
             length = len(self.step_files)
@@ -93,12 +97,15 @@ class GDMLtomaus():
                 file_name = num_of_splits - 1
                 file_name = new_string[file_name]
                 outputfile = output + '/' + file_name[:-4] + 'dat'
-                mm_xsl = os.environ["MAUS_ROOT_DIR"] + "/src/common_py/geometry/xsltScripts/MMTranslation.xsl"
-                step_file = CADImport(xmlin1 = self.step_files[num], xsl = mm_xsl, output = outputfile)
+                mm_xsl = os.environ["MAUS_ROOT_DIR"] + \
+                "/src/common_py/geometry/xsltScripts/MMTranslation.xsl"
+                step_file = CADImport(xmlin1 = self.step_files[num], \
+                                    xsl = mm_xsl, output = outputfile)
                 step_file.parse_xslt()
                 step_file = None
                 os.remove(self.step_files[num])
-                print "Converting " + str(num+1) + " of " + str(length) + " Geometry Files"
+                print "Converting " + str(num+1) + \
+            " of " + str(length) + " Geometry Files"
             os.remove(self.config_file)
 
 def main():

@@ -1,3 +1,6 @@
+"""
+M. Littlefield
+"""
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 # 
 #  MAUS is free software: you can redistribute it and/or modify
@@ -16,6 +19,11 @@
 from cdb import Geometry
 
 def main():
+    """
+    This is a small macro which 
+    prints the ids and descriptions of the 
+    geometries within the time specified.
+    """
     
     display_ids = Geometry()
     twsdl = "http://rgma19.pp.rl.ac.uk:8080/cdb/geometrySuperMouse?wsdl"
