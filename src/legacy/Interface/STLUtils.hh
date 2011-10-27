@@ -22,6 +22,7 @@
 #include <string>
 #include <sstream>
 #include <iomanip>
+#include <stdlib.h>
 
 /// STLUtils namespace contains useful utility functions for the STL.
 
@@ -141,6 +142,8 @@ template <class TEMP_CLASS> std::string ToString
   ss << value;
   return ss.str();
 }
+
+std::string ReplaceVariables( std::string fileName );
 }
 
 /// A macro to disallow the copy constructor and operator= functions

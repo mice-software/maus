@@ -24,15 +24,7 @@
 
 namespace {
 
-class STLUtilsTest : public ::testing::Test {
-  protected:
-    STLUtilsTest() {}
-    virtual ~STLUtilsTest() {}
-    virtual void SetUp()    {}
-    virtual void TearDown() {}
-};
-
-TEST_F(STLUtilsTest, IterableEqualityTest) {
+TEST(STLUtilsTest, IterableEqualityTest) {
   std::vector<int> a, b;
   EXPECT_TRUE(STLUtils::IterableEquality(a, b));
   EXPECT_TRUE(STLUtils::IterableEquality(a.begin(), a.end(),
@@ -54,7 +46,7 @@ TEST_F(STLUtilsTest, IterableEqualityTest) {
   }
 }
 
-TEST_F(STLUtilsTest, ToStringTest) {
+TEST(STLUtilsTest, ToStringTest) {
   EXPECT_EQ(STLUtils::ToString(1), std::string("1"))
                                                 << STLUtils::ToString(1);
   EXPECT_EQ(STLUtils::ToString("string"), std::string("string"))
@@ -69,5 +61,11 @@ TEST_F(STLUtilsTest, ToStringTest) {
   EXPECT_EQ(STLUtils::ToStringP(13.14159265359, 3), std::string("13.1"))
                                       << STLUtils::ToStringP(13.14159265359, 3);
 }
+
+TEST(STLUtilsTest, ReplaceVariablesTest) {
+  EXPECT_EQ(1, 0);
+}
+
+
 }
 
