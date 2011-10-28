@@ -21,8 +21,8 @@ import os
 from geometry.GDMLtoCDB import GDMLtocdb
 from geometry.GDMLtoCDB import Downloader
 from cdb import GeometrySuperMouse
+import urllib2
 
-cdb_connection = str(GeometrySuperMouse().get_status()) #pylint: disable = C0103
 
 class  test_gdml_to_cdb(unittest.TestCase): #pylint: disable = C0103, R0904
     """
@@ -31,6 +31,19 @@ class  test_gdml_to_cdb(unittest.TestCase): #pylint: disable = C0103, R0904
     This class tests the uploading class
     (GDMLtocdb) of GDMLtoCDB.
     """
+    def internet_on_uploader(self):
+        """
+        method internet_on_uploader
+        
+        This method checks there is an internet 
+        connection as the tests require internet.
+        """
+        try:
+            response=urllib2.urlopen('http://google.com',timeout=1)
+            return True
+        except urllib2.URLError as err: pass
+        return False
+
     def setUp(self): #pylint: disable = C0103
         """
         method set_up
@@ -38,11 +51,14 @@ class  test_gdml_to_cdb(unittest.TestCase): #pylint: disable = C0103, R0904
         This method sets up GDMLtoCDB objects 
         ready for testing.
         """
-        self.constructor = None
-        path = '/src/common_py/geometry/testCases/testGeometry'
-        self.testcase = os.environ['MAUS_ROOT_DIR'] + path
-        self.testnote = 'This is the unit test'
-        self.test_gdml_to_cdb = GDMLtocdb(self.testcase, self.testnote, 1)
+        if self.internet_on_uploader() == False:
+            print "No connection to CDB. Can't set up"
+        else:
+            self.constructor = None
+            path = '/src/common_py/geometry/testCases/testGeometry'
+            self.testcase = os.environ['MAUS_ROOT_DIR'] + path
+            self.testnote = 'This is the unit test'
+            self.test_gdml_to_cdb = GDMLtocdb(self.testcase, self.testnote, 1)
         
     def test_constructor(self):
         """
@@ -52,7 +68,7 @@ class  test_gdml_to_cdb(unittest.TestCase): #pylint: disable = C0103, R0904
         invalid arguments and tests whether errors are 
         raised.
         """
-        if cdb_connection != "OK":
+        if self.internet_on_uploader() == False:
             print "No connection to CDB. Unit test " + \
                       "test_constructor not carried out"
         else:
@@ -81,15 +97,14 @@ class  test_gdml_to_cdb(unittest.TestCase): #pylint: disable = C0103, R0904
         
         This method ensures the server is set up.
         """
-        if cdb_connection != "OK":
+        if self.internet_on_uploader() == False:
             print "No connection to CDB. Unit test " + \
-                      "test_constructor not carried out"
+                    "test_set_up_server not carried out"
         else:
             wsdl_url = self.test_gdml_to_cdb.set_up_server()
             wsdl = 'http://rgma19.pp.rl.ac.uk:8080/cdb/geometrySuperMouse?wsdl'
             err = 'WSDL URL not set up, test_gdmltocdb::test_set_up_server'
             self.assertEqual(wsdl_url, wsdl, err)
-            #write the same for actual server
             
     def test_check_file_list(self):
         """
@@ -98,9 +113,9 @@ class  test_gdml_to_cdb(unittest.TestCase): #pylint: disable = C0103, R0904
         This method ensures an error is raised when
         an invalid argument is passed.
         """
-        if cdb_connection != "OK":
+        if self.internet_on_uploader() == False:
             print "No connection to CDB. Unit test " + \
-                      "test_constructor not carried out"
+                  "test_check_file_list not carried out"
         else:
             path = '/src/common_py/geometry/testCases/testGDMLtoCDB'
             test_file_list = os.environ['MAUS_ROOT_DIR'] + path
@@ -119,9 +134,9 @@ class  test_gdml_to_cdb(unittest.TestCase): #pylint: disable = C0103, R0904
         file which lists the names of the files to be
         uploaded. In this case it is the test geometry.
         """
-        if cdb_connection != "OK":
+        if self.internet_on_uploader() == False:
             print "No connection to CDB. Unit test " + \
-                      "test_constructor not carried out"
+                 "test_create_file_list not carried out"
         else:
             path = '/src/common_py/geometry/testCases/testCreateFileList'
             test_create_file_list = os.environ['MAUS_ROOT_DIR'] + path
@@ -144,9 +159,9 @@ class  test_gdml_to_cdb(unittest.TestCase): #pylint: disable = C0103, R0904
         and check to make sure the test geometry
         is uploaded. 
         """
-        if cdb_connection != "OK":
+        if self.internet_on_uploader() == False:
             print "No connection to CDB. Unit test " + \
-                      "test_constructor not carried out"
+                    "test_upload_to_cdb not carried out"
         else:
             path = '/src/common_py/geometry/testCases/testUpload.not_zip'
             test_upload = os.environ['MAUS_ROOT_DIR'] + path
@@ -171,10 +186,13 @@ class  test_gdml_to_cdb(unittest.TestCase): #pylint: disable = C0103, R0904
         is created in setUp. This file causes problems for
         other tests.
         """
-        f_path = '/src/common_py/geometry/testCases/testGeometry/FileList.txt'
-        path = os.environ['MAUS_ROOT_DIR'] + f_path
-        os.remove(path) 
-        
+        if self.internet_on_uploader() == False:
+            print "No tear down required"
+        else:
+            f_path = '/src/common_py/geometry/testCases/testGeometry/FileList.txt'
+            path = os.environ['MAUS_ROOT_DIR'] + f_path
+            os.remove(path) 
+            
     
 class test_downloader(unittest.TestCase): #pylint: disable = C0103, R0904
     """
@@ -193,6 +211,13 @@ class test_downloader(unittest.TestCase): #pylint: disable = C0103, R0904
         self.constructor = None
         self.test_downloader = Downloader(1) #pylint: disable = W0201
         
+    def internet_on_downloader(self):
+        try:
+            response=urllib2.urlopen('http://google.com',timeout=1)
+            return True
+        except urllib2.URLError as err: pass
+        return False
+   
     def test_constructor(self):
         """
         method test_constructor
@@ -201,7 +226,7 @@ class test_downloader(unittest.TestCase): #pylint: disable = C0103, R0904
         invalid arguments and seeing if errors are raised 
         as they should be. 
         """
-        if cdb_connection != "OK":
+        if self.internet_on_downloader() == False:
             print "No connection to CDB. Unit test " + \
                       "test_constructor not carried out"
         else:
@@ -218,9 +243,9 @@ class test_downloader(unittest.TestCase): #pylint: disable = C0103, R0904
         This method checks to see if errors are raised 
         when false arguments are entered.
         """
-        if cdb_connection != "OK":
+        if self.internet_on_downloader() == False:
             print "No connection to CDB. Unit test " + \
-                      "test_constructor not carried out"
+                 "test_download_current not carried out"
         else:
             try:
                 self.test_downloader.download_current('Not a Path')
@@ -235,9 +260,9 @@ class test_downloader(unittest.TestCase): #pylint: disable = C0103, R0904
         This method checks to see if errors are raised 
         when false arguments are entered.
         """
-        if cdb_connection != "OK":
+        if self.internet_on_downloader() == False:
             print "No connection to CDB. Unit test " + \
-                      "test_constructor not carried out"
+        "test_download_geometry_for_id not carried out"
         else:
             try:
                 num = str(14)
@@ -261,9 +286,9 @@ class test_downloader(unittest.TestCase): #pylint: disable = C0103, R0904
         on the testserver and checks that 
         the correct id num is returned.
         """
-        if cdb_connection != "OK":
+        if self.internet_on_downloader() == False:
             print "No connection to CDB. Unit test " + \
-                      "test_constructor not carried out"
+                      "test_get_ids not carried out"
         else:
             result = Downloader(1).get_ids("2011-09-08 09:00:00", \
                                              "2011-09-09 09:00:00")
@@ -277,9 +302,9 @@ class test_downloader(unittest.TestCase): #pylint: disable = C0103, R0904
         This method checks to see if errors are raised 
         when false arguments are entered.
         """
-        if cdb_connection != "OK":
+        if self.internet_on_downloader() == False:
             print "No connection to CDB. Unit test " + \
-                      "test_constructor not carried out"
+        "test_download_beamline_for_run not carried out"
         else:
             try:
                 num = str(14)
