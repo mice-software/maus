@@ -12,7 +12,7 @@ Module MatchCoil2
   PropertyString Material Cu
 //Field
   PropertyString FieldType      Solenoid
-  PropertyString FileName       match2.dat
+  PropertyString FileName       ${MAUS_ROOT_DIR}/tmp/match2.fld
   PropertyDouble CurrentDensity      1.
   PropertyDouble Length            197.
   PropertyDouble Thickness          26.4

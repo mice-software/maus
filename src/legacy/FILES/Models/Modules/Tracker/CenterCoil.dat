@@ -12,7 +12,7 @@ Module CenterCoil
   PropertyString Material Cu
 //Field
   PropertyString FieldType      Solenoid
-  PropertyString FileName       center.dat
+  PropertyString FileName       ${MAUS_ROOT_DIR}/tmp/center.fld
   PropertyDouble CurrentDensity    1.
   PropertyDouble Length         1294.
   PropertyDouble Thickness        22.

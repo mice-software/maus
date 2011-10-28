@@ -36,28 +36,13 @@ def run():
     my_map.append(MAUS.MapCppTrackerDigitization())  # SciFi electronics model
 
     # Create a reducer. Image type specified in datacards below.
-    my_reduce = MAUS.ReducePyHistogramTDCADCCounts()
+    my_reduce = MAUS.ReducePyDoNothing()
 
-    # Can specify datacards here or by using appropriate command line calls.
-    datacards_list = []
-    # image type must be one of those supported by matplotlib
-    # (currently "svg", "ps", "emf", "rgba", "raw", "svgz", "pdf",
-    # "eps", "png"). Default: "eps".
-    datacards_list.append("histogram_image_type='%s'\n" % "eps")
-    # Add auto-numbering to the image tags. If False then each 
-    # histogram output by ReducePyMatplotlibHistogram will have
-    # tags "tdcadc" and so the end result will be just one histogram 
-    # file. If True then there will be N files, one for each spill.
-    datacards_list.append("histogram_auto_number=%s\n" % False)
-    # Prefix for file names. Default: auto-generated UUID.
-    datacards_list.append("image_file_prefix='%s'\n" % "histogram")
-    # Directory for images. Default: current directory.
-    datacards_list.append("image_directory='%s'\n" % os.getcwd())
-    datacards = io.StringIO(unicode("".join(datacards_list)))
+    datacards = io.StringIO()
 
     # Construct a MAUS output worker - filename and directory
     # comes from datacards.
-    my_output = MAUS.OutputPyImage()
+    my_output = MAUS.OutputPyJSON()
 
     # Go() drives all the components you pass in. Histograms
     # will be placed in the current directory.

@@ -12,7 +12,7 @@ Module EndCoil2
   PropertyString Material Cu
 //Field
   PropertyString FieldType      Solenoid
-  PropertyString FileName       end2.dat
+  PropertyString FileName       ${MAUS_ROOT_DIR}/tmp/end2.fld
   PropertyDouble CurrentDensity    1.
   PropertyDouble Length          110.
   PropertyDouble Thickness        68.2

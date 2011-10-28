@@ -40,7 +40,6 @@ BTSolenoid::BTSolenoid(double length, double thickness, double innerRadius, doub
           : myNumberOfRCoords(0), myNumberOfZCoords(0), zMin(0), zMax(0),
             rMin(0), rMax(0), interpolation("LinearCubic"), isAnalytic(analytic)
 {
-  fileName = STLUtils::ReplaceVariables(std::string(fileName)).c_str();
 	if(!isAnalytic)
 	{
 		SetToDefaults();
@@ -59,7 +58,6 @@ BTSolenoid::BTSolenoid(double length, double thickness, double innerRadius, doub
 // onto a file.
 BTSolenoid::BTSolenoid(char const *fileName, std::string interpolationAlgorithm): interpolation(interpolationAlgorithm), isAnalytic(false)
 {
-  fileName = STLUtils::ReplaceVariables(std::string(fileName)).c_str();
 	ReadFieldMap(fileName, interpolation);
 }
 
