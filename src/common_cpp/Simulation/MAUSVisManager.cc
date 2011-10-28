@@ -123,7 +123,7 @@ void MAUSVisManager::RegisterGraphicsSystems() {
   PrintAvailableGraphicsSystems();
 }
 
-G4Color MAUSVisManager::GetColourValues(std::string particle_type, Json::Value conf){
+G4Color MAUSVisManager::GetColourValues(std::string particle_type, Json::Value conf) {
   Json::Value particle = JsonWrapper::GetProperty
            (conf, particle_type + "_vis_colour", JsonWrapper::objectValue);
   double red = JsonWrapper::GetProperty
@@ -132,7 +132,7 @@ G4Color MAUSVisManager::GetColourValues(std::string particle_type, Json::Value c
            (particle, "green", JsonWrapper::realValue).asDouble();
   double blue = JsonWrapper::GetProperty
            (particle, "blue", JsonWrapper::realValue).asDouble();
-  G4ThreeVector colours(red, green, blue);  
+  G4ThreeVector colours(red, green, blue);
   return G4Color(colours);
 }
 
@@ -165,16 +165,16 @@ void MAUSVisManager::SetupRun() {
                    STLUtils::ToString(theta)+" "+STLUtils::ToString(phi));
   ApplyCommand("/vis/drawVolume");
   ApplyCommand("/tracking/storeTrajectory 1");
-  if (accumulate > 0){
+  if (accumulate > 0) {
       ApplyCommand("/vis/scene/endOfEventAction accumulate");
       ApplyCommand("/vis/scene/endOfRunAction accumulate");
   }
   ApplyCommand("/vis/scene/add/trajectories");
-  
-  //create new drawByParticleID to change particle colours
+
+  // create new drawByParticleID to change particle colours
   G4TrajectoryDrawByParticleID* model = new G4TrajectoryDrawByParticleID;
-  
-  //configure model
+
+  // configure model
   model->SetDefault(GetColourValues("default", conf));
   model->Set("pi+", GetColourValues("pi_plus", conf));
   model->Set("pi-", GetColourValues("pi_minus", conf));
@@ -186,11 +186,9 @@ void MAUSVisManager::SetupRun() {
   model->Set("neutron", GetColourValues("neutron", conf));
   model->Set("photon", GetColourValues("photon", conf));
 
-  //Register model with visualization manager
+  // Register model with visualization manager
   RegisterModel(model);
-
 }
- 
 
 void MAUSVisManager::TearDownRun() {
   ApplyCommand("/vis/viewer/flush");
