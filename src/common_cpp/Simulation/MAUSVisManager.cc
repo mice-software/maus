@@ -117,6 +117,24 @@ void MAUSVisManager::RegisterGraphicsSystems() {
   RegisterGraphicsSystem(new G4VRML2);
 #endif
 
+  // create new drawByParticleID to change particle colours
+//  G4TrajectoryDrawByParticleID* model = new G4TrajectoryDrawByParticleID;
+
+  // configure model
+//  model->SetDefault(GetColourValues("default", conf));
+//  model->Set("pi+", GetColourValues("pi_plus", conf));
+//  model->Set("pi-", GetColourValues("pi_minus", conf));
+//  model->Set("mu+", GetColourValues("mu_plus", conf));
+//  model->Set("mu-", GetColourValues("mu_minus", conf));
+//  model->Set("e+", GetColourValues("e_plus", conf));
+//  model->Set("e-", GetColourValues("e_minus", conf));
+//  model->Set("gamma", GetColourValues("gamma", conf));
+//  model->Set("neutron", GetColourValues("neutron", conf));
+//  model->Set("photon", GetColourValues("photon", conf));
+
+  // Register model with visualization manager
+//  RegisterModel(model);
+
   Squeak::mout(Squeak::debug)
       << "\nYou have successfully chosen to use the following graphics systems."
       << std::endl;
@@ -170,24 +188,6 @@ void MAUSVisManager::SetupRun() {
       ApplyCommand("/vis/scene/endOfRunAction accumulate");
   }
   ApplyCommand("/vis/scene/add/trajectories");
-
-  // create new drawByParticleID to change particle colours
-  G4TrajectoryDrawByParticleID* model = new G4TrajectoryDrawByParticleID;
-
-  // configure model
-  model->SetDefault(GetColourValues("default", conf));
-  model->Set("pi+", GetColourValues("pi_plus", conf));
-  model->Set("pi-", GetColourValues("pi_minus", conf));
-  model->Set("mu+", GetColourValues("mu_plus", conf));
-  model->Set("mu-", GetColourValues("mu_minus", conf));
-  model->Set("e+", GetColourValues("e_plus", conf));
-  model->Set("e-", GetColourValues("e_minus", conf));
-  model->Set("gamma", GetColourValues("gamma", conf));
-  model->Set("neutron", GetColourValues("neutron", conf));
-  model->Set("photon", GetColourValues("photon", conf));
-
-  // Register model with visualization manager
-  RegisterModel(model);
 }
 
 void MAUSVisManager::TearDownRun() {

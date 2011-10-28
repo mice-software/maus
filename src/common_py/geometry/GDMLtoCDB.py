@@ -27,22 +27,26 @@ class GDMLtocdb: #pylint: disable = R0902
     """
     @Class GDMLtocdb handles the uploading of geometries to the CDB
 
-    This class writes the geometries to the database. It requires an input of the directory path which contains the GDML
-    files produce by fastRad. It will search this path and find all the files within it and will write these as a list
-    into a test file. This list of files and the contents of each individual file is saved to a zip file by another class
+    This class writes the geometries to the database. It requires an input of 
+    the directory path which contains the GDML files produce by fastRad. It 
+    will search this path and find all the files within it and will write these 
+    as a list into a test file. This list of files and the contents of each 
+    individual file is saved to a zip file by another class
     and then encoded and uploaded to the CDB.
     """
     def __init__(self, filepath, notes, testserver = None):
         """
-        @Method Class constructor This method sets up the necessaries to upload to the database
+        @Method Class constructor This method sets up the necessaries to upload
+                                  to the database
 
-        This method sets up some class variables and then calls other methods which set up
-        the connection to the database and also organise the GDMLs into an order ready to
-        upload.
+        This method sets up some class variables and then calls other methods 
+        which set up the connection to the database and also organise the GDMLs 
+        into an order ready to upload.
 
         @Param filepath path of the directory which contains the GDML files
         @Param notes must be a string which briefly describes the geometry
-        @Param testserver enter 1 to set up the test server leave blank for real server
+        @Param testserver enter 1 to set up the test server leave blank for 
+                          real server
         """
         self.server_status = None
         self.wsdlurl = None
@@ -127,7 +131,8 @@ class GDMLtocdb: #pylint: disable = R0902
     
     def create_file_list(self):
         """
-        @method create_file_list This method creates a text file which contains a list of geometries.
+        @method create_file_list This method creates a text file which contains 
+                                 a list of geometries.
         
         This method will create a text file which contains a list
         of the GDMLs in the path given by __init__. This is in 
@@ -156,9 +161,9 @@ class GDMLtocdb: #pylint: disable = R0902
         """
         @Method upload_to_cdb, this method uploads the geometries to the CDB
 
-        This method write the contents of all the gdmls and the file which lists the gdmls
-        into one string. This string is then encoded and uploaded to the CDB with a date stamp of
-        when the method is called.
+        This method write the contents of all the gdmls and the file which lists
+        the gdmls into one string. This string is then encoded and uploaded to 
+        the CDB with a date stamp of when the method is called.
         """
         if zipped_file[-4:] != '.zip':
             raise IOError('Argument is not a zip file', \
@@ -177,8 +182,8 @@ class Downloader: #pylint: disable = R0902
     """
     @Class Downloader, this class downloads geometries from the CDB
 
-    This class downloads the information from the CDB and decodes and unpacks the
-    information.
+    This class downloads the information from the CDB and decodes and unpacks 
+    the information.
     """
     def __init__(self, testserver = None):
         """
@@ -186,7 +191,8 @@ class Downloader: #pylint: disable = R0902
 
         This method sets up the connection to the CDB ready to download.
 
-        @Param testserver, If an argument of 1 is entered this will set a connection to the test CDB if left blank write to the actual CDB
+        @Param testserver, If an argument of 1 is entered this will set a 
+        connection to the test CDB if left blank write to the actual CDB
         """
         self.times = []
         self.id_nums = []
@@ -217,13 +223,16 @@ class Downloader: #pylint: disable = R0902
             
     def download_current(self, downloadpath):
         """
-        @Method download_current, this method downloads the current valid geometry and writes the files
+        @Method download_current, this method downloads the current valid 
+                                  geometry and writes the files
 
-        this method decodes the uploaded geometry and acquires fromt the string this list of files contained
-        within the upload. It then opens files in the ~/maus/src/common_py/geometries/Download which correspond
+        this method decodes the uploaded geometry and acquires fromt the 
+        string this list of files contained within the upload. It then opens 
+        files in the ~/maus/src/common_py/geometries/Download which correspond
         to the related gdml files and write the contents to these files.
         
-        @param  downloadedpath The path location where the files will be unpacked to. 
+        @param  downloadedpath The path location where the files will be 
+                               unpacked to. 
         """
         if os.path.exists(downloadpath) == False:
             raise IOError('Path does not exist!, Downloader::download_current')
@@ -238,11 +247,12 @@ class Downloader: #pylint: disable = R0902
         """
         @Method download geometry for ID 
 
-        This method gets the geometry, for the given ID, from the database then passes the 
-        string to the unpack method which unpacks it.
+        This method gets the geometry, for the given ID, from the database then 
+        passes the string to the unpack method which unpacks it.
         
         @param  id The integer ID number for the desired geometry.
-        @param  downloadedpath The path location where the files will be unpacked to. 
+        @param  downloadedpath The path location where the files will be 
+                               unpacked to. 
         """
         if os.path.exists(downloadpath) == False:
             raise IOError('Path does not exist!, Downloader::download_current')
@@ -263,8 +273,10 @@ class Downloader: #pylint: disable = R0902
         This method queries the database for the list of geometries and prints
         to the screen their ID numbers and their descriptions.
         
-        @param start_time The datetime of which you wish the query to start must be in UTC.
-        @param stop_time The datetime of which you wish the query to stop must be in UTC. Can be blank.
+        @param start_time The datetime of which you wish the query to start must
+                          be in UTC.
+        @param stop_time The datetime of which you wish the query to stop must
+                         be in UTC. Can be blank.
         """
         id_dict = self.geometry_cdb.get_ids(start_time, stop_time)
         ids = id_dict.keys()
@@ -278,11 +290,12 @@ class Downloader: #pylint: disable = R0902
         """
         @Method download geometry for run 
 
-        This method gets the geometry, for the given run number, from the database then passes the 
-        string to the unpack method which unpacks it.
+        This method gets the geometry, for the given run number, from the 
+        database then passes the string to the unpack method which unpacks it.
         
         @param  id The long ID run number for the desired geometry.
-        @param  downloadedpath The path location where the files will be unpacked to. 
+        @param  downloadedpath The path location where the files will be 
+                               unpacked to. 
         """
         if os.path.exists(downloadpath) == False:
             raise IOError('Path does not exist!')

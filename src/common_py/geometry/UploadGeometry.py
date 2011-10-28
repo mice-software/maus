@@ -25,9 +25,11 @@ def main():
     """
     Executable File
     
-    This file is the executable file which uploads the chosen geometry to the Configuration Database.
-    It takes a command line argument of a txt file which contains variables which will aid the uploading of the 
-    geometry. The main variables are the path to the folder which contains ONLY the fastrad outputted files. The 
+    This file is the executable file which uploads the chosen geometry to the 
+    Configuration Database. It takes a command line argument of a txt file 
+    which contains variables which will aid the uploading of the 
+    geometry. The main variables are the path to the folder which 
+    contains ONLY the fastrad outputted files. The 
     second variable is the string which describes that geometry.   
     """
     #configreader class takes the arguments from the txt file so we can use them

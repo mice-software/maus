@@ -26,11 +26,11 @@ class CADImport: #pylint: disable = R0903
     
     This class has been designed to parse XML(GDML) files in a number of ways.
     The first way applies an XSLT stylesheet to a GDML file which re writes the
-    file into MICE module format. The output can be a text file. The second parsing
-    method is where the XSLT stylesheet is applied to two GDMLs and appends the MICE
-    Information of one GDML to the end of the geometry GMDL file, taken from fastRad
-    in order to merge geometrical information and field information needed for G4. This outputs the
-    a GDML file.
+    file into MICE module format. The output can be a text file. The second 
+    parsing method is where the XSLT stylesheet is applied to two GDMLs and 
+    appends the MICE Information of one GDML to the end of the geometry GMDL 
+    file, taken from fastRad in order to merge geometrical information and
+    field information needed for G4. This outputs the a GDML file.
     """
 
     def __init__(self, xmlin1, xsl=None, xmlin2=None, \
@@ -39,15 +39,20 @@ class CADImport: #pylint: disable = R0903
         """
         @Method Class constructor
 
-        This method initialises the class and takes 6 parameters. The later 4 parameters are optional.
+        This method initialises the class and takes 6 parameters. 
+        The later 4 parameters are optional.
         All arguments should be file names or paths.
 
         @param xmlin1   first xml file name/path, used to apply an XSLT to.
-        @param xsl      xslt file name/path, xslt stylesheet used to re write xml(GDML)
-        @param xmlin2   second xml file name/path, used to hold the MICE info to append to geometry
+        @param xsl      xslt file name/path, xslt stylesheet used to 
+                        re write xml(GDML)
+        @param xmlin2   second xml file name/path,  
+                        used to hold the MICE info to append to geometry
         @param output   output file name/path
-        @param mergein  template XSLT for append, this is the file name/path to Merge.xsl.in which is the stylesheet
-                         used to append the MICE info to geometry info. This file must be altered to set the putout file name/path.
+        @param mergein  template XSLT for append, this is the file name/path  
+                        to Merge.xsl.in which is the stylesheet used to append
+                        the MICE info to geometry info. This file must be 
+                        altered to set the putout file name/path.
         @param mergeout file name/path to be inserted into merge.xsl.in.
         """
         if type(xmlin1) != str:

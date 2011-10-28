@@ -189,7 +189,8 @@ class Formatter: #pylint: disable = R0902
         reference call which is lost during the parsing of the GDML's
         in other methods.
         
-        @param GDMLFile The name of the file which will have its materials reference replaced.
+        @param GDMLFile The name of the file which will have its materials
+                        reference replaced.
         """
         if inputfile[-4:] != '.txt':
             raise IOError(inputfile + \

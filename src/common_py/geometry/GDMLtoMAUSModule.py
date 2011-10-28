@@ -29,14 +29,16 @@ class GDMLtomaus(): #pylint: disable = R0903
     """
     def __init__(self, path):
         """
-        @method Class Constructor This is the class constructor which gets the file ready to be converted.
+        @method Class Constructor This is the class constructor which gets the
+                                  file ready to be converted.
             
         This method searches through the path, given by the argument, 
         and sorts out the files within the path into variables which 
         are then used by the next method to convert them to MAUS
         Modules.
             
-        @param Path This is the path to the folder which contains the GDMLS to be converted.            
+        @param Path This is the path to the folder which contains the GDMLS to 
+                    be converted.            
         """
         self.field_file = None
         self.config_file = None
@@ -76,7 +78,8 @@ class GDMLtomaus(): #pylint: disable = R0903
         component files use MMTranslation.xsl XSLTs to convert to the correct
         MAUS Modules.
         
-        @param Output This is the path to the directory where you wish the MAUS Modules to be placed. 
+        @param Output This is the path to the directory where you wish the MAUS 
+                      Modules to be placed. 
         """
         if os.path.exists(output) == False:
             errmsg = 'Output argument doesnt exist'

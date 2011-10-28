@@ -31,10 +31,12 @@ class Packer: #pylint: disable = R0903
         @Method Class Constructor
 
         This method is the class initialiser and takes one paramater.
-        The parameter asks for the file name/path of a text file. This text file must contain
-        the file names and paths of the GDML files which need to be zipped.
+        The parameter asks for the file name/path of a text file. 
+        This text file must contain the file names and paths of the GDML files 
+        which need to be zipped.
 
-        @Param filelist file name/path of the file containing the list of GDML files to be zipped.
+        @Param filelist file name/path of the file containing the list of GDML
+                        files to be zipped.
         """
         alist = []
         self.list = alist
@@ -52,10 +54,12 @@ class Packer: #pylint: disable = R0903
 
     def zipfile(self, path):
         """
-        @Method zipfile takes the collated file, containing all the GDMLs, and zips it.
+        @Method zipfile takes the collated file, containing all the GDMLs, 
+                        and zips it.
 
-        This method zips the GDML files and a text file with a list of files present. An argument of the
-        output file is specified. Default is $maus/src/common_py/geometry/zippedGeoms. This method
+        This method zips the GDML files and a text file with a list of files
+        present. An argument of the output file is specified. Default is 
+        $maus/src/common_py/geometry/zippedGeoms. This method
         also names the zip file as the time and date when method is called.
 
         @Param Output Path specify the output path of the zipfile
@@ -94,11 +98,12 @@ class Unpacker: #pylint: disable = R0903
         @method Class Constructor This is the class constructor
         
         The class constructor takes two arguments. The first is the name
-        of the file which is to be unzipped. The second is the location where this
-        file will be unzipped too.
+        of the file which is to be unzipped. The second is the location where 
+        this file will be unzipped too.
         
         @param zfile: Name of the file to be unzipped
-        @param extraction path: Name of the folder where the information will be unzipped.
+        @param extraction path: Name of the folder where the information will 
+                                be unzipped.
         """
         if input_file[-4:] != '.zip':
             raise IOError('File is not a zip file!', 'Unpacker::__init__')
