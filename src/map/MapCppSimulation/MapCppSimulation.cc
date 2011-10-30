@@ -91,9 +91,7 @@ void MapCppSimulation::SetConfiguration(std::string json_configuration) {
   // MICE Model setup
   Json::Value modname = JsonWrapper::GetProperty
              (config, "simulation_geometry_filename", JsonWrapper::stringValue);
-  cout << "Heloo1" << endl;
   simRun.miceModule = new MiceModule(modname.asString());
-  cout << "Heloo2" << endl;
   // G4 Materials
   fillMaterials(simRun);
   _g4manager = MAUSGeant4Manager::GetInstance();

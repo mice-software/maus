@@ -1,6 +1,6 @@
-verbose_level = 4
+verbose_level = 0
 
-simulation_geometry_filename = "/home/matt/maus-littlefield/src/common_py/geometry/Download/ParentGeometryFile.dat"
+simulation_geometry_filename = "Tracker/TrackerSolenoid1.dat"
 spill_generator_number_of_spills = 1
 
 beam = {
