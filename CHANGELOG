@@ -1,3 +1,35 @@
+MAUS-v0.0.9 (http://micewww.pp.rl.ac.uk/versions/show/17)
+  Bug #42: Possible memory leak in MiceModule class
+  Bug #750: OutputPyImage segmentation fault because of bad uuid library
+  Feature #179: docbooks?
+  Feature #698: Pull MICE Physcis List from legacy
+  Feature #702: matplotlib histogram reducer
+  Feature #744: libxml2 build on test server
+  Feature #755: Move example code to bin/user/
+  Feature #757: Fix readme in bin/
+  Feature #763: TOF reconstruction to space points
+
+MAUS-v0.0.8 (http://micewww.pp.rl.ac.uk/versions/show/16)
+  Bug #571: test_cdb_alarmhandler fails to import bitarray
+  Bug #701: Reducer isn't called if there is only 1 input
+  Feature #568: Code review G4MICE TOF code
+  Feature #570: Code review G4MICE TOF online recon code
+  Feature #675: "Convert to human readable" macro
+
+MAUS-v0.0.7 (http://micewww.pp.rl.ac.uk/versions/show/15)
+  Bug #700: SCons version 2.1.0 fails in build system, easy_install automatically grabs it
+  Bug #713: Segmentation fault in UUID python module
+  Bug #714: pylint style checker checks SWIG generated files
+  Bug #717: Pylint generates exceptions/errors
+  Feature #454: Review beam maker code
+  Feature #461: Passing of arguments (e.g. configuration, datacards)
+  Feature #678: ErrorHandler tweak
+  Feature #679: Permit non-json stuff in Configuration
+  Feature #692: Merge of Mac OSX support
+  Feature #715: InputPySpillGenerator
+  Feature #716: Empty spill generator
+  Feature #721: OutputPyJSON should take file name and type from datacards
+
 MAUS-v0.0.6 (http://micewww.pp.rl.ac.uk/versions/show/14)
   Bug #563: Installation of Maus
   Bug #599: root build fails when conflicting python2.7 already installed

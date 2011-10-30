@@ -3,7 +3,7 @@ Parses json schema + "description" field into a bunch of latex itemized lists.
 Sees latex maximum itemization depth and splits into a bunch of sublists as it
 goes.
 """
-
+import os
 import Queue
 import json
 import SpillSchema
@@ -105,18 +105,20 @@ def __parse_json_schema_recursive(my_schema, my_ancestors_, \
                          (value, my_ancestors_+[key], file_handle, depth+1)
         print >> file_handle, ' '*depth, LIST_END
 
-def head_matter(file_handle, schema_name):
+def head_matter(file_handle, schema_name): #pylint: disable = W0613
     """
     Make a header based on the schema name
     """
-    print >> file_handle, "\chapter{"+schema_name+"}"
+    pass
 
 def main():
     """
     Run the main program - creates documentation for:
     * SpillSchema.py
     """
-    spill_schema_fh = open('spill_schema.tex', 'w')
+    spill_schema_name = os.path.join(os.environ['MAUS_ROOT_DIR'], 'doc',
+                           'doc_src', 'spill_schema.tex')
+    spill_schema_fh = open(spill_schema_name, 'w')
     head_matter(spill_schema_fh, "Spill data structure")
     json_schema = __parse_schema(SpillSchema.spill)
     parse_json_schema(json_schema, ["spill"], spill_schema_fh)

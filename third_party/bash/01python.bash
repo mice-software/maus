@@ -35,20 +35,23 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
 	echo "INFO: Configuring:"
         sleep 1
-  if [ `uname -s` == "Darwin" ]; then
-        ./configure --enable-framework="${MAUS_ROOT_DIR}/third_party/install" --prefix="${MAUS_ROOT_DIR}/third_party/install"
-  else
-        ./configure --enable-shared --prefix="${MAUS_ROOT_DIR}/third_party/install"
-  fi
+	if [ `uname -s` == "Darwin" ]; then
+            ./configure --enable-framework="${MAUS_ROOT_DIR}/third_party/install" --prefix="${MAUS_ROOT_DIR}/third_party/install"
+	else
+            ./configure --enable-shared --prefix="${MAUS_ROOT_DIR}/third_party/install"
+	fi
 
-  echo "HACK: Enabling zlib (again?)"
+	echo "HACK: Enabling zlib (again?)"
         sleep 1
-
 
   if [ `uname -s` != "Darwin" ]; then
     if [ "$(uname -m)" = "x86_64" ]; then
         echo "     This is an x86_64 Linux"
         echo "zlib zlibmodule.c -I/usr/include -L/usr/lib64 -lz" >> Modules/Setup
+	    # See issue #774
+	    echo "_sha shamodule.c" >> Modules/Setup
+            echo "_sha256 sha256module.c" >> Modules/Setup
+	    echo "_sha512 sha512module.c" >> Modules/Setup
     else
         echo "     This is NOT an x86_64 Linux"
         echo "zlib zlibmodule.c -I/usr/include -L/usr/lib -lz" >> Modules/Setup

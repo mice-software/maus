@@ -8,7 +8,6 @@
 #include <sstream>
 #include <vector>
 #include <iomanip>
-#include "CLHEP/Units/SystemOfUnits.h"
 
 #include "Config/MiceModule.hh"
 #include "Config/ModuleTextFileIO.hh"

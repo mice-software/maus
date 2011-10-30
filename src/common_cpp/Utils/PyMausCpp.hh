@@ -18,6 +18,15 @@
 #ifndef PYMAUSCPP
 #define PYMAUSCPP
 
+// These ifdefs are required to avoid cpp compiler warning
+#ifdef _POSIX_C_SOURCE
+#undef _POSIX_C_SOURCE
+#endif
+
+#ifdef _XOPEN_SOURCE
+#undef _XOPEN_SOURCE
+#endif
+
 #include "Python.h"
 
 namespace MAUS {

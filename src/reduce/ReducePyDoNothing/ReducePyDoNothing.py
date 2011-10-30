@@ -15,22 +15,17 @@
 
 
 ## @class ReducePyDoNothing.ReducePyDoNothing
-#  ReducePyDoNothing string concatenates two spills
-#
-#  ReducePyDoNothing takes the string representation
-#  of two JSON documents and concatenates them with
-#  a line break between them.
+#  ReducePyDoNothing returns the input
+
 import json
 import types
 
 class ReducePyDoNothing:
-    def birth(self, datacards):
+    def birth(self, configurationJson):
         return True
 
-    def process(self, x, y):
-        x = x.rstrip()
-        y = y.rstrip()
-        return "%s\n%s" % (x,y)
+    def process(self, x):
+        return x
 
     def death(self):
         return True
