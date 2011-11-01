@@ -102,7 +102,7 @@ std::string MapCppTOFSlabHits::process(std::string document) {
           }
         }
       }
-    } 
+    }
   } catch(Squeal squee) {
     root = MAUS::CppErrorHandler::getInstance()
                                        ->HandleSqueal(root, squee, _classname);

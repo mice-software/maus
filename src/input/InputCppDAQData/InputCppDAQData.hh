@@ -24,6 +24,8 @@
 #include <unpacking/MDevent.h>
 #include <unpacking/MDfileManager.h>
 #include <unpacking/MDprocessManager.h>
+#include <unpacking/MDequipMap.h>
+#include <unpacking/MDfragment.h>
 
 #include <string>
 #include <iostream>
@@ -84,9 +86,9 @@ class InputCppDAQData {
 
  /** Disable one equipment type.
   * This disables the unpacking of the data produced by all equipment
-	* with the specified type.
-	*/
-	void disableEquipment(std::string pEquipType) {
+  * with the specified type.
+  */
+  void disableEquipment(std::string pEquipType) {
     _dataProcessManager.Disable(pEquipType);
   }
 
@@ -117,6 +119,17 @@ class InputCppDAQData {
   };
 
  private:
+
+ /** Initialise the processor.
+  * 
+  * 
+  */
+  template <class procType>
+  bool initProcessor(procType* &processor, Json::Value configJSON);
+
+ /** Configure the zero supression filter.
+  */
+  void configureZeroSupression(ZeroSupressionFilter* processor, Json::Value configJSON);
 
   std::string _classname;
 
@@ -153,6 +166,10 @@ class InputCppDAQData {
   */
   VLSBDataProcessor* _vLSBFragmentProc;
 
+ /** Processor for VLSB data from the cosmic test in Lab7.
+  */
+  VLSB_CDataProcessor* _vLSB_cFragmentProc;
+
  /** Processor for DBB data.
   */
   DBBDataProcessor* _DBBFragmentProc;
@@ -174,11 +191,19 @@ class InputCppDAQData {
 
  /** Max number of DAQ events to be processed.
   */ 
-  int _maxNumDaqEvents;
+  int _maxNumEvents;
 
  /** Counter of the DAQ events.
   */
-  int _daqEventsCount;
+  int _eventsCount;
+
+ /** If this is true only the phys. evens will be processed.
+  */
+  bool _phys_Events_Only;
+
+   /** If this is true only the calib. evens will be processed.
+  */
+  bool _calib_Events_Only;
 
  /** Enum of event types
   */

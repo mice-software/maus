@@ -23,12 +23,13 @@ InputCppDAQData::InputCppDAQData(std::string pDataPath,
   _eventPtr = NULL;
   _dataPaths = pDataPath;
   _datafiles = pRunNum;
-  _daqEventsCount = 0;
+  _eventsCount = 0;
   _v1290PartEventProc = NULL;
   _v1724PartEventProc = NULL;
   _v1731PartEventProc = NULL;
   _v830FragmentProc = NULL;
-  _vLSBFragmentProc = NULL;
+  _vLSB_cFragmentProc = NULL;
+  _vLSB_cFragmentProc = NULL;
   _DBBFragmentProc = NULL;
 }
 
@@ -75,90 +76,47 @@ bool InputCppDAQData::birth(std::string jsonDataCards) {
   }
 
   // Comfigure the V1290 (TDC) data processor.
-  assert(configJSON.isMember("Enable_V1290_Unpacking"));
-  if ( configJSON["Enable_V1290_Unpacking"].asBool() ) {
-    _v1290PartEventProc = new V1290DataProcessor();
-    _v1290PartEventProc->set_DAQ_map(&_map);
-
-    _dataProcessManager.SetPartEventProc("V1290", _v1290PartEventProc);
-  } else {
-    this->disableEquipment("V1290");
-  }
+  initProcessor<V1290DataProcessor>(_v1290PartEventProc, configJSON);
 
   // Comfigure the V1724 (fADC) data processor.
-  assert(configJSON.isMember("Enable_V1724_Unpacking"));
-  if ( configJSON["Enable_V1724_Unpacking"].asBool() ) {
-    _v1724PartEventProc = new V1724DataProcessor();
-    _v1724PartEventProc->set_DAQ_map(&_map);
-
-    assert(configJSON.isMember("Do_V1724_Zero_Suppression"));
-    bool zs = configJSON["Do_V1724_Zero_Suppression"].asBool();
-    _v1724PartEventProc->set_zero_supression(zs);
-
-    assert(configJSON.isMember("V1724_Zero_Suppression_Threshold"));
-    int zs_threshold = configJSON["V1724_Zero_Suppression_Threshold"].asInt();
-    _v1724PartEventProc->set_zs_threshold(zs_threshold);
-
-    _dataProcessManager.SetPartEventProc("V1724", _v1724PartEventProc);
-  } else {
-    this->disableEquipment("V1724");
-  }
+  initProcessor<V1724DataProcessor>(_v1724PartEventProc, configJSON);
+  configureZeroSupression(_v1724PartEventProc, configJSON);
 
   // Comfigure the V1731 (fADC) data processor.
-  assert(configJSON.isMember("Enable_V1731_Unpacking"));
-  if ( configJSON["Enable_V1731_Unpacking"].asBool() ) {
-    _v1731PartEventProc = new V1731DataProcessor();
-    _v1731PartEventProc->set_DAQ_map(&_map);
-
-    assert(configJSON.isMember("Do_V1731_Zero_Suppression"));
-    bool zs = configJSON["Do_V1731_Zero_Suppression"].asBool();
-    _v1731PartEventProc->set_zero_supression(zs);
-
-    assert(configJSON.isMember("V1731_Zero_Suppression_Threshold"));
-    int zs_threshold = configJSON["V1731_Zero_Suppression_Threshold"].asInt();
-    _v1731PartEventProc->set_zs_threshold(zs_threshold);
-
-    _dataProcessManager.SetPartEventProc("V1731", _v1731PartEventProc);
-  } else {
-    this->disableEquipment("V1731");
-  }
+  initProcessor<V1731DataProcessor>(_v1731PartEventProc, configJSON);
+  configureZeroSupression(_v1731PartEventProc, configJSON);
 
   // Comfigure the V830 (scaler) data processor.
-  assert(configJSON.isMember("Enable_V830_Unpacking"));
-  if ( configJSON["Enable_V830_Unpacking"].asBool() ) {
-    _v830FragmentProc = new V830DataProcessor();
-    _v830FragmentProc->set_DAQ_map(&_map);
-
-    _dataProcessManager.SetFragmentProc("V830", _v830FragmentProc);
-  } else {
-    this->disableEquipment("V830");
-  }
+  initProcessor<V830DataProcessor>(_v830FragmentProc, configJSON);
 
   // Comfigure the VLSB (tracker board) data processor.
-  assert(configJSON.isMember("Enable_VLSB_Unpacking"));
-  if (configJSON["Enable_VLSB_Unpacking"].asBool()) {
-    _vLSBFragmentProc = new VLSBDataProcessor();
-    _vLSBFragmentProc->set_DAQ_map(&_map);
+  initProcessor<VLSBDataProcessor>(_vLSBFragmentProc, configJSON);
+  configureZeroSupression(_vLSBFragmentProc, configJSON);
 
-    _dataProcessManager.SetFragmentProc("VLSB_C", _vLSBFragmentProc);
-  } else {
-    this->disableEquipment("VLSB_C");
-  }
+  // Comfigure the VLSB (tracker board) data processor.
+  // This is for the old version of the VLSB equipment used in the cosmic test in lab7
+  initProcessor<VLSB_CDataProcessor>(_vLSB_cFragmentProc, configJSON);
+  configureZeroSupression(_vLSB_cFragmentProc, configJSON);
 
   // Comfigure the DBB (EMR board) data processor.
-  assert(configJSON.isMember("Enable_DBB_Unpacking"));
-  if ( configJSON["Enable_DBB_Unpacking"].asBool() ) {
-    _DBBFragmentProc = new DBBDataProcessor();
-    _DBBFragmentProc->set_DAQ_map(&_map);
-
-    _dataProcessManager.SetFragmentProc("DBB", _DBBFragmentProc);
-  } else {
-    this->disableEquipment("DBB");
-  }
+  initProcessor<DBBDataProcessor>(_DBBFragmentProc, configJSON);
 
   // Set the number of DAQ events to be processed.
   assert(configJSON.isMember("Number_of_DAQ_Events"));
-  _maxNumDaqEvents = configJSON["Number_of_DAQ_Events"].asInt();
+  _maxNumEvents = configJSON["Number_of_DAQ_Events"].asInt();
+
+  assert(configJSON.isMember("Phys_Events_Only"));
+  _phys_Events_Only = configJSON["Phys_Events_Only"].asBool();
+  assert(configJSON.isMember("Calib_Events_Only"));
+  _calib_Events_Only = configJSON["Calib_Events_Only"].asBool();
+
+  if (_phys_Events_Only && _calib_Events_Only) {
+    Squeak::mout(Squeak::error) << "There is a contradiction in the configuration:"
+    << std::endl;
+    Squeak::mout(Squeak::error) << "Phys_Events_Only and Calib_Events_Only are both true!!!"
+    << std::endl;
+    return false;
+  }
 
   // _dataProcessManager.DumpProcessors();
 
@@ -169,12 +127,20 @@ bool InputCppDAQData::birth(std::string jsonDataCards) {
 bool InputCppDAQData::readNextEvent() {
   // Check the max number of DAQ events.
   // If it is negative, run until the end of the loaded DATE files.
-  if (_maxNumDaqEvents > -1)
-    if (_daqEventsCount >= _maxNumDaqEvents)
+  if (_maxNumEvents > -1)
+    if (_eventsCount >= _maxNumEvents)
       return false;
 
   // Use the MDfileManager object to get the next event.
-  _eventPtr = _dataFileManager.GetNextEvent();
+  if (_phys_Events_Only && (!_calib_Events_Only))
+    _eventPtr = _dataFileManager.GetNextPhysEvent();
+
+  if ((!_phys_Events_Only) && _calib_Events_Only)
+    _eventPtr = _dataFileManager.GetNextCalibEvent();
+
+  if ((!_phys_Events_Only) && (!_calib_Events_Only))
+    _eventPtr = _dataFileManager.GetNextEvent();
+
   if (!_eventPtr)
     return false;
 
@@ -202,6 +168,9 @@ std::string InputCppDAQData::getCurEvent() {
 
   if (_vLSBFragmentProc)
     _vLSBFragmentProc->set_JSON_doc(&xDocSpill);
+
+  if (_vLSB_cFragmentProc)
+    _vLSB_cFragmentProc->set_JSON_doc(&xDocSpill);
 
   if (_DBBFragmentProc)
     _DBBFragmentProc->set_JSON_doc(&xDocSpill);
@@ -252,22 +221,76 @@ std::string InputCppDAQData::getCurEvent() {
   xDocRoot["spill_num"] = _dataProcessManager.GetSpillNumber();
   unsigned int event_type = _dataProcessManager.GetEventType();
   xDocRoot["daq_event_type"] = event_type_to_str(event_type);
-  // cout<<xDocRoot<<endl;
+  // cout << xDocRoot << endl;
 
-  _daqEventsCount++;
+  _eventsCount++;
   return xJSONWr.write(xDocRoot);
 }
 
 bool InputCppDAQData::death() {
-	// Free the memory.
+  // Free the memory.
   if (_v1290PartEventProc) delete _v1290PartEventProc;
   if (_v1724PartEventProc) delete _v1724PartEventProc;
   if (_v1731PartEventProc) delete _v1731PartEventProc;
-  if (_v830FragmentProc) delete _v830FragmentProc;
-  if (_vLSBFragmentProc) delete _vLSBFragmentProc;
-  if (_DBBFragmentProc) delete _DBBFragmentProc;
+  if (_v830FragmentProc)   delete _v830FragmentProc;
+  if (_vLSBFragmentProc)   delete _vLSBFragmentProc;
+  if (_vLSB_cFragmentProc) delete _vLSB_cFragmentProc;
+  if (_DBBFragmentProc)    delete _DBBFragmentProc;
 
   return true;
+}
+
+template <class procType>
+bool InputCppDAQData::initProcessor(procType* &processor, Json::Value configJSON) {
+  processor = new procType();
+  string xName, xDataCard;
+  xName = processor->get_equipment_name();
+  xDataCard = "Enable_" + xName + "_Unpacking";
+
+  // Enable or disable this equipment.
+  assert(configJSON.isMember(xDataCard));
+  bool enableThis = configJSON[xDataCard].asBool();
+
+  if (enableThis) {
+    processor->set_DAQ_map(&_map);
+
+    // Get a pointer to the equipment fragment object from the static equipment map.
+    unsigned int xFragType = MDequipMap::GetType(xName);
+    MDfragment* xFragPtr = MDequipMap::GetFragmentPtr(xFragType);
+
+    // Check is the data from this equipment is made of particle events.
+    if (xFragPtr->IsMadeOfParticles()) {
+      // Set a processor for particle events.
+      _dataProcessManager.SetPartEventProc(xName, processor);
+    } else {
+      // Set a processor for the entire equipment fragment
+      _dataProcessManager.SetFragmentProc(xName, processor);
+    }
+
+    return true;
+  } else {
+    this->disableEquipment(xName);
+    return false;
+  }
+}
+
+void InputCppDAQData::configureZeroSupression(ZeroSupressionFilter* processor,
+                                              Json::Value configJSON) {
+  string xName, xDataCard;
+  xName = processor->get_equipment_name();
+  xDataCard = "Do_" + xName + "_Zero_Suppression";
+
+  // Enable or disable zero supression.
+  assert(configJSON.isMember(xDataCard));
+  bool zs = configJSON[xDataCard].asBool();
+  processor->set_zero_supression(zs);
+
+  if (zs) {
+    xDataCard = xName + "_Zero_Suppression_Threshold";
+    assert(configJSON.isMember(xDataCard));
+    int zs_threshold = configJSON[xDataCard].asInt();
+    processor->set_zs_threshold(zs_threshold);
+  }
 }
 
 std::string InputCppDAQData::event_type_to_str(int pType) {

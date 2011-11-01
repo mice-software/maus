@@ -159,7 +159,7 @@ int V1731DataProcessor::Process(MDdataContainer* aPartEventPtr) {
   MDpartEventV1731* xV1731Evnt = static_cast<MDpartEventV1731*>(aPartEventPtr);
 
   Json::Value pBoardDoc;
-	Json::Value xfAdcHit;
+  Json::Value xfAdcHit;
   int xLdc, xGeo, xEquip, xPartEv;
   string xDetector = "unknown";
   if (xV1731Evnt->IsValid()) {
@@ -226,30 +226,30 @@ int V830DataProcessor::Process(MDdataContainer* aFragPtr) {
     pBoardDoc["channels"] = Json::Value();
 
     uint32_t * ptr = xV830Fragment->Get32bWordPtr(0);
-    MDdataWordV830 dw(ptr);
-    unsigned int wc(0);
+    MDdataWordV830 xDataWord(ptr);
+    unsigned int xWordCount(0);
 
     // Loop over all the channels
-    while ( wc < xV830Fragment->GetWordCount() ) {
-      uint32_t dt= dw.GetDataType();
+    while ( xWordCount < xV830Fragment->GetWordCount() ) {
+      uint32_t dt= xDataWord.GetDataType();
       switch ( dt ) {
         case DWV830_Measurement:
         {
           // Convert the channel number into a channel number string!
           stringstream xConv;
-          xConv <<  "ch" << dw.GetChannel();
-          unsigned int xValue = dw.GetMeasurement();
+          xConv <<  "ch" << xDataWord.GetChannel();
+          unsigned int xValue = xDataWord.GetMeasurement();
           pBoardDoc["channels"][xConv.str()] = Json::Value(xValue);
           break;
         }
         case DWV830_Header:
         {
-           pBoardDoc["geo"] = Json::Value(dw.GetGeo());
+           pBoardDoc["geo"] = Json::Value(xDataWord.GetGeo());
            break;
         }
       }
-      wc++;
-      dw.SetDataPtr(++ptr);
+      xWordCount++;
+      xDataWord.SetDataPtr(++ptr);
     }
   }
 
@@ -263,28 +263,99 @@ int V830DataProcessor::Process(MDdataContainer* aFragPtr) {
 int VLSBDataProcessor::Process(MDdataContainer* aFragPtr) {
   // Cast the argument to structure it points to.
   // This process should be called only with MDfragmentVLSB_C argument.
-  if ( typeid(*aFragPtr) != typeid(MDfragmentVLSB_C) ) return CastError;
-  MDfragmentVLSB_C* xVLSBFragment = static_cast<MDfragmentVLSB_C*>(aFragPtr);
+  if ( typeid(*aFragPtr) != typeid(MDfragmentVLSB) ) return CastError;
+  MDfragmentVLSB* xVLSBFragment = static_cast<MDfragmentVLSB*>(aFragPtr);
 
-  Json::Value pBoardDoc;
+  Json::Value pBoardDoc, xVLSB_CHit;
   if ( xVLSBFragment->IsValid() ) {
-    int xLdc, xGeo, xEquip;
+    int xLdc, xAdc, xPartEv;
+    string xDetector;
     // Put static data into the Json
-    pBoardDoc["ldc_id"]       = xLdc = this->GetLdcId();
-    pBoardDoc["equip_type"] = xEquip = this->GetEquipmentType();
-    pBoardDoc["time_stamp"]          = this->GetTimeStamp();
-    pBoardDoc["phys_event_number"]   = this->GetPhysEventNumber();
-    pBoardDoc["part_event_number"]   = this->GetPartEventNumber();
-    pBoardDoc["geo"]          = xGeo = xVLSBFragment->GetGeo();
-    for (int ib = 0; ib < 4; ib++) {
-		// Convert the bank number into a bank number string!
-      stringstream xConv;
-      xConv << "bank_length_" << ib;
-      pBoardDoc[ib] = xVLSBFragment->GetBankLength(ib);
+    pBoardDoc["ldc_id"]        = xLdc = this->GetLdcId();
+
+    if (xLdc == 0)
+      xDetector = "tracker1";
+    if (xLdc == 2)
+      xDetector = "tracker2";
+
+    pBoardDoc["detector"]             = xDetector;
+    pBoardDoc["equip_type"]           = this->GetEquipmentType();
+    pBoardDoc["time_stamp"]           = this->GetTimeStamp();
+    pBoardDoc["phys_event_number"]    = this->GetPhysEventNumber();
+    pBoardDoc["bank_id"]              = xVLSBFragment->GetBoardID();
+    // pBoardDoc["bank_size"]            = xVLSBFragment->GetPayLoadWordCount();
+
+    // Get the number of data words.
+    uint32_t nDataWords = xVLSBFragment->GetPayLoadWordCount();
+
+    // Loop over the data.
+    uint32_t xWordCount(0);
+    while (xWordCount < nDataWords) {
+      xVLSB_CHit = pBoardDoc;
+      xVLSB_CHit["adc"] = xAdc = xVLSBFragment->GetAdc(xWordCount);
+      if (!_zero_suppression ||
+          (_zero_suppression && xAdc > _zs_threshold) ) {
+        xVLSB_CHit["part_event_number"] = xPartEv = xVLSBFragment->GetEventNum(xWordCount);
+        xVLSB_CHit["channel"] = xVLSBFragment->GetChannel(xWordCount);
+        xVLSB_CHit["tdc"] = xVLSBFragment->GetTdc(xWordCount);
+        xVLSB_CHit["discriminator"] = xVLSBFragment->GetDiscriBit(xWordCount);
+
+        ( *_docSpill )[xDetector][xPartEv][_equipment].append(xVLSB_CHit);
+      }
+      xWordCount++;
     }
   }
 
-  (*_docSpill)[_equipment].append(pBoardDoc);
+  return OK;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+int VLSB_CDataProcessor::Process(MDdataContainer* aFragPtr) {
+  // Cast the argument to structure it points to.
+  // This process should be called only with MDfragmentVLSB_C argument.
+  if ( typeid(*aFragPtr) != typeid(MDfragmentVLSB_C) ) return CastError;
+  MDfragmentVLSB_C* xVLSB_CFragment = static_cast<MDfragmentVLSB_C*>(aFragPtr);
+
+  Json::Value pBoardDoc, xVLSB_CHit;
+  if ( xVLSB_CFragment->IsValid() ) {
+    int xLdc, xAdc, xPartEv;
+    string xDetector;
+    // Put static data into the Json
+    pBoardDoc["ldc_id"]     = xLdc = this->GetLdcId();
+
+    if (xLdc == 0)
+      xDetector = "tracker1";
+    if (xLdc == 2)
+      xDetector = "tracker2";
+
+    pBoardDoc["detector"]          = xDetector;
+    pBoardDoc["equip_type"]        = this->GetEquipmentType();
+    pBoardDoc["time_stamp"]        = this->GetTimeStamp();
+    pBoardDoc["phys_event_number"] = this->GetPhysEventNumber();
+    pBoardDoc["geo"]               = xVLSB_CFragment->GetGeo();
+
+    MDdataWordVLSB xDataWord;
+    uint32_t * dataPtr = xVLSB_CFragment->UserPayLoadPtr();
+    for (unsigned int iban = 0; iban < 4; iban++) {
+      for (unsigned int iw =0; iw < xVLSB_CFragment->GetBankLength(iban); iw++) {
+        xVLSB_CHit = pBoardDoc;
+        xDataWord.SetDataPtr(dataPtr);
+        xVLSB_CHit["adc"] = xAdc = xDataWord.GetAdc();
+        if ( !_zero_suppression ||
+          (_zero_suppression && xAdc > _zs_threshold) ) {
+          xVLSB_CHit["part_event_number"] = xPartEv = xDataWord.GetEventNum();
+          xVLSB_CHit["bank"] = iban;
+          xVLSB_CHit["channel"] = xDataWord.GetChannel();
+          xVLSB_CHit["tdc"] = xDataWord.GetTdc();
+          xVLSB_CHit["discriminator"] = xDataWord.GetDiscriBit();
+
+          ( *_docSpill )[xDetector][xPartEv][_equipment].append(xVLSB_CHit);
+        }
+        dataPtr++;
+      }
+    }
+  }
 
   return OK;
 }
@@ -304,6 +375,7 @@ int DBBDataProcessor::Process(MDdataContainer* aFragPtr) {
 
   if (xDBBFragment->IsValid()) {
     // Put static data into the Json
+    pBoardDoc["detector"]      = xDetector;
     pBoardDoc["ldc_id"]       = xLdc = this->GetLdcId();
     pBoardDoc["equip_type"] = xEquip = this->GetEquipmentType();
     pBoardDoc["time_stamp"]          = this->GetTimeStamp();
@@ -350,7 +422,6 @@ int DBBDataProcessor::Process(MDdataContainer* aFragPtr) {
         xDBBHit["trailing_time"] = xTT;
         DAQChannelKey xKey(xLdc, xGeo, xCh, xEquip, xDetector);
         xDBBHit["channel_key"]   = xKey.str();
-        xDBBHit["detector"]      = xDetector;
         pBoardDoc["hits"].append(xDBBHit);
       }
     }
