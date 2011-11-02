@@ -29,7 +29,7 @@ InputCppDAQData::InputCppDAQData(std::string pDataPath,
   _v1731PartEventProc = NULL;
   _v830FragmentProc = NULL;
   _vLSB_cFragmentProc = NULL;
-  _vLSB_cFragmentProc = NULL;
+  _vLSBFragmentProc = NULL;
   _DBBFragmentProc = NULL;
 }
 

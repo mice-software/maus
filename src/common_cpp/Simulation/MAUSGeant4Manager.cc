@@ -22,8 +22,9 @@
 #include "src/common_cpp/Simulation/FieldPhaser.hh"
 
 #include "src/legacy/Interface/Squeak.hh"
-#include "src/legacy/Simulation/MICEPhysicsList.hh"
+#include "src/common_cpp/Simulation/MAUSPhysicsList.hh"
 #include "src/common_cpp/Simulation/MAUSVisManager.hh"
+#include "src/common_cpp/Simulation/MAUSRunAction.hh"
 
 namespace MAUS {
 
@@ -39,7 +40,7 @@ MAUSGeant4Manager::MAUSGeant4Manager() {
     _detector   = new MICEDetectorConstruction(*MICERun::getInstance());
     _runManager->SetUserInitialization(_detector);
 
-    _physList = MICEPhysicsList::GetMICEPhysicsList();
+    _physList = MAUSPhysicsList::GetMAUSPhysicsList();
     _runManager->SetUserInitialization(_physList);
 
     _primary  = new MAUSPrimaryGeneratorAction();
@@ -51,7 +52,7 @@ MAUSGeant4Manager::MAUSGeant4Manager() {
     _runManager->SetUserAction(_stepAct);
     _runManager->SetUserAction(_eventAct);
     //  _runManager->SetUserAction(new MAUSStackingActionKillNonMuons);
-    _runManager->SetUserAction(new MICERunAction);
+    _runManager->SetUserAction(new MAUSRunAction);
     _virtPlanes = new VirtualPlaneManager;
     _virtPlanes->ConstructVirtualPlanes(
       MICERun::getInstance()->btFieldConstructor,

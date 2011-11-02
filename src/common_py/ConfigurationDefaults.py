@@ -28,7 +28,8 @@ output_json_file_name = "simulation.out"
 output_json_file_type = "text"
 
 
-# Used, for now, to determine what level of c++ log messages are reported to the user
+# Used, for now, to determine what level of
+# c++ log messages are reported to the user:
 # 0 = debug info (and std::cout)
 # 1 = run info
 # 2 = warnings
@@ -49,12 +50,22 @@ keep_tracks = False # set to true to keep start and end point of every track
 keep_steps = False # set to true to keep start and end point of every track and
                    # every step point
 simulation_geometry_filename = "Stage6.dat" # geometry used by simulation
-maximum_number_of_steps = 10000
-simulation_reference_particle = {
+maximum_number_of_steps = 10000 # particles are killed after this number of
+                                # steps (assumed to be stuck in the fields)
+simulation_reference_particle = { # used for setting particle phase
     "position":{"x":0.0, "y":-0.0, "z":-5500.0},
     "momentum":{"x":0.0, "y":0.0, "z":1.0},
     "particle_id":-13, "energy":226.0, "time":0.0, "random_seed":10
 }
+
+# geant4 physics model
+physics_model = "QGSP_BERT" # Physics package loaded by MAUS to set default values; modifications can be made
+reference_physics_processes = "mean_energy_loss"
+physics_processes = "standard"
+particle_decay = True # set to true to activate particle decay, or False to inactivate particle decay
+charged_pion_half_life = -1. # set the pi+, pi- half life [ns]. Negative value means use geant4 default
+muon_half_life = -1. # set the mu+, mu- half life [ns]. Negative value means use geant4 default
+production_threshold = 0.5 # set the threshold for delta ray production [mm]
 
 # geant4 visualisation (not event display)
 geant4_visualisation = False
@@ -140,24 +151,25 @@ reconstruction_geometry_filename = simulation_geometry_filename
 SciFiMUXNum = 7
 SciFiFiberDecayConst = 2.7
 SciFiFiberConvFactor =  3047.1
-SciFiFiberRefractiveIndex = 1.6
-SciFiFiberCriticalAngle = 0.4782 # rad
 SciFiFiberTrappingEff = 0.056
 SciFiFiberMirrorEff = 0.6
 SciFiFiberTransmissionEff = 0.8
 SciFiMUXTransmissionEff = 1.0
-SciFiFiberRunLength = 5000.0 # mm
 SciFivlpcQE = 0.8
 SciFivlpcEnergyRes = 4.0 # MeV
 SciFivlpcTimeRes = 0.2 # ns
-SciFiadcBits = 8
 SciFiadcFactor = 6.0
 SciFitdcBits = 16
 SciFitdcFactor = 1.0
-SciFinElecChanPerPlane = 1429
 SciFinPlanes = 3
 SciFinStations = 5
 SciFinTrackers = 2
+SciFiNPECut = 4.0 # photoelectrons
+SciFiClustExcept = 100 # exception is thrown
+SciFi_sigma_tracker0_station5 = 0.4298 # mm
+SciFi_sigma_triplet = 0.3844 # mm
+SciFi_sigma_z = 0.081 # mm
+SciFi_sigma_duplet =  0.6197 # mm
 
 # this is used by ImputCppRealData
 Number_of_DAQ_Events = -1

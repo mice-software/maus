@@ -57,7 +57,7 @@ class FieldPhaser {
    *    If the particle fails to phase an RF cavity we throw an exception
    *    We use methods in MAUSGeant4Manager to move virtual planes during the
    *      execution of the phaser; we move them back at the end
-   *    We use methods in MICEPhysicsList to turn off stochastic processes
+   *    We use methods in MAUSPhysicsList to turn off stochastic processes
    *      during the execution of the phaser; we turn them on at the end
    */
   void SetPhases();

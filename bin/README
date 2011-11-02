@@ -1,8 +1,21 @@
-Please add comments in run()'s docstring that explains what the macro does.  This will help other people who want to use your code.  Here is an example:
+bin directory contains user executables for driving MAUS components. These
+executables are intended in the first instance to be used to model MAUS, but 
+additionally are expected to form examples on which users can build their own
+physics simulations and analyses.
 
-def run(number_of_events):
-    """Simulate the MICE experiment
+Directory contents:
 
-    This will simulate 'number_of_events' MICE events through the entirity
-    of MICE using Geant4.  At present, TOF and Tracker hits will be digitized.
-    """
+simulate_mice.py: simulation, digitisation and reconstruction of the MICE 
+                  experiment.
+analyze_data_offline.py: unpacking of experimental data, digitisation and
+                  reconstruction of the MICE experiment
+
+Subdirectories:
+
+examples: tutorial and example code to help users to build their own
+          applications; usually focussing on a particular part of the workflow.
+utilities: utility functions that sit outside of the normal workflow; for
+           example, utilities to browse output data files, etc.
+user: temporary user applications that don't follow the usual style requirements
+
+

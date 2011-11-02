@@ -23,7 +23,7 @@ Module TrackerStation5
     Position 0.0 0.0 0.00125 cm
     Rotation 0.0 0.0 -120.0 degree
   }
-  Module Tracker/Tracker0Station5ViewX.dat
+  Module Tracker/Tracker0Station5ViewU.dat
   {
     Position 0.0 0.0 0.6648 mm
     Rotation 0.0 0.0 0.0 degree
