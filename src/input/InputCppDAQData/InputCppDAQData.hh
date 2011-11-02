@@ -18,14 +18,6 @@
 #ifndef _MAUS_SRC_INPUT_INPUTCPPDAQDATA_INPUTCPPDAQDATA_H__
 #define _MAUS_SRC_INPUT_INPUTCPPDAQDATA_INPUTCPPDAQDATA_H__
 
-#include <json/json.h>
-#include <unpacking/event.h>
-#include <unpacking/MDdateFile.h>
-#include <unpacking/MDevent.h>
-#include <unpacking/MDfileManager.h>
-#include <unpacking/MDprocessManager.h>
-#include <unpacking/MDequipMap.h>
-#include <unpacking/MDfragment.h>
 
 #include <string>
 #include <iostream>
@@ -37,6 +29,8 @@
 #include "unpacking/MDevent.h"
 #include "unpacking/MDfileManager.h"
 #include "unpacking/MDprocessManager.h"
+#include "unpacking/MDequipMap.h"
+#include "unpacking/MDfragment.h"
 
 #include "src/input/InputCppDAQData/UnpackEventLib.hh"
 #include "Utils/DAQChannelMap.hh"
@@ -84,33 +78,13 @@ class InputCppDAQData {
 
   /** Unpack the current event into JSON.
   *
-  * This unpacks the current event into _next_event and returns true on success.
+  * This unpacks the current event into a JSON document.
   * Don't call this until readNextEvent() has been called and returned true at
   * least once!
   *
-  * \return Bool indicating that the get was successful.
+  * \return JSON document containing the unpacked DAQ data.
   */
-  bool getCurEvent();
-
-  /** Read the next event from the buffer and put it into _next_event
-   *
-   *  \return string containing the next event; or "" if unsuccessful
-   */
-  std::string getNextEvent();
-
-  /** Return the spill number for some daq event
-  */
-  int getSpillNumber(Json::Value daq_event);
-
-  /** Get a string containing the information for the next spill
-  *
-  * Unpacks all daq events in the spill and puts them into a json array. Writes
-  * to string.
-  *
-  * \return string representing a json array containing daq data for all events
-  *         in the spill
-  */
-  std::string getNextSpill();
+  std::string getCurEvent();
 
   /** Disable one equipment type.
   * This disables the unpacking of the data produced by all equipment
@@ -241,8 +215,6 @@ class InputCppDAQData {
   * \return The type of the event as string.
   */
   std::string event_type_to_str(int pType);
-
-  Json::Value _next_event;
 };
 
 #endif  // _MAUS_INPUTCPPDAQDATA_INPUTCPPDAQDATA_H__
