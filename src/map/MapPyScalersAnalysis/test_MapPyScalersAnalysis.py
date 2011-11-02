@@ -13,48 +13,59 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+"""Tests for MapPyScalersAnalysis"""
+
+#pylint: disable = C0103
+
 import os
-import json
-import types
 import unittest
 
 from Configuration import Configuration
 
 import MAUS
 
-class MapPyScalersAnalysisTestCase(unittest.TestCase):
+class MapPyScalersAnalysisTestCase(unittest.TestCase): # pylint: disable = R0904
+    """Tests for MapPyScalersAnalysis"""
     @classmethod
-    def setUpClass(self):
+    def setUpClass(cls):  #pylint: disable = C0103
+        """Construct for MapPyScalersAnalysis """
         if not os.environ.get("MAUS_ROOT_DIR"):
             raise Exception('InitializeFail', 'MAUS_ROOT_DIR unset!')
+        cls.mapper = MAUS.MapPyScalersAnalysis()
         # Set our data path & filename
         # It would be nicer to test with a smaller data file!
-        self._datapath = '%s/src/input/InputCppDAQData' % \
+        cls._datapath = '%s/src/input/InputCppDAQData' % \
                             os.environ.get("MAUS_ROOT_DIR")
-        self._datafile = '02873'
-        self._c = Configuration()
+        cls._datafile = '02873'
+        cls._c = Configuration()
 
     def test_something(self):
+        """ Check against different issues"""
         inputter = MAUS.InputCppDAQData(self._datapath, self._datafile)
         inputter.birth( self._c.getConfigJSON() )
 
-        mapper = MAUS.MapPyScalersAnalysis()
-        success = mapper.birth("{}")
-        self.assertTrue(success)
-
-        success = mapper.add("")
+        success = self.mapper.birth("{}")
         self.assertFalse(success)
 
-        success = mapper.add("{}")
+        success = self.mapper.add("")
         self.assertFalse(success)
 
-        success = mapper.dump()
+        success = self.mapper.add("{}")
+        self.assertFalse(success)
+
+        success = self.mapper.dump()
         self.assertTrue(success)
 
-        result = mapper.process("{}")
+        result = self.mapper.process("{}")
         self.assertEqual(len(result), 2)
 
-        mapper.death()
+
+    @classmethod
+    def tearDownClass(cls): #pylint: disable = C0103
+        success = cls.mapper.death()
+        if not success:
+            raise Exception('InitializeFail', 'Could not start worker')
+        cls.mapper = None
 
 if __name__ == '__main__':
     unittest.main()

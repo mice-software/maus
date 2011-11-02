@@ -13,69 +13,83 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+""" Class for ploting the time-of-flight spectrum"""
+
 import json
-import types
-import os
 import ROOT
+import ErrorHandler
 
 class MapPyTOFPlot:
-   def birth(self, configJSON):
-      #self.h1 = TH1F("tof","tof",100,20,40)
-      self.TOF0_sp = {}      
-      self.TOF1_sp = {}
-      self.TOF2_sp = {}
-      self.canvas = ROOT.TCanvas("tof", "tof")
-      self.tof_hist = ROOT.TH1F("tof","tof",150,23,38)
+    """ Class for ploting the time-of-flight spectrum"""
+    def __init__(self):
+        """ Constructor """
+        self._sp_tof0 = {}      
+        self._sp_tof1 = {}
+        self._sp_tof2 = {}
+        self.canvas = ROOT.TCanvas("tof", "tof")
+        self.tof_hist = ROOT.TH1F("tof", "tof", 150, 23, 38)
+        
+    def birth(self, json_configuration):
+        """ Do nothing here """
+        try:
+            config_doc = json.loads(json_configuration)
+            if config_doc:
+                return True
+        except Exception: #pylint: disable=W0703
+            ErrorHandler.HandleException({}, self)
 
-      return True
+        return False
 
-   def process(self, str):
-      if self.get_space_points(str):
-         #print'tof0 : ',len(self.TOF0_sp),'  tof1 : ',len(self.TOF1_sp) ,'  tof2 : ',len(self.TOF2_sp)
-         for i in range(len(self.TOF1_sp)):
-            #print i, 'sp : ', self.TOF0_sp[i], self.TOF1_sp[i]
-            if self.TOF0_sp[i] and self.TOF1_sp[i] :
-               #print self.TOF1_sp[i]
-               if len(self.TOF0_sp[i])==1 and len(self.TOF1_sp[i])==1:
-                  t_0 = self.TOF0_sp[i][0]["time"]
-                  t_1 = self.TOF1_sp[i][0]["time"]
-                  delta = self.TOF0_sp[i][0]["dt"]
-                  self.tof_hist.Fill(t_1-t_0)
-                  print t_1 - t_0
+    def process(self, json_spill_doc):
+        """Process the JSON data"""
+        if self.get_space_points(json_spill_doc):
+            for i in range(len(self._sp_tof1)):
+                if self._sp_tof0[i] and self._sp_tof1[i] :
+                    if len(self._sp_tof0[i])==1 and len(self._sp_tof1[i])==1:
+                        t_0 = self._sp_tof0[i][0]["time"]
+                        t_1 = self._sp_tof1[i][0]["time"]
+                        #delta = self._sp_tof0[i][0]["dt"]
+                        self.tof_hist.Fill(t_1-t_0)
+                        print t_1 - t_0
 
-      return str
+        return json_spill_doc
 
-   def death(self):
-      try:
-         self.tof_hist.Draw()
-         self.canvas.Update()
-         self.canvas.Print('tof.png')
-         return True
-      except Exception: #pylint: disable=W0703
-         ErrorHandler.HandleException({}, self)
-         return False
+    def death(self):
+        """ save the plot"""
+        try:
+            self.tof_hist.Draw()
+            self.canvas.Update()
+            self.canvas.Print('tof.png')
+            return True
+        except Exception: #pylint: disable=W0703
+            ErrorHandler.HandleException({}, self)
+            return False
 
+    def get_space_points(self, doc):
+        """ get the TOF space points """
+        try:
+            spill = json.loads(doc)
+            if 'space_points' not in spill:
+                return False
 
-   def get_space_points(self, doc):
-      spill = json.loads(doc)
-      if 'space_points' not in spill:
-         return False
+            if spill['space_points'] is None:
+                return False
 
-      if spill['space_points'] is None:
-         return False
+            space_points = spill['space_points']
 
-      space_points = spill['space_points']
+            if 'tof0' not in space_points:
+                return False
+            self._sp_tof0 = space_points['tof0']
 
-      if 'tof0' not in space_points:
-         return False
-      self.TOF0_sp = space_points['tof0']
+            if 'tof1' not in space_points:
+                return False
+            self._sp_tof1 = space_points['tof1']
 
-      if  'tof1' not in space_points:
-         return False
-      self.TOF1_sp = space_points['tof1']
+            if 'tof2' not in space_points:
+                return False
+            self._sp_tof2 = space_points['tof2']
 
-      if  'tof2' not in space_points:
-         return False
-      self.TOF2_sp = space_points['tof2']
-
-      return True
+        except Exception: #pylint: disable=W0703
+            ErrorHandler.HandleException({}, self)
+            
+        return True

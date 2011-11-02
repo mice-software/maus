@@ -18,40 +18,51 @@
 #  Trigger Requests, GVA, TOF0 and TOF1. It has to be extended and to
 #  include also the other channels of the scaler.
 
+""" This class dump the scaler information"""
 
 import json
-import types
-import os
-import io
-
+import ErrorHandler
 
 class MapPyScalersAnalysis:
-    def birth(self, configJSON):
+    """ This class dump the scaler information"""
+    def __init__(self):
+        """ Constructor """
         self._hits = {}
         self._triggers         = []
         self._trigger_requests = []
-        self._GVA              = []
-        self._TOF0             = []
-        self._TOF1             = []
-        return True
+        self._gva              = []
+        self._tof0             = []
+        self._tof1             = []
 
-    def process(self, str):
-        spill = json.loads(str)
+    def birth(self, json_configuration):
+        """ Do nothing here """
+        try:
+            config_doc = json.loads(json_configuration)
+            if config_doc:
+                return True
+        except Exception: #pylint: disable=W0703
+            ErrorHandler.HandleException({}, self)
+
+        return False
+
+    def process(self, json_spill_doc):
+        """Process the JSON data"""
+        spill = json.loads(json_spill_doc)
 
         if 'daq_data' not in spill:
-            return str
+            return json_spill_doc
 
         if spill['daq_data'] is None:
-            return str
+            return json_spill_doc
 
         daq_event = spill['daq_data']
         if 'V830' not in daq_event:
-            return str
+            return json_spill_doc
 
         scalers = daq_event['V830']
         #print scalers
         if 'channels' not in scalers:
-            return str
+            return json_spill_doc
 
         self._hits = scalers['channels']
         event = scalers['phys_event_number']
@@ -60,58 +71,62 @@ class MapPyScalersAnalysis:
         if self.add(self._hits) :
             self.dump()
 
-        return str
+        return json_spill_doc
 
-    def death(self):
+    def death(self): #pylint: disable=R0201
+        """ Do nothing here """
         return True
 
 
     def dump(self):
+        """ Dump the information """
         if len(self._triggers):
-            print 'triggers ....... : ', self._triggers[-1],
+            print 'triggers ....... : ', self._triggers[-1]
             print ' (', sum(self._triggers)/len(self._triggers), ')'
 
         if len(self._trigger_requests):
-            print 'trigger requests : ', self._trigger_requests[-1],
-            print ' (', sum(self._trigger_requests)/len(self._trigger_requests), ')'
+            print 'trigger requests : ', self._trigger_requests[-1]
+            print ' (', sum(self._trigger_requests)/len(
+                                         self._trigger_requests), ')'
 
-        if len(self._GVA):
-            print 'GVA ............ : ', self._GVA[-1],
-            print ' (', sum(self._GVA)/len(self._GVA), ')'
+        if len(self._gva):
+            print 'GVA ............ : ', self._gva[-1]
+            print ' (', sum(self._gva)/len(self._gva), ')'
 
-        if len(self._TOF0):
-            print 'TOF0 ........... : ', self._TOF0[-1],
-            print ' (', sum(self._TOF0)/len(self._TOF0), ')'
+        if len(self._tof0):
+            print 'TOF0 ........... : ', self._tof0[-1]
+            print ' (', sum(self._tof0)/len(self._tof0), ')'
 
-        if len(self._TOF1):
-            print 'TOF1 ........... : ', self._TOF1[-1],
-            print ' (', sum(self._TOF1)/len(self._TOF1), ')' , '\n\n'
+        if len(self._tof1):
+            print 'TOF1 ........... : ', self._tof1[-1]
+            print ' (', sum(self._tof1)/len(self._tof1), ')' , '\n\n'
 
         return True
 
     def add(self, hits=None):
+        """ add the information from this spill """
         if  'ch0' not in hits:
             return False
 
-        self._triggers.append( hits['ch0'] );
+        self._triggers.append( hits['ch0'] )
         if len(self._triggers) == 11 :
             self._triggers.pop(0)
 
-        self._trigger_requests.append( hits['ch1'] );
+        self._trigger_requests.append( hits['ch1'] )
         if len(self._trigger_requests) == 11 :
             self._trigger_requests.pop(0)
 
-        self._GVA.append( hits['ch2'] );
-        if len(self._GVA) == 11 :
-            self._GVA.pop(0)
+        self._gva.append( hits['ch2'] )
+        if len(self._gva) == 11 :
+            self._gva.pop(0)
 
-        self._TOF0.append( hits['ch3'] );
-        if len(self._TOF0) == 11 :
-            self._TOF0.pop(0)
+        self._tof0.append( hits['ch3'] )
+        if len(self._tof0) == 11 :
+            self._tof0.pop(0)
 
-        self._TOF1.append( hits['ch4'] );
-        if len(self._TOF1) == 11 :
-            self._TOF1.pop(0)
+        self._tof1.append( hits['ch4'] )
+        if len(self._tof1) == 11 :
+            self._tof1.pop(0)
 
         return True
 
