@@ -135,7 +135,7 @@ class ReducePyHistogramTDCADCCounts(ReducePyMatplotlibHistogram):
 
         # Set description of content of histogram and histogram title.
         self._content = \
-            "Total TDC and ADC counts to spill %d" % self.spill_count
+            "Total TDC and ADC counts"
         self._histogram.figure.get_axes()[0].set_title(
             self._content, fontsize=14)
 
