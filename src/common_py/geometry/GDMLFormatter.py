@@ -16,6 +16,7 @@ M. Littlefield
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+import shutil
 import os
 import os.path
 from xml.dom import minidom
@@ -31,7 +32,7 @@ class Formatter: #pylint: disable = R0902
     This class opens the files which need the correct paths added and edits the
     file in situ.
     """
-    def __init__(self, path_in, path_out):
+    def __init__(self, path_in, path_out, path_tmp):
         """
         @Method Class Constructor
 
@@ -43,6 +44,7 @@ class Formatter: #pylint: disable = R0902
         """
         self.path_in = path_in
         self.path_out = path_out
+        self.path_tmp = path_tmp
 
         self.beamline_file = None
         self.field_file = None
@@ -51,13 +53,13 @@ class Formatter: #pylint: disable = R0902
         self.stepfiles = []
 
         self.formatted = False
-        self.txtfile = ""
+        self.txt_file = ""
         self.schema = SCHEMA_PATH
         gdmls = os.listdir(self.path_in)
         for fname in gdmls:
             if fname[-5:] != '.gdml' and fname[-4:] != '.xml':
                 print fname+' not a gdml or xml file - ignored'
-            if fname.find('materials') >= 0:
+            elif fname.find('materials') >= 0:
                 self.material_file = fname
             elif fname.find('fastrad') >= 0:
                 self.configuration_file = fname
@@ -67,6 +69,9 @@ class Formatter: #pylint: disable = R0902
                 self.beamline_file = fname
             else:
                 self.stepfiles.append(fname)
+            shutil.copy(os.path.join(self.path_in, fname), 
+                        os.path.join(self.path_tmp, fname) )
+
         if self.field_file == None:
             raise IOError('Please write a Field.gdml file which ' + \
                         'contains MAUS_info. See README for details')
@@ -78,39 +83,32 @@ class Formatter: #pylint: disable = R0902
         This method parses the GDML file into memory and alters the location of 
         the schema location. It then rewrites the GDML with the valid schema.
         
-        @param GDMLFile The name of the file which will have its schema location
-                        altered.
+        @param gdmlfile absolute path to the file which will have its schema
+                        location altered.
         """
-        if gdmlfile[-5:] != '.gdml' and gdmlfile[-4:] != '.xml':
-            print gdmlfile+' not a gdml or xml file - ignored'
-        else:
-            xmldoc = minidom.parse(os.path.join(self.path_in, gdmlfile))
-            for node in xmldoc.getElementsByTagName("gdml"):
-                if node.hasAttribute("xsi:noNamespaceSchemaLocation"):
-                    node.attributes['xsi:noNamespaceSchemaLocation'] \
-                                                                   = self.schema
-            fout = open(os.path.join(self.path_out, gdmlfile), 'w')
-            xmldoc.writexml( fout)
+        xmldoc = minidom.parse(os.path.join(self.path_tmp, gdmlfile))
+        for node in xmldoc.getElementsByTagName("gdml"):
+            if node.hasAttribute("xsi:noNamespaceSchemaLocation"):
+               node.attributes['xsi:noNamespaceSchemaLocation'] = self.schema
+        fout = open(os.path.join(self.path_tmp, gdmlfile), 'w')
+        xmldoc.writexml( fout)
+        fout.close()
        
     def merge_maus_info(self, gdmlfile):
         """
         @method merge_maus_info
         
-        This method adds the field information
-        to the configuration GDML.
+        This method adds the field information to the configuration GDML.
         """
-        if gdmlfile[-5:] != '.gdml' and gdmlfile[-4:] != '.xml':
-            print gdmlfile+' not a gdml or xml file - ignored'
-        else:
-            config = minidom.parse(os.path.join(self.path_in, gdmlfile))
-            field = minidom.parse(os.path.join(self.path_in, self.field_file))
-            for node in field.getElementsByTagName("MICE_Information"):
-                maus_info = node
-            root_node = config.childNodes[2]
-            root_node.insertBefore(maus_info, root_node.childNodes[9])
-            fout = open(os.path.join(self.path_out, gdmlfile), 'w')
-            root_node.writexml(fout)
-            fout.close()
+        config = minidom.parse(os.path.join(self.path_tmp, gdmlfile))
+        field = minidom.parse(os.path.join(self.path_tmp, self.field_file))
+        for node in field.getElementsByTagName("MICE_Information"):
+            maus_info = node
+        root_node = config.childNodes[2]
+        root_node.insertBefore(maus_info, root_node.childNodes[9])
+        fout = open(os.path.join(self.path_tmp, gdmlfile), 'w')
+        root_node.writexml(fout)
+        fout.close()
         
     def merge_run_info(self, gdmlfile):
         """
@@ -118,26 +116,23 @@ class Formatter: #pylint: disable = R0902
         
         This method adds the run information to the configuration GDML.
         """
-        if gdmlfile[-5:] != '.gdml' and gdmlfile[-4:] != '.xml':
-            print gdmlfile+' not a gdml or xml file - ignored'
-        else:
-            run_info = False
-            fin = open(os.path.join(self.path_in, gdmlfile))
-            for lines in fin.readlines():
-                if lines.find('run') >= 0:
-                    run_info = True
-            fin.close()
-            if run_info == False:
-                field = minidom.parse(os.path.join(self.path_in, gdmlfile))
-                beamline = minidom.parse(self.beamline_file)
-                for node in beamline.getElementsByTagName("run"):
-                    maus_info = node
-                root_node = field.childNodes[0].childNodes[1].childNodes[1]
-                root_node.insertBefore(maus_info, root_node.childNodes[0])
-                fout = open(os.path.join(self.path_out, gdmlfile), 'w')
-                field.writexml(fout)
-                fout.close()
-            print 'Run information merged!'
+        run_info = False
+        fin = open(os.path.join(self.path_tmp, gdmlfile))
+        for lines in fin.readlines():
+            if lines.find('run') >= 0:
+                run_info = True
+        fin.close()
+        if run_info == False:
+            field = minidom.parse(os.path.join(self.path_tmp, gdmlfile))
+            beamline = minidom.parse(self.beamline_file)
+            for node in beamline.getElementsByTagName("run"):
+                maus_info = node
+            root_node = field.childNodes[0].childNodes[1].childNodes[1]
+            root_node.insertBefore(maus_info, root_node.childNodes[0])
+            fout = open(os.path.join(self.path_tmp, gdmlfile), 'w')
+            field.writexml(fout)
+            fout.close()
+        print 'Run information merged!'
      
     def format_materials(self, gdmlfile):
         """
@@ -150,24 +145,21 @@ class Formatter: #pylint: disable = R0902
         @param GDMLFile The name of the file which will have its materials
                reference file location altered.
         """
-        if gdmlfile[-5:] != '.gdml' and gdmlfile[-4:] != '.xml':
-            print gdmlfile+' not a gdml or xml file - ignored'
-        else:
-            impl = minidom.getDOMImplementation()
-            docstr = 'gdml [<!ENTITY materials SYSTEM "' \
-            + self.material_file + '">]'
-            doctype = impl.createDocumentType(docstr, None, None)
-            newdoc = impl.createDocument(None, "MAUS", doctype)
-            config = minidom.parse(os.path.join(self.path_in, gdmlfile))
-            for node in config.getElementsByTagName("gdml"):
-                rootelement = node
-            for node2 in newdoc.getElementsByTagName("MAUS"):
-                oldelement = node2
-            newdoc.replaceChild(rootelement, oldelement)
-            self.txtfile = os.path.join(self.path_out, gdmlfile[:-5] + '.txt')
-            fout = open(self.txtfile, 'w')
-            newdoc.writexml(fout)
-            fout.close()
+        impl = minidom.getDOMImplementation()
+        docstr = 'gdml [<!ENTITY materials SYSTEM "' \
+        + self.material_file + '">]'
+        doctype = impl.createDocumentType(docstr, None, None)
+        newdoc = impl.createDocument(None, "MAUS", doctype)
+        config = minidom.parse(os.path.join(self.path_tmp, gdmlfile))
+        for node in config.getElementsByTagName("gdml"):
+            rootelement = node
+        for node2 in newdoc.getElementsByTagName("MAUS"):
+            oldelement = node2
+        newdoc.replaceChild(rootelement, oldelement)
+        self.txt_file = os.path.join(self.path_tmp, gdmlfile[:-5] + '.txt')
+        fout = open(self.txt_file, 'w')
+        newdoc.writexml(fout)
+        fout.close()
                
     def insert_materials_ref(self, inputfile): #pylint: disable = R0201
         """
@@ -180,23 +172,20 @@ class Formatter: #pylint: disable = R0902
         @param GDMLFile The name of the file which will have its materials
                         reference replaced.
         """
-        if inputfile[-4:] != '.txt':
-            print gdmlfile+' not a gdml or xml file - ignored'
-        else:
-            fin = open(inputfile, 'r')
-            gdmlfile = inputfile[:-4] + '.gdml'
-            fout = open(os.path.join(self.path_out, gdmlfile), 'w')
-            for line in fin.readlines():
-                if line.find('<!-- Materials definition CallBack -->')>=0:
-                    matdef = '<!-- Materials definition CallBack -->'
-                    new_line = line.replace(matdef, matdef+'&materials;')
-                    print >> fout, new_line
-                else:
-                    print >> fout, line
-            print >> fout, '<!-- Formatted for MAUS -->'
-            fin.close()
-            fout.close()
-            os.remove(inputfile)
+        fin = open(inputfile, 'r')
+        gdmlfile = inputfile[:-4] + '.gdml'
+        fout = open(os.path.join(self.path_tmp, gdmlfile), 'w')
+        for line in fin.readlines():
+            if line.find('<!-- Materials definition CallBack -->')>=0:
+                matdef = '<!-- Materials definition CallBack -->'
+                new_line = line.replace(matdef, matdef+'&materials;')
+                print >> fout, new_line
+            else:
+                print >> fout, line
+        print >> fout, '<!-- Formatted for MAUS -->'
+        fin.close()
+        fout.close()
+        os.remove(inputfile)
             
     def format_check(self, gdmlfile):
         """
@@ -211,18 +200,23 @@ class Formatter: #pylint: disable = R0902
         
         @param GDML File The file to be checked.
         """
-        if gdmlfile[-5:] != '.gdml' and gdmlfile[-4:] != '.xml':
-            print gdmlfile+' not a gdml or xml file - ignored'
-        else:
-            self.formatted = False
-            fin = open(os.path.join(self.path_in, gdmlfile))
-            for lines in fin.readlines():
-                if lines.find('<!-- Formatted for MAUS -->') >= 0:
-                    print gdmlfile + ' already formatted!'
-                    self.formatted = True
-            fin.close()
+        self.formatted = False
+        fin = open(os.path.join(self.path_tmp, gdmlfile))
+        for lines in fin.readlines():
+            if lines.find('<!-- Formatted for MAUS -->') >= 0:
+                print gdmlfile + ' already formatted!'
+                self.formatted = True
+        fin.close()
+
+    def copy_tmp_to_out(self, filename):
+        """
+        Copy from the temporary directory to the actual output directory
+        """
+        if self.path_tmp != self.path_out:
+            shutil.copy(os.path.join(self.path_tmp, filename), \
+                        os.path.join(self.path_out, filename) )
         
-            
+
     def format(self):
         """
         @method Format
@@ -235,11 +229,14 @@ class Formatter: #pylint: disable = R0902
         self.format_check(self.configuration_file)
         if self.beamline_file != None:
             self.merge_run_info(self.field_file)
+            self.copy_tmp_to_out(self.field_file)
+
         if self.formatted == False:
             self.format_schema_location(self.configuration_file)
             self.merge_maus_info(self.configuration_file)
             self.format_materials(self.configuration_file)
             self.insert_materials_ref(self.txt_file)
+            self.copy_tmp_to_out(self.configuration_file)
         print "Formatted Configuration File"
         
         noofstepfiles = len(self.stepfiles)
@@ -248,8 +245,9 @@ class Formatter: #pylint: disable = R0902
             if self.formatted == False:
                 self.format_schema_location(self.stepfiles[num])
                 self.format_materials(self.stepfiles[num])
-                self.insert_materials_ref(self.txtfile)
+                self.insert_materials_ref(self.txt_file)
+                self.copy_tmp_to_out(self.stepfiles[num])
             print "Formatted " + str(num+1) + \
             " of " + str(noofstepfiles) + " Geometry Files"
-        print "Format Complete!"
+        print "Format Complete"
 

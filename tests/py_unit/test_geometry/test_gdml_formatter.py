@@ -22,8 +22,8 @@ from geometry.GDMLFormatter import Formatter
 
 class  TestGDMLFormatter(unittest.TestCase): #pylint: disable = C0103, R0904
     """
-    class TestGDMLFormatter This ensures that 
-    GDMLFormatter.py is working as expected.
+    class TestGDMLFormatter This ensures that GDMLFormatter.py is working as
+    expected.
     """
     def setUp(self): #pylint: disable = C0103
         """
@@ -35,7 +35,8 @@ class  TestGDMLFormatter(unittest.TestCase): #pylint: disable = C0103, R0904
         path_in = '/tests/py_unit/test_geometry/testCases/testGeometry'
         self.test_case = os.environ['MAUS_ROOT_DIR'] + path_in
         self.path_out = os.path.join(os.environ['MAUS_ROOT_DIR'], 'tmp')
-        self.gdml = Formatter(self.test_case, self.path_out)
+        self.path_tmp = os.path.join(os.environ['MAUS_ROOT_DIR'], 'tmp')
+        self.gdml = Formatter(self.test_case, self.path_out, self.path_tmp)
 
     def test_constructor(self):
         """
@@ -65,32 +66,26 @@ class  TestGDMLFormatter(unittest.TestCase): #pylint: disable = C0103, R0904
         
         #this next section tests to make sure 
         #the class object is created properly
-        err_msg = 'File name was not saved as member data'
         materialfile = 'fastradModel_materials.xml'
-        self.assertEqual(self.gdml.material_file, materialfile)
+        self.assertEqual \
+                      (self.gdml.material_file, materialfile)
         configfile = 'fastradModel.gdml'
-        self.assertEqual(self.gdml.configuration_file, configfile, err_msg)
+        self.assertEqual(self.gdml.configuration_file, configfile)
         field_file = 'Field.gdml'
-        self.assertEqual(self.gdml.field_file, field_file, err_msg)
+        self.assertEqual(self.gdml.field_file, field_file)
         beamline_file = 'Beamline.gdml'
-        self.assertEqual(self.gdml.beamline_file, beamline_file, err_msg)
+        self.assertEqual(self.gdml.beamline_file, beamline_file)
         
     def test_format_schema_location(self):
         """
         TestGDMLFormatter::test_format_schema_location
         
-        This passes a file which is not a GDML to 
-        the relating method which should raise an
-        error.
+        This passes a file which is not a GDML to the relating method which
+        should raise an error.
         """
-        try:
-            self.gdml.format_schema_location('Gemoetry.not_gdml')
-            self.assertTrue(False, 'Should have raised an error')
-        except:
-            pass #pylint: disable = W0702
-        
         #this next section calls format_schema_location
         #and checks the schema has been entered
+        self.gdml.format_schema_location('fastradModel.gdml')
         fin = open(os.path.join(self.path_out, 'fastradModel.gdml'))
         count = 0
         for line in fin.readlines():
@@ -104,9 +99,8 @@ class  TestGDMLFormatter(unittest.TestCase): #pylint: disable = C0103, R0904
         """
         TestGDMLFormatter::test_merge_maus_info
         
-        This method tests merge maus info by 
-        checking to see if errors are raised
-        when false arguments are entered.
+        This method tests merge maus info by checking to see if errors are
+        raised when false arguments are entered.
         """
         try:
             self.gdml.merge_maus_info('Gemoetry.not_gdml')
@@ -118,9 +112,8 @@ class  TestGDMLFormatter(unittest.TestCase): #pylint: disable = C0103, R0904
         """
         TestGDMLFormatter::test_merge_run_info
         
-        This method tests merge maus info by 
-        checking to see if errors are raised
-        when false arguments are entered.
+        This method tests merge maus info by checking to see if errors are
+        raised when false arguments are entered.
         """
         try:
             self.gdml.merge_run_info('Gemoetry.not_gdml')
@@ -140,9 +133,8 @@ class  TestGDMLFormatter(unittest.TestCase): #pylint: disable = C0103, R0904
         """
         TestGDMLFormatter::test_format_materials
         
-        This pass a file which is not a GDML to 
-        the relating method which should raise an
-        error.
+        This pass a file which is not a GDML to the relating method which should
+        raise an error.
         """
         try:
             self.gdml.format_materials('Gemoetry.not_gdml')
@@ -154,9 +146,8 @@ class  TestGDMLFormatter(unittest.TestCase): #pylint: disable = C0103, R0904
         """
         TestGDMLFormatter::test_insert_materials_ref
         
-        This pass a file which is not a GDML to 
-        the relating method which should raise an
-        error.
+        This pass a file which is not a GDML to the relating method which should
+        raise an error.
         """
         try:
             self.gdml.insert_materials_ref('Gemoetry.not_gdml')
@@ -168,9 +159,8 @@ class  TestGDMLFormatter(unittest.TestCase): #pylint: disable = C0103, R0904
         """
         TestGDMLFormatter::test_format_check
         
-        This pass a file which is not a GDML to 
-        the relating method which should raise an
-        error.
+        This pass a file which is not a GDML to the relating method which should
+        raise an error.
         """
         try:
             self.gdml.format_check('Geometry.not_gdml')
@@ -182,32 +172,30 @@ class  TestGDMLFormatter(unittest.TestCase): #pylint: disable = C0103, R0904
         """
         TestGDMLFormatter::test_format
         
-        This method tests the format method.
-        It does this by firstly calling the 
-        format method and then it opens the outputted
-        (formatted) files. The input files are known and 
-        the output files should be of a known form. These
-        files are read in and certain lines which are present
-        are counted and compared to numbers which we are
-        known. 
+        This method tests the format method. It does this by firstly calling the 
+        format method and then it opens the outputted (formatted) files. The
+        input files are known and the output files should be of a known form.
+        These files are read in and certain lines which are present are counted
+        and compared to numbers which we are known. 
         """
         self.gdml.format()
-        for gdml_file in [self.gdml.configurationfile]+self.gdml.stepfiles:
+        for gdml_file in [self.gdml.configuration_file]+self.gdml.stepfiles:
             (schema_found, material_found, formatted_found) = (0, 0, 0)
-            fin = open(gdml_file, 'r')
+            filename = self.path_out+'/'+gdml_file
+            fin = open(filename, 'r')
             for line in fin.readlines():
                 if line.find(self.gdml.schema) >= 0:
                     schema_found += 1
-                if line.find(self.gdml.materialfile) >= 0:
+                if line.find(self.gdml.material_file) >= 0:
                     material_found += 1
                 if line.find('<!-- Formatted for MAUS -->') >= 0:
                     formatted_found += 1
             self.assertEqual(schema_found, 1, msg="Schema "+self.gdml.schema+\
-                                                     " not found in "+gdml_file)
+                              " found "+str(schema_found)+" times in "+filename)
             self.assertEqual(material_found, 1,
-                                            msg="Material not found "+gdml_file)
+                                             msg="Material not found "+filename)
             self.assertEqual(formatted_found, 1,
-                                           msg="Formatted not found "+gdml_file)
+                                        msg="Formatted tag not found "+filename)
             fin.close()
         
 if __name__ == '__main__':
