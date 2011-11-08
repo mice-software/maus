@@ -1,8 +1,0 @@
-/home/cr67/G4MICE/MAUS/maus_rogers/src/common_py/geometry/testCases/testGeometry/Step_0.gdml 
-/home/cr67/G4MICE/MAUS/maus_rogers/src/common_py/geometry/testCases/testGeometry/Step_1.gdml 
-/home/cr67/G4MICE/MAUS/maus_rogers/src/common_py/geometry/testCases/testGeometry/Step_2.gdml 
-/home/cr67/G4MICE/MAUS/maus_rogers/src/common_py/geometry/testCases/testGeometry/Step_3.gdml 
-/home/cr67/G4MICE/MAUS/maus_rogers/src/common_py/geometry/testCases/testGeometry/Step_4.gdml 
-/home/cr67/G4MICE/MAUS/maus_rogers/src/common_py/geometry/testCases/testGeometry/Step_5.gdml 
-/home/cr67/G4MICE/MAUS/maus_rogers/src/common_py/geometry/testCases/testGeometry/fastradModel_materials.xml 
-/home/cr67/G4MICE/MAUS/maus_rogers/src/common_py/geometry/testCases/testGeometry/fastradModel.gdml 
