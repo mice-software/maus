@@ -1,6 +1,6 @@
 verbose_level = 0
 
-simulation_geometry_filename = "Tracker/TrackerSolenoid1.dat"
+simulation_geometry_filename = "Tracker.dat"
 spill_generator_number_of_spills = 1
 
 beam = {
