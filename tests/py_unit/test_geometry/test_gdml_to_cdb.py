@@ -189,7 +189,7 @@ class  test_gdml_to_cdb(unittest.TestCase): #pylint: disable = C0103, R0904
         if self.internet_on_uploader() == False:
             print "No tear down required"
         else:
-            f_path = '/src/common_py/geometry/testCases/testGeometry/' + /
+            f_path = '/src/common_py/geometry/testCases/testGeometry/' + \
                                                             'FileList.txt'
             path = os.environ['MAUS_ROOT_DIR'] + f_path
             os.remove(path) 

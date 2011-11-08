@@ -2684,9 +2684,10 @@ SWIG_Python_MustGetPtr(PyObject *obj, swig_type_info *ty, int argnum, int flags)
 /* -------- TYPES TABLE (BEGIN) -------- */
 
 #define SWIGTYPE_p_InputCppDAQData swig_types[0]
-#define SWIGTYPE_p_char swig_types[1]
-static swig_type_info *swig_types[3];
-static swig_module_info swig_module = {swig_types, 2, 0, 0, 0, 0};
+#define SWIGTYPE_p_Json__Value swig_types[1]
+#define SWIGTYPE_p_char swig_types[2]
+static swig_type_info *swig_types[4];
+static swig_module_info swig_module = {swig_types, 3, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -2949,6 +2950,16 @@ SWIG_From_std_string  (const std::string& s)
   }
 }
 
+
+  #define SWIG_From_long   PyInt_FromLong 
+
+
+SWIGINTERNINLINE PyObject *
+SWIG_From_int  (int value)
+{    
+  return SWIG_From_long  (value);
+}
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -3129,7 +3140,7 @@ SWIGINTERN PyObject *_wrap_InputCppDAQData_getCurEvent(PyObject *SWIGUNUSEDPARM(
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
-  std::string result;
+  bool result;
   
   if (!PyArg_ParseTuple(args,(char *)"O:InputCppDAQData_getCurEvent",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_InputCppDAQData, 0 |  0 );
@@ -3137,7 +3148,90 @@ SWIGINTERN PyObject *_wrap_InputCppDAQData_getCurEvent(PyObject *SWIGUNUSEDPARM(
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "InputCppDAQData_getCurEvent" "', argument " "1"" of type '" "InputCppDAQData *""'"); 
   }
   arg1 = reinterpret_cast< InputCppDAQData * >(argp1);
-  result = (arg1)->getCurEvent();
+  result = (bool)(arg1)->getCurEvent();
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_InputCppDAQData_getNextEvent(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  InputCppDAQData *arg1 = (InputCppDAQData *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  std::string result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:InputCppDAQData_getNextEvent",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_InputCppDAQData, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "InputCppDAQData_getNextEvent" "', argument " "1"" of type '" "InputCppDAQData *""'"); 
+  }
+  arg1 = reinterpret_cast< InputCppDAQData * >(argp1);
+  result = (arg1)->getNextEvent();
+  resultobj = SWIG_From_std_string(static_cast< std::string >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_InputCppDAQData_getSpillNumber(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  InputCppDAQData *arg1 = (InputCppDAQData *) 0 ;
+  Json::Value arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  int result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:InputCppDAQData_getSpillNumber",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_InputCppDAQData, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "InputCppDAQData_getSpillNumber" "', argument " "1"" of type '" "InputCppDAQData *""'"); 
+  }
+  arg1 = reinterpret_cast< InputCppDAQData * >(argp1);
+  {
+    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_Json__Value,  0  | 0);
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "InputCppDAQData_getSpillNumber" "', argument " "2"" of type '" "Json::Value""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "InputCppDAQData_getSpillNumber" "', argument " "2"" of type '" "Json::Value""'");
+    } else {
+      Json::Value * temp = reinterpret_cast< Json::Value * >(argp2);
+      arg2 = *temp;
+      if (SWIG_IsNewObj(res2)) delete temp;
+    }
+  }
+  result = (int)(arg1)->getSpillNumber(arg2);
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_InputCppDAQData_getNextSpill(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  InputCppDAQData *arg1 = (InputCppDAQData *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  std::string result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:InputCppDAQData_getNextSpill",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_InputCppDAQData, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "InputCppDAQData_getNextSpill" "', argument " "1"" of type '" "InputCppDAQData *""'"); 
+  }
+  arg1 = reinterpret_cast< InputCppDAQData * >(argp1);
+  result = (arg1)->getNextSpill();
   resultobj = SWIG_From_std_string(static_cast< std::string >(result));
   return resultobj;
 fail:
@@ -3255,6 +3349,9 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"InputCppDAQData_birth", _wrap_InputCppDAQData_birth, METH_VARARGS, NULL},
 	 { (char *)"InputCppDAQData_readNextEvent", _wrap_InputCppDAQData_readNextEvent, METH_VARARGS, NULL},
 	 { (char *)"InputCppDAQData_getCurEvent", _wrap_InputCppDAQData_getCurEvent, METH_VARARGS, NULL},
+	 { (char *)"InputCppDAQData_getNextEvent", _wrap_InputCppDAQData_getNextEvent, METH_VARARGS, NULL},
+	 { (char *)"InputCppDAQData_getSpillNumber", _wrap_InputCppDAQData_getSpillNumber, METH_VARARGS, NULL},
+	 { (char *)"InputCppDAQData_getNextSpill", _wrap_InputCppDAQData_getNextSpill, METH_VARARGS, NULL},
 	 { (char *)"InputCppDAQData_disableEquipment", _wrap_InputCppDAQData_disableEquipment, METH_VARARGS, NULL},
 	 { (char *)"InputCppDAQData_death", _wrap_InputCppDAQData_death, METH_VARARGS, NULL},
 	 { (char *)"InputCppDAQData_emitter", _wrap_InputCppDAQData_emitter, METH_VARARGS, NULL},
@@ -3267,18 +3364,22 @@ static PyMethodDef SwigMethods[] = {
 /* -------- TYPE CONVERSION AND EQUIVALENCE RULES (BEGIN) -------- */
 
 static swig_type_info _swigt__p_InputCppDAQData = {"_p_InputCppDAQData", "InputCppDAQData *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_Json__Value = {"_p_Json__Value", "Json::Value *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_char = {"_p_char", "char *", 0, 0, (void*)0, 0};
 
 static swig_type_info *swig_type_initial[] = {
   &_swigt__p_InputCppDAQData,
+  &_swigt__p_Json__Value,
   &_swigt__p_char,
 };
 
 static swig_cast_info _swigc__p_InputCppDAQData[] = {  {&_swigt__p_InputCppDAQData, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_Json__Value[] = {  {&_swigt__p_Json__Value, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_char[] = {  {&_swigt__p_char, 0, 0, 0},{0, 0, 0, 0}};
 
 static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_InputCppDAQData,
+  _swigc__p_Json__Value,
   _swigc__p_char,
 };
 

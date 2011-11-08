@@ -28,7 +28,8 @@ output_json_file_name = "simulation.out"
 output_json_file_type = "text"
 
 
-# Used, for now, to determine what level of c++ log messages are reported to the user
+# Used, for now, to determine what level of
+# c++ log messages are reported to the user:
 # 0 = debug info (and std::cout)
 # 1 = run info
 # 2 = warnings
@@ -162,24 +163,25 @@ reconstruction_geometry_filename = simulation_geometry_filename
 SciFiMUXNum = 7
 SciFiFiberDecayConst = 2.7
 SciFiFiberConvFactor =  3047.1
-SciFiFiberRefractiveIndex = 1.6
-SciFiFiberCriticalAngle = 0.4782 # rad
 SciFiFiberTrappingEff = 0.056
 SciFiFiberMirrorEff = 0.6
 SciFiFiberTransmissionEff = 0.8
 SciFiMUXTransmissionEff = 1.0
-SciFiFiberRunLength = 5000.0 # mm
 SciFivlpcQE = 0.8
 SciFivlpcEnergyRes = 4.0 # MeV
 SciFivlpcTimeRes = 0.2 # ns
-SciFiadcBits = 8
 SciFiadcFactor = 6.0
 SciFitdcBits = 16
 SciFitdcFactor = 1.0
-SciFinElecChanPerPlane = 1429
 SciFinPlanes = 3
 SciFinStations = 5
 SciFinTrackers = 2
+SciFiNPECut = 4.0 # photoelectrons
+SciFiClustExcept = 100 # exception is thrown
+SciFi_sigma_tracker0_station5 = 0.4298 # mm
+SciFi_sigma_triplet = 0.3844 # mm
+SciFi_sigma_z = 0.081 # mm
+SciFi_sigma_duplet =  0.6197 # mm
 
 # geometry upload/download information
 #Upload

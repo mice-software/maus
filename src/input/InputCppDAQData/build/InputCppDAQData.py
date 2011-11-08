@@ -79,11 +79,16 @@ class InputCppDAQData(_object):
     def birth(self, *args): return _InputCppDAQData.InputCppDAQData_birth(self, *args)
     def readNextEvent(self): return _InputCppDAQData.InputCppDAQData_readNextEvent(self)
     def getCurEvent(self): return _InputCppDAQData.InputCppDAQData_getCurEvent(self)
+    def getNextEvent(self): return _InputCppDAQData.InputCppDAQData_getNextEvent(self)
+    def getSpillNumber(self, *args): return _InputCppDAQData.InputCppDAQData_getSpillNumber(self, *args)
+    def getNextSpill(self): return _InputCppDAQData.InputCppDAQData_getNextSpill(self)
     def disableEquipment(self, *args): return _InputCppDAQData.InputCppDAQData_disableEquipment(self, *args)
     def death(self): return _InputCppDAQData.InputCppDAQData_death(self)
     def emitter(self):
-      while (self.readNextEvent()):
-        yield self.getCurEvent()
+      spill = self.getNextSpill()
+      while ( spill != ""):
+        yield spill
+        spill = self.getNextSpill()
 
 
     __swig_destroy__ = _InputCppDAQData.delete_InputCppDAQData

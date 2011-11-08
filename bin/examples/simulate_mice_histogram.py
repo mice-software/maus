@@ -32,7 +32,6 @@ def run():
     my_map = MAUS.MapPyGroup()
     my_map.append(MAUS.MapPyBeamMaker()) # beam construction
     my_map.append(MAUS.MapCppSimulation())  #  geant4 simulation
-    my_map.append(MAUS.MapCppTOFDigitization())  #  TOF electronics model
     my_map.append(MAUS.MapCppTrackerDigitization())  # SciFi electronics model
 
     # Create a reducer. Image type specified in datacards below.
