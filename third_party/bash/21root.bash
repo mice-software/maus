@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-directory=root_v5.28.00d
+directory=root_v5.30.03
 filename=${directory}.source.tar.gz 
 url=ftp://root.cern.ch/root/${filename}
 

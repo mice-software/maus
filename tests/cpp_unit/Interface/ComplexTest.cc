@@ -23,6 +23,7 @@
 
 #include "Interface/Complex.hh"
 
+
 bool test_complex();
 
 bool diff(const MAUS::complex& c1, const MAUS::complex& c2)
@@ -152,7 +153,7 @@ bool test_complex()
   return testpass; 
 }
 
-TEST(ComplexTest, old_unit_tests) {
+TEST(ComplexTest, all) {
   EXPECT_TRUE(test_complex());
 }
 

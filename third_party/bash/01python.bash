@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-
-directory=Python-2.7
+version=2.7.2
+directory=Python-${version}
 filename=${directory}.tgz
-url=http://www.python.org/ftp/python/2.7/${filename}
+url=http://www.python.org/ftp/python/${version}/${filename}
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
