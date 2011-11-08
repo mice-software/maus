@@ -56,8 +56,7 @@ class Formatter: #pylint: disable = R0902
         gdmls = os.listdir(self.path_in)
         for fname in gdmls:
             if fname[-5:] != '.gdml' and fname[-4:] != '.xml':
-                raise IOError('File '+fname+' is not a GDML or XML file', \
-                                    'GDMLFormatter::__init__')
+                print fname+' not a gdml or xml file - ignored'
             if fname.find('materials') >= 0:
                 self.material_file = fname
             elif fname.find('fastrad') >= 0:
@@ -83,8 +82,7 @@ class Formatter: #pylint: disable = R0902
                         altered.
         """
         if gdmlfile[-5:] != '.gdml' and gdmlfile[-4:] != '.xml':
-            raise IOError(gdmlfile + \
-            ' is not a gdml or xml', 'Formatter::format_schema_location')
+            print gdmlfile+' not a gdml or xml file - ignored'
         else:
             xmldoc = minidom.parse(os.path.join(self.path_in, gdmlfile))
             for node in xmldoc.getElementsByTagName("gdml"):
@@ -102,8 +100,7 @@ class Formatter: #pylint: disable = R0902
         to the configuration GDML.
         """
         if gdmlfile[-5:] != '.gdml' and gdmlfile[-4:] != '.xml':
-            raise IOError(gdmlfile + \
-            ' is not a gdml or xml', 'Formatter::merge_maus_info')
+            print gdmlfile+' not a gdml or xml file - ignored'
         else:
             config = minidom.parse(os.path.join(self.path_in, gdmlfile))
             field = minidom.parse(os.path.join(self.path_in, self.field_file))
@@ -122,8 +119,7 @@ class Formatter: #pylint: disable = R0902
         This method adds the run information to the configuration GDML.
         """
         if gdmlfile[-5:] != '.gdml' and gdmlfile[-4:] != '.xml':
-            raise IOError(gdmlfile + \
-            ' is not a gdml or xml', 'Formatter::format_schema_location')
+            print gdmlfile+' not a gdml or xml file - ignored'
         else:
             run_info = False
             fin = open(os.path.join(self.path_in, gdmlfile))
@@ -155,8 +151,7 @@ class Formatter: #pylint: disable = R0902
                reference file location altered.
         """
         if gdmlfile[-5:] != '.gdml' and gdmlfile[-4:] != '.xml':
-            raise IOError(gdmlfile + \
-            ' is not a gdml or xml', 'Formatter::format_materials')
+            print gdmlfile+' not a gdml or xml file - ignored'
         else:
             impl = minidom.getDOMImplementation()
             docstr = 'gdml [<!ENTITY materials SYSTEM "' \
@@ -186,8 +181,7 @@ class Formatter: #pylint: disable = R0902
                         reference replaced.
         """
         if inputfile[-4:] != '.txt':
-            raise IOError(inputfile + \
-            ' is not a txt file', 'Formatter::insert_materials_ref')
+            print gdmlfile+' not a gdml or xml file - ignored'
         else:
             fin = open(inputfile, 'r')
             gdmlfile = inputfile[:-4] + '.gdml'
@@ -218,8 +212,7 @@ class Formatter: #pylint: disable = R0902
         @param GDML File The file to be checked.
         """
         if gdmlfile[-5:] != '.gdml' and gdmlfile[-4:] != '.xml':
-            raise IOError(gdmlfile + \
-            ' is not a gdml or xml', 'Formatter::format_check')
+            print gdmlfile+' not a gdml or xml file - ignored'
         else:
             self.formatted = False
             fin = open(os.path.join(self.path_in, gdmlfile))

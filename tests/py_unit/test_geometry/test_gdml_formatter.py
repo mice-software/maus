@@ -20,26 +20,26 @@ import unittest
 import os
 from geometry.GDMLFormatter import Formatter
 
-class  test_gdml_formatter(unittest.TestCase): #pylint: disable = C0103, R0904
+class  TestGDMLFormatter(unittest.TestCase): #pylint: disable = C0103, R0904
     """
-    class test_gdml_formatter This ensures that 
+    class TestGDMLFormatter This ensures that 
     GDMLFormatter.py is working as expected.
     """
     def setUp(self): #pylint: disable = C0103
         """
-        method set_up
+        TestGDMLFormatter::set_up
         
         This method creates a Formatter object ready for testing
         """
         self.constructor = None
-        path_in = '/src/common_py/geometry/testCases/testGeometry'
+        path_in = '/tests/py_unit/test_geometry/testCases/testGeometry'
         self.test_case = os.environ['MAUS_ROOT_DIR'] + path_in
         self.path_out = os.path.join(os.environ['MAUS_ROOT_DIR'], 'tmp')
         self.gdml = Formatter(self.test_case, self.path_out)
 
     def test_constructor(self):
         """
-        method test_constructor 
+        TestGDMLFormatter::test_constructor 
         
         This method tests the Formatter constructor
         
@@ -56,7 +56,7 @@ class  test_gdml_formatter(unittest.TestCase): #pylint: disable = C0103, R0904
         #argument of a file which isn't a GDML. An error
         #should be raised.
         try:
-            path = '/src/common_py/geometry/testCases/testFormatter'
+            path = '/tests/py_unit/test_geometry/testCases/testFormatter'
             test_case = os.environ['MAUS_ROOT_DIR'] + path
             self.constructor = Formatter(test_case)
             self.assertTrue(False, 'Should have raised an exception')
@@ -77,7 +77,7 @@ class  test_gdml_formatter(unittest.TestCase): #pylint: disable = C0103, R0904
         
     def test_format_schema_location(self):
         """
-        method test_format_schema_location
+        TestGDMLFormatter::test_format_schema_location
         
         This passes a file which is not a GDML to 
         the relating method which should raise an
@@ -102,7 +102,7 @@ class  test_gdml_formatter(unittest.TestCase): #pylint: disable = C0103, R0904
         
     def test_merge_maus_info(self):
         """
-        method test_merge_maus_info
+        TestGDMLFormatter::test_merge_maus_info
         
         This method tests merge maus info by 
         checking to see if errors are raised
@@ -116,7 +116,7 @@ class  test_gdml_formatter(unittest.TestCase): #pylint: disable = C0103, R0904
         
     def test_merge_run_info(self):
         """
-        method test_merge_run_info
+        TestGDMLFormatter::test_merge_run_info
         
         This method tests merge maus info by 
         checking to see if errors are raised
@@ -138,7 +138,7 @@ class  test_gdml_formatter(unittest.TestCase): #pylint: disable = C0103, R0904
     
     def test_format_materials(self):
         """
-        method test_format_materials
+        TestGDMLFormatter::test_format_materials
         
         This pass a file which is not a GDML to 
         the relating method which should raise an
@@ -152,7 +152,7 @@ class  test_gdml_formatter(unittest.TestCase): #pylint: disable = C0103, R0904
 
     def test_insert_materials_ref(self):
         """
-        method test_insert_materials_ref
+        TestGDMLFormatter::test_insert_materials_ref
         
         This pass a file which is not a GDML to 
         the relating method which should raise an
@@ -166,7 +166,7 @@ class  test_gdml_formatter(unittest.TestCase): #pylint: disable = C0103, R0904
 
     def test_format_check(self):
         """
-        method test_format_check
+        TestGDMLFormatter::test_format_check
         
         This pass a file which is not a GDML to 
         the relating method which should raise an
@@ -180,7 +180,7 @@ class  test_gdml_formatter(unittest.TestCase): #pylint: disable = C0103, R0904
                 
     def test_format(self):
         """
-        method test_format
+        TestGDMLFormatter::test_format
         
         This method tests the format method.
         It does this by firstly calling the 

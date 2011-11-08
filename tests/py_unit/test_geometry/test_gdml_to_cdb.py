@@ -24,9 +24,9 @@ Test gdml uploader and downloader. Note that I switch from cdb library to cdb
 mock at run time so that we don't have any messy network calls in unit tests.
 """
 
-class  test_uploader(unittest.TestCase): #pylint: disable = C0103, R0904
+class  TestUploader(unittest.TestCase): #pylint: disable = C0103, R0904
     """
-    class test_gdml_to_cdb
+    TestUploader
     
     This class tests the uploading class
     (GDMLtocdb) of GDMLtoCDB.
@@ -34,21 +34,22 @@ class  test_uploader(unittest.TestCase): #pylint: disable = C0103, R0904
 
     def setUp(self): #pylint: disable = C0103
         """
-        method set_up
+        TestUploader::set_up
         
         This method sets up GDMLtoCDB objects 
         ready for testing.
         """
         self.constructor = None
-        path = '/src/common_py/geometry/testCases/testGeometry'
+        path = '/tests/py_unit/test_geometry/testCases/'
         self.testcase = os.environ['MAUS_ROOT_DIR'] + path
+        self.testgeom = self.testcase+'testGeometry'
         self.testnote = 'This is the unit test'
         self.test_gdml_to_cdb = \
-                               GDMLtocdb.Uploader(self.testcase, self.testnote)
+                               GDMLtocdb.Uploader(self.testgeom, self.testnote)
         
     def test_constructor(self):
         """
-        method test_constructor
+        TestUploader::test_constructor
         
         This method tests the constructor by inputting
         invalid arguments and tests whether errors are 
@@ -57,13 +58,13 @@ class  test_uploader(unittest.TestCase): #pylint: disable = C0103, R0904
         try:
             err = 'this is not an int'
             self.constructor = \
-                          GDMLtocdb.Uploader(self.testcase, self.testnote, err)
+                          GDMLtocdb.Uploader(self.testgeom, self.testnote, err)
             self.assertTrue(False, 'Should have raised an error')
         except:
             pass #pylint: disable = W0702
         
         try:
-            self.constructor = GDMLtocdb.Uploader(self.testcase, 2, 1)
+            self.constructor = GDMLtocdb.Uploader(self.testgeom, 2, 1)
             self.assertTrue(False, 'Should have raised an error')
         except:
             pass #pylint: disable = W0702
@@ -76,7 +77,7 @@ class  test_uploader(unittest.TestCase): #pylint: disable = C0103, R0904
         
     def test_set_up_server(self):
         """
-        method test_set_upserver
+        TestUploader::test_set_upserver
         
         This method ensures the server is set up.
         """
@@ -86,13 +87,12 @@ class  test_uploader(unittest.TestCase): #pylint: disable = C0103, R0904
             
     def test_check_file_list(self):
         """
-        method test_check_file_list
+        TestUploader::test_check_file_list
         
         This method ensures an error is raised when
         an invalid argument is passed.
         """
-        path = '/src/common_py/geometry/testCases/testGDMLtoCDB'
-        test_file_list = os.environ['MAUS_ROOT_DIR'] + path
+        test_file_list = self.testcase+'/testGDMLtoCDB'
         try:
             self.constructor = \
                             GDMLtocdb.Uploader(test_file_list, self.testnote, 1)
@@ -102,15 +102,14 @@ class  test_uploader(unittest.TestCase): #pylint: disable = C0103, R0904
             
     def test_create_file_list(self):
         """
-        method test_create_file_list
+        TestUploader::test_create_file_list
         
         This method ensures that a file list is created
         when this method is called. The file list is the text
         file which lists the names of the files to be
         uploaded. In this case it is the test geometry.
         """
-        path = '/src/common_py/geometry/testCases/testCreateFileList'
-        test_create_file_list = os.environ['MAUS_ROOT_DIR'] + path
+        test_create_file_list = self.testcase+'/testCreateFileList'
         self.constructor = GDMLtocdb.Uploader(test_create_file_list, \
                                                                   self.testnote)
         find_file = os.listdir(test_create_file_list)
@@ -124,41 +123,36 @@ class  test_uploader(unittest.TestCase): #pylint: disable = C0103, R0904
             
     def test_upload_to_cdb(self):
         """
-        method test_upload_to_cdb
+        TestUploader::test_upload_to_cdb
         
         This method tests the upload_to_cdb method
         and check to make sure the test geometry
         is uploaded. 
         """
-        path = '/src/common_py/geometry/testCases/testUpload.not_zip'
-        test_upload = os.environ['MAUS_ROOT_DIR'] + path
+        test_upload = self.testcase+'/testUpload.not_zip'
         try:
             self.test_gdml_to_cdb.upload_to_cdb(test_upload)
             self.assertTrue(False, 'Should have raised an error')
         except:
             pass #pylint: disable = W0702
         
-        zfile = '/src/common_py/geometry/testCases/testGeometry.zip'
-        path = os.environ['MAUS_ROOT_DIR'] + zfile
+        path = self.testcase+'/testGeometry.zip'
         self.test_gdml_to_cdb.upload_to_cdb(path)
         response = self.test_gdml_to_cdb.server_status
         self.assertEqual(response, "some_text")
             
     def tearDown(self): #pylint: disable = C0103
         """
-        method tearDown
+        TestUploader::tearDown
         
         This method removes the FileList.txt which
         is created in setUp. This file causes problems for
         other tests.
         """
-        f_path = '/src/common_py/geometry/testCases/testGeometry/' + \
-                                                        'FileList.txt'
-        path = os.environ['MAUS_ROOT_DIR'] + f_path
-        os.remove(path) 
+        pass
             
     
-class test_downloader(unittest.TestCase): #pylint: disable = C0103, R0904
+class TestDownloader(unittest.TestCase): #pylint: disable = R0904
     """
     class test_downloader
     
@@ -167,7 +161,7 @@ class test_downloader(unittest.TestCase): #pylint: disable = C0103, R0904
     """
     def set_up(self):
         """
-        method set_up
+        TestDownloader::set_up
         
         This method creates a Downloader object
         ready for testing.
@@ -177,7 +171,7 @@ class test_downloader(unittest.TestCase): #pylint: disable = C0103, R0904
         
     def test_constructor(self):
         """
-        method test_constructor
+        TestDownloader::test_constructor
         
         This method test the constructor by passing
         invalid arguments and seeing if errors are raised 
@@ -191,7 +185,7 @@ class test_downloader(unittest.TestCase): #pylint: disable = C0103, R0904
             
     def test_download_current(self):
         """
-        method test_download_current
+        TestDownloader::test_download_current
         
         This method checks to see if errors are raised 
         when false arguments are entered.
@@ -204,7 +198,7 @@ class test_downloader(unittest.TestCase): #pylint: disable = C0103, R0904
         
     def test_download_geometry_for_id(self):
         """
-        method test_download_geomtry_for_id
+        TestDownloader::test_download_geomtry_for_id
         
         This method checks to see if errors are raised 
         when false arguments are entered.
@@ -225,7 +219,7 @@ class test_downloader(unittest.TestCase): #pylint: disable = C0103, R0904
             
     def test_get_ids(self):
         """
-        method test_get_ids
+        TestDownloader::test_get_ids
         
         This method calls this method 
         on the testserver and checks that 
@@ -238,7 +232,7 @@ class test_downloader(unittest.TestCase): #pylint: disable = C0103, R0904
             
     def test_download_beamline_for_run(self):
         """
-        method test_beamline_geomtry_for_run
+        TestDownloader::test_beamline_geomtry_for_run
         
         This method checks to see if errors are raised 
         when false arguments are entered.

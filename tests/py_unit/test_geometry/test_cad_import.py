@@ -36,10 +36,11 @@ class test_cad_import(unittest.TestCase): #pylint: disable = C0103, R0904
         """
         self.maus = os.environ['MAUS_ROOT_DIR']
         self.constuctor = None
-        fra = '/src/common_py/geometry/testCases/testGeometry/fastradModel.gdml'
-        mag = '/src/common_py/geometry/testCases/testGeometry/FieldInfoTest.xml'
+        test_geometry = '/tests/py_unit/test_geometry/testCases/testGeometry/'
+        fra = test_geometry+'fastradModel.gdml'
+        mag = test_geometry+'FieldInfoTest.xml'
         xslt = '/src/common_py/geometry/xsltScripts/GDML2G4MICE.xsl'
-        output = '/src/common_py/geometry/testCases/OUTPUTFILE.txt'
+        output = '/tmp/OUTPUTFILE.txt'
         self.xml_in_1 = self.maus + fra
         self.xml_in_2 = self.maus + mag
         self.xslt = self.maus + xslt

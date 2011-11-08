@@ -47,8 +47,7 @@ class GDMLtomaus(): #pylint: disable = R0903
         file_list = []
         self.step_files = file_list
         if os.path.exists(path) == False:
-            errmsg = 'Path does not exist'
-            raise IOError(errmsg, 'GDMLFormatter::__init__')
+            raise IOError('Path does not exist '+str(path))
         else:
             self.path = path
         gdmls = os.listdir(self.path)
@@ -82,8 +81,7 @@ class GDMLtomaus(): #pylint: disable = R0903
                       Modules to be placed. 
         """
         if os.path.exists(output) == False:
-            errmsg = 'Output argument doesnt exist'
-            raise IOError(errmsg, 'GDMLtomaus::convert_to_maus')
+            raise IOError('Output argument doesnt exist '+str(output))
         else:
             outputfile = output + "/ParentGeometryFile.dat"
             maus = os.environ["MAUS_ROOT_DIR"] + '/src/common_py/geometry/'
