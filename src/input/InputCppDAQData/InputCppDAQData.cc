@@ -131,6 +131,8 @@ bool InputCppDAQData::readNextEvent() {
     if (_eventsCount >= _maxNumEvents)
       return false;
 
+  // cout << "InputCppDAQData::readNextEvent   event " << _eventsCount << endl;
+
   // Use the MDfileManager object to get the next event.
   if (_phys_Events_Only && (!_calib_Events_Only))
     _eventPtr = _dataFileManager.GetNextPhysEvent();
@@ -181,21 +183,21 @@ std::string InputCppDAQData::getCurEvent() {
   }
   // Deal with exceptions
   catch(MDexception & lExc) {
-    Squeak::mout(Squeak::error) << "InputCppDAQData : Unpacking exception." <<
-    std::endl << "DAQ Event skipped!" << std::endl;
-    Squeak::mout(Squeak::error) <<  lExc.GetDescription() << endl;
+    Squeak::mout(Squeak::error) << lExc.GetDescription() << std::endl
+    << "*** Unpacking exception in InputCppDAQData::getCurEvent() : " << endl;
+    Squeak::mout(Squeak::error) <<"DAQ Event skipped!" << endl;
     xDocSpill.clear();
     Json::Value errors;
     std::stringstream ss;
-    ss << _classname << " says:" << lExc.GetDescription() << "  Phys. Event "
+    ss << _classname << " says:" << lExc.GetDescription() << "  Phys. Event " << endl
     << _dataProcessManager.GetPhysEventNumber() << " skipped!";
     errors["bad_data_input"] = ss.str();
     xDocRoot["errors"] = errors;
   }
   catch(std::exception & lExc) {
-    Squeak::mout(Squeak::error) << "InputCppDAQData : Standard exception."
-    << std::endl << "DAQ Event skipped!" << std::endl;
-    Squeak::mout(Squeak::error) << lExc.what() << std::endl;
+    Squeak::mout(Squeak::error) << lExc.what() << std::endl
+    << "*** Standard exception in InputCppDAQData::getCurEvent() : " << endl;
+    Squeak::mout(Squeak::error) <<"DAQ Event skipped!" << endl;
     xDocSpill.clear();
     Json::Value errors;
     std::stringstream ss;
@@ -205,7 +207,7 @@ std::string InputCppDAQData::getCurEvent() {
     xDocRoot["errors"] = errors;
   }
   catch(...) {
-    Squeak::mout(Squeak::error) << "InputCppDAQData : Unknown exception occurred."
+    Squeak::mout(Squeak::error) << "InputCppDAQData::getCurEvent() : Unknown exception occurred."
     << std::endl << "DAQ Event skipped!" << std::endl;
     xDocSpill.clear();
     Json::Value errors;
@@ -259,14 +261,20 @@ bool InputCppDAQData::initProcessor(procType* &processor, Json::Value configJSON
     MDfragment* xFragPtr = MDequipMap::GetFragmentPtr(xFragType);
 
     // Check is the data from this equipment is made of particle events.
-    if (xFragPtr->IsMadeOfParticles()) {
-      // Set a processor for particle events.
-      _dataProcessManager.SetPartEventProc(xName, processor);
-    } else {
-      // Set a processor for the entire equipment fragment
-      _dataProcessManager.SetFragmentProc(xName, processor);
+    try {
+      if (xFragPtr->IsMadeOfParticles()) {
+        // Set a processor for particle events.
+        _dataProcessManager.SetPartEventProc(xName, processor);
+      } else {
+        // Set a processor for the entire equipment fragment
+        _dataProcessManager.SetFragmentProc(xName, processor);
+      }
     }
-
+    // Deal with exceptions
+    catch(MDexception & lExc) {
+      Squeak::mout(Squeak::error) << lExc.GetDescription() << std::endl
+      << "*** Unpacking exception in InputCppDAQData::initProcessor() : " << endl;
+    }
     return true;
   } else {
     this->disableEquipment(xName);

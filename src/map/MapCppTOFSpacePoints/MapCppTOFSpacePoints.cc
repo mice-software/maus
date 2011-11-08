@@ -219,7 +219,7 @@ std::string MapCppTOFSpacePoints::findTriggerPixel(Json::Value xDocPartEvent) {
 
       int slabX = xSlabHit_X["slab"].asInt();
       int slabY = xSlabHit_Y["slab"].asInt();
-      TOFPixelKey xTriggerPixelKey(1, slabX, slabY, "tof1");
+      TOFPixelKey xTriggerPixelKey(1, slabX, slabY, _triggerStation);
       // Apply the calibration corrections assuming that this pixel gives the trigger.
       // If this assumption is correct the value of the time after the corrections
       // has to be approximately 0.
@@ -251,7 +251,7 @@ Json::Value MapCppTOFSpacePoints::makeSpacePoints(Json::Value &xDocPartEvent) {
       if (calibrateSlabHit(xTriggerPixelKey, xDocPartEvent[xPlane0Hits[nX]], t_x) &&
           calibrateSlabHit(xTriggerPixelKey, xDocPartEvent[xPlane1Hits[nY]], t_y)) {
         // The first argumen should be the hit in the horizontal slab and the secon
-        // sould be the hit in the vertical slab. This is mandatory!!!
+        // should be the hit in the vertical slab. This is mandatory!!!
         Json::Value xDocSpacePoint = fillSpacePoint(xDocPartEvent[xPlane0Hits[nX]],
                                                     xDocPartEvent[xPlane1Hits[nY]]);
         double deltaT = xDocSpacePoint["dt"].asInt();
