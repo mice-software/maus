@@ -298,7 +298,7 @@ MVector<m_complex> MMatrix<Tmplt>::eigenvalues() const
 {
   if(num_row() != num_col()) throw(Squeal(Squeal::recoverable, "Attempt to get eigenvectors of non-square matrix", "MMatrix<double>::eigenvalues") );
   MMatrix<Tmplt> temp = *this;
-  MVector<m_complex> evals(num_row(), m_complex_build(2.,-1.));
+  MVector<m_complex> evals(num_row(), MAUS::Complex::complex(2.,-1.));
   gsl_eigen_nonsymm_workspace * w = gsl_eigen_nonsymm_alloc(num_row());
   gsl_eigen_nonsymm_params(0, 1, w);
   int ierr = gsl_eigen_nonsymm(get_matrix(temp), evals.get_vector(evals), w);
@@ -336,8 +336,8 @@ MMatrix<double>& operator *= (MMatrix<double>& m1,  MMatrix<double>  m2)
 MMatrix<m_complex> & operator *= (MMatrix<m_complex>& m1,  MMatrix<m_complex>  m2)
 { 
   MMatrix<m_complex> out(m1.num_row(), m2.num_col()); 
-  gsl_blas_zgemm( CblasNoTrans, CblasNoTrans, m_complex_build(1.), (gsl_matrix_complex*)m1._matrix, 
-                  (gsl_matrix_complex*)m2._matrix, m_complex_build(0.), (gsl_matrix_complex*)out._matrix); 
+  gsl_blas_zgemm( CblasNoTrans, CblasNoTrans, MAUS::Complex::complex(1.), (gsl_matrix_complex*)m1._matrix, 
+                  (gsl_matrix_complex*)m2._matrix, MAUS::Complex::complex(0.), (gsl_matrix_complex*)out._matrix); 
   m1 = out; 
   return m1;
 }
@@ -384,21 +384,21 @@ const gsl_matrix_complex* MMatrix_to_gsl(const MMatrix<m_complex>& m)
   return (gsl_matrix_complex*)m._matrix;
 }
 
-MMatrix<double>    re(MMatrix<m_complex> mc)
+MMatrix<double> re(MMatrix<m_complex> mc)
 {
   MMatrix<double> md(mc.num_row(), mc.num_col());
   for(size_t i=1; i<=mc.num_row(); i++)
     for(size_t j=1; j<=mc.num_col(); j++)
-      md(i,j) = re(mc(i,j));
+      md(i,j) = MAUS::Complex::real(mc(i,j));
   return md;
 }
 
-MMatrix<double>    im(MMatrix<m_complex> mc)
+MMatrix<double> im(MMatrix<m_complex> mc)
 {
   MMatrix<double> md(mc.num_row(), mc.num_col());
   for(size_t i=1; i<=mc.num_row(); i++)
     for(size_t j=1; j<=mc.num_col(); j++)
-      md(i,j) = im(mc(i,j));
+      md(i,j) = MAUS::Complex::imag(mc(i,j));
   return md;
 }
 
@@ -407,7 +407,7 @@ MMatrix<m_complex> complex(MMatrix<double> real)
   MMatrix<m_complex> mc(real.num_row(), real.num_col());
   for(size_t i=1; i<=mc.num_row(); i++)
     for(size_t j=1; j<=mc.num_col(); j++)
-      mc(i,j) = m_complex_build(real(i,j));
+      mc(i,j) = MAUS::Complex::complex(real(i,j));
   return mc;
 }
 
@@ -418,7 +418,7 @@ MMatrix<m_complex> complex(MMatrix<double> real, MMatrix<double> imaginary)
   MMatrix<m_complex> mc(real.num_row(), real.num_col());
   for(size_t i=1; i<=mc.num_row(); i++)
     for(size_t j=1; j<=mc.num_col(); j++)
-      mc(i,j) = m_complex_build(real(i,j), imaginary(i,j));
+      mc(i,j) = MAUS::Complex::complex(real(i,j), imaginary(i,j));
   return mc;
 }
 

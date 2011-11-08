@@ -32,69 +32,16 @@
 #ifndef MVector_h
 #define MVector_h
 
-#include "gsl/gsl_complex_math.h"
-#include "gsl/gsl_vector.h"
-#include "gsl/gsl_vector_complex_double.h"
-
 #include <iostream>
 #include <vector>
 
+#include "gsl/gsl_vector.h"
+#include "gsl/gsl_vector_complex_double.h"
+
 #include "Interface/Squeal.hh"
+#include "Interface/Complex.hh"
 
-/////////////// Complex Start //////////////////////
-
-typedef gsl_complex m_complex; //typedef because I guess at some point I may want to do something else
-
-inline m_complex m_complex_build(double r, double i) { m_complex c = {{r,i}}; return c;}
-inline m_complex m_complex_build(double r)           { m_complex c = {{r,0.}}; return c;}
-//Just overload the standard operators
-inline m_complex operator *(m_complex c,  double    d)  {return gsl_complex_mul_real(c,d);}
-inline m_complex operator *(double    d,  m_complex c)  {return gsl_complex_mul_real(c,d);}
-inline m_complex operator *(m_complex c1, m_complex c2) {return gsl_complex_mul(c1,c2);}
-
-inline m_complex operator /(m_complex c,  double    d)  {return gsl_complex_div_real(c,d);}
-inline m_complex operator /(m_complex c1, m_complex c2) {return gsl_complex_div(c1,c2);}
-inline m_complex operator /(double    d,  m_complex c)  {m_complex c1 = m_complex_build(d); return gsl_complex_div(c1,c);}
-
-inline m_complex operator +(m_complex c,  double    d)  {return gsl_complex_add_real(c, d);}
-inline m_complex operator +(double    d,  m_complex c)  {return gsl_complex_add_real(c, d);}
-inline m_complex operator +(m_complex c1, m_complex c2) {return gsl_complex_add     (c1,c2);}
-
-inline m_complex  operator -(m_complex  c)                {c.dat[0] = -c.dat[0]; c.dat[1] = -c.dat[1]; return c;}
-inline m_complex  operator -(m_complex  c,  double    d)  {return gsl_complex_sub_real(c, d);}
-inline m_complex  operator -(double     d,  m_complex c)  {return -gsl_complex_sub_real(c, d);}
-inline m_complex  operator -(m_complex  c1, m_complex c2) {return gsl_complex_sub     (c1,c2);}
-
-//suboptimal *= ... should do the substitution in place
-inline m_complex& operator *=(m_complex& c,  double    d)  {c  = gsl_complex_mul_real(c,d); return c;}
-inline m_complex& operator *=(m_complex& c1, m_complex c2) {c1 = gsl_complex_mul(c1,c2);    return c1;}
-
-inline m_complex& operator /=(m_complex& c,  double    d)  {c  = gsl_complex_div_real(c,d); return c;}
-inline m_complex& operator /=(m_complex& c1, m_complex c2) {c1 = gsl_complex_div(c1,c2);    return c1;}
-
-inline m_complex& operator +=(m_complex& c,  double    d)  {c  = gsl_complex_add_real(c, d);  return c;}
-inline m_complex& operator +=(m_complex& c1, m_complex c2) {c1 = gsl_complex_add     (c1,c2); return c1;}
-
-inline m_complex& operator -=(m_complex& c,  double    d)  {c  = gsl_complex_sub_real(c, d);  return c;}
-inline m_complex& operator -=(m_complex& c1, m_complex c2) {c1 = gsl_complex_sub     (c1,c2); return c1;}
-//comparators
-inline bool      operator ==(m_complex c1, m_complex c2) {return c1.dat[0] == c2.dat[0] && c1.dat[1] == c2.dat[1];}
-inline bool      operator !=(m_complex c1, m_complex c2) {return !(c1==c2);}
-
-//real and imaginary
-inline double&       re(m_complex& c)       {return c.dat[0];}
-inline double&       im(m_complex& c)       {return c.dat[1];}
-inline const double& re(const m_complex& c) {return c.dat[0];}
-inline const double& im(const m_complex& c) {return c.dat[1];}
-
-//complex conjugate
-inline m_complex      conj(const m_complex& c) {return m_complex_build(re(c), -im(c));}
-
-std::ostream& operator<<(std::ostream& out, m_complex  c);
-std::istream& operator>>(std::istream& in,  m_complex& c);
-
-
-//////////////// Complex End ///////////////////
+typedef gsl_complex m_complex;
 
 template <class Tmplt>
 class MMatrix; //forward declaration because MVector needs to see MMatrix for T() method (and others)

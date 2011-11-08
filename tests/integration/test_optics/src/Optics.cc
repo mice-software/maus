@@ -309,7 +309,7 @@ void DoPolyfit(const Function& func, const MiceModule& mod)
   MVector<m_complex> eig = CLHEP_to_MMatrix(tm.GetFirstOrderMap()).eigenvalues();
   Squeak::mout(Squeak::info)  << std::endl; 
   Squeak::mout(Squeak::debug) << "Eigenvalue modulus: ";
-  for(size_t i=1; i<=eig.num_row(); i++) Squeak::mout(Squeak::debug) << re(eig(i)*conj(eig(i))) << " ";
+  for(size_t i=1; i<=eig.num_row(); i++) Squeak::mout(Squeak::debug) << MAUS::Complex::real(eig(i)*MAUS::Complex::conj(eig(i))) << " ";
   Squeak::mout(Squeak::debug) << " determinant: " << tm.GetFirstOrderMap().determinant() << "\nMap:";
   Squeak::mout(Squeak::debug) << tm << std::endl; 
 }

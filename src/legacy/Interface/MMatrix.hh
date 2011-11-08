@@ -27,6 +27,7 @@
 #include "gsl/gsl_matrix.h"
 #include "gsl/gsl_blas.h"
 
+#include "Interface/Complex.hh"
 #include "Interface/MVector.hh"
 
 ///////////////// MMatrix     /////////////////
@@ -268,7 +269,11 @@ MMatrix<double>    inline & operator *=(MMatrix<double>& m,  double d)
 MVector<m_complex> inline     operator * (MMatrix<m_complex> m,  MVector<m_complex>    v)
 {
   MVector<m_complex> v0(m.num_row()); 
-  gsl_blas_zgemv(CblasNoTrans, m_complex_build(1.), (gsl_matrix_complex*)m._matrix, (gsl_vector_complex*)v._vector, m_complex_build(0.), (gsl_vector_complex*)v0._vector); 
+  gsl_blas_zgemv(CblasNoTrans, MAUS::Complex::complex(1.),
+                 (gsl_matrix_complex*)m._matrix,
+                 (gsl_vector_complex*)v._vector,
+                 MAUS::Complex::complex(0.),
+                 (gsl_vector_complex*)v0._vector); 
   return v0;
 }
 

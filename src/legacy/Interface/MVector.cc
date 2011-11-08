@@ -15,24 +15,13 @@
 //along with xboa in the doc folder.  If not, see 
 //<http://www.gnu.org/licenses/>.
 
+#include "gsl/gsl_complex_math.h"
+#include "gsl/gsl_vector.h"
+#include "gsl/gsl_vector_complex_double.h"
+
 #include "Interface/MVector.hh"
 #include "Interface/MMatrix.hh"
-
-///////////////////////// m_complex ////////////////////////////
-
-std::ostream& operator<<(std::ostream& out, m_complex  c) 
-{ 
-  out << re(c) << " r " << im(c) << " i"; 
-  return out; 
-}
-
-std::istream& operator>>(std::istream& in,  m_complex& c) 
-{ 
-  std::string dummy; 
-  in >> re(c) >> dummy >> im(c) >> dummy; 
-  return in;
-}
-
+#include "Interface/Complex.hh"
 
 ///////////////////////// MVector //////////////////////////////
 
@@ -188,28 +177,28 @@ template MVector<m_complex> MVector<m_complex>::sub(size_t n1, size_t n2) const;
 MVector<m_complex> complex(MVector<double> real)
 {
   MVector<m_complex> c(real.num_row());
-  for(size_t i=1; i<=real.num_row(); i++) c(i) = m_complex_build(real(i));
+  for(size_t i=1; i<=real.num_row(); i++) c(i) = MAUS::Complex::complex(real(i));
   return c;
 }
 
 MVector<m_complex> complex(MVector<double> real, MVector<double> im)
 {
   MVector<m_complex> c(real.num_row());
-  for(size_t i=1; i<=real.num_row(); i++) c(i) = m_complex_build(real(i), im(i));
+  for(size_t i=1; i<=real.num_row(); i++) c(i) = MAUS::Complex::complex(real(i), im(i));
   return c;
 }
 
 MVector<double>    re     (MVector<m_complex> c)
 {
   MVector<double> d(c.num_row());
-  for(size_t i=1; i<=c.num_row(); i++) d(i) = re( c(i) );
+  for(size_t i=1; i<=c.num_row(); i++) d(i) = MAUS::Complex::real( c(i) );
   return d;
 }
 
 MVector<double>    im     (MVector<m_complex> c)
 {
   MVector<double> d(c.num_row());
-  for(size_t i=1; i<=c.num_row(); i++) d(i) = im( c(i) );
+  for(size_t i=1; i<=c.num_row(); i++) d(i) = MAUS::Complex::imag( c(i) );
   return d;
 }
 

@@ -28,6 +28,7 @@
 #include <sstream>
 #include <fstream>
 
+#include "Interface/Complex.hh"
 #include "Interface/MMatrix.hh"
 #include "Interface/MVector.hh"
 
@@ -281,7 +282,7 @@ double test_data_d[16] =
 m_complex test_data_c[16];
 void build_data()
 {
-  for(int i=0; i<16; i++) test_data_c[i] = m_complex_build(test_data_d[i], test_data_d[15-i]);
+  for(int i=0; i<16; i++) test_data_c[i] = MAUS::Complex::complex(test_data_d[i], test_data_d[15-i]);
 }
 
 
@@ -311,20 +312,20 @@ bool test_MMatrixConstructor()
   MMatrix<m_complex> mm_c0;
   MMatrix<m_complex> mm_c1( mm_c0 ); 
   MMatrix<m_complex> mm_c2( 10, 20 );
-  MMatrix<m_complex> mm_c3( 10, 20, m_complex_build(3,-3));
+  MMatrix<m_complex> mm_c3( 10, 20, MAUS::Complex::complex(3,-3));
   MMatrix<m_complex> mm_c4( n1, n2, test_data_c);
   const MMatrix<m_complex> mm_c5(mm_c4);
-  MMatrix<m_complex> mm_c6 = MMatrix<m_complex>::Diagonal( 4, m_complex_build(2,-3), m_complex_build(1,-6));
+  MMatrix<m_complex> mm_c6 = MMatrix<m_complex>::Diagonal( 4, MAUS::Complex::complex(2,-3), MAUS::Complex::complex(1,-6));
   for(size_t i=1; i<=10; i++) 
-    for(size_t j=1; j<=20; j++) {m_complex c = mm_c2(i,j); c += m_complex_build(1,1);} //check for invalid read in valgrind here
+    for(size_t j=1; j<=20; j++) {m_complex c = mm_c2(i,j); c += MAUS::Complex::complex(1,1);} //check for invalid read in valgrind here
   for(size_t i=1; i<=10; i++) 
-    for(size_t j=1; j<=20; j++) testpass &= mm_c3(i,j) == m_complex_build(3,-3);
+    for(size_t j=1; j<=20; j++) testpass &= mm_c3(i,j) == MAUS::Complex::complex(3,-3);
   for(size_t i1=1; i1<=n1; i1++) 
     for(size_t i2=1; i2<=n2; i2++) 
       testpass &= mm_c4(i1,i2) == test_data_c[(i2-1)*8 + i1-1];
   for(size_t i1=1; i1<=4; i1++) 
     for(size_t i2=1; i2<=4; i2++) 
-      testpass &= (diff(mm_c6(i1,i2), m_complex_build(1,-6)) || i1==i2) &&  (diff(mm_c6(i1,i2), m_complex_build(2,-3)) || i1!=i2);
+      testpass &= (diff(mm_c6(i1,i2), MAUS::Complex::complex(1,-6)) || i1==i2) &&  (diff(mm_c6(i1,i2), MAUS::Complex::complex(2,-3)) || i1!=i2);
 
   return testpass;
 }
@@ -349,8 +350,8 @@ bool test_MMatrixDereference()
     {
       testpass &= mm_c1(i1+1,i2+1) == test_data_c[(i2)*8 + i1];
       testpass &= mm_c2(i1+1,i2+1) == test_data_c[(i2)*8 + i1];
-      mm_c1(i1+1,i2+1) = m_complex_build(4. -4);
-      testpass &= mm_c1(i1+1,i2+1) == m_complex_build(4. -4);
+      mm_c1(i1+1,i2+1) = MAUS::Complex::complex(4. -4);
+      testpass &= mm_c1(i1+1,i2+1) == MAUS::Complex::complex(4. -4);
     }
   return testpass;
 }
@@ -381,7 +382,7 @@ bool test_MMatrixBoolEq()
   const MMatrix<m_complex> mm_c0b;
   const MMatrix<m_complex> mm_c1a( n1, n2, test_data_c);
   MMatrix<m_complex> mm_c1b( n1, n2, test_data_c);
-  const MMatrix<m_complex>    mm_c1c( n2, n1, m_complex_build(0,0));
+  const MMatrix<m_complex>    mm_c1c( n2, n1, MAUS::Complex::complex(0,0));
 
   testpass &= mm_d0a == mm_d0b && !(mm_d0a != mm_d0b);
   testpass &= mm_d1a == mm_d1b && !(mm_d1a != mm_d1b);
@@ -401,7 +402,7 @@ bool test_MMatrixBoolEq()
   for(size_t i=1; i<mm_c1a.num_row(); i++) 
     for(size_t j=1; j<mm_c1a.num_col(); j++)
     {
-      mm_c1b(i,j) = m_complex_build(0,0);
+      mm_c1b(i,j) = MAUS::Complex::complex(0,0);
       testpass &= mm_c1a != mm_c1b && !(mm_c1a == mm_c1b);
       mm_c1b(i,j) = mm_c1a(i,j);
     }
@@ -488,7 +489,7 @@ bool test_MMatrixMinus()
   mm_c1a -= mm_c1a;
   for(size_t i=1; i<=mm_c1b.num_row(); i++)  
     for(size_t j=1; j<=mm_c1b.num_col(); j++)  
-      testpass &= diff(mm_c1a(i,j), m_complex_build(0,0) ); 
+      testpass &= diff(mm_c1a(i,j), MAUS::Complex::complex(0,0) ); 
   mm_c1a = -mm_c1b;
   for(size_t i=1; i<=mm_d1b.num_row(); i++)  
     for(size_t j=1; j<=mm_d1b.num_col(); j++)  
@@ -497,7 +498,7 @@ bool test_MMatrixMinus()
   mm_c1a = mm_c1b - mm_c1a;
   for(size_t i=1; i<=mm_c1b.num_row(); i++)  
     for(size_t j=1; j<=mm_c1b.num_col(); j++)  
-      testpass &= diff(mm_c1a(i,j), m_complex_build(0,0) ); 
+      testpass &= diff(mm_c1a(i,j), MAUS::Complex::complex(0,0) ); 
   
   return testpass;  
 }
@@ -531,20 +532,20 @@ bool test_MMatrixTimes()
 
   MMatrix<m_complex> mm_ca( n1, n2, test_data_c);
   const MMatrix<m_complex> mm_cb( mm_ca );
-  mm_ca *= m_complex_build(2.,-5.);
+  mm_ca *= MAUS::Complex::complex(2.,-5.);
   for(size_t i=1; i<=mm_db.num_row(); i++)
     for(size_t j=1; j<=mm_db.num_col(); j++)
-      testpass &= diff(mm_ca(i,j), m_complex_build(2.,-5.)*mm_cb(i,j)); 
-  mm_ca = mm_ca*(1./m_complex_build(2.,-5.));
+      testpass &= diff(mm_ca(i,j), MAUS::Complex::complex(2.,-5.)*mm_cb(i,j)); 
+  mm_ca = mm_ca*(1./MAUS::Complex::complex(2.,-5.));
   testpass &= diff(mm_ca, mm_cb); 
        
   m_complex c1[6];
   m_complex c2[6];
-  for(int i=0; i<6; i++) c1[i] = m_complex_build( d1[i],       d2[i]);
-  for(int i=0; i<6; i++) c2[i] = m_complex_build(-d2[i]*d1[i], d1[i]);
+  for(int i=0; i<6; i++) c1[i] = MAUS::Complex::complex( d1[i],       d2[i]);
+  for(int i=0; i<6; i++) c2[i] = MAUS::Complex::complex(-d2[i]*d1[i], d1[i]);
   MMatrix<m_complex> mm_c1( 3, 2, c1);
   MMatrix<m_complex> mm_c2( 2, 3, c2);
-  MMatrix<m_complex> mm_c3( 3, 3, m_complex_build(0,0));
+  MMatrix<m_complex> mm_c3( 3, 3, MAUS::Complex::complex(0,0));
   for(int i=1; i<=3; i++)
     for(int j=1; j<=3; j++)
       for(int k=1; k<=2; k++)
@@ -578,11 +579,11 @@ bool test_MMatrixDivide()
 
   MMatrix<m_complex> mm_ca( n1, n2, test_data_c);
   const MMatrix<m_complex> mm_cb( mm_ca );
-  mm_ca /= m_complex_build(2.,-5.);
-  mm_ca *= m_complex_build(2., -5.);
+  mm_ca /= MAUS::Complex::complex(2.,-5.);
+  mm_ca *= MAUS::Complex::complex(2., -5.);
   testpass &= diff(mm_ca, mm_cb);
-  mm_ca  = mm_ca/m_complex_build(2.,-5.);
-  mm_ca *= m_complex_build(2., -5.);
+  mm_ca  = mm_ca/MAUS::Complex::complex(2.,-5.);
+  mm_ca *= MAUS::Complex::complex(2., -5.);
   testpass &= diff(mm_ca, mm_cb); 
 
   return testpass;
@@ -616,7 +617,7 @@ bool test_MMatrixTrace()
   testpass &= diff(trace_d, mm_da.trace());
 
   const MMatrix<m_complex> mm_ca( 4, 4, test_data_c );
-  m_complex trace_c = m_complex_build(0);
+  m_complex trace_c = MAUS::Complex::complex(0);
   for(size_t i=1; i<=4; i++) trace_c += mm_ca(i,i);  
   testpass &= diff(trace_c, mm_ca.trace());
   return testpass;
@@ -650,8 +651,8 @@ bool test_MMatrixInv()
   MMatrix<m_complex> mm_cinv = mm_ca.inverse();
   MMatrix<m_complex> mm_cb( mm_ca );
   mm_ca.invert();
-  testpass &= diff(mm_cb*mm_cinv, MMatrix<m_complex>::Diagonal(4, m_complex_build(1), m_complex_build(0))); //4D identity matrix
-  testpass &= diff(mm_cb*mm_ca,   MMatrix<m_complex>::Diagonal(4, m_complex_build(1), m_complex_build(0))); //4D identity matrix
+  testpass &= diff(mm_cb*mm_cinv, MMatrix<m_complex>::Diagonal(4, MAUS::Complex::complex(1), MAUS::Complex::complex(0))); //4D identity matrix
+  testpass &= diff(mm_cb*mm_ca,   MMatrix<m_complex>::Diagonal(4, MAUS::Complex::complex(1), MAUS::Complex::complex(0))); //4D identity matrix
 
   return testpass;
 }
@@ -776,7 +777,7 @@ bool test_MMatrixToMMatrix()
   MMatrix<m_complex> mm_cc = complex(mm_dr);
   for(size_t i=1; i<mm_ca.num_row(); i++)
     for(size_t j=1; j<mm_ca.num_col(); j++)
-      testpass &= diff( mm_cc(i,j), m_complex_build( re( mm_ca(i,j) ) ) );
+      testpass &= diff( mm_cc(i,j), MAUS::Complex::complex( MAUS::Complex::real( mm_ca(i,j) ) ) );
 
   for(size_t i=1; i<=mm_ca.num_col(); i++)
   {
