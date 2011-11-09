@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """
 M. Littlefield
 """
@@ -25,31 +27,31 @@ from geometry.GDMLPacker import Unpacker
 
 def main():
     """
-    This is the code for the executable file which downloads
-    the current valid geometry. It takes the arguments of the 
-    download directory. It will download the geometry from the
-    database and translates the geometry into MAUS Module format.
+    This is the code for the executable file which downloads the current valid
+    geometry. It takes the arguments of the download directory. It will download
+    the geometry from the database and translates the geometry into MAUS Module
+    format.
     """
     #Read Config Arguments
-    inputfile = Configreader()
-    inputfile.readconfig()
+    configuration = Configreader()
+    configuration.readconfig()
     #Download file
-    current_geometry = Downloader(1)
-    current_geometry.download_current(inputfile.downloaddir)
+    geometry_downloader = Downloader()
+    geometry_downloader.download_current(configuration.maus_dl_dir)
     #Unzip file
-    path = inputfile.downloaddir + '/Geometry.zip'
-    zipped_geom = Unpacker(path, inputfile.downloaddir)
+    path = os.path.join(configuration.maus_dl_dir,
+                                            geometry.GDMLtoCDB.GEOMETRY_ZIPFILE)
+    zipped_geom = Unpacker(path, configuration.maus_dl_dir)
     zipped_geom.unzip_file()
     os.remove(path)
-    os.remove(inputfile.downloaddir + '/FileList.txt')
+    os.remove(os.path.join(configuration.maus_dl_dir,
+                                                   geometry.GDMLtoCDB.FILELIST))
     #Format Files
-    gdmls = Formatter(inputfile.downloaddir)
+    gdmls = Formatter(configuration.maus_dl_dir)
     gdmls.format()
     #Convert to MAUS Modules
-    maus_modules = GDMLtomaus(inputfile.downloaddir)
-    maus = os.environ['MAUS_ROOT_DIR']
-    outputlocation = maus + '/src/common_py/geometry/Download' 
-    maus_modules.convert_to_maus(outputlocation)
+    maus_modules = GDMLtomaus(configuration.maus_dl_dir)
+    maus_modules.convert_to_maus(configuration.maus_dl_dir)
     print "Download Complete!"
 
 if __name__ == "__main__":

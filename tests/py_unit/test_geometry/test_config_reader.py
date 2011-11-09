@@ -33,7 +33,7 @@ class test_config_reader(unittest.TestCase): #pylint: disable = C0103, R0904
         object ready to test
         """
         self.testcase = Configreader()
-        
+
     def test_readconfig(self):
         """
         These tests work by reading the defaults from
@@ -41,27 +41,30 @@ class test_config_reader(unittest.TestCase): #pylint: disable = C0103, R0904
         to what is expected in this file.
         """
         self.testcase.readconfig()
-        gdml_dir = os.environ['MAUS_ROOT_DIR'] + \
-        '/src/common_py/geometry/testCases/testGeometry'
-        self.assertEqual(self.testcase.gdmldir, gdml_dir, \
-        'GDML Directory not found, testConfigReader::test_readconfig')
-        test_note = 'This is a standard note It uses the standard test case'
-        self.assertEqual(self.testcase.geometrynotes, test_note, \
-              'Note not found, testConfigReader::test_readconfig')
-        self.assertEqual(self.testcase.zipfile, 0, \
-        'Zip file arg not found, testConfigReader::test_readconfig')
-        self.assertEqual(self.testcase.deleteoriginals, 0, \
-        'Delete originals arg not found, testConfigReader::test_readconfig')
-        test_download = os.environ['MAUS_ROOT_DIR'] + \
-                    '/src/common_py/geometry/Download/'
-        self.assertEqual(self.testcase.downloaddir, test_download, \
-        'Download directory not found, testConfigReader::test_readconfig')
-        self.assertEqual(self.testcase.starttime, '2011-09-08 09:00:00', \
-                'Start time not found, testConfigReader::test_readconfig')
-        self.assertEqual(self.testcase.stoptime, None, \
-        'Start time not found, testConfigReader::test_readconfig')
-        self.assertEqual(self.testcase.runnum, 1, \
-        'Start time not found, testConfigReader::test_readconfig')
+        cdb_download_url = "http://cdb.mice.rl.ac.uk/cdb/"
+        cdb_upload_url = "http://cdb.mice.rl.ac.uk/cdb/"
+        cdb_download_geometry_dir = "geometry?wsdl"
+        cdb_upload_geometry_dir = "geometrySuperMouse?wsdl"
+        geometry_upload_directory   = "%s/files/geometry/upload" % os.environ.get("MAUS_ROOT_DIR")
+        geometry_download_directory   = "%s/files/geometry/download" % os.environ.get("MAUS_ROOT_DIR")
+        geometry_description = "This is a standard note It uses the standard test case"
+        geometry_zip_file         = 0
+        geometry_delete_originals = 0
+        geometry_start_time = "2011-09-08 09:00:00"
+        geometry_stop_time  = None
+        geometry_run_number = 1
+        self.assertEqual(self.testcase.cdb_dl_url, cdb_download_url)
+        self.assertEqual(self.testcase.cdb_ul_url, cdb_upload_url)
+        self.assertEqual(self.testcase.cdb_dl_dir, cdb_download_geometry_dir)
+        self.assertEqual(self.testcase.cdb_ul_dir, cdb_upload_geometry_dir)
+        self.assertEqual(self.testcase.maus_ul_dir, geometry_upload_directory)
+        self.assertEqual(self.testcase.maus_dl_dir, geometry_download_directory)
+        self.assertEqual(self.testcase.geometrynotes, geometry_description)
+        self.assertEqual(self.testcase.zipfile, geometry_zip_file)
+        self.assertEqual(self.testcase.deleteoriginals, geometry_delete_originals)
+        self.assertEqual(self.testcase.starttime, geometry_start_time)
+        self.assertEqual(self.testcase.stoptime, geometry_stop_time)
+        self.assertEqual(self.testcase.runnum, geometry_run_number)
 
 if __name__ == '__main__':
     unittest.main()

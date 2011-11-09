@@ -46,41 +46,30 @@ class Configreader(): #pylint: disable = R0903, R0902
         self.starttime = ""
         self.stoptime = ""
         self.runnum = ""
+
+        self.readconfig()
         
     def readconfig(self):
         """
         @method readconfig
         
         This method reads the ConfigurationDefaults File and takes the 
-        information needed from the file which has certain tags. This 
-        information is then stored into variables which can be passed between
-        classes. The tags are,
-        
-        GeometryDirectory   = "This is where the directory to the fastrad 
-                               outputted geometry goes"
-        GeometryDescription = "This is where the description of the geometry 
-                               goes"
-        ZipFile          = "Choose 1 to create a zipfile of the geometry. 
-                            0 to do nothing"
-        Delete Originals = "Choose 1 to delete the original geometry files.  
-                            0 to do nothing"
-        DownloadDir = "This is where the directory which the user wishes to 
-                       download geometries from the CDB to goes"                      
+        information needed from the file which has certain tags.                  
         """
-        inputs = Configuration().getConfigJSON()
+        inputs = Configuration().getConfigJSON(command_line_args = True)
         config_dict          = json.loads(inputs)
         self.cdb_dl_url          = config_dict['cdb_download_url']
         self.cdb_dl_dir          = config_dict['cdb_download_geometry_dir']
         self.cdb_ul_url          = config_dict['cdb_upload_url']
         self.cdb_ul_dir          = config_dict['cdb_upload_geometry_dir']
-        self.gdmldir         = config_dict['geometry_directory']
+        self.maus_ul_dir         = config_dict['geometry_upload_directory']
+        self.maus_dl_dir         = config_dict['geometry_download_directory']
         self.geometrynotes   = config_dict['geometry_description']
-        self.zipfile         = config_dict['zip_file']
-        self.deleteoriginals = config_dict['delete_originals']
-        self.downloaddir     = config_dict['download_dir']
-        self.starttime       = config_dict['start_time']
-        self.stoptime        = config_dict['stop_time']
-        self.runnum          = config_dict['run_num']
+        self.zipfile         = config_dict['geometry_zip_file']
+        self.deleteoriginals = config_dict['geometry_delete_originals']
+        self.starttime       = config_dict['geometry_start_time']
+        self.stoptime        = config_dict['geometry_stop_time']
+        self.runnum          = config_dict['geometry_run_number']
 
 def main():
     """

@@ -1,5 +1,9 @@
 """
-M. Littlefield
+GDMLtoCDB contains the classes that handle uploading and downloading to the cdb
+
+GDMLtoCDB contains two classes:
+- Uploader handles uploading to the configuration database
+- Downloader handles downloading from the configuration database
 """
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 # 
@@ -17,10 +21,14 @@ M. Littlefield
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-import cdb
 from datetime import datetime
+
+import cdb
+
 from geometry.ConfigReader import Configreader
 
+GEOMETRY_ZIPFILE = 'geometry.zip'
+FILELIST = 'FileList.txt'
 
 #change notes no longer encode decode
 class Uploader: #pylint: disable = R0902
@@ -54,14 +62,14 @@ class Uploader: #pylint: disable = R0902
         self.textfile = None
         self.text = ""
         if type(notes) != str:
-            raise IOError('Geometry description missing', 'GDMLtocdb::__init__')
+            raise IOError('Geometry description missing or not a string')
         else:
             self.notes = notes
         filelist = []
         self.geometryfiles = filelist
         self.listofgeometries = None
         if os.path.exists(filepath) != True:
-            raise IOError("File path does not exist", "gdmltocdb::__init__")
+            raise IOError("File path "+str(filepath)+" does not exist")
         else:
             self.filepath = filepath
         self.set_up_server()
@@ -108,8 +116,7 @@ class Uploader: #pylint: disable = R0902
                     if self.text.find(gdmls[num]) >= 0:
                         count += 1
                 if numcheck != count:
-                    errormsg = "Text file doesnt list fastrad files"
-                    raise IOError(errormsg, "gdmltocdb:__init__")
+                    raise IOError("Text file "+path+" doesnt list fastrad files")
                 else:
                     self.listofgeometries = path
                     fin = open(self.listofgeometries, 'r')
@@ -131,7 +138,7 @@ class Uploader: #pylint: disable = R0902
         gdmls = os.listdir(self.filepath)
         numoffiles = len(gdmls)
         if self.textfile == None:
-            path = self.filepath + "/FileList.txt"
+            path = os.path.join(self.filepath, FILELIST)
             fout = open(path, 'w')
             for num in range(0, numoffiles):
                 filepath = self.filepath + "/" + gdmls[num]
@@ -161,6 +168,7 @@ class Uploader: #pylint: disable = R0902
             fin = open(zipped_file, 'r')
             f_contents = fin.read()
             _gdml = f_contents
+            print (_gdml, _dt, self.notes)
             self.geometry_cdb.set_gdml(_gdml, _dt, self.notes)
             self.server_status = str(self.geometry_cdb.set_gdml \
                                                        (_gdml, _dt, self.notes))
@@ -200,6 +208,7 @@ class Downloader: #pylint: disable = R0902
         """
         config = Configreader()
         self.wsdlurl = config.cdb_dl_url+config.cdb_dl_dir
+        print "WSDLURL",self.wsdlurl
         self.geometry_cdb = cdb.Geometry()
         self.geometry_cdb.set_url(self.wsdlurl)
         print "Server status is "+self.geometry_cdb.get_status()
@@ -220,10 +229,10 @@ class Downloader: #pylint: disable = R0902
                                unpacked to. 
         """
         if os.path.exists(downloadpath) == False:
-            raise IOError('Path does not exist!, Downloader::download_current')
+            raise IOError('Path '+str(downloadpath)+' does not exist')
         else:
             downloadedfile = self.geometry_cdb.get_current_gdml()
-            zip_path = downloadpath + '/Geometry.zip'
+            zip_path = os.path.join(downloadpath, GEOMETRY_ZIPFILE)
             fout = open(zip_path, 'w')
             fout.write(downloadedfile)
             fout.close()
@@ -246,7 +255,7 @@ class Downloader: #pylint: disable = R0902
             'Downloader::download_current')
         else:
             downloadedfile = self.geometry_cdb.get_gdml_for_id(id_num)
-            zip_path = downloadpath + '/Geometry.zip'
+            zip_path = os.path.join(downloadpath, GEOMETRY_ZIPFILE)
             fout = open(zip_path, 'w')
             fout.write(downloadedfile)
             fout.close()
@@ -278,7 +287,7 @@ class Downloader: #pylint: disable = R0902
         
         @param  id The long ID run number for the desired geometry.
         @param  downloadedpath The path location where the files will be 
-                               unpacked to. 
+                               unpacked to.
         """
         if os.path.exists(downloadpath) == False:
             raise IOError('Path does not exist!')

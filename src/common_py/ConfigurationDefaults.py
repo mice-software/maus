@@ -1,3 +1,15 @@
+"""
+The Configuration defaults
+
+These are the default values for MAUS and its components. Please DO NOT CHANGE
+this unless you want to change this quantity for everybody. Values can be
+overridden by setting configuration_file parameter on the comamnd line, for
+example
+
+bin/simulate_mice.py --configuration_file my_configuration.py
+"""
+
+
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 #
 #  MAUS is free software: you can redistribute it and/or modify
@@ -13,13 +25,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-## The Configuration defaults
-#  These are the default values for MAUS and its components.
-#  Please DO NOT CHANGE this unless you want to change this
-#  quantity for everybody.  If you want to fiddle, then
-#  please load your own overriding configuration by
-#  consulting the documentation.
-#
 import os
 
 type_of_dataflow = 'pipeline_single_thread'
@@ -190,22 +195,21 @@ cdb_download_url = "http://cdb.mice.rl.ac.uk/cdb/"
 cdb_upload_url = "http://cdb.mice.rl.ac.uk/cdb/"
 cdb_download_geometry_dir = "geometry?wsdl"
 cdb_upload_geometry_dir = "geometrySuperMouse?wsdl"
-geometry_directory   = "%s/src/common_py/geometry/testCases/testGeometry" % os.environ.get("MAUS_ROOT_DIR")
-geometry_description = "This is a standard note It uses the standard test case"
+geometry_upload_directory   = "%s/files/geometry/upload" % os.environ.get("MAUS_ROOT_DIR")
+geometry_download_directory   = "%s/files/geometry/download" % os.environ.get("MAUS_ROOT_DIR")
+geometry_description = "<No note specifield>"
 # Optional Arguments 1 = yes, 0 = no
-zip_file         = 0
-delete_originals = 0
+geometry_zip_file         = 0
+geometry_delete_originals = 0
 
 #Download
 #Donwloading of geometries
-#Below, name the directory where the geometry will be downloaded.
-download_dir = "%s/src/common_py/geometry/Download/" % os.environ.get("MAUS_ROOT_DIR")
 #Download Geometry for a specific ID
 #Name the start and stop time for which the geometry was valid. Stop time is optional
-start_time = "2011-09-08 09:00:00"
-stop_time  = None
+geometry_start_time = "2011-09-08 09:00:00"
+geometry_stop_time  = None
 #Download Geometry for a specific Run Num
-run_num = 1
+geometry_run_number = 1
 
 # this is used by ImputCppRealData
 Number_of_DAQ_Events = -1

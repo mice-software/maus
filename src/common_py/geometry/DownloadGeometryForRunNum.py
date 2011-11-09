@@ -46,7 +46,7 @@ def main():
     zipped_geom.unzip_file()
     os.remove(path)
     os.remove(inputs.downloaddir + '/FileList.txt')
-    current_geometry.download_beamline_for_run(inputs.runnum, inputs.downloaddir) 
+    current_geometry.download_beamline_for_run(inputs.runnum, inputs.downloaddir)
     #this needs to move when current geoms are valid
     gdmls = Formatter(inputs.downloaddir)
     gdmls.format()
