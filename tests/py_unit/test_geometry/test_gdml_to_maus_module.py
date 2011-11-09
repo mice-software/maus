@@ -40,7 +40,7 @@ class  TestGDMLToMausModule(unittest.TestCase):#pylint:disable = C0103,R0904
         tested and then removed.
         """
         test_cases_dir = os.environ['MAUS_ROOT_DIR'] + \
-                                        '/tests/py_unit/test_geometry/testCases/'
+                                       '/tests/py_unit/test_geometry/testCases/'
         self.constructor = None
         self.file_source = test_cases_dir+'/mausModuleSource'
         self.copy_files = GDMLtomaus(self.file_source)

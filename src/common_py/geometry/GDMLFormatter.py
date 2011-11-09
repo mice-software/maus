@@ -89,7 +89,7 @@ class Formatter: #pylint: disable = R0902
         xmldoc = minidom.parse(os.path.join(self.path_tmp, gdmlfile))
         for node in xmldoc.getElementsByTagName("gdml"):
             if node.hasAttribute("xsi:noNamespaceSchemaLocation"):
-               node.attributes['xsi:noNamespaceSchemaLocation'] = self.schema
+                node.attributes['xsi:noNamespaceSchemaLocation'] = self.schema
         fout = open(os.path.join(self.path_tmp, gdmlfile), 'w')
         xmldoc.writexml( fout)
         fout.close()

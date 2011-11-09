@@ -1,3 +1,8 @@
+"""
+Test gdml uploader and downloader. Note that I switch from cdb library to cdb
+mock at run time so that we don't have any messy network calls in unit tests.
+"""
+
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 # 
 #  MAUS is free software: you can redistribute it and/or modify
@@ -18,11 +23,6 @@ import os
 import geometry.GDMLtoCDB as GDMLtocdb
 import test_cdb_mockup as test_cdb_mockup
 GDMLtocdb.cdb = test_cdb_mockup # use cdb mockup library
-
-"""
-Test gdml uploader and downloader. Note that I switch from cdb library to cdb
-mock at run time so that we don't have any messy network calls in unit tests.
-"""
 
 class  TestUploader(unittest.TestCase): #pylint: disable = C0103, R0904
     """
@@ -178,7 +178,7 @@ class TestDownloader(unittest.TestCase): #pylint: disable = R0904
         as they should be. 
         """
         try:
-            self.constructor = GDMLtocdb.Downloader('no int') #pylint: disable = W0201
+            self.constructor = GDMLtocdb.Downloader('no int') #pylint: disable = W0201, C0301
             self.assertTrue(False, 'Should have raised an error')
         except:
             pass #pylint: disable = W0702
@@ -227,7 +227,6 @@ class TestDownloader(unittest.TestCase): #pylint: disable = R0904
         """
         result = GDMLtocdb.Downloader().get_ids("2011-09-08 09:00:00", \
                                          "2011-09-09 09:00:00")
-        err = "get_ids did not return the correct id"
         self.assertEqual(result, "3004")
             
     def test_download_beamline_for_run(self):

@@ -18,7 +18,7 @@ M. Littlefield
 
 import os.path
 from geometry.GDMLPacker import Packer
-from geometry.GDMLtoCDB import GDMLtocdb
+from geometry.GDMLtoCDB import Uploader
 from geometry.ConfigReader import Configreader
 
 def main():
@@ -36,7 +36,7 @@ def main():
     inputfile = Configreader()
     inputfile.readconfig()
     #upload the geometry
-    uploadgeometry = GDMLtocdb(inputfile.gdmldir, inputfile.geometrynotes, 1)
+    uploadgeometry = Uploader(inputfile.gdmldir, inputfile.geometrynotes, 1)
     path = inputfile.gdmldir + '/FileList.txt'
     zfile = Packer(path)
     zippedgeoms = '/src/common_py/geometry/zippedGeoms'

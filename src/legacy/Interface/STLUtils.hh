@@ -152,7 +152,6 @@ template <class TEMP_CLASS> std::string ToString
   ss << value;
   return ss.str();
 }
-
 }
 
 /**  A macro to disallow the copy constructor and operator= functions

@@ -19,7 +19,7 @@ M. Littlefield
 import os
 import cdb
 from datetime import datetime
-from ConfigReader import Configreader
+from geometry.ConfigReader import Configreader
 
 
 #change notes no longer encode decode
@@ -187,6 +187,8 @@ class Downloader: #pylint: disable = R0902
         filelist = []
         self.geometryfiles = filelist
         self.listofgeometries = filelist
+        self.wsdlurl = ""
+        self.geometry_cdb = None
         self.set_up_server()
 
     def set_up_server(self):
@@ -283,7 +285,7 @@ class Downloader: #pylint: disable = R0902
         elif type(run_id) != int:
             raise IOError('ID number not obtained')
         else:        
-            beamline_cdb = Beamline()
+            beamline_cdb = cdb.Beamline()
             downloadedfile = beamline_cdb.get_beamline_for_run_xml(run_id)
             path = downloadpath + '/Beamline.gdml'
             fout = open(path, 'w')
@@ -292,9 +294,4 @@ class Downloader: #pylint: disable = R0902
             dfile = beamline_cdb.get_beamline_for_run(run_id)
             self.times.append(str(dfile[1L]['startTime']))
             self.times.append(str(dfile[1L]['endTime']))
-            
-if __name__ == "__main__":
-    main()
-
-
 
