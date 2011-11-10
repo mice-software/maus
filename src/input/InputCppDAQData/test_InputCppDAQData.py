@@ -22,6 +22,7 @@ Tests for input cpp data
 import os
 import md5
 import unittest
+import json
 
 from Configuration import Configuration
 from InputCppDAQData import InputCppDAQData
@@ -67,10 +68,9 @@ class InputCppDAQDataTestCase(unittest.TestCase): #pylint: disable = R0904
         """
         self.assertTrue(self.mapper.birth(self. _c.getConfigJSON() ))
         # Get a single event and check it's the right size
-        self.assertTrue(self.mapper.readNextEvent())
-        data = self.mapper.getCurEvent()
+        data = self.mapper.getNextEvent()
         # Data shold be 66 (an empty spill, first event is start of burst)
-        self.assertEqual(len(data), 65)
+        self.assertEqual(len(data), 67)
         self.assertTrue(self.mapper.death())
         return
 
@@ -79,21 +79,25 @@ class InputCppDAQDataTestCase(unittest.TestCase): #pylint: disable = R0904
         Test reading the whole file
         """
         self.assertTrue(self.mapper.birth( self._c.getConfigJSON() ))
+        spill_count = 0
         event_count = 0
 
         # We can try md5'ing the whole dataset
         digester = md5.new()
 
-        for i in self.mapper.emitter():
-            digester.update(i)
-            event_count = event_count + 1
+        for inp in self.mapper.emitter():
+            digester.update(inp)
+            json_in = json.loads(inp)
+            spill_count = spill_count + 1
+            event_count += len(json_in["daq_data"])
 
-        # We should now have processed 26 events
+        # We should now have processed 8 spills
+        self.assertEqual(spill_count, 8)
         self.assertEqual(event_count, 26)
 
         # Check the md5 sum matches the expected value
         self.assertEqual(digester.hexdigest(),
-                         '808b39ed52f5ec72528722a4429f5988')
+                         '55589283381d4a98f8b81e6b1821835b')
 
         self.assertTrue(self.mapper.death())
 

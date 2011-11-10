@@ -30,16 +30,42 @@ cpp_cm = os.path.join('src','common_cpp')
 legacy = os.path.join('src','legacy')
 tst = os.path.join('tests', 'cpp_unit')
 
+exceptions[os.path.join(cpp_cm, 'Simulation','MAUSRunAction.hh')] = [
+('#include "globals.hh"', 'cpplint confused with g4 header', 'rogers'),
+('#include "G4UserRunAction.hh"', 'cpplint confused with g4 header', 'rogers'),
+]
+
+exceptions[os.path.join(cpp_cm, 'Simulation','MAUSRunAction.cc')] = [
+('#include "G4Run.hh"', 'cpplint confused with g4 header', 'rogers'),
+('#include "G4VVisManager.hh"', 'cpplint confused with g4 header', 'rogers'),
+('#include "G4UImanager.hh"', 'cpplint confused with g4 header', 'rogers'),
+]
+
+exceptions[os.path.join(cpp_cm, 'Simulation','MAUSPhysicsList.hh')] = [
+('#include "G4VModularPhysicsList.hh"', 'cpplint confused with g4 header', 'rogers'),
+('#include "G4UImanager.hh"', 'cpplint confused with g4 header', 'rogers'),
+('#include "G4UserSpecialCuts.hh"', 'cpplint confused with g4 header', 'rogers'),
+('#include "G4StepLimiter.hh"', 'cpplint confused with g4 header', 'rogers'),
+]
+
+exceptions[os.path.join(cpp_cm, 'Simulation','MAUSPhysicsList.cc')] = [
+('#include "G4UImanager.hh"', 'cpplint confused with g4 header', 'rogers'),
+('#include "G4ProcessTable.hh"', 'cpplint confused with g4 header', 'rogers'),
+('#include "G4ProcessVector.hh"', 'cpplint confused with g4 header', 'rogers'),
+('#include "G4PhysListFactory.hh"', 'cpplint confused with g4 header', 'rogers'),
+('#include "globals.hh"', 'cpplint confused with g4 header', 'rogers'),
+]
+
 exceptions[os.path.join(cpp_cm, 'Simulation','VirtualPlanes.cc')] = [
-('#include "G4Track.hh"', 'cpplint confused with maus header', 'rogers'),
-('#include "G4Step.hh"', 'cpplint confused with maus header', 'rogers'),
-('#include "G4StepPoint.hh"', 'cpplint confused with maus header', 'rogers')
+('#include "G4Track.hh"', 'cpplint confused with g4 header', 'rogers'),
+('#include "G4Step.hh"', 'cpplint confused with g4 header', 'rogers'),
+('#include "G4StepPoint.hh"', 'cpplint confused with g4 header', 'rogers')
 ]
 
 exceptions[os.path.join(tst, 'Simulation', 'VirtualPlaneTest.cc')] = [
-('#include "G4ParticleTable.hh"', 'cpplint confused with maus header', 'rogers'),
-('#include "G4Step.hh"', 'cpplint confused with maus header', 'rogers'),
-('#include "G4StepPoint.hh"', 'cpplint confused with maus header', 'rogers')
+('#include "G4ParticleTable.hh"', 'cpplint confused with g4 header', 'rogers'),
+('#include "G4Step.hh"', 'cpplint confused with g4 header', 'rogers'),
+('#include "G4StepPoint.hh"', 'cpplint confused with g4 header', 'rogers')
 ]
 
 exceptions[os.path.join(cpp_cm, 'Simulation','MAUSPrimaryGeneratorAction.hh')] = [

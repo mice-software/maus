@@ -10,10 +10,10 @@ Module TrackerViewV
   PropertyString Material POLYSTYRENE
   PropertyString SensitiveDetector SciFi
   PropertyInt Plane 0
-  PropertyDouble ActiveRadius 150.0 mm
-  PropertyDouble Pitch 0.426 mm
+  PropertyDouble ActiveRadius 160. mm
+  PropertyDouble Pitch 0.427 mm
   PropertyDouble FibreDiameter 0.350 mm
-  PropertyDouble CoreDiameter 0.3325 mm
+  PropertyDouble CoreDiameter 0.308 mm
   PropertyDouble CentralFibre 106.5
   PropertyBool Invisible 1
   PropertyString G4Detector SciFiPlane
