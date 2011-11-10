@@ -248,8 +248,9 @@ MAUS::complex& operator-=(MAUS::complex& lhs, const double& rhs)
 
 MAUS::complex& operator*=(MAUS::complex& lhs, const MAUS::complex& rhs)
 {
+  MAUS::complex tmp = lhs;
   lhs.dat[0] = lhs.dat[0] * rhs.dat[0] - lhs.dat[1] * rhs.dat[1];
-  lhs.dat[1] = lhs.dat[0] * rhs.dat[1] + lhs.dat[1] * rhs.dat[0];
+  lhs.dat[1] = tmp.dat[0] * rhs.dat[1] + tmp.dat[1] * rhs.dat[0];
   return lhs;
 }
 
@@ -263,9 +264,10 @@ MAUS::complex& operator*=(MAUS::complex& lhs, const double& rhs)
 MAUS::complex& operator/=(MAUS::complex& lhs, const MAUS::complex& rhs)
 {
   double denominator = rhs.dat[0] * rhs.dat[0] + rhs.dat[1] * rhs.dat[1];
+  MAUS::complex tmp = lhs;
   lhs.dat[0] = (lhs.dat[0] * rhs.dat[0] + lhs.dat[1] * rhs.dat[1])
              / denominator;
-  lhs.dat[1] = (lhs.dat[1] * rhs.dat[0] - lhs.dat[0] * rhs.dat[1])
+  lhs.dat[1] = (tmp.dat[1] * rhs.dat[0] - tmp.dat[0] * rhs.dat[1])
              / denominator;
   return lhs;
 }
@@ -288,7 +290,7 @@ const MAUS::complex operator+(const MAUS::complex&   lhs,
   return result += rhs;
 }
 
-const MAUS::complex operator+(const MAUS::complex    lhs,
+const MAUS::complex operator+(const MAUS::complex&   lhs,
                               const double&          rhs)
 {
   MAUS::complex result = MAUS::Complex::complex(lhs);

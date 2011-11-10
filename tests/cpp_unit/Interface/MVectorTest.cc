@@ -28,7 +28,7 @@
 bool test_MVector();
 
 //defined in ComplexTest.cc
-bool diff(const MAUS::complex& c1, const MAUS::complex& c2);
+bool diff(const MAUS::complex c1, const MAUS::complex c2);
 bool diff(double c1, double c2);
 
 

@@ -186,7 +186,7 @@ TEST_F(MMatrixDoubleTest, MMatrixInverseTest) {
 
 ////////////////////// IMPORT OF OLD UNIT TESTS - NEEDS CLEANUP (CTR) //////////////
 
-bool diff(m_complex c1, m_complex c2);// { return fabs(re(c1) - re(c2)) < 1e-9 && fabs(im(c1) - im(c2) ) < 1e-9; }
+bool diff(MAUS::complex c1, MAUS::complex c2);// { return fabs(re(c1) - re(c2)) < 1e-9 && fabs(im(c1) - im(c2) ) < 1e-9; }
 bool diff(double    c1, double    c2);// { return fabs(c1-c2) < 1e-9; }
 
 template <class Tmplt> bool diff(MMatrix<Tmplt> m1, MMatrix<Tmplt> m2)
