@@ -21,8 +21,6 @@ import os
 import json
 import sys
 
-from celery.task.control import inspect
-
 # MAUS
 from Configuration import Configuration
 
@@ -215,10 +213,24 @@ class Go:  #  pylint: disable=R0921
         output.
         """
 
+        from celery.task.control import inspect
+        from celery.task.control import broadcast 
+
+        # Check for active workers.
+        print("Checking for active workers")
         inspection = inspect()
         active_workers = inspection.active()
         if (active_workers == None):
             raise Exception("No active Celery workers!")
+
+        # Configure the workers.
+        print("Configuring workers")
+        # broadcast("maus_reconfigure_worker", {"config_doc":"b"}, reply=True)
+        broadcast("maus_set_worker_transforms", {"transforms":"[MAUS.MapPyDoNothing]", "tmpvalue":"ONE"}, reply=True)
+#        self._transform.append(MAUS.MapPyBeamMaker())
+#        self._transform.append(MAUS.MapCppSimulation())
+#        self._transform.append(MAUS.MapCppTOFDigitization())
+#        self._transform.append(MAUS.MapCppTrackerDigitization())
 
         print("INPUT: Reading some input")
         assert(self.input.birth(self.json_config_document) == True)
@@ -231,22 +243,12 @@ class Go:  #  pylint: disable=R0921
         transform_results = {}
         while len(map_buffer) != 0:
             for spill in map_buffer:
-#                from maustasks import maus_transform_naive
-#                result = maus_transform_naive.delay(
-#                    self.json_config_document,
-#                    self.transformer,
-#                    spill)
-#                from maustasks import MausTransformNaive
-#                result = MausTransformNaive.delay(
-#                    self.json_config_document,
-#                    self.transformer,
-#                    spill)
-                from maustasks import MausTransformDoNothing
+                from maustasks import MausGenericTransform
+                from maustasks import MapPyGroupTask
                 result = \
-                    MausTransformDoNothing.delay(spill) # pylint:disable=E1101
-#                from maustasks import MausTransformSimulate
+                    MausGenericTransform.delay(spill) # pylint:disable=E1101
 #                result = \
-#                    MausTransformSimulate.delay(spill) # pylint:disable=E1101
+#                    MapPyGroupTask.delay(spill) # pylint:disable=E1101
                 # Index results by spill_id so can present
                 # results to merge-output in same order.
                 transform_results[i] = result

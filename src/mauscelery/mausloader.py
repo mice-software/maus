@@ -37,8 +37,9 @@ class CeleryLoader(Loader):
         Prints a message then invokes superclass constructor.
         @param self Object reference.
         """
-        print "MAUS CeleryLoader"
+        print "---->MAUSCeleryLoader.__init"
         Loader.__init__(self, app, **kwargs)
+        print "<----MAUSCeleryLoader.__init"
 
     def on_worker_init(self):
         """
@@ -49,6 +50,8 @@ class CeleryLoader(Loader):
         configuration passed to them.
         @param self Object reference.
         """
+        print "---->MAUSCeleryLoader.__on_worker_init"
+
         # Load modules specified in CELERY_IMPORTS list.
         Loader.on_worker_init(self)
 
@@ -68,11 +71,39 @@ class CeleryLoader(Loader):
             config_file = None
         # Load the MAUS configuration.
         config_doc = config.getConfigJSON(config_file)
+
+        import json
+        config_dict = json.loads(config_doc)
+        print "MAUSCeleryLoader Configuration: verbose_level: %s physics_mode: %s maus_celery_config %s" % (config_dict["verbose_level"], config_dict["physics_model"], config_dict["maus_celery_config"])
+
         # Initialise the MAUS tasks.
-        print "Initialising MAUS tasks"
+        print "MAUSCeleryLoader Initialising MAUS tasks"
         for celery_task_name in registry.tasks:
             celery_task = registry.tasks[celery_task_name]
             if hasattr(celery_task, "birth"):
-                print "  MAUS task: %s. Invoking birth()" % celery_task_name
+                print "MAUSCeleryLoader MAUS task: %s. Invoking birth()" % celery_task_name
                 celery_task.birth(config_doc)
-        print "MAUS tasks initialised"
+        print "MAUSCeleryLoader MAUS tasks initialised"
+        print "<----MAUSCeleryLoader.__on_worker_init"
+
+
+    # Called every spill
+    def on_task_init(self,task_id, task):
+        print "MAUSCeleryLoader--------on_task_init"
+        Loader.on_task_init(self, task_id, task)
+
+    def on_worker_process_init(self):
+        print "MAUSCeleryLoader--------on_worker_process__init"
+        Loader.on_worker_process_init(self)
+
+    def task_prerun(self, task_id, task, args, kwargs):
+        print "MAUSCeleryLoader--------task_prerun"
+        Loader.task_prerun(self, task_id, task, args, kwargs)
+
+    def task_postrun(self, task_id, task, args, kwargs, retval):
+        print "MAUSCeleryLoader--------task_postrun"
+        Loader.task_postrun(self, task_id, task, args, kwargs, retval)
+
+    def task_sent(self, task_id, task, args, kwargs, eta, taskset):
+        print "MAUSCeleryLoader--------task_sent"
+        Loader.task_sent(self, task_id, task, args, kwargs, eta, taskset)
