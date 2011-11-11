@@ -69,8 +69,6 @@ public:
   GslVector(size_t i);
   GslVector(const GslVector<GslType>& original_instance);
   //copy data from an array
-  template<class GslType2>
-  GslVector(const GslVector<GslType2>& differently_typed_vector);
   ~GslVector();
 
   //return number of elements
@@ -106,32 +104,61 @@ public:
   //*************************
   const bool operator==(const GslVector<GslType>& rhs) const;
   const bool operator!=(const GslVector<GslType>& rhs) const;
+  
+  //*************************
+  // Befriending
+  //*************************
+  friend GslVector<gsl_vector> real(
+           const GslVector<gsl_vector_complex>& complex_vector);
+  friend GslVector<gsl_vector> imag(
+           const GslVector<gsl_vector_complex>& complex_vector);
 
 protected:
-  /** @brief create the GSL vector member of the given size
-   */
-  void build_vector(size_t size);
-  
-  /** @brief copy data from an array and put it into the GSL vector member
-   */
-  void build_vector(const GslType* data_start, const GslType* data_end);
-  
   /** @brief delete the GSL vector member
    */
   void delete_vector();
 
+  /** @brief create the GSL vector member of the given size
+   */
+  void build_vector(size_t size);
+
   GslType * vector_;
 };
 
-template<typename StdType>
-class VectorBase
+//*****************************
+// Specialization Declarations
+//*****************************
+
+//These are put here instead of Vector.cc to maintain the order of
+//function definitions.
+template <>
+GslVector<gsl_vector>& GslVector<gsl_vector>::operator=(
+  const GslVector<gsl_vector>& rhs);
+template <>
+GslVector<gsl_vector_complex>& GslVector<gsl_vector_complex>::operator=(
+  const GslVector<gsl_vector_complex>& rhs);
+template <> void GslVector<gsl_vector>::delete_vector();
+template <> void GslVector<gsl_vector_complex>::delete_vector();
+
+/** @class VectorBase Implements C++ standard type function extensions of
+ *                    GslVector.
+ */
+template<typename StdType, typename GslType>
+class VectorBase : public GslVector<GslType>
 {
+public:
   //*************************
   // Constructors
   //*************************
-  GslVector(size_t i, StdType  value);
-  GslVector(const StdType* array_beginning, const StdType* array_end);
-  GslVector(const std::vector<StdType, std::allocator<StdType> >& std_vector);
+  VectorBase();
+  VectorBase(size_t i, StdType  value);
+  VectorBase(const StdType* array_beginning, const StdType* array_end);
+  VectorBase(const std::vector<StdType, std::allocator<StdType> >& std_vector);
+
+  //*** GslVector constructors ***
+
+  VectorBase(size_t i);
+  VectorBase(const GslVector<GslType>& original_instance);
   
   //*************************
   // Indexing Operators
@@ -148,31 +175,121 @@ class VectorBase
   //*************************
   // Assignment Operators
   //*************************
-  GslVector<StdType>& operator*=(const StdType&          rhs);
-  GslVector<StdType>& operator/=(const StdType&          rhs);
+  VectorBase<StdType, GslType>& operator*=(const StdType& rhs);
+  VectorBase<StdType, GslType>& operator/=(const StdType& rhs);
   
   //*************************
   // Algebraic Operators
   //*************************
-  const GslVector<StdType> operator*(const StdType&          rhs) const;
-  const GslVector<StdType> operator/(const StdType&          rhs) const;
+  const VectorBase<StdType, GslType> operator*(const StdType& rhs) const;
+  const VectorBase<StdType, GslType> operator/(const StdType& rhs) const;
+protected:
+  /** @brief copy data from an array and put it into the GSL vector member
+   */
+  void build_vector(const StdType* data_start, const StdType* data_end);
 };
 
-template<>
+/** @class Vector Defines the association between GSL and standard C++ types.
+ */
+template<typename StdType>
 class Vector
 {
 };
 
 template<>
-class Vector<double> :  public VectorBase<double>,
-                        public GslVector<gsl_vector>
+class Vector<double> :  public VectorBase<double, gsl_vector>
 {
+public:
+  //*** VectorBase constructors ***
+
+  Vector() : VectorBase<double, gsl_vector>() { }
+  Vector(size_t i, double  value)
+    : VectorBase<double, gsl_vector>(i, value) { }
+  Vector(const double* array_beginning, const double* array_end)
+    : VectorBase<double, gsl_vector>(array_beginning, array_end) { }
+  Vector(const std::vector<double, std::allocator<double> >& std_vector)
+    : VectorBase<double, gsl_vector>(std_vector) { }
+
+  //*** GslVector constructors ***
+
+  Vector(size_t i) : VectorBase<double, gsl_vector>(i) { }
+  Vector(const GslVector<gsl_vector>& original_instance)
+    : VectorBase<double, gsl_vector>(original_instance) { }
+
+  //Because of slicing, we need deep copies of the base classes
+  /*
+  Vector(const GslVector<gsl_vector>& base_vector)
+  {
+    *this = base_vector;
+  }
+  */
+
+  Vector<double>& operator =(const GslVector<gsl_vector>& rhs)
+  {
+    ((GslVector<gsl_vector>) *this) = rhs;
+    return *this;
+  }
+/*
+  Vector(const VectorBase<double, gsl_vector>& base_vector)
+  {
+    *this = base_vector;
+  }
+  */
+  
+  Vector<double>& operator =(const VectorBase<double, gsl_vector>& rhs)
+  {
+    ((GslVector<gsl_vector>) *this) = rhs;
+    return *this;
+  }
+  
 };
 
 template<>
-class Vector<MAUS::complex> : public VectorBase<MAUS::complex>,
-                              public GslVector<gsl_vector_complex>
+class Vector<complex> : public VectorBase<complex, gsl_vector_complex>
 {
+public:
+  //*** VectorBase constructors ***
+
+  Vector() : VectorBase<complex, gsl_vector_complex>() { }
+  Vector(size_t i, complex  value)
+    : VectorBase<complex, gsl_vector_complex>(i, value) { }
+  Vector(const complex* array_beginning, const complex* array_end)
+    : VectorBase<complex, gsl_vector_complex>(array_beginning, array_end) { }
+  Vector(const std::vector<complex, std::allocator<complex> >& std_vector)
+    : VectorBase<complex, gsl_vector_complex>(std_vector) { }
+
+  //*** GslVector constructors ***
+
+  Vector(size_t i) : VectorBase<complex, gsl_vector_complex>(i) { }
+  Vector(const GslVector<gsl_vector_complex>& original_instance)
+    : VectorBase<complex, gsl_vector_complex>(original_instance) { }
+
+  //Because of slicing, we need deep copies of the base classes
+  /*
+  Vector(const GslVector<gsl_vector_complex>& base_vector)
+  {
+    *this = base_vector;
+  }
+  */
+  
+  Vector<complex>& operator=(const GslVector<gsl_vector_complex>& rhs)
+  {
+    ((GslVector<gsl_vector_complex>) *this) = rhs;
+    return *this;
+  }
+  /*
+  Vector(const VectorBase<complex, gsl_vector_complex>& base_vector)
+  {
+    *this = base_vector;
+  }
+  */
+  
+  Vector<complex>& operator=(const VectorBase<complex,gsl_vector_complex>& rhs)
+  {
+    ((GslVector<gsl_vector_complex>) *this) = rhs;
+    return *this;
+  }
+  
 };
 
 //*************************
@@ -180,30 +297,32 @@ class Vector<MAUS::complex> : public VectorBase<MAUS::complex>,
 //*************************
   
 //return vector of doubles filled with either real or imaginary part of vector
-GslVector<double>  real(GslVector<complex> vector);
-GslVector<double>  imag(GslVector<complex> vector);
-
+GslVector<gsl_vector> real(
+  const GslVector<gsl_vector_complex>& complex_vector);
+GslVector<gsl_vector> imag(
+  const GslVector<gsl_vector_complex>& complex_vector);
+  
 
 } //namespace MAUS
   
 //*************************
 // Unitary Operators
 //*************************
-template <class GslType> MAUS::GslVector<GslType>  operator-(
-  const MAUS::GslVector<GslType>&  vector);
+template <class StdType> MAUS::Vector<StdType>  operator-(
+  const MAUS::Vector<StdType>& vector);
 
 //*************************
 // Scalar Operators
 //*************************
-template <class GslType> MAUS::GslVector<GslType>  operator*(
-  const GslType&                value,
-  const MAUS::GslVector<GslType>&  vector);
+template <class StdType> MAUS::Vector<StdType>  operator*(
+  const StdType&                value,
+  const MAUS::Vector<StdType>&  vector);
 
 //*************************
 // Stream Operators
 //*************************
 template <class GslType>
-std::ostream&  operator<<(std::ostream&               out,
-                          const MAUS::GslVector<GslType>&  vector);
+std::ostream&  operator<<(std::ostream&                   out,
+                          const MAUS::GslVector<GslType>& vector);
 
 #endif

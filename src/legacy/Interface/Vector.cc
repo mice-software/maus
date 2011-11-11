@@ -17,6 +17,7 @@
 
 #include <complex>
 #include <vector>
+#include <stdio.h>
 
 #include "gsl/gsl_complex_math.h"
 #include "gsl/gsl_vector.h"
@@ -30,54 +31,45 @@ using namespace MAUS;
 namespace MAUS
 {
 
-template class GslVector<gsl_vector>;
-template class GslVector<gsl_vector_complex>;
-template class Vector<gsl_vector>;
-template class Vector<MAUS::complex>;
-
 //############################
 // GslVector (public)
 //############################
 
-//protected specialization dependancies
-template <> void GslVector<gsl_vector>::delete_vector();
-template <> void GslVector<gsl_vector_complex>::delete_vector();
+//*************************
+// Constructors
+//*************************
 
 template <typename GslType> GslVector<GslType>::GslVector() : vector_(NULL)
 { }
-/*
-template<> GslVector<gsl_vector>::GslVector()
-{
-  vector_ = NULL;
-}
-template<> GslVector<MAUS::complex>::GslVector()
-{
-  vector_ = NULL;
-}
-*/
+template GslVector<gsl_vector>::GslVector();
+template GslVector<gsl_vector_complex>::GslVector();
+
 template <typename GslType>
 GslVector<GslType>::GslVector(size_t i) : vector_(NULL)
 { 
   build_vector(i); 
 }
+template GslVector<gsl_vector>::GslVector(size_t i);
+template GslVector<gsl_vector_complex>::GslVector(size_t i);
 
 template<typename GslType>
 GslVector<GslType>::GslVector(const GslVector<GslType>& original_instance)
+  : vector_(NULL)
 {
   (*this) = original_instance;
 }
-
-template <typename GslType> template <typename GslType2>
-GslVector<GslType>::GslVector(const GslVector<GslType2>& mv) : vector_(NULL)
-{
-  *this = mv;
-}
+template GslVector<gsl_vector>::GslVector(
+  const GslVector<gsl_vector>& original_instance);
+template GslVector<gsl_vector_complex>::GslVector(
+  const GslVector<gsl_vector_complex>& original_instance);
 
 template <class GslType>
 GslVector<GslType>::~GslVector()
 {
   delete_vector();
 }
+template GslVector<gsl_vector>::~GslVector();
+template GslVector<gsl_vector_complex>::~GslVector();
 
 template <class GslType>
 size_t GslVector<GslType>::size() const
@@ -89,17 +81,66 @@ size_t GslVector<GslType>::size() const
 
   return 0;
 }
+template size_t GslVector<gsl_vector>::size() const;
+template size_t GslVector<gsl_vector_complex>::size() const;
 
-//TODO: use gsl_vector_ptr and gsl_vector_complex_ptr instead of operator[]
-template <class GslType>
-GslVector<GslType> GslVector<GslType>::subvector(size_t begin_index, size_t end_index)
-                                      const
+template <>
+GslVector<gsl_vector> GslVector<gsl_vector>::subvector(size_t begin_index,
+                                                       size_t end_index)
+                                                      const
 {
-  GslVector<GslType> subvector(end_index-begin_index);
-  for(size_t index=begin_index; index<end_index; ++index)
+  if(vector_ == NULL)
   {
-    subvector[index] = this[begin_index+index];
+    throw(Squeal(
+      Squeal::recoverable,
+      "Attempted to create a subvector from an empty vector.",
+      "MAUS::GslVector<gsl_vector>::subvector()"));
   }
+
+  GslVector<gsl_vector> subvector;
+
+  size_t sub_size = end_index-begin_index;
+  if (sub_size > 0)
+  {
+    subvector = GslVector<gsl_vector>(sub_size);
+    for(size_t index=begin_index; index<end_index; ++index)
+    {
+      *gsl_vector_ptr(subvector.vector_, index)
+        = *gsl_vector_ptr(vector_, begin_index+index);
+
+    }
+  }
+
+  return subvector;
+}
+
+template <>
+GslVector<gsl_vector_complex> GslVector<gsl_vector_complex>::subvector(
+  size_t begin_index,
+  size_t end_index) const
+{
+  if(vector_ == NULL)
+  {
+    throw(Squeal(
+      Squeal::recoverable,
+      "Attempted to create a subvector from an empty vector.",
+      "MAUS::GslVector<gsl_vector_complex>::subvector()"));
+  }
+  
+  GslVector<gsl_vector_complex> subvector;
+  
+  size_t sub_size = end_index-begin_index;
+  if (sub_size > 0)
+  {
+    subvector = GslVector<gsl_vector_complex>(sub_size);
+    for(size_t index=begin_index; index<end_index; ++index)
+    {
+      *gsl_vector_complex_ptr(subvector.vector_, index)
+      = *gsl_vector_complex_ptr(vector_, begin_index+index);
+      
+    }
+  }
+  
   return subvector;
 }
 
@@ -108,7 +149,8 @@ GslVector<GslType> GslVector<GslType>::subvector(size_t begin_index, size_t end_
 //*************************
 
 template <>
-GslVector<gsl_vector>& GslVector<gsl_vector>::operator=(const GslVector<gsl_vector>& rhs)
+GslVector<gsl_vector>& GslVector<gsl_vector>::operator=(
+  const GslVector<gsl_vector>& rhs)
 { 
   if (&rhs != this)
   {
@@ -141,10 +183,8 @@ GslVector<gsl_vector_complex>& GslVector<gsl_vector_complex>::operator=(const Gs
     }
     else
     {
-      vector_
-        = gsl_vector_complex_alloc(rhs.size()); 
-      gsl_vector_complex_memcpy(vector_,
-                                rhs.vector_);  
+      vector_ = gsl_vector_complex_alloc(rhs.size()); 
+      gsl_vector_complex_memcpy(vector_, rhs.vector_);  
     }
   }
   
@@ -152,14 +192,19 @@ GslVector<gsl_vector_complex>& GslVector<gsl_vector_complex>::operator=(const Gs
 }
 
 template<>
-GslVector<gsl_vector>& GslVector<gsl_vector>::operator+=(const GslVector<gsl_vector>& rhs)
+GslVector<gsl_vector>& GslVector<gsl_vector>::operator+=(
+  const GslVector<gsl_vector>& rhs)
 {
-  gsl_vector_add(vector_, rhs.vector_);
+  if (rhs.vector_ != NULL)
+  {
+    gsl_vector_add(vector_, rhs.vector_);
+  }
   return *this;
 }
 
 template<>
-GslVector<gsl_vector_complex>& GslVector<gsl_vector_complex>::operator+=(const GslVector<gsl_vector_complex>& rhs)
+GslVector<gsl_vector_complex>& GslVector<gsl_vector_complex>::operator+=(
+  const GslVector<gsl_vector_complex>& rhs)
 {
   if (rhs.vector_ != NULL)
   {
@@ -168,14 +213,31 @@ GslVector<gsl_vector_complex>& GslVector<gsl_vector_complex>::operator+=(const G
   return *this;
 }
 
-template<class GslType>
-GslVector<GslType>& GslVector<GslType>::operator-=(const GslVector<GslType>& rhs)
+template<>
+GslVector<gsl_vector>& GslVector<gsl_vector>::operator-=(
+  const GslVector<gsl_vector>& rhs)
 {
-  return (*this) += (-rhs);
+  if (rhs.vector_ != NULL)
+  {
+    gsl_vector_sub(vector_, rhs.vector_);
+  }
+  return *this;
 }
 
-template<class GslType>
-GslVector<GslType>& GslVector<GslType>::operator*=(const GslVector<GslType>& rhs)
+template<>
+GslVector<gsl_vector_complex>& GslVector<gsl_vector_complex>::operator-=(
+  const GslVector<gsl_vector_complex>& rhs)
+{
+  if (rhs.vector_ != NULL)
+  {
+    gsl_vector_complex_sub(vector_, rhs.vector_);
+  }
+  return *this;
+}
+
+template<>
+GslVector<gsl_vector>& GslVector<gsl_vector>::operator*=(
+  const GslVector<gsl_vector>& rhs)
 {
   if (rhs.vector_ != NULL)
   {
@@ -185,15 +247,34 @@ GslVector<GslType>& GslVector<GslType>::operator*=(const GslVector<GslType>& rhs
       throw(Squeal(
         Squeal::recoverable,
         "Attempted to perform the product of two vectors of different sizes.",
-        "MAUS::GslVector<GslType>::operator*="));
+        "MAUS::GslVector<gsl_vector>::operator*="));
     }
     
-    //TODO: use gsl_vector_ptr and gsl_vector_complex_ptr instead of operator[]
-    for(size_t index=0; index<size; ++index)
-    {
-      (*this)[index] *= rhs[index];
-    }
+    gsl_vector_mul(vector_, rhs.vector_);
   }
+  
+  return *this;
+}
+
+template<>
+GslVector<gsl_vector_complex>& GslVector<gsl_vector_complex>::operator*=(
+  const GslVector<gsl_vector_complex>& rhs)
+{
+  if (rhs.vector_ != NULL)
+  {
+    size_t size = this->size();
+    if (rhs.size() != size)
+    {
+      throw(Squeal(
+                   Squeal::recoverable,
+                   "Attempted to perform the product of two vectors of different sizes.",
+                   "MAUS::GslVector<gsl_vector_complex>::operator*="));
+    }
+    
+    gsl_vector_complex_mul(vector_, rhs.vector_);
+  }
+  
+  return *this;
 }
 
 //*************************
@@ -201,45 +282,99 @@ GslVector<GslType>& GslVector<GslType>::operator*=(const GslVector<GslType>& rhs
 //*************************
 
 template <class GslType>
-const GslVector<GslType> GslVector<GslType>::operator+(const GslVector<GslType>&  rhs) const
+const GslVector<GslType> GslVector<GslType>::operator+(
+  const GslVector<GslType>&  rhs) const
 {
   return GslVector<GslType>(*this) += rhs;
 }
+template const GslVector<gsl_vector> GslVector<gsl_vector>::operator+(
+  const GslVector<gsl_vector>&  rhs) const;
+template
+const GslVector<gsl_vector_complex> GslVector<gsl_vector_complex>::operator+(
+  const GslVector<gsl_vector_complex>&  rhs) const;
 
 template <class GslType>
-const GslVector<GslType> GslVector<GslType>::operator-(const GslVector<GslType>&  rhs) const
+const GslVector<GslType> GslVector<GslType>::operator-(
+  const GslVector<GslType>&  rhs) const
 {
   return GslVector<GslType>(*this) -= rhs;
 }
+template const GslVector<gsl_vector> GslVector<gsl_vector>::operator-(
+  const GslVector<gsl_vector>&  rhs) const;
+template
+const GslVector<gsl_vector_complex> GslVector<gsl_vector_complex>::operator-(
+  const GslVector<gsl_vector_complex>&  rhs) const;
 
 template <class GslType>
-const GslVector<GslType> GslVector<GslType>::operator*(const GslVector<GslType>&  rhs) const
+const GslVector<GslType> GslVector<GslType>::operator*(
+  const GslVector<GslType>&  rhs) const
 {
   return GslVector<GslType>(*this) *= rhs;
 }
+template const GslVector<gsl_vector> GslVector<gsl_vector>::operator*(
+  const GslVector<gsl_vector>&  rhs) const;
+template const GslVector<gsl_vector_complex>
+GslVector<gsl_vector_complex>::operator*(
+  const GslVector<gsl_vector_complex>&  rhs) const;
 
 //*************************
 // Comparison Operators
 //*************************
 
-//TODO: use gsl_vector_ptr and gsl_vector_complex_ptr instead of operator[]
-template <class GslType>
-const bool GslVector<GslType>::operator==(const GslVector<GslType>& rhs) const
+template <>
+const bool GslVector<gsl_vector>::operator==(const GslVector<gsl_vector>& rhs)
+  const
 {
   size_t this_size = size();
   if(this_size != rhs.size())
   {
     return false;
   }
-    
-  for(size_t index=0; index<size; ++index)
+
+  if (vector_ != NULL)
   {
-    if((*this)[index] != rhs[index])
+    for(size_t index=0; index<this_size; ++index)
     {
-      return false;
+      if(*gsl_vector_ptr(vector_, index) != *gsl_vector_ptr(rhs.vector_, index))
+      {
+        return false;
+      }
     }
   }
+  else if (rhs.vector_ != NULL)
+  {
+    return false;
+  }
 
+  return true;
+}
+
+template <>
+const bool GslVector<gsl_vector_complex>::operator==(
+  const GslVector<gsl_vector_complex>& rhs) const
+{
+  size_t this_size = size();
+  if(this_size != rhs.size())
+  {
+    return false;
+  }
+  
+  if (vector_ != NULL)
+  {
+    for(size_t index=0; index<this_size; ++index)
+    {
+      if(   *gsl_vector_complex_ptr(vector_, index)
+         != *gsl_vector_complex_ptr(rhs.vector_, index))
+      {
+        return false;
+      }
+    }
+  }
+  else if (rhs.vector_ != NULL)
+  {
+    return false;
+  }
+  
   return true;
 }
 
@@ -249,19 +384,12 @@ const bool GslVector<GslType>::operator!=(const GslVector<GslType>& rhs) const
   return !((*this) == rhs);
 }
 
+template class GslVector<gsl_vector>;
+template class GslVector<gsl_vector_complex>;
+
 //############################
 // GslVector (protected)
 //############################
-
-template <typename GslType>
-void GslVector<GslType>::build_vector(size_t size)
-{
-  if(vector_ != NULL)
-  {
-    gsl_vector_free(vector_);
-  }
-  vector_ = gsl_vector_alloc(size);
-}
 
 template <>
 void GslVector<gsl_vector>::delete_vector()
@@ -281,61 +409,64 @@ void GslVector<gsl_vector_complex>::delete_vector()
   }
 }
 
-//****************************
-// Conversion Functions
-//****************************
-
-GslVector<gsl_vector> real(const GslVector<gsl_vector_complex>& complex_vector)
+template <>
+void GslVector<gsl_vector>::build_vector(size_t size)
 {
-  GslVector<gsl_vector> double_vector(complex_vector.size());
-  for(size_t i=1; i<=complex_vector.size(); ++i)
-  {
-    double_vector(i) = MAUS::Complex::real(complex_vector(i));
-  }
-  return double_vector;
+  delete_vector();
+  vector_ = gsl_vector_alloc(size);
 }
 
-GslVector<gsl_vector> imag(const GslVector<gsl_vector_complex>& complex_vector)
+template <>
+void GslVector<gsl_vector_complex>::build_vector(size_t size)
 {
-  GslVector<gsl_vector> double_vector(complex_vector.size());
-  for(size_t i=1; i<=complex_vector.size(); ++i)
-  {
-    double_vector(i) = MAUS::Complex::imag(complex_vector(i));
-  }
-  return double_vector;
+  delete_vector();
+  vector_ = gsl_vector_complex_alloc(size);
 }
-
-} //namespace MAUS
 
 //############################
-// Vector (public)
+// VectorBase (public)
 //############################
 
 //*************************
 // Constructors
 //*************************
 
-template <typename StdType>
-Vector<StdType>::Vector(size_t size, StdType  value) : vector_(NULL)
+template <typename StdType, typename GslType>
+VectorBase<StdType, GslType>::VectorBase() { }
+template VectorBase<double, gsl_vector>::VectorBase();
+template VectorBase<complex, gsl_vector_complex>::VectorBase();
+  
+template <typename StdType, typename GslType>
+VectorBase<StdType, GslType>::VectorBase(size_t size, StdType  value)
 {
-  build_vector(size);
+  this->vector_ = NULL;
+  GslVector<GslType>::build_vector(size);
   for(size_t i=0; i<size; ++i)
   {
-    operator[](i) = value;
+    (*this)[i] = value;
   }
 }
-
-template <typename StdType>
-Vector<StdType>::Vector(const StdType* array_beginning,
-                        const StdType* array_end) : vector_(NULL)
+template VectorBase<double, gsl_vector>::VectorBase(size_t size, double  value);
+template VectorBase<complex, gsl_vector_complex>::VectorBase(
+  size_t size, complex  value);
+  
+template <typename StdType, typename GslType>
+VectorBase<StdType, GslType>::VectorBase(const StdType* array_beginning,
+                                         const StdType* array_end)
 {
+  this->vector_ = NULL;
   build_vector(array_beginning, array_end);
 }
+template VectorBase<double, gsl_vector>::VectorBase(
+  const double* array_beginning, const double* array_end);
+template VectorBase<complex, gsl_vector_complex>::VectorBase(
+  const complex* array_beginning, const complex* array_end);
 
-template <typename StdType>
-Vector<StdType>::Vector(
-                              const std::vector<StdType, std::allocator<StdType> >& std_vector) : vector_(NULL)
+template <typename StdType, typename GslType>
+VectorBase<StdType, GslType>::VectorBase(
+  const std::vector<StdType, std::allocator<StdType> >& std_vector)
 {
+  this->vector_ = NULL;
   //FIXME: I don't like the assumption that the address of
   //       std::vector::operator[] is a pointer to a contiguous block of
   //       memory. The implementation could be a linked list or something
@@ -343,116 +474,256 @@ Vector<StdType>::Vector(
   //       and use an iterator.
   build_vector(&std_vector[0], &std_vector.back()+1);
 }
+template VectorBase<double, gsl_vector>::VectorBase(
+  const std::vector<double, std::allocator<double> >& std_vector);
+template VectorBase<complex, gsl_vector_complex>::VectorBase(
+  const std::vector<complex, std::allocator<complex> >& std_vector);
+
+//*** GslVector constructors ***
+
+template <typename StdType, typename GslType>
+VectorBase<StdType, GslType>::VectorBase(size_t i)
+ : GslVector<GslType>(i) { }
+template VectorBase<double, gsl_vector>::VectorBase(size_t i);
+template VectorBase<complex, gsl_vector_complex>::VectorBase(size_t i);
+
+template <typename StdType, typename GslType>
+VectorBase<StdType, GslType>::VectorBase(
+  const GslVector<GslType>& original_instance)
+  : GslVector<GslType>(original_instance) { }
+template VectorBase<double, gsl_vector>::VectorBase(
+  const GslVector<gsl_vector>& original_instance);
+template VectorBase<complex, gsl_vector_complex>::VectorBase(
+  const GslVector<gsl_vector_complex>& original_instance);
 
 //*************************
 // Indexing Operators
 //*************************
 
 template <>
-const double& Vector<double>::operator[](const size_t i) const
+const double& VectorBase<double, gsl_vector>::operator[](const size_t i) const
 {
+  if (vector_ == NULL)
+  {
+    throw(Squeal(
+      Squeal::recoverable,
+      "Attempted to index an empty vector.",
+      "MAUS::VectorBase<double, gsl_vector>::operator[]()"));
+  }
+
   return *gsl_vector_ptr(vector_, i);
 }
 
 template <>
-const complex& Vector<complex>::operator[](const size_t i) const
+const complex& VectorBase<complex, gsl_vector_complex>::operator[](
+  const size_t i) const
 {
+  if (vector_ == NULL)
+  {
+    throw(Squeal(
+      Squeal::recoverable,
+      "Attempted to index an empty vector.",
+      "MAUS::VectorBase<complex, gsl_vector_complex>::operator[]()"));
+  }
+
   return *gsl_vector_complex_ptr(vector_, i);
 }
 
 template <>
-double& Vector<double>::operator[](const size_t i)
+double& VectorBase<double, gsl_vector>::operator[](const size_t i)
 {
+  if (vector_ == NULL)
+  {
+    throw(Squeal(
+      Squeal::recoverable,
+      "Attempted to index an empty vector.",
+      "MAUS::VectorBase<double, gsl_vector>::operator[]()"));
+  }
+
   return *gsl_vector_ptr(vector_, i);
 }
 
 template <>
-complex& Vector<complex>::operator[](const size_t i)
+complex& VectorBase<complex, gsl_vector_complex>::operator[](const size_t i)
 {
+  if (vector_ == NULL)
+  {
+    throw(Squeal(
+      Squeal::recoverable,
+      "Attempted to index an empty vector.",
+      "MAUS::VectorBase<complex, gsl_vector_complex>::operator[]()"));
+  }
+
   return *gsl_vector_complex_ptr(vector_, i);
 }
 
-template<typename StdType>
-StdType& Vector<StdType>::operator()(const size_t i)
+template<typename StdType, typename GslType>
+StdType& VectorBase<StdType, GslType>::operator()(const size_t i)
 {
   return (*this)[i-1];
 }
+template double& VectorBase<double, gsl_vector>::operator()(const size_t i);
+template complex& VectorBase<complex, gsl_vector_complex>::operator()(
+  const size_t i);
 
-template<typename StdType>
-const StdType& Vector<StdType>::operator()(const size_t i) const
+template<typename StdType, typename GslType>
+const StdType& VectorBase<StdType, GslType>::operator()(const size_t i) const
 {
   return (*this)[i-1];
 }
+template const double& VectorBase<double, gsl_vector>::operator()(
+  const size_t i) const;
+template const complex& VectorBase<complex, gsl_vector_complex>::operator()(
+  const size_t i) const;
 
 //*************************
 // Assignment Operators
 //*************************
 
 template<>
-Vector<gsl_vector>& Vector<double>::operator*=(const double& rhs)
+VectorBase<double, gsl_vector>& VectorBase<double, gsl_vector>::operator*=(
+  const double& rhs)
 {
   gsl_vector_scale(vector_, rhs);
   return *this;
 }
 
 template<>
-Vector<gsl_vector_complex>& Vector<complex>::operator*=(const complex& rhs)
+VectorBase<complex, gsl_vector_complex>&
+VectorBase<complex, gsl_vector_complex>::operator*=(
+  const complex& rhs)
 {
-  gsl_vector_complex_scale(vector_, rhs);
+  if (vector_ != NULL)
+  {
+    gsl_vector_complex_scale(vector_, rhs);
+  }
   return *this;
 }
 
-template<class StdType>
-Vector<StdType>& Vector<StdType>::operator/=(const StdType& rhs)
+template<typename StdType, typename GslType>
+VectorBase<StdType, GslType>& VectorBase<StdType, GslType>::operator/=(
+  const StdType& rhs)
 {
   (*this) *= 1.0 / rhs;
   return *this;
 }
+template
+VectorBase<double, gsl_vector>& VectorBase<double, gsl_vector>::operator/=(
+  const double& rhs);
+template VectorBase<complex, gsl_vector_complex>&
+VectorBase<complex, gsl_vector_complex>::operator/=(
+  const complex& rhs);
 
 //*************************
 // Algebraic Operators
 //*************************
 
-template <class StdType>
-const Vector<StdType> Vector<StdType>::operator*(const StdType&          rhs) const
+template <class StdType, typename GslType>
+const VectorBase<StdType, GslType> VectorBase<StdType, GslType>::operator*(
+  const StdType& rhs) const
 {
-  return Vector<StdType>(*this) *= rhs;
+  return VectorBase<StdType, GslType>(*this) *= rhs;
 }
+template
+const VectorBase<double, gsl_vector> VectorBase<double, gsl_vector>::operator*(
+  const double& rhs) const;
+template
+const VectorBase<complex, gsl_vector_complex>
+VectorBase<complex, gsl_vector_complex>::operator*(
+  const complex& rhs) const;
 
-template <class StdType>
-const Vector<StdType> Vector<StdType>::operator/(const StdType&          rhs) const
+template <class StdType, typename GslType>
+const VectorBase<StdType, GslType> VectorBase<StdType, GslType>::operator/(
+  const StdType& rhs)
+  const
 {
-  return Vector<StdType>(*this) /= rhs;
+  return VectorBase<StdType, GslType>(*this) /= rhs;
 }
+template const VectorBase<double, gsl_vector>
+VectorBase<double, gsl_vector>::operator/(const double& rhs) const;
+template const VectorBase<complex, gsl_vector_complex>
+VectorBase<complex, gsl_vector_complex>::operator/(const complex& rhs) const;
 
 //############################
-// Vector (protected)
+// VectorBase (protected)
 //############################
 
-template <class GslType>
-void Vector<GslType>::build_vector(const GslType* data_begin,
-                                      const GslType* data_end)
+template <class StdType, typename GslType>
+void VectorBase<StdType, GslType>::build_vector(
+  const StdType* data_begin, const StdType* data_end)
 {
-  build_vector(data_end - data_begin);
-  for(size_t i=0; i<size(); ++i)
+  GslVector<GslType>::build_vector(data_end - data_begin);
+  for(size_t i=0; i<this->size(); ++i)
   {
-    operator()(i+1) = data_begin[i];
+    (*this)[i] = data_begin[i];
   }
 }
+template void VectorBase<double, gsl_vector>::build_vector(
+  const double* data_begin, const double* data_end);
+template void VectorBase<complex, gsl_vector_complex>::build_vector(
+  const complex* data_begin, const complex* data_end);
+
+template class VectorBase<double, gsl_vector>;
+template class VectorBase<MAUS::complex, gsl_vector_complex>;
+
+template class Vector<double>;
+template class Vector<MAUS::complex>;
 
 //############################
-// Free Functions/Operators
+// Free Functions
+//############################
+
+//****************************
+// Conversion Functions
+//****************************
+
+GslVector<gsl_vector> real(const GslVector<gsl_vector_complex>& complex_vector)
+{
+  GslVector<gsl_vector> double_vector;
+
+  if(complex_vector.vector_ != NULL)
+  {
+    double_vector = GslVector<gsl_vector>(complex_vector.size());
+    for(size_t i=1; i<=complex_vector.size(); ++i)
+    {
+      *gsl_vector_ptr(double_vector.vector_, i)
+      = MAUS::Complex::real(*gsl_vector_complex_ptr(complex_vector.vector_, i));
+    }
+  }
+  return double_vector;
+}
+
+GslVector<gsl_vector> imag(const GslVector<gsl_vector_complex>& complex_vector)
+{
+  GslVector<gsl_vector> double_vector;
+
+  if(complex_vector.vector_ != NULL)
+  {
+    double_vector = GslVector<gsl_vector>(complex_vector.size());
+    for(size_t i=1; i<=complex_vector.size(); ++i)
+    {
+      *gsl_vector_ptr(double_vector.vector_, i)
+      = MAUS::Complex::imag(*gsl_vector_complex_ptr(complex_vector.vector_, i));
+    }
+  }
+  return double_vector;
+}
+
+} //namespace MAUS
+
+//############################
+// Global Operators
 //############################
 
 //*************************
 // Unitary Operators
 //*************************
 
-template <class GslType>
-MAUS::GslVector<GslType> operator-(const MAUS::GslVector<GslType>& operand)
+template <class StdType>
+MAUS::Vector<StdType> operator-(const MAUS::Vector<StdType>& operand)
 {
   size_t size = operand.size();
-  GslVector<GslType> vector(operand);
+  Vector<StdType> vector(operand);
   for(size_t index=0; index<size; ++index)
   {
     vector[index] = -vector[index];
@@ -460,36 +731,34 @@ MAUS::GslVector<GslType> operator-(const MAUS::GslVector<GslType>& operand)
 
   return vector;
 }
-template MAUS::GslVector<gsl_vector> operator-(
-  const MAUS::GslVector<gsl_vector>& operand);
-template MAUS::GslVector<gsl_vector_complex> operator-(
-  const MAUS::GslVector<gsl_vector_complex>& operand);
+template MAUS::Vector<double> operator-(const MAUS::Vector<double>& operand);
+template MAUS::Vector<complex> operator-(const MAUS::Vector<complex>& operand);
 
 //*************************
 // Scalar Operators
 //*************************
 
-template <typename GslType, typename StdType>
-MAUS::GslVector<GslType> operator*(const StdType&                   scalar,
-                                   const MAUS::GslVector<GslType>&  vector) 
+template <typename StdType>
+MAUS::Vector<StdType> operator*(const StdType&                scalar,
+                                const MAUS::Vector<StdType>&  vector) 
 {
-  return vector * scalar;
+  return vector.operator*(scalar);
 }
-template MAUS::GslVector<gsl_vector> operator*(
-  const double&                      scalar,
-  const MAUS::GslVector<gsl_vector>& vector);
+template MAUS::Vector<double> operator*(
+  const double&               scalar,
+  const MAUS::Vector<double>& vector);
 template
-MAUS::GslVector<gsl_vector_complex> operator*(
-  const complex&                              scalar,
-  const MAUS::GslVector<gsl_vector_complex>&  vector);
+MAUS::Vector<complex> operator*(
+  const complex&                scalar,
+  const MAUS::Vector<complex>&  vector);
 
 //*************************
 // Stream Operators
 //*************************
 
-template <class GslType>
-std::ostream& operator<<(std::ostream&        out,
-                         const GslVector<GslType>& vector)
+template <class StdType>
+std::ostream& operator<<(std::ostream&          out,
+                         const Vector<StdType>& vector)
 {
   out << "(";
   size_t size = vector.size();
@@ -504,9 +773,9 @@ std::ostream& operator<<(std::ostream&        out,
   out << ")" << std::endl;
   return out; 
 }
-template std::ostream& operator<<(std::ostream&        out,
-                                  const GslVector<gsl_vector>& vector);
-template std::ostream& operator<<(std::ostream&        out,
-                                  const GslVector<gsl_vector_complex>& vector);
+template std::ostream& operator<<(std::ostream&           out,
+                                  const Vector<double>&   vector);
+template std::ostream& operator<<(std::ostream&           out,
+                                  const Vector<complex>&  vector);
 
 //TODO: need operator>>()
