@@ -34,7 +34,7 @@ class CADImport: #pylint: disable = R0903
     """
 
     def __init__(self, xmlin1, xsl=None, xmlin2=None, \
-             output=None, mergein=None, mergeout=None): 
+             output=None, mergein=None, mergeout=None, filepath=''): 
              #pylint: disable = R0912, R0913
         """
         @Method Class constructor
@@ -107,9 +107,10 @@ class CADImport: #pylint: disable = R0903
         else: 
             self.merge_out = mergeout
 
+
     def parse_xslt(self):
         """
-        @Method parse_xslt to parse an XML(GDML) to text or another XML(GDML)
+        @Method parse_xslt to parse an XML(GDML) to text or another XML (GDML)
 
         This method will execute an XSLT stylesheet and produce either a text
         or another XML(GDML) according to the request.
@@ -123,9 +124,5 @@ class CADImport: #pylint: disable = R0903
         doc.freeDoc()
         result.freeDoc()
 
-def main():
-    """
-    Main Function
-    """
 if __name__ == '__main__':
     main()

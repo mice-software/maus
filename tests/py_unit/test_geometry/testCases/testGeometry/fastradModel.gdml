@@ -39,7 +39,7 @@
 		<solidref ref="WorldSphereRef"/>
 
 		<physvol>
-			<file name="Stemmmmp_0.gdml"/>
+			<file name="Step_0.gdml"/>
 			<position name="posRef_1" x="0.0000" y="0.0000" z="0.0000"/>
 		<rotationref ref="identity"/>
 		</physvol>

@@ -47,6 +47,18 @@ class  TestUploader(unittest.TestCase): #pylint: disable = C0103, R0904
         self.test_gdml_to_cdb = \
                                GDMLtocdb.Uploader(self.testgeom, self.testnote)
         
+    def test_is_filetype(self):
+        """
+        TestUploader::test_is_filetype
+        """
+        self.assertTrue(GDMLtocdb.is_filetype('bob.zip', ['zip']))
+        self.assertFalse(GDMLtocdb.is_filetype('bobzip', ['zip']))
+        self.assertFalse(GDMLtocdb.is_filetype('bob.zipa', ['zip']))
+        self.assertFalse(GDMLtocdb.is_filetype('bob.azip', ['zip']))
+        self.assertFalse(GDMLtocdb.is_filetype('zip', ['zip']))
+        self.assertTrue(GDMLtocdb.is_filetype('bob.zip', ['fred', 'zip']))
+        
+
     def test_constructor(self):
         """
         TestUploader::test_constructor

@@ -206,7 +206,7 @@ geometry_delete_originals = 0
 #Donwloading of geometries
 #Download Geometry for a specific ID
 #Name the start and stop time for which the geometry was valid. Stop time is optional
-geometry_start_time = "2011-09-08 09:00:00"
+geometry_start_time = None # note that this throws an exception !by default! - must be overridden
 geometry_stop_time  = None
 #Download Geometry for a specific Run Num
 geometry_run_number = 1

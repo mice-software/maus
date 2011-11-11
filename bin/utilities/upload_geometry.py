@@ -39,7 +39,8 @@ def main():
     configuration = Configreader()
     configuration.readconfig()
     #upload the geometry
-    upload_geometry = Uploader(configuration.maus_ul_dir, configuration.geometrynotes)
+    upload_geometry = Uploader \
+                        (configuration.maus_ul_dir, configuration.geometrynotes)
     path = os.path.join(configuration.maus_ul_dir, geometry.GDMLtoCDB.FILELIST)
     zfile = Packer(path)
     upload_file = zfile.zipfile(configuration.maus_ul_dir)

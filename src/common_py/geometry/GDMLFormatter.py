@@ -227,6 +227,10 @@ class Formatter: #pylint: disable = R0902
         the class constructor.
         """
         self.format_check(self.configuration_file)
+        if self.material_file != None:
+            self.copy_tmp_to_out(self.material_file)
+
+
         if self.beamline_file != None:
             self.merge_run_info(self.field_file)
             self.copy_tmp_to_out(self.field_file)

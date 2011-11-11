@@ -29,6 +29,14 @@ from geometry.ConfigReader import Configreader
 
 GEOMETRY_ZIPFILE = 'geometry.zip'
 FILELIST = 'FileList.txt'
+SERVER_OK = ['okay', 'OK']
+
+def is_filetype(file_name, extensions):
+    for suffix in extensions:
+        slen = file_name.rfind('.')
+        if slen != -1 and file_name[slen+1:] == suffix:
+            return True
+    return False
 
 #change notes no longer encode decode
 class Uploader: #pylint: disable = R0902
@@ -42,7 +50,7 @@ class Uploader: #pylint: disable = R0902
     individual file is saved to a zip file by another class
     and then encoded and uploaded to the CDB.
     """
-    def __init__(self, filepath, notes):
+    def __init__(self, filepath, notes, textfile = None):
         """
         @Method Class constructor This method sets up the necessaries to upload
                                   to the database
@@ -53,13 +61,14 @@ class Uploader: #pylint: disable = R0902
 
         @Param filepath path of the directory which contains the GDML files
         @Param notes must be a string which briefly describes the geometry
-        @Param testserver enter 1 to set up the test server leave blank for 
-                          real server
+        @Param textfile path to a text file containing list of geometries to be
+                        uploaded; default is None, in which case geometries are
+                        generated automatically
         """
         self.server_status = None
         self.wsdlurl = None
         self.geometry_cdb = cdb.GeometrySuperMouse()
-        self.textfile = None
+        self.textfile = textfile
         self.text = ""
         if type(notes) != str:
             raise IOError('Geometry description missing or not a string')
@@ -67,14 +76,14 @@ class Uploader: #pylint: disable = R0902
             self.notes = notes
         filelist = []
         self.geometryfiles = filelist
-        self.listofgeometries = None
         if os.path.exists(filepath) != True:
             raise IOError("File path "+str(filepath)+" does not exist")
         else:
             self.filepath = filepath
         self.set_up_server()
+        if self.textfile == None:
+            self.create_file_list()
         self.check_file_list()
-        self.create_file_list()
         
     def set_up_server(self):
         """
@@ -87,70 +96,47 @@ class Uploader: #pylint: disable = R0902
         config.readconfig()
         self.wsdlurl = config.cdb_ul_url+config.cdb_ul_dir
         self.geometry_cdb.set_url(self.wsdlurl)
-        print "Server status is "+self.geometry_cdb.get_status()
+        self.server_status = self.geometry_cdb.get_status()
+        if not self.server_status in SERVER_OK:
+            print 'Warning, server status is '+self.server_status
         return self.wsdlurl
     
+    def create_file_list(self):
+        """
+        @method create_file_list Creates a text file containing a list of
+                                 geometry files.
+        
+        Create a text file with name FILELIST containing a list of the files in
+        filepath. Only files with extension *.gdml or *.xml are added. 
+        """
+        # if there is no text file create one and fill it with the geometries.
+        files_on_disk = []
+        for fname in sorted(os.listdir(self.filepath)):
+            if is_filetype(fname, ['xml', 'gdml']):
+                files_on_disk.append(os.path.join(self.filepath, fname))
+
+        filelist_path = os.path.join(self.filepath, FILELIST)
+        fout = open(filelist_path, 'w')
+        for fname in files_on_disk:
+            fout.write(fname+'\n')
+        fout.close()
+
     def check_file_list(self):
         """
         @method check_file_list 
         
-        This method goes through the designated path given by __init__ and 
-        checks to see if there is a text file. It then checks this file to
-        if it contains a list of the geometries also in the designated path.
-        It raises an error if they don't match. If there isn't a text file
-        it stores the files within the path in a list ready for the text
-        file to be created.
+        Returns true if everything in FILELIST can be found in filepath. Else
+        returns false
         """
-        gdmls = os.listdir(self.filepath)
-        count = 0
-        for fname in gdmls:
-            if fname[-4:] == '.txt':
-                gdmls.remove(fname)
-                numcheck = len(gdmls)
-                self.textfile = fname
-                path = self.filepath + "/" + self.textfile
-                fin = open(path, 'r')
-                for lines in fin.readlines():
-                    self.text += lines
-                for num in range(0, numcheck):
-                    if self.text.find(gdmls[num]) >= 0:
-                        count += 1
-                if numcheck != count:
-                    raise IOError("Text file "+path+" doesnt list fastrad files")
-                else:
-                    self.listofgeometries = path
-                    fin = open(self.listofgeometries, 'r')
-                    for line in fin.readlines():
-                        self.geometryfiles.append(line.strip())
-                    fin.close()
-    
-    def create_file_list(self):
-        """
-        @method create_file_list This method creates a text file which contains 
-                                 a list of geometries.
-        
-        This method will create a text file which contains a list
-        of the GDMLs in the path given by __init__. This is in 
-        preparation for uploading. If there is already a text file
-        it does nothing.
-        """
-        # if there is no text file create one and fill it with the geometries.
-        gdmls = os.listdir(self.filepath)
-        numoffiles = len(gdmls)
-        if self.textfile == None:
-            path = os.path.join(self.filepath, FILELIST)
-            fout = open(path, 'w')
-            for num in range(0, numoffiles):
-                filepath = self.filepath + "/" + gdmls[num]
-                fout.write(filepath)
-                fout.write('\n')
-            fout.close()
-            self.listofgeometries = path
-            fin = open(self.listofgeometries, 'r')
-            for line in fin.readlines():
-                self.geometryfiles.append(line.strip())
-            fin.close()
-        
+        files_on_disk = sorted(os.listdir(self.filepath))
+        filelist_path = os.path.join(self.filepath, FILELIST)
+        fin = open(filelist_path)
+        files_in_filelist = [str.rstrip(x) for x in sorted(fin.readlines())]
+        fin.close()
+        for fname in files_in_filelist:
+            if fname not in files_on_disk:
+                return False
+        return True
 
     def upload_to_cdb(self, zipped_file):
         """
@@ -161,17 +147,14 @@ class Uploader: #pylint: disable = R0902
         the CDB with a date stamp of when the method is called.
         """
         if zipped_file[-4:] != '.zip':
-            raise IOError('Argument is not a zip file', \
-                                                     'GDMLtocdb::upload_to_cdb')
+            raise IOError('Argument is not a zip file')
         else:
             _dt = datetime.today()
             fin = open(zipped_file, 'r')
-            f_contents = fin.read()
-            _gdml = f_contents
-            print (_gdml, _dt, self.notes)
-            self.geometry_cdb.set_gdml(_gdml, _dt, self.notes)
-            self.server_status = str(self.geometry_cdb.set_gdml \
-                                                       (_gdml, _dt, self.notes))
+            _gdml = fin.read()
+            self.geometry_cdb = cdb.GeometrySuperMouse()
+            self.server_status = \
+                              self.geometry_cdb.set_gdml(_gdml, _dt, self.notes)
             
 class Downloader: #pylint: disable = R0902
     """
@@ -208,10 +191,11 @@ class Downloader: #pylint: disable = R0902
         """
         config = Configreader()
         self.wsdlurl = config.cdb_dl_url+config.cdb_dl_dir
-        print "WSDLURL",self.wsdlurl
         self.geometry_cdb = cdb.Geometry()
         self.geometry_cdb.set_url(self.wsdlurl)
-        print "Server status is "+self.geometry_cdb.get_status()
+        server_status = self.geometry_cdb.get_status()
+        if server_status != 'okay':
+            print 'Warning, server status is '+server_status 
         return self.wsdlurl
 
             
@@ -249,10 +233,9 @@ class Downloader: #pylint: disable = R0902
                                unpacked to. 
         """
         if os.path.exists(downloadpath) == False:
-            raise IOError('Path does not exist!, Downloader::download_current')
+            raise IOError('Path '+downloadpath+' does not exist')
         elif type(id_num) != str:
-            raise IOError('ID number not obtained, ' + \
-            'Downloader::download_current')
+            raise IOError('ID number '+str(id_num)+' malformed')
         else:
             downloadedfile = self.geometry_cdb.get_gdml_for_id(id_num)
             zip_path = os.path.join(downloadpath, GEOMETRY_ZIPFILE)
