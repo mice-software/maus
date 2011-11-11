@@ -39,16 +39,11 @@ CELERY_AMQP_TASK_RESULT_EXPIRES = 300
 CELERY_IMPORTS = ("maustasks", )
 
 # Disable log colors.
-CELERYD_LOG_COLOR=0
-
-#CELERYD_MAX_TASKS_PER_CHILD=1
-
-#CELERYD_POOL=mausloader.MyPool
+CELERYD_LOG_COLOR = 0
 
 #
 # MAUS-specific Celery configuration
 #
 
 # MAUS configuration file
-MAUS_CONFIG_FILE = "examplemausconfig.py"
-
+# MAUS_CONFIG_FILE = "examplemausconfig.py"

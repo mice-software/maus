@@ -135,7 +135,8 @@ class Go:  #  pylint: disable=R0921
         print(("\tProgram Arguments: %s" % str(sys.argv)))
         print ("\tVersion: %s" % version)
         if json_config_dictionary["verbose_level"] == 0:
-          print "Configuration: ",json.dumps(json_config_dictionary, indent=2)
+            print "Configuration: ", \
+                json.dumps(json_config_dictionary, indent=2)
 
         #
         #  Enumerate list of possible types of dataflow
@@ -214,7 +215,6 @@ class Go:  #  pylint: disable=R0921
         """
 
         from celery.task.control import inspect
-        from celery.task.control import broadcast 
 
         # Check for active workers.
         print("Checking for active workers")
@@ -223,32 +223,20 @@ class Go:  #  pylint: disable=R0921
         if (active_workers == None):
             raise Exception("No active Celery workers!")
 
-        # Configure the workers.
-        print("Configuring workers")
-        # broadcast("maus_reconfigure_worker", {"config_doc":"b"}, reply=True)
-        broadcast("maus_set_worker_transforms", {"transforms":"[MAUS.MapPyDoNothing]", "tmpvalue":"ONE"}, reply=True)
-#        self._transform.append(MAUS.MapPyBeamMaker())
-#        self._transform.append(MAUS.MapCppSimulation())
-#        self._transform.append(MAUS.MapCppTOFDigitization())
-#        self._transform.append(MAUS.MapCppTrackerDigitization())
-
         print("INPUT: Reading some input")
         assert(self.input.birth(self.json_config_document) == True)
         emitter = self.input.emitter()
         map_buffer = buffer_input(emitter, 1)
 
         print("TRANSFORM: spawning transform jobs for each spill.")
-
         i = 0
         transform_results = {}
         while len(map_buffer) != 0:
             for spill in map_buffer:
-                from maustasks import MausGenericTransform
-                from maustasks import MapPyGroupTask
+#                from maustasks import MausSimulationTask
+                from maustasks import MausDoNothingTask
                 result = \
-                    MausGenericTransform.delay(spill) # pylint:disable=E1101
-#                result = \
-#                    MapPyGroupTask.delay(spill) # pylint:disable=E1101
+                    MausDoNothingTask.delay(spill) # pylint:disable=E1101
                 # Index results by spill_id so can present
                 # results to merge-output in same order.
                 transform_results[i] = result
@@ -258,7 +246,6 @@ class Go:  #  pylint: disable=R0921
             print(" %d spills left in buffer." % (len(map_buffer)))
 
         print("TRANSFORM: waiting for transform jobs to complete.")
-
         # Wait for workers to finish - just keep looping until each
         # either succeeds or fails.
         spills = {}
