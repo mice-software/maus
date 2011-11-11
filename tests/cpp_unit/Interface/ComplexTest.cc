@@ -42,9 +42,7 @@ public:
                   c3(complex(3,   2)),
                   c4(complex(3,  -2)),
                   cs(complex(6.)),
-                  cc(complex(3,  -2)),
-                  voidout("/dev/null"),
-                  out(voidout)
+                  cc(complex(3,  -2))
   { }
 protected:
   MAUS::complex c1;
@@ -54,8 +52,6 @@ protected:
   MAUS::complex cs;
   MAUS::complex ct;
   const MAUS::complex cc;
-  std::ofstream voidout;
-  std::ostream& out;
 };
 
 TEST_F(ComplexTest, Equals) {
@@ -176,9 +172,5 @@ TEST_F(ComplexTest, Streaming) {
   std::stringstream test_stream; 
   test_stream << c1;
   test_stream >> ct;
-/*
-  fprintf(stdout, "(3,-2) * 8.0 == (%f,%f)\n", real(ct), imag(ct));
-  fflush(stdout);
- */
   EXPECT_TRUE(ct == c1);
 }

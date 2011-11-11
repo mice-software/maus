@@ -413,35 +413,13 @@ const bool operator!=(const double&                  lhs,
 
 std::ostream& operator<<(std::ostream& out, const MAUS::complex& c)
 {
-  out << "(" << c.dat[0] << "," << c.dat[1] << ")";
+  out << c.dat[0] << " + i( " << c.dat[1] << " )";
   return out;
 }
 
 std::istream& operator>>(std::istream& in,  MAUS::complex& c)
 {
   std::string dummy;
-  in >> dummy >> c.dat[0] >> dummy >> c.dat[1] >> dummy;
-/*
-  std::string string_value;
-  in >> string_value;
-
-  std::string::size_type begin_real = string_value.find("(") + 1;
-  std::string::size_type end_real = string_value.find(",");
-  std::string real = string_value.substr(begin_real, end_real);
-  std::istringstream real_stream(string_value.substr(begin_real, end_real));
-  if (!(real_stream >> c.dat[0]))
-  {
-    c.dat[0] = 0.0;
-  }
-  
-  std::string::size_type begin_imag = end_real + 1;
-  std::string::size_type end_imag = string_value.find(")");
-  std::string imag = string_value.substr(begin_imag, end_imag);
-  std::istringstream imag_stream(string_value.substr(begin_real, end_real));
-  if (!(imag_stream >> c.dat[1]))
-  {
-    c.dat[1] = 0.0;
-  }
-*/  
+  in >> c.dat[0] >> dummy >> dummy >> c.dat[1] >> dummy;
   return in;
 }
