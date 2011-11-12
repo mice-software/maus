@@ -17,6 +17,7 @@
 
 #include <complex>
 #include <vector>
+#include <iostream>
 #include <stdio.h>
 
 #include "gsl/gsl_complex_math.h"
@@ -103,7 +104,7 @@ GslVector<gsl_vector> GslVector<gsl_vector>::subvector(size_t begin_index,
   if (sub_size > 0)
   {
     subvector = GslVector<gsl_vector>(sub_size);
-    for(size_t index=begin_index; index<end_index; ++index)
+    for(size_t index=0; index<sub_size; ++index)
     {
       *gsl_vector_ptr(subvector.vector_, index)
         = *gsl_vector_ptr(vector_, begin_index+index);
@@ -133,7 +134,7 @@ GslVector<gsl_vector_complex> GslVector<gsl_vector_complex>::subvector(
   if (sub_size > 0)
   {
     subvector = GslVector<gsl_vector_complex>(sub_size);
-    for(size_t index=begin_index; index<end_index; ++index)
+    for(size_t index=0; index<sub_size; ++index)
     {
       *gsl_vector_complex_ptr(subvector.vector_, index)
       = *gsl_vector_complex_ptr(vector_, begin_index+index);
@@ -273,7 +274,47 @@ GslVector<gsl_vector_complex>& GslVector<gsl_vector_complex>::operator*=(
     
     gsl_vector_complex_mul(vector_, rhs.vector_);
   }
+  return *this;
+}
+
+template<>
+GslVector<gsl_vector>& GslVector<gsl_vector>::operator/=(
+  const GslVector<gsl_vector>& rhs)
+{
+  if (rhs.vector_ != NULL)
+  {
+    size_t size = this->size();
+    if (rhs.size() != size)
+    {
+      throw(Squeal(
+        Squeal::recoverable,
+        "Attempted to perform the product of two vectors of different sizes.",
+        "MAUS::GslVector<gsl_vector>::operator/="));
+    }
+    
+    gsl_vector_div(vector_, rhs.vector_);
+  }
   
+  return *this;
+}
+
+template<>
+GslVector<gsl_vector_complex>& GslVector<gsl_vector_complex>::operator/=(
+  const GslVector<gsl_vector_complex>& rhs)
+{
+  if (rhs.vector_ != NULL)
+  {
+    size_t size = this->size();
+    if (rhs.size() != size)
+    {
+      throw(Squeal(
+                   Squeal::recoverable,
+                   "Attempted to perform the product of two vectors of different sizes.",
+                   "MAUS::GslVector<gsl_vector_complex>::operator/="));
+    }
+    
+    gsl_vector_complex_div(vector_, rhs.vector_);
+  }
   return *this;
 }
 
@@ -315,6 +356,18 @@ template const GslVector<gsl_vector> GslVector<gsl_vector>::operator*(
   const GslVector<gsl_vector>&  rhs) const;
 template const GslVector<gsl_vector_complex>
 GslVector<gsl_vector_complex>::operator*(
+  const GslVector<gsl_vector_complex>&  rhs) const;
+
+template <class GslType>
+const GslVector<GslType> GslVector<GslType>::operator/(
+  const GslVector<GslType>&  rhs) const
+{
+  return GslVector<GslType>(*this) /= rhs;
+}
+template const GslVector<gsl_vector> GslVector<gsl_vector>::operator/(
+  const GslVector<gsl_vector>&  rhs) const;
+template const GslVector<gsl_vector_complex>
+GslVector<gsl_vector_complex>::operator/(
   const GslVector<gsl_vector_complex>&  rhs) const;
 
 //*************************
@@ -435,6 +488,17 @@ template <typename StdType, typename GslType>
 VectorBase<StdType, GslType>::VectorBase() { }
 template VectorBase<double, gsl_vector>::VectorBase();
 template VectorBase<complex, gsl_vector_complex>::VectorBase();
+
+template <typename StdType, typename GslType>
+VectorBase<StdType, GslType>::VectorBase(
+  const VectorBase<StdType, GslType>& original_instance)
+  : GslVector<GslType>(original_instance)
+{
+}
+template VectorBase<double, gsl_vector>::VectorBase(
+  const VectorBase<double, gsl_vector>& original_instance);
+template VectorBase<complex, gsl_vector_complex>::VectorBase(
+  const VectorBase<complex, gsl_vector_complex>& original_instance);
   
 template <typename StdType, typename GslType>
 VectorBase<StdType, GslType>::VectorBase(size_t size, StdType  value)
@@ -490,7 +554,9 @@ template VectorBase<complex, gsl_vector_complex>::VectorBase(size_t i);
 template <typename StdType, typename GslType>
 VectorBase<StdType, GslType>::VectorBase(
   const GslVector<GslType>& original_instance)
-  : GslVector<GslType>(original_instance) { }
+  : GslVector<GslType>(original_instance)
+{
+}
 template VectorBase<double, gsl_vector>::VectorBase(
   const GslVector<gsl_vector>& original_instance);
 template VectorBase<complex, gsl_vector_complex>::VectorBase(
@@ -584,7 +650,10 @@ template<>
 VectorBase<double, gsl_vector>& VectorBase<double, gsl_vector>::operator*=(
   const double& rhs)
 {
-  gsl_vector_scale(vector_, rhs);
+  if (vector_ != NULL)
+  {
+    gsl_vector_scale(vector_, rhs);
+  }
   return *this;
 }
 
@@ -600,19 +669,26 @@ VectorBase<complex, gsl_vector_complex>::operator*=(
   return *this;
 }
 
-template<typename StdType, typename GslType>
-VectorBase<StdType, GslType>& VectorBase<StdType, GslType>::operator/=(
-  const StdType& rhs)
+template<>
+VectorBase<double, gsl_vector>& VectorBase<double, gsl_vector>::operator/=(
+  const double& rhs)
 {
-  (*this) *= 1.0 / rhs;
+  if (vector_ != NULL)
+  {
+    gsl_vector_scale(vector_, 1./rhs);
+  }
   return *this;
 }
-template
-VectorBase<double, gsl_vector>& VectorBase<double, gsl_vector>::operator/=(
-  const double& rhs);
-template VectorBase<complex, gsl_vector_complex>&
+template<> VectorBase<complex, gsl_vector_complex>&
 VectorBase<complex, gsl_vector_complex>::operator/=(
-  const complex& rhs);
+  const complex& rhs)
+{
+  if (vector_ != NULL)
+  {
+    gsl_vector_complex_scale(vector_, 1./rhs);
+  }
+  return *this;
+}
 
 //*************************
 // Algebraic Operators
@@ -637,6 +713,8 @@ const VectorBase<StdType, GslType> VectorBase<StdType, GslType>::operator/(
   const StdType& rhs)
   const
 {
+//FIXME: this return isn't doing what it's supposed to
+//it should call VectorBase(const GslVector<GslType>& original_instance)
   return VectorBase<StdType, GslType>(*this) /= rhs;
 }
 template const VectorBase<double, gsl_vector>

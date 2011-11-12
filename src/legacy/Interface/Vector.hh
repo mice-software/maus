@@ -91,6 +91,7 @@ public:
   GslVector<GslType>& operator+=(const GslVector<GslType>&  rhs);
   GslVector<GslType>& operator-=(const GslVector<GslType>&  rhs);
   GslVector<GslType>& operator*=(const GslVector<GslType>&  rhs);
+  GslVector<GslType>& operator/=(const GslVector<GslType>&  rhs);
   
   //*************************
   // Algebraic Operators
@@ -98,6 +99,7 @@ public:
   const GslVector<GslType> operator+(const GslVector<GslType>&  rhs) const;
   const GslVector<GslType> operator-(const GslVector<GslType>&  rhs) const;
   const GslVector<GslType> operator*(const GslVector<GslType>&  rhs) const;
+  const GslVector<GslType> operator/(const GslVector<GslType>&  rhs) const;
   
   //*************************
   // Comparison Operators
@@ -151,6 +153,7 @@ public:
   // Constructors
   //*************************
   VectorBase();
+  VectorBase(const VectorBase<StdType, GslType>& original_instance);
   VectorBase(size_t i, StdType  value);
   VectorBase(const StdType* array_beginning, const StdType* array_end);
   VectorBase(const std::vector<StdType, std::allocator<StdType> >& std_vector);
@@ -213,35 +216,19 @@ public:
   //*** GslVector constructors ***
 
   Vector(size_t i) : VectorBase<double, gsl_vector>(i) { }
-  Vector(const GslVector<gsl_vector>& original_instance)
+  Vector(const Vector<double>& original_instance)
     : VectorBase<double, gsl_vector>(original_instance) { }
 
   //Because of slicing, we need deep copies of the base classes
-  /*
   Vector(const GslVector<gsl_vector>& base_vector)
+    : VectorBase<double, gsl_vector>(base_vector)
   {
-    *this = base_vector;
   }
-  */
 
-  Vector<double>& operator =(const GslVector<gsl_vector>& rhs)
-  {
-    ((GslVector<gsl_vector>) *this) = rhs;
-    return *this;
-  }
-/*
   Vector(const VectorBase<double, gsl_vector>& base_vector)
+    : VectorBase<double, gsl_vector>(base_vector)
   {
-    *this = base_vector;
   }
-  */
-  
-  Vector<double>& operator =(const VectorBase<double, gsl_vector>& rhs)
-  {
-    ((GslVector<gsl_vector>) *this) = rhs;
-    return *this;
-  }
-  
 };
 
 template<>
@@ -261,35 +248,19 @@ public:
   //*** GslVector constructors ***
 
   Vector(size_t i) : VectorBase<complex, gsl_vector_complex>(i) { }
-  Vector(const GslVector<gsl_vector_complex>& original_instance)
+  Vector(const Vector<complex>& original_instance)
     : VectorBase<complex, gsl_vector_complex>(original_instance) { }
 
   //Because of slicing, we need deep copies of the base classes
-  /*
   Vector(const GslVector<gsl_vector_complex>& base_vector)
+    : VectorBase<complex, gsl_vector_complex>(base_vector)
   {
-    *this = base_vector;
   }
-  */
-  
-  Vector<complex>& operator=(const GslVector<gsl_vector_complex>& rhs)
-  {
-    ((GslVector<gsl_vector_complex>) *this) = rhs;
-    return *this;
-  }
-  /*
+
   Vector(const VectorBase<complex, gsl_vector_complex>& base_vector)
+    : VectorBase<complex, gsl_vector_complex>(base_vector)
   {
-    *this = base_vector;
   }
-  */
-  
-  Vector<complex>& operator=(const VectorBase<complex,gsl_vector_complex>& rhs)
-  {
-    ((GslVector<gsl_vector_complex>) *this) = rhs;
-    return *this;
-  }
-  
 };
 
 //*************************

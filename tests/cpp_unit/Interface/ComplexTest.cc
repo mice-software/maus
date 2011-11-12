@@ -100,7 +100,6 @@ TEST_F(ComplexTest, Multiplication) {
   ct *= 2.;
   EXPECT_TRUE(real(ct) == real(c1)*4. && imag(ct) == imag(c1)*4.);
 
-  fprintf(stdout, "ct = (12,-8) == (%f,%f)\n", real(ct), imag(ct));
   ct = 2.*ct;
   EXPECT_TRUE(real(ct) == real(c1)*8. && imag(ct) == imag(c1)*8.);
 
