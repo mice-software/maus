@@ -797,26 +797,43 @@ MAUS::Vector<complex> operator*(
 // Stream Operators
 //*************************
 
-template <typename StdType>
-std::ostream& operator<<(std::ostream&          out,
-                         const Vector<StdType>& vector)
+template <typename StdType, typename GslType>
+std::ostream& operator<<(
+  std::ostream&                                               out,
+  const MAUS::VectorBase<StdType, GslType>&                   vector)
 {
-  out << "(";
-  size_t size = vector.size();
-  for(size_t index=1; index<=size; ++index)
+  size_t vector_size = vector.size();
+  out << vector_size << " : ";
+  for(size_t i=0; i<vector_size; ++i)
   {
-    out << vector(index);
-    if (index < size)
-    {
-      out << ", ";
-    }
+    out << " " << vector[i];
   }
-  out << ")" << std::endl;
-  return out; 
+  return out;
 }
-template std::ostream& operator<<(std::ostream&           out,
-                                  const Vector<double>&   vector);
-template std::ostream& operator<<(std::ostream&           out,
-                                  const Vector<complex>&  vector);
+template std::ostream& operator<<(
+  std::ostream&                                               out,
+  const MAUS::VectorBase<double, gsl_vector>&                 vector);
+template std::ostream& operator<<(
+  std::ostream&                                               out,
+  const MAUS::VectorBase<MAUS::complex, gsl_vector_complex>&  vector);
 
-//TODO: need operator>>()
+template <typename StdType, typename GslType>
+std::istream& operator>>(std::istream&                        in,
+                         MAUS::VectorBase<StdType, GslType>&  vector)
+{
+  size_t n;
+  in >> n;
+  vector = MAUS::VectorBase<StdType, GslType>(n);
+  
+  char dummy;
+  in >> dummy;
+  
+  for(size_t i=0; i<n; ++i) in >> vector[i];
+  return in;
+}
+template std::istream& operator>>(
+  std::istream&                                               in,
+  MAUS::VectorBase<double, gsl_vector>&                       vector);
+template std::istream& operator>>(
+  std::istream&                                               in,
+  MAUS::VectorBase<MAUS::complex, gsl_vector_complex>&        vector);

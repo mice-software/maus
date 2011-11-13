@@ -43,7 +43,7 @@
 
 namespace std
 {
-  template<class T> class complex;
+  template<typename T> class complex;
 }
 
 namespace MAUS
@@ -240,21 +240,24 @@ VectorBase<double, gsl_vector> imag(
 //*************************
 // Unitary Operators
 //*************************
-template <class StdType> MAUS::Vector<StdType>  operator-(
+template <typename StdType> MAUS::Vector<StdType>  operator-(
   const MAUS::Vector<StdType>& vector);
 
 //*************************
 // Scalar Operators
 //*************************
-template <class StdType> MAUS::Vector<StdType>  operator*(
+template <typename StdType> MAUS::Vector<StdType>  operator*(
   const StdType&                value,
   const MAUS::Vector<StdType>&  vector);
 
 //*************************
 // Stream Operators
 //*************************
-template <class StdType>
-std::ostream&  operator<<(std::ostream&                   out,
-                          const MAUS::Vector<StdType>& vector);
+template <typename StdType, typename GslType>
+std::ostream&  operator<<(std::ostream&                             out,
+                          const MAUS::VectorBase<StdType, GslType>& vector);
+template <typename StdType, typename GslType>
+std::istream&  operator>>(std::istream&                       in,
+                          MAUS::VectorBase<StdType, GslType>& vector);
 
 #endif
