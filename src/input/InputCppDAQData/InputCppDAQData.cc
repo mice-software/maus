@@ -39,6 +39,26 @@ bool InputCppDAQData::birth(std::string jsonDataCards) {
      return false;  // Faile because files are already open
   }
 
+  //  JsonCpp setup
+  Json::Value configJSON;   //  this will contain the configuration
+  Json::Reader reader;
+
+  // Check if the JSON document can be parsed, else return error only
+  bool parsingSuccessful = reader.parse(jsonDataCards, configJSON);
+  if (!parsingSuccessful) {
+    return false;
+  }
+
+  if (_dataPaths == "") {
+    assert(configJSON.isMember("daq_data_path"));
+    _dataPaths = configJSON["daq_data_path"].asString();
+  }
+
+  if (_datafiles == "") {
+    assert(configJSON.isMember("daq_data_file"));
+    _datafiles = configJSON["daq_data_file"].asString();
+  }
+
   _dataFileManager.SetList(_datafiles);
   _dataFileManager.SetPath(_dataPaths);
   _dataFileManager.OpenFile();
@@ -47,15 +67,6 @@ bool InputCppDAQData::birth(std::string jsonDataCards) {
     Squeak::mout(Squeak::error) << "Unable to load any data files." << std::endl;
     Squeak::mout(Squeak::error) << "Check your run number (or file name) and data path."
     << std::endl;
-    return false;
-  }
-  //  JsonCpp setup
-  Json::Value configJSON;   //  this will contain the configuration
-  Json::Reader reader;
-
-  // Check if the JSON document can be parsed, else return error only
-  bool parsingSuccessful = reader.parse(jsonDataCards, configJSON);
-  if (!parsingSuccessful) {
     return false;
   }
 
