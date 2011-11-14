@@ -13,7 +13,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-##  MapPyScalersAnalysis class dumps some scaler information.
+##  MapPyScalersDump class dumps some scaler information.
 #  This a first prototype and for the moment it dumps only Triggers,
 #  Trigger Requests, GVA, TOF0 and TOF1. It has to be extended and to
 #  include also the other channels of the scaler.
@@ -23,7 +23,7 @@
 import json
 import ErrorHandler
 
-class MapPyScalersAnalysis:
+class MapPyScalersDump:
     """ This class dump the scaler information"""
     def __init__(self):
         """ Constructor """
