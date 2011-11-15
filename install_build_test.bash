@@ -14,6 +14,16 @@ then
     rm $FILE_ERR
 fi
 
+if [ "${MAUS_ROOT_DIR}" ]; then  # see if the variable exists yet                                                                                                                
+    echo "Your current directory is:"
+    pwd
+    echo
+    echo "Your MAUS_ROOT_DIR is:"
+    echo ${MAUS_ROOT_DIR}
+    echo
+    echo "These should agree"
+fi
+
 echo "   Welcome to the all-in-one MAUS installer script.  This script will"
 echo "take about 1 hour and 7 minutes to run.  You can get the details of the"
 echo "progress (or ensure it is doing something) by running:"

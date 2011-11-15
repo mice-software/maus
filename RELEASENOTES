@@ -1,5 +1,5 @@
-This file contains a brief overview of the changes made in each release.
-A detailed description of changes is available at:
+This file contains a brief overview of the changes made in each release. A
+detailed description of changes is available at:
 http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
@@ -11,6 +11,9 @@ MAUS-v0.0.9
 - Skeleton documentation outline added
 The following third party libraries need to be rerun:
 - 40python_extras.bash
+- Tracker geant4 modelling code was added
+- Tracker digitization code was added
+- TOF digitization code was removed as it did not meet required quality checks
 
 MAUS-v0.0.8
 - Merged DAQ unpacking code

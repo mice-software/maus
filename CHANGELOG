@@ -1,7 +1,7 @@
 MAUS-v0.0.9 (http://micewww.pp.rl.ac.uk/versions/show/17)
   Bug #42: Possible memory leak in MiceModule class
   Bug #750: OutputPyImage segmentation fault because of bad uuid library
-  Feature #179: docbooks?
+  Feature #179: docbooks? (Latex document skeleton added)
   Feature #698: Pull MICE Physcis List from legacy
   Feature #702: matplotlib histogram reducer
   Feature #744: libxml2 build on test server
