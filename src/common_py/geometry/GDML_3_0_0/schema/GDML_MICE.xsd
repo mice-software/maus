@@ -26,7 +26,7 @@
         <xs:attribute name="z" use="required" type="xs:double"/>
     </xs:complexType>
     <xs:complexType name="LengthType">
-        <xs:attribute name="value"/>
+        <xs:attribute name="value" type="xs:double"/>
         <xs:attribute name="units" use="optional"/>
     </xs:complexType>
     <xs:complexType name="FileReferenceType">
@@ -36,11 +36,136 @@
         </xs:sequence>
         <xs:attribute name="name" type="xs:anyURI" use="required"></xs:attribute>
     </xs:complexType>
-<!--++++++++++++++++++++++++++++++++Substitution TYPES+++++++++++++++++++++++++++++++++++++-->
-
+<!--++++++++++++++++++++++++++++++++Tracker Base TYPES+++++++++++++++++++++++++++++++++++++-->
+    <xs:complexType name="NumberType">
+        <xs:attribute name="Number" use="required" type="xs:integer"/>
+    </xs:complexType>
+    <xs:complexType name="CentralFibreType">
+        <xs:attribute name="Number" use="required" fixed="112.5"/>
+    </xs:complexType>
+    <xs:complexType name="Delta_FType">
+        <xs:attribute name="value" use="required" type="xs:double"/>
+    </xs:complexType>
+    <xs:complexType name="TrackerLengthType">
+        <xs:attribute name="length" use="required" type="xs:double"/>
+        <xs:attribute name="units" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="TrackerThicknessType">
+        <xs:attribute name="thickness" use="required" type="xs:double"/>
+        <xs:attribute name="units" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="TrackerMaterialType">
+        <xs:attribute name="name" use="required" type="xs:string"/>
+    </xs:complexType>
+    <xs:complexType name="DetectorType">
+        <xs:attribute name="type" use="required" type="xs:string"/>
+    </xs:complexType>
+    <xs:complexType name="PlaneType">
+        <xs:attribute name="plane" use="required" type="xs:integer"/>
+    </xs:complexType>
+    <xs:complexType name="ActiveRadiusType">
+        <xs:attribute name="R" use="required" type="xs:double"/>
+        <xs:attribute name="unit" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="PitchType">
+        <xs:attribute name="angle" use="required" type="xs:double"/>
+        <xs:attribute name="unit" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="DiameterType">
+        <xs:attribute name="dia" use="required" type="xs:double"/>
+        <xs:attribute name="unit" use="optional"></xs:attribute>
+    </xs:complexType>
+    <xs:complexType name="InvisibleType">
+        <xs:attribute name="True" use="required" type="xs:integer"/>
+    </xs:complexType>
+    <xs:complexType name="TrackerRotationType">
+        <xs:attribute name="alpha" use="required" type="xs:double"/>
+        <xs:attribute name="beta" use="required" type="xs:double"/>
+        <xs:attribute name="gamma" use="required" type="xs:double"/>
+        <xs:attribute name="units" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="ColourType">
+        <xs:attribute name="red" use="required" type="xs:double"/>
+        <xs:attribute name="green" use="required" type="xs:double"/>
+        <xs:attribute name="blue" use="required" type="xs:double"/>
+    </xs:complexType>
+<!--++++++++++++++++++++++++++++++++Tracker Schema+++++++++++++++++++++++++++++++++++++-->
+    <xs:complexType name="SciFi_Geo_Trkr_Type">
+        <xs:annotation>
+            <xs:documentation>
+                This is the tracker type and describes the tracker as a whole.
+                It is made up of geo_stn types.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="Tracker" type="NumberType"/>
+            <xs:element name="Position" type="PositionType"/>
+            <xs:element name="Rotation" type="TrackerRotationType"/>
+            <xs:element name="Length" type="LengthType"/>
+            <xs:element name="Thickness" type="TrackerThicknessType"/>
+            <xs:element name="Material" type="TrackerMaterialType"/>
+            <xs:element name="Invisible" type="InvisibleType"/>
+        </xs:sequence>
+        <xs:attribute name="ID_Number" use="required" type="xs:integer"></xs:attribute>
+    </xs:complexType>
+    <xs:complexType name="SciFi_Geo_Stn_Type">
+        <xs:annotation>
+            <xs:documentation>
+                This is the Station type. It descirbes each station within
+                this tracker. This component is made up of doublets.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="Tracker" type="NumberType"/>
+            <xs:element name="Position" type="PositionType"/>
+            <xs:element name="Rotation" type="TrackerRotationType"/>
+            <xs:element name="Length" type="LengthType"/>
+            <xs:element name="Thickness" type="TrackerThicknessType"/>
+            <xs:element name="Station" type="NumberType"/>
+            <xs:element name="Material" type="TrackerMaterialType"/>
+            <xs:element name="OpticsMaterialLength" type="LengthType"/>
+        </xs:sequence>
+        <xs:attribute name="ID_Number" use="required" type="xs:integer"></xs:attribute>
+    </xs:complexType>
+    <xs:complexType name="SciFi_Geo_Double_Type">
+        <xs:annotation>
+            <xs:documentation>
+                This is the id type. It holds all the default information about
+                the tracker's doublets.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="View" type="NumberType"/>
+            <xs:element name="CentralFibre" type="CentralFibreType"/>
+            <xs:element name="Delta_F" type="Delta_FType"/>
+            <xs:element name="Length" type="TrackerLengthType"/>
+            <xs:element name="Thickness" type="TrackerThicknessType"/>
+            <xs:element name="Material" type="TrackerMaterialType"/>
+            <xs:element name="SensitiveDetector" type="DetectorType"/>
+            <xs:element name="Plane" type="PlaneType"/>
+            <xs:element name="ActiveRadius" type="ActiveRadiusType"/>
+            <xs:element name="Pitch" type="PitchType"/>
+            <xs:element name="FibreDiameter" type="DiameterType"/>
+            <xs:element name="CoreDiameter" type="DiameterType"/>
+            <xs:element name="Invisible" type="InvisibleType"/>
+            <xs:element name="G4Detector" type="DetectorType"/>
+            <xs:element name="MylarThickness" type="TrackerThicknessType"/>
+        </xs:sequence>
+        <xs:attribute name="ID_Number" use="required" type="xs:integer"/>
+    </xs:complexType>
 <!--+++++++++++++++++++++++++++++++++++MIDDLE TYPES++++++++++++++++++++++++++++++++++++++++-->
     <xs:complexType name="TrackerType">
+        <xs:annotation>
+            <xs:documentation>
+                This is the Tacker Geometry Information
+            </xs:documentation>
+        </xs:annotation>
         <xs:sequence>
+            <xs:element name="Tracker" type="SciFi_Geo_Trkr_Type"/>
+            <xs:element name="Station" type="SciFi_Geo_Stn_Type"/>
+            <xs:element name="SciFiGeoDbl" type="SciFi_Geo_Double_Type" minOccurs="0"/>
+        </xs:sequence>
+        <!--<xs:sequence>
             <xs:element name="Component" maxOccurs="2">
                 <xs:complexType>
                     <xs:sequence>
@@ -56,7 +181,7 @@
                     <xs:attribute name="name"/>
                 </xs:complexType>
             </xs:element>
-        </xs:sequence>
+        </xs:sequence>-->
     </xs:complexType>
     <xs:complexType name ="configurationType">
         <xs:sequence>
