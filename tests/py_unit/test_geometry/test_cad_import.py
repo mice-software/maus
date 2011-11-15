@@ -29,7 +29,7 @@ class test_cad_import(unittest.TestCase): #pylint: disable = C0103, R0904
     """
     def setUp(self): #pylint: disable = C0103
         """
-        method set_up This sets some variable for the coming tests
+        TestCADImport::set_up This sets some variable for the coming tests
         
         This method sets up some CADImport objects which various
         variables in order to test the module.
@@ -50,7 +50,9 @@ class test_cad_import(unittest.TestCase): #pylint: disable = C0103, R0904
 
     def test_constructor(self): #pylint: disable = R0912, R0915
         """
-        method test_constructor This method test the CADImport constructor
+        TestCADImport::test_constructor
+
+        This method test the CADImport constructor
         
         Test xmlin1 parameter,
         first,   test it raises an error when there is no input
@@ -163,6 +165,7 @@ class test_cad_import(unittest.TestCase): #pylint: disable = C0103, R0904
 
     def test_parse_xslt(self):
         """
+        TestCADImport::test_parse_xslt
         Test to check that the outputted file has got information within it
         """
         self.cadimport_two_xml.parse_xslt()

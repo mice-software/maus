@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 
 """
-M. Littlefield
+upload_geometry: Uploads geometries to the configuration database
+
+
 """
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 # 
@@ -19,10 +21,18 @@ M. Littlefield
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
 import os.path
+import datetime
 import geometry.GDMLtoCDB
 from geometry.GDMLPacker import Packer
 from geometry.GDMLtoCDB import Uploader
 from geometry.ConfigReader import Configreader
+
+def check_configuration():
+    if geometry_upload_note == "":
+        raise ValueError("geometry_upload_note must be specified")
+    if geometry_upload_valid_from == "":
+        raise ValueError("geometry_upload_valid_from must be specified like"+\
+                        datetime.datetime.now())
 
 def main():
     """
@@ -37,26 +47,20 @@ def main():
     """
     #configreader class takes the arguments from the txt file so we can use them
     configuration = Configreader()
-    configuration.readconfig()
+    ul_dir = configuration.geometry_upload_directory
+
     #upload the geometry
     upload_geometry = Uploader \
-                        (configuration.maus_ul_dir, configuration.geometrynotes)
-    path = os.path.join(configuration.maus_ul_dir, geometry.GDMLtoCDB.FILELIST)
-    zfile = Packer(path)
-    upload_file = zfile.zipfile(configuration.maus_ul_dir)
+                       (ul_dir, configuration.geometry_upload_note)
+    filelist_path = os.path.join(ul_dir, geometry.GDMLtoCDB.FILELIST)
+    zfile = Packer(filelist_path)
+    upload_file = zfile.zipfile(ul_dir)
     upload_geometry.upload_to_cdb(upload_file)
     #delete the text file produced by uploadtoCDB()
-    os.remove(path)
-    #delete zip file if specified
-    if configuration.zipfile == 0:
+    #delete temporary files if specified
+    if configuration.geometry_upload_cleanup:
+        os.remove(filelist_path)
         os.remove(upload_file)
-    #delete original GDML files as they are now zipped if selected
-    if configuration.deleteoriginals == 1:
-        gdmls = os.listdir(configuration.maus_ul_dir)
-        for fname in gdmls:
-            path = configuration.maus_ul_dir + '/' +fname
-            os.remove(path)
-
 
 if __name__ == "__main__":
     main()

@@ -34,7 +34,7 @@ class CADImport: #pylint: disable = R0903
     """
 
     def __init__(self, xmlin1, xsl=None, xmlin2=None, \
-             output=None, mergein=None, mergeout=None, filepath=''): 
+             output=None, mergein=None, mergeout=None): 
              #pylint: disable = R0912, R0913
         """
         @Method Class constructor
@@ -124,5 +124,3 @@ class CADImport: #pylint: disable = R0903
         doc.freeDoc()
         result.freeDoc()
 
-if __name__ == '__main__':
-    main()

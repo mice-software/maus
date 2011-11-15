@@ -34,49 +34,25 @@ class Configreader(): #pylint: disable = R0903, R0902
         This sets up the blank variables ready to be filled by the information
         contained in the Configuration text file.
         """
-        self.cdb_dl_url = ""
-        self.cdb_dl_dir = ""
-        self.cdb_ul_url = ""
-        self.cdb_ul_dir = ""
-        self.gdmldir = ""
-        self.geometrynotes = ""
-        self.zipfile = None
-        self.deleteoriginals = None
-        self.downloaddir = ""
-        self.starttime = ""
-        self.stoptime = ""
-        self.runnum = ""
-
-        self.readconfig()
-        
-    def readconfig(self):
-        """
-        @method readconfig
-        
-        This method reads the ConfigurationDefaults File and takes the 
-        information needed from the file which has certain tags.                  
-        """
         inputs = Configuration().getConfigJSON(command_line_args = True)
-        config_dict          = json.loads(inputs)
-        self.cdb_dl_url          = config_dict['cdb_download_url']
-        self.cdb_dl_dir          = config_dict['cdb_download_geometry_dir']
-        self.cdb_ul_url          = config_dict['cdb_upload_url']
-        self.cdb_ul_dir          = config_dict['cdb_upload_geometry_dir']
-        self.maus_ul_dir         = config_dict['geometry_upload_directory']
-        self.maus_dl_dir         = config_dict['geometry_download_directory']
-        self.geometrynotes   = config_dict['geometry_description']
-        self.zipfile         = config_dict['geometry_zip_file']
-        self.deleteoriginals = config_dict['geometry_delete_originals']
-        self.starttime       = config_dict['geometry_start_time']
-        self.stoptime        = config_dict['geometry_stop_time']
-        self.runnum          = config_dict['geometry_run_number']
+        config_dict = json.loads(inputs)
+        self.cdb_upload_url = config_dict['cdb_upload_url']
+        self.geometry_upload_wsdl  = config_dict['geometry_upload_wsdl']
+        self.geometry_upload_directory = config_dict \
+                                                   ['geometry_upload_directory']
+        self.geometry_upload_note = config_dict['geometry_upload_note']
+        self.geometry_upload_valid_from = config_dict \
+                                                  ['geometry_upload_valid_from']
+        self.geometry_upload_cleanup = config_dict['geometry_upload_cleanup']
 
-def main():
-    """
-    Main Function
-    """
-    cfile = Configreader()
-    cfile.readconfig()
+        self.cdb_download_url = config_dict['cdb_download_url']
+        self.geometry_download_wsdl = config_dict['geometry_download_wsdl']
+        self.geometry_download_directory = config_dict \
+                                                 ['geometry_download_directory']
+        self.geometry_download_by = config_dict['geometry_download_by']
+        self.geometry_download_run_number = config_dict \
+                                                ['geometry_download_run_number']
+        self.geometry_download_id = config_dict['geometry_download_id']
+        self.geometry_download_cleanup = config_dict \
+                                                   ['geometry_download_cleanup']
 
-if __name__ == "__main__":
-    main()

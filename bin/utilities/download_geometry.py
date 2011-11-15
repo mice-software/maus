@@ -19,6 +19,7 @@ M. Littlefield
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import shutil
 import geometry
 from geometry.GDMLtoCDB import Downloader
 from geometry.GDMLtoMAUSModule import GDMLtomaus
@@ -36,32 +37,50 @@ def main():
     the geometry from the database and translates the geometry into MAUS Module
     format.
     """
-    #Read Config Arguments
+    # Read Config Arguments
     configuration = Configreader()
-    configuration.readconfig()
-    #Download file
-    geometry_downloader = Downloader()
-    gdml_cache = os.path.join(configuration.maus_dl_dir, GDML_CACHE)
-    tmp_cache = os.path.join(configuration.maus_dl_dir, TMP_CACHE)
+    dl_dir = configuration.geometry_download_directory
+    # Set up target location for download
+    gdml_cache = os.path.join(dl_dir, GDML_CACHE)
     try:
         os.mkdir(gdml_cache)
     except OSError:
         pass
-    try:
-        os.mkdir(tmp_cache)
-    except OSError:
-        pass
-    geometry_downloader.download_current(gdml_cache)
+    #Download file
+    geometry_downloader = Downloader()
+
+    if configuration.geometry_download_by == "run_number":
+        geometry_downloader.download_geometry_by_run \
+                        (configuration.geometry_download_run_number, gdml_cache)
+    elif configuration.geometry_download_by == "current":
+        geometry_downloader.download_current(gdml_cache)
+    elif configuration.geometry_download_by == "id":
+        geometry_downloader.download_geometry_by_id \
+                                (configuration.geometry_download_id, gdml_cache)
+    else:
+        raise KeyError("Didn't recognise 'geometry_download_by' option '"+\
+               configuration.geometry_download_by+"'. Should be on of\n"+\
+               "run_number\ncurrent\nid\n")
     #Unzip file
     zip_filename = os.path.join(gdml_cache, geometry.GDMLtoCDB.GEOMETRY_ZIPFILE)
     zipped_geom = Unpacker(zip_filename, gdml_cache)
     zipped_geom.unzip_file()
-    #Format Files
-    gdmls = Formatter(gdml_cache, configuration.maus_dl_dir, tmp_cache)
+    # set up temporary directory for formatting
+    tmp_cache = os.path.join(dl_dir, TMP_CACHE)
+    try:
+        os.mkdir(tmp_cache)
+    except OSError:
+        pass
+    # format files
+    gdmls = Formatter(gdml_cache, dl_dir, tmp_cache)
     gdmls.format()
-    #Convert to MAUS Modules
-    maus_modules = GDMLtomaus(configuration.maus_dl_dir)
-    maus_modules.convert_to_maus(configuration.maus_dl_dir)
+    # convert to MAUS Modules
+    maus_modules = GDMLtomaus(dl_dir)
+    maus_modules.convert_to_maus(dl_dir)
+    # clean up if required
+    if configuration.geometry_download_cleanup:
+        shutil.rmtree(gdml_cache)
+        shutil.rmtree(tmp_cache)
     print "Download Complete"
 
 if __name__ == "__main__":

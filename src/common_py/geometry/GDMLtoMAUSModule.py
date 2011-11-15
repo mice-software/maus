@@ -92,9 +92,9 @@ class GDMLtomaus(): #pylint: disable = R0903
             "__step_max__":5.0,
         }
         for line in fin:
-          for key, value in substitutions.iteritems():
-            line = line.replace(str(key), str(value))
-          fout.write(line)
+            for key, value in substitutions.iteritems():
+                line = line.replace(str(key), str(value))
+            fout.write(line)
         fin.close()
         fout.close()
         

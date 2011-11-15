@@ -32,6 +32,10 @@ FILELIST = 'FileList.txt'
 SERVER_OK = ['okay', 'OK']
 
 def is_filetype(file_name, extensions):
+    """
+    return true if the file extension in extensions is one of the items in the
+    iterable extensions. File extensions are specified like ['zip', 'xml'] etc 
+    """
     for suffix in extensions:
         slen = file_name.rfind('.')
         if slen != -1 and file_name[slen+1:] == suffix:
@@ -65,7 +69,6 @@ class Uploader: #pylint: disable = R0902
                         uploaded; default is None, in which case geometries are
                         generated automatically
         """
-        self.server_status = None
         self.wsdlurl = None
         self.geometry_cdb = cdb.GeometrySuperMouse()
         self.textfile = textfile
@@ -93,12 +96,11 @@ class Uploader: #pylint: disable = R0902
         the test server depending on whether this is specified by __init__.
         """
         config = Configreader()
-        config.readconfig()
-        self.wsdlurl = config.cdb_ul_url+config.cdb_ul_dir
+        self.wsdlurl = config.cdb_upload_url+config.geometry_upload_wsdl
         self.geometry_cdb.set_url(self.wsdlurl)
-        self.server_status = self.geometry_cdb.get_status()
-        if not self.server_status in SERVER_OK:
-            print 'Warning, server status is '+self.server_status
+        server_status = self.geometry_cdb.get_status()
+        if not server_status in SERVER_OK:
+            print 'Warning, server status is '+server_status
         return self.wsdlurl
     
     def create_file_list(self):
@@ -153,8 +155,7 @@ class Uploader: #pylint: disable = R0902
             fin = open(zipped_file, 'r')
             _gdml = fin.read()
             self.geometry_cdb = cdb.GeometrySuperMouse()
-            self.server_status = \
-                              self.geometry_cdb.set_gdml(_gdml, _dt, self.notes)
+            self.geometry_cdb.set_gdml(_gdml, _dt, self.notes)
             
 class Downloader: #pylint: disable = R0902
     """
@@ -190,11 +191,11 @@ class Downloader: #pylint: disable = R0902
         the test server depending on whether this is specified by __init__.
         """
         config = Configreader()
-        self.wsdlurl = config.cdb_dl_url+config.cdb_dl_dir
+        self.wsdlurl = config.cdb_download_url+config.geometry_download_wsdl
         self.geometry_cdb = cdb.Geometry()
         self.geometry_cdb.set_url(self.wsdlurl)
         server_status = self.geometry_cdb.get_status()
-        if server_status != 'okay':
+        if not server_status in SERVER_OK:
             print 'Warning, server status is '+server_status 
         return self.wsdlurl
 
@@ -221,7 +222,7 @@ class Downloader: #pylint: disable = R0902
             fout.write(downloadedfile)
             fout.close()
 
-    def download_geometry_for_id(self, id_num, downloadpath):
+    def download_geometry_by_id(self, id_num, download_path):
         """
         @Method download geometry for ID 
 
@@ -232,16 +233,40 @@ class Downloader: #pylint: disable = R0902
         @param  downloadedpath The path location where the files will be 
                                unpacked to. 
         """
-        if os.path.exists(downloadpath) == False:
-            raise IOError('Path '+downloadpath+' does not exist')
+        if not os.path.exists(download_path):
+            raise IOError('Path '+download_path+' does not exist')
         elif type(id_num) != str:
             raise IOError('ID number '+str(id_num)+' malformed')
         else:
-            downloadedfile = self.geometry_cdb.get_gdml_for_id(id_num)
-            zip_path = os.path.join(downloadpath, GEOMETRY_ZIPFILE)
-            fout = open(zip_path, 'w')
-            fout.write(downloadedfile)
-            fout.close()
+            downloaded_file = self.geometry_cdb.get_gdml_for_id(id_num)
+            self.__write_zip_file(download_path, downloaded_file)
+
+
+    def download_geometry_by_run(self, run_num, download_path):
+        """
+        @Method download geometry for ID 
+
+        This method gets the geometry, for the given ID, from the database then 
+        passes the string to the unpack method which unpacks it.
+        
+        @param  id The integer ID number for the desired geometry.
+        @param  downloadedpath The path location where the files will be 
+                               unpacked to. 
+        """
+        if not os.path.exists(download_path):
+            raise IOError('Path '+download_path+' does not exist')
+        downloaded_file = self.geometry_cdb.get_gdml_for_run(long(run_num))
+        self.__write_zip_file(download_path, downloaded_file)
+
+
+    def __write_zip_file(self, path_to_file, output_string): #pylint: disable = R0201
+        """
+        Write string to file path_to_file+GEOMETRY_ZIPFILE in zip format
+        """
+        zip_file = os.path.join(path_to_file, GEOMETRY_ZIPFILE)
+        fout = open(zip_file, 'w')
+        fout.write(output_string)
+        fout.close()
             
     def get_ids(self, start_time, stop_time = None):
         """

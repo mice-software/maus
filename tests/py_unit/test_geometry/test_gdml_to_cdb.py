@@ -57,7 +57,6 @@ class  TestUploader(unittest.TestCase): #pylint: disable = C0103, R0904
         self.assertFalse(GDMLtocdb.is_filetype('bob.azip', ['zip']))
         self.assertFalse(GDMLtocdb.is_filetype('zip', ['zip']))
         self.assertTrue(GDMLtocdb.is_filetype('bob.zip', ['fred', 'zip']))
-        
 
     def test_constructor(self):
         """
@@ -208,7 +207,7 @@ class TestDownloader(unittest.TestCase): #pylint: disable = R0904
         except:
             pass #pylint: disable = W0702
         
-    def test_download_geometry_for_id(self):
+    def test_download_geometry_by_id(self):
         """
         TestDownloader::test_download_geomtry_for_id
         
@@ -217,14 +216,14 @@ class TestDownloader(unittest.TestCase): #pylint: disable = R0904
         """
         try:
             num = str(14)
-            self.test_downloader.download_geometry_for_id(num, 'Not a Path')
+            self.test_downloader.download_geometry_by_id(num, 'Not a Path')
             self.assertTrue(False, 'Should have raised an error')
         except:
             pass #pylint: disable = W0702
         try:
             num = int(14)
             maus = os.environ['MAUS_ROOT_DIR']
-            self.test_downloader.download_geometry_for_id(num, maus)
+            self.test_downloader.download_geometry_by_id(num, maus)
             self.assertTrue(False, 'Should have raised an error')
         except:
             pass #pylint: disable = W0702

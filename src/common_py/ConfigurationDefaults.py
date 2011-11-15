@@ -73,7 +73,7 @@ muon_half_life = -1. # set the mu+, mu- half life [ns]. Negative value means use
 production_threshold = 0.5 # set the threshold for delta ray production [mm]
 
 # geant4 visualisation (not event display)
-geant4_visualisation = True
+geant4_visualisation = False
 visualisation_viewer = "VRML2FILE"  # only supported option
 visualisation_theta = 90.
 visualisation_phi = 90.
@@ -188,28 +188,27 @@ SciFi_sigma_triplet = 0.3844 # mm
 SciFi_sigma_z = 0.081 # mm
 SciFi_sigma_duplet =  0.6197 # mm
 
-# geometry upload/download information
-#Upload
-# Arguments below MUST be included
-cdb_download_url = "http://cdb.mice.rl.ac.uk/cdb/"
-cdb_upload_url = "http://cdb.mice.rl.ac.uk/cdb/"
-cdb_download_geometry_dir = "geometry?wsdl"
-cdb_upload_geometry_dir = "geometrySuperMouse?wsdl"
-geometry_upload_directory   = "%s/files/geometry/upload" % os.environ.get("MAUS_ROOT_DIR")
-geometry_download_directory   = "%s/files/geometry/download" % os.environ.get("MAUS_ROOT_DIR")
-geometry_description = "<No note specifield>"
-# Optional Arguments 1 = yes, 0 = no
-geometry_zip_file         = 0
-geometry_delete_originals = 0
+# configuration database
+cdb_upload_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database uploads
+cdb_download_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database downloads
 
-#Download
-#Donwloading of geometries
-#Download Geometry for a specific ID
-#Name the start and stop time for which the geometry was valid. Stop time is optional
-geometry_start_time = None # note that this throws an exception !by default! - must be overridden
-geometry_stop_time  = None
-#Download Geometry for a specific Run Num
-geometry_run_number = 1
+# geometry download
+geometry_download_wsdl = "geometry?wsdl" # name of the web service used for downloads
+geometry_download_directory   = "%s/files/geometry/download" % os.environ.get("MAUS_ROOT_DIR") # name of the local directory where downloads will be placed
+geometry_download_by = 'run_number' # choose 'run_number' to download by run number, 'current' to use
+                                    # the currently valid geometry or 'id' to use the cdb internal id 
+                                    # (e.g. if it is desired to access an old version of a particular
+                                    # geometry)
+geometry_download_run_number = 0
+geometry_download_id = 0
+geometry_download_cleanup = True # set to True to clean up after download
+
+# geometry upload
+geometry_upload_wsdl = "geometrySuperMouse?wsdl" # name of the web service used for uploads
+geometry_upload_directory = "%s/files/geometry/upload" % os.environ.get("MAUS_ROOT_DIR") # name of the local directory where uploads are drawn from
+geometry_upload_note = "" # note, pushed to the server to describe the geometry. A note must be specified here (default will throw an exception).
+geometry_upload_valid_from = "" # date-time in format like: that the specified installation was made in the experiment. A date-time must be specified here (default will throw an exception).
+geometry_upload_cleanup = True # set to True to clean up after upload
 
 # this is used by ImputCppRealData
 Number_of_DAQ_Events = -1
@@ -253,8 +252,8 @@ Enable_timeWalk_correction = True
 Enable_triggerDelay_correction = True
 Enable_t0_correction = True
 
-daq_data_path = '%s/src/input/InputCppDAQData' % os.environ.get("MAUS_ROOT_DIR") # path to daq data
-daq_data_file = '02873.003' # file name for daq data
+daq_data_path = '%s/src/input/InputCppDAQData' % os.environ.get("MAUS_ROOT_DIR") # path to daq data. Multiple locations can be specified with a space
+daq_data_file = '02873.003' # file name for daq data; if this is just a integer string, MAUS assumes this is a run number. Multiple entries can be specified separated by a space
 
 maus_version = "" # set at runtime - do not edit this (changes are ignored)
 configuration_file = "" # should be set on the command line only (else ignored)
