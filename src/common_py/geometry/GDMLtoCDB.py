@@ -259,7 +259,7 @@ class Downloader: #pylint: disable = R0902
         self.__write_zip_file(download_path, downloaded_file)
 
 
-    def __write_zip_file(self, path_to_file, output_string): #pylint: disable = R0201
+    def __write_zip_file(self, path_to_file, output_string): #pylint: disable = R0201, C0301
         """
         Write string to file path_to_file+GEOMETRY_ZIPFILE in zip format
         """
