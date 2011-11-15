@@ -97,7 +97,7 @@ class TOFChannelKey {
   /** This function creates unique integer identifier.
   * \return Integer identifier.
   */
-  int make_TOFChannelKey_id() { return _station*1e8 + _plane*1e6 + _slab*1e3 + _pmt; }
+  //int make_TOFChannelKey_id() { return _station*1e8 + _plane*1e6 + _slab*1e3 + _pmt; }
 
  private:
 

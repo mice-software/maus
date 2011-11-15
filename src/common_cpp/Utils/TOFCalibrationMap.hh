@@ -77,7 +77,7 @@ class TOFPixelKey {
   /** This function creates unique integer identifier.
   * \return Integer identifier.
   */
-  int make_TOFPixelKey_id() {return _station*1e6 + _slabY*1e3 + _slabX;}
+  //int make_TOFPixelKey_id() {return _station*1e6 + _slabY*1e3 + _slabX;}
 
  private:
 
