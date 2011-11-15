@@ -11,11 +11,11 @@ class XMLLibsTestCase(unittest.TestCase): #pylint: disable = R0904
         """
         Check we can import libxml2
         """
-        import libxml2
+        import libxml2 # pylint: disable = W0404
 
     def libxslt_test(self):
         """
         Check we can import libxslt
         """
-        import libxslt
+        import libxslt # pylint: disable = W0404
 

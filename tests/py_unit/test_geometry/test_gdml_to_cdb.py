@@ -20,16 +20,16 @@ mock at run time so that we don't have any messy network calls in unit tests.
 
 import unittest
 import os
-import geometry.GDMLtoCDB as GDMLtocdb
+import geometry.GDMLtoCDB as GDMLtoCDB
 import test_cdb_mockup as test_cdb_mockup
-GDMLtocdb.cdb = test_cdb_mockup # use cdb mockup library
+GDMLtoCDB.cdb = test_cdb_mockup # use cdb mockup library
 
 class  TestUploader(unittest.TestCase): #pylint: disable = C0103, R0904
     """
     TestUploader
     
     This class tests the uploading class
-    (GDMLtocdb) of GDMLtoCDB.
+    (GDMLtoCDB) of GDMLtoCDB.
     """
 
     def setUp(self): #pylint: disable = C0103
@@ -45,18 +45,18 @@ class  TestUploader(unittest.TestCase): #pylint: disable = C0103, R0904
         self.testgeom = self.testcase+'testGeometry'
         self.testnote = 'This is the unit test'
         self.test_gdml_to_cdb = \
-                               GDMLtocdb.Uploader(self.testgeom, self.testnote)
+                               GDMLtoCDB.Uploader(self.testgeom, self.testnote)
         
     def test_is_filetype(self):
         """
         TestUploader::test_is_filetype
         """
-        self.assertTrue(GDMLtocdb.is_filetype('bob.zip', ['zip']))
-        self.assertFalse(GDMLtocdb.is_filetype('bobzip', ['zip']))
-        self.assertFalse(GDMLtocdb.is_filetype('bob.zipa', ['zip']))
-        self.assertFalse(GDMLtocdb.is_filetype('bob.azip', ['zip']))
-        self.assertFalse(GDMLtocdb.is_filetype('zip', ['zip']))
-        self.assertTrue(GDMLtocdb.is_filetype('bob.zip', ['fred', 'zip']))
+        self.assertTrue(GDMLtoCDB.is_filetype('bob.zip', ['zip']))
+        self.assertFalse(GDMLtoCDB.is_filetype('bobzip', ['zip']))
+        self.assertFalse(GDMLtoCDB.is_filetype('bob.zipa', ['zip']))
+        self.assertFalse(GDMLtoCDB.is_filetype('bob.azip', ['zip']))
+        self.assertFalse(GDMLtoCDB.is_filetype('zip', ['zip']))
+        self.assertTrue(GDMLtoCDB.is_filetype('bob.zip', ['fred', 'zip']))
 
     def test_constructor(self):
         """
@@ -69,19 +69,19 @@ class  TestUploader(unittest.TestCase): #pylint: disable = C0103, R0904
         try:
             err = 'this is not an int'
             self.constructor = \
-                          GDMLtocdb.Uploader(self.testgeom, self.testnote, err)
+                          GDMLtoCDB.Uploader(self.testgeom, self.testnote, err)
             self.assertTrue(False, 'Should have raised an error')
         except:
             pass #pylint: disable = W0702
         
         try:
-            self.constructor = GDMLtocdb.Uploader(self.testgeom, 2, 1)
+            self.constructor = GDMLtoCDB.Uploader(self.testgeom, 2, 1)
             self.assertTrue(False, 'Should have raised an error')
         except:
             pass #pylint: disable = W0702
                   
         try:
-            self.constructor = GDMLtocdb.Uploader(2, self.testnote, 1)
+            self.constructor = GDMLtoCDB.Uploader(2, self.testnote, 1)
             self.assertTrue(False, 'Should have raised an error')
         except:
             pass #pylint: disable = W0702
@@ -106,7 +106,7 @@ class  TestUploader(unittest.TestCase): #pylint: disable = C0103, R0904
         test_file_list = self.testcase+'/testGDMLtoCDB'
         try:
             self.constructor = \
-                            GDMLtocdb.Uploader(test_file_list, self.testnote, 1)
+                            GDMLtoCDB.Uploader(test_file_list, self.testnote, 1)
             self.assertTrue(False, 'should have raised an error')
         except:
             pass #pylint: disable = W0702
@@ -121,7 +121,7 @@ class  TestUploader(unittest.TestCase): #pylint: disable = C0103, R0904
         uploaded. In this case it is the test geometry.
         """
         test_create_file_list = self.testcase+'/testCreateFileList'
-        self.constructor = GDMLtocdb.Uploader(test_create_file_list, \
+        self.constructor = GDMLtoCDB.Uploader(test_create_file_list, \
                                                                   self.testnote)
         find_file = os.listdir(test_create_file_list)
         for fname in find_file:
@@ -149,8 +149,6 @@ class  TestUploader(unittest.TestCase): #pylint: disable = C0103, R0904
         
         path = self.testcase+'/testGeometry.zip'
         self.test_gdml_to_cdb.upload_to_cdb(path)
-        response = self.test_gdml_to_cdb.server_status
-        self.assertEqual(response, "some_text")
             
     def tearDown(self): #pylint: disable = C0103
         """
@@ -170,30 +168,21 @@ class TestDownloader(unittest.TestCase): #pylint: disable = R0904
     This class tests the Downloader class from
     GDMLtoCDB.py.
     """
-    def set_up(self):
+    def setUp(self): #pylint: disable = C0103
         """
         TestDownloader::set_up
         
         This method creates a Downloader object
         ready for testing.
         """
-        self.constructor = None
-        self.test_downloader = GDMLtocdb.Downloader(1) #pylint: disable = W0201
-        
-    def test_constructor(self):
-        """
-        TestDownloader::test_constructor
-        
-        This method test the constructor by passing
-        invalid arguments and seeing if errors are raised 
-        as they should be. 
-        """
+        self.test_downloader = GDMLtoCDB.Downloader()
+        self.maus_tmp = os.path.join(os.environ['MAUS_ROOT_DIR'], 'tmp')
+        self.geom = os.path.join(self.maus_tmp, GDMLtoCDB.GEOMETRY_ZIPFILE)
         try:
-            self.constructor = GDMLtocdb.Downloader('no int') #pylint: disable = W0201, C0301
-            self.assertTrue(False, 'Should have raised an error')
-        except:
-            pass #pylint: disable = W0702
-            
+            os.remove(self.geom)
+        except OSError:
+            pass # the file never existed probably
+        
     def test_download_current(self):
         """
         TestDownloader::test_download_current
@@ -201,12 +190,11 @@ class TestDownloader(unittest.TestCase): #pylint: disable = R0904
         This method checks to see if errors are raised 
         when false arguments are entered.
         """
-        try:
-            self.test_downloader.download_current('Not a Path')
-            self.assertTrue(False, 'Should have raised an error')
-        except:
-            pass #pylint: disable = W0702
-        
+        self.assertRaises(OSError, self.test_downloader.download_current, \
+                                                                   'Not a Path')
+        self.test_downloader.download_current(self.maus_tmp)
+        self.assertTrue(os.path.isfile(self.geom))
+ 
     def test_download_geometry_by_id(self):
         """
         TestDownloader::test_download_geomtry_for_id
@@ -214,19 +202,10 @@ class TestDownloader(unittest.TestCase): #pylint: disable = R0904
         This method checks to see if errors are raised 
         when false arguments are entered.
         """
-        try:
-            num = str(14)
-            self.test_downloader.download_geometry_by_id(num, 'Not a Path')
-            self.assertTrue(False, 'Should have raised an error')
-        except:
-            pass #pylint: disable = W0702
-        try:
-            num = int(14)
-            maus = os.environ['MAUS_ROOT_DIR']
-            self.test_downloader.download_geometry_by_id(num, maus)
-            self.assertTrue(False, 'Should have raised an error')
-        except:
-            pass #pylint: disable = W0702
+        self.assertRaises(OSError, \
+                 self.test_downloader.download_geometry_by_id, 14, 'Not a Path')
+        self.test_downloader.download_geometry_by_id(14, self.maus_tmp)
+        self.assertTrue(os.path.isfile(self.geom))
             
     def test_get_ids(self):
         """
@@ -236,7 +215,7 @@ class TestDownloader(unittest.TestCase): #pylint: disable = R0904
         on the testserver and checks that 
         the correct id num is returned.
         """
-        result = GDMLtocdb.Downloader().get_ids("2011-09-08 09:00:00", \
+        result = GDMLtoCDB.Downloader().get_ids("2011-09-08 09:00:00", \
                                          "2011-09-09 09:00:00")
         self.assertEqual(result, "3004")
             
@@ -247,20 +226,9 @@ class TestDownloader(unittest.TestCase): #pylint: disable = R0904
         This method checks to see if errors are raised 
         when false arguments are entered.
         """
-        try:
-            num = str(14)
-            self.test_downloader.download_beamline_for_run \
-                                        (num, 'Not a Path')
-            self.assertTrue(False, 'Should have raised an error')
-        except:
-            pass #pylint: disable = W0702
-        try:
-            num = int(14)
-            maus = os.environ['MAUS_ROOT_DIR']
-            self.test_downloader.download_beamline_for_run(num, maus)
-            self.assertTrue(False, 'Should have raised an error')
-        except:
-            pass #pylint: disable = W0702   
+        self.assertRaises(OSError, 
+              self.test_downloader.download_beamline_for_run, 14, 'Not a Path')
+        self.test_downloader.download_beamline_for_run(14, self.maus_tmp)
 
 if __name__ == '__main__':
     unittest.main()

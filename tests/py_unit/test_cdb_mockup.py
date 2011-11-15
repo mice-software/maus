@@ -26,6 +26,27 @@ class Beamline(): #pylint: disable = R0903
         if CDB_STATUS != None:
             raise CdbPermanentError("error") #pylint: disable = E0702
 
+    def get_beamline_for_run(self, run_number):
+        """Raise CDB_Status if CDB_STATUS is not None. Else return toy dict"""
+        if CDB_STATUS != None:
+            raise CDB_STATUS
+        return Beamline.bl_dict
+
+    def get_beamline_for_run_xml(self, run_number):
+        """Raise CDB_Status if CDB_STATUS is not None. Else return toy xml"""
+        if CDB_STATUS != None:
+            raise CDB_STATUS
+        return Beamline.bl_xml
+
+    bl_xml = """
+    <test>
+    <test1>bob</test1>
+    <test2>fred</test2>
+    </test>
+    """
+
+    bl_dict = {"test1":"bob", "test2":"fred"}
+
 class Geometry():
     """Mock up of config db geometry downloader"""
 

@@ -18,7 +18,6 @@ M. Littlefield
 
 import shutil
 import os
-import os.path
 from xml.dom import minidom
 
 SCHEMA_PATH = os.environ["MAUS_ROOT_DIR"]+\

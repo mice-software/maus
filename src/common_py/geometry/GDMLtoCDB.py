@@ -214,7 +214,7 @@ class Downloader: #pylint: disable = R0902
                                unpacked to. 
         """
         if os.path.exists(downloadpath) == False:
-            raise IOError('Path '+str(downloadpath)+' does not exist')
+            raise OSError('Path '+str(downloadpath)+' does not exist')
         else:
             downloadedfile = self.geometry_cdb.get_current_gdml()
             zip_path = os.path.join(downloadpath, GEOMETRY_ZIPFILE)
@@ -234,9 +234,7 @@ class Downloader: #pylint: disable = R0902
                                unpacked to. 
         """
         if not os.path.exists(download_path):
-            raise IOError('Path '+download_path+' does not exist')
-        elif type(id_num) != str:
-            raise IOError('ID number '+str(id_num)+' malformed')
+            raise OSError('Path '+download_path+' does not exist')
         else:
             downloaded_file = self.geometry_cdb.get_gdml_for_id(id_num)
             self.__write_zip_file(download_path, downloaded_file)
@@ -254,7 +252,7 @@ class Downloader: #pylint: disable = R0902
                                unpacked to. 
         """
         if not os.path.exists(download_path):
-            raise IOError('Path '+download_path+' does not exist')
+            raise OSError('Path '+download_path+' does not exist')
         downloaded_file = self.geometry_cdb.get_gdml_for_run(long(run_num))
         self.__write_zip_file(download_path, downloaded_file)
 
@@ -286,7 +284,7 @@ class Downloader: #pylint: disable = R0902
                            " valid from " + str(id_dict[id_number]['validFrom'])
         return str(id_number)
     
-    def download_beamline_for_run(self, run_id, downloadpath):
+    def download_beamline_for_run(self, run_id, downloadpath): #pylint: disable = R0201, C0301
         """
         @Method download geometry for run 
 
@@ -298,9 +296,7 @@ class Downloader: #pylint: disable = R0902
                                unpacked to.
         """
         if os.path.exists(downloadpath) == False:
-            raise IOError('Path does not exist!')
-        elif type(run_id) != int:
-            raise IOError('ID number not obtained')
+            raise OSError('Path '+downloadpath+' does not exist')
         else:        
             beamline_cdb = cdb.Beamline()
             downloadedfile = beamline_cdb.get_beamline_for_run_xml(run_id)
@@ -308,7 +304,4 @@ class Downloader: #pylint: disable = R0902
             fout = open(path, 'w')
             fout.write(downloadedfile)
             fout.close()
-            dfile = beamline_cdb.get_beamline_for_run(run_id)
-            self.times.append(str(dfile[1L]['startTime']))
-            self.times.append(str(dfile[1L]['endTime']))
 

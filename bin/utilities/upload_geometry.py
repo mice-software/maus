@@ -27,10 +27,15 @@ from geometry.GDMLPacker import Packer
 from geometry.GDMLtoCDB import Uploader
 from geometry.ConfigReader import Configreader
 
-def check_configuration():
-    if geometry_upload_note == "":
+def check_configuration(configuration):
+    """
+    Check that at least a geometry_upload_note has been defined and a 
+    geometry_upload_valid_from string has been specified. Does not check that 
+    the valid_from is of correct datetime format.
+    """
+    if configuration.geometry_upload_note == "":
         raise ValueError("geometry_upload_note must be specified")
-    if geometry_upload_valid_from == "":
+    if configuration.geometry_upload_valid_from == "":
         raise ValueError("geometry_upload_valid_from must be specified like"+\
                         datetime.datetime.now())
 
