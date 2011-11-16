@@ -59,7 +59,6 @@ class MapPyScalersDumpTestCase(unittest.TestCase): # pylint: disable = R0904
         result = self.mapper.process("{}")
         self.assertEqual(len(result), 2)
 
-
     @classmethod
     def tearDownClass(cls): #pylint: disable = C0103
         success = cls.mapper.death()
