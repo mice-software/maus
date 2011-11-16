@@ -66,11 +66,11 @@ class DAQChannelKey {
   int channel() const {return _channel;}
   int eqType() const {return _eqType;}
 
-  /**  This function creates unique integer identifier.
+  /*  This function creates unique integer identifier.
   * \return Integer identifier.
+  *
+  int make_DAQChannelKey_id() { return _ldcId*1e8 + _geo*1e6 + _channel*1e3 + _eqType; }
   */
-  //int make_DAQChannelKey_id() { return _ldcId*1e8 + _geo*1e6 + _channel*1e3 + _eqType; }
-
  private:
 
   /// Id number of the Local Data Concentrator (DAQ computer).
