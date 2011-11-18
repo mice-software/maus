@@ -36,9 +36,9 @@ bool MapCppSimulation::birth(std::string argJsonConfigDocument) {
     SetConfiguration(argJsonConfigDocument);
     return true;  // Sucessful completion
   // Normal session, no visualization
-  } catch(Squeal squee) {
+  } catch(Squeal& squee) {
     CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
-  } catch(std::exception exc) {
+  } catch(std::exception& exc) {
     CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
   }
   return false;
@@ -61,10 +61,10 @@ std::string MapCppSimulation::process(std::string document) {
     if (_doVis)
         MAUSGeant4Manager::GetInstance()->GetVisManager()->TearDownRun();
   }
-  catch(Squeal squee) {
+  catch(Squeal& squee) {
     spill = CppErrorHandler::getInstance()
                                        ->HandleSqueal(spill, squee, _classname);
-  } catch(std::exception exc) {
+  } catch(std::exception& exc) {
     spill = CppErrorHandler::getInstance()
                                          ->HandleStdExc(spill, exc, _classname);
   }
