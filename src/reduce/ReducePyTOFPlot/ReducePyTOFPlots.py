@@ -499,12 +499,12 @@ class ReducePyTOFPlots:
         @returns True
         """
         # Do cleanup specific to this class, none in this case.
-	self.canvas.Print("tof_times.png")
-	self.canvas_xy.Print("tof_sp2d.png")
-	self.canvas_slabxy.Print("tof_sp1d.png")
-	self.canvas_nsp.Print("tof_nsp.png")
-	self.canvas_pmthits.Print("tof_npmt.png")
-	self.canvas_hits.Print("tof_nrawhits.png")
+	self.canvas.Print("tof_times.eps")
+	self.canvas_xy.Print("tof_sp2d.eps")
+	self.canvas_slabxy.Print("tof_sp1d.eps")
+	self.canvas_nsp.Print("tof_nsp.eps")
+	self.canvas_pmthits.Print("tof_npmt.eps")
+	self.canvas_hits.Print("tof_nrawhits.eps")
         ROOT.gDirectory.GetList().Delete()
 
         return True
