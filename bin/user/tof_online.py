@@ -29,7 +29,7 @@ def run():
     # 0 = False, Interactive Mode
     # setting it to false will cause canvases to pop up on screen and 
     # will get refreshed every N spills set by the refresh_rate data card
-    data_cards_list.append("root_batch_mode='%d'\n" % 0)
+    data_cards_list.append("root_batch_mode='%d'\n" % 1)
     # refresh_rate = once in how many spills should canvases be updated
     data_cards_list.append("refresh_rate='%d'\n" % 1)
     data_cards = io.StringIO(unicode("".join(data_cards_list)))
