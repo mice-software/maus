@@ -69,7 +69,10 @@ public:
   VectorBase(const VectorBase<StdType, GslType>& original_instance);
   VectorBase(size_t i);
   VectorBase(size_t i, StdType  value);
-  VectorBase(const StdType* array_beginning, const StdType* array_end);
+  /** @brief Create an instance from an array of data. The size is the number
+   *         of elements in the array.
+   */
+  VectorBase(const StdType* data, const size_t size);
   VectorBase(const std::vector<StdType, std::allocator<StdType> >& std_vector);
   ~VectorBase();
   
@@ -85,9 +88,17 @@ public:
   StdType&       operator[](const size_t i);
   const StdType& operator[](const size_t i) const;
 
+  //*************************
+  // Size Functions
+  //*************************
+
   //return number of elements
   size_t size() const;
-  
+
+  //*************************
+  // Subvector Functions
+  //*************************
+
   /** @brief Create a vector that contains a subset of the elements. The subset
    *         begins with the element at index <code>begin_index</code> and
    *         extends to the element at index <code>end_index - 1</code>. Thus
@@ -137,10 +148,12 @@ public:
   //*************************
   // Befriending
   //*************************
-  friend VectorBase<double, gsl_vector> real(
-           const VectorBase<complex, gsl_vector_complex>& complex_vector);
-  friend VectorBase<double, gsl_vector> imag(
-           const VectorBase<complex, gsl_vector_complex>& complex_vector);
+
+  //These operations could be done using solely the public interface, but
+  //we want to use the optimised GSL matrix/vector, low-level functions.
+  friend const VectorBase<StdType, GslType> operator*(
+    const MatrixBase<StdType, GslType>& lhs,
+    const VectorBase<StdType, GslType>& rhs) const;
 
 protected:
   /** @brief delete the GSL vector member
@@ -149,7 +162,7 @@ protected:
 
   /** @brief copy data from an array and put it into the GSL vector member
    */
-  void build_vector(const StdType* data_start, const StdType* data_end);
+  void build_vector(const StdType* data, const size_t size);
 
   /** @brief create the GSL vector member of the given size
    */
@@ -234,30 +247,30 @@ VectorBase<double, gsl_vector> real(
 VectorBase<double, gsl_vector> imag(
   const VectorBase<complex, gsl_vector_complex>& complex_vector);
   
-
-} //namespace MAUS
   
 //*************************
 // Unitary Operators
 //*************************
-template <typename StdType> MAUS::Vector<StdType>  operator-(
-  const MAUS::Vector<StdType>& vector);
+template <typename StdType> Vector<StdType>  operator-(
+  const Vector<StdType>& vector);
 
 //*************************
 // Scalar Operators
 //*************************
-template <typename StdType> MAUS::Vector<StdType>  operator*(
-  const StdType&                value,
-  const MAUS::Vector<StdType>&  vector);
+template <typename StdType> Vector<StdType>  operator*(
+  const StdType&          value,
+  const Vector<StdType>&  vector);
 
 //*************************
 // Stream Operators
 //*************************
 template <typename StdType, typename GslType>
-std::ostream&  operator<<(std::ostream&                             out,
-                          const MAUS::VectorBase<StdType, GslType>& vector);
+std::ostream&  operator<<(std::ostream&                       out,
+                          const VectorBase<StdType, GslType>& vector);
 template <typename StdType, typename GslType>
 std::istream&  operator>>(std::istream&                       in,
-                          MAUS::VectorBase<StdType, GslType>& vector);
+                          VectorBase<StdType, GslType>&       vector);
+
+} //namespace MAUS
 
 #endif

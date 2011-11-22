@@ -81,16 +81,16 @@ template VectorBase<complex, gsl_vector_complex>::VectorBase(
   size_t size, complex  value);
   
 template <typename StdType, typename GslType>
-VectorBase<StdType, GslType>::VectorBase(const StdType* array_beginning,
-                                         const StdType* array_end)
+VectorBase<StdType, GslType>::VectorBase(const StdType* data,
+                                         const size_t size)
 {
   this->vector_ = NULL;
-  build_vector(array_beginning, array_end);
+  build_vector(data, size);
 }
 template VectorBase<double, gsl_vector>::VectorBase(
-  const double* array_beginning, const double* array_end);
+  const double* data, const size_t size);
 template VectorBase<complex, gsl_vector_complex>::VectorBase(
-  const complex* array_beginning, const complex* array_end);
+  const complex* data, const size_t size);
 
 template <typename StdType, typename GslType>
 VectorBase<StdType, GslType>::VectorBase(
@@ -658,6 +658,8 @@ void VectorBase<double, gsl_vector>::delete_vector()
   {
     gsl_vector_free(vector_);
   }
+  
+  vector_ = NULL;
 }
 
 template <>
@@ -667,6 +669,8 @@ void VectorBase<complex, gsl_vector_complex>::delete_vector()
   {
     gsl_vector_complex_free(vector_);
   }
+  
+  vector_ = NULL;
 }
 
 template <>
@@ -685,12 +689,12 @@ void VectorBase<complex, gsl_vector_complex>::build_vector(size_t size)
 
 template <typename StdType, typename GslType>
 void VectorBase<StdType, GslType>::build_vector(
-  const StdType* data_begin, const StdType* data_end)
+  const StdType* data, const size_t size)
 {
-  VectorBase<StdType, GslType>::build_vector(data_end - data_begin);
+  build_vector(size);
   for(size_t i=0; i<this->size(); ++i)
   {
-    (*this)[i] = data_begin[i];
+    (*this)[i] = data[i];
   }
 }
 template void VectorBase<double, gsl_vector>::build_vector(
@@ -703,10 +707,10 @@ template void VectorBase<complex, gsl_vector_complex>::build_vector(
 //############################
 
 template class VectorBase<double, gsl_vector>;
-template class VectorBase<MAUS::complex, gsl_vector_complex>;
+template class VectorBase<complex, gsl_vector_complex>;
 
 template class Vector<double>;
-template class Vector<MAUS::complex>;
+template class Vector<complex>;
 
 //############################
 // Free Functions
@@ -726,8 +730,7 @@ VectorBase<double, gsl_vector> real(
     double_vector = VectorBase<double, gsl_vector>(complex_vector.size());
     for(size_t i=1; i<=complex_vector.size(); ++i)
     {
-      *gsl_vector_ptr(double_vector.vector_, i)
-      = MAUS::Complex::real(*gsl_vector_complex_ptr(complex_vector.vector_, i));
+      double_vector(i) = real(complex_vector(i));
     }
   }
   return double_vector;
@@ -743,14 +746,11 @@ VectorBase<double, gsl_vector> imag(
     double_vector = VectorBase<double, gsl_vector>(complex_vector.size());
     for(size_t i=1; i<=complex_vector.size(); ++i)
     {
-      *gsl_vector_ptr(double_vector.vector_, i)
-      = MAUS::Complex::imag(*gsl_vector_complex_ptr(complex_vector.vector_, i));
+      double_vector(i) = imag(complex_vector(i));
     }
   }
   return double_vector;
 }
-
-} //namespace MAUS
 
 //############################
 // Global Operators
@@ -761,7 +761,7 @@ VectorBase<double, gsl_vector> imag(
 //*************************
 
 template <typename StdType>
-MAUS::Vector<StdType> operator-(const MAUS::Vector<StdType>& operand)
+Vector<StdType> operator-(const Vector<StdType>& operand)
 {
   size_t size = operand.size();
   Vector<StdType> vector(operand);
@@ -772,26 +772,26 @@ MAUS::Vector<StdType> operator-(const MAUS::Vector<StdType>& operand)
 
   return vector;
 }
-template MAUS::Vector<double> operator-(const MAUS::Vector<double>& operand);
-template MAUS::Vector<complex> operator-(const MAUS::Vector<complex>& operand);
+template Vector<double> operator-(const Vector<double>& operand);
+template Vector<complex> operator-(const Vector<complex>& operand);
 
 //*************************
 // Scalar Operators
 //*************************
 
 template <typename StdType>
-MAUS::Vector<StdType> operator*(const StdType&                scalar,
-                                const MAUS::Vector<StdType>&  vector) 
+Vector<StdType> operator*(const StdType&                scalar,
+                                const Vector<StdType>&  vector) 
 {
   return vector.operator*(scalar);
 }
-template MAUS::Vector<double> operator*(
-  const double&               scalar,
-  const MAUS::Vector<double>& vector);
+template Vector<double> operator*(
+  const double&         scalar,
+  const Vector<double>& vector);
 template
-MAUS::Vector<complex> operator*(
-  const complex&                scalar,
-  const MAUS::Vector<complex>&  vector);
+Vector<complex> operator*(
+  const complex&          scalar,
+  const Vector<complex>&  vector);
 
 //*************************
 // Stream Operators
@@ -799,8 +799,8 @@ MAUS::Vector<complex> operator*(
 
 template <typename StdType, typename GslType>
 std::ostream& operator<<(
-  std::ostream&                                               out,
-  const MAUS::VectorBase<StdType, GslType>&                   vector)
+  std::ostream&                                         out,
+  const VectorBase<StdType, GslType>&                   vector)
 {
   size_t vector_size = vector.size();
   out << vector_size << " : ";
@@ -811,19 +811,19 @@ std::ostream& operator<<(
   return out;
 }
 template std::ostream& operator<<(
-  std::ostream&                                               out,
-  const MAUS::VectorBase<double, gsl_vector>&                 vector);
+  std::ostream&                                         out,
+  const VectorBase<double, gsl_vector>&                 vector);
 template std::ostream& operator<<(
-  std::ostream&                                               out,
-  const MAUS::VectorBase<MAUS::complex, gsl_vector_complex>&  vector);
+  std::ostream&                                         out,
+  const VectorBase<complex, gsl_vector_complex>&        vector);
 
 template <typename StdType, typename GslType>
-std::istream& operator>>(std::istream&                        in,
-                         MAUS::VectorBase<StdType, GslType>&  vector)
+std::istream& operator>>(std::istream&                  in,
+                         VectorBase<StdType, GslType>&  vector)
 {
   size_t n;
   in >> n;
-  vector = MAUS::VectorBase<StdType, GslType>(n);
+  vector = VectorBase<StdType, GslType>(n);
   
   char dummy;
   in >> dummy;
@@ -832,8 +832,10 @@ std::istream& operator>>(std::istream&                        in,
   return in;
 }
 template std::istream& operator>>(
-  std::istream&                                               in,
-  MAUS::VectorBase<double, gsl_vector>&                       vector);
+  std::istream&                                         in,
+  VectorBase<double, gsl_vector>&                       vector);
 template std::istream& operator>>(
-  std::istream&                                               in,
-  MAUS::VectorBase<MAUS::complex, gsl_vector_complex>&        vector);
+  std::istream&                                         in,
+  VectorBase<complex, gsl_vector_complex>&              vector);
+
+} //namespace MAUS
