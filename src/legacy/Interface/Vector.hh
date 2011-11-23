@@ -49,10 +49,16 @@ namespace std
 namespace MAUS
 {
 
-//forward declaration because VectorBase needs to see Matrix for T() method
-//(and others)
-template <typename GslType>
-class Matrix;
+//*************************
+// Forward Declarations
+//*************************
+template <typename StdType, typename GslType> class MatrixBase;
+template <typename StdType> class Matrix;
+template <typename StdType, typename GslType> class VectorBase;
+template <typename StdType, typename GslType>
+VectorBase<StdType, GslType> operator*(
+  const MatrixBase<StdType, GslType>& lhs,
+  const VectorBase<StdType, GslType>& rhs);
 
 /** @class VectorBase A templated wrapper for GSL's C vector types and functions.
  *                   Currently only gsl_vector and gsl_vector_complex are
@@ -67,8 +73,8 @@ public:
   //*************************
   VectorBase();
   VectorBase(const VectorBase<StdType, GslType>& original_instance);
-  VectorBase(size_t i);
-  VectorBase(size_t i, StdType  value);
+  VectorBase(const size_t i);
+  VectorBase(const size_t i, const StdType  value);
   /** @brief Create an instance from an array of data. The size is the number
    *         of elements in the array.
    */
@@ -151,9 +157,9 @@ public:
 
   //These operations could be done using solely the public interface, but
   //we want to use the optimised GSL matrix/vector, low-level functions.
-  friend const VectorBase<StdType, GslType> operator*(
+  friend VectorBase<StdType, GslType> MAUS::operator*<> (
     const MatrixBase<StdType, GslType>& lhs,
-    const VectorBase<StdType, GslType>& rhs) const;
+    const VectorBase<StdType, GslType>& rhs);
 
 protected:
   /** @brief delete the GSL vector member
@@ -166,7 +172,7 @@ protected:
 
   /** @brief create the GSL vector member of the given size
    */
-  void build_vector(size_t size);
+  void build_vector(const size_t size);
 
   GslType * vector_;
 };
@@ -181,7 +187,8 @@ template <>
 VectorBase<double, gsl_vector>& VectorBase<double, gsl_vector>::operator=(
   const VectorBase<double, gsl_vector>& rhs);
 template <>
-VectorBase<complex, gsl_vector_complex>& VectorBase<complex, gsl_vector_complex>::operator=(
+VectorBase<complex, gsl_vector_complex>&
+VectorBase<complex, gsl_vector_complex>::operator=(
   const VectorBase<complex, gsl_vector_complex>& rhs);
 template <> void VectorBase<double, gsl_vector>::delete_vector();
 template <> void VectorBase<complex, gsl_vector_complex>::delete_vector();
@@ -208,12 +215,10 @@ public:
   Vector(size_t i, double  value)
     : VectorBase<double, gsl_vector>(i, value) { }
   Vector(size_t i) : VectorBase<double, gsl_vector>(i) { }
-  Vector(const double* array_beginning, const double* array_end)
-    : VectorBase<double, gsl_vector>(array_beginning, array_end) { }
+  Vector(const double* data, const size_t size)
+    : VectorBase<double, gsl_vector>(data, size) { }
   Vector(const std::vector<double, std::allocator<double> >& std_vector)
     : VectorBase<double, gsl_vector>(std_vector) { }
-
-  //Because of slicing, we need deep copies of the base classes
 };
 
 template<>
@@ -231,8 +236,8 @@ public:
   Vector(size_t i, complex  value)
     : VectorBase<complex, gsl_vector_complex>(i, value) { }
   Vector(size_t i) : VectorBase<complex, gsl_vector_complex>(i) { }
-  Vector(const complex* array_beginning, const complex* array_end)
-    : VectorBase<complex, gsl_vector_complex>(array_beginning, array_end) { }
+  Vector(const complex* data, const size_t size)
+    : VectorBase<complex, gsl_vector_complex>(data, size) { }
   Vector(const std::vector<complex, std::allocator<complex> >& std_vector)
     : VectorBase<complex, gsl_vector_complex>(std_vector) { }
 };

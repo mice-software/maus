@@ -59,15 +59,16 @@ template VectorBase<complex, gsl_vector_complex>::VectorBase(
   const VectorBase<complex, gsl_vector_complex>& original_instance);
 
 template <typename StdType, typename GslType>
-VectorBase<StdType, GslType>::VectorBase(size_t i) : vector_(NULL)
+VectorBase<StdType, GslType>::VectorBase(const size_t i) : vector_(NULL)
 { 
   build_vector(i); 
 }
-template VectorBase<double, gsl_vector>::VectorBase(size_t i);
-template VectorBase<complex, gsl_vector_complex>::VectorBase(size_t i);
+template VectorBase<double, gsl_vector>::VectorBase(const size_t i);
+template VectorBase<complex, gsl_vector_complex>::VectorBase(const size_t i);
   
 template <typename StdType, typename GslType>
-VectorBase<StdType, GslType>::VectorBase(size_t size, StdType  value)
+VectorBase<StdType, GslType>::VectorBase(
+  const size_t size, const StdType  value)
 {
   this->vector_ = NULL;
   VectorBase<StdType, GslType>::build_vector(size);
@@ -76,9 +77,10 @@ VectorBase<StdType, GslType>::VectorBase(size_t size, StdType  value)
     (*this)[i] = value;
   }
 }
-template VectorBase<double, gsl_vector>::VectorBase(size_t size, double  value);
+template VectorBase<double, gsl_vector>::VectorBase(
+  const size_t size, const double  value);
 template VectorBase<complex, gsl_vector_complex>::VectorBase(
-  size_t size, complex  value);
+  const size_t size, const complex  value);
   
 template <typename StdType, typename GslType>
 VectorBase<StdType, GslType>::VectorBase(const StdType* data,
@@ -674,14 +676,14 @@ void VectorBase<complex, gsl_vector_complex>::delete_vector()
 }
 
 template <>
-void VectorBase<double, gsl_vector>::build_vector(size_t size)
+void VectorBase<double, gsl_vector>::build_vector(const size_t size)
 {
   delete_vector();
   vector_ = gsl_vector_alloc(size);
 }
 
 template <>
-void VectorBase<complex, gsl_vector_complex>::build_vector(size_t size)
+void VectorBase<complex, gsl_vector_complex>::build_vector(const size_t size)
 {
   delete_vector();
   vector_ = gsl_vector_complex_alloc(size);
