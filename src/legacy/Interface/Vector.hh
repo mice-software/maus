@@ -157,9 +157,10 @@ public:
 
   //These operations could be done using solely the public interface, but
   //we want to use the optimised GSL matrix/vector, low-level functions.
-  friend VectorBase<StdType, GslType> MAUS::operator*<> (
-    const MatrixBase<StdType, GslType>& lhs,
-    const VectorBase<StdType, GslType>& rhs);
+  template <typename StdType, typename GslMatrixType, typename GslVectorType>
+  friend VectorBase<StdType, GslVectorType> MAUS::operator*<>(
+    const MatrixBase<StdType, GslMatrixType>& lhs,
+    const VectorBase<StdType, GslVectorType>& rhs);
 
 protected:
   /** @brief delete the GSL vector member
