@@ -262,6 +262,8 @@ class Go:  #  pylint: disable=R0921
                     del transform_results[spill_id]
                     print " Spill %d task %s FAILED " \
                         % (spill_id, result.task_id)
+                    print "Exception in worker: %s " % result.result
+                    print "Traceback in worker: %s " % result.traceback
                 else:
                     continue
         print("TRANSFORM: transform jobs completed.")
