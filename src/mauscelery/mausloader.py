@@ -19,11 +19,55 @@ to workers are initialised with MAUS configuration.
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
+import traceback
 
 from celery import registry
 from celery.loaders.default import Loader
 
 from Configuration import Configuration
+
+class TaskBirthException(Exception):
+    """ Exception raised if a MAUS task birth call failed. """
+
+    def __init__(self, task, cause = None):
+        """
+        Constructor. Overrides Exception.__init__.
+        @param self Object reference.
+        @param task Name of task that failed to be birthed.
+        @param cause Optional causal exception.
+        """
+        Exception.__init__(self)
+        self.__cause = cause
+        self.__task = task
+
+    def __str__(self):
+        """
+        Return string representation. Overrides Exception.__str__.
+        @param self Object reference.
+        @return string.
+        """
+        if (self.__cause == None):
+            return "%s.birth returned False" % self.__task
+        else:
+            return "%s birth failed due to: %s" % (self.__task, self.__cause)
+           
+    @property
+    def cause(self):
+        """
+        Getter for exception cause.
+        @param self Object reference.
+        @return cause or None.
+        """
+        return self.__cause
+
+    @property
+    def task(self):
+        """ 
+        Getter for task name.
+        @param self Object reference.
+        @return task name.
+        """
+        return self.__task
 
 class CeleryLoader(Loader):
     """
@@ -32,17 +76,9 @@ class CeleryLoader(Loader):
     to workers are initialised with MAUS configuration.
     """
 
-    def __init__(self, app, **kwargs):
-        """
-        Prints a message then invokes superclass constructor.
-        @param self Object reference.
-        """
-        print "---->MAUSCeleryLoader.__init"
-        Loader.__init__(self, app, **kwargs)
-        print "<----MAUSCeleryLoader.__init"
-
     def on_worker_init(self):
         """
+        Method called when the worker starts.
         Invokes super-class method, loads default MAUS configuration,
         loads additional configuration if a Celery configuration file
         MAUS_CONFIG_FILE property is provided. birth is then invoked
@@ -50,8 +86,6 @@ class CeleryLoader(Loader):
         configuration passed to them.
         @param self Object reference.
         """
-        print "---->MAUSCeleryLoader.__on_worker_init"
-
         # Load modules specified in CELERY_IMPORTS list.
         Loader.on_worker_init(self)
 
@@ -71,13 +105,22 @@ class CeleryLoader(Loader):
             config_file = None
         # Load the MAUS configuration.
         config_doc = config.getConfigJSON(config_file)
-        # Initialise the MAUS tasks.
-        print "MAUSCeleryLoader Initialising MAUS tasks"
+        # Initialise and birth MAUS tasks.
         for celery_task_name in registry.tasks:
             celery_task = registry.tasks[celery_task_name]
+            was_birthed = False
             if hasattr(celery_task, "birth"):
-                print "MAUSCeleryLoader MAUS task: %s. Invoking birth()" \
-                    % celery_task_name
-                celery_task.birth(config_doc)
-        print "MAUSCeleryLoader MAUS tasks initialised"
-        print "<----MAUSCeleryLoader.__on_worker_init"
+                try: 
+                    was_birthed = celery_task.birth(config_doc)
+                except Exception, birth_exception: 
+                    # Print then raise new exception.
+                    exc_info = sys.exc_info()
+                    traceback.print_exception(exc_info[0],
+                                              exc_info[1],
+                                              exc_info[2],
+                                              None, 
+                                              sys.__stderr__)
+                    raise TaskBirthException(celery_task_name, 
+                                             birth_exception)
+                if not was_birthed:
+                    raise TaskBirthException(celery_task_name)
