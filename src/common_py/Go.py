@@ -64,6 +64,20 @@ def buffer_input(the_emitter, number_spills):
 
     return my_buffer
 
+class MapReduceDataStoreArray:
+    
+    def __init__(self):
+        self.__data_store = None
+
+    def add(self, id, doc):
+        self.__data_store[id] = doc
+
+    def delete(self, id):
+        self.__data_store.pop(id)
+    
+    def entries(self):
+        return a.keys()
+
 class Go:  #  pylint: disable=R0921
     """
     @class Go
@@ -213,6 +227,18 @@ class Go:  #  pylint: disable=R0921
         Celery, the results then being driven through a merge and
         output.
         """
+   
+        import couchdb
+        from couchdb import ResourceNotFound
+        couchdb_server = couchdb.Server()
+        try:
+            couchdb_server.delete("mausdb")
+            print "mausdb deleted!"
+        except ResourceNotFound:
+            print "mausdb not found!"
+        couchdb_server.create("mausdb")
+        print "mausdb created!"
+        mausdb = couchdb_server["mausdb"]
 
         from celery.task.control import inspect
 
@@ -255,9 +281,11 @@ class Go:  #  pylint: disable=R0921
                 if result.successful():
                     del transform_results[spill_id]
                     print " Spill %d task %s OK " % (spill_id, result.task_id)
-                     # Index results by spill_id so can present
-                     # results to merge-output in same order.
-                    spills[spill_id] = result.result
+                    # Index results by spill_id so can present
+                    # results to merge-output in same order.
+                    spill = result.result
+                    spills[spill_id] = spill
+                    mausdb.save({'_id':str(spill_id), 'spill':spill})
                 elif result.failed():
                     del transform_results[spill_id]
                     print " Spill %d task %s FAILED " \
@@ -277,19 +305,35 @@ class Go:  #  pylint: disable=R0921
         print("MULTI PROCESS mode: MERGE, OUTPUT, then next spill.")
 
         i = 0
-        for spill_id in spills.keys():
-            spill = spills.pop(spill_id)
-            print "  Executing Merge->Output for spill %d\n" % spill_id,
-            spill = self.merger.process(spill)
-            self.outputer.save(spill)
+        for id in mausdb:
+            print id
+            spill_doc = mausdb.get(id)
+            spill_id = spill_doc['_id']
+            spill = spill_doc['spill']
+            print "  Executing Merge->Output for spill %s\n" % spill_id,
+            nuspill = self.merger.process(spill)
+            self.outputer.save(nuspill)
+            mausdb.delete(spill_doc)
             i += 1
-            print("  %d spills left in buffer." % (len(spills)))
+       
+#        for spill_id in spills.keys():
+#            spill = spills.pop(spill_id)
+#            print "  Executing Merge->Output for spill %d\n" % spill_id,
+#            spill = self.merger.process(spill)
+#            self.outputer.save(spill)
+#            i += 1
+#            print("  %d spills left in buffer." % (len(spills)))
 
         print("MERGE: Shutting down merger")
         assert(self.merger.death() == True)
 
         print("OUTPUT: Shutting down outputer")
         assert(self.outputer.death() == True)
+
+        print "Remaining spills in mausdb..."
+        for id in mausdb:
+            print id
+        print "...!"
 
     def many_local_threads(self):
         """
