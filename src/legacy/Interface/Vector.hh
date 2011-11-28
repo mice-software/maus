@@ -55,10 +55,10 @@ namespace MAUS
 template <typename StdType, typename GslType> class MatrixBase;
 template <typename StdType> class Matrix;
 template <typename StdType, typename GslType> class VectorBase;
-template <typename StdType, typename GslType>
-VectorBase<StdType, GslType> operator*(
-  const MatrixBase<StdType, GslType>& lhs,
-  const VectorBase<StdType, GslType>& rhs);
+template <typename StdType> class Vector;
+template <typename StdType> Vector<StdType> operator*(
+  const Matrix<StdType>& lhs,
+  const Vector<StdType>& rhs);
 
 /** @class VectorBase A templated wrapper for GSL's C vector types and functions.
  *                   Currently only gsl_vector and gsl_vector_complex are
@@ -150,17 +150,16 @@ public:
   //*************************
   const bool operator==(const VectorBase<StdType, GslType>& rhs) const;
   const bool operator!=(const VectorBase<StdType, GslType>& rhs) const;
-  
+
   //*************************
   // Befriending
   //*************************
 
   //These operations could be done using solely the public interface, but
   //we want to use the optimised GSL matrix/vector, low-level functions.
-  template <typename StdType, typename GslMatrixType, typename GslVectorType>
-  friend VectorBase<StdType, GslVectorType> MAUS::operator*<>(
-    const MatrixBase<StdType, GslMatrixType>& lhs,
-    const VectorBase<StdType, GslVectorType>& rhs);
+  friend typename MAUS::Vector<StdType> MAUS::operator*<>(
+    const MAUS::Matrix<StdType>& lhs,
+    const MAUS::Vector<StdType>& rhs);
 
 protected:
   /** @brief delete the GSL vector member
