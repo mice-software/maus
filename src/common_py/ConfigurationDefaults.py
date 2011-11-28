@@ -212,16 +212,23 @@ geometry_upload_cleanup = True # set to True to clean up after upload
 
 # this is used by ImputCppRealData
 Number_of_DAQ_Events = -1
+Phys_Events_Only = False
+Calib_Events_Only = False
 Enable_V1290_Unpacking = True
 Enable_V1731_Unpacking = True
 Enable_V1724_Unpacking = True
 Enable_V830_Unpacking = True
 Enable_VLSB_Unpacking = True
+Enable_VLSB_C_Unpacking = True
 Enable_DBB_Unpacking = True
 Do_V1731_Zero_Suppression = False
 V1731_Zero_Suppression_Threshold = 100
 Do_V1724_Zero_Suppression = True
 V1724_Zero_Suppression_Threshold = 100
+Do_VLSB_Zero_Suppression = False
+VLSB_Zero_Suppression_Threshold = 0
+Do_VLSB_C_Zero_Suppression = False
+VLSB_C_Zero_Suppression_Threshold = 0
 Enable_TOF = True
 Enable_EMR = True
 Enable_KL = True

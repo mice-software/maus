@@ -18,6 +18,7 @@
 #ifndef _MAUS_SRC_INPUT_INPUTCPPDAQDATA_INPUTCPPDAQDATA_H__
 #define _MAUS_SRC_INPUT_INPUTCPPDAQDATA_INPUTCPPDAQDATA_H__
 
+
 #include <string>
 #include <iostream>
 
@@ -28,6 +29,8 @@
 #include "unpacking/MDevent.h"
 #include "unpacking/MDfileManager.h"
 #include "unpacking/MDprocessManager.h"
+#include "unpacking/MDequipMap.h"
+#include "unpacking/MDfragment.h"
 
 #include "src/input/InputCppDAQData/UnpackEventLib.hh"
 #include "Utils/DAQChannelMap.hh"
@@ -75,39 +78,19 @@ class InputCppDAQData {
 
   /** Unpack the current event into JSON.
   *
-  * This unpacks the current event into _next_event and returns true on success.
+  * This unpacks the current event into a JSON document.
   * Don't call this until readNextEvent() has been called and returned true at
   * least once!
   *
-  * \return Bool indicating that the get was successful.
+  * \return JSON document containing the unpacked DAQ data.
   */
-  bool getCurEvent();
-
-  /** Read the next event from the buffer and put it into _next_event
-   *
-   *  \return string containing the next event; or "" if unsuccessful
-   */
-  std::string getNextEvent();
-
-  /** Return the spill number for some daq event
-  */
-  int getSpillNumber(Json::Value daq_event);
-
-  /** Get a string containing the information for the next spill
-  *
-  * Unpacks all daq events in the spill and puts them into a json array. Writes
-  * to string.
-  *
-  * \return string representing a json array containing daq data for all events
-  *         in the spill
-  */
-  std::string getNextSpill();
+  std::string getCurEvent();
 
   /** Disable one equipment type.
   * This disables the unpacking of the data produced by all equipment
-	* with the specified type.
-	*/
-	void disableEquipment(std::string pEquipType) {
+  * with the specified type.
+  */
+  void disableEquipment(std::string pEquipType) {
     _dataProcessManager.Disable(pEquipType);
   }
 
@@ -139,7 +122,21 @@ class InputCppDAQData {
 
  private:
 
-  /** Process manager object. */
+ /** Initialise the processor.
+  * 
+  * 
+  */
+  template <class procType>
+  bool initProcessor(procType* &processor, Json::Value configJSON);
+
+ /** Configure the zero supression filter.
+  */
+  void configureZeroSupression(ZeroSupressionFilter* processor, Json::Value configJSON);
+
+  std::string _classname;
+
+ /** Process manager object.
+  */
   MDprocessManager _dataProcessManager;
 
   /** File manager object. */
@@ -164,7 +161,12 @@ class InputCppDAQData {
   /** Processor for VLSB data. */
   VLSBDataProcessor* _vLSBFragmentProc;
 
-  /** Processor for DBB data. */
+ /** Processor for VLSB data from the cosmic test in Lab7.
+  */
+  VLSB_CDataProcessor* _vLSB_cFragmentProc;
+
+ /** Processor for DBB data.
+  */
   DBBDataProcessor* _DBBFragmentProc;
 
   /** Pointer to the start of the current event. */
@@ -181,7 +183,24 @@ class InputCppDAQData {
   */
   std::string _datafiles;
 
-  /** Enum of event types */
+ /** Max number of DAQ events to be processed.
+  */ 
+  int _maxNumEvents;
+
+ /** Counter of the DAQ events.
+  */
+  int _eventsCount;
+
+ /** If this is true only the phys. evens will be processed.
+  */
+  bool _phys_Events_Only;
+
+   /** If this is true only the calib. evens will be processed.
+  */
+  bool _calib_Events_Only;
+
+ /** Enum of event types
+  */
   enum {
     VmeTdc = 102,
     VmefAdc1724 = 120,
@@ -196,8 +215,6 @@ class InputCppDAQData {
   * \return The type of the event as string.
   */
   std::string event_type_to_str(int pType);
-
-  Json::Value _next_event;
 };
 
 #endif  // _MAUS_INPUTCPPDAQDATA_INPUTCPPDAQDATA_H__
