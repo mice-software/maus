@@ -18,6 +18,7 @@ M. Littlefield
 
 import os
 import unittest
+import glob
 from geometry.GDMLPacker import Packer
 from geometry.GDMLPacker import Unpacker
 
@@ -53,6 +54,17 @@ class  TestPacker(unittest.TestCase): #pylint: disable = R0904
         fin.write(self.testgeom_dir+'/fastradModel.gdml \n')
         fin.close()
         self.gdml_test_case = Packer(testcase)
+
+
+    def tearDown(self): #pylint: disable = C0103
+        """
+        TestPacker::tearDown
+        
+        This method cleans up any new files.
+        """
+        os.remove(self.testpacker_dir+'/FileList.txt')
+        for filename in glob.glob(self.testpacker_dir+'/*.zip'):
+            os.remove(filename)
     
     def test_constructor(self):
         """
