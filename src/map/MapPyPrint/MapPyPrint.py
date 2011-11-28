@@ -29,18 +29,18 @@ class MapPyPrint:
         self._indent = 4
         return True
 
-    def process(self, x):
+    def process(self, spill):
         try:
-            x_dict = json.loads(x)
+            spill_dict = json.loads(spill)
             print "MapPyPrint output:"
-            print json.dumps(x_dict, sort_keys=self._sortKeys, indent=self._indent)  #  print spill
+            print json.dumps(spill_dict, sort_keys=self._sortKeys, indent=self._indent)  #  print spill
         except:
             y = {}
             y["errors"] = {}
             y["errors"]["bad_json_document"] = "MapPyPrint couldn't parse the input"
             print y
             return json.dumps(y)
-        return x
+        return spill
 
 
     def death(self):

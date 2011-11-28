@@ -1,0 +1,22 @@
+<?xml version="1.0" ?><gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:Something">
+<MICE_Information>
+    <Configuration_information>
+	<run daqGateWidth="0" daqTrigger="0" daqVersion="0" endTime="endTime0" isisBeamPositionX="isisBeamPositionX0" isisBeamPositionY="isisBeamPositionY0" 		isisNominalBeamCurrent="0" isisNominalBeamLoss="0" isisRepRate="0" isisTargetFrequency="0" notes="notes0" optics="optics0" 				protonAbsorberThickness="protonAbsorberThickness0" pulseEnd="0" pulseStart="0" runNumber="0" runType="runType0" startTime="startTime0" status="false" step="0" 	targetDelay="0" targetDepth="0" targetDriveVoltage="0">
+            <magnet name="name0" polarity="polarity0" setCurrent="0"/>
+        </run>
+    </Configuration_information>
+    <G4Field_Information>
+        <G4Magnet_info File_Location="/home/QCFieldMap.txt" Name="Quad 1 to 3" Type="QC"/>
+        <G4Magnet_info File_Location="/home/Dipole.txt" Name="D1" Type="Dipole"/>
+        <G4Magnet_info File_Location="/home/IVFieldMap.txt" Name="Quad 4 to 6" Type="IV"/>
+        <G4Magnet_info File_Location="/home/Dipole.txt" Name="D2" Type="Dipole"/>
+        <G4Magnet_info File_Location="/home/DS.txt" Name="Decay Solenoid" Type="DS"/>    
+    </G4Field_Information>
+    <Detector_Information>
+        <TOF/>
+        <KL/>
+        <Cherenkov/>
+        <Tracker Tracker="One"/>
+    </Detector_Information>
+</MICE_Information>
+</gdml>
