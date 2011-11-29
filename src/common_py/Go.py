@@ -64,20 +64,6 @@ def buffer_input(the_emitter, number_spills):
 
     return my_buffer
 
-class MapReduceDataStoreArray:
-    
-    def __init__(self):
-        self.__data_store = None
-
-    def add(self, id, doc):
-        self.__data_store[id] = doc
-
-    def delete(self, id):
-        self.__data_store.pop(id)
-    
-    def entries(self):
-        return a.keys()
-
 class Go:  #  pylint: disable=R0921
     """
     @class Go
@@ -218,6 +204,64 @@ class Go:  #  pylint: disable=R0921
         print("OUTPUT: Shutting down outputer")
         assert(self.outputer.death() == True)
 
+    def setup_data_store_proxy(self):
+        """
+        Set up data store for multi-process execution. The data store
+        is configured via the following parameters in the JSON
+        configuration:
+
+        -data_store_class - data store class name. If omitted, then
+         the default of "InMemoryDataStore" is used.
+        -data_store_module - module in which data store class is. If
+         omitted then this is set to be equal to the data_store_class.
+
+        It is assumed that the data store class can be loaded by
+        execution of "import data_store_class from data_store_module".
+        The "connect" method of the data store is then invoked to 
+        initialise the connection.
+
+        @param self Object reference.
+        @return data store object.
+        @throws ImportError. If the module name do not exist.
+        @throws AttributeError. If the class is not in the module.
+        """
+        json_config_dictionary = json.loads(self.json_config_document)
+        json_config_dictionary["couchdb_database_name"] = "mausdb"
+        json_config_dictionary["couchdb_url"] = "http://localhost:5984"
+        json_config_dictionary["data_store_module"] = "CouchDBDocumentStore"
+        json_config_dictionary["data_store_class"] = "CouchDBDocumentStore"
+
+        data_store_module = None
+        if not json_config_dictionary.has_key("data_store_class"):
+            data_store_class = "InMemoryDocumentStore"
+        else:
+            data_store_class = json_config_dictionary["data_store_class"]
+        if not json_config_dictionary.has_key("data_store_module"):
+            data_store_module = data_store_class
+        else:
+            data_store_module = json_config_dictionary["data_store_module"]
+
+        # Dynamically import the data store class.
+        # import_data_store = \
+        #     "from " + data_store_module + " import " + data_store_class
+        # exec import_data_store
+        # Dynamically create an instance of the class.
+        # data_store = locals()[data_store_class]()
+        # This is an alternative but seems to be frowned upon.
+        # data_store = eval(data_store_class)()
+
+        # Dynamically import the module.
+        module_object = __import__(data_store_module)
+        # Get class object.
+        class_object = getattr(module_object, data_store_class)
+        # Create instance of class object.
+        data_store = class_object()
+
+        # Connect to the data store.
+        data_store.connect(json_config_dictionary)
+
+        return data_store
+
     def multi_process(self):
         """
         MAUS control room style multi-processing dataflow
@@ -227,21 +271,10 @@ class Go:  #  pylint: disable=R0921
         Celery, the results then being driven through a merge and
         output.
         """
-   
-        import couchdb
-        from couchdb import ResourceNotFound
-        couchdb_server = couchdb.Server()
-        try:
-            couchdb_server.delete("mausdb")
-            print "mausdb deleted!"
-        except ResourceNotFound:
-            print "mausdb not found!"
-        couchdb_server.create("mausdb")
-        print "mausdb created!"
-        mausdb = couchdb_server["mausdb"]
+        # Create and connect to the data store proxy.
+        data_store = self.setup_data_store_proxy()
 
         from celery.task.control import inspect
-
         # Check for active workers.
         print("Checking for active workers")
         inspection = inspect()
@@ -285,7 +318,7 @@ class Go:  #  pylint: disable=R0921
                     # results to merge-output in same order.
                     spill = result.result
                     spills[spill_id] = spill
-                    mausdb.save({'_id':str(spill_id), 'spill':spill})
+                    data_store.put(str(spill_id), spill)
                 elif result.failed():
                     del transform_results[spill_id]
                     print " Spill %d task %s FAILED " \
@@ -305,24 +338,15 @@ class Go:  #  pylint: disable=R0921
         print("MULTI PROCESS mode: MERGE, OUTPUT, then next spill.")
 
         i = 0
-        for id in mausdb:
-            print id
-            spill_doc = mausdb.get(id)
-            spill_id = spill_doc['_id']
-            spill = spill_doc['spill']
+        for spill_id in data_store.ids():
+            print spill_id
+            spill = data_store.get(spill_id)
             print "  Executing Merge->Output for spill %s\n" % spill_id,
-            nuspill = self.merger.process(spill)
-            self.outputer.save(nuspill)
-            mausdb.delete(spill_doc)
+            spill = self.merger.process(spill)
+            self.outputer.save(spill)
+            data_store.delete(spill_id)
             i += 1
-       
-#        for spill_id in spills.keys():
-#            spill = spills.pop(spill_id)
-#            print "  Executing Merge->Output for spill %d\n" % spill_id,
-#            spill = self.merger.process(spill)
-#            self.outputer.save(spill)
-#            i += 1
-#            print("  %d spills left in buffer." % (len(spills)))
+            print("  %d spills left in buffer." % (len(data_store)))
 
         print("MERGE: Shutting down merger")
         assert(self.merger.death() == True)
@@ -330,9 +354,9 @@ class Go:  #  pylint: disable=R0921
         print("OUTPUT: Shutting down outputer")
         assert(self.outputer.death() == True)
 
-        print "Remaining spills in mausdb..."
-        for id in mausdb:
-            print id
+        print "Spills in data_store..."
+        for spill_id in data_store.ids():
+            print spill_id
         print "...!"
 
     def many_local_threads(self):
