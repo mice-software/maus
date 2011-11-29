@@ -224,31 +224,16 @@ class Go:  #  pylint: disable=R0921
         @return data store object.
         @throws ImportError. If the module name do not exist.
         @throws AttributeError. If the class is not in the module.
+        @throws KeyError. If there is no data_store_class in the JSON
+        configuration.
         """
         json_config_dictionary = json.loads(self.json_config_document)
-        json_config_dictionary["couchdb_database_name"] = "mausdb"
-        json_config_dictionary["couchdb_url"] = "http://localhost:5984"
-        json_config_dictionary["data_store_module"] = "CouchDBDocumentStore"
-        json_config_dictionary["data_store_class"] = "CouchDBDocumentStore"
 
-        data_store_module = None
-        if not json_config_dictionary.has_key("data_store_class"):
-            data_store_class = "InMemoryDocumentStore"
-        else:
-            data_store_class = json_config_dictionary["data_store_class"]
-        if not json_config_dictionary.has_key("data_store_module"):
-            data_store_module = data_store_class
-        else:
-            data_store_module = json_config_dictionary["data_store_module"]
-
-        # Dynamically import the data store class.
-        # import_data_store = \
-        #     "from " + data_store_module + " import " + data_store_class
-        # exec import_data_store
-        # Dynamically create an instance of the class.
-        # data_store = locals()[data_store_class]()
-        # This is an alternative but seems to be frowned upon.
-        # data_store = eval(data_store_class)()
+        # Get class and bust up into module path and class name.
+        data_store_class = json_config_dictionary["data_store_class"]
+        path = data_store_class.split(".")
+        data_store_class = path.pop()
+        data_store_module = ".".join(path)
 
         # Dynamically import the module.
         module_object = __import__(data_store_module)
@@ -256,7 +241,6 @@ class Go:  #  pylint: disable=R0921
         class_object = getattr(module_object, data_store_class)
         # Create instance of class object.
         data_store = class_object()
-
         # Connect to the data store.
         data_store.connect(json_config_dictionary)
 
