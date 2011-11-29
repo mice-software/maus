@@ -19,6 +19,8 @@
 #include "src/legacy/Optics/TransferMap.hh"
 #include "src/legacy/Interface/MMatrixToCLHEP.hh"
 
+using namespace MAUS;
+
 void  writeEvent() {throw Squeal(Squeal::recoverable, "Not implemented", "writeEvent()");}
 std::vector<MICEEvent*> ReadLoop( std::string filename, std::vector<std::string> classesToProcess ) 
 {return Output::ReadLoop(filename, classesToProcess) ;}
@@ -222,7 +224,7 @@ void AddHitsToMap(Json::Value Events, std::map< StationId,   std::vector<PhaseSp
       psv.setEy(hit_v["e_field"]["y"].asDouble());    
       psv.setEz(hit_v["e_field"]["z"].asDouble());
       double mass = hit_v["mass"].asDouble();
-      psv.setE(sqrt(psv.P()*psv.P()+mass*mass));
+      psv.setE(::sqrt(psv.P()*psv.P()+mass*mass));
       StationId id(hit_v["station_id"].asInt(), StationId::virt);
       map[id].push_back(psv);
     }
@@ -309,7 +311,7 @@ void DoPolyfit(const Function& func, const MiceModule& mod)
   MVector<m_complex> eig = CLHEP_to_MMatrix(tm.GetFirstOrderMap()).eigenvalues();
   Squeak::mout(Squeak::info)  << std::endl; 
   Squeak::mout(Squeak::debug) << "Eigenvalue modulus: ";
-  for(size_t i=1; i<=eig.num_row(); i++) Squeak::mout(Squeak::debug) << MAUS::Complex::real(eig(i)*MAUS::Complex::conj(eig(i))) << " ";
+  for(size_t i=1; i<=eig.num_row(); i++) Squeak::mout(Squeak::debug) << real(eig(i)*conj(eig(i))) << " ";
   Squeak::mout(Squeak::debug) << " determinant: " << tm.GetFirstOrderMap().determinant() << "\nMap:";
   Squeak::mout(Squeak::debug) << tm << std::endl; 
 }

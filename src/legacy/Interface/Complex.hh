@@ -77,81 +77,81 @@ namespace MAUS
   MAUS::complex sech(const MAUS::complex& c);
   MAUS::complex coth(const MAUS::complex& c);
 
-  //******************************
-  // TODO: Inverse Hyperbolic Functions
-  //******************************
-
-  //*******************
-  // Unitary Operators
-  //*******************
-
-  MAUS::complex operator -(const MAUS::complex& operand);
-
-  //**********************
-  // Assignment Operators
-  //**********************
-
-  MAUS::complex& operator+=(MAUS::complex& lhs, const MAUS::complex& rhs);
-  MAUS::complex& operator+=(MAUS::complex& lhs, const double&        rhs);
-  MAUS::complex& operator-=(MAUS::complex& lhs, const MAUS::complex& rhs);
-  MAUS::complex& operator-=(MAUS::complex& lhs, const double&        rhs);
-  MAUS::complex& operator*=(MAUS::complex& lhs, const MAUS::complex& rhs);
-  MAUS::complex& operator*=(MAUS::complex& lhs, const double&        rhs);
-  MAUS::complex& operator/=(MAUS::complex& lhs, const MAUS::complex& rhs);
-  MAUS::complex& operator/=(MAUS::complex& lhs, const double&        rhs);
-
-  //**********************
-  // Algebraic Operators
-  //**********************
-
-  const MAUS::complex operator+(const MAUS::complex&   lhs,
-                                const MAUS::complex&   rhs);
-  const MAUS::complex operator+(const MAUS::complex&   lhs,
-                                const double&          rhs);
-  const MAUS::complex operator+(const double&          lhs,
-                                const MAUS::complex&   rhs);
-  const MAUS::complex operator-(const MAUS::complex&   lhs,
-                                const MAUS::complex&   rhs);
-  const MAUS::complex operator-(const MAUS::complex&   lhs,
-                                const double&          rhs);
-  const MAUS::complex operator-(const double&          lhs,
-                                const MAUS::complex&   rhs);
-  const MAUS::complex operator*(const MAUS::complex&   lhs,
-                                const MAUS::complex&   rhs);
-  const MAUS::complex operator*(const MAUS::complex&   lhs,
-                                const double&          rhs);
-  const MAUS::complex operator*(const double&          lhs,
-                                const MAUS::complex&   rhs);
-  const MAUS::complex operator/(const MAUS::complex&   lhs,
-                                const MAUS::complex&   rhs);
-  const MAUS::complex operator/(const MAUS::complex&   lhs,
-                                const double&          rhs);
-  const MAUS::complex operator/(const double&          lhs,
-                                const MAUS::complex&   rhs);
-
-  //**********************
-  // Comparison Operators
-  //**********************
-
-  const bool operator==(const MAUS::complex&           lhs,
-                        const MAUS::complex&           rhs);
-  const bool operator==(const MAUS::complex&           lhs,
-                        const double&                  rhs);
-  const bool operator==(const double&                  lhs,
-                        const MAUS::complex&           rhs);
-  const bool operator!=(const MAUS::complex&           lhs,
-                        const MAUS::complex&           rhs);
-  const bool operator!=(const MAUS::complex&           lhs,
-                        const double&                  rhs);
-  const bool operator!=(const double&                  lhs,
-                        const MAUS::complex&           rhs);
-  //**********************
-  // Stream Operators
-  //**********************
-
-  std::ostream& operator<<(std::ostream& out, const MAUS::complex& c);
-  std::istream& operator>>(std::istream& in,  MAUS::complex& c);
-
 } //namespace MAUS
+
+//******************************
+// TODO: Inverse Hyperbolic Functions
+//******************************
+
+//*******************
+// Unitary Operators
+//*******************
+
+MAUS::complex operator -(const MAUS::complex& operand);
+
+//**********************
+// Assignment Operators
+//**********************
+
+MAUS::complex& operator+=(MAUS::complex& lhs, const MAUS::complex& rhs);
+MAUS::complex& operator+=(MAUS::complex& lhs, const double&        rhs);
+MAUS::complex& operator-=(MAUS::complex& lhs, const MAUS::complex& rhs);
+MAUS::complex& operator-=(MAUS::complex& lhs, const double&        rhs);
+MAUS::complex& operator*=(MAUS::complex& lhs, const MAUS::complex& rhs);
+MAUS::complex& operator*=(MAUS::complex& lhs, const double&        rhs);
+MAUS::complex& operator/=(MAUS::complex& lhs, const MAUS::complex& rhs);
+MAUS::complex& operator/=(MAUS::complex& lhs, const double&        rhs);
+
+//**********************
+// Algebraic Operators
+//**********************
+
+const MAUS::complex operator+(const MAUS::complex&   lhs,
+                              const MAUS::complex&   rhs);
+const MAUS::complex operator+(const MAUS::complex&   lhs,
+                              const double&          rhs);
+const MAUS::complex operator+(const double&          lhs,
+                              const MAUS::complex&   rhs);
+const MAUS::complex operator-(const MAUS::complex&   lhs,
+                              const MAUS::complex&   rhs);
+const MAUS::complex operator-(const MAUS::complex&   lhs,
+                              const double&          rhs);
+const MAUS::complex operator-(const double&          lhs,
+                              const MAUS::complex&   rhs);
+const MAUS::complex operator*(const MAUS::complex&   lhs,
+                              const MAUS::complex&   rhs);
+const MAUS::complex operator*(const MAUS::complex&   lhs,
+                              const double&          rhs);
+const MAUS::complex operator*(const double&          lhs,
+                              const MAUS::complex&   rhs);
+const MAUS::complex operator/(const MAUS::complex&   lhs,
+                              const MAUS::complex&   rhs);
+const MAUS::complex operator/(const MAUS::complex&   lhs,
+                              const double&          rhs);
+const MAUS::complex operator/(const double&          lhs,
+                              const MAUS::complex&   rhs);
+
+//**********************
+// Comparison Operators
+//**********************
+
+const bool operator==(const MAUS::complex&           lhs,
+                      const MAUS::complex&           rhs);
+const bool operator==(const MAUS::complex&           lhs,
+                      const double&                  rhs);
+const bool operator==(const double&                  lhs,
+                      const MAUS::complex&           rhs);
+const bool operator!=(const MAUS::complex&           lhs,
+                      const MAUS::complex&           rhs);
+const bool operator!=(const MAUS::complex&           lhs,
+                      const double&                  rhs);
+const bool operator!=(const double&                  lhs,
+                      const MAUS::complex&           rhs);
+//**********************
+// Stream Operators
+//**********************
+
+std::ostream& operator<<(std::ostream& out, const MAUS::complex& c);
+std::istream& operator>>(std::istream& in,  MAUS::complex& c);
 
 #endif

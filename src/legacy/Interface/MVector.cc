@@ -191,14 +191,14 @@ MVector<m_complex> complex(MVector<double> real, MVector<double> im)
 MVector<double>    re     (MVector<m_complex> c)
 {
   MVector<double> d(c.num_row());
-  for(size_t i=1; i<=c.num_row(); i++) d(i) = MAUS::Complex::real( c(i) );
+  for(size_t i=1; i<=c.num_row(); i++) d(i) = MAUS::real( c(i) );
   return d;
 }
 
 MVector<double>    im     (MVector<m_complex> c)
 {
   MVector<double> d(c.num_row());
-  for(size_t i=1; i<=c.num_row(); i++) d(i) = MAUS::Complex::imag( c(i) );
+  for(size_t i=1; i<=c.num_row(); i++) d(i) = MAUS::imag( c(i) );
   return d;
 }
 

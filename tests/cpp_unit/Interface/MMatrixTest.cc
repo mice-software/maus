@@ -258,11 +258,6 @@ bool test_MMatrix()
   testpass.push_back( test_MMatrixToGSL() );
   testpass.push_back( test_MMatrixToMMatrix() );
 
-  std::string testnames[20] = 
-    {"test_MMatrixConstructor", "test_MMatrixDereference", "test_MMatrixSize", "test_MMatrixBoolEq", "test_MMatrixAssignmentEq",
-     "test_MMatrixPlus", "test_MMatrixMinus", "test_MMatrixTimes", "test_MMatrixDivide", "test_MMatrixOStreamOp", "test_MMatrixTrace", 
-     "test_MMatrixDet", "test_MMatrixInv", "test_MMatrixT", "test_MVectorT", "test_MMatrixSub", "test_MMatrixEigen", "test_MMatrixToGSL", 
-     "test_MMatrixToMMatrix" };
   bool all_testpass = true;
   for(size_t i=0; i<testpass.size(); i++) 
   {
@@ -777,7 +772,7 @@ bool test_MMatrixToMMatrix()
   MMatrix<m_complex> mm_cc = complex(mm_dr);
   for(size_t i=1; i<mm_ca.num_row(); i++)
     for(size_t j=1; j<mm_ca.num_col(); j++)
-      testpass &= diff( mm_cc(i,j), MAUS::Complex::complex( MAUS::Complex::real( mm_ca(i,j) ) ) );
+      testpass &= diff( mm_cc(i,j), MAUS::Complex::complex( MAUS::real( mm_ca(i,j) ) ) );
 
   for(size_t i=1; i<=mm_ca.num_col(); i++)
   {

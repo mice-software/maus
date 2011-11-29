@@ -24,7 +24,7 @@
 
 #include "Interface/Complex.hh"
 
-using namespace MAUS::Complex;
+using namespace MAUS;
 
 bool diff(const MAUS::complex c1, const MAUS::complex c2)
 {
@@ -37,12 +37,12 @@ bool diff(double c1, double c2) { return fabs(c1-c2) < 1e-9; }
 class ComplexTest : public testing::Test
 {
 public:
-  ComplexTest() : c1(complex(3,  -2)),
-                  c2(complex(3,  -2)),
-                  c3(complex(3,   2)),
-                  c4(complex(3,  -2)),
-                  cs(complex(6.)),
-                  cc(complex(3,  -2))
+  ComplexTest() : c1(Complex::complex(3,  -2)),
+                  c2(Complex::complex(3,  -2)),
+                  c3(Complex::complex(3,   2)),
+                  c4(Complex::complex(3,  -2)),
+                  cs(Complex::complex(6.)),
+                  cc(Complex::complex(3,  -2))
   { }
 protected:
   MAUS::complex c1;
@@ -83,8 +83,8 @@ TEST_F(ComplexTest, Double) {
 
 TEST_F(ComplexTest, Conjugate) {
   //complext conjugate
-  EXPECT_TRUE(conj(complex(3,-2)) == complex(3,2));
-  EXPECT_TRUE(conj(complex(3)) == complex(3));
+  EXPECT_TRUE(conj(Complex::complex(3,-2)) == Complex::complex(3,2));
+  EXPECT_TRUE(conj(Complex::complex(3)) == Complex::complex(3));
 }
 
 TEST_F(ComplexTest, Assignment) {
@@ -122,7 +122,7 @@ TEST_F(ComplexTest, Division) {
   EXPECT_TRUE(diff(ct,c1));
   ct  = 2./c1;
   ct *= c1;
-  EXPECT_TRUE(diff(ct, complex(2,0)));
+  EXPECT_TRUE(diff(ct, Complex::complex(2,0)));
   ct  = c1;
   ct /= c3;
   ct *= c3;
@@ -133,38 +133,38 @@ TEST_F(ComplexTest, Division) {
 }
 
 TEST_F(ComplexTest, Addition) {
-  ct =  complex(3,-2);
+  ct =  Complex::complex(3,-2);
   ct += 2.;
-  EXPECT_TRUE(diff(ct, complex(5,-2)));
-  ct =  complex(3,-2) + 2.;
-  EXPECT_TRUE(diff(ct, complex(5,-2)));
-  ct =  2.+complex(3,-2);
-  EXPECT_TRUE(diff(ct, complex(5,-2)));
-  ct =  complex(3,-2) + complex(5,-1);
-  EXPECT_TRUE(diff(ct, complex(8,-3)));
-  ct  = complex(3,-2);
-  ct += complex(5,-1);
-  EXPECT_TRUE(diff(ct, complex(8,-3)));
+  EXPECT_TRUE(diff(ct, Complex::complex(5,-2)));
+  ct =  Complex::complex(3,-2) + 2.;
+  EXPECT_TRUE(diff(ct, Complex::complex(5,-2)));
+  ct =  2.+Complex::complex(3,-2);
+  EXPECT_TRUE(diff(ct, Complex::complex(5,-2)));
+  ct =  Complex::complex(3,-2) + Complex::complex(5,-1);
+  EXPECT_TRUE(diff(ct, Complex::complex(8,-3)));
+  ct  = Complex::complex(3,-2);
+  ct += Complex::complex(5,-1);
+  EXPECT_TRUE(diff(ct, Complex::complex(8,-3)));
 }
 
 TEST_F(ComplexTest, Negation) {
-  ct =  -complex(3,-2);
-  EXPECT_TRUE(diff(ct, complex(-3,2)));
+  ct =  -Complex::complex(3,-2);
+  EXPECT_TRUE(diff(ct, Complex::complex(-3,2)));
 }
 
 TEST_F(ComplexTest, Subtraction) {
-  ct =  complex(3,-2);
+  ct =  Complex::complex(3,-2);
   ct -= 2.;
-  EXPECT_TRUE(diff(ct, complex(1,-2)));
-  ct =  complex(3,-2) - 2.;
-  EXPECT_TRUE(diff(ct, complex(1,-2)));
-  ct =  2. - complex(3,-2);
-  EXPECT_TRUE(diff(ct, complex(-1,2)));
-  ct =  complex(3,-2) - complex(5,-1);
-  EXPECT_TRUE(diff(ct, complex(-2,-1)));
-  ct  = complex(3,-2);
-  ct -= complex(5,-1);
-  EXPECT_TRUE(diff(ct, complex(-2,-1)));
+  EXPECT_TRUE(diff(ct, Complex::complex(1,-2)));
+  ct =  Complex::complex(3,-2) - 2.;
+  EXPECT_TRUE(diff(ct, Complex::complex(1,-2)));
+  ct =  2. - Complex::complex(3,-2);
+  EXPECT_TRUE(diff(ct, Complex::complex(-1,2)));
+  ct =  Complex::complex(3,-2) - Complex::complex(5,-1);
+  EXPECT_TRUE(diff(ct, Complex::complex(-2,-1)));
+  ct  = Complex::complex(3,-2);
+  ct -= Complex::complex(5,-1);
+  EXPECT_TRUE(diff(ct, Complex::complex(-2,-1)));
 }
 
 TEST_F(ComplexTest, Streaming) {

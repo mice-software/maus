@@ -31,7 +31,6 @@ class G4LogicalVolume;
 class G4VSolid;
 
 class MICEEvent;
-using namespace MAUS;
 class TofSD;
 
 class MICEDetectorConstruction : public G4VUserDetectorConstruction
@@ -55,7 +54,7 @@ public:
 
 private:
 
-  std::vector<MAUSSD*> _SDs; // todo: add get/set 
+  std::vector<MAUS::MAUSSD*> _SDs; // todo: add get/set 
   
   void		addDaughter( MiceModule*, G4VPhysicalVolume* );
 

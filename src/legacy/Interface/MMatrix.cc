@@ -235,7 +235,7 @@ void MMatrix<m_complex>::invert()
   gsl_permutation_free( perm );
   for(size_t i=1; i<=num_row(); i++) 
     for(size_t j=1; j<=num_row(); j++)
-      if(operator()(i,j) != operator()(i,j)) throw(Squeal(Squeal::recoverable, "Failed to invert matrix - singular?", "MMatrix::invert()"));
+      if((*this)(i,j) != (*this)(i,j)) throw(Squeal(Squeal::recoverable, "Failed to invert matrix - singular?", "MMatrix::invert()"));
 }
 
 template <>
@@ -389,7 +389,7 @@ MMatrix<double> re(MMatrix<m_complex> mc)
   MMatrix<double> md(mc.num_row(), mc.num_col());
   for(size_t i=1; i<=mc.num_row(); i++)
     for(size_t j=1; j<=mc.num_col(); j++)
-      md(i,j) = MAUS::Complex::real(mc(i,j));
+      md(i,j) = MAUS::real(mc(i,j));
   return md;
 }
 
@@ -398,7 +398,7 @@ MMatrix<double> im(MMatrix<m_complex> mc)
   MMatrix<double> md(mc.num_row(), mc.num_col());
   for(size_t i=1; i<=mc.num_row(); i++)
     for(size_t j=1; j<=mc.num_col(); j++)
-      md(i,j) = MAUS::Complex::imag(mc(i,j));
+      md(i,j) = MAUS::imag(mc(i,j));
   return md;
 }
 

@@ -99,12 +99,14 @@ VectorBase<StdType, GslType>::VectorBase(
   const std::vector<StdType, std::allocator<StdType> >& std_vector)
 {
   this->vector_ = NULL;
-  //FIXME: I don't like the assumption that the address of
-  //       std::vector::operator[] is a pointer to a contiguous block of
-  //       memory. The implementation could be a linked list or something
-  //       that is not an array. Just pass the vector instance to build_vector
-  //       and use an iterator.
-  build_vector(&std_vector[0], &std_vector.back()+1);
+  build_vector(std_vector.size());
+  typename std::vector<StdType>::const_iterator element;
+  int index=0;
+  for (element=std_vector.begin(); element<std_vector.end(); ++element)
+  {
+    //TODO: create a MAUS::Vector iterator
+    (*this)[index++] = *element;
+  }
 }
 template VectorBase<double, gsl_vector>::VectorBase(
   const std::vector<double, std::allocator<double> >& std_vector);
@@ -700,9 +702,9 @@ void VectorBase<StdType, GslType>::build_vector(
   }
 }
 template void VectorBase<double, gsl_vector>::build_vector(
-  const double* data_begin, const double* data_end);
+  const double* data, const size_t size);
 template void VectorBase<complex, gsl_vector_complex>::build_vector(
-  const complex* data_begin, const complex* data_end);
+  const complex* data, const size_t size);
 
 //############################
 // Template Declarations

@@ -207,6 +207,8 @@ MAUS::complex coth(const MAUS::complex& c)
 // TODO: Inverse Hyperbolic Functions
 //******************************
 
+} //namespace MAUS
+
 //*******************
 // Unitary Operators
 //*******************
@@ -423,5 +425,3 @@ std::istream& operator>>(std::istream& in,  MAUS::complex& c)
   in >> c.dat[0] >> dummy >> dummy >> c.dat[1] >> dummy;
   return in;
 }
-
-} //namespace MAUS

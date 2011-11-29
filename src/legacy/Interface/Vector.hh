@@ -157,6 +157,10 @@ public:
 
   //These operations could be done using solely the public interface, but
   //we want to use the optimised GSL matrix/vector, low-level functions.
+  friend VectorBase<double, gsl_vector> real(
+    const VectorBase<complex, gsl_vector_complex>& complex_vector);
+  friend VectorBase<double, gsl_vector> imag(
+    const VectorBase<complex, gsl_vector_complex>& complex_vector);
   friend typename MAUS::Vector<StdType> MAUS::operator*<>(
     const MAUS::Matrix<StdType>& lhs,
     const MAUS::Vector<StdType>& rhs);

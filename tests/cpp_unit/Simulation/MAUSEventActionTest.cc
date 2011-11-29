@@ -21,6 +21,8 @@
 #include "src/common_cpp/Simulation/MAUSEventAction.hh"
 #include "src/legacy/Interface/Squeal.hh"
 
+using namespace MAUS;
+
 namespace {
 TEST(MAUSEventActionTest, SetGetEventsTest) {
     MAUSEventAction* _eventAct
