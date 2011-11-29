@@ -16,9 +16,13 @@
 // along with G4MICE in the doc folder.  If not, see
 // <http://www.gnu.org/licenses/>.
 
+#include <sys/stat.h>
+
 #include "gtest/gtest.h"
 
 #include "BeamTools/BTSolenoid.hh"
+
+#include "src/legacy/Interface/STLUtils.hh"
 
 namespace {
 // Just testing ZMin, ZMax, RMin, RMax functions
@@ -53,5 +57,15 @@ TEST_F(BTSolenoidTest, AccessorsTest) {
   EXPECT_DOUBLE_EQ(sol.RMax(), _rExtent*radius);
 }
 
+TEST_F(BTSolenoidTest, ReadWriteTest) {
+  std::string filename = "${MAUS_ROOT_DIR}/tmp/test.fld";
+  std::string f_sub = STLUtils::ReplaceVariables(filename);
+  BTSolenoid sol;
+  sol.BuildSheets(1., 2., 3., 1., filename);
+
+  struct stat my_stat;
+  int stat_out = stat(f_sub.c_str(), &my_stat);
+  EXPECT_EQ(stat_out, 0);
+}
 }
 

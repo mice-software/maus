@@ -3,6 +3,7 @@
 #include "Interface/SplineInterpolator.hh"
 #include "Interface/Squeal.hh"
 #include "Interface/Squeak.hh"
+#include "Interface/STLUtils.hh"
 
 #include <string>
 #include <streambuf>
@@ -431,6 +432,7 @@ void MagFieldMap::ReadG4MiceBinaryMap(std::ifstream &fMap, std::string algorithm
 
 void MagFieldMap::WriteG4MiceBinaryMapV1(std::string mapFile)
 {
+  mapFile = STLUtils::ReplaceVariables(std::string(mapFile)).c_str();
 	myFileName = mapFile;
 	std::ofstream fout;
 	fout.open(mapFile.c_str(), std::fstream::out | std::fstream::binary);
@@ -501,6 +503,7 @@ bool MagFieldMap::IsSameG4MiceBinary(vector<double*> inpSheets, std::string mapF
 {
 	std::string dummy;
 
+	mapFile = STLUtils::ReplaceVariables(std::string(mapFile)).c_str();
 	std::ifstream fMap;
 	fMap.open(mapFile.c_str(), std::fstream::in | std::fstream::binary);
 	if(!fMap) return false;
