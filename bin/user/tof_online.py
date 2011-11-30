@@ -38,7 +38,7 @@ def run():
     data_dir = '%s/src/input/InputCppDAQData' % os.environ.get("MAUS_ROOT_DIR")
     data_file = '02873.003'
     # In Yordan's branch, needed to specify args to InputCppDAQData
-    # my_input = MAUS.InputCppDAQData(data_dir,data_file)
+#   my_input = MAUS.InputCppDAQData(data_dir,data_file)
     my_input = MAUS.InputCppDAQData()
 
     # Create an empty array of mappers, then populate it
@@ -48,12 +48,15 @@ def run():
     my_map.append(MAUS.MapCppTOFSlabHits())
     my_map.append(MAUS.MapCppTOFSpacePoints())
 
-    reducer = MAUS.ReducePyTOFPlots()
+    reducer = MAUS.ReducePyTOFPlot()
 
-    output_worker = MAUS.OutputPyJSON()
+    output_worker = MAUS.OutputPyImage()
 
     #  The Go() drives all the components you pass in then put all the output
     #  into a file called 'mausput'
+    # the following commented line works in Yordan's dev
+    # but currently no image because the map-output contains errors
+    # so the default output json file with errors comes out
     MAUS.Go(my_input, my_map, reducer,output_worker,data_cards) 
 
 if __name__ == '__main__':
