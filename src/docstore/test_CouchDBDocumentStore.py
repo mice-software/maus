@@ -29,12 +29,21 @@ class CouchDBDocumentStoreTestCase(unittest.TestCase): # pylint: disable=R0904, 
     Test class for CouchDBDocumentStore module.
     """
 
+    CouchDBDocumentStore.bbb = 0
+
     def setUp(self):
         """ 
         Create CouchDBDocumentStore with test-specific database.
         @param self Object reference.
         """
         self._database_url = "http://localhost:5984"
+        # Ping server to validate it's available.
+        server = couchdb.Server(self._database_url)
+        try:
+            server.version()
+        except:# pylint: disable=W0702
+            unittest.TestCase.skipTest(self, 
+                                       "CouchDB server is not accessible")
         self._database_name = self.__class__.__name__.lower()
         # Create data store and connect.
         self._data_store = CouchDBDocumentStore()
