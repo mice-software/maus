@@ -1,0 +1,1 @@
+export LD_LIBRARY_PATH=$HOME/Maus/maus/third_party/install/lib:$LD_LIBRARY_PATH
