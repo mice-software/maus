@@ -163,44 +163,42 @@ class DataflowExecutor:
         #  Parse the configuration JSON
         self.json_config_dictionary = json.loads(self.json_config_doc)
 
-    def setup_data_store_proxy(self):
+    def setup_doc_store_proxy(self):
         """
-        Set up document data store. The data store is configured via
-        the following parameters in the JSON configuration:
+        Set up document store. The document store is configured via
+        the following parameter in the JSON configuration:
 
-        -data_store_class - data store class name. If omitted, then
-         the default of "InMemoryDataStore" is used.
-        -data_store_module - module in which data store class is. If
-         omitted then this is set to be equal to the data_store_class.
+        -doc_store_class - document store class name. This value
+         is assumed to be of form "modulename.classname".
 
-        It is assumed that the data store class can be loaded by
-        execution of "import data_store_class from data_store_module".
-        The "connect" method of the data store is then invoked to 
+        It is assumed that the class can be loaded by execution of 
+        statements analogous to "import classname from modulename".
+        The "connect" method of the document store is then invoked to 
         initialise the connection.
 
         @param self Object reference.
         @return data store.
         @throws ImportError. If the module name do not exist.
         @throws AttributeError. If the class is not in the module.
-        @throws KeyError. If there is no data_store_class in the JSON
+        @throws KeyError. If there is no doc_store_class in the JSON
         configuration.
         """
         # Get class and bust up into module path and class name.
-        data_store_class = self.json_config_dictionary["data_store_class"]
-        path = data_store_class.split(".")
-        data_store_class = path.pop()
-        data_store_module = ".".join(path)
+        doc_store_class = self.json_config_dictionary["doc_store_class"]
+        path = doc_store_class.split(".")
+        doc_store_class = path.pop()
+        doc_store_module = ".".join(path)
 
         # Dynamically import the module.
-        module_object = __import__(data_store_module)
+        module_object = __import__(doc_store_module)
         # Get class object.
-        class_object = getattr(module_object, data_store_class)
+        class_object = getattr(module_object, doc_store_class)
         # Create instance of class object.
-        data_store = class_object()
+        doc_store = class_object()
         # Connect to the data store.
-        data_store.connect(self.json_config_dictionary)
+        doc_store.connect(self.json_config_dictionary)
 
-        return data_store
+        return doc_store
 
     @staticmethod
     def buffer_input(input_emitter, number_of_inputs):
@@ -315,7 +313,7 @@ class MultiProcessDataflowExecutor(DataflowExecutor):
     This class expects a data store class to be specified in
     the JSON configuration e.g.
     @verbatim
-    data_store_class = "InMemoryDocumentStore.InMemoryDocumentStore"
+    doc_store_class = "InMemoryDocumentStore.InMemoryDocumentStore"
     @endverbatim
     The class used may have additional configuration requirements.
     """
@@ -335,7 +333,7 @@ class MultiProcessDataflowExecutor(DataflowExecutor):
         DataflowExecutor.__init__(self, inputer, transformer, merger,
                                   outputer,  json_config_doc)
         # Create and connect to data store proxy.
-        self.data_store = DataflowExecutor.setup_data_store_proxy(self)
+        self.doc_store = DataflowExecutor.setup_doc_store_proxy(self)
 
     def execute(self):
         """
@@ -403,7 +401,7 @@ class MultiProcessDataflowExecutor(DataflowExecutor):
                     # results to merge-output in same order.
                     spill = result.result
                     spills[spill_id] = spill
-                    self.data_store.put(str(spill_id), spill)
+                    self.doc_store.put(str(spill_id), spill)
                 elif result.failed():
                     del transform_results[spill_id]
                     print " Spill %d task %s FAILED " \
@@ -429,13 +427,13 @@ class MultiProcessDataflowExecutor(DataflowExecutor):
 
         print("MULTI-PROCESS: Get spill, MERGE, OUTPUT, repeat")
 
-        for spill_id in self.data_store.ids():
-            spill = self.data_store.get(spill_id)
+        for spill_id in self.doc_store.ids():
+            spill = self.doc_store.get(spill_id)
             print "  Executing Merge->Output for spill %s\n" % spill_id,
             spill = self.merger.process(spill)
             self.outputer.save(spill)
-            self.data_store.delete(spill_id)
-            print("  %d spills left in data store." % (len(self.data_store)))
+            self.doc_store.delete(spill_id)
+            print("  %d spills left in data store." % (len(self.doc_store)))
 
         print("MERGE: Shutting down merger")
         assert(self.merger.death() == True)
@@ -443,7 +441,7 @@ class MultiProcessDataflowExecutor(DataflowExecutor):
         print("OUTPUT: Shutting down outputer")
         assert(self.outputer.death() == True)
 
-        print("%d spills left in data store." % (len(self.data_store)))
+        print("%d spills left in data store." % (len(self.doc_store)))
 
     @staticmethod
     def get_dataflow_description():
