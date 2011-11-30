@@ -28,17 +28,17 @@
 bool test_MVector();
 
 //defined in ComplexTest.cc
-bool diff(const MAUS::complex c1, const MAUS::complex c2);
-bool diff(double c1, double c2);
+bool equal(const MAUS::complex c1, const MAUS::complex c2);
+bool equal(double c1, double c2);
 
 
-template <class Tmplt> bool diff(MMatrix<Tmplt> m1, MMatrix<Tmplt> m2)
+template <class Tmplt> bool equal(MMatrix<Tmplt> m1, MMatrix<Tmplt> m2)
 { 
   if(m1.num_row() != m2.num_row() || m1.num_col() != m2.num_col()) 
     return false;
   for(size_t i=1; i<m1.num_row(); i++) 
     for(size_t j=1; j<m1.num_col(); j++) 
-      return diff(m1(i,j), m2(i,j));
+      return equal(m1(i,j), m2(i,j));
   return true;
 }
 
@@ -122,15 +122,15 @@ bool test_MVector()
   d_mv3 *= 2.;
   c_mv3 *= MAUS::Complex::complex(2.,-2.);
   for(size_t i=0; i<d_mv3.num_row(); i++) testpass &= fabs(d_mv3(i+1) - da[i]*2.) < 1e-9;
-  for(size_t i=0; i<c_mv3.num_row(); i++) testpass &= diff(c_mv3(i+1), ca[i]*MAUS::Complex::complex(2.,-2.) );
+  for(size_t i=0; i<c_mv3.num_row(); i++) testpass &= equal(c_mv3(i+1), ca[i]*MAUS::Complex::complex(2.,-2.) );
   d_mv3 = d_mv4 * 2.;
   c_mv3 = c_mv4 * MAUS::Complex::complex(2.,-2.);
   for(size_t i=0; i<d_mv3.num_row(); i++) testpass &= fabs(d_mv3(i+1) - da[i]*2.) < 1e-9;
-  for(size_t i=0; i<c_mv3.num_row(); i++) testpass &= diff(c_mv3(i+1), ca[i]*MAUS::Complex::complex(2.,-2.) );
+  for(size_t i=0; i<c_mv3.num_row(); i++) testpass &= equal(c_mv3(i+1), ca[i]*MAUS::Complex::complex(2.,-2.) );
   d_mv3 = 2. * d_mv4;
   c_mv3 = MAUS::Complex::complex(2.,-2.) * c_mv4;
   for(size_t i=0; i<d_mv3.num_row(); i++) testpass &= fabs(d_mv3(i+1) - da[i]*2.) < 1e-9;
-  for(size_t i=0; i<c_mv3.num_row(); i++) testpass &= diff(c_mv3(i+1), ca[i]*MAUS::Complex::complex(2.,-2.) );
+  for(size_t i=0; i<c_mv3.num_row(); i++) testpass &= equal(c_mv3(i+1), ca[i]*MAUS::Complex::complex(2.,-2.) );
   d_mv3 = d_mv4;
   c_mv3 = c_mv4;
   out << "operator*, *=    " << testpass << std::endl;
@@ -141,42 +141,42 @@ bool test_MVector()
   d_mv3 = d_mv3 * 2.;
   c_mv3 = c_mv3 * MAUS::Complex::complex(2., -3);
   for(size_t i=0; i<d_mv3.num_row(); i++) testpass &= fabs(d_mv3(i+1) - da[i]) < 1e-9;
-  for(size_t i=0; i<c_mv3.num_row(); i++) testpass &= diff(c_mv3(i+1), ca[i]);
+  for(size_t i=0; i<c_mv3.num_row(); i++) testpass &= equal(c_mv3(i+1), ca[i]);
   d_mv3 = d_mv3 / 2.;
   c_mv3 = c_mv3 / MAUS::Complex::complex(2., -3);
   d_mv3 = d_mv3 * 2.;
   c_mv3 = c_mv3 * MAUS::Complex::complex(2., -3);
   for(size_t i=0; i<d_mv3.num_row(); i++) testpass &= fabs(d_mv3(i+1) - da[i]) < 1e-9;
-  for(size_t i=0; i<c_mv3.num_row(); i++) testpass &= diff(c_mv3(i+1), ca[i]);
+  for(size_t i=0; i<c_mv3.num_row(); i++) testpass &= equal(c_mv3(i+1), ca[i]);
   out << "operator/, /=    " << testpass << std::endl;
 
   d_mv3 += (d_mv3/2.);
   c_mv3 += (c_mv3/MAUS::Complex::complex(3,-2));
   for(size_t i=0; i<d_mv3.num_row(); i++) testpass &= fabs(d_mv3(i+1) - da[i]*(1.+1./2.) ) < 1e-9;
-  for(size_t i=0; i<c_mv3.num_row(); i++) testpass &= diff(c_mv3(i+1), ca[i]*(1.+1./MAUS::Complex::complex(3,-2)) );
+  for(size_t i=0; i<c_mv3.num_row(); i++) testpass &= equal(c_mv3(i+1), ca[i]*(1.+1./MAUS::Complex::complex(3,-2)) );
   d_mv3  = d_mv4;
   c_mv3  = c_mv4;
   d_mv3  = d_mv3+(d_mv3/2.);
   c_mv3  = c_mv3+(c_mv3/MAUS::Complex::complex(3,-2));
   for(size_t i=0; i<d_mv3.num_row(); i++) testpass &= fabs(d_mv3(i+1) - da[i]*(1.+1./2.) ) < 1e-9;
-  for(size_t i=0; i<c_mv3.num_row(); i++) testpass &= diff(c_mv3(i+1), ca[i]*(1.+1./MAUS::Complex::complex(3,-2)) );
+  for(size_t i=0; i<c_mv3.num_row(); i++) testpass &= equal(c_mv3(i+1), ca[i]*(1.+1./MAUS::Complex::complex(3,-2)) );
   d_mv3  = d_mv4;
   c_mv3  = c_mv4;
   out << "operator+, +=    " << testpass << std::endl;
 
   for(size_t i=0; i<d_mv3.num_row(); i++) testpass &= fabs((-d_mv3)(i+1) + d_mv3(i+1) ) < 1e-9;
-  for(size_t i=0; i<c_mv3.num_row(); i++) testpass &= diff( (-c_mv3)(i+1), -(c_mv3(i+1)) );
+  for(size_t i=0; i<c_mv3.num_row(); i++) testpass &= equal( (-c_mv3)(i+1), -(c_mv3(i+1)) );
 
   d_mv3 -= d_mv4;
   c_mv3 -= c_mv4;
   for(size_t i=0; i<d_mv3.num_row(); i++) testpass &= fabs( d_mv3(i+1) ) < 1e-9;
-  for(size_t i=0; i<c_mv3.num_row(); i++) testpass &= diff( (-c_mv3)(i+1), MAUS::Complex::complex(0,0) );
+  for(size_t i=0; i<c_mv3.num_row(); i++) testpass &= equal( (-c_mv3)(i+1), MAUS::Complex::complex(0,0) );
   d_mv3  = d_mv4;
   c_mv3  = c_mv4;
   d_mv3  = d_mv3 - d_mv4;
   c_mv3  = c_mv3 - c_mv4;
   for(size_t i=0; i<d_mv3.num_row(); i++) testpass &= fabs( d_mv3(i+1) ) < 1e-9;
-  for(size_t i=0; i<c_mv3.num_row(); i++) testpass &= diff( (-c_mv3)(i+1), MAUS::Complex::complex(0,0) );
+  for(size_t i=0; i<c_mv3.num_row(); i++) testpass &= equal( (-c_mv3)(i+1), MAUS::Complex::complex(0,0) );
 
   out << "operator-, -=    " << testpass << std::endl;
 
@@ -187,8 +187,8 @@ bool test_MVector()
   ss >> d_mvio;
   ss << c_mv4 << std::endl;
   ss >> c_mvio;
-  for(size_t i=1; i<=d_mvio.num_row(); i++) testpass &= diff(d_mvio(i), d_mv4(i));
-  for(size_t i=1; i<=c_mvio.num_row(); i++) testpass &= diff(c_mvio(i), c_mv4(i));
+  for(size_t i=1; i<=d_mvio.num_row(); i++) testpass &= equal(d_mvio(i), d_mv4(i));
+  for(size_t i=1; i<=c_mvio.num_row(); i++) testpass &= equal(c_mvio(i), c_mv4(i));
   out << "operator<<       " << testpass << std::endl;
 
   const gsl_vector*         c_vec_d = MVector_to_gsl(d_mv4);
@@ -196,7 +196,7 @@ bool test_MVector()
   
   testpass &= c_mv4.num_row() == c_vec_c->size && d_mv4.num_row() == c_vec_d->size;
   for(size_t i=0; i<d_mv4.num_row(); i++) testpass &= fabs( d_mv4(i+1)-gsl_vector_get(c_vec_d, i) ) < 1e-9;
-  for(size_t i=0; i<c_mv4.num_row(); i++) testpass &= diff( c_mv4(i+1), gsl_vector_complex_get(c_vec_c, i) );
+  for(size_t i=0; i<c_mv4.num_row(); i++) testpass &= equal( c_mv4(i+1), gsl_vector_complex_get(c_vec_c, i) );
 
   out << "gsl interface    " << testpass << std::endl;
 
