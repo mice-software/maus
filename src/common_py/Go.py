@@ -137,68 +137,11 @@ class Go: # pylint: disable=R0921, R0903
             MultiProcessDataflowExecutor.get_dataflow_description() 
         return possible_types_of_dataflow
 
-class DataflowExecutor:
+class DataflowUtilities: # pylint: disable=W0232
     """
-    @class DataflowExecutor
-    Super-class for classes that implement MAUS task execution dataflows.
+    @class DataflowUtilities.
+    Dataflow-related utility functions.
     """
-
-    def __init__(self, inputer, transformer, merger, outputer, json_config_doc): # pylint: disable=R0913,C0301
-        """
-        Constructor. Save references to given arguments then
-        parse the configuration document.
-        
-        @param self Object reference.
-        @param inputer Input task.
-        @param transformer Transformer task.
-        @param merger Merger task.
-        @param outputer Output task.
-        @param json_config_doc JSON configuration document.
-        """
-        self.inputer = inputer
-        self.transformer = transformer
-        self.merger = merger
-        self.outputer = outputer
-        self.json_config_doc = json_config_doc
-        #  Parse the configuration JSON
-        self.json_config_dictionary = json.loads(self.json_config_doc)
-
-    def setup_doc_store_proxy(self):
-        """
-        Set up document store. The document store is configured via
-        the following parameter in the JSON configuration:
-
-        -doc_store_class - document store class name. This value
-         is assumed to be of form "modulename.classname".
-
-        It is assumed that the class can be loaded by execution of 
-        statements analogous to "import classname from modulename".
-        The "connect" method of the document store is then invoked to 
-        initialise the connection.
-
-        @param self Object reference.
-        @return data store.
-        @throws ImportError. If the module name do not exist.
-        @throws AttributeError. If the class is not in the module.
-        @throws KeyError. If there is no doc_store_class in the JSON
-        configuration.
-        """
-        # Get class and bust up into module path and class name.
-        doc_store_class = self.json_config_dictionary["doc_store_class"]
-        path = doc_store_class.split(".")
-        doc_store_class = path.pop()
-        doc_store_module = ".".join(path)
-
-        # Dynamically import the module.
-        module_object = __import__(doc_store_module)
-        # Get class object.
-        class_object = getattr(module_object, doc_store_class)
-        # Create instance of class object.
-        doc_store = class_object()
-        # Connect to the data store.
-        doc_store.connect(self.json_config_dictionary)
-
-        return doc_store
 
     @staticmethod
     def buffer_input(input_emitter, number_of_inputs):
@@ -220,7 +163,44 @@ class DataflowExecutor:
                 return my_buffer
         return my_buffer
 
-class PipelineSingleThreadDataflowExecutor(DataflowExecutor):
+    @staticmethod
+    def setup_doc_store(json_config_dictionary):
+        """
+        Set up document store. The document store is configured via
+        the following parameter in the JSON configuration:
+
+        -doc_store_class - document store class name. This value
+         is assumed to be of form "modulename.classname".
+
+        It is assumed that the class can be loaded by execution of 
+        statements analogous to "import classname from modulename".
+        The "connect" method of the document store is then invoked to 
+        initialise the connection.
+
+        @param json_config_dictionary JSON configuration.
+        @return document store.
+        @throws ImportError. If the module name do not exist.
+        @throws AttributeError. If the class is not in the module.
+        @throws KeyError. If there is no doc_store_class in the JSON
+        configuration.
+        """
+        # Get class and bust up into module path and class name.
+        doc_store_class = json_config_dictionary["doc_store_class"]
+        path = doc_store_class.split(".")
+        doc_store_class = path.pop()
+        doc_store_module = ".".join(path)
+
+        # Dynamically import the module.
+        module_object = __import__(doc_store_module)
+        # Get class object.
+        class_object = getattr(module_object, doc_store_class)
+        # Create instance of class object.
+        doc_store = class_object()
+        # Connect to the document store.
+        doc_store.connect(json_config_dictionary)
+        return doc_store
+
+class PipelineSingleThreadDataflowExecutor:
     """
     @class PipelineSingleThreadDataflowExecutor
     Execute MAUS dataflows as a single-threaded pipeline.
@@ -228,7 +208,8 @@ class PipelineSingleThreadDataflowExecutor(DataflowExecutor):
 
     def __init__(self, inputer, transformer, merger, outputer, json_config_doc): # pylint: disable=R0913,C0301
         """
-        Constructor. Call super-class constructor.
+        Save references to arguments and parse the JSON configuration
+        document.
         
         @param self Object reference.
         @param inputer Input task.
@@ -237,8 +218,13 @@ class PipelineSingleThreadDataflowExecutor(DataflowExecutor):
         @param outputer Output task.
         @param json_config_doc JSON configuration document.
         """
-        DataflowExecutor.__init__(self, inputer, transformer, merger,
-                                  outputer,  json_config_doc)
+        self.inputer = inputer
+        self.transformer = transformer
+        self.merger = merger
+        self.outputer = outputer
+        self.json_config_doc = json_config_doc
+        #  Parse the configuration JSON
+        self.json_config_dictionary = json.loads(self.json_config_doc)
 
     def execute(self):
         """
@@ -253,7 +239,7 @@ class PipelineSingleThreadDataflowExecutor(DataflowExecutor):
         # This helps us time how long the setup that sometimes happens
         # in the first spill takes
         print("HINT: MAUS will process 1 spill only at first...")
-        map_buffer = DataflowExecutor.buffer_input(emitter, 1)
+        map_buffer = DataflowUtilities.buffer_input(emitter, 1)
 
         print("TRANSFORM: Setting up transformer (this can take a while...)")
         assert(self.transformer.birth(self.json_config_doc) == True)
@@ -274,7 +260,7 @@ class PipelineSingleThreadDataflowExecutor(DataflowExecutor):
                 self.outputer.save(spill)
 
             i += len(map_buffer)
-            map_buffer = DataflowExecutor.buffer_input(emitter, 128)
+            map_buffer = DataflowUtilities.buffer_input(emitter, 128)
 
             # Not Python 3 compatible print() due to backward
             # compatability. 
@@ -303,14 +289,14 @@ class PipelineSingleThreadDataflowExecutor(DataflowExecutor):
         description += "programming' for more information."
         return description
 
-class MultiProcessDataflowExecutor(DataflowExecutor):
+class MultiProcessDataflowExecutor:
     """
     @class MultiProcessDataflowExecutor
     Execute MAUS dataflows using a Celery distributed task queue and
-    worker nodes and a data store to cache spills after being
+    worker nodes and a document store to cache spills after being
     output from transformers, before they are consumed by mergers.
 
-    This class expects a data store class to be specified in
+    This class expects a document store class to be specified in
     the JSON configuration e.g.
     @verbatim
     doc_store_class = "InMemoryDocumentStore.InMemoryDocumentStore"
@@ -320,9 +306,9 @@ class MultiProcessDataflowExecutor(DataflowExecutor):
 
     def __init__(self, inputer, transformer, merger, outputer, json_config_doc): # pylint: disable=R0913,C0301
         """
-        Constructor. Call super-class constructor then create
-        a document data store.
-        
+        Save references to arguments and parse the JSON configuration
+        document, then connect to the data store.
+       
         @param self Object reference.
         @param inputer Input task.
         @param transformer Transformer task.
@@ -330,26 +316,87 @@ class MultiProcessDataflowExecutor(DataflowExecutor):
         @param outputer Output task.
         @param json_config_doc JSON configuration document.
         """
-        DataflowExecutor.__init__(self, inputer, transformer, merger,
-                                  outputer,  json_config_doc)
-        # Create and connect to data store proxy.
-        self.doc_store = DataflowExecutor.setup_doc_store_proxy(self)
-
+        #  Parse the configuration JSON
+        json_config_dictionary = json.loads(json_config_doc)
+        # Create proxy for and connect to document store.
+        self.doc_store = DataflowUtilities.setup_doc_store(
+            json_config_dictionary)
+        # Create objects to manage workflow execution.
+        self.input_transform_executor = \
+            MultiProcessInputTransformDataflowExecutor( \
+                inputer, transformer, json_config_doc, self.doc_store)
+        self.merge_output_executor = \
+            MultiProcessMergeOutputDataflowExecutor( \
+                merger, outputer, json_config_doc, self.doc_store)
+          
     def execute(self):
         """
         Execute the dataflow - spills are, in turn, read from the 
         input, passed through the transform, saved into the spill 
-        data store, then read from this, and passed through the 
+        document store, then read from this, and passed through the 
         merge and output. 
 
         @param self Object reference.
         """
-        # Input and transform spills.
-        self.transform_input()
-        # Merge and output spills.
-        self.merge_output()
+        self.input_transform_executor.execute()
+        self.merge_output_executor.execute()
 
-    def transform_input(self):
+    @staticmethod
+    def get_dataflow_description():
+        """
+        Get dataflow description.
+
+        @return description.
+        """
+        description = "Run MICE how it is run in the control room. This\n"  
+        description += "requires CouchDB and Celery to be installed. See\n"
+        description += "the wiki links on how to do this at\n"
+        description += \
+            "http://micewww.pp.rl.ac.uk/projects/maus/wiki/MAUSCeleryConfiguration\n" # pylint:disable=C0301
+        return description
+
+class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903
+    """
+    @class MultiProcessInputTransformDataflowExecutor
+    Execute the input-transform part of MAUS dataflows using a Celery
+    distributed task queue and worker nodes and a document store to
+    cache spills after being output from transformers.
+
+    If a document store is not given then a connection to one will be
+    created. In this case, the class expects a document store class to
+    be specified in the JSON configuration e.g.
+    @verbatim
+    doc_store_class = "CouchDBDocumentStore.CouchDBDocumentStore"
+    @endverbatim
+    The class used may have additional configuration requirements.
+
+    Note that if using an in-memory data store then this MUST be
+    provided as a constructor argument.    
+    """
+    def __init__(self, inputer, transformer, json_config_doc, doc_store = None): # pylint: disable=R0913,C0301
+        """
+        Constructor. Call super-class constructor then create
+        a document data store.
+        
+        @param self Object reference.
+        @param inputer Input task.
+        @param transformer Transformer task.
+        @param json_config_doc JSON configuration document.
+        @param doc_store Document store.
+        """
+        self.inputer = inputer
+        self.transformer = transformer
+        self.json_config_doc = json_config_doc
+        #  Parse the configuration JSON
+        self.json_config_dictionary = json.loads(self.json_config_doc)
+        if (doc_store == None):
+            # Create proxy for and connect to document store.
+            self.doc_store = DataflowUtilities.setup_doc_store(
+                self.json_config_dictionary)
+        else:
+            self.doc_store = doc_store
+
+    def execute(self):
         """
         Set up MAUS input tasks and, on receipt of spills, submit
         to transform tasks accessed via a distributed task queue. 
@@ -368,7 +415,7 @@ class MultiProcessDataflowExecutor(DataflowExecutor):
         print("INPUT: Reading input")
         assert(self.inputer.birth(self.json_config_doc) == True)
         emitter = self.inputer.emitter()
-        map_buffer = DataflowExecutor.buffer_input(emitter, 1)
+        map_buffer = DataflowUtilities.buffer_input(emitter, 1)
 
         print("TRANSFORM: spawning transform jobs for each spill")
         i = 0
@@ -383,7 +430,7 @@ class MultiProcessDataflowExecutor(DataflowExecutor):
                 # results to merge-output in same order.
                 transform_results[i] = result
                 i += 1
-            map_buffer = DataflowExecutor.buffer_input(emitter, 128)
+            map_buffer = DataflowUtilities.buffer_input(emitter, 128)
             print " Processed %d spills so far," % i,
             print(" %d spills left in buffer." % (len(map_buffer)))
 
@@ -412,7 +459,48 @@ class MultiProcessDataflowExecutor(DataflowExecutor):
                     continue
         print("TRANSFORM: transform jobs completed")
 
-    def merge_output(self):
+class MultiProcessMergeOutputDataflowExecutor: # pylint: disable=R0903
+    """
+    @class MultiProcessMergeOutputDataflowExecutor
+    Execute the merge-output part of MAUS dataflows reading spills
+    from a document store where they have been previously cached. 
+
+    If a document store is not given then a connection to one will be
+    created. In this case, the class expects a document store class to
+    be specified in the JSON configuration e.g.
+    @verbatim
+    doc_store_class = "CouchDBDocumentStore.CouchDBDocumentStore"
+    @endverbatim
+    The class used may have additional configuration requirements.
+
+    Note that if using an in-memory data store then this MUST be
+    provided as a constructor argument.
+    """
+
+    def __init__(self, merger, outputer, json_config_doc, doc_store = None): # pylint: disable=R0913,C0301
+        """
+        Constructor. Call super-class constructor then create
+        a document data store.
+        
+        @param self Object reference.
+        @param merger Merger task.
+        @param outputer Output task.
+        @param json_config_doc JSON configuration document.
+        @param doc_store Document store.
+        """
+        self.merger = merger
+        self.outputer = outputer
+        self.json_config_doc = json_config_doc
+        #  Parse the configuration JSON
+        self.json_config_dictionary = json.loads(self.json_config_doc)
+        if (doc_store == None):
+            # Create proxy for and connect to document store.
+            self.doc_store = DataflowUtilities.setup_doc_store(
+                self.json_config_dictionary)
+        else:
+            self.doc_store = doc_store
+
+    def execute(self):
         """
         Pull transformed spills from a data store and submit
         these to merger then output tasks.
@@ -443,16 +531,3 @@ class MultiProcessDataflowExecutor(DataflowExecutor):
 
         print("%d spills left in data store." % (len(self.doc_store)))
 
-    @staticmethod
-    def get_dataflow_description():
-        """
-        Get dataflow description.
-
-        @return description.
-        """
-        description = "Run MICE how it is run in the control room. This\n"  
-        description += "requires CouchDB and celery to be installed. See\n"
-        description += "the wiki links on how to do this at\n"
-        description += \
-            "http://micewww.pp.rl.ac.uk/projects/maus/wiki/MAUSCeleryConfiguration\n" # pylint:disable=C0301
-        return description
