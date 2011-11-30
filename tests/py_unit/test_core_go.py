@@ -11,7 +11,7 @@ from MapPyDoNothing import MapPyDoNothing
 from ReducePyDoNothing import ReducePyDoNothing
 from OutputPyJSON import OutputPyJSON
 
-from Go import Go, get_possible_dataflows
+from Go import Go
 
 class FakeMap(): #pylint: disable = W0232, R0903
     """Map mock-up that always fails to birth"""
@@ -30,7 +30,7 @@ class GoTestCase(unittest.TestCase): #pylint: disable = R0904
         """
         Make sure get_possible_dataflows() doesn't return nonsense
         """
-        keys = get_possible_dataflows().keys()
+        keys = Go.get_possible_dataflows().keys()
         self.assertTrue('pipeline_single_thread' in keys)
 
     def input_birth_test(self):
