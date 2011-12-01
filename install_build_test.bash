@@ -65,14 +65,21 @@ else
 fi
 
 echo "Configuring..."
-if [ "MAUS_THIRD_PARTY" ]; then
+if [ "$MAUS_THIRD_PARTY" ]; then
+	echo "This loop"
 	./configure $MAUS_THIRD_PARTY 2>>$FILE_ERR 1>>$FILE_STD
+	echo "Sourcing the environment..."
+	source env.sh 2>>$FILE_ERR 1>>$FILE_STD 
 else
+	echo "The other loop"
 	./configure 2>>$FILE_ERR 1>>$FILE_STD
+	echo "Sourcing the environment..."
+	source env.sh 2>>$FILE_ERR 1>>$FILE_STD 
+	echo "Building third party libraries (takes a while...)"
+	./third_party/build_all.bash 2>>$FILE_ERR 1>>$FILE_STD
+	echo "Resource the environment (catches the new ROOT version)"
+	source env.sh 2>>$FILE_ERR 1>>$FILE_STD
 fi
-
-echo "Sourcing the environment..."
-source env.sh 2>>$FILE_ERR 1>>$FILE_STD
 
 echo "Have Scons cleanup the MAUS build state"
 scons -c 2>>$FILE_ERR 1>>$FILE_STD
