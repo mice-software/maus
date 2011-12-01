@@ -22,6 +22,7 @@
 
 import json
 import ErrorHandler
+from datetime import datetime
 
 class MapPyScalersDump:
     """ This class dump the scaler information"""
@@ -33,6 +34,7 @@ class MapPyScalersDump:
         self._gva              = []
         self._tof0             = []
         self._tof1             = []
+        self._clock            = []
 
     def birth(self, json_configuration):
         """ Do nothing here """
@@ -67,7 +69,7 @@ class MapPyScalersDump:
         self._hits = scalers['channels']
         event = scalers['phys_event_number']
         time = scalers['time_stamp']
-        print 'Spill Num  : ', event, '  time : ', time, '\n'
+        print 'Spill Num  : ', event, '  time : ', datetime.fromtimestamp(time)
         if self.add(self._hits) :
             self.dump()
 
@@ -81,25 +83,28 @@ class MapPyScalersDump:
     def dump(self):
         """ Dump the information """
         if len(self._triggers):
-            print 'triggers ....... : ', self._triggers[-1]
-            print ' (', sum(self._triggers)/len(self._triggers), ')'
+            print 'triggers .......... : ', self._triggers[-1], \
+            ' (', sum(self._triggers)/len(self._triggers), ')'
 
         if len(self._trigger_requests):
-            print 'trigger requests : ', self._trigger_requests[-1]
-            print ' (', sum(self._trigger_requests)/len(
-                                         self._trigger_requests), ')'
+            print 'trigger requests .. : ', self._trigger_requests[-1], \
+            ' (', sum(self._trigger_requests)/len(self._trigger_requests), ')'
 
         if len(self._gva):
-            print 'GVA ............ : ', self._gva[-1]
-            print ' (', sum(self._gva)/len(self._gva), ')'
+            print 'GVA ............... : ', self._gva[-1], \
+            ' (', sum(self._gva)/len(self._gva), ')'
 
         if len(self._tof0):
-            print 'TOF0 ........... : ', self._tof0[-1]
-            print ' (', sum(self._tof0)/len(self._tof0), ')'
+            print 'TOF0 .............. : ', self._tof0[-1], \
+            ' (', sum(self._tof0)/len(self._tof0), ')'
 
         if len(self._tof1):
-            print 'TOF1 ........... : ', self._tof1[-1]
-            print ' (', sum(self._tof1)/len(self._tof1), ')' , '\n\n'
+            print 'TOF1 .............. : ', self._tof1[-1], \
+            ' (', sum(self._tof1)/len(self._tof1), ')'
+
+        if len(self._clock):
+            print '10 MHz clock ...... : ', self._clock[-1], \
+            ' (', sum(self._clock)/len(self._clock), ')' , '\n\n'
 
         return True
 
@@ -127,6 +132,10 @@ class MapPyScalersDump:
         self._tof1.append( hits['ch4'] )
         if len(self._tof1) == 11 :
             self._tof1.pop(0)
+
+        self._clock.append( hits['ch12'] )
+        if len(self._clock) == 11 :
+            self._clock.pop(0)
 
         return True
 

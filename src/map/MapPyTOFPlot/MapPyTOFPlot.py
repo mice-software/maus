@@ -55,7 +55,7 @@ class MapPyTOFPlot:
         return json_spill_doc
 
     def death(self):
-        """ save the plot"""
+        """ save the plot """
         try:
             self.tof_hist.Draw()
             self.canvas.Update()
