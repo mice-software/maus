@@ -440,14 +440,21 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903
         map_buffer = DataflowUtilities.buffer_input(emitter, 1)
 
         print("TRANSFORM: spawning transform jobs for each spill")
+
+        from maustasks import MausGenericTransformTask
+        if hasattr(self.transformer, "get_worker_names"):
+            workers = self.transformer.get_worker_names()
+        else:
+            workers = [self.transformer.__class__.__name__]
         i = 0
         transform_results = {}
         while len(map_buffer) != 0:
             for spill in map_buffer:
 #                from maustasks import MausSimulationTask
-                from maustasks import MausDoNothingTask
-                result = \
-                    MausDoNothingTask.delay(spill) # pylint:disable=E1101
+#                from maustasks import MausDoNothingTask
+#                result = \
+#                    MausDoNothingTask.delay(spill) # pylint:disable=E1101
+                result = MausGenericTransformTask.delay(workers, spill)
                 # Index results by spill_id so can present
                 # results to merge-output in same order.
                 transform_results[i] = result
