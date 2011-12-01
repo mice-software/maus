@@ -38,10 +38,10 @@ class CouchDBDocumentStore:
         via the following parameters:
 
         -couchdb_url - CouchDB URL. This is a mandatory parameter.
-        -couchdb_database - CouchDB database name. This is a mandatory
-         parameter. If the database does not exist then it is
-         created. If this contains upper-case characters then these
-         will be converted to lower-case.
+        -couchdb_database_namr - CouchDB database name. This is a
+         mandatory parameter. If the database does not exist then it
+         is created. If this contains upper-case characters then these
+         will be converted to lower-case. 
 
         @param self Object reference.
         @param parameters Connection information.
