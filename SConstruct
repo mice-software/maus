@@ -457,17 +457,28 @@ def geant4_extras(env):
           """
         my_exit(1)
 
-def install_python_tests():
-    files = glob.glob('tests/py_unit/test_*.py')+glob.glob('tests/style/*.py')
-    env.Install("build", files)
+def install_python_tests(maus_root_dir):
+    """
+    Install python test files
 
-    env.Install("build", "tests/py_unit/test_cdb")
-    test_cdb_files = glob.glob('tests/py_unit/test_cdb/*.py')
-    env.Install("build/test_cdb", test_cdb_files) 
-    env.Install("build", "tests/py_unit/suds")
-    suds_files = glob.glob('tests/py_unit/suds/*.py')
-    env.Install("build/suds", suds_files) 
+    Installs files tests/py_unit/test_*.py tests/py_unit/*/test_*.py. Installs
+    into build/, preserving directory structure below tests/py_unit. Also 
+    installs files tests/style/*.py into build/ 
+    """
+    style = "%s/tests/style/" % maus_root_dir
+    target = "%s/tests/py_unit/" % maus_root_dir
+    build  = "%s/build/" % maus_root_dir
+    files = glob.glob(target+'test_*.py')+glob.glob(style+'*.py')
+    env.Install(build, files)
 
+    test_subdirs = glob.glob(target+"*")
+    for subdir in test_subdirs:
+        if os.path.isdir(subdir):
+            pos = len(target)
+            subdir_mod = subdir[pos:]
+            test_files = glob.glob(subdir+"/test_*.py")                   
+            env.Install(build+subdir_mod, test_files)
+            print subdir, subdir_mod, test_files
 
 # Setup the environment.  NOTE: SHLIBPREFIX means that shared libraries don't
 # have a 'lib' prefix, which is needed for python to find SWIG generated
@@ -482,11 +493,13 @@ if env.GetOption('clean'):
     for root, dirs, files in os.walk('%s/build' % maus_root_dir):
         for basename in files:
             filename = os.path.join(root, basename)
+            print 'Removing:', filename
             if os.path.isfile(filename):
-                print 'Removing:', filename
                 os.remove(filename)
-          
-    
+        for basename in dirs:
+            dirname = os.path.join(root, basename)
+            if os.path.isdir(dirname):
+                shutil.rmtree(dirname) 
 
 if os.path.isfile('.use_llvm_with_maus'):
     env['CC'] = "llvm-gcc"
@@ -637,6 +650,6 @@ for single_stuff in stuff_to_import:
     file_to_import.write("\n")
 
 file_to_import.close()
-install_python_tests()
+install_python_tests(maus_root_dir)
 
 env.Alias('install', ['%s/build' % maus_root_dir])

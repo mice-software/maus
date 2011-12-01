@@ -12,7 +12,7 @@ Module Stage6CoilCurrents
     ScaleFactor -96.21
   //field
     PropertyString FieldType       Solenoid
-    PropertyString FileName        coupling.fld
+    PropertyString FileName        ${MAUS_ROOT_DIR}/tmp/coupling.fld
     PropertyDouble CurrentDensity    1.
     PropertyDouble Length          250.
     PropertyDouble Thickness       116.
@@ -32,7 +32,7 @@ Module Stage6CoilCurrents
     ScaleFactor +113.95
   //field
     PropertyString FieldType       Solenoid
-    PropertyString FileName        focus.fld
+    PropertyString FileName        ${MAUS_ROOT_DIR}/tmp/focus.fld
     PropertyDouble CurrentDensity      1.
     PropertyDouble Length            210.
     PropertyDouble Thickness          84.
@@ -52,7 +52,7 @@ Module Stage6CoilCurrents
     ScaleFactor -113.95
   //field
     PropertyString FieldType       Solenoid
-    PropertyString FileName        focus.fld
+    PropertyString FileName        ${MAUS_ROOT_DIR}/tmp/focus.fld
     PropertyDouble CurrentDensity      1.
     PropertyDouble Length            210.
     PropertyDouble Thickness          84.
@@ -72,7 +72,7 @@ Module Stage6CoilCurrents
     ScaleFactor +118.56
   //Field
     PropertyString FieldType      Solenoid
-    PropertyString FileName       match1.fld
+    PropertyString FileName       ${MAUS_ROOT_DIR}/tmp/match1.fld
     PropertyDouble CurrentDensity      1.
     PropertyDouble Length            201.2
     PropertyDouble Thickness          44.7
@@ -86,7 +86,7 @@ Module Stage6CoilCurrents
     ScaleFactor -118.56
   //Field
     PropertyString FieldType      Solenoid
-    PropertyString FileName       match1.fld
+    PropertyString FileName       ${MAUS_ROOT_DIR}/tmp/match1.fld
     PropertyDouble CurrentDensity      1.
     PropertyDouble Length            201.2
     PropertyDouble Thickness          44.7
@@ -100,7 +100,7 @@ Module Stage6CoilCurrents
     ScaleFactor +137.13
   //Field
     PropertyString FieldType      Solenoid
-    PropertyString FileName       match2.fld
+    PropertyString FileName       ${MAUS_ROOT_DIR}/tmp/match2.fld
     PropertyDouble CurrentDensity      1.
     PropertyDouble Length            199.5
     PropertyDouble Thickness          29.8
@@ -114,7 +114,7 @@ Module Stage6CoilCurrents
     ScaleFactor -137.13
   //Field
     PropertyString FieldType      Solenoid
-    PropertyString FileName       match2.fld
+    PropertyString FileName       ${MAUS_ROOT_DIR}/tmp/match2.fld
     PropertyDouble CurrentDensity      1.
     PropertyDouble Length            199.5
     PropertyDouble Thickness          29.8
@@ -128,7 +128,7 @@ Module Stage6CoilCurrents
     ScaleFactor +127.37
   //Field
     PropertyString FieldType      Solenoid
-    PropertyString FileName       end1.fld
+    PropertyString FileName       ${MAUS_ROOT_DIR}/tmp/end1.fld
     PropertyDouble CurrentDensity    1.
     PropertyDouble Length          110.6
     PropertyDouble Thickness        59.6
@@ -142,7 +142,7 @@ Module Stage6CoilCurrents
     ScaleFactor -127.37
   //Field
     PropertyString FieldType      Solenoid
-    PropertyString FileName       end1.fld
+    PropertyString FileName       ${MAUS_ROOT_DIR}/tmp/end1.fld
     PropertyDouble CurrentDensity    1.
     PropertyDouble Length          110.6
     PropertyDouble Thickness        59.6

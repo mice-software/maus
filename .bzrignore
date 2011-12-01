@@ -34,6 +34,7 @@ tests/integration/optics/envelope*
 tests/integration/optics/optics
 doc/doxygen_backend/
 doc/doxygen_framework/
+tests/py_unit/test_geometry/testCases/testGeometry/FileList.txt
 tests/integration/test_optics/*.*
 tests/integration/test_optics/*.root
 tests/integration/test_optics/*.txt
