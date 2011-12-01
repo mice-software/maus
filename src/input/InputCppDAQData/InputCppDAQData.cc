@@ -220,7 +220,7 @@ std::string InputCppDAQData::getCurEvent() {
   catch(...) {
     Squeak::mout(Squeak::error) <<
     "*** InputCppDAQData::getCurEvent() : Unknown exception occurred." << std::endl;
-    Squeak::mout(Squeak::error) << "DAQ Event skipped!" << std::endl << std::end;
+    Squeak::mout(Squeak::error) << "DAQ Event skipped!" << std::endl << std::endl;
     xDocSpill.clear();
     Json::Value errors;
     std::stringstream ss;
