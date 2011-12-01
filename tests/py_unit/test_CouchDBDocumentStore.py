@@ -29,8 +29,6 @@ class CouchDBDocumentStoreTestCase(unittest.TestCase): # pylint: disable=R0904, 
     Test class for CouchDBDocumentStore module.
     """
 
-    CouchDBDocumentStore.bbb = 0
-
     def setUp(self):
         """ 
         Create CouchDBDocumentStore with test-specific database.
