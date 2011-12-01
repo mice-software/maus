@@ -65,30 +65,18 @@ class Go: # pylint: disable=R0921, R0903
         @throws Exception if MAUS_ROOT_DIR is not set or there are
         any other execution problems.
         """
-        # Determine what the 'env.sh' has set the user's environment
-        # to. Exit if not set.
-        #  otherwise with an exception.
-        maus_root_dir = os.environ.get('MAUS_ROOT_DIR')
-        if maus_root_dir == "":
-            raise Exception("MAUS_ROOT_DIR environmental variable not set")
+        # Check MAUS_ROOT_DIR.
+        Go.check_maus_root_dir()
 
-        # Warn the user that they could be using the wrong version of
-        # MAUS. os.getcwd() is the current directory from which the
-        # script is being executed. This warns the user to many common
-        # errors. 
-        if maus_root_dir not in os.getcwd():
-            print("\nWARNING: YOU ARE RUNNING MAUS OUTSIDE ITS MAUS_ROOT_DIR")
-            print("WARNING:\tMAUS_ROOT_DIR = %s" % (maus_root_dir))
-            print("WARNING:\tCURRENT DIRECTORY = %s\n" % (os.getcwd()))
-
-        # Get a copy of the configuration JSON document and keep it
-        # local. 
+        # Load the MAUS JSON configuration overriding it with the
+        # contents of the given configuration file and command
+        # line arguments.
         configuration  = Configuration()
         json_config_doc = configuration.getConfigJSON(
             config_file, command_line_args)
+
         # Parse the configuration JSON.
         json_config_dictionary = json.loads(json_config_doc)
-
         # How should we 'drive' the components?
         type_of_dataflow = json_config_dictionary['type_of_dataflow']
         # Grab version
@@ -113,6 +101,12 @@ class Go: # pylint: disable=R0921, R0903
         elif type_of_dataflow == 'multi_process':
             executor = MultiProcessDataflowExecutor(
                 inputer, transformer, merger, outputer, json_config_doc)
+        elif type_of_dataflow == 'multi_process_input_transform':
+            executor = MultiProcessInputTransformDataflowExecutor( \
+                inputer, transformer, json_config_doc)
+        elif type_of_dataflow == 'multi_process_merge_output':
+            executor = MultiProcessMergeOutputDataflowExecutor( \
+                merger, outputer, json_config_doc)
         elif type_of_dataflow == 'many_local_threads':
             raise NotImplementedError()
         else:
@@ -123,6 +117,30 @@ class Go: # pylint: disable=R0921, R0903
         executor.execute()
         print("DONE")
 
+    @staticmethod
+    def check_maus_root_dir():
+        """
+        Check that the MAUS_ROOT_DIR environment variable has been set
+        and is equal to the current directory. 
+ 
+        @throws Exception if MAUS_ROOT_DIR is not set.
+        """
+        # Determine what the 'env.sh' has set the user's environment
+        # to. Exit if not set.
+        #  otherwise with an exception.
+        maus_root_dir = os.environ.get('MAUS_ROOT_DIR')
+        if maus_root_dir == "":
+            raise Exception("MAUS_ROOT_DIR environmental variable not set")
+
+        # Warn the user that they could be using the wrong version of
+        # MAUS. os.getcwd() is the current directory from which the
+        # script is being executed. This warns the user to many common
+        # errors. 
+        if maus_root_dir not in os.getcwd():
+            print("\nWARNING: YOU ARE RUNNING MAUS OUTSIDE ITS MAUS_ROOT_DIR")
+            print("WARNING:\tMAUS_ROOT_DIR = %s" % (maus_root_dir))
+            print("WARNING:\tCURRENT DIRECTORY = %s\n" % (os.getcwd()))
+    
     @staticmethod
     def get_possible_dataflows():
         """
@@ -135,6 +153,10 @@ class Go: # pylint: disable=R0921, R0903
             PipelineSingleThreadDataflowExecutor.get_dataflow_description()
         possible_types_of_dataflow['multi_process'] = \
             MultiProcessDataflowExecutor.get_dataflow_description() 
+        possible_types_of_dataflow['multi_process_input_transform'] = \
+            MultiProcessInputTransformDataflowExecutor.get_dataflow_description()  # pylint: disable=C0301
+        possible_types_of_dataflow['multi_process_merge_output'] = \
+            MultiProcessMergeOutputDataflowExecutor.get_dataflow_description() 
         return possible_types_of_dataflow
 
 class DataflowUtilities: # pylint: disable=W0232
@@ -459,6 +481,21 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903
                     continue
         print("TRANSFORM: transform jobs completed")
 
+    @staticmethod
+    def get_dataflow_description():
+        """
+        Get dataflow description.
+
+        @return description.
+        """
+        description = "Run MICE how it is run in the control room. This\n"  
+        description += "requires CouchDB and Celery to be installed. See\n"
+        description += "the wiki links on how to do this at\n"
+        description += \
+            "http://micewww.pp.rl.ac.uk/projects/maus/wiki/MAUSCeleryConfiguration\n" # pylint:disable=C0301
+        description += "This runs input-transform dataflows only!"
+        return description
+
 class MultiProcessMergeOutputDataflowExecutor: # pylint: disable=R0903
     """
     @class MultiProcessMergeOutputDataflowExecutor
@@ -530,4 +567,19 @@ class MultiProcessMergeOutputDataflowExecutor: # pylint: disable=R0903
         assert(self.outputer.death() == True)
 
         print("%d spills left in data store." % (len(self.doc_store)))
+
+    @staticmethod
+    def get_dataflow_description():
+        """
+        Get dataflow description.
+
+        @return description.
+        """
+        description = "Run MICE how it is run in the control room. This\n"  
+        description += "requires CouchDB to be installed. See\n"
+        description += "the wiki links on how to do this at\n"
+        description += \
+            "http://micewww.pp.rl.ac.uk/projects/maus/wiki/MAUSCeleryConfiguration\n" # pylint:disable=C0301
+        description += "This runs merge-output dataflows only!"
+        return description
 
