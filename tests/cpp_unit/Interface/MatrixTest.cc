@@ -35,11 +35,23 @@
 #include "CLHEP/Random/Random.h"
 
 using namespace MAUS;
-namespace MAUS { using namespace Complex; }
 
 //Defined in ComplexTest.cc
-bool equal(const MAUS::complex c1, const MAUS::complex c2);
+bool equal(const complex c1, const complex c2);
 bool equal(double c1, double c2);
+
+class MatrixTest;
+template bool MatrixTest::elements_equal(Matrix<double> matrix, double value);
+template bool MatrixTest::elements_equal(Matrix<complex> matrix,
+                                         complex value);
+template bool MatrixTest::equal(Matrix<double> matrix, double* array);
+template bool MatrixTest::equal(Matrix<complex> matrix, complex* array);
+template bool MatrixTest::equal(Matrix<double> m1, Matrix<double> m2);
+template bool MatrixTest::equal(Matrix<complex> m1,
+                                Matrix<complex> m2);
+template bool MatrixTest::equal(Vector<double> v1, Vector<double> v2);
+template bool MatrixTest::equal(Vector<complex> v1,
+                                Vector<complex> v2);
 
 class MatrixTest : public ::testing::Test
 {
@@ -57,7 +69,7 @@ public:
 
 protected:
   template <typename Tmplt>
-  void elements_equal(Matrix<Tmplt>& matrix, Tmplt value)
+  bool elements_equal(Matrix<Tmplt>& matrix, Tmplt value)
   {
     bool are_equal = true;
     if(   matrix.number_of_rows()    != rows_
@@ -72,7 +84,7 @@ protected:
   }
 
   template <typename Tmplt>
-  void equal(Matrix<Tmplt>& matrix, Tmplt* array)
+  bool equal(Matrix<Tmplt>& matrix, Tmplt* array)
   {
     bool are_equal = true;
     if(   matrix.number_of_rows()    != rows_
@@ -125,43 +137,36 @@ protected:
   static const size_t submatrix_start_column_;
   static const size_t submatrix_columns_;
   double double_data_doubled_[24];
-  double complex_data_doubled_[24];
+  complex complex_data_doubled_[24];
   static const complex complex_scaling_factor_;
   complex complex_data_multiple_[24];
 };
-
-template bool MatrixTest::elements_equal(Matrix<double> matrix, double value);
-template bool MatrixTest::elements_equal(Matrix<complex> matrix, complex value);
-template bool MatrixTest::equal(Matrix<double> matrix, double* array);
-template bool MatrixTest::equal(Matrix<complex> matrix, complex* array);
-template bool MatrixTest::equal(Matrix<double> m1, Matrix<double> m2);
-template bool MatrixTest::equal(Matrix<complex> m1, Matrix<complex> m2);
-template bool MatrixTest::equal(Vector<double> v1, Vector<double> v2);
-template bool MatrixTest::equal(Vector<complex> v1, Vector<complex> v2);
-
 
 //****************************************
 //MatrixTest static const initializations
 //****************************************
 
 const double MatrixTest::double_data_[24] = {
-  0.,   1.,   2.,   3.,     -5.,    -8.,    -13.,   -21.,
-  34.5, 55.7, 89.3, 144.2,  -32.5,  -57.5,  -91.2,  -146.3,
-  3.14, -1.59 2.65, -3.58,  9.79,   -3.23,  8.46,   -2.64
+  0.,   1.,     2.,   3.,     -5.,    -8.,    -13.,   -21.,
+  34.5, 55.7,   89.3, 144.2,  -32.5,  -57.5,  -91.2,  -146.3,
+  3.14, -1.59,  2.65, -3.58,  9.79,   -3.23,  8.46,   -2.64
 };
 
 const complex MatrixTest::complex_data_[24] = {
-  complex(0., -2.64),     complex(1., 8.46),      complex(2., -3.23),
-  complex(3., 9.79),      complex(-5., -3.58),    complex(-8., 2.65),
-  complex(-13., -1.59),   complex(-21, 3.14),
+  Complex::complex(0., -2.64),    Complex::complex(1., 8.46),
+  Complex::complex(2., -3.23),    Complex::complex(3., 9.79),
+  Complex::complex(-5., -3.58),   Complex::complex(-8., 2.65),
+  Complex::complex(-13., -1.59),  Complex::complex(-21, 3.14),
 
-  complex(34.5, -146.3),  complex(55.7, -91.2),   complex(89.3, -57.5),
-  complex(144.2, -32.5),  complex(-32.5, 144.2),  complex(-57.5, 89.3),
-  complex(-91.2, 55.7),   complex(-146.3, 34.5)
+  Complex::complex(34.5, -146.3), Complex::complex(55.7, -91.2),
+  Complex::complex(89.3, -57.5),  Complex::complex(144.2, -32.5),
+  Complex::complex(-32.5, 144.2), Complex::complex(-57.5, 89.3),
+  Complex::complex(-91.2, 55.7),  Complex::complex(-146.3, 34.5)
   
-  complex(3.14, -21.),    complex(-1.59, -13.),   complex(2.65, -8.),
-  complex(-3.58, -5.),    complex(9.79, 3.),      complex(-3.23, 2.),
-  complex(8.46, 1.),      complex(-2.64, 0.)
+  Complex::complex(3.14, -21.),   Complex::complex(-1.59, -13.),
+  Complex::complex(2.65, -8.),    Complex::complex(-3.58, -5.),
+  Complex::complex(9.79, 3.),     Complex::complex(-3.23, 2.),
+  Complex::complex(8.46, 1.),     Complex::complex(-2.64, 0.)
 };
 
 const size_t MatrixTest::data_size_ = 24;
@@ -172,7 +177,7 @@ const size_t MatrixTest::submatrix_rows_         = 2;
 const size_t MatrixTest::submatrix_columns_      = 4;
 const size_t MatrixTest::submatrix_start_row_    = 2;
 const size_t MatrixTest::submatrix_start_column_ = 3;
-const complex MatrixTest::complex_scaling_factor_ = complex(2, -5);
+const complex MatrixTest::complex_scaling_factor_ = Complex::complex(2, -5);
 
 //***********
 //test cases
@@ -220,8 +225,8 @@ TEST_F(MatrixTest, IndexingElements) {
   Matrix<complex> matrix_c1(rows_, columns_, complex_data_);
   //check that it works for const as well
   const Matrix<complex> matrix_c2(rows_, columns_, complex_data_);
-  complex new_value1 = complex(4., -2.);
-  complex new_value2 = complex(-6., 15.);
+  complex new_value1 = Complex::complex(4., -2.);
+  complex new_value2 = Complex::complex(-6., 15.);
   for(size_t i=1; i<=rows_; ++i)
   {
     for(size_t j=0; j<columns_; ++j)
@@ -285,7 +290,7 @@ TEST_F(MatrixTest, HepMatrixConstructor) {
   ASSERT_EQ(matrix_d1.number_of_columns(),  (size_t) columns_);
   for(size_t i=1; i<=rows_; ++i)
     for(size_t j=1; j<=columns_; ++j)
-      EXPECT_EQ(matrix_d0(i,j), complex(matrix_hep0(i,j)));
+      EXPECT_EQ(matrix_d0(i,j), Complex::complex(matrix_hep0(i,j)));
   
   //check that handles 0 length okay
   Matrix<complex> matrix_d1(matrix_hep1);
@@ -298,7 +303,7 @@ TEST_F(MatrixTest, ConstructorSizeOnly) {
   EXPECT_TRUE(elements_equal(matrix_d0, 0.);
   
   Matrix<complex> matrix_c0(rows_, columns_);
-  EXPECT_TRUE(elements_equal(matrix_c0, complex(0.0));
+  EXPECT_TRUE(elements_equal(matrix_c0, Complex::complex(0.0));
 }
 
 TEST_F(MatrixTest, ConstructorFill) {
@@ -449,7 +454,8 @@ TEST_F(MatrixTest, Comparison) {
   //*** complex inequality ***
   
   //different sizes
-  Matrix<complex> matrix_c4 = matrix_c0.submatrix(1, 1, rows_-1, columns-1);
+  Matrix<complex> matrix_c4
+    = matrix_c0.submatrix(1, 1, rows_-1, columns-1);
   EXPECT_TRUE(matrix_c0 != matrix_c4);
   EXPECT_FALSE(matrix_c0 == matrix_c4);
   
@@ -552,8 +558,8 @@ TEST_F(MatrixTest, Multiplication) {
        
   complex c1[6];
   complex c2[6];
-  for(int i=0; i<6; i++) c1[i] = complex( d1[i],       d2[i]);
-  for(int i=0; i<6; i++) c2[i] = complex(-d2[i]*d1[i], d1[i]);
+  for(int i=0; i<6; i++) c1[i] = Complex::complex( d1[i],       d2[i]);
+  for(int i=0; i<6; i++) c2[i] = Complex::complex(-d2[i]*d1[i], d1[i]);
   const Matrix<complex>  matrix_c0(3, 2, d1);
   const Matrix<complex>  matrix_c1(2, 3, d2);
   Matrix<complex>        matrix_c2(3, 3);
@@ -569,7 +575,6 @@ TEST_F(MatrixTest, Multiplication) {
   EXPECT_TRUE(equal(matrix_c2, matrix_c4));
 }
 
-//FIXME: add scalar multiplication on the left
 TEST_F(MatrixTest, ScalarMultiplication) {
   //*** double multiplication ***
   
@@ -622,6 +627,10 @@ TEST_F(MatrixTest, ScalarDivision) {
   ASSERT_TRUE(equal(matrix_c2, complex_data_));
 }
 
+//TODO: test complex(Matrix<double>) and complex(Matrix<double>, Matrix<double>)
+TEST_F(MatrixTest, ComplexComposition) {
+}
+
 TEST_F(MatrixTest, ComplexDecomposition) {
   const Matrix<complex> matrix_c0(rows_, columns_, complex_data_);
   const Matrix<double> matrix_d0(rows_, columns_, double_data_);
@@ -634,14 +643,7 @@ TEST_F(MatrixTest, ComplexDecomposition) {
   //which is again just double_data_
   Matrix<double> matrix_imag = imag(matrix_c0);
   //create a pure-imaginary matrix
-  Matrix<complex> matrix_pure_imag(rows_, columns_);
-  for(size_t row=1; row<=rows_; ++row)
-  {
-    for(size_t column=1; column<=columns_; ++column)
-    {
-      matrix_pure_imag(row, column) += complex(0., matrix_imag(row, column));
-    }
-  }
+  Matrix<complex> matrix_pure_imag = Matrix::complex(0., matrix_c0);
   Matrix<complex> matrix_c1 = matrix_c0 - matrix_pure_imag;
   Matrix<double> matrix_d1(rows_, columns_);
   for(size_t row=1; row<=rows_; ++row)
@@ -652,10 +654,6 @@ TEST_F(MatrixTest, ComplexDecomposition) {
     }
   }
   EXPECT_TRUE(equal(matrix_d1, matrix_d0));
-}
-
-TEST_F(MatrixTest, ComplexComposition) {
-//TODO: test complex(Matrix<double>) and complex(Matrix<double>, Matrix<double>)
 }
 
 TEST_F(MatrixTest, Determinant) {
@@ -733,34 +731,68 @@ TEST_F(MatrixTest, HepMatrix) {
   ::CLHEP::HepMatrix matrix_hep0 = MAUS::CLHEP::HepMatrix(matrix_d0);
   ASSERT_EQUALS(matrix_hep0.num_row(), matrix_d0.number_of_rows());
   ASSERT_EQUALS(matrix_hep0.num_col(), matrix_d0.number_of_columns());
-  for(size_t row=1; row<=submatrix_rows_; ++row)
+  for(size_t row=1; row<=rows_; ++row)
   {
-    for(size_t column=1; column<=submatrix_columns_; ++column)
+    for(size_t column=1; column<=columns_; ++column)
     {
       EXPECT_NEAR(matrix_hep0(row, column), matrix_d0(row, column), 1e-9);
     }
   }
 }
 
-TEST_F(MatrixTest, HepMatrix) {
-  Matrix<double> md(size_, size_, double_data_);
-  std::pair< Vector<complex>, Matrix<complex> > evec  = md.eigenvectors();
-  Vector<complex> eval  = md.eigenvalues();
-  for(size_t i=1; i<evec.first.number_of_rows(); i++)
-    testpass &= equal(complex(md) * evec.second.get_mvector(1), evec.second.get_mvector(1)*evec.first(1) ) ;
-
-  Vector<complex> eval2 = evec.first;
-  for(size_t i=1; i<=eval2.number_of_rows(); i++)
+TEST_F(MatrixTest, Eigen) {
+  //verify the eigensystem equation M*E = e*E
+  Matrix<double> matrix_d0(size_, size_, double_data_);
+  std::pair< Vector<complex>, Matrix<complex> > eigensystem
+    = matrix_d0.eigensystem();
+  Vector<complex> eigenvalues = eigensystem.first();
+  Matrix<complex> eigenvectors = eigensystem.second();
+  ASSERT_EQUALS(eigenvalues.size(), size_);
+  ASSERT_EQUALS(eigenvectors.size(), size_);
+  for(size_t i=1; i<eigenvectors.size(); ++i)
   {
-    bool test_here = false;
-    for(size_t j=1; j<=eval2.number_of_rows(); j++)
-      if( equal( eval2(i),eval(j) ) ) test_here = true;
-    testpass &= test_here; //pass test if for each value in eval2 there is also a value in eval and size_ of eval2 == size_ of eval
+    EXPECT_TRUE(equal(Matrix::complex(matrix_d0) * eigenvectors(i),
+                      eigenvalues(i) * eigenvectors(i));
+  }
+
+  //verify that just getting the eigenvalues returns the same set from
+  //eigensystem() (but perhaps in a different order)
+  Vector<complex> eigenvalues2 = matrix_d0.eigenvalues();
+  ASSERT_EQUALS(eigenvalues2.size(), size_);
+  for(size_t i=1; i<=size_; ++i)
+  {
+    bool found_match = false;
+    for (size_t j=1; j<=size_; j++)
+    {
+      if (equal(eigenvalues2(i), eigenvalues(j)))
+      {
+        found_match = true;
+      }
+    }
+    EXPECT_TRUE(found_match);
   }    
-  testpass &= eval.number_of_rows() == eval2.number_of_rows();
 }
 
 TEST_F(MatrixTest, Negation) {
+  Matrix<double> matrix_d0(size_, size_, double_data_);
+  Matrix<double> matrix_d1(-matrix_d0);
+  for(size_t row=1; row<=rows_; ++row)
+  {
+    for(size_t column=1; column<=columns_; ++column)
+    {
+      EXPECT_NEAR(matrix_d0(row, column), -matrix_d1(row, column), 1e-9);
+    }
+  }
+
+  Matrix<complex> matrix_c0(size_, size_, complex_data_);
+  Matrix<complex> matrix_c1(-matrix_d0);
+  for(size_t row=1; row<=rows_; ++row)
+  {
+    for(size_t column=1; column<=columns_; ++column)
+    {
+      EXPECT_NEAR(matrix_c0(row, column), -matrix_c1(row, column), 1e-9);
+    }
+  }
 }
 
 TEST_F(MatrixTest, VectorMultiplication) {
@@ -783,7 +815,7 @@ TEST_F(MatrixTest, VectorMultiplication) {
   Matrix<complex> matrix_reverse_c(size_, size_);
   for (size_t i=1; i<=size_; ++i)
   {
-    matrix_d1(i,size_-i+1) = complex(1.,0.);
+    matrix_d1(i,size_-i+1) = Complex::complex(1.,0.);
   }
   Vector<complex> vector_c0 = matrix_c0.row(1);
   Vector<complex> vector_product_c = matrix_reverse_c * vector_c0;
@@ -793,21 +825,17 @@ TEST_F(MatrixTest, VectorMultiplication) {
   }
 }
 
-//FIXME
 TEST_F(MatrixTest, Streaming) {
-  bool testpass = true;
   std::stringstream test;
-  Matrix<double> matrix_da( rows_, columns_, test_data );
+  Matrix<double> matrix_da(rows_, columns_, double_data_);
   Matrix<double> matrix_db;
   test << matrix_da;
   test >> matrix_db;
-  testpass &= equal(matrix_da, matrix_db);
+  EXPECT_TRUE(equal(matrix_da, matrix_db));
 
-  Matrix<complex> matrix_ca( rows_, columns_, complex_data_ );
+  Matrix<complex> matrix_ca(rows_, columns_, complex_data_);
   Matrix<complex> matrix_cb;
   test << matrix_ca;
   test >> matrix_cb;
-  testpass &= equal(matrix_ca, matrix_cb);
-
-  return testpass;
+  EXPECT_TRUE(equal(matrix_ca, matrix_cb));
 }
