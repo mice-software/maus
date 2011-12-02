@@ -286,7 +286,7 @@ TEST_F(VirtualPlaneManagerTest, ConstructVirtualPlanes) {  // also GetPlanes()
   mod3.addPropertyString("SensitiveDetector", "");
   vpm.ConstructVirtualPlanes(NULL, &mod3);
   EXPECT_THROW(vpm.GetStationNumberFromModule(&mod3), Squeal);
-  EXPECT_EQ(vpm.GetPlanes().size(), 2);
+  EXPECT_EQ(vpm.GetPlanes().size(), (size_t) 2);
 
   vpm.ConstructVirtualPlanes(NULL, &mod2);
   double point[] = {0, 0, 0, 0};
@@ -389,9 +389,9 @@ TEST_F(VirtualPlaneManagerTest, VirtualPlanesSteppingActionTest) {
   EXPECT_THROW(vpm.GetNumberOfHits(6), Squeal);
 
   Json::Value json = vpm.GetVirtualHits();
-  ASSERT_EQ(json.size(), 3);
+  ASSERT_EQ(json.size(), (Json::UInt) 3);
   for (size_t i = 0; i < json.size(); ++i)
-    EXPECT_EQ(json[i]["station_id"].asInt(), i+2);
+    EXPECT_EQ(json[i]["station_id"].asInt(), (Json::Int) i+2);
   delete step;
 }
 
@@ -430,9 +430,9 @@ TEST_F(VirtualPlaneManagerTest, VirtualPlanesSteppingActionMultipassTest) {
   EXPECT_EQ(vpm.GetNumberOfHits(2), 3);
   EXPECT_EQ(vpm.GetNumberOfHits(3), 3);  // this is the primary station number
 
-  ASSERT_EQ(json1.size(), 3);
+  ASSERT_EQ(json1.size(), (Json::UInt) 3);
   for (size_t i = 0; i < 3; ++i)
-    EXPECT_EQ(json1[i]["station_id"].asInt(), i+1);
+    EXPECT_EQ(json1[i]["station_id"].asInt(), (Json::Int) i+1);
 
   ASSERT_EQ(json2.size(), 5);
   EXPECT_EQ(json2[3]["station_id"].asInt(), 2);

@@ -172,11 +172,11 @@ protected:
 
   /** @brief copy data from an array and put it into the GSL vector member
    */
-  void build_vector(const StdType* data, const size_t size);
+  void build_vector(const size_t size, const StdType* data);
 
   /** @brief create the GSL vector member of the given size
    */
-  void build_vector(const size_t size);
+  void build_vector(const size_t size, const bool initialize=true);
 
   GslType * vector_;
 };

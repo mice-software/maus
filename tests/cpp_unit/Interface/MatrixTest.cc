@@ -20,6 +20,12 @@
 // * No ASSERT_EQ(size_t, size_t) - gives compiler warning for overload size_t to int
 // * 
 
+/*
+fprintf(stdout, "BREAKPOINT 1\n");
+fflush(stdout);
+ */
+
+
 #include <limits>
 #include <math.h>
 #include <iostream>
@@ -63,9 +69,15 @@ public:
     {
       return false;
     }
-    for(size_t row=1; row<rows_; ++row) 
-      for(size_t column=1; column<columns_; ++column) 
+    for(size_t row=1; row<=rows_; ++row)
+    {
+      for(size_t column=1; column<=columns_; ++column)
+      {
+fprintf(stdout, "matrix(%d,%d): %f\tvalue: %f\n",row, column, matrix(row,column), value);
+fflush(stdout);
         are_equal &= ::equal(matrix(row,column), value);
+      }
+    }
     return are_equal;
   }
 
@@ -78,9 +90,14 @@ public:
     {
       return false;
     }
-    for(size_t row=1; row<rows_; ++row) 
-      for(size_t column=1; column<columns_; ++column) 
-        are_equal &= ::equal(matrix(row,column), array[(row-1)*columns_+column]);
+    for(size_t row=1; row<=rows_; ++row)
+    {
+      for(size_t column=1; column<=columns_; ++column)
+      {
+        are_equal &= ::equal(matrix(row,column),
+                             array[(row-1)*columns_+(column-1)]);
+      }
+    }
     return are_equal;
   }
 
@@ -94,8 +111,8 @@ public:
     {
       return false;
     }
-    for(size_t i=1; i<m1.number_of_rows(); i++) 
-      for(size_t j=1; j<m1.number_of_columns(); j++) 
+    for(size_t i=1; i<=m1.number_of_rows(); i++) 
+      for(size_t j=1; j<=m1.number_of_columns(); j++) 
         are_equal &= ::equal(m1(i,j), m2(i,j));
     return are_equal;
   }
@@ -108,7 +125,7 @@ public:
     {
       return false;
     }
-    for(size_t i=1; i<v1.size(); i++) 
+    for(size_t i=1; i<=v1.size(); ++i) 
       are_equal &= ::equal(v1(i), v2(i));
     return are_equal;
   }
@@ -208,7 +225,7 @@ TEST_F(MatrixTest, ConstructorFromArray) {
 TEST_F(MatrixTest, IndexingElements) {
   Matrix<double> matrix_d1(rows_, columns_, double_data_);
   const Matrix<double> matrix_d2(rows_, columns_, double_data_);
-  for(size_t i=1; i<=rows_; ++i)
+  for(size_t i=0; i<rows_; ++i)
   {
     for(size_t j=0; j<columns_; ++j)
     {
@@ -232,7 +249,7 @@ TEST_F(MatrixTest, IndexingElements) {
   const Matrix<complex> matrix_c2(rows_, columns_, complex_data_);
   complex new_value1 = Complex::complex(4., -2.);
   complex new_value2 = Complex::complex(-6., 15.);
-  for(size_t i=1; i<=rows_; ++i)
+  for(size_t i=0; i<rows_; ++i)
   {
     for(size_t j=0; j<columns_; ++j)
     {
@@ -366,37 +383,35 @@ TEST_F(MatrixTest, IndexingColumns) {
 TEST_F(MatrixTest, Submatrix) {
   Matrix<double> matrix_d0(rows_, columns_, double_data_);
   //union of the last two rows_ and middle four columns_
-  Matrix<double> submatrix = matrix_d0.submatrix(
+  Matrix<double> submatrix_d0 = matrix_d0.submatrix(
     submatrix_start_row_,    submatrix_rows_,
     submatrix_start_column_, submatrix_columns_);
-  ASSERT_EQ(submatrix.number_of_rows(),     (size_t) submatrix_rows_);
-  ASSERT_EQ(submatrix.number_of_columns(),  (size_t) submatrix_columns_);
+  ASSERT_EQ(submatrix_d0.number_of_rows(),     (size_t) submatrix_rows_);
+  ASSERT_EQ(submatrix_d0.number_of_columns(),  (size_t) submatrix_columns_);
   for(size_t row=1; row<=submatrix_rows_; ++row)
   {
     for(size_t column=1; column<=submatrix_columns_; ++column)
     {
-      EXPECT_EQ(
-        submatrix(row,column),
-        double_data_[  (row+submatrix_start_row-1)*columns_
-                     + column+submatrix_start_column]);
+      EXPECT_TRUE(::equal(submatrix_d0(row,column),
+                          double_data_[  (row+submatrix_start_row_-1)*columns_
+                                       + column+submatrix_start_column_]));
     }
   }
 
   Matrix<complex> matrix_c0(rows_, columns_, complex_data_);
   //union of the last two rows_ and middle four columns_
-  Matrix<complex> submatrix = matrix_c0.submatrix(
+  Matrix<complex> submatrix_c0 = matrix_c0.submatrix(
     submatrix_start_row_,    submatrix_rows_,
     submatrix_start_column_, submatrix_columns_);
-  ASSERT_EQ(submatrix.number_of_rows(),     (size_t) submatrix_rows_);
-  ASSERT_EQ(submatrix.number_of_columns(),  (size_t) submatrix_columns_);
+  ASSERT_EQ(submatrix_c0.number_of_rows(),     (size_t) submatrix_rows_);
+  ASSERT_EQ(submatrix_c0.number_of_columns(),  (size_t) submatrix_columns_);
   for(size_t row=1; row<=submatrix_rows_; ++row)
   {
     for(size_t column=1; column<=submatrix_columns_; ++column)
     {
-      EXPECT_EQ(
-        submatrix(row,column),
-        complex_data_[  (row+submatrix_start_row-1)*columns_
-                      + column+submatrix_start_column]);
+      EXPECT_TRUE(::equal(submatrix_c0(row,column),
+                          complex_data_[  (row+submatrix_start_row_-1)*columns_
+                                        + column+submatrix_start_column_]));
     }
   }
 }
@@ -413,14 +428,14 @@ TEST_F(MatrixTest, Comparison) {
   EXPECT_TRUE(matrix_d0 == matrix_d1);
   
   //empty equality
-  Matrix<double> matrix_d2();
-  Matrix<double> matrix_d3();
+  Matrix<double> matrix_d2;
+  Matrix<double> matrix_d3;
   EXPECT_TRUE(matrix_d2 == matrix_d3);
 
   //*** double inequality ***
 
   //different sizes
-  Matrix<double> matrix_d4 = matrix_d0.submatrix(1, 1, rows_-1, columns-1);
+  Matrix<double> matrix_d4 = matrix_d0.submatrix(1, 1, rows_-1, columns_-1);
   EXPECT_TRUE(matrix_d0 != matrix_d4);
   EXPECT_FALSE(matrix_d0 == matrix_d4);
 
@@ -444,23 +459,23 @@ TEST_F(MatrixTest, Comparison) {
   //*** complex equality ***
   
   //self-equality
-  Matrix<complex> matrix_d0(rows_, columns_, complex_data_);
-  EXPECT_TRUE(matrix_d0 == matrix_d0);
+  Matrix<complex> matrix_c0(rows_, columns_, complex_data_);
+  EXPECT_TRUE(matrix_c0 == matrix_c0);
   
   //identically prepared equality
-  Matrix<complex> matrix_d1(rows_, columns_, complex_data_);
-  EXPECT_TRUE(matrix_d0 == matrix_d1);
+  Matrix<complex> matrix_c1(rows_, columns_, complex_data_);
+  EXPECT_TRUE(matrix_c0 == matrix_c1);
   
   //empty equality
-  Matrix<complex> matrix_d2();
-  Matrix<complex> matrix_d3();
-  EXPECT_TRUE(matrix_d2 == matrix_d3);
+  Matrix<complex> matrix_c2;
+  Matrix<complex> matrix_c3;
+  EXPECT_TRUE(matrix_c2 == matrix_c3);
   
   //*** complex inequality ***
   
   //different sizes
   Matrix<complex> matrix_c4
-    = matrix_c0.submatrix(1, 1, rows_-1, columns-1);
+    = matrix_c0.submatrix(1, 1, rows_-1, columns_-1);
   EXPECT_TRUE(matrix_c0 != matrix_c4);
   EXPECT_FALSE(matrix_c0 == matrix_c4);
   
@@ -475,7 +490,7 @@ TEST_F(MatrixTest, Comparison) {
   {
     for(size_t column=1; column<=submatrix_columns_; ++column)
     {
-      matrix_c6(row, column) = (complex) row*column;
+      matrix_c6(row, column) = Complex::complex(row*column);
     }
   }
   EXPECT_TRUE(matrix_c5 != matrix_c6);
@@ -486,34 +501,34 @@ TEST_F(MatrixTest, Assignment) {
   //plain vanilla assignment
   Matrix<double> matrix_d0(rows_, columns_, double_data_);
   Matrix<double> matrix_d1 = matrix_d0;
-  EXPECT_EQUALS(matrix_d0, matrix_d1);
+  EXPECT_TRUE(equal(matrix_d0, matrix_d1));
 
   //plain vanilla assignment
   Matrix<complex> matrix_c0(rows_, columns_, complex_data_);
   Matrix<complex> matrix_c1 = matrix_c0;
-  EXPECT_EQUALS(matrix_c0, matrix_c1);
+  EXPECT_TRUE(equal(matrix_c0, matrix_c1));
 }
 
 TEST_F(MatrixTest, Addition) {
   //add and assign
   Matrix<double> matrix_d0(rows_, columns_, double_data_);
-  Matrix<double> matrix_d1();
+  Matrix<double> matrix_d1;
   matrix_d1 += matrix_d0;
-  ASSERT_EQUALSequal(matrix_d0, matrix_d1);
+  ASSERT_TRUE(equal(matrix_d0, matrix_d1));
 
   //add
   Matrix<double> matrix_d2 = matrix_d0 + matrix_d1;
   EXPECT_TRUE(equal(matrix_d2, double_data_doubled_));
 
   //add and assign
-  Matrix<complex> matrix_d0(rows_, columns_, complex_data_);
-  Matrix<complex> matrix_d1();
-  matrix_d1 += matrix_d0;
-  ASSERT_EQUALS(matrix_d0, matrix_d1);
+  Matrix<complex> matrix_c0(rows_, columns_, complex_data_);
+  Matrix<complex> matrix_c1;
+  matrix_c1 += matrix_c0;
+  ASSERT_TRUE(equal(matrix_c0, matrix_c1));
 
   //add
-  Matrix<complex> matrix_d2 = matrix_d0 + matrix_d1;
-  EXPECT_EQUALS(matrix_d2, complex_data_doubled_);
+  Matrix<complex> matrix_c2 = matrix_c0 + matrix_c1;
+  EXPECT_TRUE(equal(matrix_c2, complex_data_doubled_));
 }
 
 TEST_F(MatrixTest, Subtraction) {
@@ -522,7 +537,7 @@ TEST_F(MatrixTest, Subtraction) {
   Matrix<double> matrix_d1(rows_, columns_, double_data_doubled_);
   Matrix<double> matrix_d2(matrix_d1);
   matrix_d2 -= matrix_d0;
-  ASSERT_EQUALS(matrix_d0, matrix_d2);
+  ASSERT_TRUE(equal(matrix_d0, matrix_d2));
 
   //subtract
   Matrix<double> matrix_d3 = matrix_d1 - matrix_d0;
@@ -533,7 +548,7 @@ TEST_F(MatrixTest, Subtraction) {
   Matrix<complex> matrix_c1( rows_, columns_, complex_data_multiple_);
   Matrix<complex> matrix_c2(matrix_c1);
   matrix_c2 -= matrix_c0;
-  ASSERT_EQUALS(matrix_c0, matrix_c2);
+  ASSERT_TRUE(equal(matrix_c0, matrix_c2));
 
   //subtract
   Matrix<complex> matrix_c3 = matrix_c1 - matrix_c0;
@@ -541,8 +556,6 @@ TEST_F(MatrixTest, Subtraction) {
 }
 
 TEST_F(MatrixTest, Multiplication) {
-  bool testpass = true;
-
   double d1[6] = {1,2,3,7,6,5};
   double d2[6] = {3,4,5,2,8,3};
   const Matrix<double>  matrix_d0(3, 2, d1);
@@ -552,37 +565,37 @@ TEST_F(MatrixTest, Multiplication) {
     for(int j=1; j<=3; j++)
       for(int k=1; k<=2; k++)
         matrix_d2(i,j) += matrix_d0(i,k)*matrix_d1(k,j);
-  Matrix<double> matrix_d3(matrix_d0)
+  Matrix<double> matrix_d3(matrix_d0);
   matrix_d3 *= matrix_d1;
-  ASSERT_EQUALS(matrix_d2, matrix_d3);
+  ASSERT_TRUE(equal(matrix_d2, matrix_d3));
   
   Matrix<double> matrix_d4 = matrix_d0 * matrix_d1;
-  EXPECT_EQUALS(matrix_d2, matrix_d4);
+  EXPECT_TRUE(equal(matrix_d2, matrix_d4));
        
   complex c1[6];
   complex c2[6];
   for(int i=0; i<6; i++) c1[i] = Complex::complex( d1[i],       d2[i]);
   for(int i=0; i<6; i++) c2[i] = Complex::complex(-d2[i]*d1[i], d1[i]);
-  const Matrix<complex>  matrix_c0(3, 2, d1);
-  const Matrix<complex>  matrix_c1(2, 3, d2);
-  Matrix<complex>        matrix_c2(3, 3);
+  const Matrix<complex> matrix_c0(3, 2, c1);
+  const Matrix<complex> matrix_c1(2, 3, c2);
+  Matrix<complex>       matrix_c2(3, 3);
   for(int i=1; i<=3; i++)
     for(int j=1; j<=3; j++)
       for(int k=1; k<=2; k++)
         matrix_c2(i,j) += matrix_c0(i,k) * matrix_c1(k,j);
-  Matrix<complex> matrix_c3(matrix_c0)
+  Matrix<complex> matrix_c3(matrix_c0);
   matrix_c3 *= matrix_c1;
-  ASSERT_EQUALS(matrix_c2, matrix_c3);
+  ASSERT_TRUE(equal(matrix_c2, matrix_c3));
   
   Matrix<complex> matrix_c4 = matrix_c0 * matrix_c1;
-  EXPECT_EQUALS(matrix_c2, matrix_c4);
+  EXPECT_TRUE(equal(matrix_c2, matrix_c4));
 }
 
 TEST_F(MatrixTest, ScalarMultiplication) {
   //*** double multiplication ***
   
   //multiply and assign
-  const Matrix<double> matrix_d0(double_data_, rows_, columns_);
+  const Matrix<double> matrix_d0(rows_, columns_, double_data_);
   Matrix<double> matrix_d1(matrix_d0);
   matrix_d1 *= 2.;
   ASSERT_TRUE(equal(matrix_d1, double_data_doubled_));
@@ -593,12 +606,12 @@ TEST_F(MatrixTest, ScalarMultiplication) {
 
   //multiplication on the left by a scalar
   Matrix<double> matrix_d3 = 2. * matrix_d0;
-  ASSERT_TRUE(equal(matrix_d2, double_data_doubled_));
+  ASSERT_TRUE(equal(matrix_d3, double_data_doubled_));
   
   //*** double multiplication ***
 
   //multiply and assign
-  const Matrix<complex> matrix_c0(complex_data_, rows_, columns_);
+  const Matrix<complex> matrix_c0(rows_, columns_, complex_data_);
   Matrix<complex> matrix_c1(matrix_c0);
   matrix_c1 *= complex_scaling_factor_;
   ASSERT_TRUE(equal(matrix_c1, complex_data_multiple_));
@@ -608,8 +621,8 @@ TEST_F(MatrixTest, ScalarMultiplication) {
   ASSERT_TRUE(equal(matrix_c2, complex_data_multiple_));
 
   //multiplication on the left by a scalar
-  Matrix<complex> matrix_c3 = complex_scaling_factor_ * matrix_d0;
-  ASSERT_TRUE(equal(matrix_d2, complex_data_multiple_));
+  Matrix<complex> matrix_c3 = complex_scaling_factor_ * matrix_c0;
+  ASSERT_TRUE(equal(matrix_c3, complex_data_multiple_));
 }
 
 TEST_F(MatrixTest, ScalarDivision) {
@@ -640,7 +653,7 @@ TEST_F(MatrixTest, ComplexComposition) {
   }
   const Matrix<double> matrix_imag(rows_, columns_, double_data_reversed);
   Matrix<complex> matrix_c1 = Complex::complex(matrix_real, matrix_imag);
-  ASSERT_EQUAL(matrix_c1, matrix_c0);
+  ASSERT_TRUE(equal(matrix_c1, matrix_c0));
   
 }
 
@@ -656,7 +669,8 @@ TEST_F(MatrixTest, ComplexDecomposition) {
   //which is again just double_data_
   Matrix<double> matrix_imag = imag(matrix_c0);
   //create a pure-imaginary matrix
-  Matrix<complex> matrix_pure_imag = Complex::complex(0., matrix_c0);
+  Matrix<double> zero_matrix(rows_, columns_);
+  Matrix<complex> matrix_pure_imag = Complex::complex(zero_matrix, matrix_imag);
   Matrix<complex> matrix_c1 = matrix_c0 - matrix_pure_imag;
   Matrix<double> matrix_d1(rows_, columns_);
   for(size_t row=1; row<=rows_; ++row)
@@ -690,10 +704,9 @@ TEST_F(MatrixTest, Determinant) {
   double upper_block_diag_det = matrix_d1(1,1)*matrix_d1(2,2)
                               - matrix_d1(1,2)*matrix_d1(2,1);
   double lower_block_diag_det = matrix_d1(3,3)*matrix_d1(4,4)
-                              -matrix_d1(3,4)*matrix_d1(4,3)
-  EXPECT_NEAR(upper_block_diag_det * lower_block_diag_det,
-              matrix_d1.determinant(),
-              1e-6);
+                              -matrix_d1(3,4)*matrix_d1(4,3);
+  EXPECT_TRUE(::equal(upper_block_diag_det * lower_block_diag_det,
+              determinant(matrix_d1)));
 
   //if 2 rows are identical, det is 0
   Matrix<double> matrix_d2(size_, size_, double_data_);
@@ -701,7 +714,7 @@ TEST_F(MatrixTest, Determinant) {
   {
     matrix_d2(2, column) = matrix_d2(1, column);
   }
-  EXPECT_NEAR(0., matrix_d2.determinant(), 1e-6);
+  EXPECT_TRUE(::equal(0., determinant(matrix_d2)));
 }
 
 TEST_F(MatrixTest, Inverse) {
@@ -712,14 +725,14 @@ TEST_F(MatrixTest, Inverse) {
   {
     for(size_t column=1; column<=columns_; ++column)
     {
-      EXPECT_NEAR(row==column ? 1. : 0., matrix_d3(row, column), 1e-9);
+      EXPECT_TRUE(::equal(row==column ? 1. : 0., matrix_d3(row, column)));
     }
   }
 }
 
 TEST_F(MatrixTest, Trace) {
   Matrix<double> matrix_d1(size_, size_, double_data_);
-  double tr = matrix_d1.trace();
+  double tr = trace(matrix_d1);
   for(size_t i=1; i<=size_; i++)
   {
     tr -= matrix_d1(i, i);
@@ -730,32 +743,32 @@ TEST_F(MatrixTest, Trace) {
 TEST_F(MatrixTest, Transpose) {
   Matrix<double> matrix_da(rows_, columns_, double_data_);
   Matrix<double> matrix_dt = transpose(matrix_da);
-  ASSERT_EQUALS(matrix_da.number_of_rows(), matrix_dt.number_of_columns());
-  ASSERT_EQUALS(matrix_da.number_of_columns(), matrix_dt.number_of_rows());
+  ASSERT_EQ(matrix_da.number_of_rows(), matrix_dt.number_of_columns());
+  ASSERT_EQ(matrix_da.number_of_columns(), matrix_dt.number_of_rows());
   for(size_t i = 1; i<=matrix_da.number_of_rows(); ++i)
     for(size_t j = 1; j<=matrix_da.number_of_columns(); ++j)
-      EXPECT_EQUALS(matrix_da(i,j), matrix_dt(j,i));
+      EXPECT_EQ(matrix_da(i,j), matrix_dt(j,i));
 
   Matrix<complex> matrix_ca(rows_, columns_, complex_data_);  
   Matrix<complex> matrix_ct = transpose(matrix_ca);
-  ASSERT_EQUALS(matrix_ca.number_of_rows(), matrix_ct.number_of_columns());
-  ASSERT_EQUALS(matrix_ca.number_of_columns(), matrix_ct.number_of_rows());
+  ASSERT_EQ(matrix_ca.number_of_rows(), matrix_ct.number_of_columns());
+  ASSERT_EQ(matrix_ca.number_of_columns(), matrix_ct.number_of_rows());
   for(size_t i = 1; i<=matrix_ca.number_of_rows(); ++i)
     for(size_t j = 1; j<=matrix_ca.number_of_columns(); ++j)
-      EXPECT_EQUALS(matrix_ca(i,j), matrix_ct(j,i));
+      EXPECT_EQ(matrix_ca(i,j), matrix_ct(j,i));
 }
 
 TEST_F(MatrixTest, HepMatrix) {
   ::CLHEP::HepRandom hep_random;
   const Matrix<double> matrix_d0(rows_, columns_, double_data_);
   ::CLHEP::HepMatrix matrix_hep0 = MAUS::CLHEP::HepMatrix(matrix_d0);
-  ASSERT_EQUALS(matrix_hep0.num_row(), matrix_d0.number_of_rows());
-  ASSERT_EQUALS(matrix_hep0.num_col(), matrix_d0.number_of_columns());
+  ASSERT_EQ((size_t) matrix_hep0.num_row(), matrix_d0.number_of_rows());
+  ASSERT_EQ((size_t) matrix_hep0.num_col(), matrix_d0.number_of_columns());
   for(size_t row=1; row<=rows_; ++row)
   {
     for(size_t column=1; column<=columns_; ++column)
     {
-      EXPECT_NEAR(matrix_hep0(row, column), matrix_d0(row, column), 1e-9);
+      EXPECT_TRUE(::equal(matrix_hep0(row, column), matrix_d0(row, column)));
     }
   }
 }
@@ -763,28 +776,30 @@ TEST_F(MatrixTest, HepMatrix) {
 TEST_F(MatrixTest, Eigen) {
   //verify the eigensystem equation M*E = e*E
   Matrix<double> matrix_d0(size_, size_, double_data_);
-  std::pair< Vector<complex>, Matrix<complex> > eigensystem
-    = matrix_d0.eigensystem();
-  Vector<complex> eigenvalues = eigensystem.first();
-  Matrix<complex> eigenvectors = eigensystem.second();
-  ASSERT_EQUALS(eigenvalues.size(), size_);
-  ASSERT_EQUALS(eigenvectors.size(), size_);
-  for(size_t i=1; i<eigenvectors.size(); ++i)
+  std::pair< Vector<complex>, Matrix<complex> > eigensys
+    = eigensystem(matrix_d0);
+  Vector<complex> eigenvals = eigensys.first;
+  Matrix<complex> eigenvectors = eigensys.second;
+  ASSERT_EQ(eigenvals.size(), size_);
+  ASSERT_EQ(eigenvectors.number_of_columns(), size_);
+  for(size_t i=1; i<eigenvals.size(); ++i)
   {
-    EXPECT_TRUE(equal(Complex::complex(matrix_d0) * eigenvectors(i),
-                      eigenvalues(i) * eigenvectors(i)));
+    complex eigenvalue = eigenvals(i);
+    Vector<complex> eigenvector = eigenvectors.column(i);
+    EXPECT_TRUE(equal(Complex::complex(matrix_d0) * eigenvector,
+                      eigenvalue * eigenvector));
   }
 
   //verify that just getting the eigenvalues returns the same set from
   //eigensystem() (but perhaps in a different order)
-  Vector<complex> eigenvalues2 = matrix_d0.eigenvalues();
-  ASSERT_EQUALS(eigenvalues2.size(), size_);
+  Vector<complex> eigenvals2 = eigenvalues(matrix_d0);
+  ASSERT_EQ(eigenvals2.size(), size_);
   for(size_t i=1; i<=size_; ++i)
   {
     bool found_match = false;
     for (size_t j=1; j<=size_; j++)
     {
-      if (equal(eigenvalues2(i), eigenvalues(j)))
+      if (::equal(eigenvals2(i), eigenvals(j)))
       {
         found_match = true;
       }
@@ -800,7 +815,7 @@ TEST_F(MatrixTest, Negation) {
   {
     for(size_t column=1; column<=columns_; ++column)
     {
-      EXPECT_NEAR(matrix_d0(row, column), -matrix_d1(row, column), 1e-9);
+      EXPECT_TRUE(::equal(matrix_d0(row, column), -matrix_d1(row, column)));
     }
   }
 
@@ -810,7 +825,7 @@ TEST_F(MatrixTest, Negation) {
   {
     for(size_t column=1; column<=columns_; ++column)
     {
-      EXPECT_NEAR(matrix_c0(row, column), -matrix_c1(row, column), 1e-9);
+      EXPECT_TRUE(::equal(matrix_c0(row, column), -matrix_c1(row, column)));
     }
   }
 }
@@ -821,13 +836,13 @@ TEST_F(MatrixTest, VectorMultiplication) {
   Matrix<double> matrix_reverse_d(size_, size_);
   for (size_t i=1; i<=size_; ++i)
   {
-    matrix_d1(i,size_-i+1) = 1.;
+    matrix_reverse_d(i,size_-i+1) = 1.;
   }
   Vector<double> vector_d0 = matrix_d0.row(1);
   Vector<double> vector_product_d = matrix_reverse_d * vector_d0;
   for (size_t i=1; i<=size_; ++i)
   {
-    EXPECT_NEAR(vector_product_d(i), vector_d0(size_-i+1), 1e-9);
+    EXPECT_TRUE(::equal(vector_product_d(i), vector_d0(size_-i+1)));
   }
 
   //reverse the order of a vector's elements using a matrix
@@ -835,13 +850,13 @@ TEST_F(MatrixTest, VectorMultiplication) {
   Matrix<complex> matrix_reverse_c(size_, size_);
   for (size_t i=1; i<=size_; ++i)
   {
-    matrix_d1(i,size_-i+1) = Complex::complex(1.,0.);
+    matrix_reverse_c(i,size_-i+1) = Complex::complex(1.,0.);
   }
   Vector<complex> vector_c0 = matrix_c0.row(1);
   Vector<complex> vector_product_c = matrix_reverse_c * vector_c0;
   for (size_t i=1; i<=size_; ++i)
   {
-    EXPECT_NEAR(vector_product_c(i), vector_c0(size_-i+1), 1e-9);
+    EXPECT_TRUE(::equal(vector_product_c(i), vector_c0(size_-i+1)));
   }
 }
 
@@ -857,5 +872,5 @@ TEST_F(MatrixTest, Streaming) {
   Matrix<complex> matrix_cb;
   test << matrix_ca;
   test >> matrix_cb;
-  //EXPECT_TRUE(equal(matrix_ca, matrix_cb));
+  EXPECT_TRUE(equal(matrix_ca, matrix_cb));
 }

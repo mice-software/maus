@@ -54,6 +54,23 @@ protected:
   const MAUS::complex cc;
 };
 
+TEST_F(ComplexTest, PseudoConstructor) {
+  //real part explicitly zero, default imaginary part
+  const complex c1 = Complex::complex(0.0);
+  EXPECT_TRUE(equal(real(c1), 0.0));
+  EXPECT_TRUE(equal(imag(c1), 0.0));
+
+  //real and imaginary part explicitly zero
+  const complex c2 = Complex::complex(0.0, 0.0);
+  EXPECT_TRUE(equal(real(c2), 0.0));
+  EXPECT_TRUE(equal(imag(c2), 0.0));
+
+  //arbitrary real and imaginary part
+  const complex c3 = Complex::complex(3.14, -15.92);
+  EXPECT_TRUE(equal(real(c3), 3.14));
+  EXPECT_TRUE(equal(imag(c3), -15.92));
+}
+
 TEST_F(ComplexTest, Equals) {
   //operator ==
   ASSERT_TRUE(c1 == c2);
