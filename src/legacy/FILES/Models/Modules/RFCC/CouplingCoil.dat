@@ -12,7 +12,7 @@ Module CouplingCoil
   PropertyString Material Cu 
 //field
   PropertyString FieldType       Solenoid
-  PropertyString FileName        coupling.dat
+  PropertyString FileName        ${MAUS_ROOT_DIR}/tmp/coupling.fld
   PropertyDouble CurrentDensity    1.
   PropertyDouble Length          250.
   PropertyDouble Thickness       116.

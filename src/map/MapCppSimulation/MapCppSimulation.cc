@@ -29,17 +29,16 @@
 
 #include "src/map/MapCppSimulation/MapCppSimulation.hh"
 
-
 bool MapCppSimulation::birth(std::string argJsonConfigDocument) {
   // Check if the JSON document can be parsed, else return error only
   try {
     SetConfiguration(argJsonConfigDocument);
     return true;  // Sucessful completion
   // Normal session, no visualization
-  } catch(Squeal squee) {
-    CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
-  } catch(std::exception exc) {
-    CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
+  } catch(Squeal& squee) {
+    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
+  } catch(std::exception& exc) {
+    MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
   }
   return false;
 }
@@ -53,19 +52,19 @@ std::string MapCppSimulation::process(std::string document) {
   }
   try {
     if (_doVis) {
-        MAUSGeant4Manager::GetInstance()->GetVisManager()->SetupRun();
+        MAUS::MAUSGeant4Manager::GetInstance()->GetVisManager()->SetupRun();
     }
     Json::Value mc   = JsonWrapper::GetProperty
                                         (spill, "mc", JsonWrapper::arrayValue);
-    spill["mc"] = MAUSGeant4Manager::GetInstance()->RunManyParticles(mc);
+    spill["mc"] = MAUS::MAUSGeant4Manager::GetInstance()->RunManyParticles(mc);
     if (_doVis)
-        MAUSGeant4Manager::GetInstance()->GetVisManager()->TearDownRun();
+        MAUS::MAUSGeant4Manager::GetInstance()->GetVisManager()->TearDownRun();
   }
-  catch(Squeal squee) {
-    spill = CppErrorHandler::getInstance()
+  catch(Squeal& squee) {
+    spill = MAUS::CppErrorHandler::getInstance()
                                        ->HandleSqueal(spill, squee, _classname);
-  } catch(std::exception exc) {
-    spill = CppErrorHandler::getInstance()
+  } catch(std::exception& exc) {
+    spill = MAUS::CppErrorHandler::getInstance()
                                          ->HandleStdExc(spill, exc, _classname);
   }
   Json::FastWriter writer;
@@ -94,7 +93,7 @@ void MapCppSimulation::SetConfiguration(std::string json_configuration) {
   simRun.miceModule = new MiceModule(modname.asString());
   // G4 Materials
   fillMaterials(simRun);
-  _g4manager = MAUSGeant4Manager::GetInstance();
+  _g4manager = MAUS::MAUSGeant4Manager::GetInstance();
   // RF cavity phases
   _g4manager->SetPhases();
   Squeak::mout(Squeak::info) << "Fields:" << std::endl;

@@ -5,7 +5,6 @@ This walks the directory structure of MAUS and checks for each file of ending
 *.py,. It's possible to set up exceptions to the pylint test by 
 """
 
-import io
 import unittest
 import subprocess
 import os

@@ -20,11 +20,6 @@
 // * No ASSERT_EQ(size_t, size_t) - gives compiler warning for overload size_t to int
 // * 
 
-/*
-fprintf(stdout, "BREAKPOINT 1\n");
-fflush(stdout);
- */
-
 
 #include <limits>
 #include <math.h>
@@ -61,8 +56,24 @@ public:
   }
 
   template <typename Tmplt>
-  bool elements_equal(const Matrix<Tmplt>& matrix, const Tmplt value);
-
+  bool elements_equal(const Matrix<Tmplt>& matrix, const Tmplt value)
+  {
+    bool are_equal = true;
+    if(   matrix.number_of_rows()    != rows_
+       || matrix.number_of_columns() != columns_) 
+    {
+      return false;
+    }
+    for(size_t row=1; row<=rows_; ++row)
+    {
+      for(size_t column=1; column<=columns_; ++column)
+      {
+        are_equal &= ::equal(matrix(row,column), value);
+      }
+    }
+    return are_equal;
+  }
+  
   template <typename Tmplt>
   bool equal(const Matrix<Tmplt>& matrix, const Tmplt* array)
   {
@@ -128,12 +139,10 @@ protected:
   complex complex_data_multiple_[24];
 };
 
-/*
 template bool MatrixTest::elements_equal(const Matrix<double>& matrix,
                                          const double value);
 template bool MatrixTest::elements_equal(const Matrix<complex>& matrix,
                                          const complex value);
-*/
 template bool MatrixTest::equal(const Matrix<double>& matrix,
                                 const double* array);
 template bool MatrixTest::equal(const Matrix<complex>& matrix,
@@ -146,49 +155,6 @@ template bool MatrixTest::equal(const Vector<double>& v1,
                                 const Vector<double>& v2);
 template bool MatrixTest::equal(const Vector<complex>& v1,
                                 const Vector<complex>& v2);
-
-template <> bool MatrixTest::elements_equal(const Matrix<double>& matrix,
-                                const double value)
-{
-  bool are_equal = true;
-  if(   matrix.number_of_rows()    != rows_
-     || matrix.number_of_columns() != columns_) 
-  {
-    return false;
-  }
-  for(size_t row=1; row<=rows_; ++row)
-  {
-    for(size_t column=1; column<=columns_; ++column)
-    {
-fprintf(stdout, "matrix(%d,%d): %f\tvalue: %f\n",row, column, matrix(row,column), value);
-fflush(stdout);
-      are_equal &= ::equal(matrix(row,column), value);
-    }
-  }
-  return are_equal;
-}
-
-template <> bool MatrixTest::elements_equal(const Matrix<complex>& matrix,
-                                const complex value)
-{
-  bool are_equal = true;
-  if(   matrix.number_of_rows()    != rows_
-     || matrix.number_of_columns() != columns_) 
-  {
-    return false;
-  }
-  for(size_t row=1; row<=rows_; ++row)
-  {
-    for(size_t column=1; column<=columns_; ++column)
-    {
-fprintf(stdout, "matrix(%d,%d): %f\tvalue: (%f,%f)\n",
-      row, column, matrix(row,column), real(value), imag(value));
-fflush(stdout);
-      are_equal &= ::equal(matrix(row,column), value);
-    }
-  }
-  return are_equal;
-}
 
 //****************************************
 //MatrixTest static const initializations
@@ -422,9 +388,6 @@ TEST_F(MatrixTest, Submatrix) {
     {
       index = (submatrix_start_row_+row-2)*columns_
             + submatrix_start_column_+column-2;
-//fprintf(stdout, "submatrix(%d,%d): %f\n", row, column, submatrix_d0(row,column));
-//fflush(stdout);
-      //EXPECT_TRUE(::equal(submatrix_d0(row,column), double_data_[index]));
       EXPECT_EQ(double_data_[index], submatrix_d0(row,column));
     }
   }

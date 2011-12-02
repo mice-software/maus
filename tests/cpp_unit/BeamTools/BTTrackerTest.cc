@@ -120,7 +120,7 @@ TEST_F(BTTrackerTest, SolenoidTest_z) {
         BTTracker::integrate(z, &x[0], _sol, BTTracker::z, 0.1, 1.);
       }
     }
-    catch(Squeal squee) {EXPECT_EQ(p, 3);}  // p of particle 3 is 0 => squeal
+    catch(Squeal squee) {EXPECT_EQ(p, (size_t) 3);}  // p of particle 3 is 0 => squeal
     for(size_t i=0; i<8; ++i) {
       ASSERT_NEAR(results_sol_z[p*8+i], x[i], 1e-3) << "particle " << p 
           << " var " << _var[i] << "\nParticle coords: " << Print8Vector(&x[0]);

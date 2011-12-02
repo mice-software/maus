@@ -15,8 +15,6 @@
  *
  */
 
-#include "stdio.h"
-
 #include <string>
 #include <algorithm>
 
@@ -87,15 +85,9 @@ bool VirtualPlane::SteppingOver(const G4Step* aStep) const {
   return false;
 }
 
-void VirtualPlane::FillStaticData(VirtualHit * aHit,
-                                  const G4Step * aStep) const {
+void VirtualPlane::FillStaticData
+                               (VirtualHit * aHit, const G4Step * aStep) const {
   G4Track * theTrack = aStep->GetTrack();
-  if (theTrack == NULL)
-  {
-    throw(Squeal(Squeal::recoverable,
-                 "NULL returned from G4Step::GetTrack()",
-                 "VirtualPlane::FillStaticData(...)"));
-  }
   aHit->SetTrackID(theTrack->GetTrackID());
   aHit->SetPID(theTrack->GetDynamicParticle()
                                           ->GetDefinition()->GetPDGEncoding());
