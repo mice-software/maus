@@ -66,7 +66,6 @@ fi
 
 echo "Configuring..."
 if [ "$MAUS_THIRD_PARTY" ]; then
-	echo "This loop"
 	./configure $MAUS_THIRD_PARTY 2>>$FILE_ERR 1>>$FILE_STD
 	echo "Sourcing the environment..."
 	source env.sh 2>>$FILE_ERR 1>>$FILE_STD 

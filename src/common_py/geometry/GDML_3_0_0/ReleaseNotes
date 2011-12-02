@@ -1,0 +1,11 @@
+19.12.2008 - GDML_3_0_0
+-----------------------
+
+- Updated GDML schema:
+  o included descriptions (with units specification) for parameterised volume
+    types: box, tubs, cons, trd, trap, para, sphere, orb, torus, hype.
+  o Added elliptical cone shape.
+  o Added handling of variables in loops.
+- Removed obsolete I/O modules and related configuration/build setup.
+  The Geant4 Toolkit now integrated reader and writer with full capabilities
+  and making use of the XercesC DOM parser.
