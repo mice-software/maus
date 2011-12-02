@@ -61,25 +61,7 @@ public:
   }
 
   template <typename Tmplt>
-  bool elements_equal(const Matrix<Tmplt>& matrix, const Tmplt value)
-  {
-    bool are_equal = true;
-    if(   matrix.number_of_rows()    != rows_
-       || matrix.number_of_columns() != columns_) 
-    {
-      return false;
-    }
-    for(size_t row=1; row<=rows_; ++row)
-    {
-      for(size_t column=1; column<=columns_; ++column)
-      {
-fprintf(stdout, "matrix(%d,%d): %f\tvalue: %f\n",row, column, matrix(row,column), value);
-fflush(stdout);
-        are_equal &= ::equal(matrix(row,column), value);
-      }
-    }
-    return are_equal;
-  }
+  bool elements_equal(const Matrix<Tmplt>& matrix, const Tmplt value);
 
   template <typename Tmplt>
   bool equal(const Matrix<Tmplt>& matrix, const Tmplt* array)
@@ -146,10 +128,12 @@ protected:
   complex complex_data_multiple_[24];
 };
 
+/*
 template bool MatrixTest::elements_equal(const Matrix<double>& matrix,
                                          const double value);
 template bool MatrixTest::elements_equal(const Matrix<complex>& matrix,
                                          const complex value);
+*/
 template bool MatrixTest::equal(const Matrix<double>& matrix,
                                 const double* array);
 template bool MatrixTest::equal(const Matrix<complex>& matrix,
@@ -162,6 +146,49 @@ template bool MatrixTest::equal(const Vector<double>& v1,
                                 const Vector<double>& v2);
 template bool MatrixTest::equal(const Vector<complex>& v1,
                                 const Vector<complex>& v2);
+
+template <> bool MatrixTest::elements_equal(const Matrix<double>& matrix,
+                                const double value)
+{
+  bool are_equal = true;
+  if(   matrix.number_of_rows()    != rows_
+     || matrix.number_of_columns() != columns_) 
+  {
+    return false;
+  }
+  for(size_t row=1; row<=rows_; ++row)
+  {
+    for(size_t column=1; column<=columns_; ++column)
+    {
+fprintf(stdout, "matrix(%d,%d): %f\tvalue: %f\n",row, column, matrix(row,column), value);
+fflush(stdout);
+      are_equal &= ::equal(matrix(row,column), value);
+    }
+  }
+  return are_equal;
+}
+
+template <> bool MatrixTest::elements_equal(const Matrix<complex>& matrix,
+                                const complex value)
+{
+  bool are_equal = true;
+  if(   matrix.number_of_rows()    != rows_
+     || matrix.number_of_columns() != columns_) 
+  {
+    return false;
+  }
+  for(size_t row=1; row<=rows_; ++row)
+  {
+    for(size_t column=1; column<=columns_; ++column)
+    {
+fprintf(stdout, "matrix(%d,%d): %f\tvalue: (%f,%f)\n",
+      row, column, matrix(row,column), real(value), imag(value));
+fflush(stdout);
+      are_equal &= ::equal(matrix(row,column), value);
+    }
+  }
+  return are_equal;
+}
 
 //****************************************
 //MatrixTest static const initializations
@@ -340,7 +367,7 @@ TEST_F(MatrixTest, IndexingRows) {
   Matrix<double> matrix_d0(rows_, columns_, double_data_);
   for (size_t row=0; row<rows_; ++row)
   {
-    Vector<double> row_vector = matrix_d0.row(row);
+    Vector<double> row_vector = matrix_d0.row(row+1);
     for (size_t column=0; column<columns_; ++column)
     {
       EXPECT_EQ(row_vector[column], double_data_[row*columns_ + column]);
@@ -350,7 +377,7 @@ TEST_F(MatrixTest, IndexingRows) {
   Matrix<complex> matrix_c0(rows_, columns_, complex_data_);
   for (size_t row=0; row<rows_; ++row)
   {
-    Vector<complex> row_vector = matrix_c0.row(row);
+    Vector<complex> row_vector = matrix_c0.row(row+1);
     for (size_t column=0; column<columns_; ++column)
     {
       EXPECT_EQ(row_vector[column], complex_data_[row*columns_ + column]);
@@ -362,7 +389,7 @@ TEST_F(MatrixTest, IndexingColumns) {
   Matrix<double> matrix_d0(rows_, columns_, double_data_);
   for (size_t column=0; column<columns_; ++column)
   {
-    Vector<double> column_vector = matrix_d0.column(column);
+    Vector<double> column_vector = matrix_d0.column(column+1);
     for (size_t row=0; row<rows_; ++row)
     {
       EXPECT_EQ(column_vector[row], double_data_[row*columns_ + column]);
@@ -372,7 +399,7 @@ TEST_F(MatrixTest, IndexingColumns) {
   Matrix<complex> matrix_c0(rows_, columns_, complex_data_);
   for (size_t column=0; column<columns_; ++column)
   {
-    Vector<complex> column_vector = matrix_c0.column(column);
+    Vector<complex> column_vector = matrix_c0.column(column+1);
     for (size_t row=0; row<rows_; ++row)
     {
       EXPECT_EQ(column_vector[row], complex_data_[row*columns_ + column]);
@@ -386,15 +413,19 @@ TEST_F(MatrixTest, Submatrix) {
   Matrix<double> submatrix_d0 = matrix_d0.submatrix(
     submatrix_start_row_,    submatrix_rows_,
     submatrix_start_column_, submatrix_columns_);
-  ASSERT_EQ(submatrix_d0.number_of_rows(),     (size_t) submatrix_rows_);
-  ASSERT_EQ(submatrix_d0.number_of_columns(),  (size_t) submatrix_columns_);
+  ASSERT_EQ((size_t) submatrix_rows_,     submatrix_d0.number_of_rows());
+  ASSERT_EQ((size_t) submatrix_columns_,  submatrix_d0.number_of_columns());
+  int index;
   for(size_t row=1; row<=submatrix_rows_; ++row)
   {
     for(size_t column=1; column<=submatrix_columns_; ++column)
     {
-      EXPECT_TRUE(::equal(submatrix_d0(row,column),
-                          double_data_[  (row+submatrix_start_row_-1)*columns_
-                                       + column+submatrix_start_column_]));
+      index = (submatrix_start_row_+row-2)*columns_
+            + submatrix_start_column_+column-2;
+//fprintf(stdout, "submatrix(%d,%d): %f\n", row, column, submatrix_d0(row,column));
+//fflush(stdout);
+      //EXPECT_TRUE(::equal(submatrix_d0(row,column), double_data_[index]));
+      EXPECT_EQ(double_data_[index], submatrix_d0(row,column));
     }
   }
 
@@ -409,9 +440,9 @@ TEST_F(MatrixTest, Submatrix) {
   {
     for(size_t column=1; column<=submatrix_columns_; ++column)
     {
-      EXPECT_TRUE(::equal(submatrix_c0(row,column),
-                          complex_data_[  (row+submatrix_start_row_-1)*columns_
-                                        + column+submatrix_start_column_]));
+      index = (submatrix_start_row_+row-2)*columns_
+            + submatrix_start_column_+column-2;
+      EXPECT_TRUE(::equal(submatrix_c0(row,column), complex_data_[index]));
     }
   }
 }
@@ -512,7 +543,7 @@ TEST_F(MatrixTest, Assignment) {
 TEST_F(MatrixTest, Addition) {
   //add and assign
   Matrix<double> matrix_d0(rows_, columns_, double_data_);
-  Matrix<double> matrix_d1;
+  Matrix<double> matrix_d1(rows_, columns_);
   matrix_d1 += matrix_d0;
   ASSERT_TRUE(equal(matrix_d0, matrix_d1));
 
@@ -522,7 +553,7 @@ TEST_F(MatrixTest, Addition) {
 
   //add and assign
   Matrix<complex> matrix_c0(rows_, columns_, complex_data_);
-  Matrix<complex> matrix_c1;
+  Matrix<complex> matrix_c1(rows_, columns_);
   matrix_c1 += matrix_c0;
   ASSERT_TRUE(equal(matrix_c0, matrix_c1));
 
@@ -545,7 +576,7 @@ TEST_F(MatrixTest, Subtraction) {
 
   //subtract and assign
   Matrix<complex> matrix_c0(rows_, columns_, complex_data_);
-  Matrix<complex> matrix_c1( rows_, columns_, complex_data_multiple_);
+  Matrix<complex> matrix_c1( rows_, columns_, complex_data_doubled_);
   Matrix<complex> matrix_c2(matrix_c1);
   matrix_c2 -= matrix_c0;
   ASSERT_TRUE(equal(matrix_c0, matrix_c2));
@@ -685,7 +716,7 @@ TEST_F(MatrixTest, ComplexDecomposition) {
 
 TEST_F(MatrixTest, ComplexConjugation) {
   const Matrix<complex> matrix_c0(rows_, columns_, complex_data_);
-  const Matrix<double> matrix_d0(rows_, columns_, double_data_);
+  const Matrix<double> matrix_d0(rows_, columns_, double_data_doubled_);
   Matrix<double> matrix_d1 = real(matrix_c0 + conj(matrix_c0));
   ASSERT_TRUE(equal(matrix_d1, matrix_d0));
 }
@@ -721,9 +752,9 @@ TEST_F(MatrixTest, Inverse) {
   Matrix<double> matrix_d1(size_, size_, double_data_);
   Matrix<double> matrix_d2 = inverse(matrix_d1);
   Matrix<double> matrix_d3 = matrix_d1 * matrix_d2; //M^-1 * M = Identity
-  for(size_t row=1; row<=rows_; ++row)
+  for(size_t row=1; row<=size_; ++row)
   {
-    for(size_t column=1; column<=columns_; ++column)
+    for(size_t column=1; column<=size_; ++column)
     {
       EXPECT_TRUE(::equal(row==column ? 1. : 0., matrix_d3(row, column)));
     }
@@ -741,7 +772,7 @@ TEST_F(MatrixTest, Trace) {
 }
 
 TEST_F(MatrixTest, Transpose) {
-  Matrix<double> matrix_da(rows_, columns_, double_data_);
+  Matrix<double> matrix_da(size_, size_, double_data_);
   Matrix<double> matrix_dt = transpose(matrix_da);
   ASSERT_EQ(matrix_da.number_of_rows(), matrix_dt.number_of_columns());
   ASSERT_EQ(matrix_da.number_of_columns(), matrix_dt.number_of_rows());
@@ -749,7 +780,7 @@ TEST_F(MatrixTest, Transpose) {
     for(size_t j = 1; j<=matrix_da.number_of_columns(); ++j)
       EXPECT_EQ(matrix_da(i,j), matrix_dt(j,i));
 
-  Matrix<complex> matrix_ca(rows_, columns_, complex_data_);  
+  Matrix<complex> matrix_ca(size_, size_, complex_data_);  
   Matrix<complex> matrix_ct = transpose(matrix_ca);
   ASSERT_EQ(matrix_ca.number_of_rows(), matrix_ct.number_of_columns());
   ASSERT_EQ(matrix_ca.number_of_columns(), matrix_ct.number_of_rows());
@@ -809,7 +840,7 @@ TEST_F(MatrixTest, Eigen) {
 }
 
 TEST_F(MatrixTest, Negation) {
-  Matrix<double> matrix_d0(size_, size_, double_data_);
+  Matrix<double> matrix_d0(rows_, columns_, double_data_);
   Matrix<double> matrix_d1(-matrix_d0);
   for(size_t row=1; row<=rows_; ++row)
   {
@@ -819,8 +850,8 @@ TEST_F(MatrixTest, Negation) {
     }
   }
 
-  Matrix<complex> matrix_c0(size_, size_, complex_data_);
-  Matrix<complex> matrix_c1(-matrix_d0);
+  Matrix<complex> matrix_c0(rows_, columns_, complex_data_);
+  Matrix<complex> matrix_c1(-matrix_c0);
   for(size_t row=1; row<=rows_; ++row)
   {
     for(size_t column=1; column<=columns_; ++column)
