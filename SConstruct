@@ -27,9 +27,9 @@ if not maus_root_dir:
 
 maus_third_party = os.environ.get('MAUS_THIRD_PARTY')
 if not maus_third_party:
-    print('!! Could not find the $MAUS_THIRD_PARTY environmental variable')
-    print('!! Did you try running: "source env.sh"?')
-    my_exit(1)
+    print('Could not find the $MAUS_THIRD_PARTY environmental variable')
+    print('Setting maus_third_party to current working directory')
+    maus_third_party = maus_root_dir
 
 #this is our catch-all Dev class
 class Dev:
