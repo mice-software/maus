@@ -153,21 +153,22 @@ class Go:  #  pylint: disable=R0921
 
         print("PIPELINE mode: TRANSFORM, MERGE, OUTPUT, then next spill.")
 
-        #  This helps us time how long the setup that sometimes happens in the
-        # first spill takes
-        print("HINT: MAUS will process 1 spill only at first...")
-
         spill_count = 0
-        try:
-            spill_count += 1
-            spill = next(emitter)
-            spill = self.transformer.process(spill)
-            spill = self.merger.process(spill)
-            self.outputer.save(spill)
-            print "TRANSFORM/MERGE/OUTPUT: ",
-            print "Processed %d spills so far," % spill_count,
-        except StopIteration: # end of emitter
-            pass
+        spill_size = 1
+        loop = True
+        while loop: # main event loop
+            try:
+                spill_count += 1
+                spill = next(emitter)
+                spill = self.transformer.process(spill)
+                spill = self.merger.process(spill)
+                self.outputer.save(spill)
+                if spill_count / spill_size > 10 and spill_size < 1000:
+                    spill_size *= 10
+                if spill_count % spill_size == 0:
+                    print "Processed %d spills" % spill_count
+            except StopIteration: # end of emitter
+                loop = False
 
         print("TRANSFORM: Shutting down transformer")
         assert(self.transformer.death() == True)
