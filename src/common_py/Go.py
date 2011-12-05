@@ -140,7 +140,7 @@ class Go:  #  pylint: disable=R0921
         """
         print("INPUT: Reading some input")
         assert(self.input.birth(self.json_config_document) == True)
-        emitter = self.input.emitter()
+
 
         print("TRANSFORM: Setting up transformer (this can take a while...)")
         assert(self.transformer.birth(self.json_config_document) == True)
@@ -159,10 +159,11 @@ class Go:  #  pylint: disable=R0921
         while loop: # main event loop
             try:
                 spill_count += 1
-                spill = next(emitter)
+                spill = next(self.input.emitter()) # executes until yield 
                 spill = self.transformer.process(spill)
                 spill = self.merger.process(spill)
                 self.outputer.save(spill)
+                # formatted output
                 if spill_count / spill_size > 10 and spill_size < 1000:
                     spill_size *= 10
                 if spill_count % spill_size == 0:
