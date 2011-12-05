@@ -38,7 +38,7 @@ class MapPyValidateSpill:
     pass
 
   ## Sets up the validator.
-  def birth(self):
+  def birth(self, json_configuration):
     pass
 
   ## process the spill and enter the exception handler if an error is found.
