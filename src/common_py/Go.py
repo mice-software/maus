@@ -45,22 +45,6 @@ def get_possible_dataflows():
 
     return possible_types_of_dataflow
 
-def buffer_input(the_emitter, number_spills):
-    """
-    Buffer the input stream by only reading the first
-    1024 spills into memory.  Returns an array of spills.
-    """
-    my_buffer = []
-
-    for i in range(number_spills):  # pylint: disable=W0612
-        try:
-            value = next(the_emitter)
-            my_buffer.append(value.encode('ascii'))
-        except StopIteration:
-            return my_buffer
-
-    return my_buffer
-
 class Go:  #  pylint: disable=R0921
     """
     @class Go
@@ -154,12 +138,9 @@ class Go:  #  pylint: disable=R0921
         Drive the MAUS components in a pipeline where each spill is passed
         through transform, merge, and output, then next spill is progressed.
         """
-
-
         print("INPUT: Reading some input")
         assert(self.input.birth(self.json_config_document) == True)
         emitter = self.input.emitter()
-        map_buffer = buffer_input(emitter, 1)
 
         print("TRANSFORM: Setting up transformer (this can take a while...)")
         assert(self.transformer.birth(self.json_config_document) == True)
@@ -176,20 +157,17 @@ class Go:  #  pylint: disable=R0921
         # first spill takes
         print("HINT: MAUS will process 1 spill only at first...")
 
-        i = 0
-        while len(map_buffer) != 0:
-            for spill in map_buffer:
-                spill = self.transformer.process(spill)
-                spill = self.merger.process(spill)
-                self.outputer.save(spill)
-
-            i += len(map_buffer)
-            map_buffer = buffer_input(emitter, 128)
-
-            #  Not python 3 compatible print() due to backward compatability
+        spill_count = 0
+        try:
+            spill_count += 1
+            spill = next(emitter)
+            spill = self.transformer.process(spill)
+            spill = self.merger.process(spill)
+            self.outputer.save(spill)
             print "TRANSFORM/MERGE/OUTPUT: ",
-            print "Processed %d spills so far," % i,
-            print("%d spills in buffer." % (len(map_buffer)))
+            print "Processed %d spills so far," % spill_count,
+        except StopIteration: # end of emitter
+            pass
 
         print("TRANSFORM: Shutting down transformer")
         assert(self.transformer.death() == True)
