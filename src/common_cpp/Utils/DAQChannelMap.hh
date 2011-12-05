@@ -29,7 +29,7 @@
 #include <algorithm>
 #include <fstream>
 
-#include "Interface/Squeal.hh"
+#include "src/legacy/Interface/Squeal.hh"
 
 /** Identifier for a single DAQ channel.
  * This class is used to hold and manage all the information needed
