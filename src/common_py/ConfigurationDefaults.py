@@ -82,10 +82,20 @@ spill_generator_number_of_spills = 10
 # an optimised beam might look like
 beam = {
     "particle_generator":"binomial", # routine for generating empty primaries
+                                     # set this to "file" if use_beam_file=True
     "binomial_n":50, # number of coin tosses
     "binomial_p":0.5, # probability of making a particle on each toss
     "random_seed":5, # random seed for beam generation; controls also how the MC
                      # seeds are generated
+    "use_beam_file":False, # if true, will use a formatted beam file
+                           # default is False -- ie. make your own beam
+#   "beam_file_format":"icool_for003", # format of the formatted beam file input
+    "beam_file_format":"g4beamline_bl_track_file", # g4bl track file format
+    "beam_file":"test_g4bl.dat", # test G4BL track file
+                                 # file expected in src/map/MapPyBeamMaker
+                                 # override this with a real file
+#   "beam_file":"test_for003.dat", # test icool_for003 file
+    "nbm_particles_per_spill":25, # number of beam particles to read/spill
     "definitions":[
     ##### MUONS #######
     {

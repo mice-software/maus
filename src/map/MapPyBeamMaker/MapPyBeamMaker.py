@@ -24,8 +24,10 @@ import ErrorHandler
 import numpy
 import bisect
 import beam
+import os
+from xboa.Hit import Hit
 
-class MapPyBeamMaker:
+class MapPyBeamMaker: #pylint: disable=R0902
     """
     MapPyBeamMaker generates primaries for simulation in Geant4
 
@@ -39,10 +41,16 @@ class MapPyBeamMaker:
     - overwrite_existing overwrites existing particles and samples from random
     parent distributions with probability of a given parent distribution
     assigned by 'weight' field
+    - file reads beam particles from input beam file
+    The number of beam particles in a spill is determined by
+    nbm_particles_per_spill specified in the config.
+    - use_beam_file must be set to True in config if file input
+    If use_beam_file=True and particle_generator != "file",
+    then particle_generator is reset to "file" in this class
 
     Each beam is defined in the "definitions" array of the beam branch.
     """
-    def __init__(self):
+    def __init__(self): 
         """
         Constructor; initialises parameters to 0. Member data as follows:
         - beams list of Beam classes
@@ -54,12 +62,19 @@ class MapPyBeamMaker:
         each of which yields success with probability p.
         - seed random seed used for generating particles (and generating monte
         carlo seeds in some instances)
+        - use_beam_file set to F, set it to True in config if beam input
         """
         self.beams = []
         self.particle_generator = None
         self.binomial_n = 0
         self.binomial_p = 0.5
         self.seed = 0
+        self.use_beam_file = False
+        self.beam_file = None
+        self.beam_file_format = None
+        self.bm_fh = None
+        self.nbm_particles_per_spill = 25
+        self.beam_seed = 0
 
     def birth(self, json_configuration):
         """
@@ -77,11 +92,20 @@ class MapPyBeamMaker:
         - overwrite_existing overwrites the primary branch of any existing
         particles in mc branch, regardless of existing values. Uses the weight
         field in each beam to randomly select from multiple beam distributions.
+        - file reads beam particles from input beam file
+        The number of beam particles in a spill is determined by
+        nbm_particles_per_spill specified in the config.
         """
         try:
             config_doc = json.loads(json_configuration)
             self.__birth_empty_particles(config_doc["beam"])
             self.beams = []
+
+            # if use_beam_file, then verify the file can be opened
+            # get the file handle, and skip over headers and comments
+            if self.use_beam_file:
+                return self.__check_beam_file()
+
             for beam_def in config_doc["beam"]["definitions"]:
                 a_beam = beam.Beam()
                 a_beam.birth(beam_def, self.particle_generator, self.seed)
@@ -98,6 +122,11 @@ class MapPyBeamMaker:
         later. 
         """
         self.seed = beam_def["random_seed"]
+        self.use_beam_file = beam_def["use_beam_file"]
+        self.beam_file = beam_def["beam_file"]
+        self.beam_file_format = beam_def["beam_file_format"]
+        self.nbm_particles_per_spill = beam_def["nbm_particles_per_spill"]
+        self.beam_seed = self.seed
         numpy.random.seed(self.seed)
         if beam_def["particle_generator"] not in self.gen_keys:
             raise ValueError("Did not recognise particle_generator "+\
@@ -113,6 +142,68 @@ class MapPyBeamMaker:
             if self.binomial_n <= 0 :
                 raise ValueError("Beam binomial_n "+str(self.binomial_n)+\
                                " should be > 0")
+
+    def __check_beam_file(self):
+        """
+        Check the input beam file
+        Skip over header lines (if any) so that xboa.Hit.read is happy
+        If no predefined header lines, check for comment lines and skip
+        """
+
+        ### TO DO:
+        # option to specify file path or a search path for file
+        # check with MICE G4BL file. Other formats?
+        # check if requested file format different from what's on file?
+        # if event number on file has skipped?
+        # if use_beam_file is True BUT particle_generator != file,
+        # then reset particle_generator to be file
+        if self.particle_generator != 'file' :
+            print "Requested file-input but generator is not 'file'"
+            print "Resetting it.."
+            self.particle_generator = 'file'
+
+        # try opening the beam file
+        # construct path
+        file_path = "%s/src/map/MapPyBeamMaker/" % os.environ.get("MAUS_ROOT_DIR")
+        filename = file_path + self.beam_file
+        try:
+            self.bm_fh = open(filename,'r')
+        except IOError as err:
+            raise IOError(err)
+
+        # skip over header lines in beam file
+        _nhead = {'icool_for009':3, 
+                 'icool_for003':2, 
+                 'g4beamline_bl_track_file':0,
+                 'g4mice_special_hit':0,
+                 'g4mice_virtual_hit':0,
+                 'zgoubi':0, 
+                 'turtle':0, 
+                 'madx':0,
+                 'mars_1':0, 
+                 'maus_virtual_hit':0, 
+                 'maus_primary':0
+        }
+        _nskip = 0
+        while _nskip < _nhead[self.beam_file_format] :
+            self.bm_fh.readline()
+            _nskip = _nskip + 1
+
+        # for formats with no predefined header lines,
+        #  make sure we are not sitting on a comment line
+        skipped_comments = False
+        while not skipped_comments:
+            # mark the position in the file and read
+            # if it is not a comment line, then rewind
+            fpos = self.bm_fh.tell()
+            bline = self.bm_fh.readline()
+            if '#' not in bline:
+                # just read a non-comment line; rewind to start of line
+                self.bm_fh.seek(fpos)
+                skipped_comments = True
+
+        return True
+
 
     def process(self, json_spill_doc):
         """
@@ -134,8 +225,18 @@ class MapPyBeamMaker:
             spill = self.__process_check_spill(spill)
             new_particles = self.__process_gen_empty(spill)
             for index, particle in enumerate(new_particles):
-                a_beam = self.__process_choose_beam(index)
-                particle["primary"] = a_beam.make_one_primary()
+                # if beam IO, then read hits from file and fill spill
+                if (self.use_beam_file):
+                    spill_hit = Hit.new_from_read_builtin(self.beam_file_format,
+                                                        self.bm_fh)
+                    primary = spill_hit.get_maus_dict('maus_primary')[0]
+                    # TO DO: just incrementing seed, should consider random
+                    self.beam_seed = self.beam_seed + 1
+                    primary["random_seed"] = self.beam_seed
+                    particle["primary"] = primary
+                else:		
+                    a_beam = self.__process_choose_beam(index)
+                    particle["primary"] = a_beam.make_one_primary()
         except Exception: #pylint: disable=W0703
             ErrorHandler.HandleException(spill, self)
         return json.dumps(spill)
@@ -169,6 +270,9 @@ class MapPyBeamMaker:
             for a_beam in self.beams:
                 for i in range(a_beam.n_particles_per_spill):
                     spill["mc"].append({"primary":{}})
+        elif self.particle_generator == "file":
+            for i in range(self.nbm_particles_per_spill):
+                spill["mc"].append({"primary":{}})
         else:
             raise RuntimeError("Didn't recognise particle_generator command "+\
                                str(self.particle_generator))
@@ -191,8 +295,9 @@ class MapPyBeamMaker:
             return self.beams[bisect.bisect_left(weights, dice)-1]
 
     def death(self): #pylint: disable=R0201
-        """Does nothing (nothing to clean up); returns true"""
+        """Closes beam file; returns true"""
+        if (self.bm_fh):
+            self.bm_fh.close()
         return True
 
-    gen_keys = ["binomial", "counter", "overwrite_existing"]
-
+    gen_keys = ["binomial", "counter", "overwrite_existing", "file"]

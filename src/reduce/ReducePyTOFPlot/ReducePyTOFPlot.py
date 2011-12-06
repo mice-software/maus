@@ -58,11 +58,11 @@ class ReducePyTOFPlot: # pylint: disable=R0902
 
         # refresh_rate determines how often (in spill counts) 
         # the canvases are updated
-        self.refresh_rate = 5
+        self.refresh_rate = 1
         
         # Set ROOT Batch Mode to be False by default
         # This can be set via root_batch_mode in the driver script
-        self.root_batch_mode = 0
+        self.root_batch_mode = 1
         
         # keep track of how many spills we process
         self.spill_count = 0
@@ -172,7 +172,7 @@ class ReducePyTOFPlot: # pylint: disable=R0902
         for index, station in enumerate(dets):
             # leave if we cannot find slab hits for this detector
             if station not in slabhits:
-                return False
+                continue
             dethits = slabhits[station]
             # loop over all slab hits for this detector station
             for i in range(len(dethits)):
