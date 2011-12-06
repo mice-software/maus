@@ -30,6 +30,7 @@
 #include "unpacking/MDpartEventV1290.h"
 #include "unpacking/MDpartEventV1724.h"
 #include "unpacking/MDpartEventV1731.h"
+#include "unpacking/MDfragmentVLSB.h"
 #include "unpacking/MDfragmentVLSB_C.h"
 #include "unpacking/MDfragmentV830.h"
 #include "unpacking/MDfragmentDBB.h"
@@ -64,6 +65,8 @@ class MDarranger : public MDprocessor {
   */
   void set_DAQ_map(DAQChannelMap* map) {_chMap = map;}
 
+  string get_equipment_name() {return _equipment;}
+
  protected:
   /** The JSON node to put the data under.
  * It is created at the beginning of the spill.
@@ -75,6 +78,25 @@ class MDarranger : public MDprocessor {
   **/
   DAQChannelMap* _chMap;
   string _equipment;
+};
+
+class ZeroSupressionFilter : public MDarranger {
+
+ public:
+
+  ZeroSupressionFilter() :_zero_suppression(0), _zs_threshold(0) {}
+  virtual ~ZeroSupressionFilter() {}
+
+  void set_zero_supression(bool zs) { _zero_suppression = zs; }
+  void set_zs_threshold(int zst)    { _zs_threshold = zst; }
+
+ protected:
+
+  /// If true - do zero suppression
+  bool _zero_suppression;
+
+  /// Value of the threshold used for zero suppression */
+  int _zs_threshold;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -104,10 +126,10 @@ class V1290DataProcessor : public MDarranger {
 // do not increment inside following macro! (e.g.: MAX( ++a, ++b );
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 
-class fADCDataProcessor : public MDarranger {
+class fADCDataProcessor : public ZeroSupressionFilter {
  public:
 
-  fADCDataProcessor() {}
+  fADCDataProcessor() :ZeroSupressionFilter() {}
   ~fADCDataProcessor() {}
 
   /** Return the position of the maximum.
@@ -156,21 +178,11 @@ class fADCDataProcessor : public MDarranger {
     ceaPedMax = 3
   };
 
-
-  void set_zero_supression(bool zs) { _zero_suppression = zs; }
-  void set_zs_threshold(int zst)    { _zs_threshold = zst; }
-
  protected:
 
   void set_pedestal();
   int chargeMinMax();
   int chargePedMax();
-
-  /// If true - do zero suppression
-  bool _zero_suppression;
-
-  /// Value of the threshold used for zero suppression */
-  int _zs_threshold;
 
   /// vector of samples (measurements) */
   vector<int> _data;
@@ -187,7 +199,7 @@ class fADCDataProcessor : public MDarranger {
 #define V1724_SAMPLES_PER_WORD   2
 class V1724DataProcessor : public fADCDataProcessor {
  public:
-  V1724DataProcessor() {_equipment="V1724";}
+  V1724DataProcessor() :fADCDataProcessor() {_equipment="V1724";}
   virtual ~V1724DataProcessor() {}
 
   /** Unpack a single event to JSON.
@@ -210,7 +222,7 @@ class V1724DataProcessor : public fADCDataProcessor {
 #define V1731_SAMPLES_PER_WORD   4
 class V1731DataProcessor : public fADCDataProcessor {
  public:
-  V1731DataProcessor() {_equipment="V1731";}
+  V1731DataProcessor() :fADCDataProcessor() {_equipment="V1731";}
   virtual ~V1731DataProcessor() {}
 
  /** Unpack a single event to JSON.
@@ -223,11 +235,6 @@ class V1731DataProcessor : public fADCDataProcessor {
 	* Will be casted to MDpartEventV1731.
   */
   virtual int Process(MDdataContainer* dc);
-
-  void set_zero_supression(bool zs) { _zero_suppression = zs; }
-
- private:
-  bool _zero_suppression;
 };
 
 /** On Fragment Event V830
@@ -252,22 +259,44 @@ class V830DataProcessor : public MDarranger {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-/** On Fragment Event VLSB
- * This class unpacks a VLSB (tracker) board hit.
+/** On Fragment Event VLSB_C
+ * This class unpacks a VLSB_C board hit (tracker cosmic test in Lab7).
  */
-class VLSBDataProcessor : public MDarranger {
+class VLSBDataProcessor : public ZeroSupressionFilter {
  public:
-  VLSBDataProcessor() {_equipment="VLSB";}
+  VLSBDataProcessor() :ZeroSupressionFilter() {_equipment="VLSB";}
   virtual ~VLSBDataProcessor() {}
 
  /** Unpack a single event part to JSON.
   *
   * This function unpacks a single particle event,
-	* recorded by equipment VLSB (tracker board)
+  * recorded by equipment VLSB (tracker board)
   * into a JSON sub-tree.
   *
   * \param[in,out] dc Pointer to the event to process.
-	* Will be casted to MDpartEventVLSB_C.
+  * Will be casted to MDfragmentVLSB.
+  */
+  virtual int Process(MDdataContainer* dc);
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+/** On Fragment Event VLSB_C
+ * This class unpacks a VLSB_C board hit (tracker cosmic test in Lab7).
+ */
+class VLSB_CDataProcessor : public ZeroSupressionFilter {
+ public:
+  VLSB_CDataProcessor() :ZeroSupressionFilter() {_equipment="VLSB_C";}
+  virtual ~VLSB_CDataProcessor() {}
+
+ /** Unpack a single event part to JSON.
+  *
+  * This function unpacks a single particle event,
+  * recorded by equipment VLSB_C (tracker board)
+  * into a JSON sub-tree.
+  *
+  * \param[in,out] dc Pointer to the event to process.
+  * Will be casted to MDfragmentVLSB_C.
   */
   virtual int Process(MDdataContainer* dc);
 };
@@ -288,8 +317,8 @@ class DBBDataProcessor : public MDarranger {
   * into a JSON sub-tree.
   *
   * \param[in,out] dc Pointer to the event to process.
-	* recorded by equipment DBB (EMR board)
-	* Will be casted to MDpartEventVLSB_C.
+  * recorded by equipment DBB (EMR board)
+  * Will be casted to MDfragmentDBB.
   */
   virtual int Process(MDdataContainer* dc);
 };

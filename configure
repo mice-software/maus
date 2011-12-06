@@ -128,7 +128,7 @@ type -P scons &>/dev/null || {
     }
 
 
-root_version=root_v5.28.00d
+root_version=root_v5.30.03
 
 if [ ! -f "env.sh" ]
 then

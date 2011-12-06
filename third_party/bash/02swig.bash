@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-directory=swig-2.0.1
+directory=swig-2.0.4
 filename=${directory}.tar.gz
 url=http://prdownloads.sourceforge.net/swig/${filename}
 

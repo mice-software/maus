@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-directory=gsl-1.12
+directory=gsl-1.15
 filename=${directory}.tar.gz 
 url=http://ftp.gnu.org/pub/gnu/gsl/${filename}
 
