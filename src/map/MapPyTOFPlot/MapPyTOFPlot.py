@@ -52,10 +52,13 @@ class MapPyTOFPlot:
                         self.tof_hist.Fill(t_1-t_0)
                         print t_1 - t_0
 
+        self.tof_hist.Draw()
+        self.canvas.Update()
+
         return json_spill_doc
 
     def death(self):
-        """ save the plot"""
+        """ save the plot """
         try:
             self.tof_hist.Draw()
             self.canvas.Update()
