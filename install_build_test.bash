@@ -25,8 +25,8 @@ if [ "${MAUS_ROOT_DIR}" ]; then  # see if the variable exists yet
 fi
 
 echo
-echo "   Welcome to the MAUS installer script.  This script will build MAUS using"
-echo "precompiled third party libraries. You can get the details of the progress "
+echo "   Welcome to the MAUS installer script. "
+echo "You can get the details of the progress "
 echo "(or ensure it is doing something) by running:"
 echo
 echo "  tail -f $FILE_STD"
