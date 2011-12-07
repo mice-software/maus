@@ -195,6 +195,7 @@ def get_root_libs():
                 'MathCore', \
                 'Matrix', \
                 'Minuit', \
+                'Spectrum',\
                 'Net', \
                 'Physics', \
                 'Postscript', \
@@ -634,7 +635,7 @@ for directory in directories:
 
         stuff_to_import.append(parts[2])
 
-    if (parts[2][0:6] == 'MapCpp') or (parts[2][0:8] == 'InputCpp'):
+    if (parts[2][0:6] == 'MapCpp') or (parts[2][0:8] == 'InputCpp') or (parts[2][0:9] == 'ReduceCpp'):
         print 'Found C++ module: %s' % parts[2]
         env.jDev.Subproject(directory)
         stuff_to_import.append(parts[2])

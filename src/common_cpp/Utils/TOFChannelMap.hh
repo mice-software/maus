@@ -30,9 +30,9 @@
 #include <fstream>
 
 
-#include "Utils/DAQChannelMap.hh"
-#include "Interface/Squeal.hh"
-#include "Interface/Squeak.hh"
+#include "src/common_cpp/Utils/DAQChannelMap.hh"
+#include "src/legacy/Interface/Squeal.hh"
+#include "src/legacy/Interface/Squeak.hh"
 
 using std::string;
 using std::ostream;

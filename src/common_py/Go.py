@@ -184,7 +184,7 @@ class Go:  #  pylint: disable=R0921
                 self.outputer.save(spill)
 
             i += len(map_buffer)
-            map_buffer = buffer_input(emitter, 128)
+            map_buffer = buffer_input(emitter, 8)
 
             #  Not python 3 compatible print() due to backward compatability
             print "TRANSFORM/MERGE/OUTPUT: ",
