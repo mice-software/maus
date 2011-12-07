@@ -25,7 +25,7 @@ if [ "${MAUS_ROOT_DIR}" ]; then  # see if the variable exists yet
 fi
 
 echo
-echo "   Welcome to the MAUS installer script. "
+echo "   Welcome to the all-in-one MAUS installer script. "
 echo "You can get the details of the progress "
 echo "(or ensure it is doing something) by running:"
 echo
