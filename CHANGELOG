@@ -1,3 +1,9 @@
+MAUS-v0.1.0 (http://micewww.pp.rl.ac.uk/versions/show/13)
+  Feature #807: CAD import
+  Bug #798: ROOT version and configure script mismatch
+  Bug #799: Error handler produces useless output - sometimes
+  Bug #804: Typo in maus-apps readme
+
 MAUS-v0.0.9 (http://micewww.pp.rl.ac.uk/versions/show/17)
   Bug #42: Possible memory leak in MiceModule class
   Bug #750: OutputPyImage segmentation fault because of bad uuid library
