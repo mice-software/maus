@@ -93,7 +93,7 @@ class MausSimulationTask(MausTransformTask):
         self._transform = MAUS.MapPyGroup()
         self._transform.append(MAUS.MapPyPrint())
         self._transform.append(MAUS.MapPyBeamMaker()) # beam construction
-        self._transform.append(MAUS.MapCppSimulation())  #  geant4 simulation
+#        self._transform.append(MAUS.MapCppSimulation())  #  geant4 simulation
         self._transform.append( \
             MAUS.MapCppTrackerDigitization())  # SciFi electronics model
 
@@ -114,6 +114,9 @@ class MausGenericTransformTask(Task):
         for name in dir(MAUS):
             if re.match("Map", name):
                 map_class = getattr(MAUS, name)
+                # MapPyTOFPlot kicks up a PyROOT canvas so skip for now.
+                if name == "MapPyTOFPlot":
+                    continue
                 self.__transforms[name] = map_class()
 
     def birth(self, json_config_doc):
@@ -127,8 +130,8 @@ class MausGenericTransformTask(Task):
         """
         for name in self.__transforms:
             # MapCppSimulation takes ages to initialise so skip for now.
-#            if name == "MapCppSimulation":
-#                continue
+            if name == "MapCppSimulation":
+                continue
             self.__transforms[name].birth(json_config_doc)
         return True
 
