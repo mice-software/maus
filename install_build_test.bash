@@ -84,8 +84,9 @@ echo "Have Scons cleanup the MAUS build state"
 scons -c 2>>$FILE_ERR 1>>$FILE_STD
 
 echo "Build MAUS"
-scons build || (echo "FAIL! See logs.x" && exit 1)  2>>$FILE_ERR 1>>$FILE_STD
+echo $FILE_ERR $FILE_STD
+(scons build || (echo "FAIL! See logs.x" && exit 1))  2>>$FILE_ERR 1>>$FILE_STD
 
 echo "Run the tests"
-./tests/run_tests.bash || (echo "FAIL!  See logs." && exit 1) 2>>$FILE_ERR 1>>$FILE_STD
+(./tests/run_tests.bash || (echo "FAIL!  See logs." && exit 1)) 2>>$FILE_ERR 1>>$FILE_STD
 
