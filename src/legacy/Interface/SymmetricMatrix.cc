@@ -15,16 +15,6 @@
 //along with xboa in the doc folder.  If not, see 
 //<http://www.gnu.org/licenses/>.
 //
-//Some more details on implementation
-//
-//To get the templates right in cc file, you need to declare a function
-//and then tell compiler which template objects to compile - otherwise
-//you will get a linker error
-//
-//I am trying to replace CLHEP matrix here, as CLHEP has less functionality
-//and is probably worse written than GSL. A similar thing exists in boost
-//library
-//
 
 #include <limits>
 
@@ -44,31 +34,18 @@ namespace MAUS
 {
 
 //*************************
-// Forward Declarations
-//*************************
-
-//*************************
 // Constructors
 //*************************
   
-template <typename StdType>
-SymmetricMatrix<StdType>::SymmetricMatrix() : Matrix<StdType>()
+SymmetricMatrix::SymmetricMatrix() : Matrix<double>()
 { }
-template SymmetricMatrix<double>::SymmetricMatrix();
-template SymmetricMatrix<complex>::SymmetricMatrix();
 
-template <typename StdType>
-SymmetricMatrix<StdType>::SymmetricMatrix(
-  const SymmetricMatrix<StdType>& original_instance)
-  : Matrix<StdType>(original_instance)
+SymmetricMatrix::SymmetricMatrix(
+  const SymmetricMatrix& original_instance)
+  : Matrix<double>(original_instance)
 { }
-template SymmetricMatrix<double>::SymmetricMatrix(
-  const SymmetricMatrix<double>& original_instance);
-template SymmetricMatrix<complex>::SymmetricMatrix(
-  const SymmetricMatrix<complex>& original_instance);
 
-template <>
-SymmetricMatrix<double>::SymmetricMatrix(
+ SymmetricMatrix::SymmetricMatrix(
   const ::CLHEP::HepSymMatrix& hep_matrix) : Matrix<double>()
 {
   size_t size = hep_matrix.num_row();
@@ -88,42 +65,13 @@ SymmetricMatrix<double>::SymmetricMatrix(
     }
   }
 }
-  
-template <>
-SymmetricMatrix<complex>::SymmetricMatrix(
-  const ::CLHEP::HepSymMatrix& hep_matrix ) : Matrix<complex>()
-{
-  size_t size = hep_matrix.num_row();
-	
-  build_matrix(size, false);
-	complex element;
-  for(size_t row=1; row<=size; ++row)
-  {
-    for(size_t column=1; column<= row; ++column)
-    {
-			element = Complex::complex(hep_matrix(row,column));
-      (*this)(row,column) = element;
-			if (row != column)
-			{
-				(*this)(column,row) = element;
-			}
-    }
-  }
-}
 
-template <typename StdType>
-SymmetricMatrix<StdType>::SymmetricMatrix(const size_t size)
-  : Matrix<StdType>(size, size)
+SymmetricMatrix::SymmetricMatrix(const size_t size)
+  : Matrix<double>(size, size)
 { }
-template SymmetricMatrix<double>::SymmetricMatrix(
-  const size_t size);
-template SymmetricMatrix<complex>::SymmetricMatrix(
-  const size_t size);
 
-template <typename StdType>
-SymmetricMatrix<StdType>::SymmetricMatrix(const size_t	size,
-																					const StdType	value)
-  : Matrix<StdType>()
+SymmetricMatrix::SymmetricMatrix(const size_t	size, const double	value)
+  : Matrix<double>()
 {
   build_matrix(size);
   for(size_t row=1; row<=size; row++)
@@ -138,180 +86,109 @@ SymmetricMatrix<StdType>::SymmetricMatrix(const size_t	size,
     }
   }
 }
-template SymmetricMatrix<double>::SymmetricMatrix(
-  const size_t size, const double value);
-template SymmetricMatrix<complex>::SymmetricMatrix(
-  const size_t size, const complex value);
 
-template <typename StdType>
-SymmetricMatrix<StdType>::SymmetricMatrix(const size_t					size,
-																					StdType const * const data)
-  : Matrix<StdType>()
+SymmetricMatrix::SymmetricMatrix(const size_t					 size,
+																	double const * const data)
+  : Matrix<double>()
 {
   build_matrix(size, data);
 }
-template SymmetricMatrix<double>::SymmetricMatrix(
-  const size_t size, double const * const data);
-template SymmetricMatrix<complex>::SymmetricMatrix(
-  const size_t size, complex const * const data);
 
 //*************************
 // Size Functions
 //*************************
 
-template <typename StdType>
-size_t SymmetricMatrix<StdType>::size() const
+size_tconst Matrix::size() const
 {
-	return Matrix<StdType>::number_of_rows();
+	return number_of_rows();
 }
-template size_t SymmetricMatrix<double>::size() const;
-template size_t SymmetricMatrix<complex>::size() const;
 
 //*************************
 // Assignment Operators
 //*************************
 
-template <typename StdType>
-SymmetricMatrix<StdType>& SymmetricMatrix<StdType>::operator=(
-  const SymmetricMatrix<StdType>& rhs)
+SymmetricMatrix&const Matrix::operator=(
+  const SymmetricMatrix& rhs)
 {
-	((Matrix<StdType>) *this) = (Matrix<StdType>) rhs;
+	((Matrix<double>) *this) = (Matrix<double>) rhs;
 	return *this;
 }
-template SymmetricMatrix<double>& SymmetricMatrix<double>::operator=(
-  const SymmetricMatrix<double>& rhs);
-template SymmetricMatrix<complex>& SymmetricMatrix<complex>::operator=(
-  const SymmetricMatrix<complex>& rhs);
 
-template <typename StdType>
-SymmetricMatrix<StdType>& SymmetricMatrix<StdType>::operator+=(
-	const SymmetricMatrix<StdType>& rhs)
+SymmetricMatrix&const Matrix::operator+=(
+	const SymmetricMatrix& rhs)
 {
-	((Matrix<StdType>) *this) += (Matrix<StdType>) rhs;
+	((Matrix<double>) *this) += (Matrix<double>) rhs;
 	return *this;
 }
-template SymmetricMatrix<double>& SymmetricMatrix<double>::operator+=(
-	const SymmetricMatrix<double>& rhs);
-template SymmetricMatrix<complex>& SymmetricMatrix<complex>::operator+=(
-	const SymmetricMatrix<complex>& rhs);
 
-template <typename StdType>
-SymmetricMatrix<StdType>& SymmetricMatrix<StdType>::operator-=(
-	const SymmetricMatrix<StdType>& rhs)
+SymmetricMatrix&const Matrix::operator-=(
+	const SymmetricMatrix& rhs)
 {
-	((Matrix<StdType>) *this) -= (Matrix<StdType>) rhs;
+	((Matrix<double>) *this) -= (Matrix<double>) rhs;
 	return *this;
 }
-template SymmetricMatrix<double>& SymmetricMatrix<double>::operator-=(
-	const SymmetricMatrix<double>& rhs);
-template SymmetricMatrix<complex>& SymmetricMatrix<complex>::operator-=(
-	const SymmetricMatrix<complex>& rhs);
 
-template <typename StdType>
-SymmetricMatrix<StdType>& SymmetricMatrix<StdType>::operator*=(
-	const StdType& rhs)
+SymmetricMatrix&const Matrix::operator*=(
+	const double rhs)
 {
-	((Matrix<StdType>) *this) *= rhs;
+	((Matrix<double>) *this) *= rhs;
   return *this;
 }
-template SymmetricMatrix<double>& SymmetricMatrix<double>::operator*=(
-	const double& rhs);
-template SymmetricMatrix<complex>& SymmetricMatrix<complex>::operator*=(
-	const complex& rhs);
 
-template <typename StdType>
-SymmetricMatrix<StdType>& SymmetricMatrix<StdType>::operator/=(
-	const StdType& rhs)
+SymmetricMatrix&const Matrix::operator/=(
+	const double rhs)
 {
-	((Matrix<StdType>) *this) /= rhs;
+	((Matrix<double>) *this) /= rhs;
   return *this;
 }
-template SymmetricMatrix<double>& SymmetricMatrix<double>::operator/=(
-	const double& rhs);
-template SymmetricMatrix<complex>& SymmetricMatrix<complex>::operator/=(
-	const complex& rhs);
 
 //*************************
 // Algebraic Operators
 //*************************
 
-template <typename StdType>
-const SymmetricMatrix<StdType> SymmetricMatrix<StdType>::operator+(
-  const SymmetricMatrix<StdType>& rhs) const
+const SymmetricMatrixconst Matrix::operator+(
+  const SymmetricMatrix& rhs) const
 {
-  return SymmetricMatrix<StdType>(*this) += rhs;
+  returnconst Matrix(*this) += rhs;
 }
-template const SymmetricMatrix<double>
-SymmetricMatrix<double>::operator+(
-  const SymmetricMatrix<double>& rhs) const;
-template const SymmetricMatrix<complex>
-SymmetricMatrix<complex>::operator+(
-  const SymmetricMatrix<complex>& rhs) const;
 
-template <typename StdType>
-const SymmetricMatrix<StdType> SymmetricMatrix<StdType>::operator-(
-  const SymmetricMatrix<StdType>& rhs) const
+const SymmetricMatrix SymmetricMatrix::operator-(
+  const SymmetricMatrix& rhs) const
 {
-  return SymmetricMatrix<StdType>(*this) -= rhs;
+  return SymmetricMatrix(*this) -= rhs;
 }
-template const SymmetricMatrix<double>
-SymmetricMatrix<double>::operator-(
-  const SymmetricMatrix<double>& rhs) const;
-template const SymmetricMatrix<complex>
-SymmetricMatrix<complex>::operator-(
-  const SymmetricMatrix<complex>& rhs) const;
 
-template <typename StdType>
-const SymmetricMatrix<StdType> SymmetricMatrix<StdType>::operator*(
-  const StdType& rhs) const
+const SymmetricMatrix SymmetricMatrix::operator*(
+  const double& rhs) const
 {
-  return SymmetricMatrix<StdType>(*this) *= rhs;
+  return SymmetricMatrix(*this) *= rhs;
 }
-template const SymmetricMatrix<double>
-SymmetricMatrix<double>::operator*(
-  const double& rhs) const;
-template const SymmetricMatrix<complex>
-SymmetricMatrix<complex>::operator*(
-  const complex& rhs) const;
 
-template <typename StdType>
-const SymmetricMatrix<StdType> SymmetricMatrix<StdType>::operator/(
-  const StdType& rhs) const
+const SymmetricMatrix SymmetricMatrix::operator/(
+  const double& rhs) const
 {
-  return SymmetricMatrix<StdType>(*this) /= rhs;
+  return SymmetricMatrix(*this) /= rhs;
 }
-template const SymmetricMatrix<double>
-SymmetricMatrix<double>::operator/(
-  const double& rhs) const;
-template const SymmetricMatrix<complex>
-SymmetricMatrix<complex>::operator/(
-  const complex& rhs) const;
 
 //############################
 // SymmetricMatrix (protected)
 //############################
 
-template <typename StdType> SymmetricMatrix<StdType>::SymmetricMatrix(
-	const Matrix<StdType>& original_instance) : Matrix<StdType>(original_instance)
+SymmetricMatrix::SymmetricMatrix(
+	const Matrix<double>& original_instance) : Matrix<double>(original_instance)
 { }
 
-template <typename StdType>
-void SymmetricMatrix<StdType>::build_matrix(
+void SymmetricMatrix::build_matrix(
   const size_t size, const bool initialize)
 {
-	Matrix<StdType>::build_matrix(size, size, initialize);
+	Matrix<double>::build_matrix(size, size, initialize);
 }
-template void SymmetricMatrix<double>::build_matrix(
-  const size_t size, const bool initialize);
-template void SymmetricMatrix<complex>::build_matrix(
-  const size_t size, const bool initialize);
 
-template <typename StdType>
-void SymmetricMatrix<StdType>::build_matrix(const size_t          size,
-                                            StdType const * const data)
+void SymmetricMatrix::build_matrix(const size_t         size,
+                                   double const * const data)
 {
   build_matrix(size, false);
-	StdType element;
+	 double element;
   for(size_t row=0; row<size; ++row)
   {
     for(size_t column=0; column<row; ++column)
@@ -325,17 +202,6 @@ void SymmetricMatrix<StdType>::build_matrix(const size_t          size,
     }
   }
 }
-template void SymmetricMatrix<double>::build_matrix(
-  const size_t size, double const * const data);
-template void SymmetricMatrix<complex>::build_matrix(
-  const size_t size, complex const * const data);
-
-//############################
-// Template Declarations
-//############################
-
-template class SymmetricMatrix<double>;
-template class SymmetricMatrix<complex>;
 
 //############################
 // Free Functions
@@ -345,64 +211,15 @@ template class SymmetricMatrix<complex>;
 // Conversion Functions
 //****************************
 
-SymmetricMatrix<double> real(const SymmetricMatrix<complex>& complex_matrix)
+SymmetricMatrix inverse(const SymmetricMatrix& matrix)
 {
-	return real((Matrix<complex>) complex_matrix);
+	return inverse((Matrix<double>) matrix);
 }
-
-SymmetricMatrix<double> imag(const SymmetricMatrix<complex>& complex_matrix)
-{
-	return imag((Matrix<complex>) complex_matrix);
-}
-
-SymmetricMatrix<complex> conj(const SymmetricMatrix<complex>& matrix)
-{
-	return conj((Matrix<complex>) matrix);
-}
-
-namespace Complex
-{
-
-SymmetricMatrix<MAUS::complex> complex(
-	const SymmetricMatrix<double>& real_matrix)
-{
-	return MAUS::Complex::complex((Matrix<double>) real_matrix);
-}
-
-SymmetricMatrix<MAUS::complex> complex(
-	const SymmetricMatrix<double>& real_matrix,
-  const SymmetricMatrix<double>& imaginary_matrix)
-{
-	return MAUS::Complex::complex((Matrix<double>) real_matrix,
-																(Matrix<double>) imaginary_matrix);
-}
-
-} //namespace Matrix
-
-template <typename StdType>
-SymmetricMatrix<StdType> inverse(const SymmetricMatrix<StdType>& matrix)
-{
-	return inverse((Matrix<StdType>) matrix);
-}
-template SymmetricMatrix<double> inverse(
-	const SymmetricMatrix<double>& matrix);
-template SymmetricMatrix<complex> inverse(
-	const SymmetricMatrix<complex>& matrix);
-
-template <typename StdType>
-SymmetricMatrix<StdType> transpose(const SymmetricMatrix<StdType>& matrix)
-{
-	return transpose((Matrix<StdType>) matrix);
-}
-template SymmetricMatrix<double> transpose(
-  const SymmetricMatrix<double>& matrix);
-template SymmetricMatrix<complex> transpose(
-  const SymmetricMatrix<complex>& matrix);
 
 namespace CLHEP
 {
 
-::CLHEP::HepSymMatrix HepSymMatrix(const SymmetricMatrix<double>& matrix)
+::CLHEP::HepSymMatrix HepSymMatrix(const SymmetricMatrix& matrix)
 {
   size_t size = matrix.size();
   
@@ -425,13 +242,11 @@ namespace CLHEP
 
 }
 
-//BOOKMARK
-
 //*************************
 // Eigensystem Functions
 //*************************
 
-Vector<double> eigenvalues(const SymmetricMatrix<double>& matrix)
+Vector<double> eigenvalues(const SymmetricMatrix& matrix)
 {
   size_t rows = matrix.number_of_rows();
   size_t columns = matrix.number_of_columns();
@@ -441,7 +256,7 @@ Vector<double> eigenvalues(const SymmetricMatrix<double>& matrix)
                  "Attempt to get eigenvalues of non-square matrix",
                  "MAUS::eigenvalues") );
   }
-  SymmetricMatrix<double> temp_matrix(matrix);
+  SymmetricMatrix temp_matrix(matrix);
   gsl_vector * eigenvalues = gsl_vector_alloc(rows);
   gsl_eigen_symm_workspace * workspace = gsl_eigen_symm_alloc(rows);
   int ierr = gsl_eigen_symm(temp_matrix.matrix_, eigenvalues, workspace);
@@ -459,7 +274,7 @@ Vector<double> eigenvalues(const SymmetricMatrix<double>& matrix)
 }
 
 std::pair<Vector<double>, Matrix<double> > eigensystem(
-  const SymmetricMatrix<double>& matrix)
+  const SymmetricMatrix& matrix)
 {
   size_t rows = matrix.number_of_rows();
   size_t columns = matrix.number_of_columns();
@@ -469,7 +284,7 @@ std::pair<Vector<double>, Matrix<double> > eigensystem(
                  "Attempt to get eigensystem of non-square matrix",
                  "MAUS::eigensystem") );
   }
-  SymmetricMatrix<double> temp_matrix(matrix);
+  SymmetricMatrix temp_matrix(matrix);
   gsl_vector * eigenvalues = gsl_vector_alloc(rows);
   gsl_matrix * eigenvectors = gsl_matrix_calloc(rows, columns);
   gsl_eigen_symmv_workspace * workspace = gsl_eigen_symmv_alloc(rows);
@@ -498,29 +313,19 @@ std::pair<Vector<double>, Matrix<double> > eigensystem(
 // Unitary Operators
 //*************************
 
-template <typename StdType>
-SymmetricMatrix<StdType> operator-(const SymmetricMatrix<StdType>& matrix)
+SymmetricMatrix operator-(const SymmetricMatrix& matrix)
 {
-	return -((Matrix<StdType>) matrix);
+	return -((Matrix<double>) matrix);
 }
-template SymmetricMatrix<double> operator-(
-	const SymmetricMatrix<double>& matrix);
-template SymmetricMatrix<complex> operator-(
-	const SymmetricMatrix<complex>& matrix);
 
 //*************************
 // Scalar Operators
 //*************************
 
-template <typename StdType>
-SymmetricMatrix<StdType> operator*(const StdType&									 lhs,
-																	 const SymmetricMatrix<StdType>& rhs)
+SymmetricMatrix operator*(const double					 lhs,
+													const SymmetricMatrix& rhs)
 {
-		return lhs * (Matrix<StdType>) rhs;
+	return lhs * (Matrix<double>) rhs;
 }
-template SymmetricMatrix<double> operator*(
-  const double& lhs, const SymmetricMatrix<double>& rhs);
-template SymmetricMatrix<complex> operator*(
-  const complex& lhs, const SymmetricMatrix<complex>& rhs);
 
 } //namespace MAUS

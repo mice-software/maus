@@ -37,48 +37,19 @@ namespace MAUS
 //*************************
 // Forward Declarations
 //*************************
-template <typename StdType> class Matrix;
-template <typename StdType> class SymmetricMatrix;
-template <typename StdType> class Vector;
+class Matrix<double>;
+template class SymmetricMatrix;
+class Vector<double>;
 
 
 //*************************
 // Conversion Functions
 //*************************
 
-/** @brief Returns a real-valued matrix containing the real part of the
- *         corresponding elements of the given complex-valued matrix.
- */
-SymmetricMatrix<double> real(const SymmetricMatrix<complex>& complex_matrix);
-/** @brief Returns a real-valued matrix containing the imaginary part of the
- *         corresponding elements of the given complex-valued matrix.
- */
-SymmetricMatrix<double> imag(const SymmetricMatrix<complex>& complex_matrix);
-/** @brief Returns a complex-valued matrix containing the complex conjugate
- *         of the elements of the given matrix.
- */
-SymmetricMatrix<complex> conj(const SymmetricMatrix<complex>& complex_matrix);
-
-namespace Complex
-{
-
-SymmetricMatrix<MAUS::complex> complex(
-	const SymmetricMatrix<double>& real_matrix);
-SymmetricMatrix<MAUS::complex> complex(
-	const SymmetricMatrix<double>& real_matrix,
-  const SymmetricMatrix<double>& imaginary_matrix);
-
-} //namespace Complex
-
 /** @brief returns the inverse of a matrix
  */
-template <typename StdType>
-SymmetricMatrix<StdType> inverse(const SymmetricMatrix<StdType>& matrix);
-
-/** @brief returns the transpose of a matrix (such that M(i,j) = T(j,i))
- */
-template <typename StdType>
-SymmetricMatrix<StdType> transpose(const SymmetricMatrix<StdType>& matrix);
+template <typename double>
+SymmetricMatrix inverse(const SymmetricMatrix& matrix);
 
 namespace CLHEP
 {
@@ -87,7 +58,7 @@ namespace CLHEP
  *         it is a free function in the namespace MAUS::CLHEP.
  *
  */
-::CLHEP::HepSymMatrix HepSymMatrix(const SymmetricMatrix<double>& matrix);
+::CLHEP::HepSymMatrix HepSymMatrix(const SymmetricMatrix& matrix);
 }
 
 //*************************
@@ -98,7 +69,7 @@ namespace CLHEP
  *         matrix is not square or the eigenvalues could not be found (e.g.
  *         singular matrix or whatever).
  */
-Vector<double> eigenvalues(const SymmetricMatrix<double>& matrix);
+Vector<double> eigenvalues(const SymmetricMatrix& matrix);
 
 /** @brief returns a vector of std::pair containing a vector of eigenvalues
  *         and a matrix of eigenvectors. Throws an exception if either this
@@ -106,22 +77,21 @@ Vector<double> eigenvalues(const SymmetricMatrix<double>& matrix);
  *         singular matrix or whatever).
  */
 std::pair<Vector<double>, Matrix<double> > eigensystem(
-  const SymmetricMatrix<double>& matrix);
+  const SymmetricMatrix& matrix);
 
 //*************************
 // Unitary Operators
 //*************************
 
-template <typename StdType> MAUS::SymmetricMatrix<StdType> operator-(
-  const SymmetricMatrix<StdType>& matrix);
+MAUS::SymmetricMatrix operator-(const SymmetricMatrix& matrix);
 
 //*************************
 // Scalar Operators
 //*************************
 
-template <typename StdType> MAUS::SymmetricMatrix<StdType>  operator*(
-  const StdType&									 value,
-  const SymmetricMatrix<StdType>&  matrix);
+MAUS::SymmetricMatrix  operator*(
+  const double&						value,
+  const SymmetricMatrix& matrix);
 
 
 /** @class SymmetricMatrix extends Matrix by enforcing symmetric arrangements of
@@ -130,34 +100,33 @@ template <typename StdType> MAUS::SymmetricMatrix<StdType>  operator*(
  *				 properly. They will just return an ordinary Matrix object and be
  *				 uncastable as a SymmetricMatrix.
  */
-template <typename StdType>
-class SymmetricMatrix : public Matrix<StdType>
+class SymmetricMatrix : public Matrix<double>
 {
 public:
   /** @brief default constructor makes an empty SymmetricMatrix of size 0
    */
-  SymmetricMatrix();
+	SymmetricMatrix();
 
   /** @brief Copy constructor
    */
-  SymmetricMatrix(const SymmetricMatrix<StdType>& original_instance);
+	SymmetricMatrix(const SymmetricMatrix& original_instance);
 
   /** @brief Copy constructor for CLHEP::HepSymMatrix
    */
-  SymmetricMatrix(const ::CLHEP::HepSymMatrix& hep_matrix );
+	SymmetricMatrix(const ::CLHEP::HepSymMatrix& hep_matrix );
 
   /** @brief Construct a matrix and fill all fields with 0
    *
    *  @params size number of rows/columns
    */
-  SymmetricMatrix(const size_t size);
+	SymmetricMatrix(const size_t size);
 
   /** @brief Construct a matrix and fill with identical data
    *
    *  @params size number of rows/columns
    *  @params data variable to be copied into all items in the matrix
    */
-  SymmetricMatrix(const size_t size, const StdType value);
+	SymmetricMatrix(const size_t size, const double value);
 
   /** @brief Construct a matrix and fill with data from an array
    *
@@ -167,7 +136,7 @@ public:
 	 *					triangle of data is used to easily ensure element symmetry.
 	 *					Note SymmetricMatrix does not take ownership of memory in data.
    */
-  SymmetricMatrix(const size_t size, StdType const * const data);
+	SymmetricMatrix(const size_t size, double const * const data);
 
   //*************************
   // Size Functions
@@ -180,24 +149,24 @@ public:
   //*************************
   // Assignment Operators
   //*************************
-  SymmetricMatrix<StdType>& operator =(
-		const SymmetricMatrix<StdType>&										rhs);
-  SymmetricMatrix<StdType>& operator+=(
-    const SymmetricMatrix<StdType>&                   rhs);
-  SymmetricMatrix<StdType>& operator-=(
-    const SymmetricMatrix<StdType>&                   rhs);
-  SymmetricMatrix<StdType>& operator*=(const StdType& rhs);
-  SymmetricMatrix<StdType>& operator/=(const StdType& rhs);
+  SymmetricMatrix& operator =(
+		const SymmetricMatrix&									rhs);
+  SymmetricMatrix& operator+=(
+    const SymmetricMatrix&                 rhs);
+  SymmetricMatrix& operator-=(
+    const SymmetricMatrix&                 rhs);
+  SymmetricMatrix& operator*=(const double rhs);
+  SymmetricMatrix& operator/=(const double rhs);
   
   //*************************
   // Algebraic Operators
   //*************************
-  const SymmetricMatrix<StdType> operator+(
-    const SymmetricMatrix<StdType>&                       rhs) const;
-  const SymmetricMatrix<StdType> operator-(
-    const SymmetricMatrix<StdType>&                       rhs) const;
-  const SymmetricMatrix<StdType> operator*(const StdType& rhs) const;
-  const SymmetricMatrix<StdType> operator/(const StdType& rhs) const;
+  const SymmetricMatrix operator+(
+    const SymmetricMatrix&                     rhs) const;
+  const SymmetricMatrix operator-(
+    const SymmetricMatrix&                     rhs) const;
+  const SymmetricMatrix operator*(const double rhs) const;
+  const SymmetricMatrix operator/(const double rhs) const;
 
   //*************************
   // Befriending
@@ -205,44 +174,31 @@ public:
 
   //These use their Matrix counterparts and then use the protected base class
 	//copy constructor to cast the return type as a SymmetricMatrix
-	friend SymmetricMatrix<double> real(
-		const SymmetricMatrix<complex>& complex_matrix);
-	friend SymmetricMatrix<double> imag(
-		const SymmetricMatrix<complex>& complex_matrix);
-	friend SymmetricMatrix<complex> conj(
-		const SymmetricMatrix<complex>& complex_matrix);
-	friend SymmetricMatrix<MAUS::complex> MAUS::Complex::complex(
-		const SymmetricMatrix<double>& real_matrix);
-	friend SymmetricMatrix<MAUS::complex> MAUS::Complex::complex(
-		const SymmetricMatrix<double>& real_matrix,
-		const SymmetricMatrix<double>& imaginary_matrix);
-  friend SymmetricMatrix<StdType> inverse<>(
-		const SymmetricMatrix<StdType>& matrix);
-  friend SymmetricMatrix<StdType> transpose<>(
-		const SymmetricMatrix<StdType>& matrix);
-	friend SymmetricMatrix<StdType> MAUS::operator-<>(
-		const SymmetricMatrix<StdType>& matrix);
-	friend SymmetricMatrix<StdType> MAUS::operator*<>(
-		const StdType&									 value,
-		const SymmetricMatrix<StdType>&  matrix);
+  friend SymmetricMatrix inverse(
+		const SymmetricMatrix& matrix);
+	friend SymmetricMatrix MAUS::operator-(
+		const SymmetricMatrix& matrix);
+	friend SymmetricMatrix MAUS::operator*(
+		const  double						value,
+		const SymmetricMatrix& matrix);
 
 	//These use special low-level gsl functions for symmetric matricies
-  friend Vector<double> eigenvalues(const SymmetricMatrix<double>& matrix);
+  friend Vector<double> eigenvalues(const SymmetricMatrix& matrix);
   friend std::pair<Vector<double>, Matrix<double> >
-  eigensystem(const SymmetricMatrix<double>& matrix);
+  eigensystem(const SymmetricMatrix& matrix);
 
 protected:
 	
   /** @brief Base class copy constructor
    */
-  SymmetricMatrix(const Matrix<StdType>& original_instance);
+	SymmetricMatrix(const Matrix<double>& original_instance);
 
   //build the matrix with size^2 elements initialised to zero by default
   void build_matrix(const size_t size, const bool initialize=true);  
 
   //build the matrix with size^2 elements initialised to array data in
   //row major order
-  void build_matrix(const size_t size, StdType const * const data);
+  void build_matrix(const size_t size,  double const * const data);
 
 };
 
