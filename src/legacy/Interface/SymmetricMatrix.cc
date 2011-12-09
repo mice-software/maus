@@ -98,7 +98,7 @@ SymmetricMatrix::SymmetricMatrix(const size_t					 size,
 // Size Functions
 //*************************
 
-size_tconst Matrix::size() const
+const size_t SymmetricMatrix::size() const
 {
 	return number_of_rows();
 }
@@ -107,36 +107,31 @@ size_tconst Matrix::size() const
 // Assignment Operators
 //*************************
 
-SymmetricMatrix&const Matrix::operator=(
-  const SymmetricMatrix& rhs)
+SymmetricMatrix& SymmetricMatrix::operator=(const SymmetricMatrix& rhs)
 {
 	((Matrix<double>) *this) = (Matrix<double>) rhs;
 	return *this;
 }
 
-SymmetricMatrix&const Matrix::operator+=(
-	const SymmetricMatrix& rhs)
+SymmetricMatrix& SymmetricMatrix::operator+=(const SymmetricMatrix& rhs)
 {
 	((Matrix<double>) *this) += (Matrix<double>) rhs;
 	return *this;
 }
 
-SymmetricMatrix&const Matrix::operator-=(
-	const SymmetricMatrix& rhs)
+SymmetricMatrix& SymmetricMatrix::operator-=(const SymmetricMatrix& rhs)
 {
 	((Matrix<double>) *this) -= (Matrix<double>) rhs;
 	return *this;
 }
 
-SymmetricMatrix&const Matrix::operator*=(
-	const double rhs)
+SymmetricMatrix& SymmetricMatrix::operator*=(const double rhs)
 {
 	((Matrix<double>) *this) *= rhs;
   return *this;
 }
 
-SymmetricMatrix&const Matrix::operator/=(
-	const double rhs)
+SymmetricMatrix& SymmetricMatrix::operator/=(const double rhs)
 {
 	((Matrix<double>) *this) /= rhs;
   return *this;
@@ -146,10 +141,10 @@ SymmetricMatrix&const Matrix::operator/=(
 // Algebraic Operators
 //*************************
 
-const SymmetricMatrixconst Matrix::operator+(
-  const SymmetricMatrix& rhs) const
+const SymmetricMatrix SymmetricMatrix::operator+(
+	const SymmetricMatrix& rhs) const
 {
-  returnconst Matrix(*this) += rhs;
+  return SymmetricMatrix(*this) += rhs;
 }
 
 const SymmetricMatrix SymmetricMatrix::operator-(
@@ -158,14 +153,12 @@ const SymmetricMatrix SymmetricMatrix::operator-(
   return SymmetricMatrix(*this) -= rhs;
 }
 
-const SymmetricMatrix SymmetricMatrix::operator*(
-  const double& rhs) const
+const SymmetricMatrix SymmetricMatrix::operator*(const double rhs) const
 {
   return SymmetricMatrix(*this) *= rhs;
 }
 
-const SymmetricMatrix SymmetricMatrix::operator/(
-  const double& rhs) const
+const SymmetricMatrix SymmetricMatrix::operator/(const double rhs) const
 {
   return SymmetricMatrix(*this) /= rhs;
 }

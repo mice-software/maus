@@ -15,8 +15,8 @@
 //along with MAUS in the doc folder.  If not, see 
 //<http://www.gnu.org/licenses/>.
 
-#ifndef _SRC_COMMON_CPP_MATHS_SYMMETRIC_MATRIX_HH_
-#define _SRC_COMMON_CPP_MATHS_SYMMETRIC_MATRIX_HH_
+#ifndef _SRC_COMMON_CPP_MATHS_HERMITIAN_MATRIX_HH_
+#define _SRC_COMMON_CPP_MATHS_HERMITIAN_MATRIX_HH_
 
 #include <iostream>
 #include <vector>
@@ -132,7 +132,7 @@ public:
 	 *	@params real_matrix This matrix yields the real parts of the complex
 	 *					elements.
 	 */
-	HermitianMatrix::HermitianMatrix(const SymmetricMatrix& real_matrix);
+	HermitianMatrix(const SymmetricMatrix& real_matrix);
 
 	/** @brief	Constructs a Hermitian matrix from two symmetric matrices.
 	 *	@params real_matrix This matrix yields the real parts of the complex
@@ -142,9 +142,8 @@ public:
 	 *					diagonal components of the imaginary matrix, and conjugating the
 	 *					upper triangle.
 	 */
-	HermitianMatrix::HermitianMatrix(
-		const SymmetricMatrix& real_matrix,
-		const SymmetricMatrix& imaginary_matrix);
+	HermitianMatrix(const SymmetricMatrix& real_matrix,
+									const SymmetricMatrix& imaginary_matrix);
 
   /** @brief Construct a matrix and fill with data from an array
    *
@@ -154,7 +153,7 @@ public:
 	 *					triangle of data is used to easily ensure element symmetry.
 	 *					Note HermitianMatrix does not take ownership of memory in data.
    */
-	HermitianMatrix(const size_t size, comlex const * const data);
+	HermitianMatrix(const size_t size, complex const * const data);
 
   //*************************
   // Size Functions
@@ -162,7 +161,7 @@ public:
 
   /** @brief returns the number of rows/columns in the matrix
    */
-  size_t size() const;
+  const size_t size() const;
   
   //*************************
   // Assignment Operators
@@ -183,6 +182,7 @@ public:
 
   //These use their Matrix<complex> counterparts and rely on the protected base
 	//class copy constructor to cast the return type as a HermitianMatrix
+	friend HermitianMatrix dagger(const HermitianMatrix& matrix);
   friend HermitianMatrix inverse(const HermitianMatrix& matrix);
 	friend HermitianMatrix MAUS::operator-(const HermitianMatrix& matrix);
 

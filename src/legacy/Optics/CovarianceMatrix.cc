@@ -10,9 +10,49 @@ using CLHEP::HepSymMatrix;
 using CLHEP::HepVector;
 using CLHEP::c_light;
 
-CovarianceMatrix::CovarianceMatrix()
+namespace MAUS
 {
-  ((HepSymMatrix) this) = HepSymMatrix(6, 1));
+
+//############################
+// Free Functions
+//############################
+
+//****************************
+// Conversion Functions
+//****************************
+
+CovarianceMatrix rotate(const CovarianceMatrix& covariances, double angle)
+{
+	//FIXME
+  HepMatrix rotation(6,6,1);
+  double fcos = cos(angle);
+  double fsin = sin(angle);
+  
+  rotation      *=  fcos;
+  rotation[0][0] =  1.;
+  rotation[1][1] =  1.;
+  rotation[4][2] = -fsin;
+  rotation[5][3] = -fsin;
+  rotation[2][4] =  fsin;
+  rotation[3][5] =  fsin;
+  
+  ((HepSymMatrix) this) = similarity(rotation);
+}
+
+//############################
+// CovarianceMatrix
+//############################
+
+//****************************
+// Constructors
+//****************************
+
+CovarianceMatrix::CovarianceMatrix() : SymmetricMatrix(6)
+{
+	for (size_t index=1; index<=6; ++index)
+	{
+		(*this)(index, index) = 1.0;
+	}
 }
 
 CovarianceMatrix::CovarianceMatrix(double emittance_t,
@@ -23,8 +63,8 @@ CovarianceMatrix::CovarianceMatrix(double emittance_t,
                                    double beta_l,
                                    double alpha_l,
                                    PhaseSpaceVector const & mean)
+	: SymmetricMatrix(6)
 {
-  ((HepSymMatrix) this) = HepSymMatrix(6, 0);
   SetCovariances(emittance_t, beta_t, alpha_t, Ltwiddle_t, emittance_l, beta_l,
                  alpha_l, mean);
 }
@@ -39,11 +79,19 @@ CovarianceMatrix::CovarianceMatrix(double emittance_x,
                                    double beta_l,
                                    double alpha_l,
                                    PhaseSpaceVector const & means)
+	: SymmetricMatrix(6)
 {
-  ((HepSymMatrix) this) = HepSymMatrix(6, 0);
   SetCovariances(emittance_x, beta_x, alpha_x, emittance_y, beta_y, alpha_y,
                  emittance_l, beta_l, alpha_l, means);
 }
+
+CovarianceMatrix(CovarianceMatrix& covariances)
+	: SymmetricMatrix((SymmetricMatrix) covariances)
+{ }
+
+CovarianceMatrix(const HepSymMatrix& covariances)
+	: SymmetricMatrix(covariances)
+{ }
 
 void CovarianceMatrix::SetCovariances(double mass, double momentum,
                                       double charge,double emittance_t,
@@ -143,6 +191,7 @@ void CovarianceMatrix::SetCovariances(double mass, double momentum,
 
 bool CovarianceMatrix::IsPositiveDefinite()
 {
+	//FIXME
   int min_row = 1;
   for(int max_row=1; max_row<=num_row(); max_row++)
   {
@@ -156,19 +205,4 @@ bool CovarianceMatrix::IsPositiveDefinite()
   return true;
 }
 
-void CovarianceMatrix::Rotate(double angle) const
-{
-  HepMatrix rotation(6,6,1);
-  double fcos = cos(angle);
-  double fsin = sin(angle);
-  
-  rotation      *=  fcos;
-  rotation[0][0] =  1.;
-  rotation[1][1] =  1.;
-  rotation[4][2] = -fsin;
-  rotation[5][3] = -fsin;
-  rotation[2][4] =  fsin;
-  rotation[3][5] =  fsin;
-  
-  ((HepSymMatrix) this) = similarity(rotation);
-}
+} //namespace MAUS

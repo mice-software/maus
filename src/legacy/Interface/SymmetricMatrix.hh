@@ -38,7 +38,7 @@ namespace MAUS
 // Forward Declarations
 //*************************
 class Matrix<double>;
-template class SymmetricMatrix;
+class SymmetricMatrix;
 class Vector<double>;
 
 
@@ -48,7 +48,6 @@ class Vector<double>;
 
 /** @brief returns the inverse of a matrix
  */
-template <typename double>
 SymmetricMatrix inverse(const SymmetricMatrix& matrix);
 
 namespace CLHEP
@@ -144,7 +143,7 @@ public:
 
   /** @brief returns number of rows/columns in the matrix
    */
-  size_t size() const;
+  const size_t size() const;
   
   //*************************
   // Assignment Operators

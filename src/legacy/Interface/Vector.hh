@@ -99,7 +99,7 @@ public:
   //*************************
 
   //return number of elements
-  size_t size() const;
+  const size_t size() const;
 
   //*************************
   // Subvector Functions

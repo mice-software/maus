@@ -206,7 +206,7 @@ template const complex& VectorBase<complex, gsl_vector_complex>::operator()(
 //*************************
 
 template <typename StdType, typename GslType>
-size_t VectorBase<StdType, GslType>::size() const
+const size_t VectorBase<StdType, GslType>::size() const
 {
   if(vector_ != NULL)
   {
@@ -215,8 +215,8 @@ size_t VectorBase<StdType, GslType>::size() const
 
   return 0;
 }
-template size_t VectorBase<double, gsl_vector>::size() const;
-template size_t VectorBase<complex, gsl_vector_complex>::size() const;
+template const size_t VectorBase<double, gsl_vector>::size() const;
+template const size_t VectorBase<complex, gsl_vector_complex>::size() const;
 
 //*************************
 // Subvector Functions
