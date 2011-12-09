@@ -1,7 +1,7 @@
 """
-ReducePyTOFPlot fills TOF histograms for slab hits 
-and space points, draws them, refreshes the canvases 
-and prints to eps at the end of run.
+ReducePyTOFPlot fills TOF histograms for slab hits and space points,
+draws them, refreshes the canvases and prints to eps at the end of
+run.
 """
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 # 
@@ -18,59 +18,84 @@ and prints to eps at the end of run.
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 #
-# turn off false positives related to ROOT
+# Turn off false positives related to ROOT
 #pylint: disable = E1101
-# messages about too many branches and too many lines??
+# Disable messages about too many branches and too many lines.
 #pylint: disable = R0912
 #pylint: disable = R0915
 
-import base64
-import json
-import os
 import ROOT
+from ReducePyROOTHistogram import ReducePyROOTHistogram
 
-class ReducePyTOFPlot: # pylint: disable=R0902
+class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
     """
-    ReducePyTOFPlots plots several TOF histograms for each spill
-    Currently the following histograms are filled
-    - x,y slab_hits from spill
-    - for each slab hit, fill PMT(s) that is(are) hit 
-    - number of reconstructed space points per particle event
-    - 1d x and y of space points
-    - 2d y vs x of space points
+    ReducePyTOFPlots plots several TOF histograms for each spill.
+    Currently the following histograms are filled:
+    - x,y slab_hits from spill.
+    - For each slab hit, fill PMT(s) that is(are) hit.
+    - Number of reconstructed space points per particle event.
+    - 1d x and y of space points.
+    - 2d y vs x of space points.
     
-    Histograms are drawn on different canvases
-    The canvases are refreshed every N spills 
-     where N = refresh_rate = set via refresh_rate data card in driver script
-     default refresh_rate = 5, ie every 5 spills
+    Histograms are drawn on different canvases.
+    The canvases are refreshed every N spills where N = refresh_rate
+    set via refresh_rate data card value (see below).
    
     The default is to run ROOT in interactive mode
     To run in batch mode, set root_batch_mode = 0 in the data card
+    (see below). 
     
     At the end of the run, the canvases are printed to eps files
+
+    Histograms are output as JSON documents of form:
+
+    @verbatim
+    {"image": {"content":"Total TDC and ADC counts to spill 2",
+               "tag": TAG,
+               "image_type": "eps", 
+               "data": "...base 64 encoded image..."}}
+    @endverbatim
+
+    where "TAG" is "tof_times", "tof_hits" or "tof_sp". If
+    "histogram_auto_number" (see below) is "true" then the TAG will
+    have a number N appended where N means that the histogram was
+    produced as a consequence of the (N + 1)th spill processed  by the
+    worker. The number will be zero-padded to form a six digit string
+    e.g. "00000N". If "histogram_auto_number" is false then no such
+    number is appended 
+
+    In cases where a spill is input that contains errors (e.g. is
+    badly formatted or is missing the data needed to update a
+    histogram) then a spill is output which is just the input spill
+    with an "errors" field containing the error e.g.
+
+    The caller can configure the worker and specify:
+
+    -Image type ("histogram_image_type"). Must be one of those
+     supported by ROOT (currently "ps", "eps", "gif", "jpg", "jpeg",
+     "pdf", "svg", "png"). Default "eps".
+    -Auto-number ("histogram_auto_number"). Default: false. Flag
+     that determines if the image tag (see above) has the spill count
+     appended to it or not.
+    -ROOT batch mode ("root_batch_mode"). Default: 0 (false). Flag
+     indicating whether ROOT should be run in batch or interactive 
+     mode.
+    -Refresh rate ("refresh_rate"). Default: 5. Number of spills
+     input before the next set of histograms are output.
     """
 
-    def __init__(self): #pylint: disable=R0201
+    def __init__(self):
         """
         Set initial attribute values.
         @param self Object reference.
         """
+        ReducePyROOTHistogram.__init__(self)
         # Do initialisation specific to this class.
-
-        # refresh_rate determines how often (in spill counts) 
-        # the canvases are updated
+        # Refresh_rate determines how often (in spill counts) the
+        # canvases are updated.
         self.refresh_rate = 5
-        
-        # Set ROOT Batch Mode to be False by default
-        # This can be set via root_batch_mode in the driver script
-        self.root_batch_mode = 0
-        
-        # keep track of how many spills we process
-        self.spill_count = 0
-
-        self.filetype = "eps"
-
-        # histogram initializations. they are defined explicitly in init_histos
+        # Histogram initializations. they are defined explicitly in
+        # init_histos.
         self._ht01 = None
         self._ht02 = None
         self._ht12 = None
@@ -97,67 +122,67 @@ class ReducePyTOFPlot: # pylint: disable=R0902
         self.canvas_sp = None
         self.canvas_hits = None
 
-    def birth(self, config_json):
+    def _configure_at_birth(self, config_doc):
         """
         Configure worker from data cards. Overrides super-class method. 
         @param self Object reference.
         @param config_doc JSON document.
-        @returns True if successful.
+        @returns True if configuration succeeded.
         """
-        config_doc = json.loads(config_json)
-
-        # Read in configuration flags and parameters
-        # these will overwrite whatever defaults were set in init
+        # Read in configuration flags and parameters - these will
+        # overwrite whatever defaults were set in __init__.
         if 'refresh_rate' in config_doc:
             self.refresh_rate = int(config_doc["refresh_rate"])
-
-        if 'root_batch_mode' in config_doc:
-            self.root_batch_mode = int(config_doc["root_batch_mode"])
-             
-        #initialize histograms, setup root canvases, and set root styles
+        # Initialize histograms, setup root canvases, and set root
+        # styles.
         self.__init_histos()
-
         return True
 
-    def process(self, json_doc):
+    def _update_histograms(self, spill):
         """
-        process a spill, get slab hits via get_slab_hits
-        get space points via get_space_points
+        Process a spill, get slab hits via get_slab_hits get space
+        points via get_space_points, update the histograms then
+        creates JSON documents in the format described above. 
+        @param self Object reference.
+        @param spill Current spill.
+        @returns list of JSON documents. If json_doc has an error then
+        the list will just contain the spill augmented with error
+        information. If the the spill count is divisible by the
+        current refresh rate then a list of 3 histogram JSON documents
+        are returned. Otherwise a single list with the input spill
+        is returned.
         """
-        try:
-            spill = json.loads(json_doc)
-        except ValueError:
-            spill = {"errors": {"bad_json_document":
-                                "unable to do json.loads on input"} }
-            return json.dumps(spill)
-
-        self.spill_count = self.spill_count + 1
-
-        # get TOF slab hits & fill the relevant histograms
+        # Get TOF slab hits & fill the relevant histograms.
         if not self.get_slab_hits(spill): 
             if "errors" not in spill:
                 spill["errors"] = {}
             spill["errors"]["no_slab_hits"] = "no slab hits"
-            return json.dumps(spill)
+            return [spill]
 
-        # get TOF space points & fill histograms
+        # Get TOF space points & fill histograms.
         if not self.get_space_points(spill):
             if "errors" not in spill:
                 spill["errors"] = {}
             spill["errors"]["no_space_points"] = "no space points"
-            return json.dumps(spill)
+            return [spill]
 
-        # refresh canvases at requested frequency
+        # Refresh canvases at requested frequency.
         if self.spill_count % self.refresh_rate == 0:
-            #print self.spill_count
-            return self.update_histos()
+            self.update_histos()
+            return self.get_histogram_images()
         else:
-            return json.dumps(spill)
+            return [spill]
 
     def get_slab_hits(self, spill):
-        """ get the TOF slab hits """
+        """ 
+        Get the TOF slab hits and update the histograms.
 
-        # return if we cannot find slab_hits in the spill
+        @param self Object reference.
+        @param spill Current spill.
+        @return True if no errors or False if no "slab_hits" in
+        the spill.
+        """
+        # Return if we cannot find slab_hits in the spill.
         if 'slab_hits' not in spill:
             return False
 
@@ -190,19 +215,24 @@ class ReducePyTOFPlot: # pylint: disable=R0902
                         #plane 0, pmt1 hit for this slab
                         if ("pmt1" in dethits[i][j]):
                             self.hpmthits[index][plane_num][1].Fill(pos)
-        
         return True
 
     def get_space_points(self, spill):
-        """ get the TOF space points
+        """ 
+        Get the TOF space points and update the histograms.
+
         Go through the TOF0,1,2 space points
         Make sure it is not null
         Get the number of space points for each particle event
         For each space point, get the x & y
         Get the time & find the Time-of-Flight between 0->1, 0->2, 1->2,
         Fill histograms
-        """
 
+        @param self Object reference.
+        @param spill Current spill.
+        @return True if no errors or False if no "space_points" in
+        the spill.
+        """
         if 'space_points' not in spill:
             return False
 
@@ -283,22 +313,17 @@ class ReducePyTOFPlot: # pylint: disable=R0902
                     self.h2dprof.Fill(spnt_x, spnt_y, len(sp_tof1), 1)
                     self.hspslabx_1.Fill(spnt_x)
                     self.hspslaby_1.Fill(spnt_y)
-
         return True
 
     def __init_histos(self): #pylint: disable=R0201
-        """ 
-        ROOT batch mode is set to false (i.e. interactive) by default
-        unless it is set differently via the root_batch_mode data card
-        """ 
+        """
+        Initialise ROOT to display histograms.
 
-        ROOT.gROOT.SetBatch(False)
-        if self.root_batch_mode == 1:
-            ROOT.gROOT.SetBatch(True)
-        
+        @param self Object reference.
+        """ 
         # have root run quietly without verbose informationals
         ROOT.gErrorIgnoreLevel = 1001
-        
+
         # white canvas
         ROOT.gROOT.SetStyle("Plain")
         
@@ -380,7 +405,6 @@ class ReducePyTOFPlot: # pylint: disable=R0902
                                                          10, 0, 10))
                     self.hpmthits[i][j][k].SetFillColor(2*i)
 
-
         # Create canvases
         #
         # Draw() of histos has to be done only once
@@ -414,7 +438,6 @@ class ReducePyTOFPlot: # pylint: disable=R0902
         self.hspslaby_1.Draw()
         self.hspslaby_0.Draw("same")
         self.hspslaby_2.Draw("same")
-
 
         self.canvas_sp.cd(4)
         self.hspxy_0.Draw("text&&colz")
@@ -456,14 +479,12 @@ class ReducePyTOFPlot: # pylint: disable=R0902
 
         return True
 
-    def update_histos(self):
-       
+    def update_histos(self):       
         """
-        Updates canvases
-        This is called every @param refresh_rate spills
-        Canvases are only updated - the writing is done @ death
+        Updates histogram canvases. This is called only when the
+        number of spills is divisible by the refresh rate.
+        @param self Object reference.
         """
- 
         self.canvas_tof.cd(1)
         ROOT.gPad.Modified()
         ROOT.gPad.Update()
@@ -512,64 +533,46 @@ class ReducePyTOFPlot: # pylint: disable=R0902
         ROOT.gPad.Modified()
         ROOT.gPad.Update()
 
+    def get_histogram_images(self):       
+        """
+        Get histograms as JSON documents.
+        @param self Object reference.
+        @returns list of 3 JSON documents containing the images.
+        """
         image_list = []
 
-        tag = "tof_times_%06d" % (self.spill_count)
-        image_doc = self.get_image_doc("TOF Times", tag, self.filetype, self.canvas_tof)
-        self.append_image(image_doc, image_list)
+        tag = "tof_times"
+        doc = ReducePyROOTHistogram.get_image_doc( \
+            self, "TOF Times", tag, self.canvas_tof)
+        image_list.append(doc)
 
-        tag = "tof_sp_%06d" % (self.spill_count)
-        image_doc = self.get_image_doc("TOF Space Points", tag, self.filetype, self.canvas_sp)
-        self.append_image(image_doc, image_list)
+        tag = "tof_sp"
+        doc = ReducePyROOTHistogram.get_image_doc( \
+            self, "TOF Space Points", tag, self.canvas_sp)
+        image_list.append(doc)
 
-        tag = "tof_hits_%06d" % (self.spill_count)
-        image_doc = self.get_image_doc("TOF Hits", tag, self.filetype, self.canvas_hits)
-        self.append_image(image_doc, image_list)
+        tag = "tof_hits"
+        doc = ReducePyROOTHistogram.get_image_doc( \
+            self, "TOF Hits", tag, self.canvas_hits)
+        image_list.append(doc)
 
-        return unicode("".join(image_list))
+        return image_list
 
-    def append_image(self, image_doc, image_list):
-        image_list.append(json.dumps(image_doc))
-        image_list.append("\n")
-
-    def get_image_doc(self, content, tag, file_type, canvas):
-
-        tmp_tag = "%s_tmp" % tag
-        tmp_file_name = "%s.%s" % (tmp_tag, file_type)
-        canvas.Print(tmp_file_name)
-        tmp_file = open(tmp_file_name, 'r')
-        data = tmp_file.read()
-        encoded_data = base64.b64encode(data)
-        tmp_file.close()
-        os.remove(tmp_file_name)
-
-        json_doc = {}
-        json_doc["image"] = {}
-        json_doc["image"]["content"] = content
-        json_doc["image"]["tag"] = tag
-        json_doc["image"]["image_type"] = file_type
-        json_doc["image"]["data"] = encoded_data
-        return json_doc
-
-    def death(self):
+    def _cleanup_at_death(self):
         """
-        No sub-class-specific cleanup is needed.
+        Save final plots.
+        MIKE - need a better solution than this! See ticket.
         @param self Object reference.
         @returns True
         """
-        # print final plots at end of run
-
-        filetag = "tof_times"
-        outfile = "%s.%s" % (filetag, self.filetype)
+        tag = "tof_times"
+        outfile = "%s.%s" % (tag, self.image_type)
         self.canvas_tof.Print(outfile)
-        filetag = "tof_sp"
-        outfile = "%s.%s" % (filetag, self.filetype)
+        tag = "tof_sp"
+        outfile = "%s.%s" % (tag, self.image_type)
         self.canvas_sp.Print(outfile)
-        filetag = "tof_hits"
-        outfile = "%s.%s" % (filetag, self.filetype)
+        tag = "tof_hits"
+        outfile = "%s.%s" % (tag, self.image_type)
         self.canvas_hits.Print(outfile)
-
-        # remove any zombie root objects
-        ROOT.gDirectory.GetList().Delete()
 
         return True
