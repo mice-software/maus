@@ -27,10 +27,8 @@ class ReducePyMatplotlibHistogram: # pylint: disable=R0903
     """
     @class ReducePyMatplotlibHistogram.PyMatplotlibHistogram is 
     a base class for classes that create histograms using matplotlib. 
-    PyMatplotlibHistogram maintains a histogram created using
-    matplotlib.
 
-    The histogram output is a JSON document of form:
+    Histograms are output as JSON documents of form:
 
     @verbatim
     {"image": {"content":"...a description of the image...",
@@ -39,20 +37,21 @@ class ReducePyMatplotlibHistogram: # pylint: disable=R0903
                "data": "...base 64 encoded image..."}}
     @endverbatim
 
-    where "TAG" is specified by the sub-class. If 
-    "histogram_auto_number" (see below) is "true" then the TAG will
-    have a number N appended where N means that the histogram was
-    produced as a consequence of the (N + 1)th spill processed 
-    by the worker. The number will be zero-padded to form a six digt
-    string e.g. "00000N". If "histogram_auto_number" is false 
-    then no such number is appended.
+    "TAG" is specified by the sub-class. If "histogram_auto_number"
+    (see below) is "true" then the TAG will have a number N appended
+    where N means that the histogram was produced as a consequence of
+    the (N + 1)th spill processed  by the worker. The number will be
+    zero-padded to form a six digit string e.g. "00000N". If
+    "histogram_auto_number" is false then no such number is appended.
 
-    In case of errors the output document is just the input document
+    In cases where a spill is input that contains errors (e.g. is
+    badly formatted or is missing the data needed to update a
+    histogram) then a spill is output which is just the input spill
     with an "errors" field containing the error e.g.
 
     @verbatim
     {"errors": {..., "bad_json_document": "unable to do json.loads on input"}}
-    {"errors": {..., "no_digits": "no digits"}}
+    {"errors": {..., "...": "..."}}
     @endverbatim
 
     The caller can configure the worker and specify:
@@ -63,15 +62,15 @@ class ReducePyMatplotlibHistogram: # pylint: disable=R0903
     -Auto-number ("histogram_auto_number"). Default: false. Flag
      that determines if the image tag (see above) has the spill count
      appended to it or not.
+    -Sub-classes may support additional configuration parameter
 
     Sub-classes must override:
 
     -_configure_at_birth - to extract any additional
      sub-class-specific configuration from data cards.
-    -_update_histogram. This should update the histogram, axes, scale
-     and make any other desired changes. The _content attribute can
-     be updated with a textual description of the content of the
-     histogram.
+    -_update_histograms. This checks that a spill has the data
+     necessary to update any histograms then creates JSON documents in
+     the format described above.
     -_cleanup_at_death - to do any sub-class-specific cleanup.
     """
 
@@ -80,12 +79,12 @@ class ReducePyMatplotlibHistogram: # pylint: disable=R0903
         Set initial attribute values.
         @param self Object reference.
         """
+        # matplotlib histogram - for validation.
+        figure = Figure(figsize=(6, 6))
+        self.__histogram = FigureCanvas(figure)
         self.spill_count = 0 # Number of spills processed to date.
         self.image_type = "eps"
         self.auto_number = False
-        self._histogram = None # matplotlib histogram.
-        self._tag = "graph" # Histogram name tag.
-        self._content = "" # Description of histogram content.
 
     def birth(self, config_json):
         """
@@ -96,8 +95,6 @@ class ReducePyMatplotlibHistogram: # pylint: disable=R0903
         @returns True if configuration succeeded. 
         """
         config_doc = json.loads(config_json)
-
-        self._histogram = self._create_histogram()
 
         key = "histogram_auto_number"
         if key in config_doc:
@@ -110,23 +107,21 @@ class ReducePyMatplotlibHistogram: # pylint: disable=R0903
             self.image_type = "eps"
 
         if self.image_type not in \
-            self._histogram.get_supported_filetypes().keys():
+            self.__histogram.get_supported_filetypes().keys():
             error = "Unsupported histogram image type: %s Expect one of %s" \
                 % (self.image_type, 
-                   self._histogram.get_supported_filetypes().keys())
+                   self.__histogram.get_supported_filetypes().keys())
             raise ValueError(error)
 
         self.spill_count = 0
-        self._content = ""
 
         # Do sub-class-specific configuration.
         return self._configure_at_birth(config_doc)
 
     def _configure_at_birth(self, config_doc):
         """
-        Perform sub-class-specific configuration from data cards. When
-        this is called a sub-class can assume that self._histogram 
-        points to a matplotlib FigureCanvas that they can then customise.
+        Perform sub-class-specific configuration from data cards.
+        Sub-classes must define this function.
         @param self Object reference.
         @param config_json JSON document.
         @returns True if configuration succeeded. 
@@ -140,7 +135,6 @@ class ReducePyMatplotlibHistogram: # pylint: disable=R0903
         @param json_string String with current JSON document.
         @returns JSON document containing current histogram.
         """
-
         # Load and validate the JSON document.
         try:
             json_doc = json.loads(json_string.rstrip())
@@ -149,21 +143,31 @@ class ReducePyMatplotlibHistogram: # pylint: disable=R0903
                                 "unable to do json.loads on input"} }
             return json.dumps(json_doc)
 
-        result = self._update_histogram(json_doc)
-        if (result != None):
-            return json.dumps(result)
+        self.spill_count = self.spill_count + 1
 
-        return self._create_image_json()
+        # Process spill and update histograms.
+        result = self._update_histograms(json_doc)
+        # Convert results to strings.
+        doc_list = []
+        for doc in result:
+            doc_list.append(json.dumps(doc))
+            doc_list.append("\n")
+        return unicode("".join(doc_list))
 
-    def _update_histogram(self, json_doc):
+    def _update_histograms(self, spill):
         """
-        Update the histogram with data from the current spill
-        and output the histogram. Sub-classes must define this.
+        Check that the spill has the data necessary to update the
+        histograms then creates JSON documents in the format described
+        above. 
+        Sub-classes must define this function.
         @param self Object reference.
-        @param json_doc Current spill..
-        @returns None if histogram was created or a JSON document with
-        error messages if there were problems (e.g. information was
-        missing from the spill).
+        @param spill Current spill.
+        @returns list of JSON documents. If json_doc has an error then
+        the list will just contain the spill augmented with error
+        information. If the sub-class only updates histograms every
+        N spills then this list can just contain the input spill.
+        Otherwise it should consist of 1 or more JSON documents 
+        containing image data in the form described above. 
         """
 
     def death(self): #pylint: disable=R0201
@@ -173,13 +177,15 @@ class ReducePyMatplotlibHistogram: # pylint: disable=R0903
         """
         return self._cleanup_at_death()
 
-    def _cleanup_at_death(self):
+    def _cleanup_at_death(self): #pylint: disable=R0201
         """
-        A no-op. Can be overridden by sub-classes for sub-class-specific
-        clean-up at death time.
+        A no-op. 
+        Sub-classes can override this function to do
+        sub-class-specific clean-up at death time.
         @param self Object reference.
         @returns True
         """
+        return True
  
     def _create_histogram(self): #pylint: disable=R0201
         """
@@ -193,60 +199,61 @@ class ReducePyMatplotlibHistogram: # pylint: disable=R0903
         axes.grid(True, linestyle="-", color="0.75")
         return histogram
 
-    def _rescale_axes(self, xmin, xmax, ymin, ymax, xfudge = 0.5, yfudge = 0.5): #pylint: disable=C0301, R0913
+    def _rescale_axes(self, histogram, xmin, xmax, ymin, ymax, xfudge = 0.5, yfudge = 0.5): #pylint: disable=C0301, R0913, R0201
         """
         Rescale the X and Y axes of the histogram to show the given
         axis ranges. Fudge factors are used avoid matplotlib warning
         about "Attempting to set identical bottom==top" which arises
         if the axes are set to be exactly the maximum of the data.
         @param self Object reference.
+        @param histogram FigureCanvas representing a histogram.
         @param xmin Minimum X value.
         @param xmax Maximum X value.
         @param ymin Minimum Y value.
         @param ymin Maximum Y value.
         @param xfudge X fudge factor.
         @param yfudge Y fudge factor.
-        @returns matplotlib FigureCanvas representing the histogram.
         """
         # Fudge factors are used
-        self._histogram.figure.get_axes()[0].set_xlim( \
+        histogram.figure.get_axes()[0].set_xlim( \
             [xmin, xmax + xfudge])
-        self._histogram.figure.get_axes()[0].set_ylim( \
+        histogram.figure.get_axes()[0].set_ylim( \
             [ymin, ymax + yfudge])
 
-    def _create_image_json(self):
+    def _create_image_json(self, content, tag, canvas): #pylint: disable=R0201
         """
-        Create JSON document for output by the worker with the
-        content description, image type, tag and base-64 encoded
-        data from the histogram.
+        Build a JSON document holding image data.
+
         @param self Object reference.
-        @returns JSON document containing current histogram.
+        @param content String describing the image.
+        @param tag Image tag.
+        @param histogram FigureCanvas representing a histogram.
+        @returns JSON document.
         """
         json_doc = {}
         json_doc["image"] = {}
         if (self.auto_number):
-            tag = "%s%06d" % (self._tag, self.spill_count)
+            image_tag = "%s%06d" % (tag, self.spill_count)
         else:
-            tag = "%s" % (self._tag)
-        data = self.__convert_to_binary(self._histogram)
-        json_doc["image"]["content"] = self._content
-        json_doc["image"]["tag"] = tag
+            image_tag = tag
+        data = self.__convert_to_binary(canvas)
+        json_doc["image"]["content"] = content
+        json_doc["image"]["tag"] = image_tag
         json_doc["image"]["image_type"] = self.image_type
         json_doc["image"]["data"] = data
-        self.spill_count += 1
-        return json.dumps(json_doc)
+        return json_doc
 
-    def __convert_to_binary(self, histogram): #pylint: disable=R0201
+    def __convert_to_binary(self, canvas): #pylint: disable=R0201
         """
         Convert histogram to binary format.
         @param self Object reference.
-        @param histogram matplotlib FigureCanvas representing the
+        @param canvas matplotlib FigureCanvas representing a
         histogram. 
         @returns representation of histogram in base 64-encoded image 
         type format.
         """
-        data_file = StringIO.StringIO() 
-        histogram.print_figure(data_file, dpi=500, format=self.image_type)
+        data_file = StringIO.StringIO()
+        canvas.print_figure(data_file, dpi=500, format=self.image_type)
         data_file.seek(0)
         data = data_file.read()
         return base64.b64encode(data)
