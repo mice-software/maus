@@ -69,6 +69,11 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
     histogram) then a spill is output which is just the input spill
     with an "errors" field containing the error e.g.
 
+    @verbatim
+    {"errors": {..., "bad_json_document": "unable to do json.loads on input"}}
+    {"errors": {..., "no_space_points": "no space points"}}
+    @endverbatim
+
     The caller can configure the worker and specify:
 
     -Image type ("histogram_image_type"). Must be one of those
