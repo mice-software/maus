@@ -38,7 +38,8 @@ namespace MAUS
 // Forward Declarations
 //*************************
 template <typename StdType> class Matrix;
-template class HermitianMatrix;
+class HermitianMatrix;
+class SymmetricMatrix;
 template <typename StdType> class Vector;
 
 
@@ -49,41 +50,19 @@ template <typename StdType> class Vector;
 /** @brief Returns a real-valued matrix containing the real part of the
  *         corresponding elements of the given complex-valued matrix.
  */
-SymmetricMatrix real(const HermitianMatrix& complex_matrix);
+SymmetricMatrix real(const HermitianMatrix& hermitian_matrix);
 /** @brief Returns a real-valued matrix containing the imaginary part of the
  *         corresponding elements of the given complex-valued matrix.
  */
-SymmetricMatrix imag(const HermitianMatrix& complex_matrix);
+SymmetricMatrix imag(const HermitianMatrix& hermitian_matrix);
 /** @brief Returns a complex-valued matrix containing the complex conjugate
  *         of the elements of the given matrix.
  */
-HermitianMatrix dagger(const HermitianMatrix& complex_matrix);
-
-HermitianMatrix::HermitianMatrix(const SymmetricMatrix& real_matrix);
-
-/** @brief Constructs a Hermitian matrix made up of two symmetric matrices. The
- *				 "real" matrix yields the real parts of the complex elements. The
- *				 "imaginary" matrix yields the imagniary parts of the complex elements
- *				 by multiplying it by i, ignoring any non-zero diagonal components
- *				 of the imaginary matrix, and conjugating the upper triangle.
- */
-HermitianMatrix::HermitianMatrix(
-	const SymmetricMatrix& real_matrix,
-  const SymmetricMatrix& imaginary_matrix);
+HermitianMatrix dagger(const HermitianMatrix& hermitian_matrix);
 
 /** @brief returns the inverse of a matrix
  */
 HermitianMatrix inverse(const HermitianMatrix& matrix);
-
-namespace CLHEP
-{
-/** @brief Creates a CLHEP::HepMatrix from a MAUS::Matrix. This function is
- *         meant to look like a copy constructor for the HepMatrix class, but
- *         it is a free function in the namespace MAUS::CLHEP.
- *
- */
-::CLHEP::HepSymMatrix HepSymMatrix(const HermitianMatrix& matrix);
-}
 
 //*************************
 // Eigensystem Functions
@@ -95,10 +74,10 @@ namespace CLHEP
  */
 Vector<double> eigenvalues(const HermitianMatrix& matrix);
 
-/** @brief returns a vector of std::pair containing a vector of eigenvalues
- *         and a matrix of eigenvectors. Throws an exception if either this
- *         matrix is not square or the eigenvalues could not be found (e.g.
- *         singular matrix or whatever).
+/** @brief	returns a vector of std::pair containing a real-valued vector of
+ *					eigenvalues and a complex-valued matrix of eigenvectors. Throws an
+ *					exception if either this matrix is not square or the eigenvalues
+ *					could not be found (e.g. singular matrix or whatever).
  */
 std::pair<Vector<double>, Matrix<complex> > eigensystem(
   const HermitianMatrix& matrix);
@@ -107,22 +86,21 @@ std::pair<Vector<double>, Matrix<complex> > eigensystem(
 // Unitary Operators
 //*************************
 
-MAUS::HermitianMatrix operator-(const HermitianMatrix& matrix);
+HermitianMatrix operator-(const HermitianMatrix& matrix);
 
 //*************************
 // Scalar Operators
 //*************************
 
-MAUS::HermitianMatrix  operator*(
+HermitianMatrix  operator*(
   const double&						value,
   const HermitianMatrix& matrix);
 
 
-/** @class HermitianMatrix extends Matrix by enforcing symmetric arrangements of
- *				 elements. All elements are stored despite the redundent nature of
- *				 symmetric matrices. This is so that base class functions will work
- *				 properly. They will just return an ordinary Matrix object and be
- *				 uncastable as a HermitianMatrix.
+/** @class	HermitianMatrix extends Matrix by enforcing symmetric arrangements
+ *					of elements and refusing to allow public casts from the base class.
+ *					The base class functions will work, but they will just return an
+ *					ordinary Matrix object that is uncastable as a HermitianMatrix.
  */
 class HermitianMatrix : public Matrix<complex>
 {
@@ -148,6 +126,26 @@ public:
    */
 	HermitianMatrix(const size_t size, const complex& value);
 
+	/** @brief	Constructs a HermitianMatrix object from a symmetric matrix.
+	 *					Technically it's still symmetric, but the elements are now complex
+	 *				  with zero imaginary component.
+	 *	@params real_matrix This matrix yields the real parts of the complex
+	 *					elements.
+	 */
+	HermitianMatrix::HermitianMatrix(const SymmetricMatrix& real_matrix);
+
+	/** @brief	Constructs a Hermitian matrix from two symmetric matrices.
+	 *	@params real_matrix This matrix yields the real parts of the complex
+	 *					elements.
+	 *	@params imaginary matrix This matrix yields the imagniary parts of the
+	 *					complex elements by multiplying it by i, ignoring any non-zero
+	 *					diagonal components of the imaginary matrix, and conjugating the
+	 *					upper triangle.
+	 */
+	HermitianMatrix::HermitianMatrix(
+		const SymmetricMatrix& real_matrix,
+		const SymmetricMatrix& imaginary_matrix);
+
   /** @brief Construct a matrix and fill with data from an array
    *
    *  @params size number of rows/columns
@@ -162,47 +160,34 @@ public:
   // Size Functions
   //*************************
 
-  /** @brief returns number of rows/columns in the matrix
+  /** @brief returns the number of rows/columns in the matrix
    */
   size_t size() const;
   
   //*************************
   // Assignment Operators
   //*************************
-  HermitianMatrix& operator =(
-		const HermitianMatrix&									 rhs);
-  HermitianMatrix& operator+=(
-    const HermitianMatrix&									 rhs);
-  HermitianMatrix& operator-=(
-    const HermitianMatrix&									 rhs);
-  HermitianMatrix& operator*=(const complex& rhs);
-  HermitianMatrix& operator/=(const complex& rhs);
+  HermitianMatrix& operator =(const HermitianMatrix& rhs);
+  HermitianMatrix& operator+=(const HermitianMatrix& rhs);
+  HermitianMatrix& operator-=(const HermitianMatrix& rhs);
   
   //*************************
   // Algebraic Operators
   //*************************
-  const HermitianMatrix operator+(
-    const HermitianMatrix&											 rhs) const;
-  const HermitianMatrix operator-(
-    const HermitianMatrix&											 rhs) const;
-  const HermitianMatrix operator*(const complex& rhs) const;
-  const HermitianMatrix operator/(const complex& rhs) const;
+  const HermitianMatrix operator+(const HermitianMatrix& rhs) const;
+  const HermitianMatrix operator-(const HermitianMatrix& rhs) const;
 
   //*************************
   // Befriending
   //*************************
 
-  //These use their Matrix counterparts and then use the protected base class
-	//copy constructor to cast the return type as a HermitianMatrix
-  friend HermitianMatrix inverse(
-		const HermitianMatrix& matrix);
-	friend HermitianMatrix MAUS::operator-(
-		const HermitianMatrix& matrix);
-	friend HermitianMatrix MAUS::operator*(
-		const complex&				 value,
-		const HermitianMatrix& matrix);
+  //These use their Matrix<complex> counterparts and rely on the protected base
+	//class copy constructor to cast the return type as a HermitianMatrix
+  friend HermitianMatrix inverse(const HermitianMatrix& matrix);
+	friend HermitianMatrix MAUS::operator-(const HermitianMatrix& matrix);
 
-	//These use special low-level gsl functions for symmetric matricies
+	//These use special low-level gsl functions for Hermitian matricies, so they
+	//need access to the protected matrix_ member.
   friend Vector<double> eigenvalues(const HermitianMatrix& matrix);
   friend std::pair<Vector<double>, Matrix<complex> >
   eigensystem(const HermitianMatrix& matrix);

@@ -48,20 +48,19 @@ SymmetricMatrix real(const HermitianMatrix& hermitian_matrix)
 
 Matrix<double> imag(const HermitianMatrix& hermitian_matrix)
 {
-	//FIXME: conjugate the upper
-	return imag((Matrix<complex>) complex_matrix);
+	return imag((Matrix<complex>) hermitian_matrix);
 }
 
 HermitianMatrix dagger(const HermitianMatrix& matrix)
 {
-	return conj((Matrix<complex>) matrix);
+	Matrix<complex> transpose_matrix
+		= transpose((Matrix<complex>) matrix);
+	return conj(transpose_matrix);
 }
 
 HermitianMatrix inverse(const HermitianMatrix& matrix)
 {
 	return inverse((Matrix<complex>) matrix);
-}
-
 }
 
 //*************************
@@ -71,19 +70,12 @@ HermitianMatrix inverse(const HermitianMatrix& matrix)
 //FIXME: use Hermitian GSL functions
 Vector<double> eigenvalues(const HermitianMatrix& matrix)
 {
-  size_t rows = matrix.number_of_rows();
-  size_t columns = matrix.number_of_columns();
-  if(rows != columns)
-  {
-    throw(Squeal(Squeal::recoverable,
-                 "Attempt to get eigenvalues of non-square matrix",
-                 "MAUS::eigenvalues") );
-  }
+  size_t size = matrix.size();
   HermitianMatrix temp_matrix(matrix);
-  gsl_vector * eigenvalues = gsl_vector_alloc(rows);
-  gsl_eigen_symm_workspace * workspace = gsl_eigen_symm_alloc(rows);
-  int ierr = gsl_eigen_symm(temp_matrix.matrix_, eigenvalues, workspace);
-  gsl_eigen_symm_free(workspace);
+  gsl_vector * eigenvalues = gsl_vector_alloc(size);
+  gsl_eigen_herm_workspace * workspace = gsl_eigen_herm_alloc(size);
+  int ierr = gsl_eigen_herm(temp_matrix.matrix_, eigenvalues, workspace);
+  gsl_eigen_herm_free(workspace);
   if(ierr != 0)
   {
     gsl_vector_free(eigenvalues);
@@ -99,34 +91,27 @@ Vector<double> eigenvalues(const HermitianMatrix& matrix)
 std::pair<Vector<double>, Matrix<complex> > eigensystem(
   const HermitianMatrix& matrix)
 {
-  size_t rows = matrix.number_of_rows();
-  size_t columns = matrix.number_of_columns();
-  if(rows != columns)
-  {
-    throw(Squeal(Squeal::recoverable,
-                 "Attempt to get eigensystem of non-square matrix",
-                 "MAUS::eigensystem") );
-  }
+  size_t size = matrix.size();
   HermitianMatrix temp_matrix(matrix);
-  gsl_vector * eigenvalues = gsl_vector_alloc(rows);
-  gsl_matrix_complex * eigenvectors = gsl_matrix_complex_calloc(rows, columns);
-  gsl_eigen_symmv_workspace * workspace = gsl_eigen_symmv_alloc(rows);
-  int ierr = gsl_eigen_symmv(temp_matrix.matrix_,
+  gsl_vector * eigenvalues = gsl_vector_alloc(size);
+  gsl_matrix_complex * eigenvectors = gsl_matrix_complex_calloc(size, size);
+  gsl_eigen_hermv_workspace * workspace = gsl_eigen_hermv_alloc(rows);
+  int ierr = gsl_eigen_hermv(temp_matrix.matrix_,
 														 eigenvalues, eigenvectors,
                              workspace);
-  gsl_eigen_symmv_free(workspace);
+  gsl_eigen_hermv_free(workspace);
   if(ierr != 0)
   {
     gsl_vector_free(eigenvalues);
-    gsl_matrix_free(eigenvectors);
+    gsl_matrix_complex_free(eigenvectors);
     throw(Squeal(Squeal::recoverable,
                  "Failed to calculate eigenvalue",
                  "MAUS::eigenvectors"));
   }
   Vector<double> eigenvalue_vector((double*) eigenvalues->data, rows);
   gsl_vector_free(eigenvalues);
-  Matrix<complex> eigenvector_matrix(rows, columns,
-                                    (complex*) eigenvectors->data);
+  Matrix<complex> eigenvector_matrix(size, size,
+                                     (complex*) eigenvectors->data);
   gsl_matrix_complex_free(eigenvectors);
   return std::pair<Vector<double>, Matrix<complex> >(
            eigenvalue_vector, eigenvector_matrix);
@@ -145,7 +130,7 @@ HermitianMatrix operator-(const HermitianMatrix& matrix)
 // Scalar Operators
 //*************************
 
-HermitianMatrix operator*(const copmlex&				 lhs,
+HermitianMatrix operator*(const complex&				 lhs,
 													const HermitianMatrix& rhs)
 {
 	return lhs * (Matrix<complex>) rhs;
@@ -170,7 +155,6 @@ HermitianMatrix::HermitianMatrix(
 HermitianMatrix::HermitianMatrix(
 	const SymmetricMatrix<double>& real_matrix)
 {
-	//FIXME
 	return MAUS::Complex::complex((Matrix<double>) real_matrix);
 }
 
@@ -178,9 +162,39 @@ HermitianMatrix::HermitianMatrix(
 	const SymmetricMatrix<double>& real_matrix,
   const SymmetricMatrix<double>& imaginary_matrix)
 {
-	//FIXME
-	return MAUS::Complex::complex((Matrix<double>) real_matrix,
-																(Matrix<double>) imaginary_matrix);
+	size_t size = real_matrix.number_of_rows();
+	if (imaginary_matrix.size() != size)
+	{
+    throw(Squeal(Squeal::recoverable,
+                 "Attempted to build a Hermitian matrix using real and imaginary matrices of different sizes",
+                 "MAUS::HermitianMatrix::HermitianMatrix(<double>, <double>)"));
+	}
+
+	Matrix<complex> hermitian_matrix(size);
+	for (size_t row=1; row<=size; ++row)
+	{
+		for (size_t column=1; column<=row; ++column)
+		{
+			if (row == column)
+			{
+				//make sure the diagonal elements' imaginary parts are zero
+				hermitian_matrix(row, column)
+					= MAUS::Complex::complex(real_matrix(row, column), 0.);
+			}
+			else
+			{
+				//set the lower diagonal elements
+				hermitian_matrix(row, column)
+					= Complex::complex(real_matrix(row, column),
+														 imaginary_matrix(row, column));
+				//set the upper diagonal elements
+				hermitian_matrix(column, row)
+					= Complex::conj(hermitian_matrix(row, column));
+			}
+		}
+	}
+
+	return hermitian_matrix;
 }
 
 HermitianMatrix::HermitianMatrix(const size_t size)
@@ -195,10 +209,15 @@ HermitianMatrix::HermitianMatrix(const size_t	size, const complex& value)
   {
     for(size_t column=1; column<=row; column++)
     {
-      (*this)(row, column) = value;
 			if (row != column)
 			{
-				(*this)(column,row) = value;
+				(*this)(row, column) = value;
+				(*this)(column,row) = conj(value);
+			}
+			else
+			{
+				//make sure the imaginary part of diagonal elements are zero
+				(*this)(row, column) = Complex::complex(real(value));
 			}
     }
   }
@@ -245,20 +264,6 @@ HermitianMatrix&const Matrix::operator-=(
 	return *this;
 }
 
-HermitianMatrix&const Matrix::operator*=(
-	const complex& rhs)
-{
-	((Matrix<complex>) *this) *= rhs;
-  return *this;
-}
-
-HermitianMatrix&const Matrix::operator/=(
-	const complex& rhs)
-{
-	((Matrix<complex>) *this) /= rhs;
-  return *this;
-}
-
 //*************************
 // Algebraic Operators
 //*************************
@@ -273,18 +278,6 @@ const HermitianMatrix HermitianMatrix::operator-(
   const HermitianMatrix& rhs) const
 {
   return HermitianMatrix(*this) -= rhs;
-}
-
-const HermitianMatrix HermitianMatrix::operator*(
-  const complex& rhs) const
-{
-  return HermitianMatrix(*this) *= rhs;
-}
-
-const HermitianMatrix HermitianMatrix::operator/(
-  const complex& rhs) const
-{
-  return HermitianMatrix(*this) /= rhs;
 }
 
 //############################
@@ -305,16 +298,21 @@ void HermitianMatrix::build_matrix(const size_t         size,
                                    complex const * const data)
 {
   build_matrix(size, false);
-	 complex element;
+	complex element;
   for(size_t row=0; row<size; ++row)
   {
     for(size_t column=0; column<row; ++column)
     {
 			element = data[row*size + column];
-      (*this)(row+1, column+1) = element;
 			if (row != column)
 			{
-				(*this)(column+1, row+1) = element;
+				(*this)(row+1, column+1) = element;
+				(*this)(column+1, row+1) = conj(element);
+			}
+			else
+			{
+				//make sure the imaginary part of diagonal elements are zero
+				(*this)(row+1, column+1) = Complex::complex(real(element));
 			}
     }
   }
