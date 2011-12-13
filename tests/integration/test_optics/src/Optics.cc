@@ -51,12 +51,12 @@ dataCards* LoadDataCards(int argc, char** argv)
   return &MyDataCards;
 }
 
-void  PhaseCavities(PhaseSpaceVector ref) {
+void  PhaseCavities(::PhaseSpaceVector ref) {
     (*simRun.jsonConfiguration)["simulation_reference_particle"] =  ConvertToPGParticle(ref).WriteJson();   
     MAUSGeant4Manager::GetInstance()->SetPhases();
 }
 
-void SetupSimulation(MiceModule* root, std::vector<CovarianceMatrix> envelope)
+void SetupSimulation(MiceModule* root, std::vector< ::CovarianceMatrix> envelope)
 {
   simRun.DataCards     = &MyDataCards;
   simRun.miceModule    = root;
@@ -75,12 +75,12 @@ void SetupSimulation(MiceModule* root, std::vector<CovarianceMatrix> envelope)
   simRun.btFieldConstructor->Print(Squeak::mout(Squeak::info));
 }
 
-std::vector<G4VSolid*> MakeCylinderEnvelope(std::vector<CovarianceMatrix> matrix, double InterpolationSize)
+std::vector<G4VSolid*> MakeCylinderEnvelope(std::vector< ::CovarianceMatrix> matrix, double InterpolationSize)
 {
   return std::vector<G4VSolid*>();
 }
 
-MICEEvent* RunSimulation(PhaseSpaceVector psv)
+MICEEvent* RunSimulation(::PhaseSpaceVector psv)
 {
   simEvent = MICEEvent();
   if(psv.E() < psv.mass()) return &simEvent;
@@ -88,7 +88,7 @@ MICEEvent* RunSimulation(PhaseSpaceVector psv)
   return &simEvent;
 }
 
-MAUSPrimaryGeneratorAction::PGParticle ConvertToPGParticle(PhaseSpaceVector psv) {
+MAUSPrimaryGeneratorAction::PGParticle ConvertToPGParticle(::PhaseSpaceVector psv) {
   MAUSPrimaryGeneratorAction::PGParticle p;
   p.x = psv.x();
   p.y = psv.y();
@@ -109,27 +109,27 @@ MAUSPrimaryGeneratorAction::PGParticle ConvertToPGParticle(PhaseSpaceVector psv)
 namespace Optics
 {
 
-CovarianceMatrix EllipseIn(const MiceModule* root)
+::CovarianceMatrix EllipseIn(const MiceModule* root)
 {
   std::vector<const MiceModule*> envelope_mods = root->findModulesByPropertyExists("string", "EnvelopeType");
   if(envelope_mods.size() == 0) throw(Squeal(Squeal::recoverable, "No envelope modules detected in Optics", "Optics::EllipseIn"));
   if(envelope_mods.size() >  1) throw(Squeal(Squeal::recoverable, "More than 1 envelope modules detected in Optics", "Optics::EllipseIn"));
   Simulation::g_pid = envelope_mods[0]->propertyInt("Pid");
-  return CovarianceMatrix(envelope_mods[0]);
+  return ::CovarianceMatrix(envelope_mods[0]);
 }
 
-void Envelope(const MiceModule* root, std::vector<CovarianceMatrix>& env_out, std::vector<TransferMap*>& tm_out)
+void Envelope(const MiceModule* root, std::vector< ::CovarianceMatrix>& env_out, std::vector< ::TransferMap*>& tm_out)
 {
-  CovarianceMatrix mat = EllipseIn(root);
+  ::CovarianceMatrix mat = EllipseIn(root);
   g_mean = mat.GetMean();
-  CLHEP::HepVector delta = GetDelta(root);
+  ::CLHEP::HepVector delta = GetDelta(root);
 
   std::string env_type = root->findModulesByPropertyExists("string", "EnvelopeType")[0]->propertyString("EnvelopeType");
 
   if(env_type == "Simple" || env_type == "TrackingDerivative")
   {
     Squeak::mout(Squeak::info) << "Finding TrackingDerivative envelope functions" << std::endl;
-    std::vector<PhaseSpaceVector> hits = BuildHitsIn(g_mean, delta);
+    std::vector< ::PhaseSpaceVector> hits = BuildHitsIn(g_mean, delta);
     tm_out = TrackingDerivativeTransferMaps(hits, false, true);
     Squeak::mout(Squeak::debug) << "TM_OUT SIZE " << tm_out.size() << std::endl;
   }
@@ -149,12 +149,12 @@ void Envelope(const MiceModule* root, std::vector<CovarianceMatrix>& env_out, st
 
 }
 
-CLHEP::HepVector GetDeltaMax(const MiceModule* root) {
+	::CLHEP::HepVector GetDeltaMax(const MiceModule* root) {
   std::vector<const MiceModule*> envelope_mods = root->findModulesByPropertyExists("string", "EnvelopeType");
   if(envelope_mods.size() == 0) throw(Squeal(Squeal::recoverable, "No envelope modules detected in Optics", "Optics::GetDeltaMax"));
   if(envelope_mods.size() >  1) throw(Squeal(Squeal::recoverable, "More than 1 envelope modules detected in Optics", "Optics::GetDeltaMax"));
   const MiceModule* mod = envelope_mods[0];
-  CLHEP::HepVector deltaMax(6);
+  ::CLHEP::HepVector deltaMax(6);
   for(int i=1; i<=deltaMax.num_row(); i++) deltaMax(i) = numeric_limits<double>::max();
   try{deltaMax[0] = mod->propertyDouble("Delta_t_Max" );} catch(...) {}
   try{deltaMax[1] = mod->propertyDouble("Delta_E_Max" );} catch(...) {}
@@ -165,12 +165,12 @@ CLHEP::HepVector GetDeltaMax(const MiceModule* root) {
   return deltaMax;
 }
 
-CLHEP::HepVector GetDelta(const MiceModule* root) {
+::CLHEP::HepVector GetDelta(const MiceModule* root) {
   std::vector<const MiceModule*> envelope_mods = root->findModulesByPropertyExists("string", "EnvelopeType");
   if(envelope_mods.size() == 0) throw(Squeal(Squeal::recoverable, "No envelope modules detected in Optics", "Optics::GetDelta"));
   if(envelope_mods.size() >  1) throw(Squeal(Squeal::recoverable, "More than 1 envelope modules detected in Optics", "Optics::GetDelta"));
   const MiceModule* mod = envelope_mods[0];
-  CLHEP::HepVector delta(6);
+  ::CLHEP::HepVector delta(6);
   delta[0] = 0.1;
   for(int i=1; i<6; i++) delta[i] = 1.;
   try{delta[0] = mod->propertyDouble("Delta_t" );} catch(...) {}
@@ -182,13 +182,13 @@ CLHEP::HepVector GetDelta(const MiceModule* root) {
   return delta;
 }
 
-std::vector<PhaseSpaceVector> BuildHitsIn(PhaseSpaceVector ref, CLHEP::HepVector delta)
+std::vector< ::PhaseSpaceVector> BuildHitsIn(::PhaseSpaceVector ref, ::CLHEP::HepVector delta)
 {
-  std::vector<PhaseSpaceVector> hitsIn(13, ref);
-  CLHEP::HepVector refVec = ref.getSixVector();
+  std::vector< ::PhaseSpaceVector> hitsIn(13, ref);
+  ::CLHEP::HepVector refVec = ref.getSixVector();
   for(int i=0; i<6; i++)
   {
-    CLHEP::HepVector vec = refVec;
+    ::CLHEP::HepVector vec = refVec;
     vec[i] += delta[i];
     hitsIn[i+1].setSixVector(vec, ref.mass());
     vec[i] -= 2.*delta[i];
@@ -202,13 +202,13 @@ std::vector<PhaseSpaceVector> BuildHitsIn(PhaseSpaceVector ref, CLHEP::HepVector
   return hitsIn;
 }
 
-void AddHitsToMap(Json::Value Events, std::map< StationId,   std::vector<PhaseSpaceVector> >& map)
+void AddHitsToMap(Json::Value Events, std::map< StationId,   std::vector< ::PhaseSpaceVector> >& map)
 {
   for (size_t ev = 0; ev < Events.size(); ++ev) {
     Json::Value VHits = Events[ev]["virtual_hits"];
     for(size_t i=0; i<VHits.size(); i++) {
       Json::Value hit_v = VHits[i];
-      PhaseSpaceVector psv;
+      ::PhaseSpaceVector psv;
       psv.setT(hit_v["time"].asDouble());
       psv.setQ(hit_v["charge"].asDouble());
       psv.setX(hit_v["position"]["x"].asDouble());    
@@ -231,15 +231,15 @@ void AddHitsToMap(Json::Value Events, std::map< StationId,   std::vector<PhaseSp
   }
 }
 
-std::vector<TransferMap*>      TrackingDerivativeTransferMaps(std::vector<PhaseSpaceVector> hitsIn, bool referenceOnly, bool rephaseCavities)
+std::vector< ::TransferMap*>      TrackingDerivativeTransferMaps(std::vector< ::PhaseSpaceVector> hitsIn, bool referenceOnly, bool rephaseCavities)
 {
   if (rephaseCavities) Simulation::PhaseCavities(hitsIn[0]);
   g_hitsIn = hitsIn;
-  g_hits   = std::map<Optics::StationId, std::vector<PhaseSpaceVector> >();
+  g_hits   = std::map<Optics::StationId, std::vector< ::PhaseSpaceVector> >();
 
-  std::vector<PhaseSpaceVector> psvByEvent;
+  std::vector< ::PhaseSpaceVector> psvByEvent;
 
-  std::map< StationId,   std::vector<PhaseSpaceVector> > hits;
+  std::map< StationId,   std::vector< ::PhaseSpaceVector> > hits;
   for(unsigned int j=0; j<hitsIn.size() && (!referenceOnly || j==0); j++)
   {
     MICEEvent* event = Simulation::RunSimulation(hitsIn[j]);
@@ -253,7 +253,7 @@ std::vector<TransferMap*>      TrackingDerivativeTransferMaps(std::vector<PhaseS
   return MakePolyfitMaps(hitsIn, g_hits, order);
 }
 
-std::vector<TransferMap*>      PolynomialFitTransferMaps(PhaseSpaceVector reference, const MiceModule* root)
+std::vector< ::TransferMap*>      PolynomialFitTransferMaps(::PhaseSpaceVector reference, const MiceModule* root)
 {
   //Algorithm
   //First do any set up like phasing cavities etc
@@ -270,17 +270,17 @@ std::vector<TransferMap*>      PolynomialFitTransferMaps(PhaseSpaceVector refere
   return MakePolyfitMaps(g_hitsIn, g_hits,  root->findModulesByPropertyExists("string", "EnvelopeType")[0]->propertyInt("PolynomialOrder")+1 );
 }
 
-std::vector<TransferMap*> MakePolyfitMaps(std::vector<PhaseSpaceVector> hitsIn, std::map<StationId, std::vector<PhaseSpaceVector> > hits, int order)
+std::vector< ::TransferMap*> MakePolyfitMaps(std::vector< ::PhaseSpaceVector> hitsIn, std::map<StationId, std::vector< ::PhaseSpaceVector> > hits, int order)
 {
-  typedef std::map< StationId, std::vector<PhaseSpaceVector> >::iterator vec_it;
-  std::vector<TransferMap*> maps;
+  typedef std::map< StationId, std::vector< ::PhaseSpaceVector> >::iterator vec_it;
+  std::vector< ::TransferMap*> maps;
   for(vec_it it = hits.begin(); it!=hits.end(); it++) {
     if( it->second.size() != hitsIn.size() && order > 0)
       Squeak::mout(Squeak::warning) << "Warning - derivatives may be screwy. I only got " << it->second.size() << " hits in station " << it->first << std::endl;
     else {
       try { 
-        if(order == 0) maps.push_back( new TransferMap( CLHEP::HepMatrix(6,6,1), hitsIn[0], it->second[0], NULL) );
-        else           maps.push_back( new TransferMap( TransferMapCalculator::GetPolynomialTransferMap(hitsIn, it->second, order ) ) );
+        if(order == 0) maps.push_back( new ::TransferMap( ::CLHEP::HepMatrix(6,6,1), hitsIn[0], it->second[0], NULL) );
+        else           maps.push_back( new ::TransferMap( TransferMapCalculator::GetPolynomialTransferMap(hitsIn, it->second, order ) ) );
         AddStationToMapping(it->first, maps.back());
       }
       catch(Squeal squee) {
@@ -295,8 +295,8 @@ std::vector<TransferMap*> MakePolyfitMaps(std::vector<PhaseSpaceVector> hitsIn, 
 
 void DoPolyfit(const Function& func, const MiceModule& mod)
 {
-  CLHEP::HepVector delta    = GetDelta(&mod);
-  CLHEP::HepVector deltaMax = GetDeltaMax(&mod);
+  ::CLHEP::HepVector delta    = GetDelta(&mod);
+  ::CLHEP::HepVector deltaMax = GetDeltaMax(&mod);
   int    order            = mod.propertyIntThis   ("PolynomialOrder")+1;
   int    maxNumberOfSteps = 100;
   double chi2Max          = mod.propertyDoubleThis("Tolerance");
@@ -305,7 +305,7 @@ void DoPolyfit(const Function& func, const MiceModule& mod)
   if(mod.propertyExistsThis("MaxNumberOfSteps", "int"    )) maxNumberOfSteps = mod.propertyIntThis   ("MaxNumberOfSteps");
   if(deltaFactor      <= 1.) throw(Squeal(Squeal::recoverable, "DeltaFactor must be > 1",      "Optics::DoPolyfit"));
   if(maxNumberOfSteps <= 0 ) throw(Squeal(Squeal::recoverable, "MaxNumberOfSteps must be > 0", "Optics::DoPolyfit"));
-	TransferMap tm = TransferMapCalculator::GetSweepingPolynomialTransferMap(&func, order, chi2Max, delta, deltaMax, deltaFactor, maxNumberOfSteps, g_mean, g_mean);
+	::TransferMap tm = TransferMapCalculator::GetSweepingPolynomialTransferMap(&func, order, chi2Max, delta, deltaMax, deltaFactor, maxNumberOfSteps, g_mean, g_mean);
   Squeak::mout(Squeak::info) << "Found polynomial fit at order " << tm.GetOrder() << " with valid region ";
   for(int i=1; i<=delta.num_row(); i++) Squeak::mout(Squeak::info) << delta(i) << " ";
   MVector<m_complex> eig = CLHEP_to_MMatrix(tm.GetFirstOrderMap()).eigenvalues();
@@ -318,16 +318,16 @@ void DoPolyfit(const Function& func, const MiceModule& mod)
 
 void PolyFitFunction(const double* psv_in, double* psv_out)
 {
-  CLHEP::HepVector vec = g_mean.getSixVector();
+  ::CLHEP::HepVector vec = g_mean.getSixVector();
   for(size_t i=0; i<6; i++) vec[i] += psv_in[i];
   double     mass  = ModuleConverter::PdgPidToMass(Simulation::g_pid);
-  PhaseSpaceVector psvIn(vec, mass);
+  ::PhaseSpaceVector psvIn(vec, mass);
   psvIn.setZ(g_mean.z());
   Simulation::RunSimulation(psvIn);
   g_hitsIn.push_back(psvIn);
   AddHitsToMap(MAUSGeant4Manager::GetInstance()->GetEventAction()->GetEvents(), g_hits);
-  PhaseSpaceVector psvOut = g_hits[g_polyfit_module].back();
-  CLHEP::HepVector vecOut = psvOut.getSixVector();
+  ::PhaseSpaceVector psvOut = g_hits[g_polyfit_module].back();
+  ::CLHEP::HepVector vecOut = psvOut.getSixVector();
   MAUSGeant4Manager::GetInstance()->GetTracking()->SetTracks(Json::Value());
   for(int i=0; i<vecOut.num_row(); i++) psv_out[i] = vecOut[i] - g_mean.getSixVector()[i];
 }
@@ -345,7 +345,7 @@ void SetPolyFitModule(const MiceModule* root)
     }
 }
 
-void  AddStationToMapping(StationId id, TransferMap* map)
+void  AddStationToMapping(StationId id, ::TransferMap* map)
 {
   if(id.StationType() != StationId::virt) return;
   const MiceModule* mod = MAUSGeant4Manager::GetInstance()->GetVirtualPlanes()->GetModuleFromStationNumber(id.StationNumber());
@@ -390,22 +390,22 @@ std::ostream& operator <<(std::ostream& out, const StationId& id)
   return out;
 }
 
-std::vector<TransferMap*>     FieldDerivativeTransferMaps   ()
+std::vector< ::TransferMap*>     FieldDerivativeTransferMaps   ()
 {
   
 //SOMETHING HERE PLEASE
-//TransferMap GetDerivativeTransferMap(double target_indie, PhaseSpaceVector x_in, const BTField* field, var indep, double step_size,
+//::TransferMap GetDerivative::TransferMap(double target_indie, ::PhaseSpaceVector x_in, const BTField* field, var indep, double step_size,
 //                                                    std::vector<double> delta);
-  return std::vector<TransferMap*>();
+  return std::vector< ::TransferMap*>();
 }
 
 
 
-bool cov_comp(CovarianceMatrix a, CovarianceMatrix b) {return (a.GetMean().t() < b.GetMean().t());}
+bool cov_comp(::CovarianceMatrix a, ::CovarianceMatrix b) {return (a.GetMean().t() < b.GetMean().t());}
 
-std::vector<CovarianceMatrix> Transport(std::vector<TransferMap*> maps, CovarianceMatrix ellipse)
+std::vector< ::CovarianceMatrix> Transport(std::vector< ::TransferMap*> maps, ::CovarianceMatrix ellipse)
 {
-  std::vector<CovarianceMatrix> covs(1, ellipse);
+  std::vector< ::CovarianceMatrix> covs(1, ellipse);
   for(unsigned int i=0; i<maps.size(); i++)
   {
     covs.push_back((*maps[i])*ellipse);
@@ -422,10 +422,10 @@ T_ITER map_find_value(T_VALUE value, T_MAP a_map)
   return a_map.end();
 }
 
-void AppendPSV(PhaseSpaceVector psv, int trackID, TransferMap& tm, MICEEvent& event)
+void AppendPSV(::PhaseSpaceVector psv, int trackID, ::TransferMap& tm, MICEEvent& event)
 {
-  typedef std::map<const MiceModule*, TransferMap*> mod_map;
-  const MiceModule* mod = map_find_value<TransferMap*, mod_map, mod_map::iterator>(&tm, g_module_to_map)->first;
+  typedef std::map<const MiceModule*, ::TransferMap*> mod_map;
+  const MiceModule* mod = map_find_value< ::TransferMap*, mod_map, mod_map::iterator>(&tm, g_module_to_map)->first;
   int   stationID       = MAUSGeant4Manager::GetInstance()->GetVirtualPlanes()->GetStationNumberFromModule(mod);
   event.virtualHits.push_back(new VirtualHit( psv.virtualHit(trackID, stationID) ));
 }
@@ -437,14 +437,14 @@ void AppendPSV(PhaseSpaceVector psv, int trackID, TransferMap& tm, MICEEvent& ev
 namespace Output
 {
 
-void MakeOutput(std::vector<CovarianceMatrix> matrix, std::vector<TransferMap*> tms, const MiceModule* env_mod)
+void MakeOutput(std::vector< ::CovarianceMatrix> matrix, std::vector< ::TransferMap*> tms, const MiceModule* env_mod)
 {
   try{TextOutput(matrix, env_mod->propertyString("ShortTextOutput"));} catch(...) {Squeak::mout(Squeak::debug) << "Failed to find short text file" << std::endl;}
   try{LongTextOutput(matrix, tms, env_mod->propertyString("LongTextOutput"));} catch(...) {Squeak::mout(Squeak::debug) << "Failed to find long text file" << std::endl;}
   try{RootOutput(matrix, tms, env_mod->propertyString("RootOutput"), "Output from G4MICE Optics");} catch(...) {Squeak::mout(Squeak::debug) << "Failed to find root file" << std::endl;}
 }
 
-void TextOutput(std::vector<CovarianceMatrix> matrix, std::string outfile)
+void TextOutput(std::vector< ::CovarianceMatrix> matrix, std::string outfile)
 {
   if(outfile == "") return;
   ofstream out(outfile.c_str());
@@ -454,7 +454,7 @@ void TextOutput(std::vector<CovarianceMatrix> matrix, std::string outfile)
   out.close();
 }
 
-void LongTextOutput(std::vector<CovarianceMatrix> matrix, std::vector<TransferMap*> tms, std::string outfile)
+void LongTextOutput(std::vector< ::CovarianceMatrix> matrix, std::vector< ::TransferMap*> tms, std::string outfile)
 {
   std::string names[6] = {"t","E","x","Px","y","Py"};
   ofstream out(outfile.c_str());
@@ -472,7 +472,7 @@ void LongTextOutput(std::vector<CovarianceMatrix> matrix, std::vector<TransferMa
   {
     AnalysisPlaneBank f_theBank = matrix[i].GetAnalysisPlaneBank();
 
-    CovarianceMatrix cov = matrix[i];
+    ::CovarianceMatrix cov = matrix[i];
     double alpha_x=cov.GetTwoDAlpha(1), gamma_x=cov.GetTwoDGamma(1), alpha_y=cov.GetTwoDAlpha(2),     gamma_y=cov.GetTwoDGamma(2), 
            alpha_t=cov.GetTwoDAlpha(0), gamma_t=cov.GetTwoDGamma(0), alpha_trans=cov.GetAlphaTrans(), gamma_trans=cov.GetGammaTrans(),
            disp_x=cov.GetDispersion(1), disp_y=cov.GetDispersion(1);
@@ -503,7 +503,7 @@ void LongTextOutput(std::vector<CovarianceMatrix> matrix, std::vector<TransferMa
 }
 
 
-void RootOutput(std::vector<CovarianceMatrix> matrix, std::vector<TransferMap*> tms, std::string outfile, std::string comment)
+void RootOutput(std::vector< ::CovarianceMatrix> matrix, std::vector< ::TransferMap*> tms, std::string outfile, std::string comment)
 {
   TFile rootfile((outfile).c_str(),"RECREATE",comment.c_str());
   TTree * f_theTree = new TTree("envelope_data", comment.c_str());
@@ -558,7 +558,7 @@ void RootOutput(std::vector<CovarianceMatrix> matrix, std::vector<TransferMap*> 
         for(int k=0; k<6; k++)
             covarianceMatrix[j][k] = matrix[i].GetKineticCovariances()[j][k];
 
-    CovarianceMatrix cov = matrix[i];
+    ::CovarianceMatrix cov = matrix[i];
     double alpha_x=cov.GetTwoDAlpha(1), gamma_x=cov.GetTwoDGamma(1), alpha_y=cov.GetTwoDAlpha(2),     gamma_y=cov.GetTwoDGamma(2), 
            alpha_t=cov.GetTwoDAlpha(0), gamma_t=cov.GetTwoDGamma(0), alpha_trans=cov.GetAlphaTrans(), gamma_trans=cov.GetGammaTrans(),
            disp_x=cov.GetDispersion(1), disp_y=cov.GetDispersion(1);
@@ -657,7 +657,7 @@ namespace Optimiser
   std::vector<const MiceModule*> g_score_mod;
   bool                       g_redo_tracking = true;
   bool                       g_rebuild_simulation = true;
-  std::vector<TransferMap*>  g_transfer_maps;
+  std::vector< ::TransferMap*>  g_transfer_maps;
 
   //Find optimiser module, build and run minuit
   void RunOptimiser(MiceModule* root)
@@ -791,12 +791,12 @@ namespace Optimiser
     //calculate scores
     std::vector<double>           total_score;
     MiceModule*                   opt_mod     = g_root_mod->findModulesByPropertyExistsNC("string", "Optimiser")[0];
-    CovarianceMatrix              ellipse_in  = Optics::EllipseIn(g_root_mod);
+    ::CovarianceMatrix              ellipse_in  = Optics::EllipseIn(g_root_mod);
     bool referenceOnly      = false;
     if(opt_mod->propertyExistsThis("ReferenceOnly","bool")) referenceOnly = opt_mod->propertyBool("ReferenceOnly");
     if(g_transfer_maps.size() < 1 || g_redo_tracking) //if the field map could have changed or the tms are not yet defined
     {
-      Optics::g_module_to_map = std::map<const MiceModule*, TransferMap*>();
+      Optics::g_module_to_map = std::map<const MiceModule*, ::TransferMap*>();
       bool phase_cavities = g_transfer_maps.size() < 1 || g_rebuild_simulation;
       g_transfer_maps = Optics::TrackingDerivativeTransferMaps( Optics::BuildHitsIn(ellipse_in.GetMean(), Optics::GetDelta(g_root_mod)), referenceOnly, phase_cavities  );
     }
@@ -805,7 +805,7 @@ namespace Optimiser
     {
       if(Optics::g_module_to_map.find(g_score_mod[i]) == Optics::g_module_to_map.end())
         throw( Squeal(Squeal::recoverable, "No transfer matrix for module "+g_score_mod[i]->fullName()+" needed to calculate score. Tracking out of bounds?", "Optics::GetScore") );
-      TransferMap* tm_i  = Optics::g_module_to_map[g_score_mod[i]];
+      ::TransferMap* tm_i  = Optics::g_module_to_map[g_score_mod[i]];
       GetScore((*tm_i)*ellipse_in, g_score_mod[i], scores);
     }
     for(std::map<std::string, double>::iterator it=scores.begin(); it!=scores.end(); it++)
@@ -828,7 +828,7 @@ namespace Optimiser
   }
 
   //keep going until we run out of score variables, when we will get a "property not found" exception... return
-  void GetScore(CovarianceMatrix mat, const MiceModule* mod, std::map<std::string, double>& scores)
+  void GetScore(::CovarianceMatrix mat, const MiceModule* mod, std::map<std::string, double>& scores)
   {
     int index=0;
     while(true)
@@ -869,15 +869,15 @@ int main(int argc, char **argv)
     Optimiser::PushParameters(root, Optimiser::g_parameters);
   }
   Squeak::mout(Squeak::info) << "Building geometry" << std::endl;
-  Simulation::SetupSimulation(root, std::vector<CovarianceMatrix>());
+  Simulation::SetupSimulation(root, std::vector< ::CovarianceMatrix>());
 
   //Try to run the optimiser
   Squeak::mout(Squeak::info) << "Looking for optimisation requests" << std::endl;
   Optimiser::RunOptimiser(root);
   //Run an envelope through
   Squeak::mout(Squeak::info) << "Running beam envelope through" << std::endl;
-  std::vector<CovarianceMatrix>  envelope;
-  std::vector<TransferMap*>      tms;
+  std::vector< ::CovarianceMatrix>  envelope;
+  std::vector< ::TransferMap*>      tms;
   Optics::Envelope(root, envelope, tms);
   //Write output
   Output::MakeOutput(envelope, tms, root->findModulesByPropertyExists("string", "EnvelopeType")[0]);
