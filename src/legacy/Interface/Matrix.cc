@@ -746,8 +746,8 @@ Matrix<double> Matrix<double>::submatrix(size_t start_row,
 														 size_t number_of_columns)
 														 const
 {
-	return submatrix(start_row, number_of_rows,
-									 start_column, number_of_columns);
+	return MatrixBase<double, gsl_matrix>::submatrix(
+		start_row, number_of_rows, start_column, number_of_columns);
 }
 
 Matrix<complex> Matrix<complex>::submatrix(size_t start_row,
@@ -756,8 +756,8 @@ Matrix<complex> Matrix<complex>::submatrix(size_t start_row,
 														 size_t number_of_columns)
 														 const
 {
-	return submatrix(start_row, number_of_rows,
-									 start_column, number_of_columns);
+	return MatrixBase<complex, gsl_matrix_complex>::submatrix(
+		start_row, number_of_rows, start_column, number_of_columns);
 }
 
 //############################
@@ -1135,6 +1135,12 @@ template <> Matrix<complex> transpose(
   Matrix<complex> matrix_transpose(matrix);
   gsl_matrix_complex_transpose(matrix_transpose.matrix_);
   return matrix_transpose;
+}
+
+Matrix<complex> dagger(const Matrix<complex>& matrix)
+{
+	Matrix<complex> transpose_matrix = transpose(matrix);
+	return conj(transpose_matrix);
 }
 
 namespace CLHEP

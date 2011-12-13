@@ -70,7 +70,7 @@ SymmetricMatrix::SymmetricMatrix(const size_t size)
   : Matrix<double>(size, size)
 { }
 
-SymmetricMatrix::SymmetricMatrix(const size_t	size, const double	value)
+SymmetricMatrix::SymmetricMatrix(const size_t	size, const double& value)
   : Matrix<double>()
 {
   build_matrix(size);
@@ -109,31 +109,31 @@ const size_t SymmetricMatrix::size() const
 
 SymmetricMatrix& SymmetricMatrix::operator=(const SymmetricMatrix& rhs)
 {
-	((Matrix<double>) *this) = (Matrix<double>) rhs;
+	Matrix<double>::operator=(rhs);
 	return *this;
 }
 
 SymmetricMatrix& SymmetricMatrix::operator+=(const SymmetricMatrix& rhs)
 {
-	((Matrix<double>) *this) += (Matrix<double>) rhs;
+	Matrix<double>::operator+=(rhs);
 	return *this;
 }
 
 SymmetricMatrix& SymmetricMatrix::operator-=(const SymmetricMatrix& rhs)
 {
-	((Matrix<double>) *this) -= (Matrix<double>) rhs;
+	Matrix<double>::operator-=(rhs);
 	return *this;
 }
 
-SymmetricMatrix& SymmetricMatrix::operator*=(const double rhs)
+SymmetricMatrix& SymmetricMatrix::operator*=(const double& rhs)
 {
-	((Matrix<double>) *this) *= rhs;
+	Matrix<double>::operator*=(rhs);
   return *this;
 }
 
-SymmetricMatrix& SymmetricMatrix::operator/=(const double rhs)
+SymmetricMatrix& SymmetricMatrix::operator/=(const double& rhs)
 {
-	((Matrix<double>) *this) /= rhs;
+	Matrix<double>::operator/=(rhs);
   return *this;
 }
 
@@ -153,12 +153,12 @@ const SymmetricMatrix SymmetricMatrix::operator-(
   return SymmetricMatrix(*this) -= rhs;
 }
 
-const SymmetricMatrix SymmetricMatrix::operator*(const double rhs) const
+const SymmetricMatrix SymmetricMatrix::operator*(const double& rhs) const
 {
   return SymmetricMatrix(*this) *= rhs;
 }
 
-const SymmetricMatrix SymmetricMatrix::operator/(const double rhs) const
+const SymmetricMatrix SymmetricMatrix::operator/(const double& rhs) const
 {
   return SymmetricMatrix(*this) /= rhs;
 }
@@ -184,7 +184,7 @@ void SymmetricMatrix::build_matrix(const size_t         size,
 	 double element;
   for(size_t row=0; row<size; ++row)
   {
-    for(size_t column=0; column<row; ++column)
+    for(size_t column=0; column<=row; ++column)
     {
 			element = data[row*size + column];
       (*this)(row+1, column+1) = element;
@@ -315,7 +315,7 @@ SymmetricMatrix operator-(const SymmetricMatrix& matrix)
 // Scalar Operators
 //*************************
 
-SymmetricMatrix operator*(const double					 lhs,
+SymmetricMatrix operator*(const double&					 lhs,
 													const SymmetricMatrix& rhs)
 {
 	return lhs * (Matrix<double>) rhs;

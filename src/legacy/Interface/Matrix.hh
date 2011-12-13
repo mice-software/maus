@@ -103,6 +103,11 @@ Matrix<MAUS::complex> complex(const Matrix<double>& real_matrix,
 
 } //namespace Complex
 
+/** @brief Returns a complex-valued matrix containing the complex conjugate
+ *         of the elements of the given matrix.
+ */
+Matrix<complex> dagger(const Matrix<complex>& matrix);
+
 /** @brief returns the determinant of a matrix. Throws an exception if the
  *         matrix is not square
  */

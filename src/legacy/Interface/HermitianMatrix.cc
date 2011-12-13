@@ -46,13 +46,6 @@ namespace MAUS
 // Conversion Functions
 //****************************
 
-HermitianMatrix dagger(const HermitianMatrix& matrix)
-{
-	Matrix<complex> transpose_matrix
-		= transpose((Matrix<complex>) matrix);
-	return conj(transpose_matrix);
-}
-
 HermitianMatrix inverse(const HermitianMatrix& matrix)
 {
 	return inverse((Matrix<complex>) matrix);
@@ -205,7 +198,7 @@ HermitianMatrix::HermitianMatrix(const size_t	size, const complex& value)
   }
 }
 
-HermitianMatrix::HermitianMatrix(const size_t					 size,
+HermitianMatrix::HermitianMatrix(const size_t						size,
 																	complex const * const data)
   : Matrix<complex>()
 {
@@ -227,19 +220,19 @@ const size_t HermitianMatrix::size() const
 
 HermitianMatrix& HermitianMatrix::operator=(const HermitianMatrix& rhs)
 {
-	((Matrix<complex>) *this) = (Matrix<complex>) rhs;
+	Matrix<complex>::operator=(rhs);
 	return *this;
 }
 
 HermitianMatrix& HermitianMatrix::operator+=(const HermitianMatrix& rhs)
 {
-	((Matrix<complex>) *this) += (Matrix<complex>) rhs;
+	Matrix<complex>::operator+=(rhs);
 	return *this;
 }
 
 HermitianMatrix& HermitianMatrix::operator-=(const HermitianMatrix& rhs)
 {
-	((Matrix<complex>) *this) -= (Matrix<complex>) rhs;
+	Matrix<complex>::operator-=(rhs);
 	return *this;
 }
 
@@ -280,7 +273,7 @@ void HermitianMatrix::build_matrix(const size_t         size,
 	complex element;
   for(size_t row=0; row<size; ++row)
   {
-    for(size_t column=0; column<row; ++column)
+    for(size_t column=0; column<=row; ++column)
     {
 			element = data[row*size + column];
 			if (row != column)

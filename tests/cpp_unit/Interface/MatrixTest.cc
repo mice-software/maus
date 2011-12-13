@@ -638,16 +638,30 @@ TEST_F(MatrixTest, ScalarDivision) {
 }
 
 TEST_F(MatrixTest, ComplexComposition) {
+	//test construction of a complex matrix from one double matrix (real part)
   const Matrix<complex> matrix_c0(rows_, columns_, complex_data_);
   const Matrix<double> matrix_real(rows_, columns_, double_data_);
+	Matrix<complex> matrix_c1;
+  for (size_t row=1; row<rows_; ++row)
+  {
+		for (size_t column=1; column<columns_; ++column)
+		{
+			matrix_c1(row, column)
+				= Complex::complex(double_data_[(column-1)*rows_+(row-1)]);
+    }
+  }
+	Matrix<complex> matrix_c2 = Complex::complex(matrix_real);
+  ASSERT_TRUE(equal(matrix_c2, matrix_c1));
+
+	//test construction of a complex matrix from two double matrices (real, imag)
   double double_data_reversed[data_size_];
   for (size_t index=0; index<data_size_; ++index)
   {
     double_data_reversed[data_size_-index-1] = double_data_[index];
   }
   const Matrix<double> matrix_imag(rows_, columns_, double_data_reversed);
-  Matrix<complex> matrix_c1 = Complex::complex(matrix_real, matrix_imag);
-  ASSERT_TRUE(equal(matrix_c1, matrix_c0));
+  Matrix<complex> matrix_c3 = Complex::complex(matrix_real, matrix_imag);
+  ASSERT_TRUE(equal(matrix_c3, matrix_c0));
   
 }
 
@@ -666,15 +680,8 @@ TEST_F(MatrixTest, ComplexDecomposition) {
   Matrix<double> zero_matrix(rows_, columns_);
   Matrix<complex> matrix_pure_imag = Complex::complex(zero_matrix, matrix_imag);
   Matrix<complex> matrix_c1 = matrix_c0 - matrix_pure_imag;
-  Matrix<double> matrix_d1(rows_, columns_);
-  for(size_t row=1; row<=rows_; ++row)
-  {
-    for(size_t column=1; column<=columns_; ++column)
-    {
-      matrix_d1(row, column) = real(matrix_c1(row, column));
-    }
-  }
-  EXPECT_TRUE(equal(matrix_d1, matrix_d0));
+	Matrix<complex> matrix_c2 = Complex::complex(matrix_d0);
+  EXPECT_TRUE(equal(matrix_c1, matrix_c2));
 }
 
 TEST_F(MatrixTest, ComplexConjugation) {
@@ -750,6 +757,16 @@ TEST_F(MatrixTest, Transpose) {
   for(size_t i = 1; i<=matrix_ca.number_of_rows(); ++i)
     for(size_t j = 1; j<=matrix_ca.number_of_columns(); ++j)
       EXPECT_EQ(matrix_ca(i,j), matrix_ct(j,i));
+}
+
+TEST_F(MatrixTest, Dagger) {
+	complex herm_data[4] = {
+		Complex::complex(12.1, 0.),			Complex::complex(98.6, 100.0),
+		Complex::complex(98.6, -100.0),	Complex::complex(22.4, 0.)
+	};
+  Matrix<complex> matrix(size_, size_, herm_data); 
+  Matrix<complex> matrix_dagger = dagger(matrix);
+  ASSERT_TRUE(equal(matrix_dagger, matrix));
 }
 
 TEST_F(MatrixTest, HepMatrix) {

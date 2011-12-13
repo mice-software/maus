@@ -26,11 +26,6 @@
 #include "Interface/Vector.hh"
 #include "Interface/Matrix.hh"
 
-namespace CLHEP
-{
-  class HepSymMatrix;
-}
-
 namespace MAUS
 {
 
@@ -55,10 +50,6 @@ SymmetricMatrix real(const HermitianMatrix& hermitian_matrix);
  *         corresponding elements of the given complex-valued matrix.
  */
 SymmetricMatrix imag(const HermitianMatrix& hermitian_matrix);
-/** @brief Returns a complex-valued matrix containing the complex conjugate
- *         of the elements of the given matrix.
- */
-HermitianMatrix dagger(const HermitianMatrix& hermitian_matrix);
 
 /** @brief returns the inverse of a matrix
  */
@@ -87,14 +78,6 @@ std::pair<Vector<double>, Matrix<complex> > eigensystem(
 //*************************
 
 HermitianMatrix operator-(const HermitianMatrix& matrix);
-
-//*************************
-// Scalar Operators
-//*************************
-
-HermitianMatrix  operator*(
-  const double&						value,
-  const HermitianMatrix& matrix);
 
 
 /** @class	HermitianMatrix extends Matrix by enforcing symmetric arrangements
@@ -182,7 +165,6 @@ public:
 
   //These use their Matrix<complex> counterparts and rely on the protected base
 	//class copy constructor to cast the return type as a HermitianMatrix
-	friend HermitianMatrix dagger(const HermitianMatrix& matrix);
   friend HermitianMatrix inverse(const HermitianMatrix& matrix);
 	friend HermitianMatrix MAUS::operator-(const HermitianMatrix& matrix);
 

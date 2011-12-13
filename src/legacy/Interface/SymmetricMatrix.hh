@@ -89,7 +89,7 @@ MAUS::SymmetricMatrix operator-(const SymmetricMatrix& matrix);
 //*************************
 
 MAUS::SymmetricMatrix  operator*(
-  const double&						value,
+  const double&					 value,
   const SymmetricMatrix& matrix);
 
 
@@ -125,7 +125,7 @@ public:
    *  @params size number of rows/columns
    *  @params data variable to be copied into all items in the matrix
    */
-	SymmetricMatrix(const size_t size, const double value);
+	SymmetricMatrix(const size_t size, const double& value);
 
   /** @brief Construct a matrix and fill with data from an array
    *
@@ -151,21 +151,21 @@ public:
   SymmetricMatrix& operator =(
 		const SymmetricMatrix&									rhs);
   SymmetricMatrix& operator+=(
-    const SymmetricMatrix&                 rhs);
+    const SymmetricMatrix&									rhs);
   SymmetricMatrix& operator-=(
-    const SymmetricMatrix&                 rhs);
-  SymmetricMatrix& operator*=(const double rhs);
-  SymmetricMatrix& operator/=(const double rhs);
+    const SymmetricMatrix&									rhs);
+  SymmetricMatrix& operator*=(const double& rhs);
+  SymmetricMatrix& operator/=(const double& rhs);
   
   //*************************
   // Algebraic Operators
   //*************************
   const SymmetricMatrix operator+(
-    const SymmetricMatrix&                     rhs) const;
+    const SymmetricMatrix&											rhs) const;
   const SymmetricMatrix operator-(
-    const SymmetricMatrix&                     rhs) const;
-  const SymmetricMatrix operator*(const double rhs) const;
-  const SymmetricMatrix operator/(const double rhs) const;
+    const SymmetricMatrix&											rhs) const;
+  const SymmetricMatrix operator*(const double& rhs) const;
+  const SymmetricMatrix operator/(const double& rhs) const;
 
   //*************************
   // Befriending
@@ -178,8 +178,8 @@ public:
 	friend SymmetricMatrix MAUS::operator-(
 		const SymmetricMatrix& matrix);
 	friend SymmetricMatrix MAUS::operator*(
-		const  double						value,
-		const SymmetricMatrix& matrix);
+		const  double&						value,
+		const SymmetricMatrix&	matrix);
 
 	//These use special low-level gsl functions for symmetric matricies
   friend Vector<double> eigenvalues(const SymmetricMatrix& matrix);
