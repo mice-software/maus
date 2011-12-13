@@ -56,12 +56,11 @@ class InputPySpillGenerator:
         or until the maximum number of events is hit.
         """
         while self._current_event < self._number_of_events:
-            # remove \n and whitespace
+            self._current_event += 1
             next_value = unicode("{}")
             # yield the current event (google 'python generators' if confused)
             yield next_value
-            self._current_event += 1
-
+        return
 
     def death(self):
         """
