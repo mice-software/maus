@@ -92,10 +92,6 @@ public:
    */
 	HermitianMatrix(const HermitianMatrix& original_instance);
 
-  /** @brief Base class copy constructor
-   */
-	HermitianMatrix(const Matrix<complex>& original_instance);
-
   /** @brief Construct a matrix and fill all fields with 0
    *
    *  @params size number of rows/columns
@@ -126,7 +122,7 @@ public:
   /** @brief returns the number of rows/columns in the matrix
    */
   const size_t size() const;
-  
+
   //*************************
   // Assignment Operators
   //*************************
@@ -139,6 +135,12 @@ public:
   //*************************
   const HermitianMatrix operator+(const HermitianMatrix& rhs) const;
   const HermitianMatrix operator-(const HermitianMatrix& rhs) const;
+  
+  //*************************
+  // Comparison Operators
+  //*************************
+  const bool operator==(const HermitianMatrix& rhs) const;
+  const bool operator!=(const HermitianMatrix& rhs) const;
 
   //*************************
   // Befriending
@@ -155,7 +157,12 @@ public:
   friend std::pair<Vector<double>, Matrix<complex> >
   eigensystem(const HermitianMatrix& matrix);
 
+	friend SymmetricMatrix real(const HermitianMatrix& matrix);
 protected:
+
+  /** @brief Base class copy constructor
+   */
+	HermitianMatrix(const Matrix<complex>& original_instance);
 
   //build the matrix with size^2 elements initialised to zero by default
   void build_matrix(const size_t size, const bool initialize=true);  

@@ -48,6 +48,7 @@ namespace MAUS
 
 SymmetricMatrix real(const HermitianMatrix& matrix)
 {
+	//requires friend access to SymmetricMatrix AND HermitianMatrix
 	return real((Matrix<complex>) matrix);
 }
 

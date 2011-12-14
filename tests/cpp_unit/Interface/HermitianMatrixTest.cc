@@ -119,6 +119,11 @@ public:
     return are_equal;
   }
 
+  bool equal(const HermitianMatrix& m1, const HermitianMatrix& m2)
+  {
+		return equal((Matrix<complex>&) m1, (Matrix<complex>&) m2);
+	}
+
   bool equal(const Vector<complex>& v1, const Vector<complex>& v2)
   { 
     bool are_equal = true;
@@ -219,6 +224,13 @@ TEST_F(HermitianMatrixTest, Assignment) {
   HermitianMatrix matrix_h0(size_, complex_data_);
   HermitianMatrix matrix_h1 = matrix_h0;
   EXPECT_TRUE(equal(matrix_h0, matrix_h1));
+	
+	//make sure we can't sneakily assign a non-Hermitian matrix
+	/* Protected inherit makes this a compile error
+	Matrix<complex> matrix_c0(size_, size_);
+	matrix_h1.Matrix<complex>::operator=(matrix_c0);
+  EXPECT_TRUE(equal(matrix_h0, matrix_h1));
+	*/
 }
 
 TEST_F(HermitianMatrixTest, Addition) {
@@ -247,10 +259,18 @@ TEST_F(HermitianMatrixTest, Subtraction) {
 }
 
 TEST_F(HermitianMatrixTest, Inverse) {
+fprintf(stdout, "CHECKPOINT 1\n");
+fflush(stdout);
   HermitianMatrix matrix_h1(size_, complex_data_);
+fprintf(stdout, "CHECKPOINT 2\n");
+fflush(stdout);
   HermitianMatrix matrix_h2 = inverse(matrix_h1);
 	//M^-1 * M = Identity
+fprintf(stdout, "CHECKPOINT 3\n");
+fflush(stdout);
   Matrix<complex> matrix_c0 = (Matrix<complex>) matrix_h1 * matrix_h2;
+fprintf(stdout, "CHECKPOINT 4\n");
+fflush(stdout);
 	complex one = Complex::complex(1.);
 	complex zero = Complex::complex(0.);
   for(size_t row=1; row<=size_; ++row)

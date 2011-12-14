@@ -38,6 +38,7 @@ namespace MAUS
 // Forward Declarations
 //*************************
 class Matrix<double>;
+class HermitianMatrix;
 class SymmetricMatrix;
 class Vector<double>;
 
@@ -108,10 +109,6 @@ public:
   /** @brief Copy constructor
    */
 	SymmetricMatrix(const SymmetricMatrix& original_instance);
-	
-  /** @brief Base class copy constructor
-   */
-	SymmetricMatrix(const Matrix<double>& original_instance);
 
   /** @brief Copy constructor for CLHEP::HepSymMatrix
    */
@@ -173,13 +170,27 @@ public:
   //*************************
   // Befriending
   //*************************
+	
+	//These could be implemented using the public interface, but it's nicer
+	//to just call the Matrix functions and upcast via the protected copy c'tor
+	friend SymmetricMatrix real(const HermitianMatrix& matrix);
+	friend SymmetricMatrix operator-(const SymmetricMatrix& matrix);
+	friend SymmetricMatrix operator*(const double&					lhs,
+																	 const SymmetricMatrix& rhs);
+
+	//Declared in HermitianMatrix.hh
+	friend SymmetricMatrix inverse(const SymmetricMatrix& matrix);
 
 	//These use special low-level gsl functions for symmetric matricies
   friend Vector<double> eigenvalues(const SymmetricMatrix& matrix);
   friend std::pair<Vector<double>, Matrix<double> >
   eigensystem(const SymmetricMatrix& matrix);
-
+	
 protected:
+	
+  /** @brief Base class copy constructor
+   */
+	SymmetricMatrix(const Matrix<double>& original_instance);
 
   //build the matrix with size^2 elements initialised to zero by default
   void build_matrix(const size_t size, const bool initialize=true);  

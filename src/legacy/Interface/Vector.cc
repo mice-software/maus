@@ -291,15 +291,26 @@ VectorBase<double, gsl_vector>& VectorBase<double, gsl_vector>::operator=(
 { 
   if (&rhs != this)
   {
-    delete_vector();
-    
     if(rhs.vector_ == NULL)
     {
       vector_ = NULL;
     }
     else
     {
-      vector_ = gsl_vector_calloc(rhs.size());
+			if (vector_ == NULL)
+			{
+				//special case (like for a copy constructor call) where a non-null
+				//vector is assigned to a null vector
+				build_vector(rhs.vector_->size);
+			}
+			else
+			if (vector_->size != rhs.vector_->size)
+			{
+				throw(Squeal(Squeal::recoverable,
+										 "Attempted to assign a vector of a different size.",
+										 "VectorBase<double>::operator=()"));
+			}
+
       gsl_vector_memcpy(vector_, rhs.vector_);
     }
   }
@@ -313,15 +324,26 @@ VectorBase<complex, gsl_vector_complex>::operator=(
 { 
   if (&rhs != this)
   {
-    delete_vector();
-    
     if(rhs.vector_ == NULL)
     {
       vector_ = NULL;
     }
     else
     {
-      vector_ = gsl_vector_complex_calloc(rhs.size()); 
+			if (vector_ == NULL)
+			{
+				//special case (like for a copy constructor call) where a non-null
+				//vector is assigned to a null vector
+				build_vector(rhs.vector_->size);
+			}
+			else
+			if (vector_->size != rhs.vector_->size)
+			{
+				throw(Squeal(Squeal::recoverable,
+										 "Attempted to assign a vector of a different size.",
+										 "VectorBase<complex>::operator=()"));
+			}
+
       gsl_vector_complex_memcpy(vector_, rhs.vector_);  
     }
   }

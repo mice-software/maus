@@ -492,15 +492,58 @@ TEST_F(MatrixTest, Comparison) {
 }
 
 TEST_F(MatrixTest, Assignment) {
+
+	//*** double assignment ***
+
   //plain vanilla assignment
   Matrix<double> matrix_d0(rows_, columns_, double_data_);
-  Matrix<double> matrix_d1 = matrix_d0;
+  Matrix<double> matrix_d1(rows_, columns_);
+	matrix_d1 = matrix_d0;
   EXPECT_TRUE(equal(matrix_d0, matrix_d1));
+
+	//check special assignement to null matrix
+	Matrix<double> matrix_d2;
+	matrix_d2 = matrix_d0;
+  EXPECT_TRUE(equal(matrix_d2, matrix_d0));
+	
+	//check bad assignment to differently sized matrix
+	bool caught_exception = false;
+	try
+	{
+		Matrix<double> matrix_d3(1, 12);
+		matrix_d3 = matrix_d0;
+	}
+	catch(Squeal exception)
+	{
+		caught_exception = true;
+	}
+	EXPECT_TRUE(caught_exception);
+
+	//*** complex assignment ***
 
   //plain vanilla assignment
   Matrix<complex> matrix_c0(rows_, columns_, complex_data_);
-  Matrix<complex> matrix_c1 = matrix_c0;
+  Matrix<complex> matrix_c1(rows_, columns_);
+	matrix_c1 = matrix_c0;
   EXPECT_TRUE(equal(matrix_c0, matrix_c1));
+
+	//check special assignement to null matrix
+	Matrix<complex> matrix_c2;
+	matrix_c2 = matrix_c0;
+  EXPECT_TRUE(equal(matrix_c2, matrix_c0));
+
+	//check bad assignment to differently sized matrix
+	caught_exception = false;
+	try
+	{
+		Matrix<complex> matrix_c3(1, 12);
+		matrix_c3 = matrix_c0;
+	}
+	catch(Squeal exception)
+	{
+		caught_exception = true;
+	}
+	EXPECT_TRUE(caught_exception);
 }
 
 TEST_F(MatrixTest, Addition) {

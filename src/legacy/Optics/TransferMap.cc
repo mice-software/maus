@@ -1,4 +1,167 @@
 #include "TransferMap.hh"
+#if 0
+#include "CLHEP/Units/PhysicalConstants.h"
+
+#include "Interface/PolynomialVector.hh"
+#include "CovarianceMatrix.hh"
+#include "PhaseSpaceVector.hh"
+
+namespace MAUS
+{
+
+TransferMap::TransferMap()
+{
+  reference_trajectory_in_ = NULL;
+  reference_trajectory_out_ = NULL;
+  polynomial_ = NULL;
+}
+
+TransferMap::TransferMap(PolynomialVector const * polynomial,
+                         PhaseSpaceVector reference_trajectory_in,
+                         PhaseSpaceVector reference_trajectory_out)
+{
+  Initialize(polynomial, reference_trajectory_in, reference_trajectory_out);
+}
+
+TransferMap::TransferMap(PolynomialVector const * polynomial,
+                         PhaseSpaceVector reference_trajectory)
+{
+  Initialize(polynomial, reference_trajectory, reference_trajectory);
+}
+
+TransferMap::TransferMap(TransferMap const & original_instance)
+{
+  Initialize(original_instance.polynomial_,
+             original_instance.reference_trajectory_in_,
+             original_instance.reference_trajectory_out_);
+}
+      
+TransferMap::Initialize(PolynomialVector const * polynomial,
+                        PhaseSpaceVector reference_trajectory_in,
+                        PhaseSpaceVector reference_trajectory_out)
+{
+  if (polynomial == NULL)
+  {
+    throw(Squeal(Squeal::recoverable, "ERROR: null polynomial vector",
+                 "TransferMap::Initialize()"));
+  }
+  
+  if (reference_trajectory_in == NULL)
+  {
+    throw(Squeal(Squeal::recoverable,
+                 "ERROR: null incoming reference trajectory",
+                 "TransferMap::Initialize()"));
+  }
+  
+  if (reference_trajectory_out == NULL)
+  {
+    throw(Squeal(Squeal::recoverable,
+                 "ERROR: null outgoing reference trajectory",
+                 "TransferMap::Initialize()"));
+  }
+  
+  polynomial_ = polynomial;
+  reference_trajectory_in_ = reference_trajectory_in;
+  reference_trajectory_out_ = reference_trajectory_out;
+}  
+
+/**
+ *  Name: operator*(CovarianceMatrix const &)
+ */
+CovarianceMatrix TransferMap::operator*(
+  CovarianceMatrix const & covariances) const
+{
+	CovarianceMatrix transformed_covariances;
+
+	if (polynomial_ != NULL)
+	{
+		MMatrix transfer_matrix = first_order_map();
+
+		MMatrix transfer_matrix_transpose = transfer_matrix;
+		transfer_matrix_transpose.Transpose();
+		
+		CovarianceMatrix transformed_covariances
+			= transfer_matrix_transpose * (covariances * transfer_matrix);
+	}
+	else
+	{
+		transformed_covariances = covariances;
+	}
+
+  return transformed_covariances;
+}
+
+/**
+ *  Name: operator*(PhaseSpaceVector const &)
+ */
+PhaseSpaceVector TransferMap::operator*(
+  PhaseSpaceVector const & input_vector) const
+{
+  //subtract off the input reference trajectory to obtain phase space delta
+  MVector<double> phase_space_delta(
+    phase_space_vector - reference_trajectory_in_);
+
+  //operate on the phase space delta with the polynomial map 
+  MVector<double> transformed_delta;
+  polynomial_->F(phase_space_delta, transformed_delta);
+
+  //add the transformed phase space delta to the output reference trajectory
+  PhaseSpaceVector output_vector
+    = reference_trajectory_out_ + transformed_delta;
+
+  return output_vector;
+}
+
+/**
+ *  Name: first_order_map()
+ */
+MMatrix TransferMap::first_order_map() const
+{
+  return polynomial_->GetCoefficientsAsMatrix().sub(1,6,2,7);
+}
+
+std::ostream& operator<<(std::ostream& out, TransferMap tm)
+{
+  out << "Incomming Reference Trajectory: ";
+  PhaseSpaceVector trajectory_in = tm.reference_trajectory_in();
+  if (trajectory_in != NULL)
+  {
+    out << tm.reference_trajectory_in() << "\n"
+  }
+
+  PhaseSpaceVector * trajectory_out = tm.reference_trajectory_out();
+  if (trajectory_out != NULL)
+  {
+    out << tm.reference_trajectory_out()
+  }
+  
+  PolynomialVector const * polynomial = tm.polynomial();
+  if(polynomial != NULL)
+  {
+    out << (*polynomial) << std::endl;
+  }
+
+  return out;
+}
+
+} //namespace MAUS
+#endif
+
+
+
+
+
+
+
+
+
+
+
+
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// Legacy TransferMap
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#include "TransferMap.hh"
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_eigen.h>
 

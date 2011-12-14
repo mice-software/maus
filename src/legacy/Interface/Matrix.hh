@@ -505,9 +505,6 @@ public:
 														const;
 };
 
-//TODO: make symmetric and Hermitian derived classes and add eigensystem
-//      functions for these types of matrices
-
 
 } //end namespace MAUS
         

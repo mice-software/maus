@@ -1,24 +1,22 @@
-// MAUS WARNING: THIS IS LEGACY CODE.
-#include "Interface/PolynomialVector.hh"
-#include "Interface/Squeal.hh"
-#include "Interface/MMatrix.hh"
-#include "Interface/MVector.hh"
-#include "Interface/Mesh.hh"
-
 #include <iomanip>
 #include <sstream>
 #include <math.h>
 
 #include "gsl/gsl_sf_gamma.h"
 
+#include "Interface/PolynomialVector.hh"
+#include "Interface/Squeal.hh"
+#include "Interface/Matrix.hh"
+#include "Interface/SymmetricMatrix.hh"
+#include "Interface/Vector.hh"
+#include "Interface/Mesh.hh"
 
-
-
-////////// POLYNOMIALVECTOR START ///////////
+namespace MAUS
+{
 
 bool PolynomialVector::_printHeaders=true;
 
-PolynomialVector::PolynomialVector(int numberOfInputVariables, MMatrix<double> polynomialCoefficients)
+PolynomialVector::PolynomialVector(int numberOfInputVariables, Matrix<double> polynomialCoefficients)
         :  _pointDim(numberOfInputVariables), _polyKeyByPower(), _polyKeyByVector(), _polyCoeffs(polynomialCoefficients)
 {
   SetCoefficients(numberOfInputVariables, polynomialCoefficients);
@@ -30,9 +28,9 @@ PolynomialVector::PolynomialVector(std::vector<PolynomialCoefficient> coefficien
   SetCoefficients(coefficients);
 }
 
-void PolynomialVector::SetCoefficients(int pointDim, MMatrix<double> coeff)
+void PolynomialVector::SetCoefficients(int pointDim, Matrix<double> coeff)
 {
-  int nPCoeff      = coeff.num_col();
+  int nPCoeff      = coeff.number_of_columns();
   _pointDim        = pointDim;
   _polyKeyByPower  = std::vector< std::vector<int> >();
   _polyKeyByVector = std::vector< std::vector<int> >();
@@ -43,7 +41,7 @@ void PolynomialVector::SetCoefficients(int pointDim, MMatrix<double> coeff)
   for(int i=0; i<nPCoeff; i++) 
     _polyKeyByVector.push_back(IndexByVector(i, pointDim));
 
-  for(size_t i=0; i<_polyCoeffs.num_row(); i++) 
+  for(size_t i=0; i<_polyCoeffs.number_of_rows(); i++) 
     for(int j=0; j<nPCoeff; j++)
       _polyVector.push_back( PolynomialVector::PolynomialCoefficient(_polyKeyByVector[j], i, _polyCoeffs(i+1, j+1) ) );
 }
@@ -66,11 +64,11 @@ void PolynomialVector::SetCoefficients(std::vector<PolynomialCoefficient> coeff)
     if(polyOrder > maxPolyOrder) maxPolyOrder = polyOrder;
   }
   _pointDim++; //PointDim indexes from 0
-  _polyCoeffs = MMatrix<double>(valueDim+1, NumberOfPolynomialCoefficients(_pointDim, maxPolyOrder+1), 0.);
+  _polyCoeffs = Matrix<double>(valueDim+1, NumberOfPolynomialCoefficients(_pointDim, maxPolyOrder+1), 0.);
 
-  for(size_t i=0; i<_polyCoeffs.num_col(); i++)
+  for(size_t i=0; i<_polyCoeffs.number_of_columns(); i++)
     _polyKeyByPower.push_back(IndexByPower (i, _pointDim));
-  for(size_t i=0; i<_polyCoeffs.num_col(); i++) 
+  for(size_t i=0; i<_polyCoeffs.number_of_columns(); i++) 
   {
     _polyKeyByVector.push_back(IndexByVector(i, _pointDim));
     for(unsigned int j=0; j<coeff.size(); j++) 
@@ -82,10 +80,10 @@ void PolynomialVector::SetCoefficients(std::vector<PolynomialCoefficient> coeff)
   }
 }
 
-void PolynomialVector::SetCoefficients(MMatrix<double> coeff)
+void PolynomialVector::SetCoefficients(Matrix<double> coeff)
 {
-  for(size_t i=0; i<coeff.num_row() && i<_polyCoeffs.num_row(); i++)
-    for(size_t j=0; j<coeff.num_col() && j<_polyCoeffs.num_col(); j++)
+  for(size_t i=0; i<coeff.number_of_rows() && i<_polyCoeffs.number_of_rows(); i++)
+    for(size_t j=0; j<coeff.number_of_columns() && j<_polyCoeffs.number_of_columns(); j++)
       _polyCoeffs(i+1,j+1) = coeff(i+1,j+1);
 }
 
@@ -96,22 +94,22 @@ PolynomialVector* PolynomialVector::Recentred(double * point) const
 
 void  PolynomialVector::F(const double*   point,    double* value)          const
 {
-    MVector<double> pointV(PointDimension(), 1), valueV(ValueDimension(), 1);
+    Vector<double> pointV(PointDimension(), 1), valueV(ValueDimension(), 1);
     for(unsigned int i=0; i<PointDimension(); i++) pointV(i+1) = point[i];
     F(pointV, valueV);
     for(unsigned int i=0; i<ValueDimension(); i++) value[i]  = valueV(i+1);
 }
 
-void  PolynomialVector::F(const MVector<double>& point,   MVector<double>& value) const
+void  PolynomialVector::F(const Vector<double>& point,   Vector<double>& value) const
 {
-    MVector<double> polyVector(_polyKeyByVector.size(), 1); 
+    Vector<double> polyVector(_polyKeyByVector.size(), 1); 
     MakePolyVector(point, polyVector);
-    MVector<double> answer = _polyCoeffs*polyVector;
+    Vector<double> answer = _polyCoeffs*polyVector;
     for(unsigned int i=0; i<ValueDimension(); i++) value(i+1) = answer(i+1);
 }
 
 
-MVector<double>&  PolynomialVector::MakePolyVector(const MVector<double>& point, MVector<double>& polyVector) const
+Vector<double>&  PolynomialVector::MakePolyVector(const Vector<double>& point, Vector<double>& polyVector) const
 {
     for(unsigned int i=0; i<_polyKeyByVector.size(); i++)
         for(unsigned int j=0; j<_polyKeyByVector[i].size(); j++)
@@ -210,14 +208,14 @@ void PolynomialVector::PrintHeader(std::ostream& out, char int_separator, char s
     PrintContainer<std::vector<int> >(out, _polyKeyByPower[i], int_separator, str_separator, length, pad_at_start);
 }
 
-MVector<double> PolynomialVector::Means(std::vector<std::vector<double> > values, std::vector<double> weights)
+Vector<double> PolynomialVector::Means(std::vector<std::vector<double> > values, std::vector<double> weights)
 {
   if(values.size() < 1)    throw(Squeal(Squeal::recoverable, "No input values", "PolynomialVector::Means"));
   if(values[0].size() < 1) throw(Squeal(Squeal::recoverable, "Dimension < 1",   "PolynomialVector::Means"));
   if(weights.size() != values.size()) weights = std::vector<double>(values.size(), 1.);
   int                npoints     = values.size();
   int                dim         = values[0].size();
-  MVector<double>    means(dim,0);
+  Vector<double>    means(dim,0);
   double             totalWeight = 0;
   for(int x=0; x<npoints; x++) totalWeight += weights[x];
   for(int x=0; x<npoints; x++)
@@ -229,16 +227,16 @@ MVector<double> PolynomialVector::Means(std::vector<std::vector<double> > values
   return means;
 }
 
-MMatrix<double> PolynomialVector::Covariances(std::vector<std::vector<double> > values, std::vector<double> weights, MVector<double> means)
+SymmetricMatrix PolynomialVector::Covariances(std::vector<std::vector<double> > values, std::vector<double> weights, Vector<double> means)
 {
   size_t                 npoints = values.size();
   if(npoints < 1) throw(Squeal(Squeal::recoverable, "No input values", "PolynomialVector::Covariances()"));
   size_t                 dim     = values[0].size();
   if(dim < 1)     throw(Squeal(Squeal::recoverable, "Dimension < 1", "PolynomialVector::Covariances()"));    
-  if(means.num_row() != dim)           means   = Means(values, weights);
+  if(means.number_of_rows() != dim)           means   = Means(values, weights);
   if(weights.size()  != values.size()) weights = std::vector<double>(values.size(), 1.);
 
-  MMatrix<double>    cov(dim,dim,0.);
+  SymmetricMatrix covariances(dim, 0.);
 
   double             totalWeight = 0;
   for(size_t x=0; x<npoints; x++)
@@ -247,13 +245,13 @@ MMatrix<double> PolynomialVector::Covariances(std::vector<std::vector<double> > 
   for(size_t x=0; x<npoints; x++)
     for(size_t i=0; i<dim; i++)
       for(size_t j=0; j<dim; j++) //make a sym matrix for speed
-        cov(i+1,j+1) += values[x][i]*values[x][j]*weights[x]/totalWeight;
+        covariances(i+1,j+1) += values[x][i]*values[x][j]*weights[x]/totalWeight;
 
   for(size_t i=0; i<dim; i++)
     for(size_t j=0; j<dim; j++)
-      cov(i+1,j+1) -= means(i+1)*means(j+1);
+      covariances(i+1,j+1) -= means(i+1)*means(j+1);
 
-  return cov;
+  return covariances;
 }
 
 PolynomialVector* PolynomialVector::PolynomialLeastSquaresFit(const std::vector< std::vector<double> >&  points, const std::vector< std::vector<double> >& values, 
@@ -278,10 +276,10 @@ PolynomialVector* PolynomialVector::PolynomialLeastSquaresFit(const std::vector<
   int nPoints  = points.size();
   int nCoeffs  = NumberOfPolynomialCoefficients(pointDim, polynomialOrder);
 
-  MMatrix<double> Fy(nCoeffs, valueDim, 0.);
-  MMatrix<double> F2(nCoeffs, nCoeffs,  0.);
+  Matrix<double> Fy(nCoeffs, valueDim, 0.);
+  Matrix<double> F2(nCoeffs, nCoeffs,  0.);
 
-  MMatrix<double> dummy(valueDim, nCoeffs, 0.);
+  Matrix<double> dummy(valueDim, nCoeffs, 0.);
   for(int i=0; i<valueDim; i++) for(int j=0; j<nCoeffs; j++) dummy(i+1, j+1) = 1;
   PolynomialVector* temp = new PolynomialVector(pointDim, dummy);
 
@@ -301,11 +299,21 @@ PolynomialVector* PolynomialVector::PolynomialLeastSquaresFit(const std::vector<
         Fy(j+1,k+1) += values[i][k]*tempFx[j]*wt[i];
   }
 
-  try{ F2.invert(); }
-  catch(Squeal squee) { delete temp; throw(Squeal(Squeal::recoverable, "Could not find least squares fit for data", "PolynomialVector::PolynomialLeastSquaresFit")); }
-  MMatrix<double> A = F2 * Fy;
+	Matrix<double> F2_inverse;
+  try
+	{
+		F2_inverse = inverse(F2);
+	}
+  catch(Squeal squee)
+	{
+		delete temp;
+		throw(Squeal(Squeal::recoverable,
+								 "Could not find least squares fit for data",
+								 "PolynomialVector::PolynomialLeastSquaresFit"));
+	}
+  Matrix<double> A = F2_inverse * Fy;
   delete temp;
-  temp = new PolynomialVector(pointDim, A.T());
+  temp = new PolynomialVector(pointDim, transpose(A));
   return temp;
 }
 
@@ -324,12 +332,12 @@ PolynomialVector* PolynomialVector::ConstrainedPolynomialLeastSquaresFit(const s
   if(nPoints<1)                   throw(Squeal(Squeal::recoverable, "No data for LLS Fit", "PolynomialVector::ConstrainedPolynomialLeastSquaresFit(...)"));
   if(int(values.size())!=nPoints) throw(Squeal(Squeal::recoverable, "Misaligned array in LLS Fit", "PolynomialVector::ConstrainedPolynomialLeastSquaresFit(...)")); 
   int nCoeffsNew = NumberOfPolynomialCoefficients(pointDim, polynomialOrder);
-  MMatrix<double> A(valueDim, nCoeffsNew, 0.);
+  Matrix<double> A(valueDim, nCoeffsNew, 0.);
 
   std::vector<double>    wt    (nPoints,   1);
   if(weights.size() > 0) wt = weights; 
 
-  PolynomialVector  newPolyVector1D(pointDim, MMatrix<double>(1, nCoeffsNew)); //guaranteed to be of right order
+  PolynomialVector  newPolyVector1D(pointDim, Matrix<double>(1, nCoeffsNew)); //guaranteed to be of right order
   std::vector< std::vector<double> > tempFx(nPoints, std::vector<double>(nCoeffsNew) );
   for(int i=0; i<nPoints; i++)
     newPolyVector1D.MakePolyVector(&points[i][0], &tempFx[i][0]);
@@ -355,8 +363,8 @@ PolynomialVector* PolynomialVector::ConstrainedPolynomialLeastSquaresFit(const s
       if(exists) needsCalculation.push_back(i);
     }
 
-    MVector<double> Fy(deltaCoeff, 0);
-    MMatrix<double> F2(deltaCoeff, deltaCoeff,  0.);
+    Vector<double> Fy(deltaCoeff, 0);
+    Matrix<double> F2(deltaCoeff, deltaCoeff,  0.);
 
     for(int i=0; i<nPoints && needsCalculation.size()>0; i++) //optimisation note - this algorithm spends all its time in this loop
     {
@@ -369,10 +377,15 @@ PolynomialVector* PolynomialVector::ConstrainedPolynomialLeastSquaresFit(const s
           F2(j+1,k+1) += tempFx[i][needsCalculation[k]]*tempFx[i][needsCalculation[j]]*wt[i];
       }
     }
-    try{ F2.invert(); }
+		
+		Matrix<double> F2_inverse;
+		try
+		{
+			F2_inverse = inverse(F2);
+		}
     catch(Squeal squee) { 
       throw(Squeal(Squeal::recoverable, "Could not find least squares fit for data", "PolynomialVector::ConstrainedPolynomialLeastSquaresFit")); }
-    MVector<double> AVec = F2 * Fy;
+    Vector<double> AVec = F2_inverse * Fy;
     for(int i=0; i<deltaCoeff; i++) A(dim+1, needsCalculation[i]+1) = AVec(i+1);
   }
 
@@ -399,13 +412,17 @@ PolynomialVector* PolynomialVector::Chi2ConstrainedLeastSquaresFit
   if(int(weights.size()) != nParticles) weights = std::vector<double>(xin.size(), 1.);
   std::vector<double> weights_in = std::vector<double>(weights);
   std::vector<double> amps(nParticles);
-  MVector<double> means(dimensionOut,0);
+  Vector<double> means(dimensionOut,0);
   if(!firstIsMean)
      means = Means      (xout, weights);
   else for(int i=0; i<dimensionOut; i++) means(i+1) = xout[0][i];
 
-  MMatrix<double> covInv = Covariances(xout, weights, means);
-  try{ covInv.invert(); }
+  SymmetricMatrix covariances = Covariances(xout, weights, means);
+	SymmetricMatrix covInv;
+  try
+	{
+		covInv = inverse(covariances);
+	}
   catch(Squeal squee) {throw(Squeal(Squeal::recoverable, "Failed to find least squares fit for data", "PolynomialVector::Chi2ConstrainedLeastSquaresFit"));}
 
   double totalWeight = 0.;
@@ -416,7 +433,7 @@ PolynomialVector* PolynomialVector::Chi2ConstrainedLeastSquaresFit
 
   if(discard <= 0.) for(int i=0; i<nParticles; i++) //if chi2Start ill-defined, just use maximum chi2 in sample
   {
-    MVector<double> xoutVec    (dimensionOut, 0);
+    Vector<double> xoutVec    (dimensionOut, 0);
     for(int j=0; j<dimensionOut; j++)
       xoutVec(j+1) = xout[i][j] - means(j+1);
     amps[i]      = (xoutVec.T() * covInv * xoutVec)(1);
@@ -441,7 +458,7 @@ PolynomialVector* PolynomialVector::Chi2ConstrainedLeastSquaresFit
       {
         std::vector<double> pout(dimensionOut, 0.);
         pvec->F(&xin[i][0], &pout[0]);
-        MVector<double> residualVec(dimensionOut,0);
+        Vector<double> residualVec(dimensionOut,0);
         for(int j=0; j<dimensionOut; j++) residualVec(j+1) = pout[j] - xout[i][j];
         chi2             += weights[i]*weights[i]/totalWeight/totalWeight * (residualVec.T() * covInv * residualVec)(1); //watch weights handling here
       }
@@ -576,11 +593,11 @@ double PolynomialVector::GetAvgChi2OfDifference(std::vector< std::vector<double>
   }
   
   double chi2 = 0;
-  MMatrix<double> cov_inv = Covariances(diff, std::vector<double>(diff.size(), 1.), MVector<double>(diff.size(), 0.));
+  SymmetricMatrix cov_inv = Covariances(diff, std::vector<double>(diff.size(), 1.), Vector<double>(diff.size(), 0.));
 
   for(size_t i=0; i<diff.size(); i++)
   {
-    MVector<double> diff_mv(&(diff[i][0]), &diff[i][0]+diff[i].size());
+    Vector<double> diff_mv(&(diff[i][0]), &diff[i][0]+diff[i].size());
     chi2 += (diff_mv.T()*cov_inv*diff_mv)(1);
   }
   chi2 /= double(diff.size());
@@ -621,20 +638,17 @@ std::vector< std::vector<double> > PolynomialVector::PointBox(std::vector<double
 }
 
 //Algorithm - take the PointBox output and scale so that length is 1 in scale_matrix coordinate system
-std::vector< std::vector<double> > PolynomialVector::PointShell(MMatrix<double> scale_matrix, int i_order) {
-  size_t          point_dim = scale_matrix.num_row();
-  MMatrix<double> scale_inv = scale_matrix.inverse();
+std::vector< std::vector<double> > PolynomialVector::PointShell(Matrix<double> scale_matrix, int i_order) {
+  size_t          point_dim = scale_matrix.number_of_rows();
+  Matrix<double> scale_inv = scale_matrix.inverse();
   std::vector<std::vector<double> > point_box = PointBox(std::vector<double>(point_dim, 1.), i_order);
   for(size_t i=0; i<point_box.size(); i++) {
-    MVector<double> point(&point_box[i][0], &point_box[i][0]+point_dim);
+    Vector<double> point(&point_box[i][0], &point_box[i][0]+point_dim);
     double scale  = (point.T()*scale_inv*point)(1);
     point        /= pow(scale, double(point_dim));
     for(size_t j=0; j<point_dim; j++) point_box[i][j]=point(j+1); 
   }
   return point_box;
 }
-////////// POLYNOMIALVECTOR END ////////////
 
-
-
-
+} //namespace MAUS

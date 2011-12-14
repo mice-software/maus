@@ -60,6 +60,11 @@ MatrixBase<StdType, GslType>::MatrixBase(
   const MatrixBase<StdType, GslType>& original_instance)
   : matrix_(NULL)
 {
+	if (original_instance.matrix_ != NULL)
+	{
+		build_matrix(original_instance.matrix_->size1,
+								 original_instance.matrix_->size2);
+	}
   (*this) = original_instance;
 }
 template MatrixBase<double, gsl_matrix>::MatrixBase(
@@ -504,17 +509,30 @@ MatrixBase<double, gsl_matrix>& MatrixBase<double, gsl_matrix>::operator=(
 {
   if (&rhs != this)
   {
-    delete_matrix();
-    
     if(rhs.matrix_ == NULL)
     {
+			//assigning a null matrix
       matrix_ = NULL;
     }
-    else
-    {
-      matrix_ = gsl_matrix_calloc(rhs.number_of_rows(), rhs.number_of_columns());
+		else
+		{
+			if (matrix_ == NULL)
+			{
+				//special case (like for a copy constructor call) where a non-null
+				//matrix is assigned to a null matrix
+				build_matrix(rhs.matrix_->size1, rhs.matrix_->size2);
+			}
+			else
+			if (	 (matrix_->size1 != rhs.matrix_->size1)
+					|| (matrix_->size2 != rhs.matrix_->size2))
+			{
+				throw(Squeal(Squeal::recoverable,
+										 "Attempted to assign a matrix of a different size.",
+										 "MatrixBase<double>::operator=()"));
+			}
+
       gsl_matrix_memcpy(matrix_, rhs.matrix_);
-    }
+		}
   }
   
   return *this;
@@ -526,16 +544,28 @@ MatrixBase<complex, gsl_matrix_complex>::operator=(
 { 
   if (&rhs != this)
   {
-    delete_matrix();
-    
     if(rhs.matrix_ == NULL)
     {
+			//assigning a null matrix
       matrix_ = NULL;
     }
-    else
-    {
-      matrix_ = gsl_matrix_complex_calloc(rhs.number_of_rows(),
-                                         rhs.number_of_columns());
+		else
+		{
+			if (matrix_ == NULL)
+			{
+				//special case (like for a copy constructor call) where a non-null
+				//matrix is assigned to a null matrix
+				build_matrix(rhs.matrix_->size1, rhs.matrix_->size2);
+			}
+			else
+			if (	 (matrix_->size1 != rhs.matrix_->size1)
+					|| (matrix_->size2 != rhs.matrix_->size2))
+			{
+				throw(Squeal(Squeal::recoverable,
+										 "Attempted to assign a matrix of a different size.",
+										 "MatrixBase<complex>::operator=()"));
+			}
+
       gsl_matrix_complex_memcpy(matrix_, rhs.matrix_);
     }
   }

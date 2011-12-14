@@ -159,17 +159,27 @@ TEST_F(VectorTest, NotEquals) {
 }
 
 TEST_F(VectorTest, Assignment) {
-  d_mv6 = d_mv3;
-  d_mv6 = d_mv6; //check for specific subtle bug when self-allocating
-  EXPECT_TRUE(d_mv6 == d_mv3); //should be exactly ==
-  for(size_t i=0; i<d_mv3.size(); ++i) d_mv6(i+1) = 2.*d_mv6(i+1);
-  EXPECT_TRUE(d_mv6 != d_mv3); //verify deepcopy
+  Vector<double> vector_d0 = d_mv3;
+  vector_d0 = vector_d0; //check for specific subtle bug when self-allocating
+  EXPECT_TRUE(vector_d0 == d_mv3); //should be exactly ==
+  for(size_t i=0; i<d_mv3.size(); ++i) vector_d0(i+1) = 2.*vector_d0(i+1);
+  EXPECT_TRUE(vector_d0 != d_mv3); //verify deepcopy
 
-  c_mv6 = c_mv3;
-  c_mv6 = c_mv6; //check for specific subtle bug when self-allocating
-  EXPECT_TRUE(c_mv6 == c_mv3); //should be exactly ==
-  for(size_t i=0; i<c_mv3.size(); ++i) c_mv6(i+1) = 2.*c_mv6(i+1);
-  EXPECT_TRUE(c_mv6 != c_mv3); //verify deepcopy)
+	//check special assignement to null matrix
+	Vector<double> vector_d1;
+	vector_d1 = vector_d0;
+  EXPECT_TRUE(vector_d1 == vector_d0);
+
+  Vector<MAUS::complex> vector_c0 = c_mv3;
+  vector_c0 = vector_c0; //check for specific subtle bug when self-allocating
+  EXPECT_TRUE(vector_c0 == c_mv3); //should be exactly ==
+  for(size_t i=0; i<c_mv3.size(); ++i) vector_c0(i+1) = 2.*vector_c0(i+1);
+  EXPECT_TRUE(vector_c0 != c_mv3); //verify deepcopy)
+
+	//check special assignement to null matrix
+	Vector<MAUS::complex> vector_c1;
+	vector_c1 = vector_c0;
+  EXPECT_TRUE(vector_c1 == vector_c0);
 }
 
 TEST_F(VectorTest, Multiplication) {

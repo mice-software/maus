@@ -196,7 +196,11 @@ VectorBase<complex, gsl_vector_complex>::operator=(
   const VectorBase<complex, gsl_vector_complex>& rhs);
 template <> void VectorBase<double, gsl_vector>::delete_vector();
 template <> void VectorBase<complex, gsl_vector_complex>::delete_vector();
-
+template <> void VectorBase<double, gsl_vector>::build_vector(
+	const size_t size, const bool initialize);
+template <> void VectorBase<complex, gsl_vector_complex>::build_vector(
+	const size_t size, const bool initialize);
+	
 /** @class Vector Defines the association between GSL and standard C++ types.
  */
 template<typename StdType>
