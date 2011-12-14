@@ -43,8 +43,8 @@ class ReducePyTOFPlot: # pylint: disable=R0902
      where N = refresh_rate = set via refresh_rate data card in driver script
      default refresh_rate = 5, ie every 5 spills
    
-    The default is to run ROOT in interactive mode
-    To run in batch mode, set root_batch_mode = 0 in the data card
+    The default is to run ROOT in batch mode
+    To run in interactive mode, set root_batch_mode = 0 in the data card
     
     At the end of the run, the canvases are printed to eps files
     """
@@ -58,7 +58,7 @@ class ReducePyTOFPlot: # pylint: disable=R0902
 
         # refresh_rate determines how often (in spill counts) 
         # the canvases are updated
-        self.refresh_rate = 1
+        self.refresh_rate = 5
         
         # Set ROOT Batch Mode to be False by default
         # This can be set via root_batch_mode in the driver script
@@ -73,28 +73,27 @@ class ReducePyTOFPlot: # pylint: disable=R0902
         self._ht01 = None
         self._ht02 = None
         self._ht12 = None
+        self.hpmthits = None
         self.hspslabx_0 = None
         self.hspslabx_1 = None
         self.hspslabx_2 = None
         self.hspslaby_0 = None
         self.hspslaby_1 = None
         self.hspslaby_2 = None
-        self.hpslabxy_0 = None
-        self.hpslabxy_1 = None
-        self.hpslabxy_2 = None
-        self.hspxy_0 = None
-        self.hspxy_1 = None
-        self.hspxy_2 = None
+        self.hspxy = None
         self.hnsp_0 = None
         self.hnsp_1 = None
         self.hnsp_2 = None
-        self.hpmthits = None
-        self.h2dprof = None
         self.hslabhits = None
 
         self.canvas_tof = None
-        self.canvas_sp = None
-        self.canvas_hits = None
+        self.canvas_pmt = None
+        self.canvas_hits_x = None
+        self.canvas_hits_y = None
+        self.canvas_nsp = None
+        self.canvas_sp_x = None
+        self.canvas_sp_y = None
+        self.canvas_sp_xy = None
         
  
     def birth(self, config_json):
@@ -244,7 +243,7 @@ class ReducePyTOFPlot: # pylint: disable=R0902
                     t_1 = sp_tof1[i][0]["time"]
                     spnt_x = sp_tof0[i][0]["slabX"]
                     spnt_y = sp_tof0[i][0]["slabY"]
-                    self.hspxy_0.Fill(spnt_x, spnt_y)
+                    self.hspxy[0].Fill(spnt_x, spnt_y)
                     self.hspslabx_0.Fill(spnt_x)
                     self.hspslaby_0.Fill(spnt_y)
 
@@ -261,7 +260,7 @@ class ReducePyTOFPlot: # pylint: disable=R0902
                     t_1 = sp_tof1[i][0]["time"]
                     spnt_x = sp_tof2[i][0]["slabX"]
                     spnt_y = sp_tof2[i][0]["slabY"]
-                    self.hspxy_2.Fill(spnt_x, spnt_y)
+                    self.hspxy[2].Fill(spnt_x, spnt_y)
                     self.hspslabx_2.Fill(spnt_x)
                     self.hspslaby_2.Fill(spnt_y)
                     self._ht12.Fill(t_2-t_1)
@@ -284,8 +283,7 @@ class ReducePyTOFPlot: # pylint: disable=R0902
                     spnt_x = sp_tof1[i][0]["slabX"]
                     spnt_y = sp_tof1[i][0]["slabY"]
                     self._ht01.Fill(t_1-t_0)
-                    self.hspxy_1.Fill(spnt_x, spnt_y)
-                    self.h2dprof.Fill(spnt_x, spnt_y, len(sp_tof1), 1)
+                    self.hspxy[1].Fill(spnt_x, spnt_y)
                     self.hspslabx_1.Fill(spnt_x)
                     self.hspslaby_1.Fill(spnt_y)
 
@@ -295,7 +293,7 @@ class ReducePyTOFPlot: # pylint: disable=R0902
 
 
 
-    def __init_histos(self): #pylint: disable=R0201
+    def __init_histos(self): #pylint: disable=R0201, R0914
         """ 
         ROOT batch mode is set to false (i.e. interactive) by default
         unless it is set differently via the root_batch_mode data card
@@ -328,40 +326,30 @@ class ReducePyTOFPlot: # pylint: disable=R0902
         
         
         self.hspslabx_0 = ROOT.TH1F("spx0", "SpacePoints X slabs hit;SlabX;",
-                                     10, 0, 10)
+                                     11, -0.5, 10.5)
         self.hspslaby_0 = ROOT.TH1F("spy0", "SpacePoints Y slabs hit;SlabY;",
-                                     10, 0, 10)
+                                     11, -0.5, 10.5)
         self.hspslabx_1 = ROOT.TH1F("spx1", "SpacePoints X slabs hit;SlabX;",
-                                     10, 0, 10)
+                                     11, -0.5, 10.5)
         self.hspslaby_1 = ROOT.TH1F("spy1", "SpacePoints Y slabs hit;SlabY;",
-                                     10, 0, 10)
+                                     11, -0.5, 10.5)
         self.hspslabx_1.SetFillColor(2)
         self.hspslaby_1.SetFillColor(2) 
         self.hspslabx_2 = ROOT.TH1F("spx2", "SpacePoints X slabs hit;SlabX;",
-                                     10, 0, 10)
+                                     11, -0.5, 10.5)
         self.hspslaby_2 = ROOT.TH1F("spy2", "SpacePoints Y slabs hit;SlabY;",
-                                     10, 0, 10)
+                                     11, -0.5, 10.5)
         self.hspslabx_2.SetFillColor(4)
         self.hspslaby_2.SetFillColor(4) 
         
-        self.hspxy_0 = ROOT.TH2F("hspxy_0", "tof0: space points;SlabX;SlabY",
-                                  10, 0, 10, 10, 0, 10)
-        self.hspxy_1 = ROOT.TH2F("hspxy_1", "tof1: space points;SlabX;SlabY",
-                                  10, 0, 10, 10, 0, 10)
-        self.hspxy_2 = ROOT.TH2F("hspxy_2", "tof2: space points;SlabX;SlabY",
-                                  10, 0, 10, 10, 0, 10)
-        
         self.hnsp_0 = ROOT.TH1F("hnsp_0", ";#space points in particle event;;",
-                                 4, 0., 4.)
+                                 4, -0.5, 3.5)
         self.hnsp_1 = ROOT.TH1F("hnsp_1", ";#space points in particle event;;",
-                                 4, 0., 4.)
+                                 4, -0.5, 3.5)
         self.hnsp_1.SetFillColor(2)
         self.hnsp_2 = ROOT.TH1F("hnsp_2", ";#space points in particle event;;",
-                                 4, 0., 4.)
+                                 4, -0.5, 3.5)
         self.hnsp_2.SetFillColor(4)
-                
-        self.h2dprof = ROOT.TProfile2D("h2dprof", "Profile X Y;SlabX;SlabY",
-                                        10, 0, 10, 10, 0, 10)
 
         self.hslabhits = [[]]
         for i in range (0, 3):
@@ -372,9 +360,12 @@ class ReducePyTOFPlot: # pylint: disable=R0902
                     title = "Raw Slab Hits X; SlabX;"
                 if (j == 1): 
                     title = "Raw Slab Hits Y;SlabY;"
+                nbins = 11
+                xlo = -0.5
+                xhi = 10.5
                 self.hslabhits[i].append(ROOT.TH1F(histname,
                                                    title,
-                                                   10, 0, 10))
+                                                   nbins, xlo, xhi))
                 self.hslabhits[i][j].SetFillColor(2*i)
 
         self.hpmthits = [[[]]]
@@ -385,9 +376,12 @@ class ReducePyTOFPlot: # pylint: disable=R0902
                 for k in range (0, 2):
                     histname = "hpmthits%d%d%d" % (i, j, k)
                     title = "plane %d, pmt %d; Slab;" % (j, k)
+                    nbins = 11
+                    xlo = -0.5
+                    xhi = 10.5
                     self.hpmthits[i][j].append(ROOT.TH1F(histname, 
                                                          title,
-                                                         10, 0, 10))
+                                                         nbins, xlo, xhi))
                     self.hpmthits[i][j][k].SetFillColor(2*i)
 
 
@@ -398,72 +392,85 @@ class ReducePyTOFPlot: # pylint: disable=R0902
         # the update/refresh is done in update_histos()
         
         # tof times between 0-1-2
-        self.canvas_tof = ROOT.TCanvas("tof", "tof", 800, 800)
-        self.canvas_tof.Divide(1, 3)
-        self.canvas_tof.cd(1)
+        self.canvas_tof = []
+        for i in range (3):
+            cname = "tof%d" % (i)
+            self.canvas_tof.append(ROOT.TCanvas(cname))
+        self.canvas_tof[0].cd()
         self._ht01.Draw()
-        self.canvas_tof.cd(2)
+        self.canvas_tof[1].cd()
         self._ht12.Draw()
-        self.canvas_tof.cd(3)
+        self.canvas_tof[2].cd()
         self._ht02.Draw()
         
-        # Space points, SP x & y 1d, SP y vs x 2d
-        self.canvas_sp = ROOT.TCanvas("sp1d", "sp1d", 900, 900)
-        self.canvas_sp.Divide(3, 2)
-        self.canvas_sp.cd(1)
-        self.hnsp_1.Draw()
-        self.hnsp_0.Draw("same")
-        self.hnsp_2.Draw("same")
-
-        self.canvas_sp.cd(2)
-        self.hspslabx_1.Draw()
-        self.hspslabx_0.Draw("same")
-        self.hspslabx_2.Draw("same")
-
-        self.canvas_sp.cd(3)
-        self.hspslaby_1.Draw()
-        self.hspslaby_0.Draw("same")
-        self.hspslaby_2.Draw("same")
-
-
-        self.canvas_sp.cd(4)
-        self.hspxy_0.Draw("text&&colz")
-        self.canvas_sp.cd(5)
-        self.hspxy_1.Draw("text&&colz")
-        self.canvas_sp.cd(6)
-        self.hspxy_2.Draw("text&&colz")
-        
-        # Slab Hits
-        self.canvas_hits = ROOT.TCanvas("hits", "hits", 800, 800)
-        self.canvas_hits.Divide(2, 3)
-        self.canvas_hits.cd(1)
+        # Slab Hits x
+        self.canvas_hits_x = ROOT.TCanvas("hits_x", "hits_x", 800, 800)
+        self.canvas_hits_x.cd()
         self.hslabhits[1][0].Draw()
         for i in range (0, 3):
             self.hslabhits[i][0].Draw("same")
 
-        self.canvas_hits.cd(2)
+        # Slab Hits y
+        self.canvas_hits_y = ROOT.TCanvas("hits_y", "hits_y", 800, 800)
+        self.canvas_hits_y.cd()
         self.hslabhits[1][1].Draw()
         for i in range (0, 3):
             self.hslabhits[i][1].Draw("same")
 
-        # PMT Hits
-        self.canvas_hits.cd(3)
-        self.hpmthits[1][0][0].Draw()
-        for i in range (0, 3):
-            self.hpmthits[i][0][0].Draw("same")
-        self.canvas_hits.cd(4)
-        self.hpmthits[1][0][1].Draw()
-        for i in range (0, 3):
-            self.hpmthits[i][0][1].Draw("same")
-        self.canvas_hits.cd(5)
-        self.hpmthits[1][1][0].Draw()
-        for i in range (0, 3):
-            self.hpmthits[i][1][0].Draw("same")
-        self.canvas_hits.cd(6)
-        self.hpmthits[1][1][1].Draw()
-        for i in range (0, 3):
-            self.hpmthits[i][1][1].Draw("same")
+        # Number of Space points
+        self.canvas_nsp = ROOT.TCanvas("nsp", "nsp", 800, 800)
+        self.canvas_nsp.cd()
+        self.hnsp_1.Draw()
+        self.hnsp_0.Draw("same")
+        self.hnsp_2.Draw("same")
 
+        # SP x 1d
+        self.canvas_sp_x = ROOT.TCanvas("sp_x", "sp_x", 800, 800)
+        self.canvas_sp_x.cd()
+        self.hspslabx_1.Draw()
+        self.hspslabx_0.Draw("same")
+        self.hspslabx_2.Draw("same")
+
+        # SP y 1d
+        self.canvas_sp_y = ROOT.TCanvas("sp_y", "sp_y", 800, 800)
+        self.hspslaby_1.Draw()
+        self.hspslaby_0.Draw("same")
+        self.hspslaby_2.Draw("same")
+
+        # SP y vs x 2d
+        self.canvas_sp_xy = []
+        self.hspxy = []
+        for i in range (3):
+            cname = "sp_xy_%d" % (i)
+            c_x = 800
+            self.canvas_sp_xy.append(ROOT.TCanvas(cname, cname, c_x, c_x))
+            self.canvas_sp_xy[i].cd()
+            hname = "hspxy_%d" % (i)
+            htitle = "tof%d: space points;SlabX;SlabY" % (i)
+            nbins = 11
+            edgelo = -0.5
+            edgehi = 10.5
+            if (i == 1):
+                nbins = 8
+                edgelo = -0.5
+                edgehi = 7.5
+            self.hspxy.append(ROOT.TH2F(hname, htitle, 
+                                        nbins, edgelo, edgehi, 
+                                        nbins, edgelo, edgehi))
+            self.hspxy[i].Draw("text&&colz")
+
+        # PMT Hits
+        self.canvas_pmt = []
+        for plane in range (2):
+            for pmt in range (2):
+                cname = "pmt%d%d" % (plane, pmt)
+                c_x = 800
+                self.canvas_pmt.append(ROOT.TCanvas(cname, cname, c_x, c_x))
+                ind = 2*plane + pmt
+                self.canvas_pmt[ind].cd()
+                self.hpmthits[1][plane][pmt].Draw()
+                for i in range (3):
+                    self.hpmthits[i][plane][pmt].Draw("same")
 
         return True
 
@@ -476,91 +483,132 @@ class ReducePyTOFPlot: # pylint: disable=R0902
         Canvases are only updated - the writing is done @ death
         """
  
-        self.canvas_tof.cd(1)
-        ROOT.gPad.Modified()
-        ROOT.gPad.Update()
-        self.canvas_tof.cd(2)
-        ROOT.gPad.Modified()
-        ROOT.gPad.Update()
-        self.canvas_tof.cd(3)
-        ROOT.gPad.Modified()
-        ROOT.gPad.Update()
+        image_list = []
 
-        self.canvas_sp.cd(1)
-        ROOT.gPad.Modified()
-        ROOT.gPad.Update()
-        self.canvas_sp.cd(2)
-        ROOT.gPad.Modified()
-        ROOT.gPad.Update()
-        self.canvas_sp.cd(3)
-        ROOT.gPad.Modified()
-        ROOT.gPad.Update()
-        self.canvas_sp.cd(4)
-        ROOT.gPad.Modified()
-        ROOT.gPad.Update()
-        self.canvas_sp.cd(5)
-        ROOT.gPad.Modified()
-        ROOT.gPad.Update()
-        self.canvas_sp.cd(6)
-        ROOT.gPad.Modified()
-        ROOT.gPad.Update()
-        
-        
-        self.canvas_hits.cd(1)
-        ROOT.gPad.Modified()
-        ROOT.gPad.Update()
-        self.canvas_hits.cd(2)
-        ROOT.gPad.Modified()
-        ROOT.gPad.Update()
-        self.canvas_hits.cd(3)
-        ROOT.gPad.Modified()
-        ROOT.gPad.Update()
-        self.canvas_hits.cd(4)
-        ROOT.gPad.Modified()
-        ROOT.gPad.Update()
-        self.canvas_hits.cd(5)
-        ROOT.gPad.Modified()
-        ROOT.gPad.Update()
-        self.canvas_hits.cd(6)
-        ROOT.gPad.Modified()
-        ROOT.gPad.Update()
-
-        # How to save 3 different canvases?
-        #   create a list of dictionaries?
-        #   however -- OutputPyImage seems unable to recognize such a list
-        # image_list = []
-
-        filetag = "tof_times_%06d" % (self.spill_count)
-        file_content = "TOF Times"
+        # Raw Hits X
+        # file label = tof_hit_x.eps
+        filetag = "tof_hit_x"
+        file_content = "TOF Raw Hits X"
         outfile = "%s.%s" % (filetag, self.filetype)
-        self.canvas_tof.Print(outfile)
-        data_file = open(outfile,'r')
+        self.canvas_hits_x.Update()
+        self.canvas_hits_x.Print(outfile)
+        image_list.append(self.__create_image(outfile, 
+                                              filetag, 
+                                              file_content))
+        image_list.append("\n")
+
+        # Raw Hits Y
+        # file label = tof_hit_y.eps
+        filetag = "tof_hit_y"
+        file_content = "TOF Raw Hits Y"
+        outfile = "%s.%s" % (filetag, self.filetype)
+        self.canvas_hits_y.Update()
+        self.canvas_hits_y.Print(outfile)
+        image_list.append(self.__create_image(outfile, 
+                                              filetag, 
+                                              file_content))
+        image_list.append("\n")
+
+        # PMT hits
+        # the files are labeled: tof_pmt00 tof_pmt01 tof_pmt10 tof_pmt11
+        # the numbers stand for plane,pmt eg tof_pmt01 -> plane0, pmt1
+        for plane in range (2):
+            for pmt in range (2):
+                ind = 2*plane + pmt
+                filetag = "tof_pmt%d%d" % (plane, pmt)
+                file_content = "TOF PMT Plane%d PMT%d" % (plane, pmt)
+                outfile = "%s.%s" % (filetag, self.filetype)
+                self.canvas_pmt[ind].Update()
+                self.canvas_pmt[ind].Print(outfile)
+                image_list.append(self.__create_image(outfile, 
+                                                      filetag, 
+                                                      file_content))
+                image_list.append("\n")
+
+        # number of space points
+        # file label = tof_nsp.eps
+        filetag = "tof_nsp"
+        file_content = "TOF Number of Space Points"
+        outfile = "%s.%s" % (filetag, self.filetype)
+        self.canvas_nsp.Update()
+        self.canvas_nsp.Print(outfile)
+        image_list.append(self.__create_image(outfile, 
+                                              filetag, 
+                                              file_content))
+        image_list.append("\n")
+
+        # Spacepoints X
+        # file label = tof_sp_x.eps
+        filetag = "tof_sp_x"
+        file_content = "TOF Space Points X"
+        outfile = "%s.%s" % (filetag, self.filetype)
+        self.canvas_sp_x.Update()
+        self.canvas_sp_x.Print(outfile)
+        image_list.append(self.__create_image(outfile, 
+                                              filetag, 
+                                              file_content))
+        image_list.append("\n")
+
+        # Spacepoints Y
+        # file label = tof_sp_y.eps
+        filetag = "tof_sp_y"
+        file_content = "TOF Space Points Y"
+        outfile = "%s.%s" % (filetag, self.filetype)
+        self.canvas_sp_y.Update()
+        self.canvas_sp_y.Print(outfile)
+        image_list.append(self.__create_image(outfile, 
+                                              filetag, 
+                                              file_content))
+        image_list.append("\n")
+
+        # space point 2d output
+        # the files are labeled: tof_xy_0, tof_xy_1, tof_xy_2 .eps
+        for i in range (3):
+            filetag = "tof_xy_%d" % (i)
+            file_content = "TOF%d Space Points 2d" % (i)
+            outfile = "%s.%s" % (filetag, self.filetype)
+            self.canvas_sp_xy[i].Update()
+            self.canvas_sp_xy[i].Print(outfile)
+            image_list.append(self.__create_image(outfile, 
+                                                  filetag, 
+                                                  file_content))
+            image_list.append("\n")
+
+        # time of flight between tof stations
+        # files are labeled tof_time_01, tof_time_12, tof_time_02 .eps
+        for i in range (3):
+            if (i < 2):
+                filetag = "tof_time_%d%d" % (i, i+1)
+                file_content = "TOF%d%d Time" % (i, i+1)
+            else:
+                filetag = "tof_time_02"
+                file_content = "TOF02 Time"
+            outfile = "%s.%s" % (filetag, self.filetype)
+            self.canvas_tof[i].Update()
+            self.canvas_tof[i].Print(outfile)
+            image_list.append(self.__create_image(outfile, 
+                                                  filetag, 
+                                                  file_content))
+            image_list.append("\n")
+
+        return unicode("".join(image_list))
+
+
+    def __create_image(self, hfile, tag, cont):
+        """
+        Create images of the histograms to append to json document.
+        """
+        data_file = open(hfile,'r')
         data = data_file.read()
         data_bin = base64.b64encode(data)
         data_file.close()
         json_doc = {}
         json_doc["image"] = {}
-        json_doc["image"]["content"] = file_content
-        json_doc["image"]["tag"] = filetag
+        json_doc["image"]["content"] = cont
+        json_doc["image"]["tag"] = tag
         json_doc["image"]["image_type"] = self.filetype
         json_doc["image"]["data"] = data_bin
-	
-	# here append the other 2 canvas images to image_list
-        # but OPyIm does not like that -- seems to want just a dict
-        # image_list.append(json_doc)
-        # just print the eps files for now until we figure this out
-
-        filetag = "tof_sp_%06d" % (self.spill_count)
-        file_content = "TOF Space Points"
-        outfile = "%s.%s" % (filetag, self.filetype)
-        self.canvas_sp.Print(outfile)
-
-        filetag = "tof_hits_%06d" % (self.spill_count)
-        file_content = "TOF Hits"
-        outfile = "%s.%s" % (filetag, self.filetype)
-        self.canvas_sp.Print(outfile)
-        
-        return json.dumps(json_doc)	
+        return json.dumps(json_doc)
 
 
     def death(self):
@@ -573,13 +621,7 @@ class ReducePyTOFPlot: # pylint: disable=R0902
 
         filetag = "tof_times"
         outfile = "%s.%s" % (filetag, self.filetype)
-        self.canvas_tof.Print(outfile)
-        filetag = "tof_sp"
-        outfile = "%s.%s" % (filetag, self.filetype)
-        self.canvas_sp.Print(outfile)
-        filetag = "tof_hits"
-        outfile = "%s.%s" % (filetag, self.filetype)
-        self.canvas_hits.Print(outfile)
+        self.canvas_tof[0].Print(outfile)
 
         # remove any zombie root objects
         ROOT.gDirectory.GetList().Delete()
