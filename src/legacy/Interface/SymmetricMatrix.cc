@@ -45,7 +45,13 @@ SymmetricMatrix::SymmetricMatrix(
   : Matrix<double>(original_instance)
 { }
 
- SymmetricMatrix::SymmetricMatrix(
+SymmetricMatrix::SymmetricMatrix(
+	const Matrix<double>& original_instance) : Matrix<double>()
+{
+	Matrix<double>::operator=(original_instance);
+}
+
+SymmetricMatrix::SymmetricMatrix(
   const ::CLHEP::HepSymMatrix& hep_matrix) : Matrix<double>()
 {
   size_t size = hep_matrix.num_row();
@@ -166,10 +172,6 @@ const SymmetricMatrix SymmetricMatrix::operator/(const double& rhs) const
 //############################
 // SymmetricMatrix (protected)
 //############################
-
-SymmetricMatrix::SymmetricMatrix(
-	const Matrix<double>& original_instance) : Matrix<double>(original_instance)
-{ }
 
 void SymmetricMatrix::build_matrix(
   const size_t size, const bool initialize)

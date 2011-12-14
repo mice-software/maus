@@ -46,6 +46,11 @@ namespace MAUS
 // Conversion Functions
 //****************************
 
+SymmetricMatrix real(const HermitianMatrix& matrix)
+{
+	return real((Matrix<complex>) matrix);
+}
+
 HermitianMatrix inverse(const HermitianMatrix& matrix)
 {
 	return inverse((Matrix<complex>) matrix);
@@ -55,7 +60,6 @@ HermitianMatrix inverse(const HermitianMatrix& matrix)
 // Eigensystem Functions
 //*************************
 
-//FIXME: use Hermitian GSL functions
 Vector<double> eigenvalues(const HermitianMatrix& matrix)
 {
   size_t size = matrix.size();
@@ -129,47 +133,10 @@ HermitianMatrix::HermitianMatrix(const HermitianMatrix& original_instance)
   : Matrix<complex>(original_instance)
 { }
 
-HermitianMatrix::HermitianMatrix(const SymmetricMatrix& real_matrix)
-	: Matrix<complex>()
+HermitianMatrix::HermitianMatrix(
+	const Matrix<complex>& original_instance) : Matrix<complex>()
 {
-	const Matrix<double> matrix = (Matrix<double>) real_matrix;
-	(*this) = MAUS::Complex::complex(matrix);
-}
-
-HermitianMatrix::HermitianMatrix(const SymmetricMatrix& real_matrix,
-																 const SymmetricMatrix& imaginary_matrix)
-{
-	size_t size = real_matrix.size();
-	if (imaginary_matrix.size() != size)
-	{
-    throw(Squeal(Squeal::recoverable,
-                 "Attempted to build a Hermitian matrix using real and imaginary matrices of different sizes",
-                 "MAUS::HermitianMatrix::HermitianMatrix(<double>, <double>)"));
-	}
-
-	build_matrix(size);
-	complex element;
-	for (size_t row=1; row<=size; ++row)
-	{
-		for (size_t column=1; column<=row; ++column)
-		{
-			if (row == column)
-			{
-				//make sure the diagonal elements' imaginary parts are zero
-				(*this)(row, column)
-					= MAUS::Complex::complex(real_matrix(row, column), 0.);
-			}
-			else
-			{
-				element = Complex::complex(real_matrix(row, column),
-																	 imaginary_matrix(row, column));
-				//set the lower diagonal elements
-				(*this)(row, column) = element;
-				//set the upper diagonal elements
-				(*this)(column, row) = conj(element);
-			}
-		}
-	}
+	Matrix<complex>::operator=(original_instance);
 }
 
 HermitianMatrix::HermitianMatrix(const size_t size)
@@ -255,10 +222,6 @@ const HermitianMatrix HermitianMatrix::operator-(
 //############################
 // HermitianMatrix (protected)
 //############################
-
-HermitianMatrix::HermitianMatrix(
-	const Matrix<complex>& original_instance) : Matrix<complex>(original_instance)
-{ }
 
 void HermitianMatrix::build_matrix(
   const size_t size, const bool initialize)

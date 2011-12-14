@@ -641,13 +641,13 @@ TEST_F(MatrixTest, ComplexComposition) {
 	//test construction of a complex matrix from one double matrix (real part)
   const Matrix<complex> matrix_c0(rows_, columns_, complex_data_);
   const Matrix<double> matrix_real(rows_, columns_, double_data_);
-	Matrix<complex> matrix_c1;
-  for (size_t row=1; row<rows_; ++row)
+	Matrix<complex> matrix_c1(rows_, columns_);
+  for (size_t row=1; row<=rows_; ++row)
   {
-		for (size_t column=1; column<columns_; ++column)
+		for (size_t column=1; column<=columns_; ++column)
 		{
 			matrix_c1(row, column)
-				= Complex::complex(double_data_[(column-1)*rows_+(row-1)]);
+				= Complex::complex(double_data_[(row-1)*columns_+(column-1)]);
     }
   }
 	Matrix<complex> matrix_c2 = Complex::complex(matrix_real);
@@ -764,7 +764,7 @@ TEST_F(MatrixTest, Dagger) {
 		Complex::complex(12.1, 0.),			Complex::complex(98.6, 100.0),
 		Complex::complex(98.6, -100.0),	Complex::complex(22.4, 0.)
 	};
-  Matrix<complex> matrix(size_, size_, herm_data); 
+  Matrix<complex> matrix(2, 2, herm_data); 
   Matrix<complex> matrix_dagger = dagger(matrix);
   ASSERT_TRUE(equal(matrix_dagger, matrix));
 }

@@ -96,8 +96,7 @@ MAUS::SymmetricMatrix  operator*(
 /** @class SymmetricMatrix extends Matrix by enforcing symmetric arrangements of
  *				 elements. All elements are stored despite the redundent nature of
  *				 symmetric matrices. This is so that base class functions will work
- *				 properly. They will just return an ordinary Matrix object and be
- *				 uncastable as a SymmetricMatrix.
+ *				 properly. They will just return an ordinary Matrix object.
  */
 class SymmetricMatrix : public Matrix<double>
 {
@@ -109,6 +108,10 @@ public:
   /** @brief Copy constructor
    */
 	SymmetricMatrix(const SymmetricMatrix& original_instance);
+	
+  /** @brief Base class copy constructor
+   */
+	SymmetricMatrix(const Matrix<double>& original_instance);
 
   /** @brief Copy constructor for CLHEP::HepSymMatrix
    */
@@ -133,7 +136,7 @@ public:
    *  @params data pointer to the start of a memory block of size
    *          size^2 with data laid out <row> <row> <row>. Only the lower
 	 *					triangle of data is used to easily ensure element symmetry.
-	 *					Note SymmetricMatrix does not take ownership of memory in data.
+	 *					Note: SymmetricMatrix does not take ownership of memory in data.
    */
 	SymmetricMatrix(const size_t size, double const * const data);
 
@@ -171,26 +174,12 @@ public:
   // Befriending
   //*************************
 
-  //These use their Matrix counterparts and then use the protected base class
-	//copy constructor to cast the return type as a SymmetricMatrix
-  friend SymmetricMatrix inverse(
-		const SymmetricMatrix& matrix);
-	friend SymmetricMatrix MAUS::operator-(
-		const SymmetricMatrix& matrix);
-	friend SymmetricMatrix MAUS::operator*(
-		const  double&						value,
-		const SymmetricMatrix&	matrix);
-
 	//These use special low-level gsl functions for symmetric matricies
   friend Vector<double> eigenvalues(const SymmetricMatrix& matrix);
   friend std::pair<Vector<double>, Matrix<double> >
   eigensystem(const SymmetricMatrix& matrix);
 
 protected:
-	
-  /** @brief Base class copy constructor
-   */
-	SymmetricMatrix(const Matrix<double>& original_instance);
 
   //build the matrix with size^2 elements initialised to zero by default
   void build_matrix(const size_t size, const bool initialize=true);  

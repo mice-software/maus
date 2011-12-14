@@ -162,6 +162,19 @@ template <typename StdType, typename GslType>
 typename MatrixBase<StdType, GslType>::template Row<StdType, GslType>
 MatrixBase<StdType, GslType>::operator[](const size_t row)
 {
+	if (matrix_ == NULL)
+	{
+    throw(Squeal(Squeal::recoverable,
+                 "Attempting to index and empty matrix.",
+                 "MatrixBase< ..., ... >::operator[]"));
+	}
+	else
+	if ((row < 0) || (row >= matrix_->size1))
+	{
+    throw(Squeal(Squeal::recoverable,
+                 "Row index out of bounds.",
+                 "MatrixBase< ..., ... >::operator[]"));
+	}
   typename MatrixBase<StdType, GslType>::
   template Row<StdType, GslType> matrix_row(
     *this, row);
@@ -177,6 +190,19 @@ template <typename StdType, typename GslType>
 const typename MatrixBase<StdType, GslType>::template Row<StdType, GslType>
 MatrixBase<StdType, GslType>::operator[](const size_t row) const
 {
+	if (matrix_ == NULL)
+	{
+    throw(Squeal(Squeal::recoverable,
+                 "Attempting to index and empty matrix.",
+                 "MatrixBase< ..., ... >::operator[]"));
+	}
+	else
+	if ((row < 0) || (row >= matrix_->size1))
+	{
+    throw(Squeal(Squeal::recoverable,
+                 "Row index out of bounds.",
+                 "MatrixBase< ..., ... >::operator[]"));
+	}
   typename MatrixBase<StdType, GslType>::
   template Row<StdType, GslType> matrix_row(
     *this, row);
@@ -192,6 +218,12 @@ template <> template<>
 double& MatrixBase<double, gsl_matrix>::Row<double, gsl_matrix>::
 operator[](const size_t column)
 {
+	if ((column < 0) || (column >= matrix_.matrix_->size2))
+	{
+    throw(Squeal(Squeal::recoverable,
+                 "Column index out of bounds.",
+                 "MatrixBase<double, gsl_matrix>::Row::operator[]"));
+	}
   return *gsl_matrix_ptr(matrix_.matrix_, row_, column);
 }
 
@@ -199,6 +231,12 @@ template <> template<>
 complex& MatrixBase<complex, gsl_matrix_complex>::
 Row<complex, gsl_matrix_complex>::operator[](const size_t column)
 {
+	if ((column < 0) || (column >= matrix_.matrix_->size2))
+	{
+    throw(Squeal(Squeal::recoverable,
+                 "Column index out of bounds.",
+                 "MatrixBase<complex, gsl_matrix_complex>::Row::operator[]"));
+	}
   return *gsl_matrix_complex_ptr(matrix_.matrix_, row_, column);
 }
 
@@ -206,6 +244,12 @@ template <> template<>
 const double& MatrixBase<double, gsl_matrix>::Row<double, gsl_matrix>::
 operator[](const size_t column) const
 {
+	if ((column < 0) || (column >= matrix_.matrix_->size2))
+	{
+    throw(Squeal(Squeal::recoverable,
+                 "Column index out of bounds.",
+                 "MatrixBase<double, gsl_matrix>::Row::operator[]"));
+	}
   return *gsl_matrix_ptr(matrix_.matrix_, row_, column);
 }
 
@@ -213,6 +257,12 @@ template <> template<>
 const complex& MatrixBase<complex, gsl_matrix_complex>::
 Row<complex, gsl_matrix_complex>::operator[](const size_t column) const
 {
+	if ((column < 0) || (column >= matrix_.matrix_->size2))
+	{
+    throw(Squeal(Squeal::recoverable,
+                 "Column index out of bounds.",
+                 "MatrixBase<complex, gsl_matrix_complex>::Row::operator[]"));
+	}
   return *gsl_matrix_complex_ptr(matrix_.matrix_, row_, column);
 }
 
@@ -220,6 +270,26 @@ template <>
 double& MatrixBase<double, gsl_matrix>::operator()(
   const size_t row, const size_t column)
 {
+	if (matrix_ == NULL)
+	{
+    throw(Squeal(Squeal::recoverable,
+                 "Attempting to index an empty matrix.",
+                 "MatrixBase<double, gsl_matrix>::operator()"));
+	}
+	else
+	if ((row < 1) || (row > matrix_->size1))
+	{
+    throw(Squeal(Squeal::recoverable,
+                 "Row index out of bounds.",
+                 "MatrixBase<double, gsl_matrix>::operator()"));
+	}
+	else
+	if ((column < 1) || (column > matrix_->size2))
+	{
+    throw(Squeal(Squeal::recoverable,
+                 "Column index out of bounds.",
+                 "MatrixBase<double, gsl_matrix>::operator()"));
+	}
   return *gsl_matrix_ptr(matrix_, row-1, column-1);
 }
 
@@ -227,6 +297,26 @@ template <>
 complex& MatrixBase<complex, gsl_matrix_complex>::operator()(
   const size_t row, const size_t column)
 {
+	if (matrix_ == NULL)
+	{
+    throw(Squeal(Squeal::recoverable,
+                 "Attempting to index an empty matrix.",
+                 "MatrixBase<complex, gsl_matrix_complex>::operator()"));
+	}
+	else
+	if ((row < 1) || (row > matrix_->size1))
+	{
+    throw(Squeal(Squeal::recoverable,
+                 "Row index out of bounds.",
+                 "MatrixBase<complex, gsl_matrix_complex>::operator()"));
+	}
+	else
+	if ((column < 1) || (column > matrix_->size2))
+	{
+    throw(Squeal(Squeal::recoverable,
+                 "Column index out of bounds.",
+                 "MatrixBase<complex, gsl_matrix_complex>::operator()"));
+	}
   return *gsl_matrix_complex_ptr(matrix_, row-1, column-1);
 }
 
@@ -234,6 +324,26 @@ template <>
 const double& MatrixBase<double, gsl_matrix>::operator()(
   const size_t row, const size_t column) const
 {
+	if (matrix_ == NULL)
+	{
+    throw(Squeal(Squeal::recoverable,
+                 "Attempting to index an empty matrix.",
+                 "MatrixBase<double, gsl_matrix>::operator()"));
+	}
+	else
+	if ((row < 1) || (row > matrix_->size1))
+	{
+    throw(Squeal(Squeal::recoverable,
+                 "Row index out of bounds.",
+                 "MatrixBase<double, gsl_matrix>::operator()"));
+	}
+	else
+	if ((column < 1) || (column > matrix_->size2))
+	{
+    throw(Squeal(Squeal::recoverable,
+                 "Column index out of bounds.",
+                 "MatrixBase<double, gsl_matrix>::operator()"));
+	}
   return *gsl_matrix_ptr(matrix_, row-1, column-1);
 }
 
@@ -241,13 +351,46 @@ template <>
 const complex& MatrixBase<complex, gsl_matrix_complex>::operator()(
   const size_t row, const size_t column) const
 {
+	if (matrix_ == NULL)
+	{
+    throw(Squeal(Squeal::recoverable,
+                 "Attempting to index an empty matrix.",
+                 "MatrixBase<complex, gsl_matrix_complex>::operator()"));
+	}
+	else
+	if ((row < 1) || (row > matrix_->size1))
+	{
+    throw(Squeal(Squeal::recoverable,
+                 "Row index out of bounds.",
+                 "MatrixBase<complex, gsl_matrix_complex>::operator()"));
+	}
+	else
+	if ((column < 1) || (column > matrix_->size2))
+	{
+    throw(Squeal(Squeal::recoverable,
+                 "Column index out of bounds.",
+                 "MatrixBase<complex, gsl_matrix_complex>::operator()"));
+	}
   return *gsl_matrix_complex_ptr(matrix_, row-1, column-1);
 }
 
 template <typename StdType, typename GslType> Vector<StdType>
 MatrixBase<StdType, GslType>::row(const size_t row) const
 {
-  size_t columns = number_of_columns();
+	if (matrix_ == NULL)
+	{
+    throw(Squeal(Squeal::recoverable,
+                 "Attempting to index an empty matrix.",
+                 "MatrixBase<double, gsl_matrix>::row()"));
+	}
+	else
+	if ((row < 1) || (row > matrix_->size1))
+	{
+    throw(Squeal(Squeal::recoverable,
+                 "Row index out of bounds.",
+                 "MatrixBase<double, gsl_matrix>::operator()"));
+	}
+  size_t columns = matrix_->size2;
   Vector<StdType> row_vector(columns);
   for(size_t column=1; column<=columns; ++column)
   {
@@ -264,7 +407,20 @@ MatrixBase<complex, gsl_matrix_complex>::row(const size_t row) const;
 template <typename StdType, typename GslType> Vector<StdType>
 MatrixBase<StdType, GslType>::column(const size_t column) const
 {
-  size_t rows = number_of_rows();
+	if (matrix_ == NULL)
+	{
+    throw(Squeal(Squeal::recoverable,
+                 "Attempting to index and empty matrix.",
+                 "MatrixBase<double, gsl_matrix>::operator()"));
+	}
+	else
+	if ((column < 1) || (column > matrix_->size2))
+	{
+    throw(Squeal(Squeal::recoverable,
+                 "Column index out of bounds.",
+                 "MatrixBase<double, gsl_matrix>::operator()"));
+	}
+  size_t rows = matrix_->size1;
   Vector<StdType> column_vector(rows);
   for(size_t row=1; row<=rows; ++row)
   {

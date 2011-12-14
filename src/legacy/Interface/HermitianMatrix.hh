@@ -46,10 +46,6 @@ template <typename StdType> class Vector;
  *         corresponding elements of the given complex-valued matrix.
  */
 SymmetricMatrix real(const HermitianMatrix& hermitian_matrix);
-/** @brief Returns a real-valued matrix containing the imaginary part of the
- *         corresponding elements of the given complex-valued matrix.
- */
-SymmetricMatrix imag(const HermitianMatrix& hermitian_matrix);
 
 /** @brief returns the inverse of a matrix
  */
@@ -96,6 +92,10 @@ public:
    */
 	HermitianMatrix(const HermitianMatrix& original_instance);
 
+  /** @brief Base class copy constructor
+   */
+	HermitianMatrix(const Matrix<complex>& original_instance);
+
   /** @brief Construct a matrix and fill all fields with 0
    *
    *  @params size number of rows/columns
@@ -108,25 +108,6 @@ public:
    *  @params data variable to be copied into all items in the matrix
    */
 	HermitianMatrix(const size_t size, const complex& value);
-
-	/** @brief	Constructs a HermitianMatrix object from a symmetric matrix.
-	 *					Technically it's still symmetric, but the elements are now complex
-	 *				  with zero imaginary component.
-	 *	@params real_matrix This matrix yields the real parts of the complex
-	 *					elements.
-	 */
-	HermitianMatrix(const SymmetricMatrix& real_matrix);
-
-	/** @brief	Constructs a Hermitian matrix from two symmetric matrices.
-	 *	@params real_matrix This matrix yields the real parts of the complex
-	 *					elements.
-	 *	@params imaginary matrix This matrix yields the imagniary parts of the
-	 *					complex elements by multiplying it by i, ignoring any non-zero
-	 *					diagonal components of the imaginary matrix, and conjugating the
-	 *					upper triangle.
-	 */
-	HermitianMatrix(const SymmetricMatrix& real_matrix,
-									const SymmetricMatrix& imaginary_matrix);
 
   /** @brief Construct a matrix and fill with data from an array
    *
@@ -175,10 +156,6 @@ public:
   eigensystem(const HermitianMatrix& matrix);
 
 protected:
-	
-  /** @brief Base class copy constructor
-   */
-	HermitianMatrix(const Matrix<complex>& original_instance);
 
   //build the matrix with size^2 elements initialised to zero by default
   void build_matrix(const size_t size, const bool initialize=true);  
