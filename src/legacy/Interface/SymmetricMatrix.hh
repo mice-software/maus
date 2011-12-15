@@ -144,6 +144,14 @@ public:
   /** @brief returns number of rows/columns in the matrix
    */
   const size_t size() const;
+
+  //*************************
+  // Element Set Functions
+  //*************************
+	
+	/** @brief Sets both (row,column) and (column,row) to value.
+	 */
+	void set(size_t row, size_t column, double value);
   
   //*************************
   // Assignment Operators
@@ -187,10 +195,14 @@ public:
   eigensystem(const SymmetricMatrix& matrix);
 	
 protected:
-	
+
   /** @brief Base class copy constructor
    */
 	SymmetricMatrix(const Matrix<double>& original_instance);
+
+	//Restrict access to elements
+  StdType& operator()(const size_t row, const size_t column);
+  Row<StdType, GslType> operator[](const size_t row);
 
   //build the matrix with size^2 elements initialised to zero by default
   void build_matrix(const size_t size, const bool initialize=true);  

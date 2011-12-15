@@ -219,18 +219,24 @@ TEST_F(HermitianMatrixTest, ConstructorFromArray) {
   EXPECT_TRUE(equal(matrix_h0, complex_data_));
 }
 
+TEST_F(HermitianMatrixTest, Set) {
+  const HermitianMatrix matrix_h0(size_, complex_data_);
+  HermitianMatrix matrix_h1(size_);
+  for(size_t row=1; row<=size_; ++row)
+  {
+    for(size_t column=1; column<=row; ++column)
+    {
+			matrix_h1.set(row, column, complex_data_[(row-1)*size_+(column-1)]);
+    }
+  }
+  EXPECT_TRUE(equal(matrix_h0, matrix_h1));
+}
+
 TEST_F(HermitianMatrixTest, Assignment) {
   //plain vanilla assignment
-  HermitianMatrix matrix_h0(size_, complex_data_);
+  const HermitianMatrix matrix_h0(size_, complex_data_);
   HermitianMatrix matrix_h1 = matrix_h0;
-  EXPECT_TRUE(equal(matrix_h0, matrix_h1));
-	
-	//make sure we can't sneakily assign a non-Hermitian matrix
-	/* Protected inherit makes this a compile error
-	Matrix<complex> matrix_c0(size_, size_);
-	matrix_h1.Matrix<complex>::operator=(matrix_c0);
-  EXPECT_TRUE(equal(matrix_h0, matrix_h1));
-	*/
+  EXPECT_TRUE(equal(matrix_h1, matrix_h0));
 }
 
 TEST_F(HermitianMatrixTest, Addition) {

@@ -110,6 +110,16 @@ const size_t SymmetricMatrix::size() const
 }
 
 //*************************
+// Element Set Functions
+//*************************
+
+void set(size_t row, size_t column, double value)
+{
+	(*this)(row, column) = value;
+	(*this)(column, row) = value;
+}
+
+//*************************
 // Assignment Operators
 //*************************
 

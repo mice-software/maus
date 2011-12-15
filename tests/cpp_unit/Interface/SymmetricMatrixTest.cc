@@ -191,6 +191,19 @@ TEST_F(SymmetricMatrixTest, ConstructorFromArray) {
   EXPECT_TRUE(equal(matrix_d0, double_data_));
 }
 
+TEST_F(HermitianMatrixTest, Set) {
+  const SymmetricMatrix matrix_s0(size_, complex_data_);
+  SymmetricMatrix matrix_s1(size_);
+  for(size_t row=1; row<=size_; ++row)
+  {
+    for(size_t column=1; column<=row; ++column)
+    {
+			matrix_s1.set(row, column, double_data_[(row-1)*size_+(column-1)]);
+    }
+  }
+  EXPECT_TRUE(equal(matrix_s0, matrix_s1));
+}
+
 TEST_F(SymmetricMatrixTest, Assignment) {
   //plain vanilla assignment
   SymmetricMatrix matrix_d0(size_, double_data_);

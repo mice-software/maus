@@ -183,6 +183,16 @@ const size_t HermitianMatrix::size() const
 }
 
 //*************************
+// Element Set Functions
+//*************************
+
+void set(size_t row, size_t column, complex value)
+{
+	(*this)(row, column) = value;
+	(*this)(column, row) = conj(value);
+}
+
+//*************************
 // Assignment Operators
 //*************************
 

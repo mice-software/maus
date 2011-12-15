@@ -124,6 +124,15 @@ public:
   const size_t size() const;
 
   //*************************
+  // Element Set Functions
+  //*************************
+	
+	/** @brief Sets both (row,column) and (column,row) to value and conj(value)
+	 *				 respectively.
+	 */
+	void set(size_t row, size_t column, complex value);
+
+  //*************************
   // Assignment Operators
   //*************************
   HermitianMatrix& operator =(const HermitianMatrix& rhs);
@@ -163,6 +172,10 @@ protected:
   /** @brief Base class copy constructor
    */
 	HermitianMatrix(const Matrix<complex>& original_instance);
+
+	//Restrict access to elements
+  StdType& operator()(const size_t row, const size_t column);
+  Row<StdType, GslType> operator[](const size_t row);
 
   //build the matrix with size^2 elements initialised to zero by default
   void build_matrix(const size_t size, const bool initialize=true);  
