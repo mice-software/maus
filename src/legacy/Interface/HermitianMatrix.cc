@@ -154,13 +154,13 @@ HermitianMatrix::HermitianMatrix(const size_t	size, const complex& value)
     {
 			if (row != column)
 			{
-				(*this)(row, column) = value;
-				(*this)(column,row) = conj(value);
+				Matrix<complex>::operator()(row, column) = value;
+				Matrix<complex>::operator()(column,row) = conj(value);
 			}
 			else
 			{
 				//make sure the imaginary part of diagonal elements are zero
-				(*this)(row, column) = Complex::complex(real(value));
+				Matrix<complex>::operator()(row, column) = Complex::complex(real(value));
 			}
     }
   }
@@ -171,6 +171,15 @@ HermitianMatrix::HermitianMatrix(const size_t						size,
   : Matrix<complex>()
 {
   build_matrix(size, data);
+}
+
+//*************************
+// Indexing Operators
+//*************************
+
+complex HermitianMatrix::operator()(const size_t row, const size_t column) const
+{
+	return Matrix<complex>::operator()(row, column);
 }
 
 //*************************
@@ -186,10 +195,10 @@ const size_t HermitianMatrix::size() const
 // Element Set Functions
 //*************************
 
-void set(size_t row, size_t column, complex value)
+void HermitianMatrix::set(size_t row, size_t column, complex value)
 {
-	(*this)(row, column) = value;
-	(*this)(column, row) = conj(value);
+	Matrix<complex>::operator()(row, column) = value;
+	Matrix<complex>::operator()(column, row) = conj(value);
 }
 
 //*************************
@@ -252,13 +261,13 @@ void HermitianMatrix::build_matrix(const size_t         size,
 			element = data[row*size + column];
 			if (row != column)
 			{
-				(*this)(row+1, column+1) = element;
-				(*this)(column+1, row+1) = conj(element);
+				Matrix<complex>::operator()(row+1, column+1) = element;
+				Matrix<complex>::operator()(column+1, row+1) = conj(element);
 			}
 			else
 			{
 				//make sure the imaginary part of diagonal elements are zero
-				(*this)(row+1, column+1) = Complex::complex(real(element));
+				Matrix<complex>::operator()(row+1, column+1) = Complex::complex(real(element));
 			}
     }
   }

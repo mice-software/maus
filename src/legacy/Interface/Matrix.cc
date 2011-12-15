@@ -946,6 +946,57 @@ Matrix<complex> Matrix<complex>::submatrix(size_t start_row,
 		start_row, number_of_rows, start_column, number_of_columns);
 }
 
+const Matrix<double> Matrix<double>::operator+(const Matrix<double>& rhs) const
+{
+	return MatrixBase<double, gsl_matrix>::operator+(rhs);
+}
+
+const Matrix<double> Matrix<double>::operator-(const Matrix<double>& rhs) const
+{
+	return MatrixBase<double, gsl_matrix>::operator-(rhs);
+}
+
+const Matrix<double> Matrix<double>::operator*(const Matrix<double>& rhs) const
+{
+	return MatrixBase<double, gsl_matrix>::operator*(rhs);
+}
+
+const Matrix<double> Matrix<double>::operator*(const double& rhs) const
+{
+	return MatrixBase<double, gsl_matrix>::operator*(rhs);
+}
+
+const Matrix<double> Matrix<double>::operator/(const double& rhs) const
+{
+	return MatrixBase<double, gsl_matrix>::operator/(rhs);
+}
+
+const Matrix<complex> Matrix<complex>::operator+(const Matrix<complex>& rhs) const
+{
+	return MatrixBase<complex, gsl_matrix_complex>::operator+(rhs);
+}
+
+const Matrix<complex> Matrix<complex>::operator-(const Matrix<complex>& rhs) const
+{
+	return MatrixBase<complex, gsl_matrix_complex>::operator-(rhs);
+}
+
+const Matrix<complex> Matrix<complex>::operator*(const Matrix<complex>& rhs) const
+{
+	return MatrixBase<complex, gsl_matrix_complex>::operator*(rhs);
+}
+
+const Matrix<complex> Matrix<complex>::operator*(const complex& rhs) const
+{
+	return MatrixBase<complex, gsl_matrix_complex>::operator*(rhs);
+}
+
+const Matrix<complex> Matrix<complex>::operator/(const complex& rhs) const
+{
+	return MatrixBase<complex, gsl_matrix_complex>::operator/(rhs);
+}
+
+
 //############################
 // Template Declarations
 //############################
@@ -1484,6 +1535,33 @@ template <> Vector<complex> operator*(
   }
   return product;
 }
+
+Matrix<double> transpose(
+	const Vector<double>& column_vector)
+{
+	size_t columns = column_vector.size();
+	Matrix<double> row_vector(1, columns);
+	for (size_t index=1; index<=columns; ++index)
+	{
+		row_vector(1, index) = column_vector(index);
+	}
+	
+	return row_vector;
+}
+
+Matrix<complex> dagger(
+	const Vector<complex>& column_vector)
+{
+	size_t columns = column_vector.size();
+	Matrix<complex> row_vector(1, columns);
+	for (size_t index=1; index<=columns; ++index)
+	{
+		row_vector(1, index) = conj(column_vector(index));
+	}
+	
+	return row_vector;
+}
+
 
 //*************************
 // Stream Operators

@@ -138,6 +138,12 @@ public:
 	SymmetricMatrix(const size_t size, double const * const data);
 
   //*************************
+  // Indexing Operators
+  //*************************
+
+  double operator()(const size_t row, const size_t column) const;
+
+  //*************************
   // Size Functions
   //*************************
 
@@ -200,9 +206,9 @@ protected:
    */
 	SymmetricMatrix(const Matrix<double>& original_instance);
 
-	//Restrict access to elements
-  StdType& operator()(const size_t row, const size_t column);
-  Row<StdType, GslType> operator[](const size_t row);
+	//Just restrict to 1-indexing instead of reimplementing the Row class.
+  Row<double, gsl_matrix> operator[](const size_t row);
+  const Row<double, gsl_matrix> operator[](const size_t row) const;
 
   //build the matrix with size^2 elements initialised to zero by default
   void build_matrix(const size_t size, const bool initialize=true);  

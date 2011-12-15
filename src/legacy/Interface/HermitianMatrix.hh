@@ -116,6 +116,12 @@ public:
 	HermitianMatrix(const size_t size, complex const * const data);
 
   //*************************
+  // Indexing Operators
+  //*************************
+
+  complex operator()(const size_t row, const size_t column) const;
+
+  //*************************
   // Size Functions
   //*************************
 
@@ -173,9 +179,9 @@ protected:
    */
 	HermitianMatrix(const Matrix<complex>& original_instance);
 
-	//Restrict access to elements
-  StdType& operator()(const size_t row, const size_t column);
-  Row<StdType, GslType> operator[](const size_t row);
+	//Just restrict to 1-indexing instead of reimplementing the Row class.
+  Row<complex, gsl_matrix_complex> operator[](const size_t row);
+  const Row<complex, gsl_matrix_complex> operator[](const size_t row) const;
 
   //build the matrix with size^2 elements initialised to zero by default
   void build_matrix(const size_t size, const bool initialize=true);  

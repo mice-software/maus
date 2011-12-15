@@ -9,13 +9,6 @@
 #include "Interface/SymmetricMatrix.hh"
 #include "Optics/CovarianceMatrix.hh"
 
-//*** Legacy Includes ***//
-#include "src/legacy/Config/MiceModule.hh"
-#include "Tensor.hh"
-#include "Tensor3.hh"
-#include "src/legacy/Interface/Differentiator.hh"
-#include "src/legacy/Config/ModuleConverter.hh"
-
 #include <sstream>
 #include <iomanip>
 //***********************//
@@ -65,7 +58,7 @@ CovarianceMatrix::CovarianceMatrix() : SymmetricMatrix(6)
 {
 	for (size_t index=1; index<=6; ++index)
 	{
-		(*this)(index, index) = 1.0;
+		Matrix<double>::operator()(index, index) = 1.0;
 	}
 }
 
@@ -144,22 +137,22 @@ void CovarianceMatrix::SetCovariances(double mass, double momentum,
   double sigma_E_Py = dispersion_prime_y * sigma_E_E / energy;
   
   //put the covariances in the correct position within the matrix
-  (*this)(1, 1) = sigma_t_t;
-  (*this)(2, 2) = sigma_E_E;
-  (*this)(1, 2) = sigma_t_E;
+  Matrix<double>::operator()(1, 1) = sigma_t_t;
+  Matrix<double>::operator()(2, 2) = sigma_E_E;
+  Matrix<double>::operator()(1, 2) = sigma_t_E;
   //<x x> = <y y>
-  (*this)(3, 3) = (*this)(5, 5) = sigma_x_x;
+  Matrix<double>::operator()(3, 3) = Matrix<double>::operator()(5, 5) = sigma_x_x;
   //<Px Px> = <Py Py>
-  (*this)(4, 4) = (*this)(6, 6) = sigma_Px_Px;
+  Matrix<double>::operator()(4, 4) = Matrix<double>::operator()(6, 6) = sigma_Px_Px;
   //<x Px> = <y Py>
-  (*this)(3, 4) = (*this)(5, 6) = sigma_x_Px;
+  Matrix<double>::operator()(3, 4) = Matrix<double>::operator()(5, 6) = sigma_x_Px;
   //<Px y> = -<x Py>
-  (*this)(4, 5) = -sigma_x_Py;
-  (*this)(3, 6) = sigma_x_Py;
-  (*this)(2, 3) = sigma_E_x;
-  (*this)(2, 5) = sigma_E_y;
-  (*this)(2, 4) = sigma_E_Px;
-  (*this)(2, 6) = sigma_E_Py;
+  Matrix<double>::operator()(4, 5) = -sigma_x_Py;
+  Matrix<double>::operator()(3, 6) = sigma_x_Py;
+  Matrix<double>::operator()(2, 3) = sigma_E_x;
+  Matrix<double>::operator()(2, 5) = sigma_E_y;
+  Matrix<double>::operator()(2, 4) = sigma_E_Px;
+  Matrix<double>::operator()(2, 6) = sigma_E_Py;
 }
 
 void CovarianceMatrix::SetCovariances(double mass, double momentum,
@@ -193,19 +186,19 @@ void CovarianceMatrix::SetCovariances(double mass, double momentum,
   double sigma_E_Py = dispersion_prime_y * sigma_E_E / energy;
   
   //put the covariances in the correct position within the matrix
-  (*this)(1, 1) = sigma_t_t;
-  (*this)(2, 2) = sigma_E_E;
-  (*this)(1, 2) = sigma_t_E;
-  (*this)(3, 3) = sigma_x_x;
-  (*this)(4, 4) = sigma_Px_Px;
-  (*this)(3, 4) = sigma_x_Px;
-  (*this)(5, 5) = sigma_y_y;
-  (*this)(6, 6) = sigma_Py_Py;
-  (*this)(5, 6) = sigma_y_Py;
-  (*this)(2, 3) = sigma_E_x;
-  (*this)(2, 5) = sigma_E_y;
-  (*this)(2, 4) = sigma_E_Px;
-  (*this)(2, 6) = sigma_E_Py;
+  Matrix<double>::operator()(1, 1) = sigma_t_t;
+  Matrix<double>::operator()(2, 2) = sigma_E_E;
+  Matrix<double>::operator()(1, 2) = sigma_t_E;
+  Matrix<double>::operator()(3, 3) = sigma_x_x;
+  Matrix<double>::operator()(4, 4) = sigma_Px_Px;
+  Matrix<double>::operator()(3, 4) = sigma_x_Px;
+  Matrix<double>::operator()(5, 5) = sigma_y_y;
+  Matrix<double>::operator()(6, 6) = sigma_Py_Py;
+  Matrix<double>::operator()(5, 6) = sigma_y_Py;
+  Matrix<double>::operator()(2, 3) = sigma_E_x;
+  Matrix<double>::operator()(2, 5) = sigma_E_y;
+  Matrix<double>::operator()(2, 4) = sigma_E_Px;
+  Matrix<double>::operator()(2, 6) = sigma_E_Py;
   
 }
 
@@ -246,6 +239,15 @@ CovarianceMatrix::CovarianceMatrix(const Matrix<double>& matrix)
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // Legacy CovarianceMatrix
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+//*** Legacy Includes ***//
+#include "Config/MiceModule.hh"
+#include "Tensor.hh"
+#include "Tensor3.hh"
+#include "Interface/Differentiator.hh"
+#include "Config/ModuleConverter.hh"
+#include "Interface/PolynomialVector.hh"
+
 
 using CLHEP::HepSymMatrix;
 using CLHEP::HepVector;
@@ -1038,9 +1040,9 @@ std::ostream& MomentHeap::Print(std::ostream& out) const
 	for(int i=1; i<MaxOrder()+1; i++) 
 	{
 		int kvec_front = 1;
-		for(unsigned int j=PolynomialVector::NumberOfPolynomialCoefficients(6, i); j<PolynomialVector::NumberOfPolynomialCoefficients(6, i+1); j++) 
+		for(unsigned int j=G4MICE::PolynomialVector::NumberOfPolynomialCoefficients(6, i); j<G4MICE::PolynomialVector::NumberOfPolynomialCoefficients(6, i+1); j++) 
 		{
-			std::vector<int> kvec = PolynomialVector::IndexByVector(j, 6);
+			std::vector<int> kvec = G4MICE::PolynomialVector::IndexByVector(j, 6);
 			if(kvec.front() != kvec_front) {std::cout << "\n"; kvec_front = kvec.front();}
 			for(unsigned int k=0; k<kvec.size()-1; k++) std::cout << kvec[k] << ".";
 			double mom = GetMoment(kvec);
@@ -1059,19 +1061,19 @@ std::ostream& operator<<(std::ostream& out, const MomentHeap& heap)
 	return heap.Print(out);
 }
 
-PolynomialVector MomentHeap::Weighting(MomentHeap in, MomentHeap target, int order)
+G4MICE::PolynomialVector MomentHeap::Weighting(MomentHeap in, MomentHeap target, int order)
 {
 	size_t dimension = 6;
-	size_t size      = PolynomialVector::NumberOfPolynomialCoefficients(dimension, order+1);
+	size_t size      = G4MICE::PolynomialVector::NumberOfPolynomialCoefficients(dimension, order+1);
 	MVector<double> u(size-1);
 	MMatrix<double> M(size-1, size-1);
 	for(size_t i=1; i<size; i++)
 	{
-		std::vector<int> index1 = PolynomialVector::IndexByVector(i, dimension);
+		std::vector<int> index1 = G4MICE::PolynomialVector::IndexByVector(i, dimension);
 		u(i)                  = target.GetMoment(index1) - in.GetMoment(index1);
 		for(size_t j=1; j<size; j++)
 		{
-			std::vector<int> index2 = PolynomialVector::IndexByVector(j, dimension);
+			std::vector<int> index2 = G4MICE::PolynomialVector::IndexByVector(j, dimension);
 			std::vector<int> index3 = index2;
 			index3.insert(index3.begin(), index1.begin(), index1.end());
 			M(j,i)             = in.GetMoment(index3) - in.GetMoment(index1)*target.GetMoment(index2);
@@ -1081,5 +1083,5 @@ PolynomialVector MomentHeap::Weighting(MomentHeap in, MomentHeap target, int ord
 	MVector<double> a  = M*u;
 	MVector<double> a2 = MVector<double>(a.num_row()+1, 1.);
 	for(size_t i=0; i<a.num_row(); i++) a2(i+2) = a(i+1);
-	return PolynomialVector(dimension, a2.T() );
+	return G4MICE::PolynomialVector(dimension, a2.T() );
 }

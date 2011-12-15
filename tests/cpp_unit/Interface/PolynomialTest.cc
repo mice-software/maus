@@ -14,6 +14,8 @@
 /// NOTE: tests PolynomialVector, Differentiator and PolynomialInterpolator classes ///
 /// Three classes that are very closely related anyway... ///
 
+using namespace G4MICE; 
+
 bool PolynomialVectorTest();
 bool PolynomialLeastSquaresTest();
 bool PolyVector_PointBox_Test();

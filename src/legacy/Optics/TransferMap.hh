@@ -170,7 +170,7 @@ std::ostream& operator<<(std::ostream& out, const TransferMap& map);
 //Currently first order transformations use the CLHEP::HepMatrix object, second order transformations use the
 //Tensor3 object and higher order transformations use the Tensor object
 //
-//At some point I would like to move to the more general PolynomialVector object. For now I have implemented an 
+//At some point I would like to move to the more general G4MICE::PolynomialVector object. For now I have implemented an 
 //interface to this object
 //
 //
@@ -235,8 +235,8 @@ public:
 	double           PhaseAdvance(int axis) const;
 	double           PhaseAdvance(int axis, double LarmorAngle) const;
   //
-	PolynomialVector* GetPolynomialVector() {return _polynomial;}
-	void              SetPolynomialVector(PolynomialVector* poly) {_polynomial = poly;}
+	G4MICE::PolynomialVector* GetPolynomialVector() {return _polynomial;}
+	void              SetPolynomialVector(G4MICE::PolynomialVector* poly) {_polynomial = poly;}
 	bool              IsCanonical()         {return _canonicalMap;}
 	bool              IsCanonical(bool can) {_canonicalMap = can; return _canonicalMap;}
 
@@ -255,7 +255,7 @@ private:
 	PhaseSpaceVector     _referenceTrajectoryOut;
 	//Need this for transporting phase space vectors
 	OpticsModel*         _optics;
-	PolynomialVector*    _polynomial; //set to NULL to disable
+	G4MICE::PolynomialVector*    _polynomial; //set to NULL to disable
 	static int           _order;
 	bool                 _canonicalMap;
 

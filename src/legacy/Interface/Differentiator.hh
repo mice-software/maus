@@ -6,7 +6,6 @@
 #include "Interface/PolynomialVector.hh"
 #include <map>
 
-
 //Differentiator.hh
 //Contains:
 
@@ -25,6 +24,7 @@
 
 //Differentiator
 //Finds arbitrary order differentials for an arbitrary VectorMap or function pointer
+
 class Differentiator : public VectorMap
 {
 public:
@@ -52,8 +52,8 @@ public:
     //Return the original function ("0th differential")
     VectorMap*   FunctionMap()     const { return _y; }
     //Make a polynomial using the differential coefficients
-    PolynomialVector* PolynomialFromDifferentials(const MVector<double>& point) const;
-    PolynomialVector* PolynomialFromDifferentials(double* point)                 const;
+    G4MICE::PolynomialVector* PolynomialFromDifferentials(const MVector<double>& point) const;
+    G4MICE::PolynomialVector* PolynomialFromDifferentials(double* point)                 const;
 
     friend std::ostream& operator<<(std::ostream&, const Differentiator&); 
 
@@ -103,15 +103,15 @@ public:
     unsigned int NumberOfPoints()         const {return int(ceil(NumberOfIndices()/NumberOfDiffIndices())); } //number of points needed for each interpolation
     unsigned int PointOrder()             const {return _totalOrder - _differentialOrder;} //polynomial "order" to be contributed by points
     unsigned int NumberOfDiffIndices()    const 
-    {return PolynomialVector::NumberOfPolynomialCoefficients(PointDimension(), DifferentialOrder()+1); } //number of differentials at each point
+    {return G4MICE::PolynomialVector::NumberOfPolynomialCoefficients(PointDimension(), DifferentialOrder()+1); } //number of differentials at each point
     unsigned int NumberOfIndices()        const
-    {return PolynomialVector::NumberOfPolynomialCoefficients(_inSize, _totalOrder+1);} //number of rows in the interpolation
+    {return G4MICE::PolynomialVector::NumberOfPolynomialCoefficients(_inSize, _totalOrder+1);} //number of rows in the interpolation
     //Read and write operations
     PolynomialInterpolator* Clone()       const; //copy function
     ~PolynomialInterpolator();
 
     //The polynomial vector at a point on the mesh
-    PolynomialVector* PolyVec(Mesh::Iterator it) const {return _points[it.ToInteger()];}
+    G4MICE::PolynomialVector* PolyVec(Mesh::Iterator it) const {return _points[it.ToInteger()];}
     VectorMap*        Function()                       {return _func;}
     Mesh*             GetMesh()                  const {return _mesh;}
 
@@ -120,7 +120,7 @@ public:
 private:
 
     Mesh*                _mesh;
-    PolynomialVector**   _points;
+    G4MICE::PolynomialVector**   _points;
     VectorMap*           _func;
     int                  _differentialOrder;
     int                  _totalOrder;
@@ -139,7 +139,7 @@ private:
     static PIMMap        _meshCounter;
 
     void                          BuildFixedMeshPolynomials(VectorMap* F);
-    PolynomialVector*             PolynomialFromDiffs(Mesh::Iterator point, Differentiator* diffs);
+    G4MICE::PolynomialVector*             PolynomialFromDiffs(Mesh::Iterator point, Differentiator* diffs);
     std::vector< Mesh::Iterator > GetFixedMeshPoints(Mesh::Iterator dualIterator, int polySize);
     MMatrix<double>               GetX(std::vector< Mesh::Iterator> points );
     MMatrix<double>               GetD(std::vector< Mesh::Iterator> points, Differentiator* diff );
@@ -150,7 +150,6 @@ private:
 
 };
 std::ostream& operator<<(std::ostream&, const PolynomialInterpolator&);
-
 
 
 #endif

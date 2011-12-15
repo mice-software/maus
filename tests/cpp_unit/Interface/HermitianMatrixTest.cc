@@ -265,18 +265,10 @@ TEST_F(HermitianMatrixTest, Subtraction) {
 }
 
 TEST_F(HermitianMatrixTest, Inverse) {
-fprintf(stdout, "CHECKPOINT 1\n");
-fflush(stdout);
   HermitianMatrix matrix_h1(size_, complex_data_);
-fprintf(stdout, "CHECKPOINT 2\n");
-fflush(stdout);
   HermitianMatrix matrix_h2 = inverse(matrix_h1);
 	//M^-1 * M = Identity
-fprintf(stdout, "CHECKPOINT 3\n");
-fflush(stdout);
   Matrix<complex> matrix_c0 = (Matrix<complex>) matrix_h1 * matrix_h2;
-fprintf(stdout, "CHECKPOINT 4\n");
-fflush(stdout);
 	complex one = Complex::complex(1.);
 	complex zero = Complex::complex(0.);
   for(size_t row=1; row<=size_; ++row)

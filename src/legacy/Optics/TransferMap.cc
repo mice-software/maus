@@ -202,7 +202,7 @@ TransferMap::TransferMap() : _optics(NULL)
   _order = 0;
   for(int i=1; i<coeffs.num_col(); i++)
   {
-    std::vector<int> index = PolynomialVector::IndexByVector(i, coeffs.num_row());
+    std::vector<int> index = G4MICE::PolynomialVector::IndexByVector(i, coeffs.num_row());
     if(index.size() > uint(_order))
     {
       _order++;

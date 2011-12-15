@@ -785,6 +785,7 @@ TEST_F(MatrixTest, Trace) {
 }
 
 TEST_F(MatrixTest, Transpose) {
+	//verify the transpose of a real-valued matrix
   Matrix<double> matrix_da(size_, size_, double_data_);
   Matrix<double> matrix_dt = transpose(matrix_da);
   ASSERT_EQ(matrix_da.number_of_rows(), matrix_dt.number_of_columns());
@@ -793,6 +794,15 @@ TEST_F(MatrixTest, Transpose) {
     for(size_t j = 1; j<=matrix_da.number_of_columns(); ++j)
       EXPECT_EQ(matrix_da(i,j), matrix_dt(j,i));
 
+	//verify the creation of a real-valued, row-vector matrix
+	Vector<double> column_vector(double_data_, 6);
+	Matrix<double> row_vector = transpose(column_vector);
+	for(size_t j = 1; j<=6; ++j)
+	{
+		EXPECT_EQ(row_vector(1,j), column_vector(j));
+	}
+
+	//verify the transpose of a complex-valued matrix
   Matrix<complex> matrix_ca(size_, size_, complex_data_);  
   Matrix<complex> matrix_ct = transpose(matrix_ca);
   ASSERT_EQ(matrix_ca.number_of_rows(), matrix_ct.number_of_columns());
@@ -810,6 +820,14 @@ TEST_F(MatrixTest, Dagger) {
   Matrix<complex> matrix(2, 2, herm_data); 
   Matrix<complex> matrix_dagger = dagger(matrix);
   ASSERT_TRUE(equal(matrix_dagger, matrix));
+
+	//verify the creation of a complex-valued, row-vector matrix
+	Vector<complex> column_vector(complex_data_, 6);
+	Matrix<complex> row_vector = dagger(column_vector);
+	for(size_t j = 1; j<=6; ++j)
+	{
+		EXPECT_EQ(row_vector(1,j), conj(column_vector(j)));
+	}
 }
 
 TEST_F(MatrixTest, HepMatrix) {

@@ -177,9 +177,21 @@ template <typename StdType> MAUS::Matrix<StdType>  operator*(
 // Matrix/Vector Operators
 //*************************
 
+/** @brief Multiply a column vector on the left by a matrix.
+ */
 template <typename StdType> Vector<StdType> operator*(
   const Matrix<StdType>& lhs,
   const Vector<StdType>& rhs);
+
+/** @brief	Create a Matrix that represents a real-valued row vector that can
+ *					then multiply a matrix on the left.
+ */
+Matrix<double> transpose(const Vector<double>& column_vector);
+
+/** @brief	Create a Matrix that represents a complex-valued row vector that can
+ *					then multiply a valued matrix on the left.
+ */
+Matrix<complex> dagger(const Vector<complex>& column_vector);
 
 //*************************
 // Stream Operators
@@ -438,11 +450,9 @@ public:
   Matrix(const Matrix<double>& original_instance)
     : MatrixBase<double, gsl_matrix>(original_instance) { }
 
-  //*** MatrixBase constructors ***
+  //*** MatrixBase functions ***
 
   Matrix() : MatrixBase<double, gsl_matrix>() { }
-  Matrix(const MatrixBase<double, gsl_matrix>& base_vector)
-    : MatrixBase<double, gsl_matrix>(base_vector) { }
   Matrix(const ::CLHEP::HepMatrix& hep_matrix )
     : MatrixBase<double, gsl_matrix>(hep_matrix) { }
   Matrix(const size_t rows, const size_t columns, const double value)
@@ -452,13 +462,22 @@ public:
   Matrix(const size_t rows, const size_t columns, double const * const data)
     : MatrixBase<double, gsl_matrix>(rows, columns, data) { }
 
-  //*** Matrix<double> functions ***
-
   Matrix<double> submatrix(size_t start_row,
 													 size_t number_of_rows,
                            size_t start_column,
                            size_t number_of_columns)
                            const;
+
+  const Matrix<double> operator+(const Matrix<double>& rhs) const;
+  const Matrix<double> operator-(const Matrix<double>& rhs) const;
+  const Matrix<double> operator*(const Matrix<double>& rhs) const;
+  const Matrix<double> operator*(const double& rhs) const;
+  const Matrix<double> operator/(const double& rhs) const;
+
+  //*** Matrix<double> functions ***
+
+  Matrix(const MatrixBase<double, gsl_matrix>& base_vector)
+    : MatrixBase<double, gsl_matrix>(base_vector) { }
 };
 
 template<>
@@ -468,11 +487,9 @@ public:
   Matrix(const Matrix<complex>& original_instance)
     : MatrixBase<complex, gsl_matrix_complex>(original_instance) { }
 
-  //*** MatrixBase constructors ***
+  //*** MatrixBase functions ***
 
   Matrix() : MatrixBase<complex, gsl_matrix_complex>() { }
-  Matrix(const MatrixBase<complex, gsl_matrix_complex>& base_vector)
-    : MatrixBase<complex, gsl_matrix_complex>(base_vector) { }
   Matrix(const ::CLHEP::HepMatrix& hep_matrix )
     : MatrixBase<complex, gsl_matrix_complex>(hep_matrix) { }
   Matrix(const size_t rows, const size_t columns, const complex value)
@@ -482,13 +499,29 @@ public:
   Matrix(const size_t rows, const size_t columns, complex const * const data)
     : MatrixBase<complex, gsl_matrix_complex>(rows, columns, data) { }
 
+  Matrix<complex> submatrix(size_t start_row,
+														size_t number_of_rows,
+														size_t start_column,
+														size_t number_of_columns)
+														const;
+
+  const Matrix<complex> operator+(const Matrix<complex>& rhs) const;
+  const Matrix<complex> operator-(const Matrix<complex>& rhs) const;
+  const Matrix<complex> operator*(const Matrix<complex>& rhs) const;
+  const Matrix<complex> operator*(const complex& rhs) const;
+  const Matrix<complex> operator/(const complex& rhs) const;
+
   //*** Matrix<complex> functions ***
+
+  Matrix(const MatrixBase<complex, gsl_matrix_complex>& base_vector)
+    : MatrixBase<complex, gsl_matrix_complex>(base_vector) { }
 
   /** @brief Construct a matrix with complex elements (containing no imaginary
    *         component) corresponding to elements of the given real-valued
    *         matrix.
    */
   Matrix(const MatrixBase<double, gsl_matrix>& real_matrix);
+
   /** @brief Constructs a matrix with complex elements corresponding to elements
    *         of the given real-valued matrices. In effect the complex-valued
    *         matrix that is returned is R + i I, where R and I are real-valued
@@ -496,13 +529,6 @@ public:
    */
   Matrix(const MatrixBase<double, gsl_matrix>& real_matrix,
          const MatrixBase<double, gsl_matrix>& imaginary_matrix);
-
-
-  Matrix<complex> submatrix(size_t start_row,
-														size_t number_of_rows,
-														size_t start_column,
-														size_t number_of_columns)
-														const;
 };
 
 

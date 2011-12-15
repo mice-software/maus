@@ -63,10 +63,10 @@ SymmetricMatrix::SymmetricMatrix(
     for(size_t column=1; column<=row; ++column)
     {
 			element = hep_matrix(row, column);
-      (*this)(row,column) = element;
+      Matrix<double>::operator()(row,column) = element;
 			if (row != column)
 			{
-				(*this)(column,row) = element;
+				Matrix<double>::operator()(column,row) = element;
 			}
     }
   }
@@ -84,10 +84,10 @@ SymmetricMatrix::SymmetricMatrix(const size_t	size, const double& value)
   {
     for(size_t column=1; column<=row; column++)
     {
-      (*this)(row, column) = value;
+      Matrix<double>::operator()(row, column) = value;
 			if (row != column)
 			{
-				(*this)(column,row) = value;
+				Matrix<double>::operator()(column,row) = value;
 			}
     }
   }
@@ -98,6 +98,15 @@ SymmetricMatrix::SymmetricMatrix(const size_t					 size,
   : Matrix<double>()
 {
   build_matrix(size, data);
+}
+
+//*************************
+// Indexing Operators
+//*************************
+
+double SymmetricMatrix::operator()(const size_t row, const size_t column) const
+{
+	return Matrix<double>::operator()(row, column);
 }
 
 //*************************
@@ -113,10 +122,10 @@ const size_t SymmetricMatrix::size() const
 // Element Set Functions
 //*************************
 
-void set(size_t row, size_t column, double value)
+void SymmetricMatrix::set(size_t row, size_t column, double value)
 {
-	(*this)(row, column) = value;
-	(*this)(column, row) = value;
+	Matrix<double>::operator()(row, column) = value;
+	Matrix<double>::operator()(column, row) = value;
 }
 
 //*************************
@@ -199,10 +208,10 @@ void SymmetricMatrix::build_matrix(const size_t         size,
     for(size_t column=0; column<=row; ++column)
     {
 			element = data[row*size + column];
-      (*this)(row+1, column+1) = element;
+      Matrix<double>::operator()(row+1, column+1) = element;
 			if (row != column)
 			{
-				(*this)(column+1, row+1) = element;
+				Matrix<double>::operator()(column+1, row+1) = element;
 			}
     }
   }

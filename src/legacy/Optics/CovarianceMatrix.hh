@@ -190,7 +190,10 @@ protected:
 // Legacy CovarianceMatrix
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-class PolynomialVector;
+namespace G4MICE
+{
+	class PolynomialVector;
+}
 class MiceModule;
 
 using CLHEP::HepSymMatrix;
@@ -378,7 +381,7 @@ public:
 	int              MaxOrder() const {return m_higherMoments.size() + 2;}
 	//Return the polynomial w(\vec{u}) that returns a statistical weight w for a phase space vector u
 	//that maps the moments in to the moments target
-	static PolynomialVector Weighting(MomentHeap in, MomentHeap target, int order);
+	static G4MICE::PolynomialVector Weighting(MomentHeap in, MomentHeap target, int order);
 
 private:
   double        m_mass;
@@ -406,15 +409,14 @@ public:
 	int              MaxOrder() const;
 	//Return the polynomial w(\vec{u}) that returns a statistical weight w for a phase space vector u
 	//that maps the moments in to the moments target
-	static PolynomialVector Weighting(MomentHeap in, MomentHeap target, int order);
+	static G4MICE::PolynomialVector Weighting(MomentHeap in, MomentHeap target, int order);
 
 private:
-	PolynomialVector * moments;
+	G4MICE::PolynomialVector * moments;
 };
 */
 
 std::ostream& operator<<(std::ostream& out, const MomentHeap& heap);
-
 
 #endif
 
