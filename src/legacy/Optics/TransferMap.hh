@@ -1,9 +1,10 @@
 #ifndef TransferMap_hh
 #define TransferMap_hh
-#if 0
+
 #include <ostream>
 #include <vector>
-#include "src/legacy/Interface/Squeal.hh"
+#include "Interface/PolynomialVector.hh"
+#include "Interface/Squeal.hh"
 #include "CovarianceMatrix.hh"
 #include "Tensor.hh"
 #include "Tensor3.hh"
@@ -35,6 +36,10 @@ class PhaseSpaceVector;
 class TransferMap
 {
 public:
+  //******************************
+  // Constructors
+  //******************************
+
   /** @brief Creates an identity mapping (i.e. transport operators do nothing).
    */
    TransferMap();
@@ -44,51 +49,30 @@ public:
    *  @params reference_trajectory_in   input reference trajectory
    *  @params reference_trajectory_out  output reference trajectory
    */
-	TransferMap(PolynomialVector const * polynomial,
-              PhaseSpaceVector reference_trajectory_in,
-              PhaseSpaceVector reference_trajectory_out);
+	TransferMap(const PolynomialVector& polynomial,
+              const PhaseSpaceVector& reference_trajectory_in,
+              const PhaseSpaceVector& reference_trajectory_out);
 
   /** @brief constructor for identical input and output reference trajectories.
    *  @params polynomial            the mapping as a polynomial vector
    *  @params reference_trajectory  input/output reference trajectory
    */
-  TransferMap(PolynomialVector const * polynomial,
-              PhaseSpaceVector reference_trajectory);
+  TransferMap(const PolynomialVector& polynomial,
+              const PhaseSpaceVector& reference_trajectory);
 
   /** @brief copy constructor
    */
-  TransferMap(TransferMap const & original_instance);
+  TransferMap(const TransferMap& original_instance);
 
   /** @brief destructor
    */
 	~TransferMap() {;}
 
   //******************************
-  //Accessor and mutator functions
+  // First-order Map Functions
   //******************************
-	inline void set_reference_trajectory_in(PhaseSpaceVector referenceIn)
-  {
-    reference_trajectory_in_ = referenceIn;
-  }	
-	inline PhaseSpaceVector reference_trajectory_in()  const {
-    return reference_trajectory_in_;
-  }
-
-	inline void set_reference_trajectory_out(PhaseSpaceVector referenceOut)
-  {
-    reference_trajectory_out_ = referenceOut;
-  }
-	inline PhaseSpaceVector reference_trajectory_out() const {
-    return reference_trajectory_out_;
-  }
-
-	inline void set_polynomial(PolynomialVector const * polynomial)
-  {
-    polynomial_ = polynomial;
-  }
-	inline PolynomialVector const * polynomial() const {return polynomial_;}
   
-	MMatrix first_order_map() const;
+	Matrix<double> CreateTransferMatrix() const;
   
   //******************************
   //          operators
@@ -122,11 +106,11 @@ protected:
    *  @params reference_trajectory_in   input reference trajectory
    *  @params reference_trajectory_out  output reference trajectory
    */
-  Initialize(PolynomialVector const * polynomial,
-             PhaseSpaceVector reference_trajectory_in,
-             PhaseSpaceVector reference_trajectory_out);
+  void Initialize(const PolynomialVector& polynomial,
+									const PhaseSpaceVector& reference_trajectory_in,
+									const PhaseSpaceVector& reference_trajectory_out);
   
-	PolynomialVector const *  polynomial_;
+	PolynomialVector					polynomial_;
 	PhaseSpaceVector					reference_trajectory_in_;
 	PhaseSpaceVector					reference_trajectory_out_;
 };
@@ -134,7 +118,7 @@ protected:
 std::ostream& operator<<(std::ostream& out, const TransferMap& map);
 
 } //namespace MAUS
-#endif
+
 
 
 

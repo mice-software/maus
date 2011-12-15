@@ -1,5 +1,5 @@
 #include "TransferMap.hh"
-#if 0
+
 #include "CLHEP/Units/PhysicalConstants.h"
 
 #include "Interface/PolynomialVector.hh"
@@ -9,84 +9,52 @@
 namespace MAUS
 {
 
-TransferMap::TransferMap()
-{
-  reference_trajectory_in_ = NULL;
-  reference_trajectory_out_ = NULL;
-  polynomial_ = NULL;
-}
+//##############################
+// TransferMap public
+//##############################
 
-TransferMap::TransferMap(PolynomialVector const * polynomial,
-                         PhaseSpaceVector reference_trajectory_in,
-                         PhaseSpaceVector reference_trajectory_out)
+//******************************
+// Constructors
+//******************************
+
+TransferMap::TransferMap()
+{ }
+
+TransferMap::TransferMap(const PolynomialVector& polynomial,
+                         const PhaseSpaceVector& reference_trajectory_in,
+                         const PhaseSpaceVector& reference_trajectory_out)
 {
+	//TODO: replace Initialize with : member(value) initializers
   Initialize(polynomial, reference_trajectory_in, reference_trajectory_out);
 }
 
-TransferMap::TransferMap(PolynomialVector const * polynomial,
-                         PhaseSpaceVector reference_trajectory)
+TransferMap::TransferMap(const PolynomialVector& polynomial,
+                         const PhaseSpaceVector& reference_trajectory)
 {
   Initialize(polynomial, reference_trajectory, reference_trajectory);
 }
 
-TransferMap::TransferMap(TransferMap const & original_instance)
+TransferMap::TransferMap(const TransferMap& original_instance)
 {
   Initialize(original_instance.polynomial_,
              original_instance.reference_trajectory_in_,
              original_instance.reference_trajectory_out_);
 }
-      
-TransferMap::Initialize(PolynomialVector const * polynomial,
-                        PhaseSpaceVector reference_trajectory_in,
-                        PhaseSpaceVector reference_trajectory_out)
-{
-  if (polynomial == NULL)
-  {
-    throw(Squeal(Squeal::recoverable, "ERROR: null polynomial vector",
-                 "TransferMap::Initialize()"));
-  }
-  
-  if (reference_trajectory_in == NULL)
-  {
-    throw(Squeal(Squeal::recoverable,
-                 "ERROR: null incoming reference trajectory",
-                 "TransferMap::Initialize()"));
-  }
-  
-  if (reference_trajectory_out == NULL)
-  {
-    throw(Squeal(Squeal::recoverable,
-                 "ERROR: null outgoing reference trajectory",
-                 "TransferMap::Initialize()"));
-  }
-  
-  polynomial_ = polynomial;
-  reference_trajectory_in_ = reference_trajectory_in;
-  reference_trajectory_out_ = reference_trajectory_out;
-}  
 
 /**
  *  Name: operator*(CovarianceMatrix const &)
  */
-CovarianceMatrix TransferMap::operator*(
-  CovarianceMatrix const & covariances) const
+CovarianceMatrix TransferMap::operator*(const CovarianceMatrix& covariances)
+	const
 {
 	CovarianceMatrix transformed_covariances;
 
-	if (polynomial_ != NULL)
-	{
-		MMatrix transfer_matrix = first_order_map();
+	Matrix<double> transfer_matrix = first_order_map();
 
-		MMatrix transfer_matrix_transpose = transfer_matrix;
-		transfer_matrix_transpose.Transpose();
-		
-		CovarianceMatrix transformed_covariances
-			= transfer_matrix_transpose * (covariances * transfer_matrix);
-	}
-	else
-	{
-		transformed_covariances = covariances;
-	}
+	Matrix<double> transfer_matrix_transpose = transpose(transfer_matrix);
+	
+	CovarianceMatrix transformed_covariances
+		= transfer_matrix_transpose * covariances * transfer_matrix;
 
   return transformed_covariances;
 }
@@ -94,16 +62,16 @@ CovarianceMatrix TransferMap::operator*(
 /**
  *  Name: operator*(PhaseSpaceVector const &)
  */
-PhaseSpaceVector TransferMap::operator*(
-  PhaseSpaceVector const & input_vector) const
+PhaseSpaceVector TransferMap::operator*(const PhaseSpaceVector& input_vector)
+	const
 {
   //subtract off the input reference trajectory to obtain phase space delta
-  MVector<double> phase_space_delta(
+  Vector<double> phase_space_delta(
     phase_space_vector - reference_trajectory_in_);
 
   //operate on the phase space delta with the polynomial map 
-  MVector<double> transformed_delta;
-  polynomial_->F(phase_space_delta, transformed_delta);
+  Vector<double> transformed_delta;
+  polynomial_.F(phase_space_delta, transformed_delta);
 
   //add the transformed phase space delta to the output reference trajectory
   PhaseSpaceVector output_vector
@@ -112,40 +80,53 @@ PhaseSpaceVector TransferMap::operator*(
   return output_vector;
 }
 
-/**
- *  Name: first_order_map()
- */
-MMatrix TransferMap::first_order_map() const
+//******************************
+// First-order Map Functions
+//******************************
+
+Matrix<double> TransferMap::CreateTransferMatrix() const
 {
-  return polynomial_->GetCoefficientsAsMatrix().sub(1,6,2,7);
+  return polynomial_.GetCoefficientsAsMatrix().submatrix(1,6,2,6);
 }
+
+//##############################
+// TransferMap protected
+//##############################
+
+void TransferMap::Initialize(PolynomialVector const * polynomial,
+														 PhaseSpaceVector reference_trajectory_in,
+														 PhaseSpaceVector reference_trajectory_out)
+{
+  polynomial_ = polynomial;
+  reference_trajectory_in_ = reference_trajectory_in;
+  reference_trajectory_out_ = reference_trajectory_out;
+}  
+
+//##############################
+// Free Functions
+//##############################
+
+//******************************
+// Streaming
+//******************************
 
 std::ostream& operator<<(std::ostream& out, TransferMap tm)
 {
   out << "Incomming Reference Trajectory: ";
   PhaseSpaceVector trajectory_in = tm.reference_trajectory_in();
-  if (trajectory_in != NULL)
-  {
-    out << tm.reference_trajectory_in() << "\n"
-  }
+  out << tm.reference_trajectory_in() << "\n"
 
   PhaseSpaceVector * trajectory_out = tm.reference_trajectory_out();
-  if (trajectory_out != NULL)
-  {
-    out << tm.reference_trajectory_out()
-  }
+  out << tm.reference_trajectory_out()
   
   PolynomialVector const * polynomial = tm.polynomial();
-  if(polynomial != NULL)
-  {
-    out << (*polynomial) << std::endl;
-  }
+  out << (*polynomial) << std::endl;
 
   return out;
 }
 
 } //namespace MAUS
-#endif
+
 
 
 

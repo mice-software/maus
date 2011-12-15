@@ -59,6 +59,8 @@ namespace MAUS
 // A few interesting variations on this theme... have a look!\n
 //\n
 
+//TODO: divorce the actual vector from the collection of vectors that form a
+//			transform
 class PolynomialVector : public VectorMap
 {
 public:
@@ -68,6 +70,11 @@ public:
   //*************************
   // Constructors
   //*************************
+	
+	PolynomialVector()
+	{
+		//TODO: create an identity transform
+	}
 
 	/** @brief  Construct a polynomial vector, passing polynomial coefficients
 	 *          as a matrix.
