@@ -77,7 +77,7 @@ class  TestUploader(unittest.TestCase): #pylint: disable = C0103, R0904
         try:
             self.constructor = GDMLtoCDB.Uploader(self.testgeom, 2, 1)
             self.assertTrue(False, 'Should have raised an error')
-        except:
+        except: #pylint: disable = W0702
             pass #pylint: disable = W0702
                   
         try:
