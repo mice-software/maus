@@ -7,8 +7,24 @@ namespace MAUS
 {
 
 PhaseSpaceVector::PhaseSpaceVector()
-  : Vector<double>()
+  : Vector<double>(6)
 { }
+
+PhaseSpaceVector::PhaseSpaceVector(const Vector<double>& original_instance)
+	: Vector<double>()
+{
+	if (original_instance.size() < 6)
+	{
+		throw(Squeal(Squeal::recoverable,
+								 "Attempted to construct with a Vector<double> containing fewer than six elements",
+								 "PhaseSpaceVector::PhaseSpaceVector(Vector<double>)"));
+	}
+	build_vector(6);
+	for (size_t index=1; index<=6; ++index)
+	{
+		(*this)(index) = original_instance(index);
+	}
+}
 
 PhaseSpaceVector::PhaseSpaceVector(const PhaseSpaceVector& original_instance)
 	: Vector<double>(original_instance)
@@ -25,9 +41,11 @@ PhaseSpaceVector::PhaseSpaceVector(const double t, const double E,
   build_vector(6, data);
 }
 
-PhaseSpaceVector::PhaseSpaceVector(const double* data)
-	:Vector<double>(data, 6)
+PhaseSpaceVector::PhaseSpaceVector(double const * const array)
+	:Vector<double>(array, 6)
 { }
+
+PhaseSpaceVector::~PhaseSpaceVector() { }
 
 std::ostream& operator<<(std::ostream& out, const PhaseSpaceVector& vector) 
 {

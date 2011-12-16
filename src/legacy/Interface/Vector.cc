@@ -746,6 +746,70 @@ template void VectorBase<complex, gsl_vector_complex>::build_vector(
   const size_t size, const complex* data);
 
 //############################
+// Vector (public)
+//############################
+
+const Vector<double> Vector<double>::operator+(const Vector<double>& rhs) const
+{
+	return VectorBase<double, gsl_vector>::operator+(rhs);
+}
+
+const Vector<double> Vector<double>::operator-(const Vector<double>& rhs) const
+{
+	return VectorBase<double, gsl_vector>::operator-(rhs);
+}
+
+const Vector<double> Vector<double>::operator*(const Vector<double>& rhs) const
+{
+	return VectorBase<double, gsl_vector>::operator*(rhs);
+}
+
+const Vector<double> Vector<double>::operator/(const Vector<double>& rhs) const
+{
+	return VectorBase<double, gsl_vector>::operator/(rhs);
+}
+
+const Vector<double> Vector<double>::operator*(const double& rhs) const
+{
+	return VectorBase<double, gsl_vector>::operator*(rhs);
+}
+
+const Vector<double> Vector<double>::operator/(const double& rhs) const
+{
+	return VectorBase<double, gsl_vector>::operator/(rhs);
+}
+
+const Vector<complex> Vector<complex>::operator+(const Vector<complex>& rhs) const
+{
+	return VectorBase<complex, gsl_vector_complex>::operator+(rhs);
+}
+
+const Vector<complex> Vector<complex>::operator-(const Vector<complex>& rhs) const
+{
+	return VectorBase<complex, gsl_vector_complex>::operator-(rhs);
+}
+
+const Vector<complex> Vector<complex>::operator*(const Vector<complex>& rhs) const
+{
+	return VectorBase<complex, gsl_vector_complex>::operator*(rhs);
+}
+
+const Vector<complex> Vector<complex>::operator/(const Vector<complex>& rhs) const
+{
+	return VectorBase<complex, gsl_vector_complex>::operator/(rhs);
+}
+
+const Vector<complex> Vector<complex>::operator*(const complex& rhs) const
+{
+	return VectorBase<complex, gsl_vector_complex>::operator*(rhs);
+}
+
+const Vector<complex> Vector<complex>::operator/(const complex& rhs) const
+{
+	return VectorBase<complex, gsl_vector_complex>::operator/(rhs);
+}
+
+//############################
 // Template Declarations
 //############################
 

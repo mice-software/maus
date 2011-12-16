@@ -215,11 +215,9 @@ public:
   Vector(const Vector<double>& original_instance)
     : VectorBase<double, gsl_vector>(original_instance) { }
 
-  //*** VectorBase constructors ***
+  //*** VectorBase functions ***
 
   Vector() : VectorBase<double, gsl_vector>() { }
-  Vector(const VectorBase<double, gsl_vector>& base_vector)
-    : VectorBase<double, gsl_vector>(base_vector) { }
   Vector(size_t i, double  value)
     : VectorBase<double, gsl_vector>(i, value) { }
   Vector(size_t i) : VectorBase<double, gsl_vector>(i) { }
@@ -227,6 +225,18 @@ public:
     : VectorBase<double, gsl_vector>(data, size) { }
   Vector(const std::vector<double, std::allocator<double> >& std_vector)
     : VectorBase<double, gsl_vector>(std_vector) { }
+
+  const Vector<double> operator+(const Vector<double>& rhs) const;
+  const Vector<double> operator-(const Vector<double>& rhs) const;
+  const Vector<double> operator*(const Vector<double>& rhs) const;
+  const Vector<double> operator/(const Vector<double>& rhs) const;
+  const Vector<double> operator*(const double& rhs) const;
+  const Vector<double> operator/(const double& rhs) const;
+
+  //*** Vector<double> functions ***
+
+  Vector(const VectorBase<double, gsl_vector>& base_vector)
+    : VectorBase<double, gsl_vector>(base_vector) { }
 };
 
 template<>
@@ -236,11 +246,9 @@ public:
   Vector(const Vector<complex>& original_instance)
     : VectorBase<complex, gsl_vector_complex>(original_instance) { }
 
-  //*** VectorBase constructors ***
+  //*** VectorBase functions ***
 
   Vector() : VectorBase<complex, gsl_vector_complex>() { }
-  Vector(const VectorBase<complex, gsl_vector_complex>& base_vector)
-    : VectorBase<complex, gsl_vector_complex>(base_vector) { }
   Vector(size_t i, complex  value)
     : VectorBase<complex, gsl_vector_complex>(i, value) { }
   Vector(size_t i) : VectorBase<complex, gsl_vector_complex>(i) { }
@@ -248,6 +256,18 @@ public:
     : VectorBase<complex, gsl_vector_complex>(data, size) { }
   Vector(const std::vector<complex, std::allocator<complex> >& std_vector)
     : VectorBase<complex, gsl_vector_complex>(std_vector) { }
+
+  const Vector<complex> operator+(const Vector<complex>& rhs) const;
+  const Vector<complex> operator-(const Vector<complex>& rhs) const;
+  const Vector<complex> operator*(const Vector<complex>& rhs) const;
+  const Vector<complex> operator/(const Vector<complex>& rhs) const;
+  const Vector<complex> operator*(const complex& rhs) const;
+  const Vector<complex> operator/(const complex& rhs) const;
+
+  //*** Vector<complex> functions ***
+
+  Vector(const VectorBase<complex, gsl_vector_complex>& base_vector)
+    : VectorBase<complex, gsl_vector_complex>(base_vector) { }
 };
 
 //*************************

@@ -881,7 +881,7 @@ template void MatrixBase<complex, gsl_matrix_complex>::build_matrix(
   const size_t rows, const size_t columns, complex const * const data);
 
 //############################
-// Matrix
+// Matrix (public)
 //############################
 
 Matrix<complex>::Matrix(

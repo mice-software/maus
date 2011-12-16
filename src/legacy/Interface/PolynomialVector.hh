@@ -70,11 +70,6 @@ public:
   //*************************
   // Constructors
   //*************************
-	
-	PolynomialVector()
-	{
-		//TODO: create an identity transform
-	}
 
 	/** @brief  Construct a polynomial vector, passing polynomial coefficients
 	 *          as a matrix.

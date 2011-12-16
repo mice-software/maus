@@ -39,10 +39,6 @@ public:
   //******************************
   // Constructors
   //******************************
-
-  /** @brief Creates an identity mapping (i.e. transport operators do nothing).
-   */
-   TransferMap();
    
   /** @brief constructor for different input and output reference trajectories.
    *  @params polynomial                the mapping as a polynomial vector
@@ -97,9 +93,12 @@ public:
    */
 	PhaseSpaceVector operator*(PhaseSpaceVector const & vector) const;
 
-	friend std::ostream& operator<<(std::ostream& out, TransferMap tm);
+	friend std::ostream& operator<<(std::ostream& out, const TransferMap& tm);
 
 protected:
+
+   TransferMap();
+
   /** @brief set the polynomial mapping as well as the input and output
    *  reference trajectories.
    *  @params polynomial                the mapping as a polynomial vector

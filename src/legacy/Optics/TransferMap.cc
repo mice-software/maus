@@ -17,29 +17,24 @@ namespace MAUS
 // Constructors
 //******************************
 
-TransferMap::TransferMap()
-{ }
-
 TransferMap::TransferMap(const PolynomialVector& polynomial,
                          const PhaseSpaceVector& reference_trajectory_in,
                          const PhaseSpaceVector& reference_trajectory_out)
-{
-	//TODO: replace Initialize with : member(value) initializers
-  Initialize(polynomial, reference_trajectory_in, reference_trajectory_out);
-}
+	: polynomial_(polynomial), reference_trajectory_in_(reference_trajectory_in),
+		reference_trajectory_out_(reference_trajectory_out)
+{ }
 
 TransferMap::TransferMap(const PolynomialVector& polynomial,
                          const PhaseSpaceVector& reference_trajectory)
-{
-  Initialize(polynomial, reference_trajectory, reference_trajectory);
-}
+	: polynomial_(polynomial), reference_trajectory_in_(reference_trajectory),
+		reference_trajectory_out_(reference_trajectory)
+{ }
 
 TransferMap::TransferMap(const TransferMap& original_instance)
-{
-  Initialize(original_instance.polynomial_,
-             original_instance.reference_trajectory_in_,
-             original_instance.reference_trajectory_out_);
-}
+	: polynomial_(original_instance.polynomial_),
+		reference_trajectory_in_(original_instance.reference_trajectory_in_),
+		reference_trajectory_out_(original_instance.reference_trajectory_out_)
+{ }
 
 /**
  *  Name: operator*(CovarianceMatrix const &)
@@ -49,11 +44,11 @@ CovarianceMatrix TransferMap::operator*(const CovarianceMatrix& covariances)
 {
 	CovarianceMatrix transformed_covariances;
 
-	Matrix<double> transfer_matrix = first_order_map();
+	Matrix<double> transfer_matrix = CreateTransferMatrix();
 
 	Matrix<double> transfer_matrix_transpose = transpose(transfer_matrix);
 	
-	CovarianceMatrix transformed_covariances
+	transformed_covariances
 		= transfer_matrix_transpose * covariances * transfer_matrix;
 
   return transformed_covariances;
@@ -66,8 +61,7 @@ PhaseSpaceVector TransferMap::operator*(const PhaseSpaceVector& input_vector)
 	const
 {
   //subtract off the input reference trajectory to obtain phase space delta
-  Vector<double> phase_space_delta(
-    phase_space_vector - reference_trajectory_in_);
+  Vector<double> phase_space_delta(input_vector - reference_trajectory_in_);
 
   //operate on the phase space delta with the polynomial map 
   Vector<double> transformed_delta;
@@ -90,19 +84,6 @@ Matrix<double> TransferMap::CreateTransferMatrix() const
 }
 
 //##############################
-// TransferMap protected
-//##############################
-
-void TransferMap::Initialize(PolynomialVector const * polynomial,
-														 PhaseSpaceVector reference_trajectory_in,
-														 PhaseSpaceVector reference_trajectory_out)
-{
-  polynomial_ = polynomial;
-  reference_trajectory_in_ = reference_trajectory_in;
-  reference_trajectory_out_ = reference_trajectory_out;
-}  
-
-//##############################
 // Free Functions
 //##############################
 
@@ -110,17 +91,12 @@ void TransferMap::Initialize(PolynomialVector const * polynomial,
 // Streaming
 //******************************
 
-std::ostream& operator<<(std::ostream& out, TransferMap tm)
+std::ostream& operator<<(std::ostream& out, const TransferMap& tm)
 {
-  out << "Incomming Reference Trajectory: ";
-  PhaseSpaceVector trajectory_in = tm.reference_trajectory_in();
-  out << tm.reference_trajectory_in() << "\n"
-
-  PhaseSpaceVector * trajectory_out = tm.reference_trajectory_out();
-  out << tm.reference_trajectory_out()
-  
-  PolynomialVector const * polynomial = tm.polynomial();
-  out << (*polynomial) << std::endl;
+  out	<< "Incomming Reference Trajectory: "
+		  << tm.reference_trajectory_in_ << std::endl
+			<< tm.reference_trajectory_out_ << std::endl
+			<< tm.polynomial_ << std::endl;
 
   return out;
 }

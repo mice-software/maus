@@ -16,14 +16,18 @@ namespace MAUS
 
 bool PolynomialVector::print_headers_=true;
 
-PolynomialVector::PolynomialVector(int numberOfInputVariables, Matrix<double> polynomialCoefficients)
-        :  point_dimmension_(numberOfInputVariables), index_key_by_power_(), index_key_by_vector_(), coefficient_matrix_(polynomialCoefficients)
+PolynomialVector::PolynomialVector(int numberOfInputVariables,
+																	 Matrix<double> polynomialCoefficients)
+	:	point_dimmension_(numberOfInputVariables), index_key_by_power_(),
+		index_key_by_vector_(), coefficient_matrix_(polynomialCoefficients)
 {
   SetCoefficients(numberOfInputVariables, polynomialCoefficients);
 }
 
-PolynomialVector::PolynomialVector(std::vector<PolynomialCoefficient> coefficients)
-        :  point_dimmension_(0), index_key_by_power_(), index_key_by_vector_(), coefficient_matrix_()
+PolynomialVector::PolynomialVector(
+	std::vector<PolynomialCoefficient>	coefficients)
+	:	point_dimmension_(0), index_key_by_power_(), index_key_by_vector_(),
+		coefficient_matrix_()
 {
   SetCoefficients(coefficients);
 }
