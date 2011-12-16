@@ -50,7 +50,7 @@ class  TestGDMLFormatter(unittest.TestCase): #pylint: disable = C0103, R0904
         try:
             self.constructor = Formatter(1)
             self.assertTrue(False, 'should have raised an exception')
-        except:
+        except: #pylint: disable = W0702
             pass #pylint: disable = W0702
         
         #Now it tests the Formatter constructor by passing an
@@ -61,7 +61,7 @@ class  TestGDMLFormatter(unittest.TestCase): #pylint: disable = C0103, R0904
             test_case = os.environ['MAUS_ROOT_DIR'] + path
             self.constructor = Formatter(test_case)
             self.assertTrue(False, 'Should have raised an exception')
-        except:
+        except: #pylint: disable = W0702
             pass #pylint: disable = W0702
         
         #this next section tests to make sure 
@@ -105,7 +105,7 @@ class  TestGDMLFormatter(unittest.TestCase): #pylint: disable = C0103, R0904
         try:
             self.gdml.merge_maus_info('Gemoetry.not_gdml')
             self.assertTrue(False, 'Should have raised an error')
-        except:
+        except: #pylint: disable = W0702
             pass #pylint: disable = W0702
         
     def test_merge_run_info(self):
@@ -118,7 +118,7 @@ class  TestGDMLFormatter(unittest.TestCase): #pylint: disable = C0103, R0904
         try:
             self.gdml.merge_run_info('Gemoetry.not_gdml')
             self.assertTrue(False, 'Should have raised an error')
-        except:
+        except: #pylint: disable = W0702
             pass #pylint: disable = W0702
         fin = open(os.path.join(self.test_case, 'Field.gdml'))
         count = 0
@@ -139,7 +139,7 @@ class  TestGDMLFormatter(unittest.TestCase): #pylint: disable = C0103, R0904
         try:
             self.gdml.format_materials('Gemoetry.not_gdml')
             self.assertTrue(False, 'Should have raised an error')
-        except:
+        except: #pylint: disable = W0702
             pass #pylint: disable = W0702
 
     def test_insert_materials_ref(self):
@@ -152,7 +152,7 @@ class  TestGDMLFormatter(unittest.TestCase): #pylint: disable = C0103, R0904
         try:
             self.gdml.insert_materials_ref('Gemoetry.not_gdml')
             self.assertTrue(False, 'Should have raised an error')
-        except:
+        except: #pylint: disable = W0702
             pass #pylint: disable = W0702   
 
     def test_format_check(self):
@@ -165,7 +165,7 @@ class  TestGDMLFormatter(unittest.TestCase): #pylint: disable = C0103, R0904
         try:
             self.gdml.format_check('Geometry.not_gdml')
             self.assertTrue(False, 'Should have raised an error')
-        except:
+        except: #pylint: disable = W0702
             pass #pylint: disable = W0702
                 
     def test_format(self):

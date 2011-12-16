@@ -71,7 +71,7 @@ class  TestUploader(unittest.TestCase): #pylint: disable = C0103, R0904
             self.constructor = \
                           GDMLtoCDB.Uploader(self.testgeom, self.testnote, err)
             self.assertTrue(False, 'Should have raised an error')
-        except:
+        except: #pylint: disable = W0702
             pass #pylint: disable = W0702
         
         try:
@@ -83,7 +83,7 @@ class  TestUploader(unittest.TestCase): #pylint: disable = C0103, R0904
         try:
             self.constructor = GDMLtoCDB.Uploader(2, self.testnote, 1)
             self.assertTrue(False, 'Should have raised an error')
-        except:
+        except: #pylint: disable = W0702
             pass #pylint: disable = W0702
         
     def test_set_up_server(self):
@@ -108,7 +108,7 @@ class  TestUploader(unittest.TestCase): #pylint: disable = C0103, R0904
             self.constructor = \
                             GDMLtoCDB.Uploader(test_file_list, self.testnote, 1)
             self.assertTrue(False, 'should have raised an error')
-        except:
+        except: #pylint: disable = W0702
             pass #pylint: disable = W0702
             
     def test_create_file_list(self):
@@ -144,7 +144,7 @@ class  TestUploader(unittest.TestCase): #pylint: disable = C0103, R0904
         try:
             self.test_gdml_to_cdb.upload_to_cdb(test_upload)
             self.assertTrue(False, 'Should have raised an error')
-        except:
+        except: #pylint: disable = W0702
             pass #pylint: disable = W0702
         
         path = self.testcase+'/testGeometry.zip'
