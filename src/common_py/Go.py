@@ -141,7 +141,6 @@ class Go:  #  pylint: disable=R0921
         print("INPUT: Reading some input")
         assert(self.input.birth(self.json_config_document) == True)
 
-
         print("TRANSFORM: Setting up transformer (this can take a while...)")
         assert(self.transformer.birth(self.json_config_document) == True)
 
@@ -155,21 +154,16 @@ class Go:  #  pylint: disable=R0921
 
         spill_count = 0
         spill_size = 1
-        loop = True
-        while loop: # main event loop
-            try:
-                spill_count += 1
-                spill = next(self.input.emitter()) # executes until yield 
-                spill = self.transformer.process(spill)
-                spill = self.merger.process(spill)
-                self.outputer.save(spill)
-                # formatted output
-                if spill_count / spill_size > 10 and spill_size < 1000:
-                    spill_size *= 10
-                if spill_count % spill_size == 0:
-                    print "Processed %d spills" % spill_count
-            except StopIteration: # end of emitter
-                loop = False
+        for spill in self.input.emitter(): # main event loop
+            spill = self.transformer.process(spill)
+            spill = self.merger.process(spill)
+            self.outputer.save(spill)
+            # formatted output
+            spill_count += 1
+            if spill_count / spill_size > 10 and spill_size < 1000:
+                spill_size *= 10
+            if spill_count % spill_size == 0:
+                print "Processed %d spills" % spill_count
 
         print("TRANSFORM: Shutting down transformer")
         assert(self.transformer.death() == True)
