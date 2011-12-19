@@ -217,10 +217,6 @@ class ReducePyROOTHistogram: # pylint: disable=R0902
             image_tag = tag
         # Save to and reload from temporary file.
         file_name = "%s_tmp.%s" % (image_tag, self.image_type)
-<<<<<<< TREE
-        print "TEMP FILE %s " % file_name
-=======
->>>>>>> MERGE-SOURCE
         canvas.Print(file_name)
         tmp_file = open(file_name, 'r')
         data = tmp_file.read()

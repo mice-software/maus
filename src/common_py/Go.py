@@ -586,4 +586,3 @@ class MultiProcessMergeOutputDataflowExecutor: # pylint: disable=R0903
             "http://micewww.pp.rl.ac.uk/projects/maus/wiki/MAUSCeleryConfiguration\n" # pylint:disable=C0301
         description += "This runs merge-output dataflows only!"
         return description
-
