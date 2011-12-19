@@ -144,12 +144,15 @@ class MausGenericTransformTask(Task):
         @return JSON document string holding new spill.
         """
         logger = Task.get_logger()
+        print "Spill received at : %s" % time.ctime()
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug("Spill received at : %s" % time.ctime())
         for worker in workers:
+            print "    Executing worker : %s" % worker
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug("Executing worker : %s" % worker)
             spill = self.__transforms[worker].process(spill)
+        print "Spill completed at : %s" % time.ctime()
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug("Spill completed at : %s" % time.ctime())
         return spill

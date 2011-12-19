@@ -282,7 +282,7 @@ class PipelineSingleThreadDataflowExecutor:
                 self.outputer.save(spill)
 
             i += len(map_buffer)
-            map_buffer = DataflowUtilities.buffer_input(emitter, 8)
+            map_buffer = DataflowUtilities.buffer_input(emitter, 1)
 
             # Not Python 3 compatible print() due to backward
             # compatability. 
@@ -450,24 +450,20 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903
         transform_results = {}
         while len(map_buffer) != 0:
             for spill in map_buffer:
-#                from maustasks import MausSimulationTask
-#                from maustasks import MausDoNothingTask
-#                result = \
-#                    MausDoNothingTask.delay(spill) # pylint:disable=E1101
-                result = MausGenericTransformTask.delay(workers, spill)
+                result = \
+                    MausGenericTransformTask.delay(workers, spill) # pylint:disable=E1101, C0301
                 # Index results by spill_id so can present
                 # results to merge-output in same order.
                 transform_results[i] = result
                 i += 1
-            map_buffer = DataflowUtilities.buffer_input(emitter, 128)
+            map_buffer = DataflowUtilities.buffer_input(emitter, 1)
             print " Processed %d spills so far," % i,
             print(" %d spills left in buffer." % (len(map_buffer)))
 
-        print("TRANSFORM: waiting for transform jobs to complete")
-        # Wait for workers to finish - just keep looping until each
-        # either succeeds or fails.
-        spills = {}
-        while len(transform_results) != 0:
+            print("TRANSFORM: waiting for transform jobs to complete")
+            # Wait for workers to finish - just keep looping until each
+            # either succeeds or fails.
+            spills = {}
             for spill_id in transform_results.keys():
                 result = transform_results[spill_id]
                 if result.successful():
@@ -481,11 +477,9 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903
                 elif result.failed():
                     del transform_results[spill_id]
                     print " Spill %d task %s FAILED " \
-                        % (spill_id, result.task_id)
+                            % (spill_id, result.task_id)
                     print "Exception in worker: %s " % result.result
                     print "Traceback in worker: %s " % result.traceback
-                else:
-                    continue
         print("TRANSFORM: transform jobs completed")
 
     @staticmethod
@@ -559,14 +553,17 @@ class MultiProcessMergeOutputDataflowExecutor: # pylint: disable=R0903
 
         print("MULTI-PROCESS: Get spill, MERGE, OUTPUT, repeat")
 
-        for spill_id in self.doc_store.ids():
-            spill = self.doc_store.get(spill_id)
-            print "  Executing Merge->Output for spill %s\n" % spill_id,
-            spill = self.merger.process(spill)
-            self.outputer.save(spill)
-            self.doc_store.delete(spill_id)
-            print("  %d spills left in data store." % (len(self.doc_store)))
-
+        # This is a hack - it WILL be resolved in terms of
+        # querying the database for remaining spills.
+        while True:
+            for spill_id in self.doc_store.ids():
+                spill = self.doc_store.get(spill_id)
+                print "  Executing Merge->Output for spill %s\n" % spill_id,
+                spill = self.merger.process(spill)
+                self.outputer.save(spill)
+                self.doc_store.delete(spill_id)
+                print("  %d spills left in data store." % (len(self.doc_store)))
+                
         print("MERGE: Shutting down merger")
         assert(self.merger.death() == True)
 
