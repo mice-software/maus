@@ -169,10 +169,9 @@ class ReducePyMatplotlibHistogram: # pylint: disable=R0903
         Sub-classes must define this function.
         @param self Object reference.
         @param spill Current spill.
-        @returns list of JSON documents. If json_doc has an error then
-        the list will just contain the spill augmented with error
-        information. If the sub-class only updates histograms every
-        N spills then this list can just contain the input spill.
+        @returns list of JSON documents. If the sub-class only updates 
+        histograms every N spills then this list can just contain 
+        the input spill.
         Otherwise it should consist of 1 or more JSON documents 
         containing image data in the form described above. 
         @throws Exception if various sub-class specific errors arise.

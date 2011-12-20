@@ -104,10 +104,7 @@ class ReducePyHistogramTDCADCCounts(ReducePyMatplotlibHistogram):
         create a JSON document in the format described above. 
         @param self Object reference.
         @param spill Current spill.
-        @returns list of JSON documents. If spill has an error then
-        the list will just contain the spill augmented with error
-        information. Otherwise return a list with the histogram JSON
-        document.
+        @returns list with histogram JSON document.
         @throws KeyError if "digits" is not in spill.
         """
         # Do validation specific to this class while getting the
