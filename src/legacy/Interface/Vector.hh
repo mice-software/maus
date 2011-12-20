@@ -1,33 +1,26 @@
-// MAUS WARNING: THIS IS LEGACY CODE.
-//This file is a part of G4MICE
-//
-//G4MICE is free software: you can redistribute it and/or modify
-//it under the terms of the GNU General Public License as published by
-//the Free Software Foundation, either version 3 of the License, or
-//(at your option) any later version.
-//
-//xboa is distributed in the hope that it will be useful,
-//but WITHOUT ANY WARRANTY; without even the implied warranty of
-//MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//GNU General Public License for more details.
-//
-//You should have received a copy of the GNU General Public License
-//along with xboa in the doc folder.  If not, see 
-//<http://www.gnu.org/licenses/>.
-//
-//Wrapper for GSL vector
-//
-//VectorBase class handles maths operators and a few other operators
-//
-//Use template to define two types:
-// (i)  VectorBase<double> is a vector of doubles
-// (ii) VectorBase<complex> is a vector of complex
-//
-//Maths operators and a few others are defined, but maths operators
-//don't allow operations between types - i.e. you can't multiply
-//a complex matrix by a double matrix. Instead use interface methods
-//like real() and complex() to convert between types first
-
+/* Author: Peter Lane
+ *
+ * Based off of MVector by Chris Rogers which is a C++ wrapper for the GSL
+ * vector C library (double and gsl_complex element types only).
+ *
+ * The main differences between MVector and Vector are as follows:
+ * a) Vector avoids using void pointers by using a base class which is templated
+ *    by both element type and GSL vector type. The GSL types are then hidden by
+ *    templating the derived type only by element type.
+ * c) In general, if a function can be implemented using only the public
+ *    interface it is provided as a free function instead of a member
+ *    function. Exceptions are functions which are associated with vector
+ *    space properties such as subsets and algebraic operators.
+ * d) Use of the MAUS namespace obviates the use of the initial 'M' in the class
+ *    name (which presumably stood for MAUS).
+ *
+ * From MVector.hh:
+ *
+ * Maths operators and a few others are defined, but maths operators
+ * don't allow operations between types - i.e. you can't multiply
+ * a complex matrix by a double matrix. Instead use interface methods
+ * like real() and complex() to convert between types first.
+ */
 
 #ifndef _SRC_LEGACY_INTERFACE_VECTOR_HH_
 #define _SRC_LEGACY_INTERFACE_VECTOR_HH_

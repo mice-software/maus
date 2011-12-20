@@ -49,7 +49,7 @@ CovarianceMatrix TransferMap::operator*(const CovarianceMatrix& covariances)
 	Matrix<double> transfer_matrix_transpose = transpose(transfer_matrix);
 	
 	transformed_covariances
-		= transfer_matrix_transpose * covariances * transfer_matrix;
+		= transfer_matrix * covariances * transfer_matrix_transpose;
 
   return transformed_covariances;
 }

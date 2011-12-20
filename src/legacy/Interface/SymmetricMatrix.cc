@@ -46,9 +46,24 @@ SymmetricMatrix::SymmetricMatrix(
 { }
 
 SymmetricMatrix::SymmetricMatrix(
-	const Matrix<double>& original_instance) : Matrix<double>()
+  const Matrix<double>& matrix) : Matrix<double>()
 {
-	Matrix<double>::operator=(original_instance);
+  size_t size = matrix.num_row();
+
+  build_matrix(size, false);
+  double element;
+  for(size_t row = 1; row <= size; ++row)
+  {
+    for(size_t column = 1; column <= row; ++column)
+    {
+      element = matrix(row, column);
+      Matrix<double>::operator()(row, column) = element;
+      if (row != column)
+      {
+        Matrix<double>::operator()(column, row) = element;
+      }
+    }
+  }
 }
 
 SymmetricMatrix::SymmetricMatrix(
@@ -57,17 +72,17 @@ SymmetricMatrix::SymmetricMatrix(
   size_t size = hep_matrix.num_row();
 
   build_matrix(size, false);
-	double element;
-  for(size_t row=1; row<=size; ++row)
+  double element;
+  for(size_t row = 1; row <= size; ++row)
   {
     for(size_t column=1; column<=row; ++column)
     {
-			element = hep_matrix(row, column);
+      element = hep_matrix(row, column);
       Matrix<double>::operator()(row,column) = element;
-			if (row != column)
-			{
-				Matrix<double>::operator()(column,row) = element;
-			}
+      if (row != column)
+      {
+        Matrix<double>::operator()(column,row) = element;
+      }
     }
   }
 }
@@ -76,7 +91,7 @@ SymmetricMatrix::SymmetricMatrix(const size_t size)
   : Matrix<double>(size, size)
 { }
 
-SymmetricMatrix::SymmetricMatrix(const size_t	size, const double& value)
+SymmetricMatrix::SymmetricMatrix(const size_t  size, const double& value)
   : Matrix<double>()
 {
   build_matrix(size);
@@ -85,16 +100,16 @@ SymmetricMatrix::SymmetricMatrix(const size_t	size, const double& value)
     for(size_t column=1; column<=row; column++)
     {
       Matrix<double>::operator()(row, column) = value;
-			if (row != column)
-			{
-				Matrix<double>::operator()(column,row) = value;
-			}
+      if (row != column)
+      {
+        Matrix<double>::operator()(column,row) = value;
+      }
     }
   }
 }
 
-SymmetricMatrix::SymmetricMatrix(const size_t					 size,
-																	double const * const data)
+SymmetricMatrix::SymmetricMatrix(const size_t           size,
+                                  double const * const data)
   : Matrix<double>()
 {
   build_matrix(size, data);
@@ -106,7 +121,7 @@ SymmetricMatrix::SymmetricMatrix(const size_t					 size,
 
 double SymmetricMatrix::operator()(const size_t row, const size_t column) const
 {
-	return Matrix<double>::operator()(row, column);
+  return Matrix<double>::operator()(row, column);
 }
 
 //*************************
@@ -115,7 +130,7 @@ double SymmetricMatrix::operator()(const size_t row, const size_t column) const
 
 const size_t SymmetricMatrix::size() const
 {
-	return number_of_rows();
+  return number_of_rows();
 }
 
 //*************************
@@ -124,8 +139,8 @@ const size_t SymmetricMatrix::size() const
 
 void SymmetricMatrix::set(size_t row, size_t column, double value)
 {
-	Matrix<double>::operator()(row, column) = value;
-	Matrix<double>::operator()(column, row) = value;
+  Matrix<double>::operator()(row, column) = value;
+  Matrix<double>::operator()(column, row) = value;
 }
 
 //*************************
@@ -134,31 +149,31 @@ void SymmetricMatrix::set(size_t row, size_t column, double value)
 
 SymmetricMatrix& SymmetricMatrix::operator=(const SymmetricMatrix& rhs)
 {
-	Matrix<double>::operator=(rhs);
-	return *this;
+  Matrix<double>::operator=(rhs);
+  return *this;
 }
 
 SymmetricMatrix& SymmetricMatrix::operator+=(const SymmetricMatrix& rhs)
 {
-	Matrix<double>::operator+=(rhs);
-	return *this;
+  Matrix<double>::operator+=(rhs);
+  return *this;
 }
 
 SymmetricMatrix& SymmetricMatrix::operator-=(const SymmetricMatrix& rhs)
 {
-	Matrix<double>::operator-=(rhs);
-	return *this;
+  Matrix<double>::operator-=(rhs);
+  return *this;
 }
 
 SymmetricMatrix& SymmetricMatrix::operator*=(const double& rhs)
 {
-	Matrix<double>::operator*=(rhs);
+  Matrix<double>::operator*=(rhs);
   return *this;
 }
 
 SymmetricMatrix& SymmetricMatrix::operator/=(const double& rhs)
 {
-	Matrix<double>::operator/=(rhs);
+  Matrix<double>::operator/=(rhs);
   return *this;
 }
 
@@ -167,7 +182,7 @@ SymmetricMatrix& SymmetricMatrix::operator/=(const double& rhs)
 //*************************
 
 const SymmetricMatrix SymmetricMatrix::operator+(
-	const SymmetricMatrix& rhs) const
+  const SymmetricMatrix& rhs) const
 {
   return SymmetricMatrix(*this) += rhs;
 }
@@ -195,24 +210,24 @@ const SymmetricMatrix SymmetricMatrix::operator/(const double& rhs) const
 void SymmetricMatrix::build_matrix(
   const size_t size, const bool initialize)
 {
-	Matrix<double>::build_matrix(size, size, initialize);
+  Matrix<double>::build_matrix(size, size, initialize);
 }
 
 void SymmetricMatrix::build_matrix(const size_t         size,
                                    double const * const data)
 {
   build_matrix(size, false);
-	 double element;
+   double element;
   for(size_t row=0; row<size; ++row)
   {
     for(size_t column=0; column<=row; ++column)
     {
-			element = data[row*size + column];
+      element = data[row*size + column];
       Matrix<double>::operator()(row+1, column+1) = element;
-			if (row != column)
-			{
-				Matrix<double>::operator()(column+1, row+1) = element;
-			}
+      if (row != column)
+      {
+        Matrix<double>::operator()(column+1, row+1) = element;
+      }
     }
   }
 }
@@ -227,7 +242,7 @@ void SymmetricMatrix::build_matrix(const size_t         size,
 
 SymmetricMatrix inverse(const SymmetricMatrix& matrix)
 {
-	return inverse((Matrix<double>) matrix);
+  return inverse((Matrix<double>) matrix);
 }
 
 namespace CLHEP
@@ -238,17 +253,17 @@ namespace CLHEP
   size_t size = matrix.size();
   
   ::CLHEP::HepSymMatrix hep_matrix(size);
-	double element;
+  double element;
   for(size_t row=1; row<=size; ++row)
   {
     for(size_t column=1; column<=row; ++column)
     {
-			element = matrix(row, column);
+      element = matrix(row, column);
       hep_matrix(row, column) = element;
-			if (row != column)
-			{
-				hep_matrix(column, row) = element;
-			}
+      if (row != column)
+      {
+        hep_matrix(column, row) = element;
+      }
     }
   }
   return hep_matrix;
@@ -303,7 +318,7 @@ std::pair<Vector<double>, Matrix<double> > eigensystem(
   gsl_matrix * eigenvectors = gsl_matrix_calloc(rows, columns);
   gsl_eigen_symmv_workspace * workspace = gsl_eigen_symmv_alloc(rows);
   int ierr = gsl_eigen_symmv(temp_matrix.matrix_,
-														 eigenvalues, eigenvectors,
+                             eigenvalues, eigenvectors,
                              workspace);
   gsl_eigen_symmv_free(workspace);
   if(ierr != 0)
@@ -329,17 +344,17 @@ std::pair<Vector<double>, Matrix<double> > eigensystem(
 
 SymmetricMatrix operator-(const SymmetricMatrix& matrix)
 {
-	return -((Matrix<double>) matrix);
+  return -((Matrix<double>) matrix);
 }
 
 //*************************
 // Scalar Operators
 //*************************
 
-SymmetricMatrix operator*(const double&					 lhs,
-													const SymmetricMatrix& rhs)
+SymmetricMatrix operator*(const double&           lhs,
+                          const SymmetricMatrix& rhs)
 {
-	return lhs * (Matrix<double>) rhs;
+  return lhs * (Matrix<double>) rhs;
 }
 
 } //namespace MAUS
