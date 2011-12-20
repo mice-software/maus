@@ -47,8 +47,9 @@ TEST(MAUSEventActionTest, BeginOfEventActionTest) {
     _g4->GetVirtualPlanes()->SetVirtualHits(Json::Value(virtual_hits));
     // can't set MICEDetectorConstruction/SDHits
     _g4->GetEventAction()->BeginOfEventAction(NULL);
-    EXPECT_EQ(_g4->GetTracking()->GetTracks().size(), 0);
-    EXPECT_EQ(_g4->GetVirtualPlanes()->GetVirtualHits().size(), 0);
+    EXPECT_EQ(_g4->GetTracking()->GetTracks().size(), (unsigned int) 0);
+    EXPECT_EQ(_g4->GetVirtualPlanes()->GetVirtualHits().size(),
+              (unsigned int) 0);
 }
 
 TEST(MAUSEventActionTest, EndOfEventActionTest) {

@@ -398,58 +398,23 @@ class MatrixBase {
 // *****************************
 
 template <> MatrixBase<double, gsl_matrix>::MatrixBase(
-  const ::CLHEP::HepMatrix& hep_matrix);
+    const ::CLHEP::HepMatrix& hep_matrix);
 template <> MatrixBase<complex, gsl_matrix_complex>::MatrixBase(
-  const ::CLHEP::HepMatrix& hep_matrix);
+    const ::CLHEP::HepMatrix& hep_matrix);
 template <> double& MatrixBase<double, gsl_matrix>::operator()(
-  const size_t row, const size_t column);
+    const size_t row, const size_t column);
 template <> complex& MatrixBase<complex, gsl_matrix_complex>::operator()(
-  const size_t row, const size_t column);
+    const size_t row, const size_t column);
 template <> const double& MatrixBase<double, gsl_matrix>::operator()(
-  const size_t row, const size_t column) const;
+    const size_t row, const size_t column) const;
 template <> const complex& MatrixBase<complex, gsl_matrix_complex>::operator()(
-  const size_t row, const size_t column) const;
+    const size_t row, const size_t column) const;
 template <> void MatrixBase<double, gsl_matrix>::delete_matrix();
 template <> void MatrixBase<complex, gsl_matrix_complex>::delete_matrix();
 template <> void MatrixBase<double, gsl_matrix>::build_matrix(
-  const size_t rows, const size_t columns, const bool initialize);
+    const size_t rows, const size_t columns, const bool initialize);
 template <> void MatrixBase<complex, gsl_matrix_complex>::build_matrix(
-  const size_t rows, const size_t columns, const bool initialize);
-template <>
-MatrixBase<double, gsl_matrix>& MatrixBase<double, gsl_matrix>::operator=(
-  const MatrixBase<double, gsl_matrix>& rhs);
-template <> MatrixBase<complex, gsl_matrix_complex>&
-MatrixBase<complex, gsl_matrix_complex>::operator=(
-  const MatrixBase<complex, gsl_matrix_complex>& rhs);
-template<> MatrixBase<double, gsl_matrix>&
-MatrixBase<double, gsl_matrix>::operator+=(
-  const MatrixBase<double, gsl_matrix>& rhs);
-template<> MatrixBase<complex, gsl_matrix_complex>&
-MatrixBase<complex, gsl_matrix_complex>::operator+=(
-  const MatrixBase<complex, gsl_matrix_complex>& rhs);
-template<> MatrixBase<double, gsl_matrix>&
-MatrixBase<double, gsl_matrix>::operator-=(
-  const MatrixBase<double, gsl_matrix>& rhs);
-template<> MatrixBase<complex, gsl_matrix_complex>&
-MatrixBase<complex, gsl_matrix_complex>::operator-=(
-  const MatrixBase<complex, gsl_matrix_complex>& rhs);
-template<> MatrixBase<double, gsl_matrix>&
-MatrixBase<double, gsl_matrix>::operator*=(
-  const MatrixBase<double, gsl_matrix>& rhs);
-template<> MatrixBase<complex, gsl_matrix_complex>&
-MatrixBase<complex, gsl_matrix_complex>::operator*=(
-  const MatrixBase<complex, gsl_matrix_complex>& rhs);
-template<> MatrixBase<double, gsl_matrix>&
-MatrixBase<double, gsl_matrix>::operator*=(const double& rhs);
-template<> MatrixBase<complex, gsl_matrix_complex>&
-MatrixBase<complex, gsl_matrix_complex>::operator *=(const complex& rhs);
-template<> MatrixBase<double, gsl_matrix>&
-MatrixBase<double, gsl_matrix>::operator/=(const double& rhs);
-template<> MatrixBase<complex, gsl_matrix_complex>&
-MatrixBase<complex, gsl_matrix_complex>::operator/=(const complex& rhs);
-
-
-
+    const size_t rows, const size_t columns, const bool initialize);
 
 /** @class Matrix Defines the association between GSL and standard C++ types.
  */
@@ -490,6 +455,8 @@ class Matrix<double> :  public MatrixBase<double, gsl_matrix> {
 
   Matrix(const MatrixBase<double, gsl_matrix>& base_vector)
     : MatrixBase<double, gsl_matrix>(base_vector) {}
+
+  friend Vector<complex> eigenvalues(const Matrix<double>& matrix);
 };
 
 template<>

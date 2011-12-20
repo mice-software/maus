@@ -187,16 +187,6 @@ class SymmetricMatrix : public Matrix<double> {
   //  Befriending
   // *************************
 
-  // These could be implemented using the public interface, but it's nicer
-  // to just call the Matrix functions and upcast via the protected copy c'tor
-  friend SymmetricMatrix real(const HermitianMatrix& matrix);
-  friend SymmetricMatrix operator-(const SymmetricMatrix& matrix);
-  friend SymmetricMatrix operator*(const double&          lhs,
-                                   const SymmetricMatrix& rhs);
-
-  // Declared in HermitianMatrix.hh
-  friend SymmetricMatrix inverse(const SymmetricMatrix& matrix);
-
   // These use special low-level gsl functions for symmetric matricies
   friend Vector<double> eigenvalues(const SymmetricMatrix& matrix);
   friend std::pair<Vector<double>, Matrix<double> >

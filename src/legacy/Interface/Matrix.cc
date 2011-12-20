@@ -93,7 +93,7 @@ MatrixBase<complex, gsl_matrix_complex>::MatrixBase(
   size_t columns = hep_matrix.num_col();
 
   build_matrix(rows, columns);
-  for (size_t row = 1; row <= rows; ++row)
+  for (size_t row = 1; row <= rows; ++row) {
     for (size_t column = 1; column <= columns; ++column) {
       (*this)(row, column) = MAUS::Complex::complex(hep_matrix(row, column));
     }
@@ -864,7 +864,7 @@ Matrix<double> real(const Matrix<complex>& complex_matrix) {
   Matrix<double> double_matrix(rows, columns);
   for (size_t row = 1; row <= rows; ++row) {
     for (size_t column = 1; column <= columns; ++column) {
-      double_matrix(row, column) = real(complex_matrix(row, column));
+      double_matrix(row, column) = MAUS::real(complex_matrix(row, column));
     }
   }
   return double_matrix;
@@ -876,7 +876,7 @@ Matrix<double> imag(const Matrix<complex>& complex_matrix) {
   Matrix<double> double_matrix(rows, columns);
   for (size_t row = 1; row <= rows; ++row) {
     for (size_t column = 1; column <= columns; ++column) {
-      double_matrix(row, column) = imag(complex_matrix(row, column));
+      double_matrix(row, column) = MAUS::imag(complex_matrix(row, column));
     }
   }
   return double_matrix;
@@ -888,7 +888,7 @@ Matrix<complex> conj(const Matrix<complex>& matrix) {
   Matrix<complex> conjugate_matrix(rows, columns);
   for (size_t row = 1; row <= rows; ++row) {
     for (size_t column = 1; column <= columns; ++column) {
-      conjugate_matrix(row, column) = conj(matrix(row, column));
+      conjugate_matrix(row, column) = MAUS::conj(matrix(row, column));
     }
   }
   return conjugate_matrix;
@@ -902,7 +902,8 @@ Matrix<MAUS::complex> complex(const Matrix<double>& real_matrix) {
   Matrix<MAUS::complex> complex_matrix(rows, columns);
   for (size_t row = 1; row <= rows; ++row) {
     for (size_t column = 1; column <= columns; ++column) {
-      complex_matrix(row, column) = complex(real_matrix(row, column));
+      complex_matrix(row, column)
+        = MAUS::Complex::complex(real_matrix(row, column));
     }
   }
   return complex_matrix;
@@ -924,13 +925,14 @@ Matrix<MAUS::complex> complex(const Matrix<double>& real_matrix,
   for (size_t row = 1; row <= rows; ++row) {
     for (size_t column = 1; column <= columns; ++column) {
       complex_matrix(row, column)
-        = complex(real_matrix(row, column), imaginary_matrix(row, column));
+        = MAUS::Complex::complex(real_matrix(row, column),
+                                 imaginary_matrix(row, column));
     }
   }
   return complex_matrix;
 }
 
-}  // namespace Matrix
+}  // namespace Complex
 
 template <> double determinant(
     const Matrix<double>& matrix) {
@@ -1071,7 +1073,7 @@ template <> Matrix<complex> transpose(
 
 Matrix<complex> dagger(const Matrix<complex>& matrix) {
   Matrix<complex> transpose_matrix = transpose(matrix);
-  return conj(transpose_matrix);
+  return MAUS::conj(transpose_matrix);
 }
 
 namespace CLHEP {
@@ -1113,8 +1115,9 @@ Vector<complex> eigenvalues(const Matrix<double>& matrix) {
                  "Failed to calculate eigenvalue",
                  "MAUS::eigenvalues"));
   }
-  Vector<complex> eigenvalue_vector(dynamic_cast <complex*>(eigenvalues->data),
-                                    rows);
+  Vector<complex> eigenvalue_vector(
+    reinterpret_cast <complex*>(eigenvalues->data),
+    rows);
   gsl_vector_complex_free(eigenvalues);
   return eigenvalue_vector;
 }
@@ -1143,11 +1146,12 @@ std::pair<Vector<complex>, Matrix<complex> > eigensystem(
                  "Failed to calculate eigenvalue",
                  "MAUS::eigenvectors"));
   }
-  Vector<complex> eigenvalue_vector(dynamic_cast <complex*>(eigenvalues->data),
-                                    rows);
+  Vector<complex> eigenvalue_vector(
+    reinterpret_cast <complex*>(eigenvalues->data),
+    rows);
   gsl_vector_complex_free(eigenvalues);
   Matrix<complex> eigenvector_matrix(
-    rows, columns, dynamic_cast <complex*>(eigenvectors->data));
+    rows, columns, reinterpret_cast <complex*>(eigenvectors->data));
   gsl_matrix_complex_free(eigenvectors);
   return std::pair<Vector<complex>, Matrix<complex> >(
            eigenvalue_vector, eigenvector_matrix);
@@ -1196,7 +1200,7 @@ template <> Vector<double> operator*(
   Vector<double> product(rhs);
   if (   (lhs.matrix_ != NULL) && (rhs.vector_ != NULL)
       && (lhs.number_of_columns() == rhs.size())) {
-    gsl_matrix_mul(lhs.matrix_, product.vector_);
+    MAUS::gsl_matrix_mul(lhs.matrix_, product.vector_);
   }
   return product;
 }
@@ -1207,7 +1211,7 @@ template <> Vector<complex> operator*(
   Vector<complex> product(rhs);
   if (   (lhs.matrix_ != NULL) && (rhs.vector_ != NULL)
       && (lhs.number_of_columns() == rhs.size())) {
-    gsl_matrix_complex_mul(lhs.matrix_, product.vector_);
+    MAUS::gsl_matrix_complex_mul(lhs.matrix_, product.vector_);
   }
   return product;
 }

@@ -224,16 +224,12 @@ TEST_F(MatrixTest, IndexingElements) {
     {
       //check that it returns correct value
       EXPECT_EQ(matrix_d1(i+1,j+1), double_data_[i*columns_ + j]);
-      EXPECT_EQ(matrix_d1[i][j], double_data_[i*columns_ + j]);
       //check that it works with const matrix
       EXPECT_EQ(matrix_d2(i+1,j+1), double_data_[i*columns_ + j]);
-      EXPECT_EQ(matrix_d2[i][j], double_data_[i*columns_ + j]);
 
       //check that it can set the correct value
       matrix_d1(i+1,j+1) = 4.;
       EXPECT_EQ(matrix_d1(i+1,j+1), 4.);
-      matrix_d1[i][j] = -6.;
-      EXPECT_EQ(matrix_d1[i][j], -6.);
     }
   }
   
@@ -248,16 +244,12 @@ TEST_F(MatrixTest, IndexingElements) {
     {
       //check that it returns correct value
       EXPECT_EQ(matrix_c1(i+1,j+1), complex_data_[i*columns_ + j]);
-      EXPECT_EQ(matrix_c1[i][j], complex_data_[i*columns_ + j]);
       //check that it works with const matrix
       EXPECT_EQ(matrix_c2(i+1,j+1), complex_data_[i*columns_ + j]);
-      EXPECT_EQ(matrix_c2[i][j], complex_data_[i*columns_ + j]);
 
       //check that it can set the correct value
       matrix_c1(i+1,j+1) = new_value1;
       EXPECT_EQ(matrix_c1(i+1,j+1), new_value1);
-      matrix_c1[i][j] = new_value2;
-      EXPECT_EQ(matrix_c1[i][j], new_value2);
     }
   }
 }
