@@ -223,12 +223,12 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      export PYTHONPATH="\$MAUS_ROOT_DIR/src/common_py:\$PYTHONPATH"
      export $DYLIB_VAR="\$MAUS_ROOT_DIR/src/common_py:\$$DYLIB_VAR"
 
-     export PYTHONPATH="\$MAUS_ROOT_DIR/src/mauscelery:\$PYTHONPATH"
-     export LD_LIBRARY_PATH="\$MAUS_ROOT_DIR/src/mauscelery:\$LD_LIBRARY_PATH"
+     export PYTHONPATH="\$MAUS_ROOT_DIR/src/common_py/mauscelery:\$PYTHONPATH"
+     export LD_LIBRARY_PATH="\$MAUS_ROOT_DIR/src/common_py/mauscelery:\$LD_LIBRARY_PATH"
      export CELERY_LOADER="mausloader.CeleryLoader"
 
-     export PYTHONPATH="\$MAUS_ROOT_DIR/src/docstore:\$PYTHONPATH"
-     export LD_LIBRARY_PATH="\$MAUS_ROOT_DIR/src/docstore:\$LD_LIBRARY_PATH"
+     export PYTHONPATH="\$MAUS_ROOT_DIR/src/common_py/docstore:\$PYTHONPATH"
+     export LD_LIBRARY_PATH="\$MAUS_ROOT_DIR/src/common_py/docstore:\$LD_LIBRARY_PATH"
 
      export G4DEBUG=1
      export G4VERS=geant4.9.2.p04

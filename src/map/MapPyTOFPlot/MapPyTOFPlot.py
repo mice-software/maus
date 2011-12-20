@@ -27,7 +27,7 @@ class MapPyTOFPlot:
         self._sp_tof1 = {}
         self._sp_tof2 = {}
         self.canvas = ROOT.TCanvas("tof", "tof")
-        self.tof_hist = ROOT.TH1F("tof", "tof", 150, 23, 38)
+        self.tof_hist = ROOT.TH1F("tof", "tof", 280, 24, 38)
         
     def birth(self, json_configuration):
         """ Do nothing here """
