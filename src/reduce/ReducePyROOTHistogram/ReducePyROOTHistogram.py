@@ -23,6 +23,8 @@ histograms using ROOT.
 import base64
 import json
 import os
+
+import ErrorHandler
 import ROOT
 
 class ReducePyROOTHistogram: # pylint: disable=R0902
@@ -147,15 +149,20 @@ class ReducePyROOTHistogram: # pylint: disable=R0902
         # Load and validate the JSON document.
         try:
             json_doc = json.loads(json_string.rstrip())
-        except ValueError:
-            json_doc = {"errors": {"bad_json_document":
-                                "unable to do json.loads on input"} }
-            return json.dumps(json_doc)
+        except Exception: # pylint:disable=W0703
+            json_doc = {}
+            ErrorHandler.HandleException(json_doc, self)
+            return unicode(json.dumps(json_doc))
 
         self.spill_count = self.spill_count + 1
 
         # Process spill and update histograms.
-        result = self._update_histograms(json_doc)
+        try:
+            result = self._update_histograms(json_doc)
+        except Exception: # pylint:disable=W0703
+            ErrorHandler.HandleException(json_doc, self)
+            return unicode(json.dumps(json_doc))
+
         # Convert results to strings.
         doc_list = []
         for doc in result:
@@ -171,12 +178,12 @@ class ReducePyROOTHistogram: # pylint: disable=R0902
         Sub-classes must define this function.
         @param self Object reference.
         @param spill Current spill.
-        @returns list of JSON documents. If json_doc has an error then
-        the list will just contain the spill augmented with error
-        information. If the sub-class only updates histograms every
-        N spills then this list can just contain the input spill.
+        @returns list of JSON documents. If the sub-class only updates 
+        histograms every N spills then this list can just contain 
+        the input spill.
         Otherwise it should consist of 1 or more JSON documents 
         containing image data in the form described above. 
+        @throws Exception if various sub-class specific errors arise.
         """
 
     def death(self): #pylint: disable=R0201
