@@ -156,6 +156,10 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         @throws ValueError if "slab_hits" and "space_points" information
         is missing from the spill.
         """
+        if "END_OF_RUN" in spill:
+            self.update_histos()
+            return self.get_histogram_images()
+
         # Get TOF slab hits & fill the relevant histograms.
         if not self.get_slab_hits(spill): 
             raise ValueError("slab_hits not in spill")
@@ -593,25 +597,3 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
             image_list.append(doc)
 
         return image_list
-
-    def _cleanup_at_death(self):
-        """
-        Save final plots.
-        MIKE - need a better solution than this! See ticket.
-        DR - how to get EOR signal?
-        @param self Object reference.
-        @returns True
-        """
-        tag = "tof01_time"
-        outfile = "%s.%s" % (tag, self.image_type)
-        self.canvas_tof[0].Print(outfile)
-
-        tag = "tof12_time"
-        outfile = "%s.%s" % (tag, self.image_type)
-        self.canvas_tof[1].Print(outfile)
-
-        tag = "tof02_time"
-        outfile = "%s.%s" % (tag, self.image_type)
-        self.canvas_tof[2].Print(outfile)
-
-        return True

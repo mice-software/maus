@@ -290,6 +290,12 @@ class PipelineSingleThreadDataflowExecutor:
             print "Processed %d spills so far," % i,
             print "%d spills in buffer." % (len(map_buffer))
 
+        print("CLOSING PIPELINE: Sending END_OF_RUN to merger")
+
+        end_of_run_spill = json.dumps({"END_OF_RUN":"END_OF_RUN"})
+        spill = self.merger.process(end_of_run_spill)
+        self.outputer.save(spill)
+
         print("TRANSFORM: Shutting down transformer")
         assert(self.transformer.death() == True)
 
@@ -563,6 +569,12 @@ class MultiProcessMergeOutputDataflowExecutor: # pylint: disable=R0903
                 self.outputer.save(spill)
                 self.doc_store.delete(spill_id)
                 print("  %d spills left in data store." % (len(self.doc_store)))
+
+        print("CLOSING PIPELINE: Sending END_OF_RUN to merger")
+
+        end_of_run_spill = json.dumps({"END_OF_RUN":"END_OF_RUN"})
+        spill = self.merger.process(end_of_run_spill)
+        self.outputer.save(spill)
                 
         print("MERGE: Shutting down merger")
         assert(self.merger.death() == True)

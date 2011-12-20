@@ -181,7 +181,7 @@ class ReducePyHistogramTDCADCCountsTestCase(unittest.TestCase): # pylint: disabl
         """
         Test "process" with a JSON document with a "digits" entry,
         "channel_id" and matching tracker "type" but which only has
-        "ydc_counts".
+        "tdc_counts".
         @param self Object reference.
         """
         json_doc = {"digits": [{"tdc_counts":1, 
@@ -332,6 +332,15 @@ class ReducePyHistogramTDCADCCountsTestCase(unittest.TestCase): # pylint: disabl
         decoded_data = base64.b64decode(image["data"])
         self.assertTrue(decoded_data.find("EPS") != -1,
             "Unexpected image data")
+
+    def test_end_of_run(self):
+        """
+        Test "process" with a JSON document with an "END_OF_RUN"
+        entry.
+        @param self Object reference.
+        """
+        result = self.__process({"END_OF_RUN":"END_OF_RUN"})
+        self.assertEquals({}, result, "Expected empty output spill")
 
     def tearDown(self):
         """
