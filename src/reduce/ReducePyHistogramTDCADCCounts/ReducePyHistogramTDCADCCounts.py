@@ -108,14 +108,12 @@ class ReducePyHistogramTDCADCCounts(ReducePyMatplotlibHistogram):
         the list will just contain the spill augmented with error
         information. Otherwise return a list with the histogram JSON
         document.
+        @throws KeyError if "digits" is not in spill.
         """
         # Do validation specific to this class while getting the
         # data to be graphed.
         if "digits" not in spill:
-            if "errors" not in spill:
-                spill["errors"] = {}
-            spill["errors"]["no_digits"] = "no digits"
-            return [spill]
+            raise KeyError("digits field is not in spill")
         digits = spill["digits"]
 
         # Extract just those digits that are for the Tracker.
