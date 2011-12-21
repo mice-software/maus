@@ -27,15 +27,16 @@
  * library
  */
 
+#include "Maths/Matrix.hh"
+
 #include <limits>
 
 #include "CLHEP/Matrix/Matrix.h"
 #include "gsl/gsl_linalg.h"
 #include "gsl/gsl_eigen.h"
 
-#include "Interface/Matrix.hh"
 #include "Interface/Squeal.hh"
-#include "Interface/Vector.hh"
+#include "Maths/Vector.hh"
 
 using MAUS::complex;
 using MAUS::Vector;

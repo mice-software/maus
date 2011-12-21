@@ -27,13 +27,13 @@
 #include <sstream>
 #include <fstream>
 
-#include "Interface/Matrix.hh"
-#include "Interface/SymmetricMatrix.hh"
-#include "Interface/Vector.hh"
-
 #include "gtest/gtest.h" 
 #include "CLHEP/Matrix/SymMatrix.h"
 #include "CLHEP/Random/Random.h"
+
+#include "Maths/Matrix.hh"
+#include "Maths/SymmetricMatrix.hh"
+#include "Maths/Vector.hh"
 
 using namespace MAUS;
 

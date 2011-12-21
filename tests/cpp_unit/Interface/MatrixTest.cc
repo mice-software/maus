@@ -22,20 +22,27 @@
 
 
 #include <limits>
-#include <math.h>
+#include <cmath>
 #include <iostream>
 #include <sstream>
 #include <fstream>
-
-#include "Interface/Complex.hh"
-#include "Interface/Matrix.hh"
-#include "Interface/Vector.hh"
 
 #include "gtest/gtest.h" 
 #include "CLHEP/Matrix/Matrix.h"
 #include "CLHEP/Random/Random.h"
 
-using namespace MAUS;
+#include "Maths/Complex.hh"
+#include "Maths/Matrix.hh"
+#include "Maths/Vector.hh"
+
+using MAUS::complex;
+using MAUS::Matrix;
+using MAUS::Vector;
+using MAUS::operator*;
+using MAUS::operator+=;
+using MAUS::operator-;
+using MAUS::operator==;
+using MAUS::operator<<;
 
 //Defined in ComplexTest.cc
 bool equal(const complex c1, const complex c2);
@@ -167,20 +174,20 @@ const double MatrixTest::double_data_[24] = {
 };
 
 const complex MatrixTest::complex_data_[24] = {
-  Complex::complex(0., -2.64),    Complex::complex(1., 8.46),
-  Complex::complex(2., -3.23),    Complex::complex(3., 9.79),
-  Complex::complex(-5., -3.58),   Complex::complex(-8., 2.65),
-  Complex::complex(-13., -1.59),  Complex::complex(-21, 3.14),
+  MAUS::Complex::complex(0., -2.64),    MAUS::Complex::complex(1., 8.46),
+  MAUS::Complex::complex(2., -3.23),    MAUS::Complex::complex(3., 9.79),
+  MAUS::Complex::complex(-5., -3.58),   MAUS::Complex::complex(-8., 2.65),
+  MAUS::Complex::complex(-13., -1.59),  MAUS::Complex::complex(-21, 3.14),
 
-  Complex::complex(34.5, -146.3), Complex::complex(55.7, -91.2),
-  Complex::complex(89.3, -57.5),  Complex::complex(144.2, -32.5),
-  Complex::complex(-32.5, 144.2), Complex::complex(-57.5, 89.3),
-  Complex::complex(-91.2, 55.7),  Complex::complex(-146.3, 34.5),
+  MAUS::Complex::complex(34.5, -146.3), MAUS::Complex::complex(55.7, -91.2),
+  MAUS::Complex::complex(89.3, -57.5),  MAUS::Complex::complex(144.2, -32.5),
+  MAUS::Complex::complex(-32.5, 144.2), MAUS::Complex::complex(-57.5, 89.3),
+  MAUS::Complex::complex(-91.2, 55.7),  MAUS::Complex::complex(-146.3, 34.5),
   
-  Complex::complex(3.14, -21.),   Complex::complex(-1.59, -13.),
-  Complex::complex(2.65, -8.),    Complex::complex(-3.58, -5.),
-  Complex::complex(9.79, 3.),     Complex::complex(-3.23, 2.),
-  Complex::complex(8.46, 1.),     Complex::complex(-2.64, 0.)
+  MAUS::Complex::complex(3.14, -21.),   MAUS::Complex::complex(-1.59, -13.),
+  MAUS::Complex::complex(2.65, -8.),    MAUS::Complex::complex(-3.58, -5.),
+  MAUS::Complex::complex(9.79, 3.),     MAUS::Complex::complex(-3.23, 2.),
+  MAUS::Complex::complex(8.46, 1.),     MAUS::Complex::complex(-2.64, 0.)
 };
 
 const size_t MatrixTest::data_size_ = 24;
@@ -191,7 +198,7 @@ const size_t MatrixTest::submatrix_rows_         = 2;
 const size_t MatrixTest::submatrix_columns_      = 4;
 const size_t MatrixTest::submatrix_start_row_    = 2;
 const size_t MatrixTest::submatrix_start_column_ = 3;
-const complex MatrixTest::complex_scaling_factor_ = Complex::complex(2, -5);
+const complex MatrixTest::complex_scaling_factor_ = MAUS::Complex::complex(2, -5);
 
 //***********
 //test cases
@@ -236,20 +243,20 @@ TEST_F(MatrixTest, IndexingElements) {
   Matrix<complex> matrix_c1(rows_, columns_, complex_data_);
   //check that it works for const as well
   const Matrix<complex> matrix_c2(rows_, columns_, complex_data_);
-  complex new_value1 = Complex::complex(4., -2.);
-  complex new_value2 = Complex::complex(-6., 15.);
+  complex new_value1 = MAUS::Complex::complex(4., -2.);
+  complex new_value2 = MAUS::Complex::complex(-6., 15.);
   for(size_t i=0; i<rows_; ++i)
   {
     for(size_t j=0; j<columns_; ++j)
     {
       //check that it returns correct value
-      EXPECT_EQ(matrix_c1(i+1,j+1), complex_data_[i*columns_ + j]);
+      EXPECT_TRUE(::equal(matrix_c1(i+1,j+1), complex_data_[i*columns_ + j]));
       //check that it works with const matrix
-      EXPECT_EQ(matrix_c2(i+1,j+1), complex_data_[i*columns_ + j]);
+      EXPECT_TRUE(::equal(matrix_c2(i+1,j+1), complex_data_[i*columns_ + j]));
 
       //check that it can set the correct value
       matrix_c1(i+1,j+1) = new_value1;
-      EXPECT_EQ(matrix_c1(i+1,j+1), new_value1);
+      EXPECT_TRUE(::equal(matrix_c1(i+1,j+1), new_value1));
     }
   }
 }
@@ -297,7 +304,7 @@ TEST_F(MatrixTest, HepMatrixConstructor) {
   ASSERT_EQ(matrix_c0.number_of_columns(),  (size_t) columns_);
   for(size_t i=1; i<=rows_; ++i)
     for(size_t j=1; j<=columns_; ++j)
-      EXPECT_EQ(matrix_c0(i,j), Complex::complex(matrix_hep0(i,j)));
+      EXPECT_EQ(matrix_c0(i,j), MAUS::Complex::complex(matrix_hep0(i,j)));
   
   //check that handles 0 length okay
   Matrix<complex> matrix_c1(matrix_hep1);
@@ -310,7 +317,7 @@ TEST_F(MatrixTest, ConstructorSizeOnly) {
   EXPECT_TRUE(elements_equal(matrix_d0, 0.));
   
   Matrix<complex> matrix_c0(rows_, columns_);
-  EXPECT_TRUE(elements_equal(matrix_c0, Complex::complex(0.0)));
+  EXPECT_TRUE(elements_equal(matrix_c0, MAUS::Complex::complex(0.0)));
 }
 
 TEST_F(MatrixTest, ConstructorFill) {
@@ -476,7 +483,7 @@ TEST_F(MatrixTest, Comparison) {
   {
     for(size_t column=1; column<=submatrix_columns_; ++column)
     {
-      matrix_c6(row, column) = Complex::complex(row*column);
+      matrix_c6(row, column) = MAUS::Complex::complex(row*column);
     }
   }
   EXPECT_TRUE(matrix_c5 != matrix_c6);
@@ -485,57 +492,57 @@ TEST_F(MatrixTest, Comparison) {
 
 TEST_F(MatrixTest, Assignment) {
 
-	//*** double assignment ***
+  //*** double assignment ***
 
   //plain vanilla assignment
   Matrix<double> matrix_d0(rows_, columns_, double_data_);
   Matrix<double> matrix_d1(rows_, columns_);
-	matrix_d1 = matrix_d0;
+  matrix_d1 = matrix_d0;
   EXPECT_TRUE(equal(matrix_d0, matrix_d1));
 
-	//check special assignement to null matrix
-	Matrix<double> matrix_d2;
-	matrix_d2 = matrix_d0;
+  //check special assignement to null matrix
+  Matrix<double> matrix_d2;
+  matrix_d2 = matrix_d0;
   EXPECT_TRUE(equal(matrix_d2, matrix_d0));
-	
-	//check bad assignment to differently sized matrix
-	bool caught_exception = false;
-	try
-	{
-		Matrix<double> matrix_d3(1, 12);
-		matrix_d3 = matrix_d0;
-	}
-	catch(Squeal exception)
-	{
-		caught_exception = true;
-	}
-	EXPECT_TRUE(caught_exception);
+  
+  //check bad assignment to differently sized matrix
+  bool caught_exception = false;
+  try
+  {
+    Matrix<double> matrix_d3(1, 12);
+    matrix_d3 = matrix_d0;
+  }
+  catch(Squeal exception)
+  {
+    caught_exception = true;
+  }
+  EXPECT_TRUE(caught_exception);
 
-	//*** complex assignment ***
+  //*** complex assignment ***
 
   //plain vanilla assignment
   Matrix<complex> matrix_c0(rows_, columns_, complex_data_);
   Matrix<complex> matrix_c1(rows_, columns_);
-	matrix_c1 = matrix_c0;
+  matrix_c1 = matrix_c0;
   EXPECT_TRUE(equal(matrix_c0, matrix_c1));
 
-	//check special assignement to null matrix
-	Matrix<complex> matrix_c2;
-	matrix_c2 = matrix_c0;
+  //check special assignement to null matrix
+  Matrix<complex> matrix_c2;
+  matrix_c2 = matrix_c0;
   EXPECT_TRUE(equal(matrix_c2, matrix_c0));
 
-	//check bad assignment to differently sized matrix
-	caught_exception = false;
-	try
-	{
-		Matrix<complex> matrix_c3(1, 12);
-		matrix_c3 = matrix_c0;
-	}
-	catch(Squeal exception)
-	{
-		caught_exception = true;
-	}
-	EXPECT_TRUE(caught_exception);
+  //check bad assignment to differently sized matrix
+  caught_exception = false;
+  try
+  {
+    Matrix<complex> matrix_c3(1, 12);
+    matrix_c3 = matrix_c0;
+  }
+  catch(Squeal exception)
+  {
+    caught_exception = true;
+  }
+  EXPECT_TRUE(caught_exception);
 }
 
 TEST_F(MatrixTest, Addition) {
@@ -603,8 +610,8 @@ TEST_F(MatrixTest, Multiplication) {
        
   complex c1[6];
   complex c2[6];
-  for(int i=0; i<6; i++) c1[i] = Complex::complex( d1[i],       d2[i]);
-  for(int i=0; i<6; i++) c2[i] = Complex::complex(-d2[i]*d1[i], d1[i]);
+  for(int i=0; i<6; i++) c1[i] = MAUS::Complex::complex( d1[i],       d2[i]);
+  for(int i=0; i<6; i++) c2[i] = MAUS::Complex::complex(-d2[i]*d1[i], d1[i]);
   const Matrix<complex> matrix_c0(3, 2, c1);
   const Matrix<complex> matrix_c1(2, 3, c2);
   Matrix<complex>       matrix_c2(3, 3);
@@ -673,29 +680,29 @@ TEST_F(MatrixTest, ScalarDivision) {
 }
 
 TEST_F(MatrixTest, ComplexComposition) {
-	//test construction of a complex matrix from one double matrix (real part)
+  //test construction of a complex matrix from one double matrix (real part)
   const Matrix<complex> matrix_c0(rows_, columns_, complex_data_);
   const Matrix<double> matrix_real(rows_, columns_, double_data_);
-	Matrix<complex> matrix_c1(rows_, columns_);
+  Matrix<complex> matrix_c1(rows_, columns_);
   for (size_t row=1; row<=rows_; ++row)
   {
-		for (size_t column=1; column<=columns_; ++column)
-		{
-			matrix_c1(row, column)
-				= Complex::complex(double_data_[(row-1)*columns_+(column-1)]);
+    for (size_t column=1; column<=columns_; ++column)
+    {
+      matrix_c1(row, column)
+        = MAUS::Complex::complex(double_data_[(row-1)*columns_+(column-1)]);
     }
   }
-	Matrix<complex> matrix_c2 = Complex::complex(matrix_real);
+  Matrix<complex> matrix_c2 = MAUS::Complex::complex(matrix_real);
   ASSERT_TRUE(equal(matrix_c2, matrix_c1));
 
-	//test construction of a complex matrix from two double matrices (real, imag)
+  //test construction of a complex matrix from two double matrices (real, imag)
   double double_data_reversed[data_size_];
   for (size_t index=0; index<data_size_; ++index)
   {
     double_data_reversed[data_size_-index-1] = double_data_[index];
   }
   const Matrix<double> matrix_imag(rows_, columns_, double_data_reversed);
-  Matrix<complex> matrix_c3 = Complex::complex(matrix_real, matrix_imag);
+  Matrix<complex> matrix_c3 = MAUS::Complex::complex(matrix_real, matrix_imag);
   ASSERT_TRUE(equal(matrix_c3, matrix_c0));
   
 }
@@ -713,9 +720,9 @@ TEST_F(MatrixTest, ComplexDecomposition) {
   Matrix<double> matrix_imag = imag(matrix_c0);
   //create a pure-imaginary matrix
   Matrix<double> zero_matrix(rows_, columns_);
-  Matrix<complex> matrix_pure_imag = Complex::complex(zero_matrix, matrix_imag);
+  Matrix<complex> matrix_pure_imag = MAUS::Complex::complex(zero_matrix, matrix_imag);
   Matrix<complex> matrix_c1 = matrix_c0 - matrix_pure_imag;
-	Matrix<complex> matrix_c2 = Complex::complex(matrix_d0);
+  Matrix<complex> matrix_c2 = MAUS::Complex::complex(matrix_d0);
   EXPECT_TRUE(equal(matrix_c1, matrix_c2));
 }
 
@@ -777,7 +784,7 @@ TEST_F(MatrixTest, Trace) {
 }
 
 TEST_F(MatrixTest, Transpose) {
-	//verify the transpose of a real-valued matrix
+  //verify the transpose of a real-valued matrix
   Matrix<double> matrix_da(size_, size_, double_data_);
   Matrix<double> matrix_dt = transpose(matrix_da);
   ASSERT_EQ(matrix_da.number_of_rows(), matrix_dt.number_of_columns());
@@ -786,15 +793,15 @@ TEST_F(MatrixTest, Transpose) {
     for(size_t j = 1; j<=matrix_da.number_of_columns(); ++j)
       EXPECT_EQ(matrix_da(i,j), matrix_dt(j,i));
 
-	//verify the creation of a real-valued, row-vector matrix
-	Vector<double> column_vector(double_data_, 6);
-	Matrix<double> row_vector = transpose(column_vector);
-	for(size_t j = 1; j<=6; ++j)
-	{
-		EXPECT_EQ(row_vector(1,j), column_vector(j));
-	}
+  //verify the creation of a real-valued, row-vector matrix
+  Vector<double> column_vector(double_data_, 6);
+  Matrix<double> row_vector = transpose(column_vector);
+  for(size_t j = 1; j<=6; ++j)
+  {
+    EXPECT_EQ(row_vector(1,j), column_vector(j));
+  }
 
-	//verify the transpose of a complex-valued matrix
+  //verify the transpose of a complex-valued matrix
   Matrix<complex> matrix_ca(size_, size_, complex_data_);  
   Matrix<complex> matrix_ct = transpose(matrix_ca);
   ASSERT_EQ(matrix_ca.number_of_rows(), matrix_ct.number_of_columns());
@@ -805,21 +812,21 @@ TEST_F(MatrixTest, Transpose) {
 }
 
 TEST_F(MatrixTest, Dagger) {
-	complex herm_data[4] = {
-		Complex::complex(12.1, 0.),			Complex::complex(98.6, 100.0),
-		Complex::complex(98.6, -100.0),	Complex::complex(22.4, 0.)
-	};
+  complex herm_data[4] = {
+    MAUS::Complex::complex(12.1, 0.),      MAUS::Complex::complex(98.6, 100.0),
+    MAUS::Complex::complex(98.6, -100.0),  MAUS::Complex::complex(22.4, 0.)
+  };
   Matrix<complex> matrix(2, 2, herm_data); 
   Matrix<complex> matrix_dagger = dagger(matrix);
   ASSERT_TRUE(equal(matrix_dagger, matrix));
 
-	//verify the creation of a complex-valued, row-vector matrix
-	Vector<complex> column_vector(complex_data_, 6);
-	Matrix<complex> row_vector = dagger(column_vector);
-	for(size_t j = 1; j<=6; ++j)
-	{
-		EXPECT_EQ(row_vector(1,j), conj(column_vector(j)));
-	}
+  //verify the creation of a complex-valued, row-vector matrix
+  Vector<complex> column_vector(complex_data_, 6);
+  Matrix<complex> row_vector = dagger(column_vector);
+  for(size_t j = 1; j<=6; ++j)
+  {
+    EXPECT_EQ(row_vector(1,j), MAUS::conj(column_vector(j)));
+  }
 }
 
 TEST_F(MatrixTest, HepMatrix) {
@@ -850,7 +857,7 @@ TEST_F(MatrixTest, Eigen) {
   {
     complex eigenvalue = eigenvals(i);
     Vector<complex> eigenvector = eigenvectors.column(i);
-    EXPECT_TRUE(equal(Complex::complex(matrix_d0) * eigenvector,
+    EXPECT_TRUE(equal(MAUS::Complex::complex(matrix_d0) * eigenvector,
                       eigenvalue * eigenvector));
   }
 
@@ -914,7 +921,7 @@ TEST_F(MatrixTest, VectorMultiplication) {
   Matrix<complex> matrix_reverse_c(size_, size_);
   for (size_t i=1; i<=size_; ++i)
   {
-    matrix_reverse_c(i,size_-i+1) = Complex::complex(1.,0.);
+    matrix_reverse_c(i,size_-i+1) = MAUS::Complex::complex(1.,0.);
   }
   Vector<complex> vector_c0 = matrix_c0.row(1);
   Vector<complex> vector_product_c = matrix_reverse_c * vector_c0;

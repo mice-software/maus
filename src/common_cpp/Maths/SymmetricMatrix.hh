@@ -17,17 +17,17 @@
 /* Author: Peter Lane
  */
 
-#ifndef _SRC_COMMON_CPP_MATHS_SYMMETRIC_MATRIX_HH_
-#define _SRC_COMMON_CPP_MATHS_SYMMETRIC_MATRIX_HH_
+#ifndef COMMON_CPP_MATHS_SYMMETRIC_MATRIX_HH
+#define COMMON_CPP_MATHS_SYMMETRIC_MATRIX_HH
 
 #include <iostream>
 #include <vector>
 #include <utility>
 
-#include "Interface/Complex.hh"
 #include "Interface/Squeal.hh"
-#include "Interface/Vector.hh"
-#include "Interface/Matrix.hh"
+#include "Maths/Complex.hh"
+#include "Maths/Matrix.hh"
+#include "Maths/Vector.hh"
 
 namespace CLHEP {
 class HepSymMatrix;

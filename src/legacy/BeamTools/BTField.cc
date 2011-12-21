@@ -2,7 +2,8 @@
 #include "BTField.hh"
 #include "Interface/Differentiator.hh"
 #include "Interface/Interpolator.hh"
-#include "Interface/MMatrixToCLHEP.hh"
+#include "Maths/Matrix.hh"
+#include "Maths/Vector.hh"
 
 
 //div.E
@@ -10,8 +11,8 @@ double BTField::Maxwell1(const double point[4], const double delta[4]) const
 {
   MemberFunction<const BTField>* func = new MemberFunction<const BTField>(*this, &BTField::GetFieldValue, 4, 6); 
   Differentiator*                diff = new Differentiator(func, std::vector<double>(&delta[0], &delta[0]+4), std::vector<double>(2,1));
-  MMatrix<double> differentials(6,5,0.);
-  MVector<double> aPoint       (&point[0],&point[4]);
+  MAUS::Matrix<double> differentials(6,5,0.);
+  MAUS::Vector<double> aPoint(point, 5);
   for(int i=0; i<4; i++) aPoint(i+1) = point[i];
   diff->F(aPoint, differentials);
 
@@ -25,8 +26,8 @@ double BTField::Maxwell2(const double point[4], const double delta[4]) const
 {
   MemberFunction<const BTField>* func = new MemberFunction<const BTField>(*this, &BTField::GetFieldValue, 4, 6); 
   Differentiator*                diff = new Differentiator(func, std::vector<double>(&delta[0], &delta[0]+4), std::vector<double>(2,1));
-  MMatrix<double> differentials(6,5,0.);
-  MVector<double> aPoint       (&point[0],&point[4]);
+  MAUS::Matrix<double> differentials(6,5,0.);
+  MAUS::Vector<double> aPoint(point, 5);
   diff->F(aPoint, differentials);
 
   double result = 0;
@@ -39,8 +40,8 @@ CLHEP::Hep3Vector BTField::Maxwell3(const double point[4], const double delta[4]
 {
   MemberFunction<const BTField>* func = new MemberFunction<const BTField>(*this, &BTField::GetFieldValue, 4, 6); 
   Differentiator*                diff = new Differentiator(func, std::vector<double>(&delta[0], &delta[0]+4), std::vector<double>(2,1));
-  MMatrix<double> differentials(6,5,0.);
-  MVector<double> aPoint       (&point[0],&point[4]);
+  MAUS::Matrix<double> differentials(6,5,0.);
+  MAUS::Vector<double> aPoint(point, 5);
   diff->F(aPoint, differentials);
 
   CLHEP::Hep3Vector result;
@@ -55,8 +56,8 @@ CLHEP::Hep3Vector BTField::Maxwell4(const double point[4], const double delta[4]
 {
   MemberFunction<const BTField>* func = new MemberFunction<const BTField>(*this, &BTField::GetFieldValue, 4, 6); 
   Differentiator*                diff = new Differentiator(func, std::vector<double>(&delta[0], &delta[0]+4), std::vector<double>(2,1));
-  MMatrix<double> differentials(6,5,0.);
-  MVector<double> aPoint       (&point[0],&point[4]);
+  MAUS::Matrix<double> differentials(6,5,0.);
+  MAUS::Vector<double> aPoint(point, 5);
   diff->F(aPoint, differentials);
 
   double mueps = CLHEP::mu0*CLHEP::epsilon0;
@@ -71,8 +72,8 @@ void BTField::FieldFromVectorPotential(const double point[4], const double delta
 {
   MemberFunction<const BTField>* func = new MemberFunction<const BTField>(*this, &BTField::GetVectorPotential, 4, 4); 
   Differentiator*                diff = new Differentiator(func, std::vector<double>(&delta[0], &delta[0]+4), std::vector<double>(2,1));
-  MMatrix<double> differentials(6,5,0.);
-  MVector<double> aPoint       (&point[0],&point[4]);
+  MAUS::Matrix<double> differentials(6,5,0.);
+  MAUS::Vector<double> aPoint(point, 5);
   diff->F(aPoint, differentials);
   //B = Curl A // d_j y_i
   field[0] = differentials(3,3) - differentials(2,4);

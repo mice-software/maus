@@ -2,19 +2,21 @@
 #include <iomanip>
 
 #include "gtest/gtest.h"
+#include "CLHEP/Matrix/Matrix.h"
 
-#include "Interface/Squeak.hh"
-#include "Interface/MVector.hh"
-#include "Interface/MMatrix.hh"
-#include "Interface/MMatrixToCLHEP.hh"
-#include "Interface/PolynomialVector.hh"
-#include "Interface/Differentiator.hh"
 #include "Config/ModuleConverter.hh"
+#include "Interface/Squeak.hh"
+#include "Interface/Differentiator.hh"
+#include "Maths/Matrix.hh"
+#include "Maths/PolynomialVector.hh"
+#include "Maths/Vector.hh"
 
 /// NOTE: tests PolynomialVector, Differentiator and PolynomialInterpolator classes ///
 /// Three classes that are very closely related anyway... ///
 
-using namespace G4MICE; 
+using MAUS::PolynomialVector;
+using MAUS::Matrix;
+using MAUS::Vector;
 
 bool PolynomialVectorTest();
 bool PolynomialLeastSquaresTest();
@@ -36,7 +38,7 @@ bool PolynomialVectorTest()
     for(unsigned int i=0; i<6; i++) coeffHep[1][i] =  i*i;
     for(unsigned int i=0; i<6; i++) coeffHep[2][i] = -int(i)-1;
     Squeak::mout(Squeak::debug) << coeffHep << std::endl;
-    PolynomialVector* vecP  = new PolynomialVector(2, CLHEP_to_MMatrix( coeffHep ));
+    PolynomialVector* vecP  = new PolynomialVector(2, Matrix<double>( coeffHep ));
     PolynomialVector* clone = vecP->Clone();
     delete vecP;
     Squeak::mout(Squeak::debug) << "Ctor " << true << std::endl;
@@ -134,7 +136,7 @@ bool PolyVector_GetAvgChi2OfDifference_Test()
 {
   bool testpass = true;
   double mat_data[] = {1,4,1,  2,3,2,  7,11,7, 13,3,13, 5,7,8, 0,9,2, 1,3,4};
-  MMatrix<double>  mat(3,6,mat_data);
+  Matrix<double>  mat(3,6,mat_data);
   PolynomialVector pvec(2, mat);
   std::vector< std::vector<double> > in;
   std::vector< std::vector<double> > out;
@@ -172,9 +174,9 @@ bool PolyVector_Means_Test()
   std::vector<double> weights2(3, 1.);
   weights2[2] = 0.;
 
-  MVector<double> v1 = PolynomialVector::Means(values, std::vector<double>());
-  MVector<double> v2 = PolynomialVector::Means(values, weights1);
-  MVector<double> v3 = PolynomialVector::Means(values, weights2);
+  Vector<double> v1 = PolynomialVector::Means(values, std::vector<double>());
+  Vector<double> v2 = PolynomialVector::Means(values, weights1);
+  Vector<double> v3 = PolynomialVector::Means(values, weights2);
 
   bool testpass = true;
   for(size_t i=1; i<=3; i++)
@@ -197,29 +199,29 @@ bool PolyVector_Covariances_Test()
   for(size_t i=0; i<3; i++) values.back().push_back(-1);
   values.push_back(std::vector<double>());
   for(size_t i=0; i<3; i++) values.back().push_back(-1);
-  MVector<double> orig1(3, 0.);
-  MVector<double> orig2(3, -1.);
+  Vector<double> orig1(3, 0.);
+  Vector<double> orig2(3, -1.);
   std::vector<double> weights1(4, 1.);
   std::vector<double> weights2(4, 1.);
   weights2[0] = 0.;
   weights2[1] = 0.;
 
-  MMatrix<double> m1 = PolynomialVector::Covariances(values, std::vector<double>(), MVector<double>());
-  MMatrix<double> m2 = PolynomialVector::Covariances(values, weights1, orig1);
-  MMatrix<double> m3 = PolynomialVector::Covariances(values, weights2, orig2);
+  Matrix<double> m1 = PolynomialVector::Covariances(values, std::vector<double>(), Vector<double>());
+  Matrix<double> m2 = PolynomialVector::Covariances(values, weights1, orig1);
+  Matrix<double> m3 = PolynomialVector::Covariances(values, weights2, orig2);
 
   bool testpass = true;
-  testpass &= fabs((m1-MMatrix<double>(3,3,1.)).determinant()) < 1e-6;
-  testpass &= fabs((m2-MMatrix<double>(3,3,1.)).determinant()) < 1e-6;
-  testpass &= fabs((m3.determinant())) < 1e-6;
+  testpass &= fabs(determinant(m1-Matrix<double>(3,3,1.))) < 1e-6;
+  testpass &= fabs(determinant(m2-Matrix<double>(3,3,1.))) < 1e-6;
+  testpass &= fabs(determinant(m3)) < 1e-6;
   return testpass;
 }
 
 bool PolyVectorFTest(const PolynomialVector& vecP, double point[], double answer[])
 {
     bool testpass = true;
-    MVector<double> valueMV(3,0);
-    MVector<double> pointMV(2,0);
+    Vector<double> valueMV(3,0);
+    Vector<double> pointMV(2,0);
     for(int i=1; i<=2; i++) pointMV(i) = point[i-1];
     Squeak::mout(Squeak::debug) << "PolyVectorFTest" << std::endl;
     vecP.F(pointMV, valueMV);
@@ -259,7 +261,7 @@ bool PolynomialLeastSquaresTest()
   mat[1][3] = 3.;
   mat[2][3] = 13.;
 
-  PolynomialVector* vecF = new PolynomialVector(3, CLHEP_to_MMatrix(mat) );
+  PolynomialVector* vecF = new PolynomialVector(3, Matrix<double>(mat) );
   std::vector< std::vector<double> > points(nX*nY*nZ, std::vector<double>(3));
   std::vector< std::vector<double> > values(nX*nY*nZ, std::vector<double>(3));
   std::vector<double>                weights(nX*nY*nZ, 1);
@@ -275,7 +277,7 @@ bool PolynomialLeastSquaresTest()
       }
   delete vecF;
   PolynomialVector* pVec    = PolynomialVector::PolynomialLeastSquaresFit(points, values, 2);
-  CLHEP::HepMatrix recCoeff = MMatrix_to_CLHEP( pVec->GetCoefficientsAsMatrix() );
+  CLHEP::HepMatrix recCoeff = MAUS::CLHEP::HepMatrix( pVec->GetCoefficientsAsMatrix() );
   bool testpass=true;
   Squeak::mout(Squeak::debug) << "Input" << mat << "Output" << recCoeff << std::endl;
   for(int i=0; i<recCoeff.num_row(); i++)
@@ -288,7 +290,7 @@ bool PolynomialLeastSquaresTest()
   values .push_back(std::vector<double>(3,17.));
   weights.push_back(0.);
   pVec     = PolynomialVector::PolynomialLeastSquaresFit(points, values, 2, weights);
-  recCoeff = MMatrix_to_CLHEP( pVec->GetCoefficientsAsMatrix() );
+  recCoeff = MAUS::CLHEP::HepMatrix( pVec->GetCoefficientsAsMatrix() );
   Squeak::mout(Squeak::debug) << "Weighted Input" << mat << "Weighted Output" << recCoeff << std::endl;
   for(int i=0; i<recCoeff.num_row(); i++)
     for(int j=0; j<recCoeff.num_col(); j++)
@@ -296,13 +298,13 @@ bool PolynomialLeastSquaresTest()
   delete pVec;
 
   //now take some of the input values, try for a constrained fit
-  PolynomialVector Constraint(2, CLHEP_to_MMatrix( mat.sub(1,2,1,3) ));
+  PolynomialVector Constraint(2, Matrix<double>( mat.sub(1,2,1,3) ));
   std::vector<PolynomialVector::PolynomialCoefficient> coeffs = Constraint.GetCoefficientsAsVector();
   for(int i=0; i<2; i++)
     coeffs.erase(coeffs.begin());
   PolynomialVector* constraintPVec = new PolynomialVector(coeffs);
   pVec     = PolynomialVector::ConstrainedPolynomialLeastSquaresFit(points, values, 2, constraintPVec->GetCoefficientsAsVector(), weights);
-  recCoeff = MMatrix_to_CLHEP( pVec->GetCoefficientsAsMatrix() );
+  recCoeff = MAUS::CLHEP::HepMatrix( pVec->GetCoefficientsAsMatrix() );
   Squeak::mout(Squeak::debug) << "Constrained Input\n" << *constraintPVec << "Constrained Output\n" << *pVec << std::endl;
   for(int i=0; i<recCoeff.num_row(); i++)
     for(int j=0; j<recCoeff.num_col(); j++)
@@ -312,7 +314,7 @@ bool PolynomialLeastSquaresTest()
   //should return a copy of 
   double mat2[] = {1.,1.,1., 2.,3.,4., 7.,8.,9., 13.,14.,15., 200.,300.,400., 500.,600.,700., 800.,900.,1000., 1100.,1200.,1300., 1400.,1500.,1600., 1700.,1800.,1900.};
   Squeak::mout(Squeak::debug) << "Chi2SweepingLeastSquaresFit" << std::endl;
-  PolynomialVector* testF = new PolynomialVector(3, MMatrix<double>(3, 10, mat2) );
+  PolynomialVector* testF = new PolynomialVector(3, Matrix<double>(3, 10, mat2) );
   std::vector<double> delta(3);
   delta[0] = 1e-50;
   delta[1] = 1e-50;
@@ -326,11 +328,11 @@ bool PolynomialLeastSquaresTest()
     Squeak::mout(Squeak::debug) << "Failed to make PolynomialVector when PolynomialVector expected " << pVec << std::endl;
   }
   else {
-    MMatrix<double> o1 = pVec ->GetCoefficientsAsMatrix();
-    MMatrix<double> o2 = testF->GetCoefficientsAsMatrix();
-    testpass &= o1.num_row() == o2.num_row() && o1.num_col() == o2.num_col();
-    for(size_t i=1; i<=o2.num_row(); i++)
-      for(size_t j=1; j<=o2.num_col(); j++)
+    Matrix<double> o1 = pVec ->GetCoefficientsAsMatrix();
+    Matrix<double> o2 = testF->GetCoefficientsAsMatrix();
+    testpass &= o1.number_of_rows() == o2.number_of_rows() && o1.number_of_columns() == o2.number_of_columns();
+    for(size_t i=1; i<=o2.number_of_rows(); i++)
+      for(size_t j=1; j<=o2.number_of_columns(); j++)
         testpass &= fabs( o1(i,j) - o2(i,j) ) < 1e-2;
     Squeak::mout(Squeak::debug) << "Input should be same as output\nInput\n" << *testF 
                                 << "Output\n" << *pVec << " testpass " << testpass << std::endl;
@@ -349,11 +351,11 @@ bool PolynomialLeastSquaresTest()
     Squeak::mout(Squeak::debug) << "Failed to make PolynomialVector when PolynomialVector expected " << pVec << std::endl;
   }
   else {
-    MMatrix<double> o1 = pVec ->GetCoefficientsAsMatrix();
-    MMatrix<double> o2 = testF->GetCoefficientsAsMatrix();
-    testpass &= o1.num_row() == o2.num_row() && o1.num_col() == 4;
-    for(size_t i=1; i<=o1.num_row(); i++)
-      for(size_t j=1; j<=o1.num_col(); j++)
+    Matrix<double> o1 = pVec ->GetCoefficientsAsMatrix();
+    Matrix<double> o2 = testF->GetCoefficientsAsMatrix();
+    testpass &= o1.number_of_rows() == o2.number_of_rows() && o1.number_of_columns() == 4;
+    for(size_t i=1; i<=o1.number_of_rows(); i++)
+      for(size_t j=1; j<=o1.number_of_columns(); j++)
         testpass &= fabs( o1(i,j) - o2(i,j) ) < 1e-6;
     Squeak::mout(Squeak::debug) << "Input should be same as output\nInput\n" << *testF 
                                 << "Output\n" << *pVec << " testpass " << testpass << std::endl;
@@ -389,7 +391,7 @@ bool PolynomialLeastSquaresTest()
                    1400.e9,1500.e9,1600.e9, 
                    1700.e6,1800.e6,1900.e6
   };
-  PolynomialVector* testF2 = new PolynomialVector(3, MMatrix<double>(3, 10, mat3) );
+  PolynomialVector* testF2 = new PolynomialVector(3, Matrix<double>(3, 10, mat3) );
   Squeak::mout(Squeak::debug) << "Chi2SweepingLeastSquaresFitVariableWalls" << std::endl;
  // delta.push_back(0.);
   delta[0] = 1e-50; delta[1] = 1e-50; delta[2] = 1e-50;
@@ -414,11 +416,11 @@ bool PolynomialLeastSquaresTest()
     Squeak::mout(Squeak::debug) << "Input should be same as output\nInput\n" << *testF2 
                                 << "Output\n" << *pVec 
                                 << "For comparison, using normal algorithm\n" << *pVec2 << std::endl;
-    MMatrix<double> o1 = pVec  ->GetCoefficientsAsMatrix();
-    MMatrix<double> o2 = testF2->GetCoefficientsAsMatrix();
-    testpass &= o1.num_row() == o2.num_row() && o1.num_col() == o2.num_col();
-    for(size_t i=1; i<=o1.num_row() && i<=o2.num_row(); i++)
-      for(size_t j=1; j<=o1.num_col() && j<=o2.num_col(); j++) {
+    Matrix<double> o1 = pVec  ->GetCoefficientsAsMatrix();
+    Matrix<double> o2 = testF2->GetCoefficientsAsMatrix();
+    testpass &= o1.number_of_rows() == o2.number_of_rows() && o1.number_of_columns() == o2.number_of_columns();
+    for(size_t i=1; i<=o1.number_of_rows() && i<=o2.number_of_rows(); i++)
+      for(size_t j=1; j<=o1.number_of_columns() && j<=o2.number_of_columns(); j++) {
         testpass &= fabs( o1(i,j) - o2(i,j) )/fabs( o1(i,j) + o2(i,j) ) < 1.e-3 || fabs( o1(i,j) + o2(i,j) ) < 1e-9;
      }
   }

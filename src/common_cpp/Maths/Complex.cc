@@ -17,37 +17,37 @@
 /* Author: Peter Lane
  */
 
+#include "Maths/Complex.hh"
+
 #include <iostream>
 #include <sstream>
 #include <string>
 
 #include "gsl/gsl_complex_math.h"
 
-#include "Interface/Complex.hh"
-
 namespace MAUS {
-  namespace Complex {
-  // ************************
-  //  Construction Functions
-  // ************************
+namespace Complex {
+// ************************
+//  Construction Functions
+// ************************
 
-  MAUS::complex complex(const MAUS::complex& original_instance) {
-    MAUS::complex c = MAUS::Complex::complex(original_instance.dat[0],
-                                             original_instance.dat[1]);
-    return c;
-  }
+MAUS::complex complex(const MAUS::complex& original_instance) {
+  MAUS::complex c = MAUS::Complex::complex(original_instance.dat[0],
+                                           original_instance.dat[1]);
+  return c;
+}
 
-  MAUS::complex complex(const double& real) {
-    MAUS::complex c = gsl_complex_rect(real, 0.0);
-    return c;
-  }
+MAUS::complex complex(const double& real) {
+  MAUS::complex c = gsl_complex_rect(real, 0.0);
+  return c;
+}
 
-  MAUS::complex complex(const double& real, const double& imag) {
-    MAUS::complex c = gsl_complex_rect(real, imag);
-    return c;
-  }
+MAUS::complex complex(const double& real, const double& imag) {
+  MAUS::complex c = gsl_complex_rect(real, imag);
+  return c;
+}
 
-  }  // namespace MAUS::Complex
+}  // namespace MAUS::Complex
 
 const MAUS::complex polar(const double& r, const double& theta) {
   return gsl_complex_polar(r, theta);
@@ -184,8 +184,6 @@ MAUS::complex coth(const MAUS::complex& c) {
 // ******************************
 // TODO(plane1@iit.edu): Inverse Hyperbolic Functions
 // ******************************
-
-}  // namespace MAUS
 
 // *******************
 //  Unitary Operators
@@ -374,3 +372,5 @@ std::istream& operator>>(std::istream& in,  MAUS::complex& c) {
   in >> c.dat[0] >> dummy >> dummy >> c.dat[1] >> dummy;
   return in;
 }
+
+}  // namespace MAUS

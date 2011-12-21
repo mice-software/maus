@@ -6,23 +6,27 @@
 
 #include "gsl/gsl_sf_gamma.h"
 
+#include "Maths/Matrix.hh"
+#include "Maths/PolynomialVector.hh"
+#include "Maths/Vector.hh"
+
 ////////////////////////// DIFFERENTIATOR ///////////////////////////
 
 Differentiator::Differentiator (VectorMap* in, std::vector<double> delta, std::vector<double> magnitude)
- : _inSize(in->PointDimension()), _outSize(G4MICE::PolynomialVector::NumberOfPolynomialCoefficients(_inSize, magnitude.size())*in->ValueDimension()), _diffKey(), _factKey(),
+ : _inSize(in->PointDimension()), _outSize(MAUS::PolynomialVector::NumberOfPolynomialCoefficients(_inSize, magnitude.size())*in->ValueDimension()), _diffKey(), _factKey(),
    _delta(delta), _magnitude(magnitude), _diffOrder(magnitude.size()), _y(in)
 {
-    for(int i=0; i<int(G4MICE::PolynomialVector::NumberOfPolynomialCoefficients(_inSize, magnitude.size()) ); i++) 
+    for(int i=0; i<int(MAUS::PolynomialVector::NumberOfPolynomialCoefficients(_inSize, magnitude.size()) ); i++) 
     {
-        _diffKey.push_back(G4MICE::PolynomialVector::IndexByVector(i,_inSize));
+        _diffKey.push_back(MAUS::PolynomialVector::IndexByVector(i,_inSize));
         _factKey.push_back(1);
-        std::vector<int> powerKey = G4MICE::PolynomialVector::IndexByPower(i,_inSize);
+        std::vector<int> powerKey = MAUS::PolynomialVector::IndexByPower(i,_inSize);
         for(int j=0; j<int(powerKey.size()); j++) 
             _factKey[i] *= gsl_sf_fact(powerKey[j]);
     }
 }
 
-std::vector< std::vector<double> > Differentiator::SetupInPoints(const MVector<double>& inPoint) const
+std::vector< std::vector<double> > Differentiator::SetupInPoints(const MAUS::Vector<double>& inPoint) const
 {
     std::vector< std::vector<double> > inVector( _diffKey.size() );
 
@@ -37,9 +41,9 @@ std::vector< std::vector<double> > Differentiator::SetupInPoints(const MVector<d
     return inVector;
 }
 
-MMatrix<double> Differentiator::SetupMatrixIn(std::vector< std::vector<double> > inVector, const MVector<double>& inPoint) const
+MAUS::Matrix<double> Differentiator::SetupMatrixIn(std::vector< std::vector<double> > inVector, const MAUS::Vector<double>& inPoint) const
 {
-    MMatrix<double> matrixIn(_diffKey.size(), _diffKey.size(), 0.);
+    MAUS::Matrix<double> matrixIn(_diffKey.size(), _diffKey.size(), 0.);
 
     for(unsigned int i=0; i<_diffKey.size(); i++)
     {
@@ -56,9 +60,9 @@ MMatrix<double> Differentiator::SetupMatrixIn(std::vector< std::vector<double> >
 }
 
 
-MMatrix<double> Differentiator::SetupMatrixOut(std::vector< std::vector<double> > inVector) const
+MAUS::Matrix<double> Differentiator::SetupMatrixOut(std::vector< std::vector<double> > inVector) const
 {
-    MMatrix<double> matrixOut(_diffKey.size(), _y->ValueDimension(), 0.);
+    MAUS::Matrix<double> matrixOut(_diffKey.size(), _y->ValueDimension(), 0.);
 
     double* out = new double[_y->ValueDimension()];
     for(unsigned int i=0; i<_diffKey.size(); i++)
@@ -71,14 +75,14 @@ MMatrix<double> Differentiator::SetupMatrixOut(std::vector< std::vector<double> 
     return matrixOut;
 }
 
-MMatrix<double> Differentiator::PolynomialMap(const MVector<double>& inPoint) const
+MAUS::Matrix<double> Differentiator::PolynomialMap(const MAUS::Vector<double>& inPoint) const
 {
-    MVector<double> zero(PointDimension(), 0);
+    MAUS::Vector<double> zero(PointDimension(), 0);
     std::vector< std::vector<double> > inVec = SetupInPoints (inPoint);
-    MMatrix<double>                    in    = SetupMatrixIn (inVec, zero);
-    MMatrix<double>                    out   = SetupMatrixOut(inVec);
+    MAUS::Matrix<double>                    in    = SetupMatrixIn (inVec, zero);
+    MAUS::Matrix<double>                    out   = SetupMatrixOut(inVec);
 //    for(int i=0; i<inVec.size(); i++) { for(int j=0; j<inVec[i].size(); j++) std::cout << std::setw(12) << inVec[i][j] << " "; std::cout << std::endl;} 
-    MMatrix<double> outMap = out.T() * in.inverse();
+    MAUS::Matrix<double> outMap = transpose(out) * inverse(in);
 /*
     std::cout << "InPoints" << std::endl;
     for(unsigned int i=0; i<inVec.size(); i++) { for(unsigned int j=0; j<inVec[i].size(); j++) std::cout << inVec[i][j] << " "; std::cout << std::endl;}
@@ -88,14 +92,14 @@ MMatrix<double> Differentiator::PolynomialMap(const MVector<double>& inPoint) co
     return outMap;
 }
 
-MMatrix<double> Differentiator::CentredPolynomialMap(const MVector<double>& inPoint) const
+MAUS::Matrix<double> Differentiator::CentredPolynomialMap(const MAUS::Vector<double>& inPoint) const
 {
-    MVector<double> zero(PointDimension(), 0);
+    MAUS::Vector<double> zero(PointDimension(), 0);
     std::vector< std::vector<double> > inVec = SetupInPoints (inPoint);
 
-    MMatrix<double>                   in    = SetupMatrixIn (inVec, inPoint);
-    MMatrix<double>                   out   = SetupMatrixOut(inVec);
-    MMatrix<double> outMap = out.T() * in.inverse();
+    MAUS::Matrix<double>                   in    = SetupMatrixIn (inVec, inPoint);
+    MAUS::Matrix<double>                   out   = SetupMatrixOut(inVec);
+    MAUS::Matrix<double> outMap = transpose(out) * inverse(in);
 
     return outMap;
 }
@@ -103,20 +107,20 @@ MMatrix<double> Differentiator::CentredPolynomialMap(const MVector<double>& inPo
 
 void Differentiator::F(const double*    point, double* value) const
 {
-    MVector<double> pHep(PointDimension(),0);
+    MAUS::Vector<double> pHep(PointDimension(),0);
     for(int i=0; i<int(PointDimension()); i++) pHep(i+1) = point[i];
-    MMatrix<double> diffs(_y->ValueDimension(), _diffKey.size());
+    MAUS::Matrix<double> diffs(_y->ValueDimension(), _diffKey.size());
     F  (pHep, diffs);
     int index = -1;
-    for(size_t i=0; i<diffs.num_row(); i++)
-        for(size_t j=0; j<diffs.num_col(); j++)
+    for(size_t i=0; i<diffs.number_of_rows(); i++)
+        for(size_t j=0; j<diffs.number_of_columns(); j++)
             value[++index] = diffs(i+1,j+1);
 }
 
-void Differentiator::F(const MVector<double>& point, MMatrix<double>& differentials) const
+void Differentiator::F(const MAUS::Vector<double>& point, MAUS::Matrix<double>& differentials) const
 {
     //Fit a polynomial around point
-    MMatrix<double> map = CentredPolynomialMap(point);
+    MAUS::Matrix<double> map = CentredPolynomialMap(point);
     //d^p y_j/dx^p = p_1! p_2!... p_n! a_{pj}
     //where x^p is shorthand for x_1^{p_1} x_2^{p_2}...x_n^{p_n} etc
     for(unsigned int i=0; i<NumberOfDiffRows(); i++)
@@ -129,14 +133,14 @@ void Differentiator::F(const MVector<double>& point, MMatrix<double>& differenti
     }
 }
 
-G4MICE::PolynomialVector* Differentiator::PolynomialFromDifferentials(const MVector<double>& point) const
+MAUS::PolynomialVector* Differentiator::PolynomialFromDifferentials(const MAUS::Vector<double>& point) const
 {
-    return new G4MICE::PolynomialVector(_inSize, PolynomialMap(point) );
+    return new MAUS::PolynomialVector(_inSize, PolynomialMap(point) );
 }
 
-G4MICE::PolynomialVector* Differentiator::PolynomialFromDifferentials(double* point) const
+MAUS::PolynomialVector* Differentiator::PolynomialFromDifferentials(double* point) const
 {
-    MVector<double> pointHep(PointDimension());
+    MAUS::Vector<double> pointHep(PointDimension());
     for(int i=0; i<int(PointDimension()); i++) pointHep(i+1) = point[i];
     return PolynomialFromDifferentials(pointHep);
 }
@@ -155,8 +159,8 @@ PolynomialInterpolator::PolynomialInterpolator(Mesh* mesh, VectorMap* F, int dif
     : _mesh(mesh), _func(F), _differentialOrder(differentialOrder), _totalOrder(interpolationOrder+differentialOrder), 
       _inSize(F->PointDimension()), _outSize(F->ValueDimension()), _delta(delta), _magnitude(magnitude), _muIndex(), _alphaIndex(), _taylorCoefficient()
 {
-    for(unsigned int i=0; i<NumberOfDiffIndices(); i++) _muIndex.   push_back(G4MICE::PolynomialVector::IndexByPower(i, _inSize)); //index of differentials at each point
-    for(unsigned int i=0; i<NumberOfIndices();     i++) _alphaIndex.push_back(G4MICE::PolynomialVector::IndexByPower(i, _inSize)); //index of polynomials at each interpolation
+    for(unsigned int i=0; i<NumberOfDiffIndices(); i++) _muIndex.   push_back(MAUS::PolynomialVector::IndexByPower(i, _inSize)); //index of differentials at each point
+    for(unsigned int i=0; i<NumberOfIndices();     i++) _alphaIndex.push_back(MAUS::PolynomialVector::IndexByPower(i, _inSize)); //index of polynomials at each interpolation
     for(unsigned int i=0; i<_muIndex.size(); i++)
     {
         _taylorCoefficient.push_back(std::vector<double>(_alphaIndex.size(), 1));
@@ -175,7 +179,7 @@ PolynomialInterpolator::PolynomialInterpolator(Mesh* mesh, VectorMap* F, int dif
 PolynomialInterpolator* PolynomialInterpolator::Clone()       const
 {
     PolynomialInterpolator * clone =  new PolynomialInterpolator(*this);
-    clone->_points = new G4MICE::PolynomialVector*[_mesh->End().ToInteger()];
+    clone->_points = new MAUS::PolynomialVector*[_mesh->End().ToInteger()];
     for(int i=0; i<_mesh->End().ToInteger(); i++) clone->_points[i] = _points[i]->Clone(); 
     _meshCounter[clone] = _mesh;
     return clone;
@@ -201,7 +205,7 @@ PolynomialInterpolator::~PolynomialInterpolator()
 void PolynomialInterpolator::BuildFixedMeshPolynomials(VectorMap* F)
 {
     Differentiator*    diff     = new Differentiator(F, _delta, _magnitude);
-    _points     = new G4MICE::PolynomialVector*[_mesh->End().ToInteger()];
+    _points     = new MAUS::PolynomialVector*[_mesh->End().ToInteger()];
     for(Mesh::Iterator it=_mesh->Begin(); it<_mesh->End(); it++)
     {
         _points[it.ToInteger()] = PolynomialFromDiffs(it, diff);
@@ -214,7 +218,7 @@ void PolynomialInterpolator::F(const double* point, double* value) const
     Mesh::Iterator      it  = _mesh->Nearest(point);
     std::vector<double> pos = it.Position();
     for(unsigned int i=0; i<PointDimension(); i++) pos[i] = point[i] - pos[i];
-    G4MICE::PolynomialVector* vecP = _points[it.ToInteger()];
+    MAUS::PolynomialVector* vecP = _points[it.ToInteger()];
     vecP->F(&pos[0], value);
 }
 
@@ -250,21 +254,21 @@ bool PolynomialInterpolator::M1_LT_M2(const Mesh::Iterator& m1, const Mesh::Iter
     return dist < 0;
 }
 
-G4MICE::PolynomialVector* PolynomialInterpolator::PolynomialFromDiffs(Mesh::Iterator dualPoint, Differentiator* diff)
+MAUS::PolynomialVector* PolynomialInterpolator::PolynomialFromDiffs(Mesh::Iterator dualPoint, Differentiator* diff)
 {
     std::vector< Mesh::Iterator > points = GetFixedMeshPoints(dualPoint, _muIndex.size());
-    MMatrix<double> X = GetX(points);
-    MMatrix<double> D = GetD(points, diff);
-    MMatrix<double> A = D.T()*X.inverse();
+    MAUS::Matrix<double> X = GetX(points);
+    MAUS::Matrix<double> D = GetD(points, diff);
+    MAUS::Matrix<double> A = transpose(D) * inverse(X);
 
-    return new G4MICE::PolynomialVector(_inSize, A );
+    return new MAUS::PolynomialVector(_inSize, A );
 }
 
-MMatrix<double> PolynomialInterpolator::GetX(std::vector< Mesh::Iterator> points )
+MAUS::Matrix<double> PolynomialInterpolator::GetX(std::vector< Mesh::Iterator> points )
 {
     int size( NumberOfIndices() );
 //    std::cout << size << std::endl;
-    MMatrix<double> X(size, size, 0.);
+    MAUS::Matrix<double> X(size, size, 0.);
     int gamma = -1;
 
     for(int nu=0; nu<int(NumberOfPoints()) && gamma < size; nu++)
@@ -298,12 +302,12 @@ MMatrix<double> PolynomialInterpolator::GetX(std::vector< Mesh::Iterator> points
     return X;
 }
 
-MMatrix<double> PolynomialInterpolator::GetD(std::vector< Mesh::Iterator> points, Differentiator* diff)
+MAUS::Matrix<double> PolynomialInterpolator::GetD(std::vector< Mesh::Iterator> points, Differentiator* diff)
 {
     int size( NumberOfIndices() );
-    MMatrix<double> Delta(size, _outSize, 0.);
-    MMatrix<double> Diffs(_outSize, diff->NumberOfDiffRows(), 0.);
-    MVector<double> Pos  (_inSize, 0);
+    MAUS::Matrix<double> Delta(size, _outSize, 0.);
+    MAUS::Matrix<double> Diffs(_outSize, diff->NumberOfDiffRows(), 0.);
+    MAUS::Vector<double> Pos  (_inSize, 0);
     int gamma = 0;
     for(unsigned int nu=0; nu<NumberOfPoints() && gamma < size; nu++)
     {

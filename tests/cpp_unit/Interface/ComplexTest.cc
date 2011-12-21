@@ -22,7 +22,7 @@
 
 #include "gtest/gtest.h"
 
-#include "Interface/Complex.hh"
+#include "Maths/Complex.hh"
 
 using namespace MAUS;
 

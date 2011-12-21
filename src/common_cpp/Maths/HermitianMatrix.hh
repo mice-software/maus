@@ -17,17 +17,17 @@
 /* Author: Peter Lane
  */
 
-#ifndef _SRC_COMMON_CPP_MATHS_HERMITIAN_MATRIX_HH_
-#define _SRC_COMMON_CPP_MATHS_HERMITIAN_MATRIX_HH_
+#ifndef COMMON_CPP_MATHS_HERMITIAN_MATRIX_HH_
+#define COMMON_CPP_MATHS_HERMITIAN_MATRIX_HH_
 
 #include <iostream>
 #include <vector>
 #include <utility>
 
-#include "Interface/Complex.hh"
 #include "Interface/Squeal.hh"
-#include "Interface/Vector.hh"
-#include "Interface/Matrix.hh"
+#include "Maths/Complex.hh"
+#include "Maths/Vector.hh"
+#include "Maths/Matrix.hh"
 
 namespace MAUS {
 // *************************

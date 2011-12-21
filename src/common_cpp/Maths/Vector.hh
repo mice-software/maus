@@ -38,8 +38,8 @@
  * like real() and complex() to convert between types first.
  */
 
-#ifndef _SRC_LEGACY_INTERFACE_VECTOR_HH_
-#define _SRC_LEGACY_INTERFACE_VECTOR_HH_
+#ifndef COMMON_CPP_MATHS_VECTOR_HH
+#define COMMON_CPP_MATHS_VECTOR_HH
 
 #include <iostream>
 #include <memory>
@@ -50,7 +50,11 @@
 #include "gsl/gsl_vector_complex_double.h"
 
 #include "Interface/Squeal.hh"
-#include "Interface/Complex.hh"
+#include "Maths/Complex.hh"
+
+namespace CLHEP {
+class HepVector;
+}
 
 namespace MAUS {
 // *************************
@@ -76,8 +80,15 @@ class VectorBase {
   // *************************
   VectorBase();
   VectorBase(const VectorBase<StdType, GslType>& original_instance);
+
+  /** @brief Copy constructor for CLHEP::HepMatrix
+   */
+  explicit VectorBase(const ::CLHEP::HepVector& hep_vector);
+
   explicit VectorBase(const size_t i);
+
   VectorBase(const size_t i, const StdType  value);
+
   /** @brief Create an instance from an array of data. The size is the number
    *         of elements in the array.
    */
@@ -191,6 +202,10 @@ class VectorBase {
 
 // These are put here instead of Vector.cc to maintain the order of
 // function definitions.
+template <> VectorBase<double, gsl_vector>::VectorBase(
+    const ::CLHEP::HepVector& hep_vector);
+template <> VectorBase<complex, gsl_vector_complex>::VectorBase(
+    const ::CLHEP::HepVector& hep_matrix);
 template <>
 VectorBase<double, gsl_vector>& VectorBase<double, gsl_vector>::operator=(
   const VectorBase<double, gsl_vector>& rhs);
@@ -219,8 +234,10 @@ class Vector<double> :  public VectorBase<double, gsl_vector> {
   // *** VectorBase functions ***
 
   Vector() : VectorBase<double, gsl_vector>() {}
+  explicit Vector(const ::CLHEP::HepVector& hep_vector)
+      : VectorBase<double, gsl_vector>(hep_vector) {}
   Vector(size_t i, double  value)
-      : VectorBase<double, gsl_vector>(i, value) { }
+      : VectorBase<double, gsl_vector>(i, value) {}
   explicit Vector(size_t i) : VectorBase<double, gsl_vector>(i) {}
   Vector(const double* data, const size_t size)
       : VectorBase<double, gsl_vector>(data, size) {}
@@ -249,6 +266,8 @@ class Vector<complex> : public VectorBase<complex, gsl_vector_complex> {
   // *** VectorBase functions ***
 
   Vector() : VectorBase<complex, gsl_vector_complex>() {}
+  explicit Vector(const ::CLHEP::HepVector& hep_vector)
+      : VectorBase<complex, gsl_vector_complex>(hep_vector) {}
   Vector(size_t i, complex  value)
       : VectorBase<complex, gsl_vector_complex>(i, value) {}
   explicit Vector(size_t i) : VectorBase<complex, gsl_vector_complex>(i) {}

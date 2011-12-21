@@ -31,8 +31,8 @@
  *    name (which presumably stood for MAUS).
  */
 
-#ifndef _SRC_COMMON_CPP_MATHS_MATRIX_HH_
-#define _SRC_COMMON_CPP_MATHS_MATRIX_HH_
+#ifndef COMMON_CPP_MATHS_MATRIX_HH_
+#define COMMON_CPP_MATHS_MATRIX_HH_
 
 #include <iostream>
 #include <vector>
@@ -41,9 +41,9 @@
 #include "gsl/gsl_matrix.h"
 #include "gsl/gsl_blas.h"
 
-#include "Interface/Complex.hh"
 #include "Interface/Squeal.hh"
-#include "Interface/Vector.hh"
+#include "Maths/Complex.hh"
+#include "Maths/Vector.hh"
 
 namespace CLHEP {
 class HepMatrix;

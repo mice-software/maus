@@ -1,132 +1,12 @@
 #include "TransferMap.hh"
 
-#include "CLHEP/Units/PhysicalConstants.h"
-
-#include "Interface/PolynomialVector.hh"
-#include "CovarianceMatrix.hh"
-#include "PhaseSpaceVector.hh"
-
-namespace MAUS
-{
-
-//##############################
-// TransferMap public
-//##############################
-
-//******************************
-// Constructors
-//******************************
-
-TransferMap::TransferMap(const PolynomialVector& polynomial,
-                         const PhaseSpaceVector& reference_trajectory_in,
-                         const PhaseSpaceVector& reference_trajectory_out)
-	: polynomial_(polynomial), reference_trajectory_in_(reference_trajectory_in),
-		reference_trajectory_out_(reference_trajectory_out)
-{ }
-
-TransferMap::TransferMap(const PolynomialVector& polynomial,
-                         const PhaseSpaceVector& reference_trajectory)
-	: polynomial_(polynomial), reference_trajectory_in_(reference_trajectory),
-		reference_trajectory_out_(reference_trajectory)
-{ }
-
-TransferMap::TransferMap(const TransferMap& original_instance)
-	: polynomial_(original_instance.polynomial_),
-		reference_trajectory_in_(original_instance.reference_trajectory_in_),
-		reference_trajectory_out_(original_instance.reference_trajectory_out_)
-{ }
-
-/**
- *  Name: operator*(CovarianceMatrix const &)
- */
-CovarianceMatrix TransferMap::operator*(const CovarianceMatrix& covariances)
-	const
-{
-	CovarianceMatrix transformed_covariances;
-
-	Matrix<double> transfer_matrix = CreateTransferMatrix();
-
-	Matrix<double> transfer_matrix_transpose = transpose(transfer_matrix);
-	
-	transformed_covariances
-		= transfer_matrix * covariances * transfer_matrix_transpose;
-
-  return transformed_covariances;
-}
-
-/**
- *  Name: operator*(PhaseSpaceVector const &)
- */
-PhaseSpaceVector TransferMap::operator*(const PhaseSpaceVector& input_vector)
-	const
-{
-  //subtract off the input reference trajectory to obtain phase space delta
-  Vector<double> phase_space_delta(input_vector - reference_trajectory_in_);
-
-  //operate on the phase space delta with the polynomial map 
-  Vector<double> transformed_delta;
-  polynomial_.F(phase_space_delta, transformed_delta);
-
-  //add the transformed phase space delta to the output reference trajectory
-  PhaseSpaceVector output_vector
-    = reference_trajectory_out_ + transformed_delta;
-
-  return output_vector;
-}
-
-//******************************
-// First-order Map Functions
-//******************************
-
-Matrix<double> TransferMap::CreateTransferMatrix() const
-{
-  return polynomial_.GetCoefficientsAsMatrix().submatrix(1,6,2,6);
-}
-
-//##############################
-// Free Functions
-//##############################
-
-//******************************
-// Streaming
-//******************************
-
-std::ostream& operator<<(std::ostream& out, const TransferMap& tm)
-{
-  out	<< "Incomming Reference Trajectory: "
-		  << tm.reference_trajectory_in_ << std::endl
-			<< tm.reference_trajectory_out_ << std::endl
-			<< tm.polynomial_ << std::endl;
-
-  return out;
-}
-
-} //namespace MAUS
-
-
-
-
-
-
-
-
-
-
-
-
-
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// Legacy TransferMap
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#include "TransferMap.hh"
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_eigen.h>
-
-#include "src/legacy/Interface/MMatrixToCLHEP.hh"
+#include "CLHEP/Matrix/Matrix.h"
 
 int          TransferMap::_order  = 1;
 
-TransferMap::TransferMap(HepMatrix firstOrderMap, PhaseSpaceVector referenceIn, PhaseSpaceVector referenceOut,
+TransferMap::TransferMap(CLHEP::HepMatrix firstOrderMap, PhaseSpaceVector referenceIn, PhaseSpaceVector referenceOut,
                          OpticsModel* Optics)
 	   : _secondOrderMap(6,6,6,0), _referenceTrajectoryIn(referenceIn), _referenceTrajectoryOut(referenceOut), 
              _optics(Optics), _polynomial(NULL), _canonicalMap(true)
@@ -134,7 +14,7 @@ TransferMap::TransferMap(HepMatrix firstOrderMap, PhaseSpaceVector referenceIn, 
 	SetFirstOrderMap(firstOrderMap);
 }
 
-TransferMap::TransferMap(HepMatrix transverseMap, HepMatrix longitudinalMap, PhaseSpaceVector referenceIn, 
+TransferMap::TransferMap(CLHEP::HepMatrix transverseMap, CLHEP::HepMatrix longitudinalMap, PhaseSpaceVector referenceIn, 
                          PhaseSpaceVector referenceOut, OpticsModel* Optics)
 	   : _secondOrderMap(6,6,6,0), _referenceTrajectoryIn(referenceIn), _referenceTrajectoryOut(referenceOut), 
              _optics(Optics), _polynomial(NULL), _canonicalMap(true)
@@ -146,12 +26,12 @@ TransferMap::TransferMap(PhaseSpaceVector referenceIn, OpticsModel* Optics)
 	   : _secondOrderMap(6,6,6,0), _referenceTrajectoryIn(referenceIn), _referenceTrajectoryOut(referenceIn), 
              _optics(Optics), _polynomial(NULL), _canonicalMap(true)
 {
-	SetFirstOrderMap(HepMatrix(6,6,1));
+	SetFirstOrderMap(CLHEP::HepMatrix(6,6,1));
 }
 
 TransferMap::TransferMap() : _optics(NULL)
 {
-	SetFirstOrderMap(HepMatrix(6,6,0));
+	SetFirstOrderMap(CLHEP::HepMatrix(6,6,0));
 }
 
 /*
@@ -178,20 +58,20 @@ TransferMap::TransferMap() : _optics(NULL)
   }
 */
 
-void TransferMap::SetFirstOrderMap(HepMatrix transverseMap, HepMatrix longitudinalMap)
+void TransferMap::SetFirstOrderMap(CLHEP::HepMatrix transverseMap, CLHEP::HepMatrix longitudinalMap)
 {
 	_firstOrderMap = dsum(longitudinalMap, transverseMap);
 }
 
-void TransferMap::SetFirstOrderMap(HepMatrix firstOrderMap)
+void TransferMap::SetFirstOrderMap(CLHEP::HepMatrix firstOrderMap)
 {
 	_firstOrderMap = firstOrderMap;
 }
 
-HepMatrix TransferMap::GetFirstOrderMap() const
+CLHEP::HepMatrix TransferMap::GetFirstOrderMap() const
 {
 	if(_polynomial!=NULL) {
-    return MMatrix_to_CLHEP( _polynomial->GetCoefficientsAsMatrix().sub(1,6,2,7) );
+    return MAUS::CLHEP::HepMatrix(_polynomial->GetCoefficientsAsMatrix().submatrix(1,6,2,7));
   }
 	return _firstOrderMap;
 }
@@ -215,9 +95,9 @@ PhaseSpaceVector TransferMap::operator*(const PhaseSpaceVector& aPhaseSpaceVecto
 {
 	if(_polynomial)
 	{
-		MVector<double> vec = CLHEP_to_MVector(aPhaseSpaceVector.getSixVector());
+		MAUS::Vector<double> vec(aPhaseSpaceVector.getSixVector());
 		_polynomial->F(vec, vec);
-		vec += CLHEP_to_MVector(_referenceTrajectoryOut.getSixVector());
+		vec += MAUS::Vector<double>(_referenceTrajectoryOut.getSixVector());
 		PhaseSpaceVector out(_referenceTrajectoryOut.z(), _referenceTrajectoryIn.m());
 	}
 	
@@ -258,7 +138,7 @@ Tensor  TransferMap::GetMap(int order)    const
 
 TransferMap TransferMap::operator*(const TransferMap& aTransferMap) const
 {
-	HepMatrix firstOrderMap = _firstOrderMap*aTransferMap.GetFirstOrderMap();
+	CLHEP::HepMatrix firstOrderMap = _firstOrderMap*aTransferMap.GetFirstOrderMap();
 	return TransferMap(firstOrderMap, aTransferMap.GetReferenceIn(), _referenceTrajectoryOut, _optics);
 }
 
@@ -292,7 +172,7 @@ std::ostream& operator<<(std::ostream& out, TransferMap tm)
 
 TransferMap TransferMap::Rotate(double angle) const
 {
-	HepMatrix rotation = CovarianceMatrix::Rotation(angle);
+	CLHEP::HepMatrix rotation = CovarianceMatrix::Rotation(angle);
 	TransferMap rotated(*this);
 	rotated.SetFirstOrderMap(GetFirstOrderMap()*rotation);
 	return rotated;
@@ -306,7 +186,7 @@ CovarianceMatrix TransferMap::Decompose(double em_t, double em_x, double em_y) c
 
 	for(int i=0; i<3; i++)
 	{
-		HepMatrix sub   = GetFirstOrderMap().sub(i*2+1, i*2+2, i*2+1, i*2+2);
+		CLHEP::HepMatrix sub   = GetFirstOrderMap().sub(i*2+1, i*2+2, i*2+1, i*2+2);
 		double    sinmu = sub[0][1]/fabs(sub[0][1])*fabs(sin( acos( (sub[0][0]+sub[1][1])/2. ) ));
 		beta[i]         = refP * sub[0][1]/sinmu;
 		alpha[i]        = (sub[0][0] - sub[1][1])/(2.*sinmu);
@@ -349,7 +229,7 @@ std::vector<CovarianceMatrix> TransferMap::Decompose(double sxx, double sxp, dou
 	double em[3] = {em_t, em_x, em_y};
 	for(int a=0; a<3; a++)
 	{
-		HepMatrix sub    = GetFirstOrderMap().sub(a*2+1, a*2+2, a*2+1, a*2+2);
+		CLHEP::HepMatrix sub    = GetFirstOrderMap().sub(a*2+1, a*2+2, a*2+1, a*2+2);
 		double p         = sub[0][0];
 		double q         = sub[1][1];
 		double r         = sub[0][1];
@@ -411,7 +291,7 @@ double TransferMap::PhaseAdvance(int axis, double angle) const
 
 double TransferMap::PhaseAdvance(int axis) const
 {
-	HepMatrix subMatrix     = GetFirstOrderMap().sub(axis*2+1, axis*2+2, axis*2+1, axis*2+2);
+	CLHEP::HepMatrix subMatrix = GetFirstOrderMap().sub(axis*2+1, axis*2+2, axis*2+1, axis*2+2);
 	double    phaseAdvance = acos( (subMatrix[0][0] + subMatrix[1][1])/2. ) ;
 	if(phaseAdvance != phaseAdvance) throw(Squeal(Squeal::recoverable, "Complex phase advance", "TransferMap::PhaseAdvance")); 
 	return    phaseAdvance;

@@ -21,9 +21,8 @@
 
 #include "gtest/gtest.h"
 
-#include "Interface/Complex.hh"
-#include "Interface/MMatrix.hh"
-#include "Interface/Vector.hh"
+#include "Maths/Complex.hh"
+#include "Maths/Vector.hh"
 
 using namespace MAUS;
 

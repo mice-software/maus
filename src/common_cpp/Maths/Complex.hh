@@ -31,76 +31,76 @@
  * namespace would also clash).
  */
 
-#ifndef Complex_hh
-#define Complex_hh
+#ifndef COMMON_CPP_MATHS_COMPLEX_HH
+#define COMMON_CPP_MATHS_COMPLEX_HH
+
+#include <iostream>
 
 #include "gsl/gsl_complex_math.h"
 
 namespace MAUS {
-  typedef gsl_complex complex;
+typedef gsl_complex complex;
 
-  // ************************
-  //  Construction Functions
-  // ************************
-  namespace Complex {
-    MAUS::complex complex(const MAUS::complex& original_instance);
-    MAUS::complex complex(const double& real);
-    MAUS::complex complex(const double& real, const double& imag);
-  }  // namespace MAUS::Complex
-  const MAUS::complex polar(const double& r, const double& theta);
+// ************************
+//  Construction Functions
+// ************************
+namespace Complex {
+MAUS::complex complex(const MAUS::complex& original_instance);
+MAUS::complex complex(const double& real);
+MAUS::complex complex(const double& real, const double& imag);
+}  // namespace MAUS::Complex
+const MAUS::complex polar(const double& r, const double& theta);
 
-  // **********************
-  //  Property Functions
-  // **********************
+// **********************
+//  Property Functions
+// **********************
 
-  const double real(const MAUS::complex& c);
-  const double imag(const MAUS::complex& c);
-  const double abs(const MAUS::complex& c);
-  const double abs2(const MAUS::complex& c);
-  const double arg(const MAUS::complex& c);
-  const double norm(const MAUS::complex& c);
-  const double norm2(const MAUS::complex& c);
-  MAUS::complex conj(const MAUS::complex& c);
+const double real(const MAUS::complex& c);
+const double imag(const MAUS::complex& c);
+const double abs(const MAUS::complex& c);
+const double abs2(const MAUS::complex& c);
+const double arg(const MAUS::complex& c);
+const double norm(const MAUS::complex& c);
+const double norm2(const MAUS::complex& c);
+MAUS::complex conj(const MAUS::complex& c);
 
-  // **********************
-  //  Elementary Functions
-  // **********************
+// **********************
+//  Elementary Functions
+// **********************
 
-  MAUS::complex exp(const MAUS::complex& z);
-  MAUS::complex log(const MAUS::complex& z);
-  MAUS::complex log10(const MAUS::complex& z);
-  MAUS::complex pow(const MAUS::complex& z, const MAUS::complex& a);
-  MAUS::complex pow(const MAUS::complex& z, const double& x);
-  MAUS::complex sqrt(const MAUS::complex& z);
-  MAUS::complex sqrt(const double& x);
+MAUS::complex exp(const MAUS::complex& z);
+MAUS::complex log(const MAUS::complex& z);
+MAUS::complex log10(const MAUS::complex& z);
+MAUS::complex pow(const MAUS::complex& z, const MAUS::complex& a);
+MAUS::complex pow(const MAUS::complex& z, const double& x);
+MAUS::complex sqrt(const MAUS::complex& z);
+MAUS::complex sqrt(const double& x);
 
-  // **********************
-  //  Trig Functions
-  // **********************
+// **********************
+//  Trig Functions
+// **********************
 
-  MAUS::complex sin(const MAUS::complex& c);
-  MAUS::complex cos(const MAUS::complex& c);
-  MAUS::complex tan(const MAUS::complex& c);
-  MAUS::complex csc(const MAUS::complex& c);
-  MAUS::complex sec(const MAUS::complex& c);
-  MAUS::complex cot(const MAUS::complex& c);
+MAUS::complex sin(const MAUS::complex& c);
+MAUS::complex cos(const MAUS::complex& c);
+MAUS::complex tan(const MAUS::complex& c);
+MAUS::complex csc(const MAUS::complex& c);
+MAUS::complex sec(const MAUS::complex& c);
+MAUS::complex cot(const MAUS::complex& c);
 
-  // ************************
-  // TODO(plane1@iit.edu): Inverse Trig Functions
-  // ************************
+// ************************
+// TODO(plane1@iit.edu): Inverse Trig Functions
+// ************************
 
-  // **********************
-  //  Hyperbolic Functions
-  // **********************
+// **********************
+//  Hyperbolic Functions
+// **********************
 
-  MAUS::complex sinh(const MAUS::complex& c);
-  MAUS::complex cosh(const MAUS::complex& c);
-  MAUS::complex tanh(const MAUS::complex& c);
-  MAUS::complex csch(const MAUS::complex& c);
-  MAUS::complex sech(const MAUS::complex& c);
-  MAUS::complex coth(const MAUS::complex& c);
-
-}  // namespace MAUS
+MAUS::complex sinh(const MAUS::complex& c);
+MAUS::complex cosh(const MAUS::complex& c);
+MAUS::complex tanh(const MAUS::complex& c);
+MAUS::complex csch(const MAUS::complex& c);
+MAUS::complex sech(const MAUS::complex& c);
+MAUS::complex coth(const MAUS::complex& c);
 
 // ******************************
 // TODO(plane1@iit.edu): Inverse Hyperbolic Functions
@@ -176,5 +176,6 @@ const bool operator!=(const double&                  lhs,
 
 std::ostream& operator<<(std::ostream& out, const MAUS::complex& c);
 std::istream& operator>>(std::istream& in,  MAUS::complex& c);
+}  // namespace MAUS
 
 #endif

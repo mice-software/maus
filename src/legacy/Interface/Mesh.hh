@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <math.h>
 
-#include "Interface/MVector.hh"
+#include "Maths/Vector.hh"
 
 //
 //Mesh is a set of classes to describe a grid of points in various dimensions etc
@@ -416,8 +416,8 @@ public:
 
     inline void    LowerBound      (const std::vector<double>& pos, std::vector<int>& xIndex) const
     {xIndex = std::vector<int>(pos.size()); for(unsigned int i=0; i<pos.size(); i++) coordLowerBound(pos[i], i, xIndex[i]);}
-    inline void    LowerBound      (const MVector<double>& pos,    std::vector<int>& xIndex) const
-    {xIndex = std::vector<int>(pos.num_row()); for(size_t i=0; i<pos.num_row(); i++) coordLowerBound(pos(i+1), i, xIndex[i]);}
+    inline void    LowerBound      (const MAUS::Vector<double>& pos,    std::vector<int>& xIndex) const
+    {xIndex = std::vector<int>(pos.size()); for(size_t i=0; i<pos.size(); i++) coordLowerBound(pos(i+1), i, xIndex[i]);}
     inline double  Min             (const int& dimension) const {return _coord[dimension][0];}
     inline double  Max             (const int& dimension) const {return _coord[dimension][_coord[dimension].size()-1];}
 

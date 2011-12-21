@@ -17,9 +17,13 @@
 #include "src/legacy/Interface/SpecialHit.hh"
 #include "src/legacy/Interface/MiceEventManager.hh"
 #include "src/legacy/Optics/TransferMap.hh"
-#include "src/legacy/Interface/MMatrixToCLHEP.hh"
+#include "Maths/Complex.hh"
 
-using namespace MAUS;
+using MAUS::Matrix;
+using MAUS::Vector;
+using MAUS::MAUSGeant4Manager;
+using MAUS::MAUSPrimaryGeneratorAction;
+using MAUS::operator*;
 
 void  writeEvent() {throw Squeal(Squeal::recoverable, "Not implemented", "writeEvent()");}
 std::vector<MICEEvent*> ReadLoop( std::string filename, std::vector<std::string> classesToProcess ) 
@@ -308,10 +312,10 @@ void DoPolyfit(const Function& func, const MiceModule& mod)
 	::TransferMap tm = TransferMapCalculator::GetSweepingPolynomialTransferMap(&func, order, chi2Max, delta, deltaMax, deltaFactor, maxNumberOfSteps, g_mean, g_mean);
   Squeak::mout(Squeak::info) << "Found polynomial fit at order " << tm.GetOrder() << " with valid region ";
   for(int i=1; i<=delta.num_row(); i++) Squeak::mout(Squeak::info) << delta(i) << " ";
-  MVector<m_complex> eig = CLHEP_to_MMatrix(tm.GetFirstOrderMap()).eigenvalues();
+  Vector<MAUS::complex> eig = eigenvalues(Matrix<double>(tm.GetFirstOrderMap()));
   Squeak::mout(Squeak::info)  << std::endl; 
   Squeak::mout(Squeak::debug) << "Eigenvalue modulus: ";
-  for(size_t i=1; i<=eig.num_row(); i++) Squeak::mout(Squeak::debug) << real(eig(i)*conj(eig(i))) << " ";
+  for(size_t i=1; i<=eig.size(); i++) Squeak::mout(Squeak::debug) << MAUS::real(eig(i) * MAUS::conj(eig(i))) << " ";
   Squeak::mout(Squeak::debug) << " determinant: " << tm.GetFirstOrderMap().determinant() << "\nMap:";
   Squeak::mout(Squeak::debug) << tm << std::endl; 
 }

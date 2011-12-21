@@ -17,18 +17,20 @@
 /* Author: Peter Lane
  */
 
+#include "Maths/Vector.hh"
+
 #include <stdio.h>
 
 #include <complex>
 #include <vector>
 #include <iostream>
 
+#include "CLHEP/Matrix/Vector.h"
 #include "gsl/gsl_complex_math.h"
 #include "gsl/gsl_vector.h"
 #include "gsl/gsl_vector_complex_double.h"
 
-#include "Interface/Complex.hh"
-#include "Interface/Vector.hh"
+#include "Maths/Complex.hh"
 
 namespace MAUS {
 
@@ -55,6 +57,28 @@ template VectorBase<double, gsl_vector>::VectorBase(
   const VectorBase<double, gsl_vector>& original_instance);
 template VectorBase<complex, gsl_vector_complex>::VectorBase(
   const VectorBase<complex, gsl_vector_complex>& original_instance);
+
+template <>
+VectorBase<double, gsl_vector>::VectorBase(
+  const ::CLHEP::HepVector& hep_vector) : vector_(NULL) {
+  size_t size = hep_vector.num_row();
+
+  build_vector(size);
+  for (size_t index = 1; index <= size; ++index) {
+    (*this)(index) = hep_vector(index);
+  }
+}
+
+template <>
+VectorBase<complex, gsl_vector_complex>::VectorBase(
+  const ::CLHEP::HepVector& hep_vector) : vector_(NULL) {
+  size_t size = hep_vector.num_row();
+
+  build_vector(size);
+  for (size_t index = 1; index <= size; ++index) {
+    (*this)(index) = MAUS::Complex::complex(hep_vector(index));
+  }
+}
 
 template <typename StdType, typename GslType>
 VectorBase<StdType, GslType>::VectorBase(const size_t i) : vector_(NULL) {
@@ -428,17 +452,15 @@ VectorBase<complex, gsl_vector_complex>::operator*=(
   return *this;
 }
 
-template<>
-VectorBase<double, gsl_vector>& VectorBase<double, gsl_vector>::operator/=(
-    const double& rhs) {
+template<> VectorBase<double, gsl_vector>&
+VectorBase<double, gsl_vector>::operator/=(const double& rhs) {
   if (vector_ != NULL) {
     gsl_vector_scale(vector_, 1./rhs);
   }
   return *this;
 }
 template<> VectorBase<complex, gsl_vector_complex>&
-VectorBase<complex, gsl_vector_complex>::operator/=(
-    const complex& rhs) {
+VectorBase<complex, gsl_vector_complex>::operator/=(const complex& rhs) {
   if (vector_ != NULL) {
     gsl_vector_complex_scale(vector_, 1./rhs);
   }

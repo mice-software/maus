@@ -18,17 +18,18 @@
 
 
 #include <limits>
-#include <math.h>
+#include <cmath>
 #include <iostream>
 #include <sstream>
 #include <fstream>
 
-#include "Interface/Matrix.hh"
-#include "Optics/CovarianceMatrix.hh"
-#include "Optics/PhaseSpaceVector.hh"
-#include "Optics/TransferMap.hh"
-
 #include "gtest/gtest.h" 
+
+#include "Maths/Matrix.hh"
+#include "Maths/PolynomialVector.hh"
+#include "src/common_cpp/Optics/CovarianceMatrix.hh"
+#include "src/common_cpp/Optics/PhaseSpaceVector.hh"
+#include "src/common_cpp/Optics/TransferMap.hh"
 
 class TransferMapTest : public ::testing::Test
 {

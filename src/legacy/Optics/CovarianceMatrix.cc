@@ -1,310 +1,13 @@
-#include <sstream>
-#include <iomanip>
-#include <cstdlib>
-#include <cmath>
+#include "src/legacy/Optics/CovarianceMatrix.hh"
 
-#include "CLHEP/Units/PhysicalConstants.h"
-
-#include "Interface/Squeal.hh"
-#include "Interface/SymmetricMatrix.hh"
-#include "Optics/CovarianceMatrix.hh"
-
-#include <sstream>
-#include <iomanip>
-//***********************//
-
-namespace MAUS
-{
-
-//############################
-// Free Functions
-//############################
-
-//****************************
-// Conversion Functions
-//****************************
-
-CovarianceMatrix rotate(const CovarianceMatrix& covariances, const double angle)
-{
-  double fcos = ::cos(angle);
-  double fsin = ::sin(angle);
-  double rotation_array[36] = {
-    1.,    0.,    0.,    0.,    0.,    0.,
-    0.,    1.,    0.,    0.,    0.,    0.,
-    0.,    0.,    fcos,  0.,    fsin,  0.,
-    0.,    0.,    0.,    fcos,  0.,    fsin,
-    0.,    0.,    -fsin,0.,    fcos,  0.,
-    0.,    0.,    0.,    -fsin,0.,    fcos
-  };
-  Matrix<double> rotation(6, 6, rotation_array);
-  Matrix<double> rotation_transpose = transpose(rotation);
-
-  //the orthogonal similarity transform of a symmetric matrix is also symmetric
-  CovarianceMatrix rotated_covariances(
-    rotation * covariances * rotation_transpose);
-
-  return rotated_covariances;
-}
-
-//############################
-// CovarianceMatrix
-//############################
-
-//****************************
-// Constructors
-//****************************
-
-CovarianceMatrix::CovarianceMatrix() : SymmetricMatrix(6)
-{
-}
-
-CovarianceMatrix::CovarianceMatrix(const CovarianceMatrix& original_instance)
-  : SymmetricMatrix((SymmetricMatrix) original_instance)
-{ }
-
-CovarianceMatrix::CovarianceMatrix(const Matrix<double>& matrix)
-  : SymmetricMatrix()
-{
-  if (   (matrix.number_of_rows() < 6)
-      || (matrix.number_of_columns() < 6))
-  {
-    throw(Squeal(Squeal::recoverable,
-                 "Attempted to construct with a Matrix<double> containing fewer than six rows and/or columns",
-                 "CovarianceMatrix::CovarianceMatrix(Matrix<double>)"));
-  }
-  build_matrix(6);
-  for (size_t row=1; row<=6; ++row)
-  {
-    for (size_t column=1; column<=row; ++column)
-    {
-      set(row, column, matrix(row, column));
-    }
-  }
-}
-
-CovarianceMatrix::CovarianceMatrix(const SymmetricMatrix& symmetric_matrix)
-  : SymmetricMatrix()
-{
-  if (   (symmetric_matrix.number_of_rows() < 6)
-      || (symmetric_matrix.number_of_columns() < 6))
-  {
-    throw(Squeal(Squeal::recoverable,
-                 "Attempted to construct with a SymmetricMatrix containing fewer than six rows and/or columns",
-                 "CovarianceMatrix::CovarianceMatrix(Matrix<double>)"));
-  }
-  build_matrix(6);
-  for (size_t row=1; row<=6; ++row)
-  {
-    for (size_t column=1; column<=row; ++column)
-    {
-      set(row, column, symmetric_matrix(row, column));
-    }
-  }
-}
-
-CovarianceMatrix::CovarianceMatrix(const ::CLHEP::HepSymMatrix& hep_sym_matrix)
-  : SymmetricMatrix()
-{
-  if (   (hep_sym_matrix.num_row() < 6)
-      || (hep_sym_matrix.num_col() < 6))
-  {
-    throw(Squeal(Squeal::recoverable,
-                 "Attempted to construct with a HepSymMatrix containing fewer than six rows and/or columns",
-                 "CovarianceMatrix::CovarianceMatrix(Matrix<double>)"));
-  }
-  build_matrix(6);
-  double element;
-  for (size_t row=1; row<=6; ++row)
-  {
-    for (size_t column=1; column<=row; ++column)
-    {
-      element = hep_sym_matrix(row, column);
-      Matrix<double>::operator()(row, column) = element;
-      Matrix<double>::operator()(column, row) = element;
-    }
-  }
-}
-
-CovarianceMatrix::CovarianceMatrix(double const * const array_matrix)
-  : SymmetricMatrix(6, array_matrix)
-{ }
-
-CovarianceMatrix::CovarianceMatrix(double mass,
-                                   double momentum,
-                                   double charge,
-                                   double emittance_t,
-                                   double beta_t,
-                                   double alpha_t,
-                                   double Ltwiddle_t,
-                                   double emittance_l,
-                                   double beta_l,
-                                   double alpha_l,
-                                   double Bz,
-                                   double dispersion_x,
-                                   double dispersion_prime_x,
-                                   double dispersion_y,
-                                   double dispersion_prime_y)
-  : SymmetricMatrix()
-{
-  //*** calculate some intermediate values ***
-  double energy     = ::sqrt(momentum * momentum + mass * mass);
-  //FIXME: Penn says = charge * Bz / (2. * momentum)
-  double kappa      = ::CLHEP::c_light * Bz / (2.* momentum);
-  double gamma_t    = (1 + alpha_t*alpha_t
-                       + (beta_t*kappa - Ltwiddle_t)*(beta_t*kappa-Ltwiddle_t))
-                    / beta_t;
-  //FIXME: Penn says = (1+alpha_l*alpha_l+beta_l*beta_l*kappa*kappa)/beta_l
-  double gamma_l    = (1+alpha_l*alpha_l)/beta_l;
-
-  //*** calculate the lower triangle covariances <A B> = sigma_A_B ***
-  double sigma_t_t  =  emittance_l * mass * beta_l / momentum;
-
-  double sigma_E_t  = -emittance_l * mass * alpha_l;
-  double sigma_E_E  =  emittance_l * mass * gamma_l * momentum;
-
-  double sigma_x_t  =  0.;
-  double sigma_x_E  = -dispersion_x * sigma_E_E / energy;
-  double sigma_x_x  =  emittance_t * beta_t * mass / momentum;
-
-  double sigma_Px_t =  0.;
-  double sigma_Px_E =  dispersion_prime_x * sigma_E_E / energy;
-  double sigma_Px_x = -mass * emittance_t * alpha_t;
-  double sigma_Px_Px=  mass * momentum * emittance_t * gamma_t;
-  
-  double sigma_y_t  =  0.;
-  double sigma_y_E  = -dispersion_y * sigma_E_E / energy;
-  double sigma_y_x  =   0.;
-  //FIXME: Penn says = mass * emittance_t * (beta_t*kappa - Ltwiddle_t)
-  double sigma_y_Px =  0.;
-  //FIXME: Penn says = emittance_t * beta_t * mass / momentum
-  double sigma_y_y  =  -mass * emittance_l * alpha_t;
-  
-  //FIXME: Penn says = mass * momentum * emittance_t * gamma_t
-  double sigma_Py_t =  0.;
-  double sigma_Py_E =  dispersion_prime_y * sigma_E_E / energy;
-  //FIXME: Penn says = -mass * emittance_t * (beta_t*kappa-Ltwiddle_t)
-  double sigma_Py_x = -mass * emittance_t * (beta_t*kappa-Ltwiddle_t) * charge;
-  double sigma_Py_Px=  0.;
-  //FIXME: Penn says = -mass * emittance_t & gamma_t
-  double sigma_Py_y =  mass * momentum * emittance_l * gamma_t;
-  double sigma_Py_Py=  0.;
-
-  double covariances[36] = {
-    sigma_t_t,  0.,         0.,         0.,           0.,         0.,
-    sigma_E_t,  sigma_E_E,  0.,         0.,           0.,         0.,
-    sigma_x_t,  sigma_x_E,  sigma_x_x,  0.,           0.,         0.,
-    sigma_Px_t, sigma_Px_E, sigma_Px_x, sigma_Px_Px,  0.,         0.,
-    sigma_y_t,  sigma_y_E,  sigma_y_x,  sigma_y_Px,   sigma_y_y,  0.,
-    sigma_Py_t, sigma_Py_E, sigma_Py_x, sigma_Py_Px,  sigma_Py_y, sigma_Py_Py
-  };
-
-  build_matrix(6, covariances);
-}
-
-CovarianceMatrix::CovarianceMatrix(double mass,
-                                   double momentum,
-                                   double energy,
-                                   double emittance_x,
-                                   double beta_x,
-                                   double alpha_x,
-                                   double emittance_y,
-                                   double beta_y,
-                                   double alpha_y,
-                                   double emittance_l,
-                                   double beta_l,
-                                   double alpha_l,
-                                   double dispersion_x,
-                                   double dispersion_prime_x,
-                                   double dispersion_y,
-                                   double dispersion_prime_y)
-{
-  //*** calculate some intermediate values ***
-  double gamma_x = (1+alpha_x*alpha_x)/beta_x;
-  double gamma_y = (1+alpha_y*alpha_y)/beta_y;
-  double gamma_l = (1+alpha_l*alpha_l)/beta_l;
-  
-  //*** calculate the lower triangle covariances <A B> = sigma_A_B ***
-  double sigma_t_t  = emittance_l * mass * beta_l / momentum;
-
-  double sigma_E_t  = -emittance_l * mass * alpha_l;
-  double sigma_E_E  = emittance_l * mass * gamma_l * momentum;
-
-  double sigma_x_t  = 0.;
-  double sigma_x_E  = dispersion_x * sigma_E_E / energy;
-  double sigma_x_x  = emittance_x * mass * beta_x / momentum;
-
-  double sigma_Px_t = 0.;
-  double sigma_Px_E = dispersion_prime_x * sigma_E_E / energy;
-  double sigma_Px_x = -emittance_x * mass * alpha_x;
-  double sigma_Px_Px= emittance_x * mass * momentum * gamma_x;
-
-  double sigma_y_t  = 0.;
-  double sigma_y_E  = dispersion_y * sigma_E_E / energy;
-  double sigma_y_x  = 0.;
-  double sigma_y_Px = 0.;
-  double sigma_y_y  = emittance_y * mass * beta_y /momentum;
-
-  double sigma_Py_t = 0.;
-  double sigma_Py_E = dispersion_prime_y * sigma_E_E / energy;
-  double sigma_Py_x = 0.;
-  double sigma_Py_Px= 0.;
-  double sigma_Py_y = -emittance_y * mass * alpha_y;
-  double sigma_Py_Py= emittance_y * mass * momentum * gamma_y;
-  
-
-  double covariances[36] = {
-    sigma_t_t,  0.,         0.,         0.,           0.,         0.,
-    sigma_E_t,  sigma_E_E,  0.,         0.,           0.,         0.,
-    sigma_x_t,  sigma_x_E,  sigma_x_x,  0.,           0.,         0.,
-    sigma_Px_t, sigma_Px_E, sigma_Px_x, sigma_Px_Px,  0.,         0.,
-    sigma_y_t,  sigma_y_E,  sigma_y_x,  sigma_y_Px,   sigma_y_y,  0.,
-    sigma_Py_t, sigma_Py_E, sigma_Py_x, sigma_Py_Px,  sigma_Py_y, sigma_Py_Py
-  };
-  
-  build_matrix(6, covariances);
-}
-
-bool CovarianceMatrix::IsPositiveDefinite()
-{
-  size_t min_row = 1;
-  size_t min_column = 1;
-  size_t rows = size();
-  for(size_t length=1; length<=rows; length++)
-  {
-    //Sylvester Criterion - all the leading principle minors must be positive
-    if (determinant(submatrix(min_row, length, min_column, length)) <= 0)
-    {
-      return false;
-    }
-  }
-  
-  return true;
-}
-
-} //namespace MAUS
-
-
-
-
-
-
-
-
-
-
-
-
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// Legacy CovarianceMatrix
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-//*** Legacy Includes ***//
-#include "Config/MiceModule.hh"
 #include "Tensor.hh"
 #include "Tensor3.hh"
-#include "Interface/Differentiator.hh"
+
+#include "Config/MiceModule.hh"
 #include "Config/ModuleConverter.hh"
-#include "Interface/PolynomialVector.hh"
+#include "Interface/Differentiator.hh"
+#include "Maths/PolynomialVector.hh"
+#include "src/legacy/Optics/PhaseSpaceVector.hh"
 
 
 using CLHEP::HepSymMatrix;
@@ -664,7 +367,7 @@ double  GetTwoDAmp(int axis, PhaseSpaceVector event, CovarianceMatrix Covariance
   CLHEP::HepVector    mean   = Covariance.GetMean().getSixVector();
   CLHEP::HepVector    vector = (event.getSixVector() - mean).sub(axis+1, axis+2);
   double              em2D   = Covariance.GetTwoDEmit(axis);
-  return em2D*(vector.T()*matrix*vector)(1,1);
+  return em2D*(vector.T() * matrix * vector)(1,1);
 }
 
 double  GetAmpTrans(PhaseSpaceVector event, CovarianceMatrix Covariance)
@@ -1091,16 +794,16 @@ double MomentHeap::GetMoment(std::vector<int> position) const
 std::ostream& MomentHeap::Print(std::ostream& out) const
 {
   out << std::scientific << std::setprecision(5) << "MomentHeap order " << MaxOrder() <<  std::endl;
-/*  out << m_mean.T() << "\n ************** "  << std::endl;
+/*  out << transpose(m_mean) << "\n ************** "  << std::endl;
   out << m_vars << "\n ************* " << std::endl;
   for(unsigned int i=0; i<m_higherMoments.size(); i++)
     out << *(m_higherMoments[i]) << "\n ************* " << std::endl;*/
   for(int i=1; i<MaxOrder()+1; i++) 
   {
     int kvec_front = 1;
-    for(unsigned int j=G4MICE::PolynomialVector::NumberOfPolynomialCoefficients(6, i); j<G4MICE::PolynomialVector::NumberOfPolynomialCoefficients(6, i+1); j++) 
+    for(unsigned int j=MAUS::PolynomialVector::NumberOfPolynomialCoefficients(6, i); j<MAUS::PolynomialVector::NumberOfPolynomialCoefficients(6, i+1); j++) 
     {
-      std::vector<int> kvec = G4MICE::PolynomialVector::IndexByVector(j, 6);
+      std::vector<int> kvec = MAUS::PolynomialVector::IndexByVector(j, 6);
       if(kvec.front() != kvec_front) {std::cout << "\n"; kvec_front = kvec.front();}
       for(unsigned int k=0; k<kvec.size()-1; k++) std::cout << kvec[k] << ".";
       double mom = GetMoment(kvec);
@@ -1119,27 +822,26 @@ std::ostream& operator<<(std::ostream& out, const MomentHeap& heap)
   return heap.Print(out);
 }
 
-G4MICE::PolynomialVector MomentHeap::Weighting(MomentHeap in, MomentHeap target, int order)
+MAUS::PolynomialVector MomentHeap::Weighting(MomentHeap in, MomentHeap target, int order)
 {
   size_t dimension = 6;
-  size_t size      = G4MICE::PolynomialVector::NumberOfPolynomialCoefficients(dimension, order+1);
-  MVector<double> u(size-1);
-  MMatrix<double> M(size-1, size-1);
+  size_t size      = MAUS::PolynomialVector::NumberOfPolynomialCoefficients(dimension, order+1);
+  MAUS::Vector<double> u(size-1);
+  MAUS::Matrix<double> M(size-1, size-1);
   for(size_t i=1; i<size; i++)
   {
-    std::vector<int> index1 = G4MICE::PolynomialVector::IndexByVector(i, dimension);
+    std::vector<int> index1 = MAUS::PolynomialVector::IndexByVector(i, dimension);
     u(i)                  = target.GetMoment(index1) - in.GetMoment(index1);
     for(size_t j=1; j<size; j++)
     {
-      std::vector<int> index2 = G4MICE::PolynomialVector::IndexByVector(j, dimension);
+      std::vector<int> index2 = MAUS::PolynomialVector::IndexByVector(j, dimension);
       std::vector<int> index3 = index2;
       index3.insert(index3.begin(), index1.begin(), index1.end());
       M(j,i)             = in.GetMoment(index3) - in.GetMoment(index1)*target.GetMoment(index2);
     }
   }
-  M.invert();
-  MVector<double> a  = M*u;
-  MVector<double> a2 = MVector<double>(a.num_row()+1, 1.);
-  for(size_t i=0; i<a.num_row(); i++) a2(i+2) = a(i+1);
-  return G4MICE::PolynomialVector(dimension, a2.T() );
+  MAUS::Vector<double> a  = inverse(M) * u;
+  MAUS::Vector<double> a2 = MAUS::Vector<double>(a.size()+1, 1.);
+  for(size_t i=0; i<a.size(); i++) a2(i+2) = a(i+1);
+  return MAUS::PolynomialVector(dimension, transpose(a2) );
 }

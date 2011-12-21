@@ -3,7 +3,7 @@
 #define Differentiator_hh 1
 
 #include "Interface/Interpolator.hh"
-#include "Interface/PolynomialVector.hh"
+#include "Maths/PolynomialVector.hh"
 #include <map>
 
 //Differentiator.hh
@@ -36,13 +36,13 @@ public:
     //return value is array of dy_i/dx_j ordered like i=0,j=0;i=0,j=1;...;i=1,j=0;i=1,j=1;...;i=ni;j=nj 
     void  F    (const double*    point, double* value)                          const;
     //return value is matrix of dy_i/dx_j
-    void  F    (const MVector<double>& point, MMatrix<double>& differentials) const;
+    void  F    (const MAUS::Vector<double>& point, MAUS::Matrix<double>& differentials) const;
     void  Y    (const double* point,    double* value)                  const {return _y->F(point, value);}
     //Return coefficients for polynomial fit to taylor expansion around point
     //PolynomialMap returns coefficients for polynomial about 0 that has correct values at point
-    MMatrix<double>  PolynomialMap       (const MVector<double>& point) const;
+    MAUS::Matrix<double>  PolynomialMap       (const MAUS::Vector<double>& point) const;
     //CentredPolynomialMap returns coeffs for polynomial about inPoint that has correct values at point
-    MMatrix<double>  CentredPolynomialMap(const MVector<double>& point) const;
+    MAUS::Matrix<double>  CentredPolynomialMap(const MAUS::Vector<double>& point) const;
     //Tell me the required dimension of the input point and output value
     unsigned int PointDimension()    const { return _inSize;  }
     unsigned int ValueDimension()    const { return _outSize; }
@@ -52,15 +52,15 @@ public:
     //Return the original function ("0th differential")
     VectorMap*   FunctionMap()     const { return _y; }
     //Make a polynomial using the differential coefficients
-    G4MICE::PolynomialVector* PolynomialFromDifferentials(const MVector<double>& point) const;
-    G4MICE::PolynomialVector* PolynomialFromDifferentials(double* point)                 const;
+    MAUS::PolynomialVector* PolynomialFromDifferentials(const MAUS::Vector<double>& point) const;
+    MAUS::PolynomialVector* PolynomialFromDifferentials(double* point)                 const;
 
     friend std::ostream& operator<<(std::ostream&, const Differentiator&); 
 
 private:
-    std::vector< std::vector<double> > SetupInPoints(const MVector<double>& inPoint) const;
-    MMatrix<double>                   SetupMatrixIn (std::vector< std::vector<double> > inVector, const MVector<double>& inPoint) const;
-    MMatrix<double>                   SetupMatrixOut(std::vector< std::vector<double> > inVector) const;
+    std::vector< std::vector<double> > SetupInPoints(const MAUS::Vector<double>& inPoint) const;
+    MAUS::Matrix<double>                   SetupMatrixIn (std::vector< std::vector<double> > inVector, const MAUS::Vector<double>& inPoint) const;
+    MAUS::Matrix<double>                   SetupMatrixOut(std::vector< std::vector<double> > inVector) const;
 
     int _inSize;
     int _outSize;
@@ -71,7 +71,7 @@ private:
     std::vector<double>             _magnitude;
     int                             _diffOrder;
     VectorMap*                      _y;
-    MMatrix<double>                 _polyDiffCoefficient; //d(n)y/dx = a x^n
+    MAUS::Matrix<double>                 _polyDiffCoefficient; //d(n)y/dx = a x^n
 };
 std::ostream& operator<<(std::ostream&, const Differentiator&); 
 
@@ -103,15 +103,15 @@ public:
     unsigned int NumberOfPoints()         const {return int(ceil(NumberOfIndices()/NumberOfDiffIndices())); } //number of points needed for each interpolation
     unsigned int PointOrder()             const {return _totalOrder - _differentialOrder;} //polynomial "order" to be contributed by points
     unsigned int NumberOfDiffIndices()    const 
-    {return G4MICE::PolynomialVector::NumberOfPolynomialCoefficients(PointDimension(), DifferentialOrder()+1); } //number of differentials at each point
+    {return MAUS::PolynomialVector::NumberOfPolynomialCoefficients(PointDimension(), DifferentialOrder()+1); } //number of differentials at each point
     unsigned int NumberOfIndices()        const
-    {return G4MICE::PolynomialVector::NumberOfPolynomialCoefficients(_inSize, _totalOrder+1);} //number of rows in the interpolation
+    {return MAUS::PolynomialVector::NumberOfPolynomialCoefficients(_inSize, _totalOrder+1);} //number of rows in the interpolation
     //Read and write operations
     PolynomialInterpolator* Clone()       const; //copy function
     ~PolynomialInterpolator();
 
     //The polynomial vector at a point on the mesh
-    G4MICE::PolynomialVector* PolyVec(Mesh::Iterator it) const {return _points[it.ToInteger()];}
+    MAUS::PolynomialVector* PolyVec(Mesh::Iterator it) const {return _points[it.ToInteger()];}
     VectorMap*        Function()                       {return _func;}
     Mesh*             GetMesh()                  const {return _mesh;}
 
@@ -120,7 +120,7 @@ public:
 private:
 
     Mesh*                _mesh;
-    G4MICE::PolynomialVector**   _points;
+    MAUS::PolynomialVector**   _points;
     VectorMap*           _func;
     int                  _differentialOrder;
     int                  _totalOrder;
@@ -139,10 +139,10 @@ private:
     static PIMMap        _meshCounter;
 
     void                          BuildFixedMeshPolynomials(VectorMap* F);
-    G4MICE::PolynomialVector*             PolynomialFromDiffs(Mesh::Iterator point, Differentiator* diffs);
+    MAUS::PolynomialVector*             PolynomialFromDiffs(Mesh::Iterator point, Differentiator* diffs);
     std::vector< Mesh::Iterator > GetFixedMeshPoints(Mesh::Iterator dualIterator, int polySize);
-    MMatrix<double>               GetX(std::vector< Mesh::Iterator> points );
-    MMatrix<double>               GetD(std::vector< Mesh::Iterator> points, Differentiator* diff );
+    MAUS::Matrix<double>               GetX(std::vector< Mesh::Iterator> points );
+    MAUS::Matrix<double>               GetD(std::vector< Mesh::Iterator> points, Differentiator* diff );
 
     //Functions to build up a set of points on the mesh nearby
     void Search(int pos, std::vector<int> search, std::vector<Mesh::Iterator>& points, const Mesh* mesh);
