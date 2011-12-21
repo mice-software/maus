@@ -36,7 +36,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     ${MAUS_ROOT_DIR}/third_party/bash/43libxslt.bash
     ${MAUS_ROOT_DIR}/third_party/bash/44cdb.bash
     ${MAUS_ROOT_DIR}/third_party/bash/50cloc.bash
-    ${MAUS_ROOT_DIR}/third_party/bash/51xboas.bash
+    ${MAUS_ROOT_DIR}/third_party/bash/51xboa.bash
     ${MAUS_ROOT_DIR}/third_party/bash/52jsoncpp.bash
     ${MAUS_ROOT_DIR}/third_party/bash/53unpacking.bash
     ${MAUS_ROOT_DIR}/third_party/bash/60recpack.bash
