@@ -19,6 +19,7 @@ Go controls the running of MAUS dataflows.
 
 import os
 import json
+import socket
 import sys
 
 # MAUS
@@ -440,6 +441,9 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903
         if (active_workers == None):
             raise Exception("No active Celery workers!")
 
+        # Create unique ID
+        celery_client_id = "%s (%s)" % (socket.gethostname(), os.getpid())
+
         print("INPUT: Reading input")
         assert(self.inputer.birth(self.json_config_doc) == True)
         emitter = self.inputer.emitter()
@@ -457,7 +461,7 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903
         while len(map_buffer) != 0:
             for spill in map_buffer:
                 result = \
-                    MausGenericTransformTask.delay(workers, spill) # pylint:disable=E1101, C0301
+                    MausGenericTransformTask.delay(workers, spill, celery_client_id, i) # pylint:disable=E1101, C0301
                 # Index results by spill_id so can present
                 # results to merge-output in same order.
                 transform_results[i] = result

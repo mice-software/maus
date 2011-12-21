@@ -60,15 +60,20 @@ class MausGenericTransformTask(Task):
             self.__transforms[name].birth(json_config_doc)
         return True
 
-    def run(self, workers, spill):
+    def run(self, workers, spill, client_id = "Unknown", spill_id = 0):
         """
         Apply the transform to the spill and return the new spill.
         @param self Object reference.
         @param workers List of names of workers to process spill.
         @param spill JSON document string holding spill.
+        @param client_id ID of client who submitted job.
+        @param spill_id Index of spill from this client.
         @return JSON document string holding new spill.
         """
         logger = Task.get_logger()
+        if logger.isEnabledFor(logging.INFO):
+            logger.info("Task invoked by %s on spill %d" \
+                % (client_id, spill_id))     
         for worker in workers:
             if logger.isEnabledFor(logging.INFO):
                 logger.info("Executing worker : %s" % worker)
