@@ -28,7 +28,7 @@ class ReducePyHistogramTDCADCCounts(ReducePyMatplotlibHistogram):
     each digit within a "digits" list. For each spill input it outputs
     a new histogram. 
 
-    The histogram output is a JSON document of form:
+    Histograms are output as JSON documents of form:
 
     @verbatim
     {"image": {"content":"Total TDC and ADC counts to spill 2",
@@ -37,14 +37,16 @@ class ReducePyHistogramTDCADCCounts(ReducePyMatplotlibHistogram):
                "data": "...base 64 encoded image..."}}
     @endverbatim
 
-    where "TAG" is "tdcadc" if "histogram_auto_number" (see below)
-    is "false" or is "tdcadcN" if "histogram_auto_number" is
-    "true", where N means this is the (N + 1)th spill processed
-    by the worker.
+    where "TAG" is "tdcadc". If "histogram_auto_number" (see
+    below) is "true" then the TAG will have a number N appended where
+    N means that the histogram was produced as a consequence of the (N
+    + 1)th spill processed  by the worker. The number will be
+    zero-padded to form a six digit string e.g. "00000N". If
+    "histogram_auto_number" is false then no such number is appended
 
-    "histogram_summary_only" is false:
-
-    In case of errors the output document is just the input document
+    In cases where a spill is input that contains errors (e.g. is
+    badly formatted or is missing the data needed to update a
+    histogram) then a spill is output which is just the input spill
     with an "errors" field containing the error e.g.
 
     @verbatim
@@ -57,11 +59,9 @@ class ReducePyHistogramTDCADCCounts(ReducePyMatplotlibHistogram):
     -Image type ("histogram_image_type"). Must be one of those
      supported by matplot lib (currently "svg", "ps", "emf", "rgba",
      "raw", "svgz", "pdf", "eps", "png"). Default: "eps".
-    -Auto-number ("histogram_auto_number"). Default: false.
-     If "true" then each output image tag has an auto-number appended
-     e.g. "tdcadc0"..."tdcadcN" and "tdcadc1...tdcadcN" where N is the
-     (N + 1)th spill processed. If "false" then there is no 
-     auto-numbering of tags. 
+    -Auto-number ("histogram_auto_number"). Default: false. Flag
+     that determines if the image tag (see above) has the spill count
+     appended to it or not.
     """
 
     def __init__(self):
@@ -74,6 +74,8 @@ class ReducePyHistogramTDCADCCounts(ReducePyMatplotlibHistogram):
         self.__max_adc_count = 1
         self.__max_tdc_count = 1
         self._tag = "tdcadc"
+        self._content = ""
+        self._tdcadchistogram = None
 
     def _configure_at_birth(self, config_doc):
         """
@@ -83,36 +85,36 @@ class ReducePyHistogramTDCADCCounts(ReducePyMatplotlibHistogram):
         @returns True if successful.
         """
         # Do configuration specific to this class.
-        # Can assume that self._histogram now has a histogram
+        # Can assume that self._tdcadchistogram now has a histogram
         # (matplotlib FigureCanvas object) available which can now be
         # customised.
-        self._histogram.figure.get_axes()[0].set_xlabel(
+        self._tdcadchistogram = \
+            ReducePyMatplotlibHistogram._create_histogram(self)
+        self._tdcadchistogram.figure.get_axes()[0].set_xlabel(
             "TDC count", fontsize=12)
-        self._histogram.figure.get_axes()[0].set_ylabel(
+        self._tdcadchistogram.figure.get_axes()[0].set_ylabel(
             "ADC count", fontsize=12)
         self.__max_adc_count = 1
         self.__max_tdc_count = 1
         return True
 
-    def _update_histogram(self, json_doc):
+    def _update_histograms(self, spill):
         """
-        Update the histogram with data from the current spill
-        and output the histogram. Overrides super-class method.
+        Process a spill, update the histograms then
+        create a JSON document in the format described above. 
         @param self Object reference.
-        @param json_doc Current spill..
-        @returns None if histogram was created or a JSON document with
-        error messages if there were problems (e.g. information was
-        missing from the spill).
+        @param spill Current spill.
+        @returns list with histogram JSON document.
+        @throws KeyError if "digits" is not in spill.
         """
+        if "END_OF_RUN" in spill:
+            return [{}]
 
         # Do validation specific to this class while getting the
         # data to be graphed.
-        if "digits" not in json_doc:
-            if "errors" not in json_doc:
-                json_doc["errors"] = {}
-            json_doc["errors"]["no_digits"] = "no digits"
-            return json_doc
-        digits = json_doc["digits"]
+        if "digits" not in spill:
+            raise KeyError("digits field is not in spill")
+        digits = spill["digits"]
 
         # Extract just those digits that are for the Tracker.
         trackerdigits = \
@@ -136,19 +138,22 @@ class ReducePyHistogramTDCADCCounts(ReducePyMatplotlibHistogram):
         # Set description of content of histogram and histogram title.
         self._content = \
             "Total TDC and ADC counts"
-        self._histogram.figure.get_axes()[0].set_title(
+        self._tdcadchistogram.figure.get_axes()[0].set_title(
             self._content, fontsize=14)
 
         # Plot the data.
         if (len(tdcs) > 0):
-            self._histogram.figure.get_axes()[0].scatter(
+            self._tdcadchistogram.figure.get_axes()[0].scatter(
                 tdcs, adcs, 10, "b")
 
         # Rescale axis so 0 is always visible.
-        self._rescale_axes(0, self.__max_tdc_count,
-                           0, self.__max_adc_count)
+        ReducePyMatplotlibHistogram._rescale_axes( \
+            self, self._tdcadchistogram, \
+            0, self.__max_tdc_count, 0, self.__max_adc_count)
 
-        return None
+        image_doc = ReducePyMatplotlibHistogram._create_image_json( \
+            self, self._content, self._tag, self._tdcadchistogram)
+        return [image_doc]
 
     def __filter_trackers(self, digit): #pylint: disable=R0201
         """
@@ -183,5 +188,6 @@ class ReducePyHistogramTDCADCCounts(ReducePyMatplotlibHistogram):
         @param self Object reference.
         @returns True
         """
+        ReducePyMatplotlibHistogram._cleanup_at_death(self)
         # Do cleanup specific to this class, none in this case.
         return True

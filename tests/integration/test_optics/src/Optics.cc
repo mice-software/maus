@@ -65,6 +65,14 @@ void SetupSimulation(MiceModule* root, std::vector<CovarianceMatrix> envelope)
   (*simRun.jsonConfiguration)["geant4_visualisation"] = Json::Value(false);
   (*simRun.jsonConfiguration)["keep_steps"] = Json::Value(false);
   (*simRun.jsonConfiguration)["keep_tracks"] = Json::Value(false);
+  (*simRun.jsonConfiguration)["physics_model"] = Json::Value("QGSP_BERT");
+  (*simRun.jsonConfiguration)["reference_physics_processes"] = Json::Value("mean_energy_loss");//
+  (*simRun.jsonConfiguration)["physics_processes"] = Json::Value("standard");//
+  (*simRun.jsonConfiguration)["particle_decay"] = Json::Value(true);// # set to true to activate particle decay, or False to inactivate particle decay
+  (*simRun.jsonConfiguration)["charged_pion_half_life"] = Json::Value(-1.);// # set the pi+, pi- half life [ns]. Negative value means use geant4 default
+  (*simRun.jsonConfiguration)["muon_half_life"] = Json::Value(-1.);// # set the mu+, mu- half life [ns]. Negative value means use geant4 default
+  (*simRun.jsonConfiguration)["production_threshold"] = Json::Value(0.5);// # set the threshold for delta ray production [mm]
+
   Squeak::setStandardOutputs();
   fillMaterials(simRun);
   

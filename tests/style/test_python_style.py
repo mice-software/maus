@@ -9,6 +9,7 @@ import unittest
 import subprocess
 import os
 import time
+import glob
 
 class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
     """
@@ -31,6 +32,43 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
                                  stderr=subprocess.STDOUT)
         return errors
 
+    def in_place_filter(self, file_name):
+        """
+        @brief filter pylint output file
+
+        @params file_name name of the pylint output file
+
+        @returns tuple of 
+          (number of lines in the unfiltered file,
+           number of lines in the filtered file)
+
+        Remove lines that don't match like *.py:[0-9]: *
+        """
+        fin = open(file_name)
+        lines_in = fin.readlines()
+        lines_out = []
+        fin.close()
+        for line in lines_in:
+            try:
+                # filter for *.py:#:* where # is an integer. Probably easier in
+                # regexp, but regexp is gross...
+                # we have string like line = *.py:<str_1>
+                str_1 = line[line.index('.py:')+4:]
+                # we have string like str_1 = <str_2>:*
+                str_2 = str_1[0:str_1.index(':')]
+                # check str_2 = int
+                end_number = int(str_2)
+                lines_out.append(line)
+            except ValueError:
+                pass # line filtered - index() or int() raises ValueError
+
+        # sort here so we can do diffs on the output...
+        lines_out.sort()
+        fout = open(file_name, 'w')
+        for line in lines_out:
+            fout.write(line)
+        return (len(lines_in), len(lines_out))
+
     def walk_directories(self, target_dir, fout):
         """
         @brief walk the directory structure from target_dir
@@ -44,8 +82,9 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
                 ignore = False
                 if file_name in self.exclude_files:
                     ignore = True
-                for a_dir in self.exclude_dirs:
-                    if a_dir in maus_dir.split('/'):
+                for a_glob_target in self.exclude_dirs:
+                    test_dirs = glob.glob(self.maus_root_dir+'/'+a_glob_target)
+                    if root_dir in test_dirs:
                         ignore = True
                 if not ignore:
                     file_name = os.path.join(maus_dir, file_name)
@@ -62,7 +101,7 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
         counting the number of lines in the pylint summary file. If this
         increases, throws an error.
         """
-        current_n_python_errors = 893 # Tunnell, 7Oct2011. Reduced last-time.
+        current_n_python_errors = 702 # Rogers, 21Dec2011. Filter in place.
         file_out = os.path.join(self.maus_root_dir, 'tmp', 'pylint.out')
         fout = open(file_out, 'w')
         error_files = []
@@ -73,7 +112,7 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
         time.sleep(1.0)
         fout = open(file_out)
         # just go by number of lines - bit of a hack but will do
-        n_errors = len(fout.readlines())
+        n_errors = self.in_place_filter(file_out)[1]
         if len(error_files) > 0:
             print str(n_errors)+'/'+str(current_n_python_errors)+\
                   ' style errors in following files '+\
@@ -87,8 +126,8 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
 
     # folders in maus_root_dir to look at
     include_dirs = ['tests', 'src', 'bin', 'doc']
-    # exclude if dir path includes one of the following
-    exclude_dirs = ['build']
+    # exclude if dir path globs to one of the following 
+    exclude_dirs = ['bin/user', 'src/*/*/build']
     # exclude if filename includes one of the following
     exclude_files = [
         'test_cdb__init__.py', # makes pylint error

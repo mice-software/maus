@@ -21,7 +21,7 @@ def run(data_path, run_num):
     # Here you specify the path to the data and also the file you want to
     # analyze.
 
-    my_input = MAUS.InputCppDAQData(data_path, data_file)
+    my_input = MAUS.InputCppDAQData()
 
     # Create an empty array of mappers, then populate it
     # with the functionality you want to use.

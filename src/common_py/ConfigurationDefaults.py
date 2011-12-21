@@ -65,8 +65,8 @@ simulation_reference_particle = { # used for setting particle phase
 
 # geant4 physics model
 physics_model = "QGSP_BERT" # Physics package loaded by MAUS to set default values; modifications can be made
-reference_physics_processes = "mean_energy_loss"
-physics_processes = "standard"
+reference_physics_processes = "mean_energy_loss" # controls the physics processes of the reference particle. Set to "none" to disable all physics processes; or "mean_energy_loss" to make the reference particle see deterministic energy loss only
+physics_processes = "standard" # controls the physics processes of normal particles. Set to "none" to disable all physics processes; "mean_energy_loss" to enable deterministic energy loss only; or "standard" to enable all physics processes
 particle_decay = True # set to true to activate particle decay, or False to inactivate particle decay
 charged_pion_half_life = -1. # set the pi+, pi- half life [ns]. Negative value means use geant4 default
 muon_half_life = -1. # set the mu+, mu- half life [ns]. Negative value means use geant4 default
@@ -264,3 +264,12 @@ daq_data_file = '02873.003' # file name for daq data; if this is just a integer 
 
 maus_version = "" # set at runtime - do not edit this (changes are ignored)
 configuration_file = "" # should be set on the command line only (else ignored)
+
+doc_store_class = "InMemoryDocumentStore.InMemoryDocumentStore"
+couchdb_url = "http://localhost:5984" # Default CouchDB URL. Only needed if using CouchDBDocumentStore.
+couchdb_database_name = "mausdb" # Default CouchDB database name. Only needed if using CouchDBDocumentStore.
+
+mongodb_host = "localhost" # Default MongoDB host name. Only needed if using MongoDBDocumentStore.
+mongodb_port = 27017 # Default MongoDB port. Only needed if using MongoDBDocumentStore.
+mongodb_database_name = "mausdb" # Default MongoDB database name. Only needed if using MongoDBDocumentStore.
+mongodb_collection_name = "spills" # Default MongoDB collection name. Only needed if using MongoDBDocumentStore.

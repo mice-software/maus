@@ -65,7 +65,7 @@ class  TestGDMLToMausModule(unittest.TestCase):#pylint:disable = C0103,R0904
         try:
             self.constructor = GDMLtomaus('this path doesnt exist')
             self.assertTrue(False, 'should have raised and error')
-        except:
+        except: #pylint: disable = W0702
             pass #pylint: disable = W0702
         #This next section ensures the constructor has set
         #up the variables correctly.
