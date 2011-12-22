@@ -7,10 +7,11 @@ Release Notes
 MAUS-v0.1.1
   The following functionality was added:
     - Prototype functionality to run MAUS online added
-  The following third party libraries need to be rerun:
+  If upgrading from the previous version, the following third party libraries need to be rerun:
     - third_party/bash/40python_extras.bash
     - third_party/bash/51xboas.bash
     - third_party/bash/53unpacking.bash
+  Additionally the configure script needs to be rerun and env.sh re-sourced.
 
 MAUS-v0.1.0
   The following functionality was added:
