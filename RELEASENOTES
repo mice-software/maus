@@ -5,69 +5,76 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 Release Notes
 =============
 MAUS-v0.1.1
-- Prototype functionality to run MAUS online added
+  The following functionality was added:
+    - Prototype functionality to run MAUS online added
+  The following third party libraries need to be rerun:
+    - third_party/bash/40python_extras.bash
+    - third_party/bash/51xboas.bash
+    - third_party/bash/53unpacking.bash
 
 MAUS-v0.1.0
-- Functionality to import geometries direct from GDML files into GEANT4 added
+  The following functionality was added:
+    - Functionality to import geometries direct from GDML files into GEANT4 added
 
 MAUS-v0.0.9
-- TOF reconstruction to space points added
-- Controls for geant4 physics processes added
-- Generalised histogramming functionality for online data quality added
-- Skeleton documentation outline added
-The following third party libraries need to be rerun:
-- 40python_extras.bash
-- Tracker geant4 modelling code was added
-- Tracker digitization code was added
-- TOF digitization code was removed as it did not meet required quality checks
+  The following functionality was added:
+    - TOF reconstruction to space points added
+    - Controls for geant4 physics processes added
+    - Generalised histogramming functionality for online data quality added
+    - Skeleton documentation outline added
+    - Tracker geant4 modelling code was added
+    - Tracker digitization code was added
+    - TOF digitization code was removed as it did not meet required quality checks
+  The following third party libraries need to be rerun:
+    - 40python_extras.bash
 
 MAUS-v0.0.8
-- Merged DAQ unpacking code
-- Refactor of execution framework to prepare for multiprocessing and online
-  reconstruction
-- Documentation skeleton introduced
-- Executable (bin/utilities/json_browser.py) to browse formatted json output in
-  more human readable form 
+  - Merged DAQ unpacking code
+  - Refactor of execution framework to prepare for multiprocessing and online
+    reconstruction
+  - Documentation skeleton introduced
+  - Executable (bin/utilities/json_browser.py) to browse formatted json output in
+    more human readable form 
 
 MAUS-v0.0.7
-- New functions to generate input beam
--- Multivariate gaussian in x, px, y, py, time, energy
--- Additionally sawtooth or uniform distribution in time
--- Either fixed number of particles or selected from binomial distribution per spill
--- Multiple distributions can be generated with difference particle types, etc
-- simulate_mice run control is now entirely through datacards
--- Number of spills input and output filenames can all be selected in datacards
-- datacards can be specified on the command line or in an external file
--- -configuration_file <file> specifies the python file to use for datacards
+  - New functions to generate input beam
+    -- Multivariate gaussian in x, px, y, py, time, energy
+    -- Additionally sawtooth or uniform distribution in time
+    -- Either fixed number of particles or selected from binomial distribution per spill
+    -- Multiple distributions can be generated with difference particle types, etc
+  - simulate_mice run control is now entirely through datacards
+    -- Number of spills input and output filenames can all be selected in datacards
+  - datacards can be specified on the command line or in an external file
+    -- -configuration_file <file> specifies the python file to use for datacards
 
 MAUS-v0.0.6
-- Added calls to geant4 inline visualisation
+  - Added calls to geant4 inline visualisation
 
 MAUS-v0.0.5
-- Added some new compile flags to control C++ optimisation, profiling, debugging, code coverage
-- Added documentation for the Monte Carlo data structure (doc/run_control/spill.pdf)
-- Better testing and speed optimisation in Simulation
+  - Added some new compile flags to control C++ optimisation, profiling, debugging, code coverage
+  - Added documentation for the Monte Carlo data structure (doc/run_control/spill.pdf)
+  - Better testing and speed optimisation in Simulation
 
 MAUS-v0.0.4
-- Added SpecialVirtual detectors
-- Updated to xboa-0.11.0
+  - Added SpecialVirtual detectors
+  - Updated to xboa-0.11.0
 
 MAUS-v0.0.3:
-- Added RF cavity phasing routine
-- Added a test to check for python style
-- Streamlined the routines for handling errors between python and C++
+  - Added RF cavity phasing routine
+  - Added a test to check for python style
+  - Streamlined the routines for handling errors between python and C++
 
 MAUS-v0.0.2:
-- Added BeamMaker prototype
+  - Added BeamMaker prototype
 
 MAUS-v0.0.1:
-- Initial version
-- Core map-reduce infrastructure
-- Partial implementaton of monte carlo tracking simulation at application level
--- Port of geometry, fields, geant4 set-up, virtual planes algorithm 
-- Abiity to analyze low-level DAQ data
-- Build system of all dependencies that is tested on a wide range of systems
-- Partial port, testing, and clean up of legacy code
-- Configuration database interface
+  - Initial version
+  - Core map-reduce infrastructure
+  - Partial implementaton of monte carlo tracking simulation at application level
+    -- Port of geometry, fields, geant4 set-up, virtual planes algorithm 
+  - Abiity to analyze low-level DAQ data
+  - Build system of all dependencies that is tested on a wide range of systems
+  - Partial port, testing, and clean up of legacy code
+  - Configuration database interface
 
 
