@@ -97,8 +97,8 @@ MAUS::Matrix<double> Differentiator::CentredPolynomialMap(const MAUS::Vector<dou
     MAUS::Vector<double> zero(PointDimension(), 0);
     std::vector< std::vector<double> > inVec = SetupInPoints (inPoint);
 
-    MAUS::Matrix<double>                   in    = SetupMatrixIn (inVec, inPoint);
-    MAUS::Matrix<double>                   out   = SetupMatrixOut(inVec);
+    MAUS::Matrix<double> in     = SetupMatrixIn (inVec, inPoint);
+    MAUS::Matrix<double> out    = SetupMatrixOut(inVec);
     MAUS::Matrix<double> outMap = transpose(out) * inverse(in);
 
     return outMap;

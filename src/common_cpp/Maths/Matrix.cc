@@ -1060,15 +1060,17 @@ template complex trace(const Matrix<complex>& matrix);
 
 template <> Matrix<double> transpose(
     const Matrix<double>& matrix) {
-  Matrix<double> matrix_transpose(matrix);
-  gsl_matrix_transpose(matrix_transpose.matrix_);
+  Matrix<double> matrix_transpose(matrix.number_of_columns(),
+                                  matrix.number_of_rows());
+  gsl_matrix_transpose_memcpy(matrix_transpose.matrix_, matrix.matrix_);
   return matrix_transpose;
 }
 
 template <> Matrix<complex> transpose(
     const Matrix<complex>& matrix) {
-  Matrix<complex> matrix_transpose(matrix);
-  gsl_matrix_complex_transpose(matrix_transpose.matrix_);
+  Matrix<complex> matrix_transpose(matrix.number_of_columns(),
+                                  matrix.number_of_rows());
+  gsl_matrix_complex_transpose_memcpy(matrix_transpose.matrix_, matrix.matrix_);
   return matrix_transpose;
 }
 

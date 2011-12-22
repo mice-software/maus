@@ -89,8 +89,7 @@ template VectorBase<complex, gsl_vector_complex>::VectorBase(const size_t i);
 
 template <typename StdType, typename GslType>
 VectorBase<StdType, GslType>::VectorBase(
-    const size_t size, const StdType  value) {
-  this->vector_ = NULL;
+    const size_t size, const StdType  value) : vector_(NULL) {
   VectorBase<StdType, GslType>::build_vector(size);
   for (size_t i = 0; i < size; ++i) {
     (*this)[i] = value;
@@ -103,8 +102,7 @@ template VectorBase<complex, gsl_vector_complex>::VectorBase(
 
 template <typename StdType, typename GslType>
 VectorBase<StdType, GslType>::VectorBase(
-    const StdType* data, const size_t size) {
-  this->vector_ = NULL;
+    const StdType* data, const size_t size) : vector_(NULL) {
   build_vector(size, data);
 }
 template VectorBase<double, gsl_vector>::VectorBase(
@@ -114,8 +112,8 @@ template VectorBase<complex, gsl_vector_complex>::VectorBase(
 
 template <typename StdType, typename GslType>
 VectorBase<StdType, GslType>::VectorBase(
-    const std::vector<StdType, std::allocator<StdType> >& std_vector) {
-  this->vector_ = NULL;
+    const std::vector<StdType, std::allocator<StdType> >& std_vector)
+    : vector_(NULL) {
   build_vector(std_vector.size());
   typename std::vector<StdType>::const_iterator element;
   int index = 0;

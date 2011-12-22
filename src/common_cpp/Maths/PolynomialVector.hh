@@ -281,9 +281,10 @@ public:
 	 * If length of weights is not equal to length of values use weights = 1.
 	 * If length of mean is not equal to length of first value recalculate mean
 	 */
-	static SymmetricMatrix Covariances(std::vector<std::vector<double> >	values,
-																		 std::vector<double>								weights,
-																		 Vector<double>											mean);
+	static SymmetricMatrix Covariances(
+      const std::vector<std::vector<double> >&  values,
+			const std::vector<double>&								weights,
+			const Vector<double>&											mean);
 
 	/// Make a hypercube of points with half width of delta in each dimension so that the number
 	/// of points is at least multiplier*NumberOfPolynomialCoefficients(i_order, delta.size())

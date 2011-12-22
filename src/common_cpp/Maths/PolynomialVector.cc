@@ -291,57 +291,85 @@ Vector<double> PolynomialVector::Means(std::vector<std::vector<double> > values,
   if(values.size() < 1)    throw(Squeal(Squeal::recoverable, "No input values", "PolynomialVector::Means"));
   if(values[0].size() < 1) throw(Squeal(Squeal::recoverable, "Dimension < 1",   "PolynomialVector::Means"));
   if(weights.size() != values.size()) weights = std::vector<double>(values.size(), 1.);
-  int                npoints     = values.size();
-  int                dim         = values[0].size();
+  size_t npoints     = values.size();
+  size_t dim         = values[0].size();
   Vector<double>    means(dim,0);
   double             totalWeight = 0;
   for(int x=0; x<npoints; x++) totalWeight += weights[x];
-  for(int x=0; x<npoints; x++)
-    for(int i=0; i<dim;   ++i)
-    {
-      means(i+1) += values[x][i]*weights[x]/totalWeight;
+
+  std::vector<double> normalized_weights;
+  for (size_t x=0; x<npoints; x++) {
+    normalized_weights.push_back(weights[x] / totalWeight);
+  }
+
+  double mean;
+  for(int i=0; i<dim; ++i)
+  {
+    mean = 0.;
+    for(int x=0; x<npoints; ++x) {
+      mean += values[x][i] * normalized_weights[x];
     }
+
+    means(i+1) = mean;
+  }
 
   return means;
 }
 
-SymmetricMatrix PolynomialVector::Covariances(std::vector<std::vector<double> > values, std::vector<double> weights, Vector<double> means)
+SymmetricMatrix PolynomialVector::Covariances(
+    const std::vector<std::vector<double> >&          values,
+    const std::vector<double>&                        weights,
+    const Vector<double>&                             means)
 {
-  size_t                 npoints = values.size();
-  if(npoints < 1) throw(Squeal(Squeal::recoverable, "No input values", "PolynomialVector::Covariances()"));
-  size_t                 dim     = values[0].size();
-  if(dim < 1)     throw(Squeal(Squeal::recoverable, "Dimension < 1", "PolynomialVector::Covariances()"));    
-  if(means.size() != dim)           means   = Means(values, weights);
-  if(weights.size()  != values.size()) weights = std::vector<double>(values.size(), 1.);
+  size_t npoints = values.size();
+  if(npoints < 1) {
+    throw(Squeal(Squeal::recoverable,
+                 "No input values",
+                 "PolynomialVector::Covariances()"));
+  }
+  size_t dim = values[0].size();
+  if(dim < 1) {
+    throw(Squeal(Squeal::recoverable,
+                 "Dimension < 1",
+                 "PolynomialVector::Covariances()"));
+  }
+  Vector<double> means_vector(dim);
+  if(means.size() != dim) {
+    means_vector = Means(values, weights);
+  } else {
+    means_vector = means;
+  }
+  std::vector<double> weights_vector;
+  if (weights.size() != npoints) {
+    weights_vector = std::vector<double>(npoints, 1.);
+  } else {
+    weights_vector = weights;
+  }
 
-  SymmetricMatrix covariances(dim, 0.);
+  SymmetricMatrix covariances(dim);
 
-  double             totalWeight = 0;
-  for(size_t x=0; x<npoints; x++)
-    totalWeight += weights[x];
+  double totalWeight = 0;
+  for (size_t x=0; x<npoints; x++) {
+    totalWeight += weights_vector[x];
+  }
 
-  SymmetricMatrix tmp_matrix(dim);
-  for(size_t x=0; x<npoints; x++)
-  {
-    for(size_t i=0; i<dim; ++i)
-    {
-      for(size_t j=0; j<=i; ++j) //make a sym matrix for speed
+  std::vector<double> normalized_weights;
+  for (size_t x=0; x<npoints; x++) {
+    normalized_weights.push_back(weights_vector[x] / totalWeight);
+  }
+
+  double sum;
+  for(size_t i=0; i<dim; ++i) {
+    for(size_t j=0; j<=i; ++j) {
+      sum = 0.;
+      for(size_t x=0; x<npoints; x++)
       {
-        tmp_matrix.set(i+1, j+1,   values[x][i] * values[x][j] * weights[x]
-                                 / totalWeight);
+        sum += values[x][i] * values[x][j] * normalized_weights[x];
       }
-    }
-    covariances += tmp_matrix;
-  }
 
-  for(size_t i=0; i<dim; ++i)
-  {
-    for(size_t j=0; j<i; ++j)
-    {
-      tmp_matrix.set(i+1, j+1, means(i+1) * means(j+1));
+      covariances.set(i+1, j+1, sum - means_vector[i] * means_vector[j]);
     }
   }
-  covariances -= tmp_matrix;
 
   return covariances;
 }
@@ -629,10 +657,14 @@ PolynomialVector* PolynomialVector::Chi2ConstrainedLeastSquaresFit(
   return pvec;
 }
 
-PolynomialVector* PolynomialVector::Chi2SweepingLeastSquaresFit
-                          (const VectorMap& vec, int polynomialOrder, std::vector< PolynomialVector::PolynomialCoefficient > coeffs, 
-                           double chi2Max, std::vector<double>& delta, double deltaFactor, int maxNumberOfSteps)
-{
+PolynomialVector* PolynomialVector::Chi2SweepingLeastSquaresFit(
+    const                                                   VectorMap& vec,
+    int                                                     polynomialOrder,
+    std::vector< PolynomialVector::PolynomialCoefficient >  coeffs, 
+    double                                                  chi2Max,
+    std::vector<double>&                                    delta,
+    double                                                  deltaFactor,
+    int                                                     maxNumberOfSteps) {
   //build particles in shell
   //try to do chi2 fit
   //if chi2 fit works, increase shell size
@@ -724,9 +756,8 @@ void PolynomialVector::PolynomialCoefficient::SpaceTransform(std::vector<int> sp
 
 //Return chi2 of some set of output variables compared with the polynomial vector of some set of input variables 
 double PolynomialVector::GetAvgChi2OfDifference(
-  std::vector< std::vector<double> > in,
-  std::vector< std::vector<double> > out)
-{
+    std::vector< std::vector<double> > in,
+    std::vector< std::vector<double> > out) {
   std::vector< std::vector<double> > out_p;
   if(in.size() < 1)
   {
