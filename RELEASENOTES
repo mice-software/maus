@@ -4,8 +4,11 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v0.1.1
+- Prototype functionality to run MAUS online added
+
 MAUS-v0.1.0
-- Functionality to import geometries direct from GDML files into GEANT4
+- Functionality to import geometries direct from GDML files into GEANT4 added
 
 MAUS-v0.0.9
 - TOF reconstruction to space points added
