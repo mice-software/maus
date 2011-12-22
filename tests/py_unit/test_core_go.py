@@ -11,7 +11,7 @@ from MapPyDoNothing import MapPyDoNothing
 from ReducePyDoNothing import ReducePyDoNothing
 from OutputPyJSON import OutputPyJSON
 
-from Go import Go, get_possible_dataflows
+from Go import Go
 
 class FakeMap(): #pylint: disable = W0232, R0903
     """Map mock-up that always fails to birth"""
@@ -30,7 +30,7 @@ class GoTestCase(unittest.TestCase): #pylint: disable = R0904
         """
         Make sure get_possible_dataflows() doesn't return nonsense
         """
-        keys = get_possible_dataflows().keys()
+        keys = Go.get_possible_dataflows().keys()
         self.assertTrue('pipeline_single_thread' in keys)
 
     def input_birth_test(self):
@@ -109,8 +109,10 @@ class GoTestCase(unittest.TestCase): #pylint: disable = R0904
                command_line_args = False)
 
 
-    def test_type_of_dataflow_good(self):
-        """Check that Go executes okay with good dataflow"""
+    def test_dataflow_single_thread(self):
+        """
+        Check that Go executes okay with pipeline_single_thread dataflow.
+        """
         inputer = InputPyEmptyDocument(1)
         transformer = MapPyDoNothing()
         merger = ReducePyDoNothing()
@@ -121,13 +123,28 @@ class GoTestCase(unittest.TestCase): #pylint: disable = R0904
             Go(inputer, transformer, merger, outputer, config, \
                    command_line_args = False)
 
+    def test_dataflow_multi_process(self):
+        """
+        Check that Go executes okay with multi_process dataflow.
+        """
+        inputer = InputPyEmptyDocument(1)
+        transformer = MapPyDoNothing()
+        merger = ReducePyDoNothing()
+        outputer = OutputPyJSON(open(self.tmp_file, 'w'))
+        for map_red_type in ['multi_process']:
+            config = StringIO(u"""type_of_dataflow="%s" """ % map_red_type)
+
+            with self.assertRaises(Exception):
+                Go(inputer, transformer, merger, outputer, config, \
+                       command_line_args = False)
+
     def test_dataflow_not_implemented(self):
         """Check that Go notifies user of unimplemented dataflow"""
         inputer = InputPyEmptyDocument(1)
         transformer = MapPyDoNothing()
         merger = ReducePyDoNothing()
         outputer = OutputPyJSON(open(self.tmp_file, 'w'))
-        for map_red_type in ['many_local_threads','control_room_style']:
+        for map_red_type in ['many_local_threads']:
             config = StringIO(u"""type_of_dataflow="%s" """ % map_red_type)
             
             with self.assertRaises(NotImplementedError):

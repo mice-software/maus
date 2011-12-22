@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-directory=xboa-0.12.0
+directory=xboa-0.13.0
 filename=${directory}.tar.gz
 url=http://sourceforge.net/projects/xboa/files/${filename}/download
 

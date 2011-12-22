@@ -25,6 +25,12 @@ if not maus_root_dir:
     print('!! Did you try running: "source env.sh"?')
     my_exit(1)
 
+maus_third_party = os.environ.get('MAUS_THIRD_PARTY')
+if not maus_third_party:
+    print('Could not find the $MAUS_THIRD_PARTY environmental variable')
+    print('Setting maus_third_party to current working directory')
+    maus_third_party = maus_root_dir
+
 #this is our catch-all Dev class
 class Dev:
     cflags = ''
@@ -189,6 +195,7 @@ def get_root_libs():
                 'MathCore', \
                 'Matrix', \
                 'Minuit', \
+                'Spectrum',\
                 'Net', \
                 'Physics', \
                 'Postscript', \
@@ -504,7 +511,7 @@ if os.path.isfile('.use_llvm_with_maus'):
     env['CC'] = "llvm-gcc"
     env['CXX'] = "llvm-g++"
 
-env.Tool('swig', '%s/third_party/swig-2.0.1' % maus_root_dir)
+env.Tool('swig', '%s/third_party/swig-2.0.1' % maus_third_party)
 env.Append(SWIGFLAGS=['-python', '-c++']) # tell SWIG to make python bindings for C++
 
 env['ENV']['PATH'] =  os.environ.get('PATH')  # useful to set for root-config
@@ -514,11 +521,11 @@ env['ENV']['DYLD_LIBRARY_PATH'] = os.environ.get('DYLD_LIBRARY_PATH')
 libs = str(os.environ.get('LD_LIBRARY_PATH'))+':'+str(os.environ.get('DYLD_LIBRARY_PATH'))
 
 # to find third party libs, includes
-env.Append(LIBPATH =  libs.split(':') + ["%s/build" % maus_root_dir])
+env.Append(LIBPATH =  libs.split(':') + ["%s/build" % maus_third_party])
 
-env.Append(CPPPATH=["%s/third_party/install/include" % maus_root_dir, \
-                      "%s/third_party/install/include/python2.7" % maus_root_dir, \
-                      "%s/third_party/install/include/root" % maus_root_dir, \
+env.Append(CPPPATH=["%s/third_party/install/include" % maus_third_party, \
+                      "%s/third_party/install/include/python2.7" % maus_third_party, \
+                      "%s/third_party/install/include/root" % maus_third_party, \
                       "%s/src/legacy" % maus_root_dir,
 			"%s/src/common_cpp" % maus_root_dir, ""])
 
@@ -628,7 +635,7 @@ for directory in directories:
 
         stuff_to_import.append(parts[2])
 
-    if (parts[2][0:6] == 'MapCpp') or (parts[2][0:8] == 'InputCpp'):
+    if (parts[2][0:6] == 'MapCpp') or (parts[2][0:8] == 'InputCpp') or (parts[2][0:9] == 'ReduceCpp'):
         print 'Found C++ module: %s' % parts[2]
         env.jDev.Subproject(directory)
         stuff_to_import.append(parts[2])

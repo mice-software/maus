@@ -2,7 +2,6 @@
 
 import unittest
 import run_simulation
-import ErrorHandler
 
 class BrokenRFTestCase(unittest.TestCase):
     """
