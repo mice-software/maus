@@ -22,7 +22,7 @@ import pymongo
 from pymongo.errors import AutoReconnect
 import unittest
 
-from MongoDBDocumentStore import MongoDBDocumentStore
+from docstore.MongoDBDocumentStore import MongoDBDocumentStore
 
 class MongoDBDocumentStoreTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
     """

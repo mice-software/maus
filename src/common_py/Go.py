@@ -211,10 +211,12 @@ class DataflowUtilities: # pylint: disable=W0232
         doc_store_class = json_config_dictionary["doc_store_class"]
         path = doc_store_class.split(".")
         doc_store_class = path.pop()
-        doc_store_module = ".".join(path)
-
+        import_path = ".".join(path)
+        module_object = __import__(import_path)
+        path.pop(0)
         # Dynamically import the module.
-        module_object = __import__(doc_store_module)
+        for sub_module in path:
+            module_object = getattr(module_object, sub_module) 
         # Get class object.
         class_object = getattr(module_object, doc_store_class)
         # Create instance of class object.
@@ -451,7 +453,8 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903
 
         print("TRANSFORM: spawning transform jobs for each spill")
 
-        from maustasks import MausGenericTransformTask
+        from mauscelery.maustasks import MausGenericTransformTask
+
         if hasattr(self.transformer, "get_worker_names"):
             workers = self.transformer.get_worker_names()
         else:

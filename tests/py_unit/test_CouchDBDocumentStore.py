@@ -22,7 +22,7 @@ import couchdb
 from socket import gaierror
 import unittest
 
-from CouchDBDocumentStore import CouchDBDocumentStore
+from docstore.CouchDBDocumentStore import CouchDBDocumentStore
 
 class CouchDBDocumentStoreTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
     """

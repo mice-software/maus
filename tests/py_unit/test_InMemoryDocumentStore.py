@@ -20,7 +20,7 @@ Tests for InMemoryDocumentStore module.
 
 import unittest
 
-from InMemoryDocumentStore import InMemoryDocumentStore
+from docstore.InMemoryDocumentStore import InMemoryDocumentStore
 
 class InMemoryDocumentStoreTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
     """
