@@ -477,7 +477,6 @@ def install_python_tests(maus_root_dir):
             subdir_mod = subdir[pos:]
             test_files = glob.glob(subdir+"/test_*.py")                   
             env.Install(build+subdir_mod, test_files)
-            print subdir, subdir_mod, test_files
 
 # Setup the environment.  NOTE: SHLIBPREFIX means that shared libraries don't
 # have a 'lib' prefix, which is needed for python to find SWIG generated
@@ -634,6 +633,10 @@ for directory in directories:
         stuff_to_import.append(parts[2])
 
 file_to_import = open('%s/build/MAUS.py' % maus_root_dir, 'w')
+
+file_to_import.write("import ROOT\n")
+file_to_import.write("ROOT.PyConfig.IgnoreCommandLineOptions = True\n")
+file_to_import.write("\n")
 
 file_to_import.write("try:\n")
 file_to_import.write("     from Go import Go\n")
