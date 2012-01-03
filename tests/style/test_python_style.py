@@ -116,7 +116,7 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
         if len(error_files) > 0:
             print str(n_errors)+'/'+str(current_n_python_errors)+\
                   ' style errors in following files '+\
-                  '(see tmp/pylint.out for details)\n'+str(error_files)
+                  '(see tmp/pylint.out for details)\n'+str(sorted(error_files))
 
         if n_errors > current_n_python_errors:
             raise RuntimeError("Number of python style errors has increased"+\
