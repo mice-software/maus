@@ -186,8 +186,8 @@ SciFi_sigma_duplet =  0.6197 # mm
 # geometry upload/download information
 #Upload
 # Arguments below MUST be included
-GeometryDirectory   = "%s/src/common_py/geometry/testCases/testGeometry" % os.environ.get("MAUS_ROOT_DIR")
-GeometryDescription = "This is a standard note It uses the standard test case"
+GeometryDirectory   = "/home/matt/StepFiles/EMR/GDML_FastradModel" #%s/src/common_py/geometry/testCases/testGeometry" % os.environ.get("MAUS_ROOT_DIR")
+GeometryDescription = "This is the full CAD version of the EMR" #This is a standard note It uses the standard test case"
 # Optional Arguments 1 = yes, 0 = no
 Zip_File         = 0
 Delete_Originals = 0
@@ -195,7 +195,7 @@ Delete_Originals = 0
 #Download
 #Donwloading of geometries
 #Below, name the directory where the geometry will be downloaded.
-DownloadDir = "%s/src/common_py/geometry/Download/" % os.environ.get("MAUS_ROOT_DIR")
+DownloadDir = "/home/matt/StepFiles/EMR/GDML_FastradModel" #%s/src/common_py/geometry/Download/" % os.environ.get("MAUS_ROOT_DIR")
 #Download Geometry for a specific ID
 #Name the start and stop time for which the geometry was valid. Stop time is optional
 StartTime = "2011-09-08 09:00:00"

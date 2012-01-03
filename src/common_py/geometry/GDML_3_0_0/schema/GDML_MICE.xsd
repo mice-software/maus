@@ -73,7 +73,7 @@
     </xs:complexType>
     <xs:complexType name="DiameterType">
         <xs:attribute name="dia" use="required" type="xs:double"/>
-        <xs:attribute name="unit" use="optional"></xs:attribute>
+        <xs:attribute name="unit" use="optional"/>
     </xs:complexType>
     <xs:complexType name="InvisibleType">
         <xs:attribute name="True" use="required" type="xs:integer"/>

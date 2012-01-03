@@ -51,15 +51,14 @@ class Formatter: #pylint: disable = R0902
         gdmls = os.listdir(self.path)
         for fname in gdmls:
             if fname[-5:] != '.gdml' and fname[-4:] != '.xml':
-                raise IOError('Files are not GDMLs or XMLs', \
-                                    'GDMLFormatter::__init__')
+                raise IOError('Files are not GDMLs or XMLs')
             if fname.find('materials') >= 0:
                 materialfile = self.path + '/' + fname
                 self.materialfile = materialfile
                 self.materialfilepath = os.path.abspath(self.materialfile)
-            if fname.find('fastrad') >= 0:
+            if fname.find('fastrad') >= 0 or fname.find('Fastrad') >= 0:
                 configfile = self.path + '/' + fname
-                if file != self.materialfile:
+                if configfile != self.materialfile:
                     self.configurationfile = configfile
             if fname.find('Field') >= 0 or fname.find('field') >= 0:
                 found_file = self.path + '/' + fname
@@ -73,9 +72,9 @@ class Formatter: #pylint: disable = R0902
             and fname.find('Beamline') < 0 :
                 stepfile = self.path + '/' + fname
                 self.stepfiles.append(stepfile)
-            if self.field_file == None:
-                raise IOError('Please write a Field.gdml file which' + \
-                            'contains MAUS_info see README for details')
+        if self.field_file == None:
+            raise IOError('Please write a Field.gdml file which' + 
+                      'contains MAUS_info see README for details')
         
             
     def format_schema_location(self, gdmlfile):
@@ -91,6 +90,7 @@ class Formatter: #pylint: disable = R0902
             raise IOError(gdmlfile + \
             ' is not a gdml or xml', 'Formatter::format_schema_location')
         else:
+            print gdmlfile
             xmldoc = minidom.parse(gdmlfile)
             for node in xmldoc.getElementsByTagName("gdml"):
                 if node.hasAttribute("xsi:noNamespaceSchemaLocation"):
