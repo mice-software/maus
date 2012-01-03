@@ -1,3 +1,16 @@
+MAUS-v0.1.1 (http://micewww.pp.rl.ac.uk/versions/show/18)
+  Bug #781: Test suite output on vejur cluster at IIT
+  Bug #810: MapPyValidateSpill birth function breaks assumed signature
+  Bug #838: Trunk broken by xboa errors
+  Feature #748: cdb python api ready for merging into maus
+  Feature #809: Prototype web histogram presenter seems to cache images and not auto refresh
+
+MAUS-v0.1.0 (http://micewww.pp.rl.ac.uk/versions/show/13)
+  Feature #807: CAD import
+  Bug #798: ROOT version and configure script mismatch
+  Bug #799: Error handler produces useless output - sometimes
+  Bug #804: Typo in maus-apps readme
+
 MAUS-v0.0.9 (http://micewww.pp.rl.ac.uk/versions/show/17)
   Bug #42: Possible memory leak in MiceModule class
   Bug #750: OutputPyImage segmentation fault because of bad uuid library

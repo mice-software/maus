@@ -1,6 +1,6 @@
 """
-ReducePyMatplotlibHistogram is a base class for classes that create
-histograms using matplotlib.
+ReducePyROOTHistogram is a base class for classes that create
+histograms using ROOT.
 """
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 # 
@@ -16,19 +16,21 @@ histograms using matplotlib.
 # 
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Turn off false positives related to ROOT
+#pylint: disable = E1101
 
 import base64
 import json
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-from matplotlib.figure import Figure
-import StringIO
+import os
 
 import ErrorHandler
+import ROOT
 
-class ReducePyMatplotlibHistogram: # pylint: disable=R0903 
+class ReducePyROOTHistogram: # pylint: disable=R0902
     """
-    @class ReducePyMatplotlibHistogram.PyMatplotlibHistogram is 
-    a base class for classes that create histograms using matplotlib. 
+    @class ReducePyROOTHistogram.ReducePyROOTHistogram is a base class
+    for classes that create histograms using ROOT. 
 
     Histograms are output as JSON documents of form:
 
@@ -59,14 +61,17 @@ class ReducePyMatplotlibHistogram: # pylint: disable=R0903
     The caller can configure the worker and specify:
 
     -Image type ("histogram_image_type"). Must be one of those
-     supported by matplot lib (currently "svg", "ps", "emf", "rgba",
-     "raw", "svgz", "pdf", "eps", "png"). Default: "eps".
+     supported by ROOT (currently "ps", "eps", "gif", "jpg", "jpeg",
+     "pdf", "svg", "png"). Default "eps".
     -Auto-number ("histogram_auto_number"). Default: false. Flag
      that determines if the image tag (see above) has the spill count
      appended to it or not.
-    -Sub-classes may support additional configuration parameter
+    -ROOT batch mode ("root_batch_mode"). Default: 0 (false). Flag
+     indicating whether ROOT should be run in batch or interactive 
+     mode.
+    -Sub-classes may support additional configuration parameters.
 
-    Sub-classes must override:
+    Sub-classes must override the following functions:
 
     -_configure_at_birth - to extract any additional
      sub-class-specific configuration from data cards.
@@ -81,12 +86,12 @@ class ReducePyMatplotlibHistogram: # pylint: disable=R0903
         Set initial attribute values.
         @param self Object reference.
         """
-        # matplotlib histogram - for validation.
-        figure = Figure(figsize=(6, 6))
-        self.__histogram = FigureCanvas(figure)
-        self.spill_count = 0 # Number of spills processed to date.
+        self.supported_types = \
+            ["ps", "eps", "gif", "jpg", "jpeg", "pdf", "svg", "png"]
+        self.spill_count = 0 
         self.image_type = "eps"
         self.auto_number = False
+        self.root_batch_mode = 0 # False = Interactive mode.
 
     def birth(self, config_json):
         """
@@ -98,6 +103,13 @@ class ReducePyMatplotlibHistogram: # pylint: disable=R0903
         """
         config_doc = json.loads(config_json)
 
+        key = "root_batch_mode"
+        if key in config_doc:
+            self.root_batch_mode = int(config_doc[key])
+        ROOT.gROOT.SetBatch(False) # Interactive mode.
+        if self.root_batch_mode == 1:
+            ROOT.gROOT.SetBatch(True)
+
         key = "histogram_auto_number"
         if key in config_doc:
             self.auto_number = config_doc[key]
@@ -108,15 +120,12 @@ class ReducePyMatplotlibHistogram: # pylint: disable=R0903
         else:
             self.image_type = "eps"
 
-        if self.image_type not in \
-            self.__histogram.get_supported_filetypes().keys():
+        if self.image_type not in self.supported_types:
             error = "Unsupported histogram image type: %s Expect one of %s" \
-                % (self.image_type, 
-                   self.__histogram.get_supported_filetypes().keys())
+                % (self.image_type, self.supported_types)
             raise ValueError(error)
 
         self.spill_count = 0
-
         # Do sub-class-specific configuration.
         return self._configure_at_birth(config_doc)
 
@@ -179,10 +188,14 @@ class ReducePyMatplotlibHistogram: # pylint: disable=R0903
 
     def death(self): #pylint: disable=R0201
         """
-        Invokes _cleanup_at_death().
+        Invokes _cleanup_at_death() then removes any zombie ROOT
+        objects. 
         @returns True
         """
-        return self._cleanup_at_death()
+        result = self._cleanup_at_death()
+        # Remove any zombie ROOT objects.
+        ROOT.gDirectory.GetList().Delete()
+        return result
 
     def _cleanup_at_death(self): #pylint: disable=R0201
         """
@@ -193,75 +206,35 @@ class ReducePyMatplotlibHistogram: # pylint: disable=R0903
         @returns True
         """
         return True
- 
-    def _create_histogram(self): #pylint: disable=R0201
-        """
-        Create a histogram using matplotlib.
-        @param self Object reference.
-        @returns matplotlib FigureCanvas representing the histogram.
-        """
-        figure = Figure(figsize=(6, 6))
-        histogram = FigureCanvas(figure)
-        axes = figure.add_subplot(111)
-        axes.grid(True, linestyle="-", color="0.75")
-        return histogram
 
-    def _rescale_axes(self, histogram, xmin, xmax, ymin, ymax, xfudge = 0.5, yfudge = 0.5): #pylint: disable=C0301, R0913, R0201
+    def get_image_doc(self, content, tag, canvas):
         """
-        Rescale the X and Y axes of the histogram to show the given
-        axis ranges. Fudge factors are used avoid matplotlib warning
-        about "Attempting to set identical bottom==top" which arises
-        if the axes are set to be exactly the maximum of the data.
-        @param self Object reference.
-        @param histogram FigureCanvas representing a histogram.
-        @param xmin Minimum X value.
-        @param xmax Maximum X value.
-        @param ymin Minimum Y value.
-        @param ymin Maximum Y value.
-        @param xfudge X fudge factor.
-        @param yfudge Y fudge factor.
-        """
-        # Fudge factors are used
-        histogram.figure.get_axes()[0].set_xlim( \
-            [xmin, xmax + xfudge])
-        histogram.figure.get_axes()[0].set_ylim( \
-            [ymin, ymax + yfudge])
-
-    def _create_image_json(self, content, tag, canvas): #pylint: disable=R0201
-        """
-        Build a JSON document holding image data.
+        Build a JSON document holding image data. This saves the
+        canvas to a temporary file and then reloads it.
 
         @param self Object reference.
         @param content String describing the image.
         @param tag Image tag.
-        @param histogram FigureCanvas representing a histogram.
+        @param canvas ROOT canvas.
         @returns JSON document.
         """
-        json_doc = {}
-        json_doc["image"] = {}
         if (self.auto_number):
             image_tag = "%s%06d" % (tag, self.spill_count)
         else:
             image_tag = tag
-        data = self.__convert_to_binary(canvas)
+        # Save to and reload from temporary file.
+        file_name = "%s_tmp.%s" % (image_tag, self.image_type)
+        canvas.Print(file_name)
+        tmp_file = open(file_name, 'r')
+        data = tmp_file.read()
+        encoded_data = base64.b64encode(data)
+        tmp_file.close()
+        os.remove(file_name)
+        # Build JSON document.
+        json_doc = {}
+        json_doc["image"] = {}
         json_doc["image"]["content"] = content
         json_doc["image"]["tag"] = image_tag
         json_doc["image"]["image_type"] = self.image_type
-        json_doc["image"]["data"] = data
+        json_doc["image"]["data"] = encoded_data
         return json_doc
-
-    def __convert_to_binary(self, canvas): #pylint: disable=R0201
-        """
-        Convert histogram to binary format.
-        @param self Object reference.
-        @param canvas matplotlib FigureCanvas representing a
-        histogram. 
-        @returns representation of histogram in base 64-encoded image 
-        type format.
-        """
-        data_file = StringIO.StringIO()
-        canvas.print_figure(data_file, dpi=500, format=self.image_type)
-        data_file.seek(0)
-        data = data_file.read()
-        return base64.b64encode(data)
-

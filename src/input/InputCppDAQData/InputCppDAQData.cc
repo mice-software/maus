@@ -195,20 +195,20 @@ std::string InputCppDAQData::getCurEvent() {
   // Deal with exceptions
   catch(MDexception & lExc) {
     Squeak::mout(Squeak::error) << lExc.GetDescription() << std::endl
-    << "*** Unpacking exception in InputCppDAQData::getCurEvent() : " << endl;
-    Squeak::mout(Squeak::error) <<"DAQ Event skipped!" << endl;
+    << "*** Unpacking exception in InputCppDAQData::getCurEvent() : " << std::endl;
+    Squeak::mout(Squeak::error) <<"DAQ Event skipped!" << std::endl << std::endl;
     xDocSpill.clear();
     Json::Value errors;
     std::stringstream ss;
-    ss << _classname << " says:" << lExc.GetDescription() << "  Phys. Event " << endl
+    ss << _classname << " says:" << lExc.GetDescription() << "  Phys. Event " << std::endl
     << _dataProcessManager.GetPhysEventNumber() << " skipped!";
     errors["bad_data_input"] = ss.str();
     xDocRoot["errors"] = errors;
   }
   catch(std::exception & lExc) {
     Squeak::mout(Squeak::error) << lExc.what() << std::endl
-    << "*** Standard exception in InputCppDAQData::getCurEvent() : " << endl;
-    Squeak::mout(Squeak::error) <<"DAQ Event skipped!" << endl;
+    << "*** Standard exception in InputCppDAQData::getCurEvent() : " << std::endl;
+    Squeak::mout(Squeak::error) <<"DAQ Event skipped!" << std::endl << std::endl;
     xDocSpill.clear();
     Json::Value errors;
     std::stringstream ss;
@@ -218,8 +218,9 @@ std::string InputCppDAQData::getCurEvent() {
     xDocRoot["errors"] = errors;
   }
   catch(...) {
-    Squeak::mout(Squeak::error) << "InputCppDAQData::getCurEvent() : Unknown exception occurred."
-    << std::endl << "DAQ Event skipped!" << std::endl;
+    Squeak::mout(Squeak::error) <<
+    "*** InputCppDAQData::getCurEvent() : Unknown exception occurred." << std::endl;
+    Squeak::mout(Squeak::error) << "DAQ Event skipped!" << std::endl << std::endl;
     xDocSpill.clear();
     Json::Value errors;
     std::stringstream ss;
