@@ -21,16 +21,16 @@ import unittest
 import shutil
 from geometry.GDMLtoMAUSModule import GDMLtomaus
 
-class  test_gdml_to_maus_module(unittest.TestCase):#pylint:disable = C0103,R0904
+class  TestGDMLToMausModule(unittest.TestCase):#pylint:disable = C0103,R0904
     """
-    class test_gdml_to_maus_module
+    class TestGDMLToMausModule
     
     This class tests GDMLtoMAUSModule 
     to ensure it is working correctly.
     """    
     def setUp(self): #pylint: disable = C0103
         """
-        method set_up
+        TestGDMLToMausModule::setUp
         
         This method sets up a GDMLtomaus object
         ready for testing. It also has to move
@@ -39,27 +39,24 @@ class  test_gdml_to_maus_module(unittest.TestCase):#pylint:disable = C0103,R0904
         Therefore copies of the testGeometry are made,
         tested and then removed.
         """
+        test_cases_dir = os.environ['MAUS_ROOT_DIR'] + \
+                                       '/tests/py_unit/test_geometry/testCases/'
         self.constructor = None
-        self.file_source = os.environ['MAUS_ROOT_DIR'] + \
-        '/src/common_py/geometry/testCases/mausModuleSource'
+        self.file_source = test_cases_dir+'/mausModuleSource'
         self.copy_files = GDMLtomaus(self.file_source)
-        config_file = os.environ['MAUS_ROOT_DIR'] + \
-        '/src/common_py/geometry/testCases/testGDMLtoMAUSModule' \
-        + '/fastradModel.gdml'
+        config_file = test_cases_dir+'/testGDMLtoMAUSModule/fastradModel.gdml'
         shutil.copyfile(self.copy_files.config_file, config_file)
         length = len(self.copy_files.step_files)
         for num in range (0, length):
-            step_file = os.environ['MAUS_ROOT_DIR'] + \
-            '/src/common_py/geometry/testCases/testGDMLtoMAUSModule/Step_' + \
-            str(num) + '.gdml'
+            step_file = test_cases_dir+'/testGDMLtoMAUSModule/Step_' + \
+                                                              str(num) + '.gdml'
             shutil.copyfile(self.copy_files.step_files[num], step_file)
-        self.testcase = os.environ['MAUS_ROOT_DIR'] + \
-        '/src/common_py/geometry/testCases/testGDMLtoMAUSModule'
+        self.testcase = test_cases_dir+'/testGDMLtoMAUSModule'
         self.test_conversion = GDMLtomaus(self.testcase)
         
     def test_constructor(self):
         """
-        method test_constructor
+        TestGDMLToMausModule::test_constructor
         
         This method tests the constructor
         by passing invalid arguments and seeing
@@ -81,7 +78,7 @@ class  test_gdml_to_maus_module(unittest.TestCase):#pylint:disable = C0103,R0904
         
     def test_convert_to_maus(self):
         """
-        method test_convert_to_maus
+        TestGDMLToMausModule::test_convert_to_maus
         
         This method tests the convert_to_maus
         method which should convert the files to maus

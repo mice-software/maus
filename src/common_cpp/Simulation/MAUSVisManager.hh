@@ -56,7 +56,6 @@ class MAUSVisManager: public G4VisManager {
     Squeak::mout(Squeak::debug) << "g4ui> " << cmd << std::endl;
     G4UImanager::GetUIpointer()->ApplyCommand(cmd);
   }
-  G4Color GetColourValues(std::string particle_type, Json::Value conf);
 };
 }
 

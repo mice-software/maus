@@ -34,52 +34,25 @@ class Configreader(): #pylint: disable = R0903, R0902
         This sets up the blank variables ready to be filled by the information
         contained in the Configuration text file.
         """
-        self.gdmldir = ""
-        self.geometrynotes = ""
-        self.zipfile = None
-        self.deleteoriginals = None
-        self.downloaddir = ""
-        self.starttime = ""
-        self.stoptime = ""
-        self.runnum = ""
-        
-    def readconfig(self):
-        """
-        @method readconfig
-        
-        This method reads the ConfigurationDefaults File and takes the 
-        information needed from the file which has certain tags. This 
-        information is then stored into variables which can be passed between
-        classes. The tags are,
-        
-        GeometryDirectory   = "This is where the directory to the fastrad 
-                               outputted geometry goes"
-        GeometryDescription = "This is where the description of the geometry 
-                               goes"
-        ZipFile          = "Choose 1 to create a zipfile of the geometry. 
-                            0 to do nothing"
-        Delete Originals = "Choose 1 to delete the original geometry files.  
-                            0 to do nothing"
-        DownloadDir = "This is where the directory which the user wishes to 
-                       download geometries from the CDB to goes"                      
-        """
-        inputs = Configuration().getConfigJSON()
-        config_dict          = json.loads(inputs)
-        self.gdmldir         = config_dict['GeometryDirectory']
-        self.geometrynotes   = config_dict['GeometryDescription']
-        self.zipfile         = config_dict['Zip_File']
-        self.deleteoriginals = config_dict['Delete_Originals']
-        self.downloaddir     = config_dict['DownloadDir']
-        self.starttime       = config_dict['StartTime']
-        self.stoptime        = config_dict['StopTime']
-        self.runnum          = config_dict['RunNum']
+        inputs = Configuration().getConfigJSON(command_line_args = True)
+        config_dict = json.loads(inputs)
+        self.cdb_upload_url = config_dict['cdb_upload_url']
+        self.geometry_upload_wsdl  = config_dict['geometry_upload_wsdl']
+        self.geometry_upload_directory = config_dict \
+                                                   ['geometry_upload_directory']
+        self.geometry_upload_note = config_dict['geometry_upload_note']
+        self.geometry_upload_valid_from = config_dict \
+                                                  ['geometry_upload_valid_from']
+        self.geometry_upload_cleanup = config_dict['geometry_upload_cleanup']
 
-def main():
-    """
-    Main Function
-    """
-    cfile = Configreader()
-    cfile.readconfig()
+        self.cdb_download_url = config_dict['cdb_download_url']
+        self.geometry_download_wsdl = config_dict['geometry_download_wsdl']
+        self.geometry_download_directory = config_dict \
+                                                 ['geometry_download_directory']
+        self.geometry_download_by = config_dict['geometry_download_by']
+        self.geometry_download_run_number = config_dict \
+                                                ['geometry_download_run_number']
+        self.geometry_download_id = config_dict['geometry_download_id']
+        self.geometry_download_cleanup = config_dict \
+                                                   ['geometry_download_cleanup']
 
-if __name__ == "__main__":
-    main()

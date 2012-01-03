@@ -1,3 +1,15 @@
+"""
+The Configuration defaults
+
+These are the default values for MAUS and its components. Please DO NOT CHANGE
+this unless you want to change this quantity for everybody. Values can be
+overridden by setting configuration_file parameter on the comamnd line, for
+example
+
+bin/simulate_mice.py --configuration_file my_configuration.py
+"""
+
+
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 #
 #  MAUS is free software: you can redistribute it and/or modify
@@ -13,13 +25,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-## The Configuration defaults
-#  These are the default values for MAUS and its components.
-#  Please DO NOT CHANGE this unless you want to change this
-#  quantity for everybody.  If you want to fiddle, then
-#  please load your own overriding configuration by
-#  consulting the documentation.
-#
 import os
 
 type_of_dataflow = 'pipeline_single_thread'
@@ -183,38 +188,48 @@ SciFi_sigma_triplet = 0.3844 # mm
 SciFi_sigma_z = 0.081 # mm
 SciFi_sigma_duplet =  0.6197 # mm
 
-# geometry upload/download information
-#Upload
-# Arguments below MUST be included
-GeometryDirectory   = "/home/matt/StepFiles/EMR/GDML_FastradModel" #%s/src/common_py/geometry/testCases/testGeometry" % os.environ.get("MAUS_ROOT_DIR")
-GeometryDescription = "This is the full CAD version of the EMR" #This is a standard note It uses the standard test case"
-# Optional Arguments 1 = yes, 0 = no
-Zip_File         = 0
-Delete_Originals = 0
+# configuration database
+cdb_upload_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database uploads
+cdb_download_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database downloads
 
-#Download
-#Donwloading of geometries
-#Below, name the directory where the geometry will be downloaded.
-DownloadDir = "/home/matt/StepFiles/EMR/GDML_FastradModel" #%s/src/common_py/geometry/Download/" % os.environ.get("MAUS_ROOT_DIR")
-#Download Geometry for a specific ID
-#Name the start and stop time for which the geometry was valid. Stop time is optional
-StartTime = "2011-09-08 09:00:00"
-StopTime  = None
-#Download Geometry for a specific Run Num
-RunNum = 1
+# geometry download
+geometry_download_wsdl = "geometry?wsdl" # name of the web service used for downloads
+geometry_download_directory   = "%s/files/geometry/download" % os.environ.get("MAUS_ROOT_DIR") # name of the local directory where downloads will be placed
+geometry_download_by = 'run_number' # choose 'run_number' to download by run number, 'current' to use
+                                    # the currently valid geometry or 'id' to use the cdb internal id 
+                                    # (e.g. if it is desired to access an old version of a particular
+                                    # geometry)
+geometry_download_run_number = 0
+geometry_download_id = 0
+geometry_download_cleanup = True # set to True to clean up after download
+
+# geometry upload
+geometry_upload_wsdl = "geometrySuperMouse?wsdl" # name of the web service used for uploads
+geometry_upload_directory = "%s/files/geometry/upload" % os.environ.get("MAUS_ROOT_DIR") # name of the local directory where uploads are drawn from
+geometry_upload_note = "" # note, pushed to the server to describe the geometry. A note must be specified here (default will throw an exception).
+geometry_upload_valid_from = "" # date-time in format like: that the specified installation was made in the experiment. A date-time must be specified here (default will throw an exception).
+geometry_upload_cleanup = True # set to True to clean up after upload
+
 
 # this is used by ImputCppRealData
 Number_of_DAQ_Events = -1
+Phys_Events_Only = False
+Calib_Events_Only = False
 Enable_V1290_Unpacking = True
 Enable_V1731_Unpacking = True
 Enable_V1724_Unpacking = True
 Enable_V830_Unpacking = True
 Enable_VLSB_Unpacking = True
+Enable_VLSB_C_Unpacking = True
 Enable_DBB_Unpacking = True
 Do_V1731_Zero_Suppression = False
 V1731_Zero_Suppression_Threshold = 100
 Do_V1724_Zero_Suppression = True
 V1724_Zero_Suppression_Threshold = 100
+Do_VLSB_Zero_Suppression = False
+VLSB_Zero_Suppression_Threshold = 0
+Do_VLSB_C_Zero_Suppression = False
+VLSB_C_Zero_Suppression_Threshold = 0
 Enable_TOF = True
 Enable_EMR = True
 Enable_KL = True
@@ -245,8 +260,8 @@ Enable_timeWalk_correction = True
 Enable_triggerDelay_correction = True
 Enable_t0_correction = True
 
-daq_data_path = '%s/src/input/InputCppDAQData' % os.environ.get("MAUS_ROOT_DIR") # path to daq data
-daq_data_file = '02873.003' # file name for daq data
+daq_data_path = '%s/src/input/InputCppDAQData' % os.environ.get("MAUS_ROOT_DIR") # path to daq data. Multiple locations can be specified with a space
+daq_data_file = '02873.003' # file name for daq data; if this is just a integer string, MAUS assumes this is a run number. Multiple entries can be specified separated by a space
 
 maus_version = "" # set at runtime - do not edit this (changes are ignored)
 configuration_file = "" # should be set on the command line only (else ignored)

@@ -5,13 +5,11 @@ Configuration Stage6
   Dimensions 6. 6. 31. m
   PropertyString Material AIR
   PropertyDouble G4StepMax 1.0 mm
-
   Module BeamLine/BeamLine.dat
   {
     Position 0. 0. -10.283 m
     Rotation 0. 0. 0. degree
   }
-
   Module Tracker/TrackerSolenoid0.dat
   {
     Position 0. 0. -4.783 m
@@ -67,9 +65,5 @@ Configuration Stage6
 //    Position 0. 0. 7.0495 m
 //    Rotation 0. 0. 0. degree
 //  }
-
-  Module CoilConfig/Stage6CoilCurrents.dat
-  {
-  }
 }
 

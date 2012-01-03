@@ -19,6 +19,13 @@ M. Littlefield
 import os
 from geometry.CADImport import CADImport
 
+CONFIGXSL = os.environ["MAUS_ROOT_DIR"] + \
+                         "/src/common_py/geometry/xsltScripts/GDML2G4MICE.xsl"
+CONFIGXSL2 = os.environ["MAUS_ROOT_DIR"] + \
+                         "/tmp/GDML2G4MICE_hacked.xsl"
+MM_XSL = os.environ["MAUS_ROOT_DIR"] + \
+                         "/src/common_py/geometry/xsltScripts/MMTranslation.xsl"
+
 class GDMLtomaus(): #pylint: disable = R0903
     """
     @class GDMLtomaus This class converts GDMLs to MAUS Modules
@@ -47,8 +54,7 @@ class GDMLtomaus(): #pylint: disable = R0903
         file_list = []
         self.step_files = file_list
         if os.path.exists(path) == False:
-            errmsg = 'Path does not exist'
-            raise IOError(errmsg, 'GDMLFormatter::__init__')
+            raise IOError('Path does not exist '+str(path))
         else:
             self.path = path
         gdmls = os.listdir(self.path)
@@ -57,18 +63,41 @@ class GDMLtomaus(): #pylint: disable = R0903
                 found_file = self.path + '/' + fname
                 self.material_file = found_file
                 self.material_file_path = os.path.abspath(self.material_file)
-            if fname.find('fastrad') >= 0 and fname != self.material_file:
+            if fname == 'fastradModel.gdml':
                 found_file = self.path + '/' + fname
                 self.config_file = found_file
             if fname.find('Field') >= 0:
                 found_file = self.path + '/' + fname
                 self.field_file = found_file
             if fname.find('materials') < 0 \
-             and fname.find('fastrad') < 0 \
-               and fname.find('Field') < 0:
+               and fname.find('fastrad') < 0 \
+               and fname.find('Field') < 0 \
+               and fname[-5:] == '.gdml':
                 stepfile = self.path + '/' + fname
                 self.step_files.append(stepfile)
 
+    def hack_xsl(self):
+        """
+        Hack xsl sheet to set parameters right
+        """
+        # libxslt just gives segmentation fault when I try to use their routines
+        # it's Friday evening I've been trying to fix this stuff for days and 
+        # I'm pretty fed up so apologies for the hack - CTR
+        # I'll fix it later probably xslt is not the solution as the library
+        # seems cruddy at best
+        fin  = open(CONFIGXSL,  'r')
+        fout = open(CONFIGXSL2, 'w')
+        substitutions = {
+            "__file_path__":self.path,
+            "__step_max__":5.0,
+        }
+        for line in fin:
+            for key, value in substitutions.iteritems():
+                line = line.replace(str(key), str(value))
+            fout.write(line)
+        fin.close()
+        fout.close()
+        
     def convert_to_maus(self, output):
         """
         @method convert_to_maus This method converts the GDMLs to MAUS Modules.
@@ -82,33 +111,30 @@ class GDMLtomaus(): #pylint: disable = R0903
                       Modules to be placed. 
         """
         if os.path.exists(output) == False:
-            errmsg = 'Output argument doesnt exist'
-            raise IOError(errmsg, 'GDMLtomaus::convert_to_maus')
+            raise IOError('Output path doesnt exist '+str(output))
         else:
+            self.hack_xsl()
             outputfile = output + "/ParentGeometryFile.dat"
-            maus = os.environ["MAUS_ROOT_DIR"] + '/src/common_py/geometry/'
-            configxsl = maus  + 'xsltScripts/GDML2G4MICE.xsl'
             config_file = CADImport(xmlin1 = self.config_file, \
-                           xsl = configxsl, output = outputfile)
+                           xsl = CONFIGXSL2, output = outputfile)
             config_file.parse_xslt()
             print "Configuration File Converted"
             length = len(self.step_files)
             for num in range(0, length):
                 found_file = str(self.step_files[num])
+                
                 new_string = found_file.split('/')
                 num_of_splits = len(new_string)
                 file_name = num_of_splits - 1
                 file_name = new_string[file_name]
                 outputfile = output + '/' + file_name[:-4] + 'dat'
-                mm_xsl = os.environ["MAUS_ROOT_DIR"] + \
-                "/src/common_py/geometry/xsltScripts/MMTranslation.xsl"
                 step_file = CADImport(xmlin1 = self.step_files[num], \
-                                    xsl = mm_xsl, output = outputfile)
+                                    xsl = MM_XSL, output = outputfile)
                 step_file.parse_xslt()
                 step_file = None
                 os.remove(self.step_files[num])
                 print "Converting " + str(num+1) + \
-            " of " + str(length) + " Geometry Files"
+                                        " of " + str(length) + " Geometry Files"
             os.remove(self.config_file)
 
 def main():

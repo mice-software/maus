@@ -1,4 +1,5 @@
 #!/bin/bash
+
 FILE_STD=install_log_std
 
 if [ -f $FILE_STD ];

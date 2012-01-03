@@ -13,7 +13,7 @@ Module FCoil
   PropertyDouble RedColour 1
 //field
   PropertyString FieldType       Solenoid
-  PropertyString FileName        focus.dat
+  PropertyString FileName        ${MAUS_ROOT_DIR}/tmp/focus.fld
   PropertyDouble CurrentDensity      1.
   PropertyDouble Length            210.
   PropertyDouble Thickness          84.

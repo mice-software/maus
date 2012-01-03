@@ -250,3 +250,4 @@ class ReducePyMatplotlibHistogram: # pylint: disable=R0903
         data_file.seek(0)
         data = data_file.read()
         return base64.b64encode(data)
+
