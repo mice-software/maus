@@ -49,7 +49,7 @@ class TaskBirthException(Exception):
         if (self.__cause == None):
             return "%s.birth returned False" % self.__task
         else:
-            return "%s birth failed due to: %s" % (self.__task, self.__cause)
+            return "%s.birth failed due to: %s" % (self.__task, self.__cause)
            
     @property
     def cause(self):
