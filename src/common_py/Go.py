@@ -461,7 +461,7 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903
             workers = [self.transformer.__class__.__name__]
         i = 0
         transform_results = {}
-        while len(map_buffer) != 0:
+        while (len(map_buffer) != 0) or (len(transform_results) != 0):
             for spill in map_buffer:
                 result = \
                     MausGenericTransformTask.delay(workers, spill, celery_client_id, i) # pylint:disable=E1101, C0301
