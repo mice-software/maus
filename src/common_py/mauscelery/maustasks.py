@@ -23,6 +23,7 @@ from celery.registry import tasks
 from celery.task import Task
 
 import MAUS
+import ROOT
 
 class MausGenericTransformTask(Task):
     """
@@ -35,13 +36,13 @@ class MausGenericTransformTask(Task):
         Initialise transform to None.
         @param self Object reference.
         """
+        # Set ROOT to batch mode as certain mappers e.g. MapPyTOFPlot
+        # otherwise kick up a PyROOT canvas.
+        ROOT.gROOT.SetBatch(True) # pylint: disable=E1101
         self.__transforms = {}
         for name in dir(MAUS):
             if re.match("Map", name):
                 map_class = getattr(MAUS, name)
-                # MapPyTOFPlot kicks up a PyROOT canvas so skip for now.
-                if name == "MapPyTOFPlot":
-                    continue
                 self.__transforms[name] = map_class()
 
     def birth(self, json_config_doc):
@@ -54,9 +55,6 @@ class MausGenericTransformTask(Task):
         @throws exception if any exceptions arise in birth().
         """
         for name in self.__transforms:
-            # MapCppSimulation takes ages to initialise so skip for now.
-            if name == "MapCppSimulation":
-                continue
             self.__transforms[name].birth(json_config_doc)
         return True
 
