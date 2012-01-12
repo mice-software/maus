@@ -68,6 +68,11 @@ class TestCeleryTask(Task):
         @return True always.
         """
         return True
+
+# Running test class via nosetests gives test_mausloader.TestCeleryTask
+# Running test class directly via python gives default.TestCeleryTask
+# So, explictly set the module and class name.
+TestCeleryTask.name = "test_mausloader.TestCeleryTask"
 tasks.register(TestCeleryTask) # pylint:disable=W0104, E1101
 
 class CeleryLoaderTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
@@ -80,8 +85,9 @@ class CeleryLoaderTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         Get default task and set configuration value.
         @param self Object reference.
         """
+        self.__task_name = TestCeleryTask.name
         self.__loader = CeleryLoader()
-        self.__task = tasks["default.TestCeleryTask"]
+        self.__task = tasks[self.__task_name]
         self.__tmpfile = ""
 
     def tearDown(self):
@@ -138,7 +144,7 @@ class CeleryLoaderTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         """
         self.create_config_file("TestCeleryTaskKey", "Exception")
         with self.assertRaisesRegexp(TaskBirthException,
-            ".*default.TestCeleryTask.birth failed due to: BirthError.*"):
+            ".*TestCeleryTask.birth failed due to: BirthError.*"):
             self.__loader.on_worker_init()
 
     def test_init_birth_false(self):
@@ -149,7 +155,7 @@ class CeleryLoaderTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         """
         self.create_config_file("TestCeleryTaskKey", "False")
         with self.assertRaisesRegexp(TaskBirthException,
-            ".*default.TestCeleryTask.birth returned False.*"):
+            ".*TestCeleryTask.birth returned False.*"):
             self.__loader.on_worker_init()
 
 class TaskBirthExceptionTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
