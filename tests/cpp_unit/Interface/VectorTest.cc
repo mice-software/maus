@@ -157,6 +157,12 @@ TEST_F(VectorTest, NotEquals) {
   c_mv3(1) *= -1;
 }
 
+TEST_F(VectorTest, StdVectorConstructor) {
+  std::vector<double> stdvec(4, 4.); // like d_mv2
+  Vector<double> vector_d0(stdvec);
+  ASSERT_TRUE(vector_d0 == d_mv2);
+}
+
 TEST_F(VectorTest, Assignment) {
   Vector<double> vector_d0 = d_mv3;
   vector_d0 = vector_d0; //check for specific subtle bug when self-allocating

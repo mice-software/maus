@@ -1,5 +1,6 @@
 #include <iostream>
 #include <iomanip>
+#include <sstream>
 
 #include "gtest/gtest.h"
 #include "CLHEP/Matrix/Matrix.h"
@@ -53,7 +54,8 @@ protected:
     for(unsigned int i=0; i<6; i++) coeffHep[0][i] =  i+1;
     for(unsigned int i=0; i<6; i++) coeffHep[1][i] =  i*i;
     for(unsigned int i=0; i<6; i++) coeffHep[2][i] = -int(i)-1;
-    polynomial_map_ = new PolynomialVector(2, Matrix<double>( coeffHep ));
+    Matrix<double> coefficient_matrix(coeffHep);
+    polynomial_map_ = new PolynomialVector(2, coefficient_matrix);
 
     cloned_map_ = polynomial_map_->Clone();
 
@@ -96,7 +98,7 @@ TEST_F(PolynomialVectorTest, MapEvaluation) {
   ASSERT_TRUE(verify_mapping(extracted_coeff_map_, point1, answer1));
 
 
-  double point2[2]  = {3,-2};
+  double point2[2]  = {3,-2}; // {1, 3, -2, 9, -6, 4}
   double answer2[3] = {31,80,-31};
   ASSERT_TRUE(verify_mapping(cloned_map_, point2, answer2));
 
@@ -165,7 +167,9 @@ TEST_F(PolynomialVectorTest, PointBox) {
 }
 
 TEST_F(PolynomialVectorTest, GetAvgChi2OfDifference) {
-  double mat_data[] = {1,4,1,  2,3,2,  7,11,7, 13,3,13, 5,7,8, 0,9,2, 1,3,4};
+  double mat_data[] = {1, 2, 7, 13, 5, 0,
+                       4, 3, 11, 3, 7, 9,
+                       1, 2, 7, 13, 8, 2};
   Matrix<double>  mat(3,6,mat_data);
   PolynomialVector pvec(2, mat);
   std::vector< std::vector<double> > in;
@@ -182,9 +186,9 @@ TEST_F(PolynomialVectorTest, GetAvgChi2OfDifference) {
   for(int i=0; i<10; i++)  
   {
     in.push_back(std::vector<double>(2,i));
+    in.back()[1] = i*2;
     out    .push_back(std::vector<double>(3,0));
     out_neg.push_back(std::vector<double>(3,0));
-    in.back()[1] = i*2;
     pvec.F(&in.back()[0],&out.back()[0]);
     for(int i=0; i<3; i++) {
       out_neg.back()[i] = -out.back()[i]; 
@@ -195,8 +199,6 @@ TEST_F(PolynomialVectorTest, GetAvgChi2OfDifference) {
   ASSERT_TRUE(fabs(avg_chi2) < 1e-6);
 
   avg_chi2 = pvec.GetAvgChi2OfDifference(in, out_neg);
-fprintf(stdout, "[DEBUG] avg_chi2(in, out_neg): %fE14\n", avg_chi2/1e14);
-fflush(stdout);
   ASSERT_TRUE(fabs(avg_chi2/1e14 - 4.90542) < 1e-3); //Hope that is right
 }
 
@@ -263,8 +265,6 @@ TEST_F(PolynomialVectorTest, Covariances) {
   EXPECT_TRUE(fabs(determinant(m1-Matrix<double>(3,3,1.))) < 1e-6);
   EXPECT_TRUE(fabs(determinant(m2-Matrix<double>(3,3,1.))) < 1e-6);
   EXPECT_TRUE(fabs(determinant(m3)) < 1e-6);
-fprintf(stdout, "[DEBUG] determinant(m3): %f\n", determinant(m3));
-fflush(stdout);
 }
 
 TEST_F(PolynomialVectorTest, LeastSquaresFitting) {
@@ -344,7 +344,9 @@ TEST_F(PolynomialVectorTest, LeastSquaresFitting) {
 
   testpass = true;
   //should return a copy of 
-  double mat2[] = {1.,1.,1., 2.,3.,4., 7.,8.,9., 13.,14.,15., 200.,300.,400., 500.,600.,700., 800.,900.,1000., 1100.,1200.,1300., 1400.,1500.,1600., 1700.,1800.,1900.};
+  double mat2[] = {1., 2., 7., 13., 200., 500., 800., 1100., 1400., 1700.,
+                   1., 3., 8., 14., 300., 600., 900., 1200., 1500., 1800.,
+                   1., 4., 9., 15., 400., 700., 1000., 1300., 1600., 1900.};
   Squeak::mout(Squeak::debug) << "Chi2SweepingLeastSquaresFit" << std::endl;
   PolynomialVector* testF = new PolynomialVector(3, Matrix<double>(3, 10, mat2) );
   std::vector<double> delta(3);
@@ -415,17 +417,9 @@ TEST_F(PolynomialVectorTest, LeastSquaresFitting) {
   //validity region (delta at output) should reflect the units
   double deltaMaxA[] = {1e12, 1e12, 1e12, 1e12};
   std::vector<double> deltaMax(deltaMaxA, deltaMaxA+3);
-  double mat3[] = {1.,1.,1., 
-                   2.,3.,4., 
-                   7.e6,8.e6,9.e6, 
-                   13.e3,14.e3,15.e3, 
-                   200.,300.,400., 
-                   500.e6,600.e6,700.e6, 
-                   800.e3,900.e3,1000.e3, 
-                   1100.e12,1200.e12,1300.e12, 
-                   1400.e9,1500.e9,1600.e9, 
-                   1700.e6,1800.e6,1900.e6
-  };
+  double mat3[] = {1., 2., 7., 13.e3, 200., 500.e6, 800.e3, 1100.e12, 1400.e9, 1700.e6,
+                   1., 3., 8.e6, 14.e3, 300., 600.e6, 900.e3, 1200.e12, 1500.e9, 1800.e6,
+                   1., 4., 9.e6, 15.e3, 400., 700.e6, 1000.e3, 1300.e12, 1600.e9, 1900.e6};
   PolynomialVector* testF2 = new PolynomialVector(3, Matrix<double>(3, 10, mat3) );
   Squeak::mout(Squeak::debug) << "Chi2SweepingLeastSquaresFitVariableWalls" << std::endl;
  // delta.push_back(0.);

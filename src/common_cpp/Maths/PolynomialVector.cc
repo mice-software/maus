@@ -152,7 +152,6 @@ void  PolynomialVector::F(const Vector<double>& point, Vector<double>& value)
 	//coefficents, the polynomial terms
 	Vector<double> polynomial_vector(index_key_by_vector_.size(), 1.);
 	MakePolyVector(point, polynomial_vector);
-
 	value = coefficient_matrix_ * polynomial_vector;
 }
 
@@ -188,9 +187,11 @@ Vector<double>&  PolynomialVector::MakePolyVector(const Vector<double>& point,
                                                   Vector<double>& polyVector)
                                                  const
 {
-    for(unsigned int i=0; i<index_key_by_vector_.size();   ++i)
-        for(unsigned int j=0; j<index_key_by_vector_[i].size();   ++j)
+    for(unsigned int i=0; i<index_key_by_vector_.size();   ++i) {
+        for(unsigned int j=0; j<index_key_by_vector_[i].size();   ++j) {
             polyVector(i+1) *= point( index_key_by_vector_[i][j]+1 );
+        }
+    }
     return polyVector;
 }
 
@@ -226,14 +227,18 @@ std::vector<int> PolynomialVector::IndexByVector(int index, int nInputVariables)
     nInputVariables--;
     for(int i=0; i<index;   ++i)
     {
-        if     (indices.front() == nInputVariables) { indices = std::vector<int>(indices.size()+1, 0); indices.back()--;}
-        if     (indices.back()  == nInputVariables)
+        if (indices.front() == nInputVariables) {
+          indices = std::vector<int>(indices.size()+1, 0);
+          indices.back()--;
+        }
+        if (indices.back()  == nInputVariables)
         {
             int j=indices.size()-1;
             while(indices[j] == nInputVariables) j--;
             for(int k=indices.size()-1; k>=j; k--) indices[k] = indices[j]+1;
+        } else {
+          indices.back()++;
         }
-        else    indices.back()++;
     }
     return indices;
 }
@@ -295,7 +300,7 @@ Vector<double> PolynomialVector::Means(std::vector<std::vector<double> > values,
   size_t dim         = values[0].size();
   Vector<double>    means(dim,0);
   double             totalWeight = 0;
-  for(int x=0; x<npoints; x++) totalWeight += weights[x];
+  for(size_t x=0; x<npoints; x++) totalWeight += weights[x];
 
   std::vector<double> normalized_weights;
   for (size_t x=0; x<npoints; x++) {
@@ -791,12 +796,10 @@ double PolynomialVector::GetAvgChi2OfDifference(
   double chi2 = 0;
   SymmetricMatrix cov_inv = Covariances(diff,
                                         std::vector<double>(diff.size(), 1.),
-                                        Vector<double>(diff.size(),
-                                        0.));
-
+                                        Vector<double>(diff.size(), 0.));
   for(size_t i=0; i<diff.size(); ++i)
   {
-    Vector<double> diff_mv(&(diff[i][0]), diff[i].size());
+    Vector<double> diff_mv(diff[i]);
     chi2 += (transpose(diff_mv) * cov_inv * diff_mv)(1);
   }
   chi2 /= double(diff.size());
