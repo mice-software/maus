@@ -21,7 +21,6 @@ Test class for mausloader.TaskBirthException module.
 
 # pylint: disable=C0103
 
-import json
 import unittest
 
 from celery.registry import tasks
@@ -45,7 +44,7 @@ class TestCeleryTask(Task):
         """
         pass
 
-    def birth(self, json_config_doc): # pylint: disable=R0201
+    def birth(self, json_config_doc): # pylint: disable=R0201, W0613
         """
         If behaviour has value "False" then return False.
         If behaviour has value "Exception" then raise an Exception.
