@@ -32,11 +32,10 @@ class  TestGDMLFormatter(unittest.TestCase): #pylint: disable = C0103, R0904
         This method creates a Formatter object ready for testing
         """
         self.constructor = None
-        path_in = '/tests/py_unit/test_geometry/testCases/testGeometry'
-        self.test_case = os.environ['MAUS_ROOT_DIR'] + path_in
+        path_in = '/tests/py_unit/test_geometry/testCases/mausModuleSource'
+        self.path_in = os.environ['MAUS_ROOT_DIR'] + path_in
         self.path_out = os.path.join(os.environ['MAUS_ROOT_DIR'], 'tmp')
-        self.path_tmp = os.path.join(os.environ['MAUS_ROOT_DIR'], 'tmp')
-        self.gdml = Formatter(self.test_case, self.path_out, self.path_tmp)
+        self.gdml = Formatter(self.path_in, self.path_out)
 
     def test_constructor(self):
         """
@@ -50,7 +49,7 @@ class  TestGDMLFormatter(unittest.TestCase): #pylint: disable = C0103, R0904
         try:
             self.constructor = Formatter(1)
             self.assertTrue(False, 'should have raised an exception')
-        except:
+        except: #pylint: disable = W0702
             pass #pylint: disable = W0702
         
         #Now it tests the Formatter constructor by passing an
@@ -61,7 +60,7 @@ class  TestGDMLFormatter(unittest.TestCase): #pylint: disable = C0103, R0904
             test_case = os.environ['MAUS_ROOT_DIR'] + path
             self.constructor = Formatter(test_case)
             self.assertTrue(False, 'Should have raised an exception')
-        except:
+        except: #pylint: disable = W0702
             pass #pylint: disable = W0702
         
         #this next section tests to make sure 
@@ -85,16 +84,12 @@ class  TestGDMLFormatter(unittest.TestCase): #pylint: disable = C0103, R0904
         """
         #this next section calls format_schema_location
         #and checks the schema has been entered
-        self.gdml.format_schema_location('fastradModel.gdml')
-        fin = open(os.path.join(self.path_out, 'fastradModel.gdml'))
-        count = 0
-        for line in fin.readlines():
-            if line.find(self.gdml.schema) >= 0:
-                count += 1
-        self.assertEqual \
-             (1, count, 'Formatting not complete '+self.gdml.configuration_file)
-
-        
+        try:
+            self.gdml.format_schema_location('Gemoetry.not_gdml')
+            self.assertTrue(False, 'Should have raised an error')
+        except: #pylint: disable = W0702
+            pass #pylint: disable = W0702
+   
     def test_merge_maus_info(self):
         """
         TestGDMLFormatter::test_merge_maus_info
@@ -105,7 +100,7 @@ class  TestGDMLFormatter(unittest.TestCase): #pylint: disable = C0103, R0904
         try:
             self.gdml.merge_maus_info('Gemoetry.not_gdml')
             self.assertTrue(False, 'Should have raised an error')
-        except:
+        except: #pylint: disable = W0702
             pass #pylint: disable = W0702
         
     def test_merge_run_info(self):
@@ -118,17 +113,9 @@ class  TestGDMLFormatter(unittest.TestCase): #pylint: disable = C0103, R0904
         try:
             self.gdml.merge_run_info('Gemoetry.not_gdml')
             self.assertTrue(False, 'Should have raised an error')
-        except:
+        except: #pylint: disable = W0702
             pass #pylint: disable = W0702
-        fin = open(os.path.join(self.test_case, 'Field.gdml'))
-        count = 0
-        for lines in fin.readlines():
-            if lines.find('run') >= 0:
-                count += 1
-        self.assertEqual(2, count, 'Formatting not complete')
-        count = 0
                      
-    
     def test_format_materials(self):
         """
         TestGDMLFormatter::test_format_materials
@@ -139,7 +126,7 @@ class  TestGDMLFormatter(unittest.TestCase): #pylint: disable = C0103, R0904
         try:
             self.gdml.format_materials('Gemoetry.not_gdml')
             self.assertTrue(False, 'Should have raised an error')
-        except:
+        except: #pylint: disable = W0702
             pass #pylint: disable = W0702
 
     def test_insert_materials_ref(self):
@@ -152,7 +139,7 @@ class  TestGDMLFormatter(unittest.TestCase): #pylint: disable = C0103, R0904
         try:
             self.gdml.insert_materials_ref('Gemoetry.not_gdml')
             self.assertTrue(False, 'Should have raised an error')
-        except:
+        except: #pylint: disable = W0702
             pass #pylint: disable = W0702   
 
     def test_format_check(self):
@@ -165,10 +152,10 @@ class  TestGDMLFormatter(unittest.TestCase): #pylint: disable = C0103, R0904
         try:
             self.gdml.format_check('Geometry.not_gdml')
             self.assertTrue(False, 'Should have raised an error')
-        except:
+        except: #pylint: disable = W0702
             pass #pylint: disable = W0702
                 
-    def test_format(self):
+    def test_format(self): #pylint: disable = R0912
         """
         TestGDMLFormatter::test_format
         
@@ -181,21 +168,42 @@ class  TestGDMLFormatter(unittest.TestCase): #pylint: disable = C0103, R0904
         self.gdml.format()
         for gdml_file in [self.gdml.configuration_file]+self.gdml.stepfiles:
             (schema_found, material_found, formatted_found) = (0, 0, 0)
+            (run_found, mice_found) = (0, 0)
             filename = self.path_out+'/'+gdml_file
             fin = open(filename, 'r')
-            for line in fin.readlines():
-                if line.find(self.gdml.schema) >= 0:
-                    schema_found += 1
-                if line.find(self.gdml.material_file) >= 0:
-                    material_found += 1
-                if line.find('<!-- Formatted for MAUS -->') >= 0:
-                    formatted_found += 1
+            if gdml_file == self.gdml.configuration_file:
+                for line in fin.readlines():
+                    if self.gdml.field_file != None:
+                        if line.find('</run>') >= 0:
+                            run_found += 1
+                    if self.gdml.beamline_file != None:
+                        if line.find('</MICE_Information>') >= 0:
+                            mice_found += 1
+                    if line.find(self.gdml.schema) >= 0:
+                        schema_found += 1
+                    if line.find(self.gdml.material_file) >= 0:
+                        material_found += 1
+                    if line.find('<!-- Formatted for MAUS -->') >= 0:
+                        formatted_found += 1
+                self.assertEqual(run_found, 1,
+                            msg="Run tag not found "+filename)
+                self.assertEqual(mice_found, 1,
+                            msg="MICE Info tag not found "+filename)
+            else:
+                for line in fin.readlines():
+                    if line.find(self.gdml.schema) >= 0:
+                        schema_found += 1
+                    if line.find(self.gdml.material_file) >= 0:
+                        material_found += 1
+                    if line.find('<!-- Formatted for MAUS -->') >= 0:
+                        formatted_found += 1
             self.assertEqual(schema_found, 1, msg="Schema "+self.gdml.schema+\
                               " found "+str(schema_found)+" times in "+filename)
             self.assertEqual(material_found, 1,
                                              msg="Material not found "+filename)
             self.assertEqual(formatted_found, 1,
                                         msg="Formatted tag not found "+filename)
+
             fin.close()
         
 if __name__ == '__main__':

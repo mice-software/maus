@@ -29,7 +29,7 @@
 #include <algorithm>
 #include <fstream>
 
-#include "Interface/Squeal.hh"
+#include "src/legacy/Interface/Squeal.hh"
 
 /** Identifier for a single DAQ channel.
  * This class is used to hold and manage all the information needed
@@ -71,6 +71,7 @@ class DAQChannelKey {
   *
   int make_DAQChannelKey_id() { return _ldcId*1e8 + _geo*1e6 + _channel*1e3 + _eqType; }
   */
+
  private:
 
   /// Id number of the Local Data Concentrator (DAQ computer).

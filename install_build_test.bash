@@ -24,9 +24,10 @@ if [ "${MAUS_ROOT_DIR}" ]; then  # see if the variable exists yet
     echo "These should agree"
 fi
 
-echo "   Welcome to the all-in-one MAUS installer script.  This script will"
-echo "take about 1 hour and 7 minutes to run.  You can get the details of the"
-echo "progress (or ensure it is doing something) by running:"
+echo
+echo "   Welcome to the all-in-one MAUS installer script. "
+echo "You can get the details of the progress "
+echo "(or ensure it is doing something) by running:"
 echo
 echo "  tail -f $FILE_STD"
 echo
@@ -42,23 +43,50 @@ echo "   $FILE_STD"
 echo "   $FILE_ERR"
 echo
 
+# Assign the location of the third party libraries  
+# In order of preference the location is set to:
+# 1. The first command line argument passed to the install script
+# 2. Any existing environment variable called "maus_third_party" e.g. if set by user's .bashrc file
+# 3. The current maus working directory, as held by the variable MAUS_ROOT_DIR
+# If not location is found then the script aborts 
+if [ "$1" ]; then
+    MAUS_THIRD_PARTY=$1
+    echo "Your MAUS_THIRD_PARTY is:"
+    echo ${MAUS_THIRD_PARTY}
+    echo
+elif [ "${maus_third_party}" ]; then
+    MAUS_THIRD_PARTY=${maus_third_party}
+    echo "Your MAUS_THIRD_PARTY is:"
+    echo ${MAUS_THIRD_PARTY}
+    echo
+else
+    echo "No MAUS_THIRD_PARTY set, installing third party libraries locally"
+    echo
+fi
+
 echo "Configuring..."
-./configure 2>>$FILE_ERR 1>>$FILE_STD
-
-echo "Sourcing the environment..."
-source env.sh 2>>$FILE_ERR 1>>$FILE_STD
-
-echo "Building third party libraries (takes a while...)"
-./third_party/build_all.bash 2>>$FILE_ERR 1>>$FILE_STD
-
-echo "Resource the environment (catches the new ROOT version)"
-source env.sh 2>>$FILE_ERR 1>>$FILE_STD
+if [ "$MAUS_THIRD_PARTY" ]; then
+	./configure $MAUS_THIRD_PARTY 2>>$FILE_ERR 1>>$FILE_STD
+	echo "Sourcing the environment..."
+	source env.sh 2>>$FILE_ERR 1>>$FILE_STD 
+else
+	echo "The other loop"
+	./configure 2>>$FILE_ERR 1>>$FILE_STD
+	echo "Sourcing the environment..."
+	source env.sh 2>>$FILE_ERR 1>>$FILE_STD 
+	echo "Building third party libraries (takes a while...)"
+	./third_party/build_all.bash 2>>$FILE_ERR 1>>$FILE_STD
+	echo "Resource the environment (catches the new ROOT version)"
+	source env.sh 2>>$FILE_ERR 1>>$FILE_STD
+fi
 
 echo "Have Scons cleanup the MAUS build state"
 scons -c 2>>$FILE_ERR 1>>$FILE_STD
 
 echo "Build MAUS"
-scons build || (echo "FAIL! See logs.x" && exit 1)  2>>$FILE_ERR 1>>$FILE_STD
+echo $FILE_ERR $FILE_STD
+(scons build || (echo "FAIL! See logs.x" && exit 1))  2>>$FILE_ERR 1>>$FILE_STD
 
 echo "Run the tests"
-./tests/run_tests.bash || (echo "FAIL!  See logs." && exit 1) 2>>$FILE_ERR 1>>$FILE_STD
+(./tests/run_tests.bash || (echo "FAIL!  See logs." && exit 1)) 2>>$FILE_ERR 1>>$FILE_STD
+

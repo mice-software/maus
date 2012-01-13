@@ -1,0 +1,44 @@
+Configuration Structure_225373016 
+                       { 
+                           Dimensions 15000.0 10000.0 50000.0 mm
+                           PropertyString Material AIR  
+                           PropertyDouble G4StepMax 5.0 mm 
+                 
+                        Module /home/matt/maus-littlefield/tests/py_unit/test_geometry/testCases//testGDMLtoMAUSModule/Step_0.dat 
+                        { 
+                            Position 0.0000 0.0000 0.0000 mm 
+                            Rotation  0.0 0.0 0.0 deg 
+                        }
+                 
+                        Module /home/matt/maus-littlefield/tests/py_unit/test_geometry/testCases//testGDMLtoMAUSModule/Step_1.dat 
+                        { 
+                            Position 0.0000 0.0000 0.0000 mm 
+                            Rotation  0.0 0.0 0.0 deg 
+                        }
+                 
+                        Module /home/matt/maus-littlefield/tests/py_unit/test_geometry/testCases//testGDMLtoMAUSModule/Step_2.dat 
+                        { 
+                            Position -0.0000 -0.0000 -1207.5000 mm 
+                            Rotation  0.0 0.0 0.0 deg 
+                        }
+                 
+                        Module /home/matt/maus-littlefield/tests/py_unit/test_geometry/testCases//testGDMLtoMAUSModule/Step_3.dat 
+                        { 
+                            Position 0.0000 0.0000 0.0000 mm 
+                            Rotation  0.0 0.0 0.0 deg 
+                        }
+                 
+                        Module /home/matt/maus-littlefield/tests/py_unit/test_geometry/testCases//testGDMLtoMAUSModule/Step_4.dat 
+                        { 
+                            Position 0.0000 0.0000 0.0000 mm 
+                            Rotation  0.0 0.0 0.0 deg 
+                        }
+                 
+                        Module /home/matt/maus-littlefield/tests/py_unit/test_geometry/testCases//testGDMLtoMAUSModule/Step_5.dat 
+                        { 
+                            Position -0.0000 -0.0000 757.5000 mm 
+                            Rotation  0.0 0.0 0.0 deg 
+                        }
+                 
+                       } 
+                       //

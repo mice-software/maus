@@ -20,8 +20,9 @@ test_cpp_style can allow exceptions in certain circumstances:
   reason for the exception, it may get deleted...
 """
 
+# pylint: disable=C0301
+
 import os
-import glob
 
 exceptions = {
 }
