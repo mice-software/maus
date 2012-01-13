@@ -80,31 +80,19 @@ class CeleryLoader(Loader):
         """
         Method called when the worker starts.
         Invokes super-class method, loads default MAUS configuration,
-        loads additional configuration if a Celery configuration file
-        MAUS_CONFIG_FILE property is provided. birth is then invoked
-        on each task that supports this method and the MAUS JSON 
-        configuration passed to them.
+        birth is then invoked on each task that supports this method
+        and the MAUS JSON configuration passed to them.
         @param self Object reference.
+        @throws TaskBirthException if there is a problem in invoking
+        birth.
         """
         # Load modules specified in CELERY_IMPORTS list.
         Loader.on_worker_init(self)
 
         # Get the default MAUS configuration.
         config = Configuration()
-        # Get a MAUS configuration file, if specified in the Celery
-        # configuration.
-        if self.conf.has_key("MAUS_CONFIG_FILE"):
-            config_file_name = self.conf["MAUS_CONFIG_FILE"]
-            try:
-                config_file = open(config_file_name, "r")
-            except IOError:
-                raise ValueError, \
-                    ("MAUS_CONFIG_FILE %s does not exist" % config_file_name), \
-                     sys.exc_info()[2]
-        else:
-            config_file = None
         # Load the MAUS configuration.
-        config_doc = config.getConfigJSON(config_file)
+        config_doc = config.getConfigJSON()
         # Initialise and birth MAUS tasks.
         for celery_task_name in registry.tasks:
             celery_task = registry.tasks[celery_task_name]

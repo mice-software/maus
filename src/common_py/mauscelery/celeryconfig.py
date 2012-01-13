@@ -40,10 +40,3 @@ CELERY_IMPORTS = ("mauscelery.maustasks", )
 
 # Disable log colors.
 CELERYD_LOG_COLOR = 0
-
-#
-# MAUS-specific Celery configuration
-#
-
-# MAUS configuration file
-# MAUS_CONFIG_FILE = "examplemausconfig.py"

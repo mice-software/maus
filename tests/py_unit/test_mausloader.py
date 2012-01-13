@@ -22,9 +22,6 @@ Test class for mausloader.TaskBirthException module.
 # pylint: disable=C0103
 
 import json
-import os
-import os.path
-import tempfile
 import unittest
 
 from celery.registry import tasks
@@ -38,6 +35,9 @@ class TestCeleryTask(Task):
     Simple Celery task for testing purposes.
     """
 
+    # Control behaviour of birth.
+    behaviour = ""
+
     def __init__(self):
         """
         Constructor. No-op.
@@ -47,20 +47,18 @@ class TestCeleryTask(Task):
 
     def birth(self, json_config_doc): # pylint: disable=R0201
         """
-        Load JSON configuration. If it has a key "TestCeleryTaskKey"
-        with value "False" then return False, if the value is
-        "Exception" then raise an Exception. Otherwise return True.
+        If behaviour has value "False" then return False.
+        If behaviour has value "Exception" then raise an Exception.
+        Else, return True.
         @param self Object reference.
         @param json_config_doc JSON configuration document.       
         @return result of invoking birth.
         @throws exception if any exceptions arise in birth().
         """
-        config_doc = json.loads(json_config_doc)
-        if (config_doc.has_key("TestCeleryTaskKey")):
-            if config_doc["TestCeleryTaskKey"] == "False":
-                return False
-            if config_doc["TestCeleryTaskKey"] == "Exception":
-                raise Exception("BirthError")
+        if (TestCeleryTask.behaviour == "False"):
+            return False
+        if (TestCeleryTask.behaviour == "Exception"):
+            raise Exception("BirthError")
         return True
 
     def run(self): # pylint: disable=R0201
@@ -88,27 +86,7 @@ class CeleryLoaderTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         self.__task_name = TestCeleryTask.name
         self.__loader = CeleryLoader()
         self.__task = tasks[self.__task_name]
-        self.__tmpfile = ""
-
-    def tearDown(self):
-        """
-        Remove any temporary files. 
-        @param self Object reference.
-        """
-        if os.path.exists(self.__tmpfile):
-            os.remove(self.__tmpfile)
-
-    def create_config_file(self, key, value):
-        """
-        Create a temporary configuration file with the given key and value 
-        and set the Celery loader's MAUS_CONFIG_FILE value to point to it.
-        @param self Object reference.
-        """        
-        self.__tmpfile = tempfile.mkstemp()[1]
-        tmp = open(self.__tmpfile, "w")
-        tmp.write("%s='%s'" % (key, value))
-        tmp.close()
-        self.__loader.conf["MAUS_CONFIG_FILE"] = self.__tmpfile
+        TestCeleryTask.behaviour = ""
 
     def test_on_worker_init(self):
         """ 
@@ -117,32 +95,13 @@ class CeleryLoaderTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         """
         self.__loader.on_worker_init()
 
-    def test_non_existant_config_file(self):
-        """ 
-        Invoke on_worker_init when MAUS_CONFIG_FILE points to a
-        non-existant file.
-        @param self Object reference.
-        """
-        self.__loader.conf["MAUS_CONFIG_FILE"] = "non-existant"
-        with self.assertRaisesRegexp(ValueError,
-            ".*MAUS_CONFIG_FILE non-existant does not exist.*"):
-            self.__loader.on_worker_init()
-
-    def test_config_file(self):
-        """ 
-        Invoke on_worker_init with default values.
-        @param self Object reference.
-        """
-        self.create_config_file("TestCeleryTaskKey", "Value")
-        self.__loader.on_worker_init()
-
     def test_init_birth_exception(self):
         """ 
         Invoke on_worker_init using a task which throws an exception
         when birth is invoked.
         @param self Object reference.
         """
-        self.create_config_file("TestCeleryTaskKey", "Exception")
+        TestCeleryTask.behaviour = "Exception"
         with self.assertRaisesRegexp(TaskBirthException,
             ".*TestCeleryTask.birth failed due to: BirthError.*"):
             self.__loader.on_worker_init()
@@ -153,7 +112,7 @@ class CeleryLoaderTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         birth is invoked.
         @param self Object reference.
         """
-        self.create_config_file("TestCeleryTaskKey", "False")
+        TestCeleryTask.behaviour = "False"
         with self.assertRaisesRegexp(TaskBirthException,
             ".*TestCeleryTask.birth returned False.*"):
             self.__loader.on_worker_init()
