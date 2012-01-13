@@ -49,6 +49,11 @@ class MapPyGroup:
         for worker in argWorkers:
             self.Append(worker)
 
+    def get_worker_names(self):
+        names = []
+        for worker in self._workers:
+            names.append(worker.__class__.__name__)
+        return names
 
     def append(self, argWorker):
         assert hasattr(argWorker, 'birth')
