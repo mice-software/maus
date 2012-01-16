@@ -202,6 +202,7 @@ geometry_download_by = 'run_number' # choose 'run_number' to download by run num
 geometry_download_run_number = 0
 geometry_download_id = 0
 geometry_download_cleanup = True # set to True to clean up after download
+g4_step_max = 5.0 # this is the value which shall be placed in the Mice Modules which have been translated from CAD
 
 # geometry upload
 geometry_upload_wsdl = "geometrySuperMouse?wsdl" # name of the web service used for uploads

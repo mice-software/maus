@@ -19,6 +19,7 @@ M. Littlefield
 import shutil
 import os
 from xml.dom import minidom
+from geometry.ConfigReader import Configreader
 
 SCHEMA_PATH = os.environ["MAUS_ROOT_DIR"]+\
               "/src/common_py/geometry/GDML_3_0_0/schema/gdml.xsd"
@@ -40,6 +41,7 @@ class Formatter: #pylint: disable = R0902
         @Param Path The path to the directory which contains the fastrad
                     outputted GDML files
         """
+        self.g4_step_max = Configreader().g4_step_max
         self.path_in = path_in
         self.path_out = path_out
         self.beamline_file = None
@@ -96,24 +98,32 @@ class Formatter: #pylint: disable = R0902
         This is mainly so we can add computer specific environment
         variables into the translated gdml files.
         """
-        #field = minidom.parse(os.path.join(self.path_in, self.field_file))
-        #for node in field.getElementsByTagName("MAUS_ROOT_DIR"):
-        #    root_dir = node
         doc = minidom.Document()
-        root_node = doc.createElement("Other_Information")
-        doc.appendChild(root_node)
+        top_node = doc.createElement("Other_Information")
+        doc.appendChild(top_node)
         maus_dir = doc.createElement("MAUS_ROOT_DIR")
         maus_dir.setAttribute("location", os.environ["MAUS_ROOT_DIR"])
-        root_node.appendChild(maus_dir)
-        print doc.toxml()
-    
+        top_node.appendChild(maus_dir)
+        g4_step = doc.createElement("G4StepMax")
+        g4_step.setAttribute("Value", str(self.g4_step_max))
+        top_node.appendChild(g4_step)
+        field = minidom.parse(os.path.join(self.path_out, self.field_file))
+        old_node = field.childNodes[0].childNodes[1].childNodes[7]
+        new_node = doc.childNodes[0]
+        base_node = field.childNodes[0].childNodes[1]
+        base_node.replaceChild(new_node, old_node) 
+        fout = open(os.path.join(self.path_out, self.field_file), 'w')
+        field.writexml(fout)
+        fout.close()
+         
     def merge_maus_info(self, gdmlfile):
         """
         @method merge_maus_info
         
         This method adds the field information to the configuration GDML.
         """
-        config = minidom.parse(os.path.join(self.path_in, gdmlfile))
+        self.add_other_info()
+        config = minidom.parse(os.path.join(self.path_in, gdmlfile)) 
         field = minidom.parse(os.path.join(self.path_out, self.field_file))
         for node in field.getElementsByTagName("MICE_Information"):
             maus_info = node
@@ -235,6 +245,9 @@ class Formatter: #pylint: disable = R0902
 
         if self.beamline_file != None:
             self.merge_run_info(self.field_file)
+        else:
+            shutil.copy(os.path.join(self.path_in, self.field_file), 
+                       os.path.join(self.path_out, self.field_file))
 
         if self.formatted == False:
             self.format_schema_location(self.configuration_file)
@@ -259,7 +272,5 @@ def main():
     """
     Main Function.
     """
-    test_file = Formatter('/home/matt/maus-littlefield/tests/py_unit/test_geometry/testCases/mausModuleSource', '/home/matt/maus-littlefield/tmp')
-    test_file.add_other_info()
 if __name__ == "__main__":
     main()

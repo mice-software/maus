@@ -93,7 +93,7 @@
         <xs:attribute name="location" default="/home"/>
     </xs:complexType>
     <xs:complexType name="G4StepMaxType">
-        <xs:attribute name="G4StepMax" use="required" type="xs:double"/>
+        <xs:attribute name="Value" use="required"/>
     </xs:complexType>
 <!--++++++++++++++++++++++++++++++++Tracker Schema+++++++++++++++++++++++++++++++++++++-->
     <xs:complexType name="SciFi_Geo_Trkr_Type">

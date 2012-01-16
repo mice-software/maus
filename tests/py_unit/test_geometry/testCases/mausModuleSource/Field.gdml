@@ -37,7 +37,7 @@
     </Detector_Information>
     <Other_Information>
         <MAUS_ROOT_DIR location="/home"/>
-        <G4StepMax G4StepMax="4"/>
+        <G4StepMax Value="0.0"/>
     </Other_Information>
 </MICE_Information>
 </gdml>
