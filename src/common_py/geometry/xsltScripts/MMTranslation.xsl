@@ -38,9 +38,9 @@
                     
                 </xsl:text>
                 <xsl:for-each select="solids/tessellated/quadrangular">
-                    PropertyString QFacet<xsl:number/><xsl:text> </xsl:text><xsl:value-of select="translate(@vertex1, 'v', '')"/><xsl:text> </xsl:text><xsl:value-of select="translate(@vertex2, 'v', '')"/><xsl:text> </xsl:text><xsl:value-of select="translate(@vertex3, 'v', '')"/><xsl:text> </xsl:text><xsl:value-of select="translate(@vertex4, 'v', '')"/>
+                PropertyString QFacet<xsl:number/><xsl:text> </xsl:text><xsl:value-of select="translate(@vertex1, 'v', '')"/><xsl:text> </xsl:text><xsl:value-of select="translate(@vertex2, 'v', '')"/><xsl:text> </xsl:text><xsl:value-of select="translate(@vertex3, 'v', '')"/><xsl:text> </xsl:text><xsl:value-of select="translate(@vertex4, 'v', '')"/>
                 </xsl:for-each>
-		}
+		        }
             </body>            
         </html>
     </xsl:template>

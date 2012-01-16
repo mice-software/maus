@@ -1,0 +1,1301 @@
+Your current directory is:
+/home/matt/maus-littlefield
+
+Your MAUS_ROOT_DIR is:
+/home/matt/maus-littlefield
+
+These should agree
+Failure: ImportError (cannot import name HTTPSConnection) ... ERROR
+Test clear. ... ok
+Test connect with no parameters. ... ok
+Test delete. ... ok
+Test get, delete, clear, len, ids on an empty data store. ... ok
+Test put and get, and also ids and len. ... ok
+Test put then another with the same ID. ... ok
+Check birth with default configuration ... Going to search for run 02873 data files in /home/matt/maus-littlefield/src/input/InputCppDAQData
+Trying to add file 02873.003 from /home/matt/maus-littlefield/src/input/InputCppDAQData
+File 02873.003 is added
+ok
+Test reading the whole file ... WARNING in MDequipMap::MDequipMap() : Trying to create a multiple instances of a static singleton class
+ --- Equipment Map Dump --- 
+80 0x98e83c0 VLSB_C 0x98d62e8
+102 0x98dd790 V1290 0x98dc420
+111 0x92fb048 V830 0x98d48a0
+120 0x98d5910 V1724 0x98d9f98
+121 0x95f70a8 V1731 0x98dc470
+132 0x98d63d0 VLSB 0x98d6360
+141 0x98dd4e0 DBB 0x98e03f8
+Equipment Map count : 2
+Going to search for run 02873 data files in /home/matt/maus-littlefield/src/input/InputCppDAQData
+Trying to add file 02873.003 from /home/matt/maus-littlefield/src/input/InputCppDAQData
+File 02873.003 is added
+WARNING : The first event is not a START_OF_RUN. Spill count and Event count not accurate. 
+++++ End of file 02873.003  ++++
+ok
+Test a single event ... WARNING in MDequipMap::MDequipMap() : Trying to create a multiple instances of a static singleton class
+ --- Equipment Map Dump --- 
+80 0x98e83c0 VLSB_C 0x98d62e8
+102 0x98dd790 V1290 0x98dc420
+111 0x92fb048 V830 0x98d48a0
+120 0x98d5910 V1724 0x98d9f98
+121 0x95f70a8 V1731 0x98dc470
+132 0x98d63d0 VLSB 0x98d6360
+141 0x98dd4e0 DBB 0x98e03f8
+Equipment Map count : 3
+Going to search for run 02873 data files in /home/matt/maus-littlefield/src/input/InputCppDAQData
+Trying to add file 02873.003 from /home/matt/maus-littlefield/src/input/InputCppDAQData
+File 02873.003 is added
+WARNING : The first event is not a START_OF_RUN. Spill count and Event count not accurate. 
+ok
+Test runnig forever by trying to get 10000 empty documents ... ok
+Read 100 events only ... ok
+Test to make sure that if the input is done spitting out documents, then you can't get more documents from it ... ok
+test bad file content ... ok
+test internal counter gt ... ok
+test internal counter lt ... ok
+test what happens if there is one line with some spaces ... ok
+test read 100 events ... ok
+test trying to read twice gives nothing ... ok
+test bad input number of spills ... ok
+should be able to generate 0 events (and return nothing) ... ok
+test generate 100 events ... ok
+test_empty (test_MapCppPrint.MapCppPrintTestCase) ... ok
+Check we get an error for bad input to birth ... ok
+Check mapper runs for empty string, returning an error ... ok
+Check mapper runs for mc with wrong type, returning an error ... ok
+Check mapper runs for mc good. Check it tracks primaries by testing ... ok
+Check mapper runs for no mc string, returning an error ... ok
+test_visualisation (test_MapCppSimulation.MapCppSimulationTestCase) ... ..
+----------------------------------------------------------------------
+Ran 2 tests in 0.984s
+
+OK
+ok
+Check can handle empty configuration ... ok
+Check birth with default configuration ... ok
+Check that nothing happens in absence of data ... ok
+Test MapCppTOFDigits process method ... ok
+Check against configuration is empty ... ok
+Check that birth works properly ... ok
+Check that against data stream is empty ... ok
+Check MapCppTOFSlabHits process function ... ok
+Check against configuration is empty ... ok
+Check can handle empty spill ... ok
+Check for case where we have no data ... ok
+Check the MapCppTOFSpacePoints process function ... ok
+test the Check_param function ... ok
+Test the compute_adc_counts function ... ok
+Test to make sure death occurs ... ok
+The MiceModules are loaded and ... ok
+Test the get_npe function ... ok
+Test the get_tdc_counts function ... ok
+Test make_bundle function ... ok
+Test of the process function ... ok
+Calls the function check_sanity_mc. ... ok
+Check that the birth goes okay ... ok
+Check that we set the binomial variables; throw an error if binomial ... ok
+Check that we set the seed, particle generator correctly ... ok
+Check that we throw an error if particle generator unknown ... ok
+Check overall that process works okay ... ok
+Check that we throw an error if the spill is bad ... ok
+Check that we sample from beams with large weight in binomial mode ... ok
+Check that we sample from the correct beam for each particle when in ... ok
+Check that we sample from beams with large weight in ovewrwrite mode ... ok
+Check that we append a random number of empty primaries within allowed ... ok
+Check that we append correct number of empty primaries in counter mode ... ok
+Check that we generate empty primaries for each existing particle in ... ok
+test_document (test_MapPyDoNothing.MapPyDoNothingTestCase) ... ok
+test_empty (test_MapPyDoNothing.MapPyDoNothingTestCase) ... ok
+a test ... ok
+test_empty (test_MapPyPrint.MapPyPrintTestCase) ... ok
+test_return (test_MapPyPrint.MapPyPrintTestCase) ... ok
+test_empty (test_MapPyRemoveTracks.MapPyRemoveTracksTestCase) ... ok
+test_no_mc_branch (test_MapPyRemoveTracks.MapPyRemoveTracksTestCase) ... ok
+test_remove_non_muon (test_MapPyRemoveTracks.MapPyRemoveTracksTestCase) ... ok
+test_removes_tracks (test_MapPyRemoveTracks.MapPyRemoveTracksTestCase) ... ok
+Check against different issues ... WARNING in MDequipMap::MDequipMap() : Trying to create a multiple instances of a static singleton class
+ok
+Test clear. ... SKIP: MongoDB server is not accessible
+Test connect with a bad host throws an AutoReconnect error as ... SKIP: MongoDB server is not accessible
+Test connect with a bad port throws an AutoReconnect error as ... SKIP: MongoDB server is not accessible
+Test connect with no collection name parameter throws a KeyError. ... SKIP: MongoDB server is not accessible
+Test connect with no database name parameter throws a KeyError. ... SKIP: MongoDB server is not accessible
+Test connect with no parameters throws a KeyError as a host ... SKIP: MongoDB server is not accessible
+Test delete. ... SKIP: MongoDB server is not accessible
+Test get, delete, clear, len, ids on an empty data store. ... SKIP: MongoDB server is not accessible
+Test put and get, and also ids and len. ... SKIP: MongoDB server is not accessible
+Test put then another with the same ID. ... SKIP: MongoDB server is not accessible
+Test saving one event ... ok
+Test "birth" if given an absolute path to a directory as ... ok
+Test "birth" if given a file name as an image directory. ... ok
+Check default configuration after "birth" is called. ... ok
+Test "birth" if given a relative path to a directory as ... ok
+Test "save" with a JSON document with no "image" "data". ... ok
+Test "save" with a JSON document with no "tag". ... ok
+Test "save" with a JSON document with no "image_type". ... ok
+Test "save" with 3 JSON documents each an "image". ... ok
+Test "save" with a JSON document with no "image". ... ok
+Test OutputPyJson loads a gzip file from datacards correctly. ... ok
+Test OutputPyJson loads a text file from datacards correctly. ... ok
+Test OutputPyJson handles exceptions on bad death(). ... ok
+Try saving one spill using compressed gzip ... ok
+Try saving one spill in uncompressed fashion ... ok
+Test "process" with a JSON document with a "digits" entry, ... ok
+Test configuration when birth is called with histogram ... ok
+Test configuration when "birth" is called with an unsupported ... ok
+Check default configuration after "birth" is called. ... ok
+Test configuration when "birth" is called with a supported ... ok
+Test "process" with a JSON document with an empty "digits" ... ok
+Test "process" with a JSON document with an "END_OF_RUN" ... ok
+Test "process" with a bad JSON document as an argument string. ... ok
+Test "process" with multiple JSON documents each with multiple ... ok
+Test "process" with multiple JSON documents each with multiple ... ok
+Test "process" with a JSON document with a "digits" entry but ... ok
+Test "process" with a JSON document with no "digits" entry. ... ok
+Test "process" with a JSON document with a "digits" entry and ... ok
+Test "process" with a JSON document with a "digits" entry and ... ok
+Test "process" can create PDF images. ... ok
+Test "process" can create PNG images. ... ok
+Test "process" can create PS images. ... ok
+Test "process" can create RAW images. ... ok
+Test "process" can create RGBA images. ... ok
+Test "process" can create SVG images. ... ok
+Test "process" can create SVGZ images. ... ok
+Test "process" with a JSON document with a "digits" entry, ... ok
+test_always_true (test_always_true.AlwaysTrueTestCase) ... ok
+Overall check birth works ... ok
+Beam mean setup ... ok
+Beam longitudinal - gaussian mode ... ok
+Beam longitudinal - sawtooth/uniform time distributions ... ok
+Beam longitudinal - twiss mode ... ok
+Beam longitudinal - bad user input ... ok
+Beam longitudinal - pencil mode ... ok
+Test __birth_particle_generator for counter mode ... ok
+Test __birth_particle_generator for weighting mode ... ok
+Test __birth_particle_generator for random number assignment ... ok
+Test __birth_reference_particle ... swig/python detected a memory leak of type 'std::vector< Json::Value >::value_type *', no destructor found.
+swig/python detected a memory leak of type 'std::vector< Json::Value >::value_type *', no destructor found.
+swig/python detected a memory leak of type 'std::vector< Json::Value >::value_type *', no destructor found.
+swig/python detected a memory leak of type 'std::vector< Json::Value >::value_type *', no destructor found.
+swig/python detected a memory leak of type 'std::vector< Json::Value >::value_type *', no destructor found.
+swig/python detected a memory leak of type 'std::vector< Json::Value >::value_type *', no destructor found.
+swig/python detected a memory leak of type 'std::vector< Json::Value >::value_type *', no destructor found.
+Traceback (most recent call last):
+  File "/home/matt/maus-littlefield/build/beam.py", line 191, in __birth_reference_particle
+    beam_definition['reference'], 0)
+  File "/home/matt/maus-littlefield/third_party/install/lib/python2.7/site-packages/xboa/Hit.py", line 141, in new_from_maus_object
+    for maus_xyz, value in maus_dict[maus_name].iteritems():
+AttributeError: 'int' object has no attribute 'iteritems'
+ok
+Beam transverse - longitudinal coupling ... ok
+Beam transverse constant solenoid mode ... ok
+Test for bad input ... ok
+Test for pencil beam ... ok
+Beam transverse Penn mode ... ok
+Beam transverse twiss mode ... ok
+Check function that throws a particle - for gaussian distribution ... ok
+Check function that throws a particle - for pencil beam ... ok
+Check function that throws a particle - for sawtooth time dist ... ok
+Check function that throws a particle - for uniform time dist ... ok
+Check function that converts from an array to a primary particle ... ok
+Check we generate the seed correctly ... ok
+Test parsing bool from command line to configuration ... ok
+Test parsing bool from command line to configuration ... ok
+Test parsing number from command line to configuration ... ok
+Test parsing string from command line to configuration ... ok
+Check that we load configuration defaults correctly ... ok
+Test that we can create a configuration value from an input file ... ok
+Test that we can overwrite configuration value from an input file ... ok
+Test conversion from string to boolean type ... ok
+Check that the version is defined correctly ... ok
+Check that Go handles command line args switch correctly ... usage: nosetests [-h] [-visualisation_phi VISUALISATION_PHI]
+                 [-geometry_download_by GEOMETRY_DOWNLOAD_BY]
+                 [-maximum_number_of_steps MAXIMUM_NUMBER_OF_STEPS]
+                 [-SciFi_sigma_tracker0_station5 SCIFI_SIGMA_TRACKER0_STATION5]
+                 [-TOF_T0_calibration_file TOF_T0_CALIBRATION_FILE]
+                 [-SciFiClustExcept SCIFICLUSTEXCEPT]
+                 [-simulation_reference_particle SIMULATION_REFERENCE_PARTICLE]
+                 [-muon_half_life MUON_HALF_LIFE]
+                 [-configuration_file CONFIGURATION_FILE]
+                 [-photon_vis_colour PHOTON_VIS_COLOUR]
+                 [-TOF_makeSpacePiontCut TOF_MAKESPACEPIONTCUT]
+                 [-errors_to_stderr ERRORS_TO_STDERR]
+                 [-couchdb_database_name COUCHDB_DATABASE_NAME]
+                 [-SciFiFiberDecayConst SCIFIFIBERDECAYCONST]
+                 [-SciFiMUXTransmissionEff SCIFIMUXTRANSMISSIONEFF]
+                 [-Do_V1724_Zero_Suppression DO_V1724_ZERO_SUPPRESSION]
+                 [-couchdb_url COUCHDB_URL]
+                 [-Enable_V830_Unpacking ENABLE_V830_UNPACKING]
+                 [-VLSB_Zero_Suppression_Threshold VLSB_ZERO_SUPPRESSION_THRESHOLD]
+                 [-geometry_download_wsdl GEOMETRY_DOWNLOAD_WSDL]
+                 [-geant4_visualisation GEANT4_VISUALISATION]
+                 [-output_json_file_name OUTPUT_JSON_FILE_NAME]
+                 [-TOFconversionFactor TOFCONVERSIONFACTOR]
+                 [-Enable_EMR ENABLE_EMR]
+                 [-reference_physics_processes REFERENCE_PHYSICS_PROCESSES]
+                 [-beam BEAM] [-SciFiFiberTrappingEff SCIFIFIBERTRAPPINGEFF]
+                 [-mu_plus_vis_colour MU_PLUS_VIS_COLOUR]
+                 [-daq_data_file DAQ_DATA_FILE]
+                 [-SciFivlpcTimeRes SCIFIVLPCTIMERES]
+                 [-SciFiFiberTransmissionEff SCIFIFIBERTRANSMISSIONEFF]
+                 [-neutron_vis_colour NEUTRON_VIS_COLOUR]
+                 [-TOFattenuationLength TOFATTENUATIONLENGTH]
+                 [-SciFiFiberMirrorEff SCIFIFIBERMIRROREFF]
+                 [-DAQ_cabling_file DAQ_CABLING_FILE]
+                 [-geometry_upload_wsdl GEOMETRY_UPLOAD_WSDL]
+                 [-daq_data_path DAQ_DATA_PATH] [-SciFi_sigma_z SCIFI_SIGMA_Z]
+                 [-Enable_CKOV ENABLE_CKOV] [-mongodb_port MONGODB_PORT]
+                 [-e_minus_vis_colour E_MINUS_VIS_COLOUR]
+                 [-mongodb_database_name MONGODB_DATABASE_NAME]
+                 [-particle_decay PARTICLE_DECAY]
+                 [-Number_of_DAQ_Events NUMBER_OF_DAQ_EVENTS]
+                 [-default_vis_colour DEFAULT_VIS_COLOUR]
+                 [-Enable_DBB_Unpacking ENABLE_DBB_UNPACKING]
+                 [-Enable_V1724_Unpacking ENABLE_V1724_UNPACKING]
+                 [-SciFiNPECut SCIFINPECUT]
+                 [-geometry_upload_directory GEOMETRY_UPLOAD_DIRECTORY]
+                 [-keep_steps KEEP_STEPS]
+                 [-charged_pion_half_life CHARGED_PION_HALF_LIFE]
+                 [-Enable_TOF ENABLE_TOF]
+                 [-geometry_upload_note GEOMETRY_UPLOAD_NOTE]
+                 [-simulation_geometry_filename SIMULATION_GEOMETRY_FILENAME]
+                 [-TOF_TW_calibration_file TOF_TW_CALIBRATION_FILE]
+                 [-Enable_VLSB_C_Unpacking ENABLE_VLSB_C_UNPACKING]
+                 [-Enable_t0_correction ENABLE_T0_CORRECTION]
+                 [-on_error ON_ERROR]
+                 [-mu_minus_vis_colour MU_MINUS_VIS_COLOUR]
+                 [-TOF_Trigger_calibration_file TOF_TRIGGER_CALIBRATION_FILE]
+                 [-SciFi_sigma_triplet SCIFI_SIGMA_TRIPLET]
+                 [-pi_plus_vis_colour PI_PLUS_VIS_COLOUR]
+                 [-spill_generator_number_of_spills SPILL_GENERATOR_NUMBER_OF_SPILLS]
+                 [-pi_minus_vis_colour PI_MINUS_VIS_COLOUR]
+                 [-TOFtdcConversionFactor TOFTDCCONVERSIONFACTOR]
+                 [-visualisation_viewer VISUALISATION_VIEWER]
+                 [-mongodb_host MONGODB_HOST] [-os OS]
+                 [-type_of_dataflow TYPE_OF_DATAFLOW]
+                 [-SciFi_sigma_duplet SCIFI_SIGMA_DUPLET]
+                 [-keep_only_muon_tracks KEEP_ONLY_MUON_TRACKS]
+                 [-Enable_timeWalk_correction ENABLE_TIMEWALK_CORRECTION]
+                 [-doc_store_class DOC_STORE_CLASS]
+                 [-cdb_download_url CDB_DOWNLOAD_URL]
+                 [-mongodb_collection_name MONGODB_COLLECTION_NAME]
+                 [-V1731_Zero_Suppression_Threshold V1731_ZERO_SUPPRESSION_THRESHOLD]
+                 [-geometry_download_directory GEOMETRY_DOWNLOAD_DIRECTORY]
+                 [-SciFitdcFactor SCIFITDCFACTOR]
+                 [-TOFpmtQuantumEfficiency TOFPMTQUANTUMEFFICIENCY]
+                 [-SciFivlpcEnergyRes SCIFIVLPCENERGYRES]
+                 [-SciFiadcFactor SCIFIADCFACTOR] [-__doc__ __DOC__]
+                 [-Enable_V1290_Unpacking ENABLE_V1290_UNPACKING]
+                 [-physics_processes PHYSICS_PROCESSES]
+                 [-errors_to_json ERRORS_TO_JSON]
+                 [-Enable_V1731_Unpacking ENABLE_V1731_UNPACKING]
+                 [-Enable_KL ENABLE_KL]
+                 [-geometry_upload_cleanup GEOMETRY_UPLOAD_CLEANUP]
+                 [-SciFinTrackers SCIFINTRACKERS]
+                 [-geometry_download_run_number GEOMETRY_DOWNLOAD_RUN_NUMBER]
+                 [-VLSB_C_Zero_Suppression_Threshold VLSB_C_ZERO_SUPPRESSION_THRESHOLD]
+                 [-SciFiMUXNum SCIFIMUXNUM]
+                 [-visualisation_theta VISUALISATION_THETA]
+                 [-Enable_VLSB_Unpacking ENABLE_VLSB_UNPACKING]
+                 [-V1724_Zero_Suppression_Threshold V1724_ZERO_SUPPRESSION_THRESHOLD]
+                 [-SciFinStations SCIFINSTATIONS]
+                 [-Calib_Events_Only CALIB_EVENTS_ONLY]
+                 [-geometry_download_cleanup GEOMETRY_DOWNLOAD_CLEANUP]
+                 [-Phys_Events_Only PHYS_EVENTS_ONLY]
+                 [-production_threshold PRODUCTION_THRESHOLD]
+                 [-e_plus_vis_colour E_PLUS_VIS_COLOUR]
+                 [-cdb_upload_url CDB_UPLOAD_URL]
+                 [-Do_VLSB_Zero_Suppression DO_VLSB_ZERO_SUPPRESSION]
+                 [-Enable_triggerDelay_correction ENABLE_TRIGGERDELAY_CORRECTION]
+                 [-SciFinPlanes SCIFINPLANES]
+                 [-SciFiFiberConvFactor SCIFIFIBERCONVFACTOR]
+                 [-physics_model PHYSICS_MODEL] [-keep_tracks KEEP_TRACKS]
+                 [-maus_version MAUS_VERSION]
+                 [-TOFscintLightSpeed TOFSCINTLIGHTSPEED]
+                 [-TOF_cabling_file TOF_CABLING_FILE]
+                 [-TOFadcConversionFactor TOFADCCONVERSIONFACTOR]
+                 [-verbose_level VERBOSE_LEVEL]
+                 [-output_json_file_type OUTPUT_JSON_FILE_TYPE]
+                 [-geometry_upload_valid_from GEOMETRY_UPLOAD_VALID_FROM]
+                 [-TOF_trigger_station TOF_TRIGGER_STATION]
+                 [-SciFitdcBits SCIFITDCBITS]
+                 [-Do_V1731_Zero_Suppression DO_V1731_ZERO_SUPPRESSION]
+                 [-geometry_download_id GEOMETRY_DOWNLOAD_ID]
+                 [-gamma_vis_colour GAMMA_VIS_COLOUR]
+                 [-SciFivlpcQE SCIFIVLPCQE]
+                 [-accumulate_tracks ACCUMULATE_TRACKS]
+                 [-visualisation_zoom VISUALISATION_ZOOM]
+                 [-TOF_findTriggerPixelCut TOF_FINDTRIGGERPIXELCUT]
+                 [-TOFpmtTimeResolution TOFPMTTIMERESOLUTION]
+                 [-Do_VLSB_C_Zero_Suppression DO_VLSB_C_ZERO_SUPPRESSION]
+                 [-reconstruction_geometry_filename RECONSTRUCTION_GEOMETRY_FILENAME]
+nosetests: error: unrecognized arguments: bob
+ok
+Make sure get_possible_dataflows() doesn't return nonsense ... ok
+Check that Go raises error with bad input ... ok
+Check that Go raises error with bad transformer ... ok
+Check that Go raises error with bad outputter ... ok
+Check that Go raises error with bad merger ... ok
+Check that Go executes okay with multi_process dataflow. ... ok
+Check that Go notifies user of unimplemented dataflow ... ok
+Check that Go executes okay with pipeline_single_thread dataflow. ... ok
+Check that Go raises error with bad dataflow type ... ok
+@brief This is the main test - walks the directory structure and looks for errors using cpplint ... ok
+@brief self check - test we postprocess cpplint output correctly ... ok
+@brief self check - test the glob_maus_root_dir function (above) ... ok
+@brief self check - test we walk the path correctly, excluding relevant files and directories ... ok
+test_run_test_cpp_unit (test_cpp_unit.CppUnitTests) ... [==========] Running 146 tests from 32 test cases.
+[----------] Global test environment set-up.
+[----------] 1 test from PolynomialTest
+[ RUN      ] PolynomialTest.old_unit_tests
+[       OK ] PolynomialTest.old_unit_tests (978 ms)
+[----------] 1 test from PolynomialTest (978 ms total)
+
+[----------] 1 test from dataCardsTest
+[ RUN      ] dataCardsTest.readKeysTest
+[       OK ] dataCardsTest.readKeysTest (1 ms)
+[----------] 1 test from dataCardsTest (1 ms total)
+
+[----------] 8 tests from SqueakTest
+[ RUN      ] SqueakTest.SqueakSetOutputMoutErrorLevelTest
+[       OK ] SqueakTest.SqueakSetOutputMoutErrorLevelTest (0 ms)
+[ RUN      ] SqueakTest.SqueakMoutExceptionTest
+[       OK ] SqueakTest.SqueakMoutExceptionTest (0 ms)
+[ RUN      ] SqueakTest.SqueakMoutDefaultTest
+[       OK ] SqueakTest.SqueakMoutDefaultTest (0 ms)
+[ RUN      ] SqueakTest.GetOutputsTest
+[       OK ] SqueakTest.GetOutputsTest (0 ms)
+[ RUN      ] SqueakTest.ActivateCoutTest
+[       OK ] SqueakTest.ActivateCoutTest (0 ms)
+[ RUN      ] SqueakTest.ActivateClogTest
+[       OK ] SqueakTest.ActivateClogTest (1 ms)
+[ RUN      ] SqueakTest.ActivateCerrTest
+[       OK ] SqueakTest.ActivateCerrTest (0 ms)
+[ RUN      ] SqueakTest.SetStandardOutputs
+[       OK ] SqueakTest.SetStandardOutputs (0 ms)
+[----------] 8 tests from SqueakTest (1 ms total)
+
+[----------] 1 test from TriangularMeshTest
+[ RUN      ] TriangularMeshTest.DelaunayConstructorTest
+[       OK ] TriangularMeshTest.DelaunayConstructorTest (1 ms)
+[----------] 1 test from TriangularMeshTest (1 ms total)
+
+[----------] 1 test from MeshTest
+[ RUN      ] MeshTest.testAll
+[       OK ] MeshTest.testAll (299 ms)
+[----------] 1 test from MeshTest (299 ms total)
+
+[----------] 1 test from MVectorTest
+[ RUN      ] MVectorTest.old_unit_tests
+[       OK ] MVectorTest.old_unit_tests (0 ms)
+[----------] 1 test from MVectorTest (0 ms total)
+
+[----------] 1 test from DifferentiatorTest
+[ RUN      ] DifferentiatorTest.old_unit_tests
+[       OK ] DifferentiatorTest.old_unit_tests (1 ms)
+[----------] 1 test from DifferentiatorTest (1 ms total)
+
+[----------] 3 tests from STLUtilsTest
+[ RUN      ] STLUtilsTest.IterableEqualityTest
+[       OK ] STLUtilsTest.IterableEqualityTest (0 ms)
+[ RUN      ] STLUtilsTest.ToStringTest
+[       OK ] STLUtilsTest.ToStringTest (0 ms)
+[ RUN      ] STLUtilsTest.ReplaceVariablesTest
+[       OK ] STLUtilsTest.ReplaceVariablesTest (0 ms)
+[----------] 3 tests from STLUtilsTest (0 ms total)
+
+[----------] 11 tests from MMatrixDoubleTest
+[ RUN      ] MMatrixDoubleTest.DefaultConstructorTest
+[       OK ] MMatrixDoubleTest.DefaultConstructorTest (0 ms)
+[ RUN      ] MMatrixDoubleTest.ConstructorSizeOnlyTest
+[       OK ] MMatrixDoubleTest.ConstructorSizeOnlyTest (0 ms)
+[ RUN      ] MMatrixDoubleTest.ConstructorAllEqualTest
+[       OK ] MMatrixDoubleTest.ConstructorAllEqualTest (0 ms)
+[ RUN      ] MMatrixDoubleTest.ConstructorDataTest
+[       OK ] MMatrixDoubleTest.ConstructorDataTest (0 ms)
+[ RUN      ] MMatrixDoubleTest.CopyConstructorTest
+[       OK ] MMatrixDoubleTest.CopyConstructorTest (0 ms)
+[ RUN      ] MMatrixDoubleTest.DiagonalTest
+[       OK ] MMatrixDoubleTest.DiagonalTest (0 ms)
+[ RUN      ] MMatrixDoubleTest.MMatrixBracketOperatorTest
+[       OK ] MMatrixDoubleTest.MMatrixBracketOperatorTest (0 ms)
+[ RUN      ] MMatrixDoubleTest.MMatrixTraceTest
+[       OK ] MMatrixDoubleTest.MMatrixTraceTest (0 ms)
+[ RUN      ] MMatrixDoubleTest.MMatrixDetTest
+[       OK ] MMatrixDoubleTest.MMatrixDetTest (0 ms)
+[ RUN      ] MMatrixDoubleTest.MMatrixInvertTest
+[       OK ] MMatrixDoubleTest.MMatrixInvertTest (0 ms)
+[ RUN      ] MMatrixDoubleTest.MMatrixInverseTest
+[       OK ] MMatrixDoubleTest.MMatrixInverseTest (0 ms)
+[----------] 11 tests from MMatrixDoubleTest (1 ms total)
+
+[----------] 1 test from MMatrixTest
+[ RUN      ] MMatrixTest.old_unit_tests
+[       OK ] MMatrixTest.old_unit_tests (1 ms)
+[----------] 1 test from MMatrixTest (1 ms total)
+
+[----------] 1 test from MathUtils
+[ RUN      ] MathUtils.CompactVectorTest
+[       OK ] MathUtils.CompactVectorTest (0 ms)
+[----------] 1 test from MathUtils (0 ms total)
+
+[----------] 1 test from Mathutils
+[ RUN      ] Mathutils.GreaterThanTest
+[       OK ] Mathutils.GreaterThanTest (0 ms)
+[----------] 1 test from Mathutils (0 ms total)
+
+[----------] 7 tests from EngeTest
+[ RUN      ] EngeTest.EngeConstructorTest
+[       OK ] EngeTest.EngeConstructorTest (5 ms)
+[ RUN      ] EngeTest.MutatorAccessorTest
+[       OK ] EngeTest.MutatorAccessorTest (0 ms)
+[ RUN      ] EngeTest.SetEngeDiffIndicesTest
+[       OK ] EngeTest.SetEngeDiffIndicesTest (0 ms)
+[ RUN      ] EngeTest.HNTest
+[       OK ] EngeTest.HNTest (0 ms)
+[ RUN      ] EngeTest.GNTest
+[       OK ] EngeTest.GNTest (6 ms)
+[ RUN      ] EngeTest.GetEngeTest
+[       OK ] EngeTest.GetEngeTest (164 ms)
+[ RUN      ] EngeTest.GetDoubleEngeTest
+[       OK ] EngeTest.GetDoubleEngeTest (328 ms)
+[----------] 7 tests from EngeTest (505 ms total)
+
+[----------] 6 tests from TanhTest
+[ RUN      ] TanhTest.TanhConstructorTest
+[       OK ] TanhTest.TanhConstructorTest (0 ms)
+[ RUN      ] TanhTest.TanhMutatorAccessorTest
+[       OK ] TanhTest.TanhMutatorAccessorTest (0 ms)
+[ RUN      ] TanhTest.TanhGetTanhDiffIndicesTest
+[       OK ] TanhTest.TanhGetTanhDiffIndicesTest (0 ms)
+[ RUN      ] TanhTest.GetTanhTest
+[       OK ] TanhTest.GetTanhTest (1 ms)
+[ RUN      ] TanhTest.GetNegTanhTest
+[       OK ] TanhTest.GetNegTanhTest (0 ms)
+[ RUN      ] TanhTest.GetDoubleTanhTest
+[       OK ] TanhTest.GetDoubleTanhTest (0 ms)
+[----------] 6 tests from TanhTest (2 ms total)
+
+[----------] 11 tests from MiceModToG4SolidTest
+[ RUN      ] MiceModToG4SolidTest.checkDimTest
+[       OK ] MiceModToG4SolidTest.checkDimTest (2 ms)
+[ RUN      ] MiceModToG4SolidTest.buildWedgeTest
+[       OK ] MiceModToG4SolidTest.buildWedgeTest (2 ms)
+[ RUN      ] MiceModToG4SolidTest.buildTrapezoidTest
+[       OK ] MiceModToG4SolidTest.buildTrapezoidTest (0 ms)
+[ RUN      ] MiceModToG4SolidTest.buildBoxTest
+[       OK ] MiceModToG4SolidTest.buildBoxTest (2 ms)
+[ RUN      ] MiceModToG4SolidTest.buildCylinderTest
+[       OK ] MiceModToG4SolidTest.buildCylinderTest (1 ms)
+[ RUN      ] MiceModToG4SolidTest.buildTubeTest
+[       OK ] MiceModToG4SolidTest.buildTubeTest (3 ms)
+[ RUN      ] MiceModToG4SolidTest.buildSphereTest
+[       OK ] MiceModToG4SolidTest.buildSphereTest (6 ms)
+[ RUN      ] MiceModToG4SolidTest.buildPolyconeTest
+[       OK ] MiceModToG4SolidTest.buildPolyconeTest (0 ms)
+[ RUN      ] MiceModToG4SolidTest.buildMultipoleTest
+[       OK ] MiceModToG4SolidTest.buildMultipoleTest (1 ms)
+[ RUN      ] MiceModToG4SolidTest.buildTorusTest
+[       OK ] MiceModToG4SolidTest.buildTorusTest (4 ms)
+[ RUN      ] MiceModToG4SolidTest.buildEllipticalConeTest
+[       OK ] MiceModToG4SolidTest.buildEllipticalConeTest (2 ms)
+[----------] 11 tests from MiceModToG4SolidTest (23 ms total)
+
+[----------] 2 tests from MAUSTrackingActionTest
+[ RUN      ] MAUSTrackingActionTest.PreUserTrackingActionTest
+[       OK ] MAUSTrackingActionTest.PreUserTrackingActionTest (24 ms)
+[ RUN      ] MAUSTrackingActionTest.PostUserTrackingActionTest
+[       OK ] MAUSTrackingActionTest.PostUserTrackingActionTest (1 ms)
+[----------] 2 tests from MAUSTrackingActionTest (25 ms total)
+
+[----------] 12 tests from MAUSGeant4ManagerTest
+[ RUN      ] MAUSGeant4ManagerTest.GetSetTest
+[       OK ] MAUSGeant4ManagerTest.GetSetTest (0 ms)
+[ RUN      ] MAUSGeant4ManagerTest.GetReferenceParticleTest
+[       OK ] MAUSGeant4ManagerTest.GetReferenceParticleTest (0 ms)
+[ RUN      ] MAUSGeant4ManagerTest.SetPhasesTest
+[       OK ] MAUSGeant4ManagerTest.SetPhasesTest (8 ms)
+[ RUN      ] MAUSGeant4ManagerTest.RunParticlePGTest
+[       OK ] MAUSGeant4ManagerTest.RunParticlePGTest (958 ms)
+[ RUN      ] MAUSGeant4ManagerTest.RunParticleJsonTest
+[       OK ] MAUSGeant4ManagerTest.RunParticleJsonTest (1 ms)
+[ RUN      ] MAUSGeant4ManagerTest.RunManyParticlesTest
+[       OK ] MAUSGeant4ManagerTest.RunManyParticlesTest (2 ms)
+[ RUN      ] MAUSGeant4ManagerTest.GetSetTest
+[       OK ] MAUSGeant4ManagerTest.GetSetTest (0 ms)
+[ RUN      ] MAUSGeant4ManagerTest.GetReferenceParticleTest
+[       OK ] MAUSGeant4ManagerTest.GetReferenceParticleTest (0 ms)
+[ RUN      ] MAUSGeant4ManagerTest.SetPhasesTest
+[       OK ] MAUSGeant4ManagerTest.SetPhasesTest (7 ms)
+[ RUN      ] MAUSGeant4ManagerTest.RunParticlePGTest
+[       OK ] MAUSGeant4ManagerTest.RunParticlePGTest (132 ms)
+[ RUN      ] MAUSGeant4ManagerTest.RunParticleJsonTest
+[       OK ] MAUSGeant4ManagerTest.RunParticleJsonTest (1 ms)
+[ RUN      ] MAUSGeant4ManagerTest.RunManyParticlesTest
+[       OK ] MAUSGeant4ManagerTest.RunManyParticlesTest (2 ms)
+[----------] 12 tests from MAUSGeant4ManagerTest (1111 ms total)
+
+[----------] 6 tests from VirtualPlaneTest
+[ RUN      ] VirtualPlaneTest.ConstructorTest
+[       OK ] VirtualPlaneTest.ConstructorTest (1 ms)
+[ RUN      ] VirtualPlaneTest.GetIndependentVariableZTest
+[       OK ] VirtualPlaneTest.GetIndependentVariableZTest (0 ms)
+[ RUN      ] VirtualPlaneTest.SteppingOverTest
+[       OK ] VirtualPlaneTest.SteppingOverTest (0 ms)
+[ RUN      ] VirtualPlaneTest.BuildNewHitTest
+[       OK ] VirtualPlaneTest.BuildNewHitTest (0 ms)
+[ RUN      ] VirtualPlaneTest.ComparePositionTest
+[       OK ] VirtualPlaneTest.ComparePositionTest (0 ms)
+[ RUN      ] VirtualPlaneTest.InRadialCutTest
+[       OK ] VirtualPlaneTest.InRadialCutTest (0 ms)
+[----------] 6 tests from VirtualPlaneTest (1 ms total)
+
+[----------] 13 tests from VirtualPlaneManagerTest
+[ RUN      ] VirtualPlaneManagerTest.GetSetFieldTest
+[       OK ] VirtualPlaneManagerTest.GetSetFieldTest (1 ms)
+[ RUN      ] VirtualPlaneManagerTest.GetSetHitsTest
+[       OK ] VirtualPlaneManagerTest.GetSetHitsTest (0 ms)
+[ RUN      ] VirtualPlaneManagerTest.ConstructVirtualPlanes
+[       OK ] VirtualPlaneManagerTest.ConstructVirtualPlanes (0 ms)
+[ RUN      ] VirtualPlaneManagerTest.ConstructFromModule_IndepVariableTest
+[       OK ] VirtualPlaneManagerTest.ConstructFromModule_IndepVariableTest (5 ms)
+[ RUN      ] VirtualPlaneManagerTest.ConstructFromModule_MultiplePassesTest
+[       OK ] VirtualPlaneManagerTest.ConstructFromModule_MultiplePassesTest (2 ms)
+[ RUN      ] VirtualPlaneManagerTest.ConstructFromModule_OtherStuffTest
+[       OK ] VirtualPlaneManagerTest.ConstructFromModule_OtherStuffTest (1 ms)
+[ RUN      ] VirtualPlaneManagerTest.VirtualPlanesSteppingActionTest
+[       OK ] VirtualPlaneManagerTest.VirtualPlanesSteppingActionTest (2 ms)
+[ RUN      ] VirtualPlaneManagerTest.VirtualPlanesSteppingActionMultipassTest
+[       OK ] VirtualPlaneManagerTest.VirtualPlanesSteppingActionMultipassTest (2 ms)
+[ RUN      ] VirtualPlaneManagerTest.GetModuleFromStationNumberTest
+[       OK ] VirtualPlaneManagerTest.GetModuleFromStationNumberTest (2 ms)
+[ RUN      ] VirtualPlaneManagerTest.GetStationNumberFromModuleTest
+[       OK ] VirtualPlaneManagerTest.GetStationNumberFromModuleTest (1 ms)
+[ RUN      ] VirtualPlaneManagerTest.RemovePlaneTest
+[       OK ] VirtualPlaneManagerTest.RemovePlaneTest (3 ms)
+[ RUN      ] VirtualPlaneManagerTest.RemovePlanesTest
+[       OK ] VirtualPlaneManagerTest.RemovePlanesTest (2 ms)
+[ RUN      ] VirtualPlaneManagerTest.ReadWriteHitTest
+[       OK ] VirtualPlaneManagerTest.ReadWriteHitTest (1 ms)
+[----------] 13 tests from VirtualPlaneManagerTest (22 ms total)
+
+[----------] 4 tests from MAUSPrimaryGeneratorActionTest
+[ RUN      ] MAUSPrimaryGeneratorActionTest.PushPopTest
+[       OK ] MAUSPrimaryGeneratorActionTest.PushPopTest (0 ms)
+[ RUN      ] MAUSPrimaryGeneratorActionTest.GeneratePrimariesTest
+[       OK ] MAUSPrimaryGeneratorActionTest.GeneratePrimariesTest (1 ms)
+[ RUN      ] MAUSPrimaryGeneratorActionTest.PGParticleReadWriteTest
+[       OK ] MAUSPrimaryGeneratorActionTest.PGParticleReadWriteTest (0 ms)
+[ RUN      ] MAUSPrimaryGeneratorActionTest.PGParticleFromVirtualHitTest
+[       OK ] MAUSPrimaryGeneratorActionTest.PGParticleFromVirtualHitTest (0 ms)
+[----------] 4 tests from MAUSPrimaryGeneratorActionTest (1 ms total)
+
+[----------] 5 tests from MAUSSteppingActionTest
+[ RUN      ] MAUSSteppingActionTest.GetSetTest
+[       OK ] MAUSSteppingActionTest.GetSetTest (1 ms)
+[ RUN      ] MAUSSteppingActionTest.UserSteppingActionMaxNStepsTest
+[       OK ] MAUSSteppingActionTest.UserSteppingActionMaxNStepsTest (0 ms)
+[ RUN      ] MAUSSteppingActionTest.UserSteppingActionWriteStepsTest
+[       OK ] MAUSSteppingActionTest.UserSteppingActionWriteStepsTest (0 ms)
+[ RUN      ] MAUSSteppingActionTest.StepToJsonTest
+[       OK ] MAUSSteppingActionTest.StepToJsonTest (0 ms)
+[ RUN      ] MAUSSteppingActionTest.UserSteppingActionVirtualTest
+[       OK ] MAUSSteppingActionTest.UserSteppingActionVirtualTest (1 ms)
+[----------] 5 tests from MAUSSteppingActionTest (2 ms total)
+
+[----------] 3 tests from MAUSEventActionTest
+[ RUN      ] MAUSEventActionTest.SetGetEventsTest
+[       OK ] MAUSEventActionTest.SetGetEventsTest (1 ms)
+[ RUN      ] MAUSEventActionTest.BeginOfEventActionTest
+[       OK ] MAUSEventActionTest.BeginOfEventActionTest (0 ms)
+[ RUN      ] MAUSEventActionTest.EndOfEventActionTest
+[       OK ] MAUSEventActionTest.EndOfEventActionTest (0 ms)
+[----------] 3 tests from MAUSEventActionTest (1 ms total)
+
+[----------] 10 tests from MiceModuleTest
+[ RUN      ] MiceModuleTest.ReadModuleTest
+[       OK ] MiceModuleTest.ReadModuleTest (1 ms)
+[ RUN      ] MiceModuleTest.GetBoolTest
+[       OK ] MiceModuleTest.GetBoolTest (0 ms)
+[ RUN      ] MiceModuleTest.GetIntTest
+[       OK ] MiceModuleTest.GetIntTest (1 ms)
+[ RUN      ] MiceModuleTest.GetStringTest
+[       OK ] MiceModuleTest.GetStringTest (1 ms)
+[ RUN      ] MiceModuleTest.GetDoubleTest
+[       OK ] MiceModuleTest.GetDoubleTest (0 ms)
+[ RUN      ] MiceModuleTest.Get3VecTest
+[       OK ] MiceModuleTest.Get3VecTest (1 ms)
+[ RUN      ] MiceModuleTest.propertyDoubleAccessors
+[       OK ] MiceModuleTest.propertyDoubleAccessors (1 ms)
+[ RUN      ] MiceModuleTest.propertyHep3VecAccessors
+[       OK ] MiceModuleTest.propertyHep3VecAccessors (3 ms)
+[ RUN      ] MiceModuleTest.printTree
+[       OK ] MiceModuleTest.printTree (0 ms)
+[ RUN      ] MiceModuleTest.DumpMiceModule
+[       OK ] MiceModuleTest.DumpMiceModule (1 ms)
+[----------] 10 tests from MiceModuleTest (10 ms total)
+
+[----------] 1 test from DoubletFiberParamTest
+[ RUN      ] DoubletFiberParamTest.test_fiber_parameters
+[       OK ] DoubletFiberParamTest.test_fiber_parameters (419 ms)
+[----------] 1 test from DoubletFiberParamTest (419 ms total)
+
+[----------] 1 test from SciFiPlaneTest
+[ RUN      ] SciFiPlaneTest.Test_num_fibres_in_all_planes
+[       OK ] SciFiPlaneTest.Test_num_fibres_in_all_planes (467 ms)
+[----------] 1 test from SciFiPlaneTest (467 ms total)
+
+[----------] 2 tests from BTSolenoidTest
+[ RUN      ] BTSolenoidTest.AccessorsTest
+[       OK ] BTSolenoidTest.AccessorsTest (1 ms)
+[ RUN      ] BTSolenoidTest.ReadWriteTest
+[       OK ] BTSolenoidTest.ReadWriteTest (1 ms)
+[----------] 2 tests from BTSolenoidTest (2 ms total)
+
+[----------] 9 tests from BTMultipoleTest
+[ RUN      ] BTMultipoleTest.BTMultipoleEndFieldTest
+[       OK ] BTMultipoleTest.BTMultipoleEndFieldTest (1 ms)
+[ RUN      ] BTMultipoleTest.BTMultipoleConstructorTest
+[       OK ] BTMultipoleTest.BTMultipoleConstructorTest (0 ms)
+[ RUN      ] BTMultipoleTest.BTMultipoleTransformToRotated
+[       OK ] BTMultipoleTest.BTMultipoleTransformToRotated (22 ms)
+[ RUN      ] BTMultipoleTest.GetFieldValueTest_HardEdged
+[       OK ] BTMultipoleTest.GetFieldValueTest_HardEdged (0 ms)
+[ RUN      ] BTMultipoleTest.BTMultipoleGetConstTest
+[       OK ] BTMultipoleTest.BTMultipoleGetConstTest (0 ms)
+[ RUN      ] BTMultipoleTest.GetFieldValueTest_TanhDipole
+[       OK ] BTMultipoleTest.GetFieldValueTest_TanhDipole (4 ms)
+[ RUN      ] BTMultipoleTest.GetFieldValueTest_TanhQuad
+[       OK ] BTMultipoleTest.GetFieldValueTest_TanhQuad (4 ms)
+[ RUN      ] BTMultipoleTest.GetFieldValueTest_Enge
+[       OK ] BTMultipoleTest.GetFieldValueTest_Enge (0 ms)
+[ RUN      ] BTMultipoleTest.PrintTest
+[       OK ] BTMultipoleTest.PrintTest (1 ms)
+[----------] 9 tests from BTMultipoleTest (32 ms total)
+
+[----------] 6 tests from BTTrackerTest
+[ RUN      ] BTTrackerTest.SolenoidTest_z
+[       OK ] BTTrackerTest.SolenoidTest_z (3936 ms)
+[ RUN      ] BTTrackerTest.SolenoidTest_u
+[       OK ] BTTrackerTest.SolenoidTest_u (3 ms)
+[ RUN      ] BTTrackerTest.SolenoidTest_t
+[       OK ] BTTrackerTest.SolenoidTest_t (3 ms)
+[ RUN      ] BTTrackerTest.PillBoxTest_z
+[       OK ] BTTrackerTest.PillBoxTest_z (3 ms)
+[ RUN      ] BTTrackerTest.PillBoxTest_u
+[       OK ] BTTrackerTest.PillBoxTest_u (6 ms)
+[ RUN      ] BTTrackerTest.PillBoxTest_t
+[       OK ] BTTrackerTest.PillBoxTest_t (9 ms)
+[----------] 6 tests from BTTrackerTest (3960 ms total)
+
+[----------] 3 tests from BTFieldConstructorTest
+[ RUN      ] BTFieldConstructorTest.EndFieldTest
+[       OK ] BTFieldConstructorTest.EndFieldTest (3 ms)
+[ RUN      ] BTFieldConstructorTest.GetMultipoleTest
+[       OK ] BTFieldConstructorTest.GetMultipoleTest (3 ms)
+[ RUN      ] BTFieldConstructorTest.GetCombinedFunctionTest
+[       OK ] BTFieldConstructorTest.GetCombinedFunctionTest (3 ms)
+[----------] 3 tests from BTFieldConstructorTest (9 ms total)
+
+[----------] 4 tests from CppErrorHandlerTest
+[ RUN      ] CppErrorHandlerTest.HandleSquealTest
+Traceback (most recent call last):
+  File "/home/matt/maus-littlefield/src/common_py/ErrorHandler.py", line 159, in HandleCppException
+    raise(CppError(error_message))
+ErrorHandler.CppError: a_test at exc::test
+[       OK ] CppErrorHandlerTest.HandleSquealTest (11 ms)
+[ RUN      ] CppErrorHandlerTest.HandleStdExcTest
+Traceback (most recent call last):
+  File "/home/matt/maus-littlefield/src/common_py/ErrorHandler.py", line 159, in HandleCppException
+    raise(CppError(error_message))
+ErrorHandler.CppError: a_test at exc::test
+[       OK ] CppErrorHandlerTest.HandleStdExcTest (1 ms)
+[ RUN      ] CppErrorHandlerTest.HandleStdExcNoJsonTest
+Traceback (most recent call last):
+  File "/home/matt/maus-littlefield/src/common_py/ErrorHandler.py", line 159, in HandleCppException
+    raise(CppError(error_message))
+ErrorHandler.CppError: a_test at exc::test
+[       OK ] CppErrorHandlerTest.HandleStdExcNoJsonTest (0 ms)
+[ RUN      ] CppErrorHandlerTest.HandleSquealNoJsonTest
+Traceback (most recent call last):
+  File "/home/matt/maus-littlefield/src/common_py/ErrorHandler.py", line 159, in HandleCppException
+    raise(CppError(error_message))
+ErrorHandler.CppError: a_test at exc::test
+[       OK ] CppErrorHandlerTest.HandleSquealNoJsonTest (1 ms)
+[----------] 4 tests from CppErrorHandlerTest (13 ms total)
+
+[----------] 6 tests from JsonWrapper
+[ RUN      ] JsonWrapper.StringToJson
+[       OK ] JsonWrapper.StringToJson (0 ms)
+[ RUN      ] JsonWrapper.GetItemTest
+[       OK ] JsonWrapper.GetItemTest (2 ms)
+[ RUN      ] JsonWrapper.GetPropertyTest
+[       OK ] JsonWrapper.GetPropertyTest (6 ms)
+[ RUN      ] JsonWrapper.TypeConversionTest
+[       OK ] JsonWrapper.TypeConversionTest (0 ms)
+[ RUN      ] JsonWrapper.SimilarTypeTest
+[       OK ] JsonWrapper.SimilarTypeTest (0 ms)
+[ RUN      ] JsonWrapper.PrintTest
+[       OK ] JsonWrapper.PrintTest (0 ms)
+[----------] 6 tests from JsonWrapper (8 ms total)
+
+[----------] 4 tests from MAUSEvaluatorTest
+[ RUN      ] MAUSEvaluatorTest.AllocationTest
+[       OK ] MAUSEvaluatorTest.AllocationTest (2 ms)
+[ RUN      ] MAUSEvaluatorTest.EvaluateRawTest
+[       OK ] MAUSEvaluatorTest.EvaluateRawTest (0 ms)
+[ RUN      ] MAUSEvaluatorTest.EvaluateVariableTest
+[       OK ] MAUSEvaluatorTest.EvaluateVariableTest (1 ms)
+[ RUN      ] MAUSEvaluatorTest.ResetTest
+[       OK ] MAUSEvaluatorTest.ResetTest (1 ms)
+[----------] 4 tests from MAUSEvaluatorTest (4 ms total)
+
+[----------] Global test environment tear-down
+[==========] 146 tests from 32 test cases ran. (7902 ms total)
+[  PASSED  ] 146 tests.
+ok
+Test error handler setup from configuration ... ok
+Test CppError type works okay ... ok
+Check default handler calls correctly ... ok
+Test initialisation of the error handler ... ok
+Check we send error to json correctly ... ok
+Check that we send errors to sys.stderr if required ... ok
+Check the flag that controls sending errors to json works ... Traceback (most recent call last):
+  File "/home/matt/maus-littlefield/build/test_error_handler.py", line 81, in test_handle_exception_json
+    raise RuntimeError("Test error 1")
+RuntimeError: Test error 1
+Traceback (most recent call last):
+  File "/home/matt/maus-littlefield/build/test_error_handler.py", line 89, in test_handle_exception_json
+    raise RuntimeError("Test error 2")
+RuntimeError: Test error 2
+Traceback (most recent call last):
+  File "/home/matt/maus-littlefield/build/test_error_handler.py", line 97, in test_handle_exception_json
+    raise RuntimeError("Test error 3")
+RuntimeError: Test error 3
+ok
+Check that we handle the exception correctly (raise, halt, etc) ... Traceback (most recent call last):
+  File "/home/matt/maus-littlefield/build/test_error_handler.py", line 133, in test_handle_exception_on_error
+    raise RuntimeError("Test error 1")
+RuntimeError: Test error 1
+Traceback (most recent call last):
+  File "/home/matt/maus-littlefield/build/test_error_handler.py", line 141, in test_handle_exception_on_error
+    raise RuntimeError("Test error 1")
+RuntimeError: Test error 1
+Traceback (most recent call last):
+  File "/home/matt/maus-littlefield/build/test_error_handler.py", line 149, in test_handle_exception_on_error
+    raise RuntimeError("Test error 1")
+RuntimeError: Test error 1
+Traceback (most recent call last):
+  File "/home/matt/maus-littlefield/build/test_error_handler.py", line 154, in test_handle_exception_on_error
+    raise RuntimeError("Test error 1")
+RuntimeError: Test error 1
+ok
+Check the flag that controls sending errors to stderr ... ok
+Test we can do interface with Cpp correctly ... ok
+Test we can evaluate expressions okay ... ok
+Test evaluator initialises with math functions ... ok
+Test we can reset okay ... ok
+Test we can set evaluator variables ... ok
+TestCADImport::test_constructor ... ok
+TestCADImport::test_parse_xslt ... ok
+test_config_reader::test_readconfig ... ok
+TestGDMLFormatter::test_constructor ... ok
+TestGDMLFormatter::test_format ... ok
+TestGDMLFormatter::test_format_check ... ok
+TestGDMLFormatter::test_format_materials ... ok
+TestGDMLFormatter::test_format_schema_location ... ok
+TestGDMLFormatter::test_insert_materials_ref ... ok
+TestGDMLFormatter::test_merge_maus_info ... ok
+TestGDMLFormatter::test_merge_run_info ... ok
+TestPacker::test_constructor ... ok
+TestPacker::test_zipfile ... ok
+TestUnpacker::test_constructor ... ok
+TestUnpacker::test_unzip_file ... ok
+TestDownloader::test_beamline_geomtry_for_run ... ok
+TestDownloader::test_download_current ... ok
+TestDownloader::test_download_geomtry_for_id ... ok
+TestDownloader::test_get_ids ... ok
+TestUploader::test_check_file_list ... ok
+TestUploader::test_constructor ... ok
+TestUploader::test_create_file_list ... ok
+TestUploader::test_is_filetype ... ok
+TestUploader::test_set_upserver ... ok
+TestUploader::test_upload_to_cdb ... ok
+TestGDMLToMausModule::test_constructor ... ok
+TestGDMLToMausModule::test_convert_to_maus ... ok
+test_numpy_exists (test_numpy.NumpyTestCase) ... ok
+@brief walk up from $MAUS_ROOT_DIR and run pylint looking for errors ... ok
+test_geometries (test_root_plot.RootPlotTestCase) ... Info in <TCanvas::Print>: ps file /tmp/tmpUsHQQH has been created
+ok
+test_schema (test_schema_schema.TestSchemaSchema) ... ok
+test_schema (test_spill_schema.TestSpillSchema) ... ok
+Check we can import libxml2 ... ok
+Check we can import libxslt ... ok
+
+======================================================================
+ERROR: Failure: ImportError (cannot import name HTTPSConnection)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/matt/maus-littlefield/third_party/install/lib/python2.7/site-packages/nose-1.0.0-py2.7.egg/nose/loader.py", line 390, in loadTestsFromName
+    addr.filename, addr.module)
+  File "/home/matt/maus-littlefield/third_party/install/lib/python2.7/site-packages/nose-1.0.0-py2.7.egg/nose/importer.py", line 39, in importFromPath
+    return self.importFromDir(dir_path, fqname)
+  File "/home/matt/maus-littlefield/third_party/install/lib/python2.7/site-packages/nose-1.0.0-py2.7.egg/nose/importer.py", line 86, in importFromDir
+    mod = load_module(part_fqname, fh, filename, desc)
+  File "/home/matt/maus-littlefield/build/test_CouchDBDocumentStore.py", line 21, in <module>
+    import couchdb
+  File "build/bdist.linux-i686/egg/couchdb/__init__.py", line 9, in <module>
+  File "build/bdist.linux-i686/egg/couchdb/client.py", line 34, in <module>
+  File "build/bdist.linux-i686/egg/couchdb/http.py", line 17, in <module>
+ImportError: cannot import name HTTPSConnection
+
+Name                                  Stmts   Miss  Cover   Missing
+-------------------------------------------------------------------
+Configuration                            77      0   100%   
+ErrorHandler                             62      1    98%   90
+Go                                      226     63    72%   105, 370, 422, 440-489, 542, 554-585
+InMemoryDocumentStore                    20      0   100%   
+InputCppDAQData                          74     14    81%   17-18, 33, 41-46, 58-60, 65-67
+InputPyEmptyDocument                     18      0   100%   
+InputPyJSON                              23      0   100%   
+InputPySpillGenerator                    24      0   100%   
+MAUS                                    112     56    50%   3-4, 8-9, 13-14, 18-19, 23-24, 28-29, 33-34, 38-39, 43-44, 48-49, 53-54, 58-59, 63-64, 68-69, 73-74, 78-79, 83-84, 88-89, 93-94, 98-99, 103-104, 108-109, 113-114, 118-119, 123-124, 128-129, 133-134, 138-139
+MapCppPrint                              69     14    80%   17-18, 33, 41-46, 58-60, 65-67
+MapCppSimulation                         70     14    80%   17-18, 33, 41-46, 58-60, 65-67
+MapCppTOFDigits                          69     14    80%   17-18, 33, 41-46, 58-60, 65-67
+MapCppTOFSlabHits                        69     14    80%   17-18, 33, 41-46, 58-60, 65-67
+MapCppTOFSpacePoints                     69     14    80%   17-18, 33, 41-46, 58-60, 65-67
+MapCppTrackerDigitization               153     16    90%   17-18, 33, 41-46, 58-60, 65-67, 130-131
+MapPyBeamMaker                           87      1    99%   173
+MapPyDoNothing                           12      0   100%   
+MapPyFakeTestSimulation                  19      0   100%   
+MapPyGroup                               48     32    33%   46-50, 54-56, 59-67, 70-72, 75-76, 78-80, 83-85, 88-90, 92-94, 98, 103
+MapPyPrint                               20      0   100%   
+MapPyRemoveTracks                        37      0   100%   
+MapPyScalersDump                         78     43    45%   44-46, 57-76, 86, 90, 94, 98, 102, 106, 116-140
+MapPyTOFPlot                             60     50    17%   26-30, 34-41, 45-58, 62-69, 73-98
+MapPyValidateSpill                       21     10    52%   38, 42, 46-52, 56
+MongoDBDocumentStore                     24     14    42%   32-33, 57-61, 69, 77, 87, 97-101, 111, 118
+OutputPyDoNothing                         7      0   100%   
+OutputPyImage                            50      0   100%   
+OutputPyJSON                             34      6    82%   74-76, 101-103
+ROOT                                    346    139    60%   27, 31, 39-53, 56-59, 67-69, 73-74, 94-95, 104, 111, 128-131, 161-165, 174-189, 197-199, 222, 225, 228-230, 238-241, 250-286, 289, 305-306, 315-316, 322-324, 326-327, 350-353, 356, 369-373, 377-399, 404, 416-430, 445, 449-454, 470-471, 480, 485-486, 493-495, 507, 519-522
+ReducePyDoNothing                         9      0   100%   
+ReducePyHistogramTDCADCCounts            53      0   100%   
+ReducePyMatplotlibHistogram              78      0   100%   
+ReducePyROOTHistogram                    76     62    18%   89-94, 104-130, 150-171, 195-198, 208, 221-240
+ReducePyTOFPlot                         303    292     4%   97-127, 138-143, 159-176, 188-220, 238-317, 326-494, 502-514, 523-599
+SchemaSchema                              1      0   100%   
+SpillSchema                              17      0   100%   
+UserList                                 78     78     0%   3-88
+_LWPCookieJar                            93     93     0%   14-169
+_MozillaCookieJar                        68     68     0%   3-149
+amqplib                                   0      0   100%   
+amqplib.client_0_8                        5      5     0%   24-29
+amqplib.client_0_8.abstract_channel      39     39     0%   21-124
+amqplib.client_0_8.basic_message          9      9     0%   22-131
+amqplib.client_0_8.channel              315    315     0%   21-2692
+amqplib.client_0_8.connection           154    154     0%   21-842
+amqplib.client_0_8.exceptions            13     13     0%   22-51
+amqplib.client_0_8.method_framing       115    115     0%   21-261
+amqplib.client_0_8.serialization        253    253     0%   23-541
+amqplib.client_0_8.transport            120    120     0%   23-281
+anyjson                                  60     60     0%   4-132
+argparse                               1174   1174     0%   3-2347
+base64                                  162    162     0%   3-360
+beam                                    167      1    99%   220
+bitarray                                 46     46     0%   11-129
+bson                                    330    330     0%   15-552
+bson.binary                              43     43     0%   15-181
+bson.code                                26     26     0%   15-78
+bson.dbref                               46     46     0%   15-134
+bson.errors                               6      6     0%   15-38
+bson.max_key                             10     10     0%   15-32
+bson.min_key                             10     10     0%   15-32
+bson.objectid                            79     79     0%   15-222
+bson.son                                112    112     0%   15-216
+bson.timestamp                           34     34     0%   15-96
+bson.tz_util                             19     19     0%   15-52
+calendar                                381    381     0%   8-708
+cdb                                      16     16     0%   35-55
+cdb._alarmhandler                       115    115     0%   3-300
+cdb._base                               105    105     0%   3-164
+cdb._beamline                           183    183     0%   3-477
+cdb._beamline_supermouse                 19     19     0%   3-130
+cdb._cabling                            102    102     0%   3-246
+cdb._cabling_supermouse                  24     24     0%   3-126
+cdb._calibration                         84     84     0%   3-224
+cdb._calibration_supermouse              24     24     0%   3-124
+cdb._control                             70     70     0%   3-207
+cdb._control_supermouse                  16     16     0%   3-81
+cdb._exceptions                          17     17     0%   3-51
+cdb._geometry                            86     86     0%   3-244
+cdb._geometry_supermouse                 15     15     0%   3-71
+celery                                   21     21     0%   2-36
+celery.app                              102    102     0%   2-272
+celery.app.amqp                         179    179     0%   2-353
+celery.app.base                         159    159     0%   2-413
+celery.app.defaults                      49     49     0%   2-217
+celery.app.task                         203    203     0%   2-724
+celery.backends                          16     16     0%   2-35
+celery.backends.amqp                    154    154     0%   2-251
+celery.backends.base                    240    240     0%   2-406
+celery.datastructures                   235    235     0%   2-433
+celery.exceptions                        25     25     0%   2-84
+celery.execute                           11     11     0%   2-26
+celery.execute.trace                     79     79     0%   2-142
+celery.loaders                           11     11     0%   2-37
+celery.loaders.base                     105    105     0%   2-203
+celery.loaders.default                   29     29     0%   2-66
+celery.local                            103    103     0%   2-142
+celery.platforms                        248    248     0%   2-525
+celery.registry                          33     33     0%   2-80
+celery.result                           211    211     0%   2-569
+celery.routes                            57     57     0%   2-96
+celery.schedules                        143    143     0%   2-351
+celery.signals                           20     20     0%   2-46
+celery.states                            31     31     0%   2-117
+celery.task                              23     23     0%   2-112
+celery.task.base                         32     32     0%   2-140
+celery.task.chords                       37     37     0%   2-64
+celery.task.control                      81     81     0%   2-240
+celery.task.sets                         86     86     0%   2-211
+celery.utils                            191    191     0%   2-479
+celery.utils.compat                     158    158     0%   2-264
+celery.utils.dispatch                     2      2     0%   2-4
+celery.utils.dispatch.saferef            80     80     0%   2-282
+celery.utils.dispatch.signal             80     80     0%   2-213
+celery.utils.encoding                    58     58     0%   2-97
+celery.utils.functional                  39     39     0%   2-66
+celery.utils.mail                        78     78     0%   2-182
+celery.utils.serialization               66     66     0%   2-176
+celery.utils.timeutils                   54     54     0%   2-151
+celeryconfig                              9      0   100%   
+contextlib                               63     63     0%   3-154
+cookielib                               947    947     0%   28-1794
+cpplint                                1043   1043     0%   69-3131
+cpplint_exceptions                       17      0   100%   
+csv                                     258    258     0%   2-451
+ctypes                                  335    335     0%   4-549
+ctypes._endian                           34     34     0%   4-60
+ctypes.util                             183    183     0%   4-270
+dateutil                                  3      3     0%   7-9
+dateutil.parser                         611    611     0%   2-883
+dateutil.relativedelta                  221    221     0%   7-430
+dateutil.rrule                          815    815     0%   7-1095
+dateutil.tz                             575    575     0%   7-949
+decimal                                2480   2480     0%   20-6149
+distutils.sysconfig                     283    283     0%   12-571
+distutils.version                        65     65     0%   10-296
+email                                    30     30     0%   5-123
+email._parseaddr                        302    302     0%   4-497
+email.base64mime                         55     55     0%   5-183
+email.base64mime                         55     55     0%   5-183
+email.charset                           116    116     0%   5-397
+email.charset                           116    116     0%   5-397
+email.encoders                           36     36     0%   5-81
+email.encoders                           36     36     0%   5-81
+email.errors                             16     16     0%   5-56
+email.errors                             16     16     0%   5-56
+email.feedparser                        306    306     0%   5-484
+email.generator                         167    167     0%   4-364
+email.header                            235    235     0%   5-514
+email.iterators                          32     32     0%   5-73
+email.iterators                          32     32     0%   5-73
+email.message                           346    346     0%   5-797
+email.message                           346    346     0%   5-797
+email.mime                                0      0   100%   
+email.mime.audio                         24     24     0%   5-73
+email.mime.base                           9      9     0%   5-26
+email.mime.base                           9      9     0%   5-26
+email.mime.image                         14     14     0%   5-46
+email.mime.message                       11     11     0%   5-34
+email.mime.multipart                     12     12     0%   5-47
+email.mime.nonmultipart                   7      7     0%   5-21
+email.mime.nonmultipart                   7      7     0%   5-21
+email.mime.text                           8      8     0%   5-30
+email.mime.text                           8      8     0%   5-30
+email.parser                             44     44     0%   5-91
+email.quoprimime                        138    138     0%   5-336
+email.quoprimime                        138    138     0%   5-336
+email.utils                             155    155     0%   5-324
+email.utils                             155    155     0%   5-324
+encodings.ascii                          19     19     0%   9-42
+encodings.cp1252                         20     20     0%   5-307
+encodings.hex_codec                      28     28     0%   9-71
+encodings.latin_1                        19     19     0%   9-42
+evaluator                                21      0   100%   
+geometry                                  9      0   100%   
+geometry.CADImport                       52      0   100%   
+geometry.ConfigReader                    19      0   100%   
+geometry.GDMLFormatter                  125      0   100%   
+geometry.GDMLPacker                      54      1    98%   129
+geometry.GDMLtoCDB                      124      3    98%   254, 256-257
+geometry.GDMLtoMAUSModule                66      1    98%   146
+getopt                                  103    103     0%   34-210
+gzip                                    317    317     0%   8-509
+hmac                                     54     54     0%   6-133
+httplib                                 744    744     0%   69-1392
+importlib                                23     23     0%   4-38
+io                                       23     23     0%   46-98
+json                                     39     39     0%   100-339
+json.decoder                            222    222     0%   3-385
+json.encoder                            241    241     0%   3-442
+json.scanner                             52     52     0%   3-67
+kombu                                    33     33     0%   2-68
+kombu.abstract                           51     51     0%   11-97
+kombu.common                             38     38     0%   12-85
+kombu.compat                            132    132     0%   13-207
+kombu.compression                        26     26     0%   11-77
+kombu.connection                        404    404     0%   11-831
+kombu.entity                             98     98     0%   11-511
+kombu.exceptions                         16     16     0%   13-48
+kombu.messaging                         183    183     0%   11-455
+kombu.pidbox                            150    150     0%   12-269
+kombu.pools                              93     93     0%   11-138
+kombu.serialization                     123    123     0%   11-343
+kombu.transport                          46     46     0%   11-128
+kombu.transport.base                     94     94     0%   12-201
+kombu.transport.pyamqplib                70     70     0%   11-269
+kombu.utils                             152    152     0%   11-302
+kombu.utils.compat                      194    194     0%   11-324
+kombu.utils.encoding                     48     48     0%   11-82
+kombu.utils.functional                   29     29     0%   69-135
+libxml2                                5199   5199     0%   1-9177
+libxslt                                 705    705     0%   6-1336
+matplotlib                              461    461     0%   100-1007
+matplotlib._cm                          134    134     0%   7-1812
+matplotlib._mathtext_data                 7      7     0%   17-2345
+matplotlib._pylab_helpers                54     54     0%   5-130
+matplotlib.afm                          234    234     0%   37-504
+matplotlib.artist                       493    493     0%   1-1219
+matplotlib.axes                        3146   3146     0%   1-8459
+matplotlib.axis                        1085   1085     0%   4-2040
+matplotlib.backend_bases               1152   1152     0%   2-2869
+matplotlib.backends                      28     28     0%   2-55
+matplotlib.backends.backend_agg         243    243     0%   23-464
+matplotlib.backends.backend_mixed        54     54     0%   1-138
+matplotlib.backends.backend_pdf        1214   1214     0%   2-2189
+matplotlib.backends.backend_ps          958    958     0%   5-1659
+matplotlib.backends.backend_svg         662    662     0%   1-1116
+matplotlib.bezier                       225    225     0%   6-538
+matplotlib.blocking_input               159    159     0%   20-404
+matplotlib.cbook                        960    960     0%   5-1862
+matplotlib.cm                           149    149     0%   8-312
+matplotlib.collections                  580    580     0%   11-1323
+matplotlib.colorbar                     451    451     0%   21-953
+matplotlib.colors                       499    499     0%   51-1194
+matplotlib.container                     55     55     0%   1-111
+matplotlib.contour                      638    638     0%   5-1250
+matplotlib.dates                        497    497     0%   2-1218
+matplotlib.delaunay                       4      4     0%   8-11
+matplotlib.delaunay.interpolate          42     42     0%   1-160
+matplotlib.delaunay.triangulate          92     92     0%   1-211
+matplotlib.docstring                     36     36     0%   1-112
+matplotlib.dviread                      504    504     0%   22-902
+matplotlib.figure                       533    533     0%   14-1459
+matplotlib.finance                      253    253     0%   7-722
+matplotlib.font_manager                 604    604     0%   45-1328
+matplotlib.fontconfig_pattern            66     66     0%   22-181
+matplotlib.gridspec                     226    226     0%   17-493
+matplotlib.image                        655    655     0%   6-1367
+matplotlib.legend                       369    369     0%   14-960
+matplotlib.legend_handler               266    266     0%   27-595
+matplotlib.lines                        563    563     0%   7-1182
+matplotlib.markers                      397    397     0%   7-642
+matplotlib.mathtext                    1521   1521     0%   20-3135
+matplotlib.mlab                        1217   1217     0%   144-3178
+matplotlib.mpl                           26     26     0%   1-26
+matplotlib.offsetbox                    665    665     0%   18-1676
+matplotlib.patches                     1579   1579     0%   3-4236
+matplotlib.path                         273    273     0%   5-693
+matplotlib.projections                   31     31     0%   1-84
+matplotlib.projections.geo              381    381     0%   1-634
+matplotlib.projections.polar            317    317     0%   1-645
+matplotlib.pylab                         26     26     0%   216-298
+matplotlib.pyparsing                   2247   2247     0%   26-3600
+matplotlib.pyplot                      1209   1209     0%   17-3081
+matplotlib.quiver                       401    401     0%   18-1068
+matplotlib.rcsetup                      215    215     0%   16-580
+matplotlib.scale                        244    244     0%   1-464
+matplotlib.spines                       246    246     0%   1-461
+matplotlib.table                        281    281     0%   22-543
+matplotlib.texmanager                   302    302     0%   36-611
+matplotlib.text                         855    855     0%   4-2010
+matplotlib.textpath                     262    262     0%   3-516
+matplotlib.ticker                       843    843     0%   127-1612
+matplotlib.tight_bbox                    62     62     0%   5-131
+matplotlib.transforms                  1039   1039     0%   32-2332
+matplotlib.tri                            4      4     0%   5-8
+matplotlib.tri.triangulation             81     81     0%   1-197
+matplotlib.tri.tricontour                59     59     0%   1-287
+matplotlib.tri.tripcolor                 48     48     0%   1-98
+matplotlib.tri.triplot                   28     28     0%   1-77
+matplotlib.type1font                    179    179     0%   25-308
+matplotlib.units                         39     39     0%   45-144
+matplotlib.widgets                      679    679     0%   12-1390
+mausloader                               42     30    29%   39-41, 49-52, 61, 70, 90-126
+md5                                       6      6     0%   6-14
+mimetools                               162    162     0%   4-250
+mimetypes                               199    199     0%   26-591
+multiprocessing                         102    102     0%   44-277
+multiprocessing.process                 157    157     0%   35-323
+multiprocessing.util                    162    162     0%   35-317
+numbers                                 132    132     0%   4-391
+numpy                                    44     44     0%   110-170
+numpy.__config__                         28     28     0%   3-33
+numpy._import_tools                     223    223     0%   1-346
+numpy.add_newdocs                       244    244     0%   9-5865
+numpy.compat                              7      7     0%   11-18
+numpy.compat._inspect                   105    105     0%   8-219
+numpy.compat.py3k                        43     43     0%   6-58
+numpy.core                               35     35     0%   2-42
+numpy.core._internal                    364    364     0%   4-588
+numpy.core.arrayprint                   267    267     0%   5-524
+numpy.core.defchararray                 396    396     0%   19-2752
+numpy.core.fromnumeric                  287    287     0%   2-2529
+numpy.core.function_base                 21     21     0%   1-166
+numpy.core.getlimits                    120    120     0%   4-285
+numpy.core.info                           3      3     0%   1-86
+numpy.core.machar                       187    187     0%   8-339
+numpy.core.memmap                        92     92     0%   1-311
+numpy.core.numeric                      494    494     0%   1-2470
+numpy.core.numerictypes                 376    376     0%   86-948
+numpy.core.records                      356    356     0%   38-804
+numpy.core.shape_base                    36     36     0%   1-258
+numpy.ctypeslib                         184    184     0%   52-420
+numpy.dual                               41     41     0%   18-69
+numpy.fft                                 6      6     0%   2-9
+numpy.fft.fftpack                       115    115     0%   33-1125
+numpy.fft.helper                         42     42     0%   6-161
+numpy.fft.info                            1      1     0%   173
+numpy.lib                                33     33     0%   1-38
+numpy.lib._datasource                   164    164     0%   35-639
+numpy.lib._iotools                      352    352     0%   2-834
+numpy.lib.arraysetops                   121    121     0%   31-488
+numpy.lib.arrayterator                   72     72     0%   11-195
+numpy.lib.financial                      98     98     0%   8-657
+numpy.lib.format                        163    163     0%   138-577
+numpy.lib.function_base                 828    828     0%   1-3518
+numpy.lib.index_tricks                  272    272     0%   1-901
+numpy.lib.info                            2      2     0%   149-150
+numpy.lib.npyio                         592    592     0%   1-1615
+numpy.lib.polynomial                    370    370     0%   5-1235
+numpy.lib.scimath                        54     54     0%   19-559
+numpy.lib.shape_base                    201    201     0%   1-839
+numpy.lib.stride_tricks                  44     44     0%   8-115
+numpy.lib.twodim_base                   122    122     0%   5-889
+numpy.lib.type_check                    134    134     0%   3-647
+numpy.lib.ufunclike                      33     33     0%   5-216
+numpy.lib.utils                         515    515     0%   1-1144
+numpy.linalg                              5      5     0%   46-52
+numpy.linalg.info                         1      1     0%   36
+numpy.linalg.linalg                     574    574     0%   12-1969
+numpy.ma                                 14     14     0%   39-56
+numpy.ma.core                          2313   2313     0%   24-7193
+numpy.ma.extras                         648    648     0%   11-1923
+numpy.matrixlib                           5      5     0%   2-8
+numpy.matrixlib.defmatrix               275    275     0%   1-1074
+numpy.polynomial                          6      6     0%   16-22
+numpy.polynomial.chebyshev              316    316     0%   78-1404
+numpy.polynomial.polynomial             203    203     0%   49-931
+numpy.polynomial.polytemplate             6      6     0%   12-20
+numpy.polynomial.polyutils               73     73     0%   34-394
+numpy.random                              9      9     0%   86-102
+numpy.random.info                         2      2     0%   86-88
+numpy.version                            11     11     0%   3-18
+platform                                714    714     0%   3-1614
+pydoc                                  1477   1477     0%   3-2337
+pylab                                     3      3     0%   1-3
+pymongo                                  26     26     0%   15-116
+pymongo.collection                      265    265     0%   15-1228
+pymongo.common                          109    109     0%   16-269
+pymongo.connection                      438    438     0%   15-1122
+pymongo.cursor                          318    318     0%   15-715
+pymongo.cursor_manager                   24     24     0%   15-88
+pymongo.database                        223    223     0%   15-757
+pymongo.errors                           17     17     0%   15-98
+pymongo.helpers                          92     92     0%   15-177
+pymongo.message                         108    108     0%   15-177
+pymongo.pool                             64     64     0%   15-124
+pymongo.replica_set_connection          445    445     0%   15-943
+pymongo.son_manipulator                  66     66     0%   15-171
+pymongo.uri_parser                      113    113     0%   16-279
+quopri                                  162    162     0%   3-237
+rfc822                                  574    574     0%   74-1011
+rlcompleter                              73     73     0%   42-170
+shlex                                   229    229     0%   2-292
+smtplib                                 388    388     0%   3-848
+subprocess                              633    633     0%   12-1511
+suds                                     81     81     0%   17-154
+suds.bindings                             1      1     0%   20
+suds.bindings.binding                   256    256     0%   17-537
+suds.bindings.document                   79     79     0%   17-160
+suds.bindings.multiref                   50     50     0%   17-125
+suds.bindings.rpc                        44     44     0%   17-98
+suds.builder                             78     78     0%   17-120
+suds.cache                              177    177     0%   17-337
+suds.client                             355    355     0%   17-785
+suds.metrics                             35     35     0%   17-62
+suds.mx                                  18     18     0%   17-59
+suds.mx.appender                        122    122     0%   17-316
+suds.mx.core                             46     46     0%   17-157
+suds.mx.encoded                          77     77     0%   17-133
+suds.mx.literal                         141    141     0%   17-291
+suds.mx.typer                            46     46     0%   17-122
+suds.options                             19     19     0%   17-123
+suds.plugin                              68     68     0%   17-257
+suds.properties                         232    232     0%   17-543
+suds.reader                              59     59     0%   17-169
+suds.resolver                           228    228     0%   17-496
+suds.sax                                 44     44     0%   17-109
+suds.sax.attribute                       60     60     0%   17-181
+suds.sax.date                           155    155     0%   17-378
+suds.sax.document                        31     31     0%   17-61
+suds.sax.element                        524    524     0%   17-1147
+suds.sax.enc                             22     22     0%   17-79
+suds.sax.parser                          86     86     0%   17-139
+suds.sax.text                            59     59     0%   17-116
+suds.servicedefinition                  147    147     0%   17-248
+suds.soaparray                           26     26     0%   17-72
+suds.store                               25     25     0%   17-594
+suds.sudsobject                         263    263     0%   17-390
+suds.transport                           39     39     0%   17-130
+suds.transport.http                      94     94     0%   17-187
+suds.transport.https                     37     37     0%   17-98
+suds.umx                                 19     19     0%   17-56
+suds.umx.attrlist                        25     25     0%   17-88
+suds.umx.basic                            9      9     0%   17-41
+suds.umx.core                            81     81     0%   17-216
+suds.umx.encoded                         50     50     0%   17-128
+suds.umx.typed                           60     60     0%   17-141
+suds.wsdl                               511    511     0%   17-922
+suds.wsse                                91     91     0%   17-212
+suds.xsd                                 31     31     0%   17-85
+suds.xsd.deplist                         64     64     0%   17-140
+suds.xsd.doctor                          83     83     0%   17-225
+suds.xsd.query                          105    105     0%   17-208
+suds.xsd.schema                         209    209     0%   17-419
+suds.xsd.sxbase                         277    277     0%   17-669
+suds.xsd.sxbasic                        459    459     0%   17-823
+suds.xsd.sxbuiltin                       92     92     0%   17-274
+urllib2                                 807    807     0%   92-1448
+uu                                      121    121     0%   27-196
+uuid                                    293    293     0%   47-560
+validictory                              24     24     0%   3-46
+validictory.validator                   270    270     0%   1-490
+xboa                                      1      1     0%   1
+xboa.Bunch                              880    880     0%   18-1705
+xboa.Common                             549    549     0%   18-1028
+xboa.Hit                                511    511     0%   18-930
+xboa.core                                 1      1     0%   1
+xml.dom.expatbuilder                    625    625     0%   30-983
+xml.parsers                               0      0   100%   
+xml.parsers.expat                         2      2     0%   2-4
+zipfile                                 880    880     0%   4-1437
+-------------------------------------------------------------------
+TOTAL                                 97400  95085     2%   
+----------------------------------------------------------------------
+Ran 215 tests in 110.815s
+
+FAILED (SKIP=10, errors=1)

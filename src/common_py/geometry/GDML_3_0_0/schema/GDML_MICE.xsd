@@ -89,6 +89,12 @@
         <xs:attribute name="green" use="required" type="xs:double"/>
         <xs:attribute name="blue" use="required" type="xs:double"/>
     </xs:complexType>
+    <xs:complexType name="MAUS_ROOT_DIR_Type">
+        <xs:attribute name="location" default="/home"/>
+    </xs:complexType>
+    <xs:complexType name="G4StepMaxType">
+        <xs:attribute name="G4StepMax" use="required" type="xs:double"/>
+    </xs:complexType>
 <!--++++++++++++++++++++++++++++++++Tracker Schema+++++++++++++++++++++++++++++++++++++-->
     <xs:complexType name="SciFi_Geo_Trkr_Type">
         <xs:annotation>
@@ -231,6 +237,12 @@
             <xs:element name="Tracker_Part" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
+    <xs:complexType name="Other_InfromationType">
+        <xs:sequence>
+            <xs:element name="MAUS_ROOT_DIR" type="MAUS_ROOT_DIR_Type"/>
+            <xs:element name="G4StepMax" type="G4StepMaxType"/>
+        </xs:sequence>
+    </xs:complexType>
 <!--++++++++++++++++++++++++++++++++++TOP TYPES+++++++++++++++++++++++++++++++++++++++++-->
     <xs:element name="MICE_Information">
         <xs:annotation>
@@ -248,6 +260,7 @@
                 </xs:element>
                 <xs:element name="G4Field_Information" type="G4Field_InformationType" minOccurs="0"/>
                 <xs:element name="Detector_Information" type="Detector_InformationType" minOccurs="0"/>
+                <xs:element name="Other_Information" type="Other_InfromationType" minOccurs="0"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>

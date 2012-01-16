@@ -87,7 +87,26 @@ class Formatter: #pylint: disable = R0902
         fout = open(os.path.join(self.path_out, gdmlfile), 'w')
         xmldoc.writexml(fout)
         fout.close()
-       
+        
+    def add_other_info(self):
+        """
+        @method add_other_information
+        
+        THis methods adds other information needed by MAUS.
+        This is mainly so we can add computer specific environment
+        variables into the translated gdml files.
+        """
+        #field = minidom.parse(os.path.join(self.path_in, self.field_file))
+        #for node in field.getElementsByTagName("MAUS_ROOT_DIR"):
+        #    root_dir = node
+        doc = minidom.Document()
+        root_node = doc.createElement("Other_Information")
+        doc.appendChild(root_node)
+        maus_dir = doc.createElement("MAUS_ROOT_DIR")
+        maus_dir.setAttribute("location", os.environ["MAUS_ROOT_DIR"])
+        root_node.appendChild(maus_dir)
+        print doc.toxml()
+    
     def merge_maus_info(self, gdmlfile):
         """
         @method merge_maus_info
@@ -108,7 +127,7 @@ class Formatter: #pylint: disable = R0902
         """
         @method merge_maus_info
         
-        This method adds the run information to the configuration GDML.
+        This method adds the run information to the field GDML.
         """
         run_info = False
         fin = open(os.path.join(self.path_in, gdmlfile))
@@ -118,8 +137,8 @@ class Formatter: #pylint: disable = R0902
         fin.close()
         if run_info == False:
             field = minidom.parse(os.path.join(self.path_in, gdmlfile))
-            beamline = minidom.parse(os.path.join(self.path_in, +\
-                                                   self.beamline_file))
+            beamline_path = os.path.join(self.path_in, self.beamline_file)
+            beamline = minidom.parse(beamline_path)
             for node in beamline.getElementsByTagName("run"):
                 maus_info = node
             root_node = field.childNodes[0].childNodes[1].childNodes[1]
@@ -234,3 +253,13 @@ class Formatter: #pylint: disable = R0902
             print "Formatted " + str(num+1) + \
             " of " + str(noofstepfiles) + " Geometry Files"
         print "Format Complete"
+        
+
+def main():
+    """
+    Main Function.
+    """
+    test_file = Formatter('/home/matt/maus-littlefield/tests/py_unit/test_geometry/testCases/mausModuleSource', '/home/matt/maus-littlefield/tmp')
+    test_file.add_other_info()
+if __name__ == "__main__":
+    main()

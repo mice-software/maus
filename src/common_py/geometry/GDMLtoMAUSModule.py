@@ -72,6 +72,7 @@ class GDMLtomaus(): #pylint: disable = R0903
             if fname.find('materials') < 0 \
                and fname.find('fastrad') < 0 \
                and fname.find('Field') < 0 \
+               and fname.find('Beamline') < 0 \
                and fname[-5:] == '.gdml':
                 stepfile = self.path + '/' + fname
                 self.step_files.append(stepfile)

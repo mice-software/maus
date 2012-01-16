@@ -42,7 +42,7 @@ class  TestGDMLToMausModule(unittest.TestCase):#pylint:disable = C0103,R0904
         test_cases_dir = os.environ['MAUS_ROOT_DIR'] + \
                                        '/tests/py_unit/test_geometry/testCases/'
         self.constructor = None
-        self.file_source = test_cases_dir+'/mausModuleSource'
+        self.file_source = os.environ['MAUS_ROOT_DIR'] + '/tmp'
         self.copy_files = GDMLtomaus(self.file_source)
         config_file = test_cases_dir+'/testGDMLtoMAUSModule/fastradModel.gdml'
         shutil.copyfile(self.copy_files.config_file, config_file)

@@ -17,7 +17,7 @@
                 <title>Configuration <xsl:value-of select="structure/volume/@name"/> 
                        { 
                            Dimensions <xsl:if test="solids/sphere/@name = 'WorldSphereRef'">15000.0 10000.0 50000.0 mm</xsl:if>
-                           PropertyString Material AIR  
+                           PropertyString Material <xsl:if test="structure/volume/materialref/@ref = 'Vacuum'">AIR</xsl:if>  
                            PropertyDouble G4StepMax <xsl:value-of select="$step_max"/> mm 
                 </title>
             </head>

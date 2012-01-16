@@ -1,4 +1,4 @@
-<?xml version="1.0" ?><gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:Something">
+<?xml version="1.0" ?><gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:something">
 <MICE_Information>
     <Configuration_information>
     </Configuration_information>
@@ -13,7 +13,31 @@
         <TOF/>
         <KL/>
         <Cherenkov/>
-        <Tracker Tracker="One"/>
+        <Tracker>
+            <Tracker ID_Number="1">
+                <Tracker Number="1"/>
+                <Position x="1" y="1" z="1"/>
+                <Rotation alpha="1" beta="1" gamma="1"/>
+                <Length/>
+                <Thickness thickness="1"/>
+                <Material name="1"/>
+                <Invisible True="1"/>
+            </Tracker>
+            <Station ID_Number="2">
+                <Tracker Number="2"/>
+                <Position x="2" y="2" z="2"/>
+                <Rotation alpha="2" beta="2" gamma="2"/>
+                <Length/>
+                <Thickness thickness="2"/>
+                <Station Number="2"/>
+                <Material name="2"/>
+                <OpticsMaterialLength/>
+            </Station>
+        </Tracker>
     </Detector_Information>
+    <Other_Information>
+        <MAUS_ROOT_DIR location="/home"/>
+        <G4StepMax G4StepMax="4"/>
+    </Other_Information>
 </MICE_Information>
 </gdml>
