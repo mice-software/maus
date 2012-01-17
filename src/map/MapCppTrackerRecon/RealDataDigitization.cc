@@ -21,21 +21,18 @@ RealDataDigitization::RealDataDigitization(TrackerSpill &spill, Json::Value daq)
   // -------------------------------------------------
   // Load calibration, mapping and bad channel list.
   bool calib = load_calibration("scifi_calibration_30_09_2011.txt");
-  // std::cout << "Calibration file loaded... " << std::endl;
   assert(calib);
   bool map = load_mapping("mapping_2.txt");
-  // std::cout << "Mapping file loaded... " << std::endl;
   assert(map);
-  // get bad channel list
-  bool bad_channels_loaded = load_bad_channels();
-  assert(bad_channels_loaded);
-  // std::cout << "Bad channel list loaded..." << std::endl;
+  bool bad_channels = load_bad_channels();
+  assert(bad_channels);
   // -------------------------------------------------
 
   // Pick up JSON daq event.
   Json::Value tracker_event;
   if ( !daq.isMember("tracker1") || !daq.isMember("tracker2") ) {
-    Json::Value errors;
+    //Json::Value errors;
+    std::cout << "Missing a tracker." << std::endl;
     // std::cout << "Couldn't find one of the trackers." << std::endl;
     // std::stringstream ss;
     // ss << _classname << " says:" << "A tracker is missing.";
@@ -45,13 +42,15 @@ RealDataDigitization::RealDataDigitization(TrackerSpill &spill, Json::Value daq)
   }
   tracker_event = daq["tracker1"];
 
+  assert(daq["tracker1"].size() == daq["tracker2"].size());
+
   for ( unsigned int i = 0; i < tracker_event.size(); ++i ) {
     TrackerEvent event;
     // std::cout << "Processing event " << i+1 << " of " << tracker_event.size() << std::endl;
 
     if ( tracker_event[i].isNull() ) {
-      Json::Value errors;
-      // std::cout << "Empty event." << std::endl;
+      //Json::Value errors;
+      std::cout << "Empty event in tracker 1." << std::endl;
     }
     Json::Value input_event = tracker_event[i]["VLSB_C"];
     // merge tracker events

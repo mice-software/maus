@@ -74,7 +74,7 @@ class MapCppTrackerRecon {
 
   bool check_sanity_daq(Json::Value daq);
 
-  // bool check_sanity_digits(Json::Value digits);
+  bool check_sanity_digits(Json::Value digits);
 
   void cluster_recon(TrackerEvent &evt);
 
@@ -91,13 +91,9 @@ class MapCppTrackerRecon {
 
   void fill_digits_vector(Json::Value digits, TrackerSpill &a_spill);
 
+  void print_event_info(TrackerEvent &event);
+
  private:
-  int recon_level;
-
-  std::string run_type;
-
-  /// This is the Mice Module
-  // MiceModule*      _module;
   /// This should be the classname
   std::string _classname;
   /// This will contain the configuration
@@ -106,14 +102,9 @@ class MapCppTrackerRecon {
   Json::Value root;
   ///  JsonCpp setup
   Json::Reader reader;
-  /// an array contaning all MiceModules
-  // std::vector<const MiceModule*> modules;
-
+  ///  Cut value for npe.
   double minPE;
-  // Json::Value mc;
-
-  // TrackerEvent event;
-
+  ///  Vector with the MICE SciFi Modules.
   std::vector<const MiceModule*> modules;
 }; // Don't forget this trailing colon!!!!
 
