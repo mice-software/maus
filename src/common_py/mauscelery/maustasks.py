@@ -18,6 +18,8 @@ MAUS Celery tasks.
 
 import logging
 import re
+from types import ListType
+from types import StringType
 
 from celery.registry import tasks
 from celery.task import Task
@@ -62,7 +64,13 @@ class MausGenericTransformTask(Task):
         """
         Apply the transform to the spill and return the new spill.
         @param self Object reference.
-        @param workers List of names of workers to process spill.
+        @param workers Nested list of names of workers to invoke
+        when processing the spill e.g.
+        @verbatim 
+        ["MapCppTOFDigits", "MapCppTOFSlabHits", "MapCppTOFSpacePoint"]
+        or
+        ["MapCppTOFDigits", ["MapCppTOFSlabHits", "MapCppTOFSpacePoint"]]
+        @endverbatim
         @param spill JSON document string holding spill.
         @param client_id ID of client who submitted job.
         @param spill_id Index of spill from this client.
@@ -70,12 +78,27 @@ class MausGenericTransformTask(Task):
         """
         logger = Task.get_logger()
         if logger.isEnabledFor(logging.INFO):
-            logger.info("Task invoked by %s on spill %d" \
-                % (client_id, spill_id))     
-        for worker in workers:
-            if logger.isEnabledFor(logging.INFO):
-                logger.info("Executing worker : %s" % worker)
-            spill = self.__transforms[worker].process(spill)
+            logger.info("Task invoked by %s requesting workers %s on spill %d" \
+                % (client_id, workers, spill_id))    
+        if not isinstance(workers, ListType):
+            raise ValueError("%s is not a list" % workers)
+        # This does a start-to-end comparison of the lists.
+        worker_list = list(workers)
+        while len(worker_list) != 0:
+            worker = worker_list.pop(0)
+            if isinstance(worker, ListType):
+                # Add sub-list members to front of list.
+                worker.extend(worker_list)
+                worker_list = worker
+            else:
+                # Process spill.
+                if logger.isEnabledFor(logging.INFO):
+                    logger.info("Executing worker : %s" % worker)
+                if not isinstance(worker, StringType):
+                    raise ValueError("Worker name %s is not a string" % worker)
+                if not self.__transforms.has_key(worker):
+                    raise ValueError("No such worker: %s" % worker)
+                spill = self.__transforms[worker].process(spill)
         return spill
 
 tasks.register(MausGenericTransformTask) # pylint:disable=W0104, E1101
