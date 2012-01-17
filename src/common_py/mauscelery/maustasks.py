@@ -46,6 +46,10 @@ class MausGenericTransformTask(Task):
             if re.match("Map", name):
                 map_class = getattr(MAUS, name)
                 self.__transforms[name] = map_class()
+        self.__config = 0
+
+    def configure(self, config):
+        self.__config = config
 
     def birth(self, json_config_doc):
         """
@@ -57,7 +61,13 @@ class MausGenericTransformTask(Task):
         @throws exception if any exceptions arise in birth().
         """
         for name in self.__transforms:
+#            self.__transforms[name].birth(json_config_doc)
+
+            # MapCppSimulation takes ages to initialise so skip for now.
+            if name == "MapCppSimulation":
+                continue
             self.__transforms[name].birth(json_config_doc)
+        self.__config = self.__config + 1
         return True
 
     def run(self, workers, spill, client_id = "Unknown", spill_id = 0):
@@ -76,6 +86,7 @@ class MausGenericTransformTask(Task):
         @param spill_id Index of spill from this client.
         @return JSON document string holding new spill.
         """
+        print "Configuration: %s" % self.__config
         logger = Task.get_logger()
         if logger.isEnabledFor(logging.INFO):
             logger.info("Task invoked by %s requesting workers %s on spill %d" \
@@ -102,3 +113,38 @@ class MausGenericTransformTask(Task):
         return spill
 
 tasks.register(MausGenericTransformTask) # pylint:disable=W0104, E1101
+
+from celery.worker.control import Panel
+
+@Panel.register
+def configure_maus(panel, configuration):
+    print "Configuring..."
+    from multiprocessing import current_process 
+    print "Process name: %s" % current_process().name 
+    pool = panel.consumer.pool 
+    print "Pool processes: %s " % pool.info["processes"]
+    maustask = tasks["mauscelery.maustasks.MausGenericTransformTask"]
+    maustask.configure(configuration)
+    print "Configured"
+    return {"ok": "configured"}
+
+@Panel.register
+def reset_pool(panel):
+    print "Resetting pool..."
+    from multiprocessing import current_process 
+    print "Process name: %s" % current_process().name 
+    pool = panel.consumer.pool 
+    print "Pool.information: %s" % pool.info
+    pids = pool.info["processes"]
+    try:
+        import os 
+        import signal
+        for pid in pids:
+            print "About to SIGTERM kill %s" % pid
+            os.kill(pid, signal.SIGTERM)
+            print "Killed %s" % pid
+    except Exception: 
+        traceback.print_exc(file=sys.stdout)
+        print "Error"
+    print "Reset"
+    return {"ok": "reset"}
