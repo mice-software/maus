@@ -17,9 +17,8 @@
 #include "src/common_cpp/Recon/TrackerEvent.hh"
 
 
-TrackerEvent::TrackerEvent( ) {
-  //scifidigits.clear();
-
+TrackerEvent::TrackerEvent() {
+  // scifidigits.clear();
 }
 
 TrackerEvent::~TrackerEvent() {}

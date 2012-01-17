@@ -40,58 +40,57 @@
 
 class SciFiHit {
  public:
-   //SciFiHit(); // Default constructor
+  // SciFiHit(); // Default constructor
 
-   SciFiHit(int tracker, int station, int plane, int fibre, double edep, double time );
+  SciFiHit(int tracker, int station, int plane, int fibre, double edep, double time );
 
-   ~SciFiHit();
+  ~SciFiHit();
 
-   void set_spill(int spillNo) { _spill = spillNo; }
+  void set_spill(int spillNo) { _spill = spillNo; }
 
-   int get_spill()   const { return _spill;   }
+  int get_spill()   const { return _spill;   }
 
-   void set_eventNo(int eventNo) { _eventNo = eventNo; }
+  void set_eventNo(int eventNo) { _eventNo = eventNo; }
 
-   int get_eventNo() const { return _eventNo; }
+  int get_eventNo() const { return _eventNo; }
 
-   void set_tracker(int trackerNo) { _tracker = trackerNo; }
+  void set_tracker(int trackerNo) { _tracker = trackerNo; }
 
-   int get_tracker() const { return _tracker; }
+  int get_tracker() const { return _tracker; }
 
-   void set_station(int stationNo) { _station = stationNo; }
+  void set_station(int stationNo) { _station = stationNo; }
 
-   int get_station() const { return _station; }
+  int get_station() const { return _station; }
 
-   void set_plane(int planeNo) { _plane = planeNo; }
+  void set_plane(int planeNo) { _plane = planeNo; }
 
-   int get_plane()   const { return _plane; }
+  int get_plane()   const { return _plane; }
 
-   void set_fibre(int fibreNo) { _fibre = fibreNo; }
+  void set_fibre(int fibreNo) { _fibre = fibreNo; }
 
-   int get_fibre() const { return _fibre; }
+  int get_fibre() const { return _fibre; }
 
-   void set_edep(int edep) { _edep = edep; }
+  void set_edep(int edep) { _edep = edep; }
 
-   double get_edep()     const { return _edep;     }
+  double get_edep()     const { return _edep;     }
 
-   void set_time(int time) { _time = time; }
+  void set_time(int time) { _time = time; }
 
-   double get_time()    const { return _time;    }
+  double get_time()    const { return _time;    }
 
-   void setUsed()   { _isUsed = true; }
+  void setUsed()   { _isUsed = true; }
 
-   bool isUsed()     const { return _isUsed; }
+  bool isUsed()     const { return _isUsed; }
 
  private:
 
-   int _spill, _eventNo, _plane;
+  int _spill, _eventNo, _plane;
 
-   int _tracker, _station, _fibre;
+  int _tracker, _station, _fibre;
 
-   double _edep, _time;
+  double _edep, _time;
 
-   bool _isUsed;
-
+  bool _isUsed;
 };  // Don't forget this trailing colon!!!!
 
 #endif

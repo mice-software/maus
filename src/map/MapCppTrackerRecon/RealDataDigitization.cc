@@ -21,27 +21,27 @@ RealDataDigitization::RealDataDigitization(TrackerSpill &spill, Json::Value daq)
   // -------------------------------------------------
   // Load calibration, mapping and bad channel list.
   bool calib = load_calibration("scifi_calibration_30_09_2011.txt");
- // std::cout << "Calibration file loaded... " << std::endl;
+  // std::cout << "Calibration file loaded... " << std::endl;
   assert(calib);
   bool map = load_mapping("mapping_2.txt");
- // std::cout << "Mapping file loaded... " << std::endl;
+  // std::cout << "Mapping file loaded... " << std::endl;
   assert(map);
   // get bad channel list
   bool bad_channels_loaded = load_bad_channels();
   assert(bad_channels_loaded);
- // std::cout << "Bad channel list loaded..." << std::endl;
+  // std::cout << "Bad channel list loaded..." << std::endl;
   // -------------------------------------------------
 
   // Pick up JSON daq event.
   Json::Value tracker_event;
   if ( !daq.isMember("tracker1") || !daq.isMember("tracker2") ) {
     Json::Value errors;
-   // std::cout << "Couldn't find one of the trackers." << std::endl;
-   // std::stringstream ss;
-   // ss << _classname << " says:" << "A tracker is missing.";
-   // errors["missing_branch"] = ss.str();
-   // root["errors"] = errors;
-   // return writer.write(root);
+    // std::cout << "Couldn't find one of the trackers." << std::endl;
+    // std::stringstream ss;
+    // ss << _classname << " says:" << "A tracker is missing.";
+    // errors["missing_branch"] = ss.str();
+    // root["errors"] = errors;
+    // return writer.write(root);
   }
   tracker_event = daq["tracker1"];
 
@@ -51,7 +51,7 @@ RealDataDigitization::RealDataDigitization(TrackerSpill &spill, Json::Value daq)
 
     if ( tracker_event[i].isNull() ) {
       Json::Value errors;
-      //std::cout << "Empty event." << std::endl;
+      // std::cout << "Empty event." << std::endl;
     }
     Json::Value input_event = tracker_event[i]["VLSB_C"];
     // merge tracker events
@@ -85,7 +85,7 @@ RealDataDigitization::RealDataDigitization(TrackerSpill &spill, Json::Value daq)
       assert(channel_in.isMember("tdc"));
       int tdc = channel_in["tdc"].asInt();
 
-      //assert(channel_in.isMember("discr"));
+      // assert(channel_in.isMember("discr"));
 
       if ( !is_good_channel(bank, board, channel_ro) )
         continue;
@@ -110,7 +110,7 @@ RealDataDigitization::RealDataDigitization(TrackerSpill &spill, Json::Value daq)
       get_StatPlaneChannel(board, bank, channel_ro, tracker, station, plane, channel);
 
       // exclude missing modules
-      if ( pe > 2.0 && tracker != -1  ) {
+      if ( pe > 2.0 && tracker != -1 ) {
         assert(tracker == 0 || tracker == 1);
         assert(station > 0 && station < 6);
         assert(plane == 0 || plane == 1 || plane == 2);
@@ -125,13 +125,13 @@ RealDataDigitization::RealDataDigitization(TrackerSpill &spill, Json::Value daq)
 
 bool RealDataDigitization::load_calibration(std::string file) {
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
-  std::string fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerCosmics/"+file;
+  std::string fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerRecon/"+file;
 
   std::ifstream inf(fname.c_str());
 
   if (!inf) {
-   std::cout << "Unable to open file " << fname << std::endl;
-   return false;
+    std::cout << "Unable to open file " << fname << std::endl;
+    return false;
   }
 
   std::string line;
@@ -141,8 +141,8 @@ bool RealDataDigitization::load_calibration(std::string file) {
   std::istringstream ist1(line.c_str());
   ist1 >> numBoards;
 
-  //std::cout << "Read in " << numBoards << " from calibration file: " << std::endl;
-  //std::cout << fname << std::endl;
+  // std::cout << "Read in " << numBoards << " from calibration file: " << std::endl;
+  // std::cout << fname << std::endl;
 
   read_in_all_Boards(inf);
 
@@ -153,13 +153,13 @@ void RealDataDigitization::read_in_all_Boards(std::ifstream& inf) {
   std::string line;
 
   // run over all boards
-  for ( int i = 0; i < 16; ++i) {
+  for ( int i = 0; i < 16; ++i ) {
     // run over banks
     for ( int j = 0; j < 4; ++j ) {
       // run over channels
       for ( int k = 0; k < 128; ++k ) { // running over channels
         int unique_chan_no, board, bank, chan;
-        double p,g;
+        double p, g;
 
         getline(inf, line);
         std::istringstream ist1(line.c_str());
@@ -183,12 +183,12 @@ void RealDataDigitization::read_in_all_Boards(std::ifstream& inf) {
 
 bool RealDataDigitization::load_mapping(std::string file) {
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
-  std::string fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerCosmics/"+file;
+  std::string fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerRecon/"+file;
 
   std::ifstream inf(fname.c_str());
   if (!inf) {
-   std::cout << "Unable to open file " << fname << std::endl;
-   return false;
+    std::cout << "Unable to open file " << fname << std::endl;
+    return false;
   }
 
   std::string line;
@@ -197,7 +197,8 @@ bool RealDataDigitization::load_mapping(std::string file) {
     std::istringstream ist1(line.c_str());
 
     int board, bank, chan_ro, tracker, station, view, fibre, extWG, inWG, WGfib;
-    ist1 >> board >> bank >> chan_ro >> tracker >> station >> view >> fibre >> extWG >> inWG >> WGfib;
+    ist1 >> board >> bank >> chan_ro >> tracker >> station >>
+            view >> fibre >> extWG >> inWG >> WGfib;
 
     _board.push_back(board);
     _bank.push_back(bank);
@@ -213,28 +214,30 @@ bool RealDataDigitization::load_mapping(std::string file) {
   return true;
 }
 
-void RealDataDigitization::get_StatPlaneChannel(int& board, int& bank, int& chan_ro, int& tracker, int& station, int& plane, int& channel) {
+void RealDataDigitization::
+     get_StatPlaneChannel(int& board, int& bank, int& chan_ro,
+                          int& tracker, int& station, int& plane, int& channel) {
   bool found = false;
   tracker = station = plane = channel = -1;
 
   for ( unsigned int i = 0; !found && i < _board.size(); ++i ) {
-    if ((board == _board[i]) && (bank == _bank[i]) && (chan_ro == _chan_ro[i]) ) {
-     station = _station[i];
-     plane = _view[i];
-     channel = _fibre[i];
-     tracker = _tracker[i];
-     found = true;
+    if ( (board == _board[i]) && (bank == _bank[i]) && (chan_ro == _chan_ro[i]) ) {
+      station = _station[i];
+      plane = _view[i];
+      channel = _fibre[i];
+      tracker = _tracker[i];
+      found = true;
     }
   }
 
-  if (tracker == -1 ) {
+  if ( tracker == -1 ) {
     std::ofstream out2("bad_mapping.txt", std::ios::out | std::ios::app);
     out2 << board << " " << bank << " " << chan_ro << "\n";
     out2.close();
   }
 
-  //std::cout << board << " " << bank << " " << chan_ro << std::endl;
-  //assert(found);
+  // std::cout << board << " " << bank << " " << chan_ro << std::endl;
+  // assert(found);
 }
 
 bool RealDataDigitization::is_good_channel(int board, int bank, int chan_ro) {
@@ -243,12 +246,12 @@ bool RealDataDigitization::is_good_channel(int board, int bank, int chan_ro) {
 
 bool RealDataDigitization::load_bad_channels() {
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
-  std::string fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerCosmics/bad_chan_list.txt";
+  std::string fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerRecon/bad_chan_list.txt";
 
   std::ifstream inf(fname.c_str());
   if (!inf) {
-   std::cout << "Unable to open file " << fname << std::endl;
-   return false;
+    std::cout << "Unable to open file " << fname << std::endl;
+    return false;
   }
 
   for ( int board = 0; board < 16; ++board ) {
@@ -261,9 +264,10 @@ bool RealDataDigitization::load_bad_channels() {
 
   int bad_board, bad_bank, bad_chan_ro;
 
-  while( !inf.eof() ) {
+  while ( !inf.eof() ) {
     inf >> bad_board >> bad_bank >> bad_chan_ro;
     good_chan[bad_board][bad_bank][bad_chan_ro] = false;
   }
   return true;
 }
+

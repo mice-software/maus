@@ -43,45 +43,44 @@
 
 class SciFiSpacePoint {
  public:
-   SciFiSpacePoint(); // Default constructor
+  SciFiSpacePoint(); // Default constructor
 
-   SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2, SciFiCluster *clust3);
+  SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2, SciFiCluster *clust3);
 
-   SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2);
+  SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2);
 
-   ~SciFiSpacePoint();
+  ~SciFiSpacePoint();
 
-   void make_duplet(SciFiCluster* clusterA, SciFiCluster* clusterB);
+  void make_duplet(SciFiCluster* clusterA, SciFiCluster* clusterB);
 
-   void make_triplet(SciFiCluster* clusterA, SciFiCluster* clusterB, SciFiCluster* clusterC);
+  void make_triplet(SciFiCluster* clusterA, SciFiCluster* clusterB, SciFiCluster* clusterC);
 
-   Hep3Vector crossing_pos(SciFiCluster* c1, SciFiCluster* c2);
+  Hep3Vector crossing_pos(SciFiCluster* c1, SciFiCluster* c2);
 
-   int get_tracker() const { return _tracker; }
+  int get_tracker() const { return _tracker; }
 
-   int get_station() const { return _station; }
+  int get_station() const { return _station; }
 
-   int get_npe()     const { return _npe; }
+  int get_npe()     const { return _npe; }
 
-   int get_time()    const { return _time; }
+  int get_time()    const { return _time; }
 
-   std::string get_type()  const { return _type; }
+  std::string get_type()  const { return _type; }
 
-   Hep3Vector get_position() const { return _position; };
+  Hep3Vector get_position() const { return _position; }
 
-   std::vector<SciFiCluster*> get_channels()  const { return _channels; }
+  std::vector<SciFiCluster*> get_channels()  const { return _channels; }
 
  private:
-   int _tracker, _station, _npe;
+  int _tracker, _station, _npe;
 
-   Hep3Vector _position;
+  Hep3Vector _position;
 
-   int _chi2, _time, _time_error, _time_res;
+  int _chi2, _time, _time_error, _time_res;
 
-   std::string _type;
+  std::string _type;
 
-   std::vector<SciFiCluster*>  _channels;
-
+  std::vector<SciFiCluster*>  _channels;
 };  // Don't forget this trailing colon!!!!
 
 #endif

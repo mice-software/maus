@@ -43,21 +43,19 @@ SciFiCluster::SciFiCluster(SciFiDigit *digit) {
   doubletNo=seed->plane();
 
   time=seed->time();*/
-
 }
 
 SciFiCluster::~SciFiCluster() {}
 
 void SciFiCluster::addDigit(SciFiDigit* neigh) {
-//  digits.push_back(neigh);
+  // digits.push_back(neigh);
   neigh->setUsed();
 
   _npe += neigh->get_npe();
   _channel_w /= 2.0;
   _channel_w += (neigh->get_channel())/2.0;
 
-//  n_chan++;
-
+  // n_chan++;
 }
 
 void SciFiCluster::construct(std::vector<const MiceModule*> modules, SciFiDigit* digit) {
@@ -81,7 +79,6 @@ void SciFiCluster::construct(std::vector<const MiceModule*> modules, SciFiDigit*
     }
   }
 
-  //std::cout << "Module: " << digit->get_tracker() << " " << digit->get_station() << " " << digit->get_plane() << std::endl;
   assert(this_plane != NULL);
 
   dir  *= this_plane->globalRotation();
@@ -93,10 +90,4 @@ void SciFiCluster::construct(std::vector<const MiceModule*> modules, SciFiDigit*
 
   _position  = dist_mm * perp + this_plane->globalPosition();
   _direction = dir;
-
 }
-
-
-
-
-

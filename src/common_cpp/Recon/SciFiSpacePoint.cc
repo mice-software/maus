@@ -87,7 +87,7 @@ void SciFiSpacePoint::make_triplet(SciFiCluster* vcluster,
   Hep3Vector x_pos(xcluster->get_position());
 
   // Assume that the station is perpendicular to the Z axis
-  //get_chi_squared(x_pos,p);
+  // get_chi_squared(x_pos,p);
   double x1 = x_pos.x();
   double y1 = x_pos.y();
   double x2 = x_pos.x() + 10.0*x_dir.x();
@@ -167,7 +167,6 @@ void SciFiSpacePoint::make_duplet
   _time_error = sqrt(_time_error);
 
   _time_res = time_A - _time;
-
 }
 
 // This function calculates the intersection position of two clusters.

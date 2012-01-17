@@ -74,7 +74,7 @@ class MapCppTrackerRecon {
 
   bool check_sanity_daq(Json::Value daq);
 
-//  bool check_sanity_digits(Json::Value digits);
+  // bool check_sanity_digits(Json::Value digits);
 
   void cluster_recon(TrackerEvent &evt);
 
@@ -82,7 +82,8 @@ class MapCppTrackerRecon {
 
   bool clusters_are_not_used(SciFiCluster* candidate_A, SciFiCluster* candidate_B);
 
-  bool clusters_are_not_used(SciFiCluster* candidate_A, SciFiCluster* candidate_B, SciFiCluster* candidate_C);
+  bool clusters_are_not_used(SciFiCluster* candidate_A, SciFiCluster* candidate_B,
+                             SciFiCluster* candidate_C);
 
   bool kuno_accepts(SciFiCluster* cluster1, SciFiCluster* cluster2, SciFiCluster* cluster3);
 
@@ -96,7 +97,7 @@ class MapCppTrackerRecon {
   std::string run_type;
 
   /// This is the Mice Module
-  //MiceModule*      _module;
+  // MiceModule*      _module;
   /// This should be the classname
   std::string _classname;
   /// This will contain the configuration
@@ -106,14 +107,14 @@ class MapCppTrackerRecon {
   ///  JsonCpp setup
   Json::Reader reader;
   /// an array contaning all MiceModules
-  //std::vector<const MiceModule*> modules;
+  // std::vector<const MiceModule*> modules;
 
   double minPE;
- // Json::Value mc;
+  // Json::Value mc;
 
-  //TrackerEvent event;
+  // TrackerEvent event;
 
   std::vector<const MiceModule*> modules;
-};  // Don't forget this trailing colon!!!!
+}; // Don't forget this trailing colon!!!!
 
 #endif

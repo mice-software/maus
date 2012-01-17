@@ -80,13 +80,13 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
   TrackerSpill spill;
   spill.events_in_spill.clear();
   // start processing the mc hits
-  //std::vector<Json::Value> _alldigits;
-  //_alldigits.push_back(Json::Value());
-  //Json::Value tracker_event;
+  // std::vector<Json::Value> _alldigits;
+  // _alldigits.push_back(Json::Value());
+  // Json::Value tracker_event;
 
   // ==========================================================
   //  Loop over events
-  for ( unsigned int i = 0; i < mc.size(); i++ ) {  //i-th particle
+  for ( unsigned int i = 0; i < mc.size(); i++ ) {  // i-th particle
     Json::Value json_event = mc[i];
 
     if ( !json_event.isMember("hits") ) {
@@ -109,16 +109,17 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
     std::cout << "Digits in Event: " << event.scifidigits.size() << " " << std::endl;
 
     save_to_json(event);
-   }
+  }
 
   // ==========================================================
   return writer.write(root);
 }
 
-void MapCppTrackerMCDigitization::json_to_cpp(Json::Value js_event, TrackerSpill &spill) {
+void MapCppTrackerMCDigitization::
+     json_to_cpp(Json::Value js_event, TrackerSpill &spill) {
   TrackerEvent event;
   Json::Value _hits = js_event["hits"];
- // std::cout << "Number of hits fed in: " << _hits.size() << std::endl;
+  // std::cout << "Number of hits fed in: " << _hits.size() << std::endl;
   for ( int j = 0; j < _hits.size(); j++ ) {
     Json::Value hit = _hits[j];
     assert(hit.isMember("channel_id"));
@@ -139,7 +140,7 @@ void MapCppTrackerMCDigitization::json_to_cpp(Json::Value js_event, TrackerSpill
     fibre   = channel_id["fibre_number"].asInt();
     edep    = hit["energy_deposited"].asDouble();
     time    = hit["time"].asDouble();
-    SciFiHit *a_hit = new SciFiHit(tracker,station,plane,fibre,edep,time);
+    SciFiHit *a_hit = new SciFiHit(tracker, station, plane, fibre, edep, time);
     event.scifihits.push_back(a_hit);
   //  std::cout << "Number of hits stored in event: " << event.scifihits.size() << std::endl;
   }
@@ -168,7 +169,7 @@ void MapCppTrackerMCDigitization::construct_digits(TrackerEvent &evt) {
 
       // Get nPE from this hit.
       double edep = a_hit->get_edep();
-      //std::cout << "Edep: " << edep << std::endl;
+      // std::cout << "Edep: " << edep << std::endl;
       double nPE  = compute_npe(edep);
       // Check whether the energy deposited is below the threshold;
       // if it is, skip this hit.
@@ -178,13 +179,13 @@ void MapCppTrackerMCDigitization::construct_digits(TrackerEvent &evt) {
 
       // Compute tdc count.
       double time   = a_hit->get_time();
-      //std::cout << "Time: " << time << std::endl;
+      // std::cout << "Time: " << time << std::endl;
       int tdcCounts = compute_tdc_counts(time);
       int chanNo = compute_chan_no(a_hit);
 
       // loop over all the other hits
       for ( unsigned int hit_j = hit_i; hit_j < number_of_hits; hit_j++ ) {
-        if ( check_param(evt.scifihits[hit_i],evt.scifihits[hit_j]) ) {
+        if ( check_param(evt.scifihits[hit_i], evt.scifihits[hit_j]) ) {
           double edep_j = a_hit->get_edep();
           nPE  += compute_npe(edep_j);
           evt.scifihits[hit_j]->setUsed();
@@ -222,8 +223,8 @@ int MapCppTrackerMCDigitization::compute_chan_no(SciFiHit *ahit) {
   int station = ahit->get_station();
   int plane   = ahit->get_plane();
 
-  //std::cout << "Time: " << ahit->get_time() << std::endl;
-  //std::cout << tracker << " " << station << " " << plane << std::endl;
+  // std::cout << "Time: " << ahit->get_time() << std::endl;
+  // std::cout << tracker << " " << station << " " << plane << std::endl;
   const MiceModule* this_plane = NULL;
   for ( unsigned int j = 0; !this_plane && j < modules.size(); j++ ) {
 /*    if ( modules[j]->propertyExists("Tracker", "int") &&

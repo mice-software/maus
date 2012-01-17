@@ -34,6 +34,7 @@
 // C++ headers
 #include <cmath>
 #include <vector>
+#include <string>
 
 #include "Config/MiceModule.hh"
 #include "Interface/Squeak.hh"

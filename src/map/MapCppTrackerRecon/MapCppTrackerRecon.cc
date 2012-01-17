@@ -16,6 +16,8 @@
  */
 
 #include "src/map/MapCppTrackerRecon/MapCppTrackerRecon.hh"
+#include <iostream>
+#include <fstream>
 
 bool MapCppTrackerRecon::birth(std::string argJsonConfigDocument) {
   _classname = "MapCppTrackerRecon";
@@ -38,8 +40,8 @@ bool MapCppTrackerRecon::birth(std::string argJsonConfigDocument) {
   modules = _module->findModulesByPropertyString("SensitiveDetector", "SciFi");
 
   // Get desired reconstruction level.
-  //assert(_configJSON.isMember("SciFiReconLevel"));
-  //recon_level = _configJSON["SciFiReconLevel"].asInt();
+  // assert(_configJSON.isMember("SciFiReconLevel"));
+  // recon_level = _configJSON["SciFiReconLevel"].asInt();
 
   // Get minPE cut value.
   assert(_configJSON.isMember("SciFiNPECut"));
@@ -57,7 +59,7 @@ std::string MapCppTrackerRecon::process(std::string document) {
   Json::FastWriter writer;
   TrackerSpill spill;
   spill.events_in_spill.clear();
-  //std::cout << "Events in Spill: " << spill.events_in_spill.size() << std::endl;
+  // std::cout << "Events in Spill: " << spill.events_in_spill.size() << std::endl;
   /*event.scifidigits.clear();
   event.scificlusters.clear();
   event.scifispacepoints.clear();*/
@@ -79,15 +81,15 @@ std::string MapCppTrackerRecon::process(std::string document) {
   if ( root.isMember("daq_data") ) {
     Json::Value daq;
     daq = root.get("daq_data", 0);
-   // if ( check_sanity_daq(daq) )
-    RealDataDigitization(spill,daq);
-  // ..or try to get digits...
+    // if ( check_sanity_daq(daq) )
+    RealDataDigitization(spill, daq);
+    // ..or try to get digits...
   } else if ( root.isMember("digits") ) {
     Json::Value digits;
     digits = root.get("digits", 0);
-   //if ( check_sanity_digits(digits) )
-    fill_digits_vector(digits,spill);
-  // ... or report error. 
+    // if ( check_sanity_digits(digits) )
+    fill_digits_vector(digits, spill);
+    // ... or report error.
   } else {
     Json::Value errors;
     std::stringstream ss;
@@ -102,13 +104,13 @@ std::string MapCppTrackerRecon::process(std::string document) {
   for ( int k = 0; k < spill.events_in_spill.size(); k++ ) {
     TrackerEvent event = spill.events_in_spill[k];
     // Build Clusters
-    std::cout << event.scifidigits.size() << " " ;
-    if ( event.scifidigits.size() ) {//&& recon_level >= 0 ) {
+    std::cout << event.scifidigits.size() << " ";
+    if ( event.scifidigits.size() ) { // && recon_level >= 0 ) {
       cluster_recon(event);
     }
     // Build SpacePoints
-    std::cout << event.scificlusters.size() << " " ;
-    if ( event.scificlusters.size() ) { //&& recon_level >= 1) {
+    std::cout << event.scificlusters.size() << " ";
+    if ( event.scificlusters.size() ) { // && recon_level >= 1) {
       spacepoint_recon(event);
     }
     std::cout << event.scifispacepoints.size() << " " << std::endl;
@@ -145,7 +147,7 @@ bool MapCppTrackerRecon::check_sanity_daq(Json::Value daq) {
   // Check sanity of the 'daq_data' branch
   if ( !root.isMember("daq_data") || root["daq_data"].isNull() ) {
     Json::Value errors;
-    //std::cout << "bad DAQ_DATA, skipping event" << std::endl;
+    // std::cout << "bad DAQ_DATA, skipping event" << std::endl;
     std::stringstream ss;
     ss << _classname << " says:" << "Empty spill.";
     errors["missing_branch"] = ss.str();
@@ -189,21 +191,21 @@ void MapCppTrackerRecon::cluster_recon(TrackerEvent &evt) {
 
   // Sort seeds so that we use higher npe first.
 
-  SciFiDigit* neigh;// = NULL;
-  SciFiDigit* seed;
-  double pe;
+  // SciFiDigit* neigh;// = NULL;
+  // SciFiDigit* seed;
+  // double pe;
 
   for ( unsigned int i = 0; i < seeds.size(); i++ ) {
     if ( !seeds[i]->isUsed() ) {
-      neigh = NULL;
-      seed = seeds[i];
+      SciFiDigit* neigh = NULL;
+      SciFiDigit* seed = seeds[i];
 
       int tracker = seed->get_tracker();
       int station = seed->get_station();
       int plane   = seed->get_plane();
       int fibre   = seed->get_channel();
-      pe          = seed->get_npe();
-
+      double pe   = seed->get_npe();
+      // Look for a neighbour.
       for ( unsigned int j = i+1; j < seeds.size(); j++ ) {
         if ( seeds[j]->get_tracker() == tracker &&
              seeds[j]->get_station() == station &&
@@ -211,18 +213,18 @@ void MapCppTrackerRecon::cluster_recon(TrackerEvent &evt) {
              (seeds[j]->get_channel() - fibre) < 2 )
           neigh = seeds[j];
       }
-
+      // If there is a neighbour, sum npe contribution.
       if ( neigh ) pe += neigh->get_npe();
-
+      // Save cluster if it's above npe cut.
       if ( pe > minPE ) {
         SciFiCluster* clust = new SciFiCluster(seed);
         seed->setUsed();
         if ( neigh ) clust->addDigit(neigh);
-        clust->construct(modules,seed);
+        clust->construct(modules, seed);
         evt.scificlusters.push_back(clust);
       }
     }
-  }
+  } // ends loop over seeds
 }
 
 void MapCppTrackerRecon::spacepoint_recon(TrackerEvent &evt) {
@@ -268,10 +270,10 @@ void MapCppTrackerRecon::spacepoint_recon(TrackerEvent &evt) {
             SciFiCluster* candidate_C = (clusters[Tracker][Station][2])[clc];
 
             if ( kuno_accepts(candidate_A, candidate_B, candidate_C) &&
-                 clusters_are_not_used(candidate_A,candidate_B, candidate_C) ) {
+                 clusters_are_not_used(candidate_A, candidate_B, candidate_C) ) {
               SciFiSpacePoint* triplet = new SciFiSpacePoint(candidate_A, candidate_B, candidate_C);
               evt.scifispacepoints.push_back(triplet);
-             // triplet_counter += 1;
+              // triplet_counter += 1;
             }
           }  // ends plane 2
         }  // ends plane 1
@@ -298,7 +300,8 @@ void MapCppTrackerRecon::spacepoint_recon(TrackerEvent &evt) {
               SciFiCluster* candidate_B =
                            (clusters[Tracker][Station][another_plane])[clb];
 
-              if ( clusters_are_not_used(candidate_A, candidate_B) && candidate_A->get_plane() != candidate_B->get_plane() ) {
+              if ( clusters_are_not_used(candidate_A, candidate_B) &&
+                   candidate_A->get_plane() != candidate_B->get_plane() ) {
                 SciFiSpacePoint* duplet = new SciFiSpacePoint(candidate_A, candidate_B);
                 evt.scifispacepoints.push_back(duplet);
               //  duplet_counter += 1;
@@ -319,9 +322,9 @@ bool MapCppTrackerRecon::kuno_accepts(SciFiCluster* cluster1,
   int tracker = cluster1->get_tracker();
   int station = cluster1->get_station();
 
-  double uvwSum = cluster1->get_chanNo_w() +
-                  cluster2->get_chanNo_w() +
-                  cluster3->get_chanNo_w();
+  double uvwSum = cluster1->get_channel() +
+                  cluster2->get_channel() +
+                  cluster3->get_channel();
 
   if ((tracker == 0 && station == 5 && uvwSum < 322 && uvwSum > 318) ||
      (!(tracker == 0 && station == 5) && uvwSum < 321 && uvwSum > 316)) {
@@ -343,7 +346,7 @@ bool MapCppTrackerRecon::clusters_are_not_used(SciFiCluster* candidate_A,
 bool MapCppTrackerRecon::clusters_are_not_used(SciFiCluster* candidate_A,
                                                SciFiCluster* candidate_B,
                                                SciFiCluster* candidate_C) {
-  if ( candidate_A->isUsed() || candidate_B->isUsed() || candidate_C->isUsed()) {
+  if ( candidate_A->isUsed() || candidate_B->isUsed() || candidate_C->isUsed() ) {
     return false;
   } else {
     return true;
@@ -352,7 +355,7 @@ bool MapCppTrackerRecon::clusters_are_not_used(SciFiCluster* candidate_A,
 
 
 void MapCppTrackerRecon::save_to_json(TrackerEvent &evt) {
-  // Digits
+// Digits
   Json::Value digits;
   for ( unsigned int evt_i; evt_i < evt.scifidigits.size(); evt_i++ ) {
     Json::Value digits_in_event;
@@ -373,8 +376,8 @@ void MapCppTrackerRecon::save_to_json(TrackerEvent &evt) {
     Json::Value spacepoints_in_event;
     channels = Json::Value(Json::arrayValue);
     channels.clear();
-   // spacepoints_in_event["spill"]  = event.scifispacepoints[evt_i]->get_spill();
-   // spacepoints_in_event["event"]  = event.scifispacepoints[evt_i]->get_eventNo();
+    // spacepoints_in_event["spill"]  = event.scifispacepoints[evt_i]->get_spill();
+    // spacepoints_in_event["event"]  = event.scifispacepoints[evt_i]->get_eventNo();
     spacepoints_in_event["tracker"]= evt.scifispacepoints[evt_i]->get_tracker();
     spacepoints_in_event["station"]= evt.scifispacepoints[evt_i]->get_station();
     spacepoints_in_event["npe"]    = evt.scifispacepoints[evt_i]->get_npe();
@@ -385,10 +388,10 @@ void MapCppTrackerRecon::save_to_json(TrackerEvent &evt) {
     spacepoints_in_event["position"]["y"]   = pos.y();
     spacepoints_in_event["position"]["z"]   = pos.z();
     std::vector<SciFiCluster*> clusters_in_spacepoint = evt.scifispacepoints[evt_i]->get_channels();
-    for ( int cl = 0; cl<clusters_in_spacepoint.size(); cl++ ) {
+    for ( int cl = 0; cl < clusters_in_spacepoint.size(); cl++ ) {
       Json::Value cluster;
       cluster["plane_number"] = clusters_in_spacepoint[cl]->get_plane();
-      cluster["channel_number"] = clusters_in_spacepoint[cl]->get_chanNo_w();
+      cluster["channel_number"] = clusters_in_spacepoint[cl]->get_channel();
       cluster["npe"] = clusters_in_spacepoint[cl]->get_npe();
       channels.append(cluster);
     }

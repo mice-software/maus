@@ -17,9 +17,8 @@
 #include "src/common_cpp/Recon/TrackerSpill.hh"
 
 
-TrackerSpill::TrackerSpill( ) {
-  //scifidigits.clear();
-
+TrackerSpill::TrackerSpill() {
+  // scifidigits.clear();
 }
 
 TrackerSpill::~TrackerSpill() {}

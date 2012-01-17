@@ -26,7 +26,7 @@
 
 // C++ headers
 #include <vector>
-//#include <string>
+// #include <string>
 
 // others
 #include "src/common_cpp/Recon/TrackerEvent.hh"
@@ -34,13 +34,12 @@
 
 class TrackerSpill {
  public:
-   TrackerSpill();
-   ~TrackerSpill();
+  TrackerSpill();
+  ~TrackerSpill();
 
-   std::vector<TrackerEvent>   events_in_spill;
+  std::vector<TrackerEvent>   events_in_spill;
 
-// private:
-
+  // private:
 };  // Don't forget this trailing colon!!!!
 
 #endif

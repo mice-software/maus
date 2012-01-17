@@ -28,8 +28,6 @@
 #include <CLHEP/Random/RandPoisson.h>
 #include <CLHEP/Random/RandGauss.h>
 #include <CLHEP/Random/RandExponential.h>
-#include <CLHEP/Units/PhysicalConstants.h>
-#include "CLHEP/Matrix/Matrix.h"
 
 // C++ headers
 #include <cmath>
@@ -45,63 +43,62 @@
 
 #include "src/legacy/Config/MiceModule.hh"
 #include "src/common_cpp/Recon/SciFiDigit.hh"
-//#include "src/map/MapCppTrackerRecon/TrackerEvent.hh"
+// #include "src/map/MapCppTrackerRecon/TrackerEvent.hh"
 
 class SciFiCluster {
  public:
-   //SciFiDigit(); // Default constructor
+  // SciFiDigit(); // Default constructor
 
-   SciFiCluster(SciFiDigit *digit);
+  explicit SciFiCluster(SciFiDigit *digit);
 
-   ~SciFiCluster();
+  ~SciFiCluster();
 
-   void addDigit(SciFiDigit neigh);
+  void addDigit(SciFiDigit neigh);
 
-   int get_tracker() const { return _tracker; }
+  int get_tracker() const { return _tracker; }
 
-   int get_station() const { return _station; }
+  int get_station() const { return _station; }
 
-   int get_plane()  const  { return _plane;   }
+  int get_plane()  const  { return _plane;   }
 
-   double get_npe()     const { return _npe; }
+  double get_npe()     const { return _npe; }
 
-   int get_time()    const { return _time; }
+  int get_time()    const { return _time; }
 
-   double get_chanNo_w()  const { return _channel_w; }
+  double get_channel()  const { return _channel_w; }
 
-   bool isUsed() const { return _used; }
+  bool isUsed() const { return _used; }
 
-   void setUsed() { _used = true; }
+  void setUsed() { _used = true; }
 
-   void addDigit(SciFiDigit* neigh);
+  void addDigit(SciFiDigit* neigh);
 
-   Hep3Vector get_direction() const { return _direction; };
+  Hep3Vector get_direction() const { return _direction; }
 
-   Hep3Vector get_position() const { return _position; };
+  Hep3Vector get_position() const { return _position; }
 
-   void construct(std::vector<const MiceModule*> modules, SciFiDigit* digit);
+  void construct(std::vector<const MiceModule*> modules, SciFiDigit* digit);
 
  private:
-   int _tracker, _station, _plane;
+  int _tracker, _station, _plane;
 
-   double _npe, _channel_w;
+  double _npe, _channel_w;
 
-   int _time;
+  int _time;
 
-   SciFiDigit* seed;
+  SciFiDigit* seed;
 
-   SciFiDigit* neighbour;
+  SciFiDigit* neighbour;
 
-   std::vector<SciFiDigit*> digits;
+  std::vector<SciFiDigit*> digits;
 
-   int n_chan;
+  int n_chan;
 
-   bool _used;
+  bool _used;
 
-   Hep3Vector _direction;
+  Hep3Vector _direction;
 
-   Hep3Vector _position;
-
+  Hep3Vector _position;
 };  // Don't forget this trailing colon!!!!
 
 #endif

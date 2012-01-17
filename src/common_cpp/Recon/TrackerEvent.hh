@@ -35,20 +35,20 @@
 
 class TrackerEvent {
  public:
-   TrackerEvent();
-   ~TrackerEvent();
+  TrackerEvent();
+  ~TrackerEvent();
 
   // std::string get_geometry_filename() const { return _filename; }
 
   // void set_geometry_filename(std::string file) { _filename = file; }
 
-   std::vector<SciFiHit*>   scifihits;
-   std::vector<SciFiDigit*>   scifidigits;
-   std::vector<SciFiCluster*> scificlusters;
-   std::vector<SciFiSpacePoint* > scifispacepoints;
+  std::vector<SciFiHit*>   scifihits;
+  std::vector<SciFiDigit*>   scifidigits;
+  std::vector<SciFiCluster*> scificlusters;
+  std::vector<SciFiSpacePoint* > scifispacepoints;
 
- //private:
- //  std::string _filename;
+  // private:
+  // std::string _filename;
 };  // Don't forget this trailing colon!!!!
 
 #endif
