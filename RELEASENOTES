@@ -4,6 +4,10 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v0.1.2
+  The following functionality was added:
+    - Input beams can now be read from maus, ICOOL and G4Beamline formatted files
+
 MAUS-v0.1.1
   The following functionality was added:
     - Prototype functionality to run MAUS online added
