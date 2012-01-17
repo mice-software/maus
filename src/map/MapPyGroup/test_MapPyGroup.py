@@ -197,14 +197,17 @@ class MapPyGroupTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         names = self.__group.get_worker_names()
         self.assertEquals(len(self.__workers), len(names), 
             "Unexpected number of names")
+        # This does a start-to-end comparison of the lists.
         while len(self.__workers) != 0:
-            expected = self.__workers.pop()
-            actual = names.pop()
+            expected = self.__workers.pop(0)
+            actual = names.pop(0)
             if isinstance(actual, ListType):
                 self.assertEquals(len(expected), len(actual),
                     "Unexpected number of names in sub-list")
-                self.__workers.extend(expected)
-                names.extend(actual)
+                expected.extend(self.__workers) 
+                self.__workers = expected
+                names = actual.extend(names)
+                names = actual
             else:
                 self.assertEquals(expected.__class__.__name__, actual,
                     "Unexpected name")
