@@ -20,6 +20,8 @@ import logging
 import re
 from types import ListType
 from types import StringType
+import sys
+import traceback
 
 from celery.registry import tasks
 from celery.task import Task
@@ -49,6 +51,11 @@ class MausGenericTransformTask(Task):
         self.__config = 0
 
     def configure(self, config):
+        """
+        Set task configuration value.
+        @param self Object reference.
+        @param config Configuration value.
+        """
         self.__config = config
 
     def birth(self, json_config_doc):
@@ -61,11 +68,6 @@ class MausGenericTransformTask(Task):
         @throws exception if any exceptions arise in birth().
         """
         for name in self.__transforms:
-#            self.__transforms[name].birth(json_config_doc)
-
-            # MapCppSimulation takes ages to initialise so skip for now.
-            if name == "MapCppSimulation":
-                continue
             self.__transforms[name].birth(json_config_doc)
         self.__config = self.__config + 1
         return True
@@ -118,6 +120,12 @@ from celery.worker.control import Panel
 
 @Panel.register
 def configure_maus(panel, configuration):
+    """
+    Reconfigure MausGenericTransformTask
+    @param panel Celery panel object.
+    @param configuration Configuration value.
+    @return status document.
+    """
     print "Configuring..."
     from multiprocessing import current_process 
     print "Process name: %s" % current_process().name 
@@ -130,6 +138,11 @@ def configure_maus(panel, configuration):
 
 @Panel.register
 def reset_pool(panel):
+    """
+    Reset the worker pool by TERM killing the processes.
+    @param panel Celery panel object.
+    @return status document.
+    """
     print "Resetting pool..."
     from multiprocessing import current_process 
     print "Process name: %s" % current_process().name 
@@ -143,7 +156,7 @@ def reset_pool(panel):
             print "About to SIGTERM kill %s" % pid
             os.kill(pid, signal.SIGTERM)
             print "Killed %s" % pid
-    except Exception: 
+    except: # pylint: disable=W0702
         traceback.print_exc(file=sys.stdout)
         print "Error"
     print "Reset"
