@@ -1,7 +1,5 @@
 """
-A custom loader for Celery which ensures that all tasks available
-to workers are initialised with MAUS configuration.
-Test class for mausloader.TaskBirthException module.
+Test class for mausloader module.
 """
 
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
