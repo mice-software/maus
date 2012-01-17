@@ -31,7 +31,7 @@ RealDataDigitization::RealDataDigitization(TrackerSpill &spill, Json::Value daq)
   // Pick up JSON daq event.
   Json::Value tracker_event;
   if ( !daq.isMember("tracker1") || !daq.isMember("tracker2") ) {
-    //Json::Value errors;
+    // Json::Value errors;
     std::cout << "Missing a tracker." << std::endl;
     // std::cout << "Couldn't find one of the trackers." << std::endl;
     // std::stringstream ss;
@@ -49,7 +49,7 @@ RealDataDigitization::RealDataDigitization(TrackerSpill &spill, Json::Value daq)
     // std::cout << "Processing event " << i+1 << " of " << tracker_event.size() << std::endl;
 
     if ( tracker_event[i].isNull() ) {
-      //Json::Value errors;
+      // Json::Value errors;
       std::cout << "Empty event in tracker 1." << std::endl;
     }
     Json::Value input_event = tracker_event[i]["VLSB_C"];
