@@ -22,6 +22,7 @@
 #pylint name is MAUS standard
 #pylint: disable = C0103
 
+import os
 import unittest
 import copy
 import json
@@ -46,6 +47,18 @@ TEST_REFERENCE_PI = {
     "time":0.0,
     "random_seed":0
 }
+
+TEST_FILE_G4BL = {
+    "beam":{
+        "particle_generator":"file",
+        "beam_file_format":"g4beamline_bl_track_file",
+        "beam_file":"%s/src/map/MapPyBeamMaker/test_g4bl.dat" % os.environ.get("MAUS_ROOT_DIR"),
+        "file_particles_per_spill":5,
+        "random_seed":0,
+        "definitions":[]
+    }
+}
+
 
 TEST_COUNTER = {
     "beam":{
@@ -184,6 +197,19 @@ class TestMapPyBeamMaker(unittest.TestCase): # pylint: disable = R0904
                         self.beam_maker._MapPyBeamMaker__birth_empty_particles,
                         beam_def)
 
+    def test_birth_file(self):
+        """
+        Check that we can birth in file format
+        """
+        self.beam_maker.birth(json.dumps(TEST_FILE_G4BL))
+        self.assertEqual(self.beam_maker.particle_generator, "file")
+        self.assertEqual(self.beam_maker.use_beam_file, True)
+        self.assertEqual(self.beam_maker.beam_file, \
+    "%s/src/map/MapPyBeamMaker/test_g4bl.dat" % os.environ.get("MAUS_ROOT_DIR"))
+        self.assertEqual(self.beam_maker.beam_file_format, 
+                         "g4beamline_bl_track_file")
+        self.assertEqual(self.beam_maker.file_particles_per_spill, 5)
+
     def test_birth(self):
         """
         Check that the birth goes okay
@@ -291,6 +317,20 @@ class TestMapPyBeamMaker(unittest.TestCase): # pylint: disable = R0904
                     beam_counter[j] += 1
         self.assertGreater(beam_counter[1], beam_counter[0])
         self.assertGreater(beam_counter[2], beam_counter[0])
+
+    def test_process_file_input(self):
+        """
+        Check that we process an input file correctly
+        """
+        self.beam_maker.birth(json.dumps(TEST_FILE_G4BL))
+        spill = None
+        for i in range(5):
+            spill_string = self.beam_maker.process(json.dumps({}))
+            spill = json.loads(spill_string)
+            self.assertEqual(len(spill["mc"]), 5)
+        test_primary = spill["mc"][4]["primary"]
+        self.assertLess(abs(test_primary["position"]["x"]-7.88914), 1e-6)
+        self.assertLess(abs(test_primary["time"]-913.768), 1e-6)
 
     def test_process(self):
         """
