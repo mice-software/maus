@@ -29,25 +29,7 @@ RealDataDigitization::RealDataDigitization(TrackerSpill &spill, Json::Value daq)
   // -------------------------------------------------
 
   // Pick up JSON daq event.
-  Json::Value tracker_event;
-  if ( !daq.isMember("tracker1") || !daq.isMember("tracker2") ) {
-    // Json::Value errors;
-    std::cout << "Missing a tracker." << std::endl;
-    // std::cout << "Couldn't find one of the trackers." << std::endl;
-    // std::stringstream ss;
-    // ss << _classname << " says:" << "A tracker is missing.";
-    // errors["missing_branch"] = ss.str();
-    // root["errors"] = errors;
-    // return writer.write(root);
-  }
-  tracker_event = daq["tracker1"];
-
-  // assert(daq["tracker1"].size() == daq["tracker2"].size());
-  if ( daq["tracker1"].size() != daq["tracker2"].size() )
-    std::cout << "Different sizes for Tracker1 and Tracker2." << std::endl;
-  // A DATE feature... event counting starts at 1.
-  assert(daq["tracker1"][(Json::Value::ArrayIndex)0].isNull());
-  assert(daq["tracker2"][(Json::Value::ArrayIndex)0].isNull());
+  Json::Value tracker_event = daq["tracker1"];
 
   for ( unsigned int i = 1; i < tracker_event.size(); ++i ) {
     TrackerEvent event;
@@ -104,7 +86,7 @@ RealDataDigitization::RealDataDigitization(TrackerSpill &spill, Json::Value daq)
       get_StatPlaneChannel(board, bank, channel_ro, tracker, station, plane, channel);
 
       // Exclude missing modules.
-      if ( pe > 2.0 && tracker != -1 ) {
+      if ( pe > 1.0 && tracker != -1 ) {
         assert(tracker == 0 || tracker == 1);
         assert(station > 0 && station < 6);
         assert(plane == 0 || plane == 1 || plane == 2);
