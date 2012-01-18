@@ -1,3 +1,7 @@
+MAUS-v0.1.2 (http://micewww.pp.rl.ac.uk/versions/show/19)
+  Feature #723: Command line arguements cleanup
+  Feature #768: File IO for beam maker
+
 MAUS-v0.1.1 (http://micewww.pp.rl.ac.uk/versions/show/18)
   Bug #781: Test suite output on vejur cluster at IIT
   Bug #810: MapPyValidateSpill birth function breaks assumed signature
