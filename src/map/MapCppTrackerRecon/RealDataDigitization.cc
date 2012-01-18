@@ -42,8 +42,8 @@ RealDataDigitization::RealDataDigitization(TrackerSpill &spill, Json::Value daq)
   }
   tracker_event = daq["tracker1"];
 
-  //assert(daq["tracker1"].size() == daq["tracker2"].size());
-  if( daq["tracker1"].size() != daq["tracker2"].size() )
+  // assert(daq["tracker1"].size() == daq["tracker2"].size());
+  if ( daq["tracker1"].size() != daq["tracker2"].size() )
     std::cout << "Different sizes for Tracker1 and Tracker2." << std::endl;
   // A DATE feature... event counting starts at 1.
   assert(daq["tracker1"][(Json::Value::ArrayIndex)0].isNull());
@@ -51,9 +51,9 @@ RealDataDigitization::RealDataDigitization(TrackerSpill &spill, Json::Value daq)
 
   for ( unsigned int i = 1; i < tracker_event.size(); ++i ) {
     TrackerEvent event;
-    if( daq["tracker2"][i].isNull() )
+    if ( daq["tracker2"][i].isNull() )
       std::cout << "Empty event in tracker 1." << std::endl;
-    if( daq["tracker2"][i].isNull() )
+    if ( daq["tracker2"][i].isNull() )
       std::cout << "Empty event in tracker 2." << std::endl;
     Json::Value input_event = tracker_event[i]["VLSB_C"];
     // Merge tracker events.

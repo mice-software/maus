@@ -179,6 +179,7 @@ void MapCppTrackerRecon::cluster_recon(TrackerEvent &evt) {
   }
 
   // Sort seeds so that we use higher npe first.
+  // sort(seeds.begin(),seeds.end());
 
   // SciFiDigit* neigh;// = NULL;
   // SciFiDigit* seed;
@@ -264,7 +265,7 @@ void MapCppTrackerRecon::spacepoint_recon(TrackerEvent &evt) {
                  clusters_are_not_used(candidate_A, candidate_B, candidate_C) ) {
               SciFiSpacePoint* triplet = new SciFiSpacePoint(candidate_A, candidate_B, candidate_C);
               evt.scifispacepoints.push_back(triplet);
-              dump_info(candidate_A, candidate_B, candidate_C);
+              // dump_info(candidate_A, candidate_B, candidate_C);
               // triplet_counter += 1;
             }
           }  // ends plane 2
@@ -401,11 +402,15 @@ void MapCppTrackerRecon::print_event_info(TrackerEvent &event) {
             << event.scifispacepoints.size() << " " << std::endl;
 }
 
-void MapCppTrackerRecon::dump_info(SciFiCluster* candidate_A, SciFiCluster* candidate_B, SciFiCluster* candidate_C) {
+void MapCppTrackerRecon::dump_info(SciFiCluster* candidate_A, SciFiCluster* candidate_B,
+                                   SciFiCluster* candidate_C) {
   std::ofstream file;
   file.open("map_help.txt", std::ios::out | std::ios::app);
-  file << candidate_A->get_tracker() << " " << candidate_A->get_station() << " " << candidate_A->get_plane() << " " << candidate_A->get_channel() << "\n";
-  file << candidate_B->get_tracker() << " " << candidate_B->get_station() << " " << candidate_B->get_plane() << " " << candidate_B->get_channel() << "\n";
-  file << candidate_C->get_tracker() << " " << candidate_C->get_station() << " " << candidate_C->get_plane() << " " << candidate_C->get_channel() << "\n";
+  file << candidate_A->get_tracker() << " " << candidate_A->get_station() << " " <<
+  candidate_A->get_plane() << " " << candidate_A->get_channel() << "\n";
+  file << candidate_B->get_tracker() << " " << candidate_B->get_station() << " " <<
+  candidate_B->get_plane() << " " << candidate_B->get_channel() << "\n";
+  file << candidate_C->get_tracker() << " " << candidate_C->get_station() << " " <<
+  candidate_C->get_plane() << " " << candidate_C->get_channel() << "\n";
   file.close();
 }
