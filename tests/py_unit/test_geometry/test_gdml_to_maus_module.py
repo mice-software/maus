@@ -105,15 +105,6 @@ class  TestGDMLToMausModule(unittest.TestCase):#pylint:disable = C0103,R0904
         #These test can open the files  
         #and make sure the maus modules are written
         #correctly.
-        """
-        There is currently an IO error which occurs and this is because the step
-        and fastrad files which are being tested have old file locations on them
-        which point at the old materials file location. I think the  solution 
-        is to merge the formatter and to maus module tests so the to maus module
-        tests are carried out on formatted versions of the original sources.
-        MDL
-        """
-
         
 if __name__ == '__main__':
     unittest.main()

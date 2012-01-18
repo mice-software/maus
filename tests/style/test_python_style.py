@@ -101,7 +101,7 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
         counting the number of lines in the pylint summary file. If this
         increases, throws an error.
         """
-        current_n_python_errors = 662 # Rogers, 22Dec2011. Release 0.1.1.
+        current_n_python_errors = 648 # Rogers, 17Jan2012. Release 0.1.2
         file_out = os.path.join(self.maus_root_dir, 'tmp', 'pylint.out')
         fout = open(file_out, 'w')
         error_files = []
@@ -116,7 +116,7 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
         if len(error_files) > 0:
             print str(n_errors)+'/'+str(current_n_python_errors)+\
                   ' style errors in following files '+\
-                  '(see tmp/pylint.out for details)\n'+str(error_files)
+                  '(see tmp/pylint.out for details)\n'+str(sorted(error_files))
 
         if n_errors > current_n_python_errors:
             raise RuntimeError("Number of python style errors has increased"+\
