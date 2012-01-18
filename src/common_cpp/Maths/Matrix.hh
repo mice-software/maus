@@ -67,12 +67,12 @@ template <typename StdType> class Vector;
  *         the result in a. The intent is to mimick other standard GSL
  *         functions
  */
-int gsl_matrix_mul(gsl_matrix * matrix_A, const gsl_matrix * matrix_B);
+int gsl_matrix_mul(gsl_matrix ** matrix_A, const gsl_matrix * matrix_B);
 /** @brief Multiplies performs the complex matrix multiplication a b, leaving
  *         the result in a. The intent is to mimick other standard GSL
  *         functions
  */
-int gsl_matrix_complex_mul(gsl_matrix_complex * matrix_A,
+int gsl_matrix_complex_mul(gsl_matrix_complex ** matrix_A,
                            const gsl_matrix_complex * matrix_B);
 /** @brief Multiplies the double vector b on the left by the double matrix a,
  *         leaving the result in b. This is slightly different from the standard
@@ -81,7 +81,7 @@ int gsl_matrix_complex_mul(gsl_matrix_complex * matrix_A,
  *         relation between a and b must be disrupted or the convention must be
  *         violated.
  */
-int gsl_matrix_mul(const gsl_matrix * matrix_A, gsl_vector * vector_B);
+int gsl_matrix_mul(const gsl_matrix * matrix_A, gsl_vector ** vector_B);
 /** @brief Multiplies the complex vector b on the left by the complex matrix a,
  *         leaving the result in b. This is slightly different from the standard
  *         GSL functions in that the result is stored in the second operand, not
@@ -90,7 +90,7 @@ int gsl_matrix_mul(const gsl_matrix * matrix_A, gsl_vector * vector_B);
  *         violated.
  */
 int gsl_matrix_complex_mul(const gsl_matrix_complex * matrix_A,
-                           gsl_vector_complex * vector_B);
+                           gsl_vector_complex ** vector_B);
 
 // *************************
 //  Conversion Functions

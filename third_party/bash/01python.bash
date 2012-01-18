@@ -68,6 +68,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
                maninstall \
                libinstall \
                inclinstall \
+               libainstall \
                sharedinstall \
                oldsharedinstall \
                frameworkinstallmaclib \

@@ -393,7 +393,7 @@ MatrixBase<double, gsl_matrix>::operator+=(
                  "Attempted to add two matrices of different sizes",
                  "MatrixBase<double>::operator+=()"));
   }
-  if (rhs.matrix_ != NULL) {
+  if (matrix_ != NULL && rhs.matrix_ != NULL) {
     gsl_matrix_add(matrix_, rhs.matrix_);
   }
   return *this;
@@ -408,7 +408,7 @@ MatrixBase<complex, gsl_matrix_complex>::operator+=(
                  "Attempted to add two matrices of different sizes",
                  "MatrixBase<complex>::operator+=()"));
   }
-  if (rhs.matrix_ != NULL) {
+  if (matrix_ != NULL && rhs.matrix_ != NULL) {
     gsl_matrix_complex_add(matrix_, rhs.matrix_);
   }
   return *this;
@@ -417,7 +417,13 @@ MatrixBase<complex, gsl_matrix_complex>::operator+=(
 template<> MatrixBase<double, gsl_matrix>&
 MatrixBase<double, gsl_matrix>::operator-=(
   const MatrixBase<double, gsl_matrix>& rhs) {
-  if (rhs.matrix_ != NULL) {
+  if (   (number_of_rows() != rhs.number_of_rows())
+      || (number_of_columns() != rhs.number_of_columns())) {
+    throw(Squeal(Squeal::recoverable,
+                 "Attempted to subtract two matrices of different sizes",
+                 "MatrixBase<double,gsl_matrix>::operator-=()"));
+  }
+  if (matrix_ != NULL && rhs.matrix_ != NULL) {
     gsl_matrix_sub(matrix_, rhs.matrix_);
   }
   return *this;
@@ -426,7 +432,13 @@ MatrixBase<double, gsl_matrix>::operator-=(
 template<> MatrixBase<complex, gsl_matrix_complex>&
 MatrixBase<complex, gsl_matrix_complex>::operator-=(
   const MatrixBase<complex, gsl_matrix_complex>& rhs) {
-  if (rhs.matrix_ != NULL) {
+  if (   (number_of_rows() != rhs.number_of_rows())
+      || (number_of_columns() != rhs.number_of_columns())) {
+    throw(Squeal(Squeal::recoverable,
+                 "Attempted to subtract two matrices of different sizes",
+                 "MatrixBase<complex,gsl_matrix_complex>::operator-=()"));
+  }
+  if (matrix_ != NULL && rhs.matrix_ != NULL) {
     gsl_matrix_complex_sub(matrix_, rhs.matrix_);
   }
   return *this;
@@ -435,8 +447,13 @@ MatrixBase<complex, gsl_matrix_complex>::operator-=(
 template<> MatrixBase<double, gsl_matrix>&
 MatrixBase<double, gsl_matrix>::operator*=(
   const MatrixBase<double, gsl_matrix>& rhs) {
-  if (rhs.matrix_ != NULL) {
-    gsl_matrix_mul(matrix_, rhs.matrix_);
+  if (number_of_columns() != rhs.number_of_rows()) {
+    throw(Squeal(Squeal::recoverable,
+                 "Attempted to multiply two matrices of incompatible sizes",
+                 "MatrixBase<complex,gsl_matrix_complex>::operator*=()"));
+  }
+  if (matrix_ != NULL && rhs.matrix_ != NULL) {
+    gsl_matrix_mul(&matrix_, rhs.matrix_);
   }
   return *this;
 }
@@ -444,33 +461,46 @@ MatrixBase<double, gsl_matrix>::operator*=(
 template<> MatrixBase<complex, gsl_matrix_complex>&
 MatrixBase<complex, gsl_matrix_complex>::operator*=(
   const MatrixBase<complex, gsl_matrix_complex>& rhs) {
-  if (rhs.matrix_ != NULL) {
-    gsl_matrix_complex_mul(matrix_, rhs.matrix_);
+  if (number_of_columns() != rhs.number_of_rows()) {
+    throw(Squeal(Squeal::recoverable,
+                 "Attempted to multiply two matrices of incompatible sizes",
+                 "MatrixBase<complex,gsl_matrix_complex>::operator*=()"));
+  }
+  if (matrix_ != NULL && rhs.matrix_ != NULL) {
+    gsl_matrix_complex_mul(&matrix_, rhs.matrix_);
   }
   return *this;
 }
 
 template<> MatrixBase<double, gsl_matrix>&
 MatrixBase<double, gsl_matrix>::operator*=(const double& rhs) {
-  gsl_matrix_scale(matrix_, rhs);
+  if (matrix_ != NULL) {
+    gsl_matrix_scale(matrix_, rhs);
+  }
   return *this;
 }
 
 template<> MatrixBase<complex, gsl_matrix_complex>&
 MatrixBase<complex, gsl_matrix_complex>::operator *=(const complex& rhs) {
-  gsl_matrix_complex_scale(matrix_, rhs);
+  if (matrix_ != NULL) {
+    gsl_matrix_complex_scale(matrix_, rhs);
+  }
   return *this;
 }
 
 template<> MatrixBase<double, gsl_matrix>&
 MatrixBase<double, gsl_matrix>::operator/=(const double& rhs) {
-  gsl_matrix_scale(matrix_, 1./rhs);
+  if (matrix_ != NULL) {
+    gsl_matrix_scale(matrix_, 1./rhs);
+  }
   return *this;
 }
 
 template<> MatrixBase<complex, gsl_matrix_complex>&
 MatrixBase<complex, gsl_matrix_complex>::operator/=(const complex& rhs) {
-  gsl_matrix_complex_scale(matrix_, MAUS::Complex::complex(1.)/rhs);
+  if (matrix_ != NULL) {
+    gsl_matrix_complex_scale(matrix_, MAUS::Complex::complex(1.)/rhs);
+  }
   return *this;
 }
 
@@ -769,18 +799,18 @@ template class Matrix<complex>;
 //  GSL Helper Functions
 // *************************
 
-int gsl_matrix_mul(gsl_matrix * matrix_A, const gsl_matrix * matrix_B) {
+int gsl_matrix_mul(gsl_matrix ** matrix_A, const gsl_matrix * matrix_B) {
   int return_code;
-  gsl_matrix * matrix_AB = NULL;
-  matrix_AB = gsl_matrix_alloc(matrix_A->size1, matrix_B->size2);
+  gsl_matrix* matrix_AB = NULL;
+  matrix_AB = gsl_matrix_alloc((*matrix_A)->size1, matrix_B->size2);
   if (matrix_AB != NULL) {
     return_code =
     gsl_blas_dgemm(CblasNoTrans, CblasNoTrans,
-                   1., matrix_A, matrix_B,
+                   1., *matrix_A, matrix_B,
                    0., matrix_AB);
-    gsl_matrix_free(matrix_A);
-    matrix_A = gsl_matrix_alloc(matrix_AB->size1, matrix_AB->size2);
-    gsl_matrix_memcpy(matrix_A, matrix_AB);
+    gsl_matrix_free(*matrix_A);
+    *matrix_A = gsl_matrix_alloc(matrix_AB->size1, matrix_AB->size2);
+    gsl_matrix_memcpy(*matrix_A, matrix_AB);
     gsl_matrix_free(matrix_AB);
   } else {
     return_code = 0;
@@ -788,19 +818,19 @@ int gsl_matrix_mul(gsl_matrix * matrix_A, const gsl_matrix * matrix_B) {
   return return_code;
 }
 
-int gsl_matrix_complex_mul(gsl_matrix_complex * matrix_A,
+int gsl_matrix_complex_mul(gsl_matrix_complex ** matrix_A,
                            const gsl_matrix_complex * matrix_B) {
   int return_code;
   gsl_matrix_complex * matrix_AB = NULL;
-  matrix_AB = gsl_matrix_complex_alloc(matrix_A->size1, matrix_B->size2);
+  matrix_AB = gsl_matrix_complex_alloc((*matrix_A)->size1, matrix_B->size2);
   if (matrix_AB != NULL) {
     return_code =
     gsl_blas_zgemm(CblasNoTrans, CblasNoTrans,
-                   MAUS::Complex::complex(1.), matrix_A, matrix_B,
+                   MAUS::Complex::complex(1.), *matrix_A, matrix_B,
                    MAUS::Complex::complex(0.), matrix_AB);
-    gsl_matrix_complex_free(matrix_A);
-    matrix_A = gsl_matrix_complex_alloc(matrix_AB->size1, matrix_AB->size2);
-    gsl_matrix_complex_memcpy(matrix_A, matrix_AB);
+    gsl_matrix_complex_free(*matrix_A);
+    *matrix_A = gsl_matrix_complex_alloc(matrix_AB->size1, matrix_AB->size2);
+    gsl_matrix_complex_memcpy(*matrix_A, matrix_AB);
     gsl_matrix_complex_free(matrix_AB);
   } else {
     return_code = 0;
@@ -808,18 +838,17 @@ int gsl_matrix_complex_mul(gsl_matrix_complex * matrix_A,
   return return_code;
 }
 
-int gsl_matrix_mul(const gsl_matrix * matrix_A, gsl_vector * vector_b) {
+int gsl_matrix_mul(const gsl_matrix * matrix_A, gsl_vector ** vector_b) {
   int return_code;
   gsl_vector * vector_Ab = NULL;
   vector_Ab = gsl_vector_alloc(matrix_A->size1);
   if (vector_Ab != NULL) {
     return_code =
-    gsl_blas_dgemv(CblasNoTrans, 1., matrix_A, vector_b, 0., vector_Ab);
-    gsl_vector_free(vector_b);
-    vector_b = NULL;
-    vector_b = gsl_vector_alloc(vector_Ab->size);
+    gsl_blas_dgemv(CblasNoTrans, 1., matrix_A, *vector_b, 0., vector_Ab);
+    gsl_vector_free(*vector_b);
+    *vector_b = gsl_vector_alloc(vector_Ab->size);
     if (vector_Ab != NULL) {
-      gsl_vector_memcpy(vector_b, vector_Ab);
+      gsl_vector_memcpy(*vector_b, vector_Ab);
     } else {
       return_code = 0;
     }
@@ -831,20 +860,19 @@ int gsl_matrix_mul(const gsl_matrix * matrix_A, gsl_vector * vector_b) {
 }
 
 int gsl_matrix_complex_mul(const gsl_matrix_complex * matrix_A,
-                           gsl_vector_complex * vector_b) {
+                           gsl_vector_complex ** vector_b) {
   int return_code;
   gsl_vector_complex * vector_Ab = NULL;
   vector_Ab = gsl_vector_complex_alloc(matrix_A->size1);
   if (vector_Ab != NULL) {
     return_code =
     gsl_blas_zgemv(CblasNoTrans,
-                   MAUS::Complex::complex(1.), matrix_A, vector_b,
+                   MAUS::Complex::complex(1.), matrix_A, *vector_b,
                    MAUS::Complex::complex(0.), vector_Ab);
-    gsl_vector_complex_free(vector_b);
-    vector_b = NULL;
-    vector_b = gsl_vector_complex_alloc(vector_Ab->size);
+    gsl_vector_complex_free(*vector_b);
+    *vector_b = gsl_vector_complex_alloc(vector_Ab->size);
     if (vector_Ab != NULL) {
-      gsl_vector_complex_memcpy(vector_b, vector_Ab);
+      gsl_vector_complex_memcpy(*vector_b, vector_Ab);
     } else {
       return_code = 0;
     }
@@ -1203,7 +1231,7 @@ template <> Vector<double> operator*(
   Vector<double> product(rhs);
   if (   (lhs.matrix_ != NULL) && (rhs.vector_ != NULL)
       && (lhs.number_of_columns() == rhs.size())) {
-    MAUS::gsl_matrix_mul(lhs.matrix_, product.vector_);
+    MAUS::gsl_matrix_mul(lhs.matrix_, &product.vector_);
   }
   return product;
 }
@@ -1214,7 +1242,7 @@ template <> Vector<complex> operator*(
   Vector<complex> product(rhs);
   if (   (lhs.matrix_ != NULL) && (rhs.vector_ != NULL)
       && (lhs.number_of_columns() == rhs.size())) {
-    MAUS::gsl_matrix_complex_mul(lhs.matrix_, product.vector_);
+    MAUS::gsl_matrix_complex_mul(lhs.matrix_, &product.vector_);
   }
   return product;
 }
