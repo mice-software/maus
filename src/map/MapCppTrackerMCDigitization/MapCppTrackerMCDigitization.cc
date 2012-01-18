@@ -79,22 +79,17 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
 //  }
   TrackerSpill spill;
   spill.events_in_spill.clear();
-  // start processing the mc hits
-  // std::vector<Json::Value> _alldigits;
-  // _alldigits.push_back(Json::Value());
-  // Json::Value tracker_event;
 
   // ==========================================================
-  //  Loop over events
+  //  Loop over particle events and fill Event object with digits.
   for ( unsigned int i = 0; i < mc.size(); i++ ) {  // i-th particle
     Json::Value json_event = mc[i];
 
-    if ( !json_event.isMember("hits") ) {
+    if ( !json_event.isMember("hits") )
       continue; // if there are no MC hits, skip
-    }
 
     json_to_cpp(json_event, spill);
-  } // end for with var 'i' to loop particles
+  } // ends loop particles
 
   std::cout << "Digitization: Events in Spill: " << spill.events_in_spill.size() << std::endl;
   // ================= Reconstruction =========================
@@ -142,7 +137,7 @@ void MapCppTrackerMCDigitization::
     time    = hit["time"].asDouble();
     SciFiHit *a_hit = new SciFiHit(tracker, station, plane, fibre, edep, time);
     event.scifihits.push_back(a_hit);
-  //  std::cout << "Number of hits stored in event: " << event.scifihits.size() << std::endl;
+  // std::cout << "Number of hits stored in event: " << event.scifihits.size() << std::endl;
   }
   spill.events_in_spill.push_back(event);
 }
@@ -197,7 +192,7 @@ void MapCppTrackerMCDigitization::construct_digits(TrackerEvent &evt) {
       SciFiDigit *a_digit = new SciFiDigit(tracker, station, plane, chanNo, nPE, time);
       evt.scifidigits.push_back(a_digit);
     }
-  }  //  ends 'for' loop over hits
+  }  // ends 'for' loop over hits
 }
 
 int MapCppTrackerMCDigitization::compute_tdc_counts(double time) {
@@ -258,7 +253,6 @@ int MapCppTrackerMCDigitization::compute_chan_no(SciFiHit *ahit) {
 }
 
 double MapCppTrackerMCDigitization::compute_npe(double edep) {
-      // implement dead channels
       assert(_configJSON.isMember("SciFiFiberConvFactor"));
       double numbPE = _configJSON["SciFiFiberConvFactor"].asDouble() * edep;
 
@@ -330,8 +324,7 @@ bool MapCppTrackerMCDigitization::check_param(SciFiHit *hit1, SciFiHit *hit2) {
 }
 
 void MapCppTrackerMCDigitization::save_to_json(TrackerEvent &evt) {
-  // Digits
-  Json::Value digits;
+  Json::Value js_event;
   for ( unsigned int evt_i; evt_i < evt.scifidigits.size(); evt_i++ ) {
     Json::Value digits_in_event;
     digits_in_event["tracker"]= evt.scifidigits[evt_i]->get_tracker();
@@ -340,7 +333,11 @@ void MapCppTrackerMCDigitization::save_to_json(TrackerEvent &evt) {
     digits_in_event["channel"]= evt.scifidigits[evt_i]->get_channel();
     digits_in_event["npe"]    = evt.scifidigits[evt_i]->get_npe();
     digits_in_event["time"]   = evt.scifidigits[evt_i]->get_time();
-    digits.append(digits_in_event);
+    js_event.append(digits_in_event);
+    assert(js_event.isArray());
+    assert(!js_event.isNull());
   }
-  root["digits"].append(digits);
+  root["digits"].append(js_event);
+  assert(root["digits"].isArray());
+  assert(!root["digits"].isNull());
 }

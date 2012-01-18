@@ -42,60 +42,55 @@ RealDataDigitization::RealDataDigitization(TrackerSpill &spill, Json::Value daq)
   }
   tracker_event = daq["tracker1"];
 
-  assert(daq["tracker1"].size() == daq["tracker2"].size());
+  //assert(daq["tracker1"].size() == daq["tracker2"].size());
+  if( daq["tracker1"].size() != daq["tracker2"].size() )
+    std::cout << "Different sizes for Tracker1 and Tracker2." << std::endl;
+  // A DATE feature... event counting starts at 1.
+  assert(daq["tracker1"][(Json::Value::ArrayIndex)0].isNull());
+  assert(daq["tracker2"][(Json::Value::ArrayIndex)0].isNull());
 
-  for ( unsigned int i = 0; i < tracker_event.size(); ++i ) {
+  for ( unsigned int i = 1; i < tracker_event.size(); ++i ) {
     TrackerEvent event;
-    // std::cout << "Processing event " << i+1 << " of " << tracker_event.size() << std::endl;
-
-    if ( tracker_event[i].isNull() ) {
-      // Json::Value errors;
+    if( daq["tracker2"][i].isNull() )
       std::cout << "Empty event in tracker 1." << std::endl;
-    }
+    if( daq["tracker2"][i].isNull() )
+      std::cout << "Empty event in tracker 2." << std::endl;
     Json::Value input_event = tracker_event[i]["VLSB_C"];
-    // merge tracker events
+    // Merge tracker events.
     for ( unsigned int idig = 0; idig < daq["tracker2"][i]["VLSB_C"].size(); ++idig ) {
       input_event[input_event.size()] = daq["tracker2"][i]["VLSB_C"][idig];
     }
+
+    // Loop over the digits of this event.
     for ( unsigned int j = 0; j < input_event.size(); ++j ) {
-      // loop over the digits of this event
       Json::Value channel_in = input_event[j];
-     // std::cout << "Processing digit " << j+1 << " of " << input_event.size() << std::endl;
-
-      // read-in values from the cosmic data
       assert(channel_in.isMember("phys_event_number"));
-      int spill = channel_in["phys_event_number"].asInt();
-
       assert(channel_in.isMember("part_event_number"));
-      int eventNo = channel_in["part_event_number"].asInt();
-
       assert(channel_in.isMember("geo"));
-      int board = channel_in["geo"].asInt()-1;
-
       assert(channel_in.isMember("bank"));
-      int bank = channel_in["bank"].asInt();
-
       assert(channel_in.isMember("channel"));
-      int channel_ro = channel_in["channel"].asInt();
-
       assert(channel_in.isMember("adc"));
-      int adc = channel_in["adc"].asInt();
-
       assert(channel_in.isMember("tdc"));
-      int tdc = channel_in["tdc"].asInt();
-
       // assert(channel_in.isMember("discr"));
+
+      int spill = channel_in["phys_event_number"].asInt();
+      int eventNo = channel_in["part_event_number"].asInt();
+      int board = channel_in["geo"].asInt()-1;
+      int bank = channel_in["bank"].asInt();
+      int channel_ro = channel_in["channel"].asInt();
+      int adc = channel_in["adc"].asInt();
+      int tdc = channel_in["tdc"].asInt();
 
       if ( !is_good_channel(bank, board, channel_ro) )
         continue;
 
-      // get pedestal and gain from calibration
+      // Get pedestal and gain from calibration.
       assert(_calibration[board][bank][channel_ro].isMember("pedestal"));
       assert(_calibration[board][bank][channel_ro].isMember("gain"));
       double pedestal =  _calibration[board][bank][channel_ro]["pedestal"].asDouble();
       double gain     = _calibration[board][bank][channel_ro]["gain"].asDouble();
 
-      // calculate the number of photoelectrons
+      // Calculate the number of photoelectrons.
       double pe;
       if ( pedestal > 0. && gain > 0 ) {
         pe = (adc-pedestal)/gain;
@@ -104,11 +99,11 @@ RealDataDigitization::RealDataDigitization(TrackerSpill &spill, Json::Value daq)
       }
       int unique_chan  = _calibration[board][bank][channel_ro]["unique_chan"].asDouble();
 
-      // find tracker, station, plane, channel
+      // Find tracker, station, plane, channel.
       int tracker, station, plane, channel;
       get_StatPlaneChannel(board, bank, channel_ro, tracker, station, plane, channel);
 
-      // exclude missing modules
+      // Exclude missing modules.
       if ( pe > 2.0 && tracker != -1 ) {
         assert(tracker == 0 || tracker == 1);
         assert(station > 0 && station < 6);

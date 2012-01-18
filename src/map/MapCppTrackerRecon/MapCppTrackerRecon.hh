@@ -93,6 +93,8 @@ class MapCppTrackerRecon {
 
   void print_event_info(TrackerEvent &event);
 
+  void dump_info(SciFiCluster* candidate_A, SciFiCluster* candidate_B, SciFiCluster* candidate_C);
+
  private:
   /// This should be the classname
   std::string _classname;
