@@ -138,7 +138,7 @@ public:
 
 	/** @brief Index of highest power - 0 is const, 1 is linear, 2 is quadratic...
 	 */
-	unsigned int PolynomialOrder() const;
+	size_t PolynomialOrder() const;
 
 	/** @brief	Polymorphic copy constructor. This is a special copy constructor
 	 *					for inheritance structures, so that I can call vectorMap->Clone()
@@ -192,8 +192,8 @@ public:
 	/// Returns the number of coefficients required for an arbitrary dimension, order polynomial
 	/// e.g. \f$a_0 + a_1 x + a_2 y + a_3 z + a_4 x^2 + a_5 xy + a_6 y^2 + a_7 xz + a_8 yz + a_9 z^2\f$
 	/// => NumberOfPolynomialCoefficients(3,2) = 9 (indexing starts from 0).
-	static unsigned int	NumberOfPolynomialCoefficients(int pointDimension, int order);
-	unsigned int				NumberOfPolynomialCoefficients() {return NumberOfPolynomialCoefficients(point_dimmension_, PolynomialOrder());}
+	static size_t	NumberOfPolynomialCoefficients(int pointDimension, int order);
+	size_t				NumberOfPolynomialCoefficients() {return NumberOfPolynomialCoefficients(point_dimmension_, PolynomialOrder());}
 
 	/// Write out the PolynomialVector (effectively just polyCoeffs).
 	friend std::ostream& operator<<(std::ostream&,  const PolynomialVector&);
@@ -334,7 +334,7 @@ public:
 			/// so for coeff({1,2},0,1.1), coeff.space_transform({0,2,3,5}, {4,7,1,2,3,0}) would return coeff({3,4},5,1.1)
 			void             SpaceTransform(std::vector<int> space_in, std::vector<int> space_out);
 			/// if var is in inVariables return true
-			bool             HasInVariable(int var) const {for(unsigned int i=0; i<_inVarByVec.size(); i++) if(_inVarByVec[i] == var) return true; return false;}
+			bool             HasInVariable(int var) const {for(size_t i=0; i<_inVarByVec.size(); i++) if(_inVarByVec[i] == var) return true; return false;}
 
 		private:
 			std::vector<int> _inVarByVec;

@@ -24,19 +24,17 @@
 #include <vector>
 
 #include "Interface/Squeal.hh"
-//#include "Maths/PolynomialVector.hh"
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
 
-//Forward declarations for OpticsModel.hh
+// Forward declarations for OpticsModel.hh
 class OpticsModel;
 
-namespace MAUS
-{
+namespace MAUS {
 
-//Forward declarations for src/legacy/Interface/PolynomialVector.hh
+// Forward declarations for src/legacy/Interface/PolynomialVector.hh
 class PolynomialVector;
 
-//Forward declarations for PhaseSpaceVector.hh
+// Forward declarations for PhaseSpaceVector.hh
 class PhaseSpaceVector;
 
 /** @class TransferMap is a polynomial mapping, M, of a phase space vector from
@@ -51,75 +49,74 @@ class PhaseSpaceVector;
  *     V(Z) = U_0(Z) + U(Z),
  *  where V(Z) is the phase space vector that the TransferMap is applied to.
  */
-class TransferMap
-{
-public:
-  //******************************
-  // Constructors
-  //******************************
-   
-  /** @brief constructor for different input and output reference trajectories.
-   *  @params polynomial                the mapping as a polynomial vector
-   *  @params reference_trajectory_in   input reference trajectory
-   *  @params reference_trajectory_out  output reference trajectory
+class TransferMap {
+ public:
+  // ******************************
+  //  Constructors
+  // ******************************
+
+  /* @brief constructor for different input and output reference trajectories.
+   * @params polynomial                the mapping as a polynomial vector
+   * @params reference_trajectory_in   input reference trajectory
+   * @params reference_trajectory_out  output reference trajectory
    */
-	TransferMap(const PolynomialVector& polynomial,
+  TransferMap(const PolynomialVector& polynomial,
               const PhaseSpaceVector& reference_trajectory_in,
               const PhaseSpaceVector& reference_trajectory_out);
 
-  /** @brief constructor for identical input and output reference trajectories.
-   *  @params polynomial            the mapping as a polynomial vector
-   *  @params reference_trajectory  input/output reference trajectory
+  /* @brief constructor for identical input and output reference trajectories.
+   * @params polynomial            the mapping as a polynomial vector
+   * @params reference_trajectory  input/output reference trajectory
    */
   TransferMap(const PolynomialVector& polynomial,
               const PhaseSpaceVector& reference_trajectory);
 
-  /** @brief copy constructor
+  /* @brief copy constructor
    */
   TransferMap(const TransferMap& original_instance);
 
-  /** @brief destructor
+  /* @brief destructor
    */
-	~TransferMap() {;}
+  ~TransferMap() {;}
 
-  //******************************
-  // First-order Map Functions
-  //******************************
-  
-	Matrix<double> CreateTransferMatrix() const;
-  
-  //******************************
-  //          operators
-  //******************************
+  // ******************************
+  //  First-order Map Functions
+  // ******************************
 
-  /** @brief transports a beam envelope (covariance matrix) using a first-order
-   *  transfer mapping (transfer matrix). The function performs a similarity
-   *  transform on the covariance matrix: M^T C M.
+  Matrix<double> CreateTransferMatrix() const;
+
+  // ******************************
+  //           operators
+  // ******************************
+
+  /* @brief transports a beam envelope (covariance matrix) using a first-order
+   * transfer mapping (transfer matrix). The function performs a similarity
+   * transform on the covariance matrix: M^T C M.
    *
-   *  @params aCovMatrix the matrix of second moments of the phase space
-   *                     variables {t, E, x, Px, y, Py} to be transported
+   * @params aCovMatrix the matrix of second moments of the phase space
+   *                    variables {t, E, x, Px, y, Py} to be transported
    */
-	CovarianceMatrix operator*(const CovarianceMatrix & covariances) const;
+  CovarianceMatrix operator*(const CovarianceMatrix & covariances) const;
 
-  /** @brief transports a phase space vector ({t, E, x, Px, y, Py}) using a
-   *  polynomial vector mapping. The matrix of polynomial vector coefficients
-   *  operates on the delta of the initial vector and the initial
-   *  reference trajectory vector. The final reference trajectory is added onto
-   *  the transformed delta and returns the resulting vector.
+  /* @brief transports a phase space vector ({t, E, x, Px, y, Py}) using a
+   * polynomial vector mapping. The matrix of polynomial vector coefficients
+   * operates on the delta of the initial vector and the initial
+   * reference trajectory vector. The final reference trajectory is added onto
+   * the transformed delta and returns the resulting vector.
    *
-   *  @params aPhaseSpaceVector the phase space vector to be transported
+   * @params aPhaseSpaceVector the phase space vector to be transported
    */
-	PhaseSpaceVector operator*(PhaseSpaceVector const & vector) const;
+  PhaseSpaceVector operator*(PhaseSpaceVector const & vector) const;
 
-	friend std::ostream& operator<<(std::ostream& out, const TransferMap& tm);
+  friend std::ostream& operator<<(std::ostream& out, const TransferMap& tm);
 
-protected:
+ protected:
 
-   TransferMap();
-  
-	const PolynomialVector& polynomial_;
-	const PhaseSpaceVector& reference_trajectory_in_;
-	const PhaseSpaceVector& reference_trajectory_out_;
+  TransferMap();
+
+  const PolynomialVector& polynomial_;
+  const PhaseSpaceVector& reference_trajectory_in_;
+  const PhaseSpaceVector& reference_trajectory_out_;
 };
 
 std::ostream& operator<<(std::ostream& out, const TransferMap& map);

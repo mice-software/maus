@@ -24,30 +24,28 @@
 
 #include "Maths/Vector.hh"
 
-namespace MAUS
-{
+namespace MAUS {
 
-class PhaseSpaceVector : public Vector<double>
-{
-public:
-  /** @brief	Construct with all elements initialized to zero.
+class PhaseSpaceVector : public Vector<double> {
+ public:
+  /* @brief	Construct with all elements initialized to zero.
    */
   PhaseSpaceVector();
 
-  /** @brief  Base class copy constructor. This only copies the first 6 elements
-   *          of the Vector<double> object.
+  /* @brief  Base class copy constructor. This only copies the first 6 elements
+   *         of the Vector<double> object.
    */
-  PhaseSpaceVector(const Vector<double>& original_instance);
+  explicit PhaseSpaceVector(const Vector<double>& original_instance);
 
-  /** @brief  Copy constructor.
+  /* @brief  Copy constructor.
    */
   PhaseSpaceVector(const PhaseSpaceVector& original_instance);
 
-  /** @brief Create with coordinates from an array. Order is t, E, x, Px, y, Py.
+  /* @brief Create with coordinates from an array. Order is t, E, x, Px, y, Py.
    */
   PhaseSpaceVector(double const * const array);
 
-  /** @brief	Create with the given initial coordinates.
+  /* @brief	Create with the given initial coordinates.
    */
   PhaseSpaceVector(const double t, const double E,
                    const double x, const double Px,
@@ -55,7 +53,7 @@ public:
 
   ~PhaseSpaceVector();
 
-  //accessors
+  // accessors
   inline double time()       const {return (*this)[0];}
   inline double t()          const {return (*this)[0];}
   inline double energy()     const {return (*this)[1];}
@@ -66,8 +64,8 @@ public:
   inline double y()          const {return (*this)[4];}
   inline double y_momentum() const {return (*this)[5];}
   inline double Py()         const {return (*this)[5];}
-  
-  //mutators
+
+  // mutators
   inline void set_time(double time)              {(*this)[0] = time;}
   inline void set_t(double time)                {(*this)[0] = time;}
   inline void set_energy(double energy)          {(*this)[1] = energy;}

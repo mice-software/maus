@@ -1,4 +1,4 @@
-/* This file is part of MAUS: http://  micewww.pp.rl.ac.uk:8080/projects/maus
+/* This file is part of MAUS: http://   micewww.pp.rl.ac.uk:8080/projects/maus
  * 
  * MAUS is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,7 +11,7 @@
  * GNU General Public License for more details.
  * 
  * You should have received a copy of the GNU General Public License
- * along with MAUS.  If not, see <http://  www.gnu.org/licenses/>.
+ * along with MAUS.  If not, see <http://   www.gnu.org/licenses/>.
  */
 
 /* Author: Peter Lane
@@ -30,16 +30,16 @@ class HepSymMatrix;
 }
 
 namespace MAUS {
-//*************************
-// Forward Declarations
-//*************************
+// *************************
+//  Forward Declarations
+// *************************
 
 class Matrix<double>;
 class CovarianceMatrix;
 
-//############################
-// Free Functions
-//############################
+// ############################
+//  Free Functions
+// ############################
 
 /* @brief Return a rotated covariance matrix.
  */
@@ -47,9 +47,9 @@ CovarianceMatrix rotate(const CovarianceMatrix& covariances, double angle);
 
 std::ostream& operator<<(std::ostream& out, CovarianceMatrix cov);
 
-//############################
-// CovarianceMatrix
-//############################
+// ############################
+//  CovarianceMatrix
+// ############################
 
 /** @class CovarianceMatrix
  *  Extend SymmetricMatrix to represent a 6x6 matrix of covariances
@@ -57,7 +57,7 @@ std::ostream& operator<<(std::ostream& out, CovarianceMatrix cov);
  *  For example, element [1][3] is <E x> and [5][4] is <Py Px>.
  */
 class CovarianceMatrix : public SymmetricMatrix {
- public: 
+ public:
   /** @brief  Create a 6x6 matrix with all elements initialized to zero.
    */
   CovarianceMatrix();
@@ -75,7 +75,7 @@ class CovarianceMatrix : public SymmetricMatrix {
    *          elements of the SymmetricMatrix object.
    */
   explicit CovarianceMatrix(const SymmetricMatrix& symmetric_matrix);
-  
+
   /** @brief  HepSymMatrix copy constructor. This copies only the first 6x6
    *          block elements of the HepSymMatrix object.
    */
@@ -83,7 +83,7 @@ class CovarianceMatrix : public SymmetricMatrix {
 
   /** @brief  Construct from an array of doubles in row-major order.
    */
-  CovarianceMatrix(double const * const array_matrix);
+  explicit CovarianceMatrix(double const * const array_matrix);
 
   /** @brief  Set the matrix elements using the Penn parameterisation for a
    *          cylindrically symmetric matrix.
@@ -105,7 +105,7 @@ class CovarianceMatrix : public SymmetricMatrix {
    */
   CovarianceMatrix(double mass,
                    double momentum,
-									 double charge,
+                   double charge,
                    double emittance_t,
                    double beta_t,
                    double alpha_t,
@@ -139,25 +139,25 @@ class CovarianceMatrix : public SymmetricMatrix {
    *  @param[in] dispersion_prime_y change in y dispersion w.r.t. s
    */
   CovarianceMatrix(double mass,
-									 double momentum,
-									 double energy,
-                   double emittance_x, 
-									 double beta_x,
+                   double momentum,
+                   double energy,
+                   double emittance_x,
+                   double beta_x,
                    double alpha_x,
-									 double emittance_y,
+                   double emittance_y,
                    double beta_y,
-									 double alpha_y,
+                   double alpha_y,
                    double emittance_l,
-									 double beta_l,
+                   double beta_l,
                    double alpha_l,
                    double dispersion_x,
-									 double dispersion_prime_x,
+                   double dispersion_prime_x,
                    double dispersion_y,
-									 double dispersion_prime_y);
+                   double dispersion_prime_y);
 
-  //********************************
-  //*** Public member functions  ***
-  //********************************
+  // ********************************
+  // *** Public member functions  ***
+  // ********************************
 
   /* @brief Return true if the Covariance matrix is positive definite
    */

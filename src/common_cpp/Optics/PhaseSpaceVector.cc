@@ -17,43 +17,39 @@
 /* Author: Peter Lane
  */
 
-#include "PhaseSpaceVector.hh"
+#include "src/common_cpp/Optics/PhaseSpaceVector.hh"
 
 #include "Interface/Squeak.hh"
 #include "Maths/Vector.hh"
 
-namespace MAUS
-{
+namespace MAUS {
 
 PhaseSpaceVector::PhaseSpaceVector()
-  : Vector<double>(6)
+    : Vector<double>(6)
 { }
 
 PhaseSpaceVector::PhaseSpaceVector(const Vector<double>& original_instance)
-	: Vector<double>()
-{
-	if (original_instance.size() < 6)
-	{
-		throw(Squeal(Squeal::recoverable,
-								 "Attempted to construct with a Vector<double> containing fewer than six elements",
-								 "PhaseSpaceVector::PhaseSpaceVector(Vector<double>)"));
-	}
-	build_vector(6);
-	for (size_t index=1; index<=6; ++index)
-	{
-		(*this)(index) = original_instance(index);
-	}
+    : Vector<double>() {
+  if (original_instance.size() < 6) {
+    throw(Squeal(Squeal::recoverable,
+                 "Attempted to construct with a Vector<double> containing "
+                 "fewer than six elements",
+                 "PhaseSpaceVector::PhaseSpaceVector(Vector<double>)"));
+  }
+  build_vector(6);
+  for (size_t index = 1; index <= 6; ++index) {
+    (*this)(index) = original_instance(index);
+  }
 }
 
 PhaseSpaceVector::PhaseSpaceVector(const PhaseSpaceVector& original_instance)
-	: Vector<double>(original_instance)
+    : Vector<double>(original_instance)
 { }
 
 PhaseSpaceVector::PhaseSpaceVector(const double t, const double E,
                                    const double x, const double Px,
                                    const double y, const double Py)
-  : Vector<double>()
-{
+    : Vector<double>() {
   const double data[6] = {
     t, E, x, Px, y, Py
   };
@@ -61,16 +57,15 @@ PhaseSpaceVector::PhaseSpaceVector(const double t, const double E,
 }
 
 PhaseSpaceVector::PhaseSpaceVector(double const * const array)
-	:Vector<double>(array, 6)
+    :Vector<double>(array, 6)
 { }
 
 PhaseSpaceVector::~PhaseSpaceVector() { }
 
-std::ostream& operator<<(std::ostream& out, const PhaseSpaceVector& vector) 
-{
-	out << "t: " << vector[0] << "E: "   << vector[1]
+std::ostream& operator<<(std::ostream& out, const PhaseSpaceVector& vector) {
+  out << "t: " << vector[0] << "E: "   << vector[1]
       << "x: " << vector[2] << "Px: "  << vector[3]
       << "y: " << vector[4] << "Py: "  << vector[5];
-	return out;
+  return out;
 }
 }  // namespace MAUS

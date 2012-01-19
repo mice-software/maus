@@ -1,4 +1,4 @@
-/* This file is part of MAUS: http://  micewww.pp.rl.ac.uk:8080/projects/maus
+/* This file is part of MAUS: http://   micewww.pp.rl.ac.uk:8080/projects/maus
  * 
  * MAUS is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,7 +11,7 @@
  * GNU General Public License for more details.
  * 
  * You should have received a copy of the GNU General Public License
- * along with MAUS.  If not, see <http://  www.gnu.org/licenses/>.
+ * along with MAUS.  If not, see <http://   www.gnu.org/licenses/>.
  */
 
 /* Author: Peter Lane
@@ -35,16 +35,16 @@ namespace MAUS {
 
 using MAUS::Matrix;
 
-//############################
-// Free Functions
-//############################
+// ############################
+//  Free Functions
+// ############################
 
-//****************************
-// Conversion Functions
-//****************************
+// ****************************
+//  Conversion Functions
+// ****************************
 
-CovarianceMatrix rotate(const CovarianceMatrix& covariances, const double angle)
-{
+CovarianceMatrix rotate(const CovarianceMatrix& covariances,
+                        const double angle) {
   double fcos = ::cos(angle);
   double fsin = ::sin(angle);
   double rotation_array[36] = {
@@ -52,91 +52,81 @@ CovarianceMatrix rotate(const CovarianceMatrix& covariances, const double angle)
     0.,    1.,    0.,    0.,    0.,    0.,
     0.,    0.,    fcos,  0.,    fsin,  0.,
     0.,    0.,    0.,    fcos,  0.,    fsin,
-    0.,    0.,    -fsin,0.,    fcos,  0.,
-    0.,    0.,    0.,    -fsin,0.,    fcos
+    0.,    0.,    -fsin, 0.,    fcos,  0.,
+    0.,    0.,    0.,    -fsin, 0.,    fcos
   };
   Matrix<double> rotation(6, 6, rotation_array);
   Matrix<double> rotation_transpose = transpose(rotation);
 
-  //the orthogonal similarity transform of a symmetric matrix is also symmetric
+  // the orthogonal similarity transform of a symmetric matrix is also symmetric
   CovarianceMatrix rotated_covariances(
     rotation * covariances * rotation_transpose);
 
   return rotated_covariances;
 }
 
-//############################
-// CovarianceMatrix
-//############################
+// ############################
+//  CovarianceMatrix
+// ############################
 
-//****************************
-// Constructors
-//****************************
+// ****************************
+//  Constructors
+// ****************************
 
 CovarianceMatrix::CovarianceMatrix() : SymmetricMatrix(6)
-{
-}
+{ }
 
 CovarianceMatrix::CovarianceMatrix(const CovarianceMatrix& original_instance)
-  : SymmetricMatrix((SymmetricMatrix) original_instance)
+    : SymmetricMatrix((SymmetricMatrix) original_instance)
 { }
 
 CovarianceMatrix::CovarianceMatrix(const Matrix<double>& matrix)
-  : SymmetricMatrix()
-{
+    : SymmetricMatrix() {
   if (   (matrix.number_of_rows() < 6)
-      || (matrix.number_of_columns() < 6))
-  {
+      || (matrix.number_of_columns() < 6)) {
     throw(Squeal(Squeal::recoverable,
-                 "Attempted to construct with a Matrix<double> containing fewer than six rows and/or columns",
+                 "Attempted to construct with a Matrix<double> containing "
+                 "fewer than six rows and/or columns",
                  "CovarianceMatrix::CovarianceMatrix(Matrix<double>)"));
   }
   build_matrix(6);
-  for (size_t row=1; row<=6; ++row)
-  {
-    for (size_t column=1; column<=row; ++column)
-    {
+  for (size_t row = 1; row <= 6; ++row) {
+    for (size_t column = 1; column <= row; ++column) {
       set(row, column, matrix(row, column));
     }
   }
 }
 
 CovarianceMatrix::CovarianceMatrix(const SymmetricMatrix& symmetric_matrix)
-  : SymmetricMatrix()
-{
+    : SymmetricMatrix() {
   if (   (symmetric_matrix.number_of_rows() < 6)
-      || (symmetric_matrix.number_of_columns() < 6))
-  {
+      || (symmetric_matrix.number_of_columns() < 6)) {
     throw(Squeal(Squeal::recoverable,
-                 "Attempted to construct with a SymmetricMatrix containing fewer than six rows and/or columns",
+                 "Attempted to construct with a SymmetricMatrix containing "
+                 "fewer than six rows and/or columns",
                  "CovarianceMatrix::CovarianceMatrix(Matrix<double>)"));
   }
   build_matrix(6);
-  for (size_t row=1; row<=6; ++row)
-  {
-    for (size_t column=1; column<=row; ++column)
-    {
+  for (size_t row = 1; row <= 6; ++row) {
+    for (size_t column = 1; column <= row; ++column) {
       set(row, column, symmetric_matrix(row, column));
     }
   }
 }
 
 CovarianceMatrix::CovarianceMatrix(const ::CLHEP::HepSymMatrix& hep_sym_matrix)
-  : SymmetricMatrix()
-{
+    : SymmetricMatrix() {
   if (   (hep_sym_matrix.num_row() < 6)
-      || (hep_sym_matrix.num_col() < 6))
-  {
+      || (hep_sym_matrix.num_col() < 6)) {
     throw(Squeal(Squeal::recoverable,
-                 "Attempted to construct with a HepSymMatrix containing fewer than six rows and/or columns",
+                 "Attempted to construct with a HepSymMatrix containing fewer "
+                 "than six rows and/or columns",
                  "CovarianceMatrix::CovarianceMatrix(Matrix<double>)"));
   }
   build_matrix(6);
   double element;
-  for (size_t row=1; row<=6; ++row)
-  {
-    for (size_t column=1; column<=row; ++column)
-    {
+  for (size_t row = 1; row <= 6; ++row) {
+    for (size_t column = 1; column <= row; ++column) {
       element = hep_sym_matrix(row, column);
       Matrix<double>::operator()(row, column) = element;
       Matrix<double>::operator()(column, row) = element;
@@ -145,7 +135,7 @@ CovarianceMatrix::CovarianceMatrix(const ::CLHEP::HepSymMatrix& hep_sym_matrix)
 }
 
 CovarianceMatrix::CovarianceMatrix(double const * const array_matrix)
-  : SymmetricMatrix(6, array_matrix)
+    : SymmetricMatrix(6, array_matrix)
 { }
 
 CovarianceMatrix::CovarianceMatrix(double mass,
@@ -163,19 +153,18 @@ CovarianceMatrix::CovarianceMatrix(double mass,
                                    double dispersion_prime_x,
                                    double dispersion_y,
                                    double dispersion_prime_y)
-  : SymmetricMatrix()
-{
-  //*** calculate some intermediate values ***
+    : SymmetricMatrix() {
+  // *** calculate some intermediate values ***
   double energy     = ::sqrt(momentum * momentum + mass * mass);
-  //FIXME: Penn says = charge * Bz / (2. * momentum)
+  // FIXME: Penn says = charge * Bz / (2. * momentum)
   double kappa      = ::CLHEP::c_light * Bz / (2.* momentum);
   double gamma_t    = (1 + alpha_t*alpha_t
                        + (beta_t*kappa - Ltwiddle_t)*(beta_t*kappa-Ltwiddle_t))
                     / beta_t;
-  //FIXME: Penn says = (1+alpha_l*alpha_l+beta_l*beta_l*kappa*kappa)/beta_l
+  // FIXME: Penn says = (1+alpha_l*alpha_l+beta_l*beta_l*kappa*kappa)/beta_l
   double gamma_l    = (1+alpha_l*alpha_l)/beta_l;
 
-  //*** calculate the lower triangle covariances <A B> = sigma_A_B ***
+  // *** calculate the lower triangle covariances <A B> = sigma_A_B ***
   double sigma_t_t  =  emittance_l * mass * beta_l / momentum;
 
   double sigma_E_t  = -emittance_l * mass * alpha_l;
@@ -189,22 +178,22 @@ CovarianceMatrix::CovarianceMatrix(double mass,
   double sigma_Px_E =  dispersion_prime_x * sigma_E_E / energy;
   double sigma_Px_x = -mass * emittance_t * alpha_t;
   double sigma_Px_Px=  mass * momentum * emittance_t * gamma_t;
-  
+
   double sigma_y_t  =  0.;
   double sigma_y_E  = -dispersion_y * sigma_E_E / energy;
   double sigma_y_x  =   0.;
-  //FIXME: Penn says = mass * emittance_t * (beta_t*kappa - Ltwiddle_t)
+  // FIXME: Penn says = mass * emittance_t * (beta_t*kappa - Ltwiddle_t)
   double sigma_y_Px =  0.;
-  //FIXME: Penn says = emittance_t * beta_t * mass / momentum
+  // FIXME: Penn says = emittance_t * beta_t * mass / momentum
   double sigma_y_y  =  -mass * emittance_l * alpha_t;
-  
-  //FIXME: Penn says = mass * momentum * emittance_t * gamma_t
+
+  // FIXME: Penn says = mass * momentum * emittance_t * gamma_t
   double sigma_Py_t =  0.;
   double sigma_Py_E =  dispersion_prime_y * sigma_E_E / energy;
-  //FIXME: Penn says = -mass * emittance_t * (beta_t*kappa-Ltwiddle_t)
+  // FIXME: Penn says = -mass * emittance_t * (beta_t*kappa-Ltwiddle_t)
   double sigma_Py_x = -mass * emittance_t * (beta_t*kappa-Ltwiddle_t) * charge;
   double sigma_Py_Px=  0.;
-  //FIXME: Penn says = -mass * emittance_t & gamma_t
+  // FIXME: Penn says = -mass * emittance_t & gamma_t
   double sigma_Py_y =  mass * momentum * emittance_l * gamma_t;
   double sigma_Py_Py=  0.;
 
@@ -235,14 +224,13 @@ CovarianceMatrix::CovarianceMatrix(double mass,
                                    double dispersion_x,
                                    double dispersion_prime_x,
                                    double dispersion_y,
-                                   double dispersion_prime_y)
-{
-  //*** calculate some intermediate values ***
+                                   double dispersion_prime_y) {
+  // *** calculate some intermediate values ***
   double gamma_x = (1+alpha_x*alpha_x)/beta_x;
   double gamma_y = (1+alpha_y*alpha_y)/beta_y;
   double gamma_l = (1+alpha_l*alpha_l)/beta_l;
-  
-  //*** calculate the lower triangle covariances <A B> = sigma_A_B ***
+
+  // *** calculate the lower triangle covariances <A B> = sigma_A_B ***
   double sigma_t_t  = emittance_l * mass * beta_l / momentum;
 
   double sigma_E_t  = -emittance_l * mass * alpha_l;
@@ -269,7 +257,7 @@ CovarianceMatrix::CovarianceMatrix(double mass,
   double sigma_Py_Px= 0.;
   double sigma_Py_y = -emittance_y * mass * alpha_y;
   double sigma_Py_Py= emittance_y * mass * momentum * gamma_y;
-  
+
 
   double covariances[36] = {
     sigma_t_t,  0.,         0.,         0.,           0.,         0.,
@@ -279,24 +267,21 @@ CovarianceMatrix::CovarianceMatrix(double mass,
     sigma_y_t,  sigma_y_E,  sigma_y_x,  sigma_y_Px,   sigma_y_y,  0.,
     sigma_Py_t, sigma_Py_E, sigma_Py_x, sigma_Py_Px,  sigma_Py_y, sigma_Py_Py
   };
-  
+
   build_matrix(6, covariances);
 }
 
-bool CovarianceMatrix::IsPositiveDefinite()
-{
+bool CovarianceMatrix::IsPositiveDefinite() {
   size_t min_row = 1;
   size_t min_column = 1;
   size_t rows = size();
-  for(size_t length=1; length<=rows; length++)
-  {
-    //Sylvester Criterion - all the leading principle minors must be positive
-    if (determinant(submatrix(min_row, length, min_column, length)) <= 0)
-    {
+  for (size_t length = 1; length <= rows; length++) {
+    // Sylvester Criterion - all the leading principle minors must be positive
+    if (determinant(submatrix(min_row, length, min_column, length)) <= 0) {
       return false;
     }
   }
-  
+
   return true;
 }
 }  // namespace MAUS
