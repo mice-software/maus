@@ -102,7 +102,7 @@ class Formatter: #pylint: disable = R0902
         top_node = doc.createElement("Other_Information")
         doc.appendChild(top_node)
         maus_dir = doc.createElement("MAUS_ROOT_DIR")
-        maus_dir.setAttribute("location", os.environ["MAUS_ROOT_DIR"])
+        maus_dir.setAttribute("location", self.path_out)
         top_node.appendChild(maus_dir)
         g4_step = doc.createElement("G4StepMax")
         g4_step.setAttribute("Value", str(self.g4_step_max))

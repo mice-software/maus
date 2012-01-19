@@ -29,12 +29,29 @@
         <xs:attribute name="value" type="xs:double"/>
         <xs:attribute name="units" use="optional"/>
     </xs:complexType>
-    <xs:complexType name="FileReferenceType">
+    <xs:complexType name="MausFileReferenceType">
         <xs:sequence>
             <xs:element name="Position" type="PositionType"/>
             <xs:element name="Rotation" type="PositionType"/>
         </xs:sequence>
         <xs:attribute name="name" type="xs:anyURI" use="required"></xs:attribute>
+    </xs:complexType>
+    <xs:complexType name="MAUS_ROOT_DIR_Type">
+        <xs:attribute name="location" default="/home"/>
+    </xs:complexType>
+    <xs:complexType name="G4StepMaxType">
+        <xs:attribute name="Value" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="NameType">
+        <xs:attribute name="name" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="FieldDimensionsType">
+        <xs:attribute name="height" use="required" type="xs:double"/>
+        <xs:attribute name="width" use="required" type="xs:double"/>
+        <xs:attribute name="length" use="required" type="xs:double"/>
+    </xs:complexType>
+    <xs:complexType name="ValueType">
+        <xs:attribute name="Value" use="required" type="xs:double"/>
     </xs:complexType>
 <!--++++++++++++++++++++++++++++++++Tracker Base TYPES+++++++++++++++++++++++++++++++++++++-->
     <xs:complexType name="NumberType">
@@ -88,12 +105,6 @@
         <xs:attribute name="red" use="required" type="xs:double"/>
         <xs:attribute name="green" use="required" type="xs:double"/>
         <xs:attribute name="blue" use="required" type="xs:double"/>
-    </xs:complexType>
-    <xs:complexType name="MAUS_ROOT_DIR_Type">
-        <xs:attribute name="location" default="/home"/>
-    </xs:complexType>
-    <xs:complexType name="G4StepMaxType">
-        <xs:attribute name="Value" use="required"/>
     </xs:complexType>
 <!--++++++++++++++++++++++++++++++++Tracker Schema+++++++++++++++++++++++++++++++++++++-->
     <xs:complexType name="SciFi_Geo_Trkr_Type">
@@ -159,6 +170,63 @@
         </xs:sequence>
         <xs:attribute name="ID_Number" use="required" type="xs:integer"/>
     </xs:complexType>
+<!--+++++++++++++++++++++++++++++++++++FIELD TYPES+++++++++++++++++++++++++++++++++++++++++-->
+    <xs:complexType name="DipoleType">
+        <xs:annotation>
+            <xs:documentation>
+                This is the dipole type which holds
+                the information required to build a dipoles magnetic 
+                field in Geant4
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="Volume" minOccurs="1" maxOccurs="1" type="NameType"/>
+            <xs:element name="FieldType" minOccurs="1" maxOccurs="1" type="NameType"/>
+            <xs:element name="FieldMapMode" minOccurs="1" maxOccurs="1" type="NameType"/>
+            <xs:element name="FileType" minOccurs="1" maxOccurs="1" type="NameType"/>
+            <xs:element name="FileName" minOccurs="1" maxOccurs="1" type="NameType"/>
+            <xs:element name="Symmetry" minOccurs="1" maxOccurs="1" type="NameType"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="QuadrupoleType">
+        <xs:annotation>
+            <xs:documentation>
+                This is the dipole type which holds
+                the information required to build a quadrupoles magnetic 
+                field in Geant4
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="Volume" minOccurs="1" maxOccurs="1" type="NameType"/>
+            <xs:element name="FieldType" minOccurs="1" maxOccurs="1" type="NameType"/>
+            <xs:element name="Dimensions" minOccurs="1" maxOccurs="1" type="FieldDimensionsType"/>
+            <xs:element name="FieldStrength" minOccurs="1" maxOccurs="1" type="ValueType"/>
+            <xs:element name="Pole" minOccurs="1" maxOccurs="1" type="ValueType"/>
+            <xs:element name="MaxEndPole" minOccurs="1" maxOccurs="1" type="ValueType"/>
+            <xs:element name="EndFieldType" minOccurs="1" maxOccurs="1" type="NameType"/>
+            <xs:element name="EndLength" minOccurs="1" maxOccurs="1" type="ValueType"/>
+            <xs:element name="CentreLength" minOccurs="1" maxOccurs="1" type="ValueType"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="SolenoidType">
+        <xs:annotation>
+            <xs:documentation>
+                This is the dipole type which holds
+                the information required to build a solenoid magnetic 
+                field in Geant4
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="Volume" minOccurs="1" maxOccurs="1" type="NameType"/>
+            <xs:element name="FieldType" minOccurs="1" maxOccurs="1" type="NameType"/>
+            <xs:element name="FileName" minOccurs="1" maxOccurs="1" type="NameType"/>
+            <xs:element name="CurrentDensity" minOccurs="1" maxOccurs="1" type="ValueType"/>
+            <xs:element name="Length" minOccurs="1" maxOccurs="1" type="ValueType"/>
+            <xs:element name="Thickness" minOccurs="1" maxOccurs="1" type="ValueType"/>
+            <xs:element name="InnerRadius" minOccurs="1" maxOccurs="1" type="ValueType"/>
+            <xs:element name="ScaleFactor" minOccurs="1" maxOccurs="1" type="NameType"/>
+        </xs:sequence>
+    </xs:complexType>
 <!--+++++++++++++++++++++++++++++++++++MIDDLE TYPES++++++++++++++++++++++++++++++++++++++++-->
     <xs:complexType name="TrackerType">
         <xs:annotation>
@@ -182,7 +250,7 @@
                         <xs:element name="Material" type="LengthType"/>
                         <xs:element name="Tracker" type="LengthType"/>
                         <xs:element name="Invisible" type="LengthType"/>
-                        <xs:element name="Tracker_Element" type="FileReferenceType" maxOccurs="unbounded"></xs:element>
+                        <xs:element name="Tracker_Element" type="MausFileReferenceType" maxOccurs="unbounded"></xs:element>
                     </xs:sequence>
                     <xs:attribute name="name"/>
                 </xs:complexType>
@@ -225,6 +293,9 @@
     </xs:complexType>
     <xs:complexType name="G4Field_InformationType">
         <xs:sequence>
+            <xs:element name="Dipole" minOccurs="0" maxOccurs="unbounded" type="DipoleType"/>
+            <xs:element name="Quadrupole" minOccurs="0" maxOccurs="unbounded" type="QuadrupoleType"/>
+            <xs:element name="Solenoid" minOccurs="0" maxOccurs="unbounded" type="SolenoidType"/>
             <xs:element name="G4Magnet_info" type="G4MagnetType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
@@ -239,7 +310,7 @@
     </xs:complexType>
     <xs:complexType name="Other_InfromationType">
         <xs:sequence>
-            <xs:element name="MAUS_ROOT_DIR" type="MAUS_ROOT_DIR_Type"/>
+            <xs:element name="GDML_Files" type="MAUS_ROOT_DIR_Type"/>
             <xs:element name="G4StepMax" type="G4StepMaxType"/>
         </xs:sequence>
     </xs:complexType>

@@ -1,13 +1,38 @@
 <?xml version="1.0" ?><gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:something">
 <MICE_Information>
-    <Configuration_information>
-    </Configuration_information>
+    <Configuration_Information>
+    </Configuration_Information>
     <G4Field_Information>
-        <G4Magnet_info File_Location="/home/QCFieldMap.txt" Name="Quad 1 to 3" Type="QC"/>
-        <G4Magnet_info File_Location="/home/Dipole.txt" Name="D1" Type="Dipole"/>
-        <G4Magnet_info File_Location="/home/IVFieldMap.txt" Name="Quad 4 to 6" Type="IV"/>
-        <G4Magnet_info File_Location="/home/Dipole.txt" Name="D2" Type="Dipole"/>
-        <G4Magnet_info File_Location="/home/DS.txt" Name="Decay Solenoid" Type="DS"/>    
+        <Dipole>
+            <Volume name="None"/>
+            <FieldType name="MagneticFieldMap"/>
+            <FieldMapMode name="Read"/>
+            <FileType name="g4bl3dGrid"/>
+            <FileName name="${MAUS_ROOT_DIR}/FILES/Models/Modules/BeamLine/B1_6inch.table"/>
+            <Symmetry name="Dipole"/>
+        </Dipole>
+        <Quadrupole>
+            <Volume name="None"/>
+            <FieldType name="Multipole"/>
+            <Dimensions height="0.5" width="0.5" length="2.0"/>
+            <FieldStrength Value="1"/>
+            <Pole Value="2"/>
+            <MaxEndPole Value="4"/>
+            <EndFieldType name="Tanh"/>
+            <EndLength Value="0.12528"/>
+            <CentreLength Value="0.330899"/>
+        </Quadrupole>
+        <Solenoid>
+            <Volume name="None"/>
+            <FieldType name="Solenoid"/>
+            <FileName name="${MAUS_ROOT_DIR}/tmp/coupling.fld"/>
+            <CurrentDensity Value="1"/>
+            <Length Value="250"/>
+            <Thickness Value="116"/>
+            <InnerRadius Value="725"/>
+            <ScaleFactor name="-96.21"/>
+        </Solenoid>
+        <G4Magnet_info File_Location="/home/QCFieldMap.txt" Name="Quad 1 to 3" Type="QC"/>    
     </G4Field_Information>
     <Detector_Information>
         <TOF/>
@@ -36,7 +61,7 @@
         </Tracker>
     </Detector_Information>
     <Other_Information>
-        <MAUS_ROOT_DIR location="/home"/>
+        <GDML_Files location="/home"/>
         <G4StepMax Value="0.0"/>
     </Other_Information>
 </MICE_Information>

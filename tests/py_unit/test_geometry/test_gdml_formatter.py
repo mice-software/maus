@@ -168,7 +168,7 @@ class  TestGDMLFormatter(unittest.TestCase): #pylint: disable = C0103, R0904
         self.gdml.format()
         for gdml_file in [self.gdml.configuration_file]+self.gdml.stepfiles:
             (schema_found, material_found, formatted_found) = (0, 0, 0)
-            (run_found, mice_found, maus_root_dir_found) = (0, 0, 0)
+            (run_found, mice_found, path_out_found) = (0, 0, 0)
             filename = self.path_out+'/'+gdml_file
             fin = open(filename, 'r')
             if gdml_file == self.gdml.configuration_file:
@@ -185,16 +185,16 @@ class  TestGDMLFormatter(unittest.TestCase): #pylint: disable = C0103, R0904
                         material_found += 1
                     if line.find('<!-- Formatted for MAUS -->') >= 0:
                         formatted_found += 1
-                    maus = 'location="' + os.environ['MAUS_ROOT_DIR'] + '"'
+                    maus = 'location="' + self.gdml.path_out + '"'
                     if line.find(maus) >= 0:
-                        maus_root_dir_found += 1
-                        print str(maus_root_dir_found) + "maus number"
+                        path_out_found += 1
+                        print str(path_out_found) + "maus number"
                 self.assertEqual(run_found, 1,
                             msg="Run tag not found "+filename)
                 self.assertEqual(mice_found, 1,
                             msg="MICE Info tag not found "+filename)
-                self.assertEqual(maus_root_dir_found, 1,
-                            msg="MAUS_ROOT_DIR tag not found "+filename)
+                self.assertEqual(path_out_found, 1,
+                            msg="path_out tag not found "+filename)
             else:
                 for line in fin.readlines():
                     if line.find(self.gdml.schema) >= 0:
