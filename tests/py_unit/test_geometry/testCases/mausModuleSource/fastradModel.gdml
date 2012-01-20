@@ -11,7 +11,7 @@
 
 <gdml xmlns:gdml="http://cern.ch/2001/Schemas/GDML" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xsi:noNamespaceSchemaLocation="/home/matt/maus-littlefield/src/common_py/geometry/GDML_3_0_0/schema/gdml.xsd">
+	xsi:noNamespaceSchemaLocation="/usr/local/src/GDML_2_10_0/GDMLSchema/gdml.xsd">
 
 
 <define>

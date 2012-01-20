@@ -123,7 +123,7 @@ class Formatter: #pylint: disable = R0902
         This method adds the field information to the configuration GDML.
         """
         self.add_other_info()
-        config = minidom.parse(os.path.join(self.path_in, gdmlfile)) 
+        config = minidom.parse(os.path.join(self.path_out, gdmlfile)) 
         field = minidom.parse(os.path.join(self.path_out, self.field_file))
         for node in field.getElementsByTagName("MICE_Information"):
             maus_info = node
