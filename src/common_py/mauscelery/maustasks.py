@@ -17,15 +17,13 @@ MAUS Celery tasks.
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-import os 
-import re
-import signal
 import sys
 import traceback
 
 from multiprocessing import current_process 
 from types import ListType
 from types import StringType
+from types import UnicodeType
 
 from celery.registry import tasks
 from celery.task import Task
@@ -68,7 +66,7 @@ class MausGenericTransformTask(Task):
         ["MapCppTOFDigits", ["MapCppTOFSlabHits", "MapCppTOFSpacePoint"]]
         @endverbatim
         Transforms must be in the MAUS module namespace e.g. 
-        MAUS.MapCppTOFSlabHits.        
+        MAUS.MapCppTOFSlabHits.
         @param self Object reference.
         @param transform Transform name or list of names.
         @return transform object or MapPyGroup object (if given a list).
@@ -76,12 +74,14 @@ class MausGenericTransformTask(Task):
         or contains an element which is not a list or string, or 
         specifies an unknown transform name.
         """
+        print transform.__class__
         if isinstance(transform, ListType):
             group = MAUS.MapPyGroup()
             for transform_name in transform:
                 group.append(self.create_transform(transform_name))
             return group
-        elif isinstance(transform, StringType):
+        elif isinstance(transform, StringType) \
+            or isinstance(transform, UnicodeType):
             if not hasattr(MAUS, transform):
                 raise ValueError("No such transform: %s" % transform)
             transform_class = getattr(MAUS, transform)
@@ -96,14 +96,13 @@ class MausGenericTransformTask(Task):
         @param self Object reference.
         @param configuration JSON configuration document.
         """
-        print "---set_configuration IN"
         self.__transform.death()
-        # TODO add errors to return value.
+        # MIKE add errors to return value.
         self.__configuration = configuration
-        # TODO add errors to return value.
+        # MIKE add errors to return value.
         self.__transform.birth(self.__configuration)
-        # TODO add errors to return value.
-        print "---set_configuration OUT"
+        # MIKE add errors to return value.
+        print "Configuration applied"
 
     def set_transform(self, transform):
         """
@@ -118,14 +117,13 @@ class MausGenericTransformTask(Task):
         or contains an element which is not a list or string, or 
         specifies an unknown transform name.
         """
-        print "---set_transform IN"
         self.__transform.death()
-        # TODO add errors to return value.
+        # MIKE add errors to return value.
         self.__transform = self.create_transform(transform)
-        # TODO add errors to return value.
+        # MIKE add errors to return value.
         self.__transform.birth(self.__configuration)
-        # TODO add errors to return value.
-        print "---set_transform OUT"
+        # MIKE add errors to return value.
+        print "Transform is now: %s" % transform
 
     def reset_task(self, configuration = None, transform = None):
         """
@@ -141,33 +139,27 @@ class MausGenericTransformTask(Task):
         or contains an element which is not a list or string, or 
         specifies an unknown transform name.
         """
-        print "---reset_task IN"
         # Validate arguments before invoking death()
         if (transform != None):
             new_transform = self.create_transform(transform)
-            # TODO add errors to return value.
+            # MIKE add errors to return value.
+            print "Updated transform"
         else:
             new_transform = self.__transform
         if (configuration != None):
-            # TODO validate it's JSON
+            # MIKE validate it's JSON
             self.__configuration = configuration
-            # TODO add errors to return value.
+            # MIKE add errors to return value.
+            print "Updated configuration"
         self.__transform.death()
-        # TODO add errors to return value.
+        # MIKE add errors to return value.
         self.__transform = new_transform
         self.__transform.birth(self.__configuration)
-        # TODO add errors to return value.
-        print "---reset_task OUT"
+        # MIKE add errors to return value.
+        print "Reset task" 
 
-    def run(self, workers, spill, client_id = "Unknown", spill_id = 0):
-        print "RUN!"
-        print "Sleep..."
-        import time
-        time.sleep(20)
-        print "...awake!"
-        return spill
-
-    def run2(self, spill, client_id = "Unknown", spill_id = 0):
+    def run(self, workers_to_delete, spill, client_id = "Unknown", 
+        spill_id = 0):
         """
         Apply the current transform to the spill and return the new
         spill. 
@@ -178,11 +170,15 @@ class MausGenericTransformTask(Task):
         @return JSON document string holding new spill.
         """
         logger = Task.get_logger()
+        print "Run - (%s) - sleep!" % workers_to_delete
+#        import time
+#        time.sleep(5)
         if logger.isEnabledFor(logging.INFO):
             logger.info("Task invoked by %s on spill %d" \
-                % (client_id, spill_id))    
-            spill = self.__transform.process(spill)
-        # TODO error handling.
+                % (client_id, spill_id))
+        spill = self.__transform.process(spill)
+        # MIKE error handling.
+#        print "...awake!"
         return spill
 
 tasks.register(MausGenericTransformTask) # pylint:disable=W0104, E1101
@@ -230,7 +226,7 @@ def reset_pool_term(panel):
     except: # pylint: disable=W0702
         traceback.print_exc(file=sys.stdout)
         status["status"] = "error"
-        # TODO add errors to return value.
+        # MIKE add errors to return value.
     print status
     return status
 
@@ -256,7 +252,7 @@ def reset_pool_term_job(panel):
     except: # pylint: disable=W0702
         traceback.print_exc(file=sys.stdout)
         status["status"] = "error"
-        # TODO add errors to return value.
+        # MIKE add errors to return value.
     print status
     return status
 
@@ -279,23 +275,37 @@ def reset_pool_stopstart(panel):
         traceback.print_exc(file = sys.stdout)
         print "Error"
         status["status"] = "error"
-        # TODO add errors to status
+        # MIKE add errors to status
     print status
     return status
 
 @Panel.register
 def reset_pool_resize(panel):
+    """
+    Reset the worker pool by shrinking and growing the pool.
+    @param panel Celery panel object.
+    @return status document.
+    """
     pool = panel.consumer.pool
     pool_size = pool.num_processes
-    print pool_size
-    print "Shrinking pool..."
-    pool.shrink(pool_size)
-    print "Growing pool..."
-    pool.grow(pool_size)
     print "Current pool size %s" % pool_size
+    status = {}
+    try:
+        print "Shrinking pool..."
+        pool.shrink(pool_size)
+        print "Growing pool..."
+        pool.grow(pool_size)
+        status["status"] = "ok"
+    except: # pylint: disable=W0702
+        traceback.print_exc(file = sys.stdout)
+        print "Error"
+        status["status"] = "error"
+        # MIKE add errors to status
+    print "Current pool size %s" % pool_size
+    return status
 
 @Panel.register
-def reset_maus(panel, configuration = None, transform = None):
+def reset_maus(panel, configuration = None, transform = None): # pylint: disable=W0613, C0301
     """
     Death the current transforms, create new transforms then
     birth them with the given configuration document.
@@ -310,8 +320,10 @@ def reset_maus(panel, configuration = None, transform = None):
     list but has an element which is not a list or a string
     holding a known transform class name.
     """
-    print "Configuring..."
+    print "Resetting worker"
+    print transform
     maustask = tasks["mauscelery.maustasks.MausGenericTransformTask"]
     maustask.reset_task(configuration, transform)
-    print "...configured"
+    print "...reset!"
+    # MIKE errors
     return {"status": "ok"}
