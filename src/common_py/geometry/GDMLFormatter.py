@@ -101,7 +101,7 @@ class Formatter: #pylint: disable = R0902
         doc = minidom.Document()
         top_node = doc.createElement("Other_Information")
         doc.appendChild(top_node)
-        maus_dir = doc.createElement("MAUS_ROOT_DIR")
+        maus_dir = doc.createElement("GDML_Files")
         maus_dir.setAttribute("location", self.path_out)
         top_node.appendChild(maus_dir)
         g4_step = doc.createElement("G4StepMax")

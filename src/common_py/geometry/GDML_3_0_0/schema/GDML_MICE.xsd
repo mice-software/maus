@@ -49,9 +49,14 @@
         <xs:attribute name="height" use="required" type="xs:double"/>
         <xs:attribute name="width" use="required" type="xs:double"/>
         <xs:attribute name="length" use="required" type="xs:double"/>
+        <xs:attribute name="units" use="required"/>
     </xs:complexType>
     <xs:complexType name="ValueType">
         <xs:attribute name="Value" use="required" type="xs:double"/>
+    </xs:complexType>
+    <xs:complexType name="ValueUnitType">
+        <xs:attribute name="Value" use="required" type="xs:double"/>
+        <xs:attribute name="units" use="required"/>
     </xs:complexType>
 <!--++++++++++++++++++++++++++++++++Tracker Base TYPES+++++++++++++++++++++++++++++++++++++-->
     <xs:complexType name="NumberType">
@@ -198,14 +203,14 @@
         </xs:annotation>
         <xs:sequence>
             <xs:element name="Volume" minOccurs="1" maxOccurs="1" type="NameType"/>
-            <xs:element name="FieldType" minOccurs="1" maxOccurs="1" type="NameType"/>
+            <xs:element name="FieldType" minOccurs="1" maxOccurs="1" type="ValueUnitType"/>
             <xs:element name="Dimensions" minOccurs="1" maxOccurs="1" type="FieldDimensionsType"/>
             <xs:element name="FieldStrength" minOccurs="1" maxOccurs="1" type="ValueType"/>
             <xs:element name="Pole" minOccurs="1" maxOccurs="1" type="ValueType"/>
             <xs:element name="MaxEndPole" minOccurs="1" maxOccurs="1" type="ValueType"/>
             <xs:element name="EndFieldType" minOccurs="1" maxOccurs="1" type="NameType"/>
-            <xs:element name="EndLength" minOccurs="1" maxOccurs="1" type="ValueType"/>
-            <xs:element name="CentreLength" minOccurs="1" maxOccurs="1" type="ValueType"/>
+            <xs:element name="EndLength" minOccurs="1" maxOccurs="1" type="ValueUnitType"/>
+            <xs:element name="CentreLength" minOccurs="1" maxOccurs="1" type="ValueUnitType"/>
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="SolenoidType">

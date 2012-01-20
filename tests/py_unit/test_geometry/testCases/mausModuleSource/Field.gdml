@@ -14,13 +14,13 @@
         <Quadrupole>
             <Volume name="None"/>
             <FieldType name="Multipole"/>
-            <Dimensions height="0.5" width="0.5" length="2.0"/>
-            <FieldStrength Value="1"/>
+            <Dimensions height="0.5" width="0.5" length="2.0" units="m"/>
+            <FieldStrength Value="1" units="T/M"/>
             <Pole Value="2"/>
             <MaxEndPole Value="4"/>
             <EndFieldType name="Tanh"/>
-            <EndLength Value="0.12528"/>
-            <CentreLength Value="0.330899"/>
+            <EndLength Value="0.12528" units="m"/>
+            <CentreLength Value="0.330899" units="m"/>
         </Quadrupole>
         <Solenoid>
             <Volume name="None"/>

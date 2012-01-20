@@ -44,15 +44,15 @@
                             {
                             Volume <xsl:value-of select="Volume/@name"/>
                             PropertyString FieldType <xsl:value-of select="FieldType/@name"/>
-                            PropertyDouble Heigth <xsl:value-of select="Dimensions/@height"/>
-                            PropertyDouble Width <xsl:value-of select="Dimensions/@width"/>
-                            PropertyDouble Lenght<xsl:value-of select="Dimensions/@length"/>
-                            PropertyDouble FieldStrength <xsl:value-of select="FieldStrength/@Value"/>
+                            PropertyDouble Heigth <xsl:value-of select="Dimensions/@height"/><xsl:text> </xsl:text><xsl:value-of select="Dimensions/@units"/>
+                            PropertyDouble Width <xsl:value-of select="Dimensions/@width"/><xsl:text> </xsl:text><xsl:value-of select="Dimensions/@units"/>
+                            PropertyDouble Lenght<xsl:value-of select="Dimensions/@length"/><xsl:text> </xsl:text><xsl:value-of select="Dimensions/@units"/>
+                            PropertyDouble FieldStrength <xsl:value-of select="FieldStrength/@Value"/><xsl:text> </xsl:text><xsl:value-of select="Dimensions/@units"/>
                             PropertyInt Pole <xsl:value-of select="Pole/@Value"/>
                             PropertyInt MaxEndPole <xsl:value-of select="MaxEndPole/@Value"/>
                             PropertyString EndFieldType <xsl:value-of select="EndFieldType/@name"/>
-                            PropertyDouble EndLength <xsl:value-of select="EndLength/@Value"/>
-                            PropertyDouble CentreLength <xsl:value-of select="CentreLength/@Value"/>
+                            PropertyDouble EndLength <xsl:value-of select="EndLength/@Value"/><xsl:text> </xsl:text><xsl:value-of select="Dimensions/@units"/>
+                            PropertyDouble CentreLength <xsl:value-of select="CentreLength/@Value"/><xsl:text> </xsl:text><xsl:value-of select="Dimensions/@units"/>
                             }
                 </xsl:for-each>
                 <xsl:for-each select="MICE_Information/G4Field_Information/Solenoid">
