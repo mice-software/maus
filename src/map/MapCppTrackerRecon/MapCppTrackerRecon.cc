@@ -102,7 +102,12 @@ std::string MapCppTrackerRecon::process(std::string document) {
     if ( event.scificlusters.size() ) {
       spacepoint_recon(event);
     }
-    print_event_info(event);
+ //   print_event_info(event);
+
+    // Fit straight line.
+    if ( event.scifispacepoints.size() ) {
+      fit(event);
+    }
     save_to_json(event);
   }
   // ==========================================================
@@ -126,7 +131,7 @@ bool MapCppTrackerRecon::check_sanity_daq(Json::Value daq) {
   // Check sanity of the 'daq_data' branch
   if ( !root.isMember("daq_data") || root["daq_data"].isNull() ) {
     Json::Value errors;
-    std::cout << "bad DAQ_DATA, skipping event" << std::endl;
+    //std::cout << "bad DAQ_DATA, skipping event" << std::endl;
     std::stringstream ss;
     ss << _classname << " says:" << "Empty spill.";
     errors["missing_branch"] = ss.str();
@@ -137,26 +142,28 @@ bool MapCppTrackerRecon::check_sanity_daq(Json::Value daq) {
   file.open("errors.txt", std::ios::out | std::ios::app);
 
   if ( !daq.isMember("tracker1") ) {
-    file << 1 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << "\n";
+    file << 0 << " " << 1 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << "\n";
     //std::cout << "Missing tracker1." << std::endl;
   }
   if ( !daq.isMember("tracker2") ) {
-    file << 0 << " " << 1 << " " << 0 << " " << 0 << " " << 0 << "\n";
+    file << 0 << " " << 0 << " " << 1 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << "\n";
     //std::cout << "Missing tracker2." << std::endl;
   }
 
   if ( daq["tracker1"].size() != daq["tracker2"].size() ) {
-    file << 0 << " " << 0 << " " << 1 << " " << 0 << " " << 0 << "\n";
+    file << 0 << " " << 0 << " " << 0 << " " << 1 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << "\n";
     //std::cout << "Different sizes for Tracker1 and Tracker2." << std::endl;
   }
 
   // A DATE feature... event counting starts at 1.
   if ( !daq["tracker1"][(Json::Value::ArrayIndex)0].isNull()) {
-    file << 0 << " " << 0 << " " << 0 << " " << 1 << " " << 0 << "\n";
+    file << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 1 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << "\n";
+    //file << daq["tracker1"][0] << "\n";
     //std::cout << "First event for Tracker1 is not Null!" << std::endl;
   }
   if ( !daq["tracker2"][(Json::Value::ArrayIndex)0].isNull()) {
-    file << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 1 << "\n";
+    file << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 1 << " " << 0 << " " << 0 << " " << 0 << "\n";
+    //file << daq["tracker2"][0] << "\n";
     //std::cout << "First event for Tracker2 is not Null!" << std::endl;
   }
 
@@ -200,6 +207,11 @@ void MapCppTrackerRecon::cluster_recon(TrackerEvent &evt) {
   int seeds_size = seeds.size();
   if ( seeds_size > ClustException ) {
     std::cout << "Massive event, won't bother to reconstruct." << std::endl;
+    std::ofstream file;
+    file.open("errors.txt", std::ios::out | std::ios::app);
+    file << 1 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << "\n";
+    file.close();
+
     return;
   }
   // Sort seeds so that we use higher npe first.
@@ -288,11 +300,11 @@ void MapCppTrackerRecon::spacepoint_recon(TrackerEvent &evt) {
               assert( !candidate_A->isUsed() && !candidate_B->isUsed() && !candidate_C->isUsed());
               SciFiSpacePoint* triplet = new SciFiSpacePoint(candidate_A, candidate_B, candidate_C);
               evt.scifispacepoints.push_back(triplet);
-             // std::cout << candidate_A->get_channel() << " " <<
-             //              candidate_B->get_channel() << " " <<
-             //              candidate_C->get_channel() << std::endl;
+              // std::cout << candidate_A->get_channel() << " " <<
+              //              candidate_B->get_channel() << " " <<
+              //              candidate_C->get_channel() << std::endl;
               assert(candidate_A->isUsed() && candidate_B->isUsed() && candidate_C->isUsed());
-              // dump_info(candidate_A, candidate_B, candidate_C);
+              dump_info(candidate_A, candidate_B, candidate_C);
               // triplet_counter += 1;
             }
           }  // ends plane 2
@@ -383,7 +395,7 @@ bool MapCppTrackerRecon::clusters_are_not_used(SciFiCluster* candidate_A,
 
 void MapCppTrackerRecon::save_to_json(TrackerEvent &evt) {
   Json::Value digits;
-  for ( unsigned int evt_i; evt_i < evt.scifidigits.size(); evt_i++ ) {
+  for ( unsigned int evt_i=0; evt_i < evt.scifidigits.size(); evt_i++ ) {
     Json::Value digits_in_event;
     digits_in_event["tracker"]= evt.scifidigits[evt_i]->get_tracker();
     digits_in_event["station"]= evt.scifidigits[evt_i]->get_station();
@@ -397,7 +409,7 @@ void MapCppTrackerRecon::save_to_json(TrackerEvent &evt) {
 
   Json::Value spacepoints;
   Json::Value channels;
-  for ( unsigned int evt_i; evt_i < evt.scifispacepoints.size(); evt_i++ ) {
+  for ( unsigned int evt_i=0; evt_i < evt.scifispacepoints.size(); evt_i++ ) {
     Json::Value spacepoints_in_event;
     channels = Json::Value(Json::arrayValue);
     channels.clear();
@@ -424,7 +436,51 @@ void MapCppTrackerRecon::save_to_json(TrackerEvent &evt) {
   root["spacepoints"].append(spacepoints);
 }
 
+void MapCppTrackerRecon::fit(TrackerEvent &evt) {
+  bool station_hit[2][6] = { {false, false, false, false, false, false},
+                             {false, false, false, false, false, false}};
 
+  std::ofstream file;
+  file.open("triplets_ana.txt", std::ios::out | std::ios::app);
+
+  std::vector<SciFiSpacePoint*> event[2][6];
+  for ( unsigned int sp_i=0; sp_i < evt.scifispacepoints.size(); sp_i++ ) {
+    int tracker = evt.scifispacepoints[sp_i]->get_tracker();
+    int station = evt.scifispacepoints[sp_i]->get_station();
+    // int evt.scifispacepoints[evt_i]->get_npe();
+    // evt.scifispacepoints[evt_i]->get_time();
+    std::string type = evt.scifispacepoints[sp_i]->get_type();
+    event[tracker][station].push_back(evt.scifispacepoints[sp_i]);
+
+    if (type == "triplet" ) {
+      file << tracker << " " << station << " " << 3 << "\n";
+    } else {
+      file << tracker << " " << station << " " << 2 << "\n";
+    }
+
+    station_hit[tracker][station]=true;
+  }
+  file.close();
+
+  std::ofstream file1;
+  file1.open("efficiency_ana.txt", std::ios::out | std::ios::app);
+  for ( int tr = 0; tr < 2; tr++ ) {
+    int hit_counter = 0;
+    if ( station_hit[tr][1] && station_hit[tr][5] ) {
+      for ( int i = 2; i < 5; i++ ) {
+        if ( station_hit[i] )
+          hit_counter+=1;
+      }
+      file1 << tr << " " << hit_counter << "\n";
+    }
+  }
+  file1.close();
+
+}
+
+
+
+ 
 void MapCppTrackerRecon::print_event_info(TrackerEvent &event) {
   std::cout << event.scifidigits.size() << " "
             << event.scificlusters.size() << " "

@@ -33,10 +33,20 @@ RealDataDigitization::RealDataDigitization(TrackerSpill &spill, Json::Value daq)
 
   for ( unsigned int i = 1; i < tracker_event.size(); ++i ) {
     TrackerEvent event;
-    if ( daq["tracker2"][i].isNull() )
-      std::cout << "Empty event in tracker 1." << std::endl;
-    if ( daq["tracker2"][i].isNull() )
-      std::cout << "Empty event in tracker 2." << std::endl;
+    if ( daq["tracker1"][i].isNull() ) {
+      //std::cout << "Empty event in tracker 1." << std::endl;
+      std::ofstream file;
+      file.open("errors.txt", std::ios::out | std::ios::app);
+      file << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 1 << " " << 0 << " " << 0 << "\n";
+      file.close();
+    }
+    if ( daq["tracker2"][i].isNull() ) {
+      //std::cout << "Empty event in tracker 2." << std::endl;
+      std::ofstream file;
+      file.open("errors.txt", std::ios::out | std::ios::app);
+      file << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 1 << " " << 0 << "\n";
+      file.close();
+    }
     Json::Value input_event = tracker_event[i]["VLSB_C"];
     // Merge tracker events.
     for ( unsigned int idig = 0; idig < daq["tracker2"][i]["VLSB_C"].size(); ++idig ) {
