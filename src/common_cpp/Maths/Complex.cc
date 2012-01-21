@@ -37,19 +37,19 @@ MAUS::complex complex(const MAUS::complex& original_instance) {
   return c;
 }
 
-MAUS::complex complex(const double& real) {
+MAUS::complex complex(const double  real) {
   MAUS::complex c = gsl_complex_rect(real, 0.0);
   return c;
 }
 
-MAUS::complex complex(const double& real, const double& imag) {
+MAUS::complex complex(const double  real, const double  imag) {
   MAUS::complex c = gsl_complex_rect(real, imag);
   return c;
 }
 
 }  // namespace MAUS::Complex
 
-const MAUS::complex polar(const double& r, const double& theta) {
+const MAUS::complex polar(const double  r, const double  theta) {
   return gsl_complex_polar(r, theta);
 }
 
@@ -109,7 +109,7 @@ MAUS::complex pow(const MAUS::complex& z, const MAUS::complex& a) {
   return gsl_complex_pow(z, a);
 }
 
-MAUS::complex pow(const MAUS::complex& z, const double& x) {
+MAUS::complex pow(const MAUS::complex& z, const double  x) {
   return gsl_complex_pow_real(z, x);
 }
 
@@ -117,7 +117,7 @@ MAUS::complex sqrt(const MAUS::complex& z) {
   return gsl_complex_sqrt(z);
 }
 
-MAUS::complex sqrt(const double& x) {
+MAUS::complex sqrt(const double  x) {
   return gsl_complex_sqrt_real(x);
 }
 
@@ -203,7 +203,7 @@ MAUS::complex& operator+=(MAUS::complex& lhs, const MAUS::complex& rhs) {
   return lhs;
 }
 
-MAUS::complex& operator+=(MAUS::complex& lhs, const double& rhs) {
+MAUS::complex& operator+=(MAUS::complex& lhs, const double  rhs) {
   lhs.dat[0] += rhs;
   return lhs;
 }
@@ -214,7 +214,7 @@ MAUS::complex& operator-=(MAUS::complex& lhs, const MAUS::complex& rhs) {
   return lhs;
 }
 
-MAUS::complex& operator-=(MAUS::complex& lhs, const double& rhs) {
+MAUS::complex& operator-=(MAUS::complex& lhs, const double  rhs) {
   lhs.dat[0] -= rhs;
   return lhs;
 }
@@ -226,7 +226,7 @@ MAUS::complex& operator*=(MAUS::complex& lhs, const MAUS::complex& rhs) {
   return lhs;
 }
 
-MAUS::complex& operator*=(MAUS::complex& lhs, const double& rhs) {
+MAUS::complex& operator*=(MAUS::complex& lhs, const double  rhs) {
   lhs.dat[0] *= rhs;
   lhs.dat[1] *= rhs;
   return lhs;
@@ -242,7 +242,7 @@ MAUS::complex& operator/=(MAUS::complex& lhs, const MAUS::complex& rhs) {
   return lhs;
 }
 
-MAUS::complex& operator/=(MAUS::complex& lhs, const double& rhs) {
+MAUS::complex& operator/=(MAUS::complex& lhs, const double  rhs) {
   lhs.dat[0] /= rhs;
   lhs.dat[1] /= rhs;
   return lhs;
@@ -259,12 +259,12 @@ const MAUS::complex operator+(const MAUS::complex&   lhs,
 }
 
 const MAUS::complex operator+(const MAUS::complex&   lhs,
-                              const double&          rhs) {
+                              const double           rhs) {
   MAUS::complex result = MAUS::Complex::complex(lhs);
   return result += rhs;
 }
 
-const MAUS::complex operator+(const double&          lhs,
+const MAUS::complex operator+(const double           lhs,
                               const MAUS::complex&   rhs) {
   MAUS::complex result = MAUS::Complex::complex(lhs);
   return result += rhs;
@@ -277,12 +277,12 @@ const MAUS::complex operator-(const MAUS::complex&   lhs,
 }
 
 const MAUS::complex operator-(const MAUS::complex&   lhs,
-                              const double&          rhs) {
+                              const double           rhs) {
   MAUS::complex result = MAUS::Complex::complex(lhs);
   return result -= rhs;
 }
 
-const MAUS::complex operator-(const double&          lhs,
+const MAUS::complex operator-(const double           lhs,
                               const MAUS::complex&   rhs) {
   MAUS::complex result = MAUS::Complex::complex(lhs);
   return result -= rhs;
@@ -295,12 +295,12 @@ const MAUS::complex operator*(const MAUS::complex&   lhs,
 }
 
 const MAUS::complex operator*(const MAUS::complex&   lhs,
-                              const double&          rhs) {
+                              const double           rhs) {
   MAUS::complex result = MAUS::Complex::complex(lhs);
   return result *= rhs;
 }
 
-const MAUS::complex operator*(const double&          lhs,
+const MAUS::complex operator*(const double           lhs,
                               const MAUS::complex&   rhs) {
   MAUS::complex result = MAUS::Complex::complex(lhs);
   return result *= rhs;
@@ -313,12 +313,12 @@ const MAUS::complex operator/(const MAUS::complex&   lhs,
 }
 
 const MAUS::complex operator/(const MAUS::complex&   lhs,
-                              const double&          rhs) {
+                              const double           rhs) {
   MAUS::complex result = MAUS::Complex::complex(lhs);
   return result /= rhs;
 }
 
-const MAUS::complex operator/(const double&          lhs,
+const MAUS::complex operator/(const double           lhs,
                               const MAUS::complex&   rhs) {
   MAUS::complex result = MAUS::Complex::complex(lhs);
   return result /= rhs;
@@ -334,11 +334,11 @@ const bool operator==(const MAUS::complex&           lhs,
 }
 
 const bool operator==(const MAUS::complex&           lhs,
-                      const double&                  rhs) {
+                      const double                   rhs) {
   return lhs.dat[1] == 0.0 && lhs.dat[0] == rhs;
 }
 
-const bool operator==(const double&                  lhs,
+const bool operator==(const double                   lhs,
                       const MAUS::complex&           rhs) {
   return rhs.dat[1] == 0.0 && rhs.dat[0] == lhs;
 }
@@ -349,11 +349,11 @@ const bool operator!=(const MAUS::complex&           lhs,
 }
 
 const bool operator!=(const MAUS::complex&           lhs,
-                      const double&                  rhs) {
+                      const double                   rhs) {
   return !(lhs == rhs);
 }
 
-const bool operator!=(const double&                  lhs,
+const bool operator!=(const double                   lhs,
                       const MAUS::complex&           rhs) {
   return !(lhs == rhs);
 }

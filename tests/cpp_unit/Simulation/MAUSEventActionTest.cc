@@ -21,9 +21,9 @@
 #include "src/common_cpp/Simulation/MAUSEventAction.hh"
 #include "src/legacy/Interface/Squeal.hh"
 
-using namespace MAUS;
+using MAUS::MAUSEventAction;
+using MAUS::MAUSGeant4Manager;
 
-namespace {
 TEST(MAUSEventActionTest, SetGetEventsTest) {
     MAUSEventAction* _eventAct
                            = MAUSGeant4Manager::GetInstance()->GetEventAction();
@@ -99,6 +99,5 @@ TEST(MAUSEventActionTest, EndOfEventActionTest) {
     events[1]["tracks"] = tracks;
     events[1]["virtual_hits"] = virtual_hits;
     EXPECT_EQ(_g4->GetEventAction()->GetEvents(), events);
-}
 }
 

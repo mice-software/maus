@@ -46,10 +46,10 @@ typedef gsl_complex complex;
 // ************************
 namespace Complex {
 MAUS::complex complex(const MAUS::complex& original_instance);
-MAUS::complex complex(const double& real);
-MAUS::complex complex(const double& real, const double& imag);
+MAUS::complex complex(const double  real);
+MAUS::complex complex(const double  real, const double  imag);
 }  // namespace MAUS::Complex
-const MAUS::complex polar(const double& r, const double& theta);
+const MAUS::complex polar(const double  r, const double  theta);
 
 // **********************
 //  Property Functions
@@ -72,9 +72,9 @@ MAUS::complex exp(const MAUS::complex& z);
 MAUS::complex log(const MAUS::complex& z);
 MAUS::complex log10(const MAUS::complex& z);
 MAUS::complex pow(const MAUS::complex& z, const MAUS::complex& a);
-MAUS::complex pow(const MAUS::complex& z, const double& x);
+MAUS::complex pow(const MAUS::complex& z, const double  x);
 MAUS::complex sqrt(const MAUS::complex& z);
-MAUS::complex sqrt(const double& x);
+MAUS::complex sqrt(const double  x);
 
 // **********************
 //  Trig Functions
@@ -117,13 +117,13 @@ MAUS::complex operator -(const MAUS::complex& operand);
 // **********************
 
 MAUS::complex& operator+=(MAUS::complex& lhs, const MAUS::complex& rhs);
-MAUS::complex& operator+=(MAUS::complex& lhs, const double&        rhs);
+MAUS::complex& operator+=(MAUS::complex& lhs, const double         rhs);
 MAUS::complex& operator-=(MAUS::complex& lhs, const MAUS::complex& rhs);
-MAUS::complex& operator-=(MAUS::complex& lhs, const double&        rhs);
+MAUS::complex& operator-=(MAUS::complex& lhs, const double         rhs);
 MAUS::complex& operator*=(MAUS::complex& lhs, const MAUS::complex& rhs);
-MAUS::complex& operator*=(MAUS::complex& lhs, const double&        rhs);
+MAUS::complex& operator*=(MAUS::complex& lhs, const double         rhs);
 MAUS::complex& operator/=(MAUS::complex& lhs, const MAUS::complex& rhs);
-MAUS::complex& operator/=(MAUS::complex& lhs, const double&        rhs);
+MAUS::complex& operator/=(MAUS::complex& lhs, const double         rhs);
 
 // **********************
 //  Algebraic Operators
@@ -132,26 +132,26 @@ MAUS::complex& operator/=(MAUS::complex& lhs, const double&        rhs);
 const MAUS::complex operator+(const MAUS::complex&   lhs,
                               const MAUS::complex&   rhs);
 const MAUS::complex operator+(const MAUS::complex&   lhs,
-                              const double&          rhs);
-const MAUS::complex operator+(const double&          lhs,
+                              const double           rhs);
+const MAUS::complex operator+(const double           lhs,
                               const MAUS::complex&   rhs);
 const MAUS::complex operator-(const MAUS::complex&   lhs,
                               const MAUS::complex&   rhs);
 const MAUS::complex operator-(const MAUS::complex&   lhs,
-                              const double&          rhs);
-const MAUS::complex operator-(const double&          lhs,
+                              const double           rhs);
+const MAUS::complex operator-(const double           lhs,
                               const MAUS::complex&   rhs);
 const MAUS::complex operator*(const MAUS::complex&   lhs,
                               const MAUS::complex&   rhs);
 const MAUS::complex operator*(const MAUS::complex&   lhs,
-                              const double&          rhs);
-const MAUS::complex operator*(const double&          lhs,
+                              const double           rhs);
+const MAUS::complex operator*(const double           lhs,
                               const MAUS::complex&   rhs);
 const MAUS::complex operator/(const MAUS::complex&   lhs,
                               const MAUS::complex&   rhs);
 const MAUS::complex operator/(const MAUS::complex&   lhs,
-                              const double&          rhs);
-const MAUS::complex operator/(const double&          lhs,
+                              const double           rhs);
+const MAUS::complex operator/(const double           lhs,
                               const MAUS::complex&   rhs);
 
 // **********************
@@ -161,14 +161,14 @@ const MAUS::complex operator/(const double&          lhs,
 const bool operator==(const MAUS::complex&           lhs,
                       const MAUS::complex&           rhs);
 const bool operator==(const MAUS::complex&           lhs,
-                      const double&                  rhs);
-const bool operator==(const double&                  lhs,
+                      const double                   rhs);
+const bool operator==(const double                   lhs,
                       const MAUS::complex&           rhs);
 const bool operator!=(const MAUS::complex&           lhs,
                       const MAUS::complex&           rhs);
 const bool operator!=(const MAUS::complex&           lhs,
-                      const double&                  rhs);
-const bool operator!=(const double&                  lhs,
+                      const double                   rhs);
+const bool operator!=(const double                   lhs,
                       const MAUS::complex&           rhs);
 // **********************
 //  Stream Operators

@@ -43,7 +43,7 @@ class PhaseSpaceVector : public Vector<double> {
 
   /* @brief Create with coordinates from an array. Order is t, E, x, Px, y, Py.
    */
-  PhaseSpaceVector(double const * const array);
+  explicit PhaseSpaceVector(double const * const array);
 
   /* @brief	Create with the given initial coordinates.
    */
