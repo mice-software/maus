@@ -103,11 +103,11 @@ TEST_F(SciFiPlaneTest, Test_num_fibres_in_all_planes) {
         SciFiPlane(aplane, mat, tracker);
 
         // plane 0 (view v), plane 1 (view x), plane 2 (view w)
-        if ( trackerNo == 0 && stationNo == 5 && planeNo == 1 )
+        if ( trackerNo == 0 && stationNo == 5 && planeNo == 0 )
           EXPECT_EQ(SciFiPlane::SciFi_numFibres, 215*7);
-        if ( planeNo == 0 || planeNo == 2 )
+        if ( planeNo == 1 || planeNo == 2 )
           EXPECT_EQ(SciFiPlane::SciFi_numFibres, 214*7);
-        if ( planeNo == 1 && !(trackerNo == 0 && stationNo == 5) )
+        if ( planeNo == 0 && !(trackerNo == 0 && stationNo == 5) )
           EXPECT_EQ(SciFiPlane::SciFi_numFibres, 212*7);
       }
     }

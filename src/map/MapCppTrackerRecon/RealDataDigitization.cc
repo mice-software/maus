@@ -65,8 +65,8 @@ RealDataDigitization::RealDataDigitization(TrackerSpill &spill, Json::Value daq)
       assert(channel_in.isMember("tdc"));
       // assert(channel_in.isMember("discr"));
 
-      int spill = channel_in["phys_event_number"].asInt();
-      int eventNo = channel_in["part_event_number"].asInt();
+      // int spill = channel_in["phys_event_number"].asInt();
+      // int eventNo = channel_in["part_event_number"].asInt();
       int board = channel_in["geo"].asInt()-1;
       int bank = channel_in["bank"].asInt();
       int channel_ro = channel_in["channel"].asInt();
@@ -89,7 +89,7 @@ RealDataDigitization::RealDataDigitization(TrackerSpill &spill, Json::Value daq)
       } else {
         pe = -10.0;
       }
-      int unique_chan  = _calibration[board][bank][channel_ro]["unique_chan"].asDouble();
+      // int unique_chan  = _calibration[board][bank][channel_ro]["unique_chan"].asDouble();
 
       // Find tracker, station, plane, channel.
       int tracker, station, plane, channel;

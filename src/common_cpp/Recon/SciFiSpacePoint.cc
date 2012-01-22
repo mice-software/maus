@@ -43,9 +43,9 @@ void SciFiSpacePoint::make_triplet(SciFiCluster* vcluster,
                                             SciFiCluster* xcluster,
                                             SciFiCluster* wcluster) {
   // Set clusters as used
-  vcluster->setUsed();
-  xcluster->setUsed();
-  wcluster->setUsed();
+  vcluster->set_used();
+  xcluster->set_used();
+  wcluster->set_used();
 /*
   channels = Json::Value(Json::arrayValue);
   channels.clear();
@@ -123,8 +123,8 @@ void SciFiSpacePoint::make_duplet
      (SciFiCluster* clusterA, SciFiCluster* clusterB) {
   // Set clusters as used
   // Set clusters as used
-  clusterA->setUsed();
-  clusterB->setUsed();
+  clusterA->set_used();
+  clusterB->set_used();
 /*
   channels = Json::Value(Json::arrayValue);
   channels.clear();

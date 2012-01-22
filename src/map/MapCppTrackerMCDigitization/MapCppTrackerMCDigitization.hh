@@ -86,6 +86,8 @@ class MapCppTrackerMCDigitization {
 
   void save_to_json(TrackerEvent &evt);
 
+  int test() { return 3; }
+
  private:
   /// This is the Mice Module
   MiceModule*      _module;

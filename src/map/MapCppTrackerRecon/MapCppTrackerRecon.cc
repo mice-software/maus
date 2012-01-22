@@ -105,9 +105,9 @@ std::string MapCppTrackerRecon::process(std::string document) {
  //   print_event_info(event);
 
     // Fit straight line.
-    if ( event.scifispacepoints.size() ) {
-      fit(event);
-    }
+   // if ( event.scifispacepoints.size() ) {
+  //    fit(event);
+  //  }
     save_to_json(event);
   }
   // ==========================================================
@@ -221,8 +221,8 @@ void MapCppTrackerRecon::cluster_recon(TrackerEvent &evt) {
   // SciFiDigit* seed;
   // double pe;
 
-  for ( unsigned int i = 0; i < seeds.size(); i++ ) {
-    if ( !seeds[i]->isUsed() ) {
+  for ( unsigned int i = 0; i < seeds_size; i++ ) {
+    if ( !seeds[i]->is_used() ) {
       SciFiDigit* neigh = NULL;
       SciFiDigit* seed = seeds[i];
 
@@ -232,8 +232,8 @@ void MapCppTrackerRecon::cluster_recon(TrackerEvent &evt) {
       int fibre   = seed->get_channel();
       double pe   = seed->get_npe();
       // Look for a neighbour.
-      for ( unsigned int j = i+1; j < seeds.size(); j++ ) {
-        if ( !seeds[j]->isUsed() && seeds[j]->get_tracker() == tracker &&
+      for ( unsigned int j = i+1; j < seeds_size; j++ ) {
+        if ( !seeds[j]->is_used() && seeds[j]->get_tracker() == tracker &&
              seeds[j]->get_station() == station && seeds[j]->get_plane()   == plane &&
              abs( seeds[j]->get_channel() - fibre ) < 2 ) {
           neigh = seeds[j];
@@ -248,12 +248,11 @@ void MapCppTrackerRecon::cluster_recon(TrackerEvent &evt) {
       // Save cluster if it's above npe cut.
       if ( pe > minPE ) {
         SciFiCluster* clust = new SciFiCluster(seed);
-        seed->setUsed();
         if ( neigh ) {
-          clust->addDigit(neigh);
+          clust->add_digit(neigh);
         //  std::cout << "adding digit" << std::endl;
         }
-        clust->construct(modules, seed);
+        clust->construct(modules);
         evt.scificlusters.push_back(clust);
       }
     }
@@ -297,13 +296,13 @@ void MapCppTrackerRecon::spacepoint_recon(TrackerEvent &evt) {
 
             if ( kuno_accepts(candidate_A, candidate_B, candidate_C) &&
                  clusters_are_not_used(candidate_A, candidate_B, candidate_C) ) {
-              assert( !candidate_A->isUsed() && !candidate_B->isUsed() && !candidate_C->isUsed());
+              assert( !candidate_A->is_used() && !candidate_B->is_used() && !candidate_C->is_used());
               SciFiSpacePoint* triplet = new SciFiSpacePoint(candidate_A, candidate_B, candidate_C);
               evt.scifispacepoints.push_back(triplet);
               // std::cout << candidate_A->get_channel() << " " <<
               //              candidate_B->get_channel() << " " <<
               //              candidate_C->get_channel() << std::endl;
-              assert(candidate_A->isUsed() && candidate_B->isUsed() && candidate_C->isUsed());
+              assert(candidate_A->is_used() && candidate_B->is_used() && candidate_C->is_used());
               dump_info(candidate_A, candidate_B, candidate_C);
               // triplet_counter += 1;
             }
@@ -334,10 +333,10 @@ void MapCppTrackerRecon::spacepoint_recon(TrackerEvent &evt) {
 
               if ( clusters_are_not_used(candidate_A, candidate_B) &&
                    candidate_A->get_plane() != candidate_B->get_plane() ) {
-                assert(!candidate_A->isUsed() && !candidate_B->isUsed() );
+                assert(!candidate_A->is_used() && !candidate_B->is_used() );
                 SciFiSpacePoint* duplet = new SciFiSpacePoint(candidate_A, candidate_B);
                 evt.scifispacepoints.push_back(duplet);
-                assert(candidate_A->isUsed() && candidate_B->isUsed());
+                assert(candidate_A->is_used() && candidate_B->is_used());
               //  duplet_counter += 1;
               }
             }
@@ -375,7 +374,7 @@ bool MapCppTrackerRecon::kuno_accepts(SciFiCluster* cluster1,
 
 bool MapCppTrackerRecon::clusters_are_not_used(SciFiCluster* candidate_A,
                                                SciFiCluster* candidate_B) {
-  if ( candidate_A->isUsed() || candidate_B->isUsed() ) {
+  if ( candidate_A->is_used() || candidate_B->is_used() ) {
     return false;
   } else {
     return true;
@@ -385,7 +384,7 @@ bool MapCppTrackerRecon::clusters_are_not_used(SciFiCluster* candidate_A,
 bool MapCppTrackerRecon::clusters_are_not_used(SciFiCluster* candidate_A,
                                                SciFiCluster* candidate_B,
                                                SciFiCluster* candidate_C) {
-  if ( candidate_A->isUsed() || candidate_B->isUsed() || candidate_C->isUsed() ) {
+  if ( candidate_A->is_used() || candidate_B->is_used() || candidate_C->is_used() ) {
     return false;
   } else {
     return true;
@@ -407,13 +406,15 @@ void MapCppTrackerRecon::save_to_json(TrackerEvent &evt) {
   }
   root["digits"].append(digits);
 
-  Json::Value spacepoints;
+  Json::Value tracker0;
+  Json::Value tracker1;
   Json::Value channels;
   for ( unsigned int evt_i=0; evt_i < evt.scifispacepoints.size(); evt_i++ ) {
     Json::Value spacepoints_in_event;
     channels = Json::Value(Json::arrayValue);
     channels.clear();
-    spacepoints_in_event["tracker"]= evt.scifispacepoints[evt_i]->get_tracker();
+    int tracker = evt.scifispacepoints[evt_i]->get_tracker();
+    spacepoints_in_event["tracker"]= tracker;
     spacepoints_in_event["station"]= evt.scifispacepoints[evt_i]->get_station();
     spacepoints_in_event["npe"]    = evt.scifispacepoints[evt_i]->get_npe();
     spacepoints_in_event["time"]   = evt.scifispacepoints[evt_i]->get_time();
@@ -431,9 +432,15 @@ void MapCppTrackerRecon::save_to_json(TrackerEvent &evt) {
       channels.append(cluster);
     }
     spacepoints_in_event["channels"] = channels;
-    spacepoints.append(spacepoints_in_event);
+    if (tracker == 0 ) {
+      tracker0.append(spacepoints_in_event);
+    }
+    if ( tracker == 1 ) {
+      tracker1.append(spacepoints_in_event);
+    }
   }
-  root["spacepoints"].append(spacepoints);
+  root["space_points"]["tracker1"].append(tracker0);
+  root["space_points"]["tracker2"].append(tracker1);
 }
 
 void MapCppTrackerRecon::fit(TrackerEvent &evt) {

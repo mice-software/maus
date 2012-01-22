@@ -219,7 +219,7 @@ geometry_upload_valid_from = "" # date-time in format like: that the specified i
 geometry_upload_cleanup = True # set to True to clean up after upload
 
 # this is used by ImputCppRealData
-Number_of_DAQ_Events = -1
+Number_of_DAQ_Events = 100 #-1
 Phys_Events_Only = False
 Calib_Events_Only = False
 Enable_V1290_Unpacking = True

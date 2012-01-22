@@ -159,7 +159,7 @@ bool MapCppTrackerMCDigitization::check_sanity_mc(Json::Value mc) {
 void MapCppTrackerMCDigitization::construct_digits(TrackerEvent &evt) {
   int number_of_hits = evt.scifihits.size();
   for ( unsigned int hit_i = 0; hit_i < number_of_hits; hit_i++ ) {
-    if ( !evt.scifihits[hit_i]->isUsed() ) {
+    if ( !evt.scifihits[hit_i]->is_used() ) {
       SciFiHit *a_hit = evt.scifihits[hit_i];
 
       // Get nPE from this hit.
@@ -183,7 +183,7 @@ void MapCppTrackerMCDigitization::construct_digits(TrackerEvent &evt) {
         if ( check_param(evt.scifihits[hit_i], evt.scifihits[hit_j]) ) {
           double edep_j = a_hit->get_edep();
           nPE  += compute_npe(edep_j);
-          evt.scifihits[hit_j]->setUsed();
+          evt.scifihits[hit_j]->set_used();
         } // if-statement
       } // ends l-loop over all the array
       int tracker = a_hit->get_tracker();
@@ -300,7 +300,7 @@ int MapCppTrackerMCDigitization::compute_adc_counts(double numb_pe) {
 }
 
 bool MapCppTrackerMCDigitization::check_param(SciFiHit *hit1, SciFiHit *hit2) {
-  if ( hit2->isUsed() ) {
+  if ( hit2->is_used() ) {
     return false;
   } else {
     // two hits passed to the check_param function

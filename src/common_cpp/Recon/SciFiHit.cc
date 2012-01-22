@@ -17,9 +17,11 @@
 
 #include "src/common_cpp/Recon/SciFiHit.hh"
 
+SciFiHit::SciFiHit(): _used(false) {}
+
 SciFiHit::SciFiHit(int tracker, int station, int plane, int fibre, double edep, double time)
                   :_tracker(tracker), _station(station), _plane(plane),
-                   _fibre(fibre), _edep(edep), _time(time), _isUsed(false) {
+                   _fibre(fibre), _edep(edep), _time(time), _used(false) {
 }
 
 SciFiHit::~SciFiHit() {}
