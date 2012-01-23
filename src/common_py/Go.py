@@ -435,13 +435,46 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903
         @param self Object reference.
         @throws Exception if there are no active Celery workers.
         """
-        # Check for active Celery workers.
+        # Check for active Celery nodes.
         from celery.task.control import inspect
-        print("Checking for active workers")
+        print("Checking for active nodes")
         inspection = inspect()
-        active_workers = inspection.active()
-        if (active_workers == None):
-            raise Exception("No active Celery workers!")
+        active_nodes = inspection.active()
+        if (active_nodes == None):
+            raise Exception("No active Celery nodes!")
+
+        # Configure nodes.
+        from celery.task.control import broadcast
+        from mauscelery.maustasks import MausGenericTransformTask
+        if hasattr(self.transformer, "get_worker_names"):
+            workers = self.transformer.get_worker_names()
+        else:
+            workers = self.transformer.__class__.__name__
+        print "Reconfiguring nodes..."
+        results = broadcast("set_maus_configuration", arguments={"transform":workers, "configuration":self.json_config_doc}, reply=True)
+        reset_ok = False
+        for node in results:
+            node_id = node.keys()[0]
+            node_status = node[node_id]
+            if (node_status["status"] != "ok"):
+                print "Node %s was not reconfigured" % node_id
+            else:
+                reset_ok = True
+        if (not reset_ok):
+            raise Exception("All Celery nodes failed to reconfigure")
+
+        print "Restarting node pools..."
+        restart_results = broadcast("restart_pool", reply=True)
+        reset_ok = False
+        for node in restart_results:
+            node_id = node.keys()[0]
+            node_status = node[node_id]
+            if (node_status["status"] != "ok"):
+                print "Node %s was not restarted" % node_id
+            else:
+                reset_ok = True
+        if (not reset_ok):
+            raise Exception("All Celery nodes failed to restart")
 
         # Create unique ID
         celery_client_id = "%s (%s)" % (socket.gethostname(), os.getpid())
@@ -452,19 +485,13 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903
         map_buffer = DataflowUtilities.buffer_input(emitter, 1)
 
         print("TRANSFORM: spawning transform jobs for each spill")
-
-        from mauscelery.maustasks import MausGenericTransformTask
-
-        if hasattr(self.transformer, "get_worker_names"):
-            workers = self.transformer.get_worker_names()
-        else:
-            workers = [self.transformer.__class__.__name__]
         i = 0
         transform_results = {}
         while (len(map_buffer) != 0) or (len(transform_results) != 0):
             for spill in map_buffer:
                 result = \
-                    MausGenericTransformTask.delay(workers, spill, celery_client_id, i) # pylint:disable=E1101, C0301
+                    MausGenericTransformTask.delay(spill, celery_client_id, i) # pylint:disable=E1101, C0301
+                print " Task ID: %s" % result.task_id
                 # Index results by spill_id so can present
                 # results to merge-output in same order.
                 transform_results[i] = result
