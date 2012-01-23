@@ -32,7 +32,7 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
                                  stderr=subprocess.STDOUT)
         return errors
 
-    def in_place_filter(self, file_name):
+    def in_place_filter(self, file_name): #pylint: disable=R0201
         """
         @brief filter pylint output file
 
@@ -57,7 +57,7 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
                 # we have string like str_1 = <str_2>:*
                 str_2 = str_1[0:str_1.index(':')]
                 # check str_2 = int
-                end_number = int(str_2)
+                end_number = int(str_2) #pylint: disable=W0612
                 lines_out.append(line)
             except ValueError:
                 pass # line filtered - index() or int() raises ValueError

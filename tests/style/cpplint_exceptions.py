@@ -103,5 +103,38 @@ exceptions[os.path.join(cpp_cm, 'Simulation','MAUSVisManager.hh')] = [
 
 exceptions[os.path.join(cpp_cm, 'Simulation','MAUSEventAction.hh')] = [
 ('#include "G4UserEventAction.hh"', 'cpplint confused by g4 header', 'rogers'),
+]
 
+exceptions[os.path.join(cpp_cm, 'Maths','Complex.hh')] = [
+('MAUS::complex& operator+=(MAUS::complex& lhs, const double         rhs);',
+ 'I guess cpplint is confused by the fact that MAUS::complex is not a class but has math operators', 'lane'),
+('MAUS::complex& operator-=(MAUS::complex& lhs, const double         rhs);',
+ 'I guess cpplint is confused by the fact that MAUS::complex is not a class but has math operators', 'lane'),
+('MAUS::complex& operator*=(MAUS::complex& lhs, const double         rhs);',
+ 'I guess cpplint is confused by the fact that MAUS::complex is not a class but has math operators', 'lane'),
+('MAUS::complex& operator/=(MAUS::complex& lhs, const double         rhs);',
+ 'I guess cpplint is confused by the fact that MAUS::complex is not a class but has math operators', 'lane')
+]
+
+exceptions[os.path.join(cpp_cm, 'Maths','HermitianMatrix.hh')] = [
+('  HermitianMatrix(const Matrix<complex>& original_instance);',
+ 'cpplint confused by STL copy constructor', 'lane')
+]
+
+exceptions[os.path.join(cpp_cm, 'Maths','Matrix.hh')] = [
+('  Matrix(const Matrix<double>& original_instance)',
+ 'cpplint confused by STL copy constructor', 'lane'),
+('  Matrix(const Matrix<complex>& original_instance)',
+ 'cpplint confused by STL copy constructor', 'lane')
+]
+
+exceptions[os.path.join(cpp_cm, 'Maths','Vector.hh')] = [
+('  Vector(const Vector<double>& original_instance)',
+ 'cpplint confused by STL copy constructor', 'lane'),
+('  Vector(const Vector<complex>& original_instance)',
+ 'cpplint confused by STL copy constructor', 'lane')
+]
+
+exceptions[os.path.join(tst, 'Maths', 'PolynomialVectorTest.cc')] = [
+('  } catch (Squeal squee) {}', '"catch" is a keyword like "for" and "if", not a function', 'lane')
 ]

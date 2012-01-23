@@ -26,6 +26,8 @@
 
 #include "src/legacy/Interface/MICERun.hh"
 
+using namespace MAUS;
+
 namespace {
 class MAUSTrackingActionTest : public ::testing::Test {
  protected:

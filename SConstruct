@@ -523,10 +523,15 @@ libs = str(os.environ.get('LD_LIBRARY_PATH'))+':'+str(os.environ.get('DYLD_LIBRA
 env.Append(LIBPATH =  libs.split(':') + ["%s/build" % maus_third_party])
 
 env.Append(CPPPATH=["%s/third_party/install/include" % maus_third_party, \
-                      "%s/third_party/install/include/python2.7" % maus_third_party, \
-                      "%s/third_party/install/include/root" % maus_third_party, \
-                      "%s/src/legacy" % maus_root_dir,
-			"%s/src/common_cpp" % maus_root_dir, ""])
+                    "%s/third_party/install/include/root" % maus_third_party, \
+                    "%s/src/legacy" % maus_root_dir, \
+                    "%s/src/common_cpp" % maus_root_dir, \
+                    ""])
+
+if (sysname == 'Darwin'):
+  env.Append(CPPPATH=["%s/third_party/install/Python.framework/Versions/2.7/include/python2.7" % maus_third_party])
+else:
+  env.Append(CPPPATH=["%s/third_party/install/include/python2.7" % maus_third_party])
 
 env['USE_G4'] = False
 env['USE_ROOT'] = False
@@ -596,9 +601,6 @@ if env['USE_G4'] and env['USE_ROOT']:
 
     env.Append(LIBPATH = 'src/common_cpp')
     env.Append(CPPPATH = maus_root_dir)
-
-    if 'Darwin' in os.environ.get('G4SYSTEM'):
-       env.Append(LINKFLAGS=['-undefined','suppress','-flat_namespace'])
 
     test_cpp_files = glob.glob("tests/cpp_unit/*/*cc")+\
         glob.glob("tests/cpp_unit/*cc")

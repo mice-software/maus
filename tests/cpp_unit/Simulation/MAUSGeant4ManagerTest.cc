@@ -24,6 +24,8 @@
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 
+using namespace MAUS;
+
 namespace {
 
 // I think all I can do here is test that members were initialised to something
