@@ -19,11 +19,6 @@ MAUS Celery tasks.
 import json
 import logging
 
-from multiprocessing import current_process 
-from types import ListType
-from types import StringType
-from types import UnicodeType
-
 from celery.registry import tasks
 from celery.task import Task
 from celery.worker.control import Panel
@@ -31,66 +26,9 @@ from celery.worker.control import Panel
 import MAUS
 import ROOT
 
-class WorkerUtilities: # pylint: disable=W0232
-    """
-    MAUS worker utility methods.
-    """
-
-    @staticmethod
-    def create_transform(transform):
-        """
-        Create a transform given the name of transform
-        class(es). Either a single name can be given - representing a
-        single transform - or a list of transforms - representing a 
-        MapPyGroup. Sub-lists are treated as nested
-        MapPyGroups. Example list arguments include:  
-        @verbatim 
-        []
-        ["MapCppTOFDigits", "MapCppTOFSlabHits", "MapCppTOFSpacePoint"]
-        ["MapCppTOFDigits", ["MapCppTOFSlabHits", "MapCppTOFSpacePoint"]]
-        @endverbatim
-        Transforms must be in the MAUS module namespace e.g. 
-        MAUS.MapCppTOFSlabHits.
-        @param transform Transform name or list of names.
-        @return transform object or MapPyGroup object (if given a list).
-        @throws ValueError if transform is not a string or a list,
-        or contains an element which is not a list or string, or 
-        specifies an unknown transform name.
-        """
-        if isinstance(transform, ListType):
-            group = MAUS.MapPyGroup()
-            for transform_name in transform:
-                group.append( \
-                    WorkerUtilities.create_transform(transform_name))
-            return group
-        elif isinstance(transform, StringType) \
-            or isinstance(transform, UnicodeType):
-            if not hasattr(MAUS, transform):
-                raise ValueError("No such transform: %s" % transform)
-            transform_class = getattr(MAUS, transform)
-            return transform_class()
-        else:
-            raise ValueError("Transform name %s is not a string" % transform)
-
-    @staticmethod
-    def get_worker_names(worker):
-        """
-        Given a worker class get the name of the worker. If the
-        worker is MapPyGroup then a list of worker names is
-        returned e.g.
-        @verbatim 
-        ["MapCppTOFDigits", "MapCppTOFSlabHits", "MapCppTOFSpacePoint"]
-        or
-        ["MapCppTOFDigits", ["MapCppTOFSlabHits", "MapCppTOFSpacePoint"]]
-        @endverbatim
-        @param worker Worker.
-        @return worker name or, for MapPyGroup, list of worker names.
-        """
-        if hasattr(worker, "get_worker_names"):
-            workers = worker.get_worker_names()
-        else:
-            workers = worker.__class__.__name__
-        return workers
+from workers import WorkerUtilities
+from workers import WorkerBirthFailedException
+from workers import WorkerDeathFailedException
 
 class MausGenericTransformTask(Task):
     """
@@ -186,167 +124,6 @@ class MausGenericTransformTask(Task):
 
 tasks.register(MausGenericTransformTask) # pylint:disable=W0104, E1101
 
-class WorkerOperationException(Exception):
-    """ Exception raised if a MAUS worker operation returns False. """
-
-    def __init__(self, worker):
-        """
-        Constructor. Overrides Exception.__init__.
-        @param self Object reference.
-        @param worker Name of worker that failed.
-        """
-        Exception.__init__(self)
-        self.__worker = worker
-
-    def __str__(self):
-        """
-        Return string representation. Overrides Exception.__str__.
-        @param self Object reference.
-        @return string.
-        """
-        return "%s returned False" % self.__worker
-
-class WorkerBirthFailedException(WorkerOperationException):
-    """ Exception raised if MAUS worker birth returns False. """
-
-class WorkerDeathFailedException(WorkerOperationException):
-    """ Exception raised if MAUS worker death returns False. """
-
-class CeleryWorkerUtilities: # pylint: disable=W0232
-    """
-    MAUS Celery worker utility methods.
-    """
-
-    @staticmethod
-    def get_process_pool(panel):
-        """
-        Get information on the current process pool.
-        @param panel Celery panel object.
-        @return status document of form {master_pid: PID, master_name:
-        PROCESS_NAME, pool_pids: [PID, PID, PID]}.  
-        """
-        doc = {}
-        process_status = current_process()
-        doc["master_pid"] = process_status.pid
-        doc["master_name"] = process_status.name
-        pool = panel.consumer.pool 
-        doc["pool_pids"] = pool.info["processes"]
-        logger = logging.getLogger(__name__)
-        if logger.isEnabledFor(logging.INFO):
-            logger.info("Process pool: %s" % doc)
-        return doc
-
-    @staticmethod
-    def restart_pool(panel):
-        """
-        Restart the worker pool by killing the pool processes via a
-        pool.terminate_job invocation, which forces Celery to spawn
-        new pool processes.  
-        @param panel Celery panel object.
-        @return status document of form {status:"ok"} if all went well
-        or {status:"error", error:EXCEPTION_CLASS,
-        message:EXCEPTION_MESSAGE} if an exception occurred.
-        """
-        logger = logging.getLogger(__name__)
-        if logger.isEnabledFor(logging.INFO):
-            logger.info("Restarting pool")
-        pool = panel.consumer.pool 
-        pids = pool.info["processes"]
-        doc = {}
-        try:
-            for pid in pids:
-                if logger.isEnabledFor(logging.INFO):
-                    logger.info("About to terminate %s" % pid)
-                pool.terminate_job(pid)
-                if logger.isEnabledFor(logging.INFO):
-                    logger.info("Terminated %s" % pid)
-                doc["status"] = "ok"
-        except Exception as ex: # pylint:disable=W0703
-            if logger.isEnabledFor(logging.ERROR):
-                logger.exception(ex)
-            doc["status"] = "error"
-            doc["error"] = str(ex.__class__)
-            doc["message"] = ex.message
-        if logger.isEnabledFor(logging.INFO):
-            logger.info("Status: %s" % doc)
-        return doc
-
-    @staticmethod
-    def get_maus_configuration():
-        """
-        Get information on the current configuration and workers.
-        @return status document of form {configuration:
-        MAUS_CONFIGURATION_DOC, workers: WORKER_NAME_OR_LIST_OF_NAMES}
-        """
-        maustask = \
-            tasks["mauscelery.maustasks.MausGenericTransformTask"] 
-        doc = {}
-        doc["configuration"] = maustask.configuration
-        doc["workers"] = maustask.get_transform_names()
-        logger = logging.getLogger(__name__)
-        if logger.isEnabledFor(logging.INFO):
-            logger.info("Configuration: %s" % doc)
-        return doc
-
-    @staticmethod
-    def set_maus_configuration(panel, configuration = None, transform = None): # pylint: disable=W0613, C0301
-        """
-        Death the current transforms, create new transforms then birth
-        them with the given configuration document. 
-        @param panel Celery panel object.
-        @param configuration JSON configuration document.
-        @param transform Either a single name can be given -
-        representing a single transform - or a list of transforms -
-        representing a MapPyGroup. Sub-lists are treated as nested
-        MapPyGroups.
-        @return status document of form {status:"ok"} if all went well
-        or {status:"error", error:EXCEPTION_CLASS,
-        message:EXCEPTION_MESSAGE} if an exception occurred.
-        """
-        logger = logging.getLogger(__name__)
-        if logger.isEnabledFor(logging.INFO):
-            logger.info("Setting MAUS configuration")
-        doc = {}
-        try:
-            maustask = \
-                tasks["mauscelery.maustasks.MausGenericTransformTask"]
-            # Configuration is unicode to decode to a normal 
-            # string to avoid problems e.g. with SWIG/C++ calls.
-            maustask.reset_task(configuration.encode(), transform)
-            doc = {"status": "ok"}
-        except Exception as ex: # pylint:disable=W0703
-            if logger.isEnabledFor(logging.ERROR):
-                logger.exception(ex)
-            doc["status"] = "error"
-            doc["error"] = str(ex.__class__)
-            doc["message"] = ex.message
-        if logger.isEnabledFor(logging.INFO):
-            logger.info("Status: %s" % doc)
-        return doc
-
-@Panel.register
-def get_process_pool(panel):
-    """
-    Get information on the current process pool.
-    @param panel Celery panel object.
-    @return status document of form {master_pid: PID, master_name:
-    PROCESS_NAME, pool_pids: [PID, PID, PID]}.  
-    """
-    return CeleryWorkerUtilities.get_process_pool(panel)
-
-@Panel.register
-def restart_pool(panel):
-    """
-    Restart the worker pool by killing the pool processes via a
-    pool.terminate_job invocation, which forces Celery to spawn
-    new pool processes.  
-    @param panel Celery panel object.
-    @return status document of form {status:"ok"} if all went well
-    or {status:"error", error:EXCEPTION_CLASS,
-    message:EXCEPTION_MESSAGE} if an exception occurred.
-    """
-    return CeleryWorkerUtilities.restart_pool(panel)
-
 @Panel.register
 def get_maus_configuration(panel): # pylint:disable=W0613
     """
@@ -355,7 +132,15 @@ def get_maus_configuration(panel): # pylint:disable=W0613
     @return status document of form {configuration:
     MAUS_CONFIGURATION_DOC, workers: WORKER_NAME_OR_LIST_OF_NAMES}
     """
-    return CeleryWorkerUtilities.get_maus_configuration()
+    maustask = \
+        tasks["mauscelery.maustasks.MausGenericTransformTask"] 
+    doc = {}
+    doc["configuration"] = maustask.configuration
+    doc["workers"] = maustask.get_transform_names()
+    logger = logging.getLogger(__name__)
+    if logger.isEnabledFor(logging.INFO):
+        logger.info("Configuration: %s" % doc)
+    return doc
 
 @Panel.register
 def set_maus_configuration(panel, configuration = None, transform = None): # pylint: disable=W0613, C0301
@@ -372,11 +157,23 @@ def set_maus_configuration(panel, configuration = None, transform = None): # pyl
     or {status:"error", error:EXCEPTION_CLASS,
     message:EXCEPTION_MESSAGE} if an exception occurred.
     """
-    return CeleryWorkerUtilities.set_maus_configuration( \
-        panel, configuration, transform)
-
-
-
-
-
-
+    logger = logging.getLogger(__name__)
+    if logger.isEnabledFor(logging.INFO):
+        logger.info("Setting MAUS configuration")
+    doc = {}
+    try:
+        maustask = \
+            tasks["mauscelery.maustasks.MausGenericTransformTask"]
+        # Configuration is unicode to decode to a normal 
+        # string to avoid problems e.g. with SWIG/C++ calls.
+        maustask.reset_task(configuration.encode(), transform)
+        doc = {"status": "ok"}
+    except Exception as ex: # pylint:disable=W0703
+        if logger.isEnabledFor(logging.ERROR):
+            logger.exception(ex)
+        doc["status"] = "error"
+        doc["error"] = str(ex.__class__)
+        doc["message"] = ex.message
+    if logger.isEnabledFor(logging.INFO):
+        logger.info("Status: %s" % doc)
+    return doc
