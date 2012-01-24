@@ -2,7 +2,7 @@
 #define JSONCPPCONVERTER_H
 #include "json/json.h"
 
-#include "src/common_cpp/DataStructureBase/ConverterBase.hh"
+#include "src/common_cpp/JsonCppStreamer/ConverterBase.hh"
 #include "src/common_cpp/DataStructure/MausEventStruct.hh"
 
 /*!

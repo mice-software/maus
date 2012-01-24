@@ -1,5 +1,8 @@
 #ifndef RSTREAM_H
 #define RSTREAM_H 1
+
+#include "gtest/gtest_prod.h"
+
 #include <cstring>
 #include <TFile.h>
 #include <TTree.h>
@@ -14,14 +17,11 @@ class rstream{
   virtual bool is_open(){ return !m_file? false :  m_file->IsOpen(); }
   virtual ~rstream();
   virtual void close()=0;
-  friend  rstream& setBranch(rstream& rs,const char* name);
-//#ifdef TESTING
-  friend class test_rstream;
-
-
   static rstream& setBranch(rstream& rs,const char* name);
 
-//#endif
+  const TFile* getTFile() {return m_file;}
+  const TTree* getTTree() {return m_tree;}
+
  protected:
   TFile* m_file;
   MsgStream m_log;

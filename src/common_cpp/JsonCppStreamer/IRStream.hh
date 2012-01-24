@@ -1,5 +1,8 @@
 #ifndef IRSTREAM_H
 #define IRSTREAM_H
+
+#include "gtest/gtest_prod.h"
+
 #include "RStream.hh"
 #include "OneArgManip.hh"
 
@@ -27,9 +30,7 @@ class irstream : public rstream{
   template<typename T> irstream& operator>>(T& d);
   template<typename T> irstream& operator>>(T* & d);
 
-#ifdef TESTING
-  friend class test_irstream;
-#endif
+  long getEventCount() {return m_evtCount;}
 
  private:
   template<typename T> irstream& basetype_extraction(T&);

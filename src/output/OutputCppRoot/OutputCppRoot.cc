@@ -18,8 +18,8 @@
 #include "src/legacy/Interface/Squeal.hh"
 
 #include "src/common_cpp/Utils/JsonWrapper.hh"
-#include "src/common_cpp/DataStructureBase/ORStream.hh"
-#include "src/common_cpp/DataStructure/JsonCppConverter.hh"
+#include "src/common_cpp/JsonCppStreamer/ORStream.hh"
+#include "src/common_cpp/JsonCppStreamer/JsonCppConverter.hh"
 
 #include "OutputCppRoot.hh"
 
