@@ -57,6 +57,7 @@ class Configuration:
         config_dict = {}
         defaults = open(maus_root_dir+"/src/common_py/ConfigurationDefaults.py")
         exec(defaults, globals(), config_dict) # pylint: disable=W0122
+        config_dict = self.check_config_dict(config_dict)
 
         if command_line_args:
             config_dict = self.command_line_arguments(config_dict)
@@ -91,9 +92,9 @@ class Configuration:
         # ConfigurationDefaults.p Additionally a keyword command has been
         # created to store the path and filename to a datacard
         parser = argparse.ArgumentParser()
-        for key, value in config_dict.iteritems():
+        for key in sorted(config_dict.keys()):
             parser.add_argument('-'+key, action='store', dest=key, 
-                                default=value)
+                                default=config_dict[key])
         results = parser.parse_args()
 
         # All parsed values are input as string types, this checks the type in
@@ -161,7 +162,11 @@ class Configuration:
 
     def check_config_dict(self, config_dict): #pylint:disable=R0201
         """
-        @brief Check to see if config_dict can be encoded into json
+        @brief Strip config_dict of inappropriate items
+
+        Strip config_dict of any items that cannot or should not be encoded into
+        json e.g. module objects or the docstring.
+
         @params config_dict dictionary to be checked
         @returns Copy of config_dict with non-encodable items stripped out
         """
@@ -169,7 +174,8 @@ class Configuration:
         for key, value in config_dict.iteritems():
             try:
                 json.JSONEncoder().encode({key:value})
-                dict_copy[key] = value
+                if key != '__doc__': # explicitly exclude the docstring
+                    dict_copy[key] = value
             except TypeError:
                 pass
         return dict_copy

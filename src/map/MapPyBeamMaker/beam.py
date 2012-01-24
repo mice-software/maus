@@ -18,8 +18,6 @@ Responsible for initialising parent distribution and sampling single particles
 for beam generation.
 """
 
-# NEED TO TEST RANDOM SEED routine
-
 import numpy
 import xboa
 import xboa.Bunch #pylint: disable=W0404
@@ -385,6 +383,8 @@ class Beam(): # pylint: disable=R0902
             random_seed = self.beam_seed
             self.beam_seed += 1
             return random_seed
+        raise NotImplementedError("Did not recognise seed algorithm "+\
+                                  str(self.particle_seed_algorithm))
 
     array_keys = ["x", "px", "y", "py", "t"]
     momentum_keys = ['p', 'pz', 'energy']
