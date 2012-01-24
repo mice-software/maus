@@ -1,8 +1,9 @@
 #ifndef JSONCPPCONVERTER_H
 #define JSONCPPCONVERTER_H
-#include "ConverterBase.h"
 #include "json/json.h"
-#include "MausEventStruct.h"
+
+#include "src/common_cpp/DataStructureBase/ConverterBase.hh"
+#include "src/common_cpp/DataStructure/MausEventStruct.hh"
 
 /*!
  * \class JsonCppConverter

@@ -1,7 +1,7 @@
 #ifndef ORSTREAM_H
 #define ORSTREAM_H
-#include "rstream.h"
-#include "oneArgManip.h"
+#include "RStream.hh"
+#include "OneArgManip.hh"
 
 class orstream : public rstream{
  public:
@@ -121,13 +121,6 @@ template<typename T> orstream& orstream::basetype_insertion(T* & d){
 }
 // Friend function definitions
 //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
-#ifndef FILLEVENT
-#define FILLEVENT 
-orstream& fillEvent(orstream& ors){
-  ors.m_tree->Fill();
-  ++ors.m_evtCount;
-  return ors;
-}
-#endif
+orstream& fillEvent(orstream& ors);
 
 #endif

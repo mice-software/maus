@@ -1,4 +1,4 @@
-#include "DigitsProcessor.h"
+#include "DigitsProcessor.hh"
 #include <algorithm>
 #include "Interface/Squeak.hh"
 #include "Interface/Squeal.hh"

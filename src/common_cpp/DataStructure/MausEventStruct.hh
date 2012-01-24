@@ -1,7 +1,7 @@
 #ifndef MAUS_EVENT_STRUCT_H
 #define MAUS_EVENT_STRUCT_H
-#include "MCStructs.h"
-#include "DigitsStructs.h"
+#include "MCStructs.hh"
+#include "DigitsStructs.hh"
 
 
 /*!\class MausData

@@ -1,4 +1,4 @@
-#include "MCStructs.h"
+#include "MCStructs.hh"
 
 MCChannelID::MCChannelID():station_number(0){
     type.assign("");

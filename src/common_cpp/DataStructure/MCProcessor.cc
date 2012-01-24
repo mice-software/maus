@@ -1,4 +1,4 @@
-#include "MCProcessor.h"
+#include "MCProcessor.hh"
 #include <algorithm>
 #include "Interface/Squeak.hh"
 #include "Interface/Squeal.hh"

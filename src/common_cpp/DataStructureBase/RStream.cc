@@ -1,4 +1,4 @@
-#include "rstream.h"
+#include "RStream.hh"
 
 
 rstream::rstream(const char* filename,
@@ -27,4 +27,9 @@ rstream::~rstream(){
     delete m_tree;
     m_tree=0;
   }
+}
+
+rstream& rstream::setBranch(rstream& rs,const char* name) {
+    strcpy(rs.m_branchName,name);
+    return rs;
 }

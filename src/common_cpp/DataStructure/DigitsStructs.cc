@@ -1,4 +1,4 @@
-#include "DigitsStructs.h"
+#include "DigitsStructs.hh"
 
 ChannelID::ChannelID():channel_number(0),
 		       fiber_number(0),

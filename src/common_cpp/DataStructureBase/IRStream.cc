@@ -1,4 +1,4 @@
-#include "irstream.h"
+#include "IRStream.hh"
 #include <cstdlib>
 
 irstream::irstream(const char* fileName,

@@ -1,7 +1,7 @@
 #ifndef IRSTREAM_H
 #define IRSTREAM_H
-#include "rstream.h"
-#include "oneArgManip.h"
+#include "RStream.hh"
+#include "OneArgManip.hh"
 
 class irstream : public rstream{
  public:

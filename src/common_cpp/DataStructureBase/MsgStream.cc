@@ -1,4 +1,4 @@
-#include "MsgStream.h"
+#include "MsgStream.hh"
 
 
 MsgStream::MsgStream(std::string name,
@@ -17,7 +17,7 @@ MsgStream::MsgStream(std::string name,
     m_levelmap[MsgStream::FATAL] = "FATAL";
 }
 
-MsgStream::MsgStream(const MsgStream::MsgStream& msg){
+MsgStream::MsgStream(const MsgStream& msg){
   m_name = msg.m_name;
   m_loglevel = msg.m_loglevel;
   m_nameWidth = msg.m_nameWidth;

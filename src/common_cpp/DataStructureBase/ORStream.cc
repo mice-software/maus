@@ -1,4 +1,4 @@
-#include "orstream.h"
+#include "ORStream.hh"
 
 orstream::orstream(const char* fileName,
 		   const char* treeName,
@@ -46,3 +46,11 @@ void orstream::close(){
 orstream& orstream::operator<<(orstream& (*manip_pointer)(orstream&)){
   return manip_pointer(*this);
 }
+
+orstream& fillEvent(orstream& ors) {
+  ors.m_tree->Fill();
+  ++ors.m_evtCount;
+  return ors;
+}
+
+

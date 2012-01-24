@@ -479,6 +479,23 @@ def install_python_tests(maus_root_dir):
             env.Install(build+subdir_mod, test_files)
             print subdir, subdir_mod, test_files
 
+def root_io_libraries(env, maus_root_dir):
+    """
+    Call the methods necessary to build libraries for root IO.
+    """
+    import subprocess
+    import shutil
+    extra_libs = []
+    here = os.getcwd()
+    os.chdir(os.path.join(maus_root_dir, 'src/common_cpp/DataStructure'))
+    proc = subprocess.Popen(['root', '-q', '-l'])
+    proc.wait()
+    for shared_object in glob.glob('*.so'):
+        shutil.copy(shared_object, os.path.join(maus_root_dir, 'build', 'lib'+shared_object))
+        env.Append(LIBS=[shared_object[:-3]])
+        print 'Adding library '+shared_object[:-3]
+    os.chdir(here)
+
 # Setup the environment.  NOTE: SHLIBPREFIX means that shared libraries don't
 # have a 'lib' prefix, which is needed for python to find SWIG generated
 # libraries
@@ -498,7 +515,7 @@ if env.GetOption('clean'):
         for basename in dirs:
             dirname = os.path.join(root, basename)
             if os.path.isdir(dirname):
-                shutil.rmtree(dirname) 
+                shutil.rmtree(dirname)
 
 if os.path.isfile('.use_llvm_with_maus'):
     env['CC'] = "llvm-gcc"
@@ -563,6 +580,8 @@ set_recpack(conf, env)
 set_gtest(conf, env)
 set_unpacker(conf, env)
 
+root_io_libraries(env, os.environ['MAUS_ROOT_DIR'])
+
 # check types size!!!
 env = conf.Finish()
 if 'configure' in COMMAND_LINE_TARGETS: # pylint: disable-msg=E0602
@@ -625,13 +644,13 @@ for directory in directories:
         print 'Found Python module: %s' % parts[2]
         files = glob.glob('%s/*.py' % directory) 
         env.Install("build", files)
-
         stuff_to_import.append(parts[2])
 
-    if (parts[2][0:6] == 'MapCpp') or (parts[2][0:8] == 'InputCpp'):
-        print 'Found C++ module: %s' % parts[2]
-        env.jDev.Subproject(directory)
-        stuff_to_import.append(parts[2])
+    for item in ['MapCpp', 'InputCpp', 'OutputCpp', 'ReduceCpp']:
+        if parts[2].find(item) == 0:
+            print 'Found C++ module: %s' % parts[2]
+            env.jDev.Subproject(directory)
+            stuff_to_import.append(parts[2])
 
 file_to_import = open('%s/build/MAUS.py' % maus_root_dir, 'w')
 

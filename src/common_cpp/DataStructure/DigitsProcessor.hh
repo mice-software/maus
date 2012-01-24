@@ -12,7 +12,7 @@
 #ifndef DIGITSPROCESSOR_H
 #define DIGITSPROCESSOR_H
 #include "json/json.h"
-#include "MausEventStruct.h"
+#include "MausEventStruct.hh"
 
 /*!
  * \class DigitsProcessor

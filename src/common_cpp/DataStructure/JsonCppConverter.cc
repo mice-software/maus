@@ -1,7 +1,7 @@
-#include "JsonCppConverter.h" 
+#include "JsonCppConverter.hh" 
 #include <algorithm>
-#include "DigitsProcessor.h"
-#include "MCProcessor.h"
+#include "DigitsProcessor.hh"
+#include "MCProcessor.hh"
 #include "Interface/Squeak.hh"
 #include "Interface/Squeal.hh"
 

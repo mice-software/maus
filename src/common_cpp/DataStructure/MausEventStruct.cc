@@ -1,4 +1,4 @@
-#include "MausEventStruct.h"
+#include "MausEventStruct.hh"
 
 MausData::MausData():digits(new Digits()),mc(new MC()){}
 
