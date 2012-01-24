@@ -18,6 +18,7 @@ MAUS Celery tasks.
 
 import json
 import logging
+from types import UnicodeType
 
 from celery.registry import tasks
 from celery.task import Task
@@ -70,11 +71,13 @@ class MausGenericTransformTask(Task):
         Death the current transforms, create new transforms then
         birth them with the given configuration document.
         @param self Object reference.
-        @param configuration JSON configuration document.
+        @param configuration JSON configuration document. If None
+        then the current configuration is kept.
         @param transform Either a single name can be given -
         representing a single transform - or a list of transforms -
         representing a MapPyGroup. Sub-lists are treated as nested
-        MapPyGroups.
+        MapPyGroups. If None then the current transform is deathed 
+        and rebirthed. 
         @throws ValueError If transform is not a string or a list,
         or contains an element which is not a list or string, or 
         specifies an unknown transform name; if configuration is
@@ -92,13 +95,16 @@ class MausGenericTransformTask(Task):
         if (configuration != None):
             # Validate it's valid JSON.
             json.loads(configuration)
-            self.configuration = configuration
+            new_configuration = configuration
+        else:
+            new_configuration = self.configuration
         logger = Task.get_logger()
         if logger.isEnabledFor(logging.INFO):
             logger.info("Invoking %s.death" % self.__transform.__class__)
         if (not self.__transform.death()):
             raise WorkerDeathFailedException(self.__transform)
         self.__transform = new_transform
+        self.configuration = new_configuration
         if logger.isEnabledFor(logging.INFO):
             logger.info("Invoking %s.birth" % self.__transform.__class__)
         if (not self.__transform.birth(self.configuration)):
@@ -115,7 +121,7 @@ class MausGenericTransformTask(Task):
         @return JSON document string holding new spill.
         @throws Exception if there is a problem when process is called.
         """
-        logger = Task.get_logger()
+        logger = Task.get_logger()  
         if logger.isEnabledFor(logging.INFO):
             logger.info("Task invoked by %s on spill %d" \
                 % (client_id, spill_id))
@@ -127,17 +133,17 @@ tasks.register(MausGenericTransformTask) # pylint:disable=W0104, E1101
 @Panel.register
 def get_maus_configuration(panel): # pylint:disable=W0613
     """
-    Get information on the current configuration and workers.
+    Get information on the current configuration and transforms.
     @param panel Celery panel object.
     @return status document of form {configuration:
-    MAUS_CONFIGURATION_DOC, workers: WORKER_NAME_OR_LIST_OF_NAMES}
+    MAUS_CONFIGURATION_DOC, transform: TRANSFORM_NAME_OR_LIST_OF_NAMES}
     """
     maustask = \
         tasks["mauscelery.maustasks.MausGenericTransformTask"] 
+    logger = logging.getLogger(__name__)
     doc = {}
     doc["configuration"] = maustask.configuration
-    doc["workers"] = maustask.get_transform_names()
-    logger = logging.getLogger(__name__)
+    doc["transform"] = maustask.get_transform_names()
     if logger.isEnabledFor(logging.INFO):
         logger.info("Configuration: %s" % doc)
     return doc
@@ -164,9 +170,13 @@ def set_maus_configuration(panel, configuration = None, transform = None): # pyl
     try:
         maustask = \
             tasks["mauscelery.maustasks.MausGenericTransformTask"]
-        # Configuration is unicode to decode to a normal 
+        # If configuration is unicode convert to a normal 
         # string to avoid problems e.g. with SWIG/C++ calls.
-        maustask.reset_task(configuration.encode(), transform)
+        if (isinstance(configuration, UnicodeType)):
+            config = configuration.encode()
+        else:
+            config = configuration
+        maustask.reset_task(config, transform)
         doc = {"status": "ok"}
     except Exception as ex: # pylint:disable=W0703
         if logger.isEnabledFor(logging.ERROR):
