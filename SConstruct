@@ -491,7 +491,12 @@ def root_io_libraries(env, maus_root_dir):
     proc = subprocess.Popen(['root', '-q', '-l'])
     proc.wait()
     for shared_object in glob.glob('*.so'):
-        shutil.copy(shared_object, os.path.join(maus_root_dir, 'build', 'lib'+shared_object))
+        shutil.copy(shared_object, os.path.join(maus_root_dir, 'build', shared_object))
+        try:
+            os.symlink(os.path.join(maus_root_dir, 'build', shared_object),
+                       os.path.join(maus_root_dir, 'build', 'lib'+shared_object))
+        except OSError:
+            pass
         env.Append(LIBS=[shared_object[:-3]])
         print 'Adding library '+shared_object[:-3]
     os.chdir(here)

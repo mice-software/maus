@@ -38,7 +38,7 @@ class OutputCppRoot {
    */
   OutputCppRoot() : _outfile(NULL), _md(NULL), _jsonCppConverter(NULL) {;}
 
-  /** OutputCppRoot constructor - calls death()
+  /** OutputCppRoot destructor - calls death()
    */
   ~OutputCppRoot() {death();}
 

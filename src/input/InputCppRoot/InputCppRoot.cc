@@ -1,0 +1,69 @@
+#include "src/common_cpp/Utils/JsonWrapper.hh"
+
+#include "src/input/InputCppRoot/InputCppRoot.hh"
+
+#include "src/common_cpp/JsonCppStreamer/JsonCppConverter.hh"
+#include "src/common_cpp/JsonCppStreamer/IRStream.hh"
+#include "src/common_cpp/DataStructure/MausEventStruct.hh"
+
+namespace MAUS {
+
+InputCppRoot::InputCppRoot(std::string filename) : _infile(NULL),
+              _jsonCppConverter(NULL),  _md(NULL), _val(), _filename(filename) {
+}
+
+InputCppRoot::~InputCppRoot() {
+  death();
+}
+
+
+bool InputCppRoot::birth(std::string json_datacards) {
+  Json::Value json_dc = JsonWrapper::StringToJson(json_datacards);
+  if (_filename == "") {
+    _filename = JsonWrapper::GetProperty(json_dc,
+                   "root_input_filename", JsonWrapper::stringValue).asString();
+  }
+  _infile = new irstream(_filename.c_str());
+
+  Digits* d = new Digits();
+  MC* mc = new MC();
+  _md = new MausData(d, mc);
+
+  (*_infile) >> oneArgManip<const char*>::branchName("digits") >> d;
+  (*_infile) >> oneArgManip<const char*>::branchName("mc") >> mc;
+
+  _jsonCppConverter = new JsonCppConverter(&_val);
+  return true;
+}
+
+bool InputCppRoot::death() {
+  if (_infile != NULL) {
+    delete _infile;
+    _infile = NULL;
+  }
+  if (_jsonCppConverter != NULL) {
+    delete _jsonCppConverter;
+    _jsonCppConverter = NULL;
+  }
+  return true;
+}
+
+std::string InputCppRoot::getNextEvent() {
+  if (_jsonCppConverter == NULL || _infile == NULL) {
+    throw(Squeal(Squeal(
+      Squeal::recoverable,
+      "InputCppRoot was not initialised properly",
+      "InputCppRoot::getNextEvent"
+    )));
+  }
+  if((*_infile) >> readEvent == NULL) {
+    return "";
+  }
+  (*_jsonCppConverter)(_md);
+  Json::FastWriter writer;
+  return writer.write(_val);
+}
+
+
+}
+
