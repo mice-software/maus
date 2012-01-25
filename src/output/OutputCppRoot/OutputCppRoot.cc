@@ -21,7 +21,7 @@
 #include "src/common_cpp/JsonCppStreamer/ORStream.hh"
 #include "src/common_cpp/JsonCppStreamer/JsonCppConverter.hh"
 
-#include "OutputCppRoot.hh"
+#include "src/output/OutputCppRoot/OutputCppRoot.hh"
 
 namespace MAUS {
 
@@ -45,10 +45,10 @@ bool OutputCppRoot::birth(std::string json_datacards) {
     (*_outfile) << oneArgManip<const char*>::branchName("mc") << mc;
     _jsonCppConverter = new JsonCppConverter(_md);
     return true;
-  } catch (Squeal squee) {
+  } catch(Squeal squee) {
     // call error handler
     return false;
-  } catch (std::exception exc) {
+  } catch(std::exception exc) {
     // call error handler
     return false;
   }
@@ -67,10 +67,10 @@ bool OutputCppRoot::save(std::string json_spill_document) {
     (*_jsonCppConverter)(json_spill_document);
     (*_outfile) << fillEvent;
     return true;
-  } catch (Squeal squeal) {
+  } catch(Squeal squeal) {
     // call error handler
     return false;
-  } catch (std::exception exc) {
+  } catch(std::exception exc) {
     // call error handler
     return false;
   }
@@ -88,6 +88,5 @@ bool OutputCppRoot::death() {
   }
   return true;
 }
-
 }
 

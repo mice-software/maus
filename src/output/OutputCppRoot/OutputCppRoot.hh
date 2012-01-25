@@ -15,8 +15,10 @@
  *
  */
 
-#ifndef _SRC_OUTPUT_OUTPUTCPPROOT_HH_
-#define _SRC_OUTPUT_OUTPUTCPPROOT_HH_
+#ifndef _SRC_OUTPUT_OUTPUTCPPROOT_OUTPUTCPPROOT_HH_
+#define _SRC_OUTPUT_OUTPUTCPPROOT_OUTPUTCPPROOT_HH_
+
+#include <string>
 
 // TODO (Rogers): looks okay - but throws a segmentation fault if we forget to
 //                call death(); needs proper error handler calling
@@ -54,7 +56,7 @@ class OutputCppRoot {
    *
    *  @returns True on success, False on failure
    */
- bool save(std::string json_spill_document);
+  bool save(std::string json_spill_document);
 
   /** Delete member data
    *
@@ -67,7 +69,6 @@ class OutputCppRoot {
   MausData* _md;
   JsonCppConverter* _jsonCppConverter;
 };
-
 }
 
 #endif

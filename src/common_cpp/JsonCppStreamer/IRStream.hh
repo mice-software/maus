@@ -60,7 +60,7 @@ irstream& irstream::operator>>(T& d){
     return *this;
   }
   if(!m_tree->FindBranch(m_branchName)){
-    m_log << MsgStream::ERROR << "Couldn't find requested branch in TTree"<< std::endl;
+    m_log << MsgStream::ERROR << "Couldn't find requested branch '" << m_branchName << "' in TTree"<< std::endl;
     return *this;
   }
   m_pointers.push_back(&d);
@@ -83,7 +83,7 @@ irstream& irstream::operator>>(T* & d){
     return *this;
   }
   if(!m_tree->FindBranch(m_branchName)){
-    m_log << MsgStream::ERROR << "Couldn't find requested branch in TTree"<< std::endl;
+    m_log << MsgStream::ERROR << "Couldn't find requested branch '" << m_branchName << "' in TTree" << std::endl;
     return *this;
   }
   m_tree->SetBranchAddress(m_branchName,&d);
@@ -105,7 +105,7 @@ template<typename T> irstream& irstream::basetype_extraction(T& d){
     return *this;
   }
   if(!m_tree->FindBranch(m_branchName)){
-    m_log << MsgStream::ERROR << "Couldn't find requested branch in TTree"<< std::endl;
+    m_log << MsgStream::ERROR << "Couldn't find requested '" << m_branchName << "' in TTree" << std::endl;
     return *this;
   }
   m_tree->SetBranchAddress(m_branchName,data);
@@ -120,7 +120,7 @@ template<typename T> irstream& irstream::basetype_extraction(T* & d){
     return *this; 
   }
   if(!m_tree->FindBranch(m_branchName)){
-    m_log << MsgStream::ERROR << "Couldn't find requested branch in TTree"<< std::endl;
+    m_log << MsgStream::ERROR << "Couldn't find requested branch '" << m_branchName << "' in TTree"<< std::endl;
     return *this;
   }
   m_tree->SetBranchAddress(m_branchName,d);

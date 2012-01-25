@@ -18,6 +18,8 @@
 #ifndef _MAUS_SRC_INPUT_INPUTCPPROOT_INPUTCPPROOT_HH__
 #define _MAUS_SRC_INPUT_INPUTCPPROOT_INPUTCPPROOT_HH__
 
+#include <string>
+
 #include "json/json.h"
 
 #include "src/legacy/Interface/Squeal.hh"
@@ -28,15 +30,43 @@ class irstream;
 
 namespace MAUS {
 
+/** @class InputCppRoot
+ *
+ *  InputCppRoot enables us to read in ROOT files and emit them as strings
+ *  containing json formatted data. InputCppRoot uses irstream from
+ *  JsonCppStreamer to read ROOT files and JsonCppConverter to convert from
+ *  ROOT to json.
+ */
 class InputCppRoot {
  public:
-  InputCppRoot(std::string filename = "");
+  /** Constructor for InputCppRoot, initialises all members to NULL
+   *
+   *  @param filename if set forces the Inputter to use the filename rather than
+   *         pulling a filename from the datacards at birth
+   */
+  explicit InputCppRoot(std::string filename = "");
+  /** Destructor for InputCppRoot - calls death()
+   */
   ~InputCppRoot();
 
+  /** Initialise the inputter
+   *
+   *  @param json_datacards json formatted string containing the json datacards
+   *  - takes root file from "root_input_filename" parameter
+   */
   bool birth(std::string json_datacards);
+
+  /** Deletes inputter member data
+   */
   bool death();
+
+  /** Gets the next event from the root file. If there are no more events,
+   *  returns an empty string ("")
+   */
   std::string getNextEvent();
 
+  /** The emitter - should be overloaded by SWIG script
+   */
   std::string emitter() {
     throw(Squeal(Squeal::recoverable, "This function should be overloaded",
                 "InputCppRoot::emitter"));
@@ -49,9 +79,7 @@ class InputCppRoot {
   MausData* _md;
   Json::Value _val;
   std::string _filename;
-
 };
-
 }
 
 #endif
