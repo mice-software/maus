@@ -17,7 +17,9 @@
 
 #include "src/common_cpp/Recon/SciFiSpacePoint.hh"
 
-SciFiSpacePoint::SciFiSpacePoint() {}
+SciFiSpacePoint::SciFiSpacePoint() {
+  _tracker = -1;
+}
 
 SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2, SciFiCluster *clust3) {
   make_triplet(clust1, clust2, clust3);
@@ -25,6 +27,7 @@ SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2, Sci
   _channels.push_back(clust1);
   _channels.push_back(clust2);
   _channels.push_back(clust3);
+  _tracker = -1;
 }
 
 SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2) {
@@ -32,6 +35,7 @@ SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2) {
   _type = "duplet";
   _channels.push_back(clust1);
   _channels.push_back(clust2);
+  _tracker = -1;
 }
 
 SciFiSpacePoint::~SciFiSpacePoint() {}

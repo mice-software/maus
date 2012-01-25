@@ -32,6 +32,7 @@
 #include "src/common_cpp/Recon/SciFiDigit.hh"
 #include "src/common_cpp/Recon/SciFiCluster.hh"
 #include "src/common_cpp/Recon/SciFiSpacePoint.hh"
+#include "src/common_cpp/Recon/SciFiStraightPRTrack.hh"
 
 class TrackerEvent {
  public:
@@ -45,7 +46,8 @@ class TrackerEvent {
   std::vector<SciFiHit*>   scifihits;
   std::vector<SciFiDigit*>   scifidigits;
   std::vector<SciFiCluster*> scificlusters;
-  std::vector<SciFiSpacePoint* > scifispacepoints;
+  std::vector<SciFiSpacePoint*> scifispacepoints;
+  std::vector<SciFiStraightPRTrack*> scifistraightprtracks;
 
   // private:
   // std::string _filename;

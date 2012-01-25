@@ -80,6 +80,16 @@ class MapCppTrackerRecon {
 
   void spacepoint_recon(TrackerEvent &evt);
 
+  /** @brief Perform Pattern Recognition for straight tracks
+   *
+   *  This takes one argument, the SciFi event, extracts the 
+   *  spacepoints, reconstructs the PR tracks, and pushes them
+   *  back into the event.
+   *
+   *  @param evt - The SciFi event
+   */
+  void straightprtrack_recon(TrackerEvent &evt);
+
   bool clusters_are_not_used(SciFiCluster* candidate_A, SciFiCluster* candidate_B);
 
   bool clusters_are_not_used(SciFiCluster* candidate_A, SciFiCluster* candidate_B,

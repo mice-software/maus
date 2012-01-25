@@ -102,6 +102,10 @@ std::string MapCppTrackerRecon::process(std::string document) {
     if ( event.scificlusters.size() ) {
       spacepoint_recon(event);
     }
+    // Pattern Recognition
+    if ( event.scifispacepoints.size() ) {
+      straightprtrack_recon(event);
+    }
     print_event_info(event);
     save_to_json(event);
   }
@@ -307,6 +311,29 @@ void MapCppTrackerRecon::spacepoint_recon(TrackerEvent &evt) {
   }
 }
 
+void MapCppTrackerRecon::straightprtrack_recon(TrackerEvent &evt) {
+  std::cout << "Begining Pattern Recognition" << std::endl;
+  std::cout << "Number of spacepoints in spill: " << evt.scifispacepoints.size() << std::endl;
+
+  std::vector<SciFiSpacePoint*> spnts = evt.scifispacepoints;
+
+  // Count the number of space points in each station
+  std::vector<int> spnts_per_station(5, 0);
+
+  for ( int i = 0; i < spnts.size(); ++i ) {
+    for ( int j = 1; j < spnts_per_station.size() + 1; ++j ) {
+      if ( spnts[i]->get_station() == j ) {
+	++spnts_per_station[j-1];
+	break; // If we match this sp to a station, move to the next sp
+      }
+    }
+  }
+
+  for ( int i = 0; i < spnts_per_station.size(); ++i ) {
+    std::cout << spnts_per_station[i] << " spacepoints in station " << (i + 1) << std::endl;
+  }
+}
+
 bool MapCppTrackerRecon::kuno_accepts(SciFiCluster* cluster1,
                                       SciFiCluster* cluster2,
                                       SciFiCluster* cluster3) {
@@ -399,7 +426,8 @@ void MapCppTrackerRecon::save_to_json(TrackerEvent &evt) {
 void MapCppTrackerRecon::print_event_info(TrackerEvent &event) {
   std::cout << event.scifidigits.size() << " "
             << event.scificlusters.size() << " "
-            << event.scifispacepoints.size() << " " << std::endl;
+            << event.scifispacepoints.size() << " "
+	    << event.scifistraightprtracks.size() << " " << std::endl;
 }
 
 void MapCppTrackerRecon::dump_info(SciFiCluster* candidate_A, SciFiCluster* candidate_B,
