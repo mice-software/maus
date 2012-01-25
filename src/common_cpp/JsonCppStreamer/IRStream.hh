@@ -36,6 +36,11 @@ class irstream : public rstream{
   template<typename T> irstream& basetype_extraction(T&);
   template<typename T> irstream& basetype_extraction(T* &);
   long m_evtCount;  //added later.
+
+  FRIEND_TEST(IRStreamTest, TestConstructor);
+  FRIEND_TEST(IRStreamTest, TestFileOpen);
+  FRIEND_TEST(IRStreamTest, TestFileClose);
+  FRIEND_TEST(IRStreamTest, TestReadEvent);
 };
 
 

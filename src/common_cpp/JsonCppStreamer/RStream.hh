@@ -1,8 +1,6 @@
 #ifndef RSTREAM_H
 #define RSTREAM_H 1
 
-#include "gtest/gtest_prod.h"
-
 #include <cstring>
 #include <TFile.h>
 #include <TTree.h>
@@ -19,8 +17,8 @@ class rstream{
   virtual void close()=0;
   static rstream& setBranch(rstream& rs,const char* name);
 
-  const TFile* getTFile() {return m_file;}
-  const TTree* getTTree() {return m_tree;}
+  TFile* getTFile() {return m_file;}
+  TTree* getTTree() {return m_tree;}
 
  protected:
   TFile* m_file;
@@ -28,7 +26,6 @@ class rstream{
   char* m_branchName;
   TTree* m_tree;
   std::vector<void*> m_pointers;
-
 };
 
 

@@ -20,24 +20,23 @@
 #include "TTree.h"
 
 #include "src/common_cpp/JsonCppStreamer/IRStream.hh"
-
-namespace MAUS {
+#include "src/common_cpp/JsonCppStreamer/OneArgManip.hh"
 
 TEST( IRStreamTest, TestConstructor ) {
   TFile f("TestFile.root","RECREATE");
   TTree t("TestTree","treetitle");
   t.Write();
   f.Close();
+  // explicitly allocate memory so we can run destructor explicitly
   irstream* is = new irstream("TestFile.root","TestTree");
 
-
-  ASSERT_NE(is->getEventCount(), 0)
+  ASSERT_EQ(is->m_evtCount, 0)
                  << "Fail: event counter not initialised properly" << std::endl;
-  ASSERT_NE(is->getTFile(), static_cast<void*>(NULL))
+  ASSERT_NE(is->m_file, static_cast<void*>(NULL))
                       <<"Fail: file object not initialised properly"<<std::endl;
-  ASSERT_NE(is->getTTree(), static_cast<void*>(NULL))
+  ASSERT_NE(is->m_tree, static_cast<void*>(NULL))
                       <<"Fail: tree object not initialised properly"<<std::endl;
-
+  ASSERT_TRUE(false) << "delete makes segv so disabled";
   delete is;  // and delete shouldn't crash...
 }
 
@@ -60,9 +59,9 @@ TEST( IRStreamTest, TestFileOpen ) {
   is.open("TestFile.root","TestTree");
 
   ASSERT_EQ(is.m_evtCount, 0) << "Fail: event counter not reset" << std::endl;
-  ASSERT_NE(is.m_file, NULL)
+  ASSERT_NE(is.m_file, static_cast<void*>(NULL))
                  << "Fail: file object not initialised properly" << std::endl;
-  ASSERT_NE(is.m_tree, NULL)
+  ASSERT_NE(is.m_tree, static_cast<void*>(NULL))
                  << "Fail: tree object not initialised properly" << std::endl;
   ASSERT_NE(is.m_branchName, "") << "Fail: branch name not reset" << std::endl;
 
@@ -87,13 +86,14 @@ TEST( IRStreamTest, TestFileClose ) {
 
   ASSERT_NE(is.m_branchName, "")
                        << "Fail: did not reset the branch name." << std::endl;
-  ASSERT_EQ(is.m_file, NULL)
+  ASSERT_EQ(is.m_file, static_cast<void*>(NULL))
                       << "Fail: did not delete the file object." << std::endl;
-  ASSERT_EQ(is.m_tree, NULL)
+  ASSERT_EQ(is.m_tree, static_cast<void*>(NULL))
                           <<"Fail: did not delete the tree object"<<std::endl;
 }
 
 TEST( IRStreamTest, TestReadEvent ) {
+//  ASSERT_TRUE(false) << "Makes segv so disabled";
   TFile f("TestFile.root","RECREATE");
   TTree t("TestTree","treetitle");
   Int_t* a = new Int_t(17);
@@ -112,21 +112,17 @@ TEST( IRStreamTest, TestReadEvent ) {
 
   irstream is("TestFile.root","TestTree");
   int c=0;    
-  is>>branchName("testA")>>a;
-  is>>branchName("testB")>>c;
+  is>>oneArgManip<const char*>::branchName("testA")>>a;
+  is>>oneArgManip<const char*>::branchName("testB")>>c;
 
   int evtCount=0;    
   while(is>>readEvent){
     ++evtCount;
     ASSERT_EQ(evtCount, is.m_evtCount)
        <<"Fail: didn't increment the read event counter properly."<<std::endl;
-    ASSERT_EQ(*a, 17)
+    ASSERT_TRUE(*a == 17 || *a == 26)
          <<"Fail: didn't read in the correct values from pointer."<<std::endl;
-    ASSERT_EQ(*a, 26)
-         <<"Fail: didn't read in the correct values from pointer."<<std::endl;
-    ASSERT_EQ(c, 23)
-     <<"Fail: didn't read in the correct values from non-pointer."<<std::endl;
-    ASSERT_EQ(c, 19)
+    ASSERT_TRUE(c == 23 || c ==19)
      <<"Fail: didn't read in the correct values from non-pointer."<<std::endl;
   }
   
@@ -141,6 +137,5 @@ TEST( IRStreamTest, TestReadEvent ) {
   delete a;
 }
 
-}
 
 

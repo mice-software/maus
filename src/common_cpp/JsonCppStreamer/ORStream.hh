@@ -1,5 +1,8 @@
 #ifndef ORSTREAM_H
 #define ORSTREAM_H
+
+#include "gtest/gtest_prod.h"
+
 #include "RStream.hh"
 #include "OneArgManip.hh"
 
@@ -23,13 +26,17 @@ class orstream : public rstream{
   template<typename T> orstream& operator<<(oneArgManip<T>*);
   template<typename T> orstream& operator<<(T&);
   template<typename T> orstream& operator<<(T* &);
-#ifdef TESTING
-  friend class test_orstream;
-#endif
+
  private:
   template<typename T> orstream& basetype_insertion(T&);
   template<typename T> orstream& basetype_insertion(T* &);
   long m_evtCount;
+
+  FRIEND_TEST(ORStreamTest, TestConstructor);
+  FRIEND_TEST(ORStreamTest, TestFileOpen);
+  FRIEND_TEST(ORStreamTest, TestFileClose);
+  FRIEND_TEST(ORStreamTest, TestFillEvent);
+
 };
 
 
@@ -67,7 +74,7 @@ template<>orstream& orstream::operator<< <double>(double& d){return basetype_ins
 template<>orstream& orstream::operator<< <float>(float& d){return basetype_insertion(d);}
 
 template<typename T> orstream& orstream::operator<<(T* & d){
-  if(!strcmp(m_branchName,"")){ 
+  if(!strcmp(m_branchName,"")){
     m_log << MsgStream::ERROR << "No branch name set"<< std::endl;
     m_log << MsgStream::INFO  << "Setup a branch name before attaching a data object using << branchName(\"MyBranch\")" <<std::endl;
     return *this; 
