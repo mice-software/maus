@@ -90,6 +90,12 @@ class MapCppTrackerRecon {
    */
   void straightprtrack_recon(TrackerEvent &evt);
 
+  void make_spr_5pt(const std::vector<SciFiSpacePoint*>&, std::vector<SciFiStraightPRTrack>&);
+
+  void make_spr_4pt(const std::vector<SciFiSpacePoint*>&, std::vector<SciFiStraightPRTrack>&);
+
+  void make_spr_3pt(const std::vector<SciFiSpacePoint*>&, std::vector<SciFiStraightPRTrack>&);
+
   bool clusters_are_not_used(SciFiCluster* candidate_A, SciFiCluster* candidate_B);
 
   bool clusters_are_not_used(SciFiCluster* candidate_A, SciFiCluster* candidate_B,

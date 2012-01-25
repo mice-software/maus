@@ -315,23 +315,84 @@ void MapCppTrackerRecon::straightprtrack_recon(TrackerEvent &evt) {
   std::cout << "Begining Pattern Recognition" << std::endl;
   std::cout << "Number of spacepoints in spill: " << evt.scifispacepoints.size() << std::endl;
 
-  std::vector<SciFiSpacePoint*> spnts = evt.scifispacepoints;
+  int n_trackers = 2;
+  int n_stations_per_tracker = 5;
 
-  // Count the number of space points in each station
-  std::vector<int> spnts_per_station(5, 0);
+  // Split spacepoints up according to which tracker they occured in
+  // ----------------------------------------------------------------
 
-  for ( int i = 0; i < spnts.size(); ++i ) {
-    for ( int j = 1; j < spnts_per_station.size() + 1; ++j ) {
-      if ( spnts[i]->get_station() == j ) {
-	++spnts_per_station[j-1];
-	break; // If we match this sp to a station, move to the next sp
+  // Construct a 2D matrix to hold spacepoints
+  // 1st index differentiates between trackers, 2nd index the spacepoints
+  std::vector< std::vector<SciFiSpacePoint*> > spnts(n_trackers);
+
+  for ( int trker_no = 0; trker_no < n_trackers; ++trker_no ) {
+    for ( int i = 0; i < evt.scifispacepoints.size(); ++i ) {
+      if ( evt.scifispacepoints[i]->get_tracker() == trker_no ) {
+        spnts[trker_no].push_back(evt.scifispacepoints[i]);
       }
     }
+    std::cout << "Spacepoints in Tracker " << trker_no << ": ";
+    std::cout << spnts[trker_no].size() << std::endl;
   }
 
-  for ( int i = 0; i < spnts_per_station.size(); ++i ) {
-    std::cout << spnts_per_station[i] << " spacepoints in station " << (i + 1) << std::endl;
+  // Count the number of spacepoints per tracker per station
+  // and the number of stations hit in each tracker
+  // --------------------------------------------------------
+
+  // Construct a 2*5 matrix of ints to hold the number of sp per station per tracker
+  std::vector< std::vector<int> > spnts_per_station(2, std::vector<int>(n_stations_per_tracker, 0));
+
+  std::vector<int> stations_hit(2, 0);
+
+  for ( int trker_no = 0; trker_no < n_trackers; ++trker_no ) {
+    // Count the number of space points in each station
+    for ( int i = 0; i < spnts[trker_no].size(); ++i ) {
+      for ( int j = 1; j < spnts_per_station[trker_no].size() + 1; ++j ) {
+	if ( spnts[trker_no][i]->get_station() == j ) {
+	  ++spnts_per_station[trker_no][j-1];
+	  break; // If we match this sp to a station, move to the next sp
+	}
+      }
+    }
+    // Count how many stations have at least one spacepoint
+    for ( int i = 0; i < spnts_per_station[trker_no].size(); ++i ) {
+      std::cout << "Tracker " << trker_no+1 << " Station " << i+1;
+      std::cout << " sp: " << spnts_per_station[trker_no][i] << std::endl;
+      if ( spnts_per_station[trker_no][i] > 0 ) {
+        ++stations_hit[trker_no];
+      }
+    }
+    std::cout << stations_hit[trker_no] << " stations hit in Tracker " << trker_no+1 << std::endl;
   }
+
+  // Make the tracks depending on how many stations have spacepoints in them
+  // -----------------------------------------------------------------------
+
+  for ( int trker_no = 0; trker_no < n_trackers; ++trker_no ) {
+    if (stations_hit[trker_no] == 5)
+      make_spr_5pt(spnts[trker_no], evt.scifistraightprtracks);
+    if (evt.scifistraightprtracks.size() == 0 && stations_hit[trker_no] > 3)
+      make_spr_4pt(spnts[trker_no], evt.scifistraightprtracks);
+    if (evt.scifistraightprtracks.size() == 0 && stations_hit[trker_no] > 2)
+      make_spr_3pt(spnts[trker_no], evt.scifistraightprtracks);
+  }
+  if ( evt.scifistraightprtracks.size() == 0 )
+    std::cout << "No tracks found" << std::endl;
+}
+
+void MapCppTrackerRecon::make_spr_5pt(const std::vector<SciFiSpacePoint*>&,
+				      std::vector<SciFiStraightPRTrack>&) {
+  std::cout << "Making 5 point track" << std::endl;
+}
+
+void MapCppTrackerRecon::make_spr_4pt(const std::vector<SciFiSpacePoint*>&,
+				      std::vector<SciFiStraightPRTrack>&) {
+  std::cout << "Making 4 point track" << std::endl;
+}
+
+void MapCppTrackerRecon::make_spr_3pt(const std::vector<SciFiSpacePoint*>&,
+				      std::vector<SciFiStraightPRTrack>&) {
+  std::cout << "Making 3 point track" << std::endl;
 }
 
 bool MapCppTrackerRecon::kuno_accepts(SciFiCluster* cluster1,

@@ -47,7 +47,7 @@ class TrackerEvent {
   std::vector<SciFiDigit*>   scifidigits;
   std::vector<SciFiCluster*> scificlusters;
   std::vector<SciFiSpacePoint*> scifispacepoints;
-  std::vector<SciFiStraightPRTrack*> scifistraightprtracks;
+  std::vector<SciFiStraightPRTrack> scifistraightprtracks;
 
   // private:
   // std::string _filename;
