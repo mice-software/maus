@@ -29,6 +29,8 @@ import os
 
 type_of_dataflow = 'pipeline_single_thread'
 
+input_json_file_name = "input.json"
+input_json_file_type = "text"
 output_json_file_name = "simulation.out"
 output_json_file_type = "text"
 
