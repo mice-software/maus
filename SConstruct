@@ -488,7 +488,7 @@ def root_io_libraries(env, maus_root_dir):
     extra_libs = []
     here = os.getcwd()
     os.chdir(os.path.join(maus_root_dir, 'src/common_cpp/DataStructure'))
-    proc = subprocess.Popen(['root', '-q', '-l'])
+    proc = subprocess.Popen(['root', '-q', '-l', '-b'])
     proc.wait()
     for shared_object in glob.glob('*.so'):
         shutil.copy(shared_object, os.path.join(maus_root_dir, 'build', shared_object))
