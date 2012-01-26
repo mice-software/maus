@@ -16,8 +16,6 @@
  */
 
 #include "src/map/MapCppTrackerRecon/MapCppTrackerRecon.hh"
-#include <iostream>
-#include <fstream>
 
 bool MapCppTrackerRecon::birth(std::string argJsonConfigDocument) {
   _classname = "MapCppTrackerRecon";
@@ -56,9 +54,10 @@ std::string MapCppTrackerRecon::process(std::string document) {
   TrackerSpill spill;
   spill.events_in_spill.clear();
 
-  // Check if the JSON document can be parsed, else return error.
-  bool parsingSuccessful = reader.parse(document, root);
-  if (!parsingSuccessful) {
+  try {
+   root = JsonWrapper::StringToJson(document);
+   digitization(spill,root);
+  } catch(...) {
     Json::Value errors;
     std::stringstream ss;
     ss << _classname << " says:" << reader.getFormatedErrorMessages();
@@ -67,108 +66,46 @@ std::string MapCppTrackerRecon::process(std::string document) {
     return writer.write(root);
   }
 
-  // === The Digits vectors is filled, either by running real data ==========
-  // === digitization or by reading-in an already existing digits branch.====
-  // Try to get dat_data...
-  if ( root.isMember("daq_data") ) {
-    Json::Value daq;
-    daq = root.get("daq_data", 0);
-    if ( check_sanity_daq(daq) )
-      RealDataDigitization(spill, daq);
-    // ..or try to get digits...
-  } else if ( root.isMember("digits") ) {
-    Json::Value digits;
-    digits = root.get("digits", 0);
-    if ( check_sanity_digits(digits) )
-      fill_digits_vector(digits, spill);
-    // ... or report error.
-  } else {
+  try { // ================= Reconstruction =========================
+    for ( int k = 0; k < spill.events_in_spill.size(); k++ ) {
+      TrackerEvent event = spill.events_in_spill[k];
+      // Build Clusters.
+      if ( event.scifidigits.size() ) {
+        cluster_recon(event);
+      }
+      // Build SpacePoints.
+      if ( event.scificlusters.size() ) {
+        spacepoint_recon(event);
+      }
+   // print_event_info(event);
+
+      save_to_json(event);
+    } // ==========================================================
+  } catch(...) {
     Json::Value errors;
     std::stringstream ss;
     ss << _classname << " says:" << reader.getFormatedErrorMessages();
-    errors["bad_json_document"] = ss.str();
+    errors["recon_failed"] = ss.str();
     root["errors"] = errors;
     return writer.write(root);
   }
 
-  // ================= Reconstruction =========================
-  for ( int k = 0; k < spill.events_in_spill.size(); k++ ) {
-    TrackerEvent event = spill.events_in_spill[k];
-    // Build Clusters.
-    if ( event.scifidigits.size() ) {
-      cluster_recon(event);
-    }
-    // Build SpacePoints.
-    if ( event.scificlusters.size() ) {
-      spacepoint_recon(event);
-    }
- //   print_event_info(event);
-
-    // Fit straight line.
-   // if ( event.scifispacepoints.size() ) {
-  //    fit(event);
-  //  }
-    save_to_json(event);
-  }
-  // ==========================================================
   return writer.write(root);
 }
 
-bool MapCppTrackerRecon::check_sanity_digits(Json::Value digits) {
-  // Check if JSON document is of the right type, else return error
-  if (!digits.isArray()) {
-    Json::Value errors;
-    std::stringstream ss;
-    ss << _classname << " says:" << "Digits branch isn't an array";
-    errors["bad_type"] = ss.str();
-    root["errors"] = errors;
-    return false;
+// === The Digits vectors is filled, either by running real data ==========
+// === digitization or by reading-in an already existing digits branch.====
+void MapCppTrackerRecon::digitization(TrackerSpill &spill, Json::Value &root) {
+  if ( root.isMember("daq_data") ) {
+    Json::Value daq = root.get("daq_data", 0);
+    RealDataDigitization real;
+    real.construct(spill, daq);
+  } else if ( root.isMember("digits") ) {
+    Json::Value digits = root.get("digits", 0);
+    fill_digits_vector(digits, spill);
+  } else {
+    throw;
   }
-  return true;
-}
-
-bool MapCppTrackerRecon::check_sanity_daq(Json::Value daq) {
-  // Check sanity of the 'daq_data' branch
-  if ( !root.isMember("daq_data") || root["daq_data"].isNull() ) {
-    Json::Value errors;
-    //std::cout << "bad DAQ_DATA, skipping event" << std::endl;
-    std::stringstream ss;
-    ss << _classname << " says:" << "Empty spill.";
-    errors["missing_branch"] = ss.str();
-    root["errors"] = errors;
-    return false;
-  }
-  std::ofstream file;
-  file.open("errors.txt", std::ios::out | std::ios::app);
-
-  if ( !daq.isMember("tracker1") ) {
-    file << 0 << " " << 1 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << "\n";
-    //std::cout << "Missing tracker1." << std::endl;
-  }
-  if ( !daq.isMember("tracker2") ) {
-    file << 0 << " " << 0 << " " << 1 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << "\n";
-    //std::cout << "Missing tracker2." << std::endl;
-  }
-
-  if ( daq["tracker1"].size() != daq["tracker2"].size() ) {
-    file << 0 << " " << 0 << " " << 0 << " " << 1 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << "\n";
-    //std::cout << "Different sizes for Tracker1 and Tracker2." << std::endl;
-  }
-
-  // A DATE feature... event counting starts at 1.
-  if ( !daq["tracker1"][(Json::Value::ArrayIndex)0].isNull()) {
-    file << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 1 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << "\n";
-    //file << daq["tracker1"][0] << "\n";
-    //std::cout << "First event for Tracker1 is not Null!" << std::endl;
-  }
-  if ( !daq["tracker2"][(Json::Value::ArrayIndex)0].isNull()) {
-    file << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 1 << " " << 0 << " " << 0 << " " << 0 << "\n";
-    //file << daq["tracker2"][0] << "\n";
-    //std::cout << "First event for Tracker2 is not Null!" << std::endl;
-  }
-
-  file.close();
-  return true;
 }
 
 void MapCppTrackerRecon::fill_digits_vector(Json::Value digits_event, TrackerSpill &a_spill) {
@@ -206,20 +143,10 @@ void MapCppTrackerRecon::cluster_recon(TrackerEvent &evt) {
   // Get the number of clusters. If too large, abort reconstruction.
   int seeds_size = seeds.size();
   if ( seeds_size > ClustException ) {
-    std::cout << "Massive event, won't bother to reconstruct." << std::endl;
-    std::ofstream file;
-    file.open("errors.txt", std::ios::out | std::ios::app);
-    file << 1 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << "\n";
-    file.close();
-
     return;
   }
-  // Sort seeds so that we use higher npe first.
-  // sort(seeds.begin(),seeds.end());
 
-  // SciFiDigit* neigh;// = NULL;
-  // SciFiDigit* seed;
-  // double pe;
+  // Sort seeds so that we use higher npe first.
 
   for ( unsigned int i = 0; i < seeds_size; i++ ) {
     if ( !seeds[i]->is_used() ) {
@@ -237,8 +164,6 @@ void MapCppTrackerRecon::cluster_recon(TrackerEvent &evt) {
              seeds[j]->get_station() == station && seeds[j]->get_plane()   == plane &&
              abs( seeds[j]->get_channel() - fibre ) < 2 ) {
           neigh = seeds[j];
-         // std::cout << "Chans ns: " << seeds[j]->get_channel() << " " << fibre << ". Diff is " << seeds[j]->get_channel() - fibre << std::endl;
-         // std::cout << "Found neigh " << j << " for digit " << i <<std::endl;
         }
       }
       // If there is a neighbour, sum npe contribution.
@@ -250,7 +175,6 @@ void MapCppTrackerRecon::cluster_recon(TrackerEvent &evt) {
         SciFiCluster* clust = new SciFiCluster(seed);
         if ( neigh ) {
           clust->add_digit(neigh);
-        //  std::cout << "adding digit" << std::endl;
         }
         clust->construct(modules);
         evt.scificlusters.push_back(clust);
@@ -391,7 +315,6 @@ bool MapCppTrackerRecon::clusters_are_not_used(SciFiCluster* candidate_A,
   }
 }
 
-
 void MapCppTrackerRecon::save_to_json(TrackerEvent &evt) {
   Json::Value digits;
   for ( unsigned int evt_i=0; evt_i < evt.scifidigits.size(); evt_i++ ) {
@@ -443,51 +366,6 @@ void MapCppTrackerRecon::save_to_json(TrackerEvent &evt) {
   root["space_points"]["tracker2"].append(tracker1);
 }
 
-void MapCppTrackerRecon::fit(TrackerEvent &evt) {
-  bool station_hit[2][6] = { {false, false, false, false, false, false},
-                             {false, false, false, false, false, false}};
-
-  std::ofstream file;
-  file.open("triplets_ana.txt", std::ios::out | std::ios::app);
-
-  std::vector<SciFiSpacePoint*> event[2][6];
-  for ( unsigned int sp_i=0; sp_i < evt.scifispacepoints.size(); sp_i++ ) {
-    int tracker = evt.scifispacepoints[sp_i]->get_tracker();
-    int station = evt.scifispacepoints[sp_i]->get_station();
-    // int evt.scifispacepoints[evt_i]->get_npe();
-    // evt.scifispacepoints[evt_i]->get_time();
-    std::string type = evt.scifispacepoints[sp_i]->get_type();
-    event[tracker][station].push_back(evt.scifispacepoints[sp_i]);
-
-    if (type == "triplet" ) {
-      file << tracker << " " << station << " " << 3 << "\n";
-    } else {
-      file << tracker << " " << station << " " << 2 << "\n";
-    }
-
-    station_hit[tracker][station]=true;
-  }
-  file.close();
-
-  std::ofstream file1;
-  file1.open("efficiency_ana.txt", std::ios::out | std::ios::app);
-  for ( int tr = 0; tr < 2; tr++ ) {
-    int hit_counter = 0;
-    if ( station_hit[tr][1] && station_hit[tr][5] ) {
-      for ( int i = 2; i < 5; i++ ) {
-        if ( station_hit[i] )
-          hit_counter+=1;
-      }
-      file1 << tr << " " << hit_counter << "\n";
-    }
-  }
-  file1.close();
-
-}
-
-
-
- 
 void MapCppTrackerRecon::print_event_info(TrackerEvent &event) {
   std::cout << event.scifidigits.size() << " "
             << event.scificlusters.size() << " "

@@ -54,7 +54,9 @@
 
 class RealDataDigitization {
  public:
-  RealDataDigitization(TrackerSpill &spill, Json::Value input_event);
+  RealDataDigitization();
+
+  void construct(TrackerSpill &spill, Json::Value input_event);
 
   bool load_calibration(std::string filename);
 

@@ -17,7 +17,9 @@
 
 #include "src/map/MapCppTrackerRecon/RealDataDigitization.hh"
 
-RealDataDigitization::RealDataDigitization(TrackerSpill &spill, Json::Value daq) {
+RealDataDigitization::RealDataDigitization() {}
+
+void RealDataDigitization::construct(TrackerSpill &spill, Json::Value daq) {
   // -------------------------------------------------
   // Load calibration, mapping and bad channel list.
   bool calib = load_calibration("scifi_calibration_30_09_2011.txt");
@@ -33,20 +35,7 @@ RealDataDigitization::RealDataDigitization(TrackerSpill &spill, Json::Value daq)
 
   for ( unsigned int i = 1; i < tracker_event.size(); ++i ) {
     TrackerEvent event;
-    if ( daq["tracker1"][i].isNull() ) {
-      //std::cout << "Empty event in tracker 1." << std::endl;
-      std::ofstream file;
-      file.open("errors.txt", std::ios::out | std::ios::app);
-      file << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 1 << " " << 0 << " " << 0 << "\n";
-      file.close();
-    }
-    if ( daq["tracker2"][i].isNull() ) {
-      //std::cout << "Empty event in tracker 2." << std::endl;
-      std::ofstream file;
-      file.open("errors.txt", std::ios::out | std::ios::app);
-      file << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 0 << " " << 1 << " " << 0 << "\n";
-      file.close();
-    }
+
     Json::Value input_event = tracker_event[i]["VLSB_C"];
     // Merge tracker events.
     for ( unsigned int idig = 0; idig < daq["tracker2"][i]["VLSB_C"].size(); ++idig ) {
@@ -73,8 +62,9 @@ RealDataDigitization::RealDataDigitization(TrackerSpill &spill, Json::Value daq)
       int adc = channel_in["adc"].asInt();
       int tdc = channel_in["tdc"].asInt();
 
-      if ( !is_good_channel(bank, board, channel_ro) )
+      if ( !is_good_channel(bank, board, channel_ro) ) {
         continue;
+      }
 
       // Get pedestal and gain from calibration.
       assert(_calibration[board][bank][channel_ro].isMember("pedestal"));
@@ -97,10 +87,6 @@ RealDataDigitization::RealDataDigitization(TrackerSpill &spill, Json::Value daq)
 
       // Exclude missing modules.
       if ( pe > 1.0 && tracker != -1 ) {
-        assert(tracker == 0 || tracker == 1);
-        assert(station > 0 && station < 6);
-        assert(plane == 0 || plane == 1 || plane == 2);
-        assert(channel < 218);
         SciFiDigit *digit = new SciFiDigit(tracker, station, plane, channel, pe, tdc);
         event.scifidigits.push_back(digit);
       }

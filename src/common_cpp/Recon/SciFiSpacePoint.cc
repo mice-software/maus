@@ -46,29 +46,7 @@ void SciFiSpacePoint::make_triplet(SciFiCluster* vcluster,
   vcluster->set_used();
   xcluster->set_used();
   wcluster->set_used();
-/*
-  channels = Json::Value(Json::arrayValue);
-  channels.clear();
-  Json::Value one;
-  Json::Value two;
-  Json::Value three;
-  assert((*vcluster).isMember("ChanNoW"));
-  assert((*vcluster).isMember("plane"));
 
-  one["plane_number"]    =  (*vcluster)["plane"].asInt();
-  one["channel_number"]  =  (*vcluster)["ChanNoW"].asDouble();
-  one["npe"]             =  (*vcluster)["nPE"].asDouble();
-  two["plane_number"]    =  (*xcluster)["plane"].asInt();
-  two["channel_number"]  =  (*xcluster)["ChanNoW"].asDouble();
-  two["npe"]             =  (*xcluster)["nPE"].asDouble();
-  three["plane_number"]  =  (*wcluster)["plane"].asInt();
-  three["channel_number"]=  (*wcluster)["ChanNoW"].asDouble();
-  three["npe"]           =  (*wcluster)["nPE"].asDouble();
-
-  channels.append(one);
-  channels.append(two);
-  channels.append(three);
-*/
   _npe = vcluster->get_npe()+xcluster->get_npe()+wcluster->get_npe();
 
   Hep3Vector p1 = crossing_pos(vcluster, xcluster);
@@ -125,21 +103,7 @@ void SciFiSpacePoint::make_duplet
   // Set clusters as used
   clusterA->set_used();
   clusterB->set_used();
-/*
-  channels = Json::Value(Json::arrayValue);
-  channels.clear();
-  Json::Value one;
-  Json::Value two;
-  assert((*clusterA).isMember("ChanNoW"));
-  assert((*clusterA).isMember("plane"));
 
-  one["plane_number"]    =  (*clusterA)["plane"].asInt();
-  one["channel_number"]  =  (*clusterA)["ChanNoW"].asDouble();
-  two["plane_number"]    =  (*clusterB)["plane"].asInt();
-  two["channel_number"]  =  (*clusterB)["ChanNoW"].asDouble();
-  channels.append(one);
-  channels.append(two);
-*/
   _npe = clusterA->get_npe()+clusterB->get_npe();
 
   Hep3Vector p1 = crossing_pos(clusterA, clusterB);

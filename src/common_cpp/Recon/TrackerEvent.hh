@@ -27,6 +27,7 @@
 // C++ headers
 #include <vector>
 #include <string>
+#include <iterator>
 
 #include "src/common_cpp/Recon/SciFiHit.hh"
 #include "src/common_cpp/Recon/SciFiDigit.hh"

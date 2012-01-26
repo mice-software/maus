@@ -37,6 +37,8 @@
 // Other headers
 #include "Interface/Squeak.hh"
 #include "Config/MiceModule.hh"
+#include "src/common_cpp/Utils/CppErrorHandler.hh"
+#include "src/common_cpp/Utils/JsonWrapper.hh"
 
 #include "src/common_cpp/Recon/TrackerSpill.hh"
 #include "src/common_cpp/Recon/TrackerEvent.hh"
@@ -72,10 +74,6 @@ class MapCppTrackerRecon {
    *  Checks the sanity of the JSON input,
    */
 
-  bool check_sanity_daq(Json::Value daq);
-
-  bool check_sanity_digits(Json::Value digits);
-
   void cluster_recon(TrackerEvent &evt);
 
   void spacepoint_recon(TrackerEvent &evt);
@@ -95,7 +93,7 @@ class MapCppTrackerRecon {
 
   void dump_info(SciFiCluster* candidate_A, SciFiCluster* candidate_B, SciFiCluster* candidate_C);
 
-  void fit(TrackerEvent &evt);
+  void digitization(TrackerSpill &spill, Json::Value &root);
 
  private:
   /// This should be the classname
