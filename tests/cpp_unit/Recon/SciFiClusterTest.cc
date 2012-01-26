@@ -15,17 +15,15 @@
  *
  */
 
-#include "gtest/gtest.h"
-
-#include "src/common_cpp/Recon/SciFiCluster.hh"
-#include "src/common_cpp/Recon/SciFiDigit.hh"
-
 // C headers
 #include <assert.h>
 
 // Other headers
 #include "Config/MiceModule.hh"
+#include "src/common_cpp/Recon/SciFiCluster.hh"
+#include "src/common_cpp/Recon/SciFiDigit.hh"
 
+#include "gtest/gtest.h"
 
 namespace {
 class SciFiClusterTest : public ::testing::Test {
@@ -43,8 +41,8 @@ TEST_F(SciFiClusterTest, test_setters_getters) {
   int channel = 106;
   double npe = 3.2;
   double time = 12.2;
-  Hep3Vector direction(0.0,0.0,1.0);
-  Hep3Vector position(1.0,2.0,3.0);
+  Hep3Vector direction(0.0, 0.0, 1.0);
+  Hep3Vector position(1.0, 2.0, 3.0);
 
   SciFiCluster *Cluster = new SciFiCluster();
 
@@ -57,14 +55,14 @@ TEST_F(SciFiClusterTest, test_setters_getters) {
   Cluster->set_direction(direction);
   Cluster->set_position(position);
 
-  EXPECT_EQ(Cluster->get_tracker(),tracker);
-  EXPECT_EQ(Cluster->get_station(),station);
-  EXPECT_EQ(Cluster->get_plane(),plane);
-  EXPECT_EQ(Cluster->get_channel(),channel);
-  EXPECT_EQ(Cluster->get_npe(),npe);
-  EXPECT_EQ(Cluster->get_time(),time);
-  EXPECT_EQ(Cluster->get_direction(),direction);
-  EXPECT_EQ(Cluster->get_position(),position);
+  EXPECT_EQ(Cluster->get_tracker(), tracker);
+  EXPECT_EQ(Cluster->get_station(), station);
+  EXPECT_EQ(Cluster->get_plane(), plane);
+  EXPECT_EQ(Cluster->get_channel(), channel);
+  EXPECT_EQ(Cluster->get_npe(), npe);
+  EXPECT_EQ(Cluster->get_time(), time);
+  EXPECT_EQ(Cluster->get_direction(), direction);
+  EXPECT_EQ(Cluster->get_position(), position);
 }
 
 TEST_F(SciFiClusterTest, test_used_flag) {
@@ -88,12 +86,12 @@ TEST_F(SciFiClusterTest, test_constructor) {
 
   SciFiCluster *cluster = new SciFiCluster(digit);
 
-  EXPECT_EQ(cluster->get_tracker(),tracker);
-  EXPECT_EQ(cluster->get_station(),station);
-  EXPECT_EQ(cluster->get_plane(),plane);
-  EXPECT_EQ(cluster->get_channel(),channel);
-  EXPECT_EQ(cluster->get_npe(),npe);
-  EXPECT_EQ(cluster->get_time(),time);
+  EXPECT_EQ(cluster->get_tracker(), tracker);
+  EXPECT_EQ(cluster->get_station(), station);
+  EXPECT_EQ(cluster->get_plane(), plane);
+  EXPECT_EQ(cluster->get_channel(), channel);
+  EXPECT_EQ(cluster->get_npe(), npe);
+  EXPECT_EQ(cluster->get_time(), time);
   EXPECT_FALSE(cluster->is_used());
   EXPECT_TRUE(digit->is_used());
 }
@@ -117,8 +115,8 @@ TEST_F(SciFiClusterTest, test_add_digit) {
   // Add neighbour.
   cluster->add_digit(neighbour);
 
-  EXPECT_EQ(cluster->get_npe(),npe1+npe2);
-  EXPECT_EQ(cluster->get_channel(),(channel1+channel2)/2.0);
+  EXPECT_EQ(cluster->get_npe(), npe1+npe2);
+  EXPECT_EQ(cluster->get_channel(), (channel1+channel2)/2.0);
   EXPECT_TRUE(neighbour->is_used());
 }
 

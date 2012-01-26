@@ -29,9 +29,9 @@ bool ReduceCppTracker::birth(std::string argJsonConfigDocument) {
   _filename = "cosmics.root";
   _nSpills = 0;
 
-  TCanvas *c1 = new TCanvas( "c1","Light Yield", 200, 10, 700, 500 );
-  TCanvas *c2 = new TCanvas( "c2","Spacepoints Type", 200, 10, 700, 500 );
-  TCanvas *c3 = new TCanvas( "c3","Efficiency", 200, 10, 700, 500 );
+  TCanvas *c1 = new TCanvas("c1", "Light Yield", 200, 10, 700, 500);
+  TCanvas *c2 = new TCanvas("c2", "Spacepoints Type", 200, 10, 700, 500);
+  TCanvas *c3 = new TCanvas("c3", "Efficiency", 200, 10, 700, 500);
 
   _digits.SetNameTitle("digits", "digits");
   _digits.Branch("npe", &_npe, "npe/D");
@@ -39,21 +39,21 @@ bool ReduceCppTracker::birth(std::string argJsonConfigDocument) {
 
   _spacepoints.SetNameTitle("spacepoints", "spacepoints");
   _spacepoints.Branch("tracker", &_tracker, "tracker/I");
-  _spacepoints.Branch("station", &_station,"station/I");
-  _spacepoints.Branch("type", &_type,"type/I");
+  _spacepoints.Branch("station", &_station, "station/I");
+  _spacepoints.Branch("type", &_type, "type/I");
 
-  _events.SetNameTitle("events","events");
-  _events.Branch("station_hits",&_station_hits,"station_hits/I");
-  _events.Branch("tracker",&_tracker_event, "tracker/I");
+  _events.SetNameTitle("events", "events");
+  _events.Branch("station_hits", &_station_hits, "station_hits/I");
+  _events.Branch("tracker", &_tracker_event, "tracker/I");
 
-  c1->SetFillColor( 21 );
-  c1->GetFrame()->SetFillColor( 42 );
-  c1->GetFrame()->SetBorderSize( 6 );
-  c1->GetFrame()->SetBorderMode( -1 );
-  c1->Divide(2,1);
+  c1->SetFillColor(21);
+  c1->GetFrame()->SetFillColor(42);
+  c1->GetFrame()->SetBorderSize(6);
+  c1->GetFrame()->SetBorderMode(-1);
+  c1->Divide(2, 1);
 
-  c2->Divide(5,2);
-  c3->Divide(2,1);
+  c2->Divide(5, 2);
+  c3->Divide(2, 1);
   // JsonCpp setup
   Json::Value configJSON;
   try {
@@ -76,9 +76,9 @@ std::string  ReduceCppTracker::process(std::string document) {
   Json::Value xEventType;
   // Check if the JSON document can be parsed, else return error only
 
-  TCanvas *c1 = (TCanvas*)gROOT->GetListOfCanvases()->FindObject("c1");
-  TCanvas *c2 = (TCanvas*)gROOT->GetListOfCanvases()->FindObject("c2");
-  TCanvas *c3 = (TCanvas*)gROOT->GetListOfCanvases()->FindObject("c3");
+  TCanvas *c1 = reinterpret_cast<TCanvas*> gROOT->GetListOfCanvases()->FindObject("c1");
+  TCanvas *c2 = reinterpret_cast<TCanvas*> gROOT->GetListOfCanvases()->FindObject("c2");
+  TCanvas *c3 = reinterpret_cast<TCanvas*> gROOT->GetListOfCanvases()->FindObject("c3");
 
   try {
     root = JsonWrapper::StringToJson(document);}
@@ -104,8 +104,14 @@ std::string  ReduceCppTracker::process(std::string document) {
 
       // Loop over events.
       for (int PartEvent = 0; PartEvent < n_events; PartEvent++) {
-        Json::Value xPartEventTracker1_SP = GetPartEvent(root, "space_points", "tracker1", PartEvent);
-        Json::Value xPartEventTracker2_SP = GetPartEvent(root, "space_points", "tracker2", PartEvent);
+        Json::Value xPartEventTracker1_SP = GetPartEvent(root,
+                                                         "space_points",
+                                                         "tracker1",
+                                                         PartEvent);
+        Json::Value xPartEventTracker2_SP = GetPartEvent(root,
+                                                         "space_points",
+                                                         "tracker2",
+                                                         PartEvent);
 
         int n_sp_tracker1 = xPartEventTracker1_SP.size();
         int n_sp_tracker2 = xPartEventTracker2_SP.size();
@@ -174,9 +180,9 @@ std::string  ReduceCppTracker::process(std::string document) {
   // Display light yield.
   if (!(_nSpills%25)) {
     c1->cd(1);
-    _digits.Draw("npe","tracker==1");
+    _digits.Draw("npe", "tracker==1");
     c1->cd(2);
-    _digits.Draw("npe","tracker==2");
+    _digits.Draw("npe", "tracker==2");
     c1->Modified();
     c1->Update();
     Save();
@@ -184,37 +190,37 @@ std::string  ReduceCppTracker::process(std::string document) {
   // Display spacepoints type.
   // display_spacepoints();
   if (!(_nSpills%25)) {
-   c2->cd(1);
-   _spacepoints.Draw("type","tracker==1 && station==1 ");
-   c2->Update();
-   c2->cd(2);
-   _spacepoints.Draw("type","tracker==1 && station==2 ");
-   c2->Update();
-   c2->cd(3);
-   _spacepoints.Draw("type","tracker==1 && station==3 ");
-   c2->Update();
-   c2->cd(4);
-   _spacepoints.Draw("type","tracker==1 && station==4 ");
-   c2->Update();
-   c2->cd(5);
-   _spacepoints.Draw("type","tracker==1 && station==5 ");
-   c2->Update();
-   // tracker 1
-   c2->cd(6);
-   _spacepoints.Draw("type","tracker==2 && station==1 ");
-   c2->Update();
-   c2->cd(7);
-   _spacepoints.Draw("type","tracker==2 && station==2 ");
-   c2->Update();
-   c2->cd(8);
-   _spacepoints.Draw("type","tracker==2 && station==3 ");
-   c2->Update();
-   c2->cd(9);
-   _spacepoints.Draw("type","tracker==2 && station==4 ");
-   c2->Update();
-   c2->cd(10);
-   _spacepoints.Draw("type","tracker==2 && station==5 ");
-   c2->Update();
+    c2->cd(1);
+    _spacepoints.Draw("type", "tracker==1 && station==1 ");
+    c2->Update();
+    c2->cd(2);
+    _spacepoints.Draw("type", "tracker==1 && station==2 ");
+    c2->Update();
+    c2->cd(3);
+    _spacepoints.Draw("type", "tracker==1 && station==3 ");
+    c2->Update();
+    c2->cd(4);
+    _spacepoints.Draw("type", "tracker==1 && station==4 ");
+    c2->Update();
+    c2->cd(5);
+    _spacepoints.Draw("type", "tracker==1 && station==5 ");
+    c2->Update();
+    // tracker 1
+    c2->cd(6);
+    _spacepoints.Draw("type", "tracker==2 && station==1 ");
+    c2->Update();
+    c2->cd(7);
+    _spacepoints.Draw("type", "tracker==2 && station==2 ");
+    c2->Update();
+    c2->cd(8);
+    _spacepoints.Draw("type", "tracker==2 && station==3 ");
+    c2->Update();
+    c2->cd(9);
+    _spacepoints.Draw("type", "tracker==2 && station==4 ");
+    c2->Update();
+    c2->cd(10);
+    _spacepoints.Draw("type", "tracker==2 && station==5 ");
+    c2->Update();
   }
 
   // Display efficiency.
@@ -262,8 +268,14 @@ void ReduceCppTracker::light_yield(Json::Value &root) {
 
   // Loop over events.
   for (int PartEvent = 0; PartEvent < n_events; PartEvent++) {
-    Json::Value xPartEventTracker1_SP = GetPartEvent(root, "space_points", "tracker1", PartEvent);
-    Json::Value xPartEventTracker2_SP = GetPartEvent(root, "space_points", "tracker2", PartEvent);
+    Json::Value xPartEventTracker1_SP = GetPartEvent(root,
+                                                     "space_points",
+                                                     "tracker1",
+                                                     PartEvent);
+    Json::Value xPartEventTracker2_SP = GetPartEvent(root,
+                                                     "space_points",
+                                                     "tracker2",
+                                                     PartEvent);
 
     int n_sp_tracker1 = xPartEventTracker1_SP.size();
     int n_sp_tracker2 = xPartEventTracker2_SP.size();

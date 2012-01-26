@@ -15,12 +15,13 @@
  *
  */
 
-#include "gtest/gtest.h"
 
-//#include "src/map/MapCppTrackerRecon/MapCppTrackerRecon.hh"
+
+// #include "src/map/MapCppTrackerRecon/MapCppTrackerRecon.hh"
 #include <string>
-//#include "src/map/MapCppTrackerRecon/RealDataDigitization.hh"
+// #include "src/map/MapCppTrackerRecon/RealDataDigitization.hh"
 #include "src/map/MapCppTrackerMCDigitization/MapCppTrackerMCDigitization.hh"
+#include "gtest/gtest.h"
 
 namespace {
 class MapCppTrackerReconTest : public ::testing::Test {
@@ -35,11 +36,11 @@ TEST_F(MapCppTrackerReconTest, test_birth) {
   MapCppTrackerMCDigitization mapper;
   std::string argJsonConfigDocument("{}");
   int result = mapper.test();
-  //bool sa = mapper.death();
+  // bool sa = mapper.death();
 
-  //EXPECT_TRUE(result==2);
-//  RealDataDigitization real;
-//  EXPECT_TRUE(real.load_bad_channels());
+  // EXPECT_TRUE(result==2);
+  //  RealDataDigitization real;
+  //  EXPECT_TRUE(real.load_bad_channels());
 }
 
 } // namespace

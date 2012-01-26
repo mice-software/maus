@@ -81,7 +81,6 @@ class SciFiCluster {
 
   bool is_used() const { return _used; }
 
-  //void addDigit(SciFiDigit neigh);
   void set_direction(Hep3Vector direction) { _direction = direction; }
 
   Hep3Vector get_direction() const { return _direction; }

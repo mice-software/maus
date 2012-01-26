@@ -55,8 +55,8 @@ std::string MapCppTrackerRecon::process(std::string document) {
   spill.events_in_spill.clear();
 
   try {
-   root = JsonWrapper::StringToJson(document);
-   digitization(spill,root);
+    root = JsonWrapper::StringToJson(document);
+    digitization(spill, root);
   } catch(...) {
     Json::Value errors;
     std::stringstream ss;
@@ -77,7 +77,7 @@ std::string MapCppTrackerRecon::process(std::string document) {
       if ( event.scificlusters.size() ) {
         spacepoint_recon(event);
       }
-   // print_event_info(event);
+      // print_event_info(event);
 
       save_to_json(event);
     } // ==========================================================
@@ -162,7 +162,7 @@ void MapCppTrackerRecon::cluster_recon(TrackerEvent &evt) {
       for ( unsigned int j = i+1; j < seeds_size; j++ ) {
         if ( !seeds[j]->is_used() && seeds[j]->get_tracker() == tracker &&
              seeds[j]->get_station() == station && seeds[j]->get_plane()   == plane &&
-             abs( seeds[j]->get_channel() - fibre ) < 2 ) {
+             abs(seeds[j]->get_channel() - fibre) < 2 ) {
           neigh = seeds[j];
         }
       }
@@ -206,7 +206,6 @@ void MapCppTrackerRecon::spacepoint_recon(TrackerEvent &evt) {
       int numb_clusters_in_v = clusters[Tracker][Station][0].size();
       int numb_clusters_in_w = clusters[Tracker][Station][1].size();
       int numb_clusters_in_u = clusters[Tracker][Station][2].size();
-      //std::cout << "Number of clusters: " << numb_clusters_in_v << " " << numb_clusters_in_w << " " << numb_clusters_in_u << std::endl;
       for ( int cla = 0; cla < numb_clusters_in_v; cla++ ) {
         SciFiCluster* candidate_A = (clusters[Tracker][Station][0])[cla];
 
@@ -220,12 +219,8 @@ void MapCppTrackerRecon::spacepoint_recon(TrackerEvent &evt) {
 
             if ( kuno_accepts(candidate_A, candidate_B, candidate_C) &&
                  clusters_are_not_used(candidate_A, candidate_B, candidate_C) ) {
-              assert( !candidate_A->is_used() && !candidate_B->is_used() && !candidate_C->is_used());
               SciFiSpacePoint* triplet = new SciFiSpacePoint(candidate_A, candidate_B, candidate_C);
               evt.scifispacepoints.push_back(triplet);
-              // std::cout << candidate_A->get_channel() << " " <<
-              //              candidate_B->get_channel() << " " <<
-              //              candidate_C->get_channel() << std::endl;
               assert(candidate_A->is_used() && candidate_B->is_used() && candidate_C->is_used());
               dump_info(candidate_A, candidate_B, candidate_C);
               // triplet_counter += 1;
@@ -257,10 +252,8 @@ void MapCppTrackerRecon::spacepoint_recon(TrackerEvent &evt) {
 
               if ( clusters_are_not_used(candidate_A, candidate_B) &&
                    candidate_A->get_plane() != candidate_B->get_plane() ) {
-                assert(!candidate_A->is_used() && !candidate_B->is_used() );
                 SciFiSpacePoint* duplet = new SciFiSpacePoint(candidate_A, candidate_B);
                 evt.scifispacepoints.push_back(duplet);
-                assert(candidate_A->is_used() && candidate_B->is_used());
               //  duplet_counter += 1;
               }
             }
@@ -317,7 +310,7 @@ bool MapCppTrackerRecon::clusters_are_not_used(SciFiCluster* candidate_A,
 
 void MapCppTrackerRecon::save_to_json(TrackerEvent &evt) {
   Json::Value digits;
-  for ( unsigned int evt_i=0; evt_i < evt.scifidigits.size(); evt_i++ ) {
+  for ( unsigned int evt_i = 0; evt_i < evt.scifidigits.size(); evt_i++ ) {
     Json::Value digits_in_event;
     digits_in_event["tracker"]= evt.scifidigits[evt_i]->get_tracker();
     digits_in_event["station"]= evt.scifidigits[evt_i]->get_station();
@@ -332,7 +325,7 @@ void MapCppTrackerRecon::save_to_json(TrackerEvent &evt) {
   Json::Value tracker0;
   Json::Value tracker1;
   Json::Value channels;
-  for ( unsigned int evt_i=0; evt_i < evt.scifispacepoints.size(); evt_i++ ) {
+  for ( unsigned int evt_i = 0; evt_i < evt.scifispacepoints.size(); evt_i++ ) {
     Json::Value spacepoints_in_event;
     channels = Json::Value(Json::arrayValue);
     channels.clear();
@@ -355,7 +348,7 @@ void MapCppTrackerRecon::save_to_json(TrackerEvent &evt) {
       channels.append(cluster);
     }
     spacepoints_in_event["channels"] = channels;
-    if (tracker == 0 ) {
+    if ( tracker == 0 ) {
       tracker0.append(spacepoints_in_event);
     }
     if ( tracker == 1 ) {

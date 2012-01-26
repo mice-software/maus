@@ -61,7 +61,6 @@
 #include "TGScrollBar.h"
 #include "TGComboBox.h"
 #include "TGuiBldHintsEditor.h"
-#include "TGFrame.h"
 #include "TGFileDialog.h"
 #include "TGShutter.h"
 #include "TGButtonGroup.h"
@@ -83,7 +82,6 @@
 #include "TGToolTip.h"
 #include "TGToolBar.h"
 #include "TRootEmbeddedCanvas.h"
-#include "TCanvas.h"
 #include "TGuiBldDragManager.h"
 #include "Riostream.h"
 

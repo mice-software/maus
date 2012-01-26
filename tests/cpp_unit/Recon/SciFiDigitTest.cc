@@ -44,12 +44,12 @@ TEST_F(SciFiDigitTest, test_setters_getters) {
   digit->set_npe(npe);
   digit->set_time(time);
 
-  EXPECT_EQ(digit->get_tracker(),tracker);
-  EXPECT_EQ(digit->get_station(),station);
-  EXPECT_EQ(digit->get_plane(),plane);
-  EXPECT_EQ(digit->get_channel(),channel);
-  EXPECT_EQ(digit->get_npe(),npe);
-  EXPECT_EQ(digit->get_time(),time);
+  EXPECT_EQ(digit->get_tracker(), tracker);
+  EXPECT_EQ(digit->get_station(), station);
+  EXPECT_EQ(digit->get_plane(), plane);
+  EXPECT_EQ(digit->get_channel(), channel);
+  EXPECT_EQ(digit->get_npe(), npe);
+  EXPECT_EQ(digit->get_time(), time);
 }
 
 TEST_F(SciFiDigitTest, test_used_flag) {
@@ -70,12 +70,12 @@ TEST_F(SciFiDigitTest, test_constructor) {
 
   SciFiDigit *digit = new SciFiDigit(tracker, station, plane, channel, npe, time);
 
-  EXPECT_EQ(digit->get_tracker(),tracker);
-  EXPECT_EQ(digit->get_station(),station);
-  EXPECT_EQ(digit->get_plane(),plane);
-  EXPECT_EQ(digit->get_channel(),channel);
-  EXPECT_EQ(digit->get_npe(),npe);
-  EXPECT_EQ(digit->get_time(),time);
+  EXPECT_EQ(digit->get_tracker(), tracker);
+  EXPECT_EQ(digit->get_station(), station);
+  EXPECT_EQ(digit->get_plane(), plane);
+  EXPECT_EQ(digit->get_channel(), channel);
+  EXPECT_EQ(digit->get_npe(), npe);
+  EXPECT_EQ(digit->get_time(), time);
   EXPECT_FALSE(digit->is_used());
 }
 

@@ -31,7 +31,6 @@
 #include "TFile.h"
 
 // Root
-//#include "gROOT.h"
 #include "TAxis.h"
 #include "TGraph.h"
 #include "TMultiGraph.h"

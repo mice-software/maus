@@ -44,12 +44,12 @@ TEST_F(SciFiHitTest, test_setters_getters) {
   Hit->set_edep(edep);
   Hit->set_time(time);
 
-  EXPECT_EQ(Hit->get_tracker(),tracker);
-  EXPECT_EQ(Hit->get_station(),station);
-  EXPECT_EQ(Hit->get_plane(),plane);
-  EXPECT_EQ(Hit->get_fibre(),fibre);
-  EXPECT_EQ(Hit->get_edep(),edep);
-  EXPECT_EQ(Hit->get_time(),time);
+  EXPECT_EQ(Hit->get_tracker(), tracker);
+  EXPECT_EQ(Hit->get_station(), station);
+  EXPECT_EQ(Hit->get_plane(), plane);
+  EXPECT_EQ(Hit->get_fibre(), fibre);
+  EXPECT_EQ(Hit->get_edep(), edep);
+  EXPECT_EQ(Hit->get_time(), time);
 }
 
 TEST_F(SciFiHitTest, test_used_flag) {
@@ -70,12 +70,12 @@ TEST_F(SciFiHitTest, test_constructor) {
 
   SciFiHit *Hit = new SciFiHit(tracker, station, plane, fibre, edep, time);
 
-  EXPECT_EQ(Hit->get_tracker(),tracker);
-  EXPECT_EQ(Hit->get_station(),station);
-  EXPECT_EQ(Hit->get_plane(),plane);
-  EXPECT_EQ(Hit->get_fibre(),fibre);
-  EXPECT_EQ(Hit->get_edep(),edep);
-  EXPECT_EQ(Hit->get_time(),time);
+  EXPECT_EQ(Hit->get_tracker(), tracker);
+  EXPECT_EQ(Hit->get_station(), station);
+  EXPECT_EQ(Hit->get_plane(), plane);
+  EXPECT_EQ(Hit->get_fibre(), fibre);
+  EXPECT_EQ(Hit->get_edep(), edep);
+  EXPECT_EQ(Hit->get_time(), time);
   EXPECT_FALSE(Hit->is_used());
 }
 
