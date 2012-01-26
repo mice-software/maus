@@ -22,8 +22,8 @@
 SciFiStraightPRTrack::SciFiStraightPRTrack() {
   _x0 = -1.0;
   _y0 = -1.0;
-  _tx = -1.0;
-  _ty = -1.0;
+  _mx = -1.0;
+  _my = -1.0;
 
   _vsl.resize(4);
   for ( int i = 0; i < static_cast<int>(_vsl.size()); ++i ) {
@@ -37,14 +37,14 @@ SciFiStraightPRTrack::~SciFiStraightPRTrack() {}
 std::vector<double> SciFiStraightPRTrack::get_vsl() {
   _vsl[0] = _x0;
   _vsl[1] = _y0;
-  _vsl[2] = _tx;
-  _vsl[3] = _ty;
+  _vsl[2] = _mx;
+  _vsl[3] = _my;
   return _vsl;
 }
 
 void SciFiStraightPRTrack::print_params() {
   std::cout << " x0 is " << _x0 << std::endl;
   std::cout << " y0 is " << _y0 << std::endl;
-  std::cout << " tx is " << _tx << std::endl;
-  std::cout << " ty is " << _ty << std::endl;
+  std::cout << " tx is " << _mx << std::endl;
+  std::cout << " ty is " << _my << std::endl;
 }

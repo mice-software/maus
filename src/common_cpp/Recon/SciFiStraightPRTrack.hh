@@ -44,8 +44,8 @@ class SciFiStraightPRTrack {
 
   inline double get_x0() const { return _x0; }
   inline double get_y0() const { return _y0; }
-  inline double get_tx() const { return _tx; }
-  inline double get_ty() const { return _ty; }
+  inline double get_mx() const { return _mx; }
+  inline double get_my() const { return _my; }
 
   std::vector<double> get_vsl();
 
@@ -54,8 +54,8 @@ class SciFiStraightPRTrack {
 
   inline void set_x0(double x0) { _x0 = x0; }
   inline void set_y0(double y0) { _y0 = y0; }
-  inline void set_tx(double tx) { _tx = tx; }
-  inline void set_ty(double ty) { _ty = ty; }
+  inline void set_mx(double mx) { _mx = mx; }
+  inline void set_my(double my) { _my = my; }
 
   // Print track parameters
   void print_params();
@@ -67,8 +67,8 @@ class SciFiStraightPRTrack {
 
   double _x0;
   double _y0;
-  double _tx;
-  double _ty;
+  double _mx;
+  double _my;
 };
 
 #endif

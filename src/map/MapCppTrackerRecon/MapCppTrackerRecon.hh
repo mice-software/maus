@@ -44,6 +44,7 @@
 #include "src/common_cpp/Recon/SciFiDigit.hh"
 #include "src/common_cpp/Recon/SciFiCluster.hh"
 #include "src/common_cpp/Recon/SciFiSpacePoint.hh"
+#include "src/common_cpp/Recon/PatternRecognition.hh"
 
 class MapCppTrackerRecon {
  public:
@@ -80,21 +81,7 @@ class MapCppTrackerRecon {
 
   void spacepoint_recon(TrackerEvent &evt);
 
-  /** @brief Perform Pattern Recognition for straight tracks
-   *
-   *  This takes one argument, the SciFi event, extracts the 
-   *  spacepoints, reconstructs the PR tracks, and pushes them
-   *  back into the event.
-   *
-   *  @param evt - The SciFi event
-   */
-  void straightprtrack_recon(TrackerEvent &evt);
-
-  void make_spr_5pt(const std::vector<SciFiSpacePoint*>&, std::vector<SciFiStraightPRTrack>&);
-
-  void make_spr_4pt(const std::vector<SciFiSpacePoint*>&, std::vector<SciFiStraightPRTrack>&);
-
-  void make_spr_3pt(const std::vector<SciFiSpacePoint*>&, std::vector<SciFiStraightPRTrack>&);
+  void pattern_recognition(TrackerEvent &evt);
 
   bool clusters_are_not_used(SciFiCluster* candidate_A, SciFiCluster* candidate_B);
 
