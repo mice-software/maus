@@ -177,6 +177,95 @@ class WorkerUtilitiesTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         self.assertEquals(names, transform.get_worker_names(), 
                           "Transform contains unexpected workers")
 
+    def test_validate_transform_none(self):
+        """
+        Test get_validate_transform(None) throws an error.
+        @param self Object reference.
+        """ 
+        with self.assertRaisesRegexp(ValueError,
+            ".*Transform name None is not a string.*"):
+            WorkerUtilities.validate_transform(None)
+
+    def test_validate_transform_none_list(self):
+        """
+        Test get_validate_transform([None]) throws an error.
+        @param self Object reference.
+        """ 
+        with self.assertRaisesRegexp(ValueError,
+            ".*Transform name None is not a string.*"):
+            WorkerUtilities.validate_transform([None])
+
+    def test_validate_transform_integer(self):
+        """
+        Test get_validate_transform(123) throws an error.
+        @param self Object reference.
+        """ 
+        with self.assertRaisesRegexp(ValueError,
+            ".*Transform name 123 is not a string.*"):
+            WorkerUtilities.validate_transform(123)
+
+    def test_validate_transform_integer_list(self):
+        """
+        Test get_validate_transform([123]) throws an error.
+        @param self Object reference.
+        """ 
+        with self.assertRaisesRegexp(ValueError,
+            ".*Transform name 123 is not a string.*"):
+            WorkerUtilities.validate_transform([123])
+
+    def test_validate_transform_unknown(self):
+        """
+        Test get_validate_transform("UnknownTransform") throws an error.
+        @param self Object reference.
+        """ 
+        with self.assertRaisesRegexp(ValueError,
+            ".*No such transform: UnknownTransform.*"):
+            WorkerUtilities.validate_transform("UnknownTransform")
+
+    def test_validate_transform_unknown_list(self):
+        """
+        Test get_validate_transform(["UnknownTransform"]) throws an error.
+        @param self Object reference.
+        """ 
+        with self.assertRaisesRegexp(ValueError,
+            ".*No such transform: UnknownTransform.*"):
+            WorkerUtilities.validate_transform(["UnknownTransform"])
+
+    def test_validate_transform(self):
+        """
+        Test get_validate_transform("MapPyDoNothing") is OK.
+        @param self Object reference.
+        """ 
+        WorkerUtilities.validate_transform(MapPyDoNothing.__name__)
+        self.assertTrue("validate_transform(name) passed")
+
+    def test_validate_transform_unicode(self):
+        """
+        Test get_validate_transform(u"MapPyDoNothing") is OK.
+        @param self Object reference.
+        """ 
+        WorkerUtilities.validate_transform(unicode(MapPyDoNothing.__name__))
+        self.assertTrue("validate_transform(unicode) passed")
+
+    def test_validate_transform_empty_list(self):
+        """
+        Test get_validate_transform([]) is OK.
+        @param self Object reference.
+        """ 
+        WorkerUtilities.validate_transform([])
+        self.assertTrue("validate_transform([]) passed")
+
+    def test_validate_transform_group(self):
+        """
+        Test get_validate_transform, when given a list of transform names
+        is OK.
+        @param self Object reference.
+        """ 
+        names = [MapPyDoNothing.__name__, 
+                 [MapPyDoNothing.__name__, MapPyDoNothing.__name__]]
+        WorkerUtilities.validate_transform(names)
+        self.assertTrue("validate_transform(names) passed")
+
 class WorkerOperationExceptionTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
     """
     Test class for workers.WorkerOperationException class.

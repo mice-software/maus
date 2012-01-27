@@ -64,6 +64,36 @@ class WorkerUtilities: # pylint: disable=W0232
             raise ValueError("Transform name %s is not a string" % transform)
 
     @staticmethod
+    def validate_transform(transform):
+        """
+        Validate whether the names of transform class(es) are valid
+        transforms. Either a single name can be given - representing a
+        single transform - or a list of transforms - representing a 
+        MapPyGroup. Sub-lists are treated as nested
+        MapPyGroups. Example list arguments include:  
+        @verbatim 
+        []
+        ["MapCppTOFDigits", "MapCppTOFSlabHits", "MapCppTOFSpacePoint"]
+        ["MapCppTOFDigits", ["MapCppTOFSlabHits", "MapCppTOFSpacePoint"]]
+        @endverbatim
+        Transforms must be in the MAUS module namespace e.g. 
+        MAUS.MapCppTOFSlabHits.
+        @param transform Transform name or list of names.
+        @throws ValueError if transform is not a string or a list,
+        or contains an element which is not a list or string, or 
+        specifies an unknown transform name.
+        """
+        if isinstance(transform, ListType):
+            for transform_name in transform:
+                WorkerUtilities.validate_transform(transform_name)
+        elif isinstance(transform, StringType) \
+            or isinstance(transform, UnicodeType):
+            if not hasattr(MAUS, transform):
+                raise ValueError("No such transform: %s" % transform)
+        else:
+            raise ValueError("Transform name %s is not a string" % transform)
+
+    @staticmethod
     def get_worker_names(worker):
         """
         Given a worker class get the name of the worker. If the
@@ -108,3 +138,9 @@ class WorkerBirthFailedException(WorkerOperationException):
 
 class WorkerDeathFailedException(WorkerOperationException):
     """ Exception raised if MAUS worker death returns False. """
+
+class WorkerDeadException(WorkerOperationException):
+    """ 
+    Exception raised if MAUS worker process is called but the worker
+    is dead.
+    """
