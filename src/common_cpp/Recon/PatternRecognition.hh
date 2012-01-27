@@ -77,6 +77,10 @@ class PatternRecognition {
 
   void sort_by_station(const std::vector<SciFiSpacePoint*>& spnts,
                        std::vector< std::vector<SciFiSpacePoint*> >& spnts_stat);
+
+  static const int _n_trackers = 2;
+  static const int _n_stations = 5;
+  static const double _chisq_cut = 10;
 };
 
 #endif
