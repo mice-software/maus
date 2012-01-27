@@ -13,7 +13,7 @@ TEST(ORStreamTest, TestConstructor) {
   // orstream close but dont want to introduce dependence on the close method in unit test
   os.m_file->Close();
   delete os.m_file;
-  //delete os.m_tree;//crashes root?! ROOT must do this step automatically as part of closing file.
+  //delete os.m_tree;//crashes root?! ROOT does this step automatically as part of closing file.
   os.m_file=0;
   os.m_tree=0;
   strcpy(os.m_branchName,"");
@@ -26,7 +26,7 @@ TEST(ORStreamTest, TestFileOpen) {
   // orstream close but dont want to introduce dependence on the close method in unit test
   os.m_file->Close();
   delete os.m_file;
-  //delete os.m_tree;//crashes root?! ROOT must do this step automatically as part of closing file.
+  //delete os.m_tree;//crashes root?! ROOT does this step automatically as part of closing file.
   os.m_file=0;
   os.m_tree=0;
   strcpy(os.m_branchName,"Test");
@@ -42,7 +42,7 @@ TEST(ORStreamTest, TestFileOpen) {
   // orstream close but dont want to introduce dependence on the close method in unit test
   os.m_file->Close();
   delete os.m_file;
-  //delete os.m_tree;//crashes root?! ROOT must do this step automatically as part of closing file.
+  //delete os.m_tree;//crashes root?! ROOT does this step automatically as part of closing file.
   os.m_file=0;
   os.m_tree=0;
   strcpy(os.m_branchName,"");
@@ -63,8 +63,8 @@ TEST(ORStreamTest, TestFillEvent) {
   int a=25;
   int *b = new int(72);
   orstream os("TestFile.root","TestTree","TestTreeTitle","RECREATE");
-  os<<oneArgManip<const char*>::branchName("TestBranchA")<<a;
-  os<<oneArgManip<const char*>::branchName("TestBranchB")<<b;
+  os<<branchName("TestBranchA")<<a;
+  os<<branchName("TestBranchB")<<b;
   os<<fillEvent;
   a=14;
   *b=22;
@@ -77,7 +77,7 @@ TEST(ORStreamTest, TestFillEvent) {
   // orstream close but dont want to introduce dependence on the close method in unit test
   os.m_file->Close();
   delete os.m_file;
-  //delete os.m_tree;//crashes root?! ROOT must do this step automatically as part of closing file.
+  //delete os.m_tree;//crashes root?! ROOT does this step automatically as part of closing file.
   os.m_file=0;
   os.m_tree=0;
   strcpy(os.m_branchName,"");

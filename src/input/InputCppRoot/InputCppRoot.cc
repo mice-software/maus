@@ -46,8 +46,8 @@ bool InputCppRoot::birth(std::string json_datacards) {
   MC* mc = new MC();
   _md = new MausData(d, mc);
 
-  (*_infile) >> oneArgManip<const char*>::branchName("digits") >> d;
-  (*_infile) >> oneArgManip<const char*>::branchName("mc") >> mc;
+  (*_infile) >> branchName("digits") >> d;
+  (*_infile) >> branchName("mc") >> mc;
 
   _jsonCppConverter = new JsonCppConverter(&_val);
   return true;

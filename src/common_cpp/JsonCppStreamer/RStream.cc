@@ -6,7 +6,8 @@ rstream::rstream(const char* filename,
 		 MsgStream::LEVEL loglevel):
   m_file(new TFile(filename,mode)),
   m_log("rstream", loglevel),
-  m_tree(0){
+  m_tree(0),
+  m_evtCount(0){
  
   m_branchName = new char[40]();
   strcpy(m_branchName,"");
@@ -15,7 +16,7 @@ rstream::rstream(const char* filename,
 rstream::~rstream(){
   m_pointers.clear();
   if(m_branchName){
-    delete m_branchName;
+    delete [] m_branchName;
     m_branchName=0;
   }
   if (m_file){
@@ -24,12 +25,12 @@ rstream::~rstream(){
     m_file =0;
   }
   if(m_tree){
-    delete m_tree;
+    //delete m_tree;
     m_tree=0;
   }
 }
 
-rstream& rstream::setBranch(rstream& rs,const char* name) {
-    strcpy(rs.m_branchName,name);
-    return rs;
+rstream& rstream::setBranch(rstream& rs,const char* name){
+  strcpy(rs.m_branchName,name);
+  return rs;
 }

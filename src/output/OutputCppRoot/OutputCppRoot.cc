@@ -41,8 +41,8 @@ bool OutputCppRoot::birth(std::string json_datacards) {
     _md = new MausData(d, mc);
 
     // Set branch addresses
-    (*_outfile) << oneArgManip<const char*>::branchName("digits") << d;
-    (*_outfile) << oneArgManip<const char*>::branchName("mc") << mc;
+    (*_outfile) << branchName("digits") << d;
+    (*_outfile) << branchName("mc") << mc;
     _jsonCppConverter = new JsonCppConverter(_md);
     return true;
   } catch(Squeal squee) {

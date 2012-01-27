@@ -5,9 +5,7 @@ orstream::orstream(const char* fileName,
 		   const char* treeTitle,
 		   const char* mode,
 		   MsgStream::LEVEL loglevel): 
-  rstream(fileName, mode, loglevel),
-  m_evtCount(0){
- 
+  rstream(fileName, mode, loglevel){
   m_log.setName("orstream");
   m_tree = new TTree(treeName,treeTitle);
 }

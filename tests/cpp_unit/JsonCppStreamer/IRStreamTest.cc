@@ -36,8 +36,8 @@ TEST( IRStreamTest, TestConstructor ) {
                       <<"Fail: file object not initialised properly"<<std::endl;
   ASSERT_NE(is->m_tree, static_cast<void*>(NULL))
                       <<"Fail: tree object not initialised properly"<<std::endl;
-  ASSERT_TRUE(false) << "delete makes segv so disabled";
-  delete is;  // and delete shouldn't crash...
+  is->close();
+  delete is;
 }
 
 TEST( IRStreamTest, TestFileOpen ) {
@@ -69,7 +69,7 @@ TEST( IRStreamTest, TestFileOpen ) {
   is.m_file->Close();
   strcpy(is.m_branchName,"");
   delete is.m_file;
-  //delete m_tree; //crashes root?! ROOT must do this step automatically as part of closing file
+  //delete m_tree; //crashes root?! ROOT does this step automatically as part of closing file
   is.m_file=0;
   is.m_tree=0;
   /////////////////////////////////
@@ -93,7 +93,6 @@ TEST( IRStreamTest, TestFileClose ) {
 }
 
 TEST( IRStreamTest, TestReadEvent ) {
-//  ASSERT_TRUE(false) << "Makes segv so disabled";
   TFile f("TestFile.root","RECREATE");
   TTree t("TestTree","treetitle");
   Int_t* a = new Int_t(17);
@@ -112,8 +111,8 @@ TEST( IRStreamTest, TestReadEvent ) {
 
   irstream is("TestFile.root","TestTree");
   int c=0;    
-  is>>oneArgManip<const char*>::branchName("testA")>>a;
-  is>>oneArgManip<const char*>::branchName("testB")>>c;
+  is>>branchName("testA")>>a;
+  is>>branchName("testB")>>c;
 
   int evtCount=0;    
   while(is>>readEvent){
@@ -130,7 +129,7 @@ TEST( IRStreamTest, TestReadEvent ) {
   is.m_file->Close();
   strcpy(is.m_branchName,"");
   delete is.m_file;
-  //delete m_tree; //crashes root?! ROOT must do this step automatically as part of closing file
+  //delete m_tree; //crashes root?! ROOT does this step automatically as part of closing file
   is.m_file=0;
   is.m_tree=0;
   /////////////////////////////////
