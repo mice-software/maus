@@ -46,6 +46,7 @@ private:
   T m_value;
  
   FRIEND_TEST(OneArgManipTest, TestConstructor);
+
 public:
   /*!
    * \brief Constructor
