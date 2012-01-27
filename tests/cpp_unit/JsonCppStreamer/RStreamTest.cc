@@ -18,6 +18,7 @@ class temprstream : public rstream{
   FRIEND_TEST(RStreamTest, TestConstructor);
   FRIEND_TEST(RStreamTest, TestIsOpen);
   FRIEND_TEST(RStreamTest, TestSetBranch);
+  FRIEND_TEST(RStreamTest, TestAttachBranch);
 };
 
 TEST(RStreamTest, TestConstructor) {
@@ -45,5 +46,96 @@ TEST(RStreamTest, TestSetBranch) {
     ASSERT_EQ(std::string(a.m_branchName),"TestingBranch")<<"Fail: Branch name not set correctly."<<std::endl;
 }
 
+TEST(RStreamTest, TestAttachBranch) {
+    temprstream t("TestFile.root","RECREATE",MsgStream::INFO);
+
+    // test non pointer version
+    ///////////////////////////////////////////
+    t.m_tree = new TTree("TestTree","The Tree");
+
+    int a=9;
+    std::vector<int> b;
+    b.push_back(14);
+    b.push_back(27);
+    t.attachBranch(a,false,false);
+    ASSERT_EQ(t.m_tree->GetNbranches(),0 ) << "Fail: Should return without doing anything if branch not set."<<std::endl;
+
+    strcpy(t.m_branchName,"TestBranch1");
+    t.attachBranch(a,false,false);
+    ASSERT_EQ(t.m_tree->GetNbranches(),0 ) << "Fail: Should return without doing anything if not allowed to create new branches."<<std::endl;
+ 
+    strcpy(t.m_branchName,"TestBranch1");
+    t.attachBranch(a,false,true);
+    ASSERT_EQ(t.m_tree->GetNbranches(),1 ) << "Fail: Should have created single pointer branch."<<std::endl;
+
+    strcpy(t.m_branchName,"TestBranch2");
+    t.attachBranch(b,true,false);
+    ASSERT_EQ(t.m_tree->GetNbranches(),1 ) << "Fail: Should have not found branch."<<std::endl;
+     
+    strcpy(t.m_branchName,"TestBranch2");
+    t.attachBranch(b,true,true);
+    ASSERT_EQ(t.m_tree->GetNbranches(),2 ) << "Fail: Should have created double pointer branch."<<std::endl;
+
+    int c = 10;
+    std::vector<int> d;
+    d.push_back(13);
+    d.push_back(22);
+
+    strcpy(t.m_branchName,"TestBranch1");
+    t.attachBranch(c,false,true);
+    ASSERT_EQ(t.m_tree->GetNbranches(),2 ) << "Fail: Should have reset single pointer branch."<<std::endl;
+
+    strcpy(t.m_branchName,"TestBranch2");
+    t.attachBranch(d,true,true);
+    ASSERT_EQ(t.m_tree->GetNbranches(),2 ) << "Fail: Should have reset double pointer branch."<<std::endl;
+
+    // test pointer version
+    ///////////////////////////////////////////
+    t.m_tree->Delete();
+    t.m_tree = new TTree("TestTree","The Tree");
+    int *e= new int(9);
+    std::vector<int>* f = new std::vector<int>();
+    f->push_back(14);
+    f->push_back(27);
+    t.attachBranch(e,false,false);
+    ASSERT_EQ(t.m_tree->GetNbranches(),0 ) << "Fail: Should return without doing anything if branch not set."<<std::endl;
+    
+    strcpy(t.m_branchName,"TestBranch1");
+    t.attachBranch(e,false,false);
+    ASSERT_EQ(t.m_tree->GetNbranches(),0 ) << "Fail: Should return without doing anything if not allowed to create new branches."<<std::endl;
+ 
+    strcpy(t.m_branchName,"TestBranch1");
+    t.attachBranch(e,false,true);
+    ASSERT_EQ(t.m_tree->GetNbranches(),1 ) << "Fail: Should have created single pointer branch."<<std::endl;
+
+    strcpy(t.m_branchName,"TestBranch2");
+    t.attachBranch(f,true,false);
+    ASSERT_EQ(t.m_tree->GetNbranches(),1 ) << "Fail: Should have not found branch."<<std::endl;
+     
+    strcpy(t.m_branchName,"TestBranch2");
+    t.attachBranch(f,true,true);
+    ASSERT_EQ(t.m_tree->GetNbranches(),2 ) << "Fail: Should have created double pointer branch."<<std::endl;
+
+    int* g = new int(10);
+    std::vector<int>* h = new std::vector<int>();
+    h->push_back(13);
+    h->push_back(22);
+
+    strcpy(t.m_branchName,"TestBranch1");
+    t.attachBranch(g,false,true);
+    ASSERT_EQ(t.m_tree->GetNbranches(),2 ) << "Fail: Should have reset single pointer branch."<<std::endl;
+
+
+    strcpy(t.m_branchName,"TestBranch2");
+    t.attachBranch(h,true,true);
+    ASSERT_EQ(t.m_tree->GetNbranches(),2 ) << "Fail: Should have reset double pointer branch."<<std::endl;
+
+    t.m_file->Close();
+    delete e;e=0;
+    delete f;f=0;
+    delete g;g=0;
+    delete h;h=0;
+
+}
 
 #endif

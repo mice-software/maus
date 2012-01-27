@@ -12,7 +12,7 @@
 #ifndef ONEARG_MANIP_H
 #define ONEARG_MANIP_H
 
-#include "RStream.hh"
+class rstream;
 
 // Single argument manipulator object
 //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
@@ -30,9 +30,6 @@
 template<typename T>
 class oneArgManip{
 private:
-#ifdef TESTING
-  friend class test_oneArgManip;
-#endif
   //! Type def manipulator function pointer
   typedef rstream& (*manip_pointer)(rstream&,T);
   /*!
