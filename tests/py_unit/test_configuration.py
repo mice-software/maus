@@ -46,6 +46,7 @@ class ConfigurationTestCase(unittest.TestCase): #pylint: disable = R0904
         exclusions = [
           "maus_version", # changed at runtime, tested below 
           "os", # module needed to use environment variables
+          "__doc__", # docstring from ConfigurationDefaults
         ]
         for key in config_dict.keys():
             if key not in exclusions:

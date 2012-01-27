@@ -117,15 +117,15 @@ class ErrorHandler:
         self.on_error = str(config['on_error']).lower()
 
 class CppError(Exception):
-  """
-  Error that is raised by MAUS C++ code. Takes simply an error message as
-  argument, which is printed when the error is raised.
-  """
-  def __init__(self, message):
-    self.args = (str(message), )
+    """
+    Error that is raised by MAUS C++ code. Takes simply an error message as
+    argument, which is printed when the error is raised.
+    """
+    def __init__(self, message):
+        self.args = (str(message), )
 
-  def __repr__(self):
-    return self.args[0]
+    def __repr__(self):
+        return self.args[0]
 
 __default_handler = ErrorHandler()
 
@@ -156,13 +156,12 @@ def HandleCppException(doc, caller, error_message):
     """
     json_doc = json.loads(doc)
     try:
-      raise(CppError(error_message))
+        raise(CppError(error_message))
     except:
-      out = json.dumps(__default_handler.HandleException(json_doc, caller))
+        out = json.dumps(__default_handler.HandleException(json_doc, caller))
     return out
 
 # Sets the function call for CppErrorHandler. If not set, assume we
-# don't use python error handler; libMausCpp is defined in 
+# don't use python error handler; libMausCpp is defined in
 #   src/common_cpp/Utils/PyMausCpp.hh
 libMausCpp.SetHandleException(HandleCppException)
-

@@ -149,26 +149,24 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         creates JSON documents in the format described above. 
         @param self Object reference.
         @param spill Current spill.
-        @returns list of JSON documents. If json_doc has an error then
-        the list will just contain the spill augmented with error
-        information. If the the spill count is divisible by the
-        current refresh rate then a list of 3 histogram JSON documents
-        are returned. Otherwise a single list with the input spill
-        is returned.
+        @returns list of JSON documents. If the the spill count is
+        divisible by the current refresh rate then a list of 3
+        histogram JSON documents are returned. Otherwise a single list
+        with the input spill is returned. 
+        @throws ValueError if "slab_hits" and "space_points" information
+        is missing from the spill.
         """
+        if "END_OF_RUN" in spill:
+            self.update_histos()
+            return self.get_histogram_images()
+
         # Get TOF slab hits & fill the relevant histograms.
         if not self.get_slab_hits(spill): 
-            if "errors" not in spill:
-                spill["errors"] = {}
-            spill["errors"]["no_slab_hits"] = "no slab hits"
-            return [spill]
+            raise ValueError("slab_hits not in spill")
 
         # Get TOF space points & fill histograms.
         if not self.get_space_points(spill):
-            if "errors" not in spill:
-                spill["errors"] = {}
-            spill["errors"]["no_space_points"] = "no space points"
-            return [spill]
+            raise ValueError("space_points not in spill")
 
         # Refresh canvases at requested frequency.
         if self.spill_count % self.refresh_rate == 0:
@@ -599,25 +597,3 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
             image_list.append(doc)
 
         return image_list
-
-    def _cleanup_at_death(self):
-        """
-        Save final plots.
-        MIKE - need a better solution than this! See ticket.
-        DR - how to get EOR signal?
-        @param self Object reference.
-        @returns True
-        """
-        tag = "tof01_time"
-        outfile = "%s.%s" % (tag, self.image_type)
-        self.canvas_tof[0].Print(outfile)
-
-        tag = "tof12_time"
-        outfile = "%s.%s" % (tag, self.image_type)
-        self.canvas_tof[1].Print(outfile)
-
-        tag = "tof02_time"
-        outfile = "%s.%s" % (tag, self.image_type)
-        self.canvas_tof[2].Print(outfile)
-
-        return True

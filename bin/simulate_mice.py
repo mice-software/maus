@@ -28,7 +28,8 @@ def run():
     my_map = MAUS.MapPyGroup()
     my_map.append(MAUS.MapPyBeamMaker()) # beam construction
     my_map.append(MAUS.MapCppSimulation())  #  geant4 simulation
-    my_map.append(MAUS.MapCppTrackerDigitization())  # SciFi electronics model
+    my_map.append(MAUS.MapCppTOFDigitizer())  # SciFi electronics model
+    #my_map.append(MAUS.MapCppTrackerDigitization())  # SciFi electronics model
     # can specify datacards here or by using appropriate command line calls
     datacards = io.StringIO(u"")
     # Then construct a MAUS output component - filename comes from datacards

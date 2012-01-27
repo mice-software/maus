@@ -26,7 +26,7 @@ if [ $maus_lcov ]; then
         fi
     fi
 fi
-nosetests --with-coverage -v build
+nosetests --with-coverage -v ${MAUS_ROOT_DIR}/build
 if [ $maus_lcov ]; then
     if [ $maus_lcov -ne "0" ]; then
         echo Building lcov output
