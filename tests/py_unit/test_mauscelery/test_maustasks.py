@@ -18,6 +18,7 @@ Test class for mauscelery.maustasks module.
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
 import json
+import os
 import unittest
 import MAUS
 import ROOT
@@ -26,12 +27,20 @@ from celery import current_app
 from celery.registry import tasks
 from celery.utils import LOG_LEVELS
 
-from mauscelery.maustasks import MausGenericTransformTask
+from mauscelery.maustasks import MausConfiguration
+from mauscelery.maustasks import MausTransform
+from mauscelery.maustasks import worker_process_init_callback
+from mauscelery.maustasks import UpdateId
+from mauscelery.maustasks import execute_transform
+from mauscelery.maustasks import process_birth
+from mauscelery.maustasks import process_death
+from mauscelery.maustasks import birth
+from mauscelery.maustasks import death
 from mauscelery.maustasks import get_maus_configuration
-from mauscelery.maustasks import set_maus_configuration
 
 from workers import WorkerBirthFailedException
 from workers import WorkerDeathFailedException
+from workers import WorkerDeadException
 
 class MapDummy: # pylint:disable = R0902
     """
@@ -85,232 +94,357 @@ class MapDummy: # pylint:disable = R0902
 # needs to be created via its name.
 setattr(MAUS, "MapDummy", MapDummy)
 
-class MausGenericTransformTaskTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
+class UpdateIdTestCase(unittest.TestCase): # pylint: disable=R0904
     """
-    Test class for mauscelery.maustasks.MausGenericTransformTask class.
+    Test class for mauscelery.maustasks.UpdateId class.
     """
 
     def setUp(self): # pylint: disable=C0103
         """ 
-        Create test object.
+        Reset UpdateId.count to 0.
         @param self Object reference.
         """
+        UpdateId.count = 0
+
+    def test_increment(self):
+        """
+        Test increment().
+        @param self Object reference.
+        """
+        self.assertEquals(0, UpdateId.count, \
+            "Unexpected UpdateId.count value")
+        UpdateId.increment()
+        UpdateId.increment()
+        UpdateId.increment()
+        self.assertEquals(3, UpdateId.count, \
+           "Unexpected UpdateId.count after 3 increments")
+
+    def test_increment_mod(self):
+        """
+        Test increment() past 100.
+        @param self Object reference.
+        """
+        self.assertEquals(0, UpdateId.count, \
+            "Unexpected UpdateId.count value")
+        for _ in range(102):
+            UpdateId.increment()
+        self.assertEquals(2, UpdateId.count, \
+           "Unexpected UpdateId.count after 102 increments")
+
+    def tearDown(self): # pylint: disable=C0103
+        """ 
+        Reset UpdateId.count to 0.
+        @param self Object reference.
+        """
+        UpdateId.count = 0
+
+class MausTransformTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
+    """
+    Test class for mauscelery.maustasks.MausTransform class.
+    """
+
+    def setUp(self): # pylint: disable=C0103
+        """ 
+        Reset MausTransform and set logging.
+        @param self Object reference.
+        """
+        MausTransform.transform = None
+        MausTransform.is_dead = True
         # Set Celery logging to ensure conditional log statements
         # are called.
-        current_app.conf.CELERYD_LOG_LEVEL = LOG_LEVELS["INFO"]
-        self.__generic_task = MausGenericTransformTask()
+        current_app.conf.CELERYD_LOG_LEVEL = LOG_LEVELS["DEBUG"]
 
-    def check_task_configuration(self, 
-        configuration = "{}",
-        transform = "MapPyDoNothing"):
+    def test_initialize(self):
         """ 
-        Check the task configuration.
-        @param self Object reference.
-        @param configuration Expected configuration.
-        @param transform Expected transform names.
-        """
-        self.assertEquals(configuration, 
-                          self.__generic_task.configuration, 
-                          "Unexpected configuration")
-        self.assertEquals(transform, 
-                          self.__generic_task.get_transform_names(), 
-                          "Unexpected transform names")
-
-    def test_init(self): # pylint: disable=R0201
-        """ 
-        Invoke __init__ and check default values.
+        Invoke initialize.
         @param self Object reference.
         """
-        self.check_task_configuration()
+        MausTransform.initialize("MapDummy")
+        self.assertEquals(MapDummy, \
+            MausTransform.transform.__class__, "Unexpected transform")
+        self.assertTrue(MausTransform.is_dead, 
+            "Expected is_dead to be True")
         self.assertTrue(ROOT.gROOT.IsBatch(), "Expected ROOT.IsBatch() to be True") # pylint:disable=E1101, C0301
 
-    def test_run(self):
+    def test_initialize_bad_transform(self):
         """ 
-        Invoke run with default worker.
-        @param self Object reference.
-        """
-        spill = self.__generic_task.run("{}")
-        self.assertEquals("{}", spill, "Unpexpected result spill")
-
-    def test_reset_task_defaults(self):
-        """ 
-        Invoke reset_task with default arguments.
-        @param self Object reference.
-        """
-        self.__generic_task.reset_task()
-        # Expect no change in configuration.
-        self.check_task_configuration()
-
-    def test_reset_task_bad_config(self):
-        """ 
-        Invoke reset_task with a non-JSON configuration.
-        @param self Object reference.
-        """
-        with self.assertRaisesRegexp(ValueError,
-            ".*Expecting object.*"):
-            self.__generic_task.reset_task(configuration = "{")
-        # Expect no change in configuration.
-        self.check_task_configuration()
-
-    def test_reset_task_bad_worker(self):
-        """ 
-        Invoke reset_task with an unknown transform.
+        Invoke initialize with an unknown transform.
         @param self Object reference.
         """
         with self.assertRaisesRegexp(ValueError,
             ".*No such transform: UnknownTransform.*"):
-            self.__generic_task.reset_task(transform = "UnknownTransform")
-        # Expect no change in configuration.
-        self.check_task_configuration()
+            MausTransform.initialize("UnknownTransform")
+        self.assertEquals(None, MausTransform.transform, \
+            "Unexpected transform")
+        self.assertTrue(MausTransform.is_dead, \
+            "Expected is_dead to be True")
 
-    def test_reset_task(self):
+    def test_birth(self):
         """ 
-        Invoke reset_task.
+        Invoke birth
         @param self Object reference.
         """
-        configuration = """{}"""
-        transform = "MapDummy"
-        self.__generic_task.reset_task(
-            configuration = configuration,
-            transform = transform)
-        # Expect change in configuration.
-        self.check_task_configuration(configuration, transform)
-        # Submit a spill and check MapDummy processes it.
-        spill = self.__generic_task.run("{}")
-        spill_doc = json.loads(spill)
-        self.assertTrue(spill_doc.has_key("processed"), 
-                        "Spill does not seem to have been processed")
+        MausTransform.initialize("MapDummy")
+        MausTransform.birth("{}")
+        self.assertTrue(not MausTransform.is_dead, \
+            "Expected is_dead to be False")
 
-    def test_reset_task_fail_death(self):
+    def test_birth_fails(self):
         """ 
-        Invoke reset_task when the current transform fails during
-        its death step.
+        Invoke birth when WorkerBirthFailedException is thrown.
         @param self Object reference.
         """
-        configuration = """{"fail_death":"fail"}"""
-        transform = "MapDummy"
-        # Reset the task to be MapDummy and ensure that its death
-        # call will fail.
-        self.__generic_task.reset_task(
-            configuration = configuration,
-            transform = transform)
-        # Now reset the task again, and see if the death call
-        # does indeed fail.
-        with self.assertRaisesRegexp(WorkerDeathFailedException,
-            ".*MapDummy.*returned False.*"):
-            self.__generic_task.reset_task(
-                configuration = "{}",
-                transform = "MapPyDoNothing")
-        # Expect no change in configuration.
-        self.check_task_configuration(configuration, transform)
-
-    def test_reset_task_fail_birth(self):
-        """ 
-        Invoke reset_task when the new transform fails during its birth
-        step.
-        @param self Object reference.
-        """
-        configuration = """{"fail_birth":"fail"}"""
-        transform = "MapDummy"
-        # Reset the task to be MapDummy and ensure that its birth
-        # call will fail.
+        MausTransform.initialize("MapDummy")
         with self.assertRaisesRegexp(WorkerBirthFailedException,
-            ".*MapDummy.*returned False.*"):
-            self.__generic_task.reset_task(
-                configuration = configuration,
-                transform = transform)
-        # Expect change in configuration.
-        self.check_task_configuration(configuration, transform)
+            ".*MapDummy returned False.*"):
+            MausTransform.birth("""{"fail_birth":"true"}""")
+
+    def test_process(self):
+        """ 
+        Invoke process.
+        @param self Object reference.
+        """
+        MausTransform.initialize("MapDummy")
+        MausTransform.birth("{}")
+        spill = MausTransform.process("{}")
+        spill_doc = json.loads(spill)
+        self.assertTrue(spill_doc.has_key("processed"),
+            "Expected spill to have been processed")
+
+    def test_process_after_death(self):
+        """ 
+        Invoke death when WorkerDeathFailedException is thrown.
+        @param self Object reference.
+        """
+        MausTransform.initialize("MapDummy")
+        MausTransform.birth("{}")
+        MausTransform.death()
+        with self.assertRaisesRegexp(WorkerDeadException,
+            ".*MapDummy process called after death.*"):
+            MausTransform.process("{}")
+
+    def test_death(self):
+        """ 
+        Invoke death.
+        @param self Object reference.
+        """
+        MausTransform.initialize("MapDummy")
+        MausTransform.birth("{}")
+        MausTransform.death()
+        self.assertTrue(MausTransform.is_dead, \
+            "Expected is_dead to be True")
+
+    def test_death_fails(self):
+        """ 
+        Invoke death when WorkerDeathFailedException is thrown.
+        @param self Object reference.
+        """
+        MausTransform.initialize("MapDummy")
+        MausTransform.birth("""{"fail_death":"true"}""")
+        with self.assertRaisesRegexp(WorkerDeathFailedException,
+            ".*MapDummy returned False.*"):
+            MausTransform.death()
+
+class WorkerProcessInitCallbackTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
+    """
+    Test class for mauscelery.maustasks.worker_process_init_callback 
+    method.
+    """
+
+    def setUp(self): # pylint: disable=C0103
+        """ 
+        Reset MausTransform and set logging.
+        @param self Object reference.
+        """
+        MausTransform.transform = None
+        MausTransform.is_dead = True
+        # Set Celery logging to ensure conditional log statements
+        # are called.
+        current_app.conf.CELERYD_LOG_LEVEL = LOG_LEVELS["INFO"]
+ 
+    def test_callback(self):
+        """ 
+        Invoke worker_process_init_callback.
+        @param self Object reference.
+        """
+        MausConfiguration.transform = "MapDummy"
+        MausConfiguration.configuration = "{}"
+        worker_process_init_callback()
+        self.assertEquals(MapDummy, \
+            MausTransform.transform.__class__, "Unexpected transform")
+        self.assertTrue(not MausTransform.is_dead, 
+            "Expected is_dead to be False")
+
+class ExecuteTransformTaskTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
+    """
+    Test class for mauscelery.maustasks.execute_transform method. 
+    """
+
+    def setUp(self): # pylint: disable=C0103
+        """ 
+        Reset MausTransform and set logging.
+        @param self Object reference.
+        """
+        MausTransform.transform = None
+        MausTransform.is_dead = True
+        # Set Celery logging to ensure conditional log statements
+        # are called.
+        current_app.conf.CELERYD_LOG_LEVEL = LOG_LEVELS["INFO"]
+ 
+    def test_execute_transform(self):
+        """ 
+        Invoke execute_transform.
+        @param self Object reference.
+        """
+        MausTransform.initialize("MapDummy")
+        MausTransform.birth("{}")
+        spill = execute_transform("{}")
+        spill_doc = json.loads(spill)
+        self.assertTrue(spill_doc.has_key("processed"),
+            "Expected spill to have been processed")
+
+class ProcessBirthTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
+    """
+    Test class for mauscelery.maustasks.process_birth method. 
+    """
+
+    def setUp(self): # pylint: disable=C0103
+        """ 
+        Reset MausTransform and set logging.
+        @param self Object reference.
+        """
+        MausTransform.transform = None
+        MausTransform.is_dead = True
+        # Set Celery logging to ensure conditional log statements
+        # are called.
+        current_app.conf.CELERYD_LOG_LEVEL = LOG_LEVELS["DEBUG"]
+ 
+    def test_process_birth_master_id(self):
+        """ 
+        Invoke process_birth with a master ID that matches
+        the child ID (in UpdateId).
+        @param self Object reference.
+        """
+        status = process_birth(UpdateId.count, "MapDummy", "{}")
+        self.assertEquals(None, status, "Expected None")
+
+    def test_process_birth(self):
+        """ 
+        Invoke process_birth.
+        @param self Object reference.
+        """
+        status = process_birth(UpdateId.count + 1, "MapDummy", "{}")
+        self.assertEquals(MapDummy, \
+            MausTransform.transform.__class__, "Unexpected transform")
+        self.assertTrue(not MausTransform.is_dead, 
+            "Expected is_dead to be False")
+        self.assertEquals("MapDummy", MausConfiguration.transform,
+            "Unexpected MausConfiguration.transform")
+        self.assertEquals("{}", MausConfiguration.configuration,
+            "Unexpected MausConfiguration.configuration")
+        self.assertEquals(os.getpid(), status[0], 
+            "Unexpected process ID")
+        self.assertTrue(status[1].has_key("status"),
+            "Expect a status key")
+        self.assertEquals("ok", status[1]["status"],
+            "Expect a status key with value ok")
+
+    def test_process_birth_fails(self):
+        """ 
+        Invoke process_birth where birth throws an exception.
+        @param self Object reference.
+        """
+        status = process_birth(UpdateId.count + 1, "MapDummy", \
+            """{"fail_birth":"true"}""")
+        self.assertEquals(os.getpid(), status[0], 
+            "Unexpected process ID")
+        self.assertTrue(status[1].has_key("status"),
+            "Expect a status key")
+        self.assertEquals("error", status[1]["status"],
+            "Expect a status key with value error")
+        self.assertTrue(status[1].has_key("type"),
+            "Expect a type key")
+        self.assertTrue(status[1].has_key("message"),
+            "Expect a message key")
+
+class ProcessDeathTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
+    """
+    Test class for mauscelery.maustasks.process_death method. 
+    """
+
+    def setUp(self): # pylint: disable=C0103
+        """ 
+        Reset MausTransform and set logging.
+        @param self Object reference.
+        """
+        MausTransform.transform = None
+        MausTransform.is_dead = True
+        # Set Celery logging to ensure conditional log statements
+        # are called.
+        current_app.conf.CELERYD_LOG_LEVEL = LOG_LEVELS["DEBUG"]
+ 
+    def test_process_death_master_id(self):
+        """ 
+        Invoke process_death with a master ID that matches
+        the child ID (in UpdateId).
+        @param self Object reference.
+        """
+        status = process_death(UpdateId.count)
+        self.assertEquals(None, status, "Expected None")
+
+    def test_process_death(self):
+        """ 
+        Invoke process_death.
+        @param self Object reference.
+        """
+        status = process_death(UpdateId.count + 1)
+        self.assertEquals(os.getpid(), status[0], 
+            "Unexpected process ID")
+        self.assertTrue(status[1].has_key("status"),
+            "Expect a status key")
+        self.assertEquals("ok", status[1]["status"],
+            "Expect a status key with value ok")
+
+    def test_process_death_fails(self):
+        """ 
+        Invoke process_birth where birth throws an exception.
+        @param self Object reference.
+        """
+        status = process_birth(UpdateId.count + 1, "MapDummy", \
+            """{"fail_death":"true"}""")
+        status = process_death(UpdateId.count + 2)
+        self.assertEquals(os.getpid(), status[0], 
+            "Unexpected process ID")
+        self.assertTrue(status[1].has_key("status"),
+            "Expect a status key")
+        self.assertEquals("error", status[1]["status"],
+            "Expect a status key with value error")
+        self.assertTrue(status[1].has_key("type"),
+            "Expect a type key")
+        self.assertTrue(status[1].has_key("message"),
+            "Expect a message key")
+
+class GetMausConfigPanelTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
+    """
+    Test class for mauscelery.maustasks.get_maus_configuration method. 
+    """
 
     def test_panel_get_config(self):
         """ 
         Test the get_maus_configuration panel operation.
         @param self Object reference.
         """
-        maustask = \
-            tasks["mauscelery.maustasks.MausGenericTransformTask"] 
+        MausConfiguration.transform = "MapDummy"
+        MausConfiguration.configuration = "{test}"
         config = get_maus_configuration(None)
         self.assertTrue(config.has_key("configuration"), 
             "Missing configuration key")
-        self.assertEquals(maustask.configuration, 
+        self.assertEquals(MausConfiguration.configuration, 
             config["configuration"], "Unexpected configuration")
         self.assertTrue(config.has_key("transform"),
             "Missing transform")
-        self.assertEquals(maustask.get_transform_names(), 
+        self.assertEquals(MausConfiguration.transform,
             config["transform"], "Unexpected transform")
-
-    def test_panel_set_config_defaults(self):
-        """ 
-        Test the set_maus_configuration panel operation with its
-        default arguments.
-        @param self Object reference.
-        """
-        maustask = \
-            tasks["mauscelery.maustasks.MausGenericTransformTask"] 
-        # Save current configuration.
-        configuration = maustask.configuration
-        transform = maustask.get_transform_names()
-        # Invoke.
-        result = set_maus_configuration(None)
-        self.assertTrue(result.has_key("status"), 
-            "Missing status key")
-        self.assertEquals("ok", result["status"], "Unexpected status")
-        # Expect no change in configuration.
-        self.assertEquals(configuration, 
-                          maustask.configuration, 
-                          "Unexpected configuration")
-        self.assertEquals(transform, 
-                          maustask.get_transform_names(), 
-                          "Unexpected transform names")
-
-    def test_panel_set_config(self):
-        """ 
-        Test the set_maus_configuration panel operation.
-        @param self Object reference.
-        """
-        maustask = \
-            tasks["mauscelery.maustasks.MausGenericTransformTask"] 
-        configuration = """{}"""
-        transform = "MapDummy"
-        result = set_maus_configuration(None, configuration, transform)
-        self.assertTrue(result.has_key("status"), 
-            "Missing status key")
-        self.assertEquals("ok", result["status"], "Unexpected status")
-        # Expect change in configuration.
-        self.assertEquals(configuration, 
-                          maustask.configuration, 
-                          "Unexpected configuration")
-        self.assertEquals(transform, 
-                          maustask.get_transform_names(), 
-                          "Unexpected transform names")
-
-    def test_panel_set_config_error(self):
-        """
-        Test the set_maus_configuration panel operation where
-        the task throws an exception.
-        @param self Object reference.
-        """
-        maustask = \
-            tasks["mauscelery.maustasks.MausGenericTransformTask"] 
-        # Set configuration to be unicode to test conversion.
-        configuration = """{"fail_birth":"fail"}""".decode()
-        transform = "MapDummy"
-        # Invoke.
-        result = set_maus_configuration(None, configuration, transform)
-        self.assertTrue(result.has_key("status"), 
-            "Missing status key")
-        self.assertEquals("error", result["status"], "Unexpected status")
-        self.assertTrue(result.has_key("error"), 
-            "Missing error key")
-        self.assertTrue(result.has_key("message"), 
-            "Missing message key")
-        # Expect change in configuration.
-        self.assertEquals(configuration, 
-                          maustask.configuration, 
-                          "Unexpected configuration")
-        self.assertEquals(transform, 
-                          maustask.get_transform_names(), 
-                          "Unexpected transform names")
 
 if __name__ == '__main__':
     unittest.main()

@@ -427,7 +427,7 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903
         else:
             self.doc_store = doc_store
 
-    def execute(self):
+    def execute(self): # pylint: disable = R0914, R0912, R0915
         """
         Set up MAUS input tasks and, on receipt of spills, submit
         to transform tasks accessed via a distributed task queue. 
@@ -445,36 +445,34 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903
 
         # Configure nodes.
         from celery.task.control import broadcast
-        from mauscelery.maustasks import MausGenericTransformTask
+        from mauscelery.maustasks import execute_transform
         if hasattr(self.transformer, "get_worker_names"):
             workers = self.transformer.get_worker_names()
         else:
             workers = self.transformer.__class__.__name__
         print "Reconfiguring nodes..."
-        results = broadcast("set_maus_configuration", arguments={"transform":workers, "configuration":self.json_config_doc}, reply=True)
-        reset_ok = False
-        for node in results:
-            node_id = node.keys()[0]
-            node_status = node[node_id]
-            if (node_status["status"] != "ok"):
-                print "Node %s was not reconfigured" % node_id
+        results = []
+        results = broadcast("birth", arguments={"transform":workers, \
+            "configuration":self.json_config_doc}, reply=True)
+        print results
+        reset_ok = True
+        for worker in results:
+            worker_id = worker.keys()[0]
+            worker_status = worker[worker_id]
+            if worker_status.has_key("error"):
+                print "Celery worker reconfiguration error - %s" % worker
+                reset_ok = False
             else:
-                reset_ok = True
+                for sub_process in worker_status:
+                    if worker_status[sub_process]["status"] == "error":
+                        print "Process reconfiguration error - %s: %s" % \
+                        (worker_id, sub_process)
+                        reset_ok = False
+                    else:
+                        print "Worker %s process %s - OK" % \
+                            (worker_id, sub_process)
         if (not reset_ok):
             raise Exception("All Celery nodes failed to reconfigure")
-
-        print "Restarting node pools..."
-        restart_results = broadcast("restart_pool", reply=True)
-        reset_ok = False
-        for node in restart_results:
-            node_id = node.keys()[0]
-            node_status = node[node_id]
-            if (node_status["status"] != "ok"):
-                print "Node %s was not restarted" % node_id
-            else:
-                reset_ok = True
-        if (not reset_ok):
-            raise Exception("All Celery nodes failed to restart")
 
         # Create unique ID
         celery_client_id = "%s (%s)" % (socket.gethostname(), os.getpid())
@@ -486,40 +484,41 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903
 
         print("TRANSFORM: spawning transform jobs for each spill")
         i = 0
-        transform_results = {}
-        while (len(map_buffer) != 0) or (len(transform_results) != 0):
+        spill_count = 0
+        task_status = {}
+        while (len(map_buffer) != 0) or (len(task_status) != 0):
             for spill in map_buffer:
                 result = \
-                    MausGenericTransformTask.delay(spill, celery_client_id, i) # pylint:disable=E1101, C0301
+                    execute_transform.delay(spill, celery_client_id, i) # pylint:disable=E1101, C0301
                 print " Task ID: %s" % result.task_id
-                # Index results by spill_id so can present
-                # results to merge-output in same order.
-                transform_results[i] = result
+                # Save task ID for monitoring status.
+                task_status[result.task_id] = result
                 i += 1
             map_buffer = DataflowUtilities.buffer_input(emitter, 1)
-            print " Processed %d spills so far," % i,
-            print(" %d spills left in buffer." % (len(map_buffer)))
+            if (len(map_buffer) != 0):
+                print " Processed %d spills so far," % i,
+                print(" %d spills left in buffer." % (len(map_buffer)))
 
             print("TRANSFORM: waiting for transform jobs to complete")
             # Wait for workers to finish - just keep looping until each
             # either succeeds or fails.
             spills = {}
-            for spill_id in transform_results.keys():
-                result = transform_results[spill_id]
+            for task_id in task_status.keys():
+                result = task_status[task_id]
                 if result.successful():
-                    del transform_results[spill_id]
-                    print " Spill %d task %s OK " % (spill_id, result.task_id)
-                    # Index results by spill_id so can present
+                    del task_status[task_id]
+                    print " Task %s SUCCESS " % task_id
+                    # Index results by spill_count so can present
                     # results to merge-output in same order.
                     spill = result.result
-                    spills[spill_id] = spill
-                    self.doc_store.put(str(spill_id), spill)
+                    spills[spill_count] = spill
+                    spill_count += 1
+                    self.doc_store.put(str(spill_count), spill)
                 elif result.failed():
-                    del transform_results[spill_id]
-                    print " Spill %d task %s FAILED " \
-                            % (spill_id, result.task_id)
-                    print "Exception in worker: %s " % result.result
-                    print "Traceback in worker: %s " % result.traceback
+                    del task_status[task_id]
+                    print " Task %s FAIL " % task_id
+                    print "  Exception in worker: %s " % result.result
+                    print "  Traceback in worker: %s " % result.traceback
         print("TRANSFORM: transform jobs completed")
 
     @staticmethod
