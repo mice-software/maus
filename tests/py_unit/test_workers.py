@@ -21,7 +21,9 @@ Test class for workers module.
 
 import unittest
 
-from workers import WorkerOperationException
+from workers import WorkerBirthFailedException
+from workers import WorkerDeathFailedException
+from workers import WorkerDeadException
 from workers import WorkerUtilities
 from MAUS import MapPyDoNothing
 from MAUS import MapPyGroup
@@ -266,9 +268,9 @@ class WorkerUtilitiesTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         WorkerUtilities.validate_transform(names)
         self.assertTrue("validate_transform(names) passed")
 
-class WorkerOperationExceptionTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
+class WorkerBirthFailedExceptionTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
     """
-    Test class for workers.WorkerOperationException class.
+    Test class for workers.WorkerBirthFailedException class.
     """
 
     def test_init(self):
@@ -276,9 +278,37 @@ class WorkerOperationExceptionTestCase(unittest.TestCase): # pylint: disable=R09
         Invoke constructor and check values.
         @param self Object reference.
         """
-        exception = WorkerOperationException("TASK")
-        self.assertEquals("TASK returned False", str(exception),
-                          "Unexpected string")
+        exception = WorkerBirthFailedException("TASK")
+        self.assertEquals("TASK returned False", str(exception), \
+            "Unexpected string")
+
+class WorkerDeathFailedExceptionTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
+    """
+    Test class for workers.WorkerDeathFailedException class.
+    """
+
+    def test_init(self):
+        """ 
+        Invoke constructor and check values.
+        @param self Object reference.
+        """
+        exception = WorkerDeathFailedException("TASK")
+        self.assertEquals("TASK returned False", str(exception), \
+            "Unexpected string")
+
+class WorkerDeaddExceptionTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
+    """
+    Test class for workers.WorkerDeadException class.
+    """
+
+    def test_init(self):
+        """ 
+        Invoke constructor and check values.
+        @param self Object reference.
+        """
+        exception = WorkerDeadException("TASK")
+        self.assertEquals("TASK process called after death", \
+            str(exception), "Unexpected string")
 
 if __name__ == '__main__':
     unittest.main()

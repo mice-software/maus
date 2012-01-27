@@ -123,7 +123,10 @@ class WorkerOperationException(Exception):
         @param worker Name of worker that failed.
         """
         Exception.__init__(self)
-        self.__worker = worker
+        self._worker = worker
+
+class WorkerBirthFailedException(WorkerOperationException):
+    """ Exception raised if MAUS worker birth returns False. """
 
     def __str__(self):
         """
@@ -131,16 +134,29 @@ class WorkerOperationException(Exception):
         @param self Object reference.
         @return string.
         """
-        return "%s returned False" % self.__worker
-
-class WorkerBirthFailedException(WorkerOperationException):
-    """ Exception raised if MAUS worker birth returns False. """
+        return "%s returned False" % self._worker
 
 class WorkerDeathFailedException(WorkerOperationException):
     """ Exception raised if MAUS worker death returns False. """
+
+    def __str__(self):
+        """
+        Return string representation. Overrides Exception.__str__.
+        @param self Object reference.
+        @return string.
+        """
+        return "%s returned False" % self._worker
 
 class WorkerDeadException(WorkerOperationException):
     """ 
     Exception raised if MAUS worker process is called but the worker
     is dead.
     """
+
+    def __str__(self):
+        """
+        Return string representation. Overrides Exception.__str__.
+        @param self Object reference.
+        @return string.
+        """
+        return "%s process called after death" % self._worker
