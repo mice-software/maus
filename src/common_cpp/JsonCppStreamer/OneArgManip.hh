@@ -11,6 +11,8 @@
  */
 #ifndef ONEARG_MANIP_H
 #define ONEARG_MANIP_H
+#include "gtest/gtest_prod.h"
+
 
 class rstream;
 
@@ -42,6 +44,8 @@ private:
    * \brief The argument that the single arg manipulator should take.
    */
   T m_value;
+ 
+  FRIEND_TEST(OneArgManipTest, TestConstructor);
 public:
   /*!
    * \brief Constructor
