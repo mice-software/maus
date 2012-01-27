@@ -519,6 +519,11 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903
                     print " Task %s FAIL " % task_id
                     print "  Exception in worker: %s " % result.result
                     print "  Traceback in worker: %s " % result.traceback
+
+        # Invoke death 
+        results = broadcast("death", reply=True)
+        print results
+
         print("TRANSFORM: transform jobs completed")
 
     @staticmethod
