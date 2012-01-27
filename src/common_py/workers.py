@@ -27,8 +27,8 @@ class WorkerUtilities: # pylint: disable=W0232
     MAUS worker utility methods.
     """
 
-    @staticmethod
-    def create_transform(transform):
+    @classmethod
+    def create_transform(cls, transform):
         """
         Create a transform given the name of transform
         class(es). Either a single name can be given - representing a
@@ -42,6 +42,7 @@ class WorkerUtilities: # pylint: disable=W0232
         @endverbatim
         Transforms must be in the MAUS module namespace e.g. 
         MAUS.MapCppTOFSlabHits.
+        @param cls Class reference.
         @param transform Transform name or list of names.
         @return transform object or MapPyGroup object (if given a list).
         @throws ValueError if transform is not a string or a list,
@@ -51,8 +52,7 @@ class WorkerUtilities: # pylint: disable=W0232
         if isinstance(transform, ListType):
             group = MAUS.MapPyGroup()
             for transform_name in transform:
-                group.append( \
-                    WorkerUtilities.create_transform(transform_name))
+                group.append(cls.create_transform(transform_name))
             return group
         elif isinstance(transform, StringType) \
             or isinstance(transform, UnicodeType):
@@ -63,8 +63,8 @@ class WorkerUtilities: # pylint: disable=W0232
         else:
             raise ValueError("Transform name %s is not a string" % transform)
 
-    @staticmethod
-    def validate_transform(transform):
+    @classmethod
+    def validate_transform(cls, transform):
         """
         Validate whether the names of transform class(es) are valid
         transforms. Either a single name can be given - representing a
@@ -78,6 +78,7 @@ class WorkerUtilities: # pylint: disable=W0232
         @endverbatim
         Transforms must be in the MAUS module namespace e.g. 
         MAUS.MapCppTOFSlabHits.
+        @param cls Class reference.
         @param transform Transform name or list of names.
         @throws ValueError if transform is not a string or a list,
         or contains an element which is not a list or string, or 
@@ -85,7 +86,7 @@ class WorkerUtilities: # pylint: disable=W0232
         """
         if isinstance(transform, ListType):
             for transform_name in transform:
-                WorkerUtilities.validate_transform(transform_name)
+                cls.validate_transform(transform_name)
         elif isinstance(transform, StringType) \
             or isinstance(transform, UnicodeType):
             if not hasattr(MAUS, transform):
@@ -93,8 +94,8 @@ class WorkerUtilities: # pylint: disable=W0232
         else:
             raise ValueError("Transform name %s is not a string" % transform)
 
-    @staticmethod
-    def get_worker_names(worker):
+    @classmethod
+    def get_worker_names(cls, worker):
         """
         Given a worker class get the name of the worker. If the
         worker is MapPyGroup then a list of worker names is
@@ -104,6 +105,7 @@ class WorkerUtilities: # pylint: disable=W0232
         or
         ["MapCppTOFDigits", ["MapCppTOFSlabHits", "MapCppTOFSpacePoint"]]
         @endverbatim
+        @param cls Class reference.
         @param worker Worker.
         @return worker name or, for MapPyGroup, list of worker names.
         """
