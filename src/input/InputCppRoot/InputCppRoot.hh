@@ -68,8 +68,6 @@ class InputCppRoot {
   /** The emitter - should be overloaded by SWIG script
    */
   std::string emitter() {
-    throw(Squeal(Squeal::recoverable, "This function should be overloaded",
-                "InputCppRoot::emitter"));
     return "";
   }
 
