@@ -16,62 +16,87 @@
 """
 SConscript file controls the MAUS build
 
+Call this build script by doing (with third party libraries built)
+    source env.sh
+    scons
+scons has a good man entry. A few useful switches are
+    - scons -c cleanup (delete built files)
+    - scons -s silent (gcc errors and warnings only)
+    - scons -j2 multiprocess with e.g. 2 cores
+
 SConscript file replaces the standard makefile for the MAUS library. SConscript
 uses scons library to handle builds. We have three submodules
 - environment_tools contains tools for modifying the environment
-- module_builder contains tools for handling modules (input, output, map, reduce) 
+- module_builder contains tools for handling modules (input, output, map, 
+  reduce) 
 - core_builder contains tools for handling the MAUS core (common_cpp, common_py,
   legacy)
 """
 
-import glob
-import os
-import shutil
+# this import fails if calling as a python script - call with scons
+from SCons.Script.SConscript import SConsEnvironment # pylint: disable=F0401
 
 import maus_build_tools.environment_tools
 import maus_build_tools.core_builder
 import maus_build_tools.module_builder
 
-from SCons.Script.SConscript import SConsEnvironment
+def setup_environment():
+    """
+    Setup the environment
 
-# check that the environment has been sourced (i.e. MAUS_ROOT_DIR and 
-# MAUS_THIRD_PARTY exist)
-(maus_root_dir, maus_third_party) = \
-                  maus_build_tools.environment_tools.get_environment_variables()
+    Setup the module builder; Check for the existence of third party libraries
+    and add them to the includes.
+    """
+    # check that the environment has been sourced (i.e. MAUS_ROOT_DIR and 
+    # MAUS_THIRD_PARTY exist)
+    (_maus_root_dir, _maus_third_party) = \
+                 maus_build_tools.environment_tools.get_environment_variables()
+    # Setup the scons environment.
+    env = maus_build_tools.environment_tools.get_environment()
+    # Setup the module builder
+    SConsEnvironment.jDev = maus_build_tools.module_builder.ModuleBuilder(env)
+    # make sure the sconscripts can get to the variables - don't need to export
+    # anything but 'env'. This needs to be done at global scope I think.
+    Export('env') # pylint: disable=E0602
 
-# Setup the scons environment.
-env = maus_build_tools.environment_tools.get_environment()
+    # add 'CheckCommand' to check that we can run exe - could just call directly
+    tests = {'CheckCommand' : maus_build_tools.environment_tools.check_command}
+    conf = Configure(env, tests) # pylint: disable=E0602
+    # check libraries exist; add them into the environment
+    for lib in ['compiler', 'python', 'gsl', 'root', 'clhep', 'geant4',
+                'recpack', 'gtest', 'unpacker']:
+        maus_build_tools.environment_tools.set_lib(conf, env, lib)
+    return _maus_root_dir, env
 
-# Setup the module builder
-SConsEnvironment.jDev = maus_build_tools.module_builder.ModuleBuilder(env)
+def build_libraries(maus_root_dir, env):
+    """
+    Build the maus libraries
 
-# Cleanup anything missed by scons
-if env.GetOption('clean'):
-    SConsEnvironment.jDev.cleanup_extras()
+    Build core libraries, cpp tests, python tests, modules
+    """
+    # build the maus cpp core library (libMausCpp.so)
+    maus_build_tools.core_builder.build_lib_maus_cpp(env)
+    # build the cpp tests (test_cpp_unit)
+    maus_build_tools.core_builder.build_cpp_tests(env)
+    # install the python tests (pure python, no build to do)
+    maus_build_tools.core_builder.install_python_tests(maus_root_dir, env)
+    # build the modules - inputters, mappers, reducers, outputters
+    stuff_to_import = SConsEnvironment.jDev.build_modules()
+    # build the MAUS python library (MAUS.py)
+    maus_build_tools.module_builder.build_maus_lib \
+                           ('%s/build/MAUS.py' % maus_root_dir, stuff_to_import)
 
-# make sure the sconscripts can get to the variables - don't need to export
-# anything but 'env'. This needs to be done at global scope I think.
-Export('env')
+def main():
+    """
+    main function - should be called by SCons
+    """
+    maus_root_dir_, env_ = setup_environment()
 
-# add 'CheckCommand' to check that we can run exe - could just call directly...
-conf = Configure(env, custom_tests = {'CheckCommand' : \
-                              maus_build_tools.environment_tools.check_command})
+    # SCons can forget to clean stuff if the source file no longer exists
+    if env_.GetOption('clean'):
+        maus_build_tools.module_builder.cleanup_extras()
 
-# check libraries exist
-for lib in ['compiler', 'python', 'gsl', 'root', 'clhep', 'geant4', 'recpack',
-           'gtest', 'unpacker']:
-    maus_build_tools.environment_tools.set_lib(conf, env, lib)
+    build_libraries(maus_root_dir_, env_)
 
-# build the maus cpp core library (libMausCpp.so)
-maus_build_tools.core_builder.build_lib_maus_cpp(env)
-# build the cpp tests (test_cpp_unit)
-maus_build_tools.core_builder.build_cpp_tests(env)
-# install the python tests (pure python, no build to do)
-maus_build_tools.core_builder.install_python_tests(maus_root_dir, env)
-# build the modules - inputters, mappers, reducers, outputters
-stuff_to_import = SConsEnvironment.jDev.build_modules()
-# build the MAUS python library (MAUS.py)
-SConsEnvironment.jDev.build_maus_lib('%s/build/MAUS.py' % maus_root_dir, stuff_to_import)
-
-
+main()
 

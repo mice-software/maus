@@ -50,10 +50,10 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
         fin.close()
         for line in lines_in:
             try:
-                # filter for *.py:#:* where # is an integer. Probably easier in
+                # filter for *:#:* where # is an integer. Probably easier in
                 # regexp, but regexp is gross...
                 # we have string like line = *.py:<str_1>
-                str_1 = line[line.index('.py:')+4:]
+                str_1 = line[line.index(':')+1:]
                 # we have string like str_1 = <str_2>:*
                 str_2 = str_1[0:str_1.index(':')]
                 # check str_2 = int
@@ -93,6 +93,18 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
                         error_files.append(file_name)
         return error_files
 
+    def run_force_files(self, fout):
+        """
+        Explicitly iterate over items in force_files list and run pylint
+        """
+        error_files = []
+        for file_name in self.force_files:   
+            file_name = os.path.join(os.environ['MAUS_ROOT_DIR'], file_name)
+            errors = self.run_pylint(file_name, fout)
+            if errors > 0:
+                error_files.append(file_name)
+        return error_files
+
     def test_python_style(self):
         """
         @brief walk up from $MAUS_ROOT_DIR and run pylint looking for errors
@@ -108,6 +120,7 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
         for target_dir in self.include_dirs:
             target_dir = os.path.join(self.maus_root_dir, target_dir)
             error_files += self.walk_directories(target_dir, fout)
+        error_files += self.run_force_files(fout)
         fout.close()
         time.sleep(1.0)
         fout = open(file_out)
@@ -131,6 +144,10 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
     # exclude if filename includes one of the following
     exclude_files = [
         'test_cdb__init__.py', # makes pylint error
+    ]
+    # force include these  files (even if pylint doesn't find them)
+    force_files = [
+        'SConstruct',
     ]
     maus_root_dir = os.environ['MAUS_ROOT_DIR']
     pylintrc = os.path.join(maus_root_dir, 'tests', 'style', 'pylintrc')

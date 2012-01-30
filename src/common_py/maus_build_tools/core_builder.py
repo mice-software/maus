@@ -1,3 +1,22 @@
+#  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
+#
+#  MAUS is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  MAUS is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
+
+"""
+Tools to build core library (libMausCpp) and core library unit tests
+"""
+
 import os
 import glob
 
@@ -26,6 +45,12 @@ def install_python_tests(maus_root_dir, env):
             env.Install(build+subdir_mod, test_files)
 
 def build_lib_maus_cpp(env):
+    """
+    Build main cpp library
+
+    Build libMausCpp.so shared object - containing all the code in 
+    src/common_cpp/* and src/legacy/*
+    """
     common_cpp_files = glob.glob("src/legacy/*/*cc") + \
         glob.glob("src/legacy/*/*/*cc") + \
         glob.glob("src/common_cpp/*/*cc") + \
@@ -38,24 +63,32 @@ def build_lib_maus_cpp(env):
     env.Install("build", maus_cpp)
     #Build an extra copy with the .dylib extension for linking on OS X
     if (os.uname()[0] == 'Darwin'):
-      maus_cpp_so = env.Dylib2SO(targetpath)
-      Depends(maus_cpp_so, maus_cpp)
-      env.Install("build", maus_cpp_so)
+        maus_cpp_so = env.Dylib2SO(targetpath)
+        # Depends == SCons global variable??
+        Depends(maus_cpp_so, maus_cpp) #pylint: disable = E0602
+        env.Install("build", maus_cpp_so)
 
 
 def build_cpp_tests(env):
+    """
+    Build cpp unit tests
+
+    Build all the unit tests for cpp code - all the stuff from tests/cpp_unit as
+    tests/cpp_unit/test_cpp_unit and all the stuff from
+    tests/integration/test_optics/src as optics
+    """
     env.Append(LIBPATH = 'src/common_cpp')
     env.Append(CPPPATH = MAUS_ROOT_DIR)
 
     if 'Darwin' in os.environ.get('G4SYSTEM'):
-       env.Append(LINKFLAGS=['-undefined','suppress','-flat_namespace'])
+        env.Append(LINKFLAGS=['-undefined', 'suppress','-flat_namespace'])
 
     test_cpp_files = glob.glob("tests/cpp_unit/*/*cc")+\
         glob.glob("tests/cpp_unit/*cc")
 
-    testmain = env.Program(target = 'tests/cpp_unit/test_cpp_unit', \
-                               source = test_cpp_files, \
-                               LIBS= env['LIBS'] + ['recpack'] + ['MausCpp'])
+    env.Program(target = 'tests/cpp_unit/test_cpp_unit', \
+                source = test_cpp_files, \
+                LIBS= env['LIBS'] + ['recpack'] + ['MausCpp'])
     env.Install('build', ['tests/cpp_unit/test_cpp_unit'])
 
     test_optics_files = glob.glob("tests/integration/test_optics/src/*cc")
