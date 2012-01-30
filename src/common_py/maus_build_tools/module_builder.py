@@ -34,6 +34,8 @@ class ModuleBuilder:
     """
     SCons "Dev" class responsible for build subprojects, in this case each of
     the submodules are a "subproject"
+    
+    sconscript files call these functions
     """
 
     def __init__(self, scons_environment):
@@ -41,6 +43,10 @@ class ModuleBuilder:
         Initialise the ModuleBuilder
         """
         self.env = scons_environment
+        self.project_list = []
+        self.dependency_dict = {}
+        self.built_list = []
+        self.local_environments = {}
 
     # sets up the sconscript file for a given sub-project
     def Subproject(self, project): #pylint: disable=C0103, R0201
@@ -50,11 +56,60 @@ class ModuleBuilder:
         SConscript(sconscript_path(project), exports=['project']) # pylint: disable=E0602, C0301
 
     #sets up the build for a given project
-    def Buildit(self, localenv, project, ignore1, ignore2, ignore3=False): #pylint: disable=C0103
+    def Buildit(self, localenv, project, dependencies=[], ignore2=None, ignore3=None): #pylint: disable=C0103
         """
-        Build a particular subproject (called by SConscript files)
+        Add a particular subproject to the build list
+
+        Buildit is called by SConscript files to request that we build a module.
+        The actual build is done asynchronously so that we can build a list of
+        dependencies and make sure we build in the right order
+        @param localenv the local environment set up in the sconscript file
+        @param project the name of the project (string)
+        @param any dependencies between modules
+        @return True on success
+        """
+        self.project_list.append(project)
+        self.dependency_dict[project] = dependencies
+        self.local_environments[project] = localenv
+        return True
+
+    def build_all_subprojects(self):
+        """
+        Build all subprojects recursively building dependencies
+
+        Warning - does not check for circular dependencies
+        """
+        for project in self.project_list:
+            self.recursive_subproject_build(project)
+
+    def recursive_subproject_build(self, project):
+        """
+        Recursively build project plus dependencies. Set a flag when a project
+        is build to prevent rebuilding that project
+        """
+        # if this has already been built, don't try again
+        if project in self.built_list:
+            return
+        # if we have dependencies, build them first
+        if project in self.dependency_dict.keys() and \
+           type(self.dependency_dict[project]) == []:
+            for dependency in self.dependency_dict[project]:
+                self.recursive_project_build(project)
+        self.build_one_subproject(project)
+        self.built_list += project
+
+    def build_one_subproject(self, project):
+        """
+        Actually do the build now
+
+        @param localenv the local environment set up in the sconscript file
+        @param project the name of the project (string)
+        @param any dependencies between modules
+        @return True on success
         """
         name = project.split('/')[-1]
+        localenv = self.local_environments[project]
+
         builddir = 'build'
         targetpath = os.path.join('build', '_%s' % name)
 
@@ -79,17 +134,16 @@ class ModuleBuilder:
             self.env.Install(full_build_dir, lib_so)
 
         tests = glob.glob('test_*.py')
-
+        print 'Installing',project
         self.env.Install(full_build_dir, "build/%s.py" % name)
         self.env.Install(full_build_dir, pgm)
         self.env.Install(full_build_dir, tests)
         self.env.Alias('all', pgm)  #note: not localenv
 
-        return True
 
-    def build_modules(self):
+    def register_modules(self):
         """
-        Find the modules that need building and build them
+        Find the modules that need building and register them (call sconscripts)
         """
         directories = []
         types = ["input", "map", "reduce", "output", "util"]
