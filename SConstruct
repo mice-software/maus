@@ -82,7 +82,6 @@ def build_libraries(maus_root_dir, env):
     maus_build_tools.core_builder.install_python_tests(maus_root_dir, env)
     # build the modules - inputters, mappers, reducers, outputters
     stuff_to_import = SConsEnvironment.jDev.register_modules()
-    SConsEnvironment.jDev.build_all_subprojects()
     # build the MAUS python library (MAUS.py)
     maus_build_tools.module_builder.build_maus_lib \
                            ('%s/build/MAUS.py' % maus_root_dir, stuff_to_import)
