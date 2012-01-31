@@ -10,4 +10,4 @@ localenv = env.Clone()
 dir = 'Interface'
 srclst = map(lambda x: os.path.join(dir, x), glob.glob(os.path.join(project,dir, '*.cpp')))
 
-env.jDev.Buildit(localenv, project)
+env.jDev.build_project(localenv, project)
