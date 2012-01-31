@@ -32,7 +32,7 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
                                  stderr=subprocess.STDOUT)
         return errors
 
-    def in_place_filter(self, file_name):
+    def in_place_filter(self, file_name): # pylint: disable=R0201
         """
         @brief filter pylint output file
 
@@ -57,7 +57,7 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
                 # we have string like str_1 = <str_2>:*
                 str_2 = str_1[0:str_1.index(':')]
                 # check str_2 = int
-                end_number = int(str_2)
+                end_number = int(str_2) #pylint: disable=W0612
                 lines_out.append(line)
             except ValueError:
                 pass # line filtered - index() or int() raises ValueError
@@ -105,7 +105,7 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
                 error_files.append(file_name)
         return error_files
 
-    def test_python_style(self):
+    def test_python_style(self): #pylint: disable=R0201
         """
         @brief walk up from $MAUS_ROOT_DIR and run pylint looking for errors
 
@@ -113,7 +113,7 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
         counting the number of lines in the pylint summary file. If this
         increases, throws an error.
         """
-        current_n_python_errors = 648 # Rogers, 17Jan2012. Release 0.1.2
+        current_n_python_errors = 627 # Rogers, 31Jan2012. Release 0.1.2
         file_out = os.path.join(self.maus_root_dir, 'tmp', 'pylint.out')
         fout = open(file_out, 'w')
         error_files = []
