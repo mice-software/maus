@@ -33,6 +33,7 @@
 #include "src/common_cpp/Recon/SciFiDigit.hh"
 #include "src/common_cpp/Recon/SciFiCluster.hh"
 #include "src/common_cpp/Recon/SciFiSpacePoint.hh"
+#include "src/common_cpp/Recon/SciFiStraightPRTrack.hh"
 
 class SciFiEvent {
  public:
@@ -54,8 +55,8 @@ class SciFiEvent {
   std::vector<SciFiDigit*>   scifidigits;
 
   std::vector<SciFiCluster*> scificlusters;
-
-  std::vector<SciFiSpacePoint* > scifispacepoints;
+  std::vector<SciFiSpacePoint*> scifispacepoints;
+  std::vector<SciFiStraightPRTrack> scifistraightprtracks;
 };  // Don't forget this trailing colon!!!!
 
 #endif

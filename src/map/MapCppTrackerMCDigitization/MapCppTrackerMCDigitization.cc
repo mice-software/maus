@@ -325,6 +325,7 @@ bool MapCppTrackerMCDigitization::check_param(SciFiHit *hit1, SciFiHit *hit2) {
 
 void MapCppTrackerMCDigitization::save_to_json(SciFiEvent &evt) {
   Json::Value js_event;
+  Json::Value digits_in_event;
   for ( unsigned int evt_i = 0; evt_i < evt.scifidigits.size(); evt_i++ ) {
     Json::Value digits_in_event;
     digits_in_event["tracker"]= evt.scifidigits[evt_i]->get_tracker();
@@ -335,5 +336,6 @@ void MapCppTrackerMCDigitization::save_to_json(SciFiEvent &evt) {
     digits_in_event["time"]   = evt.scifidigits[evt_i]->get_time();
     js_event.append(digits_in_event);
   }
+  assert(!js_event.isNull());
   root["digits"].append(js_event);
 }

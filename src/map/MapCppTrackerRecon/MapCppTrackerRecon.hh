@@ -45,6 +45,10 @@
 #include "src/map/MapCppTrackerRecon/RealDataDigitization.hh"
 #include "src/common_cpp/Recon/SciFiClusterRec.hh"
 #include "src/common_cpp/Recon/SciFiSpacePointRec.hh"
+#include "src/common_cpp/Recon/SciFiDigit.hh"
+#include "src/common_cpp/Recon/SciFiCluster.hh"
+#include "src/common_cpp/Recon/SciFiSpacePoint.hh"
+#include "src/common_cpp/Recon/PatternRecognition.hh"
 
 class MapCppTrackerRecon {
  public:
@@ -97,11 +101,11 @@ class MapCppTrackerRecon {
    */
   void spacepoint_recon(SciFiEvent &evt);
 
+  void pattern_recognition(SciFiEvent &evt);
+
   void save_to_json(SciFiEvent &evt);
 
   void print_event_info(SciFiEvent &event);
-
- // void dump_info(SciFiCluster* candidate_A, SciFiCluster* candidate_B, SciFiCluster* candidate_C);
 
  private:
   /// This should be the classname

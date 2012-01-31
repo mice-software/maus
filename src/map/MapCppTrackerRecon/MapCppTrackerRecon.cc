@@ -81,6 +81,10 @@ std::string MapCppTrackerRecon::process(std::string document) {
       if ( event.scificlusters.size() ) {
         spacepoint_recon(event);
       }
+      // Pattern Recognition.
+      if ( event.scifispacepoints.size() ) {
+        pattern_recognition(event);
+      }
       // print_event_info(event);
 
       save_to_json(event);
@@ -144,6 +148,10 @@ void MapCppTrackerRecon::spacepoint_recon(SciFiEvent &evt) {
   spacepoints.process(evt);
 }
 
+void MapCppTrackerRecon::pattern_recognition(SciFiEvent &evt) {
+  PatternRecognition pr1;
+  pr1.process(evt);
+}
 
 void MapCppTrackerRecon::save_to_json(SciFiEvent &evt) {
   Json::Value digits;
@@ -199,19 +207,6 @@ void MapCppTrackerRecon::save_to_json(SciFiEvent &evt) {
 void MapCppTrackerRecon::print_event_info(SciFiEvent &event) {
   std::cout << event.scifidigits.size() << " "
             << event.scificlusters.size() << " "
-            << event.scifispacepoints.size() << " " << std::endl;
+            << event.scifispacepoints.size() << " "
+	    << event.scifistraightprtracks.size() << " " << std::endl;
 }
-/*
-void MapCppTrackerRecon::dump_info(SciFiCluster* candidate_A, SciFiCluster* candidate_B,
-                                   SciFiCluster* candidate_C) {
-  std::ofstream file;
-  file.open("map_help.txt", std::ios::out | std::ios::app);
-  file << candidate_A->get_tracker() << " " << candidate_A->get_station() << " " <<
-  candidate_A->get_plane() << " " << candidate_A->get_channel() << "\n";
-  file << candidate_B->get_tracker() << " " << candidate_B->get_station() << " " <<
-  candidate_B->get_plane() << " " << candidate_B->get_channel() << "\n";
-  file << candidate_C->get_tracker() << " " << candidate_C->get_station() << " " <<
-  candidate_C->get_plane() << " " << candidate_C->get_channel() << "\n";
-  file.close();
-}
-*/
