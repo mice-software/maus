@@ -43,7 +43,6 @@
 
 #include "src/legacy/Config/MiceModule.hh"
 #include "src/common_cpp/Recon/SciFiDigit.hh"
-// #include "src/map/MapCppTrackerRecon/TrackerEvent.hh"
 
 class SciFiCluster {
  public:
@@ -52,6 +51,8 @@ class SciFiCluster {
   explicit SciFiCluster(SciFiDigit *digit);
 
   ~SciFiCluster();
+
+  void add_digit(SciFiDigit* neigh);
 
   void set_tracker(int trackerNo) { _tracker = trackerNo; }
 
@@ -88,10 +89,6 @@ class SciFiCluster {
   void set_position(Hep3Vector position) { _position = position; }
 
   Hep3Vector get_position() const { return _position; }
-
-  void add_digit(SciFiDigit* neigh);
-
-  void construct(std::vector<const MiceModule*> modules);
 
  private:
   int _tracker, _station, _plane;

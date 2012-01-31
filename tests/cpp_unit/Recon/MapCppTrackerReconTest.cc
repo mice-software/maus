@@ -35,7 +35,6 @@ class MapCppTrackerReconTest : public ::testing::Test {
 TEST_F(MapCppTrackerReconTest, test_birth) {
   MapCppTrackerMCDigitization mapper;
   std::string argJsonConfigDocument("{}");
-  int result = mapper.test();
   // bool sa = mapper.death();
 
   // EXPECT_TRUE(result==2);

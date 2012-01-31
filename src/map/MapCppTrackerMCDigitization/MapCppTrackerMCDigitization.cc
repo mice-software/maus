@@ -77,7 +77,7 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
     // if bad, write error file
 //    return writer.write(root);
 //  }
-  TrackerSpill spill;
+  SciFiSpill spill;
   spill.events_in_spill.clear();
 
   // ==========================================================
@@ -94,7 +94,7 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
   std::cout << "Digitization: Events in Spill: " << spill.events_in_spill.size() << std::endl;
   // ================= Reconstruction =========================
   for ( int k = 0; k < spill.events_in_spill.size(); k++ ) {
-    TrackerEvent event = spill.events_in_spill[k];
+    SciFiEvent event = spill.events_in_spill[k];
 
     std::cout << "Hits in event: " << event.scifihits.size() << std::endl;
     if ( event.scifihits.size() ) {
@@ -111,8 +111,8 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
 }
 
 void MapCppTrackerMCDigitization::
-     json_to_cpp(Json::Value js_event, TrackerSpill &spill) {
-  TrackerEvent event;
+     json_to_cpp(Json::Value js_event, SciFiSpill &spill) {
+  SciFiEvent event;
   Json::Value _hits = js_event["hits"];
   // std::cout << "Number of hits fed in: " << _hits.size() << std::endl;
   for ( int j = 0; j < _hits.size(); j++ ) {
@@ -156,7 +156,7 @@ bool MapCppTrackerMCDigitization::check_sanity_mc(Json::Value mc) {
 }
 
 
-void MapCppTrackerMCDigitization::construct_digits(TrackerEvent &evt) {
+void MapCppTrackerMCDigitization::construct_digits(SciFiEvent &evt) {
   int number_of_hits = evt.scifihits.size();
   for ( unsigned int hit_i = 0; hit_i < number_of_hits; hit_i++ ) {
     if ( !evt.scifihits[hit_i]->is_used() ) {
@@ -323,7 +323,7 @@ bool MapCppTrackerMCDigitization::check_param(SciFiHit *hit1, SciFiHit *hit2) {
   }
 }
 
-void MapCppTrackerMCDigitization::save_to_json(TrackerEvent &evt) {
+void MapCppTrackerMCDigitization::save_to_json(SciFiEvent &evt) {
   Json::Value js_event;
   for ( unsigned int evt_i = 0; evt_i < evt.scifidigits.size(); evt_i++ ) {
     Json::Value digits_in_event;

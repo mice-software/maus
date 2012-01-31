@@ -39,7 +39,7 @@
 #include "Config/MiceModule.hh"
 #include "Interface/Squeak.hh"
 #include "src/common_cpp/Recon/SciFiHit.hh"
-#include "src/common_cpp/Recon/TrackerSpill.hh"
+#include "src/common_cpp/Recon/SciFiSpill.hh"
 
 class MapCppTrackerMCDigitization {
  public:
@@ -70,9 +70,9 @@ class MapCppTrackerMCDigitization {
    */
   bool check_sanity_mc(Json::Value mc);
 
-  void json_to_cpp(Json::Value json_event, TrackerSpill &spill);
+  void json_to_cpp(Json::Value json_event, SciFiSpill &spill);
 
-  void construct_digits(TrackerEvent &event);
+  void construct_digits(SciFiEvent &event);
 
   double compute_npe(double edep);
 
@@ -84,9 +84,7 @@ class MapCppTrackerMCDigitization {
 
   bool check_param(SciFiHit *hit1, SciFiHit *hit2);
 
-  void save_to_json(TrackerEvent &evt);
-
-  int test() { return 3; }
+  void save_to_json(SciFiEvent &evt);
 
  private:
   /// This is the Mice Module

@@ -48,29 +48,32 @@
 #include "Config/MiceModule.hh"
 
 #include "src/common_cpp/Recon/SciFiDigit.hh"
-#include "src/common_cpp/Recon/TrackerEvent.hh"
-#include "src/common_cpp/Recon/TrackerSpill.hh"
+#include "src/common_cpp/Recon/SciFiEvent.hh"
+#include "src/common_cpp/Recon/SciFiSpill.hh"
 
 
 class RealDataDigitization {
  public:
   RealDataDigitization();
 
-  void construct(TrackerSpill &spill, Json::Value input_event);
+  void process(SciFiSpill &spill, Json::Value const &input_event);
 
   bool load_calibration(std::string filename);
 
-  void read_in_all_Boards(std::ifstream& inf);
+  void read_in_all_Boards(std::ifstream &inf);
 
   bool load_mapping(std::string file);
 
-  void get_StatPlaneChannel(int& , int& , int& , int& , int& , int&, int&);
+  void get_StatPlaneChannel(int &board, int &bank, int &chan_ro,
+                            int &tracker, int &station, int &plane, int &channel);
 
   bool load_bad_channels();
-  bool is_good_channel(int, int, int);
+
+  bool is_good_channel(const int board, const int bank, const int chan_ro);
 
  private:
   std::vector<Json::Value> _calibration[16][4];
+
   bool good_chan[16][4][128];
 
   int temp;

@@ -14,11 +14,34 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#include "src/common_cpp/Recon/TrackerSpill.hh"
+
+/** @class SciFiSpill
+ *  D...
+ *
+ */
+
+#ifndef SCIFISPILL_HH
+#define SCIFISPILL_HH
+// C headers
+
+// C++ headers
+#include <vector>
+// #include <string>
+
+// others
+#include "src/common_cpp/Recon/SciFiEvent.hh"
 
 
-TrackerSpill::TrackerSpill() {
-  // scifidigits.clear();
-}
+class SciFiSpill {
+ public:
+  SciFiSpill();
 
-TrackerSpill::~TrackerSpill() {}
+  ~SciFiSpill();
+
+  // std::vector events() const { return events_in_spill; }
+
+  // private:
+  std::vector<SciFiEvent>   events_in_spill;
+};  // Don't forget this trailing colon!!!!
+
+#endif

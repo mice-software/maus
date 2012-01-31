@@ -15,31 +15,47 @@
  *
  */
 
-/** @class TrackerEvent
+/** @class SciFiEvent
  *  D...
  *
  */
 
-#ifndef TRACKERSPILL_HH
-#define TRACKERSPILL_HH
+#ifndef SCIFIEVENT_HH
+#define SCIFIEVENT_HH
 // C headers
 
 // C++ headers
 #include <vector>
-// #include <string>
+#include <string>
+#include <iterator>
 
-// others
-#include "src/common_cpp/Recon/TrackerEvent.hh"
+#include "src/common_cpp/Recon/SciFiHit.hh"
+#include "src/common_cpp/Recon/SciFiDigit.hh"
+#include "src/common_cpp/Recon/SciFiCluster.hh"
+#include "src/common_cpp/Recon/SciFiSpacePoint.hh"
 
-
-class TrackerSpill {
+class SciFiEvent {
  public:
-  TrackerSpill();
-  ~TrackerSpill();
+  SciFiEvent();
 
-  std::vector<TrackerEvent>   events_in_spill;
+  ~SciFiEvent();
 
-  // private:
+  // std::vector hits() const { return scifihits; }
+
+  // std::vector digits() const { return scifidigits; }
+
+  // std::vector clusters() const { return scificlusters; }
+
+  // std::vector spacepoints() const { return scifispacepoints; }
+
+// private:
+  std::vector<SciFiHit*>   scifihits;
+
+  std::vector<SciFiDigit*>   scifidigits;
+
+  std::vector<SciFiCluster*> scificlusters;
+
+  std::vector<SciFiSpacePoint* > scifispacepoints;
 };  // Don't forget this trailing colon!!!!
 
 #endif

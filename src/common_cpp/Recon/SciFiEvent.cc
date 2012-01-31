@@ -14,14 +14,14 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#include "src/common_cpp/Recon/TrackerEvent.hh"
+#include "src/common_cpp/Recon/SciFiEvent.hh"
 
 
-TrackerEvent::TrackerEvent() {
+SciFiEvent::SciFiEvent() {
   // scifidigits.clear();
 }
 
-TrackerEvent::~TrackerEvent() {
+SciFiEvent::~SciFiEvent() {
 /*
   std::vector<SciFiHit*>::iterator hit;
   for (hit=scifihits.begin(); hit!=scifihits.end(); ++hit) {

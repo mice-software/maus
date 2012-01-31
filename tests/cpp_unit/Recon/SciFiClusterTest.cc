@@ -119,7 +119,7 @@ TEST_F(SciFiClusterTest, test_add_digit) {
   EXPECT_EQ(cluster->get_channel(), (channel1+channel2)/2.0);
   EXPECT_TRUE(neighbour->is_used());
 }
-
+/*
 TEST_F(SciFiClusterTest, test_construct) {
   // Get the tracker modules.
   std::string filename;
@@ -143,5 +143,5 @@ TEST_F(SciFiClusterTest, test_construct) {
   cluster->construct(modules);
   // think of tests for direction and position...
 }
-
+*/
 } // namespace

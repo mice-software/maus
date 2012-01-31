@@ -19,7 +19,7 @@
 
 RealDataDigitization::RealDataDigitization() {}
 
-void RealDataDigitization::construct(TrackerSpill &spill, Json::Value daq) {
+void RealDataDigitization::process(SciFiSpill &spill, Json::Value const &daq) {
   // -------------------------------------------------
   // Load calibration, mapping and bad channel list.
   bool calib = load_calibration("scifi_calibration_30_09_2011.txt");
@@ -34,7 +34,7 @@ void RealDataDigitization::construct(TrackerSpill &spill, Json::Value daq) {
   Json::Value tracker_event = daq["tracker1"];
 
   for ( unsigned int i = 1; i < tracker_event.size(); ++i ) {
-    TrackerEvent event;
+    SciFiEvent event;
 
     Json::Value input_event = tracker_event[i]["VLSB_C"];
     // Merge tracker events.
@@ -121,7 +121,7 @@ bool RealDataDigitization::load_calibration(std::string file) {
   return true;
 }
 
-void RealDataDigitization::read_in_all_Boards(std::ifstream& inf) {
+void RealDataDigitization::read_in_all_Boards(std::ifstream &inf) {
   std::string line;
 
   // run over all boards
@@ -212,7 +212,7 @@ void RealDataDigitization::
   // assert(found);
 }
 
-bool RealDataDigitization::is_good_channel(int board, int bank, int chan_ro) {
+bool RealDataDigitization::is_good_channel(const int board, const int bank, const int chan_ro) {
   return good_chan[board][bank][chan_ro];
 }
 

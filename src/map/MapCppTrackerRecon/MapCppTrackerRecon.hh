@@ -40,12 +40,11 @@
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 
-#include "src/common_cpp/Recon/TrackerSpill.hh"
-#include "src/common_cpp/Recon/TrackerEvent.hh"
+#include "src/common_cpp/Recon/SciFiSpill.hh"
+#include "src/common_cpp/Recon/SciFiEvent.hh"
 #include "src/map/MapCppTrackerRecon/RealDataDigitization.hh"
-#include "src/common_cpp/Recon/SciFiDigit.hh"
-#include "src/common_cpp/Recon/SciFiCluster.hh"
-#include "src/common_cpp/Recon/SciFiSpacePoint.hh"
+#include "src/common_cpp/Recon/SciFiClusterRec.hh"
+#include "src/common_cpp/Recon/SciFiSpacePointRec.hh"
 
 class MapCppTrackerRecon {
  public:
@@ -66,34 +65,43 @@ class MapCppTrackerRecon {
    *
    *  Receive a document with MC hits and return
    *  a document with digits
+   * \param document a line/spill from the JSON input
    */
   std::string process(std::string document);
 
-  /** sanity check
+  /** makes digits
    *
-   *  Checks the sanity of the JSON input,
+   *  Digits are made by either picking up
+   *  daq or MC.
+   *  \param spill a SciFiSpill object
+   *  \param root the parsed JSON input
    */
+  void digitization(SciFiSpill &spill, Json::Value &root);
 
-  void cluster_recon(TrackerEvent &evt);
+  /** fills digits from MC digitization
+   *
+   *  \param digits the MC digits
+   *  \param a_spill the SciFiSpill we are processing
+   */
+  void fill_digits_vector(Json::Value &digits, SciFiSpill &a_spill);
 
-  void spacepoint_recon(TrackerEvent &evt);
+  /** performs the cluster reconstruction
+   *
+   *  \param evt the current SciFiEvent
+   */
+  void cluster_recon(SciFiEvent &evt);
 
-  bool clusters_are_not_used(SciFiCluster* candidate_A, SciFiCluster* candidate_B);
+  /** performs the spacepoint reconstruction
+   *
+   *  \param evt the current SciFiEvent
+   */
+  void spacepoint_recon(SciFiEvent &evt);
 
-  bool clusters_are_not_used(SciFiCluster* candidate_A, SciFiCluster* candidate_B,
-                             SciFiCluster* candidate_C);
+  void save_to_json(SciFiEvent &evt);
 
-  bool kuno_accepts(SciFiCluster* cluster1, SciFiCluster* cluster2, SciFiCluster* cluster3);
+  void print_event_info(SciFiEvent &event);
 
-  void save_to_json(TrackerEvent &evt);
-
-  void fill_digits_vector(Json::Value digits, TrackerSpill &a_spill);
-
-  void print_event_info(TrackerEvent &event);
-
-  void dump_info(SciFiCluster* candidate_A, SciFiCluster* candidate_B, SciFiCluster* candidate_C);
-
-  void digitization(TrackerSpill &spill, Json::Value &root);
+ // void dump_info(SciFiCluster* candidate_A, SciFiCluster* candidate_B, SciFiCluster* candidate_C);
 
  private:
   /// This should be the classname
@@ -106,6 +114,8 @@ class MapCppTrackerRecon {
   Json::Reader reader;
   ///  Cut value for npe.
   double minPE;
+  /// Value above which reconstruction is aborted.
+  double ClustException;
   ///  Vector with the MICE SciFi Modules.
   std::vector<const MiceModule*> modules;
 }; // Don't forget this trailing colon!!!!

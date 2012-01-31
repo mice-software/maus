@@ -76,9 +76,9 @@ std::string  ReduceCppTracker::process(std::string document) {
   Json::Value xEventType;
   // Check if the JSON document can be parsed, else return error only
 
-  TCanvas *c1 = reinterpret_cast<TCanvas*> gROOT->GetListOfCanvases()->FindObject("c1");
-  TCanvas *c2 = reinterpret_cast<TCanvas*> gROOT->GetListOfCanvases()->FindObject("c2");
-  TCanvas *c3 = reinterpret_cast<TCanvas*> gROOT->GetListOfCanvases()->FindObject("c3");
+  TCanvas *c1 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c1"));
+  TCanvas *c2 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c2"));
+  TCanvas *c3 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c3"));
 
   try {
     root = JsonWrapper::StringToJson(document);}
