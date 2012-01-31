@@ -26,9 +26,15 @@ class MapPyTOFPlot:
         self._sp_tof0 = {}      
         self._sp_tof1 = {}
         self._sp_tof2 = {}
+        ROOT.gROOT.SetBatch(True)
         self.canvas = ROOT.TCanvas("tof", "tof")
-        self.tof_hist = ROOT.TH1F("tof", "tof", 280, 24, 38)
-        
+        self.root_file = ROOT.TFile("tofplot.root","update")
+        self.tof_hist = ROOT.TH1F("tof_3505", "tof_3505", 300, 23, 53)
+        # times are in ns, constants are in ps
+        self.tof0_dt = ROOT.TH1F("tof0_dt", "tof0_dt", 200, -2, 2)
+        self.tof1_dt = ROOT.TH1F("tof1_dt", "tof1_dt", 200, -2, 2)
+        self.tof2_dt = ROOT.TH1F("tof2_dt", "tof2_dt", 200, -2, 2)
+
     def birth(self, json_configuration):
         """ Do nothing here """
         try:
@@ -48,11 +54,22 @@ class MapPyTOFPlot:
                     if len(self._sp_tof0[i])==1 and len(self._sp_tof1[i])==1:
                         t_0 = self._sp_tof0[i][0]["time"]
                         t_1 = self._sp_tof1[i][0]["time"]
-                        #delta = self._sp_tof0[i][0]["dt"]
                         self.tof_hist.Fill(t_1-t_0)
+                        delta_t0 = self._sp_tof0[i][0]["dt"]
+                        self.tof0_dt.Fill(delta_t0)
+                        delta_t1 = self._sp_tof1[i][0]["dt"]
+                        self.tof1_dt.Fill(delta_t1)
                         print t_1 - t_0
+            for i in range(len(self._sp_tof2)):
+                if self._sp_tof2[i] :
+                    if len(self._sp_tof2[i])==1 :
+                        delta_t2 = self._sp_tof2[i][0]["dt"]
+                        self.tof2_dt.Fill(delta_t2)
 
         self.tof_hist.Draw()
+        self.tof0_dt.Draw()
+        self.tof1_dt.Draw()
+        self.tof2_dt.Draw()
         self.canvas.Update()
 
         return json_spill_doc
@@ -61,8 +78,16 @@ class MapPyTOFPlot:
         """ save the plot """
         try:
             self.tof_hist.Draw()
+            self.tof0_dt.Draw()
+            self.tof1_dt.Draw()
+            self.tof2_dt.Draw()
+            self.tof_hist.Write()
+            self.tof0_dt.Write()
+            self.tof1_dt.Write()
+            self.tof2_dt.Write()
             self.canvas.Update()
-            self.canvas.Print('tof.png')
+            #self.canvas.Print('tof.png')
+            self.root_file.Close()
             return True
         except Exception: #pylint: disable=W0703
             ErrorHandler.HandleException({}, self)
