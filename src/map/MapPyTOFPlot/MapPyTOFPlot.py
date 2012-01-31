@@ -19,21 +19,21 @@ import json
 import ROOT
 import ErrorHandler
 
-class MapPyTOFPlot:
-    """ Class for ploting the time-of-flight spectrum"""
+class MapPyTOFPlot: #pylint: disable=R0902
+    """ Class for plotting the time-of-flight spectrum"""
     def __init__(self):
         """ Constructor """
         self._sp_tof0 = {}      
         self._sp_tof1 = {}
         self._sp_tof2 = {}
-        ROOT.gROOT.SetBatch(True)
-        self.canvas = ROOT.TCanvas("tof", "tof")
-        self.root_file = ROOT.TFile("tofplot.root","update")
-        self.tof_hist = ROOT.TH1F("tof_3505", "tof_3505", 300, 23, 53)
+        ROOT.gROOT.SetBatch(True) #pylint: disable=E1101
+        self.canvas = ROOT.TCanvas("tof", "tof") #pylint: disable=E1101
+        self.root_file = ROOT.TFile("tofplot.root","update") #pylint: disable=E1101, C0301
+        self.tof_hist = ROOT.TH1F("tof_3505", "tof_3505", 300, 23, 53) #pylint: disable=E1101, C0301
         # times are in ns, constants are in ps
-        self.tof0_dt = ROOT.TH1F("tof0_dt", "tof0_dt", 200, -2, 2)
-        self.tof1_dt = ROOT.TH1F("tof1_dt", "tof1_dt", 200, -2, 2)
-        self.tof2_dt = ROOT.TH1F("tof2_dt", "tof2_dt", 200, -2, 2)
+        self.tof0_dt = ROOT.TH1F("tof0_dt", "tof0_dt", 200, -2, 2) #pylint: disable=E1101, C0301
+        self.tof1_dt = ROOT.TH1F("tof1_dt", "tof1_dt", 200, -2, 2) #pylint: disable=E1101, C0301
+        self.tof2_dt = ROOT.TH1F("tof2_dt", "tof2_dt", 200, -2, 2) #pylint: disable=E1101, C0301
 
     def birth(self, json_configuration):
         """ Do nothing here """
