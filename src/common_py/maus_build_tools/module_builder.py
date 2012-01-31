@@ -25,7 +25,6 @@ import os
 import glob
 import shutil
 
-import SCons.Builder as Builder
 import SCons.Script.SConscript as SConscript # pylint: disable=F0401
 
 MAUS_ROOT_DIR = os.environ['MAUS_ROOT_DIR']
@@ -48,14 +47,9 @@ class ModuleBuilder:
         self.dependency_dict = {}
         self.built_list = []
         self.local_environments = {}
-        self.__add_link_builder()
-
-    def __add_link_builder(self):
-        link_builder = Builder.Builder(action=make_link)
-        self.env.Append(BUILDERS = {'softlink' : link_builder})
 
     # sets up the sconscript file for a given sub-project
-    def Subproject(self, project): #pylint: disable=C0103, R0201
+    def subproject(self, project): #pylint: disable=C0103, R0201
         """
         Build the Subproject with name project
         """
@@ -63,7 +57,7 @@ class ModuleBuilder:
 
 
     #sets up the build for a given project
-    def Buildit(self, localenv, project, dependencies=[], dummy2=None, dummy3=None): #pylint: disable=C0103
+    def build_project(self, localenv, project, dependencies=None): #pylint: disable=R0914, C0301
         """
         Add a particular subproject to the build list
 
@@ -72,6 +66,9 @@ class ModuleBuilder:
         @param project the name of the project (string)
         @return True on success
         """
+        if dependencies == None:
+            dependencies = [] # can cause evil if we use [] as default value
+
         name = project.split('/')[-1]
         builddir = 'build'
         # ack - build the module twice, once for lib*.so and once for _*.so 
@@ -102,7 +99,6 @@ class ModuleBuilder:
         swig_lib = localenv.SharedLibrary(swig_path, source=srclst)
         normal_lib = localenv.SharedLibrary(lib_path, source=srclst)
         for dep in dependencies:
-            dep_name = dep.split('/')[-1]
             localenv.Depends(dep, swig_lib)
             localenv.Depends(dep, normal_lib)
 
@@ -112,7 +108,7 @@ class ModuleBuilder:
             self.env.Install(full_build_dir, lib_so)
 
         tests = glob.glob('test_*.py')
-        print 'Installing',project
+        print 'Installing', project
         self.env.Install(full_build_dir, "build/%s.py" % name)
         self.env.Install(full_build_dir, swig_lib)
         self.env.Install(full_build_dir, normal_lib)
@@ -148,7 +144,7 @@ class ModuleBuilder:
                 # map -> MapCpp, input -> InputCpp, etc
                 if parts[2].find(my_type.capitalize()+'Cpp') == 0:
                     print 'Found C++ module: %s' % parts[2]
-                    self.Subproject(directory)
+                    self.subproject(directory)
                     stuff_to_import.append(parts[2])
         return stuff_to_import
 
@@ -177,23 +173,6 @@ def cleanup_extras():
             dirname = os.path.join(root, basename)
             if os.path.isdir(dirname):
                 shutil.rmtree(dirname) 
-
-def make_link(lib_name):
-    """
-    Make a soft link from '_*.so' to 'lib*.so'
-    """
-    print 'making link',lib_name
-    source_name = lib_name.split('/')[-1]
-    if file_name[0] != '_' or file_name[-3:] != '.so':
-        raise IOError('Failed to parse library name '+str(lib_name)+\
-                      ' - should be like _MyLib.so')
-    target_name = 'lib'+source_name[1:]
-    source_dir = lib_name[0:len(file_name)]
-    here = os.get_cwd()
-    os.chdir(source_dir)
-    os.symlink(source_name, target_name)
-    os.chdir(here)
-    return True
 
 def build_maus_lib(filename, stuff_to_import):
     """
