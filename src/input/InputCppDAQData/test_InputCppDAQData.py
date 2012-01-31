@@ -56,8 +56,9 @@ class InputCppDAQDataTestCase(unittest.TestCase): # pylint: disable = R0904
         # Get a single event and check it's the right size
         self.assertTrue(self.mapper.readNextEvent())
         data = self.mapper.getCurEvent()
-        # Data shold be 65 (an empty spill, first event is start of burst)
-        self.assertEqual(len(data), 65)
+        # Data shold be 65 (an empty spill, first event is start of burst)        print data, len(data)
+        # len changed due to run_num addition
+        self.assertEqual(len(data), 80)
         self.assertTrue(self.mapper.death())
         return
 
@@ -79,8 +80,9 @@ class InputCppDAQDataTestCase(unittest.TestCase): # pylint: disable = R0904
         self.assertEqual(event_count, 26)
 
         # Check the md5 sum matches the expected value
+        # changed checksum to reflect the run_num addition
         self.assertEqual(digester.hexdigest(), \
-                         '6d925662f1844ff0198d7e810bbe9f0c')
+                         '426cc54172fc1091185f4eaacdd8b85a')
 
         self.assertTrue(self.mapper.death())
 

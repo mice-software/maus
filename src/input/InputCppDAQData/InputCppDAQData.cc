@@ -235,6 +235,7 @@ std::string InputCppDAQData::getCurEvent() {
   xDocRoot["spill_num"] = _dataProcessManager.GetSpillNumber();
   unsigned int event_type = _dataProcessManager.GetEventType();
   xDocRoot["daq_event_type"] = event_type_to_str(event_type);
+  xDocRoot["run_num"] = _dataProcessManager.GetRunNumber();
   // cout << xDocRoot << endl;
 
   _eventsCount++;
