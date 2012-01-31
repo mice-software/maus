@@ -220,6 +220,59 @@ TEST_F(MatrixTest, IndexingElements) {
       EXPECT_EQ(matrix_d1(i+1, j+1), 4.);
     }
   }
+  
+  // empty matrix
+  bool caught_exception = false;
+  try {
+    Matrix<double> matrix_d3;
+    matrix_d3(20, 20) = 5.0;
+  } catch(Squeal exception) {
+    caught_exception = true;
+  }
+  EXPECT_TRUE(caught_exception);
+  caught_exception = false;
+  try {
+    Matrix<double> matrix_d3;
+    const double element_d = matrix_d3(20, 20);
+    std::cout << element_d;
+  } catch(Squeal exception) {
+    caught_exception = true;
+  }
+  EXPECT_TRUE(caught_exception);
+
+  // row out of bounds
+  caught_exception = false;
+  try {
+    matrix_d1(-1, 1) = 5.0;
+  } catch(Squeal exception) {
+    caught_exception = true;
+  }
+  EXPECT_TRUE(caught_exception);
+  caught_exception = false;
+  try {
+    const double element_d = matrix_d1(-1, 1);
+    std::cout << element_d;
+  } catch(Squeal exception) {
+    caught_exception = true;
+  }
+  EXPECT_TRUE(caught_exception);
+
+  // column out of bonds
+  caught_exception = false;
+  try {
+    matrix_d1(1, -1) = 5.0;
+  } catch(Squeal exception) {
+    caught_exception = true;
+  }
+  EXPECT_TRUE(caught_exception);
+  caught_exception = false;
+  try {
+    const double element_d = matrix_d1(1, -1);
+    std::cout << element_d;
+  } catch(Squeal exception) {
+    caught_exception = true;
+  }
+  EXPECT_TRUE(caught_exception);
 
   Matrix<complex> matrix_c1(kRows, kColumns, kComplexData);
   // check that it works for const as well
@@ -238,6 +291,57 @@ TEST_F(MatrixTest, IndexingElements) {
       EXPECT_TRUE(::equal(matrix_c1(i+1, j+1), new_value1));
     }
   }
+  
+  // empty matrix
+  MAUS::complex some_value = MAUS::Complex::complex(5.0, 6.0);
+  caught_exception = false;
+  try {
+    Matrix<complex> matrix_c3;
+    matrix_c3(20, 20) = some_value;
+  } catch(Squeal exception) {
+    caught_exception = true;
+  }
+  EXPECT_TRUE(caught_exception);
+  caught_exception = false;
+  try {
+    Matrix<complex> matrix_c3;
+    const MAUS::complex element_c = matrix_c3(20, 20);
+  } catch(Squeal exception) {
+    caught_exception = true;
+  }
+  EXPECT_TRUE(caught_exception);
+
+  // row out of bounds
+  caught_exception = false;
+  try {
+    matrix_c1(-1, 1) = some_value;
+  } catch(Squeal exception) {
+    caught_exception = true;
+  }
+  EXPECT_TRUE(caught_exception);
+  caught_exception = false;
+  try {
+    const MAUS::complex element_c = matrix_c1(-1, 1);
+  } catch(Squeal exception) {
+    caught_exception = true;
+  }
+  EXPECT_TRUE(caught_exception);
+
+  // column out of bounds
+  caught_exception = false;
+  try {
+    matrix_c1(1, -1) = some_value;
+  } catch(Squeal exception) {
+    caught_exception = true;
+  }
+  EXPECT_TRUE(caught_exception);
+  caught_exception = false;
+  try {
+    const MAUS::complex element_c = matrix_c1(1, -1);
+  } catch(Squeal exception) {
+    caught_exception = true;
+  }
+  EXPECT_TRUE(caught_exception);
 }
 
 TEST_F(MatrixTest, CopyConstructor) {
@@ -316,6 +420,25 @@ TEST_F(MatrixTest, IndexingRows) {
     }
   }
 
+  // empty matrix
+  bool caught_exception = false;
+  try {
+    Matrix<double> matrix_d3;
+    matrix_d3.row(20);
+  } catch(Squeal exception) {
+    caught_exception = true;
+  }
+  EXPECT_TRUE(caught_exception);
+
+  // row out of bounds
+  caught_exception = false;
+  try {
+    matrix_d0.row(20);
+  } catch(Squeal exception) {
+    caught_exception = true;
+  }
+  EXPECT_TRUE(caught_exception);
+
   Matrix<complex> matrix_c0(kRows, kColumns, kComplexData);
   for (size_t row = 0; row < kRows; ++row) {
     Vector<complex> row_vector = matrix_c0.row(row+1);
@@ -323,6 +446,25 @@ TEST_F(MatrixTest, IndexingRows) {
       EXPECT_EQ(row_vector[column], kComplexData[row*kColumns + column]);
     }
   }
+
+  // empty matrix
+  caught_exception = false;
+  try {
+    Matrix<double> matrix_c3;
+    matrix_c3.row(20);
+  } catch(Squeal exception) {
+    caught_exception = true;
+  }
+  EXPECT_TRUE(caught_exception);
+
+  // row out of bounds
+  caught_exception = false;
+  try {
+    matrix_c0.row(20);
+  } catch(Squeal exception) {
+    caught_exception = true;
+  }
+  EXPECT_TRUE(caught_exception);
 }
 
 TEST_F(MatrixTest, IndexingColumns) {
@@ -334,6 +476,25 @@ TEST_F(MatrixTest, IndexingColumns) {
     }
   }
 
+  // empty matrix
+  bool caught_exception = false;
+  try {
+    Matrix<double> matrix_d3;
+    matrix_d3.column(20);
+  } catch(Squeal exception) {
+    caught_exception = true;
+  }
+  EXPECT_TRUE(caught_exception);
+
+  // column out of bounds
+  caught_exception = false;
+  try {
+    matrix_d0.column(20);
+  } catch(Squeal exception) {
+    caught_exception = true;
+  }
+  EXPECT_TRUE(caught_exception);
+
   Matrix<complex> matrix_c0(kRows, kColumns, kComplexData);
   for (size_t column = 0; column < kColumns; ++column) {
     Vector<complex> column_vector = matrix_c0.column(column+1);
@@ -341,6 +502,25 @@ TEST_F(MatrixTest, IndexingColumns) {
       EXPECT_EQ(column_vector[row], kComplexData[row*kColumns + column]);
     }
   }
+
+  // empty matrix
+  caught_exception = false;
+  try {
+    Matrix<double> matrix_c3;
+    matrix_c3.column(20);
+  } catch(Squeal exception) {
+    caught_exception = true;
+  }
+  EXPECT_TRUE(caught_exception);
+
+  // column out of bounds
+  caught_exception = false;
+  try {
+    matrix_c0.column(20);
+  } catch(Squeal exception) {
+    caught_exception = true;
+  }
+  EXPECT_TRUE(caught_exception);
 }
 
 TEST_F(MatrixTest, Submatrix) {
@@ -512,6 +692,24 @@ TEST_F(MatrixTest, Addition) {
   Matrix<double> matrix_d2 = matrix_d0 + matrix_d1;
   EXPECT_TRUE(equal(matrix_d2, kDoubleDatadoubled_));
 
+  // bad addition of differently sized matrices
+  bool caught_exception = false;
+  try {
+    Matrix<double> matrix_d3(kRows+1, kColumns);
+    matrix_d3 += matrix_d0;
+  } catch(Squeal exception) {
+    caught_exception = true;
+  }
+  EXPECT_TRUE(caught_exception);
+  caught_exception = false;
+  try {
+    Matrix<double> matrix_d3(kRows, kColumns+1);
+    matrix_d3 += matrix_d0;
+  } catch(Squeal exception) {
+    caught_exception = true;
+  }
+  EXPECT_TRUE(caught_exception);
+
   // add and assign
   Matrix<complex> matrix_c0(kRows, kColumns, kComplexData);
   Matrix<complex> matrix_c1(kRows, kColumns);
@@ -521,6 +719,24 @@ TEST_F(MatrixTest, Addition) {
   // add
   Matrix<complex> matrix_c2 = matrix_c0 + matrix_c1;
   EXPECT_TRUE(equal(matrix_c2, kComplexDatadoubled_));
+
+  // bad addition of differently sized matrices
+  caught_exception = false;
+  try {
+    Matrix<complex> matrix_c3(kRows+1, kColumns);
+    matrix_c3 += matrix_c0;
+  } catch(Squeal exception) {
+    caught_exception = true;
+  }
+  EXPECT_TRUE(caught_exception);
+  caught_exception = false;
+  try {
+    Matrix<complex> matrix_c3(kRows, kColumns+1);
+    matrix_c3 += matrix_c0;
+  } catch(Squeal exception) {
+    caught_exception = true;
+  }
+  EXPECT_TRUE(caught_exception);
 }
 
 TEST_F(MatrixTest, Subtraction) {
@@ -535,6 +751,24 @@ TEST_F(MatrixTest, Subtraction) {
   Matrix<double> matrix_d3 = matrix_d1 - matrix_d0;
   EXPECT_TRUE(equal(matrix_d3, kDoubleData));
 
+  // bad subtraction of differently sized matrices
+  bool caught_exception = false;
+  try {
+    Matrix<double> matrix_d3(kRows+1, kColumns);
+    matrix_d3 -= matrix_d0;
+  } catch(Squeal exception) {
+    caught_exception = true;
+  }
+  EXPECT_TRUE(caught_exception);
+  caught_exception = false;
+  try {
+    Matrix<double> matrix_d3(kRows, kColumns+1);
+    matrix_d3 -= matrix_d0;
+  } catch(Squeal exception) {
+    caught_exception = true;
+  }
+  EXPECT_TRUE(caught_exception);
+
   // subtract and assign
   Matrix<complex> matrix_c0(kRows, kColumns, kComplexData);
   Matrix<complex> matrix_c1(kRows, kColumns, kComplexDatadoubled_);
@@ -545,9 +779,28 @@ TEST_F(MatrixTest, Subtraction) {
   // subtract
   Matrix<complex> matrix_c3 = matrix_c1 - matrix_c0;
   EXPECT_TRUE(equal(matrix_c3, kComplexData));
+
+  // bad subtraction of differently sized matrices
+  caught_exception = false;
+  try {
+    Matrix<complex> matrix_c3(kRows+1, kColumns);
+    matrix_c3 -= matrix_c0;
+  } catch(Squeal exception) {
+    caught_exception = true;
+  }
+  EXPECT_TRUE(caught_exception);
+  caught_exception = false;
+  try {
+    Matrix<complex> matrix_c3(kRows, kColumns+1);
+    matrix_c3 -= matrix_c0;
+  } catch(Squeal exception) {
+    caught_exception = true;
+  }
+  EXPECT_TRUE(caught_exception);
 }
 
 TEST_F(MatrixTest, Multiplication) {
+  // multiple and assign
   double d1[6] = {1, 2, 3, 7, 6, 5};
   double d2[6] = {3, 4, 5, 2, 8, 3};
   const Matrix<double>  matrix_d0(3, 2, d1);
@@ -561,9 +814,21 @@ TEST_F(MatrixTest, Multiplication) {
   matrix_d3 *= matrix_d1;
   ASSERT_TRUE(equal(matrix_d2, matrix_d3));
 
+  // multiply
   Matrix<double> matrix_d4 = matrix_d0 * matrix_d1;
   EXPECT_TRUE(equal(matrix_d2, matrix_d4));
 
+  // bad multiplication of differently sized matrices
+  bool caught_exception = false;
+  try {
+    Matrix<double> matrix_d3(kColumns, kRows+1);
+    matrix_d3 *= matrix_d0;
+  } catch(Squeal exception) {
+    caught_exception = true;
+  }
+  EXPECT_TRUE(caught_exception);
+
+  // multiply and assign
   complex c1[6];
   complex c2[6];
   for (int i = 0; i < 6; i++) {
@@ -583,8 +848,19 @@ TEST_F(MatrixTest, Multiplication) {
   matrix_c3 *= matrix_c1;
   ASSERT_TRUE(equal(matrix_c2, matrix_c3));
 
+  // multiply
   Matrix<complex> matrix_c4 = matrix_c0 * matrix_c1;
   EXPECT_TRUE(equal(matrix_c2, matrix_c4));
+
+  // bad multiplication of differently sized matrices
+  caught_exception = false;
+  try {
+    Matrix<complex> matrix_c3(kColumns, kRows+1);
+    matrix_c3 *= matrix_c0;
+  } catch(Squeal exception) {
+    caught_exception = true;
+  }
+  EXPECT_TRUE(caught_exception);
 }
 
 TEST_F(MatrixTest, ScalarMultiplication) {
@@ -652,6 +928,8 @@ TEST_F(MatrixTest, ComplexComposition) {
   }
   Matrix<complex> matrix_c2 = MAUS::Complex::complex(matrix_real);
   ASSERT_TRUE(equal(matrix_c2, matrix_c1));
+  const Matrix<complex> matrix_c3(matrix_real);
+  ASSERT_TRUE(equal(matrix_c3, matrix_c1));
 
   // test construction of a complex matrix from two double matrices (real, imag)
   double kDoubleDatareversed[kDataSize];
@@ -659,8 +937,31 @@ TEST_F(MatrixTest, ComplexComposition) {
     kDoubleDatareversed[kDataSize-index-1] = kDoubleData[index];
   }
   const Matrix<double> matrix_imag(kRows, kColumns, kDoubleDatareversed);
-  Matrix<complex> matrix_c3 = MAUS::Complex::complex(matrix_real, matrix_imag);
-  ASSERT_TRUE(equal(matrix_c3, matrix_c0));
+  Matrix<complex> matrix_c4 = MAUS::Complex::complex(matrix_real, matrix_imag);
+  ASSERT_TRUE(equal(matrix_c4, matrix_c0));
+  Matrix<complex> matrix_c5(matrix_real, matrix_imag);
+  ASSERT_TRUE(equal(matrix_c5, matrix_c0));
+
+  // bad use of two differently sized real matrices
+  bool caught_exception = false;
+  Matrix<double> matrix_real_bad_rows(kRows+1, kColumns);
+  try {
+    Matrix<complex> matrix_c6
+      = MAUS::Complex::complex(matrix_real_bad_rows, matrix_imag);
+  } catch(Squeal exception) {
+    caught_exception = true;
+  }
+  EXPECT_TRUE(caught_exception);
+  caught_exception = false;
+  Matrix<double> matrix_real_bad_columns(kRows, kColumns+1);
+  try {
+    Matrix<complex> matrix_c6
+      = MAUS::Complex::complex(matrix_real_bad_columns, matrix_imag);
+  } catch(Squeal exception) {
+    caught_exception = true;
+  }
+  EXPECT_TRUE(caught_exception);
+
 }
 
 TEST_F(MatrixTest, ComplexDecomposition) {
@@ -691,6 +992,7 @@ TEST_F(MatrixTest, ComplexConjugation) {
 }
 
 TEST_F(MatrixTest, Determinant) {
+  // double matrix determinant
   Matrix<double> matrix_d1(kSize, kSize, kDoubleData);
   for (size_t i = 1; i <= 2; ++i) {
     for (size_t j = 3; j <= 4; ++j) {
@@ -712,6 +1014,50 @@ TEST_F(MatrixTest, Determinant) {
     matrix_d2(2, column) = matrix_d2(1, column);
   }
   EXPECT_TRUE(::equal(0., determinant(matrix_d2)));
+
+  // bad non-square matrix determinant
+  bool caught_exception = false;
+  try {
+    Matrix<double> matrix_d3(kRows, kColumns);
+    determinant(matrix_d3);
+  } catch(Squeal exception) {
+    caught_exception = true;
+  }
+  EXPECT_TRUE(caught_exception);
+
+  // complex matrix determinant
+  Matrix<complex> matrix_c1(kSize, kSize, kComplexData);
+  for (size_t i = 1; i <= 2; ++i) {
+    for (size_t j = 3; j <= 4; ++j) {
+      matrix_c1(i, j) = MAUS::Complex::complex(0.0, 0.0);
+      matrix_c1(j, i) = MAUS::Complex::complex(0.0, 0.0);
+    }
+  }
+  // det is equal to det(upper block diag)*det(lower block diag)
+  MAUS::complex upper_block_diag_det_c = matrix_c1(1, 1)*matrix_c1(2, 2)
+                                       - matrix_c1(1, 2)*matrix_c1(2, 1);
+  MAUS::complex lower_block_diag_det_c = matrix_c1(3, 3)*matrix_c1(4, 4)
+                                       - matrix_c1(3, 4)*matrix_c1(4, 3);
+  EXPECT_TRUE(::equal(upper_block_diag_det_c * lower_block_diag_det_c,
+              determinant(matrix_c1)));
+
+  // if 2 rows are identical, det is 0
+  Matrix<complex> matrix_c2(kSize, kSize, kComplexData);
+  for (size_t column = 1; column <= kSize; ++column) {
+    matrix_c2(2, column) = matrix_c2(1, column);
+  }
+  EXPECT_TRUE(::equal(MAUS::Complex::complex(0.0, 0.0),
+                      determinant(matrix_c2)));
+
+  // bad non-square matrix determinant
+  caught_exception = false;
+  try {
+    Matrix<complex> matrix_c3(kRows, kColumns);
+    determinant(matrix_c3);
+  } catch(Squeal exception) {
+    caught_exception = true;
+  }
+  EXPECT_TRUE(caught_exception);
 }
 
 TEST_F(MatrixTest, Inverse) {
@@ -723,6 +1069,16 @@ TEST_F(MatrixTest, Inverse) {
       EXPECT_TRUE(::equal(row == column ? 1. : 0., matrix_d3(row, column)));
     }
   }
+
+  // bad non-square matrix inverse
+  bool caught_exception = false;
+  try {
+    Matrix<double> matrix_d4(kRows, kColumns);
+    inverse(matrix_d4);
+  } catch(Squeal exception) {
+    caught_exception = true;
+  }
+  EXPECT_TRUE(caught_exception);
 }
 
 TEST_F(MatrixTest, Trace) {
