@@ -37,11 +37,11 @@ from workers import WorkerDeadException
 class MausConfiguration(): # pylint:disable = W0232, R0903
     """
     MAUS transform configuration consisting of a MAUS JSON
-    configuration document and a transform specification. The
-    transform specification can be a single name - representing a
-    single transform - or a list of transforms - representing a
-    MapPyGroup. Sub-lists are treated as nested MapPyGroups. For 
-    example: 
+    configuration document, a transform specification and an
+    ID. The transform specification can be a single name -
+    representing a single transform - or a list of transforms -
+    representing a MapPyGroup. Sub-lists are treated as nested
+    MapPyGroups. For example: 
     @verbatim
     ["MapCppTOFDigits", "MapCppTOFSlabHits", "MapCppTOFSpacePoint"]
     or
@@ -56,6 +56,7 @@ class MausConfiguration(): # pylint:disable = W0232, R0903
     """
     transform = "MapPyDoNothing"
     configuration = "{}"
+    config_id = 0
 
 class MausTransform(): # pylint:disable = W0232
     """
@@ -220,34 +221,12 @@ def execute_transform(spill, client_id = "Unknown", spill_id = 0):
 # JSON configuration documents and transforms are validated prior
 # to sending to the sub-processes.
 
-class UpdateId: # pylint:disable = W0232, R0903
-    """
-    Helper class used by both the Celery master process and
-    sub-processes. The master process uses this to assign an
-    ID to an update it makes via invocation of the sub_process
-    process_* messages. 
-    The sub-processes use this to record the most recent update
-    received from the master process so they don't apply the
-    same update twice.
-    """
-    count = 0
-
-    @classmethod
-    def increment(cls):
-        """
-        Increment the count. If it hits 100, cycle back to 0.
-        @param cls Class reference.
-        """        
-        cls.count = cls.count + 1
-        (_, cls.count) = divmod(cls.count, 100)
-
-def process_birth(master_id, transform, configuration):
+def process_birth(config_id, transform, configuration):
     """
     Create and birth a new transform. This is invoked in a sub-process
     via a call from the Celery master process. Any existing transform
     is death-ed first.
-    @param master_id Update ID of master to ensure that an update from
-    the master process is only applied once.
+    @param config_id Configuration ID from client.
     @param transform Either a single name can be given - representing
     a single transform - or a list of transforms - representing a
     MapPyGroup. Sub-lists are treated as nested MapPyGroups. If None
@@ -255,11 +234,11 @@ def process_birth(master_id, transform, configuration):
     @param configuration Valid JSON configuration document.
     @return status of (PID, {"status":"ok"}) if all went well,
     (PID, {"status":"error", "type":ERROR, "message":MESSAGE}) if
-    an exception arose or None if the birth was not done as the
-    sub-process CHILD_PROCESS_UPDATE_ID matches the master_id. 
+    an exception arose or (PID, None) if the birth was not done as the
+    sub-process MausConfiguration.config_id matches config_id.
     """
-    # Only update if the master_id is new.
-    if (UpdateId.count != master_id):
+    # Only update if the configuration config_id is new.
+    if (MausConfiguration.config_id != config_id):
         doc = {}
         try:
             logger = logging.getLogger(__name__)
@@ -270,6 +249,7 @@ def process_birth(master_id, transform, configuration):
             # Update sub-process configuration.
             MausConfiguration.configuration = configuration
             MausConfiguration.transform = transform
+            MausConfiguration.config_id = config_id
             doc["status"] = "ok"
         except Exception as exc: # pylint:disable = W0703
             if logger.isEnabledFor(logging.DEBUG):
@@ -277,26 +257,23 @@ def process_birth(master_id, transform, configuration):
             doc["status"] = "error"
             doc["type"] = str(exc.__class__)
             doc["message"] = exc.message
-        UpdateId.count = master_id
         return (os.getpid(), doc)
     else:
-        return None
+        return (os.getpid(), None)
 
-def process_death(master_id):
+def process_death():
     """
     Execute death on the current transform. This is invoked in a
     sub-process via a call from the Celery master process.
-    @param master_id Update ID of master to ensure that an update from
-    the master process is only applied once.
     @return sub-process ID to indicate that this process has executed
     this method.
     @return status of (PID, {"status":"ok"}) if all went well,
     (PID, {"status":"error", "type":ERROR, "message":MESSAGE}) if
-    an exception arose or None if the birth was not done as the
-    sub-process CHILD_PROCESS_UPDATE_ID matches the master_id. 
+    an exception arose or (PID, None) if death has already been
+    invoked.
     """
-    # Only update if the master_id is new.
-    if (UpdateId.count != master_id):
+    # Only update if transform is not already dead.
+    if (not MausTransform.is_dead):
         doc = {}
         try:
             logger = logging.getLogger(__name__)
@@ -310,19 +287,21 @@ def process_death(master_id):
             doc["status"] = "error"
             doc["type"] = str(exc.__class__)
             doc["message"] = exc.message
-        UpdateId.count = master_id
         return (os.getpid(), doc)
     else:
-        return None
+        return (os.getpid(), None)
 
 @Panel.register
-def birth(panel, transform, configuration = "{}"): # pylint: disable=W0613, C0301
+def birth(panel, config_id, transform, configuration = "{}"): # pylint: disable=W0613, C0301
     """
     Create and birth a new transform in each sub-process. This is
     invoked by "broadcast" calls from clients and, in turn, invokes
     the process_birth method in sub-processes. Both the transform
-    and configuration are validated.
+    and configuration are validated. The configuration is updated
+    only if the ID given by the client is different from the 
+    ID of the current configuration.
     @param panel Celery panel object.
+    @param config_id Configuration ID from client.
     @param transform Either a single name can be given - representing
     a single transform - or a list of transforms - representing a
     MapPyGroup. Sub-lists are treated as nested MapPyGroups. If None
@@ -354,15 +333,15 @@ def birth(panel, transform, configuration = "{}"): # pylint: disable=W0613, C030
     pids_done = set() 
     # Submit asynchronous jobs to the sub-processes until they've all
     # processed the message.
-    UpdateId.increment()
     while pids ^ pids_done: 
         result = pool.apply_async( \
-            process_birth, (UpdateId.count, transform, config,))
+            process_birth, (config_id, transform, config,))
         status = result.get()
-        if status != None:
-            pids_done.add(status[0])
+        pids_done.add(status[0])
+        if status[1] != None:
             doc[str(status[0])] = status[1]
     # Update master process configuration.
+    MausConfiguration.config_id = config_id
     MausConfiguration.configuration = config
     MausConfiguration.transform = transform
     if logger.isEnabledFor(logging.INFO):
@@ -392,12 +371,11 @@ def death(panel):
     pids_done = set() 
     # Submit asynchronous jobs to the sub-processes until they've all
     # processed the message.
-    UpdateId.increment()
     while pids ^ pids_done: 
-        result = pool.apply_async(process_death, (UpdateId.count,))
+        result = pool.apply_async(process_death, ())
         status = result.get()
-        if status != None:
-            pids_done.add(status[0])
+        pids_done.add(status[0])
+        if status[1] != None:
             doc[str(status[0])] = status[1]
     if logger.isEnabledFor(logging.INFO):
         logger.info("Status: %s" % doc)
@@ -409,9 +387,11 @@ def get_maus_configuration(panel): # pylint:disable=W0613
     Get information on the current configuration and transform.
     @param panel Celery panel object.
     @return status document of form {configuration:
-    MAUS_CONFIGURATION_DOC, transform: TRANSFORM_NAME_OR_LIST_OF_NAMES}
+    MAUS_CONFIGURATION_DOC, transform:
+    TRANSFORM_NAME_OR_LIST_OF_NAMES, config_id:CONFIG_ID}
     """
     doc = {}
     doc["configuration"] = MausConfiguration.configuration
     doc["transform"] = MausConfiguration.transform
+    doc["config_id"] = MausConfiguration.config_id
     return doc

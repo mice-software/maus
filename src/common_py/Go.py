@@ -443,6 +443,9 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903
         if (active_nodes == None):
             raise Exception("No active Celery nodes!")
 
+        # Create unique ID
+        celery_client_id = "%s (%s)" % (socket.gethostname(), os.getpid())
+
         # Configure nodes.
         from celery.task.control import broadcast
         from mauscelery.maustasks import execute_transform
@@ -453,7 +456,8 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903
         print "Reconfiguring nodes..."
         results = []
         results = broadcast("birth", arguments={"transform":workers, \
-            "configuration":self.json_config_doc}, reply=True)
+            "configuration":self.json_config_doc,
+            "config_id": celery_client_id}, reply=True)
         print results
         reset_ok = True
         for worker in results:
@@ -473,9 +477,6 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903
                             (worker_id, sub_process)
         if (not reset_ok):
             raise Exception("All Celery nodes failed to reconfigure")
-
-        # Create unique ID
-        celery_client_id = "%s (%s)" % (socket.gethostname(), os.getpid())
 
         print("INPUT: Reading input")
         assert(self.inputer.birth(self.json_config_doc) == True)

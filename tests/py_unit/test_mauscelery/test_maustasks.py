@@ -24,18 +24,14 @@ import MAUS
 import ROOT
 
 from celery import current_app
-from celery.registry import tasks
 from celery.utils import LOG_LEVELS
 
 from mauscelery.maustasks import MausConfiguration
 from mauscelery.maustasks import MausTransform
 from mauscelery.maustasks import worker_process_init_callback
-from mauscelery.maustasks import UpdateId
 from mauscelery.maustasks import execute_transform
 from mauscelery.maustasks import process_birth
 from mauscelery.maustasks import process_death
-from mauscelery.maustasks import birth
-from mauscelery.maustasks import death
 from mauscelery.maustasks import get_maus_configuration
 
 from workers import WorkerBirthFailedException
@@ -93,50 +89,6 @@ class MapDummy: # pylint:disable = R0902
 # Add MapDummy to MAUS so it can be picked up by the task when it
 # needs to be created via its name.
 setattr(MAUS, "MapDummy", MapDummy)
-
-class UpdateIdTestCase(unittest.TestCase): # pylint: disable=R0904
-    """
-    Test class for mauscelery.maustasks.UpdateId class.
-    """
-
-    def setUp(self): # pylint: disable=C0103
-        """ 
-        Reset UpdateId.count to 0.
-        @param self Object reference.
-        """
-        UpdateId.count = 0
-
-    def test_increment(self):
-        """
-        Test increment().
-        @param self Object reference.
-        """
-        self.assertEquals(0, UpdateId.count, \
-            "Unexpected UpdateId.count value")
-        UpdateId.increment()
-        UpdateId.increment()
-        UpdateId.increment()
-        self.assertEquals(3, UpdateId.count, \
-           "Unexpected UpdateId.count after 3 increments")
-
-    def test_increment_mod(self):
-        """
-        Test increment() past 100.
-        @param self Object reference.
-        """
-        self.assertEquals(0, UpdateId.count, \
-            "Unexpected UpdateId.count value")
-        for _ in range(102):
-            UpdateId.increment()
-        self.assertEquals(2, UpdateId.count, \
-           "Unexpected UpdateId.count after 102 increments")
-
-    def tearDown(self): # pylint: disable=C0103
-        """ 
-        Reset UpdateId.count to 0.
-        @param self Object reference.
-        """
-        UpdateId.count = 0
 
 class MausTransformTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
     """
@@ -319,21 +271,25 @@ class ProcessBirthTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         # are called.
         current_app.conf.CELERYD_LOG_LEVEL = LOG_LEVELS["DEBUG"]
  
-    def test_process_birth_master_id(self):
+    def test_process_birth_same_id(self):
         """ 
-        Invoke process_birth with a master ID that matches
-        the child ID (in UpdateId).
+        Invoke process_birth with a config ID that matches
+        the current ID (in MausConfiguration.config_id).
         @param self Object reference.
         """
-        status = process_birth(UpdateId.count, "MapDummy", "{}")
-        self.assertEquals(None, status, "Expected None")
+        status = process_birth(MausConfiguration.config_id, \
+            "MapDummy", "{}")
+        self.assertEquals(os.getpid(), status[0], 
+            "Unexpected process ID")
+        self.assertEquals(None, status[1], "Expected None")
 
     def test_process_birth(self):
         """ 
         Invoke process_birth.
         @param self Object reference.
         """
-        status = process_birth(UpdateId.count + 1, "MapDummy", "{}")
+        new_id = MausConfiguration.config_id + 1
+        status = process_birth(new_id, "MapDummy", "{}")
         self.assertEquals(MapDummy, \
             MausTransform.transform.__class__, "Unexpected transform")
         self.assertTrue(not MausTransform.is_dead, 
@@ -342,6 +298,8 @@ class ProcessBirthTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
             "Unexpected MausConfiguration.transform")
         self.assertEquals("{}", MausConfiguration.configuration,
             "Unexpected MausConfiguration.configuration")
+        self.assertEquals(new_id, MausConfiguration.config_id,
+            "Unexpected MausConfiguration.config_id")
         self.assertEquals(os.getpid(), status[0], 
             "Unexpected process ID")
         self.assertTrue(status[1].has_key("status"),
@@ -354,8 +312,8 @@ class ProcessBirthTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         Invoke process_birth where birth throws an exception.
         @param self Object reference.
         """
-        status = process_birth(UpdateId.count + 1, "MapDummy", \
-            """{"fail_birth":"true"}""")
+        status = process_birth(MausConfiguration.config_id + 1, 
+            "MapDummy", """{"fail_birth":"true"}""")
         self.assertEquals(os.getpid(), status[0], 
             "Unexpected process ID")
         self.assertTrue(status[1].has_key("status"),
@@ -383,21 +341,14 @@ class ProcessDeathTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         # are called.
         current_app.conf.CELERYD_LOG_LEVEL = LOG_LEVELS["DEBUG"]
  
-    def test_process_death_master_id(self):
-        """ 
-        Invoke process_death with a master ID that matches
-        the child ID (in UpdateId).
-        @param self Object reference.
-        """
-        status = process_death(UpdateId.count)
-        self.assertEquals(None, status, "Expected None")
-
     def test_process_death(self):
         """ 
         Invoke process_death.
         @param self Object reference.
         """
-        status = process_death(UpdateId.count + 1)
+        process_birth(MausConfiguration.config_id + 1, 
+            "MapDummy", "{}")
+        status = process_death()
         self.assertEquals(os.getpid(), status[0], 
             "Unexpected process ID")
         self.assertTrue(status[1].has_key("status"),
@@ -405,14 +356,27 @@ class ProcessDeathTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         self.assertEquals("ok", status[1]["status"],
             "Expect a status key with value ok")
 
+    def test_process_death_already_dead(self):
+        """ 
+        Invoke process_death when the transform is already dead.
+        @param self Object reference.
+        """
+        process_birth(MausConfiguration.config_id + 1, 
+            "MapDummy", "{}")
+        process_death()
+        status = process_death()
+        self.assertEquals(os.getpid(), status[0], 
+            "Unexpected process ID")
+        self.assertEquals(None, status[1], "Expected None")
+
     def test_process_death_fails(self):
         """ 
         Invoke process_birth where birth throws an exception.
         @param self Object reference.
         """
-        status = process_birth(UpdateId.count + 1, "MapDummy", \
-            """{"fail_death":"true"}""")
-        status = process_death(UpdateId.count + 2)
+        status = process_birth(MausConfiguration.config_id + 1, 
+            "MapDummy", """{"fail_death":"true"}""")
+        status = process_death()
         self.assertEquals(os.getpid(), status[0], 
             "Unexpected process ID")
         self.assertTrue(status[1].has_key("status"),
@@ -437,6 +401,10 @@ class GetMausConfigPanelTestCase(unittest.TestCase): # pylint: disable=R0904, C0
         MausConfiguration.transform = "MapDummy"
         MausConfiguration.configuration = "{test}"
         config = get_maus_configuration(None)
+        self.assertTrue(config.has_key("config_id"), 
+            "Missing config_id key")
+        self.assertEquals(MausConfiguration.config_id, 
+            config["config_id"], "Unexpected config_id")
         self.assertTrue(config.has_key("configuration"), 
             "Missing configuration key")
         self.assertEquals(MausConfiguration.configuration, 
