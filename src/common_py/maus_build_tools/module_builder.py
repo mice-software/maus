@@ -25,6 +25,7 @@ import os
 import glob
 import shutil
 
+import SCons.Builder as Builder
 import SCons.Script.SConscript as SConscript # pylint: disable=F0401
 
 MAUS_ROOT_DIR = os.environ['MAUS_ROOT_DIR']
@@ -47,6 +48,11 @@ class ModuleBuilder:
         self.dependency_dict = {}
         self.built_list = []
         self.local_environments = {}
+        self.__add_link_builder()
+
+    def __add_link_builder(self):
+        link_builder = Builder.Builder(action=make_link)
+        self.env.Append(BUILDERS = {'softlink' : link_builder})
 
     # sets up the sconscript file for a given sub-project
     def Subproject(self, project): #pylint: disable=C0103, R0201
@@ -55,91 +61,63 @@ class ModuleBuilder:
         """
         SConscript(sconscript_path(project), exports=['project']) # pylint: disable=E0602, C0301
 
+
     #sets up the build for a given project
-    def Buildit(self, localenv, project, dependencies=[], ignore2=None, ignore3=None): #pylint: disable=C0103
+    def Buildit(self, localenv, project, dependencies=[], dummy2=None, dummy3=None): #pylint: disable=C0103
         """
         Add a particular subproject to the build list
 
         Buildit is called by SConscript files to request that we build a module.
-        The actual build is done asynchronously so that we can build a list of
-        dependencies and make sure we build in the right order
         @param localenv the local environment set up in the sconscript file
         @param project the name of the project (string)
-        @param any dependencies between modules
-        @return True on success
-        """
-        self.project_list.append(project)
-        self.dependency_dict[project] = dependencies
-        self.local_environments[project] = localenv
-        return True
-
-    def build_all_subprojects(self):
-        """
-        Build all subprojects recursively building dependencies
-
-        Warning - does not check for circular dependencies
-        """
-        for project in self.project_list:
-            self.recursive_subproject_build(project)
-
-    def recursive_subproject_build(self, project):
-        """
-        Recursively build project plus dependencies. Set a flag when a project
-        is build to prevent rebuilding that project
-        """
-        # if this has already been built, don't try again
-        if project in self.built_list:
-            return
-        # if we have dependencies, build them first
-        if project in self.dependency_dict.keys() and \
-           type(self.dependency_dict[project]) == []:
-            for dependency in self.dependency_dict[project]:
-                self.recursive_project_build(project)
-        self.build_one_subproject(project)
-        self.built_list += project
-
-    def build_one_subproject(self, project):
-        """
-        Actually do the build now
-
-        @param localenv the local environment set up in the sconscript file
-        @param project the name of the project (string)
-        @param any dependencies between modules
         @return True on success
         """
         name = project.split('/')[-1]
-        localenv = self.local_environments[project]
-
         builddir = 'build'
-        targetpath = os.path.join('build', '_%s' % name)
+        # ack - build the module twice, once for lib*.so and once for _*.so 
+        # needed by SWIG - could use a symlink here (but that seems quite hard
+        # to do for SCons novice)
+        lib_path = os.path.join('build', 'lib%s' % name)
+        swig_path = os.path.join('build', '_%s' % name)
 
         #append the user's additional compile flags
         #assume debugcflags and releasecflags are defined
         localenv.Append(LIBS=['MausCpp'])
         localenv.Append(LIBPATH = "%s/src/common_cpp" % MAUS_ROOT_DIR)
+        if type(dependencies) != type([]):
+            print 'Warning - dependencies should be a list - found '+\
+                  str(dependencies)+' in project '+project
+            dependencies = []
+        for dep in dependencies:
+            lib_name = dep.split('/')[-1]
+            localenv.Append(LIBS=lib_name)
 
         #specify the build directory
         localenv.VariantDir(variant_dir=builddir, src_dir='.', duplicate=0)
         localenv.Append(CPPPATH='.')
-
         full_build_dir = os.path.join(MAUS_ROOT_DIR, builddir)
 
         srclst = [builddir + '/' + x for x in glob.glob('*.cc')]
         srclst += [builddir + '/' + x for x in glob.glob('*.i')]
-        pgm = localenv.SharedLibrary(targetpath, source=srclst)
+        swig_lib = localenv.SharedLibrary(swig_path, source=srclst)
+        normal_lib = localenv.SharedLibrary(lib_path, source=srclst)
+        for dep in dependencies:
+            dep_name = dep.split('/')[-1]
+            localenv.Depends(dep, swig_lib)
+            localenv.Depends(dep, normal_lib)
 
         if (os.uname()[0] == 'Darwin'):
-            lib_so = self.env.Dylib2SO(targetpath)
+            lib_so = self.env.Dylib2SO(swig_path)
             Depends(lib_so, pgm) #pylint: disable=E0602
             self.env.Install(full_build_dir, lib_so)
 
         tests = glob.glob('test_*.py')
         print 'Installing',project
         self.env.Install(full_build_dir, "build/%s.py" % name)
-        self.env.Install(full_build_dir, pgm)
+        self.env.Install(full_build_dir, swig_lib)
+        self.env.Install(full_build_dir, normal_lib)
         self.env.Install(full_build_dir, tests)
-        self.env.Alias('all', pgm)  #note: not localenv
-
+        return True
 
     def register_modules(self):
         """
@@ -199,6 +177,23 @@ def cleanup_extras():
             dirname = os.path.join(root, basename)
             if os.path.isdir(dirname):
                 shutil.rmtree(dirname) 
+
+def make_link(lib_name):
+    """
+    Make a soft link from '_*.so' to 'lib*.so'
+    """
+    print 'making link',lib_name
+    source_name = lib_name.split('/')[-1]
+    if file_name[0] != '_' or file_name[-3:] != '.so':
+        raise IOError('Failed to parse library name '+str(lib_name)+\
+                      ' - should be like _MyLib.so')
+    target_name = 'lib'+source_name[1:]
+    source_dir = lib_name[0:len(file_name)]
+    here = os.get_cwd()
+    os.chdir(source_dir)
+    os.symlink(source_name, target_name)
+    os.chdir(here)
+    return True
 
 def build_maus_lib(filename, stuff_to_import):
     """
