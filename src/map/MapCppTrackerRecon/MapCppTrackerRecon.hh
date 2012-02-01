@@ -107,6 +107,10 @@ class MapCppTrackerRecon {
 
   void print_event_info(SciFiEvent &event);
 
+  Json::Value ConvertToJson(std::string jsonString);
+
+  std::string JsonToString(Json::Value json_in);
+
  private:
   /// This should be the classname
   std::string _classname;

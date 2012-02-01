@@ -155,14 +155,14 @@ void MapCppTrackerRecon::pattern_recognition(SciFiEvent &evt) {
 
 void MapCppTrackerRecon::save_to_json(SciFiEvent &evt) {
   Json::Value digits;
-  for ( unsigned int evt_i = 0; evt_i < evt.scifidigits.size(); evt_i++ ) {
+  for ( unsigned int dig_i = 0; dig_i < evt.scifidigits.size(); dig_i++ ) {
     Json::Value digits_in_event;
-    digits_in_event["tracker"]= evt.scifidigits[evt_i]->get_tracker();
-    digits_in_event["station"]= evt.scifidigits[evt_i]->get_station();
-    digits_in_event["plane"]  = evt.scifidigits[evt_i]->get_plane();
-    digits_in_event["channel"]= evt.scifidigits[evt_i]->get_channel();
-    digits_in_event["npe"]    = evt.scifidigits[evt_i]->get_npe();
-    digits_in_event["time"]   = evt.scifidigits[evt_i]->get_time();
+    digits_in_event["tracker"]= evt.scifidigits[dig_i]->get_tracker();
+    digits_in_event["station"]= evt.scifidigits[dig_i]->get_station();
+    digits_in_event["plane"]  = evt.scifidigits[dig_i]->get_plane();
+    digits_in_event["channel"]= evt.scifidigits[dig_i]->get_channel();
+    digits_in_event["npe"]    = evt.scifidigits[dig_i]->get_npe();
+    digits_in_event["time"]   = evt.scifidigits[dig_i]->get_time();
     digits.append(digits_in_event);
   }
   root["digits"].append(digits);
@@ -209,4 +209,20 @@ void MapCppTrackerRecon::print_event_info(SciFiEvent &event) {
             << event.scificlusters.size() << " "
             << event.scifispacepoints.size() << " "
 	    << event.scifistraightprtracks.size() << " " << std::endl;
+}
+
+// the following two functions are added for testing purposes only
+Json::Value MapCppTrackerRecon::ConvertToJson(std::string jsonString) {
+  Json::Value newJson;
+  // JsonCpp string -> JSON::Value converter
+  Json::Reader reader;
+
+  newJson = JsonWrapper::StringToJson(jsonString);
+  return newJson;
+}
+
+std::string MapCppTrackerRecon::JsonToString(Json::Value json_in) {
+  std::stringstream ss_io;
+  JsonWrapper::Print(ss_io, json_in);
+  return ss_io.str();
 }
