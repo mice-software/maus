@@ -40,6 +40,8 @@ using MAUS::operator +=;
 using MAUS::operator -;
 using MAUS::operator ==;
 using MAUS::operator <<;
+using MAUS::real;
+using MAUS::imag;
 
 // Defined in ComplexTest.cc
 bool equal(const complex c1, const complex c2);
@@ -220,7 +222,7 @@ TEST_F(MatrixTest, IndexingElements) {
       EXPECT_EQ(matrix_d1(i+1, j+1), 4.);
     }
   }
-  
+
   // empty matrix
   bool caught_exception = false;
   try {
@@ -291,7 +293,7 @@ TEST_F(MatrixTest, IndexingElements) {
       EXPECT_TRUE(::equal(matrix_c1(i+1, j+1), new_value1));
     }
   }
-  
+
   // empty matrix
   MAUS::complex some_value = MAUS::Complex::complex(5.0, 6.0);
   caught_exception = false;
@@ -961,7 +963,6 @@ TEST_F(MatrixTest, ComplexComposition) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
-
 }
 
 TEST_F(MatrixTest, ComplexDecomposition) {
@@ -1061,9 +1062,10 @@ TEST_F(MatrixTest, Determinant) {
 }
 
 TEST_F(MatrixTest, Inverse) {
+  // M^-1 * M = Identity (double)
   Matrix<double> matrix_d1(kSize, kSize, kDoubleData);
   Matrix<double> matrix_d2 = inverse(matrix_d1);
-  Matrix<double> matrix_d3 = matrix_d1 * matrix_d2;  // M^-1 * M = Identity
+  Matrix<double> matrix_d3 = matrix_d1 * matrix_d2;
   for (size_t row = 1; row <= kSize; ++row) {
     for (size_t column = 1; column <= kSize; ++column) {
       EXPECT_TRUE(::equal(row == column ? 1. : 0., matrix_d3(row, column)));
@@ -1079,6 +1081,21 @@ TEST_F(MatrixTest, Inverse) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
+
+  // non-invertible matrix (infinite elements)
+  caught_exception = false;
+  try {
+    const double bad_array[] = {
+      std::numeric_limits<double>::infinity(),  1,
+      1,                                        1};
+    Matrix<double> matrix_d4(2, 2, bad_array);
+    inverse(matrix_d4);
+  } catch(Squeal exception) {
+    caught_exception = true;
+  }
+  EXPECT_TRUE(caught_exception);
+
+  // non-invertible matrix (NaN elements) -- not sure how to do this
 }
 
 TEST_F(MatrixTest, Trace) {
@@ -1176,6 +1193,24 @@ TEST_F(MatrixTest, Eigen) {
     }
     EXPECT_TRUE(found_match);
   }
+
+  // bad non-square matrix eigensystem
+  bool caught_exception = false;
+  try {
+    Matrix<double> matrix_d4(kRows, kColumns);
+    eigenvalues(matrix_d4);
+  } catch(Squeal exception) {
+    caught_exception = true;
+  }
+  EXPECT_TRUE(caught_exception);
+  caught_exception = false;
+  try {
+    Matrix<double> matrix_d4(kRows, kColumns);
+    eigensystem(matrix_d4);
+  } catch(Squeal exception) {
+    caught_exception = true;
+  }
+  EXPECT_TRUE(caught_exception);
 }
 
 TEST_F(MatrixTest, Negation) {

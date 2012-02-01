@@ -239,7 +239,7 @@ TEST_F(ComplexTest, Magnitude) {
 
 TEST_F(ComplexTest, Arg) {
   double argument = MAUS::arg(cc);
-  EXPECT_TRUE(equal(argument, atan2(imag(cc),real(cc))));
+  EXPECT_TRUE(equal(argument, atan2(imag(cc), real(cc))));
 }
 
 TEST_F(ComplexTest, Exponential) {
@@ -256,7 +256,7 @@ TEST_F(ComplexTest, Logarithms) {
   double y = MAUS::arg(cc);
   ct = MAUS::Complex::complex(x, y);
   EXPECT_TRUE(equal(natural_log, ct));
-  
+
   MAUS::complex log_base_10 = MAUS::log10(cc);
   ct = natural_log / log(10);
   EXPECT_TRUE(equal(log_base_10, ct));
@@ -272,7 +272,7 @@ TEST_F(ComplexTest, Pow) {
   ct = MAUS::Complex::complex(cos(real_power * theta), sin(real_power * theta));
   ct *= pow(radius, real_power);
   EXPECT_TRUE(equal(cc_pow_double, ct));
-  
+
   // z^w = (r e^{i theta})^(x+iy) = e^{(x lnr-y theta)+i(y lnr + x theta)}
   const MAUS::complex complex_power = MAUS::Complex::complex(5.69, 2.81);
   MAUS::complex cc_pow_complex = MAUS::pow(cp, complex_power);
@@ -287,7 +287,7 @@ TEST_F(ComplexTest, SquareRoot) {
   MAUS::complex square_root = MAUS::sqrt(64.0);
   ct = MAUS::Complex::complex(sqrt(64.0), 0.0);
   EXPECT_TRUE(equal(square_root, ct));
-  
+
   square_root = MAUS::sqrt(cc);
   ct = MAUS::polar(sqrt(MAUS::norm(cc)), MAUS::arg(cc)/2);
   EXPECT_TRUE(equal(square_root, ct));
