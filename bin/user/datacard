@@ -14,7 +14,7 @@ output_json_file_type = "text"
 # 4 = fatal
 # >4 = silent
 # Doesnt effect python
-verbose_level = 4
+verbose_level = 0
 errors_to_stderr = None # None = from verbose_level; else True or False
 errors_to_json = True
 on_error = 'none' # none, halt or raise
@@ -26,10 +26,10 @@ keep_only_muon_tracks = False
 keep_tracks = False # set to true to keep start and end point of every track
 keep_steps = False # set to true to keep start and end point of every track and
                    # every step point
-simulation_geometry_filename = "Stage6.dat" # geometry used by simulation
+simulation_geometry_filename = "Stage4.dat" # geometry used by simulation
 maximum_number_of_steps = 10000
 simulation_reference_particle = {
-    "position":{"x":0.0, "y":-0.0, "z":-5500.0},
+    "position":{"x":0.0, "y":-0.0, "z":-6500.0},
     "momentum":{"x":0.0, "y":0.0, "z":1.0},
     "particle_id":-13, "energy":226.0, "time":0.0, "random_seed":10
 }
@@ -114,8 +114,6 @@ SciFinStations = 5
 SciFinTrackers = 2
 SciFiNPECut = 2
 SciFiClustExcept = 100
-SciFiReconLevel = 3
-scifi_run_type = "daq" # mc
 
 # configuration database
 cdb_upload_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database uploads

@@ -56,6 +56,8 @@ class RealDataDigitization {
  public:
   RealDataDigitization();
 
+  ~RealDataDigitization();
+
   void process(SciFiSpill &spill, Json::Value const &input_event);
 
   bool load_calibration(std::string filename);
@@ -69,7 +71,9 @@ class RealDataDigitization {
 
   bool load_bad_channels();
 
-  bool is_good_channel(const int board, const int bank, const int chan_ro);
+  bool is_good_channel(int board, int bank, int chan_ro);
+
+  // std::vector<Json::Value> get_calibration() const { return _calibration[16][4]; }
 
  private:
   std::vector<Json::Value> _calibration[16][4];
@@ -78,8 +82,8 @@ class RealDataDigitization {
 
   int temp;
 
-//  std::vector<int> _cryo;
-//  std::vector<int> _cass;
+  // std::vector<int> _cryo;
+  // std::vector<int> _cass;
   std::vector<int> _board;
   std::vector<int> _bank;
   std::vector<int> _chan_ro;

@@ -181,9 +181,10 @@ void MapCppTrackerMCDigitization::construct_digits(SciFiEvent &evt) {
       // loop over all the other hits
       for ( unsigned int hit_j = hit_i; hit_j < number_of_hits; hit_j++ ) {
         if ( check_param(evt.scifihits[hit_i], evt.scifihits[hit_j]) ) {
-          double edep_j = a_hit->get_edep();
+          SciFiHit *same_digit = evt.scifihits[hit_j];
+          double edep_j = same_digit->get_edep();
           nPE  += compute_npe(edep_j);
-          evt.scifihits[hit_j]->set_used();
+          same_digit->set_used();
         } // if-statement
       } // ends l-loop over all the array
       int tracker = a_hit->get_tracker();

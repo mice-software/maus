@@ -42,7 +42,7 @@
 
 #include "src/common_cpp/Recon/SciFiSpill.hh"
 #include "src/common_cpp/Recon/SciFiEvent.hh"
-#include "src/map/MapCppTrackerRecon/RealDataDigitization.hh"
+#include "src/common_cpp/Recon/RealDataDigitization.hh"
 #include "src/common_cpp/Recon/SciFiClusterRec.hh"
 #include "src/common_cpp/Recon/SciFiSpacePointRec.hh"
 #include "src/common_cpp/Recon/SciFiDigit.hh"

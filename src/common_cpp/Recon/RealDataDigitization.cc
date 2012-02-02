@@ -15,9 +15,11 @@
  *
  */
 
-#include "src/map/MapCppTrackerRecon/RealDataDigitization.hh"
+#include "src/common_cpp/Recon/RealDataDigitization.hh"
 
 RealDataDigitization::RealDataDigitization() {}
+
+RealDataDigitization::~RealDataDigitization() {}
 
 void RealDataDigitization::process(SciFiSpill &spill, Json::Value const &daq) {
   // -------------------------------------------------
@@ -137,9 +139,9 @@ void RealDataDigitization::read_in_all_Boards(std::ifstream &inf) {
         std::istringstream ist1(line.c_str());
         ist1 >> unique_chan_no >> board >> bank >> chan >> p >> g;
 
-        assert(board == i);
-        assert(bank  == j);
-        assert(chan  == k);
+        // assert(board == i);
+        // assert(bank  == j);
+        // assert(chan  == k);
 
         temp = unique_chan_no;
 

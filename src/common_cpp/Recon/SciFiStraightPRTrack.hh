@@ -40,23 +40,25 @@ class SciFiStraightPRTrack {
   ~SciFiStraightPRTrack();  // Default destructor
 
   // Getters
-  inline std::vector<SciFiSpacePoint> get_spacepoints() const { return _spoints; }
+  std::vector<SciFiSpacePoint> get_spacepoints() const { return _spoints; }
 
-  inline double get_x0() const { return _x0; }
-  inline double get_y0() const { return _y0; }
-  inline double get_mx() const { return _mx; }
-  inline double get_my() const { return _my; }
+  double get_x0() const { return _x0; }
+  double get_y0() const { return _y0; }
+  double get_mx() const { return _mx; }
+  double get_my() const { return _my; }
+  int get_tracker() const { return _tracker; }
 
   std::vector<double> get_vsl();
 
   // Setters
-  inline void set_spacepoints(std::vector<SciFiSpacePoint> spoints) { _spoints = spoints; }
+  void set_spacepoints(std::vector<SciFiSpacePoint> spoints) { _spoints = spoints; }
 
-  inline void set_x0(double x0) { _x0 = x0; }
-  inline void set_y0(double y0) { _y0 = y0; }
-  inline void set_mx(double mx) { _mx = mx; }
-  inline void set_my(double my) { _my = my; }
+  void set_x0(double x0) { _x0 = x0; }
+  void set_y0(double y0) { _y0 = y0; }
+  void set_mx(double mx) { _mx = mx; }
+  void set_my(double my) { _my = my; }
 
+  void set_tracker(int tracker) { _tracker = tracker; }
   // Print track parameters
   void print_params();
 
@@ -65,6 +67,7 @@ class SciFiStraightPRTrack {
 
   std::vector<double> _vsl;
 
+  int _tracker;
   double _x0;
   double _y0;
   double _mx;

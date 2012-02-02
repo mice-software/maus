@@ -51,11 +51,10 @@ class SciFiEvent {
 
 // private:
   std::vector<SciFiHit*>   scifihits;
-
   std::vector<SciFiDigit*>   scifidigits;
-
   std::vector<SciFiCluster*> scificlusters;
   std::vector<SciFiSpacePoint*> scifispacepoints;
+  std::vector<SciFiSpacePoint*> scifiseeds;
   std::vector<SciFiStraightPRTrack> scifistraightprtracks;
 };  // Don't forget this trailing colon!!!!
 

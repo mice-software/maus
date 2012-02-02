@@ -91,12 +91,13 @@ std::string  ReduceCppTracker::process(std::string document) {
     return writer.write(root);
   }
   try {
-    xEventType = JsonWrapper::GetProperty(root,
+    /*xEventType = JsonWrapper::GetProperty(root,
                                           "daq_event_type",
                                           JsonWrapper::stringValue);
 
 
-    if (xEventType == "physics_event" && root.isMember("space_points")) {
+    if (xEventType == "physics_event" && root.isMember("space_points")) {*/
+    if ( root.isMember("space_points") ) {
       // Light Yield plots.
       light_yield(root);
 

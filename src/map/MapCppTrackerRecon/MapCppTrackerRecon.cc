@@ -85,7 +85,7 @@ std::string MapCppTrackerRecon::process(std::string document) {
       if ( event.scifispacepoints.size() ) {
         pattern_recognition(event);
       }
-      // print_event_info(event);
+      print_event_info(event);
 
       save_to_json(event);
     } // ==========================================================
@@ -167,8 +167,8 @@ void MapCppTrackerRecon::save_to_json(SciFiEvent &evt) {
   }
   root["digits"].append(digits);
 
-  Json::Value tracker0;
-  Json::Value tracker1;
+  Json::Value sp_tracker0;
+  Json::Value sp_tracker1;
   Json::Value channels;
   for ( unsigned int evt_i = 0; evt_i < evt.scifispacepoints.size(); evt_i++ ) {
     Json::Value spacepoints_in_event;
@@ -194,21 +194,42 @@ void MapCppTrackerRecon::save_to_json(SciFiEvent &evt) {
     }
     spacepoints_in_event["channels"] = channels;
     if ( tracker == 0 ) {
-      tracker0.append(spacepoints_in_event);
+      sp_tracker0.append(spacepoints_in_event);
     }
     if ( tracker == 1 ) {
-      tracker1.append(spacepoints_in_event);
+      sp_tracker1.append(spacepoints_in_event);
     }
   }
-  root["space_points"]["tracker1"].append(tracker0);
-  root["space_points"]["tracker2"].append(tracker1);
+  root["space_points"]["tracker1"].append(sp_tracker0);
+  root["space_points"]["tracker2"].append(sp_tracker1);
+
+  // Tracks.
+  Json::Value tracks_tracker0;
+  Json::Value tracks_tracker1;
+  for ( unsigned int track_i = 0; track_i < evt.scifistraightprtracks.size(); track_i++ ) {
+    Json::Value a_track;
+    int tracker = 0;
+    a_track["x0"] = evt.scifistraightprtracks[track_i].get_x0();
+    a_track["y0"] = evt.scifistraightprtracks[track_i].get_y0();
+    a_track["mx"] = evt.scifistraightprtracks[track_i].get_mx();
+    a_track["my"] = evt.scifistraightprtracks[track_i].get_my();
+    a_track["tracker"] = tracker;
+    if ( tracker == 0 ) {
+      tracks_tracker0.append(a_track);
+    } else if ( tracker == 1 ) {
+      tracks_tracker1.append(a_track);
+    }
+  }
+  root["tracks"]["tracker1"].append(tracks_tracker0);
+  root["tracks"]["tracker2"].append(tracks_tracker1);
+
 }
 
 void MapCppTrackerRecon::print_event_info(SciFiEvent &event) {
   std::cout << event.scifidigits.size() << " "
             << event.scificlusters.size() << " "
             << event.scifispacepoints.size() << " "
-	    << event.scifistraightprtracks.size() << " " << std::endl;
+	      << event.scifistraightprtracks.size() << " " << std::endl;
 }
 
 // the following two functions are added for testing purposes only
