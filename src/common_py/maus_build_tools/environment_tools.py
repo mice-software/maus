@@ -37,7 +37,7 @@ def my_exit(code = 1):
     Currently this is its own function to allow easy disabling or a python
     warning.
     """
-    Exit(code) # pylint: disable-msg=E0602
+    sys.exit(code) # pylint: disable-msg=E0602
 
 def duplicate_dylib_as_so(target, source, env): # pylint: disable=W0613
     """
