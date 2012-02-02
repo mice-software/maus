@@ -27,6 +27,7 @@
 #include "Config/ModuleConverter.hh"
 #include "Interface/Squeak.hh"
 #include "Interface/Differentiator.hh"
+#include "Interface/Interpolator.hh"
 #include "Maths/Matrix.hh"
 #include "Maths/PolynomialVector.hh"
 #include "Maths/Vector.hh"
@@ -74,6 +75,21 @@ class PolynomialVectorTest : public ::testing::Test {
     Squeak::mout(Squeak::debug) << "Vec F(*, *) " << testpass << std::endl;
 
     return testpass;
+  }
+  
+  // size of point is and value is 3
+  static void weight_function(const double * point, double * weight) {
+    int hit_count = 0;
+    for (int index = 0; index < 3; ++index) {
+      if (point[index] == 92.) {
+        ++hit_count;
+      }
+    }
+    if (hit_count == 3) {
+      *weight = 0.0;
+    } else {
+      *weight = 1.0;
+    }
   }
  protected:
 
@@ -208,6 +224,7 @@ TEST_F(PolynomialVectorTest, GetAvgChi2OfDifference) {
   std::vector< std::vector<double> > out;
   std::vector< std::vector<double> > out_neg;
 
+  // empty in vector
   bool testpass = true;
   try {
     pvec.GetAvgChi2OfDifference(in, out);
@@ -231,6 +248,36 @@ TEST_F(PolynomialVectorTest, GetAvgChi2OfDifference) {
 
   avg_chi2 = pvec.GetAvgChi2OfDifference(in, out_neg);
   ASSERT_TRUE(fabs(avg_chi2/1e14 - 4.90542) < 1e-3);  // Hope that is right
+
+  // in/out size mismatch
+  in.pop_back();
+  testpass = true;
+  try {
+    pvec.GetAvgChi2OfDifference(in, out);
+    testpass = false;
+  } catch (Squeal squee) {}
+  ASSERT_TRUE(testpass);
+
+  // in[i] size != point dimension
+  out.pop_back();
+  in[0].pop_back();
+  testpass = true;
+  try {
+    pvec.GetAvgChi2OfDifference(in, out);
+    testpass = false;
+  } catch (Squeal squee) {}
+  ASSERT_TRUE(testpass);
+
+  // out[i] size != value dimension
+  in.push_back(std::vector<double>(2, 0.0));
+  in[0].push_back(0.0);
+  out[0].pop_back();
+  testpass = true;
+  try {
+    pvec.GetAvgChi2OfDifference(in, out);
+    testpass = false;
+  } catch (Squeal squee) {}
+  ASSERT_TRUE(testpass);
 }
 
 TEST_F(PolynomialVectorTest, Means) {
@@ -308,6 +355,8 @@ TEST_F(PolynomialVectorTest, LeastSquaresFitting) {
   mat[1][3] = 3.;
   mat[2][3] = 13.;
 
+  VectorMap* weightFunction = NULL;
+
   PolynomialVector* vecF = new PolynomialVector(3, Matrix<double>(mat));
   std::vector< std::vector<double> > points(nX*nY*nZ, std::vector<double>(3));
   std::vector< std::vector<double> > values(nX*nY*nZ, std::vector<double>(3));
@@ -322,8 +371,11 @@ TEST_F(PolynomialVectorTest, LeastSquaresFitting) {
         vecF->F(&points[a][0], &values[a][0]);
       }
   delete vecF;
+  // null weightFunction just tests branching to
+  // PolynomialLeastSquaresFit(points, values, 2)
   PolynomialVector* pVec
-    = PolynomialVector::PolynomialLeastSquaresFit(points, values, 2);
+    = PolynomialVector::PolynomialLeastSquaresFit(
+        points, values, 2, weightFunction);
   CLHEP::HepMatrix recCoeff
     = MAUS::CLHEP::HepMatrix(pVec->GetCoefficientsAsMatrix());
 
@@ -352,6 +404,24 @@ TEST_F(PolynomialVectorTest, LeastSquaresFitting) {
   delete pVec;
   EXPECT_TRUE(testpass);
 
+  // same test as above but using VectorMap instead of std::vector<double>
+  // for the weights
+  weightFunction
+    = new Function(&weight_function, points.size(), points.size());
+  testpass = true;
+  pVec = NULL;
+  pVec = PolynomialVector::PolynomialLeastSquaresFit(points, values,
+                                                     2, weightFunction);
+  recCoeff = MAUS::CLHEP::HepMatrix(pVec->GetCoefficientsAsMatrix());
+  for (int i = 0; i < recCoeff.num_row(); i++)
+    for (int j = 0; j < recCoeff.num_col(); j++)
+      if (fabs(recCoeff[i][j] - mat[i][j]) > 1e-6) testpass = false;
+  if (pVec != NULL) {
+    delete pVec;
+  }
+  delete weightFunction;
+  EXPECT_TRUE(testpass);
+
   testpass = true;
   // now take some of the input values, try for a constrained fit
   PolynomialVector Constraint(2, Matrix<double>(mat.sub(1, 2, 1, 3)));
@@ -370,6 +440,28 @@ TEST_F(PolynomialVectorTest, LeastSquaresFitting) {
       if (fabs(recCoeff[i][j] - mat[i][j]) > 1e-6) testpass = false;
   delete pVec;
   EXPECT_TRUE(testpass);
+
+  // bad points size
+  testpass = true;
+  try {
+    const std::vector< std::vector<double> > bad_points;
+    PolynomialVector::ConstrainedPolynomialLeastSquaresFit(
+      bad_points, values,
+      2, constraintPVec->GetCoefficientsAsVector(), weights);
+    testpass = false;
+  } catch (Squeal squee) {}
+  ASSERT_TRUE(testpass);
+
+  // bad values size
+  testpass = true;
+  try {
+    const std::vector< std::vector<double> > bad_values;
+    PolynomialVector::ConstrainedPolynomialLeastSquaresFit(
+      points, bad_values,
+      2, constraintPVec->GetCoefficientsAsVector(), weights);
+    testpass = false;
+  } catch (Squeal squee) {}
+  ASSERT_TRUE(testpass);
 
   testpass = true;
   // should return a copy of
@@ -537,4 +629,43 @@ TEST_F(PolynomialVectorTest, LeastSquaresFitting) {
   Squeak::mout(Squeak::debug) << "PolynomialLeastSquaresTest " << *testF2
                               << testpass << std::endl;
   EXPECT_TRUE(testpass);
+}
+
+TEST_F(PolynomialVectorTest, SpaceTransform) {
+  int myints[] = {1, 2};
+  std::vector<int> inVariablesByVector(
+    myints, myints + sizeof(myints) / sizeof(int));
+  PolynomialVector::PolynomialCoefficient coefficient
+    = PolynomialVector::PolynomialCoefficient(inVariablesByVector, 0, 1.1);
+  int space_in_array[] = {0, 2, 3, 5, 6};
+  std::vector<int> space_in(
+    space_in_array, space_in_array + sizeof(space_in_array) / sizeof(int));
+  int space_out_array[] = {4, 7, 1, 2, 3, 0};
+  std::vector<int> space_out(
+    space_out_array, space_out_array + sizeof(space_out_array) / sizeof(int));
+  coefficient.SpaceTransform(space_in, space_out);
+  
+  std::vector<int> transformedInVariables = coefficient.InVariables();
+  EXPECT_EQ(3, transformedInVariables[0]);
+  EXPECT_EQ(4, transformedInVariables[1]);
+  EXPECT_EQ(5, coefficient.OutVariable());
+  EXPECT_EQ(1.1, coefficient.Coefficient());
+
+  // in variable not in space mapping
+  bool testpass = true;
+  try {
+    coefficient.SpaceTransform(space_in, space_out);
+    testpass = false;
+  } catch (Squeal squee) {}
+  ASSERT_TRUE(testpass);
+
+  // out variable not in space mapping
+  space_in[3] = 7;
+  space_in[4] = 1;
+  testpass = true;
+  try {
+    coefficient.SpaceTransform(space_in, space_out);
+    testpass = false;
+  } catch (Squeal squee) {}
+  ASSERT_TRUE(testpass);
 }

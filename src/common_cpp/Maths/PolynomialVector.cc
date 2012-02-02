@@ -28,6 +28,7 @@
 
 #include "gsl/gsl_sf_gamma.h"
 
+#include "Interface/Interpolator.hh"
 #include "Interface/Mesh.hh"
 #include "Interface/Squeal.hh"
 #include "Maths/Matrix.hh"
@@ -390,9 +391,9 @@ SymmetricMatrix PolynomialVector::Covariances(
 }
 
 PolynomialVector* PolynomialVector::PolynomialLeastSquaresFit(
-  const std::vector< std::vector<double> >&  points,
+  const std::vector< std::vector<double> >& points,
   const std::vector< std::vector<double> >& values,
-  unsigned int                                        polynomialOrder,
+  unsigned int                              polynomialOrder,
   const VectorMap*                          weightFunction) {
   if (weightFunction == NULL) {
     return PolynomialLeastSquaresFit(points, values, polynomialOrder);
@@ -468,8 +469,6 @@ PolynomialVector* PolynomialVector::ConstrainedPolynomialLeastSquaresFit(
   // do LLS forcing old_f(x) polynomial terms to 0
   // Nb: in this constrained case we have to go through the output vector and
   // treat each like a 1D vector
-  int pointDim   = points[0].size();
-  int valueDim   = values[0].size();
   size_t nPoints    = points.size();
   if (nPoints < 1) {
     throw(Squeal(
@@ -483,6 +482,8 @@ PolynomialVector* PolynomialVector::ConstrainedPolynomialLeastSquaresFit(
       "Misaligned array in LLS Fit",
       "PolynomialVector::ConstrainedPolynomialLeastSquaresFit(...)"));
   }
+  int pointDim   = points[0].size();
+  int valueDim   = values[0].size();
   int nCoeffsNew = NumberOfPolynomialCoefficients(pointDim, polynomialOrder);
   Matrix<double> A(valueDim, nCoeffsNew, 0.);
 
@@ -759,7 +760,7 @@ void PolynomialVector::PolynomialCoefficient::SpaceTransform
       // mapping[space_in_index] returns space_out_index
       if (space_out[i] == space_in[j]) mapping[j] = i;
     }
-  std::vector<int> in_variables(_inVarByVec.size());
+  std::vector<int> in_variables(_inVarByVec);
   for (size_t con = 0; con < in_variables.size(); con++) {
     if (mapping.find(in_variables[con]) != mapping.end()) {
       in_variables[con] = mapping[in_variables[con]];

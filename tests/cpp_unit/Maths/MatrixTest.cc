@@ -199,6 +199,14 @@ TEST_F(MatrixTest, DefaultConstructor) {
   ASSERT_EQ(matrix_c0.number_of_columns(),  (size_t) 0);
 }
 
+TEST_F(MatrixTest, SingleElementValueConstructor) {
+  Matrix<double> matrix_d0(kRows, kColumns, kDoubleData[9]);
+  EXPECT_TRUE(elements_equal(matrix_d0, kDoubleData[9]));
+
+  Matrix<complex> matrix_c0(kRows, kColumns, kComplexData[17]);
+  EXPECT_TRUE(elements_equal(matrix_c0, kComplexData[17]));
+}
+
 TEST_F(MatrixTest, ConstructorFromArray) {
   Matrix<double> matrix_d0(kRows, kColumns, kDoubleData);
   EXPECT_TRUE(equal(matrix_d0, kDoubleData));
