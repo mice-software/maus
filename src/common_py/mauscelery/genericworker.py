@@ -1,5 +1,5 @@
 """
-MAUS Celery generic node inspection and control.
+Generic worker broadcast command handlers.
 """
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 # 

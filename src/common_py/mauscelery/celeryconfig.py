@@ -36,7 +36,9 @@ CELERY_RESULT_BACKEND = "amqp"
 CELERY_AMQP_TASK_RESULT_EXPIRES = 300
 
 # List modules each worker should import.
-CELERY_IMPORTS = ("mauscelery.maustasks", "mauscelery.nodecontrol", )
+CELERY_IMPORTS = ("mauscelery.state", "mauscelery.tasks", \
+  "mauscelery.genericworker", "mauscelery.mausprocess", \
+  "mauscelery.mausworker",)
 
 # Disable log colors.
 CELERYD_LOG_COLOR = 0

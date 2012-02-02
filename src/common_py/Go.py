@@ -448,7 +448,7 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903
 
         # Configure nodes.
         from celery.task.control import broadcast
-        from mauscelery.maustasks import execute_transform
+        from mauscelery.tasks import execute_transform
         if hasattr(self.transformer, "get_worker_names"):
             workers = self.transformer.get_worker_names()
         else:

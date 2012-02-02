@@ -23,82 +23,26 @@ from types import ListType
 import unittest
 
 from MapPyGroup import MapPyGroup
+from MapPyTestMap import MapPyTestMap
 
-class MapDummy: # pylint:disable = R0902
+class MapPyTestMapOne(MapPyTestMap):
     """
-    Simple map class for testing purposes.
-    """
-
-    def __init__(self, map_id = ""):
-        """
-        Constructor.
-        @param self Object reference.
-        @param map_id ID of this class.
-        """
-        self.map_id = map_id
-        # Configuration value.
-        self.config_value = ""
-        # Flags to indicate if these functions were called.
-        self.birth_called = False
-        self.process_called = False
-        self.death_called = False
-        # Flags holding result of these function calls.
-        self.birth_result = True
-        self.process_result = True
-        self.death_result = True
-
-    def birth(self, json_doc):
-        """
-        Birth the mapper. If a worker_key exists in the
-        JSON document then its value is saved in 
-        self.config_value.
-        @param self Object reference.
-        @param json_doc JSON configuration document.
-        @return current value of self.birth_result.
-        """
-        config = json.loads(json_doc)
-        if (config.has_key("worker_key")):
-            self.config_value = config["worker_key"]
-        self.birth_called = True
-        return self.birth_result
-
-    def process(self, spill_doc):
-        """
-        Process a spill. Add self.map_id to the spill with key self.map_id
-        and value "Processed".
-        @param self Object reference.
-        @param spill JSON spill document.
-        @return updated spill document.
-        """
-        spill = json.loads(spill_doc)
-        spill[self.map_id] = "Processed"
-        self.process_called = True
-        return json.dumps(spill)
-
-    def death(self):
-        """
-        Death the mapper.
-        @param self Object reference.
-        @return current value of self.death_result.
-        """
-        self.death_called = True
-        return self.death_result
-
-class MapDummyOne(MapDummy):
-    """
-    Sub-class of MapDummy - used to discriminate workers in MapPyGroup.
+    Sub-class of MapPyTestMap - used to discriminate workers in
+    MapPyGroup. 
     """
     pass
 
-class MapDummyTwo(MapDummy):
+class MapPyTestMapTwo(MapPyTestMap):
     """
-    Sub-class of MapDummy - used to discriminate workers in MapPyGroup.
+    Sub-class of MapPyTestMap - used to discriminate workers in
+    MapPyGroup. 
     """
     pass
 
-class MapDummyThree(MapDummy):
+class MapPyTestMapThree(MapPyTestMap):
     """
-    Sub-class of MapDummy - used to discriminate workers in MapPyGroup.
+    Sub-class of MapPyTestMap - used to discriminate workers in
+    MapPyGroup. 
     """
     pass
 
@@ -112,13 +56,13 @@ class MapPyGroupTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         Create a MapPyGroup for testing. The group has form:
         @verbatim
         MapPyGroup
-          MapDummyOne
+          MapPyTestMapOne
           MapPyGroup
-            MapDummyOne
-            MapDummyTwo
+            MapPyTestMapOne
+            MapPyTestMapTwo
           MapPyGroup
-            MapDummyThree
-          MapDummyTwo
+            MapPyTestMapThree
+          MapPyTestMapTwo
         @endverbatim
         @param self Object reference.
         """
@@ -127,17 +71,17 @@ class MapPyGroupTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         self.__workers = []
         self.__fail_worker = None
 
-        dummy = MapDummyOne("A")
+        dummy = MapPyTestMapOne("A")
         self.__group.append(dummy)
         self.__workers.append(dummy)
 
         workers = []
         group = MapPyGroup()
         self.__group.append(group)
-        dummy = MapDummyOne("B")
+        dummy = MapPyTestMapOne("B")
         group.append(dummy)
         workers.append(dummy)
-        dummy = MapDummyTwo("C")
+        dummy = MapPyTestMapTwo("C")
         self.__fail_worker = dummy # Use this worker to force failures.
         group.append(dummy)
         workers.append(dummy)
@@ -145,11 +89,11 @@ class MapPyGroupTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
 
         group = MapPyGroup()
         self.__group.append(group)
-        dummy = MapDummyThree("D")
+        dummy = MapPyTestMapThree("D")
         group.append(dummy)
         self.__workers.append([dummy])
 
-        dummy = MapDummyTwo("E")
+        dummy = MapPyTestMapTwo("E")
         self.__group.append(dummy)
         self.__workers.append(dummy)
 
@@ -170,7 +114,8 @@ class MapPyGroupTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         Test with constructor given an initial list of workers.
         @param self Object reference.
         """
-        workers = [MapDummyOne(), MapDummyTwo(), MapDummyThree()]
+        workers = \
+            [MapPyTestMapOne(), MapPyTestMapTwo(), MapPyTestMapThree()]
         group = MapPyGroup(workers)
         names = group.get_worker_names()
         self.assertEquals(len(workers), len(names), 
@@ -319,8 +264,7 @@ class MapPyGroupTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         @param self Object reference.
         """
         # Force a worker in group to fail
-        self.__fail_worker.birth_result = False
-        result = self.__group.birth("{}")
+        result = self.__group.birth("""{"fail_birth":"true"}""")
         self.assertFalse(result, "birth unexpectedly returned True")
 
     def test_process(self):
@@ -338,7 +282,9 @@ class MapPyGroupTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
             else:
                 self.assertTrue(worker.process_called, 
                     "process wasn't called for worker %s" % worker.map_id)
-                self.assertTrue(spill.has_key(worker.map_id),
+                self.assertTrue(spill.has_key("processed"),
+                    "Spill does not contain processed key")
+                self.assertTrue(worker.map_id in spill["processed"],
                     "Spill does not contain map_id for worker %s" \
                     % worker.map_id)
 
@@ -364,7 +310,7 @@ class MapPyGroupTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         @param self Object reference.
         """
         # Force a worker in group to fail
-        self.__fail_worker.death_result = False
+        self.__group.birth("""{"fail_death":"true"}""")
         result = self.__group.death()
         self.assertFalse(result, "death unexpectedly returned True")
 
