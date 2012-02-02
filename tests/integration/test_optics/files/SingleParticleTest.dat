@@ -75,7 +75,7 @@ Configuration PhaseTest
     PropertyString FieldType      Solenoid
     PropertyString FileName       fs2a_coil.fld
     PropertyString FieldMapMode   Read
-    PropertyDouble ScaleFactor    106.66*(-1.)^@RepeatNumber
+    PropertyDouble ScaleFactor    106.66*(-1.)**@RepeatNumber
     PropertyBool   RepeatModule2  true
     PropertyInt    NumberOfRepeats 20
   }

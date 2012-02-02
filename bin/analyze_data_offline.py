@@ -24,6 +24,9 @@ def run():
     # Create an empty array of mappers, then populate it
     # with the functionality you want to use.
     my_map = MAUS.MapPyGroup()
+    my_map.append(MAUS.MapCppTOFDigits())
+    my_map.append(MAUS.MapCppTOFSlabHits())
+    my_map.append(MAUS.MapCppTOFSpacePoints())
 
     #  The Go() drives all the components you pass in then put all the output
     #  into a file called 'mausput'
