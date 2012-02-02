@@ -91,17 +91,17 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
     json_to_cpp(json_event, spill);
   } // ends loop particles
 
-  std::cout << "Digitization: Events in Spill: " << spill.events_in_spill.size() << std::endl;
+  // std::cout << "Digitization: Events in Spill: " << spill.events_in_spill.size() << std::endl;
   // ================= Reconstruction =========================
   for ( int k = 0; k < spill.events_in_spill.size(); k++ ) {
     SciFiEvent event = spill.events_in_spill[k];
 
-    std::cout << "Hits in event: " << event.scifihits.size() << std::endl;
+    // std::cout << "Hits in event: " << event.scifihits.size() << std::endl;
     if ( event.scifihits.size() ) {
       // for each fiber-hit, make a digit
       construct_digits(event);
     }
-    std::cout << "Digits in Event: " << event.scifidigits.size() << " " << std::endl;
+    // std::cout << "Digits in Event: " << event.scifidigits.size() << " " << std::endl;
 
     save_to_json(event);
   }

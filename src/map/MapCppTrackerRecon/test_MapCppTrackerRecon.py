@@ -38,27 +38,12 @@ class MapCppTrackerReconTestCase(unittest.TestCase):
             is called.
         """
         self.mapper = MapCppTrackerRecon()
-        self.preMapper = MapPyFakeTestSimulation()
         conf = Configuration()
-        # print json.dumps(json.loads(conf.getConfigJSON()), indent=2)
-        self.preMapper.birth(conf.getConfigJSON())
-
         # Test whether the configuration files were loaded correctly at birth
         success = self.mapper.birth(conf.getConfigJSON())
-
         if not success:
             raise Exception('InitializeFail', 'Could not start worker')
 
-        # Read a line from /src/map/MapPyFakeTestSimulation/mausput_digits
-        root_dir = os.environ.get("MAUS_ROOT_DIR")
-        assert root_dir != None
-        assert os.path.isdir(root_dir)
-        self._filename = \
-        '%s/src/map/MapPyFakeTestSimulation/lab7_unpacked' % root_dir
-        assert os.path.isfile(self._filename)
-        self._file = open(self._filename, 'r')
-        self._document = self._file.readline().rstrip()
-        self._file.close()
 
     def test_death(self):
         """ Test to make sure death occurs """
@@ -69,22 +54,28 @@ class MapCppTrackerReconTestCase(unittest.TestCase):
         root_dir = os.environ.get("MAUS_ROOT_DIR")
         assert root_dir != None
         assert os.path.isdir(root_dir)
-        _filename = \
-        '%s/src/map/MapPyFakeTestSimulation/lab7_unpacked' % root_dir
-        assert os.path.isfile(_filename)
-        _file = open(_filename, 'r')
-        _document = _file.readline().rstrip()
-        print _document
-        #Expect an error in the Json output file
-        output = self.mapper.process(_document)
-        print output
-        self.assertTrue("errors" in json.loads(output))
-        _document = _file.readline().rstrip()
-        print _document
-        output = self.mapper.process(_document)
-        print output
-        self.assertTrue("digits" in json.loads(output))
-        _file.close()
+        self._filename = \
+        '%s/src/map/MapCppTrackerRecon/lab7_unpacked' % root_dir
+        assert os.path.isfile(self._filename)
+        self._file = open(self._filename, 'r')
+        # File is open.
+        # Spill 1 is corrupted.
+        spill_1 = self._file.readline().rstrip()
+        output_1 = self.mapper.process(spill_1)
+        self.assertTrue("errors" in json.loads(output_1))
+        # Spill 2 is sain.
+        spill_2 = self._file.readline().rstrip()
+        output_2 = self.mapper.process(spill_2)
+        self.assertTrue("digits" in json.loads(output_2))
+        self.assertTrue("space_points" in json.loads(output_2))
+        # spill 3 is end of event
+        spill_3 = self._file.readline().rstrip()
+        output_3 = self.mapper.process(spill_3)
+        self.assertTrue("END_OF_RUN" in json.loads(output_3))
+        # self.assertFalse("errors" in json.loads(output_3))
+        self.assertFalse("space_points" in json.loads(output_3))
+        # Close file.
+        self._file.close()
 
     @classmethod
     def tear_down_class(self):

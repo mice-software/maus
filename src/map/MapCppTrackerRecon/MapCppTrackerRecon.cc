@@ -104,7 +104,7 @@ std::string MapCppTrackerRecon::process(std::string document) {
 // === The Digits vectors is filled, either by running real data ==========
 // === digitization or by reading-in an already existing digits branch.====
 void MapCppTrackerRecon::digitization(SciFiSpill &spill, Json::Value &root) {
-  if ( root.isMember("daq_data") ) {
+  if ( root.isMember("daq_data") && !root["daq_data"].isNull() ) {
     Json::Value daq = root.get("daq_data", 0);
     RealDataDigitization real;
     real.process(spill, daq);
@@ -112,7 +112,7 @@ void MapCppTrackerRecon::digitization(SciFiSpill &spill, Json::Value &root) {
     Json::Value digits = root.get("digits", 0);
     fill_digits_vector(digits, spill);
   } else {
-    throw;
+    throw 0;
   }
 }
 
