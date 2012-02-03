@@ -179,7 +179,7 @@ TEST_F(VectorTest, Indexing) {
   d_mv2(2+1) = 2.;
   EXPECT_TRUE(d_mv2(2+1) == 2.);
   d_mv2(2+1) = 4.;
-  
+
   // bad access of empty vector
   testpass = true;
   try {
@@ -350,7 +350,6 @@ TEST_F(VectorTest, Multiplication) {
   test_d_vector *= d_mv4;  // {2., 2., 2.} * {1., 2., 3.}
   for (size_t i = 0; i < test_d_vector.size(); ++i)
     ASSERT_TRUE(fabs(test_d_vector(i+1) - da[i]*2.) < 1e-9);
-  
 
   // real, scalar multiplication
 
@@ -544,10 +543,10 @@ TEST_F(VectorTest, Subtraction) {
 TEST_F(VectorTest, ComplexDecomposition) {
   Vector<double> real_part = real(c_mv4);
   EXPECT_EQ(real_part, d_mv4);
-  
+
   Vector<double> imag_part = imag(c_mv4);
   for (int index = 0; index < 3; ++index) {
-    EXPECT_EQ(imag_part[index], (double) index-1);
+    EXPECT_EQ(imag_part[index], static_cast<double>(index-1));
   }
 }
 

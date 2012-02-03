@@ -138,3 +138,7 @@ exceptions[os.path.join(cpp_cm, 'Maths','Vector.hh')] = [
 exceptions[os.path.join(tst, 'Maths', 'PolynomialVectorTest.cc')] = [
 ('  } catch (Squeal squee) {}', '"catch" is a keyword like "for" and "if", not a function', 'lane')
 ]
+
+exceptions[os.path.join(tst, 'Maths', 'VectorTest.cc')] = [
+('  } catch (Squeal squeal) {}', '"catch" is a keyword like "for" and "if", not a function', 'lane')
+]

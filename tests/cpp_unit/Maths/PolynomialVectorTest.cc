@@ -76,7 +76,7 @@ class PolynomialVectorTest : public ::testing::Test {
 
     return testpass;
   }
-  
+
   // size of point is and value is 3
   static void weight_function(const double * point, double * weight) {
     int hit_count = 0;
@@ -644,7 +644,7 @@ TEST_F(PolynomialVectorTest, SpaceTransform) {
   std::vector<int> space_out(
     space_out_array, space_out_array + sizeof(space_out_array) / sizeof(int));
   coefficient.SpaceTransform(space_in, space_out);
-  
+
   std::vector<int> transformedInVariables = coefficient.InVariables();
   EXPECT_EQ(3, transformedInVariables[0]);
   EXPECT_EQ(4, transformedInVariables[1]);
