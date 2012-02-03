@@ -88,7 +88,7 @@ def birth(panel, config_id, transform, configuration = "{}"): # pylint: disable=
     # Validate transform.        
     WorkerUtilities.validate_transform(transform)
     # Validate configuration.
-    json.dumps(configuration)
+    json.loads(configuration)
     # Get sub-process IDs from process pool.
     pool = panel.consumer.pool 
     pids = set(pool.info["processes"]) 
