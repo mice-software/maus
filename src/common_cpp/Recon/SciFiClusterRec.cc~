@@ -18,8 +18,8 @@
 
 SciFiClusterRec::SciFiClusterRec() {}
 
-SciFiClusterRec::SciFiClusterRec(int cluster_exception, double min_npe):
-                                 _size_exception(cluster_exception), _min_npe(min_npe) {}
+SciFiClusterRec::SciFiClusterRec(int cluster_exception, double min_npe)
+                                 :_size_exception(cluster_exception), _min_npe(min_npe) {}
 
 SciFiClusterRec::~SciFiClusterRec() {}
 
@@ -106,6 +106,35 @@ void SciFiClusterRec::construct(SciFiCluster *clust, std::vector<const MiceModul
 
   Hep3Vector position = dist_mm * perp + this_plane->globalPosition();
 
-  clust->set_position(position);
+  Hep3Vector reference = get_reference_frame_pos(clust->get_tracker(), modules);
+
+  Hep3Vector tracker_ref_frame_pos;
+  if ( clust->get_tracker() == 0) {
+    tracker_ref_frame_pos = position - reference;
+  } else {
+    tracker_ref_frame_pos = - (position - reference);
+  }
+
+  clust->set_position(tracker_ref_frame_pos);
   clust->set_direction(dir);
+}
+
+Hep3Vector SciFiClusterRec::get_reference_frame_pos(int tracker,
+                                                    std::vector<const MiceModule*> modules) {
+  const MiceModule* reference_plane = NULL;
+  for ( unsigned int j = 0; !reference_plane && j < modules.size(); j++ ) {
+    // Find the right module
+    if ( modules[j]->propertyExists("Tracker", "int") &&
+         modules[j]->propertyExists("Station", "int") &&
+         modules[j]->propertyExists("Plane", "int")  &&
+         modules[j]->propertyInt("Tracker") == tracker &&
+         modules[j]->propertyInt("Station") == 1 &&
+         modules[j]->propertyInt("Plane")   == 0 ) {
+         // Save the module
+      reference_plane = modules[j];
+    }
+  }
+  assert(reference_plane != NULL);
+  Hep3Vector reference_pos =  reference_plane->globalPosition();
+  return reference_pos;
 }

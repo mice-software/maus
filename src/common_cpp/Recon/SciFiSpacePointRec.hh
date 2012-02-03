@@ -69,6 +69,9 @@ class SciFiSpacePointRec {
   bool clusters_are_not_used(SciFiCluster* candidate_A,
                              SciFiCluster* candidate_B,
                              SciFiCluster* candidate_C);
+
+  bool duplet_within_radius(SciFiCluster* candidate_A,
+                            SciFiCluster* candidate_B);
 };  // Don't forget this trailing colon!!!!
 
 #endif

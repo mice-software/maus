@@ -66,7 +66,7 @@ void SciFiSpacePointRec::process(SciFiEvent &evt) {
       }  // ends plane 0
     }  // end loop over stations
   }  // end loop over trackers
-
+/*
   // Run over left-overs and make duplets without any selection criteria
   for ( int a_plane = 0; a_plane < 2; a_plane++ ) {
     for ( int another_plane = a_plane+1; another_plane < 3; another_plane++ ) {
@@ -87,7 +87,8 @@ void SciFiSpacePointRec::process(SciFiEvent &evt) {
                            (clusters[Tracker][Station][another_plane])[clb];
 
               if ( clusters_are_not_used(candidate_A, candidate_B) &&
-                   candidate_A->get_plane() != candidate_B->get_plane() ) {
+                   candidate_A->get_plane() != candidate_B->get_plane() &&
+                   duplet_within_radius(candidate_A, candidate_B) ) {
                 SciFiSpacePoint* duplet = new SciFiSpacePoint(candidate_A, candidate_B);
                 build_duplet(duplet);
                 evt.scifispacepoints.push_back(duplet);
@@ -97,6 +98,17 @@ void SciFiSpacePointRec::process(SciFiEvent &evt) {
         }
       }
     }
+  }*/
+}
+
+bool SciFiSpacePointRec::duplet_within_radius(SciFiCluster* candidate_A,
+                                              SciFiCluster* candidate_B) {
+  Hep3Vector pos = crossing_pos(candidate_A, candidate_B);
+  double radius = pow(pow(pos.x(), 2)+pow(pos.y(), 2), 0.5);
+  if ( radius < 160 ) {
+    return true;
+  } else {
+    return false;
   }
 }
 

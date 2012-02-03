@@ -40,6 +40,9 @@ bool ReduceCppTracker::birth(std::string argJsonConfigDocument) {
   _spacepoints.SetNameTitle("spacepoints", "spacepoints");
   _spacepoints.Branch("tracker", &_tracker, "tracker/I");
   _spacepoints.Branch("station", &_station, "station/I");
+  _spacepoints.Branch("x", &_x, "x/D");
+  _spacepoints.Branch("y", &_y, "y/D");
+  _spacepoints.Branch("z", &_z, "z/D");
   _spacepoints.Branch("type", &_type, "type/I");
 
   _events.SetNameTitle("events", "events");
@@ -91,12 +94,6 @@ std::string  ReduceCppTracker::process(std::string document) {
     return writer.write(root);
   }
   try {
-    /*xEventType = JsonWrapper::GetProperty(root,
-                                          "daq_event_type",
-                                          JsonWrapper::stringValue);
-
-
-    if (xEventType == "physics_event" && root.isMember("space_points")) {*/
     if ( root.isMember("space_points") ) {
       // Light Yield plots.
       light_yield(root);
@@ -134,6 +131,9 @@ std::string  ReduceCppTracker::process(std::string document) {
             _type = 2;
           }
           _tracker = 1;
+          _x = xPartEventTracker1_SP[i]["position"]["x"].asDouble();
+          _y = xPartEventTracker1_SP[i]["position"]["y"].asDouble();
+          _z = xPartEventTracker1_SP[i]["position"]["z"].asDouble();
           _spacepoints.Fill();
         }
 
@@ -151,6 +151,9 @@ std::string  ReduceCppTracker::process(std::string document) {
             _type = 2;
           }
           _tracker = 2;
+          _x = xPartEventTracker2_SP[i]["position"]["x"].asDouble();
+          _y = xPartEventTracker2_SP[i]["position"]["y"].asDouble();
+          _z = xPartEventTracker2_SP[i]["position"]["z"].asDouble();
           _spacepoints.Fill();
         }
 

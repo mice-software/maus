@@ -87,7 +87,6 @@ void PatternRecognition::straightprtrack_recon(SciFiEvent &evt) {
         ++stations_hit[trker_no];
       }
     }
-    // std::cout << stations_hit[trker_no] << " stations hit in Tracker " << trker_no+1 << std::endl;
   }
 
   // Make the tracks depending on how many stations have spacepoints in them
@@ -151,7 +150,6 @@ void PatternRecognition::make_spr_5pt(const std::vector<SciFiSpacePoint*>& spnts
           double dy = pos.y() - ( y_0i + ( pos.z() * m_yi ) );
           if ( fabs(dx) < res_cut && fabs(dy) < res_cut ) {
             good_spnts[stat_no] = spnts_stat[stat_no][sp_no];
-            seeds[stat_no] = spnts_stat[stat_no][sp_no];
             // std::cout << "Good sp found" << std::endl;
             // std::cout << "dx = " << dx << "\tdy = " << dy << std::endl;
             break;
@@ -189,7 +187,6 @@ void PatternRecognition::make_spr_5pt(const std::vector<SciFiSpacePoint*>& spnts
         gsl_fit_linear(z, 1, y, 1, _n_stations,
                        &c_y, &m_y, &cov_y00, &cov_y01, &cov_y11,
                        &chisq_y);
-
         /*std::cout << "Track parameters x: c = " << c_x << ", m = ";
         std::cout << m_x << ", chisq = " << chisq_x << std::endl;
         std::cout << "Track parameters y: c = " << c_y << ", m = ";
@@ -207,6 +204,13 @@ void PatternRecognition::make_spr_5pt(const std::vector<SciFiSpacePoint*>& spnts
           track.set_mx(m_x);
           track.set_y0(c_y);
           track.set_my(m_y);
+          std::vector<SciFiSpacePoint> good_spacepoints;
+          good_spacepoints.push_back(*spnts_stat[0][stat1]);
+          good_spacepoints.push_back(*good_spnts[1]);
+          good_spacepoints.push_back(*good_spnts[2]);
+          good_spacepoints.push_back(*good_spnts[3]);
+          good_spacepoints.push_back(*spnts_stat[4][stat5]);
+          track.set_spacepoints(good_spacepoints);
           trks.push_back(track);
           success = true;
         } else {
@@ -217,13 +221,64 @@ void PatternRecognition::make_spr_5pt(const std::vector<SciFiSpacePoint*>& spnts
       }
     }
   }
-
   if ( success ) {
-    run_analysis();
+    run_analysis(trks);
   }
-
 }
 
+void PatternRecognition::run_analysis(std::vector<SciFiStraightPRTrack>& trks) {
+  // std::cout << trks.size() << std::endl;
+  for ( int st_i = 0; st_i < 5; st_i++ ) {
+    std::vector<SciFiSpacePoint> space_points = trks[0].get_spacepoints();
+    Hep3Vector position = space_points[st_i].get_position();
+    space_points.erase(space_points.begin() + st_i);
+    a_4_station_fit(space_points, position, st_i);
+  // std::cout << space_points.size() << std::endl;
+  }
+}
+
+void PatternRecognition::a_4_station_fit(std::vector<SciFiSpacePoint> space_points,
+                                         Hep3Vector position, int st_i) {
+  int _nstations = 4;
+  // std::cout << space_points[0].get_position().x() << std::endl;
+  int tracker = space_points[0].get_tracker();
+  int station = st_i;
+
+  double x[4] = { space_points[0].get_position().x(),
+                            space_points[1].get_position().x(),
+                            space_points[2].get_position().x(),
+                            space_points[3].get_position().x() };
+
+  double y[4] = { space_points[0].get_position().y(),
+                            space_points[1].get_position().y(),
+                            space_points[2].get_position().y(),
+                            space_points[3].get_position().y() };
+
+  double z[4] = { space_points[0].get_position().z(),
+                            space_points[1].get_position().z(),
+                            space_points[2].get_position().z(),
+                            space_points[3].get_position().z() };
+
+  double c_x, m_x, cov_x00, cov_x01, cov_x11, chisq_x;
+  double c_y, m_y, cov_y00, cov_y01, cov_y11, chisq_y;
+
+  gsl_fit_linear(z, 1, x, 1, 4,
+                 &c_x, &m_x, &cov_x00, &cov_x01, &cov_x11,
+                 &chisq_x);
+
+  gsl_fit_linear(z, 1, y, 1, 4,
+                 &c_y, &m_y, &cov_y00, &cov_y01, &cov_y11,
+                 &chisq_y);
+
+  double expected_z = position.z();
+  double expected_x = c_x + m_x*expected_z;
+  double expected_y = c_y + m_y*expected_z;
+  double res_x = position.x()-expected_x;
+  double res_y = position.y()-expected_y;
+  std::ofstream file("resolution.txt", std::ios::out|std::ios::app);
+  file << res_x << " " << res_y << " " << tracker << " " << station << "\n";
+  file.close();
+}
 
 void PatternRecognition::make_spr_4pt(const std::vector<SciFiSpacePoint*>& spnts,
                                       std::vector<SciFiStraightPRTrack>& trks) {

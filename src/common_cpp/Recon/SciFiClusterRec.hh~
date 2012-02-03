@@ -53,7 +53,7 @@ class SciFiClusterRec {
 
   void process(SciFiEvent &evt, std::vector<const MiceModule*> modules);
 
-  void construct(SciFiCluster *clust,std::vector<const MiceModule*> modules);
+  void construct(SciFiCluster *clust, std::vector<const MiceModule*> modules);
 
  private:
 
