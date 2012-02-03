@@ -91,7 +91,8 @@ class MausTransformTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         MausTransform.initialize("MapPyTestMap")
         with self.assertRaisesRegexp(WorkerBirthFailedException,
             ".*MapPyTestMap returned False.*"):
-            MausTransform.birth("""{"fail_birth":"true"}""")
+            MausTransform.birth("""{"birth_result":%s}""" % \
+                MapPyTestMap.FAIL)
 
     def test_process(self):
         """ 
@@ -134,7 +135,8 @@ class MausTransformTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         @param self Object reference.
         """
         MausTransform.initialize("MapPyTestMap")
-        MausTransform.birth("""{"fail_death":"true"}""")
+        MausTransform.birth("""{"death_result":%s}""" % \
+            MapPyTestMap.FAIL)
         with self.assertRaisesRegexp(WorkerDeathFailedException,
             ".*MapPyTestMap returned False.*"):
             MausTransform.death()

@@ -119,7 +119,8 @@ class ProcessBirthTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         @param self Object reference.
         """
         status = process_birth(MausConfiguration.config_id + 1, 
-            "MapPyTestMap", """{"fail_birth":"true"}""")
+            "MapPyTestMap", """{"birth_result":%s}""" % \
+            MapPyTestMap.FAIL)
         self.assertEquals(os.getpid(), status[0], 
             "Unexpected process ID")
         self.assertTrue(status[1].has_key("status"),
@@ -181,7 +182,8 @@ class ProcessDeathTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         @param self Object reference.
         """
         status = process_birth(MausConfiguration.config_id + 1, 
-            "MapPyTestMap", """{"fail_death":"true"}""")
+            "MapPyTestMap", """{"death_result":%s}""" % \
+            MapPyTestMap.FAIL)
         status = process_death()
         self.assertEquals(os.getpid(), status[0], 
             "Unexpected process ID")

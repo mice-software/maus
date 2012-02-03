@@ -25,6 +25,9 @@ class MapPyTestMap: # pylint:disable = R0902
     """
     Simple map class for testing purposes.
     """
+    OK = 0
+    FAIL = 1
+    EXCEPTION = 2
 
     def __init__(self, map_id = ""):
         """
@@ -40,49 +43,70 @@ class MapPyTestMap: # pylint:disable = R0902
         self.process_called = False
         self.death_called = False
         # Flags holding result of these function calls.
-        self.__birth_result = True
-        self.__process_result = True
-        self.__death_result = True
+        self.__process_result = MapPyTestMap.OK
+        self.__death_result = MapPyTestMap.OK
 
     def birth(self, json_doc):
         """
         Birth the mapper. If the configuration doc has a key
-        fail_birth then birth returns False. If it has a key
-        fail_death then, when death is called, it will return
-        False.
+        birth_result of value FAIL then birth returns false. If the
+        value is EXCEPTION then a ValueError is thrown. 
         @param self Object reference.
         @param json_doc JSON configuration document.
-        @return False if fail_birth is in json_doc else return 
-        True.
+        @return False if the configuration document has a
+        birth_result key with value FAIL, else return True.
+        @raise ValueError if the configuration document has a
+        birth_result key with value EXCEPTION 
         """
         config = json.loads(json_doc)
+        self.birth_called = True
+        if (config.has_key("birth_result")):
+            if (config["birth_result"] == MapPyTestMap.FAIL):
+                return False
+            if (config["birth_result"] == MapPyTestMap.EXCEPTION):
+                raise ValueError("Birth exception")
         if (config.has_key("worker_key")):
             self.config_value = config["worker_key"]
-        self.__death_result = not config.has_key("fail_death")
-        self.birth_called = True
-        return not config.has_key("fail_birth")
+        if (config.has_key("process_result")):
+            self.__process_result = config["process_result"]
+        if (config.has_key("death_result")):
+            self.__death_result = config["death_result"]
+        return True
 
     def process(self, spill_doc): # pylint:disable = R0201
         """
-        Process a spill append self.map_id to a "processed" field.
-        If no "processed" field then create one.
+        Process a spill. If the configuration document provided
+        to birth had a process_result key with value EXCEPTION
+        then a ValueError is raised. Else, process appends self.map_id
+        to a "processed" field. If no "processed" field is in the
+        spill then one is created.
         @param self Object reference.
         @param spill JSON spill document.
         @return updated spill document.
+        @raise ValueError if the configuration document provided
+        to birth had a process_result key with value EXCEPTION
         """
+        self.process_called = True
+        if (self.__process_result == MapPyTestMap.EXCEPTION):
+            raise ValueError("Process exception")
         spill = json.loads(spill_doc)
         if (not spill.has_key("processed")):
             spill["processed"] = []
         spill["processed"].append(self.map_id)
-        self.process_called = True
         return json.dumps(spill)
 
     def death(self):
         """
         Death the mapper.
         @param self Object reference.
-        @return True unless birth was given a configuration that
-        requested this return False.
+        @return False if the configuration document provided to birth
+        had a death_result key with value FAIL, else return True.
+        @raise ValueError if the configuration document provided to
+        birth had a death_result key with value EXCEPTION 
         """
         self.death_called = True
-        return self.__death_result
+        if (self.__death_result == MapPyTestMap.FAIL):
+            return False
+        if (self.__death_result == MapPyTestMap.EXCEPTION):
+            raise ValueError("Death exception")
+        return True

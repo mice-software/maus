@@ -264,7 +264,8 @@ class MapPyGroupTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         @param self Object reference.
         """
         # Force a worker in group to fail
-        result = self.__group.birth("""{"fail_birth":"true"}""")
+        result = self.__group.birth("""{"birth_result":%s}""" % \
+            MapPyTestMap.FAIL)
         self.assertFalse(result, "birth unexpectedly returned True")
 
     def test_process(self):
@@ -310,7 +311,8 @@ class MapPyGroupTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         @param self Object reference.
         """
         # Force a worker in group to fail
-        self.__group.birth("""{"fail_death":"true"}""")
+        self.__group.birth("""{"death_result":%s}""" % \
+            MapPyTestMap.FAIL)
         result = self.__group.death()
         self.assertFalse(result, "death unexpectedly returned True")
 
