@@ -1,0 +1,19 @@
+\section{Monte Carlo}
+The simulation module provides particle generation routines, GEANT4 bindings to track particles through the geometry and routines to convert modelled energy loss in detectors into digitised signals from the MICE DAQ. The Digitisation models are documented under each detector. Here we describe the beam generation and tracking routines.
+
+\section{Beam Generation}
+Beam generation is handled by the MapPyBeamMaker module.
+
+\section{GEANT4 Bindings}
+The GEANT4 bindings are encoded in the Simulation module. GEANT4 groups particles by run, event and track. A GEANT4 run maps to a MICE spill; a GEANT4 event maps to a single inbound particle from the beamline; and a GEANT4 track corresponds to a single particle in the experiment.
+
+\begin{itemize}
+\li MAUSGeant4Manager is responsible for handling the overall initialisation of the GEANT4 interface. Accessors are provided for individual GEANT4 objects (see below). Interfaces are provided to run one or many particles through the geometry, returning the relevant event data. The MAUSGeant4Manager sets and clears the event action before each run.
+\li MAUSRunAction sets up the running for a particular spill. In MAUS, it just reinitialises the visualisation.
+\li MAUSEventAction sets up the running for a particular inbound particle. At the beginning of each event, the virtual planes, tracking, detectors and stepping are all cleared. After the event the event data is pulled into the event data from each element. 
+\li MAUSPhysicsList contains routines to set up the GEANT4 physical processes. Datacards settings are provided to disable stochastic processes or all processes and set a few parameters.
+\end{itemize}
+
+
+
+
