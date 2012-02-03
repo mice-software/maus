@@ -398,6 +398,10 @@ class MatrixBase {
 // *****************************
 
 template <> MatrixBase<double, gsl_matrix>::MatrixBase(
+    const MatrixBase<double, gsl_matrix>& original_instance);
+template <> MatrixBase<complex, gsl_matrix_complex>::MatrixBase(
+  const MatrixBase<complex, gsl_matrix_complex>& original_instance);
+template <> MatrixBase<double, gsl_matrix>::MatrixBase(
     const ::CLHEP::HepMatrix& hep_matrix);
 template <> MatrixBase<complex, gsl_matrix_complex>::MatrixBase(
     const ::CLHEP::HepMatrix& hep_matrix);

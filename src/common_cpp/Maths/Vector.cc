@@ -47,16 +47,25 @@ VectorBase<StdType, GslType>::VectorBase() : vector_(NULL) {}
 template VectorBase<double, gsl_vector>::VectorBase();
 template VectorBase<complex, gsl_vector_complex>::VectorBase();
 
-template<typename StdType, typename GslType>
-VectorBase<StdType, GslType>::VectorBase(
-    const VectorBase<StdType, GslType>& original_instance)
+template <>
+VectorBase<double, gsl_vector>::VectorBase(
+  const VectorBase<double, gsl_vector>& original_instance)
     : vector_(NULL) {
-  (*this) = original_instance;
+  if (original_instance.vector_ != NULL) {
+    build_vector(original_instance.vector_->size);
+    gsl_vector_memcpy(vector_, original_instance.vector_);
+  }
 }
-template VectorBase<double, gsl_vector>::VectorBase(
-  const VectorBase<double, gsl_vector>& original_instance);
-template VectorBase<complex, gsl_vector_complex>::VectorBase(
-  const VectorBase<complex, gsl_vector_complex>& original_instance);
+
+template <>
+VectorBase<complex, gsl_vector_complex>::VectorBase(
+  const VectorBase<complex, gsl_vector_complex>& original_instance)
+    : vector_(NULL) {
+  if (original_instance.vector_ != NULL) {
+    build_vector(original_instance.vector_->size);
+    gsl_vector_complex_memcpy(vector_, original_instance.vector_);
+  }
+}
 
 template <>
 VectorBase<double, gsl_vector>::VectorBase(
@@ -281,21 +290,17 @@ template <>
 VectorBase<double, gsl_vector>& VectorBase<double, gsl_vector>::operator=(
     const VectorBase<double, gsl_vector>& rhs) {
   if (&rhs != this) {
-    if (rhs.vector_ == NULL) {
-      vector_ = NULL;
-    } else {
-      if (vector_ == NULL) {
-        // special case (like for a copy constructor call) where a non-null
-        // vector is assigned to a null vector
-        build_vector(rhs.vector_->size);
-      } else if (vector_->size != rhs.vector_->size) {
-        throw(Squeal(Squeal::recoverable,
-                     "Attempted to assign a vector of a different size.",
-                     "VectorBase<double>::operator=()"));
-      }
-
-      gsl_vector_memcpy(vector_, rhs.vector_);
+    if (vector_ == NULL) {
+      // special case (like for a copy constructor call) where a non-null
+      // vector is assigned to a null vector
+      build_vector(rhs.vector_->size);
+    } else if ((rhs.vector_ == NULL) || (vector_->size != rhs.vector_->size)) {
+      throw(Squeal(Squeal::recoverable,
+                   "Attempted to assign a vector of a different size.",
+                   "VectorBase<double>::operator=()"));
     }
+
+    gsl_vector_memcpy(vector_, rhs.vector_);
   }
 
   return *this;
@@ -305,21 +310,17 @@ template <> VectorBase<complex, gsl_vector_complex>&
 VectorBase<complex, gsl_vector_complex>::operator=(
   const VectorBase<complex, gsl_vector_complex>& rhs) {
   if (&rhs != this) {
-    if (rhs.vector_ == NULL) {
-      vector_ = NULL;
-    } else {
-      if (vector_ == NULL) {
-        // special case (like for a copy constructor call) where a non-null
-        // vector is assigned to a null vector
-        build_vector(rhs.vector_->size);
-      } else if (vector_->size != rhs.vector_->size) {
-        throw(Squeal(Squeal::recoverable,
-                     "Attempted to assign a vector of a different size.",
-                     "VectorBase<complex>::operator=()"));
-      }
-
-      gsl_vector_complex_memcpy(vector_, rhs.vector_);
+    if (vector_ == NULL) {
+      // special case (like for a copy constructor call) where a non-null
+      // vector is assigned to a null vector
+      build_vector(rhs.vector_->size);
+    } else if ((rhs.vector_ == NULL) || (vector_->size != rhs.vector_->size)) {
+      throw(Squeal(Squeal::recoverable,
+                   "Attempted to assign a vector of a different size.",
+                   "VectorBase<complex>::operator=()"));
     }
+
+    gsl_vector_complex_memcpy(vector_, rhs.vector_);
   }
 
   return *this;
@@ -374,6 +375,11 @@ VectorBase<double, gsl_vector>& VectorBase<double, gsl_vector>::operator*=(
     }
 
     gsl_vector_mul(vector_, rhs.vector_);
+  } else {
+      throw(Squeal(
+        Squeal::recoverable,
+        "Attempted to multiply a vector by an empty vector.",
+        "MAUS::VectorBase<double, gsl_vector>::operator*="));
   }
 
   return *this;
@@ -392,6 +398,11 @@ VectorBase<complex, gsl_vector_complex>::operator*=(
     }
 
     gsl_vector_complex_mul(vector_, rhs.vector_);
+  } else {
+      throw(Squeal(
+        Squeal::recoverable,
+        "Attempted to multiply a vector by an empty vector.",
+        "MAUS::VectorBase<complex, gsl_vector_complex>::operator*="));
   }
   return *this;
 }
@@ -409,6 +420,11 @@ VectorBase<double, gsl_vector>& VectorBase<double, gsl_vector>::operator/=(
     }
 
     gsl_vector_div(vector_, rhs.vector_);
+  } else {
+      throw(Squeal(
+        Squeal::recoverable,
+        "Attempted to divide a vector by an empty vector.",
+        "MAUS::VectorBase<double, gsl_vector>::operator/="));
   }
 
   return *this;
@@ -427,6 +443,11 @@ VectorBase<complex, gsl_vector_complex>::operator/=(
     }
 
     gsl_vector_complex_div(vector_, rhs.vector_);
+  } else {
+      throw(Squeal(
+        Squeal::recoverable,
+        "Attempted to divide a vector by an empty vector.",
+        "MAUS::VectorBase<complex, gsl_vector_complex>::operator/="));
   }
   return *this;
 }

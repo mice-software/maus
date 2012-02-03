@@ -201,6 +201,9 @@ TEST_F(HermitianMatrixTest, CopyConstructor) {
 
   // check that handles 0 length okay
   HermitianMatrix matrix_h2;
+fprintf(stdout, "Size of empty matrix: %dx%d\n.", matrix_h2.number_of_rows(),
+matrix_h2.number_of_columns());
+fflush(stdout);
   HermitianMatrix matrix_h3(matrix_h2);
   EXPECT_TRUE(equal(matrix_h2, matrix_h3));
 }

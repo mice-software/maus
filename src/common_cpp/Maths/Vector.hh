@@ -203,6 +203,10 @@ class VectorBase {
 // These are put here instead of Vector.cc to maintain the order of
 // function definitions.
 template <> VectorBase<double, gsl_vector>::VectorBase(
+  const VectorBase<double, gsl_vector>& original_instance);
+template <> VectorBase<complex, gsl_vector_complex>::VectorBase(
+  const VectorBase<complex, gsl_vector_complex>& original_instance);
+template <> VectorBase<double, gsl_vector>::VectorBase(
     const ::CLHEP::HepVector& hep_vector);
 template <> VectorBase<complex, gsl_vector_complex>::VectorBase(
     const ::CLHEP::HepVector& hep_matrix);
