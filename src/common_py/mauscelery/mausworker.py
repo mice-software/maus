@@ -53,6 +53,40 @@ from mauscelery.state import MausConfiguration
 from mauscelery.mausprocess import process_birth
 from mauscelery.mausprocess import process_death
 
+def sub_process_broadcast(panel, func, arguments, errors):
+    """
+    Invoke a function on every sub-process via asynchronous requests.   
+    This is based on a suggestion in 
+    http://groups.google.com/group/celery-developers/browse_thread/
+    thread/191389ab86185cce
+    which repeatedly sends the same request to all the sub-processes
+    until all confirm that they have executed the request. This is
+    done via their returning of a status message and their sub-process
+    ID. It is not the most efficient but it is the only way to ensure
+    that all sub-processes are updated at the same time and remain
+    consistent with both each other and the main process.
+    @param panel Celery panel object.
+    @param func Function to invoke.
+    @param arguments Arguments to pass to function.
+    @param errors List to which error information is to be appended. 
+    @throws Exception if any problems arise in communicating with
+    sub-processes.
+    """
+    # Get sub-process IDs from process pool.
+    pool = panel.consumer.pool 
+    pids = set(pool.info["processes"]) 
+    pids_done = set() 
+    # Submit asynchronous jobs to the sub-processes until they've all
+    # processed the message.
+    while pids ^ pids_done: 
+        result = pool.apply_async(func, arguments)
+        status = result.get()
+        pids_done.add(status[0])
+        status_detail = status[1]
+        # Avoid duplicated information.
+        if (status_detail != None) and (status_detail not in errors):
+            errors.append(status_detail)
+
 @Panel.register
 def birth(panel, config_id, transform, configuration = "{}"): # pylint: disable=W0613, C0301
     """
@@ -80,51 +114,39 @@ def birth(panel, config_id, transform, configuration = "{}"): # pylint: disable=
         logger.info("Birthing transform %s" % transform)
     doc = {}
     # Only update if the configuration config_id is new.
-    if (MausConfiguration.config_id != config_id):
-        # List of any errors from sub-processes.
-        errors = []
-        try:
-            # If configuration is unicode convert to a normal 
-            # string to avoid problems e.g. with SWIG/C++ calls.
-            if (isinstance(configuration, UnicodeType)):
-                config = configuration.encode()
-            else:
-                config = configuration
-            # Validate transform.        
-            WorkerUtilities.validate_transform(transform)
-            # Validate configuration.
-            json.loads(configuration)
-            # Get sub-process IDs from process pool.
-            pool = panel.consumer.pool 
-            pids = set(pool.info["processes"]) 
-            pids_done = set() 
-            # Submit asynchronous jobs to the sub-processes until they've all
-            # processed the message.
-            while pids ^ pids_done: 
-                result = pool.apply_async( \
-                    process_birth, (config_id, transform, config,))
-                status = result.get()
-                pids_done.add(status[0])
-                status_detail = status[1]
-                # Avoid duplicated information.
-                if (status_detail != None) and (status_detail not in errors):
-                    errors.append(status_detail)
-        except Exception as exc: # pylint:disable = W0703
-            status = {}
-            status["error"] = str(exc.__class__)
-            status["message"] = exc.message
-            errors.append(status)
-        if (len(errors)) != 0:
-            doc["status"] = "error"
-            doc["error"] = errors
-        else:
-            doc["status"] = "ok"
-            # Update master process configuration.
-            MausConfiguration.config_id = config_id
-            MausConfiguration.configuration = config
-            MausConfiguration.transform = transform
-    else:
+    if (MausConfiguration.config_id == config_id):
         doc["status"] = "unchanged"
+        return doc
+    # List of any errors from sub-processes.
+    errors = []
+    try:
+        # If configuration is unicode convert to a normal 
+        # string to avoid problems e.g. with SWIG/C++ calls.
+        if (isinstance(configuration, UnicodeType)):
+            config = configuration.encode()
+        else:
+            config = configuration
+        # Validate transform.        
+        WorkerUtilities.validate_transform(transform)
+        # Validate configuration.
+        json.loads(configuration)
+        # Invoke process_birth on all sub-processes
+        sub_process_broadcast(panel, process_birth, 
+            (config_id, transform, config,), errors)
+    except Exception as exc: # pylint:disable = W0703
+        status = {}
+        status["error"] = str(exc.__class__)
+        status["message"] = exc.message
+        errors.append(status)
+    if (len(errors)) != 0:
+        doc["status"] = "error"
+        doc["error"] = errors
+    else:
+        doc["status"] = "ok"
+        # Update master process configuration.
+        MausConfiguration.config_id = config_id
+        MausConfiguration.configuration = config
+        MausConfiguration.transform = transform
     if logger.isEnabledFor(logging.INFO):
         logger.info("Status: %s" % doc)
     return doc
@@ -145,23 +167,13 @@ def death(panel):
     if logger.isEnabledFor(logging.INFO):
         logger.info("Deathing transform")
     doc = {}
-    # Get sub-process IDs from process pool.
-    pool = panel.consumer.pool 
-    pids = set(pool.info["processes"]) 
-    pids_done = set()
     # List of any errors from sub-processes.
     errors = []
     # Submit asynchronous jobs to the sub-processes until they've all
     # processed the message.
     try:
-        while pids ^ pids_done: 
-            result = pool.apply_async(process_death, ())
-            status = result.get()
-            pids_done.add(status[0])
-            status_detail = status[1]
-            # Avoid duplicated information.
-            if (status_detail != None) and (status_detail not in errors):
-                errors.append(status_detail)
+        # Invoke process_death on all sub-processes
+        sub_process_broadcast(panel, process_death, (), errors)
     except Exception as exc: # pylint:disable = W0703
         status = {}
         status["error"] = str(exc.__class__)
