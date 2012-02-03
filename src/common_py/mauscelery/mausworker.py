@@ -59,9 +59,9 @@ def birth(panel, config_id, transform, configuration = "{}"): # pylint: disable=
     Create and birth a new transform in each sub-process. This is
     invoked by "broadcast" calls from clients and, in turn, invokes
     the process_birth method in sub-processes. Both the transform
-    and configuration are validated. The configuration is updated
-    only if the ID given by the client is different from the 
-    ID of the current configuration.
+    and configuration are validated. The configuration update request
+    is only passed to sub-processes if the if the ID given by the
+    client is different from the ID of the current configuration.
     @param panel Celery panel object.
     @param config_id Configuration ID from client.
     @param transform Either a single name can be given - representing
@@ -79,33 +79,52 @@ def birth(panel, config_id, transform, configuration = "{}"): # pylint: disable=
     if logger.isEnabledFor(logging.INFO):
         logger.info("Birthing transform %s" % transform)
     doc = {}
-    # If configuration is unicode convert to a normal 
-    # string to avoid problems e.g. with SWIG/C++ calls.
-    if (isinstance(configuration, UnicodeType)):
-        config = configuration.encode()
+    # Only update if the configuration config_id is new.
+    if (MausConfiguration.config_id != config_id):
+        # List of any errors from sub-processes.
+        errors = []
+        try:
+            # If configuration is unicode convert to a normal 
+            # string to avoid problems e.g. with SWIG/C++ calls.
+            if (isinstance(configuration, UnicodeType)):
+                config = configuration.encode()
+            else:
+                config = configuration
+            # Validate transform.        
+            WorkerUtilities.validate_transform(transform)
+            # Validate configuration.
+            json.loads(configuration)
+            # Get sub-process IDs from process pool.
+            pool = panel.consumer.pool 
+            pids = set(pool.info["processes"]) 
+            pids_done = set() 
+            # Submit asynchronous jobs to the sub-processes until they've all
+            # processed the message.
+            while pids ^ pids_done: 
+                result = pool.apply_async( \
+                    process_birth, (config_id, transform, config,))
+                status = result.get()
+                pids_done.add(status[0])
+                status_detail = status[1]
+                # Avoid duplicated information.
+                if (status_detail != None) and (status_detail not in errors):
+                    errors.append(status_detail)
+        except Exception as exc: # pylint:disable = W0703
+            status = {}
+            status["error"] = str(exc.__class__)
+            status["message"] = exc.message
+            errors.append(status)
+        if (len(errors)) != 0:
+            doc["status"] = "error"
+            doc["error"] = errors
+        else:
+            doc["status"] = "ok"
+            # Update master process configuration.
+            MausConfiguration.config_id = config_id
+            MausConfiguration.configuration = config
+            MausConfiguration.transform = transform
     else:
-        config = configuration
-    # Validate transform.        
-    WorkerUtilities.validate_transform(transform)
-    # Validate configuration.
-    json.loads(configuration)
-    # Get sub-process IDs from process pool.
-    pool = panel.consumer.pool 
-    pids = set(pool.info["processes"]) 
-    pids_done = set() 
-    # Submit asynchronous jobs to the sub-processes until they've all
-    # processed the message.
-    while pids ^ pids_done: 
-        result = pool.apply_async( \
-            process_birth, (config_id, transform, config,))
-        status = result.get()
-        pids_done.add(status[0])
-        if status[1] != None:
-            doc[str(status[0])] = status[1]
-    # Update master process configuration.
-    MausConfiguration.config_id = config_id
-    MausConfiguration.configuration = config
-    MausConfiguration.transform = transform
+        doc["status"] = "unchanged"
     if logger.isEnabledFor(logging.INFO):
         logger.info("Status: %s" % doc)
     return doc
@@ -114,14 +133,13 @@ def birth(panel, config_id, transform, configuration = "{}"): # pylint: disable=
 def death(panel):
     """
     Execute death on the current transform in each sub-process. This
-    is invoked by "broadcast" calls from clients  and, in turn,
-    invokes the process_death method in sub-processes.  
+    is invoked by broadcast calls from clients  and, in turn, invokes
+    the process_death method in sub-processes.
     @param panel Celery panel object.
-    @return status document with entries of form PID:{"status":"ok"}
-    if all went well and PID:{"status":"error", "type":ERROR,
-    "message":MESSAGE} if things went wrong in updating a process.
-    @throws Exception if any problems arise in communicating with
-    sub-processes.
+    @return status document of the form {"status":"ok"} if all went
+    well or:{"status":"error", [{"type":ERROR,
+    "message":MESSAGE},...]} if any problems arose.
+    @throws Exception if any problems arose.
     """
     logger = logging.getLogger(__name__)
     if logger.isEnabledFor(logging.INFO):
@@ -130,15 +148,30 @@ def death(panel):
     # Get sub-process IDs from process pool.
     pool = panel.consumer.pool 
     pids = set(pool.info["processes"]) 
-    pids_done = set() 
+    pids_done = set()
+    # List of any errors from sub-processes.
+    errors = []
     # Submit asynchronous jobs to the sub-processes until they've all
     # processed the message.
-    while pids ^ pids_done: 
-        result = pool.apply_async(process_death, ())
-        status = result.get()
-        pids_done.add(status[0])
-        if status[1] != None:
-            doc[str(status[0])] = status[1]
+    try:
+        while pids ^ pids_done: 
+            result = pool.apply_async(process_death, ())
+            status = result.get()
+            pids_done.add(status[0])
+            status_detail = status[1]
+            # Avoid duplicated information.
+            if (status_detail != None) and (status_detail not in errors):
+                errors.append(status_detail)
+    except Exception as exc: # pylint:disable = W0703
+        status = {}
+        status["error"] = str(exc.__class__)
+        status["message"] = exc.message
+        errors.append(status)
+    if (len(errors)) != 0:
+        doc["status"] = "error"
+        doc["error"] = errors
+    else:
+        doc["status"] = "ok"
     if logger.isEnabledFor(logging.INFO):
         logger.info("Status: %s" % doc)
     return doc
@@ -148,9 +181,9 @@ def get_maus_configuration(panel): # pylint:disable=W0613
     """
     Get information on the current configuration and transform.
     @param panel Celery panel object.
-    @return status document of form {configuration:
-    MAUS_CONFIGURATION_DOC, transform:
-    TRANSFORM_NAME_OR_LIST_OF_NAMES, config_id:CONFIG_ID}
+    @return status document of form {"configuration":
+    MAUS_CONFIGURATION_DOC, "transform":
+    TRANSFORM_NAME_OR_LIST_OF_NAMES, "config_id":CONFIG_ID}
     """
     doc = {}
     doc["configuration"] = MausConfiguration.configuration

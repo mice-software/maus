@@ -137,7 +137,10 @@ class MausTransform(): # pylint:disable = W0232
     def death(cls):
         """
         Death the current transform if it has not been done
-        already.
+        already. After this call MausTransform.is_dead will
+        be True irrespective as to whether death was successful
+        or not. The caller can decide whether to reuse the object
+        or not.
         @param cls Class reference.
         @throws Exception if there is a problem when death is called.
         @throws WorkerDeathFailedException if death returns False.
@@ -146,6 +149,6 @@ class MausTransform(): # pylint:disable = W0232
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug("Deathing transform")
         if not cls.is_dead:
+            cls.is_dead = True
             if (not cls.transform.death()):
                 raise WorkerDeathFailedException(cls.transform.__class__)
-            cls.is_dead = True

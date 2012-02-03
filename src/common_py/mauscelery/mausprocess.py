@@ -67,23 +67,24 @@ def process_birth(config_id, transform, configuration):
     """
     Create and birth a new transform. This is invoked in a sub-process
     via a call from the Celery master process. Any existing transform
-    is death-ed first.
+    is death-ed first. If the new configuration ID is equal to the
+    current configuration ID then this is a no-op.
     @param config_id Configuration ID from client.
     @param transform Either a single name can be given - representing
     a single transform - or a list of transforms - representing a
     MapPyGroup. Sub-lists are treated as nested MapPyGroups. If None
     then the current transform isdeathed and rebirthed.  
     @param configuration Valid JSON configuration document.
-    @return status of (PID, {"status":"ok"}) if all went well,
-    (PID, {"status":"error", "type":ERROR, "message":MESSAGE}) if
-    an exception arose or (PID, None) if the birth was not done as the
-    sub-process MausConfiguration.config_id matches config_id.
+    @return status of (PID, None) if all went well or (PID,
+    {"error":ERROR, "message":MESSAGE}) if an exception arose. PID is
+    the sub-process ID. This lets the master process know that the
+    sub-process has executed this operation. 
     """
+    status = None
+    logger = logging.getLogger(__name__)
     # Only update if the configuration config_id is new.
     if (MausConfiguration.config_id != config_id):
-        doc = {}
         try:
-            logger = logging.getLogger(__name__)
             if logger.isEnabledFor(logging.INFO):
                 logger.info("Birthing transform %s" % transform)
             MausTransform.initialize(transform)
@@ -92,43 +93,36 @@ def process_birth(config_id, transform, configuration):
             MausConfiguration.configuration = configuration
             MausConfiguration.transform = transform
             MausConfiguration.config_id = config_id
-            doc["status"] = "ok"
         except Exception as exc: # pylint:disable = W0703
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(exc)
-            doc["status"] = "error"
-            doc["type"] = str(exc.__class__)
-            doc["message"] = exc.message
-        return (os.getpid(), doc)
-    else:
-        return (os.getpid(), None)
+            status = {}
+            status["error"] = str(exc.__class__)
+            status["message"] = exc.message
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug("Status: %s " % status)
+    return (os.getpid(), status)
 
 def process_death():
     """
     Execute death on the current transform. This is invoked in a
-    sub-process via a call from the Celery master process.
-    @return sub-process ID to indicate that this process has executed
-    this method.
-    @return status of (PID, {"status":"ok"}) if all went well,
-    (PID, {"status":"error", "type":ERROR, "message":MESSAGE}) if
-    an exception arose or (PID, None) if death has already been
-    invoked.
+    sub-process via a call from the Celery master process. If death
+    has already been invoked then this is a no-op. 
+    @return status of (PID, None) if all went well or (PID,
+    {"error":ERROR, "message":MESSAGE}) if an exception arose. PID is
+    the sub-process ID. This lets the master process know that the
+    sub-process has executed this operation. 
     """
-    # Only update if transform is not already dead.
+    status = None
+    logger = logging.getLogger(__name__)
+    # Only call if the transform is not already dead.
     if (not MausTransform.is_dead):
-        doc = {}
         try:
-            logger = logging.getLogger(__name__)
             if logger.isEnabledFor(logging.INFO):
                 logger.info("Deathing transform")
             MausTransform.death() 
-            doc["status"] = "ok"
         except Exception as exc: # pylint:disable = W0703
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(exc)
-            doc["status"] = "error"
-            doc["type"] = str(exc.__class__)
-            doc["message"] = exc.message
-        return (os.getpid(), doc)
-    else:
-        return (os.getpid(), None)
+            status = {}
+            status["error"] = str(exc.__class__)
+            status["message"] = exc.message
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug("Status: %s " % status)
+    return (os.getpid(), status)

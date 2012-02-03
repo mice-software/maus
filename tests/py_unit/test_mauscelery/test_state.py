@@ -18,12 +18,11 @@ Test class for mauscelery.state module.
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
 import json
+import logging
 import unittest
 import ROOT
 
-from celery import current_app
-from celery.utils import LOG_LEVELS
-
+import mauscelery.state
 from mauscelery.state import MausTransform
 
 from workers import WorkerBirthFailedException
@@ -44,9 +43,10 @@ class MausTransformTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         """
         MausTransform.transform = None
         MausTransform.is_dead = True
-        # Set Celery logging to ensure conditional log statements
-        # are called.
-        current_app.conf.CELERYD_LOG_LEVEL = LOG_LEVELS["DEBUG"]
+        # Configure lowest logging level so all logging statements
+        # are executed.
+        logger = logging.getLogger(mauscelery.state.__name__)
+        logger.setLevel(logging.DEBUG)
 
     def test_initialize(self):
         """ 
@@ -94,6 +94,17 @@ class MausTransformTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
             MausTransform.birth("""{"birth_result":%s}""" % \
                 MapPyTestMap.FAIL)
 
+    def test_birth_exception(self):
+        """ 
+        Invoke birth when a ValueError is thrown by birth.
+        @param self Object reference.
+        """
+        MausTransform.initialize("MapPyTestMap")
+        with self.assertRaisesRegexp(ValueError,
+            ".*Birth exception.*"):
+            MausTransform.birth("""{"birth_result":%s}""" % \
+                MapPyTestMap.EXCEPTION)
+
     def test_process(self):
         """ 
         Invoke process.
@@ -105,6 +116,18 @@ class MausTransformTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         spill_doc = json.loads(spill)
         self.assertTrue(spill_doc.has_key("processed"),
             "Expected spill to have been processed")
+
+    def test_process_exception(self):
+        """ 
+        Invoke process when a ValueError is thrown by process.
+        @param self Object reference.
+        """
+        MausTransform.initialize("MapPyTestMap")
+        MausTransform.birth("""{"process_result":%s}""" % \
+            MapPyTestMap.EXCEPTION)
+        with self.assertRaisesRegexp(ValueError,
+            ".*Process exception.*"):
+            MausTransform.process("{}")
 
     def test_process_after_death(self):
         """ 
@@ -140,6 +163,49 @@ class MausTransformTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         with self.assertRaisesRegexp(WorkerDeathFailedException,
             ".*MapPyTestMap returned False.*"):
             MausTransform.death()
+
+    def test_death_exception(self):
+        """ 
+        Invoke death when a ValueError is thrown by death.
+        @param self Object reference.
+        """
+        MausTransform.initialize("MapPyTestMap")
+        MausTransform.birth("""{"death_result":%s}""" % \
+            MapPyTestMap.EXCEPTION)
+        with self.assertRaisesRegexp(ValueError,
+            ".*Death exception.*"):
+            MausTransform.death()
+        self.assertTrue(MausTransform.is_dead, 
+            "Expected is_dead to be True")
+
+    def test_death_fails_birth(self):
+        """ 
+        Test birth when current transform death returns False.
+        @param self Object reference.
+        """
+        MausTransform.initialize("MapPyTestMap")
+        MausTransform.birth("""{"death_result":%s}""" % \
+            MapPyTestMap.FAIL)
+        with self.assertRaisesRegexp(WorkerDeathFailedException,
+            ".*MapPyTestMap returned False.*"):
+            MausTransform.birth("""{"death_result":%s}""" % \
+                MapPyTestMap.FAIL)
+        # Except success on second attempt.
+        MausTransform.birth("{}")
+
+    def test_initialize_fails_birth(self):
+        """ 
+        Test initialize when current transform death returns False.
+        @param self Object reference.
+        """
+        MausTransform.initialize("MapPyTestMap")
+        MausTransform.birth("""{"death_result":%s}""" % \
+            MapPyTestMap.FAIL)
+        with self.assertRaisesRegexp(WorkerDeathFailedException,
+            ".*MapPyTestMap returned False.*"):
+            MausTransform.initialize("MapPyTestMap")
+        # Except success on second attempt.
+        MausTransform.initialize("MapPyTestMap")
 
 if __name__ == '__main__':
     unittest.main()

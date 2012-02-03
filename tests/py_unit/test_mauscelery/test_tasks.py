@@ -25,6 +25,7 @@ from celery.utils import LOG_LEVELS
 
 from mauscelery.state import MausTransform
 from mauscelery.tasks import execute_transform
+from MapPyTestMap import MapPyTestMap
 
 class ExecuteTransformTaskTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
     """
@@ -53,6 +54,19 @@ class ExecuteTransformTaskTestCase(unittest.TestCase): # pylint: disable=R0904, 
         spill_doc = json.loads(spill)
         self.assertTrue(spill_doc.has_key("processed"),
             "Expected spill to have been processed")
+
+    def test_execute_transform_fails(self):
+        """ 
+        Invoke execute_transform when a ValueError is thrown by
+        the transform's process method.
+        @param self Object reference.
+        """
+        MausTransform.initialize("MapPyTestMap")
+        MausTransform.birth("""{"process_result":%s}""" % \
+            MapPyTestMap.EXCEPTION)
+        with self.assertRaisesRegexp(ValueError,
+            ".*Process exception.*"):
+            MausTransform.process("{}")
 
 if __name__ == '__main__':
     unittest.main()

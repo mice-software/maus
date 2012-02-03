@@ -464,17 +464,14 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903
             worker_id = worker.keys()[0]
             worker_status = worker[worker_id]
             if worker_status.has_key("error"):
-                print "Celery worker reconfiguration error - %s" % worker
+                print "Celery worker configuration error - %s" % worker
+                reset_ok = False
+            if worker_status.has_key("unchanged"):
+                print "Celery worker configuration unchanged - %s" % worker
                 reset_ok = False
             else:
-                for sub_process in worker_status:
-                    if worker_status[sub_process]["status"] == "error":
-                        print "Process reconfiguration error - %s: %s" % \
-                        (worker_id, sub_process)
-                        reset_ok = False
-                    else:
-                        print "Worker %s process %s - OK" % \
-                            (worker_id, sub_process)
+                print "Celery worker configuration OK - %s" % worker
+
         if (not reset_ok):
             raise Exception("All Celery nodes failed to reconfigure")
 
