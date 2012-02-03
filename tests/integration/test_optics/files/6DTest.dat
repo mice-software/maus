@@ -181,7 +181,7 @@ Configuration PhaseTest
     PropertyDouble Length         150.
     PropertyDouble Thickness      150.
     PropertyDouble InnerRadius    350.
-    PropertyDouble ScaleFactor    106.66*(-1.)^@RepeatNumber
+    PropertyDouble ScaleFactor    106.66*(-1.)**@RepeatNumber
     PropertyBool   RepeatModule2  true
     PropertyInt    NumberOfRepeats 20
   } 
