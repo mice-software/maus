@@ -1,19 +1,35 @@
 \section{Monte Carlo}
-The simulation module provides particle generation routines, GEANT4 bindings to track particles through the geometry and routines to convert modelled energy loss in detectors into digitised signals from the MICE DAQ. The Digitisation models are documented under each detector. Here we describe the beam generation and tracking routines.
+The simulation module provides particle generation routines, GEANT4 bindings to track particles through the geometry and routines to convert modelled energy loss in detectors into digitised signals from the MICE DAQ. The Digitisation models are documented under each detector. Here we describe the beam generation and GEANT4 interface.
 
 \section{Beam Generation}
-Beam generation is handled by the MapPyBeamMaker module.
+Beam generation is handled by the MapPyBeamMaker module. Beam generation is separated into two classes. The MapPyBeamGenerator has routines to assign particles to a number of individual beam classes, each of which samples particle data from a predefined parent distribution. Beam generation is handled by the \verb|beam| datacard.
+
+Three different modes are provided for generating the particles, specified by the \verb|particle_generator| command. If 
 
 \section{GEANT4 Bindings}
 The GEANT4 bindings are encoded in the Simulation module. GEANT4 groups particles by run, event and track. A GEANT4 run maps to a MICE spill; a GEANT4 event maps to a single inbound particle from the beamline; and a GEANT4 track corresponds to a single particle in the experiment.
 
+A number of classes are provided for basic initialisation of GEANT4.
+
 \begin{itemize}
-\li MAUSGeant4Manager is responsible for handling the overall initialisation of the GEANT4 interface. Accessors are provided for individual GEANT4 objects (see below). Interfaces are provided to run one or many particles through the geometry, returning the relevant event data. The MAUSGeant4Manager sets and clears the event action before each run.
-\li MAUSRunAction sets up the running for a particular spill. In MAUS, it just reinitialises the visualisation.
-\li MAUSEventAction sets up the running for a particular inbound particle. At the beginning of each event, the virtual planes, tracking, detectors and stepping are all cleared. After the event the event data is pulled into the event data from each element. 
-\li MAUSPhysicsList contains routines to set up the GEANT4 physical processes. Datacards settings are provided to disable stochastic processes or all processes and set a few parameters.
+\item MAUSGeant4Manager: is responsible for handling interface to GEANT4. MAUSGeant4Manager handles initialisation of the GEANT4 bindings as well as accessors for individual GEANT4 objects (see below). Interfaces are provided to run one or many particles through the geometry, returning the relevant event data. The MAUSGeant4Manager sets and clears the event action before each run.
+\item MAUSPhysicsList: contains routines to set up the GEANT4 physical processes. Datacards settings are provided to disable stochastic processes or all processes and set a few parameters.
+\item FieldPhaser: the field phaser is a MAUS-specific tool for automatically phasing fields, for example RF cavities, such that they ramp coincidentally with incoming particles. The FieldPhaser contains routines to fire test ("reference") particles through the accelerator lattice and phase fields appropriately. The FieldPhaser phasing routines are called after GEANT4 is first initialised.
+\item VirtualPlanes: the VirtualPlanes routines are designed to extract particle data from the GEANT4 tracking independently of the GEANT4 geometry. The VirtualPlanes routines watches for steps that step across some plane in physical space, or some time, or some proper time, and then interpolates from the step ends to the plane in question.
+\item FillMaterials: (legacy) the FillMaterials routines are used to initialise a number of specific 
+\item MICEDetectorConstruction: (legacy) the MICEDetectorConstruction routines provide an interface between the MAUS internal geometry representation encoded in MiceModules and GEANT4. MICEDetectorConstruction is responsible for calling the relevant routines for setting up the general engineering geometry, calling detector-specific geometry set-up routines and calling the field map set-up routines.
+\item MAUSVisManager the MAUSVisManager is responsible for handling interfaces with the GEANT4 visualisation.
 \end{itemize}
 
+The GEANT4 \emph{Action} objects provide interfaces for MAUS-specific function calls at certain points in the tracking.
 
+\begin{itemize}
+\item MAUSRunAction: sets up the running for a particular spill. In MAUS, it just reinitialises the visualisation.
+\item MAUSEventAction: sets up the running for a particular inbound particle. At the beginning of each event, the virtual planes, tracking, detectors and stepping are all cleared. After the event the event data is pulled into the event data from each element.
+\item MAUSTrackingAction: is called when a new track is created or destroyed. If \verb|keep_tracks| datacard is set to True, on particle creation, MAUSTrackingAction writes the initial and final track position and momentum to the output data tree. If \verb|keep_steps| is set to True MAUSTrackingAction gets step data from MAUSSteppingAction and writes this also.
+\item MAUSSteppingAction: is called at each step of the particle. If \verb|keep_steps| datacard is set to True, output step data is recorded. MAUSSteppingAction kills particles if they exceed the \verb|maximum_number_of_steps| datacard. MAUSSteppingAction calls the VirtualPlanes routines on each step.
+\item MAUSPrimaryGeneratorAction: is called at the start of every event and sets the particle data for each event. In MAUS, this particle generation is handled externally and so the MAUSPrimaryGeneratorAction role is to look for the primary object on the Monte Carlo event and convert this into a GEANT4 event object.
+\item MAUSStackingActionKillNonMuons: is never initialised and should be removed.
+\end{itemize}
 
 
