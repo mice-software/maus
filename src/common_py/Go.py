@@ -442,6 +442,7 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903
         active_nodes = inspection.active()
         if (active_nodes == None):
             raise Exception("No active Celery nodes!")
+        num_nodes = len(active_nodes)
 
         # Create unique ID
         celery_client_id = "%s (%s)" % (socket.gethostname(), os.getpid())
@@ -455,9 +456,12 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903
             workers = self.transformer.__class__.__name__
         print "Reconfiguring nodes..."
         results = []
-        results = broadcast("birth", arguments={"transform":workers, \
+        # Send a birth request. Give the workers up to 1000s to reply,
+        # but if they all reply before that just continue.
+        results = broadcast("birth", arguments={"transform":workers, 
             "configuration":self.json_config_doc,
-            "config_id": celery_client_id}, reply=True)
+            "config_id": celery_client_id}, reply=True, timeout=1000,
+            limit=num_nodes)
         print results
         reset_ok = True
         for worker in results:

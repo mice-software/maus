@@ -96,7 +96,7 @@ def process_birth(config_id, transform, configuration):
         except Exception as exc: # pylint:disable = W0703
             status = {}
             status["error"] = str(exc.__class__)
-            status["message"] = exc.message
+            status["message"] = str(exc)
     if logger.isEnabledFor(logging.DEBUG):
         logger.debug("Status: %s " % status)
     return (os.getpid(), status)
@@ -122,7 +122,7 @@ def process_death():
         except Exception as exc: # pylint:disable = W0703
             status = {}
             status["error"] = str(exc.__class__)
-            status["message"] = exc.message
+            status["message"] = str(exc)
     if logger.isEnabledFor(logging.DEBUG):
         logger.debug("Status: %s " % status)
     return (os.getpid(), status)

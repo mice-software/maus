@@ -138,7 +138,7 @@ def birth(panel, config_id, transform, configuration = "{}"): # pylint: disable=
     except Exception as exc: # pylint:disable = W0703
         status = {}
         status["error"] = str(exc.__class__)
-        status["message"] = exc.message
+        status["message"] = str(exc)
         errors.append(status)
     if (len(errors)) != 0:
         doc["status"] = "error"
@@ -179,7 +179,7 @@ def death(panel):
     except Exception as exc: # pylint:disable = W0703
         status = {}
         status["error"] = str(exc.__class__)
-        status["message"] = exc.message
+        status["message"] = str(exc)
         errors.append(status)
     if (len(errors)) != 0:
         doc["status"] = "error"

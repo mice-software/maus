@@ -22,7 +22,9 @@ import logging
 from celery.task import task
 from celery.task import Task
 
+from mauscelery.state import MausConfiguration
 from mauscelery.state import MausTransform
+from workers import WorkerProcessException
 
 @task(name="mauscelery.maustasks.MausGenericTransformTask")
 def execute_transform(spill, client_id = "Unknown", spill_id = 0):
@@ -41,4 +43,13 @@ def execute_transform(spill, client_id = "Unknown", spill_id = 0):
     if logger.isEnabledFor(logging.INFO):
         logger.info("Task invoked by %s on spill %d" \
             % (client_id, spill_id))
-    return MausTransform.process(spill)
+    try:
+        return MausTransform.process(spill)
+    except Exception as exc: # pylint:disable = W0703
+        # Filter exceptions so no unPicklable exception causes
+        # problems.
+        status = {}
+        status["error"] = str(exc.__class__)
+        status["message"] = str(exc)
+        raise WorkerProcessException(MausConfiguration.transform,
+            status)

@@ -24,6 +24,7 @@ import unittest
 from workers import WorkerBirthFailedException
 from workers import WorkerDeathFailedException
 from workers import WorkerDeadException
+from workers import WorkerProcessException
 from workers import WorkerUtilities
 from MAUS import MapPyDoNothing
 from MAUS import MapPyGroup
@@ -296,7 +297,7 @@ class WorkerDeathFailedExceptionTestCase(unittest.TestCase): # pylint: disable=R
         self.assertEquals("TASK returned False", str(exception), \
             "Unexpected string")
 
-class WorkerDeaddExceptionTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
+class WorkerDeadExceptionTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
     """
     Test class for workers.WorkerDeadException class.
     """
@@ -308,6 +309,29 @@ class WorkerDeaddExceptionTestCase(unittest.TestCase): # pylint: disable=R0904, 
         """
         exception = WorkerDeadException("TASK")
         self.assertEquals("TASK process called after death", \
+            str(exception), "Unexpected string")
+
+class WorkerProcessExceptionTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
+    """
+    Test class for workers.WorkerProcessException class.
+    """
+
+    def test_init(self):
+        """ 
+        Invoke constructor and check values.
+        @param self Object reference.
+        """
+        exception = WorkerProcessException("TASK")
+        self.assertEquals("TASK process threw an exception", \
+            str(exception), "Unexpected string")
+
+    def test_init_details(self):
+        """ 
+        Invoke constructor and check values.
+        @param self Object reference.
+        """
+        exception = WorkerProcessException("TASK", "DETAILS")
+        self.assertEquals("TASK process threw an exception: DETAILS", \
             str(exception), "Unexpected string")
 
 if __name__ == '__main__':

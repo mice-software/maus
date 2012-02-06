@@ -23,8 +23,10 @@ import unittest
 from celery import current_app
 from celery.utils import LOG_LEVELS
 
+from mauscelery.state import MausConfiguration
 from mauscelery.state import MausTransform
 from mauscelery.tasks import execute_transform
+from workers import WorkerProcessException
 from MapPyTestMap import MapPyTestMap
 
 class ExecuteTransformTaskTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
@@ -39,6 +41,7 @@ class ExecuteTransformTaskTestCase(unittest.TestCase): # pylint: disable=R0904, 
         """
         MausTransform.transform = None
         MausTransform.is_dead = True
+        MausConfiguration.transform = "MapPyTestMap"
         # Set Celery logging to ensure conditional log statements
         # are called.
         current_app.conf.CELERYD_LOG_LEVEL = LOG_LEVELS["INFO"]
@@ -64,9 +67,9 @@ class ExecuteTransformTaskTestCase(unittest.TestCase): # pylint: disable=R0904, 
         MausTransform.initialize("MapPyTestMap")
         MausTransform.birth("""{"process_result":%s}""" % \
             MapPyTestMap.EXCEPTION)
-        with self.assertRaisesRegexp(ValueError,
-            ".*Process exception.*"):
-            MausTransform.process("{}")
+        with self.assertRaisesRegexp(WorkerProcessException,
+            ".*MapPyTestMap process threw an exception.*"):
+            execute_transform("{}")
 
 if __name__ == '__main__':
     unittest.main()

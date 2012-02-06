@@ -162,3 +162,31 @@ class WorkerDeadException(WorkerOperationException):
         @return string.
         """
         return "%s process called after death" % self._worker
+
+class WorkerProcessException(WorkerOperationException):
+    """ 
+    Exception raised if MAUS worker process throws an exception.
+    """
+
+    def __init__(self, worker, details = None):
+        """
+        Constructor. Overrides WorkerOperationException.__init__.
+        @param self Object reference.
+        @param worker Name of worker that failed.
+        @param details Details on the exception.
+        """
+        WorkerOperationException.__init__(self, worker)
+        self._details = details
+
+    def __str__(self):
+        """
+        Return string representation. Overrides Exception.__str__.
+        @param self Object reference.
+        @return string.
+        """
+        if (self._details == None):
+            detail_str = ""
+        else:
+            detail_str = ": %s" % self._details
+        return "%s process threw an exception%s" \
+            % (self._worker, detail_str)
