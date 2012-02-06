@@ -116,6 +116,8 @@ def birth(panel, config_id, transform, configuration = "{}"): # pylint: disable=
     # Only update if the configuration config_id is new.
     if (MausConfiguration.config_id == config_id):
         doc["status"] = "unchanged"
+        if logger.isEnabledFor(logging.INFO):
+            logger.info("Status: %s" % doc)
         return doc
     # List of any errors from sub-processes.
     errors = []
