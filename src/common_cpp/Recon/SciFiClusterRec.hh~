@@ -55,6 +55,8 @@ class SciFiClusterRec {
 
   void construct(SciFiCluster *clust, std::vector<const MiceModule*> modules);
 
+  Hep3Vector get_reference_frame_pos(int tracker, std::vector<const MiceModule*> modules);
+
  private:
 
   int _size_exception;

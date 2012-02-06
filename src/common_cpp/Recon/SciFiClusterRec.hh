@@ -51,8 +51,16 @@ class SciFiClusterRec {
 
   ~SciFiClusterRec();
 
+  /** @brief Clustering main worker.
+   * @arg evt a SciFiEvent to be filled with SciFiClusters
+   * @arg modules the SciFi MICE modules
+   */
   void process(SciFiEvent &evt, std::vector<const MiceModule*> modules);
 
+  /** @brief Finds the position and direction of the clusters.
+   * @arg clust a SciFiCluster
+   * @arg modules the MICE modules
+   */
   void construct(SciFiCluster *clust, std::vector<const MiceModule*> modules);
 
   Hep3Vector get_reference_frame_pos(int tracker, std::vector<const MiceModule*> modules);

@@ -58,17 +58,31 @@ class RealDataDigitization {
 
   ~RealDataDigitization();
 
+  /** @brief Processes a spill from DAQ
+   *  @params spill A SciFiSpill to be filled
+   *  @params input_event The DAQ JSON Tracker Event
+   */
   void process(SciFiSpill &spill, Json::Value const &input_event);
 
+  /** @brief Reads in the calibration.
+   */
   bool load_calibration(std::string filename);
 
+  /** @brief Saves calibration to vectors.
+   */
   void read_in_all_Boards(std::ifstream &inf);
 
+  /** @brief Loads the mapping.
+   */
   bool load_mapping(std::string file);
 
+  /** @brief Converts read-out map into SciFi Fibre map
+   */
   void get_StatPlaneChannel(int &board, int &bank, int &chan_ro,
                             int &tracker, int &station, int &plane, int &channel);
 
+  /** @brief Reads the bad channel list from file.
+   */
   bool load_bad_channels();
 
   bool is_good_channel(int board, int bank, int chan_ro);
