@@ -80,6 +80,7 @@ class PatternRecognition {
 
   static const int _n_trackers = 2;
   static const int _n_stations = 5;
+  static const double _res_cut = 15.0;
   static const double _chisq_cut = 10;
 };
 
