@@ -42,12 +42,12 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
         test.
         @param self Object reference.
         """
+        self.__inspection = inspect()
         try:
-            self.__inspection = inspect()
+            active_nodes = self.__inspection.active()
         except Exception: # pylint:disable = W0703
             unittest.TestCase.skipTest(self, 
                                        "Skip - RabbitMQ seems to be down")
-        active_nodes = self.__inspection.active()
         if (active_nodes == None):
             unittest.TestCase.skipTest(self, 
                                        "Skip - No active Celery workers")
