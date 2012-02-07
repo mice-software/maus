@@ -33,11 +33,11 @@ PatternRecognition::~PatternRecognition() {
 // in future it should choose between helical or straight pr
 void PatternRecognition::process(SciFiEvent &evt) {
   straightprtrack_recon(evt);
-}
+};
 
 void PatternRecognition::straightprtrack_recon(SciFiEvent &evt) {
-  // std::cout << "Begining Pattern Recognition" << std::endl;
-  // std::cout << "Number of spacepoints in spill: " << evt.scifispacepoints.size() << std::endl;
+  std::cout << "\nBegining Pattern Recognition" << std::endl;
+  std::cout << "Number of spacepoints in spill: " << evt.scifispacepoints.size() << std::endl;
 
   // Split spacepoints up according to which tracker they occured in
   // ----------------------------------------------------------------
@@ -45,19 +45,15 @@ void PatternRecognition::straightprtrack_recon(SciFiEvent &evt) {
   // Construct a 2D matrix to hold spacepoints
   // 1st index differentiates between trackers, 2nd index the spacepoints
   std::vector< std::vector<SciFiSpacePoint*> > spnts(_n_trackers);
-  // the output of this is spnts[2].. trackers are separated.
-  /*for ( int trker_no = 0; trker_no < _n_trackers; ++trker_no ) {
+
+  for ( int trker_no = 0; trker_no < _n_trackers; ++trker_no ) {
     for ( int i = 0; i < evt.scifispacepoints.size(); ++i ) {
       if ( evt.scifispacepoints[i]->get_tracker() == trker_no ) {
         spnts[trker_no].push_back(evt.scifispacepoints[i]);
       }
     }
-     std::cout << "Spacepoints in Tracker " << trker_no << ": ";
-     std::cout << spnts[trker_no].size() << std::endl;
-  }*/
-  for ( int i = 0; i < evt.scifispacepoints.size(); ++i ) {
-    int trker_no = evt.scifispacepoints[i]->get_tracker();
-    spnts[trker_no].push_back(evt.scifispacepoints[i]);
+    std::cout << "Spacepoints in Tracker " << trker_no+1 << ": ";
+    std::cout << spnts[trker_no].size() << std::endl;
   }
 
   // Count the number of spacepoints per tracker per station
@@ -68,7 +64,7 @@ void PatternRecognition::straightprtrack_recon(SciFiEvent &evt) {
   std::vector< std::vector<int> > spnts_per_station(2, std::vector<int>(_n_stations, 0));
   std::vector<int> stations_hit(2, 0);
 
-  // stations_hit... stores the number of stations hit per tracker.
+  // stations_hit stores the number of stations hit per tracker.
   for ( int trker_no = 0; trker_no < _n_trackers; ++trker_no ) {
     // Count the number of space points in each station
     for ( int i = 0; i < spnts[trker_no].size(); ++i ) {
@@ -103,38 +99,47 @@ void PatternRecognition::straightprtrack_recon(SciFiEvent &evt) {
     if (evt.scifistraightprtracks.size() == 0 && stations_hit[trker_no] > 2)
       make_spr_3pt(spnts[trker_no], evt.scifistraightprtracks);
   }
-  // if ( evt.scifistraightprtracks.size() == 0 )
-    // std::cout << "No tracks found" << std::endl;
+  std::cout << "Number of tracks found: " << evt.scifistraightprtracks.size() << "\n\n";
 }
 
 void PatternRecognition::make_spr_5pt(const std::vector<SciFiSpacePoint*>& spnts,
                                       std::vector<SciFiStraightPRTrack>& trks) {
   // std::cout << "Making 5 point track" << std::endl;
 
-  static const int _n_stations = 5;
-  static const double res_cut = 15.0;
+  // Find out if we are in tracker 1 or 2
+  // std::cout << "Forming track in Tracker " << spnts[0]->get_tracker() << std::endl;
+  int sign = 1;
+  /*
+  if ( spnts[0]->get_tracker() == 0 )
+    sign = 1;
+  else
+    sign = -1;
+ */
 
   std::vector< std::vector<SciFiSpacePoint*> > spnts_stat(_n_stations);
   sort_by_station(spnts, spnts_stat);
 
-  // Form an initial track between sp in station 5 and station 1
+  // Form a candidate track between sp in station 5 and station 1
   // -----------------------------------------------------------
 
   bool success = false;
+  bool roadcuts_ok = false;
 
-  for ( int stat5 = 0; stat5 < spnts_stat[_n_stations - 1].size(); ++stat5 ) {
+  // Loop over sp in station 5
+  for ( int stat_outer = 0; stat_outer < spnts_stat[_n_stations - 1].size(); ++stat_outer ) {
     if ( success ) break;
-    for ( int stat1 = 0; stat1 < spnts_stat[0].size(); ++stat1 ) {
+    // Loop over sp in station 1
+    for ( int stat_inner = 0; stat_inner < spnts_stat[0].size(); ++stat_inner ) {
       if ( success ) break;
 
-      Hep3Vector pos_5 = spnts_stat[4][stat5]->get_position();
-      Hep3Vector pos_1 = spnts_stat[0][stat1]->get_position();
+      Hep3Vector pos_us = spnts_stat[4][stat_outer]->get_position();
+      Hep3Vector pos_ls = spnts_stat[0][stat_inner]->get_position();
 
-      double m_xi = ( pos_1.x() - pos_5.x()) / (pos_1.z() - pos_5.z() );
-      double m_yi = ( pos_1.y() - pos_5.y()) / (pos_1.z() - pos_5.z() );
+      double m_xi = sign * ( pos_ls.x() - pos_us.x()) / (pos_ls.z() - pos_us.z() );
+      double m_yi = sign * ( pos_ls.y() - pos_us.y()) / (pos_ls.z() - pos_us.z() );
 
-      double x_0i = pos_5.x() - ( pos_5.z() * m_xi );
-      double y_0i = pos_5.y() - ( pos_5.z() * m_yi );
+      double x_0i = pos_us.x() - ( pos_us.z() * m_xi );
+      double y_0i = pos_us.y() - ( pos_us.z() * m_yi );
 
       // std::cout << "m_xi = " << m_xi << "\tx_0i = " << x_0i << std::endl;
       // std::cout << "m_yi = " << m_yi << "\ty_0i = " << y_0i << std::endl;
@@ -148,34 +153,34 @@ void PatternRecognition::make_spr_5pt(const std::vector<SciFiSpacePoint*>& spnts
           Hep3Vector pos = spnts_stat[stat_no][sp_no]->get_position();
           double dx = pos.x() - ( x_0i + ( pos.z() * m_xi ) );
           double dy = pos.y() - ( y_0i + ( pos.z() * m_yi ) );
-          if ( fabs(dx) < res_cut && fabs(dy) < res_cut ) {
+          if ( fabs(dx) < _res_cut && fabs(dy) < _res_cut ) {
             good_spnts[stat_no] = spnts_stat[stat_no][sp_no];
-            // std::cout << "Good sp found" << std::endl;
-            // std::cout << "dx = " << dx << "\tdy = " << dy << std::endl;
+            std::cout << "Good sp found with residuals of ";
+            std::cout << "dx = " << dx << "\tdy = " << dy << std::endl;
             break;
           }
         }
       }
 
       // Check we have at least 1 good sp in all the intermediate stations
-      // std::cout << "Number of stations with good sp: " << good_spnts.size() << std::endl;
+      std::cout << "Number of stations with good sp: " << good_spnts.size() << std::endl;
       if ( good_spnts.size() > 2 ) {
-        // std::cout << "Found good spacepoints in all stations, fitting a track..." << std::endl;
+        std::cout << "Found good spacepoints in all stations, fitting a track..." << std::endl;
         // Fit track
-        double x[_n_stations] = { pos_5.x(), good_spnts[3]->get_position().x(),
+        double x[_n_stations] = { pos_us.x(), good_spnts[3]->get_position().x(),
                                   good_spnts[2]->get_position().x(),
                                   good_spnts[1]->get_position().x(),
-                                  pos_1.x() };
+                                  pos_ls.x() };
 
-        double y[_n_stations] = { pos_5.y(), good_spnts[3]->get_position().y(),
+        double y[_n_stations] = { pos_us.y(), good_spnts[3]->get_position().y(),
                                   good_spnts[2]->get_position().y(),
                                   good_spnts[1]->get_position().y(),
-                                  pos_1.y() };
+                                  pos_ls.y() };
 
-        double z[_n_stations] = { pos_5.z(), good_spnts[3]->get_position().z(),
+        double z[_n_stations] = { pos_us.z(), good_spnts[3]->get_position().z(),
                                   good_spnts[2]->get_position().z(),
                                   good_spnts[1]->get_position().z(),
-                                  pos_1.z() };
+                                  pos_ls.z() };
 
         double c_x, m_x, cov_x00, cov_x01, cov_x11, chisq_x;
         double c_y, m_y, cov_y00, cov_y01, cov_y11, chisq_y;
@@ -187,7 +192,7 @@ void PatternRecognition::make_spr_5pt(const std::vector<SciFiSpacePoint*>& spnts
         gsl_fit_linear(z, 1, y, 1, _n_stations,
                        &c_y, &m_y, &cov_y00, &cov_y01, &cov_y11,
                        &chisq_y);
-        /*std::cout << "Track parameters x: c = " << c_x << ", m = ";
+        std::cout << "Track parameters x: c = " << c_x << ", m = ";
         std::cout << m_x << ", chisq = " << chisq_x << std::endl;
         std::cout << "Track parameters y: c = " << c_y << ", m = ";
         std::cout << m_y << ", chisq = " << chisq_y << std::endl;
@@ -195,21 +200,21 @@ void PatternRecognition::make_spr_5pt(const std::vector<SciFiSpacePoint*>& spnts
         for ( int i = 0; i < _n_stations; ++i ) {
           std::cout << i << "\t" << x[i] << "\t" << y[i] << "\t" << z[i] << std::endl;
         }
-        */
+
         double chisq = chisq_x + chisq_y;
         if ( chisq / ( _n_stations - 2 ) < _chisq_cut ) {
-          // std:: cout << "chisq test passed, adding track" << std::endl;
+          std:: cout << "chisq test passed, adding track" << std::endl;
           SciFiStraightPRTrack track;
           track.set_x0(c_x);
           track.set_mx(m_x);
           track.set_y0(c_y);
           track.set_my(m_y);
           std::vector<SciFiSpacePoint> good_spacepoints;
-          good_spacepoints.push_back(*spnts_stat[0][stat1]);
+          good_spacepoints.push_back(*spnts_stat[0][stat_inner]);
           good_spacepoints.push_back(*good_spnts[1]);
           good_spacepoints.push_back(*good_spnts[2]);
           good_spacepoints.push_back(*good_spnts[3]);
-          good_spacepoints.push_back(*spnts_stat[4][stat5]);
+          good_spacepoints.push_back(*spnts_stat[4][stat_outer]);
           track.set_spacepoints(good_spacepoints);
           trks.push_back(track);
           success = true;
@@ -221,9 +226,9 @@ void PatternRecognition::make_spr_5pt(const std::vector<SciFiSpacePoint*>& spnts
       }
     }
   }
-  if ( success ) {
-    run_analysis(trks);
-  }
+  /* if ( success ) {
+    // run_analysis(trks);
+  } */
 }
 
 void PatternRecognition::run_analysis(std::vector<SciFiStraightPRTrack>& trks) {

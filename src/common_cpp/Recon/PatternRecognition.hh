@@ -81,9 +81,11 @@ class PatternRecognition {
 
   void run_analysis(std::vector<SciFiStraightPRTrack>& trks);
   void a_4_station_fit(std::vector<SciFiSpacePoint> space_points, Hep3Vector position, int st_i);
+
   static const int _n_trackers = 2;
   static const int _n_stations = 5;
-  static const double _chisq_cut = 15;
+  static const double _res_cut = 15.0;
+  static const double _chisq_cut = 15.0;
 };
 
 #endif
