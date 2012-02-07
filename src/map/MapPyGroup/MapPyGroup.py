@@ -38,6 +38,8 @@ A group of workers which iterates through each worker in turn.
 from types import ListType
 import inspect
 
+import ErrorHandler
+
 class MapPyGroup:
     """
     A group of workers which iterates through each worker in turn.
@@ -115,6 +117,7 @@ class MapPyGroup:
             for worker in self._workers:
                 assert worker.birth(json_config_doc)
         except: # pylint:disable = W0702
+            ErrorHandler.HandleException({}, self)
             return False
         return True
 
@@ -142,6 +145,7 @@ class MapPyGroup:
             for worker in self._workers:
                 assert worker.death()
         except: # pylint:disable = W0702
+            ErrorHandler.HandleException({}, self)
             return False
         return True
 
