@@ -58,6 +58,7 @@ class CouchDBDocumentStoreTestCase(unittest.TestCase): # pylint: disable=R0904, 
         server = couchdb.Server(self._database_url)
         if self._database_name in server:
             server.delete(self._database_name)
+        self._data_store.disconnect()
 
     def test_connect(self):
         """

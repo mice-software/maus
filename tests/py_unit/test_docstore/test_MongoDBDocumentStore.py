@@ -37,13 +37,14 @@ class MongoDBDocumentStoreTestCase(unittest.TestCase): # pylint: disable=R0904, 
         self._host = "localhost"
         self._port = 27017
         try:
-            pymongo.Connection(self._host, self._port)
+            test_conx = pymongo.Connection(self._host, self._port)
         except AutoReconnect: # pylint: disable=W0702
             unittest.TestCase.skipTest(self, 
                                        "MongoDB server is not accessible")
+        test_conx.disconnect()
+        # Create data store and connect.
         self._database_name = self.__class__.__name__
         self._collection_name = self.__class__.__name__
-        # Create data store and connect.
         self._data_store = MongoDBDocumentStore()
         parameters = {
             "mongodb_host":self._host,
@@ -57,8 +58,10 @@ class MongoDBDocumentStoreTestCase(unittest.TestCase): # pylint: disable=R0904, 
         Delete test-specific database.
         @param self Object reference.
         """
+        self._data_store.disconnect()
         server = pymongo.Connection(self._host, self._port)
         server.drop_database(self._database_name)
+        server.disconnect()
 
     def test_connect_no_parameters(self):
         """

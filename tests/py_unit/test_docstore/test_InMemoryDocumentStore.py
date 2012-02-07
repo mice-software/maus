@@ -29,11 +29,18 @@ class InMemoryDocumentStoreTestCase(unittest.TestCase): # pylint: disable=R0904,
 
     def setUp(self):
         """ 
-        Invoke "birth" and check for success.
+        Create test object and connect method.
         @param self Object reference.
         """
         self._data_store = InMemoryDocumentStore()
         self._data_store.connect({})
+
+    def tearDown(self):
+        """
+        Disconnect.
+        @param self Object ref
+        """
+        self._data_store.disconnect()
 
     def test_connect_no_parameters(self):
         """
