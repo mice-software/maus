@@ -64,7 +64,7 @@ void RealDataDigitization::process(SciFiSpill &spill, Json::Value const &daq) {
       int adc = channel_in["adc"].asInt();
       int tdc = channel_in["tdc"].asInt();
 
-      if ( !is_good_channel(bank, board, channel_ro) ) {
+      if ( !is_good_channel(board, bank, channel_ro) ) {
         continue;
       }
 
@@ -82,7 +82,11 @@ void RealDataDigitization::process(SciFiSpill &spill, Json::Value const &daq) {
         pe = -10.0;
       }
       // int unique_chan  = _calibration[board][bank][channel_ro]["unique_chan"].asDouble();
-
+      std::ofstream out2("noise.txt", std::ios::out | std::ios::app);
+     /* if ( pe > 1.99 && pe < 4. ) {
+        out2 << board << " " << bank << " " << channel_ro << "\n";
+      }*/
+      out2.close();
       // Find tracker, station, plane, channel.
       int tracker, station, plane, channel;
       get_StatPlaneChannel(board, bank, channel_ro, tracker, station, plane, channel);
@@ -203,13 +207,13 @@ void RealDataDigitization::
       found = true;
     }
   }
-
+/*
   if ( tracker == -1 ) {
     std::ofstream out2("bad_mapping.txt", std::ios::out | std::ios::app);
     out2 << board << " " << bank << " " << chan_ro << "\n";
     out2.close();
   }
-
+*/
   // std::cout << board << " " << bank << " " << chan_ro << std::endl;
   // assert(found);
 }
