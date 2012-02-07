@@ -44,6 +44,8 @@ from celery.signals import worker_process_init
 from mauscelery.state import MausConfiguration
 from mauscelery.state import MausTransform
 
+import ErrorHandler
+
 def worker_process_init_callback(**kwargs): # pylint:disable = W0613
     """
     Callback from worker_process_init which is called when a Celery 
@@ -56,8 +58,8 @@ def worker_process_init_callback(**kwargs): # pylint:disable = W0613
     """
     logger = logging.getLogger(__name__)
     if logger.isEnabledFor(logging.INFO):
-        logger.info("Creating transform %s" \
-            % MausConfiguration.transform)
+        logger.info("Setting MAUS ErrorHandler to raise exceptions")
+    ErrorHandler.DefaultHandler().on_error = 'raise'
     MausTransform.initialize(MausConfiguration.transform)
     MausTransform.birth(MausConfiguration.configuration)
 
