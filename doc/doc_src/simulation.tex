@@ -1,10 +1,190 @@
-\section{Monte Carlo}
 The simulation module provides particle generation routines, GEANT4 bindings to track particles through the geometry and routines to convert modelled energy loss in detectors into digitised signals from the MICE DAQ. The Digitisation models are documented under each detector. Here we describe the beam generation and GEANT4 interface.
 
 \section{Beam Generation}
 Beam generation is handled by the MapPyBeamMaker module. Beam generation is separated into two classes. The MapPyBeamGenerator has routines to assign particles to a number of individual beam classes, each of which samples particle data from a predefined parent distribution. Beam generation is handled by the \verb|beam| datacard.
 
-Three different modes are provided for generating the particles, specified by the \verb|particle_generator| command. If 
+The MapPyBeamMaker can either take particles from an external file, overwrite existing particles in the spill, add a specified number of particles from each beam definition, or sample particles from a binomial distribution. The random seed is controlled at the top level and different algorithms can be selected influencing how this is used to generate random seeds on each particle. 
+
+Each beam definition has routines for sampling from a multivariate gaussian distribution or generating ensembles of identical particles (called "pencil" beams here). Additionally it is possible to produce time distributions that are either rectangular or triangular in time to give a simplistic representation of the MICE time distribution.
+
+The beam definition controls are split into four parts. The \verb|reference| branch defines the centroid of the distribution; the \verb|transverse| branch defines the transverse coordinates, $x, y, px, py$; the \verb|longitudinal| branch defines the longitudinal coordinates - time and energy/momentum and the \verb|coupling| branch defines correlations between longitudinal and transverse. Additionally a couple of parameters are available to control random seed generation and relative weighting between different beam definitions.
+
+In transverse, beams are typically sampled from a multivariate gaussian. The Twiss beam ellipse is defined by
+\begin{equation}
+\mathbf{B_\perp} = m \left(\begin{array}{cccc}
+\epsilon_x \beta_x/p   & -\epsilon_x\alpha_x & 0 & 0 \\
+-\epsilon_x\alpha_x & \epsilon_x\gamma_x p  & 0 & 0 \\
+0 & 0  & \epsilon_y\beta_y/p  & -\epsilon_y\alpha_y \\
+0 & 0 & -\epsilon_y\alpha_y & \epsilon_y\gamma_y p \\
+\end{array}\right)
+\end{equation}
+The Penn beam ellipse is defined by,
+\begin{equation}
+\mathbf{B_\perp} = m\epsilon_\perp \left(\begin{array}{cccc}
+\beta_\perp/p   & -\alpha_\perp & 0 & -\mathcal{L}+\beta_\perp B_0/2p \\
+-\alpha_\perp & \gamma_\perp p  & \mathcal{L}-\beta_\perp B_0/2p & 0 \\
+0 & \mathcal{L}-\beta_\perp B_0/2p  & \beta_\perp/p  & -\alpha_\perp \\
+-\mathcal{L}+\beta_\perp B_0/2p & 0 & -\alpha_\perp & \gamma_\perp p \\
+\end{array}\right)
+\end{equation}
+where parameters can be controlled in datacards
+
+\begin{table*}
+\begin{center}
+\caption{Multiple beam control parameters.}
+\begin{tabularx}{\textwidth}{lX}
+Name & Meaning \\
+\hline
+\verb|beam| & dict containing beam definition parameters.\\
+\hline
+\multicolumn{2}{l}{\emph{The following cards should all be defined within the \verb|beam| dict.}} \\
+\hline
+\verb|particle_generator| & Set to \verb|binomial| to choose the number of particles by sampling from a binomial distribution. Set to \verb|counter| to choose the number of particles in each beam definition explicitly. Set to \verb|file| to generate particles by reading an input file. Set to \verb|overwrite_existing| to generate particles by overwriting existing primaries. \\
+\verb|binomial_n| & When using a binomial \verb|particle_generator|, this controls the number of trials to make. Otherwise ignored. \\
+\verb|binomial_p| & When using a binomial \verb|particle_generator|, this controls the probability a trial yields a particle. Otherwise ignored. \\
+\verb|beam_file_format| & When using a file \verb|particle_generator|, set the input file format - options are 
+                          \begin{itemize}
+                            \setlength{\itemsep}{0mm}
+                            \item \verb|icool_for009|
+                            \item \verb|icool_for003|,
+                            \item \verb|g4beamline_bl_track_file|
+                            \item \verb|g4mice_special_hit|
+                            \item \verb|g4mice_virtual_hit|
+                            \item  \verb|mars_1|
+                            \item \verb|maus_virtual_hit|
+                            \item \verb|maus_primary|
+                          \end{itemize}\\
+\verb|beam_file|&  When using a file \verb|particle_generator|, set the input file name.\\
+\verb|file_particles_per_spill| & When using a file \verb|particle_generator|, this controls the number of particles per spill that will be read from the file.\\
+\verb|random_seed| & Set the random seed, which is used to generate individual random seeds for each primary (see below). \\
+\verb|definitions| & A list of dicts, each item of which is a dict defining the distribution from which to sample individual particles. \\
+\end{tabularx}
+\end{center}
+\end{table*}
+
+
+\begin{table*}
+\begin{center}
+\caption{Individual beam distribution parameters.}
+\begin{tabularx}{\linewidth}{lX}
+Name & Meaning \\
+\hline
+\multicolumn{2}{l}{\emph{The following cards should be inside a dict in the beam \verb|definitions| list.}} \\
+\hline
+\verb|random_seed_algorithm| & Choose from the following options
+                          \begin{itemize}
+                            \setlength{\itemsep}{0mm}
+                            \item \verb|beam_seed|: use the \verb|random_seed| for all particles
+                            \item \verb|random|: use a different randomly determined seed for each particle
+                            \item \verb|incrementing|: use the \verb|random_seed| but increment by one each time a new particle is generated
+                            \item \verb|incrementing_random|: determine a seed at random before any particles are generated; increment this by one each time a new particle is generated
+                          \end{itemize}\\
+\verb|weight| & When \verb|particle_generator| is \verb|binomial| or \verb|overwrite_existing|, the probability that a particle will be sampled from this distribution is given by $weight/(sumofweights)$.\\
+\verb|n_particles_per_spill| & When \verb|particle_generator| is \verb|counter|, this sets the number of particles that will be generated in each spill. \\
+\verb|reference| & Dict containing the reference particle definition. \\
+\verb|transverse| & Dict defining the longitudinal phase space distribution. \\
+\verb|longitudinal| & Dict defining the longitudinal phase space distribution. \\
+\verb|coupling| & Dict defining any correlations between transverse and longitudinal. \\
+\end{tabularx}
+\end{center}
+\end{table*}
+
+\begin{table*}
+\begin{center}
+\caption{Beam distribution reference definition.}
+\begin{tabularx}{\linewidth}{lX}
+Name & Meaning \\
+\hline
+\multicolumn{2}{|l|}{\emph{The following cards should be defined in each beam definition \verb|reference| dict.}} \\
+\hline
+\verb|position| & dict with elements \verb|x|, \verb|y| and \verb|z| that define the reference position (mm).\\
+\verb|momentum| & dict with elements \verb|x|, \verb|y| and \verb|z| that define the reference momentum direction. Normalised to 1 at runtime.\\
+\verb|particle_id| & PDG particle ID of the reference particle.\\
+\verb|energy| & Reference energy. \\
+\verb|time| & Reference time (ns). \\
+\verb|random_seed| & Set to 0 - this parameter is ignored.\\
+\end{tabularx}
+\end{center}
+\end{table*}
+
+\begin{table*}
+\begin{center}
+\caption{Beam definition transverse parameters.}
+\begin{tabularx}{\linewidth}{lX}
+Name & Meaning \\
+\hline
+\multicolumn{2}{|l|}{\emph{The following cards should be defined in each beam definition \verb|transverse| dict.}} \\
+\hline
+\verb|transverse_mode| & Options are
+                          \begin{itemize}
+                            \setlength{\itemsep}{0mm}
+                            \item \verb|pencil|: x, py, y, py taken from \verb|reference|
+                            \item \verb|penn|: cylindrical beam symmetric in x and y
+                            \item \verb|constant_solenoid|: cylindrical beam symmetric in x and y, with beam radius calculated from on-axis B-field to give constant beam radius along a solenoid.
+                            \item \verb|twiss|: beam with decoupled x and y beam ellipses.
+                          \end{itemize} \\
+\hline
+\begin{tabular}{l}\verb|normalised_angular_| \\ \verb|momentum| \end{tabular} & if \verb|transverse_mode| is \verb|penn| or \verb|constant_solenoid|, set $\mathcal{L}$.\\
+\verb|emittance_4d| & if \verb|transverse_mode| is \verb|penn| or \verb|constant_solenoid|, set $\epsilon_\perp$.\\
+\verb|beta_4d| & if \verb|transverse_mode| is \verb|penn|, set $\beta_\perp$.\\
+\verb|alpha_4d| & if \verb|transverse_mode| is \verb|penn|, set $\alpha_\perp$.\\
+\verb|bz| & if \verb|transverse_mode| is \verb|constant_solenoid|, set the B-field used to calculate $\beta_\perp$ and $\alpha_\perp$.\\
+\hline
+\verb|beta_x| & if \verb|transverse_mode| is \verb|twiss|, set $\beta_x$.\\
+\verb|alpha_x| & if \verb|transverse_mode| is \verb|twiss|, set $\alpha_x$.\\
+\verb|emittance_x| & if \verb|transverse_mode| is \verb|twiss|, set $\epsilon_x$.\\
+\verb|beta_y| & if \verb|transverse_mode| is \verb|twiss|, set $\beta_y$.\\
+\verb|alpha_y| & if \verb|transverse_mode| is \verb|twiss|, set $\alpha_y$.\\
+\verb|emittance_y| & if \verb|transverse_mode| is \verb|twiss|, set $\epsilon_y$.\\
+\end{tabularx}
+\end{center}
+\end{table*}
+
+
+\begin{table*}
+\begin{center}
+\caption{Beam definition longitudinal parameters.}
+\begin{tabularx}{\linewidth}{lX}
+Name & Meaning \\
+\hline
+\multicolumn{2}{l}{\emph{The following cards should be defined in each beam definition \verb|longitudinal| dict.}} \\
+\hline
+\verb|momentum_variable| & In all modes, set this variable to control which longitudinal variable will be used to control the input beam. Options are \verb|energy|, \verb|p|, \verb|pz|. \\
+\verb|longitudinal_mode| & Options are
+                          \begin{itemize}
+                            \setlength{\itemsep}{0mm}
+                            \item \verb|pencil|: time, energy/p/pz taken from \verb|reference|
+                            \item \verb|gaussian|: uncorrelated gaussians in time and energy/p/pz
+                            \item \verb|twiss|: multivariate gaussian in time and energy/p/pz
+                            \item \verb|uniform_time|: gaussian in energy/p/pz and uniform in time.
+                            \item \verb|sawtooth_time|: gaussian in energy/p/pz and sawtooth in time.
+                          \end{itemize} \\
+\hline
+\verb|beta_l| & In Twiss mode, set $\beta_l$\\
+\verb|alpha_l| & In Twiss mode, set $\alpha_l$\\
+\verb|emittance_l| & In Twiss mode, set $\epsilon_l$\\
+\hline
+\verb|sigma_t| & In \verb|gaussian| mode, set the RMS time. \\
+\begin{tabular}{l} \verb|sigma_p| \\ \verb|sigma_energy| \\ \verb|sigma_pz| \end{tabular} & In \verb|gaussian|, \verb|uniform_time|, \verb|sawtooth_time| mode, set the RMS energy/p/pz. \\
+\hline
+\verb|t_start| & In \verb|uniform_time| and \verb|sawtooth_time| mode, set the start time of the parent distribution \\
+\verb|t_end| & In \verb|uniform_time| and \verb|sawtooth_time| mode, set the end time of the parent distribution \\
+\end{tabularx}
+\end{center}
+\end{table*}
+
+\begin{table*}
+\begin{center}
+\caption{Beam definition coupling parameters.}
+\begin{tabularx}{\linewidth}{lX}
+Name & Meaning \\
+\hline
+\multicolumn{2}{l}{\emph{The following cards should be defined in each beam definition \verb|coupling| dict.}} \\
+\hline
+\verb|coupling_mode| & Set to \verb|none| - not implemented yet. \\
+\end{tabularx}
+\end{center}
+\end{table*}
 
 \section{GEANT4 Bindings}
 The GEANT4 bindings are encoded in the Simulation module. GEANT4 groups particles by run, event and track. A GEANT4 run maps to a MICE spill; a GEANT4 event maps to a single inbound particle from the beamline; and a GEANT4 track corresponds to a single particle in the experiment.
@@ -31,5 +211,74 @@ The GEANT4 \emph{Action} objects provide interfaces for MAUS-specific function c
 \item MAUSPrimaryGeneratorAction: is called at the start of every event and sets the particle data for each event. In MAUS, this particle generation is handled externally and so the MAUSPrimaryGeneratorAction role is to look for the primary object on the Monte Carlo event and convert this into a GEANT4 event object.
 \item MAUSStackingActionKillNonMuons: is never initialised and should be removed.
 \end{itemize}
+
+\begin{table*}
+\begin{center}
+\caption{Monte Carlo control parameters.}
+\begin{tabularx}{\textwidth}{lX}
+Name & Meaning \\
+\hline
+\multicolumn{2}{l}{\emph{General Monte Carlo controls.}} \\
+\hline
+\verb|simulation_geometry_filename| & Filename for the simulation geometry - searches first in files tagged by environment variable \verb|${MICEFILES}|, then in the local directory.\\
+\verb|simulation_reference_particle| & Reference particle used for phasing fields.\\
+\verb|keep_tracks| & Set to boolean true to store the initial and final position/momentum of each track generated by MAUS.\\
+\verb|keep_steps| & Set to boolean true to store every step generated by MAUS - warning this can lead to large output files.\\
+\verb|maximum_number_of_steps| & Set to an integer value. Tracks taking more steps are assumed to be looping.\\
+\end{tabularx}
+\end{center}
+\end{table*}
+
+\begin{table*}
+\begin{center}
+\caption{Physics list control parameters.}
+\begin{tabularx}{\textwidth}{lX}
+\hline
+\multicolumn{2}{l}{\emph{Physics list controls.}} \\
+\hline
+\verb|physics_model| & GEANT4 physics model used to set up the physics list.\\
+\verb|physics_processes| & Choose which physics processes normal particles observe during tracking. Options are 
+                            \begin{itemize}
+                            \item \verb|normal| particles will obey normal physics processes, scattering and energy straggling will be active.
+                            \item \verb|mean_energy_loss| particles will lose a deterministic amount of energy during interaction with materials and will never decay.
+                            \item \verb|none| Particles will never lose energy or scatter during tracking and will never decay.
+                            \end{itemize} \\
+\verb|reference_physics_processes| & Choose which physics processes the reference particle observes during tracking. Options are \verb|mean_energy_loss| and \verb|none|. The reference particle can never have stochastic processes enabled.\\
+\verb|particle_decay| & Set to boolean true to enable particle decay; set to boolean false to disable.\\
+\verb|charged_pion_half_life| & Set the half life for charged pions.\\
+\verb|muon_half_life| & Set the half life for muons.\\
+\verb|production_threshold| & Set the geant4 production threshold.\\
+\end{tabularx}
+\end{center}
+\end{table*}
+
+\begin{table*}
+\begin{center}
+\caption{Visualisation control parameters.}
+\begin{tabularx}{\textwidth}{lX}
+\hline
+\multicolumn{2}{l}{\emph{Visualisation controls.}} \\
+\hline
+\verb|geant4_visualisation| & Set to boolean true to activate GEANT4 visualisation.\\
+\verb|visualisation_viewer| & Control which viewer to use to visualise GEANT4 tracks. Currently only vrmlviewer is compiled into GEANT4 by default. Users can recompile GEANT4 with additional viewers enabled at their own risk.\\
+\verb|visualisation_theta| & Set the theta angle of the camera.\\
+\verb|visualisation_phi| & Set the phi angle of the camera.\\
+\verb|visualisation_zoom| & Set the camera zoom.\\
+\verb|accumulate_tracks| & Not implemented.\\
+\verb|default_vis_colour| & Not implemented.\\
+\verb|pi_plus_vis_colour| & Not implemented.\\
+\verb|pi_minus_vis_colour| & Not implemented.\\
+\verb|mu_plus_vis_colour| & Not implemented.\\
+\verb|mu_minus_vis_colour| & Not implemented.\\
+\verb|mu_plus_vis_colour| & Not implemented.\\
+\verb|mu_minus_vis_colour| & Not implemented.\\
+\verb|e_plus_vis_colour| & Not implemented.\\
+\verb|e_minus_vis_colour| & Not implemented.\\
+\verb|gamma_vis_colour| & Not implemented.\\
+\verb|neutron_vis_colour| & Not implemented.\\
+\verb|photon_vis_colour| & Not implemented.\\
+\end{tabularx}
+\end{center}
+\end{table*}
 
 
