@@ -156,13 +156,11 @@ CovarianceMatrix::CovarianceMatrix(double mass,
     : SymmetricMatrix() {
   // *** calculate some intermediate values ***
   double energy     = ::sqrt(momentum * momentum + mass * mass);
-  // FIXME: Penn says = charge * Bz / (2. * momentum)
-  double kappa      = ::CLHEP::c_light * Bz / (2.* momentum);
+  double kappa      = charge * Bz / (2. * momentum);
   double gamma_t    = (1 + alpha_t*alpha_t
                        + (beta_t*kappa - Ltwiddle_t)*(beta_t*kappa-Ltwiddle_t))
                     / beta_t;
-  // FIXME: Penn says = (1+alpha_l*alpha_l+beta_l*beta_l*kappa*kappa)/beta_l
-  double gamma_l    = (1+alpha_l*alpha_l)/beta_l;
+  double gamma_l    = (1+alpha_l*alpha_l+beta_l*beta_l*kappa*kappa)/beta_l;
 
   // *** calculate the lower triangle covariances <A B> = sigma_A_B ***
   double sigma_t_t  =  emittance_l * mass * beta_l / momentum;
@@ -182,19 +180,14 @@ CovarianceMatrix::CovarianceMatrix(double mass,
   double sigma_y_t  =  0.;
   double sigma_y_E  = -dispersion_y * sigma_E_E / energy;
   double sigma_y_x  =   0.;
-  // FIXME: Penn says = mass * emittance_t * (beta_t*kappa - Ltwiddle_t)
-  double sigma_y_Px =  0.;
-  // FIXME: Penn says = emittance_t * beta_t * mass / momentum
-  double sigma_y_y  =  -mass * emittance_l * alpha_t;
+  double sigma_y_Px =  mass * emittance_t * (beta_t*kappa - Ltwiddle_t);
+  double sigma_y_y  =  emittance_t * beta_t * mass / momentum;
 
-  // FIXME: Penn says = mass * momentum * emittance_t * gamma_t
   double sigma_Py_t =  0.;
   double sigma_Py_E =  dispersion_prime_y * sigma_E_E / energy;
-  // FIXME: Penn says = -mass * emittance_t * (beta_t*kappa-Ltwiddle_t)
-  double sigma_Py_x = -mass * emittance_t * (beta_t*kappa-Ltwiddle_t) * charge;
+  double sigma_Py_x = -mass * emittance_t * (beta_t*kappa-Ltwiddle_t);
   double sigma_Py_Px=  0.;
-  // FIXME: Penn says = -mass * emittance_t & gamma_t
-  double sigma_Py_y =  mass * momentum * emittance_l * gamma_t;
+  double sigma_Py_y =  -mass * emittance_t * gamma_t;
   double sigma_Py_Py=  0.;
 
   double covariances[36] = {
