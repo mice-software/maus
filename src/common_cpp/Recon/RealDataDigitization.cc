@@ -86,12 +86,7 @@ void RealDataDigitization::process(SciFiSpill &spill, Json::Value const &daq) {
       // Find tracker, station, plane, channel.
       int tracker, station, plane, channel;
       get_StatPlaneChannel(board, bank, channel_ro, tracker, station, plane, channel);
-      std::ofstream out2("dead_channels.txt", std::ios::out | std::ios::app);
-      if (1) { // pe > 2 && tracker != -1  ) {
-        out2 << tracker << " " << station << " " << plane << " " <<  channel  <<
-        " " << board << " " << bank << " " <<  channel_ro << "\n";
-      }
-      out2.close();
+
       // Exclude missing modules.
       if ( pe > 1.0 && tracker != -1 ) {
         SciFiDigit *digit = new SciFiDigit(tracker, station, plane, channel, pe, tdc);
@@ -120,9 +115,6 @@ bool RealDataDigitization::load_calibration(std::string file) {
   std::istringstream ist1(line.c_str());
   ist1 >> numBoards;
 
-  // std::cout << "Read in " << numBoards << " from calibration file: " << std::endl;
-  // std::cout << fname << std::endl;
-
   read_in_all_Boards(inf);
 
   return true;
@@ -143,10 +135,6 @@ void RealDataDigitization::read_in_all_Boards(std::ifstream &inf) {
         getline(inf, line);
         std::istringstream ist1(line.c_str());
         ist1 >> unique_chan_no >> board >> bank >> chan >> p >> g;
-
-        // assert(board == i);
-        // assert(bank  == j);
-        // assert(chan  == k);
 
         temp = unique_chan_no;
 
@@ -208,14 +196,7 @@ void RealDataDigitization::
       found = true;
     }
   }
-/*
-  if ( tracker == -1 ) {
-    std::ofstream out2("bad_mapping.txt", std::ios::out | std::ios::app);
-    out2 << board << " " << bank << " " << chan_ro << "\n";
-    out2.close();
-  }
-*/
-  // std::cout << board << " " << bank << " " << chan_ro << std::endl;
+
   // assert(found);
 }
 

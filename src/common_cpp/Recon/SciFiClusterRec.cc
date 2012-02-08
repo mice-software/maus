@@ -77,7 +77,6 @@ void SciFiClusterRec::process(SciFiEvent &evt, std::vector<const MiceModule*> mo
 void SciFiClusterRec::construct(SciFiCluster *clust, std::vector<const MiceModule*> modules) {
   Hep3Vector perp(-1., 0., 0.);
   Hep3Vector dir(0, 1, 0);
-
   const MiceModule* this_plane = NULL;
   for ( unsigned int j = 0; !this_plane && j < modules.size(); j++ ) {
     // Find the right module

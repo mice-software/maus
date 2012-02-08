@@ -57,7 +57,7 @@ std::string MapCppTrackerRecon::process(std::string document) {
   Json::FastWriter writer;
   SciFiSpill spill;
   spill.events_in_spill.clear();
-//  std::cout << "new spill" << std::endl;
+
   try {
     root = JsonWrapper::StringToJson(document);
     digitization(spill, root);
@@ -82,9 +82,9 @@ std::string MapCppTrackerRecon::process(std::string document) {
         spacepoint_recon(event);
       }
       // Pattern Recognition.
-      if ( event.scifispacepoints.size() ) {
-        pattern_recognition(event);
-      }
+      // if ( event.scifispacepoints.size() ) {
+      //  pattern_recognition(event);
+      // }
       print_event_info(event);
 
       save_to_json(event);
@@ -129,7 +129,7 @@ void MapCppTrackerRecon::fill_digits_vector(Json::Value &digits_event, SciFiSpil
       station = digit["station"].asInt();
       plane   = digit["plane"].asInt();
       channel = digit["channel"].asInt();
-      npe     = digit["npe"].asInt();
+      npe     = digit["npe"].asDouble();
       time    = digit["time"].asInt();
       SciFiDigit* a_digit = new SciFiDigit(tracker, station, plane, channel, npe, time);
       an_event.scifidigits.push_back(a_digit);
@@ -231,7 +231,7 @@ void MapCppTrackerRecon::print_event_info(SciFiEvent &event) {
 	      << event.scifistraightprtracks.size() << " " << std::endl;
 }
 
-// the following two functions are added for testing purposes only
+// The following two functions are added for testing purposes only
 Json::Value MapCppTrackerRecon::ConvertToJson(std::string jsonString) {
   Json::Value newJson;
   // JsonCpp string -> JSON::Value converter

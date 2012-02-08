@@ -2,7 +2,7 @@ import os
 
 type_of_dataflow = 'pipeline_single_thread'
 
-output_json_file_name = "simulation.out"
+output_json_file_name = "simulation_stage4"
 output_json_file_type = "text"
 
 
@@ -14,7 +14,7 @@ output_json_file_type = "text"
 # 4 = fatal
 # >4 = silent
 # Doesnt effect python
-verbose_level = 0
+verbose_level = 4
 errors_to_stderr = None # None = from verbose_level; else True or False
 errors_to_json = True
 on_error = 'none' # none, halt or raise
@@ -27,9 +27,9 @@ keep_tracks = False # set to true to keep start and end point of every track
 keep_steps = False # set to true to keep start and end point of every track and
                    # every step point
 simulation_geometry_filename = "Stage4.dat" # geometry used by simulation
-maximum_number_of_steps = 1000
+maximum_number_of_steps = 10000
 simulation_reference_particle = {
-    "position":{"x":0.0, "y":-0.0, "z":-5500.0},
+    "position":{"x":0.0, "y":-0.0, "z":-5700.0},
     "momentum":{"x":0.0, "y":0.0, "z":1.0},
     "particle_id":-13, "energy":226.0, "time":0.0, "random_seed":10
 }
@@ -37,7 +37,7 @@ simulation_reference_particle = {
 physics_model = "QGSP_BERT" # Physics package loaded by MAUS to set default values; modifications can be made
 reference_physics_processes = "mean_energy_loss" # controls the physics processes of the reference particle. Set to "none" to disable all physics processes; or "mean_energy_loss" to make the reference particle see deterministic energy loss only
 physics_processes = "standard" # controls the physics processes of normal particles. Set to "none" to disable all physics processes; "mean_energy_loss" to enable deterministic energy loss only; or "standard" to enable all physics processes
-particle_decay = True # set to true to activate particle decay, or False to inactivate particle decay
+particle_decay = False # set to true to activate particle decay, or False to inactivate particle decay
 charged_pion_half_life = -1. # set the pi+, pi- half life [ns]. Negative value means use geant4 default
 muon_half_life = -1. # set the mu+, mu- half life [ns]. Negative value means use geant4 default
 production_threshold = 0.5 # set the threshold for delta ray production [mm]

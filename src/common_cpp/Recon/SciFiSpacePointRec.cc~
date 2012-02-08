@@ -44,6 +44,7 @@ void SciFiSpacePointRec::process(SciFiEvent &evt) {
       int numb_clusters_in_v = clusters[Tracker][Station][0].size();
       int numb_clusters_in_w = clusters[Tracker][Station][1].size();
       int numb_clusters_in_u = clusters[Tracker][Station][2].size();
+      // std::cout << numb_clusters_in_v << " " << numb_clusters_in_v << " " << numb_clusters_in_v << std::endl;
       for ( int cla = 0; cla < numb_clusters_in_v; cla++ ) {
         SciFiCluster* candidate_A = (clusters[Tracker][Station][0])[cla];
 
@@ -127,8 +128,8 @@ bool SciFiSpacePointRec::kuno_accepts(SciFiCluster* cluster1,
                   cluster2->get_channel() +
                   cluster3->get_channel();
 
-  if ( (tracker == 0 && station == 5 && (uvwSum < (kuno_0_5+3))
-                                     && (uvwSum > (kuno_0_5-3))) ||
+  if ( (tracker == 0 && station == 5 && (uvwSum < (kuno_0_5+kuno_toler))
+                                     && (uvwSum > (kuno_0_5-kuno_toler))) ||
      (!(tracker == 0 && station == 5)&& (uvwSum < (kuno_else+kuno_toler))
                                      && (uvwSum > (kuno_else-kuno_toler))) ) {
     return true;

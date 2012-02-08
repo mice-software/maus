@@ -242,15 +242,16 @@ int MapCppTrackerMCDigitization::compute_chan_no(SciFiHit *ahit) {
 
   int numberFibres = 7*2*(this_plane->propertyDouble("CentralFibre")+0.5);
   int fiberNumber = ahit->get_fibre();
-  int _chanNo;
+  int chanNo;
 
   if ( tracker == 0 ) {
     // start counting from the other end
-    _chanNo = floor((numberFibres-fiberNumber)/7.0);
+    chanNo = floor((numberFibres-fiberNumber)/7.0);
   } else {
-       _chanNo = floor(fiberNumber/7.0);
+    chanNo = floor(fiberNumber/7.0);
   }
-  return _chanNo;
+
+  return chanNo;
 }
 
 double MapCppTrackerMCDigitization::compute_npe(double edep) {

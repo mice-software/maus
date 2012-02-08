@@ -61,14 +61,10 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
 
   Json::Value channel_id;
   channel_id["type"]           = "Tracker";
-  channel_id["fiber_number"]   = fiberNumber;
+  channel_id["fibre_number"]   = fiberNumber;
   channel_id["tracker_number"] = _module->propertyInt("Tracker");
   channel_id["station_number"] = _module->propertyInt("Station");
   channel_id["plane_number"]   = _module->propertyInt("Plane");
-
-  std::cout << _module->propertyInt("Tracker") << " " <<
-               _module->propertyInt("Station") << " " <<
-               _module->propertyInt("Plane") << std::endl;
 
   _hits[hit_i]["channel_id"] = channel_id;
   _hits[hit_i]["track_id"]   = aStep->GetTrack()->GetTrackID();
