@@ -197,9 +197,9 @@ void PatternRecognition::make_spr_5pt(const std::vector<SciFiSpacePoint*>& spnts
         // std::cout << "Track parameters y: c = " << c_y << ", m = ";
         // std::cout << m_y << ", chisq = " << chisq_y << std::endl;
         // std::cout << "sp\tx\ty\tz" << std::endl;
-        for ( int i = 0; i < _n_stations; ++i ) {
-          std::cout << i << "\t" << x[i] << "\t" << y[i] << "\t" << z[i] << std::endl;
-        }
+        // for ( int i = 0; i < _n_stations; ++i ) {
+          // std::cout << i << "\t" << x[i] << "\t" << y[i] << "\t" << z[i] << std::endl;
+        // }
 
         double chisq = chisq_x + chisq_y;
         if ( chisq / ( _n_stations - 2 ) < _chisq_cut ) {
@@ -218,6 +218,9 @@ void PatternRecognition::make_spr_5pt(const std::vector<SciFiSpacePoint*>& spnts
           track.set_spacepoints(good_spacepoints);
           trks.push_back(track);
           success = true;
+          std::ofstream file("angle.txt", std::ios::out|std::ios::app);
+          file << m_x << " " << m_y  << " " << good_spnts[2]->get_tracker()+1 << "\n";
+          file.close();
         } else {
           // std:: cout << "chisq test failed, track rejected" << std::endl;
         }
@@ -226,9 +229,9 @@ void PatternRecognition::make_spr_5pt(const std::vector<SciFiSpacePoint*>& spnts
       }
     }
   }
-  /* if ( success ) {
-    // run_analysis(trks);
-  } */
+  if ( success ) {
+    run_analysis(trks);
+  }
 }
 
 void PatternRecognition::run_analysis(std::vector<SciFiStraightPRTrack>& trks) {
