@@ -32,13 +32,9 @@
 #include <CLHEP/Units/PhysicalConstants.h>
 
 // C++ headers
-#include <cmath>
-#include <iostream>
 #include <string>
-#include <sstream>
 #include <vector>
 
-#include "Config/MiceModule.hh"
 #include "src/common_cpp/Recon/SciFiCluster.hh"
 
 class SciFiSpacePoint {
@@ -51,32 +47,53 @@ class SciFiSpacePoint {
 
   ~SciFiSpacePoint();
 
-  void make_duplet(SciFiCluster* clusterA, SciFiCluster* clusterB);
-
-  void make_triplet(SciFiCluster* clusterA, SciFiCluster* clusterB, SciFiCluster* clusterC);
-
-  Hep3Vector crossing_pos(SciFiCluster* c1, SciFiCluster* c2);
+  void set_tracker(double tracker) { _tracker = tracker; }
 
   int get_tracker() const { return _tracker; }
 
+  void set_station(double station) { _station = station; }
+
   int get_station() const { return _station; }
 
-  int get_npe()     const { return _npe; }
+  void set_npe(double nPE) { _npe = nPE; }
 
-  int get_time()    const { return _time; }
+  double get_npe()     const { return _npe; }
+
+  // void set_time(double time) { _time = time; }
+
+  // double get_time()    const { return _time; }
+
+  void set_type(std::string type) { _type = type; }
 
   std::string get_type()  const { return _type; }
 
+  void set_position(Hep3Vector position) { _position = position; }
+
   Hep3Vector get_position() const { return _position; }
+
+  void set_chi2(double chi2) { _chi2 = chi2; }
+
+  double get_chi2()    const { return _chi2; }
+
+  // void set_used() { _used = true; }
+
+  // bool is_used() const { return _used; }
+
+  void set_channels(std::vector<SciFiCluster*> channels) { _channels = channels; }
 
   std::vector<SciFiCluster*> get_channels()  const { return _channels; }
 
  private:
-  int _tracker, _station, _npe;
+  int _tracker, _station;
+
+  double _npe;
 
   Hep3Vector _position;
 
-  int _chi2, _time, _time_error, _time_res;
+  int _chi2;
+
+  // bool _used;
+  // int _time, _time_error, _time_res;
 
   std::string _type;
 

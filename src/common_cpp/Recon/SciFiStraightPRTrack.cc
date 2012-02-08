@@ -24,6 +24,7 @@ SciFiStraightPRTrack::SciFiStraightPRTrack() {
   _y0 = -1.0;
   _mx = -1.0;
   _my = -1.0;
+  _tracker = -1;
 
   _vsl.resize(4);
   for ( int i = 0; i < static_cast<int>(_vsl.size()); ++i ) {

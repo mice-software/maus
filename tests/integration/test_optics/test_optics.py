@@ -6,6 +6,7 @@ transverse beta functions.
 import os
 import unittest
 import xboa.Common as Common
+import subprocess
 
 TEST_NAMES = ['mapping', 'optimiser'] #, 'rf', '6d', 'polyfit']
 TARGET_BETA = {'mapping':0.655994338, 'optimiser':0.652749967}
@@ -17,7 +18,9 @@ def run_optics(test):
     os.chdir(os.getenv('MAUS_ROOT_DIR')+'/tests/integration/test_optics')
     run_command = './optics files/cards.'+test+' >& log.'+test
     print run_command
-    os.system(run_command)
+    proc = subprocess.Popen(['./optics', 'files/cards.mapping'])
+    proc.wait()
+    print proc.returncode
 
 def get_data(test):
     """

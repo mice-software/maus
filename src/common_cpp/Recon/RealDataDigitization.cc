@@ -15,9 +15,13 @@
  *
  */
 
-#include "src/map/MapCppTrackerRecon/RealDataDigitization.hh"
+#include "src/common_cpp/Recon/RealDataDigitization.hh"
 
-RealDataDigitization::RealDataDigitization(TrackerSpill &spill, Json::Value daq) {
+RealDataDigitization::RealDataDigitization() {}
+
+RealDataDigitization::~RealDataDigitization() {}
+
+void RealDataDigitization::process(SciFiSpill &spill, Json::Value const &daq) {
   // -------------------------------------------------
   // Load calibration, mapping and bad channel list.
   bool calib = load_calibration("scifi_calibration_30_09_2011.txt");
@@ -29,32 +33,11 @@ RealDataDigitization::RealDataDigitization(TrackerSpill &spill, Json::Value daq)
   // -------------------------------------------------
 
   // Pick up JSON daq event.
-  Json::Value tracker_event;
-  if ( !daq.isMember("tracker1") || !daq.isMember("tracker2") ) {
-    // Json::Value errors;
-    std::cout << "Missing a tracker." << std::endl;
-    // std::cout << "Couldn't find one of the trackers." << std::endl;
-    // std::stringstream ss;
-    // ss << _classname << " says:" << "A tracker is missing.";
-    // errors["missing_branch"] = ss.str();
-    // root["errors"] = errors;
-    // return writer.write(root);
-  }
-  tracker_event = daq["tracker1"];
-
-  // assert(daq["tracker1"].size() == daq["tracker2"].size());
-  if ( daq["tracker1"].size() != daq["tracker2"].size() )
-    std::cout << "Different sizes for Tracker1 and Tracker2." << std::endl;
-  // A DATE feature... event counting starts at 1.
-  assert(daq["tracker1"][(Json::Value::ArrayIndex)0].isNull());
-  assert(daq["tracker2"][(Json::Value::ArrayIndex)0].isNull());
+  Json::Value tracker_event = daq["tracker1"];
 
   for ( unsigned int i = 1; i < tracker_event.size(); ++i ) {
-    TrackerEvent event;
-    if ( daq["tracker2"][i].isNull() )
-      std::cout << "Empty event in tracker 1." << std::endl;
-    if ( daq["tracker2"][i].isNull() )
-      std::cout << "Empty event in tracker 2." << std::endl;
+    SciFiEvent event;
+
     Json::Value input_event = tracker_event[i]["VLSB_C"];
     // Merge tracker events.
     for ( unsigned int idig = 0; idig < daq["tracker2"][i]["VLSB_C"].size(); ++idig ) {
@@ -73,16 +56,17 @@ RealDataDigitization::RealDataDigitization(TrackerSpill &spill, Json::Value daq)
       assert(channel_in.isMember("tdc"));
       // assert(channel_in.isMember("discr"));
 
-      int spill = channel_in["phys_event_number"].asInt();
-      int eventNo = channel_in["part_event_number"].asInt();
+      // int spill = channel_in["phys_event_number"].asInt();
+      // int eventNo = channel_in["part_event_number"].asInt();
       int board = channel_in["geo"].asInt()-1;
       int bank = channel_in["bank"].asInt();
       int channel_ro = channel_in["channel"].asInt();
       int adc = channel_in["adc"].asInt();
       int tdc = channel_in["tdc"].asInt();
 
-      if ( !is_good_channel(bank, board, channel_ro) )
+      if ( !is_good_channel(bank, board, channel_ro) ) {
         continue;
+      }
 
       // Get pedestal and gain from calibration.
       assert(_calibration[board][bank][channel_ro].isMember("pedestal"));
@@ -97,18 +81,14 @@ RealDataDigitization::RealDataDigitization(TrackerSpill &spill, Json::Value daq)
       } else {
         pe = -10.0;
       }
-      int unique_chan  = _calibration[board][bank][channel_ro]["unique_chan"].asDouble();
+      // int unique_chan  = _calibration[board][bank][channel_ro]["unique_chan"].asDouble();
 
       // Find tracker, station, plane, channel.
       int tracker, station, plane, channel;
       get_StatPlaneChannel(board, bank, channel_ro, tracker, station, plane, channel);
 
       // Exclude missing modules.
-      if ( pe > 2.0 && tracker != -1 ) {
-        assert(tracker == 0 || tracker == 1);
-        assert(station > 0 && station < 6);
-        assert(plane == 0 || plane == 1 || plane == 2);
-        assert(channel < 218);
+      if ( pe > 1.0 && tracker != -1 ) {
         SciFiDigit *digit = new SciFiDigit(tracker, station, plane, channel, pe, tdc);
         event.scifidigits.push_back(digit);
       }
@@ -143,7 +123,7 @@ bool RealDataDigitization::load_calibration(std::string file) {
   return true;
 }
 
-void RealDataDigitization::read_in_all_Boards(std::ifstream& inf) {
+void RealDataDigitization::read_in_all_Boards(std::ifstream &inf) {
   std::string line;
 
   // run over all boards
@@ -159,9 +139,9 @@ void RealDataDigitization::read_in_all_Boards(std::ifstream& inf) {
         std::istringstream ist1(line.c_str());
         ist1 >> unique_chan_no >> board >> bank >> chan >> p >> g;
 
-        assert(board == i);
-        assert(bank  == j);
-        assert(chan  == k);
+        // assert(board == i);
+        // assert(bank  == j);
+        // assert(chan  == k);
 
         temp = unique_chan_no;
 
@@ -234,7 +214,7 @@ void RealDataDigitization::
   // assert(found);
 }
 
-bool RealDataDigitization::is_good_channel(int board, int bank, int chan_ro) {
+bool RealDataDigitization::is_good_channel(const int board, const int bank, const int chan_ro) {
   return good_chan[board][bank][chan_ro];
 }
 

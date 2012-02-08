@@ -15,18 +15,19 @@
  *
  */
 
-/** @class TrackerEvent
+/** @class SciFiEvent
  *  D...
  *
  */
 
-#ifndef TRACKEREVENT_HH
-#define TRACKEREVENT_HH
+#ifndef SCIFIEVENT_HH
+#define SCIFIEVENT_HH
 // C headers
 
 // C++ headers
 #include <vector>
 #include <string>
+#include <iterator>
 
 #include "src/common_cpp/Recon/SciFiHit.hh"
 #include "src/common_cpp/Recon/SciFiDigit.hh"
@@ -34,23 +35,27 @@
 #include "src/common_cpp/Recon/SciFiSpacePoint.hh"
 #include "src/common_cpp/Recon/SciFiStraightPRTrack.hh"
 
-class TrackerEvent {
+class SciFiEvent {
  public:
-  TrackerEvent();
-  ~TrackerEvent();
+  SciFiEvent();
 
-  // std::string get_geometry_filename() const { return _filename; }
+  ~SciFiEvent();
 
-  // void set_geometry_filename(std::string file) { _filename = file; }
+  // std::vector hits() const { return scifihits; }
 
+  // std::vector digits() const { return scifidigits; }
+
+  // std::vector clusters() const { return scificlusters; }
+
+  // std::vector spacepoints() const { return scifispacepoints; }
+
+// private:
   std::vector<SciFiHit*>   scifihits;
   std::vector<SciFiDigit*>   scifidigits;
   std::vector<SciFiCluster*> scificlusters;
   std::vector<SciFiSpacePoint*> scifispacepoints;
+  std::vector<SciFiSpacePoint*> scifiseeds;
   std::vector<SciFiStraightPRTrack> scifistraightprtracks;
-
-  // private:
-  // std::string _filename;
 };  // Don't forget this trailing colon!!!!
 
 #endif

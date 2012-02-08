@@ -40,7 +40,7 @@
 
 class SciFiHit {
  public:
-  // SciFiHit(); // Default constructor
+  SciFiHit(); // Default constructor
 
   SciFiHit(int tracker, int station, int plane, int fibre, double edep, double time );
 
@@ -70,17 +70,17 @@ class SciFiHit {
 
   int get_fibre() const { return _fibre; }
 
-  void set_edep(int edep) { _edep = edep; }
+  void set_edep(double edep) { _edep = edep; }
 
   double get_edep()     const { return _edep;     }
 
-  void set_time(int time) { _time = time; }
+  void set_time(double time) { _time = time; }
 
   double get_time()    const { return _time;    }
 
-  void setUsed()   { _isUsed = true; }
+  void set_used()   { _used = true; }
 
-  bool isUsed()     const { return _isUsed; }
+  bool is_used()     const { return _used; }
 
  private:
 
@@ -90,7 +90,7 @@ class SciFiHit {
 
   double _edep, _time;
 
-  bool _isUsed;
+  bool _used;
 };  // Don't forget this trailing colon!!!!
 
 #endif

@@ -77,7 +77,7 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
     // if bad, write error file
 //    return writer.write(root);
 //  }
-  TrackerSpill spill;
+  SciFiSpill spill;
   spill.events_in_spill.clear();
 
   // ==========================================================
@@ -91,17 +91,17 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
     json_to_cpp(json_event, spill);
   } // ends loop particles
 
-  std::cout << "Digitization: Events in Spill: " << spill.events_in_spill.size() << std::endl;
+  // std::cout << "Digitization: Events in Spill: " << spill.events_in_spill.size() << std::endl;
   // ================= Reconstruction =========================
   for ( int k = 0; k < spill.events_in_spill.size(); k++ ) {
-    TrackerEvent event = spill.events_in_spill[k];
+    SciFiEvent event = spill.events_in_spill[k];
 
-    std::cout << "Hits in event: " << event.scifihits.size() << std::endl;
+    // std::cout << "Hits in event: " << event.scifihits.size() << std::endl;
     if ( event.scifihits.size() ) {
       // for each fiber-hit, make a digit
       construct_digits(event);
     }
-    std::cout << "Digits in Event: " << event.scifidigits.size() << " " << std::endl;
+    // std::cout << "Digits in Event: " << event.scifidigits.size() << " " << std::endl;
 
     save_to_json(event);
   }
@@ -111,8 +111,8 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
 }
 
 void MapCppTrackerMCDigitization::
-     json_to_cpp(Json::Value js_event, TrackerSpill &spill) {
-  TrackerEvent event;
+     json_to_cpp(Json::Value js_event, SciFiSpill &spill) {
+  SciFiEvent event;
   Json::Value _hits = js_event["hits"];
   // std::cout << "Number of hits fed in: " << _hits.size() << std::endl;
   for ( int j = 0; j < _hits.size(); j++ ) {
@@ -156,10 +156,10 @@ bool MapCppTrackerMCDigitization::check_sanity_mc(Json::Value mc) {
 }
 
 
-void MapCppTrackerMCDigitization::construct_digits(TrackerEvent &evt) {
+void MapCppTrackerMCDigitization::construct_digits(SciFiEvent &evt) {
   int number_of_hits = evt.scifihits.size();
   for ( unsigned int hit_i = 0; hit_i < number_of_hits; hit_i++ ) {
-    if ( !evt.scifihits[hit_i]->isUsed() ) {
+    if ( !evt.scifihits[hit_i]->is_used() ) {
       SciFiHit *a_hit = evt.scifihits[hit_i];
 
       // Get nPE from this hit.
@@ -181,9 +181,10 @@ void MapCppTrackerMCDigitization::construct_digits(TrackerEvent &evt) {
       // loop over all the other hits
       for ( unsigned int hit_j = hit_i; hit_j < number_of_hits; hit_j++ ) {
         if ( check_param(evt.scifihits[hit_i], evt.scifihits[hit_j]) ) {
-          double edep_j = a_hit->get_edep();
+          SciFiHit *same_digit = evt.scifihits[hit_j];
+          double edep_j = same_digit->get_edep();
           nPE  += compute_npe(edep_j);
-          evt.scifihits[hit_j]->setUsed();
+          same_digit->set_used();
         } // if-statement
       } // ends l-loop over all the array
       int tracker = a_hit->get_tracker();
@@ -300,7 +301,7 @@ int MapCppTrackerMCDigitization::compute_adc_counts(double numb_pe) {
 }
 
 bool MapCppTrackerMCDigitization::check_param(SciFiHit *hit1, SciFiHit *hit2) {
-  if ( hit2->isUsed() ) {
+  if ( hit2->is_used() ) {
     return false;
   } else {
     // two hits passed to the check_param function
@@ -323,7 +324,7 @@ bool MapCppTrackerMCDigitization::check_param(SciFiHit *hit1, SciFiHit *hit2) {
   }
 }
 
-void MapCppTrackerMCDigitization::save_to_json(TrackerEvent &evt) {
+void MapCppTrackerMCDigitization::save_to_json(SciFiEvent &evt) {
   Json::Value js_event;
   Json::Value digits_in_event;
   for ( unsigned int evt_i = 0; evt_i < evt.scifidigits.size(); evt_i++ ) {

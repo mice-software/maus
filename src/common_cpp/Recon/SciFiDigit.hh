@@ -39,19 +39,19 @@
 
 class SciFiDigit {
  public:
-  // SciFiDigit(); // Default constructor
+  SciFiDigit(); // Default constructor
 
   SciFiDigit(int tracker, int station, int plane, int channel, double npe, double time );
 
   ~SciFiDigit();
 
-  void set_spill(int spillNo) { _spill = spillNo; }
+//  void set_spill(int spillNo) { _spill = spillNo; }
 
-  int get_spill()   const { return _spill;   }
+//  int get_spill()   const { return _spill;   }
 
-  void set_eventNo(int eventNo) { _eventNo = eventNo; }
+//  void set_eventNo(int eventNo) { _eventNo = eventNo; }
 
-  int get_eventNo() const { return _eventNo; }
+//  int get_eventNo() const { return _eventNo; }
 
   void set_tracker(int trackerNo) { _tracker = trackerNo; }
 
@@ -69,27 +69,27 @@ class SciFiDigit {
 
   int get_channel() const { return _channel; }
 
-  void set_npe(int npe) { _npe = npe; }
+  void set_npe(double npe) { _npe = npe; }
 
   double get_npe()     const { return _npe;     }
 
-  void set_time(int time) { _time = time; }
+  void set_time(double time) { _time = time; }
 
   double get_time()    const { return _time;    }
 
-  void setUsed()   { _isUsed = true; }
+  void set_used()   { _used = true; }
 
-  bool isUsed()     const { return _isUsed; }
+  bool is_used()     const { return _used; }
 
  private:
 
-  int _spill, _eventNo, _plane;
+  // int _spill, _eventNo;
 
-  int _tracker, _station, _channel;
+  int _tracker, _station, _plane, _channel;
 
   double _npe, _time;
 
-  bool _isUsed;
+  bool _used;
 };  // Don't forget this trailing colon!!!!
 
 #endif

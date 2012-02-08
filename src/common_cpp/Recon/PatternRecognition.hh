@@ -29,7 +29,7 @@
 #include <vector>
 #include <string>
 
-#include "src/common_cpp/Recon/TrackerEvent.hh"
+#include "src/common_cpp/Recon/SciFiEvent.hh"
 #include "src/common_cpp/Recon/SciFiHit.hh"
 #include "src/common_cpp/Recon/SciFiDigit.hh"
 #include "src/common_cpp/Recon/SciFiCluster.hh"
@@ -43,7 +43,7 @@ class PatternRecognition {
 
     ~PatternRecognition();
 
-    void process(TrackerEvent &evt);
+    void process(SciFiEvent &evt);
 
   private:
 
@@ -55,7 +55,7 @@ class PatternRecognition {
    *
    *  @param evt - The SciFi event
    */
-  void straightprtrack_recon(TrackerEvent &evt);
+  void straightprtrack_recon(SciFiEvent &evt);
 
   /** @brief Make a straight Pattern Recognition track with 5 spacepoints
    *
@@ -78,10 +78,14 @@ class PatternRecognition {
   void sort_by_station(const std::vector<SciFiSpacePoint*>& spnts,
                        std::vector< std::vector<SciFiSpacePoint*> >& spnts_stat);
 
+
+  void run_analysis(std::vector<SciFiStraightPRTrack>& trks);
+  void a_4_station_fit(std::vector<SciFiSpacePoint> space_points, Hep3Vector position, int st_i);
+
   static const int _n_trackers = 2;
   static const int _n_stations = 5;
   static const double _res_cut = 15.0;
-  static const double _chisq_cut = 10;
+  static const double _chisq_cut = 15.0;
 };
 
 #endif

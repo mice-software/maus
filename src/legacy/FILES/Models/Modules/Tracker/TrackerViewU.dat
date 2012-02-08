@@ -9,7 +9,7 @@ Module TrackerViewU
   Dimensions 18.9 0.06273 cm
   PropertyString Material POLYSTYRENE
   PropertyString SensitiveDetector SciFi
-  PropertyInt Plane 1
+  PropertyInt Plane 0
   PropertyDouble ActiveRadius 158.5 mm
   PropertyDouble Pitch 0.427 mm
   PropertyDouble FibreDiameter 0.350 mm

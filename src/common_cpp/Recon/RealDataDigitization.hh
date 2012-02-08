@@ -48,33 +48,42 @@
 #include "Config/MiceModule.hh"
 
 #include "src/common_cpp/Recon/SciFiDigit.hh"
-#include "src/common_cpp/Recon/TrackerEvent.hh"
-#include "src/common_cpp/Recon/TrackerSpill.hh"
+#include "src/common_cpp/Recon/SciFiEvent.hh"
+#include "src/common_cpp/Recon/SciFiSpill.hh"
 
 
 class RealDataDigitization {
  public:
-  RealDataDigitization(TrackerSpill &spill, Json::Value input_event);
+  RealDataDigitization();
+
+  ~RealDataDigitization();
+
+  void process(SciFiSpill &spill, Json::Value const &input_event);
 
   bool load_calibration(std::string filename);
 
-  void read_in_all_Boards(std::ifstream& inf);
+  void read_in_all_Boards(std::ifstream &inf);
 
   bool load_mapping(std::string file);
 
-  void get_StatPlaneChannel(int& , int& , int& , int& , int& , int&, int&);
+  void get_StatPlaneChannel(int &board, int &bank, int &chan_ro,
+                            int &tracker, int &station, int &plane, int &channel);
 
   bool load_bad_channels();
-  bool is_good_channel(int, int, int);
+
+  bool is_good_channel(int board, int bank, int chan_ro);
+
+  // std::vector<Json::Value> get_calibration() const { return _calibration[16][4]; }
 
  private:
   std::vector<Json::Value> _calibration[16][4];
+
   bool good_chan[16][4][128];
 
   int temp;
 
-//  std::vector<int> _cryo;
-//  std::vector<int> _cass;
+  // std::vector<int> _cryo;
+  // std::vector<int> _cass;
   std::vector<int> _board;
   std::vector<int> _bank;
   std::vector<int> _chan_ro;

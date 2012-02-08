@@ -14,11 +14,11 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#include "src/common_cpp/Recon/TrackerEvent.hh"
+#include "src/common_cpp/Recon/SciFiSpill.hh"
 
 
-TrackerEvent::TrackerEvent() {
+SciFiSpill::SciFiSpill() {
   // scifidigits.clear();
 }
 
-TrackerEvent::~TrackerEvent() {}
+SciFiSpill::~SciFiSpill() {}

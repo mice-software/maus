@@ -43,48 +43,59 @@
 
 #include "src/legacy/Config/MiceModule.hh"
 #include "src/common_cpp/Recon/SciFiDigit.hh"
-// #include "src/map/MapCppTrackerRecon/TrackerEvent.hh"
 
 class SciFiCluster {
  public:
-  // SciFiDigit(); // Default constructor
+  SciFiCluster(); // Default constructor
 
   explicit SciFiCluster(SciFiDigit *digit);
 
   ~SciFiCluster();
 
-  void addDigit(SciFiDigit neigh);
+  void add_digit(SciFiDigit* neigh);
+
+  void set_tracker(int trackerNo) { _tracker = trackerNo; }
 
   int get_tracker() const { return _tracker; }
 
+  void set_station(int stationNo) { _station = stationNo; }
+
   int get_station() const { return _station; }
+
+  void set_plane(int planeNo) { _plane = planeNo; }
 
   int get_plane()  const  { return _plane;   }
 
+  void set_npe(double nPE) { _npe = nPE; }
+
   double get_npe()     const { return _npe; }
 
-  int get_time()    const { return _time; }
+  void set_time(double atime) { _time = atime; }
+
+  double get_time()    const { return _time; }
+
+  void set_channel(double channelNo_w) { _channel_w = channelNo_w; }
 
   double get_channel()  const { return _channel_w; }
 
-  bool isUsed() const { return _used; }
+  void set_used() { _used = true; }
 
-  void setUsed() { _used = true; }
+  bool is_used() const { return _used; }
 
-  void addDigit(SciFiDigit* neigh);
+  void set_direction(Hep3Vector direction) { _direction = direction; }
 
   Hep3Vector get_direction() const { return _direction; }
 
-  Hep3Vector get_position() const { return _position; }
+  void set_position(Hep3Vector position) { _position = position; }
 
-  void construct(std::vector<const MiceModule*> modules, SciFiDigit* digit);
+  Hep3Vector get_position() const { return _position; }
 
  private:
   int _tracker, _station, _plane;
 
   double _npe, _channel_w;
 
-  int _time;
+  double _time;
 
   SciFiDigit* seed;
 

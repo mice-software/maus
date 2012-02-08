@@ -14,32 +14,31 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
-/** @class TrackerEvent
- *  D...
- *
- */
-
-#ifndef TRACKERSPILL_HH
-#define TRACKERSPILL_HH
-// C headers
-
-// C++ headers
-#include <vector>
-// #include <string>
-
-// others
-#include "src/common_cpp/Recon/TrackerEvent.hh"
+#include "src/common_cpp/Recon/SciFiEvent.hh"
 
 
-class TrackerSpill {
- public:
-  TrackerSpill();
-  ~TrackerSpill();
+SciFiEvent::SciFiEvent() {
+  // scifidigits.clear();
+}
 
-  std::vector<TrackerEvent>   events_in_spill;
+SciFiEvent::~SciFiEvent() {
+/*
+  std::vector<SciFiHit*>::iterator hit;
+  for (hit=scifihits.begin(); hit!=scifihits.end(); ++hit) {
+    delete (*hit);
+  }
+  //scifihits.clear();
 
-  // private:
-};  // Don't forget this trailing colon!!!!
+  std::vector<SciFiDigit*>::iterator digit;
+  for (digit=scifidigits.begin(); digit!=scifidigits.end(); ++digit) {
+    delete (*digit);
+  }
+  //scifidigits.clear();
 
-#endif
+  std::vector<SciFiSpacePoint*>::iterator spacepoint;
+  for (spacepoint=scifispacepoints.begin(); spacepoint!=scifispacepoints.end(); ++spacepoint) {
+    delete (*spacepoint);
+  }
+  //scifispacepoints.clear();
+*/
+}
