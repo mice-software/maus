@@ -46,8 +46,9 @@ bool ReduceCppTracker::birth(std::string argJsonConfigDocument) {
   _spacepoints.Branch("type", &_type, "type/I");
 
   _events.SetNameTitle("events", "events");
-  _events.Branch("station_hits", &_station_hits, "station_hits/I");
+  // _events.Branch("station_hits", &_station_hits, "station_hits/I");
   _events.Branch("tracker", &_tracker_event, "tracker/I");
+  _events.Branch("n_sp", &_number_spacepoints, "n_sp/I");
 
   c1->SetFillColor(21);
   c1->GetFrame()->SetFillColor(42);
@@ -114,6 +115,13 @@ std::string  ReduceCppTracker::process(std::string document) {
         int n_sp_tracker1 = xPartEventTracker1_SP.size();
         int n_sp_tracker2 = xPartEventTracker2_SP.size();
 
+        _tracker_event = 1;
+        _number_spacepoints = n_sp_tracker1;
+        _events.Fill();
+        _tracker_event = 2;
+        _number_spacepoints = n_sp_tracker2;
+        _events.Fill();
+
         bool station_hit[2][6] = { {false, false, false, false, false, false},
                                    {false, false, false, false, false, false}};
 
@@ -158,7 +166,7 @@ std::string  ReduceCppTracker::process(std::string document) {
         }
 
         // Fill EVENT tree.
-        for ( int tr = 0; tr < 2; tr++ ) {
+        /* for ( int tr = 0; tr < 2; tr++ ) {
           int hit_counter = 0;
           if ( station_hit[tr][1] && station_hit[tr][5] ) {
             for ( int i = 2; i < 5; i++ ) {
@@ -169,7 +177,7 @@ std::string  ReduceCppTracker::process(std::string document) {
             _tracker_event = tr+1;
             _events.Fill();
           }
-        }
+        } */
       } // ends loop over particle events
     }
   } catch(Squeal squee) {
@@ -182,7 +190,7 @@ std::string  ReduceCppTracker::process(std::string document) {
 
   _nSpills++;
   // Display light yield.
-  if (!(_nSpills%25)) {
+  if (!(_nSpills%2)) {
     c1->cd(1);
     _digits.Draw("npe", "tracker==1");
     c1->cd(2);
@@ -193,7 +201,7 @@ std::string  ReduceCppTracker::process(std::string document) {
   }
   // Display spacepoints type.
   // display_spacepoints();
-  if (!(_nSpills%25)) {
+  if (!(_nSpills%2)) {
     c2->cd(1);
     _spacepoints.Draw("type", "tracker==1 && station==1 ");
     c2->Update();
@@ -229,11 +237,11 @@ std::string  ReduceCppTracker::process(std::string document) {
 
   // Display efficiency.
   // display_efficiency();
-  if (!(_nSpills%25)) {
+  if (!(_nSpills%2)) {
     c3->cd(1);
-    _events.Draw("station_hits", "tracker==1");
+    _events.Draw("n_sp", "tracker==1");
     c3->cd(2);
-    _events.Draw("station_hits", "tracker==2");
+    _events.Draw("n_sp", "tracker==2");
   }
   return document;
 }
