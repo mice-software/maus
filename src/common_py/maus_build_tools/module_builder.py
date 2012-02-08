@@ -64,6 +64,7 @@ class ModuleBuilder:
         Buildit is called by SConscript files to request that we build a module.
         @param localenv the local environment set up in the sconscript file
         @param project the name of the project (string)
+        @param dependencies list of projects on which this project depends
         @return True on success
         """
         if dependencies == None:
