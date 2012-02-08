@@ -17,11 +17,11 @@ def run_optics(test):
     Runs optics application and produces some output
     """
     os.chdir(os.getenv('MAUS_ROOT_DIR')+'/tests/integration/test_optics')
-    print 'Running optics test',test,
+    print 'Running optics test', test,
     proc = subprocess.Popen(['./optics', 'files/cards.'+test], \
 																						stdout = open('log.'+test, 'w'))
     proc.wait()
-    print 'with return code',proc.returncode
+    print 'with return code', proc.returncode
 
 def get_data(test):
     """
