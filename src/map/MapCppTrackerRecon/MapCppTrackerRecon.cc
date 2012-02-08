@@ -57,7 +57,7 @@ std::string MapCppTrackerRecon::process(std::string document) {
   Json::FastWriter writer;
   SciFiSpill spill;
   spill.events_in_spill.clear();
-  std::cout << "new spill" << std::endl;
+//  std::cout << "new spill" << std::endl;
   try {
     root = JsonWrapper::StringToJson(document);
     digitization(spill, root);

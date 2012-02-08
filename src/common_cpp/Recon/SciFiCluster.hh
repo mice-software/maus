@@ -52,8 +52,11 @@ class SciFiCluster {
 
   ~SciFiCluster();
 
+  /** @brief Performs the cluster merging.
+  */
   void add_digit(SciFiDigit* neigh);
 
+  // list of setters and getters
   void set_tracker(int trackerNo) { _tracker = trackerNo; }
 
   int get_tracker() const { return _tracker; }

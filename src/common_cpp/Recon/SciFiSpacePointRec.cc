@@ -66,7 +66,7 @@ void SciFiSpacePointRec::process(SciFiEvent &evt) {
       }  // ends plane 0
     }  // end loop over stations
   }  // end loop over trackers
-/*
+
   // Run over left-overs and make duplets without any selection criteria
   for ( int a_plane = 0; a_plane < 2; a_plane++ ) {
     for ( int another_plane = a_plane+1; another_plane < 3; another_plane++ ) {
@@ -98,7 +98,7 @@ void SciFiSpacePointRec::process(SciFiEvent &evt) {
         }
       }
     }
-  }*/
+  }
 }
 
 bool SciFiSpacePointRec::duplet_within_radius(SciFiCluster* candidate_A,

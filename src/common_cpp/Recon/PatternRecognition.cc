@@ -280,9 +280,9 @@ void PatternRecognition::a_4_station_fit(std::vector<SciFiSpacePoint> space_poin
   double expected_y = c_y + m_y*expected_z;
   double res_x = position.x()-expected_x;
   double res_y = position.y()-expected_y;
-  std::ofstream file("resolution.txt", std::ios::out|std::ios::app);
-  file << res_x << " " << res_y << " " << tracker << " " << station << "\n";
-  file.close();
+  // std::ofstream file("resolution.txt", std::ios::out|std::ios::app);
+  // file << res_x << " " << res_y << " " << tracker << " " << station << "\n";
+  // file.close();
 }
 
 void PatternRecognition::make_spr_4pt(const std::vector<SciFiSpacePoint*>& spnts,
