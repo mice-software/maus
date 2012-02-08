@@ -150,6 +150,19 @@ TEST_F(TransferMapTest, PhaseSpaceVectorTransport) {
   EXPECT_TRUE(transported_phase_space_vector == reflected_phase_space_vector_);
 }
 
+TEST_F(TransferMapTest, Constructors) {
+  MAUS::TransferMap no_delta_map(TransferMapTest::reflection_polynomial_map_,
+                                 TransferMapTest::phase_space_vector_,
+                                 TransferMapTest::phase_space_vector_);
+  MAUS::PhaseSpaceVector transported_phase_space_vector
+    = no_delta_map * phase_space_vector_;
+  EXPECT_TRUE(transported_phase_space_vector == phase_space_vector_);
+
+  MAUS::TransferMap no_delta_map_copy(no_delta_map);
+  transported_phase_space_vector = no_delta_map_copy * phase_space_vector_;
+  EXPECT_TRUE(transported_phase_space_vector == phase_space_vector_);
+}
+
 TEST_F(TransferMapTest, FirstOrderCovarianceMatrixTransport) {
   // test simple reflection transport a covariance matrix
   MAUS::CovarianceMatrix transported_covariance_matrix
