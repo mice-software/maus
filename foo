@@ -1,0 +1,4746 @@
+------------------------------------------------------------
+revno: 665
+committer: Matt <matt@Matts-laptop>
+branch nick: devel_2
+timestamp: Fri 2012-02-10 15:42:42 +0000
+message:
+  test commit
+------------------------------------------------------------
+revno: 664 [merge]
+committer: Matt <matt@Matts-laptop>
+branch nick: maus-littlefield
+timestamp: Fri 2012-02-10 15:17:59 +0000
+message:
+  updated cdb api and made changes to the upload and download execs
+------------------------------------------------------------
+revno: 663 [merge]
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Thu 2012-02-02 16:54:37 +0000
+message:
+  Release 0.1.3
+------------------------------------------------------------
+revno: 662 [merge]
+tags: MAUS-v0.1.2
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Wed 2012-01-18 07:00:25 +0000
+message:
+  Release 0.1.2
+------------------------------------------------------------
+revno: 661 [merge]
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: release
+timestamp: Thu 2011-12-22 17:56:36 +0000
+message:
+  Release 0.1.1
+------------------------------------------------------------
+revno: 660 [merge]
+tags: MAUS-v0.1.0
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: release
+timestamp: Tue 2011-11-29 04:20:07 +0000
+message:
+  Release v0.1.0
+------------------------------------------------------------
+revno: 659
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: release
+timestamp: Mon 2011-11-07 14:53:00 +0000
+message:
+  Commit changes for another try at 0.0.9
+------------------------------------------------------------
+revno: 658 [merge]
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: release
+timestamp: Fri 2011-11-04 16:46:18 +0000
+message:
+  Changes for release 0.1.0
+------------------------------------------------------------
+revno: 657 [merge]
+committer: Chris Rogers <chris.rogers@stfc.ac.uk>
+branch nick: release
+timestamp: Tue 2011-10-25 16:58:49 +0100
+message:
+  Revert to 0.0.8
+------------------------------------------------------------
+revno: 656
+tags: MAUS-v0.0.8
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Wed 2011-10-12 11:32:44 +0100
+message:
+  Release 0.0.8
+------------------------------------------------------------
+revno: 655
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-trunk
+timestamp: Tue 2011-10-11 20:24:10 +0100
+message:
+  BUG: added string rstrip() to OutputPyJSON to make sure two '\n's don't go in
+------------------------------------------------------------
+revno: 654
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-trunk
+timestamp: Fri 2011-10-07 23:27:08 +0100
+message:
+  Fix style of test_core_go and reduce number of allowed python errors
+------------------------------------------------------------
+revno: 653
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-trunk
+timestamp: Fri 2011-10-07 23:19:50 +0100
+message:
+  Pylint error: remove unused variabley
+------------------------------------------------------------
+revno: 652
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-trunk
+timestamp: Fri 2011-10-07 21:28:15 +0100
+message:
+  BUG: Go test: AssertionError -> LookupError
+------------------------------------------------------------
+revno: 651
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-trunk
+timestamp: Fri 2011-10-07 21:18:30 +0100
+message:
+  Code review Rogers
+------------------------------------------------------------
+revno: 650
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-trunk
+timestamp: Fri 2011-10-07 21:16:35 +0100
+message:
+  Refactor Go
+------------------------------------------------------------
+revno: 649
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Wed 2011-10-05 10:15:05 +0100
+message:
+  Reduce number of style fails
+------------------------------------------------------------
+revno: 648
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Wed 2011-10-05 10:08:59 +0100
+message:
+  Bit more hacking around with documentation structure
+------------------------------------------------------------
+revno: 647 [merge]
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Wed 2011-10-05 09:42:03 +0100
+message:
+  Documentation skeleton
+------------------------------------------------------------
+revno: 646
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Tue 2011-10-04 12:30:55 +0100
+message:
+  Style guide fix
+------------------------------------------------------------
+revno: 645
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Tue 2011-10-04 12:29:04 +0100
+message:
+  Change input name; add dumb test for analyze_offline just to check it works and produces output
+------------------------------------------------------------
+revno: 644
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Tue 2011-10-04 11:50:49 +0100
+message:
+  Rogers edits; move unpacking include to own directory; analyze_offline_data driven by datacards
+------------------------------------------------------------
+revno: 643 [merge]
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Tue 2011-10-04 11:25:13 +0100
+message:
+  First merge of unpacking (rogers edits to follow)
+------------------------------------------------------------
+revno: 642
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Fri 2011-09-30 14:53:02 +0100
+message:
+  Update README back to development
+------------------------------------------------------------
+revno: 641
+tags: MAUS-v0.0.7
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Fri 2011-09-30 14:47:03 +0100
+message:
+  Changes for 0.0.7
+------------------------------------------------------------
+revno: 640
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Fri 2011-09-30 12:23:28 +0100
+message:
+  fix broken test
+------------------------------------------------------------
+revno: 639 [merge]
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Fri 2011-09-30 12:02:32 +0100
+message:
+  Beam maker integration tests and output filename from configuration
+------------------------------------------------------------
+revno: 638
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-trunk
+timestamp: Thu 2011-09-29 16:28:03 +0100
+message:
+  Fix style guide in Go.py.  Unused import uuid.
+------------------------------------------------------------
+revno: 637
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-trunk
+timestamp: Thu 2011-09-29 16:26:07 +0100
+message:
+  Closes #713.  Remove unused UUID line
+------------------------------------------------------------
+revno: 636 [merge]
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-trunk
+timestamp: Thu 2011-09-29 14:32:48 +0100
+message:
+  merge with trunk
+------------------------------------------------------------
+revno: 635 [merge]
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-trunk
+timestamp: Thu 2011-09-29 14:32:28 +0100
+message:
+  merge w/ trunk
+------------------------------------------------------------
+revno: 634
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-trunk
+timestamp: Tue 2011-09-20 22:51:44 +0100
+message:
+  why was hudson still there?  I deleted that ages ago
+------------------------------------------------------------
+revno: 633
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-trunk
+timestamp: Mon 2011-09-19 12:35:57 +0100
+message:
+  Lower number of style errors since fixed some
+------------------------------------------------------------
+revno: 632
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-trunk
+timestamp: Mon 2011-09-19 01:43:40 +0100
+message:
+  Fix style
+------------------------------------------------------------
+revno: 631 [merge]
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-trunk
+timestamp: Sat 2011-09-17 11:43:40 +0100
+message:
+  uncommit raising maus_root_dir exception
+------------------------------------------------------------
+revno: 630
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-trunk
+timestamp: Sat 2011-09-17 11:42:39 +0100
+message:
+  clarify birth
+------------------------------------------------------------
+revno: 629
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-trunk
+timestamp: Sat 2011-09-17 11:41:21 +0100
+message:
+  Clean up maus_root_dir warning message
+------------------------------------------------------------
+revno: 628
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-trunk
+timestamp: Wed 2011-09-14 21:03:18 +0100
+message:
+  easy_install pulling wrong SCons version, breaks build.  Closes #700
+------------------------------------------------------------
+revno: 627
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-trunk
+timestamp: Wed 2011-09-14 12:45:54 +0100
+message:
+  Clarified doxygen
+------------------------------------------------------------
+revno: 626
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-trunk
+timestamp: Wed 2011-09-14 12:43:20 +0100
+message:
+  Clarified warning message
+------------------------------------------------------------
+revno: 625 [merge]
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-trunk
+timestamp: Wed 2011-09-14 12:36:30 +0100
+message:
+  Merge with trunk (publication stuff)
+------------------------------------------------------------
+revno: 624
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-trunk
+timestamp: Wed 2011-09-14 12:35:10 +0100
+message:
+  Fixed nonfuctional bug
+------------------------------------------------------------
+revno: 623
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-trunk
+timestamp: Fri 2011-09-02 19:36:27 +0100
+message:
+  fiddling with style.  Works on my machine, not on test server
+------------------------------------------------------------
+revno: 622
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-trunk
+timestamp: Fri 2011-09-02 19:24:44 +0100
+message:
+  IPAC proceedings
+------------------------------------------------------------
+revno: 621
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-trunk
+timestamp: Fri 2011-09-02 19:24:09 +0100
+message:
+  Added IPAC stuff
+------------------------------------------------------------
+revno: 620 [merge]
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-trunk
+timestamp: Fri 2011-09-02 19:16:47 +0100
+message:
+  Merge  lp:~plane1/maus/devel
+------------------------------------------------------------
+revno: 619 [merge]
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-trunk
+timestamp: Fri 2011-09-02 19:04:15 +0100
+message:
+  merge
+------------------------------------------------------------
+revno: 618
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-trunk
+timestamp: Wed 2011-08-31 22:11:57 +0100
+message:
+  Add citation information
+------------------------------------------------------------
+revno: 617
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-trunk
+timestamp: Wed 2011-08-31 22:10:29 +0100
+message:
+  Updated citation
+------------------------------------------------------------
+revno: 616
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-trunk
+timestamp: Thu 2011-08-25 21:21:04 +0100
+message:
+  IPAC demo script
+------------------------------------------------------------
+revno: 615
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-trunk
+timestamp: Thu 2011-08-25 21:20:58 +0100
+message:
+  Documentation fix
+------------------------------------------------------------
+revno: 614
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Fri 2011-08-19 10:57:20 +0100
+message:
+  change to dev vers 0.0.7
+------------------------------------------------------------
+revno: 613
+tags: MAUS-v0.0.6
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Fri 2011-08-19 09:20:25 +0100
+message:
+  maus_per_commit makes more style errors than rogers desktop... change test_python_style to accomodate
+------------------------------------------------------------
+revno: 612
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Fri 2011-08-19 09:12:27 +0100
+message:
+  Changes for release 0.0.6
+------------------------------------------------------------
+revno: 611
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Tue 2011-08-16 10:02:02 +0100
+message:
+  ignore optics test output
+------------------------------------------------------------
+revno: 610
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Tue 2011-08-16 06:46:25 +0100
+message:
+  Add scons -c to install_then_build
+------------------------------------------------------------
+revno: 609 [merge]
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Mon 2011-08-15 17:31:37 +0100
+message:
+  Separate integration test stream - runs geometry tests and optics tests
+------------------------------------------------------------
+revno: 608
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Mon 2011-08-15 14:23:26 +0100
+message:
+  Fix for cpplint
+------------------------------------------------------------
+revno: 607
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Mon 2011-08-15 13:03:21 +0100
+message:
+  Typo fixed
+------------------------------------------------------------
+revno: 606 [merge]
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Mon 2011-08-15 12:56:45 +0100
+message:
+  Extra flags for compiling with g4 builtin opengl (not officially supported)
+------------------------------------------------------------
+revno: 605
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Mon 2011-08-15 10:07:51 +0100
+message:
+  jenkins incompatible with ErrorHandler?
+------------------------------------------------------------
+revno: 604
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Mon 2011-08-15 10:01:19 +0100
+message:
+  Somehow got deleted
+------------------------------------------------------------
+revno: 603 [merge]
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Mon 2011-08-15 09:47:27 +0100
+message:
+  Add geant4 vrml file production to MAUS #356
+------------------------------------------------------------
+revno: 602
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-trunk2
+timestamp: Tue 2011-08-09 00:52:47 +0100
+message:
+  64bit versus 32bit fix, python
+------------------------------------------------------------
+revno: 601
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-trunk2
+timestamp: Tue 2011-08-09 00:17:52 +0100
+message:
+  Fixes trunk?  Works on Ubuntu...
+------------------------------------------------------------
+revno: 600
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-trunk2
+timestamp: Mon 2011-08-08 15:20:16 +0100
+message:
+  Closes #563.  Python now finds zlib on Ubuntu 11.
+------------------------------------------------------------
+revno: 599
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Fri 2011-08-05 10:34:47 +0100
+message:
+  Dev version 0.0.6
+------------------------------------------------------------
+revno: 598
+tags: MAUS-v0.0.5
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Fri 2011-08-05 10:15:21 +0100
+message:
+  Changes for release 0.0.5
+------------------------------------------------------------
+revno: 597
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Fri 2011-08-05 10:06:08 +0100
+message:
+  Curtail number of errors
+------------------------------------------------------------
+revno: 596
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Fri 2011-08-05 10:04:43 +0100
+message:
+  Add chapter header for spill
+------------------------------------------------------------
+revno: 595
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Fri 2011-08-05 10:03:30 +0100
+message:
+  Spill data structure documentation
+------------------------------------------------------------
+revno: 594 [merge]
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Thu 2011-08-04 12:16:58 +0100
+message:
+  tests are more verbose; maus knows its own version number; some pylint cleanup
+------------------------------------------------------------
+revno: 593 [merge]
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Wed 2011-08-03 15:03:53 +0100
+message:
+  Add event action to simulation area
+------------------------------------------------------------
+revno: 592
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Tue 2011-08-02 12:55:28 +0100
+message:
+  Add input build dir to bzrignore
+------------------------------------------------------------
+revno: 591
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Tue 2011-08-02 12:54:49 +0100
+message:
+  Add file exception for SpillSchema from python style - argue that its a data file
+------------------------------------------------------------
+revno: 590 [merge]
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Tue 2011-08-02 10:35:59 +0100
+message:
+  Move cpplint, add spill schema documentation tool and some spill schema documentation, add extra compile flags
+------------------------------------------------------------
+revno: 589
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Mon 2011-08-01 14:40:24 +0100
+message:
+  Add a few compile options
+------------------------------------------------------------
+revno: 588
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Mon 2011-08-01 14:03:49 +0100
+message:
+  Update number of python style errors again
+------------------------------------------------------------
+revno: 587
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Mon 2011-08-01 13:42:11 +0100
+message:
+  Update to new python number of errors
+------------------------------------------------------------
+revno: 586
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Mon 2011-08-01 10:03:58 +0100
+message:
+  Update to dev version
+------------------------------------------------------------
+revno: 585
+tags: MAUS-v0.0.4
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Thu 2011-07-21 16:52:54 +0100
+message:
+  Updates for release v0.0.4
+------------------------------------------------------------
+revno: 584 [merge]
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Fri 2011-07-15 12:26:14 +0100
+message:
+  Update xboa version to 0.11.0
+------------------------------------------------------------
+revno: 583
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Tue 2011-07-12 14:03:48 +0100
+message:
+  Fix documentation
+------------------------------------------------------------
+revno: 582
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Tue 2011-07-12 14:02:13 +0100
+message:
+  Fix documentation
+------------------------------------------------------------
+revno: 581 [merge]
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Tue 2011-07-12 05:12:35 +0100
+message:
+  Add Special Virtual Plane, fix ClearSDHit bug #566, #567, fix SpillSchema bug
+------------------------------------------------------------
+revno: 580
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sun 2011-07-10 22:50:09 +0100
+message:
+  BUG: Closes #565 - Pylint now skips swig folders
+  BUG: Fixed various cppchecker warnings seen within Jenkins.  No functional change.
+------------------------------------------------------------
+revno: 579
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-07-07 18:26:38 +0100
+message:
+  Moved loadtest to tests and cleaned it up
+------------------------------------------------------------
+revno: 578
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-07-04 14:34:48 +0100
+message:
+  BUG: Accidentally erased a line.  Balls. Closes #537
+------------------------------------------------------------
+revno: 577
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2011-06-29 18:09:25 +0100
+message:
+  remove src/map/MapPyTOFCabling/
+------------------------------------------------------------
+revno: 576
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Thu 2011-06-23 17:33:35 +0100
+message:
+  Change version number back to development version
+------------------------------------------------------------
+revno: 575
+tags: MAUS-v0.0.3
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Thu 2011-06-23 17:30:58 +0100
+message:
+  changelog etc for release 0.0.3
+------------------------------------------------------------
+revno: 574
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Thu 2011-06-23 15:09:20 +0100
+message:
+  Fix to MapPyTofCabling
+------------------------------------------------------------
+revno: 573 [merge]
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Thu 2011-06-23 14:52:57 +0100
+message:
+  Lower verbosity of output
+------------------------------------------------------------
+revno: 572
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Thu 2011-06-23 14:14:26 +0100
+message:
+  Change number of errors for latest updates (but no more)
+------------------------------------------------------------
+revno: 571 [merge]
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Thu 2011-06-23 14:08:15 +0100
+message:
+  Fix memory problem (more)
+------------------------------------------------------------
+revno: 570
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-06-23 13:52:58 +0100
+message:
+  BUG: Closes #516.  For some reason, the default value argument gets initialized in constructors?
+------------------------------------------------------------
+revno: 569 [merge]
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Thu 2011-06-23 13:46:50 +0100
+message:
+  Fix memory problems in Squeak initialisation and MAUSSteppingActionTests
+------------------------------------------------------------
+revno: 568 [merge]
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Thu 2011-06-23 13:45:09 +0100
+message:
+  Automate pylint checks
+------------------------------------------------------------
+revno: 567
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-06-23 11:53:11 +0100
+message:
+  Updated docs
+------------------------------------------------------------
+revno: 566
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2011-06-22 14:22:04 +0100
+message:
+  Pylint fixes
+------------------------------------------------------------
+revno: 565
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2011-06-22 13:39:54 +0100
+message:
+  FEATURE: InputCppRealData named to InputCppData since it's data.  Closes #520.
+------------------------------------------------------------
+revno: 564
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Tue 2011-06-21 15:50:50 +0100
+message:
+  Closes #503
+------------------------------------------------------------
+revno: 563
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Tue 2011-06-21 12:23:06 +0100
+message:
+  Workaround for #516 and temporary fix to bad input format
+------------------------------------------------------------
+revno: 562
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Tue 2011-06-21 12:09:06 +0100
+message:
+  md5 for geant_config
+------------------------------------------------------------
+revno: 561 [merge]
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Tue 2011-06-21 10:53:00 +0100
+message:
+  Fix cpplint et al
+------------------------------------------------------------
+revno: 560 [merge]
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Tue 2011-06-21 10:44:21 +0100
+message:
+  Merge with rogers but ack - forgot to commit latest changes
+------------------------------------------------------------
+revno: 559
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-06-20 16:11:10 +0100
+message:
+  Add GPL 
+------------------------------------------------------------
+revno: 558
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-06-20 16:06:58 +0100
+message:
+  Fix style guide
+------------------------------------------------------------
+revno: 557 [merge]
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-06-20 16:01:42 +0100
+message:
+  Merge with Edward Santos.
+  
+  Closes #501 - Fix double pushback.
+  Closes #334 - Fix fake energy deposits.
+  Closes #502 - replaced 'uint' by 'unsigned int' (mac compatibility)
+------------------------------------------------------------
+revno: 556
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-06-20 15:33:37 +0100
+message:
+  Update comments and make more sane variable names
+------------------------------------------------------------
+revno: 555
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-06-20 14:01:29 +0100
+message:
+  Test resolution of Mac bug where two '-L's to g++ are merged?
+------------------------------------------------------------
+revno: 554
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-06-20 08:29:55 +0100
+message:
+  FEATURE: Add MAUSStackingActionKillNonMuons to kill electrons.
+  FEATURE: Update documentation OutputPyJson
+  FEATURE: Increas simulate_mice number of events
+  BUG: Update number of steps before track limiter since was killing muons at z=3m
+------------------------------------------------------------
+revno: 553
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sun 2011-06-12 14:50:44 +0100
+message:
+  Tracker digits are now in
+------------------------------------------------------------
+revno: 552
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2011-06-10 19:51:31 +0100
+message:
+  Fix Tracker MC hits
+------------------------------------------------------------
+revno: 551
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2011-06-10 15:45:02 +0100
+message:
+  Removed this test until the schema is correct
+------------------------------------------------------------
+revno: 550
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2011-06-10 14:54:26 +0100
+message:
+  Require certain version of validictory: easy_install "validictory==0.7.0"
+------------------------------------------------------------
+revno: 549
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-06-09 16:21:08 +0100
+message:
+  Scons finds other py files in component directory
+------------------------------------------------------------
+revno: 548
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-06-09 16:17:39 +0100
+message:
+  Update simulate_mice
+------------------------------------------------------------
+revno: 547
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-06-09 12:59:03 +0100
+message:
+  Automatically test that the JSON schema is a valid schema.  Also that our spill schema is a valid schema.
+------------------------------------------------------------
+revno: 546
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Thu 2011-06-09 09:57:52 +0100
+message:
+  Fix to bug in CppErrorHandler - error handler initialised incorrectly when importing MAUS in python
+------------------------------------------------------------
+revno: 545
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2011-06-08 19:42:11 +0100
+message:
+  Nothing changed.
+------------------------------------------------------------
+revno: 544
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Tue 2011-06-07 16:44:13 +0100
+message:
+  Gak - another style failure
+------------------------------------------------------------
+revno: 543
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Tue 2011-06-07 11:02:33 +0100
+message:
+  cpplint update
+------------------------------------------------------------
+revno: 542
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Tue 2011-06-07 11:01:09 +0100
+message:
+  cpplint passes
+------------------------------------------------------------
+revno: 541
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Tue 2011-06-07 09:10:37 +0100
+message:
+  try again...
+------------------------------------------------------------
+revno: 540
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Tue 2011-06-07 08:48:05 +0100
+message:
+  Restores broken build (maybe)
+------------------------------------------------------------
+revno: 539 [merge]
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Tue 2011-06-07 08:12:31 +0100
+message:
+  CppErrorHandler interface to Python ErrorHandler
+------------------------------------------------------------
+revno: 538
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sun 2011-06-05 19:44:29 +0100
+message:
+  remove 'third_party.tar.gz'
+------------------------------------------------------------
+revno: 537
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sun 2011-06-05 17:21:29 +0100
+message:
+  Remove dead geant4 file
+------------------------------------------------------------
+revno: 536
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sun 2011-06-05 17:17:35 +0100
+message:
+  Temporarily remove micewww stuff
+------------------------------------------------------------
+revno: 535 [merge]
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Thu 2011-06-02 14:50:20 +0100
+message:
+  Update directory structure and remove h, cpp file endings
+------------------------------------------------------------
+revno: 534
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sat 2011-05-28 21:21:39 +0100
+message:
+  FEATURE: Closes #495.  Disclaimers to src/common code to mark it legacy.  Remove disclaimer when code is improved.
+------------------------------------------------------------
+revno: 533
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sat 2011-05-28 21:05:54 +0100
+message:
+  FEATURE: Remove dead files
+------------------------------------------------------------
+revno: 532
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sat 2011-05-28 19:55:42 +0100
+message:
+  TWEAK: Remove 'code not executed' GCC flag since nearly all false positives
+------------------------------------------------------------
+revno: 531
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2011-05-27 15:20:46 +0100
+message:
+  FEATURE: Closes #494. Remove unused legacy files
+------------------------------------------------------------
+revno: 530
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2011-05-27 13:13:11 +0100
+message:
+  BUG: MapPyGroup birth fix
+------------------------------------------------------------
+revno: 529
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2011-05-27 11:53:11 +0100
+message:
+  BUG: Remove dead code 'iTraces'?
+------------------------------------------------------------
+revno: 528
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Fri 2011-05-27 10:03:20 +0100
+message:
+  Closes #436 #388 #328
+------------------------------------------------------------
+revno: 527
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2011-05-27 11:43:00 +0100
+message:
+  BUG: Remove deadcode TPG (was detector considered against SciFi tracker)
+------------------------------------------------------------
+revno: 526
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-05-26 23:07:00 +0100
+message:
+  BUG: Fix deadcode and memory leak
+------------------------------------------------------------
+revno: 525
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-05-26 20:10:41 +0100
+message:
+  Remove G4MICE Recon since not used.  Fix coverity issues.
+------------------------------------------------------------
+revno: 524
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-05-26 19:49:34 +0100
+message:
+  BUG: Coverity.  Use value before check if NULL; number of trajectories.  Plus a forbidden cout.
+------------------------------------------------------------
+revno: 523
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-05-26 15:26:46 +0100
+message:
+  BUG: Closes #470 - Unpacker works on latest Ubuntu
+------------------------------------------------------------
+revno: 522
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-05-26 15:21:58 +0100
+message:
+  BUG: Closes #468 - Style issues with G4MICE/MAUS check_sync.py
+  FEATURE: Closes #474 - Merge of some legacy G4MICE -> MAUS
+  BUG: Closes #434 - Fixes Ubuntu ROOT install bug
+------------------------------------------------------------
+revno: 521
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Thu 2011-05-26 08:52:11 +0100
+message:
+  test for setting random seed in MPGA
+------------------------------------------------------------
+revno: 520
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Thu 2011-05-26 08:41:57 +0100
+message:
+  Oops, slight fix
+------------------------------------------------------------
+revno: 519 [merge]
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Thu 2011-05-26 08:36:00 +0100
+message:
+  Closes #472 - MPGA fails to set the time and #352 - Optics code
+------------------------------------------------------------
+revno: 518
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2011-05-25 17:04:55 +0100
+message:
+  Closes bug #470 of GCC issues on 4.5.2
+------------------------------------------------------------
+revno: 517
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2011-05-25 16:38:09 +0100
+message:
+  Check sync changes
+------------------------------------------------------------
+revno: 516
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2011-05-25 16:37:56 +0100
+message:
+  Tweak fix includes
+------------------------------------------------------------
+revno: 515
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2011-05-25 16:36:56 +0100
+message:
+  Fix includes script
+------------------------------------------------------------
+revno: 514
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2011-05-25 15:56:04 +0100
+message:
+  Check_sync can now combine changes in G4MICE/MAUS
+------------------------------------------------------------
+revno: 513
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Wed 2011-05-25 14:22:25 +0100
+message:
+  Add version number
+------------------------------------------------------------
+revno: 512
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2011-05-25 13:55:14 +0100
+message:
+  G4MICE/MAUS repo syncer: Remove hardcoded path, fixed indents, style fixes (though style problems remain)
+------------------------------------------------------------
+revno: 511
+tags: MAUS-v0.0.2
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Wed 2011-05-25 10:30:17 +0100
+message:
+  Change log and release notes for v0.0.2
+------------------------------------------------------------
+revno: 510
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2011-05-24 16:49:38 +0100
+message:
+  Fix some Go() tests and improve coverage of Outputers
+------------------------------------------------------------
+revno: 509
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-05-23 23:19:06 +0100
+message:
+  Reducers now accept datacards
+------------------------------------------------------------
+revno: 508
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-05-23 22:29:44 +0100
+message:
+  Deal with broken trunk: birth takes json datacards
+------------------------------------------------------------
+revno: 507
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-05-23 20:35:52 +0100
+message:
+  Reduce Birth -> birth
+------------------------------------------------------------
+revno: 506
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-05-23 18:42:30 +0100
+message:
+  Closes #463.  Indentation mistakes.
+------------------------------------------------------------
+revno: 505
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-05-23 18:39:19 +0100
+message:
+  Closes #462 where Go() wasn't seeing birth() failures.  Caught other bugs. Added tests for Go() and failing classes().
+------------------------------------------------------------
+revno: 504
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2011-05-17 17:59:19 +0100
+message:
+  Now 'scons -c' removes all files (but not directories) in 'build'. Closes #448
+------------------------------------------------------------
+revno: 503
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2011-05-17 17:24:45 +0100
+message:
+  Stray . in core/Go.py leading to import fail
+------------------------------------------------------------
+revno: 502 [merge]
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2011-05-17 17:02:07 +0100
+message:
+  Merge with Carlisle.  Added BeamMaker and CreateSpill. Closes #357.
+------------------------------------------------------------
+revno: 501
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2011-05-17 14:26:02 +0100
+message:
+  Python 3 compliency for Go()
+------------------------------------------------------------
+revno: 500 [merge]
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Mon 2011-05-16 10:30:19 +0100
+message:
+  error handler test coverage - fixes #437
+------------------------------------------------------------
+revno: 499
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-05-12 19:49:18 +0100
+message:
+  Doxygen fixes
+------------------------------------------------------------
+revno: 498
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-05-12 19:44:11 +0100
+message:
+  Fix style stuff and update test of #452
+------------------------------------------------------------
+revno: 497
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-05-12 17:36:48 +0100
+message:
+  Remove flash ADCs from input reader (temporarily).  closes #452
+------------------------------------------------------------
+revno: 496
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-05-12 12:39:16 +0100
+message:
+  Change 'number_of_events' to more clear 'number_of_spills'
+------------------------------------------------------------
+revno: 495
+tags: v0.1.1
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-05-12 11:45:41 +0100
+message:
+  update changelog and release notes for v0.0.1
+------------------------------------------------------------
+revno: 494
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-05-12 09:36:04 +0100
+message:
+  Test that correct instance of MAUS being used.  closes #451
+------------------------------------------------------------
+revno: 493
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-05-12 09:26:03 +0100
+message:
+  Remove 'do nothing' number_of_events line
+------------------------------------------------------------
+revno: 492
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Thu 2011-05-12 08:49:06 +0100
+message:
+  minor changes
+------------------------------------------------------------
+revno: 491
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-data
+timestamp: Wed 2011-05-11 16:24:47 +0100
+message:
+  Configuration database example.  Closes #446
+------------------------------------------------------------
+revno: 490 [merge]
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-data
+timestamp: Wed 2011-05-11 14:02:17 +0100
+message:
+  Merge trunk.
+------------------------------------------------------------
+revno: 489
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-data
+timestamp: Wed 2011-05-11 14:01:09 +0100
+message:
+  Adding Config Database interface and tests.  Closes #446
+------------------------------------------------------------
+revno: 488
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2011-05-10 18:53:12 +0100
+message:
+  0.0.1 changelog
+------------------------------------------------------------
+revno: 487
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2011-05-10 18:50:24 +0100
+message:
+  added release notes
+------------------------------------------------------------
+revno: 486
+tags: MAUS-v0.0.1
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2011-05-10 17:20:39 +0100
+message:
+  make MapPyPrint more clear
+------------------------------------------------------------
+revno: 485
+tags: MAUS-v0.6
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2011-05-10 16:54:12 +0100
+message:
+  remove csh from maus closes #416
+------------------------------------------------------------
+revno: 484
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-data
+timestamp: Tue 2011-05-10 16:50:23 +0100
+message:
+  use "import MAUS"
+------------------------------------------------------------
+revno: 483
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-data
+timestamp: Tue 2011-05-10 16:04:39 +0100
+message:
+  MapPyTOFCabling
+------------------------------------------------------------
+revno: 482
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-data
+timestamp: Tue 2011-05-10 15:18:04 +0100
+message:
+  add numpy and test
+------------------------------------------------------------
+revno: 481
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-data
+timestamp: Tue 2011-05-10 12:18:48 +0100
+message:
+  tof cabling
+------------------------------------------------------------
+revno: 480
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-data
+timestamp: Tue 2011-05-10 12:14:27 +0100
+message:
+  fix up birth with Go() and inputs
+------------------------------------------------------------
+revno: 479
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-data
+timestamp: Tue 2011-05-10 11:30:50 +0100
+message:
+  add analyze data macro
+  refix mappyprint tests
+------------------------------------------------------------
+revno: 478
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-data
+timestamp: Tue 2011-05-10 11:15:28 +0100
+message:
+  add some tests
+------------------------------------------------------------
+revno: 477
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-data
+timestamp: Tue 2011-05-10 10:51:50 +0100
+message:
+  style guide stuff
+------------------------------------------------------------
+revno: 476
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-data
+timestamp: Tue 2011-05-10 10:42:04 +0100
+message:
+  Fayer patch passes tests
+------------------------------------------------------------
+revno: 475
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-data
+timestamp: Tue 2011-05-10 10:34:11 +0100
+message:
+  Patch from Fayer
+------------------------------------------------------------
+revno: 474
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-data
+timestamp: Mon 2011-05-09 16:15:23 +0100
+message:
+  fix bug where birth must return true
+  incorporate coverage into run_tests.bash
+------------------------------------------------------------
+revno: 473
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-data
+timestamp: Mon 2011-05-09 16:06:53 +0100
+message:
+  increase coverage to infinite case
+------------------------------------------------------------
+revno: 472
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-data
+timestamp: Mon 2011-05-09 15:59:06 +0100
+message:
+  increase test coverage, fixes whitespace bug in inputpyjson (#438?)
+------------------------------------------------------------
+revno: 471
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-data
+timestamp: Mon 2011-05-09 15:42:01 +0100
+message:
+  Remove MapPyVirtualPlanes since Rogers is making a fancier one
+------------------------------------------------------------
+revno: 470 [merge]
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-data
+timestamp: Mon 2011-05-09 15:11:54 +0100
+message:
+  merge trunk
+------------------------------------------------------------
+revno: 469
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus-data
+timestamp: Mon 2011-05-02 01:39:29 +0100
+message:
+  delete conflict
+------------------------------------------------------------
+revno: 468
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-05-02 01:37:12 +0100
+message:
+  update .bzrignore
+------------------------------------------------------------
+revno: 467
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-05-02 01:33:55 +0100
+message:
+  file shouldn't be there
+------------------------------------------------------------
+revno: 466
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sat 2011-04-30 11:43:41 +0100
+message:
+  Closes #413.  these pass cpplint minus minor copyright stuff (we need to remove that warning).
+------------------------------------------------------------
+revno: 465
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sat 2011-04-30 10:54:03 +0100
+message:
+  Tidying up SConstruct.  Using pylint disable-msg to make pylint not flag SCons specific stuff
+------------------------------------------------------------
+revno: 464 [merge]
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Wed 2011-04-20 14:11:06 +0100
+message:
+  Remove dupe cpplint and more clean up in bzrignore
+------------------------------------------------------------
+revno: 463 [merge]
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Wed 2011-04-20 13:51:48 +0100
+message:
+  broken build - forgot to commit cpplint_exceptions.py
+------------------------------------------------------------
+revno: 462 [merge]
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Wed 2011-04-20 12:03:52 +0100
+message:
+  Remove @authors from some files, add automated cpplint test
+------------------------------------------------------------
+revno: 461
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Wed 2011-04-20 12:02:34 +0100
+message:
+  Remove scons again - fix rogers error
+------------------------------------------------------------
+revno: 460
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-04-18 22:02:47 +0100
+message:
+  cleanup messy .bzrignore
+------------------------------------------------------------
+revno: 459
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Mon 2011-04-18 17:16:33 +0100
+message:
+  Broken configure file
+------------------------------------------------------------
+revno: 458
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Mon 2011-04-18 17:10:45 +0100
+message:
+  Replacement
+------------------------------------------------------------
+revno: 457 [merge]
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Mon 2011-04-18 15:58:46 +0100
+message:
+  Merge rogers - CppErrHandler, simulation stuff, cpplint test
+------------------------------------------------------------
+revno: 456
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2011-04-15 09:52:17 +0100
+message:
+  add install link
+------------------------------------------------------------
+revno: 455
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2011-04-15 09:51:39 +0100
+message:
+  cleanup
+------------------------------------------------------------
+revno: 454
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2011-04-13 20:51:24 +0100
+message:
+  authors are just thosed with merged branches
+------------------------------------------------------------
+revno: 453
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2011-04-13 00:52:36 +0100
+message:
+  remove bin
+------------------------------------------------------------
+revno: 452
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2011-04-12 21:11:57 +0100
+message:
+  lower n
+------------------------------------------------------------
+revno: 451
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Tue 2011-04-12 19:07:22 +0100
+message:
+  27 -> 60 in recpack filename
+------------------------------------------------------------
+revno: 450
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Tue 2011-04-12 18:29:25 +0100
+message:
+  update checksum for realdata
+------------------------------------------------------------
+revno: 449
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Tue 2011-04-12 17:59:27 +0100
+message:
+  add macros to 'run_tests' since they should run
+------------------------------------------------------------
+revno: 448 [merge]
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Tue 2011-04-12 17:56:16 +0100
+message:
+  merge trunk
+------------------------------------------------------------
+revno: 447
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Tue 2011-04-12 15:58:56 +0100
+message:
+  stupid permissions.  needs +x
+------------------------------------------------------------
+revno: 446
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Tue 2011-04-12 15:50:26 +0100
+message:
+  recpack requires CLHEP
+------------------------------------------------------------
+revno: 445
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Tue 2011-04-12 15:39:49 +0100
+message:
+  change mappers Birth -> birth for style guide reasons.  Same for death, process.
+------------------------------------------------------------
+revno: 444
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Tue 2011-04-12 15:39:10 +0100
+message:
+  update unpacking to not std::cout
+------------------------------------------------------------
+revno: 443
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Mon 2011-04-11 16:38:14 +0100
+message:
+  input of real data now works
+------------------------------------------------------------
+revno: 442
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Mon 2011-04-11 16:26:28 +0100
+message:
+  adding unpacker
+------------------------------------------------------------
+revno: 441
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Mon 2011-04-11 12:48:40 +0100
+message:
+  add warning
+------------------------------------------------------------
+revno: 440 [merge]
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Mon 2011-04-11 12:30:57 +0100
+message:
+  merge Robinson: Mac support
+------------------------------------------------------------
+revno: 439
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Fri 2011-04-08 15:25:13 +0100
+message:
+  remove geometry test that was confusing people
+------------------------------------------------------------
+revno: 438 [merge]
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Fri 2011-04-08 15:11:17 +0100
+message:
+  resolve .bzrignore issue, merge trunk
+------------------------------------------------------------
+revno: 437
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Mon 2011-04-04 01:13:28 +0100
+message:
+  removed some packages that require python.h but can't find it
+------------------------------------------------------------
+revno: 436
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Sun 2011-04-03 23:51:08 +0100
+message:
+  now can 'import MAUS'
+------------------------------------------------------------
+revno: 435
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Sun 2011-04-03 23:00:57 +0100
+message:
+  scons required by jsoncpp. put it after in build process
+------------------------------------------------------------
+revno: 434
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Sun 2011-04-03 21:40:37 +0100
+message:
+  forgot 'bash' in the install commands
+------------------------------------------------------------
+revno: 433
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Sun 2011-04-03 21:31:24 +0100
+message:
+  add help in the configure script for new users
+------------------------------------------------------------
+revno: 432
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Sun 2011-04-03 21:23:41 +0100
+message:
+  update configure to not need scons
+------------------------------------------------------------
+revno: 431
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: temp
+timestamp: Sun 2011-04-03 21:08:32 +0100
+message:
+  removed licenses: we don't ship with them anymore
+------------------------------------------------------------
+revno: 430
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: temp
+timestamp: Sun 2011-04-03 21:06:23 +0100
+message:
+  remove more scons since easy_install does it
+------------------------------------------------------------
+revno: 429
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: temp
+timestamp: Sun 2011-04-03 21:05:23 +0100
+message:
+  removed some files that are now install by easy_install 
+------------------------------------------------------------
+revno: 428
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Sun 2011-04-03 21:00:02 +0100
+message:
+  update third party location
+------------------------------------------------------------
+revno: 427
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Sun 2011-04-03 20:57:16 +0100
+message:
+  cleanup configure
+------------------------------------------------------------
+revno: 426
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Sun 2011-04-03 20:39:33 +0100
+message:
+  removed dead integration tests, renamed hudson -> integration
+------------------------------------------------------------
+revno: 425
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Sun 2011-04-03 20:37:09 +0100
+message:
+  new buildall works
+------------------------------------------------------------
+revno: 424
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Sun 2011-04-03 20:34:54 +0100
+message:
+  move around bash scripts, move a lot of the python scripts into a 'python_extras' script
+------------------------------------------------------------
+revno: 423
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Sun 2011-04-03 17:03:26 +0100
+message:
+  improve the style of this file to -1.28 from -10.5... it's cleaner than before but needs another pass.  We also need to think about how to 'remember' pylint exceptions
+------------------------------------------------------------
+revno: 422
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Sun 2011-04-03 15:25:28 +0100
+message:
+  indent correctly SConstruct and start getting it to pass style guide
+------------------------------------------------------------
+revno: 421
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2011-04-01 14:38:38 +0100
+message:
+  style guides
+------------------------------------------------------------
+revno: 420
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2011-04-01 14:34:44 +0100
+message:
+  bin passes style guies
+------------------------------------------------------------
+revno: 419
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2011-04-01 14:29:37 +0100
+message:
+  style guide bin
+------------------------------------------------------------
+revno: 418
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Fri 2011-04-01 10:35:43 +0100
+message:
+  documentation typo: profiling -> profile
+------------------------------------------------------------
+revno: 417
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-03-31 17:47:05 +0100
+message:
+  BUG: remove old hits from SD
+------------------------------------------------------------
+revno: 416 [merge]
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Thu 2011-03-31 16:22:53 +0100
+message:
+  Vassil's geometry
+------------------------------------------------------------
+revno: 415
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Thu 2011-03-31 16:06:23 +0100
+message:
+  remove dedx cut from EMRSD
+------------------------------------------------------------
+revno: 414 [merge]
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Thu 2011-03-31 15:43:16 +0100
+message:
+  emr stuff from Verguilov
+------------------------------------------------------------
+revno: 413 [merge]
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Thu 2011-03-31 14:43:21 +0100
+message:
+  merge with Verguilov
+------------------------------------------------------------
+revno: 412
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Thu 2011-03-31 14:28:21 +0100
+message:
+  remove dedx cut
+------------------------------------------------------------
+revno: 411
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Thu 2011-03-31 13:42:56 +0100
+message:
+  remove fake beammaker, put author information in AUTHORS instead of doxygen files
+------------------------------------------------------------
+revno: 410
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Thu 2011-03-31 13:23:55 +0100
+message:
+  remove author
+------------------------------------------------------------
+revno: 409
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Thu 2011-03-31 11:10:16 +0100
+message:
+  remove emcal, closes #406, remove pidfits
+------------------------------------------------------------
+revno: 408
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2011-03-30 13:45:03 +0100
+message:
+  added vassil
+------------------------------------------------------------
+revno: 407 [merge]
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2011-03-30 13:41:13 +0100
+message:
+  feature closes #404 from Vassil Verguilov for trapezoid support in mice module
+------------------------------------------------------------
+revno: 406
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2011-03-30 13:21:55 +0100
+message:
+  closes #404 switch from it = it.end() to break
+------------------------------------------------------------
+revno: 405
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-03-28 15:51:32 +0100
+message:
+  BUG: closes #402 since we now check if pythonpath exists before trying to set stuff. There was a trailing :
+------------------------------------------------------------
+revno: 404
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sun 2011-03-20 14:04:54 +0000
+message:
+  suds is found at an https site and needs wget to have --no-check-certificate
+------------------------------------------------------------
+revno: 403
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Sat 2011-03-19 10:30:31 +0000
+message:
+  typo -> True true
+------------------------------------------------------------
+revno: 402
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Sat 2011-03-19 10:12:15 +0000
+message:
+  delete variables assigned in new
+------------------------------------------------------------
+revno: 401
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Sat 2011-03-19 09:54:05 +0000
+message:
+  should be delete[]
+------------------------------------------------------------
+revno: 400
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Sat 2011-03-19 09:52:11 +0000
+message:
+  needs to be delete[]
+------------------------------------------------------------
+revno: 399
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Sat 2011-03-19 09:41:18 +0000
+message:
+  random bug fixes
+------------------------------------------------------------
+revno: 398 [merge]
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Sat 2011-03-19 08:52:02 +0000
+message:
+  merge with trunk
+------------------------------------------------------------
+revno: 397
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Sat 2011-03-19 08:50:31 +0000
+message:
+  canvas pylint
+------------------------------------------------------------
+revno: 396
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Fri 2011-03-18 15:39:36 +0000
+message:
+  output section clean
+------------------------------------------------------------
+revno: 395
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Fri 2011-03-18 15:29:13 +0000
+message:
+  fix tests
+------------------------------------------------------------
+revno: 394
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Thu 2011-03-17 18:12:08 +0000
+message:
+  moved cpplint.
+  renamed some stuff in inputcpprealdata
+------------------------------------------------------------
+revno: 393
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Thu 2011-03-17 18:08:10 +0000
+message:
+  changed input syntax
+------------------------------------------------------------
+revno: 392
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Thu 2011-03-17 18:06:42 +0000
+message:
+  input is clean
+------------------------------------------------------------
+revno: 391
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Thu 2011-03-17 18:03:57 +0000
+message:
+  more style fixes
+------------------------------------------------------------
+revno: 390
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Thu 2011-03-17 18:02:23 +0000
+message:
+  another style imrpovement commit
+------------------------------------------------------------
+revno: 389
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Thu 2011-03-17 17:39:04 +0000
+message:
+  style changes and doxypy added
+------------------------------------------------------------
+revno: 388
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Thu 2011-03-17 17:16:33 +0000
+message:
+  style fixes
+------------------------------------------------------------
+revno: 387
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Thu 2011-03-17 16:38:34 +0000
+message:
+  remove commented out lines
+------------------------------------------------------------
+revno: 386
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Thu 2011-03-17 16:36:18 +0000
+message:
+  fix root bug and cleanup
+------------------------------------------------------------
+revno: 385 [merge]
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-03-17 15:43:20 +0000
+message:
+  merge fayer
+------------------------------------------------------------
+revno: 384
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Thu 2011-03-17 13:19:20 +0000
+message:
+  readme update
+------------------------------------------------------------
+revno: 383
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Thu 2011-03-17 13:12:28 +0000
+message:
+  cleanup docs, add author list
+------------------------------------------------------------
+revno: 382
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Thu 2011-03-17 13:05:06 +0000
+message:
+  update docs stuff
+------------------------------------------------------------
+revno: 381
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Thu 2011-03-17 12:04:03 +0000
+message:
+  added suds, pylint, and pychecker
+------------------------------------------------------------
+revno: 380 [merge]
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Thu 2011-03-17 11:01:35 +0000
+message:
+  merge with trunk
+------------------------------------------------------------
+revno: 379
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Wed 2011-03-16 02:43:14 +0000
+message:
+  package all things (like gtest) in latest third_party mega source
+------------------------------------------------------------
+revno: 378
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Tue 2011-03-15 11:37:27 +0000
+message:
+  closes #376
+------------------------------------------------------------
+revno: 377
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Fri 2011-03-11 17:55:13 +0000
+message:
+  remove stray files
+------------------------------------------------------------
+revno: 376
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Fri 2011-03-11 17:49:02 +0000
+message:
+  test scripts go in tests not build
+------------------------------------------------------------
+revno: 375 [merge]
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Thu 2011-03-10 16:25:51 +0000
+message:
+  Merge rogers - add spill validation tool, add cpp Json interface, add cpplint, remove gunit
+------------------------------------------------------------
+revno: 374 [merge]
+committer: Chris Rogers < chris.rogers@stfc.ac.uk >
+branch nick: maus
+timestamp: Fri 2011-03-04 14:16:36 +0000
+message:
+  Fix floating point precision error and various compiler warnings
+------------------------------------------------------------
+revno: 373
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Fri 2011-03-04 00:00:15 +0000
+message:
+  remove redundant config options to ROOT install ./configure (think it is causing build issues)
+------------------------------------------------------------
+revno: 372
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Thu 2011-03-03 16:28:11 +0000
+message:
+  try to fix ROOT thisroot.sh finding
+------------------------------------------------------------
+revno: 371
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Thu 2011-03-03 13:38:48 +0000
+message:
+  make root version a variable
+------------------------------------------------------------
+revno: 370
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Thu 2011-03-03 11:05:06 +0000
+message:
+  update root version; https://savannah.cern.ch/bugs/?75608
+------------------------------------------------------------
+revno: 369 [merge]
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2011-03-02 20:08:22 +0000
+message:
+  merge rogers
+------------------------------------------------------------
+revno: 368
+tags: MAUS-v0.5
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Wed 2011-03-02 10:27:10 +0000
+message:
+  stupid geant bugs
+------------------------------------------------------------
+revno: 367
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Tue 2011-03-01 23:06:20 +0000
+message:
+  bash Configure instead
+------------------------------------------------------------
+revno: 366
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Tue 2011-03-01 21:17:51 +0000
+message:
+  have it find gtest
+------------------------------------------------------------
+revno: 365
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Tue 2011-03-01 21:16:12 +0000
+message:
+  remove dead lines of code: mylibs?
+  renumber conflict filename
+------------------------------------------------------------
+revno: 364
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Tue 2011-03-01 21:06:52 +0000
+message:
+  geant fix for header files
+------------------------------------------------------------
+revno: 363
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: devel2
+timestamp: Tue 2011-03-01 16:40:44 +0000
+message:
+  remove stray line
+------------------------------------------------------------
+revno: 362 [merge]
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2011-03-01 16:26:26 +0000
+message:
+  readme change
+------------------------------------------------------------
+revno: 361
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2011-03-01 16:08:42 +0000
+message:
+  fix thirdparty source tar prob
+------------------------------------------------------------
+revno: 360
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2011-03-01 15:13:57 +0000
+message:
+  updated third_party package
+------------------------------------------------------------
+revno: 359 [merge]
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2011-03-01 14:33:55 +0000
+message:
+  merge tunnell
+------------------------------------------------------------
+revno: 358
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2011-03-01 14:14:40 +0000
+message:
+  added rogers
+------------------------------------------------------------
+revno: 357 [merge]
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2011-03-01 14:07:37 +0000
+message:
+  merge with rogers
+------------------------------------------------------------
+revno: 356 [merge]
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2011-03-01 12:12:03 +0000
+message:
+  works
+------------------------------------------------------------
+revno: 355
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2011-03-01 12:10:20 +0000
+message:
+  remove multicore stuff
+------------------------------------------------------------
+revno: 354
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2011-03-01 12:01:24 +0000
+message:
+  add exception check
+------------------------------------------------------------
+revno: 353
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2011-03-01 11:55:17 +0000
+message:
+  add root test
+------------------------------------------------------------
+revno: 352
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2011-03-01 11:46:58 +0000
+message:
+  closes #312
+  fixes ROOT
+------------------------------------------------------------
+revno: 351
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2011-03-01 10:50:40 +0000
+message:
+  closes #337
+  scons -c now works
+------------------------------------------------------------
+revno: 350
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-02-28 19:11:28 +0000
+message:
+  fixes root draw bug
+------------------------------------------------------------
+revno: 349
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-02-28 18:36:50 +0000
+message:
+  check if thisroot.sh exists
+------------------------------------------------------------
+revno: 348
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-02-28 18:34:04 +0000
+message:
+  root fix?
+------------------------------------------------------------
+revno: 347
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-02-28 18:32:27 +0000
+message:
+  test local install? maybe?
+------------------------------------------------------------
+revno: 346
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-02-28 18:03:14 +0000
+message:
+  try switching ROOT version to 5.26 to fix plotting issues
+------------------------------------------------------------
+revno: 345 [merge]
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-02-24 17:20:40 +0000
+message:
+  merge with carlisle
+------------------------------------------------------------
+revno: 344
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-02-24 17:20:21 +0000
+message:
+  simulate 10 events
+------------------------------------------------------------
+revno: 343
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2011-02-23 17:08:38 +0000
+message:
+  relates #340
+------------------------------------------------------------
+revno: 342
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2011-02-23 17:04:26 +0000
+message:
+  relates r340
+  
+  doxygen ran if found if runnig just 'scons'
+------------------------------------------------------------
+revno: 341
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2011-02-23 17:00:58 +0000
+message:
+  closes #336 by adding: http://code.google.com/p/googletest/
+------------------------------------------------------------
+revno: 340
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2011-02-11 20:19:03 +0000
+message:
+  added new outputter
+------------------------------------------------------------
+revno: 339
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2011-02-11 19:36:08 +0000
+message:
+  added comments
+------------------------------------------------------------
+revno: 338
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2011-02-11 19:17:57 +0000
+message:
+  added mappyprint
+------------------------------------------------------------
+revno: 337
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2011-02-11 18:47:08 +0000
+message:
+  simulate one particle demo
+------------------------------------------------------------
+revno: 336
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-02-10 17:45:38 +0000
+message:
+  remove dead file
+------------------------------------------------------------
+revno: 335
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-02-10 17:05:39 +0000
+message:
+  recpack check
+------------------------------------------------------------
+revno: 334
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-02-10 12:14:56 +0000
+message:
+  doxy fixes
+------------------------------------------------------------
+revno: 333
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-02-10 12:10:25 +0000
+message:
+  doxygen fix accel params
+------------------------------------------------------------
+revno: 332
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-02-10 12:06:40 +0000
+message:
+  doxygen fix class names
+------------------------------------------------------------
+revno: 331
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-02-10 12:03:57 +0000
+message:
+  doxy ignore commoncpp
+------------------------------------------------------------
+revno: 330
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-02-10 11:46:42 +0000
+message:
+  doxy change
+------------------------------------------------------------
+revno: 329
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-02-10 09:46:45 +0000
+message:
+  remove disco links
+------------------------------------------------------------
+revno: 328
+tags: MAUS-v0.4
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2011-02-04 17:27:01 +0000
+message:
+  closes #323
+  patch recpack
+------------------------------------------------------------
+revno: 327
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2011-02-04 17:06:56 +0000
+message:
+  another stupid geant4 typo in version name
+------------------------------------------------------------
+revno: 326
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2011-02-04 15:17:21 +0000
+message:
+  fix geant4 stuff
+  make install script not bail on /etc/ errors
+------------------------------------------------------------
+revno: 325
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2011-02-04 12:36:56 +0000
+message:
+  closes #321
+  
+  applies a geant4 patch that eventually will make it into geant4
+------------------------------------------------------------
+revno: 324
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2011-02-04 12:10:53 +0000
+message:
+  switch to p4 geant4
+------------------------------------------------------------
+revno: 323
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2011-02-04 00:29:42 +0000
+message:
+  fix error codes install script
+------------------------------------------------------------
+revno: 322
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2011-02-04 00:27:49 +0000
+message:
+  change exit codes
+------------------------------------------------------------
+revno: 321
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2011-02-04 00:24:59 +0000
+message:
+  remove root hacks for SL
+------------------------------------------------------------
+revno: 320
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-02-03 23:11:05 +0000
+message:
+  switch root versions
+  remove manpath from configure
+------------------------------------------------------------
+revno: 319
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-02-03 15:57:31 +0000
+message:
+  install script
+------------------------------------------------------------
+revno: 318
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-02-03 15:56:41 +0000
+message:
+  removed require all
+------------------------------------------------------------
+revno: 317
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-02-03 15:26:26 +0000
+message:
+  closes #319
+------------------------------------------------------------
+revno: 316
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-02-03 12:10:59 +0000
+message:
+  path fix
+------------------------------------------------------------
+revno: 315
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-02-03 12:05:44 +0000
+message:
+  update
+------------------------------------------------------------
+revno: 314
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-02-03 11:45:08 +0000
+message:
+  thirdparty.tar.gz check
+------------------------------------------------------------
+revno: 313
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-02-03 11:20:40 +0000
+message:
+  add wget
+------------------------------------------------------------
+revno: 312
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2011-02-02 19:04:52 +0000
+message:
+  remove some geant4 library checks
+------------------------------------------------------------
+revno: 311
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2011-02-02 19:00:12 +0000
+message:
+  now finds ld_library_path
+------------------------------------------------------------
+revno: 310
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2011-02-02 18:47:50 +0000
+message:
+  remove discoproject
+------------------------------------------------------------
+revno: 309
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2011-02-02 16:17:11 +0000
+message:
+  forgot xboa interface file
+------------------------------------------------------------
+revno: 308
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2011-02-02 16:11:09 +0000
+message:
+  typo 25 -> 26
+------------------------------------------------------------
+revno: 307
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2011-02-02 15:13:44 +0000
+message:
+  tests pass
+------------------------------------------------------------
+revno: 306
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2011-02-02 14:57:23 +0000
+message:
+  scons fix so it finds common files
+------------------------------------------------------------
+revno: 305
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2011-02-02 14:45:28 +0000
+message:
+  xboa added to build scripts
+------------------------------------------------------------
+revno: 304
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2011-02-02 14:07:07 +0000
+message:
+  closes #311
+------------------------------------------------------------
+revno: 303
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2011-02-02 13:26:37 +0000
+message:
+  added xboa
+------------------------------------------------------------
+revno: 302
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2011-02-02 12:29:32 +0000
+message:
+  nose added
+------------------------------------------------------------
+revno: 301
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2011-02-02 11:54:05 +0000
+message:
+  #300 refix
+------------------------------------------------------------
+revno: 300
+tags: MAUS-v0.3
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2011-02-02 11:08:45 +0000
+message:
+  don't use whole path in geometry tests
+------------------------------------------------------------
+revno: 299
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2011-02-02 10:34:01 +0000
+message:
+  closes #306
+  added check in configure
+------------------------------------------------------------
+revno: 298
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2011-02-02 00:38:37 +0000
+message:
+  fixed
+------------------------------------------------------------
+revno: 297
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2011-02-02 00:29:17 +0000
+message:
+  can just add remove tracks
+------------------------------------------------------------
+revno: 296
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2011-02-02 00:26:36 +0000
+message:
+  load test stuff
+------------------------------------------------------------
+revno: 295
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2011-02-01 23:38:39 +0000
+message:
+  removed volume name, enabled choice trakcs
+------------------------------------------------------------
+revno: 294
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2011-02-01 19:28:01 +0000
+message:
+  wrong var name
+------------------------------------------------------------
+revno: 293
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2011-02-01 19:22:49 +0000
+message:
+  bug bug the output isn't a well formed doc, so checking for it crashes
+------------------------------------------------------------
+revno: 292
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-01-31 22:37:43 +0000
+message:
+  don't run doxygen
+------------------------------------------------------------
+revno: 291
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-01-31 19:48:18 +0000
+message:
+  remove comment
+------------------------------------------------------------
+revno: 290
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-01-31 17:35:54 +0000
+message:
+  can use llvm if you create .use_llvm_with_maus in MAUS_ROOT_DIR
+------------------------------------------------------------
+revno: 289
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-01-31 17:30:12 +0000
+message:
+  doxy fixes
+------------------------------------------------------------
+revno: 288
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-01-31 17:28:20 +0000
+message:
+  beammaker demo
+------------------------------------------------------------
+revno: 287
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-01-31 17:27:31 +0000
+message:
+  beammaker draft
+------------------------------------------------------------
+revno: 286
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-01-31 15:49:42 +0000
+message:
+  stupid fracking whitespace fixes
+------------------------------------------------------------
+revno: 285
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-01-31 15:47:15 +0000
+message:
+  whitespace fix
+------------------------------------------------------------
+revno: 284
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-01-31 15:43:04 +0000
+message:
+  don't escape
+------------------------------------------------------------
+revno: 283
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-01-31 13:35:24 +0000
+message:
+  remove dead directory
+------------------------------------------------------------
+revno: 282
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-01-31 13:25:52 +0000
+message:
+  configure works on csh
+------------------------------------------------------------
+revno: 281
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-01-31 13:03:49 +0000
+message:
+  fixes #305
+------------------------------------------------------------
+revno: 280
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-01-31 12:28:37 +0000
+message:
+  virtual planes
+------------------------------------------------------------
+revno: 279
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-01-31 11:11:12 +0000
+message:
+  track remover was not keeping muons when told.  configuration issue, but new tests
+------------------------------------------------------------
+revno: 278
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-01-31 09:15:17 +0000
+message:
+  taking a crack at virtual planes
+------------------------------------------------------------
+revno: 277
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sun 2011-01-30 21:45:55 +0000
+message:
+  wiki archive
+------------------------------------------------------------
+revno: 276
+tags: MAUS-v0.2
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2011-01-28 16:23:16 +0000
+message:
+  all tests pass now
+------------------------------------------------------------
+revno: 275
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2011-01-28 14:31:05 +0000
+message:
+  relates r298
+  fixing tests
+------------------------------------------------------------
+revno: 274
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2011-01-28 13:40:44 +0000
+message:
+  fix unit test
+------------------------------------------------------------
+revno: 273
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2011-01-28 13:33:21 +0000
+message:
+  profiling option for map reduce
+------------------------------------------------------------
+revno: 272
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2011-01-28 13:19:48 +0000
+message:
+  fixed go - unicode issues
+  closes #298
+------------------------------------------------------------
+revno: 271
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-01-27 03:17:43 +0000
+message:
+  made configuration class for doxy reasons
+------------------------------------------------------------
+revno: 270
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-01-27 03:15:47 +0000
+message:
+  doxy test
+------------------------------------------------------------
+revno: 269
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-01-27 03:00:55 +0000
+message:
+  doxygen test
+------------------------------------------------------------
+revno: 268
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-01-27 02:58:28 +0000
+message:
+  doxy udpate
+------------------------------------------------------------
+revno: 267
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-01-27 02:57:28 +0000
+message:
+  doxygen update
+------------------------------------------------------------
+revno: 266
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-01-27 02:54:29 +0000
+message:
+  remove search so things work with redmine
+------------------------------------------------------------
+revno: 265
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-01-27 02:40:44 +0000
+message:
+  updating doxygen
+------------------------------------------------------------
+revno: 264
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-01-27 02:30:45 +0000
+message:
+  doxygen fixes
+------------------------------------------------------------
+revno: 263
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2011-01-25 15:28:44 +0000
+message:
+  remove dead examples.  these were from ATLAS tucs
+------------------------------------------------------------
+revno: 262
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2011-01-25 15:25:41 +0000
+message:
+  forgot these tests!
+------------------------------------------------------------
+revno: 261
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2011-01-25 14:58:14 +0000
+message:
+  fix python 3 buss
+------------------------------------------------------------
+revno: 260
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2011-01-25 14:15:44 +0000
+message:
+  tracker digits work
+------------------------------------------------------------
+revno: 259
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2011-01-25 13:55:37 +0000
+message:
+  python 3 compatible
+------------------------------------------------------------
+revno: 258
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2011-01-25 13:52:18 +0000
+message:
+  fix scifi LY
+------------------------------------------------------------
+revno: 257
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2011-01-25 13:49:21 +0000
+message:
+  2to3 python 3compatible
+------------------------------------------------------------
+revno: 256
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2011-01-25 13:44:37 +0000
+message:
+  tracker digitization
+------------------------------------------------------------
+revno: 255
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2011-01-25 13:44:24 +0000
+message:
+  ran 2to3, refactored
+------------------------------------------------------------
+revno: 254
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-01-24 15:02:48 +0000
+message:
+  tof digits work
+------------------------------------------------------------
+revno: 253
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-01-24 12:07:06 +0000
+message:
+  mapcppsimulation uses geometry filename from json config
+------------------------------------------------------------
+revno: 252
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-01-24 12:02:04 +0000
+message:
+  added a datacards replacement.  updated Birth() and tests for each map
+------------------------------------------------------------
+revno: 251
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-01-24 09:27:56 +0000
+message:
+  configuration works
+------------------------------------------------------------
+revno: 250
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-01-24 09:05:45 +0000
+message:
+  added configuration (like datacards)
+------------------------------------------------------------
+revno: 249
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2011-01-19 03:56:51 +0000
+message:
+  manpath search fails in sl5
+------------------------------------------------------------
+revno: 248
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2011-01-18 04:06:14 +0000
+message:
+  update doxygen main page
+------------------------------------------------------------
+revno: 247
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2011-01-18 04:03:49 +0000
+message:
+  update doxygen mainpage
+------------------------------------------------------------
+revno: 246
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sun 2011-01-16 23:48:00 +0000
+message:
+  cleaned up core
+  now everything is documented/tested
+------------------------------------------------------------
+revno: 245
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sun 2011-01-16 22:39:02 +0000
+message:
+  update doc
+------------------------------------------------------------
+revno: 244
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sun 2011-01-16 22:25:06 +0000
+message:
+  beammaker unused
+  pyjson doc fix
+------------------------------------------------------------
+revno: 243
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sun 2011-01-16 22:07:32 +0000
+message:
+  doxy tweaks, removed dead class
+------------------------------------------------------------
+revno: 242
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sun 2011-01-16 22:07:05 +0000
+message:
+  polishing docs and tests
+------------------------------------------------------------
+revno: 241
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sun 2011-01-16 22:04:33 +0000
+message:
+  document and test complete
+------------------------------------------------------------
+revno: 240
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sun 2011-01-16 16:49:44 +0000
+message:
+  I think the doxygen format is much nicer, usable, and I think I found a documentation style that works
+------------------------------------------------------------
+revno: 239
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2011-01-14 22:01:31 +0000
+message:
+  fix go test
+------------------------------------------------------------
+revno: 238
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2011-01-14 21:44:27 +0000
+message:
+  load test with empty document input reader
+------------------------------------------------------------
+revno: 237
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2011-01-14 20:09:13 +0000
+message:
+  more IO
+------------------------------------------------------------
+revno: 236
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-01-13 03:56:21 +0000
+message:
+  updated fake sim sha1 sum
+------------------------------------------------------------
+revno: 235
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2011-01-13 03:53:35 +0000
+message:
+  add fake simulation map
+  add output json
+  go finishes native map/reduce support
+------------------------------------------------------------
+revno: 234
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2011-01-12 00:19:56 +0000
+message:
+  fixed the damn tracking in mapcppsim
+------------------------------------------------------------
+revno: 233
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2011-01-11 22:13:42 +0000
+message:
+  geometry tests
+------------------------------------------------------------
+revno: 232
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2011-01-11 18:11:40 +0000
+message:
+  added fields for other stages
+------------------------------------------------------------
+revno: 231
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2011-01-11 00:35:37 +0000
+message:
+  updating configuraitons
+------------------------------------------------------------
+revno: 230
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2011-01-11 00:20:48 +0000
+message:
+  remove a bunch of CVS files and old configurations
+------------------------------------------------------------
+revno: 229
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-01-10 21:51:57 +0000
+message:
+  tests
+------------------------------------------------------------
+revno: 228
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2011-01-10 21:46:14 +0000
+message:
+  removed emr
+  adde some tof digit
+------------------------------------------------------------
+revno: 227
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2010-12-17 20:26:53 +0000
+message:
+  trying to benchmark
+------------------------------------------------------------
+revno: 226
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-12-15 14:41:35 +0000
+message:
+  maping group components
+------------------------------------------------------------
+revno: 225
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-12-15 14:37:59 +0000
+message:
+  don't actually need this
+------------------------------------------------------------
+revno: 224
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-12-15 14:37:51 +0000
+message:
+  group
+------------------------------------------------------------
+revno: 223
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-12-15 13:42:04 +0000
+message:
+  add comments
+------------------------------------------------------------
+revno: 222
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-12-15 13:39:55 +0000
+message:
+  buffer idea stupid: inputpyjson now works and passes tetss
+------------------------------------------------------------
+revno: 221
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-12-15 13:26:46 +0000
+message:
+  rewrite without buffer
+------------------------------------------------------------
+revno: 220
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2010-12-14 17:35:03 +0000
+message:
+  style checks
+------------------------------------------------------------
+revno: 219
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2010-12-14 17:20:52 +0000
+message:
+  unit tests
+------------------------------------------------------------
+revno: 218
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2010-12-14 17:10:57 +0000
+message:
+  fixed unit tests
+------------------------------------------------------------
+revno: 217
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2010-12-14 16:00:12 +0000
+message:
+  trying to get some more unit tests in
+------------------------------------------------------------
+revno: 216
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2010-12-13 16:51:52 +0000
+message:
+  reduce base
+------------------------------------------------------------
+revno: 215
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2010-12-13 16:50:44 +0000
+message:
+  add do nothing
+------------------------------------------------------------
+revno: 214
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2010-12-13 16:46:30 +0000
+message:
+  'go' is the map-reduce magic.  handles many methods if need be
+------------------------------------------------------------
+revno: 213
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2010-12-13 16:44:25 +0000
+message:
+  add beammaker, digitization, input json
+------------------------------------------------------------
+revno: 212
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2010-12-10 17:08:57 +0000
+message:
+  patch syncing test
+------------------------------------------------------------
+revno: 211
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2010-12-10 16:58:42 +0000
+message:
+  undo mice-module rev.  go to rev. 209
+------------------------------------------------------------
+revno: 210
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2010-12-10 15:14:11 +0000
+message:
+  pulling in recent g4mice changes
+------------------------------------------------------------
+revno: 209
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2010-12-10 13:33:02 +0000
+message:
+  remove map.py
+------------------------------------------------------------
+revno: 208
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2010-12-02 18:34:35 +0000
+message:
+  c shell support
+------------------------------------------------------------
+revno: 207
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-12-01 19:40:29 +0000
+message:
+  remove some stdout/squeak output.
+  demo_simulate_one_muon works
+------------------------------------------------------------
+revno: 206
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-12-01 18:23:39 +0000
+message:
+  python and c++ workers act a little different in how they take args, so broke asserts
+------------------------------------------------------------
+revno: 205
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-12-01 18:19:33 +0000
+message:
+  set manpath correctly
+------------------------------------------------------------
+revno: 204
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-12-01 18:09:19 +0000
+message:
+  worked on the core so Go() is nicer.
+------------------------------------------------------------
+revno: 203
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-12-01 17:05:26 +0000
+message:
+  polishing go
+------------------------------------------------------------
+revno: 202
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-12-01 16:18:29 +0000
+message:
+  updated go sanity checks and added unit tests
+------------------------------------------------------------
+revno: 201
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-12-01 15:34:08 +0000
+message:
+  fix sl48
+------------------------------------------------------------
+revno: 200
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-12-01 14:52:27 +0000
+message:
+  update readme
+------------------------------------------------------------
+revno: 199
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2010-11-29 10:24:17 +0000
+message:
+  hide python output in unit tests
+------------------------------------------------------------
+revno: 198
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2010-11-29 03:03:25 +0000
+message:
+  fixed unittest stuff.  hardcoded datacards location (which should be removed later anyways)
+------------------------------------------------------------
+revno: 197
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sun 2010-11-28 16:54:35 +0000
+message:
+  fixes #237
+------------------------------------------------------------
+revno: 196
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sun 2010-11-28 15:37:23 +0000
+message:
+  unit test fail fixes #236
+  remove kek closes #235
+------------------------------------------------------------
+revno: 195
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sun 2010-11-28 14:59:22 +0000
+message:
+  readded simevent
+------------------------------------------------------------
+revno: 194
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sat 2010-11-27 22:00:11 +0000
+message:
+  nose and bzr aren't needed
+------------------------------------------------------------
+revno: 193
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sat 2010-11-27 21:56:36 +0000
+message:
+  cpplint cleanup
+------------------------------------------------------------
+revno: 192
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sat 2010-11-27 21:25:44 +0000
+message:
+  cpplint pass
+------------------------------------------------------------
+revno: 191
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sat 2010-11-27 20:10:41 +0000
+message:
+  add new buildbot script for unit test
+------------------------------------------------------------
+revno: 190
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sat 2010-11-27 20:06:01 +0000
+message:
+  forgot to append 'extras' in configure, resulting in BB fails in sl48
+------------------------------------------------------------
+revno: 189
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sat 2010-11-27 19:59:28 +0000
+message:
+  readme
+------------------------------------------------------------
+revno: 188
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sat 2010-11-27 19:57:49 +0000
+message:
+  mapcppsimulation unit tests
+------------------------------------------------------------
+revno: 187
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sat 2010-11-27 16:33:34 +0000
+message:
+  broken bb script
+------------------------------------------------------------
+revno: 186
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2010-11-26 09:37:59 +0000
+message:
+  demos, other workers, and things can daisy chain finally
+------------------------------------------------------------
+revno: 185
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2010-11-25 20:13:11 +0000
+message:
+  loads files installed in build
+------------------------------------------------------------
+revno: 184
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2010-11-25 17:57:49 +0000
+message:
+  updating bzrignore
+------------------------------------------------------------
+revno: 183
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2010-11-25 17:45:28 +0000
+message:
+  custom event, stepping, tracking actions to store tracks
+  closes #229
+  
+  scons now automagically finds maps.  python too
+  closes #230
+------------------------------------------------------------
+revno: 182
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2010-11-22 14:46:44 +0000
+message:
+  generalizing detmodel
+------------------------------------------------------------
+revno: 181
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2010-11-22 00:57:11 +0000
+message:
+  remove style guide dead symlinks
+------------------------------------------------------------
+revno: 180
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2010-11-22 00:41:58 +0000
+message:
+  getting tofsd to work
+------------------------------------------------------------
+revno: 179
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2010-11-18 20:34:15 +0000
+message:
+  digitization tweaks.
+------------------------------------------------------------
+revno: 178
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2010-11-16 18:17:29 +0000
+message:
+  remove old persistency
+------------------------------------------------------------
+revno: 177
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2010-11-16 17:40:40 +0000
+message:
+  style fixes, namespace relates #215
+------------------------------------------------------------
+revno: 176
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2010-11-16 17:09:10 +0000
+message:
+  licesning stuff and readme
+------------------------------------------------------------
+revno: 175
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2010-11-16 17:03:09 +0000
+message:
+  don't call writevent
+  relates #210
+------------------------------------------------------------
+revno: 174
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2010-11-16 17:02:22 +0000
+message:
+  takes in input from JSON now
+------------------------------------------------------------
+revno: 173
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2010-11-16 17:01:34 +0000
+message:
+  relates #210
+  don't clearevent
+------------------------------------------------------------
+revno: 172
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2010-11-16 16:59:53 +0000
+message:
+  passes cpplint and works
+------------------------------------------------------------
+revno: 171
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2010-11-12 17:10:48 +0000
+message:
+  mapcpp class to inherit from
+  simulation.cc (writeevent is defined there, temp!)
+------------------------------------------------------------
+revno: 170
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2010-11-12 17:09:54 +0000
+message:
+  fixes #209 globalreader
+------------------------------------------------------------
+revno: 169
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2010-11-12 17:03:18 +0000
+message:
+  replaced mice primary generator action fixes #204
+  removed mice staging action (7 years old, does nothing)
+------------------------------------------------------------
+revno: 168
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2010-11-11 11:37:05 +0000
+message:
+  now mostly passes cpplint (~300 problems to ~20)
+------------------------------------------------------------
+revno: 167
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-11-10 12:17:13 +0000
+message:
+  Temporary fix to lack of two channel clusters caused by no simulation of fibre ribbon overlap
+------------------------------------------------------------
+revno: 166
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-11-10 12:11:18 +0000
+message:
+  forgot to add FILES.
+  
+  moved in vassil commit:
+  numSlabs is corrected to be equal to 7
+------------------------------------------------------------
+revno: 165
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-11-10 12:09:49 +0000
+message:
+  ivan reid adds getproperty
+------------------------------------------------------------
+revno: 164
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-11-10 12:05:11 +0000
+message:
+  update
+------------------------------------------------------------
+revno: 163
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2010-11-09 14:13:01 +0000
+message:
+  cleanup of commoncpp, update sim worker
+------------------------------------------------------------
+revno: 162
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2010-11-08 16:06:15 +0000
+message:
+  update readme
+------------------------------------------------------------
+revno: 161
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2010-11-08 16:05:04 +0000
+message:
+  license stuff for what's included 
+------------------------------------------------------------
+revno: 160
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2010-11-08 15:48:12 +0000
+message:
+  gpl v3
+------------------------------------------------------------
+revno: 159
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2010-11-05 17:07:52 +0000
+message:
+  require xorg-x11-devel and remove hack
+------------------------------------------------------------
+revno: 158
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2010-11-05 16:41:35 +0000
+message:
+  recpack fix
+------------------------------------------------------------
+revno: 157
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2010-11-05 02:27:06 +0000
+message:
+  recpack added
+------------------------------------------------------------
+revno: 156
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2010-11-04 23:39:34 +0000
+message:
+  add configure option to sconcruct
+  add new buildbot tests
+  add from g4mice: recon, calib, persist
+------------------------------------------------------------
+revno: 155
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2010-11-04 22:14:04 +0000
+message:
+  geant4 lib finder fix
+------------------------------------------------------------
+revno: 154
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2010-11-04 20:44:46 +0000
+message:
+  update configure script
+------------------------------------------------------------
+revno: 153
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2010-11-04 20:03:39 +0000
+message:
+  get around geant4 bug about needing interactive shells (removed sanity check, living dangerously ;)
+------------------------------------------------------------
+revno: 152
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-11-03 16:55:30 +0000
+message:
+  tweak g4 install
+------------------------------------------------------------
+revno: 151
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-11-03 15:50:38 +0000
+message:
+  fix install stuff?
+------------------------------------------------------------
+revno: 150
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-11-03 14:38:15 +0000
+message:
+  typo xpm -> x11
+------------------------------------------------------------
+revno: 149
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-11-03 13:45:43 +0000
+message:
+  g4mice check for lbisy
+------------------------------------------------------------
+revno: 148
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-11-03 13:39:24 +0000
+message:
+  only build g4mice if root/geant4 exist
+------------------------------------------------------------
+revno: 147
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-11-03 13:33:15 +0000
+message:
+  libx11 bug fix for sl
+------------------------------------------------------------
+revno: 146
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-11-03 13:15:42 +0000
+message:
+  it's echo, not print
+------------------------------------------------------------
+revno: 145
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-11-03 13:14:45 +0000
+message:
+  space between { echo
+------------------------------------------------------------
+revno: 144
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-11-03 13:13:31 +0000
+message:
+  fail to compile/make option
+------------------------------------------------------------
+revno: 143
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-11-03 13:11:36 +0000
+message:
+  tracking down build failure
+------------------------------------------------------------
+revno: 142
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2010-11-02 18:18:36 +0000
+message:
+  simplify sconscript
+------------------------------------------------------------
+revno: 141
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2010-11-02 18:11:56 +0000
+message:
+  added initial map simulation
+------------------------------------------------------------
+revno: 140
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2010-11-02 18:10:48 +0000
+message:
+  added g4mice into commonCpp
+------------------------------------------------------------
+revno: 139
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2010-11-02 03:51:06 +0000
+message:
+  install include in one dir
+------------------------------------------------------------
+revno: 138
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2010-11-02 03:50:15 +0000
+message:
+  update config location
+------------------------------------------------------------
+revno: 137
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2010-11-02 03:47:49 +0000
+message:
+  clean up sconstruct, better geant4 tests
+------------------------------------------------------------
+revno: 136
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2010-11-01 16:17:44 +0000
+message:
+  forgot to uncommont root-config parser
+------------------------------------------------------------
+revno: 135
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2010-11-01 16:16:44 +0000
+message:
+  remove extra :
+------------------------------------------------------------
+revno: 134
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2010-11-01 16:16:16 +0000
+message:
+  stupidly had root check fail on purpose
+------------------------------------------------------------
+revno: 133
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2010-11-01 15:46:34 +0000
+message:
+  fixed geant4 check
+------------------------------------------------------------
+revno: 132
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2010-11-01 13:54:14 +0000
+message:
+  fi in wrong spot
+------------------------------------------------------------
+revno: 131
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2010-11-01 13:43:56 +0000
+message:
+  new worker path
+  disco config
+------------------------------------------------------------
+revno: 130
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sun 2010-10-31 16:00:22 +0000
+message:
+  geant4 checks
+------------------------------------------------------------
+revno: 129
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sun 2010-10-31 13:12:51 +0000
+message:
+  added set -e to better handle errors.
+  expanded 'find'
+------------------------------------------------------------
+revno: 128
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sat 2010-10-30 15:31:33 +0100
+message:
+  require_all for full build of nightly
+------------------------------------------------------------
+revno: 127
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sat 2010-10-30 04:02:27 +0100
+message:
+  keywo
+------------------------------------------------------------
+revno: 126
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sat 2010-10-30 03:35:02 +0100
+message:
+  gsl gslcblas checks work
+------------------------------------------------------------
+revno: 125
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sat 2010-10-30 03:20:01 +0100
+message:
+  separate out gsl/clhep checks from root/geant4
+------------------------------------------------------------
+revno: 124
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sat 2010-10-30 03:06:45 +0100
+message:
+  of course sl48 and sl55 have different locations of this library, so different bug hacks for each
+------------------------------------------------------------
+revno: 123
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sat 2010-10-30 01:36:10 +0100
+message:
+  don't need two scons calls with env var
+------------------------------------------------------------
+revno: 122
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sat 2010-10-30 01:34:54 +0100
+message:
+  forgot colon
+------------------------------------------------------------
+revno: 121
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sat 2010-10-30 01:33:01 +0100
+message:
+  don't use target, use env var
+------------------------------------------------------------
+revno: 120
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sat 2010-10-30 01:24:54 +0100
+message:
+  env.finish in wrong spot
+------------------------------------------------------------
+revno: 119
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sat 2010-10-30 01:23:24 +0100
+message:
+  wrong config file URL
+------------------------------------------------------------
+revno: 118
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sat 2010-10-30 01:21:15 +0100
+message:
+  not 'use' it's 'with' for root lib targets
+------------------------------------------------------------
+revno: 117
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sat 2010-10-30 01:20:08 +0100
+message:
+  add config-all option for build target to more easily see in buildbot when all dependencies didn't build
+------------------------------------------------------------
+revno: 116
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sat 2010-10-30 01:02:21 +0100
+message:
+  libxpm sl fix
+------------------------------------------------------------
+revno: 115
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sat 2010-10-30 00:57:20 +0100
+message:
+  64bit libXpm SL bug fix
+------------------------------------------------------------
+revno: 114
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Sat 2010-10-30 00:04:00 +0100
+message:
+  tweaking sconstruct
+------------------------------------------------------------
+revno: 113
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2010-10-29 23:59:57 +0100
+message:
+  pipe all tar output to bash so I can actually read the output
+------------------------------------------------------------
+revno: 112
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2010-10-29 23:56:45 +0100
+message:
+  new config for granular libraries
+------------------------------------------------------------
+revno: 111
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2010-10-29 23:22:15 +0100
+message:
+  workaround for stupid sl48 bug
+------------------------------------------------------------
+revno: 110
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2010-10-29 22:35:00 +0100
+message:
+  resolve conflict
+------------------------------------------------------------
+revno: 109 [merge]
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2010-10-29 22:20:51 +0100
+message:
+  resolve merge
+------------------------------------------------------------
+revno: 108
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Fri 2010-10-29 22:18:05 +0100
+message:
+  check for geant4 and new buildbot scriptxy
+------------------------------------------------------------
+revno: 107
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2010-10-28 19:11:32 +0100
+message:
+  reoganizing
+------------------------------------------------------------
+revno: 106
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2010-10-28 15:51:09 +0100
+message:
+  build_rest buildbot thing
+------------------------------------------------------------
+revno: 105
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2010-10-28 01:38:19 +0100
+message:
+  bzr ignore files
+------------------------------------------------------------
+revno: 104
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Thu 2010-10-28 01:35:16 +0100
+message:
+  ignore certain files in bzr
+------------------------------------------------------------
+revno: 103
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-10-27 22:32:12 +0100
+message:
+  --without-pcre to enable installation on sl4.8.  disables regex in swig.
+------------------------------------------------------------
+revno: 102
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-10-27 21:44:24 +0100
+message:
+  old versions of find (sl55) don't support -executable
+------------------------------------------------------------
+revno: 101
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-10-27 21:42:29 +0100
+message:
+  older versions of 'find' (like what's in SL5.5) don't support -executable
+------------------------------------------------------------
+revno: 100
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-10-27 19:50:08 +0100
+message:
+  forgot third_party dir name in search (doh)
+------------------------------------------------------------
+revno: 99
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-10-27 19:48:21 +0100
+message:
+  exit line
+  forgot maus_root_dir in bash search
+------------------------------------------------------------
+revno: 98
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-10-27 19:47:54 +0100
+message:
+  exit line
+  add environmental var
+------------------------------------------------------------
+revno: 97
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-10-27 19:44:29 +0100
+message:
+  build essential
+------------------------------------------------------------
+revno: 96
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-10-27 19:41:11 +0100
+message:
+  added a build-essential
+------------------------------------------------------------
+revno: 95
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-10-27 19:31:18 +0100
+message:
+  oops forgot to install json here
+------------------------------------------------------------
+revno: 94
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-10-27 19:09:01 +0100
+message:
+  added 'source' commands to setup environment
+------------------------------------------------------------
+revno: 93
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-10-27 19:07:08 +0100
+message:
+  added exit codes
+------------------------------------------------------------
+revno: 92
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-10-27 19:03:49 +0100
+message:
+  set maus_root_dir
+------------------------------------------------------------
+revno: 91
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-10-27 18:58:27 +0100
+message:
+  more buildbot tests
+------------------------------------------------------------
+revno: 90
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-10-27 18:50:26 +0100
+message:
+  build_bot tests
+------------------------------------------------------------
+revno: 89
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Wed 2010-10-27 00:57:05 +0100
+message:
+  pythonpath not python_path
+------------------------------------------------------------
+revno: 88
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2010-10-26 04:38:39 +0100
+message:
+  renamed stuff to Map* to aid readability
+------------------------------------------------------------
+revno: 87
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2010-10-26 04:31:38 +0100
+message:
+  fixed a swig install bug (bad prefix)
+  tweaked sconstruct to check for swig
+  refactored adding workers (to allow root/geant checks)
+------------------------------------------------------------
+revno: 86
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2010-10-26 04:19:56 +0100
+message:
+  stray 'fi'
+------------------------------------------------------------
+revno: 85
+tags: MAUS-v0.1.1
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2010-10-26 03:04:28 +0100
+message:
+  added bzr to the mix
+------------------------------------------------------------
+revno: 84
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2010-10-26 02:55:07 +0100
+message:
+  added info about installing root (if not found)
+------------------------------------------------------------
+revno: 83
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2010-10-26 02:47:56 +0100
+message:
+  nice buildall script (for stuff in bash)
+------------------------------------------------------------
+revno: 82
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2010-10-26 02:41:06 +0100
+message:
+  fixes #143
+  order of config checks wrong
+------------------------------------------------------------
+revno: 81
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2010-10-26 00:26:23 +0100
+message:
+  update configure for new bash script layout, and advice what to do when no gcc/g++
+------------------------------------------------------------
+revno: 80
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Tue 2010-10-26 00:20:09 +0100
+message:
+  reshuffling bash scripts
+------------------------------------------------------------
+revno: 79
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2010-10-25 23:55:04 +0100
+message:
+  using gcc 4.3.4
+------------------------------------------------------------
+revno: 78
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2010-10-25 23:47:46 +0100
+message:
+  stuff needed to compile gcc
+------------------------------------------------------------
+revno: 77
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2010-10-25 23:37:06 +0100
+message:
+  fixed gmp (removed stray url)
+  added gmp (for gcc)
+------------------------------------------------------------
+revno: 76
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus
+timestamp: Mon 2010-10-25 23:35:00 +0100
+message:
+  added gmp (for gcc)
+  tweaked python install prefix stuff (non-functional change, aethstetic)
+------------------------------------------------------------
+revno: 75
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Mon 2010-10-25 22:49:06 +0100
+message:
+  fixes #142
+  forgot a ; and &
+------------------------------------------------------------
+revno: 74
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Mon 2010-10-25 22:41:44 +0100
+message:
+  fixes #141
+  problem with use_root env var since crashes worker sconscript
+------------------------------------------------------------
+revno: 73
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Mon 2010-10-25 22:32:15 +0100
+message:
+  bug fix: stray fi 
+  
+  fixes #140
+------------------------------------------------------------
+revno: 72
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Mon 2010-10-25 22:27:55 +0100
+message:
+  don't need readline
+------------------------------------------------------------
+revno: 71
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Mon 2010-10-25 22:17:30 +0100
+message:
+  refs #139
+  
+  sl55 doesn't ship with gcc. add error if it's not found.
+------------------------------------------------------------
+revno: 70
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Mon 2010-10-25 21:58:58 +0100
+message:
+  during buildbot tests, on SL55 the stupidly old python version doesn't support --version but supports -V
+------------------------------------------------------------
+revno: 69
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Mon 2010-10-25 21:08:16 +0100
+message:
+  tag
+------------------------------------------------------------
+revno: 68
+tags: MAUS-v0.1
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Mon 2010-10-25 18:16:49 +0100
+message:
+  and let's have python as well.  so all required things are included in source tree.
+------------------------------------------------------------
+revno: 67
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Mon 2010-10-25 18:15:48 +0100
+message:
+  swig should probably come too (since required)
+------------------------------------------------------------
+revno: 66
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Mon 2010-10-25 18:15:02 +0100
+message:
+  nose shouldn't be included.
+  json should be included (since it's required for running)
+------------------------------------------------------------
+revno: 65
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Mon 2010-10-25 18:10:23 +0100
+message:
+  build system now done
+------------------------------------------------------------
+revno: 64
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Mon 2010-10-25 18:07:18 +0100
+message:
+  finished refactoring all the bash scripts to have common output and md5sum
+------------------------------------------------------------
+revno: 63
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Mon 2010-10-25 18:01:31 +0100
+message:
+  md5sum update and output update
+------------------------------------------------------------
+revno: 62
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Mon 2010-10-25 17:58:13 +0100
+message:
+  updated md5sum check and output format
+------------------------------------------------------------
+revno: 61
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Mon 2010-10-25 17:53:12 +0100
+message:
+  this is now updated in output format and md5
+------------------------------------------------------------
+revno: 60
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Mon 2010-10-25 17:48:49 +0100
+message:
+  udpated and works
+------------------------------------------------------------
+revno: 59
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Mon 2010-10-25 17:43:05 +0100
+message:
+  update staus of bash stuff
+------------------------------------------------------------
+revno: 58
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Mon 2010-10-25 17:42:51 +0100
+message:
+  cloc now up to date
+------------------------------------------------------------
+revno: 57
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Mon 2010-10-25 17:39:43 +0100
+message:
+  updated to say state of things
+------------------------------------------------------------
+revno: 56
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Mon 2010-10-25 17:39:26 +0100
+message:
+  this now works, yay
+------------------------------------------------------------
+revno: 55
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Mon 2010-10-25 17:18:56 +0100
+message:
+  getting there towards working...
+------------------------------------------------------------
+revno: 54
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Mon 2010-10-25 15:12:33 +0100
+message:
+  tweaking geant
+------------------------------------------------------------
+revno: 53
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Mon 2010-10-25 15:06:25 +0100
+message:
+  clhep bash now looks like I want it to
+------------------------------------------------------------
+revno: 52
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Mon 2010-10-25 15:06:12 +0100
+message:
+  This commit refs #123
+------------------------------------------------------------
+revno: 51
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Mon 2010-10-25 14:25:18 +0100
+message:
+  fixed clhep to clenaup
+------------------------------------------------------------
+revno: 50
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Mon 2010-10-25 14:19:14 +0100
+message:
+  geant4 md5sums
+------------------------------------------------------------
+revno: 49
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Mon 2010-10-25 14:18:30 +0100
+message:
+  notes on bash dir
+------------------------------------------------------------
+revno: 48
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Mon 2010-10-25 14:17:41 +0100
+message:
+  fixed md5sum location
+------------------------------------------------------------
+revno: 47
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Mon 2010-10-25 14:04:23 +0100
+message:
+  root is a shining example of how the rest of these scripts should look
+------------------------------------------------------------
+revno: 46
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Mon 2010-10-25 00:16:24 +0100
+message:
+  refiddling build system
+------------------------------------------------------------
+revno: 45
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Sat 2010-10-23 15:14:18 +0100
+message:
+  tweaking
+------------------------------------------------------------
+revno: 44
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Sat 2010-10-23 00:46:39 +0100
+message:
+  maus.tag autogenerated
+------------------------------------------------------------
+revno: 43
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Sat 2010-10-23 00:45:40 +0100
+message:
+  everything in sync, yay
+------------------------------------------------------------
+revno: 42
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Sat 2010-10-23 00:43:22 +0100
+message:
+  scons should come with MAUS (since it's the build system)
+------------------------------------------------------------
+revno: 41
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Sat 2010-10-23 00:39:18 +0100
+message:
+  update readme
+------------------------------------------------------------
+revno: 40
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Sat 2010-10-23 00:31:41 +0100
+message:
+  added bash install scripts and md5s
+  mauscleanup too
+------------------------------------------------------------
+revno: 39
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Sat 2010-10-23 00:28:44 +0100
+message:
+  remove jsoncpp (so it's now downloaded instead)
+------------------------------------------------------------
+revno: 38
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Fri 2010-10-22 21:27:17 +0100
+message:
+  clean up a ton of install stuff
+------------------------------------------------------------
+revno: 37
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Fri 2010-10-22 19:21:22 +0100
+message:
+  refactoring dependecy building
+------------------------------------------------------------
+revno: 36
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Fri 2010-10-22 16:03:45 +0100
+message:
+  added python
+------------------------------------------------------------
+revno: 35
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Thu 2010-10-21 18:41:41 +0100
+message:
+  swig
+------------------------------------------------------------
+revno: 34
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Thu 2010-10-21 18:27:34 +0100
+message:
+  added cloc from svn
+------------------------------------------------------------
+revno: 33
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Thu 2010-10-21 18:17:39 +0100
+message:
+  don't need workers_old
+------------------------------------------------------------
+revno: 32
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Thu 2010-10-21 18:16:42 +0100
+message:
+  rootlogon not needed at present
+------------------------------------------------------------
+revno: 31
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Thu 2010-10-21 18:15:17 +0100
+message:
+  remove config and bin (not needed)
+------------------------------------------------------------
+revno: 30
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Thu 2010-10-21 18:06:34 +0100
+message:
+  restructure
+------------------------------------------------------------
+revno: 29
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Thu 2010-10-21 11:17:44 +0100
+message:
+  add jsoncpp
+  remove test (for moment)
+  setup scons to find workers
+  demo cppprint worker
+------------------------------------------------------------
+revno: 28
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Wed 2010-10-20 13:26:45 +0100
+message:
+  moved jsoncpp and have 0.5.0 svn tag
+------------------------------------------------------------
+revno: 27
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Wed 2010-10-20 13:23:45 +0100
+message:
+  add jsoncpp
+------------------------------------------------------------
+revno: 26
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Wed 2010-10-20 11:45:01 +0100
+message:
+  add printer test
+------------------------------------------------------------
+revno: 25
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Wed 2010-10-20 11:44:32 +0100
+message:
+  tweaking config
+------------------------------------------------------------
+revno: 24
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Fri 2010-10-15 11:28:52 +0100
+message:
+  go
+------------------------------------------------------------
+revno: 23
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Fri 2010-10-01 20:02:29 +0100
+message:
+  remove test
+------------------------------------------------------------
+revno: 22
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Fri 2010-10-01 19:56:50 +0100
+message:
+  test
+------------------------------------------------------------
+revno: 21
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Fri 2010-10-01 19:46:13 +0100
+message:
+  redmine rest (ignore!)
+------------------------------------------------------------
+revno: 20
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Fri 2010-10-01 19:20:28 +0100
+message:
+  update readme
+------------------------------------------------------------
+revno: 19
+committer: Christopher Tunnell <c.tunnell1@physics.ox.ac.uk>
+branch nick: maus1
+timestamp: Fri 2010-10-01 19:19:01 +0100
+message:
+  fiddle with core and logging
+------------------------------------------------------------
+revno: 18
+committer: tunnell <tunnell@itchy>
+branch nick: maus1
+timestamp: Thu 2010-09-30 14:56:05 +0100
+message:
+  add third party
+------------------------------------------------------------
+revno: 17
+committer: tunnell <tunnell@itchy>
+branch nick: maus1
+timestamp: Thu 2010-09-30 14:55:20 +0100
+message:
+  third_
+  thir
+------------------------------------------------------------
+revno: 16
+committer: tunnell <tunnell@itchy>
+branch nick: maus1
+timestamp: Wed 2010-09-29 18:16:30 +0100
+message:
+  ok
+------------------------------------------------------------
+revno: 15
+committer: tunnell <tunnell@itchy>
+branch nick: maus1
+timestamp: Tue 2010-09-28 18:48:12 +0100
+message:
+  cleanup src
+------------------------------------------------------------
+revno: 14
+committer: tunnell <tunnell@itchy>
+branch nick: maus1
+timestamp: Tue 2010-09-28 17:26:51 +0100
+message:
+  changes
+------------------------------------------------------------
+revno: 13
+committer: tunnell <tunnell@itchy>
+branch nick: maus1
+timestamp: Tue 2010-09-28 16:39:22 +0100
+message:
+  move scripts to bin
+  remove .svn stuff
+  start working on fetch runs
+  add nose
+------------------------------------------------------------
+revno: 12
+committer: tunnell <tunnell@itchy>
+branch nick: maus1
+timestamp: Tue 2010-09-28 11:33:36 +0100
+message:
+  added style guide stuff
+------------------------------------------------------------
+revno: 11
+committer: tunnell <tunnell@itchy>
+branch nick: maus1
+timestamp: Mon 2010-09-27 10:22:42 +0100
+message:
+  updated readme
+------------------------------------------------------------
+revno: 10
+tags: initial
+committer: tunnell <tunnell@itchy>
+branch nick: maus1
+timestamp: Sun 2010-09-26 22:13:22 +0100
+message:
+  added scons and cxxtest (stealing RAT ideas)
+------------------------------------------------------------
+revno: 9
+committer: tunnell <tunnell@itchy>
+branch nick: maus1
+timestamp: Fri 2010-09-24 18:26:18 +0100
+message:
+  cleaning up
+------------------------------------------------------------
+revno: 8
+committer: tunnell <tunnell@itchy>
+branch nick: maus1
+timestamp: Mon 2010-09-20 18:06:37 +0100
+message:
+  moving stuff
+------------------------------------------------------------
+revno: 7
+committer: tunnell <tunnell@itchy>
+branch nick: maus1
+timestamp: Mon 2010-09-20 13:31:12 +0100
+message:
+  cleanup of initial setup
+------------------------------------------------------------
+revno: 6
+committer: tunnell <tunnell@itchy>
+branch nick: maus1
+timestamp: Mon 2010-09-20 13:30:08 +0100
+message:
+  removed rat specific stuff
+------------------------------------------------------------
+revno: 5
+committer: tunnell <tunnell@itchy>
+branch nick: maus1
+timestamp: Mon 2010-09-20 13:09:02 +0100
+message:
+  added rat version
+------------------------------------------------------------
+revno: 4
+committer: tunnell <tunnell@itchy>
+branch nick: maus1
+timestamp: Mon 2010-09-20 11:52:02 +0100
+message:
+  moving stuff from tucs
+------------------------------------------------------------
+revno: 3
+committer: tunnell <tunnell@itchy>
+branch nick: maus1
+timestamp: Tue 2010-09-07 20:57:24 +0100
+message:
+  added link
+------------------------------------------------------------
+revno: 2
+committer: tunnell <tunnell@itchy>
+branch nick: maus1
+timestamp: Tue 2010-09-07 20:56:57 +0100
+message:
+  setup file
+------------------------------------------------------------
+revno: 1
+committer: tunnell <tunnell@itchy>
+branch nick: maus1
+timestamp: Tue 2010-09-07 20:56:32 +0100
+message:
+  initial commit
+------------------------------------------------------------
+Use --include-merges or -n0 to see merged revisions.
