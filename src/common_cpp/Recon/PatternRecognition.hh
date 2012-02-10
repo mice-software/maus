@@ -23,12 +23,14 @@
 
 #ifndef PATTERNRECOGNITION_HH
 #define PATTERNRECOGNITION_HH
-// C headers
 
 // C++ headers
 #include <vector>
+#include <map>
 #include <string>
 
+// MAUS headers
+#include "src/common_cpp/Recon/SimpleLine.hh"
 #include "src/common_cpp/Recon/SciFiEvent.hh"
 #include "src/common_cpp/Recon/SciFiHit.hh"
 #include "src/common_cpp/Recon/SciFiDigit.hh"
@@ -43,49 +45,96 @@ class PatternRecognition {
 
     ~PatternRecognition();
 
+    /** @brief Top level function to begin Pattern Recognition
+      *
+      * Top level function to begin Pattern Recognition, only used to
+      * decide whether straight or helical fitting is used.
+      *
+      *  @param evt - The SciFi event
+      */
     void process(SciFiEvent &evt);
 
   private:
 
-  /** @brief Perform Pattern Recognition for straight tracks
-   *
-   *  This takes one argument, the SciFi event, extracts the 
-   *  spacepoints, reconstructs the PR tracks, and pushes them
-   *  back into the event.
-   *
-   *  @param evt - The SciFi event
-   */
-  void straightprtrack_recon(SciFiEvent &evt);
+    /** @brief Perform Pattern Recognition for straight tracks
+     *
+     *  This takes one argument, the SciFi event, extracts the
+     *  spacepoints, reconstructs the PR tracks, and pushes them
+     *  back into the event.
+     *
+     *  @param evt - The SciFi event
+     */
+    void straightprtrack_recon(SciFiEvent &evt);
 
-  /** @brief Make a straight Pattern Recognition track with 5 spacepoints
-   *
-   *  Make a straight Pattern Recognition track/s when there are spacepoints
-   *  found in all 5 stations of a tracker.  Least squared fitting used,
-   *  together with a chi^2 goodness-of-fit test.
-   *
-   *  @param spnts - A vector of all the input spacepoints
-   *  @param trks - A vector of the output Pattern Recognition tracks 
-   */
-  void make_spr_5pt(const std::vector<SciFiSpacePoint*>& spnts,
-                    std::vector<SciFiStraightPRTrack>& trks);
+    /** @brief Make straight Pattern Recognition tracks with 5 spacepoints
+     *
+     *  Make a straight Pattern Recognition track/s when there are spacepoints
+     *  found in all 5 stations of a tracker.  Least squared fitting used,
+     *  together with a chi^2 goodness-of-fit test.
+     *
+     *  @param spnts - A vector of all the input spacepoints
+     *  @param trks - A vector of the output Pattern Recognition tracks
+     */
+    void make_spr_5pt(const std::vector<SciFiSpacePoint*>& spnts,
+                      std::vector<SciFiStraightPRTrack>& trks);
 
-  void make_spr_4pt(const std::vector<SciFiSpacePoint*>& spnts,
-                    std::vector<SciFiStraightPRTrack>& trks);
+    /** @brief Make straight Pattern Recognition tracks with 4 spacepoints
+     *
+     *  Make a straight Pattern Recognition track/s when there at least 4 stations
+     *  with spacepoints in them. Least squared fitting used, together with a
+     *  chi^2 goodness-of-fit test.
+     *
+     *  @param spnts - A vector of all the input spacepoints
+     *  @param trks - A vector of the output Pattern Recognition tracks
+     */
+    void make_spr_4pt(const std::vector<SciFiSpacePoint*>& spnts,
+                      std::vector<SciFiStraightPRTrack>& trks);
 
-  void make_spr_3pt(const std::vector<SciFiSpacePoint*>& spnts,
-                    std::vector<SciFiStraightPRTrack>& trks);
+    /** @brief Make straight Pattern Recognition tracks with 3 spacepoints
+     *
+     *  Make a straight Pattern Recognition track/s when there at least 3 stations
+     *  with spacepoints in them. Least squared fitting used, together with a
+     *  chi^2 goodness-of-fit test.
+     *
+     *  @param spnts - A vector of all the input spacepoints
+     *  @param trks - A vector of the output Pattern Recognition tracks
+     */
+    void make_spr_3pt(const std::vector<SciFiSpacePoint*>& spnts,
+                      std::vector<SciFiStraightPRTrack>& trks);
 
-  void sort_by_station(const std::vector<SciFiSpacePoint*>& spnts,
-                       std::vector< std::vector<SciFiSpacePoint*> >& spnts_stat);
+    /** @brief Fit a straight line in x and y to some spacepoints
+     *
+     *  Fit straight lines, x = f(z) and y = f(z), using gsl linear fitter,
+     *  for input spacepoints. Output is the line in x and line in y.
+     *
+     *  @param spnts - A vector of all the input spacepoints
+     *  @param line_x - Output line in x - z plane
+     *  @param line_y - Output line in y - z plane
+     *
+     */
+    void linear_fit(std::map<int, SciFiSpacePoint*> &spnts,
+                    SimpleLine &line_x, SimpleLine &line_y);
+
+    /** @brief Create a 2D vector of SciFi sp sorted by tracker station
+     *
+     *  Take an input vector of spacepoints and output a 2D vector of spacepoints
+     *  where the first index is the station the spacepoint is located.
+     *
+     *  @param spnts - A vector of all the input spacepoints
+     *  @param spnts_stat - Output 2D vector of spacepoints sorted by station
+     *
+     */
+    void sort_by_station(const std::vector<SciFiSpacePoint*>& spnts,
+                        std::vector< std::vector<SciFiSpacePoint*> >& spnts_stat);
 
 
-  void run_analysis(std::vector<SciFiStraightPRTrack>& trks);
-  void a_4_station_fit(std::vector<SciFiSpacePoint> space_points, Hep3Vector position, int st_i);
+    void run_analysis(std::vector<SciFiStraightPRTrack>& trks);
+    void a_4_station_fit(std::vector<SciFiSpacePoint> space_points, Hep3Vector position, int st_i);
 
-  static const int _n_trackers = 2;
-  static const int _n_stations = 5;
-  static const double _res_cut = 15.0;
-  static const double _chisq_cut = 15.0;
+    static const int _n_trackers = 2;
+    static const int _n_stations = 5;
+    static const double _res_cut = 15.0;
+    static const double _chisq_cut = 15.0;
 };
 
 #endif

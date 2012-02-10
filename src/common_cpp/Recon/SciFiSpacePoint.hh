@@ -22,6 +22,7 @@
 
 #ifndef SCIFISPACEPOINT_HH
 #define SCIFISPACEPOINT_HH
+
 // C headers
 #include <assert.h>
 #include <json/json.h>
@@ -75,9 +76,9 @@ class SciFiSpacePoint {
 
   double get_chi2()    const { return _chi2; }
 
-  // void set_used() { _used = true; }
+  void set_used() { _used = true; }
 
-  // bool is_used() const { return _used; }
+  bool is_used() const { return _used; }
 
   void set_channels(std::vector<SciFiCluster*> channels) { _channels = channels; }
 
@@ -92,7 +93,7 @@ class SciFiSpacePoint {
 
   int _chi2;
 
-  // bool _used;
+  bool _used;
   // int _time, _time_error, _time_res;
 
   std::string _type;
