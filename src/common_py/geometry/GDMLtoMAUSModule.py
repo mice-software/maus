@@ -21,8 +21,6 @@ from geometry.CADImport import CADImport
 
 CONFIGXSL = os.environ["MAUS_ROOT_DIR"] + \
                          "/src/common_py/geometry/xsltScripts/GDML2G4MICE.xsl"
-CONFIGXSL2 = os.environ["MAUS_ROOT_DIR"] + \
-                         "/tmp/GDML2G4MICE_hacked.xsl"
 MM_XSL = os.environ["MAUS_ROOT_DIR"] + \
                          "/src/common_py/geometry/xsltScripts/MMTranslation.xsl"
 
@@ -72,32 +70,11 @@ class GDMLtomaus(): #pylint: disable = R0903
             if fname.find('materials') < 0 \
                and fname.find('fastrad') < 0 \
                and fname.find('Field') < 0 \
+               and fname.find('Beamline') < 0 \
                and fname[-5:] == '.gdml':
                 stepfile = self.path + '/' + fname
                 self.step_files.append(stepfile)
 
-    def hack_xsl(self):
-        """
-        Hack xsl sheet to set parameters right
-        """
-        # libxslt just gives segmentation fault when I try to use their routines
-        # it's Friday evening I've been trying to fix this stuff for days and 
-        # I'm pretty fed up so apologies for the hack - CTR
-        # I'll fix it later probably xslt is not the solution as the library
-        # seems cruddy at best
-        fin  = open(CONFIGXSL,  'r')
-        fout = open(CONFIGXSL2, 'w')
-        substitutions = {
-            "__file_path__":self.path,
-            "__step_max__":5.0,
-        }
-        for line in fin:
-            for key, value in substitutions.iteritems():
-                line = line.replace(str(key), str(value))
-            fout.write(line)
-        fin.close()
-        fout.close()
-        
     def convert_to_maus(self, output):
         """
         @method convert_to_maus This method converts the GDMLs to MAUS Modules.
@@ -113,10 +90,9 @@ class GDMLtomaus(): #pylint: disable = R0903
         if os.path.exists(output) == False:
             raise IOError('Output path doesnt exist '+str(output))
         else:
-            self.hack_xsl()
             outputfile = output + "/ParentGeometryFile.dat"
-            config_file = CADImport(xmlin1 = self.config_file, \
-                           xsl = CONFIGXSL2, output = outputfile)
+            config_file = CADImport(xmlin1 = str(self.config_file), \
+                           xsl = str(CONFIGXSL), output = str(outputfile))
             config_file.parse_xslt()
             print "Configuration File Converted"
             length = len(self.step_files)
@@ -128,8 +104,8 @@ class GDMLtomaus(): #pylint: disable = R0903
                 file_name = num_of_splits - 1
                 file_name = new_string[file_name]
                 outputfile = output + '/' + file_name[:-4] + 'dat'
-                step_file = CADImport(xmlin1 = self.step_files[num], \
-                                    xsl = MM_XSL, output = outputfile)
+                step_file = CADImport(xmlin1 = str(self.step_files[num]), \
+                                    xsl = str(MM_XSL), output = str(outputfile))
                 step_file.parse_xslt()
                 step_file = None
                 os.remove(self.step_files[num])

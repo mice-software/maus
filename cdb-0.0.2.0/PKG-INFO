@@ -1,0 +1,12 @@
+Metadata-Version: 1.1
+Name: cdb
+Version: 0.0.2.0
+Summary: Configuration Database client
+Home-page: http://cdb.mice.rl.ac.uk
+Author: MICE
+Author-email: mice-cdb@jiscmail.ac.uk
+License: UNKNOWN
+Description: UNKNOWN
+Platform: UNKNOWN
+Requires: suds
+Provides: cdb

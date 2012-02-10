@@ -26,21 +26,225 @@
         <xs:attribute name="z" use="required" type="xs:double"/>
     </xs:complexType>
     <xs:complexType name="LengthType">
-        <xs:attribute name="value"/>
+        <xs:attribute name="value" type="xs:double"/>
         <xs:attribute name="units" use="optional"/>
     </xs:complexType>
-    <xs:complexType name="FileReferenceType">
+    <xs:complexType name="MausFileReferenceType">
         <xs:sequence>
             <xs:element name="Position" type="PositionType"/>
             <xs:element name="Rotation" type="PositionType"/>
         </xs:sequence>
         <xs:attribute name="name" type="xs:anyURI" use="required"></xs:attribute>
     </xs:complexType>
-<!--++++++++++++++++++++++++++++++++Substitution TYPES+++++++++++++++++++++++++++++++++++++-->
-
+    <xs:complexType name="MAUS_ROOT_DIR_Type">
+        <xs:attribute name="location" default="/home"/>
+    </xs:complexType>
+    <xs:complexType name="G4StepMaxType">
+        <xs:attribute name="Value" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="NameType">
+        <xs:attribute name="name" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="FieldDimensionsType">
+        <xs:attribute name="height" use="required" type="xs:double"/>
+        <xs:attribute name="width" use="required" type="xs:double"/>
+        <xs:attribute name="length" use="required" type="xs:double"/>
+        <xs:attribute name="units" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="ValueType">
+        <xs:attribute name="Value" use="required" type="xs:double"/>
+    </xs:complexType>
+    <xs:complexType name="ValueUnitType">
+        <xs:attribute name="Value" use="required" type="xs:double"/>
+        <xs:attribute name="units" use="required"/>
+    </xs:complexType>
+<!--++++++++++++++++++++++++++++++++Tracker Base TYPES+++++++++++++++++++++++++++++++++++++-->
+    <xs:complexType name="NumberType">
+        <xs:attribute name="Number" use="required" type="xs:integer"/>
+    </xs:complexType>
+    <xs:complexType name="CentralFibreType">
+        <xs:attribute name="Number" use="required" fixed="112.5"/>
+    </xs:complexType>
+    <xs:complexType name="Delta_FType">
+        <xs:attribute name="value" use="required" type="xs:double"/>
+    </xs:complexType>
+    <xs:complexType name="TrackerLengthType">
+        <xs:attribute name="length" use="required" type="xs:double"/>
+        <xs:attribute name="units" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="TrackerThicknessType">
+        <xs:attribute name="thickness" use="required" type="xs:double"/>
+        <xs:attribute name="units" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="TrackerMaterialType">
+        <xs:attribute name="name" use="required" type="xs:string"/>
+    </xs:complexType>
+    <xs:complexType name="DetectorType">
+        <xs:attribute name="type" use="required" type="xs:string"/>
+    </xs:complexType>
+    <xs:complexType name="PlaneType">
+        <xs:attribute name="plane" use="required" type="xs:integer"/>
+    </xs:complexType>
+    <xs:complexType name="ActiveRadiusType">
+        <xs:attribute name="R" use="required" type="xs:double"/>
+        <xs:attribute name="unit" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="PitchType">
+        <xs:attribute name="angle" use="required" type="xs:double"/>
+        <xs:attribute name="unit" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="DiameterType">
+        <xs:attribute name="dia" use="required" type="xs:double"/>
+        <xs:attribute name="unit" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="InvisibleType">
+        <xs:attribute name="True" use="required" type="xs:integer"/>
+    </xs:complexType>
+    <xs:complexType name="TrackerRotationType">
+        <xs:attribute name="alpha" use="required" type="xs:double"/>
+        <xs:attribute name="beta" use="required" type="xs:double"/>
+        <xs:attribute name="gamma" use="required" type="xs:double"/>
+        <xs:attribute name="units" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="ColourType">
+        <xs:attribute name="red" use="required" type="xs:double"/>
+        <xs:attribute name="green" use="required" type="xs:double"/>
+        <xs:attribute name="blue" use="required" type="xs:double"/>
+    </xs:complexType>
+<!--++++++++++++++++++++++++++++++++Tracker Schema+++++++++++++++++++++++++++++++++++++-->
+    <xs:complexType name="SciFi_Geo_Trkr_Type">
+        <xs:annotation>
+            <xs:documentation>
+                This is the tracker type and describes the tracker as a whole.
+                It is made up of geo_stn types.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="Tracker" type="NumberType"/>
+            <xs:element name="Position" type="PositionType"/>
+            <xs:element name="Rotation" type="TrackerRotationType"/>
+            <xs:element name="Length" type="LengthType"/>
+            <xs:element name="Thickness" type="TrackerThicknessType"/>
+            <xs:element name="Material" type="TrackerMaterialType"/>
+            <xs:element name="Invisible" type="InvisibleType"/>
+        </xs:sequence>
+        <xs:attribute name="ID_Number" use="required" type="xs:integer"></xs:attribute>
+    </xs:complexType>
+    <xs:complexType name="SciFi_Geo_Stn_Type">
+        <xs:annotation>
+            <xs:documentation>
+                This is the Station type. It descirbes each station within
+                this tracker. This component is made up of doublets.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="Tracker" type="NumberType"/>
+            <xs:element name="Position" type="PositionType"/>
+            <xs:element name="Rotation" type="TrackerRotationType"/>
+            <xs:element name="Length" type="LengthType"/>
+            <xs:element name="Thickness" type="TrackerThicknessType"/>
+            <xs:element name="Station" type="NumberType"/>
+            <xs:element name="Material" type="TrackerMaterialType"/>
+            <xs:element name="OpticsMaterialLength" type="LengthType"/>
+        </xs:sequence>
+        <xs:attribute name="ID_Number" use="required" type="xs:integer"></xs:attribute>
+    </xs:complexType>
+    <xs:complexType name="SciFi_Geo_Double_Type">
+        <xs:annotation>
+            <xs:documentation>
+                This is the id type. It holds all the default information about
+                the tracker's doublets.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="View" type="NumberType"/>
+            <xs:element name="CentralFibre" type="CentralFibreType"/>
+            <xs:element name="Delta_F" type="Delta_FType"/>
+            <xs:element name="Length" type="TrackerLengthType"/>
+            <xs:element name="Thickness" type="TrackerThicknessType"/>
+            <xs:element name="Material" type="TrackerMaterialType"/>
+            <xs:element name="SensitiveDetector" type="DetectorType"/>
+            <xs:element name="Plane" type="PlaneType"/>
+            <xs:element name="ActiveRadius" type="ActiveRadiusType"/>
+            <xs:element name="Pitch" type="PitchType"/>
+            <xs:element name="FibreDiameter" type="DiameterType"/>
+            <xs:element name="CoreDiameter" type="DiameterType"/>
+            <xs:element name="Invisible" type="InvisibleType"/>
+            <xs:element name="G4Detector" type="DetectorType"/>
+            <xs:element name="MylarThickness" type="TrackerThicknessType"/>
+        </xs:sequence>
+        <xs:attribute name="ID_Number" use="required" type="xs:integer"/>
+    </xs:complexType>
+<!--+++++++++++++++++++++++++++++++++++FIELD TYPES+++++++++++++++++++++++++++++++++++++++++-->
+    <xs:complexType name="DipoleType">
+        <xs:annotation>
+            <xs:documentation>
+                This is the dipole type which holds
+                the information required to build a dipoles magnetic 
+                field in Geant4
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="Volume" minOccurs="1" maxOccurs="1" type="NameType"/>
+            <xs:element name="FieldType" minOccurs="1" maxOccurs="1" type="NameType"/>
+            <xs:element name="FieldMapMode" minOccurs="1" maxOccurs="1" type="NameType"/>
+            <xs:element name="FileType" minOccurs="1" maxOccurs="1" type="NameType"/>
+            <xs:element name="FileName" minOccurs="1" maxOccurs="1" type="NameType"/>
+            <xs:element name="Symmetry" minOccurs="1" maxOccurs="1" type="NameType"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="QuadrupoleType">
+        <xs:annotation>
+            <xs:documentation>
+                This is the dipole type which holds
+                the information required to build a quadrupoles magnetic 
+                field in Geant4
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="Volume" minOccurs="1" maxOccurs="1" type="NameType"/>
+            <xs:element name="FieldType" minOccurs="1" maxOccurs="1" type="ValueUnitType"/>
+            <xs:element name="Dimensions" minOccurs="1" maxOccurs="1" type="FieldDimensionsType"/>
+            <xs:element name="FieldStrength" minOccurs="1" maxOccurs="1" type="ValueType"/>
+            <xs:element name="Pole" minOccurs="1" maxOccurs="1" type="ValueType"/>
+            <xs:element name="MaxEndPole" minOccurs="1" maxOccurs="1" type="ValueType"/>
+            <xs:element name="EndFieldType" minOccurs="1" maxOccurs="1" type="NameType"/>
+            <xs:element name="EndLength" minOccurs="1" maxOccurs="1" type="ValueUnitType"/>
+            <xs:element name="CentreLength" minOccurs="1" maxOccurs="1" type="ValueUnitType"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="SolenoidType">
+        <xs:annotation>
+            <xs:documentation>
+                This is the dipole type which holds
+                the information required to build a solenoid magnetic 
+                field in Geant4
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="Volume" minOccurs="1" maxOccurs="1" type="NameType"/>
+            <xs:element name="FieldType" minOccurs="1" maxOccurs="1" type="NameType"/>
+            <xs:element name="FileName" minOccurs="1" maxOccurs="1" type="NameType"/>
+            <xs:element name="CurrentDensity" minOccurs="1" maxOccurs="1" type="ValueType"/>
+            <xs:element name="Length" minOccurs="1" maxOccurs="1" type="ValueType"/>
+            <xs:element name="Thickness" minOccurs="1" maxOccurs="1" type="ValueType"/>
+            <xs:element name="InnerRadius" minOccurs="1" maxOccurs="1" type="ValueType"/>
+            <xs:element name="ScaleFactor" minOccurs="1" maxOccurs="1" type="NameType"/>
+        </xs:sequence>
+    </xs:complexType>
 <!--+++++++++++++++++++++++++++++++++++MIDDLE TYPES++++++++++++++++++++++++++++++++++++++++-->
     <xs:complexType name="TrackerType">
+        <xs:annotation>
+            <xs:documentation>
+                This is the Tacker Geometry Information
+            </xs:documentation>
+        </xs:annotation>
         <xs:sequence>
+            <xs:element name="Tracker" type="SciFi_Geo_Trkr_Type"/>
+            <xs:element name="Station" type="SciFi_Geo_Stn_Type"/>
+            <xs:element name="SciFiGeoDbl" type="SciFi_Geo_Double_Type" minOccurs="0"/>
+        </xs:sequence>
+        <!--<xs:sequence>
             <xs:element name="Component" maxOccurs="2">
                 <xs:complexType>
                     <xs:sequence>
@@ -51,12 +255,12 @@
                         <xs:element name="Material" type="LengthType"/>
                         <xs:element name="Tracker" type="LengthType"/>
                         <xs:element name="Invisible" type="LengthType"/>
-                        <xs:element name="Tracker_Element" type="FileReferenceType" maxOccurs="unbounded"></xs:element>
+                        <xs:element name="Tracker_Element" type="MausFileReferenceType" maxOccurs="unbounded"></xs:element>
                     </xs:sequence>
                     <xs:attribute name="name"/>
                 </xs:complexType>
             </xs:element>
-        </xs:sequence>
+        </xs:sequence>-->
     </xs:complexType>
     <xs:complexType name ="configurationType">
         <xs:sequence>
@@ -94,6 +298,9 @@
     </xs:complexType>
     <xs:complexType name="G4Field_InformationType">
         <xs:sequence>
+            <xs:element name="Dipole" minOccurs="0" maxOccurs="unbounded" type="DipoleType"/>
+            <xs:element name="Quadrupole" minOccurs="0" maxOccurs="unbounded" type="QuadrupoleType"/>
+            <xs:element name="Solenoid" minOccurs="0" maxOccurs="unbounded" type="SolenoidType"/>
             <xs:element name="G4Magnet_info" type="G4MagnetType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
@@ -104,6 +311,12 @@
             <xs:element name="Cherenkov" minOccurs="0"/>
             <xs:element name="Tracker" type="TrackerType" minOccurs="0"/>
             <xs:element name="Tracker_Part" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="Other_InfromationType">
+        <xs:sequence>
+            <xs:element name="GDML_Files" type="MAUS_ROOT_DIR_Type"/>
+            <xs:element name="G4StepMax" type="G4StepMaxType"/>
         </xs:sequence>
     </xs:complexType>
 <!--++++++++++++++++++++++++++++++++++TOP TYPES+++++++++++++++++++++++++++++++++++++++++-->
@@ -123,6 +336,7 @@
                 </xs:element>
                 <xs:element name="G4Field_Information" type="G4Field_InformationType" minOccurs="0"/>
                 <xs:element name="Detector_Information" type="Detector_InformationType" minOccurs="0"/>
+                <xs:element name="Other_Information" type="Other_InfromationType" minOccurs="0"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>

@@ -1,0 +1,11 @@
+To install the cdb module run:
+./setup.py install
+
+To use a cdb other than the default server use the environment variable or set the props file
+	set
+		CDB_SERVER=http://host.domain:port
+or
+	create a file 
+		/opt/mice/etc/cdb-client/cdb.props
+	which should contain a line like
+		cdb.server=http://host.domain:port
