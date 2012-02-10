@@ -175,59 +175,59 @@ void PatternRecognition::make_spr_5pt(const std::vector<SciFiSpacePoint*>& spnts
       }
     }
   }
-  /* if ( success ) {
-    // run_analysis(trks);
-  } */
+  if ( success ) {
+    run_analysis(trks);
+  }
 }
 
 void PatternRecognition::linear_fit(std::map<int, SciFiSpacePoint*> &spnts,
                                      SimpleLine &line_x,
                                      SimpleLine &line_y) {
-        // Set up arrays for gsl fitter
-        double x[_n_stations] = { spnts[4]->get_position().x(),
-                                  spnts[3]->get_position().x(),
-                                  spnts[2]->get_position().x(),
-                                  spnts[1]->get_position().x(),
-                                  spnts[0]->get_position().x() };
+  // Set up arrays for gsl fitter
+  double x[_n_stations] = { spnts[4]->get_position().x(),
+                            spnts[3]->get_position().x(),
+                            spnts[2]->get_position().x(),
+                            spnts[1]->get_position().x(),
+                            spnts[0]->get_position().x() };
 
-        double y[_n_stations] = { spnts[4]->get_position().y(),
-                                  spnts[3]->get_position().y(),
-                                  spnts[2]->get_position().y(),
-                                  spnts[1]->get_position().y(),
-                                  spnts[0]->get_position().y() };
+  double y[_n_stations] = { spnts[4]->get_position().y(),
+                            spnts[3]->get_position().y(),
+                            spnts[2]->get_position().y(),
+                            spnts[1]->get_position().y(),
+                            spnts[0]->get_position().y() };
 
-        double z[_n_stations] = { spnts[4]->get_position().z(),
-                                  spnts[3]->get_position().z(),
-                                  spnts[2]->get_position().z(),
-                                  spnts[1]->get_position().z(),
-                                  spnts[0]->get_position().z() };
+  double z[_n_stations] = { spnts[4]->get_position().z(),
+                            spnts[3]->get_position().z(),
+                            spnts[2]->get_position().z(),
+                            spnts[1]->get_position().z(),
+                            spnts[0]->get_position().z() };
 
-        // Set up variables to hold gsl fitter results
-        double c_x, m_x, cov_x00, cov_x01, cov_x11, chisq_x;
-        double c_y, m_y, cov_y00, cov_y01, cov_y11, chisq_y;
+  // Set up variables to hold gsl fitter results
+  double c_x, m_x, cov_x00, cov_x01, cov_x11, chisq_x;
+  double c_y, m_y, cov_y00, cov_y01, cov_y11, chisq_y;
 
-        // Perform the fit
-        gsl_fit_linear(z, 1, x, 1, _n_stations,
-                       &c_x, &m_x, &cov_x00, &cov_x01, &cov_x11,
-                       &chisq_x);
+  // Perform the fit
+  gsl_fit_linear(z, 1, x, 1, _n_stations,
+                  &c_x, &m_x, &cov_x00, &cov_x01, &cov_x11,
+                  &chisq_x);
 
-        gsl_fit_linear(z, 1, y, 1, _n_stations,
-                       &c_y, &m_y, &cov_y00, &cov_y01, &cov_y11,
-                       &chisq_y);
+  gsl_fit_linear(z, 1, y, 1, _n_stations,
+                  &c_y, &m_y, &cov_y00, &cov_y01, &cov_y11,
+                  &chisq_y);
 
-        // Write some output to screen
-        std::cout << "Track parameters x: c = " << c_x << ", m = ";
-        std::cout << m_x << ", chisq = " << chisq_x << std::endl;
-        std::cout << "Track parameters y: c = " << c_y << ", m = ";
-        std::cout << m_y << ", chisq = " << chisq_y << std::endl;
-        std::cout << "sp\tx\ty\tz" << std::endl;
-        for ( int i = 0; i < _n_stations; ++i ) {
-          std::cout << i << "\t" << x[i] << "\t" << y[i] << "\t" << z[i] << std::endl;
-        }
+  // Write some output to screen
+  std::cout << "Track parameters x: c = " << c_x << ", m = ";
+  std::cout << m_x << ", chisq = " << chisq_x << std::endl;
+  std::cout << "Track parameters y: c = " << c_y << ", m = ";
+  std::cout << m_y << ", chisq = " << chisq_y << std::endl;
+  std::cout << "sp\tx\ty\tz" << std::endl;
+  for ( int i = 0; i < _n_stations; ++i ) {
+    std::cout << i << "\t" << x[i] << "\t" << y[i] << "\t" << z[i] << std::endl;
+  }
 
-        // Return the lines in x and y
-        line_x.set_parameters(c_x, m_x, chisq_x);
-        line_y.set_parameters(c_y, m_y, chisq_y);
+  // Return the lines in x and y
+  line_x.set_parameters(c_x, m_x, chisq_x);
+  line_y.set_parameters(c_y, m_y, chisq_y);
 }
 
 void PatternRecognition::run_analysis(std::vector<SciFiStraightPRTrack>& trks) {

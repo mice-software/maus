@@ -28,11 +28,11 @@ def run(data_path, run_num):
     my_map = MAUS.MapPyGroup()
     my_map.append(MAUS.MapCppTrackerRecon())
 
-    reducer = MAUS.ReduceCppTracker()
-    # reducer = MAUS.ReducePyDoNothing()
+    # reducer = MAUS.ReduceCppTracker()
+    reducer = MAUS.ReducePyDoNothing()
     # reducer = MAUS.ReduceCppTrackerErrorLog()
 
-    output_file = open("unpacked_1909", 'w')  #  Uncompressed
+    output_file = open("unpacked_1901", 'w')  #  Uncompressed
     my_output = MAUS.OutputPyJSON(output_file)
 
     # The Go() drives all the components you pass in then put all the output
@@ -47,7 +47,7 @@ if __name__ == '__main__':
     # Temporary values for the data path and data file
 
     data_path = '/home/edward/cosmic_raw/'  #'%s/src/input/InputCppDAQData' % os.environ.get("MAUS_ROOT_DIR")
-    data_file = 'gdc1909.000'
+    data_file = 'gdc1901.001'
     
     # Check command line arguments for path to data and file name
     if len(sys.argv) == 1:

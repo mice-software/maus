@@ -82,15 +82,16 @@ void RealDataDigitization::process(SciFiSpill &spill, Json::Value const &daq) {
         pe = -10.0;
       }
       // int unique_chan  = _calibration[board][bank][channel_ro]["unique_chan"].asDouble();
-      std::ofstream out2("noise.txt", std::ios::out | std::ios::app);
-     /* if ( pe > 1.99 && pe < 4. ) {
-        out2 << board << " " << bank << " " << channel_ro << "\n";
-      }*/
-      out2.close();
+
       // Find tracker, station, plane, channel.
       int tracker, station, plane, channel;
       get_StatPlaneChannel(board, bank, channel_ro, tracker, station, plane, channel);
-
+      std::ofstream out2("dead_channels.txt", std::ios::out | std::ios::app);
+      if (1) { // pe > 2 && tracker != -1  ) {
+        out2 << tracker << " " << station << " " << plane << " " <<  channel  <<
+        " " << board << " " << bank << " " <<  channel_ro << "\n";
+      }
+      out2.close();
       // Exclude missing modules.
       if ( pe > 1.0 && tracker != -1 ) {
         SciFiDigit *digit = new SciFiDigit(tracker, station, plane, channel, pe, tdc);
