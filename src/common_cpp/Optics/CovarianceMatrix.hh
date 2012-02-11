@@ -45,8 +45,6 @@ class CovarianceMatrix;
  */
 CovarianceMatrix rotate(const CovarianceMatrix& covariances, double angle);
 
-std::ostream& operator<<(std::ostream& out, CovarianceMatrix cov);
-
 // ############################
 //  CovarianceMatrix
 // ############################
@@ -103,21 +101,22 @@ class CovarianceMatrix : public SymmetricMatrix {
    *  @param[in] dispersion_y y dispersion
    *  @param[in] dispersion_prime_y change in y dispersion w.r.t. s
    */
-  CovarianceMatrix(double mass,
-                   double momentum,
-                   double charge,
-                   double emittance_t,
-                   double beta_t,
-                   double alpha_t,
-                   double Ltwiddle_t,
-                   double emittance_l,
-                   double beta_l,
-                   double alpha_l,
-                   double Bz,
-                   double dispersion_x,
-                   double dispersion_prime_x,
-                   double dispersion_y,
-                   double dispersion_prime_y);
+  static const CovarianceMatrix CreateFromPennParameters(
+      double mass,
+      double momentum,
+      double charge,
+      double Bz,
+      double Ltwiddle_t,
+      double emittance_t,
+      double beta_t,
+      double alpha_t,
+      double emittance_l,
+      double beta_l,
+      double alpha_l,
+      double dispersion_x,
+      double dispersion_prime_x,
+      double dispersion_y,
+      double dispersion_prime_y);
 
   /** @brief  Set the matrix elements using the Twiss parameterisation.
    *
@@ -138,22 +137,22 @@ class CovarianceMatrix : public SymmetricMatrix {
    *  @param[in] dispersion_y y dispersion
    *  @param[in] dispersion_prime_y change in y dispersion w.r.t. s
    */
-  CovarianceMatrix(double mass,
-                   double momentum,
-                   double energy,
-                   double emittance_x,
-                   double beta_x,
-                   double alpha_x,
-                   double emittance_y,
-                   double beta_y,
-                   double alpha_y,
-                   double emittance_l,
-                   double beta_l,
-                   double alpha_l,
-                   double dispersion_x,
-                   double dispersion_prime_x,
-                   double dispersion_y,
-                   double dispersion_prime_y);
+  static const CovarianceMatrix CreateFromTwissParameters(
+      double mass,
+      double momentum,
+      double emittance_x,
+      double beta_x,
+      double alpha_x,
+      double emittance_y,
+      double beta_y,
+      double alpha_y,
+      double emittance_l,
+      double beta_l,
+      double alpha_l,
+      double dispersion_x,
+      double dispersion_prime_x,
+      double dispersion_y,
+      double dispersion_prime_y);
 
   // ********************************
   // *** Public member functions  ***
@@ -161,7 +160,7 @@ class CovarianceMatrix : public SymmetricMatrix {
 
   /* @brief Return true if the Covariance matrix is positive definite
    */
-  bool IsPositiveDefinite();
+  bool IsPositiveDefinite() const;
 };
 }  // namespace MAUS
 

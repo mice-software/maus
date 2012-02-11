@@ -34,6 +34,7 @@
 namespace MAUS {
 
 using MAUS::Matrix;
+using ::CLHEP::c_light;
 
 // ############################
 //  Free Functions
@@ -55,8 +56,8 @@ CovarianceMatrix rotate(const CovarianceMatrix& covariances,
     0.,    0.,    -fsin, 0.,    fcos,  0.,
     0.,    0.,    0.,    -fsin, 0.,    fcos
   };
-  Matrix<double> rotation(6, 6, rotation_array);
-  Matrix<double> rotation_transpose = transpose(rotation);
+  const Matrix<double> rotation(6, 6, rotation_array);
+  const Matrix<double> rotation_transpose = transpose(rotation);
 
   // the orthogonal similarity transform of a symmetric matrix is also symmetric
   CovarianceMatrix rotated_covariances(
@@ -138,25 +139,33 @@ CovarianceMatrix::CovarianceMatrix(double const * const array_matrix)
     : SymmetricMatrix(6, array_matrix)
 { }
 
-CovarianceMatrix::CovarianceMatrix(double mass,
-                                   double momentum,
-                                   double charge,
-                                   double emittance_t,
-                                   double beta_t,
-                                   double alpha_t,
-                                   double Ltwiddle_t,
-                                   double emittance_l,
-                                   double beta_l,
-                                   double alpha_l,
-                                   double Bz,
-                                   double dispersion_x,
-                                   double dispersion_prime_x,
-                                   double dispersion_y,
-                                   double dispersion_prime_y)
-    : SymmetricMatrix() {
+/* xboa uses an equation for calculating canonical angular momentum that is
+ * different from the standard. This in turn affects Ltwiddle_t. Furthermore,
+ * xboa uses a different definition of kappa and sigma_y_Px than G. Penn's
+ * paper (this might be an error). It also appears that xboa uses total
+ * momentum instead of longitudinal momentum in calculations of the covariances.
+ */
+const CovarianceMatrix CovarianceMatrix::CreateFromPennParameters(
+    double mass,
+    double momentum,
+    double charge,
+    double Bz,
+    double Ltwiddle_t,
+    double emittance_t,
+    double beta_t,
+    double alpha_t,
+    double emittance_l,
+    double beta_l,
+    double alpha_l,
+    double dispersion_x,
+    double dispersion_prime_x,
+    double dispersion_y,
+    double dispersion_prime_y) {
+
   // *** calculate some intermediate values ***
   double energy     = ::sqrt(momentum * momentum + mass * mass);
-  double kappa      = charge * Bz / (2. * momentum);
+  // this differs from G. Penn's paper
+  double kappa      = c_light * Bz / (2. * momentum);
   double gamma_t    = (1 + alpha_t*alpha_t
                        + (beta_t*kappa - Ltwiddle_t)*(beta_t*kappa-Ltwiddle_t))
                     / beta_t;
@@ -180,15 +189,17 @@ CovarianceMatrix::CovarianceMatrix(double mass,
   double sigma_y_t  =  0.;
   double sigma_y_E  = -dispersion_y * sigma_E_E / energy;
   double sigma_y_x  =   0.;
-  double sigma_y_Px =  mass * emittance_t * (beta_t*kappa - Ltwiddle_t);
+  // this differes from G. Penn's paper
+  double sigma_y_Px =  mass * emittance_t
+                    * (beta_t*kappa - Ltwiddle_t) * charge;
   double sigma_y_y  =  emittance_t * beta_t * mass / momentum;
 
   double sigma_Py_t =  0.;
   double sigma_Py_E =  dispersion_prime_y * sigma_E_E / energy;
-  double sigma_Py_x = -mass * emittance_t * (beta_t*kappa-Ltwiddle_t);
+  double sigma_Py_x = -sigma_y_Px;
   double sigma_Py_Px=  0.;
-  double sigma_Py_y =  -mass * emittance_t * gamma_t;
-  double sigma_Py_Py=  0.;
+  double sigma_Py_y =  sigma_Px_x;
+  double sigma_Py_Py=  sigma_Px_Px;
 
   double covariances[36] = {
     sigma_t_t,  0.,         0.,         0.,           0.,         0.,
@@ -199,26 +210,27 @@ CovarianceMatrix::CovarianceMatrix(double mass,
     sigma_Py_t, sigma_Py_E, sigma_Py_x, sigma_Py_Px,  sigma_Py_y, sigma_Py_Py
   };
 
-  build_matrix(6, covariances);
+  return CovarianceMatrix(covariances);
 }
 
-CovarianceMatrix::CovarianceMatrix(double mass,
-                                   double momentum,
-                                   double energy,
-                                   double emittance_x,
-                                   double beta_x,
-                                   double alpha_x,
-                                   double emittance_y,
-                                   double beta_y,
-                                   double alpha_y,
-                                   double emittance_l,
-                                   double beta_l,
-                                   double alpha_l,
-                                   double dispersion_x,
-                                   double dispersion_prime_x,
-                                   double dispersion_y,
-                                   double dispersion_prime_y) {
+const CovarianceMatrix CovarianceMatrix::CreateFromTwissParameters(
+      double mass,
+      double momentum,
+      double emittance_x,
+      double beta_x,
+      double alpha_x,
+      double emittance_y,
+      double beta_y,
+      double alpha_y,
+      double emittance_l,
+      double beta_l,
+      double alpha_l,
+      double dispersion_x,
+      double dispersion_prime_x,
+      double dispersion_y,
+      double dispersion_prime_y) {
   // *** calculate some intermediate values ***
+  double energy  = ::sqrt(momentum * momentum + mass * mass);
   double gamma_x = (1+alpha_x*alpha_x)/beta_x;
   double gamma_y = (1+alpha_y*alpha_y)/beta_y;
   double gamma_l = (1+alpha_l*alpha_l)/beta_l;
@@ -250,7 +262,7 @@ CovarianceMatrix::CovarianceMatrix(double mass,
   double sigma_Py_Px= 0.;
   double sigma_Py_y = -emittance_y * mass * alpha_y;
   double sigma_Py_Py= emittance_y * mass * momentum * gamma_y;
-
+fflush(stdout);
 
   double covariances[36] = {
     sigma_t_t,  0.,         0.,         0.,           0.,         0.,
@@ -261,10 +273,10 @@ CovarianceMatrix::CovarianceMatrix(double mass,
     sigma_Py_t, sigma_Py_E, sigma_Py_x, sigma_Py_Px,  sigma_Py_y, sigma_Py_Py
   };
 
-  build_matrix(6, covariances);
+  return CovarianceMatrix(covariances);
 }
 
-bool CovarianceMatrix::IsPositiveDefinite() {
+bool CovarianceMatrix::IsPositiveDefinite() const {
   size_t min_row = 1;
   size_t min_column = 1;
   size_t rows = size();

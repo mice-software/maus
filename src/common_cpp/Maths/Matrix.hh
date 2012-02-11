@@ -338,8 +338,6 @@ class MatrixBase {
     const MatrixBase<StdType, GslType>&                   rhs);
   MatrixBase<StdType, GslType>& operator*=(
     const MatrixBase<StdType, GslType>&                   rhs);
-  MatrixBase<StdType, GslType>& operator/=(
-    const MatrixBase<StdType, GslType>&                   rhs);
   MatrixBase<StdType, GslType>& operator*=(const StdType& rhs);
   MatrixBase<StdType, GslType>& operator/=(const StdType& rhs);
 
