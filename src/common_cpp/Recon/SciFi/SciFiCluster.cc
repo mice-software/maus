@@ -16,6 +16,8 @@
  */
 #include "src/common_cpp/Recon/SciFi/SciFiCluster.hh"
 
+// namespace MAUS {
+
 SciFiCluster::SciFiCluster(): _used(false) {}
 
 SciFiCluster::SciFiCluster(SciFiDigit *digit):_used(false),
@@ -37,3 +39,4 @@ void SciFiCluster::add_digit(SciFiDigit* neigh) {
   _channel_w /= 2.0;
   _channel_w += (neigh->get_channel())/2.0;
 }
+// }// ~namespace MAUS

@@ -17,6 +17,8 @@
 
 #include "src/common_cpp/Recon/SciFi/SciFiDigit.hh"
 
+// namespace MAUS {
+
 SciFiDigit::SciFiDigit():_used(false) {}
 
 SciFiDigit::SciFiDigit(int tracker, int station, int plane, int channel, double npe, double time )
@@ -25,4 +27,4 @@ SciFiDigit::SciFiDigit(int tracker, int station, int plane, int channel, double 
 }
 
 SciFiDigit::~SciFiDigit() {}
-
+// } ~namespace MAUS

@@ -16,9 +16,11 @@
  */
 #include "src/common_cpp/Recon/SciFi/SciFiSpill.hh"
 
+// namespace MAUS {
 
 SciFiSpill::SciFiSpill() {
   // scifidigits.clear();
 }
 
 SciFiSpill::~SciFiSpill() {}
+// }// ~namespace MAUS

@@ -44,6 +44,8 @@
 #include "src/legacy/Config/MiceModule.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiDigit.hh"
 
+// namespace MAUS {
+
 class SciFiCluster {
  public:
   SciFiCluster(); // Default constructor
@@ -114,5 +116,6 @@ class SciFiCluster {
 
   Hep3Vector _position;
 };  // Don't forget this trailing colon!!!!
+// }// ~namespace MAUS
 
 #endif

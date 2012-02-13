@@ -33,6 +33,8 @@
 // MAUS headers
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
 
+// namespace MAUS {
+
 class SciFiStraightPRTrack {
   public:
   // Constructors
@@ -76,5 +78,6 @@ class SciFiStraightPRTrack {
   double _mx;
   double _my;
 };
+// }// ~namespace MAUS
 
 #endif

@@ -27,7 +27,7 @@
 
 #include "gtest/gtest.h"
 
-namespace {
+// MAUS namespace {
 class SciFiSpacePointRecTest : public ::testing::Test {
  protected:
   SciFiSpacePointRecTest()  {}
@@ -68,5 +68,4 @@ TEST_F(SciFiSpacePointRecTest, test_process) {
   test.process(event);
   EXPECT_EQ(event.scifispacepoints.size(), 0);
 }
-
-} // namespace
+// } // namespace

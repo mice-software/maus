@@ -23,6 +23,8 @@
 #ifndef  SIMPLELINE_HH
 #define SIMPLELINE_HH
 
+// namespace MAUS {
+
 class SimpleLine {
   public:
     SimpleLine();   // Default constructor
@@ -44,5 +46,6 @@ class SimpleLine {
     double _m;
     double _chisq;
 };
+// }// ~namespace MAUS
 
 #endif

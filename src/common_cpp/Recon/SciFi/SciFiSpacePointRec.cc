@@ -17,6 +17,8 @@
 
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePointRec.hh"
 
+// namespace MAUS {
+
 SciFiSpacePointRec::SciFiSpacePointRec() {}
 
 SciFiSpacePointRec::~SciFiSpacePointRec() {}
@@ -282,3 +284,4 @@ Hep3Vector SciFiSpacePointRec::crossing_pos(SciFiCluster* c1,
 
     return an_intersection;
 }
+// }// ~namespace MAUS

@@ -17,6 +17,8 @@
 
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
 
+// namespace MAUS {
+
 SciFiSpacePoint::SciFiSpacePoint() {}
 
 SciFiSpacePoint::~SciFiSpacePoint() {}
@@ -60,3 +62,4 @@ SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2) {
   // _time_error = 0;
   // _time_res   = 0;
 }
+// }// ~namespace MAUS

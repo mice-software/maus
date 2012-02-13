@@ -41,6 +41,8 @@
 #include "src/common_cpp/Recon/SciFi/SciFiHit.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiSpill.hh"
 
+// namespace MAUS {
+
 class MapCppTrackerMCDigitization {
  public:
   /** Sets up the worker
@@ -103,5 +105,6 @@ class MapCppTrackerMCDigitization {
   /// an array contaning all MiceModules
   std::vector<const MiceModule*> modules;
 };  // Don't forget this trailing colon!!!!
+// }// ~namespace MAUS
 
 #endif

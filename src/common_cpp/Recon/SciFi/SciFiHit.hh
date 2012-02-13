@@ -38,6 +38,8 @@
 #include <sstream>
 #include <vector>
 
+// namespace MAUS {
+
 class SciFiHit {
  public:
   SciFiHit(); // Default constructor
@@ -92,5 +94,6 @@ class SciFiHit {
 
   bool _used;
 };  // Don't forget this trailing colon!!!!
+// }// ~namespace MAUS
 
 #endif

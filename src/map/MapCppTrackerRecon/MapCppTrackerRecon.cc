@@ -17,6 +17,8 @@
 
 #include "src/map/MapCppTrackerRecon/MapCppTrackerRecon.hh"
 
+// namespace MAUS {
+
 bool MapCppTrackerRecon::birth(std::string argJsonConfigDocument) {
   _classname = "MapCppTrackerRecon";
 
@@ -246,3 +248,4 @@ std::string MapCppTrackerRecon::JsonToString(Json::Value json_in) {
   JsonWrapper::Print(ss_io, json_in);
   return ss_io.str();
 }
+// }// ~namespace MAUS

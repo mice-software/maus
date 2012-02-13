@@ -19,7 +19,7 @@
 
 #include "src/common_cpp/Recon/SciFi/SciFiHit.hh"
 
-namespace {
+// MAUS namespace {
 class SciFiHitTest : public ::testing::Test {
  protected:
   SciFiHitTest()  {}
@@ -78,5 +78,4 @@ TEST_F(SciFiHitTest, test_constructor) {
   EXPECT_EQ(Hit->get_time(), time);
   EXPECT_FALSE(Hit->is_used());
 }
-
-} // namespace
+// } // namespace

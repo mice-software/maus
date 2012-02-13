@@ -35,6 +35,8 @@
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiStraightPRTrack.hh"
 
+// namespace MAUS {
+
 class SciFiEvent {
  public:
   SciFiEvent();
@@ -57,5 +59,6 @@ class SciFiEvent {
   std::vector<SciFiSpacePoint*> scifiseeds;
   std::vector<SciFiStraightPRTrack> scifistraightprtracks;
 };  // Don't forget this trailing colon!!!!
+// }// ~namespace MAUS
 
 #endif

@@ -37,6 +37,8 @@
 #include <sstream>
 #include <vector>
 
+// namespace MAUS {
+
 class SciFiDigit {
  public:
   SciFiDigit(); // Default constructor
@@ -91,5 +93,6 @@ class SciFiDigit {
 
   bool _used;
 };  // Don't forget this trailing colon!!!!
+// } ~namespace MAUS
 
 #endif

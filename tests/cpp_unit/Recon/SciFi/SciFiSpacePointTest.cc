@@ -26,7 +26,7 @@
 
 #include "gtest/gtest.h"
 
-namespace {
+// namespace {
 class SciFiSpacePointTest : public ::testing::Test {
  protected:
   SciFiSpacePointTest()  {}
@@ -103,5 +103,4 @@ TEST_F(SciFiSpacePointTest, test_duplet_constructor) {
   std::vector<SciFiCluster*> channels = spacepoint->get_channels();
   EXPECT_EQ(channels.size(), 2);
 }
-
-} // namespace
+// } // namespace

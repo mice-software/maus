@@ -23,7 +23,7 @@
 #include "src/map/MapCppTrackerMCDigitization/MapCppTrackerMCDigitization.hh"
 #include "gtest/gtest.h"
 
-namespace {
+// MAUS namespace {
 class MapCppTrackerReconTest : public ::testing::Test {
  protected:
   MapCppTrackerReconTest()  {}
@@ -41,5 +41,4 @@ TEST_F(MapCppTrackerReconTest, test_birth) {
   //  RealDataDigitization real;
   //  EXPECT_TRUE(real.load_bad_channels());
 }
-
-} // namespace
+// } // namespace

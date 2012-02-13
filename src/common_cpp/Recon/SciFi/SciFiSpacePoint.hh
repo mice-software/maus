@@ -38,6 +38,8 @@
 
 #include "src/common_cpp/Recon/SciFi/SciFiCluster.hh"
 
+// namespace MAUS {
+
 class SciFiSpacePoint {
  public:
   SciFiSpacePoint(); // Default constructor
@@ -100,5 +102,6 @@ class SciFiSpacePoint {
 
   std::vector<SciFiCluster*>  _channels;
 };  // Don't forget this trailing colon!!!!
+// }// ~namespace MAUS
 
 #endif

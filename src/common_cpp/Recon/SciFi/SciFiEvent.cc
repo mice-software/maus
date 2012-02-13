@@ -16,6 +16,7 @@
  */
 #include "src/common_cpp/Recon/SciFi/SciFiEvent.hh"
 
+// namespace MAUS {
 
 SciFiEvent::SciFiEvent() {
   // scifidigits.clear();
@@ -42,3 +43,4 @@ SciFiEvent::~SciFiEvent() {
   //scifispacepoints.clear();
 */
 }
+// }// ~namespace MAUS

@@ -31,6 +31,7 @@
 // others
 #include "src/common_cpp/Recon/SciFi/SciFiEvent.hh"
 
+// namespace MAUS {
 
 class SciFiSpill {
  public:
@@ -43,5 +44,6 @@ class SciFiSpill {
   // private:
   std::vector<SciFiEvent>   events_in_spill;
 };  // Don't forget this trailing colon!!!!
+// }// ~namespace MAUS
 
 #endif

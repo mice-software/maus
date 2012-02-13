@@ -17,6 +17,8 @@
 
 #include "src/map/MapCppTrackerMCDigitization/MapCppTrackerMCDigitization.hh"
 
+// namespace MAUS {
+
 bool MapCppTrackerMCDigitization::birth(std::string argJsonConfigDocument) {
   _classname = "MapCppTrackerMCDigitization";
 
@@ -341,3 +343,4 @@ void MapCppTrackerMCDigitization::save_to_json(SciFiEvent &evt) {
   assert(!js_event.isNull());
   root["digits"].append(js_event);
 }
+// }// ~namespace MAUS

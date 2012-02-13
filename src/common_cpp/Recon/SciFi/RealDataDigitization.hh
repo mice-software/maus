@@ -51,6 +51,7 @@
 #include "src/common_cpp/Recon/SciFi/SciFiEvent.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiSpill.hh"
 
+// namespace MAUS {
 
 class RealDataDigitization {
  public:
@@ -109,5 +110,6 @@ class RealDataDigitization {
   std::vector<int> _inWG;
   std::vector<int> _WGfib;
 };  // Don't forget this trailing colon!!!!
+// }// ~namespace MAUS
 
 #endif

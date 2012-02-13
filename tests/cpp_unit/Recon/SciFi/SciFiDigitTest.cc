@@ -19,7 +19,7 @@
 
 #include "src/common_cpp/Recon/SciFi/SciFiDigit.hh"
 
-namespace {
+// MAUS namespace {
 class SciFiDigitTest : public ::testing::Test {
  protected:
   SciFiDigitTest()  {}
@@ -78,5 +78,4 @@ TEST_F(SciFiDigitTest, test_constructor) {
   EXPECT_EQ(digit->get_time(), time);
   EXPECT_FALSE(digit->is_used());
 }
-
-} // namespace
+// } // namespace

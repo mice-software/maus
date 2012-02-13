@@ -28,6 +28,8 @@
 #include "src/common_cpp/Recon/SciFi/PatternRecognition.hh"
 #include "src/common_cpp/Recon/SciFi/SimpleLine.hh"
 
+// namespace MAUS {
+
 PatternRecognition::PatternRecognition() {
   // Do nothing
 };
@@ -247,3 +249,4 @@ void PatternRecognition::sort_by_station(const std::vector<SciFiSpacePoint*>& sp
     }
   }
 }
+// }// ~namespace MAUS

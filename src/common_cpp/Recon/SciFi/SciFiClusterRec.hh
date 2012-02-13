@@ -43,6 +43,8 @@
 #include "src/common_cpp/Recon/SciFi/SciFiEvent.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiDigit.hh"
 
+// namespace MAUS {
+
 class SciFiClusterRec {
  public:
   SciFiClusterRec(); // Default constructor
@@ -71,5 +73,6 @@ class SciFiClusterRec {
 
   double _min_npe;
 };  // Don't forget this trailing colon!!!!
+// }// ~namespace MAUS
 
 #endif

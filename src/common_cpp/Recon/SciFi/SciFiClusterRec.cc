@@ -16,6 +16,8 @@
  */
 #include "src/common_cpp/Recon/SciFi/SciFiClusterRec.hh"
 
+// namespace MAUS {
+
 SciFiClusterRec::SciFiClusterRec() {}
 
 SciFiClusterRec::SciFiClusterRec(int cluster_exception, double min_npe)
@@ -137,3 +139,4 @@ Hep3Vector SciFiClusterRec::get_reference_frame_pos(int tracker,
   Hep3Vector reference_pos =  reference_plane->globalPosition();
   return reference_pos;
 }
+// }// ~namespace MAUS

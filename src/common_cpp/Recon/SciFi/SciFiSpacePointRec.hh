@@ -44,6 +44,8 @@
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiEvent.hh"
 
+// namespace MAUS {
+
 class SciFiSpacePointRec {
  public:
   SciFiSpacePointRec(); // Default constructor
@@ -73,5 +75,6 @@ class SciFiSpacePointRec {
   bool duplet_within_radius(SciFiCluster* candidate_A,
                             SciFiCluster* candidate_B);
 };  // Don't forget this trailing colon!!!!
+// }// ~namespace MAUS
 
 #endif

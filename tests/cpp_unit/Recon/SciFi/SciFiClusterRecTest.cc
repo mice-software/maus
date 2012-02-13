@@ -27,7 +27,7 @@
 
 #include "gtest/gtest.h"
 
-namespace {
+// MAUS namespace {
 class SciFiClusterRecTest : public ::testing::Test {
  protected:
   SciFiClusterRecTest()  {
@@ -77,5 +77,4 @@ TEST_F(SciFiClusterRecTest, test_process) {
   cluster->construct(modules);*/
   // think of tests for direction and position...
 }
-
-} // namespace
+// } // namespace

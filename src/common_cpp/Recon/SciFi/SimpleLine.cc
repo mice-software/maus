@@ -17,6 +17,8 @@
 
 #include "src/common_cpp/Recon/SciFi/SimpleLine.hh"
 
+// namespace MAUS {
+
 // Constructor
 SimpleLine::SimpleLine() {}
 
@@ -28,3 +30,4 @@ void SimpleLine::set_parameters(double c, double m, double chisq) {
   _m = m;
   _chisq = chisq;
 }
+// }// ~namespace MAUS

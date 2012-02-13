@@ -38,6 +38,8 @@
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiStraightPRTrack.hh"
 
+// namespace MAUS {
+
 class PatternRecognition {
   public:
 
@@ -136,5 +138,6 @@ class PatternRecognition {
     static const double _res_cut = 15.0;
     static const double _chisq_cut = 15.0;
 };
+// }// ~namespace MAUS
 
 #endif

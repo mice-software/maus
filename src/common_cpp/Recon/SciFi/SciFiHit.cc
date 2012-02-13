@@ -17,6 +17,8 @@
 
 #include "src/common_cpp/Recon/SciFi/SciFiHit.hh"
 
+// namespace MAUS {
+
 SciFiHit::SciFiHit(): _used(false) {}
 
 SciFiHit::SciFiHit(int tracker, int station, int plane, int fibre, double edep, double time)
@@ -25,3 +27,4 @@ SciFiHit::SciFiHit(int tracker, int station, int plane, int fibre, double edep, 
 }
 
 SciFiHit::~SciFiHit() {}
+// }// ~namespace MAUS

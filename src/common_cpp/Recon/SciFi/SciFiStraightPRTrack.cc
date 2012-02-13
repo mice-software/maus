@@ -18,6 +18,8 @@
 #include <vector>
 #include "src/common_cpp/Recon/SciFi/SciFiStraightPRTrack.hh"
 
+// namespace MAUS {
+
 // Constructors
 SciFiStraightPRTrack::SciFiStraightPRTrack() {
   _x0 = -1.0;
@@ -65,3 +67,4 @@ void SciFiStraightPRTrack::print_params() {
   std::cout << " tx is " << _mx << std::endl;
   std::cout << " ty is " << _my << std::endl;
 }
+// }// ~namespace MAUS

@@ -20,7 +20,7 @@
 #include "src/common_cpp/Recon/SciFi/SciFiSpill.hh"
 #include "src/common_cpp/Recon/SciFi/RealDataDigitization.hh"
 
-namespace {
+// MAUS namespace {
 class RealDataDigitizationTest : public ::testing::Test {
  protected:
   RealDataDigitizationTest()  {}
@@ -87,4 +87,4 @@ TEST_F(RealDataDigitizationTest, test_bad_channel_load) {
   EXPECT_TRUE(test_case.is_good_channel(good_channel[0], good_channel[1], good_channel[2]));
   EXPECT_FALSE(test_case.is_good_channel(out_of_range[0], out_of_range[1], out_of_range[2]));
 }
-} // namespace
+// } // namespace
