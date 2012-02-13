@@ -15,7 +15,7 @@
  *
  */
 
-#include "src/common_cpp/Recon/RealDataDigitization.hh"
+#include "src/common_cpp/Recon/SciFi/RealDataDigitization.hh"
 
 RealDataDigitization::RealDataDigitization() {}
 

@@ -15,7 +15,7 @@
  *
  */
 
-#include "src/common_cpp/Recon/SciFiDigit.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiDigit.hh"
 
 SciFiDigit::SciFiDigit():_used(false) {}
 

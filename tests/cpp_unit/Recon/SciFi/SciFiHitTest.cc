@@ -17,7 +17,7 @@
 
 #include "gtest/gtest.h"
 
-#include "src/common_cpp/Recon/SciFiHit.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiHit.hh"
 
 namespace {
 class SciFiHitTest : public ::testing::Test {

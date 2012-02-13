@@ -47,9 +47,9 @@
 // from old file
 #include "Config/MiceModule.hh"
 
-#include "src/common_cpp/Recon/SciFiDigit.hh"
-#include "src/common_cpp/Recon/SciFiEvent.hh"
-#include "src/common_cpp/Recon/SciFiSpill.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiDigit.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiEvent.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiSpill.hh"
 
 
 class RealDataDigitization {

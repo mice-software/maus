@@ -16,7 +16,7 @@
  */
 
 #include <vector>
-#include "src/common_cpp/Recon/SciFiStraightPRTrack.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiStraightPRTrack.hh"
 
 // Constructor
 SciFiStraightPRTrack::SciFiStraightPRTrack() {

@@ -14,7 +14,7 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#include "src/common_cpp/Recon/SciFiEvent.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiEvent.hh"
 
 
 SciFiEvent::SciFiEvent() {

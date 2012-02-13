@@ -36,7 +36,7 @@
 #include <string>
 #include <vector>
 
-#include "src/common_cpp/Recon/SciFiCluster.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiCluster.hh"
 
 class SciFiSpacePoint {
  public:

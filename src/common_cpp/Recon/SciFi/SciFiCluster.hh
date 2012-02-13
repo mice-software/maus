@@ -42,7 +42,7 @@
 #include "CLHEP/Vector/Rotation.h"
 
 #include "src/legacy/Config/MiceModule.hh"
-#include "src/common_cpp/Recon/SciFiDigit.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiDigit.hh"
 
 class SciFiCluster {
  public:

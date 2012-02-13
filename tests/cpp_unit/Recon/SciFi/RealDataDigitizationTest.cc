@@ -17,8 +17,8 @@
 
 #include "gtest/gtest.h"
 
-#include "src/common_cpp/Recon/SciFiSpill.hh"
-#include "src/common_cpp/Recon/RealDataDigitization.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiSpill.hh"
+#include "src/common_cpp/Recon/SciFi/RealDataDigitization.hh"
 
 namespace {
 class RealDataDigitizationTest : public ::testing::Test {

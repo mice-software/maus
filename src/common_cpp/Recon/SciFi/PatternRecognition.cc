@@ -25,8 +25,8 @@
 #include "gsl/gsl_fit.h"
 
 // MAUS headers
-#include "src/common_cpp/Recon/PatternRecognition.hh"
-#include "src/common_cpp/Recon/SimpleLine.hh"
+#include "src/common_cpp/Recon/SciFi/PatternRecognition.hh"
+#include "src/common_cpp/Recon/SciFi/SimpleLine.hh"
 
 PatternRecognition::PatternRecognition() {
   // Do nothing
@@ -36,8 +36,8 @@ PatternRecognition::~PatternRecognition() {
   // Do nothing
 };
 
-// For the moment this just calls the straight pr,
-// in future it should choose between helical or straight pr
+// For the moment this just calls the straight PR,
+// in future it should choose between helical or straight PR
 void PatternRecognition::process(SciFiEvent &evt) {
   straightprtrack_recon(evt);
 };

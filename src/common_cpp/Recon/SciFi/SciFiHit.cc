@@ -15,33 +15,13 @@
  *
  */
 
-/** @class SciFiSpill
- *  D...
- *
- */
+#include "src/common_cpp/Recon/SciFi/SciFiHit.hh"
 
-#ifndef SCIFISPILL_HH
-#define SCIFISPILL_HH
-// C headers
+SciFiHit::SciFiHit(): _used(false) {}
 
-// C++ headers
-#include <vector>
-// #include <string>
+SciFiHit::SciFiHit(int tracker, int station, int plane, int fibre, double edep, double time)
+                  :_tracker(tracker), _station(station), _plane(plane),
+                   _fibre(fibre), _edep(edep), _time(time), _used(false) {
+}
 
-// others
-#include "src/common_cpp/Recon/SciFiEvent.hh"
-
-
-class SciFiSpill {
- public:
-  SciFiSpill();
-
-  ~SciFiSpill();
-
-  // std::vector events() const { return events_in_spill; }
-
-  // private:
-  std::vector<SciFiEvent>   events_in_spill;
-};  // Don't forget this trailing colon!!!!
-
-#endif
+SciFiHit::~SciFiHit() {}

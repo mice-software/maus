@@ -15,7 +15,7 @@
  *
  */
 
-#include "src/common_cpp/Recon/SciFiSpacePointRec.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiSpacePointRec.hh"
 
 SciFiSpacePointRec::SciFiSpacePointRec() {}
 

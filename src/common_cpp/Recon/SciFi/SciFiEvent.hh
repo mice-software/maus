@@ -29,11 +29,11 @@
 #include <string>
 #include <iterator>
 
-#include "src/common_cpp/Recon/SciFiHit.hh"
-#include "src/common_cpp/Recon/SciFiDigit.hh"
-#include "src/common_cpp/Recon/SciFiCluster.hh"
-#include "src/common_cpp/Recon/SciFiSpacePoint.hh"
-#include "src/common_cpp/Recon/SciFiStraightPRTrack.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiHit.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiDigit.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiCluster.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiStraightPRTrack.hh"
 
 class SciFiEvent {
  public:

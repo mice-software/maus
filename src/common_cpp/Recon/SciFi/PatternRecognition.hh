@@ -30,19 +30,23 @@
 #include <string>
 
 // MAUS headers
-#include "src/common_cpp/Recon/SimpleLine.hh"
-#include "src/common_cpp/Recon/SciFiEvent.hh"
-#include "src/common_cpp/Recon/SciFiHit.hh"
-#include "src/common_cpp/Recon/SciFiDigit.hh"
-#include "src/common_cpp/Recon/SciFiCluster.hh"
-#include "src/common_cpp/Recon/SciFiSpacePoint.hh"
-#include "src/common_cpp/Recon/SciFiStraightPRTrack.hh"
+#include "src/common_cpp/Recon/SciFi/SimpleLine.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiEvent.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiHit.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiDigit.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiCluster.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiStraightPRTrack.hh"
 
 class PatternRecognition {
   public:
 
+    /** @brief Default constructor, does nothing
+     */
     PatternRecognition();
 
+    /** @brief Default destructor, does nothing
+     */
     ~PatternRecognition();
 
     /** @brief Top level function to begin Pattern Recognition
@@ -115,7 +119,7 @@ class PatternRecognition {
     void linear_fit(std::map<int, SciFiSpacePoint*> &spnts,
                     SimpleLine &line_x, SimpleLine &line_y);
 
-    /** @brief Create a 2D vector of SciFi sp sorted by tracker station
+    /** @brief Create a 2D vector of SciFi spacepoints sorted by tracker station
      *
      *  Take an input vector of spacepoints and output a 2D vector of spacepoints
      *  where the first index is the station the spacepoint is located.

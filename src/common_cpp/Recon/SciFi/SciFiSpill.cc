@@ -14,17 +14,11 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+#include "src/common_cpp/Recon/SciFi/SciFiSpill.hh"
 
-#include "src/common_cpp/Recon/SimpleLine.hh"
 
-// Constructor
-SimpleLine::SimpleLine() {}
-
-// Destructor
-SimpleLine::~SimpleLine() {}
-
-void SimpleLine::set_parameters(double c, double m, double chisq) {
-  _c = c;
-  _m = m;
-  _chisq = chisq;
+SciFiSpill::SciFiSpill() {
+  // scifidigits.clear();
 }
+
+SciFiSpill::~SciFiSpill() {}

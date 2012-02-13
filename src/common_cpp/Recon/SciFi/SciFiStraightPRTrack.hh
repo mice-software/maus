@@ -31,7 +31,7 @@
 #include <vector>
 
 // MAUS headers
-#include "src/common_cpp/Recon/SciFiSpacePoint.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
 
 
 class SciFiStraightPRTrack {
