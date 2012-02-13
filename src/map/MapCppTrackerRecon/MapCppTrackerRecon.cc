@@ -17,6 +17,8 @@
 
 #include "src/map/MapCppTrackerRecon/MapCppTrackerRecon.hh"
 
+// namespace MAUS {
+
 bool MapCppTrackerRecon::birth(std::string argJsonConfigDocument) {
   _classname = "MapCppTrackerRecon";
 
@@ -118,7 +120,7 @@ void MapCppTrackerRecon::digitization(SciFiSpill &spill, Json::Value &root) {
 
 void MapCppTrackerRecon::fill_digits_vector(Json::Value &digits_event, SciFiSpill &a_spill) {
   for ( unsigned int i = 0; i < digits_event.size(); i++ ) {
-    SciFiEvent* an_event;
+    SciFiEvent* an_event = new SciFiEvent();
     Json::Value digits;
     digits = digits_event[i];
     for ( unsigned int j = 0; j < digits.size(); j++ ) {
@@ -246,3 +248,4 @@ std::string MapCppTrackerRecon::JsonToString(Json::Value json_in) {
   JsonWrapper::Print(ss_io, json_in);
   return ss_io.str();
 }
+// }// ~namespace MAUS

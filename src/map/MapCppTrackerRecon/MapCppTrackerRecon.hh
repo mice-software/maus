@@ -40,15 +40,17 @@
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 
-#include "src/common_cpp/Recon/SciFiSpill.hh"
-#include "src/common_cpp/Recon/SciFiEvent.hh"
-#include "src/common_cpp/Recon/RealDataDigitization.hh"
-#include "src/common_cpp/Recon/SciFiClusterRec.hh"
-#include "src/common_cpp/Recon/SciFiSpacePointRec.hh"
-#include "src/common_cpp/Recon/SciFiDigit.hh"
-#include "src/common_cpp/Recon/SciFiCluster.hh"
-#include "src/common_cpp/Recon/SciFiSpacePoint.hh"
-#include "src/common_cpp/Recon/PatternRecognition.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiSpill.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiEvent.hh"
+#include "src/common_cpp/Recon/SciFi/RealDataDigitization.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiClusterRec.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiSpacePointRec.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiDigit.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiCluster.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
+#include "src/common_cpp/Recon/SciFi/PatternRecognition.hh"
+
+// namespace MAUS {
 
 class MapCppTrackerRecon {
  public:
@@ -127,5 +129,5 @@ class MapCppTrackerRecon {
   ///  Vector with the MICE SciFi Modules.
   std::vector<const MiceModule*> modules;
 }; // Don't forget this trailing colon!!!!
-
+// }// ~namespace MAUS
 #endif

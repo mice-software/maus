@@ -17,6 +17,8 @@
 
 #include "src/map/MapCppTrackerMCDigitization/MapCppTrackerMCDigitization.hh"
 
+// namespace MAUS {
+
 bool MapCppTrackerMCDigitization::birth(std::string argJsonConfigDocument) {
   _classname = "MapCppTrackerMCDigitization";
 
@@ -73,12 +75,11 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
   Json::Value mc;
   mc = root.get("mc", 0);
   // check sanity of json input file and mc brach
-//  if ( !check_sanity_mc(mc) ) {
+  if ( !check_sanity_mc(mc) ) {
     // if bad, write error file
-//    return writer.write(root);
-//  }
+    return writer.write(root);
+  }
   SciFiSpill spill;
-  spill.events_in_spill.clear();
 
   // ==========================================================
   //  Loop over particle events and fill Event object with digits.
@@ -90,7 +91,6 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
 
     json_to_cpp(json_event, spill);
   } // ends loop particles
-
   // std::cout << "Digitization: Events in Spill: " << spill.events_in_spill.size() << std::endl;
   // ================= Reconstruction =========================
   for ( unsigned int k = 0; k < spill.events_in_spill.size(); k++ ) {
@@ -137,7 +137,7 @@ void MapCppTrackerMCDigitization::
     time    = hit["time"].asDouble();
     SciFiHit *a_hit = new SciFiHit(tracker, station, plane, fibre, edep, time);
     event->scifihits.push_back(a_hit);
-  // std::cout << "Number of hits stored in event: " << event.scifihits.size() << std::endl;
+    // std::cout << "Number of hits stored in event: " << event->scifihits.size() << std::endl;
   }
   spill.events_in_spill.push_back(event);
 }
@@ -175,7 +175,7 @@ void MapCppTrackerMCDigitization::construct_digits(SciFiEvent &evt) {
       // Compute tdc count.
       double time   = a_hit->get_time();
       // std::cout << "Time: " << time << std::endl;
-      int tdcCounts = compute_tdc_counts(time);
+      // int tdcCounts = compute_tdc_counts(time);
       int chanNo = compute_chan_no(a_hit);
 
       // loop over all the other hits
@@ -223,11 +223,6 @@ int MapCppTrackerMCDigitization::compute_chan_no(SciFiHit *ahit) {
   // std::cout << tracker << " " << station << " " << plane << std::endl;
   const MiceModule* this_plane = NULL;
   for ( unsigned int j = 0; !this_plane && j < modules.size(); j++ ) {
-/*    if ( modules[j]->propertyExists("Tracker", "int") &&
-         modules[j]->propertyExists("Station", "int") &&
-         modules[j]->propertyExists("Plane", "int") )
-      std::cout << modules[j]->propertyInt("Tracker") << modules[j]->propertyInt("Station") << modules[j]->propertyInt("Plane") <<std::endl;
-*/
     if ( modules[j]->propertyExists("Tracker", "int") &&
          modules[j]->propertyInt("Tracker") == tracker &&
          modules[j]->propertyExists("Station", "int") &&
@@ -338,6 +333,7 @@ void MapCppTrackerMCDigitization::save_to_json(SciFiEvent &evt) {
     digits_in_event["time"]   = evt.scifidigits[evt_i]->get_time();
     js_event.append(digits_in_event);
   }
-  assert(!js_event.isNull());
-  root["digits"].append(js_event);
+  if (!js_event.isNull())
+    root["digits"].append(js_event);
 }
+// }// ~namespace MAUS

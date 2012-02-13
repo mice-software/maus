@@ -38,8 +38,10 @@
 
 #include "Config/MiceModule.hh"
 #include "Interface/Squeak.hh"
-#include "src/common_cpp/Recon/SciFiHit.hh"
-#include "src/common_cpp/Recon/SciFiSpill.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiHit.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiSpill.hh"
+
+// namespace MAUS {
 
 class MapCppTrackerMCDigitization {
  public:
@@ -103,5 +105,6 @@ class MapCppTrackerMCDigitization {
   /// an array contaning all MiceModules
   std::vector<const MiceModule*> modules;
 };  // Don't forget this trailing colon!!!!
+// }// ~namespace MAUS
 
 #endif

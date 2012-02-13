@@ -17,5 +17,5 @@ Module TrackerViewV
   PropertyDouble CentralFibre 106.5
   PropertyBool Invisible 1
   PropertyString G4Detector SciFiPlane
-  PropertyDouble G4StepMax .05 mm
+  PropertyDouble G4StepMax .1 mm
 }
