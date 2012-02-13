@@ -45,6 +45,8 @@ bool OutputCppRoot::birth(std::string json_datacards) {
     (*_outfile) << branchName("mc") << mc;
     _jsonCppConverter = new JsonCppConverter(_md);
     return true;
+  } catch(int i){
+    return false;
   } catch(Squeal squee) {
     // call error handler
     return false;

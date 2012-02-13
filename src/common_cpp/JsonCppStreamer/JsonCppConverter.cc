@@ -26,7 +26,7 @@ MausData* JsonCppConverter::operator()(const Json::Value& JsonDocument){
   if(!root.isMember("digits")  ||
      !root.isMember("mc")      ){
     Squeak::mout(Squeak::warning) <<"Cannot find either \"digits\" or \"mc\" branch within Json object"<<std::endl; 
-    //throw Squeal(Squeal::recoverable,"Json object to convert must contain \"digits\" and \"mc\" branch objects.","JsonCppConverter::operator()(const Json::Value& JsonDocument)");
+    throw Squeal(Squeal::recoverable,"Json object to convert must contain \"digits\" and \"mc\" branch objects.","JsonCppConverter::operator()(const Json::Value& JsonDocument)");
   }
 
   if(!m_d2){m_d2 = new MausData();}//lazy loading to stop user messing up

@@ -41,7 +41,7 @@ class rstream{
    */
   rstream(const char*,
 	  const char*,
-	  MsgStream::LEVEL);
+	  MsgStream::LEVEL = MsgStream::INFO);
   /*!\brief check if the file is open
    * \return boolean value indicating the presence of an open file.
    */

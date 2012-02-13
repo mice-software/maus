@@ -60,14 +60,14 @@ class TestOutputCppRoot(unittest.TestCase):
         """
         Check that if passed a bad event, code fails gracefully
         """
-        self.assertFalse(True)
+        #self.assertFalse(True)
         self.assertFalse(self.output.save(
                       json.dumps({"no_branch":{}})
         ))
         print 0
         self.assertFalse(self.output.save(''))
         print 3
-        my_output.death()
+        self.output.death()
   
 
 if __name__=="__main__":

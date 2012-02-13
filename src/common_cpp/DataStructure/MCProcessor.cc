@@ -17,7 +17,7 @@ MausData* MCProcessor::operator()(const Json::Value& jv){
   if(!jv.isMember("hits")       ||
      !jv.isMember("primary")    ){
     Squeak::mout(Squeak::warning) <<"Cannot find all expected content of \"mc\" branch"<<std::endl; 
-    // throw Squeal(Squeal::recoverable,"Not all \"mc\" content present","MCProcessor::operator()(const Json::Value&)");
+    throw Squeal(Squeal::recoverable,"Not all \"mc\" content present","MCProcessor::operator()(const Json::Value&)");
   }
 
   if(!m_md){m_md = new MausData(); }//lazy loading to stop user messing up

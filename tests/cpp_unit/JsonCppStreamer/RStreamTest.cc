@@ -11,8 +11,8 @@
 class temprstream : public rstream{
  public:
   temprstream(const char* a,
-	     const char* b,
-	     MsgStream::LEVEL c):rstream(a,b,c){}
+	      const char* b,
+	      MsgStream::LEVEL c):rstream(a,b,c){}
     void close(){m_file->Close();}
  private:
   FRIEND_TEST(RStreamTest, TestConstructor);
@@ -22,14 +22,14 @@ class temprstream : public rstream{
 };
 
 TEST(RStreamTest, TestConstructor) {
-    temprstream a("TestFile","RECREATE",MsgStream::INFO);
+    temprstream a("TestFile.root","RECREATE",MsgStream::INFO);
     ASSERT_NE(a.m_file, static_cast<void*>(NULL)) <<"Fail: file object not correctly created."<<std::endl;
     ASSERT_NE(a.m_branchName, static_cast<void*>(NULL)) <<"Fail: branch name memory not correctly allocated"<<std::endl;
     ASSERT_NE(a.m_branchName,"")<<"Fail. branch name not set to default value."<<std::endl;
 }
 
 TEST(RStreamTest, TestIsOpen) {
-    temprstream a("TestFile","RECREATE",MsgStream::INFO);
+    temprstream a("TestFile.root","RECREATE",MsgStream::INFO);
     ASSERT_TRUE(a.is_open())<<"Fail: reporting file closed when open"<<std::endl;
     TFile * f = a.m_file;
     a.m_file=0;

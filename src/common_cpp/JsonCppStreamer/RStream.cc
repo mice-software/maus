@@ -1,13 +1,22 @@
 #include "RStream.hh"
 
-
 rstream::rstream(const char* filename,
 		 const char* mode,
 		 MsgStream::LEVEL loglevel):
-  m_file(new TFile(filename,mode)),
   m_log("rstream", loglevel),
   m_tree(0),
   m_evtCount(0){
+  if( !strcmp(filename,"") || !strcmp(mode,"")) {
+    m_log << MsgStream::FATAL << "Couldn't open ROOT TFile as no filename or open mode given" << std::endl;
+    throw 1;
+  }
+
+  m_file = new TFile(filename,mode);
+  if(!m_file){
+    m_log << MsgStream::FATAL << "ROOT TFile opened incorrectly" << std::endl;
+    throw 2;
+  }
+
  
   m_branchName = new char[40]();
   strcpy(m_branchName,"");

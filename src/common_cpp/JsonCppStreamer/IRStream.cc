@@ -1,5 +1,5 @@
 #include "IRStream.hh"
-#include <cstdlib>
+//#include <cstdlib>
 
 irstream::irstream(const char* fileName,
 		   const char* treeName,
@@ -10,8 +10,9 @@ irstream::irstream(const char* fileName,
   m_log.setName("irstream");
   m_tree = (TTree*)m_file->GetObjectChecked(treeName,"TTree");
   if(!m_tree){ 
-    m_log << MsgStream::ERROR << "The requested tree '"<<treeName << "' was not found in the tree." <<std::endl;
-    exit(1); // added later.
+    m_log << MsgStream::FATAL << "The requested tree '"<<treeName << "' was not found in the tree." <<std::endl;
+    throw 3;
+    //exit(1); // added later.
   }
 }
 
@@ -19,8 +20,24 @@ irstream::irstream(const char* fileName,
 void irstream::open(const char* fileName,
 		    const char* treeName,
 		    const char* mode){
+  if( !strcmp(fileName,"") ) {
+    m_log << MsgStream::FATAL << "Couldn't open ROOT TFile as no filename given" << std::endl;
+    throw 1;
+  } 
+
   m_file = new TFile(fileName,mode);
+  if(!m_file){
+    m_log << MsgStream::FATAL << "ROOT TFile opened incorrectly" << std::endl;
+    throw 2;
+  }
+  
   m_tree = (TTree*)m_file->GetObjectChecked(treeName,"TTree");
+  if(!m_tree){ 
+    m_log << MsgStream::FATAL << "The requested tree '"<<treeName << "' was not found in the tree." <<std::endl;
+    throw 3;
+    //exit(1); // added later.
+  }
+
   strcpy(m_branchName,"");
   m_evtCount=0;// added later.
 }

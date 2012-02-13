@@ -15,8 +15,18 @@ void orstream::open(const char* fileName,
 		    const char* treeName,
 		    const char* treeTitle,
 		    const char* mode){
- 
+
+  if( !strcmp(fileName,"") ) {
+    m_log << MsgStream::FATAL << "Couldn't open ROOT TFile as no filename given" << std::endl;
+    throw 1;
+  }
+
   m_file = new TFile(fileName,mode);
+  if(!m_file){
+    m_log << MsgStream::FATAL << "ROOT TFile opened incorrectly" << std::endl;
+    throw 2;
+  }
+
   m_tree = new TTree(treeName,treeTitle);
   strcpy(m_branchName,"");
   m_evtCount=0;
