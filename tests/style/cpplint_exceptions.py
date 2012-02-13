@@ -142,3 +142,11 @@ exceptions[os.path.join(tst, 'Maths', 'PolynomialVectorTest.cc')] = [
 exceptions[os.path.join(tst, 'Maths', 'VectorTest.cc')] = [
 ('  } catch (Squeal squeal) {}', '"catch" is a keyword like "for" and "if", not a function', 'lane')
 ]
+
+exceptions[os.path.join(tst, 'Optics', 'PhaseSpaceVectorTest.cc')] = [
+('  } catch (Squeal squeal) {}', '"catch" is a keyword like "for" and "if", not a function', 'lane')
+]
+
+exceptions[os.path.join(tst, 'Optics', 'CovarianceMatrixTest.cc')] = [
+('  } catch (Squeal squeal) {}', '"catch" is a keyword like "for" and "if", not a function', 'lane')
+]

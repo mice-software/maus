@@ -101,7 +101,7 @@ class CovarianceMatrixTest : public ::testing::Test {
     // random_engine_ = new CLHEP::HepJamesRandom(-1);
     random_gauss_ = new CLHEP::RandGauss(new CLHEP::HepJamesRandom(-1));
   }
-  
+
   virtual void TearDown() {
     delete random_gauss_;
   }
@@ -114,7 +114,6 @@ const double CovarianceMatrixTest::mass_        = 105.658367;         // MeV/c^2
 const double CovarianceMatrixTest::momentum_    = 199.804294;         // MeV/c
 const double CovarianceMatrixTest::charge_      = -1.0;               // e
 const double CovarianceMatrixTest::Bz_          = 0.004;              // T?
-//const double CovarianceMatrixTest::Ltwiddle_t_  = 0.00325396474222;   // mm?
 const double CovarianceMatrixTest::Ltwiddle_t_  = 0.00650534498541;   // mm?
 
 const double CovarianceMatrixTest::emittance_t_ = 5.90976389295;      // mm
@@ -142,51 +141,51 @@ const double CovarianceMatrixTest::rotation_angle_ = 0.628319;  // pi / 5
 
 // from BeamMaker/xboa {ct, E, x, px, y, py}
 const double CovarianceMatrixTest::means_data_[6] = {
-   99740014.0111,  226.033429351,
-   0.843461236593,  -0.0217829119313,
+  +99740014.0111,  226.033429351,
+  +0.843461236593,  -0.0217829119313,
   -0.250110599127,   0.76387175952
 };
 
 // from BeamMaker + xboa {ct, E, x, px, y, py}
 const double CovarianceMatrixTest::penn_covariances_data_[36] = {
-  1.91531138e+05, -8.53413918e+01,
-  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+  +1.91531138e+05, -8.53413918e+01,
+  +0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
 
- -8.53413918e+01,  2.02192558e+01,
-  1.32112012e+00,  4.03485323e+00, -1.03025553e+01,  5.79008832e+00,
+  -8.53413918e+01,  2.02192558e+01,
+  +1.32112012e+00,  4.03485323e+00, -1.03025553e+01,  5.79008832e+00,
 
-  0.00000000e+00,  1.32112012e+00,
-  1.01811730e+03, -6.12884830e+02,  0.00000000e+00,  6.06385733e+02,
+  +0.00000000e+00,  1.32112012e+00,
+  +1.01811730e+03, -6.12884830e+02,  0.00000000e+00,  6.06385733e+02,
 
-  0.00000000e+00,  4.03485323e+00,
- -6.12884830e+02,  1.11306115e+03, -6.06385733e+02,  0.00000000e+00,
+  +0.00000000e+00,  4.03485323e+00,
+  -6.12884830e+02,  1.11306115e+03, -6.06385733e+02,  0.00000000e+00,
 
-  0.00000000e+00, -1.03025553e+01,
-  0.00000000e+00, -6.06385733e+02,  1.01811730e+03, -6.12884830e+02,
+  +0.00000000e+00, -1.03025553e+01,
+  +0.00000000e+00, -6.06385733e+02,  1.01811730e+03, -6.12884830e+02,
 
-  0.00000000e+00,  5.79008832e+00,
-  6.06385733e+02,  0.00000000e+00, -6.12884830e+02,  1.11306115e+03
+  +0.00000000e+00,  5.79008832e+00,
+  +6.06385733e+02,  0.00000000e+00, -6.12884830e+02,  1.11306115e+03
 };
 
 // from BeamMaker + xboa {ct, E, x, px, y, py}
 const double CovarianceMatrixTest::twiss_covariances_data_[36] = {
-  1.91531139e+05,  -8.53413918e+01,
-  1.25053024e+02,  1.94593790e+00, -3.57346382e+02,  8.03446694e+01,
+  +1.91531139e+05,  -8.53413918e+01,
+  +1.25053024e+02,  1.94593790e+00, -3.57346382e+02,  8.03446694e+01,
 
- -8.53413918e+01,  2.02192558e+01,
-  1.32112013e+00,  4.03485324e+00, -1.03025553e+01,  5.79008832e+00,
+  -8.53413918e+01,  2.02192558e+01,
+  +1.32112013e+00,  4.03485324e+00, -1.03025553e+01,  5.79008832e+00,
 
-  1.25053024e+02, 1.32112013e+00,
-  1.01671668e+03, -5.77575205e+02, -4.63520838e+01,  6.28878344e+02,
+  +1.25053024e+02, 1.32112013e+00,
+  +1.01671668e+03, -5.77575205e+02, -4.63520838e+01,  6.28878344e+02,
 
-  1.94593790e+00,  4.03485324e+00,
- -5.77575205e+02,  1.06904491e+03, -5.84662003e+02,  1.32913208e+01,
+  +1.94593790e+00,  4.03485324e+00,
+  -5.77575205e+02,  1.06904491e+03, -5.84662003e+02,  1.32913208e+01,
 
- -3.57346382e+02, -1.03025553e+01,
- -4.63520838e+01, -5.84662003e+02,  1.01951792e+03, -6.48194455e+02,
+  -3.57346382e+02, -1.03025553e+01,
+  -4.63520838e+01, -5.84662003e+02,  1.01951792e+03, -6.48194455e+02,
 
-  8.03446694e+01,  5.79008832e+00,
-  6.28878344e+02,  1.32913208e+01, -6.48194455e+02,  1.15916946e+03
+  +8.03446694e+01,  5.79008832e+00,
+  +6.28878344e+02,  1.32913208e+01, -6.48194455e+02,  1.15916946e+03
 };
 
 const double CovarianceMatrixTest::positive_definite_data_[36] = {
@@ -209,23 +208,23 @@ const double CovarianceMatrixTest::non_positive_definite_data_[36] = {
 
 // Rotated penn_covariances_ using Mathematica
 const double CovarianceMatrixTest::rotated_penn_covariance_data_[36] = {
-  1.91531138e+05, -8.53413918e+01,
-  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+  +1.91531138e+05, -8.53413918e+01,
+  +0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
 
- -8.53413918e+01,  2.02192558e+01,
- -4.98688144+00,   6.66759336e+00, -9.11147725e+00,  2.31265263e+00,
+  -8.53413918e+01,  2.02192558e+01,
+  -4.98688144+00,   6.66759336e+00, -9.11147725e+00,  2.31265263e+00,
 
-  0.00000000e+00, -4.98688144e+00,
-  1.01811730e+03, -6.12884830e+02,  0.00000000e+00,  6.06385735e+02,
+  +0.00000000e+00, -4.98688144e+00,
+  +1.01811730e+03, -6.12884830e+02,  0.00000000e+00,  6.06385735e+02,
 
-  0.00000000e+00,  6.66759336e+00,
- -6.12884831e+02,  1.11306115e+03, -1.87383497e+02,  0.00000000e+00,
+  +0.00000000e+00,  6.66759336e+00,
+  -6.12884831e+02,  1.11306115e+03, -1.87383497e+02,  0.00000000e+00,
 
-  0.00000000e+00, -9.11147725e+00,
-  0.00000000e+00, -6.06385733e+02,  1.01811730e+03, -6.12884830e+02,
+  +0.00000000e+00, -9.11147725e+00,
+  +0.00000000e+00, -6.06385733e+02,  1.01811730e+03, -6.12884830e+02,
 
-  0.00000000e+00,  2.31265263e+00,
-  6.06385735e+02,  0.00000000e+00, -6.12884831e+02,  1.11306115e+03
+  +0.00000000e+00,  2.31265263e+00,
+  +6.06385735e+02,  0.00000000e+00, -6.12884831e+02,  1.11306115e+03
 };
 
 const MAUS::Vector<double> CovarianceMatrixTest::means_
@@ -274,7 +273,7 @@ TEST_F(CovarianceMatrixTest, CopyConstructors) {
       dispersion_x_, dispersion_prime_x_, dispersion_y_, dispersion_prime_y_);
   const CovarianceMatrix twiss_too(twiss_ellipse);
   ASSERT_EQ(twiss_too, twiss_ellipse);
-  
+
   // Matrix<double> copies
   const Matrix<double> double_matrix(6, 6, non_positive_definite_data_);
   const CovarianceMatrix double_covariances(double_matrix);
@@ -354,7 +353,7 @@ fprintf(stdout, "percent error (%d, %d): %f\n", row, column, error);
 */
       // FIXME(plane1@hawk.iit.edu) Independently verify t & E covariances
       if ((row < 3) && (column < 3)) {
-        //EXPECT_TRUE(error < 1e-4);
+        // EXPECT_TRUE(error < 1e-4);
       }
       if ((row > 2) && (column > 2) && (row < 5) && (column < 5)) {
         EXPECT_TRUE(error < 1e-4);
@@ -441,7 +440,7 @@ TEST_F(CovarianceMatrixTest, RotateEllipse) {
     for (size_t column = 1; column <= 6; ++column) {
       // percent difference
       if (penn_covariances_(row, column) > 0.0) {
-        error = fabs(  difference(row, column)
+        error = fabs(difference(row, column)
                      / rotated_penn_covariances_(row, column));
       } else {
         error = fabs(difference(row, column));

@@ -75,13 +75,13 @@ TEST_F(PhaseSpaceVectorTest, VectorConstructor) {
   for (size_t index = 0; index < 6; ++index) {
     EXPECT_EQ(ps_vector[index], kData[index]);
   }
-  
+
   const Vector<double> bad_vector(kData, 4);
   bool testpass = true;
   try {
     const PhaseSpaceVector bad_ps_vector(bad_vector);
     testpass = false;
-  } catch (Squeal squeal) { }
+  } catch (Squeal squeal) {}
   ASSERT_TRUE(testpass);
 }
 
