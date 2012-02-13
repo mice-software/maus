@@ -93,8 +93,8 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
 
   // std::cout << "Digitization: Events in Spill: " << spill.events_in_spill.size() << std::endl;
   // ================= Reconstruction =========================
-  for ( int k = 0; k < spill.events_in_spill.size(); k++ ) {
-    SciFiEvent event = spill.events_in_spill[k];
+  for ( unsigned int k = 0; k < spill.events_in_spill.size(); k++ ) {
+    SciFiEvent event = *(spill.events_in_spill[k]);
 
     // std::cout << "Hits in event: " << event.scifihits.size() << std::endl;
     if ( event.scifihits.size() ) {
@@ -112,10 +112,10 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
 
 void MapCppTrackerMCDigitization::
      json_to_cpp(Json::Value js_event, SciFiSpill &spill) {
-  SciFiEvent event;
+  SciFiEvent* event = new SciFiEvent();
   Json::Value _hits = js_event["hits"];
   // std::cout << "Number of hits fed in: " << _hits.size() << std::endl;
-  for ( int j = 0; j < _hits.size(); j++ ) {
+  for ( unsigned int j = 0; j < _hits.size(); j++ ) {
     Json::Value hit = _hits[j];
     assert(hit.isMember("channel_id"));
     Json::Value channel_id = hit["channel_id"];
@@ -136,7 +136,7 @@ void MapCppTrackerMCDigitization::
     edep    = hit["energy_deposited"].asDouble();
     time    = hit["time"].asDouble();
     SciFiHit *a_hit = new SciFiHit(tracker, station, plane, fibre, edep, time);
-    event.scifihits.push_back(a_hit);
+    event->scifihits.push_back(a_hit);
   // std::cout << "Number of hits stored in event: " << event.scifihits.size() << std::endl;
   }
   spill.events_in_spill.push_back(event);
@@ -158,7 +158,7 @@ bool MapCppTrackerMCDigitization::check_sanity_mc(Json::Value mc) {
 
 void MapCppTrackerMCDigitization::construct_digits(SciFiEvent &evt) {
   int number_of_hits = evt.scifihits.size();
-  for ( unsigned int hit_i = 0; hit_i < number_of_hits; hit_i++ ) {
+  for ( int hit_i = 0; hit_i < number_of_hits; hit_i++ ) {
     if ( !evt.scifihits[hit_i]->is_used() ) {
       SciFiHit *a_hit = evt.scifihits[hit_i];
 
@@ -179,7 +179,7 @@ void MapCppTrackerMCDigitization::construct_digits(SciFiEvent &evt) {
       int chanNo = compute_chan_no(a_hit);
 
       // loop over all the other hits
-      for ( unsigned int hit_j = hit_i; hit_j < number_of_hits; hit_j++ ) {
+      for ( int hit_j = hit_i; hit_j < number_of_hits; hit_j++ ) {
         if ( check_param(evt.scifihits[hit_i], evt.scifihits[hit_j]) ) {
           SciFiHit *same_digit = evt.scifihits[hit_j];
           double edep_j = same_digit->get_edep();

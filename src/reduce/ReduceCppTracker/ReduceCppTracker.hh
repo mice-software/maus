@@ -99,7 +99,6 @@ class ReduceCppTracker {
   int _station_hits;
   // int _number_spacepoints;
 
-
   double tracker2;
 };
 

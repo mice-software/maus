@@ -24,6 +24,7 @@ RealDataDigitization::~RealDataDigitization() {}
 void RealDataDigitization::process(SciFiSpill &spill, Json::Value const &daq) {
   // -------------------------------------------------
   // Load calibration, mapping and bad channel list.
+  // These calls are to be replaced by CDB interface...
   bool calib = load_calibration("scifi_calibration_30_09_2011.txt");
   assert(calib);
   bool map = load_mapping("mapping_2.txt");
@@ -36,7 +37,7 @@ void RealDataDigitization::process(SciFiSpill &spill, Json::Value const &daq) {
   Json::Value tracker_event = daq["tracker1"];
 
   for ( unsigned int i = 1; i < tracker_event.size(); ++i ) {
-    SciFiEvent event;
+    SciFiEvent* event = new SciFiEvent();
 
     Json::Value input_event = tracker_event[i]["VLSB_C"];
     // Merge tracker events.
@@ -90,7 +91,7 @@ void RealDataDigitization::process(SciFiSpill &spill, Json::Value const &daq) {
       // Exclude missing modules.
       if ( pe > 1.0 && tracker != -1 ) {
         SciFiDigit *digit = new SciFiDigit(tracker, station, plane, channel, pe, tdc);
-        event.scifidigits.push_back(digit);
+        event->scifidigits.push_back(digit);
       }
     }  // ends loop over channels (j)
     spill.events_in_spill.push_back(event);
@@ -136,7 +137,7 @@ void RealDataDigitization::read_in_all_Boards(std::ifstream &inf) {
         std::istringstream ist1(line.c_str());
         ist1 >> unique_chan_no >> board >> bank >> chan >> p >> g;
 
-        temp = unique_chan_no;
+        int temp = unique_chan_no;
 
         Json::Value channel;
         channel["pedestal"]=p;

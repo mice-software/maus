@@ -18,27 +18,27 @@
 
 
 SciFiEvent::SciFiEvent() {
-  // scifidigits.clear();
+  scifihits.resize(0);
+  scifidigits.resize(0);
+  scificlusters.resize(0);
+  scifispacepoints.resize(0);
+  scifiseeds.resize(0);
+  scifistraightprtracks.resize(0);
 }
 
 SciFiEvent::~SciFiEvent() {
-/*
   std::vector<SciFiHit*>::iterator hit;
-  for (hit=scifihits.begin(); hit!=scifihits.end(); ++hit) {
+  for (hit = scifihits.begin(); hit!= scifihits.end(); ++hit) {
     delete (*hit);
   }
-  //scifihits.clear();
 
   std::vector<SciFiDigit*>::iterator digit;
-  for (digit=scifidigits.begin(); digit!=scifidigits.end(); ++digit) {
+  for (digit = scifidigits.begin(); digit!= scifidigits.end(); ++digit) {
     delete (*digit);
   }
-  //scifidigits.clear();
 
   std::vector<SciFiSpacePoint*>::iterator spacepoint;
-  for (spacepoint=scifispacepoints.begin(); spacepoint!=scifispacepoints.end(); ++spacepoint) {
+  for (spacepoint = scifispacepoints.begin(); spacepoint!= scifispacepoints.end(); ++spacepoint) {
     delete (*spacepoint);
   }
-  //scifispacepoints.clear();
-*/
 }

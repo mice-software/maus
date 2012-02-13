@@ -69,4 +69,33 @@ TEST_F(SciFiSpacePointRecTest, test_process) {
   EXPECT_EQ(event.scifispacepoints.size(), 0);
 }
 
+TEST_F(SciFiSpacePointRecTest, test_duplet_radius) {
+  SciFiSpacePointRec a_test;
+  SciFiCluster* c1 = new SciFiCluster();
+  SciFiCluster* c2 = new SciFiCluster();
+
+  Hep3Vector pos1(5.78222, -11.6053, -751.132);
+  Hep3Vector pos2(-50.6352, -0.604, -749.828);
+  Hep3Vector dir1(-0.866025, -0.5, 0);
+  Hep3Vector dir2(0.866025, -0.5, 0);
+
+  c1->set_direction(dir1);
+
+  c2->set_direction(dir2);
+
+  c1->set_position(pos1);
+
+  c2->set_position(pos2);
+
+  bool test_1 = a_test.duplet_within_radius(c1, c2);
+  EXPECT_TRUE(test_1);
+
+  Hep3Vector pos3(300.0, -11.6053, -751.132);
+  Hep3Vector pos4(300.0, -0.604, -749.828);
+  c1->set_direction(pos3);
+  c2->set_direction(pos4);
+  bool test_2 = a_test.duplet_within_radius(c1, c2);
+  EXPECT_FALSE(test_2);
+}
+
 } // namespace

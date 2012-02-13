@@ -11,7 +11,7 @@ Module TrackerViewU
   PropertyString SensitiveDetector SciFi
   PropertyInt Plane 0
   PropertyDouble ActiveRadius 158.5 mm
-  PropertyDouble Pitch 0.426 mm
+  PropertyDouble Pitch 0.427 mm
   PropertyDouble FibreDiameter 0.350 mm
   PropertyDouble CoreDiameter 0.308 mm
   PropertyDouble CentralFibre 105.5

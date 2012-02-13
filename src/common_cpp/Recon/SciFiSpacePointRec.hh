@@ -72,6 +72,12 @@ class SciFiSpacePointRec {
 
   bool duplet_within_radius(SciFiCluster* candidate_A,
                             SciFiCluster* candidate_B);
+ private:
+  /// This is the acceptable radius for any duplet.
+  static const int _acceptable_radius = 160; // mm
+  static const int _kuno_0_5   = 320;
+  static const int _kuno_else  = 318;
+  static const int _kuno_toler = 2;
 };  // Don't forget this trailing colon!!!!
 
 #endif

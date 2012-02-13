@@ -105,7 +105,7 @@ bool SciFiSpacePointRec::duplet_within_radius(SciFiCluster* candidate_A,
                                               SciFiCluster* candidate_B) {
   Hep3Vector pos = crossing_pos(candidate_A, candidate_B);
   double radius = pow(pow(pos.x(), 2)+pow(pos.y(), 2), 0.5);
-  if ( radius < 160 ) {
+  if ( radius < _acceptable_radius ) {
     return true;
   } else {
     return false;
@@ -115,9 +115,6 @@ bool SciFiSpacePointRec::duplet_within_radius(SciFiCluster* candidate_A,
 bool SciFiSpacePointRec::kuno_accepts(SciFiCluster* cluster1,
                                       SciFiCluster* cluster2,
                                       SciFiCluster* cluster3) {
-  const int kuno_0_5   = 320;
-  const int kuno_else  = 318;
-  const int kuno_toler = 2;
   // The 3 clusters passed to the kuno_accepts function belong
   // to the same station, only the planes are different
   int tracker = cluster1->get_tracker();
@@ -127,10 +124,10 @@ bool SciFiSpacePointRec::kuno_accepts(SciFiCluster* cluster1,
                   cluster2->get_channel() +
                   cluster3->get_channel();
 
-  if ( (tracker == 0 && station == 5 && (uvwSum < (kuno_0_5+kuno_toler))
-                                     && (uvwSum > (kuno_0_5-kuno_toler))) ||
-     (!(tracker == 0 && station == 5)&& (uvwSum < (kuno_else+kuno_toler))
-                                     && (uvwSum > (kuno_else-kuno_toler))) ) {
+  if ( (tracker == 0 && station == 5 && (uvwSum < (_kuno_0_5+_kuno_toler))
+                                     && (uvwSum > (_kuno_0_5-_kuno_toler))) ||
+     (!(tracker == 0 && station == 5)&& (uvwSum < (_kuno_else+_kuno_toler))
+                                     && (uvwSum > (_kuno_else-_kuno_toler))) ) {
     return true;
   } else {
     return false;

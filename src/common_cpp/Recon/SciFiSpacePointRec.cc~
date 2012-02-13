@@ -44,7 +44,6 @@ void SciFiSpacePointRec::process(SciFiEvent &evt) {
       int numb_clusters_in_v = clusters[Tracker][Station][0].size();
       int numb_clusters_in_w = clusters[Tracker][Station][1].size();
       int numb_clusters_in_u = clusters[Tracker][Station][2].size();
-      // std::cout << numb_clusters_in_v << " " << numb_clusters_in_v << " " << numb_clusters_in_v << std::endl;
       for ( int cla = 0; cla < numb_clusters_in_v; cla++ ) {
         SciFiCluster* candidate_A = (clusters[Tracker][Station][0])[cla];
 
@@ -106,7 +105,7 @@ bool SciFiSpacePointRec::duplet_within_radius(SciFiCluster* candidate_A,
                                               SciFiCluster* candidate_B) {
   Hep3Vector pos = crossing_pos(candidate_A, candidate_B);
   double radius = pow(pow(pos.x(), 2)+pow(pos.y(), 2), 0.5);
-  if ( radius < 160 ) {
+  if ( radius < _acceptable_radius ) {
     return true;
   } else {
     return false;
@@ -116,9 +115,6 @@ bool SciFiSpacePointRec::duplet_within_radius(SciFiCluster* candidate_A,
 bool SciFiSpacePointRec::kuno_accepts(SciFiCluster* cluster1,
                                       SciFiCluster* cluster2,
                                       SciFiCluster* cluster3) {
-  const int kuno_0_5   = 320;
-  const int kuno_else  = 318;
-  const int kuno_toler = 2;
   // The 3 clusters passed to the kuno_accepts function belong
   // to the same station, only the planes are different
   int tracker = cluster1->get_tracker();

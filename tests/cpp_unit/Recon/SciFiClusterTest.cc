@@ -86,12 +86,12 @@ TEST_F(SciFiClusterTest, test_constructor) {
 
   SciFiCluster *cluster = new SciFiCluster(digit);
 
-  EXPECT_EQ(cluster->get_tracker(), tracker);
-  EXPECT_EQ(cluster->get_station(), station);
-  EXPECT_EQ(cluster->get_plane(), plane);
-  EXPECT_EQ(cluster->get_channel(), channel);
-  EXPECT_EQ(cluster->get_npe(), npe);
-  EXPECT_EQ(cluster->get_time(), time);
+  EXPECT_EQ(tracker, cluster->get_tracker());
+  EXPECT_EQ(station, cluster->get_station());
+  EXPECT_EQ(plane, cluster->get_plane());
+  EXPECT_EQ(channel, cluster->get_channel());
+  EXPECT_EQ(npe, cluster->get_npe());
+  EXPECT_EQ(time, cluster->get_time());
   EXPECT_FALSE(cluster->is_used());
   EXPECT_TRUE(digit->is_used());
 }

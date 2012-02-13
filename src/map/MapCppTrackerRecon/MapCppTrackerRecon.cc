@@ -56,7 +56,7 @@ std::string MapCppTrackerRecon::process(std::string document) {
   // Writes a line in the JSON document.
   Json::FastWriter writer;
   SciFiSpill spill;
-  spill.events_in_spill.clear();
+//  spill.events_in_spill.clear();
 
   try {
     root = JsonWrapper::StringToJson(document);
@@ -72,7 +72,7 @@ std::string MapCppTrackerRecon::process(std::string document) {
 
   try { // ================= Reconstruction =========================
     for ( int k = 0; k < spill.events_in_spill.size(); k++ ) {
-      SciFiEvent event = spill.events_in_spill[k];
+      SciFiEvent event = *(spill.events_in_spill[k]);
       // Build Clusters.
       if ( event.scifidigits.size() ) {
         cluster_recon(event);
@@ -118,7 +118,7 @@ void MapCppTrackerRecon::digitization(SciFiSpill &spill, Json::Value &root) {
 
 void MapCppTrackerRecon::fill_digits_vector(Json::Value &digits_event, SciFiSpill &a_spill) {
   for ( unsigned int i = 0; i < digits_event.size(); i++ ) {
-    SciFiEvent an_event;
+    SciFiEvent* an_event;
     Json::Value digits;
     digits = digits_event[i];
     for ( unsigned int j = 0; j < digits.size(); j++ ) {
@@ -132,7 +132,7 @@ void MapCppTrackerRecon::fill_digits_vector(Json::Value &digits_event, SciFiSpil
       npe     = digit["npe"].asDouble();
       time    = digit["time"].asInt();
       SciFiDigit* a_digit = new SciFiDigit(tracker, station, plane, channel, npe, time);
-      an_event.scifidigits.push_back(a_digit);
+      an_event->scifidigits.push_back(a_digit);
     } // ends loop over digits in the event
     a_spill.events_in_spill.push_back(an_event);
   } // ends loop over events.

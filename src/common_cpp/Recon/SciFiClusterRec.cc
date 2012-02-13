@@ -50,7 +50,7 @@ void SciFiClusterRec::process(SciFiEvent &evt, std::vector<const MiceModule*> mo
       int fibre   = seed->get_channel();
       double pe   = seed->get_npe();
       // Look for a neighbour.
-      for ( unsigned int j = i+1; j < seeds_size; j++ ) {
+      for ( int j = i+1; j < seeds_size; j++ ) {
         if ( !seeds[j]->is_used() && seeds[j]->get_tracker() == tracker &&
              seeds[j]->get_station() == station && seeds[j]->get_plane()   == plane &&
              abs(seeds[j]->get_channel() - fibre) < 2 ) {

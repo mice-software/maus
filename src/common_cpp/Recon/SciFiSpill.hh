@@ -41,7 +41,8 @@ class SciFiSpill {
   // std::vector events() const { return events_in_spill; }
 
   // private:
-  std::vector<SciFiEvent>   events_in_spill;
+  /// This is a vector containing the events of a spill.
+  std::vector<SciFiEvent*>   events_in_spill;
 };  // Don't forget this trailing colon!!!!
 
 #endif

@@ -18,7 +18,7 @@
 
 
 SciFiSpill::SciFiSpill() {
-  // scifidigits.clear();
+  events_in_spill.resize(0);
 }
 
 SciFiSpill::~SciFiSpill() {}
