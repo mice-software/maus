@@ -259,7 +259,7 @@ TEST_F(CovarianceMatrixTest, DefaultConstructor) {
     total += zeros(row, column);
     }
   }
-  ASSERT_EQ(total, 0.0);
+  ASSERT_TRUE(total < 1.e-9);
 }
 
 TEST_F(CovarianceMatrixTest, CopyConstructors) {

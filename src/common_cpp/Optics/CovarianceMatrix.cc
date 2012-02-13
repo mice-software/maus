@@ -243,26 +243,31 @@ const CovarianceMatrix CovarianceMatrix::CreateFromTwissParameters(
 
   double sigma_x_t  = 0.;
   double sigma_x_E  = dispersion_x * sigma_E_E / energy;
+  // FIXME(plane1@hawk.iit.edu) Shouldn't this be just beta_x emittance_x?
   double sigma_x_x  = emittance_x * mass * beta_x / momentum;
 
   double sigma_Px_t = 0.;
   double sigma_Px_E = dispersion_prime_x * sigma_E_E / energy;
+  // FIXME(plane1@hawk.iit.edu) Shouldn't this be just -alpha_x emittance_x ?
   double sigma_Px_x = -emittance_x * mass * alpha_x;
+  // FIXME(plane1@hawk.iit.edu) Shouldn't this be just gamma_x emittance_x ?
   double sigma_Px_Px= emittance_x * mass * momentum * gamma_x;
 
   double sigma_y_t  = 0.;
   double sigma_y_E  = dispersion_y * sigma_E_E / energy;
   double sigma_y_x  = 0.;
   double sigma_y_Px = 0.;
-  double sigma_y_y  = emittance_y * mass * beta_y /momentum;
+  // FIXME(plane1@hawk.iit.edu) Shouldn't this be just beta_y emittance_y?
+  double sigma_y_y  = emittance_y * mass * beta_y / momentum;
 
   double sigma_Py_t = 0.;
   double sigma_Py_E = dispersion_prime_y * sigma_E_E / energy;
   double sigma_Py_x = 0.;
   double sigma_Py_Px= 0.;
+  // FIXME(plane1@hawk.iit.edu) Shouldn't this be just -alpha_y emittance_y ?
   double sigma_Py_y = -emittance_y * mass * alpha_y;
+  // FIXME(plane1@hawk.iit.edu) Shouldn't this be just gamma_y emittance_y ?
   double sigma_Py_Py= emittance_y * mass * momentum * gamma_y;
-fflush(stdout);
 
   double covariances[36] = {
     sigma_t_t,  0.,         0.,         0.,           0.,         0.,
