@@ -33,10 +33,13 @@
 // MAUS headers
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
 
-
 class SciFiStraightPRTrack {
- public:
-  SciFiStraightPRTrack();   // Default constructor
+  public:
+  // Constructors
+  SciFiStraightPRTrack();
+  SciFiStraightPRTrack(int tracker, double x0, double mx, double y0, double my);
+
+  // Destructors
   ~SciFiStraightPRTrack();  // Default destructor
 
   // Getters
