@@ -87,7 +87,6 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
   } else {
     chanNo = floor(fiberNumber/7);
   }
-
   // assert agreement on chanNo with legacy calculation
   assert(abs(chanNo-old_chanNo) < 2);
 
