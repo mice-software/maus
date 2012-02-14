@@ -112,23 +112,6 @@ bool InputCppDAQData::birth(std::string jsonDataCards) {
   // Comfigure the DBB (EMR board) data processor.
   initProcessor<DBBDataProcessor>(_DBBFragmentProc, configJSON);
 
-  // Set the number of DAQ events to be processed.
-  assert(configJSON.isMember("Number_of_DAQ_Events"));
-  _maxNumEvents = configJSON["Number_of_DAQ_Events"].asInt();
-
-  assert(configJSON.isMember("Phys_Events_Only"));
-  _phys_Events_Only = configJSON["Phys_Events_Only"].asBool();
-  assert(configJSON.isMember("Calib_Events_Only"));
-  _calib_Events_Only = configJSON["Calib_Events_Only"].asBool();
-
-  if (_phys_Events_Only && _calib_Events_Only) {
-    Squeak::mout(Squeak::error) << "There is a contradiction in the configuration:"
-    << std::endl;
-    Squeak::mout(Squeak::error) << "Phys_Events_Only and Calib_Events_Only are both true!!!"
-    << std::endl;
-    return false;
-  }
-
   // _dataProcessManager.DumpProcessors();
 
   return true;
@@ -136,28 +119,13 @@ bool InputCppDAQData::birth(std::string jsonDataCards) {
 
 
 bool InputCppDAQData::readNextEvent() {
-  // Check the max number of DAQ events.
-  // If it is negative, run until the end of the loaded DATE files.
-  if (_maxNumEvents > -1)
-    if (_eventsCount >= _maxNumEvents)
-      return false;
 
-  // cout << "InputCppDAQData::readNextEvent   event " << _eventsCount << endl;
+  Squeak::mout(Squeak::error)
+  << "ERROR : InputCppDAQData is a base imput class and can not be used to access the DAQ data!"
+  << std::endl << "*** Use InputCppDAQOfflineData or InputCppDAQOnlineData instead. ***"
+  << std::endl << std::endl;
 
-  // Use the MDfileManager object to get the next event.
-  if (_phys_Events_Only && (!_calib_Events_Only))
-    _eventPtr = _dataFileManager.GetNextPhysEvent();
-
-  if ((!_phys_Events_Only) && _calib_Events_Only)
-    _eventPtr = _dataFileManager.GetNextCalibEvent();
-
-  if ((!_phys_Events_Only) && (!_calib_Events_Only))
-    _eventPtr = _dataFileManager.GetNextEvent();
-
-  if (!_eventPtr)
-    return false;
-
-  return true;
+  return false;
 }
 
 std::string InputCppDAQData::getCurEvent() {

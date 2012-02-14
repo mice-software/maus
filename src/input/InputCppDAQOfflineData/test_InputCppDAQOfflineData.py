@@ -13,21 +13,20 @@
 # You should have received a copy of the GNU General Public License
 # along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Tests for MapCppTOFDigits"""
+"""Tests for MapCppTOFOfflineDigits"""
 
 # pylint: disable = C0103
 
 import os
 import md5
 import unittest
-import json
 from Configuration import Configuration
-from InputCppDAQData import InputCppDAQData
+from InputCppDAQOfflineData import InputCppDAQOfflineData
 
-class InputCppDAQDataTestCase(unittest.TestCase): # pylint: disable = R0904
-    """Tests for InputCppDAQData"""
+class InputCppDAQOfflineDataTestCase(unittest.TestCase): #pylint:disable=R0904
+    """Tests for InputCppDAQOfflineData"""
     @classmethod
-    def setUpClass(self): # pylint: disable = C0103
+    def setUpClass(self): # pylint: disable = C0103, C0202
         """Sets a mapper and configuration"""
         if not os.environ.get("MAUS_ROOT_DIR"):
             raise Exception('InitializeFail', 'MAUS_ROOT_DIR unset!')
@@ -37,10 +36,11 @@ class InputCppDAQDataTestCase(unittest.TestCase): # pylint: disable = R0904
                             os.environ.get("MAUS_ROOT_DIR")
         self._datafile = '02873'
         self._c = Configuration()
+        self.mapper = None
 
     def test_init(self):
         """Check birth with default configuration"""
-        self.mapper = InputCppDAQData(self._datapath, \
+        self.mapper = InputCppDAQOfflineData(self._datapath, \
                                        self._datafile)
         self.assertTrue(self.mapper.birth( self._c.getConfigJSON() ))
         # Check re-init without closing fails
@@ -50,15 +50,43 @@ class InputCppDAQDataTestCase(unittest.TestCase): # pylint: disable = R0904
 
     def test_single(self):
         """Test a single event"""
-        self.mapper = InputCppDAQData(self._datapath, \
+        self.mapper = InputCppDAQOfflineData(self._datapath, \
                                        self._datafile)
         self.assertTrue(self.mapper.birth(self. _c.getConfigJSON() ))
         # Get a single event and check it's the right size
-        self.assertFalse(self.mapper.readNextEvent())
+        self.assertTrue(self.mapper.readNextEvent())
+        data = self.mapper.getCurEvent()
+        # Data shold be 80 (first event is start of burst)
+        self.assertEqual(len(data), 80)
+        self.assertTrue(self.mapper.death())
         return
 
+    def test_multi(self):
+        """Test reading the whole file"""
+        self.mapper = InputCppDAQOfflineData(self._datapath, \
+                                       self._datafile)
+        self.assertTrue(self.mapper.birth( self._c.getConfigJSON() ))
+        event_count = 0
+
+        # We can try md5'ing the whole dataset
+        digester = md5.new()
+
+        for i in self.mapper.emitter():
+            digester.update(i)
+            event_count = event_count + 1
+
+        # We should now have processed 26 events
+        self.assertEqual(event_count, 26)
+
+        # Check the md5 sum matches the expected value
+        # changed checksum to reflect the run_num addition
+        self.assertEqual(digester.hexdigest(), \
+                         '426cc54172fc1091185f4eaacdd8b85a')
+
+        self.assertTrue(self.mapper.death())
+
     @classmethod
-    def tearDownClass(self): # pylint: disable = C0103
+    def tearDownClass(self): # pylint: disable = C0103, C0202
         """Check that we can death() MapCppTOFDigits"""
         pass
 

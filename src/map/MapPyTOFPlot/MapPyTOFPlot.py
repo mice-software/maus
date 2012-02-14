@@ -28,7 +28,7 @@ class MapPyTOFPlot: #pylint: disable=R0902
         self._sp_tof2 = {}
         ROOT.gROOT.SetBatch(True) #pylint: disable=E1101
         self.canvas = ROOT.TCanvas("tof", "tof") #pylint: disable=E1101
-        self.root_file = ROOT.TFile("tofplot.root","update") #pylint: disable=E1101, C0301
+        self.root_file = ROOT.TFile("tofplot.root","create") #pylint: disable=E1101, C0301
         self.tof_hist = ROOT.TH1F("tof_3505", "tof_3505", 300, 23, 53) #pylint: disable=E1101, C0301
         # times are in ns, constants are in ps
         self.tof0_dt = ROOT.TH1F("tof0_dt", "tof0_dt", 200, -2, 2) #pylint: disable=E1101, C0301
