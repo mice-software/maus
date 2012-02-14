@@ -45,37 +45,48 @@ class SciFiEvent {
 
   void add_hit(SciFiHit* hit) { _scifihits.push_back(hit); }
 
-  std::vector<SciFiHit*> hits() { return _scifihits; }
+  std::vector<SciFiHit*> hits() const { return _scifihits; }
 
   void add_digit(SciFiDigit* digit) { _scifidigits.push_back(digit); }
 
-  std::vector<SciFiDigit*> digits() { return _scifidigits; }
+  std::vector<SciFiDigit*> digits() const { return _scifidigits; }
 
   void add_cluster(SciFiCluster* cluster) { _scificlusters.push_back(cluster); }
 
-  std::vector<SciFiCluster*> clusters() { return _scificlusters; }
+  std::vector<SciFiCluster*> clusters() const { return _scificlusters; }
 
   void add_spacepoint(SciFiSpacePoint* spacepoint) { _scifispacepoints.push_back(spacepoint); }
 
-  std::vector<SciFiSpacePoint*> spacepoints() { return _scifispacepoints; }
+  std::vector<SciFiSpacePoint*> spacepoints() const { return _scifispacepoints; }
 
   void add_seeds(SciFiSpacePoint* seed) { _scifiseeds.push_back(seed); }
 
-  std::vector<SciFiSpacePoint*> seeds() { return _scifiseeds; }
+  std::vector<SciFiSpacePoint*> seeds() const { return _scifiseeds; }
 
   // void add_straightprtrack(SciFiStraightPRTrack* track) { _scifistraightprtracks.push_back(track); }
 
   // std::vector<SciFiStraightPRTrack> straightprtracks() const { return _scifistraightprtracks; }
 
-  // this line is to be replaced by code in lines 66, 68 and 79
+  // this line is to be replaced by code in lines 66, 68 and 90
    std::vector<SciFiStraightPRTrack> scifistraightprtracks;
 
  private:
+  /// Hits in an event.
   std::vector<SciFiHit*>            _scifihits;
+
+  /// Digits in an event.
   std::vector<SciFiDigit*>          _scifidigits;
+
+  /// Clusters in an event.
   std::vector<SciFiCluster*>        _scificlusters;
+
+  /// Spacepoints in an event.
   std::vector<SciFiSpacePoint*>     _scifispacepoints;
+
+  /// Seeds for track fitting.
   std::vector<SciFiSpacePoint*>     _scifiseeds;
+
+  /// Straight tracks.
   // std::vector<SciFiStraightPRTrack> _scifistraightprtracks;
 };  // Don't forget this trailing colon!!!!
 // } // ~namespace MAUS
