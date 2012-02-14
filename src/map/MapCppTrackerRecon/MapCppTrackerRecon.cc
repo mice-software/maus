@@ -84,9 +84,9 @@ std::string MapCppTrackerRecon::process(std::string document) {
         spacepoint_recon(event);
       }
       // Pattern Recognition.
-      // if ( event.scifispacepoints.size() ) {
-      //  pattern_recognition(event);
-      // }
+      if ( event.scifispacepoints.size() ) {
+      pattern_recognition(event);
+      }
       print_event_info(event);
 
       save_to_json(event);

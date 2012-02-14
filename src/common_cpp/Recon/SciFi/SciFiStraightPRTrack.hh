@@ -37,46 +37,46 @@
 
 class SciFiStraightPRTrack {
   public:
-  // Constructors
-  SciFiStraightPRTrack();
-  SciFiStraightPRTrack(int tracker, double x0, double mx, double y0, double my);
+    // Constructors
+    SciFiStraightPRTrack();
+    SciFiStraightPRTrack(int tracker, double x0, double mx, double y0, double my);
 
-  // Destructors
-  ~SciFiStraightPRTrack();  // Default destructor
+    // Destructors
+    ~SciFiStraightPRTrack();  // Default destructor
 
-  // Getters
-  std::vector<SciFiSpacePoint> get_spacepoints() const { return _spoints; }
+    // Getters
+    std::vector<SciFiSpacePoint> get_spacepoints() const { return _spoints; }
 
-  double get_x0() const { return _x0; }
-  double get_y0() const { return _y0; }
-  double get_mx() const { return _mx; }
-  double get_my() const { return _my; }
-  int get_tracker() const { return _tracker; }
+    double get_x0() const { return _x0; }
+    double get_y0() const { return _y0; }
+    double get_mx() const { return _mx; }
+    double get_my() const { return _my; }
+    int get_tracker() const { return _tracker; }
 
-  std::vector<double> get_vsl();
+    std::vector<double> get_vsl();
 
-  // Setters
-  void set_spacepoints(std::vector<SciFiSpacePoint> spoints) { _spoints = spoints; }
+    // Setters
+    void set_spacepoints(std::vector<SciFiSpacePoint> spoints) { _spoints = spoints; }
 
-  void set_x0(double x0) { _x0 = x0; }
-  void set_y0(double y0) { _y0 = y0; }
-  void set_mx(double mx) { _mx = mx; }
-  void set_my(double my) { _my = my; }
+    void set_x0(double x0) { _x0 = x0; }
+    void set_y0(double y0) { _y0 = y0; }
+    void set_mx(double mx) { _mx = mx; }
+    void set_my(double my) { _my = my; }
 
-  void set_tracker(int tracker) { _tracker = tracker; }
-  // Print track parameters
-  void print_params();
+    void set_tracker(int tracker) { _tracker = tracker; }
+    // Print track parameters
+    void print_params();
 
- private:
-  std::vector<SciFiSpacePoint> _spoints;
+  private:
+    std::vector<SciFiSpacePoint> _spoints;
 
-  std::vector<double> _vsl;
+    std::vector<double> _vsl;
 
-  int _tracker;
-  double _x0;
-  double _y0;
-  double _mx;
-  double _my;
+    int _tracker;
+    double _x0;
+    double _y0;
+    double _mx;
+    double _my;
 };
 // }// ~namespace MAUS
 
