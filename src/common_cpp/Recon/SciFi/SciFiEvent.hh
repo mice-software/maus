@@ -59,6 +59,6 @@ class SciFiEvent {
   std::vector<SciFiSpacePoint*> scifiseeds;
   std::vector<SciFiStraightPRTrack> scifistraightprtracks;
 };  // Don't forget this trailing colon!!!!
-// }// ~namespace MAUS
+// } // ~namespace MAUS
 
 #endif

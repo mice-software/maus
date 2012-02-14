@@ -38,8 +38,6 @@ class G4VPhysicalVolume;
  * MICE scintillating fiber tracker for the MICE proposal
  */
 
-// TODO(Santos): Have another look at the rotation of the fibre plane.
-
 class SciFiPlane {
   public:
 

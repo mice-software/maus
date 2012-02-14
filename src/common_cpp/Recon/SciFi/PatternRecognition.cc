@@ -249,4 +249,4 @@ void PatternRecognition::sort_by_station(const std::vector<SciFiSpacePoint*>& sp
     }
   }
 }
-// }// ~namespace MAUS
+// } // ~namespace MAUS

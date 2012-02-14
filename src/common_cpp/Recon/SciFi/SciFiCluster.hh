@@ -106,6 +106,6 @@ class SciFiCluster {
 
   Hep3Vector _position;
 };  // Don't forget this trailing colon!!!!
-// }// ~namespace MAUS
+// } // ~namespace MAUS
 
 #endif

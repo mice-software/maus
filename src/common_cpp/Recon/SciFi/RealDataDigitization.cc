@@ -233,4 +233,4 @@ bool RealDataDigitization::load_bad_channels() {
   }
   return true;
 }
-// }// ~namespace MAUS
+// } // ~namespace MAUS

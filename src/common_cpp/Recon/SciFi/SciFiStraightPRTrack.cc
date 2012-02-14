@@ -67,4 +67,4 @@ void SciFiStraightPRTrack::print_params() {
   std::cout << " tx is " << _mx << std::endl;
   std::cout << " ty is " << _my << std::endl;
 }
-// }// ~namespace MAUS
+// } // ~namespace MAUS

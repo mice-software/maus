@@ -139,4 +139,4 @@ Hep3Vector SciFiClusterRec::get_reference_frame_pos(int tracker,
   Hep3Vector reference_pos =  reference_plane->globalPosition();
   return reference_pos;
 }
-// }// ~namespace MAUS
+// } // ~namespace MAUS

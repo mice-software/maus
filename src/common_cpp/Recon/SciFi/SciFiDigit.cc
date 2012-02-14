@@ -27,4 +27,4 @@ SciFiDigit::SciFiDigit(int tracker, int station, int plane, int channel, double 
 }
 
 SciFiDigit::~SciFiDigit() {}
-// } ~namespace MAUS
+// } // ends namespace MAUS

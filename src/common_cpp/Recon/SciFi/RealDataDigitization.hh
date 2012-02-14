@@ -112,6 +112,6 @@ class RealDataDigitization {
   std::vector<int> _inWG;
   std::vector<int> _WGfib;
 };  // Don't forget this trailing colon!!!!
-// }// ~namespace MAUS
+// } // ~namespace MAUS
 
 #endif

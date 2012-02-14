@@ -94,6 +94,6 @@ class SciFiHit {
 
   bool _used;
 };  // Don't forget this trailing colon!!!!
-// }// ~namespace MAUS
+// } // ~namespace MAUS
 
 #endif

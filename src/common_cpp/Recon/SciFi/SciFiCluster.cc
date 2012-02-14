@@ -39,4 +39,4 @@ void SciFiCluster::add_digit(SciFiDigit* neigh) {
   _channel_w /= 2.0;
   _channel_w += (neigh->get_channel())/2.0;
 }
-// }// ~namespace MAUS
+// } // ~namespace MAUS

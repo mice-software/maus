@@ -62,4 +62,4 @@ SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2) {
   // _time_error = 0;
   // _time_res   = 0;
 }
-// }// ~namespace MAUS
+// } // ~namespace MAUS
