@@ -68,7 +68,7 @@ class SciFiEvent {
   // std::vector<SciFiStraightPRTrack> straightprtracks() const { return _scifistraightprtracks; }
 
   // this line is to be replaced by code in lines 66, 68 and 90
-   std::vector<SciFiStraightPRTrack> scifistraightprtracks;
+  std::vector<SciFiStraightPRTrack> scifistraightprtracks;
 
  private:
   /// Hits in an event.

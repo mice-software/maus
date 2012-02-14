@@ -41,7 +41,7 @@ void SciFiClusterRec::process(SciFiEvent &evt, std::vector<const MiceModule*> mo
 
   // Sort seeds so that we use higher npe first.
 
-  for ( unsigned int i = 0; i < seeds_size; i++ ) {
+  for ( int i = 0; i < seeds_size; i++ ) {
     if ( !seeds[i]->is_used() ) {
       SciFiDigit* neigh = NULL;
       SciFiDigit* seed = seeds[i];

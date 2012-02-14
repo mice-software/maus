@@ -51,7 +51,7 @@ void PatternRecognition::straightprtrack_recon(SciFiEvent &evt) {
   // Split spacepoints up according to which tracker they occured in
   std::vector< std::vector<SciFiSpacePoint*> > spnts_by_tracker(_n_trackers);
   for ( int trker_no = 0; trker_no < _n_trackers; ++trker_no ) {  // Loop over trackers
-    for ( int i = 0; i < evt.spacepoints().size(); ++i ) {  // Loop over spacepoints
+    for ( unsigned int i = 0; i < evt.spacepoints().size(); ++i ) {  // Loop over spacepoints
       if ( evt.spacepoints()[i]->get_tracker() == trker_no ) {
         spnts_by_tracker[trker_no].push_back(evt.spacepoints()[i]);
       }
@@ -66,7 +66,7 @@ void PatternRecognition::straightprtrack_recon(SciFiEvent &evt) {
 
     // Count how many stations have at least one spacepoint
     int stations_hit = 0;
-    for ( int i = 0; i < spnts_by_station.size(); ++i ) {
+    for ( unsigned int i = 0; i < spnts_by_station.size(); ++i ) {
       if ( spnts_by_station[i].size() > 0 ) {
         ++stations_hit;
       }
@@ -100,10 +100,10 @@ void PatternRecognition::make_spr_5pt(const std::vector<SciFiSpacePoint*>& spnts
   // Form a candidate track between sp in station 5 and station 1
   bool success = false;
   // Loop over sp in station 5
-  for ( int stat_outer = 0; stat_outer < spnts_stat[_n_stations - 1].size(); ++stat_outer ) {
+  for ( unsigned int stat_outer = 0; stat_outer < spnts_stat[_n_stations - 1].size(); ++stat_outer ) {
     if ( success ) break;
     // Loop over sp in station 1
-    for ( int stat_inner = 0; stat_inner < spnts_stat[0].size(); ++stat_inner ) {
+    for ( unsigned int stat_inner = 0; stat_inner < spnts_stat[0].size(); ++stat_inner ) {
       if ( success ) break;
 
       // Draw a straight line between spacepoints in outer most and inner most stations
@@ -124,7 +124,7 @@ void PatternRecognition::make_spr_5pt(const std::vector<SciFiSpacePoint*>& spnts
 
       // Loop over intermediate stations and compare sp with the line
       for ( int stat_no = 1; stat_no < 4; ++stat_no ) {
-        for ( int sp_no = 0; sp_no < spnts_stat[stat_no].size(); ++sp_no ) {
+        for ( unsigned int sp_no = 0; sp_no < spnts_stat[stat_no].size(); ++sp_no ) {
           Hep3Vector pos = spnts_stat[stat_no][sp_no]->get_position();
           // Calculate the residuals
           double dx = pos.x() - ( x_0i + ( pos.z() * m_xi ) );
@@ -241,8 +241,8 @@ void PatternRecognition::make_spr_3pt(const std::vector<SciFiSpacePoint*>& spnts
 
 void PatternRecognition::sort_by_station(const std::vector<SciFiSpacePoint*>& spnts,
                                  std::vector< std::vector<SciFiSpacePoint*> >& spnts_stat) {
-  for ( int stat_no = 0; stat_no < spnts_stat.size(); ++stat_no ) {
-    for ( int i = 0; i < spnts.size(); ++i ) {
+  for ( unsigned int stat_no = 0; stat_no < spnts_stat.size(); ++stat_no ) {
+    for ( unsigned int i = 0; i < spnts.size(); ++i ) {
       if ( spnts[i]->get_station() == stat_no + 1 ) {
         spnts_stat[stat_no].push_back(spnts[i]);
       }

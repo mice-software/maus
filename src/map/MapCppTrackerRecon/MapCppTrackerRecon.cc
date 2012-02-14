@@ -70,7 +70,7 @@ std::string MapCppTrackerRecon::process(std::string document) {
   }
 
   try { // ================= Reconstruction =========================
-    for ( int k = 0; k < spill.events().size(); k++ ) {
+    for ( unsigned int k = 0; k < spill.events().size(); k++ ) {
       SciFiEvent event = *(spill.events()[k]);
       // Build Clusters.
       if ( event.digits().size() ) {
