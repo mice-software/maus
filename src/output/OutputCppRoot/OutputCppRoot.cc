@@ -40,7 +40,7 @@ bool OutputCppRoot::birth(std::string json_datacards) {
     //MC* mc = new MC();
     _d = new Digits();
     _mc = new MC();
-    _md = new MausData(d, mc);
+    _md = new MausData(_d, _mc);
 
     // Set branch addresses
     (*_outfile) << branchName("digits") << _d;

@@ -24,6 +24,8 @@
 
 #include "src/legacy/Interface/Squeal.hh"
 
+class Digits;
+class MC;
 class MausData;
 class JsonCppConverter;
 class irstream;
@@ -74,6 +76,8 @@ class InputCppRoot {
  private:
   irstream* _infile;
   JsonCppConverter* _jsonCppConverter;
+  Digits* _d;
+  MC* _mc;
   MausData* _md;
   Json::Value _val;
   std::string _filename;

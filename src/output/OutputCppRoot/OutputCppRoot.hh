@@ -23,6 +23,8 @@
 // TODO (Rogers): looks okay - but throws a segmentation fault if we forget to
 //                call death(); needs proper error handler calling
 
+class Digits;
+class MC;
 class MausData;
 class JsonCppConverter;
 class orstream;

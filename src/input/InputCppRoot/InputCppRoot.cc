@@ -42,12 +42,12 @@ bool InputCppRoot::birth(std::string json_datacards) {
   }
   _infile = new irstream(_filename.c_str());
 
-  Digits* d = new Digits();
-  MC* mc = new MC();
-  _md = new MausData(d, mc);
+  _d = new Digits();
+  _mc = new MC();
+  _md = new MausData(_d, _mc);
 
-  (*_infile) >> branchName("digits") >> d;
-  (*_infile) >> branchName("mc") >> mc;
+  (*_infile) >> branchName("digits") >> _d;
+  (*_infile) >> branchName("mc") >> _mc;
 
   _jsonCppConverter = new JsonCppConverter(&_val);
   return true;
@@ -65,6 +65,14 @@ bool InputCppRoot::death() {
   if (_md != NULL) {
     delete _md;
     _md = NULL;
+  }
+  if (_mc != NULL) {
+    delete _mc;
+    _mc = NULL;
+  }
+  if (_d != NULL) {
+    delete _d;
+    _d = NULL;
   }
   return true;
 }
