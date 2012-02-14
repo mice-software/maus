@@ -100,7 +100,8 @@ void PatternRecognition::make_spr_5pt(const std::vector<SciFiSpacePoint*>& spnts
   // Form a candidate track between sp in station 5 and station 1
   bool success = false;
   // Loop over sp in station 5
-  for ( unsigned int stat_outer = 0; stat_outer < spnts_stat[_n_stations - 1].size(); ++stat_outer ) {
+  for ( unsigned int stat_outer = 0;
+        stat_outer < spnts_stat[_n_stations - 1].size(); ++stat_outer ) {
     if ( success ) break;
     // Loop over sp in station 1
     for ( unsigned int stat_inner = 0; stat_inner < spnts_stat[0].size(); ++stat_inner ) {

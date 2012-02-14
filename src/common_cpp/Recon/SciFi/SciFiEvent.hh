@@ -63,7 +63,8 @@ class SciFiEvent {
 
   std::vector<SciFiSpacePoint*> seeds() const { return _scifiseeds; }
 
-  // void add_straightprtrack(SciFiStraightPRTrack* track) { _scifistraightprtracks.push_back(track); }
+  // void add_straightprtrack(SciFiStraightPRTrack* track)
+  // { _scifistraightprtracks.push_back(track); }
 
   // std::vector<SciFiStraightPRTrack> straightprtracks() const { return _scifistraightprtracks; }
 
