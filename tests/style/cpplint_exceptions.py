@@ -20,88 +20,97 @@ test_cpp_style can allow exceptions in certain circumstances:
   reason for the exception, it may get deleted...
 """
 
-# pylint: disable=C0301
-
 import os
 
-exceptions = {
+exceptions = { #pylint: disable=C0103
 }
 
-cpp_cm = os.path.join('src','common_cpp')
-legacy = os.path.join('src','legacy')
-tst = os.path.join('tests', 'cpp_unit')
+CPP_CM = os.path.join('src','common_cpp')
+LEGACY = os.path.join('src','LEGACY')
+TST = os.path.join('tests', 'cpp_unit')
 
-exceptions[os.path.join(cpp_cm, 'Simulation','MAUSRunAction.hh')] = [
+exceptions[os.path.join(CPP_CM, 'Simulation','MAUSRunAction.hh')] = [
 ('#include "globals.hh"', 'cpplint confused with g4 header', 'rogers'),
 ('#include "G4UserRunAction.hh"', 'cpplint confused with g4 header', 'rogers'),
 ]
 
-exceptions[os.path.join(cpp_cm, 'Simulation','MAUSRunAction.cc')] = [
+exceptions[os.path.join(CPP_CM, 'Simulation','MAUSRunAction.cc')] = [
 ('#include "G4Run.hh"', 'cpplint confused with g4 header', 'rogers'),
 ('#include "G4VVisManager.hh"', 'cpplint confused with g4 header', 'rogers'),
 ('#include "G4UImanager.hh"', 'cpplint confused with g4 header', 'rogers'),
 ]
 
-exceptions[os.path.join(cpp_cm, 'Simulation','MAUSPhysicsList.hh')] = [
-('#include "G4VModularPhysicsList.hh"', 'cpplint confused with g4 header', 'rogers'),
+exceptions[os.path.join(CPP_CM, 'Simulation','MAUSPhysicsList.hh')] = [
+('#include "G4VModularPhysicsList.hh"', 'cpplint confused with g4 header',
+                                                                      'rogers'),
 ('#include "G4UImanager.hh"', 'cpplint confused with g4 header', 'rogers'),
-('#include "G4UserSpecialCuts.hh"', 'cpplint confused with g4 header', 'rogers'),
+('#include "G4UserSpecialCuts.hh"', 'cpplint confused with g4 header',
+                                                                      'rogers'),
 ('#include "G4StepLimiter.hh"', 'cpplint confused with g4 header', 'rogers'),
 ]
 
-exceptions[os.path.join(cpp_cm, 'Simulation','MAUSPhysicsList.cc')] = [
+exceptions[os.path.join(CPP_CM, 'Simulation','MAUSPhysicsList.cc')] = [
 ('#include "G4UImanager.hh"', 'cpplint confused with g4 header', 'rogers'),
 ('#include "G4ProcessTable.hh"', 'cpplint confused with g4 header', 'rogers'),
 ('#include "G4ProcessVector.hh"', 'cpplint confused with g4 header', 'rogers'),
-('#include "G4PhysListFactory.hh"', 'cpplint confused with g4 header', 'rogers'),
+('#include "G4PhysListFactory.hh"', 'cpplint confused with g4 header',
+                                                                      'rogers'),
 ('#include "globals.hh"', 'cpplint confused with g4 header', 'rogers'),
 ]
 
-exceptions[os.path.join(cpp_cm, 'Simulation','VirtualPlanes.cc')] = [
+exceptions[os.path.join(CPP_CM, 'Simulation','VirtualPlanes.cc')] = [
 ('#include "G4Track.hh"', 'cpplint confused with g4 header', 'rogers'),
 ('#include "G4Step.hh"', 'cpplint confused with g4 header', 'rogers'),
 ('#include "G4StepPoint.hh"', 'cpplint confused with g4 header', 'rogers')
 ]
 
-exceptions[os.path.join(tst, 'Simulation', 'VirtualPlaneTest.cc')] = [
+exceptions[os.path.join(TST, 'Simulation', 'VirtualPlaneTest.cc')] = [
 ('#include "G4ParticleTable.hh"', 'cpplint confused with g4 header', 'rogers'),
 ('#include "G4Step.hh"', 'cpplint confused with g4 header', 'rogers'),
 ('#include "G4StepPoint.hh"', 'cpplint confused with g4 header', 'rogers')
 ]
 
-exceptions[os.path.join(cpp_cm, 'Simulation','MAUSPrimaryGeneratorAction.hh')] = [
+exceptions[os.path.join(CPP_CM, 'Simulation',
+                                           'MAUSPrimaryGeneratorAction.hh')] = [
 ('#include "G4ParticleGun.hh"', 'cpplint confused by g4 header', 'rogers'),
 ('#include "G4ParticleTable.hh"', 'cpplint confused by g4 header', 'rogers'),
-('#include "G4VUserPrimaryGeneratorAction.hh"  // inherit from', 'cpplint confused with maus header', 'rogers'),
-('    long int seed;', 'CLHEP also uses long int for its random seed - if we want to be compatible we should follow their lead', 'rogers'),
-('#include "G4Track.hh"  //  arg to tracking action', 'cpplint confused by g4 header', 'rogers'),
-('#include "G4UserTrackingAction.hh"  //  inherit from', 'cpplint confused by g4 header', 'rogers')
+('#include "G4VUserPrimaryGeneratorAction.hh"  // inherit from',
+                                 'cpplint confused with maus header', 'rogers'),
+('    long int seed;', 'CLHEP also uses long int for its random seed - if we want to be compatible we should follow their lead', 'rogers'), #pylint: disable=C0301
+('#include "G4Track.hh"  //  arg to tracking action',
+'cpplint confused by g4 header', 'rogers'),
+('#include "G4UserTrackingAction.hh"  //  inherit from',
+'cpplint confused by g4 header', 'rogers')
 ]
 
-exceptions[os.path.join(cpp_cm, 'Simulation','MAUSPrimaryGeneratorAction.cc')] = [
+exceptions[os.path.join(CPP_CM, 'Simulation',
+                                           'MAUSPrimaryGeneratorAction.cc')] = [
 ('#include "G4Event.hh"', 'cpplint confused by g4 header', 'rogers'),
 ('#include "G4PrimaryVertex.hh"', 'cpplint confused by g4 header', 'rogers'),
 ('#include "G4Track.hh"', 'cpplint confused by g4 header', 'rogers'),
 ('#include "G4ios.hh"', 'cpplint confused by g4 header', 'rogers')
 ]
 
-exceptions[os.path.join(cpp_cm, 'Simulation','MAUSSteppingAction.hh')] = [
+exceptions[os.path.join(CPP_CM, 'Simulation','MAUSSteppingAction.hh')] = [
 ('#include "G4Step.hh"', 'cpplint confused by g4 header', 'rogers'),
 ('#include "G4StepPoint.hh"', 'cpplint confused by g4 header', 'rogers'),
 ('#include "G4Track.hh"', 'cpplint confused by g4 header', 'rogers'),
-('#include "G4UserSteppingAction.hh"', 'cpplint confused by g4 header', 'rogers'),
+('#include "G4UserSteppingAction.hh"', 
+                                     'cpplint confused by g4 header', 'rogers'),
 ]
 
-exceptions[os.path.join(cpp_cm, 'Simulation','MAUSTrackingAction.hh')] = [
-('#include "G4Track.hh"  //  arg to tracking action', 'cpplint confused by g4 header', 'rogers'),
-('#include "G4UserTrackingAction.hh"  //  inherit from', 'cpplint confused by g4 header', 'rogers')
+exceptions[os.path.join(CPP_CM, 'Simulation','MAUSTrackingAction.hh')] = [
+('#include "G4Track.hh"  //  arg to tracking action', 
+                                     'cpplint confused by g4 header', 'rogers'),
+('#include "G4UserTrackingAction.hh"  //  inherit from',
+                                      'cpplint confused by g4 header', 'rogers')
 ]
 
-exceptions[os.path.join(cpp_cm, 'Simulation','MAUSVisManager.hh')] = [
+exceptions[os.path.join(CPP_CM, 'Simulation','MAUSVisManager.hh')] = [
 ('#include "G4VisManager.hh"', 'cpplint confused by g4 header', 'rogers'),
 ]
 
-exceptions[os.path.join(cpp_cm, 'Simulation','MAUSEventAction.hh')] = [
+exceptions[os.path.join(CPP_CM, 'Simulation','MAUSEventAction.hh')] = [
 ('#include "G4UserEventAction.hh"', 'cpplint confused by g4 header', 'rogers'),
 ]
 
