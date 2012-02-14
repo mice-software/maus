@@ -33,7 +33,7 @@ def run(number_of_spills):
     my_map = MAUS.MapPyGroup()
     my_map.append(MAUS.MapCppSimulation())  #  geant4 simulation
     my_map.append(MAUS.MapCppTOFDigitization())  #  TOF detector digitization
-    my_map.append(MAUS.MapCppTrackerDigitization())  #  tracker detector digitization
+    my_map.append(MAUS.MapCppTrackerMCDigitization())  #  tracker detector digitization
     
     datacards = io.StringIO(u"keep_tracks = False\nsimulation_geometry_filename = \"Stage5.dat\"")
     #  You may specify datacards if you wish.  To do so you create a file object
