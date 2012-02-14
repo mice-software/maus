@@ -46,14 +46,14 @@ void PatternRecognition::process(SciFiEvent &evt) {
 
 void PatternRecognition::straightprtrack_recon(SciFiEvent &evt) {
   std::cout << "\nBegining Pattern Recognition" << std::endl;
-  std::cout << "Number of spacepoints in spill: " << evt.scifispacepoints.size() << std::endl;
+  std::cout << "Number of spacepoints in spill: " << evt.spacepoints().size() << std::endl;
 
   // Split spacepoints up according to which tracker they occured in
   std::vector< std::vector<SciFiSpacePoint*> > spnts_by_tracker(_n_trackers);
   for ( int trker_no = 0; trker_no < _n_trackers; ++trker_no ) {  // Loop over trackers
-    for ( int i = 0; i < evt.scifispacepoints.size(); ++i ) {  // Loop over spacepoints
-      if ( evt.scifispacepoints[i]->get_tracker() == trker_no ) {
-        spnts_by_tracker[trker_no].push_back(evt.scifispacepoints[i]);
+    for ( int i = 0; i < evt.spacepoints().size(); ++i ) {  // Loop over spacepoints
+      if ( evt.spacepoints()[i]->get_tracker() == trker_no ) {
+        spnts_by_tracker[trker_no].push_back(evt.spacepoints()[i]);
       }
     } // ~Loop over spacepoints
   } // ~Loop over trackers
@@ -74,13 +74,13 @@ void PatternRecognition::straightprtrack_recon(SciFiEvent &evt) {
 
     // Make the tracks depending on how many stations have spacepoints in them
     if (stations_hit == 5)
-      make_spr_5pt(spnts_by_tracker[trker_no], evt.scifistraightprtracks);
+      make_spr_5pt(spnts_by_tracker[trker_no], evt.straightprtracks());
     if (evt.scifistraightprtracks.size() == 0 && stations_hit > 3)
-      make_spr_4pt(spnts_by_tracker[trker_no], evt.scifistraightprtracks);
+      make_spr_4pt(spnts_by_tracker[trker_no], evt.straightprtracks());
     if (evt.scifistraightprtracks.size() == 0 && stations_hit > 2)
-      make_spr_3pt(spnts_by_tracker[trker_no], evt.scifistraightprtracks);
+      make_spr_3pt(spnts_by_tracker[trker_no], evt.straightprtracks());
   }// ~Loop over trackers
-  std::cout << "Number of tracks found: " << evt.scifistraightprtracks.size() << "\n\n";
+  std::cout << "Number of tracks found: " << evt.straightprtracks().size() << "\n\n";
 }
 
 void PatternRecognition::make_spr_5pt(const std::vector<SciFiSpacePoint*>& spnts,

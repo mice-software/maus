@@ -43,21 +43,25 @@ class SciFiEvent {
 
   ~SciFiEvent();
 
-  // std::vector hits() const { return scifihits; }
+  std::vector<SciFiHit*> hits() const { return _scifihits; }
 
-  // std::vector digits() const { return scifidigits; }
+  std::vector<SciFiDigit*> digits() const { return _scifidigits; }
 
-  // std::vector clusters() const { return scificlusters; }
+  std::vector<SciFiCluster*> clusters() const { return _scificlusters; }
 
-  // std::vector spacepoints() const { return scifispacepoints; }
+  std::vector<SciFiSpacePoint*> spacepoints() const { return _scifispacepoints; }
 
-// private:
-  std::vector<SciFiHit*>   scifihits;
-  std::vector<SciFiDigit*>   scifidigits;
-  std::vector<SciFiCluster*> scificlusters;
-  std::vector<SciFiSpacePoint*> scifispacepoints;
-  std::vector<SciFiSpacePoint*> scifiseeds;
-  std::vector<SciFiStraightPRTrack> scifistraightprtracks;
+  std::vector<SciFiSpacePoint*> seeds() const { return _scifiseeds; }
+
+  std::vector<SciFiStraightPRTrack> straightprtracks() const { return _scifistraightprtracks; }
+
+ private:
+  std::vector<SciFiHit*>            _scifihits;
+  std::vector<SciFiDigit*>          _scifidigits;
+  std::vector<SciFiCluster*>        _scificlusters;
+  std::vector<SciFiSpacePoint*>     _scifispacepoints;
+  std::vector<SciFiSpacePoint*>     _scifiseeds;
+  std::vector<SciFiStraightPRTrack> _scifistraightprtracks;
 };  // Don't forget this trailing colon!!!!
 // } // ~namespace MAUS
 

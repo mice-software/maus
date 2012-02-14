@@ -28,9 +28,9 @@ SciFiClusterRec::~SciFiClusterRec() {}
 void SciFiClusterRec::process(SciFiEvent &evt, std::vector<const MiceModule*> modules) {
   // Create and fill the seeds vector.
   std::vector<SciFiDigit*>   seeds;
-  for ( unsigned int dig = 0; dig < evt.scifidigits.size(); dig++ ) {
-    if ( evt.scifidigits[dig]->get_npe() > _min_npe/2.0 )
-      seeds.push_back(evt.scifidigits[dig]);
+  for ( unsigned int dig = 0; dig < evt.digits().size(); dig++ ) {
+    if ( evt.digits()[dig]->get_npe() > _min_npe/2.0 )
+      seeds.push_back(evt.digits()[dig]);
   }
 
   // Get the number of clusters. If too large, abort reconstruction.
@@ -70,7 +70,7 @@ void SciFiClusterRec::process(SciFiEvent &evt, std::vector<const MiceModule*> mo
           clust->add_digit(neigh);
         }
         construct(clust, modules);
-        evt.scificlusters.push_back(clust);
+        evt.clusters().push_back(clust);
       }
     }
   } // ends loop over seeds

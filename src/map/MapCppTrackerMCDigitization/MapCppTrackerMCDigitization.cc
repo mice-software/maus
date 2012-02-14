@@ -94,12 +94,12 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
   for ( unsigned int k = 0; k < spill.events_in_spill.size(); k++ ) {
     SciFiEvent event = *(spill.events_in_spill[k]);
 
-    // std::cout << "Hits in event: " << event.scifihits.size() << std::endl;
-    if ( event.scifihits.size() ) {
+    // std::cout << "Hits in event: " << event.hits().size() << std::endl;
+    if ( event.hits().size() ) {
       // for each fiber-hit, make a digit
       construct_digits(event);
     }
-    // std::cout << "Digits in Event: " << event.scifidigits.size() << " " << std::endl;
+    // std::cout << "Digits in Event: " << event.digits().size() << " " << std::endl;
 
     save_to_json(event);
   }
@@ -134,8 +134,8 @@ void MapCppTrackerMCDigitization::
     edep    = hit["energy_deposited"].asDouble();
     time    = hit["time"].asDouble();
     SciFiHit *a_hit = new SciFiHit(tracker, station, plane, fibre, edep, time);
-    event->scifihits.push_back(a_hit);
-    // std::cout << "Number of hits stored in event: " << event->scifihits.size() << std::endl;
+    event->hits().push_back(a_hit);
+    // std::cout << "Number of hits stored in event: " << event->hits().size() << std::endl;
   }
   spill.events_in_spill.push_back(event);
 }
@@ -155,10 +155,10 @@ bool MapCppTrackerMCDigitization::check_sanity_mc(Json::Value mc) {
 
 
 void MapCppTrackerMCDigitization::construct_digits(SciFiEvent &evt) {
-  int number_of_hits = evt.scifihits.size();
+  int number_of_hits = evt.hits().size();
   for ( int hit_i = 0; hit_i < number_of_hits; hit_i++ ) {
-    if ( !evt.scifihits[hit_i]->is_used() ) {
-      SciFiHit *a_hit = evt.scifihits[hit_i];
+    if ( !evt.hits()[hit_i]->is_used() ) {
+      SciFiHit *a_hit = evt.hits()[hit_i];
 
       // Get nPE from this hit.
       double edep = a_hit->get_edep();
@@ -178,8 +178,8 @@ void MapCppTrackerMCDigitization::construct_digits(SciFiEvent &evt) {
 
       // loop over all the other hits
       for ( int hit_j = hit_i; hit_j < number_of_hits; hit_j++ ) {
-        if ( check_param(evt.scifihits[hit_i], evt.scifihits[hit_j]) ) {
-          SciFiHit *same_digit = evt.scifihits[hit_j];
+        if ( check_param(evt.hits()[hit_i], evt.hits()[hit_j]) ) {
+          SciFiHit *same_digit = evt.hits()[hit_j];
           double edep_j = same_digit->get_edep();
           nPE  += compute_npe(edep_j);
           same_digit->set_used();

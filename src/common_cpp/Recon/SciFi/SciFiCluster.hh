@@ -50,6 +50,8 @@ class SciFiCluster {
  public:
   SciFiCluster(); // Default constructor
 
+  /** @brief Constructs cluster from a single digit.
+   */
   explicit SciFiCluster(SciFiDigit *digit);
 
   ~SciFiCluster();

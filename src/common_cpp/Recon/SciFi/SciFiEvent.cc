@@ -19,27 +19,27 @@
 // namespace MAUS {
 
 SciFiEvent::SciFiEvent() {
-  scifihits.resize(0);
-  scifidigits.resize(0);
-  scificlusters.resize(0);
-  scifispacepoints.resize(0);
-  scifiseeds.resize(0);
-  scifistraightprtracks.resize(0);
+  _scifihits.resize(0);
+  _scifidigits.resize(0);
+  _scificlusters.resize(0);
+  _scifispacepoints.resize(0);
+  _scifiseeds.resize(0);
+  _scifistraightprtracks.resize(0);
 }
 
 SciFiEvent::~SciFiEvent() {
   std::vector<SciFiHit*>::iterator hit;
-  for (hit = scifihits.begin(); hit!= scifihits.end(); ++hit) {
+  for (hit = _scifihits.begin(); hit!= _scifihits.end(); ++hit) {
     delete (*hit);
   }
 
   std::vector<SciFiDigit*>::iterator digit;
-  for (digit = scifidigits.begin(); digit!= scifidigits.end(); ++digit) {
+  for (digit = _scifidigits.begin(); digit!= _scifidigits.end(); ++digit) {
     delete (*digit);
   }
 
   std::vector<SciFiSpacePoint*>::iterator spacepoint;
-  for (spacepoint = scifispacepoints.begin(); spacepoint!= scifispacepoints.end(); ++spacepoint) {
+  for (spacepoint = _scifispacepoints.begin(); spacepoint!= _scifispacepoints.end(); ++spacepoint) {
     delete (*spacepoint);
   }
 }

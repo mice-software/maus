@@ -90,8 +90,6 @@ class RealDataDigitization {
    */
   bool is_good_channel(int board, int bank, int chan_ro);
 
-  // std::vector<Json::Value> get_calibration() const { return _calibration[16][4]; }
-
  private:
   /// A vector containing calibration values for every 4 banks of the 16 boards.
   std::vector<Json::Value> _calibration[16][4];
