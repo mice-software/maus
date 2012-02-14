@@ -43,17 +43,32 @@ class SciFiEvent {
 
   ~SciFiEvent();
 
-  std::vector<SciFiHit*> hits() const { return _scifihits; }
+  void add_hit(SciFiHit* hit) { _scifihits.push_back(hit); }
 
-  std::vector<SciFiDigit*> digits() const { return _scifidigits; }
+  std::vector<SciFiHit*> hits() { return _scifihits; }
 
-  std::vector<SciFiCluster*> clusters() const { return _scificlusters; }
+  void add_digit(SciFiDigit* digit) { _scifidigits.push_back(digit); }
 
-  std::vector<SciFiSpacePoint*> spacepoints() const { return _scifispacepoints; }
+  std::vector<SciFiDigit*> digits() { return _scifidigits; }
 
-  std::vector<SciFiSpacePoint*> seeds() const { return _scifiseeds; }
+  void add_cluster(SciFiCluster* cluster) { _scificlusters.push_back(cluster); }
 
-  std::vector<SciFiStraightPRTrack> straightprtracks() const { return _scifistraightprtracks; }
+  std::vector<SciFiCluster*> clusters() { return _scificlusters; }
+
+  void add_spacepoint(SciFiSpacePoint* spacepoint) { _scifispacepoints.push_back(spacepoint); }
+
+  std::vector<SciFiSpacePoint*> spacepoints() { return _scifispacepoints; }
+
+  void add_seeds(SciFiSpacePoint* seed) { _scifiseeds.push_back(seed); }
+
+  std::vector<SciFiSpacePoint*> seeds() { return _scifiseeds; }
+
+  // void add_straightprtrack(SciFiStraightPRTrack* track) { _scifistraightprtracks.push_back(track); }
+
+  // std::vector<SciFiStraightPRTrack> straightprtracks() const { return _scifistraightprtracks; }
+
+  // this line is to be replaced by code in lines 66, 68 and 79
+   std::vector<SciFiStraightPRTrack> scifistraightprtracks;
 
  private:
   std::vector<SciFiHit*>            _scifihits;
@@ -61,7 +76,7 @@ class SciFiEvent {
   std::vector<SciFiCluster*>        _scificlusters;
   std::vector<SciFiSpacePoint*>     _scifispacepoints;
   std::vector<SciFiSpacePoint*>     _scifiseeds;
-  std::vector<SciFiStraightPRTrack> _scifistraightprtracks;
+  // std::vector<SciFiStraightPRTrack> _scifistraightprtracks;
 };  // Don't forget this trailing colon!!!!
 // } // ~namespace MAUS
 

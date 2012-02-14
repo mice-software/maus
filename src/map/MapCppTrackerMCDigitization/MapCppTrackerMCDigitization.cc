@@ -89,10 +89,9 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
 
     json_to_cpp(json_event, spill);
   } // ends loop particles
-  // std::cout << "Digitization: Events in Spill: " << spill.events_in_spill.size() << std::endl;
   // ================= Reconstruction =========================
-  for ( unsigned int k = 0; k < spill.events_in_spill.size(); k++ ) {
-    SciFiEvent event = *(spill.events_in_spill[k]);
+  for ( unsigned int k = 0; k < spill.events().size(); k++ ) {
+    SciFiEvent event = *(spill.events()[k]);
 
     // std::cout << "Hits in event: " << event.hits().size() << std::endl;
     if ( event.hits().size() ) {
@@ -134,10 +133,10 @@ void MapCppTrackerMCDigitization::
     edep    = hit["energy_deposited"].asDouble();
     time    = hit["time"].asDouble();
     SciFiHit *a_hit = new SciFiHit(tracker, station, plane, fibre, edep, time);
-    event->hits().push_back(a_hit);
+    event->add_hit(a_hit);
     // std::cout << "Number of hits stored in event: " << event->hits().size() << std::endl;
   }
-  spill.events_in_spill.push_back(event);
+  spill.add_event(event);
 }
 
 bool MapCppTrackerMCDigitization::check_sanity_mc(Json::Value mc) {
@@ -189,7 +188,7 @@ void MapCppTrackerMCDigitization::construct_digits(SciFiEvent &evt) {
       int station = a_hit->get_station();
       int plane = a_hit->get_plane();
       SciFiDigit *a_digit = new SciFiDigit(tracker, station, plane, chanNo, nPE, time);
-      evt.scifidigits.push_back(a_digit);
+      evt.add_digit(a_digit);
     }
   }  // ends 'for' loop over hits
 }
@@ -321,14 +320,14 @@ bool MapCppTrackerMCDigitization::check_param(SciFiHit *hit1, SciFiHit *hit2) {
 void MapCppTrackerMCDigitization::save_to_json(SciFiEvent &evt) {
   Json::Value js_event;
   Json::Value digits_in_event;
-  for ( unsigned int evt_i = 0; evt_i < evt.scifidigits.size(); evt_i++ ) {
+  for ( unsigned int evt_i = 0; evt_i < evt.digits().size(); evt_i++ ) {
     Json::Value digits_in_event;
-    digits_in_event["tracker"]= evt.scifidigits[evt_i]->get_tracker();
-    digits_in_event["station"]= evt.scifidigits[evt_i]->get_station();
-    digits_in_event["plane"]  = evt.scifidigits[evt_i]->get_plane();
-    digits_in_event["channel"]= evt.scifidigits[evt_i]->get_channel();
-    digits_in_event["npe"]    = evt.scifidigits[evt_i]->get_npe();
-    digits_in_event["time"]   = evt.scifidigits[evt_i]->get_time();
+    digits_in_event["tracker"]= evt.digits()[evt_i]->get_tracker();
+    digits_in_event["station"]= evt.digits()[evt_i]->get_station();
+    digits_in_event["plane"]  = evt.digits()[evt_i]->get_plane();
+    digits_in_event["channel"]= evt.digits()[evt_i]->get_channel();
+    digits_in_event["npe"]    = evt.digits()[evt_i]->get_npe();
+    digits_in_event["time"]   = evt.digits()[evt_i]->get_time();
     js_event.append(digits_in_event);
   }
   if (!js_event.isNull())

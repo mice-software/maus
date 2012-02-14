@@ -24,7 +24,8 @@ SciFiEvent::SciFiEvent() {
   _scificlusters.resize(0);
   _scifispacepoints.resize(0);
   _scifiseeds.resize(0);
-  _scifistraightprtracks.resize(0);
+  scifistraightprtracks.resize(0);
+  // _scifistraightprtracks.resize(0);
 }
 
 SciFiEvent::~SciFiEvent() {

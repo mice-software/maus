@@ -74,13 +74,13 @@ void PatternRecognition::straightprtrack_recon(SciFiEvent &evt) {
 
     // Make the tracks depending on how many stations have spacepoints in them
     if (stations_hit == 5)
-      make_spr_5pt(spnts_by_tracker[trker_no], evt.straightprtracks());
+      make_spr_5pt(spnts_by_tracker[trker_no], evt.scifistraightprtracks);
     if (evt.scifistraightprtracks.size() == 0 && stations_hit > 3)
-      make_spr_4pt(spnts_by_tracker[trker_no], evt.straightprtracks());
+      make_spr_4pt(spnts_by_tracker[trker_no], evt.scifistraightprtracks);
     if (evt.scifistraightprtracks.size() == 0 && stations_hit > 2)
-      make_spr_3pt(spnts_by_tracker[trker_no], evt.straightprtracks());
+      make_spr_3pt(spnts_by_tracker[trker_no], evt.scifistraightprtracks);
   }// ~Loop over trackers
-  std::cout << "Number of tracks found: " << evt.straightprtracks().size() << "\n\n";
+  std::cout << "Number of tracks found: " << evt.scifistraightprtracks.size() << "\n\n";
 }
 
 void PatternRecognition::make_spr_5pt(const std::vector<SciFiSpacePoint*>& spnts,

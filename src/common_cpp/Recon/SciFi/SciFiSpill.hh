@@ -39,11 +39,13 @@ class SciFiSpill {
 
   ~SciFiSpill();
 
-  // std::vector events() const { return events_in_spill; }
+  void add_event(SciFiEvent* event) { _events_in_spill.push_back(event); }
 
-  // private:
+  std::vector<SciFiEvent*> events() { return _events_in_spill; }
+
+ private:
   /// This is a vector containing the events of a spill.
-  std::vector<SciFiEvent*>   events_in_spill;
+  std::vector<SciFiEvent*>   _events_in_spill;
 };  // Don't forget this trailing colon!!!!
 // } // ~namespace MAUS
 

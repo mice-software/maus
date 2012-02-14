@@ -19,7 +19,7 @@
 // namespace MAUS {
 
 SciFiSpill::SciFiSpill() {
-  events_in_spill.resize(0);
+  _events_in_spill.resize(0);
 }
 
 SciFiSpill::~SciFiSpill() {}

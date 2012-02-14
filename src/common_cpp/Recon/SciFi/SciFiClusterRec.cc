@@ -70,7 +70,7 @@ void SciFiClusterRec::process(SciFiEvent &evt, std::vector<const MiceModule*> mo
           clust->add_digit(neigh);
         }
         construct(clust, modules);
-        evt.clusters().push_back(clust);
+        evt.add_cluster(clust);
       }
     }
   } // ends loop over seeds

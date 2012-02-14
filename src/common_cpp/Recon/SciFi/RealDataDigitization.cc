@@ -93,10 +93,10 @@ void RealDataDigitization::process(SciFiSpill &spill, Json::Value const &daq) {
       // Exclude missing modules.
       if ( pe > 1.0 && tracker != -1 ) {
         SciFiDigit *digit = new SciFiDigit(tracker, station, plane, channel, pe, tdc);
-        event->scifidigits.push_back(digit);
+        event->add_digit(digit);
       }
     }  // ends loop over channels (j)
-    spill.events_in_spill.push_back(event);
+    spill.add_event(event);
   }  // ends loop over events (i)
 }
 
@@ -139,7 +139,7 @@ void RealDataDigitization::read_in_all_Boards(std::ifstream &inf) {
         std::istringstream ist1(line.c_str());
         ist1 >> unique_chan_no >> board >> bank >> chan >> p >> g;
 
-        int temp = unique_chan_no;
+        // int temp = unique_chan_no;
 
         Json::Value channel;
         channel["pedestal"]=p;

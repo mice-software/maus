@@ -62,11 +62,11 @@ TEST_F(SciFiSpacePointRecTest, test_process) {
   Cluster->set_position(position);
 
   SciFiEvent event;
-  event.scificlusters.push_back(Cluster);
+  event.add_cluster(Cluster);
 
   SciFiSpacePointRec test;
   test.process(event);
-  EXPECT_EQ(event.scifispacepoints.size(), 0);
+  EXPECT_EQ(event.spacepoints().size(), 0);
 }
 
 TEST_F(SciFiSpacePointRecTest, test_duplet_radius) {

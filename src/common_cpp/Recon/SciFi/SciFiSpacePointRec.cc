@@ -25,11 +25,11 @@ SciFiSpacePointRec::~SciFiSpacePointRec() {}
 
 void SciFiSpacePointRec::process(SciFiEvent &evt) {
   int tracker, station, plane;
-  int clusters_size = evt.scificlusters.size();
+  int clusters_size = evt.clusters().size();
   // Store clusters in a vector.
   std::vector<SciFiCluster*> clusters[2][6][3];
   for ( int cl = 0; cl < clusters_size; cl++ ) {
-    SciFiCluster* a_cluster = evt.scificlusters[cl];
+    SciFiCluster* a_cluster = evt.clusters()[cl];
     tracker = a_cluster->get_tracker();
     station = a_cluster->get_station();
     plane   = a_cluster->get_plane();
@@ -61,7 +61,7 @@ void SciFiSpacePointRec::process(SciFiEvent &evt) {
                  clusters_are_not_used(candidate_A, candidate_B, candidate_C) ) {
               SciFiSpacePoint* triplet = new SciFiSpacePoint(candidate_A, candidate_B, candidate_C);
               build_triplet(triplet);
-              evt.scifispacepoints.push_back(triplet);
+              evt.add_spacepoint(triplet);
             }
           }  // ends plane 2
         }  // ends plane 1
@@ -76,13 +76,13 @@ void SciFiSpacePointRec::process(SciFiEvent &evt) {
         for ( int Station = 0; Station < 6; Station++ ) {  // for each station
           // Make all possible combinations of doublet clusters from views 0 & 1
           // looping over all clusters in view 0, then 1
-          for ( int cla = 0;
+          for ( unsigned int cla = 0;
                 cla < clusters[Tracker][Station][a_plane].size(); cla++ ) {
           SciFiCluster* candidate_A =
                           (clusters[Tracker][Station][a_plane])[cla];
 
             // Looping over all clusters in view 1,2, then 2
-            for ( int clb = 0;
+            for ( unsigned int clb = 0;
                   clb < clusters[Tracker][Station][another_plane].size();
                   clb++ ) {
               SciFiCluster* candidate_B =
@@ -93,7 +93,7 @@ void SciFiSpacePointRec::process(SciFiEvent &evt) {
                    duplet_within_radius(candidate_A, candidate_B) ) {
                 SciFiSpacePoint* duplet = new SciFiSpacePoint(candidate_A, candidate_B);
                 build_duplet(duplet);
-                evt.scifispacepoints.push_back(duplet);
+                evt.add_spacepoint(duplet);
               }
             }
           }
