@@ -66,6 +66,8 @@ class OutputCppRoot {
 
  private:
   orstream* _outfile;
+  MC* _mc;
+  Digits* _d;
   MausData* _md;
   JsonCppConverter* _jsonCppConverter;
 };

@@ -36,13 +36,15 @@ bool OutputCppRoot::birth(std::string json_datacards) {
                    "root_output_filename", JsonWrapper::stringValue).asString();
     // Setup output stream
     _outfile = new orstream(root_output.c_str(), "MausData");
-    Digits* d = new Digits();
-    MC* mc = new MC();
+    //    Digits* d = new Digits();
+    //MC* mc = new MC();
+    _d = new Digits();
+    _mc = new MC();
     _md = new MausData(d, mc);
 
     // Set branch addresses
-    (*_outfile) << branchName("digits") << d;
-    (*_outfile) << branchName("mc") << mc;
+    (*_outfile) << branchName("digits") << _d;
+    (*_outfile) << branchName("mc") << _mc;
     _jsonCppConverter = new JsonCppConverter(_md);
     return true;
   } catch(int i){
@@ -58,7 +60,11 @@ bool OutputCppRoot::birth(std::string json_datacards) {
 
 bool OutputCppRoot::save(std::string json_spill_document) {
   try {
-    if (_jsonCppConverter == NULL || _md == NULL || _outfile == NULL) {
+    if (_jsonCppConverter == NULL || 
+	_md == NULL               ||
+	_d == NULL                ||
+	_mc ==NULL                ||
+	_outfile == NULL) {
       throw(Squeal(Squeal(
         Squeal::recoverable,
         "OutputCppRoot was not initialised properly",
@@ -87,6 +93,14 @@ bool OutputCppRoot::death() {
   if (_md != NULL) {
     delete _md;
     _md = NULL;
+  }
+  if (_mc != NULL) {
+    delete _mc;
+    _mc = NULL;
+  }
+  if (_d != NULL) {
+    delete _d;
+    _d = NULL;
   }
   return true;
 }
