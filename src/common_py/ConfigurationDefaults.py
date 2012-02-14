@@ -42,7 +42,7 @@ output_json_file_type = "text"
 # 4 = fatal
 # >4 = silent
 # Doesnt effect python
-verbose_level = 0
+verbose_level = 4
 errors_to_stderr = None # None = from verbose_level; else True or False
 errors_to_json = True
 on_error = 'none' # none, halt or raise
@@ -227,8 +227,8 @@ Do_V1724_Zero_Suppression = True
 V1724_Zero_Suppression_Threshold = 100
 Do_VLSB_Zero_Suppression = False
 VLSB_Zero_Suppression_Threshold = 0
-Do_VLSB_C_Zero_Suppression = True
-VLSB_C_Zero_Suppression_Threshold = 60
+Do_VLSB_C_Zero_Suppression = False
+VLSB_C_Zero_Suppression_Threshold = 0
 Enable_TOF = True
 Enable_EMR = True
 Enable_KL = True
