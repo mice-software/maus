@@ -20,7 +20,7 @@
 bool MapCppTrackerMCDigitization::birth(std::string argJsonConfigDocument) {
   _classname = "MapCppTrackerMCDigitization";
 
-  //  JsonCpp string -> JSON::Value converter
+  // JsonCpp string -> JSON::Value converter
   Json::Reader reader;
 
   // Check if the JSON document can be parsed, else return error only
