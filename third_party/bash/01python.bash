@@ -66,6 +66,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
           make frameworkinstallstructure \
                bininstall \
                maninstall \
+               altbininstall \
                libinstall \
                inclinstall \
                libainstall \
