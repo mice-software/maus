@@ -203,7 +203,7 @@ cdb_download_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuratio
 # geometry download
 geometry_download_wsdl = "geometry?wsdl" # name of the web service used for downloads
 geometry_download_directory   = "%s/files/geometry/download" % os.environ.get("MAUS_ROOT_DIR") # name of the local directory where downloads will be placed
-geometry_download_by = 'current' # choose 'run_number' to download by run number, 'current' to use
+geometry_download_by = 'run_number' # choose 'run_number' to download by run number, 'current' to use
                                     # the currently valid geometry or 'id' to use the cdb internal id 
                                     # (e.g. if it is desired to access an old version of a particular
                                     # geometry)

@@ -18,7 +18,7 @@
                 <text>
                 {</text>
                 Volume TessellatedSolid
-                PropertyString Material <xsl:if test="structure/volume/materialref/@ref = 'ALUMINUM'">Al</xsl:if>
+                PropertyString Material Al <!--<xsl:if test="structure/volume/materialref/@ref = 'ALUMINUM'">Al</xsl:if>-->
                 PropertyDouble BlueColour 0.75
                 PropertyDouble GreenColour 0.3
                 PropertyDouble RedColour 0.75

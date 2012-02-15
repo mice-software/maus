@@ -46,7 +46,7 @@
                             PropertyString FieldType <xsl:value-of select="FieldType/@name"/>
                             PropertyDouble Height <xsl:value-of select="Dimensions/@height"/><xsl:text> </xsl:text><xsl:value-of select="Dimensions/@units"/>
                             PropertyDouble Width <xsl:value-of select="Dimensions/@width"/><xsl:text> </xsl:text><xsl:value-of select="Dimensions/@units"/>
-                            PropertyDouble Lenght<xsl:value-of select="Dimensions/@length"/><xsl:text> </xsl:text><xsl:value-of select="Dimensions/@units"/>
+                            PropertyDouble Length <xsl:value-of select="Dimensions/@length"/><xsl:text> </xsl:text><xsl:value-of select="Dimensions/@units"/>
                             PropertyDouble FieldStrength <xsl:value-of select="FieldStrength/@Value"/><xsl:text> </xsl:text><xsl:value-of select="Dimensions/@units"/>
                             PropertyInt Pole <xsl:value-of select="Pole/@Value"/>
                             PropertyInt MaxEndPole <xsl:value-of select="MaxEndPole/@Value"/>

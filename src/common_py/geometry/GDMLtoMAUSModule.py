@@ -92,8 +92,8 @@ class GDMLtomaus(): #pylint: disable = R0903
             raise IOError('Output path doesnt exist '+str(output))
         else:
             outputfile = output + "/ParentGeometryFile.dat"
-            config_file = CADImport(xmlin1 = self.config_file, \
-                           xsl = CONFIGXSL, output = outputfile)
+            config_file = CADImport(xmlin1 = str(self.config_file), \
+                           xsl = str(CONFIGXSL), output = str(outputfile))
             config_file.parse_xslt()
             print "Configuration File Converted"
             length = len(self.step_files)
@@ -105,14 +105,15 @@ class GDMLtomaus(): #pylint: disable = R0903
                 file_name = num_of_splits - 1
                 file_name = new_string[file_name]
                 outputfile = output + '/' + file_name[:-4] + 'dat'
-                step_file = CADImport(xmlin1 = self.step_files[num], \
-                                    xsl = MM_XSL, output = outputfile)
+                step_file = CADImport(xmlin1 = str(self.step_files[num]), \
+                                    xsl = str(MM_XSL), output = str(outputfile))
                 step_file.parse_xslt()
                 step_file = None
                 os.remove(self.step_files[num])
                 print "Converting " + str(num+1) + \
                                         " of " + str(length) + " Geometry Files"
             os.remove(self.config_file)
+            print "Files saved to " + str(output)
 
 def main():
     """
