@@ -14,24 +14,24 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "src/common_cpp/DataStructure/MCEventData.hh"
+#include "src/common_cpp/DataStructure/ReconEvent.hh"
 
 namespace MAUS {
 
-MCEventData::MCEventData() {
+ReconEvent::ReconEvent() {
 }
 
-MCEventData::MCEventData(const MCEventData& md) {
+ReconEvent::ReconEvent(const ReconEvent& md) {
 }
        
-MCEventData& MCEventData::operator=(const MCEventData& md) {
+ReconEvent& ReconEvent::operator=(const ReconEvent& md) {
     if (this == &md) {
         return *this;
     }
     return *this;    
 }
 
-MCEventData::~MCEventData() {
+ReconEvent::~ReconEvent() {
 }
 
 }

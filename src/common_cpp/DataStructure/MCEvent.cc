@@ -14,32 +14,25 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_MCEVENTDATA_HH_
-#define _SRC_COMMON_CPP_DATASTRUCTURE_MCEVENTDATA_HH_
-
-#include <vector>
-
-#include "Rtypes.h" // ROOT
+#include "src/common_cpp/DataStructure/MCEvent.hh"
 
 namespace MAUS {
 
-class MCEventData {
- public:
-  MCEventData();
+MCEvent::MCEvent() {
+}
 
-  MCEventData(const MCEventData& md);
+MCEvent::MCEvent(const MCEvent& md) {
+}
        
-  MCEventData& operator=(const MCEventData& md);
-  
-  virtual ~MCEventData();
+MCEvent& MCEvent::operator=(const MCEvent& md) {
+    if (this == &md) {
+        return *this;
+    }
+    return *this;    
+}
 
-  ClassDef(MCEventData, 1)
-
- private:
-};
-
-typedef std::vector<MCEventData> MCEventArray;
+MCEvent::~MCEvent() {
+}
 
 }
 
-#endif

@@ -23,22 +23,22 @@
 
 namespace MAUS {
 
-class ReconEventData {
+class ReconEvent {
  public:
-  ReconEventData();
+  ReconEvent();
 
-  ReconEventData(const ReconEventData& md);
+  ReconEvent(const ReconEvent& md);
        
-  ReconEventData& operator=(const ReconEventData& md);
+  ReconEvent& operator=(const ReconEvent& md);
   
-  virtual ~ReconEventData();
+  virtual ~ReconEvent();
 
-  ClassDef(ReconEventData, 1)
+  ClassDef(ReconEvent, 1)
 
  private:
 };
 
-typedef std::vector<ReconEventData> ReconEventArray;
+typedef std::vector<ReconEvent> ReconEventArray;
 
 
 }

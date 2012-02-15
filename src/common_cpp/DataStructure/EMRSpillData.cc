@@ -14,24 +14,26 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "src/common_cpp/DataStructure/ReconEventData.hh"
+#include "src/common_cpp/DataStructure/EMRSpillData.hh"
 
 namespace MAUS {
 
-ReconEventData::ReconEventData() {
+EMRSpillData::EMRSpillData() {
 }
 
-ReconEventData::ReconEventData(const ReconEventData& md) {
+EMRSpillData::EMRSpillData(const EMRSpillData& md) {
 }
+
        
-ReconEventData& ReconEventData::operator=(const ReconEventData& md) {
-    if (this == &md) {
-        return *this;
-    }
-    return *this;    
+EMRSpillData& EMRSpillData::operator=(const EMRSpillData& md) {
+  if (&md == this) {
+      return *this;
+  }
+  return *this;
 }
+  
+EMRSpillData::~EMRSpillData() {
 
-ReconEventData::~ReconEventData() {
 }
 
 }

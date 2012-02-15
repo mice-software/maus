@@ -21,12 +21,13 @@
 
 namespace MAUS {
 
-class ScalarsData;
-class EMRData;
-class MCEventData;
-class ReconEventData;
-typedef std::vector<MCEventData> MCEventArray;
-typedef std::vector<ReconEventData> ReconEventArray;
+class Scalars;
+class EMRSpillData;
+class MCEvent;
+class ReconEvent;
+class DAQData;
+typedef std::vector<MCEvent> MCEventArray;
+typedef std::vector<ReconEvent> ReconEventArray;
 
 class MausSpill {
  public:
@@ -38,11 +39,14 @@ class MausSpill {
   
   virtual ~MausSpill();
   
-  void SetScalarsData(ScalarsData* scalars);
-  ScalarsData* GetScalarsData() const;
+  void SetScalars(Scalars* scalars);
+  Scalars* GetScalars() const;
 
-  void SetEMRData(EMRData* emr);
-  EMRData* GetEMRData() const;
+  void SetEMRSpillData(EMRSpillData* emr);
+  EMRSpillData* GetEMRSpillData() const;
+
+  void SetDAQData(DAQData* daq);
+  DAQData* GetDAQData() const;
 
   void SetMCEventArray(MCEventArray* MCEvent);
   MCEventArray* GetMCEventArray() const;
@@ -53,8 +57,9 @@ class MausSpill {
   ClassDef(MausSpill, 1)
 
  private:
-  ScalarsData* _scalars;
-  EMRData* _emr;
+  DAQData* _daq;
+  Scalars* _scalars;
+  EMRSpillData* _emr;
   MCEventArray* _mc;
   ReconEventArray* _recon;
 };
@@ -64,3 +69,7 @@ class MausSpill {
 
 
 #endif
+
+// Dec 2012 step iv construction complete
+// Dec 2018 step vi construction complete
+

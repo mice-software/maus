@@ -6,7 +6,7 @@ this unless you want to change this quantity for everybody. Values can be
 overridden by setting configuration_file parameter on the comamnd line, for
 example
 
-bin/simulate_mice.py --configuration_file my_configuration.py
+bin/simulate_mice.py -configuration_file my_configuration.py
 """
 
 
@@ -67,8 +67,8 @@ simulation_reference_particle = { # used for setting particle phase
 
 # geant4 physics model
 physics_model = "QGSP_BERT" # Physics package loaded by MAUS to set default values; modifications can be made
-reference_physics_processes = "mean_energy_loss"
-physics_processes = "standard"
+reference_physics_processes = "mean_energy_loss" # controls the physics processes of the reference particle. Set to "none" to disable all physics processes; or "mean_energy_loss" to make the reference particle see deterministic energy loss only
+physics_processes = "standard" # controls the physics processes of normal particles. Set to "none" to disable all physics processes; "mean_energy_loss" to enable deterministic energy loss only; or "standard" to enable all physics processes
 particle_decay = True # set to true to activate particle decay, or False to inactivate particle decay
 charged_pion_half_life = -1. # set the pi+, pi- half life [ns]. Negative value means use geant4 default
 muon_half_life = -1. # set the mu+, mu- half life [ns]. Negative value means use geant4 default
@@ -101,10 +101,18 @@ spill_generator_number_of_spills = 10
 # an optimised beam might look like
 beam = {
     "particle_generator":"binomial", # routine for generating empty primaries
-    "binomial_n":50, # number of coin tosses
-    "binomial_p":0.5, # probability of making a particle on each toss
+                                     # set to "binomial" to generate on binomial distribution; 
+                                     # set to "counter" to set a fixed number of primaries per count;
+                                     # set to "file" if use_beam_file=True
+    "binomial_n":50, # number of coin tosses if particle_generator is binomial
+    "binomial_p":0.5, # probability of making a particle on each toss if particle_generator is binomial
     "random_seed":5, # random seed for beam generation; controls also how the MC
                      # seeds are generated
+#   "beam_file_format":"icool_for003", # format of the formatted beam file input
+    "beam_file_format":"g4beamline_bl_track_file", # g4bl track file format
+    "beam_file":"%s/src/map/MapPyBeamMaker/test_g4bl.dat" % os.environ.get("MAUS_ROOT_DIR"), # filename if particle_generator is "file". Default is a test G4BL track file
+#   "beam_file":"test_for003.dat", # test icool_for003 file
+    "file_particles_per_spill":25, # number of particles per spill if particle_generator is file
     "definitions":[
     ##### MUONS #######
     {
@@ -250,10 +258,10 @@ TOFscintLightSpeed =  170.0 # mm/ns
 TOF_trigger_station = "tof1"
 #TOF_trigger_station = "tof0"
 TOF_cabling_file = "/files/cabling/TOFChannelMap.txt"
-TOF_TW_calibration_file = "/files/calibration/tofcalibTW.txt"
-TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF1.txt"
+TOF_TW_calibration_file = "/files/calibration/tofcalibTW_dec2011.txt"
+TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF1_dec2011.txt"
 #TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF0.txt"
-TOF_Trigger_calibration_file = "/files/calibration/tofcalibTrigger_trTOF1.txt"
+TOF_Trigger_calibration_file = "/files/calibration/tofcalibTrigger_trTOF1_dec2011.txt"
 #TOF_Trigger_calibration_file = "/files/calibration/tofcalibTrigger_trTOF0.txt"
 TOF_findTriggerPixelCut = 0.5 # nanosecond
 TOF_makeSpacePiontCut = 0.5 # nanosecond
@@ -266,3 +274,12 @@ daq_data_file = '02873.003' # file name for daq data; if this is just a integer 
 
 maus_version = "" # set at runtime - do not edit this (changes are ignored)
 configuration_file = "" # should be set on the command line only (else ignored)
+
+doc_store_class = "InMemoryDocumentStore.InMemoryDocumentStore"
+couchdb_url = "http://localhost:5984" # Default CouchDB URL. Only needed if using CouchDBDocumentStore.
+couchdb_database_name = "mausdb" # Default CouchDB database name. Only needed if using CouchDBDocumentStore.
+
+mongodb_host = "localhost" # Default MongoDB host name. Only needed if using MongoDBDocumentStore.
+mongodb_port = 27017 # Default MongoDB port. Only needed if using MongoDBDocumentStore.
+mongodb_database_name = "mausdb" # Default MongoDB database name. Only needed if using MongoDBDocumentStore.
+mongodb_collection_name = "spills" # Default MongoDB collection name. Only needed if using MongoDBDocumentStore.

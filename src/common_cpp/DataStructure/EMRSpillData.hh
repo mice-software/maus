@@ -14,24 +14,24 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_SCALARSDATA_HH_
-#define _SRC_COMMON_CPP_DATASTRUCTURE_SCALARSDATA_HH_
+#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_EMRSPILLDATA_HH_
+#define _SRC_COMMON_CPP_DATASTRUCTURE_EMRSPILLDATA_HH_
 
 #include "Rtypes.h"
 
 namespace MAUS {
 
-class ScalarsData {
+class EMRSpillData{
  public:
-  ScalarsData();
+  EMRSpillData();
 
-  ScalarsData(const ScalarsData& md);
+  EMRSpillData(const EMRSpillData& md);
        
-  ScalarsData& operator=(const ScalarsData& md);
+  EMRSpillData& operator=(const EMRSpillData& md);
   
-  virtual ~ScalarsData();
+  virtual ~EMRSpillData();
 
-  ClassDef(ScalarsData, 1)
+  ClassDef(EMRSpillData, 1)
 
  private:
 };

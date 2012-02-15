@@ -61,13 +61,13 @@ class test_cad_import(unittest.TestCase): #pylint: disable = C0103, R0904
         try:
             self.constuctor = CADImport(xsl = self.xslt)
             self.assertTrue(False, "should have raised an exception")
-        except:
+        except: #pylint: disable = W0702
             pass #pylint: disable = W0702
         try:
             fast = "fastradModel.not_xml"
             self.constuctor = CADImport(xmlin1 = fast, xsl = self.xslt)
             self.assertTrue(False, "Should have raised an exception")
-        except:
+        except: #pylint: disable = W0702
             pass #pylint: disable = W0702
         #Test xsl parameter,
         #first,   test it raises an error when there is no input
@@ -76,13 +76,13 @@ class test_cad_import(unittest.TestCase): #pylint: disable = C0103, R0904
             self.constuctor = CADImport(xmlin1 = self.xml_in_1)
             err = "Should have raised an exception"
             self.assertEqual(self.constuctor.xsl, None, err)
-        except:
+        except: #pylint: disable = W0702
             pass #pylint: disable = W0702
         try:
             xfile = "GDML2G4MICE.not_xsl"
             self.constuctor = CADImport(xmlin1 = self.xml_in_1, xsl = xfile)
             self.assertTrue(False, "Should have raised an exception")
-        except:
+        except: #pylint: disable = W0702
             pass #pylint: disable = W0702
         #Test xmlin2 parameter,
         #first,   test its default is none
@@ -92,20 +92,20 @@ class test_cad_import(unittest.TestCase): #pylint: disable = C0103, R0904
             self.constuctor = CADImport(xmlin1=self.xml_in_1, xsl = self.xslt)
             err = "default is not None"
             self.assertEqual(self.constuctor.xml_in_2, None, err)
-        except:
+        except: #pylint: disable = W0702
             pass #pylint: disable = W0702
         try:
             self.constuctor = CADImport(xmlin1=self.xml_in_1, \
                                         xsl=self.xslt, xmlin2=1)
             self.assertTrue(False, "Should have raised an exception")
-        except:
+        except: #pylint: disable = W0702
             pass #pylint: disable = W0702
         try:
             xfile = "FieldInfoTest.not_xml"
             self.constuctor = CADImport(xmlin1=self.xml_in_1, \
                                     xsl=self.xslt, xmlin2=xfile)
             self.assertTrue(False, "Should have raised an exception")
-        except:
+        except: #pylint: disable = W0702
             pass #pylint: disable = W0702
         #Test output parameter,
         #first,   test its default is none
@@ -114,13 +114,13 @@ class test_cad_import(unittest.TestCase): #pylint: disable = C0103, R0904
             self.constuctor = CADImport(xmlin1 = self.xml_in_1, xsl = self.xslt)
             err = "default is not None"
             self.assertEqual(self.constuctor.output, None, err)
-        except:
+        except: #pylint: disable = W0702
             pass #pylint: disable = W0702
         try:
             self.constuctor = CADImport(xmlin1 = self.xml_in_1, \
                                       xsl = self.xslt, output = 1)
             self.assertTrue(False, "Should have raised an exception")
-        except:
+        except: #pylint: disable = W0702
             pass #pylint: disable = W0702
         #Test mergein parameter,
         #first,   test its default is Merge.xsl.in
@@ -130,14 +130,14 @@ class test_cad_import(unittest.TestCase): #pylint: disable = C0103, R0904
                      xsl = self.xslt, mergein = "something else")
             self.assertEqual(self.constuctor.merge_in, \
                    "Merge.xsl.in", "default is not Merge.xsl.in")
-        except:
+        except: #pylint: disable = W0702
             pass #pylint: disable = W0702
         
         try :
             self.constuctor = CADImport(xmlin1 = self.xml_in_1, \
                                      xsl = self.xslt, mergin = 1)
             self.assertTrue(False, "Should have raised an exception")
-        except:
+        except: #pylint: disable = W0702
             pass #pylint: disable = W0702
         #Test mergeout parameter,
         #first,   test its default is Merge.xsl
@@ -147,19 +147,19 @@ class test_cad_import(unittest.TestCase): #pylint: disable = C0103, R0904
             self.constuctor = CADImport(xmlin1 = self.xml_in_1, xsl = self.xslt)
             self.assertEqual(self.constuctor.merge_out, \
                   "Merge.xsl", "default is not Merge.xsl")
-        except:
+        except: #pylint: disable = W0702
             pass #pylint: disable = W0702
         try:
             self.constuctor = CADImport(xmlin1 = self.xml_in_1, \
                                     xsl = self.xslt, mergout = 1)
             self.assertTrue(False, "Should have raised an exception")
-        except:
+        except: #pylint: disable = W0702
             pass #pylint: disable = W0702
         try:
             self.constuctor = CADImport(xmlin1 = self.xml_in_1, \
                  xsl = self.xslt, mergeout = "MergedOut.not_xsl")
             self.assertTrue(False, "Should have raised an exception")
-        except:
+        except: #pylint: disable = W0702
             pass #pylint: disable = W0702
 
 

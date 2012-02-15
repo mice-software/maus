@@ -14,10 +14,11 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "src/common_cpp/DataStructure/EMRData.hh"
-#include "src/common_cpp/DataStructure/ScalarsData.hh"
-#include "src/common_cpp/DataStructure/MCEventData.hh"
-#include "src/common_cpp/DataStructure/ReconEventData.hh"
+#include "src/common_cpp/DataStructure/DAQData.hh"
+#include "src/common_cpp/DataStructure/EMRSpillData.hh"
+#include "src/common_cpp/DataStructure/Scalars.hh"
+#include "src/common_cpp/DataStructure/MCEvent.hh"
+#include "src/common_cpp/DataStructure/ReconEvent.hh"
 #include "src/common_cpp/DataStructure/MausSpill.hh"
 
 
@@ -29,8 +30,9 @@ MausSpill::MausSpill() : _scalars(NULL), _emr(NULL), _mc(NULL), _recon(NULL) {
 MausSpill::MausSpill(const MausSpill& md) {
     _recon = new ReconEventArray(*md._recon);
     _mc = new MCEventArray(*md._mc);
-    _emr = new EMRData(*md._emr);
-    _scalars = new ScalarsData(*md._scalars);
+    _emr = new EMRSpillData(*md._emr);
+    _scalars = new Scalars(*md._scalars);
+    _daq = new DAQData(*md._daq);
 }
        
 MausSpill& MausSpill::operator=(const MausSpill& md) {
@@ -39,8 +41,9 @@ MausSpill& MausSpill::operator=(const MausSpill& md) {
     }
     _recon = new ReconEventArray(*md._recon);
     _mc = new MCEventArray(*md._mc);
-    _emr = new EMRData(*md._emr);
-    _scalars = new ScalarsData(*md._scalars);
+    _emr = new EMRSpillData(*md._emr);
+    _scalars = new Scalars(*md._scalars);
+    _daq = new DAQData(*md._daq);
     return *this;
 }
   
@@ -64,21 +67,27 @@ MausSpill::~MausSpill() {
         delete _recon;
         _recon = NULL;
     }
+
+    if (_daq != NULL) {
+        delete _daq;
+        _daq = NULL;
+    }
+
 }
 
-void MausSpill::SetScalarsData(ScalarsData* scalars) {
+void MausSpill::SetScalars(Scalars* scalars) {
   _scalars = scalars;
 }
 
-ScalarsData* MausSpill::GetScalarsData() const {
+Scalars* MausSpill::GetScalars() const {
   return _scalars;
 }
 
-void MausSpill::SetEMRData(EMRData* emr) {
+void MausSpill::SetEMRSpillData(EMRSpillData* emr) {
   _emr = emr;
 }
 
-EMRData* MausSpill::GetEMRData() const {
+EMRSpillData* MausSpill::GetEMRSpillData() const {
   return _emr;
 }
 
@@ -96,6 +105,14 @@ void MausSpill::SetReconEventArray(ReconEventArray* recon) {
 
 ReconEventArray* MausSpill::GetReconEventArray() const {
   return _recon;
+}
+
+void MausSpill::SetDAQData(DAQData* daq) {
+  _daq = daq;
+}
+
+DAQData* MausSpill::GetDAQData() const {
+  return _daq;
 }
 
 }

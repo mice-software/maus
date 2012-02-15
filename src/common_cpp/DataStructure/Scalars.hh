@@ -14,27 +14,28 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "src/common_cpp/DataStructure/EMRData.hh"
+#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_SCALARSDATA_HH_
+#define _SRC_COMMON_CPP_DATASTRUCTURE_SCALARSDATA_HH_
+
+#include "Rtypes.h"
 
 namespace MAUS {
 
-EMRData::EMRData() {
-}
+class Scalars {
+ public:
+  Scalars();
 
-EMRData::EMRData(const EMRData& md) {
-}
-
+  Scalars(const Scalars& md);
        
-EMRData& EMRData::operator=(const EMRData& md) {
-  if (&md == this) {
-      return *this;
-  }
-  return *this;
-}
+  Scalars& operator=(const Scalars& md);
   
-EMRData::~EMRData() {
+  virtual ~Scalars();
+
+  ClassDef(Scalars, 1)
+
+ private:
+};
 
 }
 
-}
-
+#endif

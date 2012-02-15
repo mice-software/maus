@@ -14,24 +14,24 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "src/common_cpp/DataStructure/ScalarsData.hh"
+#include "src/common_cpp/DataStructure/Scalars.hh"
 
 namespace MAUS {
 
-ScalarsData::ScalarsData() {
+Scalars::Scalars() {
 }
 
-ScalarsData::ScalarsData(const ScalarsData& md) {
+Scalars::Scalars(const Scalars& md) {
 }
 
-ScalarsData& ScalarsData::operator=(const ScalarsData& md) {
+Scalars& Scalars::operator=(const Scalars& md) {
   if (&md == this) {
       return *this;
   }
   return *this;
 }
   
-ScalarsData::~ScalarsData() {
+Scalars::~Scalars() {
 
 }
 

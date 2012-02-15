@@ -8,7 +8,8 @@ This walks the directory structure of MAUS and checks for each file of ending
 import unittest
 import subprocess
 import os
-import time
+import glob
+import json
 
 class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
     """
@@ -31,6 +32,49 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
                                  stderr=subprocess.STDOUT)
         return errors
 
+    def in_place_filter(self, file_name): # pylint: disable=R0201
+        """
+        @brief filter pylint output file
+
+        @params file_name name of the pylint output file
+
+        @returns tuple of 
+          (number of lines in the unfiltered file,
+           number of lines in the filtered file)
+
+        Remove lines that don't match like *.py:[0-9]: *
+        """
+        fin = open(file_name)
+        lines_in = fin.readlines()
+        lines_out = []
+        fin.close()
+        for line in lines_in:
+            try:
+                # filter for *:#:* where # is an integer. Probably easier in
+                # regexp, but regexp is gross...
+                # we have string like line = *.py:<str_1>
+                str_1 = line[line.index(':')+1:]
+                # we have string like str_1 = <str_2>:*
+                str_2 = str_1[0:str_1.index(':')]
+                # check str_2 = int
+                end_number = int(str_2) #pylint: disable=W0612
+                lines_out.append(line)
+            except ValueError:
+                pass # line filtered - index() or int() raises ValueError
+
+        # sort here so we can do diffs on the output...
+        lines_out.sort()
+        fout = open(file_name, 'w')
+        err_dict_ = {}
+        for line in lines_out:
+            fout.write(line)
+            file_name = line[0:line.index(':')]
+            if file_name in err_dict_.keys():
+                err_dict_[file_name] += 1
+            else:
+                err_dict_[file_name] = 1
+        return (len(lines_in), len(lines_out), err_dict_)
+
     def walk_directories(self, target_dir, fout):
         """
         @brief walk the directory structure from target_dir
@@ -44,8 +88,9 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
                 ignore = False
                 if file_name in self.exclude_files:
                     ignore = True
-                for a_dir in self.exclude_dirs:
-                    if a_dir in maus_dir.split('/'):
+                for a_glob_target in self.exclude_dirs:
+                    test_dirs = glob.glob(self.maus_root_dir+'/'+a_glob_target)
+                    if root_dir in test_dirs:
                         ignore = True
                 if not ignore:
                     file_name = os.path.join(maus_dir, file_name)
@@ -54,7 +99,68 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
                         error_files.append(file_name)
         return error_files
 
-    def test_python_style(self):
+    def run_force_files(self, fout):
+        """
+        Explicitly iterate over items in force_files list and run pylint
+        """
+        error_files = []
+        for file_name in self.force_files:   
+            file_name = os.path.join(os.environ['MAUS_ROOT_DIR'], file_name)
+            errors = self.run_pylint(file_name, fout)
+            if errors > 0:
+                error_files.append(file_name)
+        return error_files
+
+    def run_all_pylints(self):
+        """
+        Run pylint against all specified files
+        
+        @returns the file name of the file used to store pylint output
+        """
+        file_out = os.path.join(self.maus_root_dir, 'tmp', 'pylint.out')
+        fout = open(file_out, 'w')
+        for target_dir in self.include_dirs:
+            target_dir = os.path.join(self.maus_root_dir, target_dir)
+            self.walk_directories(target_dir, fout)
+        self.run_force_files(fout)
+        fout.close()
+        return file_out
+
+    def postprocess_error_file(self, file_out):
+        """
+        Postprocess the pylint errors to extract errors per file
+
+        Filter the pylint output to show only errors using in_place_filter. Then
+        compare mapping of errors to files with reference mapping. List areas
+        where the errors have changed. Fail if errors have increased in any file
+        """
+        (dummy, n_errors, err_dict) = self.in_place_filter(file_out)
+        fout = open(os.path.join(self.maus_root_dir, 'tmp/pylint.json'), 'w')
+        print >> fout, json.dumps(err_dict)
+        fout.close()
+        fin = open(os.path.join(self.maus_root_dir, 
+                                            'tests/style/ref-pylint.json'))
+        ref_dict = json.loads(fin.readline())
+        passes = True
+        err_keys = sorted(err_dict.keys())
+        print str(n_errors)+' style errors in following files '+\
+          '(see tmp/pylint.out for details)\n'+str(err_keys)
+        for key in err_keys:
+            if key not in ref_dict:
+                print 'FAILS:\nExpected: 0 found:', err_dict[key], \
+                                                             'errors', key
+
+            elif err_dict[key] != ref_dict[key]:
+                if err_dict[key] > ref_dict[key]:
+                    passes = False
+                    print 'FAILS:'
+                print 'Expected', ref_dict[key], \
+                                  ' and found', err_dict[key], 'errors in ', key
+        if not passes:
+            raise RuntimeError("Number of python style errors has increased")
+        fout.close()
+
+    def test_python_style(self): #pylint: disable=R0201
         """
         @brief walk up from $MAUS_ROOT_DIR and run pylint looking for errors
 
@@ -62,36 +168,21 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
         counting the number of lines in the pylint summary file. If this
         increases, throws an error.
         """
-        current_n_python_errors = 893 # Tunnell, 7Oct2011. Reduced last-time.
-        file_out = os.path.join(self.maus_root_dir, 'tmp', 'pylint.out')
-        fout = open(file_out, 'w')
-        error_files = []
-        for target_dir in self.include_dirs:
-            target_dir = os.path.join(self.maus_root_dir, target_dir)
-            error_files += self.walk_directories(target_dir, fout)
-        fout.close()
-        time.sleep(1.0)
-        fout = open(file_out)
+        file_name = self.run_all_pylints()
         # just go by number of lines - bit of a hack but will do
-        n_errors = len(fout.readlines())
-        if len(error_files) > 0:
-            print str(n_errors)+'/'+str(current_n_python_errors)+\
-                  ' style errors in following files '+\
-                  '(see tmp/pylint.out for details)\n'+str(error_files)
-
-        if n_errors > current_n_python_errors:
-            raise RuntimeError("Number of python style errors has increased"+\
-                               " - Previously "+str(current_n_python_errors)+\
-                               ". Now "+str(n_errors))
-        fout.close()
+        self.postprocess_error_file(file_name)
 
     # folders in maus_root_dir to look at
-    include_dirs = ['tests', 'src', 'bin', 'doc']
-    # exclude if dir path includes one of the following
-    exclude_dirs = ['build']
+    include_dirs = ['doc', 'tests', 'src', 'bin', 'doc']
+    # exclude if dir path globs to one of the following 
+    exclude_dirs = ['bin/user', 'src/*/*/build']
     # exclude if filename includes one of the following
     exclude_files = [
         'test_cdb__init__.py', # makes pylint error
+    ]
+    # force include these  files (even if pylint doesn't find them)
+    force_files = [
+        'SConstruct',
     ]
     maus_root_dir = os.environ['MAUS_ROOT_DIR']
     pylintrc = os.path.join(maus_root_dir, 'tests', 'style', 'pylintrc')

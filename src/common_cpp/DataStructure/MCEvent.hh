@@ -14,27 +14,31 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_EMRDATA_HH_
-#define _SRC_COMMON_CPP_DATASTRUCTURE_EMRDATA_HH_
+#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_MCEVENTDATA_HH_
+#define _SRC_COMMON_CPP_DATASTRUCTURE_MCEVENTDATA_HH_
 
-#include "Rtypes.h"
+#include <vector>
+
+#include "Rtypes.h" // ROOT
 
 namespace MAUS {
 
-class EMRData{
+class MCEvent {
  public:
-  EMRData();
+  MCEvent();
 
-  EMRData(const EMRData& md);
+  MCEvent(const MCEvent& md);
        
-  EMRData& operator=(const EMRData& md);
+  MCEvent& operator=(const MCEvent& md);
   
-  virtual ~EMRData();
+  virtual ~MCEvent();
 
-  ClassDef(EMRData, 1)
+  ClassDef(MCEvent, 1)
 
  private:
 };
+
+typedef std::vector<MCEvent> MCEventArray;
 
 }
 
