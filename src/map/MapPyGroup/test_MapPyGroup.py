@@ -103,6 +103,7 @@ class TestMapPyGroup(unittest.TestCase): #pylint: disable=R0904
         self.assertFalse(self.test_group.death())
         self.assertTrue(self.tests[0].has_deathed)
         self.assertTrue(self.tests[2].has_deathed)
+        del(self.test_group)
 
     def test_del(self):
         """TestMapPyGroup __del__"""
