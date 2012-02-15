@@ -25,7 +25,7 @@ import unittest
 import subprocess
 import os
 
-from xboa.Bunch import Bunch
+from xboa.Bunch import Bunch #pylint: disable=F0401
 
 MAUS_ROOT_DIR = os.getenv("MAUS_ROOT_DIR")
 SIM_PATH = os.path.join(MAUS_ROOT_DIR, "bin", "simulate_mice.py")

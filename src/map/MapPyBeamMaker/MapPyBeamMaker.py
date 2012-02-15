@@ -26,7 +26,7 @@ import ErrorHandler
 import numpy
 import bisect
 import beam
-from xboa.Hit import Hit
+from xboa.Hit import Hit #pylint: disable=F0401
 
 class MapPyBeamMaker: #pylint: disable=R0902
     """

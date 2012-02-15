@@ -23,7 +23,8 @@ def glob_maus_root_dir(glob_string):
     """
     @brief return glob relative to maus_root_dir
 
-    @params glob_string file name or directory relative to maus_root_dir, with wildcards where appropriate
+    @params glob_string file name or directory relative to maus_root_dir, with
+            wildcards where appropriate
 
     @returns list of paths matching glob string, relative to maus_root_dir
     """
@@ -38,8 +39,10 @@ def walker(maus_root_dir, exclude_dirs, exclude_files, filename):
     @brief walk up from maus_root_dir and run cpplint
 
     @params maus_root_dir start walking from here
-    @params exclude_dirs list of directory paths relative to maus_root_dir that should be excluded from the walk (hence recursive)
-    @params exclude_files list of file paths relative to maus_root_dir that should be excluded from cpplint
+    @params exclude_dirs list of directory paths relative to maus_root_dir that
+            should be excluded from the walk (hence recursive)
+    @params exclude_files list of file paths relative to maus_root_dir that 
+            should be excluded from cpplint
 
     @returns number of errors found by cpplint
     """
@@ -58,7 +61,8 @@ def path_exclude(exclude_paths, path_root, path_list):
     """
     @brief Remove paths from path_list that are found in exclude_paths
 
-    @params exclude_paths list of paths to exclude (paths relative to MAUS_ROOT_DIR)
+    @params exclude_paths list of paths to exclude (paths relative to 
+            MAUS_ROOT_DIR)
     @params path_root suffix to add to path_list using os.path.join
     @params path_list list of paths to check for exclusions and modify
 
@@ -152,7 +156,8 @@ class cpplint_postprocessor:
         """
         @brief Print formatted output
 
-        @params file_to_error dict like {filename:[cpplint_error, line_number, line_text]}
+        @params file_to_error dict like {filename:[cpplint_error, line_number, 
+                line_text]}
         @params fh filehandle to which we write
         """
         for f,key in file_to_error.iteritems():
@@ -191,8 +196,10 @@ class cpplint_postprocessor:
         """
         @brief Look for errors in the test strings
 
-        @params test_dict dict like {filename:[cpplint_error, line_number, line_text]}
-        @params ref_dict dict like {filename:[line_text, exception_reason, developer_name]}
+        @params test_dict dict like {filename:[cpplint_error, line_number, 
+                line_text]}
+        @params ref_dict dict like {filename:[line_text, exception_reason, 
+                developer_name]}
         """
         n_errors = 0
         ref_dict_2 = self.strip_ref_dict(ref_dict)
@@ -210,11 +217,14 @@ class cpplint_postprocessor:
         """
         @brief Parse the cpplint output and check for exceptions
 
-        @params cpplint_output_filename go through the cpplint output in this file and look for exceptions
+        @params cpplint_output_filename go through the cpplint output in this 
+                file and look for exceptions
         @params cpplint_exceptions list of exceptions for the cpplint output
-        @params processed_output_filename if not set to None, output will be written to this file
+        @params processed_output_filename if not set to None, output will be 
+                written to this file
 
-        @returns integer corresponding to the number of errors that were not in the exceptions list
+        @returns integer corresponding to the number of errors that were not in 
+                the exceptions list
         """
         file_to_error = self.get_line_numbers(cpplint_output_filename)
         file_to_error = self.get_line_strings(file_to_error)
@@ -226,7 +236,7 @@ class cpplint_postprocessor:
         return n_errors
 
 
-class test_cpp_style(unittest.TestCase):
+class test_cpp_style(unittest.TestCase): #pylint: disable=R0904
     """@brief Interface to unittest module"""
     def test_glob_maus_root_dir(self):
         """
@@ -238,12 +248,15 @@ class test_cpp_style(unittest.TestCase):
 
     def test_walker_and_path_exclude(self):
         """
-        @brief self check - test we walk the path correctly, excluding relevant files and directories
+        @brief self check - test we walk the path correctly, excluding relevant 
+              files and directories
         """
         test_root_dir = os.path.join(maus_root_dir, 'tests', 'style')
-        test_exclude_dirs = [os.path.join('cpplint_test', 'cpplint_test_exclude_dir')]
+        test_exclude_dirs = \
+                      [os.path.join('cpplint_test', 'cpplint_test_exclude_dir')]
         test_exclude_files = [os.path.join('cpplint_test', 'force_fail.cc')]
-        test_result = walker(test_root_dir, test_exclude_dirs, test_exclude_files, os.devnull)
+        test_result = walker\
+              (test_root_dir, test_exclude_dirs, test_exclude_files, os.devnull)
         self.assertEqual(test_result, 3) #2 errors from force_fail_2.cc
 
     def test_cpplint_postprocessor(self):
@@ -251,9 +264,10 @@ class test_cpp_style(unittest.TestCase):
         @brief self check - test we postprocess cpplint output correctly
         """
         #First we make some errors
-        style_dir = os.path.join(maus_root_dir,'tests','style', 'cpplint_test')
+        style_dir = os.path.join \
+                              (maus_root_dir, 'tests', 'style', 'cpplint_test')
         file_name = os.path.join(maus_root_dir, 'tmp', 'test_cpplint.out')
-        test_result = walker(style_dir, [], [], file_name)
+        walker(style_dir, [], [], file_name)
         # now we try to postprocess
         test_exceptions = {'tests/style/cpplint_test/force_fail.cc':[
                 ('//No space at start - should fail', 'Deliberately broken for testing', 'Chris Rogers'),
@@ -265,9 +279,10 @@ class test_cpp_style(unittest.TestCase):
 
     def test_cpp_style(self):
         """
-        @brief This is the main test - walks the directory structure and looks for errors using cpplint
+        @brief This is the main test - walks the directory structure and looks 
+        for errors using cpplint
         """
-        file_name = os.path.join(maus_root_dir,'tmp','cpplint.out')
+        file_name = os.path.join(maus_root_dir, 'tmp', 'cpplint.out')
         walker(maus_root_dir, exclude_dirs, exclude_files, file_name)
         test_result = cpplint_postprocessor().process(file_name, cpplint_exceptions.exceptions, processed_output_filename=file_name)
         self.assertEqual(test_result, 0,
@@ -369,5 +384,5 @@ exclude_files += file_append(os.path.join(cp, 'Calib'), calib_files)
 exclude_files += file_append(os.path.join(cp, 'Config'), config_files)
 exclude_files += file_append(os.path.join(cp, 'Optics'), optics_files)
 
-if __name__=="__main__":
+if __name__ == "__main__":
     unittest.main()
