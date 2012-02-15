@@ -197,12 +197,12 @@ SciFi_sigma_z = 0.081 # mm
 SciFi_sigma_duplet =  0.6197 # mm
 
 # configuration database
-cdb_upload_url = "http://rgma19.pp.rl.ac.uk:8080/cdb/" # target URL for configuration database uploads
-cdb_download_url = "http://rgma19.pp.rl.ac.uk:8080/cdb/" # target URL for configuration database downloads
+cdb_upload_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database uploads TestServer::http://rgma19.pp.rl.ac.uk:8080/cdb/
+cdb_download_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database downloads
 
 # geometry download
 geometry_download_wsdl = "geometry?wsdl" # name of the web service used for downloads
-geometry_download_directory   = "/home/matt/maus-littlefield/tmp/test" #"%s/files/geometry/download" % os.environ.get("MAUS_ROOT_DIR") # name of the local directory where downloads will be placed
+geometry_download_directory   = "%s/files/geometry/download" % os.environ.get("MAUS_ROOT_DIR") # name of the local directory where downloads will be placed
 geometry_download_by = 'current' # choose 'run_number' to download by run number, 'current' to use
                                     # the currently valid geometry or 'id' to use the cdb internal id 
                                     # (e.g. if it is desired to access an old version of a particular
@@ -214,9 +214,9 @@ g4_step_max = 5.0 # this is the value which shall be placed in the Mice Modules 
 
 # geometry upload
 geometry_upload_wsdl = "geometrySuperMouse?wsdl" # name of the web service used for uploads
-geometry_upload_directory = "/home/matt/StepFiles/GDML_fastradModel" #"%s/files/geometry/upload" % os.environ.get("MAUS_ROOT_DIR") # name of the local directory where uploads are drawn from
-geometry_upload_note = "This is a test of the EMR CAD Model" # note, pushed to the server to describe the geometry. A note must be specified here (default will throw an exception).
-geometry_upload_valid_from = "2012-02-10 09:00:00" # date-time in format like: that the specified installation was made in the experiment. A date-time must be specified here (default will throw an exception).
+geometry_upload_directory = "%s/files/geometry/upload" % os.environ.get("MAUS_ROOT_DIR") # name of the local directory where uploads are drawn from
+geometry_upload_note = "" # note, pushed to the server to describe the geometry. A note must be specified here (default will throw an exception).
+geometry_upload_valid_from = "" # date-time in format like: that the specified installation was made in the experiment. A date-time must be specified here (default will throw an exception).
 geometry_upload_cleanup = True # set to True to clean up after upload
 
 
