@@ -62,7 +62,7 @@ class Formatter: #pylint: disable = R0902
                 self.material_file = fname
                 shutil.copy(os.path.join(self.path_in, fname), 
                         os.path.join(self.path_out, fname)   )
-            elif fname.find('fastrad') >= 0:
+            elif fname.find('fastrad') >= 0 or fname.find('Fastrad') >= 0:
                 self.configuration_file = fname
             elif fname.find('Field') >= 0 or fname.find('field') >= 0:
                 self.field_file = fname

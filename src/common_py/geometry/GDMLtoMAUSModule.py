@@ -61,7 +61,7 @@ class GDMLtomaus(): #pylint: disable = R0903
                 found_file = self.path + '/' + fname
                 self.material_file = found_file
                 self.material_file_path = os.path.abspath(self.material_file)
-            if fname == 'fastradModel.gdml':
+            if fname == 'fastradModel.gdml' or fname == 'FastradModel.gdml':
                 found_file = self.path + '/' + fname
                 self.config_file = found_file
             if fname.find('Field') >= 0:
@@ -69,6 +69,7 @@ class GDMLtomaus(): #pylint: disable = R0903
                 self.field_file = found_file
             if fname.find('materials') < 0 \
                and fname.find('fastrad') < 0 \
+               and fname.find('Fastrad') < 0 \
                and fname.find('Field') < 0 \
                and fname.find('Beamline') < 0 \
                and fname[-5:] == '.gdml':
@@ -91,8 +92,8 @@ class GDMLtomaus(): #pylint: disable = R0903
             raise IOError('Output path doesnt exist '+str(output))
         else:
             outputfile = output + "/ParentGeometryFile.dat"
-            config_file = CADImport(xmlin1 = str(self.config_file), \
-                           xsl = str(CONFIGXSL), output = str(outputfile))
+            config_file = CADImport(xmlin1 = self.config_file, \
+                           xsl = CONFIGXSL, output = outputfile)
             config_file.parse_xslt()
             print "Configuration File Converted"
             length = len(self.step_files)
@@ -104,8 +105,8 @@ class GDMLtomaus(): #pylint: disable = R0903
                 file_name = num_of_splits - 1
                 file_name = new_string[file_name]
                 outputfile = output + '/' + file_name[:-4] + 'dat'
-                step_file = CADImport(xmlin1 = str(self.step_files[num]), \
-                                    xsl = str(MM_XSL), output = str(outputfile))
+                step_file = CADImport(xmlin1 = self.step_files[num], \
+                                    xsl = MM_XSL, output = outputfile)
                 step_file.parse_xslt()
                 step_file = None
                 os.remove(self.step_files[num])
