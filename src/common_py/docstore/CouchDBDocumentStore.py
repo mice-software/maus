@@ -125,3 +125,10 @@ class CouchDBDocumentStore:
         """
         for key in self.__data_store: 
             self.delete(key)
+
+    def disconnect(self):
+        """
+        Disconnect - a no-op. 
+        @param self Object reference.
+        """
+        pass

@@ -1,5 +1,5 @@
 """
-Tests for CouchDBDocumentStore module.
+Tests for MongoDBDocumentStore module.
 """
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 # 
@@ -18,36 +18,39 @@ Tests for CouchDBDocumentStore module.
 
 # pylint: disable=C0103
 
-import couchdb
-from socket import gaierror
+import pymongo
+from pymongo.errors import AutoReconnect
 import unittest
 
-from CouchDBDocumentStore import CouchDBDocumentStore
+from docstore.MongoDBDocumentStore import MongoDBDocumentStore
 
-class CouchDBDocumentStoreTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
+class MongoDBDocumentStoreTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
     """
-    Test class for CouchDBDocumentStore module.
+    Test class for MongoDBDocumentStore module.
     """
 
     def setUp(self):
         """ 
-        Create CouchDBDocumentStore with test-specific database.
+        Create MongoDBDocumentStore with test-specific database.
         @param self Object reference.
         """
-        self._database_url = "http://localhost:5984"
-        # Ping server to validate it's available.
-        server = couchdb.Server(self._database_url)
+        self._host = "localhost"
+        self._port = 27017
         try:
-            server.version()
-        except:# pylint: disable=W0702
+            test_conx = pymongo.Connection(self._host, self._port)
+        except AutoReconnect: # pylint: disable=W0702
             unittest.TestCase.skipTest(self, 
-                                       "CouchDB server is not accessible")
-        self._database_name = self.__class__.__name__.lower()
+                                       "MongoDB server is not accessible")
+        test_conx.disconnect()
         # Create data store and connect.
-        self._data_store = CouchDBDocumentStore()
+        self._database_name = self.__class__.__name__
+        self._collection_name = self.__class__.__name__
+        self._data_store = MongoDBDocumentStore()
         parameters = {
-            "couchdb_url":self._database_url,
-            "couchdb_database_name":self._database_name}
+            "mongodb_host":self._host,
+            "mongodb_port":self._port,
+            "mongodb_database_name":self._database_name,
+            "mongodb_collection_name":self._collection_name}
         self._data_store.connect(parameters)
 
     def tearDown(self):
@@ -55,24 +58,15 @@ class CouchDBDocumentStoreTestCase(unittest.TestCase): # pylint: disable=R0904, 
         Delete test-specific database.
         @param self Object reference.
         """
-        server = couchdb.Server(self._database_url)
-        if self._database_name in server:
-            server.delete(self._database_name)
-
-    def test_connect(self):
-        """
-        Test default invocation of connect in setUp has created
-        a database on the server with the expected name.
-        @param self Object reference.
-        """
-        server = couchdb.Server(self._database_url)
-        self.assertTrue(self._database_name in server,
-            "Database has not been created on the server")
+        self._data_store.disconnect()
+        server = pymongo.Connection(self._host, self._port)
+        server.drop_database(self._database_name)
+        server.disconnect()
 
     def test_connect_no_parameters(self):
         """
-        Test connect with no parameters throws a KeyError as a database
-        URL is expected.
+        Test connect with no parameters throws a KeyError as a host
+        is expected.
         @param self Object reference.
         """
         try:
@@ -80,38 +74,56 @@ class CouchDBDocumentStoreTestCase(unittest.TestCase): # pylint: disable=R0904, 
         except KeyError:
             pass
 
-    def test_connect_bad_url(self):
+    def test_connect_bad_host(self):
         """
-        Test connect with a bad URL throws a gaierror as expected.
+        Test connect with a bad host throws an AutoReconnect error as
+        expected. 
         @param self Object reference.
         """
-        parameters = {"couchdb_url":"non-existant"}
+        parameters = {"mongodb_host":"nonExistant", "mongodb_port":999999}
         try:
             self._data_store.connect(parameters)
-        except gaierror:
+        except AutoReconnect:
+            pass
+
+    def test_connect_bad_port(self):
+        """
+        Test connect with a bad port throws an AutoReconnect error as
+        expected. 
+        @param self Object reference.
+        """
+        parameters = {"mongodb_host":self._host, "mongodb_port":999999}
+        try:
+            self._data_store.connect(parameters)
+        except AutoReconnect:
             pass
 
     def test_connect_no_database_name(self):
         """
-        Test connect with no parameters throws a KeyError as a database
-        name is expected.
+        Test connect with no database name parameter throws a KeyError.
         @param self Object reference.
         """
-        parameters = {"couchdb_url":self._database_url}
+        parameters = {
+            "mongodb_host":self._host,
+            "mongodb_port":self._port}
         try:
             self._data_store.connect(parameters)
         except KeyError:
             pass
 
-    def test_connect_existing_database_name(self):
+    def test_connect_no_collection_name(self):
         """
-        Test connect with an existing database name.
+        Test connect with no collection name parameter throws a KeyError.
         @param self Object reference.
         """
         parameters = {
-            "couchdb_url":self._database_url,
-            "couchdb_database_name":self._database_name}
-        self._data_store.connect(parameters)
+            "mongodb_host":self._host,
+            "mongodb_port":self._port,
+            "mongodb_database_name":self._database_name}
+        try:
+            self._data_store.connect(parameters)
+        except KeyError:
+            pass
 
     def test_empty_data_store(self):
         """

@@ -1,5 +1,5 @@
 """
-Tests for InMemoryDocumentStore module.
+Tests for CouchDBDocumentStore module.
 """
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 # 
@@ -18,30 +18,101 @@ Tests for InMemoryDocumentStore module.
 
 # pylint: disable=C0103
 
+import couchdb
+from socket import gaierror
 import unittest
 
-from InMemoryDocumentStore import InMemoryDocumentStore
+from docstore.CouchDBDocumentStore import CouchDBDocumentStore
 
-class InMemoryDocumentStoreTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
+class CouchDBDocumentStoreTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
     """
-    Test class for InMemoryDocumentStore module.
+    Test class for CouchDBDocumentStore module.
     """
 
     def setUp(self):
         """ 
-        Invoke "birth" and check for success.
+        Create CouchDBDocumentStore with test-specific database.
         @param self Object reference.
         """
-        self._data_store = InMemoryDocumentStore()
-        self._data_store.connect({})
+        self._database_url = "http://localhost:5984"
+        # Ping server to validate it's available.
+        server = couchdb.Server(self._database_url)
+        try:
+            server.version()
+        except:# pylint: disable=W0702
+            unittest.TestCase.skipTest(self, 
+                                       "CouchDB server is not accessible")
+        self._database_name = self.__class__.__name__.lower()
+        # Create data store and connect.
+        self._data_store = CouchDBDocumentStore()
+        parameters = {
+            "couchdb_url":self._database_url,
+            "couchdb_database_name":self._database_name}
+        self._data_store.connect(parameters)
+
+    def tearDown(self):
+        """
+        Delete test-specific database.
+        @param self Object reference.
+        """
+        server = couchdb.Server(self._database_url)
+        if self._database_name in server:
+            server.delete(self._database_name)
+        self._data_store.disconnect()
+
+    def test_connect(self):
+        """
+        Test default invocation of connect in setUp has created
+        a database on the server with the expected name.
+        @param self Object reference.
+        """
+        server = couchdb.Server(self._database_url)
+        self.assertTrue(self._database_name in server,
+            "Database has not been created on the server")
 
     def test_connect_no_parameters(self):
         """
-        Test connect with no parameters.
+        Test connect with no parameters throws a KeyError as a database
+        URL is expected.
         @param self Object reference.
         """
-        # Expect no exceptions.
-        self._data_store.connect()
+        try:
+            self._data_store.connect({})
+        except KeyError:
+            pass
+
+    def test_connect_bad_url(self):
+        """
+        Test connect with a bad URL throws a gaierror as expected.
+        @param self Object reference.
+        """
+        parameters = {"couchdb_url":"non-existant"}
+        try:
+            self._data_store.connect(parameters)
+        except gaierror:
+            pass
+
+    def test_connect_no_database_name(self):
+        """
+        Test connect with no parameters throws a KeyError as a database
+        name is expected.
+        @param self Object reference.
+        """
+        parameters = {"couchdb_url":self._database_url}
+        try:
+            self._data_store.connect(parameters)
+        except KeyError:
+            pass
+
+    def test_connect_existing_database_name(self):
+        """
+        Test connect with an existing database name.
+        @param self Object reference.
+        """
+        parameters = {
+            "couchdb_url":self._database_url,
+            "couchdb_database_name":self._database_name}
+        self._data_store.connect(parameters)
 
     def test_empty_data_store(self):
         """
