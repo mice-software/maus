@@ -1,20 +1,22 @@
 #include "RStream.hh"
+#include "Interface/Squeal.hh"
 
-rstream::rstream(const char* filename,
-		 const char* mode,
-		 MsgStream::LEVEL loglevel):
-  m_log("rstream", loglevel),
+rstream::rstream(const char* filename, const char* mode):
   m_tree(0),
   m_evtCount(0){
   if( !strcmp(filename,"") || !strcmp(mode,"")) {
-    m_log << MsgStream::FATAL << "Couldn't open ROOT TFile as no filename or open mode given" << std::endl;
-    throw 1;
+    Squeak::mout(Squeak::fatal) << "Couldn't open ROOT TFile as no filename or open mode given" << std::endl;
+    throw Squeal(Squeal::nonRecoverable,
+		 "rstream object not correctly initialised as null \"\" string passed as filename or open mode.",
+		 "rstream::rstream(const char*, const char*)");
   }
 
   m_file = new TFile(filename,mode);
   if(!m_file){
-    m_log << MsgStream::FATAL << "ROOT TFile opened incorrectly" << std::endl;
-    throw 2;
+    Squeak::mout(Squeak::fatal) << "ROOT TFile opened incorrectly" << std::endl;
+    throw Squeal(Squeal::nonRecoverable,
+		 "rstream object not correctly initialised as TFile not opened properly",
+		 "rstream::rstream(const char*, const char*)");
   }
 
  
@@ -34,7 +36,7 @@ rstream::~rstream(){
     m_file =0;
   }
   if(m_tree){
-    //delete m_tree;
+    //delete m_tree; //ROOT does this automatically on closing file.
     m_tree=0;
   }
 }

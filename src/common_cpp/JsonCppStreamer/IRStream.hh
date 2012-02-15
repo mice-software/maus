@@ -35,8 +35,7 @@ class irstream : public rstream{
    */
   irstream(const char*,
 	   const char* = "Data",
-	   const char* = "READ",
-	   MsgStream::LEVEL = MsgStream::INFO);
+	   const char* = "READ");
   
   /*!
    * \brief open a root input stream
@@ -51,12 +50,6 @@ class irstream : public rstream{
   
   //! \brief close the file and cleanup
   void close();
-  // Note changed this to a pointer so can return 0 to get
-  //  while(irstream>>) functionality. This was done afterwards so may
-  //  break things
-  // old:
-  //  friend irstream& readEvent(irstream& ors);
-  //  irstream& operator>>(irstream& (*manip_pointer)(irstream&));
   //! Declare friend function.
   friend irstream* readEvent(irstream& ors);
 
@@ -124,11 +117,6 @@ template<>           irstream& irstream::operator>> <float> (float* &  d){attach
 
 // Friend function definitions
 //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
-// Note changed this to a pointer so can return 0 to get
-//  while(irstream>>) functionality. This was done afterwards so may
-//  break things
-//  irstream& readEvent(irstream& irs);
-
 irstream* readEvent(irstream& irs);
 
 #endif

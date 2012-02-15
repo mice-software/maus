@@ -37,8 +37,7 @@ class orstream : public rstream{
   orstream(const char*,
 	   const char* = "Data",
 	   const char* = "Created by orstream",
-	   const char* = "RECREATE",
-	   MsgStream::LEVEL= MsgStream::INFO);
+	   const char* = "RECREATE");
 
   /*!
    * \brief open a root output stream.

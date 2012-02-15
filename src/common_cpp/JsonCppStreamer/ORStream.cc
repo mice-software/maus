@@ -1,12 +1,11 @@
 #include "ORStream.hh"
+#include "Interface/Squeal.hh"
 
 orstream::orstream(const char* fileName,
 		   const char* treeName,
 		   const char* treeTitle,
-		   const char* mode,
-		   MsgStream::LEVEL loglevel): 
-  rstream(fileName, mode, loglevel){
-  m_log.setName("orstream");
+		   const char* mode): 
+  rstream(fileName, mode){
   m_tree = new TTree(treeName,treeTitle);
 }
 
@@ -17,14 +16,18 @@ void orstream::open(const char* fileName,
 		    const char* mode){
 
   if( !strcmp(fileName,"") ) {
-    m_log << MsgStream::FATAL << "Couldn't open ROOT TFile as no filename given" << std::endl;
-    throw 1;
+    Squeak::mout(Squeak::error) << "Couldn't open ROOT TFile as no filename given" << std::endl;
+    throw Squeal(Squeal::recoverable,
+		 "Cannot open file as null \"\" string passed as filename",
+		 "void orstream::open(const char*, const char*, const char*, const char*)");
   }
 
   m_file = new TFile(fileName,mode);
   if(!m_file){
-    m_log << MsgStream::FATAL << "ROOT TFile opened incorrectly" << std::endl;
-    throw 2;
+    Squeak::mout(Squeak::error) << "ROOT TFile opened incorrectly" << std::endl;
+    throw Squeal(Squeal::recoverable,
+		 "TFile object not opened properly",
+		 "void orstream::open(const char*, const char*, const char*, const char*)");
   }
 
   m_tree = new TTree(treeName,treeTitle);
@@ -38,7 +41,7 @@ void orstream::close(){
   m_file->cd();
   m_tree->Write();
   m_file->Close();
-  m_log << MsgStream::INFO << "Written "<<m_evtCount << " event(s) to file." << std::endl;
+  Squeak::mout(Squeak::info) << "Written "<<m_evtCount << " event(s) to file." << std::endl;
   strcpy(m_branchName,"");
   
   if(m_file){
@@ -46,7 +49,7 @@ void orstream::close(){
       m_file=0;
   }
   if(m_tree){
-    //delete m_tree; //crashes root?! ROOT must do this step automatically
+    //delete m_tree; //ROOT does this automatically on closing file.
     m_tree=0;
   }
 }

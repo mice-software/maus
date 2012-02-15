@@ -12,8 +12,7 @@
 class tmprstream:public rstream{
 public:
   tmprstream(const char* a,
-	     const char* b,
-	     MsgStream::LEVEL c):rstream(a,b,c){}
+	     const char* b):rstream(a,b){}
     void close(){m_file->Close();}
     bool operator!=(tmprstream& rs){
       return &rs!=this;
@@ -60,7 +59,7 @@ TEST( OneArgManipTest, TestOperator ) {
     manip_pointer p = &rstream::setBranch;
     oneArgManip<const char*> a(p,"TestOperator");
 
-    tmprstream r1("TestFile","RECREATE",MsgStream::INFO);
+    tmprstream r1("TestFile","RECREATE");
     tmprstream* r2 = reinterpret_cast<tmprstream*>(&a(r1));
  
    

@@ -18,8 +18,8 @@
 #include <cstring>
 #include <TFile.h>
 #include <TTree.h>
-#include "MsgStream.hh"
 #include <vector>
+#include "Interface/Squeak.hh"
 
 /*!
  * \class rstream
@@ -39,13 +39,11 @@ class rstream{
    * \param char* the mode specifier to use when opening
    * \param MsgStream::LEVEL the level of the logging output.
    */
-  rstream(const char*,
-	  const char*,
-	  MsgStream::LEVEL = MsgStream::INFO);
+  rstream(const char*, const char*);
   /*!\brief check if the file is open
    * \return boolean value indicating the presence of an open file.
    */
-  virtual bool is_open(){ return !m_file? false :  m_file->IsOpen(); }
+  virtual bool is_open(){ return !m_file? false : m_file->IsOpen(); }
   //! Destructor
   virtual ~rstream();
   //! Close the file and cleanup, pure virtual function.
@@ -75,30 +73,26 @@ class rstream{
    */
   template<typename T> rstream& attachBranch(T* & d, bool, bool);
 
-  /*!\var TFile* m_file
-   * \brief Pointer to the open file.
-   */
-  TFile* m_file;
-  /*!\var MsgStream m_log
-   * \brief The logging message stream.
-   */
-  MsgStream m_log;
-  /*!\var char* m_branchName
-   * \brief The currently defined branch name.
-   */
-  char* m_branchName;
   /*!\var TTree* m_tree
    * \brief pointer to the working tree.
    */
   TTree* m_tree;
-  /*!\var std::vector<void*> m_pointers
-   * \brief collection of pointers to data types.
-   */
-  std::vector<void*> m_pointers;
   /*!\var long m_evtCount
    * \brief event counter.
    */
   long m_evtCount;  //added later.
+  /*!\var TFile* m_file
+   * \brief Pointer to the open file.
+   */
+  TFile* m_file;
+  /*!\var char* m_branchName
+   * \brief The currently defined branch name.
+   */
+  char* m_branchName;
+  /*!\var std::vector<void*> m_pointers
+   * \brief collection of pointers to data types.
+   */
+  std::vector<void*> m_pointers;
 
 };
 
@@ -110,14 +104,14 @@ class rstream{
 //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
 template<typename T> rstream& rstream::attachBranch(T& d,bool doublePointer, bool createNonExistentBranch){
   if(!strcmp(m_branchName,"")){
-    m_log << MsgStream::ERROR << "No branch name set"<< std::endl;
-    m_log << MsgStream::INFO  << "Setup a branch name before attaching a data object using << branchName(\"MyBranch\")" <<std::endl;
+    Squeak::mout(Squeak::error) << "No branch name set"<< std::endl;
+    Squeak::mout(Squeak::info)  << "Setup a branch name before attaching a data object using << branchName(\"MyBranch\")" <<std::endl;
     strcpy(m_branchName,"");
     return *this;
   }
   if(!m_tree->FindBranch(m_branchName) && !createNonExistentBranch){
-    m_log << MsgStream::ERROR << "Branch not found"<< std::endl;
-    m_log << MsgStream::INFO  << "Could not find the requested branch in the tree" <<std::endl;
+    Squeak::mout(Squeak::error) << "Branch not found"<< std::endl;
+    Squeak::mout(Squeak::info)  << "Could not find the requested branch in the tree" <<std::endl;
     strcpy(m_branchName,"");
     return *this; 
   }
@@ -144,14 +138,14 @@ template<typename T> rstream& rstream::attachBranch(T& d,bool doublePointer, boo
 //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
 template<typename T> rstream& rstream::attachBranch(T* & d,bool doublePointer, bool createNonExistentBranch){
   if(!strcmp(m_branchName,"")){
-    m_log << MsgStream::ERROR << "No branch name set"<< std::endl;
-    m_log << MsgStream::INFO  << "Setup a branch name before attaching a data object using << branchName(\"MyBranch\")" <<std::endl;
+    Squeak::mout(Squeak::error) << "No branch name set"<< std::endl;
+    Squeak::mout(Squeak::info)  << "Setup a branch name before attaching a data object using << branchName(\"MyBranch\")" <<std::endl;
     strcpy(m_branchName,"");
     return *this;
   }
   if(!m_tree->FindBranch(m_branchName) && !createNonExistentBranch){
-    m_log << MsgStream::ERROR << "Branch not found"<< std::endl;
-    m_log << MsgStream::INFO  << "Could not find the requested branch in the tree" <<std::endl;
+    Squeak::mout(Squeak::error) << "Branch not found"<< std::endl;
+    Squeak::mout(Squeak::info)  << "Could not find the requested branch in the tree" <<std::endl;
     strcpy(m_branchName,"");
     return *this; 
   }
