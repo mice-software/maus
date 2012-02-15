@@ -510,7 +510,7 @@ if os.path.isfile('.use_llvm_with_maus'):
     env['CC'] = "llvm-gcc"
     env['CXX'] = "llvm-g++"
 
-env.Tool('swig', '%s/third_party/swig-2.0.1' % maus_third_party)
+env.Tool('swig', '%s/swig-2.0.1' % maus_third_party)
 env.Append(SWIGFLAGS=['-python', '-c++']) # tell SWIG to make python bindings for C++
 
 env['ENV']['PATH'] =  os.environ.get('PATH')  # useful to set for root-config
@@ -522,16 +522,16 @@ libs = str(os.environ.get('LD_LIBRARY_PATH'))+':'+str(os.environ.get('DYLD_LIBRA
 # to find third party libs, includes
 env.Append(LIBPATH =  libs.split(':') + ["%s/build" % maus_third_party])
 
-env.Append(CPPPATH=["%s/third_party/install/include" % maus_third_party, \
-                    "%s/third_party/install/include/root" % maus_third_party, \
+env.Append(CPPPATH=["%s/install/include" % maus_third_party, \
+                    "%s/install/include/root" % maus_third_party, \
                     "%s/src/legacy" % maus_root_dir, \
                     "%s/src/common_cpp" % maus_root_dir, \
                     ""])
 
 if (sysname == 'Darwin'):
-  env.Append(CPPPATH=["%s/third_party/install/Python.framework/Versions/2.7/include/python2.7" % maus_third_party])
+  env.Append(CPPPATH=["%s/install/Python.framework/Versions/2.7/include/python2.7" % maus_third_party])
 else:
-  env.Append(CPPPATH=["%s/third_party/install/include/python2.7" % maus_third_party])
+  env.Append(CPPPATH=["%s/install/include/python2.7" % maus_third_party])
 
 env['USE_G4'] = False
 env['USE_ROOT'] = False
@@ -553,7 +553,7 @@ Export('env') # pylint: disable-msg=E0602
 #                  'doxygen doc/Doxyfile && cd doc/html')
 #env.Alias('doc', [dox])
 
-#python_executable = '%s/third_party/install/bin/python' % maus_root_dir
+#python_executable = '%s/install/bin/python' % maus_third_party
 #if os.path.isfile(python_executable):
 #  unit = env.Command('does_not_exist2', 'build', '%s -m unittest discover -b -v build' % python_executable)
 #  env.Alias('unittest', [unit])
