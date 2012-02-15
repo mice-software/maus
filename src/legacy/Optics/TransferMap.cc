@@ -3,6 +3,9 @@
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_eigen.h>
 #include "CLHEP/Matrix/Matrix.h"
+#include "Maths/Matrix.hh"
+
+using MAUS::Matrix;
 
 int          TransferMap::_order  = 1;
 
@@ -71,7 +74,8 @@ void TransferMap::SetFirstOrderMap(CLHEP::HepMatrix firstOrderMap)
 CLHEP::HepMatrix TransferMap::GetFirstOrderMap() const
 {
 	if(_polynomial!=NULL) {
-    return MAUS::CLHEP::HepMatrix(_polynomial->GetCoefficientsAsMatrix().submatrix(1,6,2,7));
+    Matrix<double> coefficients = _polynomial->GetCoefficientsAsMatrix();
+    return MAUS::CLHEP::HepMatrix(coefficients.submatrix(1,6,2,6));
   }
 	return _firstOrderMap;
 }
