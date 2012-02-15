@@ -12,7 +12,7 @@
 #ifndef MCPROCESSOR_H
 #define MCPROCESSOR_H
 #include "json/json.h"
-#include "MausEventStruct.hh"
+#include "src/common_cpp/DataStructure/MausEventStruct.hh"
 
 /*!
  * \class MCProcessor
