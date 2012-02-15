@@ -8,7 +8,7 @@
             <FieldType name="MagneticFieldMap"/>
             <FieldMapMode name="Read"/>
             <FileType name="g4bl3dGrid"/>
-            <FileName name="${MAUS_ROOT_DIR}/FILES/Models/Modules/BeamLine/B1_6inch.table"/>
+            <FileName name="${MAUS_ROOT_DIR}/src/legacy/FILES/Models/Modules/BeamLine/B1_6inch.table"/>
             <Symmetry name="Dipole"/>
         </Dipole>
         <Quadrupole>
