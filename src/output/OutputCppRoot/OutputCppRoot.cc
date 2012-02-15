@@ -90,18 +90,20 @@ bool OutputCppRoot::death() {
     delete _outfile;
     _outfile = NULL;
   }
+  /*
   if (_md != NULL) {
     delete _md;
     _md = NULL;
   }
   if (_mc != NULL) {
-    //delete _mc;
+    delete _mc;
     _mc = NULL;
   }
   if (_d != NULL) {
-    //delete _d;
+    delete _d;
     _d = NULL;
   }
+  */
   return true;
 }
 }
