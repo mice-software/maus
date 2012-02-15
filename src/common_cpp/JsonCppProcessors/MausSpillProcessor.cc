@@ -15,10 +15,34 @@
  */
 
 #include "src/common_cpp/JsonCppProcessors/MausSpillProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/ScalarsProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/EMRSpillDataProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/DAQDataProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/MCEventProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/ReconEventProcessor.hh"
 
 namespace MAUS {
 
 MausSpill* MausSpillProcessor::operator()(const Json::Value& jv) {
+    MausSpill* ms = new MausSpill();
+
+    if (!jv["scalars"].isNull()) {
+        ms->SetScalars(ScalarsProcessor()(jv["scalars"]));
+    }
+    if (!jv["emr_spill_data"].isNull()) {
+        ms->SetEMRSpillData(EMRSpillDataProcessor()(jv["emr_spill_data"]));
+    }
+    if (!jv["daq_data"].isNull()) {
+        ms->SetDAQData(DAQDataProcessor()(jv["daq_data"]));
+    }
+    if (!jv["mc_events"].isNull()) {
+        ms->SetMCEventArray(MCEventArrayProcessor()(jv["mc_events"]));
+    }
+    if (!jv["recon_events"].isNull()) {
+        ms->SetReconEventArray(ReconEventArrayProcessor()(jv["recon_events"]));
+    }
+
+    return ms;  
 }
 
 }

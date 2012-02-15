@@ -25,17 +25,10 @@ namespace MAUS {
 
 class MausSpillProcessor {
  public:
-  MausSpillProcessor(MausSpill* data);
-  MausSpillProcessor(MausSpill& data);
-  MausSpillProcessor(Json::Value* data);
-  MausSpillProcessor(Json::Value& data);
-
   MausSpill* operator()(const Json::Value& data);
   Json::Value* operator()(const MausSpill& data);
 
  private:
-  MausSpill* cpp_ms;
-	Json::Value* json_ms;
 };
 
 }

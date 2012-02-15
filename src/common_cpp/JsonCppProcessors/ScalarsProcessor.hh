@@ -14,32 +14,22 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_MCEVENTDATA_HH_
-#define _SRC_COMMON_CPP_DATASTRUCTURE_MCEVENTDATA_HH_
+#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_SCALARSPROCESSOR_HH_
+#define _SRC_COMMON_CPP_DATASTRUCTURE_SCALARSPROCESSOR_HH_
 
-#include <vector>
+#include "json/value.h"
 
-#include "Rtypes.h" // ROOT
+#include "src/common_cpp/DataStructure/Scalars.hh"
 
 namespace MAUS {
 
-class MCEvent {
- public:
-  MCEvent();
-
-  MCEvent(const MCEvent& md);
-       
-  MCEvent& operator=(const MCEvent& md);
-  
-  virtual ~MCEvent();
-
-  ClassDef(MCEvent, 1)
-
- private:
+class ScalarsProcessor {
+  public:
+    Scalars* operator()(const Json::Value& data);
+    Json::Value* operator()(const Scalars& data);
 };
-
-typedef std::vector<MCEvent*> MCEventArray;
 
 }
 
 #endif
+

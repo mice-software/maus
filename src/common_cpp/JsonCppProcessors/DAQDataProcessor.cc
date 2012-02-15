@@ -14,28 +14,17 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_EMRDATAPROCESSOR_HH_
-#define _SRC_COMMON_CPP_DATASTRUCTURE_EMRDATAPROCESSOR_HH_
-
-#include "json/value.h"
-#include "src/common_cpp/DataStructure/MausSpill.hh"
+#include "src/common_cpp/JsonCppProcessors/DAQDataProcessor.hh"
 
 namespace MAUS {
 
-class EMRDataProcessor {
- public:
-  EMRDataProcessor(EMRData* data);
-  EMRDataProcessor(EMRData& data);
-  EMRDataProcessor(Json::Value* data);
-  EMRDataProcessor(Json::Value& data);
+DAQData* DAQDataProcessor::operator()(const Json::Value& data) {
+    return new DAQData();
+}
 
-  EMRData* operator()(const Json::Value& data);
-  Json::Value* operator()(const EMRData& data);
+Json::Value* DAQDataProcessor::operator()(const DAQData& data) {
+    return new Json::Value();
+}
 
- private:
-  EMRData* cpp_ms;
-	Json::Value* json_s;
-};
-
-#endif
+}
 

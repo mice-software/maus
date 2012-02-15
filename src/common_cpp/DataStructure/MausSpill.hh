@@ -26,8 +26,8 @@ class EMRSpillData;
 class MCEvent;
 class ReconEvent;
 class DAQData;
-typedef std::vector<MCEvent> MCEventArray;
-typedef std::vector<ReconEvent> ReconEventArray;
+typedef std::vector<MCEvent*> MCEventArray;
+typedef std::vector<ReconEvent*> ReconEventArray;
 
 class MausSpill {
  public:

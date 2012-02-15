@@ -14,32 +14,24 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_MCEVENTDATA_HH_
-#define _SRC_COMMON_CPP_DATASTRUCTURE_MCEVENTDATA_HH_
+#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_DAQDATAPROCESSOR_HH_
+#define _SRC_COMMON_CPP_DATASTRUCTURE_DAQDATAPROCESSOR_HH_
 
-#include <vector>
+#include "json/value.h"
 
-#include "Rtypes.h" // ROOT
+#include "src/common_cpp/DataStructure/DAQData.hh"
 
 namespace MAUS {
 
-class MCEvent {
+class DAQDataProcessor {
  public:
-  MCEvent();
-
-  MCEvent(const MCEvent& md);
-       
-  MCEvent& operator=(const MCEvent& md);
-  
-  virtual ~MCEvent();
-
-  ClassDef(MCEvent, 1)
+  DAQData* operator()(const Json::Value& data);
+  Json::Value* operator()(const DAQData& data);
 
  private:
 };
 
-typedef std::vector<MCEvent*> MCEventArray;
-
 }
 
 #endif
+

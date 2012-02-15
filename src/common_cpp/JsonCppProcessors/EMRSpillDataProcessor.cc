@@ -14,32 +14,17 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_MCEVENTDATA_HH_
-#define _SRC_COMMON_CPP_DATASTRUCTURE_MCEVENTDATA_HH_
-
-#include <vector>
-
-#include "Rtypes.h" // ROOT
+#include "src/common_cpp/JsonCppProcessors/EMRSpillDataProcessor.hh"
 
 namespace MAUS {
 
-class MCEvent {
- public:
-  MCEvent();
+EMRSpillData* EMRSpillDataProcessor::operator()(const Json::Value& data) {
+    return new EMRSpillData();
+}
 
-  MCEvent(const MCEvent& md);
-       
-  MCEvent& operator=(const MCEvent& md);
-  
-  virtual ~MCEvent();
-
-  ClassDef(MCEvent, 1)
-
- private:
-};
-
-typedef std::vector<MCEvent*> MCEventArray;
+Json::Value* EMRSpillDataProcessor::operator()(const EMRSpillData& data) {
+    return new Json::Value();
+}
 
 }
 
-#endif

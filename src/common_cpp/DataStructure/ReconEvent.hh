@@ -38,7 +38,7 @@ class ReconEvent {
  private:
 };
 
-typedef std::vector<ReconEvent> ReconEventArray;
+typedef std::vector<ReconEvent*> ReconEventArray;
 
 
 }
