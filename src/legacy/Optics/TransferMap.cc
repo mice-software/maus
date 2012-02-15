@@ -71,7 +71,8 @@ void TransferMap::SetFirstOrderMap(CLHEP::HepMatrix firstOrderMap)
 CLHEP::HepMatrix TransferMap::GetFirstOrderMap() const
 {
 	if(_polynomial!=NULL) {
-    return MAUS::CLHEP::HepMatrix(_polynomial->GetCoefficientsAsMatrix().submatrix(1,6,2,7));
+    
+    return MAUS::CLHEP::HepMatrix(_polynomial->GetCoefficientsAsMatrix().submatrix(2,7,1,6));
   }
 	return _firstOrderMap;
 }

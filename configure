@@ -61,39 +61,25 @@ fi
 if [ "$1" ]; then
     maus_third_party=$1 #if a command line argument is entered, set third party directory from it
 elif [ -z "${maus_third_party}" ]; then
-    maus_third_party=${maus_root_dir} #if not set above or anywhere else use the local maus working directory
+    maus_third_party="${maus_root_dir}/third_party" #if not set above or anywhere else use the local maus working directory
 fi
 
 # Temporarily setup the environment (this gets repeated in the env.sh output)
 #      maus_central says where the precompiled third party libraries are (if any)
 #      PATH says where the binaries are
 #      DYLIB_VAR says where your shared libraries are
-if [ "${maus_third_party}" ]; then
-    echo "INFO: Attempting to use third party libraries from " ${maus_third_party}
-    echo
-    if [ -z "${PATH}" ]; then  # see if the variable exists yet
-        PATH="${maus_third_party}/install/bin"       # if not, initialize it
-    else
-        PATH="${maus_third_party}/install/bin:$PATH" # else add to it
-    fi
-
-    if [ -z "${!DYLIB_VAR}" ]; then  # see if the variable exists yet
-        eval ${DYLIB_VAR}="${maus_third_party}/install/lib"                  # if not, initialize it
-    else
-        eval ${DYLIB_VAR}="${maus_third_party}/install/lib:${!DYLIB_VAR}" # else add to to it
-    fi
+echo "INFO: Attempting to use third party libraries from " ${maus_third_party}
+echo
+if [ -z "${PATH}" ]; then  # see if the variable exists yet
+    PATH="${maus_third_party}/install/bin"       # if not, initialize it
 else
-    if [ -z "${PATH}" ]; then  # see if the variable exists yet
-        PATH="${maus_third_party}/install/bin"       # if not, initialize it
-    else
-        PATH="${maus_third_party}/install/bin:$PATH" # else add to it
-    fi
+    PATH="${maus_third_party}/install/bin:$PATH" # else add to it
+fi
 
-    if [ -z "${!DYLIB_VAR}" ]; then  # see if the variable exists yet
-        eval ${DYLIB_VAR}="${maus_root_dir}/third_party/install/lib"                  # if not, initialize it
-    else
-        eval ${DYLIB_VAR}="${maus_third_party}/install/lib:${!DYLIB_VAR}" # else add to to it
-    fi
+if [ -z "${!DYLIB_VAR}" ]; then  # see if the variable exists yet
+    eval ${DYLIB_VAR}="${maus_third_party}/install/lib"                  # if not, initialize it
+else
+    eval ${DYLIB_VAR}="${maus_third_party}/install/lib:${!DYLIB_VAR}" # else add to to it
 fi
 
 # Check for Python

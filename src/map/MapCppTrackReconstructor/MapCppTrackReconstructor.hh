@@ -67,7 +67,7 @@ class MapCppTrackReconstructor {
    *
    *  This takes no arguments.
    */
-  MapCppTrackReconstructor();
+  ~MapCppTrackReconstructor();
 
   /** @brief Begin the startup procedure for TrackReconstructor
    *
@@ -105,9 +105,9 @@ class MapCppTrackReconstructor {
   static const size_t kPhaseSpaceDimension;
 
   std::string classname_;
-  BTField * electromagnetic_field_
+  BTField * electromagnetic_field_;
 };
 
-const MapCppTrackReconstructor::kPhaseSpaceDimension = 6;
+const size_t MapCppTrackReconstructor::kPhaseSpaceDimension = 6;
 
 #endif  // _SRC_MAP_MAPCPPTRACKRECONSTRUCTOR_HH_

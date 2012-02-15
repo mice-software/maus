@@ -27,8 +27,6 @@ A few helper functions also in there.
 
 import sys
 import os
-import shutil
-
 import SCons # pylint: disable=F0401
 
 def my_exit(code = 1):
@@ -38,21 +36,6 @@ def my_exit(code = 1):
     warning.
     """
     sys.exit(code) # pylint: disable-msg=E0602
-
-def duplicate_dylib_as_so(target, source, env): # pylint: disable=W0613
-    """
-    Wrapper for shutil.copyfile for dylib2so tool
-
-    @param source - the file source
-    @param target - the target file
-    @param env - the SCons environment
-    """
-    print "Duplicating %s as %s." % (source[0], target[0])
-    shutil.copyfile(str(source[0]), str(target[0]))
-    return None
-
-DYLIB2SO = SCons.Builder.Builder(action = duplicate_dylib_as_so, suffix = '.so',
-                   src_suffix = '.dylib')
 
 def which(program):
     """
@@ -118,14 +101,14 @@ def get_environment():
    #  NOTE: SHLIBPREFIX means that shared libraries don't
     # have a 'lib' prefix, which is needed for python to find SWIG generated
     # libraries
-    env = SCons.Environment.Environment(SHLIBPREFIX="",
-                 BUILDERS = {'Dylib2SO' : DYLIB2SO}) # pylint: disable-msg=E0602
+    env = SCons.Environment.Environment(SHLIBPREFIX="") \
+        # pylint: disable-msg=E0602
     if os.path.isfile('.use_llvm_with_maus'):
         env['CC'] = "llvm-gcc"
         env['CXX'] = "llvm-g++"
 
     env.Tool \
-          ('swig', '%s/third_party/swig-2.0.1' % os.environ['MAUS_THIRD_PARTY'])
+          ('swig', '%s/swig-2.0.1' % os.environ['MAUS_THIRD_PARTY'])
     # tell SWIG to make python bindings for C++
     env.Append(SWIGFLAGS=['-python', '-c++']) 
 
@@ -142,12 +125,17 @@ def get_environment():
                                   ["%s/build" % os.environ['MAUS_THIRD_PARTY']])
 
     maus_root = os.environ['MAUS_ROOT_DIR']
-    maus_third = os.environ['MAUS_THIRD_PARTY']
-    env.Append(CPPPATH=["%s/third_party/install/include" % maus_third,
-                        "%s/third_party/install/include/python2.7" % maus_third,
-                        "%s/third_party/install/include/root" % maus_third,
+    maus_third_party = os.environ['MAUS_THIRD_PARTY']
+    env.Append(CPPPATH=["%s/install/include" % maus_third_party,
+                        "%s/install/include/root" % maus_third_party,
                         "%s/src/legacy" % maus_root,
                         "%s/src/common_cpp" % maus_root, ""])
+    if (sys.platform == 'darwin'):
+        env.Append(CPPPATH=[
+          "%s/install/Python.framework/Versions/2.7/include/python2.7"
+          % maus_third_party])
+    else:
+        env.Append(CPPPATH=["%s/install/include/python2.7" % maus_third_party])
 
     env['USE_G4'] = False
     env['USE_ROOT'] = False

@@ -19,6 +19,8 @@ Tools to build core library (libMausCpp) and core library unit tests
 
 import os
 import glob
+import shutil
+import SCons # pylint: disable=F0401
 
 MAUS_ROOT_DIR = os.environ['MAUS_ROOT_DIR']
 
@@ -44,6 +46,23 @@ def install_python_tests(maus_root_dir, env):
             test_files = glob.glob(subdir+"/test_*.py")                   
             env.Install(build+subdir_mod, test_files)
 
+def duplicate_dylib_as_so(target, source, env): # pylint: disable=W0613
+    """
+    Wrapper for shutil.copyfile for dylib2so tool
+
+    @param source - the file source
+    @param target - the target file
+    @param env - the SCons environment
+    """
+    print "Duplicating %s as %s." % (source[0], target[0])
+    shutil.copyfile(str(source[0]), str(target[0]))
+    return None
+
+
+DYLIB2SO = SCons.Builder.Builder(action = duplicate_dylib_as_so,
+                                 suffix = '.so',
+                                 src_suffix = '.dylib')
+
 def build_lib_maus_cpp(env):
     """
     Build main cpp library
@@ -51,6 +70,9 @@ def build_lib_maus_cpp(env):
     Build libMausCpp.so shared object - containing all the code in 
     src/common_cpp/* and src/legacy/*
     """
+
+    env.Append(BUILDERS = {'Dylib2SO' : DYLIB2SO}) # pylint: disable-msg=E0602
+
     common_cpp_files = glob.glob("src/legacy/*/*cc") + \
         glob.glob("src/legacy/*/*/*cc") + \
         glob.glob("src/common_cpp/*/*cc") + \
@@ -65,7 +87,7 @@ def build_lib_maus_cpp(env):
     if (os.uname()[0] == 'Darwin'):
         maus_cpp_so = env.Dylib2SO(targetpath)
         # Depends == SCons global variable??
-        Depends(maus_cpp_so, maus_cpp) #pylint: disable = E0602
+        env.Depends(maus_cpp_so, maus_cpp) #pylint: disable = E0602
         env.Install("build", maus_cpp_so)
 
 

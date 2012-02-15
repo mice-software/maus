@@ -20,6 +20,7 @@
 #include <vector>
 #include <string>
 
+#include "TMinuit.h"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 

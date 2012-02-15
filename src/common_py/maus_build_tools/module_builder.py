@@ -105,7 +105,7 @@ class ModuleBuilder:
 
         if (os.uname()[0] == 'Darwin'):
             lib_so = self.env.Dylib2SO(swig_path)
-            Depends(lib_so, pgm) #pylint: disable=E0602
+            self.env.Depends(lib_so, normal_lib) #pylint: disable=E0602
             self.env.Install(full_build_dir, lib_so)
 
         tests = glob.glob('test_*.py')
