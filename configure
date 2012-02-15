@@ -209,6 +209,8 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      export PYTHONPATH="\$MAUS_ROOT_DIR/src/common_py:\$PYTHONPATH"
      export $DYLIB_VAR="\$MAUS_ROOT_DIR/src/common_py:\$$DYLIB_VAR"
 
+    export PYTHONPATH="\$MAUS_THIRD_PARTY/install/lib/python2.7/site-packages:\$PYTHONPATH"
+
      export PYTHONPATH="\$MAUS_ROOT_DIR/src/common_py/docstore:\$PYTHONPATH" 
 
      export PYTHONPATH="\$MAUS_ROOT_DIR/src/common_py/mauscelery:\$PYTHONPATH"
