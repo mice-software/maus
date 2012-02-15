@@ -17,10 +17,9 @@
 #include "src/common_cpp/JsonCppProcessors/MausSpillProcessor.hh"
 
 namespace MAUS {
-/*
-MausData* MausSpillProcessor::operator()(const Json::Value& jv) {
-//		JsonWrapper::GetObject("emr", Json::Value())
+
+MausSpill* MausSpillProcessor::operator()(const Json::Value& jv) {
 }
-*/
+
 }
 
