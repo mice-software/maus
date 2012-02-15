@@ -62,6 +62,7 @@ bool InputCppRoot::death() {
     delete _jsonCppConverter;
     _jsonCppConverter = NULL;
   }
+/*
   if (_md != NULL) {
     delete _md;
     _md = NULL;
@@ -74,6 +75,7 @@ bool InputCppRoot::death() {
     delete _d;
     _d = NULL;
   }
+*/
   return true;
 }
 
