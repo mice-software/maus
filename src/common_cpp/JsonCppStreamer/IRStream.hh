@@ -13,8 +13,8 @@
 
 #include "gtest/gtest_prod.h"
 
-#include "RStream.hh"
-#include "OneArgManip.hh"
+#include "JsonCppStreamer/RStream.hh"
+#include "JsonCppStreamer/OneArgManip.hh"
 
 /*!
  * \class irstream
@@ -24,7 +24,7 @@
  * \author Alexander Richards, Imperial College London
  * \date 06/01/2012
  */
-class irstream : public rstream{
+class irstream : public rstream {
  public:
   /*!
    * \brief Constructor
@@ -36,7 +36,7 @@ class irstream : public rstream{
   irstream(const char*,
 	   const char* = "Data",
 	   const char* = "READ");
-  
+
   /*!
    * \brief open a root input stream
    * \param char* the name of the root file to open
@@ -47,10 +47,10 @@ class irstream : public rstream{
   void open(const char*,
 	    const char* = "Data",
 	    const char* = "READ");
-  
-  //! \brief close the file and cleanup
+
+  // ! \brief close the file and cleanup
   void close();
-  //! Declare friend function.
+  // ! Declare friend function.
   friend irstream* readEvent(irstream& ors);
 
   /*!
@@ -93,8 +93,8 @@ class irstream : public rstream{
 
 
 // Member functions template definitions
-//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
-template<typename T> irstream& irstream::operator>>(oneArgManip<T>* manip){
+// \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
+template<typename T> irstream& irstream::operator>>(oneArgManip<T>* manip) {
   (*manip)(*this);
   delete manip;
   return *this;
@@ -116,7 +116,7 @@ template<>           irstream& irstream::operator>> <float> (float* &  d){attach
 
 
 // Friend function definitions
-//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
+// \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
 irstream* readEvent(irstream& irs);
 
 #endif

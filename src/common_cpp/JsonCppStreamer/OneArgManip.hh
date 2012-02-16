@@ -30,10 +30,10 @@ class rstream;
  * \date 06/01/2012
  */
 template<typename T>
-class oneArgManip{
+class oneArgManip {
 private:
   //! Type def manipulator function pointer
-  typedef rstream& (*manip_pointer)(rstream&,T);
+  typedef rstream& (*manip_pointer)(rstream&, T);
   /*!
    * \var manip_pointer m_manip
    * \brief pointer to the single arg manipulator function.
@@ -53,12 +53,12 @@ public:
    * \param manip_pointer a function pointer to the single arg manipulator
    * \param T the single argument to be wrapped.
    */
-  oneArgManip(manip_pointer manip,T value): m_manip(manip), m_value(value){}
+  oneArgManip(manip_pointer manip, T value): m_manip(manip), m_value(value) {}
   /*!
    * \brief call the wrapped function
    * \param rstream& The rstream object that the function will operate on.
    */
-  rstream& operator()(rstream& rs){
+  rstream& operator()(rstream& rs) {
     return m_manip(rs, m_value);
   }
 };
