@@ -22,23 +22,21 @@
 #include "PhaseSpaceVector.hh"
 #include "src/legacy/Interface/Squeal.hh"
 
-using namespace std;
-
 class Material
 {
 public:
 	//constructor for evaluating length given an emittance kick
 	//position should be z position of material center
-	Material(string materialType, double position);
+	Material(std::string materialType, double position);
 	//constructor for material with a certain thickness and type
-	Material(double thickness, string materialType, double position);
+	Material(double thickness, std::string materialType, double position);
 	//constructor for arbritrary material with known x0 and dEdZ
-	Material(double x0_mm, double dEdZ_MeVpermm, string materialName, double position);
+	Material(double x0_mm, double dEdZ_MeVpermm, std::string materialName, double position);
 	~Material();
 
 	//Print details
-	void Print(ostream &out)
-	{out << _materialType << "\t" << GetZ() << "\t" << _thickness << endl;}
+	void Print(std::ostream &out)
+	{out << _materialType << "\t" << GetZ() << "\t" << _thickness << std::endl;}
 
 	//Methods for TransportManager
 	double           GetZ()                  const {return _z;}
@@ -47,7 +45,7 @@ public:
 	//Use s(E') = s(E)[1 + d/dE(dE/dz)*dz]
 	//          = s(E)[1 + p/E*d/dp(dE/dz)*dz]
 	double           GetCurvature(double pz) const;
-	HepSymMatrix     GetCovariances(PhaseSpaceVector track) const;
+	CLHEP::HepSymMatrix     GetCovariances(PhaseSpaceVector track) const;
 	//Transport muons through the material
 	CovarianceMatrix Transport(CovarianceMatrix covIn)      const;
 	PhaseSpaceVector Transport(PhaseSpaceVector psIn)       const;
@@ -73,20 +71,20 @@ private:
 	bool _setsLengthOnStep;
 	//lists holding the data of the materials the class can access
 	//initialised in SetMaterialList()
-	vector<string> _materialList;
-	vector<double> _x0List;
-	vector<double> _ZList;
-	vector<double> _dEdZList;
-	vector<double> _AList;
-	vector<double> _IList;
-	vector<double> _deltaList;
-	vector<double> _densityList;
+	std::vector<std::string> _materialList;
+	std::vector<double> _x0List;
+	std::vector<double> _ZList;
+	std::vector<double> _dEdZList;
+	std::vector<double> _AList;
+	std::vector<double> _IList;
+	std::vector<double> _deltaList;
+	std::vector<double> _densityList;
 
 	//the material type of this material
 	std::string _materialType;
 	std::string _dEdXModel;
 	//set x0 and dEdZ for various materials
-	void SetMaterial(string materialType);
+	void SetMaterial(std::string materialType);
 	//set the list of material propertie - called by SetMaterial
 	void SetMaterialList();
 

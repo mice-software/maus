@@ -26,6 +26,8 @@
 
 #include "src/legacy/Interface/MICERun.hh"
 
+using namespace MAUS;
+
 namespace {
 class MAUSSteppingActionTest : public ::testing::Test {
  protected:
@@ -40,12 +42,12 @@ class MAUSSteppingActionTest : public ::testing::Test {
     point = new G4StepPoint();
     point->SetPosition(G4ThreeVector(1., 2., 3.));
     point->SetMass(pd->GetPDGMass());
-    point->SetMomentumDirection(G4ThreeVector(0., sqrt(0.5), sqrt(0.5)));
+    point->SetMomentumDirection(G4ThreeVector(0., ::sqrt(0.5), ::sqrt(0.5)));
     point->SetKineticEnergy(100.);
     post = new G4StepPoint();
     post->SetPosition(G4ThreeVector(7., 8., 9.));
     post->SetMass(pd->GetPDGMass());
-    post->SetMomentumDirection(G4ThreeVector(sqrt(1./3.), sqrt(1./3.), sqrt(1./3.)));
+    post->SetMomentumDirection(G4ThreeVector(::sqrt(1./3.), ::sqrt(1./3.), ::sqrt(1./3.)));
     post->SetKineticEnergy(110.);
     post->SetGlobalTime(-10.);
     track->SetStep(step);
@@ -162,14 +164,14 @@ G4Track* SetG4TrackAndStep(G4Step* step) {
   step->GetPreStepPoint()->SetMass(dyn->GetMass());
   step->GetPreStepPoint()->SetKineticEnergy(100.);
   step->GetPreStepPoint()->SetMomentumDirection
-                                    (CLHEP::Hep3Vector(0., 0.1, 1.)/sqrt(1.01));
+                                    (CLHEP::Hep3Vector(0., 0.1, 1.)/::sqrt(1.01));
 
   step->GetPostStepPoint()->SetGlobalTime(1.);
   step->GetPostStepPoint()->SetPosition(CLHEP::Hep3Vector(3., 4., 8.));
   step->GetPostStepPoint()->SetMass(dyn->GetMass());
   step->GetPostStepPoint()->SetKineticEnergy(110.);
   step->GetPostStepPoint()->SetMomentumDirection
-                                    (CLHEP::Hep3Vector(0., 0.1, 1.)/sqrt(1.01));
+                                    (CLHEP::Hep3Vector(0., 0.1, 1.)/::sqrt(1.01));
   return track;
 }
 

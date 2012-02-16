@@ -19,8 +19,8 @@ for beam generation.
 """
 
 import numpy
-import xboa
-import xboa.Bunch #pylint: disable=W0404
+import xboa #pylint: disable=F0401
+import xboa.Bunch #pylint: disable=F0401
 import sys
 
 # 32 bit long; note that CLHEP max for the seed is a 32 bit unsigned int which
