@@ -15,6 +15,9 @@
  *
  */
 
+#include "TFile.h"
+#include "TTree.h"
+
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 
 #include "src/input/InputCppRoot/InputCppRoot.hh"
@@ -32,6 +35,35 @@ InputCppRoot::~InputCppRoot() {
   death();
 }
 
+bool InputCppRoot::test_script() {
+  TFile* f = new TFile("TestFile.root", "RECREATE");
+  TTree* t = new TTree("Data", "Spills");
+  TestSpill* spill = new TestSpill();
+  t->Branch("spill", spill, sizeof(*spill), 1);
+  spill->SetMyInt(1);
+  t->Fill();
+  spill->SetMyInt(2);
+  t->Fill();
+  spill->SetMyInt(3);
+  t->Fill();
+  t->Write();
+  f->Close();
+
+  TFile* fin = new TFile("TestFile.root", "READ");
+  TTree* tin = (TTree*)fin->Get("Data");
+  TestSpill* spillin = new TestSpill();
+  std::cerr << "New TestSpill " << spillin->GetMyInt() << std::endl;
+  tin->SetBranchAddress("spill", &spillin);
+  std::cerr << tin->GetEntry(0);
+  std::cerr << "GetEntry TestSpill " << spillin << " " << spillin->GetMyInt() << std::endl;
+  std::cerr << tin->GetEntry(1);
+  std::cerr << "GetEntry TestSpill " << spillin << " "  << spillin->GetMyInt() << std::endl;
+  std::cerr << tin->GetEntry(2);
+  std::cerr << "GetEntry TestSpill " << spillin << " "  << spillin->GetMyInt() << std::endl;
+  std::cerr << sizeof(*tin) << std::endl;
+  fin->Close();
+  return false;
+}
 
 bool InputCppRoot::birth(std::string json_datacards) {
   Json::Value json_dc = JsonWrapper::StringToJson(json_datacards);
@@ -41,7 +73,7 @@ bool InputCppRoot::birth(std::string json_datacards) {
   }
   _infile = new irstream(_filename.c_str());
 
-  _spill = new Spill();
+  _spill = new TestSpill();
 
   (*_infile) >> branchName("spill") >> _spill;
 
@@ -81,6 +113,7 @@ std::string InputCppRoot::getNextEvent() {
     return "";
   }
   std::cerr << "_spill conversion " << _spill << std::endl;
+  std::cerr << "spill int " << _spill->GetMyInt() << std::endl;
   Json::Value* value = (*_jsonCppConverter)(*_spill);
   Json::FastWriter writer;
   return writer.write(*value);

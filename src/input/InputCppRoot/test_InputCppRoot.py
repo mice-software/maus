@@ -39,25 +39,9 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
         """
         Make a sample TFile
         """
-        mrd = os.environ['MAUS_ROOT_DIR']
-        self.fname = os.path.join(mrd, "tmp", "TestInputCppRoot.root")
-        tfile = ROOT.TFile(self.fname, "RECREATE") # pylint: disable=E1101
-        ttree = ROOT.TTree("Data", "treetitle") # pylint: disable=E1101
-        mc_events = ROOT.MAUS.MCEventArray()
-        for i in range(3):
-            mc_events.push_back(ROOT.MAUS.MCEvent())
-        self.spill = ROOT.MAUS.Spill()
-        self.spill.SetScalars(ROOT.MAUS.Scalars())
-        self.spill.SetEMRSpillData(ROOT.MAUS.EMRSpillData())
-        self.spill.SetDAQData(ROOT.MAUS.DAQData())
-        self.spill.SetMCEventArray(mc_events)
-        self.spill.SetReconEventArray(ROOT.MAUS.ReconEventArray())
-        ttree.Branch('spill', self.spill, 'spill')
-        ttree.Fill()
-        ttree.Fill()
-        ttree.Fill()
-        ttree.Write()
-        tfile.Close()
+        inputter = InputCppRoot.InputCppRoot()
+        inputter.test_script()
+        self.fname = "TestFile.root"
 
     def test_birth_death(self):
         """
@@ -85,8 +69,10 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
         inputter.birth("{}")
         print "get next event"
         print inputter.getNextEvent()
+        print inputter.getNextEvent()
+        print inputter.getNextEvent()
         print "emitter"
-        for item in inputter.emitter():
+        for item in ra:
             print "emitted"
             print item
             print type(item)

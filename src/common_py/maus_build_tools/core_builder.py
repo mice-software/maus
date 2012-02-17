@@ -119,6 +119,7 @@ def build_data_structure(env):
     proc.wait()
     os.remove('rootlogon.C')
 
+    data_libs = []
     for shared_object_path in glob.glob(data_struct+'/*.so'):
         shared_object = shared_object_path.split('/')[-1]
         target_path =  os.path.join(maus_root_dir, 'build', shared_object)
@@ -127,10 +128,20 @@ def build_data_structure(env):
         try:
             os.symlink(target_path,
                       os.path.join(maus_root_dir, 'build', 'lib'+shared_object))
+            pass
         except OSError:
             pass
-        env.Append(LIBS=[shared_object[:-3]])
+        data_libs.append(shared_object[:-3])
         print 'Adding library '+shared_object[:-3]
+
+    # bug: note only provides a single link point, all the other libraries still
+    # need to be in LD_LIBRARY_PATH
+    maus_data_structure = env.SharedLibrary(target = 'libMausDataStructure.so',
+                                 source=[],
+                                 LIBS=data_libs)
+    env.Install("build", maus_data_structure)
+    print 'Installed', maus_data_structure
+    env.Append(LIBS=['MausDataStructure'])
     os.chdir(here)
 
 
