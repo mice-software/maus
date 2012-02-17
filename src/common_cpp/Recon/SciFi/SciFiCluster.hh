@@ -50,6 +50,8 @@ class SciFiCluster {
  public:
   SciFiCluster(); // Default constructor
 
+  /** @brief Constructs cluster from a single digit.
+   */
   explicit SciFiCluster(SciFiDigit *digit);
 
   ~SciFiCluster();
@@ -98,17 +100,7 @@ class SciFiCluster {
  private:
   int _tracker, _station, _plane;
 
-  double _npe, _channel_w;
-
-  double _time;
-
-  SciFiDigit* seed;
-
-  SciFiDigit* neighbour;
-
-  std::vector<SciFiDigit*> digits;
-
-  int n_chan;
+  double _npe, _channel_w, _time;
 
   bool _used;
 
@@ -116,6 +108,6 @@ class SciFiCluster {
 
   Hep3Vector _position;
 };  // Don't forget this trailing colon!!!!
-// }// ~namespace MAUS
+// } // ~namespace MAUS
 
 #endif

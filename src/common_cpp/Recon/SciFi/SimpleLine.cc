@@ -30,4 +30,4 @@ void SimpleLine::set_parameters(double c, double m, double chisq) {
   _m = m;
   _chisq = chisq;
 }
-// }// ~namespace MAUS
+// } // ~namespace MAUS

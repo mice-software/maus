@@ -43,22 +43,52 @@ class SciFiEvent {
 
   ~SciFiEvent();
 
-  // std::vector hits() const { return scifihits; }
+  void add_hit(SciFiHit* hit) { _scifihits.push_back(hit); }
 
-  // std::vector digits() const { return scifidigits; }
+  std::vector<SciFiHit*> hits() const { return _scifihits; }
 
-  // std::vector clusters() const { return scificlusters; }
+  void add_digit(SciFiDigit* digit) { _scifidigits.push_back(digit); }
 
-  // std::vector spacepoints() const { return scifispacepoints; }
+  std::vector<SciFiDigit*> digits() const { return _scifidigits; }
 
-// private:
-  std::vector<SciFiHit*>   scifihits;
-  std::vector<SciFiDigit*>   scifidigits;
-  std::vector<SciFiCluster*> scificlusters;
-  std::vector<SciFiSpacePoint*> scifispacepoints;
-  std::vector<SciFiSpacePoint*> scifiseeds;
-  std::vector<SciFiStraightPRTrack> scifistraightprtracks;
+  void add_cluster(SciFiCluster* cluster) { _scificlusters.push_back(cluster); }
+
+  std::vector<SciFiCluster*> clusters() const { return _scificlusters; }
+
+  void add_spacepoint(SciFiSpacePoint* spacepoint) { _scifispacepoints.push_back(spacepoint); }
+
+  std::vector<SciFiSpacePoint*> spacepoints() const { return _scifispacepoints; }
+
+  void add_seeds(SciFiSpacePoint* seed) { _scifiseeds.push_back(seed); }
+
+  std::vector<SciFiSpacePoint*> seeds() const { return _scifiseeds; }
+
+  void add_straightprtrack(SciFiStraightPRTrack track) { _scifistraightprtracks.push_back(track); }
+
+  void set_straightprtrack(std::vector<SciFiStraightPRTrack> tracks) {
+                           _scifistraightprtracks = tracks; }
+
+  std::vector<SciFiStraightPRTrack> straightprtracks() const { return _scifistraightprtracks; }
+
+ private:
+  /// Hits in an event.
+  std::vector<SciFiHit*>            _scifihits;
+
+  /// Digits in an event.
+  std::vector<SciFiDigit*>          _scifidigits;
+
+  /// Clusters in an event.
+  std::vector<SciFiCluster*>        _scificlusters;
+
+  /// Spacepoints in an event.
+  std::vector<SciFiSpacePoint*>     _scifispacepoints;
+
+  /// Seeds for track fitting.
+  std::vector<SciFiSpacePoint*>     _scifiseeds;
+
+  /// Straight tracks.
+  std::vector<SciFiStraightPRTrack> _scifistraightprtracks;
 };  // Don't forget this trailing colon!!!!
-// }// ~namespace MAUS
+// } // ~namespace MAUS
 
 #endif

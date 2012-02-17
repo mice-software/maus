@@ -138,6 +138,6 @@ class PatternRecognition {
     static const double _res_cut = 15.0;
     static const double _chisq_cut = 15.0;
 };
-// }// ~namespace MAUS
+// } // ~namespace MAUS
 
 #endif

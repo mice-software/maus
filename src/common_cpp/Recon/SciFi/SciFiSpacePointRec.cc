@@ -25,11 +25,11 @@ SciFiSpacePointRec::~SciFiSpacePointRec() {}
 
 void SciFiSpacePointRec::process(SciFiEvent &evt) {
   int tracker, station, plane;
-  int clusters_size = evt.scificlusters.size();
+  int clusters_size = evt.clusters().size();
   // Store clusters in a vector.
   std::vector<SciFiCluster*> clusters[2][6][3];
   for ( int cl = 0; cl < clusters_size; cl++ ) {
-    SciFiCluster* a_cluster = evt.scificlusters[cl];
+    SciFiCluster* a_cluster = evt.clusters()[cl];
     tracker = a_cluster->get_tracker();
     station = a_cluster->get_station();
     plane   = a_cluster->get_plane();
@@ -61,7 +61,7 @@ void SciFiSpacePointRec::process(SciFiEvent &evt) {
                  clusters_are_not_used(candidate_A, candidate_B, candidate_C) ) {
               SciFiSpacePoint* triplet = new SciFiSpacePoint(candidate_A, candidate_B, candidate_C);
               build_triplet(triplet);
-              evt.scifispacepoints.push_back(triplet);
+              evt.add_spacepoint(triplet);
             }
           }  // ends plane 2
         }  // ends plane 1
@@ -76,13 +76,13 @@ void SciFiSpacePointRec::process(SciFiEvent &evt) {
         for ( int Station = 0; Station < 6; Station++ ) {  // for each station
           // Make all possible combinations of doublet clusters from views 0 & 1
           // looping over all clusters in view 0, then 1
-          for ( int cla = 0;
+          for ( unsigned int cla = 0;
                 cla < clusters[Tracker][Station][a_plane].size(); cla++ ) {
           SciFiCluster* candidate_A =
                           (clusters[Tracker][Station][a_plane])[cla];
 
             // Looping over all clusters in view 1,2, then 2
-            for ( int clb = 0;
+            for ( unsigned int clb = 0;
                   clb < clusters[Tracker][Station][another_plane].size();
                   clb++ ) {
               SciFiCluster* candidate_B =
@@ -93,7 +93,7 @@ void SciFiSpacePointRec::process(SciFiEvent &evt) {
                    duplet_within_radius(candidate_A, candidate_B) ) {
                 SciFiSpacePoint* duplet = new SciFiSpacePoint(candidate_A, candidate_B);
                 build_duplet(duplet);
-                evt.scifispacepoints.push_back(duplet);
+                evt.add_spacepoint(duplet);
               }
             }
           }
@@ -107,7 +107,7 @@ bool SciFiSpacePointRec::duplet_within_radius(SciFiCluster* candidate_A,
                                               SciFiCluster* candidate_B) {
   Hep3Vector pos = crossing_pos(candidate_A, candidate_B);
   double radius = pow(pow(pos.x(), 2)+pow(pos.y(), 2), 0.5);
-  if ( radius < 160 ) {
+  if ( radius < _acceptable_radius ) {
     return true;
   } else {
     return false;
@@ -117,9 +117,6 @@ bool SciFiSpacePointRec::duplet_within_radius(SciFiCluster* candidate_A,
 bool SciFiSpacePointRec::kuno_accepts(SciFiCluster* cluster1,
                                       SciFiCluster* cluster2,
                                       SciFiCluster* cluster3) {
-  const int kuno_0_5   = 320;
-  const int kuno_else  = 318;
-  const int kuno_toler = 2;
   // The 3 clusters passed to the kuno_accepts function belong
   // to the same station, only the planes are different
   int tracker = cluster1->get_tracker();
@@ -129,10 +126,10 @@ bool SciFiSpacePointRec::kuno_accepts(SciFiCluster* cluster1,
                   cluster2->get_channel() +
                   cluster3->get_channel();
 
-  if ( (tracker == 0 && station == 5 && (uvwSum < (kuno_0_5+kuno_toler))
-                                     && (uvwSum > (kuno_0_5-kuno_toler))) ||
-     (!(tracker == 0 && station == 5)&& (uvwSum < (kuno_else+kuno_toler))
-                                     && (uvwSum > (kuno_else-kuno_toler))) ) {
+  if ( (tracker == 0 && station == 5 && (uvwSum < (_kuno_0_5+_kuno_toler))
+                                     && (uvwSum > (_kuno_0_5-_kuno_toler))) ||
+     (!(tracker == 0 && station == 5)&& (uvwSum < (_kuno_else+_kuno_toler))
+                                     && (uvwSum > (_kuno_else-_kuno_toler))) ) {
     return true;
   } else {
     return false;
@@ -284,4 +281,4 @@ Hep3Vector SciFiSpacePointRec::crossing_pos(SciFiCluster* c1,
 
     return an_intersection;
 }
-// }// ~namespace MAUS
+// } // ~namespace MAUS

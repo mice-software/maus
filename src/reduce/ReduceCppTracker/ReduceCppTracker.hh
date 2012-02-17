@@ -97,8 +97,7 @@ class ReduceCppTracker {
   TTree _events;
   int _tracker_event;
   int _station_hits;
-  int _number_spacepoints;
-
+  // int _number_spacepoints;
 
   double tracker2;
 };

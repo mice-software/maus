@@ -50,8 +50,6 @@
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
 #include "src/common_cpp/Recon/SciFi/PatternRecognition.hh"
 
-// namespace MAUS {
-
 class MapCppTrackerRecon {
  public:
   /** Sets up the worker
@@ -129,5 +127,4 @@ class MapCppTrackerRecon {
   ///  Vector with the MICE SciFi Modules.
   std::vector<const MiceModule*> modules;
 }; // Don't forget this trailing colon!!!!
-// }// ~namespace MAUS
 #endif

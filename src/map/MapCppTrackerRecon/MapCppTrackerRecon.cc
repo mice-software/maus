@@ -17,8 +17,6 @@
 
 #include "src/map/MapCppTrackerRecon/MapCppTrackerRecon.hh"
 
-// namespace MAUS {
-
 bool MapCppTrackerRecon::birth(std::string argJsonConfigDocument) {
   _classname = "MapCppTrackerRecon";
 
@@ -58,7 +56,6 @@ std::string MapCppTrackerRecon::process(std::string document) {
   // Writes a line in the JSON document.
   Json::FastWriter writer;
   SciFiSpill spill;
-  spill.events_in_spill.clear();
 
   try {
     root = JsonWrapper::StringToJson(document);
@@ -73,22 +70,22 @@ std::string MapCppTrackerRecon::process(std::string document) {
   }
 
   try { // ================= Reconstruction =========================
-    for ( int k = 0; k < spill.events_in_spill.size(); k++ ) {
-      SciFiEvent event = spill.events_in_spill[k];
+    for ( int k = 0; k < spill.events().size(); k++ ) {
+      SciFiEvent event = *(spill.events()[k]);
       // Build Clusters.
-      if ( event.scifidigits.size() ) {
+      if ( event.digits().size() ) {
         cluster_recon(event);
       }
       // Build SpacePoints.
-      if ( event.scificlusters.size() ) {
+      if ( event.clusters().size() ) {
         spacepoint_recon(event);
       }
       // Pattern Recognition.
-      if ( event.scifispacepoints.size() ) {
+      if ( event.spacepoints().size() ) {
       pattern_recognition(event);
       }
-      print_event_info(event);
 
+      print_event_info(event);
       save_to_json(event);
     } // ==========================================================
   } catch(...) {
@@ -120,7 +117,7 @@ void MapCppTrackerRecon::digitization(SciFiSpill &spill, Json::Value &root) {
 
 void MapCppTrackerRecon::fill_digits_vector(Json::Value &digits_event, SciFiSpill &a_spill) {
   for ( unsigned int i = 0; i < digits_event.size(); i++ ) {
-    SciFiEvent an_event;
+    SciFiEvent* an_event = new SciFiEvent();
     Json::Value digits;
     digits = digits_event[i];
     for ( unsigned int j = 0; j < digits.size(); j++ ) {
@@ -134,9 +131,9 @@ void MapCppTrackerRecon::fill_digits_vector(Json::Value &digits_event, SciFiSpil
       npe     = digit["npe"].asDouble();
       time    = digit["time"].asInt();
       SciFiDigit* a_digit = new SciFiDigit(tracker, station, plane, channel, npe, time);
-      an_event.scifidigits.push_back(a_digit);
+      an_event->add_digit(a_digit);
     } // ends loop over digits in the event
-    a_spill.events_in_spill.push_back(an_event);
+    a_spill.add_event(an_event);
   } // ends loop over events.
 }
 
@@ -157,14 +154,14 @@ void MapCppTrackerRecon::pattern_recognition(SciFiEvent &evt) {
 
 void MapCppTrackerRecon::save_to_json(SciFiEvent &evt) {
   Json::Value digits;
-  for ( unsigned int dig_i = 0; dig_i < evt.scifidigits.size(); dig_i++ ) {
+  for ( unsigned int dig_i = 0; dig_i < evt.digits().size(); dig_i++ ) {
     Json::Value digits_in_event;
-    digits_in_event["tracker"]= evt.scifidigits[dig_i]->get_tracker();
-    digits_in_event["station"]= evt.scifidigits[dig_i]->get_station();
-    digits_in_event["plane"]  = evt.scifidigits[dig_i]->get_plane();
-    digits_in_event["channel"]= evt.scifidigits[dig_i]->get_channel();
-    digits_in_event["npe"]    = evt.scifidigits[dig_i]->get_npe();
-    digits_in_event["time"]   = evt.scifidigits[dig_i]->get_time();
+    digits_in_event["tracker"]= evt.digits()[dig_i]->get_tracker();
+    digits_in_event["station"]= evt.digits()[dig_i]->get_station();
+    digits_in_event["plane"]  = evt.digits()[dig_i]->get_plane();
+    digits_in_event["channel"]= evt.digits()[dig_i]->get_channel();
+    digits_in_event["npe"]    = evt.digits()[dig_i]->get_npe();
+    digits_in_event["time"]   = evt.digits()[dig_i]->get_time();
     digits.append(digits_in_event);
   }
   root["digits"].append(digits);
@@ -172,21 +169,21 @@ void MapCppTrackerRecon::save_to_json(SciFiEvent &evt) {
   Json::Value sp_tracker0;
   Json::Value sp_tracker1;
   Json::Value channels;
-  for ( unsigned int evt_i = 0; evt_i < evt.scifispacepoints.size(); evt_i++ ) {
+  for ( unsigned int evt_i = 0; evt_i < evt.spacepoints().size(); evt_i++ ) {
     Json::Value spacepoints_in_event;
     channels = Json::Value(Json::arrayValue);
     channels.clear();
-    int tracker = evt.scifispacepoints[evt_i]->get_tracker();
+    int tracker = evt.spacepoints()[evt_i]->get_tracker();
     spacepoints_in_event["tracker"]= tracker;
-    spacepoints_in_event["station"]= evt.scifispacepoints[evt_i]->get_station();
-    spacepoints_in_event["npe"]    = evt.scifispacepoints[evt_i]->get_npe();
-    // spacepoints_in_event["time"]   = evt.scifispacepoints[evt_i]->get_time();
-    spacepoints_in_event["type"]   = evt.scifispacepoints[evt_i]->get_type();
-    Hep3Vector pos = evt.scifispacepoints[evt_i]->get_position();
+    spacepoints_in_event["station"]= evt.spacepoints()[evt_i]->get_station();
+    spacepoints_in_event["npe"]    = evt.spacepoints()[evt_i]->get_npe();
+    // spacepoints_in_event["time"]   = evt.spacepoints()[evt_i]->get_time();
+    spacepoints_in_event["type"]   = evt.spacepoints()[evt_i]->get_type();
+    Hep3Vector pos = evt.spacepoints()[evt_i]->get_position();
     spacepoints_in_event["position"]["x"]   = pos.x();
     spacepoints_in_event["position"]["y"]   = pos.y();
     spacepoints_in_event["position"]["z"]   = pos.z();
-    std::vector<SciFiCluster*> clusters_in_spacepoint = evt.scifispacepoints[evt_i]->get_channels();
+    std::vector<SciFiCluster*> clusters_in_spacepoint = evt.spacepoints()[evt_i]->get_channels();
     for ( unsigned int cl = 0; cl < clusters_in_spacepoint.size(); cl++ ) {
       Json::Value cluster;
       cluster["plane_number"] = clusters_in_spacepoint[cl]->get_plane();
@@ -208,13 +205,13 @@ void MapCppTrackerRecon::save_to_json(SciFiEvent &evt) {
   // Tracks.
   Json::Value tracks_tracker0;
   Json::Value tracks_tracker1;
-  for ( unsigned int track_i = 0; track_i < evt.scifistraightprtracks.size(); track_i++ ) {
+  for ( unsigned int track_i = 0; track_i < evt.straightprtracks().size(); track_i++ ) {
     Json::Value a_track;
     int tracker = 0;
-    a_track["x0"] = evt.scifistraightprtracks[track_i].get_x0();
-    a_track["y0"] = evt.scifistraightprtracks[track_i].get_y0();
-    a_track["mx"] = evt.scifistraightprtracks[track_i].get_mx();
-    a_track["my"] = evt.scifistraightprtracks[track_i].get_my();
+    a_track["x0"] = evt.straightprtracks()[track_i].get_x0();
+    a_track["y0"] = evt.straightprtracks()[track_i].get_y0();
+    a_track["mx"] = evt.straightprtracks()[track_i].get_mx();
+    a_track["my"] = evt.straightprtracks()[track_i].get_my();
     a_track["tracker"] = tracker;
     if ( tracker == 0 ) {
       tracks_tracker0.append(a_track);
@@ -227,10 +224,10 @@ void MapCppTrackerRecon::save_to_json(SciFiEvent &evt) {
 }
 
 void MapCppTrackerRecon::print_event_info(SciFiEvent &event) {
-  std::cout << event.scifidigits.size() << " "
-            << event.scificlusters.size() << " "
-            << event.scifispacepoints.size() << " "
-	      << event.scifistraightprtracks.size() << " " << std::endl;
+  std::cout << event.digits().size() << " "
+            << event.clusters().size() << " "
+            << event.spacepoints().size() << " "
+	      << event.straightprtracks().size() << " " << std::endl;
 }
 
 // The following two functions are added for testing purposes only
@@ -248,4 +245,3 @@ std::string MapCppTrackerRecon::JsonToString(Json::Value json_in) {
   JsonWrapper::Print(ss_io, json_in);
   return ss_io.str();
 }
-// }// ~namespace MAUS

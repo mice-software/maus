@@ -78,6 +78,6 @@ class SciFiStraightPRTrack {
     double _mx;
     double _my;
 };
-// }// ~namespace MAUS
+// } // ~namespace MAUS
 
 #endif

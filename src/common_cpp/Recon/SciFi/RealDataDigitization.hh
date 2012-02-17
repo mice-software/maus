@@ -86,16 +86,16 @@ class RealDataDigitization {
    */
   bool load_bad_channels();
 
+  /** @brief Returns value depends on the goodness of the channel.
+   */
   bool is_good_channel(int board, int bank, int chan_ro);
 
-  // std::vector<Json::Value> get_calibration() const { return _calibration[16][4]; }
-
  private:
+  /// A vector containing calibration values for every 4 banks of the 16 boards.
   std::vector<Json::Value> _calibration[16][4];
 
+  /// This is a vector storing the goodness of each channel.
   bool good_chan[16][4][128];
-
-  int temp;
 
   // std::vector<int> _cryo;
   // std::vector<int> _cass;
@@ -110,6 +110,6 @@ class RealDataDigitization {
   std::vector<int> _inWG;
   std::vector<int> _WGfib;
 };  // Don't forget this trailing colon!!!!
-// }// ~namespace MAUS
+// } // ~namespace MAUS
 
 #endif

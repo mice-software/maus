@@ -42,7 +42,7 @@ class SciFiClusterRecTest : public ::testing::Test {
 
     SciFiCluster *cluster = new SciFiCluster();
 
-    event.scificlusters.push_back(cluster);
+    event.add_cluster(cluster);
   }
   virtual ~SciFiClusterRecTest() {}
   virtual void SetUp()    {}

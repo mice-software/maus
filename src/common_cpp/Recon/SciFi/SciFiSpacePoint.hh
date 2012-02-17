@@ -102,6 +102,6 @@ class SciFiSpacePoint {
 
   std::vector<SciFiCluster*>  _channels;
 };  // Don't forget this trailing colon!!!!
-// }// ~namespace MAUS
+// } // ~namespace MAUS
 
 #endif

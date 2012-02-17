@@ -38,8 +38,6 @@ class SciFiSpacePointTest : public ::testing::Test {
 TEST_F(SciFiSpacePointTest, test_setters_getters) {
   int tracker = 1;
   int station = 2;
-  // int plane = 0;
-  // int channel = 106;
   double npe = 3.2;
   double time = 12.2;
   // Hep3Vector direction(0.0, 0.0, 1.0);
@@ -49,11 +47,8 @@ TEST_F(SciFiSpacePointTest, test_setters_getters) {
 
   spacepoint->set_tracker(tracker);
   spacepoint->set_station(station);
-  // spacepoint->set_plane(plane);
-  // spacepoint->set_channel(channel);
   spacepoint->set_npe(npe);
   // spacepoint->set_time(time);
-  // spacepoint->set_direction(direction);
   spacepoint->set_position(position);
 
   EXPECT_EQ(spacepoint->get_tracker(), tracker);
@@ -61,7 +56,6 @@ TEST_F(SciFiSpacePointTest, test_setters_getters) {
 
   EXPECT_EQ(spacepoint->get_npe(), npe);
   // EXPECT_EQ(Cluster->get_time(), time);
-  // EXPECT_EQ(Cluster->get_direction(), direction);
   EXPECT_EQ(spacepoint->get_position(), position);
 }
 

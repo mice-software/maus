@@ -46,6 +46,6 @@ class SimpleLine {
     double _m;
     double _chisq;
 };
-// }// ~namespace MAUS
+// } // ~namespace MAUS
 
 #endif

@@ -43,6 +43,8 @@ class SciFiDigit {
  public:
   SciFiDigit(); // Default constructor
 
+  /** @brief Constructs a scifi digit initializing member variables.
+   */
   SciFiDigit(int tracker, int station, int plane, int channel, double npe, double time );
 
   ~SciFiDigit();
@@ -55,6 +57,7 @@ class SciFiDigit {
 
 //  int get_eventNo() const { return _eventNo; }
 
+  // list of getters and setters.
   void set_tracker(int trackerNo) { _tracker = trackerNo; }
 
   int get_tracker() const { return _tracker; }
@@ -93,6 +96,6 @@ class SciFiDigit {
 
   bool _used;
 };  // Don't forget this trailing colon!!!!
-// } ~namespace MAUS
+// } // ends namespace MAUS
 
 #endif

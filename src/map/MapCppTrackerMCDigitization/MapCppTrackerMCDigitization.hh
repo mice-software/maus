@@ -41,7 +41,6 @@
 #include "src/common_cpp/Recon/SciFi/SciFiHit.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiSpill.hh"
 
-// namespace MAUS {
 
 class MapCppTrackerMCDigitization {
  public:
@@ -52,40 +51,57 @@ class MapCppTrackerMCDigitization {
    */
   bool birth(std::string argJsonConfigDocument);
 
-  /** Shutdowns the worker
+  /** @brief Shutdowns the worker
    *
    *  This takes no arguments and does nothing
    */
   bool death();
 
-  /** process JSON document
+  /** @brief process JSON document
    *
    *  Receive a document with MC hits and return
    *  a document with digits
    */
   std::string process(std::string document);
 
-  /** sanity check
+  /** @brief sanity check
    *
-   *  Checks the sanity of the JSON input,
-   *  in particular, of the MC branch
+   *  Checks the sanity of of the MC branch
    */
   bool check_sanity_mc(Json::Value mc);
 
+  /** @brief sanity check
+   *
+   *  Checks the sanity of of the MC branch
+   */
   void json_to_cpp(Json::Value json_event, SciFiSpill &spill);
 
+  /** @brief builds digits and stores them in the SciFiEvent
+   */
   void construct_digits(SciFiEvent &event);
 
+  /** @brief computes npe from energy deposits.
+   */
   double compute_npe(double edep);
 
+  /** @brief computes scifi chan numb from GEANT fibre copy numb
+   */
   int compute_chan_no(SciFiHit *ahit);
 
+  /** @brief computes tdc from time.
+   */
   int compute_tdc_counts(double time);
 
+  /** @brief computes adc from npe.
+   */
   int compute_adc_counts(double numb_pe);
 
+  /** @brief checks if hits belong to the same scifi channel.
+   */
   bool check_param(SciFiHit *hit1, SciFiHit *hit2);
 
+  /** @brief saves digits to json.
+   */
   void save_to_json(SciFiEvent &evt);
 
  private:
@@ -105,6 +121,5 @@ class MapCppTrackerMCDigitization {
   /// an array contaning all MiceModules
   std::vector<const MiceModule*> modules;
 };  // Don't forget this trailing colon!!!!
-// }// ~namespace MAUS
 
 #endif

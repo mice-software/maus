@@ -28,9 +28,9 @@ SciFiClusterRec::~SciFiClusterRec() {}
 void SciFiClusterRec::process(SciFiEvent &evt, std::vector<const MiceModule*> modules) {
   // Create and fill the seeds vector.
   std::vector<SciFiDigit*>   seeds;
-  for ( unsigned int dig = 0; dig < evt.scifidigits.size(); dig++ ) {
-    if ( evt.scifidigits[dig]->get_npe() > _min_npe/2.0 )
-      seeds.push_back(evt.scifidigits[dig]);
+  for ( unsigned int dig = 0; dig < evt.digits().size(); dig++ ) {
+    if ( evt.digits()[dig]->get_npe() > _min_npe/2.0 )
+      seeds.push_back(evt.digits()[dig]);
   }
 
   // Get the number of clusters. If too large, abort reconstruction.
@@ -52,7 +52,7 @@ void SciFiClusterRec::process(SciFiEvent &evt, std::vector<const MiceModule*> mo
       int fibre   = seed->get_channel();
       double pe   = seed->get_npe();
       // Look for a neighbour.
-      for ( unsigned int j = i+1; j < seeds_size; j++ ) {
+      for ( int j = i+1; j < seeds_size; j++ ) {
         if ( !seeds[j]->is_used() && seeds[j]->get_tracker() == tracker &&
              seeds[j]->get_station() == station && seeds[j]->get_plane()   == plane &&
              abs(seeds[j]->get_channel() - fibre) < 2 ) {
@@ -70,7 +70,7 @@ void SciFiClusterRec::process(SciFiEvent &evt, std::vector<const MiceModule*> mo
           clust->add_digit(neigh);
         }
         construct(clust, modules);
-        evt.scificlusters.push_back(clust);
+        evt.add_cluster(clust);
       }
     }
   } // ends loop over seeds
@@ -139,4 +139,4 @@ Hep3Vector SciFiClusterRec::get_reference_frame_pos(int tracker,
   Hep3Vector reference_pos =  reference_plane->globalPosition();
   return reference_pos;
 }
-// }// ~namespace MAUS
+// } // ~namespace MAUS
