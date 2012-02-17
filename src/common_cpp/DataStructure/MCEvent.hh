@@ -17,8 +17,6 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_MCEVENTDATA_HH_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_MCEVENTDATA_HH_
 
-#include <vector>
-
 #include "Rtypes.h" // ROOT
 
 namespace MAUS {
@@ -33,12 +31,10 @@ class MCEvent {
   
   virtual ~MCEvent();
 
-  ClassDef(MCEvent, 1)
-
  private:
-};
 
-typedef std::vector<MCEvent*> MCEventArray;
+  ClassDef(MCEvent, 1)
+};
 
 }
 

@@ -22,7 +22,6 @@ import glob
 import subprocess
 import shutil
 
-
 MAUS_ROOT_DIR = os.environ['MAUS_ROOT_DIR']
 
 def install_python_tests(maus_root_dir, env):
@@ -109,6 +108,8 @@ def build_data_structure(env):
     called. We build this by calling root and letting it do it's dynamic linker 
     stuff
     """
+    # bug - if the *.so is deleted from src/common_cpp/DataStructure by hand; 
+    # ROOT doesn't usually rebuild unless the file has changed (I think)
     maus_root_dir = os.environ['MAUS_ROOT_DIR']
     data_struct = os.path.join(maus_root_dir, 'src/common_cpp/DataStructure/') 
     here = os.getcwd()

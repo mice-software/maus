@@ -31,9 +31,9 @@ class Scalars {
   
   virtual ~Scalars();
 
-  ClassDef(Scalars, 1)
-
  private:
+
+  ClassDef(Scalars, 1)
 };
 
 }

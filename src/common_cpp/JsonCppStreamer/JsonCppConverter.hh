@@ -3,7 +3,9 @@
 #include "json/json.h"
 
 #include "src/common_cpp/JsonCppStreamer/ConverterBase.hh"
-#include "src/common_cpp/DataStructure/MausEventStruct.hh"
+#include "src/common_cpp/DataStructure/Spill.hh"
+
+namespace MAUS {
 
 /*!
  * \class JsonCppConverter
@@ -18,29 +20,10 @@
  * \author Alexander Richards, Imperial College London
  * \date 06/01/2012
  */
-class JsonCppConverter : public ConverterBase<Json::Value, MausData>{
+class JsonCppConverter : public ConverterBase<Json::Value, Spill>{
 public:
-  /*!
-   * \brief Constructor
-   * \param MausData& a MausData object
-   */
-  JsonCppConverter(MausData&);
-  /*!
-   * \brief Constructor
-   * \param MausData* a pointer to a MausData object
-   */
-  JsonCppConverter(MausData*);
+  JsonCppConverter() : ConverterBase<Json::Value, Spill>(static_cast<Spill*>(NULL)) {}
 
-  /*!
-   * \brief Constructor
-   * \param Json::Value& a Json::Value object
-   */
-  JsonCppConverter(Json::Value&);
-  /*!
-   * \brief Constructor
-   * \param Json::Value* a pointer to aJson::Value object
-   */
-  JsonCppConverter(Json::Value*);
   /*!
    * \brief Convert Json value
    * Overloaded process initiate the conversion process converting the 
@@ -49,7 +32,8 @@ public:
    * \param Json::Value& The root \a Json::Value object from the Json data file 
    * \return a pointer to the MausData object
    */
-  MausData* operator()(const Json::Value&);
+  Spill* operator()(const Json::Value&);
+
   /*!
    * \brief Convert MausData
    * Overloaded process initiates the conversion process converting the 
@@ -58,15 +42,11 @@ public:
    * \param MausData& The root \a MausData object from the cpp data structure
    * \return a pointer to the Json::Value object 
    */
-  Json::Value* operator()(const MausData&);
+  Json::Value* operator()(const Spill&);
 
 private:
-  /*! \var Json::Reader m_reader
-   * \brief The Json string parser
-   */
-  Json::Reader m_reader;
 };
 
-
+}
 
 #endif

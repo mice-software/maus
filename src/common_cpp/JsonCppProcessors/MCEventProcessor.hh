@@ -20,13 +20,14 @@
 #include "json/value.h"
 
 #include "src/common_cpp/DataStructure/MCEvent.hh"
+#include "src/common_cpp/DataStructure/MCEventArray.hh"
 
 namespace MAUS {
 
 class MCEventArrayProcessor {
  public:
-  std::vector<MCEvent*>* operator()(const Json::Value& data);
-  Json::Value* operator()(const std::vector<MCEvent*>& data);
+  MCEventArray* operator()(const Json::Value& data);
+  Json::Value* operator()(const MCEventArray& data);
 
  private:
 };

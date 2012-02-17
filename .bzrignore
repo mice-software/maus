@@ -17,6 +17,7 @@ gmon.out
 list.prof
 unit_test
 tmp/*
+src/common_cpp/DataStructure/*.d
 src/input/*/build
 src/map/*/build
 tests/cpp_unit/test_cpp_unit

@@ -15,19 +15,21 @@
  */
 
 #include "src/common_cpp/JsonCppProcessors/MCEventProcessor.hh"
+#include <iostream>
 
 namespace MAUS {
 
-std::vector<MCEvent*>* MCEventArrayProcessor::operator()(const Json::Value& data) {
-    std::vector<MCEvent*>* event_vector = new std::vector<MCEvent*>();
+MCEventArray* MCEventArrayProcessor::operator()(const Json::Value& data) {
+    MCEventArray* event_vector = new MCEventArray();
     for (size_t i = 0; i < data.size(); ++i) {
         event_vector->push_back(MCEventProcessor()(data[i]));
     }
     return event_vector;
 }
 
-Json::Value* MCEventArrayProcessor::operator()(const std::vector<MCEvent*>& data) {
+Json::Value* MCEventArrayProcessor::operator()(const MCEventArray& data) {
     Json::Value* event_array = new Json::Value(Json::arrayValue);
+    std::cerr << "MCEventArray size " << data.size() << std::endl;
     for (size_t i = 0; i < data.size(); ++i) {
         event_array->append(MCEventProcessor()(data[i]));
     }

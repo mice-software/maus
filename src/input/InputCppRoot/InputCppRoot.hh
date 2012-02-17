@@ -23,14 +23,13 @@
 #include "json/json.h"
 
 #include "src/legacy/Interface/Squeal.hh"
+#include "src/common_cpp/DataStructure/Spill.hh"
 
-class Digits;
-class MC;
-class MausData;
-class JsonCppConverter;
 class irstream;
 
 namespace MAUS {
+
+class JsonCppConverter;
 
 /** @class InputCppRoot
  *
@@ -76,10 +75,7 @@ class InputCppRoot {
  private:
   irstream* _infile;
   JsonCppConverter* _jsonCppConverter;
-  Digits* _d;
-  MC* _mc;
-  MausData* _md;
-  Json::Value _val;
+  Spill* _spill;
   std::string _filename;
 };
 }

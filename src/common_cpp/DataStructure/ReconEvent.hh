@@ -33,9 +33,9 @@ class ReconEvent {
   
   virtual ~ReconEvent();
 
-  ClassDef(ReconEvent, 1)
-
  private:
+
+  ClassDef(ReconEvent, 1)
 };
 
 typedef std::vector<ReconEvent*> ReconEventArray;

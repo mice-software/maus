@@ -24,7 +24,7 @@
 #include "src/output/OutputCppRoot/OutputCppRoot.hh"
 
 namespace MAUS {
-
+/*
 // BUG - segmentation fault if I don't death() - probably not destructing in
 //       proper order
 
@@ -90,21 +90,8 @@ bool OutputCppRoot::death() {
     delete _outfile;
     _outfile = NULL;
   }
-  /*
-  if (_md != NULL) {
-    delete _md;
-    _md = NULL;
-  }
-  if (_mc != NULL) {
-    delete _mc;
-    _mc = NULL;
-  }
-  if (_d != NULL) {
-    delete _d;
-    _d = NULL;
-  }
-  */
   return true;
 }
+*/
 }
 

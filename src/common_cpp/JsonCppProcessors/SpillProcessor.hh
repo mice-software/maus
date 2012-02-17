@@ -19,14 +19,14 @@
 
 #include "json/value.h"
 
-#include "src/common_cpp/DataStructure/MausSpill.hh"
+#include "src/common_cpp/DataStructure/Spill.hh"
 
 namespace MAUS {
 
-class MausSpillProcessor {
+class SpillProcessor {
  public:
-  MausSpill* operator()(const Json::Value& data);
-  Json::Value* operator()(const MausSpill& data);
+  Spill* operator()(const Json::Value& data);
+  Json::Value* operator()(const Spill& data);
 
  private:
 };
