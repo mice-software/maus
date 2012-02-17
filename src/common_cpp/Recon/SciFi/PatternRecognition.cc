@@ -51,7 +51,7 @@ void PatternRecognition::straightprtrack_recon(SciFiEvent &evt) {
   // Split spacepoints up according to which tracker they occured in
   std::vector< std::vector<SciFiSpacePoint*> > spnts_by_tracker(_n_trackers);
   for ( int trker_no = 0; trker_no < _n_trackers; ++trker_no ) {  // Loop over trackers
-    for ( int i = 0; i < static_cast<int>(evt.spacepoints().size()); ++i ) {  // Loop over sp
+    for ( unsigned int i = 0; i < evt.spacepoints().size(); ++i ) {  // Loop over spacepoints
       if ( evt.spacepoints()[i]->get_tracker() == trker_no ) {
         spnts_by_tracker[trker_no].push_back(evt.spacepoints()[i]);
       }
@@ -142,7 +142,6 @@ void PatternRecognition::make_spr_5pt(const std::vector<SciFiSpacePoint*>& spnts
               }
             }
           }
-
           // Check we have at least 1 good sp in all the intermediate stations
           std::cout << "Number of stations with good sp: " << good_spnts.size() << std::endl;
           if ( good_spnts.size() > 2 ) {
@@ -171,7 +170,6 @@ void PatternRecognition::make_spr_5pt(const std::vector<SciFiSpacePoint*>& spnts
                 good_spnts[i]->set_used(true);
                 good_spacepoints.push_back(*good_spnts[i]);
               }
-
               track.set_spacepoints(good_spacepoints);
               trks.push_back(track);
 

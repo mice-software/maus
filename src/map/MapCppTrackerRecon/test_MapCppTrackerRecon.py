@@ -1,12 +1,18 @@
+"""  Test for MapCppTrackerRecon """
 import json
 import unittest
 import os
 import random
 from Configuration import Configuration
-# import ErrorHandler
 
 from MapCppTrackerRecon import MapCppTrackerRecon
-from MapPyFakeTestSimulation import MapPyFakeTestSimulation
+
+# Disable: Too many public methods
+# pylint: disable-msg=R0904
+# Disable: Invalid name
+# pylint: disable-msg=C0103
+# Disable: Class method should have 'cls' as first argument
+# pylint: disable-msg=C0202
 
 class MapCppTrackerReconTestCase(unittest.TestCase):
     """ The MapCppTrackerRecon test.
@@ -30,7 +36,7 @@ class MapCppTrackerReconTestCase(unittest.TestCase):
     (check the tests/cpp_unit/Recon/ directory).
 
     This python test will work over the process
-    """
+    """    
     @classmethod
     def setUpClass(self):
         """ Class Initializer.
@@ -54,28 +60,28 @@ class MapCppTrackerReconTestCase(unittest.TestCase):
         root_dir = os.environ.get("MAUS_ROOT_DIR")
         assert root_dir != None
         assert os.path.isdir(root_dir)
-        self._filename = \
+        _filename = \
         '%s/src/map/MapCppTrackerRecon/lab7_unpacked' % root_dir
-        assert os.path.isfile(self._filename)
-        self._file = open(self._filename, 'r')
+        assert os.path.isfile(_filename)
+        _file = open(_filename, 'r')
         # File is open.
         # Spill 1 is corrupted.
-        spill_1 = self._file.readline().rstrip()
+        spill_1 = _file.readline().rstrip()
         output_1 = self.mapper.process(spill_1)
         self.assertTrue("errors" in json.loads(output_1))
         # Spill 2 is sain.
-        spill_2 = self._file.readline().rstrip()
+        spill_2 = _file.readline().rstrip()
         output_2 = self.mapper.process(spill_2)
         self.assertTrue("digits" in json.loads(output_2))
         self.assertTrue("space_points" in json.loads(output_2))
         # spill 3 is end of event
-        spill_3 = self._file.readline().rstrip()
+        spill_3 = _file.readline().rstrip()
         output_3 = self.mapper.process(spill_3)
         self.assertTrue("END_OF_RUN" in json.loads(output_3))
         # self.assertFalse("errors" in json.loads(output_3))
         self.assertFalse("space_points" in json.loads(output_3))
         # Close file.
-        self._file.close()
+        _file.close()
 
     @classmethod
     def tear_down_class(self):

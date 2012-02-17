@@ -1,12 +1,11 @@
+"""Test for MapCppTrackerMCDigitization """
 import json
 import unittest
 import os
-import random
 from Configuration import Configuration
 # import ErrorHandler
 
 from MapCppTrackerMCDigitization import MapCppTrackerMCDigitization
-from MapPyFakeTestSimulation import MapPyFakeTestSimulation
 
 class MapCppTrackerMCDigitizationTestCase(unittest.TestCase):
     """ The MapCppTrackerRecon test.
@@ -32,7 +31,7 @@ class MapCppTrackerMCDigitizationTestCase(unittest.TestCase):
     This python test will work over the process
     """
     @classmethod
-    def setUpClass(self):
+    def setUpClass(self):  # pylint: disable-msg=C0103
         """ Class Initializer.
             The set up is called before each test function
             is called.
