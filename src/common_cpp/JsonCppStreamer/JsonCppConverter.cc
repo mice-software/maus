@@ -1,15 +1,16 @@
 #include "JsonCppConverter.hh" 
 
-#include "src/common_cpp/DataStructure/TestSpill.hh"
+#include "src/common_cpp/DataStructure/Spill.hh"
+#include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
 
 namespace MAUS {
 
-TestSpill* JsonCppConverter::operator()(const Json::Value& data){
-  return new TestSpill();
+Spill* JsonCppConverter::operator()(const Json::Value& data){
+  return SpillProcessor().JsonToCpp(data);
 }
 
-Json::Value* JsonCppConverter::operator()(const TestSpill& data){
-  return new Json::Value;
+Json::Value* JsonCppConverter::operator()(const Spill& data){
+  return SpillProcessor().CppToJson(data);
 }
 
 }

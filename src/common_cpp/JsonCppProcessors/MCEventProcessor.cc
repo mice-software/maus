@@ -36,6 +36,8 @@ Json::Value* MCEventArrayProcessor::operator()(const MCEventArray& data) {
     return event_array;
 }
 
+
+
 MCEvent* MCEventProcessor::operator()(const Json::Value& data) {
     return new MCEvent();
 }

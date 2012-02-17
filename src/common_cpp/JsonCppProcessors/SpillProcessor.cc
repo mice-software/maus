@@ -25,44 +25,17 @@
 
 namespace MAUS {
 
-Spill* SpillProcessor::operator()(const Json::Value& jv) {
-    Spill* ms = new Spill();
-
-    if (!jv["scalars"].isNull()) {
-        ms->SetScalars(*ScalarsProcessor()(jv["scalars"]));
-    }
-    if (!jv["emr_spill_data"].isNull()) {
-        ms->SetEMRSpillData(*EMRSpillDataProcessor()(jv["emr_spill_data"]));
-    }
-    if (!jv["daq_data"].isNull()) {
-        ms->SetDAQData(*DAQDataProcessor()(jv["daq_data"]));
-    }
-    if (!jv["mc_events"].isNull()) {
-        ms->SetMCEventArray(*MCEventArrayProcessor()(jv["mc_events"]));
-    }
-    if (!jv["recon_events"].isNull()) {
-        ms->SetReconEventArray(*ReconEventArrayProcessor()(jv["recon_events"]));
-    }
-
-    return ms;  
-}
-
-Json::Value* SpillProcessor::operator()(const Spill& cpp_spill) {
-        Json::Value* json_spill = new Json::Value();
-
-        std::cerr << "SPILL PROCESSOR 0 " << this << std::endl;
-        (*json_spill)["scalars"] = ScalarsProcessor()((cpp_spill.GetScalars()));
-        std::cerr << "SPILL PROCESSOR a" << std::endl;
-        (*json_spill)["emr_spill_data"] = EMRSpillDataProcessor()((cpp_spill.GetEMRSpillData()));
-        std::cerr << "SPILL PROCESSOR b" << std::endl;
-        (*json_spill)["daq_data"] = DAQDataProcessor()((cpp_spill.GetDAQData()));
-        std::cerr << "SPILL PROCESSOR c" << std::endl;
-        (*json_spill)["mc_events"] = MCEventArrayProcessor()((cpp_spill.GetMCEventArray()));
-        std::cerr << "SPILL PROCESSOR d" << std::endl;
-        (*json_spill)["recon_events"] = ReconEventArrayProcessor()((cpp_spill.GetReconEventArray()));
-        std::cerr << "SPILL PROCESSOR e" << std::endl;
-
-    return json_spill;  
+SpillProcessor::SpillProcessor() {
+    DAQDataProcessor ddp;
+    ScalarsProcessor scal;
+    EMRSpillDataProcessor emr;
+    ReconEventArrayProcessor rec;
+    MCEventArrayProcessor mc;
+    this->push_back(JsonCppItem<Spill, DAQData>("daq_data", &ddp, Spill::SetDAQData, Spill::GetDAQData, true));
+    JsonCppObjectProcessor<Spill>::push_back(JsonCppItem<Spill, Scalars>("scalars", &scal, Spill::SetScalars, Spill::GetScalars, true));
+    JsonCppObjectProcessor<Spill>::push_back(JsonCppItem<Spill, EMRSpillData>("emr_spill_data", &emr, Spill::SetEMRSpillData, Spill::GetEMRSpillData, true));
+    JsonCppObjectProcessor<Spill>::push_back(JsonCppItem<Spill, ReconEventArray>("recon_events", &rec, Spill::SetReconEventArray, Spill::GetReconEvents, true));
+    JsonCppObjectProcessor<Spill>::push_back(JsonCppItem<Spill, MCEventArray>("mc_events", &mc, Spill::SetMCEventArray, Spill::GetMCEvents, true));
 }
 
 }

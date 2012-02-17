@@ -3,7 +3,7 @@
 #include "json/json.h"
 
 #include "src/common_cpp/JsonCppStreamer/ConverterBase.hh"
-#include "src/common_cpp/DataStructure/TestSpill.hh"
+#include "src/common_cpp/DataStructure/Spill.hh"
 
 namespace MAUS {
 
@@ -20,9 +20,9 @@ namespace MAUS {
  * \author Alexander Richards, Imperial College London
  * \date 06/01/2012
  */
-class JsonCppConverter : public ConverterBase<Json::Value, TestSpill>{
+class JsonCppConverter : public ConverterBase<Json::Value, Spill>{
 public:
-  JsonCppConverter() : ConverterBase<Json::Value, TestSpill>(static_cast<TestSpill*>(NULL)) {}
+  JsonCppConverter() : ConverterBase<Json::Value, Spill>(static_cast<Spill*>(NULL)) {}
 
   /*!
    * \brief Convert Json value
@@ -32,7 +32,7 @@ public:
    * \param Json::Value& The root \a Json::Value object from the Json data file 
    * \return a pointer to the MausData object
    */
-  TestSpill* operator()(const Json::Value&);
+  Spill* operator()(const Json::Value&);
 
   /*!
    * \brief Convert MausData
@@ -42,7 +42,7 @@ public:
    * \param MausData& The root \a MausData object from the cpp data structure
    * \return a pointer to the Json::Value object 
    */
-  Json::Value* operator()(const TestSpill&);
+  Json::Value* operator()(const Spill&);
 
 private:
 };

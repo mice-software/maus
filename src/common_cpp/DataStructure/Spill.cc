@@ -20,15 +20,11 @@
 
 namespace MAUS {
 
-Spill::Spill() : _mc() {
+Spill::Spill() {
     std::cerr << "Spill Ctor " << this <<  std::endl;
 }
 
-Spill::Spill(const Spill& md) : _recon(md._recon),
-                               _mc(md._mc),
-                              _emr(md._emr),
-                              _scalars(md._scalars),
-                              _daq(md._daq) {
+Spill::Spill(const Spill& md) {
     std::cerr << "Spill Copy Ctor MC: " << &_mc << std::endl;
 }
        
@@ -83,6 +79,14 @@ void Spill::SetDAQData(DAQData daq) {
 
 DAQData Spill::GetDAQData() const {
   return _daq;
+}
+
+int Spill::GetMyInt() const { 
+    return my_int;
+}
+
+void Spill::SetMyInt(int _int) {
+    my_int = _int;
 }
 
 }

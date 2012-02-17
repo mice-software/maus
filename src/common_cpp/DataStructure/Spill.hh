@@ -61,12 +61,16 @@ class Spill {
   void SetReconEventArray(ReconEventArray ReconEvent);
   ReconEventArray GetReconEventArray() const;
 
+  int GetMyInt() const;
+  void SetMyInt(int i);
+
  private:
   DAQData _daq;
   Scalars _scalars;
   EMRSpillData _emr;
   MCEventArray _mc;
   ReconEventArray _recon;
+  int my_int;
   ClassDef(Spill, 1)
 };
 

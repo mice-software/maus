@@ -19,15 +19,22 @@
 
 #include "json/value.h"
 
+#include "src/common_cpp/JsonCppProcessors/JsonCppProcessorBase.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
 
 namespace MAUS {
 
-class SpillProcessor {
+class SpillProcessor : JsonCppObjectProcessor<Spill> {
  public:
-  Spill* operator()(const Json::Value& data);
-  Json::Value* operator()(const Spill& data);
+    SpillProcessor();
 
+    Spill* JsonToCpp(const Json::Value& json_spill) {
+        return JsonCppObjectProcessor<Spill>::JsonToCpp(json_spill);
+    }
+    Json::Value* CppToJson(const Spill& cpp_spill) {
+        return JsonCppObjectProcessor<Spill>::CppToJson(cpp_spill);
+    }
+    
  private:
 };
 

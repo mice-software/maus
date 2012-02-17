@@ -77,7 +77,7 @@ class InputCppRoot {
  private:
   irstream* _infile;
   JsonCppConverter* _jsonCppConverter;
-  TestSpill* _spill;
+  Spill* _spill;
   std::string _filename;
 };
 }

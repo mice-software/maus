@@ -38,7 +38,7 @@ InputCppRoot::~InputCppRoot() {
 bool InputCppRoot::test_script() {
   TFile* f = new TFile("TestFile.root", "RECREATE");
   TTree* t = new TTree("Data", "Spills");
-  TestSpill* spill = new TestSpill();
+  Spill* spill = new Spill();
   t->Branch("spill", spill, sizeof(*spill), 1);
   spill->SetMyInt(1);
   t->Fill();
@@ -51,15 +51,15 @@ bool InputCppRoot::test_script() {
 
   TFile* fin = new TFile("TestFile.root", "READ");
   TTree* tin = (TTree*)fin->Get("Data");
-  TestSpill* spillin = new TestSpill();
-  std::cerr << "New TestSpill " << spillin->GetMyInt() << std::endl;
+  Spill* spillin = new Spill();
+  std::cerr << "New Spill " << spillin->GetMyInt() << std::endl;
   tin->SetBranchAddress("spill", &spillin);
   std::cerr << tin->GetEntry(0);
-  std::cerr << "GetEntry TestSpill " << spillin << " " << spillin->GetMyInt() << std::endl;
+  std::cerr << "GetEntry Spill " << spillin << " " << spillin->GetMyInt() << std::endl;
   std::cerr << tin->GetEntry(1);
-  std::cerr << "GetEntry TestSpill " << spillin << " "  << spillin->GetMyInt() << std::endl;
+  std::cerr << "GetEntry Spill " << spillin << " "  << spillin->GetMyInt() << std::endl;
   std::cerr << tin->GetEntry(2);
-  std::cerr << "GetEntry TestSpill " << spillin << " "  << spillin->GetMyInt() << std::endl;
+  std::cerr << "GetEntry Spill " << spillin << " "  << spillin->GetMyInt() << std::endl;
   std::cerr << sizeof(*tin) << std::endl;
   fin->Close();
   return false;
@@ -73,7 +73,7 @@ bool InputCppRoot::birth(std::string json_datacards) {
   }
   _infile = new irstream(_filename.c_str());
 
-  _spill = new TestSpill();
+  _spill = new Spill();
 
   (*_infile) >> branchName("spill") >> _spill;
 
