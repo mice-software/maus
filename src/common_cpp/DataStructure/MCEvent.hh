@@ -17,9 +17,20 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_MCEVENT_HH_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_MCEVENT_HH_
 
+#include <vector>
+
 #include "Rtypes.h" // ROOT
 
 namespace MAUS {
+
+class MCTrack;
+class VirtualHit;
+class SDHit;
+class Primary;
+
+typedef std::vector<MCTrack> TrackArray;
+typedef std::vector<VirtualHit> VirtualHitArray;
+typedef std::vector<SDHit> SDHitArray;
 
 class MCEvent {
  public:
@@ -31,7 +42,24 @@ class MCEvent {
   
   virtual ~MCEvent();
 
+  TrackArray* GetTracks();
+  void SetTracks(TrackArray* tracks);
+
+  VirtualHitArray* GetVirtualHits();
+  void SetVirtualHits(VirtualHitArray* hits);
+
+  SDHitArray* GetSDHits();
+  void SetSDHits(SDHitArray* hits);
+
+  Primary* GetPrimary();
+  void SetPrimary(Primary* primary);
+
  private:
+
+  Primary* _primary;
+  VirtualHitArray* _virtuals;
+  SDHitArray* _sdhits;
+  TrackArray* _tracks;
 
   ClassDef(MCEvent, 1)
 };

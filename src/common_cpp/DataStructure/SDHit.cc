@@ -14,19 +14,5 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
-
-#include "src/common_cpp/JsonCppProcessors/MCEventProcessor.hh"
-
-namespace MAUS {
-
-MCEvent* MCEventProcessor::JsonToCpp(const Json::Value& data) {
-    return new MCEvent();
-}
-
-Json::Value* MCEventProcessor::CppToJson(const MCEvent& data) {
-    return new Json::Value();
-}
-
-}
+#include "src/common_cpp/DataStructure/SDHit.hh"
 

@@ -14,19 +14,32 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
+#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_PRIMARY_HH_
+#define _SRC_COMMON_CPP_DATASTRUCTURE_PRIMARY_HH_
 
-#include "src/common_cpp/JsonCppProcessors/MCEventProcessor.hh"
+#include <vector>
+
+#include "Rtypes.h" // ROOT
 
 namespace MAUS {
 
-MCEvent* MCEventProcessor::JsonToCpp(const Json::Value& data) {
-    return new MCEvent();
+class Primary {
+ public:
+  Primary() {}
+
+  Primary(const Primary& md) {}
+       
+  Primary& operator=(const Primary& md) {return *this;}
+  
+  virtual ~Primary() {}
+
+ private:
+
+
+  ClassDef(Primary, 1)
+};
+
 }
 
-Json::Value* MCEventProcessor::CppToJson(const MCEvent& data) {
-    return new Json::Value();
-}
-
-}
+#endif
 
