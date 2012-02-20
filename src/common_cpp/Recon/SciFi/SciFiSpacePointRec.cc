@@ -106,7 +106,7 @@ void SciFiSpacePointRec::process(SciFiEvent &evt) {
 bool SciFiSpacePointRec::duplet_within_radius(SciFiCluster* candidate_A,
                                               SciFiCluster* candidate_B) {
   Hep3Vector pos = crossing_pos(candidate_A, candidate_B);
-  double radius = pow(pow(pos.x(), 2)+pow(pos.y(), 2), 0.5);
+  double radius = pow(pow(pos.x(), 2.0)+pow(pos.y(), 2.0), 0.5);
   if ( radius < _acceptable_radius ) {
     return true;
   } else {

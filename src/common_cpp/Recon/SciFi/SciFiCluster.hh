@@ -98,11 +98,11 @@ class SciFiCluster {
   Hep3Vector get_position() const { return _position; }
 
  private:
+  bool _used;
+
   int _tracker, _station, _plane;
 
-  double _npe, _channel_w, _time;
-
-  bool _used;
+  double _channel_w, _npe, _time;
 
   Hep3Vector _direction;
 
