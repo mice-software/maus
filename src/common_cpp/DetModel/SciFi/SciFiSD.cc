@@ -47,7 +47,7 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
   double pid = aStep->GetTrack()->GetDefinition()->GetPDGEncoding();
 
   if ( edep == 0. ) return false;
-  if ( abs(pid) != 13 ) return false;
+  if ( fabs(pid) != 13 ) return false;
   // the old chanNo, held for comparison
   int old_chanNo = legacy_chanNo(aStep);
 
@@ -81,11 +81,11 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
   _hits[hit_i]["position"]["z"]= Pos.z();
 
   int chanNo;
-  int numbFibres = 7*2*(_module->propertyDouble("CentralFibre")+0.5);
+  int numbFibres = static_cast<int> (7*2*(_module->propertyDouble("CentralFibre")+0.5));
   if ( _module->propertyInt("Tracker") == 0 ) {
-    chanNo = floor((numbFibres-fiberNumber)/7);
+    chanNo = static_cast<int> (floor((numbFibres-fiberNumber)/7));
   } else {
-    chanNo = floor(fiberNumber/7);
+    chanNo = static_cast<int> (floor(fiberNumber/7));
   }
   // assert agreement on chanNo with legacy calculation
   assert(abs(chanNo-old_chanNo) < 2);

@@ -50,11 +50,11 @@ class SciFiSpacePoint {
 
   ~SciFiSpacePoint();
 
-  void set_tracker(double tracker) { _tracker = tracker; }
+  void set_tracker(int tracker) { _tracker = tracker; }
 
   int get_tracker() const { return _tracker; }
 
-  void set_station(double station) { _station = station; }
+  void set_station(int station) { _station = station; }
 
   int get_station() const { return _station; }
 
