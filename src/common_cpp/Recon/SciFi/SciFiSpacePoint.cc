@@ -55,7 +55,7 @@ SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2) {
   _tracker = clust1->get_tracker();
   _station = clust1->get_station();
   _npe = clust1->get_npe()+clust2->get_npe();
-  _chi2 = -10;
+  _chi2 = -10.0;
 
   // _position(0, 0, 0);
   // _time = 0;

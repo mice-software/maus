@@ -93,7 +93,7 @@ class SciFiSpacePoint {
 
   Hep3Vector _position;
 
-  int _chi2;
+  double _chi2;
 
   bool _used;
   // int _time, _time_error, _time_res;
