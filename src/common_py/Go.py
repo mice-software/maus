@@ -285,7 +285,7 @@ class PipelineSingleThreadDataflowExecutor:
                 self.outputer.save(spill)
 
             i += len(map_buffer)
-            map_buffer = DataflowUtilities.buffer_input(emitter, 1)
+            map_buffer = DataflowUtilities.buffer_input(emitter, 128)
 
             # Not Python 3 compatible print() due to backward
             # compatability. 
