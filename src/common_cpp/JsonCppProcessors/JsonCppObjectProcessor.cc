@@ -14,29 +14,5 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_MCEVENT_HH_
-#define _SRC_COMMON_CPP_DATASTRUCTURE_MCEVENT_HH_
-
-#include "Rtypes.h" // ROOT
-
-namespace MAUS {
-
-class MCEvent {
- public:
-  MCEvent();
-
-  MCEvent(const MCEvent& md);
-       
-  MCEvent& operator=(const MCEvent& md);
-  
-  virtual ~MCEvent();
-
- private:
-
-  ClassDef(MCEvent, 1)
-};
-
-}
-
-#endif
+#include "src/common_cpp/JsonCppProcessors/JsonCppObjectProcessor.hh"
 

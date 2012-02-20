@@ -20,56 +20,52 @@
 
 namespace MAUS {
 
-Spill::Spill() {
-    std::cerr << "Spill Ctor " << this <<  std::endl;
+Spill::Spill()
+        : _daq(NULL), _scalars(NULL), _emr(NULL), _mc(NULL), _recon(NULL), _spill_number(0) {
 }
 
 Spill::Spill(const Spill& md) {
-    std::cerr << "Spill Copy Ctor MC: " << &_mc << std::endl;
 }
        
 Spill& Spill::operator=(const Spill& md) {
     if (this == &md) {
         return *this;
     }
-    std::cerr << "Spill Eq Operator MC: " << &_mc << std::endl; 
     return *this;
 }
   
 Spill::~Spill() {
 }
 
-void Spill::SetScalars(Scalars scalars) {
+void Spill::SetScalars(Scalars* scalars) {
   _scalars = scalars;
 }
 
-Scalars Spill::GetScalars() const {
+Scalars* Spill::GetScalars() const {
   return _scalars;
 }
 
-void Spill::SetEMRSpillData(EMRSpillData emr) {
+void Spill::SetEMRSpillData(EMRSpillData* emr) {
   _emr = emr;
 }
 
-EMRSpillData Spill::GetEMRSpillData() const {
+EMRSpillData* Spill::GetEMRSpillData() const {
   return _emr;
 }
 
-void Spill::SetMCEventArray(MCEventArray mc) {
+void Spill::SetMCEvents(MCEventArray* mc) {
   _mc = mc;
-  std::cerr << "SET MC:" << &_mc << std::endl;
 }
 
-MCEventArray Spill::GetMCEventArray() const {
-  std::cerr << "GET MC:" << &_mc << std::endl;
+MCEventArray* Spill::GetMCEvents() const {
   return _mc;
 }
 
-void Spill::SetReconEventArray(ReconEventArray recon) {
+void Spill::SetReconEvents(ReconEventArray* recon) {
   _recon = recon;
 }
 
-ReconEventArray Spill::GetReconEventArray() const {
+ReconEventArray* Spill::GetReconEvents() const {
   return _recon;
 }
 
@@ -81,12 +77,12 @@ DAQData* Spill::GetDAQData() const {
   return _daq;
 }
 
-int Spill::GetMyInt() const { 
-    return my_int;
+void Spill::SetSpillNumber(int spill) {
+  _spill_number = spill;
 }
 
-void Spill::SetMyInt(int _int) {
-    my_int = _int;
+int Spill::GetSpillNumber() const {
+  return _spill_number;
 }
 
 }

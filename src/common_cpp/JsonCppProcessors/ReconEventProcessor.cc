@@ -18,30 +18,12 @@
 
 namespace MAUS {
 
-ReconEventArray* ReconEventArrayProcessor::operator()(const Json::Value& data) {
-    ReconEventArray* event_vector = new ReconEventArray();
-    for (size_t i = 0; i < data.size(); ++i) {
-        ReconEvent* ev = ReconEventProcessor()(data[i]);
-        event_vector->push_back(ev);
-    }
-    return event_vector;
-}
-
-Json::Value* ReconEventArrayProcessor::operator()(const std::vector<ReconEvent*>& data) {
-    Json::Value* event_array = new Json::Value(Json::arrayValue);
-    for (size_t i = 0; i < data.size(); ++i) {
-        event_array->append(ReconEventProcessor()(data[i]));
-    }
-    return event_array;
-}
-
-ReconEvent* ReconEventProcessor::operator()(const Json::Value& data) {
+ReconEvent* ReconEventProcessor::JsonToCpp(const Json::Value& data) {
     return new ReconEvent();
 }
 
-Json::Value* ReconEventProcessor::operator()(const ReconEvent& data) {
+Json::Value* ReconEventProcessor::CppToJson(const ReconEvent& data) {
     return new Json::Value();
 }
 
 }
-

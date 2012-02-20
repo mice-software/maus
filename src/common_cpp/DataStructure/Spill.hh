@@ -19,22 +19,17 @@
 
 #include "Rtypes.h"
 
+#include <vector>
+
 #include "src/common_cpp/DataStructure/DAQData.hh"
 #include "src/common_cpp/DataStructure/EMRSpillData.hh"
 #include "src/common_cpp/DataStructure/Scalars.hh"
 #include "src/common_cpp/DataStructure/MCEvent.hh"
-#include "src/common_cpp/DataStructure/MCEventArray.hh"
 #include "src/common_cpp/DataStructure/ReconEvent.hh"
 
 namespace MAUS {
-
-class Scalars;
-class EMRSpillData;
-class MCEvent;
-class ReconEvent;
-class DAQData;
-class MCEventArray;
 typedef std::vector<ReconEvent*> ReconEventArray;
+typedef std::vector<MCEvent*> MCEventArray;
 
 class Spill {
  public:
@@ -46,31 +41,31 @@ class Spill {
   
   virtual ~Spill();
   
-  void SetScalars(Scalars scalars);
-  Scalars GetScalars() const;
+  void SetScalars(Scalars* scalars);
+  Scalars* GetScalars() const;
 
-  void SetEMRSpillData(EMRSpillData emr);
-  EMRSpillData GetEMRSpillData() const;
+  void SetEMRSpillData(EMRSpillData* emr);
+  EMRSpillData* GetEMRSpillData() const;
 
   void SetDAQData(DAQData* daq);
   DAQData* GetDAQData() const;
 
-  void SetMCEventArray(MCEventArray MCEvent);
-  MCEventArray GetMCEventArray() const;
+  void SetMCEvents(MCEventArray* events);
+  MCEventArray* GetMCEvents() const;
 
-  void SetReconEventArray(ReconEventArray ReconEvent);
-  ReconEventArray GetReconEventArray() const;
+  void SetReconEvents(ReconEventArray* ReconEvent);
+  ReconEventArray* GetReconEvents() const;
 
-  int GetMyInt() const;
-  void SetMyInt(int i);
+  void SetSpillNumber(int spill);
+  int GetSpillNumber() const;
 
  private:
   DAQData* _daq;
-  Scalars _scalars;
-  EMRSpillData _emr;
-  MCEventArray _mc;
-  ReconEventArray _recon;
-  int my_int;
+  Scalars* _scalars;
+  EMRSpillData* _emr;
+  MCEventArray* _mc;
+  ReconEventArray* _recon;
+  int _spill_number;
   ClassDef(Spill, 1)
 };
 

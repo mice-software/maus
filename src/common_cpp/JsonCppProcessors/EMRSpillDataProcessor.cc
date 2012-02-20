@@ -18,11 +18,11 @@
 
 namespace MAUS {
 
-EMRSpillData* EMRSpillDataProcessor::operator()(const Json::Value& data) {
+EMRSpillData* EMRSpillDataProcessor::JsonToCpp(const Json::Value& data) {
     return new EMRSpillData();
 }
 
-Json::Value* EMRSpillDataProcessor::operator()(const EMRSpillData& data) {
+Json::Value* EMRSpillDataProcessor::CppToJson(const EMRSpillData& data) {
     return new Json::Value();
 }
 

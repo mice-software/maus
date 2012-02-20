@@ -19,12 +19,22 @@
 
 #include "json/value.h"
 
-#include "src/common_cpp/JsonCppProcessors/JsonCppProcessorBase.hh"
+#include "src/common_cpp/JsonCppProcessors/DAQDataProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/ScalarsProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/EMRSpillDataProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/MCEventProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/JsonCppPrimitivesProcessors.hh"
+#include "src/common_cpp/JsonCppProcessors/JsonCppArrayProcessors.hh"
+
+#include "src/common_cpp/JsonCppProcessors/JsonCppObjectProcessor.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
+
 
 namespace MAUS {
 
-class SpillProcessor : JsonCppObjectProcessor<Spill> {
+typedef std::vector<MCEvent*> MCEventArray;
+
+class SpillProcessor : public JsonCppObjectProcessor<Spill> {
  public:
     SpillProcessor();
 
@@ -36,6 +46,15 @@ class SpillProcessor : JsonCppObjectProcessor<Spill> {
     }
     
  private:
+    Spill _spill;
+
+    ScalarsProcessor _scal_proc;
+    DAQDataProcessor _daq_proc;
+    EMRSpillDataProcessor _emr_proc;
+    JsonCppPointerArrayProcessor<MCEvent> _mc_array_proc;
+    JsonCppPointerArrayProcessor<ReconEvent> _recon_array_proc;
+    JsonCppIntProcessor _int_proc;
+
 };
 
 }

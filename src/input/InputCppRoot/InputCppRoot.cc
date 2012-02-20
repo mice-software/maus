@@ -22,6 +22,9 @@
 
 #include "src/input/InputCppRoot/InputCppRoot.hh"
 
+#include "src/common_cpp/DataStructure/DAQData.hh"
+#include "src/common_cpp/DataStructure/MCEvent.hh"
+
 #include "src/common_cpp/JsonCppStreamer/JsonCppConverter.hh"
 #include "src/common_cpp/JsonCppStreamer/IRStream.hh"
 
@@ -39,12 +42,14 @@ bool InputCppRoot::test_script() {
   TFile* f = new TFile("TestFile.root", "RECREATE");
   TTree* t = new TTree("Data", "Spills");
   Spill* spill = new Spill();
+  spill->SetDAQData(new DAQData());
+  spill->SetMCEvents(new MCEventArray);
   t->Branch("spill", spill, sizeof(*spill), 1);
-  spill->SetMyInt(1);
+  spill->SetSpillNumber(1);
   t->Fill();
-  spill->SetMyInt(2);
+  spill->SetSpillNumber(2);
   t->Fill();
-  spill->SetMyInt(3);
+  spill->SetSpillNumber(3);
   t->Fill();
   t->Write();
   f->Close();
@@ -52,14 +57,10 @@ bool InputCppRoot::test_script() {
   TFile* fin = new TFile("TestFile.root", "READ");
   TTree* tin = (TTree*)fin->Get("Data");
   Spill* spillin = new Spill();
-  std::cerr << "New Spill " << spillin->GetMyInt() << std::endl;
   tin->SetBranchAddress("spill", &spillin);
   std::cerr << tin->GetEntry(0);
-  std::cerr << "GetEntry Spill " << spillin << " " << spillin->GetMyInt() << std::endl;
   std::cerr << tin->GetEntry(1);
-  std::cerr << "GetEntry Spill " << spillin << " "  << spillin->GetMyInt() << std::endl;
   std::cerr << tin->GetEntry(2);
-  std::cerr << "GetEntry Spill " << spillin << " "  << spillin->GetMyInt() << std::endl;
   std::cerr << sizeof(*tin) << std::endl;
   fin->Close();
   return false;
@@ -108,12 +109,10 @@ std::string InputCppRoot::getNextEvent() {
       "InputCppRoot::getNextEvent"
     ) );
   }
-  std::cerr << "_spill originally " << _spill << std::endl;
   if ((*_infile) >> readEvent == NULL) {
     return "";
   }
-  std::cerr << "_spill conversion " << _spill << std::endl;
-  std::cerr << "spill int " << _spill->GetMyInt() << std::endl;
+  _spill->SetDAQData(new DAQData());
   Json::Value* value = (*_jsonCppConverter)(*_spill);
   Json::FastWriter writer;
   return writer.write(*value);

@@ -19,15 +19,21 @@
 
 #include "json/value.h"
 
+#include "src/common_cpp/JsonCppProcessors/JsonCppProcessorBase.hh"
+
 #include "src/common_cpp/DataStructure/Scalars.hh"
 
 namespace MAUS {
 
-class ScalarsProcessor {
-  public:
-    Scalars* operator()(const Json::Value& data);
-    Json::Value* operator()(const Scalars& data);
+class ScalarsProcessor : public JsonCppProcessorBase<Scalars> {
+ public:
+  Scalars* JsonToCpp(const Json::Value& data);
+  Json::Value* CppToJson(const Scalars& data);
+
+ private:
 };
+
+
 
 }
 

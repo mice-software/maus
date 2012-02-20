@@ -18,11 +18,11 @@
 
 namespace MAUS {
 
-Scalars* ScalarsProcessor::operator()(const Json::Value& data) {
+Scalars* ScalarsProcessor::JsonToCpp(const Json::Value& data) {
     return new Scalars();
 }
 
-Json::Value* ScalarsProcessor::operator()(const Scalars& data) {
+Json::Value* ScalarsProcessor::CppToJson(const Scalars& data) {
     return new Json::Value();
 }
 

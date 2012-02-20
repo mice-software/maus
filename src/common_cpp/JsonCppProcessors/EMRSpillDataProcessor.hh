@@ -19,14 +19,16 @@
 
 #include "json/value.h"
 
+#include "src/common_cpp/JsonCppProcessors/JsonCppProcessorBase.hh"
+
 #include "src/common_cpp/DataStructure/EMRSpillData.hh"
 
 namespace MAUS {
 
-class EMRSpillDataProcessor {
+class EMRSpillDataProcessor : public JsonCppProcessorBase<EMRSpillData>  {
  public:
-  EMRSpillData* operator()(const Json::Value& data);
-  Json::Value* operator()(const EMRSpillData& data);
+  EMRSpillData* JsonToCpp(const Json::Value& data);
+  Json::Value* CppToJson(const EMRSpillData& data);
 
  private:
 };

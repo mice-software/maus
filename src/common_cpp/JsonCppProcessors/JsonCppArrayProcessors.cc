@@ -14,41 +14,5 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_MCEVENTARRAY_HH_
-#define _SRC_COMMON_CPP_DATASTRUCTURE_MCEVENTARRAY_HH_
+#include "src/common_cpp/JsonCppProcessors/JsonCppArrayProcessors.hh"
 
-#include "Rtypes.h" // ROOT
-
-#include <vector>
-
-namespace MAUS {
-
-class MCEvent;
-
-class MCEventArray {
- public:
-  MCEventArray();
-
-  MCEventArray(const MCEventArray& md);
-
-  MCEventArray& operator=(const MCEventArray& md);
-
-  ~MCEventArray();
-
-  void push_back(MCEvent* ev);
-
-  size_t size() const;
-
-  MCEvent*& operator[](size_t i);
-
-  MCEvent* operator[](size_t i) const;
-
- private:
-
-  std::vector<MCEvent*> _vec;
-  ClassDef(MCEventArray, 1)
-};
-
-}
-
-#endif

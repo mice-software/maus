@@ -14,26 +14,23 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/ScalarsProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/EMRSpillDataProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/DAQDataProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/MCEventProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/ReconEventProcessor.hh"
-
 #include <iostream>
+
+#include "src/common_cpp/JsonCppProcessors/ReconEventProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/MCEventProcessor.hh"
+
+#include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
 
 namespace MAUS {
 
-SpillProcessor::SpillProcessor() {
-    Spill* a_spill;
-    DAQDataProcessor ddp;
-    JsonCppObjectProcessor<Spill>::add_branch<DAQData>(std::string("daq_data"), &ddp, a_spill, &Spill::GetDAQData, &Spill::SetDAQData, true);
+SpillProcessor::SpillProcessor() :_mc_array_proc(new MCEventProcessor()), _recon_array_proc(new ReconEventProcessor()) {
+    AddPointerBranch("scalars", &_scal_proc, &Spill::GetScalars, &Spill::SetScalars, true);
+    AddPointerBranch("daq_data", &_daq_proc, &Spill::GetDAQData, &Spill::SetDAQData, true);
+    AddPointerBranch("emr_spill_data", &_emr_proc, &Spill::GetEMRSpillData, &Spill::SetEMRSpillData, true);
+    AddPointerBranch("mc_events", &_mc_array_proc, &Spill::GetMCEvents, &Spill::SetMCEvents, false);
+    AddPointerBranch("recon_events", &_recon_array_proc, &Spill::GetReconEvents, &Spill::SetReconEvents, true);
+    AddValueBranch("spill_number", &_int_proc, &Spill::GetSpillNumber, &Spill::SetSpillNumber, true);
 /*
-    ScalarsProcessor scal;
-    EMRSpillDataProcessor emr;
-    ReconEventArrayProcessor rec;
-    MCEventArrayProcessor mc;
 
     JsonCppObjectProcessor<Spill>::add_branch<DAQData>(std::string("daq_data"), &scal, a_spill, &Spill::GetDAQData, &Spill::SetDAQData, true);
     JsonCppObjectProcessor<Spill>::add_branch<DAQData>(std::string("daq_data"), &emr, a_spill, &Spill::GetDAQData, &Spill::SetDAQData, true);

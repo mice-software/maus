@@ -19,30 +19,11 @@
 
 namespace MAUS {
 
-MCEventArray* MCEventArrayProcessor::operator()(const Json::Value& data) {
-    MCEventArray* event_vector = new MCEventArray();
-    for (size_t i = 0; i < data.size(); ++i) {
-        event_vector->push_back(MCEventProcessor()(data[i]));
-    }
-    return event_vector;
-}
-
-Json::Value* MCEventArrayProcessor::operator()(const MCEventArray& data) {
-    Json::Value* event_array = new Json::Value(Json::arrayValue);
-    std::cerr << "MCEventArray size " << data.size() << std::endl;
-    for (size_t i = 0; i < data.size(); ++i) {
-        event_array->append(MCEventProcessor()(data[i]));
-    }
-    return event_array;
-}
-
-
-
-MCEvent* MCEventProcessor::operator()(const Json::Value& data) {
+MCEvent* MCEventProcessor::JsonToCpp(const Json::Value& data) {
     return new MCEvent();
 }
 
-Json::Value* MCEventProcessor::operator()(const MCEvent& data) {
+Json::Value* MCEventProcessor::CppToJson(const MCEvent& data) {
     return new Json::Value();
 }
 

@@ -19,22 +19,16 @@
 
 #include "json/value.h"
 
+#include "src/common_cpp/JsonCppProcessors/JsonCppObjectProcessor.hh"
+
 #include "src/common_cpp/DataStructure/ReconEvent.hh"
 
 namespace MAUS {
 
-class ReconEventArrayProcessor {
+class ReconEventProcessor : public JsonCppObjectProcessor<ReconEvent> {
  public:
-  ReconEventArray* operator()(const Json::Value& data);
-  Json::Value* operator()(const ReconEventArray& data);
-
- private:
-};
-
-class ReconEventProcessor {
- public:
-  ReconEvent* operator()(const Json::Value& data);
-  Json::Value* operator()(const ReconEvent& data);
+  ReconEvent* JsonToCpp(const Json::Value& data);
+  Json::Value* CppToJson(const ReconEvent& data);
 
  private:
 
