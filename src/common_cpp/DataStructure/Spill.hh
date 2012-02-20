@@ -52,8 +52,8 @@ class Spill {
   void SetEMRSpillData(EMRSpillData emr);
   EMRSpillData GetEMRSpillData() const;
 
-  void SetDAQData(DAQData daq);
-  DAQData GetDAQData() const;
+  void SetDAQData(DAQData* daq);
+  DAQData* GetDAQData() const;
 
   void SetMCEventArray(MCEventArray MCEvent);
   MCEventArray GetMCEventArray() const;
@@ -65,7 +65,7 @@ class Spill {
   void SetMyInt(int i);
 
  private:
-  DAQData _daq;
+  DAQData* _daq;
   Scalars _scalars;
   EMRSpillData _emr;
   MCEventArray _mc;

@@ -14,8 +14,6 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "src/legacy/Interface/Squeal.hh"
-
 #include "src/common_cpp/JsonCppProcessors/JsonCppProcessorBase.hh"
 
 namespace MAUS {
@@ -82,68 +80,6 @@ Json::Value* JsonCppArrayProcessor<ArrayContents>::
     return json_array;
 
 }
-
-template <class ObjectType>
-template <class ChildType>
-void JsonCppObjectProcessor<ObjectType>::push_back(JsonCppItem<ObjectType, ChildType> class_member) {
-    JsonCppBaseItem<ObjectType> item = new JsonCppItem<ObjectType, ChildType>(class_member);
-    items.push_back(item);
-}
-//    virtual void SetCppChild(ParentType& parent);
-//    virtual Json::Value* GetJsonChild(const ParentType& parent);
-
-template <class ObjectType>
-ObjectType* JsonCppObjectProcessor<ObjectType>::JsonToCpp(const Json::Value& json_object) {
-    ObjectType* cpp_object = new ObjectType();
-    for (size_t i = 0; i < items.size(); ++i) {
-        try {
-            items[i].SetCppChild(json_object, *cpp_object);
-        } catch (Squeal squee) {
-            delete cpp_object;
-            throw squee;
-        }
-    }
-    return cpp_object;
-}
-
-template <class ObjectType>
-Json::Value* JsonCppObjectProcessor<ObjectType>::CppToJson(const ObjectType& cpp_object) {
-    Json::Value* json_object = new Json::Value(Json::objectValue);
-    for (size_t i = 0; i < items.size(); ++i) {
-        try {
-            items[i].SetJsonChild(cpp_object, *json_object);
-        } catch (Squeal squee) {
-            delete json_object;
-            throw squee;
-        }
-    }
-    return json_object;
-}
-
-template <class ObjectType>
-template <class ChildType>
-JsonCppItem<ObjectType, ChildType>::JsonCppItem<ObjectType, ChildType>
-    (std::string branch_name, JsonCppProcessorBase<ObjectType>* child_processor,
-                         SetMethod setter, GetMethod getter, bool is_required) 
-    : _branch(branch_name), _processor(child_processor), _setter(setter),
-      _getter(getter), _require(is_required) {   
-}
-
-template <class ObjectType>
-template <class ChildType>
-void JsonCppItem<ObjectType, ChildType>::SetCppChild(const Json::Value& parent_json, ObjectType& parent_cpp) {
-    
-}
-
-template <class ObjectType>
-template <class ChildType>
-void JsonCppItem<ObjectType, ChildType>::GetJsonChild(const ObjectType& parent_cpp, Json::Value& parent_json) {
-}
-
-
-    // Set the child in the ParentInstance
-//    virtual void SetCppChild(const Json::Value& parent_json, ParentType& parent_cpp);
-//    virtual void GetJsonChild(const ParentType& parent_cpp, Json::Value& parent_json);
 
 
 

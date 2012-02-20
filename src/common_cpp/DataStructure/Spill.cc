@@ -73,11 +73,11 @@ ReconEventArray Spill::GetReconEventArray() const {
   return _recon;
 }
 
-void Spill::SetDAQData(DAQData daq) {
+void Spill::SetDAQData(DAQData* daq) {
   _daq = daq;
 }
 
-DAQData Spill::GetDAQData() const {
+DAQData* Spill::GetDAQData() const {
   return _daq;
 }
 

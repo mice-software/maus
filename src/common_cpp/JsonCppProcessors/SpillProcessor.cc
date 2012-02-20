@@ -26,16 +26,20 @@
 namespace MAUS {
 
 SpillProcessor::SpillProcessor() {
+    Spill* a_spill;
     DAQDataProcessor ddp;
+    JsonCppObjectProcessor<Spill>::add_branch<DAQData>(std::string("daq_data"), &ddp, a_spill, &Spill::GetDAQData, &Spill::SetDAQData, true);
+/*
     ScalarsProcessor scal;
     EMRSpillDataProcessor emr;
     ReconEventArrayProcessor rec;
     MCEventArrayProcessor mc;
-    this->push_back(JsonCppItem<Spill, DAQData>("daq_data", &ddp, Spill::SetDAQData, Spill::GetDAQData, true));
-    JsonCppObjectProcessor<Spill>::push_back(JsonCppItem<Spill, Scalars>("scalars", &scal, Spill::SetScalars, Spill::GetScalars, true));
-    JsonCppObjectProcessor<Spill>::push_back(JsonCppItem<Spill, EMRSpillData>("emr_spill_data", &emr, Spill::SetEMRSpillData, Spill::GetEMRSpillData, true));
-    JsonCppObjectProcessor<Spill>::push_back(JsonCppItem<Spill, ReconEventArray>("recon_events", &rec, Spill::SetReconEventArray, Spill::GetReconEvents, true));
-    JsonCppObjectProcessor<Spill>::push_back(JsonCppItem<Spill, MCEventArray>("mc_events", &mc, Spill::SetMCEventArray, Spill::GetMCEvents, true));
+
+    JsonCppObjectProcessor<Spill>::add_branch<DAQData>(std::string("daq_data"), &scal, a_spill, &Spill::GetDAQData, &Spill::SetDAQData, true);
+    JsonCppObjectProcessor<Spill>::add_branch<DAQData>(std::string("daq_data"), &emr, a_spill, &Spill::GetDAQData, &Spill::SetDAQData, true);
+    JsonCppObjectProcessor<Spill>::add_branch<DAQData>(std::string("daq_data"), &rec, a_spill, &Spill::GetDAQData, &Spill::SetDAQData, true);
+    JsonCppObjectProcessor<Spill>::add_branch<DAQData>(std::string("daq_data"), &mc, a_spill, &Spill::GetDAQData, &Spill::SetDAQData, true);
+*/
 }
 
 }

@@ -19,6 +19,8 @@
 
 #include "json/json.h"
 
+#include "src/legacy/Interface/Squeal.hh"
+
 namespace MAUS {
 
 template <class CppRepresentation>
@@ -35,8 +37,12 @@ class JsonCppProcessorBase : IJsonCppProcessor<CppRepresentation> {
     virtual CppRepresentation* JsonToCpp(const Json::Value& json_representation) = 0;
     virtual Json::Value* CppToJson(const CppRepresentation& cpp_representation) = 0;
 
-    virtual void SetIsStrict(bool isStrict);
-    virtual bool GetIsStrict();
+    virtual void SetIsStrict(bool isStrict) {
+        _isStrict = isStrict;
+    }
+    virtual bool GetIsStrict() {
+        return _isStrict;
+    }
   protected:
     bool _isStrict;
 };
@@ -84,7 +90,7 @@ template <class ParentType>
 class JsonCppBaseItem {
   public:
     virtual void SetCppChild(const Json::Value& parent_json, ParentType& parent_cpp) = 0;
-    virtual void GetJsonChild(const ParentType& parent_cpp, Json::Value& parent_json) = 0;
+    virtual void SetJsonChild(const ParentType& parent_cpp, Json::Value& parent_json) = 0;
 
   protected:
 };
@@ -93,18 +99,32 @@ template <class ParentType, class ChildType>
 class JsonCppItem : public JsonCppBaseItem<ParentType> {
   public:
     typedef void (ParentType::*SetMethod)(ChildType* value);
-    typedef ChildType* (ParentType::*GetMethod)();
+    typedef ChildType* (ParentType::*GetMethod)() const;
 
-    JsonCppItem(std::string branch_name, JsonCppProcessorBase<ParentType>* child_processor,
-                SetMethod setter, GetMethod getter, bool is_required);
+    JsonCppItem(std::string branch_name, JsonCppProcessorBase<ChildType>* child_processor,
+                SetMethod setter, GetMethod getter, bool is_required)    : JsonCppBaseItem<ParentType>(), _branch(branch_name), _processor(child_processor), _setter(setter),
+      _getter(getter), _required(is_required) {
+    }
 
+    // BUG: need to handle is_required
     // Set the child in the ParentInstance
-    virtual void SetCppChild(const Json::Value& parent_json, ParentType& parent_cpp);
-    virtual void GetJsonChild(const ParentType& parent_cpp, Json::Value& parent_json);
+    void SetCppChild(const Json::Value& parent_json, ParentType& parent_cpp) {
+        Json::Value child_json = parent_json[_branch];
+        ChildType* child_cpp = _processor->JsonToCpp(child_json);
+        parent_cpp._setter(child_cpp);
+    }
+
+    // BUG: need to handle is_required
+    void SetJsonChild(const ParentType& parent_cpp, Json::Value& parent_json) {
+        ChildType* child_cpp = parent_cpp._getter();
+        Json::Value* child_json = _processor->CppToJson(child_cpp);
+        parent_json[_branch] = *child_json;
+        delete child_json;
+    }
 
   private:
     std::string _branch;
-    JsonCppProcessorBase<ParentType>* _processor;
+    JsonCppProcessorBase<ChildType>* _processor;
     SetMethod _setter;
     GetMethod _getter;
     bool      _required;
@@ -117,14 +137,60 @@ class JsonCppObjectProcessor : public JsonCppProcessorBase<ObjectType> {
     Json::Value* CppToJson(const ObjectType& cpp_instance);
 
     template <class ChildType>
-    void push_back(JsonCppItem<ObjectType, ChildType> class_member);
+    void add_branch(std::string branch_name,
+                    JsonCppProcessorBase<ChildType>* child_processor,
+                    ObjectType* object,
+                    ChildType* (ObjectType::*GetMethod)() const,
+                    void (ObjectType::*SetMethod)(ChildType* value),
+                    bool is_required);
   private:
     std::vector< JsonCppBaseItem<ObjectType>* > items;
-
 };
 
+template <class ObjectType>
+template <class ChildType>
+void JsonCppObjectProcessor<ObjectType>::add_branch(
+                std::string branch_name,
+                JsonCppProcessorBase<ChildType>* child_processor,
+                ObjectType* object,
+                ChildType* (ObjectType::*GetMethod)() const,
+                void (ObjectType::*SetMethod)(ChildType* value),
+                bool is_required) {
+    JsonCppBaseItem<ObjectType> item = new JsonCppItem<ObjectType, ChildType>(branch_name, child_processor, GetMethod, SetMethod, is_required);
+    items.push_back(item);
+}
+//    virtual void SetCppChild(ParentType& parent);
+//    virtual Json::Value* GetJsonChild(const ParentType& parent);
+
+template <class ObjectType>
+ObjectType* JsonCppObjectProcessor<ObjectType>::JsonToCpp(const Json::Value& json_object) {
+    ObjectType* cpp_object = new ObjectType();
+    for (size_t i = 0; i < items.size(); ++i) {
+        try {
+            items[i]->SetCppChild(json_object, *cpp_object);
+        } catch (Squeal squee) {
+            delete cpp_object;
+            throw squee;
+        }
+    }
+    return cpp_object;
 }
 
+template <class ObjectType>
+Json::Value* JsonCppObjectProcessor<ObjectType>::CppToJson(const ObjectType& cpp_object) {
+    Json::Value* json_object = new Json::Value(Json::objectValue);
+    for (size_t i = 0; i < items.size(); ++i) {
+        try {
+            items[i]->SetJsonChild(cpp_object, *json_object);
+        } catch (Squeal squee) {
+            delete json_object;
+            throw squee;
+        }
+    }
+    return json_object;
+}
+
+}
 
 #endif
 

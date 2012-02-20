@@ -19,14 +19,16 @@
 
 #include "json/value.h"
 
+#include "src/common_cpp/JsonCppProcessors/JsonCppProcessorBase.hh"
+
 #include "src/common_cpp/DataStructure/DAQData.hh"
 
 namespace MAUS {
 
-class DAQDataProcessor {
+class DAQDataProcessor : public JsonCppProcessorBase<DAQData> {
  public:
-  DAQData* operator()(const Json::Value& data);
-  Json::Value* operator()(const DAQData& data);
+  DAQData* JsonToCpp(const Json::Value& data);
+  Json::Value* CppToJson(const DAQData& data);
 
  private:
 };

@@ -23,7 +23,6 @@
 #include "json/json.h"
 
 #include "src/legacy/Interface/Squeal.hh"
-#include "src/common_cpp/DataStructure/TestSpill.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
 
 class irstream;
