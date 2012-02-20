@@ -123,7 +123,8 @@ void MapCppTrackerRecon::fill_digits_vector(Json::Value &digits_event, SciFiSpil
     for ( unsigned int j = 0; j < digits.size(); j++ ) {
       Json::Value digit;
       digit = digits[j];
-      int tracker, station, plane, channel, npe, time;
+      int tracker, station, plane, channel;
+      double npe, time;
       tracker = digit["tracker"].asInt();
       station = digit["station"].asInt();
       plane   = digit["plane"].asInt();

@@ -123,7 +123,7 @@ class MapCppTrackerRecon {
   ///  Cut value for npe.
   double minPE;
   /// Value above which reconstruction is aborted.
-  double ClustException;
+  int ClustException;
   ///  Vector with the MICE SciFi Modules.
   std::vector<const MiceModule*> modules;
 }; // Don't forget this trailing colon!!!!
