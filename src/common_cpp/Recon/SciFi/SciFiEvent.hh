@@ -63,13 +63,12 @@ class SciFiEvent {
 
   std::vector<SciFiSpacePoint*> seeds() const { return _scifiseeds; }
 
-  // void add_straightprtrack(SciFiStraightPRTrack* track)
-  // { _scifistraightprtracks.push_back(track); }
+  std::vector<SciFiStraightPRTrack> straightprtracks() const { return _scifistraightprtracks; }
 
-  // std::vector<SciFiStraightPRTrack> straightprtracks() const { return _scifistraightprtracks; }
+  void add_straightprtrack(SciFiStraightPRTrack track) { _scifistraightprtracks.push_back(track); }
 
-  // this line is to be replaced by code in lines 66, 68 and 90
-  std::vector<SciFiStraightPRTrack> scifistraightprtracks;
+  void set_straightprtrack(std::vector<SciFiStraightPRTrack> tracks) {
+                           _scifistraightprtracks = tracks; }
 
  private:
   /// Hits in an event.
@@ -88,7 +87,7 @@ class SciFiEvent {
   std::vector<SciFiSpacePoint*>     _scifiseeds;
 
   /// Straight tracks.
-  // std::vector<SciFiStraightPRTrack> _scifistraightprtracks;
+  std::vector<SciFiStraightPRTrack> _scifistraightprtracks;
 };  // Don't forget this trailing colon!!!!
 // } // ~namespace MAUS
 

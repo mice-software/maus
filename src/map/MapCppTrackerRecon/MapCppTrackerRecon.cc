@@ -81,11 +81,11 @@ std::string MapCppTrackerRecon::process(std::string document) {
         spacepoint_recon(event);
       }
       // Pattern Recognition.
-      // if ( event.spacepoints().size() ) {
-      //  pattern_recognition(event);
-      // }
-      print_event_info(event);
+      if ( event.spacepoints().size() ) {
+      pattern_recognition(event);
+      }
 
+      print_event_info(event);
       save_to_json(event);
     } // ==========================================================
   } catch(...) {
@@ -205,13 +205,13 @@ void MapCppTrackerRecon::save_to_json(SciFiEvent &evt) {
   // Tracks.
   Json::Value tracks_tracker0;
   Json::Value tracks_tracker1;
-  for ( unsigned int track_i = 0; track_i < evt.scifistraightprtracks.size(); track_i++ ) {
+  for ( unsigned int track_i = 0; track_i < evt.straightprtracks().size(); track_i++ ) {
     Json::Value a_track;
     int tracker = 0;
-    a_track["x0"] = evt.scifistraightprtracks[track_i].get_x0();
-    a_track["y0"] = evt.scifistraightprtracks[track_i].get_y0();
-    a_track["mx"] = evt.scifistraightprtracks[track_i].get_mx();
-    a_track["my"] = evt.scifistraightprtracks[track_i].get_my();
+    a_track["x0"] = evt.straightprtracks()[track_i].get_x0();
+    a_track["y0"] = evt.straightprtracks()[track_i].get_y0();
+    a_track["mx"] = evt.straightprtracks()[track_i].get_mx();
+    a_track["my"] = evt.straightprtracks()[track_i].get_my();
     a_track["tracker"] = tracker;
     if ( tracker == 0 ) {
       tracks_tracker0.append(a_track);
@@ -227,7 +227,7 @@ void MapCppTrackerRecon::print_event_info(SciFiEvent &event) {
   std::cout << event.digits().size() << " "
             << event.clusters().size() << " "
             << event.spacepoints().size() << " "
-	      << event.scifistraightprtracks.size() << " " << std::endl;
+	      << event.straightprtracks().size() << " " << std::endl;
 }
 
 // The following two functions are added for testing purposes only
