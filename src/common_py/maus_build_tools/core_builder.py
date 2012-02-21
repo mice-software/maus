@@ -108,40 +108,21 @@ def build_data_structure(env):
     called. We build this by calling root and letting it do it's dynamic linker 
     stuff
     """
-    # bug - if the *.so is deleted from src/common_cpp/DataStructure by hand; 
-    # ROOT doesn't usually rebuild unless the file has changed (I think)
     maus_root_dir = os.environ['MAUS_ROOT_DIR']
     data_struct = os.path.join(maus_root_dir, 'src/common_cpp/DataStructure/') 
     here = os.getcwd()
     os.chdir(maus_root_dir)
-    shutil.copy(data_struct+'rootlogon.C', maus_root_dir)
-    proc = subprocess.Popen(['root', '-q', '-l', '-b'])
+    data_items = glob.glob(data_struct+'/*.hh')
+    # LinkDef.hh must be last
+    data_items.sort(key = lambda x: x.find('LinkDef.hh')) 
+    dict_target = (data_struct+'/MausDataStructure.cc')
+    proc_target = ['rootcint']+['-f', dict_target, '-c']
+    for include in env['CPPPATH']:
+        proc_target.append('-I'+include)
+    proc_target += data_items
+    print proc_target
+    proc = subprocess.Popen(proc_target)
     proc.wait()
-    os.remove('rootlogon.C')
-
-    data_libs = []
-    for shared_object_path in glob.glob(data_struct+'/*.so'):
-        shared_object = shared_object_path.split('/')[-1]
-        target_path =  os.path.join(maus_root_dir, 'build', shared_object)
-        print target_path
-        shutil.copy(shared_object_path, target_path)
-        try:
-            os.symlink(target_path,
-                      os.path.join(maus_root_dir, 'build', 'lib'+shared_object))
-            pass
-        except OSError:
-            pass
-        data_libs.append(shared_object[:-3])
-        print 'Adding library '+shared_object[:-3]
-
-    # bug: note only provides a single link point, all the other libraries still
-    # need to be in LD_LIBRARY_PATH
-    maus_data_structure = env.SharedLibrary(target = 'libMausDataStructure.so',
-                                 source=[],
-                                 LIBS=data_libs)
-    env.Install("build", maus_data_structure)
-    print 'Installed', maus_data_structure
-    env.Append(LIBS=['MausDataStructure'])
     os.chdir(here)
 
 

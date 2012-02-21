@@ -14,12 +14,24 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "src/common_cpp/JsonCppProcessors/ScalarsProcessor.hh"
+#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_THREEVECTORPROCESSOR_HH_
+#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_THREEVECTORPROCESSOR_HH_
+
+#include "src/common_cpp/DataStructure/ThreeVector.hh"
+
+#include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/PrimitivesProcessors.hh"
 
 namespace MAUS {
-ScalarsProcessor::ScalarsProcessor() {
-}
+
+class ThreeVectorProcessor : public ObjectProcessor<ThreeVector> {
+  public:
+    ThreeVectorProcessor();   
+  private:
+    DoubleProcessor _double_proc;
+};
 
 }
 
+#endif
 

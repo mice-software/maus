@@ -14,8 +14,8 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_JSONCPPPROCESSORBASE_HH_
-#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_JSONCPPPROCESSORBASE_HH_
+#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_PROCESSORBASE_HH_
+#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_PROCESSORBASE_HH_
 
 #include "json/json.h"
 
@@ -24,15 +24,15 @@
 namespace MAUS {
 
 template <class CppRepresentation>
-class IJsonCppProcessor {
+class IProcessor {
   public:
-    virtual ~IJsonCppProcessor() {}
+    virtual ~IProcessor() {}
     virtual CppRepresentation* JsonToCpp(const Json::Value& json_representation) = 0;
     virtual Json::Value* CppToJson(const CppRepresentation& cpp_representation) = 0;
 };
 
 template <class CppRepresentation>
-class JsonCppProcessorBase : IJsonCppProcessor<CppRepresentation> {
+class ProcessorBase : IProcessor<CppRepresentation> {
   public:
     virtual CppRepresentation* JsonToCpp(const Json::Value& json_representation) = 0;
     virtual Json::Value* CppToJson(const CppRepresentation& cpp_representation) = 0;

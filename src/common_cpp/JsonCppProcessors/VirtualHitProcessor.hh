@@ -14,5 +14,31 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "src/common_cpp/DataStructure/MCTrack.hh"
+#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_VIRTUALHITPROCESSOR_HH_
+#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_VIRTUALHITPROCESSOR_HH_
+
+#include "json/value.h"
+
+#include "src/common_cpp/JsonCppProcessors/PrimaryProcessor.hh"
+
+#include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
+
+#include "src/common_cpp/DataStructure/VirtualHit.hh"
+
+namespace MAUS {
+
+class VirtualHitProcessor : public ObjectProcessor<VirtualHit> {
+ public:
+    VirtualHitProcessor();
+
+ private:
+    ThreeVectorProcessor _three_vec_proc;
+    DoubleProcessor _double_proc;
+    IntProcessor _int_proc;
+};
+
+}
+
+#endif
 

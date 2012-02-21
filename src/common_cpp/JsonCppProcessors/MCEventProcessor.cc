@@ -16,16 +16,18 @@
 
 #include <iostream>
 
+#include "src/common_cpp/JsonCppProcessors/VirtualHitProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/TrackProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/HitProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/MCEventProcessor.hh"
 
 namespace MAUS {
 
-MCEvent* MCEventProcessor::JsonToCpp(const Json::Value& data) {
-    return new MCEvent();
-}
-
-Json::Value* MCEventProcessor::CppToJson(const MCEvent& data) {
-    return new Json::Value();
+MCEventProcessor::MCEventProcessor() : _hit_proc(new HitProcessor()), _track_proc(new TrackProcessor()), _virtual_hit_proc(new VirtualHitProcessor()) {
+    RegisterPointerBranch("primary", &_primary_proc, &MCEvent::GetPrimary, &MCEvent::SetPrimary, true);
+    RegisterPointerBranch("hits", &_hit_proc, &MCEvent::GetHits, &MCEvent::SetHits, true);
+    RegisterPointerBranch("tracks", &_track_proc, &MCEvent::GetTracks, &MCEvent::SetTracks, true);
+    RegisterPointerBranch("virtual_hits", &_virtual_hit_proc, &MCEvent::GetVirtualHits, &MCEvent::SetVirtualHits, true);
 }
 
 }

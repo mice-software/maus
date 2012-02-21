@@ -14,12 +14,15 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "src/common_cpp/JsonCppProcessors/ScalarsProcessor.hh"
+#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_THREEVECTOR_HH_
+#define _SRC_COMMON_CPP_DATASTRUCTURE_THREEVECTOR_HH_
+
+#include "CLHEP/Vector/ThreeVector.h"
 
 namespace MAUS {
-ScalarsProcessor::ScalarsProcessor() {
-}
+typedef CLHEP::Hep3Vector ThreeVector;
 
 }
 
+#endif
 

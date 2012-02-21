@@ -18,12 +18,7 @@
 
 namespace MAUS {
 
-DAQData* DAQDataProcessor::JsonToCpp(const Json::Value& data) {
-    return new DAQData();
-}
-
-Json::Value* DAQDataProcessor::CppToJson(const DAQData& data) {
-    return new Json::Value();
+DAQDataProcessor::DAQDataProcessor() {
 }
 
 }

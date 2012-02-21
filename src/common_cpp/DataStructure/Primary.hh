@@ -18,6 +18,7 @@
 #define _SRC_COMMON_CPP_DATASTRUCTURE_PRIMARY_HH_
 
 #include <vector>
+#include "src/common_cpp/DataStructure/ThreeVector.hh"
 
 #include "Rtypes.h" // ROOT
 
@@ -25,16 +26,40 @@ namespace MAUS {
 
 class Primary {
  public:
-  Primary() {}
+  Primary();
 
-  Primary(const Primary& md) {}
+  Primary(const Primary& md);
        
-  Primary& operator=(const Primary& md) {return *this;}
+  Primary& operator=(const Primary& md);
   
-  virtual ~Primary() {}
+  virtual ~Primary();
+
+  int GetParticleId() const;
+  void SetParticleId(int id);
+  
+  int GetRandomSeed() const;
+  void SetRandomSeed(int seed);
+
+  double GetEnergy() const;
+  void SetEnergy(double energy);
+
+  double GetTime() const;
+  void SetTime(double time);
+
+  ThreeVector GetPosition() const;
+  void SetPosition(ThreeVector pos);
+
+  ThreeVector GetMomentum() const;
+  void SetMomentum(ThreeVector mom);
 
  private:
 
+  int _seed;
+  int _particle_id;
+  double _energy;
+  double _time;
+  ThreeVector _position;
+  ThreeVector _momentum;
 
   ClassDef(Primary, 1)
 };

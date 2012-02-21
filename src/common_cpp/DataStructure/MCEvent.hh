@@ -23,14 +23,14 @@
 
 namespace MAUS {
 
-class MCTrack;
+class Track;
 class VirtualHit;
-class SDHit;
+class Hit;
 class Primary;
 
-typedef std::vector<MCTrack> TrackArray;
+typedef std::vector<Track> TrackArray;
 typedef std::vector<VirtualHit> VirtualHitArray;
-typedef std::vector<SDHit> SDHitArray;
+typedef std::vector<Hit> HitArray;
 
 class MCEvent {
  public:
@@ -42,23 +42,23 @@ class MCEvent {
   
   virtual ~MCEvent();
 
-  TrackArray* GetTracks();
+  TrackArray* GetTracks() const;
   void SetTracks(TrackArray* tracks);
 
-  VirtualHitArray* GetVirtualHits();
+  VirtualHitArray* GetVirtualHits() const;
   void SetVirtualHits(VirtualHitArray* hits);
 
-  SDHitArray* GetSDHits();
-  void SetSDHits(SDHitArray* hits);
+  HitArray* GetHits() const;
+  void SetHits(HitArray* hits);
 
-  Primary* GetPrimary();
+  Primary* GetPrimary() const;
   void SetPrimary(Primary* primary);
 
  private:
 
   Primary* _primary;
   VirtualHitArray* _virtuals;
-  SDHitArray* _sdhits;
+  HitArray* _hits;
   TrackArray* _tracks;
 
   ClassDef(MCEvent, 1)

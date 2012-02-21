@@ -14,40 +14,40 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_JSONCPPARRAYPROCESSOR_HH_
-#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_JSONCPPARRAYPROCESSORBASE_HH_
+#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_ARRAYPROCESSOR_HH_
+#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_ARRAYPROCESSOR_HH_
 
 #include "json/json.h"
 
-#include "src/common_cpp/JsonCppProcessors/JsonCppProcessorBase.hh"
+#include "src/common_cpp/JsonCppProcessors/ProcessorBase.hh"
 
 namespace MAUS {
 
 template <class ArrayContents>
-class JsonCppPointerArrayProcessor : public JsonCppProcessorBase<std::vector<ArrayContents*> > {
+class PointerArrayProcessor : public ProcessorBase<std::vector<ArrayContents*> > {
   public:
-    JsonCppPointerArrayProcessor(JsonCppProcessorBase<ArrayContents>* contents_processor);
-    ~JsonCppPointerArrayProcessor();
+    PointerArrayProcessor(ProcessorBase<ArrayContents>* contents_processor);
+    ~PointerArrayProcessor();
     std::vector<ArrayContents*>* JsonToCpp(const Json::Value& json_array);
     Json::Value* CppToJson(const std::vector<ArrayContents*>& cpp_array);
   private:
-    JsonCppProcessorBase<ArrayContents>* _proc;
+    ProcessorBase<ArrayContents>* _proc;
 };
 
 template <class ArrayContents>
-class JsonCppValueArrayProcessor : public JsonCppProcessorBase<std::vector<ArrayContents> > {
+class ValueArrayProcessor : public ProcessorBase<std::vector<ArrayContents> > {
   public:
-    JsonCppValueArrayProcessor(JsonCppProcessorBase<ArrayContents>* ArrayContentsProcessor);
-    ~JsonCppValueArrayProcessor();
+    ValueArrayProcessor(ProcessorBase<ArrayContents>* ArrayContentsProcessor);
+    ~ValueArrayProcessor();
     std::vector<ArrayContents>* JsonToCpp(const Json::Value& json_array);
     Json::Value* CppToJson(const std::vector<ArrayContents>& cpp_array);
   private:
-    JsonCppProcessorBase<ArrayContents>* _proc;
+    ProcessorBase<ArrayContents>* _proc;
 };
 
 }
 
-#include "src/common_cpp/JsonCppProcessors/JsonCppArrayProcessors-inl.hh"
+#include "src/common_cpp/JsonCppProcessors/ArrayProcessors-inl.hh"
 
 #endif
 

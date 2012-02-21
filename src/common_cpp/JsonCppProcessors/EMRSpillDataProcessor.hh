@@ -14,21 +14,20 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_EMRDATAPROCESSOR_HH_
-#define _SRC_COMMON_CPP_DATASTRUCTURE_EMRDATAPROCESSOR_HH_
+#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_EMRDATAPROCESSOR_HH_
+#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_EMRDATAPROCESSOR_HH_
 
 #include "json/value.h"
 
-#include "src/common_cpp/JsonCppProcessors/JsonCppProcessorBase.hh"
+#include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
 
 #include "src/common_cpp/DataStructure/EMRSpillData.hh"
 
 namespace MAUS {
 
-class EMRSpillDataProcessor : public JsonCppProcessorBase<EMRSpillData>  {
+class EMRSpillDataProcessor : public ObjectProcessor<EMRSpillData>  {
  public:
-  EMRSpillData* JsonToCpp(const Json::Value& data);
-  Json::Value* CppToJson(const EMRSpillData& data);
+    EMRSpillDataProcessor();
 
  private:
 };

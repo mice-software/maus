@@ -14,12 +14,5 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "src/common_cpp/JsonCppProcessors/ScalarsProcessor.hh"
-
-namespace MAUS {
-ScalarsProcessor::ScalarsProcessor() {
-}
-
-}
-
+#include "src/common_cpp/DataStructure/ThreeVector.hh"
 

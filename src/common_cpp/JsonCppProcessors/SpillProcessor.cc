@@ -24,19 +24,12 @@
 namespace MAUS {
 
 SpillProcessor::SpillProcessor() :_mc_array_proc(new MCEventProcessor()), _recon_array_proc(new ReconEventProcessor()) {
-    AddPointerBranch("scalars", &_scal_proc, &Spill::GetScalars, &Spill::SetScalars, true);
-    AddPointerBranch("daq_data", &_daq_proc, &Spill::GetDAQData, &Spill::SetDAQData, true);
-    AddPointerBranch("emr_spill_data", &_emr_proc, &Spill::GetEMRSpillData, &Spill::SetEMRSpillData, true);
-    AddPointerBranch("mc_events", &_mc_array_proc, &Spill::GetMCEvents, &Spill::SetMCEvents, false);
-    AddPointerBranch("recon_events", &_recon_array_proc, &Spill::GetReconEvents, &Spill::SetReconEvents, true);
-    AddValueBranch("spill_number", &_int_proc, &Spill::GetSpillNumber, &Spill::SetSpillNumber, true);
-/*
-
-    JsonCppObjectProcessor<Spill>::add_branch<DAQData>(std::string("daq_data"), &scal, a_spill, &Spill::GetDAQData, &Spill::SetDAQData, true);
-    JsonCppObjectProcessor<Spill>::add_branch<DAQData>(std::string("daq_data"), &emr, a_spill, &Spill::GetDAQData, &Spill::SetDAQData, true);
-    JsonCppObjectProcessor<Spill>::add_branch<DAQData>(std::string("daq_data"), &rec, a_spill, &Spill::GetDAQData, &Spill::SetDAQData, true);
-    JsonCppObjectProcessor<Spill>::add_branch<DAQData>(std::string("daq_data"), &mc, a_spill, &Spill::GetDAQData, &Spill::SetDAQData, true);
-*/
+    RegisterPointerBranch("scalars", &_scal_proc, &Spill::GetScalars, &Spill::SetScalars, true);
+    RegisterPointerBranch("daq_data", &_daq_proc, &Spill::GetDAQData, &Spill::SetDAQData, true);
+    RegisterPointerBranch("emr_spill_data", &_emr_proc, &Spill::GetEMRSpillData, &Spill::SetEMRSpillData, true);
+    RegisterPointerBranch("mc_events", &_mc_array_proc, &Spill::GetMCEvents, &Spill::SetMCEvents, false);
+    RegisterPointerBranch("recon_events", &_recon_array_proc, &Spill::GetReconEvents, &Spill::SetReconEvents, true);
+    RegisterValueBranch("spill_number", &_int_proc, &Spill::GetSpillNumber, &Spill::SetSpillNumber, true);
 }
 
 }

@@ -14,13 +14,13 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_JSONCPPOBJECTPROCESSOR_INL_HH_
-#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_JSONCPPOBJECTPROCESSOR_INL_HH_
+#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_OBJECTPROCESSOR_INL_HH_
+#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_OBJECTPROCESSOR_INL_HH_
 
 namespace MAUS {
 
 template <class ParentType>
-class JsonCppBaseItem {
+class BaseItem {
   public:
     virtual void SetCppChild(const Json::Value& parent_json, ParentType& parent_cpp) = 0;
     virtual void SetJsonChild(const ParentType& parent_cpp, Json::Value& parent_json) = 0;
@@ -29,13 +29,13 @@ class JsonCppBaseItem {
 };
 
 template <class ParentType, class ChildType>
-class JsonCppPointerItem : public JsonCppBaseItem<ParentType> {
+class PointerItem : public BaseItem<ParentType> {
   public:
     typedef void (ParentType::*SetMethod)(ChildType* value);
     typedef ChildType* (ParentType::*GetMethod)() const;
 
-    JsonCppPointerItem(std::string branch_name, JsonCppProcessorBase<ChildType>* child_processor,
-                GetMethod getter, SetMethod setter, bool is_required)    : JsonCppBaseItem<ParentType>(), _branch(branch_name), _processor(child_processor), _setter(setter),
+    PointerItem(std::string branch_name, ProcessorBase<ChildType>* child_processor,
+                GetMethod getter, SetMethod setter, bool is_required)    : BaseItem<ParentType>(), _branch(branch_name), _processor(child_processor), _setter(setter),
       _getter(getter), _required(is_required) {
     }
 
@@ -58,20 +58,20 @@ class JsonCppPointerItem : public JsonCppBaseItem<ParentType> {
 
   private:
     std::string _branch;
-    JsonCppProcessorBase<ChildType>* _processor;
+    ProcessorBase<ChildType>* _processor;
     SetMethod _setter;
     GetMethod _getter;
     bool      _required;
 };
 
 template <class ParentType, class ChildType>
-class JsonCppValueItem : public JsonCppBaseItem<ParentType> {
+class ValueItem : public BaseItem<ParentType> {
   public:
     typedef void (ParentType::*SetMethod)(ChildType value);
     typedef ChildType (ParentType::*GetMethod)() const;
 
-    JsonCppValueItem(std::string branch_name, JsonCppProcessorBase<ChildType>* child_processor,
-                GetMethod getter, SetMethod setter, bool is_required)    : JsonCppBaseItem<ParentType>(), _branch(branch_name), _processor(child_processor), _setter(setter),
+    ValueItem(std::string branch_name, ProcessorBase<ChildType>* child_processor,
+                GetMethod getter, SetMethod setter, bool is_required)    : BaseItem<ParentType>(), _branch(branch_name), _processor(child_processor), _setter(setter),
       _getter(getter), _required(is_required) {
     }
 
@@ -95,7 +95,7 @@ class JsonCppValueItem : public JsonCppBaseItem<ParentType> {
 
   private:
     std::string _branch;
-    JsonCppProcessorBase<ChildType>* _processor;
+    ProcessorBase<ChildType>* _processor;
     SetMethod _setter;
     GetMethod _getter;
     bool      _required;
@@ -105,27 +105,27 @@ class JsonCppValueItem : public JsonCppBaseItem<ParentType> {
 
 template <class ObjectType>
 template <class ChildType>
-void JsonCppObjectProcessor<ObjectType>::AddPointerBranch(
+void ObjectProcessor<ObjectType>::RegisterPointerBranch(
                 std::string branch_name,
-                JsonCppProcessorBase<ChildType>* child_processor,
+                ProcessorBase<ChildType>* child_processor,
 //                ObjectType* object,
                 ChildType* (ObjectType::*GetMethod)() const,
                 void (ObjectType::*SetMethod)(ChildType* value),
                 bool is_required) {
-    JsonCppBaseItem<ObjectType>* item = new JsonCppPointerItem<ObjectType, ChildType>(branch_name, child_processor, GetMethod, SetMethod, is_required);
+    BaseItem<ObjectType>* item = new PointerItem<ObjectType, ChildType>(branch_name, child_processor, GetMethod, SetMethod, is_required);
     items.push_back(item);
 }
 
 template <class ObjectType>
 template <class ChildType>
-void JsonCppObjectProcessor<ObjectType>::AddValueBranch(
+void ObjectProcessor<ObjectType>::RegisterValueBranch(
                 std::string branch_name,
-                JsonCppProcessorBase<ChildType>* child_processor,
+                ProcessorBase<ChildType>* child_processor,
 //                ObjectType* object,
                 ChildType (ObjectType::*GetMethod)() const,
                 void (ObjectType::*SetMethod)(ChildType value),
                 bool is_required) {
-    JsonCppBaseItem<ObjectType>* item = new JsonCppValueItem<ObjectType, ChildType>(branch_name, child_processor, GetMethod, SetMethod, is_required);
+    BaseItem<ObjectType>* item = new ValueItem<ObjectType, ChildType>(branch_name, child_processor, GetMethod, SetMethod, is_required);
     items.push_back(item);
 }
 
@@ -133,7 +133,7 @@ void JsonCppObjectProcessor<ObjectType>::AddValueBranch(
 //    virtual Json::Value* GetJsonChild(const ParentType& parent);
 
 template <class ObjectType>
-ObjectType* JsonCppObjectProcessor<ObjectType>::JsonToCpp(const Json::Value& json_object) {
+ObjectType* ObjectProcessor<ObjectType>::JsonToCpp(const Json::Value& json_object) {
     ObjectType* cpp_object = new ObjectType();
     for (size_t i = 0; i < items.size(); ++i) {
         try {
@@ -147,7 +147,7 @@ ObjectType* JsonCppObjectProcessor<ObjectType>::JsonToCpp(const Json::Value& jso
 }
 
 template <class ObjectType>
-Json::Value* JsonCppObjectProcessor<ObjectType>::CppToJson(const ObjectType& cpp_object) {
+Json::Value* ObjectProcessor<ObjectType>::CppToJson(const ObjectType& cpp_object) {
     Json::Value* json_object = new Json::Value(Json::objectValue);
     for (size_t i = 0; i < items.size(); ++i) {
         try {

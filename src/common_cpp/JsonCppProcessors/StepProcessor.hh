@@ -14,6 +14,26 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "src/common_cpp/JsonCppProcessors/JsonCppProcessorBase.hh"
+#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_STEPPROCESSOR_HH_
+#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_STEPPROCESSOR_HH_
 
+#include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/PrimitivesProcessors.hh"
+#include "src/common_cpp/JsonCppProcessors/ThreeVectorProcessor.hh"
 
+#include "src/common_cpp/DataStructure/Step.hh"
+
+namespace MAUS {
+
+class StepProcessor : public ObjectProcessor<Step> {
+  public:
+    StepProcessor();
+
+  private:
+    DoubleProcessor _double_proc;
+    ThreeVectorProcessor _three_vec_proc;
+};
+
+}
+
+#endif

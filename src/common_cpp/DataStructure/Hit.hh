@@ -14,8 +14,8 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_VIRTUALHIT_HH_
-#define _SRC_COMMON_CPP_DATASTRUCTURE_VIRTUALHIT_HH_
+#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_HIT_HH_
+#define _SRC_COMMON_CPP_DATASTRUCTURE_HIT_HH_
 
 #include <vector>
 
@@ -25,68 +25,64 @@
 
 namespace MAUS {
 
-class VirtualHit {
+class ChannelId {
   public:
-    VirtualHit();
+      virtual ChannelId* Clone() { return NULL; }
+};
 
-    VirtualHit(const VirtualHit& md);
+class Hit {
+  public:
+    Hit();
+
+    Hit(const Hit& md);
          
-    VirtualHit& operator=(const VirtualHit& md);
-    
-    virtual ~VirtualHit() {}
-
-    int GetStationId() const;
-    void SetStationId(int id);
-
-    int GetParticleId() const;
-    void SetParticleId(int id);
+    Hit& operator=(const Hit& md);
+ 
+    virtual ~Hit();
 
     int GetTrackId() const;
     void SetTrackId(int id);
 
-    double GetTime() const;
-    void SetTime(double time);
+    int GetParticleId() const;
+    void SetParticleId(int pid);
 
-    double GetMass() const;
-    void SetMass(double mass);
+    double GetEnergy() const;
+    void SetEnergy(double energy);
 
     double GetCharge() const;
     void SetCharge(double charge);
 
-    double GetProperTime() const;
-    void SetProperTime(double proper_time);
+    double GetTime() const;
+    void SetTime(double time);
 
-    double GetPathLength() const;
-    void SetPathLength(double path_length);
+    double GetEnergyDeposited() const;
+    void SetEnergyDeposited(double edep);
 
     ThreeVector GetPosition() const;
-    void SetPosition(ThreeVector position);
+    void SetPosition(ThreeVector pos);
 
     ThreeVector GetMomentum() const;
-    void SetMomentum(ThreeVector momentum);
+    void SetMomentum(ThreeVector mom);
 
-    ThreeVector GetBField() const;
-    void SetBField(ThreeVector b_field);
-
-    ThreeVector GetEField() const;
-    void SetEField(ThreeVector e_field);
+    ChannelId* GetChannelId() const;
+    void SetChannelId(ChannelId* id);
 
   private:
-    int _station_id;
-    int _particle_id;
     int _track_id;
-    double _time;
-    double _mass;
+    int _particle_id;
+    double _energy;
     double _charge;
-    double _proper_time;
-    double _path_length;
+    double _time;
+    double _energy_deposited;
     ThreeVector _position;
     ThreeVector _momentum;
-    ThreeVector _b_field;
-    ThreeVector _e_field;  
 
-    ClassDef(VirtualHit, 1)
+    ChannelId* _channel_id;
+
+    ClassDef(Hit, 1)
 };
+
+
 
 }
 

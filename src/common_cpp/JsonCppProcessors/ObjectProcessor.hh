@@ -14,53 +14,53 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_JSONCPPOBJECTPROCESSOR_HH_
-#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_JSONCPPOBJECTPROCESSOR_HH_
+#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_OBJECTPROCESSOR_HH_
+#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_OBJECTPROCESSOR_HH_
 
 #include "json/json.h"
 
-#include "src/common_cpp/JsonCppProcessors/JsonCppProcessorBase.hh"
+#include "src/common_cpp/JsonCppProcessors/ProcessorBase.hh"
 
 namespace MAUS {
 
 template <class ObjectType>
-class JsonCppBaseItem; // defined in JsonCppObjectProcessor-inl
+class BaseItem; // defined in ObjectProcessor-inl
 
 template <class ObjectType, class ChildType>
-class JsonCppPointerItem; // defined in JsonCppObjectProcessor-inl
+class PointerItem; // defined in ObjectProcessor-inl
 
 template <class ObjectType, class ChildType>
-class JsonCppValueItem; // defined in JsonCppObjectProcessor-inl
+class ValueItem; // defined in ObjectProcessor-inl
 
 template <class ObjectType>
-class JsonCppObjectProcessor : public JsonCppProcessorBase<ObjectType> {
+class ObjectProcessor : public ProcessorBase<ObjectType> {
   public:
     ObjectType* JsonToCpp(const Json::Value& json_object);
     Json::Value* CppToJson(const ObjectType& cpp_instance);
 
     template <class ChildType>
-    void AddPointerBranch(std::string branch_name,
-                    JsonCppProcessorBase<ChildType>* child_processor,
+    void RegisterPointerBranch(std::string branch_name,
+                    ProcessorBase<ChildType>* child_processor,
                     ChildType* (ObjectType::*GetMethod)() const,
                     void (ObjectType::*SetMethod)(ChildType* value),
                     bool is_required);
 
 
     template <class ChildType>
-    void AddValueBranch(std::string branch_name,
-                    JsonCppProcessorBase<ChildType>* child_processor,
+    void RegisterValueBranch(std::string branch_name,
+                    ProcessorBase<ChildType>* child_processor,
                     ChildType (ObjectType::*GetMethod)() const,
                     void (ObjectType::*SetMethod)(ChildType value),
                     bool is_required);
 
 
   private:
-    std::vector< JsonCppBaseItem<ObjectType>* > items;
+    std::vector< BaseItem<ObjectType>* > items;
 };
 
 }
 
-#include "src/common_cpp/JsonCppProcessors/JsonCppObjectProcessor-inl.hh"
+#include "src/common_cpp/JsonCppProcessors/ObjectProcessor-inl.hh"
 
 #endif
 

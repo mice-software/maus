@@ -14,8 +14,8 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_MAUSSPILLPROCESSOR_HH_
-#define _SRC_COMMON_CPP_DATASTRUCTURE_MAUSSPILLPROCESSOR_HH_
+#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_SPILLPROCESSOR_HH_
+#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_SPILLPROCESSOR_HH_
 
 #include "json/value.h"
 
@@ -23,10 +23,10 @@
 #include "src/common_cpp/JsonCppProcessors/ScalarsProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/EMRSpillDataProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/MCEventProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/JsonCppPrimitivesProcessors.hh"
-#include "src/common_cpp/JsonCppProcessors/JsonCppArrayProcessors.hh"
+#include "src/common_cpp/JsonCppProcessors/PrimitivesProcessors.hh"
+#include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
 
-#include "src/common_cpp/JsonCppProcessors/JsonCppObjectProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
 
 
@@ -34,26 +34,17 @@ namespace MAUS {
 
 typedef std::vector<MCEvent*> MCEventArray;
 
-class SpillProcessor : public JsonCppObjectProcessor<Spill> {
+class SpillProcessor : public ObjectProcessor<Spill> {
  public:
     SpillProcessor();
 
-    Spill* JsonToCpp(const Json::Value& json_spill) {
-        return JsonCppObjectProcessor<Spill>::JsonToCpp(json_spill);
-    }
-    Json::Value* CppToJson(const Spill& cpp_spill) {
-        return JsonCppObjectProcessor<Spill>::CppToJson(cpp_spill);
-    }
-    
  private:
-    Spill _spill;
-
     ScalarsProcessor _scal_proc;
     DAQDataProcessor _daq_proc;
     EMRSpillDataProcessor _emr_proc;
-    JsonCppPointerArrayProcessor<MCEvent> _mc_array_proc;
-    JsonCppPointerArrayProcessor<ReconEvent> _recon_array_proc;
-    JsonCppIntProcessor _int_proc;
+    PointerArrayProcessor<MCEvent> _mc_array_proc;
+    PointerArrayProcessor<ReconEvent> _recon_array_proc;
+    IntProcessor _int_proc;
 
 };
 

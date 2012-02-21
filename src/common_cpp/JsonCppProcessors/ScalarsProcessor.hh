@@ -14,21 +14,20 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_SCALARSPROCESSOR_HH_
-#define _SRC_COMMON_CPP_DATASTRUCTURE_SCALARSPROCESSOR_HH_
+#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_SCALARSPROCESSOR_HH_
+#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_SCALARSPROCESSOR_HH_
 
 #include "json/value.h"
 
-#include "src/common_cpp/JsonCppProcessors/JsonCppProcessorBase.hh"
+#include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
 
 #include "src/common_cpp/DataStructure/Scalars.hh"
 
 namespace MAUS {
 
-class ScalarsProcessor : public JsonCppProcessorBase<Scalars> {
+class ScalarsProcessor : public ObjectProcessor<Scalars> {
  public:
-  Scalars* JsonToCpp(const Json::Value& data);
-  Json::Value* CppToJson(const Scalars& data);
+    ScalarsProcessor();
 
  private:
 };

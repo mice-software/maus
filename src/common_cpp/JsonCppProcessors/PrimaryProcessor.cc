@@ -14,32 +14,18 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_MCEVENTPROCESSOR_HH_
-#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_MCEVENTPROCESSOR_HH_
-
-#include "json/value.h"
-
 #include "src/common_cpp/JsonCppProcessors/PrimaryProcessor.hh"
-
-#include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
-
-#include "src/common_cpp/DataStructure/MCEvent.hh"
 
 namespace MAUS {
 
-class MCEventProcessor : public ObjectProcessor<MCEvent> {
- public:
-    MCEventProcessor();
-
- private:
-    ValueArrayProcessor<Hit> _hit_proc;
-    ValueArrayProcessor<Track> _track_proc;
-    ValueArrayProcessor<VirtualHit> _virtual_hit_proc;
-    PrimaryProcessor _primary_proc;
-};
-
+PrimaryProcessor::PrimaryProcessor() {
+    RegisterValueBranch("particle_id", &_int_proc, &Primary::GetParticleId, &Primary::SetParticleId, true);
+    RegisterValueBranch("random_seed", &_int_proc, &Primary::GetRandomSeed, &Primary::SetRandomSeed, true);
+    RegisterValueBranch("time", &_double_proc, &Primary::GetTime, &Primary::SetTime, true);
+    RegisterValueBranch("energy", &_double_proc, &Primary::GetEnergy, &Primary::SetEnergy, true);
+    RegisterValueBranch("position", &_three_vec_proc, &Primary::GetPosition, &Primary::SetPosition, true);
+    RegisterValueBranch("momentum", &_three_vec_proc, &Primary::GetMomentum, &Primary::SetMomentum, true);
 }
 
-#endif
+}
 

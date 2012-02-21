@@ -19,35 +19,35 @@
 
 #include "json/json.h"
 
-#include "src/common_cpp/JsonCppProcessors/JsonCppProcessorBase.hh"
+#include "src/common_cpp/JsonCppProcessors/ProcessorBase.hh"
 
 namespace MAUS {
 
-class JsonCppDoubleProcessor : public JsonCppProcessorBase<double> {
+class DoubleProcessor : public ProcessorBase<double> {
   public:
     virtual double* JsonToCpp(const Json::Value& json_double);
     virtual Json::Value* CppToJson(const double& cpp_double);
 };
 
-class JsonCppStringProcessor : public IJsonCppProcessor<std::string> {
+class StringProcessor : public ProcessorBase<std::string> {
   public:
     virtual std::string* JsonToCpp(const Json::Value& json_string);
     virtual Json::Value* CppToJson(const std::string& cpp_string);
 };
 
-class JsonCppIntProcessor : public JsonCppProcessorBase<int> {
+class IntProcessor : public ProcessorBase<int> {
   public:
     virtual int* JsonToCpp(const Json::Value& json_int);
     virtual Json::Value* CppToJson(const int& cpp_int);
 };
 
-class JsonCppUIntProcessor : public JsonCppProcessorBase<unsigned int> {
+class UIntProcessor : public ProcessorBase<unsigned int> {
   public:
     virtual unsigned int* JsonToCpp(const Json::Value& json_uint);
     virtual Json::Value* CppToJson(const unsigned int& cpp_double);
 };
 
-class JsonCppBoolProcessor : public JsonCppProcessorBase<bool> {
+class BoolProcessor : public ProcessorBase<bool> {
   public:
     virtual bool* JsonToCpp(const Json::Value& json_bool);
     virtual Json::Value* CppToJson(const bool& cpp_bool);

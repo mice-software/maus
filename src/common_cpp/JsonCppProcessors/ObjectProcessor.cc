@@ -14,5 +14,5 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "src/common_cpp/JsonCppProcessors/JsonCppObjectProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
 

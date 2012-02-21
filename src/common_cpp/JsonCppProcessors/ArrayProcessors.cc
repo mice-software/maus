@@ -14,32 +14,5 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_MCTRACK_HH_
-#define _SRC_COMMON_CPP_DATASTRUCTURE_MCTRACK_HH_
-
-#include <vector>
-
-#include "Rtypes.h" // ROOT
-
-namespace MAUS {
-
-class MCTrack {
- public:
-  MCTrack() {}
-
-  MCTrack(const MCTrack& md) {}
-       
-  MCTrack& operator=(const MCTrack& md) {return *this;}
-  
-  virtual ~MCTrack() {}
-
- private:
-
-
-  ClassDef(MCTrack, 1)
-};
-
-}
-
-#endif
+#include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
 

@@ -17,11 +17,11 @@
 namespace MAUS {
 
 template <class ArrayContents>
-JsonCppPointerArrayProcessor<ArrayContents>::JsonCppPointerArrayProcessor(JsonCppProcessorBase<ArrayContents>* contents_processor) : _proc(contents_processor) {
+PointerArrayProcessor<ArrayContents>::PointerArrayProcessor(ProcessorBase<ArrayContents>* contents_processor) : _proc(contents_processor) {
 }
 
 template <class ArrayContents>
-JsonCppPointerArrayProcessor<ArrayContents>::~JsonCppPointerArrayProcessor<ArrayContents>() {
+PointerArrayProcessor<ArrayContents>::~PointerArrayProcessor<ArrayContents>() {
     if (_proc != NULL) {
         delete _proc;
         _proc = NULL;
@@ -29,14 +29,14 @@ JsonCppPointerArrayProcessor<ArrayContents>::~JsonCppPointerArrayProcessor<Array
 }
 
 template <class ArrayContents>
-std::vector<ArrayContents*>* JsonCppPointerArrayProcessor<ArrayContents>::JsonToCpp
+std::vector<ArrayContents*>* PointerArrayProcessor<ArrayContents>::JsonToCpp
                                                (const Json::Value& json_array) {
     if (!json_array.isConvertibleTo(Json::arrayValue)) {
-        if (JsonCppProcessorBase<std::vector<ArrayContents*> >::_isStrict) {
+        if (ProcessorBase<std::vector<ArrayContents*> >::_isStrict) {
             // no memory allocated yet...
             throw(Squeal(Squeal::recoverable, 
                         "\nFailed to resolve Json::Value to array",
-                        "JsonCppPointerArrayProcessor::JsonToCpp()"
+                        "PointerArrayProcessor::JsonToCpp()"
                         ) );
         } else {
             return NULL;
@@ -44,7 +44,7 @@ std::vector<ArrayContents*>* JsonCppPointerArrayProcessor<ArrayContents>::JsonTo
     }
     std::vector<ArrayContents*>* vec = new std::vector<ArrayContents*>(json_array.size());
 
-    _proc->SetIsStrict(JsonCppProcessorBase<std::vector<ArrayContents*> >::_isStrict);
+    _proc->SetIsStrict(ProcessorBase<std::vector<ArrayContents*> >::_isStrict);
     for (size_t i = 0; i < json_array.size(); ++i) {
         try {
             // allocate the vector
@@ -66,12 +66,12 @@ std::vector<ArrayContents*>* JsonCppPointerArrayProcessor<ArrayContents>::JsonTo
 
 
 template <class ArrayContents>
-Json::Value* JsonCppPointerArrayProcessor<ArrayContents>::
+Json::Value* PointerArrayProcessor<ArrayContents>::
                       CppToJson(const std::vector<ArrayContents*>& cpp_array) {
     Json::Value* json_array = new Json::Value(Json::arrayValue);
     json_array->resize(cpp_array.size());
 
-    _proc->SetIsStrict(JsonCppProcessorBase<std::vector<ArrayContents*> >::_isStrict);
+    _proc->SetIsStrict(ProcessorBase<std::vector<ArrayContents*> >::_isStrict);
     for (size_t i = 0; i < cpp_array.size(); ++i) {
         try {
             Json::Value* data = _proc->CppToJson(*cpp_array[i]);
@@ -89,11 +89,11 @@ Json::Value* JsonCppPointerArrayProcessor<ArrayContents>::
 ///////////
 
 template <class ArrayContents>
-JsonCppValueArrayProcessor<ArrayContents>::JsonCppValueArrayProcessor(JsonCppProcessorBase<ArrayContents>* contents_processor) : _proc(contents_processor) {
+ValueArrayProcessor<ArrayContents>::ValueArrayProcessor(ProcessorBase<ArrayContents>* contents_processor) : _proc(contents_processor) {
 }
 
 template <class ArrayContents>
-JsonCppValueArrayProcessor<ArrayContents>::~JsonCppValueArrayProcessor<ArrayContents>() {
+ValueArrayProcessor<ArrayContents>::~ValueArrayProcessor<ArrayContents>() {
     if (_proc != NULL) {
         delete _proc;
         _proc = NULL;
@@ -102,14 +102,14 @@ JsonCppValueArrayProcessor<ArrayContents>::~JsonCppValueArrayProcessor<ArrayCont
 
 
 template <class ArrayContents>
-std::vector<ArrayContents>* JsonCppValueArrayProcessor<ArrayContents>::JsonToCpp
+std::vector<ArrayContents>* ValueArrayProcessor<ArrayContents>::JsonToCpp
                                                (const Json::Value& json_array) {
     if (!json_array.isConvertibleTo(Json::arrayValue)) {
-        if (JsonCppProcessorBase<std::vector<ArrayContents> >::_isStrict) {
+        if (ProcessorBase<std::vector<ArrayContents> >::_isStrict) {
             // no memory allocated yet...
             throw(Squeal(Squeal::recoverable, 
                         "\nFailed to resolve Json::Value to array",
-                        "JsonCppValueArrayProcessor::JsonToCpp()"
+                        "ValueArrayProcessor::JsonToCpp()"
                         ) );
         } else {
             return NULL;
@@ -117,7 +117,7 @@ std::vector<ArrayContents>* JsonCppValueArrayProcessor<ArrayContents>::JsonToCpp
     }
     std::vector<ArrayContents>* vec = new std::vector<ArrayContents>(json_array.size());
 
-    _proc->SetIsStrict(JsonCppProcessorBase<std::vector<ArrayContents> >::_isStrict);
+    _proc->SetIsStrict(ProcessorBase<std::vector<ArrayContents> >::_isStrict);
     for (size_t i = 0; i < json_array.size(); ++i) {
         try {
             // allocate the vector
@@ -135,12 +135,12 @@ std::vector<ArrayContents>* JsonCppValueArrayProcessor<ArrayContents>::JsonToCpp
 
 
 template <class ArrayContents>
-Json::Value* JsonCppValueArrayProcessor<ArrayContents>::
+Json::Value* ValueArrayProcessor<ArrayContents>::
                       CppToJson(const std::vector<ArrayContents>& cpp_array) {
     Json::Value* json_array = new Json::Value(Json::arrayValue);
     json_array->resize(cpp_array.size());
 
-    _proc->SetIsStrict(JsonCppProcessorBase<std::vector<ArrayContents> >::_isStrict);
+    _proc->SetIsStrict(ProcessorBase<std::vector<ArrayContents> >::_isStrict);
     for (size_t i = 0; i < cpp_array.size(); ++i) {
         try {
             Json::Value* data = _proc->CppToJson(cpp_array[i]);

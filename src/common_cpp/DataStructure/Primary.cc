@@ -16,3 +16,79 @@
 
 #include "src/common_cpp/DataStructure/Primary.hh"
 
+namespace MAUS {
+
+Primary::Primary() : _seed(0), _particle_id(0), _energy(0.), _time(0.),
+                     _position(0, 0, 0), _momentum(0, 0, 0) {
+}
+
+Primary::Primary(const Primary& md) {
+    *this = md;
+}
+     
+Primary& Primary::operator=(const Primary& md) {
+    if(this == &md) {
+        return *this;
+    }
+    _seed = md._seed;
+    _particle_id = md._particle_id;
+    _energy = md._energy;
+    _time = md._time;
+    _position = md._position;
+    _momentum = md._momentum;
+    return *this;
+}
+
+Primary::~Primary() {
+}
+
+int Primary::GetParticleId() const {
+    return _particle_id;
+}
+
+void Primary::SetParticleId(int id) {
+    _particle_id = id;
+}
+
+double Primary::GetEnergy() const {
+    return _energy;
+}
+
+void Primary::SetEnergy(double energy) {
+    _energy = energy;
+}
+
+double Primary::GetTime() const {
+    return _time;
+}
+
+void Primary::SetTime(double time) {
+    _time = time;
+}
+
+ThreeVector Primary::GetPosition() const {
+    return _position;
+}
+
+void Primary::SetPosition(ThreeVector pos) {
+    _position = pos;
+}
+
+ThreeVector Primary::GetMomentum() const {
+    return _momentum;
+}
+
+void Primary::SetMomentum(ThreeVector mom) {
+    _momentum = mom;
+}
+
+int Primary::GetRandomSeed() const {
+    return _seed;
+}
+
+void Primary::SetRandomSeed(int seed) {
+    _seed = seed;
+}
+
+}
+

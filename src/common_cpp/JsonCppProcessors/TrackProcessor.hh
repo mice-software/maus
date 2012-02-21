@@ -14,12 +14,28 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "src/common_cpp/JsonCppProcessors/ScalarsProcessor.hh"
+#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_TRACKPROCESSOR_HH_
+#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_TRACKPROCESSOR_HH_
+
+#include "src/common_cpp/JsonCppProcessors/PrimitivesProcessors.hh"
+#include "src/common_cpp/JsonCppProcessors/ThreeVectorProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
+
+#include "src/common_cpp/DataStructure/Step.hh"
+#include "src/common_cpp/DataStructure/Track.hh"
 
 namespace MAUS {
-ScalarsProcessor::ScalarsProcessor() {
-}
+
+class TrackProcessor : public ObjectProcessor<Track> {
+  public:
+    TrackProcessor();
+
+  private:
+    IntProcessor _int_proc;
+    ThreeVectorProcessor _three_vec_proc;
+    ValueArrayProcessor<Step> _step_proc;
+};
 
 }
 
-
+#endif

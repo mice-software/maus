@@ -14,5 +14,26 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "src/common_cpp/DataStructure/SDHit.hh"
+#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_PRIMARYPROCESSOR_HH_
+#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_PRIMARYPROCESSOR_HH_
 
+#include "src/common_cpp/JsonCppProcessors/PrimitivesProcessors.hh"
+#include "src/common_cpp/JsonCppProcessors/ThreeVectorProcessor.hh"
+
+#include "src/common_cpp/DataStructure/Primary.hh"
+
+namespace MAUS {
+
+class PrimaryProcessor : public ObjectProcessor<Primary> {
+  public:
+    PrimaryProcessor();
+
+  private:
+    DoubleProcessor _double_proc;
+    IntProcessor _int_proc;
+    ThreeVectorProcessor _three_vec_proc;
+};
+
+}
+
+#endif

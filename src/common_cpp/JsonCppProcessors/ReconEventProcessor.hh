@@ -14,24 +14,43 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_RECONEVENTPROCESSOR_HH_
-#define _SRC_COMMON_CPP_DATASTRUCTURE_RECONEVENTPROCESSOR_HH_
+#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_RECONEVENTPROCESSOR_HH_
+#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_RECONEVENTPROCESSOR_HH_
 
 #include "json/value.h"
 
-#include "src/common_cpp/JsonCppProcessors/JsonCppObjectProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
 
 #include "src/common_cpp/DataStructure/ReconEvent.hh"
 
 namespace MAUS {
 
-class ReconEventProcessor : public JsonCppObjectProcessor<ReconEvent> {
- public:
-  ReconEvent* JsonToCpp(const Json::Value& data);
-  Json::Value* CppToJson(const ReconEvent& data);
+class TofEventProcessor : public ObjectProcessor<TofEvent> {};
 
- private:
+class TrackerEventProcessor : public ObjectProcessor<TrackerEvent> {};
 
+class CkovEventProcessor : public ObjectProcessor<CkovEvent> {};
+
+class KLEventProcessor : public ObjectProcessor<KLEvent> {};
+
+class EMREventProcessor : public ObjectProcessor<EMREvent> {};
+
+class TriggerEventProcessor : public ObjectProcessor<TriggerEvent> {};
+
+class GlobalEventProcessor : public ObjectProcessor<GlobalEvent> {};
+
+class ReconEventProcessor : public ObjectProcessor<ReconEvent> {
+  public:
+    ReconEventProcessor();
+
+  private:
+    TofEventProcessor _tof_proc;
+    TrackerEventProcessor _tracker_proc;
+    CkovEventProcessor _ckov_proc;
+    KLEventProcessor _kl_proc;
+    EMREventProcessor _emr_proc;
+    TriggerEventProcessor _trigger_proc;
+    GlobalEventProcessor _global_proc;
 };
 
 }

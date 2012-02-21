@@ -14,32 +14,6 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_SDHIT_HH_
-#define _SRC_COMMON_CPP_DATASTRUCTURE_SDHIT_HH_
+#include "src/common_cpp/JsonCppProcessors/ProcessorBase.hh"
 
-#include <vector>
-
-#include "Rtypes.h" // ROOT
-
-namespace MAUS {
-
-class SDHit {
- public:
-  SDHit() {}
-
-  SDHit(const SDHit& md) {}
-       
-  SDHit& operator=(const SDHit& md) {return *this;}
-  
-  virtual ~SDHit() {}
-
- private:
-
-
-  ClassDef(SDHit, 1)
-};
-
-}
-
-#endif
 
