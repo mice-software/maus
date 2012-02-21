@@ -63,6 +63,7 @@ def worker_process_init_callback(**kwargs): # pylint:disable = W0613
     MausTransform.initialize(MausConfiguration.transform)
     MausTransform.birth(MausConfiguration.configuration)
 
+# Bind the callback method to the Celery worker_process_init signal.
 worker_process_init.connect(worker_process_init_callback) 
 
 def process_birth(config_id, transform, configuration):
