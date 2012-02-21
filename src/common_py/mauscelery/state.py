@@ -27,9 +27,9 @@ from workers import WorkerDeadException
 class MausConfiguration(): # pylint:disable = W0232, R0903
     """
     MAUS transform configuration consisting of a MAUS JSON
-    configuration document, a transform specification and an
-    ID. The transform specification can be a single name -
-    representing a single transform - or a list of transforms -
+    configuration document, a transform specification an ID and the
+    current MAUS version. The transform specification can be a single
+    name - representing a single transform - or a list of transforms -
     representing a MapPyGroup. Sub-lists are treated as nested
     MapPyGroups. For example: 
     @verbatim
@@ -47,6 +47,7 @@ class MausConfiguration(): # pylint:disable = W0232, R0903
     transform = "MapPyDoNothing"
     configuration = "{}"
     config_id = 0
+    version = ""
 
 class MausTransform(): # pylint:disable = W0232
     """

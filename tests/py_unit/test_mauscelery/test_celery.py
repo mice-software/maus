@@ -28,6 +28,7 @@ from datetime import datetime
 from celery.task.control import broadcast
 from celery.task.control import inspect
 
+from Configuration import Configuration
 from MapPyTestMap import MapPyTestMap
 from mauscelery.tasks import execute_transform
 
@@ -51,6 +52,12 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
         if (active_nodes == None):
             unittest.TestCase.skipTest(self, 
                                        "Skip - No active Celery workers")
+        # Get the current MAUS version.
+        configuration  = Configuration()
+        config_doc = configuration.getConfigJSON()
+        print config_doc
+        config_dictionary = json.loads(config_doc)
+        self.__version = config_dictionary["maus_version"]
         # Reset the worker. Invoke twice in case the first attempt
         # fails due to mess left by previous test.
         self.reset_worker()
@@ -65,7 +72,8 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
         """
         config_id = datetime.now().microsecond
         broadcast("birth", 
-            arguments={"configuration":"{}", \
+            arguments={"configuration":"""{"maus_version":"%s"}""" \
+                       % self.__version,
                        "transform":"MapPyDoNothing", 
                        "config_id":config_id}, reply=True)
 
@@ -87,7 +95,8 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
         config_id = None):
         """
         Validate workers have the given configuration using
-        set_maus_configuration.
+        set_maus_configuration and the same MAUS version as the
+        test class.
         @param self Object reference.
         @param configuration Expected configuration.
         @param transform Expected transform specification.
@@ -120,6 +129,11 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
                 "Configuration has no transform entry")
             self.assertEquals(transform, worker_config["transform"],
                 "Unexpected transform value")
+            self.assertTrue(worker_config.has_key("version"),
+                "Configuration has no version entry")
+            self.assertEquals(self.__version, 
+                worker_config["version"],
+                "Unexpected version value")
 
     def validate_status(self, report, status = "ok"):
         """
@@ -166,7 +180,8 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
         @param self Object reference.
         """
         # Check using default values.
-        self.validate_configuration("{}", "MapPyDoNothing")
+        configuration = """{"maus_version":"%s"}""" % self.__version
+        self.validate_configuration(configuration, "MapPyDoNothing")
 
     def test_birth(self):
         """
@@ -175,7 +190,10 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
         """
         config_id = datetime.now().microsecond
         transform = "MapPyPrint"
-        configuration = """{"TOFconversionFactor":%s}""" % config_id
+        configuration = """{"TOFconversionFactor":%s, "maus_version":"%s"}""" \
+            % (config_id, self.__version)
+        print self.__version
+        print configuration
         result = self.birth(config_id, configuration, transform)
         print "birth(OK): %s " % result
         # Check the status and that the configuration has been 
@@ -198,9 +216,22 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
         """
         config_id = datetime.now().microsecond
         transform = "MapPyPrint"
-        configuration = """{"TOFconversionFactor":BAD"""
+        configuration = """{"TOFconversionFactor":BADJSON"""
         result = self.birth(config_id, configuration, transform)
         print "birth(bad JSON document): %s " % result
+        self.validate_status(result, "error")
+
+    def test_birth_bad_version(self):
+        """
+        Test birth broadcast command with an invalid JSON
+        configuration document. 
+        @param self Object reference.
+        """
+        config_id = datetime.now().microsecond
+        transform = "MapPyPrint"
+        configuration = """{"maus_version":"BAD"}"""
+        result = self.birth(config_id, configuration, transform)
+        print "birth(bad version): %s " % result
         self.validate_status(result, "error")
 
     def test_birth_bad_transform(self):
@@ -210,7 +241,7 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
         """
         config_id = datetime.now().microsecond
         transform = "MapPyUnknown"
-        configuration = "{}"
+        configuration = """{"maus_version":"%s"}""" % self.__version
         result = self.birth(config_id, configuration, transform)
         print "birth(bad transform name): %s " % result
         self.validate_status(result, "error")
@@ -224,8 +255,8 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
         # Set up a transform that will fail when it is birthed.
         config_id = datetime.now().microsecond
         transform = "MapPyTestMap"
-        configuration = """{"birth_result":%s}""" \
-            % MapPyTestMap.EXCEPTION
+        configuration = """{"birth_result":%s, "maus_version":"%s"}""" \
+            % (MapPyTestMap.EXCEPTION, self.__version)
         result = self.birth(config_id, configuration, transform)
         print "birth(transform.birth exception): %s " % result
         # Check the status specifies an error.
@@ -240,7 +271,8 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
         # Set up a transform that will fail when it is deathed.
         config_id = datetime.now().microsecond
         transform = "MapPyTestMap"
-        configuration = """{"death_result":%s}""" % MapPyTestMap.EXCEPTION
+        configuration = """{"death_result":%s, "maus_version":"%s"}""" \
+            % (MapPyTestMap.EXCEPTION, self.__version)
         result = self.birth(config_id, configuration, transform)
         # Check the status is OK.
         self.validate_status(result)
@@ -248,7 +280,7 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
         # of the current one.
         config_id = datetime.now().microsecond
         transform = "MapPyDoNothing"
-        configuration = "{}"
+        configuration = """{"maus_version":"%s"}""" % self.__version
         result = self.birth(config_id, configuration, transform)
         print "birth(transform.death exception): %s " % result
         # Check the status specifies an error.
@@ -283,7 +315,8 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
         # Set up a transform that will fail when it is deathed.
         config_id = datetime.now().microsecond
         transform = "MapPyTestMap"
-        configuration = """{"death_result":%s}""" % MapPyTestMap.EXCEPTION
+        configuration = """{"death_result":%s, "maus_version":"%s"}""" \
+            % (MapPyTestMap.EXCEPTION, self.__version)
         result = self.birth(config_id, configuration, transform)
         # Check the status is OK.
         self.validate_status(result)
@@ -302,7 +335,7 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
         """
         config_id = datetime.now().microsecond
         transform = "MapPyTestMap"
-        configuration = "{}"
+        configuration = """{"maus_version":"%s"}""" % self.__version
         result = self.birth(config_id, configuration, transform)
         self.validate_status(result)
         # Call process.
@@ -321,7 +354,7 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
         """
         config_id = datetime.now().microsecond
         transform = "MapPyTestMap"
-        configuration = "{}"
+        configuration = """{"maus_version":"%s"}""" % self.__version
         result = self.birth(config_id, configuration, transform)
         self.validate_status(result)
         result = broadcast("death", reply=True)

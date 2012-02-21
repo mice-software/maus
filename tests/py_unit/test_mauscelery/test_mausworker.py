@@ -17,10 +17,45 @@ Test class for mauscelery.mausworker module.
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+import json
+import logging
 import unittest
 
+from Configuration import Configuration
+import mauscelery.mausworker
 from mauscelery.state import MausConfiguration
+from mauscelery.mausworker import worker_init_callback
 from mauscelery.mausworker import get_maus_configuration
+
+class WorkerInitCallbackTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
+    """
+    Test class for mauscelery.mausworker.worker_init_callback 
+    method.
+    """
+
+    def setUp(self): # pylint: disable=C0103
+        """ 
+        Reset MausConfiguration and set logging.
+        @param self Object reference.
+        """
+        MausConfiguration.version = None
+        # Configure lowest logging level so all logging statements
+        # are executed.
+        logger = logging.getLogger(mauscelery.mausworker.__name__)
+        logger.setLevel(logging.DEBUG)
+
+    def test_callback(self):
+        """ 
+        Invoke worker_process_callback.
+        @param self Object reference.
+        """
+        worker_init_callback()
+        configuration  = Configuration()
+        config_doc = configuration.getConfigJSON()
+        config_dictionary = json.loads(config_doc)
+        self.assertEquals(config_dictionary["maus_version"],
+            MausConfiguration.version,
+            "Unexpected version")
 
 class GetMausConfigPanelTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
     """
@@ -34,6 +69,7 @@ class GetMausConfigPanelTestCase(unittest.TestCase): # pylint: disable=R0904, C0
         """
         MausConfiguration.transform = "MapPyTestMap"
         MausConfiguration.configuration = "{test}"
+        MausConfiguration.version = "MAUS release version: 123"
         config = get_maus_configuration(None)
         self.assertTrue(config.has_key("config_id"), 
             "Missing config_id key")
@@ -47,6 +83,8 @@ class GetMausConfigPanelTestCase(unittest.TestCase): # pylint: disable=R0904, C0
             "Missing transform")
         self.assertEquals(MausConfiguration.transform,
             config["transform"], "Unexpected transform")
+        self.assertEquals(MausConfiguration.version,
+            config["version"], "Unexpected version")
 
 if __name__ == '__main__':
     unittest.main()

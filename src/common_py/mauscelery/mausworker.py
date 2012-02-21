@@ -1,10 +1,7 @@
 """
-MAUS-specific worker broadcast command handlers. Some of these handlers
-invoke operations in Celery sub-processes and defined in 
-mauscelery.mausprocess.
-
-These methods are invoked by the Celery worker's main process
-in response to "broadcast" calls by clients.
+MAUS-specific worker main process commands. Some of these are
+"broadcast" handlers and invoke operations in Celery sub-processes and
+defined in mauscelery.mausprocess.
 
 Each Celery worker spawns one or more sub-processes to handle
 jobs. Each sub-process will have a MausConfiguration and MausTransform
@@ -52,6 +49,32 @@ from workers import WorkerUtilities
 from mauscelery.state import MausConfiguration
 from mauscelery.mausprocess import process_birth
 from mauscelery.mausprocess import process_death
+
+from Configuration import Configuration
+
+from celery.signals import worker_init 
+
+def worker_init_callback(**kwargs): # pylint:disable = W0613
+    """
+    Callback from worker_init which is called when the Celery main
+    worker process starts. It is used to read the MAUS configuration
+    and extract the current MAUS version from this and put it into
+    MausConfiguration. Since sub-processes will receive a copy of
+    MausConfiguration from the Celery master process, the sub-process
+    will always inherit the latest version of MausConfiguration from
+    the master process. 
+    @param kwargs Arguments - unused.
+    """
+    configuration  = Configuration()
+    config_doc = configuration.getConfigJSON()
+    config_dictionary = json.loads(config_doc)
+    MausConfiguration.version = config_dictionary["maus_version"]
+    logger = logging.getLogger(__name__)
+    if logger.isEnabledFor(logging.INFO):
+        logger.info("MAUS version: %s" % MausConfiguration.version)
+
+# Bind the callback method to the Celery worker_init signal.
+worker_init.connect(worker_init_callback) 
 
 def sub_process_broadcast(panel, func, arguments, errors):
     """
@@ -130,8 +153,12 @@ def birth(panel, config_id, transform, configuration = "{}"): # pylint: disable=
             config = configuration
         # Validate transform.        
         WorkerUtilities.validate_transform(transform)
-        # Validate configuration.
-        json.loads(configuration)
+        # Validate configuration is valid JSON.
+        config_doc = json.loads(configuration)
+        # Check MAUS version number is consistent.
+        if (config_doc["maus_version"] != MausConfiguration.version):
+            raise ValueError("maus_version: expected %s, got %s" % 
+                (MausConfiguration.version, config_doc["maus_version"]))
         # Invoke process_birth on all sub-processes
         sub_process_broadcast(panel, process_birth, 
             (config_id, transform, config,), errors)
@@ -197,10 +224,12 @@ def get_maus_configuration(panel): # pylint:disable=W0613
     @param panel Celery panel object.
     @return status document of form {"configuration":
     MAUS_CONFIGURATION_DOC, "transform":
-    TRANSFORM_NAME_OR_LIST_OF_NAMES, "config_id":CONFIG_ID}
+    TRANSFORM_NAME_OR_LIST_OF_NAMES, "config_id":CONFIG_ID,
+    "version":MAUS_VERSION}
     """
     doc = {}
     doc["configuration"] = MausConfiguration.configuration
     doc["transform"] = MausConfiguration.transform
     doc["config_id"] = MausConfiguration.config_id
+    doc["version"] = MausConfiguration.version
     return doc
