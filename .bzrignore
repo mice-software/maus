@@ -50,3 +50,5 @@ doc/doc_src/detectors/*.aux
 doc/doc_src/detectors/*.log
 doc/coverage
 
+src/common_cpp/DataStructure/MausDataStructure.cc
+src/common_cpp/DataStructure/MausDataStructure.h
