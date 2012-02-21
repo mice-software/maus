@@ -102,7 +102,8 @@ TransferMap TransferMapCalculator::GetSweepingPolynomialTransferMap(const Vector
   std::vector<double> deltaV(6), deltaMaxV(6);
   deltaV[0]=delta[0]; deltaV[1]=delta[1]; deltaV[2]=delta[2]; deltaV[3]=delta[3]; deltaV[4]=delta[4]; deltaV[5]=delta[5]; 
   deltaMaxV[0]=deltaMax[0]; deltaMaxV[1]=deltaMax[1]; deltaMaxV[2]=deltaMax[2]; deltaMaxV[3]=deltaMax[3]; deltaMaxV[4]=deltaMax[4]; deltaMaxV[5]=deltaMax[5]; 
-  MAUS::PolynomialVector* pvec = MAUS::PolynomialVector::Chi2SweepingLeastSquaresFitVariableWalls(*trackingOutput, order, std::vector< MAUS::PolynomialVector::PolynomialCoefficient >(), 
+  MAUS::PolynomialVector* pvec = MAUS::PolynomialVector::Chi2SweepingLeastSquaresFitVariableWalls(
+    *trackingOutput, order, std::vector< MAUS::PolynomialVector::PolynomialCoefficient >(), 
                                chi2Max, deltaV, deltaFactor, maxNumberOfSteps, deltaMaxV);
   if(!pvec) throw(Squeal(Squeal::recoverable, "Failed to make any polynomial fit at all - try tweaking control parameters", "TransferMapCalculator::GetSweepingPolynomialTransferMap"));
   for(size_t i=0; i<deltaV.size(); i++) delta[i] = deltaV[i];
