@@ -55,7 +55,6 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
         # Get the current MAUS version.
         configuration  = Configuration()
         config_doc = configuration.getConfigJSON()
-        print config_doc
         config_dictionary = json.loads(config_doc)
         self.__version = config_dictionary["maus_version"]
         # Reset the worker. Invoke twice in case the first attempt
@@ -192,8 +191,6 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
         transform = "MapPyPrint"
         configuration = """{"TOFconversionFactor":%s, "maus_version":"%s"}""" \
             % (config_id, self.__version)
-        print self.__version
-        print configuration
         result = self.birth(config_id, configuration, transform)
         print "birth(OK): %s " % result
         # Check the status and that the configuration has been 
