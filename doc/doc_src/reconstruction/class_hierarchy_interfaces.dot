@@ -1,0 +1,94 @@
+digraph G {
+  fontname = "Bitstream Vera Sans"
+  fontsize = 10
+  size = "8.5 11"
+
+  rankdir = "BT"
+
+  node [
+    fontname = "Bitstream Vera Sans"
+    fontsize = 8
+    shape = "record"
+  ]
+
+  edge [
+    fontname = "Bitstream Vera Sans"
+    fontsize = 8
+  ]
+
+  OpticsModel [
+    label = "{\<\<interface\>\>\n\N|Transport(PhaseSpaceVector): PhaseSpaceVector\lTransport(CovarianceMatrix): CovarianceMatrix\l}"
+  ]
+
+  TrackFitter [
+    label = "{\<\<interface\>\>\n\N}"
+  ]
+
+  RungeKuttaOpticsModel [
+  ]
+
+  IntegratingOpticsModel [
+  ]
+
+  DifferentiatingOpticsModel [
+  ]
+
+  LeastSquaresOpticsModel [
+  ]
+
+  TransferMap [
+    label = "{\<\<interface\>\>\n\N|Transport(PhaseSpaceVector): PhaseSpaceVector\lTransport(CovarianceMatrix): CovarianceMatrix\l}"
+    pos = "10,50"
+  ]
+
+  PolynomialMap [
+  ]
+
+  PolynomialTransferMap [
+  ]
+
+  RungeKuttaTransferMap [
+  ]
+
+  MinuitTrackFitter [
+    label = "{\N|transferMap: TransferMap}"
+  ]
+
+  TOFTrackFitter [
+  ]
+
+  KalmanFilterTrackFitter [
+    label = "{\N|transferMap: TransferMap}"
+  ]
+
+  edge [
+    style = "solid"
+  ]
+
+  PolynomialTransferMap -> PolynomialMap
+
+  edge [
+    style = "dotted"
+  ]
+
+  RungeKuttaOpticsModel -> OpticsModel
+  IntegratingOpticsModel -> OpticsModel
+  DifferentiatingOpticsModel -> OpticsModel
+  LeastSquaresOpticsModel -> OpticsModel
+  PolynomialTransferMap -> TransferMap
+  RungeKuttaTransferMap -> TransferMap
+  MinuitTrackFitter -> TrackFitter
+  TOFTrackFitter -> TrackFitter
+  KalmanFilterTrackFitter -> TrackFitter
+
+  edge [
+    style = "solid"
+    arrowhead = "none"
+
+    headlabel = "1"
+  ]
+
+  OpticsModel -> TransferMap
+  MinuitTrackFitter -> TransferMap
+  KalmanFilterTrackFitter -> TransferMap
+}
