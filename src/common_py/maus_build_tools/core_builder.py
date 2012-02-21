@@ -22,7 +22,6 @@ import glob
 import subprocess
 import shutil
 
-
 MAUS_ROOT_DIR = os.environ['MAUS_ROOT_DIR']
 
 def install_python_tests(maus_root_dir, env):
@@ -113,23 +112,17 @@ def build_data_structure(env):
     data_struct = os.path.join(maus_root_dir, 'src/common_cpp/DataStructure/') 
     here = os.getcwd()
     os.chdir(maus_root_dir)
-    shutil.copy(data_struct+'rootlogon.C', maus_root_dir)
-    proc = subprocess.Popen(['root', '-q', '-l', '-b'])
+    data_items = glob.glob(data_struct+'/*.hh')
+    # LinkDef.hh must be last
+    data_items.sort(key = lambda x: x.find('LinkDef.hh')) 
+    dict_target = (data_struct+'/MausDataStructure.cc')
+    proc_target = ['rootcint']+['-f', dict_target, '-c']
+    for include in env['CPPPATH']:
+        proc_target.append('-I'+include)
+    proc_target += data_items
+    print proc_target
+    proc = subprocess.Popen(proc_target)
     proc.wait()
-    os.remove('rootlogon.C')
-
-    for shared_object_path in glob.glob(data_struct+'/*.so'):
-        shared_object = shared_object_path.split('/')[-1]
-        target_path =  os.path.join(maus_root_dir, 'build', shared_object)
-        print target_path
-        shutil.copy(shared_object_path, target_path)
-        try:
-            os.symlink(target_path,
-                      os.path.join(maus_root_dir, 'build', 'lib'+shared_object))
-        except OSError:
-            pass
-        env.Append(LIBS=[shared_object[:-3]])
-        print 'Adding library '+shared_object[:-3]
     os.chdir(here)
 
 

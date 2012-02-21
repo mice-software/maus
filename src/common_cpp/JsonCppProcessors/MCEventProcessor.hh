@@ -14,30 +14,29 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_MCEVENTPROCESSOR_HH_
-#define _SRC_COMMON_CPP_DATASTRUCTURE_MCEVENTPROCESSOR_HH_
+#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_MCEVENTPROCESSOR_HH_
+#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_MCEVENTPROCESSOR_HH_
 
 #include "json/value.h"
+
+#include "src/common_cpp/JsonCppProcessors/PrimaryProcessor.hh"
+
+#include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
 
 #include "src/common_cpp/DataStructure/MCEvent.hh"
 
 namespace MAUS {
 
-class MCEventArrayProcessor {
+class MCEventProcessor : public ObjectProcessor<MCEvent> {
  public:
-  std::vector<MCEvent*>* operator()(const Json::Value& data);
-  Json::Value* operator()(const std::vector<MCEvent*>& data);
+    MCEventProcessor();
 
  private:
-};
-
-class MCEventProcessor {
- public:
-  MCEvent* operator()(const Json::Value& data);
-  Json::Value* operator()(const MCEvent& data);
-
- private:
-
+    ValueArrayProcessor<Hit> _hit_proc;
+    ValueArrayProcessor<Track> _track_proc;
+    ValueArrayProcessor<VirtualHit> _virtual_hit_proc;
+    PrimaryProcessor _primary_proc;
 };
 
 }

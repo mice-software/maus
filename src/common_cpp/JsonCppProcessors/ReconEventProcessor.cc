@@ -18,30 +18,14 @@
 
 namespace MAUS {
 
-ReconEventArray* ReconEventArrayProcessor::operator()(const Json::Value& data) {
-    ReconEventArray* event_vector = new ReconEventArray();
-    for (size_t i = 0; i < data.size(); ++i) {
-        ReconEvent* ev = ReconEventProcessor()(data[i]);
-        event_vector->push_back(ev);
-    }
-    return event_vector;
-}
-
-Json::Value* ReconEventArrayProcessor::operator()(const std::vector<ReconEvent*>& data) {
-    Json::Value* event_array = new Json::Value(Json::arrayValue);
-    for (size_t i = 0; i < data.size(); ++i) {
-        event_array->append(ReconEventProcessor()(data[i]));
-    }
-    return event_array;
-}
-
-ReconEvent* ReconEventProcessor::operator()(const Json::Value& data) {
-    return new ReconEvent();
-}
-
-Json::Value* ReconEventProcessor::operator()(const ReconEvent& data) {
-    return new Json::Value();
+ReconEventProcessor::ReconEventProcessor() {
+    RegisterPointerBranch("tof_event", &_tof_proc, &ReconEvent::GetTofEvent, &ReconEvent::SetTofEvent, false);
+    RegisterPointerBranch("tracker_event", &_tracker_proc, &ReconEvent::GetTrackerEvent, &ReconEvent::SetTrackerEvent, false);
+    RegisterPointerBranch("ckov_event", &_ckov_proc, &ReconEvent::GetCkovEvent, &ReconEvent::SetCkovEvent, false);
+    RegisterPointerBranch("emr_event", &_emr_proc, &ReconEvent::GetEMREvent, &ReconEvent::SetEMREvent, false);
+    RegisterPointerBranch("kl_event", &_kl_proc, &ReconEvent::GetKLEvent, &ReconEvent::SetKLEvent, false);
+    RegisterPointerBranch("trigger_event", &_trigger_proc, &ReconEvent::GetTriggerEvent, &ReconEvent::SetTriggerEvent, false);
+    RegisterPointerBranch("global_event", &_global_proc, &ReconEvent::GetGlobalEvent, &ReconEvent::SetGlobalEvent, false);
 }
 
 }
-

@@ -14,14 +14,23 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_MCEVENTDATA_HH_
-#define _SRC_COMMON_CPP_DATASTRUCTURE_MCEVENTDATA_HH_
+#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_MCEVENT_HH_
+#define _SRC_COMMON_CPP_DATASTRUCTURE_MCEVENT_HH_
 
 #include <vector>
 
 #include "Rtypes.h" // ROOT
 
 namespace MAUS {
+
+class Track;
+class VirtualHit;
+class Hit;
+class Primary;
+
+typedef std::vector<Track> TrackArray;
+typedef std::vector<VirtualHit> VirtualHitArray;
+typedef std::vector<Hit> HitArray;
 
 class MCEvent {
  public:
@@ -33,13 +42,29 @@ class MCEvent {
   
   virtual ~MCEvent();
 
-  ClassDef(MCEvent, 1)
+  TrackArray* GetTracks() const;
+  void SetTracks(TrackArray* tracks);
+
+  VirtualHitArray* GetVirtualHits() const;
+  void SetVirtualHits(VirtualHitArray* hits);
+
+  HitArray* GetHits() const;
+  void SetHits(HitArray* hits);
+
+  Primary* GetPrimary() const;
+  void SetPrimary(Primary* primary);
 
  private:
-};
 
-typedef std::vector<MCEvent*> MCEventArray;
+  Primary* _primary;
+  VirtualHitArray* _virtuals;
+  HitArray* _hits;
+  TrackArray* _tracks;
+
+  ClassDef(MCEvent, 1)
+};
 
 }
 
 #endif
+

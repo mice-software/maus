@@ -14,32 +14,20 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <iostream>
+
+#include "src/common_cpp/JsonCppProcessors/VirtualHitProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/TrackProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/HitProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/MCEventProcessor.hh"
 
 namespace MAUS {
 
-std::vector<MCEvent*>* MCEventArrayProcessor::operator()(const Json::Value& data) {
-    std::vector<MCEvent*>* event_vector = new std::vector<MCEvent*>();
-    for (size_t i = 0; i < data.size(); ++i) {
-        event_vector->push_back(MCEventProcessor()(data[i]));
-    }
-    return event_vector;
-}
-
-Json::Value* MCEventArrayProcessor::operator()(const std::vector<MCEvent*>& data) {
-    Json::Value* event_array = new Json::Value(Json::arrayValue);
-    for (size_t i = 0; i < data.size(); ++i) {
-        event_array->append(MCEventProcessor()(data[i]));
-    }
-    return event_array;
-}
-
-MCEvent* MCEventProcessor::operator()(const Json::Value& data) {
-    return new MCEvent();
-}
-
-Json::Value* MCEventProcessor::operator()(const MCEvent& data) {
-    return new Json::Value();
+MCEventProcessor::MCEventProcessor() : _hit_proc(new HitProcessor()), _track_proc(new TrackProcessor()), _virtual_hit_proc(new VirtualHitProcessor()) {
+    RegisterPointerBranch("primary", &_primary_proc, &MCEvent::GetPrimary, &MCEvent::SetPrimary, true);
+    RegisterPointerBranch("hits", &_hit_proc, &MCEvent::GetHits, &MCEvent::SetHits, true);
+    RegisterPointerBranch("tracks", &_track_proc, &MCEvent::GetTracks, &MCEvent::SetTracks, true);
+    RegisterPointerBranch("virtual_hits", &_virtual_hit_proc, &MCEvent::GetVirtualHits, &MCEvent::SetVirtualHits, true);
 }
 
 }

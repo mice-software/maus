@@ -31,9 +31,9 @@ class EMRSpillData{
   
   virtual ~EMRSpillData();
 
-  ClassDef(EMRSpillData, 1)
-
  private:
+
+  ClassDef(EMRSpillData, 1)
 };
 
 }

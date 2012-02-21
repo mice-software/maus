@@ -23,14 +23,13 @@
 #include "json/json.h"
 
 #include "src/legacy/Interface/Squeal.hh"
+#include "src/common_cpp/DataStructure/Spill.hh"
 
-class Digits;
-class MC;
-class MausData;
-class JsonCppConverter;
 class irstream;
 
 namespace MAUS {
+
+class JsonCppConverter;
 
 /** @class InputCppRoot
  *
@@ -57,6 +56,7 @@ class InputCppRoot {
    *  - takes root file from "root_input_filename" parameter
    */
   bool birth(std::string json_datacards);
+  bool test_script();
 
   /** Deletes inputter member data
    */
@@ -76,10 +76,7 @@ class InputCppRoot {
  private:
   irstream* _infile;
   JsonCppConverter* _jsonCppConverter;
-  Digits* _d;
-  MC* _mc;
-  MausData* _md;
-  Json::Value _val;
+  Spill* _spill;
   std::string _filename;
 };
 }

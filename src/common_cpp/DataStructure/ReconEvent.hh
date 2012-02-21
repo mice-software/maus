@@ -23,19 +23,62 @@
 
 namespace MAUS {
 
-class ReconEvent {
- public:
-  ReconEvent();
+class TofEvent {};
 
-  ReconEvent(const ReconEvent& md);
-       
-  ReconEvent& operator=(const ReconEvent& md);
-  
-  virtual ~ReconEvent();
+class TrackerEvent {};
+
+class CkovEvent {};
+
+class KLEvent {};
+
+class EMREvent {};
+
+class TriggerEvent {};
+
+class GlobalEvent {};
+
+class ReconEvent {
+  public:
+    ReconEvent();
+
+    ReconEvent(const ReconEvent& md);
+         
+    ReconEvent& operator=(const ReconEvent& md);
+    
+    virtual ~ReconEvent();
+
+    TofEvent* GetTofEvent() const;
+    void SetTofEvent(TofEvent* event);
+
+    TrackerEvent* GetTrackerEvent() const;
+    void SetTrackerEvent(TrackerEvent* event);
+
+    CkovEvent* GetCkovEvent() const;
+    void SetCkovEvent(CkovEvent* event);
+
+    KLEvent* GetKLEvent() const;
+    void SetKLEvent(KLEvent* event);
+
+    EMREvent* GetEMREvent() const;
+    void SetEMREvent(EMREvent* event);
+
+    TriggerEvent* GetTriggerEvent() const;
+    void SetTriggerEvent(TriggerEvent* event);
+
+    GlobalEvent* GetGlobalEvent() const;
+    void SetGlobalEvent(GlobalEvent* event);
+
+  private:
+
+    TofEvent* _tof_event;
+    TrackerEvent* _tracker_event;
+    CkovEvent* _ckov_event;
+    KLEvent* _kl_event;
+    EMREvent* _emr_event;
+    TriggerEvent* _trigger_event;
+    GlobalEvent* _global_event;
 
   ClassDef(ReconEvent, 1)
-
- private:
 };
 
 typedef std::vector<ReconEvent*> ReconEventArray;

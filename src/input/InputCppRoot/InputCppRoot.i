@@ -8,7 +8,7 @@
 
 %feature("shadow") InputCppRoot::emitter() %{
 def emitter(self):
-  next_event = "a"
+  next_event = "No Event"
   while (next_event != ""):
     next_event = self.getNextEvent()
     yield next_event

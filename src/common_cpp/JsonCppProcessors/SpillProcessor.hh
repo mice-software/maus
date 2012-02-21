@@ -14,36 +14,40 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "src/common_cpp/JsonCppProcessors/MausSpillProcessor.hh"
+#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_SPILLPROCESSOR_HH_
+#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_SPILLPROCESSOR_HH_
+
+#include "json/value.h"
+
+#include "src/common_cpp/JsonCppProcessors/DAQDataProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/ScalarsProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/EMRSpillDataProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/DAQDataProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/MCEventProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/ReconEventProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/PrimitivesProcessors.hh"
+#include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
+
+#include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
+#include "src/common_cpp/DataStructure/Spill.hh"
+
 
 namespace MAUS {
 
-MausSpill* MausSpillProcessor::operator()(const Json::Value& jv) {
-    MausSpill* ms = new MausSpill();
+typedef std::vector<MCEvent*> MCEventArray;
 
-    if (!jv["scalars"].isNull()) {
-        ms->SetScalars(ScalarsProcessor()(jv["scalars"]));
-    }
-    if (!jv["emr_spill_data"].isNull()) {
-        ms->SetEMRSpillData(EMRSpillDataProcessor()(jv["emr_spill_data"]));
-    }
-    if (!jv["daq_data"].isNull()) {
-        ms->SetDAQData(DAQDataProcessor()(jv["daq_data"]));
-    }
-    if (!jv["mc_events"].isNull()) {
-        ms->SetMCEventArray(MCEventArrayProcessor()(jv["mc_events"]));
-    }
-    if (!jv["recon_events"].isNull()) {
-        ms->SetReconEventArray(ReconEventArrayProcessor()(jv["recon_events"]));
-    }
+class SpillProcessor : public ObjectProcessor<Spill> {
+ public:
+    SpillProcessor();
 
-    return ms;  
-}
+ private:
+    ScalarsProcessor _scal_proc;
+    DAQDataProcessor _daq_proc;
+    EMRSpillDataProcessor _emr_proc;
+    PointerArrayProcessor<MCEvent> _mc_array_proc;
+    PointerArrayProcessor<ReconEvent> _recon_array_proc;
+    IntProcessor _int_proc;
+
+};
 
 }
+#endif
 

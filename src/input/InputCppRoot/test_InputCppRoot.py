@@ -39,19 +39,9 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
         """
         Make a sample TFile
         """
-        mrd = os.environ['MAUS_ROOT_DIR']
-        self.fname = os.path.join(mrd, "tmp", "TestInputCppRoot.root")
-        tfile = ROOT.TFile(self.fname, "RECREATE") # pylint: disable=E1101
-        ttree = ROOT.TTree("Data", "treetitle") # pylint: disable=E1101
-        dig = ROOT.Digits() # pylint: disable=E1101
-        mc = ROOT.MC() # pylint: disable=E1101
-        md = ROOT.MausData() # pylint: disable=E1101
-        md.set_digits(dig)
-        md.set_mc(mc)
-        ttree.Branch('digits', md.get_digits(), 'digits')
-        ttree.Branch('mc', md.get_mc(), 'mc')
-        ttree.Write()
-        tfile.Close()
+        inputter = InputCppRoot.InputCppRoot()
+        inputter.test_script()
+        self.fname = "TestFile.root"
 
     def test_birth_death(self):
         """
@@ -69,15 +59,23 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
 
         inputter_3 = InputCppRoot.InputCppRoot()
         inputter_3.death()
-        print 'done'
 
     def test_read_normal_event(self):
         """
         Try saving a few standard events
         """
+        print "init"
         inputter = InputCppRoot.InputCppRoot(self.fname)
-        for item in inputter.emitter():
+        inputter.birth("{}")
+        print "get next event"
+        print inputter.getNextEvent()
+        print inputter.getNextEvent()
+        print inputter.getNextEvent()
+        print "emitter"
+        for item in ra:
+            print "emitted"
             print item
+            print type(item)
         
 
     def test_read_bad_event(self):

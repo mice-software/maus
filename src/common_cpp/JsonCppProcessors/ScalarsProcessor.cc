@@ -17,13 +17,7 @@
 #include "src/common_cpp/JsonCppProcessors/ScalarsProcessor.hh"
 
 namespace MAUS {
-
-Scalars* ScalarsProcessor::operator()(const Json::Value& data) {
-    return new Scalars();
-}
-
-Json::Value* ScalarsProcessor::operator()(const Scalars& data) {
-    return new Json::Value();
+ScalarsProcessor::ScalarsProcessor() {
 }
 
 }

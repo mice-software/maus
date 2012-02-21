@@ -14,21 +14,22 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_DAQDATAPROCESSOR_HH_
-#define _SRC_COMMON_CPP_DATASTRUCTURE_DAQDATAPROCESSOR_HH_
+#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_DAQDATAPROCESSOR_HH_
+#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_DAQDATAPROCESSOR_HH_
 
 #include "json/value.h"
+
+#include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
 
 #include "src/common_cpp/DataStructure/DAQData.hh"
 
 namespace MAUS {
 
-class DAQDataProcessor {
- public:
-  DAQData* operator()(const Json::Value& data);
-  Json::Value* operator()(const DAQData& data);
+class DAQDataProcessor : public ObjectProcessor<DAQData> {
+  public:
+    DAQDataProcessor();
 
- private:
+  private:
 };
 
 }
