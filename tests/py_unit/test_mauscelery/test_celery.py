@@ -145,7 +145,7 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
             MESSAGE},...], u'status': u'error'}},...]
         @endverbatim
         @param self Object reference.
-        @param report Expected status report.
+        @param report Status report.
         @param status Expected status.
         """
         self.assertTrue(len(report) > 0, 
