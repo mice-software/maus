@@ -189,7 +189,7 @@ SciFi_sigma_z = 0.081 # mm
 SciFi_sigma_duplet =  0.6197 # mm
 
 # configuration database
-cdb_upload_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database uploads
+cdb_upload_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database uploads TestServer::http://rgma19.pp.rl.ac.uk:8080/cdb/
 cdb_download_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database downloads
 
 # geometry download
@@ -202,6 +202,7 @@ geometry_download_by = 'run_number' # choose 'run_number' to download by run num
 geometry_download_run_number = 0
 geometry_download_id = 0
 geometry_download_cleanup = True # set to True to clean up after download
+g4_step_max = 5.0 # this is the value which shall be placed in the Mice Modules which have been translated from CAD
 
 # geometry upload
 geometry_upload_wsdl = "geometrySuperMouse?wsdl" # name of the web service used for uploads
@@ -209,6 +210,7 @@ geometry_upload_directory = "%s/files/geometry/upload" % os.environ.get("MAUS_RO
 geometry_upload_note = "" # note, pushed to the server to describe the geometry. A note must be specified here (default will throw an exception).
 geometry_upload_valid_from = "" # date-time in format like: that the specified installation was made in the experiment. A date-time must be specified here (default will throw an exception).
 geometry_upload_cleanup = True # set to True to clean up after upload
+
 
 # this is used by ImputCppRealData
 Number_of_DAQ_Events = -1
