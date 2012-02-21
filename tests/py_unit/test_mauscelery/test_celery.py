@@ -220,8 +220,7 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
 
     def test_birth_bad_version(self):
         """
-        Test birth broadcast command with an invalid JSON
-        configuration document. 
+        Test birth broadcast command with a mismatched MAUS version. 
         @param self Object reference.
         """
         config_id = datetime.now().microsecond
