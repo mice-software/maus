@@ -1,5 +1,5 @@
 """
-MongoDB-based document store.
+Document store super-class.
 """
 
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
@@ -17,60 +17,20 @@ MongoDB-based document store.
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-from datetime import datetime
-import time
-import pymongo
-
-from docstore.DocumentStore import DocumentStore
-
-class MongoDBDocumentStore(DocumentStore):
+class DocumentStore: # pylint: disable=W0232
     """
-    MongoDB-based document store.
+    Document store super-class which holds documents identified by
+    a unique identifier and timestamped with their time added to
+    the store.
     """
 
-    def __init__(self):
-        """ 
-        Constructor.
-        @param self Object reference.
-        """
-        self.__mongodb = None
-        self.__data_store = None
-        
     def connect(self, parameters = None):
         """ 
-        Connect to the data store. The connection is configured
-        via the following parameters:
-
-        -mongodb_host - MongoDB host name. This is a mandatory parameter.
-        -mongodb_port - MongoDB port. This is a mandatory parameter.
-        -mongodb_database_name - MongoDB database name. This is a
-         mandatory parameter. If the database does not exist then it
-         is created.
-        -mongodb_collection_name - MongoDB collection name. This is a
-         mandatory parameter. If the collection does not exist then it
-         is created.
-
+        Connect to the data store - this is a no-op.
         @param self Object reference.
         @param parameters Connection information.
-        @throws KeyError. If mongodb_host, mongodb_port,
-        mongodb_database_name or mongo_collection_name are not
-        provided. 
-        @throws pymongo.errors.AutoReconnect. If the database cannot
-        be contacted using the given host and port.
         """
-        self.__mongodb = pymongo.Connection(
-            parameters["mongodb_host"],
-            parameters["mongodb_port"])
-        database = self.__mongodb[parameters["mongodb_database_name"]]
-        self.__data_store = database[parameters["mongodb_collection_name"]]
-
-    def __len__(self):
-        """ 
-        Get number of documents in the data store.
-        @param self Object reference.
-        @return number >= 0.
-        """
-        return self.__data_store.count()
+        pass
 
     def ids(self):
         """ 
@@ -78,7 +38,15 @@ class MongoDBDocumentStore(DocumentStore):
         @param self Object reference.
         @return ID list.
         """
-        return self.__data_store.distinct("_id")
+        pass
+
+    def __len__(self):
+        """ 
+        Get number of documents in the data store.
+        @param self Object reference.
+        @return number >= 0.
+        """
+        pass
 
     def put(self, docid, doc):
         """ 
@@ -89,9 +57,7 @@ class MongoDBDocumentStore(DocumentStore):
         @param docid Document ID.
         @param doc Document.
         """
-        # Get (YYYY,MM,DD,HH,MM,SS,MILLI)
-        current_time = datetime.fromtimestamp(time.time())
-        self.__data_store.save({'_id':docid, 'date':current_time, 'doc':doc})
+        pass
 
     def get(self, docid):
         """ 
@@ -101,13 +67,9 @@ class MongoDBDocumentStore(DocumentStore):
         @param docid Document ID.
         @return document or None.
         """
-        doc = self.__data_store.find_one({"_id":docid})
-        if doc != None:
-            return doc['doc']
-        else:
-            return None
+        pass
 
-    def get_since(self, earliest = None):
+    def get_since(self, earliest):
         """ 
         Get the documents added since the given date from the data 
         store or None if there is none.
@@ -118,12 +80,7 @@ class MongoDBDocumentStore(DocumentStore):
         {'_id':id, 'date':date, 'doc':doc} where date is in the
         Python datetime format e.g. YYYY-MM-DD HH:MM:SS.MILLIS.
         """
-        if (earliest == None):
-            result = self.__data_store.find()
-        else:
-            result = self.__data_store.find(\
-                {"date":{"$gt":earliest}}).sort("_id")
-        return result
+        pass
 
     def delete(self, docid):
         """ 
@@ -132,18 +89,18 @@ class MongoDBDocumentStore(DocumentStore):
         @param self Object reference.
         @param docid Document ID.
         """
-        self.__data_store.remove({"_id":docid})
+        pass
 
     def clear(self):
         """ 
         Clear all the documents from the data store.
         @param self Object reference.
         """
-        self.__data_store.remove()
+        pass
 
     def disconnect(self):
         """
-        Disconnect. 
+        Disconnect. If there is no notion of disconnect this is a no-op.
         @param self Object reference.
         """
-        self.__mongodb.disconnect()
+        pass
