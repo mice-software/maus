@@ -17,7 +17,6 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     easy_install bitarray
     easy_install matplotlib
     easy_install celery
-    easy_install CouchDB
     easy_install pymongo
 
     echo "INFO: The package should be locally build now in your"

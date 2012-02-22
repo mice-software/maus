@@ -380,7 +380,7 @@ class MultiProcessDataflowExecutor:
         @return description.
         """
         description = "Run MICE how it is run in the control room. This\n"  
-        description += "requires CouchDB and Celery to be installed. See\n"
+        description += "requires MongoDB and Celery to be installed. See\n"
         description += "the wiki links on how to do this at\n"
         description += \
             "http://micewww.pp.rl.ac.uk/projects/maus/wiki/MAUSCeleryConfiguration\n" # pylint:disable=C0301
@@ -397,7 +397,7 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903
     created. In this case, the class expects a document store class to
     be specified in the JSON configuration e.g.
     @verbatim
-    doc_store_class = "CouchDBDocumentStore.CouchDBDocumentStore"
+    doc_store_class = "MongoDBDocumentStore.MongoDBDocumentStore"
     @endverbatim
     The class used may have additional configuration requirements.
 
@@ -536,7 +536,7 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903
         @return description.
         """
         description = "Run MICE how it is run in the control room. This\n"  
-        description += "requires CouchDB and Celery to be installed. See\n"
+        description += "requires MongoDB and Celery to be installed. See\n"
         description += "the wiki links on how to do this at\n"
         description += \
             "http://micewww.pp.rl.ac.uk/projects/maus/wiki/MAUSCeleryConfiguration\n" # pylint:disable=C0301
@@ -553,7 +553,7 @@ class MultiProcessMergeOutputDataflowExecutor: # pylint: disable=R0903
     created. In this case, the class expects a document store class to
     be specified in the JSON configuration e.g.
     @verbatim
-    doc_store_class = "CouchDBDocumentStore.CouchDBDocumentStore"
+    doc_store_class = "MongoDBDocumentStore.MongoDBDocumentStore"
     @endverbatim
     The class used may have additional configuration requirements.
 
@@ -632,7 +632,7 @@ class MultiProcessMergeOutputDataflowExecutor: # pylint: disable=R0903
         @return description.
         """
         description = "Run MICE how it is run in the control room. This\n"  
-        description += "requires CouchDB to be installed. See\n"
+        description += "requires MongoDB to be installed. See\n"
         description += "the wiki links on how to do this at\n"
         description += \
             "http://micewww.pp.rl.ac.uk/projects/maus/wiki/MAUSCeleryConfiguration\n" # pylint:disable=C0301

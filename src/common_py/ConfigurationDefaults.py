@@ -274,8 +274,6 @@ maus_version = "" # set at runtime - do not edit this (changes are ignored)
 configuration_file = "" # should be set on the command line only (else ignored)
 
 doc_store_class = "docstore.InMemoryDocumentStore.InMemoryDocumentStore"
-couchdb_url = "http://localhost:5984" # Default CouchDB URL. Only needed if using CouchDBDocumentStore.
-couchdb_database_name = "mausdb" # Default CouchDB database name. Only needed if using CouchDBDocumentStore.
 
 mongodb_host = "localhost" # Default MongoDB host name. Only needed if using MongoDBDocumentStore.
 mongodb_port = 27017 # Default MongoDB port. Only needed if using MongoDBDocumentStore.
