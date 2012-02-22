@@ -32,6 +32,12 @@ class PointerItem; // defined in ObjectProcessor-inl
 template <class ObjectType, class ChildType>
 class ValueItem; // defined in ObjectProcessor-inl
 
+/** ObjectProcessor processes json object types into C++ classes
+ *
+ *  Methods are implemented to convert each C++ data member to a Json::Value
+ *  instance. 
+ */
+
 template <class ObjectType>
 class ObjectProcessor : public ProcessorBase<ObjectType> {
   public:

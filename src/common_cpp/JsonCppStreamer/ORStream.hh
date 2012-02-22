@@ -13,8 +13,8 @@
 
 #include "gtest/gtest_prod.h"
 
-#include "RStream.hh"
-#include "OneArgManip.hh"
+#include "JsonCppStreamer/RStream.hh"
+#include "JsonCppStreamer/OneArgManip.hh"
 
 /*!
  * \class orstream
@@ -24,7 +24,7 @@
  * \author Alexander Richards, Imperial College London
  * \date 06/01/2012
  */
-class orstream : public rstream{
+class orstream : public rstream {
  public:
   /*!
    * \brief Constructor
@@ -51,9 +51,9 @@ class orstream : public rstream{
 	    const char* = "Created by orstream",
 	    const char* = "READ");
 
-  //! \brief close the file and cleanup
+  // ! \brief close the file and cleanup
   void close();
-  //! Declare friend function.
+  // ! Declare friend function.
   friend orstream& fillEvent(orstream& ors);
   /*!
    * \brief insertion operator dealing with zero-arg manipulators
@@ -91,14 +91,13 @@ class orstream : public rstream{
   FRIEND_TEST(ORStreamTest, TestFileOpen);
   FRIEND_TEST(ORStreamTest, TestFileClose);
   FRIEND_TEST(ORStreamTest, TestFillEvent);
-
 };
 
 
 // Member functions template definitions
-//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
+// \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
 template<typename T>
-orstream& orstream::operator<<(oneArgManip<T>* manip){
+orstream& orstream::operator<<(oneArgManip<T>* manip) {
   (*manip)(*this);
   delete manip;
   return *this;
@@ -120,7 +119,7 @@ template<>           orstream& orstream::operator<< <float> (float* &  d){attach
 
 
 // Friend function definitions
-//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
+// \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
 /*!
  * \brief push the event back into the tree with the current content of the branches.
  * This manipulator function will populate the tree with an additional event

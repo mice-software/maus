@@ -23,19 +23,46 @@
 
 namespace MAUS {
 
+/** @class IProcessor
+ *  
+ *  IProcessor is the processor interface class for processing json data to cpp
+ *  data. Json data is represented by Json::Value while cpp data is represented
+ *  by CppRepresentation type.
+ */
 template <class CppRepresentation>
 class IProcessor {
   public:
     virtual ~IProcessor() {}
-    virtual CppRepresentation* JsonToCpp(const Json::Value& json_representation) = 0;
-    virtual Json::Value* CppToJson(const CppRepresentation& cpp_representation) = 0;
+
+    /** Convert from the Json representation to the cpp representation
+     *
+     *  Memory for CppRepresentation should be allocated by this function.
+     */
+    virtual CppRepresentation* JsonToCpp
+                                   (const Json::Value& json_representation) = 0;
+
+    /** Convert from the Cpp representation to the json representation
+     *
+     *  Memory for the json representation should be allocated by this function.
+     */
+    virtual Json::Value* CppToJson
+                              (const CppRepresentation& cpp_representation) = 0;
 };
 
+/** @class ProcessorBase
+ *  
+ *  ProcessorBase is the processor base class for processing json data to cpp
+ *  data. Json data is represented by Json::Value while cpp data is represented
+ *  by CppRepresentation type. The isStrict data member has been added to enable
+ *  runtime control of how errors in the json data are handled. 
+ */
 template <class CppRepresentation>
 class ProcessorBase : IProcessor<CppRepresentation> {
   public:
-    virtual CppRepresentation* JsonToCpp(const Json::Value& json_representation) = 0;
-    virtual Json::Value* CppToJson(const CppRepresentation& cpp_representation) = 0;
+    virtual CppRepresentation* JsonToCpp
+                                   (const Json::Value& json_representation) = 0;
+    virtual Json::Value* CppToJson
+                              (const CppRepresentation& cpp_representation) = 0;
 
     virtual void SetIsStrict(bool isStrict) {
         _isStrict = isStrict;
