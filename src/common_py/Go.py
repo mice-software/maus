@@ -17,6 +17,7 @@ Go controls the running of MAUS dataflows.
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+from datetime import datetime
 import os
 import json
 import socket
@@ -24,6 +25,7 @@ import sys
 
 # MAUS
 from Configuration import Configuration
+import ErrorHandler
 from docstore.DocumentStore import DocumentStore
 
 class Go: # pylint: disable=R0921, R0903
@@ -442,6 +444,10 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903
         @param self Object reference.
         @throws Exception if there are no active Celery workers.
         """
+        # Purge the document store.
+        print("Purging data store")
+        self.doc_store.clear()
+
         # Check for active Celery nodes.
         from celery.task.control import inspect
         print("Checking for active nodes")
@@ -608,14 +614,24 @@ class MultiProcessMergeOutputDataflowExecutor: # pylint: disable=R0903
 
         # This is a hack - it WILL be resolved in terms of
         # querying the database for remaining spills.
+
+        last_time = datetime(1970, 01, 01)
         while True:
-            for spill_id in self.doc_store.ids():
-                spill = self.doc_store.get(spill_id)
-                print "  Executing Merge->Output for spill %s\n" % spill_id,
-                spill = self.merger.process(spill)
-                self.outputer.save(spill)
-                self.doc_store.delete(spill_id)
-                print("  %d spills left in data store." % (len(self.doc_store)))
+            recent_docs = self.doc_store.get_since(last_time)
+            for doc in recent_docs:
+                doc_id = doc["_id"]
+                doc_time = doc["date"]
+                if (doc_time > last_time):
+                    last_time = doc_time
+                spill = doc["doc"]
+                print "Retrieved document %s (dated %s)" % \
+                    (doc_id, doc_time)
+                print "  Executing Merge->Output for spill %s\n" % doc_id,
+                try:
+                    spill = self.merger.process(spill)
+                    self.outputer.save(spill)
+                except: # pylint:disable = W0702
+                    ErrorHandler.HandleException({}, self)
 
         print("CLOSING PIPELINE: Sending END_OF_RUN to merger")
 
