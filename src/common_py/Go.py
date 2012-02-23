@@ -395,7 +395,11 @@ class MultiProcessDataflowExecutor:
             "http://micewww.pp.rl.ac.uk/projects/maus/wiki/MAUSCeleryConfiguration\n" # pylint:disable=C0301
         return description
 
-class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903
+from celery.task.control import inspect
+from celery.task.control import broadcast
+from mauscelery.tasks import execute_transform
+
+class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903, R0902
     """
     @class MultiProcessInputTransformDataflowExecutor
     Execute the input-transform part of MAUS dataflows using a Celery
@@ -427,7 +431,12 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903
         self.inputer = inputer
         self.transformer = transformer
         self.json_config_doc = json_config_doc
-        #  Parse the configuration JSON
+        # Unique ID.
+        self.client_config_id = "%s (%s)" \
+            % (socket.gethostname(), os.getpid())
+        self.spill_count = 0
+        self.run_number = 0
+        # Parse the configuration JSON
         self.json_config_dictionary = json.loads(self.json_config_doc)
         if (doc_store == None):
             # Create proxy for and connect to document store.
@@ -436,110 +445,196 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903
         else:
             self.doc_store = doc_store
 
+    @staticmethod
+    def ping_celery_nodes():
+        """
+        Check for active Celery nodes.
+        @return number of active nodes.
+        @throws Exception if no active nodes.
+        """
+        print("Checking for active Celery nodes...")
+        inspection = inspect()
+        active_nodes = inspection.active()
+        if (active_nodes == None):
+            raise Exception("No active Celery nodes!")
+        num_nodes = len(active_nodes)
+        print("Number of active Celery nodes: %d" % num_nodes)
+        return num_nodes
+
+    def configure_celery_nodes(self):
+        """
+        Configure Celery nodes with the current MAUS configuration
+        and transformer names via a Celery broadcast.
+        @throws Exception if one or more nodes fail to reconfigure.
+        """
+        print "Configuring Celery nodes and birthing transforms..."
+        if hasattr(self.transformer, "get_worker_names"):
+            workers = self.transformer.get_worker_names()
+        else:
+            workers = self.transformer.__class__.__name__
+        # First ping the workers to see if there's at least one.
+        num_nodes = self.ping_celery_nodes()
+        # Send a birth request. Give each node up to 1000s to reply,
+        # but if they all reply before that just continue. This is
+        # why we record the number of active nodes from the ping.
+        print "Pushing new configuration..."
+        results = []
+        results = broadcast("birth", arguments={
+            "transform": workers, 
+            "configuration": self.json_config_doc,
+            "config_id": self.client_config_id}, 
+            reply=True, timeout=1000, limit=num_nodes)
+        # Validate that all nodes updated.
+        updated_ok = True
+        for node in results:
+            node_id = node.keys()[0]
+            node_status = node[node_id]
+            if node_status["status"] == "error":
+                print "  Node error: %s : %s" % (node_id, node_status)
+                updated_ok = False
+            if node_status["status"] == "unchanged":
+                print "  Node unchanged: %s" % node_id
+#                updated_ok = False
+            else:
+                print "  Node configured: %s" % node_id
+        if (not updated_ok):
+            raise Exception("Celery nodes failed to configure!")
+        print "Celery nodes configured!"
+
+    @staticmethod
+    def death_celery_nodes():
+        """
+        Call death on transforms in Celery nodes.
+        """
+        print "Requesting Celery nodes death transforms..."
+        results = broadcast("death", reply=True)
+        for node in results:
+            node_id = node.keys()[0]
+            node_status = node[node_id]
+            if node_status.has_key("error"):
+                print "  Node error: %s : %s" % (node_id, node_status)
+            else:
+                print "  Node transforms deathed: %s" % node_id
+        print "Celery node transforms deathed!"
+
+    def handle_celery_tasks(self, celery_tasks):
+        """
+        Wait for tasks currently being executed by Celery nodes to 
+        complete.
+        @param self Object reference.
+        @param celery_tasks Celery AsyncResult used to access individual
+        task status, indexed by a task ID.
+        """
+        # Check each submitted Celery task.
+        for task_id in celery_tasks.keys():
+            result = celery_tasks[task_id]
+            if result.successful():
+                del celery_tasks[task_id]
+                print " Celery task %s SUCCESS " % task_id
+                # Index results by spill_count so can present
+                # results to merge-output in same order.
+                spill = result.result
+                self.spill_count += 1
+                self.doc_store.put(str(self.spill_count), spill)
+            elif result.failed():
+                del celery_tasks[task_id]
+                print " Celery task %s FAILED : %s : %s" \
+                    % (task_id, result.result, result.traceback)
+
+    @staticmethod
+    def is_start_of_run(spill_doc):
+        """
+        Return true if spill represents a start of a run i.e. it has
+        "daq_event_type" with value "start_of_run".
+        @param spill_doc Spill as a JSON doc.
+        @return True or False.
+        """
+        return (spill_doc.has_key("daq_event_type") and
+            spill_doc["daq_event_type"] == "start_of_run")
+
+    @staticmethod
+    def get_run_number(spill_doc):
+        """
+        Extract run number from spill. Assumes spill has a 
+        "run_num" entry.
+        @param spill_doc Spill as a JSON doc.
+        @return run number or -1 if none.
+        """
+        run_number = -1
+        if spill_doc.has_key("run_num"):
+            run_number = spill_doc["run_num"]
+        return run_number
+
+    def start_new_run(self, celery_tasks, run_number):
+        """
+        Prepare for a new run by waiting for current Celery
+        tasks to complete, updating the local run number then
+        reconfiguring the Celery nodes.
+        @param self Object reference.
+        @param celery_tasks Celery AsyncResult used to access individual
+        task status, indexed by a task ID.
+        @param run_number New run number.
+        """
+        print "New run detected...waiting for current processing to complete"
+        # Wait for current tasks, from previous run, to complete.
+        # This also ensures their timestamps < those of next run.
+        while (len(celery_tasks) != 0):
+            self.handle_celery_tasks(celery_tasks)
+        self.run_number = run_number
+        # Configure Celery nodes.
+        print "---------- RUN %d ----------" % self.run_number
+        self.configure_celery_nodes()
+
     def execute(self): # pylint: disable = R0914, R0912, R0915
         """
         Set up MAUS input tasks and, on receipt of spills, submit
         to transform tasks accessed via a distributed task queue. 
 
         @param self Object reference.
-        @throws Exception if there are no active Celery workers.
+        @throws Exception if there are no active Celery nodes.
         """
         # Purge the document store.
         print("Purging data store")
         self.doc_store.clear()
+        # Do an initial check for active Celery nodes.
+        self.ping_celery_nodes()
 
-        # Check for active Celery nodes.
-        from celery.task.control import inspect
-        print("Checking for active nodes")
-        inspection = inspect()
-        active_nodes = inspection.active()
-        if (active_nodes == None):
-            raise Exception("No active Celery nodes!")
-        num_nodes = len(active_nodes)
-
-        # Create unique ID
-        celery_client_id = "%s (%s)" % (socket.gethostname(), os.getpid())
-
-        # Configure nodes.
-        from celery.task.control import broadcast
-        from mauscelery.tasks import execute_transform
-        if hasattr(self.transformer, "get_worker_names"):
-            workers = self.transformer.get_worker_names()
-        else:
-            workers = self.transformer.__class__.__name__
-        print "Reconfiguring nodes..."
-        results = []
-        # Send a birth request. Give the workers up to 1000s to reply,
-        # but if they all reply before that just continue.
-        results = broadcast("birth", arguments={"transform":workers, 
-            "configuration":self.json_config_doc,
-            "config_id": celery_client_id}, reply=True, timeout=1000,
-            limit=num_nodes)
-        print results
-        reset_ok = True
-        for worker in results:
-            worker_id = worker.keys()[0]
-            worker_status = worker[worker_id]
-            if worker_status.has_key("error"):
-                print "Celery worker configuration error - %s" % worker
-                reset_ok = False
-            if worker_status.has_key("unchanged"):
-                print "Celery worker configuration unchanged - %s" % worker
-                reset_ok = False
-            else:
-                print "Celery worker configuration OK - %s" % worker
-
-        if (not reset_ok):
-            raise Exception("All Celery nodes failed to reconfigure")
-
-        print("INPUT: Reading input")
+        print("INPUT: Birth")
         assert(self.inputer.birth(self.json_config_doc) == True)
         emitter = self.inputer.emitter()
         map_buffer = DataflowUtilities.buffer_input(emitter, 1)
 
-        print("TRANSFORM: spawning transform jobs for each spill")
+        self.spill_count = 0
+        celery_tasks = {}
         i = 0
-        spill_count = 0
-        task_status = {}
-        while (len(map_buffer) != 0) or (len(task_status) != 0):
+        while (len(map_buffer) != 0) or (len(celery_tasks) != 0):
             for spill in map_buffer:
+                print("INPUT: read next spill")
+                # Check run number.
+                spill_doc = json.loads(spill)
+                spill_run_number = self.get_run_number(spill_doc) 
+                if (spill_run_number != self.run_number):
+                    if (not self.is_start_of_run(spill_doc)):
+                        print "  Missing a start_of_run spill!"
+                    self.start_new_run(celery_tasks, spill_run_number)
+                    print("TRANSFORM: processing spills")
                 result = \
-                    execute_transform.delay(spill, celery_client_id, i) # pylint:disable=E1101, C0301
-                print " Task ID: %s" % result.task_id
+                    execute_transform.delay(spill, self.client_config_id, i) # pylint:disable=E1101, C0301
+                print "Task ID: %s" % result.task_id
                 # Save task ID for monitoring status.
-                task_status[result.task_id] = result
+                celery_tasks[result.task_id] = result
                 i += 1
             map_buffer = DataflowUtilities.buffer_input(emitter, 1)
             if (len(map_buffer) != 0):
-                print " Processed %d spills so far," % i,
+                print "Processed %d spills so far," % i,
                 print(" %d spills left in buffer." % (len(map_buffer)))
-
-            print("TRANSFORM: waiting for transform jobs to complete")
-            # Wait for workers to finish - just keep looping until each
-            # either succeeds or fails.
-            spills = {}
-            for task_id in task_status.keys():
-                result = task_status[task_id]
-                if result.successful():
-                    del task_status[task_id]
-                    print " Task %s SUCCESS " % task_id
-                    # Index results by spill_count so can present
-                    # results to merge-output in same order.
-                    spill = result.result
-                    spills[spill_count] = spill
-                    spill_count += 1
-                    self.doc_store.put(str(spill_count), spill)
-                elif result.failed():
-                    del task_status[task_id]
-                    print " Task %s FAIL " % task_id
-                    print "  Exception in worker: %s " % result.result
-                    print "  Traceback in worker: %s " % result.traceback
-
+            # Go through current transform tasks and see if any's completed. 
+            self.handle_celery_tasks(celery_tasks)
+        print "--------------------"
         # Invoke death 
-        results = broadcast("death", reply=True)
-        print results
-
-        print("TRANSFORM: transform jobs completed")
+        self.death_celery_nodes()
+        print("TRANSFORM: transform tasks completed")
+        print "--------------------"
 
     @staticmethod
     def get_dataflow_description():
@@ -626,7 +721,7 @@ class MultiProcessMergeOutputDataflowExecutor: # pylint: disable=R0903
                 spill = doc["doc"]
                 print "Retrieved document %s (dated %s)" % \
                     (doc_id, doc_time)
-                print "  Executing Merge->Output for spill %s\n" % doc_id,
+                print "Executing Merge->Output for spill %s\n" % doc_id,
                 try:
                     spill = self.merger.process(spill)
                     self.outputer.save(spill)
