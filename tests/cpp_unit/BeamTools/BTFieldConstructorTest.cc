@@ -208,5 +208,10 @@ TEST_F(BTFieldConstructorTest, GetCombinedFunctionTest) {
   _mod[0]->setProperty<double>("Length", 4);
 
 }
+
+TEST(FieldConstructorTest, GetRFCavityTest) {
+    EXPECT_TRUE(false);
+}
+
 }
 

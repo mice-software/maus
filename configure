@@ -59,7 +59,9 @@ fi
 # 2. Any existing environment variable called "maus_third_party" e.g. if set by user's .bashrc file
 # 3. The current maus working directory, as held by the variable maus_root_dir  
 if [ "$1" ]; then
-    maus_third_party=$1 #if a command line argument is entered, set third party directory from it
+    #if a command line argument is entered, set third party directory from it - 
+    #cd $1; pwd forces to absolute path; -P gives physical path (no links)
+    maus_third_party=`cd $1; pwd -P`
 elif [ -z "${maus_third_party}" ]; then
     maus_third_party=${maus_root_dir} #if not set above or anywhere else use the local maus working directory
 fi
