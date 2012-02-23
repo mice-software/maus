@@ -273,7 +273,7 @@ daq_data_file = '02873.003' # file name for daq data; if this is just a integer 
 maus_version = "" # set at runtime - do not edit this (changes are ignored)
 configuration_file = "" # should be set on the command line only (else ignored)
 
-doc_store_class = "docstore.InMemoryDocumentStore.InMemoryDocumentStore"
+doc_store_class = "docstore.MongoDBDocumentStore.MongoDBDocumentStore"
 
 mongodb_host = "localhost" # Default MongoDB host name. Only needed if using MongoDBDocumentStore.
 mongodb_port = 27017 # Default MongoDB port. Only needed if using MongoDBDocumentStore.

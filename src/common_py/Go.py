@@ -24,6 +24,7 @@ import sys
 
 # MAUS
 from Configuration import Configuration
+from docstore.DocumentStore import DocumentStore
 
 class Go: # pylint: disable=R0921, R0903
     """
@@ -206,6 +207,8 @@ class DataflowUtilities: # pylint: disable=W0232
         @throws AttributeError. If the class is not in the module.
         @throws KeyError. If there is no doc_store_class in the JSON
         configuration.
+        @throws TypeError If doc_store_class does not sub-class
+        docstore.DocumentStore.DocumentStore.
         """
         # Get class and bust up into module path and class name.
         doc_store_class = json_config_dictionary["doc_store_class"]
@@ -221,8 +224,12 @@ class DataflowUtilities: # pylint: disable=W0232
         class_object = getattr(module_object, doc_store_class)
         # Create instance of class object.
         doc_store = class_object()
+        # Validate.
+        if (not isinstance(doc_store, DocumentStore)):
+            raise TypeError("Document store class %s does not implement %s" \
+                % (doc_store_class, DocumentStore))
         # Connect to the document store.
-        doc_store.connect(json_config_dictionary)
+        doc_store.connect(json_config_dictionary) 
         return doc_store
 
 class PipelineSingleThreadDataflowExecutor:
