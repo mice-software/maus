@@ -17,12 +17,12 @@
 /* Author: Peter Lane
  */
 
-#ifndef COMMON_CPP_OPTICS_PARTICLE_TRAJECTORY_HH
-#define COMMON_CPP_OPTICS_PARTICLE_TRAJECTORY_HH
+#ifndef COMMON_CPP_RECONSTRUCTION_PARTICLE_TRAJECTORY_HH
+#define COMMON_CPP_RECONSTRUCTION_PARTICLE_TRAJECTORY_HH
 
 #include <vector>
 
-#include "src/common_cpp/Optics/ParticleTrack.hh"
+#include "Reconstruction/ParticleTrack.hh"
 
 namespace MAUS {
 

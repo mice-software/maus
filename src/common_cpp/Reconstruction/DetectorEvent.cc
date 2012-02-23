@@ -17,33 +17,35 @@
 /* Author: Peter Lane
  */
 
-#include "src/common_cpp/Optics/ParticleTrack.hh"
+#include "Reconstruction/DetectorEvent.hh"
 
 #include "Interface/Squeak.hh"
 
 namespace MAUS {
 
-ParticleTrack::ParticleTrack()
-    : PhaseSpaceVector(), z_(0.), z_momentum_(0.)
+DetectorEvent::DetectorEvent()
+    : ParticleTrack(), detector_id_(-1)
 { }
 
-ParticleTrack::ParticleTrack(const double t, const double E,
+DetectorEvent::DetectorEvent(const double t, const double E,
                                    const double x, const double Px,
-                                   const double y, const double Py)
-    : PhaseSpaceVector(t, E, x, Px, y, Py), z_(0.), z_momentum_(0.)
+                                   const double y, const double Py,
+                                   const int detector_id)
+    : ParticleTrack(t, E, x, Px, y, Py), detector_id_(detector_id)
 { }
 
-ParticleTrack::ParticleTrack(double const * const array)
-    : PhaseSpaceVector(array)
+DetectorEvent::DetectorEvent(double const * const array)
+    : ParticleTrack(array)
 { }
 
-ParticleTrack::~ParticleTrack() { }
+DetectorEvent::~DetectorEvent() { }
 
-std::ostream& operator<<(std::ostream& out, const ParticleTrack& vector) {
-  out << "t: " << vector[0]  << "E: "   << vector[1]
-      << "x: " << vector[2]  << "Px: "  << vector[3]
-      << "y: " << vector[4]  << "Py: "  << vector[5]
-      << "z: " << vector.z() << "Pz: "  << vector.Pz();
+std::ostream& operator<<(std::ostream& out, const DetectorEvent& vector) {
+  out << "t: "            << vector[0]  << "E: "  << vector[1]
+      << "x: "            << vector[2]  << "Px: " << vector[3]
+      << "y: "            << vector[4]  << "Py: " << vector[5]
+      << "z: "            << vector.z() << "Pz: " << vector.Pz()
+      << "Detector ID: "  << vector.detector_id();
   return out;
 }
 }  // namespace MAUS

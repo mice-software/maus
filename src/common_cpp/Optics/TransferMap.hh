@@ -26,9 +26,6 @@
 #include "Interface/Squeal.hh"
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
 
-// Forward declarations for OpticsModel.hh
-class OpticsModel;
-
 namespace MAUS {
 
 // Forward declarations for src/legacy/Interface/PolynomialVector.hh

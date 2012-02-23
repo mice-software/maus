@@ -17,12 +17,13 @@
 /* Author: Peter Lane
  */
 
-#ifndef COMMON_CPP_OPTICS_PARTICLE_TRACK_HH
-#define COMMON_CPP_OPTICS_PARTICLE_TRACK_HH
+#ifndef COMMON_CPP_RECONSTRUCTION_PARTICLE_TRACK_HH
+#define COMMON_CPP_RECONSTRUCTION_PARTICLE_TRACK_HH
 
 #include <iostream>
 
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
+#include "src/common_cpp/Simulation/MAUSPrimaryGeneratorAction.hh"
      
 namespace MAUS {
 
@@ -31,6 +32,10 @@ class ParticleTrack : public MAUS::PhaseSpaceVector {
   /* @brief	Construct with all elements initialized to zero.
    */
   ParticleTrack();
+
+  /* @brief  Copy constructor.
+   */
+  ParticleTrack(const ParticleTrack& original_instance);
 
   /* @brief Create with coordinates from an array. Order is t, E, x, Px, y, Py.
    */
@@ -52,8 +57,7 @@ class ParticleTrack : public MAUS::PhaseSpaceVector {
   inline double z_momentum() const {return z_momentum_;}
   inline double Pz()         const {return z_momentum_;}
   
-  void FillInCoordinates();
-  
+  void FillInCoordinates(const double mass);  
  protected:
   double z_;
   double z_momentum_;

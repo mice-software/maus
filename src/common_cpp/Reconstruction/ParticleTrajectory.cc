@@ -17,20 +17,23 @@
 /* Author: Peter Lane
  */
 
-#include "src/common_cpp/Optics/ParticleTrajectory.hh"
+#include "Reconstruction/ParticleTrajectory.hh"
 
 #include "Interface/Squeak.hh"
+#include "src/common_cpp/Simulation/MAUSPrimaryGeneratorAction.hh"
 
 namespace MAUS {
 
 ParticleTrajectory::ParticleTrajectory()
-    : std::vector<ParticleTrack>()
+    : std::vector<ParticleTrack>(), particle_id_(0)
 { }
 
 ParticleTrajectory::ParticleTrajectory(const std::vector<ParticleTrack>& tracks,
                                        const int particle_id)
     : std::vector<ParticleTrack>(tracks), particle_id_(particle_id)
-{ }
+{
+  
+}
 
 ParticleTrajectory::~ParticleTrajectory()
 { }
@@ -41,5 +44,23 @@ int ParticleTrajectory::particle_id() const {
 
 void ParticleTrajectory::set_particle_id(const int particle_id) {
   particle_id_ = particle_id;
+}
+
+MAUS::MAUSPrimaryGeneratorAction::PGParticle
+ParticleTrajectory::PrimaryGeneratorParticle(
+ParticleTrack const * const track) {
+  MAUSPrimaryGeneratorAction::PGParticle particle;
+  particle.x = track->x();
+  particle.y = track->y();
+  particle.z = track->z();
+  particle.time = track->t();
+  particle.px = track->Px();
+  particle.py = track->Py();
+  particle.pz = track->Pz();
+  particle.energy = track->E();
+  particle.pid = particle_id_;
+  particle.seed = 0; //BUG
+  return particle;
+
 }
 }  // namespace MAUS
