@@ -221,20 +221,26 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903, R0902
         task status, indexed by a task ID.
         """
         # Check each submitted Celery task.
-        for task_id in celery_tasks.keys():
-            result = celery_tasks[task_id]
+        num_tasks = len(celery_tasks)
+        current = 0
+        while (current < num_tasks):
+            result = celery_tasks[current]
             if result.successful():
-                del celery_tasks[task_id]
-                print " Celery task %s SUCCESS " % task_id
+                celery_tasks.pop(current)
+                num_tasks -= 1
+                print " Celery task %s SUCCESS " % result.task_id
                 # Index results by spill_count so can present
                 # results to merge-output in same order.
                 spill = result.result
                 self.spill_count += 1
                 self.doc_store.put(str(self.spill_count), spill)
             elif result.failed():
-                del celery_tasks[task_id]
+                celery_tasks.pop(current)
+                num_tasks -= 1
                 print " Celery task %s FAILED : %s : %s" \
-                    % (task_id, result.result, result.traceback)
+                    % (result.task_id, result.result, result.traceback)
+            else:
+                current += 1
 
     def start_new_run(self, celery_tasks, run_number):
         """
@@ -276,7 +282,7 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903, R0902
         map_buffer = DataflowUtilities.buffer_input(emitter, 1)
 
         self.spill_count = 0
-        celery_tasks = {}
+        celery_tasks = []
         i = 0
         while (len(map_buffer) != 0) or (len(celery_tasks) != 0):
             for spill in map_buffer:
@@ -292,8 +298,8 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903, R0902
                 result = \
                     execute_transform.delay(spill, self.client_config_id, i) # pylint:disable=E1101, C0301
                 print "Task ID: %s" % result.task_id
-                # Save task ID for monitoring status.
-                celery_tasks[result.task_id] = result
+                # Save asynchronous result object for checking task status. 
+                celery_tasks.append(result)
                 i += 1
             map_buffer = DataflowUtilities.buffer_input(emitter, 1)
             if (len(map_buffer) != 0):
