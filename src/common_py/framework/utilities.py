@@ -28,15 +28,14 @@ class DataflowUtilities: # pylint: disable=W0232
     @staticmethod
     def buffer_input(input_emitter, number_of_inputs):
         """
-        Buffer the input stream by only reading up to the first N
-        inputs into memory.  Returns an array of inputs. 
+        Buffer an input stream of strings by only reading up to the
+        first N inputs into memory. Returns an array of inputs. 
 
-        @param input_emitter Input stream.
+        @param input_emitter Input stream of strings.
         @param number_of_inputs Number of inputs to read.
         @return array of number_of_inputs inputs.
         """
         my_buffer = []
-
         for i in range(number_of_inputs):  # pylint: disable=W0612
             try:
                 value = next(input_emitter)
@@ -61,10 +60,10 @@ class DataflowUtilities: # pylint: disable=W0232
 
         @param json_config_dictionary JSON configuration.
         @return document store.
-        @throws ImportError. If the module name do not exist.
-        @throws AttributeError. If the class is not in the module.
         @throws KeyError. If there is no doc_store_class in the JSON
         configuration.
+        @throws ValueError. If the module name do not exist,
+        or the class is not in the module.
         @throws TypeError If doc_store_class does not sub-class
         docstore.DocumentStore.DocumentStore.
         """
@@ -73,15 +72,19 @@ class DataflowUtilities: # pylint: disable=W0232
         path = doc_store_class.split(".")
         doc_store_class = path.pop()
         import_path = ".".join(path)
-        module_object = __import__(import_path)
-        path.pop(0)
-        # Dynamically import the module.
-        for sub_module in path:
-            module_object = getattr(module_object, sub_module) 
-        # Get class object.
-        class_object = getattr(module_object, doc_store_class)
-        # Create instance of class object.
-        doc_store = class_object()
+        try:
+            module_object = __import__(import_path)
+            path.pop(0)
+            # Dynamically import the module.
+            for sub_module in path:
+                module_object = getattr(module_object, sub_module) 
+            # Get class object.
+            class_object = getattr(module_object, doc_store_class)
+            # Create instance of class object.
+            doc_store = class_object()
+        except:
+            raise ValueError("Module %s does not exist or has a problem" \
+                % doc_store_class)
         # Validate.
         if (not isinstance(doc_store, DocumentStore)):
             raise TypeError("Document store class %s does not implement %s" \
