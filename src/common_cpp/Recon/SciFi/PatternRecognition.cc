@@ -48,10 +48,11 @@ void PatternRecognition::straightprtrack_recon(SciFiEvent &evt) {
   std::cout << "\nBegining Pattern Recognition" << std::endl;
   std::cout << "Number of spacepoints in spill: " << evt.spacepoints().size() << std::endl;
 
-  // Split spacepoints up according to which tracker they occured in
+  // Split spacepoints up according to which tracker they occured in and set used flag to false
   std::vector< std::vector<SciFiSpacePoint*> > spnts_by_tracker(_n_trackers);
   for ( int trker_no = 0; trker_no < _n_trackers; ++trker_no ) {  // Loop over trackers
     for ( unsigned int i = 0; i < evt.spacepoints().size(); ++i ) {  // Loop over spacepoints
+      evt.spacepoints()[i]->set_used(false);
       if ( evt.spacepoints()[i]->get_tracker() == trker_no ) {
         spnts_by_tracker[trker_no].push_back(evt.spacepoints()[i]);
       }
@@ -92,23 +93,20 @@ void PatternRecognition::straightprtrack_recon(SciFiEvent &evt) {
 
 void PatternRecognition::make_spr_5pt(const std::vector<SciFiSpacePoint*>& spnts,
                                       std::vector<SciFiStraightPRTrack>& trks) {
-  std::cout << "Making 5 point track" << std::endl;
+  std::cout << "Making 5 point tracks" << std::endl;
 
   std::vector< std::vector<SciFiSpacePoint*> > spnts_stat(_n_stations);
   sort_by_station(spnts, spnts_stat);
 
   // Form a candidate track between sp in station 5 and station 1
-  // bool success = false;
   // Loop over sp in station 5
   for ( int stat_outer = 0;
         stat_outer < static_cast<int>(spnts_stat[_n_stations - 1].size()); ++stat_outer ) {
-    // if ( success ) break;
     std::cout << "Outer is used? " << spnts_stat[4][stat_outer]->get_used() << std::endl;
     if ( !spnts_stat[4][stat_outer]->get_used() ) { // Check the outer spacepoint is unused
       // Loop over sp in station 1
       for ( int stat_inner = 0;
             stat_inner < static_cast<int>(spnts_stat[0].size()); ++stat_inner ) {
-        // if ( success ) break;
         std::cout << "Inner is used? " << spnts_stat[0][stat_outer]->get_used() << std::endl;
         if ( !spnts_stat[4][stat_outer]->get_used() ) { // Check the inner spacepoint is unused
 
@@ -130,15 +128,19 @@ void PatternRecognition::make_spr_5pt(const std::vector<SciFiSpacePoint*>& spnts
 
           // Loop over intermediate stations and compare sp with the line
           for ( int stat_no = 1; stat_no < 4; ++stat_no ) {
+            double delta_sq = 1000000;
             for ( int sp_no = 0; sp_no < static_cast<int>(spnts_stat[stat_no].size()); ++sp_no ) {
-              Hep3Vector pos = spnts_stat[stat_no][sp_no]->get_position();
-              // Calculate the residuals
-              double dx = pos.x() - ( x_0i + ( pos.z() * m_xi ) );
-              double dy = pos.y() - ( y_0i + ( pos.z() * m_yi ) );
-              // Apply a road cut using the residuals
-              if ( fabs(dx) < _res_cut && fabs(dy) < _res_cut ) {
-                good_spnts[stat_no] = spnts_stat[stat_no][sp_no];
-                break;
+              if ( !spnts_stat[stat_no][sp_no]->get_used() ) {
+                Hep3Vector pos = spnts_stat[stat_no][sp_no]->get_position();
+                // Calculate the residuals
+                double dx = pos.x() - ( x_0i + ( pos.z() * m_xi ) );
+                double dy = pos.y() - ( y_0i + ( pos.z() * m_yi ) );
+                // Apply roadcuts using the residuals and then
+                // find the spacepoints with the smallest total residuals for the line
+                if ( fabs(dx) < _res_cut && fabs(dy) < _res_cut && delta_sq > (dx*dx + dy*dy) ) {
+                  delta_sq = dx*dx + dy*dy;
+                  good_spnts[stat_no] = spnts_stat[stat_no][sp_no];
+                }
               }
             }
           }
@@ -175,13 +177,14 @@ void PatternRecognition::make_spr_5pt(const std::vector<SciFiSpacePoint*>& spnts
 
               // success = true;
             } else {
-              // std:: cout << "chisq test failed, track rejected" << std::endl;
+              std:: cout << "chisq test failed, track rejected" << std::endl;
             } // ~Check track passes chisq test
           } // ~ if ( good_spnts.size() > 2 )
         } // ~Check the inner spacepoint is unused
       } // ~Loop over sp in station 1
     } // ~Check the outer spacepoint is unused
   } // ~Loop over sp in station 5
+  std::cout << "Finished making 5 pt tracks" << std::endl;
 } // ~make_spr_5pt
 
 void PatternRecognition::linear_fit(std::map<int, SciFiSpacePoint*> &spnts,
