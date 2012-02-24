@@ -169,7 +169,7 @@ class WorkerUtilitiesTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         Test with a spill that has a no "run_num".
         @param self Object reference.
         """
-        self.assertEquals(-1,
+        self.assertEquals(0,
             DataflowUtilities.get_run_number({}),
             "Unexpected run number")
 

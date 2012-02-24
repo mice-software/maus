@@ -110,9 +110,9 @@ class DataflowUtilities: # pylint: disable=W0232
         Extract run number from spill. Assumes spill has a 
         "run_num" entry.
         @param spill_doc Spill as a JSON doc.
-        @return run number or -1 if none.
+        @return run number or 0 if none.
         """
-        run_number = -1
+        run_number = 0
         if spill_doc.has_key("run_num"):
             run_number = spill_doc["run_num"]
         return run_number

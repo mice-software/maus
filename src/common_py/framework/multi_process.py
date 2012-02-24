@@ -130,7 +130,7 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903, R0902
         self.client_config_id = "%s (%s)" \
             % (socket.gethostname(), os.getpid())
         self.spill_count = 0
-        self.run_number = 0
+        self.run_number = -1
         # Parse the configuration JSON
         self.json_config_dictionary = json.loads(self.json_config_doc)
         if (doc_store == None):
@@ -236,30 +236,6 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903, R0902
                 print " Celery task %s FAILED : %s : %s" \
                     % (task_id, result.result, result.traceback)
 
-    @staticmethod
-    def is_start_of_run(spill_doc):
-        """
-        Return true if spill represents a start of a run i.e. it has
-        "daq_event_type" with value "start_of_run".
-        @param spill_doc Spill as a JSON doc.
-        @return True or False.
-        """
-        return (spill_doc.has_key("daq_event_type") and
-            spill_doc["daq_event_type"] == "start_of_run")
-
-    @staticmethod
-    def get_run_number(spill_doc):
-        """
-        Extract run number from spill. Assumes spill has a 
-        "run_num" entry.
-        @param spill_doc Spill as a JSON doc.
-        @return run number or -1 if none.
-        """
-        run_number = -1
-        if spill_doc.has_key("run_num"):
-            run_number = spill_doc["run_num"]
-        return run_number
-
     def start_new_run(self, celery_tasks, run_number):
         """
         Prepare for a new run by waiting for current Celery
@@ -307,9 +283,9 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903, R0902
                 print("INPUT: read next spill")
                 # Check run number.
                 spill_doc = json.loads(spill)
-                spill_run_number = self.get_run_number(spill_doc) 
+                spill_run_number = DataflowUtilities.get_run_number(spill_doc) 
                 if (spill_run_number != self.run_number):
-                    if (not self.is_start_of_run(spill_doc)):
+                    if (not DataflowUtilities.is_start_of_run(spill_doc)):
                         print "  Missing a start_of_run spill!"
                     self.start_new_run(celery_tasks, spill_run_number)
                     print("TRANSFORM: processing spills")
