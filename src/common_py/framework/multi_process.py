@@ -295,6 +295,10 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903, R0902
                         print "  Missing a start_of_run spill!"
                     self.start_new_run(celery_tasks, spill_run_number)
                     print("TRANSFORM: processing spills")
+                if (spill_run_number == 0):
+                    # There was no run_num in spill so add it.
+                    spill_doc["run_num"] = self.run_number
+                    spill = json.dumps(spill_doc)
                 result = \
                     execute_transform.delay(spill, self.client_config_id, i) # pylint:disable=E1101, C0301
                 print "Task ID: %s" % result.task_id
