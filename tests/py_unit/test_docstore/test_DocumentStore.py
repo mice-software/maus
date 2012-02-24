@@ -89,7 +89,8 @@ class DocumentStoreTests(object): # pylint: disable=R0904, C0301
     def insert_documents(self, number, sleep_time = 0):
         """
         Insert some sample documents of form
-        {"aN":"bN", "cN":"dN"}.
+        {"aN":"bN", "cN":"dN"}. Documents are inserted with N
+        ranging from number to 1.
         @param self Object reference.
         @param number Number of documents to insert.
         @param sleep_time Time to sleep between each insertion.
@@ -97,7 +98,7 @@ class DocumentStoreTests(object): # pylint: disable=R0904, C0301
         """
         # Insert sample documents.
         docs = {}
-        for i in range(number):
+        for i in range(number, 0, -1):
             docid = "ID%s" % i
             doc = {"a%s" % i:"b%s" % i, "c%s" % i :"d%s" % i}
             docs[docid] = doc
@@ -122,14 +123,30 @@ class DocumentStoreTests(object): # pylint: disable=R0904, C0301
         self.assertEquals(len(expected), len(docids), 
             "Unexpected number of documents")
 
+    def validate_date_sorted(self, docs):
+        """
+        Validate documents are sorted in increasing date order.
+        @param self Object reference.
+        @param Documents. Iterator that returns 
+        documents of form {"_id":ID, "date:"DATE", "doc":DOC}
+        """
+        current_time = datetime(1970, 1, 1)
+        for doc in docs:
+            self.assertTrue(current_time < doc["date"],
+                       "Dates are not in increasing order")
+            current_time = doc["date"]        
+
     def test_get_since_all(self):
         """
-        Test get_since with no datetime.
+        Test get_since with no datetime and check that results are
+        sorted in increasing date order.
         @param self Object reference.
         """
-        docs = self.insert_documents(5)
+        docs = self.insert_documents(5, 0.1)
         since = self._data_store.get_since()
         self.validate_documents(docs, since)
+        since = self._data_store.get_since()
+        self.validate_date_sorted(since)
 
     def test_get_since(self):
         """

@@ -75,10 +75,11 @@ class DocumentStore: # pylint: disable=W0232
         store or None if there is none.
         @param self Object reference.
         @param earliest datetime representing date of interest. If
-        None then all are returned.
+        None then all are returned. 
         @return iterable serving up the documents in the form
         {'_id':id, 'date':date, 'doc':doc} where date is in the
         Python datetime format e.g. YYYY-MM-DD HH:MM:SS.MILLIS.
+        Documents are sorted earliest to latest.
         """
         pass
 

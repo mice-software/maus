@@ -117,12 +117,13 @@ class MongoDBDocumentStore(DocumentStore):
         @return iterable serving up the documents in the form
         {'_id':id, 'date':date, 'doc':doc} where date is in the
         Python datetime format e.g. YYYY-MM-DD HH:MM:SS.MILLIS.
+        Documents are sorted earliest to latest.
         """
         if (earliest == None):
-            result = self.__data_store.find()
+            result = self.__data_store.find().sort("date")
         else:
             result = self.__data_store.find(\
-                {"date":{"$gt":earliest}}).sort("_id")
+                {"date":{"$gt":earliest}}).sort("date")
         return result
 
     def delete(self, docid):

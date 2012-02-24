@@ -85,6 +85,7 @@ class InMemoryDocumentStore(DocumentStore):
         @return iterable serving up the documents in the form
         {'_id':id, 'date':date, 'doc':doc} where date is in the
         Python datetime format e.g. YYYY-MM-DD HH:MM:SS.MILLIS.
+        Documents are sorted earliest to latest.
         """
         since = []
         if (earliest == None):
@@ -94,7 +95,8 @@ class InMemoryDocumentStore(DocumentStore):
             for (docid, doc) in self.__data_store.items():
                 if (doc[1] > earliest):
                     since.append({'_id':docid, 'date':doc[1], 'doc':doc[0]})
-        return iter(since)
+        sorted_since = sorted(since, key=lambda item: item['date'])
+        return iter(sorted_since)
 
     def delete(self, docid):
         """ 
