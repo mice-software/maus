@@ -104,6 +104,11 @@ class MapCppTrackReconstructor {
  private:
   static const size_t kPhaseSpaceDimension;
 
+  OpticsModel * optics_model_;
+  DetectorEvent * events_;
+  TrackFitter * track_fitter_;
+  ParticleTrajectory * trajectories_;
+  
   std::string classname_;
   BTField * electromagnetic_field_;
 };

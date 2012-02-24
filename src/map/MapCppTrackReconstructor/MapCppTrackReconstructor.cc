@@ -29,6 +29,10 @@
 
 #include "src/map/MapCppTrackReconstructor/MapCppTrackReconstructor.hh"
 
+namespace MAUS {
+
+using MAUS::LeastSquaresOpticsModel::Algorithm;
+
 void transfer_map_score_function(Int_t &    number_of_parameters,
                                  Double_t * gradiants,
                                  Double_t & score,
@@ -51,7 +55,8 @@ void transfer_map_score_function(Int_t &    number_of_parameters,
 }
 
 MapCppTrackReconstructor::MapCppTrackReconstructor()
-    : electromagnetic_field_(NULL) {
+    : optics_model_(NULL), events_(NULL), track_fitter_(NULL),
+      trajectories_(NULL), electromagnetic_field_(NULL) {
   classname_ = "MapCppTrackReconstructor";
     
   // Setup *global* scope Minuit object
@@ -109,6 +114,45 @@ void MapCppSimulation::SetConfiguration(std::string json_configuration) {
 
 std::string MapCppTrackReconstructor::process(std::string document) {
   // TODO(plane1@hawk.iit.edu) Create transfer map from the materials and fields
+  MICERun& run = *MICERun::getInstance();
+  Json::Value& config = *run.jsonConfiguration;
+  Json::Value optics_model_names
+    = JsonWrapper::GetProperty(config, "reconstruction_optics_models",
+                               JsonWrapper::stringValue);
+  Json::Value optics_model_name
+    = JsonWrapper::GetProperty(config, "reconstruction_optics_model",
+                               JsonWrapper::stringValue);
+  /* TODO(plane1@hawk.iit.edu)
+  if (optics_model_name == optics_model_names[0]) {
+    optics_model_ = new DifferentiatingOpticsModel();
+  } else if (optics_model_name == optics_model_names[1]) {
+    optics_model_ = new IntegratingOpticsModel();
+  } else if (optics_model_name == optics_model_names[2]) {
+    optics_model_ = new LeastSquaresOpticsModel();
+  } else if (optics_model_name == optics_model_names[3]) {
+    optics_model_ = new RungeKuttaOpticsModel();
+  */
+  if (optics_model_name == optics_model_names[2]) {
+    int algorithm_number
+      = JsonWrapper::GetProperty(config, "LeastSquaresOpticsModel_algorithm",
+                                 JsonWrapper::stringValue).asInt();
+    Algorithm algorithm;
+    switch (algorithm_number) {
+      case 4: algorithm = Algorithm::kSweepingChiSquaredWithVariableWalls;
+              break;
+      case 3: algorithm = Algorithm::kSweepingChiSquared;       break;
+      case 2: algorithm = Algorithm::kConstrainedChiSquared;    break;
+      case 1: algorithm = Algorithm::kConstrainedPolynomial;    break;
+      case 0:
+      default: algorithm = Algorithm::kUnconstrainedPolynomial;      
+    }
+    optics_model_ = new LeastSquaresOpticsModel(algorithm);
+  } else {
+    throw(Squeal(Squeal::nonRecoverable,
+                 "Unsupported optics model in reconstruction configuration.",
+                 "MapCppTrackReconstructor::process()"));
+  }
+  optics_model_.Build(&config);
 
   Json::Value spill;
   try {spill = JsonWrapper::StringToJson(document);}
