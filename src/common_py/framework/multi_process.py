@@ -372,6 +372,36 @@ class MultiProcessMergeOutputDataflowExecutor: # pylint: disable=R0903
                 self.json_config_dictionary)
         else:
             self.doc_store = doc_store
+        self.run_number = -1
+
+    def end_run(self):
+        """
+        End a run by sending an END_OF_RUN spill through the merger
+        then death the merger and outputer.
+        @param self Object reference.
+        """
+        print("CLOSING PIPELINE: Sending END_OF_RUN to merger")
+        end_of_run_spill = json.dumps({"END_OF_RUN":"END_OF_RUN"})
+        spill = self.merger.process(end_of_run_spill)
+        self.outputer.save(spill)
+        print("MERGE: Shutting down merger")
+        assert(self.merger.death() == True)
+        print("OUTPUT: Shutting down outputer")
+        assert(self.outputer.death() == True)
+
+    def start_new_run(self, run_number):
+        """
+        Prepare for a new run by updating the local run number then
+        birthing the merger and outputer.
+        @param self Object reference.
+        @param run_number New run number.
+        """
+        self.run_number = run_number
+        print "---------- RUN %d ----------" % self.run_number
+        print("MERGE: Setting up merger")
+        assert(self.merger.birth(self.json_config_doc) == True)
+        print("OUTPUT: Setting up outputer")
+        assert(self.outputer.birth(self.json_config_doc) == True)
 
     def execute(self):
         """
@@ -397,11 +427,18 @@ class MultiProcessMergeOutputDataflowExecutor: # pylint: disable=R0903
             for doc in recent_docs:
                 doc_id = doc["_id"]
                 doc_time = doc["date"]
-                if (doc_time > last_time):
-                    last_time = doc_time
                 spill = doc["doc"]
                 print "Retrieved document %s (dated %s)" % \
                     (doc_id, doc_time)
+                if (doc_time > last_time):
+                    last_time = doc_time
+                # Check run number.
+                spill_doc = json.loads(spill)
+                spill_run_number = DataflowUtilities.get_run_number(spill_doc) 
+                if (spill_run_number != self.run_number):
+                    print "New run detected...waiting for current processing to complete"
+                    self.end_run()
+                    self.start_new_run(spill_run_number)
                 print "Executing Merge->Output for spill %s\n" % doc_id,
                 try:
                     spill = self.merger.process(spill)
@@ -409,19 +446,7 @@ class MultiProcessMergeOutputDataflowExecutor: # pylint: disable=R0903
                 except: # pylint:disable = W0702
                     ErrorHandler.HandleException({}, self)
 
-        print("CLOSING PIPELINE: Sending END_OF_RUN to merger")
-
-        end_of_run_spill = json.dumps({"END_OF_RUN":"END_OF_RUN"})
-        spill = self.merger.process(end_of_run_spill)
-        self.outputer.save(spill)
-                
-        print("MERGE: Shutting down merger")
-        assert(self.merger.death() == True)
-
-        print("OUTPUT: Shutting down outputer")
-        assert(self.outputer.death() == True)
-
-        print("%d spills left in data store." % (len(self.doc_store)))
+        self.end_run()
 
     @staticmethod
     def get_dataflow_description():
