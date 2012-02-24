@@ -22,9 +22,9 @@ import logging
 from celery.task import task
 from celery.task import Task
 
+from framework.workers import WorkerProcessException
 from mauscelery.state import MausConfiguration
 from mauscelery.state import MausTransform
-from workers import WorkerProcessException
 
 @task(name="mauscelery.maustasks.MausGenericTransformTask")
 def execute_transform(spill, client_id = "Unknown", spill_id = 0):

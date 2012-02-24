@@ -45,7 +45,7 @@ from types import UnicodeType
 from celery.worker.control import Panel
 from celery.worker.control.registry import Panel 
 
-from workers import WorkerUtilities
+from framework.workers import WorkerUtilities
 from mauscelery.state import MausConfiguration
 from mauscelery.mausprocess import process_birth
 from mauscelery.mausprocess import process_death

@@ -27,7 +27,6 @@ from mauscelery.state import MausTransform
 from mauscelery.mausprocess import worker_process_init_callback
 from mauscelery.mausprocess import process_birth
 from mauscelery.mausprocess import process_death
-
 from MapPyTestMap import MapPyTestMap
 
 class WorkerProcessInitCallbackTestCase(unittest.TestCase): # pylint: disable=R0904, C0301

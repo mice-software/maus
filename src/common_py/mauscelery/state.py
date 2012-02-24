@@ -19,10 +19,10 @@ MAUS Celery configuration and transform wrapper.
 import logging
 
 import ROOT
-from workers import WorkerUtilities
-from workers import WorkerBirthFailedException
-from workers import WorkerDeathFailedException
-from workers import WorkerDeadException
+from framework.workers import WorkerUtilities
+from framework.workers import WorkerBirthFailedException
+from framework.workers import WorkerDeathFailedException
+from framework.workers import WorkerDeadException
 
 class MausConfiguration(): # pylint:disable = W0232, R0903
     """
