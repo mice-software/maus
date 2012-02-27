@@ -12,6 +12,7 @@ class ReducePyCherenkov(ReducePyROOTHistogram): # pylint: disable=R0902
        
         self._hcharge = None
         self._htime = None
+        self._htof = None
         self._htof_A = None
         self._htof_B = None
         self._hPMu = None
@@ -22,6 +23,7 @@ class ReducePyCherenkov(ReducePyROOTHistogram): # pylint: disable=R0902
 
         self.canvas_charge = None
         self.canvas_time = None
+        self.canvas_tof = None
         self.canvas_tof_A = None
         self.canvas_tof_B = None
         self.canvas_hPMu = None
@@ -88,7 +90,7 @@ class ReducePyCherenkov(ReducePyROOTHistogram): # pylint: disable=R0902
 
         #The cuts on e and mu TOFs are made first by 'eyeing' the 1D TOF distributions.
         
-        tof_cut_e = 26.00
+        tof_cut_e = 27.00
         tof_cut_mu = 29.00
 
         d = 7.8241 #Distance between TOF1 and TOF0
@@ -107,6 +109,8 @@ class ReducePyCherenkov(ReducePyROOTHistogram): # pylint: disable=R0902
                     if sp_tof0[i][0]["part_event_number"]==digits[i]['B']['part_event_number']:
                         t_0 = sp_tof0[i][0]["time"]
                         t_1 = sp_tof1[i][0]["time"]
+                        self._htof.Fill(t_1-t_0)
+                        
                         charge_B = digits[i]["B"]["total_charge"] #This should be done pe and done in the mapper.
                         charge_A = digits[i]["A"]["total_charge"]
                         PE_B = charge_B/20.00 #Photoelectrons Normalized (can be done in mapper)
@@ -133,7 +137,7 @@ class ReducePyCherenkov(ReducePyROOTHistogram): # pylint: disable=R0902
                                 p = -1.0
                         if (m==MASS_MU and p > 0.0):
                             self._hPMu.Fill(p)
-                            self._hlight_Mu.Fill(p, PE_B)
+                            self._hlight_Mu.Fill(p, PE_A)
                         if (m==MASS_PI and p > 0.0):
                             self._hPPi.Fill(p)                                
                         
@@ -147,6 +151,7 @@ class ReducePyCherenkov(ReducePyROOTHistogram): # pylint: disable=R0902
         digits = spill['digits']
                 
         for i in range(len(digits)):
+            print i
             for pmt in range(1,9):
                 pulse = "pulse_%d" % (pmt)
                 arrival_time = "arrival_time_%d" % (pmt)
@@ -154,23 +159,22 @@ class ReducePyCherenkov(ReducePyROOTHistogram): # pylint: disable=R0902
                 #CkovB
                 if pmt < 5:
                     charge = digits[i]['B'][pulse]
+                    print charge
+                    if charge > -1:
+                        self._hcharge[i-1].Fill(charge)
                     time = digits[i]['B'][arrival_time]
-                    max = digits[i]['B'][max_time]
-
+                    print time
+                    if time < 255:
+                        self._htime[i-1].Fill(time)
                 #CkovA
-                else:
+                if pmt > 4:
                     charge = digits[i]['A'][pulse]
+                    if charge > -1:
+                        self._hcharge[i-1].Fill(charge)
                     time = digits[i]['A'][arrival_time]
-                    max = digits[i]['A'][max_time]
-
-                #filling charge in PMTs
-                self._hcharge[i-1].Fill(charge)
-
-                #filling arrival times
-                if time < 255:
-                    self._htime[i-1].Fill(time)
-                print "time:", time
-
+                    if time < 255:
+                        self._htime[1-i].Fill(time)
+               
         return True
     
     def __init_histos(self): #pylint: disable=R0201, R0914
@@ -197,18 +201,25 @@ class ReducePyCherenkov(ReducePyROOTHistogram): # pylint: disable=R0902
         #Make Canvas for TOF
         
         self.canvas_tof_A = ROOT.TCanvas("tof_A", "tof_A", 600, 600)
-        self._htof_A = ROOT.TH2F("tof_A", "tof_A", 100, 0, 50, 200, 0, 60)
+        self._htof_A = ROOT.TH2F("tof_A", "tof_A", 100, 0, 50, 200, 15, 35)
         self._htof_A.GetXaxis().SetTitle("#PE")
         self._htof_A.GetYaxis().SetTitle("TOF(CKOVA) (ns)")
         self.canvas_tof_A.cd()
         self._htof_A.Draw()
 
         self.canvas_tof_B = ROOT.TCanvas("tof_B", "tof_B", 600, 600)
-        self._htof_B = ROOT.TH2F("tof_B", "tof_B", 100, 0, 50, 200, 0, 60)
+        self._htof_B = ROOT.TH2F("tof_B", "tof_B", 100, 0, 50, 200, 15, 35)
         self._htof_B.GetXaxis().SetTitle("#PE")
         self._htof_B.GetYaxis().SetTitle("TOF(CKOVB) (ns)")
         self.canvas_tof_B.cd()
         self._htof_B.Draw()
+
+        self.canvas_tof = ROOT.TCanvas("tof", "tof", 600, 600)
+        self._htof =  ROOT.TH1F("htof", "htof", 100, 10, 40)
+        self._htof.GetXaxis().SetTitle("TOF(ns)")
+        self.canvas_tof.cd()
+        self._htof.Draw()
+                                        
         
         #Make Canvas for PMT Charges
         self.canvas_charge = ROOT.TCanvas("charge", "charge", 1200, 800)
@@ -263,7 +274,7 @@ class ReducePyCherenkov(ReducePyROOTHistogram): # pylint: disable=R0902
         self._hPPi.Draw()
 
         self.canvas_hlight_Mu = ROOT.TCanvas("hLight", "hLight", 600, 600)
-        self._hlight_Mu = ROOT.TH2F("hLight", "hLight", 500, 0, 500, 100, 0, 50)
+        self._hlight_Mu = ROOT.TH2F("hLight", "hLight", 500, 0, 500, 100, 0, 30)
         self._hlight_Mu.GetXaxis().SetTitle("Momentum (MeV/c)")
         self._hlight_Mu.GetYaxis().SetTitle("#PE")
         self.canvas_hlight_Mu.cd()
@@ -275,6 +286,7 @@ class ReducePyCherenkov(ReducePyROOTHistogram): # pylint: disable=R0902
 
         self.canvas_charge.Update()
         self.canvas_time.Update()
+        self.canvas_tof.Update()
         self.canvas_tof_A.Update()
         self.canvas_tof_B.Update()
         self.canvas_hPMu.Update()
@@ -302,6 +314,13 @@ class ReducePyCherenkov(ReducePyROOTHistogram): # pylint: disable=R0902
         content = "arrival_time"
         doc = ReducePyROOTHistogram.get_image_doc(self, content, tag, self.canvas_time)
         image_list.append(doc)
+
+        #TOF
+        #file label = "TOF"
+        tag = "TOF"
+        content = "TOF"
+        doc = ReducePyROOTHistogram.get_image_doc(self, content, tag, self.canvas_tof)
+        image_list.append(doc)                                
 
         #TOFA and Charge
         #file label = "TOF_A"
