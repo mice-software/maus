@@ -151,7 +151,7 @@ class ReducePyCherenkov(ReducePyROOTHistogram): # pylint: disable=R0902
         digits = spill['digits']
                 
         for i in range(len(digits)):
-            print i
+
             for pmt in range(1,9):
                 pulse = "pulse_%d" % (pmt)
                 arrival_time = "arrival_time_%d" % (pmt)
@@ -159,11 +159,10 @@ class ReducePyCherenkov(ReducePyROOTHistogram): # pylint: disable=R0902
                 #CkovB
                 if pmt < 5:
                     charge = digits[i]['B'][pulse]
-                    print charge
                     if charge > -1:
                         self._hcharge[i-1].Fill(charge)
+
                     time = digits[i]['B'][arrival_time]
-                    print time
                     if time < 255:
                         self._htime[i-1].Fill(time)
                 #CkovA
@@ -171,6 +170,7 @@ class ReducePyCherenkov(ReducePyROOTHistogram): # pylint: disable=R0902
                     charge = digits[i]['A'][pulse]
                     if charge > -1:
                         self._hcharge[i-1].Fill(charge)
+
                     time = digits[i]['A'][arrival_time]
                     if time < 255:
                         self._htime[1-i].Fill(time)
