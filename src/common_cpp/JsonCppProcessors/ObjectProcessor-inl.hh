@@ -31,6 +31,10 @@ namespace MAUS {
 template <class ParentType>
 class BaseItem {
   public:
+    /** Destructor
+     */
+    virtual ~BaseItem() {}
+
     /** SetCppChild set the child data on the C++ representation
      */
     virtual void SetCppChild
@@ -265,6 +269,14 @@ Json::Value* ObjectProcessor<ObjectType>::CppToJson(const ObjectType& cpp_object
     }
     return json_object;
 }
+
+template <class ObjectType>
+ObjectProcessor<ObjectType>::~ObjectProcessor() {
+    for (size_t i = 0; i < items.size(); ++i) {
+        delete items[i];
+    }
+}
+
 
 }
 #endif

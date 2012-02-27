@@ -44,7 +44,6 @@ std::string* StringProcessor::JsonToCpp(const Json::Value& json_string) {
           "Failed to convert json value to string",
           "StringProcessor::JsonToCpp"
       ));
-      return NULL; // appease gcc
   }
 }
 
@@ -61,7 +60,6 @@ int* IntProcessor::JsonToCpp(const Json::Value& json_int) {
           "Failed to convert json value to integer",
           "IntProcessor::JsonToCpp"
       ));
-      return NULL; // appease gcc
   }
 }
 
@@ -102,7 +100,6 @@ bool* BoolProcessor::JsonToCpp(const Json::Value& json_bool) {
 Json::Value* BoolProcessor::CppToJson(const bool& cpp_bool) {
   return new Json::Value(cpp_bool);
 }
-
 
 }
 

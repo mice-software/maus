@@ -130,6 +130,10 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
                     ChildType (ObjectType::*GetMethod)() const,
                     void (ObjectType::*SetMethod)(ChildType value),
                     bool is_required);
+    
+    /** Destructor frees memory allocated to items vector
+     */
+    virtual ~ObjectProcessor();
 
   private:
     std::vector< BaseItem<ObjectType>* > items;

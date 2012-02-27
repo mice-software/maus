@@ -36,7 +36,9 @@ class IProcessor {
 
     /** Convert from the Json representation to the cpp representation
      *
-     *  Memory for CppRepresentation should be allocated by this function.
+     *  Memory for CppRepresentation should be allocated by this function. If
+     *  the conversion fails, throw a Squeal - don't return NULL or allocate
+     *  memory.
      */
     virtual CppRepresentation* JsonToCpp
                                    (const Json::Value& json_representation) = 0;
@@ -44,6 +46,8 @@ class IProcessor {
     /** Convert from the Cpp representation to the json representation
      *
      *  Memory for the json representation should be allocated by this function.
+     *  If the conversion fails, throw a Squeal - don't return NULL or allocate
+     *  memory.
      */
     virtual Json::Value* CppToJson
                               (const CppRepresentation& cpp_representation) = 0;
@@ -53,8 +57,11 @@ class IProcessor {
  *  
  *  ProcessorBase is the processor base class for processing json data to cpp
  *  data. Json data is represented by Json::Value while cpp data is represented
- *  by CppRepresentation type. The isStrict data member has been added to enable
- *  runtime control of how errors in the json data are handled. 
+ *  by CppRepresentation type.
+ *
+ *  This class is provided because at some point I want to provide some more
+ *  sophisticated error handling.
+ *
  */
 template <class CppRepresentation>
 class ProcessorBase : IProcessor<CppRepresentation> {
@@ -64,14 +71,7 @@ class ProcessorBase : IProcessor<CppRepresentation> {
     virtual Json::Value* CppToJson
                               (const CppRepresentation& cpp_representation) = 0;
 
-    virtual void SetIsStrict(bool isStrict) {
-        _isStrict = isStrict;
-    }
-    virtual bool GetIsStrict() {
-        return _isStrict;
-    }
   protected:
-    bool _isStrict;
 };
 
 

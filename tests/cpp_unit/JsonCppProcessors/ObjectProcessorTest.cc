@@ -113,11 +113,13 @@ TEST_F(ObjectProcessorTest, JsonToCppNotRequiredTest) {
   // should not throw if object is missing
   Json::Value json_object_missing_a(Json::objectValue);
   json_object_missing_a["branch_b"] = Json::Value(2.);
-  EXPECT_NO_THROW(not_req_proc.JsonToCpp(json_object_missing_a));
+  cpp_object = not_req_proc.JsonToCpp(json_object_missing_a);
+  delete cpp_object;
 
   Json::Value json_object_missing_b(Json::objectValue);
   json_object_missing_b["branch_a"] = Json::Value(2.);
-  EXPECT_NO_THROW(not_req_proc.JsonToCpp(json_object_missing_b));
+  cpp_object = not_req_proc.JsonToCpp(json_object_missing_b);
+  delete cpp_object;
 
   // should throw if object is present but can't be processed
   json_object["branch_b"] = Json::Value("string");
