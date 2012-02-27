@@ -41,7 +41,7 @@ def install_python_tests(maus_root_dir, env):
         if os.path.isdir(subdir):
             pos = len(target)
             subdir_mod = subdir[pos:]
-            test_files = glob.glob(subdir+"/test_*.py")                   
+            test_files = glob.glob(subdir+"/*.py")                   
             env.Install(build+subdir_mod, test_files)
 
 def build_lib_maus_cpp(env):
