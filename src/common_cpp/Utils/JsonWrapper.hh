@@ -31,6 +31,7 @@
 #define _SRC_CPP_CORE_UTILS_JSONWRAPPER_HH
 
 #include <string>
+#include <ostream>
 
 #include "json/json.h"
 

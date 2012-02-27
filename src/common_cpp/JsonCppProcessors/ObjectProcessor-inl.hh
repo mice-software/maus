@@ -85,10 +85,10 @@ class PointerItem : public BaseItem<ParentType> {
      *  @param parent_cpp C++ object where C++ data is put
      */
     void SetCppChild(const Json::Value& parent_json, ParentType& parent_cpp) {
-        if (!parent_json.isMember(name)) {
-            if (is_required) {
+        if (!parent_json.isMember(_branch)) {
+            if (_required) {
                 throw Squeal(Squeal::recoverable,
-                "Failed to recover branch "+branch_name,
+                "Failed to recover branch "+_branch,
                 "PointerItem::SetCppChild");
             } else {
                 return;
@@ -109,9 +109,9 @@ class PointerItem : public BaseItem<ParentType> {
     void SetJsonChild(const ParentType& parent_cpp, Json::Value& parent_json) {
         ChildType* child_cpp = (parent_cpp.*_getter)();
         if (child_cpp == NULL) {
-            if (is_required) {
+            if (_required) {
                 throw Squeal(Squeal::recoverable,
-                "Failed to recover branch "+branch_name+": class data was NULL",
+                "Failed to recover branch "+_branch+": class data was NULL",
                 "PointerItem::GetCppChild");               
             } else {
                 return;

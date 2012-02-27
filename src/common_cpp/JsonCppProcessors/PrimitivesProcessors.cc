@@ -72,6 +72,8 @@ Json::Value* IntProcessor::CppToJson(const int& cpp_int) {
 unsigned int* UIntProcessor::JsonToCpp(const Json::Value& json_uint) {
   if (json_uint.isUInt()) {
       return new unsigned int (json_uint.asUInt());
+  } else if (json_uint.isInt() && json_uint.asInt() > 0) {
+      return new unsigned int (json_uint.asUInt());
   } else {
       throw(Squeal(
           Squeal::recoverable,
