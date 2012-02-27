@@ -162,7 +162,6 @@ class ValueItem : public BaseItem<ParentType> {
       _getter(getter), _required(is_required) {
     }
 
-    // BUG: need to handle is_required
     // Set the child in the ParentInstance
     /** SetCppChild using data from parent_json
      *
@@ -171,6 +170,15 @@ class ValueItem : public BaseItem<ParentType> {
      *  @param parent_cpp C++ object where C++ data is put
      */
     void SetCppChild(const Json::Value& parent_json, ParentType& parent_cpp) {
+        if (!parent_json.isMember(_branch)) {
+            if (_required) {
+                throw Squeal(Squeal::recoverable,
+                "Failed to recover branch "+_branch,
+                "PointerItem::SetCppChild");
+            } else {
+                return;
+            }
+        }
         Json::Value child_json = parent_json[_branch];
         ChildType* child_cpp = _processor->JsonToCpp(child_json);
         // syntax is (_object.*_function)(args);
@@ -178,7 +186,6 @@ class ValueItem : public BaseItem<ParentType> {
         delete child_cpp;
     }
 
-    // BUG: need to handle is_required
     /** SetJsonChild using data from parent_cpp
      *
      *  @param parent_cpp C++ object from whence C++ data is got
