@@ -335,7 +335,7 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
         result = self.birth(config_id, configuration, transform)
         self.validate_status(result)
         # Call process.
-        result = execute_transform.delay("{}", 1, 1) # pylint:disable=E1101, C0301
+        result = execute_transform.delay("{}", 1)
         # Wait for it to complete.
         result.wait()
         self.assertTrue(result.successful(), "Expected success")
@@ -356,7 +356,7 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
         result = broadcast("death", reply=True)
         self.validate_status(result)
         # Call process.
-        result = execute_transform.delay("{}", 1, 1) # pylint:disable=E1101, C0301
+        result = execute_transform.delay("{}", 1) 
         # Wait for it to complete.
         try:
             result.wait()
