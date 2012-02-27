@@ -20,7 +20,9 @@ Multi-process dataflows module.
 from datetime import datetime
 import os
 import json
+import signal
 import socket
+import sys
 
 from celery.task.control import inspect
 from celery.task.control import broadcast
@@ -405,6 +407,17 @@ class MultiProcessMergeOutputDataflowExecutor: # pylint: disable=R0903
         print("OUTPUT: Setting up outputer")
         assert(self.outputer.birth(self.json_config_doc) == True)
 
+    def handle_ctrl_c(self, signum, frame): # pylint: disable=W0613
+        """ 
+        CTRL-C handler to break out of the document store monitoring
+        loop. Invokes end_run then sys.exit(0).
+        @param self Object reference.
+        @param signum Signal number.
+        @param frame. Frame.
+        """
+        self.end_run()
+        sys.exit(0)
+
     def execute(self):
         """
         Pull transformed spills from a data store and submit
@@ -412,17 +425,12 @@ class MultiProcessMergeOutputDataflowExecutor: # pylint: disable=R0903
 
         @param self Object reference.
         """
-        print("MERGE: Setting up merger")
-        assert(self.merger.birth(self.json_config_doc) == True)
-
-        print("OUTPUT: Setting up outputer")
-        assert(self.outputer.birth(self.json_config_doc) == True)
-
         print("MULTI-PROCESS: Get spill, MERGE, OUTPUT, repeat")
 
-        # This is a hack - it WILL be resolved in terms of
-        # querying the database for remaining spills.
+        # Register CTRL-C handler.
+        signal.signal(signal.SIGINT, self.handle_ctrl_c) 
 
+        is_birthed = False
         last_time = datetime(1970, 01, 01)
         while True:
             recent_docs = self.doc_store.get_since(last_time)
@@ -439,9 +447,11 @@ class MultiProcessMergeOutputDataflowExecutor: # pylint: disable=R0903
                 spill_run_number = DataflowUtilities.get_run_number(spill_doc) 
                 if (spill_run_number != self.run_number):
                     print "New run detected..."
-                    print "Waiting for current processing to complete"
-                    self.end_run()
+                    if (is_birthed):
+                        print "Waiting for current processing to complete"
+                        self.end_run()
                     self.start_new_run(spill_run_number)
+                    is_birthed = True
                 print "Executing Merge->Output for spill %s\n" % doc_id,
                 try:
                     spill = self.merger.process(spill)
