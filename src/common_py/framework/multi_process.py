@@ -126,11 +126,12 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903, R0902
         self.inputer = inputer
         self.transformer = transformer
         self.json_config_doc = json_config_doc
-        # Unique ID.
         self.client_config_id = "%s (%s)" \
-            % (socket.gethostname(), os.getpid())
-        self.spill_count = 0
+            % (socket.gethostname(), os.getpid()) # Unique ID.
+        self.spill_input_count = 0 # Count of spills input.
+        self.spill_process_count = 0 # Count of spills processed.
         self.run_number = None
+        self.celery_tasks = [] # Celery AsyncResult objects.
         # Parse the configuration JSON
         self.json_config_dictionary = json.loads(self.json_config_doc)
         if (doc_store == None):
@@ -212,51 +213,56 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903, R0902
                 print "  Node transforms deathed: %s" % node_id
         print "Celery node transforms deathed!"
 
-    def handle_celery_tasks(self, celery_tasks):
+    def poll_celery_tasks(self):
         """
         Wait for tasks currently being executed by Celery nodes to 
         complete.
         @param self Object reference.
-        @param celery_tasks Celery AsyncResult used to access individual
-        task status, indexed by a task ID.
         """
         # Check each submitted Celery task.
-        num_tasks = len(celery_tasks)
+        num_tasks = len(self.celery_tasks)
         current = 0
         while (current < num_tasks):
-            result = celery_tasks[current]
+            result = self.celery_tasks[current]
             if result.successful():
-                celery_tasks.pop(current)
+                self.celery_tasks.pop(current)
                 num_tasks -= 1
                 print " Celery task %s SUCCESS " % result.task_id
-                # Index results by spill_count so can present
-                # results to merge-output in same order.
                 spill = result.result
-                self.spill_count += 1
-                self.doc_store.put(str(self.spill_count), spill)
+                self.spill_process_count += 1
+                self.doc_store.put(str(self.spill_process_count), spill)
             elif result.failed():
-                celery_tasks.pop(current)
+                self.celery_tasks.pop(current)
                 num_tasks -= 1
                 print " Celery task %s FAILED : %s : %s" \
                     % (result.task_id, result.result, result.traceback)
             else:
                 current += 1
 
-    def start_new_run(self, celery_tasks, run_number):
+    def submit_spill_to_celery(self, spill):
+        """
+        Submit a spill to Celery for transforming.
+        @param self Object reference.
+        """
+        result = \
+            execute_transform.delay(spill, self.client_config_id) # pylint:disable=E1101, C0301
+        print "Task ID: %s" % result.task_id
+        # Save asynchronous result object for checking task status. 
+        self.celery_tasks.append(result)
+
+    def start_new_run(self, run_number):
         """
         Prepare for a new run by waiting for current Celery
         tasks to complete, updating the local run number then
         reconfiguring the Celery nodes.
         @param self Object reference.
-        @param celery_tasks Celery AsyncResult used to access individual
-        task status, indexed by a task ID.
         @param run_number New run number.
         """
         print "New run detected...waiting for current processing to complete"
         # Wait for current tasks, from previous run, to complete.
         # This also ensures their timestamps < those of next run.
-        while (len(celery_tasks) != 0):
-            self.handle_celery_tasks(celery_tasks)
+        while (len(self.celery_tasks) != 0):
+            self.poll_celery_tasks()
         self.run_number = run_number
         # Configure Celery nodes.
         print "---------- RUN %d ----------" % self.run_number
@@ -280,16 +286,16 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903, R0902
         assert(self.inputer.birth(self.json_config_doc) == True)
         emitter = self.inputer.emitter()
         map_buffer = DataflowUtilities.buffer_input(emitter, 1)
-
-        self.spill_count = 0
-        celery_tasks = []
-        i = 0
-        while (len(map_buffer) != 0) or (len(celery_tasks) != 0):
+        self.spill_input_count = 0
+        self.spill_process_count = 0
+        self.celery_tasks = []
+        while (len(map_buffer) != 0) or (len(self.celery_tasks) != 0):
             for spill in map_buffer:
                 print("INPUT: read next spill")
                 # Check run number.
                 spill_doc = json.loads(spill)
                 spill_run_number = DataflowUtilities.get_run_number(spill_doc) 
+                self.spill_input_count += 1
                 if (spill_run_number == None):
                     # There was no run_num in spill so add a 0 (pure MC run).
                     spill_run_number = 0
@@ -298,20 +304,15 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903, R0902
                 if (spill_run_number != self.run_number):
                     if (not DataflowUtilities.is_start_of_run(spill_doc)):
                         print "  Missing a start_of_run spill!"
-                    self.start_new_run(celery_tasks, spill_run_number)
+                    self.start_new_run(spill_run_number)
                     print("TRANSFORM: processing spills")
-                result = \
-                    execute_transform.delay(spill, self.client_config_id, i) # pylint:disable=E1101, C0301
-                print "Task ID: %s" % result.task_id
-                # Save asynchronous result object for checking task status. 
-                celery_tasks.append(result)
-                i += 1
+                self.submit_spill_to_celery(spill)
             map_buffer = DataflowUtilities.buffer_input(emitter, 1)
             if (len(map_buffer) != 0):
-                print "Processed %d spills so far," % i,
+                print "Input %d spills so far," % self.spill_input_count,
                 print(" %d spills left in buffer." % (len(map_buffer)))
             # Go through current transform tasks and see if any's completed. 
-            self.handle_celery_tasks(celery_tasks)
+            self.poll_celery_tasks()
         print "--------------------"
         # Invoke death 
         self.death_celery_nodes()
@@ -447,7 +448,6 @@ class MultiProcessMergeOutputDataflowExecutor: # pylint: disable=R0903
                     self.outputer.save(spill)
                 except: # pylint:disable = W0702
                     ErrorHandler.HandleException({}, self)
-
         self.end_run()
 
     @staticmethod
