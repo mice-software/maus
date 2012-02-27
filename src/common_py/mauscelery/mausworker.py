@@ -43,7 +43,6 @@ import logging
 from types import UnicodeType
 
 from celery.worker.control import Panel
-from celery.worker.control.registry import Panel 
 
 from framework.workers import WorkerUtilities
 from mauscelery.state import MausConfiguration
