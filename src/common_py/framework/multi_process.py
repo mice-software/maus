@@ -130,7 +130,7 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903, R0902
         self.client_config_id = "%s (%s)" \
             % (socket.gethostname(), os.getpid())
         self.spill_count = 0
-        self.run_number = -1
+        self.run_number = None
         # Parse the configuration JSON
         self.json_config_dictionary = json.loads(self.json_config_doc)
         if (doc_store == None):
@@ -290,15 +290,16 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903, R0902
                 # Check run number.
                 spill_doc = json.loads(spill)
                 spill_run_number = DataflowUtilities.get_run_number(spill_doc) 
+                if (spill_run_number == None):
+                    # There was no run_num in spill so add a 0 (pure MC run).
+                    spill_run_number = 0
+                    spill_doc["run_num"] = spill_run_number
+                    spill = json.dumps(spill_doc)
                 if (spill_run_number != self.run_number):
                     if (not DataflowUtilities.is_start_of_run(spill_doc)):
                         print "  Missing a start_of_run spill!"
                     self.start_new_run(celery_tasks, spill_run_number)
                     print("TRANSFORM: processing spills")
-                if (spill_run_number == 0):
-                    # There was no run_num in spill so add it.
-                    spill_doc["run_num"] = self.run_number
-                    spill = json.dumps(spill_doc)
                 result = \
                     execute_transform.delay(spill, self.client_config_id, i) # pylint:disable=E1101, C0301
                 print "Task ID: %s" % result.task_id
@@ -372,7 +373,7 @@ class MultiProcessMergeOutputDataflowExecutor: # pylint: disable=R0903
                 self.json_config_dictionary)
         else:
             self.doc_store = doc_store
-        self.run_number = -1
+        self.run_number = None
 
     def end_run(self):
         """
