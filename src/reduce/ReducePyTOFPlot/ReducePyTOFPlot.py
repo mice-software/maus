@@ -47,17 +47,35 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
     
     At the end of the run, the canvases are printed to eps files
 
-    Histograms are output as JSON documents of form:
+    A sequence of 13 histograms are output as JSON documents of form:
 
     @verbatim
-    {"image": {"content":"Total TDC and ADC counts to spill 2",
+    {"image": {"keywords": [...list of image keywords...],
+               "description":"...a description of the image...",
                "tag": TAG,
                "image_type": "eps", 
                "data": "...base 64 encoded image..."}}
     @endverbatim
 
-    where "TAG" is "tof_times", "tof_hits" or "tof_sp". If
-    "histogram_auto_number" (see below) is "true" then the TAG will
+    These are as follows and have the following TAGs:
+
+    - "tof_hit_x" - TOF raw hits X.
+    - "tof_hit_y" - TOF raw hits Y.
+    - "tof_pmt00" - TOF PMT Plane 0 PMT 0.
+    - "tof_pmt01"  - TOF PMT Plane 0 PMT 1.
+    - "tof_pmt10"  - TOF PMT Plane 1 PMT 0.
+    - "tof_pmt11"  - TOF PMT Plane 1 PMT 1.
+    - "tof_nsp" - TOF number of space points.
+    - "tof_sp_x" - TOF space points X.
+    - "tof_sp_y" - TOF space points Y.
+    - "tof_xy_0" - TOF space points 2D.
+    - "tof_xy_1" - TOF space points 2D.
+    - "tof_xy_2" - TOF space points 2D.
+    - "tof_time_01" - TOF01 time.
+    - "tof_time_12" - TOF12 time.
+    - "tof_time_02" - TOF02 time.
+
+    If "histogram_auto_number" (see below) is "true" then the TAG will
     have a number N appended where N means that the histogram was
     produced as a consequence of the (N + 1)th spill processed  by the
     worker. The number will be zero-padded to form a six digit string
@@ -513,7 +531,6 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         for i in range (3):
             self.canvas_tof[i].Update()
 
-
     def get_histogram_images(self):       
         """
         Get histograms as JSON documents.
@@ -525,75 +542,79 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         # Raw Hits X
         # file label = tof_hit_x.eps
         tag = "tof_hit_x"
-        content = "TOF Raw Hits X"
+        keywords = ["TOF", "raw", "hits"]
+        description = "TOF Raw Hits X"
         doc = ReducePyROOTHistogram.get_image_doc( \
-            self, content, tag, self.canvas_hits_x)
+            self, keywords, description, tag, self.canvas_hits_x)
         image_list.append(doc)
 
         # Raw Hits Y
         # file label = tof_hit_y.eps
         tag = "tof_hit_y"
-        content = "TOF Raw Hits Y"
+        description = "TOF Raw Hits Y"
         doc = ReducePyROOTHistogram.get_image_doc( \
-            self, content, tag, self.canvas_hits_y)
+            self, keywords, description, tag, self.canvas_hits_y)
         image_list.append(doc)
 
         # PMT hits
         # the files are labeled: tof_pmt00 tof_pmt01 tof_pmt10 tof_pmt11
         # the numbers stand for plane,pmt eg tof_pmt01 -> plane0, pmt1
+        keywords = ["TOF", "PMT", "plane"]
         for plane in range (2):
             for pmt in range (2):
                 ind = 2*plane + pmt
                 tag = "tof_pmt%d%d" % (plane, pmt)
-                content = "TOF PMT Plane%d PMT%d" % (plane, pmt)
+                description = "TOF PMT Plane%d PMT%d" % (plane, pmt)
                 doc = ReducePyROOTHistogram.get_image_doc( \
-                    self, content, tag, self.canvas_pmt[ind])
+                    self, keywords, description, tag, self.canvas_pmt[ind])
                 image_list.append(doc)
 
         # number of space points
         # file label = tof_nsp.eps
         tag = "tof_nsp"
-        content = "TOF Number of Space Points"
+        keywords = ["TOF", "space", "points"]
+        description = "TOF Number of Space Points"
         doc = ReducePyROOTHistogram.get_image_doc( \
-            self, content, tag, self.canvas_nsp)
+            self, keywords, description, tag, self.canvas_nsp)
         image_list.append(doc)
 
         # Spacepoints X
         # file label = tof_sp_x.eps
         tag = "tof_sp_x"
-        content = "TOF Space Points X"
+        description = "TOF Space Points X"
         doc = ReducePyROOTHistogram.get_image_doc( \
-            self, content, tag, self.canvas_sp_x)
+            self, keywords, description, tag, self.canvas_sp_x)
         image_list.append(doc)
 
         # Spacepoints Y
         # file label = tof_sp_y.eps
         tag = "tof_sp_y"
-        content = "TOF Space Points Y"
+        description = "TOF Space Points Y"
         doc = ReducePyROOTHistogram.get_image_doc( \
-            self, content, tag, self.canvas_sp_y)
+            self, keywords, description, tag, self.canvas_sp_y)
         image_list.append(doc)
 
         # space point 2d output
         # the files are labeled: tof_xy_0, tof_xy_1, tof_xy_2 .eps
         for i in range (3):
             tag = "tof_xy_%d" % (i)
-            content = "TOF%d Space Points 2d" % (i)
+            description = "TOF%d Space Points 2d" % (i)
             doc = ReducePyROOTHistogram.get_image_doc( \
-                self, content, tag, self.canvas_sp_xy[i])
+                self, keywords, description, tag, self.canvas_sp_xy[i])
             image_list.append(doc)
 
         # time of flight between tof stations
         # files are labeled tof_time_01, tof_time_12, tof_time_02 .eps
+        keywords = ["TOF", "time", "flight"]
         for i in range (3):
             if (i < 2):
                 tag = "tof_time_%d%d" % (i, i+1)
-                content = "TOF%d%d Time" % (i, i+1)
+                description = "TOF%d%d Time" % (i, i+1)
             else:
                 tag = "tof_time_02"
-                content = "TOF02 Time"
+                description = "TOF02 Time"
             doc = ReducePyROOTHistogram.get_image_doc( \
-                self, content, tag, self.canvas_tof[i])
+                self, keywords, description, tag, self.canvas_tof[i])
             image_list.append(doc)
 
         return image_list

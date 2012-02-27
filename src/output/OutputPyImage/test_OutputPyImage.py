@@ -126,7 +126,7 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=R0904
         with self.assertRaisesRegexp(ValueError,
             ".*Missing tag.*"):
             self.__save({"image": {
-                "content":"Content", 
+                "description":"Description", 
                 "image_type": self.__file_extension, 
                 "data": "Data"}})
 
@@ -138,7 +138,7 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=R0904
         with self.assertRaisesRegexp(ValueError,
             ".*Missing image_type.*"):
             self.__save({"image": {
-                "content":"Content", 
+                "description":"Description", 
                 "tag": "tdcadc", 
                 "data": "Data"}})
 
@@ -150,7 +150,7 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=R0904
         with self.assertRaisesRegexp(ValueError,
             ".*Missing data.*"):
             self.__save({"image": {
-                "content":"Content", 
+                "description":"Description", 
                 "tag": "tdcadc", 
                 "image_type": self.__file_extension}})
 
@@ -162,12 +162,13 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=R0904
         json_str = ""
         for i in range(0, 3):
             json_doc = {"image": {
-                "content":"Content", 
+                "description":"Description", 
                 "tag": "tdcadc%d" % i, 
                 "image_type": self.__file_extension, 
                 "data": "Data"}}
             json_str = "%s\n%s" % (json.dumps(json_doc), json_str)
         self.__worker.save(json_str)
+        # Check output files...
         self.__check_result(3)
 
     def __save(self, json_doc):
@@ -189,16 +190,31 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=R0904
         @param number_of_files Number of files to check for.
         """
         directory = join(os.getcwd(), self.__worker.directory)
-        files = []
+        image_files = []
+        json_files = []
         for afile in os.listdir(directory):
             if fnmatch.fnmatch(afile, '*.%s' % self.__file_extension):
-                files.append(afile)
-        files = sorted(files)
-        self.assertEquals(number_of_files, len(files), 
-            "Unexpected number of files")
+                image_files.append(afile)
+            if fnmatch.fnmatch(afile, '*.json'):
+                json_files.append(afile)
+        image_files = sorted(image_files)
+        json_files = sorted(json_files)
+        self.assertEquals(number_of_files, len(image_files), 
+            "Unexpected number of image files")
+        self.assertEquals(number_of_files, len(json_files), 
+            "Unexpected number of JSON files")
         for i in range(0, number_of_files):
-            self.assertEquals(files[i], "prefixtdcadc%d.%s" % 
+            self.assertEquals(image_files[i], "prefixtdcadc%d.%s" % 
                                         (i, self.__file_extension))
+        for i in range(0, number_of_files):
+            self.assertEquals(json_files[i], "prefixtdcadc%d.json" % i)
+            json_file = open(json_files[i])
+            try:
+                content = json_file.read()
+                json.loads(content) 
+            except: # pylint: disable=W0702
+                self.fail("Invalid JSON for file %s: %s" \
+                    % (json_files[i], content))
 
     def tearDown(self):
         """
@@ -214,6 +230,8 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=R0904
             shutil.rmtree(self.__tmpdir)
         for afile in os.listdir(os.getcwd()):
             if fnmatch.fnmatch(afile, '*.%s' % self.__file_extension):
+                os.remove(afile)
+            if fnmatch.fnmatch(afile, '*.json'):
                 os.remove(afile)
 
     @classmethod

@@ -327,7 +327,8 @@ class ReducePyHistogramTDCADCCountsTestCase(unittest.TestCase): # pylint: disabl
         else:
             tag = "tdcadc"
         self.assertEquals(tag, image["tag"], "Unexpected tag")
-        self.assertTrue("content" in image, "No content field")
+        self.assertTrue("keywords" in image, "No keywords field")
+        self.assertTrue("description" in image, "No description field")
         self.assertTrue("data" in image, "No data field")
         decoded_data = base64.b64decode(image["data"])
         self.assertTrue(decoded_data.find("EPS") != -1,
