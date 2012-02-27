@@ -97,6 +97,8 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
      *  where memory is given to the ObjectProcessor
      *  @param is_required if the branch doesnt exist in json or is NULL in C++,
      *  throw Squeal if is_required is set to true
+     *
+     *  Note: don't forget Get method has to be const
      */
     template <class ChildType>
     void RegisterPointerBranch(std::string branch_name,
@@ -119,6 +121,8 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
      *  associated with this branch
      *  @param is_required if the branch doesnt exist in json, throw Squeal if
      *  is_required is set to true
+     *
+     *  Note: don't forget Get method has to be const
      */
     template <class ChildType>
     void RegisterValueBranch(std::string branch_name,
