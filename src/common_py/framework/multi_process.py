@@ -436,7 +436,8 @@ class MultiProcessMergeOutputDataflowExecutor: # pylint: disable=R0903
                 spill_doc = json.loads(spill)
                 spill_run_number = DataflowUtilities.get_run_number(spill_doc) 
                 if (spill_run_number != self.run_number):
-                    print "New run detected...waiting for current processing to complete"
+                    print "New run detected..."
+                    print "Waiting for current processing to complete"
                     self.end_run()
                     self.start_new_run(spill_run_number)
                 print "Executing Merge->Output for spill %s\n" % doc_id,
