@@ -55,8 +55,13 @@ def summarise_database(url, database_name):
             continue
         for collection_name in collection_names:
             collection = mongodb[collection_name]
-            print "  Collection: %s : %d documents" % \
-               (collection_name, collection.count())
+            space = mongodb.validate_collection(collection_name)\
+                ["datasize"]
+            space_kb = space / 1024
+            space_mb = space_kb / 1024
+            print "  Collection: %s : %d documents (%d bytes %d Kb %d Mb)" \
+                % (collection_name, collection.count(), space, \
+                space_kb, space_mb)
 
 def main(argv):
     """
