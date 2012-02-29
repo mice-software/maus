@@ -112,7 +112,7 @@ ThreeVector VirtualHit::GetPosition() const {
 }
 
 void VirtualHit::SetPosition(ThreeVector position) {
-    _position = _position;
+    _position = position;
 }
 
 ThreeVector VirtualHit::GetMomentum() const {

@@ -23,35 +23,66 @@
 
 namespace MAUS {
 
+/** @class Step holds data pertaining to a single step point in GEANT4
+ *
+ *  Each time a step is made, we can record the position and momentum of the
+ *  step point, total energy, time, energy deposited, path length, proper
+ *  time of the step.
+ */
 class Step {
   public:
+    /** Initialise to 0
+     */
     Step();
 
+    /** Copy constructor */
     Step(const Step& step);    
 
+    /** Equality operator */
     Step& operator=(const Step& step);
 
+    /** Destructor - does nothing */
     ~Step();
 
+    /** Returns the position of the step */
     ThreeVector GetPosition() const;
+    /** Sets the position of the step */
     void SetPosition(ThreeVector pos);
 
+    /** Returns the momentum of the step */
     ThreeVector GetMomentum() const;
+
+    /** Sets the momentum of the step */
     void SetMomentum(ThreeVector mom);
 
+    /** Returns the proper time of the step */
     double GetProperTime() const;
+
+    /** Sets the proper time of the step */
     void SetProperTime(double tau);
 
+    /** Returns the path length so far of the track */
     double GetPathLength() const;
+
+    /** Sets the path length so far of the track */
     void SetPathLength(double length);
 
+    /** Returns the time at which the step was made */
     double GetTime() const;
+
+    /** Sets the time at which the step was made */
     void SetTime(double time);    
 
+    /** Returns the energy of the track making the step */
     double GetEnergy() const;
+
+    /** Sets the energy of the track making the step */
     void SetEnergy(double energy);
 
+    /** Returns the energy deposited during the step */
     double GetEnergyDeposited() const;
+
+    /** Sets the energy deposited during the step */
     void SetEnergyDeposited(double edep);
 
   private:

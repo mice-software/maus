@@ -24,7 +24,11 @@ Track::Track() : _steps(NULL), _initial_position(0, 0, 0),
                  _particle_id(0), _track_id(0), _parent_track_id(0) {
 }
 
-Track::Track(const Track& track) {
+Track::Track(const Track& track)
+               : _steps(NULL), _initial_position(0, 0, 0),
+                 _final_position(0, 0, 0),
+                 _initial_momentum(0, 0, 0), _final_momentum(0, 0, 0),
+                 _particle_id(0), _track_id(0), _parent_track_id(0)  {
     *this = track;
 }
 
@@ -32,9 +36,18 @@ Track& Track::operator=(const Track& track) {
     if (this == &track) {
         return *this;
     }
-    _steps = new std::vector<Step>(*(track._steps));
+    if (_steps != NULL) {
+        delete _steps;
+    }
+    if (track._steps == NULL) {
+        _steps = NULL;
+    } else {
+        _steps = new std::vector<Step>(*(track._steps));
+    }
     _initial_position = track._initial_position;
     _final_position = track._final_position;
+    _initial_momentum = track._initial_momentum;
+    _final_momentum = track._final_momentum;
     _particle_id = track._particle_id;
     _track_id = track._track_id;
     _parent_track_id = track._parent_track_id;

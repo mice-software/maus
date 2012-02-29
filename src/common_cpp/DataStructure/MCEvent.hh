@@ -32,26 +32,71 @@ typedef std::vector<Track> TrackArray;
 typedef std::vector<VirtualHit> VirtualHitArray;
 typedef std::vector<Hit> HitArray;
 
+/** @class MCEvent describes data pertaining to a single Monte Carlo event
+ *
+ *  Each Monte Carlo event represents a single particle entering the detector
+ *  system. Multiple tracks can be created by knock on electrons or particle
+ *  decays.
+ *
+ *  MCEvent holds a list of tracks if the appropriate data card is set; a list
+ *  of virtual hits (crossings of virtual detector planes); a list of sensitive
+ *  detector hits (crossings of real detectors); and the initial primary for the
+ *  event
+ */
+
 class MCEvent {
  public:
+  /** Constructor initialises everything to NULL
+   */
   MCEvent();
 
+  /** Deep copy constructor - copies memory referenced by md
+   */
   MCEvent(const MCEvent& md);
        
+  /** Deep copy - copies memory referenced by md
+   */
   MCEvent& operator=(const MCEvent& md);
   
+  /** Delete all pointers
+   */
   virtual ~MCEvent();
 
+  /** Get the tracks pertaining to this event. MCEvent still owns TrackArray*
+   */
   TrackArray* GetTracks() const;
+
+  /** Set the tracks pertaining to this event. MCEvent takes ownership of memory
+   *  pointed to by tracks.
+   */
   void SetTracks(TrackArray* tracks);
 
+  /** Get the virtual hits pertaining to this event. MCEvent still owns
+   *  VirtualHitArray*.
+   */
   VirtualHitArray* GetVirtualHits() const;
+
+  /** Set the virtual hits pertaining to this event. MCEvent takes ownership of
+   *  memory pointed to by hits.
+   */
   void SetVirtualHits(VirtualHitArray* hits);
 
+  /** Set the hits pertaining to this event MCEvent still owns HitArray*.
+   */
   HitArray* GetHits() const;
+
+  /** Set the hits pertaining to this event. MCEvent takes ownership of
+   *  memory pointed to by hits.
+   */
   void SetHits(HitArray* hits);
 
+  /** Get the primary pertaining to this event. MCEvent still owns Primary*.
+   */
   Primary* GetPrimary() const;
+
+  /** Set the primary pertaining to this event. MCEvent takes ownership of
+   *  memory pointed to by primary.
+   */
   void SetPrimary(Primary* primary);
 
  private:

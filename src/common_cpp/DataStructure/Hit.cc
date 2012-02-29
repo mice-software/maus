@@ -23,8 +23,11 @@ Hit::Hit() : _track_id(0), _particle_id(0), _energy(0), _charge(0), _time(0),
              _channel_id(NULL) {
 }
 
-Hit::Hit(const Hit& md) {
-
+Hit::Hit(const Hit& md)
+           : _track_id(0), _particle_id(0), _energy(0), _charge(0), _time(0),
+             _energy_deposited(0), _position(0, 0, 0), _momentum(0, 0, 0),
+             _channel_id(NULL) {
+    *this = md;
 }
          
 Hit& Hit::operator=(const Hit& md) {
@@ -41,7 +44,6 @@ Hit& Hit::operator=(const Hit& md) {
     _momentum = md._momentum;
     if (_channel_id != NULL) {
         delete _channel_id;
-        _channel_id = NULL;
     }
     if (md._channel_id == NULL) {
         _channel_id = NULL;
@@ -124,11 +126,14 @@ void Hit::SetMomentum(ThreeVector mom) {
 }
 
 ChannelId* Hit::GetChannelId() const {
-    return NULL;
+    return _channel_id;
 }
 
 void Hit::SetChannelId(ChannelId* id) {
-    _channel_id = NULL;
+    if (_channel_id != NULL) {
+        delete _channel_id;
+    }
+    _channel_id = id;
 }
 
 }
