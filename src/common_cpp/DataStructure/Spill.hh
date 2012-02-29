@@ -31,32 +31,59 @@ namespace MAUS {
 typedef std::vector<ReconEvent*> ReconEventArray;
 typedef std::vector<MCEvent*> MCEventArray;
 
+/** @class Spill stores data for all items in a given spill
+ *
+ *  The Spill is the fundamental "event" type for MAUS. Branches for spill-level
+ *  objects; Scalars, DAQ, EMR, plus Recon event and MC Event
+ */
 class Spill {
  public:
+  /** Initialise to NULL/0 */
   Spill();
 
+  /** Copy constructor - deep copy */
   Spill(const Spill& md);
        
+  /** Equals operator - does a deep copy */
   Spill& operator=(const Spill& md);
   
+  /** Destructor - frees memory */
   virtual ~Spill();
   
+  /** Set the scalars information */
   void SetScalars(Scalars* scalars);
+
+  /** Get the scalars information */
   Scalars* GetScalars() const;
 
+  /** Set the EMR Spill information */
   void SetEMRSpillData(EMRSpillData* emr);
+
+  /** Get the EMR Spill information */
   EMRSpillData* GetEMRSpillData() const;
 
+  /** Set the DAQ output */
   void SetDAQData(DAQData* daq);
+
+  /** Get the DAQ output */
   DAQData* GetDAQData() const;
 
+  /** Set the MC events */
   void SetMCEvents(MCEventArray* events);
+
+  /** Get the MC events */
   MCEventArray* GetMCEvents() const;
 
+  /** Set the Recon events */
   void SetReconEvents(ReconEventArray* ReconEvent);
+
+  /** Get the Recon events */
   ReconEventArray* GetReconEvents() const;
 
+  /** Set the spill number */
   void SetSpillNumber(int spill);
+
+  /** Get the spill number */
   int GetSpillNumber() const;
 
  private:
@@ -71,10 +98,5 @@ class Spill {
 
 }
 
-
-
 #endif
-
-// Dec 2012 step iv construction complete
-// Dec 2018 step vi construction complete
 

@@ -25,9 +25,9 @@
 
 namespace MAUS {
 
-class TofEventProcessor : public ObjectProcessor<TofEvent> {};
+class TOFEventProcessor : public ObjectProcessor<TOFEvent> {};
 
-class TrackerEventProcessor : public ObjectProcessor<TrackerEvent> {};
+class SciFiEventProcessor : public ObjectProcessor<SciFiEvent> {};
 
 class CkovEventProcessor : public ObjectProcessor<CkovEvent> {};
 
@@ -44,8 +44,8 @@ class ReconEventProcessor : public ObjectProcessor<ReconEvent> {
     ReconEventProcessor();
 
   private:
-    TofEventProcessor _tof_proc;
-    TrackerEventProcessor _tracker_proc;
+    TOFEventProcessor _tof_proc;
+    SciFiEventProcessor _scifi_proc;
     CkovEventProcessor _ckov_proc;
     KLEventProcessor _kl_proc;
     EMREventProcessor _emr_proc;

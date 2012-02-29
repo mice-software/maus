@@ -23,62 +23,94 @@
 
 namespace MAUS {
 
-class TofEvent {};
+class TOFEvent {};  // placeholder for the Tof Event
 
-class TrackerEvent {};
+class SciFiEvent {};  // placeholder for the SciFi Event
 
-class CkovEvent {};
+class CkovEvent {};  // placeholder for the Ckov Event
 
-class KLEvent {};
+class KLEvent {};  // placeholder for the KL Event
 
-class EMREvent {};
+class EMREvent {};  // placeholder for the EMR Event
 
-class TriggerEvent {};
+class TriggerEvent {};  // placeholder for the Trigger Event
 
-class GlobalEvent {};
+class GlobalEvent {};  // placeholder for the Global recon event
 
+/** @class ReconEvent contains reconstruction data pertaining to a DAQ particle
+ *         event
+ *
+ *  ReconEvent holds the data for a single DAQ particle event (i.e. trigger
+ *  condition). Holds reconstruction data for each detector (TOF, Ckov, SciFi,
+ *  KL, EMR) as well as the trigger and the global event (global tracks).
+ */
 class ReconEvent {
   public:
+    /** Initialise to NULL */
     ReconEvent();
 
+    /** Copy constructor - deep copy */
     ReconEvent(const ReconEvent& md);
          
+    /** Equality operator - deep copy */
     ReconEvent& operator=(const ReconEvent& md);
     
+    /** Destructor */
     virtual ~ReconEvent();
 
-    TofEvent* GetTofEvent() const;
-    void SetTofEvent(TofEvent* event);
+    /** Get the TOF detector event */
+    TOFEvent* GetTOFEvent() const;
 
-    TrackerEvent* GetTrackerEvent() const;
-    void SetTrackerEvent(TrackerEvent* event);
+    /** Set the TOF detector event */
+    void SetTOFEvent(TOFEvent* event);
 
+    /** Get the SciFi detector event */
+    SciFiEvent* GetSciFiEvent() const;
+
+    /** Set the SciFi detector event */
+    void SetSciFiEvent(SciFiEvent* event);
+
+    /** Get the Cerenkov detector event */
     CkovEvent* GetCkovEvent() const;
+
+    /** Set the Cerenkov detector event */
     void SetCkovEvent(CkovEvent* event);
 
+    /** Get the KL detector event */
     KLEvent* GetKLEvent() const;
+
+    /** Set the KL detector event */
     void SetKLEvent(KLEvent* event);
 
+    /** Get the EMR detector event */
     EMREvent* GetEMREvent() const;
+
+    /** Set the EMR detector event */
     void SetEMREvent(EMREvent* event);
 
+    /** Get the trigger detector event */
     TriggerEvent* GetTriggerEvent() const;
+
+    /** Set the trigger detector event */
     void SetTriggerEvent(TriggerEvent* event);
 
+    /** Get the global track */
     GlobalEvent* GetGlobalEvent() const;
+
+    /** Set the global track */
     void SetGlobalEvent(GlobalEvent* event);
 
   private:
 
-    TofEvent* _tof_event;
-    TrackerEvent* _tracker_event;
+    TOFEvent* _tof_event;
+    SciFiEvent* _scifi_event;
     CkovEvent* _ckov_event;
     KLEvent* _kl_event;
     EMREvent* _emr_event;
     TriggerEvent* _trigger_event;
     GlobalEvent* _global_event;
 
-  ClassDef(ReconEvent, 1)
+    ClassDef(ReconEvent, 1)
 };
 
 typedef std::vector<ReconEvent*> ReconEventArray;

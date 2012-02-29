@@ -19,8 +19,8 @@
 namespace MAUS {
 
 ReconEventProcessor::ReconEventProcessor() {
-    RegisterPointerBranch("tof_event", &_tof_proc, &ReconEvent::GetTofEvent, &ReconEvent::SetTofEvent, false);
-    RegisterPointerBranch("tracker_event", &_tracker_proc, &ReconEvent::GetTrackerEvent, &ReconEvent::SetTrackerEvent, false);
+    RegisterPointerBranch("tof_event", &_tof_proc, &ReconEvent::GetTOFEvent, &ReconEvent::SetTOFEvent, false);
+    RegisterPointerBranch("scifi_event", &_scifi_proc, &ReconEvent::GetSciFiEvent, &ReconEvent::SetSciFiEvent, false);
     RegisterPointerBranch("ckov_event", &_ckov_proc, &ReconEvent::GetCkovEvent, &ReconEvent::SetCkovEvent, false);
     RegisterPointerBranch("emr_event", &_emr_proc, &ReconEvent::GetEMREvent, &ReconEvent::SetEMREvent, false);
     RegisterPointerBranch("kl_event", &_kl_proc, &ReconEvent::GetKLEvent, &ReconEvent::SetKLEvent, false);
