@@ -130,8 +130,9 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903, R0902
         self.json_config_doc = json_config_doc
         self.client_config_id = "%s (%s)" \
             % (socket.gethostname(), os.getpid()) # Unique ID.
-        self.spill_input_count = 0 # Count of spills input.
-        self.spill_process_count = 0 # Count of spills processed.
+        self.spill_input_count = 0 # Count of spills input
+        self.spill_process_count = 0 # Count of spills processed
+        self.spill_fail_count = 0 # Count of spills wher processing failed
         self.run_number = None
         self.celery_tasks = [] # Celery AsyncResult objects.
         # Parse the configuration JSON
@@ -233,11 +234,14 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903, R0902
                 spill = result.result
                 self.spill_process_count += 1
                 self.doc_store.put(str(self.spill_process_count), spill)
+                self.print_counts()
             elif result.failed():
                 self.celery_tasks.pop(current)
+                self.spill_fail_count += 1
                 num_tasks -= 1
                 print " Celery task %s FAILED : %s : %s" \
                     % (result.task_id, result.result, result.traceback)
+                self.print_counts()
             else:
                 current += 1
 
@@ -270,6 +274,15 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903, R0902
         print "---------- RUN %d ----------" % self.run_number
         self.configure_celery_nodes()
 
+    def print_counts(self):
+        """
+        Print spill counts to date.
+        @param self Object reference.
+        """
+        print "Spills input: %d Processed: %d Failed %d" % \
+            (self.spill_input_count, self.spill_process_count,
+             self.spill_fail_count)
+
     def execute(self): # pylint: disable = R0914, R0912, R0915
         """
         Set up MAUS input tasks and, on receipt of spills, submit
@@ -290,6 +303,7 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903, R0902
         map_buffer = DataflowUtilities.buffer_input(emitter, 1)
         self.spill_input_count = 0
         self.spill_process_count = 0
+        self.spill_fail_count = 0
         self.celery_tasks = []
         while (len(map_buffer) != 0) or (len(self.celery_tasks) != 0):
             for spill in map_buffer:
@@ -298,6 +312,7 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903, R0902
                 spill_doc = json.loads(spill)
                 spill_run_number = DataflowUtilities.get_run_number(spill_doc) 
                 self.spill_input_count += 1
+                self.print_counts()
                 if (spill_run_number == None):
                     # There was no run_num in spill so add a 0 (pure MC run).
                     spill_run_number = 0
@@ -311,8 +326,7 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903, R0902
                 self.submit_spill_to_celery(spill)
             map_buffer = DataflowUtilities.buffer_input(emitter, 1)
             if (len(map_buffer) != 0):
-                print "Input %d spills so far," % self.spill_input_count,
-                print(" %d spills left in buffer." % (len(map_buffer)))
+                print("%d spills left in buffer" % (len(map_buffer)))
             # Go through current transform tasks and see if any's completed. 
             self.poll_celery_tasks()
         print "--------------------"
@@ -377,6 +391,7 @@ class MultiProcessMergeOutputDataflowExecutor: # pylint: disable=R0903
         else:
             self.doc_store = doc_store
         self.run_number = None
+        self.spill_count = 0 # Count of spills handled.
 
     def end_run(self):
         """
@@ -453,6 +468,8 @@ class MultiProcessMergeOutputDataflowExecutor: # pylint: disable=R0903
                     self.start_new_run(spill_run_number)
                     is_birthed = True
                 print "Executing Merge->Output for spill %s\n" % doc_id,
+                self.spill_count += 1
+                print "Spills handled: %d" % self.spill_count
                 try:
                     spill = self.merger.process(spill)
                     self.outputer.save(spill)
