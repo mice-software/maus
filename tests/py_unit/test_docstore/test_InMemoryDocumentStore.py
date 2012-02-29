@@ -37,6 +37,8 @@ class InMemoryDocumentStoreTestCase(unittest.TestCase, DocumentStoreTests): # py
         unittest.TestCase.setUp(self)
         self._data_store = InMemoryDocumentStore()
         self._data_store.connect({})
+        self._collection = self.__class__.__name__
+        self._data_store.create_collection(self._collection)
 
     def tearDown(self):
         """
@@ -44,6 +46,7 @@ class InMemoryDocumentStoreTestCase(unittest.TestCase, DocumentStoreTests): # py
         @param self Object ref
         """
         unittest.TestCase.tearDown(self)
+        self._data_store.delete_collection(self._collection)
         self._data_store.disconnect()
 
     def test_connect_no_parameters(self):

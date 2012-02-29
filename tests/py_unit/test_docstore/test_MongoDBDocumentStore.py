@@ -47,14 +47,14 @@ class MongoDBDocumentStoreTestCase(unittest.TestCase, DocumentStoreTests): # pyl
         test_conx.disconnect()
         # Create data store and connect.
         self._database_name = self.__class__.__name__
-        self._collection_name = self.__class__.__name__
+        self._collection = self.__class__.__name__
         self._data_store = MongoDBDocumentStore()
         parameters = {
             "mongodb_host":self._host,
             "mongodb_port":self._port,
-            "mongodb_database_name":self._database_name,
-            "mongodb_collection_name":self._collection_name}
+            "mongodb_database_name":self._database_name}
         self._data_store.connect(parameters)
+        self._data_store.create_collection(self._collection)
 
     def tearDown(self):
         """
@@ -62,6 +62,7 @@ class MongoDBDocumentStoreTestCase(unittest.TestCase, DocumentStoreTests): # pyl
         @param self Object reference.
         """
         unittest.TestCase.tearDown(self)
+        self._data_store.delete_collection(self._collection)
         self._data_store.disconnect()
         server = pymongo.Connection(self._host, self._port)
         server.drop_database(self._database_name)
@@ -110,20 +111,6 @@ class MongoDBDocumentStoreTestCase(unittest.TestCase, DocumentStoreTests): # pyl
         parameters = {
             "mongodb_host":self._host,
             "mongodb_port":self._port}
-        try:
-            self._data_store.connect(parameters)
-        except KeyError:
-            pass
-
-    def test_connect_no_collection_name(self):
-        """
-        Test connect with no collection name parameter throws a KeyError.
-        @param self Object reference.
-        """
-        parameters = {
-            "mongodb_host":self._host,
-            "mongodb_port":self._port,
-            "mongodb_database_name":self._database_name}
         try:
             self._data_store.connect(parameters)
         except KeyError:

@@ -143,6 +143,8 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903, R0902
                 self.json_config_dictionary)
         else:
             self.doc_store = doc_store
+        self.collection = \
+            self.json_config_dictionary["doc_collection_name"]
 
     @staticmethod
     def ping_celery_nodes():
@@ -233,7 +235,8 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903, R0902
                 print " Celery task %s SUCCESS " % result.task_id
                 spill = result.result
                 self.spill_process_count += 1
-                self.doc_store.put(str(self.spill_process_count), spill)
+                self.doc_store.put(self.collection,
+                    str(self.spill_process_count), spill)
                 self.print_counts()
             elif result.failed():
                 self.celery_tasks.pop(current)
@@ -293,7 +296,9 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903, R0902
         """
         # Purge the document store.
         print("Purging data store")
-        self.doc_store.clear()
+        if (self.doc_store.has_collection(self.collection)):
+            self.doc_store.delete_collection(self.collection)
+        self.doc_store.create_collection(self.collection)
         # Do an initial check for active Celery nodes.
         self.ping_celery_nodes()
 
@@ -350,7 +355,7 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903, R0902
         description += "This runs input-transform dataflows only!"
         return description
 
-class MultiProcessMergeOutputDataflowExecutor: # pylint: disable=R0903
+class MultiProcessMergeOutputDataflowExecutor: # pylint: disable=R0903, R0902
     """
     @class MultiProcessMergeOutputDataflowExecutor
     Execute the merge-output part of MAUS dataflows reading spills
@@ -390,6 +395,8 @@ class MultiProcessMergeOutputDataflowExecutor: # pylint: disable=R0903
                 self.json_config_dictionary)
         else:
             self.doc_store = doc_store
+        self.collection = \
+            self.json_config_dictionary["doc_collection_name"]
         self.run_number = None
         self.spill_count = 0 # Count of spills handled.
 
@@ -448,7 +455,8 @@ class MultiProcessMergeOutputDataflowExecutor: # pylint: disable=R0903
         is_birthed = False
         last_time = datetime(1970, 01, 01)
         while True:
-            recent_docs = self.doc_store.get_since(last_time)
+            recent_docs = self.doc_store.get_since( \
+                self.collection, last_time)
             for doc in recent_docs:
                 doc_id = doc["_id"]
                 doc_time = doc["date"]

@@ -19,9 +19,9 @@ Document store super-class.
 
 class DocumentStore: # pylint: disable=W0232
     """
-    Document store super-class which holds documents identified by
-    a unique identifier and timestamped with their time added to
-    the store.
+    Document store super-class which holds documents, gathered into
+    collections, and identified by a unique identifier and timestamped
+    with their time added to the store.
     """
 
     def connect(self, parameters = None):
@@ -32,48 +32,78 @@ class DocumentStore: # pylint: disable=W0232
         """
         pass
 
-    def ids(self):
+    def collection_names(self):
         """ 
-        Get a list of IDs of the documents in the data store.
+        Get a list of collection names.
         @param self Object reference.
+        @return list.
+        """
+        pass
+
+    def create_collection(self, collection):
+        """ 
+        Create a collection. If it already exists, this is a no-op.
+        @param self Object reference.
+        @param collection Collection name.
+        """
+        pass
+
+    def has_collection(self, collection):
+        """ 
+        Check if collection exists.
+        @param self Object reference.
+        @param collection Collection name.
+        @return True if collection exists else False.
+        """
+        pass
+
+    def get_ids(self, collection):
+        """ 
+        Get a list of IDs of the documents in the collection.
+        @param self Object reference.
+        @param collection Collection name.
         @return ID list.
         """
         pass
 
-    def __len__(self):
+    def count(self, collection):
         """ 
-        Get number of documents in the data store.
+        Get number of documents in the collection.
         @param self Object reference.
+        @param collection Collection name.
         @return number >= 0.
         """
         pass
 
-    def put(self, docid, doc):
+    def put(self, collection, docid, doc):
         """ 
-        Put a document with the given ID into the data store. Any existing
+        Put a document with the given ID into the collection. Any existing
         document with the same ID is overwritten. The time of addition
         is also recorded.
         @param self Object reference.
+        @param collection Collection name.
         @param docid Document ID.
         @param doc Document.
         """
         pass
 
-    def get(self, docid):
+    def get(self, collection, docid):
         """ 
-        Get the document with the given ID from the data store or
+        Get the document with the given ID from the collection or
         None if there is none.
         @param self Object reference.
+        @param collection Collection name.
         @param docid Document ID.
         @return document or None.
         """
         pass
 
-    def get_since(self, earliest):
+    def get_since(self, collection, earliest):
         """ 
         Get the documents added since the given date from the data 
         store or None if there is none.
         @param self Object reference.
+        @param collection Collection name.
         @param earliest datetime representing date of interest. If
         None then all are returned. 
         @return iterable serving up the documents in the form
@@ -83,19 +113,21 @@ class DocumentStore: # pylint: disable=W0232
         """
         pass
 
-    def delete(self, docid):
+    def delete_document(self, collection, docid):
         """ 
-        Delete the document with the given ID from the data store.
+        Delete the document with the given ID from the collection.
         If there is no such document then this is a no-op.
         @param self Object reference.
+        @param collection Collection name.
         @param docid Document ID.
         """
         pass
 
-    def clear(self):
+    def delete_collection(self, collection):
         """ 
-        Clear all the documents from the data store.
+        Delete collection.
         @param self Object reference.
+        @param collection Collection name.
         """
         pass
 
