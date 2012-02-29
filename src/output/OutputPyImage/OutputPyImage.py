@@ -78,7 +78,9 @@ class OutputPyImage:
         key = "image_directory"
         if key in config_doc:
             directory = config_doc[key]
-            if not os.path.exists(directory):
+            if (directory == None):
+                self.directory = os.getcwd()
+            elif not os.path.exists(directory):
                 os.makedirs(directory) 
             elif (not os.path.isdir(directory)):
                 raise ValueError("image_directory is a file: %s" % 
