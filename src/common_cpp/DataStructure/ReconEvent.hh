@@ -51,10 +51,10 @@ class ReconEvent {
 
     /** Copy constructor - deep copy */
     ReconEvent(const ReconEvent& md);
-         
+
     /** Equality operator - deep copy */
     ReconEvent& operator=(const ReconEvent& md);
-    
+
     /** Destructor */
     virtual ~ReconEvent();
 
@@ -114,8 +114,6 @@ class ReconEvent {
 };
 
 typedef std::vector<ReconEvent*> ReconEventArray;
-
-
 }
 
 #endif

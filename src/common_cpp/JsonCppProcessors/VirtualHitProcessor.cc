@@ -19,19 +19,30 @@
 namespace MAUS {
 
 VirtualHitProcessor::VirtualHitProcessor() {
-    RegisterValueBranch("station_id", &_int_proc, &VirtualHit::GetStationId, &VirtualHit::SetStationId, true);
-    RegisterValueBranch("particle_id", &_int_proc, &VirtualHit::GetParticleId, &VirtualHit::SetParticleId, true);
-    RegisterValueBranch("track_id", &_int_proc, &VirtualHit::GetTrackId, &VirtualHit::SetTrackId, true);
-    RegisterValueBranch("time", &_double_proc, &VirtualHit::GetTime, &VirtualHit::SetTime, true);
-    RegisterValueBranch("mass", &_double_proc, &VirtualHit::GetMass, &VirtualHit::SetMass, true);
-    RegisterValueBranch("charge", &_double_proc, &VirtualHit::GetCharge, &VirtualHit::SetCharge, true);
-    RegisterValueBranch("proper_time", &_double_proc, &VirtualHit::GetProperTime, &VirtualHit::SetProperTime, true);
-    RegisterValueBranch("path_length", &_double_proc, &VirtualHit::GetPathLength, &VirtualHit::SetPathLength, true);
-    RegisterValueBranch("position", &_three_vec_proc, &VirtualHit::GetPosition, &VirtualHit::SetPosition, true);
-    RegisterValueBranch("momentum", &_three_vec_proc, &VirtualHit::GetMomentum, &VirtualHit::SetMomentum, true);
-    RegisterValueBranch("b_field", &_three_vec_proc, &VirtualHit::GetBField, &VirtualHit::SetBField, true);
-    RegisterValueBranch("e_field", &_three_vec_proc, &VirtualHit::GetEField, &VirtualHit::SetEField, true);
+    RegisterValueBranch("station_id", &_int_proc, &VirtualHit::GetStationId,
+                                               &VirtualHit::SetStationId, true);
+    RegisterValueBranch("particle_id", &_int_proc, &VirtualHit::GetParticleId,
+                                              &VirtualHit::SetParticleId, true);
+    RegisterValueBranch("track_id", &_int_proc, &VirtualHit::GetTrackId,
+                                                 &VirtualHit::SetTrackId, true);
+    RegisterValueBranch("time", &_double_proc, &VirtualHit::GetTime,
+                                                    &VirtualHit::SetTime, true);
+    RegisterValueBranch("mass", &_double_proc, &VirtualHit::GetMass,
+                                                    &VirtualHit::SetMass, true);
+    RegisterValueBranch("charge", &_double_proc, &VirtualHit::GetCharge,
+                                                  &VirtualHit::SetCharge, true);
+    RegisterValueBranch("proper_time", &_double_proc,
+                  &VirtualHit::GetProperTime, &VirtualHit::SetProperTime, true);
+    RegisterValueBranch("path_length", &_double_proc,
+                  &VirtualHit::GetPathLength, &VirtualHit::SetPathLength, true);
+    RegisterValueBranch("position", &_three_vec_proc, &VirtualHit::GetPosition,
+                                                &VirtualHit::SetPosition, true);
+    RegisterValueBranch("momentum", &_three_vec_proc, &VirtualHit::GetMomentum,
+                                                &VirtualHit::SetMomentum, true);
+    RegisterValueBranch("b_field", &_three_vec_proc, &VirtualHit::GetBField,
+                                                  &VirtualHit::SetBField, true);
+    RegisterValueBranch("e_field", &_three_vec_proc, &VirtualHit::GetEField,
+                                                  &VirtualHit::SetEField, true);
 }
-
 }
 

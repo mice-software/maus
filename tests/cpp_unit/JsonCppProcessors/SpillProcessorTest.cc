@@ -42,9 +42,9 @@ void test_value(ProcessorBase<TYPE>* proc, std::string test_string) {
     Json::Value json_in;
     ASSERT_NO_THROW(json_in = JsonWrapper::StringToJson(test_string))
                                                                  << test_string;
-    TYPE* cpp_type;
+    TYPE* cpp_type = NULL;
     ASSERT_NO_THROW(cpp_type = proc->JsonToCpp(json_in));
-    Json::Value* json_out;
+    Json::Value* json_out = NULL;
     ASSERT_NO_THROW(json_out = proc->CppToJson(*cpp_type));
     EXPECT_PRED3(JsonWrapper::AlmostEqual, json_in, *json_out, 1e-9);
     delete cpp_type;
@@ -83,7 +83,7 @@ std::string HIT =
     std::string("\"position\":{\"x\":6.,\"y\":7.,\"z\":8.},")+
     std::string("\"momentum\":{\"x\":9.,\"y\":10.,\"z\":11.}}");
 
-std::string VIRTUAL_HIT =    
+std::string VIRTUAL_HIT =
     std::string("{\"particle_id\":1,\"track_id\":2,\"station_id\":3,")+
     std::string("\"time\":5.,\"mass\":6.,\"charge\":7.,")+
     std::string("\"proper_time\":8.,\"path_length\":9.,")+
@@ -160,6 +160,5 @@ TEST(SpillProcessorTest, SpillProcessorTest) {
     test_value(&proc, SPILL_NO_MC);
     test_value(&proc, SPILL_MC);
 }
-
 }
 }

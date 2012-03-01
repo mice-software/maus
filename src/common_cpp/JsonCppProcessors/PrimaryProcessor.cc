@@ -19,13 +19,18 @@
 namespace MAUS {
 
 PrimaryProcessor::PrimaryProcessor() {
-    RegisterValueBranch("particle_id", &_int_proc, &Primary::GetParticleId, &Primary::SetParticleId, true);
-    RegisterValueBranch("random_seed", &_int_proc, &Primary::GetRandomSeed, &Primary::SetRandomSeed, true);
-    RegisterValueBranch("time", &_double_proc, &Primary::GetTime, &Primary::SetTime, true);
-    RegisterValueBranch("energy", &_double_proc, &Primary::GetEnergy, &Primary::SetEnergy, true);
-    RegisterValueBranch("position", &_three_vec_proc, &Primary::GetPosition, &Primary::SetPosition, true);
-    RegisterValueBranch("momentum", &_three_vec_proc, &Primary::GetMomentum, &Primary::SetMomentum, true);
+    RegisterValueBranch("particle_id", &_int_proc, &Primary::GetParticleId,
+                                                 &Primary::SetParticleId, true);
+    RegisterValueBranch("random_seed", &_int_proc, &Primary::GetRandomSeed,
+                                                 &Primary::SetRandomSeed, true);
+    RegisterValueBranch("time", &_double_proc, &Primary::GetTime,
+                                                       &Primary::SetTime, true);
+    RegisterValueBranch("energy", &_double_proc, &Primary::GetEnergy,
+                                                     &Primary::SetEnergy, true);
+    RegisterValueBranch("position", &_three_vec_proc, &Primary::GetPosition,
+                                                   &Primary::SetPosition, true);
+    RegisterValueBranch("momentum", &_three_vec_proc, &Primary::GetMomentum,
+                                                   &Primary::SetMomentum, true);
 }
-
 }
 

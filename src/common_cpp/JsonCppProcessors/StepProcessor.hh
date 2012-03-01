@@ -25,15 +25,16 @@
 
 namespace MAUS {
 
+/** @class StepProcessor processor for the Monte Carlo Step */
 class StepProcessor : public ObjectProcessor<Step> {
   public:
+    /** Constructor - registers the branch structure */
     StepProcessor();
 
   private:
     DoubleProcessor _double_proc;
     ThreeVectorProcessor _three_vec_proc;
 };
-
 }
 
 #endif

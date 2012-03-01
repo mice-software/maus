@@ -100,6 +100,5 @@ bool* BoolProcessor::JsonToCpp(const Json::Value& json_bool) {
 Json::Value* BoolProcessor::CppToJson(const bool& cpp_bool) {
   return new Json::Value(cpp_bool);
 }
-
 }
 

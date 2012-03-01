@@ -24,13 +24,14 @@
 
 namespace MAUS {
 
+/** @class ThreeVectorProcessor for converting json <-> cpp ThreeVector */
 class ThreeVectorProcessor : public ObjectProcessor<ThreeVector> {
   public:
-    ThreeVectorProcessor();   
+    /** Constructor - registers the branch structure */
+    ThreeVectorProcessor();
   private:
     DoubleProcessor _double_proc;
 };
-
 }
 
 #endif

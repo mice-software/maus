@@ -99,6 +99,5 @@ double Step::GetEnergyDeposited() const {
 void Step::SetEnergyDeposited(double edep) {
     _energy_deposited = edep;
 }
-
 }
 

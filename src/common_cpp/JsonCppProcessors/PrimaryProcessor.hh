@@ -24,8 +24,10 @@
 
 namespace MAUS {
 
+/** @class PrimaryProcessor for converting json <-> cpp MC Primary */
 class PrimaryProcessor : public ObjectProcessor<Primary> {
   public:
+    /** Constructor - registers the branch structure */
     PrimaryProcessor();
 
   private:
@@ -33,7 +35,6 @@ class PrimaryProcessor : public ObjectProcessor<Primary> {
     IntProcessor _int_proc;
     ThreeVectorProcessor _three_vec_proc;
 };
-
 }
 
 #endif

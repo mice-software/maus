@@ -39,8 +39,15 @@ class TriggerEventProcessor : public ObjectProcessor<TriggerEvent> {};
 
 class GlobalEventProcessor : public ObjectProcessor<GlobalEvent> {};
 
+/** @class ReconEventProcessor processes the data for ReconEvent class
+ *  
+ *  Stubs in place for processors for each of the detector types (but
+ *  expect them to be implemented later)
+ */
 class ReconEventProcessor : public ObjectProcessor<ReconEvent> {
   public:
+    /** Constructor - registers the branch structure
+     */
     ReconEventProcessor();
 
   private:
@@ -52,7 +59,6 @@ class ReconEventProcessor : public ObjectProcessor<ReconEvent> {
     TriggerEventProcessor _trigger_proc;
     GlobalEventProcessor _global_proc;
 };
-
 }
 
 #endif

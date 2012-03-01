@@ -20,22 +20,22 @@
 #include "Rtypes.h"
 
 namespace MAUS {
-
-class EMRSpillData{
+/** Stub class for EMR data on the spill level
+ */
+class EMRSpillData {
  public:
   EMRSpillData();
 
   EMRSpillData(const EMRSpillData& md);
-       
+
   EMRSpillData& operator=(const EMRSpillData& md);
-  
+
   virtual ~EMRSpillData();
 
  private:
 
   ClassDef(EMRSpillData, 1)
 };
-
 }
 
 #endif

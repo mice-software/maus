@@ -20,16 +20,22 @@
 namespace MAUS {
 
 HitProcessor::HitProcessor() {
-    RegisterValueBranch("track_id", &_int_proc, &Hit::GetTrackId, &Hit::SetTrackId, true);
-    RegisterValueBranch("particle_id", &_int_proc, &Hit::GetParticleId, &Hit::SetParticleId, true);
-    RegisterValueBranch("energy", &_double_proc, &Hit::GetEnergy, &Hit::SetEnergy, true);
-    RegisterValueBranch("charge", &_double_proc, &Hit::GetCharge, &Hit::SetCharge, true);
-    RegisterValueBranch("time", &_double_proc, &Hit::GetTime, &Hit::SetTime, true);
-    RegisterValueBranch("energy_deposited", &_double_proc, &Hit::GetEnergyDeposited, &Hit::SetEnergyDeposited, true);
-    RegisterValueBranch("position", &_three_vec_proc, &Hit::GetPosition, &Hit::SetPosition, true);
-    RegisterValueBranch("momentum", &_three_vec_proc, &Hit::GetMomentum, &Hit::SetMomentum, true);
+    RegisterValueBranch
+             ("track_id", &_int_proc, &Hit::GetTrackId, &Hit::SetTrackId, true);
+    RegisterValueBranch
+    ("particle_id", &_int_proc, &Hit::GetParticleId, &Hit::SetParticleId, true);
+    RegisterValueBranch
+              ("energy", &_double_proc, &Hit::GetEnergy, &Hit::SetEnergy, true);
+    RegisterValueBranch
+              ("charge", &_double_proc, &Hit::GetCharge, &Hit::SetCharge, true);
+    RegisterValueBranch
+                    ("time", &_double_proc, &Hit::GetTime, &Hit::SetTime, true);
+    RegisterValueBranch("energy_deposited", &_double_proc,
+                      &Hit::GetEnergyDeposited, &Hit::SetEnergyDeposited, true);
+    RegisterValueBranch
+     ("position", &_three_vec_proc, &Hit::GetPosition, &Hit::SetPosition, true);
+    RegisterValueBranch
+     ("momentum", &_three_vec_proc, &Hit::GetMomentum, &Hit::SetMomentum, true);
 }
-
 }
-
 

@@ -17,6 +17,8 @@
 #ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_OBJECTPROCESSOR_INL_HH_
 #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_OBJECTPROCESSOR_INL_HH_
 
+#include <string>
+
 namespace MAUS {
 
 /** BaseItem is base representation of a particular data structure branch
@@ -64,7 +66,7 @@ class PointerItem : public BaseItem<ParentType> {
 
     /** Constructor
      *
-     *  @param branch_name name used by json to reference the branch 
+     *  @param branch_name name used by json to reference the branch
      *  @param child_processor processor that will be used to convert the
      *  representation of the child types
      *  @param GetMethod callback that will return a pointer to the child data,
@@ -116,7 +118,7 @@ class PointerItem : public BaseItem<ParentType> {
             if (_required) {
                 throw Squeal(Squeal::recoverable,
                 "Failed to recover branch "+_branch+": class data was NULL",
-                "PointerItem::GetCppChild");               
+                "PointerItem::GetCppChild");
             } else {
                 return;
             }
@@ -151,7 +153,7 @@ class ValueItem : public BaseItem<ParentType> {
 
     /** Constructor
      *
-     *  @param branch_name name used by json to reference the branch 
+     *  @param branch_name name used by json to reference the branch
      *  @param child_processor processor that will be used to convert the
      *  representation of the child types
      *  @param GetMethod callback that will return the value of the child data
@@ -162,7 +164,9 @@ class ValueItem : public BaseItem<ParentType> {
      *  is_required is set to true
      */
     ValueItem(std::string branch_name, ProcessorBase<ChildType>* child_processor,
-                GetMethod getter, SetMethod setter, bool is_required)    : BaseItem<ParentType>(), _branch(branch_name), _processor(child_processor), _setter(setter),
+                GetMethod getter, SetMethod setter, bool is_required)
+                          : BaseItem<ParentType>(), _branch(branch_name),
+                            _processor(child_processor), _setter(setter),
       _getter(getter), _required(is_required) {
     }
 
@@ -222,7 +226,8 @@ void ObjectProcessor<ObjectType>::RegisterPointerBranch(
                 ChildType* (ObjectType::*GetMethod)() const,
                 void (ObjectType::*SetMethod)(ChildType* value),
                 bool is_required) {
-    BaseItem<ObjectType>* item = new PointerItem<ObjectType, ChildType>(branch_name, child_processor, GetMethod, SetMethod, is_required);
+    BaseItem<ObjectType>* item = new PointerItem<ObjectType, ChildType>
+              (branch_name, child_processor, GetMethod, SetMethod, is_required);
     items.push_back(item);
 }
 
@@ -235,7 +240,8 @@ void ObjectProcessor<ObjectType>::RegisterValueBranch(
                 ChildType (ObjectType::*GetMethod)() const,
                 void (ObjectType::*SetMethod)(ChildType value),
                 bool is_required) {
-    BaseItem<ObjectType>* item = new ValueItem<ObjectType, ChildType>(branch_name, child_processor, GetMethod, SetMethod, is_required);
+    BaseItem<ObjectType>* item = new ValueItem<ObjectType, ChildType>
+              (branch_name, child_processor, GetMethod, SetMethod, is_required);
     items.push_back(item);
 }
 
@@ -253,7 +259,7 @@ ObjectType* ObjectProcessor<ObjectType>::JsonToCpp(const Json::Value& json_objec
     for (size_t i = 0; i < items.size(); ++i) {
         try {
             items[i]->SetCppChild(json_object, *cpp_object);
-        } catch (Squeal squee) {
+        } catch(Squeal squee) {
             delete cpp_object;
             throw squee;
         }
@@ -267,7 +273,7 @@ Json::Value* ObjectProcessor<ObjectType>::CppToJson(const ObjectType& cpp_object
     for (size_t i = 0; i < items.size(); ++i) {
         try {
             items[i]->SetJsonChild(cpp_object, *json_object);
-        } catch (Squeal squee) {
+        } catch(Squeal squee) {
             delete json_object;
             throw squee;
         }
@@ -281,8 +287,6 @@ ObjectProcessor<ObjectType>::~ObjectProcessor() {
         delete items[i];
     }
 }
-
-
 }
 #endif
 

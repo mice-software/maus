@@ -1,18 +1,18 @@
-// This file is a part of MAUS
-//
-// MAUS is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// MAUS is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with MAUS in the doc folder.  If not, see
-// <http://www.gnu.org/licenses/>.
+/* This file is part of MAUS: http://micewww.pp.rl.ac.uk/projects/maus
+ *
+ * MAUS is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MAUS is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "gtest/gtest.h"
 
@@ -38,7 +38,7 @@ class TestObject {
     double* GetB() const {return _b;}
     void SetB(double* data) {
       if (_b != NULL) {
-        delete _b; 
+        delete _b;
       }
       _b = data;
     }
@@ -58,7 +58,7 @@ class ObjectProcessorTest : public ::testing::Test {
 
     not_req_proc.RegisterValueBranch("branch_a", &double_proc,
                                    &TestObject::GetA, &TestObject::SetA, false);
-    not_req_proc.RegisterPointerBranch("branch_b", &double_proc, 
+    not_req_proc.RegisterPointerBranch("branch_b", &double_proc,
                                    &TestObject::GetB, &TestObject::SetB, false);
     test.SetA(1.);
     test.SetB(new double(2.));
@@ -159,7 +159,5 @@ TEST_F(ObjectProcessorTest, CppToJsonNotRequiredTest) {
   EXPECT_FALSE(json_value->isMember("branch_b"));
   delete json_value;
 }
-
 }
-
 

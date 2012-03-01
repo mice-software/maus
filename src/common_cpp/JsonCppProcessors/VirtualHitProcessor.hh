@@ -28,8 +28,10 @@
 
 namespace MAUS {
 
+/** @class VirtualHitProcessor for converting json <-> cpp MCEvent */
 class VirtualHitProcessor : public ObjectProcessor<VirtualHit> {
  public:
+    /** Constructor - registers the branch structure */
     VirtualHitProcessor();
 
  private:
@@ -37,7 +39,6 @@ class VirtualHitProcessor : public ObjectProcessor<VirtualHit> {
     DoubleProcessor _double_proc;
     IntProcessor _int_proc;
 };
-
 }
 
 #endif

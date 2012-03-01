@@ -62,13 +62,13 @@ TEST(ReconEventTest, ReconEventTest) {
     my_event.SetEMREvent(emr_1);
     my_event.SetTriggerEvent(trigger_1);
     my_event.SetGlobalEvent(global_1);
-    EXPECT_EQ(my_event.GetTOFEvent(), tof_1);    
-    EXPECT_EQ(my_event.GetSciFiEvent(), scifi_1);    
-    EXPECT_EQ(my_event.GetCkovEvent(), ckov_1);    
-    EXPECT_EQ(my_event.GetKLEvent(), kl_1);    
-    EXPECT_EQ(my_event.GetEMREvent(), emr_1);    
-    EXPECT_EQ(my_event.GetTriggerEvent(), trigger_1);    
-    EXPECT_EQ(my_event.GetGlobalEvent(), global_1);    
+    EXPECT_EQ(my_event.GetTOFEvent(), tof_1);
+    EXPECT_EQ(my_event.GetSciFiEvent(), scifi_1);
+    EXPECT_EQ(my_event.GetCkovEvent(), ckov_1);
+    EXPECT_EQ(my_event.GetKLEvent(), kl_1);
+    EXPECT_EQ(my_event.GetEMREvent(), emr_1);
+    EXPECT_EQ(my_event.GetTriggerEvent(), trigger_1);
+    EXPECT_EQ(my_event.GetGlobalEvent(), global_1);
 
     // check reallocation okay
     my_event.SetTOFEvent(tof_2);
@@ -78,13 +78,13 @@ TEST(ReconEventTest, ReconEventTest) {
     my_event.SetEMREvent(emr_2);
     my_event.SetTriggerEvent(trigger_2);
     my_event.SetGlobalEvent(global_2);
-    EXPECT_EQ(my_event.GetTOFEvent(), tof_2);    
-    EXPECT_EQ(my_event.GetSciFiEvent(), scifi_2);    
-    EXPECT_EQ(my_event.GetCkovEvent(), ckov_2);    
-    EXPECT_EQ(my_event.GetKLEvent(), kl_2);    
-    EXPECT_EQ(my_event.GetEMREvent(), emr_2);    
-    EXPECT_EQ(my_event.GetTriggerEvent(), trigger_2);    
-    EXPECT_EQ(my_event.GetGlobalEvent(), global_2);    
+    EXPECT_EQ(my_event.GetTOFEvent(), tof_2);
+    EXPECT_EQ(my_event.GetSciFiEvent(), scifi_2);
+    EXPECT_EQ(my_event.GetCkovEvent(), ckov_2);
+    EXPECT_EQ(my_event.GetKLEvent(), kl_2);
+    EXPECT_EQ(my_event.GetEMREvent(), emr_2);
+    EXPECT_EQ(my_event.GetTriggerEvent(), trigger_2);
+    EXPECT_EQ(my_event.GetGlobalEvent(), global_2);
 
     // check copy constructor (deep copy)
     ReconEvent my_event_copy(my_event);
@@ -139,6 +139,5 @@ TEST(ReconEventTest, ReconEventTest) {
     EXPECT_EQ(trigger_null, my_event_equal.GetTriggerEvent());
     EXPECT_EQ(global_null, my_event_equal.GetGlobalEvent());
 }
-
 }
 

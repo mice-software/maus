@@ -43,10 +43,10 @@ class VirtualHit {
 
     /**Copy constructor*/
     VirtualHit(const VirtualHit& md);
-         
+
     /**Equality operator*/
     VirtualHit& operator=(const VirtualHit& md);
-    
+
     /**Destructor does nothing*/
     virtual ~VirtualHit() {}
 
@@ -151,7 +151,6 @@ class VirtualHit {
 
     ClassDef(VirtualHit, 1)
 };
-
 }
 
 #endif

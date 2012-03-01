@@ -19,13 +19,20 @@
 namespace MAUS {
 
 ReconEventProcessor::ReconEventProcessor() {
-    RegisterPointerBranch("tof_event", &_tof_proc, &ReconEvent::GetTOFEvent, &ReconEvent::SetTOFEvent, false);
-    RegisterPointerBranch("scifi_event", &_scifi_proc, &ReconEvent::GetSciFiEvent, &ReconEvent::SetSciFiEvent, false);
-    RegisterPointerBranch("ckov_event", &_ckov_proc, &ReconEvent::GetCkovEvent, &ReconEvent::SetCkovEvent, false);
-    RegisterPointerBranch("emr_event", &_emr_proc, &ReconEvent::GetEMREvent, &ReconEvent::SetEMREvent, false);
-    RegisterPointerBranch("kl_event", &_kl_proc, &ReconEvent::GetKLEvent, &ReconEvent::SetKLEvent, false);
-    RegisterPointerBranch("trigger_event", &_trigger_proc, &ReconEvent::GetTriggerEvent, &ReconEvent::SetTriggerEvent, false);
-    RegisterPointerBranch("global_event", &_global_proc, &ReconEvent::GetGlobalEvent, &ReconEvent::SetGlobalEvent, false);
+    RegisterPointerBranch("tof_event", &_tof_proc, &ReconEvent::GetTOFEvent,
+                                               &ReconEvent::SetTOFEvent, false);
+    RegisterPointerBranch("scifi_event", &_scifi_proc,
+                 &ReconEvent::GetSciFiEvent, &ReconEvent::SetSciFiEvent, false);
+    RegisterPointerBranch("ckov_event", &_ckov_proc, &ReconEvent::GetCkovEvent,
+                                              &ReconEvent::SetCkovEvent, false);
+    RegisterPointerBranch("emr_event", &_emr_proc, &ReconEvent::GetEMREvent,
+                                               &ReconEvent::SetEMREvent, false);
+    RegisterPointerBranch("kl_event", &_kl_proc, &ReconEvent::GetKLEvent,
+                                                &ReconEvent::SetKLEvent, false);
+    RegisterPointerBranch("trigger_event", &_trigger_proc,
+             &ReconEvent::GetTriggerEvent, &ReconEvent::SetTriggerEvent, false);
+    RegisterPointerBranch("global_event", &_global_proc,
+               &ReconEvent::GetGlobalEvent, &ReconEvent::SetGlobalEvent, false);
+}
 }
 
-}

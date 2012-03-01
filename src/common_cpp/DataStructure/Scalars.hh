@@ -21,21 +21,21 @@
 
 namespace MAUS {
 
+/** Stub for scalars data
+ */
 class Scalars {
  public:
   Scalars();
 
   Scalars(const Scalars& md);
-       
+
   Scalars& operator=(const Scalars& md);
-  
+
   virtual ~Scalars();
 
  private:
-
   ClassDef(Scalars, 1)
 };
-
 }
 
 #endif

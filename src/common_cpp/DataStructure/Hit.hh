@@ -30,6 +30,7 @@ namespace MAUS {
 class ChannelId {
   public:
       virtual ChannelId* Clone() { return new ChannelId(); }
+      virtual ~ChannelId() {}
 };
 
 /** @class Hit contains Monte Carlo sensitive detector hit data
@@ -51,11 +52,11 @@ class Hit {
     /** Copy constructor; deep copies channel ID
      */
     Hit(const Hit& md);
-         
+
     /** Equality operator; deep copies channel ID
      */
     Hit& operator=(const Hit& md);
- 
+
     /** Destructor - cleans memory associated with channel ID
      */
     virtual ~Hit();
@@ -146,9 +147,6 @@ class Hit {
 
     ClassDef(Hit, 1)
 };
-
-
-
 }
 
 #endif

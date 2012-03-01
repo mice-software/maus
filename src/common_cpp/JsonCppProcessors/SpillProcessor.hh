@@ -17,6 +17,8 @@
 #ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_SPILLPROCESSOR_HH_
 #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_SPILLPROCESSOR_HH_
 
+#include <vector>
+
 #include "json/value.h"
 
 #include "src/common_cpp/JsonCppProcessors/DAQDataProcessor.hh"
@@ -34,8 +36,10 @@ namespace MAUS {
 
 typedef std::vector<MCEvent*> MCEventArray;
 
+/** @class SpillProcessor processor for the entire spill */
 class SpillProcessor : public ObjectProcessor<Spill> {
  public:
+    /** Constructor - registers the branch structure */
     SpillProcessor();
 
  private:
@@ -45,9 +49,7 @@ class SpillProcessor : public ObjectProcessor<Spill> {
     PointerArrayProcessor<MCEvent> _mc_array_proc;
     PointerArrayProcessor<ReconEvent> _recon_array_proc;
     IntProcessor _int_proc;
-
 };
-
 }
 #endif
 

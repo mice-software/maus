@@ -38,11 +38,11 @@ class Primary {
   /** Copy constructor
    */
   Primary(const Primary& md);
-       
+
   /** Equality operator
    */
   Primary& operator=(const Primary& md);
-  
+
   /** Destructor (does nothing)
    */
   virtual ~Primary();
@@ -54,7 +54,7 @@ class Primary {
   /** Set the PDG particle ID
    */
   void SetParticleId(int id);
-  
+
   /** Get the random seed (used by GEANT4)
    */
   int GetRandomSeed() const;
@@ -106,7 +106,6 @@ class Primary {
 
   ClassDef(Primary, 1)
 };
-
 }
 
 #endif

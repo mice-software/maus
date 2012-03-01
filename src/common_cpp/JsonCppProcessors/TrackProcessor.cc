@@ -21,15 +21,22 @@
 namespace MAUS {
 
 TrackProcessor::TrackProcessor() : _step_proc(new StepProcessor()) {
-    RegisterValueBranch("particle_id", &_int_proc, &Track::GetParticleId, &Track::SetParticleId, true);
-    RegisterValueBranch("track_id", &_int_proc, &Track::GetTrackId, &Track::SetTrackId, true);
-    RegisterValueBranch("parent_track_id", &_int_proc, &Track::GetParentTrackId, &Track::SetParentTrackId, true);
-    RegisterPointerBranch("steps", &_step_proc, &Track::GetSteps, &Track::SetSteps, false);
-    RegisterValueBranch("initial_position", &_three_vec_proc, &Track::GetInitialPosition, &Track::SetInitialPosition, true);
-    RegisterValueBranch("final_position", &_three_vec_proc, &Track::GetFinalPosition, &Track::SetFinalPosition, true);
-    RegisterValueBranch("initial_momentum", &_three_vec_proc, &Track::GetInitialMomentum, &Track::SetInitialMomentum, true);
-    RegisterValueBranch("final_momentum", &_three_vec_proc, &Track::GetFinalMomentum, &Track::SetFinalMomentum, true);   
+    RegisterValueBranch("particle_id", &_int_proc, &Track::GetParticleId,
+                                                   &Track::SetParticleId, true);
+    RegisterValueBranch("track_id", &_int_proc, &Track::GetTrackId,
+                                                      &Track::SetTrackId, true);
+    RegisterValueBranch("parent_track_id", &_int_proc,
+                      &Track::GetParentTrackId, &Track::SetParentTrackId, true);
+    RegisterPointerBranch("steps", &_step_proc, &Track::GetSteps,
+                                                       &Track::SetSteps, false);
+    RegisterValueBranch("initial_position", &_three_vec_proc,
+                  &Track::GetInitialPosition, &Track::SetInitialPosition, true);
+    RegisterValueBranch("final_position", &_three_vec_proc,
+                      &Track::GetFinalPosition, &Track::SetFinalPosition, true);
+    RegisterValueBranch("initial_momentum", &_three_vec_proc,
+                  &Track::GetInitialMomentum, &Track::SetInitialMomentum, true);
+    RegisterValueBranch("final_momentum", &_three_vec_proc,
+                      &Track::GetFinalMomentum, &Track::SetFinalMomentum, true);
 }
-
 }
 

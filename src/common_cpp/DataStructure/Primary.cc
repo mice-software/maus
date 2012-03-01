@@ -25,9 +25,9 @@ Primary::Primary() : _seed(0), _particle_id(0), _energy(0.), _time(0.),
 Primary::Primary(const Primary& md) {
     *this = md;
 }
-     
+
 Primary& Primary::operator=(const Primary& md) {
-    if(this == &md) {
+    if (this == &md) {
         return *this;
     }
     _seed = md._seed;
@@ -89,6 +89,5 @@ int Primary::GetRandomSeed() const {
 void Primary::SetRandomSeed(int seed) {
     _seed = seed;
 }
-
 }
 

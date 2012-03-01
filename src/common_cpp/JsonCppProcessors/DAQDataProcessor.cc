@@ -20,6 +20,5 @@ namespace MAUS {
 
 DAQDataProcessor::DAQDataProcessor() {
 }
-
 }
 

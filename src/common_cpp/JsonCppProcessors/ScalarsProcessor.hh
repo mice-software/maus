@@ -25,15 +25,14 @@
 
 namespace MAUS {
 
+/** @class ScalarsProcessor for converting json <-> cpp Scalars */
 class ScalarsProcessor : public ObjectProcessor<Scalars> {
  public:
+    /** Constructor - registers the branch structure */
     ScalarsProcessor();
 
  private:
 };
-
-
-
 }
 
 #endif

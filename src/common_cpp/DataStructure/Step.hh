@@ -36,7 +36,7 @@ class Step {
     Step();
 
     /** Copy constructor */
-    Step(const Step& step);    
+    Step(const Step& step);
 
     /** Equality operator */
     Step& operator=(const Step& step);
@@ -71,7 +71,7 @@ class Step {
     double GetTime() const;
 
     /** Sets the time at which the step was made */
-    void SetTime(double time);    
+    void SetTime(double time);
 
     /** Returns the energy of the track making the step */
     double GetEnergy() const;
@@ -93,11 +93,9 @@ class Step {
     double _time;
     double _energy;
     double _energy_deposited;
-
 };
 
 typedef std::vector<Step> StepArray;
-
 }
 
 #endif

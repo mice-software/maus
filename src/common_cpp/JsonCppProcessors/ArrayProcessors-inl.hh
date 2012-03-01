@@ -14,6 +14,8 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <vector>
+
 namespace MAUS {
 
 template <class ArrayContents>
@@ -35,7 +37,7 @@ std::vector<ArrayContents*>* PointerArrayProcessor<ArrayContents>::JsonToCpp
                                                (const Json::Value& json_array) {
     if (!json_array.isConvertibleTo(Json::arrayValue)) {
         // no memory allocated yet...
-        throw(Squeal(Squeal::recoverable, 
+        throw(Squeal(Squeal::recoverable,
                     "\nFailed to resolve Json::Value to array",
                     "PointerArrayProcessor::JsonToCpp()"
                     ) );
@@ -46,7 +48,7 @@ std::vector<ArrayContents*>* PointerArrayProcessor<ArrayContents>::JsonToCpp
            // allocate the vector
             ArrayContents* data = _proc->JsonToCpp(json_array[i]);
             (*vec)[i] = data;
-        } catch (Squeal squee) {
+        } catch(Squeal squee) {
             // if there's a problem, clean up before rethrowing the exception
             for (size_t j = 0; j < vec->size(); ++j) {
                 if ((*vec)[j] != NULL) {
@@ -69,7 +71,7 @@ Json::Value* PointerArrayProcessor<ArrayContents>::
     for (size_t i = 0; i < cpp_array.size(); ++i) {
         try {
             if (cpp_array[i] == NULL) {
-                throw(Squeal(Squeal::recoverable, 
+                throw(Squeal(Squeal::recoverable,
                              "Tried to convert a NULL pointer to a json value",
                              "PointerToArrayProcessor<>::CppToJson"));
             }
@@ -77,19 +79,20 @@ Json::Value* PointerArrayProcessor<ArrayContents>::
             Json::FastWriter writer;
             (*json_array)[i] = *data; // json copies memory here
             delete data; // so we need to clean up here
-        } catch (Squeal squee) {
+        } catch(Squeal squee) {
             // if there's a problem, clean up before rethrowing the exception
             delete json_array;
             throw squee;
         }
     }
     return json_array;
-
 }
 ///////////
 
 template <class ArrayContents>
-ValueArrayProcessor<ArrayContents>::ValueArrayProcessor(ProcessorBase<ArrayContents>* contents_processor) : _proc(contents_processor) {
+ValueArrayProcessor<ArrayContents>::ValueArrayProcessor
+                              (ProcessorBase<ArrayContents>* contents_processor)
+                                                   : _proc(contents_processor) {
 }
 
 template <class ArrayContents>
@@ -106,7 +109,7 @@ std::vector<ArrayContents>* ValueArrayProcessor<ArrayContents>::JsonToCpp
                                                (const Json::Value& json_array) {
     if (!json_array.isConvertibleTo(Json::arrayValue)) {
         // no memory allocated yet...
-        throw(Squeal(Squeal::recoverable, 
+        throw(Squeal(Squeal::recoverable,
                     "\nFailed to resolve Json::Value to array",
                     "ValueArrayProcessor::JsonToCpp()"
                     ) );
@@ -120,7 +123,7 @@ std::vector<ArrayContents>* ValueArrayProcessor<ArrayContents>::JsonToCpp
             ArrayContents* data = _proc->JsonToCpp(json_array[i]);
             (*vec)[i] = *data;
             delete data;
-        } catch (Squeal squee) {
+        } catch(Squeal squee) {
             // if there's a problem, clean up before rethrowing the exception
             delete vec;
             throw squee;
@@ -141,15 +144,13 @@ Json::Value* ValueArrayProcessor<ArrayContents>::
             Json::Value* data = _proc->CppToJson(cpp_array[i]);
             (*json_array)[i] = *data; // json copies memory here
             delete data; // so we need to clean up here
-        } catch (Squeal squee) {
+        } catch(Squeal squee) {
             // if there's a problem, clean up before rethrowing the exception
             delete json_array;
             throw squee;
         }
     }
     return json_array;
-
 }
-
 }
 

@@ -385,7 +385,7 @@ exclude_files += file_append(os.path.join(cp, 'Config'), config_files)
 exclude_files += file_append(os.path.join(cp, 'Optics'), optics_files)
 
 exclude_files += file_append \
-    (os.path.join('src', 'common_cpp', 'DataStructure'), 'MausDataStructure.cc')
+  (os.path.join('src', 'common_cpp', 'DataStructure'), ['MausDataStructure.cc'])
 
 if __name__ == "__main__":
     unittest.main()

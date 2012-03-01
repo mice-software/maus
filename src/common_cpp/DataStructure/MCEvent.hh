@@ -53,11 +53,11 @@ class MCEvent {
   /** Deep copy constructor - copies memory referenced by md
    */
   MCEvent(const MCEvent& md);
-       
+
   /** Deep copy - copies memory referenced by md
    */
   MCEvent& operator=(const MCEvent& md);
-  
+
   /** Delete all pointers
    */
   virtual ~MCEvent();
@@ -108,7 +108,6 @@ class MCEvent {
 
   ClassDef(MCEvent, 1)
 };
-
 }
 
 #endif

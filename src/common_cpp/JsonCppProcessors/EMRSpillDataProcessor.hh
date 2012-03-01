@@ -25,13 +25,14 @@
 
 namespace MAUS {
 
+/** @class EMRSpillData processor for converting EMR spill level data */
 class EMRSpillDataProcessor : public ObjectProcessor<EMRSpillData>  {
- public:
+  public:
+    /** Constructor - registers the branch structure */
     EMRSpillDataProcessor();
 
- private:
+  private:
 };
-
 }
 
 #endif

@@ -20,12 +20,11 @@ namespace MAUS {
 
 ThreeVectorProcessor::ThreeVectorProcessor() : _double_proc() {
     RegisterValueBranch
-                ("x", &_double_proc, &ThreeVector::x, &ThreeVector::setX, true);   
+                ("x", &_double_proc, &ThreeVector::x, &ThreeVector::setX, true);
     RegisterValueBranch
-                ("y", &_double_proc, &ThreeVector::y, &ThreeVector::setY, true);   
+                ("y", &_double_proc, &ThreeVector::y, &ThreeVector::setY, true);
     RegisterValueBranch
-                ("z", &_double_proc, &ThreeVector::z, &ThreeVector::setZ, true);   
+                ("z", &_double_proc, &ThreeVector::z, &ThreeVector::setZ, true);
 }
-
 }
 

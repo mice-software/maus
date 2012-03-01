@@ -26,14 +26,14 @@ Spill::Spill()
 
 Spill::Spill(const Spill& md) {
 }
-       
+
 Spill& Spill::operator=(const Spill& md) {
     if (this == &md) {
         return *this;
     }
     return *this;
 }
-  
+
 Spill::~Spill() {
 }
 
@@ -84,6 +84,5 @@ void Spill::SetSpillNumber(int spill) {
 int Spill::GetSpillNumber() const {
   return _spill_number;
 }
-
 }
 

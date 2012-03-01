@@ -26,8 +26,10 @@
 
 namespace MAUS {
 
+/** @class TrackProcessor for converting json <-> cpp MC Track */
 class TrackProcessor : public ObjectProcessor<Track> {
   public:
+    /** Constructor - registers the branch structure */
     TrackProcessor();
 
   private:
@@ -35,7 +37,6 @@ class TrackProcessor : public ObjectProcessor<Track> {
     ThreeVectorProcessor _three_vec_proc;
     ValueArrayProcessor<Step> _step_proc;
 };
-
 }
 
 #endif

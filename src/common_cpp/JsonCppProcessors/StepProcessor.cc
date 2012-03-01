@@ -19,14 +19,20 @@
 namespace MAUS {
 
 StepProcessor::StepProcessor() {
-    RegisterValueBranch("proper_time", &_double_proc, &Step::GetPathLength, &Step::SetPathLength, true);
-    RegisterValueBranch("path_length", &_double_proc, &Step::GetProperTime, &Step::SetProperTime, true);
-    RegisterValueBranch("time", &_double_proc, &Step::GetTime, &Step::SetTime, true);
-    RegisterValueBranch("energy", &_double_proc, &Step::GetEnergy, &Step::SetEnergy, true);
-    RegisterValueBranch("energy_deposited", &_double_proc, &Step::GetEnergyDeposited, &Step::SetEnergyDeposited, true);
-    RegisterValueBranch("position", &_three_vec_proc, &Step::GetPosition, &Step::SetPosition, true);
-    RegisterValueBranch("momentum", &_three_vec_proc, &Step::GetMomentum, &Step::SetMomentum, true);
+    RegisterValueBranch("proper_time", &_double_proc, &Step::GetPathLength,
+                                                    &Step::SetPathLength, true);
+    RegisterValueBranch("path_length", &_double_proc, &Step::GetProperTime,
+                                                    &Step::SetProperTime, true);
+    RegisterValueBranch("time", &_double_proc, &Step::GetTime,
+                                                          &Step::SetTime, true);
+    RegisterValueBranch("energy", &_double_proc, &Step::GetEnergy,
+                                                        &Step::SetEnergy, true);
+    RegisterValueBranch("energy_deposited", &_double_proc,
+                    &Step::GetEnergyDeposited, &Step::SetEnergyDeposited, true);
+    RegisterValueBranch("position", &_three_vec_proc, &Step::GetPosition,
+                                                      &Step::SetPosition, true);
+    RegisterValueBranch("momentum", &_three_vec_proc, &Step::GetMomentum,
+                                                      &Step::SetMomentum, true);
 }
-
 }
 

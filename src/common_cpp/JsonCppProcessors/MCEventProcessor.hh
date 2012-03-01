@@ -28,8 +28,10 @@
 
 namespace MAUS {
 
+/** @class MCEventProcessor for converting json <-> cpp MCEvent */
 class MCEventProcessor : public ObjectProcessor<MCEvent> {
  public:
+    /** Constructor - registers the branch structure */
     MCEventProcessor();
 
  private:
@@ -38,7 +40,6 @@ class MCEventProcessor : public ObjectProcessor<MCEvent> {
     ValueArrayProcessor<VirtualHit> _virtual_hit_proc;
     PrimaryProcessor _primary_proc;
 };
-
 }
 
 #endif

@@ -42,7 +42,7 @@ TEST(MCEventTest, StepTest) {
     EXPECT_EQ(my_step.GetProperTime(), 10.);
     EXPECT_EQ(my_step.GetPathLength(), 11.);
     EXPECT_EQ(my_step.GetEnergy(), 12.);
-    EXPECT_EQ(my_step.GetEnergyDeposited(), 13.);   
+    EXPECT_EQ(my_step.GetEnergyDeposited(), 13.);
 
     // copy_constructor
     Step my_step_copy(my_step);
@@ -50,7 +50,7 @@ TEST(MCEventTest, StepTest) {
     EXPECT_EQ(my_step.GetMomentum(), my_step_copy.GetMomentum());
     EXPECT_EQ(my_step.GetPathLength(), my_step_copy.GetPathLength());
     EXPECT_EQ(my_step.GetEnergy(), my_step_copy.GetEnergy());
-    EXPECT_EQ(my_step.GetEnergyDeposited(), my_step_copy.GetEnergyDeposited());   
+    EXPECT_EQ(my_step.GetEnergyDeposited(), my_step_copy.GetEnergyDeposited());
 
     // equality operator
     Step my_step_equal;
@@ -59,7 +59,7 @@ TEST(MCEventTest, StepTest) {
     EXPECT_EQ(my_step.GetMomentum(), my_step_equal.GetMomentum());
     EXPECT_EQ(my_step.GetPathLength(), my_step_equal.GetPathLength());
     EXPECT_EQ(my_step.GetEnergy(), my_step_equal.GetEnergy());
-    EXPECT_EQ(my_step.GetEnergyDeposited(), my_step_equal.GetEnergyDeposited());   
+    EXPECT_EQ(my_step.GetEnergyDeposited(), my_step_equal.GetEnergyDeposited());
 
     // test that equality on myself doesn't cause trouble
     my_step = my_step;
@@ -319,20 +319,20 @@ TEST(MCEventTest, MCEventTest) {
     my_event.SetVirtualHits(virt_1);
     my_event.SetHits(hit_1);
     my_event.SetTracks(track_1);
-    EXPECT_EQ(my_event.GetPrimary(), prim_1);    
-    EXPECT_EQ(my_event.GetVirtualHits(), virt_1);    
-    EXPECT_EQ(my_event.GetHits(), hit_1);    
-    EXPECT_EQ(my_event.GetTracks(), track_1);    
+    EXPECT_EQ(my_event.GetPrimary(), prim_1);
+    EXPECT_EQ(my_event.GetVirtualHits(), virt_1);
+    EXPECT_EQ(my_event.GetHits(), hit_1);
+    EXPECT_EQ(my_event.GetTracks(), track_1);
 
     // check reallocation okay
     my_event.SetPrimary(prim_2);
     my_event.SetVirtualHits(virt_2);
     my_event.SetHits(hit_2);
     my_event.SetTracks(track_2);
-    EXPECT_EQ(my_event.GetPrimary(), prim_2);    
-    EXPECT_EQ(my_event.GetVirtualHits(), virt_2);    
-    EXPECT_EQ(my_event.GetHits(), hit_2);    
-    EXPECT_EQ(my_event.GetTracks(), track_2);    
+    EXPECT_EQ(my_event.GetPrimary(), prim_2);
+    EXPECT_EQ(my_event.GetVirtualHits(), virt_2);
+    EXPECT_EQ(my_event.GetHits(), hit_2);
+    EXPECT_EQ(my_event.GetTracks(), track_2);
 
     // check copy constructor (deep copy)
     MCEvent my_event_copy(my_event);
@@ -372,6 +372,5 @@ TEST(MCEventTest, MCEventTest) {
     EXPECT_EQ(hit_null, my_event_equal.GetHits());
     EXPECT_EQ(track_null, my_event_equal.GetTracks());
 }
-
 }
 

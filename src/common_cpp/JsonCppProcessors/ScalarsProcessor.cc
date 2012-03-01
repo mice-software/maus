@@ -19,7 +19,6 @@
 namespace MAUS {
 ScalarsProcessor::ScalarsProcessor() {
 }
-
 }
 
 

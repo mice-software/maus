@@ -17,6 +17,9 @@
 #ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_OBJECTPROCESSOR_HH_
 #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_OBJECTPROCESSOR_HH_
 
+#include <vector>
+#include <string>
+
 #include "json/json.h"
 
 #include "src/common_cpp/JsonCppProcessors/ProcessorBase.hh"
@@ -34,7 +37,7 @@ class ValueItem; // defined in ObjectProcessor-inl
 
 /** @class ObjectProcessor processes json object types into C++ classes
  *
- *  The object processor converts from a C++ class to a json value and vice 
+ *  The object processor converts from a C++ class to a json value and vice
  *  versa. Member data can be stored as items of the json object. Members are
  *  registered using the RegisterPointerBranch and RegisterValueBranch methods
  *  and these are accessed by the JsonToCpp and CppToJson conversion methods.
@@ -75,7 +78,7 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
      *  Returned item is newly allocated memory (caller's responsibility).
      *
      *  If a branch is required but has NULL value, throw a Squeal.
-     *  
+     *
      *  @param C++ object to be converted to json
      *
      *  @returns json representation of the object. Caller is responsible for
@@ -88,7 +91,7 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
      *  @tparam ChildType of the child object referenced by the branch. Should
      *  use the actual type even if the target is a pointer
      *
-     *  @param branch_name name used by json to reference the branch 
+     *  @param branch_name name used by json to reference the branch
      *  @param child_processor processor that will be used to convert the
      *  representation of the child types
      *  @param GetMethod callback that will return a pointer to the child data,
@@ -112,7 +115,7 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
      *  @tparam ChildType of the child object referenced by the branch. Should
      *  use the actual type even if the target is a pointer
      *
-     *  @param branch_name name used by json to reference the branch 
+     *  @param branch_name name used by json to reference the branch
      *  @param child_processor processor that will be used to convert the
      *  representation of the child types
      *  @param GetMethod callback that will return the value of the child data
@@ -130,7 +133,7 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
                     ChildType (ObjectType::*GetMethod)() const,
                     void (ObjectType::*SetMethod)(ChildType value),
                     bool is_required);
-    
+
     /** Destructor frees memory allocated to items vector
      */
     virtual ~ObjectProcessor();
@@ -138,7 +141,6 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
   private:
     std::vector< BaseItem<ObjectType>* > items;
 };
-
 }
 
 #include "src/common_cpp/JsonCppProcessors/ObjectProcessor-inl.hh"

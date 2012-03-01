@@ -73,7 +73,7 @@ MCEvent& MCEvent::operator=(const MCEvent& md) {
         _primary = new Primary(*md._primary);
     }
 
-    return *this;    
+    return *this;
 }
 
 MCEvent::~MCEvent() {
@@ -137,9 +137,6 @@ void MCEvent::SetPrimary(Primary* primary) {
         delete _primary;
     }
     _primary = primary;
-
 }
-
-
 }
 

@@ -124,7 +124,5 @@ std::vector<Step>* Track::GetSteps() const {
 void Track::SetSteps(std::vector<Step>* steps) {
     _steps = steps;
 }
-
-
 }
 

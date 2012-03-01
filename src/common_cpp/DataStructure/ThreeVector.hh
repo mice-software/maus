@@ -21,7 +21,6 @@
 
 namespace MAUS {
 typedef CLHEP::Hep3Vector ThreeVector;
-
 }
 
 #endif

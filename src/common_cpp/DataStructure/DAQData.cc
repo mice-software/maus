@@ -24,17 +24,14 @@ DAQData::DAQData() {
 DAQData::DAQData(const DAQData& daq) {
 }
 
-       
 DAQData& DAQData::operator=(const DAQData& daq) {
   if (&daq == this) {
       return *this;
   }
   return *this;
 }
-  
+
 DAQData::~DAQData() {
-
 }
-
 }
 

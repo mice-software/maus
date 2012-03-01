@@ -19,8 +19,6 @@
 namespace MAUS {
 
 EMRSpillDataProcessor::EMRSpillDataProcessor() {
-
 }
-
 }
 

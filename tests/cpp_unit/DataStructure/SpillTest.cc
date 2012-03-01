@@ -51,11 +51,11 @@ TEST(SpillTest, SpillTest) {
     my_spill.SetMCEvents(mc_1);
     my_spill.SetReconEvents(rec_1);
     my_spill.SetSpillNumber(1);
-    EXPECT_EQ(my_spill.GetDAQData(), daq_1);    
-    EXPECT_EQ(my_spill.GetScalars(), scalars_1);    
-    EXPECT_EQ(my_spill.GetEMRSpillData(), emr_1);    
-    EXPECT_EQ(my_spill.GetMCEvents(), mc_1);    
-    EXPECT_EQ(my_spill.GetReconEvents(), rec_1);    
+    EXPECT_EQ(my_spill.GetDAQData(), daq_1);
+    EXPECT_EQ(my_spill.GetScalars(), scalars_1);
+    EXPECT_EQ(my_spill.GetEMRSpillData(), emr_1);
+    EXPECT_EQ(my_spill.GetMCEvents(), mc_1);
+    EXPECT_EQ(my_spill.GetReconEvents(), rec_1);
     EXPECT_EQ(my_spill.GetSpillNumber(), 1);
 
     // check reallocation okay
@@ -64,11 +64,11 @@ TEST(SpillTest, SpillTest) {
     my_spill.SetEMRSpillData(emr_2);
     my_spill.SetMCEvents(mc_2);
     my_spill.SetReconEvents(rec_2);
-    EXPECT_EQ(my_spill.GetDAQData(), daq_2);    
-    EXPECT_EQ(my_spill.GetScalars(), scalars_2);    
-    EXPECT_EQ(my_spill.GetEMRSpillData(), emr_2);    
-    EXPECT_EQ(my_spill.GetMCEvents(), mc_2);    
-    EXPECT_EQ(my_spill.GetReconEvents(), rec_2);    
+    EXPECT_EQ(my_spill.GetDAQData(), daq_2);
+    EXPECT_EQ(my_spill.GetScalars(), scalars_2);
+    EXPECT_EQ(my_spill.GetEMRSpillData(), emr_2);
+    EXPECT_EQ(my_spill.GetMCEvents(), mc_2);
+    EXPECT_EQ(my_spill.GetReconEvents(), rec_2);
 
     // check copy constructor (deep copy)
     Spill my_spill_copy(my_spill);
@@ -107,6 +107,5 @@ TEST(SpillTest, SpillTest) {
     EXPECT_EQ(mc_null, my_spill_equal.GetMCEvents());
     EXPECT_EQ(rec_null, my_spill_equal.GetReconEvents());
 }
-
 }
 

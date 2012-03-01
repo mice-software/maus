@@ -109,7 +109,6 @@ class Track {
     int _track_id;
     int _parent_track_id;
 };
-
 }
 
 #endif

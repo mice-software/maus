@@ -30,11 +30,9 @@ Scalars& Scalars::operator=(const Scalars& md) {
   }
   return *this;
 }
-  
+
 Scalars::~Scalars() {
-
 }
-
 }
 
 

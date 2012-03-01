@@ -17,6 +17,8 @@
 #ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_JSONCPPPRIMITIVESPROCESSOR_HH_
 #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_JSONCPPPRIMITIVESPROCESSOR_HH_
 
+#include <string>
+
 #include "json/json.h"
 
 #include "src/common_cpp/JsonCppProcessors/ProcessorBase.hh"
@@ -99,7 +101,6 @@ class BoolProcessor : public ProcessorBase<bool> {
      */
     virtual Json::Value* CppToJson(const bool& cpp_bool);
 };
-
 }
 
 #endif

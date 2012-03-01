@@ -24,12 +24,12 @@ ReconEvent::ReconEvent() :_tof_event(NULL), _scifi_event(NULL),
 }
 
 ReconEvent::ReconEvent(const ReconEvent& md)
-   : _tof_event(NULL), _scifi_event(NULL),
-     _ckov_event(NULL), _kl_event(NULL), _emr_event(NULL), _trigger_event(NULL),
-     _global_event(NULL) {
+          : _tof_event(NULL), _scifi_event(NULL),
+            _ckov_event(NULL), _kl_event(NULL), _emr_event(NULL),
+            _trigger_event(NULL), _global_event(NULL) {
     *this = md;
 }
-       
+
 ReconEvent& ReconEvent::operator=(const ReconEvent& recon) {
     if (this == &recon) {
         return *this;
@@ -96,8 +96,8 @@ ReconEvent& ReconEvent::operator=(const ReconEvent& recon) {
         _global_event = NULL;
     } else {
         _global_event = new GlobalEvent(*recon._global_event);
-    }    
-    return *this;    
+    }
+    return *this;
 }
 
 ReconEvent::~ReconEvent() {
@@ -200,7 +200,5 @@ void ReconEvent::SetGlobalEvent(GlobalEvent* event) {
     }
     _global_event = event;
 }
-
-
 }
 

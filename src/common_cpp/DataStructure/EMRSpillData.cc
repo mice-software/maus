@@ -24,17 +24,14 @@ EMRSpillData::EMRSpillData() {
 EMRSpillData::EMRSpillData(const EMRSpillData& md) {
 }
 
-       
 EMRSpillData& EMRSpillData::operator=(const EMRSpillData& md) {
   if (&md == this) {
       return *this;
   }
   return *this;
 }
-  
+
 EMRSpillData::~EMRSpillData() {
-
 }
-
 }
 

@@ -29,7 +29,7 @@ Hit::Hit(const Hit& md)
              _channel_id(NULL) {
     *this = md;
 }
-         
+
 Hit& Hit::operator=(const Hit& md) {
     if (this == &md) {
         return *this;
@@ -52,7 +52,7 @@ Hit& Hit::operator=(const Hit& md) {
     }
     return *this;
 }
- 
+
 Hit::~Hit() {
     if (_channel_id != NULL) {
         delete _channel_id;
@@ -62,7 +62,7 @@ Hit::~Hit() {
 
 
 int Hit::GetTrackId() const {
-    return _track_id;    
+    return _track_id;
 }
 
 void Hit::SetTrackId(int id) {
@@ -135,5 +135,4 @@ void Hit::SetChannelId(ChannelId* id) {
     }
     _channel_id = id;
 }
-
 }

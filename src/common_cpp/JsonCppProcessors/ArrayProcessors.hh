@@ -17,6 +17,8 @@
 #ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_ARRAYPROCESSOR_HH_
 #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_ARRAYPROCESSOR_HH_
 
+#include <vector>
+
 #include "json/json.h"
 
 #include "src/common_cpp/JsonCppProcessors/ProcessorBase.hh"
@@ -38,7 +40,8 @@ class PointerArrayProcessor : public ProcessorBase<std::vector<ArrayContents*> >
      *  target contents. PointerArrayProcessor takes ownership of the memory
      *  allocated to contents_processor.
      */
-    PointerArrayProcessor(ProcessorBase<ArrayContents>* contents_processor);
+    explicit PointerArrayProcessor
+                             (ProcessorBase<ArrayContents>* contents_processor);
 
     /** @Destructor deletes memory allocted to _proc
      */
@@ -81,7 +84,8 @@ class ValueArrayProcessor : public ProcessorBase<std::vector<ArrayContents> > {
      *  target contents. PointerArrayProcessor takes ownership of the memory
      *  allocated to contents_processor.
      */
-    ValueArrayProcessor(ProcessorBase<ArrayContents>* ArrayContentsProcessor);
+    explicit ValueArrayProcessor
+                         (ProcessorBase<ArrayContents>* ArrayContentsProcessor);
 
     /** @Destructor deletes memory allocated to _proc
      */
@@ -108,7 +112,6 @@ class ValueArrayProcessor : public ProcessorBase<std::vector<ArrayContents> > {
   private:
     ProcessorBase<ArrayContents>* _proc;
 };
-
 }
 
 #include "src/common_cpp/JsonCppProcessors/ArrayProcessors-inl.hh"

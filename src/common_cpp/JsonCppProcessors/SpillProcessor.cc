@@ -23,14 +23,20 @@
 
 namespace MAUS {
 
-SpillProcessor::SpillProcessor() :_mc_array_proc(new MCEventProcessor()), _recon_array_proc(new ReconEventProcessor()) {
-    RegisterPointerBranch("scalars", &_scal_proc, &Spill::GetScalars, &Spill::SetScalars, true);
-    RegisterPointerBranch("daq_data", &_daq_proc, &Spill::GetDAQData, &Spill::SetDAQData, true);
-    RegisterPointerBranch("emr_spill_data", &_emr_proc, &Spill::GetEMRSpillData, &Spill::SetEMRSpillData, true);
-    RegisterPointerBranch("mc_events", &_mc_array_proc, &Spill::GetMCEvents, &Spill::SetMCEvents, false);
-    RegisterPointerBranch("recon_events", &_recon_array_proc, &Spill::GetReconEvents, &Spill::SetReconEvents, true);
-    RegisterValueBranch("spill_number", &_int_proc, &Spill::GetSpillNumber, &Spill::SetSpillNumber, true);
+SpillProcessor::SpillProcessor() :_mc_array_proc(new MCEventProcessor()),
+                                  _recon_array_proc(new ReconEventProcessor()) {
+    RegisterPointerBranch
+         ("scalars", &_scal_proc, &Spill::GetScalars, &Spill::SetScalars, true);
+    RegisterPointerBranch
+         ("daq_data", &_daq_proc, &Spill::GetDAQData, &Spill::SetDAQData, true);
+    RegisterPointerBranch("emr_spill_data", &_emr_proc,
+                        &Spill::GetEMRSpillData, &Spill::SetEMRSpillData, true);
+    RegisterPointerBranch("mc_events", &_mc_array_proc, &Spill::GetMCEvents,
+                                                    &Spill::SetMCEvents, false);
+    RegisterPointerBranch("recon_events", &_recon_array_proc,
+                          &Spill::GetReconEvents, &Spill::SetReconEvents, true);
+    RegisterValueBranch("spill_number", &_int_proc, &Spill::GetSpillNumber,
+                                                  &Spill::SetSpillNumber, true);
 }
-
 }
 

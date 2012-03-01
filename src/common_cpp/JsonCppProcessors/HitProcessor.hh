@@ -28,8 +28,10 @@
 
 namespace MAUS {
 
+/** @class Hit processor for converting json <-> cpp data */
 class HitProcessor : public ObjectProcessor<Hit> {
  public:
+    /** Constructor - registers the branch structure */
     HitProcessor();
 
  private:
@@ -37,7 +39,6 @@ class HitProcessor : public ObjectProcessor<Hit> {
     DoubleProcessor _double_proc;
     IntProcessor _int_proc;
 };
-
 }
 
 #endif

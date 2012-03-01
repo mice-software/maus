@@ -25,13 +25,14 @@
 
 namespace MAUS {
 
+/** @class DAQData processor for the DAQ data branch */
 class DAQDataProcessor : public ObjectProcessor<DAQData> {
   public:
+    /** Constructor - registers the branch structure */
     DAQDataProcessor();
 
   private:
 };
-
 }
 
 #endif

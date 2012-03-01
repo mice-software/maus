@@ -21,21 +21,23 @@
 
 namespace MAUS {
 
-class DAQData{
+/** Stub class for DAQ data (output of DAQ parsed into MAUS)
+ */
+
+class DAQData {
  public:
   DAQData();
 
   DAQData(const DAQData& daq);
-       
+
   DAQData& operator=(const DAQData& daq);
-  
+
   virtual ~DAQData();
 
   ClassDef(DAQData, 1)
 
  private:
 };
-
 }
 
 #endif

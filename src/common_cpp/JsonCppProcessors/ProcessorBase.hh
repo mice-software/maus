@@ -73,20 +73,7 @@ class ProcessorBase : IProcessor<CppRepresentation> {
 
   protected:
 };
-
-
 }
 
 #endif
-
-/*
-      nullValue = 0, ///< 'null' value
-      intValue,      ///< signed integer value
-      uintValue,     ///< unsigned integer value
-      realValue,     ///< double value
-      stringValue,   ///< UTF-8 string value
-      booleanValue,  ///< bool value
-      arrayValue,    ///< array value (ordered list)
-      objectValue    ///< object value (collection of name/value pairs).
-*/
 

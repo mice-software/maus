@@ -17,9 +17,9 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_MAUS_SPILL_HH_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_MAUS_SPILL_HH_
 
-#include "Rtypes.h"
-
 #include <vector>
+
+#include "Rtypes.h"
 
 #include "src/common_cpp/DataStructure/DAQData.hh"
 #include "src/common_cpp/DataStructure/EMRSpillData.hh"
@@ -43,13 +43,13 @@ class Spill {
 
   /** Copy constructor - deep copy */
   Spill(const Spill& md);
-       
+
   /** Equals operator - does a deep copy */
   Spill& operator=(const Spill& md);
-  
+
   /** Destructor - frees memory */
   virtual ~Spill();
-  
+
   /** Set the scalars information */
   void SetScalars(Scalars* scalars);
 
@@ -95,7 +95,6 @@ class Spill {
   int _spill_number;
   ClassDef(Spill, 1)
 };
-
 }
 
 #endif
