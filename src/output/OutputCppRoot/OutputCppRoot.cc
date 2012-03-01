@@ -20,66 +20,64 @@
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/JsonCppStreamer/ORStream.hh"
 #include "src/common_cpp/JsonCppStreamer/JsonCppConverter.hh"
+#include "src/common_cpp/Utils/CppErrorHandler.hh"
 
 #include "src/output/OutputCppRoot/OutputCppRoot.hh"
 
 namespace MAUS {
-/*
-// BUG - segmentation fault if I don't death() - probably not destructing in
-//       proper order
+OutputCppRoot::OutputCppRoot() : _outfile(NULL), _spill(NULL),
+                          _jsonCppConverter(NULL), _classname("OutputCppRoot") {
+}
 
 bool OutputCppRoot::birth(std::string json_datacards) {
   try {
+    // clean up any allocated memory or throw an exception
+    if (!death()) {
+        throw(Squeal(
+            Squeal::nonRecoverable,
+            "Failed to clean up memory",
+            "OutputCppRoot::birth"
+        ));
+    }
     // load datacards
     Json::Value datacards = JsonWrapper::StringToJson(json_datacards);
     std::string root_output = JsonWrapper::GetProperty(datacards,
-                   "root_output_filename", JsonWrapper::stringValue).asString();
+                   "output_root_filename", JsonWrapper::stringValue).asString();
     // Setup output stream
-    _outfile = new orstream(root_output.c_str(), "MausData");
-    //    Digits* d = new Digits();
-    //MC* mc = new MC();
-    _d = new Digits();
-    _mc = new MC();
-    _md = new MausData(_d, _mc);
-
-    // Set branch addresses
-    (*_outfile) << branchName("digits") << _d;
-    (*_outfile) << branchName("mc") << _mc;
-    _jsonCppConverter = new JsonCppConverter(_md);
+    _outfile = new orstream(root_output.c_str(), "Spill");
+    _spill = new Spill();
+    _jsonCppConverter = new JsonCppConverter();
+    (*_outfile) << branchName("spill") << _spill;
     return true;
-  } catch(int i){
-    return false;
   } catch(Squeal squee) {
-    // call error handler
+    death();
+    CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
     return false;
   } catch(std::exception exc) {
-    // call error handler
+    death();
+    CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
     return false;
   }
 }
 
 bool OutputCppRoot::save(std::string json_spill_document) {
   try {
-    if (_jsonCppConverter == NULL || 
-	_md == NULL               ||
-	_d == NULL                ||
-	_mc ==NULL                ||
-	_outfile == NULL) {
-      throw(Squeal(Squeal(
-        Squeal::recoverable,
-        "OutputCppRoot was not initialised properly",
-        "OutputCppRoot::save"
-      )));
-    }
-
-    (*_jsonCppConverter)(json_spill_document);
-    (*_outfile) << fillEvent;
-    return true;
-  } catch(Squeal squeal) {
-    // call error handler
+      if (_jsonCppConverter == NULL || _spill == NULL || _outfile == NULL) {
+          throw(Squeal(Squeal(
+            Squeal::recoverable,
+            "OutputCppRoot was not initialised properly",
+            "OutputCppRoot::save"
+          )));
+      }
+      Json::Value json_spill = JsonWrapper::StringToJson(json_spill_document);
+      (*_jsonCppConverter)(json_spill);
+      (*_outfile) << fillEvent;
+      return true;
+  } catch(Squeal squee) {
+    CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
     return false;
   } catch(std::exception exc) {
-    // call error handler
+    CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
     return false;
   }
 }
@@ -88,10 +86,18 @@ bool OutputCppRoot::death() {
   if (_outfile != NULL) {
     _outfile->close();
     delete _outfile;
-    _outfile = NULL;
+    _outfile = NULL;  // deletes spill
+    _spill = NULL;
+  } else if (_spill != NULL) {
+    delete _spill;
+    _spill = NULL;
+  }
+  if (_jsonCppConverter != NULL) {
+    delete _jsonCppConverter;
+    _jsonCppConverter = NULL;
   }
   return true;
 }
-*/
+
 }
 

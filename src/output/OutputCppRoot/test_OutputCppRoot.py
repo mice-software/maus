@@ -17,6 +17,7 @@
 Test for OutputCppRoot
 """
 
+import os
 import unittest
 import json
 import OutputCppRoot
@@ -34,8 +35,18 @@ class TestOutputCppRoot(unittest.TestCase):
         Define cards and initialise Output
         """
         self.output = OutputCppRoot.OutputCppRoot()
-        self.cards = json.dumps({"root_output_filename":"maus_output.root"})
+        outfile = os.path.join \
+                 (os.environ["MAUS_ROOT_DIR"], "tmp", "test_outputCppRoot.root")
+        self.cards = json.dumps({"root_output_filename":outfile})
         self.output.birth(self.cards)
+        self.test_data = {
+            "scalars":{},
+            "emr_spill_data":{},
+            "daq_data":{},
+            "spill_number":1,
+            "recon_events":[],
+            "mc_events":[]
+        }
 
     def test_birth_death(self):
         """
@@ -45,7 +56,6 @@ class TestOutputCppRoot(unittest.TestCase):
         self.assertFalse(an_output.birth('{}'))
         self.assertFalse(an_output.birth('{"root_output_filename":""}'))
         self.assertTrue(an_output.birth(self.cards))
-        # makes a segv if I don't call death()
         self.assertTrue(an_output.death())
 
     def test_save_normal_event(self):
@@ -53,22 +63,24 @@ class TestOutputCppRoot(unittest.TestCase):
         Try saving a few standard events
         """
         self.assertTrue(self.output.save(
-                      json.dumps({"mc":[], "digits":[]})
+            json.dumps(self.test_data)
+        ))
+        self.assertTrue(self.output.save(
+            json.dumps(self.test_data)
+        ))
+        self.assertTrue(self.output.save(
+            json.dumps(self.test_data)
         ))
 
     def test_save_bad_event(self):
         """
         Check that if passed a bad event, code fails gracefully
         """
-        #self.assertFalse(True)
         self.assertFalse(self.output.save(
                       json.dumps({"no_branch":{}})
         ))
-        print 0
         self.assertFalse(self.output.save(''))
-        print 3
         self.output.death()
-  
 
 if __name__=="__main__":
     unittest.main()

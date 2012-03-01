@@ -19,6 +19,7 @@
 #include "TTree.h"
 
 #include "src/common_cpp/Utils/JsonWrapper.hh"
+#include "src/common_cpp/Utils/CppErrorHandler.hh"
 
 #include "src/input/InputCppRoot/InputCppRoot.hh"
 
@@ -38,47 +39,26 @@ InputCppRoot::~InputCppRoot() {
   death();
 }
 
-bool InputCppRoot::test_script() {
-  TFile* f = new TFile("TestFile.root", "RECREATE");
-  TTree* t = new TTree("Data", "Spills");
-  Spill* spill = new Spill();
-  spill->SetDAQData(new DAQData());
-  spill->SetMCEvents(new MCEventArray);
-  t->Branch("spill", spill, sizeof(*spill), 1);
-  spill->SetSpillNumber(1);
-  t->Fill();
-  spill->SetSpillNumber(2);
-  t->Fill();
-  spill->SetSpillNumber(3);
-  t->Fill();
-  t->Write();
-  f->Close();
-
-  TFile* fin = new TFile("TestFile.root", "READ");
-  TTree* tin = (TTree*)fin->Get("Data");
-  Spill* spillin = new Spill();
-  tin->SetBranchAddress("spill", &spillin);
-  std::cerr << tin->GetEntry(0);
-  std::cerr << tin->GetEntry(1);
-  std::cerr << tin->GetEntry(2);
-  std::cerr << sizeof(*tin) << std::endl;
-  fin->Close();
-  return false;
-}
-
 bool InputCppRoot::birth(std::string json_datacards) {
-  Json::Value json_dc = JsonWrapper::StringToJson(json_datacards);
-  if (_filename == "") {
-    _filename = JsonWrapper::GetProperty(json_dc,
-                   "root_input_filename", JsonWrapper::stringValue).asString();
+  try {
+      Json::Value json_dc = JsonWrapper::StringToJson(json_datacards);
+      if (_filename == "") {
+        _filename = JsonWrapper::GetProperty(json_dc,
+                    "input_root_filename", JsonWrapper::stringValue).asString();
+      }
+      _infile = new irstream(_filename.c_str());
+      _jsonCppConverter = new JsonCppConverter();
+      _spill = new Spill();
+      (*_infile) >> branchName("spill") >> _spill;
+  } catch(Squeal squee) {
+    death();
+    CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
+    return false;
+  } catch(std::exception exc) {
+    death();
+    CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
+    return false;
   }
-  _infile = new irstream(_filename.c_str());
-
-  _spill = new Spill();
-
-  (*_infile) >> branchName("spill") >> _spill;
-
-  _jsonCppConverter = new JsonCppConverter();
   return true;
 }
 
@@ -102,20 +82,34 @@ bool InputCppRoot::death() {
 }
 
 std::string InputCppRoot::getNextEvent() {
-  if (_jsonCppConverter == NULL || _infile == NULL) {
-    throw(Squeal(
-      Squeal::recoverable,
-      "InputCppRoot was not initialised properly",
-      "InputCppRoot::getNextEvent"
-    ) );
-  }
-  if ((*_infile) >> readEvent == NULL) {
+  try {
+      if (_jsonCppConverter == NULL || _infile == NULL) {
+        throw(Squeal(
+          Squeal::recoverable,
+          "InputCppRoot was not initialised properly",
+          "InputCppRoot::getNextEvent"
+        ) );
+      }
+      if ((*_infile) >> readEvent == NULL) {
+        return "";
+      }
+      Json::Value* value = (*_jsonCppConverter)(*_spill);
+      Json::FastWriter writer;
+      std::string output = writer.write(*value);
+      delete value;
+      return output;
+  } catch(Squeal squee) {
+    CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
+    return "";
+  } catch(std::exception exc) {
+    CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
     return "";
   }
-  _spill->SetDAQData(new DAQData());
-  Json::Value* value = (*_jsonCppConverter)(*_spill);
-  Json::FastWriter writer;
-  return writer.write(*value);
+}
+
+int InputCppRoot::my_sizeof() {
+  Spill spill;
+  return sizeof(spill);
 }
 
 }

@@ -20,10 +20,12 @@
 Test for OutputCppRoot
 """
 
+import libMausCpp
 import unittest
 import json
 import ROOT
 import os
+import ErrorHandler
 
 import InputCppRoot
 
@@ -40,8 +42,23 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
         Make a sample TFile
         """
         inputter = InputCppRoot.InputCppRoot()
-        inputter.test_script()
-        self.fname = "TestFile.root"
+        self.fname = os.path.join \
+                  (os.environ["MAUS_ROOT_DIR"], "tmp", "test_inputCppRoot.root")
+        root_file = ROOT.TFile(self.fname, "RECREATE")
+        spill = ROOT.MAUS.Spill()
+        tree = ROOT.TTree("Data", "TTree")
+        tree.Branch("spill", spill, inputter.my_sizeof(), 1)
+        tree.Fill()
+        spill.SetScalars(ROOT.MAUS.Scalars())
+        spill.SetEMRSpillData(ROOT.MAUS.EMRSpillData())
+        spill.SetDAQData(ROOT.MAUS.DAQData())
+        spill.SetMCEvents(ROOT.MAUS.MCEventArray())
+        spill.SetReconEvents(ROOT.MAUS.ReconEventArray())
+        spill.SetSpillNumber(1)
+        tree.Fill()
+        tree.Fill()
+        tree.Write()
+        root_file.Close()
 
     def test_birth_death(self):
         """
@@ -65,24 +82,21 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
         Try saving a few standard events
         """
         print "init"
-        inputter = InputCppRoot.InputCppRoot(self.fname)
-        inputter.birth("{}")
-        print "get next event"
-        print inputter.getNextEvent()
-        print inputter.getNextEvent()
-        print inputter.getNextEvent()
-        print "emitter"
-        for item in ra:
-            print "emitted"
-            print item
-            print type(item)
-        
-
-    def test_read_bad_event(self):
-        """
-        Check that if passed a bad event, code fails gracefully
-        """
-        pass
+        inputter = InputCppRoot.InputCppRoot()
+        inputter.birth(json.dumps({"input_root_filename":self.fname}))
+        # bad event (no branches set)
+        self.assertEqual(inputter.getNextEvent(), "")
+        # normal event
+        json_event = json.loads(inputter.getNextEvent())
+        self.assertEqual \
+             (json_event["scalars"], {}, msg=json.dumps(json_event, indent=2))
+        # normal event
+        json_event = json.loads(inputter.getNextEvent())
+        self.assertEqual \
+             (json_event["scalars"], {}, msg=json.dumps(json_event, indent=2))
+        # out of events
+        self.assertEqual(inputter.getNextEvent(), "")
 
 if __name__ == "__main__":
     unittest.main()
+

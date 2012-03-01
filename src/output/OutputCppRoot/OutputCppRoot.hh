@@ -23,9 +23,7 @@
 // TODO (Rogers): looks okay - but throws a segmentation fault if we forget to
 //                call death(); needs proper error handler calling
 
-class Digits;
-class MC;
-class MausData;
+class Spill;
 class JsonCppConverter;
 class orstream;
 
@@ -40,7 +38,7 @@ class OutputCppRoot {
  public:
   /** OutputCppRoot constructor - initialise to NULL
    */
-  OutputCppRoot() : _outfile(NULL), _md(NULL), _jsonCppConverter(NULL) {;}
+  OutputCppRoot();
 
   /** OutputCppRoot destructor - calls death()
    */
@@ -68,10 +66,9 @@ class OutputCppRoot {
 
  private:
   orstream* _outfile;
-  MC* _mc;
-  Digits* _d;
-  MausData* _md;
+  Spill* _spill;
   JsonCppConverter* _jsonCppConverter;
+  std::string _classname;
 };
 }
 

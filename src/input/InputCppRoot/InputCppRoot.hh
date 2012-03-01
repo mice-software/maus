@@ -39,45 +39,53 @@ class JsonCppConverter;
  *  ROOT to json.
  */
 class InputCppRoot {
- public:
-  /** Constructor for InputCppRoot, initialises all members to NULL
-   *
-   *  @param filename if set forces the Inputter to use the filename rather than
-   *         pulling a filename from the datacards at birth
-   */
-  explicit InputCppRoot(std::string filename = "");
-  /** Destructor for InputCppRoot - calls death()
-   */
-  ~InputCppRoot();
+  public:
+    /** Constructor for InputCppRoot, initialises all members to NULL
+     *
+     *  @param filename if set forces the Inputter to use the filename rather than
+     *         pulling a filename from the datacards at birth
+     */
+    explicit InputCppRoot(std::string filename = "");
+    /** Destructor for InputCppRoot - calls death()
+     */
+    ~InputCppRoot();
 
-  /** Initialise the inputter
-   *
-   *  @param json_datacards json formatted string containing the json datacards
-   *  - takes root file from "root_input_filename" parameter
-   */
-  bool birth(std::string json_datacards);
-  bool test_script();
+    /** Initialise the inputter
+     *
+     *  @param json_datacards json formatted string containing the json datacards
+     *  - takes root file from "root_input_filename" parameter
+     */
+    bool birth(std::string json_datacards);
 
-  /** Deletes inputter member data
-   */
-  bool death();
+    /** Deletes inputter member data
+     */
+    bool death();
 
-  /** Gets the next event from the root file. If there are no more events,
-   *  returns an empty string ("")
-   */
-  std::string getNextEvent();
+    /** Gets the next event from the root file. If there are no more events,
+     *  returns an empty string ("")
+     */
+    std::string getNextEvent();
 
-  /** The emitter - should be overloaded by SWIG script
-   */
-  std::string emitter() {
-    return "";
-  }
+    /** The emitter - should be overloaded by SWIG script
+     */
+    std::string emitter() {
+      return "";
+    }
 
- private:
-  irstream* _infile;
-  JsonCppConverter* _jsonCppConverter;
-  Spill* _spill;
-  std::string _filename;
+    /** Returns sizeof the spill object
+     *
+     *  When setting up TTrees directly in ROOT, it is necessary to hand ROOT
+     *  the size of the class member. This is difficult (impossible?) to access
+     *  from python, so we provide a convenience function here.
+     */
+    int my_sizeof();
+
+  private:
+    irstream* _infile;
+    JsonCppConverter* _jsonCppConverter;
+    Spill* _spill;
+    std::string _filename;
+    std::string _classname;
 };
 }
 
