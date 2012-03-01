@@ -19,15 +19,51 @@ Tests for the json_to_root and root_to_json utilities
 """
 
 import unittest
+import os
+import subprocess
+import json
 
 class TestRootIO(unittest.TestCase): #pylint: disable=R0904
     """
     Tests for the json_to_root and root_to_json utilities
     """
 
-    def test_fail(self):
-        """Auto fail until I write some tests"""
-        raise NotImplementedError("Need to make some root io tests")
+    def setUp(self):
+        """Write some test output data"""
+        self.test_data = {
+            "scalars":{},
+            "emr_spill_data":{},
+            "daq_data":{},
+            "spill_number":1,
+            "recon_events":[],
+            "mc_events":[]
+        }
+        self.json_name = os.path.join(os.environ["MAUS_ROOT_DIR"], "tmp",
+                                                       "json_to_root_test.json")
+        self.root_name = os.path.join(os.environ["MAUS_ROOT_DIR"], "tmp",
+                                                       "root_to_json_test.root")
+        self.json_to_root = os.path.join(os.environ["MAUS_ROOT_DIR"], "bin",
+                                                 "utilities", "json_to_root.py")
+        self.root_to_json = os.path.join(os.environ["MAUS_ROOT_DIR"], "bin",
+                                                 "utilities", "root_to_json.py")
+        fout = open(self.json_name, 'w')
+        for i in range(10):
+            print >> fout, json.dumps(self.test_data)
+        print >> fout
+
+    def test_all(self):
+        """Try writing a root file then reading it back"""
+        subproc = subprocess.Popen \
+                ([self.json_to_root, '-input_json_file_name', self.json_name,
+                                     '-output_root_file_name', self.root_name,
+                                     '-verbose_level', '0'])
+        subproc.wait()
+        subproc = subprocess.Popen \
+                ([self.root_to_json, '-input_root_file_name', self.root_name,
+                                     '-output_json_file_name', self.json_name])
+        subproc.wait()
+        
+    
 
 if __name__ == "__main__":
     unittest.main()

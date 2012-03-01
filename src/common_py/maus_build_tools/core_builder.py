@@ -20,7 +20,6 @@ Tools to build core library (libMausCpp) and core library unit tests
 import os
 import glob
 import subprocess
-import shutil
 
 MAUS_ROOT_DIR = os.environ['MAUS_ROOT_DIR']
 

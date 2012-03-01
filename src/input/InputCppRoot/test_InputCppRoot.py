@@ -20,12 +20,10 @@
 Test for OutputCppRoot
 """
 
-import libMausCpp
 import unittest
 import json
 import ROOT
 import os
-import ErrorHandler
 
 import InputCppRoot
 
@@ -44,16 +42,16 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
         inputter = InputCppRoot.InputCppRoot()
         self.fname = os.path.join \
                   (os.environ["MAUS_ROOT_DIR"], "tmp", "test_inputCppRoot.root")
-        root_file = ROOT.TFile(self.fname, "RECREATE")
-        spill = ROOT.MAUS.Spill()
-        tree = ROOT.TTree("Data", "TTree")
+        root_file = ROOT.TFile(self.fname, "RECREATE") # pylint: disable = E1101
+        spill = ROOT.MAUS.Spill() # pylint: disable = E1101
+        tree = ROOT.TTree("Data", "TTree") # pylint: disable = E1101
         tree.Branch("spill", spill, inputter.my_sizeof(), 1)
         tree.Fill()
-        spill.SetScalars(ROOT.MAUS.Scalars())
-        spill.SetEMRSpillData(ROOT.MAUS.EMRSpillData())
-        spill.SetDAQData(ROOT.MAUS.DAQData())
-        spill.SetMCEvents(ROOT.MAUS.MCEventArray())
-        spill.SetReconEvents(ROOT.MAUS.ReconEventArray())
+        spill.SetScalars(ROOT.MAUS.Scalars()) # pylint: disable = E1101
+        spill.SetEMRSpillData(ROOT.MAUS.EMRSpillData()) # pylint: disable = E1101, C0301
+        spill.SetDAQData(ROOT.MAUS.DAQData()) # pylint: disable = E1101
+        spill.SetMCEvents(ROOT.MAUS.MCEventArray()) # pylint: disable = E1101
+        spill.SetReconEvents(ROOT.MAUS.ReconEventArray()) # pylint: disable = E1101, C0301
         spill.SetSpillNumber(1)
         tree.Fill()
         tree.Fill()
@@ -65,10 +63,10 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
         Check that we can birth and death properly
         """
         inputter = InputCppRoot.InputCppRoot()
-        inputter.birth(json.dumps({"root_input_filename":self.fname}))
+        inputter.birth(json.dumps({"root_input_file_name":self.fname}))
         inputter.death()
         inputter.death()
-        inputter.birth(json.dumps({"root_input_filename":self.fname}))
+        inputter.birth(json.dumps({"root_input_file_name":self.fname}))
         inputter.death()
 
         inputter_2 = InputCppRoot.InputCppRoot(self.fname)
@@ -83,7 +81,7 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
         """
         print "init"
         inputter = InputCppRoot.InputCppRoot()
-        inputter.birth(json.dumps({"input_root_filename":self.fname}))
+        inputter.birth(json.dumps({"input_root_file_name":self.fname}))
         # bad event (no branches set)
         self.assertEqual(inputter.getNextEvent(), "")
         # normal event

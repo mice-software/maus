@@ -42,7 +42,7 @@ bool OutputCppRoot::birth(std::string json_datacards) {
     // load datacards
     Json::Value datacards = JsonWrapper::StringToJson(json_datacards);
     std::string root_output = JsonWrapper::GetProperty(datacards,
-                   "output_root_filename", JsonWrapper::stringValue).asString();
+                  "output_root_file_name", JsonWrapper::stringValue).asString();
     // Setup output stream
     _outfile = new orstream(root_output.c_str(), "Spill");
     _spill = new Spill();
@@ -98,6 +98,5 @@ bool OutputCppRoot::death() {
   }
   return true;
 }
-
 }
 

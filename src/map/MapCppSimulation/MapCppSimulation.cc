@@ -103,5 +103,4 @@ void MapCppSimulation::SetConfiguration(std::string json_configuration) {
   _doVis = JsonWrapper::GetProperty
            (config, "geant4_visualisation", JsonWrapper::booleanValue).asBool();
 }
-
 }

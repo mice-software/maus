@@ -44,9 +44,9 @@ bool InputCppRoot::birth(std::string json_datacards) {
       Json::Value json_dc = JsonWrapper::StringToJson(json_datacards);
       if (_filename == "") {
         _filename = JsonWrapper::GetProperty(json_dc,
-                    "input_root_filename", JsonWrapper::stringValue).asString();
+                   "input_root_file_name", JsonWrapper::stringValue).asString();
       }
-      _infile = new irstream(_filename.c_str());
+      _infile = new irstream(_filename.c_str(), "Spill");
       _jsonCppConverter = new JsonCppConverter();
       _spill = new Spill();
       (*_infile) >> branchName("spill") >> _spill;
@@ -64,7 +64,7 @@ bool InputCppRoot::birth(std::string json_datacards) {
 
 bool InputCppRoot::death() {
   // if _infile != NULL, _infile will delete spill
-  if (_infile == NULL && _spill != NULL) {  
+  if (_infile == NULL && _spill != NULL) {
     delete _spill;
     _spill = NULL;
   }
@@ -111,6 +111,5 @@ int InputCppRoot::my_sizeof() {
   Spill spill;
   return sizeof(spill);
 }
-
 }
 

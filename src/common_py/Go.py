@@ -179,6 +179,7 @@ class DataflowUtilities: # pylint: disable=W0232
 
         for i in range(number_of_inputs):  # pylint: disable=W0612
             try:
+                print "INPUT EMITTER", input_emitter
                 value = next(input_emitter)
                 my_buffer.append(value.encode('ascii'))
             except StopIteration:

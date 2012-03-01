@@ -13,6 +13,8 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+# pylint: disable=C0103
+
 """
 Test for OutputCppRoot
 """
@@ -22,7 +24,7 @@ import unittest
 import json
 import OutputCppRoot
 
-class TestOutputCppRoot(unittest.TestCase):
+class TestOutputCppRoot(unittest.TestCase): # pylint: disable=R0904
     """
     Test we can write out ROOT tree.
 
@@ -37,7 +39,7 @@ class TestOutputCppRoot(unittest.TestCase):
         self.output = OutputCppRoot.OutputCppRoot()
         outfile = os.path.join \
                  (os.environ["MAUS_ROOT_DIR"], "tmp", "test_outputCppRoot.root")
-        self.cards = json.dumps({"root_output_filename":outfile})
+        self.cards = json.dumps({"root_output_file_name":outfile})
         self.output.birth(self.cards)
         self.test_data = {
             "scalars":{},
@@ -54,7 +56,7 @@ class TestOutputCppRoot(unittest.TestCase):
         """
         an_output = OutputCppRoot.OutputCppRoot()
         self.assertFalse(an_output.birth('{}'))
-        self.assertFalse(an_output.birth('{"root_output_filename":""}'))
+        self.assertFalse(an_output.birth('{"root_output_file_name":""}'))
         self.assertTrue(an_output.birth(self.cards))
         self.assertTrue(an_output.death())
 
@@ -82,7 +84,7 @@ class TestOutputCppRoot(unittest.TestCase):
         self.assertFalse(self.output.save(''))
         self.output.death()
 
-if __name__=="__main__":
+if __name__ == "__main__":
     unittest.main()
 
 

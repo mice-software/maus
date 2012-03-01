@@ -30,15 +30,15 @@
 #ifndef _SRC_CPP_CORE_UTILS_JSONWRAPPER_HH
 #define _SRC_CPP_CORE_UTILS_JSONWRAPPER_HH
 
-#include <string>
 #include <ostream>
+#include <string>
 
 #include "json/json.h"
 
 #include "CLHEP/Vector/ThreeVector.h"
 
-#include "Interface/STLUtils.hh"
-#include "Interface/Squeal.hh"
+#include "src/legacy/Interface/STLUtils.hh"
+#include "src/legacy/Interface/Squeal.hh"
 
 class JsonWrapper {
  public:

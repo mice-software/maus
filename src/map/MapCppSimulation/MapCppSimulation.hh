@@ -107,7 +107,6 @@ class MapCppSimulation {
   bool _storeTracks;
   bool _doVis;
 };  // Don't forget this trailing colon!!!!
-
 }
 
 #endif  // _SRC_MAP_MAPCPPSIMULATION_HH_
