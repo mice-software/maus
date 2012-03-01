@@ -244,6 +244,11 @@ void ObjectProcessor<ObjectType>::RegisterValueBranch(
 
 template <class ObjectType>
 ObjectType* ObjectProcessor<ObjectType>::JsonToCpp(const Json::Value& json_object) {
+    if (json_object.type() != Json::objectValue) {
+        throw(Squeal(Squeal::recoverable,
+                     "Attempt to pass a json non-object type as an object",
+                     "ObjectProcessor<ObjectType>::JsonToCpp"));
+    }
     ObjectType* cpp_object = new ObjectType();
     for (size_t i = 0; i < items.size(); ++i) {
         try {

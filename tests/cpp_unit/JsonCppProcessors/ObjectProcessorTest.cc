@@ -71,6 +71,10 @@ class ObjectProcessorTest : public ::testing::Test {
 };
 
 TEST_F(ObjectProcessorTest, JsonToCppRequiredTest) {
+  Json::Value json_int(1);
+  // should throw if this is not an object at all
+  EXPECT_THROW(req_proc.JsonToCpp(json_int), Squeal);
+
   Json::Value json_object(Json::objectValue);
   json_object["branch_a"] = Json::Value(1.);
   json_object["branch_b"] = Json::Value(2.);

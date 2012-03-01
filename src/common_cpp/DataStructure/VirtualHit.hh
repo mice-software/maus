@@ -147,7 +147,7 @@ class VirtualHit {
     ThreeVector _position;
     ThreeVector _momentum;
     ThreeVector _b_field;
-    ThreeVector _e_field;  
+    ThreeVector _e_field;
 
     ClassDef(VirtualHit, 1)
 };
