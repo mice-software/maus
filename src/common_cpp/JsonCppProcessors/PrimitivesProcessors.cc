@@ -44,7 +44,6 @@ std::string* StringProcessor::JsonToCpp(const Json::Value& json_string) {
           "Failed to convert json value to string",
           "StringProcessor::JsonToCpp"
       ));
-      return NULL; // appease gcc
   }
 }
 
@@ -61,7 +60,6 @@ int* IntProcessor::JsonToCpp(const Json::Value& json_int) {
           "Failed to convert json value to integer",
           "IntProcessor::JsonToCpp"
       ));
-      return NULL; // appease gcc
   }
 }
 
@@ -71,6 +69,8 @@ Json::Value* IntProcessor::CppToJson(const int& cpp_int) {
 
 unsigned int* UIntProcessor::JsonToCpp(const Json::Value& json_uint) {
   if (json_uint.isUInt()) {
+      return new unsigned int (json_uint.asUInt());
+  } else if (json_uint.isInt() && json_uint.asInt() > 0) {
       return new unsigned int (json_uint.asUInt());
   } else {
       throw(Squeal(
@@ -100,7 +100,6 @@ bool* BoolProcessor::JsonToCpp(const Json::Value& json_bool) {
 Json::Value* BoolProcessor::CppToJson(const bool& cpp_bool) {
   return new Json::Value(cpp_bool);
 }
-
 
 }
 

@@ -23,39 +23,82 @@
 
 namespace MAUS {
 
+/** Processor to convert between C++ double and Json::numericValue
+ */
 class DoubleProcessor : public ProcessorBase<double> {
   public:
+    /** Convert from Json::numericValue to double
+     *
+     *  If json_double cannot be converted to a double, throw a Squeal
+     */
     virtual double* JsonToCpp(const Json::Value& json_double);
+
+    /** Convert from double to Json::numericValue
+     */
     virtual Json::Value* CppToJson(const double& cpp_double);
 };
 
+/** Processor to convert between C++ std::string and Json::stringValue
+ */
 class StringProcessor : public ProcessorBase<std::string> {
   public:
+    /** Convert from Json::numericValue to double
+     *
+     *  If json_string cannot be converted to a double, throw a Squeal
+     */
     virtual std::string* JsonToCpp(const Json::Value& json_string);
+
+    /** Convert from std::string to Json::stringValue
+     */
     virtual Json::Value* CppToJson(const std::string& cpp_string);
 };
 
+/** Processor to convert between C++ int and Json::intValue
+ */
 class IntProcessor : public ProcessorBase<int> {
   public:
+    /** Convert from Json::intValue to int
+     *
+     *  If json_string cannot be converted to a int, throw a Squeal
+     */
     virtual int* JsonToCpp(const Json::Value& json_int);
+
+    /** Convert from int to Json::intValue
+     */
     virtual Json::Value* CppToJson(const int& cpp_int);
 };
 
+/** Processor to convert between C++ uint and Json::intValue or Json::uintValue
+ */
 class UIntProcessor : public ProcessorBase<unsigned int> {
   public:
+    /** Convert from Json::intValue or Json::uintValue to unsigned int
+     *
+     *  If we have a negative Json::intValue or another type, throw an exception
+     */
     virtual unsigned int* JsonToCpp(const Json::Value& json_uint);
+
+    /** Convert from unsigned int to Json::uintValue
+     */
     virtual Json::Value* CppToJson(const unsigned int& cpp_double);
 };
 
+/** Processor to convert between C++ nool and Json::boolValue
+ */
 class BoolProcessor : public ProcessorBase<bool> {
   public:
+    /** Convert from Json::boolValue to bool
+     *
+     *  If json_bool cannot be converted to a bool, throw a Squeal
+     */
     virtual bool* JsonToCpp(const Json::Value& json_bool);
+
+    /** Convert from bool to Json::boolValue
+     *
+     *  If json_bool cannot be converted to a Json::boolValue, throw a Squeal
+     */
     virtual Json::Value* CppToJson(const bool& cpp_bool);
 };
-
-
-
-
 
 }
 

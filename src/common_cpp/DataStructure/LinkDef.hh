@@ -12,8 +12,8 @@
 #pragma link C++ class MAUS::DAQData+;
 #pragma link C++ class MAUS::ReconEvent+;
 
-#pragma link C++ class MAUS::TofEvent+;
-#pragma link C++ class MAUS::TrackerEvent+;
+#pragma link C++ class MAUS::TOFEvent+;
+#pragma link C++ class MAUS::SciFiEvent+;
 #pragma link C++ class MAUS::EMREvent+;
 #pragma link C++ class MAUS::KLEvent+;
 #pragma link C++ class MAUS::TriggerEvent+;

@@ -31,15 +31,48 @@ MCEvent::MCEvent(const MCEvent& md)
        : _primary(NULL), _virtuals(NULL), _hits(NULL), _tracks(NULL) {
   *this = md;
 }
-       
+
 MCEvent& MCEvent::operator=(const MCEvent& md) {
     if (this == &md) {
         return *this;
     }
-    _tracks = new TrackArray(*md._tracks);
-    _virtuals = new VirtualHitArray(*md._virtuals);
-    _hits = new HitArray(*md._hits);
-    _primary = new Primary(*md._primary);
+    if (_tracks != NULL) {
+        delete _tracks;
+    }
+    if (md._tracks == NULL) {
+        _tracks = NULL;
+    } else {
+        _tracks = new TrackArray(*md._tracks);
+    }
+
+    if (_virtuals != NULL) {
+        delete _virtuals;
+    }
+    if (md._virtuals == NULL) {
+        _virtuals = NULL;
+    } else {
+        _virtuals = new VirtualHitArray(*md._virtuals);
+    }
+
+
+    if (_hits != NULL) {
+        delete _hits;
+    }
+    if (md._hits == NULL) {
+        _hits = NULL;
+    } else {
+        _hits = new HitArray(*md._hits);
+    }
+
+    if (_primary != NULL) {
+        delete _primary;
+    }
+    if (md._primary == NULL) {
+        _primary = NULL;
+    } else {
+        _primary = new Primary(*md._primary);
+    }
+
     return *this;    
 }
 
@@ -67,6 +100,9 @@ TrackArray* MCEvent::GetTracks() const {
 }
 
 void MCEvent::SetTracks(TrackArray* tracks) {
+    if (_tracks != NULL) {
+        delete _tracks;
+    }
     _tracks = tracks;
 }
 
@@ -75,6 +111,9 @@ VirtualHitArray* MCEvent::GetVirtualHits() const {
 }
 
 void MCEvent::SetVirtualHits(VirtualHitArray* hits) {
+    if (_virtuals != NULL) {
+        delete _virtuals;
+    }
     _virtuals = hits;
 }
 
@@ -83,6 +122,9 @@ HitArray* MCEvent::GetHits() const {
 }
 
 void MCEvent::SetHits(HitArray* hits) {
+    if (_hits != NULL) {
+        delete _hits;
+    }
     _hits = hits;
 }
 
@@ -91,7 +133,11 @@ Primary* MCEvent::GetPrimary() const {
 }
 
 void MCEvent::SetPrimary(Primary* primary) {
+    if (_primary != NULL) {
+        delete _primary;
+    }
     _primary = primary;
+
 }
 
 

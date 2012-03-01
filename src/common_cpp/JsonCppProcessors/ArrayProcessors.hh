@@ -23,23 +23,87 @@
 
 namespace MAUS {
 
+/** @class PointerArrayProcessor
+ *
+ *  PointerArrayProcessor provides bindings for converting between a C++ vector
+ *  of pointers and a json array (json's vector type). Note that this class is
+ *  specifically for converting a vector of pointers.
+ */
 template <class ArrayContents>
 class PointerArrayProcessor : public ProcessorBase<std::vector<ArrayContents*> > {
   public:
+    /** @Constructor
+     *
+     *  @param contents_processor is a pointer that will be used to process the 
+     *  target contents. PointerArrayProcessor takes ownership of the memory
+     *  allocated to contents_processor.
+     */
     PointerArrayProcessor(ProcessorBase<ArrayContents>* contents_processor);
+
+    /** @Destructor deletes memory allocted to _proc
+     */
     ~PointerArrayProcessor();
+
+    /** Convert from a json array type to a C++ std::vector type.
+     *
+     *  @param json_array Json arrayValue
+     *
+     *  @returns std::vector C++ representation of the data. As with all
+     *  processors, caller has ownership of this memory
+     */
     std::vector<ArrayContents*>* JsonToCpp(const Json::Value& json_array);
+
+    /** Convert from a C++ vector type to a json array type.
+     *
+     *  @param cpp_array C++ vector
+     *
+     *  @returns Json::Value arrayValue with vector contents in Json
+     *  representation. As with all processors, caller has ownership of this
+     *  memory
+     */
     Json::Value* CppToJson(const std::vector<ArrayContents*>& cpp_array);
   private:
     ProcessorBase<ArrayContents>* _proc;
 };
 
+/** @class ValueArrayProcessor
+ *
+ *  ValueArrayProcessor provides bindings for converting between a C++ vector
+ *  of values and a json array (json's vector type). Note that this class is
+ *  specifically for converting a vector of values.
+ */
 template <class ArrayContents>
 class ValueArrayProcessor : public ProcessorBase<std::vector<ArrayContents> > {
   public:
+    /** @Constructor
+     *
+     *  @param contents_processor is a pointer that will be used to process the 
+     *  target contents. PointerArrayProcessor takes ownership of the memory
+     *  allocated to contents_processor.
+     */
     ValueArrayProcessor(ProcessorBase<ArrayContents>* ArrayContentsProcessor);
+
+    /** @Destructor deletes memory allocated to _proc
+     */
     ~ValueArrayProcessor();
+
+    /** Convert from a json array type to a C++ std::vector type.
+     *
+     *  @param json_array Json arrayValue
+     *
+     *  @returns std::vector C++ representation of the data. As with all
+     *  processors, caller has ownership of this memory
+     */
     std::vector<ArrayContents>* JsonToCpp(const Json::Value& json_array);
+
+    /** Convert from a C++ vector type to a json array type.
+     *
+     *  @param cpp_array C++ vector
+     *
+     *  @returns Json::Value arrayValue with vector contents in Json
+     *  representation. As with all processors, caller has ownership of this
+     *  memory
+     */
     Json::Value* CppToJson(const std::vector<ArrayContents>& cpp_array);
   private:
     ProcessorBase<ArrayContents>* _proc;
