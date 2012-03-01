@@ -15,14 +15,15 @@
  *
  */
 
-#include "gtest/gtest.h"
 #include "TFile.h"
 #include "TTree.h"
+
+#include "gtest/gtest.h"
 
 #include "src/common_cpp/JsonCppStreamer/IRStream.hh"
 #include "src/common_cpp/JsonCppStreamer/OneArgManip.hh"
 
-TEST( IRStreamTest, TestConstructor ) {
+TEST(IRStreamTest, TestConstructor) {
   TFile f("TestFile.root", "RECREATE");
   TTree t("TestTree", "treetitle");
   t.Write();
@@ -30,14 +31,20 @@ TEST( IRStreamTest, TestConstructor ) {
   // explicitly allocate memory so we can run destructor explicitly
   irstream* is = new irstream("TestFile.root", "TestTree");
 
-  ASSERT_EQ(is->m_evtCount, 0)                    << "Fail: event counter not initialised properly" << std::endl;
-  ASSERT_NE(is->m_file, static_cast<void*>(NULL)) << "Fail: file object not initialised properly"   << std::endl;
-  ASSERT_NE(is->m_tree, static_cast<void*>(NULL)) << "Fail: tree object not initialised properly"   << std::endl;
+  ASSERT_EQ(is->m_evtCount, 0)
+    << "Fail: event counter not initialised properly"
+    << std::endl;
+  ASSERT_NE(is->m_file, static_cast<void*>(NULL))
+    << "Fail: file object not initialised properly"
+    << std::endl;
+  ASSERT_NE(is->m_tree, static_cast<void*>(NULL))
+    << "Fail: tree object not initialised properly"
+    << std::endl;
   is->close();
   delete is;
 }
 
-TEST( IRStreamTest, TestFileOpen ) {
+TEST(IRStreamTest, TestFileOpen) {
   TFile f("TestFile.root", "RECREATE");
   TTree t("TestTree", "treetitle");
   t.Write();
@@ -55,10 +62,18 @@ TEST( IRStreamTest, TestFileOpen ) {
 
   is.open("TestFile.root", "TestTree");
 
-  ASSERT_EQ(is.m_evtCount, 0)                    << "Fail: event counter not reset"              << std::endl;
-  ASSERT_NE(is.m_file, static_cast<void*>(NULL)) << "Fail: file object not initialised properly" << std::endl;
-  ASSERT_NE(is.m_tree, static_cast<void*>(NULL)) << "Fail: tree object not initialised properly" << std::endl;
-  ASSERT_NE(is.m_branchName, "")                 << "Fail: branch name not reset"                << std::endl;
+  ASSERT_EQ(is.m_evtCount, 0)
+    << "Fail: event counter not reset"
+    << std::endl;
+  ASSERT_NE(is.m_file, static_cast<void*>(NULL))
+    << "Fail: file object not initialised properly"
+    << std::endl;
+  ASSERT_NE(is.m_tree, static_cast<void*>(NULL))
+    << "Fail: tree object not initialised properly"
+    << std::endl;
+  ASSERT_NE(is.m_branchName, "")
+    << "Fail: branch name not reset"
+    << std::endl;
 
   // irstream close but dont want to introduce dependence on the close method in unit test
   is.m_file->Close();
@@ -70,7 +85,7 @@ TEST( IRStreamTest, TestFileOpen ) {
   /////////////////////////////////
 }
 
-TEST( IRStreamTest, TestFileClose ) {
+TEST(IRStreamTest, TestFileClose) {
   TFile f("TestFile.root", "RECREATE");
   TTree t("TestTree", "treetitle");
   t.Write();
@@ -79,12 +94,18 @@ TEST( IRStreamTest, TestFileClose ) {
 
   is.close();
 
-  ASSERT_NE(is.m_branchName, "")                 << "Fail: did not reset the branch name."  << std::endl;
-  ASSERT_EQ(is.m_file, static_cast<void*>(NULL)) << "Fail: did not delete the file object." << std::endl;
-  ASSERT_EQ(is.m_tree, static_cast<void*>(NULL)) << "Fail: did not delete the tree object"  << std::endl;
+  ASSERT_NE(is.m_branchName, "")
+    << "Fail: did not reset the branch name."
+    << std::endl;
+  ASSERT_EQ(is.m_file, static_cast<void*>(NULL))
+    << "Fail: did not delete the file object."
+    << std::endl;
+  ASSERT_EQ(is.m_tree, static_cast<void*>(NULL))
+    << "Fail: did not delete the tree object"
+    << std::endl;
 }
 
-TEST( IRStreamTest, TestReadEvent ) {
+TEST(IRStreamTest, TestReadEvent ) {
   TFile f("TestFile.root", "RECREATE");
   TTree t("TestTree", "treetitle");
   Int_t* a = new Int_t(17);
@@ -97,23 +118,29 @@ TEST( IRStreamTest, TestReadEvent ) {
   t.Fill();
   t.Write();
   f.Close();
-  
-  a = new (a) int(0);
+
+  a = new(a) Int_t(0);
   delete b;
 
   irstream is("TestFile.root", "TestTree");
-  int c = 0;    
+  int c = 0;
   is >> branchName("testA") >> a;
   is >> branchName("testB") >> c;
 
-  int evtCount = 0;    
+  int evtCount = 0;
   while (is >> readEvent) {
     ++evtCount;
-    ASSERT_EQ(evtCount, is.m_evtCount) << "Fail: didn't increment the read event counter properly."   << std::endl;
-    ASSERT_TRUE(*a == 17 || *a == 26)  << "Fail: didn't read in the correct values from pointer."     << std::endl;
-    ASSERT_TRUE( c == 23 ||  c == 19)  << "Fail: didn't read in the correct values from non-pointer." << std::endl;
+    ASSERT_EQ(evtCount, is.m_evtCount)
+      << "Fail: didn't increment the read event counter properly."
+      << std::endl;
+    ASSERT_TRUE(*a == 17 || *a == 26)
+      << "Fail: didn't read in the correct values from pointer."
+      << std::endl;
+    ASSERT_TRUE(c == 23 ||  c == 19)
+      << "Fail: didn't read in the correct values from non-pointer."
+      << std::endl;
   }
-  
+
   // irstream close but dont want to introduce dependence on the close method in unit test
   is.m_file->Close();
   strcpy(is.m_branchName, "");
@@ -124,6 +151,3 @@ TEST( IRStreamTest, TestReadEvent ) {
   /////////////////////////////////
   delete a;
 }
-
-
-

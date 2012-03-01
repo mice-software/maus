@@ -1,3 +1,21 @@
+/* This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
+ *
+ * MAUS is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MAUS is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+
 #ifndef CONVERTERBASE_H
 #define CONVERTERBASE_H
 
@@ -15,6 +33,8 @@
 template<class TYPE1, class TYPE2>
   class ConverterBase {
  public:
+    // ! Destructor
+    virtual ~ConverterBase() {}
   /*!
    * \brief Constructor
    *
@@ -23,7 +43,7 @@ template<class TYPE1, class TYPE2>
    *
    * \param TYPE1* a pointer to a \a TYPE1 object
    */
-  ConverterBase(TYPE1* d1):m_d1(d1),m_d2(0){}
+  explicit ConverterBase(TYPE1* d1) : m_d1(d1), m_d2(0) {}
   /*!
    * \brief Constructor
    *
@@ -32,7 +52,7 @@ template<class TYPE1, class TYPE2>
    *
    * \param TYPE1& a \a TYPE1 object
    */
-  ConverterBase(TYPE1& d1):m_d1(&d1),m_d2(0){}
+  explicit ConverterBase(TYPE1& d1) : m_d1(&d1), m_d2(0) {}
   /*!
    * \brief Constructor
    *
@@ -41,7 +61,7 @@ template<class TYPE1, class TYPE2>
    *
    * \param TYPE2* a pointer to a \a TYPE2 object
    */
-  ConverterBase(TYPE2* d2):m_d1(0),m_d2(d2){}
+  explicit ConverterBase(TYPE2* d2) : m_d1(0), m_d2(d2) {}
   /*!
    * \brief Constructor
    *
@@ -50,7 +70,7 @@ template<class TYPE1, class TYPE2>
    *
    * \param TYPE2& a \a TYPE2 object
    */
-  ConverterBase(TYPE2& d2):m_d1(0),m_d2(&d2){}
+  explicit ConverterBase(TYPE2& d2) : m_d1(0), m_d2(&d2) {}
 
   /*!
    * \brief Perform conversion
@@ -63,7 +83,7 @@ template<class TYPE1, class TYPE2>
    * \param DATA_TYPE_2 The input data to be converted
    * \return The output data after conversion
    */
-    virtual TYPE1* operator()(const TYPE2&) =0;
+    virtual TYPE1* operator()(const TYPE2&) = 0;
   /*!
    * \brief Perform conversion
    *
@@ -75,7 +95,7 @@ template<class TYPE1, class TYPE2>
    * \param DATA_TYPE_1 The input data to be converted
    * \return The output data after conversion
    */
-    virtual TYPE2* operator()(const TYPE1&) =0;
+    virtual TYPE2* operator()(const TYPE1&) = 0;
  protected:
   /*! \var long m_evtcnt
    * \brief Event counter

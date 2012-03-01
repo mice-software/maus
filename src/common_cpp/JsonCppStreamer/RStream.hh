@@ -1,3 +1,21 @@
+/* This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
+ *
+ * MAUS is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MAUS is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+
 /*!
  * \file rstream.h
  *
@@ -105,33 +123,51 @@ template<typename T> rstream& rstream::attachBranch(T& d,
 						    bool doublePointer,
 						    bool createNonExistentBranch) {
   if (!strcmp(m_branchName, "")) {
-    Squeak::mout(Squeak::error) << "No branch name set" << std::endl;
-    Squeak::mout(Squeak::info)  << "Setup a branch name before attaching a data object using << branchName(\"MyBranch\")" << std::endl;
+    Squeak::mout(Squeak::error)
+      << "No branch name set"
+      << std::endl;
+    Squeak::mout(Squeak::info)
+      << "Setup a branch name before attaching a data object using << branchName(\"MyBranch\")"
+      << std::endl;
     strcpy(m_branchName, "");
     return *this;
   }
   if (!m_tree->FindBranch(m_branchName) && !createNonExistentBranch) {
-    Squeak::mout(Squeak::error) << "Branch not found" << std::endl;
-    Squeak::mout(Squeak::info)  << "Could not find the requested branch in the tree" << std::endl;
+    Squeak::mout(Squeak::error)
+      << "Branch not found"
+      << std::endl;
+    Squeak::mout(Squeak::info)
+      << "Could not find the requested branch in the tree"
+      << std::endl;
     strcpy(m_branchName, "");
     return *this;
   }
   m_pointers.push_back(&d);
   T** data1 = 0;
   T*  data2 = 0;
-  if (doublePointer) { data1 = reinterpret_cast<T**>(&m_pointers.back());}
-  else               { data2 = reinterpret_cast<T* >( m_pointers.back());}
+  if (doublePointer) {
+    data1 = reinterpret_cast<T**>(&m_pointers.back());
+  } else {
+    data2 = reinterpret_cast<T* >( m_pointers.back());
+  }
 
   if (!m_tree->FindBranch(m_branchName)) {
-    if (doublePointer) { m_tree->Branch(m_branchName, data1);}
-    else               { m_tree->Branch(m_branchName, data2);}
+    if (doublePointer) {
+      m_tree->Branch(m_branchName, data1);
+    } else {
+      m_tree->Branch(m_branchName, data2);
+    }
+  } else {
+    if (doublePointer) {
+      m_tree->SetBranchAddress(m_branchName, data1);
+    } else {
+      m_tree->SetBranchAddress(m_branchName, data2);
+    }
   }
-  else {
-    if (doublePointer) { m_tree->SetBranchAddress(m_branchName, data1);}
-    else               { m_tree->SetBranchAddress(m_branchName, data2);}
-  }
-  strcpy(m_branchName, ""); // this has effect of forcing the user to use branchName("blah") before setting 
-  return *this;            // every variable as resets the branchname and will get above warning
+  // this has effect of forcing the user to use branchName("blah") before setting
+  // every variable as resets the branchname and will get above warning
+  strcpy(m_branchName, "");
+  return *this;
 }
 
 // \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
@@ -141,27 +177,42 @@ template<typename T> rstream& rstream::attachBranch(T* & d,
 						    bool doublePointer,
 						    bool createNonExistentBranch) {
   if (!strcmp(m_branchName, "")) {
-    Squeak::mout(Squeak::error) << "No branch name set" << std::endl;
-    Squeak::mout(Squeak::info)  << "Setup a branch name before attaching a data object using << branchName(\"MyBranch\")" << std::endl;
+    Squeak::mout(Squeak::error)
+      << "No branch name set"
+      << std::endl;
+    Squeak::mout(Squeak::info)
+      << "Setup a branch name before attaching a data object using << branchName(\"MyBranch\")"
+      << std::endl;
     strcpy(m_branchName, "");
     return *this;
   }
   if (!m_tree->FindBranch(m_branchName) && !createNonExistentBranch) {
-    Squeak::mout(Squeak::error) << "Branch not found" << std::endl;
-    Squeak::mout(Squeak::info)  << "Could not find the requested branch in the tree" << std::endl;
+    Squeak::mout(Squeak::error)
+      << "Branch not found"
+      << std::endl;
+    Squeak::mout(Squeak::info)
+      << "Could not find the requested branch in the tree"
+      << std::endl;
     strcpy(m_branchName, "");
-    return *this; 
+    return *this;
   }
   if (!m_tree->FindBranch(m_branchName)) {
-    if (doublePointer) { m_tree->Branch(m_branchName, &d);}
-    else               { m_tree->Branch(m_branchName,  d);}
+    if (doublePointer) {
+      m_tree->Branch(m_branchName, &d);
+    } else {
+      m_tree->Branch(m_branchName,  d);
+    }
+  } else {
+    if (doublePointer) {
+      m_tree->SetBranchAddress(m_branchName, &d);
+    } else {
+      m_tree->SetBranchAddress(m_branchName,  d);
+    }
   }
-  else {
-    if (doublePointer) { m_tree->SetBranchAddress(m_branchName, &d);}
-    else               { m_tree->SetBranchAddress(m_branchName,  d);}
-  }
-  strcpy(m_branchName, ""); // this has effect of forcing the user to use branchName("blah") before setting
-  return *this;            // every variable as resets the branchname and will get above warning
+  // this has effect of forcing the user to use branchName("blah") before setting
+  // every variable as resets the branchname and will get above warning
+  strcpy(m_branchName, "");
+  return *this;
 }
 
 #endif

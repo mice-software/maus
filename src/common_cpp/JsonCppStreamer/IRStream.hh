@@ -1,3 +1,21 @@
+/* This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
+ *
+ * MAUS is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MAUS is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+
 /*!
  * \file irstream.h
  *
@@ -100,19 +118,55 @@ template<typename T> irstream& irstream::operator>>(oneArgManip<T>* manip) {
   return *this;
 }
 
-template<typename T> irstream& irstream::operator>>         (T&      d){attachBranch(d,true ,false); return *this;}
-template<>           irstream& irstream::operator>> <int>   (int&    d){attachBranch(d,false,false); return *this;}
-template<>           irstream& irstream::operator>> <short> (short&  d){attachBranch(d,false,false); return *this;}
-template<>           irstream& irstream::operator>> <long>  (long&   d){attachBranch(d,false,false); return *this;}
-template<>           irstream& irstream::operator>> <double>(double& d){attachBranch(d,false,false); return *this;}
-template<>           irstream& irstream::operator>> <float> (float&  d){attachBranch(d,false,false); return *this;}
+template<typename T> irstream& irstream::operator>>         (T&      d) {
+  attachBranch(d, true , false);
+  return *this;
+}
+template<>           irstream& irstream::operator>> <int>   (int&    d) {
+  attachBranch(d, false, false);
+  return *this;
+}
+template<>           irstream& irstream::operator>> <short> (short&  d) {
+  attachBranch(d, false, false);
+  return *this;
+}
+template<>           irstream& irstream::operator>> <long>  (long&   d) {
+  attachBranch(d, false, false);
+  return *this;
+}
+template<>           irstream& irstream::operator>> <double>(double& d) {
+  attachBranch(d, false, false);
+  return *this;
+}
+template<>           irstream& irstream::operator>> <float> (float&  d) {
+  attachBranch(d, false, false);
+  return *this;
+}
 
-template<typename T> irstream& irstream::operator>>         (T* &      d){attachBranch(d,true ,false); return *this;}
-template<>           irstream& irstream::operator>> <int>   (int* &    d){attachBranch(d,false,false); return *this;}
-template<>           irstream& irstream::operator>> <short> (short* &  d){attachBranch(d,false,false); return *this;}
-template<>           irstream& irstream::operator>> <long>  (long* &   d){attachBranch(d,false,false); return *this;}
-template<>           irstream& irstream::operator>> <double>(double* & d){attachBranch(d,false,false); return *this;}
-template<>           irstream& irstream::operator>> <float> (float* &  d){attachBranch(d,false,false); return *this;}
+template<typename T> irstream& irstream::operator>>         (T* &      d) {
+  attachBranch(d, true , false);
+  return *this;
+}
+template<>           irstream& irstream::operator>> <int>   (int* &    d) {
+  attachBranch(d, false, false);
+  return *this;
+}
+template<>           irstream& irstream::operator>> <short> (short* &  d) {
+  attachBranch(d, false, false);
+  return *this;
+}
+template<>           irstream& irstream::operator>> <long>  (long* &   d) {
+  attachBranch(d, false, false);
+  return *this;
+}
+template<>           irstream& irstream::operator>> <double>(double* & d) {
+  attachBranch(d, false, false);
+  return *this;
+}
+template<>           irstream& irstream::operator>> <float> (float* &  d) {
+  attachBranch(d, false, false);
+  return *this;
+}
 
 
 // Friend function definitions
