@@ -29,6 +29,8 @@
 
 #include "src/map/MapCppSimulation/MapCppSimulation.hh"
 
+namespace MAUS {
+
 bool MapCppSimulation::birth(std::string argJsonConfigDocument) {
   // Check if the JSON document can be parsed, else return error only
   try {
@@ -101,4 +103,4 @@ void MapCppSimulation::SetConfiguration(std::string json_configuration) {
   _doVis = JsonWrapper::GetProperty
            (config, "geant4_visualisation", JsonWrapper::booleanValue).asBool();
 }
-
+}
