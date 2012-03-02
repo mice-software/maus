@@ -29,9 +29,13 @@ import os
 
 type_of_dataflow = 'pipeline_single_thread'
 
+input_json_file_name = "input.json"
+input_json_file_type = "text"
 output_json_file_name = "simulation.out"
 output_json_file_type = "text"
 
+input_root_file_name = "input.root"
+output_root_file_name = "output.root"
 
 # Used, for now, to determine what level of
 # c++ log messages are reported to the user:
