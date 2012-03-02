@@ -39,7 +39,7 @@ class TestOutputCppRoot(unittest.TestCase): # pylint: disable=R0904
         self.output = OutputCppRoot.OutputCppRoot()
         outfile = os.path.join \
                  (os.environ["MAUS_ROOT_DIR"], "tmp", "test_outputCppRoot.root")
-        self.cards = json.dumps({"root_output_file_name":outfile})
+        self.cards = json.dumps({"output_root_file_name":outfile})
         self.output.birth(self.cards)
         self.test_data = {
             "scalars":{},
@@ -56,7 +56,7 @@ class TestOutputCppRoot(unittest.TestCase): # pylint: disable=R0904
         """
         an_output = OutputCppRoot.OutputCppRoot()
         self.assertFalse(an_output.birth('{}'))
-        self.assertFalse(an_output.birth('{"root_output_file_name":""}'))
+        self.assertFalse(an_output.birth('{"output_root_file_name":""}'))
         self.assertTrue(an_output.birth(self.cards))
         self.assertTrue(an_output.death())
 

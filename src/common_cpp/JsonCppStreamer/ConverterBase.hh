@@ -97,12 +97,12 @@ template<class TYPE1, class TYPE2>
    */
     virtual TYPE2* operator()(const TYPE1&) = 0;
  protected:
-  /*! \var long m_evtcnt
+  /*! \var int m_evtcnt
    * \brief Event counter
    *
    * Event counting functionality provided by the abstract base class.
    */
-  long m_evtcnt;
+  int m_evtcnt;
   /*! \var TYPE1* m_d1
    * \brief pointer to the TYPE1 object being constructed
    * \note the memory from this variable is assumed under the control of the user
