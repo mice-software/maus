@@ -45,9 +45,13 @@ bool ReduceCppTracker::birth(std::string argJsonConfigDocument) {
   _spacepoints.Branch("z", &_z, "z/D");
   _spacepoints.Branch("type", &_type, "type/I");
 
-  _events.SetNameTitle("events", "events");
+  _events.SetNameTitle("tracks", "tracks");
   _events.Branch("station_hits", &_station_hits, "station_hits/I");
   _events.Branch("tracker", &_tracker_event, "tracker/I");
+  _events.Branch("mx", &_mx, "mx/D");
+  _events.Branch("my", &_my, "my/D");
+  _events.Branch("x0", &_x0, "x0/D");
+  _events.Branch("y0", &_y0, "y0/D");
   // _events.Branch("n_sp", &_number_spacepoints, "n_sp/I");
 
   c1->SetFillColor(21);
@@ -165,6 +169,34 @@ std::string  ReduceCppTracker::process(std::string document) {
           _spacepoints.Fill();
         }
 
+        if ( root.isMember("tracks") ) {
+        Json::Value tracker1_track = GetPartEvent(root,
+                                                  "tracks",
+                                                  "tracker1",
+                                                  PartEvent);
+        Json::Value tracker2_track = GetPartEvent(root,
+                                                  "tracks",
+                                                  "tracker2",
+                                                  PartEvent);
+
+        int numb_tracks = tracker1_track.size();
+        for ( int ed = 0; ed < numb_tracks; ed++ ) {
+
+        if ( !tracker1_track[ed].isNull() ) {
+          _mx=tracker1_track[ed]["mx"].asDouble();
+          _my=tracker1_track[ed]["my"].asDouble();
+          _x0=tracker1_track[ed]["x0"].asDouble();
+          _y0=tracker1_track[ed]["y0"].asDouble();
+        }
+        if ( !tracker2_track[ed].isNull() ) {
+          _mx=tracker1_track[ed]["mx"].asDouble();
+          _my=tracker1_track[ed]["my"].asDouble();
+          _x0=tracker1_track[ed]["x0"].asDouble();
+          _y0=tracker1_track[ed]["y0"].asDouble();
+        }
+        }
+        }
+
         // Fill EVENT tree.
          for ( int tr = 0; tr < 2; tr++ ) {
           int hit_counter = 0;
@@ -173,7 +205,7 @@ std::string  ReduceCppTracker::process(std::string document) {
               if ( station_hit[tr][i] )
                 hit_counter+=1;
             }
-            _station_hits = hit_counter;
+            _station_hits = hit_counter+2;
             _tracker_event = tr+1;
             _events.Fill();
           }
@@ -259,7 +291,6 @@ void ReduceCppTracker::Save() {
   _spacepoints.Write();
   _events.Write();
 
-  datafile.ls();
   datafile.Close();
   Squeak::mout(Squeak::info) << _filename << " is updated." << std::endl;
 }
