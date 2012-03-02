@@ -62,15 +62,23 @@ class PatternRecognition {
 
   private:
 
-    /** @brief Perform Pattern Recognition for straight tracks
-     *
-     *  This takes one argument, the SciFi event, extracts the
-     *  spacepoints, reconstructs the PR tracks, and pushes them
-     *  back into the event.
-     *
-     *  @param evt - The SciFi event
+    /** @brief Form an initial line and find intermediate spacepoints which best match
+     * 
+     *  @param spnts_by_station 2D vector of spacepoints, sorted by station
+     *  @param outer_station_num outermost station being used
+     *                           (e.g. station 5 in a 5pt track)
+     *  @param inner_station_num innermost station being used
+     *                           (e.g. station 1 in a 5pt track)
+     *  @param station_outer_sp index representing outer station spacepoint
+     *  @param station_inner_sp index representing inner station spacepoint
+     *  @param good_spnts map between station number and spacepoint number in station,
+     *                    holding those spacepoints (if any) which best match the
+     *                    initial line
      */
-    void straightprtrack_recon(SciFiEvent &evt);
+    void initial_line(const std::vector< std::vector<SciFiSpacePoint*> >& spnts_by_station,
+                      const int ignore_station, const int outer_station_num,
+                      const int inner_station_num, const int station_outer_sp,
+                      const int station_inner_sp, std::map<int, SciFiSpacePoint*>& good_spnts);
 
     /** @brief Make straight Pattern Recognition tracks with 5 spacepoints
      *
@@ -78,11 +86,11 @@ class PatternRecognition {
      *  found in all 5 stations of a tracker.  Least squared fitting used,
      *  together with a chi^2 goodness-of-fit test.
      *
-     *  @param spnts - A vector of all the input spacepoints
+     *  @param spnts_by_station - A 2D vector of all the input spacepoints ordered by station
      *  @param trks - A vector of the output Pattern Recognition tracks
      */
-    void make_spr_5pt(const std::vector<SciFiSpacePoint*>& spnts,
-                      std::vector<SciFiStraightPRTrack>& trks);
+    void make_straight_5tracks(std::vector< std::vector<SciFiSpacePoint*> >& spnts_by_station,
+                                          std::vector<SciFiStraightPRTrack>& trks);
 
     /** @brief Make straight Pattern Recognition tracks with 4 spacepoints
      *
@@ -90,11 +98,23 @@ class PatternRecognition {
      *  with spacepoints in them. Least squared fitting used, together with a
      *  chi^2 goodness-of-fit test.
      *
-     *  @param spnts - A vector of all the input spacepoints
+     *  @param spnts_by_station - A 2D vector of all the input spacepoints ordered by station
      *  @param trks - A vector of the output Pattern Recognition tracks
      */
-    void make_spr_4pt(const std::vector<SciFiSpacePoint*>& spnts,
+    void make_straight_4tracks(std::vector< std::vector<SciFiSpacePoint*> >& spnts_by_station,
                       std::vector<SciFiStraightPRTrack>& trks);
+
+    /** @brief Fits a track for a given set of stations
+     * 
+     *  @param ignore_station int specifying which station is not to be used for the track fit
+     *                        0 - 4 represent stations 1 - 5 respectively,
+     *                        while -1 means use *all* the stations (ignore none of them)
+     *  @param spnts_by_station - A 2D vector of all the input spacepoints ordered by station
+     *  @param trks - A vector of the output Pattern Recognition tracks
+     */
+    void make_straight_tracks(const int num_points, const int ignore_station,
+                     std::vector< std::vector<SciFiSpacePoint*> >& spnts_by_station,
+                     std::vector<SciFiStraightPRTrack>& trks);
 
     /** @brief Make straight Pattern Recognition tracks with 3 spacepoints
      *
@@ -105,7 +125,7 @@ class PatternRecognition {
      *  @param spnts - A vector of all the input spacepoints
      *  @param trks - A vector of the output Pattern Recognition tracks
      */
-    void make_spr_3pt(const std::vector<SciFiSpacePoint*>& spnts,
+    void make_straight_3tracks(const std::vector<SciFiSpacePoint*>& spnts,
                       std::vector<SciFiStraightPRTrack>& trks);
 
     /** @brief Fit a straight line in x and y to some spacepoints
@@ -121,17 +141,45 @@ class PatternRecognition {
     void linear_fit(std::map<int, SciFiSpacePoint*> &spnts,
                     SimpleLine &line_x, SimpleLine &line_y);
 
+    void set_end_stations(const int ignore_station,
+                          int & outer_station_num, int & inner_station_num);
+
     /** @brief Create a 2D vector of SciFi spacepoints sorted by tracker station
      *
      *  Take an input vector of spacepoints and output a 2D vector of spacepoints
      *  where the first index is the station the spacepoint is located.
      *
      *  @param spnts - A vector of all the input spacepoints
-     *  @param spnts_stat - Output 2D vector of spacepoints sorted by station
+     *  @param spnts_by_station - Output 2D vector of spacepoints sorted by station
      *
      */
     void sort_by_station(const std::vector<SciFiSpacePoint*>& spnts,
-                        std::vector< std::vector<SciFiSpacePoint*> >& spnts_stat);
+                         std::vector< std::vector<SciFiSpacePoint*> >& spnts_by_station);
+
+    int num_stations_with_unused_spnts(
+        const std::vector< std::vector<SciFiSpacePoint*> >& spnts_by_station);
+
+    /** @brief Count and return how many tracker stations have at least 1 unused spacepoint
+     *
+     *  @param spnts_by_station - Input 2D vector of spacepoints sorted by station
+     *  @param stations_hit - Output vector holding the numbers of each station with at 
+     *                        least 1 unused spacepoint
+     *  @param stations_not_hit - Output vector holding the numbers of each station with
+     *                            no unused spacepoints
+     */
+    void stations_with_unused_spnts(
+           const std::vector< std::vector<SciFiSpacePoint*> >& spnts_by_station,
+           std::vector<int>& stations_hit, std::vector<int>& stations_not_hit);
+
+    /** @brief Perform Pattern Recognition for straight tracks
+     * 
+     *  This takes one argument, the SciFi event, extracts the
+     *  spacepoints, reconstructs the PR tracks, and pushes them
+     *  back into the event.
+     *
+     *  @param evt - The SciFi event
+     */
+    void straight_track_recon(SciFiEvent &evt);
 
     static const int _n_trackers = 2;
     static const int _n_stations = 5;
