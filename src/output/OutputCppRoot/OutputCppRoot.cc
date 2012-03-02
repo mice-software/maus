@@ -70,6 +70,9 @@ bool OutputCppRoot::save(std::string json_spill_document) {
           )));
       }
       Json::Value json_spill = JsonWrapper::StringToJson(json_spill_document);
+      if (json_spill.isMember("END_OF_RUN")) {
+          return true; // nothing to do, we don't handle end of run yet
+      }
       (*_jsonCppConverter)(json_spill);
       (*_outfile) << fillEvent;
       return true;

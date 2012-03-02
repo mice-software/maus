@@ -6,7 +6,7 @@
  %}
 %include "std_string.i"
 
-%feature("shadow") InputCppRoot::emitter() %{
+%feature("shadow") MAUS::InputCppRoot::emitter() %{
 def emitter(self):
   next_event = "No Event"
   while (next_event != ""):

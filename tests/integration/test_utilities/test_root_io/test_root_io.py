@@ -56,7 +56,7 @@ class TestRootIO(unittest.TestCase): #pylint: disable=R0904
         subproc = subprocess.Popen \
                 ([self.json_to_root, '-input_json_file_name', self.json_name,
                                      '-output_root_file_name', self.root_name,
-                                     '-verbose_level', '0'])
+                                     '-verbose_level', '1'])
         subproc.wait()
         subproc = subprocess.Popen \
                 ([self.root_to_json, '-input_root_file_name', self.root_name,
