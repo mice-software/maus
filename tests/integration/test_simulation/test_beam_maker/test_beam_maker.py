@@ -28,8 +28,9 @@ import subprocess
 import ROOT
 import numpy
 
-from xboa.Bunch import Bunch
-import xboa.Common as Common
+from xboa.Bunch import Bunch #pylint: disable=F0401
+import xboa.Common as Common #pylint: disable=F0401
+
 
 MAUS_ROOT_DIR = os.getenv("MAUS_ROOT_DIR")
 TMP_PATH = os.path.join(MAUS_ROOT_DIR, "tmp")

@@ -55,4 +55,5 @@ class Configreader(): #pylint: disable = R0903, R0902
         self.geometry_download_id = config_dict['geometry_download_id']
         self.geometry_download_cleanup = config_dict \
                                                    ['geometry_download_cleanup']
+        self.g4_step_max = config_dict['g4_step_max']
 

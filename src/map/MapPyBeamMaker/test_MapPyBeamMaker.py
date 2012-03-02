@@ -26,7 +26,7 @@ import os
 import unittest
 import copy
 import json
-import xboa
+import xboa #pylint: disable=F0401
 
 from MapPyBeamMaker import MapPyBeamMaker
 
@@ -52,7 +52,8 @@ TEST_FILE_G4BL = {
     "beam":{
         "particle_generator":"file",
         "beam_file_format":"g4beamline_bl_track_file",
-        "beam_file":"%s/src/map/MapPyBeamMaker/test_g4bl.dat" % os.environ.get("MAUS_ROOT_DIR"),
+        "beam_file":"%s/src/map/MapPyBeamMaker/test_g4bl.dat"
+          % os.environ.get("MAUS_ROOT_DIR"),
         "file_particles_per_spill":5,
         "random_seed":0,
         "definitions":[]
@@ -324,7 +325,7 @@ class TestMapPyBeamMaker(unittest.TestCase): # pylint: disable = R0904
         """
         self.beam_maker.birth(json.dumps(TEST_FILE_G4BL))
         spill = None
-        for i in range(5):
+        for i in range(5): #pylint: disable=W0612
             spill_string = self.beam_maker.process(json.dumps({}))
             spill = json.loads(spill_string)
             self.assertEqual(len(spill["mc"]), 5)

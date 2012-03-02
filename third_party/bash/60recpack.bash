@@ -49,7 +49,12 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 	echo "INFO: Automake and autoconf"
 	echo
 	export AUTOCONF=`which autoconf`
+	export AUTORECONF=`which autoreconf`
 	export AUTOHEADER=`which autoheader`
+
+  # avoid complaint about different libtool versions
+  autoreconf -i
+
 	./autogen.sh
 	./autogen.sh
 	echo

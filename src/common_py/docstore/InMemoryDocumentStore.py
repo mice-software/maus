@@ -94,3 +94,9 @@ class InMemoryDocumentStore:
         """
         self.__data_store.clear()
 
+    def disconnect(self):
+        """
+        Disconnect - a no-op. 
+        @param self Object reference.
+        """
+        pass

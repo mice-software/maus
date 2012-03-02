@@ -1,0 +1,36 @@
+\section{Module API}
+
+\subsection{Input}
+
+\subsection{Map}
+
+\subsection{Reduce}
+
+\subsection{Output}
+
+\subsection{Converters}
+
+
+\section{Datastructure}
+
+
+\section{JsonCppStreamer}
+It is foreseen that the data may be represented in several different ways. To enable this, the JsonCppStreamer library has been developed to enable conversion between different representations. The JsonCppStreamer library contains an abstract Converter template class to convert from one type to another, in addition to implementations that convert from JsonCpp to ROOT data representations. To facilitate this, two classes have been implemented.
+
+\begin{itemize}
+\li ConverterBase: this is an interface for converting from one type to another
+\li JsonCppConverter: this is a specific implementation that converts from Json to Cpp and back again
+\end{itemize}
+
+Additionally, a streamer has been developed to enable streaming from ROOT to Json
+
+\begin{itemize}
+\li rstream: base class containing some common functionality
+\li irstream: input streamer (takes Cpp/ROOT as input, outputs Json)
+\li orstream: output streamer (takes Json as input, outputs ROOT/Cpp)
+\li oneArgManip: manipulator class - can place objects onto the input or output stream to perform file operations e.g. setting a ROOT branch
+\end{itemize}
+
+\section{Distributed Computing}
+
+

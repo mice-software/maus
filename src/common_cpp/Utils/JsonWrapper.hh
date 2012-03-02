@@ -30,14 +30,15 @@
 #ifndef _SRC_CPP_CORE_UTILS_JSONWRAPPER_HH
 #define _SRC_CPP_CORE_UTILS_JSONWRAPPER_HH
 
+#include <ostream>
 #include <string>
 
 #include "json/json.h"
 
 #include "CLHEP/Vector/ThreeVector.h"
 
-#include "Interface/STLUtils.hh"
-#include "Interface/Squeal.hh"
+#include "src/legacy/Interface/STLUtils.hh"
+#include "src/legacy/Interface/Squeal.hh"
 
 class JsonWrapper {
  public:
@@ -123,7 +124,37 @@ class JsonWrapper {
    */
   static void Print(std::ostream& out, const Json::Value& val);
 
+  /** @brief Check for equality between json values
+   *
+   *  Check that value_1 == value_2; when comparing reals, we allow a float
+   *  tolerance given by tolerance. Recursively search through arrays and
+   *  objects.
+   *
+   *  @param tolerance float tolerance - requirement is that
+   *         fabs(float_1-float_2) < tolerance
+   */
+  static bool AlmostEqual
+                   (Json::Value value_1, Json::Value value_2, double tolerance);
+
+  /** @brief Check for equality between json arrays
+   *
+   *  Check that value_1 == value_2, within float tolerance. Note that there is
+   *  no type checking done here.
+   */
+  static bool ArrayEqual
+                   (Json::Value value_1, Json::Value value_2, double tolerance);
+
+  /** @brief Check for equality between json objects
+   *
+   *  Check that value_1 == value_2, within float tolerance. Note that there is
+   *  no type checking done here.
+   */
+  static bool ObjectEqual
+                   (Json::Value value_1, Json::Value value_2, double tolerance);
+
+
  private:
+
   JsonWrapper();
   ~JsonWrapper();
   DISALLOW_COPY_AND_ASSIGN(JsonWrapper);

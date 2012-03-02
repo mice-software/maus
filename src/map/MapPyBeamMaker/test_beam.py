@@ -24,7 +24,7 @@ Tests the Beam class
 
 import unittest
 import beam
-import xboa.Hit
+import xboa.Hit #pylint: disable=F0401
 import copy
 import numpy
 
