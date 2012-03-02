@@ -254,6 +254,7 @@ BTField * BTFieldConstructor::GetRFCavity(const MiceModule * theModule)
 	}
 	else
 	{
+		frequency = theModule->propertyDoubleThis("Frequency");
 		energyGain = theModule->propertyDoubleThis("PeakEField");
 		timeDelay  = theModule->propertyDoubleThis("TimeDelay");
 		if(theModule->propertyStringThis("FieldType") == "PillBox")

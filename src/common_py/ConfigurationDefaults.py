@@ -6,7 +6,7 @@ this unless you want to change this quantity for everybody. Values can be
 overridden by setting configuration_file parameter on the comamnd line, for
 example
 
-bin/simulate_mice.py -configuration_file my_configuration.py
+bin/simulate_mice.py --configuration_file my_configuration.py
 """
 
 
@@ -29,9 +29,13 @@ import os
 
 type_of_dataflow = 'pipeline_single_thread'
 
+input_json_file_name = "input.json"
+input_json_file_type = "text"
 output_json_file_name = "simulation.out"
 output_json_file_type = "text"
 
+input_root_file_name = "input.root"
+output_root_file_name = "output.root"
 
 # Used, for now, to determine what level of
 # c++ log messages are reported to the user:
@@ -99,18 +103,10 @@ spill_generator_number_of_spills = 10
 # an optimised beam might look like
 beam = {
     "particle_generator":"binomial", # routine for generating empty primaries
-                                     # set to "binomial" to generate on binomial distribution; 
-                                     # set to "counter" to set a fixed number of primaries per count;
-                                     # set to "file" if use_beam_file=True
-    "binomial_n":50, # number of coin tosses if particle_generator is binomial
-    "binomial_p":0.5, # probability of making a particle on each toss if particle_generator is binomial
+    "binomial_n":50, # number of coin tosses
+    "binomial_p":0.5, # probability of making a particle on each toss
     "random_seed":5, # random seed for beam generation; controls also how the MC
                      # seeds are generated
-#   "beam_file_format":"icool_for003", # format of the formatted beam file input
-    "beam_file_format":"g4beamline_bl_track_file", # g4bl track file format
-    "beam_file":"%s/src/map/MapPyBeamMaker/test_g4bl.dat" % os.environ.get("MAUS_ROOT_DIR"), # filename if particle_generator is "file". Default is a test G4BL track file
-#   "beam_file":"test_for003.dat", # test icool_for003 file
-    "file_particles_per_spill":25, # number of particles per spill if particle_generator is file
     "definitions":[
     ##### MUONS #######
     {
@@ -197,7 +193,7 @@ SciFi_sigma_z = 0.081 # mm
 SciFi_sigma_duplet =  0.6197 # mm
 
 # configuration database
-cdb_upload_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database uploads
+cdb_upload_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database uploads TestServer::http://rgma19.pp.rl.ac.uk:8080/cdb/
 cdb_download_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database downloads
 
 # geometry download
@@ -210,6 +206,7 @@ geometry_download_by = 'run_number' # choose 'run_number' to download by run num
 geometry_download_run_number = 0
 geometry_download_id = 0
 geometry_download_cleanup = True # set to True to clean up after download
+g4_step_max = 5.0 # this is the value which shall be placed in the Mice Modules which have been translated from CAD
 
 # geometry upload
 geometry_upload_wsdl = "geometrySuperMouse?wsdl" # name of the web service used for uploads
@@ -217,6 +214,7 @@ geometry_upload_directory = "%s/files/geometry/upload" % os.environ.get("MAUS_RO
 geometry_upload_note = "" # note, pushed to the server to describe the geometry. A note must be specified here (default will throw an exception).
 geometry_upload_valid_from = "" # date-time in format like: that the specified installation was made in the experiment. A date-time must be specified here (default will throw an exception).
 geometry_upload_cleanup = True # set to True to clean up after upload
+
 
 # this is used by ImputCppRealData
 Number_of_DAQ_Events = -1
@@ -273,7 +271,7 @@ daq_data_file = '02873.003' # file name for daq data; if this is just a integer 
 maus_version = "" # set at runtime - do not edit this (changes are ignored)
 configuration_file = "" # should be set on the command line only (else ignored)
 
-doc_store_class = "InMemoryDocumentStore.InMemoryDocumentStore"
+doc_store_class = "docstore.InMemoryDocumentStore.InMemoryDocumentStore"
 couchdb_url = "http://localhost:5984" # Default CouchDB URL. Only needed if using CouchDBDocumentStore.
 couchdb_database_name = "mausdb" # Default CouchDB database name. Only needed if using CouchDBDocumentStore.
 

@@ -9,8 +9,8 @@ Module Tracker1
 {
   Volume Cylinder
   Dimensions 20.0 113.0 cm
-  PropertyBool Invisible 1
   PropertyInt Tracker 1
+  PropertyBool Invisible 1
   PropertyString Material He
   Module Tracker/TrackerRef1.dat
   {

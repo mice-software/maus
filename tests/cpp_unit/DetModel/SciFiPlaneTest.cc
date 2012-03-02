@@ -100,15 +100,17 @@ TEST_F(SciFiPlaneTest, Test_num_fibres_in_all_planes) {
 
         // arguments are the plane module, material and mother physical volume
         MiceModule* aplane = const_cast < MiceModule* > (this_plane);
-        SciFiPlane(aplane, mat, tracker);
+        SciFiPlane plane(aplane, mat, tracker);
+
+        int number_fibres = plane.get_numb_fibres();
 
         // plane 0 (view v), plane 1 (view x), plane 2 (view w)
-        if ( trackerNo == 0 && stationNo == 5 && planeNo == 1 )
-          EXPECT_EQ(SciFiPlane::SciFi_numFibres, 215*7);
-        if ( planeNo == 0 || planeNo == 2 )
-          EXPECT_EQ(SciFiPlane::SciFi_numFibres, 214*7);
-        if ( planeNo == 1 && !(trackerNo == 0 && stationNo == 5) )
-          EXPECT_EQ(SciFiPlane::SciFi_numFibres, 212*7);
+        if ( trackerNo == 0 && stationNo == 5 && planeNo == 0 )
+          EXPECT_EQ(number_fibres, 215*7);
+        if ( planeNo == 1 || planeNo == 2 )
+          EXPECT_EQ(number_fibres, 214*7);
+        if ( planeNo == 0 && !(trackerNo == 0 && stationNo == 5) )
+          EXPECT_EQ(number_fibres, 212*7);
       }
     }
   }

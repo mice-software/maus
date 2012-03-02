@@ -38,8 +38,12 @@
 
 /** \class InputCppDAQData
 * Load MICE raw data and unpack it into a JSON stream.
-*
-* This module reads data in the format of the MICE DAQ.  It drives the
+* 
+* InputCppDAQData is a base imput class and can not be used to access the DAQ data!
+* The access to the data is provided by the two daughter classes InputCppDAQOfflineData
+* and InputCppDAQOnlineData.
+* 
+* This module reads binary data in the format of the MICE DAQ.  It drives the
 * 'unpacker' library to do this conversion.  The end result is the MICE data
 * in JSON format.  The data includes TDC and flash ADC values, so this
 * information is low-level.
@@ -67,12 +71,11 @@ class InputCppDAQData {
   */
   bool birth(std::string pJSONConfig);
 
-  /** Read the next event from the file into memory.
+ /** Dummy function.
+  * The access to the data is provided by the two daughter classes 
+  * InputCppDAQOfflineData and InputCppDAQOnlineData.
   *
-  * This function simply reads an event into memory,
-  * it doesn't unpack the event anymore than required to read it.
-  *
-  * \return True if an event was read ready for unpacking.
+  * \return false after printing an error message.
   */
   bool readNextEvent();
 
@@ -120,6 +123,20 @@ class InputCppDAQData {
      return "";
   };
 
+ protected:
+
+  std::string _classname;
+
+ /** Counter of the DAQ events.
+  */
+  int _eventsCount;
+
+  /** File manager object. */
+  MDfileManager _dataFileManager;
+
+  /** Pointer to the start of the current event. */
+  unsigned char *_eventPtr;
+
  private:
 
  /** Initialise the processor.
@@ -133,14 +150,9 @@ class InputCppDAQData {
   */
   void configureZeroSupression(ZeroSupressionFilter* processor, Json::Value configJSON);
 
-  std::string _classname;
-
  /** Process manager object.
   */
   MDprocessManager _dataProcessManager;
-
-  /** File manager object. */
-  MDfileManager _dataFileManager;
 
   /** The DAQ channel map object.
   * It is used to group all measurements belonging to a given detector.*/
@@ -169,9 +181,6 @@ class InputCppDAQData {
   */
   DBBDataProcessor* _DBBFragmentProc;
 
-  /** Pointer to the start of the current event. */
-  unsigned char *_eventPtr;
-
   /** Paths to the data.
   * This string has to contain one or more space separated paths.
   */
@@ -182,22 +191,6 @@ class InputCppDAQData {
   * file names or run numbers.
   */
   std::string _datafiles;
-
- /** Max number of DAQ events to be processed.
-  */ 
-  int _maxNumEvents;
-
- /** Counter of the DAQ events.
-  */
-  int _eventsCount;
-
- /** If this is true only the phys. evens will be processed.
-  */
-  bool _phys_Events_Only;
-
-   /** If this is true only the calib. evens will be processed.
-  */
-  bool _calib_Events_Only;
 
  /** Enum of event types
   */
