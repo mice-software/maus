@@ -59,6 +59,7 @@ class TestOutputCppRoot(unittest.TestCase): # pylint: disable=R0904
         self.assertFalse(an_output.birth('{"output_root_file_name":""}'))
         self.assertTrue(an_output.birth(self.cards))
         self.assertTrue(an_output.death())
+        self.output.death()
 
     def test_save_normal_event(self):
         """
@@ -73,6 +74,7 @@ class TestOutputCppRoot(unittest.TestCase): # pylint: disable=R0904
         self.assertTrue(self.output.save(
             json.dumps(self.test_data)
         ))
+        self.output.death()
 
     def test_save_bad_event(self):
         """
