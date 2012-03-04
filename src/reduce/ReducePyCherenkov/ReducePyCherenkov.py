@@ -20,6 +20,7 @@ class ReducePyCherenkov(ReducePyROOTHistogram): # pylint: disable=R0902
         self._hPMuA = None
         self._hPPiA = None
         self._hlight_Mu = None
+        self._hEstCkov = None
 
         self.canvas_charge = None
         self.canvas_time = None
@@ -91,13 +92,16 @@ class ReducePyCherenkov(ReducePyROOTHistogram): # pylint: disable=R0902
         #The cuts on e and mu TOFs are made first by 'eyeing' the 1D TOF distributions.
         
         tof_cut_e = 27.00
-        tof_cut_mu = 29.00
+        tof_cut_mu = 31.00
 
         d = 7.8241 #Distance between TOF1 and TOF0
         
         MASS_MU = 105.658
         MASS_PI = 139.570
 
+        CKOV_TURN_ON_107 = 2.6270345
+        CKOV_TURN_ON_112 = 1.9826290
+        
         m = 0
         p = 0
 
@@ -121,9 +125,7 @@ class ReducePyCherenkov(ReducePyROOTHistogram): # pylint: disable=R0902
                         if PE_A > 0:
                             self._htof_A.Fill(PE_A, (t_1-t_0))
                         
-                        #Convert to momenta from TOF using m and d while making the appropriate cuts;
-                        #fill momenta histograms
-        
+                        #Convert to momenta from TOF using m and d while making the appropriate cuts; fill momenta histograms
                         if ((t_1-t_0) < tof_cut_e):
                             p = -1.0
                         else:
@@ -135,11 +137,20 @@ class ReducePyCherenkov(ReducePyROOTHistogram): # pylint: disable=R0902
                                 p = m / sqrt(((t_1-t_0)*0.3/d)*((t_1-t_0)*0.3/d)-1)
                             else:
                                 p = -1.0
-                        if (m==MASS_MU and p > 0.0):
+
+                        if (m==MASS_MU and p > 0.0 and PE_A > 1):
                             self._hPMu.Fill(p)
                             self._hlight_Mu.Fill(p, PE_A)
+
                         if (m==MASS_PI and p > 0.0):
                             self._hPPi.Fill(p)                                
+
+                       # if (p > CKOV_TURN_ON_107*MASS_MU):
+                       #     n_photons_est_ckov107 = 18*(1 - (CKOV_TURN_ON_107*MASS_MU/p)*(CKOV_TURN_ON_107*MASS_MU/p))
+                       #     self._hEstCkov.Fill(p, n_phtons_est_ckov107)
+                       # else:
+                       #     n_photons_est_ckov107 = 0.0
+                       #     self._hEstCkov.Fill(p, n_photons_est_ckov107)
                         
         return True
     
@@ -273,17 +284,18 @@ class ReducePyCherenkov(ReducePyROOTHistogram): # pylint: disable=R0902
         self.canvas_hPPi.cd()
         self._hPPi.Draw()
 
-        self.canvas_hlight_Mu = ROOT.TCanvas("hLight", "hLight", 600, 600)
+        self.canvas_hlight_Mu = ROOT.TCanvas("PE_MOM", "PE_MOM", 600, 600)
         self._hlight_Mu = ROOT.TH2F("hLight", "hLight", 500, 0, 500, 100, 0, 30)
+        self._hEstCkov = ROOT.TH2F("hLight", "hLight", 500, 0, 500, 100, 0, 30)
         self._hlight_Mu.GetXaxis().SetTitle("Momentum (MeV/c)")
         self._hlight_Mu.GetYaxis().SetTitle("#PE")
         self.canvas_hlight_Mu.cd()
         self._hlight_Mu.Draw()
-                    
+        self._hEstCkov.Draw("same")            
         return True
     
     def update_histos(self):
-
+        
         self.canvas_charge.Update()
         self.canvas_time.Update()
         self.canvas_tof.Update()
