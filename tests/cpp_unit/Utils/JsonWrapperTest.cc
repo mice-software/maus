@@ -20,6 +20,8 @@
 
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 
+namespace {
+
 TEST(JsonWrapper, StringToJson) {
   std::string good_json = "{}";
   Json::Value val = JsonWrapper::StringToJson(good_json);
@@ -116,5 +118,94 @@ TEST(JsonWrapper, PrintTest) {
   JsonWrapper::Print(my_ss, val_in);
   Json::Value val_out = JsonWrapper::StringToJson(my_ss.str());
   EXPECT_EQ(val_in, val_out);
+}
+
+TEST(JsonWrapper, AlmostEqualTest) {
+  Json::Value real_1(1.), real_2(1.+1e-8);
+  EXPECT_TRUE(JsonWrapper::AlmostEqual(real_1, real_1, 1e-9));
+  EXPECT_TRUE(JsonWrapper::AlmostEqual(real_1, real_2, 2e-8));
+  EXPECT_FALSE(JsonWrapper::AlmostEqual(real_1, real_2, 1e-9));
+
+  Json::Value null_1, null_2;
+  EXPECT_TRUE(JsonWrapper::AlmostEqual(null_1, null_1, 1e-9));
+
+  Json::Value bool_1(true), bool_2(false);
+  EXPECT_TRUE(JsonWrapper::AlmostEqual(bool_1, bool_1, 1e-9));
+  EXPECT_FALSE(JsonWrapper::AlmostEqual(bool_1, bool_2, 1e-9));
+
+  Json::Value string_1("a"), string_2("b");
+  EXPECT_TRUE(JsonWrapper::AlmostEqual(string_1, string_1, 1e-9));
+  EXPECT_FALSE(JsonWrapper::AlmostEqual(string_1, string_2, 1e-9));
+
+  Json::Value int_1(1), int_2(2);
+  EXPECT_TRUE(JsonWrapper::AlmostEqual(int_1, int_1, 1e-9));
+  EXPECT_FALSE(JsonWrapper::AlmostEqual(int_1, int_2, 1e-9));
+
+  Json::Value uint_1(Json::UInt(1)), uint_2(Json::UInt(2));
+  EXPECT_TRUE(JsonWrapper::AlmostEqual(uint_1, uint_1, 1e-9));
+  EXPECT_FALSE(JsonWrapper::AlmostEqual(uint_1, uint_2, 1e-9));
+
+  EXPECT_FALSE(JsonWrapper::AlmostEqual(uint_1, int_1, 1e-9));  // type checking
+  
+  // more array tests below
+  Json::Value arr_1(Json::arrayValue), arr_2(Json::arrayValue);
+  arr_1.append(int_1);
+  arr_2.append(int_2);
+  EXPECT_TRUE(JsonWrapper::AlmostEqual(arr_1, arr_1, 1e-9));
+  EXPECT_FALSE(JsonWrapper::AlmostEqual(arr_1, arr_2, 1e-9));
+
+  // more object tests below
+  Json::Value obj_1(Json::objectValue), obj_2(Json::objectValue);
+  obj_1["1"] = int_1;
+  obj_2["1"] = int_2;
+  EXPECT_TRUE(JsonWrapper::AlmostEqual(obj_1, obj_1, 1e-9));
+  EXPECT_FALSE(JsonWrapper::AlmostEqual(obj_1, obj_2, 1e-9));
+}
+
+TEST(JsonWrapper, ArrayEqualTest) {
+  Json::Value int_1(1), int_2(2);
+  Json::Value arr_1(Json::arrayValue), arr_2(Json::arrayValue);
+  arr_1.append(int_1);
+  arr_1.append(int_2);
+  arr_1.append(int_1);
+  arr_2.append(int_1);
+  arr_2.append(int_2);
+  EXPECT_TRUE(JsonWrapper::AlmostEqual(arr_1, arr_1, 1e-9));
+  EXPECT_FALSE(JsonWrapper::AlmostEqual(arr_1, arr_2, 1e-9));  // test size
+  arr_2.append(int_2);
+  EXPECT_FALSE(JsonWrapper::AlmostEqual(arr_1, arr_2, 1e-9));  // test value  
+  arr_1.append(arr_2);
+  arr_1.append(int_1);
+  arr_1.append(arr_1);
+  EXPECT_TRUE(JsonWrapper::AlmostEqual(arr_1, arr_1, 1e-9));  // test recursion
+  arr_2 = arr_1;
+  arr_2[5][3].append(int_2);
+  EXPECT_FALSE(JsonWrapper::AlmostEqual(arr_1, arr_2, 1e-9));  // test recursion
+}
+
+
+TEST(JsonWrapper, ObjectEqualTest) {
+  Json::Value int_1(1), int_2(2);
+  Json::Value obj_1(Json::objectValue), obj_2(Json::objectValue);
+  obj_1["1"] = int_1;
+  obj_1["2"] = int_2;
+  obj_1["3"] = int_1;
+  obj_2["1"] = int_1;
+  obj_2["2"] = int_2;
+  EXPECT_TRUE(JsonWrapper::AlmostEqual(obj_1, obj_1, 1e-9));
+  EXPECT_FALSE(JsonWrapper::AlmostEqual(obj_1, obj_2, 1e-9));  // test size
+  obj_1["3"] = int_2;
+  EXPECT_FALSE(JsonWrapper::AlmostEqual(obj_1, obj_2, 1e-9));  // test value
+
+  obj_1["branch"] = obj_1;
+  obj_1["top branch"] = obj_1;
+  EXPECT_TRUE(JsonWrapper::AlmostEqual(obj_1, obj_1, 1e-9));
+
+  obj_2 = obj_1;
+  obj_2["top branch"]["branch"]["3"] = int_1;
+  EXPECT_FALSE(JsonWrapper::AlmostEqual(obj_1, obj_2, 1e-9)) << obj_1 << "\n\n" 
+                                                          << obj_2 << std::endl;
+}
+
 }
 

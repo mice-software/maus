@@ -11,14 +11,12 @@
 #include <json/json.h>
 #include <string>
 
-using namespace MAUS;
-
 class G4Step;
 class G4HCofThisEvent;
 class MICEEvent;
 class MiceModule;
 
-class TofSD : public MAUSSD {
+class TofSD : public MAUS::MAUSSD {
  public:
   TofSD( MiceModule* );
 

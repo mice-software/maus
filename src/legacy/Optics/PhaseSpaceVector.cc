@@ -283,4 +283,3 @@ VirtualHit PhaseSpaceVector::virtualHit(int trackID, int stationID)
   hit.SetEField(_E);
   return hit;
 }
-

@@ -38,8 +38,6 @@ class G4VPhysicalVolume;
  * MICE scintillating fiber tracker for the MICE proposal
  */
 
-// TODO(Santos): Have another look at the rotation of the fibre plane.
-
 class SciFiPlane {
   public:
 
@@ -63,9 +61,11 @@ class SciFiPlane {
    */
   G4PVPlacement*    placementCore() const { return placeCore; }
 
-  static G4int SciFi_numFibres;
+  int get_numb_fibres() const { return _numFibres; }
 
  private:
+
+  int _numFibres;
 
   G4Tubs*            solidDoublet;
   G4LogicalVolume*   logicDoublet;

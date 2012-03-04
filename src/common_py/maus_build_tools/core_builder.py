@@ -19,6 +19,7 @@ Tools to build core library (libMausCpp) and core library unit tests
 
 import os
 import glob
+import subprocess
 
 MAUS_ROOT_DIR = os.environ['MAUS_ROOT_DIR']
 
@@ -96,4 +97,31 @@ def build_cpp_tests(env):
                                source = test_optics_files, \
                                LIBS= env['LIBS'] + ['MausCpp'])
     env.Install('build', test_optics)
+
+def build_data_structure(env):
+    """
+    Build the data structure library
+
+    ROOT needs a .so containing the data structure
+    class symbols and this needs to be ported to wherever the data structure is
+    called. We build this by calling root and letting it do it's dynamic linker 
+    stuff
+    """
+    maus_root_dir = os.environ['MAUS_ROOT_DIR']
+    data_struct = os.path.join(maus_root_dir, 'src/common_cpp/DataStructure/') 
+    here = os.getcwd()
+    os.chdir(maus_root_dir)
+    data_items = glob.glob(data_struct+'/*.hh')
+    # LinkDef.hh must be last
+    data_items.sort(key = lambda x: x.find('LinkDef.hh')) 
+    dict_target = (data_struct+'/MausDataStructure.cc')
+    proc_target = ['rootcint']+['-f', dict_target, '-c']
+    for include in env['CPPPATH']:
+        proc_target.append('-I'+include)
+    proc_target += data_items
+    print proc_target
+    proc = subprocess.Popen(proc_target)
+    proc.wait()
+    os.chdir(here)
+
 

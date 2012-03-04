@@ -9,7 +9,7 @@ Module TrackerViewW
   Dimensions 18.9 0.06273 cm
   PropertyString Material POLYSTYRENE
   PropertyString SensitiveDetector SciFi
-  PropertyInt Plane 2
+  PropertyInt Plane 1
   PropertyDouble ActiveRadius 160. mm
   PropertyDouble Pitch 0.427 mm
   PropertyDouble FibreDiameter 0.350 mm
@@ -17,4 +17,5 @@ Module TrackerViewW
   PropertyDouble CentralFibre 106.5
   PropertyBool Invisible 1
   PropertyString G4Detector SciFiPlane
+  PropertyDouble G4StepMax .1 mm
 }

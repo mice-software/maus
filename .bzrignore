@@ -17,7 +17,9 @@ gmon.out
 list.prof
 unit_test
 tmp/*
+src/common_cpp/DataStructure/*.d
 src/input/*/build
+src/output/*/build
 src/map/*/build
 tests/cpp_unit/test_cpp_unit
 third_party/home
@@ -46,4 +48,7 @@ doc/doc_src/*.aux
 doc/doc_src/*.log
 doc/doc_src/detectors/*.aux
 doc/doc_src/detectors/*.log
+doc/coverage
 
+src/common_cpp/DataStructure/MausDataStructure.cc
+src/common_cpp/DataStructure/MausDataStructure.h

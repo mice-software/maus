@@ -44,18 +44,19 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 	echo "HACK: Enabling zlib (again?)"
         sleep 1
 
-	if [ "$(uname -m)" = "x86_64" ]; then
-	    echo "     This is an x86_64 Linux"
-	    echo "zlib zlibmodule.c -I/usr/include -L/usr/lib64 -lz" >> Modules/Setup
-
+  if [ `uname -s` != "Darwin" ]; then
+    if [ "$(uname -m)" = "x86_64" ]; then
+        echo "     This is an x86_64 Linux"
+        echo "zlib zlibmodule.c -I/usr/include -L/usr/lib64 -lz" >> Modules/Setup
 	    # See issue #774
 	    echo "_sha shamodule.c" >> Modules/Setup
             echo "_sha256 sha256module.c" >> Modules/Setup
 	    echo "_sha512 sha512module.c" >> Modules/Setup
-	elif [ `uname -s` != "Darwin" ]; then
-	    echo "     This is NOT an x86_64 Linux"
-	    echo "zlib zlibmodule.c -I/usr/include -L/usr/lib -lz" >> Modules/Setup
-	fi
+    else
+        echo "     This is NOT an x86_64 Linux"
+        echo "zlib zlibmodule.c -I/usr/include -L/usr/lib -lz" >> Modules/Setup
+    fi
+  fi
 
         echo "INFO: Making:"
         sleep 1
@@ -63,9 +64,14 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         echo "INFO: Installing within MAUS's third party directory:"
         if [ `uname -s` == "Darwin" ]; then
           make frameworkinstallstructure \
-               altinstall \
                bininstall \
                maninstall \
+               altbininstall \
+               libinstall \
+               inclinstall \
+               libainstall \
+               sharedinstall \
+               oldsharedinstall \
                frameworkinstallmaclib \
                frameworkinstallunixtools
         else

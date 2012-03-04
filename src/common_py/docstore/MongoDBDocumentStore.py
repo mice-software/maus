@@ -116,3 +116,10 @@ class MongoDBDocumentStore:
         @param self Object reference.
         """
         self.__data_store.remove()
+
+    def disconnect(self):
+        """
+        Disconnect - a no-op. 
+        @param self Object reference.
+        """
+        self.__mongodb.disconnect()
