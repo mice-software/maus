@@ -160,6 +160,8 @@ bool JsonWrapper::AlmostEqual(Json::Value value_1, Json::Value value_2, double t
             return value_1.asBool() == value_2.asBool();
         case Json::nullValue:
             return true;
+        default:
+            return false;
     }
 }
 
