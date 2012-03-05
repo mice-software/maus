@@ -93,8 +93,10 @@ TEST_F(MAUSPrimaryGeneratorActionTest, GeneratePrimariesTest) {
     primary->Push(part_in);
 
     G4Event* event = new G4Event();
-    for (size_t i=0; i<2; ++i)
+    for (size_t i=0; i<2; ++i) {
+        std::cerr << "PUSH " << i << std::endl;
         primary->GeneratePrimaries(event);
+    }
     double mu_mass = 105.658;
     double p_in    = ::sqrt(200.*200.-mu_mass*mu_mass);
     double p_scale = 
@@ -112,8 +114,10 @@ TEST_F(MAUSPrimaryGeneratorActionTest, GeneratePrimariesTest) {
     EXPECT_EQ(27, CLHEP::HepRandom::getTheSeed());
     EXPECT_EQ(-13,  event->GetPrimaryVertex()->GetPrimary()->GetPDGcode());
 
-    for (size_t i=0; i<5; ++i)
+    for (size_t i=0; i<5; ++i) {
+        std::cerr << "PUSH EXCEPT " << i << std::endl;
         EXPECT_THROW(primary->GeneratePrimaries(event), Squeal);
+    }
     delete event;
 }
 

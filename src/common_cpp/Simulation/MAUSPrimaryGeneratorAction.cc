@@ -77,6 +77,7 @@ void MAUSPrimaryGeneratorAction::GeneratePrimaries(G4Event* argEvent) {
   gun->GeneratePrimaryVertex(argEvent);
   long int uint_max = 
                 static_cast<long int>(std::numeric_limits<unsigned int>::max());
+  std::cerr << "SEED " << part.seed << std::endl;
   if ( part.seed < 0 || part.seed > uint_max ) {
     throw(Squeal(Squeal::recoverable,
                  "Random seed out of range",
