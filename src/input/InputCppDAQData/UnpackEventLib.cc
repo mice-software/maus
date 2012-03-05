@@ -183,14 +183,18 @@ int V1731DataProcessor::Process(MDdataContainer* aPartEventPtr) {
     }
     xfAdcHit = pBoardDoc;
     this->set_pedestal();
-    int charge_mm = this->get_charge(ceaMinMax);
+    int charge_mm = this->get_charge(ceaMinMax); 
     if ( !_zero_suppression ||
         (_zero_suppression && charge_mm > _zs_threshold) ) {
       xfAdcHit["charge_mm"]    = charge_mm;
-      xfAdcHit["charge_pm"]    = this->get_charge(ceaPedMax);
-      xfAdcHit["position_max"] = this->get_max_position();
-      xfAdcHit["pedestal"]    = this->get_pedestal();
-
+      xfAdcHit["charge_pm"]    = this->get_charge(ceaPedMin);
+      int dummy_var = 0;
+      xfAdcHit["pulse_area"]   = this->get_neg_signal_area(dummy_var);
+      xfAdcHit["max_pos"]      = this->get_max_position();
+      xfAdcHit["arrival_time"] = this->get_arrival_time();
+      xfAdcHit["position_min"] = this->get_min_position();
+      xfAdcHit["pedestal"]     = this->get_pedestal();
+      xfAdcHit["samples"]      = this ->get_samples();
       DAQChannelKey* xKey = _chMap->find(xLdc, xGeo, xCh, xEquip);
       if (xKey) {
         xDetector = xKey->detector();
@@ -450,7 +454,7 @@ int fADCDataProcessor::get_area() {
 }
 
 void fADCDataProcessor::set_pedestal() {
-  int area = 0;
+  double area = 0;
   unsigned int pedBins = 20;
 	if (_data.size() > pedBins) {
     for (unsigned int i = 0; i < pedBins; i++) {
@@ -474,6 +478,29 @@ int fADCDataProcessor::chargeMinMax() {
   return max - min;
 }
 
+int fADCDataProcessor::get_neg_signal_area(int&pos) {
+  vector<int>::iterator it = _data.begin();
+  vector<int>::iterator min;
+  
+  int area = 0;
+
+  min = min_element(_data.begin(), _data.end());
+  pos = distance(_data.begin(), min);
+  
+  //if (pos > 19 && pos < 80) {
+    if (pos > 10) {
+    it = min -  10;
+
+  while (it < min + 20) {
+    
+      area+= abs(*it - _pedestal);
+    it++;
+  }
+}
+  return area;
+}
+
+
 int fADCDataProcessor::get_signal_area(int& pos) {
   vector<int>::iterator it = _data.begin();
   vector<int>::iterator max;
@@ -485,12 +512,49 @@ int fADCDataProcessor::get_signal_area(int& pos) {
   if (pos > 10) it = max - 10;
 
   while (it < max+20) {
-    area += *it - _pedestal;
+    area += abs(*it - _pedestal);
     it++;
   }
 
   return area;
 }
+
+int fADCDataProcessor::get_arrival_time() {
+  int arr_time = 0;
+  for ( unsigned int i = 0; i < _data.size(); ++i ) {
+    arr_time = i;
+    if ( abs(_pedestal - _data[i]) > 2) {
+      break;
+    }
+  }   
+    return arr_time;
+}
+
+/*
+int fADCDataProcessor::get_neg_signal_area(int& pos) {
+
+  vector<int>::iterator it = _data.begin();
+  vector<int>::iterator min;
+  int area = 0;
+
+  min = min_element(_data.begin(), _data.end());
+  pos = distance(_data.begin(), min);
+
+  if (pos > 10) 
+    {
+      it = min - 10;
+
+  while (it < min+20) 
+    {
+      if (abs(*it - _pedestal) > 1)
+    area += abs(*it - _pedestal);
+    it++;
+      }
+    }
+
+  return area;
+}
+*/
 
 int fADCDataProcessor::get_pedestal_area(int& pos) {
   vector<int>::iterator it = _data.begin();
@@ -527,11 +591,26 @@ int fADCDataProcessor::get_max_position() {
   return pos;
 }
 
+int fADCDataProcessor::get_min_position() {
+  int pos = 0;
+  vector<int>::iterator min;
+  min = min_element(_data.begin(), _data.end());
+  pos = distance(_data.begin(), min);
+
+  return pos;
+
+}
 
 int fADCDataProcessor::chargePedMax() {
   int max = 0;
   max = *max_element(_data.begin(), _data.end());
   return max - _pedestal;
+}
+
+int fADCDataProcessor::chargePedMin() {
+  int min = 0;
+  min = *min_element(_data.begin(), _data.end());
+  return _pedestal - min;
 }
 
 int fADCDataProcessor::get_charge(int Algorithm) {
@@ -543,7 +622,10 @@ int fADCDataProcessor::get_charge(int Algorithm) {
   case ceaPedMax:
     charge = chargePedMax();
     break;
-   default:
+  case ceaPedMin:
+    charge = chargePedMin();
+    break;
+  default:
     charge = -99;
     break;
   }
@@ -551,11 +633,11 @@ int fADCDataProcessor::get_charge(int Algorithm) {
   return charge;
 }
 
+Json::Value fADCDataProcessor::get_samples() {
 
-
-
-
-
-
-
-
+Json::Value xfAdcHit;
+  for ( unsigned int i = 0; i < _data.size(); ++i ) {
+    xfAdcHit.append(_data[i]);
+  }
+  return xfAdcHit;
+}
