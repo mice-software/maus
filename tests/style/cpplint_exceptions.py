@@ -112,5 +112,135 @@ exceptions[os.path.join(CPP_CM, 'Simulation','MAUSVisManager.hh')] = [
 
 exceptions[os.path.join(CPP_CM, 'Simulation','MAUSEventAction.hh')] = [
 ('#include "G4UserEventAction.hh"', 'cpplint confused by g4 header', 'rogers'),
+]
+
+exceptions[os.path.join(CPP_CM, 'Maths','Complex.hh')] = [
+('MAUS::complex& operator+=(MAUS::complex& lhs, const double         rhs);',
+ 'cpplint confused by MAUS::complex not a class but has math operators',
+ 'lane'),
+('MAUS::complex& operator-=(MAUS::complex& lhs, const double         rhs);',
+ 'cpplint confused by MAUS::complex not a class but has math operators',
+ 'lane'),
+('MAUS::complex& operator*=(MAUS::complex& lhs, const double         rhs);',
+ 'cpplint confused by MAUS::complex not a class but has math operators',
+ 'lane'),
+('MAUS::complex& operator/=(MAUS::complex& lhs, const double         rhs);',
+ 'cpplint confused by MAUS::complex not a class but has math operators',
+ 'lane'),
+]
+
+exceptions[os.path.join(CPP_CM, 'Maths','HermitianMatrix.hh')] = [
+('  HermitianMatrix(const Matrix<complex>& original_instance);',
+ 'cpplint confused by STL copy constructor', 'lane')
+]
+
+exceptions[os.path.join(CPP_CM, 'Maths','Matrix.hh')] = [
+('  Matrix(const Matrix<double>& original_instance)',
+ 'cpplint confused by STL copy constructor', 'lane'),
+('  Matrix(const Matrix<complex>& original_instance)',
+ 'cpplint confused by STL copy constructor', 'lane')
+]
+
+exceptions[os.path.join(CPP_CM, 'Maths','Vector.hh')] = [
+('  Vector(const Vector<double>& original_instance)',
+ 'cpplint confused by STL copy constructor', 'lane'),
+('  Vector(const Vector<complex>& original_instance)',
+ 'cpplint confused by STL copy constructor', 'lane')
+]
+
+exceptions[os.path.join(TST, 'Maths', 'PolynomialVectorTest.cc')] = [
+('  } catch (Squeal squee) {}',
+ '"catch" is a keyword like "for" and "if", not a function', 'lane')
+]
+
+exceptions[os.path.join(TST, 'Maths', 'VectorTest.cc')] = [
+('  } catch (Squeal squeal) {}',
+ '"catch" is a keyword like "for" and "if", not a function', 'lane')
+]
+
+exceptions[os.path.join(TST, 'Optics', 'PhaseSpaceVectorTest.cc')] = [
+('  } catch (Squeal squeal) {}',
+ '"catch" is a keyword like "for" and "if", not a function', 'lane')
+]
+
+exceptions[os.path.join(TST, 'Optics', 'CovarianceMatrixTest.cc')] = [
+('  } catch (Squeal squeal) {}',
+ '"catch" is a keyword like "for" and "if", not a function', 'lane')
+]
+
+exceptions[os.path.join(CPP_CM, 'JsonCppStreamer','ORStream.hh')] = [
+('template<>           orstream& orstream::operator<< <short> (short&  d) {', 'doesnt like the necessary specialisation', 'richards'),
+('template<>           orstream& orstream::operator<< <long>  (long&   d) {', 'doesnt like the necessary specialisation', 'richards'),
+('template<>           orstream& orstream::operator<< <short> (short* &  d) {', 'doesnt like the necessary specialisation', 'richards'),
+('template<>           orstream& orstream::operator<< <long>  (long* &   d) {', 'doesnt like the necessary specialisation', 'richards'),
+
+]
+
+exceptions[os.path.join(CPP_CM, 'JsonCppStreamer','ORStream.cc')] = [
+('  strcpy(m_branchName, "");', '', 'richards'),
+('  strcpy(m_branchName, "");', '', 'richards'),
+
+]
+exceptions[os.path.join(TST, 'JsonCppStreamer','ORStreamTest.cc')] = [
+('  strcpy(os.m_branchName, "");', '', 'richards'),
+('  strcpy(os.m_branchName, "Test");', '', 'richards'),
+('  strcpy(os.m_branchName, "");', '', 'richards'),
+('  strcpy(os.m_branchName, "HelloWorld");', '', 'richards'),
+('  strcpy(os.m_branchName, "");', '', 'richards'),
+('  long nevent = 0;', 'root uses longs', 'richards'),
+]
+exceptions[os.path.join(CPP_CM, 'JsonCppStreamer','IRStream.hh')] = [
+('template<>           irstream& irstream::operator>> <short> (short&  d) {', 'doesnt like the necessary specialisation', 'richards'),
+('template<>           irstream& irstream::operator>> <long>  (long&   d) {', 'doesnt like the necessary specialisation', 'richards'),
+('template<>           irstream& irstream::operator>> <short> (short* &  d) {', 'doesnt like the necessary specialisation', 'richards'),
+('template<>           irstream& irstream::operator>> <long>  (long* &   d) {', 'doesnt like the necessary specialisation', 'richards'),
+
+]
+
+exceptions[os.path.join(CPP_CM, 'JsonCppStreamer','IRStream.cc')] = [
+('  long nextEvent = irs.m_tree->GetReadEntry() + 1;', 'root can return a long', 'richards'),
+('  strcpy(m_branchName, "");', '', 'richards'),
+('  strcpy(m_branchName, "");', '', 'richards')
+
+]
+
+exceptions[os.path.join(TST, 'JsonCppStreamer','IRStreamTest.cc')] = [
+('  strcpy(is.m_branchName, "Test");', '', 'richards'),
+('  strcpy(is.m_branchName, "");', '', 'richards'),
+('  strcpy(is.m_branchName, "");', '', 'richards'),
+
+]
+
+exceptions[os.path.join(CPP_CM, 'JsonCppStreamer','RStream.hh')] = [
+('  long m_evtCount;', 'root can return a long', 'richards'),
+('    strcpy(m_branchName, "");', '', 'richards'),
+('    strcpy(m_branchName, "");', '', 'richards'),
+('  strcpy(m_branchName, "");', '', 'richards'),
+('    strcpy(m_branchName, "");', '', 'richards'),
+('    strcpy(m_branchName, "");', '', 'richards'),
+('  strcpy(m_branchName, "");', '', 'richards'),
+
+]
+
+exceptions[os.path.join(CPP_CM, 'JsonCppStreamer','RStream.cc')] = [
+('  strcpy(m_branchName, "");', '', 'richards'),
+('  strcpy(rs.m_branchName, name);', '', 'richards'),
+
+
+]
+
+exceptions[os.path.join(TST, 'JsonCppStreamer','RStreamTest.cc')] = [
+('    strcpy(t.m_branchName, "TestBranch1");', '', 'richards'),
+('    strcpy(t.m_branchName, "TestBranch1");', '', 'richards'),
+('    strcpy(t.m_branchName, "TestBranch2");', '', 'richards'),
+('    strcpy(t.m_branchName, "TestBranch2");', '', 'richards'),
+('    strcpy(t.m_branchName, "TestBranch1");', '', 'richards'),
+('    strcpy(t.m_branchName, "TestBranch2");', '', 'richards'),
+('    strcpy(t.m_branchName, "TestBranch1");', '', 'richards'),
+('    strcpy(t.m_branchName, "TestBranch1");', '', 'richards'),
+('    strcpy(t.m_branchName, "TestBranch2");', '', 'richards'),
+('    strcpy(t.m_branchName, "TestBranch2");', '', 'richards'),
+('    strcpy(t.m_branchName, "TestBranch1");', '', 'richards'),
+('    strcpy(t.m_branchName, "TestBranch2");', '', 'richards'),
 
 ]

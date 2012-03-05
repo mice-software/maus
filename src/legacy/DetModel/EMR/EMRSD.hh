@@ -16,9 +16,7 @@ class MiceModule;
 * EMR calorimeter simulation.
 **/
 
-using namespace MAUS;
-
-class EMRSD : public MAUSSD {
+class EMRSD : public MAUS::MAUSSD {
   public:
 
       //! Constructor

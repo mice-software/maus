@@ -16,6 +16,7 @@
  */
 
 #include <algorithm>
+#include <vector>
 
 #include "json/json.h"
 
@@ -110,6 +111,7 @@ Json::ValueType JsonWrapper::JsonTypeToValueType(JsonWrapper::JsonType tp)
                    "Could not convert anyValue to Json ValueType",
                    "JsonWrapper::JsonTypeToValueType"));
   }
+  return Json::nullValue;  // appease gcc
 }
 
 CLHEP::Hep3Vector JsonWrapper::JsonToThreeVector
@@ -128,12 +130,72 @@ CLHEP::Hep3Vector JsonWrapper::JsonToThreeVector
 
 bool JsonWrapper::SimilarType(JsonWrapper::JsonType jt1,
                               JsonWrapper::JsonType jt2) {
-  return (jt1 == jt2 || jt1 == JsonWrapper::anyValue
-                     || jt2 == JsonWrapper::anyValue);
+    return (jt1 == jt2 || jt1 == JsonWrapper::anyValue
+                       || jt2 == JsonWrapper::anyValue);
 }
 
 void JsonWrapper::Print(std::ostream& out, const Json::Value& val) {
-  Json::FastWriter writer;
-  out << writer.write(val);
+    Json::FastWriter writer;
+    out << writer.write(val);
+}
+
+bool JsonWrapper::AlmostEqual(Json::Value value_1, Json::Value value_2, double tolerance) {
+    if (value_1.type() != value_2.type()) {
+        return false;
+    }
+    switch (value_1.type()) {
+        case Json::objectValue:
+            return ObjectEqual(value_1, value_2, tolerance);
+        case Json::arrayValue:
+            return ArrayEqual(value_1, value_2, tolerance);
+        case Json::realValue:
+            return fabs(value_1.asDouble() - value_2.asDouble()) < tolerance;
+        case Json::stringValue:
+            return value_1.asString() == value_2.asString();
+        case Json::uintValue:
+            return value_1.asUInt() == value_2.asUInt();
+        case Json::intValue:
+            return value_1.asInt() == value_2.asInt();
+        case Json::booleanValue:
+            return value_1.asBool() == value_2.asBool();
+        case Json::nullValue:
+            return true;
+    }
+}
+
+bool JsonWrapper::ObjectEqual
+                  (Json::Value value_1, Json::Value value_2, double tolerance) {
+    // get keys, assure that ordering is same
+    std::vector<std::string> keys_1 = value_1.getMemberNames();
+    std::vector<std::string> keys_2 = value_2.getMemberNames();
+    std::sort(keys_1.begin(), keys_1.end());
+    std::sort(keys_2.begin(), keys_2.end());
+    // check keys are same
+    if (keys_1 != keys_2) {
+        return false;
+    }
+    // check values are same
+    for (size_t i = 0; i < keys_1.size(); ++i) {
+        if (!AlmostEqual(value_1[keys_1[i]], value_2[keys_1[i]], tolerance)) {
+            return false;
+        }
+    }
+    // return true
+    return true;
+}
+
+bool JsonWrapper::ArrayEqual
+                  (Json::Value value_1, Json::Value value_2, double tolerance) {
+    // check length is same
+    if (value_1.size() != value_2.size()) {
+        return false;
+    }
+    // check each item is the same (recursively)
+    for (size_t i = 0; i < value_1.size(); ++i) {
+        if (!AlmostEqual(value_1[i], value_2[i], tolerance)) {
+            return false;
+        }
+    }
+    return true;
 }
 

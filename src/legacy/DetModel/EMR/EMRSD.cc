@@ -49,6 +49,7 @@ void EMRSD::Initialize(G4HCofThisEvent* HCE)
 G4bool EMRSD::ProcessHits(G4Step* aStep,G4TouchableHistory* ROhist)
 {
 	std::cout << _module->fullName() << std::endl;
+  return false;
 	/*
 	Json::Value hit;
     G4double length = aStep->GetStepLength();

@@ -2,7 +2,6 @@
 Test gdml uploader and downloader. Note that I switch from cdb library to cdb
 mock at run time so that we don't have any messy network calls in unit tests.
 """
-
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 # 
 #  MAUS is free software: you can redistribute it and/or modify
@@ -218,6 +217,7 @@ class TestDownloader(unittest.TestCase): #pylint: disable = R0904
         result = GDMLtoCDB.Downloader().get_ids("2011-09-08 09:00:00", \
                                          "2011-09-09 09:00:00")
         self.assertEqual(result, "3004")
+
             
     def test_download_beamline_for_run(self):
         """

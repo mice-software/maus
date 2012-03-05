@@ -53,6 +53,8 @@
 #include "Interface/SpecialHit.hh"  // needed by persist
 #include "Interface/Squeak.hh"
 
+namespace MAUS {
+
 class MapCppSimulation {
  public:
   /** @brief Sets up the worker
@@ -98,14 +100,13 @@ class MapCppSimulation {
   void SetConfiguration(std::string config);
 
  private:
-  MAUSGeant4Manager* _g4manager;
+  MAUS::MAUSGeant4Manager* _g4manager;
   std::string _jsonConfigDocument;
   std::string _classname;
   std::string _geometry;
   bool _storeTracks;
   bool _doVis;
 };  // Don't forget this trailing colon!!!!
-
-
+}
 
 #endif  // _SRC_MAP_MAPCPPSIMULATION_HH_

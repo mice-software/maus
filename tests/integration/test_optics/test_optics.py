@@ -6,8 +6,8 @@ transverse beta functions.
 import os
 import unittest
 import subprocess
+import xboa.Common as Common #pylint: disable=F0401
 
-import xboa.Common as Common
 
 TEST_NAMES = ['mapping', 'optimiser'] #, 'rf', '6d', 'polyfit']
 TARGET_BETA = {'mapping':0.655994338, 'optimiser':0.652749967}

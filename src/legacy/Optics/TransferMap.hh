@@ -6,10 +6,11 @@
 #include "CLHEP/Units/SystemOfUnits.h"
 
 #include "src/legacy/Interface/Differentiator.hh"
-#include "CovarianceMatrix.hh"
-#include "PhaseSpaceVector.hh"
-#include "OpticsModel.hh"
-#include "Tensor3.hh"
+#include "Maths/PolynomialVector.hh"
+#include "src/legacy/Optics/CovarianceMatrix.hh"
+#include "src/legacy/Optics/PhaseSpaceVector.hh"
+#include "src/legacy/Optics/OpticsModel.hh"
+#include "src/legacy/Optics/Tensor3.hh"
 
 //
 //TransferMap is a polynomial mapping of a phase space vector from a plane at Z1 to another plane at Z2,
@@ -21,7 +22,7 @@
 //Currently first order transformations use the CLHEP::HepMatrix object, second order transformations use the
 //Tensor3 object and higher order transformations use the Tensor object
 //
-//At some point I would like to move to the more general PolynomialVector object. For now I have implemented an 
+//At some point I would like to move to the more general MAUS::PolynomialVector object. For now I have implemented an 
 //interface to this object
 //
 //
@@ -86,8 +87,8 @@ public:
 	double           PhaseAdvance(int axis) const;
 	double           PhaseAdvance(int axis, double LarmorAngle) const;
   //
-	PolynomialVector* GetPolynomialVector() {return _polynomial;}
-	void              SetPolynomialVector(PolynomialVector* poly) {_polynomial = poly;}
+	MAUS::PolynomialVector* GetPolynomialVector() {return _polynomial;}
+	void              SetPolynomialVector(MAUS::PolynomialVector* poly) {_polynomial = poly;}
 	bool              IsCanonical()         {return _canonicalMap;}
 	bool              IsCanonical(bool can) {_canonicalMap = can; return _canonicalMap;}
 
@@ -106,7 +107,7 @@ private:
 	PhaseSpaceVector     _referenceTrajectoryOut;
 	//Need this for transporting phase space vectors
 	OpticsModel*         _optics;
-	PolynomialVector*    _polynomial; //set to NULL to disable
+	MAUS::PolynomialVector*    _polynomial; //set to NULL to disable
 	static int           _order;
 	bool                 _canonicalMap;
 

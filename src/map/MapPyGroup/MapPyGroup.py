@@ -1,3 +1,6 @@
+"""
+A group of workers which iterates through each worker in turn.
+"""
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 #
 #  MAUS is free software: you can redistribute it and/or modify
@@ -13,128 +16,143 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-"""
-MapPyGroup module for grouping mappers
-"""
+## @class MapPyGroup.MapPyGroup
+#  MapPyGroup is for chaining mappers together
+#
+#  This class is used to chain maps together.  For example,
+#  if one wants to simulate a spill then fit the spill then
+#  create some accelerator physics quantity, one has to chain
+#  various mappers together.  Or mathematically, if you have
+#  some function/operation f(x), g(x), and h(x) on some spill
+#  called 's'.  Then this allows the composition f(g(h(s))).
+#
+#  A demo would be the following:
+#
+#  \code
+#  group = MapPyGroup()
+#  group.append(MapCppSimulation())
+#  group.append(MapPyRemoveTracks())
+#  group.append(MapPyGlobalRecon())
+#  \endcode
 
+from types import ListType
 import inspect
+
+import ErrorHandler
 
 class MapPyGroup:
     """
-    @class MapPyGroup
-    MapPyGroup is for chaining mappers together
-
-    This class is used to chain maps together.  For example, if one wants to
-    simulate a spill then fit the spill then create some accelerator physics 
-    quantity, one has to chain various mappers together.  Or mathematically, 
-    if you have some function/operation f(x), g(x), and h(x) on some spill 
-    called 's'.  Then this allows the composition f(g(h(s))).
+    A group of workers which iterates through each worker in turn.
     """
-    def __init__(self, arg_workers=None):
+    def __init__(self, initial_workers = []): # pylint:disable = W0102
         """
-        Initialise the MapPyGroup
-        
-        @param arg_workers list of workers to be added to the list
+        Constructor.
+        @param self Object reference
+        @param initial_workers List of 0 or more default workers.
+        @param id. ID of this class.
+        @throws AssertionError if initial_workers is not a list or if
+        any worker therein does not satisfy the criteria of the append
+        function. 
         """
-        if arg_workers == None:
-            arg_workers = []
-
         self._workers = []
-        for worker in arg_workers:
+        assert isinstance(initial_workers, ListType)
+        for worker in initial_workers:
             self.append(worker)
 
     def get_worker_names(self):
         """
-        @return a list of the class name of each worker
+        Get the names of this worker and all its sub-workers.
+        @param self Object reference.
+        @return nested list of worker and sub-worker names e.g.
+        @verbatim 
+        ["MapCppTOFDigits", "MapCppTOFSlabHits", "MapCppTOFSpacePoint"]
+
+        or
+
+        ["MapCppTOFDigits", ["MapCppTOFSlabHits", "MapCppTOFSpacePoint"]]
+        @endverbatim
         """
         names = []
         for worker in self._workers:
-            names.append(worker.__class__.__name__)
+            if isinstance(worker, MapPyGroup):
+                name = worker.get_worker_names()
+            else:
+                name = worker.__class__.__name__
+            names.append(name)
         return names
 
-    def append(self, arg_worker):
+    def append(self, worker):
         """
-        append the worker to the map
-
-        @param arg_worker should be a mapper. MapPyGroup checks that the mapper
-                has a birth, process and death function and that they have the
-                appropriate call signature.
+        Append a worker to the group.
+        @param self Object reference.
+        @param worker Worker.
+        @throws AssertionError if the worker has no birth/2 (for
+        Python) or non 0-arity birth function (for SWIG);  if the
+        worker has no process/2 (for Python) or non 0-arity process
+        function (for SWIG); or no death/1 function.
         """
-        # Rogers: this should be done with inheritance!
-        if not hasattr(arg_worker, 'birth'):
-            raise TypeError(str(arg_worker)+' does not have a birth()')
-        # python uses args, swig uses varargs
-        py_arg = len(inspect.getargspec(arg_worker.birth).args) == 2
-        swig_arg = inspect.getargspec(arg_worker.birth).varargs != None
-        if not py_arg ^ swig_arg: # exclusive or
-            raise TypeError(str(arg_worker)+' birth() has wrong call signature')
+        assert hasattr(worker, 'birth')
+        py_ok = len(inspect.getargspec(worker.birth).args) == 2 # for python
+        swig_ok = inspect.getargspec(worker.birth).varargs != None # for swig
+        assert py_ok ^ swig_ok # exclusive or
 
-        if not hasattr(arg_worker, 'process'):
-            raise TypeError(str(arg_worker)+' does not have a process()')
+        assert hasattr(worker, 'process')
+        py_ok = len(inspect.getargspec(worker.process).args) == 2 # for python
+        swig_ok = inspect.getargspec(worker.process).varargs != None # for swig
+        assert py_ok ^ swig_ok # exclusive or
 
-        # python uses args, swig uses varargs
-        py_arg = len(inspect.getargspec(arg_worker.process).args) == 2
-        swig_arg = inspect.getargspec(arg_worker.process).varargs != None
-        if not py_arg ^ swig_arg : # exclusive or
-            raise TypeError\
-                         (str(arg_worker)+' process() has wrong call signature')
+        assert hasattr(worker, 'death')
+        assert len(inspect.getargspec(worker.death).args) == 1 # self only
 
-        if not hasattr(arg_worker, 'death'):
-            raise TypeError(str(arg_worker)+' does not have a death()')
-        if len(inspect.getargspec(arg_worker.death).args) != 1: # self only
-            raise TypeError(str(arg_worker)+' death() has wrong call signature')
+        self._workers.append(worker)
 
-        self._workers.append(arg_worker)
-
-    def birth(self, arg_json_config):
+    def birth(self, json_config_doc):
         """
-        Call birth() on each worker. 
-
-        @param argJsonConfigDocument string containing configuration data in
-               json format
-
-        If a worker fails to birth, will call death() on all workers (including
-        the ones that have not been birthed already).
-
-        @return True if all workers birthed correctly, else return False
+        Birth the mapper by invoking birth on all workers.
+        @param self Object reference.
+        @param json_config_doc JSON configuration document.
+        @return True if all workers return True else return False.
         """
-        for worker in self._workers:
-            if not worker.birth(arg_json_config):
-                print 'Failed to birth() '+worker.__class__.__name__
-                for worker_death in self._workers:
-                    worker_death.death()
-                return False
+        try:
+            for worker in self._workers:
+                assert worker.birth(json_config_doc)
+        except: # pylint:disable = W0702
+            ErrorHandler.HandleException({}, self)
+            return False
         return True
 
     def process(self, spill):
         """
-        Call process() on each worker. 
-
-        @param spill string containing spill data in json format
-
-        @return the spill document modified by all worker process calls
+        Process a spill by passing it through each worker in turn,
+        passing the result spill from one into the process function
+        of the next.
+        @param self Object reference.
+        @param spill JSON spill document.
+        @return result spill
         """
+        nu_spill = spill
         for worker in self._workers:
-            spill = worker.process(spill)
-        return spill
+            nu_spill = worker.process(nu_spill)
+        return nu_spill
 
     def death(self):
         """
-        Call death() on all workers in the group.
-
-        @return True if all workers died successfully, else print an error and
-                return False
+        Death the mapper by invoking death on all workers.
+        @param self Object reference.
+        @return True if all workers return True else return False.
         """
-        all_dead = True
-        for worker in self._workers:
-            if not worker.death():
-                all_dead = False
-                print 'Failed to death() '+worker.__class__.__name__
-        return all_dead
+        try:
+            for worker in self._workers:
+                assert worker.death()
+        except: # pylint:disable = W0702
+            ErrorHandler.HandleException({}, self)
+            return False
+        return True
 
     def __del__(self):
         """
-        Call death() on all workers
+        Delete the mapper. Invoke death on all workers.
+        @param self Object reference.
         """
-        self.death()
-
+        for worker in self._workers:
+            worker.death()
