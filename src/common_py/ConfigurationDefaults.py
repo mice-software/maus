@@ -274,7 +274,7 @@ maus_version = "" # set at runtime - do not edit this (changes are ignored)
 configuration_file = "" # should be set on the command line only (else ignored)
 
 doc_store_class = "docstore.MongoDBDocumentStore.MongoDBDocumentStore"
-doc_collection_name = "spills" # Default document collection name. Only needed if using multi_process mode.
+doc_collection_name = "spills" # Default document collection name. Only needed if using multi_process mode. If "auto" then a collection name will be auto-generated for spills output by input-transform workflows.
 
 mongodb_host = "localhost" # Default MongoDB host name. Only needed if using MongoDBDocumentStore.
 mongodb_port = 27017 # Default MongoDB port. Only needed if using MongoDBDocumentStore.

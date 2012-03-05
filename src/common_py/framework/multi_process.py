@@ -68,7 +68,8 @@ class MultiProcessDataflowExecutor:
                 inputer, transformer, json_config_doc, self.doc_store)
         self.merge_output_executor = \
             MultiProcessMergeOutputDataflowExecutor( \
-                merger, outputer, json_config_doc, self.doc_store)
+                merger, outputer, json_config_doc, self.doc_store,
+                self.input_transform_executor.collection)
           
     def execute(self):
         """
@@ -128,7 +129,7 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903, R0902
         self.inputer = inputer
         self.transformer = transformer
         self.json_config_doc = json_config_doc
-        self.client_config_id = "%s (%s)" \
+        self.client_config_id = "%s-%s" \
             % (socket.gethostname(), os.getpid()) # Unique ID.
         self.spill_input_count = 0 # Count of spills input
         self.spill_process_count = 0 # Count of spills processed
@@ -143,8 +144,15 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903, R0902
                 self.json_config_dictionary)
         else:
             self.doc_store = doc_store
-        self.collection = \
-            self.json_config_dictionary["doc_collection_name"]
+        # Get collection name.        
+        if (not self.json_config_dictionary.has_key("doc_collection_name") or
+            (self.json_config_dictionary["doc_collection_name"] == None) or
+            (self.json_config_dictionary["doc_collection_name"] == "") or
+            (self.json_config_dictionary["doc_collection_name"] == "auto")):
+            self.collection = self.client_config_id
+        else:
+            self.collection = \
+                self.json_config_dictionary["doc_collection_name"]
 
     @staticmethod
     def ping_celery_nodes():
@@ -232,9 +240,11 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903, R0902
             if result.successful():
                 self.celery_tasks.pop(current)
                 num_tasks -= 1
-                print " Celery task %s SUCCESS " % result.task_id
                 spill = result.result
                 self.spill_process_count += 1
+                print " Celery task %s SUCCESS " % (result.task_id)
+                print "   SAVING to collection %s (with ID %s)" \
+                    % (self.collection, self.spill_process_count)
                 self.doc_store.put(self.collection,
                     str(self.spill_process_count), spill)
                 self.print_counts()
@@ -373,7 +383,7 @@ class MultiProcessMergeOutputDataflowExecutor: # pylint: disable=R0903, R0902
     provided as a constructor argument.
     """
 
-    def __init__(self, merger, outputer, json_config_doc, doc_store = None): # pylint: disable=R0913,C0301
+    def __init__(self, merger, outputer, json_config_doc, doc_store = None, collection_name = None): # pylint: disable=R0913,C0301
         """
         Constructor. Call super-class constructor then create
         a document data store.
@@ -383,6 +393,9 @@ class MultiProcessMergeOutputDataflowExecutor: # pylint: disable=R0903, R0902
         @param outputer Output task.
         @param json_config_doc JSON configuration document.
         @param doc_store Document store.
+        @param collection_name Collection name in document store.
+        @throws ValueError if collection_name is None and there is no
+        "doc_collection_name" entry in json_config_doc.
         """
         self.merger = merger
         self.outputer = outputer
@@ -395,8 +408,18 @@ class MultiProcessMergeOutputDataflowExecutor: # pylint: disable=R0903, R0902
                 self.json_config_dictionary)
         else:
             self.doc_store = doc_store
-        self.collection = \
-            self.json_config_dictionary["doc_collection_name"]
+        # Get collection name
+        if (collection_name == None):
+            if ((not \
+                 self.json_config_dictionary.has_key("doc_collection_name")) or
+                (self.json_config_dictionary["doc_collection_name"] == None) or
+                (self.json_config_dictionary["doc_collection_name"] == "")):
+                raise ValueError("collection is not specified")
+            else:
+                self.collection = \
+                    self.json_config_dictionary["doc_collection_name"]
+        else:   
+            self.collection = collection_name
         self.run_number = None
         self.spill_count = 0 # Count of spills handled.
 
