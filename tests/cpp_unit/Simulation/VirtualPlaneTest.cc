@@ -159,7 +159,7 @@ TEST_F(VirtualPlaneTest, BuildNewHitTest) {  // sorry this is a long one...
   VirtualPlaneManager vpm;
   vpm.ConstructVirtualPlanes(&field, MICERun::getInstance()->miceModule);
   G4Step*  step  = new G4Step();
-  G4Track* track = SetG4TrackAndStep(step);
+  SetG4TrackAndStep(step);
   VirtualHit hit = vp_z.BuildNewHit(step, 99);
   double     mass = step->GetPreStepPoint()->GetMass();
 

@@ -75,7 +75,9 @@ void MAUSPrimaryGeneratorAction::GeneratePrimaries(G4Event* argEvent) {
   gun->SetParticleMomentumDirection(G4ThreeVector
                                  (part.px, part.py, part.pz));
   gun->GeneratePrimaryVertex(argEvent);
-  if ( part.seed < 0 || part.seed > std::numeric_limits<unsigned int>::max() ) {
+  long int uint_max = 
+                static_cast<long int>(std::numeric_limits<unsigned int>::max());
+  if ( part.seed < 0 || part.seed > uint_max ) {
     throw(Squeal(Squeal::recoverable,
                  "Random seed out of range",
                  "MAUSPrimaryGeneratorAction::GeneratePrimaries"));

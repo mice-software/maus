@@ -87,6 +87,10 @@ JsonWrapper::JsonType JsonWrapper::ValueTypeToJsonType(Json::ValueType tp) {
     case Json::booleanValue: return booleanValue;
     case Json::arrayValue: return arrayValue;
     case Json::objectValue: return objectValue;
+    default:
+      throw(Squeal(Squeal::recoverable,
+                   "Json ValueType not recognised",
+                   "JsonWrapper::ValueTypeToJsonType"));
   }
 }
 
@@ -101,7 +105,7 @@ Json::ValueType JsonWrapper::JsonTypeToValueType(JsonWrapper::JsonType tp)
     case booleanValue: return Json::booleanValue;
     case arrayValue:   return Json::arrayValue;
     case objectValue:  return Json::objectValue;
-    case anyValue:
+    case anyValue: default:
       throw(Squeal(Squeal::recoverable,
                    "Could not convert anyValue to Json ValueType",
                    "JsonWrapper::JsonTypeToValueType"));
