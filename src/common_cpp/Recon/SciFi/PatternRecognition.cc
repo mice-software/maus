@@ -100,10 +100,12 @@ void PatternRecognition::make_straight_5tracks(
                          std::vector< std::vector<SciFiSpacePoint*> >& spnts_by_station,
                          std::vector<SciFiStraightPRTrack>& trks) {
   std::cout << "Making 5 point tracks" << std::endl;
+  
+  int num_points = 5;
 
-  int ignore_station = -1;
+  std::vector<int> ignore_stations; // A zero size vector sets that all stations are used
 
-  make_straight_tracks(5, ignore_station, spnts_by_station, trks);
+  make_straight_tracks(num_points, ignore_stations, spnts_by_station, trks);
 
   std::cout << "Finished making 5 pt tracks" << std::endl;
 } // ~make_spr_5pt(...)
@@ -120,25 +122,32 @@ void PatternRecognition::make_straight_4tracks(
 
   // Call make_tracks with parameters depending on how many stations have unused spacepoints
   if ( num_stations_hit == 5 ) {
-    std::cout << "5 stations with unused spacepoints" << std::endl;
+
+    std::cout << "4pt track: 5 stations with unused spacepoints" << std::endl;
+    
     for (int i = 0; i < 5; ++i) { // Loop of stations, ignoring each one in turn
       // Recount how many stations have at least one unused spacepoint
       num_stations_hit = num_stations_with_unused_spnts(spnts_by_station);
       // If there are enough occupied stations left to make a 4 point track, keep making tracks
       if ( num_stations_hit  >= num_points ) {
-        make_straight_tracks(num_points, i, spnts_by_station, trks);
+        std::vector<int> ignore_stations(1, i);
+        make_straight_tracks(num_points, ignore_stations, spnts_by_station, trks);
       } else {
         break;
       }
     } // ~Loop of stations, ignoring each one in turn
   } else if ( num_stations_hit == 4 ) {
-    std::cout << "4 stations with unused spacepoints" << std::endl;
+    
+    std::cout << "4pt track: 4 stations with unused spacepoints" << std::endl;
+    
     // Find out which station has no unused hits (1st entry in stations_not_hit vector)
     std::vector<int> stations_hit, stations_not_hit;
     stations_with_unused_spnts(spnts_by_station, stations_hit, stations_not_hit);
+    
     // Make the tracks
     if ( static_cast<int>(stations_not_hit.size()) == 1 ) {
-      make_straight_tracks(num_points, stations_not_hit[0], spnts_by_station, trks);
+      std::vector<int> ignore_stations(1, stations_not_hit[0]);
+      make_straight_tracks(num_points, ignore_stations, spnts_by_station, trks);
     } else {
       std::cout << "Wrong number of stations without spacepoints, ";
       std::cout << "aborting 4 pt track." << std::endl;
@@ -148,23 +157,92 @@ void PatternRecognition::make_straight_4tracks(
   } else if ( num_stations_hit > 6 ) {
     std::cout << "Wrong number of stations with spacepoints, aborting 4 pt track." << std::endl;
   }
+  
   std::cout << "Finished making 4 pt tracks" << std::endl;
 } // ~make_straight_4tracks(...)
 
 void PatternRecognition::make_straight_3tracks(const std::vector<SciFiSpacePoint*>& spnts,
                                       std::vector<SciFiStraightPRTrack>& trks) {
-  // std::cout << "Making 3 point track" << std::endl;
-}
+  std::cout << "Making 3 point track" << std::endl;
+  
+  int num_points = 3;
+  
+  // Count how many stations have at least one *unused* spacepoint
+  int num_stations_hit = num_stations_with_unused_spnts(spnts_by_station);
+  
+  bool sufficient_hit_stations = true;
+  
+  // Call make_tracks with parameters depending on how many stations have unused spacepoints
+  if ( num_stations_hit == 5 ) {
+    
+    std::cout << "3pt track: 5 stations with unused spacepoints" << std::endl;
+    
+    for (int i = 0; i < 5; ++i) { // Loop of first station to ignore
+      if ( sufficient_hit_stations ) {
+        for (int j = 0; j < 5; ++j) { // Loop of second station to ignore
+          if ( sufficient_hit_stations ) {
+            // Recount how many stations have at least one unused spacepoint
+            num_stations_hit = num_stations_with_unused_spnts(spnts_by_station);
+            // If there are enough occupied stations left to make a 3 point track, keep making tracks
+            if ( num_stations_hit  >= num_points ) {
+              std::vector<int> ignore_stations;
+              ignore_stations.push_back(i);
+              ignore_stations.push_back(j);
+              make_straight_tracks(num_points, ignore_stations, spnts_by_station, trks);
+            } else {
+                sufficient_hit_stations = false;
+            }
+          } // ~if ( sufficient_hit_stations )
+        } // ~Loop of second station to ignore
+      } // ~if ( sufficient_hit_stations )
+    } // ~Loop of first station to ignore
+  } else if ( num_stations_hit == 4 ) {
+    
+    std::cout << "3pt track: 4 stations with unused spacepoints" << std::endl;
+    
+    // Find out which station has no unused hits (1st entry in stations_not_hit vector)
+    std::vector<int> stations_hit, stations_not_hit;
+    stations_with_unused_spnts(spnts_by_station, stations_hit, stations_not_hit);
+    std::vector<int> ignore_stations;
+    
+    // Make the tracks
+    if ( static_cast<int>(stations_not_hit.size()) == 1 ) {
+      for (int i = 0; i < 5; ++i) { // Loop of stations, ignoring each one in turn
+        // Recount how many stations have at least one unused spacepoint
+        num_stations_hit = num_stations_with_unused_spnts(spnts_by_station);
+        // If there are enough occupied stations left to make a 4 point track, keep making tracks
+        if ( num_stations_hit  >= num_points ) {
+          ignore_stations.clear();
+          ignore_stations.push_back(stations_not_hit[0]);
+          ignore_stations.push_back(i);
+          make_straight_tracks(num_points, ignore_stations, spnts_by_station, trks);
+        } else {
+          break;
+        }
+      }
+    }
+  } else if ( num_stations_hit == 3 ) {
+    
+    // Find out which stations have no unused hits
+    
+    // Make the tracks
+    
+  } else if ( num_stations_hit < 3 ) {
+      std::cout << "Not enough unused spacepoints, quiting 3 point track." << std::endl;
+  } else if ( num_stations_hit > 6 ) {
+      std::cout << "Wrong number of stations with spacepoints, aborting 3 pt track." << std::endl;
+  }
+} // ~make_straight_3tracks(...)
 
-void PatternRecognition::make_straight_tracks(const int num_points, const int ignore_station,
+void PatternRecognition::make_straight_tracks(const int num_points,
+                                     const std::vector<int> ignore_stations,
                                      std::vector< std::vector<SciFiSpacePoint*> >& spnts_by_station,
                                      std::vector<SciFiStraightPRTrack>& trks) {
   // Set inner and outer stations
   int outer_station_num = -1, inner_station_num = -1;
-  set_end_stations(ignore_station, outer_station_num, inner_station_num);
+  set_end_stations(ignore_stations, outer_station_num, inner_station_num);
   std::cout << "outer station: " << outer_station_num << " inner station: ";
   std::cout << inner_station_num << std::endl;
-  std::cout << "ignoring station: " << ignore_station << std::endl;
 
   // Loop over spacepoints in outer station
   for ( int station_outer_sp = 0;
@@ -197,7 +275,7 @@ void PatternRecognition::make_straight_tracks(const int num_points, const int ig
 
           // Form a line between the outer and inner station spacepoints, and find the
           // spacepoints in the intermediate stations which best match this line
-          initial_line(spnts_by_station, ignore_station,
+          initial_line(spnts_by_station, ignore_stations,
                        outer_station_num, inner_station_num,
                        station_outer_sp, station_inner_sp, good_spnts);
 
@@ -255,9 +333,23 @@ void PatternRecognition::make_straight_tracks(const int num_points, const int ig
 
 void PatternRecognition::initial_line(
        const std::vector< std::vector<SciFiSpacePoint*> >& spnts_by_station,
-       const int ignore_station, const int outer_station_num, const int inner_station_num,
+       const std::vector<int> ignore_stations,
+       const int outer_station_num, const int inner_station_num,
        const int station_outer_sp, const int station_inner_sp,
        std::map<int, SciFiSpacePoint*>& good_spnts) {
+  
+  int ignore_station_1 = -1, ignore_station_2 = -1;
+  if ( ignore_stations.size() == 0 )
+    continue;
+  else if ( ignore_station.size() == 1 )
+    ignore_station_1 = ignore_stations[0];
+  else if ( ignore_station.size() == 2 ) {
+    ignore_station_1 = ignore_stations[0];
+    ignore_station_2 = ignore_stations[1];
+  } else {
+    std::cout << "Error: Invalid ignore station argument." << std::endl;
+    return;
+  }
 
   // Draw a straight line between spacepoints in outer most and inner most stations
   Hep3Vector pos_outer = spnts_by_station[outer_station_num][station_outer_sp]->get_position();
@@ -275,7 +367,7 @@ void PatternRecognition::initial_line(
   // Loop over intermediate stations and compare spacepoints with the line
   for ( int station_num = inner_station_num + 1;
         station_num < outer_station_num; ++station_num ) {
-    if (station_num != ignore_station) {
+    if (station_num != ignore_station_1 && station_num != ignore_station_2) {
       double delta_sq = 1000000;
       for ( int sp_no = 0;
             sp_no < static_cast<int>(spnts_by_station[station_num].size()); ++sp_no ) {
@@ -341,36 +433,40 @@ void PatternRecognition::linear_fit(std::map<int, SciFiSpacePoint*> &spnts,
   line_y.set_parameters(c_y, m_y, chisq_y);
 }
 
-void PatternRecognition::set_end_stations(const int ignore_station,
+void PatternRecognition::set_end_stations(const std::vector<int> ignore_stations,
                       int & outer_station_num, int & inner_station_num) {
-  switch ( ignore_station ) {
-    case 4:
-      outer_station_num = 3;
-      inner_station_num = 0;
-      break;
-    case 3:
-      outer_station_num = 4;
-      inner_station_num = 0;
-      break;
-    case 2:
-      outer_station_num = 4;
-      inner_station_num = 0;
-      break;
-    case 1:
-      outer_station_num = 4;
-      inner_station_num = 0;
-      break;
-    case 0:
-      outer_station_num = 4;
-      inner_station_num = 1;
-      break;
-    case -1: // Use if all stations are present
-      outer_station_num = 4;
-      inner_station_num = 0;
-      break;
-    default: // The error condition
-      outer_station_num = -1;
-      inner_station_num = -1;
+  
+  if ( static_cast<int>(ignore_stations.size()) == 0 ) { // 5pt track case
+    outer_station_num = 0;
+    inner_station_num = 4;
+  } else if ( static_cast<int>(ignore_stations.size()) == 1 ) { // 4pt track case
+      // Set outer station number
+      if ( ignore_stations[0] != 4 )
+        outer_station_num = 4;
+      else
+        outer_station_num = 3;
+      // Set inner station number
+      if ( ignore_stations[0] != 0 )
+        inner_station_num = 0;
+      else
+        inner_station_num = 1;
+  } else if ( static_cast<int>(ignore_stations.size()) == 2 ) { // 3pt track case
+      // Set outer station number
+      if ( ignore_stations[1] != 4 )
+        outer_station_num = 4;
+      else if ( ignore_stations[0] != 3 )
+        outer_station_num = 3;
+      else
+        outer_station_num = 2;
+      // Set inner station number
+      if ( ignore_stations[0] != 0 )
+        outer_station_num = 0;
+      else if ( ignore_stations[1] != 1 )
+        outer_station_num = 1;
+      else
+        outer_station_num = 2;
+  } else {
+    std::cout << "Error: Invalid ignore station argument." << std::endl;
   }
 }
 
