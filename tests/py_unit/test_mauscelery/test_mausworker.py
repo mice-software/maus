@@ -206,7 +206,6 @@ class MausBroadcastTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         command. Expect one of:  
         @verbatim
         {'status': 'ok'}
-        {'status': 'unchanged'}
         {u'error': [{u'error': CLASS, u'message': 
             MESSAGE},...], u'status': u'error'}
         @endverbatim
@@ -263,14 +262,21 @@ class MausBroadcastTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         self.assertEquals(process_birth, 
             self.__panel.consumer.pool.result.func,
             "An unexpected function was passed to be invoked")
-        self.assertEquals((config_id, transform, configuration), 
-            self.__panel.consumer.pool.result.arguments,
-            "Unexpected arguments were passed to be invoked")
+        (check_set, check_config_id, check_transform, check_config) = \
+            self.__panel.consumer.pool.result.arguments
+        self.assertTrue(isinstance(check_set, set),
+             "Expected a set to be passed")
+        self.assertEquals(check_config_id, config_id,
+            "Unexpected config_id was passed to be invoked")
+        self.assertEquals(check_transform, transform,
+            "Unexpected transform was passed to be invoked")
+        self.assertEquals(check_config, configuration,
+            "Unexpected configuration was passed to be invoked")
         # Check that another birth with the same ID is a no-op. Use
         # different transform name and configuration to be sure.
         result = birth(self.__panel, config_id, transform, configuration)
-        # Check the status and configuration are unchanged.
-        self.validate_status(result, "unchanged")
+        # Check the status and configuration.
+        self.validate_status(result, "ok")
         self.validate_configuration(configuration, transform, config_id)
 
     def test_birth_bad_config_json(self):
@@ -333,9 +339,9 @@ class MausBroadcastTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         self.assertEquals(process_death, 
             self.__panel.consumer.pool.result.func,
             "An unexpected function was passed to be invoked")
-        self.assertEquals((), 
-            self.__panel.consumer.pool.result.arguments,
-            "Unexpected arguments were passed to be invoked")
+        (check_set,) = self.__panel.consumer.pool.result.arguments
+        self.assertTrue(isinstance(check_set, set),
+             "Expected a set to be passed")
 
     def test_death_function_exception(self):
         """

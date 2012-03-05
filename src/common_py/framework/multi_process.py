@@ -201,9 +201,6 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903, R0902
             if node_status["status"] == "error":
                 print "  Node error: %s : %s" % (node_id, node_status)
                 updated_ok = False
-            if node_status["status"] == "unchanged":
-                print "  Node unchanged: %s" % node_id
-#                updated_ok = False
             else:
                 print "  Node configured: %s" % node_id
         if (not updated_ok):

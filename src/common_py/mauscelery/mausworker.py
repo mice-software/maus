@@ -98,10 +98,14 @@ def sub_process_broadcast(panel, func, arguments, errors):
     pool = panel.consumer.pool 
     pids = set(pool.info["processes"]) 
     pids_done = set() 
+    # Create new argument list with the current set of process IDs.
+    # PIDs are passed to sub-processes to ensure they only call
+    # their function once.
+    pids_arguments = (pids_done,) + arguments
     # Submit asynchronous jobs to the sub-processes until they've all
     # processed the message.
     while pids ^ pids_done: 
-        result = pool.apply_async(func, arguments)
+        result = pool.apply_async(func, pids_arguments)
         status = result.get()
         pids_done.add(status[0])
         status_detail = status[1]
@@ -115,9 +119,7 @@ def birth(panel, config_id, transform, configuration = "{}"): # pylint: disable=
     Create and birth a new transform in each sub-process. This is
     invoked by "broadcast" calls from clients and, in turn, invokes
     the process_birth method in sub-processes. Both the transform
-    and configuration are validated. The configuration update request
-    is only passed to sub-processes if the if the ID given by the
-    client is different from the ID of the current configuration.
+    and configuration are validated. 
     @param panel Celery panel object.
     @param config_id Configuration ID from client.
     @param transform Either a single name can be given - representing
@@ -135,12 +137,6 @@ def birth(panel, config_id, transform, configuration = "{}"): # pylint: disable=
     if logger.isEnabledFor(logging.INFO):
         logger.info("Birthing transform %s" % transform)
     doc = {}
-    # Only update if the configuration config_id is new.
-    if (MausConfiguration.config_id == config_id):
-        doc["status"] = "unchanged"
-        if logger.isEnabledFor(logging.INFO):
-            logger.info("Status: %s" % doc)
-        return doc
     # List of any errors from sub-processes.
     errors = []
     try:

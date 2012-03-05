@@ -140,7 +140,6 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
         command. Expect one of:
         @verbatim
         [{u'w1': {'status': 'ok'}},...]
-        [{u'w1': {'status': 'unchanged'}},...]
         [{u'w1': {u'error': [{u'error': CLASS, u'message': 
             MESSAGE},...], u'status': u'error'}},...]
         @endverbatim
@@ -199,10 +198,10 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
         self.validate_configuration(configuration, transform, config_id)
         # Check that another birth with the same ID is a no-op. Use
         # different transform name and configuration to be sure.
-        result = self.birth(config_id)
-        print "birth(unchanged): %s " % result
-        # Check the status and configuration are unchanged.
-        self.validate_status(result, "unchanged")
+        result = self.birth(config_id, configuration, transform)
+        print "birth(OK): %s " % result
+        # Check the status and configuration are OK.
+        self.validate_status(result)
         self.validate_configuration(configuration, transform, config_id)
 
     def test_birth_bad_config_json(self):
