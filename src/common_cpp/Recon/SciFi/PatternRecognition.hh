@@ -96,7 +96,7 @@ class PatternRecognition {
      *  @param trks - A vector of the output Pattern Recognition tracks
      */
     void make_straight_5tracks(std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
-                                          std::vector<SciFiStraightPRTrack> &trks);
+                               std::vector<SciFiStraightPRTrack> &trks);
 
     /** @brief Make straight Pattern Recognition tracks with 4 spacepoints
      *
@@ -146,7 +146,7 @@ class PatternRecognition {
      *  @param line_y - Output line in y - z plane
      *
      */
-    void linear_fit(std::map<int, SciFiSpacePoint*> &spnts,
+    void linear_fit(const std::map<int, SciFiSpacePoint*> &spnts,
                     SimpleLine &line_x, SimpleLine &line_y);
 
     /** @brief Determine which two stations the initial line should be drawn between

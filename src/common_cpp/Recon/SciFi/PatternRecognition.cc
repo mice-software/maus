@@ -403,7 +403,7 @@ void PatternRecognition::initial_line(
   } // ~Loop over intermediate stations
 } // ~initial_line(...)
 
-void PatternRecognition::linear_fit(std::map<int, SciFiSpacePoint*> &spnts,
+void PatternRecognition::linear_fit(const std::map<int, SciFiSpacePoint*> &spnts,
                                     SimpleLine &line_x, SimpleLine &line_y) {
 
   int num_points = spnts.size();
@@ -414,7 +414,8 @@ void PatternRecognition::linear_fit(std::map<int, SciFiSpacePoint*> &spnts,
   double z[num_points];
 
   int counter = 0;
-  for ( std::map<int, SciFiSpacePoint*>::iterator ii = spnts.begin(); ii != spnts.end(); ++ii ) {
+  for ( std::map<int, SciFiSpacePoint*>::const_iterator ii = spnts.begin();
+        ii != spnts.end(); ++ii ) {
     x[counter] = (*ii).second->get_position().x();
     y[counter] = (*ii).second->get_position().y();
     z[counter] = (*ii).second->get_position().z();
