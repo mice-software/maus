@@ -21,7 +21,9 @@
 #include "src/common_cpp/Simulation/MAUSEventAction.hh"
 #include "src/legacy/Interface/Squeal.hh"
 
-namespace {
+using MAUS::MAUSEventAction;
+using MAUS::MAUSGeant4Manager;
+
 TEST(MAUSEventActionTest, SetGetEventsTest) {
     MAUSEventAction* _eventAct
                            = MAUSGeant4Manager::GetInstance()->GetEventAction();
@@ -45,8 +47,9 @@ TEST(MAUSEventActionTest, BeginOfEventActionTest) {
     _g4->GetVirtualPlanes()->SetVirtualHits(Json::Value(virtual_hits));
     // can't set MICEDetectorConstruction/SDHits
     _g4->GetEventAction()->BeginOfEventAction(NULL);
-    EXPECT_EQ(_g4->GetTracking()->GetTracks().size(), 0);
-    EXPECT_EQ(_g4->GetVirtualPlanes()->GetVirtualHits().size(), 0);
+    EXPECT_EQ(_g4->GetTracking()->GetTracks().size(), (unsigned int) 0);
+    EXPECT_EQ(_g4->GetVirtualPlanes()->GetVirtualHits().size(),
+              (unsigned int) 0);
 }
 
 TEST(MAUSEventActionTest, EndOfEventActionTest) {
@@ -96,6 +99,5 @@ TEST(MAUSEventActionTest, EndOfEventActionTest) {
     events[1]["tracks"] = tracks;
     events[1]["virtual_hits"] = virtual_hits;
     EXPECT_EQ(_g4->GetEventAction()->GetEvents(), events);
-}
 }
 

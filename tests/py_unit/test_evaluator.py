@@ -18,7 +18,7 @@
 
 import unittest
 
-import xboa.Common
+import xboa.Common #pylint: disable=F0401
 
 import evaluator
 

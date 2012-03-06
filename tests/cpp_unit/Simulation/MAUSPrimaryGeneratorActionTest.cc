@@ -1,5 +1,3 @@
-// Copyright 2011 Chris Rogers
-//
 // This file is a part of MAUS
 //
 // MAUS is free software: you can redistribute it and/or modify
@@ -26,6 +24,8 @@
 
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 #include "src/common_cpp/Simulation/MAUSPrimaryGeneratorAction.hh"
+
+using namespace MAUS;
 
 namespace {
 class MAUSPrimaryGeneratorActionTest : public ::testing::Test {
@@ -96,9 +96,9 @@ TEST_F(MAUSPrimaryGeneratorActionTest, GeneratePrimariesTest) {
     for (size_t i=0; i<2; ++i)
         primary->GeneratePrimaries(event);
     double mu_mass = 105.658;
-    double p_in    = sqrt(200.*200.-mu_mass*mu_mass);
+    double p_in    = ::sqrt(200.*200.-mu_mass*mu_mass);
     double p_scale = 
-        sqrt(part_in.px*part_in.px+part_in.py*part_in.py+part_in.pz*part_in.pz);
+        ::sqrt(part_in.px*part_in.px+part_in.py*part_in.py+part_in.pz*part_in.pz);
     double p_norm  = p_in/p_scale;
     EXPECT_NEAR(part_in.x, event->GetPrimaryVertex()->GetX0(), 1e-3);
     EXPECT_NEAR(part_in.y, event->GetPrimaryVertex()->GetY0(), 1e-3);

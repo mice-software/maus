@@ -53,10 +53,10 @@ def main():
     #configreader class takes the arguments from the txt file so we can use them
     configuration = Configreader()
     ul_dir = configuration.geometry_upload_directory
-
+    
     #upload the geometry
     upload_geometry = Uploader \
-                       (ul_dir, configuration.geometry_upload_note)
+                       (ul_dir, str(configuration.geometry_upload_note))
     filelist_path = os.path.join(ul_dir, geometry.GDMLtoCDB.FILELIST)
     zfile = Packer(filelist_path)
     upload_file = zfile.zipfile(ul_dir)
@@ -66,6 +66,7 @@ def main():
     if configuration.geometry_upload_cleanup:
         os.remove(filelist_path)
         os.remove(upload_file)
+    print "Upload Complete"
 
 if __name__ == "__main__":
     main()

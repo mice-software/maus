@@ -39,8 +39,6 @@
 // of Logical and Solid Volumes;
 // possible bug in the destructor.
 
-G4int SciFiPlane::SciFi_numFibres = 0;
-
 // SciFiPlane - Specific parameterisation of the SciFi station
 // to be called by the generic MICE detector construction code
 SciFiPlane::SciFiPlane(MiceModule* mod,
@@ -95,7 +93,7 @@ SciFiPlane::SciFiPlane(MiceModule* mod,
   G4double tlen = 1.0 * mm;
 
   // the number of fibres to be simulated
-  SciFiPlane::SciFi_numFibres = (G4int)floor(2. * ar / (0.5 * fp));
+  _numFibres = (G4int)floor(2. * ar / (0.5 * fp));
 
   // Beginning of the fiber core definitions
   solidCore = new G4Tubs(coreName, 0.0, cd / 2., tlen, 0.0 * deg, 360.0 * deg);
@@ -106,7 +104,7 @@ SciFiPlane::SciFiPlane(MiceModule* mod,
                                                            0.0, fd, fp / fd);
 
   physiCore = new G4PVParameterised(coreName, logicCore, physiDoublet,
-                                    kUndefined, SciFi_numFibres, coreParam);
+                                    kUndefined, _numFibres, coreParam);
 }
 
 SciFiPlane::~SciFiPlane() {
