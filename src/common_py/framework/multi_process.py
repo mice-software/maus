@@ -26,6 +26,7 @@ import sys
 
 from celery.task.control import inspect
 from celery.task.control import broadcast
+from docstore.DocumentStore import DocumentStoreException
 from framework.utilities import DataflowUtilities
 from mauscelery.tasks import execute_transform
 import ErrorHandler
@@ -56,6 +57,8 @@ class MultiProcessDataflowExecutor:
         @param merger Merger task.
         @param outputer Output task.
         @param json_config_doc JSON configuration document.
+        @throws DocumentStoreException if there is a problem
+        connecting to the document store.
         """
         #  Parse the configuration JSON
         json_config_dictionary = json.loads(json_config_doc)
@@ -77,8 +80,13 @@ class MultiProcessDataflowExecutor:
         input, passed through the transform, saved into the spill 
         document store, then read from this, and passed through the 
         merge and output. 
-
         @param self Object reference.
+        @throws RabbitMQException if RabbitMQ cannot be contacted.
+        @throws NoCeleryWorkerException if no Celery workers.
+        @throws CeleryWorkersConfigException if Celery workers fail to
+        configure. 
+        @throws DocumentStoreException if there is a problem
+        using the document store.
         """
         self.input_transform_executor.execute()
         self.merge_output_executor.execute()
@@ -87,7 +95,6 @@ class MultiProcessDataflowExecutor:
     def get_dataflow_description():
         """
         Get dataflow description.
-
         @return description.
         """
         description = "Run MICE how it is run in the control room. This\n"  
@@ -125,6 +132,8 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903, R0902
         @param transformer Transformer task.
         @param json_config_doc JSON configuration document.
         @param doc_store Document store.
+        @throws DocumentStoreException if there is a problem
+        connecting to the document store.
         """
         self.inputer = inputer
         self.transformer = transformer
@@ -139,9 +148,12 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903, R0902
         # Parse the configuration JSON
         self.json_config_dictionary = json.loads(self.json_config_doc)
         if (doc_store == None):
-            # Create proxy for and connect to document store.
-            self.doc_store = DataflowUtilities.setup_doc_store(
-                self.json_config_dictionary)
+            try:
+                # Create proxy for and connect to document store.
+                self.doc_store = DataflowUtilities.setup_doc_store(
+                    self.json_config_dictionary)
+            except Exception as exc:
+                raise DocumentStoreException(exc)
         else:
             self.doc_store = doc_store
         # Get collection name.        
@@ -159,13 +171,17 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903, R0902
         """
         Check for active Celery nodes.
         @return number of active nodes.
-        @throws Exception if no active nodes.
+        @throws RabbitMQException if RabbitMQ cannot be contacted.
+        @throws NoCeleryWorkerException if no Celery workers.
         """
         print("Checking for active Celery nodes...")
         inspection = inspect()
-        active_nodes = inspection.active()
+        try:
+            active_nodes = inspection.active()
+        except socket.error as exc:
+            raise RabbitMQException(exc)
         if (active_nodes == None):
-            raise Exception("No active Celery nodes!")
+            raise NoCeleryWorkerException()
         num_nodes = len(active_nodes)
         print("Number of active Celery nodes: %d" % num_nodes)
         return num_nodes
@@ -175,6 +191,9 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903, R0902
         Configure Celery nodes with the current MAUS configuration
         and transformer names via a Celery broadcast.
         @throws Exception if one or more nodes fail to reconfigure.
+        @throws RabbitMQException if RabbitMQ cannot be contacted.
+        @throws CeleryWorkersConfigException if Celery  workers fail 
+        to configure.
         """
         print "Configuring Celery nodes and birthing transforms..."
         if hasattr(self.transformer, "get_worker_names"):
@@ -188,32 +207,39 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903, R0902
         # why we record the number of active nodes from the ping.
         print "Pushing new configuration..."
         results = []
-        results = broadcast("birth", arguments={
-            "transform": workers, 
-            "configuration": self.json_config_doc,
-            "config_id": self.client_config_id}, 
-            reply=True, timeout=1000, limit=num_nodes)
+        try:
+            results = broadcast("birth", arguments={
+                "transform": workers, 
+                "configuration": self.json_config_doc,
+                "config_id": self.client_config_id}, 
+                reply=True, timeout=1000, limit=num_nodes)
+        except socket.error as exc:
+            raise RabbitMQException(exc)
         # Validate that all nodes updated.
-        updated_ok = True
+        failed_nodes = []
         for node in results:
             node_id = node.keys()[0]
             node_status = node[node_id]
             if node_status["status"] == "error":
                 print "  Node error: %s : %s" % (node_id, node_status)
-                updated_ok = False
+                failed_nodes.append((node_id, node_status))
             else:
                 print "  Node configured: %s" % node_id
-        if (not updated_ok):
-            raise Exception("Celery nodes failed to configure!")
+        if (len(failed_nodes) > 0):
+            raise CeleryWorkerConfigException(failed_nodes)
         print "Celery nodes configured!"
 
     @staticmethod
     def death_celery_nodes():
         """
         Call death on transforms in Celery nodes.
+        @throws RabbitMQException if RabbitMQ cannot be contacted.
         """
         print "Requesting Celery nodes death transforms..."
-        results = broadcast("death", reply=True)
+        try:
+            results = broadcast("death", reply=True)
+        except socket.error as exc:
+            raise RabbitMQException(exc)
         for node in results:
             node_id = node.keys()[0]
             node_status = node[node_id]
@@ -228,6 +254,8 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903, R0902
         Wait for tasks currently being executed by Celery nodes to 
         complete.
         @param self Object reference.
+        @throws DocumentStoreException if there is a problem
+        using the document store.
         """
         # Check each submitted Celery task.
         num_tasks = len(self.celery_tasks)
@@ -242,8 +270,11 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903, R0902
                 print " Celery task %s SUCCESS " % (result.task_id)
                 print "   SAVING to collection %s (with ID %s)" \
                     % (self.collection, self.spill_process_count)
-                self.doc_store.put(self.collection,
-                    str(self.spill_process_count), spill)
+                try:
+                    self.doc_store.put(self.collection,
+                        str(self.spill_process_count), spill)
+                except Exception as exc:
+                    raise DocumentStoreException(exc)
                 self.print_counts()
             elif result.failed():
                 self.celery_tasks.pop(current)
@@ -259,9 +290,13 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903, R0902
         """
         Submit a spill to Celery for transforming.
         @param self Object reference.
+        @throws RabbitMQException if RabbitMQ cannot be contacted.
         """
-        result = \
-            execute_transform.delay(spill, self.client_config_id) # pylint:disable=E1101, C0301
+        try:
+            result = \
+                execute_transform.delay(spill, self.client_config_id) # pylint:disable=E1101, C0301
+        except socket.error as exc:
+            raise RabbitMQException(exc)
         print "Task ID: %s" % result.task_id
         # Save asynchronous result object for checking task status. 
         self.celery_tasks.append(result)
@@ -299,13 +334,22 @@ class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903, R0902
         to transform tasks accessed via a distributed task queue. 
 
         @param self Object reference.
-        @throws Exception if there are no active Celery nodes.
+        @throws RabbitMQException if RabbitMQ cannot be contacted.
+        @throws NoCeleryWorkerException if no Celery workers.
+        @throws CeleryWorkersConfigException if Celery workers fail to
+        configure. 
+        @throws DocumentStoreException if there is a problem
+        using the document store.
         """
         # Purge the document store.
         print("Purging data store")
-        if (self.doc_store.has_collection(self.collection)):
-            self.doc_store.delete_collection(self.collection)
-        self.doc_store.create_collection(self.collection)
+        try:
+            if (self.doc_store.has_collection(self.collection)):
+                self.doc_store.delete_collection(self.collection)
+            self.doc_store.create_collection(self.collection)
+        except Exception as exc:
+            raise DocumentStoreException(exc)
+
         # Do an initial check for active Celery nodes.
         self.ping_celery_nodes()
 
@@ -393,6 +437,8 @@ class MultiProcessMergeOutputDataflowExecutor: # pylint: disable=R0903, R0902
         @param collection_name Collection name in document store.
         @throws ValueError if collection_name is None and there is no
         "doc_collection_name" entry in json_config_doc.
+        @throws DocumentStoreException if there is a problem
+        connecting to the document store.
         """
         self.merger = merger
         self.outputer = outputer
@@ -400,9 +446,12 @@ class MultiProcessMergeOutputDataflowExecutor: # pylint: disable=R0903, R0902
         #  Parse the configuration JSON
         self.json_config_dictionary = json.loads(self.json_config_doc)
         if (doc_store == None):
-            # Create proxy for and connect to document store.
-            self.doc_store = DataflowUtilities.setup_doc_store(
-                self.json_config_dictionary)
+            try:
+                # Create proxy for and connect to document store.
+                self.doc_store = DataflowUtilities.setup_doc_store(
+                    self.json_config_dictionary)
+            except Exception as exc:
+                raise DocumentStoreException(exc)
         else:
             self.doc_store = doc_store
         # Get collection name
@@ -466,6 +515,8 @@ class MultiProcessMergeOutputDataflowExecutor: # pylint: disable=R0903, R0902
         these to merger then output tasks.
 
         @param self Object reference.
+        @throws DocumentStoreException if there is a problem
+        using the document store.
         """
         print("MULTI-PROCESS: Get spill, MERGE, OUTPUT, repeat")
 
@@ -475,8 +526,11 @@ class MultiProcessMergeOutputDataflowExecutor: # pylint: disable=R0903, R0902
         is_birthed = False
         last_time = datetime(1970, 01, 01)
         while True:
-            recent_docs = self.doc_store.get_since( \
-                self.collection, last_time)
+            try:
+                recent_docs = self.doc_store.get_since( \
+                    self.collection, last_time)
+            except Exception as exc:
+                raise DocumentStoreException(exc)
             for doc in recent_docs:
                 doc_id = doc["_id"]
                 doc_time = doc["date"]
@@ -519,3 +573,57 @@ class MultiProcessMergeOutputDataflowExecutor: # pylint: disable=R0903, R0902
             "http://micewww.pp.rl.ac.uk/projects/maus/wiki/MAUSCeleryConfiguration\n" # pylint:disable=C0301
         description += "This runs merge-output dataflows only!"
         return description
+
+class RabbitMQException(Exception):
+    """ Exception raised if RabbitMQ cannot be contacted. """
+
+    def __init__(self, exception):
+        """
+        Constructor. Overrides Exception.__init__.
+        @param self Object reference.
+        @param exception Wrapped exception
+        """
+        Exception.__init__(self)
+        self.exception = exception
+
+    def __str__(self, exception):
+        """
+        Return string representation. Overrides Exception.__str__.
+        @param self Object reference.
+        @return string.
+        """
+        return "RabbitMQ cannot be contacted. Problem is %s" \
+            % self.exception
+
+class NoCeleryWorkerException(Exception):
+    """ Exception raised if no Celery workers are available. """
+
+    def __str__(self):
+        """
+        Return string representation. Overrides Exception.__str__.
+        @param self Object reference.
+        @return string.
+        """
+        return "No Celery workers are available"
+
+class CeleryWorkerConfigException(Exception):
+    """ Exception raised if Celery workers fail to configure. """
+
+    def __init__(self, nodes = []):  # pylint:disable = W0102
+        """
+        Constructor. Overrides Exception.__init__.
+        @param self Object reference.
+        @param nodes List of tuples of form (node_id, node_status)
+        with failure information.
+        """
+        Exception.__init__(self)
+        self.nodes = nodes
+
+    def __str__(self):
+        """
+        Return string representation. Overrides Exception.__str__.
+        @param self Object reference.
+        @return string.
+        """
+        node_ids = [node[0] for node in self.nodes]
+        return "Celery worker(s) %s failed to configure" % node_ids
