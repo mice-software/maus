@@ -161,7 +161,7 @@ class CeleryUtilities: # pylint: disable=W0232
         Check for active Celery nodes.
         @return number of active nodes.
         @throws RabbitMQException if RabbitMQ cannot be contacted.
-        @throws NoCeleryWorkerException if no Celery workers.
+        @throws NoCeleryNodeException if no Celery nodes.
         """
         inspection = inspect()
         try:
@@ -169,14 +169,16 @@ class CeleryUtilities: # pylint: disable=W0232
         except socket.error as exc:
             raise RabbitMQException(exc)
         if (active_nodes == None):
-            raise NoCeleryWorkerException()
+            raise NoCeleryNodeException()
         return len(active_nodes)
 
     @staticmethod
-    def birth_celery(transform, config, config_id, num_nodes, timeout = 1000):
+    def birth_celery(transform, config, config_id, timeout = 1000):
         """
         Set new configuration and transforms in Celery nodes, and
-        birth the transforms. Each node is given up to 1000s to reply
+        birth the transforms. An initial ping is done to
+        identify the number of live nodes. 
+        Each node is given up to 1000s to reply
         but if they all reply then the method returns sooner.
         @param transform Either a single name can be given - representing
         a single transform - or a list of transforms - representing a
@@ -184,79 +186,58 @@ class CeleryUtilities: # pylint: disable=W0232
         then the current transform is deathed and rebirthed.  
         @param config Valid JSON configuration document
         @param config_id Configuration ID from client.
-        @param num_nodes Expected number of Celery nodes.
         @param timeout Time to wait for replies.
         @return results from Celery.
         @throws RabbitMQException if RabbitMQ cannot be contacted.
+        @throws CeleryNodeException if one or more Celery 
+        nodes fails to configure or birth.
         """
+        num_nodes = CeleryUtilities.ping_celery_nodes()
         try:
-            return broadcast("birth", arguments={
+            response = broadcast("birth", arguments={
                 "transform": transform, 
                 "configuration": config,
                 "config_id": config_id}, 
                 reply=True, timeout=timeout, limit=num_nodes)
         except socket.error as exc:
             raise RabbitMQException(exc)
-
-    @staticmethod
-    def birth_celery_nodes(transform, config, config_id):
-        """
-        Configure Celery nodes with the MAUS configuration and
-        transform names. An initial Celery ping is done to identify
-        the number of live nodes.
-        @param transform Either a single name can be given - representing
-        a single transform - or a list of transforms - representing a
-        MapPyGroup. Sub-lists are treated as nested MapPyGroups. If None
-        then the current transform is deathed and rebirthed.  
-        @param config Valid JSON configuration document
-        @param config_id Configuration ID from client.
-        @throws RabbitMQException if RabbitMQ cannot be contacted.
-        @throws CeleryWorkerException if one or more Celery 
-        workers fails to configure or birth.
-        """
-        num_nodes = CeleryUtilities.ping_celery_nodes()
-        results = CeleryUtilities.birth_celery(transform, config,
-            config_id, num_nodes, 1000)
-        # Validate that all nodes updated.
-        failed_nodes = []
-        for node in results:
-            node_id = node.keys()[0]
-            node_status = node[node_id]
-            if node_status["status"] == "error":
-                failed_nodes.append((node_id, node_status))
-        if (len(failed_nodes) > 0):
-            raise CeleryWorkerException(failed_nodes)
+        CeleryUtilities.validate_celery_response(response)
 
     @staticmethod
     def death_celery():
         """
         Call death on transforms in Celery nodes.
-        @return results from Celery.
         @throws RabbitMQException if RabbitMQ cannot be contacted.
+        @throws CeleryNodeException if one or more Celery 
+        nodes fails to death.
         """
         try:
-            return broadcast("death", reply=True)
+            response = broadcast("death", reply=True)
         except socket.error as exc:
             raise RabbitMQException(exc)
- 
+        CeleryUtilities.validate_celery_response(response)
+
     @staticmethod
-    def death_celery_nodes():
+    def validate_celery_response(response):
         """
-        Call death on transforms in Celery nodes.
-        @throws RabbitMQException if RabbitMQ cannot be contacted.
-        @throws CeleryWorkerException if one or more Celery 
-        workers fails to death.
+        Validate the status from a Celery confgure or death 
+        broadcast. Give a dictionary of node statuses, indexed
+        by node name, if any status has a "status" key 
+        with value "error" then an exception is thrown. All
+        the nodes are checked and any exception records all the
+        problematic nodes.
+        @param response Status from Celery broadcast.
+        @throws CeleryNodeException if one or more Celery 
+        nodes raised an error.
         """
-        results = CeleryUtilities.death_celery()        
-        # Validate that all nodes updated.
         failed_nodes = []
-        for node in results:
+        for node in response:
             node_id = node.keys()[0]
             node_status = node[node_id]
             if node_status["status"] == "error":
                 failed_nodes.append((node_id, node_status))
         if (len(failed_nodes) > 0):
-            raise CeleryWorkerException(failed_nodes)
+            raise CeleryNodeException(failed_nodes)
 
 class RabbitMQException(Exception):
     """ Exception raised if RabbitMQ cannot be contacted. """
@@ -270,7 +251,7 @@ class RabbitMQException(Exception):
         Exception.__init__(self)
         self.exception = exception
 
-    def __str__(self, exception):
+    def __str__(self):
         """
         Return string representation. Overrides Exception.__str__.
         @param self Object reference.
@@ -279,8 +260,8 @@ class RabbitMQException(Exception):
         return "RabbitMQ cannot be contacted. Problem is %s" \
             % self.exception
 
-class NoCeleryWorkerException(Exception):
-    """ Exception raised if no Celery workers are available. """
+class NoCeleryNodeException(Exception):
+    """ Exception raised if no Celery nodes are available. """
 
     def __str__(self):
         """
@@ -288,23 +269,23 @@ class NoCeleryWorkerException(Exception):
         @param self Object reference.
         @return string.
         """
-        return "No Celery workers are available"
+        return "No Celery nodes are available"
 
-class CeleryWorkerException(Exception):
+class CeleryNodeException(Exception):
     """ 
-    Exception raised if Celery workers fail to configure, birth
+    Exception raised if Celery nodes fail to configure, birth
     or death.
     """
 
-    def __init__(self, nodes = []):  # pylint:disable = W0102
+    def __init__(self, node_status = []):  # pylint:disable = W0102
         """
         Constructor. Overrides Exception.__init__.
         @param self Object reference.
-        @param nodes List of tuples of form (node_id, node_status)
+        @param node_status List of tuples of form (node_id, node_status)
         with failure information.
         """
         Exception.__init__(self)
-        self.nodes = nodes
+        self.node_status = node_status
 
     def __str__(self):
         """
@@ -312,5 +293,5 @@ class CeleryWorkerException(Exception):
         @param self Object reference.
         @return string.
         """
-        node_ids = [node[0] for node in self.nodes]
-        return "Celery worker(s) %s failed to configure" % node_ids
+        node_ids = [node[0] for node in self.node_status]
+        return "Celery node(s) %s failed to configure" % node_ids

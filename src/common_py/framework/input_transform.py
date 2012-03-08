@@ -35,7 +35,7 @@ class InputTransformExecutor: # pylint: disable=R0903, R0902
     """
     @class InputTransformExecutor
     Execute input-transform MAUS dataflows using a Celery
-    distributed task queue and worker nodes and a document store to
+    distributed task queue and nodes and a document store to
     cache spills after being output from transformers. 
 
     If a document store is not given to the constructor then this
@@ -166,7 +166,7 @@ class InputTransformExecutor: # pylint: disable=R0903, R0902
         print "---------- RUN %d ----------" % self.run_number
         print "Configuring Celery nodes and birthing transforms..."
         transform = WorkerUtilities.get_worker_names(self.transformer)
-        CeleryUtilities.birth_celery_nodes(transform,
+        CeleryUtilities.birth_celery(transform,
             self.config_doc, self.config_id)
         print "Celery nodes configured!"
 
@@ -181,26 +181,14 @@ class InputTransformExecutor: # pylint: disable=R0903, R0902
 
     def execute(self): # pylint: disable = R0914, R0912, R0915
         """
-        Execute the dataflow - delegate to
-        InputTransfomExecutor.execute and
-        MergeOutputExecutor.execute. 
-         @param self Object reference.
-        @throws RabbitMQException if RabbitMQ cannot be contacted.
-        @throws NoCeleryWorkerException if no Celery workers.
-        @throws CeleryWorkerException if Celery workers fail to
-        configure.  
-        @throws DocumentStoreException if there is a problem
-        using the document store.
-
         Set up MAUS input tasks and, on receipt of spills, submit
         to transform tasks accessed via a distributed task queue. 
-
         @param self Object reference.
         @throws WorkerBirthFailedException if inputer.birth returns False.
         @throws WorkerDeathFailedException if inputer death returns False.
         @throws RabbitMQException if RabbitMQ cannot be contacted.
-        @throws NoCeleryWorkerException if no Celery workers.
-        @throws CeleryWorkerException if Celery workers fail to
+        @throws NoCeleryNodeException if no Celery nodes.
+        @throws CeleryNodeException if Celery nodes fail to
         configure. 
         @throws DocumentStoreException if there is a problem
         using the document store.
@@ -250,7 +238,7 @@ class InputTransformExecutor: # pylint: disable=R0903, R0902
         print "--------------------"
         # Invoke death 
         print "Requesting Celery nodes death transforms..."
-        CeleryUtilities.death_celery_nodes()
+        CeleryUtilities.death_celery()
         print "Celery node transforms deathed!"
         print("TRANSFORM: transform tasks completed")
         print("INPUT: Death")

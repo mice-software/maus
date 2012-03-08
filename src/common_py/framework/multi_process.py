@@ -27,7 +27,7 @@ class MultiProcessExecutor:
     """
     @class MultiProcessExecutor
     Execute MAUS dataflows using a Celery distributed task queue and
-    worker nodes and a document store to cache spills after being
+    nodes and a document store to cache spills after being
     output from transformers, before they are consumed by mergers. 
 
     This class expects a document store class to be specified in
@@ -73,8 +73,8 @@ class MultiProcessExecutor:
         MergeOutputExecutor.execute. 
          @param self Object reference.
         @throws RabbitMQException if RabbitMQ cannot be contacted.
-        @throws NoCeleryWorkerException if no Celery workers.
-        @throws CeleryWorkerException if Celery workers fail to 
+        @throws NoCeleryNodeException if no Celery nodes.
+        @throws CeleryNodeException if Celery nodes fail to 
         configure, birth or death.
         @throws DocumentStoreException if there is a problem
         using the document store.
