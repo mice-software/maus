@@ -17,79 +17,70 @@ Multi-process dataflows module.
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-from datetime import datetime
-import os
 import json
-import signal
-import socket
-import sys
 
-from celery.task.control import inspect
-from celery.task.control import broadcast
-from docstore.DocumentStore import DocumentStoreException
-from framework.utilities import DataflowUtilities
-from mauscelery.tasks import execute_transform
-import ErrorHandler
+from framework.input_transform import InputTransformExecutor
+from framework.merge_output import MergeOutputExecutor
+from framework.utilities import DocumentStoreUtilities
 
-class MultiProcessDataflowExecutor:
+class MultiProcessExecutor:
     """
-    @class MultiProcessDataflowExecutor
+    @class MultiProcessExecutor
     Execute MAUS dataflows using a Celery distributed task queue and
     worker nodes and a document store to cache spills after being
-    output from transformers, before they are consumed by mergers.
+    output from transformers, before they are consumed by mergers. 
 
     This class expects a document store class to be specified in
     the JSON configuration e.g.
     @verbatim
-    doc_store_class = "InMemoryDocumentStore.InMemoryDocumentStore"
+    doc_store_class = "MongoDBDocumentStore.MongoDBDocumentStore"
     @endverbatim
-    The class used may have additional configuration requirements.
+    The document store class itself may have additional configuration
+    requirements.  
     """
 
-    def __init__(self, inputer, transformer, merger, outputer, json_config_doc): # pylint: disable=R0913,C0301
+    def __init__(self, inputer, transformer, merger, outputer, config_doc): # pylint: disable=R0913,C0301
         """
         Save references to arguments and parse the JSON configuration
-        document, then connect to the data store.
-       
+        document, then connect to the document store. 
         @param self Object reference.
         @param inputer Input task.
         @param transformer Transformer task.
         @param merger Merger task.
         @param outputer Output task.
-        @param json_config_doc JSON configuration document.
+        @param config_doc JSON configuration document.
+        @throws KeyError If any required configuration parameters are
+        missing.
+        @throws ValueError If any configuration values are invalid.
+        @throws TypeError If any dynamic class does not implement
+        a required interface.
         @throws DocumentStoreException if there is a problem
         connecting to the document store.
         """
-        #  Parse the configuration JSON
-        json_config_dictionary = json.loads(json_config_doc)
-        # Create proxy for and connect to document store.
-        self.doc_store = DataflowUtilities.setup_doc_store(
-            json_config_dictionary)
-        # Create objects to manage workflow execution.
-        self.input_transform_executor = \
-            MultiProcessInputTransformDataflowExecutor( \
-                inputer, transformer, json_config_doc, self.doc_store)
-        self.merge_output_executor = \
-            MultiProcessMergeOutputDataflowExecutor( \
-                merger, outputer, json_config_doc, self.doc_store,
-                self.input_transform_executor.collection)
-          
+        configuration = json.loads(config_doc)
+        self.doc_store = \
+            DocumentStoreUtilities.setup_doc_store(configuration)
+        self.input_transform = InputTransformExecutor( \
+           inputer, transformer, config_doc, self.doc_store)
+        self.merge_output = MergeOutputExecutor( \
+           merger, outputer, config_doc, self.doc_store,
+           self.input_transform.collection)
+  
     def execute(self):
         """
-        Execute the dataflow - spills are, in turn, read from the 
-        input, passed through the transform, saved into the spill 
-        document store, then read from this, and passed through the 
-        merge and output. 
-        @param self Object reference.
+        Execute the dataflow - delegate to
+        InputTransfomExecutor.execute and
+        MergeOutputExecutor.execute. 
+         @param self Object reference.
         @throws RabbitMQException if RabbitMQ cannot be contacted.
         @throws NoCeleryWorkerException if no Celery workers.
-        @throws CeleryWorkersConfigException if Celery workers fail to
-        configure. 
+        @throws CeleryWorkerException if Celery workers fail to 
+        configure, birth or death.
         @throws DocumentStoreException if there is a problem
         using the document store.
         """
-        self.input_transform_executor.execute()
-        self.merge_output_executor.execute()
+        self.input_transform.execute()
+        self.merge_output.execute()
 
     @staticmethod
     def get_dataflow_description():
@@ -97,533 +88,9 @@ class MultiProcessDataflowExecutor:
         Get dataflow description.
         @return description.
         """
-        description = "Run MICE how it is run in the control room. This\n"  
-        description += "requires MongoDB and Celery to be installed. See\n"
+        description = "Run MAUS in multi-processing mode. This\n"  
+        description += "requires Celery and MongoDB to be installed. See\n" 
         description += "the wiki links on how to do this at\n"
         description += \
-            "http://micewww.pp.rl.ac.uk/projects/maus/wiki/MAUSCeleryConfiguration\n" # pylint:disable=C0301
+            "http://micewww.pp.rl.ac.uk/projects/maus/wiki/MAUSDevs\n"
         return description
-
-class MultiProcessInputTransformDataflowExecutor: # pylint: disable=R0903, R0902
-    """
-    @class MultiProcessInputTransformDataflowExecutor
-    Execute the input-transform part of MAUS dataflows using a Celery
-    distributed task queue and worker nodes and a document store to
-    cache spills after being output from transformers.
-
-    If a document store is not given then a connection to one will be
-    created. In this case, the class expects a document store class to
-    be specified in the JSON configuration e.g.
-    @verbatim
-    doc_store_class = "MongoDBDocumentStore.MongoDBDocumentStore"
-    @endverbatim
-    The class used may have additional configuration requirements.
-
-    Note that if using an in-memory data store then this MUST be
-    provided as a constructor argument.    
-    """
-    def __init__(self, inputer, transformer, json_config_doc, doc_store = None): # pylint: disable=R0913,C0301
-        """
-        Constructor. Call super-class constructor then create
-        a document data store.
-        
-        @param self Object reference.
-        @param inputer Input task.
-        @param transformer Transformer task.
-        @param json_config_doc JSON configuration document.
-        @param doc_store Document store.
-        @throws DocumentStoreException if there is a problem
-        connecting to the document store.
-        """
-        self.inputer = inputer
-        self.transformer = transformer
-        self.json_config_doc = json_config_doc
-        self.client_config_id = "%s-%s" \
-            % (socket.gethostname(), os.getpid()) # Unique ID.
-        self.spill_input_count = 0 # Count of spills input
-        self.spill_process_count = 0 # Count of spills processed
-        self.spill_fail_count = 0 # Count of spills wher processing failed
-        self.run_number = None
-        self.celery_tasks = [] # Celery AsyncResult objects.
-        # Parse the configuration JSON
-        self.json_config_dictionary = json.loads(self.json_config_doc)
-        if (doc_store == None):
-            try:
-                # Create proxy for and connect to document store.
-                self.doc_store = DataflowUtilities.setup_doc_store(
-                    self.json_config_dictionary)
-            except Exception as exc:
-                raise DocumentStoreException(exc)
-        else:
-            self.doc_store = doc_store
-        # Get collection name.        
-        if (not self.json_config_dictionary.has_key("doc_collection_name") or
-            (self.json_config_dictionary["doc_collection_name"] == None) or
-            (self.json_config_dictionary["doc_collection_name"] == "") or
-            (self.json_config_dictionary["doc_collection_name"] == "auto")):
-            self.collection = self.client_config_id
-        else:
-            self.collection = \
-                self.json_config_dictionary["doc_collection_name"]
-
-    @staticmethod
-    def ping_celery_nodes():
-        """
-        Check for active Celery nodes.
-        @return number of active nodes.
-        @throws RabbitMQException if RabbitMQ cannot be contacted.
-        @throws NoCeleryWorkerException if no Celery workers.
-        """
-        print("Checking for active Celery nodes...")
-        inspection = inspect()
-        try:
-            active_nodes = inspection.active()
-        except socket.error as exc:
-            raise RabbitMQException(exc)
-        if (active_nodes == None):
-            raise NoCeleryWorkerException()
-        num_nodes = len(active_nodes)
-        print("Number of active Celery nodes: %d" % num_nodes)
-        return num_nodes
-
-    def configure_celery_nodes(self):
-        """
-        Configure Celery nodes with the current MAUS configuration
-        and transformer names via a Celery broadcast.
-        @throws Exception if one or more nodes fail to reconfigure.
-        @throws RabbitMQException if RabbitMQ cannot be contacted.
-        @throws CeleryWorkersConfigException if Celery  workers fail 
-        to configure.
-        """
-        print "Configuring Celery nodes and birthing transforms..."
-        if hasattr(self.transformer, "get_worker_names"):
-            workers = self.transformer.get_worker_names()
-        else:
-            workers = self.transformer.__class__.__name__
-        # First ping the workers to see if there's at least one.
-        num_nodes = self.ping_celery_nodes()
-        # Send a birth request. Give each node up to 1000s to reply,
-        # but if they all reply before that just continue. This is
-        # why we record the number of active nodes from the ping.
-        print "Pushing new configuration..."
-        results = []
-        try:
-            results = broadcast("birth", arguments={
-                "transform": workers, 
-                "configuration": self.json_config_doc,
-                "config_id": self.client_config_id}, 
-                reply=True, timeout=1000, limit=num_nodes)
-        except socket.error as exc:
-            raise RabbitMQException(exc)
-        # Validate that all nodes updated.
-        failed_nodes = []
-        for node in results:
-            node_id = node.keys()[0]
-            node_status = node[node_id]
-            if node_status["status"] == "error":
-                print "  Node error: %s : %s" % (node_id, node_status)
-                failed_nodes.append((node_id, node_status))
-            else:
-                print "  Node configured: %s" % node_id
-        if (len(failed_nodes) > 0):
-            raise CeleryWorkerConfigException(failed_nodes)
-        print "Celery nodes configured!"
-
-    @staticmethod
-    def death_celery_nodes():
-        """
-        Call death on transforms in Celery nodes.
-        @throws RabbitMQException if RabbitMQ cannot be contacted.
-        """
-        print "Requesting Celery nodes death transforms..."
-        try:
-            results = broadcast("death", reply=True)
-        except socket.error as exc:
-            raise RabbitMQException(exc)
-        for node in results:
-            node_id = node.keys()[0]
-            node_status = node[node_id]
-            if node_status.has_key("error"):
-                print "  Node error: %s : %s" % (node_id, node_status)
-            else:
-                print "  Node transforms deathed: %s" % node_id
-        print "Celery node transforms deathed!"
-
-    def poll_celery_tasks(self):
-        """
-        Wait for tasks currently being executed by Celery nodes to 
-        complete.
-        @param self Object reference.
-        @throws DocumentStoreException if there is a problem
-        using the document store.
-        """
-        # Check each submitted Celery task.
-        num_tasks = len(self.celery_tasks)
-        current = 0
-        while (current < num_tasks):
-            result = self.celery_tasks[current]
-            if result.successful():
-                self.celery_tasks.pop(current)
-                num_tasks -= 1
-                spill = result.result
-                self.spill_process_count += 1
-                print " Celery task %s SUCCESS " % (result.task_id)
-                print "   SAVING to collection %s (with ID %s)" \
-                    % (self.collection, self.spill_process_count)
-                try:
-                    self.doc_store.put(self.collection,
-                        str(self.spill_process_count), spill)
-                except Exception as exc:
-                    raise DocumentStoreException(exc)
-                self.print_counts()
-            elif result.failed():
-                self.celery_tasks.pop(current)
-                self.spill_fail_count += 1
-                num_tasks -= 1
-                print " Celery task %s FAILED : %s : %s" \
-                    % (result.task_id, result.result, result.traceback)
-                self.print_counts()
-            else:
-                current += 1
-
-    def submit_spill_to_celery(self, spill):
-        """
-        Submit a spill to Celery for transforming.
-        @param self Object reference.
-        @throws RabbitMQException if RabbitMQ cannot be contacted.
-        """
-        try:
-            result = \
-                execute_transform.delay(spill, self.client_config_id) # pylint:disable=E1101, C0301
-        except socket.error as exc:
-            raise RabbitMQException(exc)
-        print "Task ID: %s" % result.task_id
-        # Save asynchronous result object for checking task status. 
-        self.celery_tasks.append(result)
-
-    def start_new_run(self, run_number):
-        """
-        Prepare for a new run by waiting for current Celery
-        tasks to complete, updating the local run number then
-        reconfiguring the Celery nodes.
-        @param self Object reference.
-        @param run_number New run number.
-        """
-        print "New run detected...waiting for current processing to complete"
-        # Wait for current tasks, from previous run, to complete.
-        # This also ensures their timestamps < those of next run.
-        while (len(self.celery_tasks) != 0):
-            self.poll_celery_tasks()
-        self.run_number = run_number
-        # Configure Celery nodes.
-        print "---------- RUN %d ----------" % self.run_number
-        self.configure_celery_nodes()
-
-    def print_counts(self):
-        """
-        Print spill counts to date.
-        @param self Object reference.
-        """
-        print "Spills input: %d Processed: %d Failed %d" % \
-            (self.spill_input_count, self.spill_process_count,
-             self.spill_fail_count)
-
-    def execute(self): # pylint: disable = R0914, R0912, R0915
-        """
-        Set up MAUS input tasks and, on receipt of spills, submit
-        to transform tasks accessed via a distributed task queue. 
-
-        @param self Object reference.
-        @throws RabbitMQException if RabbitMQ cannot be contacted.
-        @throws NoCeleryWorkerException if no Celery workers.
-        @throws CeleryWorkersConfigException if Celery workers fail to
-        configure. 
-        @throws DocumentStoreException if there is a problem
-        using the document store.
-        """
-        # Purge the document store.
-        print("Purging data store")
-        try:
-            if (self.doc_store.has_collection(self.collection)):
-                self.doc_store.delete_collection(self.collection)
-            self.doc_store.create_collection(self.collection)
-        except Exception as exc:
-            raise DocumentStoreException(exc)
-
-        # Do an initial check for active Celery nodes.
-        self.ping_celery_nodes()
-
-        print("INPUT: Birth")
-        assert(self.inputer.birth(self.json_config_doc) == True)
-        emitter = self.inputer.emitter()
-        map_buffer = DataflowUtilities.buffer_input(emitter, 1)
-        self.spill_input_count = 0
-        self.spill_process_count = 0
-        self.spill_fail_count = 0
-        self.celery_tasks = []
-        while (len(map_buffer) != 0) or (len(self.celery_tasks) != 0):
-            for spill in map_buffer:
-                print("INPUT: read next spill")
-                # Check run number.
-                spill_doc = json.loads(spill)
-                spill_run_number = DataflowUtilities.get_run_number(spill_doc) 
-                self.spill_input_count += 1
-                self.print_counts()
-                if (spill_run_number == None):
-                    # There was no run_num in spill so add a 0 (pure MC run).
-                    spill_run_number = 0
-                    spill_doc["run_num"] = spill_run_number
-                    spill = json.dumps(spill_doc)
-                if (spill_run_number != self.run_number):
-                    if (not DataflowUtilities.is_start_of_run(spill_doc)):
-                        print "  Missing a start_of_run spill!"
-                    self.start_new_run(spill_run_number)
-                    print("TRANSFORM: processing spills")
-                self.submit_spill_to_celery(spill)
-            map_buffer = DataflowUtilities.buffer_input(emitter, 1)
-            if (len(map_buffer) != 0):
-                print("%d spills left in buffer" % (len(map_buffer)))
-            # Go through current transform tasks and see if any's completed. 
-            self.poll_celery_tasks()
-        print "--------------------"
-        # Invoke death 
-        self.death_celery_nodes()
-        print("TRANSFORM: transform tasks completed")
-        print "--------------------"
-
-    @staticmethod
-    def get_dataflow_description():
-        """
-        Get dataflow description.
-
-        @return description.
-        """
-        description = "Run MICE how it is run in the control room. This\n"  
-        description += "requires MongoDB and Celery to be installed. See\n"
-        description += "the wiki links on how to do this at\n"
-        description += \
-            "http://micewww.pp.rl.ac.uk/projects/maus/wiki/MAUSCeleryConfiguration\n" # pylint:disable=C0301
-        description += "This runs input-transform dataflows only!"
-        return description
-
-class MultiProcessMergeOutputDataflowExecutor: # pylint: disable=R0903, R0902
-    """
-    @class MultiProcessMergeOutputDataflowExecutor
-    Execute the merge-output part of MAUS dataflows reading spills
-    from a document store where they have been previously cached. 
-
-    If a document store is not given then a connection to one will be
-    created. In this case, the class expects a document store class to
-    be specified in the JSON configuration e.g.
-    @verbatim
-    doc_store_class = "MongoDBDocumentStore.MongoDBDocumentStore"
-    @endverbatim
-    The class used may have additional configuration requirements.
-
-    Note that if using an in-memory data store then this MUST be
-    provided as a constructor argument.
-    """
-
-    def __init__(self, merger, outputer, json_config_doc, doc_store = None, collection_name = None): # pylint: disable=R0913,C0301
-        """
-        Constructor. Call super-class constructor then create
-        a document data store.
-        
-        @param self Object reference.
-        @param merger Merger task.
-        @param outputer Output task.
-        @param json_config_doc JSON configuration document.
-        @param doc_store Document store.
-        @param collection_name Collection name in document store.
-        @throws ValueError if collection_name is None and there is no
-        "doc_collection_name" entry in json_config_doc.
-        @throws DocumentStoreException if there is a problem
-        connecting to the document store.
-        """
-        self.merger = merger
-        self.outputer = outputer
-        self.json_config_doc = json_config_doc
-        #  Parse the configuration JSON
-        self.json_config_dictionary = json.loads(self.json_config_doc)
-        if (doc_store == None):
-            try:
-                # Create proxy for and connect to document store.
-                self.doc_store = DataflowUtilities.setup_doc_store(
-                    self.json_config_dictionary)
-            except Exception as exc:
-                raise DocumentStoreException(exc)
-        else:
-            self.doc_store = doc_store
-        # Get collection name
-        if (collection_name == None):
-            if ((not \
-                 self.json_config_dictionary.has_key("doc_collection_name")) or
-                (self.json_config_dictionary["doc_collection_name"] == None) or
-                (self.json_config_dictionary["doc_collection_name"] == "")):
-                raise ValueError("collection is not specified")
-            else:
-                self.collection = \
-                    self.json_config_dictionary["doc_collection_name"]
-        else:   
-            self.collection = collection_name
-        self.run_number = None
-        self.spill_count = 0 # Count of spills handled.
-
-    def end_run(self):
-        """
-        End a run by sending an END_OF_RUN spill through the merger
-        then death the merger and outputer.
-        @param self Object reference.
-        """
-        print("CLOSING PIPELINE: Sending END_OF_RUN to merger")
-        end_of_run_spill = json.dumps({"END_OF_RUN":"END_OF_RUN"})
-        spill = self.merger.process(end_of_run_spill)
-        self.outputer.save(spill)
-        print("MERGE: Shutting down merger")
-        assert(self.merger.death() == True)
-        print("OUTPUT: Shutting down outputer")
-        assert(self.outputer.death() == True)
-
-    def start_new_run(self, run_number):
-        """
-        Prepare for a new run by updating the local run number then
-        birthing the merger and outputer.
-        @param self Object reference.
-        @param run_number New run number.
-        """
-        self.run_number = run_number
-        print "---------- RUN %d ----------" % self.run_number
-        print("MERGE: Setting up merger")
-        assert(self.merger.birth(self.json_config_doc) == True)
-        print("OUTPUT: Setting up outputer")
-        assert(self.outputer.birth(self.json_config_doc) == True)
-
-    def handle_ctrl_c(self, signum, frame): # pylint: disable=W0613
-        """ 
-        CTRL-C handler to break out of the document store monitoring
-        loop. Invokes end_run then sys.exit(0).
-        @param self Object reference.
-        @param signum Signal number.
-        @param frame. Frame.
-        """
-        self.end_run()
-        sys.exit(0)
-
-    def execute(self):
-        """
-        Pull transformed spills from a data store and submit
-        these to merger then output tasks.
-
-        @param self Object reference.
-        @throws DocumentStoreException if there is a problem
-        using the document store.
-        """
-        print("MULTI-PROCESS: Get spill, MERGE, OUTPUT, repeat")
-
-        # Register CTRL-C handler.
-        signal.signal(signal.SIGINT, self.handle_ctrl_c) 
-
-        is_birthed = False
-        last_time = datetime(1970, 01, 01)
-        while True:
-            try:
-                recent_docs = self.doc_store.get_since( \
-                    self.collection, last_time)
-            except Exception as exc:
-                raise DocumentStoreException(exc)
-            for doc in recent_docs:
-                doc_id = doc["_id"]
-                doc_time = doc["date"]
-                spill = doc["doc"]
-                print "Retrieved document %s (dated %s)" % \
-                    (doc_id, doc_time)
-                if (doc_time > last_time):
-                    last_time = doc_time
-                # Check run number.
-                spill_doc = json.loads(spill)
-                spill_run_number = DataflowUtilities.get_run_number(spill_doc) 
-                if (spill_run_number != self.run_number):
-                    print "New run detected..."
-                    if (is_birthed):
-                        print "Waiting for current processing to complete"
-                        self.end_run()
-                    self.start_new_run(spill_run_number)
-                    is_birthed = True
-                print "Executing Merge->Output for spill %s\n" % doc_id,
-                self.spill_count += 1
-                print "Spills handled: %d" % self.spill_count
-                try:
-                    spill = self.merger.process(spill)
-                    self.outputer.save(spill)
-                except: # pylint:disable = W0702
-                    ErrorHandler.HandleException({}, self)
-        self.end_run()
-
-    @staticmethod
-    def get_dataflow_description():
-        """
-        Get dataflow description.
-
-        @return description.
-        """
-        description = "Run MICE how it is run in the control room. This\n"  
-        description += "requires MongoDB to be installed. See\n"
-        description += "the wiki links on how to do this at\n"
-        description += \
-            "http://micewww.pp.rl.ac.uk/projects/maus/wiki/MAUSCeleryConfiguration\n" # pylint:disable=C0301
-        description += "This runs merge-output dataflows only!"
-        return description
-
-class RabbitMQException(Exception):
-    """ Exception raised if RabbitMQ cannot be contacted. """
-
-    def __init__(self, exception):
-        """
-        Constructor. Overrides Exception.__init__.
-        @param self Object reference.
-        @param exception Wrapped exception
-        """
-        Exception.__init__(self)
-        self.exception = exception
-
-    def __str__(self, exception):
-        """
-        Return string representation. Overrides Exception.__str__.
-        @param self Object reference.
-        @return string.
-        """
-        return "RabbitMQ cannot be contacted. Problem is %s" \
-            % self.exception
-
-class NoCeleryWorkerException(Exception):
-    """ Exception raised if no Celery workers are available. """
-
-    def __str__(self):
-        """
-        Return string representation. Overrides Exception.__str__.
-        @param self Object reference.
-        @return string.
-        """
-        return "No Celery workers are available"
-
-class CeleryWorkerConfigException(Exception):
-    """ Exception raised if Celery workers fail to configure. """
-
-    def __init__(self, nodes = []):  # pylint:disable = W0102
-        """
-        Constructor. Overrides Exception.__init__.
-        @param self Object reference.
-        @param nodes List of tuples of form (node_id, node_status)
-        with failure information.
-        """
-        Exception.__init__(self)
-        self.nodes = nodes
-
-    def __str__(self):
-        """
-        Return string representation. Overrides Exception.__str__.
-        @param self Object reference.
-        @return string.
-        """
-        node_ids = [node[0] for node in self.nodes]
-        return "Celery worker(s) %s failed to configure" % node_ids

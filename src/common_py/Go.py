@@ -23,10 +23,10 @@ import sys
 
 # MAUS
 from Configuration import Configuration
+from framework.input_transform import InputTransformExecutor
+from framework.merge_output import MergeOutputExecutor
+from framework.multi_process import MultiProcessExecutor
 from framework.single_thread import PipelineSingleThreadDataflowExecutor
-from framework.multi_process import MultiProcessDataflowExecutor
-from framework.multi_process import MultiProcessInputTransformDataflowExecutor
-from framework.multi_process import MultiProcessMergeOutputDataflowExecutor
 
 class Go: # pylint: disable=R0921, R0903
     """
@@ -103,13 +103,13 @@ class Go: # pylint: disable=R0921, R0903
             executor = PipelineSingleThreadDataflowExecutor(
                 inputer, transformer, merger, outputer, json_config_doc)
         elif type_of_dataflow == 'multi_process':
-            executor = MultiProcessDataflowExecutor(
+            executor = MultiProcessExecutor(
                 inputer, transformer, merger, outputer, json_config_doc)
         elif type_of_dataflow == 'multi_process_input_transform':
-            executor = MultiProcessInputTransformDataflowExecutor( \
+            executor = InputTransformExecutor( \
                 inputer, transformer, json_config_doc)
         elif type_of_dataflow == 'multi_process_merge_output':
-            executor = MultiProcessMergeOutputDataflowExecutor( \
+            executor = MergeOutputExecutor( \
                 merger, outputer, json_config_doc)
         elif type_of_dataflow == 'many_local_threads':
             raise NotImplementedError()
@@ -156,9 +156,9 @@ class Go: # pylint: disable=R0921, R0903
         possible_types_of_dataflow['pipeline_single_thread'] = \
             PipelineSingleThreadDataflowExecutor.get_dataflow_description()
         possible_types_of_dataflow['multi_process'] = \
-            MultiProcessDataflowExecutor.get_dataflow_description() 
+            MultiProcessExecutor.get_dataflow_description() 
         possible_types_of_dataflow['multi_process_input_transform'] = \
-            MultiProcessInputTransformDataflowExecutor.get_dataflow_description()  # pylint: disable=C0301
+            InputTransformExecutor.get_dataflow_description()
         possible_types_of_dataflow['multi_process_merge_output'] = \
-            MultiProcessMergeOutputDataflowExecutor.get_dataflow_description() 
+            MergeOutputExecutor.get_dataflow_description() 
         return possible_types_of_dataflow
