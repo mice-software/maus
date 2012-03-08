@@ -86,15 +86,11 @@ TEST_F(MAUSPrimaryGeneratorActionTest, GeneratePrimariesTest) {
     part_in.pid = 0; //non-physical?
     primary->Push(part_in);
 
-    part_in.seed = -1; //non-physical
-    primary->Push(part_in);
-
     part_in.seed = std::numeric_limits<unsigned int>::max()+1; 
     primary->Push(part_in);
 
     G4Event* event = new G4Event();
     for (size_t i=0; i<2; ++i) {
-        std::cerr << "PUSH " << i << std::endl;
         primary->GeneratePrimaries(event);
     }
     double mu_mass = 105.658;
@@ -114,8 +110,7 @@ TEST_F(MAUSPrimaryGeneratorActionTest, GeneratePrimariesTest) {
     EXPECT_EQ(27, CLHEP::HepRandom::getTheSeed());
     EXPECT_EQ(-13,  event->GetPrimaryVertex()->GetPrimary()->GetPDGcode());
 
-    for (size_t i=0; i<5; ++i) {
-        std::cerr << "PUSH EXCEPT " << i << std::endl;
+    for (size_t i=0; i<4; ++i) {
         EXPECT_THROW(primary->GeneratePrimaries(event), Squeal);
     }
     delete event;
@@ -166,7 +161,7 @@ TEST_F(MAUSPrimaryGeneratorActionTest, PGParticleFromVirtualHitTest) {
     EXPECT_NEAR(part_in.time, 4., 1e-6);
     EXPECT_NEAR(part_in.energy, 200., 1e-6);
     EXPECT_EQ(part_in.pid, -13);
-    EXPECT_EQ(part_in.seed, 0);
+    EXPECT_EQ(part_in.seed, size_t(0));
 
 }
 

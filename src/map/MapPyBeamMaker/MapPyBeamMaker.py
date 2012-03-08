@@ -212,11 +212,13 @@ class MapPyBeamMaker: #pylint: disable=R0902
 
         @returns a string with the json spill
         """
+        raise NotImplementedError("SOME WEIRD BUG HERE")
         spill = {}
         try:
             spill = json.loads(json_spill_doc)
             spill = self.__process_check_spill(spill)
             new_particles = self.__process_gen_empty(spill)
+            print "NEW PARTICLES", new_particles
             for index, particle in enumerate(new_particles):
                 # if beam IO, then read hits from file and fill spill
                 if (self.use_beam_file):

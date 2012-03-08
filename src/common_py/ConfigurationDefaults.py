@@ -279,3 +279,6 @@ mongodb_host = "localhost" # Default MongoDB host name. Only needed if using Mon
 mongodb_port = 27017 # Default MongoDB port. Only needed if using MongoDBDocumentStore.
 mongodb_database_name = "mausdb" # Default MongoDB database name. Only needed if using MongoDBDocumentStore.
 mongodb_collection_name = "spills" # Default MongoDB collection name. Only needed if using MongoDBDocumentStore.
+
+ckov_position_threshold = 40
+
