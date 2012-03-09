@@ -5,9 +5,9 @@ beam = {
     "random_seed":0,
     "definitions":[{
        "reference":{
-            "position":{"x":0.0, "y":0.0, "z":0.0},
+            "position":{"x":0.0, "y":0.0, "z":200.0},
             "momentum":{"x":0.0, "y":0.0, "z":1.0},
-            "particle_id":-13, "energy":226.0, "time":0.0, "random_seed":0
+            "particle_id":2212, "energy":5000.0, "time":20.0, "random_seed":0
        },
        "random_seed_algorithm":"incrementing_random",
        "n_particles_per_spill":1,
@@ -20,9 +20,9 @@ beam = {
        "coupling":{"coupling_mode":"none"}
     },{
        "reference":{
-            "position":{"x":0.0, "y":0.0, "z":101.0},
+            "position":{"x":-10.0, "y":0.0, "z":0.0},
             "momentum":{"x":0.0, "y":0.0, "z":1.0},
-            "particle_id":-13, "energy":226.0, "time":0.0, "random_seed":0
+            "particle_id":2212, "energy":5000.0, "time":0.0, "random_seed":0
        },
        "random_seed_algorithm":"incrementing_random",
        "n_particles_per_spill":1,

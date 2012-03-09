@@ -13,7 +13,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-
 """
 BeamMaker generates beams for input into MAUS
 """
@@ -218,7 +217,6 @@ class MapPyBeamMaker: #pylint: disable=R0902
             spill = json.loads(json_spill_doc)
             spill = self.__process_check_spill(spill)
             new_particles = self.__process_gen_empty(spill)
-            print "NEW PARTICLES", new_particles
             for index, particle in enumerate(new_particles):
                 # if beam IO, then read hits from file and fill spill
                 if (self.use_beam_file):

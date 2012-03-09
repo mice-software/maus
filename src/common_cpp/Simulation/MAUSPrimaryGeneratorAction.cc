@@ -98,7 +98,7 @@ void MAUSPrimaryGeneratorAction::PGParticle::ReadJson(Json::Value particle) {
   pid = JsonWrapper::GetProperty
                        (particle, "particle_id", JsonWrapper::intValue).asInt();
   seed = JsonWrapper::GetProperty
-                      (particle, "random_seed", JsonWrapper::intValue).asUInt();
+                     (particle, "random_seed", JsonWrapper::intValue).asUInt();
   x = JsonWrapper::GetProperty(pos, "x", JsonWrapper::realValue).asDouble();
   y = JsonWrapper::GetProperty(pos, "y", JsonWrapper::realValue).asDouble();
   z = JsonWrapper::GetProperty(pos, "z", JsonWrapper::realValue).asDouble();
@@ -126,7 +126,7 @@ Json::Value MAUSPrimaryGeneratorAction::PGParticle::WriteJson() {
   particle["position"] = pos;
   particle["momentum"] = mom;
   particle["particle_id"] = Json::Value(pid);
-  particle["random_seed"] = Json::Value(Json::UInt(seed));
+  particle["random_seed"] = Json::Value(Json::Int(seed));
 
   particle["energy"] = Json::Value(energy);
   particle["time"] = Json::Value(time);

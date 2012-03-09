@@ -54,7 +54,7 @@ TEST(MAUSGeant4ManagerTest, GetReferenceParticleTest) {
     (*conf)["simulation_reference_particle"]["momentum"] = pos;
     (*conf)["simulation_reference_particle"]["energy"] = -1.;
     (*conf)["simulation_reference_particle"]["time"] = -2.;
-    (*conf)["simulation_reference_particle"]["random_seed"] = -2;
+    (*conf)["simulation_reference_particle"]["random_seed"] = Json::Int(2);
     EXPECT_EQ(MAUSGeant4Manager::GetInstance()->GetReferenceParticle().pid, 111);
 }
 
@@ -120,7 +120,7 @@ TEST(MAUSGeant4ManagerTest, RunParticlePGTest) {
 }
 
 TEST(MAUSGeant4ManagerTest, RunParticleJsonTest) {
-    std::string pg_string = 
+    std::string pg_string =
       "{\"primary\":{\"position\":{\"x\":1.0, \"y\":2.0, \"z\":3.0}, \"momentum\":{\"x\":0.0, \"y\":0.0, \"z\":1.0}, \"particle_id\":-13, \"energy\":226.0, \"time\":0.0, \"random_seed\":10}}";
     Json::Value pg = JsonWrapper::StringToJson(pg_string);
     MAUSGeant4Manager::GetInstance()->GetStepping()->SetWillKeepSteps(false);

@@ -8,9 +8,9 @@ Configuration VirtualPlanesTest
     PropertyString Volume None
     PropertyString SensitiveDetector Virtual
     PropertyHep3Vector Position 0.0 0.0 100. mm
-    PropertyDouble RadialExtent 0.0 0.0 100. mm
+    PropertyDouble RadialExtent 100. mm
     PropertyDouble GlobalCoordinates false
-    PropertyString AllowBackwards true
+    PropertyString AllowBackwards true // BUG THIS DOESNT WORK
   }
 }
 
