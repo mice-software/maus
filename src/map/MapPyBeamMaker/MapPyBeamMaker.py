@@ -211,7 +211,6 @@ class MapPyBeamMaker: #pylint: disable=R0902
 
         @returns a string with the json spill
         """
-        raise NotImplementedError("SOME WEIRD BUG HERE")
         spill = {}
         try:
             spill = json.loads(json_spill_doc)

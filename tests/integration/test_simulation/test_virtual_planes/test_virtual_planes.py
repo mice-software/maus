@@ -29,13 +29,18 @@ def run_simulation(geometry, configuration):
       "tests/integration/test_simulation/test_virtual_planes/",
       geometry
     )
+    config_file = os.path.join(mrd,
+      "tests/integration/test_simulation/test_virtual_planes/",
+      configuration
+    ) 
     output_json = os.path.join(mrd, "tmp/test_virtual_planes_"+name+".json")
 
     simulation = os.path.join(mrd, "bin/simulate_mice.py")
     call_options = [simulation,
-                    "-configuration_file", configuration,
+                    "-configuration_file", config_file,
                     "-simulation_geometry_filename", sim_file,
-                    "-output_json_file_name", output_json
+                    "-output_json_file_name", output_json,
+                    "-verbose_level", "1",
                    ]
 
     log = open(
@@ -52,31 +57,31 @@ class VirtualPlaneTestCase(unittest.TestCase):
         for primaries that don't track across the virtual plane
         """
         filename = run_simulation("VirtualPlanesTestDefaults.dat",
-                                  "configuration_defaults.py")
+                                  "defaults.config")
         virts = xboa.Bunch.Bunch.new_from_read_builtin\
                                           ("maus_virtual_hit", filename)
-        self.assertEqual(len(virts.hits()), 2)
+        self.assertEqual(len(virts.hits()), 3)
         self.assertAlmostEqual(virts[0]['z'], 100.)
-        self.assertAlmostEqual(virts[1]['x'], 101.)
+        self.assertLess(virts[1]['pz'], 0.) # allow backwards defaults to true
+        self.assertAlmostEqual(virts[2]['x'], 101.)
 
     def test_virtual_options(self):
         """
         Check that the various options on the virtual hit work okay
         """
         filename = run_simulation("VirtualPlanesTestOptions.dat",
-                                  "configuration_options.py")
+                                  "options.config")
         virts = xboa.Bunch.Bunch.new_from_read_builtin\
                                           ("maus_virtual_hit", filename)
-        self.assertEqual(len(virts.hits()), 2)
+        self.assertEqual(len(virts.hits()), 1)
         self.assertAlmostEqual(virts[0]['z'], 100.)
-        self.assertAlmostEqual(virts[1]['x'], 0.)
 
     def test_virtual_indie_u(self):
         """
         Check that independent variable u can be set okay
         """
         filename = run_simulation("VirtualPlanesTestIndieU.dat",
-                                  "configuration_indie.py")
+                                  "indie.config")
         virts = xboa.Bunch.Bunch.new_from_read_builtin\
                                           ("maus_virtual_hit", filename)
         self.assertEqual(len(virts.hits()), 1)
@@ -88,7 +93,7 @@ class VirtualPlaneTestCase(unittest.TestCase):
         Check that independent variable t can be set okay
         """
         filename = run_simulation("VirtualPlanesTestIndieT.dat",
-                                  "configuration_indie.py")
+                                  "indie.config")
         virts = xboa.Bunch.Bunch.new_from_read_builtin\
                                           ("maus_virtual_hit", filename)
         self.assertEqual(len(virts.hits()), 1)
@@ -99,7 +104,7 @@ class VirtualPlaneTestCase(unittest.TestCase):
         Check that independent variable tau can be set okay
         """
         filename = run_simulation("VirtualPlanesTestIndieTau.dat",
-                                  "configuration_indie.py")
+                                  "indie.config")
         virts = xboa.Bunch.Bunch.new_from_read_builtin\
                                           ("maus_virtual_hit", filename)
         self.assertEqual(len(virts.hits()), 2)

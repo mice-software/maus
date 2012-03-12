@@ -415,6 +415,7 @@ TEST_F(VirtualPlaneManagerTest, VirtualPlanesSteppingActionBackwardsTest) {
   EXPECT_EQ(vpm.GetNumberOfHits(1), 1);
   EXPECT_EQ(vpm.GetNumberOfHits(2), 1);
   vpm.SetVirtualHits(Json::Value(Json::arrayValue));
+  vpm.StartOfEvent();
 
   step->GetPreStepPoint()->SetPosition(G4ThreeVector(0., 0., 8.));
   step->GetPostStepPoint()->SetPosition(G4ThreeVector(0., 0., 4.));
