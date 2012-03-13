@@ -143,6 +143,8 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         self.canvas_sp_x = None
         self.canvas_sp_y = None
         self.canvas_sp_xy = None
+        # Has an end_of_run been processed?
+        self.run_ended = False
 
     def _configure_at_birth(self, config_doc):
         """
@@ -158,6 +160,7 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         # Initialize histograms, setup root canvases, and set root
         # styles.
         self.__init_histos()
+        self.run_ended = False
         return True
 
     def _update_histograms(self, spill):
@@ -174,9 +177,14 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         @throws ValueError if "slab_hits" and "space_points" information
         is missing from the spill.
         """
-        if "END_OF_RUN" in spill:
-            self.update_histos()
-            return self.get_histogram_images()
+        if (spill.has_key("daq_event_type") and
+            spill["daq_event_type"] == "end_of_run"):
+            if (not self.run_ended):
+                self.update_histos()
+                self.run_ended = True
+                return self.get_histogram_images()
+            else:
+                return [{}]
 
         # Get TOF slab hits & fill the relevant histograms.
         if not self.get_slab_hits(spill): 

@@ -336,11 +336,12 @@ class ReducePyHistogramTDCADCCountsTestCase(unittest.TestCase): # pylint: disabl
 
     def test_end_of_run(self):
         """
-        Test "process" with a JSON document with an "END_OF_RUN"
-        entry.
+        Test "process" with a JSON document which is an end_of_run.
         @param self Object reference.
         """
-        result = self.__process({"END_OF_RUN":"END_OF_RUN"})
+        end_of_run = {"daq_data":None, "daq_event_type":"end_of_run", \
+            "run_num":1, "spill_num":-1}
+        result = self.__process(end_of_run)
         self.assertEquals({}, result, "Expected empty output spill")
 
     def tearDown(self):

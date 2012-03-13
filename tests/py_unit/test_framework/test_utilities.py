@@ -97,6 +97,35 @@ class DataflowUtilitiesTestCase(unittest.TestCase): # pylint: disable=R0904, C03
         self.assertTrue(not DataflowUtilities.is_start_of_run({}),
             "Expected False")
 
+    def test_is_end_of_run_true(self):
+        """
+        Test with a spill with "daq_event_type":"end_of_run".
+        @param self Object reference.
+        """
+        spill = {}
+        spill["daq_event_type"] = "end_of_run"
+        self.assertTrue(DataflowUtilities.is_end_of_run(spill),
+            "Expected True")
+
+    def test_is_end_of_run_wrong_daq_event(self):
+        """
+        Test with a spill with "daq_event_type" not equal
+        to "end_of_run".
+        @param self Object reference.
+        """
+        spill = {}
+        spill["daq_event_type"] = "made_up"
+        self.assertTrue(not DataflowUtilities.is_end_of_run(spill),
+            "Expected False")
+
+    def test_is_end_of_run_no_daq_event(self):
+        """
+        Test with a spill no "daq_event_type".
+        @param self Object reference.
+        """
+        self.assertTrue(not DataflowUtilities.is_end_of_run({}),
+            "Expected False")
+
     def test_get_run_number(self):
         """
         Test with a spill that has a "run_num".

@@ -61,6 +61,17 @@ class DataflowUtilities: # pylint: disable=W0232
             spill["daq_event_type"] == "start_of_run")
 
     @staticmethod
+    def is_end_of_run(spill):
+        """
+        Return true if spill represents a end of a run i.e. it has
+        "daq_event_type" with value "end_of_run".
+        @param spill Spill document as a dictionary.
+        @return True or False.
+        """
+        return (spill.has_key("daq_event_type") and
+            spill["daq_event_type"] == "end_of_run")
+
+    @staticmethod
     def get_run_number(spill):
         """
         Extract run number from spill. Assumes spill has a 

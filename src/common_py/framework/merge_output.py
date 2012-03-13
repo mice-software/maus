@@ -74,6 +74,8 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
         self.config = json.loads(self.config_doc)
         # Current run number (from spills).
         self.run_number = None
+        # Last end_of_run spill received.
+        self.end_of_run = None
         # Counts of spills processed.
         self.spill_process_count = 0
         # Connect to doc store.
@@ -102,6 +104,7 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
         @throws Exception if there is a problem when birth is called.
         """
         self.run_number = run_number
+        self.end_of_run = None
         print "---------- START RUN %d ----------" % self.run_number
         print("BIRTH merger %s" % self.merger.__class__)
         if (not self.merger.birth(self.config_doc)):
@@ -112,15 +115,25 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
 
     def end_run(self):
         """
-        End a run by sending an END_OF_RUN spill through the merger
-        and outputer then death the merger and outputer. 
+        End a run by sending an end_of_run spill through the merger
+        and outputer then death the merger and outputer. The end_of_run
+        spill is the last one that was encountered before a change
+        in run was detected. If there was no such end_of_run then
+        a dummy is created.
         @param self Object reference.
         @throws WorkerDeathFailedException if death returns False.
         @throws Exception if there is a problem when passing the
-        END_OF_RUN through or when death is called.
+        end_of_run through or when death is called.
         """
-        print("Finishing current run...sending END_OF_RUN to merger")
-        end_of_run_spill = json.dumps({"END_OF_RUN":"END_OF_RUN"})
+        print("Finishing current run...sending end_of_run to merger")
+        if (self.end_of_run == None):
+            print "  Missing an end_of_run spill..."
+            print "  ...creating one to flush the mergers!"
+            self.end_of_run = {"daq_data":None, \
+                "daq_event_type":"end_of_run", \
+                "run_num":self.run_number, \
+                "spill_num":-1}
+        end_of_run_spill = json.dumps(self.end_of_run)
         spill = self.merger.process(end_of_run_spill)
         self.outputer.save(spill)
         print("DEATH merger %s" % self.merger.__class__)
@@ -145,7 +158,7 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
         @throws WorkerDeathFailedException if death returns False.
         @throws Exception if there is a problem when merging or
         outputting a spill, birthing or deathing the merger or
-        outputer or merging an END_OF_RUN spill.
+        outputer or merging an end_of_run spill.
         """
         print("-------- MERGE OUTPUT --------")
         # Register CTRL-C handler.
@@ -167,6 +180,8 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
                 # Check for change in run.
                 spill_doc = json.loads(spill)
                 spill_run_number = DataflowUtilities.get_run_number(spill_doc) 
+                if (DataflowUtilities.is_end_of_run(spill_doc)):
+                    self.end_of_run = spill_doc
                 if (spill_run_number != self.run_number):
                     print "Change of run detected"
                     if (is_birthed):
