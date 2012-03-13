@@ -13,33 +13,36 @@ import MAUS
 import io
 
 def run():
-    """Analyze data from the MICE experiment
-
-    This will read in and process data taken from the MICE experiment. It will
-    eventually include things like cabling information, calibrations, and fits.
+    """
+    Analyze data from the MICE experiment
+    This reads in and processes data taken from the MICE
+    experiment.
     """
     # Set up data cards.
     data_cards_list = []
     # batch mode = runs ROOT in batch mode so that canvases are not displayed
     # 1 = True, Batch Mode
     # 0 = False, Interactive Mode
-    # setting it to false will cause canvases to pop up on screen and 
-    # will get refreshed every N spills set by the refresh_rate data card
+    # setting it to false/0 will cause canvases to pop up on screen and 
+    # will get refreshed every N spills set by the refresh_rate data
+    # card. 
     data_cards_list.append("root_batch_mode='%d'\n" % 1)
     # refresh_rate = once in how many spills should canvases be updated
     data_cards_list.append("refresh_rate='%d'\n" % 1)
     # Add auto-numbering to the image tags. If False then each
-    # histogram output by ReducePyMatplotlibHistogram will have
-    # tags "tdcadc" and so the end result will be just one histogram 
-    # file. If True then there will be N files, one for each spill.
+    # histogram output for successive spills will have the same tag
+    # so there are no spill-specific histograms. This is the
+    # recommended use for online reconstruction.
     data_cards_list.append("histogram_auto_number=%s\n" % False)
-
+    # Default image type is eps. For online use, use PNG.
+    data_cards_list.append("histogram_image_type=\"png\"\n")
     # Directory for images. Default: $MAUS_WEB_MEDIA_RAW if set
-    # else current directory.
+    # else the current directory is used.
+    # Uncomment and change the following if you want to hard
+    # code a different default path.
 #    data_cards_list.append("image_directory='%s'\n" % os.getcwd())
 
-    # Convert data_cards to string.
-    
+    # Convert data_cards to string.    
     data_cards = io.StringIO(unicode("".join(data_cards_list)))
 
     # Set up the input that reads from DAQ
