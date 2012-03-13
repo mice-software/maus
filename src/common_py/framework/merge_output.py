@@ -34,6 +34,38 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
     Execute merge-output MAUS dataflows reading spills from a document
     store.
 
+    This is the algorithm used to merge spills and pass the results to
+    an output stream: 
+    @verbatim
+    run_number = None
+    end_of_run = None
+    is_birthed = FALSE
+    last_time = 01/01/1970
+    WHILE TRUE
+      READ spills added since last time from document store
+      IF spill IS "end_of_run" 
+        end_of_run = spill
+      IF spill_run_number != run_number
+        IF is_birthed
+          IF end_of_run == None
+              end_of_run = 
+                  {"daq_event_type":"end_of_run",  "run_num":run_number}
+          Send end_of_run to merger
+          DEATH merger and outputter
+        BIRTH merger and outputter
+        run_number = spill_run_number
+        end_of_run = None
+        is_birthed = TRUE
+      MERGE and OUTPUT spill
+    Send END_OF_RUN block to merger
+    DEATH merger and outputter
+    @endverbatim
+    This assumes that all spills for run N-1 have time stamps less
+    than that of spills for run N.
+
+    is_birthed is used to ensure that there is no BIRTH-DEATH-BIRTH
+    redundancy on receipt of the first spill. 
+
     If a document store is not given to the constructor then this
     class expects a document store class to be specified in the JSON
     configuration e.g.  

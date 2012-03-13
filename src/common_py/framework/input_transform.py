@@ -38,6 +38,38 @@ class InputTransformExecutor: # pylint: disable=R0903, R0902
     distributed task queue and nodes and a document store to
     cache spills after being output from transformers. 
 
+    This is the algorithm used to transform spills from an input
+    stream: 
+    @verbatim
+    CLEAR document store
+    run_number = None
+    WHILE an input spill is available
+      GET next spill
+      IF spill does not have a run number
+        # Assume pure MC
+        spill_run_number = 0
+      IF (spill_run_number != run_number)
+        # We've changed run.
+        IF spill is NOT a start_of_run spill
+          WARN user of missing start_of_run spill
+        WAIT for current Celery tasks to complete
+          WRITE result spills to document store
+        run_number = spill_run_number
+        CONFIGURE Celery by DEATHing current transforms 
+            and BIRTHing new transforms
+      TRANSFORM spill using Celery
+      WRITE result spill to document store
+     DEATH Celery worker transforms
+    @endverbatim
+    If there is no initial start_of_run spill (or no spill_num in the
+    spills) in the input stream then spill_run_number will be 0,
+    run_number will be None and a Celery configuration will be done
+    before the first spill needs to be transformed.  
+
+    Spills are inserted into the document store in the order of their
+    return from Celery workers. This may not be in synch with the order in
+    which they were originally read from the input stream. 
+
     If a document store is not given to the constructor then this
     class expects a document store class to be specified in the JSON
     configuration e.g.  
