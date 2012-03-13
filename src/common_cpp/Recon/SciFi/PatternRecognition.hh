@@ -206,8 +206,10 @@ class PatternRecognition {
 
     static const int _n_trackers = 2;
     static const int _n_stations = 5;
-    static const double _res_cut = 15.0;
-    static const double _chisq_cut = 15.0;
+    static const double _sd_1to4 = 0.3844;
+    static const double _sd_5 = 0.4298;
+    static const double _res_cut = 10;
+    static const double _chisq_cut = 15;
 };
 // } // ~namespace MAUS
 
