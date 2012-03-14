@@ -7,6 +7,7 @@ node [shape=record];
 
   MCEventArray [shape=record, label="{MCEventArray|mc_events}"]
   MCEvent [shape=record, label="{MCEvent|\[\]}"]
+  Primary [shape=record, label="{Primary|primary}"]
   TrackArray [shape=record, label="{TrackArray|tracks}"]
   Track [shape=record, label="{Track|\[\]}"]
   StepArray [shape=record, label="{StepArray|steps}"]
@@ -14,13 +15,13 @@ node [shape=record];
   VirtualHitArray [shape=record, label="{VirtualHitArray|virtual_hits}"]
   VirtualHit [shape=record, label="{VirtualHit|\[\]}"]
   SciFiHitArray [shape=record, label="{SciFiHitArray|sci_fi_hits}"]
-  Hit_SciFiChannelId [shape=record, label="{Hit_SciFiChannelId|\[\]}"]
+  Hit_SciFiChannelId [shape=record, label="{Hit\<SciFiChannelId\>|\[\]}"]
   SciFiChannelId [shape=record, label="{SciFiChannelId|channel_id}"]
   TOFHitArray [shape=record, label="{TOFHitArray|tof_hits}"]
-  Hit_TOFChannelId [shape=record, label="{Hit_TOFChannelId|\[\]}"]
+  Hit_TOFChannelId [shape=record, label="{Hit\<TOFChannelId\>|\[\]}"]
   TOFChannelId [shape=record, label="{TOFChannelId|channel_id}"]
   SpecialVirtualHitArray [shape=record, label="{SpecialVirtualHitArray|special_virtual_hits}"]
-  Hit_SpecialVirtualChannelId [shape=record, label="{Hit_SpecialVirtualChannelId|\[\]}"]  
+  Hit_SpecialVirtualChannelId [shape=record, label="{Hit\<SpecialVirtualChannelId\>|\[\]}"]  
   SpecialVirtualChannelId [shape=record, label="{SpecialVirtualChannelId|channel_id}"]
 
   ReconEventArray [shape=record, label="{ReconEventArray|recon_events}"]
@@ -36,8 +37,11 @@ node [shape=record];
   Spill->DAQData
   Spill->Scalars
   Spill->EMRSpillData
-  Spill->MCEventArray->MCEvent
-  Spill->ReconEventArray->ReconEvent
+  Spill->MCEventArray [style=dotted]
+         MCEventArray->MCEvent [arrowhead=normalnormal]
+  Spill->ReconEventArray
+         ReconEventArray->ReconEvent [arrowhead=normalnormal]
+
 
   ReconEvent->EMREvent
   ReconEvent->KLEvent
@@ -47,11 +51,21 @@ node [shape=record];
   ReconEvent->TriggerEvent
   ReconEvent->GlobalEvent
 
-  MCEvent->TrackArray->Track->StepArray->Step
-  MCEvent->VirtualHitArray->VirtualHit
-  MCEvent->SciFiHitArray->Hit_SciFiChannelId->SciFiChannelId
-  MCEvent->TOFHitArray->Hit_TOFChannelId->TOFChannelId
-  MCEvent->SpecialVirtualHitArray->Hit_SpecialVirtualChannelId->SpecialVirtualChannelId
-
+  MCEvent->TrackArray [style=dotted]
+  TrackArray->Track [arrowhead=normalnormal]
+  Track->StepArray [style=dotted]
+  StepArray->Step [arrowhead=normalnormal]
+  MCEvent->Primary
+  MCEvent->VirtualHitArray
+           VirtualHitArray->VirtualHit [arrowhead=normalnormal]
+  MCEvent->SciFiHitArray
+           SciFiHitArray->Hit_SciFiChannelId [arrowhead=normalnormal]
+                          Hit_SciFiChannelId->SciFiChannelId
+  MCEvent->TOFHitArray
+           TOFHitArray->Hit_TOFChannelId [arrowhead=normalnormal]
+                        Hit_TOFChannelId->TOFChannelId
+  MCEvent->SpecialVirtualHitArray
+           SpecialVirtualHitArray->Hit_SpecialVirtualChannelId [arrowhead=normalnormal]
+                                   Hit_SpecialVirtualChannelId->SpecialVirtualChannelId
 }
 
