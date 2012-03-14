@@ -48,6 +48,10 @@ void PatternRecognition::process(SciFiEvent &evt) {
   } else {
     std::cout << "No spacepoints in event" << std::endl;
   }
+/* Helical Tracking option????
+  if ( static_cast<int>(evt.spacepoints().size()) > 0 ) {
+    helical_track_recon(evt);
+  }*/
 };
 
 void PatternRecognition::straight_track_recon(SciFiEvent &evt) {
@@ -99,6 +103,57 @@ void PatternRecognition::straight_track_recon(SciFiEvent &evt) {
     std::cout << "Finished Tracker " << trker_no + 1 << std::endl;
   }// ~Loop over trackers
   std::cout << "Number of tracks found: " << evt.straightprtracks().size() << "\n\n";
+}
+// Summer added below function *************************
+void PatternRecognition::helical_track_recon(SciFiEvent &evt) {
+  // Split spacepoints up according to which tracker they occured in and set used flag to false
+  std::vector< std::vector<SciFiSpacePoint*> > spnts_by_tracker(_n_trackers);
+  for ( int trker_no = 0; trker_no < _n_trackers; ++trker_no ) {  // Loop over trackers
+    for ( unsigned int i = 0; i < evt.spacepoints().size(); ++i ) {  // Loop over spacepoints
+      evt.spacepoints()[i]->set_used(false);
+      if ( evt.spacepoints()[i]->get_tracker() == trker_no ) {
+        spnts_by_tracker[trker_no].push_back(evt.spacepoints()[i]);
+      }
+    } // ~Loop over spacepoints
+  } // ~Loop over trackers
+
+  // Loop over trackers
+  for ( int trker_no = 0; trker_no < _n_trackers; ++trker_no ) {
+
+    std::cout << "Reconstructing for Tracker " << trker_no + 1 << std::endl;
+
+    // Split spacepoints according to which station they occured in
+    std::vector< std::vector<SciFiSpacePoint*> > spnts_by_station(_n_stations);
+    sort_by_station(spnts_by_tracker[trker_no], spnts_by_station);
+
+    // Count how many stations have at least one *unused* spacepoint
+    int num_stations_hit = num_stations_with_unused_spnts(spnts_by_station);
+
+    // Make the tracks depending on how many stations have spacepoints in them
+    if (num_stations_hit == 5) {
+      std::vector<SciFiHelicalPRTrack> trks;
+      make_helical_5tracks(spnts_by_station, trks );
+      for ( int i = 0; i < static_cast<int>(trks.size()); ++i ) {
+        evt.add_helicalprtrack(trks[i]);
+      }
+    }
+    if (num_stations_hit > 3) {
+      std::vector<SciFiHelicalPRTrack> trks;
+      make_helical_4tracks(spnts_by_station, trks);
+      for ( int i = 0; i < static_cast<int>(trks.size()); ++i ) {
+        evt.add_helicalprtrack(trks[i]);
+      }
+    }
+    if (num_stations_hit > 2) {
+      std::vector<SciFiHelicalPRTrack> trks;
+      make_helical_3tracks(spnts_by_station, trks);
+      for ( int i = 0; i < static_cast<int>(trks.size()); ++i ) {
+        evt.add_helicalprtrack(trks[i]);
+      }
+    }
+    std::cout << "Finished Tracker " << trker_no + 1 << std::endl;
+  }// ~Loop over trackers
+  std::cout << "Number of tracks found: " << evt.helicalprtracks().size() << "\n\n";
 }
 
 void PatternRecognition::make_straight_5tracks(
@@ -249,6 +304,155 @@ void PatternRecognition::make_straight_3tracks(
   }
   std::cout << "Finished making 3 pt tracks" << std::endl;
 } // ~make_straight_3tracks(...)
+
+void PatternRecognition::make_helical_5tracks(
+                         std::vector< std::vector<SciFiSpacePoint*> >& spnts_by_station,
+                         std::vector<SciFiHelicalPRTrack>& trks) {
+  std::cout << "Making 5 point tracks" << std::endl;
+
+  int num_points = 5;
+
+  std::vector<int> ignore_stations; // A zero size vector sets that all stations are used
+
+// make_helical_tracks(num_points, ignore_stations, spnts_by_station, trks);
+
+  std::cout << "Finished making 5 pt tracks" << std::endl;
+} // ~make_hpr_5pt(...)
+
+void PatternRecognition::make_helical_4tracks(
+                         std::vector< std::vector<SciFiSpacePoint*> >& spnts_by_station,
+                         std::vector<SciFiHelicalPRTrack>& trks) {
+  std::cout << "Making 4 point tracks" << std::endl;
+
+  int num_points = 4;
+
+  // Count how many stations have at least one *unused* spacepoint
+  int num_stations_hit = num_stations_with_unused_spnts(spnts_by_station);
+
+  // Call make_tracks with parameters depending on how many stations have unused spacepoints
+  if ( num_stations_hit == 5 ) {
+
+    std::cout << "4pt track: 5 stations with unused spacepoints" << std::endl;
+
+    for (int i = 0; i < 5; ++i) { // Loop of stations, ignoring each one in turn
+      // Recount how many stations have at least one unused spacepoint
+      num_stations_hit = num_stations_with_unused_spnts(spnts_by_station);
+      // If there are enough occupied stations left to make a 4 point track, keep making tracks
+      if ( num_stations_hit  >= num_points ) {
+        std::vector<int> ignore_stations(1, i);
+       // make_helical_tracks(num_points, ignore_stations, spnts_by_station, trks);
+      } else {
+        break;
+      }
+    } // ~Loop of stations, ignoring each one in turn
+  } else if ( num_stations_hit == 4 ) {
+
+    std::cout << "4pt track: 4 stations with unused spacepoints" << std::endl;
+
+    // Find out which station has no unused hits (1st entry in stations_not_hit vector)
+    std::vector<int> stations_hit, stations_not_hit;
+    stations_with_unused_spnts(spnts_by_station, stations_hit, stations_not_hit);
+
+    // Make the tracks
+    if ( static_cast<int>(stations_not_hit.size()) == 1 ) {
+     // make_helical_tracks(num_points, stations_not_hit, spnts_by_station, trks);
+    } else {
+      std::cout << "Wrong number of stations without spacepoints, ";
+      std::cout << "aborting 4 pt track." << std::endl;
+    }
+  } else if ( num_stations_hit < 4 ) {
+    std::cout << "Not enough unused spacepoints, quiting 4 point track." << std::endl;
+  } else if ( num_stations_hit > 6 ) {
+    std::cout << "Wrong number of stations with spacepoints, aborting 4 pt track." << std::endl;
+  }
+
+  std::cout << "Finished making 4 pt tracks" << std::endl;
+} // ~make_hpr_4pt(...)
+
+void PatternRecognition::make_helical_3tracks(
+                         std::vector< std::vector<SciFiSpacePoint*> >& spnts_by_station,
+                         std::vector<SciFiHelicalPRTrack>& trks) {
+  std::cout << "Making 3 point track" << std::endl;
+
+  int num_points = 3;
+
+  // Count how many stations have at least one *unused* spacepoint
+  int num_stations_hit = num_stations_with_unused_spnts(spnts_by_station);
+
+  bool sufficient_hit_stations = true;
+
+  // Call make_tracks with parameters depending on how many stations have unused spacepoints
+  if ( num_stations_hit == 5 ) {
+
+    std::cout << "3pt track: 5 stations with unused spacepoints" << std::endl;
+
+    for (int i = 0; i < 4; ++i) { // Loop of first station to ignore
+      if ( sufficient_hit_stations ) {
+        for (int j = i + 1; j < 5; ++j) { // Loop of second station to ignore
+          if ( sufficient_hit_stations ) {
+            // Recount how many stations have at least one unused spacepoint
+            num_stations_hit = num_stations_with_unused_spnts(spnts_by_station);
+            // If there are enough occupied stations left to make a 3pt track, keep making tracks
+            if ( num_stations_hit  >= num_points ) {
+              std::vector<int> ignore_stations;
+              ignore_stations.push_back(i);
+              ignore_stations.push_back(j);
+             // make_helical_tracks(num_points, ignore_stations, spnts_by_station, trks);
+            } else {
+                sufficient_hit_stations = false;
+            }
+          } // ~if ( sufficient_hit_stations )
+        } // ~Loop of second station to ignore
+      } // ~if ( sufficient_hit_stations )
+    } // ~Loop of first station to ignore
+  } else if ( num_stations_hit == 4 ) {
+
+    std::cout << "3pt track: 4 stations with unused spacepoints" << std::endl;
+
+    // Find out which station has no unused hits (1st entry in stations_not_hit vector)
+    std::vector<int> stations_hit, stations_not_hit;
+    stations_with_unused_spnts(spnts_by_station, stations_hit, stations_not_hit);
+    std::vector<int> ignore_stations;
+
+    // Make the tracks
+    if ( static_cast<int>(stations_not_hit.size()) == 1 ) {
+      for (int i = 0; i < 5; ++i) { // Loop of stations, ignoring each one in turn
+        // Recount how many stations have at least one unused spacepoint
+        num_stations_hit = num_stations_with_unused_spnts(spnts_by_station);
+        // If there are enough occupied stations left to make a 4 point track, keep making tracks
+        if ( num_stations_hit  >= num_points ) {
+          ignore_stations.clear();
+          ignore_stations.push_back(stations_not_hit[0]);
+          ignore_stations.push_back(i);
+         // make_helical_tracks(num_points, ignore_stations, spnts_by_station, trks);
+        } else {
+          break;
+        }
+      }
+    }
+  } else if ( num_stations_hit == 3 ) {
+
+    std::cout << "3pt track: 3 stations with unused spacepoints" << std::endl;
+
+    // Find out which station has no unused hits (1st entry in stations_not_hit vector)
+    std::vector<int> stations_hit, stations_not_hit;
+    stations_with_unused_spnts(spnts_by_station, stations_hit, stations_not_hit);
+
+    // Make the tracks
+    if ( static_cast<int>(stations_not_hit.size()) == 2 ) {
+    //  make_helical_tracks(num_points, stations_not_hit, spnts_by_station, trks);
+    } else {
+      std::cout << "Wrong number of stations without spacepoints, ";
+      std::cout << "aborting 3 pt track." << std::endl;
+    }
+
+  } else if ( num_stations_hit < 3 ) {
+      std::cout << "Not enough unused spacepoints, quiting 3 point track." << std::endl;
+  } else if ( num_stations_hit > 6 ) {
+      std::cout << "Wrong number of stations with spacepoints, aborting 3 pt track." << std::endl;
+  }
+  std::cout << "Finished making 3 pt tracks" << std::endl;
+} // ~make_hpr_3pt(...)
 
 void PatternRecognition::make_straight_tracks(const int num_points,
                                      const std::vector<int> ignore_stations,

@@ -37,6 +37,8 @@
 #include "src/common_cpp/Recon/SciFi/SciFiCluster.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiStraightPRTrack.hh"
+// Added by Summer
+#include "src/common_cpp/Recon/SciFi/SciFiHelicalPRTrack.hh"
 
 // namespace MAUS {
 
@@ -203,6 +205,53 @@ class PatternRecognition {
      *  @param evt - The SciFi event
      */
     void straight_track_recon(SciFiEvent &evt);
+
+    // Summer added below member functions *************
+    /** @brief Perform Pattern Recognition for helical tracks
+     * 
+     * This takes one argument, the SciFi event, extracts the 
+     * spacepoints, reconstructs the PR tracks, and pushed them
+     * back into the event.
+     *
+     * @param evt - the SciFi event
+     */
+    void helical_track_recon(SciFiEvent &evt);
+
+    /** @brief Make helical Pattern Recognition tracks with 5 spacepoints
+     *
+     *  Make a helical Pattern Recognition track/s when there are spacepoints
+     *  found in all 5 stations of a tracker.  Least squared fitting used,
+     *  together with a chi^2 goodness-of-fit test.
+     *
+     *  @param spnts_by_station - A 2D vector of all the input spacepoints ordered by station
+     *  @param trks - A vector of the output Pattern Recognition tracks
+     */
+    void make_helical_5tracks(std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
+                               std::vector<SciFiHelicalPRTrack> &trks);
+
+    /** @brief Make helical Pattern Recognition tracks with 4 spacepoints
+     *
+     *  Make a helical Pattern Recognition track/s when there are spacepoints
+     *  found in 4 stations of a tracker.  Least squared fitting used,
+     *  together with a chi^2 goodness-of-fit test.
+     *
+     *  @param spnts_by_station - A 2D vector of all the input spacepoints ordered by station
+     *  @param trks - A vector of the output Pattern Recognition tracks
+     */
+    void make_helical_4tracks(std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
+                               std::vector<SciFiHelicalPRTrack> &trks);
+
+    /** @brief Make helical Pattern Recognition tracks with 3 spacepoints
+     *
+     *  Make a helical Pattern Recognition track/s when there are spacepoints
+     *  found in 3 stations of a tracker.  Least squared fitting used,
+     *  together with a chi^2 goodness-of-fit test.
+     *
+     *  @param spnts_by_station - A 2D vector of all the input spacepoints ordered by station
+     *  @param trks - A vector of the output Pattern Recognition tracks
+     */
+    void make_helical_3tracks(std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
+                               std::vector<SciFiHelicalPRTrack> &trks);
 
     static const int _n_trackers = 2;
     static const int _n_stations = 5;
