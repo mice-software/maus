@@ -1,8 +1,9 @@
 // MAUS WARNING: THIS IS LEGACY CODE.
 #include "Interface/Interpolator.hh"
+
 #include "Interface/Spline1D.hh"
-#include "Interface/MVector.hh"
-#include "Interface/MMatrix.hh"
+#include "Maths/Matrix.hh"
+#include "Maths/Vector.hh"
 
 
 std::string Interpolator3dSolenoidalTo3d::_interpolationAlgorithmString[3]= {"BiCubic", "LinearCubic", "BiLinear"};
@@ -140,8 +141,8 @@ void BiCubicInterpolator::F(const double point[2], double value[1]) const
 	double    x0 = _coordinates->x(xStart+1);
 	double    y0 = _coordinates->y(yStart+1);
 
-	MVector<double> f (16,0.);
-	MMatrix<double> XY(16,16,0.);
+	MAUS::Vector<double> f (16,0.);
+	MAUS::Matrix<double> XY(16,16,0.);
 
 	//// First calculate the polynomial
 	//// This should be done when the BiCubic interpolator is built - but I am too lazy
@@ -167,8 +168,8 @@ void BiCubicInterpolator::F(const double point[2], double value[1]) const
                         std::cout << m << " " << f(m+1) << std::endl;
 			m++;
 		}
-	MVector<double> a = XY.inverse() * f;
-	std::cout << XY << f.T() << a.T();
+	MAUS::Vector<double> a = inverse(XY) * f;
+	std::cout << XY << transpose(f) << transpose(a);
 	//// 
 
 	//// Now calculate the value

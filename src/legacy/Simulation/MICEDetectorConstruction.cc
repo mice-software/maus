@@ -443,7 +443,7 @@ void MICEDetectorConstruction::setSteppingAccuracy()
 }
 
 std::vector<Json::Value> MICEDetectorConstruction::GetSDHits(int i){
-  if (i >= 0 and i < _SDs.size() and _SDs[i]){
+  if (i >= 0 and ((size_t) i) < _SDs.size() and _SDs[i]){
     if (_SDs[i]->isHit()) {
       return _SDs[i]->GetHits();
     }
@@ -453,7 +453,7 @@ std::vector<Json::Value> MICEDetectorConstruction::GetSDHits(int i){
 }
 
 void MICEDetectorConstruction::ClearSDHits(){
-  for ( int i = 0; i < _SDs.size(); i++ ) {
+  for ( int i = 0; ((size_t) i) < _SDs.size(); i++ ) {
     if (_SDs[i]) _SDs[i]->ClearHits();
   }
 }

@@ -48,7 +48,7 @@ namespace Simulation
   //Generate an event from PrimaryGenerator
   PhaseSpaceVector       GetPrimaryGeneratorEvent();
   // Convert an event from a PSV to a MAUSPrimaryGeneratorAction particle
-  MAUSPrimaryGeneratorAction::PGParticle ConvertToPGParticle(PhaseSpaceVector psv);
+  MAUS::MAUSPrimaryGeneratorAction::PGParticle ConvertToPGParticle(PhaseSpaceVector psv);
 } /////////// Simulation Namespace End ///////////
 
 namespace Optics

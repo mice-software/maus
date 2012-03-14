@@ -100,7 +100,7 @@ class MapCppSimulation {
   void SetConfiguration(std::string config);
 
  private:
-  MAUSGeant4Manager* _g4manager;
+  MAUS::MAUSGeant4Manager* _g4manager;
   std::string _jsonConfigDocument;
   std::string _classname;
   std::string _geometry;

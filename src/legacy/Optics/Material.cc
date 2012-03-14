@@ -1,26 +1,29 @@
 //
 #include "Material.hh"
+
+#include <cmath>
+
 #include "CLHEP/GenericFunctions/Ln.hh"
-#include <math.h>
+#include "CLHEP/Matrix/SymMatrix.h"
 #include "CLHEP/Units/PhysicalConstants.h"
 
 double Material::m_mu=105.658369;
 double Material::m_e=CLHEP::electron_mass_c2;
 double Material::K=0.307075; // divided by A [g mol^-1]
 
-Material::Material(string MaterialType, double position) 
+Material::Material(std::string MaterialType, double position) 
         : _thickness(0), _z(position), _setsLengthOnStep(false), _materialType(MaterialType) 
 {
 	SetMaterial(_materialType);
 }
 
-Material::Material(double thickness, string MaterialType, double position) 
+Material::Material(double thickness, std::string MaterialType, double position) 
         : _thickness(thickness), _z(position), _setsLengthOnStep(false), _materialType(MaterialType)
 {
 	SetMaterial(_materialType);
 }
 
-Material::Material(double x0_mm, double dEdZ_MeVpermm, string materialName, double position)
+Material::Material(double x0_mm, double dEdZ_MeVpermm, std::string materialName, double position)
         : _x0(x0_mm), _dEdZ(dEdZ_MeVpermm), _setsLengthOnStep(false), _materialType(materialName)
 {
 }
@@ -34,7 +37,7 @@ CovarianceMatrix Material::Transport(CovarianceMatrix covIn) const
 {
 	CovarianceMatrix covOut = covIn;
 	covOut.SetMean(Transport(covIn.GetMean()));
-	HepSymMatrix     covMat = covOut.GetKineticCovariances();
+	CLHEP::HepSymMatrix     covMat = covOut.GetKineticCovariances();
 	double           pRatio = covOut.GetMean().P() / covIn.GetMean().P();
 	double           p      = covOut.GetMean().P();
 	covMat[3][3] = covMat[3][3]*pRatio*pRatio;
@@ -55,7 +58,7 @@ CovarianceMatrix Material::TransportBack(CovarianceMatrix covIn) const
 {
 	CovarianceMatrix covOut = covIn;
 	covOut.SetMean(TransportBack(covIn.GetMean()));
-	HepSymMatrix     covMat = covIn.GetKineticCovariances();
+	CLHEP::HepSymMatrix     covMat = covIn.GetKineticCovariances();
 	double           pRatio = covOut.GetMean().P() / covIn.GetMean().P();
 	double           p      = covIn.GetMean().P();
 	covMat[3][3] = covMat[3][3] - GetdTheta2(covIn.GetMean().P())*covIn.GetMean().P()*covIn.GetMean().P();
@@ -136,7 +139,7 @@ PhaseSpaceVector Material::TransportBack(PhaseSpaceVector psIn) const
 	return psOut;
 }
 
-void Material::SetMaterial(string MaterialType)
+void Material::SetMaterial(std::string MaterialType)
 {
 	if(_materialList.size()==0) SetMaterialList();
 
@@ -154,9 +157,9 @@ void Material::SetMaterial(string MaterialType)
 	_dEdZ    = _dEdZList[i];
 }
 
-HepSymMatrix Material::GetCovariances(PhaseSpaceVector track) const
+CLHEP::HepSymMatrix Material::GetCovariances(PhaseSpaceVector track) const
 {
-	HepSymMatrix cov(6,0);
+	CLHEP::HepSymMatrix cov(6,0);
 	
 	cov(3,3) = GetdTheta2(track.P());
 	cov(5,5) = cov(3,3);
@@ -212,8 +215,8 @@ double Material::GetLengthGivenEmittance(CovarianceMatrix bunch, double emittanc
 		}
 
 
-		cout << _thickness << " " << thickness_min << " " << thickness_max << " " <<
-		        emittance_upper << " " << emittance_lower << endl;
+		std::cout << _thickness << " " << thickness_min << " " << thickness_max << " " <<
+		        emittance_upper << " " << emittance_lower << std::endl;
 		counter++;
 	}
 
@@ -234,7 +237,7 @@ double Material::GetdTheta2(double pz) const
 
 void Material::SetMaterialList()
 {
-	string materialList[10] = {"Pb", "POLYSTYRENE", "MYLAR", "Al",    "Be", "FLUOROCARBON", "BC600", "lH2", "LITHIUM_HYDRIDE", "unknown"};
+	std::string materialList[10] = {"Pb", "POLYSTYRENE", "MYLAR", "Al",    "Be", "FLUOROCARBON", "BC600", "lH2", "LITHIUM_HYDRIDE", "unknown"};
 	double x0List      [10] = {    5.64,   413.1,     500,   88.97,   352.8, 200, 400,   8904.4,    971.0,  1e10}; //mm
 	double dEdZList    [10] = {  1.2247,  0.2052,     0.2,   1.615, 0.29475, 0.15, 0.24,  0.028,   0.1555,  1e-10}; //MeV/mm
 	double ZList       [10] = {      82, 0.53768,     0.7,      13,       4, 0, 0,            1,  0.50321,  1}; //g mol^-1

@@ -65,14 +65,8 @@ def main():
     zip_filename = os.path.join(gdml_cache, geometry.GDMLtoCDB.GEOMETRY_ZIPFILE)
     zipped_geom = Unpacker(zip_filename, gdml_cache)
     zipped_geom.unzip_file()
-    # set up temporary directory for formatting
-    tmp_cache = os.path.join(dl_dir, TMP_CACHE)
-    try:
-        os.mkdir(tmp_cache)
-    except OSError:
-        pass
     # format files
-    gdmls = Formatter(gdml_cache, dl_dir, tmp_cache)
+    gdmls = Formatter(gdml_cache, dl_dir)
     gdmls.format()
     # convert to MAUS Modules
     maus_modules = GDMLtomaus(dl_dir)
@@ -80,7 +74,6 @@ def main():
     # clean up if required
     if configuration.geometry_download_cleanup:
         shutil.rmtree(gdml_cache)
-        shutil.rmtree(tmp_cache)
     print "Download Complete"
 
 if __name__ == "__main__":

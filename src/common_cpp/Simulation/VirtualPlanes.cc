@@ -141,7 +141,7 @@ void VirtualPlane::FillKinematics
 
   double mass = aStep->GetPostStepPoint()->GetMass();
   // FORCE mass shell condition
-  x[4] = sqrt(x[5]*x[5]+x[6]*x[6]+x[7]*x[7]+mass*mass);
+  x[4] = ::sqrt(x[5]*x[5]+x[6]*x[6]+x[7]*x[7]+mass*mass);
   aHit->SetEnergy(x[4]);
   aHit->SetTime(x[0]);
   aHit->SetProperTime(0.);
@@ -443,7 +443,7 @@ VirtualHit VirtualPlaneManager::ReadHit(Json::Value v_hit) {
     hit.SetMomentum(JsonWrapper::JsonToThreeVector(mom_v));
     hit.SetBField(JsonWrapper::JsonToThreeVector(b_v));
     hit.SetEField(JsonWrapper::JsonToThreeVector(e_v));
-    hit.SetEnergy(sqrt(hit.GetMomentum().mag2()+hit.GetMass()*hit.GetMass()));
+    hit.SetEnergy(::sqrt(hit.GetMomentum().mag2()+hit.GetMass()*hit.GetMass()));
     return hit;
 }
 
