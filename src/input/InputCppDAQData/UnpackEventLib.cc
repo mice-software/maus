@@ -183,7 +183,7 @@ int V1731DataProcessor::Process(MDdataContainer* aPartEventPtr) {
     }
     xfAdcHit = pBoardDoc;
     this->set_pedestal();
-    int charge_mm = this->get_charge(ceaMinMax); 
+    int charge_mm = this->get_charge(ceaMinMax);
     if ( !_zero_suppression ||
         (_zero_suppression && charge_mm > _zs_threshold) ) {
       xfAdcHit["charge_mm"]    = charge_mm;
@@ -481,18 +481,16 @@ int fADCDataProcessor::chargeMinMax() {
 int fADCDataProcessor::get_neg_signal_area(int&pos) {
   vector<int>::iterator it = _data.begin();
   vector<int>::iterator min;
-  
   int area = 0;
 
   min = min_element(_data.begin(), _data.end());
   pos = distance(_data.begin(), min);
-  
-  //if (pos > 19 && pos < 80) {
-    if (pos > 10) {
+
+  if (pos > 10) {
     it = min -  10;
 
   while (it < min + 20) {
-    
+
       area+= abs(*it - _pedestal);
     it++;
   }
@@ -523,10 +521,10 @@ int fADCDataProcessor::get_arrival_time() {
   int arr_time = 0;
   for ( unsigned int i = 0; i < _data.size(); ++i ) {
     arr_time = i;
-    if ( abs(_pedestal - _data[i]) > 2) {
+    if ( abs(_pedestal - _data[i]) > 2 ) {
       break;
     }
-  }   
+  }
     return arr_time;
 }
 
@@ -572,7 +570,6 @@ int fADCDataProcessor::get_min_position() {
   pos = distance(_data.begin(), min);
 
   return pos;
-
 }
 
 int fADCDataProcessor::chargePedMax() {
