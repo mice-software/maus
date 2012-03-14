@@ -46,8 +46,7 @@ void test_value(ProcessorBase<TYPE>* proc, std::string test_string) {
     ASSERT_NO_THROW(json_in = JsonWrapper::StringToJson(test_string))
                                                                  << test_string;
     TYPE* cpp_type = NULL;
- //   ASSERT_NO_THROW(cpp_type = proc->JsonToCpp(json_in)) << json_in;
-    cpp_type = proc->JsonToCpp(json_in);
+    ASSERT_NO_THROW(cpp_type = proc->JsonToCpp(json_in)) << json_in;
     Json::Value* json_out = NULL;
     ASSERT_NO_THROW(json_out = proc->CppToJson(*cpp_type));
     EXPECT_PRED3(JsonWrapper::AlmostEqual, json_in, *json_out, 1e-9);

@@ -72,10 +72,10 @@ int main(int argc, char **argv) {
   int test_out = -1;
   try {
       test_out = RUN_ALL_TESTS();
-  } catch (Squeal squee) {
+  } catch(Squeal squee) {
       std::cerr << squee.GetMessage() << "\n" << squee.GetLocation() << "\n"
                 << squee.GetStackTrace() << std::endl;
-  } catch (std::exception exc) {
+  } catch(std::exception exc) {
       std::cerr << "Caught std::exception" << "\n" << exc.what() << std::endl;
   }
   return test_out;

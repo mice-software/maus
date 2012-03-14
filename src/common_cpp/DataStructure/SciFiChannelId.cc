@@ -72,6 +72,5 @@ int SciFiChannelId::GetPlaneNumber() const {
 void SciFiChannelId::SetPlaneNumber(int plane) {
     _plane = plane;
 }
-
 }
 

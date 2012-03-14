@@ -45,5 +45,5 @@ int SpecialVirtualChannelId::GetStation() const {
 void SpecialVirtualChannelId::SetStation(int station) {
     _station = station;
 }
-
 }
+

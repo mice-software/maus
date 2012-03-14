@@ -39,7 +39,7 @@ class HitProcessor : public ObjectProcessor<Hit<ChannelId> > {
     void RegisterBranches();
 
  private:
-    ProcessorBase<ChannelId>* _channel_id_proc;    
+    ProcessorBase<ChannelId>* _channel_id_proc;
     ThreeVectorProcessor _three_vec_proc;
     DoubleProcessor _double_proc;
     IntProcessor _int_proc;
@@ -63,11 +63,11 @@ void HitProcessor<ChannelId>::RegisterBranches() {
     RegisterValueBranch("charge", &_double_proc,
                         &Hit<ChannelId>::GetCharge,
                         &Hit<ChannelId>::SetCharge, true);
-    RegisterValueBranch("time", &_double_proc, 
+    RegisterValueBranch("time", &_double_proc,
                         &Hit<ChannelId>::GetTime,
                         &Hit<ChannelId>::SetTime, true);
     RegisterValueBranch("energy_deposited", &_double_proc,
-                        &Hit<ChannelId>::GetEnergyDeposited, 
+                        &Hit<ChannelId>::GetEnergyDeposited,
                         &Hit<ChannelId>::SetEnergyDeposited, true);
     RegisterValueBranch("position", &_three_vec_proc,
                         &Hit<ChannelId>::GetPosition,

@@ -63,6 +63,5 @@ int TOFChannelId::GetPlane() const {
 void TOFChannelId::SetPlane(int plane) {
     _plane = plane;
 }
-
 }
 
