@@ -1,0 +1,57 @@
+digraph G {
+node [shape=record];
+  Spill [shape=record, label="{Spill}"]
+  DAQData [shape=record, label="{DAQData|daq_data}"]
+  Scalars [shape=record, label="{Scalars|scalars}"]
+  EMRSpillData [shape=record, label="{EMRSpillData|emr_spill_data}"]
+
+  MCEventArray [shape=record, label="{MCEventArray|mc_events}"]
+  MCEvent [shape=record, label="{MCEvent|\[\]}"]
+  TrackArray [shape=record, label="{TrackArray|tracks}"]
+  Track [shape=record, label="{Track|\[\]}"]
+  StepArray [shape=record, label="{StepArray|steps}"]
+  Step [shape=record, label="{Step|\[\]}"]
+  VirtualHitArray [shape=record, label="{VirtualHitArray|virtual_hits}"]
+  VirtualHit [shape=record, label="{VirtualHit|\[\]}"]
+  SciFiHitArray [shape=record, label="{SciFiHitArray|sci_fi_hits}"]
+  Hit_SciFiChannelId [shape=record, label="{Hit_SciFiChannelId|\[\]}"]
+  SciFiChannelId [shape=record, label="{SciFiChannelId|channel_id}"]
+  TOFHitArray [shape=record, label="{TOFHitArray|tof_hits}"]
+  Hit_TOFChannelId [shape=record, label="{Hit_TOFChannelId|\[\]}"]
+  TOFChannelId [shape=record, label="{TOFChannelId|channel_id}"]
+  SpecialVirtualHitArray [shape=record, label="{SpecialVirtualHitArray|special_virtual_hits}"]
+  Hit_SpecialVirtualChannelId [shape=record, label="{Hit_SpecialVirtualChannelId|\[\]}"]  
+  SpecialVirtualChannelId [shape=record, label="{SpecialVirtualChannelId|channel_id}"]
+
+  ReconEventArray [shape=record, label="{ReconEventArray|recon_events}"]
+  ReconEvent [shape=record, label="{ReconEvent|\[\]}"]
+  EMREvent [shape=record, label="{EMREvent|emr_event}"]
+  KLEvent [shape=record, label="{KLEvent|kl_event}"]
+  SciFiEvent [shape=record, label="{SciFiEvent|sci_fi_event}"]
+  CkovEvent [shape=record, label="{CkovEvent|ckov_event}"]
+  TOFEvent [shape=record, label="{TOFEvent|tof_event}"]
+  TriggerEvent [shape=record, label="{TriggerEvent|trigger_event}"]
+  GlobalEvent [shape=record, label="{GlobalEvent|global_event }"]
+  
+  Spill->DAQData
+  Spill->Scalars
+  Spill->EMRSpillData
+  Spill->MCEventArray->MCEvent
+  Spill->ReconEventArray->ReconEvent
+
+  ReconEvent->EMREvent
+  ReconEvent->KLEvent
+  ReconEvent->SciFiEvent
+  ReconEvent->CkovEvent
+  ReconEvent->TOFEvent
+  ReconEvent->TriggerEvent
+  ReconEvent->GlobalEvent
+
+  MCEvent->TrackArray->Track->StepArray->Step
+  MCEvent->VirtualHitArray->VirtualHit
+  MCEvent->SciFiHitArray->Hit_SciFiChannelId->SciFiChannelId
+  MCEvent->TOFHitArray->Hit_TOFChannelId->TOFChannelId
+  MCEvent->SpecialVirtualHitArray->Hit_SpecialVirtualChannelId->SpecialVirtualChannelId
+
+}
+
