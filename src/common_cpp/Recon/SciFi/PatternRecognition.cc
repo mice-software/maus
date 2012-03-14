@@ -28,6 +28,7 @@
 // MAUS headers
 #include "src/common_cpp/Recon/SciFi/PatternRecognition.hh"
 #include "src/common_cpp/Recon/SciFi/SimpleLine.hh"
+#include "src/common_cpp/Recon/SciFi/SimpleCircle.hh"
 
 // namespace MAUS {
 
@@ -526,6 +527,74 @@ void PatternRecognition::linear_fit(const std::map<int, SciFiSpacePoint*> &spnts
   line_y.set_parameters(c_y, m_y, chisq_y);
 
   */
+}
+
+void PatternRecognition::circle_fit(const std::map<int, SciFiSpacePoint*> &spnts,
+                                    SimpleCircle &circle) {
+
+  int num_points = spnts.size();
+
+  CLHEP::HepMatrix A(num_points, 3); // rows, columns
+  CLHEP::HepMatrix V(num_points, num_points); // error matrix
+  CLHEP::HepMatrix K(num_points, 1);
+
+  int counter = 0;
+  for ( std::map<int, SciFiSpacePoint*>::const_iterator ii = spnts.begin();
+       ii != spnts.end(); ++ii ) {
+
+  // This part is subject to change once we figure out proper errors
+  double sd = -1.0;
+  if ( (*ii).first == 5 )
+    sd = _sd_5;
+  else
+    sd = _sd_1to4;
+
+    double tmp_xpos = (*ii).second->get_position().x();
+    double tmp_ypos = (*ii).second->get_position().y();
+
+    A[counter][0] = ( tmp_xpos * tmp_xpos ) + ( tmp_ypos * tmp_ypos );
+    A[counter][1] = (*ii).second->get_position().x();
+    V[counter][counter] = ( sd * sd );
+    K[counter][0] = 1; // I don't entirely understand why this should be 1
+
+    ++counter;
+  }
+
+  CLHEP::HepMatrix At, tmpx, tmp_params;
+
+  int ierr;
+  V.invert(ierr);
+
+  At = A.T();
+  tmpx = At * V * A;
+  tmpx.invert(ierr);
+  tmp_params = tmpx * At * V * K;
+
+  double a, b, c;
+  a = tmp_params[0][0];
+  b = tmp_params[1][0];
+  c = tmp_params[2][0];
+
+  double x0, y0, R;
+  x0 = -b / 2 * a;
+  y0 = -c / 2 * a;
+  R = sqrt((4 * a) + (b * b) + (c * c)) / (2 * a);
+
+  circle.set_x0(x0);
+  circle.set_y0(y0);
+  circle.set_R(R);
+  /*
+  circle.set_x0_err(x0_err);
+  circle.set_y0_err(y0_err);
+  circle.set_R_err(R_err);
+  */
+
+  CLHEP::HepMatrix C, result;
+
+  C = K - (A * tmp_params);
+  result = C.T() * V * C;
+  double xchi2 = result[0][0];
+  circle.set_chisq(xchi2 / num_points);
 }
 
 void PatternRecognition::set_end_stations(const std::vector<int> ignore_stations,

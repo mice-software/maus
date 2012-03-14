@@ -31,6 +31,7 @@
 
 // MAUS headers
 #include "src/common_cpp/Recon/SciFi/SimpleLine.hh"
+#include "src/common_cpp/Recon/SciFi/SimpleCircle.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiEvent.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiHit.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiDigit.hh"
@@ -140,7 +141,7 @@ class PatternRecognition {
 
     /** @brief Fit a straight line in x and y to some spacepoints
      *
-     *  Fit straight lines, x = f(z) and y = f(z), using gsl linear fitter,
+     *  Fit straight lines, x = f(z) and y = f(z), using linear least squares fitting,
      *  for input spacepoints. Output is the line in x and line in y.
      *
      *  @param spnts - A vector of all the input spacepoints
@@ -150,6 +151,17 @@ class PatternRecognition {
      */
     void linear_fit(const std::map<int, SciFiSpacePoint*> &spnts,
                     SimpleLine &line_x, SimpleLine &line_y);
+
+    /** @brief Fit a circle to some spacepoints
+     *
+     *  Fit a circle of the form A*(x^2 + y^2) + b*x + c*y = 1 with least squares fit 
+     *  for input spacepoints. Output is a circle in the x-y projection.
+     *
+     *  @param spnts - A vector of all the input spacepoints
+     *  @param circle - The output circle fit
+     *
+     */
+    void circle_fit(const std::map<int, SciFiSpacePoint*> &spnts, SimpleCircle &circle);
 
     /** @brief Determine which two stations the initial line should be drawn between
      * 
@@ -205,8 +217,6 @@ class PatternRecognition {
      *  @param evt - The SciFi event
      */
     void straight_track_recon(SciFiEvent &evt);
-
-    // Summer added below member functions *************
 
     static const int _n_trackers = 2;
     static const int _n_stations = 5;
