@@ -14,31 +14,36 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "src/common_cpp/JsonCppProcessors/HitProcessor.hh"
-
-#include "src/common_cpp/JsonCppProcessors/SciFiChannelIdProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/TOFChannelIdProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/SpecialVirtualChannelIdProcessor.hh"
+#include "src/common_cpp/DataStructure/SpecialVirtualChannelId.hh"
 
 namespace MAUS {
 
-template <>
-HitProcessor<SciFiChannelId>::HitProcessor()
-    : _channel_id_proc(new SciFiChannelIdProcessor()) {
-    RegisterBranches();
+SpecialVirtualChannelId::SpecialVirtualChannelId()
+    : _station(0) {
 }
 
-template <>
-HitProcessor<TOFChannelId>::HitProcessor()
-    : _channel_id_proc(new TOFChannelIdProcessor()) {
-    RegisterBranches();
+SpecialVirtualChannelId::SpecialVirtualChannelId
+         (const SpecialVirtualChannelId& channel) : _station(channel._station) {
 }
 
-template <>
-HitProcessor<SpecialVirtualChannelId>::HitProcessor()
-    : _channel_id_proc(new SpecialVirtualChannelIdProcessor()) {
-    RegisterBranches();
-}
+SpecialVirtualChannelId& SpecialVirtualChannelId::operator=
+                                      (const SpecialVirtualChannelId& channel) {
+    if (this == &channel) {
+        return *this;
+    }
+    _station = channel._station;
+    return *this;
 }
 
+SpecialVirtualChannelId::~SpecialVirtualChannelId() {
+}
 
+int SpecialVirtualChannelId::GetStation() const {
+    return _station;
+}
+
+void SpecialVirtualChannelId::SetStation(int station) {
+    _station = station;
+}
+
+}

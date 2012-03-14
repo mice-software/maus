@@ -14,5 +14,20 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "src/common_cpp/DataStructure/Hit.hh"
+#include "src/common_cpp/JsonCppProcessors/TOFChannelIdProcessor.hh"
+
+namespace MAUS {
+
+TOFChannelIdProcessor::TOFChannelIdProcessor() {
+    RegisterValueBranch("slab", &_int_proc,
+                        &TOFChannelId::GetSlab,
+                        &TOFChannelId::SetSlab, true);
+    RegisterValueBranch("station", &_int_proc,
+                        &TOFChannelId::GetStation,
+                        &TOFChannelId::SetStation, true);
+    RegisterValueBranch("plane", &_int_proc,
+                        &TOFChannelId::GetPlane,
+                        &TOFChannelId::SetPlane, true);
+}
+}
 

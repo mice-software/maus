@@ -58,7 +58,7 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
         tree.Write()
         root_file.Close()
 
-    def _test_birth_death(self):
+    def test_birth_death(self):
         """
         Check that we can birth and death properly
         """
