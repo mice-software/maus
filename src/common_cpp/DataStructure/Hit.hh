@@ -22,27 +22,29 @@
 #include "Rtypes.h" // ROOT
 
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
+#include "src/common_cpp/DataStructure/SpecialVirtualChannelId.hh"
+#include "src/common_cpp/DataStructure/TOFChannelId.hh"
+#include "src/common_cpp/DataStructure/SciFiChannelId.hh"
 
 namespace MAUS {
 
-/** @class ChannelId contains information about the detector channel hit
- */
-class ChannelId {
-  public:
-      virtual ChannelId* Clone() { return new ChannelId(); }
-      virtual ~ChannelId() {}
-};
-
 /** @class Hit contains Monte Carlo sensitive detector hit data
- *
- *  This is really a placeholder - needs a bit more work on individual
- *  detectors. Probably it needs to be a template class in the end.
  *
  *  Hit holds information pertaining to a particle step in a sensitive detector
  *  Stores information on the Track number, particle type, energy of the 
  *  particle, charge, time, energy deposited by this step, position, momentum
  *  and channel hit (channel id) 
+ *
+ *  The template is here to tell developers and users that I expect an extra
+ *  parameter, channel id, in actual instantiations of this class, that contains
+ *  information about the channel (slab, fiber, etc) that was hit.
+ *
+ *  ChannelId is required to have a copy constructor
+ *
+ *  Note that I use a typedef to define specialisations for each detector, like
+ *  TOFHit, SciFiHit, ...
  */
+template <class ChannelId>
 class Hit {
   public:
     /** Initialises everything to 0
@@ -51,11 +53,11 @@ class Hit {
 
     /** Copy constructor; deep copies channel ID
      */
-    Hit(const Hit& md);
+    Hit(const Hit& hit);
 
     /** Equality operator; deep copies channel ID
      */
-    Hit& operator=(const Hit& md);
+    virtual Hit& operator=(const Hit& hit);
 
     /** Destructor - cleans memory associated with channel ID
      */
@@ -63,75 +65,75 @@ class Hit {
 
     /** Returns the track number of the track that made the hit
      */
-    int GetTrackId() const;
+    virtual int GetTrackId() const;
 
     /** Sets the track number of the track that made the hit
      */
-    void SetTrackId(int id);
+    virtual void SetTrackId(int id);
 
     /** Returns the PDG particle type of the track that made the hit
      */
-    int GetParticleId() const;
+    virtual int GetParticleId() const;
 
     /** Sets the PDG particle type of the track that made the hit
      */
-    void SetParticleId(int pid);
+    virtual void SetParticleId(int pid);
 
     /** Returns the total energy of the track that made the hit
      */
-    double GetEnergy() const;
+    virtual double GetEnergy() const;
 
     /** Sets the total energy of the track that made the hit
      */
-    void SetEnergy(double energy);
+    virtual void SetEnergy(double energy);
 
     /** Returns the charge of the track that made the hit
      */
-    double GetCharge() const;
+    virtual double GetCharge() const;
 
     /** Sets the charge of the track that made the hit
      */
-    void SetCharge(double charge);
+    virtual void SetCharge(double charge);
 
     /** Returns the time of the track when it made the hit
      */
-    double GetTime() const;
+    virtual double GetTime() const;
 
     /** Sets the time of the track when it made the hit
      */
-    void SetTime(double time);
+    virtual void SetTime(double time);
 
     /** Returns the energy deposited by the track when it made the hit
      */
-    double GetEnergyDeposited() const;
+    virtual double GetEnergyDeposited() const;
 
     /** Sets the energy deposited by the track when it made the hit
      */
-    void SetEnergyDeposited(double edep);
+    virtual void SetEnergyDeposited(double edep);
 
     /** Returns the position of the track when it made the hit
      */
-    ThreeVector GetPosition() const;
+    virtual ThreeVector GetPosition() const;
 
     /** Sets the position of the track when it made the hit
      */
-    void SetPosition(ThreeVector pos);
+    virtual void SetPosition(ThreeVector pos);
 
     /** Returns the momentum of the track when it made the hit
      */
-    ThreeVector GetMomentum() const;
+    virtual ThreeVector GetMomentum() const;
 
     /** Sets the momentum of the track when it made the hit
      */
-    void SetMomentum(ThreeVector mom);
+    virtual void SetMomentum(ThreeVector mom);
 
     /** Returns the channel id that was hit by the track
      */
-    ChannelId* GetChannelId() const;
+    virtual ChannelId* GetChannelId() const;
 
     /** Sets the channel id that was hit by the track
      */
-    void SetChannelId(ChannelId* id);
+    virtual void SetChannelId(ChannelId* id);
 
   private:
     int _track_id;
@@ -147,7 +149,13 @@ class Hit {
 
     ClassDef(Hit, 1)
 };
+
+typedef Hit<SciFiChannelId> SciFiHit;
+typedef Hit<TOFChannelId> TOFHit;
+typedef Hit<SpecialVirtualChannelId> SpecialVirtualHit;
 }
+
+#include "src/common_cpp/DataStructure/Hit-inl.hh"
 
 #endif
 

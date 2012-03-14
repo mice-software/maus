@@ -24,12 +24,22 @@
 namespace MAUS {
 
 MCEventProcessor::MCEventProcessor()
-    : _hit_proc(new HitProcessor()), _track_proc(new TrackProcessor()),
+    : _sci_fi_hit_proc(new SciFiHitProcessor()),
+      _tof_hit_proc(new TOFHitProcessor()),
+      _special_virtual_hit_proc(new SpecialVirtualHitProcessor()),
+      _track_proc(new TrackProcessor()),
       _virtual_hit_proc(new VirtualHitProcessor()) {
     RegisterPointerBranch("primary", &_primary_proc, &MCEvent::GetPrimary,
                                                     &MCEvent::SetPrimary, true);
     RegisterPointerBranch
-               ("hits", &_hit_proc, &MCEvent::GetHits, &MCEvent::SetHits, true);
+        ("sci_fi_hits", &_sci_fi_hit_proc, &MCEvent::GetSciFiHits,
+                                           &MCEvent::SetSciFiHits, true);
+    RegisterPointerBranch
+        ("tof_hits", &_tof_hit_proc, &MCEvent::GetTOFHits,
+                                     &MCEvent::SetTOFHits, true);
+    RegisterPointerBranch("special_virtual_hits", &_special_virtual_hit_proc,
+                          &MCEvent::GetSpecialVirtualHits,
+                          &MCEvent::SetSpecialVirtualHits, true);
     RegisterPointerBranch
        ("tracks", &_track_proc, &MCEvent::GetTracks, &MCEvent::SetTracks, true);
     RegisterPointerBranch("virtual_hits", &_virtual_hit_proc,

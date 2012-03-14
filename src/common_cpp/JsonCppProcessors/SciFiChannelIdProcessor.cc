@@ -14,31 +14,23 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "src/common_cpp/JsonCppProcessors/HitProcessor.hh"
-
 #include "src/common_cpp/JsonCppProcessors/SciFiChannelIdProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/TOFChannelIdProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/SpecialVirtualChannelIdProcessor.hh"
 
 namespace MAUS {
 
-template <>
-HitProcessor<SciFiChannelId>::HitProcessor()
-    : _channel_id_proc(new SciFiChannelIdProcessor()) {
-    RegisterBranches();
-}
-
-template <>
-HitProcessor<TOFChannelId>::HitProcessor()
-    : _channel_id_proc(new TOFChannelIdProcessor()) {
-    RegisterBranches();
-}
-
-template <>
-HitProcessor<SpecialVirtualChannelId>::HitProcessor()
-    : _channel_id_proc(new SpecialVirtualChannelIdProcessor()) {
-    RegisterBranches();
+SciFiChannelIdProcessor::SciFiChannelIdProcessor() {
+    RegisterValueBranch("fiber_number", &_int_proc,
+                        &SciFiChannelId::GetFiberNumber,
+                        &SciFiChannelId::SetFiberNumber, true);
+    RegisterValueBranch("station_number", &_int_proc,
+                        &SciFiChannelId::GetStationNumber,
+                        &SciFiChannelId::SetStationNumber, true);
+    RegisterValueBranch("tracker_number", &_int_proc,
+                        &SciFiChannelId::GetTrackerNumber,
+                        &SciFiChannelId::SetTrackerNumber, true);
+    RegisterValueBranch("plane_number", &_int_proc,
+                        &SciFiChannelId::GetPlaneNumber,
+                        &SciFiChannelId::SetPlaneNumber, true);
 }
 }
-
 

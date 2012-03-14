@@ -14,5 +14,26 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "src/common_cpp/DataStructure/Hit.hh"
+#include "src/common_cpp/JsonCppProcessors/PrimitivesProcessors.hh"
+#include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
+
+#include "src/common_cpp/DataStructure/TOFChannelId.hh"
+
+#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_TOFCHANNELIDPROCESSOR_HH_
+#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_TOFCHANNELIDPROCESSOR_HH_
+
+namespace MAUS {
+
+/** @class TOFChannelProcessor processor for the TOF channel id */
+class TOFChannelIdProcessor : public ObjectProcessor<TOFChannelId> {
+ public:
+    /** Constructor - registers the branch structure */
+    TOFChannelIdProcessor();
+
+ private:
+    IntProcessor _int_proc;
+};
+}
+
+#endif
 

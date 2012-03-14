@@ -14,5 +14,14 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "src/common_cpp/DataStructure/Hit.hh"
+#include "src/common_cpp/JsonCppProcessors/SpecialVirtualChannelIdProcessor.hh"
+
+namespace MAUS {
+
+SpecialVirtualChannelIdProcessor::SpecialVirtualChannelIdProcessor() {
+    RegisterValueBranch("station", &_int_proc,
+                        &SpecialVirtualChannelId::GetStation,
+                        &SpecialVirtualChannelId::SetStation, true);
+}
+}
 

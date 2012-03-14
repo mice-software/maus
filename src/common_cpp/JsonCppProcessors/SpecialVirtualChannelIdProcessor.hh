@@ -14,34 +14,25 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_MCEVENTPROCESSOR_HH_
-#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_MCEVENTPROCESSOR_HH_
-
-#include "json/value.h"
-
-#include "src/common_cpp/JsonCppProcessors/PrimaryProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/PrimitivesProcessors.hh"
 #include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
 
-#include "src/common_cpp/JsonCppProcessors/HitProcessor.hh"
+#include "src/common_cpp/DataStructure/SpecialVirtualChannelId.hh"
 
-#include "src/common_cpp/DataStructure/MCEvent.hh"
+#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_SPECIALVIRTUALCHANNELIDPROCESSOR_HH_
+#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_SPECIALVIRTUALCHANNELIDPROCESSOR_HH_
 
 namespace MAUS {
 
-/** @class MCEventProcessor for converting json <-> cpp MCEvent */
-class MCEventProcessor : public ObjectProcessor<MCEvent> {
+/** @class SpecialVirtualChannelProcessor processor for the SpecialVirtual channel id */
+class SpecialVirtualChannelIdProcessor
+                             : public ObjectProcessor<SpecialVirtualChannelId> {
  public:
     /** Constructor - registers the branch structure */
-    MCEventProcessor();
+    SpecialVirtualChannelIdProcessor();
 
  private:
-    ValueArrayProcessor<SciFiHit> _sci_fi_hit_proc;
-    ValueArrayProcessor<TOFHit> _tof_hit_proc;
-    ValueArrayProcessor<SpecialVirtualHit> _special_virtual_hit_proc;
-    ValueArrayProcessor<Track> _track_proc;
-    ValueArrayProcessor<VirtualHit> _virtual_hit_proc;
-    PrimaryProcessor _primary_proc;
+    IntProcessor _int_proc;
 };
 }
 

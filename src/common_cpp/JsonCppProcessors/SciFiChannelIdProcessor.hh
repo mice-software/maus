@@ -14,5 +14,26 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "src/common_cpp/DataStructure/Hit.hh"
+#include "src/common_cpp/JsonCppProcessors/PrimitivesProcessors.hh"
+#include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
+
+#include "src/common_cpp/DataStructure/SciFiChannelId.hh"
+
+#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_SCIFICHANNELIDPROCESSOR_HH_
+#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_SCIFICHANNELIDPROCESSOR_HH_
+
+namespace MAUS {
+
+/** @class SciFiChannelProcessor processor for the sci fi channel id */
+class SciFiChannelIdProcessor : public ObjectProcessor<SciFiChannelId> {
+ public:
+    /** Constructor - registers the branch structure */
+    SciFiChannelIdProcessor();
+
+ private:
+    IntProcessor _int_proc;
+};
+}
+
+#endif
 

@@ -39,7 +39,12 @@
 #pragma link C++ class MAUS::VirtualHit+;
 #pragma link C++ class MAUS::Primary+;
 #pragma link C++ class MAUS::Step+;
-#pragma link C++ class MAUS::Hit+;
+#pragma link C++ class MAUS::SciFiHit+;
+#pragma link C++ class MAUS::SciFiChannelId+;
+#pragma link C++ class MAUS::TOFHit+;
+#pragma link C++ class MAUS::TOFChannelId+;
+#pragma link C++ class MAUS::SpecialVirtualHit+;
+#pragma link C++ class MAUS::SpecialVirtualChannelId+;
 
 #pragma link C++ global gROOT;
 #pragma link C++ global gEnv;
