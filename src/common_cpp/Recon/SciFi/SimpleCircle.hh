@@ -41,11 +41,12 @@ class SimpleCircle {
     void set_y0(double y0) { _y0 = y0; }
     void set_R(double R) { _R = R; }
     void set_chisq(double chisq) { _chisq = chisq; }
-    void set_parameters(double c, double m, double chisq);
+    void set_parameters(double x0, double y0, double R, double chisq);
 
   private:
-    double _c;
-    double _m;
+    double _x0;
+    double _y0;
+    double _R;
     double _chisq;
 };
 // } // ~namespace MAUS
