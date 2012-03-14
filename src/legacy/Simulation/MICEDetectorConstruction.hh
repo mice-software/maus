@@ -46,7 +46,7 @@ public:
   //Set the magnetic fields from BeamTools using MiceModule
   void    setBTMagneticField(MiceModule* rootModule);
 
-  std::vector<Json::Value> GetSDHits(int i);
+  Json::Value GetSDHits(int i);
 
   void ClearSDHits();
 
