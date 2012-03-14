@@ -81,7 +81,7 @@ class MapPyCkovSecondPeaks:
                 #The minimum within the new array is found and bins from -10 to +20 are summed.
                 
                 for pmt in range(0, 8):#pylint: disable=C0103
-                    for j in range(len(ckov[i]['V1731'][pmt]['samples'])):
+                    for j in range(len(ckov[0]['V1731'][0]['samples'])):
                         samples.append(ckov[i]['V1731'][pmt]['samples'][j])
                     if pmt <= 3:
                         ckov_sta = 'A2'
@@ -101,14 +101,14 @@ class MapPyCkovSecondPeaks:
 
                    #Create new array excluding the inital peak
                    
-                        for i in range(0, lower_bound):
-                            samples_reduce.append(samples[i])
+                        for low in range(0, lower_bound):
+                            samples_reduce.append(samples[low])
                             
-                        for j in range(lower_bound, upper_bound):#pylint: disable=W0612
+                        for peak in range(lower_bound, upper_bound):#pylint: disable=W0612
                             samples_reduce.append(200)
                                 
-                        for k in range(upper_bound, end):
-                            samples_reduce.append(samples[k])
+                        for high in range(upper_bound, end):
+                            samples_reduce.append(samples[high])
 
                     #Find the new minimum using python's built-in "min" function.
                         if (pedestal - min(samples_reduce) )> second_pulse_threshold:
