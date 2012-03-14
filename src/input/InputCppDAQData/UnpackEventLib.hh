@@ -23,6 +23,7 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <algorithm>
 
 #include "json/json.h"
 
