@@ -83,9 +83,7 @@ class ReducePyCkovTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
                         "No ReducePyCkov field")        
         errors = errors["ReducePyCkov"]
         self.assertTrue(len(errors) >= 1, "Missing error trace")
-        self.assertEquals("<type 'exceptions.ValueError'>: \
-                           Expecting object: line 1 column 0 (char 0)", errors[0], "Unexpected error trace") # pylint: disable=C0301
-        
+                
     def test_no_digits(self):
         """
         Test "process" with a JSON document with no "digits" entry.
