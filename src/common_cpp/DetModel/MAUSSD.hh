@@ -42,7 +42,6 @@ class MAUSSD : public G4VSensitiveDetector {
   void ClearHits() { _hits.clear(); }
   Json::Value GetHits() { return _hits; }
 
-
  protected:
   Json::Value _hits;
 

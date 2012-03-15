@@ -89,6 +89,10 @@ JsonWrapper::JsonType JsonWrapper::ValueTypeToJsonType(Json::ValueType tp) {
     case Json::booleanValue: return booleanValue;
     case Json::arrayValue: return arrayValue;
     case Json::objectValue: return objectValue;
+    default:
+      throw(Squeal(Squeal::recoverable,
+                   "Json ValueType not recognised",
+                   "JsonWrapper::ValueTypeToJsonType"));
   }
 }
 
@@ -103,7 +107,7 @@ Json::ValueType JsonWrapper::JsonTypeToValueType(JsonWrapper::JsonType tp)
     case booleanValue: return Json::booleanValue;
     case arrayValue:   return Json::arrayValue;
     case objectValue:  return Json::objectValue;
-    case anyValue:
+    case anyValue: default:
       throw(Squeal(Squeal::recoverable,
                    "Could not convert anyValue to Json ValueType",
                    "JsonWrapper::JsonTypeToValueType"));
@@ -157,6 +161,8 @@ bool JsonWrapper::AlmostEqual(Json::Value value_1, Json::Value value_2, double t
             return value_1.asBool() == value_2.asBool();
         case Json::nullValue:
             return true;
+        default:
+            return false;
     }
 }
 

@@ -21,6 +21,9 @@
 
 #include "Rtypes.h" // ROOT
 
+#include "src/common_cpp/DataStructure/Hit.hh" // ROOT was tripping up on
+                                               // forward declaration of this
+
 namespace MAUS {
 
 class Track;
@@ -30,11 +33,6 @@ class Primary;
 class SciFiChannelId;
 class TOFChannelId;
 class SpecialVirtualChannelId;
-template <class ChannelId> class Hit;
-
-typedef Hit<SciFiChannelId> SciFiHit;
-typedef Hit<TOFChannelId> TOFHit;
-typedef Hit<SpecialVirtualChannelId> SpecialVirtualHit;
 
 typedef std::vector<Track> TrackArray;
 typedef std::vector<VirtualHit> VirtualHitArray;

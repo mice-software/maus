@@ -15,7 +15,6 @@
  */
 
 #include "src/common_cpp/DataStructure/Track.hh"
-#include "src/common_cpp/DataStructure/Hit.hh"
 #include "src/common_cpp/DataStructure/VirtualHit.hh"
 #include "src/common_cpp/DataStructure/Primary.hh"
 

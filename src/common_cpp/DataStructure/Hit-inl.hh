@@ -17,7 +17,6 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_HIT_INL_HH_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_HIT_INL_HH_
 
-
 namespace MAUS {
 
 template <class ChannelId>
@@ -161,3 +160,4 @@ void Hit<ChannelId>::SetChannelId(ChannelId* id) {
 }
 
 #endif
+
