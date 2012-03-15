@@ -85,6 +85,5 @@ class MapPyCkovSecondPeaksTestCase(unittest.TestCase):# pylint: disable = R0904
             raise Exception('Initialize Fail', 'Could not start worker')
         #self.mapper = None
 
-
 if __name__ == '__main__':
     unittest.main()
