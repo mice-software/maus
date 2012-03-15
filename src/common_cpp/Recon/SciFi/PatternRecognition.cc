@@ -529,6 +529,203 @@ void PatternRecognition::linear_fit(const std::map<int, SciFiSpacePoint*> &spnts
   */
 }
 
+void PatternRecognition::make_helix(
+       const std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
+       const std::vector<int> ignore_stations,
+       const int outer_station_num, const int inner_station_num,
+       const int station_outer_sp, const int station_inner_sp,
+       std::map<int, SciFiSpacePoint*> &good_spnts,
+       std::vector<SciFiStraightPRTrack> &trks) {
+
+  int ignore_station_1 = -1, ignore_station_2 = -1;
+  if ( ignore_stations.size() == 0 ) {
+     // Leave ignore stations as -1
+  } else if ( ignore_stations.size() == 1 ) {
+    ignore_station_1 = ignore_stations[0];
+  } else if ( ignore_stations.size() == 2 ) {
+    ignore_station_1 = ignore_stations[0];
+    ignore_station_2 = ignore_stations[1];
+  } else if ( ignore_stations.size() > 2 ) {
+      std::cout << "Error: Invalid ignore station argument." << std::endl;
+      return;
+  }
+
+  SimpleCircle circle1;
+
+  // Find the circle that fits uniquely to the 3 spacepoints: from inner, outer
+  // and intermediate stations
+  Hep3Vector pos_outer = spnts_by_station[outer_station_num][station_outer_sp]->get_position();
+  Hep3Vector pos_inner = spnts_by_station[inner_station_num][station_inner_sp]->get_position();
+
+  // Loop over intermediate stations to find one more spacepoint for circle seed
+  for ( int mid_station_num = inner_station_num + 1;
+        mid_station_num < outer_station_num; ++mid_station_num ) {
+    if (mid_station_num != ignore_station_1 && mid_station_num != ignore_station_2) {
+      for ( int sp_no = 0;
+            sp_no < static_cast<int>(spnts_by_station[mid_station_num].size()); ++sp_no ) {
+        if ( !spnts_by_station[mid_station_num][sp_no]->get_used() ) {
+          Hep3Vector pos_medium = spnts_by_station[mid_station_num][sp_no]->get_position();
+          // Send off the three spacepoints to made the initial circle
+          bool goodcircle = initial_circle(pos_inner, pos_outer, pos_medium, circle1);
+          if ( goodcircle ) {
+            for ( int station_num = mid_station_num + 1;
+                  station_num < outer_station_num; ++station_num ) {
+              if (station_num != ignore_station_1 && station_num != ignore_station_2) {
+               /* for ( int sp
+                Hep3Vector pos_interm = spnts_by_station[station_num][]
+                double dR = delta_R(circle1, pos_intermediate);
+                if (dr < R_cut)
+                  // proceed...
+*/
+              } // ~if (station_num != ignore_station)
+            } // ~Loop over intermediate stations not used in seed
+          } // ~If the seed circle is formed correctly with finite radius
+ /*         // Apply roadcuts & find the spacepoints with the smallest residuals for the line
+          if ( fabs(dx) < _res_cut && fabs(dy) < _res_cut && delta_sq > (dx*dx + dy*dy) ) {
+            delta_sq = dx*dx + dy*dy;
+            good_spnts[station_num] = spnts_by_station[station_num][sp_no];
+          } // ~If pass roadcuts and beats previous best fit point*/
+        } // ~If spacepoint is unused
+      } // ~Loop over spacepoints
+    } // ~if (station_num != ignore_station)
+  } // ~Loop over intermediate stations
+} // ~initial_circle(...)
+
+bool PatternRecognition::initial_circle(CLHEP::Hep3Vector p1, CLHEP::Hep3Vector p2,
+                                        CLHEP::Hep3Vector p3, SimpleCircle circle) {
+
+  CLHEP::HepMatrix a(3, 3); // Rows, columns
+  CLHEP::HepMatrix d(3, 3);
+  CLHEP::HepMatrix e(3, 3);
+  CLHEP::HepMatrix f(3, 3);
+
+  // Row 1
+  a[0][0] = p1.x();
+  a[0][1] = p1.y();
+  a[0][2] = 1.;
+  // Row 2
+  a[1][0] = p2.x();
+  a[1][1] = p2.y();
+  a[1][2] = 1.;
+  // Row 3
+  a[2][0] = p3.x();
+  a[2][1] = p3.y();
+  a[2][2] = 1.;
+
+  // Row 1
+  d[0][0] = p1.x() * p1.x() + p1.y() * p1.y();
+  d[0][1] = p1.y();
+  d[0][2] = 1.;
+  // Row 2
+  d[1][0] = p2.x() * p2.x() + p2.y() * p2.y();
+  d[1][1] = p2.y();
+  d[1][2] = 1.;
+  // Row 3
+  d[2][0] = p3.x() * p3.x() + p3.y() * p3.y();
+  d[2][1] = p3.y();
+  d[2][2] = 1.;
+
+  // Row 1
+  e[0][0] = p1.x() * p1.x() + p1.y() * p1.y();
+  e[0][1] = p1.x();
+  e[0][2] = 1.;
+  // Row 2
+  e[1][0] = p2.x() * p2.x() + p2.y() * p2.y();
+  e[1][1] = p2.x();
+  e[1][2] = 1.;
+  // Row 3
+  e[2][0] = p3.x() * p3.x() + p3.y() * p3.y();
+  e[2][1] = p3.x();
+  e[2][2] = 1.;
+
+  // Row 1
+  f[0][0] = p1.x() * p1.x() + p1.y() * p1.y();
+  f[0][1] = p1.x();
+  f[0][2] = p1.y();
+  // Row 2
+  f[1][0] = p2.x() * p2.x() + p2.y() * p2.y();
+  f[1][1] = p2.x();
+  f[1][2] = p2.y();
+  // Row 3
+  f[2][0] = p3.x() * p3.x() + p3.y() * p3.y();
+  f[2][1] = p3.x();
+  f[2][2] = p3.y();
+
+  double detA = a.determinant();
+  double detD = - d.determinant();
+  double detE = e.determinant();
+  double detF = - f.determinant();
+
+  if (detA == 0)
+    return false;
+
+  double x0 = - detD / (2. * detA);
+  double y0 = - detE / (2. * detA);
+
+  double det = ( detD * detD + detE * detE ) / (4. * detA * detA ) - ( detF / detA );
+
+  if (det < 0.)
+    return false;
+
+  double r = sqrt(det); // mm
+
+  circle.set_x0(x0);
+  circle.set_y0(y0);
+  circle.set_R(r);
+
+  return true;
+}
+
+double PatternRecognition::delta_R(SimpleCircle circle, CLHEP::Hep3Vector pos) {
+
+  double x0 = circle.get_x0();
+  double y0 = circle.get_y0();
+  double R = circle.get_R();
+
+  double R_i = sqrt((pos.x() - x0)*(pos.x() - x0) + (pos.y() - y0)*(pos.y() - y0));
+
+  double delta = R_i - R;
+
+  return delta;
+}
+
+void PatternRecognition::determine_dipangle(const std::map<int, SciFiSpacePoint*> &spnts,
+                                            SimpleCircle circle, SimpleLine line_sz) {
+
+  std::vector<double> phiz;
+  for ( std::map<int, SciFiSpacePoint*>::const_iterator ii = spnts.begin();
+       ii != spnts.end(); ++ii ) {
+    double x_pos = (*ii).second->get_position().x();
+    double y_pos = (*ii).second->get_position().y();
+    double phi = calculate_Phi(x_pos, y_pos, circle);
+
+    phiz.push_back(phi);
+
+    double z_pos = (*ii).second->get_position().z();
+  }
+  // Determine seperation between stations
+/*  std::vector<double> dz;
+    for( unsigned int i = 0; i < spnts.size(); ++i ) {
+      double z_pos_i = spnts[i]->get_position().z();
+      double z_pos_j = spnts[i+1]->get_position().z();
+      // i < j
+      double dz_ji = z_pos_j - z_pos_i; 
+      dz.push_back(dz_ji);
+    } */
+}
+
+double PatternRecognition::calculate_Phi(double xpos, double ypos, SimpleCircle circle) {
+
+  double y0 = circle.get_y0();
+  double x0 = circle.get_x0();
+  double angle = atan2(ypos - y0, xpos - x0);
+
+  if ( angle < 0. )
+    angle += 2. * pi;
+
+  return angle;
+}
+
 void PatternRecognition::circle_fit(const std::map<int, SciFiSpacePoint*> &spnts,
                                     SimpleCircle &circle) {
 
