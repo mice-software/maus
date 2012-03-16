@@ -221,9 +221,9 @@ TEST(JsonWrapper, ObjectMergeTest) {
   // check that merge was correct
   EXPECT_EQ(object_merged["string"], Json::Value("string_value"));
   EXPECT_EQ(object_merged["string_alt"], Json::Value("string_value_alt"));
-  EXPECT_EQ(object_merged["array_alt_1"].size(), 1);
-  EXPECT_EQ(object_merged["array_alt_2"].size(), 1);
-  EXPECT_EQ(object_merged["array"].size(), 2);
+  EXPECT_EQ(object_merged["array_alt_1"].size(), size_t(1));
+  EXPECT_EQ(object_merged["array_alt_2"].size(), size_t(1));
+  EXPECT_EQ(object_merged["array"].size(), size_t(2));
   EXPECT_EQ(object_merged["string"], Json::Value("string_value"));
   // throw because common non-array properties
   EXPECT_THROW(JsonWrapper::ObjectMerge(object_1, object_1), Squeal);
