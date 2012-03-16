@@ -133,6 +133,7 @@ class InputTransformExecutor: # pylint: disable=R0903, R0902
         Wait for tasks currently being executed by Celery nodes to 
         complete.
         @param self Object reference.
+        @throws RabbitMQException if RabbitMQ cannot be contacted.
         @throws DocumentStoreException if there is a problem
         using the document store.
         """
@@ -141,10 +142,18 @@ class InputTransformExecutor: # pylint: disable=R0903, R0902
         current = 0
         while (current < num_tasks):
             result = self.celery_tasks[current]
-            if result.successful():
+            try:
+                # Catch any RabbitMQ errors when querying status.
+                is_successful = result.successful()
+                is_failed = result.failed()
+                result_result = result.result
+                result_traceback = result.traceback
+            except socket.error as exc:
+                raise RabbitMQException(exc)
+            if is_successful:
                 self.celery_tasks.pop(current)
                 num_tasks -= 1
-                spill = result.result
+                spill = result_result
                 self.spill_process_count += 1
                 print " Celery task %s SUCCESS " % (result.task_id)
                 print "   SAVING to collection %s (with ID %s)" \
@@ -155,12 +164,12 @@ class InputTransformExecutor: # pylint: disable=R0903, R0902
                 except Exception as exc:
                     raise DocumentStoreException(exc)
                 self.print_counts()
-            elif result.failed():
+            elif is_failed:
                 self.celery_tasks.pop(current)
                 self.spill_fail_count += 1
                 num_tasks -= 1
                 print " Celery task %s FAILED : %s : %s" \
-                    % (result.task_id, result.result, result.traceback)
+                    % (result.task_id, result_result, result_traceback)
                 self.print_counts()
             else:
                 current += 1

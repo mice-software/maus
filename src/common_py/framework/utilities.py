@@ -19,6 +19,7 @@ MAUS framework utilities module.
 
 import socket
 
+from celery.task.control import discard_all
 from celery.task.control import inspect
 from celery.task.control import broadcast
 from docstore.DocumentStore import DocumentStore
@@ -184,6 +185,18 @@ class CeleryUtilities: # pylint: disable=W0232
         return len(active_nodes)
 
     @staticmethod
+    def discard_celery_jobs():
+        """
+        Discard all currently pending Celery jobs.
+        @throws RabbitMQException if RabbitMQ cannot be contacted.
+        @throws NoCeleryNodeException if no Celery nodes.
+        """
+        try:
+            discard_all()
+        except socket.error as exc:
+            raise RabbitMQException(exc)
+
+    @staticmethod
     def birth_celery(transform, config, config_id, timeout = 1000):
         """
         Set new configuration and transforms in Celery nodes, and
@@ -304,5 +317,5 @@ class CeleryNodeException(Exception):
         @param self Object reference.
         @return string.
         """
-        node_ids = [node[0] for node in self.node_status]
-        return "Celery node(s) %s failed to configure" % node_ids
+        return "Celery node(s) failed to configure: %s" \
+            % self.node_status
