@@ -241,6 +241,12 @@ Enable_KL = True
 Enable_CKOV = True
 DAQ_cabling_file = "/files/cabling/DAQChannelMap.txt"
 
+#cerenkov digitization
+ckov_position_threshold = 40
+ckov_pulse_area_threshold = 1
+ckov_window_min = 19
+ckov_window_max = 80
+
 # tof digitization
 TOFconversionFactor = 0.01 # MeV
 TOFpmtTimeResolution = 0.1 # nanosecond
