@@ -28,17 +28,22 @@ def run():
     my_map = MAUS.MapPyGroup()
     my_map.append(MAUS.MapPyBeamMaker()) # beam construction
     my_map.append(MAUS.MapCppSimulation())  #  geant4 simulation
-    my_map.append(MAUS.MapCppTrackerMCDigitization())  # SciFi electronics model
     my_map.append(MAUS.MapCppTOFMCDigitizer())  # TOF MC Digitizer
+    my_map.append(MAUS.MapCppTOFSlabHits())  # TOF SlabHit Reco
+    my_map.append(MAUS.MapCppTOFSpacePoints())  # TOF SpacePoint Reco
+    #my_map.append(MAUS.MapCppTrackerRecon())  # SciFi recon
     # can specify datacards here or by using appropriate command line calls
     datacards = io.StringIO(u"")
+
+    reducer = MAUS.ReducePyDoNothing()
+
     # Then construct a MAUS output component - filename comes from datacards
     my_output = MAUS.OutputPyJSON()
 
     # The Go() drives all the components you pass in, then check the file
     # (default simulation.out) for output
 
-    MAUS.Go(my_input, my_map, MAUS.ReducePyDoNothing(), my_output, datacards)
+    MAUS.Go(my_input, my_map, reducer, my_output, datacards)
 
 if __name__ == '__main__':
     run()
