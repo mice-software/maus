@@ -31,24 +31,31 @@ class InputPySpillGeneratorTestCase(unittest.TestCase):
     def test_birth_bad(self):
         """test bad input number of spills
         """
-        test_conf_1 = unicode('{"spill_generator_number_of_spills":"bob"}')
-        test_conf_2 = unicode("{}")
-        test_conf_3 = unicode('{"spill_generator_number_of_spills":-1}')
+        test_conf_1 = json.dumps({"spill_generator_number_of_spills":"bob",
+                                  "monte_carlo_run_number":0})
+        test_conf_2 = json.dumps({"spill_generator_number_of_spills":1,
+                                  "monte_carlo_run_number":"jim"})
+        test_conf_3 = json.dumps({})
+        test_conf_4 = json.dumps({"spill_generator_number_of_spills":-1,
+                                  "monte_carlo_run_number":"jim"})
         self.assertFalse(InputPySpillGenerator().birth(test_conf_1))
         self.assertFalse(InputPySpillGenerator().birth(test_conf_2))
         self.assertFalse(InputPySpillGenerator().birth(test_conf_3))
+        self.assertFalse(InputPySpillGenerator().birth(test_conf_4))
     
     def test_generate100(self):
         """test generate 100 events
         """
         my_input = InputPySpillGenerator()
-        test_conf = unicode('{"spill_generator_number_of_spills":100}')
+        test_conf = json.dumps({"spill_generator_number_of_spills":100,
+                                "monte_carlo_run_number":7,})
         self.assertTrue(my_input.birth(test_conf))
         n_spills = 0
         for doc in my_input.emitter():
             json_doc = json.loads(doc)
-            self.assertTrue(json_doc == {})
             n_spills += 1
+            self.assertEqual(json_doc, {"run_num":7, "spill_num":n_spills,
+                                        "daq_event_type":"physics_event"})
         self.assertEqual(n_spills, 100)
         self.assertTrue(my_input.death())
 

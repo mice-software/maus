@@ -215,8 +215,7 @@ class MapPyCkov:
         #spill['daq_data']['ckov'] = {}                                      
         if 'digits' not in spill:
             spill['digits'] = {}
-
-        spill['digits'] = digits
+        spill['digits']['ckov'] = digits
 
         return json.dumps(spill)
 
