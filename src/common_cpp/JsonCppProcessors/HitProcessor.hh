@@ -20,25 +20,72 @@
 #include "json/value.h"
 
 #include "src/common_cpp/JsonCppProcessors/PrimaryProcessor.hh"
-
 #include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
+#include "src/common_cpp/JsonCppProcessors/ProcessorBase.hh"
 
 #include "src/common_cpp/DataStructure/Hit.hh"
 
 namespace MAUS {
 
 /** @class Hit processor for converting json <-> cpp data */
-class HitProcessor : public ObjectProcessor<Hit> {
+template <class ChannelId>
+class HitProcessor : public ObjectProcessor<Hit<ChannelId> > {
  public:
     /** Constructor - registers the branch structure */
     HitProcessor();
+    /** delete the channel_id processor */
+    ~HitProcessor();
+
+    void RegisterBranches();
 
  private:
+    ProcessorBase<ChannelId>* _channel_id_proc;
     ThreeVectorProcessor _three_vec_proc;
     DoubleProcessor _double_proc;
     IntProcessor _int_proc;
 };
+
+typedef HitProcessor<SciFiChannelId> SciFiHitProcessor;
+typedef HitProcessor<TOFChannelId> TOFHitProcessor;
+typedef HitProcessor<SpecialVirtualChannelId> SpecialVirtualHitProcessor;
+
+template <class ChannelId>
+void HitProcessor<ChannelId>::RegisterBranches() {
+    RegisterValueBranch("track_id", &_int_proc,
+                        &Hit<ChannelId>::GetTrackId,
+                        &Hit<ChannelId>::SetTrackId, true);
+    RegisterValueBranch("particle_id", &_int_proc,
+                        &Hit<ChannelId>::GetParticleId,
+                        &Hit<ChannelId>::SetParticleId, true);
+    RegisterValueBranch("energy", &_double_proc,
+                        &Hit<ChannelId>::GetEnergy,
+                        &Hit<ChannelId>::SetEnergy, true);
+    RegisterValueBranch("charge", &_double_proc,
+                        &Hit<ChannelId>::GetCharge,
+                        &Hit<ChannelId>::SetCharge, true);
+    RegisterValueBranch("time", &_double_proc,
+                        &Hit<ChannelId>::GetTime,
+                        &Hit<ChannelId>::SetTime, true);
+    RegisterValueBranch("energy_deposited", &_double_proc,
+                        &Hit<ChannelId>::GetEnergyDeposited,
+                        &Hit<ChannelId>::SetEnergyDeposited, true);
+    RegisterValueBranch("position", &_three_vec_proc,
+                        &Hit<ChannelId>::GetPosition,
+                        &Hit<ChannelId>::SetPosition, true);
+    RegisterValueBranch("momentum", &_three_vec_proc,
+                        &Hit<ChannelId>::GetMomentum,
+                        &Hit<ChannelId>::SetMomentum, true);
+    RegisterPointerBranch("channel_id", _channel_id_proc,
+                        &Hit<ChannelId>::GetChannelId,
+                        &Hit<ChannelId>::SetChannelId, true);
+}
+
+template <class ChannelId>
+HitProcessor<ChannelId>::~HitProcessor() {
+    if (_channel_id_proc != NULL) {
+        delete _channel_id_proc;
+    }
+}
 }
 
 #endif

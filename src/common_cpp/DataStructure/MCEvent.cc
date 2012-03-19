@@ -15,7 +15,6 @@
  */
 
 #include "src/common_cpp/DataStructure/Track.hh"
-#include "src/common_cpp/DataStructure/Hit.hh"
 #include "src/common_cpp/DataStructure/VirtualHit.hh"
 #include "src/common_cpp/DataStructure/Primary.hh"
 
@@ -24,11 +23,13 @@
 namespace MAUS {
 
 MCEvent::MCEvent()
-       : _primary(NULL), _virtuals(NULL), _hits(NULL), _tracks(NULL) {
+       : _primary(NULL), _virtuals(NULL), _sci_fi_hits(NULL), _tof_hits(NULL),
+         _special_virtual_hits(NULL), _tracks(NULL) {
 }
 
 MCEvent::MCEvent(const MCEvent& md)
-       : _primary(NULL), _virtuals(NULL), _hits(NULL), _tracks(NULL) {
+       : _primary(NULL), _virtuals(NULL), _sci_fi_hits(NULL), _tof_hits(NULL),
+         _special_virtual_hits(NULL), _tracks(NULL) {
   *this = md;
 }
 
@@ -54,14 +55,32 @@ MCEvent& MCEvent::operator=(const MCEvent& md) {
         _virtuals = new VirtualHitArray(*md._virtuals);
     }
 
-
-    if (_hits != NULL) {
-        delete _hits;
+    if (_sci_fi_hits != NULL) {
+        delete _sci_fi_hits;
     }
-    if (md._hits == NULL) {
-        _hits = NULL;
+    if (md._sci_fi_hits == NULL) {
+        _sci_fi_hits = NULL;
     } else {
-        _hits = new HitArray(*md._hits);
+        _sci_fi_hits = new SciFiHitArray(*md._sci_fi_hits);
+    }
+
+    if (_tof_hits != NULL) {
+        delete _tof_hits;
+    }
+    if (md._tof_hits == NULL) {
+        _tof_hits = NULL;
+    } else {
+        _tof_hits = new TOFHitArray(*md._tof_hits);
+    }
+
+    if (_special_virtual_hits != NULL) {
+        delete _special_virtual_hits;
+    }
+    if (md._special_virtual_hits == NULL) {
+        _special_virtual_hits = NULL;
+    } else {
+        _special_virtual_hits =
+                          new SpecialVirtualHitArray(*md._special_virtual_hits);
     }
 
     if (_primary != NULL) {
@@ -85,9 +104,17 @@ MCEvent::~MCEvent() {
         delete _virtuals;
         _virtuals = NULL;
     }
-    if (_hits != NULL) {
-        delete _hits;
-        _hits = NULL;
+    if (_sci_fi_hits != NULL) {
+        delete _sci_fi_hits;
+        _sci_fi_hits = NULL;
+    }
+    if (_tof_hits != NULL) {
+        delete _tof_hits;
+        _tof_hits = NULL;
+    }
+    if (_special_virtual_hits != NULL) {
+        delete _special_virtual_hits;
+        _special_virtual_hits = NULL;
     }
     if (_primary != NULL) {
         delete _primary;
@@ -117,15 +144,37 @@ void MCEvent::SetVirtualHits(VirtualHitArray* hits) {
     _virtuals = hits;
 }
 
-HitArray* MCEvent::GetHits() const {
-    return _hits;
+SciFiHitArray* MCEvent::GetSciFiHits() const {
+    return _sci_fi_hits;
 }
 
-void MCEvent::SetHits(HitArray* hits) {
-    if (_hits != NULL) {
-        delete _hits;
+void MCEvent::SetSciFiHits(SciFiHitArray* hits) {
+    if (_sci_fi_hits != NULL) {
+        delete _sci_fi_hits;
     }
-    _hits = hits;
+    _sci_fi_hits = hits;
+}
+
+TOFHitArray* MCEvent::GetTOFHits() const {
+    return _tof_hits;
+}
+
+void MCEvent::SetTOFHits(TOFHitArray* hits) {
+    if (_tof_hits != NULL) {
+        delete _tof_hits;
+    }
+    _tof_hits = hits;
+}
+
+SpecialVirtualHitArray* MCEvent::GetSpecialVirtualHits() const {
+    return _special_virtual_hits;
+}
+
+void MCEvent::SetSpecialVirtualHits(SpecialVirtualHitArray* hits) {
+    if (_special_virtual_hits != NULL) {
+        delete _special_virtual_hits;
+    }
+    _special_virtual_hits = hits;
 }
 
 Primary* MCEvent::GetPrimary() const {

@@ -1,0 +1,40 @@
+Configuration VirtualPlanesTest
+{
+  Dimensions 10 10 10 m
+  PropertyString Material Galactic
+
+  MiceModule VirtualTest_z
+  {
+    PropertyString Volume None
+    PropertyString SensitiveDetector Virtual
+    PropertyHep3Vector Position 0.0 0.0 100. mm
+    PropertyString IndependentVariable z
+  }
+  MiceModule VirtualTest_u
+  {
+    PropertyString Volume None
+    PropertyString SensitiveDetector Virtual
+    PropertyHep3Vector Position 200.0 0.0 100. mm
+    PropertyHep3Vector Rotation 0.0 45.0 0. degree
+    PropertyDouble RadialExtent 10.0 mm
+    PropertyString IndependentVariable u
+  }
+  MiceModule VirtualTest_t
+  {
+    PropertyString Volume None
+    PropertyString SensitiveDetector Virtual
+    PropertyHep3Vector Position 0.0 0.0 -100. mm
+    PropertyString IndependentVariable t
+    PropertyDouble PlaneTime 10.
+  }
+  MiceModule VirtualTest_tau
+  {
+    PropertyString Volume None
+    PropertyString SensitiveDetector Virtual
+    PropertyHep3Vector Position 0.0 0.0 -100. mm
+    PropertyString IndependentVariable tau
+    PropertyDouble PlaneTime 10.
+  }
+}
+
+

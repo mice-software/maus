@@ -1,21 +1,17 @@
 #!/usr/bin/env python
 
-#################################################################
-###!!! YOU ARE NOT ALLOWED TO MODIFY THIS FILE DIRECTLY    !!!###
-###!!! PLEASE MAKE A COPY OF THIS FILE WITH THE CP COMMAND !!!###
-#################################################################
-
 """
-Offline analysis to produce reconstructed events from the MICE Experiment
+Reconstruct data from the MICE experiment
+
+Offline analysis to produce reconstructed elements for MICE. TOF is
+reconstructed through to space points; Ckov is reconstructed through to Digits.
 """
 
 import MAUS
 
 def run():
-    """Analyze data from the MICE experiment
-
-    This will read in and process data taken from the MICE experiment. It will
-    eventually include things like cabling information, calibrations, and fits.
+    """
+    Analyze data from the MICE experiment
     """
 
     # Set up the input that reads from DAQ
@@ -24,9 +20,17 @@ def run():
     # Create an empty array of mappers, then populate it
     # with the functionality you want to use.
     my_map = MAUS.MapPyGroup()
+
+    # TOF
     my_map.append(MAUS.MapCppTOFDigits())
     my_map.append(MAUS.MapCppTOFSlabHits())
     my_map.append(MAUS.MapCppTOFSpacePoints())
+
+    # Ckov
+    my_map.append(MAUS.MapPyCkov())
+
+    # Tracker (commented out as no tracker installed in MICE hall)
+    #my_map.append(MAUS.MapCppTrackerRecon())
 
     #  The Go() drives all the components you pass in then put all the output
     #  into a file called 'mausput'
