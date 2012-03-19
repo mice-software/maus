@@ -81,7 +81,7 @@ class InputCppDAQOfflineDataTestCase(unittest.TestCase): #pylint:disable=R0904
         # Check the md5 sum matches the expected value
         # changed checksum to reflect the run_num addition
         self.assertEqual(digester.hexdigest(), \
-                         '426cc54172fc1091185f4eaacdd8b85a')
+                         '01cc561a902615f0bbd5e65421f702c1')
 
         self.assertTrue(self.mapper.death())
 
