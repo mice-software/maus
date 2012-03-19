@@ -17,30 +17,45 @@
 
 #include "src/common_cpp/FieldTools/ScalingMagnet.hh"
 
+#include "gsl/gsl_sf_gamma.h"
+
 namespace MAUS {
 
 ScalingMagnet::ScalingMagnet() : _radius(0), _b0(0), _k(0), _coefficients() {
 }
 
 ScalingMagnet::ScalingMagnet(double radius, double b_0, double field_index)
-    : _radius(radius), _b0(b_0), _k(field_index), _coefficients(10, 10) {
+    : _radius(radius), _b0(b_0), _k(field_index), _coefficients() {
     SetCoefficients(10, 10);
 }
 
 ScalingMagnet::SetCoefficients(int max_index) {
-    _coefficients = MMatrix<double>(max_index, max_index);
+    _coefficients = std::vector< std::vector<double> >
+                                    (max_index, std::vector<double>(max_index));
     for (size_t i = 0; i < max_index; ++i) {
-        for (size_t j = 0; j < max_index; ++j) {
-            
+        _coefficients[i][0] = 
+                         pow(_radius, _k-static_cast<double>(i))/gsl_sf_fact(i);
+        for (size_t k = 0; k < i; ++k) {
+            _coefficients[i][0] *= _k-static_cast<double>(k);
         }
     }
 }
 
-
+// r, y, phi, time
+void GetFieldValuePolar(const double* position, double* field) {
+    for (size_t r_index = 0; r_index < _max_r_power; ++r_index) {
+        for (size_t y_index = 0; y_index < _max_y_power; ++y_index) {
+            field[1] += _coefficients[r_index][y_index]*
+                        pow(position[0]-_radius, r_index)*
+                        pow(position[1], y_index)*
+                        GetEndField(position[2]);
+        }
+    }
+}
 
 /*       for i in range(10):
             const = self._radius**(self._k-i)/math.factorial(i)
-            for index in range(0, i):
+            for index in range(0, i):const = self._
                 const *= (self._k-index)
             self._coefficients[i, 0] = const
 

@@ -41,15 +41,17 @@ class ScalingMagnet : public BTField {
 
     void GetFieldValue(const double* position, double* field);
 
+    void GetFieldValuePolar(const double* position, double* field);
+
   private:
-    /** Get the By value of the field
-     */
-    double GetByField(double radius, double y, double phi);
+    double GetEndField(double phi) {return 1.;}
 
     double _radius;
     double _b0;
     double _k;
-    MMatrix<double> _coefficients;
+    size_t _max_y_power;
+    size_t _max_r_power;
+    std::vector< std::vector<double> > _coefficients;
 };
 
 }
