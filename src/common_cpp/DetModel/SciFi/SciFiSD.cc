@@ -92,7 +92,6 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
     chanNo = static_cast<int> (floor(fiberNumber/7));
   }
   // assert agreement on chanNo with legacy calculation
-  std::cout << chanNo << " " << old_chanNo << std::endl;
   assert(abs(chanNo-old_chanNo) < 2);
 
   return true;
