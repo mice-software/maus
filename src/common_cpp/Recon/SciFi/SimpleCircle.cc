@@ -15,23 +15,20 @@
  *
  */
 
-#include "src/common_cpp/Recon/SciFi/SimpleLine.hh"
+#include "src/common_cpp/Recon/SciFi/SimpleCircle.hh"
 
 // namespace MAUS {
 
 // Constructor
-SimpleLine::SimpleLine() {}
+SimpleCircle::SimpleCircle() {}
 
 // Destructor
-SimpleLine::~SimpleLine() {}
+SimpleCircle::~SimpleCircle() {}
 
-void SimpleLine::set_parameters(double c, double c_err, double m, double m_err,
-                                double chisq, double chisq_dof) {
-  _c = c;
-  _c_err = c_err;
-  _m = m;
-  _m_err = m_err;
+void SimpleCircle::set_parameters(double x0, double y0, double R, double chisq) {
+  _x0 = x0;
+  _y0 = y0;
+  _R = R;
   _chisq = chisq;
-  _chisq_dof = chisq_dof;
 }
 // } // ~namespace MAUS

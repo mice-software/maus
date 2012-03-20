@@ -15,13 +15,13 @@
  *
  */
 
-/** @class SciFiStraightPRTrack
+/** @class SciFiHelicalPRTrack
  *
  *
  */
 
-#ifndef  SCIFISTRAIGHTPRTRACK_HH
-#define SCIFISTRAIGHTPRTRACK_HH
+#ifndef  SCIFIHELICALPRTRACK_HH
+#define SCIFIHELICALPRTRACK_HH
 
 // C++ headers
 #include <cmath>
@@ -35,44 +35,49 @@
 
 // namespace MAUS {
 
-class SciFiStraightPRTrack {
+class SciFiHelicalPRTrack {
   public:
     // Constructors
-    SciFiStraightPRTrack();
-    SciFiStraightPRTrack(int tracker, int num_points,
-                         double x0, double mx, double x_chisq,
-                         double y0, double my, double y_chisq);
+    SciFiHelicalPRTrack();
+    SciFiHelicalPRTrack(int tracker, double x0, double y0, double z0,
+                        double phi0, double psi0, double dzds, double R);
+    // SciFiHelicalPRTrack(int tracker, std::vector<double> r0, int station,
+    //                     double phi0, double psi0, double dzds, double R);
 
     // Destructors
-    ~SciFiStraightPRTrack();  // Default destructor
+    ~SciFiHelicalPRTrack();  // Default destructor
 
     // Getters
     std::vector<SciFiSpacePoint> get_spacepoints() const { return _spoints; }
+    // std::vector<double> get_r0() const { return _r0; }
 
     double get_x0() const { return _x0; }
     double get_y0() const { return _y0; }
-    double get_mx() const { return _mx; }
-    double get_my() const { return _my; }
-    double get_x_chisq() const { return _x_chisq; }
-    double get_y_chisq() const { return _y_chisq; }
-
+    double get_z0() const { return _z0; }
+    double get_phi0() const { return _phi0; }
+    double get_psi0() const { return _psi0; }
+    double get_dzds() const { return _dzds; }
+    double get_R() const { return _R; }
     int get_tracker() const { return _tracker; }
-    int get_num_points() const { return _num_points; }
+    // int get_station() const { return _station; }
 
     std::vector<double> get_vsl();
 
     // Setters
     void set_spacepoints(std::vector<SciFiSpacePoint> spoints) { _spoints = spoints; }
+    // void set_r0(std::vector<double> r0) { _r0 = r0; }
 
     void set_x0(double x0) { _x0 = x0; }
     void set_y0(double y0) { _y0 = y0; }
-    void set_mx(double mx) { _mx = mx; }
-    void set_my(double my) { _my = my; }
-    void set_x_chisq(double x_chisq) { _x_chisq = x_chisq; }
-    void set_y_chisq(double y_chisq) { _y_chisq = y_chisq; }
+    void set_z0(double z0) { _z0 = z0; }
+    void set_phi0(double phi0) { _phi0 = phi0; }
+    void set_psi0(double psi0) { _psi0 = psi0; }
+    void set_dzds(double dzds) { _dzds = dzds; }
+    void set_R(double R) { _R = R; }
 
     void set_tracker(int tracker) { _tracker = tracker; }
-    void set_num_points(int num_points) { _num_points = num_points; }
+    // void set_station(double station) { _station = station; }
+
     // Print track parameters
     void print_params();
 
@@ -80,16 +85,17 @@ class SciFiStraightPRTrack {
     std::vector<SciFiSpacePoint> _spoints;
 
     std::vector<double> _vsl;
+    // std::vector<double> r0;
 
     int _tracker;
-    int _num_points;
-
+    // int _station;
     double _x0;
     double _y0;
-    double _mx;
-    double _my;
-    double _x_chisq;
-    double _y_chisq;
+    double _z0;
+    double _phi0;
+    double _psi0;
+    double _dzds;
+    double _R;
 };
 // } // ~namespace MAUS
 

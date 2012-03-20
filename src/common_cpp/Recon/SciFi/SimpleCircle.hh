@@ -15,46 +15,39 @@
  *
  */
 
-/** @class SimpleLine
+/** @class SimpleCircle
  *
  *
  */
 
-#ifndef  SIMPLELINE_HH
-#define SIMPLELINE_HH
+#ifndef  SIMPLECIRCLE_HH
+#define SIMPLECIRCLE_HH
 
 // namespace MAUS {
 
-class SimpleLine {
+class SimpleCircle {
   public:
-    SimpleLine();   // Default constructor
-    ~SimpleLine();  // Default destructor
+    SimpleCircle();   // Default constructor
+    ~SimpleCircle();  // Default destructor
 
     // Getters
-    double get_c() const { return _c; }
-    double get_c_err() const { return _c_err; }
-    double get_m() const { return _m; }
-    double get_m_err() const { return _m_err; }
+    double get_x0() const { return _x0; }
+    double get_y0() const { return _y0; }
+    double get_R() const { return _R; }
     double get_chisq() const { return _chisq; }
-    double get_chisq_dof() const { return _chisq_dof; }
 
     // Setters
-    void set_c(double c) { _c = c; }
-    void set_c_err(double c_err) { _c_err = c_err; }
-    void set_m(double m) { _m = m; }
-    void set_m_err(double m_err) { _m_err = m_err; }
+    void set_x0(double x0) { _x0 = x0; }
+    void set_y0(double y0) { _y0 = y0; }
+    void set_R(double R) { _R = R; }
     void set_chisq(double chisq) { _chisq = chisq; }
-    void set_chisq_dof(double chisq_dof) { _chisq_dof = chisq_dof; }
-    void set_parameters(double c, double c_err, double m, double m_err,
-                        double chisq, double chisq_dof);
+    void set_parameters(double x0, double y0, double R, double chisq);
 
   private:
-    double _c;
-    double _c_err;
-    double _m;
-    double _m_err;
+    double _x0;
+    double _y0;
+    double _R;
     double _chisq;
-    double _chisq_dof;
 };
 // } // ~namespace MAUS
 
