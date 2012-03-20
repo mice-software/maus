@@ -156,7 +156,7 @@ G4bool SpecialVirtualSD::ProcessHits(G4Step* aStep, G4TouchableHistory*
   hit_i["charge"] =  aStep->GetTrack()->GetDefinition()->GetPDGCharge();
   hit_i["mass"] = aStep->GetTrack()->GetDefinition()->GetPDGMass();
 
-  _hits.push_back(hit_i);
+  _hits["special_virtual_hits"].append(hit_i);
   return true;
 }
 

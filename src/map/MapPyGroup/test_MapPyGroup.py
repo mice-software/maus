@@ -315,6 +315,7 @@ class MapPyGroupTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
             MapPyTestMap.FAIL)
         result = self.__group.death()
         self.assertFalse(result, "death unexpectedly returned True")
+        del self.__group # clean up now please
 
     def test_del(self):
         """
