@@ -21,36 +21,54 @@
 
 namespace MAUS {
 
-ScalingMagnet::ScalingMagnet() : _radius(0), _b0(0), _k(0), _coefficients() {
+ScalingMagnet::ScalingMagnet()
+              : _radius(0), _b0(0), _k(0), _max_index(0), _coefficients() {
 }
 
 ScalingMagnet::ScalingMagnet(double radius, double b_0, double field_index)
-    : _radius(radius), _b0(b_0), _k(field_index), _coefficients() {
-    SetCoefficients(10, 10);
+    : _radius(radius), _b0(b_0), _k(field_index), _max_index(0), _coefficients() {
+    SetCoefficients(10);
 }
 
-ScalingMagnet::SetCoefficients(int max_index) {
+ScalingMagnet::~ScalingMagnet() {
+}
+
+void ScalingMagnet::SetCoefficients(size_t max_index) {
+    _max_index = max_index;
     _coefficients = std::vector< std::vector<double> >
                                     (max_index, std::vector<double>(max_index));
     for (size_t i = 0; i < max_index; ++i) {
         _coefficients[i][0] = 
                          pow(_radius, _k-static_cast<double>(i))/gsl_sf_fact(i);
+//        std::cerr << _coefficients[i][0] << " ";
         for (size_t k = 0; k < i; ++k) {
             _coefficients[i][0] *= _k-static_cast<double>(k);
         }
+        std::cerr << _coefficients[i][0] << " ";
     }
+    std::cerr << std::endl << std::endl;
 }
 
+int ScalingMagnet::GetCoefficient(size_t r_index, size_t y_index) {
+    return _coefficients[r_index][y_index];
+    if (r_index < _coefficients.size() &&
+        y_index < _coefficients[r_index].size()) {
+    }
+    return 0;
+}
+
+
 // r, y, phi, time
-void GetFieldValuePolar(const double* position, double* field) {
-    for (size_t r_index = 0; r_index < _max_r_power; ++r_index) {
-        for (size_t y_index = 0; y_index < _max_y_power; ++y_index) {
+void ScalingMagnet::GetFieldValuePolar(const double* position, double* field) {
+    double r = position[0]/_radius-_radius;
+    for (size_t r_index = 0; r_index < _max_index; ++r_index) {
+        for (size_t y_index = 0; y_index < _max_index; ++y_index) {
             field[1] += _coefficients[r_index][y_index]*
-                        pow(position[0]-_radius, r_index)*
-                        pow(position[1], y_index)*
-                        GetEndField(position[2]);
+                        pow(r, r_index)*
+                        pow(position[1], y_index);
         }
     }
+    field[1] *= _b0;
 }
 
 /*       for i in range(10):
