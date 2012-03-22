@@ -18,8 +18,7 @@
                 <text>
                 {</text>
                 Volume TessellatedSolid
-                PropertyString Material <xsl:choose><xsl:when test="contains(structure/volume/materialref/@ref, '9314') or contains(structure/volume/materialref/@ref, '9315') or contains(structure/volume/materialref/@ref, '9320') or contains(structure/volume/materialref/@ref, '9321') or contains(structure/volume/materialref/@ref, '9328') or contains(structure/volume/materialref/@ref, '9348')">STEEL304</xsl:when><xsl:when test="contains(structure/volume/materialref/@ref, '9318') or contains(structure/volume/materialref/@ref, '9325') or contains(structure/volume/materialref/@ref, '9347')">Cu</xsl:when><xsl:when test="contains(structure/volume/materialref/@ref, '9327') or contains(structure/volume/materialref/@ref, '9346')">Fe</xsl:when><xsl:when test="contains(structure/volume/materialref/@ref, '9323')">Al</xsl:when><xsl:otherwise>Galactic</xsl:otherwise></xsl:choose>
-                <!--PropertyString SensitiveDetector EMR-->
+                PropertyString Material Al <!--<xsl:if test="structure/volume/materialref/@ref = 'ALUMINUM'">Al</xsl:if>-->
                 PropertyDouble BlueColour 0.75
                 PropertyDouble GreenColour 0.3
                 PropertyDouble RedColour 0.75

@@ -252,8 +252,7 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      export maus_no_optimize=0 # force gcc not to optimise
      export maus_lcov=0 # enable cpp coverage - requires lcov
      export maus_debug=0 # enable debugging
-     export maus_gprof=0 # enable cpp profiling of cpp unit tests 
-                         # requires gprof
+     export maus_gprof=0 # enable cpp profiling - requires gprof
 
      echo "SUCCESS: MAUS setup"
 else

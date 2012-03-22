@@ -76,13 +76,12 @@ VirtualPlane VirtualPlane::BuildVirtualPlane(CLHEP::HepRotation rot,
 bool VirtualPlane::SteppingOver(const G4Step* aStep) const {
   double pre  = GetIndependentVariable(aStep->GetPreStepPoint());
   double post = GetIndependentVariable(aStep->GetPostStepPoint());
-  if (pre  <= _independentVariable && post > _independentVariable) {
+
+  if (pre  <= _independentVariable && post > _independentVariable)
     return true;  // stepping forwards
-  }
   if (_allowBackwards && post <= _independentVariable &&
-                         pre  > _independentVariable) {
+                         pre  > _independentVariable)
     return true;  // stepping backwards
-  }
   return false;
 }
 

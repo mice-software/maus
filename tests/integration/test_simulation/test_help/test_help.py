@@ -15,9 +15,8 @@ class HelpTest(unittest.TestCase):
         test_out.close()
         test_in = open(file_name)
         first_line = test_in.readline()
-        assumed_output = unicode('usage: simulate_mice.py [-h]')
-        self.assertTrue(first_line.find(unicode(assumed_output)) > -1, 
-        msg='Found\n'+first_line+'\nexpected\n'+assumed_output)
+        assumed_output = 'usage: simulate_mice.py [-h]'
+        self.assertEqual(assumed_output,first_line[:28])
 
 if __name__ == '__main__':
     unittest.main()

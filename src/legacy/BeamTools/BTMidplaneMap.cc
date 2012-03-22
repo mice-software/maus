@@ -67,9 +67,7 @@ void BTMidplaneMap::BiCubicCoefficients(double f[4], double dfdx[4], double dfdz
 
 	for(int i=0; i<4; i++)
 	{
-    if (i > 0) {
-  		x[i-1]  = f[i];
-    }
+		x[i-1]  = f[i];
 		x[i+3]  = dfdx[i]*xLength;
 		x[i+7]  = dfdz[i]*zLength;
 		x[i+11] = d2fdxdz[i]*xzProduct;

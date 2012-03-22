@@ -31,15 +31,12 @@
 
 // MAUS headers
 #include "src/common_cpp/Recon/SciFi/SimpleLine.hh"
-#include "src/common_cpp/Recon/SciFi/SimpleCircle.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiEvent.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiHit.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiDigit.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiCluster.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiStraightPRTrack.hh"
-// Added by Summer
-#include "src/common_cpp/Recon/SciFi/SciFiHelicalPRTrack.hh"
 
 // namespace MAUS {
 
@@ -89,43 +86,31 @@ class PatternRecognition {
                       const int station_outer_sp, const int station_inner_sp,
                       std::map<int, SciFiSpacePoint*> &good_spnts);
 
-    /** @brief Make Pattern Recognition tracks with 5 spacepoints
+    /** @brief Make straight Pattern Recognition tracks with 5 spacepoints
      *
-     *  Make a Pattern Recognition track/s when there are spacepoints
+     *  Make a straight Pattern Recognition track/s when there are spacepoints
      *  found in all 5 stations of a tracker.  Least squared fitting used,
      *  together with a chi^2 goodness-of-fit test.
      *
      *  @param spnts_by_station - A 2D vector of all the input spacepoints ordered by station
      *  @param trks - A vector of the output Pattern Recognition tracks
      */
-    void make_5tracks(std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
+    void make_straight_5tracks(std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
                                std::vector<SciFiStraightPRTrack> &trks);
 
-    /** @brief Make Pattern Recognition tracks with 4 spacepoints
+    /** @brief Make straight Pattern Recognition tracks with 4 spacepoints
      *
-     *  Make a Pattern Recognition track/s when there at least 4 stations
+     *  Make a straight Pattern Recognition track/s when there at least 4 stations
      *  with spacepoints in them. Least squared fitting used, together with a
      *  chi^2 goodness-of-fit test.
      *
      *  @param spnts_by_station - A 2D vector of all the input spacepoints ordered by station
      *  @param trks - A vector of the output Pattern Recognition tracks
      */
-    void make_4tracks(std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
+    void make_straight_4tracks(std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
                       std::vector<SciFiStraightPRTrack> &trks);
 
-    /** @brief Make Pattern Recognition tracks with 3 spacepoints
-     *
-     *  Make a Pattern Recognition track/s when there at least 3 stations
-     *  with spacepoints in them. Least squared fitting used, together with a
-     *  chi^2 goodness-of-fit test.
-     *
-     *  @param spnts - A vector of all the input spacepoints
-     *  @param trks - A vector of the output Pattern Recognition tracks
-     */
-    void make_3tracks(std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
-         std::vector<SciFiStraightPRTrack>& trks);
-
-    /** @brief Fits a straight track for a given set of stations
+    /** @brief Fits a track for a given set of stations
      * 
      *  @param ignore_stations int vector specifying which stations are not to be used for
      *                         the track fit. 0 - 4 represent stations 1 - 5 respectively,
@@ -139,9 +124,21 @@ class PatternRecognition {
                      std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
                      std::vector<SciFiStraightPRTrack> &trks);
 
+    /** @brief Make straight Pattern Recognition tracks with 3 spacepoints
+     *
+     *  Make a straight Pattern Recognition track/s when there at least 3 stations
+     *  with spacepoints in them. Least squared fitting used, together with a
+     *  chi^2 goodness-of-fit test.
+     *
+     *  @param spnts - A vector of all the input spacepoints
+     *  @param trks - A vector of the output Pattern Recognition tracks
+     */
+    void make_straight_3tracks(std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
+         std::vector<SciFiStraightPRTrack>& trks);
+
     /** @brief Fit a straight line in x and y to some spacepoints
      *
-     *  Fit straight lines, x = f(z) and y = f(z), using linear least squares fitting,
+     *  Fit straight lines, x = f(z) and y = f(z), using gsl linear fitter,
      *  for input spacepoints. Output is the line in x and line in y.
      *
      *  @param spnts - A vector of all the input spacepoints
@@ -151,92 +148,6 @@ class PatternRecognition {
      */
     void linear_fit(const std::map<int, SciFiSpacePoint*> &spnts,
                     SimpleLine &line_x, SimpleLine &line_y);
-
-    /** @brief Form a helical track from spacepoints
-     *
-     *  Two part process. (1) Fit circle in x-y projection. (2) Fit a
-     *  line in the s-z projection
-     *
-     *  @param spnts_by_station 2D vector of spacepoints, sorted by station
-     *  @param outer_station_num outermost station being used
-     *                           (e.g. station 5 in a 5pt track)
-     *  @param inner_station_num innermost station being used
-     *                           (e.g. station 1 in a 5pt track)
-     *  @param ignore_stations int vector specifying which stations are not to be used for
-     *                         the track fit. 0 - 4 represent stations 1 - 5 respectively,
-     *                         while -1 means use *all* the stations (ignore none of them).
-     *                         The size of the vector should be 0 for a 5pt track,
-     *                         1 for a 4pt track, and 2 for a 3pt track.
-     *  @param station_outer_sp index representing outer station spacepoint
-     *  @param station_inner_sp index representing inner station spacepoint
-     *  @param good_spnts map between station number and spacepoint number in station,
-     *                    holding those spacepoints (if any) which best match the
-     *                    initial line
-     *  @param trks The track holding the initial helix parameters and spacepoints used
-     *
-     */
-    void make_helix(const std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
-       const std::vector<int> ignore_stations, const int outer_station_num,
-       const int inner_station_num, const int station_outer_sp, const int station_inner_sp,
-       std::map<int, SciFiSpacePoint*> &good_spnts, std::vector<SciFiStraightPRTrack> &trks);
-
-    /** @brief Fit an initial circle to three spacepoints
-     *
-     *  Fit an initial circle to inner, outer, and an intermediate stations'
-     *  spacepoints (Three in total), through geometric construction.  Returns
-     *  false if the circle cannot be constructed. Output is an initial circle
-     *  in the x-y projection.
-     *
-     *  @param p1 - spacepoint 1
-     *  @param p2 - spacepoint 2
-     *  @param p3 - spacepoint 3
-     *  @param circle - The output circle fit
-     *
-     */
-    bool initial_circle(CLHEP::Hep3Vector p1, CLHEP::Hep3Vector p2, CLHEP::Hep3Vector p3,
-                        SimpleCircle circle);
-
-    /** @brief Find points from intermediate stations which fit to the "trial track"
-     *
-     * Calculate the radial deviation of intermediate station spacepoints from an
-     * initial circle formed with only 3 spacepoints.  Check if these delta_R's are
-     * acceptable with a cut, and if they are, append them to the trial track.
-     *
-     */
-    double delta_R(SimpleCircle circle, CLHEP::Hep3Vector pos);
-
-    /** @brief Fit a circle to all spacepoints in "trail track"
-     *
-     *  Fit a circle of the form A*(x^2 + y^2) + b*x + c*y = 1 with least squares fit 
-     *  for input spacepoints. Output is a circle in the x-y projection.
-     *
-     *  @param spnts - A vector of all the input spacepoints
-     *  @param circle - The output circle fit
-     *
-     */
-    void circle_fit(const std::map<int, SciFiSpacePoint*> &spnts, SimpleCircle &circle);
-
-    /** @brief Determine the dip angle of the helix
-     *
-     * Calculate the dip angle of the helix.  Output is a line, the slope of which
-     * is dsdz = 1/tanlambda.
-     *
-     * @param spnts - A vector of all the input spacepoints
-     * @param circle - The circle fit of spacepoints from x-y projection
-     * @param line_sz - The output fitted line in s-z projection.
-     *
-     */
-    void determine_dipangle(const std::map<int, SciFiSpacePoint*> &spnts,
-                            SimpleCircle circle, SimpleLine line_sz);
-
-    /** @brief Calculate the turning angle of a spacepoint w.r.t. helix center
-     *
-     * @param xpos - x position of spacepoint
-     * @param ypos - y position of  spacepoint
-     * @param circle - Contains the helix center
-     *
-     */
-    double calculate_Phi(double xpos, double ypos, SimpleCircle circle);
 
     /** @brief Determine which two stations the initial line should be drawn between
      * 
@@ -295,10 +206,8 @@ class PatternRecognition {
 
     static const int _n_trackers = 2;
     static const int _n_stations = 5;
-    static const double _sd_1to4 = 0.3844;
-    static const double _sd_5 = 0.4298;
-    static const double _res_cut = 10;
-    static const double _chisq_cut = 15;
+    static const double _res_cut = 15.0;
+    static const double _chisq_cut = 15.0;
 };
 // } // ~namespace MAUS
 

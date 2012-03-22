@@ -13,6 +13,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+
 """
 BeamMaker generates beams for input into MAUS
 """

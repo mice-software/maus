@@ -28,13 +28,8 @@
 
 namespace MAUS {
 
-MAUSGeant4Manager* MAUSGeant4Manager::_instance = NULL;
-bool MAUSGeant4Manager::_isClosed = false;
-
 MAUSGeant4Manager* MAUSGeant4Manager::GetInstance() {
-  if (_instance == NULL && !_isClosed) {
-      _instance = new MAUSGeant4Manager();
-  }
+  static MAUSGeant4Manager* _instance = new MAUSGeant4Manager();
   return _instance;
 }
 
@@ -70,7 +65,6 @@ MAUSGeant4Manager::~MAUSGeant4Manager() {
     if (_visManager != NULL) {
         delete _visManager;
     }
-    _isClosed = true;
 }
 
 void MAUSGeant4Manager::SetPhases() {

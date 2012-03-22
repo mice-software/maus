@@ -17,7 +17,6 @@
 
 #include <algorithm>
 #include <vector>
-#include <map>
 
 #include "json/json.h"
 
@@ -89,10 +88,6 @@ JsonWrapper::JsonType JsonWrapper::ValueTypeToJsonType(Json::ValueType tp) {
     case Json::booleanValue: return booleanValue;
     case Json::arrayValue: return arrayValue;
     case Json::objectValue: return objectValue;
-    default:
-      throw(Squeal(Squeal::recoverable,
-                   "Json ValueType not recognised",
-                   "JsonWrapper::ValueTypeToJsonType"));
   }
 }
 
@@ -107,7 +102,7 @@ Json::ValueType JsonWrapper::JsonTypeToValueType(JsonWrapper::JsonType tp)
     case booleanValue: return Json::booleanValue;
     case arrayValue:   return Json::arrayValue;
     case objectValue:  return Json::objectValue;
-    case anyValue: default:
+    case anyValue:
       throw(Squeal(Squeal::recoverable,
                    "Could not convert anyValue to Json ValueType",
                    "JsonWrapper::JsonTypeToValueType"));
@@ -161,8 +156,6 @@ bool JsonWrapper::AlmostEqual(Json::Value value_1, Json::Value value_2, double t
             return value_1.asBool() == value_2.asBool();
         case Json::nullValue:
             return true;
-        default:
-            return false;
     }
 }
 
@@ -200,61 +193,5 @@ bool JsonWrapper::ArrayEqual
         }
     }
     return true;
-}
-
-Json::Value JsonWrapper::ObjectMerge
-                                  (Json::Value object_1, Json::Value object_2) {
-    // check we have objects
-    if (object_1.type() != Json::objectValue ||
-        object_2.type() != Json::objectValue) {
-        throw(Squeal(Squeal::recoverable,
-                     "Expecting object type for object merge",
-                     "JsonWrapper::ObjectMerge"));
-    }
-    Json::Value object_merged(object_1);
-    std::vector<std::string> names_1 = object_1.getMemberNames();
-    std::vector<std::string> names_2 = object_2.getMemberNames();
-    std::map<std::string, int> names_merged;
-
-    // find out which key is in which object
-    // int = 1 => in object 1, int = 2 => in object 2; int = 3 => in both
-    for (size_t i = 0; i < names_1.size(); ++i) {
-        names_merged[names_1[i]] = 1;
-    }
-    for (size_t i = 0; i < names_2.size(); ++i) {
-        if (names_merged.find(names_2[i]) != names_merged.end()) {
-          names_merged[names_2[i]] = 3;
-        } else {
-          names_merged[names_2[i]] = 2;
-        }
-    }
-    // loop over all keys and pull from relevant object into the merge target
-    typedef std::map<std::string, int>::iterator my_iter;
-    for (my_iter it = names_merged.begin(); it != names_merged.end(); ++it) {
-        if (it->second == 1) {
-          // do nothing, merge target is already a copy of object_1 (faster?)
-        } else if (it->second == 2) {
-            object_merged[it->first] = object_2[it->first];
-        } else {
-            object_merged[it->first] = JsonWrapper::ArrayMerge
-                                     (object_1[it->first], object_2[it->first]);
-        }
-    }
-
-    return object_merged;
-}
-
-Json::Value JsonWrapper::ArrayMerge(Json::Value array_1, Json::Value array_2) {
-    if (array_1.type() != Json::arrayValue ||
-        array_2.type() != Json::arrayValue) {
-        throw(Squeal(Squeal::recoverable,
-                     "Expecting array type for array merge",
-                     "JsonWrapper::ArrayMerge"));
-    }
-    Json::Value array_merge(array_1);
-    for (size_t i = 0; i < array_2.size(); ++i) {
-        array_merge.append(array_2[i]);
-    }
-    return array_merge;
 }
 

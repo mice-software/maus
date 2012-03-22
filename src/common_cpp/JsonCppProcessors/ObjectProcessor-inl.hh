@@ -94,7 +94,7 @@ class PointerItem : public BaseItem<ParentType> {
         if (!parent_json.isMember(_branch)) {
             if (_required) {
                 throw Squeal(Squeal::recoverable,
-                "Failed to recover branch "+_branch+" converting json->cpp",
+                "Failed to recover branch "+_branch,
                 "PointerItem::SetCppChild");
             } else {
                 return;
@@ -181,7 +181,7 @@ class ValueItem : public BaseItem<ParentType> {
         if (!parent_json.isMember(_branch)) {
             if (_required) {
                 throw Squeal(Squeal::recoverable,
-                "Failed to recover branch "+_branch+" converting json->cpp",
+                "Failed to recover branch "+_branch,
                 "PointerItem::SetCppChild");
             } else {
                 return;

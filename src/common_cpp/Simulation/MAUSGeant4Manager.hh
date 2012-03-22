@@ -139,14 +139,10 @@ class MAUSGeant4Manager {
      */
     MAUSVisManager* GetVisManager() {return _visManager;}
 
-    /** Delete the manager and close any existing simulation
-     *
-     *  Note that it is a feature of Geant4 that the geometry cannot be reopened
-     */
-    ~MAUSGeant4Manager();
 
   private:
     MAUSGeant4Manager();
+    ~MAUSGeant4Manager();
 
     G4RunManager* _runManager;
     MAUSPhysicsList* _physList;
@@ -161,9 +157,6 @@ class MAUSGeant4Manager {
     void SetVisManager();
 
     Json::Value Tracking(MAUSPrimaryGeneratorAction::PGParticle p);
-
-    static MAUSGeant4Manager* _instance;
-    static bool _isClosed;
 };
 
 }  // namespace MAUS

@@ -14,31 +14,28 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "src/common_cpp/DataStructure/Hit.hh"
 #include "src/common_cpp/JsonCppProcessors/HitProcessor.hh"
-
-#include "src/common_cpp/JsonCppProcessors/SciFiChannelIdProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/TOFChannelIdProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/SpecialVirtualChannelIdProcessor.hh"
 
 namespace MAUS {
 
-template <>
-HitProcessor<SciFiChannelId>::HitProcessor()
-    : _channel_id_proc(new SciFiChannelIdProcessor()) {
-    RegisterBranches();
+HitProcessor::HitProcessor() {
+    RegisterValueBranch
+             ("track_id", &_int_proc, &Hit::GetTrackId, &Hit::SetTrackId, true);
+    RegisterValueBranch
+    ("particle_id", &_int_proc, &Hit::GetParticleId, &Hit::SetParticleId, true);
+    RegisterValueBranch
+              ("energy", &_double_proc, &Hit::GetEnergy, &Hit::SetEnergy, true);
+    RegisterValueBranch
+              ("charge", &_double_proc, &Hit::GetCharge, &Hit::SetCharge, true);
+    RegisterValueBranch
+                    ("time", &_double_proc, &Hit::GetTime, &Hit::SetTime, true);
+    RegisterValueBranch("energy_deposited", &_double_proc,
+                      &Hit::GetEnergyDeposited, &Hit::SetEnergyDeposited, true);
+    RegisterValueBranch
+     ("position", &_three_vec_proc, &Hit::GetPosition, &Hit::SetPosition, true);
+    RegisterValueBranch
+     ("momentum", &_three_vec_proc, &Hit::GetMomentum, &Hit::SetMomentum, true);
 }
-
-template <>
-HitProcessor<TOFChannelId>::HitProcessor()
-    : _channel_id_proc(new TOFChannelIdProcessor()) {
-    RegisterBranches();
 }
-
-template <>
-HitProcessor<SpecialVirtualChannelId>::HitProcessor()
-    : _channel_id_proc(new SpecialVirtualChannelIdProcessor()) {
-    RegisterBranches();
-}
-}
-
 

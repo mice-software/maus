@@ -45,10 +45,16 @@ void MAUSEventAction::EndOfEventAction(const G4Event *anEvent) {
         throw(Squeal(Squeal::recoverable,
                      "Ran out of space in event array",
                      "MAUSEventAction::EndOfEventAction"));
+    _events[_primary]["hits"] = Json::Value(Json::arrayValue);
     for (int i = 0; i < _geometry->GetSDSize(); i++) {
       //  Retrieve detector i's hits
-      Json::Value hits = _geometry->GetSDHits(i);
-      _events[_primary] = JsonWrapper::ObjectMerge(_events[_primary], hits);
+      std::vector<Json::Value> hits = _geometry->GetSDHits(i);
+      for (size_t j = 0; j < hits.size(); ++j) {
+        if (!hits[j].isNull()) {
+          // Json cpp just makes a new array
+          _events[_primary]["hits"].append(hits[j]);
+        }
+      }
     }
     if (_tracking->GetWillKeepTracks())
         _events[_primary]["tracks"] = _tracking->GetTracks();

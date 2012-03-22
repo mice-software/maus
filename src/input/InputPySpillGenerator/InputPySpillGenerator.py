@@ -32,8 +32,6 @@ class InputPySpillGenerator:
         """
         self._number_of_events = 0
         self._current_event = 0
-        self._run_number = 0
-
 
     def birth(self, json_config):
         """
@@ -44,8 +42,6 @@ class InputPySpillGenerator:
             self._number_of_events = \
                             int(config_doc["spill_generator_number_of_spills"])
             assert self._number_of_events > -1
-            if "monte_carlo_run_number" in config_doc.keys():
-                self._run_number = int(config_doc["monte_carlo_run_number"])
             return True
         except Exception: #pylint: disable=W0703
             ErrorHandler.HandleException({}, self)
@@ -61,13 +57,9 @@ class InputPySpillGenerator:
         """
         while self._current_event < self._number_of_events:
             # remove \n and whitespace
-            next_value = {}
-            next_value["spill_num"] = self._current_event+1
-            next_value["run_num"] = self._run_number
-            next_value["daq_event_type"] = "physics_event"
-
+            next_value = unicode("{}")
             # yield the current event (google 'python generators' if confused)
-            yield json.dumps(next_value)
+            yield next_value
             self._current_event += 1
 
 

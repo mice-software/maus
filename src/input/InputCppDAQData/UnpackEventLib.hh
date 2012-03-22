@@ -23,7 +23,6 @@
 #include <string>
 #include <vector>
 #include <sstream>
-#include <algorithm>
 
 #include "json/json.h"
 
@@ -138,13 +137,6 @@ class fADCDataProcessor : public ZeroSupressionFilter {
   */
   int get_max_position();
 
-  /** Return the position of the minimum.
-   * This function returns the number of the sample having minimum amplitude.
-   */
-
-  int get_min_position();
-
-  int get_arrival_time();
   /** Return the area of the signal.
   * This function returns the area of the signal. The pedestal is subtracted.
   * The integration is done in window starting 10 samples before the maximum
@@ -153,7 +145,6 @@ class fADCDataProcessor : public ZeroSupressionFilter {
   */
   int get_signal_area(int &pos);
 
-  int get_neg_signal_area(int &pos);
 
   int get_pedestal_area(int &pos);
 
@@ -165,14 +156,10 @@ class fADCDataProcessor : public ZeroSupressionFilter {
   /// Return the vector of samples
   vector<int> get_data() const { return _data; }
 
-  /// Return each fADC sample value
-  Json::Value get_samples();
-
   /** Return the area of the signal.
   * This function returns the area of the signal. The pedestal is subtracted.
   * The integration is done using the whole acquisition window.
   */
-
   int get_area();
 
   /// Return the data member _pedestal
@@ -186,23 +173,17 @@ class fADCDataProcessor : public ZeroSupressionFilter {
   int get_charge(int Algorithm = ceaPedMax);
 
   enum chargeEstimationAlgorithm {
-    ceaMinMax, /// Simplest algorithm
-    ceaFractionDescriminatorThreshold, /// not implemented
-    ceaPedMax,
-    ceaPedMin ,
+    ceaMinMax = 0, /// Simplest algorithm
+    ceaFractionDescriminatorThreshold = 1, /// not implemented
+    ceaPedMax = 3
   };
-
-  /**Return the charge of the Cherenkov Singal (negative pulse)
-  Uses same Algorithm.  
-  */
-  int get_charge_ckov(int Algorithm = ceaPedMin);
 
  protected:
 
   void set_pedestal();
   int chargeMinMax();
   int chargePedMax();
-  int chargePedMin();
+
   /// vector of samples (measurements) */
   vector<int> _data;
 

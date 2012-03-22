@@ -153,22 +153,6 @@ class JsonWrapper {
                    (Json::Value value_1, Json::Value value_2, double tolerance);
 
 
-  /** @brief Merge two json objects
-   *
-   *  Merge two json objects. For each property in the object; if the property
-   *  exists in object_1 or object_2 and is an array, append items from object_2
-   *  array onto the back of the object_1 array; if the property exists in one
-   *  object but not the other put it in the merged object; if the property
-   *  exists in both objects but is not an array, throw an exception.
-   */
-  static Json::Value ObjectMerge(Json::Value object_1, Json::Value object_2);
-
-  /** @brief Merge two json arrays
-   *
-   *  Put items from array_2 onto the back of array_1
-   */
-  static Json::Value ArrayMerge(Json::Value array_1, Json::Value array_2);
-
  private:
 
   JsonWrapper();

@@ -21,24 +21,16 @@
 
 #include "Rtypes.h" // ROOT
 
-#include "src/common_cpp/DataStructure/Hit.hh" // ROOT was tripping up on
-                                               // forward declaration of this
-
 namespace MAUS {
 
 class Track;
 class VirtualHit;
+class Hit;
 class Primary;
-
-class SciFiChannelId;
-class TOFChannelId;
-class SpecialVirtualChannelId;
 
 typedef std::vector<Track> TrackArray;
 typedef std::vector<VirtualHit> VirtualHitArray;
-typedef std::vector<SciFiHit> SciFiHitArray;
-typedef std::vector<TOFHit> TOFHitArray;
-typedef std::vector<SpecialVirtualHit> SpecialVirtualHitArray;
+typedef std::vector<Hit> HitArray;
 
 /** @class MCEvent describes data pertaining to a single Monte Carlo event
  *
@@ -89,33 +81,14 @@ class MCEvent {
    */
   void SetVirtualHits(VirtualHitArray* hits);
 
-  /** Get the hits pertaining to this event MCEvent still owns HitArray*.
+  /** Set the hits pertaining to this event MCEvent still owns HitArray*.
    */
-  SciFiHitArray* GetSciFiHits() const;
+  HitArray* GetHits() const;
 
   /** Set the hits pertaining to this event. MCEvent takes ownership of
    *  memory pointed to by hits.
    */
-  void SetSciFiHits(SciFiHitArray* hits);
-
-  /** Get the TOF hits pertaining to this event MCEvent still owns HitArray*.
-   */
-  TOFHitArray* GetTOFHits() const;
-
-  /** Set the TOF hits pertaining to this event. MCEvent takes ownership of
-   *  memory pointed to by hits.
-   */
-  void SetTOFHits(TOFHitArray* hits);
-
-  /** Get the Special Virtual hits pertaining to this event. MCEvent still owns
-   *  SpecialVirtualHitArray*.
-   */
-  SpecialVirtualHitArray* GetSpecialVirtualHits() const;
-
-  /** Set the Special Virtual hits pertaining to this event. MCEvent takes
-   * ownership of memory pointed to by hits.
-   */
-  void SetSpecialVirtualHits(SpecialVirtualHitArray* hits);
+  void SetHits(HitArray* hits);
 
   /** Get the primary pertaining to this event. MCEvent still owns Primary*.
    */
@@ -130,9 +103,7 @@ class MCEvent {
 
   Primary* _primary;
   VirtualHitArray* _virtuals;
-  SciFiHitArray* _sci_fi_hits;
-  TOFHitArray* _tof_hits;
-  SpecialVirtualHitArray* _special_virtual_hits;
+  HitArray* _hits;
   TrackArray* _tracks;
 
   ClassDef(MCEvent, 1)

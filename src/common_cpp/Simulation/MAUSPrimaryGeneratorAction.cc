@@ -75,14 +75,13 @@ void MAUSPrimaryGeneratorAction::GeneratePrimaries(G4Event* argEvent) {
   gun->SetParticleMomentumDirection(G4ThreeVector
                                  (part.px, part.py, part.pz));
   gun->GeneratePrimaryVertex(argEvent);
-  unsigned int uint_max = std::numeric_limits<unsigned int>::max();
-  if ( part.seed < 0 || part.seed > uint_max ) {
+  if ( part.seed < 0 || part.seed > std::numeric_limits<unsigned int>::max() ) {
     throw(Squeal(Squeal::recoverable,
                  "Random seed out of range",
                  "MAUSPrimaryGeneratorAction::GeneratePrimaries"));
   }
 
-  CLHEP::HepRandom::setTheSeed(part.seed);
+  CLHEP::HepRandom::setTheSeed(static_cast<unsigned int>(part.seed));
 }
 
 MAUSPrimaryGeneratorAction::PGParticle::PGParticle()
@@ -98,7 +97,7 @@ void MAUSPrimaryGeneratorAction::PGParticle::ReadJson(Json::Value particle) {
   pid = JsonWrapper::GetProperty
                        (particle, "particle_id", JsonWrapper::intValue).asInt();
   seed = JsonWrapper::GetProperty
-                     (particle, "random_seed", JsonWrapper::intValue).asUInt();
+                       (particle, "random_seed", JsonWrapper::intValue).asInt();
   x = JsonWrapper::GetProperty(pos, "x", JsonWrapper::realValue).asDouble();
   y = JsonWrapper::GetProperty(pos, "y", JsonWrapper::realValue).asDouble();
   z = JsonWrapper::GetProperty(pos, "z", JsonWrapper::realValue).asDouble();

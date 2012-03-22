@@ -29,6 +29,8 @@
 #include "src/legacy/Interface/dataCards.hh"
 #include "src/legacy/Interface/MICEEvent.hh"
 #include "src/legacy/Interface/MICERun.hh"
+#include "src/common_cpp/Utils/JsonWrapper.hh"
+
 
 #include "src/legacy/Config/MiceModule.hh"
 #include "src/legacy/Interface/MiceMaterials.hh"
@@ -38,9 +40,6 @@
 /////////// Needed until I clean up legacy tests to gtest framework //////////
 #include "src/legacy/Interface/Squeak.hh"
 /////////// Needed until I clean up legacy tests to gtest framework //////////
-
-#include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
-
 
 Json::Value SetupConfig() {
   Json::Value config(Json::objectValue);
@@ -70,16 +69,7 @@ int main(int argc, char **argv) {
   Squeak::setOutput(Squeak::debug, Squeak::nullOut());
   Squeak::setStandardOutputs();
   ::testing::InitGoogleTest(&argc, argv);
-  int test_out = -1;
-  try {
-      test_out = RUN_ALL_TESTS();
-  } catch(Squeal squee) {
-      std::cerr << squee.GetMessage() << "\n" << squee.GetLocation() << "\n"
-                << squee.GetStackTrace() << std::endl;
-  } catch(std::exception exc) {
-      std::cerr << "Caught std::exception" << "\n" << exc.what() << std::endl;
-  }
-  delete MAUS::MAUSGeant4Manager::GetInstance();
+  int test_out = RUN_ALL_TESTS();
   return test_out;
 }
 

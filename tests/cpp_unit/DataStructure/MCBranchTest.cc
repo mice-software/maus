@@ -229,14 +229,13 @@ TEST(MCEventTest, PrimaryTest) {
     my_primary_equal = my_primary_equal;
 }
 
-// for this example I test with a SciFiChannelId, but could be anything
 TEST(MCEventTest, HitTest) {
-    SciFiChannelId* channel_id_1 = new SciFiChannelId();
-    SciFiChannelId* channel_id_2 = new SciFiChannelId();
-    SciFiChannelId* channel_id_null = NULL;
+    ChannelId* channel_id_1 = new ChannelId();
+    ChannelId* channel_id_2 = new ChannelId();
+    ChannelId* channel_id_null = NULL;
 
     // Accessors/mutators
-    SciFiHit my_hit;
+    Hit my_hit;
     my_hit.SetPosition(ThreeVector(1., 2., 3.));
     my_hit.SetMomentum(ThreeVector(-1, -2, -3));
     my_hit.SetParticleId(10);
@@ -260,7 +259,7 @@ TEST(MCEventTest, HitTest) {
     EXPECT_EQ(my_hit.GetChannelId(), channel_id_2);
 
     // copy_constructor
-    SciFiHit my_hit_copy(my_hit);
+    Hit my_hit_copy(my_hit);
     EXPECT_EQ(my_hit.GetPosition(), my_hit_copy.GetPosition());
     EXPECT_EQ(my_hit.GetMomentum(), my_hit_copy.GetMomentum());
     EXPECT_EQ(my_hit.GetParticleId(), my_hit_copy.GetParticleId());
@@ -273,7 +272,7 @@ TEST(MCEventTest, HitTest) {
     EXPECT_NE(channel_id_null, my_hit_copy.GetChannelId());
 
     // equality operator
-    SciFiHit my_hit_equal;
+    Hit my_hit_equal;
     my_hit_equal = my_hit;
     EXPECT_EQ(my_hit.GetPosition(), my_hit_equal.GetPosition());
     EXPECT_EQ(my_hit.GetMomentum(), my_hit_equal.GetMomentum());
@@ -292,7 +291,7 @@ TEST(MCEventTest, HitTest) {
 
     // check that we handle copy of NULL channel id okay
     // (i.e. don't attempt to copy!)
-    SciFiHit default_hit;
+    Hit default_hit;
     my_hit_equal = default_hit;
     EXPECT_EQ(channel_id_null, my_hit_equal.GetChannelId());
 }
@@ -306,19 +305,9 @@ TEST(MCEventTest, MCEventTest) {
     std::vector<VirtualHit>* virt_2 = new std::vector<VirtualHit>();
     std::vector<VirtualHit>* virt_null = NULL;
 
-    std::vector<SciFiHit>* sf_hit_1 = new std::vector<SciFiHit>();
-    std::vector<SciFiHit>* sf_hit_2 = new std::vector<SciFiHit>();
-    std::vector<SciFiHit>* sf_hit_null = NULL;
-
-    std::vector<TOFHit>* tof_hit_1 = new std::vector<TOFHit>();
-    std::vector<TOFHit>* tof_hit_2 = new std::vector<TOFHit>();
-    std::vector<TOFHit>* tof_hit_null = NULL;
-
-    std::vector<SpecialVirtualHit>* sv_hit_1 =
-                                           new std::vector<SpecialVirtualHit>();
-    std::vector<SpecialVirtualHit>* sv_hit_2 =
-                                           new std::vector<SpecialVirtualHit>();
-    std::vector<SpecialVirtualHit>* sv_hit_null = NULL;
+    std::vector<Hit>* hit_1 = new std::vector<Hit>();
+    std::vector<Hit>* hit_2 = new std::vector<Hit>();
+    std::vector<Hit>* hit_null = NULL;
 
     std::vector<Track>* track_1 = new std::vector<Track>();
     std::vector<Track>* track_2 = new std::vector<Track>();
@@ -328,45 +317,32 @@ TEST(MCEventTest, MCEventTest) {
     // check allocation from NULL okay
     my_event.SetPrimary(prim_1);
     my_event.SetVirtualHits(virt_1);
-    my_event.SetSciFiHits(sf_hit_1);
-    my_event.SetTOFHits(tof_hit_1);
-    my_event.SetSpecialVirtualHits(sv_hit_1);
+    my_event.SetHits(hit_1);
     my_event.SetTracks(track_1);
     EXPECT_EQ(my_event.GetPrimary(), prim_1);
     EXPECT_EQ(my_event.GetVirtualHits(), virt_1);
-    EXPECT_EQ(my_event.GetSciFiHits(), sf_hit_1);
-    EXPECT_EQ(my_event.GetTOFHits(), tof_hit_1);
-    EXPECT_EQ(my_event.GetSpecialVirtualHits(), sv_hit_1);
+    EXPECT_EQ(my_event.GetHits(), hit_1);
     EXPECT_EQ(my_event.GetTracks(), track_1);
 
     // check reallocation okay
     my_event.SetPrimary(prim_2);
     my_event.SetVirtualHits(virt_2);
-    my_event.SetSciFiHits(sf_hit_2);
-    my_event.SetTOFHits(tof_hit_2);
-    my_event.SetSpecialVirtualHits(sv_hit_2);
+    my_event.SetHits(hit_2);
     my_event.SetTracks(track_2);
     EXPECT_EQ(my_event.GetPrimary(), prim_2);
     EXPECT_EQ(my_event.GetVirtualHits(), virt_2);
-    EXPECT_EQ(my_event.GetSciFiHits(), sf_hit_2);
-    EXPECT_EQ(my_event.GetTOFHits(), tof_hit_2);
-    EXPECT_EQ(my_event.GetSpecialVirtualHits(), sv_hit_2);
+    EXPECT_EQ(my_event.GetHits(), hit_2);
     EXPECT_EQ(my_event.GetTracks(), track_2);
 
     // check copy constructor (deep copy)
     MCEvent my_event_copy(my_event);
     EXPECT_NE(my_event.GetPrimary(), my_event_copy.GetPrimary());
     EXPECT_NE(my_event.GetVirtualHits(), my_event_copy.GetVirtualHits());
-    EXPECT_NE(my_event.GetSciFiHits(), my_event_copy.GetSciFiHits());
-    EXPECT_NE(my_event.GetTOFHits(), my_event_copy.GetTOFHits());
-    EXPECT_NE(my_event.GetSpecialVirtualHits(),
-                                         my_event_copy.GetSpecialVirtualHits());
+    EXPECT_NE(my_event.GetHits(), my_event_copy.GetHits());
     EXPECT_NE(my_event.GetTracks(), my_event_copy.GetTracks());
     EXPECT_NE(prim_null, my_event_copy.GetPrimary());
     EXPECT_NE(virt_null, my_event_copy.GetVirtualHits());
-    EXPECT_NE(sf_hit_null, my_event_copy.GetSciFiHits());
-    EXPECT_NE(tof_hit_null, my_event_copy.GetTOFHits());
-    EXPECT_NE(sv_hit_null, my_event_copy.GetSpecialVirtualHits());
+    EXPECT_NE(hit_null, my_event_copy.GetHits());
     EXPECT_NE(track_null, my_event_copy.GetTracks());
 
     // check equality operator (deep copy)
@@ -374,16 +350,11 @@ TEST(MCEventTest, MCEventTest) {
     my_event_equal = my_event;
     EXPECT_NE(my_event.GetPrimary(), my_event_equal.GetPrimary());
     EXPECT_NE(my_event.GetVirtualHits(), my_event_equal.GetVirtualHits());
-    EXPECT_NE(my_event.GetSciFiHits(), my_event_equal.GetSciFiHits());
-    EXPECT_NE(my_event.GetTOFHits(), my_event_equal.GetTOFHits());
-    EXPECT_NE(my_event.GetSpecialVirtualHits(),
-                                        my_event_equal.GetSpecialVirtualHits());
+    EXPECT_NE(my_event.GetHits(), my_event_equal.GetHits());
     EXPECT_NE(my_event.GetTracks(), my_event_equal.GetTracks());
     EXPECT_NE(prim_null, my_event_equal.GetPrimary());
     EXPECT_NE(virt_null, my_event_equal.GetVirtualHits());
-    EXPECT_NE(sf_hit_null, my_event_equal.GetSciFiHits());
-    EXPECT_NE(tof_hit_null, my_event_equal.GetTOFHits());
-    EXPECT_NE(sv_hit_null, my_event_equal.GetSpecialVirtualHits());
+    EXPECT_NE(hit_null, my_event_equal.GetHits());
     EXPECT_NE(track_null, my_event_equal.GetTracks());
 
     // test that we free okay on reallocation
@@ -398,87 +369,8 @@ TEST(MCEventTest, MCEventTest) {
     my_event_equal = default_event;
     EXPECT_EQ(prim_null, my_event_equal.GetPrimary());
     EXPECT_EQ(virt_null, my_event_equal.GetVirtualHits());
-    EXPECT_EQ(sf_hit_null, my_event_equal.GetSciFiHits());
-    EXPECT_EQ(tof_hit_null, my_event_equal.GetTOFHits());
-    EXPECT_EQ(sv_hit_null, my_event_equal.GetSpecialVirtualHits());
+    EXPECT_EQ(hit_null, my_event_equal.GetHits());
     EXPECT_EQ(track_null, my_event_equal.GetTracks());
-}
-
-TEST(MCEventTest, SciFiChannelIdTest) {
-    // Accessors/mutators
-    SciFiChannelId my_id;
-    my_id.SetStationNumber(1);
-    my_id.SetFiberNumber(2);
-    my_id.SetTrackerNumber(3);
-    my_id.SetPlaneNumber(4);
-    EXPECT_EQ(my_id.GetStationNumber(), 1);
-    EXPECT_EQ(my_id.GetFiberNumber(), 2);
-    EXPECT_EQ(my_id.GetTrackerNumber(), 3);
-    EXPECT_EQ(my_id.GetPlaneNumber(), 4);
-
-    // copy_constructor
-    SciFiChannelId my_id_copy(my_id);
-    EXPECT_EQ(my_id.GetStationNumber(), my_id_copy.GetStationNumber());
-    EXPECT_EQ(my_id.GetFiberNumber(), my_id_copy.GetFiberNumber());
-    EXPECT_EQ(my_id.GetTrackerNumber(), my_id_copy.GetTrackerNumber());
-    EXPECT_EQ(my_id.GetPlaneNumber(), my_id_copy.GetPlaneNumber());
-
-    // equality operator
-    SciFiChannelId my_id_equal;
-    my_id_equal = my_id;
-    EXPECT_EQ(my_id.GetStationNumber(), my_id_equal.GetStationNumber());
-    EXPECT_EQ(my_id.GetFiberNumber(), my_id_equal.GetFiberNumber());
-    EXPECT_EQ(my_id.GetTrackerNumber(), my_id_equal.GetTrackerNumber());
-    EXPECT_EQ(my_id.GetPlaneNumber(), my_id_equal.GetPlaneNumber());
-
-    // test that equality on myself doesn't cause trouble
-    my_id = my_id;
-}
-
-TEST(MCEventTest, TOFChannelIdTest) {
-    // Accessors/mutators
-    TOFChannelId my_id;
-    my_id.SetStation(1);
-    my_id.SetSlab(2);
-    my_id.SetPlane(3);
-    EXPECT_EQ(my_id.GetStation(), 1);
-    EXPECT_EQ(my_id.GetSlab(), 2);
-    EXPECT_EQ(my_id.GetPlane(), 3);
-
-    // copy_constructor
-    TOFChannelId my_id_copy(my_id);
-    EXPECT_EQ(my_id.GetStation(), my_id_copy.GetStation());
-    EXPECT_EQ(my_id.GetSlab(), my_id_copy.GetSlab());
-    EXPECT_EQ(my_id.GetPlane(), my_id_copy.GetPlane());
-
-    // equality operator
-    TOFChannelId my_id_equal;
-    my_id_equal = my_id;
-    EXPECT_EQ(my_id.GetStation(), my_id_equal.GetStation());
-    EXPECT_EQ(my_id.GetSlab(), my_id_equal.GetSlab());
-    EXPECT_EQ(my_id.GetPlane(), my_id_equal.GetPlane());
-
-    // test that equality on myself doesn't cause trouble
-    my_id = my_id;
-}
-
-TEST(MCEventTest, SpecialVirtualChannelIdTest) {
-    // Accessors/mutators
-    SpecialVirtualChannelId my_id;
-    my_id.SetStation(1);
-    EXPECT_EQ(my_id.GetStation(), 1);
-
-    // copy_constructor
-    SpecialVirtualChannelId my_id_copy(my_id);
-    EXPECT_EQ(my_id.GetStation(), my_id_copy.GetStation());
-
-    // equality operator
-    SpecialVirtualChannelId my_id_equal;
-    my_id_equal = my_id;
-    EXPECT_EQ(my_id.GetStation(), my_id_equal.GetStation());
-
-    // test that equality on myself doesn't cause trouble
-    my_id = my_id;
 }
 }
 

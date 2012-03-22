@@ -24,9 +24,6 @@
 #include "src/common_cpp/JsonCppProcessors/StepProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/TrackProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/PrimaryProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/SciFiChannelIdProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/TOFChannelIdProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/SpecialVirtualChannelIdProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/HitProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/VirtualHitProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/MCEventProcessor.hh"
@@ -46,7 +43,7 @@ void test_value(ProcessorBase<TYPE>* proc, std::string test_string) {
     ASSERT_NO_THROW(json_in = JsonWrapper::StringToJson(test_string))
                                                                  << test_string;
     TYPE* cpp_type = NULL;
-    ASSERT_NO_THROW(cpp_type = proc->JsonToCpp(json_in)) << json_in;
+    ASSERT_NO_THROW(cpp_type = proc->JsonToCpp(json_in));
     Json::Value* json_out = NULL;
     ASSERT_NO_THROW(json_out = proc->CppToJson(*cpp_type));
     EXPECT_PRED3(JsonWrapper::AlmostEqual, json_in, *json_out, 1e-9);
@@ -80,28 +77,11 @@ std::string PRIMARY =
     std::string("\"position\":{\"x\":6.,\"y\":7.,\"z\":8.},")+
     std::string("\"momentum\":{\"x\":9.,\"y\":10.,\"z\":11.}}");
 
-std::string SF_CHANNEL_ID =
-    std::string("{\"fiber_number\":1,\"station_number\":2,\"plane_number\":3,")+
-    std::string("\"tracker_number\":4}");
-
-std::string TOF_CHANNEL_ID =
-    std::string("{\"slab\":1,\"station\":2,\"plane\":3}");
-
-std::string SV_CHANNEL_ID =
-    std::string("{\"station\":1}");
-
-std::string HIT_SEED =
+std::string HIT =
     std::string("{\"particle_id\":1,\"charge\":2.,\"time\":3.,")+
     std::string("\"energy\":4.,\"energy_deposited\":5.,\"track_id\":6,")+
     std::string("\"position\":{\"x\":6.,\"y\":7.,\"z\":8.},")+
-    std::string("\"momentum\":{\"x\":9.,\"y\":10.,\"z\":11.},")+
-    std::string("\"channel_id\":");
-
-std::string SF_HIT = HIT_SEED+SF_CHANNEL_ID+"}";
-
-std::string TOF_HIT = HIT_SEED+TOF_CHANNEL_ID+"}";
-
-std::string SV_HIT = HIT_SEED+SV_CHANNEL_ID+"}";
+    std::string("\"momentum\":{\"x\":9.,\"y\":10.,\"z\":11.}}");
 
 std::string VIRTUAL_HIT =
     std::string("{\"particle_id\":1,\"track_id\":2,\"station_id\":3,")+
@@ -114,9 +94,7 @@ std::string VIRTUAL_HIT =
 
 std::string MC_EVENT =
     std::string("{\"primary\":")+PRIMARY+","+
-    std::string("\"sci_fi_hits\":[")+SF_HIT+","+SF_HIT+"],"+
-    std::string("\"tof_hits\":[")+TOF_HIT+","+TOF_HIT+"],"+
-    std::string("\"special_virtual_hits\":[")+SV_HIT+","+SV_HIT+"],"+
+    std::string("\"hits\":[")+HIT+","+HIT+"],"+
     std::string("\"virtual_hits\":[")+VIRTUAL_HIT+"],"+
     std::string("\"tracks\":[")+TRACK_STEP+","+TRACK_NO_STEP+"]}";
 
@@ -152,34 +130,9 @@ TEST(SpillProcessorTest, TrackProcessorTest) {
     test_value(&proc, TRACK_STEP);
 }
 
-TEST(SpillProcessorTest, TOFChannelIdProcessorTest) {
-    TOFChannelIdProcessor proc;
-    test_value(&proc, TOF_CHANNEL_ID);
-}
-
-TEST(SpillProcessorTest, SciFiChannelIdProcessorTest) {
-    SciFiChannelIdProcessor proc;
-    test_value(&proc, SF_CHANNEL_ID);
-}
-
-TEST(SpillProcessorTest, SpecialVirtualChannelIdProcessorTest) {
-    SpecialVirtualChannelIdProcessor proc;
-    test_value(&proc, SV_CHANNEL_ID);
-}
-
-TEST(SpillProcessorTest, SciFiHitProcessorTest) {
-    SciFiHitProcessor proc;
-    test_value(&proc, SF_HIT);
-}
-
-TEST(SpillProcessorTest, TOFHitProcessorTest) {
-    TOFHitProcessor proc;
-    test_value(&proc, TOF_HIT);
-}
-
-TEST(SpillProcessorTest, SpecialVirtualHitProcessorTest) {
-    SpecialVirtualHitProcessor proc;
-    test_value(&proc, SV_HIT);
+TEST(SpillProcessorTest, HitProcessorTest) {
+    HitProcessor proc;
+    test_value(&proc, HIT);
 }
 
 TEST(SpillProcessorTest, VirtualHitProcessorTest) {

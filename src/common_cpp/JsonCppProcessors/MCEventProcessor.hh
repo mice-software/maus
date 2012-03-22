@@ -20,10 +20,9 @@
 #include "json/value.h"
 
 #include "src/common_cpp/JsonCppProcessors/PrimaryProcessor.hh"
+
 #include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
-
-#include "src/common_cpp/JsonCppProcessors/HitProcessor.hh"
 
 #include "src/common_cpp/DataStructure/MCEvent.hh"
 
@@ -36,9 +35,7 @@ class MCEventProcessor : public ObjectProcessor<MCEvent> {
     MCEventProcessor();
 
  private:
-    ValueArrayProcessor<SciFiHit> _sci_fi_hit_proc;
-    ValueArrayProcessor<TOFHit> _tof_hit_proc;
-    ValueArrayProcessor<SpecialVirtualHit> _special_virtual_hit_proc;
+    ValueArrayProcessor<Hit> _hit_proc;
     ValueArrayProcessor<Track> _track_proc;
     ValueArrayProcessor<VirtualHit> _virtual_hit_proc;
     PrimaryProcessor _primary_proc;

@@ -392,39 +392,6 @@ TEST_F(VirtualPlaneManagerTest, VirtualPlanesSteppingActionTest) {
   ASSERT_EQ(json.size(), (Json::UInt) 3);
   for (size_t i = 0; i < json.size(); ++i)
     EXPECT_EQ(json[i]["station_id"].asInt(), (Json::Int) i+2);
-
-  delete step;
-}
-
-TEST_F(VirtualPlaneManagerTest, VirtualPlanesSteppingActionBackwardsTest) {
-  G4Step*  step  = new G4Step();
-  SetG4TrackAndStep(step);  // prestep is at z=4 poststep at z=8
-
-  MiceModule mod_6;
-  mod_6.addPropertyString("SensitiveDetector", "Virtual");
-  mod_6.addPropertyHep3Vector("Position", "0 0 6.0 mm");
-  mod_6.addPropertyBool("AllowBackwards", false);
-  MiceModule mod_7;
-  mod_7.addPropertyString("SensitiveDetector", "Virtual");
-  mod_7.addPropertyHep3Vector("Position", "0 0 7.0 mm");
-  mod_7.addPropertyBool("AllowBackwards", true);
-  vpm.ConstructVirtualPlanes(NULL, &mod_6);
-  vpm.ConstructVirtualPlanes(NULL, &mod_7);
-
-  vpm.VirtualPlanesSteppingAction(step);
-  EXPECT_EQ(vpm.GetNumberOfHits(1), 1);
-  EXPECT_EQ(vpm.GetNumberOfHits(2), 1);
-  vpm.SetVirtualHits(Json::Value(Json::arrayValue));
-  vpm.StartOfEvent();
-
-  step->GetPreStepPoint()->SetPosition(G4ThreeVector(0., 0., 8.));
-  step->GetPostStepPoint()->SetPosition(G4ThreeVector(0., 0., 4.));
-  step->GetPreStepPoint()->SetMomentumDirection(G4ThreeVector(0., 0., -1.));
-  step->GetPostStepPoint()->SetMomentumDirection(G4ThreeVector(0., 0., -1.));
-  vpm.VirtualPlanesSteppingAction(step);
-  EXPECT_EQ(vpm.GetNumberOfHits(1), 0);
-  EXPECT_EQ(vpm.GetNumberOfHits(2), 1);
-
   delete step;
 }
 

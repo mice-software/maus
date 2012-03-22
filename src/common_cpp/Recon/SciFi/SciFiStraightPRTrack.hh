@@ -39,9 +39,7 @@ class SciFiStraightPRTrack {
   public:
     // Constructors
     SciFiStraightPRTrack();
-    SciFiStraightPRTrack(int tracker, int num_points,
-                         double x0, double mx, double x_chisq,
-                         double y0, double my, double y_chisq);
+    SciFiStraightPRTrack(int tracker, double x0, double mx, double y0, double my);
 
     // Destructors
     ~SciFiStraightPRTrack();  // Default destructor
@@ -53,11 +51,7 @@ class SciFiStraightPRTrack {
     double get_y0() const { return _y0; }
     double get_mx() const { return _mx; }
     double get_my() const { return _my; }
-    double get_x_chisq() const { return _x_chisq; }
-    double get_y_chisq() const { return _y_chisq; }
-
     int get_tracker() const { return _tracker; }
-    int get_num_points() const { return _num_points; }
 
     std::vector<double> get_vsl();
 
@@ -68,11 +62,8 @@ class SciFiStraightPRTrack {
     void set_y0(double y0) { _y0 = y0; }
     void set_mx(double mx) { _mx = mx; }
     void set_my(double my) { _my = my; }
-    void set_x_chisq(double x_chisq) { _x_chisq = x_chisq; }
-    void set_y_chisq(double y_chisq) { _y_chisq = y_chisq; }
 
     void set_tracker(int tracker) { _tracker = tracker; }
-    void set_num_points(int num_points) { _num_points = num_points; }
     // Print track parameters
     void print_params();
 
@@ -82,14 +73,10 @@ class SciFiStraightPRTrack {
     std::vector<double> _vsl;
 
     int _tracker;
-    int _num_points;
-
     double _x0;
     double _y0;
     double _mx;
     double _my;
-    double _x_chisq;
-    double _y_chisq;
 };
 // } // ~namespace MAUS
 

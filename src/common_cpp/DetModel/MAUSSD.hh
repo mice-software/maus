@@ -40,10 +40,11 @@ class MAUSSD : public G4VSensitiveDetector {
   bool isHit();
   int GetNHits() { return _hits.size(); }
   void ClearHits() { _hits.clear(); }
-  Json::Value GetHits() { return _hits; }
+  std::vector<Json::Value> GetHits() { return _hits; }
+
 
  protected:
-  Json::Value _hits;
+  std::vector<Json::Value> _hits;
 
   MiceModule* _module;
 };
