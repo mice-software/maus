@@ -183,16 +183,16 @@ std::string  ReduceCppTracker::process(std::string document) {
         for ( int ed = 0; ed < numb_tracks; ed++ ) {
 
         if ( !tracker1_track[ed].isNull() ) {
-          _mx=tracker1_track[ed]["mx"].asDouble();
-          _my=tracker1_track[ed]["my"].asDouble();
-          _x0=tracker1_track[ed]["x0"].asDouble();
-          _y0=tracker1_track[ed]["y0"].asDouble();
+          _mx = tracker1_track[ed]["mx"].asDouble();
+          _my = tracker1_track[ed]["my"].asDouble();
+          _x0 = tracker1_track[ed]["x0"].asDouble();
+          _y0 = tracker1_track[ed]["y0"].asDouble();
         }
         if ( !tracker2_track[ed].isNull() ) {
-          _mx=tracker1_track[ed]["mx"].asDouble();
-          _my=tracker1_track[ed]["my"].asDouble();
-          _x0=tracker1_track[ed]["x0"].asDouble();
-          _y0=tracker1_track[ed]["y0"].asDouble();
+          _mx = tracker1_track[ed]["mx"].asDouble();
+          _my = tracker1_track[ed]["my"].asDouble();
+          _x0 = tracker1_track[ed]["x0"].asDouble();
+          _y0 = tracker1_track[ed]["y0"].asDouble();
         }
         }
         }

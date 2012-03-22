@@ -85,10 +85,10 @@ std::string MapCppTrackerRecon::process(std::string document) {
         pattern_recognition(event);
       }
 
-      //Kalman Track Fit.
-      //if ( event.helicalprtracks().size() ) {
+      // Kalman Track Fit.
+      // if ( event.helicalprtracks().size() ) {
       //  track_fit(event);
-      //}
+      // }
 
       print_event_info(event);
       save_to_json(event);
@@ -159,8 +159,8 @@ void MapCppTrackerRecon::pattern_recognition(SciFiEvent &evt) {
 }
 
 void MapCppTrackerRecon::track_fit(SciFiEvent &evt) {
-  KalmanTrackFit fit;
-  fit.process(evt);
+  // KalmanTrackFit fit;
+  // fit.process(evt);
 }
 
 void MapCppTrackerRecon::save_to_json(SciFiEvent &evt) {
