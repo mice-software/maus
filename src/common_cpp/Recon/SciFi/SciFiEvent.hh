@@ -34,6 +34,8 @@
 #include "src/common_cpp/Recon/SciFi/SciFiCluster.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiStraightPRTrack.hh"
+// Added by Summer below
+#include "src/common_cpp/Recon/SciFi/SciFiHelicalPRTrack.hh"
 
 // namespace MAUS {
 
@@ -67,9 +69,15 @@ class SciFiEvent {
 
   void add_straightprtrack(SciFiStraightPRTrack track) { _scifistraightprtracks.push_back(track); }
 
+  std::vector<SciFiHelicalPRTrack> helicalprtracks() const {return _scifihelicalprtracks; }
+
+  void add_helicalprtrack(SciFiHelicalPRTrack track) { _scifihelicalprtracks.push_back(track); }
+
   void set_straightprtrack(std::vector<SciFiStraightPRTrack> tracks) {
                            _scifistraightprtracks = tracks; }
 
+  void set_helicalprtrack(std::vector<SciFiHelicalPRTrack> tracks) {
+                          _scifihelicalprtracks = tracks; }
  private:
   /// Hits in an event.
   std::vector<SciFiHit*>            _scifihits;
@@ -88,6 +96,9 @@ class SciFiEvent {
 
   /// Straight tracks.
   std::vector<SciFiStraightPRTrack> _scifistraightprtracks;
+
+  /// Helical tracks.
+  std::vector<SciFiHelicalPRTrack> _scifihelicalprtracks;
 };  // Don't forget this trailing colon!!!!
 // } // ~namespace MAUS
 

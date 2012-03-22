@@ -111,6 +111,21 @@ std::string MapCppTOFSpacePoints::process(std::string document) {
                                                          "slab_hits",
                                                          JsonWrapper::objectValue);
 
+        // NOTE: DR March15
+        // Cheating -- until I figure out how to handle trig-req-time in MC:
+        //   I have to change the triggerpixelcut for MC in order for the calib
+        //   corrections to be applied correctly.
+        //   2 options --
+        //   a) change the cut in ConfigDefaults
+        //      but this <may> mess up data -- though I did run on real data
+        //      with this modified cut and things (resol,time) look OK @ 1st glance
+        //   b) use a different cut if it's MC
+        //      this breaks the agreement that we'll treat real data/MC same way
+        //      but for now it at least lets MC get reconstructed without clobbering real data
+        // For now I have chosen option a) with option b) commented out below
+        // need to be sure to change configdefaults for switching between data<->mc
+        if (root.isMember("mc")) _findTriggerPixelCut = 50.0;
+
         // Loop over each station starting from the trigger station.
         for (unsigned int n_station = 0; n_station < _stationKeys.size(); n_station++) {
           std::string detector = _stationKeys[n_station];

@@ -4,6 +4,14 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v0.2.0
+  The following functionality was added:
+    - Ckov reconstruction to digits
+    - First TOF digitisation
+    - Documentation was added for Monte Carlo Simulation 
+  If upgrading from the previous version, the following third party library scripts need to be rerun:
+    - third_party/bash/44cdb.bash
+
 MAUS-v0.1.4
   The following functionality was added:
     - Tracker reconstruction to space points
