@@ -136,6 +136,7 @@ std::string MapCppTrackReconstructor::process(std::string document) {
     int algorithm_number
       = JsonWrapper::GetProperty(config, "LeastSquaresOpticsModel_algorithm",
                                  JsonWrapper::stringValue).asInt();
+    /*
     Algorithm algorithm;
     switch (algorithm_number) {
       case 4: algorithm = Algorithm::kSweepingChiSquaredWithVariableWalls;
@@ -152,6 +153,24 @@ std::string MapCppTrackReconstructor::process(std::string document) {
                  "Unsupported optics model in reconstruction configuration.",
                  "MapCppTrackReconstructor::process()"));
   }
+  */
+  /* TODO(plane1@hawk.iit.edu)
+  if (optics_model_name == optics_model_names[0]) {
+    optics_model_ = new DifferentiatingOpticsModel();
+  } else if (optics_model_name == optics_model_names[1]) {
+    optics_model_ = new IntegratingOpticsModel();
+  } else if (optics_model_name == optics_model_names[2]) {
+    optics_model_ = new LeastSquaresOpticsModel();
+  } else if (optics_model_name == optics_model_names[3]) {
+    optics_model_ = new RungeKuttaOpticsModel();
+  } else {
+    return std::string("{\"errors\":{\"bad_json_document\":") +
+           std::string("\"Unsupported optics model in reconstruction ") +
+           std::string("configuration.\"}}");
+  }
+  */
+  // Use a stupid linear approximation model until everything else is working.
+  optics_model_ = new LinearApproximationOpticsModel();
   optics_model_.Build(&config);
 
   Json::Value spill;
@@ -176,10 +195,14 @@ std::string MapCppTrackReconstructor::process(std::string document) {
                                          ->HandleStdExc(spill, exc, _classname);
   }
 
-  // TODO(plane1@hawk.iit.edu) Use Minuit to reconstruct the start plane track
+  // TODO(plane1@hawk.iit.edu) Implement Kalman Filter and TOF track fitters
+  //  in addition to Minuit, and select between them based on the configuration
+
+  // Use Minuit to reconstruct the start plane track
+  track_fitter_ = new MinuitTrackFitter(optics_model_);
 
   // TODO(plane1@hawk.iit.edu) Reconstruct tracks at the desired locations
-  //                           specified in the configuration.
+  //  specified in the configuration.
 
   Json::FastWriter writer;
   std::string output = writer.write(spill);

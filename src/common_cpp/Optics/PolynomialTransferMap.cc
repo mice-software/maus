@@ -17,7 +17,7 @@
 /* Author: Peter Lane
  */
 
-#include "src/common_cpp/Optics/TransferMap.hh"
+#include "src/common_cpp/Optics/PolynomialTransferMap.hh"
 
 #include "CLHEP/Units/PhysicalConstants.h"
 
@@ -27,27 +27,30 @@
 
 namespace MAUS {
 // ##############################
-//  TransferMap public
+//  PolynomialTransferMap public
 // ##############################
 
 // ******************************
 //  Constructors
 // ******************************
 
-TransferMap::TransferMap(const PolynomialVector& polynomial,
-                         const PhaseSpaceVector& reference_trajectory_in,
-                         const PhaseSpaceVector& reference_trajectory_out)
+PolynomialTransferMap::PolynomialTransferMap(
+  const PolynomialVector& polynomial,
+  const PhaseSpaceVector& reference_trajectory_in,
+  const PhaseSpaceVector& reference_trajectory_out)
   : polynomial_(polynomial), reference_trajectory_in_(reference_trajectory_in),
     reference_trajectory_out_(reference_trajectory_out)
 { }
 
-TransferMap::TransferMap(const PolynomialVector& polynomial,
-                         const PhaseSpaceVector& reference_trajectory)
+PolynomialTransferMap::PolynomialTransferMap(
+  const PolynomialVector& polynomial,
+  const PhaseSpaceVector& reference_trajectory)
   : polynomial_(polynomial), reference_trajectory_in_(reference_trajectory),
     reference_trajectory_out_(reference_trajectory)
 { }
 
-TransferMap::TransferMap(const TransferMap& original_instance)
+PolynomialTransferMap::PolynomialTransferMap(
+  const PolynomialTransferMap& original_instance)
   : polynomial_(original_instance.polynomial_),
     reference_trajectory_in_(original_instance.reference_trajectory_in_),
     reference_trajectory_out_(original_instance.reference_trajectory_out_)
@@ -56,14 +59,14 @@ TransferMap::TransferMap(const TransferMap& original_instance)
 /**
  *  Name: operator*(CovarianceMatrix const &)
  */
-CovarianceMatrix TransferMap::operator*(const CovarianceMatrix& covariances)
-    const {
+CovarianceMatrix PolynomialTransferMap::Transport(
+    CovarianceMatrix const * const covariances) const {
   Matrix<double> transfer_matrix = CreateTransferMatrix();
 
   Matrix<double> transfer_matrix_transpose = transpose(transfer_matrix);
 
   CovarianceMatrix transformed_covariances(
-    transfer_matrix * covariances * transfer_matrix_transpose);
+    transfer_matrix * (*covariances) * transfer_matrix_transpose);
 
   return transformed_covariances;
 }
@@ -71,10 +74,10 @@ CovarianceMatrix TransferMap::operator*(const CovarianceMatrix& covariances)
 /**
  *  Name: operator*(PhaseSpaceVector const &)
  */
-PhaseSpaceVector TransferMap::operator*(const PhaseSpaceVector& input_vector)
-    const {
+PhaseSpaceVector PolynomialTransferMap::Transport(
+    PhaseSpaceVector const * const input_vector) const {
   // subtract off the input reference trajectory to obtain phase space delta
-  Vector<double> phase_space_delta(input_vector - reference_trajectory_in_);
+  Vector<double> phase_space_delta((*input_vector) - reference_trajectory_in_);
 
   // operate on the phase space delta with the polynomial map
   Vector<double> transformed_delta;
@@ -91,7 +94,7 @@ PhaseSpaceVector TransferMap::operator*(const PhaseSpaceVector& input_vector)
 //  First-order Map Functions
 // ******************************
 
-Matrix<double> TransferMap::CreateTransferMatrix() const {
+Matrix<double> PolynomialTransferMap::CreateTransferMatrix() const {
   return polynomial_.GetCoefficientsAsMatrix().submatrix(1, 6, 2, 6);
 }
 
@@ -103,7 +106,7 @@ Matrix<double> TransferMap::CreateTransferMatrix() const {
 //  Streaming
 // ******************************
 
-std::ostream& operator<<(std::ostream& out, const TransferMap& tm) {
+std::ostream& operator<<(std::ostream& out, const PolynomialTransferMap& tm) {
   out  << "Incomming Reference Trajectory: "
       << tm.reference_trajectory_in_ << std::endl
       << tm.reference_trajectory_out_ << std::endl
