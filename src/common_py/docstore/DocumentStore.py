@@ -137,3 +137,26 @@ class DocumentStore: # pylint: disable=W0232
         @param self Object reference.
         """
         pass
+
+class DocumentStoreException(Exception):
+    """ 
+    Exception raised if there is a problem using the document store.
+    """
+
+    def __init__(self, exception):
+        """
+        Constructor. Overrides Exception.__init__.
+        @param self Object reference.
+        @param exception Wrapped exception
+        """
+        Exception.__init__(self)
+        self.exception = exception
+
+    def __str__(self):
+        """
+        Return string representation. Overrides Exception.__str__.
+        @param self Object reference.
+        @return string.
+        """
+        return "Exception when using document store: %s" \
+            % self.exception

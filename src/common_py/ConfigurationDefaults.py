@@ -216,7 +216,7 @@ geometry_upload_valid_from = "" # date-time in format like: that the specified i
 geometry_upload_cleanup = True # set to True to clean up after upload
 
 
-# this is used by ImputCppRealData
+# this is used by ImputCppDAQData
 Number_of_DAQ_Events = -1
 Phys_Events_Only = False
 Calib_Events_Only = False
@@ -240,6 +240,8 @@ Enable_EMR = True
 Enable_KL = True
 Enable_CKOV = True
 DAQ_cabling_file = "/files/cabling/DAQChannelMap.txt"
+DAQ_hostname = 'miceraid1a'
+DAQ_monitor_name = 'MICE_Online_Monitor'
 
 # tof digitization
 TOFconversionFactor = 0.01 # MeV

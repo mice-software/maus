@@ -127,11 +127,9 @@ def birth(panel, config_id, transform, configuration = "{}"): # pylint: disable=
     MapPyGroup. Sub-lists are treated as nested MapPyGroups. If None
     then the current transform isdeathed and rebirthed.  
     @param configuration JSON configuration document.
-    @return status document with entries of form PID:{"status":"ok"}
-    if all went well and PID:{"status":"error", "type":ERROR,
-    "message":MESSAGE} if things went wrong in updating a process.
-    @throws Exception if any problems arise in communicating with
-    sub-processes.
+    @return status document with entries of form {"status":"ok"}
+    if all went well and {"status":"error", "error":[{"message":"...",
+    "type":"TYPE"},...]} if things went wrong.
     """
     logger = logging.getLogger(__name__)
     if logger.isEnabledFor(logging.INFO):
@@ -182,10 +180,9 @@ def death(panel):
     is invoked by broadcast calls from clients  and, in turn, invokes
     the process_death method in sub-processes.
     @param panel Celery panel object.
-    @return status document of the form {"status":"ok"} if all went
-    well or:{"status":"error", [{"type":ERROR,
-    "message":MESSAGE},...]} if any problems arose.
-    @throws Exception if any problems arose.
+    @return status document with entries of form {"status":"ok"}
+    if all went well and {"status":"error", "error":[{"message":"...",
+    "type":"TYPE"},...]} if things went wrong.
     """
     logger = logging.getLogger(__name__)
     if logger.isEnabledFor(logging.INFO):

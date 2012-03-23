@@ -109,7 +109,8 @@ class ReducePyHistogramTDCADCCounts(ReducePyMatplotlibHistogram):
         @returns list with histogram JSON document.
         @throws KeyError if "digits" is not in spill.
         """
-        if "END_OF_RUN" in spill:
+        if (spill.has_key("daq_event_type") and
+            spill["daq_event_type"] == "end_of_run"):
             return [{}]
 
         # Do validation specific to this class while getting the

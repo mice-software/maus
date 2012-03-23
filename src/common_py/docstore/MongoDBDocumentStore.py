@@ -71,12 +71,15 @@ class MongoDBDocumentStore(DocumentStore):
     def create_collection(self, collection):
         """ 
         Create a collection. If it already exists, this is a no-op.
+        An index is created on the "date" field.
         @param self Object reference.
         @param collection Collection name.
         """
         if (not collection in self.__data_store.collection_names()):
             self.__data_store.create_collection(collection)
-
+            collection = self.__data_store[collection]
+            collection.create_index("date")
+        
     def has_collection(self, collection):
         """ 
         Check if collection exists.
