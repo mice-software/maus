@@ -114,6 +114,7 @@ def build_data_structure(env):
     data_items = glob.glob(data_struct+'/*.hh')
     # LinkDef.hh must be last
     data_items.sort(key = lambda x: x.find('LinkDef.hh')) 
+    data_items = filter(lambda x: x[-7:] != '-inl.hh', data_items)
     dict_target = (data_struct+'/MausDataStructure.cc')
     proc_target = ['rootcint']+['-f', dict_target, '-c']
     for include in env['CPPPATH']:

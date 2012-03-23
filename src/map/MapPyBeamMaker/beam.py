@@ -359,6 +359,7 @@ class Beam(): # pylint: disable=R0902
         elif longitudinal_variable == "energy":
             hit["energy"] = particle_array[5]
             hit.mass_shell_condition("pz")
+        hit["pz"] *= self.reference['pz']/abs(self.reference['pz'])
         primary = hit.get_maus_dict('maus_primary')[0]
         primary["position"]["z"] = self.reference["z"]
         primary["random_seed"] = self.__process_get_seed()

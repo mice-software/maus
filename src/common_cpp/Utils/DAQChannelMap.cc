@@ -127,7 +127,9 @@ bool DAQChannelMap::InitFromFile(std::string filename) {
   return true;
 }
 
-bool DAQChannelMap::InitFromCDB() {}
+bool DAQChannelMap::InitFromCDB() {
+  return false;
+}
 
 DAQChannelKey* DAQChannelMap::find(int ldc, int geo, int ch, int eqType) {
   // To be optimised !!!

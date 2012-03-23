@@ -48,6 +48,15 @@ TEST_PRIM_MU = {
     "random_seed":0
 }
 
+TEST_PRIM_MU_NEG =  {
+    "position":{"x":0.0, "y":0.0, "z":3.0},
+    "momentum":{"x":0.0, "y":0.0, "z":-1.0}, #going backwards
+    "particle_id":-13,
+    "energy":226.0,
+    "time":0.0,
+    "random_seed":0
+}
+
 TEST_PRIM_F1 = {
     "position":{"x":0.0, "y":0.0, "z":0.0},
     "momentum":{"x":0.0, "y":0.0, "z":0.0}, # momentum vector = 0
@@ -402,6 +411,22 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
         self.assertAlmostEqual(primary["momentum"]["z"],
               (600.**2.-xboa.Common.pdg_pid_to_mass[13]**2.-20.**2-40.**2)**0.5)
         self.assertAlmostEqual(primary["energy"], 600.)
+
+    def test_process_array_to_primary_sign(self):
+        """Check function that converts from an array to a primary particle"""
+        mean = numpy.array([10., 20., 30., 40., 50., 600.])
+        mass = xboa.Common.pdg_pid_to_mass[13]
+        self._beam._Beam__birth_reference_particle \
+                                                ({"reference":TEST_PRIM_MU_NEG})
+        self._beam.beam_seed = 10
+        self._beam.particle_seed_algorithm = "beam_seed"
+        primary = self._beam._Beam__process_array_to_primary(mean, 13, 'p')
+        self.assertLess(primary["momentum"]["z"], 0.)
+        primary = self._beam._Beam__process_array_to_primary(mean, 13, 'pz')
+        self.assertLess(primary["momentum"]["z"], 0.)
+        primary = self._beam._Beam__process_array_to_primary(mean, 13, 'energy')
+        self.assertLess(primary["momentum"]["z"], 0.)
+
 
     def test_make_one_primary_gaus(self):
         """Check function that throws a particle - for gaussian distribution"""
