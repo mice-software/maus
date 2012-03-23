@@ -109,8 +109,12 @@ class ReducePyCkov(ReducePyROOTHistogram): # pylint: disable=R0902
 
         if 'digits' not in spill:
             return False
-
         digits = spill['digits']
+
+        if 'ckov' not in digits:
+            return False
+
+        ckov = digits['ckov']
 
         #The cuts on e and mu TOFs are made first
         #by 'eyeing' the 1D TOF distributions.
@@ -136,16 +140,16 @@ class ReducePyCkov(ReducePyROOTHistogram): # pylint: disable=R0902
             if sp_tof0[i] and sp_tof1[i] :
                 if len(sp_tof0[i]) == 1 and len(sp_tof1[i]) == 1:
                     if sp_tof0[i][0]["part_event_number"] == \
-                           digits[i]['B']['part_event_number'] and \
+                           ckov[i]['B']['part_event_number'] and \
                        sp_tof0[i][0]["part_event_number"] == \
-                       digits[i]['A']['part_event_number']:
+                       ckov[i]['A']['part_event_number']:
                            
                         t_0 = sp_tof0[i][0]["time"]
                         t_1 = sp_tof1[i][0]["time"]
                         self._htof.Fill(t_1-t_0)
                         
-                        PE_B = digits[i]["B"]["number_of_pes"]
-                        PE_A = digits[i]["A"]["number_of_pes"]
+                        PE_B = ckov[i]["B"]["number_of_pes"]
+                        PE_A = ckov[i]["A"]["number_of_pes"]
                        
                         if PE_B > 0:
                             self._htof_B.Fill(PE_B, (t_1 - t_0))
@@ -190,8 +194,13 @@ class ReducePyCkov(ReducePyROOTHistogram): # pylint: disable=R0902
             return False
 
         digits = spill['digits']
+
+        if 'ckov' not in digits:
+            return False
+
+        ckov = digits['ckov']
                 
-        for i in range(len(digits)):
+        for i in range(len(ckov)):
 
             for pmt in range(0, 8):
                 pulse = "pulse_%d" % (pmt)
@@ -202,11 +211,11 @@ class ReducePyCkov(ReducePyROOTHistogram): # pylint: disable=R0902
                     ckov_sta = 'A'
                 if pmt >= 4:
                     ckov_sta = 'B'
-                charge = digits[i][ckov_sta][pulse]
+                charge = ckov[i][ckov_sta][pulse]
                 if charge > -1:
                     self._hcharge[i].Fill(charge)
 
-                time = digits[i][ckov_sta][arrival_time]
+                time = ckov[i][ckov_sta][arrival_time]
                 if time < 255:
                     self._htime[i].Fill(time)
                               

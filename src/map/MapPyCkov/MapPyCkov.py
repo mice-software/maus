@@ -36,6 +36,7 @@ class MapPyCkov:
         in ConfigurationDefaults
         """
         try:
+            json_configuration = unicode(json_configuration)
             config_doc = json.loads(json_configuration)
             if config_doc:
                 keys = []
@@ -214,8 +215,7 @@ class MapPyCkov:
         #spill['daq_data']['ckov'] = {}                                      
         if 'digits' not in spill:
             spill['digits'] = {}
-
-        spill['digits'] = digits
+        spill['digits']['ckov'] = digits
 
         return json.dumps(spill)
 

@@ -456,7 +456,7 @@ int fADCDataProcessor::get_area() {
 void fADCDataProcessor::set_pedestal() {
   double area = 0;
   unsigned int pedBins = 20;
-	if (_data.size() > pedBins) {
+  if (_data.size() > pedBins) {
     for (unsigned int i = 0; i < pedBins; i++) {
        area += _data[i];
     }
@@ -488,13 +488,11 @@ int fADCDataProcessor::get_neg_signal_area(int&pos) {
 
   if (pos > 10) {
     it = min -  10;
-
-  while (it < min + 20) {
-
-      area+= abs(*it - _pedestal);
-    it++;
+    while (it < min + 20 && it < _data.end()) {
+      area += abs(*it - _pedestal);
+      it++;
+    }
   }
-}
   return area;
 }
 
@@ -586,7 +584,7 @@ int fADCDataProcessor::chargePedMin() {
 
 int fADCDataProcessor::get_charge(int Algorithm) {
   int charge;
-	switch( Algorithm ) {
+  switch ( Algorithm ) {
   case ceaMinMax:
     charge = chargeMinMax();
     break;

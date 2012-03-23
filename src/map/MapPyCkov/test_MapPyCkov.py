@@ -73,10 +73,10 @@ class MapPyCkovTestCase(unittest.TestCase):# pylint: disable = R0904
             print 'no digits'
 
         #test the ckov output
-        n_part_events = int(len(spill['digits'])) - 1
+        n_part_events = int(len(spill['digits']['ckov'])) - 1
         #test there are no dupilcate events
         last_part_event_number = \
-             spill['digits'][n_part_events]['A']['part_event_number']
+             spill['digits']['ckov'][n_part_events]['A']['part_event_number']
         self.assertEqual(last_part_event_number, n_part_events)
 
     def tearDown(self): #pylint: disable = C0103

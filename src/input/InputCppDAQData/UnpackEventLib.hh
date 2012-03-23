@@ -162,11 +162,10 @@ class fADCDataProcessor : public ZeroSupressionFilter {
   */
   int get_point(int i) const { return _data[i]; }
 
-  // Return the vector of samples
+  /// Return the vector of samples
   vector<int> get_data() const { return _data; }
 
-  // Return each fADC sample value
-
+  /// Return each fADC sample value
   Json::Value get_samples();
 
   /** Return the area of the signal.
@@ -185,11 +184,6 @@ class fADCDataProcessor : public ZeroSupressionFilter {
   * \param[in] Algorithm identifier of the algorithm.
   */
   int get_charge(int Algorithm = ceaPedMax);
-
-  /**Return the charge of the Cherenkov's negative signal.
-   */
-
-  // int get_charge(int Algorithm = ceaPedMin);
 
   enum chargeEstimationAlgorithm {
     ceaMinMax, /// Simplest algorithm

@@ -442,13 +442,13 @@ void MICEDetectorConstruction::setSteppingAccuracy()
     fieldMgr->SetMaximumEpsilonStep( epsilonMax );
 }
 
-std::vector<Json::Value> MICEDetectorConstruction::GetSDHits(int i){
+Json::Value MICEDetectorConstruction::GetSDHits(int i){
   if (i >= 0 and ((size_t) i) < _SDs.size() and _SDs[i]){
     if (_SDs[i]->isHit()) {
       return _SDs[i]->GetHits();
     }
   }
-  std::vector<Json::Value> empty;
+  Json::Value empty(Json::objectValue);
   return empty;
 }
 

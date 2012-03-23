@@ -34,11 +34,13 @@ void BTTracker::integrate(double target_indie, double* y, const BTField* field, 
 {
   _q       = charge;
   _m       = sqrt(y[4]*y[4] - y[5]*y[5] - y[6]*y[6] - y[7]*y[7]);
-  if( std::isnan(_m) || std::isinf(_m) )
-    if (y[4]*y[4] - y[5]*y[5] - y[6]*y[6] - y[7]*y[7] > -1e-6)
+  if( std::isnan(_m) || std::isinf(_m) ) {
+    if (y[4]*y[4] - y[5]*y[5] - y[6]*y[6] - y[7]*y[7] > -1e-6) {
       _m = 0.;
-    else
+    } else {
       throw(Squeal(Squeal::recoverable, "Mass undefined in stepping function", "BTTracker::integrate"));
+    }
+  }
 
   if(indep == symplectic_tau1) { BTTracker::symplecticIntegrate(target_indie, y, field, 0., step_size, charge, 1); return; }
   if(indep == symplectic_tau2) { BTTracker::symplecticIntegrate(target_indie, y, field, 0., step_size, charge, 2); return; }

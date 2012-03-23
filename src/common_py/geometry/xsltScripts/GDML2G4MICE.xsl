@@ -21,16 +21,18 @@
             </head>
             <body>
                 <xsl:for-each select="structure/volume/physvol"> 
-                            Module <xsl:value-of select="ancestor::gdml/MICE_Information/Other_Information/GDML_Files/@location"/>/<xsl:value-of select="substring-before(file/@name, '.')"/>.dat 
+                            Module <xsl:value-of select="ancestor::gdml/MICE_Information/Other_Information/GDML_Files/@location"/><xsl:value-of select="substring-before(file/@name, '.')"/>.dat 
                             { 
                                 Position <xsl:value-of select="position/@x"/><xsl:text> </xsl:text><xsl:value-of select="position/@y"/><xsl:text> </xsl:text><xsl:value-of select="position/@z"/> mm 
-                                Rotation <xsl:if test="rotationref/@ref = 'identity'"> 0.0 0.0 0.0 deg</xsl:if> 
+                                Rotation <xsl:choose><xsl:when test="rotationref/@ref = 'RotateX90'"> 90.0 0.0 0.0 deg</xsl:when><xsl:when test="rotationref/@ref = 'RotateX270'"> 270.0 0.0 0.0 deg</xsl:when><xsl:when test="rotationref/@ref = 'RotateX180'"> 180.0 0.0 0.0 deg</xsl:when><xsl:otherwise> 0.0 0.0 0.0 deg</xsl:otherwise></xsl:choose> 
                             }
                 </xsl:for-each>
                             // Fields
                 <xsl:for-each select="MICE_Information/G4Field_Information/Dipole">
-                            Module Dipole
+                            Module <xsl:value-of select="FieldName/@name"/>
                             {
+                            Position <xsl:value-of select="Position/@x"/><xsl:text> </xsl:text><xsl:value-of select="Position/@y"/><xsl:text> </xsl:text><xsl:value-of select="Position/@z"/> mm
+                            Rotation <xsl:value-of select="Rotation/@x"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@y"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@z"/> mm
                             Volume <xsl:value-of select="Volume/@name"/>
                             PropertyString FieldType <xsl:value-of select="FieldType/@name"/>
                             PropertyString FieldMapMode <xsl:value-of select="FieldMapMode/@name"/>
@@ -40,8 +42,10 @@
                             }
                 </xsl:for-each>
                 <xsl:for-each select="MICE_Information/G4Field_Information/Quadrupole">
-                            Module Quadrupole
+                            Module <xsl:value-of select="FieldName/@name"/>
                             {
+                            Position <xsl:value-of select="Position/@x"/><xsl:text> </xsl:text><xsl:value-of select="Position/@y"/><xsl:text> </xsl:text><xsl:value-of select="Position/@z"/> mm
+                            Rotation <xsl:value-of select="Rotation/@x"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@y"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@z"/> mm                            
                             Volume <xsl:value-of select="Volume/@name"/>
                             PropertyString FieldType <xsl:value-of select="FieldType/@name"/>
                             PropertyDouble Height <xsl:value-of select="Dimensions/@height"/><xsl:text> </xsl:text><xsl:value-of select="Dimensions/@units"/>
@@ -56,8 +60,10 @@
                             }
                 </xsl:for-each>
                 <xsl:for-each select="MICE_Information/G4Field_Information/Solenoid">
-                            Module Solenoid
+                            Module <xsl:value-of select="FieldName/@name"/>
                             {
+                            Position <xsl:value-of select="Position/@x"/><xsl:text> </xsl:text><xsl:value-of select="Position/@y"/><xsl:text> </xsl:text><xsl:value-of select="Position/@z"/> mm
+                            Rotation <xsl:value-of select="Rotation/@x"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@y"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@z"/> mm                            
                             Volume <xsl:value-of select="Volume/@name"/>
                             PropertyString FieldType <xsl:value-of select="FieldType/@name"/>
                             PropertyString FileName <xsl:value-of select="FileName/@name"/>
