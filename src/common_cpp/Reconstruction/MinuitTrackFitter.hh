@@ -28,10 +28,17 @@ class MinuitTrackFitter : public TrackFitter
   ~MinuitTrackFitter();
  protected:
   static const size_t kPhaseSpaceDimension;
-  DetectorEvent * last_detector_event;
-  
+  std::vector<double> detector_planes_;
+  std::vector<CovarianceMatrix> detector_errors_;
+  std::const_iterator<std::vector<DetectorEvent> > trajectories_;
+
   MinuitTrackFitter();
   Double_t ScoreTrack(Double_t const * const phase_space_coordinates) const;
+  void GetDetectorPlanes(std::vector<double> * detector_planes);
+  void GetDetectorErrors(std::vector<CovarianceMatrix> * error_matrices);
+  void CorrelateDetectorEvents(
+    std::vector<DetectorEvent> const * const detector_events,
+    std::vector<std::vector<DetectorEvent> > * &event_sets);
 };
 
 const size_t MapCppTrackReconstructor::kPhaseSpaceDimension = 6;

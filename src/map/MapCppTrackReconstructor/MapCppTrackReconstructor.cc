@@ -169,7 +169,7 @@ std::string MapCppTrackReconstructor::process(std::string document) {
 
   // TODO(plane1@hawk.iit.edu) Reconstruct tracks at the desired locations
   //  specified in the configuration.
-  // track_fitter_->Fit(optics_model_, &events, &trajectories);
+  // track_fitter_->Fit(&events, &trajectories);
 
   Json::FastWriter writer;
   std::string output = writer.write(spill);

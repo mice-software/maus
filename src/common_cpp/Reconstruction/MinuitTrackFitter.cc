@@ -48,6 +48,7 @@ MinuitTrackFitter::MinuitTrackFitter(OpticsModel const * const optics_model)
     = new TMinuit(kPhaseSpaceDimension);
   TMinuit * minimiser
     = common_cpp_optics_reconstruction_minuit_track_fitter_minuit;
+  minimiser->SetMaxIteration(100);
   int error_flag = 0;
   // setup the index, name, init value, step size, min, and max value for each
   // phase space variable (mins and maxes calculated from 800MeV/c ISIS beam)
@@ -60,6 +61,10 @@ MinuitTrackFitter::MinuitTrackFitter(OpticsModel const * const optics_model)
   minimiser->SetFitObject(this);
   minimiser->SetFCN(
     common_cpp_optics_reconstruction_minuit_track_fitter_score_function);
+
+  GetDetectorPlanes(&detector_planes_);
+
+  GetDetectorErrors(&detector_errors_);
 }
 
 MinuitTrackFitter::~MinuitTrackFitter() {
@@ -67,81 +72,91 @@ MinuitTrackFitter::~MinuitTrackFitter() {
 }
 void MinuitTrackFitter::Fit(
     std::vector<DetectorEvent> const * const detector_events
-    std::vector<ParticleTrajectory> * trajectories) {
-
-  // TODO(plane1@hawk.iit.edu) eventually we'll neeed to trick out which events
-  // came from the same particle and compile a set of event sets. For now just
-  // assume the events are all for the same particle.
+    std::vector<ParticleTrajectory> * const trajectories) {
+ 
+  // determine which events came from which particles
+  std::vector<std::vector<DetectorEvent> > event_sets;
+  CorrelateDetectorEvents(detector_events, &event_sets);
 
   if (detector_events.size() < 2) {
     // TODO(plane1@hawk.iit.edu) Squeal: less than 2 tracks = no trajectory
   }
 
-  // TODO(plane1@hawk.iit.edu) for each particle minimize the score function
-  TMinuit * minimiser
-    = common_cpp_optics_reconstruction_minuit_track_fitter_minuit;
-  minimiser->SetMaxIteration(100);
-
-  const_iterator events = detector_events->begin();
-  last_detector_event = &(*events);
-  while (events != detector_events.end())
-  {
+  // Find the best fit trajectory for each particle traversing the lattice
+  const_iterator<std::vector<DetectorEvent> > trajectories;
+  for (trajectories = event_sets.begin();
+       trajectories < event_sets.end();
+       ++trajectories) {
+    // Find the start plane track that minimizes the score for the calculated
+    // trajectory based off of this track (i.e. best fits the measured tracks
+    // from the detectors).
+    TMinuit * minimiser
+      = common_cpp_optics_reconstruction_minuit_track_fitter_minuit;
     Int_t status = minimiser->Migrad();
-    last_detector_event = ++events;
   }
-
-  // TODO(plane1@hawk.iit.edu) assemble trajectories for each particle
 }
 
-Double_t ScoreTrack(Double_t * phase_space_coordinates) {
-  const PhaseSpaceVector first_detector_guess(phase_space_coordinates[0],
+Double_t MinuitTrackFitter::ScoreTrack(Double_t * phase_space_coordinates) {
+  TransferMap transfer_map = optics_model_->transfer_map();
+
+  // FIXME(plane1@hake.iit.edu) assuming muons with m = 105.7 MeV/c^2.
+  // Should use PID to look up the mass of the particle.
+  double mass = 105.7;
+
+  const PhaseSpaceVector start_plane_track(phase_space_coordinates[0],
                                               phase_space_coordinates[1],
                                               phase_space_coordinates[2],
                                               phase_space_coordinates[3],
                                               phase_space_coordinates[4],
                                               phase_space_coordinates[5]);
-  TransferMap transfer_map = optics_model_->transfer_map();
+  PhaseSpaceVector guess = start_plane_track;
 
-  // FIXME(plane1@hake.iit.edu) assuming muons with m = 105.7 MeV/c^2
-  // should use PID to look up the mass of the particle
-  double mass = 105.7;
-
-  // 1) Get z coordinates of the detectors.
-  std::vector<double> * detector_planes = GetDetectorPlanes();
-  int number_of_detectors = detector_planes->size();
-  // 2) Get measured PSV v^M_1 and error matrix E_1 from detector 1
-  PhaseSpaceVector * measurement = GetDetectorMeasurement(0);
-  CovarianceMatrix * detector_error = GetDetectorError(0);
-
-  double chi_squared = 0;
   PhaseSpaceVector delta;
-  TransferMap transfer_map;
-  PhaseSpaceVector guess = first_detector_guess;
-  for (int index = 0; index < number_of_detectors; ++index) {
-    delta = guess - (*measurement);
-    chi_squared += delta * (*detector_error) * transpose(delta)
+  PhaseSpaceVector measurement;
 
-    if (index < (number_of_detectors-1)) {
-      transfer_map = optics_model_->transfer_map((*detector_planes)[index],
-                                                 (*detector_planes)[index+1],
+  const_iterator<DetectorEvent> events = (*trajectories_).begin();
+  const_iterator<DetectorEvent> errors = detector_errors_.begin();
+  double chi_squared = 0;
+  while (events < (*trajectories_).end()) {
+    // get the measured phase space coordinates of the event
+    measurement = (*events).coordinates();
+
+    // sum the squares of the differences between the calculated phase space
+    // coordinates and the measured coordinates
+    delta = guess - measurement;
+    chi_squared += delta * (*errors) * transpose(delta)
+
+    // calculate the next event's phase space coordinates using the transfer map
+    if (events > (*trajectories_).rbegin()) {
+      transfer_map = optics_model_->transfer_map(detector_planes_[index],
+                                                 detector_planes_[index+1],
                                                  mass)
-      guess = transfer_map.Transport(*measurement);
-      measurement = GetDetectorMeasurement(index+1);
-      detector_error = GetDetectorError(index+1);
+      guess = transfer_map.Transport(&guess);
     }
+
+    ++events;
+    ++errors;
   }
+
+  // TODO(plane1@hawk.iit.edu) save the calculate trajectory in case this is the
+  // last one (i.e. the best fit trajectory).
 }
 
-std::vector<double> const * const GetDetectorPlanes() {
+void MinuitTrackFitter::CorrelateDetectorEvents(
+  std::vector<DetectorEvent> const * const detector_events,
+  std::vector<std::vector<DetectorEvent> > * &event_sets) {
+  // TODO(plane1@hawk.iit.edu) create sets of events where each set corresponds
+  // to a different particle. For now assume that all events are from the same
+  // particle.
+  event_sets->assign(detector_events.begin(), detector_events.end());
+}
+
+void MinuitTrackFitter::GetDetectorPlanes(std::vector<double> * detector_planes) {
   // TODO(plane1@hawk.iit.edu) get z coordinates of available detectors
 }
 
-PhaseSpaceVector const * const GetDetectorMeasurement(int detector_index) {
-  // TODO(plane1@hawk.iit.edu) get track of particle from detector i
-}
-
-CovarianceMatrix const * const GetDetectorError(int detector_index) {
-  // TODO(plane1@hawk.iit.edu) get error matrix from detector i
+void MinuitTrackFitter::GetDetectorErrors(std::vector<CovarianceMatrix> * error_matrices) {
+  // TODO(plane1@hawk.iit.edu) get error matrices of available detectors
 }
 
 }  // namespace MAUS
