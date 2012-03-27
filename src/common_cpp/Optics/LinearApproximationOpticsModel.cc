@@ -20,7 +20,6 @@
 #include "Optics/LinearApproximationOpticsModel.hh"
 
 #include <cmath>
-
 #include <vector>
 
 #include "Interface/Squeal.hh"
@@ -42,6 +41,7 @@ CovarianceMatrix LinearApproximationTransferMap::Transport(
   // so just return what was given.
   return *covariances;
 }
+
 PhaseSpaceVector LinearApproximationTransferMap::Transport(
     PhaseSpaceVector const * const vector) {
   // Use the energy and momentum to determine when and where the particle would

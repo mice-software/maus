@@ -33,40 +33,6 @@ namespace MAUS {
 
 using MAUS::LeastSquaresOpticsModel::Algorithm;
 
-void transfer_map_score_function(Int_t &    number_of_parameters,
-                                 Double_t * gradiants,
-                                 Double_t & score,
-                                 Double_t * phase_space_coordinate_values,
-                                 Int_t      execution_stage_flag) {
-  // map_cpp_track_reconstructor_minuit is defined globally in the header file
-  TMinuit * minuit = map_cpp_track_reconstructor_minuit;
-
-  const PhaseSpaceVector start_plane_track(phase_space_coordinate_values[0],
-                                           phase_space_coordinate_values[1],
-                                           phase_space_coordinate_values[2],
-                                           phase_space_coordinate_values[3],
-                                           phase_space_coordinate_values[4],
-                                           phase_space_coordinate_values[5]) {
-
-  MapCppTrackReconstructor * reconstructor
-    = (MapCppTrackReconstructor *) minuit->GetObjectFit();
-
-  const double score = reconstructor->ScoreTrack(&start_plane_track);
-}
-
-MapCppTrackReconstructor::MapCppTrackReconstructor()
-    : optics_model_(NULL), events_(NULL), track_fitter_(NULL),
-      trajectories_(NULL), electromagnetic_field_(NULL) {
-  classname_ = "MapCppTrackReconstructor";
-    
-  // Setup *global* scope Minuit object
-  map_cpp_track_reconstructor_minuit = new TMinuit(kPhaseSpaceDimension);
-}
-
-MapCppTrackReconstructor::MapCppTrackReconstructor() {
-  delete map_cpp_track_reconstructor_minuit;
-}
-
 bool MapCppTrackReconstructor::birth(std::string argJsonConfigDocument) {
   // Attempt to parse the JSON document.
   try {
@@ -203,6 +169,7 @@ std::string MapCppTrackReconstructor::process(std::string document) {
 
   // TODO(plane1@hawk.iit.edu) Reconstruct tracks at the desired locations
   //  specified in the configuration.
+  // track_fitter_->Fit(optics_model_, &events, &trajectories);
 
   Json::FastWriter writer;
   std::string output = writer.write(spill);
@@ -212,4 +179,3 @@ std::string MapCppTrackReconstructor::process(std::string document) {
 bool MapCppTrackReconstructor::death() {
   return true;  // successful
 }
-

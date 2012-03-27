@@ -25,20 +25,6 @@
 
 namespace MAUS {
 
-
-/** @brief Calculates TransferMaps using any of several least squares fit
- *  functions.
- *  
- *  Here we find a polynomial of arbitrary dimension and order from a set of
- *  points by the method of least squares. The particular version of least
- *  squares used is specified in the constructor.
- *
- *  Note that the problem must be overspecified, so the number of points must be
- *  >= number of polynomial coefficients.
- *  A few interesting variations on this theme... have a look!\n
- * \n
- */
-
 class LinearApproximationOpticsModel : public OpticsModel {
  public:
   // *************************
@@ -57,8 +43,6 @@ class LinearApproximationTransferMap : public TransferMap {
     : z1_(z1), z2_(z2), mass_(mass) { }
   LinearApproximationTransferMap(const LinearApproximationTransferMap& map);
     : z1_(map.z1_), z2_(map.z2_), mass_(map.mass_) { }
-  CovarianceMatrix Transport(CovarianceMatrix const * const covariances);
-  PhaseSpaceVector Transport(PhaseSpaceVector const * const vector);
  private:
   double z1_;
   double z2_;
