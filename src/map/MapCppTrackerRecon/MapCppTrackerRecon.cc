@@ -68,7 +68,6 @@ std::string MapCppTrackerRecon::process(std::string document) {
     root["errors"] = errors;
     return writer.write(root);
   }
-
   try { // ================= Reconstruction =========================
     for ( unsigned int k = 0; k < spill.events().size(); k++ ) {
       SciFiEvent event = *(spill.events()[k]);
@@ -92,7 +91,7 @@ std::string MapCppTrackerRecon::process(std::string document) {
 
       print_event_info(event);
       save_to_json(event);
-    } // ==========================================================
+    }  // ==========================================================
   } catch(...) {
     Json::Value errors;
     std::stringstream ss;
@@ -101,7 +100,6 @@ std::string MapCppTrackerRecon::process(std::string document) {
     root["errors"] = errors;
     return writer.write(root);
   }
-
   return writer.write(root);
 }
 
@@ -112,8 +110,8 @@ void MapCppTrackerRecon::digitization(SciFiSpill &spill, Json::Value &root) {
     Json::Value daq = root.get("daq_data", 0);
     RealDataDigitization real;
     real.process(spill, daq);
-  } else if ( root.isMember("digits") ) {
-    Json::Value digits = root.get("digits", 0);
+  } else if ( root.isMember("tracker_digits") ) {
+    Json::Value digits = root.get("tracker_digits", 0);
     fill_digits_vector(digits, spill);
   } else {
     throw 0;
@@ -175,7 +173,7 @@ void MapCppTrackerRecon::save_to_json(SciFiEvent &evt) {
     digits_in_event["time"]   = evt.digits()[dig_i]->get_time();
     digits.append(digits_in_event);
   }
-  root["digits"].append(digits);
+  root["tracker_digits"].append(digits);
 
   Json::Value sp_tracker0;
   Json::Value sp_tracker1;

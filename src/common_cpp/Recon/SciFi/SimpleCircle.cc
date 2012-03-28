@@ -25,10 +25,15 @@ SimpleCircle::SimpleCircle() {}
 // Destructor
 SimpleCircle::~SimpleCircle() {}
 
-void SimpleCircle::set_parameters(double x0, double y0, double R, double chisq) {
+void SimpleCircle::set_parameters(double x0, double x0_err, double y0, double y0_err,
+                                  double R, double R_err, double chisq) {
   _x0 = x0;
+  _x0_err = x0_err;
   _y0 = y0;
+  _y0_err = y0_err;
   _R = R;
+  _R_err = R_err;
+
   _chisq = chisq;
 }
 // } // ~namespace MAUS

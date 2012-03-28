@@ -33,7 +33,7 @@ def run():
 
     # SciFi
     my_map.append(MAUS.MapCppTrackerMCDigitization())  # SciFi electronics model
-#    my_map.append(MAUS.MapCppTrackerRecon()) # SciFi Recon
+    my_map.append(MAUS.MapCppTrackerRecon()) # SciFi Recon
 
     # Then construct a MAUS output component - filename comes from datacards
     my_output = MAUS.OutputPyJSON()

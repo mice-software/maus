@@ -129,5 +129,7 @@ class MapCppTrackerRecon {
   int ClustException;
   ///  Vector with the MICE SciFi Modules.
   std::vector<const MiceModule*> modules;
+
+  int SciFiRunRecon;
 }; // Don't forget this trailing colon!!!!
 #endif
