@@ -16,3 +16,50 @@
 
 #include "src/common_cpp/FieldTools/SectorField.hh"
 
+namespace MAUS {
+
+SectorField::SectorField() : BTField() {}
+
+SectorField::SectorField(double bbMinR, double bbMinY, double bbMinPhi,
+            double bbMaxR, double bbMaxY, double bbMaxPhi) {
+    SetBoundingBoxMinPolar(bbMinR, bbMinY, bbMinPhi);
+    SetBoundingBoxMaxPolar(bbMaxR, bbMaxY, bbMaxPhi);
+}
+
+virtual void GetFieldValuePolar
+                         (const double* point_polar, double* field_polar) {}
+
+virtual void GetFieldValue
+                       (const double* point_cartes, double* field_cartes) {}
+
+virtual void ConvertToPolar(double* position) {
+    double x = ::sqrt(position[0]*position[0]+position[2]*position[2]);
+    double z = ::atan2(point[2], point[0]);
+    position[0] = x;
+    position[2] = z;
+}
+
+virtual void ConvertToCartesian(double* position) {
+    double x = position[0]*::cos(position[2]);  // r cos(phi)
+    double z = -position[0]*::sin(position[2]);  // r sin(phi)
+    position[0] = x;
+    position[2] = z;
+}
+
+virtual void ConvertToCartesian(const double* position, double* value) {
+    double x = value[0]*::cos(position[2]);  // r cos(phi)
+    double z = -value[0]*::sin(position[2]);  // r sin(phi)
+    position[0] = x;
+    position[2] = z;
+}
+
+
+void SetPolarBoundingBoxMin(double bbMinR, double bbMinY, double bbMinPhi) {
+}
+
+void SetPolarBoundingBoxMax(double bbMaxR, double bbMaxY, double bbMaxPhi) {
+}
+
+}
+
+

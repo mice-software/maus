@@ -29,16 +29,15 @@
 namespace MAUS {
 
 SectorMagneticFieldMap::SectorMagneticFieldMap()
-                       : _interpolator(NULL), _symmetry(none) {
+                       : SectorField(), _interpolator(NULL), _symmetry(none) {
 }
 
 SectorMagneticFieldMap::SectorMagneticFieldMap(std::string file_name,
        std::string file_format, std::vector<double> units, std::string symmetry)
-                        : _interpolator(NULL), _symmetry(none) {
+                        : SectorField(), _interpolator(NULL), _symmetry(none) {
     SetSymmetry(symmetry);
-    _interpolator = SectorMagneticFieldMapIO::ReadMap
-                                    (file_name, file_format, units, symmetry);
-
+    SetInterpolator(SectorMagneticFieldMapIO::ReadMap
+                                    (file_name, file_format, units, symmetry));
 }
 
 SectorMagneticFieldMap::~SectorMagneticFieldMap() {
@@ -51,7 +50,19 @@ Interpolator3dGridTo3d* SectorMagneticFieldMap::GetInterpolator() {
 
 void SectorMagneticFieldMap::SetInterpolator
                                         (Interpolator3dGridTo3d* interpolator) {
+    if (_interpolator != NULL) {
+        delete _interpolator;
+    }
     _interpolator = interpolator;
+    if (_interpolator != NULL) {
+        ThreeDGrid* grid = _interpolator->GetGrid();
+        SectorField::SetPolarBoundingBoxMin(grid->MinX(),
+                                            grid->MinY(),
+                                            grid->MinZ());
+        SectorField::SetPolarBoundingBoxMax(grid->MaxX(),
+                                            grid->MaxY(),
+                                            grid->MaxZ());
+    }
 }
 
 std::string SectorMagneticFieldMap::GetSymmetry() {
@@ -101,14 +112,8 @@ void SectorMagneticFieldMap::GetFieldValuePolar
 void SectorMagneticFieldMap::GetFieldValue(const double* point, double* field) {
     double mirror = 1.;
     std::vector<double> _point(&point[0], &point[3]);
-    _point[0] = sqrt(point[0]*point[0]+point[2]*point[2]);
+    _point[0] = ::sqrt(point[0]*point[0]+point[2]*point[2]);
     _point[2] = atan2(point[2], point[0]);
-    if (_symmetry == dipole) {
-        if (_point[1] < 0.) {
-            mirror = -1;
-            _point[1] *= -1.;
-        }
-    }
     _interpolator->F(&_point[0], field);
 }
 
@@ -183,7 +188,7 @@ Interpolator3dGridTo3d* SectorMagneticFieldMapIO::ReadToscaMap
     for (size_t i = 0; i < field_points.size(); ++i) {
         double x = field_points[i][0];
         double z = field_points[i][2];
-        field_points[i][0] = sqrt(x*x+z*z);
+        field_points[i][0] = ::sqrt(x*x+z*z);
         field_points[i][2] = atan2(z, x);
     }
 

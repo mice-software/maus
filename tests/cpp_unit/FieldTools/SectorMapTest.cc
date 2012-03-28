@@ -117,7 +117,7 @@ TEST(SectorMapTest, TestGetFieldValuePolar) {
         double field[6] = {0., 0., 0., 0., 0., 0.};
         map.GetFieldValuePolar(point, field);
         EXPECT_NEAR(field[0], 0., 1e-9) << " at radius " << r;
-        EXPECT_NEAR(field[1], b0*::pow(double(r/r0), double(k0)), 1e-3)
+        EXPECT_NEAR(field[1], b0*::pow(double(r/r0), double(k0)), 0.1)
                                                           << " at radius " << r;
         EXPECT_NEAR(field[2], 0., 1e-9) << " at radius " << r;
     }

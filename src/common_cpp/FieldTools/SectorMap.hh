@@ -60,7 +60,6 @@ class SectorMagneticFieldMap : public SectorField {
     symmetry _symmetry;
 
     friend class SectorMagneticFieldMapIO;
-
 };
 
 class SectorMagneticFieldMapIO {

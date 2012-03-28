@@ -25,18 +25,27 @@ class SectorField : public BTField {
   public:
     SectorField() {}
   	SectorField(double bbMinR, double bbMinY, double bbMinPhi,
-                double bbMaxR, double bbMaxY, double bbMaxPhi) {;}
+                double bbMaxR, double bbMaxY, double bbMaxPhi);
     virtual ~SectorField() {}
 
     virtual void GetFieldValuePolar
-                             (const double* point_polar, double* field_polar) {}
+                             (const double* point_polar, double* field_polar) = 0;
 
     virtual void GetFieldValue
-                           (const double* point_cartes, double* field_cartes) {}
+                           (const double* point_cartes, double* field_cartes) = 0;
+
+    virtual void ConvertToPolar(double* position)
+
+    virtual void ConvertToCartesian(double* position);
 
   protected:
-    std::vector<double> bbMinPolar;
-    std::vector<double> bbMaxPolar;
+    void SetPolarBoundingBoxMin(double bbMinR, double bbMinY, double bbMinPhi) {
+    }
+
+    void SetPolarBoundingBoxMax(double bbMaxR, double bbMaxY, double bbMaxPhi) {
+    }
+
+  private:
 };
 }
 
