@@ -104,6 +104,8 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
   }
 
   // ==========================================================
+  assert(root["digits"].isArray());
+  assert(!root["digits"][(Json::Value::ArrayIndex)0].isNull());
   return writer.write(root);
 }
 

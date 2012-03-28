@@ -45,6 +45,8 @@ bool MapCppTrackerRecon::birth(std::string argJsonConfigDocument) {
   assert(_configJSON.isMember("SciFiClustExcept"));
   ClustException = _configJSON["SciFiClustExcept"].asDouble();
 
+  assert(_configJSON.isMember("SciFiRunRecon"));
+  SciFiRunRecon = _configJSON["SciFiRunRecon"].asInt();
   return true;
 }
 
@@ -68,7 +70,7 @@ std::string MapCppTrackerRecon::process(std::string document) {
     root["errors"] = errors;
     return writer.write(root);
   }
-
+  if ( SciFiRunRecon == 1 ) {
   try { // ================= Reconstruction =========================
     for ( unsigned int k = 0; k < spill.events().size(); k++ ) {
       SciFiEvent event = *(spill.events()[k]);
@@ -81,13 +83,13 @@ std::string MapCppTrackerRecon::process(std::string document) {
         spacepoint_recon(event);
       }
       // Pattern Recognition.
-      if ( event.spacepoints().size() ) {
-      pattern_recognition(event);
-      }
+      // if ( event.spacepoints().size() ) {
+      // pattern_recognition(event);
+      // }
 
       print_event_info(event);
       save_to_json(event);
-    } // ==========================================================
+    }  // ==========================================================
   } catch(...) {
     Json::Value errors;
     std::stringstream ss;
@@ -96,7 +98,7 @@ std::string MapCppTrackerRecon::process(std::string document) {
     root["errors"] = errors;
     return writer.write(root);
   }
-
+  }
   return writer.write(root);
 }
 
