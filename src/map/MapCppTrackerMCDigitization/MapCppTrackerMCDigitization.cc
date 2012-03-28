@@ -121,10 +121,10 @@ void MapCppTrackerMCDigitization::
     Json::Value channel_id = hit["channel_id"];
 
     // assert this is a tracker hit
-    assert(channel_id.isMember("type"));
-    if (channel_id["type"].asString() != "Tracker") {
-      continue;
-    }
+    // assert(channel_id.isMember("type"));
+    // if (channel_id["type"].asString() != "Tracker") {
+     //  continue;
+    // }
 
     int tracker, plane, station, fibre;
     double edep, time;
