@@ -13,7 +13,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-
 """
 BeamMaker generates beams for input into MAUS
 """
@@ -26,7 +25,7 @@ import ErrorHandler
 import numpy
 import bisect
 import beam
-from xboa.Hit import Hit
+from xboa.Hit import Hit #pylint: disable=F0401
 
 class MapPyBeamMaker: #pylint: disable=R0902
     """

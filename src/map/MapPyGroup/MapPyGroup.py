@@ -1,3 +1,6 @@
+"""
+A group of workers which iterates through each worker in turn.
+"""
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 #
 #  MAUS is free software: you can redistribute it and/or modify
@@ -13,7 +16,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-
 ## @class MapPyGroup.MapPyGroup
 #  MapPyGroup is for chaining mappers together
 #
@@ -28,76 +30,129 @@
 #
 #  \code
 #  group = MapPyGroup()
-#  group.Append(MapCppSimulation())
-#  group.Append(MapPyRemoveTracks())
-#  group.Append(MapPyGlobalRecon())
+#  group.append(MapCppSimulation())
+#  group.append(MapPyRemoveTracks())
+#  group.append(MapPyGlobalRecon())
 #  \endcode
-#
 
-from types import ListType,InstanceType,MethodType
+from types import ListType
 import inspect
 
+import ErrorHandler
+
 class MapPyGroup:
-    """Iterate through the workers
-
-    this processor handles all the workers
     """
-    def __init__(self, argWorkers=[]):
-        assert isinstance(argWorkers, ListType)
-
+    A group of workers which iterates through each worker in turn.
+    """
+    def __init__(self, initial_workers = []): # pylint:disable = W0102
+        """
+        Constructor.
+        @param self Object reference
+        @param initial_workers List of 0 or more default workers.
+        @param id. ID of this class.
+        @throws AssertionError if initial_workers is not a list or if
+        any worker therein does not satisfy the criteria of the append
+        function. 
+        """
         self._workers = []
-        for worker in argWorkers:
-            self.Append(worker)
+        assert isinstance(initial_workers, ListType)
+        for worker in initial_workers:
+            self.append(worker)
 
     def get_worker_names(self):
+        """
+        Get the names of this worker and all its sub-workers.
+        @param self Object reference.
+        @return nested list of worker and sub-worker names e.g.
+        @verbatim 
+        ["MapCppTOFDigits", "MapCppTOFSlabHits", "MapCppTOFSpacePoint"]
+
+        or
+
+        ["MapCppTOFDigits", ["MapCppTOFSlabHits", "MapCppTOFSpacePoint"]]
+        @endverbatim
+        """
         names = []
         for worker in self._workers:
-            names.append(worker.__class__.__name__)
+            if isinstance(worker, MapPyGroup):
+                name = worker.get_worker_names()
+            else:
+                name = worker.__class__.__name__
+            names.append(name)
         return names
 
-    def append(self, argWorker):
-        assert hasattr(argWorker, 'birth')
-        x = len(inspect.getargspec(argWorker.process).args) == 2 # for python
-        y = inspect.getargspec(argWorker.process).varargs != None # for swig
-        assert x ^ y # exclusive or
+    def append(self, worker):
+        """
+        Append a worker to the group.
+        @param self Object reference.
+        @param worker Worker.
+        @throws AssertionError if the worker has no birth/2 (for
+        Python) or non 0-arity birth function (for SWIG);  if the
+        worker has no process/2 (for Python) or non 0-arity process
+        function (for SWIG); or no death/1 function.
+        """
+        assert hasattr(worker, 'birth')
+        py_ok = len(inspect.getargspec(worker.birth).args) == 2 # for python
+        swig_ok = inspect.getargspec(worker.birth).varargs != None # for swig
+        assert py_ok ^ swig_ok # exclusive or
 
-        assert hasattr(argWorker, 'process')
-        x = len(inspect.getargspec(argWorker.process).args) == 2 # for python
-        y = inspect.getargspec(argWorker.process).varargs != None # for swig
-        assert x ^ y # exclusive or
+        assert hasattr(worker, 'process')
+        py_ok = len(inspect.getargspec(worker.process).args) == 2 # for python
+        swig_ok = inspect.getargspec(worker.process).varargs != None # for swig
+        assert py_ok ^ swig_ok # exclusive or
 
-        assert hasattr(argWorker, 'death')
-        assert len(inspect.getargspec(argWorker.death).args) == 1 # self only
+        assert hasattr(worker, 'death')
+        assert len(inspect.getargspec(worker.death).args) == 1 # self only
 
-        self._workers.append(argWorker)
+        self._workers.append(worker)
 
-    def birth(self, argJsonConfigDocument):
+    def birth(self, json_config_doc):
+        """
+        Birth the mapper by invoking birth on all workers.
+        @param self Object reference.
+        @param json_config_doc JSON configuration document.
+        @return True if all workers return True else return False.
+        """
         try:
             for worker in self._workers:
-                assert worker.birth(argJsonConfigDocument)
-        except:
+                assert worker.birth(json_config_doc)
+        except: # pylint:disable = W0702
+            ErrorHandler.HandleException({}, self)
             return False
         return True
 
-    def process(self, x):
+    def process(self, spill):
+        """
+        Process a spill by passing it through each worker in turn,
+        passing the result spill from one into the process function
+        of the next.
+        @param self Object reference.
+        @param spill JSON spill document.
+        @return result spill
+        """
+        nu_spill = spill
         for worker in self._workers:
-            x = worker.process(x)
-        return x
+            nu_spill = worker.process(nu_spill)
+        return nu_spill
 
     def death(self):
+        """
+        Death the mapper by invoking death on all workers.
+        @param self Object reference.
+        @return True if all workers return True else return False.
+        """
         try:
             for worker in self._workers:
                 assert worker.death()
-        except:
+        except: # pylint:disable = W0702
+            ErrorHandler.HandleException({}, self)
             return False
-
         return True
 
     def __del__(self):
+        """
+        Delete the mapper. Invoke death on all workers.
+        @param self Object reference.
+        """
         for worker in self._workers:
             worker.death()
-
-
-
-if __name__ == '__main__':
-    unittest.main()

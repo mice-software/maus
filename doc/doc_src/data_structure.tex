@@ -1,0 +1,14 @@
+\section{Data Structure}
+The event in MAUS is the MICE spill. The major part of the MAUS data structure therefore is a tree corresponding to one spill. The spill is separated into two main sections: the MCEventArray contains an array of data each member of which represents the Monte Carlo of a single primary particle crossing the system; the ReconEventArray contains an array of data each member of which corresponds to a particle event (i.e. set of DAQ triggers).
+
+\subsection{Spill Data}
+
+\subsection{MCEvent}
+The MCEvent is subdivided into sensitive detector hits and some pure Monte Carlo outputs. The primary that led to data being created is held in the Primary branch. Here the random seed, primary position momentum and so forth is stored. Sensitive detector hits have Hit data (energy deposited, position, momentum, etc) and a detector specific ChannelId that represents the channel of the detector that was hit - e.g. for TOF this indexes the slab, plane and station. Virtual hits are also stored - these are not sensitive detector hits, rather output position, momenta etc of particles that cross a particular plane in space, time or proper time is recorded. Note virtual hits do not inherit from the Hit class.
+
+\subsection{ReconEvent}
+
+\subsection{Extending the Data Structure}
+
+
+

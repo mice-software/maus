@@ -43,7 +43,7 @@ bool MapCppTrackerRecon::birth(std::string argJsonConfigDocument) {
 
   // Get the value above which an Exception is thrown
   assert(_configJSON.isMember("SciFiClustExcept"));
-  ClustException = _configJSON["SciFiClustExcept"].asDouble();
+  ClustException = _configJSON["SciFiClustExcept"].asInt();
 
   assert(_configJSON.isMember("SciFiRunRecon"));
   SciFiRunRecon = _configJSON["SciFiRunRecon"].asInt();
@@ -84,7 +84,12 @@ std::string MapCppTrackerRecon::process(std::string document) {
       }
       // Pattern Recognition.
       // if ( event.spacepoints().size() ) {
-      // pattern_recognition(event);
+        // pattern_recognition(event);
+      // }
+
+      // Kalman Track Fit.
+      // if ( event.helicalprtracks().size() ) {
+      //  track_fit(event);
       // }
 
       print_event_info(event);
@@ -125,7 +130,8 @@ void MapCppTrackerRecon::fill_digits_vector(Json::Value &digits_event, SciFiSpil
     for ( unsigned int j = 0; j < digits.size(); j++ ) {
       Json::Value digit;
       digit = digits[j];
-      int tracker, station, plane, channel, npe, time;
+      int tracker, station, plane, channel;
+      double npe, time;
       tracker = digit["tracker"].asInt();
       station = digit["station"].asInt();
       plane   = digit["plane"].asInt();
@@ -152,6 +158,11 @@ void MapCppTrackerRecon::spacepoint_recon(SciFiEvent &evt) {
 void MapCppTrackerRecon::pattern_recognition(SciFiEvent &evt) {
   PatternRecognition pr1;
   pr1.process(evt);
+}
+
+void MapCppTrackerRecon::track_fit(SciFiEvent &evt) {
+  // KalmanTrackFit fit;
+  // fit.process(evt);
 }
 
 void MapCppTrackerRecon::save_to_json(SciFiEvent &evt) {
@@ -209,15 +220,17 @@ void MapCppTrackerRecon::save_to_json(SciFiEvent &evt) {
   Json::Value tracks_tracker1;
   for ( unsigned int track_i = 0; track_i < evt.straightprtracks().size(); track_i++ ) {
     Json::Value a_track;
-    int tracker = 0;
+    a_track["num_points"] = evt.straightprtracks()[track_i].get_num_points();
     a_track["x0"] = evt.straightprtracks()[track_i].get_x0();
     a_track["y0"] = evt.straightprtracks()[track_i].get_y0();
     a_track["mx"] = evt.straightprtracks()[track_i].get_mx();
     a_track["my"] = evt.straightprtracks()[track_i].get_my();
-    a_track["tracker"] = tracker;
-    if ( tracker == 0 ) {
+    a_track["x_chisq"] = evt.straightprtracks()[track_i].get_x_chisq();
+    a_track["y_chisq"] = evt.straightprtracks()[track_i].get_y_chisq();
+    a_track["tracker"] = evt.straightprtracks()[track_i].get_tracker();
+    if ( evt.straightprtracks()[track_i].get_tracker() == 0 ) {
       tracks_tracker0.append(a_track);
-    } else if ( tracker == 1 ) {
+    } else if ( evt.straightprtracks()[track_i].get_tracker() == 1 ) {
       tracks_tracker1.append(a_track);
     }
   }

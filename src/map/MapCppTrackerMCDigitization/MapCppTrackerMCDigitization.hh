@@ -118,8 +118,6 @@ class MapCppTrackerMCDigitization {
 
   double SciFiNPECut;
 
-  //Json::Value js_event;
-
   /// an array contaning all MiceModules
   std::vector<const MiceModule*> modules;
 };  // Don't forget this trailing colon!!!!

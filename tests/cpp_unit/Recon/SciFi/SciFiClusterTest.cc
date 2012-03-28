@@ -108,7 +108,7 @@ TEST_F(SciFiClusterTest, test_add_digit) {
   // Start a cluster from "digit"
   SciFiCluster *cluster = new SciFiCluster(digit);
   // Construct a neighbour.
-  int npe2 = 2.0;
+  double npe2 = 2.0;
   int channel2 = 107;
   SciFiDigit *neighbour = new SciFiDigit(tracker, station, plane, channel2, npe2, time);
   EXPECT_FALSE(neighbour->is_used());

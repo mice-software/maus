@@ -25,6 +25,7 @@ SciFiEvent::SciFiEvent() {
   _scifispacepoints.resize(0);
   _scifiseeds.resize(0);
   _scifistraightprtracks.resize(0);
+  _scifihelicalprtracks.resize(0); // Added by Summer
 }
 
 SciFiEvent::~SciFiEvent() {

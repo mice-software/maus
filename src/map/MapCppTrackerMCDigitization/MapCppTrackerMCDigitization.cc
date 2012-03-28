@@ -84,8 +84,8 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
   for ( unsigned int i = 0; i < mc.size(); i++ ) {  // i-th particle
     Json::Value json_event = mc[i];
 
-    if ( !json_event.isMember("hits") )
-      continue; // if there are no MC hits, skip
+    if ( !json_event.isMember("sci_fi_hits") )
+      continue;
 
     json_to_cpp(json_event, spill);
   } // ends loop particles
@@ -93,37 +93,29 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
   for ( unsigned int k = 0; k < spill.events().size(); k++ ) {
     SciFiEvent event = *(spill.events()[k]);
 
-    // std::cout << "Hits in event: " << event.hits().size() << std::endl;
+     std::cout << "Hits in event: " << event.hits().size() << std::endl;
     if ( event.hits().size() ) {
       // for each fiber-hit, make a digit
       construct_digits(event);
     }
-    // std::cout << "Digits in Event: " << event.digits().size() << " " << std::endl;
+     std::cout << "Digits in Event: " << event.digits().size() << " " << std::endl;
 
     save_to_json(event);
   }
 
   // ==========================================================
-  assert(root["digits"].isArray());
-  assert(!root["digits"][(Json::Value::ArrayIndex)0].isNull());
   return writer.write(root);
 }
 
 void MapCppTrackerMCDigitization::
      json_to_cpp(Json::Value js_event, SciFiSpill &spill) {
   SciFiEvent* event = new SciFiEvent();
-  Json::Value _hits = js_event["hits"];
+  Json::Value _hits = js_event["sci_fi_hits"];
   // std::cout << "Number of hits fed in: " << _hits.size() << std::endl;
   for ( unsigned int j = 0; j < _hits.size(); j++ ) {
     Json::Value hit = _hits[j];
     assert(hit.isMember("channel_id"));
     Json::Value channel_id = hit["channel_id"];
-
-    // assert this is a tracker hit
-    assert(channel_id.isMember("type"));
-    if (channel_id["type"].asString() != "Tracker") {
-      continue;
-    }
 
     int tracker, plane, station, fibre;
     double edep, time;
@@ -234,15 +226,15 @@ int MapCppTrackerMCDigitization::compute_chan_no(SciFiHit *ahit) {
 
   assert(this_plane != NULL);
 
-  int numberFibres = 7*2*(this_plane->propertyDouble("CentralFibre")+0.5);
+  int numberFibres = static_cast<int> (7*2*(this_plane->propertyDouble("CentralFibre")+0.5));
   int fiberNumber = ahit->get_fibre();
   int chanNo;
 
   if ( tracker == 0 ) {
     // start counting from the other end
-    chanNo = floor((numberFibres-fiberNumber)/7.0);
+    chanNo = static_cast<int> (floor((numberFibres-fiberNumber)/7.0));
   } else {
-    chanNo = floor(fiberNumber/7.0);
+    chanNo = static_cast<int> (floor(fiberNumber/7.0));
   }
 
   return chanNo;

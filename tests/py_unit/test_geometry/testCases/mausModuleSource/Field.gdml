@@ -1,0 +1,199 @@
+<?xml version="1.0" ?>
+<MICE_Information xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:something">
+    <Configuration_Information>
+    </Configuration_Information>
+    <G4Field_Information>
+        <Dipole>
+            <FieldName name="D1"/>
+            <Position x="0" y="0" z="0"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Volume name="None"/>
+            <FieldType name="MagneticFieldMap"/>
+            <FieldMapMode name="Read"/>
+            <FileType name="g4bl3dGrid"/>
+            <FileName name="${MAUS_ROOT_DIR}/src/legacy/FILES/Models/Modules/BeamLine/B1_6inch.table"/>
+            <Symmetry name="Dipole"/>
+        </Dipole>
+        <Dipole>
+            <FieldName name="D2"/>
+            <Position x="0" y="0" z="0"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Volume name="None"/>
+            <FieldType name="MagneticFieldMap"/>
+            <FieldMapMode name="Read"/>
+            <FileType name="g4bl3dGrid"/>
+            <FileName name="${MAUS_ROOT_DIR}/src/legacy/FILES/Models/Modules/BeamLine/B1_6inch.table"/>
+            <Symmetry name="Dipole"/>
+        </Dipole>
+        <Quadrupole>
+            <FieldName name="Q1"/>
+            <Position x="0" y="0" z="0"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Volume name="None"/>
+            <FieldType name="Multipole"/>
+            <Dimensions height="0.5" width="0.5" length="2.0" units="m"/>
+            <FieldStrength Value="1" units="T/M"/>
+            <Pole Value="2"/>
+            <MaxEndPole Value="4"/>
+            <EndFieldType name="Tanh"/>
+            <EndLength Value="0.12528" units="m"/>
+            <CentreLength Value="0.330899" units="m"/>
+        </Quadrupole>
+        <Quadrupole>
+            <FieldName name="Q2"/>
+            <Position x="0" y="0" z="0"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Volume name="None"/>
+            <FieldType name="Multipole"/>
+            <Dimensions height="0.5" width="0.5" length="2.0" units="m"/>
+            <FieldStrength Value="1" units="T/M"/>
+            <Pole Value="2"/>
+            <MaxEndPole Value="4"/>
+            <EndFieldType name="Tanh"/>
+            <EndLength Value="0.12528" units="m"/>
+            <CentreLength Value="0.330899" units="m"/>
+        </Quadrupole>
+        <Quadrupole>
+            <FieldName name="Q3"/>
+            <Position x="0" y="0" z="0"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Volume name="None"/>
+            <FieldType name="Multipole"/>
+            <Dimensions height="0.5" width="0.5" length="2.0" units="m"/>
+            <FieldStrength Value="1" units="T/M"/>
+            <Pole Value="2"/>
+            <MaxEndPole Value="4"/>
+            <EndFieldType name="Tanh"/>
+            <EndLength Value="0.12528" units="m"/>
+            <CentreLength Value="0.330899" units="m"/>
+        </Quadrupole>
+        <Quadrupole>
+            <FieldName name="Q4"/>
+            <Position x="0" y="0" z="0"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Volume name="None"/>
+            <FieldType name="Multipole"/>
+            <Dimensions height="0.5" width="0.5" length="2.0" units="m"/>
+            <FieldStrength Value="1" units="T/M"/>
+            <Pole Value="2"/>
+            <MaxEndPole Value="4"/>
+            <EndFieldType name="Tanh"/>
+            <EndLength Value="0.12528" units="m"/>
+            <CentreLength Value="0.330899" units="m"/>
+        </Quadrupole>
+        <Quadrupole>
+            <FieldName name="Q5"/>
+            <Position x="0" y="0" z="0"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Volume name="None"/>
+            <FieldType name="Multipole"/>
+            <Dimensions height="0.5" width="0.5" length="2.0" units="m"/>
+            <FieldStrength Value="1" units="T/M"/>
+            <Pole Value="2"/>
+            <MaxEndPole Value="4"/>
+            <EndFieldType name="Tanh"/>
+            <EndLength Value="0.12528" units="m"/>
+            <CentreLength Value="0.330899" units="m"/>
+        </Quadrupole>
+        <Quadrupole>
+            <FieldName name="Q6"/>
+            <Position x="0" y="0" z="0"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Volume name="None"/>
+            <FieldType name="Multipole"/>
+            <Dimensions height="0.5" width="0.5" length="2.0" units="m"/>
+            <FieldStrength Value="1" units="T/M"/>
+            <Pole Value="2"/>
+            <MaxEndPole Value="4"/>
+            <EndFieldType name="Tanh"/>
+            <EndLength Value="0.12528" units="m"/>
+            <CentreLength Value="0.330899" units="m"/>
+        </Quadrupole>
+        <Quadrupole>
+            <FieldName name="Q7"/>
+            <Position x="0" y="0" z="0"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Volume name="None"/>
+            <FieldType name="Multipole"/>
+            <Dimensions height="0.5" width="0.5" length="2.0" units="m"/>
+            <FieldStrength Value="1" units="T/M"/>
+            <Pole Value="2"/>
+            <MaxEndPole Value="4"/>
+            <EndFieldType name="Tanh"/>
+            <EndLength Value="0.12528" units="m"/>
+            <CentreLength Value="0.330899" units="m"/>
+        </Quadrupole>
+        <Quadrupole>
+            <FieldName name="Q8"/>
+            <Position x="0" y="0" z="0"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Volume name="None"/>
+            <FieldType name="Multipole"/>
+            <Dimensions height="0.5" width="0.5" length="2.0" units="m"/>
+            <FieldStrength Value="1" units="T/M"/>
+            <Pole Value="2"/>
+            <MaxEndPole Value="4"/>
+            <EndFieldType name="Tanh"/>
+            <EndLength Value="0.12528" units="m"/>
+            <CentreLength Value="0.330899" units="m"/>
+        </Quadrupole>
+        <Quadrupole>
+            <FieldName name="Q9"/>
+            <Position x="0" y="0" z="0"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Volume name="None"/>
+            <FieldType name="Multipole"/>
+            <Dimensions height="0.5" width="0.5" length="2.0" units="m"/>
+            <FieldStrength Value="1" units="T/M"/>
+            <Pole Value="2"/>
+            <MaxEndPole Value="4"/>
+            <EndFieldType name="Tanh"/>
+            <EndLength Value="0.12528" units="m"/>
+            <CentreLength Value="0.330899" units="m"/>
+        </Quadrupole>
+        <Solenoid>
+            <FieldName name="Solenoid"/>
+            <Position x="0" y="0" z="0"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Volume name="None"/>
+            <FieldType name="Solenoid"/>
+            <FileName name="${MAUS_ROOT_DIR}/tmp/coupling.fld"/>
+            <CurrentDensity Value="1"/>
+            <Length Value="250"/>
+            <Thickness Value="116"/>
+            <InnerRadius Value="725"/>
+            <ScaleFactor name="-96.21"/>
+        </Solenoid>
+        <G4Magnet_info File_Location="/home/QCFieldMap.txt" Name="Quad 1 to 3" Type="QC"/>    
+    </G4Field_Information>
+    <Detector_Information>
+        <TOF/>
+        <KL/>
+        <Cherenkov/>
+        <Tracker>
+            <Tracker ID_Number="1">
+                <Tracker Number="1"/>
+                <Position x="1" y="1" z="1"/>
+                <Rotation alpha="1" beta="1" gamma="1"/>
+                <Length/>
+                <Thickness thickness="1"/>
+                <Material name="1"/>
+                <Invisible True="1"/>
+            </Tracker>
+            <Station ID_Number="2">
+                <Tracker Number="2"/>
+                <Position x="2" y="2" z="2"/>
+                <Rotation alpha="2" beta="2" gamma="2"/>
+                <Length/>
+                <Thickness thickness="2"/>
+                <Station Number="2"/>
+                <Material name="2"/>
+                <OpticsMaterialLength/>
+            </Station>
+        </Tracker>
+    </Detector_Information>
+    <Other_Information>
+        <GDML_Files location="/home"/>
+        <G4StepMax Value="0.0"/>
+    </Other_Information>
+</MICE_Information>

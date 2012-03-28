@@ -49,6 +49,7 @@
 #include "src/common_cpp/Recon/SciFi/SciFiCluster.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
 #include "src/common_cpp/Recon/SciFi/PatternRecognition.hh"
+// #include "src/common_cpp/Recon/SciFi/KalmanTrackFit.hh"
 
 class MapCppTrackerRecon {
  public:
@@ -103,6 +104,8 @@ class MapCppTrackerRecon {
 
   void pattern_recognition(SciFiEvent &evt);
 
+  void track_fit(SciFiEvent &evt);
+
   void save_to_json(SciFiEvent &evt);
 
   void print_event_info(SciFiEvent &event);
@@ -123,7 +126,7 @@ class MapCppTrackerRecon {
   ///  Cut value for npe.
   double minPE;
   /// Value above which reconstruction is aborted.
-  double ClustException;
+  int ClustException;
   ///  Vector with the MICE SciFi Modules.
   std::vector<const MiceModule*> modules;
 

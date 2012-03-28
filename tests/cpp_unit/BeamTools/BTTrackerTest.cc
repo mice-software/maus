@@ -120,7 +120,7 @@ TEST_F(BTTrackerTest, SolenoidTest_z) {
         BTTracker::integrate(z, &x[0], _sol, BTTracker::z, 0.1, 1.);
       }
     }
-    catch(Squeal squee) {EXPECT_EQ(p, 3);}  // p of particle 3 is 0 => squeal
+    catch(Squeal squee) {EXPECT_EQ(p, (size_t) 3);}  // p of particle 3 is 0 => squeal
     for(size_t i=0; i<8; ++i) {
       ASSERT_NEAR(results_sol_z[p*8+i], x[i], 1e-3) << "particle " << p 
           << " var " << _var[i] << "\nParticle coords: " << Print8Vector(&x[0]);
@@ -143,7 +143,7 @@ TEST_F(BTTrackerTest, SolenoidTest_u) {
         BTTracker::integrate(u, &x[0], _sol, BTTracker::u, 0.1, 1.);
       }
     }
-    catch(Squeal squee) {EXPECT_EQ(p, 3);}  // p of particle 3 is 0 => squeal
+    catch(Squeal squee) {EXPECT_EQ(p, (size_t) 3);}  // p of particle 3 is 0 => squeal
     for(size_t i=0; i<8; ++i) {
       ASSERT_NEAR(results_sol_u[p*8+i], x[i], 1e-3) << "particle " << p 
           << " var " << _var[i] << "\nParticle coords: " << Print8Vector(&x[0]);
@@ -155,7 +155,7 @@ TEST_F(BTTrackerTest, SolenoidTest_u) {
                                       origin, CLHEP::HepRotationY(180*degree));
       }
     }
-    catch(Squeal squee) {EXPECT_EQ(p, 3);}  // p of particle 3 is 0 => squeal
+    catch(Squeal squee) {EXPECT_EQ(p, (size_t) 3);}  // p of particle 3 is 0 => squeal
     for(size_t i=0; i<8; ++i) {
       ASSERT_NEAR(_particles[p][i], x[i], 1e-3) << "particle " << p 
           << " var " << _var[i] << "\nParticle coords: " << Print8Vector(&x[0]);
@@ -206,7 +206,7 @@ TEST_F(BTTrackerTest, PillBoxTest_z) {
         BTTracker::integrate(z, &x[0], _rot_pb, BTTracker::z, 0.1, 1.);
       }
     }
-    catch(Squeal squee) {EXPECT_EQ(p, 3);}  // p of particle 3 is 0 => squeal
+    catch(Squeal squee) {EXPECT_EQ(p, size_t(3));}  // p of particle 3 is 0 => squeal
     for(size_t i=0; i<8; ++i) {
       ASSERT_NEAR(results[p*8+i], x[i], 1e-3) << "particle " << p 
           << " var " << _var[i] << "\nParticle coords: " << Print8Vector(&x[0]);
@@ -229,7 +229,7 @@ TEST_F(BTTrackerTest, PillBoxTest_u) {
         BTTracker::integrate(u, &x[0], _rot_pb, BTTracker::u, 0.1, 1.);
       }
     }
-    catch(Squeal squee) {EXPECT_EQ(p, 3);}  // p of particle 3 is 0 => squeal
+    catch(Squeal squee) {EXPECT_EQ(p, size_t(3));}  // p of particle 3 is 0 => squeal
     for(size_t i=0; i<8; ++i) {
       ASSERT_NEAR(results[p*8+i], x[i], 1e-3) << "(no rot) particle " << p 
           << " var " << _var[i] << "\nParticle coords: " << Print8Vector(&x[0]);
@@ -241,7 +241,7 @@ TEST_F(BTTrackerTest, PillBoxTest_u) {
                                       origin, CLHEP::HepRotationY(180*degree));
       }
     }
-    catch(Squeal squee) {EXPECT_EQ(p, 3);}  // p of particle 3 is 0 => squeal
+    catch(Squeal squee) {EXPECT_EQ(p, size_t(3));}  // p of particle 3 is 0 => squeal
     for(size_t i=0; i<8; ++i) {
       ASSERT_NEAR(_particles[p][i], x[i], 1e-1) << "(rot) particle " << p 
           << " var " << _var[i] << "\nParticle coords: " << Print8Vector(&x[0]);

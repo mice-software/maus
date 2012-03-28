@@ -86,9 +86,9 @@ class SciFiHit {
 
  private:
 
-  int _spill, _eventNo, _plane;
+  int _spill, _eventNo;
 
-  int _tracker, _station, _fibre;
+  int _tracker, _station, _plane, _fibre;
 
   double _edep, _time;
 

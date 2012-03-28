@@ -19,12 +19,12 @@
 
 // namespace MAUS {
 
-SciFiSpacePoint::SciFiSpacePoint() {}
+SciFiSpacePoint::SciFiSpacePoint() { _used = false; }
 
 SciFiSpacePoint::~SciFiSpacePoint() {}
 
 SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2, SciFiCluster *clust3) {
-  // _used = false;
+  _used = false;
   _type = "triplet";
   clust1->set_used();
   clust2->set_used();
@@ -45,7 +45,7 @@ SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2, Sci
 }
 
 SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2) {
-  // _used = false;
+  _used = false;
   _type = "duplet";
   clust1->set_used();
   clust2->set_used();
@@ -55,7 +55,7 @@ SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2) {
   _tracker = clust1->get_tracker();
   _station = clust1->get_station();
   _npe = clust1->get_npe()+clust2->get_npe();
-  _chi2 = -10;
+  _chi2 = -10.0;
 
   // _position(0, 0, 0);
   // _time = 0;
