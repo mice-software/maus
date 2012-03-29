@@ -193,8 +193,8 @@ class PatternRecognition {
      *  @param circle - The output circle fit
      *
      */
-    bool initial_circle(const CLHEP::Hep3Vector p1, const CLHEP::Hep3Vector p2, const CLHEP::Hep3Vector p3,
-                        SimpleCircle &circle);
+    bool initial_circle(const CLHEP::Hep3Vector p1, const CLHEP::Hep3Vector p2,
+                        const CLHEP::Hep3Vector p3, SimpleCircle &circle);
 
     /** @brief Find points from intermediate stations which fit to the "trial track"
      *
@@ -328,7 +328,6 @@ class PatternRecognition {
     static const double _AB_cut = .1; // Need to calculate appropriate cut here
     static const double _sd_phi_1to4 = 1.; // Still needs to be calculated!!!!
     static const double _sd_phi_5 = 1.; // Still needs to be calculated!!!!
-
 };
 // } // ~namespace MAUS
 

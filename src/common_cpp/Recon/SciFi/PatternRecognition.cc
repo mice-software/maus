@@ -707,7 +707,7 @@ void PatternRecognition::calculate_dipangle(const std::map<int, SciFiSpacePoint*
   for ( std::map<int, SciFiSpacePoint*>::const_iterator ii = spnts.begin();
        ii != spnts.end(); ++ii ) {
 
-    std::map<int,SciFiSpacePoint*>::const_iterator jj = ii;
+    std::map<int, SciFiSpacePoint*>::const_iterator jj = ii;
     jj = jj++;
 
     double z_i = (*ii).second->get_position().z();
@@ -739,7 +739,8 @@ void PatternRecognition::calculate_dipangle(const std::map<int, SciFiSpacePoint*
     // if (ok) --> do linear fit.
 }
 
-double PatternRecognition::calculate_Phi(const double xpos, const double ypos, const SimpleCircle circle) {
+double PatternRecognition::calculate_Phi(const double xpos, const double ypos,
+                                         const SimpleCircle circle) {
 
   double angle = atan2(ypos - circle.get_y0(), xpos - circle.get_x0());
 
@@ -817,7 +818,8 @@ void PatternRecognition::circle_fit(const std::map<int, SciFiSpacePoint*> &spnts
   circle.set_chisq(xchi2 / num_points);
 }
 
-bool PatternRecognition::turns_between_stations(const std::vector<double> dz, std::vector<double> &dphi) {
+bool PatternRecognition::turns_between_stations(const std::vector<double> dz,
+                                                std::vector<double> &dphi) {
 
   //  Make sure that you have enough points to make a line (2)
   if ( dz.size() < 2 || dphi.size() < 2 )
@@ -843,7 +845,8 @@ bool PatternRecognition::turns_between_stations(const std::vector<double> dz, st
   } // end j
 }
 
-bool PatternRecognition::AB_ratio(double &dphi_kj, double &dphi_ji, const double dz_kj, const double dz_ji) {
+bool PatternRecognition::AB_ratio(double &dphi_kj, double &dphi_ji, const double dz_kj,
+                                  const double dz_ji) {
 
   double A, B;
   for ( int n = 0; n < 5; ++n )
