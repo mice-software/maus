@@ -26,11 +26,15 @@
 
 namespace MAUS {
 
-class ParticleTrajectory : std::vector<ParticleTrack> {
+class ParticleTrajectory : public std::vector<ParticleTrack> {
  public:
   /* @brief	Construct with all elements initialized to zero.
    */
   ParticleTrajectory();
+
+  /* @brief Create with particle ID only.
+   */
+  explicit ParticleTrajectory(const int particle_id);
 
   /* @brief Create with tracks and particle ID.
    */

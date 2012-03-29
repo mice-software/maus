@@ -30,9 +30,9 @@ ParticleTrajectory::ParticleTrajectory()
 
 ParticleTrajectory::ParticleTrajectory(const std::vector<ParticleTrack>& tracks,
                                        const int particle_id)
-    : std::vector<ParticleTrack>(tracks), particle_id_(particle_id)
+    : particle_id_(particle_id)
 {
-  
+  assign(tracks);
 }
 
 ParticleTrajectory::~ParticleTrajectory()

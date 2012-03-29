@@ -98,19 +98,20 @@ class MapCppTrackReconstructor {
    */
   std::string process(std::string document);
 
-  const double ScoreTrack(PhaseSpaceVector const * const start_plane_track)
-      const;
-
  private:
   static const size_t kPhaseSpaceDimension;
 
   OpticsModel * optics_model_;
+  TrajectoryFitter * trajectory_fitter_;
   DetectorEvent * events_;
-  TrackFitter * track_fitter_;
-  ParticleTrajectory * trajectories_;
+  std::vector<ParticleTrajectory> trajectories_;
   
   std::string classname_;
   BTField * electromagnetic_field_;
+
+  void CorrelateDetectorEvents(
+      std::vector<DetectorEvent> const * const detector_events,
+      std::vector<std::vector<DetectorEvent const * const> > * event_sets);
 };
 
 const size_t MapCppTrackReconstructor::kPhaseSpaceDimension = 6;

@@ -23,22 +23,20 @@ void common_cpp_optics_reconstruction_minuit_track_fitter_score_function(
 class MinuitTrackFitter : public TrackFitter
 {
  public:
-  MinuitTrackFitter(OpticsModel const * const optics_model);
+  MinuitTrackFitter(
+      OpticsModel const * const optics_model,
+      std::vector<double> const * const detector_planes,
+      std::vector<CovarianceMatrix> const * detector_uncertainties);
 
   ~MinuitTrackFitter();
  protected:
   static const size_t kPhaseSpaceDimension;
-  std::vector<double> detector_planes_;
-  std::vector<CovarianceMatrix> detector_errors_;
-  std::const_iterator<std::vector<DetectorEvent> > trajectories_;
+  std::vector<DetectorEvent const *> const * detector_events_;
+  ParticleTrajectory * trajectory_;
+  double mass_;
 
   MinuitTrackFitter();
-  Double_t ScoreTrack(Double_t const * const phase_space_coordinates) const;
-  void GetDetectorPlanes(std::vector<double> * detector_planes);
-  void GetDetectorErrors(std::vector<CovarianceMatrix> * error_matrices);
-  void CorrelateDetectorEvents(
-    std::vector<DetectorEvent> const * const detector_events,
-    std::vector<std::vector<DetectorEvent> > * &event_sets);
+  Double_t ScoreTrack(Double_t const * const start_plane_track_coordinates);
 };
 
 const size_t MapCppTrackReconstructor::kPhaseSpaceDimension = 6;
