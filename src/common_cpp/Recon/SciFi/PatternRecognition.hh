@@ -238,6 +238,32 @@ class PatternRecognition {
      */
     double calculate_Phi(double xpos, double ypos, SimpleCircle circle);
 
+    /** @brief Account for possible 2*pi rotations between stations
+     *
+     *  As the seperation along z increases between stations, the difference in phi should
+     *  also increase. Inputs are vectors containing the seperation in z, from stations 1-5,
+     *  and a vector containing the phi differences.  Returns true if the rotations are
+     *  consistent with z spacing, and the vector dphi should contain new dphis corrected for
+     *  2*pi rotations.
+     *
+     * @param dz - a vector containing z seperations, z_j - z_i
+     * @param dphi - a vector containing the differences in phi b/w stations, phi_j - phi_i
+     *
+     */
+    bool turns_bw_stations(std::vector<double> dz, std::vector<double> (&dphi));
+
+    /** @brief Check that the ratio between the change in z and change in phi is appropriate
+     *
+     *  Returns true is the ABcut is satisfied.  Should be very nearly 0.
+     *
+     *  @param dphi_kj - dphi_k - dphi_j where k > j
+     *  @param dphi_ji - dphi_j - dphi_i where j > i
+     *  @param dz_kj - dz_k - dz_j where k > j
+     *  @param dz_ji - dz_j - dz_i where j > i
+     *
+     */
+    bool ABratio(double& dphi_kj, double& dphi_ji, double dz_kj, double dz_ji);
+
     /** @brief Determine which two stations the initial line should be drawn between
      * 
      *  The initial line is to be drawn between the two outermost stations being used.
@@ -299,6 +325,7 @@ class PatternRecognition {
     static const double _sd_5 = 0.4298;
     static const double _res_cut = 10;
     static const double _chisq_cut = 15;
+    static const double _ABcut = .1;
 };
 // } // ~namespace MAUS
 

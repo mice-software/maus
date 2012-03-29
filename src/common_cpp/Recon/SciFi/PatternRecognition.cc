@@ -692,26 +692,45 @@ double PatternRecognition::delta_R(SimpleCircle circle, CLHEP::Hep3Vector pos) {
 void PatternRecognition::determine_dipangle(const std::map<int, SciFiSpacePoint*> &spnts,
                                             SimpleCircle circle, SimpleLine line_sz) {
 
-  std::vector<double> phiz;
+  int num_points = spnts.size();
+
+  CLHEP::HepMatrix A(num_points, 2); // rows, columns
+  CLHEP::HepMatrix V(num_points, num_points); // error matrix
+  CLHEP::HepMatrix S(num_points, 1); // measurements
+
+  double R = circle.get_R();
+
+  std::vector<double> dz;
+  std::vector<double> dphi;
+  std::vector<double> dphi_err;
+
   for ( std::map<int, SciFiSpacePoint*>::const_iterator ii = spnts.begin();
        ii != spnts.end(); ++ii ) {
-    double x_pos = (*ii).second->get_position().x();
-    double y_pos = (*ii).second->get_position().y();
-    double phi = calculate_Phi(x_pos, y_pos, circle);
 
-    phiz.push_back(phi);
+    std::map<int, SciFiSpacePoint*>::const_iterator jj = ii++;
 
-    double z_pos = (*ii).second->get_position().z();
+    double z_i = (*ii).second->get_position().z();
+    double z_j = (*jj).second->get_position().z();
+    double dz_ji = z_j - z_i;
+    dz.push_back(dz_ji);
+
+    double x_i = (*ii).second->get_position().x();
+    double y_i = (*ii).second->get_position().y();
+    double phi_i = calculate_Phi(x_i, y_i, circle);
+
+    double x_j = (*jj).second->get_position().x();
+    double y_j = (*jj).second->get_position().y();
+    double phi_j = calculate_Phi(x_j, y_j, circle);
+
+    double dphi_ji = phi_j - phi_i;
+    double dphi_err_ji = 1.; // For now, needs to be worked out and put in header file
+    dphi.push_back(dphi_ji);
+    dphi_err.push_back(dphi_err_ji);
   }
-  // Determine seperation between stations
-/*  std::vector<double> dz;
-    for( unsigned int i = 0; i < spnts.size(); ++i ) {
-      double z_pos_i = spnts[i]->get_position().z();
-      double z_pos_j = spnts[i+1]->get_position().z();
-      // i < j
-      double dz_ji = z_pos_j - z_pos_i; 
-      dz.push_back(dz_ji);
-    } */
+
+    bool ok = turns_bw_stations(dz, dphi);
+
+    // if (ok) --> do linear fit.
 }
 
 double PatternRecognition::calculate_Phi(double xpos, double ypos, SimpleCircle circle) {
@@ -792,6 +811,46 @@ void PatternRecognition::circle_fit(const std::map<int, SciFiSpacePoint*> &spnts
   result = C.T() * V * C;
   double xchi2 = result[0][0];
   circle.set_chisq(xchi2 / num_points);
+}
+
+bool PatternRecognition::turns_bw_stations(std::vector<double> dz, std::vector<double> (&dphi)) {
+
+  if ( dphi[0] < 0 )
+    dphi[0] += 2 * pi;
+
+  //  Make sure that dphi is always increasing between stations
+  for ( unsigned int j = 1; j < dphi.size(); j++ ) {
+    while ( dphi[j-1] > dphi[j] )
+      dphi[j] += 2 * pi;
+  }
+
+  for ( unsigned int j = 1; j < dphi.size() ; j++ ) {
+
+    bool goodAB = ABratio(dphi[j-1] , dphi[j], dz[j-1], dz[j]);
+
+    if ( !goodAB )
+      return false; // return determineDip false if the ratio is never satisfied
+  }
+}
+
+bool PatternRecognition::ABratio(double& dphi_kj, double& dphi_ji, double dz_kj, double dz_ji) {
+
+  double A, B;
+  for ( unsigned int n = 0; n < 5; ++n )
+    for ( unsigned int m = 0; m < 5; ++m ) {
+      A = ( dphi_kj + ( 2 * n * pi ) ) / ( dphi_ji + ( 2 * m * pi ) );
+      B = dz_kj / dz_ji;
+
+      std::cout << "A-B = "<< fabs(A-B) << std::endl;
+
+      if ( fabs(A - B) < _ABcut ) {
+        dphi_kj += 2 * n * pi;
+        dphi_ji += 2 * m * pi;
+
+        return true;
+      }
+    }
+  return false; // Return false if _ABcut is never satisfied
 }
 
 void PatternRecognition::set_end_stations(const std::vector<int> ignore_stations,
