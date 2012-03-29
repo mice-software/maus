@@ -97,7 +97,7 @@ type -P python &>/dev/null || {
     echo "FATAL:      ./third_party/bash/01python.bash" >&2;
     exit 1; }
 
-python_version=`env $DYLIB_VAR=./third_party/install/lib python -V 2>&1`
+python_version=`env $DYLIB_VAR=${maus_third_party}/install/lib python -V 2>&1`
 ## Check for supported python version
 if [ "${python_version}" != "Python 2.7" ]
 then               ##################################################
