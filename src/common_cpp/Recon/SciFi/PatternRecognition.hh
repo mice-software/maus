@@ -193,8 +193,8 @@ class PatternRecognition {
      *  @param circle - The output circle fit
      *
      */
-    bool initial_circle(CLHEP::Hep3Vector p1, CLHEP::Hep3Vector p2, CLHEP::Hep3Vector p3,
-                        SimpleCircle circle);
+    bool initial_circle(const CLHEP::Hep3Vector p1, const CLHEP::Hep3Vector p2, const CLHEP::Hep3Vector p3,
+                        SimpleCircle &circle);
 
     /** @brief Find points from intermediate stations which fit to the "trial track"
      *
@@ -203,7 +203,7 @@ class PatternRecognition {
      * acceptable with a cut, and if they are, append them to the trial track.
      *
      */
-    double delta_R(SimpleCircle circle, CLHEP::Hep3Vector pos);
+    double delta_R(const SimpleCircle circle, const CLHEP::Hep3Vector pos);
 
     /** @brief Fit a circle to all spacepoints in "trail track"
      *
@@ -226,8 +226,8 @@ class PatternRecognition {
      * @param line_sz - The output fitted line in s-z projection.
      *
      */
-    void determine_dipangle(const std::map<int, SciFiSpacePoint*> &spnts,
-                            SimpleCircle circle, SimpleLine line_sz);
+    void calculate_dipangle(const std::map<int, SciFiSpacePoint*> &spnts,
+                            const SimpleCircle circle, SimpleLine &line_sz);
 
     /** @brief Calculate the turning angle of a spacepoint w.r.t. helix center
      *
@@ -236,7 +236,7 @@ class PatternRecognition {
      * @param circle - Contains the helix center
      *
      */
-    double calculate_Phi(double xpos, double ypos, SimpleCircle circle);
+    double calculate_Phi(const double xpos, const double ypos, const SimpleCircle circle);
 
     /** @brief Account for possible 2*pi rotations between stations
      *
@@ -250,7 +250,7 @@ class PatternRecognition {
      * @param dphi - a vector containing the differences in phi b/w stations, phi_j - phi_i
      *
      */
-    bool turns_bw_stations(std::vector<double> dz, std::vector<double> (&dphi));
+    bool turns_between_stations(const std::vector<double> dz, std::vector<double> &dphi);
 
     /** @brief Check that the ratio between the change in z and change in phi is appropriate
      *
@@ -262,7 +262,7 @@ class PatternRecognition {
      *  @param dz_ji - dz_j - dz_i where j > i
      *
      */
-    bool ABratio(double& dphi_kj, double& dphi_ji, double dz_kj, double dz_ji);
+    bool AB_ratio(double &dphi_kj, double &dphi_ji, const double dz_kj, const double dz_ji);
 
     /** @brief Determine which two stations the initial line should be drawn between
      * 
@@ -325,7 +325,10 @@ class PatternRecognition {
     static const double _sd_5 = 0.4298;
     static const double _res_cut = 10;
     static const double _chisq_cut = 15;
-    static const double _ABcut = .1;
+    static const double _AB_cut = .1; // Need to calculate appropriate cut here
+    static const double _sd_phi_1to4 = 1.; // Still needs to be calculated!!!!
+    static const double _sd_phi_5 = 1.; // Still needs to be calculated!!!!
+
 };
 // } // ~namespace MAUS
 
