@@ -1,3 +1,6 @@
+MAUS-v0.2.1 (http://micewww.pp.rl.ac.uk/versions/show/21)
+  Bug #952: MAUS_0.2 build error
+
 MAUS-v0.2.0 (http://micewww.pp.rl.ac.uk/versions/show/21)
   Bug #498: Compiler warnings
   Bug #806: ReduceCpp... doesn't build
