@@ -237,7 +237,7 @@ int MapCppTrackerMCDigitization::compute_chan_no(SciFiHit *ahit) {
     chanNo = static_cast<int> (floor(fiberNumber/7.0));
   }
 
-  return chanNo;
+  return fiberNumber; // chanNo;
 }
 
 double MapCppTrackerMCDigitization::compute_npe(double edep) {

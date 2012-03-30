@@ -84,7 +84,8 @@ SciFiPlane::SciFiPlane(MiceModule* mod,
 
   logicDoublet = new G4LogicalVolume(solidDoublet, mater, doubletName, 0, 0, 0);
 
-  physiDoublet = placeCore = new G4PVPlacement(trot, mod->position(),
+  // physiDoublet = placeCore = new G4PVPlacement(trot, mod->position(),
+  physiDoublet = placeCore = new G4PVPlacement(0, mod->position(),
                                                logicDoublet, doubletName,
                                                mlv->GetLogicalVolume(),
                                                false, 0);
@@ -93,7 +94,8 @@ SciFiPlane::SciFiPlane(MiceModule* mod,
   G4double tlen = 1.0 * mm;
 
   // the number of fibres to be simulated
-  _numFibres = (G4int)floor(2. * ar / (0.5 * fp));
+  // _numFibres = (G4int)floor(2. * ar / (0.5 * fp));
+  G4int num = (G4int)floor(2. * ar / (0.5 * fp));
 
   // Beginning of the fiber core definitions
   solidCore = new G4Tubs(coreName, 0.0, cd / 2., tlen, 0.0 * deg, 360.0 * deg);
@@ -104,7 +106,8 @@ SciFiPlane::SciFiPlane(MiceModule* mod,
                                                            0.0, fd, fp / fd);
 
   physiCore = new G4PVParameterised(coreName, logicCore, physiDoublet,
-                                    kUndefined, _numFibres, coreParam);
+                                     kUndefined, num, coreParam);
+  //                                  kUndefined, _numFibres, coreParam);
 }
 
 SciFiPlane::~SciFiPlane() {
