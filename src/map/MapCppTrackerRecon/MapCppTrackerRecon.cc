@@ -44,6 +44,8 @@ bool MapCppTrackerRecon::birth(std::string argJsonConfigDocument) {
   // Get the value above which an Exception is thrown
   assert(_configJSON.isMember("SciFiClustExcept"));
   ClustException = _configJSON["SciFiClustExcept"].asInt();
+
+  return true;
 }
 
 bool MapCppTrackerRecon::death() {
