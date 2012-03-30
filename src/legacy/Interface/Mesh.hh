@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <math.h>
 
-#include "Interface/MVector.hh"
+#include "Maths/Vector.hh"
 
 //
 //Mesh is a set of classes to describe a grid of points in various dimensions etc
@@ -197,9 +197,9 @@ public:
     //if you are sure the grid has constant spacing ConstSpacing is quicker; VarSpacing in either case
     //return lower bound on x for insertion i.e. 0 if x < x[1], 1 if  x[1] < x < x[2], ... , x.size()-1 if x > x.back()
     inline void xLowerBound            (const double& x, int& xIndex) const 
-    {if(_constantSpacing) xIndex = floor( (x - _x[0])/(_x[1]-_x[0]) ); else xIndex = std::lower_bound(_x.begin(), _x.end(), x)-_x.begin()-1;}
+    {if(_constantSpacing) xIndex = static_cast<int>(floor( (x - _x[0])/(_x[1]-_x[0]) )); else xIndex = std::lower_bound(_x.begin(), _x.end(), x)-_x.begin()-1;}
     inline void yLowerBound            (const double& y, int& yIndex) const
-    {if(_constantSpacing) yIndex = floor( (y - _y[0])/(_y[1]-_y[0]) ); else yIndex = std::lower_bound(_y.begin(), _y.end(), y)-_y.begin()-1;}
+    {if(_constantSpacing) yIndex = static_cast<int>(floor( (y - _y[0])/(_y[1]-_y[0]) )); else yIndex = std::lower_bound(_y.begin(), _y.end(), y)-_y.begin()-1;}
     inline void LowerBound             (const double& x, int& xIndex, const double& y, int& yIndex) const
     {xLowerBound(x, xIndex); yLowerBound(y, yIndex);}
 
@@ -309,11 +309,11 @@ public:
     //if you are sure the grid has constant spacing ConstSpacing is quicker; VarSpacing in either case
     //indexing starts at 0 and goes to nCoords+1
     inline void xLowerBound            (const double& x, int& xIndex) const 
-    {if(_constantSpacing) xIndex = floor( (x - _x[0])/(_x[1]-_x[0]) ); else xIndex = std::lower_bound(_x.begin(), _x.end(), x)-_x.begin()-1;}
+    {if(_constantSpacing) xIndex = static_cast<int>(floor( (x - _x[0])/(_x[1]-_x[0]) )); else xIndex = std::lower_bound(_x.begin(), _x.end(), x)-_x.begin()-1;}
     inline void yLowerBound            (const double& y, int& yIndex) const
-    {if(_constantSpacing) yIndex = floor( (y - _y[0])/(_y[1]-_y[0]) ); else yIndex = std::lower_bound(_y.begin(), _y.end(), y)-_y.begin()-1;}
+    {if(_constantSpacing) yIndex = static_cast<int>(floor( (y - _y[0])/(_y[1]-_y[0]) )); else yIndex = std::lower_bound(_y.begin(), _y.end(), y)-_y.begin()-1;}
     inline void zLowerBound            (const double& z, int& zIndex) const
-    {if(_constantSpacing) zIndex = floor( (z - _z[0])/(_z[1]-_z[0]) ); else zIndex = std::lower_bound(_z.begin(), _z.end(), z)-_z.begin()-1;}
+    {if(_constantSpacing) zIndex = static_cast<int>(floor( (z - _z[0])/(_z[1]-_z[0]) )); else zIndex = std::lower_bound(_z.begin(), _z.end(), z)-_z.begin()-1;}
     inline void LowerBound             (const double& x, int& xIndex, const double& y, int& yIndex, const double& z, int& zIndex) const
     {xLowerBound(x, xIndex); yLowerBound(y, yIndex); zLowerBound(z, zIndex);}
     inline void LowerBound             (const double& x, const double& y, const double& z, Mesh::Iterator& it) const
@@ -410,14 +410,14 @@ public:
     //indexing starts at 0 and goes to nCoords+1
     inline void    coordLowerBound (const double& x, const int& dimension, int& xIndex)       const
     {
-        if(_constantSpacing) xIndex = floor( (x - _coord[dimension][0])/(_coord[dimension][1]-_coord[dimension][0]) ); 
+        if(_constantSpacing) xIndex = static_cast<int>(floor( (x - _coord[dimension][0])/(_coord[dimension][1]-_coord[dimension][0]) )); 
         else xIndex = std::lower_bound(_coord[dimension].begin(), _coord[dimension].end(), x)-_coord[dimension].begin()-1;
     }
 
     inline void    LowerBound      (const std::vector<double>& pos, std::vector<int>& xIndex) const
     {xIndex = std::vector<int>(pos.size()); for(unsigned int i=0; i<pos.size(); i++) coordLowerBound(pos[i], i, xIndex[i]);}
-    inline void    LowerBound      (const MVector<double>& pos,    std::vector<int>& xIndex) const
-    {xIndex = std::vector<int>(pos.num_row()); for(size_t i=0; i<pos.num_row(); i++) coordLowerBound(pos(i+1), i, xIndex[i]);}
+    inline void    LowerBound      (const MAUS::Vector<double>& pos,    std::vector<int>& xIndex) const
+    {xIndex = std::vector<int>(pos.size()); for(size_t i=0; i<pos.size(); i++) coordLowerBound(pos(i+1), i, xIndex[i]);}
     inline double  Min             (const int& dimension) const {return _coord[dimension][0];}
     inline double  Max             (const int& dimension) const {return _coord[dimension][_coord[dimension].size()-1];}
 

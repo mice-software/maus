@@ -19,8 +19,8 @@ for beam generation.
 """
 
 import numpy
-import xboa
-import xboa.Bunch #pylint: disable=W0404
+import xboa #pylint: disable=F0401
+import xboa.Bunch #pylint: disable=F0401
 import sys
 
 # 32 bit long; note that CLHEP max for the seed is a 32 bit unsigned int which
@@ -359,6 +359,7 @@ class Beam(): # pylint: disable=R0902
         elif longitudinal_variable == "energy":
             hit["energy"] = particle_array[5]
             hit.mass_shell_condition("pz")
+        hit["pz"] *= self.reference['pz']/abs(self.reference['pz'])
         primary = hit.get_maus_dict('maus_primary')[0]
         primary["position"]["z"] = self.reference["z"]
         primary["random_seed"] = self.__process_get_seed()

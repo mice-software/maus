@@ -1,5 +1,3 @@
-// Copyright 2011 Chris Rogers
-//
 // This file is a part of MAUS
 //
 // MAUS is free software: you can redistribute it and/or modify
@@ -26,6 +24,8 @@
 
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 #include "src/common_cpp/Simulation/MAUSPrimaryGeneratorAction.hh"
+
+using namespace MAUS;
 
 namespace {
 class MAUSPrimaryGeneratorActionTest : public ::testing::Test {
@@ -86,19 +86,17 @@ TEST_F(MAUSPrimaryGeneratorActionTest, GeneratePrimariesTest) {
     part_in.pid = 0; //non-physical?
     primary->Push(part_in);
 
-    part_in.seed = -1; //non-physical
-    primary->Push(part_in);
-
     part_in.seed = std::numeric_limits<unsigned int>::max()+1; 
     primary->Push(part_in);
 
     G4Event* event = new G4Event();
-    for (size_t i=0; i<2; ++i)
+    for (size_t i=0; i<2; ++i) {
         primary->GeneratePrimaries(event);
+    }
     double mu_mass = 105.658;
-    double p_in    = sqrt(200.*200.-mu_mass*mu_mass);
+    double p_in    = ::sqrt(200.*200.-mu_mass*mu_mass);
     double p_scale = 
-        sqrt(part_in.px*part_in.px+part_in.py*part_in.py+part_in.pz*part_in.pz);
+        ::sqrt(part_in.px*part_in.px+part_in.py*part_in.py+part_in.pz*part_in.pz);
     double p_norm  = p_in/p_scale;
     EXPECT_NEAR(part_in.x, event->GetPrimaryVertex()->GetX0(), 1e-3);
     EXPECT_NEAR(part_in.y, event->GetPrimaryVertex()->GetY0(), 1e-3);
@@ -112,8 +110,9 @@ TEST_F(MAUSPrimaryGeneratorActionTest, GeneratePrimariesTest) {
     EXPECT_EQ(27, CLHEP::HepRandom::getTheSeed());
     EXPECT_EQ(-13,  event->GetPrimaryVertex()->GetPrimary()->GetPDGcode());
 
-    for (size_t i=0; i<5; ++i)
+    for (size_t i=0; i<4; ++i) {
         EXPECT_THROW(primary->GeneratePrimaries(event), Squeal);
+    }
     delete event;
 }
 
@@ -162,7 +161,7 @@ TEST_F(MAUSPrimaryGeneratorActionTest, PGParticleFromVirtualHitTest) {
     EXPECT_NEAR(part_in.time, 4., 1e-6);
     EXPECT_NEAR(part_in.energy, 200., 1e-6);
     EXPECT_EQ(part_in.pid, -13);
-    EXPECT_EQ(part_in.seed, 0);
+    EXPECT_EQ(part_in.seed, size_t(0));
 
 }
 

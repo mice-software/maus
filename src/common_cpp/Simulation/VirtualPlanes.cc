@@ -76,12 +76,13 @@ VirtualPlane VirtualPlane::BuildVirtualPlane(CLHEP::HepRotation rot,
 bool VirtualPlane::SteppingOver(const G4Step* aStep) const {
   double pre  = GetIndependentVariable(aStep->GetPreStepPoint());
   double post = GetIndependentVariable(aStep->GetPostStepPoint());
-
-  if (pre  <= _independentVariable && post > _independentVariable)
+  if (pre  <= _independentVariable && post > _independentVariable) {
     return true;  // stepping forwards
+  }
   if (_allowBackwards && post <= _independentVariable &&
-                         pre  > _independentVariable)
+                         pre  > _independentVariable) {
     return true;  // stepping backwards
+  }
   return false;
 }
 
@@ -141,7 +142,7 @@ void VirtualPlane::FillKinematics
 
   double mass = aStep->GetPostStepPoint()->GetMass();
   // FORCE mass shell condition
-  x[4] = sqrt(x[5]*x[5]+x[6]*x[6]+x[7]*x[7]+mass*mass);
+  x[4] = ::sqrt(x[5]*x[5]+x[6]*x[6]+x[7]*x[7]+mass*mass);
   aHit->SetEnergy(x[4]);
   aHit->SetTime(x[0]);
   aHit->SetProperTime(0.);
@@ -443,7 +444,7 @@ VirtualHit VirtualPlaneManager::ReadHit(Json::Value v_hit) {
     hit.SetMomentum(JsonWrapper::JsonToThreeVector(mom_v));
     hit.SetBField(JsonWrapper::JsonToThreeVector(b_v));
     hit.SetEField(JsonWrapper::JsonToThreeVector(e_v));
-    hit.SetEnergy(sqrt(hit.GetMomentum().mag2()+hit.GetMass()*hit.GetMass()));
+    hit.SetEnergy(::sqrt(hit.GetMomentum().mag2()+hit.GetMass()*hit.GetMass()));
     return hit;
 }
 

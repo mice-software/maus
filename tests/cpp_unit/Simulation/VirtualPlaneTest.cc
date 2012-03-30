@@ -140,14 +140,14 @@ G4Track* SetG4TrackAndStep(G4Step* step) {
   step->GetPreStepPoint()->SetMass(dyn->GetMass());
   step->GetPreStepPoint()->SetKineticEnergy(100.);
   step->GetPreStepPoint()->SetMomentumDirection
-                                    (CLHEP::Hep3Vector(0., 0.1, 1.)/sqrt(1.01));
+                                    (CLHEP::Hep3Vector(0., 0.1, 1.)/::sqrt(1.01));
 
   step->GetPostStepPoint()->SetGlobalTime(2.);
   step->GetPostStepPoint()->SetPosition(CLHEP::Hep3Vector(3., 4., 8.));
   step->GetPostStepPoint()->SetMass(dyn->GetMass());
   step->GetPostStepPoint()->SetKineticEnergy(110.);
   step->GetPostStepPoint()->SetMomentumDirection
-                                    (CLHEP::Hep3Vector(0., 0.1, 1.)/sqrt(1.01));
+                                    (CLHEP::Hep3Vector(0., 0.1, 1.)/::sqrt(1.01));
   return track;
 }
 
@@ -159,7 +159,7 @@ TEST_F(VirtualPlaneTest, BuildNewHitTest) {  // sorry this is a long one...
   VirtualPlaneManager vpm;
   vpm.ConstructVirtualPlanes(&field, MICERun::getInstance()->miceModule);
   G4Step*  step  = new G4Step();
-  G4Track* track = SetG4TrackAndStep(step);
+  SetG4TrackAndStep(step);
   VirtualHit hit = vp_z.BuildNewHit(step, 99);
   double     mass = step->GetPreStepPoint()->GetMass();
 
@@ -168,10 +168,10 @@ TEST_F(VirtualPlaneTest, BuildNewHitTest) {  // sorry this is a long one...
   EXPECT_NEAR(hit.GetPos().z(), 5.,  1e-6);
   CLHEP::Hep3Vector p = hit.GetMomentum();
   EXPECT_NEAR(hit.GetEnergy(), 102.5+mass,  1e-1);
-  double p_tot = sqrt(hit.GetEnergy()*hit.GetEnergy()-mass*mass);
+  double p_tot = ::sqrt(hit.GetEnergy()*hit.GetEnergy()-mass*mass);
   // transport through B-field should conserve ptrans and pz
-  EXPECT_NEAR(sqrt(p.x()*p.x()+p.y()*p.y()), p_tot*0.1/sqrt(1.01), 1e-2);
-  EXPECT_NEAR(p.z(), p_tot*1./sqrt(1.01),  1e-6);
+  EXPECT_NEAR(::sqrt(p.x()*p.x()+p.y()*p.y()), p_tot*0.1/::sqrt(1.01), 1e-2);
+  EXPECT_NEAR(p.z(), p_tot*1./::sqrt(1.01),  1e-6);
   EXPECT_EQ(hit.GetStationNumber(), 99);
   EXPECT_EQ(hit.GetTrackID(), 10);
   EXPECT_NEAR(hit.GetTime(), 1.25, 1e-3);  // not quite as v_z b4/after is
@@ -220,8 +220,8 @@ TEST_F(VirtualPlaneTest, InRadialCutTest) {
   VirtualPlane vp_z_no_cut = VirtualPlane::BuildVirtualPlane(rot, pos, 0.,
                           false, 5., BTTracker::z, VirtualPlane::ignore, true);
   // position in local coords
-  CLHEP::Hep3Vector pos_in(99./sqrt(2), 99./sqrt(2), 0.);
-  CLHEP::Hep3Vector pos_out(100.1/sqrt(2), 100.1/sqrt(2), 0.);
+  CLHEP::Hep3Vector pos_in(99./::sqrt(2), 99./::sqrt(2), 0.);
+  CLHEP::Hep3Vector pos_out(100.1/::sqrt(2), 100.1/::sqrt(2), 0.);
   pos_in  = rot.inverse()*pos_in+pos;
   pos_out = rot.inverse()*pos_out+pos;
   EXPECT_TRUE(vp_z.InRadialCut(pos_in));
@@ -286,7 +286,7 @@ TEST_F(VirtualPlaneManagerTest, ConstructVirtualPlanes) {  // also GetPlanes()
   mod3.addPropertyString("SensitiveDetector", "");
   vpm.ConstructVirtualPlanes(NULL, &mod3);
   EXPECT_THROW(vpm.GetStationNumberFromModule(&mod3), Squeal);
-  EXPECT_EQ(vpm.GetPlanes().size(), 2);
+  EXPECT_EQ(vpm.GetPlanes().size(), (size_t) 2);
 
   vpm.ConstructVirtualPlanes(NULL, &mod2);
   double point[] = {0, 0, 0, 0};
@@ -389,9 +389,42 @@ TEST_F(VirtualPlaneManagerTest, VirtualPlanesSteppingActionTest) {
   EXPECT_THROW(vpm.GetNumberOfHits(6), Squeal);
 
   Json::Value json = vpm.GetVirtualHits();
-  ASSERT_EQ(json.size(), 3);
+  ASSERT_EQ(json.size(), (Json::UInt) 3);
   for (size_t i = 0; i < json.size(); ++i)
-    EXPECT_EQ(json[i]["station_id"].asInt(), i+2);
+    EXPECT_EQ(json[i]["station_id"].asInt(), (Json::Int) i+2);
+
+  delete step;
+}
+
+TEST_F(VirtualPlaneManagerTest, VirtualPlanesSteppingActionBackwardsTest) {
+  G4Step*  step  = new G4Step();
+  SetG4TrackAndStep(step);  // prestep is at z=4 poststep at z=8
+
+  MiceModule mod_6;
+  mod_6.addPropertyString("SensitiveDetector", "Virtual");
+  mod_6.addPropertyHep3Vector("Position", "0 0 6.0 mm");
+  mod_6.addPropertyBool("AllowBackwards", false);
+  MiceModule mod_7;
+  mod_7.addPropertyString("SensitiveDetector", "Virtual");
+  mod_7.addPropertyHep3Vector("Position", "0 0 7.0 mm");
+  mod_7.addPropertyBool("AllowBackwards", true);
+  vpm.ConstructVirtualPlanes(NULL, &mod_6);
+  vpm.ConstructVirtualPlanes(NULL, &mod_7);
+
+  vpm.VirtualPlanesSteppingAction(step);
+  EXPECT_EQ(vpm.GetNumberOfHits(1), 1);
+  EXPECT_EQ(vpm.GetNumberOfHits(2), 1);
+  vpm.SetVirtualHits(Json::Value(Json::arrayValue));
+  vpm.StartOfEvent();
+
+  step->GetPreStepPoint()->SetPosition(G4ThreeVector(0., 0., 8.));
+  step->GetPostStepPoint()->SetPosition(G4ThreeVector(0., 0., 4.));
+  step->GetPreStepPoint()->SetMomentumDirection(G4ThreeVector(0., 0., -1.));
+  step->GetPostStepPoint()->SetMomentumDirection(G4ThreeVector(0., 0., -1.));
+  vpm.VirtualPlanesSteppingAction(step);
+  EXPECT_EQ(vpm.GetNumberOfHits(1), 0);
+  EXPECT_EQ(vpm.GetNumberOfHits(2), 1);
+
   delete step;
 }
 
@@ -430,15 +463,15 @@ TEST_F(VirtualPlaneManagerTest, VirtualPlanesSteppingActionMultipassTest) {
   EXPECT_EQ(vpm.GetNumberOfHits(2), 3);
   EXPECT_EQ(vpm.GetNumberOfHits(3), 3);  // this is the primary station number
 
-  ASSERT_EQ(json1.size(), 3);
+  ASSERT_EQ(json1.size(), (Json::UInt) 3);
   for (size_t i = 0; i < 3; ++i)
-    EXPECT_EQ(json1[i]["station_id"].asInt(), i+1);
+    EXPECT_EQ(json1[i]["station_id"].asInt(), (Json::Int) i+1);
 
-  ASSERT_EQ(json2.size(), 5);
+  ASSERT_EQ(json2.size(), (Json::UInt) 5);
   EXPECT_EQ(json2[3]["station_id"].asInt(), 2);
   EXPECT_EQ(json2[4]["station_id"].asInt(), 6);
 
-  ASSERT_EQ(json3.size(), 7);
+  ASSERT_EQ(json3.size(), (Json::UInt) 7);
   EXPECT_EQ(json3[5]["station_id"].asInt(), 2);
   EXPECT_EQ(json3[6]["station_id"].asInt(), 9);
 
@@ -447,9 +480,9 @@ TEST_F(VirtualPlaneManagerTest, VirtualPlanesSteppingActionMultipassTest) {
   vpm.VirtualPlanesSteppingAction(step);
   Json::Value json4 = vpm.GetVirtualHits();
 
-  ASSERT_EQ(json4.size(), 3);
+  ASSERT_EQ(json4.size(), (Json::UInt) 3);
   for (size_t i = 0; i < 3; ++i) {
-    EXPECT_EQ(json4[i]["station_id"].asInt(), i+1);
+    EXPECT_EQ(json4[i]["station_id"].asInt(), (Json::Int) i+1);
     EXPECT_EQ(vpm.GetNumberOfHits(i+1), 1);
   }
 

@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 #http://www.linuxfromscratch.org/blfs/view/6.3/general/libxslt.html
 
-version=0.0.1.0
-directory=cdb-${version}
-filename=${directory}.tar.gz
-url=http://bazaar.launchpad.net/~antony-wilson/mcdb/mice.cdb.client.api-python/view/head:/dist/${filename}
-
+version=0.0.2.0
+directory=cdb-0.0.2.0
+filename=cdb-0.0.2.0.tar.gz
+filename_mash=cdb0.0.2.0.tar.gz-20120110153743-3hxuv2vczbgwgkgu-3/cdb-0.0.2.0.tar.gz
+url=http://bazaar.launchpad.net/~antony-wilson/mcdb/mice.cdb.client.api-python/download/head:/${filename_mash}
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
     if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ]
@@ -13,7 +13,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         echo "INFO: Found source archive in 'source' directory"
     else  
         echo "INFO: Source archive doesn't exist.  Downloading..."
-        #wget --directory-prefix=${MAUS_ROOT_DIR}/third_party/source ${url}
+        wget --directory-prefix=${MAUS_ROOT_DIR}/third_party/source ${url}
     fi
    
     if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ]

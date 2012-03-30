@@ -1,7 +1,7 @@
 %module InputCppDAQData
  %{
  /* Includes the header in the wrapper code */
- #include "InputCppDAQData.hh"
+ #include "src/input/InputCppDAQData/InputCppDAQData.hh"
 
  %}
 %include "std_string.i"
@@ -12,5 +12,5 @@ def emitter(self):
     yield self.getCurEvent()
 %}
 
-%include "InputCppDAQData.hh"
+%include "src/input/InputCppDAQData/InputCppDAQData.hh"
 

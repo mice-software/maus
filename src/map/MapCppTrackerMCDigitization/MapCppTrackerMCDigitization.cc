@@ -84,8 +84,8 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
   for ( unsigned int i = 0; i < mc.size(); i++ ) {  // i-th particle
     Json::Value json_event = mc[i];
 
-    if ( !json_event.isMember("hits") )
-      continue; // if there are no MC hits, skip
+    if ( !json_event.isMember("sci_fi_hits") )
+      continue;
 
     json_to_cpp(json_event, spill);
   } // ends loop particles
@@ -110,18 +110,12 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
 void MapCppTrackerMCDigitization::
      json_to_cpp(Json::Value js_event, SciFiSpill &spill) {
   SciFiEvent* event = new SciFiEvent();
-  Json::Value _hits = js_event["hits"];
+  Json::Value _hits = js_event["sci_fi_hits"];
   // std::cout << "Number of hits fed in: " << _hits.size() << std::endl;
   for ( unsigned int j = 0; j < _hits.size(); j++ ) {
     Json::Value hit = _hits[j];
     assert(hit.isMember("channel_id"));
     Json::Value channel_id = hit["channel_id"];
-
-    // assert this is a tracker hit
-    assert(channel_id.isMember("type"));
-    if (channel_id["type"].asString() != "Tracker") {
-      continue;
-    }
 
     int tracker, plane, station, fibre;
     double edep, time;
@@ -331,5 +325,5 @@ void MapCppTrackerMCDigitization::save_to_json(SciFiEvent &evt) {
     js_event.append(digits_in_event);
   }
   if (!js_event.isNull())
-    root["digits"].append(js_event);
+    root["tracker_digits"].append(js_event);
 }

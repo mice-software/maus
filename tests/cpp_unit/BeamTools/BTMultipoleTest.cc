@@ -26,6 +26,8 @@
 #include "Interface/Differentiator.hh"
 #include "Interface/MathUtils.hh"
 #include "Interface/Squeal.hh"
+#include "Maths/Matrix.hh"
+#include "Maths/Vector.hh"
 
 #include "BeamTools/BTMultipole.hh"
 
@@ -269,8 +271,8 @@ TEST_F(BTMultipoleTest, GetFieldValueTest_TanhQuad) {
                                       &BTMultipole::GetFieldValue, 4, 6);
     Differentiator* diff = new Differentiator(func,
         std::vector<double>(&delta[0], &delta[0]+4), std::vector<double>(2, 1));
-    MMatrix<double> differentials(6, 5, 0.);
-    MVector<double> aPoint(&pos[0], &pos[4]);
+    MAUS::Matrix<double> differentials(6, 5, 0.);
+    MAUS::Vector<double> aPoint(pos, 5);
     diff->F(aPoint, differentials);
     for (size_t i = 1; i <= 4; ++i)
       for (size_t j = 1; j <= 3; ++j) {
