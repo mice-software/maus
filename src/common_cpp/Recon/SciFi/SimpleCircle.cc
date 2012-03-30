@@ -25,7 +25,7 @@ SimpleCircle::SimpleCircle() {}
 // Destructor
 SimpleCircle::~SimpleCircle() {}
 
-void SimpleCircle::set_parameters(double x0, double x0_err, double y0, double y0_err
+void SimpleCircle::set_parameters(double x0, double x0_err, double y0, double y0_err,
                                   double R, double R_err, double chisq) {
   _x0 = x0;
   _x0_err = x0_err;

@@ -34,7 +34,7 @@ class SimpleCircle {
     double get_x0() const { return _x0; }
     double get_x0_err() const { return _x0_err; }
     double get_y0() const { return _y0; }
-    double get_y0_err() const (return _y0_err; }
+    double get_y0_err() const { return _y0_err; }
     double get_R() const { return _R; }
     double get_R_err() const { return _R_err; }
     double get_chisq() const { return _chisq; }
@@ -54,7 +54,7 @@ class SimpleCircle {
     double _x0;
     double _x0_err;
     double _y0;
-    double y0_err;
+    double _y0_err;
     double _R;
     double _R_err;
     double _chisq;
