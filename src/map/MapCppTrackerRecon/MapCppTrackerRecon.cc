@@ -44,10 +44,6 @@ bool MapCppTrackerRecon::birth(std::string argJsonConfigDocument) {
   // Get the value above which an Exception is thrown
   assert(_configJSON.isMember("SciFiClustExcept"));
   ClustException = _configJSON["SciFiClustExcept"].asInt();
-
-  assert(_configJSON.isMember("SciFiRunRecon"));
-  SciFiRunRecon = _configJSON["SciFiRunRecon"].asInt();
-  return true;
 }
 
 bool MapCppTrackerRecon::death() {
@@ -70,7 +66,6 @@ std::string MapCppTrackerRecon::process(std::string document) {
     root["errors"] = errors;
     return writer.write(root);
   }
-  if ( SciFiRunRecon == 1 ) {
   try { // ================= Reconstruction =========================
     for ( unsigned int k = 0; k < spill.events().size(); k++ ) {
       SciFiEvent event = *(spill.events()[k]);
@@ -103,7 +98,6 @@ std::string MapCppTrackerRecon::process(std::string document) {
     root["errors"] = errors;
     return writer.write(root);
   }
-  }
   return writer.write(root);
 }
 
@@ -114,8 +108,8 @@ void MapCppTrackerRecon::digitization(SciFiSpill &spill, Json::Value &root) {
     Json::Value daq = root.get("daq_data", 0);
     RealDataDigitization real;
     real.process(spill, daq);
-  } else if ( root.isMember("digits") ) {
-    Json::Value digits = root.get("digits", 0);
+  } else if ( root.isMember("tracker_digits") ) {
+    Json::Value digits = root.get("tracker_digits", 0);
     fill_digits_vector(digits, spill);
   } else {
     throw 0;
@@ -126,10 +120,12 @@ void MapCppTrackerRecon::fill_digits_vector(Json::Value &digits_event, SciFiSpil
   for ( unsigned int i = 0; i < digits_event.size(); i++ ) {
     SciFiEvent* an_event = new SciFiEvent();
     Json::Value digits;
+    std::cout << "about to store digits.." << std::endl;
     digits = digits_event[i];
     for ( unsigned int j = 0; j < digits.size(); j++ ) {
       Json::Value digit;
       digit = digits[j];
+      std::cout << "found tracker digit." << std::endl;
       int tracker, station, plane, channel;
       double npe, time;
       tracker = digit["tracker"].asInt();
@@ -177,7 +173,7 @@ void MapCppTrackerRecon::save_to_json(SciFiEvent &evt) {
     digits_in_event["time"]   = evt.digits()[dig_i]->get_time();
     digits.append(digits_in_event);
   }
-  root["digits"].append(digits);
+  root["tracker_digits"].append(digits);
 
   Json::Value sp_tracker0;
   Json::Value sp_tracker1;

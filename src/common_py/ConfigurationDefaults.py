@@ -196,7 +196,6 @@ SciFi_sigma_tracker0_station5 = 0.4298 # mm
 SciFi_sigma_triplet = 0.3844 # mm
 SciFi_sigma_z = 0.081 # mm
 SciFi_sigma_duplet =  0.6197 # mm
-SciFiRunRecon = 1
 
 # configuration database
 cdb_upload_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database uploads TestServer::http://rgma19.pp.rl.ac.uk:8080/cdb/

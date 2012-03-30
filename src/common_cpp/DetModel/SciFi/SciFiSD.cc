@@ -46,9 +46,8 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
 
   double pid = aStep->GetTrack()->GetDefinition()->GetPDGEncoding();
 
-  if ( edep == 0. ) // return false;
-    edep = 1.0 * MeV;
-  // if ( fabs(pid) != 13 ) return false;
+  if ( edep == 0. ) return false;
+  if ( fabs(pid) != 13 ) return false;
   // the old chanNo, held for comparison
   int old_chanNo = legacy_chanNo(aStep);
 
@@ -64,7 +63,7 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
   G4ThreeVector Mom = aStep->GetTrack()->GetMomentum();  // true momentum
 
   Json::Value channel_id;
-  channel_id["fibre_number"] = old_chanNo; // fiberNumber;
+  channel_id["fibre_number"] = fiberNumber;
   channel_id["tracker_number"] = _module->propertyInt("Tracker");
   channel_id["station_number"] = _module->propertyInt("Station");
   channel_id["plane_number"] = _module->propertyInt("Plane");
@@ -93,7 +92,7 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
     chanNo = static_cast<int> (floor(fiberNumber/7));
   }
   // assert agreement on chanNo with legacy calculation
-  // assert(abs(chanNo-old_chanNo) < 2);
+  assert(abs(chanNo-old_chanNo) < 2);
 
   return true;
 }

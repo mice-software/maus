@@ -237,7 +237,7 @@ int MapCppTrackerMCDigitization::compute_chan_no(SciFiHit *ahit) {
     chanNo = static_cast<int> (floor(fiberNumber/7.0));
   }
 
-  return fiberNumber; // chanNo;
+  return chanNo;
 }
 
 double MapCppTrackerMCDigitization::compute_npe(double edep) {
@@ -325,5 +325,5 @@ void MapCppTrackerMCDigitization::save_to_json(SciFiEvent &evt) {
     js_event.append(digits_in_event);
   }
   if (!js_event.isNull())
-    root["digits"].append(js_event);
+    root["tracker_digits"].append(js_event);
 }
