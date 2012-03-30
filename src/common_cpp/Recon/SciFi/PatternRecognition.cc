@@ -591,8 +591,8 @@ void PatternRecognition::make_helix(
   } // ~Loop over intermediate stations
 } // ~initial_circle(...)
 
-bool PatternRecognition::initial_circle(CLHEP::Hep3Vector p1, CLHEP::Hep3Vector p2,
-                                        CLHEP::Hep3Vector p3, SimpleCircle &circle) {
+bool PatternRecognition::initial_circle(const CLHEP::Hep3Vector &p1, const CLHEP::Hep3Vector &p2,
+                                        const CLHEP::Hep3Vector &p3, SimpleCircle &circle) {
 
   CLHEP::HepMatrix a(3, 3); // Rows, columns
   CLHEP::HepMatrix d(3, 3);
@@ -676,7 +676,7 @@ bool PatternRecognition::initial_circle(CLHEP::Hep3Vector p1, CLHEP::Hep3Vector 
   return true;
 }
 
-double PatternRecognition::delta_R(SimpleCircle circle, CLHEP::Hep3Vector pos) {
+double PatternRecognition::delta_R(const SimpleCircle &circle, const CLHEP::Hep3Vector &pos) {
 
   double x0 = circle.get_x0();
   double y0 = circle.get_y0();
@@ -690,7 +690,7 @@ double PatternRecognition::delta_R(SimpleCircle circle, CLHEP::Hep3Vector pos) {
 }
 
 void PatternRecognition::calculate_dipangle(const std::map<int, SciFiSpacePoint*> &spnts,
-                                            const SimpleCircle circle, SimpleLine &line_sz) {
+                                            const SimpleCircle &circle, SimpleLine &line_sz) {
 
   int num_points = static_cast<int>(spnts.size());
 
@@ -739,8 +739,7 @@ void PatternRecognition::calculate_dipangle(const std::map<int, SciFiSpacePoint*
     // if (ok) --> do linear fit.
 }
 
-double PatternRecognition::calculate_Phi(const double xpos, const double ypos,
-                                         const SimpleCircle circle) {
+double PatternRecognition::calculate_Phi(double xpos, double ypos, const SimpleCircle &circle) {
 
   double angle = atan2(ypos - circle.get_y0(), xpos - circle.get_x0());
 
@@ -818,7 +817,7 @@ void PatternRecognition::circle_fit(const std::map<int, SciFiSpacePoint*> &spnts
   circle.set_chisq(xchi2 / num_points);
 }
 
-bool PatternRecognition::turns_between_stations(const std::vector<double> dz,
+bool PatternRecognition::turns_between_stations(const std::vector<double> &dz,
                                                 std::vector<double> &dphi) {
 
   //  Make sure that you have enough points to make a line (2)
@@ -845,8 +844,8 @@ bool PatternRecognition::turns_between_stations(const std::vector<double> dz,
   } // end j
 }
 
-bool PatternRecognition::AB_ratio(double &dphi_kj, double &dphi_ji, const double dz_kj,
-                                  const double dz_ji) {
+bool PatternRecognition::AB_ratio(double &dphi_kj, double &dphi_ji, double dz_kj,
+                                  double dz_ji) {
 
   double A, B;
   for ( int n = 0; n < 5; ++n )

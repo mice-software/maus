@@ -32,21 +32,31 @@ class SimpleCircle {
 
     // Getters
     double get_x0() const { return _x0; }
+    double get_x0_err() const { return _x0_err; }
     double get_y0() const { return _y0; }
+    double get_y0_err() const (return _y0_err; }
     double get_R() const { return _R; }
+    double get_R_err() const { return _R_err; }
     double get_chisq() const { return _chisq; }
 
     // Setters
     void set_x0(double x0) { _x0 = x0; }
+    void set_x0_err(double x0_err) { _x0_err = x0_err; }
     void set_y0(double y0) { _y0 = y0; }
+    void set_y0_err(double y0_err) { _y0_err = y0_err; }
     void set_R(double R) { _R = R; }
+    void set_R_err(double R_err) { _R_err = R_err; }
     void set_chisq(double chisq) { _chisq = chisq; }
-    void set_parameters(double x0, double y0, double R, double chisq);
+    void set_parameters(double x0, double x0_err, double y0, double y0_err,
+                        double R, double R_err, double chisq);
 
   private:
     double _x0;
+    double _x0_err;
     double _y0;
+    double y0_err;
     double _R;
+    double _R_err;
     double _chisq;
 };
 // } // ~namespace MAUS

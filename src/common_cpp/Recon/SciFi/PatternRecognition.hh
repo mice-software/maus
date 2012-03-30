@@ -193,8 +193,8 @@ class PatternRecognition {
      *  @param circle - The output circle fit
      *
      */
-    bool initial_circle(const CLHEP::Hep3Vector p1, const CLHEP::Hep3Vector p2,
-                        const CLHEP::Hep3Vector p3, SimpleCircle &circle);
+    bool initial_circle(const CLHEP::Hep3Vector &p1, const CLHEP::Hep3Vector &p2,
+                        const CLHEP::Hep3Vector &p3, SimpleCircle &circle);
 
     /** @brief Find points from intermediate stations which fit to the "trial track"
      *
@@ -203,7 +203,7 @@ class PatternRecognition {
      * acceptable with a cut, and if they are, append them to the trial track.
      *
      */
-    double delta_R(const SimpleCircle circle, const CLHEP::Hep3Vector pos);
+    double delta_R(const SimpleCircle &circle, const CLHEP::Hep3Vector &pos);
 
     /** @brief Fit a circle to all spacepoints in "trail track"
      *
@@ -227,7 +227,7 @@ class PatternRecognition {
      *
      */
     void calculate_dipangle(const std::map<int, SciFiSpacePoint*> &spnts,
-                            const SimpleCircle circle, SimpleLine &line_sz);
+                            const SimpleCircle &circle, SimpleLine &line_sz);
 
     /** @brief Calculate the turning angle of a spacepoint w.r.t. helix center
      *
@@ -236,7 +236,7 @@ class PatternRecognition {
      * @param circle - Contains the helix center
      *
      */
-    double calculate_Phi(const double xpos, const double ypos, const SimpleCircle circle);
+    double calculate_Phi(double xpos, double ypos, const SimpleCircle &circle);
 
     /** @brief Account for possible 2*pi rotations between stations
      *
@@ -250,7 +250,7 @@ class PatternRecognition {
      * @param dphi - a vector containing the differences in phi b/w stations, phi_j - phi_i
      *
      */
-    bool turns_between_stations(const std::vector<double> dz, std::vector<double> &dphi);
+    bool turns_between_stations(const std::vector<double> &dz, std::vector<double> &dphi);
 
     /** @brief Check that the ratio between the change in z and change in phi is appropriate
      *
@@ -262,7 +262,7 @@ class PatternRecognition {
      *  @param dz_ji - dz_j - dz_i where j > i
      *
      */
-    bool AB_ratio(double &dphi_kj, double &dphi_ji, const double dz_kj, const double dz_ji);
+    bool AB_ratio(double &dphi_kj, double &dphi_ji, double dz_kj, double dz_ji);
 
     /** @brief Determine which two stations the initial line should be drawn between
      * 
