@@ -78,9 +78,9 @@ std::string MapCppTrackerRecon::process(std::string document) {
         spacepoint_recon(event);
       }
       // Pattern Recognition.
-      // if ( event.spacepoints().size() ) {
-        // pattern_recognition(event);
-      // }
+      if ( event.spacepoints().size() ) {
+        pattern_recognition(event);
+      }
 
       // Kalman Track Fit.
       // if ( event.helicalprtracks().size() ) {
@@ -120,12 +120,10 @@ void MapCppTrackerRecon::fill_digits_vector(Json::Value &digits_event, SciFiSpil
   for ( unsigned int i = 0; i < digits_event.size(); i++ ) {
     SciFiEvent* an_event = new SciFiEvent();
     Json::Value digits;
-    std::cout << "about to store digits.." << std::endl;
     digits = digits_event[i];
     for ( unsigned int j = 0; j < digits.size(); j++ ) {
       Json::Value digit;
       digit = digits[j];
-      std::cout << "found tracker digit." << std::endl;
       int tracker, station, plane, channel;
       double npe, time;
       tracker = digit["tracker"].asInt();
