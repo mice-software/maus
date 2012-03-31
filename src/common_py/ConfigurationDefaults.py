@@ -221,7 +221,7 @@ geometry_upload_valid_from = "" # date-time in format like: that the specified i
 geometry_upload_cleanup = True # set to True to clean up after upload
 
 
-# this is used by ImputCppRealData
+# this is used by ImputCppDAQData
 Number_of_DAQ_Events = -1
 Phys_Events_Only = False
 Calib_Events_Only = False
@@ -245,6 +245,14 @@ Enable_EMR = True
 Enable_KL = True
 Enable_CKOV = True
 DAQ_cabling_file = "/files/cabling/DAQChannelMap.txt"
+DAQ_hostname = 'miceraid1a'
+DAQ_monitor_name = 'MICE_Online_Monitor'
+
+#cerenkov digitization
+ckov_position_threshold = 40
+ckov_pulse_area_threshold = 1
+ckov_window_min = 19
+ckov_window_max = 80
 
 #cerenkov digitization
 ckov_position_threshold = 40
@@ -288,9 +296,8 @@ doc_collection_name = "spills" # Default document collection name. Only needed i
 mongodb_host = "localhost" # Default MongoDB host name. Only needed if using MongoDBDocumentStore.
 mongodb_port = 27017 # Default MongoDB port. Only needed if using MongoDBDocumentStore.
 mongodb_database_name = "mausdb" # Default MongoDB database name. Only needed if using MongoDBDocumentStore.
+mongodb_collection_name = "spills" # Default MongoDB collection name. Only needed if using MongoDBDocumentStore.
 
 # Default OutputPyImage image directory. MAUS web application directory.
 image_directory = os.environ.get("MAUS_WEB_MEDIA_RAW") if (os.environ.get("MAUS_WEB_MEDIA_RAW") != None) else os.getcwd()
-# Default OutputPyFile output directory. MAUS web application directory.
-output_file_directory = os.environ.get("MAUS_WEB_MEDIA_RAW") if (os.environ.get("MAUS_WEB_MEDIA_RAW") != None) else os.getcwd()
 

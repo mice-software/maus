@@ -15,28 +15,26 @@
  *
  */
 
-#ifndef _MAUS_SRC_INPUT_INPUTCPPDAQDATA_INPUTCPPDAOFFLINEQDATA_H__
-#define _MAUS_SRC_INPUT_INPUTCPPDAQDATA_INPUTCPPDAQOFFLINEDATA_H__
+#ifndef _MAUS_SRC_INPUT_INPUTCPPDAQONLINEDATA_INPUTCPPDAQONLINEDATA_H__
+#define _MAUS_SRC_INPUT_INPUTCPPDAQONLINEDATA_INPUTCPPDAQONLINEDATA_H__
 
 #include <string>
 
-#include "unpacking/MDfileManager.h"
-
 #include "src/input/InputCppDAQData/InputCppDAQData.hh"
+#include "src/input/InputCppDAQOnlineData/MDmonitoring.hh"
 
-
-class InputCppDAQOfflineData : public InputCppDAQData {
+class InputCppDAQOnlineData : public InputCppDAQData {
 
  public:
 
-  /** Create an instance of InputCppDAQData.
+  /** Create an instance of InputCppDAQOnlineData.
   * 
-  * This is the constructor for InputCppDAQData.
+  * This is the constructor for InputCppDAQOnlineData.
   *
   * \param[in] pDataPath The (directory) path to read the data from
   * \param[in] pFilename The filename to read from the pDataPath directory
   */
-  InputCppDAQOfflineData(std::string pDataPath = "", std::string pFilename = "");
+  InputCppDAQOnlineData();
 
   /** Initialise the Unpacker.
   *
@@ -55,41 +53,15 @@ class InputCppDAQOfflineData : public InputCppDAQData {
   */
   bool readNextEvent();
 
+  void setMonitorSrc(std::string mon) {
+    _dataManager->setMonSrc(mon);
+    _dataManager->Init();
+  }
+
  private:
 
-  /** File manager object. */
-  MDfileManager _dataFileManager;
-
-  /** Paths to the data.
-  * This string has to contain one or more space separated paths.
-  */
-  std::string _dataPaths;
-
-  /** File and run names within _dataPaths.
-  * This string has to contain one or more space separated
-  * file names or run numbers.
-  */
-  std::string _datafiles;
-
- /** Max number of DAQ events to be processed.
-  */ 
-  int _maxNumEvents;
-
- /** Counter of the DAQ events.
-  */
-  int _eventsCount;
-
- /** If this is true only the phys. evens will be processed.
-  */
-  bool _phys_Events_Only;
-
-   /** If this is true only the calib. evens will be processed.
-  */
-  bool _calib_Events_Only;
+  /** Data manager object. */
+  MDmonitoring * _dataManager;
 };
 
-#endif
-
-
-
-
+#endif  // _MAUS_INPUTCPPDAQDATA_INPUTCPPDAQDATA_H__
