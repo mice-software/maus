@@ -158,7 +158,7 @@ void MapCppTrackerRecon::pattern_recognition(SciFiEvent &evt) {
 
 void MapCppTrackerRecon::track_fit(SciFiEvent &evt) {
   KalmanTrackFit fit;
-  fit.process(evt);
+  fit.process(evt,modules);
 }
 
 void MapCppTrackerRecon::save_to_json(SciFiEvent &evt) {
