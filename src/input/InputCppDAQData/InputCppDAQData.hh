@@ -200,6 +200,7 @@ class InputCppDAQData {
     VmefAdc1731 = 121,
     VmeScaler = 111,
     DBB = 141,
+    VLSB = 132,
     VLSB_C = 80
   };
 

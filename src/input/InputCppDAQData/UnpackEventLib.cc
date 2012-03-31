@@ -267,6 +267,7 @@ int V830DataProcessor::Process(MDdataContainer* aFragPtr) {
 int VLSBDataProcessor::Process(MDdataContainer* aFragPtr) {
   // Cast the argument to structure it points to.
   // This process should be called only with MDfragmentVLSB_C argument.
+  std::cout << "Entering VLSB data processor" << std::endl;
   if ( typeid(*aFragPtr) != typeid(MDfragmentVLSB) )
     return CastError;
 
@@ -276,6 +277,7 @@ int VLSBDataProcessor::Process(MDdataContainer* aFragPtr) {
   if ( !xVLSBFragment->IsValid() )
     return GenericError;
 
+  std::cout << "survived." << std::endl;
   int xLdc, xAdc, xPartEv;
   string xDetector;
   // Put static data into the Json
@@ -285,6 +287,8 @@ int VLSBDataProcessor::Process(MDdataContainer* aFragPtr) {
     xDetector = "tracker1";
   if (xLdc == 2)
     xDetector = "tracker2";
+  if (xLdc == 3)
+    xDetector = "single_station";
 
   pBoardDoc["detector"]             = xDetector;
   pBoardDoc["equip_type"]           = this->GetEquipmentType();
