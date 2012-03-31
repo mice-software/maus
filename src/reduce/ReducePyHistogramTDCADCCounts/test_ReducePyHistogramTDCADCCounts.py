@@ -327,7 +327,8 @@ class ReducePyHistogramTDCADCCountsTestCase(unittest.TestCase): # pylint: disabl
         else:
             tag = "tdcadc"
         self.assertEquals(tag, image["tag"], "Unexpected tag")
-        self.assertTrue("content" in image, "No content field")
+        self.assertTrue("keywords" in image, "No keywords field")
+        self.assertTrue("description" in image, "No description field")
         self.assertTrue("data" in image, "No data field")
         decoded_data = base64.b64decode(image["data"])
         self.assertTrue(decoded_data.find("EPS") != -1,
@@ -335,11 +336,12 @@ class ReducePyHistogramTDCADCCountsTestCase(unittest.TestCase): # pylint: disabl
 
     def test_end_of_run(self):
         """
-        Test "process" with a JSON document with an "END_OF_RUN"
-        entry.
+        Test "process" with a JSON document which is an end_of_run.
         @param self Object reference.
         """
-        result = self.__process({"END_OF_RUN":"END_OF_RUN"})
+        end_of_run = {"daq_data":None, "daq_event_type":"end_of_run", \
+            "run_num":1, "spill_num":-1}
+        result = self.__process(end_of_run)
         self.assertEquals({}, result, "Expected empty output spill")
 
     def tearDown(self):

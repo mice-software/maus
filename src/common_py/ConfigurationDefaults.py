@@ -282,14 +282,15 @@ daq_data_file = '02873.003' # file name for daq data; if this is just a integer 
 maus_version = "" # set at runtime - do not edit this (changes are ignored)
 configuration_file = "" # should be set on the command line only (else ignored)
 
-doc_store_class = "docstore.InMemoryDocumentStore.InMemoryDocumentStore"
-couchdb_url = "http://localhost:5984" # Default CouchDB URL. Only needed if using CouchDBDocumentStore.
-couchdb_database_name = "mausdb" # Default CouchDB database name. Only needed if using CouchDBDocumentStore.
+doc_store_class = "docstore.MongoDBDocumentStore.MongoDBDocumentStore"
+doc_collection_name = "spills" # Default document collection name. Only needed if using multi_process mode. If "auto" then a collection name will be auto-generated for spills output by input-transform workflows.
 
 mongodb_host = "localhost" # Default MongoDB host name. Only needed if using MongoDBDocumentStore.
 mongodb_port = 27017 # Default MongoDB port. Only needed if using MongoDBDocumentStore.
 mongodb_database_name = "mausdb" # Default MongoDB database name. Only needed if using MongoDBDocumentStore.
-mongodb_collection_name = "spills" # Default MongoDB collection name. Only needed if using MongoDBDocumentStore.
 
-ckov_position_threshold = 40
+# Default OutputPyImage image directory. MAUS web application directory.
+image_directory = os.environ.get("MAUS_WEB_MEDIA_RAW") if (os.environ.get("MAUS_WEB_MEDIA_RAW") != None) else os.getcwd()
+# Default OutputPyFile output directory. MAUS web application directory.
+output_file_directory = os.environ.get("MAUS_WEB_MEDIA_RAW") if (os.environ.get("MAUS_WEB_MEDIA_RAW") != None) else os.getcwd()
 

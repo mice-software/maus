@@ -20,7 +20,7 @@ from types import ListType
 from types import StringType
 from types import UnicodeType
 
-import MAUS
+from MapPyGroup import MapPyGroup
 
 class WorkerUtilities: # pylint: disable=W0232
     """
@@ -40,8 +40,9 @@ class WorkerUtilities: # pylint: disable=W0232
         ["MapCppTOFDigits", "MapCppTOFSlabHits", "MapCppTOFSpacePoint"]
         ["MapCppTOFDigits", ["MapCppTOFSlabHits", "MapCppTOFSpacePoint"]]
         @endverbatim
-        Transforms must be in the MAUS module namespace e.g. 
-        MAUS.MapCppTOFSlabHits.
+        Transforms must be in modules named after the transform class
+        e.g. for the above the transform MapCppTOFSlabHits must be 
+        in a class MapCppTOFSlabHits.MapCppTOFSlabHits.
         @param cls Class reference.
         @param transform Transform name or list of names.
         @return transform object or MapPyGroup object (if given a list).
@@ -50,15 +51,17 @@ class WorkerUtilities: # pylint: disable=W0232
         specifies an unknown transform name.
         """
         if isinstance(transform, ListType):
-            group = MAUS.MapPyGroup()
+            group = MapPyGroup()
             for transform_name in transform:
                 group.append(cls.create_transform(transform_name))
             return group
         elif isinstance(transform, StringType) \
             or isinstance(transform, UnicodeType):
-            if not hasattr(MAUS, transform):
+            try:
+                module_object = __import__(transform)
+            except ImportError: 
                 raise ValueError("No such transform: %s" % transform)
-            transform_class = getattr(MAUS, transform)
+            transform_class = getattr(module_object, transform)
             return transform_class()
         else:
             raise ValueError("Transform name %s is not a string" % transform)
@@ -76,8 +79,9 @@ class WorkerUtilities: # pylint: disable=W0232
         ["MapCppTOFDigits", "MapCppTOFSlabHits", "MapCppTOFSpacePoint"]
         ["MapCppTOFDigits", ["MapCppTOFSlabHits", "MapCppTOFSpacePoint"]]
         @endverbatim
-        Transforms must be in the MAUS module namespace e.g. 
-        MAUS.MapCppTOFSlabHits.
+        Transforms must be in modules named after the transform class
+        e.g. for the above the transform MapCppTOFSlabHits must be 
+        in a class MapCppTOFSlabHits.MapCppTOFSlabHits.
         @param cls Class reference.
         @param transform Transform name or list of names.
         @throws ValueError if transform is not a string or a list,
@@ -89,7 +93,9 @@ class WorkerUtilities: # pylint: disable=W0232
                 cls.validate_transform(transform_name)
         elif isinstance(transform, StringType) \
             or isinstance(transform, UnicodeType):
-            if not hasattr(MAUS, transform):
+            try:
+                __import__(transform)
+            except ImportError: 
                 raise ValueError("No such transform: %s" % transform)
         else:
             raise ValueError("Transform name %s is not a string" % transform)

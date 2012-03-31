@@ -49,6 +49,10 @@ def delete_database(url, database_name, collection_name):
             mongo.drop_database(database_name)
         elif collection_name in mongodb.collection_names():
             mongodb.drop_collection(collection_name)
+        else:
+            print "Collection %s not found" % collection_name
+    else:
+        print "Database %s not found" % database_name
 
 def main(argv):
     """
