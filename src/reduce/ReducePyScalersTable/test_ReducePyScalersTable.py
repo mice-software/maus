@@ -347,8 +347,8 @@ class ReducePyScalersTableTestCase(unittest.TestCase): # pylint: disable=R0904, 
         description = "Scaler counts from channel data for event: %s at time: %s" % (event, time_str) # pylint: disable=C0301
         self.assertEquals(description, table["description"],
             "Unexpected description")
-        self.assertTrue("data" in table, "No data")
-        data = table["data"]
+        self.assertTrue("table_data" in table, "No data")
+        data = table["table_data"]
         self.assertEquals(6, len(data), "Unexpected number of rows")
         for i in range(0, 6):
             row = data[i]

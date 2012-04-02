@@ -143,11 +143,11 @@ class ReducePyScalersTable: # pylint: disable=R0902
     @verbatim
     {"table": {"keywords": [...list of data keywords...],
                "description": "...a description of the data...",
-               "data":[["...average name...", 
+               "table_data":[["...average name...", 
                         LAST_READ_VALUE,
                         AVERAGE_OF_MOST_RECENT_VALUES,
                         AVERAGE_OVER_RUN],
-                       [...,...,...,...],...]}}  
+                        [...,...,...,...],...]}}  
     @endverbatim
 
     In cases where a spill is input that contains errors (e.g. is
@@ -319,7 +319,7 @@ class ReducePyScalersTable: # pylint: disable=R0902
                 scaler.get_recent_value(),
                 scaler.get_recent_average(),
                 scaler.get_average()])
-        content["data"] = rows
+        content["table_data"] = rows
         return table
 
     def get_scalers(self):
