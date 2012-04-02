@@ -141,13 +141,12 @@ class ReducePyScalersTable: # pylint: disable=R0902
     Data is output as JSON documents of general form:
 
     @verbatim
-    {"table": {"keywords": [...list of data keywords...],
-               "description": "...a description of the data...",
-               "table_data":[["...average name...", 
-                        LAST_READ_VALUE,
-                        AVERAGE_OF_MOST_RECENT_VALUES,
-                        AVERAGE_OVER_RUN],
-                        [...,...,...,...],...]}}  
+    {"keywords": [...list of data keywords...],
+     "description": "...a description of the data...",
+     "table_data":[["...average name...", 
+                    LAST_READ_VALUE,
+                    AVERAGE_OF_MOST_RECENT_VALUES,
+                    AVERAGE_OVER_RUN],...]}
     @endverbatim
 
     In cases where a spill is input that contains errors (e.g. is
@@ -298,28 +297,26 @@ class ReducePyScalersTable: # pylint: disable=R0902
 
     def _create_output(self):
         """
-        Create JSON @table@ document for output.
+        Create JSON document for output.
         @param self Object reference.
         @return JSON document.
         """
         table = {}
-        table["table"] = {}
-        content = table["table"]
-        content["keywords"] = ["Scalers"]
+        table["keywords"] = ["Scalers"]
         if (self._time != None):
             time_str = str(datetime.fromtimestamp(self._time))
         else:
             time_str = ""
         description = "Scaler counts from channel data for event: ", \
             self._event, " at time: ", time_str
-        content["description"] = "".join(description)
+        table["description"] = "".join(description)
         rows = []
         for (_, name, scaler) in self._scalers:
             rows.append([name, 
                 scaler.get_recent_value(),
                 scaler.get_recent_average(),
                 scaler.get_average()])
-        content["table_data"] = rows
+        table["table_data"] = rows
         return table
 
     def get_scalers(self):

@@ -336,19 +336,17 @@ class ReducePyScalersTableTestCase(unittest.TestCase): # pylint: disable=R0904, 
         @param time_stamp Time stamp to put in spill.
         @param expected Scaler containing expected results.
         """
-        self.assertTrue("table" in result, "No table")
-        table = result["table"]
-        self.assertTrue("keywords" in table, "No keywords")
-        self.assertTrue("description" in table, "No description")
+        self.assertTrue("keywords" in result, "No keywords")
+        self.assertTrue("description" in result, "No description")
         if (time_stamp != None):
             time_str = datetime.fromtimestamp(time_stamp)
         else:
             time_str = ""
         description = "Scaler counts from channel data for event: %s at time: %s" % (event, time_str) # pylint: disable=C0301
-        self.assertEquals(description, table["description"],
+        self.assertEquals(description, result["description"],
             "Unexpected description")
-        self.assertTrue("table_data" in table, "No data")
-        data = table["table_data"]
+        self.assertTrue("table_data" in result, "No data")
+        data = result["table_data"]
         self.assertEquals(6, len(data), "Unexpected number of rows")
         for i in range(0, 6):
             row = data[i]
