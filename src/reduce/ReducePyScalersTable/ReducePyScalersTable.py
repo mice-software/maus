@@ -159,7 +159,6 @@ class ReducePyScalersTable: # pylint: disable=R0902
         """
         # Channel IDs.
         self._channels = ["ch0", "ch1", "ch2", "ch3", "ch4", "ch12"]
-
         # Channel ID, scaler name, counts.
         self._scalers = []
         self._scalers.append(("ch0", "Triggers", Scaler()))
@@ -199,13 +198,11 @@ class ReducePyScalersTable: # pylint: disable=R0902
             json_doc = {}
             ErrorHandler.HandleException(json_doc, self)
             return unicode(json.dumps(json_doc))
-
         try:
             result = self._process_spill(json_doc)
         except Exception: # pylint:disable=W0703
             ErrorHandler.HandleException(json_doc, self)
             return unicode(json.dumps(json_doc))
-
         # Convert result to string.
         doc_list = [json.dumps(result), "\n"]
         return unicode("".join(doc_list))
@@ -269,25 +266,12 @@ class ReducePyScalersTable: # pylint: disable=R0902
         if  "ch0" not in hits:
             raise KeyError("ch0 is not in spill")
 
-        event = scalers["phys_event_number"]
-        time = scalers["time_stamp"]
-        self._update_data(hits, event, time)
-
-        return self._create_output()
-
-    def _update_data(self, hits, event, time):
-        """
-        Update data used to calculate averages with information
-        from the current spill.
-        @param self Object reference.
-        @param hits Data from current spill.        
-        @param event Physical event number.
-        @param time Time stamp.
-        """
-        self._event = event
-        self._time = time
+        # Update
+        self._event = scalers["phys_event_number"]
+        self._time = scalers["time_stamp"]
         for (channel, _, scaler) in self._scalers:
             scaler.add_value(hits[channel])
+        return self._create_output()
 
     def _create_output(self):
         """
@@ -310,6 +294,7 @@ class ReducePyScalersTable: # pylint: disable=R0902
         for (_, name, scaler) in self._scalers:
             rows.append([name, 
                 scaler.get_recent_value(),
-                scaler.get_recent_average()])
+                scaler.get_recent_average(),
+                scaler.get_average()])
         content["data"] = rows
         return table

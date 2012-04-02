@@ -255,7 +255,10 @@ class ReducePyScalersTableTestCase(unittest.TestCase): # pylint: disable=R0904, 
         spill = ReducePyScalersTableTestCase.__get_spill( \
             "process_spill", current_time, 1)
         result = self.__process(spill)
-        self.__check_result(result, "process_spill", current_time, 1, 1)
+        # Scalar, for validation.
+        expected = Scaler()
+        expected.add_value(1)
+        self.__check_result(result, "process_spill", current_time, expected)
 
     def test_process_multiple_spills(self):
         """
@@ -264,24 +267,21 @@ class ReducePyScalersTableTestCase(unittest.TestCase): # pylint: disable=R0904, 
         values.
         @param self Object reference.
         """
+        # Scalar, for validation.
+        expected = Scaler()
         for i in range(0, 14):
-            # Calculate expected values.
-            base = i - 9
-            if (base < 0):
-                base = 0
-            values = range(base, i + 1)
-            average = sum(values) / len(values)
+            expected.add_value(i)
             event = "multiple_spills %d" % i
             current_time = time.time()
             spill = ReducePyScalersTableTestCase.__get_spill( \
                 event, current_time, i)
             result = self.__process(spill)
-            self.__check_result(result, event, current_time, i, average)
+            self.__check_result(result, event, current_time, expected)
         # Send down an end of run.
         end_of_run = {"daq_data":None, "daq_event_type":"end_of_run", \
             "run_num":1, "spill_num":-1}
         result = self.__process(end_of_run)
-        self.__check_result(result, event, current_time, 13, average)
+        self.__check_result(result, event, current_time, expected)
 
     def test_end_of_run(self):
         """
@@ -291,19 +291,18 @@ class ReducePyScalersTableTestCase(unittest.TestCase): # pylint: disable=R0904, 
         end_of_run = {"daq_data":None, "daq_event_type":"end_of_run", \
             "run_num":1, "spill_num":-1}
         result = self.__process(end_of_run)
-        self.__check_result(result, "", None, 0, 0)
+        self.__check_result(result, "", None, Scaler())
         result = self.__process(end_of_run)
         self.assertEquals({}, result, "Unexpected spill after end_of_run")
 
-    def __check_result(self, result, event, time_stamp, value, average): # pylint: disable=R0913, C0301
+    def __check_result(self, result, event, time_stamp, expected): # pylint: disable=R0913, C0301
         """
         Check result spill for process.
         @param self Object reference. 
         @param result spill to validate.
         @param event Event ID to put in spill.
         @param time_stamp Time stamp to put in spill.
-        @param value Expected value.
-        @param average Expected average.
+        @param expected Scaler containing expected results.
         """
         self.assertTrue("table" in result, "No table")
         table = result["table"]
@@ -321,8 +320,12 @@ class ReducePyScalersTableTestCase(unittest.TestCase): # pylint: disable=R0904, 
         self.assertEquals(6, len(data), "Unexpected number of rows")
         for i in range(0, 6):
             row = data[i]
-            self.assertEquals(value, row[1], "Unexpected value")
-            self.assertEquals(average, row[2], "Unexpected average")
+            self.assertEquals(expected.get_recent_value(), 
+                row[1], "Unexpected recent value")
+            self.assertEquals(expected.get_recent_average(), 
+                row[2], "Unexpected recent average")
+            self.assertEquals(expected.get_average(), 
+                row[3], "Unexpected average")
 
     def tearDown(self):
         """
