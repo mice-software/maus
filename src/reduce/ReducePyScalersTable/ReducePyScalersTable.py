@@ -27,17 +27,17 @@ class Scaler:
     @class ReducePyScalersTable.Scaler maintains the total sum
     of values for a scaler as well as the last N values.
     """
-    def __init__(self, window = 11):
+    def __init__(self, recent_window = 10):
         """
         Set initial attribute values.
         @param self Object reference.
-        @param window Window size determining last N values to
+        @param recent_window Window size determining last N values to
         hold.
         """
-        self._total  = 0  # Total to date.
-        self._count  = 0  # Count of values added to total.
-        self._window = window 
-        self._recent = [] # list of last _window values.
+        self._total = 0  # Total to date.
+        self._count = 0  # Count of values added to total.
+        self._recent_window = recent_window 
+        self._recent = [] # list of last _recent_window values.
  
     def add_value(self, value):
         """
@@ -50,7 +50,7 @@ class Scaler:
         self._total += value
         self._count += 1
         self._recent.append(value)
-        if len(self._recent) == self._window:
+        if len(self._recent) > self._recent_window:
             self._recent.pop(0)
  
     def get_count(self):
@@ -61,13 +61,21 @@ class Scaler:
         """
         return self._count
 
+    def set_recent_window(self, recent_window):
+        """
+        Set number of recent values that will be held.
+        @param self Object reference.
+        @param recent_window Recent window size.
+        """
+        self._recent_window = recent_window
+
     def get_recent_window(self):
         """
         Get number of recent values that will be held.
         @param self Object reference.
         @return window
         """
-        return self._window
+        return self._recent_window
 
     def get_average(self):
         """
@@ -137,7 +145,7 @@ class ReducePyScalersTable: # pylint: disable=R0902
                "description": "...a description of the data...",
                "data":[["...average name...", 
                         LAST_READ_VALUE,
-                        AVERAGE_OF_LAST_10_VALUES,
+                        AVERAGE_OF_MOST_RECENT_VALUES,
                         AVERAGE_OVER_RUN],
                        [...,...,...,...],...]}}  
     @endverbatim
@@ -150,6 +158,12 @@ class ReducePyScalersTable: # pylint: disable=R0902
     @verbatim
     {"errors": {..., "bad_json_document": "unable to do json.loads on input"}}
     @endverbatim
+
+    The caller can configure the worker and specify:
+
+    -Recent scalers window ("recent_scalers_window"). Default: 10. 
+     Number of most recent values for which MOST_RECENT_AVERAGE above
+     is calculated. 
     """
 
     def __init__(self):
@@ -159,18 +173,23 @@ class ReducePyScalersTable: # pylint: disable=R0902
         """
         # Channel IDs.
         self._channels = ["ch0", "ch1", "ch2", "ch3", "ch4", "ch12"]
+        # Recent window size.
+        self._recent_window = 10
         # Channel ID, scaler name, counts.
         self._scalers = []
-        self._scalers.append(("ch0", "Triggers", Scaler()))
-        self._scalers.append(("ch1", "Trigger Requests", Scaler()))
-        self._scalers.append(("ch2", "GVA", Scaler()))
-        self._scalers.append(("ch3", "TOF0", Scaler()))
-        self._scalers.append(("ch4", "TOF1", Scaler()))
-        self._scalers.append(("ch12", "10 MHz clock", Scaler()))
-        self._event            = ""
-        self._time             = None
+        self._scalers.append(("ch0", "Triggers", 
+            Scaler(self._recent_window)))
+        self._scalers.append(("ch1", "Trigger Requests", 
+            Scaler(self._recent_window)))
+        self._scalers.append(("ch2", "GVA", Scaler(self._recent_window)))
+        self._scalers.append(("ch3", "TOF0", Scaler(self._recent_window)))
+        self._scalers.append(("ch4", "TOF1", Scaler(self._recent_window)))
+        self._scalers.append(("ch12", "10 MHz clock",
+            Scaler(self._recent_window)))
+        self._event = ""
+        self._time = None
         # Has an end_of_run been processed?
-        self._run_ended        = False
+        self._run_ended = False
 
     def birth(self, config_json): # pylint: disable=W0613
         """
@@ -180,6 +199,9 @@ class ReducePyScalersTable: # pylint: disable=R0902
         @param config_json JSON document string.
         @returns True if configuration succeeded. 
         """
+        config_doc = json.loads(config_json)
+        if 'recent_scalers_window' in config_doc:
+            self._recent_window = int(config_doc["recent_scalers_window"])
         self._reset_data()
         return True
 
@@ -223,6 +245,7 @@ class ReducePyScalersTable: # pylint: disable=R0902
         """
         for (_, _, scaler) in self._scalers:
             scaler.clear()
+            scaler.set_recent_window(self._recent_window)
         self._event     = ""
         self._time      = None
         self._run_ended = False
@@ -298,3 +321,13 @@ class ReducePyScalersTable: # pylint: disable=R0902
                 scaler.get_average()])
         content["data"] = rows
         return table
+
+    def get_scalers(self):
+        """
+        Get scaler counts.
+        @param self Object reference.
+        @return ordered list of scaler counts in form 
+        (CHANNEL_NAME, SCALER_NAME, SCALER).
+        """
+        return self._scalers
+ 

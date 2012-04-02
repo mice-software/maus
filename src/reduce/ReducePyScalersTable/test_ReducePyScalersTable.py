@@ -45,7 +45,7 @@ class ScalerTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         """
         self.assertEquals(0, self.__scaler.get_count(), 
             "Unexpected count")
-        self.assertEquals(11, self.__scaler.get_recent_window(), 
+        self.assertEquals(10, self.__scaler.get_recent_window(), 
             "Unexpected window")
         self.assertEquals(0, self.__scaler.get_average(), 
             "Unexpected average")
@@ -54,7 +54,7 @@ class ScalerTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         self.assertEquals(0, self.__scaler.get_recent_value(), 
             "Unexpected recent value")
 
-    def test_window(self):
+    def test_init_recent_window(self):
         """
         Test setting a new window in the constructor.
         @param self Object reference.
@@ -62,6 +62,18 @@ class ScalerTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         scaler = Scaler(123)
         self.assertEquals(123, scaler.get_recent_window(), 
             "Unexpected window")
+
+    def test_set_recent_window(self):
+        """
+        Test setting a new window.
+        @param self Object reference.
+        """
+        scaler = Scaler()
+        self.assertEquals(10, scaler.get_recent_window(), 
+            "Unexpected window")
+        scaler.set_recent_window(123)
+        self.assertEquals(123, scaler.get_recent_window(), 
+            "Unexpected window after set_recent_window")
 
     def test_add_value_clear(self):
         """
@@ -93,10 +105,10 @@ class ScalerTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         self.assertEquals(sum(values) / len(values), 
             self.__scaler.get_average(), 
             "Unexpected average")
-        start = len(values) - self.__scaler.get_recent_window() + 1
+        start = len(values) - self.__scaler.get_recent_window()
         end = len(values)
         self.assertEquals(
-            sum(values[start:end]) / (self.__scaler.get_recent_window() - 1),
+            sum(values[start:end]) / self.__scaler.get_recent_window(),
             self.__scaler.get_recent_average(), 
             "Unexpected recent average")
         self.assertEquals(19, self.__scaler.get_recent_value(), 
@@ -123,6 +135,26 @@ class ReducePyScalersTableTestCase(unittest.TestCase): # pylint: disable=R0904, 
         success = self.__reducer.birth("{}")
         if not success:
             raise Exception('Test setUp failed', 'reducer.birth() failed')
+
+    def test_get_scalers(self):
+        """
+        Test get_scalers.
+        @param self Object reference.
+        """
+        self.assertEquals(6, len(self.__reducer.get_scalers()),
+            "Unexpected number of scalers")
+
+    def test_recent_scalers_window(self):
+        """
+        Test birth where a recent_scalers_window is given.
+        @param self Object reference.
+        """
+        reducer = ReducePyScalersTable()
+        reducer.birth("""{"recent_scalers_window":123}""")
+        (_, _, scaler) = reducer.get_scalers()[0]
+        # Check that the value was passed down to the scalers.
+        self.assertEquals(123, scaler.get_recent_window(),
+            "Unexpected recent window")
 
     def test_invalid_json(self):
         """
