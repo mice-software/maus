@@ -595,9 +595,9 @@ bool PatternRecognition::initial_circle(const CLHEP::Hep3Vector &p1, const CLHEP
                                         const CLHEP::Hep3Vector &p3, SimpleCircle &circle) {
 
   CLHEP::HepMatrix a(3, 3); // Rows, columns
-  CLHEP::HepMatrix d(3, 3);
-  CLHEP::HepMatrix e(3, 3);
-  CLHEP::HepMatrix f(3, 3);
+  CLHEP::HepMatrix b(3, 3);
+  CLHEP::HepMatrix g(3, 3);
+  CLHEP::HepMatrix k(3, 3);
 
   // Row 1
   a[0][0] = p1.x();
@@ -613,56 +613,56 @@ bool PatternRecognition::initial_circle(const CLHEP::Hep3Vector &p1, const CLHEP
   a[2][2] = 1.;
 
   // Row 1
-  d[0][0] = p1.x() * p1.x() + p1.y() * p1.y();
-  d[0][1] = p1.y();
-  d[0][2] = 1.;
+  b[0][0] = p1.x() * p1.x() + p1.y() * p1.y();
+  b[0][1] = p1.y();
+  b[0][2] = 1.;
   // Row 2
-  d[1][0] = p2.x() * p2.x() + p2.y() * p2.y();
-  d[1][1] = p2.y();
-  d[1][2] = 1.;
+  b[1][0] = p2.x() * p2.x() + p2.y() * p2.y();
+  b[1][1] = p2.y();
+  b[1][2] = 1.;
   // Row 3
-  d[2][0] = p3.x() * p3.x() + p3.y() * p3.y();
-  d[2][1] = p3.y();
-  d[2][2] = 1.;
+  b[2][0] = p3.x() * p3.x() + p3.y() * p3.y();
+  b[2][1] = p3.y();
+  b[2][2] = 1.;
 
   // Row 1
-  e[0][0] = p1.x() * p1.x() + p1.y() * p1.y();
-  e[0][1] = p1.x();
-  e[0][2] = 1.;
+  g[0][0] = p1.x() * p1.x() + p1.y() * p1.y();
+  g[0][1] = p1.x();
+  g[0][2] = 1.;
   // Row 2
-  e[1][0] = p2.x() * p2.x() + p2.y() * p2.y();
-  e[1][1] = p2.x();
-  e[1][2] = 1.;
+  g[1][0] = p2.x() * p2.x() + p2.y() * p2.y();
+  g[1][1] = p2.x();
+  g[1][2] = 1.;
   // Row 3
-  e[2][0] = p3.x() * p3.x() + p3.y() * p3.y();
-  e[2][1] = p3.x();
-  e[2][2] = 1.;
+  g[2][0] = p3.x() * p3.x() + p3.y() * p3.y();
+  g[2][1] = p3.x();
+  g[2][2] = 1.;
 
   // Row 1
-  f[0][0] = p1.x() * p1.x() + p1.y() * p1.y();
-  f[0][1] = p1.x();
-  f[0][2] = p1.y();
+  k[0][0] = p1.x() * p1.x() + p1.y() * p1.y();
+  k[0][1] = p1.x();
+  k[0][2] = p1.y();
   // Row 2
-  f[1][0] = p2.x() * p2.x() + p2.y() * p2.y();
-  f[1][1] = p2.x();
-  f[1][2] = p2.y();
+  k[1][0] = p2.x() * p2.x() + p2.y() * p2.y();
+  k[1][1] = p2.x();
+  k[1][2] = p2.y();
   // Row 3
-  f[2][0] = p3.x() * p3.x() + p3.y() * p3.y();
-  f[2][1] = p3.x();
-  f[2][2] = p3.y();
+  k[2][0] = p3.x() * p3.x() + p3.y() * p3.y();
+  k[2][1] = p3.x();
+  k[2][2] = p3.y();
 
   double detA = a.determinant();
-  double detD = - d.determinant();
-  double detE = e.determinant();
-  double detF = - f.determinant();
+  double detB = - b.determinant();
+  double detG = g.determinant();
+  double detK = - k.determinant();
 
   if (detA == 0)
     return false;
 
-  double x0 = - detD / (2. * detA);
-  double y0 = - detE / (2. * detA);
+  double x0 = - detB / (2. * detA);
+  double y0 = - detG / (2. * detA);
 
-  double det = ( detD * detD + detE * detE ) / (4. * detA * detA ) - ( detF / detA );
+  double det = ( detB * detB + detG * detG ) / (4. * detA * detA ) - ( detK / detA );
 
   if (det < 0.)
     return false;
@@ -672,21 +672,34 @@ bool PatternRecognition::initial_circle(const CLHEP::Hep3Vector &p1, const CLHEP
   circle.set_x0(x0);
   circle.set_y0(y0);
   circle.set_R(r);
+  circle.set_alpha(detA);
+  circle.set_beta(detB);
+  circle.set_gamma(detG);
+  circle.set_kappa(detK);
 
   return true;
 }
 
 double PatternRecognition::delta_R(const SimpleCircle &circle, const CLHEP::Hep3Vector &pos) {
 
-  double x0 = circle.get_x0();
-  double y0 = circle.get_y0();
-  double R = circle.get_R();
+  // double x0 = circle.get(x0);
+  // double y0 = circle.get(y0);
+  // double R = circle.get(R);
+  double alpha = circle.get_alpha();
+  double beta = circle.get_beta();
+  double gamma = circle.get_gamma();
+  double kappa = circle.get_kappa();
 
-  double R_i = sqrt((pos.x() - x0)*(pos.x() - x0) + (pos.y() - y0)*(pos.y() - y0));
+  //  Expression too long for one line so we break it down into terms
+  double t_1 = pos.x()*pos.x() + pos.y()*pos.y(); // First term
+  double t_2 = ((beta*beta) + (gamma*gamma)) / (4.*alpha*alpha); // second term
+  double t_3 = ((beta*pos.x()) + (gamma*pos.y())) / alpha; // third term
+  double t_4 = t_2 - (kappa/alpha); // Radius
 
-  double delta = R_i - R;
+  double delta_R = sqrt(t_1 + t_2 + t_3 - t_4);
+  // double R_i = sqrt((pos.x() - x0)*(pos.x() - x0) + (pos.y() - y0)*(pos.y() - y0));
 
-  return delta;
+  return delta_R;
 }
 
 void PatternRecognition::calculate_dipangle(const std::map<int, SciFiSpacePoint*> &spnts,
@@ -790,15 +803,15 @@ void PatternRecognition::circle_fit(const std::map<int, SciFiSpacePoint*> &spnts
   tmpx.invert(ierr);
   tmp_params = tmpx * At * V * K;
 
-  double a, b, c;
-  a = tmp_params[0][0];
-  b = tmp_params[1][0];
-  c = tmp_params[2][0];
+  double alpha, beta, gamma; // See tracker software documentation for more details about this
+  alpha = tmp_params[0][0];
+  beta = tmp_params[1][0];
+  gamma = tmp_params[2][0];
 
   double x0, y0, R;
-  x0 = -b / 2 * a;
-  y0 = -c / 2 * a;
-  R = sqrt((4 * a) + (b * b) + (c * c)) / (2 * a);
+  x0 = -beta / 2 * alpha;
+  y0 = -gamma / 2 * alpha;
+  R = sqrt((4 * alpha) + (beta * beta) + (gamma * gamma)) / (2 * alpha);
 
   circle.set_x0(x0);
   circle.set_y0(y0);
@@ -807,6 +820,18 @@ void PatternRecognition::circle_fit(const std::map<int, SciFiSpacePoint*> &spnts
   circle.set_x0_err(x0_err);
   circle.set_y0_err(y0_err);
   circle.set_R_err(R_err);
+  */
+
+  // Don't think we need to store these paramters here.
+  // Commented out for now, uncomment if needed.  More important
+  // for the delta_R function.
+  /*
+  circle.set_alpha(alpha);
+  circle.set_beta(beta);
+  circle.set_gamma(gamma);
+  circle.set_alpha_err(alpha_err);
+  circle.set_beta_err(beta_err);
+  circle.set_gamma_err(gamma_err);
   */
 
   CLHEP::HepMatrix C, result;
