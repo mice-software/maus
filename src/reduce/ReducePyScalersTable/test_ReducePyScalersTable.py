@@ -23,7 +23,84 @@ import json
 import time
 import unittest
 
+from ReducePyScalersTable import Scaler
 from ReducePyScalersTable import ReducePyScalersTable
+
+class ScalerTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
+    """
+    Test class for Scaler.
+    """
+
+    def setUp(self):
+        """ 
+        Prepare for test by setting up a Scaler.
+        @param self Object reference.
+        """
+        self.__scaler = Scaler()
+
+    def test_default_values(self):
+        """
+        Check default values.
+        @param self Object reference.
+        """
+        self.assertEquals(0, self.__scaler.get_count(), 
+            "Unexpected count")
+        self.assertEquals(11, self.__scaler.get_recent_window(), 
+            "Unexpected window")
+        self.assertEquals(0, self.__scaler.get_average(), 
+            "Unexpected average")
+        self.assertEquals(0, self.__scaler.get_recent_average(), 
+            "Unexpected recent average")
+        self.assertEquals(0, self.__scaler.get_recent_value(), 
+            "Unexpected recent value")
+
+    def test_window(self):
+        """
+        Test setting a new window in the constructor.
+        @param self Object reference.
+        """
+        scaler = Scaler(123)
+        self.assertEquals(123, scaler.get_recent_window(), 
+            "Unexpected window")
+
+    def test_add_value_clear(self):
+        """
+        Test add_value and clear.
+        @param self Object reference.
+        """
+        for i in range(0, 10):
+            self.__scaler.add_value(i)
+        self.__scaler.clear()
+        self.assertEquals(0, self.__scaler.get_count(), 
+            "Unexpected count")
+        self.assertEquals(0, self.__scaler.get_average(), 
+            "Unexpected average")
+        self.assertEquals(0, self.__scaler.get_recent_average(), 
+            "Unexpected recent average")
+        self.assertEquals(0, self.__scaler.get_recent_value(), 
+            "Unexpected recent value")
+
+    def test_add_value(self):
+        """
+        Test add_value and getters
+        @param self Object reference.
+        """
+        values = range(0, 20)
+        for i in values:
+            self.__scaler.add_value(i)
+        self.assertEquals(len(values), self.__scaler.get_count(), 
+            "Unexpected count")
+        self.assertEquals(sum(values) / len(values), 
+            self.__scaler.get_average(), 
+            "Unexpected average")
+        start = len(values) - self.__scaler.get_recent_window() + 1
+        end = len(values)
+        self.assertEquals(
+            sum(values[start:end]) / (self.__scaler.get_recent_window() - 1),
+            self.__scaler.get_recent_average(), 
+            "Unexpected recent average")
+        self.assertEquals(19, self.__scaler.get_recent_value(), 
+            "Unexpected recent value")
 
 class ReducePyScalersTableTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
     """

@@ -22,6 +22,98 @@ import json
 import ErrorHandler
 from datetime import datetime
 
+class Scaler:
+    """
+    @class ReducePyScalersTable.Scaler maintains the total sum
+    of values for a scaler as well as the last N values.
+    """
+    def __init__(self, window = 11):
+        """
+        Set initial attribute values.
+        @param self Object reference.
+        @param window Window size determining last N values to
+        hold.
+        """
+        self._total  = 0  # Total to date.
+        self._count  = 0  # Count of values added to total.
+        self._window = window 
+        self._recent = [] # list of last _window values.
+ 
+    def add_value(self, value):
+        """
+        Add the value to total and also the most recent N values.
+        If the set of recent values exceeds N then pop off the first
+        one.
+        @param self Object reference.
+        @param value
+        """
+        self._total += value
+        self._count += 1
+        self._recent.append(value)
+        if len(self._recent) == self._window:
+            self._recent.pop(0)
+ 
+    def get_count(self):
+        """
+        Get number of values added to date.
+        @param self Object reference.
+        @return count
+        """
+        return self._count
+
+    def get_recent_window(self):
+        """
+        Get number of recent values that will be held.
+        @param self Object reference.
+        @return window
+        """
+        return self._window
+
+    def get_average(self):
+        """
+        Get the average of all the values to date.
+        @param self Object reference.
+        @return average or 0 if no values have been added to date.
+        """
+        if (self._count > 0):
+            return self._total / self._count
+        else:
+            return 0
+
+    def get_recent_average(self):
+        """
+        Add the value to total and also the most recent N values.
+        If the set of recent values exceeds N then pop off the first
+        one.
+        @param self Object reference.
+        @return average or 0 if no values have been added to date.
+        """
+        if len(self._recent):
+            return sum(self._recent) / len(self._recent)
+        else:
+            return 0
+
+    def get_recent_value(self):
+        """
+        Get the last value added to the most recent N values.
+        @param self Object reference.
+        @return average or 0 if no values have been added to date.
+        """
+        if len(self._recent):
+            return self._recent[-1]
+        else:
+            return 0
+
+    def clear(self):
+        """
+        Set the total and count to 0 and empty the list of
+        recent values.
+        @param self Object reference.
+        """
+        self._total  = 0
+        self._count  = 0
+        self._recent = []
+
 class ReducePyScalersTable: # pylint: disable=R0902
     """
     @class ReducePyScalersTable.ReducePyScalersTable calculates
@@ -43,7 +135,11 @@ class ReducePyScalersTable: # pylint: disable=R0902
     @verbatim
     {"table": {"keywords": [...list of data keywords...],
                "description": "...a description of the data...",
-               "data":[[...row...],[...row...],...]}}
+               "data":[["...average name...", 
+                        LAST_READ_VALUE,
+                        AVERAGE_OF_LAST_10_VALUES,
+                        AVERAGE_OVER_RUN],
+                       [...,...,...,...],...]}}  
     @endverbatim
 
     In cases where a spill is input that contains errors (e.g. is
@@ -61,15 +157,19 @@ class ReducePyScalersTable: # pylint: disable=R0902
         Set initial attribute values.
         @param self Object reference.
         """
-        self._triggers         = []
-        self._trigger_requests = []
-        self._gva              = []
-        self._tof0             = []
-        self._tof1             = []
-        self._clock            = []
+        # Channel IDs.
+        self._channels = ["ch0", "ch1", "ch2", "ch3", "ch4", "ch12"]
+
+        # Channel ID, scaler name, counts.
+        self._scalers = []
+        self._scalers.append(("ch0", "Triggers", Scaler()))
+        self._scalers.append(("ch1", "Trigger Requests", Scaler()))
+        self._scalers.append(("ch2", "GVA", Scaler()))
+        self._scalers.append(("ch3", "TOF0", Scaler()))
+        self._scalers.append(("ch4", "TOF1", Scaler()))
+        self._scalers.append(("ch12", "10 MHz clock", Scaler()))
         self._event            = ""
         self._time             = None
-        self._window           = 11
         # Has an end_of_run been processed?
         self._run_ended        = False
 
@@ -124,15 +224,11 @@ class ReducePyScalersTable: # pylint: disable=R0902
         Reset data.
         @param self Object reference.
         """
-        self._triggers         = []
-        self._trigger_requests = []
-        self._gva              = []
-        self._tof0             = []
-        self._tof1             = []
-        self._clock            = []
-        self._event            = ""
-        self._time             = None
-        self._run_ended        = False
+        for (_, _, scaler) in self._scalers:
+            scaler.clear()
+        self._event     = ""
+        self._time      = None
+        self._run_ended = False
 
     def _process_spill(self, spill):
         """
@@ -190,47 +286,8 @@ class ReducePyScalersTable: # pylint: disable=R0902
         """
         self._event = event
         self._time = time
-
-        self._triggers.append(hits["ch0"])
-        if len(self._triggers) == self._window:
-            self._triggers.pop(0)
-
-        self._trigger_requests.append(hits["ch1"])
-        if len(self._trigger_requests) == self._window:
-            self._trigger_requests.pop(0)
-
-        self._gva.append(hits["ch2"])
-        if len(self._gva) == self._window:
-            self._gva.pop(0)
-
-        self._tof0.append(hits["ch3"])
-        if len(self._tof0) == self._window:
-            self._tof0.pop(0)
-
-        self._tof1.append(hits["ch4"])
-        if len(self._tof1) == self._window:
-            self._tof1.pop(0)
-
-        self._clock.append(hits["ch12"])
-        if len(self._clock) == self._window:
-            self._clock.pop(0)
-
-    @staticmethod
-    def _get_data_list(data_name, data):
-        """"
-        Given a list of integers return a list of form
-        [data_name, last item in list, average value of list]
-        or, for a 0 length list, a list of form
-        [data_name, 0, 0]  
-        @param data_name Name of data.
-        @param data List of values.
-        @return list.
-        """
-        if len(data):
-            data_list = [data_name, data[-1], sum(data) / len(data)]
-        else:
-            data_list = [data_name, 0, 0]
-        return data_list
+        for (channel, _, scaler) in self._scalers:
+            scaler.add_value(hits[channel])
 
     def _create_output(self):
         """
@@ -250,17 +307,9 @@ class ReducePyScalersTable: # pylint: disable=R0902
             self._event, " at time: ", time_str
         content["description"] = "".join(description)
         rows = []
-        rows.append(ReducePyScalersTable._get_data_list( \
-            "Triggers", self._triggers))
-        rows.append(ReducePyScalersTable._get_data_list( \
-            "Trigger requests", self._trigger_requests))
-        rows.append(ReducePyScalersTable._get_data_list( \
-            "GVA", self._gva))
-        rows.append(ReducePyScalersTable._get_data_list( \
-            "TOF0", self._tof0))
-        rows.append(ReducePyScalersTable._get_data_list( \
-            "TOF1", self._tof1))
-        rows.append(ReducePyScalersTable._get_data_list( \
-            "10 MHz clock", self._clock))
+        for (_, name, scaler) in self._scalers:
+            rows.append([name, 
+                scaler.get_recent_value(),
+                scaler.get_recent_average()])
         content["data"] = rows
         return table
