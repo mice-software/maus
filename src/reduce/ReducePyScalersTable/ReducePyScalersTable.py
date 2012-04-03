@@ -151,15 +151,6 @@ class ReducePyScalersTable: # pylint: disable=R0902
                     AVERAGE_OVER_RUN],...]}
     @endverbatim
 
-    In cases where a spill is input that contains errors (e.g. is
-    badly formatted or is missing the data needed to update the
-    averages) then a spill is output which is just the input spill 
-    with an "errors" field containing the error e.g.
-
-    @verbatim
-    {"errors": {..., "bad_json_document": "unable to do json.loads on input"}}
-    @endverbatim
-
     The caller can configure the worker and specify:
 
     -Recent scalers window ("recent_scalers_window"). Default: 10. 
@@ -213,7 +204,10 @@ class ReducePyScalersTable: # pylint: disable=R0902
     def process(self, json_spill_doc):
         """
         Update the averages with data from the current spill
-        and output a table with the new averages.
+        and output a table with the new averages. If the spill
+        does not contain the expected data then the last good
+        averages are output (if the ErrorHandler is configured
+        not to raise exceptions).
         @param self Object reference.
         @param json_spill_doc String with current JSON document.
         @returns JSON document containing the table of new 
@@ -229,7 +223,7 @@ class ReducePyScalersTable: # pylint: disable=R0902
             result = self._process_spill(json_doc)
         except Exception: # pylint:disable=W0703
             ErrorHandler.HandleException(json_doc, self)
-            return unicode(json.dumps(json_doc))
+            result = self._create_output()
         # Convert result to string.
         doc_list = [json.dumps(result), "\n"]
         return unicode("".join(doc_list))
@@ -316,9 +310,10 @@ class ReducePyScalersTable: # pylint: disable=R0902
             time_str = str(datetime.fromtimestamp(self._time))
         else:
             time_str = ""
-        description = "Scaler counts from channel data for event: ", \
-            self._event, " at time: ", time_str
-        table["description"] = "".join(description)
+        description = \
+            "Scaler counts from channel data for event: %s at time: %s" \
+            % (self._event, time_str)
+        table["description"] = description
         rows = []
         for (_, name, scaler) in self._scalers:
             rows.append([name, 
