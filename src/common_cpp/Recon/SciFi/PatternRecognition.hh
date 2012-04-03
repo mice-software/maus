@@ -294,6 +294,11 @@ class PatternRecognition {
     void sort_by_station(const std::vector<SciFiSpacePoint*> &spnts,
                          std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station);
 
+    /** @brief Count the number of stations that have unused spacepoint
+     *
+     *  @param spnts_by_station - Input 2D vector of spacepoints sorted by station
+     * 
+     */
     int num_stations_with_unused_spnts(
         const std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station);
 
@@ -321,13 +326,13 @@ class PatternRecognition {
 
     static const int _n_trackers = 2;
     static const int _n_stations = 5;
-    static const double _sd_1to4 = 0.3844;
-    static const double _sd_5 = 0.4298;
-    static const double _res_cut = 10;
-    static const double _chisq_cut = 15;
-    static const double _AB_cut = .1; // Need to calculate appropriate cut here
-    static const double _sd_phi_1to4 = 1.; // Still needs to be calculated!!!!
-    static const double _sd_phi_5 = 1.; // Still needs to be calculated!!!!
+    static const double _sd_1to4 = 0.3844;  // Position error associated with stations 1 through 4
+    static const double _sd_5 = 0.4298;     // Position error associated with station 5
+    static const double _res_cut = 10;      // Road cut in mm
+    static const double _chisq_cut = 15;    // Cut on the chi^2 of the least squares fit in mm
+    static const double _AB_cut = .1;       // Need to calculate appropriate cut here
+    static const double _sd_phi_1to4 = 1.;  // Still needs to be calculated!!!!
+    static const double _sd_phi_5 = 1.;     // Still needs to be calculated!!!!
 };
 // } // ~namespace MAUS
 

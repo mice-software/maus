@@ -482,51 +482,6 @@ void PatternRecognition::linear_fit(const std::map<int, SciFiSpacePoint*> &spnts
   result = D.T()* V * D;
   line_y.set_chisq(result[0][0]);
   line_y.set_chisq_dof(result[0][0] / num_points);
-
-  /*
-
-  // Set up C style arrays for gsl fitter
-  double x[num_points];
-  double y[num_points];
-  double z[num_points];
-
-  int counter = 0;
-  for ( std::map<int, SciFiSpacePoint*>::const_iterator ii = spnts.begin();
-        ii != spnts.end(); ++ii ) {
-    x[counter] = (*ii).second->get_position().x();
-    y[counter] = (*ii).second->get_position().y();
-    z[counter] = (*ii).second->get_position().z();
-    ++counter;
-  }
-
-  // Set up variables to hold gsl fitter results
-  double c_x, m_x, cov_x00, cov_x01, cov_x11, chisq_x;
-  double c_y, m_y, cov_y00, cov_y01, cov_y11, chisq_y;
-
-  // Perform the fit
-  gsl_fit_linear(z, 1, x, 1, num_points,
-                  &c_x, &m_x, &cov_x00, &cov_x01, &cov_x11,
-                  &chisq_x);
-
-  gsl_fit_linear(z, 1, y, 1, num_points,
-                  &c_y, &m_y, &cov_y00, &cov_y01, &cov_y11,
-                  &chisq_y);
-
-  // Write some output to screen
-  std::cout << "Track parameters x: c = " << c_x << ", m = ";
-  std::cout << m_x << ", chisq = " << chisq_x << std::endl;
-  std::cout << "Track parameters y: c = " << c_y << ", m = ";
-  std::cout << m_y << ", chisq = " << chisq_y << std::endl;
-  std::cout << "sp\tx\ty\tz" << std::endl;
-  for ( int i = 0; i < _n_stations; ++i ) {
-    std::cout << i << "\t" << x[i] << "\t" << y[i] << "\t" << z[i] << std::endl;
-  }
-
-  // Return the lines in x and y
-  line_x.set_parameters(c_x, m_x, chisq_x);
-  line_y.set_parameters(c_y, m_y, chisq_y);
-
-  */
 }
 
 void PatternRecognition::make_helix(
