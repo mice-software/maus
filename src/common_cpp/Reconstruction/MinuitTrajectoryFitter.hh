@@ -5,6 +5,8 @@
 
 #include "TMinuit.h"
 
+#include "src/common_cpp/Optics/CovarianceMatrix.hh"
+
 namespace MAUS {
 
 class OpticsModel;

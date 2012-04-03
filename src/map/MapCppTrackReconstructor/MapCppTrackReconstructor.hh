@@ -15,32 +15,15 @@
  *
  */
 
-// FIXME(plane@hawk.iit.edu) UNDER CONSTRUCTION. For now this just uses Minuit
-// and transfer matrices
-
-/** @class MapCppTrackReconstructor
- *  Reconstruct tracks at the desired longitudinal spacing using the desired
- *  track fitting method.
- */
-
-
 #ifndef _SRC_MAP_MAPCPPTRACKRECONSTRUCTOR_HH_
 #define _SRC_MAP_MAPCPPTRACKRECONSTRUCTOR_HH_
 
-// C headers
-#include <stdlib.h>
-
 // C++ headers
 #include <string>
-#include <sstream>
 #include <vector>
 
 // external libraries
 #include "TMinuit.h"
-#include "json/json.h"
-
-//  MAUS code
-#include "src/common_cpp/TrackReconstructor/MAUSGeant4Manager.hh"
 
 // G4MICE from legacy
 #include "BeamTools/BTField.hh"
@@ -57,6 +40,11 @@ void transfer_map_score_function(Int_t &    number_of_parameters,
                                  Double_t * phase_space_coordinate_values,
                                  Int_t      execution_stage_flag);
 
+
+/** @class MapCppTrackReconstructor
+ *  Reconstruct tracks at the desired longitudinal spacing using the desired
+ *  trajectory fitting method.
+ */
 class MapCppTrackReconstructor {
  public:
   /** @brief Allocates the global-scope Minuit instance used for minimization.
@@ -82,13 +70,6 @@ class MapCppTrackReconstructor {
    */
   bool death();
 
-  /** @brief Set up configuration information on the MICERun
-   *  
-   *  Sets the datacards, json configuration, Squeak standard outputs,
-   *  and MiceModules
-   */
-  void SetConfiguration(std::string config);
-
   /** @brief Generate a list of reconstructed tracks.
    *
    *  This function takes a single spill and generates a list of tracks based
@@ -101,8 +82,12 @@ class MapCppTrackReconstructor {
  private:
   static const size_t kPhaseSpaceDimension;
 
+  Json::Value configuration_;
   OpticsModel * optics_model_;
   TrajectoryFitter * trajectory_fitter_;
+
+  Json::Value run_data_;
+  ReconstructionInput * reconstruction_input_;
   DetectorEvent * events_;
   std::vector<ParticleTrajectory> trajectories_;
   
@@ -111,9 +96,13 @@ class MapCppTrackReconstructor {
 
   void CorrelateDetectorEvents(
       std::vector<DetectorEvent> const * const detector_events,
-      std::vector<std::vector<DetectorEvent const * const> > * event_sets);
+      std::vector<std::vector<DetectorEvent const *> > * event_sets);
 };
 
 const size_t MapCppTrackReconstructor::kPhaseSpaceDimension = 6;
+const unsigned int kProcessModeUnset = 0;
+const unsigned int kProcessModeTesting = 1;
+const unsigned int kProcessModeSimulation = 2;
+const unsigned int kProcessModeLive = 3;
 
 #endif  // _SRC_MAP_MAPCPPTRACKRECONSTRUCTOR_HH_

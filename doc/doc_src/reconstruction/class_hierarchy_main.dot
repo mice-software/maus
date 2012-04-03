@@ -1,0 +1,91 @@
+digraph G {
+  fontname = "Bitstream Vera Sans"
+  fontsize = 10
+  size = "8.5 11"
+
+  rankdir = "BT"
+
+  node [
+    fontname = "Bitstream Vera Sans"
+    fontsize = 8
+    shape = "record"
+  ]
+
+  edge [
+    fontname = "Bitstream Vera Sans"
+    fontsize = 8
+  ]
+  
+  ReconstructionInput [
+    label = "{\N|detectorPlanes: Double[]\ldetectorUncertainties: CovarianceMatrix[]\levents: DetectorEvent[]\l}"
+  ]
+
+  MapCppTrackReconstructor [
+    label = "{\N|input: ReconstructionInput\lopticsModel: OpticsModel\ltrajectoryFitter: TrajectoryFitter\ltrajectories: ParticleTrajectory[]\l|Process()\l}"
+  ]
+
+  DetectorEvent [
+    label = "{\N|detectorID: Integer\lparticleID: Integer}"
+  ]
+
+  ParticleTrajectory [
+    label = "{\N|particleID: Integer\ltracks: ParticleTrack[]\l}"
+  ]
+
+  OpticsModel [
+    label = "{\<\<interface\>\>\n\N||Transport(PhaseSpaceVector): PhaseSpaceVector\lTransport(CovarianceMatrix): CovarianceMatrix\l}"
+  ]
+
+  TrajectoryFitter [
+    label = "{\<\<interface\>\>\n\N|opticsModel: OpticsModel\ldetectorPlanes: Double[]\ldetectorUncertainties: CovarianceMatrix[]\l|Fit(DetectorEvent[], ParticleTrajectory *)}"
+  ]
+
+  subgraph Main {
+    rank = same; MapCppTrackReconstructor; DetectorEvent; ParticleTrajectory; OpticsModel; TrajectoryFitter;
+  }
+
+  PhaseSpaceVector [
+    label = "{\N|t: Double\lE: Double\lx: Double\lPx: Double\ly: Double\lPy: Double\l}"
+  ]
+
+  ParticleTrack [
+    label = "{\N|z: Double\lPz: Double\luncertainties: CovarianceMatrix|FillInCoordinates()\l}"
+  ]
+
+  TransferMap [
+    label = "{\<\<interface\>\>\n\N||Transport(PhaseSpaceVector): PhaseSpaceVector\lTransport(CovarianceMatrix): CovarianceMatrix\l}"
+    pos = "10,50"
+  ]
+
+  edge [
+    style = "solid"
+  ]
+
+  ParticleTrack -> PhaseSpaceVector
+  DetectorEvent -> ParticleTrack
+
+
+  edge [
+    style = "solid"
+    arrowhead = "none"
+
+    headlabel = "1..*"
+  ]
+
+  ReconstructionInput -> DetectorEvent
+  MapCppTrackReconstructor -> ParticleTrajectory
+  ParticleTrajectory -> ParticleTrack
+
+  edge [
+    style = "solid"
+    arrowhead = "none"
+
+    headlabel = "1"
+  ]
+
+  MapCppTrackReconstructor -> ReconstructionInput
+  MapCppTrackReconstructor -> TrajectoryFitter
+  MapCppTrackReconstructor -> OpticsModel
+  TrajectoryFitter -> OpticsModel
+  OpticsModel -> TransferMap
+}

@@ -14,14 +14,23 @@
  * along with MAUS.  If not, see <http://  www.gnu.org/licenses/>.
  */
 
-/* Author: Peter Lanec++ what to include for const_iterator
+/* Author: Peter Lane
  */
 
-#include "Reconstruction/ParticleTrajectory.hh"
+#include "Reconstruction/MinuitTrajectoryFitter.hh"
+ 
+#include <vector>
 
 #include "TMinuit.h"
 
 #include "Interface/Squeal.hh"
+#include "src/common_cpp/Optics/CovarianceMatrix.hh"
+#include "Optics/OpticsModel.hh"
+#include "src/common_cpp/Optics/PhaseSpaceVector.hh"
+#include "src/common_cpp/Optics/TransferMap.hh"
+#include "Reconstruction/DetectorEvent.hh"
+#include "Reconstruction/ParticleTrack.hh"
+#include "Reconstruction/ParticleTrajectory.hh"
 
 namespace MAUS {
 
@@ -116,8 +125,8 @@ Double_t MinuitTrackFitter::ScoreTrack(
   ParticleTrack guess; 
   PhaseSpaceVector delta;  // difference between the guess and the measurement
 
-  const_iterator<DetectorEvent const *> events = detector_events_->begin();
-  const_iterator<CovarianceMatrix> errors = detector_uncertainties_->begin();
+  std::vector<DetectorEvent const *>::const_iterator events = detector_events_->begin();
+  std::vector<CovarianceMatrix>::const_iterator<CovarianceMatrix> errors = detector_uncertainties_->begin();
   double chi_squared = 0;
   while (events < detector_events_->end()) {
   // save the calculated trajectory in case this is the last one
