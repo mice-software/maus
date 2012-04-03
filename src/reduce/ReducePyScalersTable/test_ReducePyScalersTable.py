@@ -337,6 +337,12 @@ class ReducePyScalersTableTestCase(unittest.TestCase): # pylint: disable=R0904, 
         @param expected Scaler containing expected results.
         """
         self.assertTrue("keywords" in result, "No keywords")
+        self.assertTrue("table_headings" in result, "No table headings")
+        headings = result["table_headings"]
+        self.assertEquals("Average of last %d values" \
+            % expected.get_recent_window(), 
+            headings[2],
+            "Unexpected heading")
         self.assertTrue("description" in result, "No description")
         if (time_stamp != None):
             time_str = datetime.fromtimestamp(time_stamp)

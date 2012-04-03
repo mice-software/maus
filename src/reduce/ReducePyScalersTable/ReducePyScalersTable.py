@@ -143,6 +143,8 @@ class ReducePyScalersTable: # pylint: disable=R0902
     @verbatim
     {"keywords": [...list of data keywords...],
      "description": "...a description of the data...",
+     "table_headings": ["Scaler", "Last read value", 
+         "Average of last 10 values", "Average over run"],
      "table_data":[["...average name...", 
                     LAST_READ_VALUE,
                     AVERAGE_OF_MOST_RECENT_VALUES,
@@ -170,6 +172,10 @@ class ReducePyScalersTable: # pylint: disable=R0902
         Set initial attribute values.
         @param self Object reference.
         """
+        self._headings = ["Scaler", 
+            "Last read value", 
+            "Average of last N values", 
+            "Average over run"]
         # Channel IDs.
         self._channels = ["ch0", "ch1", "ch2", "ch3", "ch4", "ch12"]
         # Recent window size.
@@ -248,6 +254,8 @@ class ReducePyScalersTable: # pylint: disable=R0902
         self._event     = ""
         self._time      = None
         self._run_ended = False
+        self._headings[2] = \
+            "Average of last %d values" % self._recent_window
 
     def _process_spill(self, spill):
         """
@@ -303,6 +311,7 @@ class ReducePyScalersTable: # pylint: disable=R0902
         """
         table = {}
         table["keywords"] = ["Scalers"]
+        table["table_headings"] = self._headings
         if (self._time != None):
             time_str = str(datetime.fromtimestamp(self._time))
         else:
