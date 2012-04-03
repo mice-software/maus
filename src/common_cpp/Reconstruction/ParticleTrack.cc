@@ -31,32 +31,53 @@ ParticleTrack::ParticleTrack()
 { }
 
 ParticleTrack::ParticleTrack(const ParticleTrack& original_instance)
-    : PhaseSpaceVector(original_instance), z_(original_instance.z_),
-      z_momentum_(original_instance.z_momentum_)
+    : PhaseSpaceVector(original_instance),
+      z_(original_instance.z_), z_momentum_(original_instance.z_momentum_),
+      detector_id_(original_instance.detector_id_)
 { }
 
 ParticleTrack::ParticleTrack(const double t, const double E,
                                    const double x, const double Px,
-                                   const double y, const double Py)
-    : PhaseSpaceVector(t, E, x, Px, y, Py), z_(0.), z_momentum_(0.)
-{ }
+                                   const double y, const double Py,
+                                   const double z, const double Pz
+                                   const unsigned int detector_id)
+    : PhaseSpaceVector(t, E, x, Px, y, Py),
+      z_(z), z_momentum_(Pz), detector_id_(detector_id) {
+  FillInCoordinates();
+}
 
 ParticleTrack::ParticleTrack(double const * const array)
-    : PhaseSpaceVector(array)
-{ }
+    : PhaseSpaceVector(array) {
+  FillInCoordinates();
+}
 
 ParticleTrack::~ParticleTrack() { }
 
+/* If t < 0 it fills in t and E from z, Pz, and the given mass parameter.
+ * If t >= 0 and z < 0, it fills in z and Pz from t, E, and the mass.
+ */
 void ParticleTrack::FillInCoordinates(const double mass) {
-  double energy = (*this)[1]
   double c_squared = ::CLHEP::c_light * ::CLHEP::c_light;
   double px = (*this)[3];
   double py = (*this)[5];
-  z_momentum_ = ::sqrt(energy*energy - mass*mass - px*px - py*py);
 
-  double velocity = z_momentum_ / mass;
-  double time = (*this)[0];
-  z_ = velocity * time;
+  if ((*this)[0] < 0) {
+    // fill in the time coordinate
+    double velocity = z_momentum_ / mass;
+    (*this)[0] = z_ / velocity;
+
+    // fill in the energy coordinate
+    (*this)[1] = ::sqrt(mass*mass + px*px + py*py);
+  } else if (z_ < 0) {
+    // fill in the Pz coordinate
+    double energy = (*this)[1]
+    z_momentum_ = ::sqrt(energy*energy - mass*mass - px*px - py*py);
+
+    // fill in the z coordinate
+    double velocity = z_momentum_ / mass;
+    double time = (*this)[0];
+    z_ = velocity * time;
+  }
 }
 
 std::ostream& operator<<(std::ostream& out, const ParticleTrack& vector) {

@@ -40,7 +40,6 @@ void transfer_map_score_function(Int_t &    number_of_parameters,
                                  Double_t * phase_space_coordinate_values,
                                  Int_t      execution_stage_flag);
 
-
 /** @class MapCppTrackReconstructor
  *  Reconstruct tracks at the desired longitudinal spacing using the desired
  *  trajectory fitting method.
@@ -88,15 +87,13 @@ class MapCppTrackReconstructor {
 
   Json::Value run_data_;
   ReconstructionInput * reconstruction_input_;
-  DetectorEvent * events_;
   std::vector<ParticleTrajectory> trajectories_;
   
   std::string classname_;
   BTField * electromagnetic_field_;
 
-  void CorrelateDetectorEvents(
-      std::vector<DetectorEvent> const * const detector_events,
-      std::vector<std::vector<DetectorEvent const *> > * event_sets);
+  void CorrelateParticleTracks(
+      std::vector<std::vector<ParticleTrack const *> > * track_sets);
 };
 
 const size_t MapCppTrackReconstructor::kPhaseSpaceDimension = 6;

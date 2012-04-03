@@ -9,7 +9,7 @@ class OpticsModel
 {
  public:
   virtual void Build(Json::Value * configuration) = 0;
-  virtual TransferMap transfer_map(double z1, double z2) = 0;
+  virtual TransferMap GenerateTransferMap(double z1, double z2) = 0;
  protected:
 };
 

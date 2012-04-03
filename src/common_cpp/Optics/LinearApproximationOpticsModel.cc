@@ -31,7 +31,7 @@ void LinearApproximationOpticsModel::Build(Json::Value * configuration) {
   // Nothing to do here
 }
 
-TransferMap transfer_map(double z1, double z2, double mass) {
+TransferMap GenerateTransferMap(double z1, double z2, double mass) {
   return LinearApproximationTransferMap(z1, z2, mass);
 }
 

@@ -17,21 +17,17 @@ digraph G {
   ]
 
   OpticsModel [
-    label = "{\<\<interface\>\>\n\N||Transport(PhaseSpaceVector): PhaseSpaceVector\lTransport(CovarianceMatrix): CovarianceMatrix\l}"
+    label = "{\<\<interface\>\>\n\N||GenerateTransferMap(Double z1, Double z2): TransferMap\l}"
   ]
 
   TrajectoryFitter [
-    label = "{\<\<interface\>\>\n\N|opticsModel: OpticsModel\ldetectorPlanes: Double[]\ldetectorUncertainties: CovarianceMatrix[]\l|Fit(DetectorEvent[], ParticleTrajectory *)}"
+    label = "{\<\<interface\>\>\n\N|opticsModel: OpticsModel\ldetectors: Detector[]\l|Fit(DetectorEvent[], ParticleTrajectory *)}"
   ]
 
   RungeKuttaOpticsModel [
   ]
 
   IntegratingOpticsModel [
-  ]
- 
-  TrajectoryFitter [
-    label = "{\<\<interface\>\>\n\N|opticsModel: OpticsModel\ldetectorPlanes: Double[]\ldetectorUncertainties: CovarianceMatrix[]\l|Fit(DetectorEvent[], ParticleTrajectory *)}"
   ]
 
   DifferentiatingOpticsModel [
@@ -55,14 +51,12 @@ digraph G {
   ]
 
   MinuitTrajectoryFitter [
-    label = "{\N|transferMap: TransferMap}"
   ]
 
   TOFTrajectoryFitter [
   ]
 
   KalmanFilterTrajectoryFitter [
-    label = "{\N|transferMap: TransferMap}"
   ]
 
   edge [
@@ -91,8 +85,4 @@ digraph G {
 
     headlabel = "1"
   ]
-
-  OpticsModel -> TransferMap
-  MinuitTrajectoryFitter -> TransferMap
-  KalmanFilterTrajectoryFitter -> TransferMap
 }

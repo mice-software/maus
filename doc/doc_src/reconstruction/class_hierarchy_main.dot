@@ -16,16 +16,16 @@ digraph G {
     fontsize = 8
   ]
   
+  Detector [
+    label = "{\N|id: Integer\lplane: Double\luncertainties: CovarianceMatrix\l}"
+  ]
+  
   ReconstructionInput [
-    label = "{\N|detectorPlanes: Double[]\ldetectorUncertainties: CovarianceMatrix[]\levents: DetectorEvent[]\l}"
+    label = "{\N|beamPolarityNegative: Boolean\ldetectors: Detector[]\ltracks: ParticleTrack[]\l}"
   ]
 
   MapCppTrackReconstructor [
     label = "{\N|input: ReconstructionInput\lopticsModel: OpticsModel\ltrajectoryFitter: TrajectoryFitter\ltrajectories: ParticleTrajectory[]\l|Process()\l}"
-  ]
-
-  DetectorEvent [
-    label = "{\N|detectorID: Integer\lparticleID: Integer}"
   ]
 
   ParticleTrajectory [
@@ -33,15 +33,15 @@ digraph G {
   ]
 
   OpticsModel [
-    label = "{\<\<interface\>\>\n\N||Transport(PhaseSpaceVector): PhaseSpaceVector\lTransport(CovarianceMatrix): CovarianceMatrix\l}"
+    label = "{\<\<interface\>\>\n\N||GenerateTransferMap(Double z1, Double z2): TransferMap\l}"
   ]
 
   TrajectoryFitter [
-    label = "{\<\<interface\>\>\n\N|opticsModel: OpticsModel\ldetectorPlanes: Double[]\ldetectorUncertainties: CovarianceMatrix[]\l|Fit(DetectorEvent[], ParticleTrajectory *)}"
+    label = "{\<\<interface\>\>\n\N|opticsModel: OpticsModel\ldetectors: Detector[]\l|Fit(ParicleTrack[], ParticleTrajectory *)}"
   ]
 
   subgraph Main {
-    rank = same; MapCppTrackReconstructor; DetectorEvent; ParticleTrajectory; OpticsModel; TrajectoryFitter;
+    rank = same; MapCppTrackReconstructor; ParticleTrajectory; OpticsModel; TrajectoryFitter;
   }
 
   PhaseSpaceVector [
@@ -49,7 +49,7 @@ digraph G {
   ]
 
   ParticleTrack [
-    label = "{\N|z: Double\lPz: Double\luncertainties: CovarianceMatrix|FillInCoordinates()\l}"
+    label = "{\N|z: Double\lPz: Double\ldetectorID: Integer\l|FillInCoordinates()\l}"
   ]
 
   TransferMap [
@@ -62,7 +62,6 @@ digraph G {
   ]
 
   ParticleTrack -> PhaseSpaceVector
-  DetectorEvent -> ParticleTrack
 
 
   edge [
@@ -72,7 +71,9 @@ digraph G {
     headlabel = "1..*"
   ]
 
-  ReconstructionInput -> DetectorEvent
+  ReconstructionInput -> Detector
+  TrajectoryFitter -> Detector
+  ReconstructionInput -> ParticleTrack
   MapCppTrackReconstructor -> ParticleTrajectory
   ParticleTrajectory -> ParticleTrack
 
@@ -87,5 +88,4 @@ digraph G {
   MapCppTrackReconstructor -> TrajectoryFitter
   MapCppTrackReconstructor -> OpticsModel
   TrajectoryFitter -> OpticsModel
-  OpticsModel -> TransferMap
 }

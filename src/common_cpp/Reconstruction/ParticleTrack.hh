@@ -27,6 +27,17 @@
      
 namespace MAUS {
 
+/* @class ParticleTrack a phase space vector with redundant t/E and z/Pz
+ * coordinates as well as an ID that links the track to the detector that
+ * measured it.
+ *
+ * The redundant sets of coordinates can be filled in by explicitly using the
+ * FillInCoordinates() function or by setting all of the coordinates at once
+ * using the array or parameterised constructors (which implicitly call
+ * FillInCoordinates()). If t < 0 it fills in t and E from z, Pz, and the given
+ * mass parameter. If t >= 0 and z < 0, it fills in z and Pz from t, E, and
+ * the mass.
+ */
 class ParticleTrack : public MAUS::PhaseSpaceVector {
  public:
   /* @brief	Construct with all elements initialized to zero.
@@ -37,7 +48,8 @@ class ParticleTrack : public MAUS::PhaseSpaceVector {
    */
   ParticleTrack(const ParticleTrack& original_instance);
 
-  /* @brief Create with coordinates from an array. Order is t, E, x, Px, y, Py.
+  /* @brief Create with coordinates from an array.
+     Order is t, E, x, Px, y, Py, z, Pz.
    */
   explicit ParticleTrack(double const * const array);
 
@@ -45,7 +57,9 @@ class ParticleTrack : public MAUS::PhaseSpaceVector {
    */
   ParticleTrack(const double t, const double E,
                    const double x, const double Px,
-                   const double y, const double Py);
+                   const double y, const double Py,
+                   const double z, const double Pz
+                   const unsigned int detector_id);
 
   ~ParticleTrack();
 
@@ -53,10 +67,17 @@ class ParticleTrack : public MAUS::PhaseSpaceVector {
   //       Accessors
   // *************************
 
+  inline void set_detector_id(unsigned int id) {detector_id_ = id;}
+  inline void detector_id() const {return detector_id_;}
+ 
   inline double z()          const {return z_;}
+  inline void set_z(const double z) {z_ = z;}
+
   inline double z_momentum() const {return z_momentum_;}
+  inline void set_z_momentum(const double z_momentum) {z_momentum_ = z_momentum;}
   inline double Pz()         const {return z_momentum_;}
-  
+  inline void set_Pz(const double Pz) {z_momentum_ = Pz;}
+ 
   void FillInCoordinates(const double mass);  
  protected:
   double z_;

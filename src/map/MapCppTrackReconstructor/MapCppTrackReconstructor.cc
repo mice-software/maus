@@ -30,6 +30,7 @@
 // MAUS
 #include "src/common_cpp/Optics/LeastSquaresOpticsModel.hh"
 #include "src/common_cpp/Optics/LinearApproximationOpticsModel.hh"
+#include "src/common_cpp/Reconstruction/ReconstructionInput.hh"
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
@@ -40,10 +41,14 @@
 
 namespace MAUS {
 
-using MAUS::LeastSquaresOpticsModel::Algorithm;
+MapCppTrackReconstructor::MapCppTrackReconstructor()
+    : reconstruction_input_(NULL) {
+}
 
-
-MapCppTrackReconstructor::MapCppTrackReconstructor() {
+MapCppTrackReconstructor::~MapCppTrackReconstructor() {
+  if (reconstruction_input_ ~= NULL) {
+    delete reconstruction_input_;
+  }
 }
 
 bool MapCppTrackReconstructor::birth(std::string configuration) {
@@ -71,7 +76,7 @@ std::string MapCppTrackReconstructor::process(std::string run_data) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
   }
 
-  // Create ReconstructionInput instance from JSON data
+  // Populate ReconstructionInput instance from JSON data
   if (run_data_.isMember("ReconstructionTestingData")) {
     LoadTestingData();
   } else if (run_data_.isMember("mc")) {
@@ -83,17 +88,17 @@ std::string MapCppTrackReconstructor::process(std::string run_data) {
   // TODO(plane1@hawk.iit.edu) Implement Kalman Filter and TOF track fitters
   //  in addition to Minuit, and select between them based on the configuration
  
-  // determine which events came from which particles
-  std::vector<std::vector<DetectorEvent const *> > event_sets;
-  CorrelateDetectorEvents(detector_events_, &event_sets);
+  // associate tracks with individual particles
+  std::vector<std::vector<ParticleTrack const *> > track_sets;
+  CorrelateParticleTracks(&track_sets);
 
   // Find the best fit trajectory for each particle traversing the lattice
-  std::vector<std::vector<DetectorEvent const *> >::const_iterator
+  std::vector<std::vector<ParticleTrack const *> >::const_iterator
                                                           measured_trajectories;
-  for (trajectories = event_sets.begin();
-       trajectories < event_sets.end();
+  int particle_ids[] = {
+  for (trajectories = track_sets.begin();
+       trajectories < track_sets.end();
        ++trajectories) {
-    int particle_id = (*trajectories).front()->paritcle_id();
     ParticleTrajectory best_fit_trajectory(particle_id);
     trajectory_fitter_->Fit(&(*measured_trajectories), &best_fit_trajectory);
 
@@ -171,7 +176,8 @@ MapCppTrackReconstructor::SetupOpticsModel() {
         }
       }
 
-      Algorithm algorithm;
+      Algorithm algorithm;  track_sets->push_back(
+
       switch (algorithm_number) {
         case 4: algorithm = Algorithm::kSweepingChiSquaredWithVariableWalls;
                 break;
@@ -290,15 +296,23 @@ void MapCppTrackReconstructor::LoadSimulationData() {
 
 void MapCppTrackReconstructor::LoadLiveData() {
   // reconstruction_input_ = new ReconstructionInput(...);
-}
+}    int particle_id = (*trajectories).front()->paritcle_id();
 
-void MapCppTrackReconstructor::CorrelateDetectorEvents(
-    std::vector<DetectorEvent> const * const detector_events,
-    std::vector<std::vector<DetectorEvent const *> > * event_sets) {
+
+void MapCppTrackReconstructor::CorrelateParticleTracks(
+    std::vector<std::vector<ParticleTrack const *> > * track_sets) {
   // TODO(plane1@hawk.iit.edu) create sets of events where each set corresponds
   // to a different particle. For now assume that all events are from the same
   // particle.
-  event_sets->assign(detector_events->begin(), detector_events->end());
+  std::vector<ParticleTrack> const * const particle_tracks
+      = reconstruction_input_->tracks();
+  std::vector<ParticleTrack const *> superset;
+  std::vector<ParticleTrack>::const_iterator iter = particle_tracks->begin();
+  while (iter < particle_tracks->end()) {
+    superset->push_back(&(*iter));
+    ++iter;
+  }
+  track_sets->push_back(superset);
 }
 
 bool MapCppTrackReconstructor::death() {
