@@ -17,34 +17,20 @@
 /* Author: Peter Lane
  */
 
-#ifndef COMMON_CPP_RECONSTRUCTION_RECONSTRUCTION_INPUT_HH
-#define COMMON_CPP_RECONSTRUCTION_RECONSTRUCTION_INPUT_HH
-
+#include <iostream>
 #include <vector>
 
-#include "src/common_cpp/Reconstruction/Detector.hh"
-#include "src/common_cpp/Reconstruction/ParticleTrack.hh"
+#include "src/common_cpp/Reconstruction/ReconstructionInput.hh"
 
 namespace MAUS {
 
-class ReconstructionInput {
- public:
-  /* @brief	Create with the given input values.
-   */
-  ReconstructionInput(const bool beam_polarity_negative,
-                      std::vector<Detector> const * const detectors,
-                      std::vector<ParticleTrack> const * const tracks);
-
-  ~ReconstructionInput() { }
-                     
- protected:
-  ReconstructionInput();
-
-  bool beam_polarity_negative_;
-  std::vector<Detector> detectors_;
-  std::vector<ParticleTrack> tracks_;
-};
+ReconstructionInput::ReconstructionInput(
+    const bool beam_polarity_negative,
+    std::vector<Detector> const * const detectors,
+    std::vector<ParticleTrack> const * const tracks)
+    : beam_polarity_negative_(beam_polarity_negative),
+      detectors_(*detectors), tracks_(*tracks) {
+}
 
 }  // namespace MAUS
 
-#endif
