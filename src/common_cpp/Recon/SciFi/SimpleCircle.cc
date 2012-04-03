@@ -20,20 +20,107 @@
 // namespace MAUS {
 
 // Constructor
-SimpleCircle::SimpleCircle() {}
+SimpleCircle::SimpleCircle() {
+  _x0 = 0.0;
+  _x0_err = 0.0;
+  _y0 = 0.0;
+  _y0_err = 0.0;
+  _R = 0.0;
+  _R_err = 0.0;
+  _alpha = 0.0;
+  _alpha_err = 0.0;
+  _beta = 0.0;
+  _beta_err = 0.0;
+  _gamma = 0.0;
+  _gamma_err = 0.0;
+  _kappa = 0.0;
+  _kappa_err = 0.0;
+  _delta_R = 0.0;
+  _chisq = 0.0;
+}
 
-// Destructor
-SimpleCircle::~SimpleCircle() {}
+SimpleCircle::SimpleCircle(double x0, double y0, double R) {
+  _x0 = x0;
+  _x0_err = 0.0;
+  _y0 = x0;
+  _y0_err = 0.0;
+  _R = R;
+  _R_err = 0.0;
+  _alpha = 0.0;
+  _alpha_err = 0.0;
+  _beta = 0.0;
+  _beta_err = 0.0;
+  _gamma = 0.0;
+  _gamma_err = 0.0;
+  _kappa = 0.0;
+  _kappa_err = 0.0;
+  _delta_R = 0.0;
+  _chisq = 0.0;
+}
 
-void SimpleCircle::set_parameters(double x0, double x0_err, double y0, double y0_err,
-                                  double R, double R_err, double chisq) {
+SimpleCircle::SimpleCircle(double x0, double x0_err, double y0, double y0_err, double R,
+                           double R_err, double alpha, double alpha_err, double beta,
+                           double beta_err, double gamma, double gamma_err, double kappa,
+                           double kappa_err, double delta_R, double chisq) {
   _x0 = x0;
   _x0_err = x0_err;
   _y0 = y0;
   _y0_err = y0_err;
   _R = R;
   _R_err = R_err;
+  _alpha = alpha;
+  _alpha_err = alpha_err;
+  _beta = beta;
+  _beta_err = beta_err;
+  _gamma = gamma;
+  _gamma_err = gamma_err;
+  _kappa = kappa;
+  _kappa_err = kappa_err;
+  _delta_R = delta_R;
+  _chisq = chisq;
+}
 
+// Destructor
+SimpleCircle::~SimpleCircle() {}
+
+void SimpleCircle::clear() {
+  _x0 = 0.0;
+  _x0_err = 0.0;
+  _y0 = 0.0;
+  _y0_err = 0.0;
+  _R = 0.0;
+  _R_err = 0.0;
+  _alpha = 0.0;
+  _alpha_err = 0.0;
+  _beta = 0.0;
+  _beta_err = 0.0;
+  _gamma = 0.0;
+  _gamma_err = 0.0;
+  _kappa = 0.0;
+  _kappa_err = 0.0;
+  _delta_R = 0.0;
+  _chisq = 0.0;
+}
+
+void SimpleCircle::set_parameters(double x0, double x0_err, double y0, double y0_err,
+                                  double R, double R_err, double alpha, double alpha_err,
+                                  double beta, double beta_err, double gamma, double gamma_err,
+                                  double kappa, double kappa_err, double delta_R, double chisq) {
+  _x0 = x0;
+  _x0_err = x0_err;
+  _y0 = y0;
+  _y0_err = y0_err;
+  _R = R;
+  _R_err = R_err;
+  _alpha = alpha;
+  _alpha_err = alpha_err;
+  _beta = beta;
+  _beta_err = beta_err;
+  _gamma = gamma;
+  _gamma_err = gamma_err;
+  _kappa = kappa;
+  _kappa_err = kappa_err;
+  _delta_R = delta_R;
   _chisq = chisq;
 }
 // } // ~namespace MAUS

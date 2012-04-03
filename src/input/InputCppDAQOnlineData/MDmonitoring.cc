@@ -39,7 +39,7 @@ void MDmonitoring::Init() {
     << _monSrc << ")." << std::endl;
     exit(1);
   }
-
+/*
   char* mon = const_cast<char*> (_monSrc.c_str());
   if ((_status = monitorSetDataSource(mon)) != 0) {
     std::cerr << "Error in MDmonitoring::Init( monitorSetDataSource ):"
@@ -92,12 +92,12 @@ void MDmonitoring::Init() {
     // _dataBuffer = (unsigned char *)_staticDataBuffer;
     _dataBuffer =  reinterpret_cast<unsigned char *>(_staticDataBuffer);
   }
-
+*/
   std::cout << "Done Init." << std::endl;
 }
 
 unsigned char * MDmonitoring::GetNextEvent() {
-  struct eventHeaderStruct *event;
+/*  struct eventHeaderStruct *event;
   std::cout << "Getting event " << std::endl;
   bool again = true;
   int tries(0);
@@ -145,7 +145,7 @@ unsigned char * MDmonitoring::GetNextEvent() {
     << "Length: " << event->eventSize << std::endl
     << "Data size: " << (event->eventSize - event->eventHeadSize ) << std::endl;
   }
-
+*/
   return _dataBuffer;
 }
 

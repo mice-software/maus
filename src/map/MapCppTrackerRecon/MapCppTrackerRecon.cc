@@ -79,16 +79,16 @@ std::string MapCppTrackerRecon::process(std::string document) {
       if ( event.clusters().size() ) {
         spacepoint_recon(event);
       }
-      // Pattern Recognition.
+/*      // Pattern Recognition.
       if ( event.spacepoints().size() ) {
         pattern_recognition(event);
       }
 
       // Kalman Track Fit.
-      // if ( event.helicalprtracks().size() ) {
-      //  track_fit(event);
-      // }
-
+      if ( event.straightprtracks().size() ) {
+        track_fit(event);
+      }
+*/
       print_event_info(event);
       save_to_json(event);
     }  // ==========================================================
@@ -158,7 +158,7 @@ void MapCppTrackerRecon::pattern_recognition(SciFiEvent &evt) {
 
 void MapCppTrackerRecon::track_fit(SciFiEvent &evt) {
   KalmanTrackFit fit;
-  fit.process(evt,modules);
+  fit.process(evt);
 }
 
 void MapCppTrackerRecon::save_to_json(SciFiEvent &evt) {

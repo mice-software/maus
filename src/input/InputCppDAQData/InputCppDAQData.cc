@@ -205,17 +205,14 @@ bool InputCppDAQData::initProcessor(procType* &processor, Json::Value configJSON
   // Enable or disable this equipment.
   assert(configJSON.isMember(xDataCard));
   bool enableThis = configJSON[xDataCard].asBool();
-  std::cout << "Entering initProcessor... " << std::endl;
   if (enableThis) {
     processor->set_DAQ_map(&_map);
 
     // Get a pointer to the equipment fragment object from the static equipment map.
     unsigned int xFragType = MDequipMap::GetType(xName);
     MDfragment* xFragPtr = MDequipMap::GetFragmentPtr(xFragType);
-    std::cout << "Pointer from the equip map is" << xFragPtr << std::endl;
     // Check is the data from this equipment is made of particle events.
     try {
-      std::cout << "Is made of particles? " << xFragPtr->IsMadeOfParticles() << std::endl;
       if (xFragPtr->IsMadeOfParticles()) {
         // Set a processor for particle events.
         _dataProcessManager.SetPartEventProc(xName, processor);
