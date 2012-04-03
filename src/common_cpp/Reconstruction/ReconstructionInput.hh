@@ -29,22 +29,20 @@ namespace MAUS {
 
 class ReconstructionInput {
  public:
-  ReconstructionInput();
-
   /* @brief	Create with the given input values.
    */
-  ReconstructionInput(std::vector<Detector> detectors,
-                      std::vector<ParticleTrack> tracks);
+  ReconstructionInput(const bool beam_polarity_negative,
+                      std::vector<Detector> const * const detectors,
+                      std::vector<ParticleTrack> const * const tracks);
 
   ~ReconstructionInput();
-
-  void AddParameters(double detector_plane,
-                     CovarianceMatrix const * const detector_uncertainties,
-                     DetectorEvent
+                     
  protected:
-  std::vector<double> detector_planes_;
-  std::vector<CovarianceMatrix> detector_uncertainties_;
-  std::vector<DetectorEvent> events_;
+  ReconstructionInput();
+
+  bool beam_polarity_negative_;
+  std::vector<Detector> detectors_;
+  std::vector<ParticleTrack> tracks_;
 };
 
 }  // namespace MAUS

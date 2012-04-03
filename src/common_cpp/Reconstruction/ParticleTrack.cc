@@ -53,6 +53,46 @@ ParticleTrack::ParticleTrack(double const * const array)
 
 ParticleTrack::~ParticleTrack() { }
 
+ParticleTrack::double z() const {
+  return z_;
+}
+
+ParticleTrack::void set_z(const double z) {
+  z_ = z;
+}
+
+ParticleTrack::double z_momentum() const {
+  return z_momentum_;
+}
+
+ParticleTrack::void set_z_momentum(const double z_momentum) {
+  z_momentum_ = z_momentum;
+}
+
+ParticleTrack::double Pz() const {
+  return z_momentum_;
+}
+
+ParticleTrack::void set_Pz(const double Pz) {
+  z_momentum_ = Pz;
+}
+
+ParticleTrack::void set_detector_id(unsigned int id) {
+  detector_id_ = id;
+}
+
+ParticleTrack::unsigned int detector_id() const {
+  return detector_id_;
+}
+
+ParticleTrack::void set_uncertainties(CovarianceMatrix const * const uncertainties {
+  uncertainties_ = (*uncertainties);
+}
+
+ParticleTrack::CovarianceMatrix const * uncertainties() const {
+  return &uncertainties_;
+}
+
 /* If t < 0 it fills in t and E from z, Pz, and the given mass parameter.
  * If t >= 0 and z < 0, it fills in z and Pz from t, E, and the mass.
  */

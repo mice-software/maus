@@ -66,22 +66,28 @@ class ParticleTrack : public MAUS::PhaseSpaceVector {
   // *************************
   //       Accessors
   // *************************
-
-  inline void set_detector_id(unsigned int id) {detector_id_ = id;}
-  inline void detector_id() const {return detector_id_;}
  
-  inline double z()          const {return z_;}
-  inline void set_z(const double z) {z_ = z;}
+  double z() const;
+  void set_z(const double z);
 
-  inline double z_momentum() const {return z_momentum_;}
-  inline void set_z_momentum(const double z_momentum) {z_momentum_ = z_momentum;}
-  inline double Pz()         const {return z_momentum_;}
-  inline void set_Pz(const double Pz) {z_momentum_ = Pz;}
+  double z_momentum() const;
+  void set_z_momentum(const double z_momentum);
+  double Pz() const;
+  void set_Pz(const double Pz);
+
+  void set_detector_id(unsigned int id);
+  unsigned int detector_id() const;
+
+  void set_uncertainties(CovarianceMatrix const * const uncertainties;
+  CovarianceMatrix const * uncertainties() const;
  
   void FillInCoordinates(const double mass);  
  protected:
   double z_;
   double z_momentum_;
+  unsigned int detector_id_;  // = 0 if this was not measured in a detector
+  CovarianceMatrix uncertainties_;
+  
 };
 
 std::ostream& operator<<(std::ostream& out, const ParticleTrack& vector);
