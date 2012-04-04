@@ -177,6 +177,13 @@ class ReducePyScalersTableTestCase(unittest.TestCase): # pylint: disable=R0904, 
         @param self Object reference.
         """
         result = self.__process({})
+        self.assertTrue("errors" in result, "No errors field")
+        errors = result["errors"]
+        self.assertTrue("ReducePyScalersTable" in errors,
+            "No ReducePyScalersTable field")        
+        errors = errors["ReducePyScalersTable"]
+        self.assertTrue(len(errors) >= 1, "Missing error trace")
+        self.assertEquals("<type 'exceptions.KeyError'>: 'daq_data is not in spill'", errors[0], "Unexpected error trace") # pylint: disable=C0301
         # Scalar, for validation.
         expected = Scaler()
         self.__check_result(result, "", None, expected)
@@ -188,6 +195,13 @@ class ReducePyScalersTableTestCase(unittest.TestCase): # pylint: disable=R0904, 
         @param self Object reference.
         """
         result = self.__process({"daq_data":None})
+        self.assertTrue("errors" in result, "No errors field")
+        errors = result["errors"]
+        self.assertTrue("ReducePyScalersTable" in errors,
+            "No ReducePyScalersTable field")        
+        errors = errors["ReducePyScalersTable"]
+        self.assertTrue(len(errors) >= 1, "Missing error trace")
+        self.assertEquals("<type 'exceptions.ValueError'>: daq_data is None", errors[0], "Unexpected error trace") # pylint: disable=C0301
         # Scalar, for validation.
         expected = Scaler()
         self.__check_result(result, "", None, expected)
@@ -198,6 +212,13 @@ class ReducePyScalersTableTestCase(unittest.TestCase): # pylint: disable=R0904, 
         @param self Object reference.
         """
         result = self.__process({"daq_data":{}})
+        self.assertTrue("errors" in result, "No errors field")
+        errors = result["errors"]
+        self.assertTrue("ReducePyScalersTable" in errors,
+            "No ReducePyScalersTable field")        
+        errors = errors["ReducePyScalersTable"]
+        self.assertTrue(len(errors) >= 1, "Missing error trace")
+        self.assertEquals("<type 'exceptions.KeyError'>: 'V830 is not in spill'", errors[0], "Unexpected error trace") # pylint: disable=C0301
         # Scalar, for validation.
         expected = Scaler()
         self.__check_result(result, "", None, expected)
@@ -208,6 +229,13 @@ class ReducePyScalersTableTestCase(unittest.TestCase): # pylint: disable=R0904, 
         @param self Object reference.
         """
         result = self.__process({"daq_data":{"V830":{}}})
+        self.assertTrue("errors" in result, "No errors field")
+        errors = result["errors"]
+        self.assertTrue("ReducePyScalersTable" in errors,
+            "No ReducePyScalersTable field")        
+        errors = errors["ReducePyScalersTable"]
+        self.assertTrue(len(errors) >= 1, "Missing error trace")
+        self.assertEquals("<type 'exceptions.KeyError'>: 'channels is not in spill'", errors[0], "Unexpected error trace") # pylint: disable=C0301
         # Scalar, for validation.
         expected = Scaler()
         self.__check_result(result, "", None, expected)
@@ -218,8 +246,16 @@ class ReducePyScalersTableTestCase(unittest.TestCase): # pylint: disable=R0904, 
         @param self Object reference.
         """
         result = self.__process({"daq_data":{"V830":{"channels":{}}}})
+        self.assertTrue("errors" in result, "No errors field")
+        errors = result["errors"]
+        self.assertTrue("ReducePyScalersTable" in errors,
+            "No ReducePyScalersTable field")        
+        errors = errors["ReducePyScalersTable"]
+        self.assertTrue(len(errors) >= 1, "Missing error trace")
+        self.assertEquals("<type 'exceptions.KeyError'>: 'ch0 is not in spill'", errors[0], "Unexpected error trace") # pylint: disable=C0301
         # Scalar, for validation.
         expected = Scaler()
+        print result
         self.__check_result(result, "", None, expected)
 
     def __process(self, json_doc):

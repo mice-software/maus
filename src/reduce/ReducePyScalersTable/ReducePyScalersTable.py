@@ -156,6 +156,15 @@ class ReducePyScalersTable: # pylint: disable=R0902
     -Recent scalers window ("recent_scalers_window"). Default: 10. 
      Number of most recent values for which MOST_RECENT_AVERAGE above
      is calculated. 
+
+    In cases where a spill is input that does not contain information
+    needed to calculate the scaler values then a spill, as above,
+    is output with the last good values, plus an "errors" field
+    describing the missing information e.g.
+    @verbatim
+    {"errors": {..., "bad_json_document": "unable to do json.loads on input"}}
+    {"errors": {..., "...": "..."}}
+    @endverbatim
     """
 
     def __init__(self):
@@ -222,8 +231,8 @@ class ReducePyScalersTable: # pylint: disable=R0902
         try:
             result = self._process_spill(json_doc)
         except Exception: # pylint:disable=W0703
-            ErrorHandler.HandleException(json_doc, self)
             result = self._create_output()
+            ErrorHandler.HandleException(result, self)
         # Convert result to string.
         doc_list = [json.dumps(result), "\n"]
         return unicode("".join(doc_list))
