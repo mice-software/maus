@@ -56,12 +56,9 @@ void SectorMagneticFieldMap::SetInterpolator
     _interpolator = interpolator;
     if (_interpolator != NULL) {
         ThreeDGrid* grid = _interpolator->GetGrid();
-        SectorField::SetPolarBoundingBoxMin(grid->MinX(),
-                                            grid->MinY(),
-                                            grid->MinZ());
-        SectorField::SetPolarBoundingBoxMax(grid->MaxX(),
-                                            grid->MaxY(),
-                                            grid->MaxZ());
+        SectorField::SetPolarBoundingBox
+                                    (grid->MinX(), grid->MinY(), grid->MinZ(),
+                                     grid->MaxX(), grid->MaxY(), grid->MaxZ());
     }
 }
 
@@ -110,7 +107,6 @@ void SectorMagneticFieldMap::GetFieldValuePolar
 }
 
 void SectorMagneticFieldMap::GetFieldValue(const double* point, double* field) {
-    double mirror = 1.;
     std::vector<double> _point(&point[0], &point[3]);
     _point[0] = ::sqrt(point[0]*point[0]+point[2]*point[2]);
     _point[2] = atan2(point[2], point[0]);

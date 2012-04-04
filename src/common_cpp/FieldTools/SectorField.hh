@@ -23,10 +23,10 @@ namespace MAUS {
 
 class SectorField : public BTField {
   public:
-    SectorField() {}
+    SectorField();
   	SectorField(double bbMinR, double bbMinY, double bbMinPhi,
                 double bbMaxR, double bbMaxY, double bbMaxPhi);
-    virtual ~SectorField() {}
+    virtual ~SectorField();
 
     virtual void GetFieldValuePolar
                              (const double* point_polar, double* field_polar) = 0;
@@ -34,18 +34,22 @@ class SectorField : public BTField {
     virtual void GetFieldValue
                            (const double* point_cartes, double* field_cartes) = 0;
 
-    virtual void ConvertToPolar(double* position)
+    static void ConvertToPolar(double* position);
 
-    virtual void ConvertToCartesian(double* position);
+    static void ConvertToPolar(const double* position_polar, double* value);
+
+    static void ConvertToCartesian(double* position);
+
+    static void ConvertToCartesian(const double* position_polar, double* value);
 
   protected:
-    void SetPolarBoundingBoxMin(double bbMinR, double bbMinY, double bbMinPhi) {
-    }
-
-    void SetPolarBoundingBoxMax(double bbMaxR, double bbMaxY, double bbMaxPhi) {
-    }
+    void SetPolarBoundingBox(double bbMinR, double bbMinY, double bbMinPhi,
+                             double bbMaxR, double bbMaxY, double bbMaxPhi);
 
   private:
+
+    std::vector< std::vector<double> > GetCorners
+               (double bbMinR, double bbMinPhi, double bbMaxR, double bbMaxPhi);
 };
 }
 
