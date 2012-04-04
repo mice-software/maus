@@ -42,7 +42,7 @@ def run():
 
     # Set up data cards.
     data_cards_list = []
-    data_cards_list.append("output_file_prefix='%s'\n" % "scalers")
+    data_cards_list.append("output_file_name='%s'\n" % "scalers")
     data_cards_list.append("output_file_auto_number=%s\n" % True)
     data_cards = io.StringIO(unicode("".join(data_cards_list)))
 
