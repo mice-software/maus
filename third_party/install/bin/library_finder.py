@@ -88,7 +88,7 @@ class library_linker:
                64bit). If not specified, use system architecture.
         """
         lib_full_name = "lib"+lib_name+".so"
-        lib_location = self.file_searcher
+        lib_location = self.file_searcher \
                           ("/usr/", lib_full_name, architecture_filter_function)
         if lib_location == None:
             raise RuntimeError("Failed to find dependency "+lib_full_name)
