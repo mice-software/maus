@@ -27,8 +27,15 @@
 
 class SimpleLine {
   public:
-    SimpleLine();   // Default constructor
-    ~SimpleLine();  // Default destructor
+
+    // Constructors
+    SimpleLine();
+    SimpleLine(double c, double m);
+    SimpleLine(double c, double c_err, double m, double m_err,
+               double chisq, double chisq_dof);
+
+    // Destructor
+    ~SimpleLine();
 
     // Getters
     double get_c() const { return _c; }
@@ -39,6 +46,7 @@ class SimpleLine {
     double get_chisq_dof() const { return _chisq_dof; }
 
     // Setters
+    void clear();
     void set_c(double c) { _c = c; }
     void set_c_err(double c_err) { _c_err = c_err; }
     void set_m(double m) { _m = m; }
