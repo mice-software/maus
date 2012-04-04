@@ -37,7 +37,6 @@ def run():
         hits["ch12"] = i
         scalers["channels"] = hits
         input_docs.append(json.dumps(json_doc))
-        print json_doc
         input_docs.append("\n")
     input_file = io.StringIO(unicode("".join(input_docs)))
 
