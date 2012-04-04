@@ -190,7 +190,7 @@ SciFitdcFactor = 1.0
 SciFinPlanes = 3
 SciFinStations = 5
 SciFinTrackers = 2
-SciFiNPECut = 4.0 # photoelectrons
+SciFiNPECut = 2.0 # photoelectrons
 SciFiClustExcept = 100 # exception is thrown
 SciFi_sigma_tracker0_station5 = 0.4298 # mm
 SciFi_sigma_triplet = 0.3844 # mm
@@ -237,9 +237,9 @@ V1731_Zero_Suppression_Threshold = 100
 Do_V1724_Zero_Suppression = True
 V1724_Zero_Suppression_Threshold = 100
 Do_VLSB_Zero_Suppression = True
-VLSB_Zero_Suppression_Threshold = 40
+VLSB_Zero_Suppression_Threshold = 30
 Do_VLSB_C_Zero_Suppression = True
-VLSB_C_Zero_Suppression_Threshold = 45
+VLSB_C_Zero_Suppression_Threshold = 30
 Enable_TOF = True
 Enable_EMR = True
 Enable_KL = True
@@ -300,4 +300,5 @@ mongodb_collection_name = "spills" # Default MongoDB collection name. Only neede
 
 # Default OutputPyImage image directory. MAUS web application directory.
 image_directory = os.environ.get("MAUS_WEB_MEDIA_RAW") if (os.environ.get("MAUS_WEB_MEDIA_RAW") != None) else os.getcwd()
-
+# Default OutputPyFile output directory. MAUS web application directory.
+output_file_directory = os.environ.get("MAUS_WEB_MEDIA_RAW") if (os.environ.get("MAUS_WEB_MEDIA_RAW") != None) else os.getcwd()

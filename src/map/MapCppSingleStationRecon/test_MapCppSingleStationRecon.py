@@ -5,7 +5,7 @@ import os
 import random
 from Configuration import Configuration
 
-from MapCppTrackerSE import MapCppTrackerSE
+from MapCppSingleStationRecon import MapCppSingleStationRecon
 
 # Disable: Too many public methods
 # pylint: disable-msg=R0904
@@ -15,7 +15,7 @@ from MapCppTrackerSE import MapCppTrackerSE
 # pylint: disable-msg=C0202
 
 class MapCppTrackerSETestCase(unittest.TestCase):
-    """ The MapCppTrackerSE test.
+    """ The MapCppSingleStation test.
     Member functions are:
 
     - bool birth(std::string argJsonConfigDocument);
@@ -43,7 +43,7 @@ class MapCppTrackerSETestCase(unittest.TestCase):
             The set up is called before each test function
             is called.
         """
-        self.mapper = MapCppTrackerSE()
+        self.mapper = MapCppSingleStationRecon()
         conf = Configuration()
         # Test whether the configuration files were loaded correctly at birth
         success = self.mapper.birth(conf.getConfigJSON())
@@ -61,7 +61,7 @@ class MapCppTrackerSETestCase(unittest.TestCase):
         assert root_dir != None
         assert os.path.isdir(root_dir)
         _filename = \
-        '%s/src/map/MapCppTrackerSE/lab7_unpacked' % root_dir
+        '%s/src/map/MapCppSingleStation/lab7_unpacked' % root_dir
         #assert os.path.isfile(_filename)
         #_file = open(_filename, 'r')
         # File is open.
