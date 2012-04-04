@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-directory=root_v5.30.03
+#directory=root_v5.30.03
+directory=root_v5.32.01
 filename=${directory}.source.tar.gz 
 url=ftp://root.cern.ch/root/${filename}
 
@@ -39,7 +40,18 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 	echo
 	sleep 1
 
-  ./configure --disable-xrootd --enable-gsl-shared --with-gsl-incdir=${MAUS_ROOT_DIR}/third_party/install/include --with-gsl-libdir=${MAUS_ROOT_DIR}/third_party/install/lib && echo && echo && echo "INFO: Making:" && echo && sleep 1 && make || { echo "FAIL: Failed to configure/make";exit 1; }
+    x11=${MAUS_THIRD_PARTY}/third_party/install/lib/
+    # hack to find third party libraries - for ubuntu et al where they have weird and wonderful
+    # library locations to support multiple architectures. Sticks them in ${x11} directory
+    python ${MAUS_THIRD_PARTY}/third_party/install/bin/library_finder.py X11 Xext Xft
+    ./configure --disable-xrootd --enable-gsl-shared \
+              --with-gsl-incdir=${MAUS_ROOT_DIR}/third_party/install/include \
+              --with-gsl-libdir=${MAUS_ROOT_DIR}/third_party/install/lib \
+              --with-x11-libdir=${x11} \
+              --with-x11-libdir=${x11} \
+              --with-xft-libdir=${x11} \
+              --with-xext-libdir=${x11}
+    echo && echo &&  echo "INFO: Making:" && echo && sleep 1 && make || { echo "FAIL: Failed to configure/make";exit 1; }
 
 	            ################################################## 
 	echo
