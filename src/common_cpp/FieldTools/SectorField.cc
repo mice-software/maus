@@ -25,7 +25,13 @@
 
 namespace MAUS {
 
-SectorField::SectorField() : BTField() {}
+SectorField::SectorField() : BTField(), _polarBBMin(3, 0),  _polarBBMax(3, 0) {
+    _polarBBMin[1] = bbMin[1];
+    _polarBBMax[1] = bbMax[1];
+    _polarBBMax[0] = bbMax[0];
+    _polarBBMin[2] = -2.*M_PI;
+    _polarBBMax[2] = 2.*M_PI;
+}
 
 SectorField::~SectorField() {}
 
@@ -84,13 +90,20 @@ void SectorField::SetPolarBoundingBox
                "Bounding box minimum angle was greater than maximum angle",
                "SectorField::SetPolarBoundingBox"));
     }
-    if (bbMinPhi < -2.*M_PI || bbMinPhi < 2.*M_PI ||
-        bbMaxPhi < -2.*M_PI || bbMaxPhi < 2.*M_PI) {
+    if (bbMinPhi < -2.*M_PI || bbMinPhi > 2.*M_PI ||
+        bbMaxPhi < -2.*M_PI || bbMaxPhi > 2.*M_PI) {
         throw (Squeal(Squeal::recoverable, 
                "Bounding box angles must be in range -2*M_PI < phi < 2*M_PI",
                "SectorField::SetPolarBoundingBox"));
     }
 
+    _polarBBMin[0] = bbMinR;
+    _polarBBMin[1] = bbMinY;
+    _polarBBMin[2] = bbMinPhi;
+
+    _polarBBMax[0] = bbMaxR;
+    _polarBBMax[1] = bbMaxY;
+    _polarBBMax[2] = bbMaxPhi;
 
     // bounding box from corner coordinates
     std::vector< std::vector<double> > corner_coords(
@@ -150,6 +163,16 @@ std::vector< std::vector<double> > SectorField::GetCorners
     corner_coords[1][3] = corner_3[2];
     return corner_coords;
 }
+
+
+std::vector<double> SectorField::GetPolarBoundingBoxMin() const {
+    return _polarBBMin;
+}
+
+std::vector<double> SectorField::GetPolarBoundingBoxMax() const {
+    return _polarBBMax;
+}
+
 
 }
 

@@ -29,6 +29,15 @@ class SectorFieldTestClass : public SectorField {
 
     virtual void GetFieldValue
                            (const double* point_cartes, double* field_cartes) {}
+
+    void SetPolarBoundingBox(double bbMinR, double bbMinY, double bbMinPhi,
+                             double bbMaxR, double bbMaxY, double bbMaxPhi) {
+        SectorField::SetPolarBoundingBox(bbMinR, bbMinY, bbMinPhi,
+                             bbMaxR, bbMaxY, bbMaxPhi);
+    }
+
+    std::vector<double> GetBoundingBoxMin() {return BTField::bbMin;}
+    std::vector<double> GetBoundingBoxMax() {return BTField::bbMax;}
 };
 
 void __testConvertPosToPolarAndCartesian(const double* position_in,
@@ -147,8 +156,36 @@ TEST(SectorFieldTest, ConvertValueToPolarAndCartesianTest) {
     }
 }
 
+void __testBB(const double* bb_polar_in, const double* bb_cart_expected) {
+    SectorFieldTestClass test;
+    test.SetPolarBoundingBox(bb_polar_in[0], bb_polar_in[1], bb_polar_in[2],
+                             bb_polar_in[3], bb_polar_in[4], bb_polar_in[5]);
+    std::vector<double> bb_polar_min_out = test.GetPolarBoundingBoxMin();
+    std::vector<double> bb_polar_max_out = test.GetPolarBoundingBoxMax();
+
+    std::vector<double> bb_cart_min_out = test.GetBoundingBoxMin();
+    std::vector<double> bb_cart_max_out = test.GetBoundingBoxMax();
+
+    for (size_t i = 0; i < 3; ++i) {
+        EXPECT_NEAR(bb_polar_min_out[i], bb_polar_in[i], 1e-12);
+        EXPECT_NEAR(bb_polar_max_out[i], bb_polar_in[i+3], 1e-12);
+    }
+    for (size_t i = 0; i < 3; ++i) {
+        EXPECT_NEAR(bb_cart_min_out[i], bb_cart_expected[i], 1e-3);
+        EXPECT_NEAR(bb_cart_max_out[i], bb_cart_expected[i+3], 1e-3`);
+    }
+}
+
+
 TEST(SectorFieldTest, SetPolarBoundingBoxTest) {
-    EXPECT_TRUE(false);
+    double bb_polar_1[6] = {0., 0., 0., 1., 1., M_PI/2.};
+    double bb_cart_1[6] = {0., 0., 0., 1., 1., 1.};
+    __testBB(bb_polar_1, bb_cart_1);
+
+    double bb_polar_2[6] = {0.5, -3., -M_PI*1.999, 1.5, 3., M_PI*1.999};
+    double bb_cart_2[6] = {-1.5, -3., -1.5, -1.5, 3., 1.5};
+    __testBB(bb_polar_2, bb_cart_2);
+
 }
 
 }

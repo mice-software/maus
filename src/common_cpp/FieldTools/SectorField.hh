@@ -42,10 +42,16 @@ class SectorField : public BTField {
 
     static void ConvertToCartesian(const double* position_polar, double* value);
 
+    virtual std::vector<double> GetPolarBoundingBoxMin() const;
+
+    virtual std::vector<double> GetPolarBoundingBoxMax() const;
+
   protected:
     void SetPolarBoundingBox(double bbMinR, double bbMinY, double bbMinPhi,
                              double bbMaxR, double bbMaxY, double bbMaxPhi);
 
+    std::vector<double> _polarBBMin;
+    std::vector<double> _polarBBMax;
   private:
 
     std::vector< std::vector<double> > GetCorners
