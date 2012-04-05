@@ -1,5 +1,5 @@
 """
-Test class for workers module.
+Tests for workers module.
 """
 
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
@@ -21,17 +21,17 @@ Test class for workers module.
 
 import unittest
 
-from workers import WorkerBirthFailedException
-from workers import WorkerDeathFailedException
-from workers import WorkerDeadException
-from workers import WorkerProcessException
-from workers import WorkerUtilities
+from framework.workers import WorkerBirthFailedException
+from framework.workers import WorkerDeathFailedException
+from framework.workers import WorkerDeadException
+from framework.workers import WorkerProcessException
+from framework.workers import WorkerUtilities
 from MAUS import MapPyDoNothing
 from MAUS import MapPyGroup
 
 class WorkerUtilitiesTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
     """
-    Test class for workers.WorkerUtilities.
+    Test class for framework.workers.WorkerUtilities.
     """
 
     def test_get_worker_names_none(self):
@@ -271,7 +271,7 @@ class WorkerUtilitiesTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
 
 class WorkerBirthFailedExceptionTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
     """
-    Test class for workers.WorkerBirthFailedException class.
+    Test class for framework.workers.WorkerBirthFailedException class.
     """
 
     def test_init(self):
@@ -285,7 +285,7 @@ class WorkerBirthFailedExceptionTestCase(unittest.TestCase): # pylint: disable=R
 
 class WorkerDeathFailedExceptionTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
     """
-    Test class for workers.WorkerDeathFailedException class.
+    Test class for framework.workers.WorkerDeathFailedException class.
     """
 
     def test_init(self):
@@ -299,7 +299,7 @@ class WorkerDeathFailedExceptionTestCase(unittest.TestCase): # pylint: disable=R
 
 class WorkerDeadExceptionTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
     """
-    Test class for workers.WorkerDeadException class.
+    Test class for framework.workers.WorkerDeadException class.
     """
 
     def test_init(self):
@@ -313,7 +313,7 @@ class WorkerDeadExceptionTestCase(unittest.TestCase): # pylint: disable=R0904, C
 
 class WorkerProcessExceptionTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
     """
-    Test class for workers.WorkerProcessException class.
+    Test class for framework.workers.WorkerProcessException class.
     """
 
     def test_init(self):

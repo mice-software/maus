@@ -35,7 +35,8 @@ class ReducePyROOTHistogram: # pylint: disable=R0902
     Histograms are output as JSON documents of form:
 
     @verbatim
-    {"image": {"content":"...a description of the image...",
+    {"image": {"keywords": [...list of image keywords...],
+               "description":"...a description of the image...",
                "tag": TAG,
                "image_type": "eps", 
                "data": "...base 64 encoded image..."}}
@@ -207,13 +208,14 @@ class ReducePyROOTHistogram: # pylint: disable=R0902
         """
         return True
 
-    def get_image_doc(self, content, tag, canvas):
+    def get_image_doc(self, keywords, description, tag, canvas):
         """
         Build a JSON document holding image data. This saves the
         canvas to a temporary file and then reloads it.
 
         @param self Object reference.
-        @param content String describing the image.
+        @param keywords List of image keywords.
+        @param description String describing the image.
         @param tag Image tag.
         @param canvas ROOT canvas.
         @returns JSON document.
@@ -233,7 +235,8 @@ class ReducePyROOTHistogram: # pylint: disable=R0902
         # Build JSON document.
         json_doc = {}
         json_doc["image"] = {}
-        json_doc["image"]["content"] = content
+        json_doc["image"]["keywords"] = keywords
+        json_doc["image"]["description"] = description
         json_doc["image"]["tag"] = image_tag
         json_doc["image"]["image_type"] = self.image_type
         json_doc["image"]["data"] = encoded_data
