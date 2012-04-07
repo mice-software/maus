@@ -29,7 +29,8 @@ bool ReduceCppSingleStation::birth(std::string argJsonConfigDocument) {
   _filename = "se.root";
   _nSpills = 0;
 
-  TCanvas *c1 = new TCanvas("c1", "ADC Monitor", 200, 10, 700, 500);
+  TCanvas *c1 = new TCanvas("c1", "ADC Monitor-Cassette1", 200, 10, 700, 500);
+  TCanvas *c2 = new TCanvas("c2", "ADC Monitor-Cassette2", 200, 10, 700, 500);
 
   _unpacked.SetNameTitle("unpacked", "unpacked");
   _unpacked.Branch("adc", &_adc, "adc/I");
@@ -41,6 +42,12 @@ bool ReduceCppSingleStation::birth(std::string argJsonConfigDocument) {
   c1->GetFrame()->SetFillColor(42);
   c1->GetFrame()->SetBorderSize(6);
   c1->GetFrame()->SetBorderMode(-1);
+
+  c2->Divide(4, 2);
+  c2->SetFillColor(21);
+  c2->GetFrame()->SetFillColor(42);
+  c2->GetFrame()->SetBorderSize(6);
+  c2->GetFrame()->SetBorderMode(-1);
 
   // JsonCpp setup
   Json::Value configJSON;
@@ -65,9 +72,13 @@ std::string  ReduceCppSingleStation::process(std::string document) {
   // Check if the JSON document can be parsed, else return error only
 
   TCanvas *c1 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c1"));
+  TCanvas *c2 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c2"));
 
   try {
-    root = JsonWrapper::StringToJson(document);}
+    root = JsonWrapper::StringToJson(document);
+    std::cerr << root.type() << " obj:" << Json::Value(Json::objectValue).type() << " null:" << Json::Value().type() << " str:" << Json::Value("").type() << std::endl;
+
+  }
   catch(...) {
     Json::Value errors;
     std::stringstream ss;
@@ -77,8 +88,17 @@ std::string  ReduceCppSingleStation::process(std::string document) {
     return writer.write(root);
   }
   try {
-    if ( root.isMember("daq_data") ) {
-      int n_events = root["daq_data"]["single_station"].size();
+    std::cout << "Entering process." << std::endl;
+
+    if ( root.isMember("daq_data") && !root["daq_data"].isNull()) {
+      //std::cerr << root.isMember("daq_data") << std::endl;
+      Json::Value daq_data = JsonWrapper::GetProperty(root,
+                                                   "daq_data" ,
+                                                   JsonWrapper::objectValue);
+      std::cerr << "looking up daq data..." << std::endl;
+      if ( !daq_data.isNull() ) {
+      std::cout << "daq_data is non Null." << std::endl;
+      int n_events = daq_data["single_station"].size();
       // std::cout << "Number of events: " << n_events << std::endl;
       // Loop over events.
       for (int PartEvent = 0; PartEvent < n_events; PartEvent++) {
@@ -100,7 +120,8 @@ std::string  ReduceCppSingleStation::process(std::string document) {
           _unpacked.Fill();
         }
       } // ends loop over particle events
-    }
+     }
+   }
   } catch(Squeal squee) {
      Squeak::mout(Squeak::error) << squee.GetMessage() << std::endl;
     root = MAUS::CppErrorHandler::getInstance()->HandleSqueal(root, squee, _classname);
@@ -137,13 +158,40 @@ std::string  ReduceCppSingleStation::process(std::string document) {
     c1->cd(8);
     _unpacked.Draw("adc:chan", "bank == 7 ");
     c1->Update();
-  }
 
+    c2->cd();
+    c2->cd(1);
+    _unpacked.Draw("adc:chan", "bank == 8 ");
+    c2->Update();
+    c2->cd(2);
+    _unpacked.Draw("adc:chan", "bank == 9 ");
+    c2->Update();
+    c2->cd(3);
+    _unpacked.Draw("adc:chan", "bank == 10 ");
+    c2->Update();
+    c2->cd(4);
+    _unpacked.Draw("adc:chan", "bank == 11");
+    c2->Update();
+    c2->cd(5);
+    _unpacked.Draw("adc:chan", "bank == 12");
+    c2->Update();
+    c2->cd(6);
+    _unpacked.Draw("adc:chan", "bank == 13");
+    c2->Update();
+    c2->cd(7);
+    _unpacked.Draw("adc:chan", "bank == 14");
+    c2->Update();
+    c2->cd(8);
+    _unpacked.Draw("adc:chan", "bank == 15");
+    c2->Update();
+  }
+  std::cout << "End of process" << std::endl;
   return document;
 }
 
 bool ReduceCppSingleStation::death()  {
   Save();
+  std::cout << "************ Dead of Single Station Reducer ************" << std::endl;
   return true;
 }
 
