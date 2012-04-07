@@ -34,8 +34,10 @@ bool MapCppSingleStationRecon::birth(std::string argJsonConfigDocument) {
   std::string filename;
   filename = _configJSON["reconstruction_geometry_filename"].asString();
   MiceModule* _module;
+  std::cout << "Looking up modules...";
   _module = new MiceModule(filename);
   modules = _module->findModulesByPropertyString("SensitiveDetector", "SE");
+  std::cout << "Found them!" << std::endl;
 
   // Get minPE cut value.
   assert(_configJSON.isMember("SciFiNPECut"));
@@ -71,15 +73,18 @@ std::string MapCppSingleStationRecon::process(std::string document) {
 
   try { // ================= Reconstruction =========================
     root = JsonWrapper::StringToJson(document);
+    std::cout << "Reading unpacked data." << std::endl;
     digitization(spill, root);
 
     for ( unsigned int k = 0; k < spill.events().size(); k++ ) {
       SEEvent event = *(spill.events()[k]);
       // Build Clusters.
+      std::cout << "Clustering." << std::endl;
       if ( event.digits().size() ) {
         cluster_recon(event);
       }
       // Build SpacePoints.
+      std::cout << "Finally, Spacepoints." << std::endl;
       if ( event.clusters().size() ) {
         spacepoint_recon(event);
       }
