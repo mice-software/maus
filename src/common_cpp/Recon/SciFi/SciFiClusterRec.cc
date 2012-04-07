@@ -127,7 +127,7 @@ void SciFiClusterRec::construct(SciFiCluster *clust, std::vector<const MiceModul
   double channel = clust->get_channel() - CentralFibre;
   clust->set_relative_position(relative_position);
   clust->set_alpha(channel);
-  int id = tracker + 3*(station-1) + (plane);
+  int id = 15*tracker + 3*(station-1) + (plane);
   clust->set_id(id);
 }
 
