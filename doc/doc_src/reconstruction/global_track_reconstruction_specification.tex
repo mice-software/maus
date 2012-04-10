@@ -393,6 +393,14 @@ The fundamental algorithm that is proposed for track reconstruction is to take i
 
 Several different algorithms can be foreseen; one task of the Global Reconstruction is to determine a framework in which different algorithms can be implemented without major infrastructure changes.\\
 
+\subsection{Detector Outputs}
+
+\subsubsection{TOF}
+\subsubsection{Cerenkov}
+\subsubsection{Scintillating Fiber Tracker}
+\subsubsection{Calorimeter (KL)}
+\subsubsection{Electron/Muon Ranger (EMR)}
+
 \subsection{Track and Error Propagation}
 
 In the paraxial approximation, tracks propagate according to an equation like
@@ -445,7 +453,7 @@ Minuit is the algorithm, packaged with ROOT, that allows for solving of fairly g
 
 The Kalman filter technique may be a more optimal solution. This algorithm has been proposed for use by the tracker group.\\
 
-The Kalman filter would work in the context of track reconstruction by predicting subsequent particle event coordinates and calculating a weighted average between the prediction and the actual measurement from the detector. The transfer matrix is given, and the last weighted average is propagated back through the lattice to produce a final trajectory.\emph{Is this last part right?}
+The Kalman filter would work in the context of track reconstruction by predicting subsequent particle event coordinates and calculating a weighted average between the prediction and the actual measurement from the detector. The transfer matrix is given, and the last weighted average is propagated back through the lattice to produce a final track.\emph{Is this last part right?}
 
 \subsubsection{TOF Iteration (\emph{Better Name?})}
 
@@ -485,9 +493,9 @@ It may also be possible to use mass as a free parameter in the track finding. Th
 \section{Class Hierarchy}
 
 Figure 1.1 shows the proposed, main class hierarchy for track reconstruction.
-The interfaces OpticsModel, TransferMap, and TrajectoryFitter provide the
+The interfaces OpticsModel, TransferMap, and TrackFitter provide the
 required implementation flexibility which is detailed in figure 1.2. The
-particular optics model and trajectory fitting algorithm can be specified in the configuration file. The appropriate class instances will then be instantiated.
+particular optics model and track fitting algorithm can be specified in the configuration file. The appropriate class instances will then be instantiated.
 
 \begin{figure}
 \centering
@@ -518,7 +526,7 @@ information:
 \begin{enumerate}
   \item a flag indicating the polarity of the particle beam,
   \item a list of detector information data structures, and
-  \item a list of particle track data structures.
+  \item a list of track point data structures.
 \end{enumerate}
 
 Each instance of the detector information data structure is comprised of
@@ -528,43 +536,43 @@ Each instance of the detector information data structure is comprised of
   \item a matrix of covariances indicating the uncertainties of the detector.
 \end{enumerate}
 
-The items of the particle track data structure that are used for inputs into
+The items of the track point data structure that are used for inputs into
 reconstruction are
 \begin{enumerate}
-  \item the 6D phase space coordinates of the track $(t, E, x, Px, y, Py)$, and
-  \item the ID of the detector which measured the track.
+  \item the 6D phase space coordinates of the track point $(t, E, x, Px, y, Py)$, and
+  \item the ID of the detector which produced the track point.
 \end{enumerate}
 This data structure also contains the z and Pz coordinates as well an
 uncertainty matrix. The z and Pz coordinates are filled in automatically and are
-provided as an output of reconstruction. For measured particle tracks the
+provided as an output of reconstruction. For measured track points the
 uncertainty matrix is filled in using the one given for the detector where
-the track was measured.
+the track point was produced.
 
 \subsection{Output Data Structure}
 
-The outputs of reconstruction are a list of particle trajectory data structures.
-Each trajectory contains
+The outputs of reconstruction are a list of track data structures.
+Each track contains
 \begin{enumerate}
-  \item the PDG particle ID for the type of particle associated with the trajectory, and
-  \item a list of particle track data structures that comprise the discrete trajectory.
+  \item the PDG particle ID for the type of particle associated with the track, and
+  \item a list of track pont data structures that comprise the discrete track.
 \end{enumerate}
 
-Each particle track data structure contains the following items:
+Each track point data structure contains the following items:
 \begin{enumerate}
-  \item the 6D phase space coordinates of the track $(t, E, x, Px, y, Py)$,
+  \item the 6D phase space coordinates of the track point $(t, E, x, Px, y, Py)$,
   \item the calculated z and Pz coordinates,
   \item the uncertainties on the phase space coordinates in the form of a
         covariance matrix.
-  \item the ID of the detector which measured the track, or zero if this track was 
-        calculated.
+  \item the ID of the detector which produced the track point, or zero if this track point was 
+        calculated during reconstruction.
 \end{enumerate}
 
 \section{Task Breakdown}
 
 \subsection{Data Structures}
 
-Define input and output data structures. It is crucial to get this flushed out early on so that the detector groups know what is needed. Referring to the class diagram, this would involve implementing PhaseSpaceVector (exists already), ParticleTrack, Detector,
-and ReconstructionInput for the inputs. ParticleTrajectory must be implemented
+Define input and output data structures. It is crucial to get this flushed out early on so that the detector groups know what is needed. Referring to the class diagram, this would involve implementing PhaseSpaceVector (exists already), TrackPoint, Detector,
+and ReconstructionInput for the inputs. Track must be implemented
 for the outputs.
 
 \subsection{Interfaces}

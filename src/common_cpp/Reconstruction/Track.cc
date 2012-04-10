@@ -17,37 +17,37 @@
 /* Author: Peter Lane
  */
 
-#include "Reconstruction/ParticleTrajectory.hh"
+#include "Reconstruction/Track.hh"
 
 #include "Interface/Squeak.hh"
 #include "src/common_cpp/Simulation/MAUSPrimaryGeneratorAction.hh"
 
 namespace MAUS {
 
-ParticleTrajectory::ParticleTrajectory()
+Track::Track()
     : std::vector<ParticleTrack>(), particle_id_(0)
 { }
 
-ParticleTrajectory::ParticleTrajectory(const std::vector<ParticleTrack>& tracks,
+Track::Track(const std::vector<ParticleTrack>& tracks,
                                        const int particle_id)
     : particle_id_(particle_id)
 {
   assign(tracks);
 }
 
-ParticleTrajectory::~ParticleTrajectory()
+Track::~Track()
 { }
 
-int ParticleTrajectory::particle_id() const {
+int Track::particle_id() const {
   return particle_id_;
 }
 
-void ParticleTrajectory::set_particle_id(const int particle_id) {
+void Track::set_particle_id(const int particle_id) {
   particle_id_ = particle_id;
 }
 
 MAUS::MAUSPrimaryGeneratorAction::PGParticle
-ParticleTrajectory::PrimaryGeneratorParticle(
+Track::PrimaryGeneratorParticle(
 ParticleTrack const * const track) {
   MAUSPrimaryGeneratorAction::PGParticle particle;
   particle.x = track->x();

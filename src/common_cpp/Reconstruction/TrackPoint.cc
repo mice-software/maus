@@ -17,7 +17,7 @@
 /* Author: Peter Lane
  */
 
-#include "Reconstruction/ParticleTrack.hh"
+#include "Reconstruction/TrackPoint.hh"
 
 #include <cmath>
 #include "CLHEP/Units/PhysicalConstants.h"
@@ -26,17 +26,17 @@
 
 namespace MAUS {
 
-ParticleTrack::ParticleTrack()
+TrackPoint::TrackPoint()
     : PhaseSpaceVector(), z_(0.), z_momentum_(0.)
 { }
 
-ParticleTrack::ParticleTrack(const ParticleTrack& original_instance)
+TrackPoint::TrackPoint(const TrackPoint& original_instance)
     : PhaseSpaceVector(original_instance),
       z_(original_instance.z_), z_momentum_(original_instance.z_momentum_),
       detector_id_(original_instance.detector_id_)
 { }
 
-ParticleTrack::ParticleTrack(const double t, const double E,
+TrackPoint::TrackPoint(const double t, const double E,
                                    const double x, const double Px,
                                    const double y, const double Py,
                                    const double z, const double Pz
@@ -46,57 +46,57 @@ ParticleTrack::ParticleTrack(const double t, const double E,
   FillInCoordinates();
 }
 
-ParticleTrack::ParticleTrack(double const * const array)
+TrackPoint::TrackPoint(double const * const array)
     : PhaseSpaceVector(array) {
   FillInCoordinates();
 }
 
-ParticleTrack::~ParticleTrack() { }
+TrackPoint::~TrackPoint() { }
 
-ParticleTrack::double z() const {
+TrackPoint::double z() const {
   return z_;
 }
 
-ParticleTrack::void set_z(const double z) {
+TrackPoint::void set_z(const double z) {
   z_ = z;
 }
 
-ParticleTrack::double z_momentum() const {
+TrackPoint::double z_momentum() const {
   return z_momentum_;
 }
 
-ParticleTrack::void set_z_momentum(const double z_momentum) {
+TrackPoint::void set_z_momentum(const double z_momentum) {
   z_momentum_ = z_momentum;
 }
 
-ParticleTrack::double Pz() const {
+TrackPoint::double Pz() const {
   return z_momentum_;
 }
 
-ParticleTrack::void set_Pz(const double Pz) {
+TrackPoint::void set_Pz(const double Pz) {
   z_momentum_ = Pz;
 }
 
-ParticleTrack::void set_detector_id(unsigned int id) {
+TrackPoint::void set_detector_id(unsigned int id) {
   detector_id_ = id;
 }
 
-ParticleTrack::unsigned int detector_id() const {
+TrackPoint::unsigned int detector_id() const {
   return detector_id_;
 }
 
-ParticleTrack::void set_uncertainties(CovarianceMatrix const * const uncertainties {
+TrackPoint::void set_uncertainties(CovarianceMatrix const * const uncertainties {
   uncertainties_ = (*uncertainties);
 }
 
-ParticleTrack::CovarianceMatrix const * uncertainties() const {
+TrackPoint::CovarianceMatrix const * uncertainties() const {
   return &uncertainties_;
 }
 
 /* If t < 0 it fills in t and E from z, Pz, and the given mass parameter.
  * If t >= 0 and z < 0, it fills in z and Pz from t, E, and the mass.
  */
-void ParticleTrack::FillInCoordinates(const double mass) {
+void TrackPoint::FillInCoordinates(const double mass) {
   double c_squared = ::CLHEP::c_light * ::CLHEP::c_light;
   double px = (*this)[3];
   double py = (*this)[5];
@@ -120,7 +120,7 @@ void ParticleTrack::FillInCoordinates(const double mass) {
   }
 }
 
-std::ostream& operator<<(std::ostream& out, const ParticleTrack& vector) {
+std::ostream& operator<<(std::ostream& out, const TrackPoint& vector) {
   out << "t: " << vector[0]  << "E: "   << vector[1]
       << "x: " << vector[2]  << "Px: "  << vector[3]
       << "y: " << vector[4]  << "Py: "  << vector[5]

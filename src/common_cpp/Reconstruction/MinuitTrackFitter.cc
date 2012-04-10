@@ -17,7 +17,7 @@
 /* Author: Peter Lane
  */
 
-#include "Reconstruction/MinuitTrajectoryFitter.hh"
+#include "Reconstruction/MinuitTrackFitter.hh"
  
 #include <vector>
 

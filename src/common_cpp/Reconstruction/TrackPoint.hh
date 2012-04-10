@@ -17,8 +17,8 @@
 /* Author: Peter Lane
  */
 
-#ifndef COMMON_CPP_RECONSTRUCTION_PARTICLE_TRACK_HH
-#define COMMON_CPP_RECONSTRUCTION_PARTICLE_TRACK_HH
+#ifndef COMMON_CPP_RECONSTRUCTION_TRACK_POINT_HH
+#define COMMON_CPP_RECONSTRUCTION_TRACK_POINT_HH
 
 #include <iostream>
 
@@ -27,7 +27,7 @@
      
 namespace MAUS {
 
-/* @class ParticleTrack a phase space vector with redundant t/E and z/Pz
+/* @class TrackPoint a phase space vector with redundant t/E and z/Pz
  * coordinates as well as an ID that links the track to the detector that
  * measured it.
  *
@@ -38,30 +38,30 @@ namespace MAUS {
  * mass parameter. If t >= 0 and z < 0, it fills in z and Pz from t, E, and
  * the mass.
  */
-class ParticleTrack : public MAUS::PhaseSpaceVector {
+class TrackPoint : public MAUS::PhaseSpaceVector {
  public:
   /* @brief	Construct with all elements initialized to zero.
    */
-  ParticleTrack();
+  TrackPoint();
 
   /* @brief  Copy constructor.
    */
-  ParticleTrack(const ParticleTrack& original_instance);
+  TrackPoint(const TrackPoint& original_instance);
 
   /* @brief Create with coordinates from an array.
      Order is t, E, x, Px, y, Py, z, Pz.
    */
-  explicit ParticleTrack(double const * const array);
+  explicit TrackPoint(double const * const array);
 
   /* @brief	Create with the given initial coordinates.
    */
-  ParticleTrack(const double t, const double E,
+  TrackPoint(const double t, const double E,
                    const double x, const double Px,
                    const double y, const double Py,
                    const double z, const double Pz
                    const unsigned int detector_id);
 
-  ~ParticleTrack();
+  ~TrackPoint();
 
   // *************************
   //       Accessors
@@ -90,7 +90,7 @@ class ParticleTrack : public MAUS::PhaseSpaceVector {
   
 };
 
-std::ostream& operator<<(std::ostream& out, const ParticleTrack& vector);
+std::ostream& operator<<(std::ostream& out, const TrackPoint& vector);
 }  // namespace MAUS
 
 #endif

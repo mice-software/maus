@@ -17,8 +17,8 @@
 /* Author: Peter Lane
  */
 
-#ifndef COMMON_CPP_RECONSTRUCTION_PARTICLE_TRAJECTORY_HH
-#define COMMON_CPP_RECONSTRUCTION_PARTICLE_TRAJECTORY_HH
+#ifndef COMMON_CPP_RECONSTRUCTION_TRACK_HH
+#define COMMON_CPP_RECONSTRUCTION_TRACK_HH
 
 #include <vector>
 
@@ -26,22 +26,22 @@
 
 namespace MAUS {
 
-class ParticleTrajectory : public std::vector<ParticleTrack> {
+class Track : public std::vector<ParticleTrack> {
  public:
   /* @brief	Construct with all elements initialized to zero.
    */
-  ParticleTrajectory();
+  Track();
 
   /* @brief Create with particle ID only.
    */
-  explicit ParticleTrajectory(const int particle_id);
+  explicit Track(const int particle_id);
 
   /* @brief Create with tracks and particle ID.
    */
-  ParticleTrajectory(const std::vector<ParticleTrack>& tracks,
+  Track(const std::vector<ParticleTrack>& tracks,
                      const int particle_id);
 
-  ~ParticleTrajectory();
+  ~Track();
   
   int particle_id() const;
   void set_particle_id(const int particle_id);

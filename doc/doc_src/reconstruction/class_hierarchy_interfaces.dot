@@ -20,8 +20,8 @@ digraph G {
     label = "{\<\<interface\>\>\n\N||GenerateTransferMap(Double z1, Double z2): TransferMap\l}"
   ]
 
-  TrajectoryFitter [
-    label = "{\<\<interface\>\>\n\N|opticsModel: OpticsModel\ldetectors: Detector[]\l|Fit(DetectorEvent[], ParticleTrajectory *)}"
+  TrackFitter [
+    label = "{\<\<interface\>\>\n\N|opticsModel: OpticsModel\ldetectors: Detector[]\l|Fit(DetectorEvent[], Track *)}"
   ]
 
   RungeKuttaOpticsModel [
@@ -50,13 +50,13 @@ digraph G {
   RungeKuttaTransferMap [
   ]
 
-  MinuitTrajectoryFitter [
+  MinuitTrackFitter [
   ]
 
-  TOFTrajectoryFitter [
+  TOFTrackFitter [
   ]
 
-  KalmanFilterTrajectoryFitter [
+  KalmanFilterTrackFitter [
   ]
 
   edge [
@@ -75,9 +75,9 @@ digraph G {
   LeastSquaresOpticsModel -> OpticsModel
   PolynomialTransferMap -> TransferMap
   RungeKuttaTransferMap -> TransferMap
-  MinuitTrajectoryFitter -> TrajectoryFitter
-  TOFTrajectoryFitter -> TrajectoryFitter
-  KalmanFilterTrajectoryFitter -> TrajectoryFitter
+  MinuitTrackFitter -> TrackFitter
+  TOFTrackFitter -> TrackFitter
+  KalmanFilterTrackFitter -> TrackFitter
 
   edge [
     style = "solid"
