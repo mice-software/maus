@@ -58,6 +58,28 @@ SciFiStraightPRTrack::SciFiStraightPRTrack(int tracker, int num_points,
   _vsl[2] = _y0;
   _vsl[3] = _my;
 }
+
+SciFiStraightPRTrack::SciFiStraightPRTrack(int tracker, int num_points,
+                                           SimpleLine line_x, SimpleLine line_y) {
+
+  _x0 = line_x.get_c();
+  _mx = line_x.get_m();
+  _x_chisq = line_x.get_chisq();
+
+  _y0 = line_y.get_c();
+  _my = line_y.get_m();
+  _y_chisq = line_y.get_chisq();
+
+  _num_points = num_points;
+  _tracker = tracker;
+
+  _vsl.resize(4);
+  _vsl[0] = _x0;
+  _vsl[1] = _mx;
+  _vsl[2] = _y0;
+  _vsl[3] = _my;
+}
+
 // Destructor
 SciFiStraightPRTrack::~SciFiStraightPRTrack() {}
 

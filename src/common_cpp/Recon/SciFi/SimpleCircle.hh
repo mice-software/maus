@@ -27,7 +27,11 @@
 
 class SimpleCircle {
   public:
-    SimpleCircle();   // Default constructor
+
+    // Constructors
+    SimpleCircle();
+
+    // Destructor
     ~SimpleCircle();  // Default destructor
 
     // Getters

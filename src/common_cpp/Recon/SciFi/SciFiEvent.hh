@@ -22,6 +22,7 @@
 
 #ifndef SCIFIEVENT_HH
 #define SCIFIEVENT_HH
+
 // C headers
 
 // C++ headers
@@ -29,56 +30,68 @@
 #include <string>
 #include <iterator>
 
+// Third party headers
+#include "TH1D.h"
+
+// MAUS headers
 #include "src/common_cpp/Recon/SciFi/SciFiHit.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiDigit.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiCluster.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiStraightPRTrack.hh"
-// Added by Summer below
 #include "src/common_cpp/Recon/SciFi/SciFiHelicalPRTrack.hh"
 
 // namespace MAUS {
 
 class SciFiEvent {
  public:
-  SciFiEvent();
 
+  /// Constructor and Destructor
+  SciFiEvent();
   ~SciFiEvent();
 
-  void add_hit(SciFiHit* hit) { _scifihits.push_back(hit); }
+  /// Residual histograms
+  void add_res_hist(TH1D res_hist) { _res_hists.push_back(res_hist); }
+  std::vector<TH1D> res_hists() const { return _res_hists; }
+  void set_res_hist(std::vector<TH1D> res_hists) { _res_hists = res_hists; }
 
+  /// Hits
+  void add_hit(SciFiHit* hit) { _scifihits.push_back(hit); }
   std::vector<SciFiHit*> hits() const { return _scifihits; }
 
+  /// Digits
   void add_digit(SciFiDigit* digit) { _scifidigits.push_back(digit); }
-
   std::vector<SciFiDigit*> digits() const { return _scifidigits; }
 
+  /// Clusters
   void add_cluster(SciFiCluster* cluster) { _scificlusters.push_back(cluster); }
-
   std::vector<SciFiCluster*> clusters() const { return _scificlusters; }
 
+  /// Spacepoints
   void add_spacepoint(SciFiSpacePoint* spacepoint) { _scifispacepoints.push_back(spacepoint); }
-
   std::vector<SciFiSpacePoint*> spacepoints() const { return _scifispacepoints; }
 
+  /// Seeds
   void add_seeds(SciFiSpacePoint* seed) { _scifiseeds.push_back(seed); }
-
   std::vector<SciFiSpacePoint*> seeds() const { return _scifiseeds; }
 
+  /// Straight Pattern Recognition tracks
+  void add_straightprtrack(SciFiStraightPRTrack track) { _scifistraightprtracks.push_back(track); }
+  void set_straightprtrack(std::vector<SciFiStraightPRTrack> tracks) {
+    _scifistraightprtracks = tracks; }
   std::vector<SciFiStraightPRTrack> straightprtracks() const { return _scifistraightprtracks; }
 
-  void add_straightprtrack(SciFiStraightPRTrack track) { _scifistraightprtracks.push_back(track); }
-
-  std::vector<SciFiHelicalPRTrack> helicalprtracks() const {return _scifihelicalprtracks; }
-
+  /// Helical Pattern Recognition tracks
   void add_helicalprtrack(SciFiHelicalPRTrack track) { _scifihelicalprtracks.push_back(track); }
-
-  void set_straightprtrack(std::vector<SciFiStraightPRTrack> tracks) {
-                           _scifistraightprtracks = tracks; }
-
   void set_helicalprtrack(std::vector<SciFiHelicalPRTrack> tracks) {
                           _scifihelicalprtracks = tracks; }
+  std::vector<SciFiHelicalPRTrack> helicalprtracks() const {return _scifihelicalprtracks; }
+
  private:
+
+  /// Residuals histograms
+  std::vector<TH1D>                 _res_hists;
+
   /// Hits in an event.
   std::vector<SciFiHit*>            _scifihits;
 

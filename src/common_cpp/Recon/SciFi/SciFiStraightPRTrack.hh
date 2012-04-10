@@ -32,6 +32,7 @@
 
 // MAUS headers
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
+#include "src/common_cpp/Recon/SciFi/SimpleLine.hh"
 
 // namespace MAUS {
 
@@ -42,6 +43,7 @@ class SciFiStraightPRTrack {
     SciFiStraightPRTrack(int tracker, int num_points,
                          double x0, double mx, double x_chisq,
                          double y0, double my, double y_chisq);
+    SciFiStraightPRTrack(int tracker, int num_points, SimpleLine line_x, SimpleLine line_y);
 
     // Destructors
     ~SciFiStraightPRTrack();  // Default destructor

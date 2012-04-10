@@ -65,30 +65,6 @@ class PatternRecognition {
 
   private:
 
-    /** @brief Form an initial line and find intermediate spacepoints which best match
-     * 
-     *  @param spnts_by_station 2D vector of spacepoints, sorted by station
-     *  @param outer_station_num outermost station being used
-     *                           (e.g. station 5 in a 5pt track)
-     *  @param inner_station_num innermost station being used
-     *                           (e.g. station 1 in a 5pt track)
-     *  @param ignore_stations int vector specifying which stations are not to be used for
-     *                         the track fit. 0 - 4 represent stations 1 - 5 respectively,
-     *                         while -1 means use *all* the stations (ignore none of them). 
-     *                         The size of the vector should be 0 for a 5pt track,
-     *                         1 for a 4pt track, and 2 for a 3pt track.
-     *  @param station_outer_sp index representing outer station spacepoint
-     *  @param station_inner_sp index representing inner station spacepoint
-     *  @param good_spnts map between station number and spacepoint number in station,
-     *                    holding those spacepoints (if any) which best match the
-     *                    initial line
-     */
-    void initial_line(const std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
-                      const std::vector<int> ignore_stations,
-                      const int outer_station_num, const int inner_station_num,
-                      const int station_outer_sp, const int station_inner_sp,
-                      std::map<int, SciFiSpacePoint*> &good_spnts);
-
     /** @brief Make Pattern Recognition tracks with 5 spacepoints
      *
      *  Make a Pattern Recognition track/s when there are spacepoints
@@ -149,7 +125,7 @@ class PatternRecognition {
      *  @param line_y - Output line in y - z plane
      *
      */
-    void linear_fit(const std::map<int, SciFiSpacePoint*> &spnts,
+    void linear_fit(const std::vector<SciFiSpacePoint*> &spnts,
                     SimpleLine &line_x, SimpleLine &line_y);
 
     /** @brief Form a helical track from spacepoints
@@ -294,6 +270,11 @@ class PatternRecognition {
     void sort_by_station(const std::vector<SciFiSpacePoint*> &spnts,
                          std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station);
 
+    /** @brief Count the number of stations that have unused spacepoint
+     *
+     *  @param spnts_by_station - Input 2D vector of spacepoints sorted by station
+     * 
+     */
     int num_stations_with_unused_spnts(
         const std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station);
 
@@ -309,25 +290,21 @@ class PatternRecognition {
            const std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
            std::vector<int> &stations_hit, std::vector<int> &stations_not_hit);
 
-    /** @brief Perform Pattern Recognition for straight tracks
-     * 
-     *  This takes one argument, the SciFi event, extracts the
-     *  spacepoints, reconstructs the PR tracks, and pushes them
-     *  back into the event.
-     *
-     *  @param evt - The SciFi event
-     */
-    void straight_track_recon(SciFiEvent &evt);
+    void set_ignore_stations(const std::vector<int> &ignore_stations,
+                             int &ignore_station_1, int &ignore_station_2);
+
+    void draw_line(const SciFiSpacePoint *sp1, const SciFiSpacePoint *sp2,
+                                   SimpleLine &line_x, SimpleLine &line_y);
 
     static const int _n_trackers = 2;
     static const int _n_stations = 5;
-    static const double _sd_1to4 = 0.3844;
-    static const double _sd_5 = 0.4298;
-    static const double _res_cut = 10;
-    static const double _chisq_cut = 15;
-    static const double _AB_cut = .1; // Need to calculate appropriate cut here
-    static const double _sd_phi_1to4 = 1.; // Still needs to be calculated!!!!
-    static const double _sd_phi_5 = 1.; // Still needs to be calculated!!!!
+    static const double _sd_1to4 = 0.3844;  // Position error associated with stations 1 through 4
+    static const double _sd_5 = 0.4298;     // Position error associated with station 5
+    static const double _res_cut = 10;      // Road cut in mm
+    static const double _chisq_cut = 15;    // Cut on the chi^2 of the least squares fit in mm
+    static const double _AB_cut = .1;       // Need to calculate appropriate cut here
+    static const double _sd_phi_1to4 = 1.;  // Still needs to be calculated!!!!
+    static const double _sd_phi_5 = 1.;     // Still needs to be calculated!!!!
 };
 // } // ~namespace MAUS
 
