@@ -24,6 +24,7 @@
 #include "src/legacy/Interface/Squeal.hh"
 
 #include "src/legacy/Interface/Mesh.hh"
+#include "src/legacy/Interface/STLUtils.hh"
 
 #include "src/common_cpp/FieldTools/SectorMagneticFieldMap.hh"
 
@@ -116,6 +117,7 @@ Interpolator3dGridTo3d* SectorMagneticFieldMapIO::ReadMap
      (std::string file_name, std::string file_type, std::vector<double> units,
                                          std::string symmetry) {
     try {
+        file_name = STLUtils::ReplaceVariables(file_name);
         Squeak::mout(Squeak::debug) << "Opening sector field map " << file_name
                                     << " type " << file_type << std::endl;
         if (file_type == "tosca_sector_1") {

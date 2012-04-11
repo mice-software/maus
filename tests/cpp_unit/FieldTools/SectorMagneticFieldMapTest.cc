@@ -22,11 +22,14 @@
 
 namespace MAUS {
 
+std::string SECTORMAGNETICMAP =
+             "${MAUS_ROOT_DIR}/tests/cpp_unit/FieldTools/test_sector_map.table";
+
 // Check ReadToscaMap function for no symmetry
 TEST(SectorMagneticFieldMapTest, TestReadToscaMapNoSymmetry) {
     double _units[6] = {10., 10., 10., 1.e-4, 1.e-4, 1.e-4};
     std::vector<double> units(&_units[0], &_units[6]);
-    std::string map_file = "tests/cpp_unit/FieldTools/test_sector_map.table";
+    std::string map_file = SECTORMAGNETICMAP;
 
     ASSERT_THROW(SectorMagneticFieldMapIO::ReadMap
                                (map_file, "Nonsense", units, "Dipole"), Squeal);
@@ -66,7 +69,7 @@ TEST(SectorMagneticFieldMapTest, TestReadToscaMapNoSymmetry) {
 TEST(SectorMagneticFieldMapTest, TestReadToscaMapDipoleSymmetry) {
     double _units[6] = {10., 10., 10., 1.e-4, 1.e-4, 1.e-4};
     std::vector<double> units(&_units[0], &_units[6]);
-    std::string map_file = "tests/cpp_unit/FieldTools/test_sector_map.table";
+    std::string map_file = SECTORMAGNETICMAP;
 
     Interpolator3dGridTo3d* interpolator_dipole = SectorMagneticFieldMapIO::
                              ReadMap(map_file, "tosca_sector_1", units, "Dipole");
@@ -108,7 +111,7 @@ TEST(SectorMagneticFieldMapTest, TestReadToscaMapDipoleSymmetry) {
 TEST(SectorMagneticFieldMapTest, TestGetFieldValuePolar) {
     double _units[6] = {10., 10., 10., 1.e-4, 1.e-4, 1.e-4};
     std::vector<double> units(&_units[0], &_units[6]);
-    std::string map_file = "tests/cpp_unit/FieldTools/test_sector_map.table";
+    std::string map_file = SECTORMAGNETICMAP;
     SectorMagneticFieldMap map(map_file, "tosca_sector_1", units, "Dipole");
 
     double b0 = 0.727;
@@ -174,7 +177,7 @@ TEST(SectorMagneticFieldMapTest, TestGetFieldValueCartesian) {
     // data)
     double _units[6] = {10., 10., 10., 1.e-4, 1.e-4, 1.e-4};
     std::vector<double> units(&_units[0], &_units[6]);
-    std::string map_file = "tests/cpp_unit/FieldTools/test_sector_map.table";
+    std::string map_file = SECTORMAGNETICMAP;
     SectorMagneticFieldMap map(map_file, "tosca_sector_1", units, "Dipole");
 
     double b0 = 0.727;
