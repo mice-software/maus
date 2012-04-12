@@ -29,10 +29,23 @@ class ReconstructionInput {
  public:
   /* @brief	Create with the given input values.
    */
-  Detector(const unsigned int id, const double plane,
-           const CovarianceMatrix uncertainties);
+  Detector(const unsigned int id,
+           const double plane,
+           const CovarianceMatrix const * const uncertainties);
 
-  ~ReconstructionInput();
+  ~Detector();
+
+  const unsigned int id();
+  const double plane();
+  const CovarianceMatrix const * uncertainties();
+
+  static const unsigned int kTOF0;
+  static const unsigned int kCherenkov1;
+  static const unsigned int kTOF1;
+  static const unsigned int kTracker1;
+  static const unsigned int kTracker2;
+  static const unsigned int kCherenkov2;
+  static const unsigned int kCalorimeter;
  protected:
   Detector();
 
@@ -40,6 +53,14 @@ class ReconstructionInput {
   double plane_;
   CovarianceMatrix uncertainties_;
 };
+
+const unsigned int Detector::kTOF0 = 0;
+const unsigned int Detector::kCherenkov1 = 1;
+const unsigned int Detector::kTOF1 = 2;
+const unsigned int Detector::kTracker1 = 3;
+const unsigned int Detector::kTracker2 = 4;
+const unsigned int Detector::kCherenkov2 = 5;
+const unsigned int Detector::kCalorimeter = 6;
 
 }  // namespace MAUS
 

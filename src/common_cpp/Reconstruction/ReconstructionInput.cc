@@ -27,9 +27,21 @@ namespace MAUS {
 ReconstructionInput::ReconstructionInput(
     const bool beam_polarity_negative,
     std::vector<Detector> const * const detectors,
-    std::vector<ParticleTrack> const * const tracks)
+    std::vector<TrackPoint> const * const events)
     : beam_polarity_negative_(beam_polarity_negative),
-      detectors_(*detectors), tracks_(*tracks) {
+      detectors_(*detectors), events_(*events) {
+}
+
+bool ReconstructionInput::beam_polarity_negative() {
+  return beam_polarity_negative_;
+}
+
+std::vector<Detector> const * ReconstructionInput::detectors() {
+  return &detectors_;
+}
+
+std::vector<TrackPoint> const * ReconstructionInput::events() {
+  return &events_;
 }
 
 }  // namespace MAUS

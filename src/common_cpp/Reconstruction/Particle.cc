@@ -143,19 +143,19 @@ Particle::Particle() {
 
 Particle::Particle() { }
 
-Particle const * Particle::GetInstance() {
+Particle const * Particle::GetInstance() const {
   return &Particle::singleton;
 }
 
-std::string Particle::GetName(int id) {
+std::string Particle::GetName(int id) const {
   return names.find(id).second;
 }
 
-double Particle::GetMass(int id) {
+double Particle::GetMass(int id) const {
   return masses.find(id).second;
 }
 
-int Particle::GetCharge(int id) {
+int Particle::GetCharge(int id) const {
   return charges.find(id).second;
 }
 

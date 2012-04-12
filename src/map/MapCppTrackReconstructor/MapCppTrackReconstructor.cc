@@ -28,8 +28,11 @@
 #include "json/json.h"
 
 // MAUS
+#include "src/common_cpp/Optics/CovarianceMatrix.hh"
 #include "src/common_cpp/Optics/LeastSquaresOpticsModel.hh"
 #include "src/common_cpp/Optics/LinearApproximationOpticsModel.hh"
+#include "src/common_cpp/Reconstruction/Detector.hh"
+#include "src/common_cpp/Reconstruction/Particle.hh"
 #include "src/common_cpp/Reconstruction/ReconstructionInput.hh"
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
@@ -273,6 +276,63 @@ MapCppTrackReconstructor::SetupTrajectoryFitter() {
 
 void MapCppTrackReconstructor::LoadTestingData() {
   // TODO(plane1@hawk.iit.edu) reconstruction_input_ = new ReconstructionInput(...);
+  // Create random track points for TOF0, TOF1, Tracker 1, Tracker 2, and TOF 2
+  srand((unsigned)time(NULL));
+
+  const bool beam_polarity_negative = true;  // e-, mu-, pi-
+
+  CovarianceMatrix * uncertainties = NULL;
+
+  // generate moch detector info
+  std::vector<Detector> detectors;
+  double plane;
+  double uncertainty_data[36];
+  for (int id = 0; id <= Detector.kCalorimeter_id; ++id) {
+    plane = ((double)rand()/(double)RAND_MAX) * 20;  // 0.0 - 20.0 meters
+    for (int index = 0; index < 36; ++index) {
+      uncertainty_data[index] = ((double)rand()/(double)RAND_MAX) * 100;
+    }
+    uncertainties = new CovarianceMatrix(uncertainty_data);
+    detectors.push_back(Detector(id, plane, uncertainties));
+    delete uncertainties;  // gets copied in Detector constructor
+  }
+
+  // generate random muon detector event data
+  Particle const * const particle = Particle::GetInstance();
+  const double mass = particle->GetMass(Particle::kMuMinus);
+  std::vector<TrackPoint> events;
+  // 2 trackers with 5 planes each + 3 TOFs = 13 events
+  unsigned int detector_id;
+  double position[4], momentum[4];
+  for (int index = 0; index < 13; ++index) {
+    switch (index) {
+     case 0: detector_id = Detector::kTOF0; break;
+     case 1: detector_id = Detector::kTOF1; break;
+     case 2: case 3: case 4: case 5: case 6:
+      detector_id = Detector::kTracker1; break;
+     case 7: case 8: case 9: case 10: case 11:
+      detector_id = Detector::kTracker2; break;
+     case 12: detector_id = Detector::kTOF2; break;
+    }
+
+    for (int coordinate = 0; coordinate < 4; ++coordinate) {
+      position[coordinate] = ((double)rand()/(double)RAND_MAX) * 20;  // meters
+    }
+
+    for (int coordinate = 0; coordinate < 4; ++coordinate) {
+      momentum[coordinate] = ((double)rand()/(double)RAND_MAX) * 500;  // MeV
+    }
+
+    events.push_back(TrackPoint(position[0], momentum[0],
+                                position[1], momentum[1],
+                                position[2], momentum[2],
+                                position[3], momentum[3],
+                                detector_id));
+  }
+
+  reconstruction_input_ = new ReconstructionInput(beam_polarity_negative,
+                                                  detectors,
+                                                  events);
 }
 
 void MapCppTrackReconstructor::LoadSimulationData() {
@@ -281,6 +341,7 @@ void MapCppTrackReconstructor::LoadSimulationData() {
     Json::Value mc = JsonWrapper::GetProperty(run_data_,
                                               "mc",
                                               JsonWrapper::arrayValue);
+    //mc --> Json::Value[mc.size()] --> "primary"
 
     // TODO(plane1@hawk.iit.edu) Collect tracks from the detectors and
     // dynamically allocate the ReconstructionInput instance
@@ -296,13 +357,13 @@ void MapCppTrackReconstructor::LoadSimulationData() {
 
 void MapCppTrackReconstructor::LoadLiveData() {
   // reconstruction_input_ = new ReconstructionInput(...);
-}    int particle_id = (*trajectories).front()->paritcle_id();
+}
 
 
 void MapCppTrackReconstructor::CorrelateParticleTracks(
     std::vector<std::vector<ParticleTrack const *> > * track_sets) {
   // TODO(plane1@hawk.iit.edu) create sets of events where each set corresponds
-  // to a different particle. For now assume that all events are from the same
+  // to a different particle. For now assume that all events are from a single
   // particle.
   std::vector<ParticleTrack> const * const particle_tracks
       = reconstruction_input_->tracks();

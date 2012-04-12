@@ -33,16 +33,19 @@ class ReconstructionInput {
    */
   ReconstructionInput(const bool beam_polarity_negative,
                       std::vector<Detector> const * const detectors,
-                      std::vector<ParticleTrack> const * const tracks);
+                      std::vector<TrackPoint> const * const events);
 
   ~ReconstructionInput() { }
-                     
+
+  bool beam_polarity_negative();
+  std::vector<Detector> const * detectors();
+  std::vector<TrackPoint> const * events();
  protected:
   ReconstructionInput();
 
   bool beam_polarity_negative_;
-  std::vector<Detector> detectors_;
-  std::vector<ParticleTrack> tracks_;
+  std::vector<DetectorPoint> detectors_;
+  std::vector<Track> events_;
 };
 
 }  // namespace MAUS
