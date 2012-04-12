@@ -178,7 +178,7 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         is missing from the spill.
         """
         if not spill.has_key("daq_event_type"):
-        	raise ValueError("No event type")
+            raise ValueError("No event type")
         if spill["daq_event_type"] == "end_of_run":
             if (not self.run_ended):
                 self.update_histos()
@@ -187,15 +187,22 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
             else:
                 return [{}]
         elif spill["daq_event_type"] != "physics_event":
-		    return spill
+            return spill
+
+        # do not try to get data from start/end spill markers
+        data_spill = True
+        if spill["daq_event_type"] == "start_of_run" \
+              or spill["daq_event_type"] == "start_of_burst" \
+              or spill["daq_event_type"] == "end_of_burst":
+            data_spill = False
 
         # Get TOF slab hits & fill the relevant histograms.
-        if not self.get_slab_hits(spill): 
+        if data_spill and not self.get_slab_hits(spill): 
             print "No space points recorded"
             #raise ValueError("slab_hits not in spill")
 
         # Get TOF space points & fill histograms.
-        if not self.get_space_points(spill):
+        if data_spill and not self.get_space_points(spill):
             print "No space points recorded"
             #raise ValueError("space_points not in spill")
 
@@ -277,74 +284,77 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
 
         # if there are no TOF0,1,2 space point objects, return false
         # not sure if we require all 3, 
-        # -- but currently returning false unless we get all 3 detectors
-        if 'tof0' not in space_points:
-            return False
-        sp_tof0 = space_points['tof0']
+        # -obviously this causes probs when eg. no TOF2 - fixed 3/24
+        sp_tof0 = None
+        sp_tof1 = None
+        sp_tof2 = None
+        if 'tof0' in space_points:
+            sp_tof0 = space_points['tof0']
 
-        if 'tof1' not in space_points:
-            return False
-        sp_tof1 = space_points['tof1']
+        if 'tof1' in space_points:
+            sp_tof1 = space_points['tof1']
 
-        if 'tof2' not in space_points:
-            return False
-        sp_tof2 = space_points['tof2']
+        if 'tof2' in space_points:
+            sp_tof2 = space_points['tof2']
 
         
-        # TOF0 
-        for i in range(len(sp_tof0)):
-            if sp_tof0[i]:
-                self.hnsp_0.Fill(len(sp_tof0[i]))
-            else:
-                self.hnsp_0.Fill(0)           
-            if sp_tof0[i] and sp_tof1[i] :
-                if len(sp_tof0[i])==1 and len(sp_tof1[i])==1:
-                    t_0 = sp_tof0[i][0]["time"]
-                    t_1 = sp_tof1[i][0]["time"]
+        # TOF0
+        if sp_tof0:
+            for i in range(len(sp_tof0)):
+                if sp_tof0[i]:
+                    self.hnsp_0.Fill(len(sp_tof0[i]))
                     spnt_x = sp_tof0[i][0]["slabX"]
                     spnt_y = sp_tof0[i][0]["slabY"]
                     self.hspxy[0].Fill(spnt_x, spnt_y)
                     self.hspslabx_0.Fill(spnt_x)
                     self.hspslaby_0.Fill(spnt_y)
-                    
+                else:
+                    self.hnsp_0.Fill(0)           
+                if sp_tof0[i] and sp_tof1[i] :
+                    if len(sp_tof0[i])==1 and len(sp_tof1[i])==1:
+                        t_0 = sp_tof0[i][0]["time"]
+                        t_1 = sp_tof1[i][0]["time"]
+
         # TOF 2
-        for i in range(len(sp_tof2)):
-            if sp_tof2[i]:
-                self.hnsp_2.Fill(len(sp_tof2[i]))
-            else:
-                self.hnsp_2.Fill(0)
-            if sp_tof2[i] and sp_tof1[i] :
-                if len(sp_tof2[i])==1 and len(sp_tof1[i])==1:
-                    t_2 = sp_tof2[i][0]["time"]
-                    t_1 = sp_tof1[i][0]["time"]
+        if sp_tof2:
+            for i in range(len(sp_tof2)):
+                if sp_tof2[i]:
+                    self.hnsp_2.Fill(len(sp_tof2[i]))
                     spnt_x = sp_tof2[i][0]["slabX"]
                     spnt_y = sp_tof2[i][0]["slabY"]
                     self.hspxy[2].Fill(spnt_x, spnt_y)
                     self.hspslabx_2.Fill(spnt_x)
                     self.hspslaby_2.Fill(spnt_y)
-                    self._ht12.Fill(t_2-t_1)
-            if sp_tof2[i] and sp_tof0[i] :
-                if len(sp_tof2[i])==1 and len(sp_tof0[i])==1:
-                    t_2 = sp_tof2[i][0]["time"]
-                    t_0 = sp_tof0[i][0]["time"]
-                    self._ht02.Fill(t_2-t_0)
+                else:
+                    self.hnsp_2.Fill(0)
+                if sp_tof2[i] and sp_tof1[i] :
+                    if len(sp_tof2[i])==1 and len(sp_tof1[i])==1:
+                        t_2 = sp_tof2[i][0]["time"]
+                        t_1 = sp_tof1[i][0]["time"]
+                        self._ht12.Fill(t_2-t_1)
+                if sp_tof2[i] and sp_tof0[i] :
+                    if len(sp_tof2[i])==1 and len(sp_tof0[i])==1:
+                        t_2 = sp_tof2[i][0]["time"]
+                        t_0 = sp_tof0[i][0]["time"]
+                        self._ht02.Fill(t_2-t_0)
 
         # TOF 1
-        for i in range(len(sp_tof1)):
-            if sp_tof1[i]:
-                self.hnsp_1.Fill(len(sp_tof1[i]))
-            else:
-                self.hnsp_1.Fill(0)           
-            if sp_tof0[i] and sp_tof1[i] :
-                if len(sp_tof0[i])==1 and len(sp_tof1[i])==1:
-                    t_0 = sp_tof0[i][0]["time"]
-                    t_1 = sp_tof1[i][0]["time"]
+        if sp_tof1:
+            for i in range(len(sp_tof1)):
+                if sp_tof1[i]:
+                    self.hnsp_1.Fill(len(sp_tof1[i]))
                     spnt_x = sp_tof1[i][0]["slabX"]
                     spnt_y = sp_tof1[i][0]["slabY"]
-                    self._ht01.Fill(t_1-t_0)
                     self.hspxy[1].Fill(spnt_x, spnt_y)
                     self.hspslabx_1.Fill(spnt_x)
                     self.hspslaby_1.Fill(spnt_y)
+                else:
+                    self.hnsp_1.Fill(0)           
+                if sp_tof0[i] and sp_tof1[i] :
+                    if len(sp_tof0[i])==1 and len(sp_tof1[i])==1:
+                        t_0 = sp_tof0[i][0]["time"]
+                        t_1 = sp_tof1[i][0]["time"]
+                        self._ht01.Fill(t_1-t_0)
         return True
 
     def __init_histos(self): #pylint: disable=R0201, R0914

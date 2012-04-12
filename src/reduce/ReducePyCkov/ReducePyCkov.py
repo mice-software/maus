@@ -70,22 +70,23 @@ class ReducePyCkov(ReducePyROOTHistogram): # pylint: disable=R0902
             return self.get_histogram_images()
         
         if not self.get_space_points(spill):
-            raise ValueError("space points not in spill")
+            print "space points not in spill"
+            #raise ValueError("space points not in spill")
 
         # Get charge points & fill histograms.
         if not self.get_charge(spill):
-            raise ValueError("charge not in spill")
+            print "charge not in spill"
         
         # Refresh canvases at requested frequency.
-    
         if self.spill_count % self.refresh_rate == 0:
             self.update_histos()
-            return self.get_histogram_images()
+            output = self.get_histogram_images()
+            return output
         else:
             return [spill]
-    
+
     def get_space_points(self, spill):#pylint: disable=R0911,R0912,R0914
-        """Get space points from JSON """
+        '''Get space points from JSON '''
         if 'space_points' not in spill:
             return False
         
@@ -102,10 +103,6 @@ class ReducePyCkov(ReducePyROOTHistogram): # pylint: disable=R0902
         if 'tof1' not in space_points:
             return False
         sp_tof1 = space_points['tof1']
-        
-        #if 'tof2' not in space_points:
-        #    return False
-        #sp_tof2 = space_points['tof2']
 
         if 'digits' not in spill:
             return False
@@ -137,6 +134,7 @@ class ReducePyCkov(ReducePyROOTHistogram): # pylint: disable=R0902
         #TOF vs. Total Charge
         
         for i in range(len(sp_tof1)):
+
             if sp_tof0[i] and sp_tof1[i] :
                 if len(sp_tof0[i]) == 1 and len(sp_tof1[i]) == 1:
                     if sp_tof0[i][0]["part_event_number"] == \
@@ -150,7 +148,7 @@ class ReducePyCkov(ReducePyROOTHistogram): # pylint: disable=R0902
                         
                         PE_B = ckov[i]["B"]["number_of_pes"]
                         PE_A = ckov[i]["A"]["number_of_pes"]
-                       
+                        
                         if PE_B > 0:
                             self._htof_B.Fill(PE_B, (t_1 - t_0))
                         
@@ -174,7 +172,7 @@ class ReducePyCkov(ReducePyROOTHistogram): # pylint: disable=R0902
                         if (m==MASS_MU and p > 0.0 and PE_A > 1):
                             self._hPMu.Fill(p)
                             self._hlight_Mu.Fill(p, PE_A)
-
+                            
                         if (m==MASS_PI and p > 0.0):
                             self._hPPi.Fill(p)                                
 
@@ -187,7 +185,7 @@ class ReducePyCkov(ReducePyROOTHistogram): # pylint: disable=R0902
                        #     self._hEstCkov.Fill(p, n_photons_est_ckov107)
                         
         return True
-    
+
     def get_charge(self, spill):
         """Get Ckov digits """
         if 'digits' not in spill:
@@ -218,7 +216,7 @@ class ReducePyCkov(ReducePyROOTHistogram): # pylint: disable=R0902
                 time = ckov[i][ckov_sta][arrival_time]
                 if time < 255:
                     self._htime[i].Fill(time)
-                              
+                    
         return True
     
     def __init_histos(self): #pylint: disable=R0201,R0914,R0915
@@ -347,62 +345,64 @@ class ReducePyCkov(ReducePyROOTHistogram): # pylint: disable=R0902
         @returns list of 3 JSON documents containing the images.
         """
         image_list = []
-        
+
         # PMT Charge
         # file label = PTM1-8.eps
         tag = "PMT1-8"
         content = "PMTCharge"
-        doc = ReducePyROOTHistogram.get_image_doc(self, content, tag, self.canvas_charge)
-        image_list.append(doc)
+        try:
+            doc = ReducePyROOTHistogram.get_image_doc(self, [], content, tag, self.canvas_charge)
+            image_list.append(doc)
+        except:
+            sys.excepthook(*sys.exc_info())
 
         #ArrivalTimes
         #file label = ArrivalTime.eps
         tag = "ArrivalTime"
         content = "arrival_time"
-        doc = ReducePyROOTHistogram.get_image_doc(self, content, tag, self.canvas_time)
+        doc = ReducePyROOTHistogram.get_image_doc(self, [], content, tag, self.canvas_time)
         image_list.append(doc)
 
         #TOF
         #file label = "TOF"
         tag = "TOF"
         content = "TOF"
-        doc = ReducePyROOTHistogram.get_image_doc(self, content, tag, self.canvas_tof)
+        doc = ReducePyROOTHistogram.get_image_doc(self, [], content, tag, self.canvas_tof)
         image_list.append(doc)                                
 
         #TOFA and Charge
         #file label = "TOF_A"
         tag = "TOF_A"
         content = "TOF_A"
-        doc = ReducePyROOTHistogram.get_image_doc(self, content, tag, self.canvas_tof_A)
+        doc = ReducePyROOTHistogram.get_image_doc(self, [], content, tag, self.canvas_tof_A)
         image_list.append(doc)
 
         #TOFB and Charge
         #file label = "TOF_B"
         tag = "TOF_B"
         content = "TOF_B"
-        doc = ReducePyROOTHistogram.get_image_doc(self, content, tag, self.canvas_tof_B)
+        doc = ReducePyROOTHistogram.get_image_doc(self, [], content, tag, self.canvas_tof_B)
         image_list.append(doc)
 
         #Muon Momentum
         #file label = hPMu
         tag = "hPMu"
         content = "hPMu"
-        doc = ReducePyROOTHistogram.get_image_doc(self, content, tag, self.canvas_hPMu)
+        doc = ReducePyROOTHistogram.get_image_doc(self, [], content, tag, self.canvas_hPMu)
         image_list.append(doc)
 
         #Pion Momentum
         #file label = hPPi
         tag = "hPPi"
         content = "hPPi"
-        doc = ReducePyROOTHistogram.get_image_doc(self, content, tag, self.canvas_hPPi)
+        doc = ReducePyROOTHistogram.get_image_doc(self, [], content, tag, self.canvas_hPPi)
         image_list.append(doc)
 
         #PE vs Momentum
         #file label = PE_MOM
         tag = "PE_MOM"
         content = "PE_MOM"
-        doc = ReducePyROOTHistogram.get_image_doc(self, content, tag, self.canvas_hlight_Mu)
+        doc = ReducePyROOTHistogram.get_image_doc(self, [], content, tag, self.canvas_hlight_Mu)
         image_list.append(doc)
-                                
+
         return image_list
-                                                                            
