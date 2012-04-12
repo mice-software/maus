@@ -15,7 +15,7 @@
  */
 
 #ifndef SRC_COMMON_CPP_MATHS_POLYNOMIAL_MAP_HH
-#define SRC_COMMON_CPP_MATHS_POLYNOMIAL_MAP_HH
+#define SRC_COMMON_CPP_MATHS_POLYNOMIAL_MAP_HH/
 
 #include <map>
 #include <vector>
@@ -24,11 +24,12 @@
 
 namespace MAUS {
 
-/** PolynomialVector, an arbitrary order polynomial map class.
+/* @class PolynomialVector An arbitrary order polynomial vector class.
  *
  *  Maps a vector \f$\vec{x}\f$ onto a vector \f$\vec{y}\f$ with
  *  \f$\vec{y} = a_0 + sum(a_{j_1j_2...j_n} x_1^{j_1} x_2^{j_2}...x_n^{j_n})\f$.
- *  Also algorithms to map a single index J into \f$j_1...j_n\f$.\n
+ *
+ *  Also includes algorithms to map a single index J into \f$j_1...j_n\f$.\n
  *  \n
  *  IndexByPower gives an index like:\n
  *  \f$ w_i = x_1^{i_1} x_2^{i_2} ... x_n^{i_n} \f$ \n
@@ -39,28 +40,77 @@ namespace MAUS {
 
 class PolynomialVector : public Vector<double> {
  public:
-  // forward declaration of embedded class
-  class PolynomialCoefficient;
-
   // *************************
   //  Constructors
   // *************************
 
-  /** @brief  Make a vector like \f$(c, x, x^2, x^3...)\f$.
-   *  @param[in] polyVector .
+  /** @brief  Make a vector like \f$(c, x_1, x_1^2, x_1 x_2, x_2^2, ...)\f$ and
+   *          fill each x_i with zero.
+   *  @param[in] dimension The size of the point array (# of variables).
+   *  @param[in] order The order of the polynomial.
    *
-   *  could be static but faster as member function (use lookup table for
-   *  _polyKey).
+   *  The size of the PolynomialVector with point dimension n and polynomial
+   *  order p will be the sum of C(i+n-1,n-1), where i goes from 0 to p and
+   *  C(m, k) is the binomial coefficient function.
    */
-  PolynomialVector(const Vector<double>& point, size_t order) const;
+  PolynomialVector(const size_t dimension, const size_t order);
 
-  /** @brief  Make a vector like \f$(c, x, x^2, x^3...)\f$.
-   *  @param[in] polyVector should be of size NumberOfPolynomialCoefficients().
+  /** @brief  Make a vector like \f$(c, x_1, x_1^2, x_1 x_2, x_2^2, ...)\f$ and
+   *          fill each x_i with point[i].
+   *  @param[in] point The values of the multiplicands in the polynomial term
+   *                   products (i.e. x_1, x_2, ..., x_n).
+   *  @param[in] order The order of the polynomial.
    *
-   *  Could be static but faster as member function (use lookup table for
-   *  _polyKey).
+   *  The size of the PolynomialVector with point dimension n and polynomial
+   *  order p will be the sum of C(i+n-1,n-1), where i goes from 0 to p and
+   *  C(m, k) is the binomial coefficient function.
    */
-  PolynomialVector(const double* point, size_t order) const;
+  PolynomialVector(const Vector<double>& point, const size_t order);
+
+  /** @brief  Make a vector like \f$(c, x_1, x_1^2, x_1 x_2, x_2^2, ...)\f$ and
+   *          fill each x_i with point[i].
+   *  @param[in] point The values of the multiplicands in the polynomial term
+   *                   products (i.e. x_1, x_2, ..., x_n).
+   *  @param[in] dimension The size of the point array (# of variables).
+   *  @param[in] order The order of the polynomial.
+   *
+   *  The size of the PolynomialVector with point dimension n and polynomial
+   *  order p will be the sum of C(i+n-1,n-1), where i goes from 0 to p and
+   *  C(m, k) is the binomial coefficient function.
+   */
+  PolynomialVector(double const * const point,
+                   const size_t dimension,
+                   const size_t order);
+
+  // *************************
+  //  Fill Functions
+  // *************************
+
+  /** @brief  Fill each x_i with point[i].
+   *  @param[in] point The values of the multiplicands in the polynomial term
+   *                   products (i.e. x_1, x_2, ..., x_n). The vector must be of
+   *                   size Pointdimension().
+   */
+  Fill(const Vector<double>& point);
+
+  /** @brief  Fill each x_i with point[i].
+   *  @param[in] point The values of the multiplicands in the polynomial term
+   *                   products (i.e. x_1, x_2, ..., x_n). The array must be of
+   *                   size Pointdimension().
+   */
+  Fill(double const * const point);
+
+  // *************************
+  //  Accessors
+  // *************************
+
+  /** @brief  Length of the input point vector.
+   */
+  unsigned int dimension() const;
+
+  /** @brief Index of highest power - 0 is const, 1 is linear, 2 is quadratic...
+   */
+  unsigned int order() const;
 
   /** Transforms from a 1d index of polynomial coefficients to an nd index.
    *  This is slow - you should use it to build a lookup table.
@@ -85,15 +135,58 @@ class PolynomialVector : public Vector<double> {
    */
   friend std::ostream& operator<<(std::ostream&,  const PolynomialVector&);
 
-
-
  private:
   std::vector< std::vector<int> >    index_key_by_power_; // std::vector<int>[i_1] = j_1
   std::vector< std::vector<int> >    index_key_by_vector_; // std::vector<int>[j_1] = i_1
 };
 
-std::ostream& operator<<(std::ostream&, const PolynomialVector&);
+/* @class PolynomialVectorMap Implements the mapping from a point in n-space
+ *                            to a point in the polynomial term space.
+ */
+class PolynomialVectorMap : public VectorMap {
+ public:
+  /* @brief Create a map from a vector \f$x = (x_1, x_2, ..., x_n)\f$ to a
+   * vector \f$y = (c, x_1, x_1^2, x_1 x_2, x_2^2, ...)\f$.
+   *  @param[in] dimension The size of the point array (# of variables).
+   *  @param[in] order The order of any polynomial for which the mapped-to
+   *             vector represents the variable products in it's terms.
+   *
+   *  The value dimension with point dimension n and polynomial order p will be
+   *  the sum of C(i+n-1,n-1), where i goes from 0 to p and C(m, k) is the
+   *  binomial coefficient function.
+   */
+  PolynomialVectorMap(const size_t dimension, const size_t order);
 
+	unsigned int PointDimension() const;
+	unsigned int ValueDimension() const;
+
+  /** @brief Fill value with \f$ y_i \f$ at some set of \f$ x_i \f$ (point).
+   *  @param[in] point an array of length PointDimension().
+   *  @param[in] value an array of length ValueDimension().
+   */
+  void F(double const * point, double * value) const;
+
+  /** @brief  Fill value with \f$ y_i \f$ at some set of \f$ x_i \f$ (point).
+   *  @param[in] point a vector of length PointDimension().
+   *  @param[in] value a vector of length ValueDimension().
+   *
+   *  Note that there is no bounds checking here.
+   */
+  void F(const Vector<double>& point, Vector<double>& value) const;
+
+  /** @brief  Polymorphic copy constructor. This is a special copy constructor
+   *          for inheritance structures, so that I can call vectorMap->Clone()
+   *          and it will create a vectorMap of the appropriate child type
+   *          without the caller needing to know what type vectorMap actually is.
+   */
+  PolynomialVector * Clone() const;
+ private:
+  const size_t point_dimension_;
+  const size_t value_dimension_;
+  const size_t polynomial_order_;
+};
+
+std::ostream& operator<<(std::ostream&, const PolynomialVector&);
 
 } // namespace MAUS
 

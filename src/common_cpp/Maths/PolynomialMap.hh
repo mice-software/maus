@@ -53,7 +53,7 @@ namespace MAUS {
  * \n
  */
 
-class PolynomialMap : public VectorMap {
+class PolynomialMap {
  public:
   // forward declaration of embedded class
   class PolynomialCoefficient;
@@ -105,39 +105,6 @@ class PolynomialMap : public VectorMap {
    *          including 0 values.
    */
   std::vector<PolynomialCoefficient> GetCoefficientsAsVector() const;
-
-  /** @brief  Fill value with \f$ y_i \f$ at some set of \f$ x_i \f$ (point).
-   *  @param[in] point  an array of length PointDimension().
-   *  @param[in] value  an array of length ValueDimension().
-   */
-  void F(const double * point, double * value) const;
-
-  /** @brief  Fill value with \f$ y_i \f$ at some set of \f$ x_i \f$ (point).
-   *  @param[in] point  a vector of length PointDimension().
-   *  @param[in] value  a vector of length ValueDimension().
-   *
-   *  Note that there is no bounds checking here.
-   */
-  void F(const Vector<double>& point, Vector<double>& value) const;
-
-  /** @brief  Length of the input point (x) vector.
-   */
-  unsigned int PointDimension() const;
-
-  /** @brief  Length of the output value (y) vector.
-   */
-  unsigned int ValueDimension() const;
-
-  /** @brief Index of highest power - 0 is const, 1 is linear, 2 is quadratic...
-   */
-  unsigned int PolynomialOrder() const;
-
-  /** @brief  Polymorphic copy constructor. This is a special copy constructor
-   *          for inheritance structures, so that I can call vectorMap->Clone()
-   *          and it will create a vectorMap of the appropriate child type
-   *          without the caller needing to know what type vectorMap actually is.
-   */
-  PolynomialMap * Clone() const;
 
   /** @brief  Return a copy, centred on point.
    */
@@ -334,9 +301,12 @@ class PolynomialMap : public VectorMap {
       /** transform coefficient from subspace space_in to subspace space_out,
        * both subspaces of some larger space if any of coeff variables is not
        * in space_out OR not in space_in, leave this coeff untouched and Squeal
-       * so for coeff({1,2},0,1.1),
-       * coeff.space_transform({0,2,3,5}, {4,7,1,2,3,0}) would return
-       * coeff({3,4},5,1.1)
+       * so for coeff({1,2},0,1.1) (e.g. y_0 = 1.1 x_1 x_2),
+       * coeff.space_transform({1,3,5,7}, {4,2,6,3,5,1}) would return
+       * coeff({3,4},5,1.1) (e.g. y_5 = 1.1 x_3 x_4). That is if two numbers
+       * in space_in and space_out match, the value of its index in space_in is
+       * mapped to the value of its index in space_out (e.g. 1 has index 0 in
+       * space_in and 5 in space_out, so 0 -> 5).
        * @param space_in vector indexing the vector of each dimension in the
        *        input subspace
        * @param space_out vector indexing the vector of each dimension in the

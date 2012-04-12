@@ -41,28 +41,21 @@ bool PolynomialMap::print_headers_ = true;
 
 PolynomialMap::PolynomialMap(int numberOfInputVariables,
                                    Matrix<double> polynomialCoefficients)
-  :  point_dimension_(numberOfInputVariables), index_key_by_power_(),
-    index_key_by_vector_(), coefficient_matrix_(polynomialCoefficients) {
+    : point_dimension_(numberOfInputVariables),
+      coefficient_matrix_(polynomialCoefficients) {
   SetCoefficients(numberOfInputVariables, polynomialCoefficients);
 }
 
 PolynomialMap::PolynomialMap(
-  std::vector<PolynomialCoefficient>  coefficients)
-  :  point_dimension_(0), index_key_by_power_(), index_key_by_vector_(),
-    coefficient_matrix_() {
+    std::vector<PolynomialCoefficient>  coefficients)
+    : point_dimension_(0), coefficient_matrix_() {
   SetCoefficients(coefficients);
 }
 
 void PolynomialMap::SetCoefficients(int pointDim, Matrix<double> coeff) {
   int nPCoeff      = coeff.number_of_columns();
   point_dimension_        = pointDim;
-  index_key_by_power_  = std::vector< std::vector<int> >();
-  index_key_by_vector_ = std::vector< std::vector<int> >();
   polynomial_vector_ = std::vector<PolynomialCoefficient>();
-  for (int i = 0; i < nPCoeff; ++i)
-    index_key_by_power_.push_back(IndexByPower(i, pointDim));
-  for (int i = 0; i < nPCoeff; ++i)
-    index_key_by_vector_.push_back(IndexByVector(i, pointDim));
 
   for (size_t i = 0; i < coefficient_matrix_.number_of_rows(); ++i)
     for (int j = 0; j < nPCoeff; ++j)
@@ -75,8 +68,6 @@ void PolynomialMap::SetCoefficients(int pointDim, Matrix<double> coeff) {
 void PolynomialMap::SetCoefficients
                                     (std::vector<PolynomialCoefficient> coeff) {
   point_dimension_        = 0;
-  index_key_by_power_  = std::vector< std::vector<int> >();
-  index_key_by_vector_ = std::vector< std::vector<int> >();
   polynomial_vector_      = coeff;
 
   int maxPolyOrder = 0;
@@ -97,9 +88,7 @@ void PolynomialMap::SetCoefficients
         maxPolyOrder+1),
         0.);
 
-  for (size_t i = 0; i < coefficient_matrix_.number_of_columns(); ++i) {
-    index_key_by_power_.push_back(IndexByPower(i, point_dimension_));
-  }
+  // FIXME(plane1@hawk.iit.edu) index_key_by_vector_ has moved to PolynomialVectorMap
   for (size_t i = 0; i < coefficient_matrix_.number_of_columns(); ++i) {
     index_key_by_vector_.push_back(IndexByVector(i, point_dimension_));
     for (size_t j = 0; j < coeff.size();   ++j)
@@ -132,71 +121,6 @@ PolynomialMap::GetCoefficientsAsVector() const {
 PolynomialMap* PolynomialMap::Recentred(double * point) const {
   throw(Squeal(Squeal::nonRecoverable, "Recentred not implemented",
         "PolynomialMap::Recentred"));
-}
-
-void  PolynomialMap::F(const double* point, double* value) const {
-  Vector<double> pointV(PointDimension(), 1.);
-  Vector<double> valueV(ValueDimension(), 1.);
-  for (size_t i = 0; i < PointDimension(); ++i) {
-    pointV(i+1) = point[i];
-  }
-
-  F(pointV, valueV);
-
-  for (size_t i = 0; i < ValueDimension(); ++i) {
-    value[i]  = valueV(i+1);
-  }
-}
-
-void  PolynomialMap::F(const Vector<double>& point, Vector<double>& value)
-  const {
-  // create a vector of point coordinate products that form, together with the
-  // coefficents, the polynomial terms
-  Vector<double> polynomial_vector(index_key_by_vector_.size(), 1.);
-  MakePolyVector(point, polynomial_vector);
-  value = coefficient_matrix_ * polynomial_vector;
-}
-
-unsigned int PolynomialMap::PointDimension() const {
-  return point_dimension_;
-}
-
-unsigned int PolynomialMap::ValueDimension() const {
-  return coefficient_matrix_.number_of_rows();
-}
-
-unsigned int PolynomialMap::PolynomialOrder() const {
-  if (index_key_by_vector_.size() > 0) {
-    return index_key_by_vector_.back().size()+1;
-  } else {
-    return 0;
-  }
-}
-
-PolynomialMap * PolynomialMap::Clone() const {
-  return new PolynomialMap(*this);
-}
-
-
-Vector<double>&  PolynomialMap::MakePolyVector(const Vector<double>& point,
-                                                  Vector<double>& polyVector)
-                                                 const {
-    for (size_t i = 0; i < index_key_by_vector_.size(); ++i) {
-        for (size_t j = 0; j < index_key_by_vector_[i].size(); ++j) {
-            polyVector(i+1) *= point(index_key_by_vector_[i][j]+1);
-        }
-    }
-    return polyVector;
-}
-
-double*  PolynomialMap::MakePolyVector(const double* point,
-                                          double* polyVector) const {
-    for (size_t i = 0; i < index_key_by_vector_.size(); ++i) {
-        polyVector[i] = 1.;
-        for (size_t j = 0; j < index_key_by_vector_[i].size(); ++j)
-            polyVector[i] *= point[ index_key_by_vector_[i][j] ];
-    }
-    return polyVector;
 }
 
 // Turn int index into a std::vector<int> 'a' of length 'd' with values
@@ -288,6 +212,7 @@ void PolynomialMap::PrintContainer(std::ostream& out,
   out << strstr2.str();
 }
 
+// FIXME(plane1@hawk.iit.edu) index_key_by_* have moved to PolynomialVectorMap
 void PolynomialMap::PrintHeader(std::ostream& out, char int_separator,
                       char str_separator, int length, bool pad_at_start) const {
   if (index_key_by_power_.size() > 0) {
@@ -394,11 +319,14 @@ SymmetricMatrix PolynomialMap::Covariances(
 void PolynomialMap::PolynomialCoefficient::SpaceTransform
                        (std::vector<int> space_in, std::vector<int> space_out) {
   std::map<int, int> mapping; // probably optimise this
-  for (size_t i = 0; i < space_out.size(); ++i)
+  for (size_t i = 0; i < space_out.size(); ++i) {
     for (size_t j = 0; j < space_in.size(); ++j) {
       // mapping[space_in_index] returns space_out_index
-      if (space_out[i] == space_in[j]) mapping[j] = i;
+      if (space_out[i] == space_in[j]) {
+        mapping[j] = i;
+      }
     }
+  }
   std::vector<int> in_variables(_inVarByVec);
   for (size_t con = 0; con < in_variables.size(); con++) {
     if (mapping.find(in_variables[con]) != mapping.end()) {
