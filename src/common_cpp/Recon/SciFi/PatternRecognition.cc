@@ -360,7 +360,7 @@ void PatternRecognition::make_straight_tracks(const int num_points,
             } else {
               std::cout << "x_chisq = " << line_x.get_chisq();
               std::cout << "\ty_chisq = " << line_y.get_chisq() << std::endl;
-              std:: cout << "chisq test failed, " << num_points << "pt track rejected" << std::endl;
+              std::cout << "chisq test failed, " << num_points << "pt track rejected" << std::endl;
             } // ~Check track passes chisq test
           } // ~ if ( good_spnts.size() > 1 )
         } else {
@@ -780,7 +780,6 @@ bool PatternRecognition::turns_between_stations(const std::vector<double> &dz,
 
 bool PatternRecognition::AB_ratio(double &dphi_kj, double &dphi_ji, double dz_kj,
                                   double dz_ji) {
-
   double A, B;
   for ( int n = 0; n < 5; ++n )
     for ( int m = 0; m < 5; ++m ) {
@@ -794,8 +793,8 @@ bool PatternRecognition::AB_ratio(double &dphi_kj, double &dphi_ji, double dz_kj
         dphi_ji += 2 * m * pi;
 
         return true;
-      }
-    }
+      } // end m loop
+    } // end n loop
   return false; // Return false if _ABcut is never satisfied
 }
 
