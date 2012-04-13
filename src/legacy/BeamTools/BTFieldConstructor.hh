@@ -61,7 +61,7 @@ public:
   /// Set up some defaults
 	BTFieldConstructor();
   /// Destructor
-	~BTFieldConstructor() {;}
+	~BTFieldConstructor();
   /// Build the fields from root module
 	void BuildFields(MiceModule * rootModule);
   /// Returns true if any child field changes energy - used to tell whether we

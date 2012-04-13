@@ -18,6 +18,7 @@
 
 #include "gtest/gtest.h"
 
+#include "src/legacy/Interface/Squeal.hh"
 #include "Interface/dataCards.hh"
 
 #include "Config/MiceModule.hh"
@@ -239,6 +240,8 @@ TEST_F(BTFieldConstructorTest, GetSectorMagneticFieldMapTest) {
   _mod[0]->addPropertyDouble("Unit4", 1.e-4);
   _mod[0]->addPropertyDouble("Unit5", 1.e-4);
   _mod[0]->addPropertyDouble("Unit6", 1.e-4);
+  EXPECT_THROW(_field->GetField(_mod[0]), Squeal);
+  MAUS::SectorMagneticFieldMap::ClearFieldCache();
   map = static_cast<MAUS::SectorMagneticFieldMap*>(_field->GetField(_mod[0]));
   for (int i = 0; i < 3; ++i) {
     point[i] *= 10.;
@@ -250,6 +253,7 @@ TEST_F(BTFieldConstructorTest, GetSectorMagneticFieldMapTest) {
     EXPECT_NEAR(field_in[k], field_ex_2[k]*1e-4, 1e-9)
       << "axis " << k << ": " << point[0] << " " << point[1] << " " << point[2];
   }
+  MAUS::SectorMagneticFieldMap::ClearFieldCache();
 }
 }
 

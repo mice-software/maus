@@ -53,6 +53,10 @@ BTFieldConstructor::BTFieldConstructor(MiceModule * rootModule) :
   BuildFields(rootModule);
 }
 
+BTFieldConstructor::~BTFieldConstructor() {
+    MAUS::SectorMagneticFieldMap::ClearFieldCache();
+}
+
 void BTFieldConstructor::BuildFields(MiceModule * rootModule)
 {
 	SetDefaults();

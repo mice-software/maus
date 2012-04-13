@@ -123,9 +123,7 @@ TEST(SectorMagneticFieldMapTest, TestFieldMapCache) {
     map = new SectorMagneticFieldMap
                          (SECTORMAGNETICMAP, "tosca_sector_1", units, "Dipole");
     delete map;
-    // need to look at the implementation here. We have a bug that the field map
-    // cache never gets cleared.
-    EXPECT_TRUE(false);
+    SectorMagneticFieldMap::ClearFieldCache();
 }
 
 // Check GetFieldValuePolar function
@@ -189,6 +187,7 @@ TEST(SectorMagneticFieldMapTest, TestGetFieldValuePolar) {
                                               << "point " << j << " axis " << k;
         }
     }
+    SectorMagneticFieldMap::ClearFieldCache();
 }
 
 // Check GetFieldValue function
@@ -255,6 +254,7 @@ TEST(SectorMagneticFieldMapTest, TestGetFieldValueCartesian) {
                                               << "point " << j << " axis " << k;
         }
     }
+    SectorMagneticFieldMap::ClearFieldCache();
 }
 }
 
