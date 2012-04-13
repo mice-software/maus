@@ -40,13 +40,12 @@ SectorMagneticFieldMap::SectorMagneticFieldMap(std::string file_name,
        std::string file_format, std::vector<double> units, std::string symmetry)
        : SectorField(), _interpolator(NULL), _symmetry(none), _units(units), _format(file_format),
                         _filename(file_name) {
-    std::cerr << "CONST 0" << std::endl;
     SetSymmetry(symmetry);
     if (_fields.find(file_name) == _fields.end()) {
-        std::cerr << "CONST 1" << std::endl;
-        SetInterpolator(SectorMagneticFieldMapIO::ReadMap
-                                    (file_name, file_format, units, symmetry));
-        std::cerr << "CONST 2" << std::endl;
+        Interpolator3dGridTo3d* interpolator = SectorMagneticFieldMapIO::ReadMap
+                                      (file_name, file_format, units, symmetry);
+        SetInterpolator(interpolator);
+        delete _interpolator->Clone();
         _fields[file_name] = new SectorMagneticFieldMap(*this);
     } else {
         SectorMagneticFieldMap* tgt = _fields[file_name];
@@ -57,8 +56,7 @@ SectorMagneticFieldMap::SectorMagneticFieldMap(std::string file_name,
                std::string("but different settings"),
                "SectorMagneticFieldMap::SectorMagneticFieldMap(...)"));
         }
-        SetInterpolator
-             (new Interpolator3dGridTo3d(*(tgt->_interpolator)));
+        SetInterpolator(tgt->_interpolator->Clone());
     }
 }
 
@@ -66,12 +64,11 @@ SectorMagneticFieldMap::SectorMagneticFieldMap
                                         (const SectorMagneticFieldMap& field) 
     : SectorField(field), _interpolator(NULL), _symmetry(field._symmetry), _units(field._units), _format(field._format),
       _filename(field._filename) {
-    std::cerr << "CONST 3" << std::endl;
-    Interpolator3dGridTo3d* interpolator = new Interpolator3dGridTo3d
-                                                       (*(field._interpolator));
-    std::cerr << "CONST 4" << std::endl;
+    Interpolator3dGridTo3d* interpolator = NULL;
+    if (field._interpolator != NULL) {
+        interpolator = field._interpolator->Clone();
+    }
     SetInterpolator(interpolator);
-    std::cerr << "CONST 5" << std::endl;
 }
 
 SectorMagneticFieldMap::~SectorMagneticFieldMap() {
@@ -94,6 +91,7 @@ void SectorMagneticFieldMap::SetInterpolator
                                     (grid->MinX(), grid->MinY(), grid->MinZ(),
                                      grid->MaxX(), grid->MaxY(), grid->MaxZ());
     }
+    delete _interpolator->Clone();
 }
 
 std::string SectorMagneticFieldMap::GetSymmetry() {
