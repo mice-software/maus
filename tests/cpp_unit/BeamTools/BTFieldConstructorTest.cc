@@ -22,6 +22,9 @@
 
 #include "Config/MiceModule.hh"
 
+#include "src/common_cpp/FieldTools/SectorMagneticFieldMap.hh"
+#include "src/common_cpp/FieldTools/SectorField.hh"
+
 #include "BeamTools/BTCombinedFunction.hh"
 #include "BeamTools/BTMultipole.hh"
 #include "BeamTools/BTFieldConstructor.hh"
@@ -206,7 +209,47 @@ TEST_F(BTFieldConstructorTest, GetCombinedFunctionTest) {
   _mod[0]->setProperty<double>("Length", 0);
   EXPECT_THROW(delete _field->GetCombinedFunction(_mod[0]), Squeal);
   _mod[0]->setProperty<double>("Length", 4);
+}
 
+TEST_F(BTFieldConstructorTest, GetSectorMagneticFieldMapTest) {
+  _mod[0]->addPropertyString("FieldType", "SectorMagneticFieldMap");
+  _mod[0]->addPropertyString("FileName",
+            "${MAUS_ROOT_DIR}/tests/cpp_unit/FieldTools/test_sector_map.table");
+  _mod[0]->addPropertyString("FileType", "tosca_sector_1");
+  MAUS::SectorMagneticFieldMap* map = static_cast<MAUS::SectorMagneticFieldMap*>
+                                                    (_field->GetField(_mod[0]));
+  Interpolator3dGridTo3d* null_interpolator = NULL;
+  EXPECT_NE(map->GetInterpolator(), null_interpolator);
+  EXPECT_EQ(map->GetSymmetry(), "None");
+  double point[4] = {210.+1e-9, 1.-1.e-9, 22.5/180.*M_PI-1.e-9, 0.};
+  double field_in[6] = {0., 0., 0., 0., 0., 0.};
+  double field_ex[3] = {-0.10002656988, -5.3512047987, -0.42126847878E-01};
+  MAUS::SectorField::ConvertToCartesian(point);
+  map->GetFieldValue(point, field_in);
+  for (int k = 0; k < 3; ++k) {
+    EXPECT_NEAR(field_in[k], field_ex[k], 1e-6)
+      << "axis " << k << ": " << point[0] << " " << point[1] << " " << point[2];
+  }
+  delete map;
+
+  _mod[0]->addPropertyString("Symmetry", "Dipole");
+  _mod[0]->addPropertyDouble("Unit1", 10.);
+  _mod[0]->addPropertyDouble("Unit2", 10.);
+  _mod[0]->addPropertyDouble("Unit3", 10.);
+  _mod[0]->addPropertyDouble("Unit4", 1.e-4);
+  _mod[0]->addPropertyDouble("Unit5", 1.e-4);
+  _mod[0]->addPropertyDouble("Unit6", 1.e-4);
+  map = static_cast<MAUS::SectorMagneticFieldMap*>(_field->GetField(_mod[0]));
+  for (int i = 0; i < 3; ++i) {
+    point[i] *= 10.;
+  }
+  point[1] *= -1.;
+  map->GetFieldValue(point, field_in);
+  double field_ex_2[3] = {0.10002656988, -5.3512047987, 0.42126847878E-01};
+  for (int k = 0; k < 3; ++k) {
+    EXPECT_NEAR(field_in[k], field_ex_2[k]*1e-4, 1e-9)
+      << "axis " << k << ": " << point[0] << " " << point[1] << " " << point[2];
+  }
 }
 }
 

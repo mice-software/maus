@@ -107,6 +107,33 @@ TEST(SectorMagneticFieldMapTest, TestReadToscaMapDipoleSymmetry) {
     EXPECT_NEAR(field_1[2], -field_2[2], 1e-9);
 }
 
+// Check that we can read the same map twice, clear the cache, reread, etc.
+TEST(SectorMagneticFieldMapTest, TestFieldMapCache) {
+    double _units[6] = {10., 10., 10., 1.e-4, 1.e-4, 1.e-4};
+    std::vector<double> units(&_units[0], &_units[6]);
+
+    std::cerr << "1" << std::endl;
+    SectorMagneticFieldMap* map;
+    map = new SectorMagneticFieldMap
+                         (SECTORMAGNETICMAP, "tosca_sector_1", units, "Dipole");
+    std::cerr << "2a" << std::endl;
+    delete map;
+    std::cerr << "2" << std::endl;
+    map = new SectorMagneticFieldMap
+                         (SECTORMAGNETICMAP, "tosca_sector_1", units, "Dipole");
+    delete map;
+    std::cerr << "3" << std::endl;
+    SectorMagneticFieldMap::ClearFieldCache();
+    std::cerr << "4" << std::endl;
+    map = new SectorMagneticFieldMap
+                         (SECTORMAGNETICMAP, "tosca_sector_1", units, "Dipole");
+    delete map;
+    std::cerr << "5" << std::endl;
+    // need to look at the implementation here. We have a bug that the field map
+    // cache never gets cleared.
+    EXPECT_TRUE(false);
+}
+
 // Check GetFieldValuePolar function
 TEST(SectorMagneticFieldMapTest, TestGetFieldValuePolar) {
     double _units[6] = {10., 10., 10., 1.e-4, 1.e-4, 1.e-4};

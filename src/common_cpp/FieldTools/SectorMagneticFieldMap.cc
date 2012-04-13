@@ -30,16 +30,48 @@
 
 namespace MAUS {
 
+std::map<std::string, SectorMagneticFieldMap*> SectorMagneticFieldMap::_fields;
+
 SectorMagneticFieldMap::SectorMagneticFieldMap()
                        : SectorField(), _interpolator(NULL), _symmetry(none) {
 }
 
 SectorMagneticFieldMap::SectorMagneticFieldMap(std::string file_name,
        std::string file_format, std::vector<double> units, std::string symmetry)
-                        : SectorField(), _interpolator(NULL), _symmetry(none) {
+       : SectorField(), _interpolator(NULL), _symmetry(none), _units(units), _format(file_format),
+                        _filename(file_name) {
+    std::cerr << "CONST 0" << std::endl;
     SetSymmetry(symmetry);
-    SetInterpolator(SectorMagneticFieldMapIO::ReadMap
+    if (_fields.find(file_name) == _fields.end()) {
+        std::cerr << "CONST 1" << std::endl;
+        SetInterpolator(SectorMagneticFieldMapIO::ReadMap
                                     (file_name, file_format, units, symmetry));
+        std::cerr << "CONST 2" << std::endl;
+        _fields[file_name] = new SectorMagneticFieldMap(*this);
+    } else {
+        SectorMagneticFieldMap* tgt = _fields[file_name];
+        if (_symmetry != tgt-> _symmetry || _units != tgt->_units ||
+            _format != tgt->_format || _filename != tgt->_filename) {
+            throw(Squeal(Squeal::recoverable, 
+               "Attempt to construct different SectorFieldMaps with same file "+
+               std::string("but different settings"),
+               "SectorMagneticFieldMap::SectorMagneticFieldMap(...)"));
+        }
+        SetInterpolator
+             (new Interpolator3dGridTo3d(*(tgt->_interpolator)));
+    }
+}
+
+SectorMagneticFieldMap::SectorMagneticFieldMap
+                                        (const SectorMagneticFieldMap& field) 
+    : SectorField(field), _interpolator(NULL), _symmetry(field._symmetry), _units(field._units), _format(field._format),
+      _filename(field._filename) {
+    std::cerr << "CONST 3" << std::endl;
+    Interpolator3dGridTo3d* interpolator = new Interpolator3dGridTo3d
+                                                       (*(field._interpolator));
+    std::cerr << "CONST 4" << std::endl;
+    SetInterpolator(interpolator);
+    std::cerr << "CONST 5" << std::endl;
 }
 
 SectorMagneticFieldMap::~SectorMagneticFieldMap() {
@@ -99,15 +131,25 @@ std::string SectorMagneticFieldMap::SymmetryToString
 }
 
 void SectorMagneticFieldMap::GetFieldValuePolar
-                                          (const double* point, double* field) {
+                                    (const double* point, double* field) const {
     _interpolator->F(&point[0], field);
     SectorField::ConvertToPolar(point, field);
 }
 
-void SectorMagneticFieldMap::GetFieldValue(const double* point, double* field) {
+void SectorMagneticFieldMap::GetFieldValue
+                                    (const double* point, double* field) const {
     std::vector<double> _point(&point[0], &point[4]);
     SectorField::ConvertToPolar(&_point[0]);
     _interpolator->F(&_point[0], field);
+}
+
+
+void SectorMagneticFieldMap::ClearFieldCache() {
+    for (std::map<std::string, SectorMagneticFieldMap*>::iterator it = 
+                                   _fields.begin(); it != _fields.end(); ++it) {
+        delete (*it).second;
+    }
+    _fields = std::map<std::string, SectorMagneticFieldMap*>();
 }
 
 const double SectorMagneticFieldMapIO::float_tolerance = 1e-3;
@@ -291,5 +333,6 @@ ThreeDGrid* SectorMagneticFieldMapIO::GenerateGrid
     ThreeDGrid* grid = new ThreeDGrid(r_grid, y_grid, phi_grid);
     return grid;
 }
+
 }
 

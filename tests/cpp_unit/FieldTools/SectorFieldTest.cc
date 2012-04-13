@@ -27,10 +27,10 @@ namespace MAUS {
 class SectorFieldTestClass : public SectorField {
   public:
     virtual void GetFieldValuePolar
-                             (const double* point_polar, double* field_polar) {}
+                       (const double* point_polar, double* field_polar) const {}
 
     virtual void GetFieldValue
-                           (const double* point_cartes, double* field_cartes) {}
+                     (const double* point_cartes, double* field_cartes) const {}
 
     void SetPolarBoundingBox(double bbMinR, double bbMinY, double bbMinPhi,
                              double bbMaxR, double bbMaxY, double bbMaxPhi) {

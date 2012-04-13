@@ -70,7 +70,7 @@ class SectorField : public BTField {
      *         Overwrites any existing data
      */
     virtual void GetFieldValuePolar
-                           (const double* point_polar, double* field_polar) = 0;
+                     (const double* point_polar, double* field_polar) const = 0;
 
     /** Return the field value in cartesian coordinates
      *
@@ -84,7 +84,7 @@ class SectorField : public BTField {
      *         Overwrites any existing data
      */
     virtual void GetFieldValue
-                         (const double* point_cartes, double* field_cartes) = 0;
+                   (const double* point_cartes, double* field_cartes) const = 0;
 
     /** Convert a position from cartesian to polar coordinates
      *

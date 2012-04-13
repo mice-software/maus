@@ -100,6 +100,8 @@ public:
 	BTField * GetFastSolenoid     (const MiceModule * theModule);
   /// Read a magnetic field map
 	BTField * GetMagFieldMap      (const MiceModule * theModule);
+  /// Read a sector magnetic field map
+	BTField * GetSectorMagFieldMap      (const MiceModule * theModule);
   /// Generate an RF cavity (TM010 mode only) - pill box and RF field map
 	BTField * GetRFCavity         (const MiceModule * theModule);
   /// Return a BTMultipole with parameters specific to dipoles

@@ -19,6 +19,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 #include "src/legacy/Interface/Interpolator.hh"
 
@@ -41,6 +42,10 @@ namespace MAUS {
  *  A constructor is provided which calls the SectorMagneticFieldMapIO class to
  *  generate the field map, and it is expected that this will be the usual way
  *  to generate the map.
+ *
+ *  The SectorMagneticFieldMap class caches field maps by file name to avoid
+ *  multiple loads of the same field map. This cache should be cleared after
+ *  running (otherwise we have a memory leak).
  *
  *  For details on coordinate systems etc, see SectorField class
  */
@@ -66,9 +71,6 @@ class SectorMagneticFieldMap : public SectorField {
     /** Copy constructor - makes a deep copy of the field map */
     SectorMagneticFieldMap(const SectorMagneticFieldMap& field);
 
-    /** Equality operator - makes a deep copy of the field map */
-    SectorMagneticFieldMap& operator=(const SectorMagneticFieldMap& field);
-
     /** Destructor - delete allocated memory */
     ~SectorMagneticFieldMap();
 
@@ -79,7 +81,7 @@ class SectorMagneticFieldMap : public SectorField {
      *  @param field array of at least 6 doubles, to which the field at point
      *         is written (br, by, bphi, er=0, ey=0, ephi=0)
      */
-    void GetFieldValuePolar(const double* point, double* field);
+    void GetFieldValuePolar(const double* point, double* field) const;
 
     /** Get the field value in cartesian coordinates
      *
@@ -88,7 +90,7 @@ class SectorMagneticFieldMap : public SectorField {
      *  @param field array of at least 6 doubles, to which the field at point
      *         is written (bx, by, bz, ex=0, ey=0, ez=0)
      */
-    void GetFieldValue(const double* point, double* field);
+    void GetFieldValue(const double* point, double* field) const;
 
     /** Get a pointer to the interpolator or NULL if it is not set
      *
@@ -101,7 +103,8 @@ class SectorMagneticFieldMap : public SectorField {
      *  @param interpolator set the field map interpolator. Note
      *  SectorMagneticFieldMap now owns the memory pointed to by interpolator
      */
-    void SetInterpolator(Interpolator3dGridTo3d* interpolator);
+    void SetInterpolator
+                  (Interpolator3dGridTo3d* interpolator);
 
     /** Get a string corresponding to the field map symmetry
      *
@@ -115,6 +118,9 @@ class SectorMagneticFieldMap : public SectorField {
      */
     void SetSymmetry(std::string name);
 
+    /** Delete cached fields
+     */
+    static void ClearFieldCache();
   private:
     enum symmetry {none, dipole};
 
@@ -125,8 +131,15 @@ class SectorMagneticFieldMap : public SectorField {
 
     Interpolator3dGridTo3d* _interpolator;
     symmetry _symmetry;
+    const std::vector<double> _units;
+    const std::string _format;
+    const std::string _filename;
 
+    static std::map<std::string, SectorMagneticFieldMap*> _fields;
     friend class SectorMagneticFieldMapIO;
+
+    // disabled - dont use
+    SectorMagneticFieldMap& operator=(const SectorMagneticFieldMap& field);
 };
 
 /** @class SectorMagneticFieldMapIO handles reading sector field maps
