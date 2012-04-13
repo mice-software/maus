@@ -29,7 +29,7 @@ bool ReduceCppSingleStation::birth(std::string argJsonConfigDocument) {
   _filename = "se.root";
   _nSpills = 0;
 
-  TCanvas *c1 = new TCanvas("c1", "ADC Values", 200, 10, 700, 500);
+  TCanvas *c1 = new TCanvas("c1", "adc Values", 200, 10, 700, 500);
   TCanvas *c2 = new TCanvas("c2", "Digits", 200, 10, 700, 500);
   TCanvas *c3 = new TCanvas("c3", "SpacePoints", 200, 10, 700, 500);
 

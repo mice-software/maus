@@ -182,7 +182,7 @@ void SEDigitization::
       found = true;
     }
   }
-  // std::cout << bank << " " << chan_ro << std::endl;
+  // std::cerr << bank << " " << chan_ro << std::endl;
   // assert(found);
 }
 
