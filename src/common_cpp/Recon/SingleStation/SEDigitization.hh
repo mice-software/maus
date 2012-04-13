@@ -39,6 +39,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cmath>
+#include "src/common_cpp/Utils/JsonWrapper.hh"
 
 // G4MICE from commonCpp
 #include "Interface/dataCards.hh"

@@ -57,15 +57,15 @@ void SEClusterRec::process(SEEvent &evt, std::vector<const MiceModule*> modules)
         }
       }
       // If there is a neighbour, sum npe contribution.
-      if ( neigh ) {
-        pe += neigh->get_npe();
-      }
+      //if ( neigh ) {
+      //  pe += neigh->get_npe();
+      //}
       // Save cluster if it's above npe cut.
       if ( pe > _min_npe ) {
         SECluster* clust = new SECluster(seed);
-        if ( neigh ) {
-          clust->add_digit(neigh);
-        }
+        //if ( neigh ) {
+        //  clust->add_digit(neigh);
+        //}
         construct(clust, modules);
         evt.add_cluster(clust);
       }
@@ -77,6 +77,7 @@ void SEClusterRec::construct(SECluster *clust, std::vector<const MiceModule*> mo
   Hep3Vector perp(-1., 0., 0.);
   Hep3Vector dir(0, 1, 0);
   const MiceModule* this_plane = NULL;
+  // std::cout << "Modules size: "  << modules.size() << std::endl;
   for ( unsigned int j = 0; !this_plane && j < modules.size(); j++ ) {
     // Find the right module
     if ( modules[j]->propertyInt("Plane") ==
@@ -85,6 +86,7 @@ void SEClusterRec::construct(SECluster *clust, std::vector<const MiceModule*> mo
       this_plane = modules[j];
     }
   }
+  // std::cout << clust->get_plane() << std::endl;
 
   assert(this_plane != NULL);
 

@@ -264,16 +264,16 @@ int V830DataProcessor::Process(MDdataContainer* aFragPtr) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-int VLSBDataProcessor::Process(MDdataContainer* aFragPtr) {
+int VLSB_bankDataProcessor::Process(MDdataContainer* aFragPtr) {
   // Cast the argument to structure it points to.
   // This process should be called only with MDfragmentVLSB_C argument.
-  if ( typeid(*aFragPtr) != typeid(MDfragmentVLSB) ) {
+  if ( typeid(*aFragPtr) != typeid(MDfragmentVLSB_bank) ) {
     std::cout << "CASTERROR: " << typeid(*aFragPtr).name() << " != " <<
-                                  typeid(MDfragmentVLSB).name() << std::endl;
+                                  typeid(MDfragmentVLSB_bank).name() << std::endl;
     return CastError;
   }
 
-  MDfragmentVLSB* xVLSBFragment = static_cast<MDfragmentVLSB*>(aFragPtr);
+  MDfragmentVLSB_bank* xVLSBFragment = static_cast<MDfragmentVLSB_bank*>(aFragPtr);
 
   Json::Value pBoardDoc, xVLSB_CHit;
   if ( !xVLSBFragment->IsValid() )
@@ -285,7 +285,7 @@ int VLSBDataProcessor::Process(MDdataContainer* aFragPtr) {
   pBoardDoc["ldc_id"]        = xLdc = this->GetLdcId();
 
   if (xLdc == 0)
-    xDetector = "tracker1";
+    xDetector = "single_station";
   if (xLdc == 2)
     xDetector = "tracker2";
   if (xLdc == 3)
@@ -323,6 +323,61 @@ int VLSBDataProcessor::Process(MDdataContainer* aFragPtr) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+int VLSB_boardDataProcessor::Process(MDdataContainer* aFragPtr) {
+  // Cast the argument to structure it points to.
+  // This process should be called only with MDfragmentVLSB_C argument.
+  std::cerr << "VLSB_boardDataProcessor called" << std::endl;
+
+  if ( typeid(*aFragPtr) != typeid(MDfragmentVLSB_board) )
+    return CastError;
+
+  MDfragmentVLSB_board* xVLSB_CFragment = static_cast<MDfragmentVLSB_board*>(aFragPtr);
+
+  Json::Value pBoardDoc, xVLSB_CHit;
+  if ( !xVLSB_CFragment->IsValid() )
+    return GenericError;
+
+  int xLdc, xAdc, xPartEv;
+  string xDetector;
+  // Put static data into the Json
+  //pBoardDoc["ldc_id"]     = xLdc = this->GetLdcId();
+
+  //if (xLdc == 0)
+    //xDetector = "tracker1";
+ // if (xLdc == 2)
+   // xDetector = "tracker2";
+/*
+  pBoardDoc["detector"]          = xDetector;
+  pBoardDoc["equip_type"]        = this->GetEquipmentType();
+  pBoardDoc["time_stamp"]        = this->GetTimeStamp();
+  pBoardDoc["phys_event_number"] = this->GetPhysEventNumber();
+  pBoardDoc["geo"]               = xVLSB_CFragment->GetGeo();
+
+  MDdataWordVLSB_bank xDataWord;
+  uint32_t * dataPtr = xVLSB_CFragment->UserPayLoadPtr();
+  for (unsigned int iban = 0; iban < 4; iban++) {
+    for (unsigned int iw =0; iw < xVLSB_CFragment->GetBankLength(iban); iw++) {
+      xVLSB_CHit = pBoardDoc;
+      xDataWord.SetDataPtr(dataPtr);
+      xVLSB_CHit["adc"] = xAdc = xDataWord.GetAdc();
+      //if ( !_zero_suppression ||
+        //  (_zero_suppression && xAdc > _zs_threshold) ) {
+        xVLSB_CHit["part_event_number"] = xPartEv = xDataWord.GetEventNum();
+        xVLSB_CHit["bank"] = iban;
+        xVLSB_CHit["channel"] = xDataWord.GetChannel();
+        xVLSB_CHit["tdc"] = xDataWord.GetTdc();
+        xVLSB_CHit["discriminator"] = xDataWord.GetDiscriBit();
+
+        ( *_docSpill )[xDetector][xPartEv][_equipment].append(xVLSB_CHit);
+      //}
+      dataPtr++;
+    }
+  }*/
+  return OK;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 int VLSB_CDataProcessor::Process(MDdataContainer* aFragPtr) {
   // Cast the argument to structure it points to.
   // This process should be called only with MDfragmentVLSB_C argument.
@@ -351,7 +406,7 @@ int VLSB_CDataProcessor::Process(MDdataContainer* aFragPtr) {
   pBoardDoc["phys_event_number"] = this->GetPhysEventNumber();
   pBoardDoc["geo"]               = xVLSB_CFragment->GetGeo();
 
-  MDdataWordVLSB xDataWord;
+  MDdataWordVLSB_bank xDataWord;
   uint32_t * dataPtr = xVLSB_CFragment->UserPayLoadPtr();
   for (unsigned int iban = 0; iban < 4; iban++) {
     for (unsigned int iw =0; iw < xVLSB_CFragment->GetBankLength(iban); iw++) {

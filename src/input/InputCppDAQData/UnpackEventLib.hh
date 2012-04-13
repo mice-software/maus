@@ -31,7 +31,9 @@
 #include "unpacking/MDpartEventV1290.h"
 #include "unpacking/MDpartEventV1724.h"
 #include "unpacking/MDpartEventV1731.h"
-#include "unpacking/MDfragmentVLSB.h"
+#include "unpacking/MDfragmentVLSB_bank.h"
+//#include "unpacking/MDfragmentVLSB_master.h"
+#include "unpacking/MDfragmentVLSB_board.h"
 #include "unpacking/MDfragmentVLSB_C.h"
 #include "unpacking/MDfragmentV830.h"
 #include "unpacking/MDfragmentDBB.h"
@@ -278,22 +280,42 @@ class V830DataProcessor : public MDarranger {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-/** On Fragment Event VLSB_C
- * This class unpacks a VLSB_C board hit (tracker cosmic test in Lab7).
+/** On Fragment Event VLSB_bank
+ * This class unpacks a VLSB_bank hit.
  */
-class VLSBDataProcessor : public ZeroSupressionFilter {
+class VLSB_bankDataProcessor : public ZeroSupressionFilter {
  public:
-  VLSBDataProcessor() :ZeroSupressionFilter() {_equipment="VLSB";}
-  virtual ~VLSBDataProcessor() {}
+  VLSB_bankDataProcessor() :ZeroSupressionFilter() {_equipment="VLSB_bank";}
+  virtual ~VLSB_bankDataProcessor() {}
 
  /** Unpack a single event part to JSON.
   *
   * This function unpacks a single particle event,
-  * recorded by equipment VLSB (tracker board)
+  * recorded by equipment VLSB_bank (tracker equip)
   * into a JSON sub-tree.
   *
   * \param[in,out] dc Pointer to the event to process.
-  * Will be casted to MDfragmentVLSB.
+  * Will be casted to MDfragmentVLSB_bank.
+  */
+  virtual int Process(MDdataContainer* dc);
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+/** On Fragment Event VLSB_board
+ * This class unpacks a VLSB_board board hit (tracker cosmic test in Lab7).
+ */
+class VLSB_boardDataProcessor : public MDarranger {
+ public:
+  VLSB_boardDataProcessor() {_equipment="VLSB_board";}
+  virtual ~VLSB_boardDataProcessor() {}
+
+ /** Unpack a single event part to JSON.
+  *
+  *
+  *
+  * \param[in,out] dc Pointer to the event to process.
+  * Will be casted to MDfragmentVLSB_board.
   */
   virtual int Process(MDdataContainer* dc);
 };

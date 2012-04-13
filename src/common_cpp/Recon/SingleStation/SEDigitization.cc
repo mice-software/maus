@@ -25,24 +25,23 @@ void SEDigitization::process(SESpill &spill, Json::Value const &daq) {
   // -------------------------------------------------
   // Load calibration, mapping and bad channel list.
   // These calls are to be replaced by CDB interface...
-  std::cout << "loading calibration" << std::endl;
+  // std::cout << "loading calibration" << std::endl;
   bool calib = load_calibration("se_calibration.txt");
   assert(calib);
-  std::cout << "loading mapping" << std::endl;
+  // std::cout << "loading mapping" << std::endl;
   bool map = load_mapping("se_mapping.txt");
   assert(map);
-  std::cout << "loading bad channel list" << std::endl;
-  bool bad_channels = load_bad_channels();
-  assert(bad_channels);
+  // std::cout << "loading bad channel list" << std::endl;
+  // bool bad_channels = load_bad_channels();
+  // assert(bad_channels);
   // -------------------------------------------------
-
   // Pick up JSON daq event.
   Json::Value _events = daq["single_station"];
-
+  std::cout <<  _events.size() << std::endl;
   for ( unsigned int i = 1; i < _events.size(); ++i ) {
     SEEvent* event = new SEEvent();
 
-    Json::Value input_event = _events[i]["VLSB"];
+    Json::Value input_event = _events[i]["VLSB_bank"];
 
     // Loop over the digits of this event.
     for ( unsigned int j = 0; j < input_event.size(); ++j ) {
@@ -50,7 +49,7 @@ void SEDigitization::process(SESpill &spill, Json::Value const &daq) {
       assert(channel_in.isMember("phys_event_number"));
       assert(channel_in.isMember("part_event_number"));
       // assert(channel_in.isMember("geo"));
-      assert(channel_in.isMember("bank"));
+      assert(channel_in.isMember("bank_id"));
       assert(channel_in.isMember("channel"));
       assert(channel_in.isMember("adc"));
       assert(channel_in.isMember("tdc"));
@@ -58,7 +57,7 @@ void SEDigitization::process(SESpill &spill, Json::Value const &daq) {
 
       // int spill = channel_in["phys_event_number"].asInt();
       // int eventNo = channel_in["part_event_number"].asInt();
-      int bank = channel_in["bank"].asInt();
+      int bank = channel_in["bank_id"].asInt();
       int channel_ro = channel_in["channel"].asInt();
       int adc = channel_in["adc"].asInt();
       int tdc = channel_in["tdc"].asInt();
@@ -88,7 +87,7 @@ void SEDigitization::process(SESpill &spill, Json::Value const &daq) {
 
       // Exclude missing modules.
       if ( pe > 1.0 && plane != -1 ) {
-        std::cout << "Making digit: " << plane << " " << channel << " " << pe << std::endl;
+       // std::cout << "Making digit: " << plane << " " << channel << " " << pe << std::endl;
         SEDigit *digit = new SEDigit(plane, channel, pe, tdc);
         event->add_digit(digit);
       }
@@ -183,8 +182,8 @@ void SEDigitization::
       found = true;
     }
   }
-
-  assert(found);
+  //std::cout << bank << " " << chan_ro << std::endl;
+  //assert(found);
 }
 
 bool SEDigitization::is_good_channel(const int bank, const int chan_ro) {

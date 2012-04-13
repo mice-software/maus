@@ -29,7 +29,9 @@ InputCppDAQData::InputCppDAQData(std::string pDataPath,
   _v1731PartEventProc = NULL;
   _v830FragmentProc = NULL;
   _vLSB_cFragmentProc = NULL;
-  _vLSBFragmentProc = NULL;
+  _vLSB_bankFragmentProc = NULL;
+  _vLSB_boardFragmentProc = NULL;
+  //_vLSB_masterFragmentProc = NULL;
   _DBBFragmentProc = NULL;
 }
 
@@ -101,8 +103,10 @@ bool InputCppDAQData::birth(std::string jsonDataCards) {
   initProcessor<V830DataProcessor>(_v830FragmentProc, configJSON);
 
   // Comfigure the VLSB (tracker board) data processor.
-  initProcessor<VLSBDataProcessor>(_vLSBFragmentProc, configJSON);
-  configureZeroSupression(_vLSBFragmentProc, configJSON);
+  initProcessor<VLSB_bankDataProcessor>(_vLSB_bankFragmentProc, configJSON);
+  configureZeroSupression(_vLSB_bankFragmentProc, configJSON);
+
+  initProcessor<VLSB_boardDataProcessor>(_vLSB_boardFragmentProc, configJSON);
 
   // Comfigure the VLSB (tracker board) data processor.
   // This is for the old version of the VLSB equipment used in the cosmic test in lab7
@@ -147,8 +151,11 @@ std::string InputCppDAQData::getCurEvent() {
   if (_v830FragmentProc)
     _v830FragmentProc->set_JSON_doc(&xDocSpill);
 
-  if (_vLSBFragmentProc)
-    _vLSBFragmentProc->set_JSON_doc(&xDocSpill);
+  if (_vLSB_bankFragmentProc)
+    _vLSB_bankFragmentProc->set_JSON_doc(&xDocSpill);
+
+  if (_vLSB_boardFragmentProc)
+    _vLSB_boardFragmentProc->set_JSON_doc(&xDocSpill);
 
   if (_vLSB_cFragmentProc)
     _vLSB_cFragmentProc->set_JSON_doc(&xDocSpill);
@@ -216,7 +223,8 @@ bool InputCppDAQData::death() {
   if (_v1724PartEventProc) delete _v1724PartEventProc;
   if (_v1731PartEventProc) delete _v1731PartEventProc;
   if (_v830FragmentProc)   delete _v830FragmentProc;
-  if (_vLSBFragmentProc)   delete _vLSBFragmentProc;
+  if (_vLSB_bankFragmentProc)   delete _vLSB_bankFragmentProc;
+  if (_vLSB_boardFragmentProc)   delete _vLSB_boardFragmentProc;
   if (_vLSB_cFragmentProc) delete _vLSB_cFragmentProc;
   if (_DBBFragmentProc)    delete _DBBFragmentProc;
 
