@@ -15,9 +15,11 @@
  *
  */
 
-#include "src/common_cpp/FieldTools/ScalingMagnet.hh"
+#include <vector>
 
 #include "gsl/gsl_sf_gamma.h"
+
+#include "src/common_cpp/FieldTools/ScalingMagnet.hh"
 
 namespace MAUS {
 
@@ -38,7 +40,7 @@ void ScalingMagnet::SetCoefficients(size_t max_index) {
     _coefficients = std::vector< std::vector<double> >
                                     (max_index, std::vector<double>(max_index));
     for (size_t i = 0; i < max_index; ++i) {
-        _coefficients[i][0] = 
+        _coefficients[i][0] =
                          pow(_radius, _k-static_cast<double>(i))/gsl_sf_fact(i);
 //        std::cerr << _coefficients[i][0] << " ";
         for (size_t k = 0; k < i; ++k) {

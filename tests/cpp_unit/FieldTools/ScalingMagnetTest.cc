@@ -42,6 +42,5 @@ TEST(ScalingMagnetTest, MidplaneFieldTest) {
         std::cerr << pos[0] << " " << field[1] << " " << b0*pow(pos[0]/r0, k) << std::endl;
     }
 }
-
 }
 

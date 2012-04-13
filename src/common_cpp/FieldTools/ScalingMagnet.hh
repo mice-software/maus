@@ -17,6 +17,8 @@
 #ifndef _SRC_COMMON_CPP_FIELDTOOLS_SCALINGMAGNET_HH_
 #define _SRC_COMMON_CPP_FIELDTOOLS_SCALINGMAGNET_HH_
 
+#include <vector>
+
 #include "src/legacy/BeamTools/BTField.hh"
 
 namespace MAUS {
@@ -26,7 +28,7 @@ class ScalingMagnet : public BTField {
     ScalingMagnet();
     ScalingMagnet(double radius, double b_0, double field_index);
     ~ScalingMagnet();
-    
+
     void SetRadius(double radius);
     double GetRadius();
 
@@ -52,7 +54,6 @@ class ScalingMagnet : public BTField {
     size_t _max_index;
     std::vector< std::vector<double> > _coefficients;
 };
-
 }
 #endif
 

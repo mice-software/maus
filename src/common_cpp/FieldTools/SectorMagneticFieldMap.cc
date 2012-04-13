@@ -51,7 +51,7 @@ SectorMagneticFieldMap::SectorMagneticFieldMap(std::string file_name,
         SectorMagneticFieldMap* tgt = _fields[file_name];
         if (_symmetry != tgt-> _symmetry || _units != tgt->_units ||
             _format != tgt->_format || _filename != tgt->_filename) {
-            throw(Squeal(Squeal::recoverable, 
+            throw(Squeal(Squeal::recoverable,
                "Attempt to construct different SectorFieldMaps with same file "+
                std::string("but different settings"),
                "SectorMagneticFieldMap::SectorMagneticFieldMap(...)"));
@@ -61,8 +61,9 @@ SectorMagneticFieldMap::SectorMagneticFieldMap(std::string file_name,
 }
 
 SectorMagneticFieldMap::SectorMagneticFieldMap
-                                        (const SectorMagneticFieldMap& field) 
-    : SectorField(field), _interpolator(NULL), _symmetry(field._symmetry), _units(field._units), _format(field._format),
+                                        (const SectorMagneticFieldMap& field)
+    : SectorField(field), _interpolator(NULL), _symmetry(field._symmetry),
+      _units(field._units), _format(field._format),
       _filename(field._filename) {
     Interpolator3dGridTo3d* interpolator = NULL;
     if (field._interpolator != NULL) {
@@ -143,7 +144,7 @@ void SectorMagneticFieldMap::GetFieldValue
 
 
 void SectorMagneticFieldMap::ClearFieldCache() {
-    for (std::map<std::string, SectorMagneticFieldMap*>::iterator it = 
+    for (std::map<std::string, SectorMagneticFieldMap*>::iterator it =
                                    _fields.begin(); it != _fields.end(); ++it) {
         delete (*it).second;
     }
@@ -331,6 +332,5 @@ ThreeDGrid* SectorMagneticFieldMapIO::GenerateGrid
     ThreeDGrid* grid = new ThreeDGrid(r_grid, y_grid, phi_grid);
     return grid;
 }
-
 }
 
