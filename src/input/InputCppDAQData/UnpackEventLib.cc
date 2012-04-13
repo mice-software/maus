@@ -340,13 +340,13 @@ int VLSB_boardDataProcessor::Process(MDdataContainer* aFragPtr) {
   int xLdc, xAdc, xPartEv;
   string xDetector;
   // Put static data into the Json
-  //pBoardDoc["ldc_id"]     = xLdc = this->GetLdcId();
-
-  //if (xLdc == 0)
-    //xDetector = "tracker1";
- // if (xLdc == 2)
-   // xDetector = "tracker2";
+  // pBoardDoc["ldc_id"]     = xLdc = this->GetLdcId();
 /*
+  if (xLdc == 0)
+    xDetector = "tracker1";
+  if (xLdc == 2)
+    xDetector = "tracker2";
+
   pBoardDoc["detector"]          = xDetector;
   pBoardDoc["equip_type"]        = this->GetEquipmentType();
   pBoardDoc["time_stamp"]        = this->GetTimeStamp();

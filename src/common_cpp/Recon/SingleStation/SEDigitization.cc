@@ -182,8 +182,8 @@ void SEDigitization::
       found = true;
     }
   }
-  //std::cout << bank << " " << chan_ro << std::endl;
-  //assert(found);
+  // std::cout << bank << " " << chan_ro << std::endl;
+  // assert(found);
 }
 
 bool SEDigitization::is_good_channel(const int bank, const int chan_ro) {
@@ -192,7 +192,8 @@ bool SEDigitization::is_good_channel(const int bank, const int chan_ro) {
 
 bool SEDigitization::load_bad_channels() {
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
-  std::string fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppSingleStationRecon/se_bad_chan_list.txt";
+  std::string fname =
+  std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppSingleStationRecon/se_bad_chan_list.txt";
 
   std::ifstream inf(fname.c_str());
   if (!inf) {

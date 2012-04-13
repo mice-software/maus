@@ -31,7 +31,7 @@ InputCppDAQData::InputCppDAQData(std::string pDataPath,
   _vLSB_cFragmentProc = NULL;
   _vLSB_bankFragmentProc = NULL;
   _vLSB_boardFragmentProc = NULL;
-  //_vLSB_masterFragmentProc = NULL;
+  // _vLSB_masterFragmentProc = NULL;
   _DBBFragmentProc = NULL;
 }
 

@@ -43,6 +43,7 @@
 #include "TGFrame.h"
 #include "TVirtualPad.h"
 #include "TFrame.h"
+#include "TH2F.h"
 
 #include "Interface/Squeak.hh"
 #include "Interface/Squeal.hh"
@@ -79,7 +80,18 @@ class ReduceCppSingleStation {
 
   bool is_physics_daq_event(Json::Value root);
 
+  void count_particle_events(Json::Value root);
+
  private:
+  TGraph *_graph;
+  int _spill_counter;
+
+  TH2F *triplets;
+
+  TH2F *duplets;
+
+  TH2F *_trig_efficiency;
+
   std::string _classname;
 
   std::string _filename;
@@ -89,7 +101,7 @@ class ReduceCppSingleStation {
   void Save();
 
   TTree _unpacked;
-  int _adc, _bank, _chan;
+  int _adc, _bank, _chan, _activebank;
 
   TTree _digits;
   int _plane;

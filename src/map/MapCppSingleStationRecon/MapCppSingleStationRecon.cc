@@ -58,7 +58,7 @@ std::string MapCppSingleStationRecon::process(std::string document) {
   // Writes a line in the JSON document.
   Json::FastWriter writer;
   SESpill spill;
-  //std::cout << "Start Recon" << std::endl;
+  // std::cout << "Start Recon" << std::endl;
 /*
   try {
     root = JsonWrapper::StringToJson(document);
@@ -90,7 +90,7 @@ std::string MapCppSingleStationRecon::process(std::string document) {
         spacepoint_recon(event);
       }
 
-      //print_event_info(event);
+      // print_event_info(event);
       save_to_json(event);
       }
     } // ==========================================================
@@ -102,7 +102,7 @@ std::string MapCppSingleStationRecon::process(std::string document) {
     root["errors"] = errors;
     return writer.write(root);
   }
- // std::cout << "End Recon" << std::endl;
+  // std::cout << "End Recon" << std::endl;
   return writer.write(root);
 }
 

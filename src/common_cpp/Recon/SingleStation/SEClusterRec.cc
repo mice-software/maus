@@ -57,15 +57,15 @@ void SEClusterRec::process(SEEvent &evt, std::vector<const MiceModule*> modules)
         }
       }
       // If there is a neighbour, sum npe contribution.
-      //if ( neigh ) {
-      //  pe += neigh->get_npe();
-      //}
+      if ( neigh ) {
+        pe += neigh->get_npe();
+      }
       // Save cluster if it's above npe cut.
       if ( pe > _min_npe ) {
         SECluster* clust = new SECluster(seed);
-        //if ( neigh ) {
-        //  clust->add_digit(neigh);
-        //}
+        if ( neigh ) {
+          clust->add_digit(neigh);
+        }
         construct(clust, modules);
         evt.add_cluster(clust);
       }
