@@ -31,10 +31,10 @@ def run():
     data_cards_list.append("Do_VLSB_Zero_Suppression_Threshold=%d\n" % 70)
     # setup = 'MayRun.dat'
     # data_cards_list.append("reconstruction_geometry_filename=%s\n" % Stage6.dat)
-    data_path = '%s/src/map/MapCppSingleStationRecon/' % os.environ.get("MAUS_ROOT_DIR")
+    data_path = '/home/edward/control_room/'#'%s/src/map/MapCppSingleStationRecon/' % os.environ.get("MAUS_ROOT_DIR")
     # data_file = '3758.000'
     # data_cards_list.append("daq_data_path=%s\n" % data_path)
-    data_file = '3944.000'
+    data_file = '3996.000'
     # data_cards_list.append("daq_data_file=%s\n" % data_file)
     # refresh_rate = once in how many spills should canvases be updated
     # data_cards_list.append("refresh_rate='%d'\n" % 1)

@@ -52,7 +52,7 @@ void SEClusterRec::process(SEEvent &evt, std::vector<const MiceModule*> modules)
       // Look for a neighbour.
       for ( int j = i+1; j < seeds_size; j++ ) {
         if ( !seeds[j]->is_used() && seeds[j]->get_plane() == plane &&
-             abs(seeds[j]->get_channel() - fibre) < 2 ) {
+             abs(seeds[j]->get_channel() - fibre) < 2.0 ) {
           neigh = seeds[j];
         }
       }
@@ -61,10 +61,11 @@ void SEClusterRec::process(SEEvent &evt, std::vector<const MiceModule*> modules)
         pe += neigh->get_npe();
       }
       // Save cluster if it's above npe cut.
-      if ( pe > _min_npe ) {
+      if ( pe > 2.0 ) {
         SECluster* clust = new SECluster(seed);
         if ( neigh ) {
           clust->add_digit(neigh);
+          std::cerr << "Clustering" << std::endl;
         }
         construct(clust, modules);
         evt.add_cluster(clust);

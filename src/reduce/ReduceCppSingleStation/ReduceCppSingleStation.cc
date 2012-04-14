@@ -40,6 +40,15 @@ bool ReduceCppSingleStation::birth(std::string argJsonConfigDocument) {
   duplets_copy  = new TH2F("duplets_copy", "All Spills (x, y)", 300, -150, 150, 300, -150, 150);
   _graph = new TGraph();
 
+  _hist_plane0 = new TH1F("_hist_plane0","plane 0", 215, 0, 214);
+  _hist_plane1 = new TH1F("_hist_plane1","plane 1", 215, 0, 214);
+  _hist_plane2 = new TH1F("_hist_plane2","plane 2", 215, 0, 214);
+  _chan_sum = new TH1F("_hist_plane2","Sum Of Channel Numb", 641, 0, 640);
+
+  _npe_plane0 = new TH1F("_npe_plane0","plane 0", 31, 0, 30);
+  _npe_plane1 = new TH1F("_npe_plane1","plane 1", 31, 0, 30);
+  _npe_plane2 = new TH1F("_npe_plane2","plane 2", 31, 0, 30);
+
   _unpacked.SetNameTitle("unpacked", "unpacked");
   _unpacked.Branch("adc", &_adc, "adc/I");
   _unpacked.Branch("tdc", &_tdc, "tdc/I");
@@ -84,7 +93,7 @@ bool ReduceCppSingleStation::birth(std::string argJsonConfigDocument) {
   gStyle->SetTitleOffset(0.6, "x");
   gStyle->SetTitleOffset(0.4, "y");
 
-  c4->Divide(1,1);
+  c4->Divide(3,1);
   triplets->SetMarkerStyle(20);
   triplets->SetMarkerColor(kBlue);
   triplets_copy->SetMarkerStyle(20);
@@ -173,8 +182,9 @@ std::string  ReduceCppSingleStation::process(std::string document) {
   _nSpills++;
   if (!(_nSpills%1)) {
    c1->cd(1);
-   _unpacked.Draw("adc", "activebank==1");
- /*   _unpacked.Draw("adc:chan", "bank == 0 ");
+   _chan_sum->Draw();
+   //_unpacked.Draw("adc", "activebank==1");
+/*   _unpacked.Draw("adc:chan", "bank == 0 ");
     c1->Update();
     c1->cd(2);
     _unpacked.Draw("adc:chan", "bank == 2 ");
@@ -205,20 +215,11 @@ std::string  ReduceCppSingleStation::process(std::string document) {
 */
     c1->Update();
     c2->cd(1);
-    _digits.Draw("channel","plane==0");
-    //c2->cd(1);
-    //_unpacked.Draw("adc", "bank==0 && chan>65 && chan<90");
-    //_unpacked.Draw("adc", "activebank==1");
-    //c2->SetLogy();
-    // _unpacked.Draw("adc", "activebank==1");
+    _hist_plane0->Draw();
     c2->cd(2);
-    //_unpacked.Draw("tdc", "bank==0 && chan>65 && chan<90");
-    //_unpacked.Draw("tdc", "activebank==1");
-    _digits.Draw("channel","plane==1");
-    // _digits.Draw("npe");
+    _hist_plane1->Draw();
     c2->cd(3);
-    //_unpacked.Draw("adc:tdc", "activebank==1");
-    _digits.Draw("channel","plane==2");
+    _hist_plane2->Draw();
     c2->Update();
 
     c3->cd(1);
@@ -240,7 +241,12 @@ std::string  ReduceCppSingleStation::process(std::string document) {
     c3->Update();
 
    c4->cd(1);
-   _graph->Draw("ac*");
+   //_graph->Draw("ac*");
+   _npe_plane0->Draw();
+   c4->cd(2);
+   _npe_plane1->Draw();
+   c4->cd(3);
+   _npe_plane2->Draw();
    c4->Update();
   }
 
@@ -336,12 +342,25 @@ void ReduceCppSingleStation::digits_histograms(Json::Value root) {
                                         event_i,
                                         JsonWrapper::arrayValue);
     int numb_digits = i_PartEvent.size();
+    double chan_sum = 0;
     for ( int digit_j = 0; digit_j < numb_digits; digit_j++ ) {
       _plane      = i_PartEvent[digit_j]["plane"].asInt();
       _channel = i_PartEvent[digit_j]["channel"].asDouble();
       _npe     = i_PartEvent[digit_j]["npe"].asDouble();
       _digits.Fill();
+      chan_sum += _channel;
+      if ( _plane == 0 ) {
+        _hist_plane0->Fill(_channel);
+        _npe_plane0->Fill(_npe);
+      } else if ( _plane == 1 ) {
+        _hist_plane1->Fill(_channel);
+        _npe_plane1->Fill(_npe);
+      } else if ( _plane == 2 ) {
+        _hist_plane2->Fill(_channel);
+        _npe_plane2->Fill(_npe);
+      }
     }
+    _chan_sum->Fill(chan_sum);
   }
   // } else {
   //  throw(Squeal(Squeal::recoverable,
@@ -362,12 +381,12 @@ void ReduceCppSingleStation::unpacked_data_histograms(Json::Value root) {
     //                                    "VLSB_bank",
     //                                    JsonWrapper::objectValue);
     Json::Value i_PartEvent = daq_data["single_station"][event_i];
-    int number_channels_within = i_PartEvent["VLSB"].size();
+    int number_channels_within = i_PartEvent["VLSB_bank"].size();
     for ( int i = 0; i < number_channels_within; i++ ) {
-      _tdc  = i_PartEvent["VLSB"][i]["tdc"].asInt();
-      _adc  = i_PartEvent["VLSB"][i]["adc"].asInt();
-      _bank = i_PartEvent["VLSB"][i]["bank_id"].asInt();
-      _chan = i_PartEvent["VLSB"][i]["channel"].asInt();
+      _tdc  = i_PartEvent["VLSB_bank"][i]["tdc"].asInt();
+      _adc  = i_PartEvent["VLSB_bank"][i]["adc"].asInt();
+      _bank = i_PartEvent["VLSB_bank"][i]["bank_id"].asInt();
+      _chan = i_PartEvent["VLSB_bank"][i]["channel"].asInt();
       if ( _bank == 0 || _bank == 2 || _bank == 5 ||
            _bank == 7 || _bank == 9 || _bank == 10 ||
            _bank == 11 || _bank == 12 || _bank == 13 ||
