@@ -207,7 +207,8 @@ class PatternRecognition {
      *
      */
     void calculate_dipangle(const std::vector<SciFiSpacePoint*> &spnts,
-                            const SimpleCircle &circle, SimpleLine &line_sz);
+                            const SimpleCircle &circle, std::vector<double> &dphi,
+                            SimpleLine &line_sz);
 
     /** @brief Calculate the turning angle of a spacepoint w.r.t. helix center
      *
@@ -254,6 +255,20 @@ class PatternRecognition {
      *
      */
     void dphi_to_ds( double R, const std::vector<double> &dphi, std::vector<double> &ds);
+
+    /** @brief Fit a full helix to the spacepoints with a nonlinear least squares fit
+     *
+     *  A non-linear least squares helix fit is performed on spacepoints which passed previous
+     *  chisq circle and line tests in the x-y and s-z projections, respectively.  This is the last
+     *  fit in the helical pattern recognition routine, and will provide the initial parameter
+     *  values for the Kalman Filter.
+     *
+     *  @param good_spnts - Vector containing spacepoints being used for the fit, in order of
+     *                      innermost to outermost stations
+     *
+     */
+    void full_helix_fit(const std::vector<SciFiSpacePoint*> &spnts, const SimpleCircle &circle,
+                        const SimpleLine &line_sz);
 
     /** @brief Determine which two stations the initial line should be drawn between
      * 

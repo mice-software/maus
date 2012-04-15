@@ -58,10 +58,10 @@ SimpleCircle::SimpleCircle(double x0, double y0, double R) {
   _chisq = 0.0;
 }
 
-SimpleCircle::SimpleCircle(double x0, double x0_err, double y0, double y0_err,
-                                  double R, double R_err, double alpha, double alpha_err,
-                                  double beta, double beta_err, double gamma, double gamma_err,
-                                  double kappa, double kappa_err, double delta_R, double chisq) {
+SimpleCircle::SimpleCircle(double x0, double x0_err, double y0, double y0_err, double R,
+                           double R_err, double alpha, double alpha_err, double beta,
+                           double beta_err, double gamma, double gamma_err, double kappa,
+                           double kappa_err, double delta_R, double chisq) {
   _x0 = x0;
   _x0_err = x0_err;
   _y0 = y0;

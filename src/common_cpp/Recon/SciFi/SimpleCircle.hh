@@ -23,6 +23,8 @@
 #ifndef  SIMPLECIRCLE_HH
 #define SIMPLECIRCLE_HH
 
+#include <vector>
+
 // namespace MAUS {
 
 class SimpleCircle {
@@ -57,6 +59,8 @@ class SimpleCircle {
     double get_chisq() const { return _chisq; }
     double get_delta_R() const { return _delta_R; }
 
+    std::vector<double> get_turning_angles() const { return _turning_angles; }
+
     // Setters
     void clear();
     void set_x0(double x0) { _x0 = x0; }
@@ -76,6 +80,8 @@ class SimpleCircle {
 
     void set_chisq(double chisq) { _chisq = chisq; }
     void set_delta_R(double delta_R) { _delta_R = delta_R; }
+
+    void set_turning_angles(std::vector<double> turning_angles) { _turning_angles = turning_angles; }
 
     void set_parameters(double x0, double x0_err, double y0, double y0_err,
                         double R, double R_err, double alpha, double alpha_err,
@@ -99,6 +105,8 @@ class SimpleCircle {
     double _kappa_err;
     double _delta_R;
     double _chisq;
+
+    std::vector<double> _turning_angles;
 };
 // } // ~namespace MAUS
 

@@ -363,7 +363,7 @@ void PatternRecognition::make_straight_tracks(const int num_points,
             SimpleLine line_x, line_y;
             linear_fit2(_z, _x, _x_err, line_x);
             linear_fit2(_z, _y, _y_err, line_y);
-            //linear_fit(good_spnts, line_x, line_y);
+            // linear_fit(good_spnts, line_x, line_y);
 
             // Check track passes chisq test, then create SciFiStraightPRTrack
             if ( ( line_x.get_chisq() / ( num_points - 2 ) < _chisq_cut ) &&
@@ -580,16 +580,15 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
                       Hep3Vector pos = spnts_by_station[station_num][sp_no]->get_position();
 
                       // Calculate the residual dR
-                      double dR = delta_R( circle, pos );
+                      double dR = delta_R(circle, pos);
 
                       // Apply roadcut to see if spacepoint belongs to same circle
                       if ( fabs(dR) < _R_res_cut )
                         good_spnts.push_back(spnts_by_station[station_num][sp_no]);
-
                     } // ~If intermediate station spacepoint is unused
                   } // ~Loop over intermediate staion spacepoints
                 } // ~if (station_num != ignore_station)
-              } // ~Loop over intermediate stations not used in initial circle_fit 
+              } // ~Loop over intermediate stations not used in initial circle_fit
 
               // Clear the circle object so we can reuse it
               circle.clear();
@@ -605,22 +604,22 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
                 good_spnts.push_back(spnts_by_station[outer_station_num][station_outer_sp]);
 
                 // Perform another circle fit now that we have found all of the good spnts
-                circle_fit( good_spnts, circle );
+                circle_fit(good_spnts, circle);
 
                 // Check circle fit passes chisq test
                 if ( circle.get_chisq() / ( num_points - 2 ) < _chisq_cut ) {
                   std::cout << "** chisq circle test passed, moving onto linear fit in s-z **\n";
 
                   SimpleLine line_sz;
-                  calculate_dipangle( good_spnts, circle, line_sz);
+                  std::vector<double> dphi;
+                  calculate_dipangle(good_spnts, circle, dphi, line_sz);
 
                   // Check linear fit passes chisq test, then perform full helix fit
                   if ( line_sz.get_chisq() / ( num_points - 2 ) < _chisq_cut ) {
-
                   std::cout << "** line in s-z chisq test passed, moving on to full helix fit**\n";
-
-                  }
-                  else {
+                  circle.set_turning_angles(dphi); // The turning angles will be needed in helix fit
+                  full_helix_fit(good_spnts, circle, line_sz);
+                  } else {
                     std::cout << "sz chisq = " << line_sz.get_chisq();
                     std::cout << "sz chisq test failed, " << num_points << "track rejected" << "\n";
                   } // ~Check s-z line passes chisq test
@@ -629,7 +628,6 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
                     std::cout << "circle chisq = " << circle.get_chisq();
                     std::cout << "circle chisq test failed, track rejected" << "\n";
                 } // ~circle fail chisq test
-
               } // ~if enough spacepoints are found for fit (must be at least 3)
             } // ~if intmediate station sp unused
           } // ~Loop over intermediate station spacepoints
@@ -740,7 +738,7 @@ void PatternRecognition::circle_fit(const std::vector<SciFiSpacePoint*> &spnts,
   CLHEP::HepMatrix V(num_points, num_points); // error matrix
   CLHEP::HepMatrix K(num_points, 1);
 
-  for ( int i = 0; i = static_cast<int>(spnts.size()); ++i ) {
+  for ( int i = 0; i < static_cast<int>(spnts.size()); ++i ) {
 
     // This part will change once I figure out proper errors
     double sd = -1.0;
@@ -827,11 +825,11 @@ double PatternRecognition::delta_R(const SimpleCircle &circle, const CLHEP::Hep3
 }
 
 void PatternRecognition::calculate_dipangle(const std::vector<SciFiSpacePoint*> &spnts,
-                                            const SimpleCircle &circle, SimpleLine &line_sz) {
+                                            const SimpleCircle &circle, std::vector<double> &dphi,
+                                            SimpleLine &line_sz) {
   double R = circle.get_R();
 
   std::vector<double> dz;
-  std::vector<double> dphi;
   std::vector<double> dphi_err;
 
   // For the linear fit in s-z, we care about the change in z vs change in s
@@ -869,8 +867,8 @@ void PatternRecognition::calculate_dipangle(const std::vector<SciFiSpacePoint*> 
     if ( ok ) {
       std::vector<double> ds;
       // Multiply each element of dphi by R so that each element dphi_ji--> ds_ji
-      dphi_to_ds( R, dphi, ds);
-      linear_fit2(dz, dphi, dphi_err, line_sz);
+      dphi_to_ds(R, dphi, ds);
+      linear_fit2(dz, ds, dphi_err, line_sz); // Need to change dphi_err to ds_err.
     }
 }
 
@@ -907,7 +905,7 @@ bool PatternRecognition::turns_between_stations(const std::vector<double> &dz,
     if ( good_AB )
       return true;
     else
-      return false;
+      return false; // must return false if the condition is not met for a station stepping
   } // end j
 }
 
@@ -931,11 +929,55 @@ bool PatternRecognition::AB_ratio(double &dphi_kj, double &dphi_ji, double dz_kj
   return false; // Return false if _ABcut is never satisfied
 }
 
-void PatternRecognition::dphi_to_ds( double R, const std::vector<double> &dphi, std::vector<double> &ds) {
-  // This function performs scaler multiplication on the input vector. 
-  for ( int i = 0; i < dphi.size(); ++i ) {
+void PatternRecognition::dphi_to_ds(double R, const std::vector<double> &dphi,
+                                    std::vector<double> &ds) {
+  // This function performs scaler multiplication on the input vector.
+  for ( int i = 0; i < static_cast<int>(dphi.size()); ++i ) {
     double ds_ji = dphi[i] * R;
     ds.push_back(ds_ji);
+  }
+}
+
+void PatternRecognition::full_helix_fit(const std::vector<SciFiSpacePoint*> &spnts,
+                                        const SimpleCircle &circle, const SimpleLine &line_sz) {
+  CLHEP::HepMatrix G(3, 3); // symmetric matrix containing second derivatives w.r.t. each parameter
+  CLHEP::HepMatrix g(3, 1); // vector containing first derivatives w.r.t. each parameter
+
+  double A, B, C;
+  A = spnts[0]->get_position().x();
+  B = spnts[0]->get_position().y();
+  C = spnts[0]->get_position().z();
+
+  double R = circle.get_R();
+  double phi_0 = circle.get_turning_angles()[0]; //  Is this the right syntax to pick up the first
+  // element of the vector turning_angles?????????????????????????????????????????????????
+  double dsdz = line_sz.get_m();
+  double tan_lambda = 1 / dsdz;
+  // construct the individual matrix elements as 0 to begin with.
+  double G_rr = 0., G_bb = 0., G_ll = 0., G_rb = 0., G_rl = 0., G_bl = 0.;
+
+  for ( int i = 0; i < static_cast<int>(spnts.size()); ++i ) {
+    CLHEP::Hep3Vector p = spnts[i]->get_position();
+    double phi_i = circle.get_turning_angles()[i];
+    phi_i -= phi_0; // Everything relative to starting point.
+
+    double sd;
+    if ( spnts[i]->get_station() == 5 )
+      sd = _sd_5;
+    else
+      sd = _sd_1to4;
+
+    double w = 1 / (sd * sd);
+
+    double x_i = A + R * (cos(phi_i) - 1) * cos(phi_0) - R * sin(phi_i) * sin(phi_0);
+    double y_i = B + R * (cos(phi_i) - 1) * sin(phi_0) - R * sin(phi_i) * cos(phi_0);
+    double z_i = C + R * phi_i * tan_lambda;
+
+    G_rr += w * ((x_i - A) * (x_i - A) + (y_i - B) * (y_i - B)) + (z_i - C) * (z_i - C);
+    G_rb += w * ((p.x() - x_i) * (y_i - B) + (p.y() - y_i) * (x_i - A));
+    G_rl += ((z_i - C) - (p.z() - z_i)) * phi_i;
+    G_bb += w * ((p.x() - A) * (x_i - A) + (p.y() - B) * (y_i - B));
+    G_ll += phi_i * phi_i;
   }
 }
 
