@@ -30,6 +30,10 @@ class SimpleCircle {
 
     // Constructors
     SimpleCircle();
+    SimpleCircle(double x0, double y0, double R);
+    SimpleCircle(double x0, double x0_err, double y0, double y0_err, double R, double R_err,
+                 double alpha, double alpha_err, double beta, double beta_err, double gamma,
+                 double gamma_err, double kappa, double kappa_err, double delta_R, double chisq);
 
     // Destructor
     ~SimpleCircle();  // Default destructor
@@ -54,6 +58,7 @@ class SimpleCircle {
     double get_delta_R() const { return _delta_R; }
 
     // Setters
+    void clear();
     void set_x0(double x0) { _x0 = x0; }
     void set_x0_err(double x0_err) { _x0_err = x0_err; }
     void set_y0(double y0) { _y0 = y0; }
