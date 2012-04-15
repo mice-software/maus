@@ -181,39 +181,10 @@ std::string  ReduceCppSingleStation::process(std::string document) {
 
   _nSpills++;
   if (!(_nSpills%1)) {
-   c1->cd(1);
-   _chan_sum->Draw();
-   //_unpacked.Draw("adc", "activebank==1");
-/*   _unpacked.Draw("adc:chan", "bank == 0 ");
+    c1->cd(1);
+    _graph->Draw("ac*");
     c1->Update();
-    c1->cd(2);
-    _unpacked.Draw("adc:chan", "bank == 2 ");
-    c1->Update();
-    c1->cd(3);
-    _unpacked.Draw("adc:chan", "bank == 5 ");
-    c1->Update();
-    c1->cd(4);
-    _unpacked.Draw("adc:chan", "bank == 7 ");
-    c1->Update();
-    c1->cd(5);
-    _unpacked.Draw("adc:chan", "bank == 9 ");
-    c1->Update();
-    c1->cd(6);
-    _unpacked.Draw("adc:chan", "bank == 10 ");
-    c1->Update();
-    c1->cd(7);
-    _unpacked.Draw("adc:chan", "bank == 11 ");
-    c1->Update();
-    c1->cd(8);
-    _unpacked.Draw("adc:chan", "bank == 12 ");
-    c1->Update();
-    c1->cd(9);
-    _unpacked.Draw("adc:chan", "bank == 13 ");
-    c1->Update();
-    c1->cd(10);
-    _unpacked.Draw("adc:chan", "bank == 14 ");
-*/
-    c1->Update();
+
     c2->cd(1);
     _hist_plane0->Draw();
     c2->cd(2);
@@ -259,15 +230,23 @@ void ReduceCppSingleStation::count_particle_events(Json::Value root) {
   int numb_triggers = root["daq_data"]["tof1"].size();
   int numb_spacepoints = 0;
 
-  int n_events = root["spacepoints"]["single_station"].size();
+  int n_events = root["space_points"]["single_station"].size();
+  // std::cout << "Number events " << n_events << std::endl;
   for ( int event_i = 0; event_i < n_events; event_i++ ) {
-    if ( !root["spacepoints"]["single_station"][event_i].isNull() ) {
-      numb_spacepoints += 1;
-    }
+    // std::cerr << root["space_points"]["single_station"][event_i] << std::endl;
+    // int numb_spacepoints = root["space_points"]["single_station"][event_i].size();
+//    for ( int sp_j = 0; sp_j < numb_spacepoints; ++sp_j ) {
+      if ( !root["space_points"]["single_station"][event_i].isNull() ) {
+        // std::cerr << "summing spacepoint" << std::endl;
+        numb_spacepoints += 1;
+      }
+  //  }
   }
 
-  float effic = static_cast<float>(numb_spacepoints)/static_cast<float>(numb_triggers);
+  float effic = static_cast<float>(numb_spacepoints)/numb_triggers;
   float _spill_counter_copy = static_cast<float>(_spill_counter);
+  //float y = 0.1;
+  //std::cerr << effic << " Spacepoints: " << numb_spacepoints << " TOF Triggers:" << numb_triggers << std::endl;
   _graph->SetPoint(_spill_counter, _spill_counter_copy, effic);
 /*
   TAxis *axis = _trig_efficiency->GetXaxis();

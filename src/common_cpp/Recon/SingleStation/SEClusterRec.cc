@@ -65,7 +65,7 @@ void SEClusterRec::process(SEEvent &evt, std::vector<const MiceModule*> modules)
         SECluster* clust = new SECluster(seed);
         if ( neigh ) {
           clust->add_digit(neigh);
-          std::cerr << "Clustering" << std::endl;
+          // std::cerr << "Clustering" << std::endl;
         }
         construct(clust, modules);
         evt.add_cluster(clust);
