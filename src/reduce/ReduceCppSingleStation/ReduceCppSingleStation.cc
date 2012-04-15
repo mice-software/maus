@@ -29,10 +29,11 @@ bool ReduceCppSingleStation::birth(std::string argJsonConfigDocument) {
   _filename = "se.root";
   _nSpills = 0;
 
-  TCanvas *c1 = new TCanvas("c1", "adc Values", 200, 10, 700, 500);
-  TCanvas *c2 = new TCanvas("c2", "Digits", 200, 10, 700, 500);
+  TCanvas *c1 = new TCanvas("c1", "Efficiency (SE/TOF1)", 200, 10, 700, 500);
+  TCanvas *c2 = new TCanvas("c2", "Channel Hits", 200, 10, 700, 500);
   TCanvas *c3 = new TCanvas("c3", "SpacePoints", 200, 10, 700, 500);
-  TCanvas *c4 = new TCanvas("c4", "Efficiency", 200, 10, 700, 500);
+  TCanvas *c4 = new TCanvas("c4", "Cluster NPE", 200, 10, 700, 500);
+  TCanvas *c5 = new TCanvas("c5", "ADCs", 200, 10, 700, 500);
 
   triplets = new TH2F("triplets", "Current Spill (x, y)", 300, -150, 150, 300, -150, 150);
   duplets  = new TH2F("duplets",  "Current Spill (x, y)", 300, -150, 150, 300, -150, 150);
@@ -75,6 +76,7 @@ bool ReduceCppSingleStation::birth(std::string argJsonConfigDocument) {
   _spacepointscopy.Branch("z", &_z, "z/D");
   _spacepointscopy.Branch("type", &_type, "type/I");
 
+  c5->Divide(1,1);
   c1->Divide(1, 1);
   c1->SetFillColor(21);
   c1->GetFrame()->SetFillColor(42);
@@ -138,6 +140,7 @@ std::string  ReduceCppSingleStation::process(std::string document) {
   TCanvas *c2 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c2"));
   TCanvas *c3 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c3"));
   TCanvas *c4 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c4"));
+  TCanvas *c5 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c5"));
 
   Squeak::activateCout(1);
 
@@ -211,14 +214,19 @@ std::string  ReduceCppSingleStation::process(std::string document) {
     _spacepointscopy.Draw("type");
     c3->Update();
 
-   c4->cd(1);
-   //_graph->Draw("ac*");
-   _npe_plane0->Draw();
-   c4->cd(2);
-   _npe_plane1->Draw();
-   c4->cd(3);
-   _npe_plane2->Draw();
-   c4->Update();
+    c4->cd(1);
+    _npe_plane0->Draw();
+    c4->cd(2);
+    _npe_plane1->Draw();
+    c4->cd(3);
+    _npe_plane2->Draw();
+    c4->Update();
+
+    c5->cd(1);
+    _unpacked.Draw("adc","bank==0 || bank==2 || bank==5 || bank==7 || bank==9|| bank==10|| bank==11 ||bank==12 || bank==13|| bank==14");
+
+    c5->Update();
+
   }
 
   // std::cerr << "End Reducer Process" << std::endl;
@@ -231,16 +239,11 @@ void ReduceCppSingleStation::count_particle_events(Json::Value root) {
   int numb_spacepoints = 0;
 
   int n_events = root["space_points"]["single_station"].size();
-  // std::cout << "Number events " << n_events << std::endl;
+
   for ( int event_i = 0; event_i < n_events; event_i++ ) {
-    // std::cerr << root["space_points"]["single_station"][event_i] << std::endl;
-    // int numb_spacepoints = root["space_points"]["single_station"][event_i].size();
-//    for ( int sp_j = 0; sp_j < numb_spacepoints; ++sp_j ) {
-      if ( !root["space_points"]["single_station"][event_i].isNull() ) {
-        // std::cerr << "summing spacepoint" << std::endl;
-        numb_spacepoints += 1;
-      }
-  //  }
+    if ( !root["space_points"]["single_station"][event_i].isNull() ) {
+      numb_spacepoints += 1;
+    }
   }
 
   float effic = static_cast<float>(numb_spacepoints)/numb_triggers;
@@ -360,12 +363,12 @@ void ReduceCppSingleStation::unpacked_data_histograms(Json::Value root) {
     //                                    "VLSB_bank",
     //                                    JsonWrapper::objectValue);
     Json::Value i_PartEvent = daq_data["single_station"][event_i];
-    int number_channels_within = i_PartEvent["VLSB_bank"].size();
+    int number_channels_within = i_PartEvent["VLSB"].size();
     for ( int i = 0; i < number_channels_within; i++ ) {
-      _tdc  = i_PartEvent["VLSB_bank"][i]["tdc"].asInt();
-      _adc  = i_PartEvent["VLSB_bank"][i]["adc"].asInt();
-      _bank = i_PartEvent["VLSB_bank"][i]["bank_id"].asInt();
-      _chan = i_PartEvent["VLSB_bank"][i]["channel"].asInt();
+      _tdc  = i_PartEvent["VLSB"][i]["tdc"].asInt();
+      _adc  = i_PartEvent["VLSB"][i]["adc"].asInt();
+      _bank = i_PartEvent["VLSB"][i]["bank_id"].asInt();
+      _chan = i_PartEvent["VLSB"][i]["channel"].asInt();
       if ( _bank == 0 || _bank == 2 || _bank == 5 ||
            _bank == 7 || _bank == 9 || _bank == 10 ||
            _bank == 11 || _bank == 12 || _bank == 13 ||
