@@ -1,10 +1,7 @@
 """
-MAUS-specific worker broadcast command handlers. Some of these handlers
-invoke operations in Celery sub-processes and defined in 
-mauscelery.mausprocess.
-
-These methods are invoked by the Celery worker's main process
-in response to "broadcast" calls by clients.
+MAUS-specific worker main process commands. Some of these are
+"broadcast" handlers and invoke operations in Celery sub-processes and
+defined in mauscelery.mausprocess.
 
 Each Celery worker spawns one or more sub-processes to handle
 jobs. Each sub-process will have a MausConfiguration and MausTransform
@@ -46,12 +43,37 @@ import logging
 from types import UnicodeType
 
 from celery.worker.control import Panel
-from celery.worker.control.registry import Panel 
 
-from workers import WorkerUtilities
+from framework.workers import WorkerUtilities
 from mauscelery.state import MausConfiguration
 from mauscelery.mausprocess import process_birth
 from mauscelery.mausprocess import process_death
+
+from Configuration import Configuration
+
+from celery.signals import worker_init 
+
+def worker_init_callback(**kwargs): # pylint:disable = W0613
+    """
+    Callback from worker_init which is called when the Celery main
+    worker process starts. It is used to read the MAUS configuration
+    and extract the current MAUS version from this and put it into
+    MausConfiguration. Since sub-processes will receive a copy of
+    MausConfiguration from the Celery master process, the sub-process
+    will always inherit the latest version of MausConfiguration from
+    the master process. 
+    @param kwargs Arguments - unused.
+    """
+    configuration  = Configuration()
+    config_doc = configuration.getConfigJSON()
+    config_dictionary = json.loads(config_doc)
+    MausConfiguration.version = config_dictionary["maus_version"]
+    logger = logging.getLogger(__name__)
+    if logger.isEnabledFor(logging.INFO):
+        logger.info("MAUS version: %s" % MausConfiguration.version)
+
+# Bind the callback method to the Celery worker_init signal.
+worker_init.connect(worker_init_callback) 
 
 def sub_process_broadcast(panel, func, arguments, errors):
     """
@@ -76,10 +98,14 @@ def sub_process_broadcast(panel, func, arguments, errors):
     pool = panel.consumer.pool 
     pids = set(pool.info["processes"]) 
     pids_done = set() 
+    # Create new argument list with the current set of process IDs.
+    # PIDs are passed to sub-processes to ensure they only call
+    # their function once.
+    pids_arguments = (pids_done,) + arguments
     # Submit asynchronous jobs to the sub-processes until they've all
     # processed the message.
     while pids ^ pids_done: 
-        result = pool.apply_async(func, arguments)
+        result = pool.apply_async(func, pids_arguments)
         status = result.get()
         pids_done.add(status[0])
         status_detail = status[1]
@@ -93,9 +119,7 @@ def birth(panel, config_id, transform, configuration = "{}"): # pylint: disable=
     Create and birth a new transform in each sub-process. This is
     invoked by "broadcast" calls from clients and, in turn, invokes
     the process_birth method in sub-processes. Both the transform
-    and configuration are validated. The configuration update request
-    is only passed to sub-processes if the if the ID given by the
-    client is different from the ID of the current configuration.
+    and configuration are validated. 
     @param panel Celery panel object.
     @param config_id Configuration ID from client.
     @param transform Either a single name can be given - representing
@@ -103,22 +127,14 @@ def birth(panel, config_id, transform, configuration = "{}"): # pylint: disable=
     MapPyGroup. Sub-lists are treated as nested MapPyGroups. If None
     then the current transform isdeathed and rebirthed.  
     @param configuration JSON configuration document.
-    @return status document with entries of form PID:{"status":"ok"}
-    if all went well and PID:{"status":"error", "type":ERROR,
-    "message":MESSAGE} if things went wrong in updating a process.
-    @throws Exception if any problems arise in communicating with
-    sub-processes.
+    @return status document with entries of form {"status":"ok"}
+    if all went well and {"status":"error", "error":[{"message":"...",
+    "type":"TYPE"},...]} if things went wrong.
     """
     logger = logging.getLogger(__name__)
     if logger.isEnabledFor(logging.INFO):
         logger.info("Birthing transform %s" % transform)
     doc = {}
-    # Only update if the configuration config_id is new.
-    if (MausConfiguration.config_id == config_id):
-        doc["status"] = "unchanged"
-        if logger.isEnabledFor(logging.INFO):
-            logger.info("Status: %s" % doc)
-        return doc
     # List of any errors from sub-processes.
     errors = []
     try:
@@ -130,8 +146,12 @@ def birth(panel, config_id, transform, configuration = "{}"): # pylint: disable=
             config = configuration
         # Validate transform.        
         WorkerUtilities.validate_transform(transform)
-        # Validate configuration.
-        json.loads(configuration)
+        # Validate configuration is valid JSON.
+        config_doc = json.loads(configuration)
+        # Check MAUS version number is consistent.
+        if (config_doc["maus_version"] != MausConfiguration.version):
+            raise ValueError("maus_version: expected %s, got %s" % 
+                (MausConfiguration.version, config_doc["maus_version"]))
         # Invoke process_birth on all sub-processes
         sub_process_broadcast(panel, process_birth, 
             (config_id, transform, config,), errors)
@@ -160,10 +180,9 @@ def death(panel):
     is invoked by broadcast calls from clients  and, in turn, invokes
     the process_death method in sub-processes.
     @param panel Celery panel object.
-    @return status document of the form {"status":"ok"} if all went
-    well or:{"status":"error", [{"type":ERROR,
-    "message":MESSAGE},...]} if any problems arose.
-    @throws Exception if any problems arose.
+    @return status document with entries of form {"status":"ok"}
+    if all went well and {"status":"error", "error":[{"message":"...",
+    "type":"TYPE"},...]} if things went wrong.
     """
     logger = logging.getLogger(__name__)
     if logger.isEnabledFor(logging.INFO):
@@ -197,10 +216,12 @@ def get_maus_configuration(panel): # pylint:disable=W0613
     @param panel Celery panel object.
     @return status document of form {"configuration":
     MAUS_CONFIGURATION_DOC, "transform":
-    TRANSFORM_NAME_OR_LIST_OF_NAMES, "config_id":CONFIG_ID}
+    TRANSFORM_NAME_OR_LIST_OF_NAMES, "config_id":CONFIG_ID,
+    "version":MAUS_VERSION}
     """
     doc = {}
     doc["configuration"] = MausConfiguration.configuration
     doc["transform"] = MausConfiguration.transform
     doc["config_id"] = MausConfiguration.config_id
+    doc["version"] = MausConfiguration.version
     return doc

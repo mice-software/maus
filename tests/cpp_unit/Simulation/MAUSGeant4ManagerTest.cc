@@ -114,9 +114,10 @@ TEST(MAUSGeant4ManagerTest, RunParticlePGTest) {
     // note dependency on random seed (require we get the same hit twice)
     Json::Value val_sd_1 = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
     Json::Value val_sd_2 = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
-    EXPECT_TRUE(val_sd_1["hits"].isArray());
-    EXPECT_TRUE(val_sd_1["hits"].size() > 0);
-    EXPECT_EQ(val_sd_1["hits"].size(), val_sd_2["hits"].size());
+    EXPECT_TRUE(val_sd_1["special_virtual_hits"].isArray());
+    EXPECT_TRUE(val_sd_1["special_virtual_hits"].size() > 0) << val_sd_1;
+    EXPECT_EQ(val_sd_1["special_virtual_hits"].size(),
+              val_sd_2["special_virtual_hits"].size());
 }
 
 TEST(MAUSGeant4ManagerTest, RunParticleJsonTest) {

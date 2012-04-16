@@ -78,8 +78,6 @@ TEST(MAUSEventActionTest, EndOfEventActionTest) {
     _g4->GetEventAction()->EndOfEventAction(NULL);
     _g4->GetEventAction()->EndOfEventAction(NULL);
 
-    events[zero]["hits"] = Json::Value(Json::arrayValue);
-    events[1]["hits"] = Json::Value(Json::arrayValue);
     EXPECT_EQ(_g4->GetEventAction()->GetEvents(), events);
     // _events out of range
     EXPECT_THROW(_g4->GetEventAction()->EndOfEventAction(NULL), Squeal);

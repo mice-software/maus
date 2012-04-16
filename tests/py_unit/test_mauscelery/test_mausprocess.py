@@ -27,7 +27,6 @@ from mauscelery.state import MausTransform
 from mauscelery.mausprocess import worker_process_init_callback
 from mauscelery.mausprocess import process_birth
 from mauscelery.mausprocess import process_death
-
 from MapPyTestMap import MapPyTestMap
 
 class WorkerProcessInitCallbackTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
@@ -84,7 +83,7 @@ class ProcessBirthTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         the current ID (in MausConfiguration.config_id).
         @param self Object reference.
         """
-        status = process_birth(MausConfiguration.config_id, \
+        status = process_birth(set(), MausConfiguration.config_id, \
             "MapPyTestMap", "{}")
         self.assertEquals(os.getpid(), status[0], 
             "Unexpected process ID")
@@ -96,7 +95,7 @@ class ProcessBirthTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         @param self Object reference.
         """
         new_id = MausConfiguration.config_id + 1
-        status = process_birth(new_id, "MapPyTestMap", "{}")
+        status = process_birth(set(), new_id, "MapPyTestMap", "{}")
         self.assertEquals(MapPyTestMap, \
             MausTransform.transform.__class__, "Unexpected transform")
         self.assertTrue(not MausTransform.is_dead, 
@@ -117,7 +116,7 @@ class ProcessBirthTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
       . WorkerBirthFailedException.
         @param self Object reference.
         """
-        status = process_birth(MausConfiguration.config_id + 1, 
+        status = process_birth(set(), MausConfiguration.config_id + 1, 
             "MapPyTestMap", """{"birth_result":%s}""" % \
             MapPyTestMap.FAIL)
         self.assertEquals(os.getpid(), status[0], 
@@ -132,7 +131,7 @@ class ProcessBirthTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         Invoke process_birth where birth throws an exception.
         @param self Object reference.
         """
-        status = process_birth(MausConfiguration.config_id + 1, 
+        status = process_birth(set(), MausConfiguration.config_id + 1, 
             "MapPyTestMap", """{"birth_result":%s}""" % \
             MapPyTestMap.EXCEPTION)
         self.assertEquals(os.getpid(), status[0], 
@@ -148,11 +147,11 @@ class ProcessBirthTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         an exception.
         @param self Object reference.
         """
-        process_birth(MausConfiguration.config_id + 1, 
+        process_birth(set(), MausConfiguration.config_id + 1, 
             "MapPyTestMap", """{"death_result":%s}""" % \
             MapPyTestMap.EXCEPTION)
         # Now try knowing that death will fail.
-        status = process_birth(MausConfiguration.config_id + 2, 
+        status = process_birth(set(), MausConfiguration.config_id + 2, 
             "MapPyTestMap", "{}")
         self.assertEquals(os.getpid(), status[0], 
             "Unexpected process ID")
@@ -163,7 +162,7 @@ class ProcessBirthTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         self.assertTrue(MausTransform.is_dead, 
             "Expected is_dead to be True")
         # Now try again - should be fine.
-        status = process_birth(MausConfiguration.config_id + 3, 
+        status = process_birth(set(), MausConfiguration.config_id + 3, 
             "MapPyDoNothing", "{}")
         self.assertEquals(os.getpid(), status[0], 
             "Unexpected process ID on subsequent birth call")
@@ -196,9 +195,9 @@ class ProcessDeathTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         Invoke process_death.
         @param self Object reference.
         """
-        process_birth(MausConfiguration.config_id + 1, 
+        process_birth(set(), MausConfiguration.config_id + 1, 
             "MapPyTestMap", "{}")
-        status = process_death()
+        status = process_death(set(), )
         self.assertEquals(os.getpid(), status[0], 
             "Unexpected process ID")
         self.assertEquals(None, status[1],
@@ -206,7 +205,7 @@ class ProcessDeathTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         self.assertTrue(MausTransform.is_dead, 
             "Expected is_dead to be True")
         # Expect same again.
-        status = process_death()
+        status = process_death(set(), )
         self.assertEquals(os.getpid(), status[0], 
             "Unexpected process ID on subseqent death call")
         self.assertEquals(None, status[1],
@@ -219,10 +218,10 @@ class ProcessDeathTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         Invoke process_death where death throws an exception.
         @param self Object reference.
         """
-        status = process_birth(MausConfiguration.config_id + 1, 
+        status = process_birth(set(), MausConfiguration.config_id + 1, 
             "MapPyTestMap", """{"death_result":%s}""" % \
             MapPyTestMap.EXCEPTION)
-        status = process_death()
+        status = process_death(set(), )
         self.assertEquals(os.getpid(), status[0], 
             "Unexpected process ID")
         self.assertTrue(status[1].has_key("error"),
@@ -230,7 +229,7 @@ class ProcessDeathTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         self.assertTrue(status[1].has_key("message"),
             "Expect a message key")
         # Expect subsequent attempt to succeed.
-        status = process_death()
+        status = process_death(set(), )
         self.assertEquals(os.getpid(), status[0], 
             "Unexpected process ID on subseqent death call")
         self.assertEquals(None, status[1],

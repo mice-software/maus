@@ -65,7 +65,7 @@ class ReducePyROOTTester(ReducePyROOTHistogram):
         if spill.has_key("error"):
             raise Exception("error")
         image_doc = ReducePyROOTHistogram.get_image_doc( \
-            self, "content", "test", self._canvas)
+            self, ["keywords"], "description", "test", self._canvas)
         return [image_doc]
 
     def _cleanup_at_death(self):
@@ -318,7 +318,8 @@ class ReducePyROOTHistogramTestCase(unittest.TestCase): # pylint: disable=R0904,
         else:
             tag = "test"
         self.assertEquals(tag, image["tag"], "Unexpected tag")
-        self.assertTrue("content" in image, "No content field")
+        self.assertTrue("keywords" in image, "No keywords field")
+        self.assertTrue("description" in image, "No description field")
         self.assertTrue("data" in image, "No data field")
         decoded_data = base64.b64decode(image["data"])
         self.assertTrue(decoded_data.find("EPS") != -1,

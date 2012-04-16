@@ -43,7 +43,7 @@ class Formatter: #pylint: disable = R0902
         """
         self.g4_step_max = Configreader().g4_step_max
         self.path_in = path_in
-        self.path_out = path_out
+        self.path_out = path_out + '/'
         self.beamline_file = None
         self.field_file = None
         self.configuration_file = None
@@ -53,8 +53,8 @@ class Formatter: #pylint: disable = R0902
         self.txt_file = ""
         self.schema = SCHEMA_PATH
         gdmls = os.listdir(self.path_in)
-        if self.path_in == self.path_out:
-            paths_equal = True
+        #if self.path_in == self.path_out:
+        #    paths_equal = True
         for fname in gdmls:
             if fname[-5:] != '.gdml' and fname[-4:] != '.xml':
                 print fname+' not a gdml or xml file - ignored'
@@ -109,17 +109,24 @@ class Formatter: #pylint: disable = R0902
         doc = minidom.Document()
         top_node = doc.createElement("Other_Information")
         doc.appendChild(top_node)
-        maus_dir = doc.createElement("GDML_Files")
-        maus_dir.setAttribute("location", self.path_out)
-        top_node.appendChild(maus_dir)
+        maus_root_dir = doc.createElement("MAUS_ROOT_DIR")
+        maus_path = os.environ['MAUS_ROOT_DIR']
+        maus_root_dir.setAttribute("location", maus_path)
+        top_node.appendChild(maus_root_dir)        
+        gdml_file_dir = doc.createElement("GDML_Files")
+        path = self.path_out
+        gdml_file_dir.setAttribute("location", path)
+        top_node.appendChild(gdml_file_dir)
         g4_step = doc.createElement("G4StepMax")
         g4_step.setAttribute("Value", str(self.g4_step_max))
         top_node.appendChild(g4_step)
         field = minidom.parse(os.path.join(self.path_out, self.field_file))
-        old_node = field.childNodes[0].childNodes[1].childNodes[7]
+        # the next line is trying to grab the <other_information> tag
+        # from the original file
+        old_node = field.childNodes[0].childNodes[7]
         new_node = doc.childNodes[0]
-        base_node = field.childNodes[0].childNodes[1]
-        base_node.replaceChild(new_node, old_node) 
+        base_node = field.childNodes[0]
+        base_node.replaceChild(new_node, old_node)
         fout = open(os.path.join(self.path_out, self.field_file), 'w')
         field.writexml(fout)
         fout.close()
@@ -159,7 +166,7 @@ class Formatter: #pylint: disable = R0902
             beamline = minidom.parse(beamline_path)
             for node in beamline.getElementsByTagName("run"):
                 maus_info = node
-            root_node = field.childNodes[0].childNodes[1].childNodes[1]
+            root_node = field.childNodes[0].childNodes[1]
             root_node.insertBefore(maus_info, root_node.childNodes[0])
             fout = open(os.path.join(self.path_out, gdmlfile), 'w')
             field.writexml(fout)

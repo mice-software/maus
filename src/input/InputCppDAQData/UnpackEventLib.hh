@@ -23,6 +23,7 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <algorithm>
 
 #include "json/json.h"
 
@@ -136,13 +137,13 @@ class fADCDataProcessor : public ZeroSupressionFilter {
   * This function returns the number of the sample having maximum amplitude.
   */
   int get_max_position();
-  
+
   /** Return the position of the minimum.
    * This function returns the number of the sample having minimum amplitude.
    */
 
   int get_min_position();
-  
+
   int get_arrival_time();
   /** Return the area of the signal.
   * This function returns the area of the signal. The pedestal is subtracted.
@@ -163,16 +164,15 @@ class fADCDataProcessor : public ZeroSupressionFilter {
 
   /// Return the vector of samples
   vector<int> get_data() const { return _data; }
-  
-  //Return each fADC sample value
 
+  /// Return each fADC sample value
   Json::Value get_samples();
 
   /** Return the area of the signal.
   * This function returns the area of the signal. The pedestal is subtracted.
   * The integration is done using the whole acquisition window.
   */
-  
+
   int get_area();
 
   /// Return the data member _pedestal
@@ -184,12 +184,7 @@ class fADCDataProcessor : public ZeroSupressionFilter {
   * \param[in] Algorithm identifier of the algorithm.
   */
   int get_charge(int Algorithm = ceaPedMax);
-  
-  /**Return the charge of the Cherenkov's negative signal.
-   */
 
-  //int get_charge(int Algorithm = ceaPedMin);
-  
   enum chargeEstimationAlgorithm {
     ceaMinMax, /// Simplest algorithm
     ceaFractionDescriminatorThreshold, /// not implemented

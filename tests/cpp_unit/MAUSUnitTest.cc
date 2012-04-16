@@ -72,10 +72,12 @@ int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   int test_out = -1;
   try {
-    test_out = RUN_ALL_TESTS();
+      test_out = RUN_ALL_TESTS();
   } catch(Squeal squee) {
-    std::cerr << "Caught exception" << std::endl << squee.GetMessage() << "\n"
-              << squee.GetStackTrace() << std::endl;
+      std::cerr << squee.GetMessage() << "\n" << squee.GetLocation() << "\n"
+                << squee.GetStackTrace() << std::endl;
+  } catch(std::exception exc) {
+      std::cerr << "Caught std::exception" << "\n" << exc.what() << std::endl;
   }
   delete MAUS::MAUSGeant4Manager::GetInstance();
   return test_out;

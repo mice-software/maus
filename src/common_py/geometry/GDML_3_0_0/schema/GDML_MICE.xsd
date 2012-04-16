@@ -185,6 +185,9 @@
             </xs:documentation>
         </xs:annotation>
         <xs:sequence>
+            <xs:element name="FieldName" minOccurs="1" maxOccurs="1" type="NameType"/>
+            <xs:element name="Position" minOccurs="1" maxOccurs="1" type="PositionType"/>
+            <xs:element name="Rotation" minOccurs="1" maxOccurs="1" type="PositionType"/>
             <xs:element name="Volume" minOccurs="1" maxOccurs="1" type="NameType"/>
             <xs:element name="FieldType" minOccurs="1" maxOccurs="1" type="NameType"/>
             <xs:element name="FieldMapMode" minOccurs="1" maxOccurs="1" type="NameType"/>
@@ -202,10 +205,13 @@
             </xs:documentation>
         </xs:annotation>
         <xs:sequence>
+            <xs:element name="FieldName" minOccurs="1" maxOccurs="1" type="NameType"/>
+            <xs:element name="Position" minOccurs="1" maxOccurs="1" type="PositionType"/>
+            <xs:element name="Rotation" minOccurs="1" maxOccurs="1" type="PositionType"/>
             <xs:element name="Volume" minOccurs="1" maxOccurs="1" type="NameType"/>
-            <xs:element name="FieldType" minOccurs="1" maxOccurs="1" type="ValueUnitType"/>
+            <xs:element name="FieldType" minOccurs="1" maxOccurs="1" type="NameType"/>
             <xs:element name="Dimensions" minOccurs="1" maxOccurs="1" type="FieldDimensionsType"/>
-            <xs:element name="FieldStrength" minOccurs="1" maxOccurs="1" type="ValueType"/>
+            <xs:element name="FieldStrength" minOccurs="1" maxOccurs="1" type="ValueUnitType"/>
             <xs:element name="Pole" minOccurs="1" maxOccurs="1" type="ValueType"/>
             <xs:element name="MaxEndPole" minOccurs="1" maxOccurs="1" type="ValueType"/>
             <xs:element name="EndFieldType" minOccurs="1" maxOccurs="1" type="NameType"/>
@@ -222,6 +228,9 @@
             </xs:documentation>
         </xs:annotation>
         <xs:sequence>
+            <xs:element name="FieldName" minOccurs="1" maxOccurs="1" type="NameType"/>
+            <xs:element name="Position" minOccurs="1" maxOccurs="1" type="PositionType"/>
+            <xs:element name="Rotation" minOccurs="1" maxOccurs="1" type="PositionType"/>
             <xs:element name="Volume" minOccurs="1" maxOccurs="1" type="NameType"/>
             <xs:element name="FieldType" minOccurs="1" maxOccurs="1" type="NameType"/>
             <xs:element name="FileName" minOccurs="1" maxOccurs="1" type="NameType"/>
@@ -264,7 +273,7 @@
     </xs:complexType>
     <xs:complexType name ="configurationType">
         <xs:sequence>
-            <xs:element name="run">
+            <xs:element name="run" minOccurs="0">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element name="magnet" type="runMagnetType" minOccurs="0"/>                        
@@ -298,9 +307,9 @@
     </xs:complexType>
     <xs:complexType name="G4Field_InformationType">
         <xs:sequence>
-            <xs:element name="Dipole" minOccurs="0" maxOccurs="unbounded" type="DipoleType"/>
-            <xs:element name="Quadrupole" minOccurs="0" maxOccurs="unbounded" type="QuadrupoleType"/>
-            <xs:element name="Solenoid" minOccurs="0" maxOccurs="unbounded" type="SolenoidType"/>
+            <xs:element name="Dipole" minOccurs="0" maxOccurs="2" type="DipoleType"/>
+            <xs:element name="Quadrupole" minOccurs="0" maxOccurs="9" type="QuadrupoleType"/>
+            <xs:element name="Solenoid" minOccurs="0" maxOccurs="1" type="SolenoidType"/>
             <xs:element name="G4Magnet_info" type="G4MagnetType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
@@ -315,6 +324,7 @@
     </xs:complexType>
     <xs:complexType name="Other_InfromationType">
         <xs:sequence>
+            <xs:element name="MAUS_ROOT_DIR" type="MAUS_ROOT_DIR_Type"/>
             <xs:element name="GDML_Files" type="MAUS_ROOT_DIR_Type"/>
             <xs:element name="G4StepMax" type="G4StepMaxType"/>
         </xs:sequence>
