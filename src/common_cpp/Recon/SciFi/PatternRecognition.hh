@@ -125,21 +125,8 @@ class PatternRecognition {
      *  @param line_y - Output line in y - z plane
      *
      */
-    void linear_fit2(const std::vector<double> &_x, const std::vector<double> &_y,
+    void linear_fit(const std::vector<double> &_x, const std::vector<double> &_y,
                     const std::vector<double> &_y_err, SimpleLine &line);
-
-    /** @brief Fit a straight line in x and y to some spacepoints
-     *
-     *  Fit straight lines, x = f(z) and y = f(z), using linear least squares fitting,
-     *  for input spacepoints. Output is the line in x and line in y.
-     *
-     *  @param spnts - A vector of all the input spacepoints
-     *  @param line_x - Output line in x - z plane
-     *  @param line_y - Output line in y - z plane
-     *
-     */
-    void linear_fit(const std::vector<SciFiSpacePoint*> &spnts,
-                    SimpleLine &line_x, SimpleLine &line_y);
 
     /** @brief Form a helical track from spacepoints
      *
@@ -159,22 +146,6 @@ class PatternRecognition {
     void make_helix(const int num_points, const std::vector<int> ignore_stations,
                     std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
                     std::vector<SciFiStraightPRTrack> &trks);
-
-    /** @brief Fit an initial circle to three spacepoints
-     *
-     *  Fit an initial circle to inner, outer, and an intermediate stations'
-     *  spacepoints (Three in total), through geometric construction.  Returns
-     *  false if the circle cannot be constructed. Output is an initial circle
-     *  in the x-y projection.
-     *
-     *  @param p1 - spacepoint 1
-     *  @param p2 - spacepoint 2
-     *  @param p3 - spacepoint 3
-     *  @param circle - The output circle fit
-     *
-     */
-    bool initial_circle(const SciFiSpacePoint *pos1, const SciFiSpacePoint *pos2,
-                        const SciFiSpacePoint *pos3, SimpleCircle &circle);
 
     /** @brief Find points from intermediate stations which fit to the "trial track"
      *
@@ -245,7 +216,7 @@ class PatternRecognition {
      */
     bool AB_ratio(double &dphi_kj, double &dphi_ji, double dz_kj, double dz_ji);
 
-    /** @brief Changes dphi vector to ds vector 
+    /** @brief Changes dphi vector to ds vector
      *
      *  Just scalar multiplication of each element dphi_ji by R.
      *
@@ -254,7 +225,7 @@ class PatternRecognition {
      * @param ds - vector containing ds_ji for each station step (corresponding to dz_ji's)
      *
      */
-    void dphi_to_ds( double R, const std::vector<double> &dphi, std::vector<double> &ds);
+    void dphi_to_ds(double R, const std::vector<double> &dphi, std::vector<double> &ds);
 
     /** @brief Fit a full helix to the spacepoints with a nonlinear least squares fit
      *
