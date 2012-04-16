@@ -23,10 +23,10 @@ import unittest
 from celery import current_app
 from celery.utils import LOG_LEVELS
 
+from framework.workers import WorkerProcessException
 from mauscelery.state import MausConfiguration
 from mauscelery.state import MausTransform
 from mauscelery.tasks import execute_transform
-from workers import WorkerProcessException
 from MapPyTestMap import MapPyTestMap
 
 class ExecuteTransformTaskTestCase(unittest.TestCase): # pylint: disable=R0904, C0301

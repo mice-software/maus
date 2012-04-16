@@ -324,6 +324,7 @@
     </xs:complexType>
     <xs:complexType name="Other_InfromationType">
         <xs:sequence>
+            <xs:element name="MAUS_ROOT_DIR" type="MAUS_ROOT_DIR_Type"/>
             <xs:element name="GDML_Files" type="MAUS_ROOT_DIR_Type"/>
             <xs:element name="G4StepMax" type="G4StepMaxType"/>
         </xs:sequence>

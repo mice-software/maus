@@ -33,7 +33,8 @@ class ReducePyMatplotlibHistogram: # pylint: disable=R0903
     Histograms are output as JSON documents of form:
 
     @verbatim
-    {"image": {"content":"...a description of the image...",
+    {"image": {"keywords": [...list of image keywords...],
+               "description":"...a description of the image...",
                "tag": TAG,
                "image_type": "eps", 
                "data": "...base 64 encoded image..."}}
@@ -227,12 +228,12 @@ class ReducePyMatplotlibHistogram: # pylint: disable=R0903
         histogram.figure.get_axes()[0].set_ylim( \
             [ymin, ymax + yfudge])
 
-    def _create_image_json(self, content, tag, canvas): #pylint: disable=R0201
+    def _get_image_doc(self, keywords, description, tag, canvas): #pylint: disable=C0301
         """
         Build a JSON document holding image data.
-
         @param self Object reference.
-        @param content String describing the image.
+        @param keywords List of image keywords.
+        @param description String describing the image.
         @param tag Image tag.
         @param histogram FigureCanvas representing a histogram.
         @returns JSON document.
@@ -244,7 +245,8 @@ class ReducePyMatplotlibHistogram: # pylint: disable=R0903
         else:
             image_tag = tag
         data = self.__convert_to_binary(canvas)
-        json_doc["image"]["content"] = content
+        json_doc["image"]["keywords"] = keywords
+        json_doc["image"]["description"] = description
         json_doc["image"]["tag"] = image_tag
         json_doc["image"]["image_type"] = self.image_type
         json_doc["image"]["data"] = data

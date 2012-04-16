@@ -63,19 +63,22 @@ def worker_process_init_callback(**kwargs): # pylint:disable = W0613
     MausTransform.initialize(MausConfiguration.transform)
     MausTransform.birth(MausConfiguration.configuration)
 
+# Bind the callback method to the Celery worker_process_init signal.
 worker_process_init.connect(worker_process_init_callback) 
 
-def process_birth(config_id, transform, configuration):
+def process_birth(pids, config_id, transform, configuration):
     """
     Create and birth a new transform. This is invoked in a sub-process
     via a call from the Celery master process. Any existing transform
-    is death-ed first. If the new configuration ID is equal to the
-    current configuration ID then this is a no-op.
+    is death-ed first. 
+    @aram pids List of process IDs whose process_birth method has been
+    invoked. If this process is in the list then this method just returns
+    (PID, None).
     @param config_id Configuration ID from client.
     @param transform Either a single name can be given - representing
     a single transform - or a list of transforms - representing a
     MapPyGroup. Sub-lists are treated as nested MapPyGroups. If None
-    then the current transform isdeathed and rebirthed.  
+    then the current transform is deathed and rebirthed.  
     @param configuration Valid JSON configuration document.
     @return status of (PID, None) if all went well or (PID,
     {"error":ERROR, "message":MESSAGE}) if an exception arose. PID is
@@ -84,8 +87,8 @@ def process_birth(config_id, transform, configuration):
     """
     status = None
     logger = logging.getLogger(__name__)
-    # Only update if the configuration config_id is new.
-    if (MausConfiguration.config_id != config_id):
+    # Check if processed already.  
+    if (not os.getpid() in pids):
         try:
             if logger.isEnabledFor(logging.INFO):
                 logger.info("Birthing transform %s" % transform)
@@ -103,11 +106,14 @@ def process_birth(config_id, transform, configuration):
         logger.debug("Status: %s " % status)
     return (os.getpid(), status)
 
-def process_death():
+def process_death(pids):
     """
     Execute death on the current transform. This is invoked in a
     sub-process via a call from the Celery master process. If death
     has already been invoked then this is a no-op. 
+    @aram pids List of process IDs whose process_birth method has been
+    invoked. If this process is in the list then this method just returns
+    (PID, None).
     @return status of (PID, None) if all went well or (PID,
     {"error":ERROR, "message":MESSAGE}) if an exception arose. PID is
     the sub-process ID. This lets the master process know that the
@@ -115,16 +121,18 @@ def process_death():
     """
     status = None
     logger = logging.getLogger(__name__)
-    # Only call if the transform is not already dead.
-    if (not MausTransform.is_dead):
-        try:
-            if logger.isEnabledFor(logging.INFO):
-                logger.info("Deathing transform")
-            MausTransform.death() 
-        except Exception as exc: # pylint:disable = W0703
-            status = {}
-            status["error"] = str(exc.__class__)
-            status["message"] = str(exc)
+    # Check if processed already.
+    if (not os.getpid() in pids):
+        # Only call if the transform is not already dead.
+        if (not MausTransform.is_dead):
+            try:
+                if logger.isEnabledFor(logging.INFO):
+                    logger.info("Deathing transform")
+                MausTransform.death() 
+            except Exception as exc: # pylint:disable = W0703
+                status = {}
+                status["error"] = str(exc.__class__)
+                status["message"] = str(exc)
     if logger.isEnabledFor(logging.DEBUG):
         logger.debug("Status: %s " % status)
     return (os.getpid(), status)
