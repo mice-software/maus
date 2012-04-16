@@ -76,7 +76,6 @@ bool ReduceCppSingleStation::birth(std::string argJsonConfigDocument) {
   _spacepointscopy.Branch("z", &_z, "z/D");
   _spacepointscopy.Branch("type", &_type, "type/I");
 
-  c5->Divide(1,1);
   c1->Divide(1, 1);
   c1->SetFillColor(21);
   c1->GetFrame()->SetFillColor(42);
@@ -101,6 +100,7 @@ bool ReduceCppSingleStation::birth(std::string argJsonConfigDocument) {
   triplets_copy->SetMarkerStyle(20);
   triplets_copy->SetMarkerColor(kBlue);
 
+  c5->Divide(1, 1);
   duplets->SetMarkerStyle(20);
   duplets->SetMarkerColor(kRed);
   duplets_copy->SetMarkerStyle(20);
@@ -142,6 +142,7 @@ std::string  ReduceCppSingleStation::process(std::string document) {
   TCanvas *c4 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c4"));
   TCanvas *c5 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c5"));
 
+  //TPad* c5_1 = (TPad*)(c5->GetPrimitive("c5_1"));
   Squeak::activateCout(1);
 
   // std::cerr << "Begin Reducer Process" << std::endl;
@@ -223,6 +224,8 @@ std::string  ReduceCppSingleStation::process(std::string document) {
     c4->Update();
 
     c5->cd(1);
+    //c5_1->SetLogy(1);
+    //c5_1->SetGrid(1,1);
     _unpacked.Draw("adc","bank==0 || bank==2 || bank==5 || bank==7 || bank==9|| bank==10|| bank==11 ||bank==12 || bank==13|| bank==14");
 
     c5->Update();
@@ -363,12 +366,12 @@ void ReduceCppSingleStation::unpacked_data_histograms(Json::Value root) {
     //                                    "VLSB_bank",
     //                                    JsonWrapper::objectValue);
     Json::Value i_PartEvent = daq_data["single_station"][event_i];
-    int number_channels_within = i_PartEvent["VLSB"].size();
+    int number_channels_within = i_PartEvent["VLSB_bank"].size();
     for ( int i = 0; i < number_channels_within; i++ ) {
-      _tdc  = i_PartEvent["VLSB"][i]["tdc"].asInt();
-      _adc  = i_PartEvent["VLSB"][i]["adc"].asInt();
-      _bank = i_PartEvent["VLSB"][i]["bank_id"].asInt();
-      _chan = i_PartEvent["VLSB"][i]["channel"].asInt();
+      _tdc  = i_PartEvent["VLSB_bank"][i]["tdc"].asInt();
+      _adc  = i_PartEvent["VLSB_bank"][i]["adc"].asInt();
+      _bank = i_PartEvent["VLSB_bank"][i]["bank_id"].asInt();
+      _chan = i_PartEvent["VLSB_bank"][i]["channel"].asInt();
       if ( _bank == 0 || _bank == 2 || _bank == 5 ||
            _bank == 7 || _bank == 9 || _bank == 10 ||
            _bank == 11 || _bank == 12 || _bank == 13 ||
