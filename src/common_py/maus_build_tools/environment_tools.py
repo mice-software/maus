@@ -285,10 +285,10 @@ def get_root_libs():
                 'Gpad', \
                 'Graf', \
                 'Graf3d', \
-                'Hist', \
                 'MathCore', \
-                'Matrix', \
                 'Minuit', \
+                'Hist', \
+                'Matrix', \
                 'Spectrum',\
                 'Net', \
                 'Physics', \
