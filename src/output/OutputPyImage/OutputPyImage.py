@@ -29,7 +29,8 @@ class OutputPyImage:
     breaks e.g.:
 
     @verbatim
-    {"image": {"content":"Total TDC and ADC counts to spill 2",
+    {"image": {"keywords":["TDC", "ADC", "counts"],
+               "description":"Total TDC and ADC counts to spill 2",
                "tag": "tdcadc",
                "image_type": "eps", 
                "data": "...base 64 encoded image..."}}
@@ -42,6 +43,10 @@ class OutputPyImage:
     concatenation of the image file prefix and "tag". This class
     does not ensure that the file names are unique - it's up to
     the input provider to ensure that the tags are unique.
+
+    The JSON document, minus the "data" field, is also saved in the 
+    same directory and with the same file name as the image, but
+    with a .json extension.
 
     The caller can configure the worker and specify:
 
@@ -73,7 +78,9 @@ class OutputPyImage:
         key = "image_directory"
         if key in config_doc:
             directory = config_doc[key]
-            if not os.path.exists(directory):
+            if (directory == None):
+                directory = os.getcwd()
+            elif not os.path.exists(directory):
                 os.makedirs(directory) 
             elif (not os.path.isdir(directory)):
                 raise ValueError("image_directory is a file: %s" % 
@@ -106,12 +113,16 @@ class OutputPyImage:
                         raise ValueError("Missing image_type in %s")
                     if (not "data" in image):
                         raise ValueError("Missing data in %s")
-                    file_path = self.__get_file_path(image["tag"], 
-                                                     image["image_type"])
-                    data_file = open(file_path, "w")
-                    decoded_data = base64.b64decode(image["data"])
+                    image_path = self.__get_file_path(image["tag"], 
+                                                      image["image_type"])
+                    data_file = open(image_path, "w")
+                    decoded_data = base64.b64decode(image.pop("data"))
                     data_file.write(decoded_data)
                     data_file.close()
+                    json_path = self.__get_file_path(image["tag"], "json")
+                    json_file = open(json_path, "w")
+                    json_file.write(json.dumps(image) + "\n")
+                    json_file.close()
             next_value = document_file.readline()
 
     def death(self): #pylint: disable=R0201

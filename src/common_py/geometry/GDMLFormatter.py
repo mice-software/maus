@@ -109,14 +109,20 @@ class Formatter: #pylint: disable = R0902
         doc = minidom.Document()
         top_node = doc.createElement("Other_Information")
         doc.appendChild(top_node)
-        maus_dir = doc.createElement("GDML_Files")
+        maus_root_dir = doc.createElement("MAUS_ROOT_DIR")
+        maus_path = os.environ['MAUS_ROOT_DIR']
+        maus_root_dir.setAttribute("location", maus_path)
+        top_node.appendChild(maus_root_dir)        
+        gdml_file_dir = doc.createElement("GDML_Files")
         path = self.path_out
-        maus_dir.setAttribute("location", path)
-        top_node.appendChild(maus_dir)
+        gdml_file_dir.setAttribute("location", path)
+        top_node.appendChild(gdml_file_dir)
         g4_step = doc.createElement("G4StepMax")
         g4_step.setAttribute("Value", str(self.g4_step_max))
         top_node.appendChild(g4_step)
         field = minidom.parse(os.path.join(self.path_out, self.field_file))
+        # the next line is trying to grab the <other_information> tag
+        # from the original file
         old_node = field.childNodes[0].childNodes[7]
         new_node = doc.childNodes[0]
         base_node = field.childNodes[0]

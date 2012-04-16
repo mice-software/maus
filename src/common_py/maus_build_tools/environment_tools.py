@@ -264,14 +264,14 @@ def set_gsl(conf, env): # pylint: disable=W0613
     """
     Setup gsl
     """
+    conf.env.Append(LIBS = ['gsl'])
+    conf.env.Append(LIBS = ['gslcblas'])
     if not conf.CheckLib('gsl'):
         print "ERROR: Cound't find GSL"
         my_exit(1)
     if not conf.CheckLib('gslcblas'):
         print "ERROR: Cound't find GSL (required for ROOT)."
         my_exit(1)
-    conf.env.Append(LIBS = ['gsl'])
-    conf.env.Append(LIBS = ['gslcblas'])
 
 
 def get_root_libs():
