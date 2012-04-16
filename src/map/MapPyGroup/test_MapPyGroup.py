@@ -22,29 +22,13 @@ import json
 from types import ListType
 import unittest
 
+import ErrorHandler
+from MapPyDoNothing import MapPyDoNothing
 from MapPyGroup import MapPyGroup
+from MapPyGroup import MapPyGroupBirthException
+from MapPyGroup import MapPyGroupDeathException
+from MapPyPrint import MapPyPrint
 from MapPyTestMap import MapPyTestMap
-
-class MapPyTestMapOne(MapPyTestMap):
-    """
-    Sub-class of MapPyTestMap - used to discriminate workers in
-    MapPyGroup. 
-    """
-    pass
-
-class MapPyTestMapTwo(MapPyTestMap):
-    """
-    Sub-class of MapPyTestMap - used to discriminate workers in
-    MapPyGroup. 
-    """
-    pass
-
-class MapPyTestMapThree(MapPyTestMap):
-    """
-    Sub-class of MapPyTestMap - used to discriminate workers in
-    MapPyGroup. 
-    """
-    pass
 
 class MapPyGroupTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
     """
@@ -53,49 +37,10 @@ class MapPyGroupTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
 
     def setUp(self):
         """ 
-        Create a MapPyGroup for testing. The group has form:
-        @verbatim
-        MapPyGroup
-          MapPyTestMapOne
-          MapPyGroup
-            MapPyTestMapOne
-            MapPyTestMapTwo
-          MapPyGroup
-            MapPyTestMapThree
-          MapPyTestMapTwo
-        @endverbatim
+        Reset the ErrorHandler to "none".
         @param self Object reference.
         """
-        # Map group.
-        self.__group = MapPyGroup()
-        self.__workers = []
-        self.__fail_worker = None
-
-        dummy = MapPyTestMapOne("A")
-        self.__group.append(dummy)
-        self.__workers.append(dummy)
-
-        workers = []
-        group = MapPyGroup()
-        self.__group.append(group)
-        dummy = MapPyTestMapOne("B")
-        group.append(dummy)
-        workers.append(dummy)
-        dummy = MapPyTestMapTwo("C")
-        self.__fail_worker = dummy # Use this worker to force failures.
-        group.append(dummy)
-        workers.append(dummy)
-        self.__workers.append(workers)
-
-        group = MapPyGroup()
-        self.__group.append(group)
-        dummy = MapPyTestMapThree("D")
-        group.append(dummy)
-        self.__workers.append([dummy])
-
-        dummy = MapPyTestMapTwo("E")
-        self.__group.append(dummy)
-        self.__workers.append(dummy)
+        ErrorHandler.DefaultHandler().on_error='none'
 
     def test_init_default(self):
         """
@@ -114,8 +59,7 @@ class MapPyGroupTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         Test with constructor given an initial list of workers.
         @param self Object reference.
         """
-        workers = \
-            [MapPyTestMapOne(), MapPyTestMapTwo(), MapPyTestMapThree()]
+        workers = [MapPyTestMap(), MapPyDoNothing(), MapPyPrint()]
         group = MapPyGroup(workers)
         names = group.get_worker_names()
         self.assertEquals(len(workers), len(names), 
@@ -130,7 +74,7 @@ class MapPyGroupTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         Test constructor when it's given a non-list.
         @param self Object reference.
         """
-        with self.assertRaisesRegexp(AssertionError,
+        with self.assertRaisesRegexp(TypeError,
             ".*"):
             MapPyGroup("bad_argument")
 
@@ -139,33 +83,39 @@ class MapPyGroupTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         Test get_worker_names.
         @param self Object reference.
         """
-        names = self.__group.get_worker_names()
-        self.assertEquals(len(self.__workers), len(names), 
+        # Create nested group.
+        workers = [MapPyTestMap(), MapPyDoNothing(), MapPyPrint()]
+        group = MapPyGroup(workers)
+        group = MapPyGroup([MapPyDoNothing(), group, MapPyTestMap()])
+        workers = ["MapPyDoNothing", 
+            ["MapPyTestMap", "MapPyDoNothing", "MapPyPrint"], 
+            "MapPyTestMap"]
+        names = group.get_worker_names()
+        self.assertEquals(len(workers), len(names), 
             "Unexpected number of names")
         # This does a start-to-end comparison of the lists.
-        while len(self.__workers) != 0:
-            expected = self.__workers.pop(0)
+        while len(workers) != 0:
+            expected = workers.pop(0)
             actual = names.pop(0)
             if isinstance(actual, ListType):
                 self.assertEquals(len(expected), len(actual),
                     "Unexpected number of names in sub-list")
-                expected.extend(self.__workers) 
-                self.__workers = expected
+                expected.extend(workers) 
+                workers = expected
                 names = actual.extend(names)
                 names = actual
             else:
-                self.assertEquals(expected.__class__.__name__, actual,
-                    "Unexpected name")
+                self.assertEquals(expected, actual, "Unexpected name")
 
     def execute_bad_append(self, worker):
         """
         Test appending the given worker to the group and check than
-        an AssertionError is raised.
+        a TypeError is raised.
         @param self Object reference.
         @param worker Worker.
         """
-        with self.assertRaisesRegexp(AssertionError, ".*"):
-            self.__group.append(worker)
+        with self.assertRaisesRegexp(TypeError, ".*"):
+            MapPyGroup().append(worker)
 
     def test_append_worker_no_birth(self):
         """
@@ -194,7 +144,7 @@ class MapPyGroupTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         @param self Object reference.
         """
         class TestWorker: # pylint:disable = C0111, W0232, R0903
-            def birth(self):
+            def birth(self, json_document):
                 pass
         self.execute_bad_append(TestWorker())
 
@@ -219,7 +169,7 @@ class MapPyGroupTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         class TestWorker: # pylint:disable = C0111, W0232
             def birth(self, json_document):
                 pass
-            def process(self):
+            def process(self, spill):
                 pass
         self.execute_bad_append(TestWorker())
         
@@ -244,29 +194,81 @@ class MapPyGroupTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         birth function called and configuration set.
         @param self Object reference.
         """
-        result = self.__group.birth("""{"worker_key":"birth"}""")
+        workers = \
+            [MapPyTestMap("A"), MapPyTestMap("B"), MapPyTestMap("C")]
+        group = MapPyGroup(workers)
+        result = group.birth("""{"worker_key":"birth"}""")
         self.assertTrue(result, "birth unexpectedly returned False")
-        while len(self.__workers) != 0:
-            worker = self.__workers.pop()
-            if isinstance(worker, ListType):
-                self.__workers.extend(worker)
-            else:
-                self.assertTrue(worker.birth_called, 
-                    "birth wasn't called for worker %s" % worker.map_id)
-                self.assertEquals("birth", 
-                  worker.config_value,
-                  "Worker %s has unexpected configuration value %s" \
-                  % (worker.map_id, worker.config_value))
+        for worker in workers:
+            self.assertTrue(worker.birth_called, 
+                "birth wasn't called for worker %s" % worker.map_id)
+            self.assertEquals("birth", 
+              worker.config_value,
+              "Worker %s has unexpected configuration value %s" \
+              % (worker.map_id, worker.config_value))
 
-    def test_bad_birth(self):
+    def test_birth_false(self):
         """
         Test calling birth where one worker's birth function fails.
         @param self Object reference.
         """
+        workers = [MapPyDoNothing(), MapPyDoNothing(), MapPyTestMap()]
+        group = MapPyGroup(workers)
         # Force a worker in group to fail
-        result = self.__group.birth("""{"birth_result":%s}""" % \
+        result = group.birth("""{"birth_result":%s}""" % \
             MapPyTestMap.FAIL)
         self.assertFalse(result, "birth unexpectedly returned True")
+
+    def test_birth_exception(self):
+        """
+        Test calling birth where one worker's birth function 
+        throws an exception.
+        @param self Object reference.
+        """
+        workers = [MapPyDoNothing(), MapPyDoNothing(), MapPyTestMap()]
+        group = MapPyGroup(workers)
+        # Force a worker in group to fail
+        result = group.birth("""{"birth_result":%s}""" % \
+            MapPyTestMap.EXCEPTION)
+        self.assertFalse(result, "birth unexpectedly returned True")
+
+    def test_birth_exception_raise(self):
+        """
+        Test calling death where one worker's birth function 
+        throws an exception and the ErrorHandler is set to
+        "raise"
+        @param self Object reference.
+        """
+        ErrorHandler.DefaultHandler().on_error='raise'
+        workers = [MapPyDoNothing(), MapPyDoNothing(), MapPyTestMap()]
+        group = MapPyGroup(workers)
+        # Force a worker in group to fail
+        with self.assertRaisesRegexp(MapPyGroupBirthException, ".*"):
+            group.birth("""{"birth_result":%s}""" % \
+                MapPyTestMap.EXCEPTION)
+
+    def test_birth_death_exception(self):
+        """
+        Test calling birth where one worker's birth function 
+        throws an exception and other worker's death functions
+        also throw exceptions.
+        @param self Object reference.
+        """
+        ErrorHandler.DefaultHandler().on_error='raise'
+        # Create worker that fails on death.
+        class TestWorker: # pylint:disable = C0111, W0232
+            def birth(self, json_document):
+                pass
+            def process(self, spill):
+                pass
+            def death(self): # pylint:disable = R0201
+                raise ValueError("Test")
+        workers = [MapPyDoNothing(), TestWorker(), MapPyTestMap()]
+        group = MapPyGroup(workers)
+        # Force 3rd worker to fail on birth.
+        with self.assertRaisesRegexp(MapPyGroupBirthException, ".*"):
+            group.birth("""{"birth_result":%s}""" % \
+                MapPyTestMap.EXCEPTION)
 
     def test_process(self):
         """
@@ -274,20 +276,19 @@ class MapPyGroupTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         process function called and process the spill.
         @param self Object reference.
         """
-        spill_doc = self.__group.process("{}")
+        workers = \
+            [MapPyTestMap("A"), MapPyTestMap("B"), MapPyTestMap("C")]
+        group = MapPyGroup(workers)
+        spill_doc = group.process("{}")
         spill = json.loads(spill_doc)
-        while len(self.__workers) != 0:
-            worker = self.__workers.pop()
-            if isinstance(worker, ListType):
-                self.__workers.extend(worker)
-            else:
-                self.assertTrue(worker.process_called, 
-                    "process wasn't called for worker %s" % worker.map_id)
-                self.assertTrue(spill.has_key("processed"),
-                    "Spill does not contain processed key")
-                self.assertTrue(worker.map_id in spill["processed"],
-                    "Spill does not contain map_id for worker %s" \
-                    % worker.map_id)
+        for worker in workers:
+            self.assertTrue(worker.process_called, 
+                "process wasn't called for worker %s" % worker.map_id)
+            self.assertTrue(spill.has_key("processed"),
+                "Spill does not contain processed key")
+            self.assertTrue(worker.map_id in spill["processed"],
+                "Spill does not contain map_id for worker %s" \
+                % worker.map_id)
 
     def test_death(self):
         """
@@ -295,27 +296,54 @@ class MapPyGroupTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         functions called.
         @param self Object reference.
         """
-        result = self.__group.death()
+        workers = \
+            [MapPyTestMap("A"), MapPyTestMap("B"), MapPyTestMap("C")]
+        group = MapPyGroup(workers)
+        result = group.death()
         self.assertTrue(result, "death unexpectedly returned False")
-        while len(self.__workers) != 0:
-            worker = self.__workers.pop()
-            if isinstance(worker, ListType):
-                self.__workers.extend(worker)
-            else:
-                self.assertTrue(worker.death_called, 
-                    "death wasn't called for worker %s" % worker.map_id)
+        for worker in workers:
+            self.assertTrue(worker.death_called, 
+                "death wasn't called for worker %s" % worker.map_id)
 
-    def test_bad_death(self):
+    def test_death_false(self):
         """
         Test calling death where one worker's death function fails.
         @param self Object reference.
         """
+        workers = [MapPyDoNothing(), MapPyDoNothing(), MapPyTestMap()]
+        group = MapPyGroup(workers)
         # Force a worker in group to fail
-        self.__group.birth("""{"death_result":%s}""" % \
-            MapPyTestMap.FAIL)
-        result = self.__group.death()
+        workers[2].birth("""{"death_result":%s}""" % MapPyTestMap.FAIL)
+        result = group.death()
         self.assertFalse(result, "death unexpectedly returned True")
-        del self.__group # clean up now please
+
+    def test_death_exception(self):
+        """
+        Test calling death where one worker's death function 
+        throws an exception.
+        @param self Object reference.
+        """
+        workers = [MapPyDoNothing(), MapPyDoNothing(), MapPyTestMap()]
+        group = MapPyGroup(workers)
+        # Force a worker in group to fail
+        workers[2].birth("""{"death_result":%s}""" % MapPyTestMap.EXCEPTION)
+        result = group.death()
+        self.assertFalse(result, "death unexpectedly returned True")
+
+    def test_death_exception_raise(self):
+        """
+        Test calling death where one worker's death function 
+        throws an exception and the ErrorHandler is set to
+        "raise"
+        @param self Object reference.
+        """
+        ErrorHandler.DefaultHandler().on_error='raise'
+        workers = [MapPyDoNothing(), MapPyDoNothing(), MapPyTestMap()]
+        group = MapPyGroup(workers)
+        # Force a worker in group to fail
+        workers[2].birth("""{"death_result":%s}""" % MapPyTestMap.EXCEPTION)
+        with self.assertRaisesRegexp(MapPyGroupDeathException, ".*"):
+            group.death()
 
     def test_del(self):
         """
@@ -323,14 +351,12 @@ class MapPyGroupTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         functions called.
         @param self Object reference.
         """
-        self.__group = None
-        while len(self.__workers) != 0:
-            worker = self.__workers.pop()
-            if isinstance(worker, ListType):
-                self.__workers.extend(worker)
-            else:
-                self.assertTrue(worker.death_called, 
-                    "death wasn't called for worker %s" % worker.map_id)
+        workers = \
+            [MapPyTestMap("A"), MapPyTestMap("B"), MapPyTestMap("C")]
+        MapPyGroup(workers)
+        for worker in workers:
+            self.assertTrue(worker.death_called, 
+                "death wasn't called for worker %s" % worker.map_id)
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,5 +1,5 @@
 """
-In-memory document store.
+Document store super-class.
 """
 
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
@@ -17,21 +17,20 @@ In-memory document store.
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-from datetime import datetime
-import time
-from docstore.DocumentStore import DocumentStore
-
-class InMemoryDocumentStore(DocumentStore):
+class DocumentStore: # pylint: disable=W0232
     """
-    In-memory document store.
+    Document store super-class which holds documents, gathered into
+    collections, and identified by a unique identifier and timestamped
+    with their time added to the store.
     """
 
-    def __init__(self):
+    def connect(self, parameters = None):
         """ 
-        Constructor.
+        Connect to the data store - this is a no-op.
         @param self Object reference.
+        @param parameters Connection information.
         """
-        self.__data_store = {}
+        pass
 
     def collection_names(self):
         """ 
@@ -39,7 +38,7 @@ class InMemoryDocumentStore(DocumentStore):
         @param self Object reference.
         @return list.
         """
-        return self.__data_store.keys()
+        pass
 
     def create_collection(self, collection):
         """ 
@@ -47,8 +46,7 @@ class InMemoryDocumentStore(DocumentStore):
         @param self Object reference.
         @param collection Collection name.
         """
-        if (not self.__data_store.has_key(collection)):
-            self.__data_store[collection] = {}
+        pass
 
     def has_collection(self, collection):
         """ 
@@ -57,7 +55,7 @@ class InMemoryDocumentStore(DocumentStore):
         @param collection Collection name.
         @return True if collection exists else False.
         """
-        return self.__data_store.has_key(collection)
+        pass
 
     def get_ids(self, collection):
         """ 
@@ -66,7 +64,7 @@ class InMemoryDocumentStore(DocumentStore):
         @param collection Collection name.
         @return ID list.
         """
-        return self.__data_store[collection].keys()
+        pass
 
     def count(self, collection):
         """ 
@@ -75,11 +73,11 @@ class InMemoryDocumentStore(DocumentStore):
         @param collection Collection name.
         @return number >= 0.
         """
-        return len(self.__data_store[collection].keys())
+        pass
 
     def put(self, collection, docid, doc):
         """ 
-        Put a document with the given ID into the data store. Any existing
+        Put a document with the given ID into the collection. Any existing
         document with the same ID is overwritten. The time of addition
         is also recorded.
         @param self Object reference.
@@ -87,59 +85,43 @@ class InMemoryDocumentStore(DocumentStore):
         @param docid Document ID.
         @param doc Document.
         """
-        # Get (YYYY,MM,DD,HH,MM,SS,MILLI)
-        current_time = datetime.fromtimestamp(time.time())
-        self.__data_store[collection][docid] = (doc, current_time)
+        pass
 
     def get(self, collection, docid):
         """ 
-        Get the document with the given ID from the data store or
+        Get the document with the given ID from the collection or
         None if there is none.
         @param self Object reference.
         @param collection Collection name.
         @param docid Document ID.
         @return document or None.
         """
-        if self.__data_store[collection].has_key(docid):
-            return self.__data_store[collection][docid][0]
-        else:
-            return None
+        pass
 
-    def get_since(self, collection, earliest = None):
+    def get_since(self, collection, earliest):
         """ 
         Get the documents added since the given date from the data 
         store or None if there is none.
         @param self Object reference.
         @param collection Collection name.
         @param earliest datetime representing date of interest. If
-        None then all are returned.
+        None then all are returned. 
         @return iterable serving up the documents in the form
         {'_id':id, 'date':date, 'doc':doc} where date is in the
         Python datetime format e.g. YYYY-MM-DD HH:MM:SS.MILLIS.
         Documents are sorted earliest to latest.
         """
-        since = []
-        collection = self.__data_store[collection]
-        if (earliest == None):
-            for (docid, doc) in collection.items():
-                since.append({'_id':docid, 'date':doc[1], 'doc':doc[0]})
-        else:
-            for (docid, doc) in collection.items():
-                if (doc[1] > earliest):
-                    since.append({'_id':docid, 'date':doc[1], 'doc':doc[0]})
-        sorted_since = sorted(since, key=lambda item: item['date'])
-        return iter(sorted_since)
+        pass
 
     def delete_document(self, collection, docid):
         """ 
-        Delete the document with the given ID from the data store.
+        Delete the document with the given ID from the collection.
         If there is no such document then this is a no-op.
         @param self Object reference.
         @param collection Collection name.
         @param docid Document ID.
         """
-        if self.__data_store[collection].has_key(docid):
-            self.__data_store[collection].pop(docid)
+        pass
 
     def delete_collection(self, collection):
         """ 
@@ -147,4 +129,34 @@ class InMemoryDocumentStore(DocumentStore):
         @param self Object reference.
         @param collection Collection name.
         """
-        self.__data_store.pop(collection)
+        pass
+
+    def disconnect(self):
+        """
+        Disconnect. If there is no notion of disconnect this is a no-op.
+        @param self Object reference.
+        """
+        pass
+
+class DocumentStoreException(Exception):
+    """ 
+    Exception raised if there is a problem using the document store.
+    """
+
+    def __init__(self, exception):
+        """
+        Constructor. Overrides Exception.__init__.
+        @param self Object reference.
+        @param exception Wrapped exception
+        """
+        Exception.__init__(self)
+        self.exception = exception
+
+    def __str__(self):
+        """
+        Return string representation. Overrides Exception.__str__.
+        @param self Object reference.
+        @return string.
+        """
+        return "Exception when using document store: %s" \
+            % self.exception
