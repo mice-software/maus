@@ -85,6 +85,7 @@ class ReduceCppSingleStation {
 
   void count_particle_events(Json::Value root);
 
+  void compute_station_efficiencies(Json::Value root);
  private:
   TGraph *_graph;
   int _spill_counter;
