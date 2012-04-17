@@ -25,7 +25,8 @@ import unittest
 MRD = os.getenv("MAUS_ROOT_DIR")
 ANALYSIS = os.path.join(MRD, "bin", "analyze_data_offline.py")
 SIMULATION = os.path.join(MRD, "bin", "simulate_mice.py")
-ROOT_TO_JSON = os.path.join(MRD, "bin", "user", "json_to_root.py")
+ROOT_TO_JSON = os.path.join(MRD, "bin", "user", "root_to_json.py")
+JSON_TO_ROOT = os.path.join(MRD, "bin", "user", "json_to_root.py")
 
 def run_analyze_offline(json_file_name):
     """
@@ -49,9 +50,8 @@ def run_mc_simulation(json_file_name):
         pass
     subproc = subprocess.Popen([SIMULATION,
                                 "-output_json_file_name", json_file_name,
-                                "-simulation_geometry_file_name"])
+                                "-simulation_geometry_filename", "Test.dat"])
     subproc.wait()
-
 
 def run_json_to_root(json_file_name, root_file_name):
     """
@@ -61,16 +61,29 @@ def run_json_to_root(json_file_name, root_file_name):
         os.remove(root_file_name)
     except OSError:
         pass
-    subproc = subprocess.Popen([ROOT_TO_JSON,
+    subproc = subprocess.Popen([JSON_TO_ROOT,
                                 "-input_json_file_name", json_file_name,
                                 "-output_root_file_name", root_file_name])
+    subproc.wait()
+
+def run_root_to_json(root_file_name, json_file_name):
+    """
+    Run the converter to convert from json to root
+    """
+    try:
+        os.remove(json_file_name)
+    except OSError:
+        pass
+    subproc = subprocess.Popen([ROOT_TO_JSON,
+                                "-input_root_file_name", root_file_name,
+                                "-output_json_file_name", json_file_name])
     subproc.wait()
 
 class RootIOTest(unittest.TestCase): #pylint: disable=R0904
     """
     Check that the conversion from ROOT to JSON works okay
     """
-    def test_analyze_offline(self): #pylint: disable=R0201
+    def _test_analyze_offline(self): #pylint: disable=R0201
         """
         check that we can run the offline analysis, convert to root, convert
         back to json
@@ -88,11 +101,15 @@ class RootIOTest(unittest.TestCase): #pylint: disable=R0904
         json
         """
         sim_json = os.path.join \
-                              (MRD, "tmp", "test_root_io_simulate_mice.json")
+                              (MRD, "tmp", "test_root_io_simulate_mice_IN.json")
         sim_root = os.path.join \
                               (MRD, "tmp", "test_root_io_simulate_mice.root")
-        run_mc_simulation(sim_json)
-        run_json_to_root(sim_json, sim_root)
+        sim_json_out = os.path.join \
+                              (MRD, "tmp", "test_root_io_simulate_mice_OUT.json")
+        #run_mc_simulation(sim_json)
+        #run_json_to_root(sim_json, sim_root)
+        run_root_to_json(sim_root, sim_json_out)
+
 
 if __name__ == "__main__":
     unittest.main()
