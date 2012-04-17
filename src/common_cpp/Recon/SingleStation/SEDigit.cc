@@ -21,9 +21,9 @@
 
 SEDigit::SEDigit():_used(false) {}
 
-SEDigit::SEDigit(int plane, int channel, double npe, double time )
+SEDigit::SEDigit(int plane, int channel, double npe, double time, int adc)
                  :_plane(plane), _channel(channel), _npe(npe),
-                  _time(time), _used(false) {
+                  _time(time), _adc(adc), _used(false) {
 }
 
 SEDigit::~SEDigit() {}

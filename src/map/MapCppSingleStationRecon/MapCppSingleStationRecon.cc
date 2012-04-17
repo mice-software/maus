@@ -129,13 +129,25 @@ void MapCppSingleStationRecon::spacepoint_recon(SEEvent &evt) {
 }
 
 void MapCppSingleStationRecon::save_to_json(SEEvent &evt) {
-  Json::Value digits;
+  Json::Value doublet_clusters;
   for ( unsigned int dig_i = 0; dig_i < evt.clusters().size(); dig_i++ ) {
     Json::Value digits_in_event;
     digits_in_event["plane"]  = evt.clusters()[dig_i]->get_plane();
     digits_in_event["channel"]= evt.clusters()[dig_i]->get_channel();
     digits_in_event["npe"]    = evt.clusters()[dig_i]->get_npe();
     digits_in_event["time"]   = evt.clusters()[dig_i]->get_time();
+    doublet_clusters.append(digits_in_event);
+  }
+  root["doublet_clusters"]["single_station"].append(doublet_clusters);
+
+  Json::Value digits;
+  for ( unsigned int dig_i = 0; dig_i < evt.digits().size(); dig_i++ ) {
+    Json::Value digits_in_event;
+    digits_in_event["plane"]  = evt.digits()[dig_i]->get_plane();
+    digits_in_event["channel"]= evt.digits()[dig_i]->get_channel();
+    digits_in_event["npe"]   = evt.digits()[dig_i]->get_npe();
+    digits_in_event["time"]  = evt.digits()[dig_i]->get_time();
+    digits_in_event["adc"]   = evt.digits()[dig_i]->get_adc();
     digits.append(digits_in_event);
   }
   root["digits"]["single_station"].append(digits);

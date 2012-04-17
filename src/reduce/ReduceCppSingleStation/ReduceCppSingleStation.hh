@@ -77,6 +77,8 @@ class ReduceCppSingleStation {
 
   void digits_histograms(Json::Value root);
 
+  void doublet_clusters_histograms(Json::Value root);
+
   void draw_spacepoints(Json::Value root);
 
   bool is_physics_daq_event(Json::Value root);
@@ -110,6 +112,16 @@ class ReduceCppSingleStation {
 
   TH1F *_npe_plane2;
 
+  TH1F *_adc_plane0;
+
+  TH1F *_adc_plane1;
+
+  TH1F *_adc_plane2;
+
+  TH1F *_dig_npe_plane0;
+  TH1F *_dig_npe_plane1;
+  TH1F *_dig_npe_plane2;
+
   std::string _classname;
 
   std::string _filename;
@@ -122,6 +134,10 @@ class ReduceCppSingleStation {
   int _adc, _tdc, _bank, _chan, _activebank;
 
   TTree _digits;
+  int _plane_dig, _adc_dig;
+  double _npe_dig, _channel_dig;
+
+  TTree _doublet_clusters;
   int _plane;
   double _npe, _channel;
 
