@@ -104,7 +104,6 @@ class ReduceCppSingleStation {
   TH1F *_hist_plane2;
 
   TH1F *_chan_sum;
-  //TH2F *_trig_efficiency;
 
   TH1F *_npe_plane0;
 

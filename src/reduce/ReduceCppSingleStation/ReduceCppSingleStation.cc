@@ -128,6 +128,38 @@ bool ReduceCppSingleStation::birth(std::string argJsonConfigDocument) {
   _spacepointscopy.Branch("z", &_z, "z/D");
   _spacepointscopy.Branch("type", &_type, "type/I");
 
+  c5->Divide(1, 1);
+  c1->Divide(1, 1);
+  c1->SetFillColor(21);
+  c1->GetFrame()->SetFillColor(42);
+  c1->GetFrame()->SetBorderSize(6);
+  c1->GetFrame()->SetBorderMode(-1);
+
+  c2->Divide(3, 1);
+  c2->SetFillColor(21);
+  c2->GetFrame()->SetFillColor(42);
+  c2->GetFrame()->SetBorderSize(6);
+  c2->GetFrame()->SetBorderMode(-1);
+
+  c3->Divide(2, 2);
+  gStyle->SetLabelSize(0.07, "xyz");
+  gStyle->SetTitleSize(0.07, "xy");
+  gStyle->SetTitleOffset(0.6, "x");
+  gStyle->SetTitleOffset(0.4, "y");
+
+  c4->Divide(3, 1);
+  triplets->SetMarkerStyle(20);
+  triplets->SetMarkerColor(kBlue);
+  triplets_copy->SetMarkerStyle(20);
+  triplets_copy->SetMarkerColor(kBlue);
+
+  duplets->SetMarkerStyle(20);
+  duplets->SetMarkerColor(kRed);
+  duplets_copy->SetMarkerStyle(20);
+  duplets_copy->SetMarkerColor(kRed);
+  // gPad->SetLogY(1);
+  // gStyle->SetMarkerStyle(34);
+  // gStyle->SetMarkerSize(0.6);
   // JsonCpp setup
   Json::Value configJSON;
   try {
@@ -287,8 +319,6 @@ void ReduceCppSingleStation::count_particle_events(Json::Value root) {
 
   float effic = static_cast<float>(numb_spacepoints)/numb_triggers;
   float _spill_counter_copy = static_cast<float>(_spill_counter);
-  //float y = 0.1;
-  //std::cerr << effic << " Spacepoints: " << numb_spacepoints << " TOF Triggers:" << numb_triggers << std::endl;
   _graph->SetPoint(_spill_counter, _spill_counter_copy, effic);
 /*
   TAxis *axis = _trig_efficiency->GetXaxis();

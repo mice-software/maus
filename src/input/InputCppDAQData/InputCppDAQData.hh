@@ -171,10 +171,8 @@ class InputCppDAQData {
   V830DataProcessor*  _v830FragmentProc;
 
   /** Processor for VLSB data. */
-  // VLSBDataProcessor* _vLSBFragmentProc;
-  VLSB_bankDataProcessor* _vLSB_bankFragmentProc;
-  VLSB_boardDataProcessor* _vLSB_boardFragmentProc;
-  // VLSB_masterDataProcessor* _vLSB_masterFragmentProc;
+  VLSBDataProcessor* _vLSBFragmentProc;
+
  /** Processor for VLSB data from the cosmic test in Lab7.
   */
   VLSB_CDataProcessor* _vLSB_cFragmentProc;
