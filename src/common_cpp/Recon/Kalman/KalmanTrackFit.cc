@@ -15,7 +15,7 @@
  *
  */
 
-#include "src/common_cpp/Recon/SciFi/KalmanTrackFit.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanTrackFit.hh"
 #include <algorithm>
 
 KalmanTrackFit::KalmanTrackFit() {

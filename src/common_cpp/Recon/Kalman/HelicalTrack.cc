@@ -15,7 +15,7 @@
  *
  */
 
-#include "src/common_cpp/Recon/SciFi/Kalman/HelicalTrack.hh"
+#include "src/common_cpp/Recon/Kalman/HelicalTrack.hh"
 
 HelicalTrack::HelicalTrack() {}
 

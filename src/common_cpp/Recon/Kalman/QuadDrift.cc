@@ -15,7 +15,7 @@
  *
  */
 #include <math.h>
-#include "src/common_cpp/Recon/SciFi/Kalman/QuadDrift.hh"
+#include "src/common_cpp/Recon/Kalman/QuadDrift.hh"
 
 QuadDrift::QuadDrift() {}
 

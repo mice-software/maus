@@ -30,7 +30,7 @@
 #include "TMatrixD.h"
 
 
-#include "src/common_cpp/Recon/SciFi/Kalman/KalmanSite.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
 
 class StraightTrack {
  public:

@@ -32,10 +32,10 @@
 
 
 #include "src/common_cpp/Recon/SciFi/SciFiEvent.hh"
-#include "src/common_cpp/Recon/SciFi/HelicalTrack.hh"
-#include "src/common_cpp/Recon/SciFi/StraightTrack.hh"
-#include "src/common_cpp/Recon/SciFi/KalmanSite.hh"
-#include "src/common_cpp/Recon/SciFi/KalmanMonitor.hh"
+#include "src/common_cpp/Recon/Kalman/HelicalTrack.hh"
+#include "src/common_cpp/Recon/Kalman/StraightTrack.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanMonitor.hh"
 // namespace ublas = boost::numeric::ublas;
 
 class KalmanTrackFit {

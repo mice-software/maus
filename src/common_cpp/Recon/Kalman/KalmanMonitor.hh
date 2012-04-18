@@ -33,7 +33,7 @@
 #include "TMath.h"
 #include "TMatrixD.h"
 
-#include "src/common_cpp/Recon/SciFi/KalmanSite.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
 // namespace ublas = boost::numeric::ublas;
 
 class KalmanMonitor {

@@ -15,7 +15,7 @@
  *
  */
 
-#include "src/common_cpp/Recon/SciFi/KalmanSite.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
 
 KalmanSite::KalmanSite() {
   _C.ResizeTo(5, 5);

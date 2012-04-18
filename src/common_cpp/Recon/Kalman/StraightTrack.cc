@@ -15,7 +15,7 @@
  *
  */
 #include <math.h>
-#include "src/common_cpp/Recon/SciFi/StraightTrack.hh"
+#include "src/common_cpp/Recon/Kalman/StraightTrack.hh"
 
 StraightTrack::StraightTrack() {
   // Initialise straight-track member matrices:

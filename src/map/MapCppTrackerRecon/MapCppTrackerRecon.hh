@@ -49,7 +49,7 @@
 #include "src/common_cpp/Recon/SciFi/SciFiCluster.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
 #include "src/common_cpp/Recon/SciFi/PatternRecognition.hh"
-#include "src/common_cpp/Recon/SciFi/Kalman/KalmanTrackFit.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanTrackFit.hh"
 
 class MapCppTrackerRecon {
  public:
@@ -104,7 +104,7 @@ class MapCppTrackerRecon {
 
   void pattern_recognition(SciFiEvent &evt);
 
-  //  void track_fit(SciFiEvent &evt);
+  void track_fit(SciFiEvent &evt);
 
   void save_to_json(SciFiEvent &evt);
 

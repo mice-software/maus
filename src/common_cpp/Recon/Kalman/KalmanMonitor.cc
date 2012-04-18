@@ -15,7 +15,7 @@
  *
  */
 
-#include "src/common_cpp/Recon/SciFi/KalmanMonitor.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanMonitor.hh"
 
 KalmanMonitor::KalmanMonitor() {
   //histo = new TH1F("h","monitor; site; alpha",30, 0, 30);
