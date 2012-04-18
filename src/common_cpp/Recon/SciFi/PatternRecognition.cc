@@ -549,7 +549,7 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
                   if ( line_sz.get_chisq() / ( num_points - 2 ) < _chisq_cut ) {
                   std::cout << "** line in s-z chisq test passed, moving on to full helix fit**\n";
                   circle.set_turning_angle(dphi); // The turning angles will be needed in helix fit
-                  full_helix_fit(good_spnts, circle, line_sz);
+                  full_helix_fit(good_spnts, circle, line_sz); // eventually need to pass helix.
                   } else {
                     std::cout << "sz chisq = " << line_sz.get_chisq();
                     std::cout << "sz chisq test failed, " << num_points << "track rejected" << "\n";
@@ -778,6 +778,66 @@ void PatternRecognition::dphi_to_ds(double R, const std::vector<double> &dphi,
 
 void PatternRecognition::full_helix_fit(const std::vector<SciFiSpacePoint*> &spnts,
                                         const SimpleCircle &circle, const SimpleLine &line_sz) {
+  // Initial parameters
+  double R = circle.get_R();
+  double Phi_0 = circle.get_turning_angle()[0]; //  Is this the right syntax?
+  double dsdz = line_sz.get_m();
+  double tan_lambda = 1 / dsdz;
+  double A, B, C;
+  A = spnts[0]->get_position().x();
+  B = spnts[0]->get_position().y();
+  C = spnts[0]->get_position().z();
+
+  // Define a helix object to hold final parameters to be passed to kalman filter
+  // SimpleHelix helix;
+
+  double small_number = 1.; // should figure out what this is and put it in the header file
+
+  // Calculate chisq with initial params
+  double chi2;
+  for ( int i = 0; i < static_cast<int>(spnts.size()); ++i ) {
+    CLHEP::Hep3Vector p = spnts[i]->get_position();
+    double phi_i = circle.get_turning_angle()[i];
+    phi_i -= Phi_0; // Everything relative to starting point.
+
+    double x_i, y_i, z_i;
+    helix_function_at_i(R, Phi_0, tan_lambda, A, B, C, phi_i, x_i, y_i, z_i);
+
+    chi2 += (p.x() - x_i)*(p.x() - x_i) + (p.y() - y_i)*(p.y() - y_i) + (p.z() - z_i)*(p.z() - z_i);
+  }
+  double best_chi2dof = chi2 / static_cast<int>(spnts.size());
+
+  // Declare adjustments to parameters and chisq that will be calculated after adjuments are made
+  double dR, dPhi_0, dtan_lambda, chi2_dof;
+  for ( chi2_dof = 0.; chi2_dof < best_chi2dof; chi2_dof = best_chi2dof ) {
+
+    calculate_adjustments(spnts, circle, R, Phi_0, tan_lambda, dR, dPhi_0, dtan_lambda, chi2_dof);
+
+    if ( chi2_dof < best_chi2dof && (best_chi2dof - chi2_dof) < small_number ) {
+      std::cout << "yay, finished" << std::endl;
+      // return a helix
+    } else if ( !(chi2_dof < best_chi2dof) ) { // meaning chi2 increased with the last iteration
+      std::cout << "Helix fit passed minimum. Revert parameters to previous iteration" << std::endl;
+      R -= dR;
+      Phi_0 -= dPhi_0;
+      tan_lambda -= dtan_lambda;
+      // return a helix
+    }
+  } // ~ chisq for loop
+}
+
+void PatternRecognition::helix_function_at_i(double R, double phi_0, double tan_lambda,
+                                             double A, double B, double C, double phi_i,
+                                             double &x_i, double &y_i, double &z_i) {
+    x_i = A + R * (cos(phi_i) - 1) * cos(phi_0) - R * sin(phi_i) * sin(phi_0);
+    y_i = B + R * (cos(phi_i) - 1) * sin(phi_0) - R * sin(phi_i) * cos(phi_0);
+    z_i = C + R * phi_i * tan_lambda;
+}
+
+void PatternRecognition::calculate_adjustments(const std::vector<SciFiSpacePoint*> &spnts,
+                                               const SimpleCircle &circle, double &R, double &phi_0,
+                                               double &tan_lambda, double &dR, double &dphi_0,
+                                               double &dtan_lambda, double &chi2_dof) {
   CLHEP::HepMatrix G(3, 3); // symmetric matrix containing second derivatives w.r.t. each parameter
   CLHEP::HepMatrix g(3, 1); // vector containing first derivatives w.r.t. each parameter
 
@@ -786,19 +846,18 @@ void PatternRecognition::full_helix_fit(const std::vector<SciFiSpacePoint*> &spn
   B = spnts[0]->get_position().y();
   C = spnts[0]->get_position().z();
 
-  double R = circle.get_R();
-  double phi_0 = circle.get_turning_angle()[0]; //  Is this the right syntax to pick up the first
-  // element of the vector turning_angle?????????????????????????????????????????????????
-  double dsdz = line_sz.get_m();
-  double tan_lambda = 1 / dsdz;
   // construct the individual matrix elements as 0 to begin with.
-  double G_rr = 0., G_bb = 0., G_ll = 0., G_rb = 0., G_rl = 0., G_bl = 0.;
+  double G_rr = 0., G_bb = 0., G_ll = 0., G_rb = 0., G_br = 0., G_rl = 0., G_lr = 0.;
+  double G_bl = 0., G_lb = 0.; // These will remain 0.
+
+  double g_r = 0., g_b = 0., g_l = 0.;
 
   for ( int i = 0; i < static_cast<int>(spnts.size()); ++i ) {
     CLHEP::Hep3Vector p = spnts[i]->get_position();
     double phi_i = circle.get_turning_angle()[i];
     phi_i -= phi_0; // Everything relative to starting point.
 
+    // Get errors on x and y measurements (equal).  Note error on z negligible.
     double sd;
     if ( spnts[i]->get_station() == 5 )
       sd = _sd_5;
@@ -807,16 +866,78 @@ void PatternRecognition::full_helix_fit(const std::vector<SciFiSpacePoint*> &spn
 
     double w = 1 / (sd * sd);
 
-    double x_i = A + R * (cos(phi_i) - 1) * cos(phi_0) - R * sin(phi_i) * sin(phi_0);
-    double y_i = B + R * (cos(phi_i) - 1) * sin(phi_0) - R * sin(phi_i) * cos(phi_0);
-    double z_i = C + R * phi_i * tan_lambda;
+    double x_i, y_i, z_i;
+    helix_function_at_i(R, phi_0, tan_lambda, A, B, C, phi_i, x_i, y_i, z_i);
 
+    // Calculate the elements of the gradient vector g
+    g_r += w * ((p.x() - x_i) * (x_i - A) + (p.y() - y_i) * (y_i - B)) + (p.z() - z_i) * (z_i - C);
+    g_b += w * (-(p.x() - x_i) * (y_i - B) + (p.y() - y_i) * (x_i - A));
+    g_l += (p.z() - z_i) * phi_i;
+
+    // Calculate the elements of the matrix G
     G_rr += w * ((x_i - A) * (x_i - A) + (y_i - B) * (y_i - B)) + (z_i - C) * (z_i - C);
     G_rb += w * ((p.x() - x_i) * (y_i - B) + (p.y() - y_i) * (x_i - A));
     G_rl += ((z_i - C) - (p.z() - z_i)) * phi_i;
     G_bb += w * ((p.x() - A) * (x_i - A) + (p.y() - B) * (y_i - B));
     G_ll += phi_i * phi_i;
+  } // end i
+
+  g_r = -2 / R * g_r;
+  g_b = -2 * g_b;
+  g_l = -2 * R * g_l;
+
+  G_rr = 2 / (R * R) * G_rr;
+  G_rb = 2 / R * G_rb;
+  G_br = G_rb;
+  G_rl = 2 * G_rl;
+  G_lr = G_rl;
+  G_bb = 2 * G_bb;
+  G_ll = 2 * R * R * G_ll;
+
+  // Now we fill the matrix and gradient vector.
+  G[0][0] = G_rr;
+  G[0][1] = G_rb;
+  G[0][2] = G_rl;
+
+  G[1][0] = G_br;
+  G[1][1] = G_bb;
+  G[1][2] = G_bl; // Should be 0
+
+  G[2][0] = G_lr;
+  G[2][1] = G_lb; // Should be 0
+  G[2][2] = G_ll;
+
+  // Column vector
+  g[0][0] = g_r;
+  g[1][0] = g_b;
+  g[1][0] = g_l;
+
+  // Now we calculate the corrections to the parameters
+  int ierr;
+  G.invert(ierr);
+  CLHEP::HepMatrix d_params = G * g; // (3x3)(3x1) = (3x1) vector of corrections
+
+  dR = d_params[0][0];
+  dphi_0 = d_params[1][0];
+  dtan_lambda = d_params[2][0];
+
+  // Adjusted the parameters to calculate new chi2_dof.
+  R += dR;
+  phi_0 += dphi_0;
+  tan_lambda += dtan_lambda;
+
+  double chi2;
+  for ( int i = 0; i < static_cast<int>(spnts.size()); ++i ) {
+    CLHEP::Hep3Vector p = spnts[i]->get_position();
+    double phi_i = circle.get_turning_angle()[i];
+    phi_i -= phi_0; // Everything relative to starting point.
+
+    double x_i, y_i, z_i;
+    helix_function_at_i(R, phi_0, tan_lambda, A, B, C, phi_i, x_i, y_i, z_i);
+
+    chi2 += (p.x() - x_i)*(p.x() - x_i) + (p.y() - y_i)*(p.y() - y_i) + (p.z() - z_i)*(p.z() - z_i);
   }
+  chi2_dof = chi2 / static_cast<int>(spnts.size());
 }
 
 void PatternRecognition::set_end_stations(const std::vector<int> ignore_stations,

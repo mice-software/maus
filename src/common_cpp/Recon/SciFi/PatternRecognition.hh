@@ -234,12 +234,49 @@ class PatternRecognition {
      *  fit in the helical pattern recognition routine, and will provide the initial parameter
      *  values for the Kalman Filter.
      *
-     *  @param good_spnts - Vector containing spacepoints being used for the fit, in order of
-     *                      innermost to outermost stations
+     *  @param spnts - Vector containing spacepoints being used for the fit, in order of
+     *                 innermost to outermost stations
      *
      */
     void full_helix_fit(const std::vector<SciFiSpacePoint*> &spnts, const SimpleCircle &circle,
                         const SimpleLine &line_sz);
+
+    /** @brief Calculates helix at a point i
+     *
+     *  Finds helix function at the ith spacepoint using the parameter values and the spacepoint
+     *
+     *  @param R - raidus of helix
+     *  @param phi_0 - turning angle of initial spacepoint
+     *  @param tan_lambda - helix dip angle
+     *  @param x_i - Helix value x at point i (cartesian)
+     *  @param y_i - Helix value y at point i
+     *  @param z_i - Helix value z at point i
+     *
+     */
+    void helix_function_at_i(double R, double phi_0, double tan_lambda, double A, double B,
+                             double C, double phi_i, double &x_i, double &y_i, double &z_i);
+
+    /** @brief Calculates the adjustments to the seed parameters
+     *
+     *  By taking first, second, and mixed derivatives of chi_sq for helix, we calculate the
+     *  adjustments to the seed paramters R, Phi_0, and tan_lambda. i.e. R' = R + dR, where R' is
+     *  the new parameter value, R is the seed value, and dR is the adjustment. Inputs are inital
+     *  seed parameters and the outputs are the ajustments.
+     *
+     *  @param spnts - Vector containing spacepoints being used for the fit, in order of innermost
+     *                 to outermost stations
+     *  @param R - initial R value as calculated from circle fit
+     *  @param phi_0 - turning angle of initial spacepoint as calculate from circle fit
+     *  @param tan_lambda - helix dip angle calculated from the slope of line in the s-z projection
+     *  @param dR - adjustment to R
+     *  @param dphi_0 - adjumtment to phi_0
+     *  @param dtan_lmabda - adjustment to tan_lmabda
+     *
+     */
+    void calculate_adjustments(const std::vector<SciFiSpacePoint*> &spnts,
+                               const SimpleCircle &circle, double &R, double &phi_0,
+                               double &tan_lambda, double &dR, double &dphi_0, double &dtan_lambda,
+                               double &chi2_dof);
 
     /** @brief Determine which two stations the initial line should be drawn between
      * 
