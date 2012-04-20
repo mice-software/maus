@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 #
 #  MAUS is free software: you can redistribute it and/or modify
@@ -63,7 +65,9 @@ def run_json_to_root(json_file_name, root_file_name):
         pass
     subproc = subprocess.Popen([JSON_TO_ROOT,
                                 "-input_json_file_name", json_file_name,
-                                "-output_root_file_name", root_file_name])
+                                "-output_root_file_name", root_file_name,
+                                "-verbose_level", "1"])
+
     subproc.wait()
 
 def run_root_to_json(root_file_name, json_file_name):
@@ -76,7 +80,8 @@ def run_root_to_json(root_file_name, json_file_name):
         pass
     subproc = subprocess.Popen([ROOT_TO_JSON,
                                 "-input_root_file_name", root_file_name,
-                                "-output_json_file_name", json_file_name])
+                                "-output_json_file_name", json_file_name,
+                                "-verbose_level", "1"])
     subproc.wait()
 
 class RootIOTest(unittest.TestCase): #pylint: disable=R0904
@@ -106,8 +111,8 @@ class RootIOTest(unittest.TestCase): #pylint: disable=R0904
                               (MRD, "tmp", "test_root_io_simulate_mice.root")
         sim_json_out = os.path.join \
                               (MRD, "tmp", "test_root_io_simulate_mice_OUT.json")
-        #run_mc_simulation(sim_json)
-        #run_json_to_root(sim_json, sim_root)
+#        run_mc_simulation(sim_json)
+        run_json_to_root(sim_json, sim_root)
         run_root_to_json(sim_root, sim_json_out)
 
 

@@ -26,6 +26,9 @@ def run():
     my_map.append(MAUS.MapPyBeamMaker()) # beam construction
     my_map.append(MAUS.MapCppSimulation())  #  geant4 simulation
 
+    # Global Digits - post simulation
+    my_map.append(MAUS.MapPyMCScalars()) # monte carlo scalars   
+
     # TOF
     my_map.append(MAUS.MapCppTOFMCDigitizer())  # TOF MC Digitizer
     my_map.append(MAUS.MapCppTOFSlabHits()) # TOF MC Slab Hits
@@ -34,6 +37,8 @@ def run():
     # SciFi
     my_map.append(MAUS.MapCppTrackerMCDigitization())  # SciFi electronics model
 #    my_map.append(MAUS.MapCppTrackerRecon()) # SciFi Recon
+
+    # Global Digits - post detector digitisation
 
     # Then construct a MAUS output component - filename comes from datacards
     my_output = MAUS.OutputPyJSON()

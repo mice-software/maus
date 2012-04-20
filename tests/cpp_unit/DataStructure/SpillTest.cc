@@ -106,6 +106,9 @@ TEST(SpillTest, SpillTest) {
     EXPECT_EQ(emr_null, my_spill_equal.GetEMRSpillData());
     EXPECT_EQ(mc_null, my_spill_equal.GetMCEvents());
     EXPECT_EQ(rec_null, my_spill_equal.GetReconEvents());
+
+    EXPECT_TRUE(false) << "No Spill::errors branch";
+    EXPECT_TRUE(false) << "Check valgrind";
 }
 }
 

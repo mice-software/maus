@@ -15,6 +15,8 @@
  *
  */
 
+#include <iostream>
+
 #include "TFile.h"
 #include "TTree.h"
 
@@ -32,7 +34,7 @@
 namespace MAUS {
 
 InputCppRoot::InputCppRoot(std::string filename) : _infile(NULL),
-              _jsonCppConverter(NULL),  _spill(NULL), _filename(filename) {
+              _jsonCppConverter(NULL),  _data(NULL), _filename(filename) {
 }
 
 InputCppRoot::~InputCppRoot() {
@@ -47,9 +49,9 @@ bool InputCppRoot::birth(std::string json_datacards) {
                    "input_root_file_name", JsonWrapper::stringValue).asString();
       }
       _infile = new irstream(_filename.c_str(), "Spill");
+      _data = new Data();
       _jsonCppConverter = new JsonCppConverter();
-      _spill = new Spill();
-      (*_infile) >> branchName("spill") >> _spill;
+      (*_infile) >> branchName("data") >> _data;
   } catch(Squeal squee) {
     death();
     CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
@@ -64,9 +66,9 @@ bool InputCppRoot::birth(std::string json_datacards) {
 
 bool InputCppRoot::death() {
   // if _infile != NULL, _infile will delete spill
-  if (_infile == NULL && _spill != NULL) {
-    delete _spill;
-    _spill = NULL;
+  if (_infile == NULL && _data != NULL) {
+    delete _data;
+    _data = NULL;
   }
 
   if (_infile != NULL) {
@@ -82,33 +84,33 @@ bool InputCppRoot::death() {
 }
 
 std::string InputCppRoot::getNextEvent() {
-  try {
-      if (_jsonCppConverter == NULL || _infile == NULL) {
-        throw(Squeal(
-          Squeal::recoverable,
-          "InputCppRoot was not initialised properly",
-          "InputCppRoot::getNextEvent"
-        ) );
-      }
-      if ((*_infile) >> readEvent == NULL) {
+    try {
+        if (_jsonCppConverter == NULL || _infile == NULL) {
+            throw(Squeal(
+                Squeal::recoverable,
+                "InputCppRoot was not initialised properly",
+                "InputCppRoot::getNextEvent"
+            ) );
+        }
+        if ((*_infile) >> readEvent == NULL) {
+            return "";
+        }
+        Json::Value* value = (*_jsonCppConverter)(*_data->GetSpill());
+        Json::FastWriter writer;
+        std::string output = writer.write(*value);
+        delete value;
+        return output;
+    } catch(Squeal squee) {
+        CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
         return "";
-      }
-      Json::Value* value = (*_jsonCppConverter)(*_spill);
-      Json::FastWriter writer;
-      std::string output = writer.write(*value);
-      delete value;
-      return output;
-  } catch(Squeal squee) {
-    CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
-    return "";
-  } catch(std::exception exc) {
-    CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
-    return "";
-  }
+    } catch(std::exception exc) {
+        CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
+        return "";
+    }
 }
 
 int InputCppRoot::my_sizeof() {
-  Spill spill;
+  Data spill;
   return sizeof(spill);
 }
 }
