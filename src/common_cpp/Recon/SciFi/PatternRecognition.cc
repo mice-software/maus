@@ -778,6 +778,9 @@ void PatternRecognition::dphi_to_ds(double R, const std::vector<double> &dphi,
 
 void PatternRecognition::full_helix_fit(const std::vector<SciFiSpacePoint*> &spnts,
                                         const SimpleCircle &circle, const SimpleLine &line_sz) {
+  // If the counter reaches 10 before an acceptable chisq value is reached, then we reject the track
+  // This is because we've already done the 
+
   // Initial parameters
   double R = circle.get_R();
   double Phi_0 = circle.get_turning_angle()[0]; //  Is this the right syntax?
