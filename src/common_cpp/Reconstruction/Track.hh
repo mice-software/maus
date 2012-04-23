@@ -22,11 +22,11 @@
 
 #include <vector>
 
-#include "Reconstruction/ParticleTrack.hh"
+#include "Reconstruction/TrackPoint.hh"
 
 namespace MAUS {
 
-class Track : public std::vector<ParticleTrack> {
+class Track : public std::vector<TrackPoint> {
  public:
   /* @brief	Construct with all elements initialized to zero.
    */
@@ -38,7 +38,7 @@ class Track : public std::vector<ParticleTrack> {
 
   /* @brief Create with tracks and particle ID.
    */
-  Track(const std::vector<ParticleTrack>& tracks,
+  Track(const std::vector<TrackPoint>& tracks,
                      const int particle_id);
 
   ~Track();

@@ -23,7 +23,7 @@
 #include <vector>
 
 #include "src/common_cpp/Reconstruction/Detector.hh"
-#include "src/common_cpp/Reconstruction/ParticleTrack.hh"
+#include "src/common_cpp/Reconstruction/TrackPoint.hh"
 
 namespace MAUS {
 
@@ -38,7 +38,7 @@ class ReconstructionInput {
   ~ReconstructionInput() { }
 
   bool beam_polarity_negative();
-  std::vector<Detector> const * detectors();
+  std::vector<Detector> const * detectorsmymap.find('a')->second();
   std::vector<TrackPoint> const * events();
  protected:
   ReconstructionInput();

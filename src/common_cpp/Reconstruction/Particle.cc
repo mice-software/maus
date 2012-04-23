@@ -26,137 +26,137 @@ namespace MAUS {
 using MAUS::Particle;
 
 Particle::Particle() {
-  names.insert(std::pair<int, std::string>(0, std::string("none")));
-  masses.insert(std::pair<int, double>(0, 0.));
-  charges.insert(std::pair<int, int>(0, 0));
+  names_.insert(std::pair<int, std::string>(kNone, std::string("none")));
+  masses_.insert(std::pair<int, double>(kNone, 0.));
+  charges_.insert(std::pair<int, int>(kNone, 0));
 
-  names.insert(std::pair<int, std::string>(11, std::string("e-")));
-  masses.insert(std::pair<int, double>(11, 0.510998910));
-  charges.insert(std::pair<int, int>(11, -1));
+  names_.insert(std::pair<int, std::string>(kEMinus, std::string("e-")));
+  masses_.insert(std::pair<int, double>(kEMinus, 0.510998910));
+  charges_.insert(std::pair<int, int>(kEMinus, -1));
 
-  names.insert(std::pair<int, std::string>(12, std::string("electron neutrino")));
-  masses.insert(std::pair<int, double>(12, 1.9e-6));
-  charges.insert(std::pair<int, int>(12, 0));
+  names_.insert(std::pair<int, std::string>(kElectronNeutrino, std::string("electron neutrino")));
+  masses_.insert(std::pair<int, double>(kElectronNeutrino, 1.9e-6));
+  charges_.insert(std::pair<int, int>(kElectronNeutrino, 0));
 
-  names.insert(std::pair<int, std::string>(13, std::string("mu-")));
-  masses.insert(std::pair<int, double>(13, 105.6583668));
-  charges.insert(std::pair<int, int>(13, -1));
+  names_.insert(std::pair<int, std::string>(kMuMinus, std::string("mu-")));
+  masses_.insert(std::pair<int, double>(kMuMinus, 105.6583668));
+  charges_.insert(std::pair<int, int>(kMuMinus, -1));
 
-  names.insert(std::pair<int, std::string>(14, std::string("muon neutrino")));
-  masses.insert(std::pair<int, double>(14, 1.9e-6));
-  charges.insert(std::pair<int, int>(14, 0));
+  names_.insert(std::pair<int, std::string>(kMuonNeutrino, std::string("muon neutrino")));
+  masses_.insert(std::pair<int, double>(kMuonNeutrino, 1.9e-6));
+  charges_.insert(std::pair<int, int>(kMuonNeutrino, 0));
 
-  names.insert(std::pair<int, std::string>(22, std::string("photon")));
-  masses.insert(std::pair<int, double>(22, 0.));
-  charges.insert(std::pair<int, int>(22, -1));
+  names_.insert(std::pair<int, std::string>(kPhoton, std::string("photon")));
+  masses_.insert(std::pair<int, double>(kPhoton, 0.));
+  charges_.insert(std::pair<int, int>(kPhoton, -1));
 
-  names.insert(std::pair<int, std::string>(111, std::string("pi0")));
-  masses.insert(std::pair<int, double>(111, 134.9766));
-  charges.insert(std::pair<int, int>(111, 0));
+  names_.insert(std::pair<int, std::string>(kPi0, std::string("pi0")));
+  masses_.insert(std::pair<int, double>(kPi0, 134.9766));
+  charges_.insert(std::pair<int, int>(kPi0, 0));
 
-  names.insert(std::pair<int, std::string>(211, std::string("pi+")));
-  masses.insert(std::pair<int, double>(211, 139.57018));
-  charges.insert(std::pair<int, int>(211, +1));
+  names_.insert(std::pair<int, std::string>(kPiPlus, std::string("pi+")));
+  masses_.insert(std::pair<int, double>(kPiPlus, 139.57018));
+  charges_.insert(std::pair<int, int>(kPiPlus, +1));
 
-  names.insert(std::pair<int, std::string>(321, std::string("K+")));
-  masses.insert(std::pair<int, double>(321, 493.667));
-  charges.insert(std::pair<int, int>(321, +1));
+  names_.insert(std::pair<int, std::string>(kKPlus, std::string("K+")));
+  masses_.insert(std::pair<int, double>(kKPlus, 493.667));
+  charges_.insert(std::pair<int, int>(kKPlus, +1));
 
-  names.insert(std::pair<int, std::string>(2112, std::string("neutron")));
-  masses.insert(std::pair<int, double>(2112, 939.56536));
-  charges.insert(std::pair<int, int>(2112, 0));
+  names_.insert(std::pair<int, std::string>(kNeutron, std::string("neutron")));
+  masses_.insert(std::pair<int, double>(kNeutron, 939.56536));
+  charges_.insert(std::pair<int, int>(kNeutron, 0));
 
-  names.insert(std::pair<int, std::string>(2212, std::string("proton")));
-  masses.insert(std::pair<int, double>(2212, 938.271996));
-  charges.insert(std::pair<int, int>(2212, +1));
+  names_.insert(std::pair<int, std::string>(kProton, std::string("proton")));
+  masses_.insert(std::pair<int, double>(kProton, 938.271996));
+  charges_.insert(std::pair<int, int>(kProton, +1));
 
-  names.insert(std::pair<int, std::string>(1000010020, std::string("deuterium")));
-  masses.insert(std::pair<int, double>(1000010020, 1876.1239));
-  charges.insert(std::pair<int, int>(1000010020, 0));
+  names_.insert(std::pair<int, std::string>(kDeuterium, std::string("deuterium")));
+  masses_.insert(std::pair<int, double>(kDeuterium, 1876.1239));
+  charges_.insert(std::pair<int, int>(kDeuterium, 0));
 
-  names.insert(std::pair<int, std::string>(1000010030, std::string("tritium")));
-  masses.insert(std::pair<int, double>(1000010030, 2809.432));
-  charges.insert(std::pair<int, int>(1000010030, 0));
+  names_.insert(std::pair<int, std::string>(kTritium, std::string("tritium")));
+  masses_.insert(std::pair<int, double>(kTritium, 2809.432));
+  charges_.insert(std::pair<int, int>(kTritium, 0));
 
-  names.insert(std::pair<int, std::string>(1000020030, std::string("3He")));
-  masses.insert(std::pair<int, double>(1000020030, 2809.41346));
-  charges.insert(std::pair<int, int>(1000020030, 0));
+  names_.insert(std::pair<int, std::string>(kHelium3, std::string("3He")));
+  masses_.insert(std::pair<int, double>(kHelium3, 2809.41346));
+  charges_.insert(std::pair<int, int>(kHelium3, 0));
 
-  names.insert(std::pair<int, std::string>(1000020040, std::string("4He")));
-  masses.insert(std::pair<int, double>(1000020040, 3728.4001));
-  charges.insert(std::pair<int, int>(1000020040, 0));
+  names_.insert(std::pair<int, std::string>(kHelium4, std::string("4He")));
+  masses_.insert(std::pair<int, double>(kHelium4, 3728.4001));
+  charges_.insert(std::pair<int, int>(kHelium4, 0));
 
-  names.insert(std::pair<int, std::string>(130, std::string("K0L")));
-  masses.insert(std::pair<int, double>(130, 497.614));
-  charges.insert(std::pair<int, int>(130, 0));
+  names_.insert(std::pair<int, std::string>(kKLong, std::string("K0L")));
+  masses_.insert(std::pair<int, double>(kKLong, 497.614));
+  charges_.insert(std::pair<int, int>(kKLong, 0));
 
-  names.insert(std::pair<int, std::string>(310, std::string("K0S")));
-  masses.insert(std::pair<int, double>(310, 497.614));
-  charges.insert(std::pair<int, int>(310, 0));
+  names_.insert(std::pair<int, std::string>(kKShort, std::string("K0S")));
+  masses_.insert(std::pair<int, double>(kKShort, 497.614));
+  charges_.insert(std::pair<int, int>(kKShort, 0));
 
-  names.insert(std::pair<int, std::string>(311, std::string("K0")));
-  masses.insert(std::pair<int, double>(311, 497.614));
-  charges.insert(std::pair<int, int>(311, 0));
+  names_.insert(std::pair<int, std::string>(kK0, std::string("K0")));
+  masses_.insert(std::pair<int, double>(kK0, 497.614));
+  charges_.insert(std::pair<int, int>(kK0, 0));
 
-  names.insert(std::pair<int, std::string>(3122, std::string("lambda")));
-  masses.insert(std::pair<int, double>(3122, 1115.683));
-  charges.insert(std::pair<int, int>(3122, 0));
+  names_.insert(std::pair<int, std::string>(kLambda, std::string("lambda")));
+  masses_.insert(std::pair<int, double>(kLambda, 1115.683));
+  charges_.insert(std::pair<int, int>(kLambda, 0));
 
-  names.insert(std::pair<int, std::string>(-11, std::string("e+")));
-  masses.insert(std::pair<int, double>(-11, 0.510998910));
-  charges.insert(std::pair<int, int>(-11, +1));
+  names_.insert(std::pair<int, std::string>(kEPlus, std::string("e+")));
+  masses_.insert(std::pair<int, double>(kEPlus, 0.510998910));
+  charges_.insert(std::pair<int, int>(kEPlus, +1));
 
-  names.insert(std::pair<int, std::string>(-12, std::string(
+  names_.insert(std::pair<int, std::string>(kElectronAntineutrino, std::string(
     "electron antineutrino")));
-  masses.insert(std::pair<int, double>(-12, 0.));
-  charges.insert(std::pair<int, int>(-12, 0));
+  masses_.insert(std::pair<int, double>(kElectronAntineutrino, 0.));
+  charges_.insert(std::pair<int, int>(kElectronAntineutrino, 0));
 
-  names.insert(std::pair<int, std::string>(-13, std::string("mu+")));
-  masses.insert(std::pair<int, double>(-13, 105.6583668));
-  charges.insert(std::pair<int, int>(-13, +1));
+  names_.insert(std::pair<int, std::string>(kMuPlus, std::string("mu+")));
+  masses_.insert(std::pair<int, double>(kMuPlus, 105.6583668));
+  charges_.insert(std::pair<int, int>(kMuPlus, +1));
 
-  names.insert(std::pair<int, std::string>(-14, std::string(
+  names_.insert(std::pair<int, std::string>(kMuonAntineutrino, std::string(
     "muon antineutrino")));
-  masses.insert(std::pair<int, double>(-14, 0.));
-  charges.insert(std::pair<int, int>(-14, 0));
+  masses_.insert(std::pair<int, double>(kMuonAntineutrino, 0.));
+  charges_.insert(std::pair<int, int>(kMuonAntineutrino, 0));
 
-  names.insert(std::pair<int, std::string>(-211, std::string("pi-")));
-  masses.insert(std::pair<int, double>(-211, 139.57018));
-  charges.insert(std::pair<int, int>(-211, -1));
+  names_.insert(std::pair<int, std::string>(kPiMinus, std::string("pi-")));
+  masses_.insert(std::pair<int, double>(kPiMinus, 139.57018));
+  charges_.insert(std::pair<int, int>(kPiMinus, -1));
 
-  names.insert(std::pair<int, std::string>(-321, std::string("K-")));
-  masses.insert(std::pair<int, double>(-321, 493.667));
-  charges.insert(std::pair<int, int>(-321, -1));
+  names_.insert(std::pair<int, std::string>(kKMinus, std::string("K-")));
+  masses_.insert(std::pair<int, double>(kKMinus, 493.667));
+  charges_.insert(std::pair<int, int>(kKMinus, -1));
 
-  names.insert(std::pair<int, std::string>(-2112, std::string("antineutron")));
-  masses.insert(std::pair<int, double>(-2112, 939.56536));
-  charges.insert(std::pair<int, int>(-2112, 0));
+  names_.insert(std::pair<int, std::string>(kAntineutron, std::string("antineutron")));
+  masses_.insert(std::pair<int, double>(kAntineutron, 939.56536));
+  charges_.insert(std::pair<int, int>(kAntineutron, 0));
 
-  names.insert(std::pair<int, std::string>(-2212, std::string("antiproton")));
-  masses.insert(std::pair<int, double>(-2212, 938.271996));
-  charges.insert(std::pair<int, int>(-2212, -1));
+  names_.insert(std::pair<int, std::string>(kAntiproton, std::string("antiproton")));
+  masses_.insert(std::pair<int, double>(kAntiproton, 938.271996));
+  charges_.insert(std::pair<int, int>(kAntiproton, -1));
 
-  names.insert(std::pair<int, std::string>(-3122, std::string("antilambda")));
-  masses.insert(std::pair<int, double>(-3122, 1115.683));
-  charges.insert(std::pair<int, int>(-3122, 0));
+  names_.insert(std::pair<int, std::string>(kAntilambda, std::string("antilambda")));
+  masses_.insert(std::pair<int, double>(kAntilambda, 1115.683));
+  charges_.insert(std::pair<int, int>(kAntilambda, 0));
 }
 
-Particle::Particle() { }
+Particle::~Particle() { }
 
-Particle const * Particle::GetInstance() const {
-  return &Particle::singleton;
+Particle const * Particle::GetInstance() {
+  return &Particle::kSingleton;
 }
 
 std::string Particle::GetName(int id) const {
-  return names.find(id).second;
+  return names_.find(id)->second;
 }
 
 double Particle::GetMass(int id) const {
-  return masses.find(id).second;
+  return masses_.find(id)->second;
 }
 
 int Particle::GetCharge(int id) const {
-  return charges.find(id).second;
+  return charges_.find(id)->second;
 }
 
 }  // namespace MAUS

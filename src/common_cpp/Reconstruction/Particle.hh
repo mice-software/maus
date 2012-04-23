@@ -21,13 +21,12 @@
 #define COMMON_CPP_RECONSTRUCTION_PARTICLE_HH
 
 #include <iostream>
+#include <map>
 #include <string>
 
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
      
 namespace MAUS {
-
-using MAUS::Particle;
 
 class Particle {
  public:
@@ -46,39 +45,40 @@ class Particle {
    */
   int GetCharge(int id) const;
   
-  static const int kNone = 0;
-  static const int kEMinus = 11;
-  static const int kElectronNeutrino = 12;
-  static const int kMuMinus = 13;
-  static const int kMuonNeutrino = 14;
-  static const int kPhoton = 22;
-  static const int kPi0 = 111;
-  static const int kPiPlus = 211;
-  static const int kKPlus = 321;
-  static const int kNeutron = 2112;
-  static const int kProton = 2212;
-  static const int kDeuterium = 1000010020;
-  static const int kTritium = 1000010030;
-  static const int kHelium3 = 1000020030;
-  static const int kHelium4 = 1000020040;
-  static const int kKLong = 130;
-  static const int kKShort = 310;
-  static const int kK0 = 311;
-  static const int kLambda = 3122;
-  static const int kEPlus = -11;
-  static const int kElectronAntineutrino = -12;
-  static const int kMuPlus = -13;
-  static const int kPiMinus = -211;
-  static const int kKMinus = -321;
-  static const int kAntineutron = -2112;
-  static const int kAntiproton = -2212;
-  static const int kMuPlus = -Antilambda;
+  static const int kNone;
+  static const int kEMinus;
+  static const int kElectronNeutrino;
+  static const int kMuMinus;
+  static const int kMuonNeutrino;
+  static const int kPhoton;
+  static const int kPi0;
+  static const int kPiPlus;
+  static const int kKPlus;
+  static const int kNeutron;
+  static const int kProton;
+  static const int kDeuterium;
+  static const int kTritium;
+  static const int kHelium3;
+  static const int kHelium4;
+  static const int kKLong;
+  static const int kKShort;
+  static const int kK0;
+  static const int kLambda;
+  static const int kEPlus;
+  static const int kElectronAntineutrino;
+  static const int kMuPlus;
+  static const int kMuonAntineutrino;
+  static const int kPiMinus;
+  static const int kKMinus;
+  static const int kAntineutron;
+  static const int kAntiproton;
+  static const int kAntilambda;
  protected:
   Particle();
-  static const Particle singleton;
-  std::map<int, std::string> names;
-  std::map<int, double> masses;
-  std::map<int, int> charges;
+  static const Particle kSingleton;
+  std::map<int, std::string> names_;
+  std::map<int, double> masses_;
+  std::map<int, int> charges_;
 };
 
 const int Particle::kNone = 0;
@@ -100,16 +100,17 @@ const int Particle::kKLong = 130;
 const int Particle::kKShort = 310;
 const int Particle::kK0 = 311;
 const int Particle::kLambda = 3122;
-const int Particle::kEPlus = -11;
-const int Particle::kElectronAntineutrino = -12;
-const int Particle::kMuPlus = -13;
-const int Particle::kPiMinus = -211;
-const int Particle::kKMinus = -321;
-const int Particle::kAntineutron = -2112;
-const int Particle::kAntiproton = -2212;
-const int Particle::kMuPlus = -Antilambda;
+const int Particle::kEPlus = -kEMinus;
+const int Particle::kElectronAntineutrino = -kElectronNeutrino;
+const int Particle::kMuPlus = -kMuMinus;
+const int Particle::kMuonAntineutrino = -kMuonNeutrino;
+const int Particle::kPiMinus = -kPiPlus;
+const int Particle::kKMinus = -kKPlus;
+const int Particle::kAntineutron = -kNeutron;
+const int Particle::kAntiproton = -kProton;
+const int Particle::kAntilambda = -kLambda;
 
-const Particle Particle::singleton = Particle();
+const Particle Particle::kSingleton = Particle();
 
 std::ostream& operator<<(std::ostream& out, const Particle& vector);
 }  // namespace MAUS
