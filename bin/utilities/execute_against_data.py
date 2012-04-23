@@ -45,6 +45,7 @@ Return codes are:
 """
 
 # dynamically set __doc__ string so I can access it for argparse
+#pylint: disable = W0622
 __doc__ = DESCRIPTION+"""
 
 Three classes are defined

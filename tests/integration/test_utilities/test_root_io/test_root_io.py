@@ -110,7 +110,7 @@ class RootIOTest(unittest.TestCase): #pylint: disable=R0904
         sim_root = os.path.join \
                               (MRD, "tmp", "test_root_io_simulate_mice.root")
         sim_json_out = os.path.join \
-                              (MRD, "tmp", "test_root_io_simulate_mice_OUT.json")
+                             (MRD, "tmp", "test_root_io_simulate_mice_OUT.json")
 #        run_mc_simulation(sim_json)
         run_json_to_root(sim_json, sim_root)
         run_root_to_json(sim_root, sim_json_out)
