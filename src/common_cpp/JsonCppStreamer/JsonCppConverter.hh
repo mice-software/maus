@@ -42,6 +42,7 @@ class JsonCppConverter : public ConverterBase<Json::Value, Spill> {
     JsonCppConverter()
     : ConverterBase<Json::Value, Spill>(static_cast<Spill*>(NULL)) {}
 
+
     /*!
      * \brief Convert Json value
      * Overloaded process initiate the conversion process converting the

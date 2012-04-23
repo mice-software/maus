@@ -43,6 +43,9 @@ TEST(SpillTest, SpillTest) {
     ReconEventArray* rec_2 = new ReconEventArray();
     ReconEventArray* rec_null = NULL;
 
+    ErrorsMap errors_1 = std::map<std::string, std::string>();
+    errors_1["test"] = "test_out";
+
     Spill my_spill;
     // check allocation from NULL okay
     my_spill.SetDAQData(daq_1);
@@ -51,12 +54,14 @@ TEST(SpillTest, SpillTest) {
     my_spill.SetMCEvents(mc_1);
     my_spill.SetReconEvents(rec_1);
     my_spill.SetSpillNumber(1);
+    my_spill.SetErrors(errors_1);
     EXPECT_EQ(my_spill.GetDAQData(), daq_1);
     EXPECT_EQ(my_spill.GetScalars(), scalars_1);
     EXPECT_EQ(my_spill.GetEMRSpillData(), emr_1);
     EXPECT_EQ(my_spill.GetMCEvents(), mc_1);
     EXPECT_EQ(my_spill.GetReconEvents(), rec_1);
     EXPECT_EQ(my_spill.GetSpillNumber(), 1);
+    EXPECT_EQ(my_spill.GetErrors()["test"], std::string("test_out"));
 
     // check reallocation okay
     my_spill.SetDAQData(daq_2);
@@ -78,7 +83,8 @@ TEST(SpillTest, SpillTest) {
     EXPECT_NE(my_spill.GetMCEvents(), my_spill_copy.GetMCEvents());
     EXPECT_NE
             (my_spill.GetReconEvents(), my_spill_copy.GetReconEvents());
-    EXPECT_NE(my_spill.GetSpillNumber(), my_spill_copy.GetSpillNumber());
+    EXPECT_EQ(my_spill.GetSpillNumber(), my_spill_copy.GetSpillNumber());
+    EXPECT_EQ(my_spill.GetErrors()["test"], my_spill_copy.GetErrors()["test"]);
 
     // check equality operator (deep copy)
     Spill my_spill_equal;
@@ -89,7 +95,8 @@ TEST(SpillTest, SpillTest) {
     EXPECT_NE(my_spill.GetMCEvents(), my_spill_equal.GetMCEvents());
     EXPECT_NE
            (my_spill.GetReconEvents(), my_spill_equal.GetReconEvents());
-    EXPECT_NE(my_spill.GetSpillNumber(), my_spill_equal.GetSpillNumber());
+    EXPECT_EQ(my_spill.GetSpillNumber(), my_spill_equal.GetSpillNumber());
+    EXPECT_EQ(my_spill.GetErrors()["test"], my_spill_equal.GetErrors()["test"]);
 
     // test that we free okay on reallocation
     my_spill_equal = my_spill;
@@ -106,6 +113,14 @@ TEST(SpillTest, SpillTest) {
     EXPECT_EQ(emr_null, my_spill_equal.GetEMRSpillData());
     EXPECT_EQ(mc_null, my_spill_equal.GetMCEvents());
     EXPECT_EQ(rec_null, my_spill_equal.GetReconEvents());
+
+    EXPECT_TRUE(false) << "Need to test Data class";
+    EXPECT_TRUE(false) << "Data structure:" << std::endl
+                       << "* Scalars\n"
+                       << "* DAQData\n"
+                       << "* TOF\n"
+                       << "* Ckov\n"
+                       << "* Tracker" << std::endl;
 }
 }
 
