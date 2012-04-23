@@ -24,7 +24,8 @@
 namespace MAUS {
 
 SpillProcessor::SpillProcessor() :_mc_array_proc(new MCEventProcessor()),
-                                  _recon_array_proc(new ReconEventProcessor()) {
+                                  _recon_array_proc(new ReconEventProcessor()),
+                                 _error_proc(new StringProcessor()) {
     RegisterPointerBranch
          ("scalars", &_scal_proc, &Spill::GetScalars, &Spill::SetScalars, true);
     RegisterPointerBranch
@@ -37,6 +38,9 @@ SpillProcessor::SpillProcessor() :_mc_array_proc(new MCEventProcessor()),
                           &Spill::GetReconEvents, &Spill::SetReconEvents, true);
     RegisterValueBranch("spill_number", &_int_proc, &Spill::GetSpillNumber,
                                                   &Spill::SetSpillNumber, true);
+    RegisterValueBranch("errors", &_error_proc, &Spill::GetErrors,
+                                                  &Spill::SetErrors, true);
+
 }
 }
 

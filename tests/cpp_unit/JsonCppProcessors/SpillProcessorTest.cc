@@ -128,7 +128,7 @@ std::string RECON_EVENT =
 std::string SPILL_SEED =
     std::string("{\"scalars\":{},\"daq_data\":{},\"emr_spill_data\":{},")+
     std::string("\"recon_events\":[")+RECON_EVENT+","+RECON_EVENT+"],"+
-    std::string("\"spill_number\":1");
+    std::string("\"spill_number\":1, \"errors\":{\"an_error\":\"message\"}");
 
 std::string SPILL_MC = SPILL_SEED+","+
     std::string("\"mc_events\":[")+MC_EVENT+","+MC_EVENT+"]}";
