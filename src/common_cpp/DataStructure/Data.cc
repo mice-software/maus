@@ -55,6 +55,5 @@ void Data::SetSpill(Spill* spill) {
 Spill* Data::GetSpill() const {
     return _spill;
 }
-
 }
 

@@ -42,7 +42,7 @@ class Data {
 
     /** Deletes the spill data */
     ~Data();
-  
+
     /** Set the spill data
      *
      *  Data now takes ownership of memory allocated to spill
@@ -59,7 +59,6 @@ class Data {
     Spill* _spill;
     ClassDef(Data, 1)
 };
-
 }
 
 #endif

@@ -40,7 +40,6 @@ SpillProcessor::SpillProcessor() :_mc_array_proc(new MCEventProcessor()),
                                                   &Spill::SetSpillNumber, true);
     RegisterValueBranch("errors", &_error_proc, &Spill::GetErrors,
                                                   &Spill::SetErrors, true);
-
 }
 }
 

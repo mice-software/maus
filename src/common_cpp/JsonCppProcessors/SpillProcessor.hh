@@ -18,6 +18,7 @@
 #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_SPILLPROCESSOR_HH_
 
 #include <vector>
+#include <string>
 
 #include "json/value.h"
 
