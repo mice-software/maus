@@ -21,6 +21,8 @@
 
 namespace MAUS {
 
+/** Data is sitting above the Spill
+ */
 TEST(SpillTest, DataTest) {
     Data data_1;
     Spill* spill_1 = new Spill();
