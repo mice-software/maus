@@ -1,3 +1,3 @@
 """
-Celery package.
+Document store package.
 """

@@ -42,7 +42,7 @@ def install_python_tests(maus_root_dir, env):
         if os.path.isdir(subdir):
             pos = len(target)
             subdir_mod = subdir[pos:]
-            test_files = glob.glob(subdir+"/test_*.py")                   
+            test_files = glob.glob(subdir+"/*.py")                   
             env.Install(build+subdir_mod, test_files)
 
 def build_lib_maus_cpp(env):
@@ -115,6 +115,7 @@ def build_data_structure(env):
     data_items = [item for item in data_items if item[-7:] != '-inl.hh']
     # LinkDef.hh must be last
     data_items.sort(key = lambda x: x.find('LinkDef.hh')) 
+    data_items = filter(lambda x: x[-7:] != '-inl.hh', data_items)
     dict_target = (data_struct+'/MausDataStructure.cc')
     proc_target = ['rootcint']+['-f', dict_target, '-c']
     for include in env['CPPPATH']:

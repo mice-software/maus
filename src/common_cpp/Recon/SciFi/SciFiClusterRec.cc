@@ -79,6 +79,10 @@ void SciFiClusterRec::process(SciFiEvent &evt, std::vector<const MiceModule*> mo
 void SciFiClusterRec::construct(SciFiCluster *clust, std::vector<const MiceModule*> modules) {
   Hep3Vector perp(-1., 0., 0.);
   Hep3Vector dir(0, 1, 0);
+  int tracker = clust->get_tracker();
+  int station = clust->get_station();
+  int plane   = clust->get_plane();
+
   const MiceModule* this_plane = NULL;
   for ( unsigned int j = 0; !this_plane && j < modules.size(); j++ ) {
     // Find the right module
@@ -86,11 +90,11 @@ void SciFiClusterRec::construct(SciFiCluster *clust, std::vector<const MiceModul
          modules[j]->propertyExists("Station", "int") &&
          modules[j]->propertyExists("Plane", "int")  &&
          modules[j]->propertyInt("Tracker") ==
-         clust->get_tracker() &&
+         tracker &&
          modules[j]->propertyInt("Station") ==
-         clust->get_station() &&
+         station &&
          modules[j]->propertyInt("Plane") ==
-         clust->get_plane() ) {
+         plane ) {
          // Save the module
       this_plane = modules[j];
     }
@@ -118,6 +122,13 @@ void SciFiClusterRec::construct(SciFiCluster *clust, std::vector<const MiceModul
 
   clust->set_position(tracker_ref_frame_pos);
   clust->set_direction(dir);
+  // Set relative position & channel number for the Kalman Filter.
+  Hep3Vector relative_position = position - this_plane->globalPosition();
+  double channel = clust->get_channel() - CentralFibre;
+  clust->set_relative_position(relative_position);
+  clust->set_alpha(channel);
+  int id = tracker + 3*(station-1) + (plane);
+  clust->set_id(id);
 }
 
 Hep3Vector SciFiClusterRec::get_reference_frame_pos(int tracker,

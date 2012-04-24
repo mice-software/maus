@@ -60,8 +60,8 @@ class ReducePyMatplotlibTester(ReducePyMatplotlibHistogram):
             raise Exception("error")
         ReducePyMatplotlibHistogram._rescale_axes( \
             self, self._histogram, 0, 1, 0, 1)
-        image_doc = ReducePyMatplotlibHistogram._create_image_json( \
-            self, "content", "test", self._histogram)
+        image_doc = ReducePyMatplotlibHistogram._get_image_doc( \
+            self, ["keywords"], "description", "test", self._histogram)
         return [image_doc]
 
     def _cleanup_at_death(self):
@@ -294,7 +294,8 @@ class ReducePyMatplotlibHistogramTestCase(unittest.TestCase): # pylint: disable=
         else:
             tag = "test"
         self.assertEquals(tag, image["tag"], "Unexpected tag")
-        self.assertTrue("content" in image, "No content field")
+        self.assertTrue("keywords" in image, "No keywords field")
+        self.assertTrue("description" in image, "No description field")
         self.assertTrue("data" in image, "No data field")
         decoded_data = base64.b64decode(image["data"])
         self.assertTrue(decoded_data.find("EPS") != -1,
