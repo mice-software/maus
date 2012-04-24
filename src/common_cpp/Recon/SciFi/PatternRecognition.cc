@@ -40,71 +40,68 @@ PatternRecognition::~PatternRecognition() {
   // Do nothing
 };
 
-// For the moment this just calls the straight PR,
-// in future it should choose between helical or straight PR
 void PatternRecognition::process(SciFiEvent &evt) {
+
   std::cout << "\nBegining Pattern Recognition" << std::endl;
   std::cout << "Number of spacepoints in spill: " << evt.spacepoints().size() << std::endl;
+
   if ( static_cast<int>(evt.spacepoints().size()) > 0 ) {
-    straight_track_recon(evt);
+
+    // Split spacepoints up according to which tracker they occured in and set used flag to false
+    std::vector< std::vector<SciFiSpacePoint*> > spnts_by_tracker(_n_trackers);
+    for ( int trker_no = 0; trker_no < _n_trackers; ++trker_no ) {  // Loop over trackers
+      for ( unsigned int i = 0; i < evt.spacepoints().size(); ++i ) {  // Loop over spacepoints
+        evt.spacepoints()[i]->set_used(false);
+        if ( evt.spacepoints()[i]->get_tracker() == trker_no ) {
+          spnts_by_tracker[trker_no].push_back(evt.spacepoints()[i]);
+        }
+      } // ~Loop over spacepoints
+    } // ~Loop over trackers
+
+    // Loop over trackers
+    for ( int trker_no = 0; trker_no < _n_trackers; ++trker_no ) {
+      std::cout << "Reconstructing for Tracker " << trker_no + 1 << std::endl;
+
+      // Split spacepoints according to which station they occured in
+      std::vector< std::vector<SciFiSpacePoint*> > spnts_by_station(_n_stations);
+      sort_by_station(spnts_by_tracker[trker_no], spnts_by_station);
+
+      // Count how many stations have at least one *unused* spacepoint
+      int num_stations_hit = num_stations_with_unused_spnts(spnts_by_station);
+
+      // Make the tracks depending on how many stations have spacepoints in them
+      if (num_stations_hit == 5) {
+        std::vector<SciFiStraightPRTrack> trks;
+        make_5tracks(spnts_by_station, trks);
+        for ( int i = 0; i < static_cast<int>(trks.size()); ++i ) {
+          trks[i].set_tracker(trker_no);
+          evt.add_straightprtrack(trks[i]);
+        }
+      }
+      if (num_stations_hit > 3) {
+        std::vector<SciFiStraightPRTrack> trks;
+        make_4tracks(spnts_by_station, trks);
+        for ( int i = 0; i < static_cast<int>(trks.size()); ++i ) {
+          trks[i].set_tracker(trker_no);
+          evt.add_straightprtrack(trks[i]);
+        }
+      }
+      if (num_stations_hit > 2) {
+        std::vector<SciFiStraightPRTrack> trks;
+        make_3tracks(spnts_by_station, trks);
+        for ( int i = 0; i < static_cast<int>(trks.size()); ++i ) {
+          trks[i].set_tracker(trker_no);
+          evt.add_straightprtrack(trks[i]);
+        }
+      }
+      std::cout << "Finished Tracker " << trker_no + 1 << std::endl;
+    }// ~Loop over trackers
+    std::cout << "Number of tracks found: " << evt.straightprtracks().size() << "\n\n";
+
   } else {
     std::cout << "No spacepoints in event" << std::endl;
   }
 };
-
-void PatternRecognition::straight_track_recon(SciFiEvent &evt) {
-  // Split spacepoints up according to which tracker they occured in and set used flag to false
-  std::vector< std::vector<SciFiSpacePoint*> > spnts_by_tracker(_n_trackers);
-  for ( int trker_no = 0; trker_no < _n_trackers; ++trker_no ) {  // Loop over trackers
-    for ( unsigned int i = 0; i < evt.spacepoints().size(); ++i ) {  // Loop over spacepoints
-      evt.spacepoints()[i]->set_used(false);
-      if ( evt.spacepoints()[i]->get_tracker() == trker_no ) {
-        spnts_by_tracker[trker_no].push_back(evt.spacepoints()[i]);
-      }
-    } // ~Loop over spacepoints
-  } // ~Loop over trackers
-
-  // Loop over trackers
-  for ( int trker_no = 0; trker_no < _n_trackers; ++trker_no ) {
-
-     std::cout << "Reconstructing for Tracker " << trker_no + 1 << std::endl;
-
-    // Split spacepoints according to which station they occured in
-    std::vector< std::vector<SciFiSpacePoint*> > spnts_by_station(_n_stations);
-    sort_by_station(spnts_by_tracker[trker_no], spnts_by_station);
-
-    // Count how many stations have at least one *unused* spacepoint
-    int num_stations_hit = num_stations_with_unused_spnts(spnts_by_station);
-
-    // Make the tracks depending on how many stations have spacepoints in them
-    if (num_stations_hit == 5) {
-      std::vector<SciFiStraightPRTrack> trks;
-      make_5tracks(spnts_by_station, trks );
-      for ( int i = 0; i < static_cast<int>(trks.size()); ++i ) {
-        trks[i].set_tracker(trker_no);
-        evt.add_straightprtrack(trks[i]);
-      }
-    }
-    if (num_stations_hit > 3) {
-      std::vector<SciFiStraightPRTrack> trks;
-      make_4tracks(spnts_by_station, trks);
-      for ( int i = 0; i < static_cast<int>(trks.size()); ++i ) {
-        trks[i].set_tracker(trker_no);
-        evt.add_straightprtrack(trks[i]);
-      }
-    }
-    if (num_stations_hit > 2) {
-      std::vector<SciFiStraightPRTrack> trks;
-      make_3tracks(spnts_by_station, trks);
-      for ( int i = 0; i < static_cast<int>(trks.size()); ++i ) {
-        trks[i].set_tracker(trker_no);
-        evt.add_straightprtrack(trks[i]);
-      }
-    }
-     std::cout << "Finished Tracker " << trker_no + 1 << std::endl;
-  }// ~Loop over trackers
-  std::cout << "Number of tracks found: " << evt.straightprtracks().size() << "\n\n";
-}
 
 void PatternRecognition::make_5tracks(
                          std::vector< std::vector<SciFiSpacePoint*> >& spnts_by_station,
@@ -260,93 +257,139 @@ void PatternRecognition::make_straight_tracks(const int num_points,
   // Set inner and outer stations
   int outer_station_num = -1, inner_station_num = -1;
   set_end_stations(ignore_stations, outer_station_num, inner_station_num);
-  // std::cout << "outer station: " << outer_station_num << " inner station: ";
-  // std::cout << inner_station_num << std::endl;
 
   // Loop over spacepoints in outer station
   for ( int station_outer_sp = 0;
         station_outer_sp < static_cast<int>(spnts_by_station[outer_station_num].size());
         ++station_outer_sp ) {
 
-    // std::cout << "Looking at outer station sp " << station_outer_sp << std::endl;
-
     // Check the outer spacepoint is unused and enough stations are left with unused sp
-    // std::cout << "Checking outer sp is unused and enough occupied stations are left...\n";
     if ( !spnts_by_station[outer_station_num][station_outer_sp]->get_used() &&
          num_stations_with_unused_spnts(spnts_by_station) >= num_points) {
-     // std::cout << "...yes, continuing" << std::endl;
 
       // Loop over spacepoints in inner station
       for ( int station_inner_sp = 0;
           station_inner_sp < static_cast<int>(spnts_by_station[inner_station_num].size());
           ++station_inner_sp ) {
 
-        // std::cout << "Looking at inner station sp " << station_inner_sp << std::endl;
-
         // Check the inner spacepoint is unused and enough stations are left with unused sp
-        // std::cout << "Checking inner sp is unused and enough occupied stations are left...\n";
         if ( !spnts_by_station[inner_station_num][station_inner_sp]->get_used() &&
              num_stations_with_unused_spnts(spnts_by_station) >= num_points ) {
-         // std::cout << "...yes, continuing" << std::endl;
 
-          // Map to hold the good spacepoints in each station
-          std::map<int, SciFiSpacePoint*> good_spnts;
+          // Vector to hold the good spacepoints in each station
+          std::vector<SciFiSpacePoint*> good_spnts;
+          // good_spnts.resize(num_points);
 
-          // Form a line between the outer and inner station spacepoints, and find the
-          // spacepoints in the intermediate stations which best match this line
-          initial_line(spnts_by_station, ignore_stations,
-                       outer_station_num, inner_station_num,
-                       station_outer_sp, station_inner_sp, good_spnts);
+          // Set variables to hold which stations are to be ignored
+          int ignore_station_1 = -1, ignore_station_2 = -1;
+          set_ignore_stations(ignore_stations, ignore_station_1, ignore_station_2);
+
+          // Draw a straight line between spacepoints in outer most and inner most stations
+          SimpleLine line_x, line_y;
+          draw_line(spnts_by_station[outer_station_num][station_outer_sp],
+                    spnts_by_station[inner_station_num][station_inner_sp],
+                    line_x, line_y);
+
+          // Loop over intermediate stations and compare spacepoints with the line
+          for ( int station_num = inner_station_num + 1;
+                station_num < outer_station_num; ++station_num ) {
+            if (station_num != ignore_station_1 && station_num != ignore_station_2) {
+
+              double delta_sq = 1000000;  // A large number so initial value is set as best first
+
+              for ( int sp_no = 0;
+                    sp_no < static_cast<int>(spnts_by_station[station_num].size()); ++sp_no ) {
+
+                // If the spacepoint has not already been used in a track fit
+                if ( !spnts_by_station[station_num][sp_no]->get_used() ) {
+                  Hep3Vector pos = spnts_by_station[station_num][sp_no]->get_position();
+
+                  // Calculate the residuals
+                  double dx = pos.x() - ( line_x.get_c() + ( pos.z() * line_x.get_m() ) );
+                  double dy = pos.y() - ( line_y.get_c() + ( pos.z() * line_y.get_m() ) );
+
+                  // Apply roadcuts & find the spacepoints with the smallest residuals for the line
+                  if ( fabs(dx) < _res_cut && fabs(dy) < _res_cut && delta_sq > (dx*dx + dy*dy) ) {
+                    delta_sq = dx*dx + dy*dy;
+                    good_spnts.push_back(spnts_by_station[station_num][sp_no]);
+                  } // ~If pass roadcuts and beats previous best fit point
+                } // ~If spacepoint is unused
+              } // ~Loop over spacepoints
+            } // ~if (station_num != ignore_station)
+          } // ~Loop over intermediate stations
+
+          // Clear the line objects so we can reuse them
+          line_x.clear();
+          line_y.clear();
 
           // Check we have at least 1 good spacepoint in each of the intermediate stations
-          std::cout << "Number of intermediate stations with good sp: ";
-          std::cout << good_spnts.size() << std::endl;
+          std::cout << "Num of intermediate stations with good sp: " << good_spnts.size() << "\n";
+
           if ( static_cast<int>(good_spnts.size()) > (num_points - 3) ) {
             std::cout << "Found good spacepoints in all stations, fitting a track..." << std::endl;
-            good_spnts[outer_station_num] = spnts_by_station[outer_station_num][station_outer_sp];
-            good_spnts[inner_station_num] = spnts_by_station[inner_station_num][station_inner_sp];
+
+            good_spnts.insert(good_spnts.begin(),
+                              spnts_by_station[inner_station_num][station_inner_sp]);
+            good_spnts.push_back(spnts_by_station[outer_station_num][station_outer_sp]);
+
+            std::vector<double> _z;
+            std::vector<double> _x;
+            std::vector<double> _x_err;
+            std::vector<double> _y;
+            std::vector<double> _y_err;
+
+            for ( int i = 0; i < static_cast<int>(good_spnts.size()); ++i ) {
+              double z_i = good_spnts[i]->get_position().z();
+              double x_i = good_spnts[i]->get_position().x();
+              double y_i = good_spnts[i]->get_position().y();
+
+              _z.push_back(z_i);
+              _x.push_back(x_i);
+              _y.push_back(y_i);
+
+              // The error on the position measurements of sp in a tracker (same in x and y)
+              double sd = -1.0;
+
+              if ( good_spnts[i]->get_station() == 5 )
+                sd = _sd_5;
+              else
+                sd = _sd_1to4;
+
+              _x_err.push_back(sd);
+              _y_err.push_back(sd);
+            }
 
             // Fit track
             SimpleLine line_x, line_y;
-            linear_fit(good_spnts, line_x, line_y);
+            linear_fit(_z, _x, _x_err, line_x);
+            linear_fit(_z, _y, _y_err, line_y);
+            // linear_fit(good_spnts, line_x, line_y);
 
-            // Check track passes chisq test
-             if ( ( line_x.get_chisq() / ( num_points - 2 ) < _chisq_cut ) &&
-                  ( line_y.get_chisq() / ( num_points - 2 ) < _chisq_cut ) ) {
-              std:: cout << "**chisq test passed, adding " << num_points << "pt track" << std::endl;
-             std::cout << " x0 = " << line_x.get_c() << "\tmx = " << line_x.get_m();
-             std::cout << " chisq_x = " << line_x.get_chisq() << std::endl;
-             std::cout << " y0 = " << line_y.get_c() << "\tmy = " << line_y.get_m();
-             std::cout << " chisq_y = " << line_y.get_chisq() << std::endl;
+            // Check track passes chisq test, then create SciFiStraightPRTrack
+            if ( ( line_x.get_chisq() / ( num_points - 2 ) < _chisq_cut ) &&
+                 ( line_y.get_chisq() / ( num_points - 2 ) < _chisq_cut ) ) {
 
-              // Create a SciFi PR track
-              SciFiStraightPRTrack track;
-              track.set_num_points(num_points);
-              track.set_x0(line_x.get_c());
-              track.set_mx(line_x.get_m());
-              track.set_x_chisq(line_x.get_chisq());
-              track.set_y0(line_y.get_c());
-              track.set_my(line_y.get_m());
-              track.set_y_chisq(line_y.get_chisq());
+              std::cout << "** chisq test passed, adding " << num_points << "pt track **\n";
 
-              // Convert the map holding the good spacepoints into a std vector
-              std::vector<SciFiSpacePoint> good_spacepoints;
-              for ( std::map<int, SciFiSpacePoint*>::iterator ii = good_spnts.begin();
-                    ii != good_spnts.end(); ++ii ) {
-                // Sets the flag for each sp to used = true.
-                // This will also set used = true for the other sp containers too,
-                // as we are using pointers to the same sp in each container.
-                (*ii).second->set_used(true);
-                good_spacepoints.push_back(*((*ii).second));
+              SciFiStraightPRTrack track(-1, num_points, line_x, line_y);
+
+              // Set all the good sp to used and convert pointers to variables
+              std::vector<SciFiSpacePoint> good_spnts_variables;
+              good_spnts_variables.resize(good_spnts.size());
+
+              for ( int i = 0; i < static_cast<int>(good_spnts.size()); ++i ) {
+                good_spnts[i]->set_used(true);
+                good_spnts_variables[i] = *good_spnts[i];
               }
+
               // Populate the sp of the track and then push the track back into the trks vector
-              track.set_spacepoints(good_spacepoints);
+              track.set_spacepoints(good_spnts_variables);
               trks.push_back(track);
 
             } else {
               std::cout << "x_chisq = " << line_x.get_chisq();
               std::cout << "\ty_chisq = " << line_y.get_chisq() << std::endl;
-              std:: cout << "chisq test failed, " << num_points << "pt track rejected" << std::endl;
+              std::cout << "chisq test failed, " << num_points << "pt track rejected" << std::endl;
             } // ~Check track passes chisq test
           } // ~ if ( good_spnts.size() > 1 )
         } else {
@@ -359,374 +402,172 @@ void PatternRecognition::make_straight_tracks(const int num_points,
   } // ~Loop over sp in station 5
 }
 
-void PatternRecognition::initial_line(
-       const std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
-       const std::vector<int> ignore_stations,
-       const int outer_station_num, const int inner_station_num,
-       const int station_outer_sp, const int station_inner_sp,
-       std::map<int, SciFiSpacePoint*> &good_spnts) {
+void PatternRecognition::linear_fit(const std::vector<double> &_x, const std::vector<double> &_y,
+                                    const std::vector<double> &_y_err, SimpleLine &line) {
 
-  int ignore_station_1 = -1, ignore_station_2 = -1;
-  if ( ignore_stations.size() == 0 ) {
-     // Leave ignore stations as -1
-  } else if ( ignore_stations.size() == 1 ) {
-    ignore_station_1 = ignore_stations[0];
-  } else if ( ignore_stations.size() == 2 ) {
-    ignore_station_1 = ignore_stations[0];
-    ignore_station_2 = ignore_stations[1];
-  } else if ( ignore_stations.size() > 2 ) {
-      std::cout << "Error: Invalid ignore station argument." << std::endl;
-      return;
-  }
-
-  // Draw a straight line between spacepoints in outer most and inner most stations
-  Hep3Vector pos_outer = spnts_by_station[outer_station_num][station_outer_sp]->get_position();
-  Hep3Vector pos_inner = spnts_by_station[inner_station_num][station_inner_sp]->get_position();
-
-  double m_xi = ( pos_inner.x() - pos_outer.x()) / (pos_inner.z() - pos_outer.z() );
-  double m_yi = ( pos_inner.y() - pos_outer.y()) / (pos_inner.z() - pos_outer.z() );
-
-  double x_0i = pos_outer.x() - ( pos_outer.z() * m_xi );
-  double y_0i = pos_outer.y() - ( pos_outer.z() * m_yi );
-
-  std::cout << "m_xi = " << m_xi << "\tx_0i = " << x_0i << std::endl;
-  std::cout << "m_yi = " << m_yi << "\ty_0i = " << y_0i << std::endl;
-
-  std::cout << "inner_station_num = " << inner_station_num << std::endl;
-  std::cout << "outer_station_num = " << outer_station_num << std::endl;
-
-  // Loop over intermediate stations and compare spacepoints with the line
-  for ( int station_num = inner_station_num + 1;
-        station_num < outer_station_num; ++station_num ) {
-    if (station_num != ignore_station_1 && station_num != ignore_station_2) {
-      double delta_sq = 1000000;
-      for ( int sp_no = 0;
-            sp_no < static_cast<int>(spnts_by_station[station_num].size()); ++sp_no ) {
-        if ( !spnts_by_station[station_num][sp_no]->get_used() ) {
-          Hep3Vector pos = spnts_by_station[station_num][sp_no]->get_position();
-          // Calculate the residuals
-          double dx = pos.x() - ( x_0i + ( pos.z() * m_xi ) );
-          double dy = pos.y() - ( y_0i + ( pos.z() * m_yi ) );
-          // Apply roadcuts & find the spacepoints with the smallest residuals for the line
-          if ( fabs(dx) < _res_cut && fabs(dy) < _res_cut && delta_sq > (dx*dx + dy*dy) ) {
-            delta_sq = dx*dx + dy*dy;
-            good_spnts[station_num] = spnts_by_station[station_num][sp_no];
-          } // ~If pass roadcuts and beats previous best fit point
-        } // ~If spacepoint is unused
-      } // ~Loop over spacepoints
-    } // ~if (station_num != ignore_station)
-  } // ~Loop over intermediate stations
-} // ~initial_line(...)
-
-void PatternRecognition::linear_fit(const std::map<int, SciFiSpacePoint*> &spnts,
-                                    SimpleLine &line_x, SimpleLine &line_y) {
-
-  int num_points = spnts.size();
+  int num_points = static_cast<int>(_x.size());
 
   CLHEP::HepMatrix A(num_points, 2); // rows, columns
   CLHEP::HepMatrix V(num_points, num_points); // error matrix
-  CLHEP::HepMatrix X(num_points, 1); // measurements
   CLHEP::HepMatrix Y(num_points, 1); // measurements
 
-  int counter = 0;
-  for ( std::map<int, SciFiSpacePoint*>::const_iterator ii = spnts.begin();
-       ii != spnts.end(); ++ii ) {
+  for ( int i = 0; i < static_cast<int>(_x.size()); ++i ) {
 
-    double sd = -1.0;
-    if ( (*ii).first == 5 )
-      sd = _sd_5;
-    else
-      sd = _sd_1to4;
-
-    A[counter][0] = 1;
-    A[counter][1] = (*ii).second->get_position().z();
-    V[counter][counter] = ( sd * sd );
-    X[counter][0] = (*ii).second->get_position().x();
-    Y[counter][0] = (*ii).second->get_position().y();
-
-    ++counter;
+    A[i][0] = 1;
+    A[i][1] = _x[i];
+    V[i][i] = ( _y_err[i] * _y_err[i] );
+    Y[i][0] = _y[i];
   }
 
-  CLHEP::HepMatrix At, tmpx, tmpy, xparams, yparams;
+  CLHEP::HepMatrix At, tmpy, yparams;
 
   int ierr;
   V.invert(ierr);
-
   At = A.T();
-  tmpx = At * V * A;
-  tmpx.invert(ierr);
-  xparams = tmpx * At * V * X;
 
   tmpy = At * V * A;
   tmpy.invert(ierr);
   yparams = tmpy * At * V * Y;
 
-  line_x.set_c(xparams[0][0]);
-  line_x.set_m(xparams[1][0]);
-  line_x.set_c_err(sqrt(tmpx[0][0]));
-  line_x.set_m_err(sqrt(tmpx[1][1]));
+  line.set_c(yparams[0][0]);
+  line.set_m(yparams[1][0]);
+  line.set_c_err(sqrt(tmpy[0][0]));
+  line.set_m_err(sqrt(tmpy[1][1]));
 
-  line_y.set_c(yparams[0][0]);
-  line_y.set_m(yparams[1][0]);
-  line_y.set_c_err(sqrt(tmpy[0][0]));
-  line_y.set_m_err(sqrt(tmpy[1][1]));
+  CLHEP::HepMatrix C, result;
 
-  CLHEP::HepMatrix C, D, result;
-
-  C = X - (A * xparams);
+  C = Y - (A * yparams);
   result = C.T() * V * C;
-  line_x.set_chisq(result[0][0]);
-  line_x.set_chisq_dof(result[0][0] / num_points);
-
-  D = Y - (A * yparams);
-  result = D.T()* V * D;
-  line_y.set_chisq(result[0][0]);
-  line_y.set_chisq_dof(result[0][0] / num_points);
-
-  /*
-
-  // Set up C style arrays for gsl fitter
-  double x[num_points];
-  double y[num_points];
-  double z[num_points];
-
-  int counter = 0;
-  for ( std::map<int, SciFiSpacePoint*>::const_iterator ii = spnts.begin();
-        ii != spnts.end(); ++ii ) {
-    x[counter] = (*ii).second->get_position().x();
-    y[counter] = (*ii).second->get_position().y();
-    z[counter] = (*ii).second->get_position().z();
-    ++counter;
-  }
-
-  // Set up variables to hold gsl fitter results
-  double c_x, m_x, cov_x00, cov_x01, cov_x11, chisq_x;
-  double c_y, m_y, cov_y00, cov_y01, cov_y11, chisq_y;
-
-  // Perform the fit
-  gsl_fit_linear(z, 1, x, 1, num_points,
-                  &c_x, &m_x, &cov_x00, &cov_x01, &cov_x11,
-                  &chisq_x);
-
-  gsl_fit_linear(z, 1, y, 1, num_points,
-                  &c_y, &m_y, &cov_y00, &cov_y01, &cov_y11,
-                  &chisq_y);
-
-  // Write some output to screen
-  std::cout << "Track parameters x: c = " << c_x << ", m = ";
-  std::cout << m_x << ", chisq = " << chisq_x << std::endl;
-  std::cout << "Track parameters y: c = " << c_y << ", m = ";
-  std::cout << m_y << ", chisq = " << chisq_y << std::endl;
-  std::cout << "sp\tx\ty\tz" << std::endl;
-  for ( int i = 0; i < _n_stations; ++i ) {
-    std::cout << i << "\t" << x[i] << "\t" << y[i] << "\t" << z[i] << std::endl;
-  }
-
-  // Return the lines in x and y
-  line_x.set_parameters(c_x, m_x, chisq_x);
-  line_y.set_parameters(c_y, m_y, chisq_y);
-
-  */
+  line.set_chisq(result[0][0]);
+  line.set_chisq_dof(result[0][0] / num_points);
 }
 
-void PatternRecognition::make_helix(
-       const std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
-       const std::vector<int> ignore_stations,
-       const int outer_station_num, const int inner_station_num,
-       const int station_outer_sp, const int station_inner_sp,
-       std::map<int, SciFiSpacePoint*> &good_spnts,
-       std::vector<SciFiStraightPRTrack> &trks) {
+void PatternRecognition::make_helix(const int num_points, const std::vector<int> ignore_stations,
+                                    std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
+                                    std::vector<SciFiStraightPRTrack> &trks) {
+  // Set inner and outer stations
+  int outer_station_num = -1, inner_station_num = -1;
+  set_end_stations(ignore_stations, outer_station_num, inner_station_num);
 
-  int ignore_station_1 = -1, ignore_station_2 = -1;
-  if ( ignore_stations.size() == 0 ) {
-     // Leave ignore stations as -1
-  } else if ( ignore_stations.size() == 1 ) {
-    ignore_station_1 = ignore_stations[0];
-  } else if ( ignore_stations.size() == 2 ) {
-    ignore_station_1 = ignore_stations[0];
-    ignore_station_2 = ignore_stations[1];
-  } else if ( ignore_stations.size() > 2 ) {
-      std::cout << "Error: Invalid ignore station argument." << std::endl;
-      return;
-  }
+  // Set intermediate station number to be inner_station_num + 1
+  int intermed_station_num = inner_station_num + 1;
 
-  SimpleCircle circle1;
+  // Loop over spacepoints in outer station
+  for ( int station_outer_sp = 0;
+        station_outer_sp < static_cast<int>(spnts_by_station[outer_station_num].size());
+        ++station_outer_sp ) {
 
-  // Find the circle that fits uniquely to the 3 spacepoints: from inner, outer
-  // and intermediate stations
-  Hep3Vector pos_outer = spnts_by_station[outer_station_num][station_outer_sp]->get_position();
-  Hep3Vector pos_inner = spnts_by_station[inner_station_num][station_inner_sp]->get_position();
+    // Check the outer spacepoint is unused and enough stations are left with unused sp
+    if ( !spnts_by_station[outer_station_num][station_outer_sp]->get_used() &&
+         num_stations_with_unused_spnts(spnts_by_station) >= num_points) {
 
-  // Loop over intermediate stations to find one more spacepoint for circle seed
-  for ( int mid_station_num = inner_station_num + 1;
-        mid_station_num < outer_station_num; ++mid_station_num ) {
-    if (mid_station_num != ignore_station_1 && mid_station_num != ignore_station_2) {
-      for ( int sp_no = 0;
-            sp_no < static_cast<int>(spnts_by_station[mid_station_num].size()); ++sp_no ) {
-        if ( !spnts_by_station[mid_station_num][sp_no]->get_used() ) {
-          Hep3Vector pos_medium = spnts_by_station[mid_station_num][sp_no]->get_position();
-          // Send off the three spacepoints to made the initial circle
-          bool goodcircle = initial_circle(pos_inner, pos_outer, pos_medium, circle1);
-          if ( goodcircle ) {
-            for ( int station_num = mid_station_num + 1;
-                  station_num < outer_station_num; ++station_num ) {
-              if (station_num != ignore_station_1 && station_num != ignore_station_2) {
-               /* for ( int sp
-                Hep3Vector pos_interm = spnts_by_station[station_num][]
-                double dR = delta_R(circle1, pos_intermediate);
-                if (dr < R_cut)
-                  // proceed...
-*/
-              } // ~if (station_num != ignore_station)
-            } // ~Loop over intermediate stations not used in seed
-          } // ~If the seed circle is formed correctly with finite radius
- /*         // Apply roadcuts & find the spacepoints with the smallest residuals for the line
-          if ( fabs(dx) < _res_cut && fabs(dy) < _res_cut && delta_sq > (dx*dx + dy*dy) ) {
-            delta_sq = dx*dx + dy*dy;
-            good_spnts[station_num] = spnts_by_station[station_num][sp_no];
-          } // ~If pass roadcuts and beats previous best fit point*/
-        } // ~If spacepoint is unused
-      } // ~Loop over spacepoints
-    } // ~if (station_num != ignore_station)
-  } // ~Loop over intermediate stations
-} // ~initial_circle(...)
+      // Loop over spacepoints in inner station
+      for ( int station_inner_sp = 0;
+          station_inner_sp < static_cast<int>(spnts_by_station[inner_station_num].size());
+          ++station_inner_sp ) {
 
-bool PatternRecognition::initial_circle(CLHEP::Hep3Vector p1, CLHEP::Hep3Vector p2,
-                                        CLHEP::Hep3Vector p3, SimpleCircle circle) {
+        // Check the inner spacepoint is unused and enough stations are left with unused sp
+        if ( !spnts_by_station[inner_station_num][station_inner_sp]->get_used() &&
+             num_stations_with_unused_spnts(spnts_by_station) >= num_points ) {
 
-  CLHEP::HepMatrix a(3, 3); // Rows, columns
-  CLHEP::HepMatrix d(3, 3);
-  CLHEP::HepMatrix e(3, 3);
-  CLHEP::HepMatrix f(3, 3);
+          // Loop over spacepoints in intermediate station
+          for ( int station_intermed_sp = 0;
+              station_intermed_sp < static_cast<int>(spnts_by_station[intermed_station_num].size());
+              ++station_intermed_sp ) {
 
-  // Row 1
-  a[0][0] = p1.x();
-  a[0][1] = p1.y();
-  a[0][2] = 1.;
-  // Row 2
-  a[1][0] = p2.x();
-  a[1][1] = p2.y();
-  a[1][2] = 1.;
-  // Row 3
-  a[2][0] = p3.x();
-  a[2][1] = p3.y();
-  a[2][2] = 1.;
+            // Check the intermediate spacepoints is unused and enough stations are left with
+            // unused spacepoints
+            if ( !spnts_by_station[intermed_station_num][station_intermed_sp]->get_used() &&
+                 num_stations_with_unused_spnts(spnts_by_station) >= num_points ) {
 
-  // Row 1
-  d[0][0] = p1.x() * p1.x() + p1.y() * p1.y();
-  d[0][1] = p1.y();
-  d[0][2] = 1.;
-  // Row 2
-  d[1][0] = p2.x() * p2.x() + p2.y() * p2.y();
-  d[1][1] = p2.y();
-  d[1][2] = 1.;
-  // Row 3
-  d[2][0] = p3.x() * p3.x() + p3.y() * p3.y();
-  d[2][1] = p3.y();
-  d[2][2] = 1.;
+              // Vector to hold the good spacepoints in each station
+              std::vector<SciFiSpacePoint*> good_spnts;
+              // good_spnts.resize(num_points);
 
-  // Row 1
-  e[0][0] = p1.x() * p1.x() + p1.y() * p1.y();
-  e[0][1] = p1.x();
-  e[0][2] = 1.;
-  // Row 2
-  e[1][0] = p2.x() * p2.x() + p2.y() * p2.y();
-  e[1][1] = p2.x();
-  e[1][2] = 1.;
-  // Row 3
-  e[2][0] = p3.x() * p3.x() + p3.y() * p3.y();
-  e[2][1] = p3.x();
-  e[2][2] = 1.;
+              // Set variables to hold which stations are to be ignored
+              int ignore_station_1 = -1, ignore_station_2 = -1;
+              set_ignore_stations(ignore_stations, ignore_station_1, ignore_station_2);
 
-  // Row 1
-  f[0][0] = p1.x() * p1.x() + p1.y() * p1.y();
-  f[0][1] = p1.x();
-  f[0][2] = p1.y();
-  // Row 2
-  f[1][0] = p2.x() * p2.x() + p2.y() * p2.y();
-  f[1][1] = p2.x();
-  f[1][2] = p2.y();
-  // Row 3
-  f[2][0] = p3.x() * p3.x() + p3.y() * p3.y();
-  f[2][1] = p3.x();
-  f[2][2] = p3.y();
+              SimpleCircle circle;
+              // Collect the spacepoints into a vector so that we can pass it to circle_fit
+              std::vector<SciFiSpacePoint*> tmp_spnts;
+              tmp_spnts.push_back(spnts_by_station[inner_station_num][station_inner_sp]);
+              tmp_spnts.push_back(spnts_by_station[intermed_station_num][station_intermed_sp]);
+              tmp_spnts.push_back(spnts_by_station[outer_station_num][station_outer_sp]);
 
-  double detA = a.determinant();
-  double detD = - d.determinant();
-  double detE = e.determinant();
-  double detF = - f.determinant();
+              // Fit a circle in the xy projection to 3 sp from inner, outer, and interm stations
+              circle_fit(tmp_spnts, circle);
 
-  if (detA == 0)
-    return false;
+              // Loop over other intemediate stations so that we can try adding them to the circle
+              for ( int station_num = intermed_station_num + 1;
+                    station_num < outer_station_num; ++station_num ) {
+                if (station_num != ignore_station_1 && station_num != ignore_station_2) {
 
-  double x0 = - detD / (2. * detA);
-  double y0 = - detE / (2. * detA);
+                  for ( int sp_no = 0;
+                        sp_no < static_cast<int>(spnts_by_station[station_num].size()); ++sp_no ) {
 
-  double det = ( detD * detD + detE * detE ) / (4. * detA * detA ) - ( detF / detA );
+                    // If the spacepoint has not already been used in a track fit
+                    if ( !spnts_by_station[station_num][sp_no]->get_used() ) {
+                      Hep3Vector pos = spnts_by_station[station_num][sp_no]->get_position();
 
-  if (det < 0.)
-    return false;
+                      // Calculate the residual dR
+                      double dR = delta_R(circle, pos);
 
-  double r = sqrt(det); // mm
+                      // Apply roadcut to see if spacepoint belongs to same circle
+                      if ( fabs(dR) < _R_res_cut )
+                        good_spnts.push_back(spnts_by_station[station_num][sp_no]);
+                    } // ~If intermediate station spacepoint is unused
+                  } // ~Loop over intermediate staion spacepoints
+                } // ~if (station_num != ignore_station)
+              } // ~Loop over intermediate stations not used in initial circle_fit
 
-  circle.set_x0(x0);
-  circle.set_y0(y0);
-  circle.set_R(r);
+              // Clear the circle object so we can reuse it
+              circle.clear();
 
-  return true;
-}
+              // Check we have at least 1 good spacepoint in each of the intermediate stations
+              std::cout << "Num of intermediate stations w/ good sp: " << good_spnts.size() << "\n";
 
-double PatternRecognition::delta_R(SimpleCircle circle, CLHEP::Hep3Vector pos) {
+              if ( static_cast<int>(good_spnts.size()) > (num_points - 2) ) {
+                std::cout << "Found good spnts in all stations, fitting a track..." << std::endl;
 
-  double x0 = circle.get_x0();
-  double y0 = circle.get_y0();
-  double R = circle.get_R();
+                good_spnts.insert(good_spnts.begin(),
+                                  spnts_by_station[inner_station_num][station_inner_sp]);
+                good_spnts.push_back(spnts_by_station[outer_station_num][station_outer_sp]);
 
-  double R_i = sqrt((pos.x() - x0)*(pos.x() - x0) + (pos.y() - y0)*(pos.y() - y0));
+                // Perform another circle fit now that we have found all of the good spnts
+                circle_fit(good_spnts, circle);
 
-  double delta = R_i - R;
+                // Check circle fit passes chisq test
+                if ( circle.get_chisq() / ( num_points - 2 ) < _chisq_cut ) {
+                  std::cout << "** chisq circle test passed, moving onto linear fit in s-z **\n";
 
-  return delta;
-}
+                  SimpleLine line_sz;
+                  std::vector<double> dphi;
+                  calculate_dipangle(good_spnts, circle, dphi, line_sz);
 
-void PatternRecognition::determine_dipangle(const std::map<int, SciFiSpacePoint*> &spnts,
-                                            SimpleCircle circle, SimpleLine line_sz) {
+                  // Check linear fit passes chisq test, then perform full helix fit
+                  if ( line_sz.get_chisq() / ( num_points - 2 ) < _chisq_cut ) {
+                  std::cout << "** line in s-z chisq test passed, moving on to full helix fit**\n";
+                  circle.set_turning_angle(dphi); // The turning angles will be needed in helix fit
+                  full_helix_fit(good_spnts, circle, line_sz); // eventually need to pass helix.
+                  } else {
+                    std::cout << "sz chisq = " << line_sz.get_chisq();
+                    std::cout << "sz chisq test failed, " << num_points << "track rejected" << "\n";
+                  } // ~Check s-z line passes chisq test
+                } else { // ~ last end bracket was for circle chisq cut test passed
+                  std::cout << "circle chisq = " << circle.get_chisq();
+                  std::cout << "circle chisq test failed, track rejected" << "\n";
+                } // ~circle fail chisq test
+              } // ~if enough spacepoints are found for fit (must be at least 3)
+            } // ~if intmediate station sp unused
+          } // ~Loop over intermediate station spacepoints
+        } // ~If inner station spacepoint is unused
+      } // ~Loop over inner station spacepoints
+    } // ~if outer station spacepoint is unused
+  } // ~Loop over outer station spacepoints
+} // ~make_helix(...)
 
-  std::vector<double> phiz;
-  for ( std::map<int, SciFiSpacePoint*>::const_iterator ii = spnts.begin();
-       ii != spnts.end(); ++ii ) {
-    double x_pos = (*ii).second->get_position().x();
-    double y_pos = (*ii).second->get_position().y();
-    double phi = calculate_Phi(x_pos, y_pos, circle);
-
-    phiz.push_back(phi);
-
-    double z_pos = (*ii).second->get_position().z();
-  }
-  // Determine seperation between stations
-/*  std::vector<double> dz;
-    for( unsigned int i = 0; i < spnts.size(); ++i ) {
-      double z_pos_i = spnts[i]->get_position().z();
-      double z_pos_j = spnts[i+1]->get_position().z();
-      // i < j
-      double dz_ji = z_pos_j - z_pos_i; 
-      dz.push_back(dz_ji);
-    } */
-}
-
-double PatternRecognition::calculate_Phi(double xpos, double ypos, SimpleCircle circle) {
-
-  double y0 = circle.get_y0();
-  double x0 = circle.get_x0();
-  double angle = atan2(ypos - y0, xpos - x0);
-
-  if ( angle < 0. )
-    angle += 2. * pi;
-
-  return angle;
-}
-
-void PatternRecognition::circle_fit(const std::map<int, SciFiSpacePoint*> &spnts,
+void PatternRecognition::circle_fit(const std::vector<SciFiSpacePoint*> &spnts,
                                     SimpleCircle &circle) {
 
   int num_points = spnts.size();
@@ -735,26 +576,25 @@ void PatternRecognition::circle_fit(const std::map<int, SciFiSpacePoint*> &spnts
   CLHEP::HepMatrix V(num_points, num_points); // error matrix
   CLHEP::HepMatrix K(num_points, 1);
 
-  int counter = 0;
-  for ( std::map<int, SciFiSpacePoint*>::const_iterator ii = spnts.begin();
-       ii != spnts.end(); ++ii ) {
+  for ( int i = 0; i < static_cast<int>(spnts.size()); ++i ) {
 
-  // This part is subject to change once we figure out proper errors
-  double sd = -1.0;
-  if ( (*ii).first == 5 )
-    sd = _sd_5;
-  else
-    sd = _sd_1to4;
+    // This part will change once I figure out proper errors
+    double sd = -1.0;
+    if ( spnts[i]->get_station() == 5 )
+      sd = _sd_5;
+    else
+      sd = _sd_1to4;
 
-    double tmp_xpos = (*ii).second->get_position().x();
-    double tmp_ypos = (*ii).second->get_position().y();
+    double tmp_xpos = spnts[i]->get_position().x();
+    double tmp_ypos = spnts[i]->get_position().y();
 
-    A[counter][0] = ( tmp_xpos * tmp_xpos ) + ( tmp_ypos * tmp_ypos );
-    A[counter][1] = (*ii).second->get_position().x();
-    V[counter][counter] = ( sd * sd );
-    K[counter][0] = 1; // I don't entirely understand why this should be 1
+    A[i][0] = ( tmp_xpos * tmp_xpos ) + ( tmp_ypos * tmp_ypos );
+    A[i][1] = spnts[i]->get_position().x();
+    A[i][2] = spnts[i]->get_position().y();
 
-    ++counter;
+    V[i][i] = ( sd * sd );
+
+    K[i][0] = 1;
   }
 
   CLHEP::HepMatrix At, tmpx, tmp_params;
@@ -767,15 +607,17 @@ void PatternRecognition::circle_fit(const std::map<int, SciFiSpacePoint*> &spnts
   tmpx.invert(ierr);
   tmp_params = tmpx * At * V * K;
 
-  double a, b, c;
-  a = tmp_params[0][0];
-  b = tmp_params[1][0];
-  c = tmp_params[2][0];
+  // These values will be used for delta_R calculation
+  double alpha, beta, gamma;
+  alpha = tmp_params[0][0];
+  beta = tmp_params[1][0];
+  gamma = tmp_params[2][0];
 
+  // Convert the linear parameters into the circle center and radius
   double x0, y0, R;
-  x0 = -b / 2 * a;
-  y0 = -c / 2 * a;
-  R = sqrt((4 * a) + (b * b) + (c * c)) / (2 * a);
+  x0 = -beta / 2 * alpha;
+  y0 = -gamma / 2 * alpha;
+  R = sqrt((4 * alpha) + (beta * beta) + (gamma * gamma)) / (2 * alpha);
 
   circle.set_x0(x0);
   circle.set_y0(y0);
@@ -785,6 +627,13 @@ void PatternRecognition::circle_fit(const std::map<int, SciFiSpacePoint*> &spnts
   circle.set_y0_err(y0_err);
   circle.set_R_err(R_err);
   */
+  //  Stored to be used for delta_R calculation
+  circle.set_alpha(alpha);
+  circle.set_beta(beta);
+  circle.set_gamma(gamma);
+  // circle.set_alpha_err(alpha_err);
+  // circle.set_beta_err(beta_err);
+  // circle.set_gamma_err(gamma_err);
 
   CLHEP::HepMatrix C, result;
 
@@ -792,6 +641,303 @@ void PatternRecognition::circle_fit(const std::map<int, SciFiSpacePoint*> &spnts
   result = C.T() * V * C;
   double xchi2 = result[0][0];
   circle.set_chisq(xchi2 / num_points);
+}
+
+double PatternRecognition::delta_R(const SimpleCircle &circle, const CLHEP::Hep3Vector &pos) {
+
+  double alpha = circle.get_alpha();
+  double beta = circle.get_beta();
+  double gamma = circle.get_gamma();
+  double kappa = circle.get_kappa();
+
+  // Expression too long for one line so its broken down into terms
+  double t_1 = pos.x()*pos.x() + pos.y()*pos.y(); // First term
+  double t_2 = ((beta*beta) + (gamma*gamma)) / (4.*alpha*alpha); // second term
+  double t_3 = ((beta*pos.x()) + (gamma*pos.y())) / alpha; // third term
+  double t_4 = t_2 - (kappa/alpha); // Radius
+
+  double delta_R = sqrt(t_1 + t_2 + t_3 - t_4);
+  // double R_i = sqrt((pos.x() - x0)*(pos.x() - x0) + (pos.y() - y0)*(pos.y() - y0));
+
+  return delta_R;
+}
+
+void PatternRecognition::calculate_dipangle(const std::vector<SciFiSpacePoint*> &spnts,
+                                            const SimpleCircle &circle, std::vector<double> &dphi,
+                                            SimpleLine &line_sz) {
+  double R = circle.get_R();
+
+  std::vector<double> dz;
+  std::vector<double> dphi_err;
+
+  // For the linear fit in s-z, we care about the change in z vs change in s
+  // So here we calculate the values dz_ji and dphi_ji (because ds_ji = R*dphi_ji)
+  for ( int i = 0; i < static_cast<int>(spnts.size()); ++i ) {
+    int j = i + 1;
+
+    double z_i = spnts[i]->get_position().z();
+    double z_j = spnts[j]->get_position().z();
+    double dz_ji = z_j - z_i;
+    dz.push_back(dz_ji);
+
+    double x_i = spnts[i]->get_position().x();
+    double y_i = spnts[i]->get_position().y();
+    double phi_i = calculate_Phi(x_i, y_i, circle);
+
+    double x_j = spnts[j]->get_position().x();
+    double y_j = spnts[j]->get_position().y();
+    double phi_j = calculate_Phi(x_j, y_j, circle);
+
+    double dphi_ji = phi_j - phi_i;
+    dphi.push_back(dphi_ji);
+
+    double sd_phi = -1.0;
+    if ( (spnts[i]->get_station() == 5) || (spnts[j]->get_station() == 5) )
+      sd_phi = _sd_phi_5;
+    else
+      sd_phi = _sd_phi_1to4;
+
+    dphi_err.push_back(sd_phi);
+  }
+
+    bool ok = turns_between_stations(dz, dphi);
+
+    if ( ok ) {
+      std::vector<double> ds;
+      // Multiply each element of dphi by R so that each element dphi_ji--> ds_ji
+      dphi_to_ds(R, dphi, ds);
+      linear_fit(dz, ds, dphi_err, line_sz); // Need to change dphi_err to ds_err.
+    }
+}
+
+double PatternRecognition::calculate_Phi(double xpos, double ypos, const SimpleCircle &circle) {
+
+  double angle = atan2(ypos - circle.get_y0(), xpos - circle.get_x0());
+
+  if ( angle < 0. )
+    angle += 2. * pi;
+
+  return angle;
+}
+
+bool PatternRecognition::turns_between_stations(const std::vector<double> &dz,
+                                                std::vector<double> &dphi) {
+
+  //  Make sure that you have enough points to make a line (2)
+  if ( dz.size() < 2 || dphi.size() < 2 )
+    return false;
+
+  if ( dphi[0] < 0 )
+    dphi[0] += 2 * pi;
+
+  //  Make sure that dphi is always increasing between stations
+  for ( int j = 1; j < static_cast<int>(dphi.size()); j++ ) {
+    while ( dphi[j-1] > dphi[j] )
+      dphi[j] += 2 * pi;
+  }
+
+  for ( int j = 1; j < static_cast<int>(dphi.size()) ; j++ ) {
+
+    bool good_AB = AB_ratio(dphi[j-1] , dphi[j], dz[j-1], dz[j]);
+
+    if ( good_AB )
+      return true;
+    else
+      return false; // must return false if the condition is not met for a station stepping
+  } // end j
+}
+
+bool PatternRecognition::AB_ratio(double &dphi_kj, double &dphi_ji, double dz_kj,
+                                  double dz_ji) {
+  double A, B;
+  for ( int n = 0; n < 5; ++n )
+    for ( int m = 0; m < 5; ++m ) {
+      A = ( dphi_kj + ( 2 * n * pi ) ) / ( dphi_ji + ( 2 * m * pi ) );
+      B = dz_kj / dz_ji;
+
+      std::cout << "A-B = " << fabs(A-B) << std::endl;
+
+      if ( fabs(A - B) < _AB_cut ) {
+        dphi_kj += 2 * n * pi;
+        dphi_ji += 2 * m * pi;
+
+        return true;
+      } // end m loop
+    } // end n loop
+  return false; // Return false if _ABcut is never satisfied
+}
+
+void PatternRecognition::dphi_to_ds(double R, const std::vector<double> &dphi,
+                                    std::vector<double> &ds) {
+  // This function performs scaler multiplication on the input vector.
+  for ( int i = 0; i < static_cast<int>(dphi.size()); ++i ) {
+    double ds_ji = dphi[i] * R;
+    ds.push_back(ds_ji);
+  }
+}
+
+void PatternRecognition::full_helix_fit(const std::vector<SciFiSpacePoint*> &spnts,
+                                        const SimpleCircle &circle, const SimpleLine &line_sz) {
+  // Initial parameters
+  double R = circle.get_R();
+  double Phi_0 = circle.get_turning_angle()[0]; //  Is this the right syntax?
+  double dsdz = line_sz.get_m();
+  double tan_lambda = 1 / dsdz;
+  double A, B, C;
+  A = spnts[0]->get_position().x();
+  B = spnts[0]->get_position().y();
+  C = spnts[0]->get_position().z();
+
+  // Define a helix object to hold final parameters to be passed to kalman filter
+  // SimpleHelix helix;
+
+  double small_number = 1.; // should figure out what this is and put it in the header file
+
+  // Calculate chisq with initial params
+  double chi2;
+  for ( int i = 0; i < static_cast<int>(spnts.size()); ++i ) {
+    CLHEP::Hep3Vector p = spnts[i]->get_position();
+    double phi_i = circle.get_turning_angle()[i];
+    phi_i -= Phi_0; // Everything relative to starting point.
+
+    double x_i, y_i, z_i;
+    helix_function_at_i(R, Phi_0, tan_lambda, A, B, C, phi_i, x_i, y_i, z_i);
+
+    chi2 += (p.x() - x_i)*(p.x() - x_i) + (p.y() - y_i)*(p.y() - y_i) + (p.z() - z_i)*(p.z() - z_i);
+  }
+  double best_chi2dof = chi2 / static_cast<int>(spnts.size());
+
+  // Declare adjustments to parameters and chisq that will be calculated after adjuments are made
+  double dR, dPhi_0, dtan_lambda, chi2_dof;
+  for ( chi2_dof = 0.; chi2_dof < best_chi2dof; chi2_dof = best_chi2dof ) {
+
+    calculate_adjustments(spnts, circle, R, Phi_0, tan_lambda, dR, dPhi_0, dtan_lambda, chi2_dof);
+
+    if ( chi2_dof < best_chi2dof && (best_chi2dof - chi2_dof) < small_number ) {
+      std::cout << "yay, finished" << std::endl;
+      // return a helix
+    } else if ( !(chi2_dof < best_chi2dof) ) { // meaning chi2 increased with the last iteration
+      std::cout << "Helix fit passed minimum. Revert parameters to previous iteration" << std::endl;
+      R -= dR;
+      Phi_0 -= dPhi_0;
+      tan_lambda -= dtan_lambda;
+      // return a helix
+    }
+  } // ~ chisq for loop
+}
+
+void PatternRecognition::helix_function_at_i(double R, double phi_0, double tan_lambda,
+                                             double A, double B, double C, double phi_i,
+                                             double &x_i, double &y_i, double &z_i) {
+    x_i = A + R * (cos(phi_i) - 1) * cos(phi_0) - R * sin(phi_i) * sin(phi_0);
+    y_i = B + R * (cos(phi_i) - 1) * sin(phi_0) - R * sin(phi_i) * cos(phi_0);
+    z_i = C + R * phi_i * tan_lambda;
+}
+
+void PatternRecognition::calculate_adjustments(const std::vector<SciFiSpacePoint*> &spnts,
+                                               const SimpleCircle &circle, double &R, double &phi_0,
+                                               double &tan_lambda, double &dR, double &dphi_0,
+                                               double &dtan_lambda, double &chi2_dof) {
+  CLHEP::HepMatrix G(3, 3); // symmetric matrix containing second derivatives w.r.t. each parameter
+  CLHEP::HepMatrix g(3, 1); // vector containing first derivatives w.r.t. each parameter
+
+  double A, B, C;
+  A = spnts[0]->get_position().x();
+  B = spnts[0]->get_position().y();
+  C = spnts[0]->get_position().z();
+
+  // construct the individual matrix elements as 0 to begin with.
+  double G_rr = 0., G_bb = 0., G_ll = 0., G_rb = 0., G_br = 0., G_rl = 0., G_lr = 0.;
+  double G_bl = 0., G_lb = 0.; // These will remain 0.
+
+  double g_r = 0., g_b = 0., g_l = 0.;
+
+  for ( int i = 0; i < static_cast<int>(spnts.size()); ++i ) {
+    CLHEP::Hep3Vector p = spnts[i]->get_position();
+    double phi_i = circle.get_turning_angle()[i];
+    phi_i -= phi_0; // Everything relative to starting point.
+
+    // Get errors on x and y measurements (equal).  Note error on z negligible.
+    double sd;
+    if ( spnts[i]->get_station() == 5 )
+      sd = _sd_5;
+    else
+      sd = _sd_1to4;
+
+    double w = 1 / (sd * sd);
+
+    double x_i, y_i, z_i;
+    helix_function_at_i(R, phi_0, tan_lambda, A, B, C, phi_i, x_i, y_i, z_i);
+
+    // Calculate the elements of the gradient vector g
+    g_r += w * ((p.x() - x_i) * (x_i - A) + (p.y() - y_i) * (y_i - B)) + (p.z() - z_i) * (z_i - C);
+    g_b += w * (-(p.x() - x_i) * (y_i - B) + (p.y() - y_i) * (x_i - A));
+    g_l += (p.z() - z_i) * phi_i;
+
+    // Calculate the elements of the matrix G
+    G_rr += w * ((x_i - A) * (x_i - A) + (y_i - B) * (y_i - B)) + (z_i - C) * (z_i - C);
+    G_rb += w * ((p.x() - x_i) * (y_i - B) + (p.y() - y_i) * (x_i - A));
+    G_rl += ((z_i - C) - (p.z() - z_i)) * phi_i;
+    G_bb += w * ((p.x() - A) * (x_i - A) + (p.y() - B) * (y_i - B));
+    G_ll += phi_i * phi_i;
+  } // end i
+
+  g_r = -2 / R * g_r;
+  g_b = -2 * g_b;
+  g_l = -2 * R * g_l;
+
+  G_rr = 2 / (R * R) * G_rr;
+  G_rb = 2 / R * G_rb;
+  G_br = G_rb;
+  G_rl = 2 * G_rl;
+  G_lr = G_rl;
+  G_bb = 2 * G_bb;
+  G_ll = 2 * R * R * G_ll;
+
+  // Now we fill the matrix and gradient vector.
+  G[0][0] = G_rr;
+  G[0][1] = G_rb;
+  G[0][2] = G_rl;
+
+  G[1][0] = G_br;
+  G[1][1] = G_bb;
+  G[1][2] = G_bl; // Should be 0
+
+  G[2][0] = G_lr;
+  G[2][1] = G_lb; // Should be 0
+  G[2][2] = G_ll;
+
+  // Column vector
+  g[0][0] = g_r;
+  g[1][0] = g_b;
+  g[1][0] = g_l;
+
+  // Now we calculate the corrections to the parameters
+  int ierr;
+  G.invert(ierr);
+  CLHEP::HepMatrix d_params = G * g; // (3x3)(3x1) = (3x1) vector of corrections
+
+  dR = d_params[0][0];
+  dphi_0 = d_params[1][0];
+  dtan_lambda = d_params[2][0];
+
+  // Adjusted the parameters to calculate new chi2_dof.
+  R += dR;
+  phi_0 += dphi_0;
+  tan_lambda += dtan_lambda;
+
+  double chi2;
+  for ( int i = 0; i < static_cast<int>(spnts.size()); ++i ) {
+    CLHEP::Hep3Vector p = spnts[i]->get_position();
+    double phi_i = circle.get_turning_angle()[i];
+    phi_i -= phi_0; // Everything relative to starting point.
+
+    double x_i, y_i, z_i;
+    helix_function_at_i(R, phi_0, tan_lambda, A, B, C, phi_i, x_i, y_i, z_i);
+
+    chi2 += (p.x() - x_i)*(p.x() - x_i) + (p.y() - y_i)*(p.y() - y_i) + (p.z() - z_i)*(p.z() - z_i);
+  }
+  chi2_dof = chi2 / static_cast<int>(spnts.size());
 }
 
 void PatternRecognition::set_end_stations(const std::vector<int> ignore_stations,
@@ -894,6 +1040,38 @@ void PatternRecognition::stations_with_unused_spnts(
     std::cout << unused_sp << "  ";
   }
   std::cout << std::endl;
+}
+
+void PatternRecognition::set_ignore_stations(const std::vector<int> &ignore_stations,
+                         int &ignore_station_1, int &ignore_station_2) {
+
+  ignore_station_1 = -1, ignore_station_2 = -1;
+  if ( ignore_stations.size() == 0 ) {
+    // Leave ignore stations as -1
+  } else if ( ignore_stations.size() == 1 ) {
+    ignore_station_1 = ignore_stations[0];
+  } else if ( ignore_stations.size() == 2 ) {
+    ignore_station_1 = ignore_stations[0];
+    ignore_station_2 = ignore_stations[1];
+  } else if ( ignore_stations.size() > 2 ) {
+    std::cout << "Error: Invalid ignore station argument." << std::endl;
+  }
+}
+
+void PatternRecognition::draw_line(const SciFiSpacePoint *sp1, const SciFiSpacePoint *sp2,
+                                   SimpleLine &line_x, SimpleLine &line_y) {
+
+          Hep3Vector pos_outer = sp1->get_position();
+          Hep3Vector pos_inner = sp2->get_position();
+
+          line_x.set_m(( pos_inner.x() - pos_outer.x()) / (pos_inner.z() - pos_outer.z() ));
+          line_x.set_c(pos_outer.x() - ( pos_outer.z() * line_x.get_m()) );
+
+          line_y.set_m(( pos_inner.y() - pos_outer.y()) / (pos_inner.z() - pos_outer.z() ));
+          line_y.set_c(pos_outer.y() - ( pos_outer.z() *  line_y.get_m() ));
+
+          std::cout << "m_xi = " << line_x.get_m()  << "\tx_0i = " << line_x.get_c() << std::endl;
+          std::cout << "m_yi = " << line_y.get_m() << "\ty_0i = " << line_y.get_c() << std::endl;
 }
 
 // } // ~namespace MAUS
