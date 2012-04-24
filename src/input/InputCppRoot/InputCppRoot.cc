@@ -95,6 +95,9 @@ std::string InputCppRoot::getNextEvent() {
         if ((*_infile) >> readEvent == NULL) {
             return "";
         }
+        if (_data->GetSpill() == NULL) {
+            return "";
+        }
         Json::Value* value = (*_jsonCppConverter)(*_data->GetSpill());
         Json::FastWriter writer;
         std::string output = writer.write(*value);

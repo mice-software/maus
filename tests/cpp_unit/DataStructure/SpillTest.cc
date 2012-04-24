@@ -16,9 +16,35 @@
 
 #include "gtest/gtest.h"
 
+#include "src/common_cpp/DataStructure/Data.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
 
 namespace MAUS {
+
+/** Data is sitting above the Spill
+ */
+TEST(SpillTest, DataTest) {
+    Data data_1;
+    Spill* spill_1 = new Spill();
+    spill_1->SetSpillNumber(1);
+    Spill* spill_2 = new Spill();
+    spill_2->SetSpillNumber(2);
+    Spill* spill_null = NULL;
+    EXPECT_EQ(data_1.GetSpill(), spill_null);
+    data_1.SetSpill(spill_1);
+    EXPECT_EQ
+           (data_1.GetSpill()->GetSpillNumber(), spill_1->GetSpillNumber());
+    data_1.SetSpill(spill_2);
+    EXPECT_EQ
+           (data_1.GetSpill()->GetSpillNumber(), spill_2->GetSpillNumber());
+    Data data_2;
+    data_2 = data_1;
+    EXPECT_EQ
+           (data_2.GetSpill()->GetSpillNumber(), spill_2->GetSpillNumber());
+    Data data_3(data_1);
+    EXPECT_EQ
+           (data_3.GetSpill()->GetSpillNumber(), spill_2->GetSpillNumber());
+}
 
 /** Tests the Spill - all one big function urk
  */
@@ -113,14 +139,14 @@ TEST(SpillTest, SpillTest) {
     EXPECT_EQ(emr_null, my_spill_equal.GetEMRSpillData());
     EXPECT_EQ(mc_null, my_spill_equal.GetMCEvents());
     EXPECT_EQ(rec_null, my_spill_equal.GetReconEvents());
-
-    EXPECT_TRUE(false) << "Need to test Data class";
+/*
     EXPECT_TRUE(false) << "Data structure:" << std::endl
                        << "* Scalars\n"
                        << "* DAQData\n"
                        << "* TOF\n"
                        << "* Ckov\n"
                        << "* Tracker" << std::endl;
+*/
 }
 }
 

@@ -17,6 +17,10 @@
 #ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_OBJECTMAPPROCESSORS_INL_HH_
 #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_OBJECTMAPPROCESSORS_INL_HH_
 
+#include <map>
+#include <string>
+#include <vector>
+
 namespace MAUS {
 
 template <class MapSecond>
@@ -34,12 +38,12 @@ std::map<std::string, MapSecond>* ObjectMapValueProcessor<MapSecond>::JsonToCpp
                                               (const Json::Value& json_object) {
     if (json_object.type() != Json::objectValue &&
         json_object.type() != Json::nullValue) {
-        throw Squeal(Squeal::recoverable, 
+        throw Squeal(Squeal::recoverable,
                     "Can only convert json objects to maps",
                     "ObjectMapValueProcessor::JsonToCpp");
     }
     std::map<std::string, MapSecond>* my_map =
-                                         new std::map<std::string, MapSecond>(); 
+                                         new std::map<std::string, MapSecond>();
     std::vector<std::string> names = json_object.getMemberNames();
     for (size_t i = 0; i < names.size(); ++i) {
         MapSecond* cpp_out;
@@ -53,7 +57,6 @@ std::map<std::string, MapSecond>* ObjectMapValueProcessor<MapSecond>::JsonToCpp
         delete cpp_out;
     }
     return my_map;
-
 }
 
 template <class MapSecond>

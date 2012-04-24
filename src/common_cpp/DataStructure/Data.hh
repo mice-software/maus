@@ -27,7 +27,7 @@ namespace MAUS {
  *  Data class is the root class for the MAUS data structure. At the moment it
  *  just holds a pointer to the spill. Note that the bottom of any ROOT data
  *  structure has to be outside the json data structure as we usually allocate 
- *  allocate new memory whenever we load a new spill - which ROOT does not like.
+ *  new memory whenever we load a new spill - which ROOT does not like.
  */
 class Data {
   public:
@@ -42,7 +42,7 @@ class Data {
 
     /** Deletes the spill data */
     ~Data();
-  
+
     /** Set the spill data
      *
      *  Data now takes ownership of memory allocated to spill
@@ -59,7 +59,6 @@ class Data {
     Spill* _spill;
     ClassDef(Data, 1)
 };
-
 }
 
 #endif

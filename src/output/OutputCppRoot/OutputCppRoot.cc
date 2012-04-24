@@ -76,10 +76,8 @@ bool OutputCppRoot::save(std::string json_spill_document) {
               return true; // nothing to do, we don't handle end of run yet
           }
           _data->SetSpill( (*_jsonCppConverter)(json_spill) );
-          std::cerr << "---SPILL OUT " << _data->GetSpill()->GetSpillNumber() << std::endl;
 
           (*_outfile) << fillEvent;
-          std::cerr << "--- FILLED" << std::endl;
           return true;
       } else {
           return false;
@@ -94,7 +92,6 @@ bool OutputCppRoot::save(std::string json_spill_document) {
 }
 
 bool OutputCppRoot::death() {
-  std::cerr << "---- OUTPUTCPPROOT DEATH" << std::endl;
   if (_outfile != NULL) {
     _outfile->close();
     delete _outfile;
