@@ -97,6 +97,18 @@ class SciFiCluster {
 
   Hep3Vector get_position() const { return _position; }
 
+  void set_relative_position(Hep3Vector rel_pos) { _relat_pos = rel_pos; }
+
+  void set_alpha(double channel) { _alpha = channel; }
+
+  Hep3Vector get_relative_position() const { return _relat_pos; }
+
+  double get_alpha() const { return _alpha; }
+
+  void set_id(int id) { _id = id; }
+
+  int get_id() const { return _id; }
+
  private:
   bool _used;
 
@@ -107,6 +119,12 @@ class SciFiCluster {
   Hep3Vector _direction;
 
   Hep3Vector _position;
+
+  Hep3Vector _relat_pos;
+
+  double _alpha;
+
+  int _id;
 };  // Don't forget this trailing colon!!!!
 // } // ~namespace MAUS
 

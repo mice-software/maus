@@ -17,12 +17,9 @@
 
 #include "src/input/InputCppDAQData/InputCppDAQData.hh"
 
-InputCppDAQData::InputCppDAQData(std::string pDataPath,
-                                   std::string pRunNum) {
+InputCppDAQData::InputCppDAQData() {
   _classname = "InputCppDAQData";
   _eventPtr = NULL;
-  _dataPaths = pDataPath;
-  _datafiles = pRunNum;
   _eventsCount = 0;
   _v1290PartEventProc = NULL;
   _v1724PartEventProc = NULL;
@@ -35,10 +32,6 @@ InputCppDAQData::InputCppDAQData(std::string pDataPath,
 
 
 bool InputCppDAQData::birth(std::string jsonDataCards) {
-  if ( _dataFileManager.GetNFiles() ) {
-     return false;  // Faile because files are already open
-  }
-
   //  JsonCpp setup
   Json::Value configJSON;   //  this will contain the configuration
   Json::Reader reader;
@@ -46,27 +39,6 @@ bool InputCppDAQData::birth(std::string jsonDataCards) {
   // Check if the JSON document can be parsed, else return error only
   bool parsingSuccessful = reader.parse(jsonDataCards, configJSON);
   if (!parsingSuccessful) {
-    return false;
-  }
-
-  if (_dataPaths == "") {
-    assert(configJSON.isMember("daq_data_path"));
-    _dataPaths = configJSON["daq_data_path"].asString();
-  }
-
-  if (_datafiles == "") {
-    assert(configJSON.isMember("daq_data_file"));
-    _datafiles = configJSON["daq_data_file"].asString();
-  }
-
-  _dataFileManager.SetList(_datafiles);
-  _dataFileManager.SetPath(_dataPaths);
-  _dataFileManager.OpenFile();
-  unsigned int nfiles = _dataFileManager.GetNFiles();
-  if (!nfiles) {
-    Squeak::mout(Squeak::error) << "Unable to load any data files." << std::endl;
-    Squeak::mout(Squeak::error) << "Check your run number (or file name) and data path."
-    << std::endl;
     return false;
   }
 
@@ -233,14 +205,12 @@ bool InputCppDAQData::initProcessor(procType* &processor, Json::Value configJSON
   // Enable or disable this equipment.
   assert(configJSON.isMember(xDataCard));
   bool enableThis = configJSON[xDataCard].asBool();
-
   if (enableThis) {
     processor->set_DAQ_map(&_map);
 
     // Get a pointer to the equipment fragment object from the static equipment map.
     unsigned int xFragType = MDequipMap::GetType(xName);
     MDfragment* xFragPtr = MDequipMap::GetFragmentPtr(xFragType);
-
     // Check is the data from this equipment is made of particle events.
     try {
       if (xFragPtr->IsMadeOfParticles()) {

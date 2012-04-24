@@ -46,7 +46,7 @@ output_root_file_name = "output.root"
 # 4 = fatal
 # >4 = silent
 # Doesnt effect python
-verbose_level = 4
+verbose_level = 0
 errors_to_stderr = None # None = from verbose_level; else True or False
 errors_to_json = True
 on_error = 'none' # none, halt or raise
@@ -221,7 +221,7 @@ geometry_upload_valid_from = "" # date-time in format like: that the specified i
 geometry_upload_cleanup = True # set to True to clean up after upload
 
 
-# this is used by ImputCppRealData
+# this is used by ImputCppDAQData
 Number_of_DAQ_Events = -1
 Phys_Events_Only = False
 Calib_Events_Only = False
@@ -236,8 +236,8 @@ Do_V1731_Zero_Suppression = False
 V1731_Zero_Suppression_Threshold = 100
 Do_V1724_Zero_Suppression = True
 V1724_Zero_Suppression_Threshold = 100
-Do_VLSB_Zero_Suppression = False
-VLSB_Zero_Suppression_Threshold = 0
+Do_VLSB_Zero_Suppression = True
+VLSB_Zero_Suppression_Threshold = 30
 Do_VLSB_C_Zero_Suppression = True
 VLSB_C_Zero_Suppression_Threshold = 30
 Enable_TOF = True
@@ -245,6 +245,14 @@ Enable_EMR = True
 Enable_KL = True
 Enable_CKOV = True
 DAQ_cabling_file = "/files/cabling/DAQChannelMap.txt"
+DAQ_hostname = 'miceraid1a'
+DAQ_monitor_name = 'MICE_Online_Monitor'
+
+#cerenkov digitization
+ckov_position_threshold = 40
+ckov_pulse_area_threshold = 1
+ckov_window_min = 19
+ckov_window_max = 80
 
 #cerenkov digitization
 ckov_position_threshold = 40
@@ -282,14 +290,15 @@ daq_data_file = '02873.003' # file name for daq data; if this is just a integer 
 maus_version = "" # set at runtime - do not edit this (changes are ignored)
 configuration_file = "" # should be set on the command line only (else ignored)
 
-doc_store_class = "docstore.InMemoryDocumentStore.InMemoryDocumentStore"
-couchdb_url = "http://localhost:5984" # Default CouchDB URL. Only needed if using CouchDBDocumentStore.
-couchdb_database_name = "mausdb" # Default CouchDB database name. Only needed if using CouchDBDocumentStore.
+doc_store_class = "docstore.MongoDBDocumentStore.MongoDBDocumentStore"
+doc_collection_name = "spills" # Default document collection name. Only needed if using multi_process mode. If "auto" then a collection name will be auto-generated for spills output by input-transform workflows.
 
 mongodb_host = "localhost" # Default MongoDB host name. Only needed if using MongoDBDocumentStore.
 mongodb_port = 27017 # Default MongoDB port. Only needed if using MongoDBDocumentStore.
 mongodb_database_name = "mausdb" # Default MongoDB database name. Only needed if using MongoDBDocumentStore.
 mongodb_collection_name = "spills" # Default MongoDB collection name. Only needed if using MongoDBDocumentStore.
 
-ckov_position_threshold = 40
-
+# Default OutputPyImage image directory. MAUS web application directory.
+image_directory = os.environ.get("MAUS_WEB_MEDIA_RAW") if (os.environ.get("MAUS_WEB_MEDIA_RAW") != None) else os.getcwd()
+# Default OutputPyFile output directory. MAUS web application directory.
+output_file_directory = os.environ.get("MAUS_WEB_MEDIA_RAW") if (os.environ.get("MAUS_WEB_MEDIA_RAW") != None) else os.getcwd()

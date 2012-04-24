@@ -32,6 +32,7 @@
 // MAUS headers
 #include "src/common_cpp/Recon/SciFi/SimpleLine.hh"
 #include "src/common_cpp/Recon/SciFi/SimpleCircle.hh"
+#include "src/common_cpp/Recon/SciFi/SimpleHelix.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiEvent.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiHit.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiDigit.hh"
@@ -232,14 +233,15 @@ class PatternRecognition {
      *  A non-linear least squares helix fit is performed on spacepoints which passed previous
      *  chisq circle and line tests in the x-y and s-z projections, respectively.  This is the last
      *  fit in the helical pattern recognition routine, and will provide the initial parameter
-     *  values for the Kalman Filter.
+     *  values for the Kalman Filter. Returns true if a good fit has been made in a reasonable
+     *  number of iterations.  Returns false otherwise.
      *
      *  @param spnts - Vector containing spacepoints being used for the fit, in order of
      *                 innermost to outermost stations
      *
      */
-    void full_helix_fit(const std::vector<SciFiSpacePoint*> &spnts, const SimpleCircle &circle,
-                        const SimpleLine &line_sz);
+    bool full_helix_fit(const std::vector<SciFiSpacePoint*> &spnts, const SimpleCircle &circle,
+                        const SimpleLine &line_sz, SimpleHelix helix);
 
     /** @brief Calculates helix at a point i
      *
@@ -276,7 +278,7 @@ class PatternRecognition {
     void calculate_adjustments(const std::vector<SciFiSpacePoint*> &spnts,
                                const SimpleCircle &circle, double &R, double &phi_0,
                                double &tan_lambda, double &dR, double &dphi_0, double &dtan_lambda,
-                               double &chi2_dof);
+                               double &chi2);
 
     /** @brief Determine which two stations the initial line should be drawn between
      * 
