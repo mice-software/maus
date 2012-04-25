@@ -41,6 +41,7 @@
 #pragma link C++ class MAUS::VirtualHit+;
 #pragma link C++ class MAUS::Primary+;
 #pragma link C++ class MAUS::Step+;
+#pragma link C++ class MAUS::Track+;
 #pragma link C++ class MAUS::SciFiHit+;
 #pragma link C++ class MAUS::SciFiChannelId+;
 #pragma link C++ class MAUS::TOFHit+;

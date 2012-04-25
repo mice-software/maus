@@ -152,7 +152,7 @@ G4bool SpecialVirtualSD::ProcessHits(G4Step* aStep, G4TouchableHistory*
   
   hit_i["time"] = aStep->GetPostStepPoint()->GetGlobalTime();
   hit_i["energy"] = aStep->GetTrack()->GetTotalEnergy();
-  hit_i["pid"] = aStep->GetTrack()->GetDefinition()->GetPDGEncoding();
+  hit_i["particle_id"] = aStep->GetTrack()->GetDefinition()->GetPDGEncoding();
   hit_i["charge"] =  aStep->GetTrack()->GetDefinition()->GetPDGCharge();
   hit_i["mass"] = aStep->GetTrack()->GetDefinition()->GetPDGMass();
 

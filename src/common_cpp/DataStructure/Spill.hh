@@ -77,11 +77,31 @@ class Spill {
   /** Get the MC events */
   MCEventArray* GetMCEvents() const;
 
+  /** Get a single MC event (needed for PyROOT) */
+  MCEvent& GetAnMCEvent(size_t i) const {
+    return (*(*_mc)[i]);
+  }
+
+  /** Get the MC event size (needed for PyROOT)*/
+  size_t GetMCEventSize() const {
+    return _mc->size();
+  }
+
   /** Set the Recon events */
   void SetReconEvents(ReconEventArray* ReconEvent);
 
   /** Get the Recon events */
   ReconEventArray* GetReconEvents() const;
+
+  /** Get a single Recon event (needed for PyROOT) */
+  ReconEvent& GetAReconEvent(int i) const {
+    return (*(*_recon)[i]);
+  }
+
+  /** Get the Recon event size (needed for PyROOT)*/
+  size_t GetReconEventSize() const {
+    return _recon->size();
+  }
 
   /** Set the spill number */
   void SetSpillNumber(int spill);

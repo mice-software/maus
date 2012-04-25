@@ -44,9 +44,9 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
                   (os.environ["MAUS_ROOT_DIR"], "tmp", "test_inputCppRoot.root")
         root_file = ROOT.TFile(self.fname, "RECREATE") # pylint: disable = E1101
         spill = ROOT.MAUS.Spill() # pylint: disable = E1101
-        data = ROOT.MAUS.Data()
+        data = ROOT.MAUS.Data() # pylint: disable = E1101
         tree = ROOT.TTree("Spill", "TTree") # pylint: disable = E1101
-        tree.Branch("data", data, inputter.my_sizeof(), 1)
+        tree.Branch("data", data, data.my_sizeof(), 1)
         tree.Fill()
         spill.SetScalars(ROOT.MAUS.Scalars()) # pylint: disable = E1101
         spill.SetEMRSpillData(ROOT.MAUS.EMRSpillData()) # pylint: disable = E1101, C0301

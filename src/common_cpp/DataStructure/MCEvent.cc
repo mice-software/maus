@@ -187,5 +187,13 @@ void MCEvent::SetPrimary(Primary* primary) {
     }
     _primary = primary;
 }
+
+VirtualHit& MCEvent::GetAVirtualHit(size_t i) const {
+    return (*_virtuals)[i];
+}
+
+size_t MCEvent::GetVirtualHitsSize() const {
+    return _virtuals->size();
+}
 }
 

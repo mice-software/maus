@@ -27,15 +27,15 @@ SpillProcessor::SpillProcessor() :_mc_array_proc(new MCEventProcessor()),
                                   _recon_array_proc(new ReconEventProcessor()),
                                  _error_proc(new StringProcessor()) {
     RegisterPointerBranch
-         ("scalars", &_scal_proc, &Spill::GetScalars, &Spill::SetScalars, true);
+         ("scalars", &_scal_proc, &Spill::GetScalars, &Spill::SetScalars, false);
     RegisterPointerBranch
-         ("daq_data", &_daq_proc, &Spill::GetDAQData, &Spill::SetDAQData, true);
+         ("daq_data", &_daq_proc, &Spill::GetDAQData, &Spill::SetDAQData, false);
     RegisterPointerBranch("emr_spill_data", &_emr_proc,
-                        &Spill::GetEMRSpillData, &Spill::SetEMRSpillData, true);
+                        &Spill::GetEMRSpillData, &Spill::SetEMRSpillData, false);
     RegisterPointerBranch("mc_events", &_mc_array_proc, &Spill::GetMCEvents,
                                                     &Spill::SetMCEvents, false);
     RegisterPointerBranch("recon_events", &_recon_array_proc,
-                          &Spill::GetReconEvents, &Spill::SetReconEvents, true);
+                          &Spill::GetReconEvents, &Spill::SetReconEvents, false);
     RegisterValueBranch("spill_number", &_int_proc, &Spill::GetSpillNumber,
                                                   &Spill::SetSpillNumber, true);
     RegisterValueBranch("errors", &_error_proc, &Spill::GetErrors,
