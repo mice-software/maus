@@ -264,12 +264,16 @@ class PatternRecognition {
      *
      *  @param spnts - Vector containing spacepoints being used for the fit, in order of
      *                 innermost to outermost stations
-     *  @param circle - The output circle from circle_fit
+     *  @param turning_angles - vector containing turning angles for each spacepoint.
+     *                  organized inner-> outermost stations for i = 0.... N
+     *  @param Phi_0 - azimuthal angle of inital spacepoint in x-y plane
      *  @param tan_lambda - helix dip angle
+     *  @param R - radius of helix
      *
      */
-    void calculate_chisq(const std::vector<SciFiSpacePoint*> &spnts, const SimpleCircle &circle,
-                         double tan_lambda);
+    double calculate_chisq(const std::vector<SciFiSpacePoint*> &spnts,
+                           const std::vector<double> &turning_angles, double Phi_0,
+                           double tan_lambda, double R);
 
     /** @brief Calculates the adjustments to the seed parameters
      *
@@ -280,6 +284,8 @@ class PatternRecognition {
      *
      *  @param spnts - Vector containing spacepoints being used for the fit, in order of innermost
      *                 to outermost stations
+     *  @param turning_angles - vector containing turning angles for each spacepoint.
+     *                  organized inner-> outermost stations for i = 0.... N
      *  @param R - initial R value as calculated from circle fit
      *  @param phi_0 - turning angle of initial spacepoint as calculate from circle fit
      *  @param tan_lambda - helix dip angle calculated from the slope of line in the s-z projection
@@ -289,7 +295,7 @@ class PatternRecognition {
      *
      */
     void calculate_adjustments(const std::vector<SciFiSpacePoint*> &spnts,
-                               const SimpleCircle &circle, double &R, double &phi_0,
+                               const std::vector<double> &turning_angles, double &R, double &phi_0,
                                double &tan_lambda, double &dR, double &dphi_0, double &dtan_lambda,
                                double &chi2);
 
