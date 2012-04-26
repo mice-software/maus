@@ -799,7 +799,8 @@ bool PatternRecognition::full_helix_fit(const std::vector<SciFiSpacePoint*> &spn
   C = spnts[0]->get_position().z();
 
   // Define a helix object to hold final parameters to be passed to kalman filter
-  // SimpleHelix helix;
+
+  calculate_chisq(spnts, circle, tan_lambda);
 
   double small_number = 0.001; // should figure out what this is and put it in the header file
   // Calculate chisq with initial params
@@ -855,12 +856,24 @@ bool PatternRecognition::full_helix_fit(const std::vector<SciFiSpacePoint*> &spn
   return false;
 }
 
+double PatternRecognition::calculate_chisq(const std::vector<SciFiSpacePoint*> &spnts,
+                                           const SimpleCircle &circle, double tan_lambda) {
+  double chisq;
+  for ( int i = 0; i < static_cast<int>(spnts.size()); ++i ) {
+    CLHEP::Hep3Vector p = spnts[i]->get_position();
+    double phi_i = circle.get_turning_angle()[i];
+    phi_i -= Phi_0; // Everything relative to starting point.
+
+    helix_function_at_i(R, Phi_0, tan_lambda, A, B, C, phi_i, xi, yi, zi);
+    chisq += (p.x() - xi)*(p.x() - xi) + (p.y() - yi)*(p.y() - yi) + (p.z() - zi)*(p.z() - zi);
+}
+
 void PatternRecognition::helix_function_at_i(double R, double phi_0, double tan_lambda,
                                              double A, double B, double C, double phi_i,
-                                             double &x_i, double &y_i, double &z_i) {
-    x_i = A + R * (cos(phi_i) - 1) * cos(phi_0) - R * sin(phi_i) * sin(phi_0);
-    y_i = B + R * (cos(phi_i) - 1) * sin(phi_0) - R * sin(phi_i) * cos(phi_0);
-    z_i = C + R * phi_i * tan_lambda;
+                                             double &xi, double &yi, double &zi) {
+    xi = A + R * (cos(phi_i) - 1) * cos(phi_0) - R * sin(phi_i) * sin(phi_0);
+    yi = B + R * (cos(phi_i) - 1) * sin(phi_0) - R * sin(phi_i) * cos(phi_0);
+    zi = C + R * phi_i * tan_lambda;
 }
 
 void PatternRecognition::calculate_adjustments(const std::vector<SciFiSpacePoint*> &spnts,
@@ -898,19 +911,19 @@ void PatternRecognition::calculate_adjustments(const std::vector<SciFiSpacePoint
 
     double w = 1 / (sd * sd);
 
-    double x_i, y_i, z_i;
-    helix_function_at_i(R, phi_0, tan_lambda, A, B, C, phi_i, x_i, y_i, z_i);
+    double xi, yi, zi;
+    helix_function_at_i(R, phi_0, tan_lambda, A, B, C, phi_i, xi, yi, zi);
 
     // Calculate the elements of the gradient vector g
-    g_r += w * ((p.x() - x_i) * (x_i - A) + (p.y() - y_i) * (y_i - B)) + (p.z() - z_i) * (z_i - C);
-    g_b += w * (-(p.x() - x_i) * (y_i - B) + (p.y() - y_i) * (x_i - A));
-    g_l += (p.z() - z_i) * phi_i;
+    g_r += w * ((p.x() - xi) * (xi - A) + (p.y() - yi) * (yi - B)) + (p.z() - zi) * (zi - C);
+    g_b += w * (-(p.x() - xi) * (yi - B) + (p.y() - yi) * (xi - A));
+    g_l += (p.z() - zi) * phi_i;
 
     // Calculate the elements of the matrix G
-    G_rr += w * ((x_i - A) * (x_i - A) + (y_i - B) * (y_i - B)) + (z_i - C) * (z_i - C);
-    G_rb += w * ((p.x() - x_i) * (y_i - B) + (p.y() - y_i) * (x_i - A));
-    G_rl += ((z_i - C) - (p.z() - z_i)) * phi_i;
-    G_bb += w * ((p.x() - A) * (x_i - A) + (p.y() - B) * (y_i - B));
+    G_rr += w * ((xi - A) * (xi - A) + (yi - B) * (yi - B)) + (zi - C) * (zi - C);
+    G_rb += w * ((p.x() - xi) * (yi - B) + (p.y() - yi) * (xi - A));
+    G_rl += ((zi - C) - (p.z() - zi)) * phi_i;
+    G_bb += w * ((p.x() - A) * (xi - A) + (p.y() - B) * (yi - B));
     G_ll += phi_i * phi_i;
   } // end i
 
@@ -963,10 +976,10 @@ void PatternRecognition::calculate_adjustments(const std::vector<SciFiSpacePoint
     double phi_i = circle.get_turning_angle()[i];
     phi_i -= phi_0; // Everything relative to starting point.
 
-    double x_i, y_i, z_i;
-    helix_function_at_i(R, phi_0, tan_lambda, A, B, C, phi_i, x_i, y_i, z_i);
+    double xi, yi, zi;
+    helix_function_at_i(R, phi_0, tan_lambda, A, B, C, phi_i, xi, yi, zi);
 
-    chi2 += (p.x() - x_i)*(p.x() - x_i) + (p.y() - y_i)*(p.y() - y_i) + (p.z() - z_i)*(p.z() - z_i);
+    chi2 += (p.x() - xi)*(p.x() - xi) + (p.y() - yi)*(p.y() - yi) + (p.z() - zi)*(p.z() - zi);
   }
   double chi2_dof = chi2 / static_cast<int>(spnts.size());
 }
