@@ -51,9 +51,8 @@ class SciFiEvent {
   ~SciFiEvent();
 
   /// Residual histograms
-  void add_res_hist(TH1D res_hist) { _res_hists.push_back(res_hist); }
-  std::vector<TH1D> res_hists() const { return _res_hists; }
-  void set_res_hist(std::vector<TH1D> res_hists) { _res_hists = res_hists; }
+  std::vector< std::vector<int> > residuals() const { return _residuals; }
+  void set_residuals(std::vector< std::vector<int> > residuals) { _residuals = residuals; }
 
   /// Hits
   void add_hit(SciFiHit* hit) { _scifihits.push_back(hit); }
@@ -90,28 +89,28 @@ class SciFiEvent {
  private:
 
   /// Residuals histograms
-  std::vector<TH1D>                 _res_hists;
+  std::vector< std::vector<int> >  _residuals;
 
   /// Hits in an event.
-  std::vector<SciFiHit*>            _scifihits;
+  std::vector<SciFiHit*>              _scifihits;
 
   /// Digits in an event.
-  std::vector<SciFiDigit*>          _scifidigits;
+  std::vector<SciFiDigit*>            _scifidigits;
 
   /// Clusters in an event.
-  std::vector<SciFiCluster*>        _scificlusters;
+  std::vector<SciFiCluster*>          _scificlusters;
 
   /// Spacepoints in an event.
-  std::vector<SciFiSpacePoint*>     _scifispacepoints;
+  std::vector<SciFiSpacePoint*>       _scifispacepoints;
 
   /// Seeds for track fitting.
-  std::vector<SciFiSpacePoint*>     _scifiseeds;
+  std::vector<SciFiSpacePoint*>       _scifiseeds;
 
   /// Straight tracks.
-  std::vector<SciFiStraightPRTrack> _scifistraightprtracks;
+  std::vector<SciFiStraightPRTrack>   _scifistraightprtracks;
 
   /// Helical tracks.
-  std::vector<SciFiHelicalPRTrack> _scifihelicalprtracks;
+  std::vector<SciFiHelicalPRTrack>    _scifihelicalprtracks;
 };  // Don't forget this trailing colon!!!!
 // } // ~namespace MAUS
 

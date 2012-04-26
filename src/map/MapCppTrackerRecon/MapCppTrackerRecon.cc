@@ -81,6 +81,7 @@ std::string MapCppTrackerRecon::process(std::string document) {
       }
       // Pattern Recognition.
       if ( event.spacepoints().size() ) {
+        std::cout << "Calling Pattern Recognition..." << std::endl;
         pattern_recognition(event);
       }
 
