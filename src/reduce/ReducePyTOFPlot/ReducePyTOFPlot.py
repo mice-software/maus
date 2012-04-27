@@ -47,17 +47,35 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
     
     At the end of the run, the canvases are printed to eps files
 
-    Histograms are output as JSON documents of form:
+    A sequence of 13 histograms are output as JSON documents of form:
 
     @verbatim
-    {"image": {"content":"Total TDC and ADC counts to spill 2",
+    {"image": {"keywords": [...list of image keywords...],
+               "description":"...a description of the image...",
                "tag": TAG,
                "image_type": "eps", 
                "data": "...base 64 encoded image..."}}
     @endverbatim
 
-    where "TAG" is "tof_times", "tof_hits" or "tof_sp". If
-    "histogram_auto_number" (see below) is "true" then the TAG will
+    These are as follows and have the following TAGs:
+
+    - "tof_hit_x" - TOF raw hits X.
+    - "tof_hit_y" - TOF raw hits Y.
+    - "tof_pmt00" - TOF PMT Plane 0 PMT 0.
+    - "tof_pmt01"  - TOF PMT Plane 0 PMT 1.
+    - "tof_pmt10"  - TOF PMT Plane 1 PMT 0.
+    - "tof_pmt11"  - TOF PMT Plane 1 PMT 1.
+    - "tof_nsp" - TOF number of space points.
+    - "tof_sp_x" - TOF space points X.
+    - "tof_sp_y" - TOF space points Y.
+    - "tof_xy_0" - TOF space points 2D.
+    - "tof_xy_1" - TOF space points 2D.
+    - "tof_xy_2" - TOF space points 2D.
+    - "tof_time_01" - TOF01 time.
+    - "tof_time_12" - TOF12 time.
+    - "tof_time_02" - TOF02 time.
+
+    If "histogram_auto_number" (see below) is "true" then the TAG will
     have a number N appended where N means that the histogram was
     produced as a consequence of the (N + 1)th spill processed  by the
     worker. The number will be zero-padded to form a six digit string
@@ -125,6 +143,8 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         self.canvas_sp_x = None
         self.canvas_sp_y = None
         self.canvas_sp_xy = None
+        # Has an end_of_run been processed?
+        self.run_ended = False
 
     def _configure_at_birth(self, config_doc):
         """
@@ -140,6 +160,7 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         # Initialize histograms, setup root canvases, and set root
         # styles.
         self.__init_histos()
+        self.run_ended = False
         return True
 
     def _update_histograms(self, spill):
@@ -156,17 +177,34 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         @throws ValueError if "slab_hits" and "space_points" information
         is missing from the spill.
         """
-        if "END_OF_RUN" in spill:
-            self.update_histos()
-            return self.get_histogram_images()
+        if not spill.has_key("daq_event_type"):
+            raise ValueError("No event type")
+        if spill["daq_event_type"] == "end_of_run":
+            if (not self.run_ended):
+                self.update_histos()
+                self.run_ended = True
+                return self.get_histogram_images()
+            else:
+                return [{}]
+        elif spill["daq_event_type"] != "physics_event":
+            return spill
+
+        # do not try to get data from start/end spill markers
+        data_spill = True
+        if spill["daq_event_type"] == "start_of_run" \
+              or spill["daq_event_type"] == "start_of_burst" \
+              or spill["daq_event_type"] == "end_of_burst":
+            data_spill = False
 
         # Get TOF slab hits & fill the relevant histograms.
-        if not self.get_slab_hits(spill): 
-            raise ValueError("slab_hits not in spill")
+        if data_spill and not self.get_slab_hits(spill): 
+            print "No space points recorded"
+            #raise ValueError("slab_hits not in spill")
 
         # Get TOF space points & fill histograms.
-        if not self.get_space_points(spill):
-            raise ValueError("space_points not in spill")
+        if data_spill and not self.get_space_points(spill):
+            print "No space points recorded"
+            #raise ValueError("space_points not in spill")
 
         # Refresh canvases at requested frequency.
         if self.spill_count % self.refresh_rate == 0:
@@ -246,74 +284,77 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
 
         # if there are no TOF0,1,2 space point objects, return false
         # not sure if we require all 3, 
-        # -- but currently returning false unless we get all 3 detectors
-        if 'tof0' not in space_points:
-            return False
-        sp_tof0 = space_points['tof0']
+        # -obviously this causes probs when eg. no TOF2 - fixed 3/24
+        sp_tof0 = None
+        sp_tof1 = None
+        sp_tof2 = None
+        if 'tof0' in space_points:
+            sp_tof0 = space_points['tof0']
 
-        if 'tof1' not in space_points:
-            return False
-        sp_tof1 = space_points['tof1']
+        if 'tof1' in space_points:
+            sp_tof1 = space_points['tof1']
 
-        if 'tof2' not in space_points:
-            return False
-        sp_tof2 = space_points['tof2']
+        if 'tof2' in space_points:
+            sp_tof2 = space_points['tof2']
 
         
-        # TOF0 
-        for i in range(len(sp_tof0)):
-            if sp_tof0[i]:
-                self.hnsp_0.Fill(len(sp_tof0[i]))
-            else:
-                self.hnsp_0.Fill(0)           
-            if sp_tof0[i] and sp_tof1[i] :
-                if len(sp_tof0[i])==1 and len(sp_tof1[i])==1:
-                    t_0 = sp_tof0[i][0]["time"]
-                    t_1 = sp_tof1[i][0]["time"]
+        # TOF0
+        if sp_tof0:
+            for i in range(len(sp_tof0)):
+                if sp_tof0[i]:
+                    self.hnsp_0.Fill(len(sp_tof0[i]))
                     spnt_x = sp_tof0[i][0]["slabX"]
                     spnt_y = sp_tof0[i][0]["slabY"]
                     self.hspxy[0].Fill(spnt_x, spnt_y)
                     self.hspslabx_0.Fill(spnt_x)
                     self.hspslaby_0.Fill(spnt_y)
-                    
+                else:
+                    self.hnsp_0.Fill(0)           
+                if sp_tof0[i] and sp_tof1[i] :
+                    if len(sp_tof0[i])==1 and len(sp_tof1[i])==1:
+                        t_0 = sp_tof0[i][0]["time"]
+                        t_1 = sp_tof1[i][0]["time"]
+
         # TOF 2
-        for i in range(len(sp_tof2)):
-            if sp_tof2[i]:
-                self.hnsp_2.Fill(len(sp_tof2[i]))
-            else:
-                self.hnsp_2.Fill(0)
-            if sp_tof2[i] and sp_tof1[i] :
-                if len(sp_tof2[i])==1 and len(sp_tof1[i])==1:
-                    t_2 = sp_tof2[i][0]["time"]
-                    t_1 = sp_tof1[i][0]["time"]
+        if sp_tof2:
+            for i in range(len(sp_tof2)):
+                if sp_tof2[i]:
+                    self.hnsp_2.Fill(len(sp_tof2[i]))
                     spnt_x = sp_tof2[i][0]["slabX"]
                     spnt_y = sp_tof2[i][0]["slabY"]
                     self.hspxy[2].Fill(spnt_x, spnt_y)
                     self.hspslabx_2.Fill(spnt_x)
                     self.hspslaby_2.Fill(spnt_y)
-                    self._ht12.Fill(t_2-t_1)
-            if sp_tof2[i] and sp_tof0[i] :
-                if len(sp_tof2[i])==1 and len(sp_tof0[i])==1:
-                    t_2 = sp_tof2[i][0]["time"]
-                    t_0 = sp_tof0[i][0]["time"]
-                    self._ht02.Fill(t_2-t_0)
+                else:
+                    self.hnsp_2.Fill(0)
+                if sp_tof2[i] and sp_tof1[i] :
+                    if len(sp_tof2[i])==1 and len(sp_tof1[i])==1:
+                        t_2 = sp_tof2[i][0]["time"]
+                        t_1 = sp_tof1[i][0]["time"]
+                        self._ht12.Fill(t_2-t_1)
+                if sp_tof2[i] and sp_tof0[i] :
+                    if len(sp_tof2[i])==1 and len(sp_tof0[i])==1:
+                        t_2 = sp_tof2[i][0]["time"]
+                        t_0 = sp_tof0[i][0]["time"]
+                        self._ht02.Fill(t_2-t_0)
 
         # TOF 1
-        for i in range(len(sp_tof1)):
-            if sp_tof1[i]:
-                self.hnsp_1.Fill(len(sp_tof1[i]))
-            else:
-                self.hnsp_1.Fill(0)           
-            if sp_tof0[i] and sp_tof1[i] :
-                if len(sp_tof0[i])==1 and len(sp_tof1[i])==1:
-                    t_0 = sp_tof0[i][0]["time"]
-                    t_1 = sp_tof1[i][0]["time"]
+        if sp_tof1:
+            for i in range(len(sp_tof1)):
+                if sp_tof1[i]:
+                    self.hnsp_1.Fill(len(sp_tof1[i]))
                     spnt_x = sp_tof1[i][0]["slabX"]
                     spnt_y = sp_tof1[i][0]["slabY"]
-                    self._ht01.Fill(t_1-t_0)
                     self.hspxy[1].Fill(spnt_x, spnt_y)
                     self.hspslabx_1.Fill(spnt_x)
                     self.hspslaby_1.Fill(spnt_y)
+                else:
+                    self.hnsp_1.Fill(0)           
+                if sp_tof0[i] and sp_tof1[i] :
+                    if len(sp_tof0[i])==1 and len(sp_tof1[i])==1:
+                        t_0 = sp_tof0[i][0]["time"]
+                        t_1 = sp_tof1[i][0]["time"]
+                        self._ht01.Fill(t_1-t_0)
         return True
 
     def __init_histos(self): #pylint: disable=R0201, R0914
@@ -513,7 +554,6 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         for i in range (3):
             self.canvas_tof[i].Update()
 
-
     def get_histogram_images(self):       
         """
         Get histograms as JSON documents.
@@ -525,75 +565,79 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         # Raw Hits X
         # file label = tof_hit_x.eps
         tag = "tof_hit_x"
-        content = "TOF Raw Hits X"
+        keywords = ["TOF", "raw", "hits"]
+        description = "TOF Raw Hits X"
         doc = ReducePyROOTHistogram.get_image_doc( \
-            self, content, tag, self.canvas_hits_x)
+            self, keywords, description, tag, self.canvas_hits_x)
         image_list.append(doc)
 
         # Raw Hits Y
         # file label = tof_hit_y.eps
         tag = "tof_hit_y"
-        content = "TOF Raw Hits Y"
+        description = "TOF Raw Hits Y"
         doc = ReducePyROOTHistogram.get_image_doc( \
-            self, content, tag, self.canvas_hits_y)
+            self, keywords, description, tag, self.canvas_hits_y)
         image_list.append(doc)
 
         # PMT hits
         # the files are labeled: tof_pmt00 tof_pmt01 tof_pmt10 tof_pmt11
         # the numbers stand for plane,pmt eg tof_pmt01 -> plane0, pmt1
+        keywords = ["TOF", "PMT", "plane"]
         for plane in range (2):
             for pmt in range (2):
                 ind = 2*plane + pmt
                 tag = "tof_pmt%d%d" % (plane, pmt)
-                content = "TOF PMT Plane%d PMT%d" % (plane, pmt)
+                description = "TOF PMT Plane%d PMT%d" % (plane, pmt)
                 doc = ReducePyROOTHistogram.get_image_doc( \
-                    self, content, tag, self.canvas_pmt[ind])
+                    self, keywords, description, tag, self.canvas_pmt[ind])
                 image_list.append(doc)
 
         # number of space points
         # file label = tof_nsp.eps
         tag = "tof_nsp"
-        content = "TOF Number of Space Points"
+        keywords = ["TOF", "space", "points"]
+        description = "TOF Number of Space Points"
         doc = ReducePyROOTHistogram.get_image_doc( \
-            self, content, tag, self.canvas_nsp)
+            self, keywords, description, tag, self.canvas_nsp)
         image_list.append(doc)
 
         # Spacepoints X
         # file label = tof_sp_x.eps
         tag = "tof_sp_x"
-        content = "TOF Space Points X"
+        description = "TOF Space Points X"
         doc = ReducePyROOTHistogram.get_image_doc( \
-            self, content, tag, self.canvas_sp_x)
+            self, keywords, description, tag, self.canvas_sp_x)
         image_list.append(doc)
 
         # Spacepoints Y
         # file label = tof_sp_y.eps
         tag = "tof_sp_y"
-        content = "TOF Space Points Y"
+        description = "TOF Space Points Y"
         doc = ReducePyROOTHistogram.get_image_doc( \
-            self, content, tag, self.canvas_sp_y)
+            self, keywords, description, tag, self.canvas_sp_y)
         image_list.append(doc)
 
         # space point 2d output
         # the files are labeled: tof_xy_0, tof_xy_1, tof_xy_2 .eps
         for i in range (3):
             tag = "tof_xy_%d" % (i)
-            content = "TOF%d Space Points 2d" % (i)
+            description = "TOF%d Space Points 2d" % (i)
             doc = ReducePyROOTHistogram.get_image_doc( \
-                self, content, tag, self.canvas_sp_xy[i])
+                self, keywords, description, tag, self.canvas_sp_xy[i])
             image_list.append(doc)
 
         # time of flight between tof stations
         # files are labeled tof_time_01, tof_time_12, tof_time_02 .eps
+        keywords = ["TOF", "time", "flight"]
         for i in range (3):
             if (i < 2):
                 tag = "tof_time_%d%d" % (i, i+1)
-                content = "TOF%d%d Time" % (i, i+1)
+                description = "TOF%d%d Time" % (i, i+1)
             else:
                 tag = "tof_time_02"
-                content = "TOF02 Time"
+                description = "TOF02 Time"
             doc = ReducePyROOTHistogram.get_image_doc( \
-                self, content, tag, self.canvas_tof[i])
+                self, keywords, description, tag, self.canvas_tof[i])
             image_list.append(doc)
 
         return image_list

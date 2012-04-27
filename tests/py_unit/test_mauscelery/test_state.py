@@ -22,13 +22,11 @@ import logging
 import unittest
 import ROOT
 
+from framework.workers import WorkerBirthFailedException
+from framework.workers import WorkerDeathFailedException
+from framework.workers import WorkerDeadException
 import mauscelery.state
 from mauscelery.state import MausTransform
-
-from workers import WorkerBirthFailedException
-from workers import WorkerDeathFailedException
-from workers import WorkerDeadException
-
 from MapPyTestMap import MapPyTestMap
 
 class MausTransformTestCase(unittest.TestCase): # pylint: disable=R0904, C0301

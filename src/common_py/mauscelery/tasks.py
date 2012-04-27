@@ -22,12 +22,12 @@ import logging
 from celery.task import task
 from celery.task import Task
 
+from framework.workers import WorkerProcessException
 from mauscelery.state import MausConfiguration
 from mauscelery.state import MausTransform
-from workers import WorkerProcessException
 
 @task(name="mauscelery.maustasks.MausGenericTransformTask")
-def execute_transform(spill, client_id = "Unknown", spill_id = 0):
+def execute_transform(spill, client_id = "Unknown"):
     """
     MAUS Celery transform task used by sub-processes to execute jobs
     from clients. Proxies of this task are invoked by clients.This
@@ -35,14 +35,12 @@ def execute_transform(spill, client_id = "Unknown", spill_id = 0):
     spill.  
     @param spill JSON document string holding spill.
     @param client_id ID of client who submitted job.
-    @param spill_id Index of spill from this client.
     @return JSON document string holding new spill.
     @throws Exception if there is a problem when process is called.
     """
     logger = Task.get_logger()  
     if logger.isEnabledFor(logging.INFO):
-        logger.info("Task invoked by %s on spill %d" \
-            % (client_id, spill_id))
+        logger.info("Task invoked by %s" % client_id)
     try:
         return MausTransform.process(spill)
     except Exception as exc: # pylint:disable = W0703

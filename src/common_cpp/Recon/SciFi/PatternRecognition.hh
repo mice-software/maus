@@ -32,6 +32,7 @@
 // MAUS headers
 #include "src/common_cpp/Recon/SciFi/SimpleLine.hh"
 #include "src/common_cpp/Recon/SciFi/SimpleCircle.hh"
+#include "src/common_cpp/Recon/SciFi/SimpleHelix.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiEvent.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiHit.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiDigit.hh"
@@ -234,14 +235,15 @@ class PatternRecognition {
      *  A non-linear least squares helix fit is performed on spacepoints which passed previous
      *  chisq circle and line tests in the x-y and s-z projections, respectively.  This is the last
      *  fit in the helical pattern recognition routine, and will provide the initial parameter
-     *  values for the Kalman Filter.
+     *  values for the Kalman Filter. Returns true if a good fit has been made in a reasonable
+     *  number of iterations.  Returns false otherwise.
      *
      *  @param spnts - Vector containing spacepoints being used for the fit, in order of
      *                 innermost to outermost stations
      *
      */
-    void full_helix_fit(const std::vector<SciFiSpacePoint*> &spnts, const SimpleCircle &circle,
-                        const SimpleLine &line_sz);
+    bool full_helix_fit(const std::vector<SciFiSpacePoint*> &spnts, const SimpleCircle &circle,
+                        const SimpleLine &line_sz, SimpleHelix helix);
 
     /** @brief Calculates helix at a point i
      *
@@ -250,13 +252,30 @@ class PatternRecognition {
      *  @param R - raidus of helix
      *  @param phi_0 - turning angle of initial spacepoint
      *  @param tan_lambda - helix dip angle
-     *  @param x_i - Helix value x at point i (cartesian)
-     *  @param y_i - Helix value y at point i
-     *  @param z_i - Helix value z at point i
+     *  @param xi - Helix value x at point i (cartesian)
+     *  @param yi - Helix value y at point i
+     *  @param zi - Helix value z at point i
      *
      */
     void helix_function_at_i(double R, double phi_0, double tan_lambda, double A, double B,
-                             double C, double phi_i, double &x_i, double &y_i, double &z_i);
+                             double C, double phi_i, double &xi, double &yi, double &zi);
+
+    /** @brief Calculates helix chisq
+     *
+     *  Calculates chisq for given parameter values and spacepoints
+     *
+     *  @param spnts - Vector containing spacepoints being used for the fit, in order of
+     *                 innermost to outermost stations
+     *  @param turning_angles - vector containing turning angles for each spacepoint.
+     *                  organized inner-> outermost stations for i = 0.... N
+     *  @param Phi_0 - azimuthal angle of inital spacepoint in x-y plane
+     *  @param tan_lambda - helix dip angle
+     *  @param R - radius of helix
+     *
+     */
+    double calculate_chisq(const std::vector<SciFiSpacePoint*> &spnts,
+                           const std::vector<double> &turning_angles, double Phi_0,
+                           double tan_lambda, double R);
 
     /** @brief Calculates the adjustments to the seed parameters
      *
@@ -267,6 +286,8 @@ class PatternRecognition {
      *
      *  @param spnts - Vector containing spacepoints being used for the fit, in order of innermost
      *                 to outermost stations
+     *  @param turning_angles - vector containing turning angles for each spacepoint.
+     *                  organized inner-> outermost stations for i = 0.... N
      *  @param R - initial R value as calculated from circle fit
      *  @param phi_0 - turning angle of initial spacepoint as calculate from circle fit
      *  @param tan_lambda - helix dip angle calculated from the slope of line in the s-z projection
@@ -276,9 +297,9 @@ class PatternRecognition {
      *
      */
     void calculate_adjustments(const std::vector<SciFiSpacePoint*> &spnts,
-                               const SimpleCircle &circle, double &R, double &phi_0,
+                               const std::vector<double> &turning_angles, double &R, double &phi_0,
                                double &tan_lambda, double &dR, double &dphi_0, double &dtan_lambda,
-                               double &chi2_dof);
+                               double &chi2);
 
     /** @brief Determine which two stations the initial line should be drawn between
      * 
@@ -350,7 +371,7 @@ class PatternRecognition {
     static const double _AB_cut = .1;       // Need to calculate appropriate cut here!!!
     static const double _sd_phi_1to4 = 1.;  // Still needs to be calculated!!!!
     static const double _sd_phi_5 = 1.;     // Still needs to be calculated!!!!
-    static const double _active_diameter = 300.0;  // Active volume diameter a tracker in mm 
+    static const double _active_diameter = 300.0;  // Active volume diameter a tracker in mm
 };
 // } // ~namespace MAUS
 

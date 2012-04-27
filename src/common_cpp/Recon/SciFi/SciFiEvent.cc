@@ -20,7 +20,7 @@
 
 SciFiEvent::SciFiEvent() {
   _residuals.resize(4);
-  _residuals.assign(4, std::vector<int>(102,0));
+  _residuals.assign(4, std::vector<int>(102, 0));
   _scifihits.resize(0);
   _scifidigits.resize(0);
   _scificlusters.resize(0);
