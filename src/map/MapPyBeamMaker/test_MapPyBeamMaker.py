@@ -226,49 +226,48 @@ class TestMapPyBeamMaker(unittest.TestCase): # pylint: disable = R0904
         """
         Check that we throw an error if the spill is bad
         """
-        self.assertRaises(KeyError,
-               self.beam_maker._MapPyBeamMaker__process_check_spill, {"mc":""})
+        self.assertRaises(KeyError, \
+         self.beam_maker._MapPyBeamMaker__process_check_spill, {"mc_events":""})
         self.assertEqual( \
                 self.beam_maker._MapPyBeamMaker__process_check_spill({}),\
-                {"mc":[]})
+                {"mc_events":[]})
         self.assertEqual(
-               self.beam_maker._MapPyBeamMaker__process_check_spill({"mc":[]}),\
-               {"mc":[]} )
-        self.assertEqual(
-             self.beam_maker._MapPyBeamMaker__process_check_spill({"mc":[""]}),\
-             {"mc":[""]})
+        self.beam_maker._MapPyBeamMaker__process_check_spill \
+                                          ({"mc_events":[]}), {"mc_events":[]} )
+        self.assertEqual(self.beam_maker._MapPyBeamMaker__process_check_spill \
+                                       ({"mc_events":[""]}), {"mc_events":[""]})
 
     def test_process_gen_empty_ovrwrt(self):
         """
         Check that we generate empty primaries for each existing particle in
         overwrite_existing mode
         """
-        spill = {"mc":[{}, {}, {}]}
+        spill = {"mc_events":[{}, {}, {}]}
         self.beam_maker.birth(json.dumps(TEST_OVERWRITE))
         self.assertEqual(
            self.beam_maker._MapPyBeamMaker__process_gen_empty(spill),
            [{"primary":{}}]*3)
         self.assertEqual(
-           spill["mc"],
+           spill["mc_events"],
            [{"primary":{}}]*3)
 
     def test_process_gen_empty_counter(self):
         """
         Check that we append correct number of empty primaries in counter mode
         """
-        spill = {"mc":[{}, {}, {}]}
+        spill = {"mc_events":[{}, {}, {}]}
         self.beam_maker.birth(json.dumps(TEST_COUNTER))
         self.assertEqual(
            self.beam_maker._MapPyBeamMaker__process_gen_empty(spill),
            [{'primary':{}}]*16)
-        self.assertEqual(spill["mc"], [{}]*3+[{'primary':{}}]*16)
+        self.assertEqual(spill["mc_events"], [{}]*3+[{'primary':{}}]*16)
 
     def test_process_gen_empty_binomial(self):
         """
         Check that we append a random number of empty primaries within allowed
         range
         """
-        spill = {"mc":[{}, {}, {}]}
+        spill = {"mc_events":[{}, {}, {}]}
         self.beam_maker.birth(json.dumps(TEST_BINOMIAL))
         particles = self.beam_maker._MapPyBeamMaker__process_gen_empty(spill)
         for part in particles:
@@ -328,8 +327,8 @@ class TestMapPyBeamMaker(unittest.TestCase): # pylint: disable = R0904
         for i in range(5): #pylint: disable=W0612
             spill_string = self.beam_maker.process(json.dumps({}))
             spill = json.loads(spill_string)
-            self.assertEqual(len(spill["mc"]), 5)
-        test_primary = spill["mc"][4]["primary"]
+            self.assertEqual(len(spill["mc_events"]), 5)
+        test_primary = spill["mc_events"][4]["primary"]
         self.assertLess(abs(test_primary["position"]["x"]-7.88914), 1e-6)
         self.assertLess(abs(test_primary["time"]-913.768), 1e-6)
 
@@ -338,14 +337,16 @@ class TestMapPyBeamMaker(unittest.TestCase): # pylint: disable = R0904
         Check overall that process works okay
         """
         self.beam_maker.birth(json.dumps(TEST_OVERWRITE))
-        spill_out = self.beam_maker.process(json.dumps({"mc":[{}]*50}))
+        spill_out = self.beam_maker.process(json.dumps({"mc_events":[{}]*50}))
         spill_out = json.loads(spill_out)
-        self.assertEqual(len(spill_out["mc"]), 50)
-        primary_list = [particle["primary"] for particle in spill_out["mc"]]
+        self.assertEqual(len(spill_out["mc_events"]), 50)
+        primary_list = \
+                    [particle["primary"] for particle in spill_out["mc_events"]]
         for primary in primary_list:
             hit = xboa.Hit.Hit.new_from_maus_object("maus_primary", primary, 0)
             self.assertTrue(hit.check())
-        spill_out = json.loads(self.beam_maker.process(json.dumps({"mc":""})))
+        spill_out = \
+               json.loads(self.beam_maker.process(json.dumps({"mc_events":""})))
         self.assertEqual(len(spill_out["errors"]["MapPyBeamMaker"]), 1)
         
 if __name__ == "__main__":

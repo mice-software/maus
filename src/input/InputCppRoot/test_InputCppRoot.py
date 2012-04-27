@@ -44,8 +44,9 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
                   (os.environ["MAUS_ROOT_DIR"], "tmp", "test_inputCppRoot.root")
         root_file = ROOT.TFile(self.fname, "RECREATE") # pylint: disable = E1101
         spill = ROOT.MAUS.Spill() # pylint: disable = E1101
+        data = ROOT.MAUS.Data() # pylint: disable = E1101
         tree = ROOT.TTree("Spill", "TTree") # pylint: disable = E1101
-        tree.Branch("spill", spill, inputter.my_sizeof(), 1)
+        tree.Branch("data", data, inputter.my_sizeof(), 1)
         tree.Fill()
         spill.SetScalars(ROOT.MAUS.Scalars()) # pylint: disable = E1101
         spill.SetEMRSpillData(ROOT.MAUS.EMRSpillData()) # pylint: disable = E1101, C0301
@@ -53,6 +54,7 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
         spill.SetMCEvents(ROOT.MAUS.MCEventArray()) # pylint: disable = E1101
         spill.SetReconEvents(ROOT.MAUS.ReconEventArray()) # pylint: disable = E1101, C0301
         spill.SetSpillNumber(1)
+        data.SetSpill(spill)
         tree.Fill()
         tree.Fill()
         tree.Write()
@@ -86,11 +88,11 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
         # normal event
         json_event = json.loads(inputter.getNextEvent())
         self.assertEqual \
-             (json_event["scalars"], {}, msg=json.dumps(json_event, indent=2))
+           (json_event["spill_number"], 1, msg=json.dumps(json_event, indent=2))
         # normal event
         json_event = json.loads(inputter.getNextEvent())
         self.assertEqual \
-             (json_event["scalars"], {}, msg=json.dumps(json_event, indent=2))
+           (json_event["spill_number"], 1, msg=json.dumps(json_event, indent=2))
         # out of events
         self.assertEqual(inputter.getNextEvent(), "")
 

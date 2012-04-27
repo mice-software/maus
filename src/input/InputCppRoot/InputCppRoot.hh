@@ -23,7 +23,7 @@
 #include "json/json.h"
 
 #include "src/legacy/Interface/Squeal.hh"
-#include "src/common_cpp/DataStructure/Spill.hh"
+#include "src/common_cpp/DataStructure/Data.hh"
 
 class irstream;
 
@@ -83,7 +83,7 @@ class InputCppRoot {
   private:
     irstream* _infile;
     JsonCppConverter* _jsonCppConverter;
-    Spill* _spill;
+    Data* _data;
     std::string _filename;
     std::string _classname;
 };

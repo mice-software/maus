@@ -18,6 +18,8 @@
 #define _SRC_COMMON_CPP_DATASTRUCTURE_MAUS_SPILL_HH_
 
 #include <vector>
+#include <map>
+#include <string>
 
 #include "Rtypes.h"
 
@@ -30,11 +32,12 @@
 namespace MAUS {
 typedef std::vector<ReconEvent*> ReconEventArray;
 typedef std::vector<MCEvent*> MCEventArray;
+typedef std::map<std::string, std::string> ErrorsMap;
 
 /** @class Spill stores data for all items in a given spill
  *
  *  The Spill is the fundamental "event" type for MAUS. Branches for spill-level
- *  objects; Scalars, DAQ, EMR, plus Recon event and MC Event
+ *  objects; Scalars, DAQ, EMR, plus Recon event and MC Event vectors.
  */
 class Spill {
  public:
@@ -86,6 +89,12 @@ class Spill {
   /** Get the spill number */
   int GetSpillNumber() const;
 
+  /** Set the errors on this spill */
+  void SetErrors(ErrorsMap errors);
+
+  /** Get the errors on this spill */
+  ErrorsMap GetErrors() const;
+
  private:
   DAQData* _daq;
   Scalars* _scalars;
@@ -93,6 +102,8 @@ class Spill {
   MCEventArray* _mc;
   ReconEventArray* _recon;
   int _spill_number;
+  std::map<std::string, std::string> _errors;
+
   ClassDef(Spill, 1)
 };
 }

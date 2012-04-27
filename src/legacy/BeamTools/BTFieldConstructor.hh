@@ -61,7 +61,7 @@ public:
   /// Set up some defaults
 	BTFieldConstructor();
   /// Destructor
-	~BTFieldConstructor() {;}
+	~BTFieldConstructor();
   /// Build the fields from root module
 	void BuildFields(MiceModule * rootModule);
   /// Returns true if any child field changes energy - used to tell whether we
@@ -100,6 +100,8 @@ public:
 	BTField * GetFastSolenoid     (const MiceModule * theModule);
   /// Read a magnetic field map
 	BTField * GetMagFieldMap      (const MiceModule * theModule);
+  /// Read a sector magnetic field map
+	BTField * GetSectorMagFieldMap      (const MiceModule * theModule);
   /// Generate an RF cavity (TM010 mode only) - pill box and RF field map
 	BTField * GetRFCavity         (const MiceModule * theModule);
   /// Return a BTMultipole with parameters specific to dipoles

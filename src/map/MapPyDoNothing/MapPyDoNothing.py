@@ -26,14 +26,9 @@ class MapPyDoNothing:
         return True
 
     ## process to pass input to output
-    def process(self, str):
+    def process(self, input_json_doc):
         # check if valid document
-        try:
-            doc = json.loads(str)
-        except ValueError:
-            doc = {"errors": {"bad_json_document": "unable to do json.loads on input"} }
-
-        return json.dumps(doc)
+        return input_json_doc
 
     def death(self):
         return True
