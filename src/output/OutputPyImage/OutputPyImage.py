@@ -79,7 +79,7 @@ class OutputPyImage:
         if key in config_doc:
             directory = config_doc[key]
             if (directory == None):
-                self.directory = os.getcwd()
+                directory = os.getcwd()
             elif not os.path.exists(directory):
                 os.makedirs(directory) 
             elif (not os.path.isdir(directory)):

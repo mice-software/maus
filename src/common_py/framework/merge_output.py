@@ -202,7 +202,17 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
                 docs = self.doc_store.get_since(self.collection, last_time)
             except Exception as exc:
                 raise DocumentStoreException(exc)
-            for doc in docs:
+            # Iterate using while, not for, since docs is an
+            # iterator which streams data from database and we
+            # want to detect database errors.
+            while True:
+                try:
+                    doc = docs.next()
+                except StopIteration:
+                    # No more data so exit inner loop.
+                    break
+                except Exception as exc:
+                    raise DocumentStoreException(exc)
                 doc_id = doc["_id"]
                 doc_time = doc["date"]
                 spill = doc["doc"]
@@ -211,7 +221,8 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
                     last_time = doc_time
                 # Check for change in run.
                 spill_doc = json.loads(spill)
-                spill_run_number = DataflowUtilities.get_run_number(spill_doc) 
+                spill_run_number = \
+                    DataflowUtilities.get_run_number(spill_doc) 
                 if (DataflowUtilities.is_end_of_run(spill_doc)):
                     self.end_of_run = spill_doc
                 if (spill_run_number != self.run_number):

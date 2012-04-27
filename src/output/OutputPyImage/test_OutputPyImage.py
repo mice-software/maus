@@ -58,21 +58,21 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=R0904
         Check default configuration after "birth" is called.
         @param self Object reference.
         """
-        worker = OutputPyImage()
-        success = worker.birth("""{"image_directory":null}""")
-        self.assertTrue(success, "worker.birth() failed")
         self.assertEquals(os.getcwd(), self.__worker.directory, 
             "Unexpected worker.directory")
+        self.assertEquals("prefix", self.__worker.file_prefix, 
+            "Unexpected worker.file_prefix")
 
     def test_birth_none_dir(self):
         """ 
         Check default configuration after "birth" is called.
         @param self Object reference.
         """
-        self.assertEquals(os.getcwd(), self.__worker.directory, 
+        worker = OutputPyImage()
+        success = worker.birth("""{"image_directory":null}""")
+        self.assertTrue(success, "worker.birth() failed")
+        self.assertEquals(os.getcwd(), worker.directory, 
             "Unexpected worker.directory")
-        self.assertEquals("prefix", self.__worker.file_prefix, 
-            "Unexpected worker.file_prefix")
 
     def test_birth_bad_dir(self):
         """ 

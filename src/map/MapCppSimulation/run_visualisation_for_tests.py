@@ -66,7 +66,7 @@ class MapCppSimulationVisualisationTestCase(unittest.TestCase):
         event viewer.
         """
         good_event = {
-            "mc":[self.particle,self.particle]
+            "mc_events":[self.particle,self.particle]
         }
         result = self.mapper.process(json.dumps(good_event))
         if "errors" in result:
@@ -86,7 +86,7 @@ class MapCppSimulationVisualisationTestCase(unittest.TestCase):
         for filename in glob.glob('g4_*.wrl'):
             os.rename(filename, os.environ['MAUS_ROOT_DIR']+'/tmp/'+filename) 
         good_event = {
-            "mc":[]
+            "mc_events":[]
         }
         result = self.mapper.process(json.dumps(good_event))
         if "errors" in result:

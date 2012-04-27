@@ -20,7 +20,7 @@ Appease pylint but does nothing
 """
 
 DESCRIPTION = """
-Script for offline submission to batch farm
+This is the script used for offline submission to batch farm.
 
 execute_against_data is the script that is submitted to the batch farm for
 running batch jobs once the data is pulled to the offline data store.
@@ -28,27 +28,31 @@ execute_against_data runs a simulation monte carlo job using simulate_mice.py
 and a reconstruction job using analyze_data_offline.py. The only input is a
 run number which is found dynamically based on the file name.
 
-Need to source env.sh in the usual way before running.
+The user needs to source env.sh in the usual way before running.
 
-creates a tarball called ######_offline.tar where ##### is the run number right
+Creates a tarball called ######_offline.tar where ##### is the run number right
 aligned and padded by 0s.
 
-return codes are:
-    0 - everything ran okay
-    1 - transient error, try again later
-    2 - there was some internal problem with the reconstruction - needs to be
-        checked by software expert
-    3 - there was some problem with this script - needs to be checked by
-        checked by software expert
-
-Three classes are defined
-  - RunManager: handles overall run execution
-  - FileManager: handles logging and output tarball
-  - RunSettings: handles run setup
+Return codes are:
+    0 - Everything ran okay.
+    1 - There was a transient error. Try again later. Transient errors are
+        errors like the configuration database could not be contacted, or there
+        was no suitable run geometry uploaded yet.
+    2 - there was some internal problem with the reconstruction. It needs to be
+        checked by the software expert.
+    3 - there was some problem with this script. It needs to be checked by the
+        software expert.
 """
 
 # dynamically set __doc__ string so I can access it for argparse
-__doc__ = DESCRIPTION #pylint: disable = W0622
+#pylint: disable = W0622
+__doc__ = DESCRIPTION+"""
+
+Three classes are defined
+  - RunManager: handles overall run execution;
+  - FileManager: handles logging and output tarball;
+  - RunSettings: handles run setup #pylint: disable = W0622
+"""
 
 # TODO (rogers): pylint: disable = W0511
 # - tests
@@ -68,14 +72,15 @@ def arg_parser():
 
     Use -h switch at the command line for information on command line args used.
     """
-    parser = argparse.ArgumentParser(description=DESCRIPTION)
+    parser = argparse.ArgumentParser(description=DESCRIPTION, \
+                           formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--input-file', dest='input_file', \
                         help='Read in json file with this name', required=True)
     parser.add_argument('--test', dest='test_mode', \
-                        help='Run the batch job using a test geometry',
+                        help='Run the batch job using test cdb output',
                         action='store_true', default=False)
     parser.add_argument('--no-test', dest='test_mode', \
-                        help="Don't run the batch job using a test geometry",
+                        help="Don't run the batch job using test cdb output",
                         action='store_false', default=False)
     return parser
 
@@ -115,15 +120,15 @@ class RunManager:
 
     Main function is run()
     """
-    def __init__(self, argv):
+    def __init__(self, args_in_):
         """
         Setup log files and run setup
 
-        @param argv list of command line arguments (strings)
+        @param args_in_ arg_parser object (called from arg_parser function)
         """
         self.logs = FileManager()
         self.logs.open_log('download.log', 'sim.log', 'reco.log', 'batch.log')
-        self.run_setup = RunSettings(argv)
+        self.run_setup = RunSettings(args_in_)
         self.logs.tar_file_name = self.run_setup.tar_file_name
 
     def run(self):
@@ -253,9 +258,10 @@ class RunManager:
         If not in test mode, calls cleanup to clean current working directory
         and closes log files.
         """
-        if not self.run_setup.test_mode:
-            self.cleanup()
-        self.logs.close_log()
+        if not self.run_setup == None:
+            if not self.run_setup.test_mode:
+                self.cleanup()
+            self.logs.close_log()
 
 
 class RunSettings: #pylint: disable = R0902
@@ -266,7 +272,7 @@ class RunSettings: #pylint: disable = R0902
     the main execution blocks
     """
 
-    def __init__(self, argv):
+    def __init__(self, args_in):
         """
         Initialise the run parameters
 
@@ -275,9 +281,6 @@ class RunSettings: #pylint: disable = R0902
         Run number is taken from the name of the tarball passed as an argument.
         All other file names etc are then built off that
         """
-        args = arg_parser()
-        args_in = args.parse_args(argv)
-
         self.input_file_name = args_in.input_file
         self.test_mode = args_in.test_mode    
 
@@ -444,8 +447,11 @@ def main(argv):
     """
     my_return_value = 3
     my_run = None
+    args = arg_parser()
+    args_in_ = args.parse_args(argv) # call the arg_parser before logging
+                                     # starts so we get -h output okay
     try:
-        my_run = RunManager(argv)
+        my_run = RunManager(args_in_)
         my_return_value = my_run.run()
     # download errors are considered transient - i.e. try again later
     except DownloadError:

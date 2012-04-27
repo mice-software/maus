@@ -254,6 +254,12 @@ ckov_pulse_area_threshold = 1
 ckov_window_min = 19
 ckov_window_max = 80
 
+#cerenkov digitization
+ckov_position_threshold = 40
+ckov_pulse_area_threshold = 1
+ckov_window_min = 19
+ckov_window_max = 80
+
 # tof digitization
 TOFconversionFactor = 0.01 # MeV
 TOFpmtTimeResolution = 0.1 # nanosecond
@@ -290,7 +296,9 @@ doc_collection_name = "spills" # Default document collection name. Only needed i
 mongodb_host = "localhost" # Default MongoDB host name. Only needed if using MongoDBDocumentStore.
 mongodb_port = 27017 # Default MongoDB port. Only needed if using MongoDBDocumentStore.
 mongodb_database_name = "mausdb" # Default MongoDB database name. Only needed if using MongoDBDocumentStore.
-mongodb_collection_name = "spills" # Default MongoDB collection name. Only needed if using MongoDBDocumentStore.
 
 # Default OutputPyImage image directory. MAUS web application directory.
 image_directory = os.environ.get("MAUS_WEB_MEDIA_RAW") if (os.environ.get("MAUS_WEB_MEDIA_RAW") != None) else os.getcwd()
+# Default OutputPyFile output directory. MAUS web application directory.
+output_file_directory = os.environ.get("MAUS_WEB_MEDIA_RAW") if (os.environ.get("MAUS_WEB_MEDIA_RAW") != None) else os.getcwd()
+

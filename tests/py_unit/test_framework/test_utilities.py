@@ -387,7 +387,7 @@ class CeleryNodeExceptionTestCase(unittest.TestCase): # pylint: disable=R0904, C
         @param self Object reference.
         """
         exception = CeleryNodeException()
-        self.assertEquals("Celery node(s) [] failed to configure", 
+        self.assertEquals("Celery node(s) failed to configure: []", 
             str(exception), "Unexpected string")
         self.assertEquals([], exception.node_status,
             "Unexpected node status")
@@ -399,7 +399,7 @@ class CeleryNodeExceptionTestCase(unittest.TestCase): # pylint: disable=R0904, C
         """
         node_status = [("1", "Failure 1"), ("2", "Failure 2")]
         exception = CeleryNodeException(node_status)
-        expected = "Celery node(s) %s failed to configure" % ["1", "2"]
+        expected = "Celery node(s) failed to configure: %s" % node_status
         self.assertEquals(expected, str(exception), "Unexpected string")
         self.assertEquals(node_status, exception.node_status,
             "Unexpected node status")
