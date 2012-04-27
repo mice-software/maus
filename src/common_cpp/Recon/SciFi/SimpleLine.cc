@@ -19,15 +19,54 @@
 
 // namespace MAUS {
 
-// Constructor
-SimpleLine::SimpleLine() {}
+// Constructors
+SimpleLine::SimpleLine() {
+  _c = 0.0;
+  _c_err = 0.0;
+  _m = 0.0;
+  _m_err = 0.0;
+  _chisq = 0.0;
+  _chisq_dof = 0.0;
+}
+
+SimpleLine::SimpleLine(double c, double m) {
+  _c = c;
+  _c_err = 0.0;
+  _m = m;
+  _m_err = 0.0;
+  _chisq = 0.0;
+  _chisq_dof = 0.0;
+}
+
+SimpleLine::SimpleLine(double c, double c_err, double m, double m_err,
+                       double chisq, double chisq_dof) {
+  _c = c;
+  _c_err = c_err;
+  _m = m;
+  _m_err = m_err;
+  _chisq = chisq;
+  _chisq_dof = chisq_dof;
+}
 
 // Destructor
 SimpleLine::~SimpleLine() {}
 
-void SimpleLine::set_parameters(double c, double m, double chisq) {
+void SimpleLine::clear() {
+  _c = 0.0;
+  _c_err = 0.0;
+  _m = 0.0;
+  _m_err = 0.0;
+  _chisq = 0.0;
+  _chisq_dof = 0.0;
+}
+
+void SimpleLine::set_parameters(double c, double c_err, double m, double m_err,
+                                double chisq, double chisq_dof) {
   _c = c;
+  _c_err = c_err;
   _m = m;
+  _m_err = m_err;
   _chisq = chisq;
+  _chisq_dof = chisq_dof;
 }
 // } // ~namespace MAUS

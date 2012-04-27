@@ -43,7 +43,7 @@ bool MapCppTrackerRecon::birth(std::string argJsonConfigDocument) {
 
   // Get the value above which an Exception is thrown
   assert(_configJSON.isMember("SciFiClustExcept"));
-  ClustException = _configJSON["SciFiClustExcept"].asDouble();
+  ClustException = _configJSON["SciFiClustExcept"].asInt();
 
   return true;
 }
@@ -68,7 +68,6 @@ std::string MapCppTrackerRecon::process(std::string document) {
     root["errors"] = errors;
     return writer.write(root);
   }
-
   try { // ================= Reconstruction =========================
     for ( unsigned int k = 0; k < spill.events().size(); k++ ) {
       SciFiEvent event = *(spill.events()[k]);
@@ -82,12 +81,17 @@ std::string MapCppTrackerRecon::process(std::string document) {
       }
       // Pattern Recognition.
       if ( event.spacepoints().size() ) {
-      pattern_recognition(event);
+        pattern_recognition(event);
       }
-
+/*
+      // Kalman Track Fit.
+      if ( event.straightprtracks().size() ) {
+        track_fit(event);
+      }
+*/
       print_event_info(event);
       save_to_json(event);
-    } // ==========================================================
+    }  // ==========================================================
   } catch(...) {
     Json::Value errors;
     std::stringstream ss;
@@ -96,7 +100,6 @@ std::string MapCppTrackerRecon::process(std::string document) {
     root["errors"] = errors;
     return writer.write(root);
   }
-
   return writer.write(root);
 }
 
@@ -107,8 +110,8 @@ void MapCppTrackerRecon::digitization(SciFiSpill &spill, Json::Value &root) {
     Json::Value daq = root.get("daq_data", 0);
     RealDataDigitization real;
     real.process(spill, daq);
-  } else if ( root.isMember("digits") ) {
-    Json::Value digits = root.get("digits", 0);
+  } else if ( root.isMember("tracker_digits") ) {
+    Json::Value digits = root.get("tracker_digits", 0);
     fill_digits_vector(digits, spill);
   } else {
     throw 0;
@@ -152,7 +155,12 @@ void MapCppTrackerRecon::pattern_recognition(SciFiEvent &evt) {
   PatternRecognition pr1;
   pr1.process(evt);
 }
-
+/*
+void MapCppTrackerRecon::track_fit(SciFiEvent &evt) {
+  KalmanTrackFit fit;
+  fit.process(evt);
+}
+*/
 void MapCppTrackerRecon::save_to_json(SciFiEvent &evt) {
   Json::Value digits;
   for ( unsigned int dig_i = 0; dig_i < evt.digits().size(); dig_i++ ) {
@@ -165,7 +173,7 @@ void MapCppTrackerRecon::save_to_json(SciFiEvent &evt) {
     digits_in_event["time"]   = evt.digits()[dig_i]->get_time();
     digits.append(digits_in_event);
   }
-  root["digits"].append(digits);
+  root["tracker_digits"].append(digits);
 
   Json::Value sp_tracker0;
   Json::Value sp_tracker1;
@@ -208,15 +216,17 @@ void MapCppTrackerRecon::save_to_json(SciFiEvent &evt) {
   Json::Value tracks_tracker1;
   for ( unsigned int track_i = 0; track_i < evt.straightprtracks().size(); track_i++ ) {
     Json::Value a_track;
-    int tracker = 0;
+    a_track["num_points"] = evt.straightprtracks()[track_i].get_num_points();
     a_track["x0"] = evt.straightprtracks()[track_i].get_x0();
     a_track["y0"] = evt.straightprtracks()[track_i].get_y0();
     a_track["mx"] = evt.straightprtracks()[track_i].get_mx();
     a_track["my"] = evt.straightprtracks()[track_i].get_my();
-    a_track["tracker"] = tracker;
-    if ( tracker == 0 ) {
+    a_track["x_chisq"] = evt.straightprtracks()[track_i].get_x_chisq();
+    a_track["y_chisq"] = evt.straightprtracks()[track_i].get_y_chisq();
+    a_track["tracker"] = evt.straightprtracks()[track_i].get_tracker();
+    if ( evt.straightprtracks()[track_i].get_tracker() == 0 ) {
       tracks_tracker0.append(a_track);
-    } else if ( tracker == 1 ) {
+    } else if ( evt.straightprtracks()[track_i].get_tracker() == 1 ) {
       tracks_tracker1.append(a_track);
     }
   }

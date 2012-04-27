@@ -27,6 +27,7 @@
 #include "unpacking/event.h"
 #include "unpacking/MDdateFile.h"
 #include "unpacking/MDevent.h"
+#include "unpacking/MDfileManager.h"
 #include "unpacking/MDprocessManager.h"
 #include "unpacking/MDequipMap.h"
 #include "unpacking/MDfragment.h"
@@ -54,11 +55,13 @@ class InputCppDAQData {
  public:
 
   /** Create an instance of InputCppDAQData.
-  *
+  * 
   * This is the constructor for InputCppDAQData.
   *
+  * \param[in] pDataPath The (directory) path to read the data from
+  * \param[in] pFilename The filename to read from the pDataPath directory
   */
-  InputCppDAQData();
+  InputCppDAQData(std::string pDataPath = "", std::string pFilename = "");
 
   /** Initialise the Unpacker.
   *
@@ -128,6 +131,9 @@ class InputCppDAQData {
   */
   int _eventsCount;
 
+  /** File manager object. */
+  MDfileManager _dataFileManager;
+
   /** Pointer to the start of the current event. */
   unsigned char *_eventPtr;
 
@@ -174,6 +180,17 @@ class InputCppDAQData {
  /** Processor for DBB data.
   */
   DBBDataProcessor* _DBBFragmentProc;
+
+  /** Paths to the data.
+  * This string has to contain one or more space separated paths.
+  */
+  std::string _dataPaths;
+
+  /** File and run names within _dataPaths.
+  * This string has to contain one or more space separated
+  * file names or run numbers.
+  */
+  std::string _datafiles;
 
  /** Enum of event types
   */

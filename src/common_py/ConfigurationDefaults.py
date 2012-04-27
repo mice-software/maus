@@ -190,7 +190,7 @@ SciFitdcFactor = 1.0
 SciFinPlanes = 3
 SciFinStations = 5
 SciFinTrackers = 2
-SciFiNPECut = 4.0 # photoelectrons
+SciFiNPECut = 2.0 # photoelectrons
 SciFiClustExcept = 100 # exception is thrown
 SciFi_sigma_tracker0_station5 = 0.4298 # mm
 SciFi_sigma_triplet = 0.3844 # mm
@@ -236,10 +236,10 @@ Do_V1731_Zero_Suppression = False
 V1731_Zero_Suppression_Threshold = 100
 Do_V1724_Zero_Suppression = True
 V1724_Zero_Suppression_Threshold = 100
-Do_VLSB_Zero_Suppression = False
-VLSB_Zero_Suppression_Threshold = 0
-Do_VLSB_C_Zero_Suppression = False
-VLSB_C_Zero_Suppression_Threshold = 0
+Do_VLSB_Zero_Suppression = True
+VLSB_Zero_Suppression_Threshold = 30
+Do_VLSB_C_Zero_Suppression = True
+VLSB_C_Zero_Suppression_Threshold = 30
 Enable_TOF = True
 Enable_EMR = True
 Enable_KL = True
@@ -296,9 +296,9 @@ doc_collection_name = "spills" # Default document collection name. Only needed i
 mongodb_host = "localhost" # Default MongoDB host name. Only needed if using MongoDBDocumentStore.
 mongodb_port = 27017 # Default MongoDB port. Only needed if using MongoDBDocumentStore.
 mongodb_database_name = "mausdb" # Default MongoDB database name. Only needed if using MongoDBDocumentStore.
+mongodb_collection_name = "spills" # Default MongoDB collection name. Only needed if using MongoDBDocumentStore.
 
 # Default OutputPyImage image directory. MAUS web application directory.
 image_directory = os.environ.get("MAUS_WEB_MEDIA_RAW") if (os.environ.get("MAUS_WEB_MEDIA_RAW") != None) else os.getcwd()
 # Default OutputPyFile output directory. MAUS web application directory.
 output_file_directory = os.environ.get("MAUS_WEB_MEDIA_RAW") if (os.environ.get("MAUS_WEB_MEDIA_RAW") != None) else os.getcwd()
-

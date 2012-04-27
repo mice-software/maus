@@ -267,8 +267,11 @@ int V830DataProcessor::Process(MDdataContainer* aFragPtr) {
 int VLSBDataProcessor::Process(MDdataContainer* aFragPtr) {
   // Cast the argument to structure it points to.
   // This process should be called only with MDfragmentVLSB_C argument.
-  if ( typeid(*aFragPtr) != typeid(MDfragmentVLSB) )
+  if ( typeid(*aFragPtr) != typeid(MDfragmentVLSB) ) {
+    std::cout << "CASTERROR: " << typeid(*aFragPtr).name() << " != " <<
+                                  typeid(MDfragmentVLSB).name() << std::endl;
     return CastError;
+  }
 
   MDfragmentVLSB* xVLSBFragment = static_cast<MDfragmentVLSB*>(aFragPtr);
 
@@ -285,6 +288,8 @@ int VLSBDataProcessor::Process(MDdataContainer* aFragPtr) {
     xDetector = "tracker1";
   if (xLdc == 2)
     xDetector = "tracker2";
+  if (xLdc == 3)
+    xDetector = "single_station";
 
   pBoardDoc["detector"]             = xDetector;
   pBoardDoc["equip_type"]           = this->GetEquipmentType();

@@ -19,12 +19,14 @@
 // namespace MAUS {
 
 SciFiEvent::SciFiEvent() {
+  _res_hists.resize(0);
   _scifihits.resize(0);
   _scifidigits.resize(0);
   _scificlusters.resize(0);
   _scifispacepoints.resize(0);
   _scifiseeds.resize(0);
   _scifistraightprtracks.resize(0);
+  _scifihelicalprtracks.resize(0);
 }
 
 SciFiEvent::~SciFiEvent() {
