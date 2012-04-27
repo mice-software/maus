@@ -69,6 +69,7 @@ class Uploader: #pylint: disable = R0902
                         uploaded; default is None, in which case geometries are
                         generated automatically
         """
+	self.config = Configreader()
         self.wsdlurl = None
         self.geometry_cdb = cdb.GeometrySuperMouse()
         self.textfile = textfile
@@ -95,8 +96,7 @@ class Uploader: #pylint: disable = R0902
         This method sets up a connection to either the supermouse server or
         the test server depending on whether this is specified by __init__.
         """
-        config = Configreader()
-        self.wsdlurl = config.cdb_upload_url+config.geometry_upload_wsdl
+        self.wsdlurl = self.config.cdb_upload_url+self.config.geometry_upload_wsdl
         self.geometry_cdb.set_url(self.wsdlurl)
         server_status = self.geometry_cdb.get_status()
         if not server_status in SERVER_OK:
@@ -151,7 +151,7 @@ class Uploader: #pylint: disable = R0902
         if zipped_file[-4:] != '.zip':
             raise IOError('Argument is not a zip file')
         else:
-            _dt = datetime.today()
+            _dt = self.config.geometry_upload_valid_from
             fin = open(zipped_file, 'r')
             _gdml = fin.read()
             self.geometry_cdb = cdb.GeometrySuperMouse()

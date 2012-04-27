@@ -234,7 +234,7 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
                     is_birthed = True
                 # Handle current spill.
                 print "Executing Merge for spill %s\n" % doc_id,
-                merged_spill = self.merger.process(spill)
+                merged_spill = self.merger.process(str(spill))
                 print "Executing Output for spill %s\n" % doc_id,
                 self.outputer.save(merged_spill)
                 self.spill_process_count += 1
