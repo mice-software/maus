@@ -34,6 +34,8 @@ class PhaseSpaceVector;
 
 class TransferMap {
  public:
+  TransferMap(const double start_plane, const double end_plane)
+      : start_plane_(start_plane), end_plane_(end_plane) { }
   // ******************************
   //      Transport functions
   // ******************************
@@ -43,15 +45,21 @@ class TransferMap {
    * @params covariances the matrix of second moments of the phase space
    *                    variables {t, E, x, Px, y, Py} to be transported
    */
-  virtual CovarianceMatrix Transport(CovarianceMatrix const * const covariances)
+  virtual CovarianceMatrix Transport(const CovarianceMatrix & covariances)
       const = 0;
 
   /* @brief transports a phase space vector ({t, E, x, Px, y, Py}).
    *
    * @params aPhaseSpaceVector the phase space vector to be transported
    */
-  virtual PhaseSpaceVector Transport(PhaseSpaceVector const * const vector)
+  virtual PhaseSpaceVector Transport(const PhaseSpaceVector & vector)
       const = 0;
+      
+  const double start_plane() {return start_plane_;}
+  const double end_plane() {return end_plane_;}
+ protected:
+  const double start_plane_;
+  const double end_plane_;
 };
 }  // namespace MAUS
 

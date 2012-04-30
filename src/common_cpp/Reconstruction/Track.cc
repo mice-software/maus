@@ -34,6 +34,11 @@ Track::Track(const std::vector<TrackPoint>& tracks,
 Track::~Track()
 { }
 
+Track::Track(const Track & original_instance)
+    : std::vector<TrackPoint>(original_instance),
+      particle_id_(original_instance.particle_id_)
+{ }
+
 int Track::particle_id() const {
   return particle_id_;
 }

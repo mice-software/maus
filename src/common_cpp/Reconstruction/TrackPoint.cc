@@ -22,6 +22,7 @@
 #include <cmath>
 #include "CLHEP/Units/PhysicalConstants.h"
 
+#include "src/common_cpp/Maths/Vector.hh"
 #include "src/common_cpp/Simulation/MAUSPrimaryGeneratorAction.hh"
 #include "Interface/Squeak.hh"
 #include "Reconstruction/Detector.hh"
@@ -31,14 +32,24 @@ namespace MAUS {
 TrackPoint::TrackPoint()
     : PhaseSpaceVector(),
       z_(0.), z_momentum_(0.), detector_id_(Detector::kNone),
-      uncertainties_(new CovarianceMatrix());
+      uncertainties_(new CovarianceMatrix())
 { }
 
 TrackPoint::TrackPoint(const TrackPoint& original_instance)
     : PhaseSpaceVector(original_instance),
       z_(original_instance.z_), z_momentum_(original_instance.z_momentum_),
       detector_id_(original_instance.detector_id_),
-      uncertainties_(new CovarianceMatrix(original_instance.uncertainties_))
+      uncertainties_(new CovarianceMatrix(*original_instance.uncertainties_))
+{ }
+
+TrackPoint::TrackPoint(const PhaseSpaceVector & original_instance)
+    : PhaseSpaceVector(original_instance),
+      detector_id_(Detector::kNone), uncertainties_(new CovarianceMatrix())
+{ }
+
+TrackPoint::TrackPoint(const Vector<double> & original_instance)
+    : PhaseSpaceVector(original_instance),
+      detector_id_(Detector::kNone), uncertainties_(new CovarianceMatrix())
 { }
 
 TrackPoint::TrackPoint(const double t, const double E,
@@ -57,12 +68,12 @@ TrackPoint::TrackPoint(const double t, const double E,
                                    const double z, const double Pz,
                                    const Detector & detector)
     : PhaseSpaceVector(t, E, x, Px, y, Py), z_(z), z_momentum_(Pz),
-      detector_id_(detector.id_),
+      detector_id_(detector.id()),
       uncertainties_(new CovarianceMatrix(detector.uncertainties())) {
 }
 
 TrackPoint::TrackPoint(double const * const array)
-    : PhaseSpaceVector(array), z_(array[6]), z_momentum(array[7]),
+    : PhaseSpaceVector(array), z_(array[6]), z_momentum_(array[7]),
       detector_id_(Detector::kNone), uncertainties_(new CovarianceMatrix()) {
 }
 
@@ -102,44 +113,47 @@ unsigned int TrackPoint::detector_id() const {
   return detector_id_;
 }
 
-void TrackPoint::set_uncertainties(const CovarianceMatrix & uncertainties {
+void TrackPoint::set_uncertainties(const CovarianceMatrix & uncertainties) {
   delete uncertainties_;
   uncertainties_ = new CovarianceMatrix(uncertainties);
 }
 
 const CovarianceMatrix & TrackPoint::uncertainties() const {
-  return uncertainties_;
+  return *uncertainties_;
 }
 
-/* If t < 0 it fills in t and E from z, Pz, and the given mass parameter.
- * If t >= 0 and z < 0, it fills in z and Pz from t, E, and the mass.
+/* Fills in z and Pz from t, E, and the mass.
  */
-void TrackPoint::FillInCoordinates(const double mass) {
-  double c_squared = ::CLHEP::c_light * ::CLHEP::c_light;
+void TrackPoint::FillInAxialCoordinates(const double mass) {
   double px = (*this)[3];
   double py = (*this)[5];
 
-  if ((*this)[0] < 0) {
-    // fill in the time coordinate
-    double velocity = z_momentum_ / mass;
-    (*this)[0] = z_ / velocity;
+  // fill in the Pz coordinate
+  double energy = (*this)[1];
+  z_momentum_ = ::sqrt(energy*energy - mass*mass - px*px - py*py);
 
-    // fill in the energy coordinate
-    (*this)[1] = ::sqrt(mass*mass + px*px + py*py);
-  } else if (z_ < 0) {
-    // fill in the Pz coordinate
-    double energy = (*this)[1]
-    z_momentum_ = ::sqrt(energy*energy - mass*mass - px*px - py*py);
+  // fill in the z coordinate
+  double velocity = z_momentum_ / mass;
+  double time = (*this)[0];
+  z_ = velocity * time;
+}
 
-    // fill in the z coordinate
-    double velocity = z_momentum_ / mass;
-    double time = (*this)[0];
-    z_ = velocity * time;
-  }
+/* Fills in t and E from z, Pz, and the given mass parameter.
+ */
+void TrackPoint::FillInTemporalCoordinates(const double mass) {
+  double px = (*this)[3];
+  double py = (*this)[5];
+
+  // fill in the time coordinate
+  double velocity = z_momentum_ / mass;
+  (*this)[0] = z_ / velocity;
+
+  // fill in the energy coordinate
+  (*this)[1] = ::sqrt(mass*mass + px*px + py*py);
 }
 
 MAUS::MAUSPrimaryGeneratorAction::PGParticle
-PrimaryGeneratorParticle(const TrackPoint & point) {
+PrimaryGeneratorParticle(const TrackPoint & point, const int pid) {
   MAUSPrimaryGeneratorAction::PGParticle particle;
   particle.time = point.t();
   particle.energy = point.E();
@@ -149,7 +163,7 @@ PrimaryGeneratorParticle(const TrackPoint & point) {
   particle.py = point.Py();
   particle.z = point.z();
   particle.pz = point.Pz();
-  particle.pid = point.particle_id_;
+  particle.pid = pid;
   particle.seed = 0; //BUG
 
   return particle;

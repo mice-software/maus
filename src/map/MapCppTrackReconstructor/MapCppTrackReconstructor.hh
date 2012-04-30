@@ -30,6 +30,12 @@
 #include "Config/MiceModule.hh"
 #include "Interface/Squeak.hh"
 
+namespace MAUS {
+
+class OpticsModel;
+class TrajectoryFitter;
+class ReconstructionInput;
+
 // Minuit requires a gobal, static function to minimize. This requires a
 // global instance of TMinuit to use TMinuit::GetObjectFit().
 TMinuit * map_cpp_track_reconstructor_minuit;
@@ -87,19 +93,19 @@ class MapCppTrackReconstructor {
 
   Json::Value run_data_;
   ReconstructionInput * reconstruction_input_;
-  std::vector<ParticleTrajectory> trajectories_;
+  std::vector<TrackPoint> track_points_;
   
   std::string classname_;
   BTField * electromagnetic_field_;
 
-  void CorrelateParticleTracks(
-      std::vector<std::vector<ParticleTrack const *> > * track_sets);
+  void SetupOpticsModel();
+  void SetupTrajectoryFitter();
+  void LoadTestingData();
+  void LoadSimulationData();
+  void LoadLiveData();
+  void CorrelateTrackPoints(std::vector<Track> & tracks);
 };
 
-const size_t MapCppTrackReconstructor::kPhaseSpaceDimension = 6;
-const unsigned int kProcessModeUnset = 0;
-const unsigned int kProcessModeTesting = 1;
-const unsigned int kProcessModeSimulation = 2;
-const unsigned int kProcessModeLive = 3;
+}  // namespace MAUS
 
 #endif  // _SRC_MAP_MAPCPPTRACKRECONSTRUCTOR_HH_

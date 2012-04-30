@@ -23,12 +23,15 @@
 #include <vector>
 
 #include "TMinuit.h"
+#include "TObject.h"
 
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
+#include "TrackFitter.hh"
 
 namespace MAUS {
 
 class OpticsModel;
+class Track;
 
 // Minuit requires a gobal, static function to minimize. This requires a
 // global instance of TMinuit to use TMinuit::GetObjectFit().
@@ -41,26 +44,29 @@ void common_cpp_optics_reconstruction_minuit_track_fitter_score_function(
     Double_t * phase_space_coordinate_values,
     Int_t      execution_stage_flag);
 
-class MinuitTrackFitter : public TrackFitter
-{
+class MinuitTrackFitter : public TrackFitter, TObject {
  public:
   MinuitTrackFitter(
-      OpticsModel const * const optics_model,
-      std::vector<double> const * const detector_planes,
-      std::vector<CovarianceMatrix> const * detector_uncertainties);
+      const OpticsModel & optics_model,
+      const double start_plane,
+      const std::vector<double> & detector_planes);
+
+  //pure virtual function from TrackFitter base class
+  void Fit(const std::vector<TrackPoint> & detector_events,
+           Track * const track);
 
   ~MinuitTrackFitter();
+
+  Double_t ScoreTrack(Double_t const * const start_plane_track_coordinates);
  protected:
   static const size_t kPhaseSpaceDimension;
-  std::vector<DetectorEvent const *> const * detector_events_;
-  ParticleTrajectory * trajectory_;
+
+  std::vector<TrackPoint> const * detector_events_;
+  Track * track_;
   double mass_;
 
   MinuitTrackFitter();
-  Double_t ScoreTrack(Double_t const * const start_plane_track_coordinates);
 };
-
-const size_t MapCppTrackReconstructor::kPhaseSpaceDimension = 6;
 
 }
 

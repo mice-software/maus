@@ -32,20 +32,20 @@ class ReconstructionInput {
   /* @brief	Create with the given input values.
    */
   ReconstructionInput(const bool beam_polarity_negative,
-                      std::vector<Detector> const * const detectors,
-                      std::vector<TrackPoint> const * const events);
+                      const std::vector<Detector> & detectors,
+                      const std::vector<TrackPoint> & events);
 
   ~ReconstructionInput() { }
 
   bool beam_polarity_negative();
-  std::vector<Detector> const * detectorsmymap.find('a')->second();
-  std::vector<TrackPoint> const * events();
+  const std::vector<Detector> & detectors();
+  const std::vector<TrackPoint> & events();
  protected:
   ReconstructionInput();
 
   bool beam_polarity_negative_;
-  std::vector<DetectorPoint> detectors_;
-  std::vector<Track> events_;
+  std::vector<Detector> detectors_;
+  std::vector<TrackPoint> events_;
 };
 
 }  // namespace MAUS

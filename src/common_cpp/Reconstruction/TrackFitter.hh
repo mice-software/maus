@@ -22,8 +22,8 @@
 
 #include <vector>
 
-#include "DetectorEvent.hh"
-#include "ParticleTrajectory.hh"
+#include "TrackPoint.hh"
+#include "Track.hh"
 
 namespace MAUS {
 
@@ -32,12 +32,21 @@ class OpticsModel;
 class TrackFitter
 {
  public:
-  virtual void Fit(std::vector<DetectorEvent const *> const * const detector_events
-                   ParticleTrajectory * const trajectory) = 0;
+  TrackFitter(
+      const OpticsModel & optics_model,
+      const double start_plane,
+      const std::vector<double> & detector_planes)
+      : optics_model_(&optics_model), start_plane_(start_plane),
+        detector_planes_(&detector_planes) { }
+
+  virtual void Fit(const std::vector<TrackPoint> & detector_events,
+                   Track * const track) = 0;
  protected:
   OpticsModel const * optics_model_;
+  const double start_plane_;
   std::vector<double> const * detector_planes_;
-  std::vector<CovarianceMatrix> const * detector_uncertainties_;
+
+  TrackFitter() : start_plane_(0.0) { };
 };
 
 }

@@ -19,18 +19,19 @@
 
 #include "Reconstruction/MinuitTrackFitter.hh"
  
+#include <cmath>
 #include <vector>
 
 #include "TMinuit.h"
 
 #include "Interface/Squeal.hh"
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
-#include "Optics/OpticsModel.hh"
+#include "src/common_cpp/Optics/OpticsModel.hh"
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
 #include "src/common_cpp/Optics/TransferMap.hh"
-#include "Reconstruction/DetectorEvent.hh"
-#include "Reconstruction/ParticleTrack.hh"
-#include "Reconstruction/ParticleTrajectory.hh"
+#include "Reconstruction/Particle.hh"
+#include "Reconstruction/Track.hh"
+#include "Reconstruction/TrackPoint.hh"
 
 namespace MAUS {
 
@@ -51,17 +52,16 @@ void common_cpp_optics_reconstruction_minuit_track_fitter_score_function(
 }
 
 MinuitTrackFitter::MinuitTrackFitter(
-    OpticsModel const * const optics_model,
-    std::vector<double> const * const detector_planes,
-    std::vector<CovarianceMatrix> const * detector_uncertainties)
-    : optics_model_(optics_model), detector_planes_(detector_planes),
-      detector_uncertainties_(uncertainties) {
+    const OpticsModel & optics_model,
+    const double start_plane,
+    const std::vector<double> & detector_planes)
+    : TrackFitter(optics_model, start_plane, detector_planes) {
   // Setup *global* scope Minuit object
   common_cpp_optics_reconstruction_minuit_track_fitter_minuit
     = new TMinuit(kPhaseSpaceDimension);
   TMinuit * minimiser
     = common_cpp_optics_reconstruction_minuit_track_fitter_minuit;
-  minimiser->SetMaxIteration(100);
+  minimiser->SetMaxIterations(100);
   int error_flag = 0;
   // setup the index, name, init value, step size, min, and max value for each
   // phase space variable (mins and maxes calculated from 800MeV/c ISIS beam)
@@ -71,7 +71,7 @@ MinuitTrackFitter::MinuitTrackFitter(
   minimiser->mnparm(3, "Px", 900, 0.1, 30., 1860, error_flag);    // MeV/c
   minimiser->mnparm(4, "Y", 0, 0.001, -1.5, 1.5, error_flag);      // m
   minimiser->mnparm(5, "Py", 900, 0.1, 30., 1860, error_flag);    // MeV/c
-  minimiser->SetFitObject(this);
+  minimiser->SetObjectFit(this);
   minimiser->SetFCN(
     common_cpp_optics_reconstruction_minuit_track_fitter_score_function);
 }
@@ -81,74 +81,83 @@ MinuitTrackFitter::~MinuitTrackFitter() {
 }
 
 void MinuitTrackFitter::Fit(
-    std::vector<DetectorEvent const *> const * const detector_events,
-    ParticleTrajectory * const trajectory) {
-  detector_events_ = detector_events;
-  trajectory_ = trajectory;
+    const std::vector<TrackPoint> & detector_events,
+    Track * const track) {
+  detector_events_ = &detector_events;
+  track_ = track;
 
-  int particle_id = trajectory->particle_id();
-  // FIXME(plane1@hake.iit.edu) assuming muons with m = 105.7 MeV/c^2.
-  // Should use particle_id to look up the mass of the particle.
-  mass_ = 105.7;
+  int particle_id = track_->particle_id();
+  mass_ = Particle::GetInstance()->GetMass(particle_id);
 
-  if (detector_events->size() < 2) {
+  if (detector_events_->size() < 2) {
     throw(Squeal(Squeal::recoverable,
-                 "Not enough tracks to fit trajectory (need at least two).",
+                 "Not enough track points to fit track (need at least two).",
                  "MAUS::MinuitTrackFitter::Fit()"));
   }
 
-  // Find the start plane track that minimizes the score for the calculated
-  // trajectory based off of this track (i.e. best fits the measured tracks
-  // from the detectors).
+  // Find the start plane coordinates that minimize the score for the calculated
+  // track based off of this track point (i.e. best fits the measured track
+  // points from the detectors).
   TMinuit * minimiser
     = common_cpp_optics_reconstruction_minuit_track_fitter_minuit;
-  Int_t status = minimiser->Migrad();
+  //Int_t status = minimiser->Migrad();
+  minimiser->Migrad();
   
   // TODO(plane1@hawk.iit.edu) Handle status from minimiser
 }
 
 Double_t MinuitTrackFitter::ScoreTrack(
-    Double_t * start_plane_track_coordinates) {
-  TransferMap transfer_map = optics_model_->transfer_map();
-
-  // clear the last saved trajectory
-  trajectory_->clear();
-
-  // the first guess (calculated track) is the start plane track give by Minuit
-  ParticleTrack guess(start_plane_track_coordinates[0],
-                      start_plane_track_coordinates[1],
-                      start_plane_track_coordinates[2],
-                      start_plane_track_coordinates[3],
-                      start_plane_track_coordinates[4],
-                      start_plane_track_coordinates[5]);
+    Double_t const * const start_plane_track_coordinates) {
+  // clear the last saved track
+  track_->clear();
   
-  ParticleTrack guess; 
+  // Setup the start plane track point based on the Minuit initial conditions
+  TrackPoint guess(start_plane_track_coordinates[0],
+                   start_plane_track_coordinates[1],
+                   start_plane_track_coordinates[2],
+                   start_plane_track_coordinates[3],
+                   start_plane_track_coordinates[4],
+                   start_plane_track_coordinates[5],
+                   0.0, 0.0, CovarianceMatrix());
+  guess.FillInAxialCoordinates(mass_);
+  double start_plane = guess.z();
+  track_->push_back(guess);
+
   PhaseSpaceVector delta;  // difference between the guess and the measurement
+  TransferMap const * transfer_map = NULL;
+  CovarianceMatrix const * uncertainties = &guess.uncertainties();
+  std::vector<TrackPoint>::const_iterator events
+    = detector_events_->begin();
 
-  std::vector<DetectorEvent const *>::const_iterator events = detector_events_->begin();
-  std::vector<CovarianceMatrix>::const_iterator<CovarianceMatrix> errors = detector_uncertainties_->begin();
-  double chi_squared = 0;
-  while (events < detector_events_->end()) {
-  // save the calculated trajectory in case this is the last one
-  // (i.e. the best fit trajectory).
-    trajectory_->push_back(guess);
+  // calculate chi^2
+  Double_t chi_squared = 0.0;
+  for (size_t index = 0; events < detector_events_->end(); ++index) {
+    // calculate the next guess
+    transfer_map
+      = optics_model_->GenerateTransferMap(start_plane,
+                                           detector_planes_->at(index),
+                                           mass_);
+    guess = TrackPoint(transfer_map->Transport(guess));
+    delete transfer_map;
 
-    // sum the squares of the differences between the calculated phase space
-    // coordinates and the measured coordinates
-    delta = guess - (*events);
-    chi_squared += delta * (*errors) * transpose(delta)
+    guess.FillInAxialCoordinates(mass_);
+    uncertainties = &(*events).uncertainties();
+    guess.set_uncertainties(*uncertainties);
 
-    // calculate the next event's phase space coordinates using the transfer map
-    if (events > (*detector_events_).rbegin()) {
-      transfer_map = optics_model_->transfer_map(detector_planes_[index],
-                                                 detector_planes_[index+1],
-                                                 mass_)
-      guess = transfer_map.Transport(&guess);
-    }
+    // save the calculated track in case this is the last one
+    // (i.e. the best fit track).
+    track_->push_back(guess);
 
+    // Sum the squares of the differences between the calculated phase space
+    // coordinates and the measured coordinates.
+    delta = TrackPoint(guess - (*events));
+    chi_squared += (transpose(delta) * (*uncertainties) * delta)[0];
+
+    start_plane = guess.z();
     ++events;
-    ++errors;
   }
+
+  return chi_squared;
 }
 
 }  // namespace MAUS

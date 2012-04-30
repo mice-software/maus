@@ -17,7 +17,7 @@
  /* Author: Peter Lane
  */
 
-#include "MapCppTrackReconstructor/MapCppTrackReconstructor.hh"
+#include "src/map/MapCppTrackReconstructor/MapCppTrackReconstructor.hh"
 
 // C++
 #include <vector>
@@ -29,7 +29,7 @@
 
 // MAUS
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
-#include "src/common_cpp/Optics/LeastSquaresOpticsModel.hh"
+//#include "src/common_cpp/Optics/LeastSquaresOpticsModel.hh"
 #include "src/common_cpp/Optics/LinearApproximationOpticsModel.hh"
 #include "src/common_cpp/Reconstruction/Detector.hh"
 #include "src/common_cpp/Reconstruction/Particle.hh"
@@ -92,17 +92,17 @@ std::string MapCppTrackReconstructor::process(std::string run_data) {
   //  in addition to Minuit, and select between them based on the configuration
  
   // associate tracks with individual particles
-  std::vector<std::vector<ParticleTrack const *> > track_sets;
-  CorrelateParticleTracks(&track_sets);
+  std::vector<Track> tracks;
+  CorrelateTrackPoints(&tracks);
 
   // Find the best fit trajectory for each particle traversing the lattice
-  std::vector<std::vector<ParticleTrack const *> >::const_iterator
+  std::vector<std::vector<TrackPoint const *> >::const_iterator
                                                           measured_trajectories;
   int particle_ids[] = {
   for (trajectories = track_sets.begin();
        trajectories < track_sets.end();
        ++trajectories) {
-    ParticleTrajectory best_fit_trajectory(particle_id);
+    Track best_fit_trajectory(particle_id);
     trajectory_fitter_->Fit(&(*measured_trajectories), &best_fit_trajectory);
 
     // TODO(plane1@hawk.iit.edu) Reconstruct tracks at the desired locations
@@ -122,7 +122,7 @@ std::string MapCppTrackReconstructor::process(std::string run_data) {
   return output;
 }
 
-MapCppTrackReconstructor::SetupOpticsModel() {
+void MapCppTrackReconstructor::SetupOpticsModel() {
   Json::Value optics_model_names = JsonWrapper::GetProperty(
       configuration_,
       "reconstruction_optics_models",
@@ -160,6 +160,7 @@ MapCppTrackReconstructor::SetupOpticsModel() {
       break;
     }
     case 2: {
+    /*
       // "Least Squares"
       Json::Value algorithm_names = JsonWrapper::GetProperty(
           configuration_,
@@ -179,7 +180,7 @@ MapCppTrackReconstructor::SetupOpticsModel() {
         }
       }
 
-      Algorithm algorithm;  track_sets->push_back(
+      Algorithm algorithm;
 
       switch (algorithm_number) {
         case 4: algorithm = Algorithm::kSweepingChiSquaredWithVariableWalls;
@@ -191,7 +192,7 @@ MapCppTrackReconstructor::SetupOpticsModel() {
         default: algorithm = Algorithm::kUnconstrainedPolynomial;      
       }
       optics_model_ = new LeastSquaresOpticsModel(algorithm);
-
+    */
       break;
     }
     case 3: {
@@ -360,22 +361,26 @@ void MapCppTrackReconstructor::LoadLiveData() {
 }
 
 
-void MapCppTrackReconstructor::CorrelateParticleTracks(
-    std::vector<std::vector<ParticleTrack const *> > * track_sets) {
+void MapCppTrackReconstructor::CorrelateTrackPoints(
+    std::vector<Track> & tracks) {
+  const std::vector<TrackPoint> & track_points
+      = reconstruction_input_->events();
+
   // TODO(plane1@hawk.iit.edu) create sets of events where each set corresponds
   // to a different particle. For now assume that all events are from a single
   // particle.
-  std::vector<ParticleTrack> const * const particle_tracks
-      = reconstruction_input_->tracks();
-  std::vector<ParticleTrack const *> superset;
-  std::vector<ParticleTrack>::const_iterator iter = particle_tracks->begin();
-  while (iter < particle_tracks->end()) {
-    superset->push_back(&(*iter));
-    ++iter;
-  }
-  track_sets->push_back(superset);
+  tracks->push_back(Track(track_points));
 }
 
 bool MapCppTrackReconstructor::death() {
   return true;  // successful
 }
+
+const size_t MapCppTrackReconstructor::kPhaseSpaceDimension = 6;
+const unsigned int kProcessModeUnset = 0;
+const unsigned int kProcessModeTesting = 1;
+const unsigned int kProcessModeSimulation = 2;
+const unsigned int kProcessModeLive = 3;
+
+}  // namespace MAUS
+

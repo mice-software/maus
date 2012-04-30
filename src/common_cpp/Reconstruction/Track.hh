@@ -36,6 +36,10 @@ class Track : public std::vector<TrackPoint> {
    */
   explicit Track(const int particle_id);
 
+  /* @brief Copy constructor;
+   */  
+  Track(const Track & original_instance);
+
   /* @brief Create with tracks and particle ID.
    */
   Track(const std::vector<TrackPoint>& tracks,

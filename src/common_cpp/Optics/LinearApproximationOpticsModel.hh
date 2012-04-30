@@ -22,6 +22,7 @@
 #include <vector>
 
 #include "src/common_cpp/Optics/TransferMap.hh"
+#include "src/common_cpp/Optics/OpticsModel.hh"
 
 namespace MAUS {
 
@@ -34,18 +35,33 @@ class LinearApproximationOpticsModel : public OpticsModel {
   LinearApproximationOpticsModel();
 
   ~LinearApproximationOpticsModel() { }
- private:
+  void Build(const Json::Value & configuration);
+
+  /* @brief Dynamically allocate a new TransferMap between two z-axis.
+   *
+   * The user of this function takes ownership of the dynamically allocated
+   * memory and is responsible for deallocating it.
+   */
+  TransferMap * GenerateTransferMap(
+      double start_plane, double end_plane, double mass) const;
+
+ protected:
 };
 
 class LinearApproximationTransferMap : public TransferMap {
  public:
-  LinearApproximationTransferMap(double z1, double z2, double mass)
-    : z1_(z1), z2_(z2), mass_(mass) { }
-  LinearApproximationTransferMap(const LinearApproximationTransferMap& map);
-    : z1_(map.z1_), z2_(map.z2_), mass_(map.mass_) { }
+  LinearApproximationTransferMap(double start_plane, double end_plane, double mass)
+    : TransferMap(start_plane, end_plane), mass_(mass) { }
+  LinearApproximationTransferMap(const LinearApproximationTransferMap & map)
+    : TransferMap(map.start_plane_, map.end_plane_), mass_(map.mass_) { }
+  CovarianceMatrix Transport(const CovarianceMatrix & covariances) const;
+
+  /* @brief transports a phase space vector ({t, E, x, Px, y, Py}).
+   *
+   * @params aPhaseSpaceVector the phase space vector to be transported
+   */
+  PhaseSpaceVector Transport(const PhaseSpaceVector & vector) const;
  private:
-  double z1_;
-  double z2_;
   double mass_;
 };
 

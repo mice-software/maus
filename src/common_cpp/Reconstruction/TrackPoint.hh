@@ -29,6 +29,7 @@ namespace MAUS {
 
 class CovarianceMatrix;
 class Detector;
+class Vector<double>;
 
 /* @class TrackPoint a phase space vector with redundant t/E and z/Pz
  * coordinates as well as an ID that links the track to the detector that
@@ -49,7 +50,15 @@ class TrackPoint : public MAUS::PhaseSpaceVector {
 
   /* @brief  Copy constructor.
    */
-  TrackPoint(const TrackPoint& original_instance);
+  TrackPoint(const TrackPoint & original_instance);
+
+  /* @brief  Base class copy constructor.
+   */
+  explicit TrackPoint(const PhaseSpaceVector & original_instance);
+
+  /* @brief  Vector<double> copy constructor.
+   */
+  explicit TrackPoint(const Vector<double> & original_instance);
 
   /* @brief Create with coordinates from an array.
      Order is t, E, x, Px, y, Py, z, Pz.
@@ -94,9 +103,10 @@ class TrackPoint : public MAUS::PhaseSpaceVector {
   unsigned int detector_id() const;
 
   void set_uncertainties(const CovarianceMatrix & uncertainties);
-  CovarianceMatrix const * const uncertainties() const;
+  const CovarianceMatrix & uncertainties() const;
  
-  void FillInCoordinates(const double mass);  
+  void FillInAxialCoordinates(const double mass);  
+  void FillInTemporalCoordinates(const double mass);  
  protected:
   double z_;
   double z_momentum_;
@@ -106,7 +116,7 @@ class TrackPoint : public MAUS::PhaseSpaceVector {
 };
 
 MAUS::MAUSPrimaryGeneratorAction::PGParticle PrimaryGeneratorParticle(
-    const TrackPoint & point);
+    const TrackPoint & point, const int pid);
 
 std::ostream& operator<<(std::ostream & out, const TrackPoint & vector);
 }  // namespace MAUS

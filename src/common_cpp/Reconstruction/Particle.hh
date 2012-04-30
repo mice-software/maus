@@ -81,37 +81,6 @@ class Particle {
   std::map<int, int> charges_;
 };
 
-const int Particle::kNone = 0;
-const int Particle::kEMinus = 11;
-const int Particle::kElectronNeutrino = 12;
-const int Particle::kMuMinus = 13;
-const int Particle::kMuonNeutrino = 14;
-const int Particle::kPhoton = 22;
-const int Particle::kPi0 = 111;
-const int Particle::kPiPlus = 211;
-const int Particle::kKPlus = 321;
-const int Particle::kNeutron = 2112;
-const int Particle::kProton = 2212;
-const int Particle::kDeuterium = 1000010020;
-const int Particle::kTritium = 1000010030;
-const int Particle::kHelium3 = 1000020030;
-const int Particle::kHelium4 = 1000020040;
-const int Particle::kKLong = 130;
-const int Particle::kKShort = 310;
-const int Particle::kK0 = 311;
-const int Particle::kLambda = 3122;
-const int Particle::kEPlus = -kEMinus;
-const int Particle::kElectronAntineutrino = -kElectronNeutrino;
-const int Particle::kMuPlus = -kMuMinus;
-const int Particle::kMuonAntineutrino = -kMuonNeutrino;
-const int Particle::kPiMinus = -kPiPlus;
-const int Particle::kKMinus = -kKPlus;
-const int Particle::kAntineutron = -kNeutron;
-const int Particle::kAntiproton = -kProton;
-const int Particle::kAntilambda = -kLambda;
-
-const Particle Particle::kSingleton = Particle();
-
 std::ostream& operator<<(std::ostream& out, const Particle& vector);
 }  // namespace MAUS
 

@@ -23,22 +23,24 @@
 #include <iostream>
 #include <vector>
 
+#include "src/common_cpp/Optics/CovarianceMatrix.hh"
 namespace MAUS {
 
-class ReconstructionInput {
+class Detector {
  public:
   /* @brief	Create with the given input values.
    */
   Detector(const unsigned int id,
            const double plane,
-           const CovarianceMatrix const * const uncertainties);
+           const CovarianceMatrix & uncertainties);
 
   ~Detector();
 
-  const unsigned int id();
-  const double plane();
-  const CovarianceMatrix const * uncertainties();
+  const unsigned int id() const;
+  const double plane() const;
+  const CovarianceMatrix & uncertainties() const;
 
+  static const unsigned int kNone;
   static const unsigned int kTOF0;
   static const unsigned int kCherenkov1;
   static const unsigned int kTOF1;
@@ -53,15 +55,6 @@ class ReconstructionInput {
   double plane_;
   CovarianceMatrix uncertainties_;
 };
-
-const unsigned int Detector::None = 0;
-const unsigned int Detector::TOF0 = 1;
-const unsigned int Detector::Cherenkov1 = 2;
-const unsigned int Detector::TOF1 = 3;
-const unsigned int Detector::Tracker1 = 4;
-const unsigned int Detector::Tracker2 = 5;
-const unsigned int Detector::Cherenkov2 = 6;
-const unsigned int Detector::Calorimeter = 7;
 
 }  // namespace MAUS
 
