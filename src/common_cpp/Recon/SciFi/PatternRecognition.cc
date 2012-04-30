@@ -20,6 +20,7 @@
 #include <fstream>
 #include <map>
 #include <vector>
+#include <cmath>
 
 // External libs headers
 #include "gsl/gsl_fit.h"
@@ -63,6 +64,9 @@ void PatternRecognition::process(SciFiEvent &evt) {
     for ( int trker_no = 0; trker_no < _n_trackers; ++trker_no ) {
       std::cout << "Reconstructing for Tracker " << trker_no + 1 << std::endl;
 
+      // Vector of ints holding the track residuals for histogramming later
+      std::vector< std::vector<int> > residuals(4, std::vector<int>(102, 0));
+
       // Split spacepoints according to which station they occured in
       std::vector< std::vector<SciFiSpacePoint*> > spnts_by_station(_n_stations);
       sort_by_station(spnts_by_tracker[trker_no], spnts_by_station);
@@ -73,28 +77,32 @@ void PatternRecognition::process(SciFiEvent &evt) {
       // Make the tracks depending on how many stations have spacepoints in them
       if (num_stations_hit == 5) {
         std::vector<SciFiStraightPRTrack> trks;
-        make_5tracks(spnts_by_station, trks);
+        make_5tracks(spnts_by_station, trks, residuals);
         for ( int i = 0; i < static_cast<int>(trks.size()); ++i ) {
           trks[i].set_tracker(trker_no);
           evt.add_straightprtrack(trks[i]);
+          evt.set_residuals(residuals);
         }
       }
       if (num_stations_hit > 3) {
         std::vector<SciFiStraightPRTrack> trks;
-        make_4tracks(spnts_by_station, trks);
+        make_4tracks(spnts_by_station, trks, residuals);
         for ( int i = 0; i < static_cast<int>(trks.size()); ++i ) {
           trks[i].set_tracker(trker_no);
           evt.add_straightprtrack(trks[i]);
+          evt.set_residuals(residuals);
         }
       }
       if (num_stations_hit > 2) {
         std::vector<SciFiStraightPRTrack> trks;
-        make_3tracks(spnts_by_station, trks);
+        make_3tracks(spnts_by_station, trks, residuals);
         for ( int i = 0; i < static_cast<int>(trks.size()); ++i ) {
           trks[i].set_tracker(trker_no);
           evt.add_straightprtrack(trks[i]);
+          evt.set_residuals(residuals);
         }
       }
+
       std::cout << "Finished Tracker " << trker_no + 1 << std::endl;
     }// ~Loop over trackers
     std::cout << "Number of tracks found: " << evt.straightprtracks().size() << "\n\n";
@@ -105,20 +113,22 @@ void PatternRecognition::process(SciFiEvent &evt) {
 };
 
 void PatternRecognition::make_5tracks(
-                         std::vector< std::vector<SciFiSpacePoint*> >& spnts_by_station,
-                         std::vector<SciFiStraightPRTrack>& trks) {
+                         std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
+                         std::vector<SciFiStraightPRTrack> &trks,
+                         std::vector< std::vector<int> > &residuals) {
   std::cout << "Making 5 point tracks" << std::endl;
 
   int num_points = 5;
   std::vector<int> ignore_stations; // A zero size vector sets that all stations are used
-  make_straight_tracks(num_points, ignore_stations, spnts_by_station, trks);
+  make_straight_tracks(num_points, ignore_stations, spnts_by_station, trks, residuals);
 
   std::cout << "Finished making 5 pt tracks" << std::endl;
 } // ~make_spr_5pt(...)
 
 void PatternRecognition::make_4tracks(
                          std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
-                         std::vector<SciFiStraightPRTrack> &trks) {
+                         std::vector<SciFiStraightPRTrack> &trks,
+                         std::vector< std::vector<int> > &residuals) {
   std::cout << "Making 4 point tracks" << std::endl;
 
   int num_points = 4;
@@ -137,7 +147,7 @@ void PatternRecognition::make_4tracks(
       // If there are enough occupied stations left to make a 4 point track, keep making tracks
       if ( num_stations_hit  >= num_points ) {
         std::vector<int> ignore_stations(1, i);
-        make_straight_tracks(num_points, ignore_stations, spnts_by_station, trks);
+        make_straight_tracks(num_points, ignore_stations, spnts_by_station, trks, residuals);
       } else {
         break;
       }
@@ -152,7 +162,7 @@ void PatternRecognition::make_4tracks(
 
     // Make the tracks
     if ( static_cast<int>(stations_not_hit.size()) == 1 ) {
-      make_straight_tracks(num_points, stations_not_hit, spnts_by_station, trks);
+      make_straight_tracks(num_points, stations_not_hit, spnts_by_station, trks, residuals);
     } else {
       std::cout << "Wrong number of stations without spacepoints, ";
       std::cout << "aborting 4 pt track." << std::endl;
@@ -168,7 +178,8 @@ void PatternRecognition::make_4tracks(
 
 void PatternRecognition::make_3tracks(
                          std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
-                         std::vector<SciFiStraightPRTrack> &trks) {
+                         std::vector<SciFiStraightPRTrack> &trks,
+                         std::vector< std::vector<int> > &residuals) {
   std::cout << "Making 3 point track" << std::endl;
 
   int num_points = 3;
@@ -194,7 +205,7 @@ void PatternRecognition::make_3tracks(
               std::vector<int> ignore_stations;
               ignore_stations.push_back(i);
               ignore_stations.push_back(j);
-              make_straight_tracks(num_points, ignore_stations, spnts_by_station, trks);
+              make_straight_tracks(num_points, ignore_stations, spnts_by_station, trks, residuals);
             } else {
                 sufficient_hit_stations = false;
             }
@@ -221,7 +232,7 @@ void PatternRecognition::make_3tracks(
           ignore_stations.clear();
           ignore_stations.push_back(stations_not_hit[0]);
           ignore_stations.push_back(i);
-          make_straight_tracks(num_points, ignore_stations, spnts_by_station, trks);
+          make_straight_tracks(num_points, ignore_stations, spnts_by_station, trks, residuals);
         } else {
           break;
         }
@@ -237,7 +248,7 @@ void PatternRecognition::make_3tracks(
 
     // Make the tracks
     if ( static_cast<int>(stations_not_hit.size()) == 2 ) {
-      make_straight_tracks(num_points, stations_not_hit, spnts_by_station, trks);
+      make_straight_tracks(num_points, stations_not_hit, spnts_by_station, trks, residuals);
     } else {
       std::cout << "Wrong number of stations without spacepoints, ";
       std::cout << "aborting 3 pt track." << std::endl;
@@ -254,7 +265,8 @@ void PatternRecognition::make_3tracks(
 void PatternRecognition::make_straight_tracks(const int num_points,
                                      const std::vector<int> ignore_stations,
                                      std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
-                                     std::vector<SciFiStraightPRTrack> &trks) {
+                                     std::vector<SciFiStraightPRTrack> &trks,
+                                     std::vector< std::vector<int> > &residuals) {
   // Set inner and outer stations
   int outer_station_num = -1, inner_station_num = -1;
   set_end_stations(ignore_stations, outer_station_num, inner_station_num);
@@ -309,10 +321,13 @@ void PatternRecognition::make_straight_tracks(const int num_points,
                   double dx = pos.x() - ( line_x.get_c() + ( pos.z() * line_x.get_m() ) );
                   double dy = pos.y() - ( line_y.get_c() + ( pos.z() * line_y.get_m() ) );
 
+                  add_residuals(false, dx, dy, residuals);
+
                   // Apply roadcuts & find the spacepoints with the smallest residuals for the line
                   if ( fabs(dx) < _res_cut && fabs(dy) < _res_cut && delta_sq > (dx*dx + dy*dy) ) {
                     delta_sq = dx*dx + dy*dy;
                     good_spnts.push_back(spnts_by_station[station_num][sp_no]);
+                    add_residuals(true, dx, dy, residuals);
                   } // ~If pass roadcuts and beats previous best fit point
                 } // ~If spacepoint is unused
               } // ~Loop over spacepoints
@@ -333,20 +348,13 @@ void PatternRecognition::make_straight_tracks(const int num_points,
                               spnts_by_station[inner_station_num][station_inner_sp]);
             good_spnts.push_back(spnts_by_station[outer_station_num][station_outer_sp]);
 
-            std::vector<double> _z;
-            std::vector<double> _x;
-            std::vector<double> _x_err;
-            std::vector<double> _y;
-            std::vector<double> _y_err;
+            std::vector<double> x, x_err, y, y_err, z;
 
             for ( int i = 0; i < static_cast<int>(good_spnts.size()); ++i ) {
-              double z_i = good_spnts[i]->get_position().z();
-              double x_i = good_spnts[i]->get_position().x();
-              double y_i = good_spnts[i]->get_position().y();
 
-              _z.push_back(z_i);
-              _x.push_back(x_i);
-              _y.push_back(y_i);
+              x.push_back(good_spnts[i]->get_position().x());
+              y.push_back(good_spnts[i]->get_position().y());
+              z.push_back(good_spnts[i]->get_position().z());
 
               // The error on the position measurements of sp in a tracker (same in x and y)
               double sd = -1.0;
@@ -356,14 +364,14 @@ void PatternRecognition::make_straight_tracks(const int num_points,
               else
                 sd = _sd_1to4;
 
-              _x_err.push_back(sd);
-              _y_err.push_back(sd);
+              x_err.push_back(sd);
+              y_err.push_back(sd);
             }
 
             // Fit track
             SimpleLine line_x, line_y;
-            linear_fit(_z, _x, _x_err, line_x);
-            linear_fit(_z, _y, _y_err, line_y);
+            linear_fit(z, x, x_err, line_x);
+            linear_fit(z, y, y_err, line_y);
             // linear_fit(good_spnts, line_x, line_y);
 
             // Check track passes chisq test, then create SciFiStraightPRTrack
@@ -1113,6 +1121,54 @@ void PatternRecognition::draw_line(const SciFiSpacePoint *sp1, const SciFiSpaceP
 
           std::cout << "m_xi = " << line_x.get_m()  << "\tx_0i = " << line_x.get_c() << std::endl;
           std::cout << "m_yi = " << line_y.get_m() << "\ty_0i = " << line_y.get_c() << std::endl;
+}
+
+bool PatternRecognition::add_residuals(const bool passed, const double dx, const double dy,
+                                       std::vector< std::vector<int> > &residuals) {
+
+  if (residuals.size() == 4) {
+    double bin_width = _active_diameter / _n_bins;
+    std::cout << "Bin width is " << bin_width << std::endl;
+
+    if (passed) {  // if we have only residuals that passed the road cuts
+      if (dx < 0.0 )
+        ++residuals[2][0]; // Underflow
+      else if ( dx > _active_diameter )
+        ++residuals[2][_n_bins+1]; // Overflow
+      else
+        ++residuals[2][ceil(dx/bin_width)];
+
+      if (dy < 0.0 )
+        ++residuals[3][0]; // Underflow
+      else if ( dy > _active_diameter )
+        ++residuals[3][_n_bins+1]; // Overflow
+      else
+        ++residuals[3][ceil(dy/bin_width)];
+
+      return true;
+
+    } else {  // all the residuals, passed or not
+      if (dx < 0.0 )
+        ++residuals[0][0]; // Underflow
+      else if ( dx > _active_diameter )
+        ++residuals[0][_n_bins+1]; // Overflow
+      else
+        ++residuals[0][ceil(dx/bin_width)];
+
+      if (dy < 0.0 )
+        ++residuals[1][0]; // Underflow
+      else if ( dy > _active_diameter )
+        ++residuals[1][_n_bins+1]; // Overflow
+      else
+        ++residuals[1][ceil(dy/bin_width)];
+
+      return true;
+    }
+
+  } else {
+    std::cout << "Warning: Bad residuals vector passed to add_residuals function" << std::endl;
+    return false;
+  }
 }
 
 // } // ~namespace MAUS

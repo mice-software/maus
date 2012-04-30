@@ -39,7 +39,6 @@
 #include "src/common_cpp/Recon/SciFi/SciFiCluster.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiStraightPRTrack.hh"
-// Added by Summer
 #include "src/common_cpp/Recon/SciFi/SciFiHelicalPRTrack.hh"
 
 // namespace MAUS {
@@ -57,8 +56,7 @@ class PatternRecognition {
 
     /** @brief Top level function to begin Pattern Recognition
       *
-      * Top level function to begin Pattern Recognition, only used to
-      * decide whether straight or helical fitting is used.
+      * Top level function to begin Pattern Recognition
       *
       *  @param evt - The SciFi event
       */
@@ -76,7 +74,8 @@ class PatternRecognition {
      *  @param trks - A vector of the output Pattern Recognition tracks
      */
     void make_5tracks(std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
-                               std::vector<SciFiStraightPRTrack> &trks);
+                      std::vector<SciFiStraightPRTrack> &trks, std::vector< std::vector<int> >
+&residuals );
 
     /** @brief Make Pattern Recognition tracks with 4 spacepoints
      *
@@ -88,7 +87,8 @@ class PatternRecognition {
      *  @param trks - A vector of the output Pattern Recognition tracks
      */
     void make_4tracks(std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
-                      std::vector<SciFiStraightPRTrack> &trks);
+                      std::vector<SciFiStraightPRTrack> &trks, std::vector< std::vector<int> >
+&residuals );
 
     /** @brief Make Pattern Recognition tracks with 3 spacepoints
      *
@@ -100,7 +100,8 @@ class PatternRecognition {
      *  @param trks - A vector of the output Pattern Recognition tracks
      */
     void make_3tracks(std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
-         std::vector<SciFiStraightPRTrack>& trks);
+                      std::vector<SciFiStraightPRTrack>& trks, std::vector< std::vector<int> >
+&residuals );
 
     /** @brief Fits a straight track for a given set of stations
      * 
@@ -114,7 +115,8 @@ class PatternRecognition {
      */
     void make_straight_tracks(const int num_points, const std::vector<int> ignore_stations,
                      std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
-                     std::vector<SciFiStraightPRTrack> &trks);
+                     std::vector<SciFiStraightPRTrack> &trks, std::vector< std::vector<int> >
+&residuals );
 
     /** @brief Least-squares straight line fit
      *
@@ -353,10 +355,14 @@ class PatternRecognition {
                              int &ignore_station_1, int &ignore_station_2);
 
     void draw_line(const SciFiSpacePoint *sp1, const SciFiSpacePoint *sp2,
-                                   SimpleLine &line_x, SimpleLine &line_y);
+                   SimpleLine &line_x, SimpleLine &line_y);
+
+    bool add_residuals(const bool passed, const double dx, const double dy,
+                       std::vector< std::vector<int> > &residuals);
 
     static const int _n_trackers = 2;
     static const int _n_stations = 5;
+    static const int _n_bins = 100;         // Number of bins in each residuals histogram
     static const double _sd_1to4 = 0.3844;  // Position error associated with stations 1 through 4
     static const double _sd_5 = 0.4298;     // Position error associated with station 5
     static const double _res_cut = 10;      // Road cut for linear fit in mm
@@ -365,6 +371,7 @@ class PatternRecognition {
     static const double _AB_cut = .1;       // Need to calculate appropriate cut here!!!
     static const double _sd_phi_1to4 = 1.;  // Still needs to be calculated!!!!
     static const double _sd_phi_5 = 1.;     // Still needs to be calculated!!!!
+    static const double _active_diameter = 300.0;  // Active volume diameter a tracker in mm
 };
 // } // ~namespace MAUS
 
