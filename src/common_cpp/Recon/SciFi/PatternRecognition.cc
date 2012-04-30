@@ -805,17 +805,16 @@ bool PatternRecognition::full_helix_fit(const std::vector<SciFiSpacePoint*> &spn
   double small_number = 0.001; // should figure out what this is and put it in the header file
 
   double best_chi2dof = chisq / static_cast<int>(spnts.size());
-  // Clear the value of chisq so we can reuse the variable.
 
   // Declare adjustments to parameters and chisq that will be calculated after adjuments are made
   double dR, dPhi_0, dtan_lambda;
   for ( int counter = 0; counter < 10; ++counter ) {
-    double chi2, chi2_dof;
+    double chi2;
     calculate_adjustments(spnts, circle.get_turning_angle(), R, Phi_0, tan_lambda, dR, dPhi_0,
                           dtan_lambda, chi2);
-    chi2_dof = chi2 / static_cast<int>(spnts.size());
+    double chi2_dof = chi2 / static_cast<int>(spnts.size());
 
-    if ( chi2_dof < best_chi2dof && (best_chi2dof - chi2_dof) < small_number ) {
+    if ( fabs(best_chi2dof - chi2_dof) < small_number ) {
       std::cout << "yay, finished" << std::endl;
       best_chi2dof = chi2_dof;
       helix.set_R(R);
@@ -824,20 +823,38 @@ bool PatternRecognition::full_helix_fit(const std::vector<SciFiSpacePoint*> &spn
       helix.set_chisq_dof(best_chi2dof);
       return true;
       // returns a helix too
-    } else if ( chi2_dof > best_chi2dof && (best_chi2dof - chi2_dof) > small_number ) {
+    } else if ( chi2_dof > best_chi2dof && fabs(best_chi2dof - chi2_dof) > small_number ) {
       // If the new chi2 you calculate is larger than previous, then the maximum has been passed
       // over, and its safest to revert back.  Since we passed over a minimum as well, we are not
       // necessarily sending back the "best" parameters, but they are close and we can at least be
       // sure that the points fit to a helix, which is what we care about anyway.
-      std::cout << "Helix fit passed minimum. Revert parameters to previous iteration" << std::endl;
+
+      // Cut the previous adjustments in half, and then re-calculate chisq
       R -= dR / 2;
       Phi_0 -= dPhi_0 / 2;
       tan_lambda -= dtan_lambda / 2;
-      calculate_adjustments(spnts, circle.get_turning_angle(), R, Phi_0, tan_lambda, dR, dPhi_0,
-                            dtan_lambda, chi2);
+      while ( chi2_dof > best_chi2dof && (best_chi2dof - chi2_dof) > small_number ) {
+        chi2 = calculate_chisq(spnts, circle.get_turning_angle(), Phi_0, tan_lambda, R);
+        chi2_dof = chi2 / static_cast<int>(spnts.size());
+        // Now if we meet the convergence criteria after halving the adjustments...
+        if ( fabs(best_chi2dof - chi2_dof) < small_number ) {
+          std::cout << "yay, finished" << std::endl;
+          best_chi2dof = chi2_dof;
+          helix.set_R(R);
+          helix.set_Phi_0(Phi_0);
+          helix.set_tan_lambda(tan_lambda);
+          helix.set_chisq_dof(best_chi2dof);
+          return true;
+        }
+        calculate_adjustments(spnts, circle.get_turning_angle(), R, Phi_0, tan_lambda, dR, dPhi_0,
+                              dtan_lambda, chi2);
+        double chi2_dof = chi2 / static_cast<int>(spnts.size());
+
+        ++counter; // Otherwise, try halving the adjustments again, and increase counter.
+      }
     }
   } // ~ counter loop
-  // Return false if the loop above
+  // Return false if the loop above hasn't returned true, on in other words, i reached 10
   return false;
 }
 
@@ -961,8 +978,6 @@ void PatternRecognition::calculate_adjustments(const std::vector<SciFiSpacePoint
   phi_0 += dphi_0;
   tan_lambda += dtan_lambda;
 
-  // Make sure chisq = 0. (It might not because of previous iteration)
-  chi2 = 0.;
   chi2 = calculate_chisq(spnts, turning_angles, phi_0, tan_lambda, R);
 }
 
