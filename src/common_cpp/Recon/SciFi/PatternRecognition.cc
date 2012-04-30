@@ -718,7 +718,11 @@ void PatternRecognition::calculate_dipangle(const std::vector<SciFiSpacePoint*> 
 
 double PatternRecognition::calculate_Phi(double xpos, double ypos, const SimpleCircle &circle) {
 
-  double angle = atan2(ypos - circle.get_y0(), xpos - circle.get_x0());
+  double alpha = circle.get_alpha();
+  double beta = circle.get_beta();
+  double gamma = circle.get_gamma();
+
+  double angle = atan2(ypos - ( -gamma / (2 * alpha) ), xpos - ( -beta / (2 * alpha) ));
 
   if ( angle < 0. )
     angle += 2. * pi;
