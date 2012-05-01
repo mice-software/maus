@@ -129,13 +129,17 @@ void TrackPoint::FillInAxialCoordinates(const double mass) {
   double py = (*this)[5];
 
   // fill in the Pz coordinate
-  double energy = (*this)[1];
-  z_momentum_ = ::sqrt(energy*energy - mass*mass - px*px - py*py);
+  if (z_momentum_ != 0) {
+    double energy = (*this)[1];
+    z_momentum_ = ::sqrt(energy*energy - mass*mass - px*px - py*py);
+  }
 
   // fill in the z coordinate
-  double velocity = z_momentum_ / mass;
-  double time = (*this)[0];
-  z_ = velocity * time;
+  if (z_ != 0.0) {
+    double velocity = z_momentum_ / mass;
+    double time = (*this)[0];
+    z_ = velocity * time;
+  }
 }
 
 /* Fills in t and E from z, Pz, and the given mass parameter.
@@ -144,12 +148,16 @@ void TrackPoint::FillInTemporalCoordinates(const double mass) {
   double px = (*this)[3];
   double py = (*this)[5];
 
-  // fill in the time coordinate
-  double velocity = z_momentum_ / mass;
-  (*this)[0] = z_ / velocity;
-
   // fill in the energy coordinate
-  (*this)[1] = ::sqrt(mass*mass + px*px + py*py);
+  if ((*this)[1] != 0.0) {
+    (*this)[1] = ::sqrt(mass*mass + px*px + py*py);
+  }
+
+  // fill in the time coordinate
+  if ((*this)[0] != 0.0) {
+    double velocity = z_momentum_ / mass;
+    (*this)[0] = z_ / velocity;
+  }
 }
 
 MAUS::MAUSPrimaryGeneratorAction::PGParticle

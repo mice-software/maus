@@ -32,21 +32,15 @@ class OpticsModel;
 class TrackFitter
 {
  public:
-  TrackFitter(
-      const OpticsModel & optics_model,
-      const double start_plane,
-      const std::vector<double> & detector_planes)
-      : optics_model_(&optics_model), start_plane_(start_plane),
-        detector_planes_(&detector_planes) { }
+  TrackFitter(const OpticsModel & optics_model, const double start_plane)
+      : optics_model_(&optics_model), start_plane_(start_plane) { }
 
-  virtual void Fit(const std::vector<TrackPoint> & detector_events,
-                   Track * const track) = 0;
+  virtual void Fit(const Track & detector_events, Track & track) = 0;
  protected:
   OpticsModel const * optics_model_;
   const double start_plane_;
-  std::vector<double> const * detector_planes_;
 
-  TrackFitter() : start_plane_(0.0) { };
+  TrackFitter() : optics_model_(NULL), start_plane_(0.0) { };
 };
 
 }

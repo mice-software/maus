@@ -27,30 +27,42 @@
 #include "TMinuit.h"
 #include "json/json.h"
 
+// Legacy/G4MICE
+#include "Interface/Squeal.hh"
+#include "Interface/dataCards.hh"
+
 // MAUS
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
 //#include "src/common_cpp/Optics/LeastSquaresOpticsModel.hh"
 #include "src/common_cpp/Optics/LinearApproximationOpticsModel.hh"
 #include "src/common_cpp/Reconstruction/Detector.hh"
+#include "src/common_cpp/Reconstruction/MinuitTrackFitter.hh"
 #include "src/common_cpp/Reconstruction/Particle.hh"
 #include "src/common_cpp/Reconstruction/ReconstructionInput.hh"
+#include "src/common_cpp/Reconstruction/Track.hh"
+#include "src/common_cpp/Reconstruction/TrackFitter.hh"
+#include "src/common_cpp/Reconstruction/TrackPoint.hh"
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 
-// Legacy/G4MICE
-#include "Interface/Squeal.hh"
-#include "Interface/dataCards.hh"
-
 namespace MAUS {
 
 MapCppTrackReconstructor::MapCppTrackReconstructor()
-    : reconstruction_input_(NULL) {
+    : optics_model_(NULL), track_fitter_(NULL), reconstruction_input_(NULL) {
 }
 
 MapCppTrackReconstructor::~MapCppTrackReconstructor() {
-  if (reconstruction_input_ ~= NULL) {
+  if (reconstruction_input_ != NULL) {
     delete reconstruction_input_;
+  }
+
+  if (optics_model_ != NULL) {
+    delete optics_model_;
+  }
+
+  if (track_fitter_ != NULL) {
+    delete track_fitter_;
   }
 }
 
@@ -59,12 +71,12 @@ bool MapCppTrackReconstructor::birth(std::string configuration) {
   try {
     configuration_ = new Json::Value(JsonWrapper::StringToJson(configuration));
     SetupOpticsModel();
-    SetupTrajectoryFitter();
+    SetupTrackFitter();
     return true;  // Sucessful parsing
   } catch(Squeal& squee) {
-    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
+    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, classname_);
   } catch(std::exception& exc) {
-    MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
+    MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, classname_);
   }
   return false;
 }
@@ -74,9 +86,9 @@ std::string MapCppTrackReconstructor::process(std::string run_data) {
   try {
     run_data_ = new Json::Value(JsonWrapper::StringToJson(run_data));
   } catch(Squeal& squee) {
-    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
+    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, classname_);
   } catch(std::exception& exc) {
-    MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
+    MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, classname_);
   }
 
   // Populate ReconstructionInput instance from JSON data
@@ -93,27 +105,29 @@ std::string MapCppTrackReconstructor::process(std::string run_data) {
  
   // associate tracks with individual particles
   std::vector<Track> tracks;
-  CorrelateTrackPoints(&tracks);
-
-  // Find the best fit trajectory for each particle traversing the lattice
-  std::vector<std::vector<TrackPoint const *> >::const_iterator
-                                                          measured_trajectories;
-  int particle_ids[] = {
-  for (trajectories = track_sets.begin();
-       trajectories < track_sets.end();
-       ++trajectories) {
-    Track best_fit_trajectory(particle_id);
-    trajectory_fitter_->Fit(&(*measured_trajectories), &best_fit_trajectory);
-
-    // TODO(plane1@hawk.iit.edu) Reconstruct tracks at the desired locations
-    //  specified in the configuration.
-
-    trajectories_.push_back(best_fit_trajectory);
+  CorrelateTrackPoints(tracks);
+  
+  int particle_id;
+  if (reconstruction_input_->beam_polarity_negative()) {
+    particle_id = Particle::kMuMinus;
+  } else {
+    particle_id = Particle::kMuPlus;
   }
 
-  // clean up
-  delete optics_model_;
-  delete trajectory_fitter_;
+  // Find the best fit track for each particle traversing the lattice
+  Track best_fit_track;
+  for (std::vector<Track>::const_iterator measured_tracks = tracks.begin();
+       measured_tracks < tracks.end();
+       ++measured_tracks) {
+    best_fit_track.set_particle_id(particle_id);
+    best_fit_track.clear();
+    track_fitter_->Fit(*measured_tracks, best_fit_track);
+
+    // TODO(plane1@hawk.iit.edu) Reconstruct track at the desired locations
+    //  specified in the configuration.
+
+    reconstructed_tracks_.push_back(best_fit_track);
+  }
 
   // pass on the updated run data to the next map in the workflow
   Json::FastWriter writer;
@@ -131,7 +145,7 @@ void MapCppTrackReconstructor::SetupOpticsModel() {
       configuration_,
       "reconstruction_optics_model",
       JsonWrapper::stringValue);
-  int model;
+  size_t model;
   for (model = 0; model < optics_model_names.size(); ++model) {
     if (optics_model_name == optics_model_names[model]) {
       break;  // leave the current index into optics_model_names in model
@@ -156,7 +170,7 @@ void MapCppTrackReconstructor::SetupOpticsModel() {
       */
       throw(Squeal(Squeal::nonRecoverable,
                    "IntegratingOpticsModel is not yet implemented.",
-                   "MapCppTrackReconstructor::process()"));
+                   "MapCppTrackReconstructor::SetupOpticsModel()()"));
       break;
     }
     case 2: {
@@ -202,7 +216,7 @@ void MapCppTrackReconstructor::SetupOpticsModel() {
       */
       throw(Squeal(Squeal::nonRecoverable,
                    "RungeKuttaOpticsModel is not yet implemented.",
-                   "MapCppTrackReconstructor::process()"));
+                   "MapCppTrackReconstructor::SetupOpticsModel()()"));
       break;
     }
     case 4: {
@@ -216,22 +230,22 @@ void MapCppTrackReconstructor::SetupOpticsModel() {
       message += std::string("\" in reconstruction configuration.");
       throw(Squeal(Squeal::nonRecoverable,
                    message.c_str(),
-                   "MapCppTrackReconstructor::process()"));
+                   "MapCppTrackReconstructor::SetupOpticsModel()()"));
     }
   }
-  optics_model_.Build(&configuration_);
+  optics_model_->Build(configuration_);
 }
 
-MapCppTrackReconstructor::SetupTrajectoryFitter() {
+void MapCppTrackReconstructor::SetupTrackFitter() {
   Json::Value fitter_names = JsonWrapper::GetProperty(
       configuration_,
-      "reconstruction_trajectory_fitters",
+      "reconstruction_track_fitters",
       JsonWrapper::stringValue);
   Json::Value fitter_name = JsonWrapper::GetProperty(
       configuration_,
-      "reconstruction_trajectory_fitter",
+      "reconstruction_track_fitter",
       JsonWrapper::stringValue);
-  int fitter;
+  size_t fitter;
   for (fitter = 0; fitter < fitter_names.size(); ++fitter) {
     if (fitter_name == fitter_names[fitter]) {
       break;  // leave the current index into fitter_names in fitter
@@ -241,36 +255,37 @@ MapCppTrackReconstructor::SetupTrajectoryFitter() {
   switch (fitter) {
     case 0: {
       // Minuit
-      trajectory_fitter_ = new MinuitTrajectoryFitter(optics_model_);
+      double start_plane = 0.0;
+      track_fitter_ = new MinuitTrackFitter(*optics_model_, start_plane);
       break;
     }
     case 1: {
       // Kalman Filter
       /* TODO(plane1@hawk.iit.edu)
-      trajectory_fitter_ = new KalmanFilterTrajectoryFitter(optics_model_);
+      track_fitter_ = new KalmanFilterTrackFitter(optics_model_);
       */
       throw(Squeal(Squeal::nonRecoverable,
-                   "KalmanFilterTrajectoryFitter is not yet implemented.",
-                   "MapCppTrackReconstructor::process()"));
+                   "KalmanFilterTrackFitter is not yet implemented.",
+                   "MapCppTrackReconstructor::SetupTrackFitter()"));
       break;
     }
     case 2: {
       // TOF
       /* TODO(plane1@hawk.iit.edu)
-      trajectory_fitter_ = new TOFTrajectoryFitter(optics_model_);
+      track_fitter_ = new TOFTrackFitter(optics_model_);
       */
       throw(Squeal(Squeal::nonRecoverable,
-                   "TOFTrajectoryFitter is not yet implemented.",
-                   "MapCppTrackReconstructor::process()"));
+                   "TOFTrackFitter is not yet implemented.",
+                   "MapCppTrackReconstructor::SetupTrackFitter()"));
       break;
     }
     default: {
-      std::string message("Unsupported trajectory fitter \"");
-      message += optics_model_name.asString();
+      std::string message("Unsupported track fitter \"");
+      message += fitter_name.asString();
       message += std::string("\" in reconstruction configuration.");
       throw(Squeal(Squeal::nonRecoverable,
                    message.c_str(),
-                   "MapCppTrackReconstructor::process()"));
+                   "MapCppTrackReconstructor::SetupTrackFitter()"));
     }
   }
 }
@@ -282,39 +297,30 @@ void MapCppTrackReconstructor::LoadTestingData() {
 
   const bool beam_polarity_negative = true;  // e-, mu-, pi-
 
-  CovarianceMatrix * uncertainties = NULL;
-
-  // generate moch detector info
   std::vector<Detector> detectors;
   double plane;
   double uncertainty_data[36];
-  for (int id = 0; id <= Detector.kCalorimeter_id; ++id) {
+  std::vector<TrackPoint> events;
+  double position[4], momentum[4];
+  Detector const * detector;
+
+  // generate mock detector info and random muon detector event data
+  for (size_t id = 1; id <= Detector::kCalorimeter; ++id) {
     plane = ((double)rand()/(double)RAND_MAX) * 20;  // 0.0 - 20.0 meters
     for (int index = 0; index < 36; ++index) {
       uncertainty_data[index] = ((double)rand()/(double)RAND_MAX) * 100;
     }
-    uncertainties = new CovarianceMatrix(uncertainty_data);
+    CovarianceMatrix uncertainties(uncertainty_data);
     detectors.push_back(Detector(id, plane, uncertainties));
-    delete uncertainties;  // gets copied in Detector constructor
-  }
 
-  // generate random muon detector event data
-  Particle const * const particle = Particle::GetInstance();
-  const double mass = particle->GetMass(Particle::kMuMinus);
-  std::vector<TrackPoint> events;
-  // 2 trackers with 5 planes each + 3 TOFs = 13 events
-  unsigned int detector_id;
-  double position[4], momentum[4];
-  for (int index = 0; index < 13; ++index) {
-    switch (index) {
-     case 0: detector_id = Detector::kTOF0; break;
-     case 1: detector_id = Detector::kTOF1; break;
-     case 2: case 3: case 4: case 5: case 6:
-      detector_id = Detector::kTracker1; break;
-     case 7: case 8: case 9: case 10: case 11:
-      detector_id = Detector::kTracker2; break;
-     case 12: detector_id = Detector::kTOF2; break;
+    // skip detectors we're not using
+    if ((id == Detector::kCherenkov1) ||
+        (id == Detector::kCherenkov2) ||
+        (id == Detector::kCalorimeter)) {
+      continue;
     }
+
+    detector = &detectors[id];
 
     for (int coordinate = 0; coordinate < 4; ++coordinate) {
       position[coordinate] = ((double)rand()/(double)RAND_MAX) * 20;  // meters
@@ -328,7 +334,7 @@ void MapCppTrackReconstructor::LoadTestingData() {
                                 position[1], momentum[1],
                                 position[2], momentum[2],
                                 position[3], momentum[3],
-                                detector_id));
+                                *detector));
   }
 
   reconstruction_input_ = new ReconstructionInput(beam_polarity_negative,
@@ -369,14 +375,14 @@ void MapCppTrackReconstructor::CorrelateTrackPoints(
   // TODO(plane1@hawk.iit.edu) create sets of events where each set corresponds
   // to a different particle. For now assume that all events are from a single
   // particle.
-  tracks->push_back(Track(track_points));
+  tracks.push_back(Track(track_points, Particle::kNone));
 }
 
 bool MapCppTrackReconstructor::death() {
   return true;  // successful
 }
 
-const size_t MapCppTrackReconstructor::kPhaseSpaceDimension = 6;
+const std::string classname_ = "MAUS::MapCppTrackReconstructor";
 const unsigned int kProcessModeUnset = 0;
 const unsigned int kProcessModeTesting = 1;
 const unsigned int kProcessModeSimulation = 2;

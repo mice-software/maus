@@ -44,8 +44,17 @@ class Detector {
   static const unsigned int kTOF0;
   static const unsigned int kCherenkov1;
   static const unsigned int kTOF1;
-  static const unsigned int kTracker1;
-  static const unsigned int kTracker2;
+  static const unsigned int kTracker1_1;
+  static const unsigned int kTracker1_2;
+  static const unsigned int kTracker1_3;
+  static const unsigned int kTracker1_4;
+  static const unsigned int kTracker1_5;
+  static const unsigned int kTracker2_1;
+  static const unsigned int kTracker2_2;
+  static const unsigned int kTracker2_3;
+  static const unsigned int kTracker2_4;
+  static const unsigned int kTracker2_5;
+  static const unsigned int kTOF2;
   static const unsigned int kCherenkov2;
   static const unsigned int kCalorimeter;
  protected:

@@ -33,8 +33,8 @@ void LinearApproximationOpticsModel::Build(const Json::Value & configuration) {
   // Nothing to do here
 }
 
-TransferMap * GenerateTransferMap(double start_plane, double end_plane,
-                                        double mass) {
+TransferMap * LinearApproximationOpticsModel::GenerateTransferMap(
+    double start_plane, double end_plane, double mass) const {
   return new LinearApproximationTransferMap(start_plane, end_plane, mass);
 }
 

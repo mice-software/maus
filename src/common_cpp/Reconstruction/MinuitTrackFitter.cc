@@ -53,9 +53,8 @@ void common_cpp_optics_reconstruction_minuit_track_fitter_score_function(
 
 MinuitTrackFitter::MinuitTrackFitter(
     const OpticsModel & optics_model,
-    const double start_plane,
-    const std::vector<double> & detector_planes)
-    : TrackFitter(optics_model, start_plane, detector_planes) {
+    const double start_plane)
+    : TrackFitter(optics_model, start_plane) {
   // Setup *global* scope Minuit object
   common_cpp_optics_reconstruction_minuit_track_fitter_minuit
     = new TMinuit(kPhaseSpaceDimension);
@@ -80,13 +79,11 @@ MinuitTrackFitter::~MinuitTrackFitter() {
   delete common_cpp_optics_reconstruction_minuit_track_fitter_minuit;
 }
 
-void MinuitTrackFitter::Fit(
-    const std::vector<TrackPoint> & detector_events,
-    Track * const track) {
+void MinuitTrackFitter::Fit(const Track & detector_events, Track & track) {
   detector_events_ = &detector_events;
-  track_ = track;
+  track_ = &track;
 
-  int particle_id = track_->particle_id();
+  int particle_id = detector_events_->particle_id();
   mass_ = Particle::GetInstance()->GetMass(particle_id);
 
   if (detector_events_->size() < 2) {
@@ -118,9 +115,9 @@ Double_t MinuitTrackFitter::ScoreTrack(
                    start_plane_track_coordinates[3],
                    start_plane_track_coordinates[4],
                    start_plane_track_coordinates[5],
-                   0.0, 0.0, CovarianceMatrix());
+                   start_plane_, 0.0, CovarianceMatrix());
   guess.FillInAxialCoordinates(mass_);
-  double start_plane = guess.z();
+  double start_plane = start_plane_;
   track_->push_back(guess);
 
   PhaseSpaceVector delta;  // difference between the guess and the measurement
@@ -134,9 +131,7 @@ Double_t MinuitTrackFitter::ScoreTrack(
   for (size_t index = 0; events < detector_events_->end(); ++index) {
     // calculate the next guess
     transfer_map
-      = optics_model_->GenerateTransferMap(start_plane,
-                                           detector_planes_->at(index),
-                                           mass_);
+      = optics_model_->GenerateTransferMap(start_plane, events->z(), mass_);
     guess = TrackPoint(transfer_map->Transport(guess));
     delete transfer_map;
 
@@ -153,11 +148,13 @@ Double_t MinuitTrackFitter::ScoreTrack(
     delta = TrackPoint(guess - (*events));
     chi_squared += (transpose(delta) * (*uncertainties) * delta)[0];
 
-    start_plane = guess.z();
+    start_plane = events->z();
     ++events;
   }
 
   return chi_squared;
 }
+
+const size_t MinuitTrackFitter::kPhaseSpaceDimension = 6;
 
 }  // namespace MAUS

@@ -30,25 +30,19 @@
 #include "Config/MiceModule.hh"
 #include "Interface/Squeak.hh"
 
+// MAUS
+#include "Reconstruction/Track.hh"
+#include "Reconstruction/TrackPoint.hh"
+
 namespace MAUS {
 
 class OpticsModel;
-class TrajectoryFitter;
+class TrackFitter;
 class ReconstructionInput;
-
-// Minuit requires a gobal, static function to minimize. This requires a
-// global instance of TMinuit to use TMinuit::GetObjectFit().
-TMinuit * map_cpp_track_reconstructor_minuit;
-
-void transfer_map_score_function(Int_t &    number_of_parameters,
-                                 Double_t * gradiants,
-                                 Double_t & function_value,
-                                 Double_t * phase_space_coordinate_values,
-                                 Int_t      execution_stage_flag);
 
 /** @class MapCppTrackReconstructor
  *  Reconstruct tracks at the desired longitudinal spacing using the desired
- *  trajectory fitting method.
+ *  track fitting method.
  */
 class MapCppTrackReconstructor {
  public:
@@ -85,21 +79,19 @@ class MapCppTrackReconstructor {
   std::string process(std::string document);
 
  private:
-  static const size_t kPhaseSpaceDimension;
-
   Json::Value configuration_;
   OpticsModel * optics_model_;
-  TrajectoryFitter * trajectory_fitter_;
+  TrackFitter * track_fitter_;
 
   Json::Value run_data_;
   ReconstructionInput * reconstruction_input_;
-  std::vector<TrackPoint> track_points_;
+  std::vector<Track> reconstructed_tracks_;
   
-  std::string classname_;
+  static const std::string classname_;
   BTField * electromagnetic_field_;
 
   void SetupOpticsModel();
-  void SetupTrajectoryFitter();
+  void SetupTrackFitter();
   void LoadTestingData();
   void LoadSimulationData();
   void LoadLiveData();

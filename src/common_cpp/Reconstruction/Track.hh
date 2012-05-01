@@ -43,7 +43,7 @@ class Track : public std::vector<TrackPoint> {
   /* @brief Create with tracks and particle ID.
    */
   Track(const std::vector<TrackPoint>& tracks,
-                     const int particle_id);
+        const int particle_id);
 
   ~Track();
   

@@ -29,7 +29,7 @@ ReconstructionInput::ReconstructionInput(
     const std::vector<Detector> & detectors,
     const std::vector<TrackPoint> & events)
     : beam_polarity_negative_(beam_polarity_negative),
-      detectors_(&detectors), events_(&events) {
+      detectors_(detectors), events_(events) {
 }
 
 bool ReconstructionInput::beam_polarity_negative() {
@@ -37,11 +37,11 @@ bool ReconstructionInput::beam_polarity_negative() {
 }
 
 const std::vector<Detector> & ReconstructionInput::detectors() {
-  return *detectors_;
+  return detectors_;
 }
 
 const std::vector<TrackPoint> & ReconstructionInput::events() {
-  return *events_;
+  return events_;
 }
 
 }  // namespace MAUS

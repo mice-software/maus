@@ -44,16 +44,12 @@ void common_cpp_optics_reconstruction_minuit_track_fitter_score_function(
     Double_t * phase_space_coordinate_values,
     Int_t      execution_stage_flag);
 
-class MinuitTrackFitter : public TrackFitter, TObject {
+class MinuitTrackFitter : public TrackFitter, public TObject {
  public:
-  MinuitTrackFitter(
-      const OpticsModel & optics_model,
-      const double start_plane,
-      const std::vector<double> & detector_planes);
+  MinuitTrackFitter(const OpticsModel & optics_model, const double start_plane);
 
-  //pure virtual function from TrackFitter base class
-  void Fit(const std::vector<TrackPoint> & detector_events,
-           Track * const track);
+  // pure virtual function from TrackFitter base class
+  void Fit(const Track & detector_events, Track & track);
 
   ~MinuitTrackFitter();
 
@@ -61,7 +57,7 @@ class MinuitTrackFitter : public TrackFitter, TObject {
  protected:
   static const size_t kPhaseSpaceDimension;
 
-  std::vector<TrackPoint> const * detector_events_;
+  Track const * detector_events_;
   Track * track_;
   double mass_;
 
