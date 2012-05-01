@@ -243,7 +243,7 @@ class PatternRecognition {
      *
      */
     bool full_helix_fit(const std::vector<SciFiSpacePoint*> &spnts, const SimpleCircle &circle,
-                        const SimpleLine &line_sz, SimpleHelix helix);
+                        const SimpleLine &line_sz, SimpleHelix &helix);
 
     /** @brief Calculates helix at a point i
      *
@@ -298,8 +298,7 @@ class PatternRecognition {
      */
     void calculate_adjustments(const std::vector<SciFiSpacePoint*> &spnts,
                                const std::vector<double> &turning_angles, double &R, double &phi_0,
-                               double &tan_lambda, double &dR, double &dphi_0, double &dtan_lambda,
-                               double &chi2);
+                               double &tan_lambda, double &dR, double &dphi_0, double &dtan_lambda);
 
     /** @brief Determine which two stations the initial line should be drawn between
      * 
