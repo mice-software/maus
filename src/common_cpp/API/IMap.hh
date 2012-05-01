@@ -2,12 +2,16 @@
 #define IMAP_H
 #include "IModule.hh"
 
-template <typename INPUT, typename OUTPUT>
-class IMap : public virtual IModule {
-public:
-  virtual ~IMap() {}
+namespace MAUS {
 
-public:
-  virtual OUTPUT* process(INPUT*) const = 0;
-};
+  template <typename INPUT, typename OUTPUT>
+  class IMap : public virtual IModule {
+  public:
+    virtual ~IMap() {}
+    
+  public:
+    virtual OUTPUT* process(INPUT*) const = 0;
+  };
+  
+}//end of namespace
 #endif

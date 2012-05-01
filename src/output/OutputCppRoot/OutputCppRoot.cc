@@ -19,7 +19,8 @@
 
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/JsonCppStreamer/ORStream.hh"
-#include "src/common_cpp/JsonCppStreamer/JsonCppConverter.hh"
+#include "src/common_cpp/Converter/DataConverters/JsonCppConverter.hh"
+//#include "src/common_cpp/JsonCppStreamer/JsonCppConverter.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 
 #include "src/output/OutputCppRoot/OutputCppRoot.hh"
@@ -73,7 +74,7 @@ bool OutputCppRoot::save(std::string json_spill_document) {
       if (json_spill.isMember("END_OF_RUN")) {
           return true; // nothing to do, we don't handle end of run yet
       }
-      (*_jsonCppConverter)(json_spill);
+      (*_jsonCppConverter)(&json_spill);
       (*_outfile) << fillEvent;
       return true;
   } catch(Squeal squee) {

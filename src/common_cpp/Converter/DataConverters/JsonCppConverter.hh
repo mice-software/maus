@@ -19,7 +19,8 @@
 #define JSONCPPCONVERTER_H
 #include "json/json.h"
 
-#include "src/common_cpp/JsonCppStreamer/ConverterBase.hh"
+#include "src/common_cpp/Converter/ConverterBase.hh"
+//#include "src/common_cpp/JsonCppStreamer/ConverterBase.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
 
 namespace MAUS {
@@ -37,11 +38,12 @@ namespace MAUS {
  * \author Alexander Richards, Imperial College London
  * \date 06/01/2012
  */
-class JsonCppConverter : public ConverterBase<Json::Value, Spill> {
+  class JsonCppConverter : public ConverterBase<Json::Value, Spill> {
   public:
     JsonCppConverter()
-    : ConverterBase<Json::Value, Spill>(static_cast<Spill*>(NULL)) {}
+      : ConverterBase<Json::Value, Spill>("JsonCppConverter") {}
 
+  private:
     /*!
      * \brief Convert Json value
      * Overloaded process initiate the conversion process converting the
@@ -51,7 +53,7 @@ class JsonCppConverter : public ConverterBase<Json::Value, Spill> {
      *        file
      * \return a pointer to the MausData object
      */
-    Spill* operator()(const Json::Value&);
+    Spill* _convert(const Json::Value*) const;
 
     /*!
      * \brief Convert MausData
@@ -61,7 +63,7 @@ class JsonCppConverter : public ConverterBase<Json::Value, Spill> {
      * \param MausData& The root \a MausData object from the cpp data structure
      * \return a pointer to the Json::Value object
      */
-    Json::Value* operator()(const Spill&);
+    Json::Value* _convert(const Spill*) const;
 
   private:
 };

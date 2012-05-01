@@ -2,12 +2,16 @@
 #define IREDUCE_H
 #include "IModule.hh"
 
-template<typename T>
-class IReduce : public virtual IModule {
-public:
-  virtual ~IReduce() {}
+namespace MAUS {
 
-public:
-  virtual T* process(T*) = 0;
-};
+  template<typename T>
+  class IReduce : public virtual IModule {
+  public:
+    virtual ~IReduce() {}
+    
+  public:
+    virtual T* process(T*) = 0;
+  };
+
+}//end of namespace
 #endif

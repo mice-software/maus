@@ -2,14 +2,17 @@
 #define IMODULE_H
 #include <string>
 
-class IModule{
-public:
-  virtual ~IModule() {}
+namespace MAUS {
 
-public:
-  virtual void birth (const std::string&) = 0;
-  virtual void death ()                   = 0;
-};
-
+  class IModule{
+  public:
+    virtual ~IModule() {}
+    
+  public:
+    virtual void birth (const std::string&) = 0;
+    virtual void death ()                   = 0;
+  };
+  
+}//end of namespace
 #endif
 

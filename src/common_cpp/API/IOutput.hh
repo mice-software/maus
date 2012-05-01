@@ -2,12 +2,16 @@
 #define IOUTPUT_H
 #include <string>
 
-template<typename T>
-class IOutput {
-public:
-  virtual ~IOutput() {}
+namespace MAUS {
 
-public:
-  virtual bool save (T*) = 0;
-};
+  template<typename T>
+  class IOutput {
+  public:
+    virtual ~IOutput() {}
+    
+  public:
+    virtual bool save (T*) = 0;
+  };
+
+}//end of namespace
 #endif

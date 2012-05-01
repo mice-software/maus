@@ -26,7 +26,8 @@
 #include "src/common_cpp/DataStructure/DAQData.hh"
 #include "src/common_cpp/DataStructure/MCEvent.hh"
 
-#include "src/common_cpp/JsonCppStreamer/JsonCppConverter.hh"
+#include "src/common_cpp/Converter/DataConverters/JsonCppConverter.hh"
+//#include "src/common_cpp/JsonCppStreamer/JsonCppConverter.hh"
 #include "src/common_cpp/JsonCppStreamer/IRStream.hh"
 
 namespace MAUS {
@@ -93,7 +94,7 @@ std::string InputCppRoot::getNextEvent() {
       if ((*_infile) >> readEvent == NULL) {
         return "";
       }
-      Json::Value* value = (*_jsonCppConverter)(*_spill);
+      Json::Value* value = (*_jsonCppConverter)(_spill);
       Json::FastWriter writer;
       std::string output = writer.write(*value);
       delete value;
