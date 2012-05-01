@@ -80,7 +80,7 @@ class MapPyCkov:
             return doc
         ckov = daq_event['ckov']
 
-        digits = []
+        digits = {}
         ckov_digit = {}
 
         #initializing variables and arrays
@@ -204,7 +204,10 @@ class MapPyCkov:
 
                         #Append a shallow copy of the list
                         if pmt == 7:
-                            digits.append(ckov_digit.copy())
+                            event_num = ckov_digit[ckov_sta]['part_event_number']
+                            if event_num not in digits.keys():
+                                digits[event_num] = []
+                            digits[event_num].append(ckov_digit.copy())
 
                         deltas = []
                         reducer = []
@@ -213,9 +216,10 @@ class MapPyCkov:
                         position = []
 
         #spill['daq_data']['ckov'] = {}                                      
-        if 'digits' not in spill:
-            spill['digits'] = {}
-        spill['digits']['ckov'] = digits
+        for event in spill['recon_events']:
+            event['ckov_event']['ckov_digits'] = []
+            if event['part_event_number'] in digits.keys():
+                event['ckov_event']['ckov_digits'] = digits[event['part_event_number']]
 
         return json.dumps(spill)
 

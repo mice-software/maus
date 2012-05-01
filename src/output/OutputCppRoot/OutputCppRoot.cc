@@ -53,6 +53,7 @@ bool OutputCppRoot::birth(std::string json_datacards) {
   } catch(Squeal squee) {
     death();
     CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
+    Squeak::mout(Squeak::debug) << squee.GetStackTrace() << std::endl;
     return false;
   } catch(std::exception exc) {
     death();

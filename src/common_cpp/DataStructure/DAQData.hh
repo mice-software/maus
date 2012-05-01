@@ -34,10 +34,28 @@ class DAQData {
 
   virtual ~DAQData();
 
-  ClassDef(DAQData, 1)
-
  private:
+  ClassDef(DAQData, 1)
 };
 }
+
+
+/*
+  tof0
+  tof1
+  tof2
+  ckov
+  trigger_request
+  V830
+
+  V1290DataProcessor
+  fADCDataProcessor
+  V1724DataProcessor
+  V1731DataProcessor
+  V830DataProcessor
+  VLSBDataProcessor
+  VLSB_CDataProcessor
+  DBBDataProcessor
+*/
 
 #endif

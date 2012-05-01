@@ -46,6 +46,9 @@ class BaseItem {
     virtual void SetJsonChild
                   (const ParentType& parent_cpp, Json::Value& parent_json) = 0;
 
+    /** Get the branch name */
+    virtual std::string GetBranchName() const = 0;
+
   protected:
 };
 
@@ -128,6 +131,9 @@ class PointerItem : public BaseItem<ParentType> {
         delete child_json;
     }
 
+    /** Get the branch name */
+    std::string GetBranchName() const {return _branch;}
+
   private:
     std::string _branch;
     ProcessorBase<ChildType>* _processor;
@@ -207,6 +213,9 @@ class ValueItem : public BaseItem<ParentType> {
         delete child_json;
     }
 
+    /** Get the branch name */
+    std::string GetBranchName() const {return _branch;}
+
   private:
     std::string _branch;
     ProcessorBase<ChildType>* _processor;
@@ -261,6 +270,8 @@ ObjectType* ObjectProcessor<ObjectType>::JsonToCpp(const Json::Value& json_objec
             items[i]->SetCppChild(json_object, *cpp_object);
         } catch(Squeal squee) {
             delete cpp_object;
+            squee.SetMessage("In branch "+items[i]->GetBranchName()+"\n"
+                            +squee.GetMessage());
             throw squee;
         }
     }
@@ -275,6 +286,8 @@ Json::Value* ObjectProcessor<ObjectType>::CppToJson(const ObjectType& cpp_object
             items[i]->SetJsonChild(cpp_object, *json_object);
         } catch(Squeal squee) {
             delete json_object;
+            squee.SetMessage("In branch "+items[i]->GetBranchName()+"\n"
+                            +squee.GetMessage());
             throw squee;
         }
     }

@@ -144,6 +144,14 @@ void MCEvent::SetVirtualHits(VirtualHitArray* hits) {
     _virtuals = hits;
 }
 
+VirtualHit& MCEvent::GetAVirtualHit(size_t i) const {
+    return (*_virtuals)[i];
+}
+
+size_t MCEvent::GetVirtualHitsSize() const {
+    return _virtuals->size();
+}
+
 SciFiHitArray* MCEvent::GetSciFiHits() const {
     return _sci_fi_hits;
 }
@@ -186,14 +194,6 @@ void MCEvent::SetPrimary(Primary* primary) {
         delete _primary;
     }
     _primary = primary;
-}
-
-VirtualHit& MCEvent::GetAVirtualHit(size_t i) const {
-    return (*_virtuals)[i];
-}
-
-size_t MCEvent::GetVirtualHitsSize() const {
-    return _virtuals->size();
 }
 }
 

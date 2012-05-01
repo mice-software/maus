@@ -21,13 +21,9 @@ def run():
     # with the functionality you want to use.
     my_map = MAUS.MapPyGroup()
 
-    # TOF
-    my_map.append(MAUS.MapCppTOFDigits())
-    my_map.append(MAUS.MapCppTOFSlabHits())
-    my_map.append(MAUS.MapCppTOFSpacePoints())
+    # Trigger
+    my_map.append(MAUS.MapPyReconSetup())
 
-    # Ckov
-    my_map.append(MAUS.MapPyCkov())
 
     # Tracker (commented out as no tracker installed in MICE hall)
     #my_map.append(MAUS.MapCppTrackerRecon())
