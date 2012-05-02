@@ -21,21 +21,15 @@
 
 #include "Rtypes.h" // ROOT
 
+#include "src/common_cpp/DataStructure/TOFEvent.hh"
+#include "src/common_cpp/DataStructure/SciFiEvent.hh"
+#include "src/common_cpp/DataStructure/CkovEvent.hh"
+#include "src/common_cpp/DataStructure/KLEvent.hh"
+#include "src/common_cpp/DataStructure/EMREvent.hh"
+#include "src/common_cpp/DataStructure/TriggerEvent.hh"
+#include "src/common_cpp/DataStructure/GlobalEvent.hh"
+
 namespace MAUS {
-
-class TOFEvent {};  // placeholder for the Tof Event
-
-class SciFiEvent {};  // placeholder for the SciFi Event
-
-class CkovEvent {};  // placeholder for the Ckov Event
-
-class KLEvent {};  // placeholder for the KL Event
-
-class EMREvent {};  // placeholder for the EMR Event
-
-class TriggerEvent {};  // placeholder for the Trigger Event
-
-class GlobalEvent {};  // placeholder for the Global recon event
 
 /** @class ReconEvent contains reconstruction data pertaining to a DAQ particle
  *         event

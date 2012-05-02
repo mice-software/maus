@@ -14,26 +14,58 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_DAQDATAPROCESSOR_HH_
-#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_DAQDATAPROCESSOR_HH_
-
-#include "json/value.h"
-
-#include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
+#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_DAQDATAPROCESSOR_
+#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_DAQDATAPROCESSOR_
 
 #include "src/common_cpp/DataStructure/DAQData.hh"
+#include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
+#include "src/common_cpp/JsonCppProcessors/CkovDaqProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/KLDaqProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/TOFDaqProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/TagProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/TriggerProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/TriggerRequestProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/UnknownProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/V830Processor.hh"
 
 namespace MAUS {
 
-/** @class DAQData processor for the DAQ data branch */
+/** @class DAQDataProcessor Conversions for DAQData between C++ and Json 
+ *
+ *  @var _V830_proc_proc Processor for _V830
+ *  @var _trigger_request_proc_proc Processor for _trigger_request
+ *  @var _tof1_proc_proc Processor for _tof1
+ *  @var _ckov_proc_proc Processor for _ckov
+ *  @var _tof2_proc_proc Processor for _tof2
+ *  @var _tof0_proc_proc Processor for _tof0
+ *  @var _kl_proc_proc Processor for _kl
+ *  @var _tag_proc_proc Processor for _tag
+ *  @var _unknown_proc_proc Processor for _unknown
+ *  @var _trigger_proc_proc Processor for _trigger
+ */
+
 class DAQDataProcessor : public ObjectProcessor<DAQData> {
   public:
-    /** Constructor - registers the branch structure */
+    /** Set up processors and register branches
+     *
+     *  Everything else is handled by the base class
+     */
     DAQDataProcessor();
 
   private:
+    V830Processor _V830_proc;
+    ValueArrayProcessor<TriggerRequest> _trigger_request_proc;
+    ValueArrayProcessor<TOFDaq> _tof1_proc;
+    ValueArrayProcessor<CkovDaq> _ckov_proc;
+    ValueArrayProcessor<TOFDaq> _tof2_proc;
+    ValueArrayProcessor<TOFDaq> _tof0_proc;
+    ValueArrayProcessor<KLDaq> _kl_proc;
+    ValueArrayProcessor<Tag> _tag_proc;
+    ValueArrayProcessor<Unknown> _unknown_proc;
+    ValueArrayProcessor<Trigger> _trigger_proc;
 };
-}
+}  // namespace MAUS
 
-#endif
+#endif  // #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_DAQDATAPROCESSOR_
 

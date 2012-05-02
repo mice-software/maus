@@ -213,10 +213,12 @@ class DataStructureImplementation:
         getter += " "+self.class_name+"::"
         getter += "Get"+variable['upper_name']+"() const {\n"
         getter += "    return "+variable['var_name']+";\n}"
+        if variable.is_array:
+            getter += "\n\n"+self.getter_array_extras(variable)
         return getter
 
     def getter_array_extras(self, variable):
-        extras = variable['element_type']+" "+self.class_name+"::Get"+\
+        extras = variable.element_type()+" "+self.class_name+"::Get"+\
                       variable['upper_name']+"Element(size_t index) const{\n"
         extras += "    return "+variable['var_name']+"[index];\n}\n\n"
         extras += "size_t "+self.class_name+"::Get"+variable['upper_name']+\
@@ -623,7 +625,6 @@ class DataStructureItem:
 
     class_to_pointers = {}
     branch_rename = {
-        str([]):'Spill',
         str([u'recon_events', '[]', u'ckov_event', u'ckov_digits', '[]', u'A']):'CkovA',
         str([u'recon_events', '[]', u'ckov_event', u'ckov_digits', '[]', u'B']):'CkovB',
         str([u'daq_data']):'DAQData',
