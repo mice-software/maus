@@ -114,6 +114,8 @@ std::string MapCppTrackReconstructor::process(std::string run_data) {
     particle_id = Particle::kMuPlus;
   }
 
+  Json::Value global_tracks;
+
   // Find the best fit track for each particle traversing the lattice
   Track best_fit_track;
   for (std::vector<Track>::const_iterator measured_tracks = tracks.begin();
@@ -127,7 +129,11 @@ std::string MapCppTrackReconstructor::process(std::string run_data) {
     //  specified in the configuration.
 
     reconstructed_tracks_.push_back(best_fit_track);
+    global_tracks.append(TrackToJson(best_fit_track));
   }
+
+  // TODO(plane1@hawk.iit.edu) Update the run data with reconstruction results.
+  run_data_["global_tracks"] = global_tracks;
 
   // pass on the updated run data to the next map in the workflow
   Json::FastWriter writer;
@@ -382,7 +388,58 @@ bool MapCppTrackReconstructor::death() {
   return true;  // successful
 }
 
-const std::string classname_ = "MAUS::MapCppTrackReconstructor";
+Json::Value MapCppTrackReconstructor::TrackToJson(const Track & track) {
+  Json::Value track_node;
+
+  // track points
+  Json::Value track_points;
+  for (size_t index = 0; index < track.size(); ++index) {
+    track_points.append(TrackPointToJson(track[index]));
+  }
+  track_node["track_points"] = track_points;
+  
+  // particle ID
+  track_node["PID"] = Json::Value(track.particle_id());
+
+  return track_node;
+}
+
+Json::Value MapCppTrackReconstructor::TrackPointToJson(
+    const TrackPoint & track_point) {
+  Json::Value track_point_node;
+
+  // coordinates
+  Json::Value coordinates;
+  coordinates["t"] = track_point.t();
+  coordinates["E"] = track_point.E();
+  coordinates["x"] = track_point.x();
+  coordinates["Px"] = track_point.Px();
+  coordinates["y"] = track_point.y();
+  coordinates["Py"] = track_point.Py();
+  coordinates["z"] = track_point.z();
+  coordinates["Pz"] = track_point.Pz();
+  coordinates["Pz"] = track_point.Pz();
+  track_point_node["coordinates"] = coordinates;
+  
+  // detector ID
+  track_point_node["detector_id"] = Json::Value(track_point.detector_id());
+  
+  // uncertainty matrix
+  Json::Value uncertainties;
+  size_t size = track_point.uncertainties().size();
+  for (size_t row = 1; row <= size; ++row) {
+    Json::Value row_node;
+    for (size_t column = 1; column <= size; ++column) {
+      row_node.append(Json::Value(track_point.uncertainties()(row, column)));
+    }
+    uncertainties.append(row_node);
+  }
+  track_point_node["uncertainties"] = uncertainties;
+
+  return track_point_node;
+}
+
+const std::string classname_ = "MapCppTrackReconstructor";
 const unsigned int kProcessModeUnset = 0;
 const unsigned int kProcessModeTesting = 1;
 const unsigned int kProcessModeSimulation = 2;

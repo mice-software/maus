@@ -96,6 +96,9 @@ class MapCppTrackReconstructor {
   void LoadSimulationData();
   void LoadLiveData();
   void CorrelateTrackPoints(std::vector<Track> & tracks);
+
+  static Json::Value TrackToJson(const Track & track);
+  static Json::Value TrackPointToJson(const TrackPoint & track_point);
 };
 
 }  // namespace MAUS
