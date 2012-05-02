@@ -110,7 +110,10 @@ std::string MapCppTOFMCDigitizer::process(std::string document) {
           std::cout << "mcevt: " << i << " tof" << snum << " " << _hits.size()
                     << " hits, " << all_tof_digits.size() << " digits" << std::endl;
        }
-       root["digits"][_stationKeys[snum]].append(tof_evt[i]);
+       //root["digits"][_stationKeys[snum]].append(tof_evt[i]);
+       Json::Value tof_digs = fill_tof_evt(i, snum, all_tof_digits);
+       root["recon_events"][i]["tof_event"]["tof_digits"][_stationKeys[snum]]
+                                                                     = tof_digs;
      } // end loop over stations
   } // end loop over events
   // write it out

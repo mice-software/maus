@@ -74,7 +74,7 @@ class MapCppTOFSpacePoints {
   std::map<int, std::string> _triggerhit_pixels;
 
   Json::Value fillSpacePoint(Json::Value &xDocSlabHit0, Json::Value &xDocSlabHit1);
-  Json::Value processTOFStation(Json::Value &xSlabHits, std::string detector);
+  Json::Value processTOFStation(Json::Value &xSlabHits, std::string detector, unsigned int part_event);
   std::string findTriggerPixel(Json::Value xDocPartEvent);
   bool calibratePmtHit(TOFPixelKey xPixelKey, Json::Value &xPmtHit, double &time);
   bool calibrateSlabHit(TOFPixelKey xPixelKey, Json::Value &xSlabHit, double &time);

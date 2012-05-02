@@ -26,7 +26,8 @@ def run():
     my_map.append(MAUS.MapPyBeamMaker()) # beam construction
     my_map.append(MAUS.MapCppSimulation())  #  geant4 simulation
 
-    # Global Digits - pre detector digitisation
+    # Pre detector set up
+    my_map.append(MAUS.MapPyMCReconSetup())  #  geant4 simulation
 
     # TOF
     my_map.append(MAUS.MapCppTOFMCDigitizer())  # TOF MC Digitizer

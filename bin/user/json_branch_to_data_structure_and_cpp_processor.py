@@ -530,19 +530,20 @@ class DataStructureItem:
         return self.__dict__[key]
 
 class DataBranch:
-    def __init__(self, json_object, class_name, json_name, parent=None):
-        self.class_name = class_name
-        self.json_name = json_name
+    def __init__(self, json_object, class_name, json_path, parent=None):
+        self.class_name = None
+        self.get_class_name(class_name, json_path)
+        self.json_path = json_path
         if self.class_name in self.branch_rename.keys():
             self.class_name = self.branch_rename[self.class_name]
         self.json_object = json_object
         self.parent_branch = parent
         self.variables = {}
         self.child_branches = {}
-        if type(json_object) == type([]):
-            array = [x for x in json_object if x != None]
-            self.json_object = array[0]
-        self.analyse_object()
+        if type(self.json_object) == type({}):
+            self.analyse_object()
+        elif type(self.json_object) == type([]):
+            self.analyse_array() 
         self.add_to_branch_dict()
 
     def analyse_object(self):
@@ -553,32 +554,60 @@ class DataBranch:
         for key, value in self.json_object.iteritems():
             variable = DataStructureItem()
             variable.parse_key_value(key, value, key in pointers)
-            if variable.is_class and value != None:
-                new_branch = DataBranch(value, variable.upper_name, key, self)
+            if (variable.is_class or variable.is_array) and value != None:
+                branch_name = variable.upper_name
+                if variable.is_array:
+                    branch_name += "Array"
+                new_branch = DataBranch\
+                        (value, branch_name, self.json_path+[key], self)
                 self.child_branches[key] = new_branch
             self.variables[key] = variable
         self.add_to_branch_dict()
         return self.variables
 
+    def analyse_array(self):
+        if self.class_name in self.class_to_pointers.keys():
+            pointers = self.class_to_pointers[self.class_name]
+        else:
+            pointers = []
+        if len(self.json_object) > 0:
+            key, value = "[]", self.json_object[0]
+            variable = DataStructureItem()
+            variable.parse_key_value(self.json_path[-1], value, self.json_path[-1] in pointers)
+            if (variable.is_class or variable.is_array) and value != None:
+                branch_name = variable.upper_name
+                if variable.is_array:
+                    branch_name += "Array"
+                new_branch = DataBranch\
+                        (value, branch_name, self.json_path+[key], self)
+                self.child_branches[key] = new_branch
+            self.variables[key] = variable
+        self.add_to_branch_dict()
+        return self.variables
+
+    def get_class_name(self, class_name, json_path):
+        if str(json_path) in self.branch_rename.keys():
+            self.class_name = self.branch_rename[str(json_path)]
+        else:
+            self.class_name = class_name
+
     def add_to_branch_dict(self):
-        if self.class_name in self.branch_dict:
-            if self.similarity(self.branch_dict[self.class_name]) > 0.9:
-                merged = self.merge(self.branch_dict[self.class_name])
-                self.branch_dict[self.class_name] = merged
-            elif self.class_name in self.merge_force:
-                MESSAGES['warn'].append('Forcing merge of branch '+\
-                               self.class_name+' with different data')
-                merged = self.merge(self.branch_dict[self.class_name])
-                self.branch_dict[self.class_name] = merged
-            elif self.parent_branch == None:
-                MESSAGES['warn'].append('Multiple root classes '+\
-                               self.class_name+' with different data - merging')
+        if self.class_name in self.branch_dict.keys():
+            if self.json_path == self.branch_dict[self.class_name].json_path:
+                self.merge(self.branch_dict[self.class_name])
+            elif str(self.json_path) in self.merge_force:
                 self.merge(self.branch_dict[self.class_name])
             else:
                 MESSAGES['warn'].append('Classes with same name '+\
-                               self.class_name+' but different data - renaming')
-                self.class_name = '_'+self.class_name
-                return self.add_to_branch_dict() # check for no dupes with rename
+                               self.class_name+' but different path')
+                parent = self.parent_branch
+                class_name =  self.class_name
+                while class_name in self.branch_dict and parent != None:
+                    if type(parent.json_object) != type([]):
+                        class_name = parent.class_name+'_'+class_name
+                    parent = parent.parent_branch
+                print 'class_name',self.json_path, class_name, self.class_name
+                self.class_name = class_name
         self.branch_dict[self.class_name] = self
 
     def merge(self, another_branch):
@@ -589,6 +618,7 @@ class DataBranch:
             if key not in self.variables.keys():
                 self.variables[key] = another_branch.variables[key]
                 self.variables[key].is_required = False
+        return self
 
     def similarity(self, another_branch):
         n_in, n_out = 0, 0
@@ -648,9 +678,10 @@ class DataBranch:
 
     class_to_pointers = {}
     branch_dict = {}
-    merge_force = ['MCEvent']
-    branch_rename = {"McEvents":"MCEvent", "A":"CkovA", "B":"CkovB",
-                     "Momentum":"ThreeVector", "Position":"ThreeVector"}
+    merge_force = {
+    }
+    branch_rename = {
+    }
 
 class DotGenerator:
     def __init__(self):
@@ -658,7 +689,7 @@ class DotGenerator:
         self.connectors = {}
 
     def get_nodes(self, branch):
-        a_json_name = branch.json_name
+        a_json_name = branch.json_path[-1]
         self.nodes[branch.class_name] = ' [shape=record, label="{'+\
                  branch.class_name+'|'+a_json_name+'}"]'
         for name, variable in branch.variables.iteritems():
@@ -706,7 +737,8 @@ def main():
         DataBranch.class_to_pointers = {}
         for line in fin.readlines():
             recon_branch = json.loads(line)  
-            DataBranch(recon_branch, "Spill", "")
+            if recon_branch["daq_event_type"] == "physics_event":
+                DataBranch(recon_branch, "Spill", [""])
         for value in DataBranch.branch_dict.values():
             value.build_data_structure()
         DotGenerator().write_dot('test_datastructure.dot')

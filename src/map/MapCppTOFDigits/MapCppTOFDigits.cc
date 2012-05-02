@@ -127,15 +127,27 @@ std::string MapCppTOFDigits::process(std::string document) {
                                             "trigger",
                                             JsonWrapper::arrayValue);
 
+        Json::Value xDocAllDigits; // list by station then by event
+        unsigned int n_events = 0;
         for (unsigned int n_station = 0; n_station < _stationKeys.size(); n_station++) {
           if (xDaqData.isMember(_stationKeys[n_station])) {
             Json::Value xDocDetectorData = JsonWrapper::GetProperty(xDaqData,
                                                                     _stationKeys[n_station],
                                                                     JsonWrapper::arrayValue);
-
-            Json::Value xDocDigits = makeDigits(xDocDetectorData, xDocTrigReq, xDocTrig);
-            root["digits"][_stationKeys[n_station]] = xDocDigits;
+            xDocAllDigits[n_station] = makeDigits(xDocDetectorData, xDocTrigReq, xDocTrig);  // list of events for station n_station
+            n_events = xDocAllDigits[n_station].size();
           }
+        }
+        for (unsigned int ev = 0; ev < n_events; ev++) {
+          Json::Value xDocTofDigits(Json::objectValue);
+          for (unsigned int stat = 0; stat < _stationKeys.size(); stat++) {
+            if (xDocAllDigits[stat][ev].type() == Json::arrayValue) {
+              xDocTofDigits[_stationKeys[stat]] = xDocAllDigits[stat][ev];
+            } else {
+              xDocTofDigits[_stationKeys[stat]] = Json::Value(Json::arrayValue);
+            }
+          }
+          root["recon_events"][ev]["tof_event"]["tof_digits"] = xDocTofDigits;
         }
       }
     }

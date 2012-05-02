@@ -24,15 +24,19 @@ class TestMapPyReconSetup(unittest.TestCase):
     """Tests for MapPyTriggerRecon"""
 
     def setUp(self):
+        """Initialises a MapPyReconSetup"""
         self.recon = MapPyReconSetup.MapPyReconSetup()
 
     def test_birth(self):
+        """Should just always return true"""
         self.assertTrue(self.recon.birth(""))
 
     def test_death(self):
+        """Should just always return true"""
         self.assertTrue(self.recon.death())
 
     def test_process_bad(self):
+        """Should put in an errors branch"""
         json_out = json.loads(self.recon.process(""))
         self.assertTrue("errors" in json_out)
         json_out = json.loads(self.recon.process(json.dumps({})))
@@ -54,6 +58,7 @@ class TestMapPyReconSetup(unittest.TestCase):
         ]}
 
     def test_process_good(self):
+        """Should make the detector branches"""
         trigs = [23, 17, 42]
         good = {"daq_data":{"trigger":[self.__v1290(x) for x in trigs]}}
         spill = json.loads(self.recon.process(json.dumps(good)))
