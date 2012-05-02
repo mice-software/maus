@@ -50,10 +50,14 @@ class LinearApproximationOpticsModel : public OpticsModel {
 
 class LinearApproximationTransferMap : public TransferMap {
  public:
-  LinearApproximationTransferMap(double start_plane, double end_plane, double mass)
-    : TransferMap(start_plane, end_plane), mass_(mass) { }
+  LinearApproximationTransferMap(double start_plane, double end_plane,
+                                 double mass)
+    : start_plane_(start_plane), end_plane_(end_plane), mass_(mass) { }
+
   LinearApproximationTransferMap(const LinearApproximationTransferMap & map)
-    : TransferMap(map.start_plane_, map.end_plane_), mass_(map.mass_) { }
+    : start_plane_(map.start_plane_), end_plane_(map.end_plane_),
+      mass_(map.mass_) { }
+
   CovarianceMatrix Transport(const CovarianceMatrix & covariances) const;
 
   /* @brief transports a phase space vector ({t, E, x, Px, y, Py}).
@@ -62,6 +66,8 @@ class LinearApproximationTransferMap : public TransferMap {
    */
   PhaseSpaceVector Transport(const PhaseSpaceVector & vector) const;
  private:
+  const double start_plane_;
+  const double end_plane_;
   double mass_;
 };
 

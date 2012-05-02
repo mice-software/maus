@@ -251,7 +251,7 @@ const MAUS::CovarianceMatrix CovarianceMatrixTest::rotated_penn_covariances_
 
 TEST_F(CovarianceMatrixTest, DefaultConstructor) {
   const CovarianceMatrix zeros;
-  double total;
+  double total = 0.0;
   ASSERT_EQ(zeros.size(), static_cast<size_t>(6));
 
   for (size_t row = 1; row <= 6; ++row) {

@@ -34,8 +34,7 @@ class PhaseSpaceVector;
 
 class TransferMap {
  public:
-  TransferMap(const double start_plane, const double end_plane)
-      : start_plane_(start_plane), end_plane_(end_plane) { }
+  TransferMap() { }
   // ******************************
   //      Transport functions
   // ******************************
@@ -54,12 +53,7 @@ class TransferMap {
    */
   virtual PhaseSpaceVector Transport(const PhaseSpaceVector & vector)
       const = 0;
-      
-  const double start_plane() {return start_plane_;}
-  const double end_plane() {return end_plane_;}
  protected:
-  const double start_plane_;
-  const double end_plane_;
 };
 }  // namespace MAUS
 
