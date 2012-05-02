@@ -48,8 +48,8 @@ TEST_BRANCH = {
     "a_pointer":1,
 }
 
-DATA_DIR = "src/common_cpp/TestDataStructure"
-PROC_DIR = "src/common_cpp/TestJsonCppProcessors"
+DATA_DIR = "src/common_cpp/DataStructure"
+PROC_DIR = "src/common_cpp/JsonCppProcessors"
 
 MESSAGES = {
 "info":[],
@@ -86,7 +86,7 @@ class DataStructureDeclaration:
     def getter_array_extras(self, variable):
         extras = "    /** Get an element from "+variable['upper_name']+\
                                                     " (needed for PyROOT) */\n"
-        extras += "    "+variable['element_type']+" Get"+\
+        extras += "    "+variable.element_type()+" Get"+\
                       variable['upper_name']+"Element(size_t index) const;\n\n"
         extras += "    /** Get size of "+variable['upper_name']+\
                                                     " (needed for PyROOT) */\n"
@@ -121,25 +121,30 @@ class DataStructureDeclaration:
         return var_out
 
     def includes(self):
-        includes = []  # should really be a set...
+        includes = {}  # should really be a set...
         for variable in self.variables.values():
             if variable["is_array"]:
-                includes += ['#include <vector>']
+                includes['#include <vector>'] = 1
             if variable['type'] == "std::string":
-                includes += ['#include <string>']
+                includes['#include <string>'] = 1
             if variable['type'] == "std::map":
-                includes += ['#include <map>']
+                includes['#include <map>'] = 1
             if variable['is_class']:
                 class_file = os.path.join(DATA_DIR, variable['type']+'.hh')
-                includes += ['#include "'+class_file+'"']
-        includes += ['#include "Rtypes.h"  // ROOT']
+                includes['#include "'+class_file+'"'] = 1
+            if variable['is_array']:
+                array_el = variable.child_items.values()[0]
+                if array_el.is_class:
+                    class_file = os.path.join(DATA_DIR, array_el.type+'.hh')
+                    includes['#include "'+class_file+'"'] = 1
+        includes['#include "Rtypes.h"  // ROOT'] = 1
         return '\n'.join(includes)
 
     def typedefs(self):
         typedefs = {}
         for variable in self.variables.values():
             if variable["is_array"]:
-                typedefs["typedef std::vector<"+variable["upper_name"]+"> "+\
+                typedefs["typedef std::vector<"+variable.element_type()+"> "+\
                                                        variable["type"]+";"] = 1
         return '\n'.join(typedefs.keys())
 
@@ -164,7 +169,8 @@ class DataStructureDeclaration:
 
     def bottom_matter(self):
         bottom_matter = "\n    ClassDef("+self.class_name+", 1)\n"
-        return "};\n}\n\n#endif  // "+self.ifdef+"\n"
+        bottom_matter += "};\n}\n\n#endif  // "+self.ifdef+"\n"
+        return bottom_matter
 
     def ctors(self):
         decl = "    /** Default constructor - initialises to 0/NULL */\n"
@@ -343,8 +349,9 @@ class JsonCppProcessorDeclaration:
             if var['is_array']:
                 includes['#include "'+\
                            os.path.join(PROC_DIR, 'ArrayProcessors.hh')+'"'] = 1
-                includes['#include "'+\
-                      os.path.join(PROC_DIR, var['element_proc']+'.hh')+'"'] = 1
+                if var.element_is_class():
+                    includes['#include "'+\
+                          os.path.join(PROC_DIR, var.element_proc_type()+'.hh')+'"'] = 1
             if var['is_class']:
                 includes['#include "'+\
                      os.path.join(PROC_DIR, var['type']+'Processor.hh')+'"'] = 1
@@ -415,7 +422,7 @@ class JsonCppProcessorImplementation:
         for var in self.variables.values():
             a_ctor = var['proc_name']+"("
             if var['is_array']:
-                a_ctor += 'new '+var['element_proc']
+                a_ctor += 'new '+var.element_proc_type()
             a_ctor += "), "
             if len(var_ctors+a_ctor) <= 80:
                 var_ctors = var_ctors+a_ctor
@@ -453,59 +460,114 @@ class JsonCppProcessorImplementation:
 
 class DataStructureItem:
     def __init__(self):
-        self.is_array = False
-        self.is_pointer = False
-        self.is_class = False
-        self.branch_name = None
-        self.var_name = None
-        self.upper_name = None
-        self.type = None
-        self.proc_type = None
-        self.element_type = None
-        self.element_proc = None
-        self.user_name = None
-        self.proc_name = None
-        self.is_required = True
+        self.is_array = False  # true if this is an array (python list, c++ vector)
+        self.is_pointer = False  # true if this is a pointer
+        self.is_class = False  # true if this is a class (python dict, json object)
 
-    def parse_key_value(self, key, value, is_pointer):
-            words = key.split('_')
-            self.branch_name = key
-            self.var_name = '_'.join(['']+words)
-            self.upper_name = ''
+        self.type = None # type - should be same as upper_name for classes and arrays
+        self.proc_type = None # type of processor
+
+        self.branch_name = None  # json name of the branch - arrays use parent's branch_name
+        self.user_name = None # variable name used in public (set function calls etc)
+        self.proc_name = None # name used for private member processor name
+        self.var_name = None  # name used to reference private member variables
+        self.upper_name = None # name used for C++ function and class
+
+        self.is_required = True # set to true to force the data to have relevant member
+        self.json_path = [] # path to get here through the whole json data tree
+        self.parent_branch = None # reference to the parent data structure item - None if root branch
+        self.child_items = {} # reference to any child data structure items - arrays only ever have one entry
+
+    def parse_key_value(self, key, value, is_pointer, json_path, parent):
+        words = key.split('_')
+        self.parent_branch = parent
+        self.json_path = json_path
+        self.branch_name = key
+        self.var_name = '_'.join(['']+words)
+        self.upper_name = ''
+        if str(self.json_path) in self.branch_rename.keys():
+            self.upper_name = self.branch_rename[str(json_path)]
+        else:
             for word in words:
                 self.upper_name += string.capwords(word)
-            if type(value) == type([]):
-                self.type = self.upper_name+'Array'
-                self.is_array = True
-                self.element_type = self.upper_name
-                self.proc_type = "ValueArrayProcessor<"+\
-                                                    self.element_type+">"
-                self.element_proc = self.element_type+"Processor"
-            elif type(value) == type({}) or value == None:
-                self.type = self.upper_name
-                self.proc_type = self.type+'Processor'
-                self.is_class = True
+        if type(value) == type([]):
+            if self.upper_name[-1] == 's':
+                self.upper_name = self.upper_name[:-1]
+            self.upper_name += 'Array'
+            self.type = self.upper_name
+            self.is_array = True
+        elif type(value) == type({}) or value == None:
+            self.type = self.upper_name
+            self.proc_type = self.type+'Processor'
+            self.is_class = True
+        else:
+            self.type, self.proc_type = self.get_primitive(key, value)
+        self.is_pointer = is_pointer
+        self.user_name = self.var_name[1:]
+        self.proc_name = self.var_name+"_proc"
+        if self.is_class:
+            self.branch_from_object(value, self.json_path)
+        if self.is_array:
+            self.branch_from_array(value, self.json_path)
+
+    def branch_from_object(self, json_object, json_path):
+        if self.upper_name in self.class_to_pointers.keys():
+            pointers = self.class_to_pointers[self.upper_name]
+        else:
+            pointers = []
+        for key, value in json_object.iteritems():
+            variable = DataStructureItem()
+            variable.parse_key_value(key, value, key in pointers, self.json_path+[key], self)
+            self.child_items[key] = variable
+        self.add_to_branch_dict()
+
+    def branch_from_array(self, json_array, json_path):
+        my_list = [x for x in json_array if x != None]
+        for item in my_list:
+            if type(item) != type(my_list[0]):
+                MESSAGES['warn'].append('Cannot parse list '+self.branch_name+\
+                           ' with mixed types '+str(type(my_list[0]))+\
+                           ' and '+str(type(item))+ ' - ignoring')
+                return
+        if len(my_list) > 0:
+            if type(my_list[0]) == type([]):
+                MESSAGES['warn'].append('Cannot parse list of lists '+\
+                                         'in branch '+self.branch_name)
             else:
-                self.type, self.proc_type = self.get_primitive(key, value)
-            self.is_pointer = is_pointer
-            self.user_name = self.var_name[1:]
-            self.proc_name = self.var_name+"_proc"
-            if self.is_array:
-                my_list = [x for x in value if x != None]
-                if len(my_list) > 0:
-                    if type(my_list[0]) == type({}):
-                        self.is_class = True
-                    elif type(my_list[0]) == type([]):
-                        MESSAGES['warn'].append('Cannot parse list of lists '+\
-                                                 'in branch '+self.branch_name)
-                    else:
-                        self.element_type, self.element_proc = \
-                                           self.get_primitive('[]', my_list[0])
-                for item in my_list:
-                    if type(item) != type(my_list[0]):
-                        MESSAGES['warn'].append('Cannot parse list '+self.branch_name+\
-                                   ' with mixed types '+str(type(my_list[0]))+\
-                                   ' and '+str(type(item)))
+                key = self.branch_name
+                if key[-1] == 's':
+                    key = key[0:-1]
+                variable = DataStructureItem()
+                variable.parse_key_value(key, my_list[0], False, self.json_path+['[]'], self)
+                self.child_items[key] = variable
+                self.proc_type = "ValueArrayProcessor<"+\
+                                                self.element_type()+">"
+
+        self.add_to_branch_dict()
+
+    def element_is_class(self):
+        if self.is_array and len(self.child_items.values()) == 1:
+            return self.child_items.values()[0].is_class
+        else:
+            raise TypeError('Attempt to get element type for non-array')
+
+    def element_type(self):
+        if self.is_array and len(self.child_items.values()) == 1:
+            return self.child_items.values()[0].type
+        else:
+            raise TypeError('Attempt to get element type for non-array')
+
+    def element_proc(self):
+        if self.is_array and len(self.child_items.values()) == 1:
+            return self.child_items.values()[0].proc_name
+        else:
+            raise TypeError('Attempt to get element type for non-array')
+
+    def element_proc_type(self):
+        if self.is_array and len(self.child_items.values()) == 1:
+            return self.child_items.values()[0].proc_type
+        else:
+            raise TypeError('Attempt to get element type for non-array')
 
     def get_primitive(self, key, value):
         my_tp = type(value)
@@ -523,165 +585,63 @@ class DataStructureItem:
             raise TypeError("Did not recognise type '"+str(my_tp)+\
                                      "' of json value "+str(key)+":"+str(value))
 
-    def  __setitem__(self, key, value):
-        self.__dict__[key] = value
-
-    def  __getitem__(self, key):
-        return self.__dict__[key]
-
-class DataBranch:
-    def __init__(self, json_object, class_name, json_path, parent=None):
-        self.class_name = None
-        self.get_class_name(class_name, json_path)
-        self.json_path = json_path
-        if self.class_name in self.branch_rename.keys():
-            self.class_name = self.branch_rename[self.class_name]
-        self.json_object = json_object
-        self.parent_branch = parent
-        self.variables = {}
-        self.child_branches = {}
-        if type(self.json_object) == type({}):
-            self.analyse_object()
-        elif type(self.json_object) == type([]):
-            self.analyse_array() 
-        self.add_to_branch_dict()
-
-    def analyse_object(self):
-        if self.class_name in self.class_to_pointers.keys():
-            pointers = self.class_to_pointers[self.class_name]
-        else:
-            pointers = [] 
-        for key, value in self.json_object.iteritems():
-            variable = DataStructureItem()
-            variable.parse_key_value(key, value, key in pointers)
-            if (variable.is_class or variable.is_array) and value != None:
-                branch_name = variable.upper_name
-                if variable.is_array:
-                    branch_name += "Array"
-                new_branch = DataBranch\
-                        (value, branch_name, self.json_path+[key], self)
-                self.child_branches[key] = new_branch
-            self.variables[key] = variable
-        self.add_to_branch_dict()
-        return self.variables
-
-    def analyse_array(self):
-        if self.class_name in self.class_to_pointers.keys():
-            pointers = self.class_to_pointers[self.class_name]
-        else:
-            pointers = []
-        if len(self.json_object) > 0:
-            key, value = "[]", self.json_object[0]
-            variable = DataStructureItem()
-            variable.parse_key_value(self.json_path[-1], value, self.json_path[-1] in pointers)
-            if (variable.is_class or variable.is_array) and value != None:
-                branch_name = variable.upper_name
-                if variable.is_array:
-                    branch_name += "Array"
-                new_branch = DataBranch\
-                        (value, branch_name, self.json_path+[key], self)
-                self.child_branches[key] = new_branch
-            self.variables[key] = variable
-        self.add_to_branch_dict()
-        return self.variables
-
-    def get_class_name(self, class_name, json_path):
-        if str(json_path) in self.branch_rename.keys():
-            self.class_name = self.branch_rename[str(json_path)]
-        else:
-            self.class_name = class_name
-
-    def add_to_branch_dict(self):
-        if self.class_name in self.branch_dict.keys():
-            if self.json_path == self.branch_dict[self.class_name].json_path:
-                self.merge(self.branch_dict[self.class_name])
-            elif str(self.json_path) in self.merge_force:
-                self.merge(self.branch_dict[self.class_name])
-            else:
-                MESSAGES['warn'].append('Classes with same name '+\
-                               self.class_name+' but different path')
-                parent = self.parent_branch
-                class_name =  self.class_name
-                while class_name in self.branch_dict and parent != None:
-                    if type(parent.json_object) != type([]):
-                        class_name = parent.class_name+'_'+class_name
-                    parent = parent.parent_branch
-                print 'class_name',self.json_path, class_name, self.class_name
-                self.class_name = class_name
-        self.branch_dict[self.class_name] = self
-
-    def merge(self, another_branch):
-        for key in self.variables.keys():
-            if key not in another_branch.variables.keys():
-                self.variables[key].is_required = False
-        for key in another_branch.variables.keys():
-            if key not in self.variables.keys():
-                self.variables[key] = another_branch.variables[key]
-                self.variables[key].is_required = False
-        return self
-
-    def similarity(self, another_branch):
-        n_in, n_out = 0, 0
-        for var in self.variables.keys():
-            if var in another_branch.variables.keys():
-                n_in += 1
-            else:
-                n_out += 1
-        for var in another_branch.variables.keys():
-            if var not in self.variables.keys():
-                n_out += 1
-        if n_in == 0 and n_out == 0:
-            return 1.
-        return float(n_in)/float(n_in+n_out)
-
     def build_data_structure(self):
-        MESSAGES['info'].append("Building "+self.class_name)
-        fout = open(os.path.join(DATA_DIR, self.class_name+".hh"), "w")
-        my_decl = DataStructureDeclaration(self.class_name, self.variables)
+        MESSAGES['info'].append("Building class "+self.upper_name)
+        fout = open(os.path.join(DATA_DIR, self.upper_name+".hh"), "w")
+        my_decl = DataStructureDeclaration(self.upper_name, self.child_items)
         print >>fout, my_decl.class_declaration()
         fout.close()
 
-        fout = open(os.path.join(DATA_DIR, self.class_name+".cc"), "w")
-        my_impl = DataStructureImplementation(self.class_name, self.variables)
+        fout = open(os.path.join(DATA_DIR, self.upper_name+".cc"), "w")
+        my_impl = DataStructureImplementation(self.upper_name, self.child_items)
         print >>fout, my_impl.class_implementation()
         fout.close()
 
-        json_decl = JsonCppProcessorDeclaration(self.class_name, self.variables)
+        json_decl = JsonCppProcessorDeclaration(self.upper_name, self.child_items)
         fout = open(os.path.join(PROC_DIR, json_decl.proc_name+".hh"), "w")
         print >>fout, json_decl.class_declaration()
         fout.close()
 
-        json_impl = JsonCppProcessorImplementation(self.class_name, self.variables)
+        json_impl = JsonCppProcessorImplementation(self.upper_name, self.child_items)
         fout = open(os.path.join(PROC_DIR, json_impl.proc_name+".cc"), "w")
         print >>fout, json_impl.class_implementation()
         fout.close()
 
         if len(MESSAGES['at_end']) == 0:
             MESSAGES['at_end'].append("Now add the following lines to LinkDef.hh")
-        MESSAGES['at_end'].append("#pragma link C++ class MAUS::"+self.class_name+"+")
+        MESSAGES['at_end'].append("#pragma link C++ class MAUS::"+self.upper_name+"+;")
 
-    def get_primitive(self, key, value):
-        my_tp = type(value)
-        if my_tp == type(1):
-            return 'int', "IntProcessor"
-        elif my_tp == type(""):
-            return 'std::string', "StringProcessor"
-        elif my_tp == type(1.):
-            return 'double', "DoubleProcessor"
-        elif my_tp == type(True):
-            return 'bool', "BoolProcessor"
-        elif my_tp == type([]) or my_tp == type({}):
-            return None, None
-        else:
-            raise TypeError("Did not recognise type of json value "+\
-                                         str(key)+":"+str(value))
+    def add_to_branch_dict(self):
+        self.branch_dict[str(self.json_path)] = self
+
+
+    def  __setitem__(self, key, value):
+        self.__dict__[key] = value
+
+    def  __getitem__(self, key):
+        return self.__dict__[key]
 
     class_to_pointers = {}
-    branch_dict = {}
-    merge_force = {
-    }
     branch_rename = {
+        str([]):'Spill',
+        str([u'recon_events', '[]', u'ckov_event', u'ckov_digits', '[]', u'A']):'CkovA',
+        str([u'recon_events', '[]', u'ckov_event', u'ckov_digits', '[]', u'B']):'CkovB',
+        str([u'daq_data']):'DAQData',
+        str([u'daq_data', u'ckov', '[]']):'CkovDaq',
+        str([u'daq_data', u'tof0', '[]']):'TOFDaq',
+        str([u'daq_data', u'tof1', '[]']):'TOFDaq',
+        str([u'daq_data', u'tof2', '[]']):'TOFDaq',
+        str([u'daq_data', u'tof0']):'TOF0',
+        str([u'daq_data', u'tof1']):'TOF1',
+        str([u'daq_data', u'tof2']):'TOF2',
+        str([u'daq_data', u'kl']):'KL',
+        str([u'daq_data', u'kl', '[]']):'KLDaq',
+        str([u'recon_events', '[]', u'kl_event']):'KLEvent',
+        str([u'recon_events', '[]', u'tof_event']):'TOFEvent',
+        str([u'recon_events', '[]', u'emr_event']):'EMREvent',
     }
+    branch_dict = {}
+
 
 class DotGenerator:
     def __init__(self):
@@ -689,21 +649,16 @@ class DotGenerator:
         self.connectors = {}
 
     def get_nodes(self, branch):
-        a_json_name = branch.json_path[-1]
-        self.nodes[branch.class_name] = ' [shape=record, label="{'+\
-                 branch.class_name+'|'+a_json_name+'}"]'
-        for name, variable in branch.variables.iteritems():
-            if variable.is_array:
-                self.nodes[variable.type] = ' [shape=record, label="{'+\
-                         variable.type+'| [] }"]'
+        a_json_name = ""
+        if len(branch.json_path) > 0:
+            a_json_name = branch.json_path[-1]
+        self.nodes[branch.type] = ' [shape=record, label="{'+\
+                 branch.type+'|'+a_json_name+'}"]'
 
     def get_connections(self, branch):
-        for child_branch in branch.child_branches.values():
-            self.connectors[branch.class_name+' -> '+child_branch.class_name] = 1
-            for name, variable in branch.variables.iteritems():
-                if variable.is_array:
-                    self.connectors[branch.class_name+' -> '+variable.type] = 1
-                    self.connectors[variable.type+' -> '+variable.element_type] = 1
+        for child_branch in branch.child_items.values():
+            if child_branch.is_class or child_branch.is_array:
+                self.connectors[branch.type+' -> '+child_branch.type] = 1
 
     def top_matter(self):
         return "digraph G {\n    node [shape=record];"
@@ -713,11 +668,11 @@ class DotGenerator:
 
     def generate_dot_text(self):
         dot_text = self.top_matter()+"\n"
-        for key, value in DataBranch.branch_dict.iteritems():
+        for key, value in DataStructureItem.branch_dict.iteritems():
             self.get_nodes(value)
         for key, value in self.nodes.iteritems():
             dot_text += key+value+"\n"
-        for name, data_branch in DataBranch.branch_dict.iteritems():
+        for name, data_branch in DataStructureItem.branch_dict.iteritems():
             self.get_connections(data_branch)
         for key in self.connectors.keys():
             dot_text += key+"\n"
@@ -734,23 +689,26 @@ def main():
         if os.getcwd() != os.environ["MAUS_ROOT_DIR"]:
             raise OSError("Must be in MAUS_ROOT_DIR to run script")
         fin = open("simulation.out")
-        DataBranch.class_to_pointers = {}
         for line in fin.readlines():
             recon_branch = json.loads(line)  
             if recon_branch["daq_event_type"] == "physics_event":
-                DataBranch(recon_branch, "Spill", [""])
-        for value in DataBranch.branch_dict.values():
-            value.build_data_structure()
+                branch = DataStructureItem()#recon_branch, "Spill", [""]
+                branch.parse_key_value("root", recon_branch, False, [], None)
+        for value in DataStructureItem.branch_dict.values():
+            MESSAGES['info'].append('Found '+str(value.json_path))
+            if value.is_class:
+                print value.upper_name
+                value.build_data_structure()
         DotGenerator().write_dot('test_datastructure.dot')
     except Exception:
         sys.excepthook(*sys.exc_info())
     print "Log:"
-#    for msg in MESSAGES['info']:
-#        print 'INFO', msg
-#    for msg in MESSAGES['warn']:
-#        print 'WARN', msg
-#    for msg in MESSAGES['at_end']:
-#        print msg
+    for msg in MESSAGES['info']:
+        print 'INFO', msg
+    for msg in MESSAGES['warn']:
+        print 'WARN', msg
+    for msg in MESSAGES['at_end']:
+        print msg
 
 if __name__ == "__main__":
     main()
