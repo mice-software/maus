@@ -93,9 +93,10 @@ std::string MapCppTOFSlabHits::process(std::string document) {
             Json::Value xDocPartEvent = JsonWrapper::GetProperty(xDocTofEvent,
                                                         "tof_digits",
                                                         JsonWrapper::objectValue);
+            // Ack! sometimes tofn is a nullValue
             xDocPartEvent = JsonWrapper::GetProperty(xDocPartEvent,
                                                     _stationKeys[n_station],
-                                                    JsonWrapper::arrayValue);
+                                                    JsonWrapper::anyValue);
             Json::Value xDocSlabHits = makeSlabHits(xDocPartEvent);
             root["recon_events"][n_event]["tof_event"]["tof_slab_hits"]
                                        [_stationKeys[n_station]] = xDocSlabHits;
