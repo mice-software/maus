@@ -50,6 +50,8 @@ TEST_BRANCH = {
 
 DATA_DIR = "/home/cr67/MAUS/work/delete/DataStructure"
 PROC_DIR = "/home/cr67/MAUS/work/delete/JsonCppProcessors"
+TEST_DATA_DIR = "/home/cr67/MAUS/work/delete/TestDataStructure"
+TEST_PROC_DIR = "/home/cr67/MAUS/work/delete/TestJsonCppProcessors"
 
 MESSAGES = {
 "info":[],
