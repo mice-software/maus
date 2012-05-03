@@ -40,7 +40,8 @@ def run_analyze_offline(json_file_name):
     except OSError:
         pass
     subproc = subprocess.Popen([ANALYSIS,
-                                "-output_json_file_name", json_file_name])
+                                "-output_json_file_name", json_file_name,
+                                "-TOF_findTriggerPixelCut", "2.0"])
     subproc.wait()
 
 def run_mc_simulation(json_file_name):
@@ -70,7 +71,7 @@ def run_json_to_root(json_file_name, root_file_name):
     subproc = subprocess.Popen([JSON_TO_ROOT,
                                 "-input_json_file_name", json_file_name,
                                 "-output_root_file_name", root_file_name,
-                                "-verbose_level", "1"])
+                                "-verbose_level", "01"])
 
     subproc.wait()
 
@@ -109,7 +110,7 @@ class RootIOTest(unittest.TestCase): #pylint: disable=R0904
         self.__check_equality(ana_json_in, ana_json_out)
 
 
-    def _test_simulate_mice(self): #pylint: disable=R0201
+    def test_simulate_mice(self): #pylint: disable=R0201
         """
         Check that we can run simulate_mice, convert to root, convert back to
         json
@@ -120,7 +121,7 @@ class RootIOTest(unittest.TestCase): #pylint: disable=R0904
                               (MRD, "tmp", "test_root_io_simulate_mice.root")
         sim_json_out = os.path.join \
                              (MRD, "tmp", "test_root_io_simulate_mice_OUT.json")
-        #run_mc_simulation(sim_json_in)
+        run_mc_simulation(sim_json_in)
         run_json_to_root(sim_json_in, sim_root)
         run_root_to_json(sim_root, sim_json_out)
         self.__check_equality(sim_json_in, sim_json_out)
@@ -134,36 +135,69 @@ class RootIOTest(unittest.TestCase): #pylint: disable=R0904
         self.assertEqual(len(json_fin), len(json_fout))
         for i in range(len(json_fin)):
             jin = json.loads(json_fin[i])
-            jout = json.loads(json_fin[i])
+            jout = json.loads(json_fout[i])
             self.__almost_equal(jin, jout, verbose=False)
 
 
-    def __almost_equal(self, item1, item2, verbose=True, depth=0, tol=1e-9):
+    def __almost_equal(self, item_in, item_out, verbose=True, branch=[], tol=1e-9):
         """
-        Check that two json data structures are the same
+        Check that two json data structures are the same.
+
+        If there are extra branches in item_out that's okay but we require that
+        they have default constructors (empty arrays, dicts and strings,
+        numerics are 0, bools are either true or false).
         """
         if verbose == True:
-            print depth
-        my_msg =  "item1:\n"+json.dumps(item1, indent=2)
-        my_msg += "item2:\n"+json.dumps(item2, indent=2)
-        self.assertEqual(type(item1), type(item2), msg=my_msg)
-        if type(item1) == type({}):
-            self.assertEqual(item1.keys(), item2.keys(), msg=my_msg)
+            print branch
+        my_msg =  "item_in:\n  "+json.dumps(item_in, indent=2)
+        my_msg += "\nitem_out:\n  "+json.dumps(item_out, indent=2)
+        my_msg += "\nin branch:\n  "+str(branch)
+        if type(item_in) != type(None):
+            self.assertEqual(type(item_in), type(item_out), msg=my_msg)
+        if type(item_in) == type({}):
+            keys_in = item_in.keys()
+            keys_out = item_out.keys()
+            for key in keys_in:
+                self.assertTrue(key in keys_out, msg=my_msg+\
+                                                      "\nMissing key "+str(key))
             if verbose == True:
-                print item1.keys()
-                print item2.keys()
-            for key in item1.keys():
-                self.__almost_equal(item1[key], item2[key],
-                                        verbose=verbose, depth=depth+1, tol=tol)
-        elif type(item1) == type([]):
-            self.assertEqual(len(item1), len(item2), msg=my_msg)
-            for i in range(len(item1)):
-                self.__almost_equal(item1[i], item2[i],
-                                        verbose=verbose, depth=depth+1, tol=tol)
-        elif type(item1) == type(1.):
-            self.assertAlmostEqual(item1, item2, tol+item1*tol, msg=my_msg)
+                print keys_in
+                print keys_out
+            for key in keys_in:
+                self.__almost_equal(item_in[key], item_out[key],
+                                  verbose=verbose, branch=branch+[key], tol=tol)
+            for key in keys_out:
+                if key not in keys_in:
+                    self.__is_default_value(item_out[key])
+        elif type(item_in) == type([]):
+            self.assertEqual(len(item_in), len(item_out), msg=my_msg)
+            for i in range(len(item_in)):
+                self.__almost_equal(item_in[i], item_out[i],
+                                 verbose=verbose, branch=branch+['[]'], tol=tol)
+        elif type(item_in) == type(1.):
+            my_tol = tol+abs(item_in)*tol 
+            self.assertTrue(abs(item_in-item_out) < my_tol,
+                msg=my_msg+"\nFloats were different  in: "+str(item_in)+\
+                "  out: "+str(item_out)+"  diff: "+str(item_in-item_out)+\
+                "  tol: "+str(my_tol))
+        elif type(item_in) == type(None):
+            self.__is_default_value(item_out)
         else:
-            self.assertEqual(item1, item2, msg=my_msg)
+            self.assertEqual(item_in, item_out, msg=my_msg)
+
+    def __is_default_value(self, value):
+        """
+        Check that a json value has some default value
+        """
+        if type(value) == type("") or type(value) == type([]):
+            self.assertEqual(len(value), 0)
+        elif type(value) == type({}):
+            self.assertEqual(len(value.keys()), 0)
+        elif type(value) == type(0.):
+            self.assertAlmostEqual(value, 0., 1e-12)
+        elif type(value) == type(0):
+            self.assertEqual(value, 0)
+        #None and bool types are always okay
 
 if __name__ == "__main__":
     unittest.main()

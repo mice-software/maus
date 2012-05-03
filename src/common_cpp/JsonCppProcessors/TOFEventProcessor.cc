@@ -18,7 +18,17 @@
 
 namespace MAUS {
 
-TOFEventProcessor::TOFEventProcessor() {
+TOFEventProcessor::TOFEventProcessor()
+    : _tof_slab_hits_proc(), _tof_space_points_proc(), _tof_digits_proc() {
+    RegisterValueBranch
+          ("tof_slab_hits", &_tof_slab_hits_proc, &TOFEvent::GetTOFEventSlabHit,
+          &TOFEvent::SetTOFEventSlabHit, false);
+    RegisterValueBranch
+          ("tof_space_points", &_tof_space_points_proc, &TOFEvent::GetTOFEventSpacePoint,
+          &TOFEvent::SetTOFEventSpacePoint, false);
+    RegisterValueBranch
+          ("tof_digits", &_tof_digits_proc, &TOFEvent::GetTOFEventDigit,
+          &TOFEvent::SetTOFEventDigit, false);
 }
 }  // namespace MAUS
 

@@ -55,6 +55,10 @@ class ValueItem; // defined in ObjectProcessor-inl
 template <class ObjectType>
 class ObjectProcessor : public ProcessorBase<ObjectType> {
   public:
+    /** Default constructor sets _throws_if_different_properties to true
+     */
+    ObjectProcessor();
+
     /** Convert from a Json object to a C++ instance
      *
      *  Iterate over each registered branch. If the branch is of pointer type,
@@ -134,12 +138,26 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
                     void (ObjectType::*SetMethod)(ChildType value),
                     bool is_required);
 
+    /** Return true if json value properties not the same as branches
+     *
+     *  Compare the list of properties on the json value and compare with the
+     *  list of registered branches. If they are different return false. Else
+     *  return true.
+     *
+     *  @param value Json::Value to check against. Throw an exception if value
+     *         is not an object type.
+     */
+    bool HasSameJsonProperties(const Json::Value& value) const;
+
     /** Destructor frees memory allocated to items vector
      */
     virtual ~ObjectProcessor();
 
+  protected:
+    bool _throws_if_different_properties;
+
   private:
-    std::vector< BaseItem<ObjectType>* > items;
+    std::vector< BaseItem<ObjectType>* > _items;
 };
 }
 

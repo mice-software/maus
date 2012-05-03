@@ -159,5 +159,9 @@ TEST_F(ObjectProcessorTest, CppToJsonNotRequiredTest) {
   EXPECT_FALSE(json_value->isMember("branch_b"));
   delete json_value;
 }
+
+TEST_F(ObjectProcessorTest, CppToJsonThrowIfDifferentTest) {
+  EXPECT_TRUE(false) << "Need to check: handling of NULL/nullValue, HasSameJsonProperties, and calling in JsonToCpp";
+}
 }
 

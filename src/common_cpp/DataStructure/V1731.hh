@@ -28,20 +28,20 @@ typedef std::vector<int> SampleArray;
 /** @class V1731 comment
  *
  *  @var ldc_id  <--description-->
- *  @var max_pos  <--description-->
- *  @var part_event_number  <--description-->
+ *  @var samples  <--description-->
  *  @var charge_mm  <--description-->
  *  @var equip_type  <--description-->
- *  @var channel_key  <--description-->
+ *  @var phys_event_number  <--description-->
  *  @var charge_pm  <--description-->
  *  @var arrival_time  <--description-->
- *  @var phys_event_number  <--description-->
+ *  @var channel_key  <--description-->
  *  @var position_min  <--description-->
- *  @var samples  <--description-->
- *  @var time_stamp  <--description-->
- *  @var trigger_time_tag  <--description-->
- *  @var detector  <--description-->
  *  @var pulse_area  <--description-->
+ *  @var max_pos  <--description-->
+ *  @var trigger_time_tag  <--description-->
+ *  @var time_stamp  <--description-->
+ *  @var detector  <--description-->
+ *  @var part_event_number  <--description-->
  *  @var geo  <--description-->
  *  @var pedestal  <--description-->
  *  @var channel  <--description-->
@@ -68,17 +68,17 @@ class V1731 {
     /** Sets LdcId */
     void SetLdcId(int ldc_id);
 
-    /** Returns MaxPos */
-    int GetMaxPos() const;
+    /** Returns SampleArray */
+    SampleArray GetSampleArray() const;
 
-    /** Sets MaxPos */
-    void SetMaxPos(int max_pos);
+    /** Get an element from SampleArray (needed for PyROOT) */
+    int GetSampleArrayElement(size_t index) const;
 
-    /** Returns PartEventNumber */
-    int GetPartEventNumber() const;
+    /** Get size of SampleArray (needed for PyROOT) */
+    size_t GetSampleArraySize() const;
 
-    /** Sets PartEventNumber */
-    void SetPartEventNumber(int part_event_number);
+    /** Sets SampleArray */
+    void SetSampleArray(SampleArray samples);
 
     /** Returns ChargeMm */
     int GetChargeMm() const;
@@ -92,11 +92,11 @@ class V1731 {
     /** Sets EquipType */
     void SetEquipType(int equip_type);
 
-    /** Returns ChannelKey */
-    std::string GetChannelKey() const;
+    /** Returns PhysEventNumber */
+    int GetPhysEventNumber() const;
 
-    /** Sets ChannelKey */
-    void SetChannelKey(std::string channel_key);
+    /** Sets PhysEventNumber */
+    void SetPhysEventNumber(int phys_event_number);
 
     /** Returns ChargePm */
     int GetChargePm() const;
@@ -110,11 +110,11 @@ class V1731 {
     /** Sets ArrivalTime */
     void SetArrivalTime(int arrival_time);
 
-    /** Returns PhysEventNumber */
-    int GetPhysEventNumber() const;
+    /** Returns ChannelKey */
+    std::string GetChannelKey() const;
 
-    /** Sets PhysEventNumber */
-    void SetPhysEventNumber(int phys_event_number);
+    /** Sets ChannelKey */
+    void SetChannelKey(std::string channel_key);
 
     /** Returns PositionMin */
     int GetPositionMin() const;
@@ -122,23 +122,17 @@ class V1731 {
     /** Sets PositionMin */
     void SetPositionMin(int position_min);
 
-    /** Returns SampleArray */
-    SampleArray GetSampleArray() const;
+    /** Returns PulseArea */
+    int GetPulseArea() const;
 
-    /** Get an element from SampleArray (needed for PyROOT) */
-    int GetSampleArrayElement(size_t index) const;
+    /** Sets PulseArea */
+    void SetPulseArea(int pulse_area);
 
-    /** Get size of SampleArray (needed for PyROOT) */
-    size_t GetSampleArraySize() const;
+    /** Returns MaxPos */
+    int GetMaxPos() const;
 
-    /** Sets SampleArray */
-    void SetSampleArray(SampleArray samples);
-
-    /** Returns TimeStamp */
-    int GetTimeStamp() const;
-
-    /** Sets TimeStamp */
-    void SetTimeStamp(int time_stamp);
+    /** Sets MaxPos */
+    void SetMaxPos(int max_pos);
 
     /** Returns TriggerTimeTag */
     int GetTriggerTimeTag() const;
@@ -146,17 +140,23 @@ class V1731 {
     /** Sets TriggerTimeTag */
     void SetTriggerTimeTag(int trigger_time_tag);
 
+    /** Returns TimeStamp */
+    int GetTimeStamp() const;
+
+    /** Sets TimeStamp */
+    void SetTimeStamp(int time_stamp);
+
     /** Returns Detector */
     std::string GetDetector() const;
 
     /** Sets Detector */
     void SetDetector(std::string detector);
 
-    /** Returns PulseArea */
-    int GetPulseArea() const;
+    /** Returns PartEventNumber */
+    int GetPartEventNumber() const;
 
-    /** Sets PulseArea */
-    void SetPulseArea(int pulse_area);
+    /** Sets PartEventNumber */
+    void SetPartEventNumber(int part_event_number);
 
     /** Returns Geo */
     int GetGeo() const;
@@ -178,20 +178,20 @@ class V1731 {
 
   private:
     int _ldc_id;
-    int _max_pos;
-    int _part_event_number;
+    SampleArray _samples;
     int _charge_mm;
     int _equip_type;
-    std::string _channel_key;
+    int _phys_event_number;
     int _charge_pm;
     int _arrival_time;
-    int _phys_event_number;
+    std::string _channel_key;
     int _position_min;
-    SampleArray _samples;
-    int _time_stamp;
-    int _trigger_time_tag;
-    std::string _detector;
     int _pulse_area;
+    int _max_pos;
+    int _trigger_time_tag;
+    int _time_stamp;
+    std::string _detector;
+    int _part_event_number;
     int _geo;
     int _pedestal;
     int _channel;

@@ -18,11 +18,17 @@
 #define _SRC_COMMON_CPP_DATASTRUCTURE_TOFEVENT_
 
 #include "Rtypes.h"  // ROOT
+#include "src/common_cpp/DataStructure/TOFEventDigit.hh"
+#include "src/common_cpp/DataStructure/TOFEventSlabHit.hh"
+#include "src/common_cpp/DataStructure/TOFEventSpacePoint.hh"
 
 namespace MAUS {
 
 /** @class TOFEvent comment
  *
+ *  @var tof_slab_hits  <--description-->
+ *  @var tof_space_points  <--description-->
+ *  @var tof_digits  <--description-->
  */
 
 class TOFEvent {
@@ -40,7 +46,28 @@ class TOFEvent {
     ~TOFEvent();
 
 
+    /** Returns TOFEventSlabHit */
+    TOFEventSlabHit GetTOFEventSlabHit() const;
+
+    /** Sets TOFEventSlabHit */
+    void SetTOFEventSlabHit(TOFEventSlabHit tof_slab_hits);
+
+    /** Returns TOFEventSpacePoint */
+    TOFEventSpacePoint GetTOFEventSpacePoint() const;
+
+    /** Sets TOFEventSpacePoint */
+    void SetTOFEventSpacePoint(TOFEventSpacePoint tof_space_points);
+
+    /** Returns TOFEventDigit */
+    TOFEventDigit GetTOFEventDigit() const;
+
+    /** Sets TOFEventDigit */
+    void SetTOFEventDigit(TOFEventDigit tof_digits);
+
   private:
+    TOFEventSlabHit _tof_slab_hits;
+    TOFEventSpacePoint _tof_space_points;
+    TOFEventDigit _tof_digits;
 
     ClassDef(TOFEvent, 1)
 };

@@ -28,12 +28,12 @@ namespace MAUS {
  *  @var _bunch_id_proc_proc Processor for _bunch_id
  *  @var _ldc_id_proc_proc Processor for _ldc_id
  *  @var _equip_type_proc_proc Processor for _equip_type
- *  @var _channel_key_proc_proc Processor for _channel_key
- *  @var _trailing_time_proc_proc Processor for _trailing_time
  *  @var _phys_event_number_proc_proc Processor for _phys_event_number
+ *  @var _trailing_time_proc_proc Processor for _trailing_time
+ *  @var _channel_key_proc_proc Processor for _channel_key
  *  @var _leading_time_proc_proc Processor for _leading_time
- *  @var _time_stamp_proc_proc Processor for _time_stamp
  *  @var _trigger_time_tag_proc_proc Processor for _trigger_time_tag
+ *  @var _time_stamp_proc_proc Processor for _time_stamp
  *  @var _detector_proc_proc Processor for _detector
  *  @var _part_event_number_proc_proc Processor for _part_event_number
  *  @var _geo_proc_proc Processor for _geo
@@ -52,12 +52,12 @@ class V1290Processor : public ObjectProcessor<V1290> {
     IntProcessor _bunch_id_proc;
     IntProcessor _ldc_id_proc;
     IntProcessor _equip_type_proc;
-    StringProcessor _channel_key_proc;
-    IntProcessor _trailing_time_proc;
     IntProcessor _phys_event_number_proc;
+    IntProcessor _trailing_time_proc;
+    StringProcessor _channel_key_proc;
     IntProcessor _leading_time_proc;
-    IntProcessor _time_stamp_proc;
     IntProcessor _trigger_time_tag_proc;
+    IntProcessor _time_stamp_proc;
     StringProcessor _detector_proc;
     IntProcessor _part_event_number_proc;
     IntProcessor _geo_proc;

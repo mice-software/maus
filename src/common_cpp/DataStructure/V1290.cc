@@ -20,16 +20,16 @@
 namespace MAUS {
 
 V1290::V1290()
-    : _bunch_id(0), _ldc_id(0), _equip_type(0), _channel_key(""),
-      _trailing_time(0), _phys_event_number(0), _leading_time(0),
-      _time_stamp(0), _trigger_time_tag(0), _detector(""),
+    : _bunch_id(0), _ldc_id(0), _equip_type(0), _phys_event_number(0),
+      _trailing_time(0), _channel_key(""), _leading_time(0),
+      _trigger_time_tag(0), _time_stamp(0), _detector(""),
       _part_event_number(0), _geo(0), _channel(0) {
 }
 
 V1290::V1290(const V1290& _v1290)
-    : _bunch_id(0), _ldc_id(0), _equip_type(0), _channel_key(""),
-      _trailing_time(0), _phys_event_number(0), _leading_time(0),
-      _time_stamp(0), _trigger_time_tag(0), _detector(""),
+    : _bunch_id(0), _ldc_id(0), _equip_type(0), _phys_event_number(0),
+      _trailing_time(0), _channel_key(""), _leading_time(0),
+      _trigger_time_tag(0), _time_stamp(0), _detector(""),
       _part_event_number(0), _geo(0), _channel(0) {
     *this = _v1290;
 }
@@ -41,12 +41,12 @@ V1290& V1290::operator=(const V1290& _v1290) {
     SetBunchId(_v1290._bunch_id);
     SetLdcId(_v1290._ldc_id);
     SetEquipType(_v1290._equip_type);
-    SetChannelKey(_v1290._channel_key);
-    SetTrailingTime(_v1290._trailing_time);
     SetPhysEventNumber(_v1290._phys_event_number);
+    SetTrailingTime(_v1290._trailing_time);
+    SetChannelKey(_v1290._channel_key);
     SetLeadingTime(_v1290._leading_time);
-    SetTimeStamp(_v1290._time_stamp);
     SetTriggerTimeTag(_v1290._trigger_time_tag);
+    SetTimeStamp(_v1290._time_stamp);
     SetDetector(_v1290._detector);
     SetPartEventNumber(_v1290._part_event_number);
     SetGeo(_v1290._geo);
@@ -81,12 +81,12 @@ void V1290::SetEquipType(int equip_type) {
     _equip_type = equip_type;
 }
 
-std::string V1290::GetChannelKey() const {
-    return _channel_key;
+int V1290::GetPhysEventNumber() const {
+    return _phys_event_number;
 }
 
-void V1290::SetChannelKey(std::string channel_key) {
-    _channel_key = channel_key;
+void V1290::SetPhysEventNumber(int phys_event_number) {
+    _phys_event_number = phys_event_number;
 }
 
 int V1290::GetTrailingTime() const {
@@ -97,12 +97,12 @@ void V1290::SetTrailingTime(int trailing_time) {
     _trailing_time = trailing_time;
 }
 
-int V1290::GetPhysEventNumber() const {
-    return _phys_event_number;
+std::string V1290::GetChannelKey() const {
+    return _channel_key;
 }
 
-void V1290::SetPhysEventNumber(int phys_event_number) {
-    _phys_event_number = phys_event_number;
+void V1290::SetChannelKey(std::string channel_key) {
+    _channel_key = channel_key;
 }
 
 int V1290::GetLeadingTime() const {
@@ -113,20 +113,20 @@ void V1290::SetLeadingTime(int leading_time) {
     _leading_time = leading_time;
 }
 
-int V1290::GetTimeStamp() const {
-    return _time_stamp;
-}
-
-void V1290::SetTimeStamp(int time_stamp) {
-    _time_stamp = time_stamp;
-}
-
 int V1290::GetTriggerTimeTag() const {
     return _trigger_time_tag;
 }
 
 void V1290::SetTriggerTimeTag(int trigger_time_tag) {
     _trigger_time_tag = trigger_time_tag;
+}
+
+int V1290::GetTimeStamp() const {
+    return _time_stamp;
+}
+
+void V1290::SetTimeStamp(int time_stamp) {
+    _time_stamp = time_stamp;
 }
 
 std::string V1290::GetDetector() const {

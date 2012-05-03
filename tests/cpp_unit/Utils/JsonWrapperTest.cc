@@ -249,5 +249,10 @@ TEST(JsonWrapper, ArrayMergeTest) {
   EXPECT_THROW(JsonWrapper::ArrayMerge(int_1, array_1), Squeal);
   EXPECT_THROW(JsonWrapper::ArrayMerge(array_1, int_1), Squeal);
 }
+
+TEST(JsonWrapper, JsonValueTypeToStringTest) {
+  EXPECT_TRUE(false) << "Need to test these two functions";
+}
+
 }
 

@@ -25,7 +25,7 @@ TOFDaqProcessor::TOFDaqProcessor()
           &TOFDaq::SetV1724Array, true);
     RegisterValueBranch
           ("V1290", &_V1290_proc, &TOFDaq::GetV1290Array,
-          &TOFDaq::SetV1290Array, true);
+          &TOFDaq::SetV1290Array, false);
 }
 }  // namespace MAUS
 

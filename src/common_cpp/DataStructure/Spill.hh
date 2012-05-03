@@ -109,6 +109,18 @@ class Spill {
   /** Get the spill number */
   int GetSpillNumber() const;
 
+  /** Set the event type */
+  void SetDaqEventType(std::string type);
+
+  /** Get the event type */
+  std::string GetDaqEventType() const;
+
+  /** Set the run number */
+  void SetRunNumber(int run);
+
+  /** Get the run number */
+  int GetRunNumber() const;
+
   /** Set the errors on this spill */
   void SetErrors(ErrorsMap errors);
 
@@ -122,6 +134,9 @@ class Spill {
   MCEventArray* _mc;
   ReconEventArray* _recon;
   int _spill_number;
+  int _run_number;
+  std::string _daq_event_type; 
+
   std::map<std::string, std::string> _errors;
 
   ClassDef(Spill, 1)

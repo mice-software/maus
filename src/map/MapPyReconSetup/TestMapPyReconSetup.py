@@ -70,7 +70,7 @@ class TestMapPyReconSetup(unittest.TestCase):
             self.assertEqual(ev["ckov_event"], {})
             self.assertEqual(ev["kl_event"], {})
             self.assertEqual(ev["emr_event"], {})
-            self.assertEqual(ev["scifi_event"], {})
+            self.assertEqual(ev["sci_fi_event"], {})
             self.assertEqual(ev["global_event"], {})
             self.assertEqual(ev["tof_event"], {})
 

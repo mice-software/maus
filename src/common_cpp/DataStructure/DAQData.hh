@@ -30,15 +30,15 @@
 
 namespace MAUS {
 // Needed for ROOT
-typedef std::vector<KLDaq> KLArray;
-typedef std::vector<TOFDaq> TOF2Array;
-typedef std::vector<TOFDaq> TOF1Array;
-typedef std::vector<Trigger> TriggerArray;
-typedef std::vector<CkovDaq> CkovArray;
-typedef std::vector<TriggerRequest> TriggerRequestArray;
-typedef std::vector<Unknown> UnknownArray;
-typedef std::vector<TOFDaq> TOF0Array;
-typedef std::vector<Tag> TagArray;
+typedef std::vector<KLDaq*> KLArray;
+typedef std::vector<CkovDaq*> CkovArray;
+typedef std::vector<TOFDaq*> TOF0DaqArray;
+typedef std::vector<Trigger*> TriggerArray;
+typedef std::vector<TOFDaq*> TOF1DaqArray;
+typedef std::vector<TOFDaq*> TOF2DaqArray;
+typedef std::vector<TriggerRequest*> TriggerRequestArray;
+typedef std::vector<Unknown*> UnknownArray;
+typedef std::vector<Tag*> TagArray;
 
 /** @class DAQData comment
  *
@@ -47,10 +47,10 @@ typedef std::vector<Tag> TagArray;
  *  @var tof1  <--description-->
  *  @var ckov  <--description-->
  *  @var tof2  <--description-->
- *  @var tof0  <--description-->
+ *  @var unknown  <--description-->
  *  @var kl  <--description-->
  *  @var tag  <--description-->
- *  @var unknown  <--description-->
+ *  @var tof0  <--description-->
  *  @var trigger  <--description-->
  */
 
@@ -79,7 +79,7 @@ class DAQData {
     TriggerRequestArray GetTriggerRequestArray() const;
 
     /** Get an element from TriggerRequestArray (needed for PyROOT) */
-    TriggerRequest GetTriggerRequestArrayElement(size_t index) const;
+    TriggerRequest* GetTriggerRequestArrayElement(size_t index) const;
 
     /** Get size of TriggerRequestArray (needed for PyROOT) */
     size_t GetTriggerRequestArraySize() const;
@@ -87,23 +87,23 @@ class DAQData {
     /** Sets TriggerRequestArray */
     void SetTriggerRequestArray(TriggerRequestArray trigger_request);
 
-    /** Returns TOF1Array */
-    TOF1Array GetTOF1Array() const;
+    /** Returns TOF1DaqArray */
+    TOF1DaqArray GetTOF1DaqArray() const;
 
-    /** Get an element from TOF1Array (needed for PyROOT) */
-    TOFDaq GetTOF1ArrayElement(size_t index) const;
+    /** Get an element from TOF1DaqArray (needed for PyROOT) */
+    TOFDaq* GetTOF1DaqArrayElement(size_t index) const;
 
-    /** Get size of TOF1Array (needed for PyROOT) */
-    size_t GetTOF1ArraySize() const;
+    /** Get size of TOF1DaqArray (needed for PyROOT) */
+    size_t GetTOF1DaqArraySize() const;
 
-    /** Sets TOF1Array */
-    void SetTOF1Array(TOF1Array tof1);
+    /** Sets TOF1DaqArray */
+    void SetTOF1DaqArray(TOF1DaqArray tof1);
 
     /** Returns CkovArray */
     CkovArray GetCkovArray() const;
 
     /** Get an element from CkovArray (needed for PyROOT) */
-    CkovDaq GetCkovArrayElement(size_t index) const;
+    CkovDaq* GetCkovArrayElement(size_t index) const;
 
     /** Get size of CkovArray (needed for PyROOT) */
     size_t GetCkovArraySize() const;
@@ -111,35 +111,35 @@ class DAQData {
     /** Sets CkovArray */
     void SetCkovArray(CkovArray ckov);
 
-    /** Returns TOF2Array */
-    TOF2Array GetTOF2Array() const;
+    /** Returns TOF2DaqArray */
+    TOF2DaqArray GetTOF2DaqArray() const;
 
-    /** Get an element from TOF2Array (needed for PyROOT) */
-    TOFDaq GetTOF2ArrayElement(size_t index) const;
+    /** Get an element from TOF2DaqArray (needed for PyROOT) */
+    TOFDaq* GetTOF2DaqArrayElement(size_t index) const;
 
-    /** Get size of TOF2Array (needed for PyROOT) */
-    size_t GetTOF2ArraySize() const;
+    /** Get size of TOF2DaqArray (needed for PyROOT) */
+    size_t GetTOF2DaqArraySize() const;
 
-    /** Sets TOF2Array */
-    void SetTOF2Array(TOF2Array tof2);
+    /** Sets TOF2DaqArray */
+    void SetTOF2DaqArray(TOF2DaqArray tof2);
 
-    /** Returns TOF0Array */
-    TOF0Array GetTOF0Array() const;
+    /** Returns UnknownArray */
+    UnknownArray GetUnknownArray() const;
 
-    /** Get an element from TOF0Array (needed for PyROOT) */
-    TOFDaq GetTOF0ArrayElement(size_t index) const;
+    /** Get an element from UnknownArray (needed for PyROOT) */
+    Unknown* GetUnknownArrayElement(size_t index) const;
 
-    /** Get size of TOF0Array (needed for PyROOT) */
-    size_t GetTOF0ArraySize() const;
+    /** Get size of UnknownArray (needed for PyROOT) */
+    size_t GetUnknownArraySize() const;
 
-    /** Sets TOF0Array */
-    void SetTOF0Array(TOF0Array tof0);
+    /** Sets UnknownArray */
+    void SetUnknownArray(UnknownArray unknown);
 
     /** Returns KLArray */
     KLArray GetKLArray() const;
 
     /** Get an element from KLArray (needed for PyROOT) */
-    KLDaq GetKLArrayElement(size_t index) const;
+    KLDaq* GetKLArrayElement(size_t index) const;
 
     /** Get size of KLArray (needed for PyROOT) */
     size_t GetKLArraySize() const;
@@ -151,7 +151,7 @@ class DAQData {
     TagArray GetTagArray() const;
 
     /** Get an element from TagArray (needed for PyROOT) */
-    Tag GetTagArrayElement(size_t index) const;
+    Tag* GetTagArrayElement(size_t index) const;
 
     /** Get size of TagArray (needed for PyROOT) */
     size_t GetTagArraySize() const;
@@ -159,23 +159,23 @@ class DAQData {
     /** Sets TagArray */
     void SetTagArray(TagArray tag);
 
-    /** Returns UnknownArray */
-    UnknownArray GetUnknownArray() const;
+    /** Returns TOF0DaqArray */
+    TOF0DaqArray GetTOF0DaqArray() const;
 
-    /** Get an element from UnknownArray (needed for PyROOT) */
-    Unknown GetUnknownArrayElement(size_t index) const;
+    /** Get an element from TOF0DaqArray (needed for PyROOT) */
+    TOFDaq* GetTOF0DaqArrayElement(size_t index) const;
 
-    /** Get size of UnknownArray (needed for PyROOT) */
-    size_t GetUnknownArraySize() const;
+    /** Get size of TOF0DaqArray (needed for PyROOT) */
+    size_t GetTOF0DaqArraySize() const;
 
-    /** Sets UnknownArray */
-    void SetUnknownArray(UnknownArray unknown);
+    /** Sets TOF0DaqArray */
+    void SetTOF0DaqArray(TOF0DaqArray tof0);
 
     /** Returns TriggerArray */
     TriggerArray GetTriggerArray() const;
 
     /** Get an element from TriggerArray (needed for PyROOT) */
-    Trigger GetTriggerArrayElement(size_t index) const;
+    Trigger* GetTriggerArrayElement(size_t index) const;
 
     /** Get size of TriggerArray (needed for PyROOT) */
     size_t GetTriggerArraySize() const;
@@ -186,13 +186,13 @@ class DAQData {
   private:
     V830 _V830;
     TriggerRequestArray _trigger_request;
-    TOF1Array _tof1;
+    TOF1DaqArray _tof1;
     CkovArray _ckov;
-    TOF2Array _tof2;
-    TOF0Array _tof0;
+    TOF2DaqArray _tof2;
+    UnknownArray _unknown;
     KLArray _kl;
     TagArray _tag;
-    UnknownArray _unknown;
+    TOF0DaqArray _tof0;
     TriggerArray _trigger;
 
     ClassDef(DAQData, 1)

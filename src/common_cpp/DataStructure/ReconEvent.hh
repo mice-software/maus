@@ -52,6 +52,12 @@ class ReconEvent {
     /** Destructor */
     virtual ~ReconEvent();
 
+    /** Get the DAQ particle event number */
+    int GetPartEventNumber() const;
+
+    /** Set the DAQ particle event number */
+    void SetPartEventNumber(int event);
+
     /** Get the TOF detector event */
     TOFEvent* GetTOFEvent() const;
 
@@ -103,6 +109,8 @@ class ReconEvent {
     EMREvent* _emr_event;
     TriggerEvent* _trigger_event;
     GlobalEvent* _global_event;
+
+    int _part_event_number;
 
     ClassDef(ReconEvent, 1)
 };

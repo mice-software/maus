@@ -114,7 +114,7 @@ class MapPyCkov:
                     
                     ckov_digit[ckov_sta]['coincidences']      = 0
                     ckov_digit[ckov_sta]['total_charge']      = 0
-                    ckov_digit[ckov_sta]['number_of_pes']     = 0
+                    ckov_digit[ckov_sta]['number_of_pes']     = 0.
                     ckov_digit[ckov_sta]['part_event_number'] = 0
                     
                     ckov_digit[ckov_sta][arrival_time] = \
@@ -161,7 +161,7 @@ class MapPyCkov:
                             
                         if area.count(0) == 4:
                             ckov_digit[ckov_sta]['total_charge'] = 0
-                            ckov_digit[ckov_sta]['number_of_pes'] = 0
+                            ckov_digit[ckov_sta]['number_of_pes'] = 0.
                             ckov_digit[ckov_sta]['coincidences'] = 0
                             ckov_digit[ckov_sta]['part_event_number'] = \
                                        ckov[i]['V1731'][pmt]['part_event_number']
@@ -171,7 +171,7 @@ class MapPyCkov:
                             
                         if area.count(0) == 3:
                             ckov_digit[ckov_sta]['total_charge'] = sum(area)
-                            ckov_digit[ckov_sta]['number_of_pes'] = sum(photoelectrons)
+                            ckov_digit[ckov_sta]['number_of_pes'] = float(sum(photoelectrons))
                             ckov_digit[ckov_sta]['coincidences'] = 1
                             ckov_digit[ckov_sta]['part_event_number'] = \
                                        ckov[i]['V1731'][pmt]['part_event_number']
@@ -196,7 +196,7 @@ class MapPyCkov:
                                     reducer[2][pos] = 0
                                     
                             ckov_digit[ckov_sta]['total_charge'] = sum(reducer[1])
-                            ckov_digit[ckov_sta]['number_of_pes'] = sum(reducer[2])
+                            ckov_digit[ckov_sta]['number_of_pes'] = float(sum(reducer[2]))
                             ckov_digit[ckov_sta]['coincidences'] = \
                                       len(reducer[1]) - reducer[1].count(0)
                             ckov_digit[ckov_sta]['part_event_number'] = \

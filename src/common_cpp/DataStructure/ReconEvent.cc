@@ -20,13 +20,13 @@ namespace MAUS {
 
 ReconEvent::ReconEvent() :_tof_event(NULL), _scifi_event(NULL),
     _ckov_event(NULL), _kl_event(NULL), _emr_event(NULL), _trigger_event(NULL),
-    _global_event(NULL) {
+    _global_event(NULL), _part_event_number(0) {
 }
 
 ReconEvent::ReconEvent(const ReconEvent& md)
           : _tof_event(NULL), _scifi_event(NULL),
             _ckov_event(NULL), _kl_event(NULL), _emr_event(NULL),
-            _trigger_event(NULL), _global_event(NULL) {
+            _trigger_event(NULL), _global_event(NULL), _part_event_number(0) {
     *this = md;
 }
 
@@ -35,6 +35,7 @@ ReconEvent& ReconEvent::operator=(const ReconEvent& recon) {
         return *this;
     }
 
+    _part_event_number = recon._part_event_number;
     if (_tof_event != NULL) {
         delete _tof_event;
     }
@@ -122,6 +123,14 @@ ReconEvent::~ReconEvent() {
     if (_global_event != NULL) {
         delete _global_event;
     }
+}
+
+int ReconEvent::GetPartEventNumber() const {
+    return _part_event_number;
+}
+
+void ReconEvent::SetPartEventNumber(int event) {
+    _part_event_number = event;
 }
 
 TOFEvent* ReconEvent::GetTOFEvent() const {

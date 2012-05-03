@@ -20,13 +20,13 @@
 namespace MAUS {
 
 DAQData::DAQData()
-    : _V830(), _trigger_request(), _tof1(), _ckov(), _tof2(), _tof0(), _kl(),
-      _tag(), _unknown(), _trigger() {
+    : _V830(), _trigger_request(), _tof1(), _ckov(), _tof2(), _unknown(),
+      _kl(), _tag(), _tof0(), _trigger() {
 }
 
 DAQData::DAQData(const DAQData& _daqdata)
-    : _V830(), _trigger_request(), _tof1(), _ckov(), _tof2(), _tof0(), _kl(),
-      _tag(), _unknown(), _trigger() {
+    : _V830(), _trigger_request(), _tof1(), _ckov(), _tof2(), _unknown(),
+      _kl(), _tag(), _tof0(), _trigger() {
     *this = _daqdata;
 }
 
@@ -36,13 +36,13 @@ DAQData& DAQData::operator=(const DAQData& _daqdata) {
     }
     SetV830(_daqdata._V830);
     SetTriggerRequestArray(_daqdata._trigger_request);
-    SetTOF1Array(_daqdata._tof1);
+    SetTOF1DaqArray(_daqdata._tof1);
     SetCkovArray(_daqdata._ckov);
-    SetTOF2Array(_daqdata._tof2);
-    SetTOF0Array(_daqdata._tof0);
+    SetTOF2DaqArray(_daqdata._tof2);
+    SetUnknownArray(_daqdata._unknown);
     SetKLArray(_daqdata._kl);
     SetTagArray(_daqdata._tag);
-    SetUnknownArray(_daqdata._unknown);
+    SetTOF0DaqArray(_daqdata._tof0);
     SetTriggerArray(_daqdata._trigger);
     return *this;
 }
@@ -62,7 +62,7 @@ TriggerRequestArray DAQData::GetTriggerRequestArray() const {
     return _trigger_request;
 }
 
-TriggerRequest DAQData::GetTriggerRequestArrayElement(size_t index) const{
+TriggerRequest* DAQData::GetTriggerRequestArrayElement(size_t index) const{
     return _trigger_request[index];
 }
 
@@ -74,19 +74,19 @@ void DAQData::SetTriggerRequestArray(TriggerRequestArray trigger_request) {
     _trigger_request = trigger_request;
 }
 
-TOF1Array DAQData::GetTOF1Array() const {
+TOF1DaqArray DAQData::GetTOF1DaqArray() const {
     return _tof1;
 }
 
-TOFDaq DAQData::GetTOF1ArrayElement(size_t index) const{
+TOFDaq* DAQData::GetTOF1DaqArrayElement(size_t index) const{
     return _tof1[index];
 }
 
-size_t DAQData::GetTOF1ArraySize() const {
+size_t DAQData::GetTOF1DaqArraySize() const {
     return _tof1.size();
 }
 
-void DAQData::SetTOF1Array(TOF1Array tof1) {
+void DAQData::SetTOF1DaqArray(TOF1DaqArray tof1) {
     _tof1 = tof1;
 }
 
@@ -94,7 +94,7 @@ CkovArray DAQData::GetCkovArray() const {
     return _ckov;
 }
 
-CkovDaq DAQData::GetCkovArrayElement(size_t index) const{
+CkovDaq* DAQData::GetCkovArrayElement(size_t index) const{
     return _ckov[index];
 }
 
@@ -106,43 +106,43 @@ void DAQData::SetCkovArray(CkovArray ckov) {
     _ckov = ckov;
 }
 
-TOF2Array DAQData::GetTOF2Array() const {
+TOF2DaqArray DAQData::GetTOF2DaqArray() const {
     return _tof2;
 }
 
-TOFDaq DAQData::GetTOF2ArrayElement(size_t index) const{
+TOFDaq* DAQData::GetTOF2DaqArrayElement(size_t index) const{
     return _tof2[index];
 }
 
-size_t DAQData::GetTOF2ArraySize() const {
+size_t DAQData::GetTOF2DaqArraySize() const {
     return _tof2.size();
 }
 
-void DAQData::SetTOF2Array(TOF2Array tof2) {
+void DAQData::SetTOF2DaqArray(TOF2DaqArray tof2) {
     _tof2 = tof2;
 }
 
-TOF0Array DAQData::GetTOF0Array() const {
-    return _tof0;
+UnknownArray DAQData::GetUnknownArray() const {
+    return _unknown;
 }
 
-TOFDaq DAQData::GetTOF0ArrayElement(size_t index) const{
-    return _tof0[index];
+Unknown* DAQData::GetUnknownArrayElement(size_t index) const{
+    return _unknown[index];
 }
 
-size_t DAQData::GetTOF0ArraySize() const {
-    return _tof0.size();
+size_t DAQData::GetUnknownArraySize() const {
+    return _unknown.size();
 }
 
-void DAQData::SetTOF0Array(TOF0Array tof0) {
-    _tof0 = tof0;
+void DAQData::SetUnknownArray(UnknownArray unknown) {
+    _unknown = unknown;
 }
 
 KLArray DAQData::GetKLArray() const {
     return _kl;
 }
 
-KLDaq DAQData::GetKLArrayElement(size_t index) const{
+KLDaq* DAQData::GetKLArrayElement(size_t index) const{
     return _kl[index];
 }
 
@@ -158,7 +158,7 @@ TagArray DAQData::GetTagArray() const {
     return _tag;
 }
 
-Tag DAQData::GetTagArrayElement(size_t index) const{
+Tag* DAQData::GetTagArrayElement(size_t index) const{
     return _tag[index];
 }
 
@@ -170,27 +170,27 @@ void DAQData::SetTagArray(TagArray tag) {
     _tag = tag;
 }
 
-UnknownArray DAQData::GetUnknownArray() const {
-    return _unknown;
+TOF0DaqArray DAQData::GetTOF0DaqArray() const {
+    return _tof0;
 }
 
-Unknown DAQData::GetUnknownArrayElement(size_t index) const{
-    return _unknown[index];
+TOFDaq* DAQData::GetTOF0DaqArrayElement(size_t index) const{
+    return _tof0[index];
 }
 
-size_t DAQData::GetUnknownArraySize() const {
-    return _unknown.size();
+size_t DAQData::GetTOF0DaqArraySize() const {
+    return _tof0.size();
 }
 
-void DAQData::SetUnknownArray(UnknownArray unknown) {
-    _unknown = unknown;
+void DAQData::SetTOF0DaqArray(TOF0DaqArray tof0) {
+    _tof0 = tof0;
 }
 
 TriggerArray DAQData::GetTriggerArray() const {
     return _trigger;
 }
 
-Trigger DAQData::GetTriggerArrayElement(size_t index) const{
+Trigger* DAQData::GetTriggerArrayElement(size_t index) const{
     return _trigger[index];
 }
 

@@ -50,9 +50,7 @@ class MapPyReconSetup:
                                 "unable to do json.loads on input"} }
             return json.dumps(spill)
 
-        # we make spill a dict initially to ensure a one-to-one mapping of
-        # part_event_numbers to recon_events
-        spill["recon_events"] = {}
+        spill["recon_events"] = []
 
         # check data integrity
         if "daq_data" not in spill or type(spill["daq_data"]) != type({}):
@@ -62,10 +60,12 @@ class MapPyReconSetup:
             type(daq_data["trigger"]) != type([]):
             return json.dumps(spill)
 
-        # loop over all triggers and fill the recon event
-        for a_trigger in daq_data["trigger"]:
-            event_number = a_trigger["V1290"][0]["part_event_number"]
-            spill["recon_events"][event_number] = (
+        # list of events
+        ev_number_list = [trig["V1290"][0]["part_event_number"] \
+                                                for trig in daq_data["trigger"]]
+        # now make events
+        for event_number in ev_number_list:
+            spill["recon_events"].append(
                                          {"part_event_number":event_number,
                                           "trigger_event":{},
                                           "tof_event":{},
@@ -76,8 +76,6 @@ class MapPyReconSetup:
                                           "global_event":{},
             })
 
-        # really we want a list - so now just take the list of values
-        spill["recon_events"] = spill["recon_events"].values() 
         return json.dumps(spill)
 
     def death(self):

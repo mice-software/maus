@@ -86,19 +86,20 @@ std::string MapCppTOFSlabHits::process(std::string document) {
         xDocTofEvent = JsonWrapper::GetProperty(xDocTofEvent,
                                                 "tof_event",
                                                 JsonWrapper::objectValue);
-        root["recon_events"][n_event]["tof_event"]["tof_slab_hits"] =
-                                                                  Json::Value();
-        for (unsigned int n_station = 0; n_station < _stationKeys.size(); n_station++) {
-          Json::Value xDocPartEvent = JsonWrapper::GetProperty(xDocTofEvent,
-                                                      "tof_digits",
-                                                      JsonWrapper::objectValue);
-          xDocPartEvent = JsonWrapper::GetProperty(xDocPartEvent,
-                                                  _stationKeys[n_station],
-                                                  JsonWrapper::arrayValue);
-
-          Json::Value xDocSlabHits = makeSlabHits(xDocPartEvent);
-          root["recon_events"][n_event]["tof_event"]["tof_slab_hits"]
+        if (root["recon_events"][n_event]["tof_event"].isMember("tof_digits")) {
+          root["recon_events"][n_event]["tof_event"]["tof_slab_hits"] =
+                                                   Json::Value(Json::objectValue);
+          for (unsigned int n_station = 0; n_station < _stationKeys.size(); n_station++) {
+            Json::Value xDocPartEvent = JsonWrapper::GetProperty(xDocTofEvent,
+                                                        "tof_digits",
+                                                        JsonWrapper::objectValue);
+            xDocPartEvent = JsonWrapper::GetProperty(xDocPartEvent,
+                                                    _stationKeys[n_station],
+                                                    JsonWrapper::arrayValue);
+            Json::Value xDocSlabHits = makeSlabHits(xDocPartEvent);
+            root["recon_events"][n_event]["tof_event"]["tof_slab_hits"]
                                        [_stationKeys[n_station]] = xDocSlabHits;
+          }
         }
       }
 

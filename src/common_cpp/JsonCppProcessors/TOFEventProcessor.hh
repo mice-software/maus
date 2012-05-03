@@ -19,11 +19,17 @@
 
 #include "src/common_cpp/DataStructure/TOFEvent.hh"
 #include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/TOFEventDigitProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/TOFEventSlabHitProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/TOFEventSpacePointProcessor.hh"
 
 namespace MAUS {
 
 /** @class TOFEventProcessor Conversions for TOFEvent between C++ and Json 
  *
+ *  @var _tof_slab_hits_proc_proc Processor for _tof_slab_hits
+ *  @var _tof_space_points_proc_proc Processor for _tof_space_points
+ *  @var _tof_digits_proc_proc Processor for _tof_digits
  */
 
 class TOFEventProcessor : public ObjectProcessor<TOFEvent> {
@@ -35,6 +41,9 @@ class TOFEventProcessor : public ObjectProcessor<TOFEvent> {
     TOFEventProcessor();
 
   private:
+    TOFEventSlabHitProcessor _tof_slab_hits_proc;
+    TOFEventSpacePointProcessor _tof_space_points_proc;
+    TOFEventDigitProcessor _tof_digits_proc;
 };
 }  // namespace MAUS
 

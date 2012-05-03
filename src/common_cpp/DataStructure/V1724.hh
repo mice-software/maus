@@ -27,16 +27,16 @@ namespace MAUS {
  *  @var ldc_id  <--description-->
  *  @var charge_mm  <--description-->
  *  @var equip_type  <--description-->
- *  @var channel_key  <--description-->
- *  @var charge_pm  <--description-->
- *  @var phys_event_number  <--description-->
- *  @var position_max  <--description-->
- *  @var time_stamp  <--description-->
- *  @var trigger_time_tag  <--description-->
  *  @var detector  <--description-->
+ *  @var phys_event_number  <--description-->
+ *  @var charge_pm  <--description-->
+ *  @var channel_key  <--description-->
+ *  @var trigger_time_tag  <--description-->
+ *  @var time_stamp  <--description-->
+ *  @var pedestal  <--description-->
  *  @var part_event_number  <--description-->
  *  @var geo  <--description-->
- *  @var pedestal  <--description-->
+ *  @var position_max  <--description-->
  *  @var channel  <--description-->
  */
 
@@ -73,17 +73,11 @@ class V1724 {
     /** Sets EquipType */
     void SetEquipType(int equip_type);
 
-    /** Returns ChannelKey */
-    std::string GetChannelKey() const;
+    /** Returns Detector */
+    std::string GetDetector() const;
 
-    /** Sets ChannelKey */
-    void SetChannelKey(std::string channel_key);
-
-    /** Returns ChargePm */
-    int GetChargePm() const;
-
-    /** Sets ChargePm */
-    void SetChargePm(int charge_pm);
+    /** Sets Detector */
+    void SetDetector(std::string detector);
 
     /** Returns PhysEventNumber */
     int GetPhysEventNumber() const;
@@ -91,17 +85,17 @@ class V1724 {
     /** Sets PhysEventNumber */
     void SetPhysEventNumber(int phys_event_number);
 
-    /** Returns PositionMax */
-    int GetPositionMax() const;
+    /** Returns ChargePm */
+    int GetChargePm() const;
 
-    /** Sets PositionMax */
-    void SetPositionMax(int position_max);
+    /** Sets ChargePm */
+    void SetChargePm(int charge_pm);
 
-    /** Returns TimeStamp */
-    int GetTimeStamp() const;
+    /** Returns ChannelKey */
+    std::string GetChannelKey() const;
 
-    /** Sets TimeStamp */
-    void SetTimeStamp(int time_stamp);
+    /** Sets ChannelKey */
+    void SetChannelKey(std::string channel_key);
 
     /** Returns TriggerTimeTag */
     int GetTriggerTimeTag() const;
@@ -109,11 +103,17 @@ class V1724 {
     /** Sets TriggerTimeTag */
     void SetTriggerTimeTag(int trigger_time_tag);
 
-    /** Returns Detector */
-    std::string GetDetector() const;
+    /** Returns TimeStamp */
+    int GetTimeStamp() const;
 
-    /** Sets Detector */
-    void SetDetector(std::string detector);
+    /** Sets TimeStamp */
+    void SetTimeStamp(int time_stamp);
+
+    /** Returns Pedestal */
+    int GetPedestal() const;
+
+    /** Sets Pedestal */
+    void SetPedestal(int pedestal);
 
     /** Returns PartEventNumber */
     int GetPartEventNumber() const;
@@ -127,11 +127,11 @@ class V1724 {
     /** Sets Geo */
     void SetGeo(int geo);
 
-    /** Returns Pedestal */
-    int GetPedestal() const;
+    /** Returns PositionMax */
+    int GetPositionMax() const;
 
-    /** Sets Pedestal */
-    void SetPedestal(int pedestal);
+    /** Sets PositionMax */
+    void SetPositionMax(int position_max);
 
     /** Returns Channel */
     int GetChannel() const;
@@ -143,16 +143,16 @@ class V1724 {
     int _ldc_id;
     int _charge_mm;
     int _equip_type;
-    std::string _channel_key;
-    int _charge_pm;
-    int _phys_event_number;
-    int _position_max;
-    int _time_stamp;
-    int _trigger_time_tag;
     std::string _detector;
+    int _phys_event_number;
+    int _charge_pm;
+    std::string _channel_key;
+    int _trigger_time_tag;
+    int _time_stamp;
+    int _pedestal;
     int _part_event_number;
     int _geo;
-    int _pedestal;
+    int _position_max;
     int _channel;
 
     ClassDef(V1724, 1)

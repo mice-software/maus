@@ -38,10 +38,10 @@ namespace MAUS {
  *  @var _tof1_proc_proc Processor for _tof1
  *  @var _ckov_proc_proc Processor for _ckov
  *  @var _tof2_proc_proc Processor for _tof2
- *  @var _tof0_proc_proc Processor for _tof0
+ *  @var _unknown_proc_proc Processor for _unknown
  *  @var _kl_proc_proc Processor for _kl
  *  @var _tag_proc_proc Processor for _tag
- *  @var _unknown_proc_proc Processor for _unknown
+ *  @var _tof0_proc_proc Processor for _tof0
  *  @var _trigger_proc_proc Processor for _trigger
  */
 
@@ -55,15 +55,15 @@ class DAQDataProcessor : public ObjectProcessor<DAQData> {
 
   private:
     V830Processor _V830_proc;
-    ValueArrayProcessor<TriggerRequest> _trigger_request_proc;
-    ValueArrayProcessor<TOFDaq> _tof1_proc;
-    ValueArrayProcessor<CkovDaq> _ckov_proc;
-    ValueArrayProcessor<TOFDaq> _tof2_proc;
-    ValueArrayProcessor<TOFDaq> _tof0_proc;
-    ValueArrayProcessor<KLDaq> _kl_proc;
-    ValueArrayProcessor<Tag> _tag_proc;
-    ValueArrayProcessor<Unknown> _unknown_proc;
-    ValueArrayProcessor<Trigger> _trigger_proc;
+    PointerArrayProcessor<TriggerRequest> _trigger_request_proc;
+    PointerArrayProcessor<TOFDaq> _tof1_proc;
+    PointerArrayProcessor<CkovDaq> _ckov_proc;
+    PointerArrayProcessor<TOFDaq> _tof2_proc;
+    PointerArrayProcessor<Unknown> _unknown_proc;
+    PointerArrayProcessor<KLDaq> _kl_proc;
+    PointerArrayProcessor<Tag> _tag_proc;
+    PointerArrayProcessor<TOFDaq> _tof0_proc;
+    PointerArrayProcessor<Trigger> _trigger_proc;
 };
 }  // namespace MAUS
 

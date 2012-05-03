@@ -27,12 +27,12 @@ namespace MAUS {
  *  @var bunch_id  <--description-->
  *  @var ldc_id  <--description-->
  *  @var equip_type  <--description-->
- *  @var channel_key  <--description-->
- *  @var trailing_time  <--description-->
  *  @var phys_event_number  <--description-->
+ *  @var trailing_time  <--description-->
+ *  @var channel_key  <--description-->
  *  @var leading_time  <--description-->
- *  @var time_stamp  <--description-->
  *  @var trigger_time_tag  <--description-->
+ *  @var time_stamp  <--description-->
  *  @var detector  <--description-->
  *  @var part_event_number  <--description-->
  *  @var geo  <--description-->
@@ -72,11 +72,11 @@ class V1290 {
     /** Sets EquipType */
     void SetEquipType(int equip_type);
 
-    /** Returns ChannelKey */
-    std::string GetChannelKey() const;
+    /** Returns PhysEventNumber */
+    int GetPhysEventNumber() const;
 
-    /** Sets ChannelKey */
-    void SetChannelKey(std::string channel_key);
+    /** Sets PhysEventNumber */
+    void SetPhysEventNumber(int phys_event_number);
 
     /** Returns TrailingTime */
     int GetTrailingTime() const;
@@ -84,11 +84,11 @@ class V1290 {
     /** Sets TrailingTime */
     void SetTrailingTime(int trailing_time);
 
-    /** Returns PhysEventNumber */
-    int GetPhysEventNumber() const;
+    /** Returns ChannelKey */
+    std::string GetChannelKey() const;
 
-    /** Sets PhysEventNumber */
-    void SetPhysEventNumber(int phys_event_number);
+    /** Sets ChannelKey */
+    void SetChannelKey(std::string channel_key);
 
     /** Returns LeadingTime */
     int GetLeadingTime() const;
@@ -96,17 +96,17 @@ class V1290 {
     /** Sets LeadingTime */
     void SetLeadingTime(int leading_time);
 
-    /** Returns TimeStamp */
-    int GetTimeStamp() const;
-
-    /** Sets TimeStamp */
-    void SetTimeStamp(int time_stamp);
-
     /** Returns TriggerTimeTag */
     int GetTriggerTimeTag() const;
 
     /** Sets TriggerTimeTag */
     void SetTriggerTimeTag(int trigger_time_tag);
+
+    /** Returns TimeStamp */
+    int GetTimeStamp() const;
+
+    /** Sets TimeStamp */
+    void SetTimeStamp(int time_stamp);
 
     /** Returns Detector */
     std::string GetDetector() const;
@@ -136,12 +136,12 @@ class V1290 {
     int _bunch_id;
     int _ldc_id;
     int _equip_type;
-    std::string _channel_key;
-    int _trailing_time;
     int _phys_event_number;
+    int _trailing_time;
+    std::string _channel_key;
     int _leading_time;
-    int _time_stamp;
     int _trigger_time_tag;
+    int _time_stamp;
     std::string _detector;
     int _part_event_number;
     int _geo;

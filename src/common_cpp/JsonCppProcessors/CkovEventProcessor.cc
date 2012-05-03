@@ -22,7 +22,7 @@ CkovEventProcessor::CkovEventProcessor()
     : _ckov_digits_proc(new CkovDigitProcessor) {
     RegisterValueBranch
           ("ckov_digits", &_ckov_digits_proc, &CkovEvent::GetCkovDigitArray,
-          &CkovEvent::SetCkovDigitArray, true);
+          &CkovEvent::SetCkovDigitArray, false);
 }
 }  // namespace MAUS
 

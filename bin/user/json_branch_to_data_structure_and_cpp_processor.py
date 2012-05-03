@@ -48,8 +48,8 @@ TEST_BRANCH = {
     "a_pointer":1,
 }
 
-DATA_DIR = "src/common_cpp/DataStructure"
-PROC_DIR = "src/common_cpp/JsonCppProcessors"
+DATA_DIR = "/home/cr67/MAUS/work/delete/DataStructure"
+PROC_DIR = "/home/cr67/MAUS/work/delete/JsonCppProcessors"
 
 MESSAGES = {
 "info":[],
@@ -466,14 +466,14 @@ class DataStructureItem:
         self.is_pointer = False  # true if this is a pointer
         self.is_class = False  # true if this is a class (python dict, json object)
 
-        self.type = None # type - should be same as upper_name for classes and arrays
+        self.type = None # type - by default same as upper_name for classes and arrays
         self.proc_type = None # type of processor
 
         self.branch_name = None  # json name of the branch - arrays use parent's branch_name
+        self.upper_name = None # name used for C++ function and class (cpp name of the branch)
         self.user_name = None # variable name used in public (set function calls etc)
         self.proc_name = None # name used for private member processor name
         self.var_name = None  # name used to reference private member variables
-        self.upper_name = None # name used for C++ function and class
 
         self.is_required = True # set to true to force the data to have relevant member
         self.json_path = [] # path to get here through the whole json data tree
@@ -487,8 +487,8 @@ class DataStructureItem:
         self.branch_name = key
         self.var_name = '_'.join(['']+words)
         self.upper_name = ''
-        if str(self.json_path) in self.branch_rename.keys():
-            self.upper_name = self.branch_rename[str(json_path)]
+        if str(self.json_path) in self.branch_to_upper_name.keys():
+            self.upper_name = self.branch_to_upper_name[str(json_path)]
         else:
             for word in words:
                 self.upper_name += string.capwords(word)
@@ -513,6 +513,8 @@ class DataStructureItem:
             self.branch_from_array(value, self.json_path)
 
     def branch_from_object(self, json_object, json_path):
+        if json_object == None:
+            json_object = {}
         if self.upper_name in self.class_to_pointers.keys():
             pointers = self.class_to_pointers[self.upper_name]
         else:
@@ -544,6 +546,15 @@ class DataStructureItem:
                 self.child_items[key] = variable
                 self.proc_type = "ValueArrayProcessor<"+\
                                                 self.element_type()+">"
+        else:
+            key = self.branch_name
+            if key[-1] == 's':
+                key = key[0:-1]
+            variable = DataStructureItem()
+            variable.parse_key_value(key, {}, False, self.json_path+['[]'], self)
+            self.child_items[key] = variable
+            self.proc_type = "ValueArrayProcessor<"+\
+                                            self.element_type()+">"
 
         self.add_to_branch_dict()
 
@@ -588,6 +599,9 @@ class DataStructureItem:
                                      "' of json value "+str(key)+":"+str(value))
 
     def build_data_structure(self):
+        if self.upper_name in self.disable_dict.keys():
+            return
+        self.disable_dict[self.upper_name] = 1 # only build once
         MESSAGES['info'].append("Building class "+self.upper_name)
         fout = open(os.path.join(DATA_DIR, self.upper_name+".hh"), "w")
         my_decl = DataStructureDeclaration(self.upper_name, self.child_items)
@@ -624,7 +638,7 @@ class DataStructureItem:
         return self.__dict__[key]
 
     class_to_pointers = {}
-    branch_rename = {
+    branch_to_upper_name = { # index json_path to cpp branch name
         str([u'recon_events', '[]', u'ckov_event', u'ckov_digits', '[]', u'A']):'CkovA',
         str([u'recon_events', '[]', u'ckov_event', u'ckov_digits', '[]', u'B']):'CkovB',
         str([u'daq_data']):'DAQData',
@@ -632,37 +646,90 @@ class DataStructureItem:
         str([u'daq_data', u'tof0', '[]']):'TOFDaq',
         str([u'daq_data', u'tof1', '[]']):'TOFDaq',
         str([u'daq_data', u'tof2', '[]']):'TOFDaq',
-        str([u'daq_data', u'tof0']):'TOF0',
-        str([u'daq_data', u'tof1']):'TOF1',
-        str([u'daq_data', u'tof2']):'TOF2',
+        str([u'daq_data', u'tof0']):'TOF0Daq',
+        str([u'daq_data', u'tof1']):'TOF1Daq',
+        str([u'daq_data', u'tof2']):'TOF2Daq',
         str([u'daq_data', u'kl']):'KL',
         str([u'daq_data', u'kl', '[]']):'KLDaq',
         str([u'recon_events', '[]', u'kl_event']):'KLEvent',
         str([u'recon_events', '[]', u'tof_event']):'TOFEvent',
         str([u'recon_events', '[]', u'emr_event']):'EMREvent',
+        str([u'recon_events', '[]', u'tof_event', u'tof_digits']):'TOFEventDigit',
+        str([u'recon_events', '[]', u'tof_event', u'tof_digits', u'tof0']):'TOF0Digit',
+        str([u'recon_events', '[]', u'tof_event', u'tof_digits', u'tof1']):'TOF1Digit',
+        str([u'recon_events', '[]', u'tof_event', u'tof_digits', u'tof2']):'TOF2Digit',
+        str([u'recon_events', '[]', u'tof_event', u'tof_digits', u'tof0', '[]']):'TOFDigit',
+        str([u'recon_events', '[]', u'tof_event', u'tof_digits', u'tof1', '[]']):'TOFDigit',
+        str([u'recon_events', '[]', u'tof_event', u'tof_digits', u'tof2', '[]']):'TOFDigit',
+        str([u'recon_events', '[]', u'tof_event', u'tof_space_points']):'TOFEventSpacePoint',
+        str([u'recon_events', '[]', u'tof_event', u'tof_space_points', u'tof0']):'TOF0SpacePoint',
+        str([u'recon_events', '[]', u'tof_event', u'tof_space_points', u'tof1']):'TOF1SpacePoint',
+        str([u'recon_events', '[]', u'tof_event', u'tof_space_points', u'tof2']):'TOF2SpacePoint',
+        str([u'recon_events', '[]', u'tof_event', u'tof_space_points', u'tof0', '[]']):'TOFSpacePoint',
+        str([u'recon_events', '[]', u'tof_event', u'tof_space_points', u'tof1', '[]']):'TOFSpacePoint',
+        str([u'recon_events', '[]', u'tof_event', u'tof_space_points', u'tof2', '[]']):'TOFSpacePoint',
+        str([u'recon_events', '[]', u'tof_event', u'tof_slab_hits']):'TOFEventSlabHit',
+        str([u'recon_events', '[]', u'tof_event', u'tof_slab_hits', u'tof0']):'TOF0SlabHit',
+        str([u'recon_events', '[]', u'tof_event', u'tof_slab_hits', u'tof1']):'TOF1SlabHit',
+        str([u'recon_events', '[]', u'tof_event', u'tof_slab_hits', u'tof2']):'TOF2SlabHit',
+        str([u'recon_events', '[]', u'tof_event', u'tof_slab_hits', u'tof0', '[]']):'TOFSlabHit',
+        str([u'recon_events', '[]', u'tof_event', u'tof_slab_hits', u'tof1', '[]']):'TOFSlabHit',
+        str([u'recon_events', '[]', u'tof_event', u'tof_slab_hits', u'tof2', '[]']):'TOFSlabHit',
+        str([u'mc_events']):'MCEvents',
+        str([u'mc_events', '[]', u'primary', u'position']):'ThreeVector',
+        str([u'mc_events', '[]', u'primary', u'momentum']):'ThreeVector',
+        str([u'mc_events', '[]', u'sci_fi_hits', '[]', u'position']):'ThreeVector',
+        str([u'mc_events', '[]', u'sci_fi_hits', '[]', u'momentum']):'ThreeVector',
+        str([u'mc_events', '[]', u'sci_fi_hits', '[]', u'channel_id']):'SciFiChannelID',
+        str([u'mc_events', '[]', u'special_virtual_hits', '[]', u'position']):'ThreeVector',
+        str([u'mc_events', '[]', u'special_virtual_hits', '[]', u'momentum']):'ThreeVector',
+        str([u'mc_events', '[]', u'special_virtual_hits', '[]', u'channel_id']):'SpecialVirtualChannelID',
+        str([u'mc_events', '[]', u'tof_hits', '[]', u'position']):'ThreeVector',
+        str([u'mc_events', '[]', u'tof_hits', '[]', u'momentum']):'ThreeVector',
+        str([u'mc_events', '[]', u'tof_hits', '[]', u'channel_id']):'TOFChannelID',
+        str([u'mc_events', '[]']):'MCEvent',
+    }
+    branch_to_type = { # index json path to cpp class type (NOT IMPLEMENTED)
+    }
+    optional_branches = {
     }
     branch_dict = {}
+    disable_dict = {'ReconEvent':1, 'Root':1}
 
 
 class DotGenerator:
     def __init__(self):
         self.nodes = {}
         self.connectors = {}
+        self.node_indents = {}
+
+    def node_name(self, branch):
+        node = '_'.join(branch.json_path)
+        node = node.replace('[]', 'array_item')
+        if node == "":
+            node = "root_item"
+        return node
+
+    def indent(self, branch):
+        if len(branch.json_path) == 0:
+          return '  '
+        return ' '.join(['']*(len(branch.json_path)+2))        
 
     def get_nodes(self, branch):
         a_json_name = ""
         if len(branch.json_path) > 0:
             a_json_name = branch.json_path[-1]
-        self.nodes[branch.type] = ' [shape=record, label="{'+\
+        self.nodes[self.node_name(branch)] = ' [shape=record, label="{'+\
                  branch.type+'|'+a_json_name+'}"]'
+        self.node_indents[self.node_name(branch)] = self.indent(branch)
 
     def get_connections(self, branch):
         for child_branch in branch.child_items.values():
             if child_branch.is_class or child_branch.is_array:
-                self.connectors[branch.type+' -> '+child_branch.type] = 1
+                self.connectors[self.node_name(branch)+' -> '+self.node_name(child_branch)] = self.indent(branch)
 
     def top_matter(self):
-        return "digraph G {\n    node [shape=record];"
+        return "digraph G {\n  node [shape=record];"
 
     def bottom_matter(self):
         return "}"
@@ -671,12 +738,13 @@ class DotGenerator:
         dot_text = self.top_matter()+"\n"
         for key, value in DataStructureItem.branch_dict.iteritems():
             self.get_nodes(value)
-        for key, value in self.nodes.iteritems():
-            dot_text += key+value+"\n"
+        for key in sorted(self.nodes.keys()):
+            dot_text += self.node_indents[key]+key+self.nodes[key]+"\n"
+        dot_text += '\n\n'
         for name, data_branch in DataStructureItem.branch_dict.iteritems():
             self.get_connections(data_branch)
-        for key in self.connectors.keys():
-            dot_text += key+"\n"
+        for key in sorted(self.connectors.keys()):
+            dot_text += self.connectors[key]+key+"\n"
         dot_text += self.bottom_matter()+"\n"
         return dot_text
 
@@ -689,12 +757,15 @@ def main():
     try:
         if os.getcwd() != os.environ["MAUS_ROOT_DIR"]:
             raise OSError("Must be in MAUS_ROOT_DIR to run script")
-        fin = open("simulation.out")
-        for line in fin.readlines():
-            recon_branch = json.loads(line)  
-            if recon_branch["daq_event_type"] == "physics_event":
-                branch = DataStructureItem()#recon_branch, "Spill", [""]
-                branch.parse_key_value("root", recon_branch, False, [], None)
+        for file_name in ["tmp/test_root_io_offline_analysis_IN.json", "tmp/test_root_io_simulate_mice_IN.json"]:
+          fin = open(file_name)
+          for line in fin.readlines():
+              recon_branch = json.loads(line)  
+              if recon_branch["daq_event_type"] == "physics_event":
+                  branch = DataStructureItem()#recon_branch, "Spill", [""]
+                  branch.parse_key_value("spill", recon_branch, False, [], None)
+        MESSAGES['warn'].append('Not building '+\
+                                    str(DataStructureItem.disable_dict.keys()))
         for value in DataStructureItem.branch_dict.values():
             MESSAGES['info'].append('Found '+str(value.json_path))
             if value.is_class:
@@ -710,6 +781,7 @@ def main():
         print 'WARN', msg
     for msg in MESSAGES['at_end']:
         print msg
+    print "NOTE I REDIRECTED OUTPUT TO A STUPID DIRECTORY so that I could play without breaking stuff"
 
 if __name__ == "__main__":
     main()

@@ -38,6 +38,10 @@ SpillProcessor::SpillProcessor() :_mc_array_proc(new MCEventProcessor()),
                           &Spill::GetReconEvents, &Spill::SetReconEvents, false);
     RegisterValueBranch("spill_number", &_int_proc, &Spill::GetSpillNumber,
                                                   &Spill::SetSpillNumber, true);
+    RegisterValueBranch("run_number", &_int_proc, &Spill::GetRunNumber,
+                                                  &Spill::SetRunNumber, true);
+    RegisterValueBranch("daq_event_type", &_string_proc, &Spill::GetDaqEventType,
+                                                  &Spill::SetDaqEventType, true);
     RegisterValueBranch("errors", &_error_proc, &Spill::GetErrors,
                                                   &Spill::SetErrors, false);
 }

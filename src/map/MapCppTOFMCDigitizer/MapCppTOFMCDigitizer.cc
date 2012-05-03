@@ -293,7 +293,7 @@ bool MapCppTOFMCDigitizer::check_sanity_mc(std::string document) {
   }
 
   // Check if the JSON document has a 'mc' branch, else return error
-  if (!root.isMember("mc")) {
+  if (!root.isMember("mc_events")) {
     Json::Value errors;
     std::stringstream ss;
     ss << _classname << " says:" << "I need an MC branch to simulate.";
@@ -302,7 +302,7 @@ bool MapCppTOFMCDigitizer::check_sanity_mc(std::string document) {
     return false;
   }
 
-  mc = root.get("mc", 0);
+  mc = root.get("mc_events", 0);
   // Check if JSON document is of the right type, else return error
   if (!mc.isArray()) {
     Json::Value errors;
@@ -365,7 +365,7 @@ void MapCppTOFMCDigitizer::findTriggerPixel(std::vector<Json::Value> all_tof_dig
 //////////////////////////////////////////////////////////////////////
 Json::Value MapCppTOFMCDigitizer::fill_tof_evt(int evnum, int snum,
                                              std::vector<Json::Value> all_tof_digits) {
-  Json::Value tof_digit;
+  Json::Value tof_digit(Json::arrayValue);
   // return null if this evt had no tof hits
   if (all_tof_digits.size() == 0) return tof_digit;
   double npe;
@@ -394,7 +394,8 @@ Json::Value MapCppTOFMCDigitizer::fill_tof_evt(int evnum, int snum,
 
       // convert light yield to adc & set the charge
       int adc = static_cast<int>(npe / (_configJSON["TOFadcConversionFactor"].asDouble()));
-      digit["charge"] = adc;
+      // ROGERS = changed from "charge" to "charge_pm" for data integrity
+      digit["charge_pm"] = adc;
       // NOTE: needs tweaking/verifying -- DR 3/15
       digit["charge_mm"] = adc;
       digit["tof_key"] = all_tof_digits[i]["tof_key"].asString();
@@ -429,12 +430,20 @@ Json::Value MapCppTOFMCDigitizer::fill_tof_evt(int evnum, int snum,
       digit["leading_time"] = tdc;
       digit["trigger_request_leading_time"] =
                          all_tof_digits[i]["trigger_request_leading_time"].asInt();
-      digit["trailing_time"] = 0.;
+      // ROGERS addition to maintain data integrity 03-May-2012
+      //  - trigger_leading_time 
+      //  - trigger_trailing_time 
+      //  - trigger_request_trailing_timr
+      digit["trigger_leading_time"] = 0;
+      digit["trigger_trailing_time"] = 0;
+      digit["trigger_request_trailing_time"] = 0;
+      digit["trailing_time"] = 0;
+      digit["time_stamp"] = 0;
+      digit["trigger_time_tag"] = 0;
 
       // store event number
       digit["phys_event_number"] = evnum;
       digit["part_event_number"] = evnum;
-
 
       tof_digit.append(digit);
       if (fDebug)

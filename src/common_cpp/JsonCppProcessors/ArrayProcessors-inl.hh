@@ -45,9 +45,13 @@ std::vector<ArrayContents*>* PointerArrayProcessor<ArrayContents>::JsonToCpp
     std::vector<ArrayContents*>* vec = new std::vector<ArrayContents*>(json_array.size());
     for (size_t i = 0; i < json_array.size(); ++i) {
         try {
-           // allocate the vector
-            ArrayContents* data = _proc->JsonToCpp(json_array[i]);
-            (*vec)[i] = data;
+            // allocate the vector
+            if (json_array[i].type() == Json::nullValue) {
+                (*vec)[i] = NULL;
+            } else {
+                ArrayContents* data = _proc->JsonToCpp(json_array[i]);
+                (*vec)[i] = data;
+            }
         } catch(Squeal squee) {
             // if there's a problem, clean up before rethrowing the exception
             for (size_t j = 0; j < vec->size(); ++j) {
@@ -70,13 +74,12 @@ Json::Value* PointerArrayProcessor<ArrayContents>::
 
     for (size_t i = 0; i < cpp_array.size(); ++i) {
         try {
+            Json::Value* data = NULL;
             if (cpp_array[i] == NULL) {
-                throw(Squeal(Squeal::recoverable,
-                             "Tried to convert a NULL pointer to a json value",
-                             "PointerToArrayProcessor<>::CppToJson"));
+                data = new Json::Value();  // that is a NULL value
+            } else {
+                data = _proc->CppToJson(*cpp_array[i]);
             }
-            Json::Value* data = _proc->CppToJson(*cpp_array[i]);
-            Json::FastWriter writer;
             (*json_array)[i] = *data; // json copies memory here
             delete data; // so we need to clean up here
         } catch(Squeal squee) {

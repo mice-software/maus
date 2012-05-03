@@ -19,9 +19,11 @@
 namespace MAUS {
 
 ReconEventProcessor::ReconEventProcessor() {
+    RegisterValueBranch("part_event_number", &_int_proc,
+       &ReconEvent::GetPartEventNumber, &ReconEvent::SetPartEventNumber, true);
     RegisterPointerBranch("tof_event", &_tof_proc, &ReconEvent::GetTOFEvent,
                                                &ReconEvent::SetTOFEvent, false);
-    RegisterPointerBranch("scifi_event", &_scifi_proc,
+    RegisterPointerBranch("sci_fi_event", &_sci_fi_proc,
                  &ReconEvent::GetSciFiEvent, &ReconEvent::SetSciFiEvent, false);
     RegisterPointerBranch("ckov_event", &_ckov_proc, &ReconEvent::GetCkovEvent,
                                               &ReconEvent::SetCkovEvent, false);

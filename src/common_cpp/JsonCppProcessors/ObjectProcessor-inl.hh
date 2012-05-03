@@ -19,6 +19,8 @@
 
 #include <string>
 
+#include "src/common_cpp/Utils/JsonWrapper.hh"
+
 namespace MAUS {
 
 /** BaseItem is base representation of a particular data structure branch
@@ -97,7 +99,7 @@ class PointerItem : public BaseItem<ParentType> {
         if (!parent_json.isMember(_branch)) {
             if (_required) {
                 throw Squeal(Squeal::recoverable,
-                "Failed to recover branch "+_branch+" converting json->cpp",
+                "Missing required branch "+_branch+" converting json->cpp",
                 "PointerItem::SetCppChild");
             } else {
                 return;
@@ -120,7 +122,7 @@ class PointerItem : public BaseItem<ParentType> {
         if (child_cpp == NULL) {
             if (_required) {
                 throw Squeal(Squeal::recoverable,
-                "Failed to recover branch "+_branch+": class data was NULL",
+                "Failed to find branch "+_branch+": class data was NULL",
                 "PointerItem::GetCppChild");
             } else {
                 return;
@@ -187,7 +189,7 @@ class ValueItem : public BaseItem<ParentType> {
         if (!parent_json.isMember(_branch)) {
             if (_required) {
                 throw Squeal(Squeal::recoverable,
-                "Failed to recover branch "+_branch+" converting json->cpp",
+                "Missing required branch "+_branch+" converting json->cpp",
                 "PointerItem::SetCppChild");
             } else {
                 return;
@@ -225,6 +227,10 @@ class ValueItem : public BaseItem<ParentType> {
 };
 
 
+template <class ObjectType>
+ObjectProcessor<ObjectType>::ObjectProcessor()
+    : _throws_if_different_properties(false), _items() {//BUG SHOULD BE TRUE (STYLE GUIDE SHOULD PICK ME UP...)
+}
 
 template <class ObjectType>
 template <class ChildType>
@@ -237,7 +243,7 @@ void ObjectProcessor<ObjectType>::RegisterPointerBranch(
                 bool is_required) {
     BaseItem<ObjectType>* item = new PointerItem<ObjectType, ChildType>
               (branch_name, child_processor, GetMethod, SetMethod, is_required);
-    items.push_back(item);
+    _items.push_back(item);
 }
 
 template <class ObjectType>
@@ -251,7 +257,7 @@ void ObjectProcessor<ObjectType>::RegisterValueBranch(
                 bool is_required) {
     BaseItem<ObjectType>* item = new ValueItem<ObjectType, ChildType>
               (branch_name, child_processor, GetMethod, SetMethod, is_required);
-    items.push_back(item);
+    _items.push_back(item);
 }
 
 //    virtual void SetCppChild(ParentType& parent);
@@ -260,17 +266,23 @@ void ObjectProcessor<ObjectType>::RegisterValueBranch(
 template <class ObjectType>
 ObjectType* ObjectProcessor<ObjectType>::JsonToCpp(const Json::Value& json_object) {
     if (json_object.type() != Json::objectValue) {
+        std::string tp = JsonWrapper::ValueTypeToString(json_object.type());
         throw(Squeal(Squeal::recoverable,
-                     "Attempt to pass a json non-object type as an object",
+                     "Attempt to pass a json "+tp+" type as an object",
+                     "ObjectProcessor<ObjectType>::JsonToCpp"));
+    }
+    if (_throws_if_different_properties && HasSameJsonProperties(json_object)) {
+        throw(Squeal(Squeal::recoverable,
+                     "Failed to recognise all json properties",
                      "ObjectProcessor<ObjectType>::JsonToCpp"));
     }
     ObjectType* cpp_object = new ObjectType();
-    for (size_t i = 0; i < items.size(); ++i) {
+    for (size_t i = 0; i < _items.size(); ++i) {
         try {
-            items[i]->SetCppChild(json_object, *cpp_object);
+            _items[i]->SetCppChild(json_object, *cpp_object);
         } catch(Squeal squee) {
             delete cpp_object;
-            squee.SetMessage("In branch "+items[i]->GetBranchName()+"\n"
+            squee.SetMessage("In branch "+_items[i]->GetBranchName()+"\n"
                             +squee.GetMessage());
             throw squee;
         }
@@ -281,12 +293,12 @@ ObjectType* ObjectProcessor<ObjectType>::JsonToCpp(const Json::Value& json_objec
 template <class ObjectType>
 Json::Value* ObjectProcessor<ObjectType>::CppToJson(const ObjectType& cpp_object) {
     Json::Value* json_object = new Json::Value(Json::objectValue);
-    for (size_t i = 0; i < items.size(); ++i) {
+    for (size_t i = 0; i < _items.size(); ++i) {
         try {
-            items[i]->SetJsonChild(cpp_object, *json_object);
+            _items[i]->SetJsonChild(cpp_object, *json_object);
         } catch(Squeal squee) {
             delete json_object;
-            squee.SetMessage("In branch "+items[i]->GetBranchName()+"\n"
+            squee.SetMessage("In branch "+_items[i]->GetBranchName()+"\n"
                             +squee.GetMessage());
             throw squee;
         }
@@ -296,10 +308,30 @@ Json::Value* ObjectProcessor<ObjectType>::CppToJson(const ObjectType& cpp_object
 
 template <class ObjectType>
 ObjectProcessor<ObjectType>::~ObjectProcessor() {
-    for (size_t i = 0; i < items.size(); ++i) {
-        delete items[i];
+    for (size_t i = 0; i < _items.size(); ++i) {
+        delete _items[i];
     }
 }
+
+template <class ObjectType>
+bool ObjectProcessor<ObjectType>::HasSameJsonProperties
+                                               (const Json::Value& value) const {
+    if (!value.isObject()) {
+        std::string tp = JsonWrapper::ValueTypeToString(value.type());
+        throw(Squeal(Squeal::recoverable,
+                     "Comparison value must be a json object type - found "+tp,
+                     "ObjectProcessor::HasExtraJsonProperties(...)"));
+    }
+    if (value.size() != _items.size()) {
+        return false;
+    }
+    for (size_t i = 0; i < _items.size(); ++i) {
+        if (!value.isMember(_items[i]->GetBranchName())) {
+            return false;
+        }
+    }
+    return true;
 }
-#endif
+}  // namespace MAUS
+#endif  // #ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_OBJECTPROCESSOR_INL_HH_
 

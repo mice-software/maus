@@ -73,11 +73,7 @@ bool OutputCppRoot::save(std::string json_spill_document) {
       }
       if (json_spill_document != "") {
           Json::Value json_spill = JsonWrapper::StringToJson(json_spill_document);
-          if (json_spill["daq_event_type"] == "end_of_run") {
-              return true; // nothing to do, we don't handle end of run yet
-          }
           _data->SetSpill( (*_jsonCppConverter)(json_spill) );
-
           (*_outfile) << fillEvent;
           return true;
       } else {

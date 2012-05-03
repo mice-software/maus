@@ -27,20 +27,20 @@ namespace MAUS {
 /** @class V1731Processor Conversions for V1731 between C++ and Json 
  *
  *  @var _ldc_id_proc_proc Processor for _ldc_id
- *  @var _max_pos_proc_proc Processor for _max_pos
- *  @var _part_event_number_proc_proc Processor for _part_event_number
+ *  @var _samples_proc_proc Processor for _samples
  *  @var _charge_mm_proc_proc Processor for _charge_mm
  *  @var _equip_type_proc_proc Processor for _equip_type
- *  @var _channel_key_proc_proc Processor for _channel_key
+ *  @var _phys_event_number_proc_proc Processor for _phys_event_number
  *  @var _charge_pm_proc_proc Processor for _charge_pm
  *  @var _arrival_time_proc_proc Processor for _arrival_time
- *  @var _phys_event_number_proc_proc Processor for _phys_event_number
+ *  @var _channel_key_proc_proc Processor for _channel_key
  *  @var _position_min_proc_proc Processor for _position_min
- *  @var _samples_proc_proc Processor for _samples
- *  @var _time_stamp_proc_proc Processor for _time_stamp
- *  @var _trigger_time_tag_proc_proc Processor for _trigger_time_tag
- *  @var _detector_proc_proc Processor for _detector
  *  @var _pulse_area_proc_proc Processor for _pulse_area
+ *  @var _max_pos_proc_proc Processor for _max_pos
+ *  @var _trigger_time_tag_proc_proc Processor for _trigger_time_tag
+ *  @var _time_stamp_proc_proc Processor for _time_stamp
+ *  @var _detector_proc_proc Processor for _detector
+ *  @var _part_event_number_proc_proc Processor for _part_event_number
  *  @var _geo_proc_proc Processor for _geo
  *  @var _pedestal_proc_proc Processor for _pedestal
  *  @var _channel_proc_proc Processor for _channel
@@ -56,20 +56,20 @@ class V1731Processor : public ObjectProcessor<V1731> {
 
   private:
     IntProcessor _ldc_id_proc;
-    IntProcessor _max_pos_proc;
-    IntProcessor _part_event_number_proc;
+    ValueArrayProcessor<int> _samples_proc;
     IntProcessor _charge_mm_proc;
     IntProcessor _equip_type_proc;
-    StringProcessor _channel_key_proc;
+    IntProcessor _phys_event_number_proc;
     IntProcessor _charge_pm_proc;
     IntProcessor _arrival_time_proc;
-    IntProcessor _phys_event_number_proc;
+    StringProcessor _channel_key_proc;
     IntProcessor _position_min_proc;
-    ValueArrayProcessor<int> _samples_proc;
-    IntProcessor _time_stamp_proc;
-    IntProcessor _trigger_time_tag_proc;
-    StringProcessor _detector_proc;
     IntProcessor _pulse_area_proc;
+    IntProcessor _max_pos_proc;
+    IntProcessor _trigger_time_tag_proc;
+    IntProcessor _time_stamp_proc;
+    StringProcessor _detector_proc;
+    IntProcessor _part_event_number_proc;
     IntProcessor _geo_proc;
     IntProcessor _pedestal_proc;
     IntProcessor _channel_proc;

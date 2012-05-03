@@ -178,5 +178,9 @@ TEST(ArrayProcessorsTest, ValueArrayCppToJsonTest) {
     }
     delete json_array;
 }
+
+TEST(ArrayProcessorsTest, PointerArrayNullValueTest) {
+    EXPECT_TRUE(false) << "Check that we parse null values correctly to pointers";
+}
 }
 

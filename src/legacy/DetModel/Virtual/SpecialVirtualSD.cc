@@ -103,7 +103,6 @@ G4bool SpecialVirtualSD::ProcessHits(G4Step* aStep, G4TouchableHistory*
              History)
 {
   Json::Value hit_i, channel_id, threeVectorValue;
-  channel_id["type"] = "SpecialVirtual";
   channel_id[ "station" ] = _stationNumber;
 
   hit_i["channel_id"] = channel_id;
@@ -113,7 +112,6 @@ G4bool SpecialVirtualSD::ProcessHits(G4Step* aStep, G4TouchableHistory*
   hit_i["energy"] = aStep->GetTrack()->GetTotalEnergy();
   hit_i["particle_id"] = aStep->GetTrack()->GetDefinition()->GetPDGEncoding();
   hit_i["charge"] =  aStep->GetTrack()->GetDefinition()->GetPDGCharge();
-  hit_i["mass"] = aStep->GetTrack()->GetDefinition()->GetPDGMass();
 
   threeVectorValue["x"] = aStep->GetPostStepPoint()->GetPosition().x();
   threeVectorValue["y"] = aStep->GetPostStepPoint()->GetPosition().y();
