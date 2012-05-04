@@ -14,13 +14,27 @@
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-Online run script to get maus to run online 
+Online run script to get maus to run online.
+
+Contains subprocess commands to
   - set up celery nodes
   - set up web app
   - set up input_transform
-  - set up merger_output
+  - set up merger_outputs
   - logging
+Also some reasonably complicated process handling.
+
+Each of the subprocesses is handled by the subprocess module. Cleanup of child
+processes is done automatically on exit.
+
+Only one instance of analyze_data_online is allowed to run at any time. This is
+controlled by a lock file. Additionally the lock file contains a list of child
+process ids. If this script fails to clean up at the end of the run, for example
+if it is killed by an external signal, then next time it is run we can
+kill all child processes.
 """
+
+# would be great to have some tests for this
 
 import sys
 import os
@@ -43,10 +57,7 @@ REDUCER_LIST = [
 def poll_processes(proc_list):
     """
     Poll processes in process list. Return True if processes are all running,
-    false if any have finished. 
-    
-    If verbose is True, prints out a message with status of each pid.
-    If verbose is False, prints out a '.' or 'x' for each pid   
+    false if any have finished.
     """
     all_ok = True
     for proc in proc_list:
@@ -117,6 +128,10 @@ def maus_merge_output_process(maus_output_log, reducer_name):
     return proc
 
 def force_kill_maus_web_app():
+    """
+    maus web app spawns a child process that is pretty hard to kill. This
+    function searches the process table for mausweb child process and kills it.
+    """
     hack_stdout = os.path.join(os.environ['MAUS_ROOT_DIR'], 'tmp', 'grep.out')
     fout = open(hack_stdout, 'w')
     ps_proc = subprocess.Popen(['ps', '-e', '-F'], stdout=fout,\
@@ -134,6 +149,13 @@ def force_kill_maus_web_app():
     print "Killed", pid
 
 def clear_lockfile():
+    """
+    Clear an existing lockfile
+
+    If the script fails to exit gracefully, we leave a lock file and can leave
+    associated child processes running. In this case, this function kills all
+    child processes.
+    """
     if os.path.exists(LOCKFILE):
         print """
 Found lockfile - this may mean you have an existing session running elsewhere.
@@ -156,6 +178,9 @@ Kill existing session? (y/N)"""
         time.sleep(3)
 
 def make_lockfile(PROCESSES):
+    """
+    Make a lock file listing pid of this process and all children
+    """
     print 'Making lockfile '+LOCKFILE
     fout = open(LOCKFILE, 'w')
     print >>fout, os.getpid()
@@ -164,6 +189,9 @@ def make_lockfile(PROCESSES):
     fout.close()
 
 def cleanup():
+    """
+    Kill any subprocesses of this process
+    """
     print 'Exiting... killing all MAUS processes'
     for process in PROCESSES:
         if process.poll() == None:
@@ -177,6 +205,10 @@ def cleanup():
 
 
 def main():
+    """
+    Make a lockfile; spawn child processes; and poll subprocesses until user
+    hits ctrl-c
+    """
     try:
         clear_lockfile()
         log_dir = os.environ['MAUS_WEB_MEDIA_RAW']
