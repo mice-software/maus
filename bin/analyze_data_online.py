@@ -116,30 +116,43 @@ def maus_merge_output_process(maus_output_log, reducer_name):
     print 'with pid', proc.pid
     return proc
 
+def force_kill_maus_web_app():
+    hack_stdout = os.path.join(os.environ['MAUS_ROOT_DIR'], 'tmp', 'grep.out')
+    fout = open(hack_stdout, 'w')
+    ps_proc = subprocess.Popen(['ps', '-e', '-F'], stdout=fout,\
+                                                       stderr=subprocess.STDOUT)
+    ps_proc.wait()
+    fout.close()
+    fin = open(hack_stdout)
+    pid = None
+    for line in fin.readlines():
+        if line.find('src/mausweb/manage.py') > -1:
+           words = line.split()
+           pid = int(words[1])
+           print "Found lurking maus-web-app process"
+    os.kill(pid, signal.SIGKILL)
+    print "Killed", pid
+
 def clear_lockfile():
     if os.path.exists(LOCKFILE):
         print """
-        Found lockfile - either you are running in two different windows or the
-        application was not shut down properly last time. Please look at
-            """+LOCKFILE+"""
-        for a list of process ids - you will need to kill them by hand by doing
-            kill <process id>
-        Sorry about that. Once you are done, delete the file
-             """+LOCKFILE+"""
-        and things might run okay.
-        """ 
-        os.abort()
-        # unfortunately this block fails to kill a child process spawned by
-        # maus-web-app... otherwise I could automate the cleanup
+Found lockfile - this may mean you have an existing session running elsewhere.
+Kill existing session? (y/N)""" 
+        user_input = raw_input()
+        if len(user_input) == 0 or user_input[0].lower() != 'y':
+            # note this doesnt go through cleanup function - just exits
+            os.abort()
         print 'Lockfile', LOCKFILE, 'found - killing processes'
         fin = open(LOCKFILE)
         for line in fin.readlines():
             pid = int(line.rstrip('\n'))
             try:
-                os.kill(pid, signal.SIGTERM)
+                os.kill(pid, signal.SIGKILL)
             except OSError:
                 pass # maybe the pid didn't exist
             print 'Killed', pid
+        # maus web app spawns a child that needs special handling
+        force_kill_maus_web_app()
         time.sleep(3)
 
 def make_lockfile(PROCESSES):
@@ -176,12 +189,12 @@ def main():
         PROCESSES.append(maus_web_app_process(maus_web_log))
         PROCESSES.append(maus_input_transform_process(input_log))
         for reducer in REDUCER_LIST:
-            reduce_log = os.path.join(log_dir, reducer[0:-2]+'.log')
+            reduce_log = os.path.join(log_dir, reducer[0:-3]+'.log')
             PROCESSES.append(maus_merge_output_process(reduce_log,
                                                        reducer))
             
         make_lockfile(PROCESSES)
-        print 'ctrl-c to quit'
+        print '\nCTRL-C to quit\n'
         while poll_processes(PROCESSES):
            time.sleep(POLL_TIME)
     except Exception:
