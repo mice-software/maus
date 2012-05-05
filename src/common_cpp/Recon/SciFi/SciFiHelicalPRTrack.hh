@@ -32,6 +32,7 @@
 
 // MAUS headers
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
+#include "src/common_cpp/Recon/SciFi/SimpleHelix.hh"
 
 // namespace MAUS {
 
@@ -43,6 +44,7 @@ class SciFiHelicalPRTrack {
                         double phi0, double psi0, double dzds, double R);
     // SciFiHelicalPRTrack(int tracker, std::vector<double> r0, int station,
     //                     double phi0, double psi0, double dzds, double R);
+    SciFiHelicalPRTrack(int tracker, int num_points, CLHEP::Hep3Vector pos0, SimpleHelix helix);
 
     // Destructors
     ~SciFiHelicalPRTrack();  // Default destructor
@@ -60,6 +62,9 @@ class SciFiHelicalPRTrack {
     double get_R() const { return _R; }
     int get_tracker() const { return _tracker; }
     // int get_station() const { return _station; }
+    int get_num_points() const { return _num_points; }
+    int get_chisq() const { return _chisq; }
+    int get_chisq_dof() const { return _chisq_dof; }
 
     std::vector<double> get_vsl();
 
@@ -74,6 +79,9 @@ class SciFiHelicalPRTrack {
     void set_psi0(double psi0) { _psi0 = psi0; }
     void set_dzds(double dzds) { _dzds = dzds; }
     void set_R(double R) { _R = R; }
+    void set_num_points(int num_points) { _num_points = num_points; }
+    void set_chisq(double chisq) { _chisq = chisq; }
+    void set_chisq_dof(double chisq_dof) { _chisq_dof = chisq_dof; }
 
     void set_tracker(int tracker) { _tracker = tracker; }
     // void set_station(double station) { _station = station; }
@@ -96,6 +104,9 @@ class SciFiHelicalPRTrack {
     double _psi0;
     double _dzds;
     double _R;
+    double _chisq;
+    double _chisq_dof;
+    double _num_points;
 };
 // } // ~namespace MAUS
 

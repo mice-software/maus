@@ -77,28 +77,34 @@ void PatternRecognition::process(SciFiEvent &evt) {
       // Make the tracks depending on how many stations have spacepoints in them
       if (num_stations_hit == 5) {
         std::vector<SciFiStraightPRTrack> trks;
+        // std::vector<SciFiHelicalPRTrack> trks; // use for helical testing
         make_5tracks(spnts_by_station, trks, residuals);
         for ( int i = 0; i < static_cast<int>(trks.size()); ++i ) {
           trks[i].set_tracker(trker_no);
           evt.add_straightprtrack(trks[i]);
+          // evt.add_helicalprtrack(tracks[i]); // agian for helical testing purposes
           evt.set_residuals(residuals);
         }
       }
       if (num_stations_hit > 3) {
         std::vector<SciFiStraightPRTrack> trks;
+        // std::vector<SciFiHelicalPRTrack> trks;
         make_4tracks(spnts_by_station, trks, residuals);
         for ( int i = 0; i < static_cast<int>(trks.size()); ++i ) {
           trks[i].set_tracker(trker_no);
           evt.add_straightprtrack(trks[i]);
+          // evt.add_helicalprtrack(tracks[i]); // agian for helical testing purposes
           evt.set_residuals(residuals);
         }
       }
       if (num_stations_hit > 2) {
         std::vector<SciFiStraightPRTrack> trks;
+        // std::vector<SciFiHelicalPRTrack> trks;
         make_3tracks(spnts_by_station, trks, residuals);
         for ( int i = 0; i < static_cast<int>(trks.size()); ++i ) {
           trks[i].set_tracker(trker_no);
           evt.add_straightprtrack(trks[i]);
+          // evt.add_helicalprtrack(tracks[i]); // agian for helical testing purposes
           evt.set_residuals(residuals);
         }
       }
@@ -106,6 +112,7 @@ void PatternRecognition::process(SciFiEvent &evt) {
       std::cout << "Finished Tracker " << trker_no + 1 << std::endl;
     }// ~Loop over trackers
     std::cout << "Number of tracks found: " << evt.straightprtracks().size() << "\n\n";
+    // std::cout << "Number of tracks found: " << evt.helicalprtracks().size() << "\n\n";
 
   } else {
     std::cout << "No spacepoints in event" << std::endl;
@@ -564,8 +571,9 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
                       // push helix back into track object once its made
                       std::cout << "Helix fit found, adding " << num_points << "pt track **\n";
 
+                      CLHEP::Hep3Vector pos_0 = good_spnts[0]->get_position();
                       // Need to pester Adam about the inheritance!!!!!!!!
-                      // SciFiHelicalPRTrack track(-1, num_points, helix);
+                      // SciFiHelicalPRTrack track(-1, num_points, pos_0, helix);
 
                      // Set all the good sp to used and convert pointers to variables
                      std::vector<SciFiSpacePoint> good_spnts_variables;
