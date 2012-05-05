@@ -49,7 +49,7 @@ class SciFiPRTrack {
     int get_tracker() const { return _tracker; }
     int get_num_points() const { return _num_points; }
 
-    //std::vector<double> get_vsl();
+    // std::vector<double> get_vsl();
 
     // Setters
     void set_spacepoints(std::vector<SciFiSpacePoint> spoints) { _spoints = spoints; }
