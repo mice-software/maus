@@ -64,6 +64,18 @@ TEST(ArrayProcessorsTest, PointerArrayJsonToCppWrongTypeTest) {
                                                       // memory allocation
 }
 
+// test we pass the exception up correctly for type errors in JsonToCpp
+TEST(ArrayProcessorsTest, PointerArrayJsonToCppNullTest) {
+    PointerArrayProcessor<double> proc(new DoubleProcessor());
+    Json::Value json_array(Json::arrayValue);
+    json_array.append(Json::Value());
+    std::vector<double*>* vec_out = proc.JsonToCpp(json_array);
+    EXPECT_EQ(vec_out->size(), 1);
+    double* null_double = NULL;
+    EXPECT_EQ((*vec_out)[0], null_double);
+    delete vec_out;
+}
+
 // test detect not an array type
 TEST(ArrayProcessorsTest, PointerArrayJsonToCppNotArrayTest) {
     PointerArrayProcessor<double> proc(new DoubleProcessor());
@@ -96,14 +108,18 @@ TEST(ArrayProcessorsTest, PointerArrayCppToJsonTest) {
     delete json_array;
 }
 
-// test detect null values and throw
+// test detect null values and return json null
 TEST(ArrayProcessorsTest, PointerArrayCppToJsonNullTest) {
     PointerArrayProcessor<double> proc(new DoubleProcessor());
     std::vector<double*> vec;
     for (int i = 0; i < 3; ++i) {
         vec.push_back(NULL);
     }
-    EXPECT_THROW(proc.CppToJson(vec), Squeal);
+    Json::Value* test_value = proc.CppToJson(vec);    
+    for (int i = 0; i < 3; ++i) {
+        EXPECT_EQ((*test_value)[i], Json::Value());
+    }
+    delete test_value;
 }
 
 ////////////////
@@ -177,10 +193,6 @@ TEST(ArrayProcessorsTest, ValueArrayCppToJsonTest) {
         EXPECT_DOUBLE_EQ( vec[i], (*json_array)[i].asDouble() );
     }
     delete json_array;
-}
-
-TEST(ArrayProcessorsTest, PointerArrayNullValueTest) {
-    EXPECT_TRUE(false) << "Check that we parse null values correctly to pointers";
 }
 }
 
