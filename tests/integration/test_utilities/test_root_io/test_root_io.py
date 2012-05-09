@@ -28,35 +28,35 @@ import json
 MRD = os.getenv("MAUS_ROOT_DIR")
 ANALYSIS = os.path.join(MRD, "bin", "analyze_data_offline.py")
 SIMULATION = os.path.join(MRD, "bin", "simulate_mice.py")
-ROOT_TO_JSON = os.path.join(MRD, "bin", "user", "root_to_json.py")
-JSON_TO_ROOT = os.path.join(MRD, "bin", "user", "json_to_root.py")
+ROOT_TO_JSON = os.path.join(MRD, "bin", "utilities", "root_to_json.py")
+JSON_TO_ROOT = os.path.join(MRD, "bin", "utilities", "json_to_root.py")
 
-def run_analyze_offline(json_file_name):
+def run_analyze_offline(root_file_name):
     """
     Run the offline analysis with default dataset
     """
     try:
-        os.remove(json_file_name)
+        os.remove(root_file_name)
     except OSError:
         pass
     subproc = subprocess.Popen([ANALYSIS,
-                                "-output_json_file_name", json_file_name,
+                                "-output_root_file_name", root_file_name,
                                 "-TOF_findTriggerPixelCut", "2.0"])
     subproc.wait()
 
-def run_mc_simulation(json_file_name):
+def run_mc_simulation(root_file_name):
     """
     Run the offline analysis with default dataset
     """
     try:
-        os.remove(json_file_name)
+        os.remove(root_file_name)
     except OSError:
         pass
     config_file_name = os.path.join(MRD,
            "tests/integration/test_utilities/test_root_io/root_io_mc_config.py")
     subproc = subprocess.Popen([SIMULATION,
                                 "-configuration_file", config_file_name,
-                                "-output_json_file_name", json_file_name,
+                                "-output_root_file_name", root_file_name,
                                 ])
     subproc.wait()
 
@@ -104,7 +104,8 @@ class RootIOTest(unittest.TestCase): #pylint: disable=R0904
                               (MRD, "tmp", "test_root_io_offline_analysis.root")
         ana_json_out = os.path.join \
                           (MRD, "tmp", "test_root_io_offline_analysis_OUT.json")
-        run_analyze_offline(ana_json_in)
+        run_analyze_offline(ana_root)
+        run_root_to_json(ana_root, ana_json_in)
         run_json_to_root(ana_json_in, ana_root)
         run_root_to_json(ana_root, ana_json_out)
         self.__check_equality(ana_json_in, ana_json_out)
@@ -121,7 +122,8 @@ class RootIOTest(unittest.TestCase): #pylint: disable=R0904
                               (MRD, "tmp", "test_root_io_simulate_mice.root")
         sim_json_out = os.path.join \
                              (MRD, "tmp", "test_root_io_simulate_mice_OUT.json")
-        run_mc_simulation(sim_json_in)
+        run_mc_simulation(sim_root)
+        run_root_to_json(sim_root, sim_json_in)
         run_json_to_root(sim_json_in, sim_root)
         run_root_to_json(sim_root, sim_json_out)
         self.__check_equality(sim_json_in, sim_json_out)

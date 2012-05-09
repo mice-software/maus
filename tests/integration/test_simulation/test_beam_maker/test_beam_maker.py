@@ -35,6 +35,7 @@ import xboa.Common as Common #pylint: disable=F0401
 MAUS_ROOT_DIR = os.getenv("MAUS_ROOT_DIR")
 TMP_PATH = os.path.join(MAUS_ROOT_DIR, "tmp")
 SIM_PATH = os.path.join(MAUS_ROOT_DIR, "bin", "simulate_mice.py")
+CONV_PATH = os.path.join(MAUS_ROOT_DIR, "bin", "utilities", "root_to_json.py")
 PLOT_DIR = os.path.join(MAUS_ROOT_DIR, "tests", "integration", \
                                     "plots", "beam_maker")
 TEST_DIR = os.path.join(MAUS_ROOT_DIR, "tests", "integration", \
@@ -61,17 +62,30 @@ def run_simulations():
     pull it out into a separate part of the test.
     """
     out = open(TMP_PATH+'/test_beam_maker_output.out', 'w')
+    # run simulation
     subproc = subprocess.Popen([SIM_PATH, '-configuration_file', \
                            os.path.join(TEST_DIR, 'default_beam_config.py')], \
                            stdout = out)
     subproc.wait()
-    os.rename('simulation.out', DEF_SIM)
+    # run format conversion
+    subproc = subprocess.Popen([CONV_PATH, '-configuration_file', \
+                           os.path.join(TEST_DIR, 'default_beam_config.py'),
+                          '-output_json_file_name', DEF_SIM], \
+                           stdout = out)
+    subproc.wait()
 
+    # run simulation
     subproc = subprocess.Popen([SIM_PATH, '-configuration_file', \
                            os.path.join(TEST_DIR, 'binomial_beam_config.py')], \
                            stdout = out)
     subproc.wait()
-    os.rename('simulation.out', BIN_SIM)
+    # run format conversion
+    subproc = subprocess.Popen([CONV_PATH, '-configuration_file', \
+                           os.path.join(TEST_DIR, 'default_beam_config.py'),
+                          '-output_json_file_name', DEF_SIM], \
+                           stdout = out)
+    subproc.wait()
+
     out.close()
 
 class BeamMakerTest(unittest.TestCase): # pylint: disable = R0904
