@@ -22,7 +22,7 @@
 
 namespace {
 
-TEST(JsonWrapper, StringToJson) {
+TEST(JsonWrapperTest, StringToJson) {
   std::string good_json = "{}";
   Json::Value val = JsonWrapper::StringToJson(good_json);
   EXPECT_EQ(val, Json::Value(Json::objectValue));
@@ -30,7 +30,7 @@ TEST(JsonWrapper, StringToJson) {
   EXPECT_THROW(JsonWrapper::StringToJson(bad_json), Squeal);
 }
 
-TEST(JsonWrapper, GetItemTest) {
+TEST(JsonWrapperTest, GetItemTest) {
   std::string good_json = "[2, 3, 4]";
   Json::Value good_val = JsonWrapper::StringToJson(good_json);
   for (unsigned int i = 0; i < 2; ++i) {
@@ -49,7 +49,7 @@ TEST(JsonWrapper, GetItemTest) {
 
 }
 
-TEST(JsonWrapper, GetPropertyTest) {
+TEST(JsonWrapperTest, GetPropertyTest) {
   Json::Value test;
   std::string good_json =
       std::string("{\"real\":2.5, \"int\":3, \"null\":null, \"bool\":true, ")+
@@ -84,7 +84,7 @@ TEST(JsonWrapper, GetPropertyTest) {
     JsonWrapper::GetProperty(emptyProp, "a", JsonWrapper::anyValue), Squeal);
 }
 
-TEST(JsonWrapper, TypeConversionTest) {
+TEST(JsonWrapperTest, TypeConversionTest) {
    JsonWrapper::JsonType wr_tp[] = {JsonWrapper::nullValue,
      JsonWrapper::uintValue, JsonWrapper::intValue, JsonWrapper::realValue,
      JsonWrapper::stringValue, JsonWrapper::booleanValue,
@@ -100,7 +100,7 @@ TEST(JsonWrapper, TypeConversionTest) {
   EXPECT_THROW(JsonWrapper::JsonTypeToValueType(JsonWrapper::anyValue), Squeal);
 }
 
-TEST(JsonWrapper, SimilarTypeTest) {
+TEST(JsonWrapperTest, SimilarTypeTest) {
    JsonWrapper::JsonType wr_tp[] = {JsonWrapper::nullValue,
      JsonWrapper::uintValue, JsonWrapper::intValue, JsonWrapper::realValue,
      JsonWrapper::stringValue, JsonWrapper::booleanValue,
@@ -112,7 +112,7 @@ TEST(JsonWrapper, SimilarTypeTest) {
     }
 }
 
-TEST(JsonWrapper, PrintTest) {
+TEST(JsonWrapperTest, PrintTest) {
   std::stringstream my_ss;
   Json::Value val_in("Mary had a little lamb");
   JsonWrapper::Print(my_ss, val_in);
@@ -120,7 +120,7 @@ TEST(JsonWrapper, PrintTest) {
   EXPECT_EQ(val_in, val_out);
 }
 
-TEST(JsonWrapper, AlmostEqualTest) {
+TEST(JsonWrapperTest, AlmostEqualTest) {
   Json::Value real_1(1.), real_2(1.+1e-8);
   EXPECT_TRUE(JsonWrapper::AlmostEqual(real_1, real_1, 1e-9));
   EXPECT_TRUE(JsonWrapper::AlmostEqual(real_1, real_2, 2e-8));
@@ -162,7 +162,7 @@ TEST(JsonWrapper, AlmostEqualTest) {
   EXPECT_FALSE(JsonWrapper::AlmostEqual(obj_1, obj_2, 1e-9));
 }
 
-TEST(JsonWrapper, ArrayEqualTest) {
+TEST(JsonWrapperTest, ArrayEqualTest) {
   Json::Value int_1(1), int_2(2);
   Json::Value arr_1(Json::arrayValue), arr_2(Json::arrayValue);
   arr_1.append(int_1);
@@ -183,7 +183,7 @@ TEST(JsonWrapper, ArrayEqualTest) {
   EXPECT_FALSE(JsonWrapper::AlmostEqual(arr_1, arr_2, 1e-9));  // test recursion
 }
 
-TEST(JsonWrapper, ObjectEqualTest) {
+TEST(JsonWrapperTest, ObjectEqualTest) {
   Json::Value int_1(1), int_2(2);
   Json::Value obj_1(Json::objectValue), obj_2(Json::objectValue);
   obj_1["1"] = int_1;
@@ -206,7 +206,7 @@ TEST(JsonWrapper, ObjectEqualTest) {
                                                           << obj_2 << std::endl;
 }
 
-TEST(JsonWrapper, ObjectMergeTest) {
+TEST(JsonWrapperTest, ObjectMergeTest) {
   Json::Value int_1(1);
   Json::Value object_1(Json::objectValue), object_2(Json::objectValue);
   Json::Value array_1(Json::arrayValue);
@@ -232,7 +232,7 @@ TEST(JsonWrapper, ObjectMergeTest) {
   EXPECT_THROW(JsonWrapper::ObjectMerge(object_1, int_1), Squeal);
 }
 
-TEST(JsonWrapper, ArrayMergeTest) {
+TEST(JsonWrapperTest, ArrayMergeTest) {
   Json::Value int_1(1);
   Json::Value array_1(Json::arrayValue), array_2(Json::arrayValue);
   array_1.append(1);
@@ -250,8 +250,9 @@ TEST(JsonWrapper, ArrayMergeTest) {
   EXPECT_THROW(JsonWrapper::ArrayMerge(array_1, int_1), Squeal);
 }
 
-TEST(JsonWrapper, JsonValueTypeToStringTest) {
-  EXPECT_TRUE(false) << "Need to test these two functions";
+TEST(JsonWrapperTest, JsonValueTypeToStringTest) {
+  // check one works. Not sure I can really do much more
+  EXPECT_EQ(JsonWrapper::ValueTypeToString(Json::nullValue), "nullValue");
 }
 
 }
