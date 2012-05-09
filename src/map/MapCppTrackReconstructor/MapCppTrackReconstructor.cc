@@ -67,30 +67,36 @@ MapCppTrackReconstructor::~MapCppTrackReconstructor() {
 }
 
 bool MapCppTrackReconstructor::birth(std::string configuration) {
+std::cout << "Entering MapCppTrackReconstructor::birth()" << std::endl;
   // parse the JSON document.
   try {
     configuration_ = new Json::Value(JsonWrapper::StringToJson(configuration));
     SetupOpticsModel();
     SetupTrackFitter();
-    return true;  // Sucessful parsing
   } catch(Squeal& squee) {
-    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, classname_);
+    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(
+      squee, MapCppTrackReconstructor::kClassname);
   } catch(std::exception& exc) {
-    MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, classname_);
+    MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(
+      exc, MapCppTrackReconstructor::kClassname);
   }
-  return false;
+
+std::cout << "Leaving MapCppTrackReconstructor::birth()" << std::endl;
+  return true;  // Sucessful parsing
 }
 
 std::string MapCppTrackReconstructor::process(std::string run_data) {
+std::cout << "Entering MapCppTrackReconstructor::process()" << std::endl;
   // parse the JSON document.
   try {
-    run_data_ = new Json::Value(JsonWrapper::StringToJson(run_data));
+    run_data_ = Json::Value(JsonWrapper::StringToJson(run_data));
   } catch(Squeal& squee) {
-    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, classname_);
+    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, kClassname);
   } catch(std::exception& exc) {
-    MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, classname_);
+    MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, kClassname);
   }
 
+std::cout << "CHECKPOINT(-1) MapCppTrackReconstructor::process()" << std::endl;
   // Populate ReconstructionInput instance from JSON data
   if (run_data_.isMember("ReconstructionTestingData")) {
     LoadTestingData();
@@ -100,6 +106,7 @@ std::string MapCppTrackReconstructor::process(std::string run_data) {
     LoadLiveData();
   }
 
+std::cout << "CHECKPOINT(-0.5) MapCppTrackReconstructor::process()" << std::endl;
   // TODO(plane1@hawk.iit.edu) Implement Kalman Filter and TOF track fitters
   //  in addition to Minuit, and select between them based on the configuration
  
@@ -108,6 +115,7 @@ std::string MapCppTrackReconstructor::process(std::string run_data) {
   CorrelateTrackPoints(tracks);
   
   int particle_id;
+std::cout << "CHECKPOINT(0) MapCppTrackReconstructor::process()" << std::endl;
   if (reconstruction_input_->beam_polarity_negative()) {
     particle_id = Particle::kMuMinus;
   } else {
@@ -139,6 +147,7 @@ std::string MapCppTrackReconstructor::process(std::string run_data) {
   Json::FastWriter writer;
   std::string output = writer.write(run_data_);
 
+std::cout << "Leaving MapCppTrackReconstructor::process()" << std::endl;
   return output;
 }
 
@@ -297,6 +306,7 @@ void MapCppTrackReconstructor::SetupTrackFitter() {
 }
 
 void MapCppTrackReconstructor::LoadTestingData() {
+std::cout << "Entering MapCppTrackReconstructor::LoadTestingData()" << std::endl;
   // TODO(plane1@hawk.iit.edu) reconstruction_input_ = new ReconstructionInput(...);
   // Create random track points for TOF0, TOF1, Tracker 1, Tracker 2, and TOF 2
   srand((unsigned)time(NULL));
@@ -346,6 +356,7 @@ void MapCppTrackReconstructor::LoadTestingData() {
   reconstruction_input_ = new ReconstructionInput(beam_polarity_negative,
                                                   detectors,
                                                   events);
+std::cout << "Leaving MapCppTrackReconstructor::LoadTestingData()" << std::endl;
 }
 
 void MapCppTrackReconstructor::LoadSimulationData() {
@@ -439,11 +450,8 @@ Json::Value MapCppTrackReconstructor::TrackPointToJson(
   return track_point_node;
 }
 
-const std::string classname_ = "MapCppTrackReconstructor";
-const unsigned int kProcessModeUnset = 0;
-const unsigned int kProcessModeTesting = 1;
-const unsigned int kProcessModeSimulation = 2;
-const unsigned int kProcessModeLive = 3;
+const std::string MapCppTrackReconstructor::kClassname
+  = "MapCppTrackReconstructor";
 
 }  // namespace MAUS
 

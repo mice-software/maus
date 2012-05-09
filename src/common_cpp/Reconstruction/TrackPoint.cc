@@ -80,6 +80,34 @@ TrackPoint::TrackPoint(double const * const array)
 TrackPoint::~TrackPoint() {
   delete uncertainties_;
 }
+ 
+const bool TrackPoint::operator==(const TrackPoint& rhs) const {
+  if ((*this) != ((PhaseSpaceVector) rhs)) {
+    return false;
+  } else if (rhs.z_ != z_) {
+    fprintf(stdout, "z coordinates are not equal!\n");
+    return false;
+  } else if (rhs.z_momentum_ != z_momentum_) {
+    fprintf(stdout, "z momenta are not equal!\n");
+    return false;
+  } else if (rhs.detector_id_ != detector_id_) {
+    fprintf(stdout, "Detector IDs are not equal!\n");
+    return false;
+  } else if ((*rhs.uncertainties_) != (*uncertainties_)) {
+    fprintf(stdout, "CovarianceMatrices are not equal!\n");
+    return false;
+  }
+/*
+  if (operator!=((PhaseSpaceVector) rhs) ||
+      (rhs.z_ != z_) || (rhs.z_momentum_ != z_momentum_) ||
+      (rhs.detector_id_ != detector_id_) ||
+      (rhs.uncertainties_ != uncertainties_)) {
+    return false;
+  }
+*/
+
+  return true;
+}
 
 double TrackPoint::z() const {
   return z_;
@@ -125,39 +153,49 @@ const CovarianceMatrix & TrackPoint::uncertainties() const {
 /* Fills in z and Pz from t, E, and the mass.
  */
 void TrackPoint::FillInAxialCoordinates(const double mass) {
-  double px = (*this)[3];
-  double py = (*this)[5];
+  double energy = (*this)[1];
+  const double px = (*this)[3];
+  const double py = (*this)[5];
+
+  const double momentum = ::sqrt(energy*energy - mass*mass);
 
   // fill in the Pz coordinate
-  if (z_momentum_ != 0) {
-    double energy = (*this)[1];
-    z_momentum_ = ::sqrt(energy*energy - mass*mass - px*px - py*py);
-  }
+  z_momentum_ = ::sqrt(momentum*momentum - px*px - py*py);
+
+  const double time = (*this)[0];
+  const double x = (*this)[2];
+  const double y = (*this)[4];
+
+  double velocity = ::CLHEP::c_light * momentum / energy;
+  double position = velocity * time;
 
   // fill in the z coordinate
-  if (z_ != 0.0) {
-    double velocity = z_momentum_ / mass;
-    double time = (*this)[0];
-    z_ = velocity * time;
-  }
+  z_ = ::sqrt(position*position - x*x - y*y);
 }
 
 /* Fills in t and E from z, Pz, and the given mass parameter.
  */
 void TrackPoint::FillInTemporalCoordinates(const double mass) {
-  double px = (*this)[3];
-  double py = (*this)[5];
+  double & energy_ = (*this)[1];
+  const double px = (*this)[3];
+  const double py = (*this)[5];
+  const double pz = z_momentum_;
+
+  const double momentum = ::sqrt(px*px + py*py + pz*pz);
 
   // fill in the energy coordinate
-  if ((*this)[1] != 0.0) {
-    (*this)[1] = ::sqrt(mass*mass + px*px + py*py);
-  }
+  energy_ = ::sqrt(mass*mass + momentum*momentum);
+  
+  double & time_ = (*this)[0];
+  const double x = (*this)[2];
+  const double y = (*this)[4];
+  const double z = z_;
+
+  const double position = ::sqrt(x*x + y*y + z*z);
+  const double velocity = ::CLHEP::c_light * momentum / energy_;
 
   // fill in the time coordinate
-  if ((*this)[0] != 0.0) {
-    double velocity = z_momentum_ / mass;
-    (*this)[0] = z_ / velocity;
-  }
+  time_ = position / velocity;
 }
 
 MAUS::MAUSPrimaryGeneratorAction::PGParticle

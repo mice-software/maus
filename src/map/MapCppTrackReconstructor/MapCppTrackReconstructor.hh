@@ -87,7 +87,7 @@ class MapCppTrackReconstructor {
   ReconstructionInput * reconstruction_input_;
   std::vector<Track> reconstructed_tracks_;
   
-  static const std::string classname_;
+  static const std::string kClassname;
   BTField * electromagnetic_field_;
 
   void SetupOpticsModel();
