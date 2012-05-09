@@ -2,19 +2,16 @@
 #include "API/APIExceptions.hh"
 #include "Interface/Squeal.hh"
 #include "Utils/CppErrorHandler.hh"
-//#include <exception>
-//#include "/home/hep/arichard/Maus/merged/root_io/src/legacy/Interface/Squeal.hh"
-//class Squeal;
 
 namespace MAUS {
 
-  ModuleBase::ModuleBase(const std::string& s) : IModule(), _classname(s) {}
+  ModuleBase::ModuleBase(const std::string& s) : IModule(), _classname(s) {std::cout<<"HERE1"<<std::endl;}
   ModuleBase::ModuleBase(const ModuleBase& mb) : IModule(), _classname(mb._classname) {}
   ModuleBase::~ModuleBase() {}
   
   void ModuleBase::birth(const std::string& s) {
     try {
-      return _birth(s);
+      _birth(s);
     }
     catch (Squeal& s) {
       CppErrorHandler::getInstance()->HandleSquealNoJson(s, _classname);
@@ -29,7 +26,7 @@ namespace MAUS {
   
   void ModuleBase::death() {
     try {
-      return _death();
+      _death();
     }
     catch (Squeal& s) {
       CppErrorHandler::getInstance()->HandleSquealNoJson(s, _classname);

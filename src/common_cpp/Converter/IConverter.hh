@@ -10,9 +10,9 @@ namespace MAUS{
     
   public:
     virtual OUTPUT* operator()(const INPUT* ) const = 0;
-    virtual INPUT*  operator()(const OUTPUT*) const = 0;
+//     virtual INPUT*  operator()(const OUTPUT*) const = 0;
     virtual OUTPUT* convert   (const INPUT* ) const = 0;
-    virtual INPUT*  convert   (const OUTPUT*) const = 0;
+//     virtual INPUT*  convert   (const OUTPUT*) const = 0;
   };
   
 } //end of namespace

@@ -12,7 +12,7 @@
 namespace MAUS {
 
   template <typename T>
-  class InputBase : public ModuleBase, public virtual IInput<T> {
+  class InputBase : public virtual IInput<T>, public ModuleBase {
     
   public:
     explicit InputBase(const std::string&);
@@ -27,10 +27,10 @@ namespace MAUS {
   };
   
   template <typename T>
-  InputBase<T>::InputBase(const std::string& s) : ModuleBase(s), IInput<T>() {}
+  InputBase<T>::InputBase(const std::string& s) : IInput<T>(), ModuleBase(s) {}
   
   template <typename T>
-  InputBase<T>::InputBase(const InputBase& ib) : ModuleBase(ib._classname), IInput<T>() {}
+  InputBase<T>::InputBase(const InputBase& ib) : IInput<T>(), ModuleBase(ib._classname) {}
   
   template <typename T>
   InputBase<T>::~InputBase() {}

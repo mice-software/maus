@@ -2,7 +2,6 @@
 #define MAP_BASE_H
 #include "IMap.hh"
 #include "ModuleBase.hh"
-//#include "/home/hep/arichard/Maus/merged/root_io/src/legacy/Interface/Squeal.hh"
 #include "API/APIExceptions.hh"
 #include "Interface/Squeal.hh"
 #include "Utils/CppErrorHandler.hh"
@@ -11,7 +10,7 @@
 namespace MAUS {
 
   template <typename INPUT, typename OUTPUT>
-  class MapBase : public ModuleBase, public virtual IMap<INPUT, OUTPUT> {
+  class MapBase : public virtual IMap<INPUT, OUTPUT>, public ModuleBase {
     
   public:
     explicit MapBase(const std::string&);
@@ -28,10 +27,10 @@ namespace MAUS {
   
   
   template <typename INPUT, typename OUTPUT>
-  MapBase<INPUT, OUTPUT>::MapBase(const std::string& s) : ModuleBase(s), IMap<INPUT, OUTPUT>() {}
+  MapBase<INPUT, OUTPUT>::MapBase(const std::string& s) : IMap<INPUT, OUTPUT>(), ModuleBase(s) {std::cout<<"HERE2"<<std::endl;}
   
   template <typename INPUT, typename OUTPUT>
-  MapBase<INPUT, OUTPUT>::MapBase(const MapBase& mb) : ModuleBase(mb._classname), IMap<INPUT, OUTPUT>() {}
+  MapBase<INPUT, OUTPUT>::MapBase(const MapBase& mb) : IMap<INPUT, OUTPUT>(), ModuleBase(mb._classname)  {}
   
   template <typename INPUT, typename OUTPUT>
   MapBase<INPUT, OUTPUT>::~MapBase() {}
@@ -41,9 +40,11 @@ namespace MAUS {
   OUTPUT* MapBase<INPUT, OUTPUT>::process(OTHER* o) const {
     
     ConverterFactory c;
+    INPUT* tmp;
+    OUTPUT* ret;
     try{
-      INPUT* tmp = c.convert<OTHER,INPUT>(o);
-      OUTPUT* ret =  process( tmp );
+      tmp = c.convert<OTHER,INPUT>(o);
+      ret =  process( tmp );
     }
     catch (std::exception& e) {
       if(tmp) { delete tmp; }

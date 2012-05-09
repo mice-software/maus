@@ -12,10 +12,10 @@
 namespace MAUS {
 
   template <typename T>
-  class OutputBase : public ModuleBase, public virtual IOutput<T> {
+  class OutputBase : public virtual IOutput<T>, public ModuleBase {
     
   public:
-    explicit OuputBase(const std::string&);
+    explicit OutputBase(const std::string&);
     OutputBase(const OutputBase&);
     virtual ~OutputBase();
     
@@ -27,10 +27,10 @@ namespace MAUS {
   };
   
   template <typename T>
-  OutputBase<T>::OutputBase(const std::string& s) : ModuleBase(s), IOutput<T>() {}
+  OutputBase<T>::OutputBase(const std::string& s) : IOutput<T>(), ModuleBase(s) {}
   
   template <typename T>
-  OutputBase<T>::OutputBase(const OutputBase& ob) : ModuleBase(ob._classname), IOutput<T>() {}
+  OutputBase<T>::OutputBase(const OutputBase& ob) : IOutput<T>(), ModuleBase(ob._classname) {}
   
   template <typename T>
   OutputBase<T>::~OutputBase() {}

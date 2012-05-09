@@ -26,14 +26,14 @@
 #include "src/common_cpp/DataStructure/DAQData.hh"
 #include "src/common_cpp/DataStructure/MCEvent.hh"
 
-#include "src/common_cpp/Converter/DataConverters/JsonCppConverter.hh"
+#include "src/common_cpp/Converter/DataConverters/CppJsonConverter.hh"
 //#include "src/common_cpp/JsonCppStreamer/JsonCppConverter.hh"
 #include "src/common_cpp/JsonCppStreamer/IRStream.hh"
 
 namespace MAUS {
 
 InputCppRoot::InputCppRoot(std::string filename) : _infile(NULL),
-              _jsonCppConverter(NULL),  _spill(NULL), _filename(filename) {
+              _cppJsonConverter(NULL),  _spill(NULL), _filename(filename) {
 }
 
 InputCppRoot::~InputCppRoot() {
@@ -48,7 +48,7 @@ bool InputCppRoot::birth(std::string json_datacards) {
                    "input_root_file_name", JsonWrapper::stringValue).asString();
       }
       _infile = new irstream(_filename.c_str(), "Spill");
-      _jsonCppConverter = new JsonCppConverter();
+      _cppJsonConverter = new CppJsonConverter();
       _spill = new Spill();
       (*_infile) >> branchName("spill") >> _spill;
   } catch(Squeal squee) {
@@ -75,16 +75,16 @@ bool InputCppRoot::death() {
     _infile = NULL;
   }
 
-  if (_jsonCppConverter != NULL) {
-    delete _jsonCppConverter;
-    _jsonCppConverter = NULL;
+  if (_cppJsonConverter != NULL) {
+    delete _cppJsonConverter;
+    _cppJsonConverter = NULL;
   }
   return true;
 }
 
 std::string InputCppRoot::getNextEvent() {
   try {
-      if (_jsonCppConverter == NULL || _infile == NULL) {
+      if (_cppJsonConverter == NULL || _infile == NULL) {
         throw(Squeal(
           Squeal::recoverable,
           "InputCppRoot was not initialised properly",
@@ -94,7 +94,7 @@ std::string InputCppRoot::getNextEvent() {
       if ((*_infile) >> readEvent == NULL) {
         return "";
       }
-      Json::Value* value = (*_jsonCppConverter)(_spill);
+      Json::Value* value = (*_cppJsonConverter)(_spill);
       Json::FastWriter writer;
       std::string output = writer.write(*value);
       delete value;

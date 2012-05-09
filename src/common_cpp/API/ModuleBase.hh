@@ -1,6 +1,7 @@
 #ifndef MODULE_BASE_H
 #define MODULE_BASE_H
 #include "IModule.hh"
+#include "gtest/gtest_prod.h"
 
 namespace MAUS {
 

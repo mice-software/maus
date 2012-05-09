@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef JSONCPPCONVERTER_H
-#define JSONCPPCONVERTER_H
+#ifndef CPPJSONCONVERTER_H
+#define CPPJSONCONVERTER_H
 #include "json/json.h"
 
 #include "src/common_cpp/Converter/ConverterBase.hh"
@@ -38,10 +38,10 @@ namespace MAUS {
  * \author Alexander Richards, Imperial College London
  * \date 06/01/2012
  */
-  class JsonCppConverter : public ConverterBase<Json::Value, Spill> {
+  class CppJsonConverter : public ConverterBase<Spill, Json::Value> {
   public:
-    JsonCppConverter()
-      : ConverterBase<Json::Value, Spill>("JsonCppConverter") {}
+    CppJsonConverter()
+      : ConverterBase<Spill, Json::Value>("CppJsonConverter") {}
 
   private:
     /*!
@@ -53,7 +53,7 @@ namespace MAUS {
      *        file
      * \return a pointer to the MausData object
      */
-    Spill* _convert(const Json::Value*) const;
+//     Spill* _convert(const Json::Value*) const;
 
     /*!
      * \brief Convert MausData
@@ -63,7 +63,7 @@ namespace MAUS {
      * \param MausData& The root \a MausData object from the cpp data structure
      * \return a pointer to the Json::Value object
      */
-//     Json::Value* _convert(const Spill*) const;
+    Json::Value* _convert(const Spill*) const;
 
   private:
 };

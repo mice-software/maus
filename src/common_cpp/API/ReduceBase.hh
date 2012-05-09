@@ -3,7 +3,7 @@
 #include "IReduce.hh"
 #include "ModuleBase.hh"
 #include "API/APIExceptions.hh"
-#include "Converter/ConverterFactory.hh"
+//#include "Converter/ConverterFactory.hh"
 #include "Interface/Squeal.hh"
 #include "Utils/CppErrorHandler.hh"
 
@@ -12,7 +12,7 @@
 namespace MAUS {
 
   template <typename T>
-  class ReduceBase : public ModuleBase, public virtual IReduce<T> {
+  class ReduceBase : public virtual IReduce<T>, public ModuleBase {
     
   public:
     explicit ReduceBase(const std::string&);
@@ -27,10 +27,10 @@ namespace MAUS {
   };
   
   template <typename T>
-  ReduceBase<T>::ReduceBase(const std::string& s) : ModuleBase(s), IReduce<T>() {}
+  ReduceBase<T>::ReduceBase(const std::string& s) : IReduce<T>(), ModuleBase(s) {}
   
   template <typename T>
-  ReduceBase<T>::ReduceBase(const ReduceBase& rb) : ModuleBase(rb._classname), IReduce<T>() {}
+  ReduceBase<T>::ReduceBase(const ReduceBase& rb) : IReduce<T>(), ModuleBase(rb._classname) {}
   
   template <typename T>
   ReduceBase<T>::~ReduceBase() {}

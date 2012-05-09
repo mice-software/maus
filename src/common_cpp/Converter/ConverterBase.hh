@@ -18,16 +18,16 @@ namespace MAUS{
     
   public:
     OUTPUT* operator()(const INPUT* ) const;
-    INPUT*  operator()(const OUTPUT*) const;
+//     INPUT*  operator()(const OUTPUT*) const;
     OUTPUT* convert   (const INPUT* ) const;
-    INPUT*  convert   (const OUTPUT*) const;
+//     INPUT*  convert   (const OUTPUT*) const;
     
   protected:
     std::string _classname;
     
   private:
     virtual OUTPUT* _convert(const INPUT* ) const = 0;
-    virtual INPUT*  _convert(const OUTPUT*) const = 0;
+//     virtual INPUT*  _convert(const OUTPUT*) const = 0;
   };
   
   template <typename INPUT, typename OUTPUT>
@@ -44,10 +44,10 @@ namespace MAUS{
     return convert(i);
   }
 
-  template <typename INPUT, typename OUTPUT>
-  INPUT* ConverterBase<INPUT, OUTPUT>::operator()(const OUTPUT* o) const {
-    return convert(o);
-  }
+//   template <typename INPUT, typename OUTPUT>
+//   INPUT* ConverterBase<INPUT, OUTPUT>::operator()(const OUTPUT* o) const {
+//     return convert(o);
+//   }
   
   template <typename INPUT, typename OUTPUT>
   OUTPUT* ConverterBase<INPUT, OUTPUT>::convert(const INPUT* i) const {
@@ -67,22 +67,22 @@ namespace MAUS{
   }
 
 
-  template <typename INPUT, typename OUTPUT>
-  INPUT* ConverterBase<INPUT, OUTPUT>::convert(const OUTPUT* o) const {
-    if(!o){ throw NullInputException(_classname); }
-    try {
-      return _convert(o);
-    }
-    catch (Squeal& s) {
-      CppErrorHandler::getInstance()->HandleSquealNoJson(s, _classname);
-    }
-    catch (std::exception& e) {
-      CppErrorHandler::getInstance()->HandleStdExcNoJson(e, _classname);
-    }
-    catch (...){
-      throw UnhandledException(_classname);
-    }
-  }
+//   template <typename INPUT, typename OUTPUT>
+//   INPUT* ConverterBase<INPUT, OUTPUT>::convert(const OUTPUT* o) const {
+//     if(!o){ throw NullInputException(_classname); }
+//     try {
+//       return _convert(o);
+//     }
+//     catch (Squeal& s) {
+//       CppErrorHandler::getInstance()->HandleSquealNoJson(s, _classname);
+//     }
+//     catch (std::exception& e) {
+//       CppErrorHandler::getInstance()->HandleStdExcNoJson(e, _classname);
+//     }
+//     catch (...){
+//       throw UnhandledException(_classname);
+//     }
+//   }
 
 }//end of namespace
 #endif

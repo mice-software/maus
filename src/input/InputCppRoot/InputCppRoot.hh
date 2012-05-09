@@ -29,7 +29,7 @@ class irstream;
 
 namespace MAUS {
 
-class JsonCppConverter;
+class CppJsonConverter;
 
 /** @class InputCppRoot
  *
@@ -82,7 +82,7 @@ class InputCppRoot {
 
   private:
     irstream* _infile;
-    JsonCppConverter* _jsonCppConverter;
+    CppJsonConverter* _cppJsonConverter;
     Spill* _spill;
     std::string _filename;
     std::string _classname;
