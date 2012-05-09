@@ -1,3 +1,8 @@
+"""
+Configuration for root io test
+"""
+#pylint: disable=C0103
+
 verbose_level = 1
 simulation_geometry_filename = "Stage6.dat"
 spill_generator_number_of_spills = 2

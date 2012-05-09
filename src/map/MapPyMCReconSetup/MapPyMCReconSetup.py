@@ -18,7 +18,6 @@ Does some global data structure set up
 """
 
 import json
-import ErrorHandler
 
 class MapPyMCReconSetup:
     """
@@ -31,13 +30,13 @@ class MapPyMCReconSetup:
         """
         pass
 
-    def birth(self, json_configuration):
+    def birth(self, json_configuration): #pylint: disable=W0613, R0201
         """
-        Returns true
+        Just returns true
         """
         return True
 
-    def process(self, json_document):
+    def process(self, json_document): #pylint: disable=R0201
         """
         Set up recon_events branch
 
@@ -59,7 +58,7 @@ class MapPyMCReconSetup:
             return json.dumps(spill)
 
         # loop over all triggers and fill the recon event
-        for i, event in enumerate(spill["mc_events"]):
+        for i, event in enumerate(spill["mc_events"]): #pylint: disable=W0612
             spill["recon_events"].append({"part_event_number":i,
                                           "trigger_event":{},
                                           "tof_event":{},
@@ -70,6 +69,9 @@ class MapPyMCReconSetup:
                                           "global_event":{}})
         return json.dumps(spill)
 
-    def death(self):
+    def death(self): #pylint: disable=R0201
+        """
+        Just returns true
+        """
         return True
 

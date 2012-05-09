@@ -20,10 +20,10 @@ import json
 
 import MapPyReconSetup
 
-class TestMapPyReconSetup(unittest.TestCase):
+class TestMapPyReconSetup(unittest.TestCase): #pylint: disable=R0904
     """Tests for MapPyTriggerRecon"""
 
-    def setUp(self):
+    def setUp(self): # pylint: disable=C0103
         """Initialises a MapPyReconSetup"""
         self.recon = MapPyReconSetup.MapPyReconSetup()
 
@@ -49,7 +49,10 @@ class TestMapPyReconSetup(unittest.TestCase):
             "trigger_event":[]}})))
         self.assertFalse("errors" in json_out)
     
-    def __v1290(self, an_int):
+    def __v1290(self, an_int): # pylint: disable=R0201
+        """
+        Return an array called V1290 with just some preformatted objects
+        """
         return {"V1290":[
                 {"part_event_number":an_int},
                 {"part_event_number":an_int},
@@ -64,15 +67,15 @@ class TestMapPyReconSetup(unittest.TestCase):
         spill = json.loads(self.recon.process(json.dumps(good)))
         self.assertEqual(len(spill["recon_events"]), 3)
         for i in range(3):
-            ev = spill["recon_events"][i]
-            self.assertEqual(ev["part_event_number"], trigs[i])
-            self.assertEqual(ev["trigger_event"], {})
-            self.assertEqual(ev["ckov_event"], {})
-            self.assertEqual(ev["kl_event"], {})
-            self.assertEqual(ev["emr_event"], {})
-            self.assertEqual(ev["sci_fi_event"], {})
-            self.assertEqual(ev["global_event"], {})
-            self.assertEqual(ev["tof_event"], {})
+            event = spill["recon_events"][i]
+            self.assertEqual(event["part_event_number"], trigs[i])
+            self.assertEqual(event["trigger_event"], {})
+            self.assertEqual(event["ckov_event"], {})
+            self.assertEqual(event["kl_event"], {})
+            self.assertEqual(event["emr_event"], {})
+            self.assertEqual(event["sci_fi_event"], {})
+            self.assertEqual(event["global_event"], {})
+            self.assertEqual(event["tof_event"], {})
 
 if __name__ == "__main__":
     unittest.main()

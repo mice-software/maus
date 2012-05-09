@@ -332,6 +332,10 @@ class DataStructureImplementation:
         class_out += "\n"+self.bottom_matter()
         return class_out
 
+class DataStructureTest:
+    def __init__(self, class_name, variables):
+      self.class_name = 
+
 class JsonCppProcessorDeclaration:
     def __init__(self, class_name, variables):
         self.class_name = class_name

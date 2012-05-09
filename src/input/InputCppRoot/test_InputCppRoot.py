@@ -39,7 +39,6 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
         """
         Make a sample TFile
         """
-        inputter = InputCppRoot.InputCppRoot()
         self.fname = os.path.join \
                   (os.environ["MAUS_ROOT_DIR"], "tmp", "test_inputCppRoot.root")
         root_file = ROOT.TFile(self.fname, "RECREATE") # pylint: disable = E1101

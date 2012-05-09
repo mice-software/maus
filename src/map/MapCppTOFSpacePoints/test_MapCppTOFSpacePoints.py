@@ -67,7 +67,8 @@ class MapCppTOFSpacePointsTestCase(unittest.TestCase): #pylint: disable = R0904
         spill_out = json.loads(result)
         self.assertFalse('space_points' in spill_out)
 
-    def __get_space_point(self, spill, tof, event):
+    def __get_space_point(self, spill, tof, event): # pylint: disable=R0201
+        """Return the space point for given tof and particle event"""
         return spill['recon_events'][event]['tof_event']\
                                             ['tof_space_points']['tof'+str(tof)]
 

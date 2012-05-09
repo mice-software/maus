@@ -92,8 +92,6 @@ class MapCppTOFDigitsTestCase(unittest.TestCase): # pylint: disable = R0904
 
     def __test_process_tof2_digits(self, spill_out):
         """Test tof2 digits"""
-        n_digits_part_ev1_tof1 = len(\
-                spill_out['recon_events'][1]['tof_event']['tof_digits']['tof1'])
         self.assertFalse(spill_out\
                          ['recon_events'][0]['tof_event']['tof_digits']['tof2'])
         self.assertFalse(spill_out\

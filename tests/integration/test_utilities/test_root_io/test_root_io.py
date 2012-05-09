@@ -139,7 +139,8 @@ class RootIOTest(unittest.TestCase): #pylint: disable=R0904
             self.__almost_equal(jin, jout, verbose=False)
 
 
-    def __almost_equal(self, item_in, item_out, verbose=True, branch=[], tol=1e-9):
+    def __almost_equal(self, # pylint: disable=R0913, R0912
+                       item_in, item_out, verbose=True, branch=None, tol=1e-9):
         """
         Check that two json data structures are the same.
 
@@ -147,6 +148,8 @@ class RootIOTest(unittest.TestCase): #pylint: disable=R0904
         they have default constructors (empty arrays, dicts and strings,
         numerics are 0, bools are either true or false).
         """
+        if branch == None:
+            branch = []
         if verbose == True:
             print branch
         my_msg =  "item_in:\n  "+json.dumps(item_in, indent=2)

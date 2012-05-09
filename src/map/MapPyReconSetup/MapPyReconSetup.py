@@ -18,7 +18,6 @@ Does some global data structure set up
 """
 
 import json
-import ErrorHandler
 
 class MapPyReconSetup:
     """
@@ -31,13 +30,13 @@ class MapPyReconSetup:
         """
         pass
 
-    def birth(self, json_configuration):
+    def birth(self, json_configuration): # pylint: disable=W0613, R0201
         """
         Returns true
         """
         return True
 
-    def process(self, json_document):
+    def process(self, json_document): # pylint: disable=R0201
         """
         Set up recon_events branch
 
@@ -78,6 +77,7 @@ class MapPyReconSetup:
 
         return json.dumps(spill)
 
-    def death(self):
+    def death(self): # pylint: disable=R0201
+        """Just returns true"""
         return True
 
