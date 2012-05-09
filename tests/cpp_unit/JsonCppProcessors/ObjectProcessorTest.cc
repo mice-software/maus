@@ -43,10 +43,6 @@ class TestObject {
       _b = data;
     }
 
-    void SetThrowsIfDifferentProperties(bool will_throw) {
-      _throws_if_different_properties = will_throw;
-    }
-
   private:
     double _a;
     double* _b;
@@ -73,6 +69,34 @@ class ObjectProcessorTest : public ::testing::Test {
   MAUS::DoubleProcessor double_proc;
   TestObject test;
 };
+
+
+TEST_F(ObjectProcessorTest, HasUnknownBranches) {
+  EXPECT_TRUE(not_req_proc.GetThrowsIfUnknownBranches());
+  EXPECT_TRUE(req_proc.GetThrowsIfUnknownBranches());
+  req_proc.SetThrowsIfUnknownBranches(false);
+  EXPECT_FALSE(req_proc.GetThrowsIfUnknownBranches());
+  req_proc.SetThrowsIfUnknownBranches(true);
+  EXPECT_TRUE(req_proc.GetThrowsIfUnknownBranches());
+
+  Json::Value json_int = Json::Value(1.);
+  EXPECT_THROW(not_req_proc.HasUnknownBranches(json_int), Squeal);
+
+  Json::Value json_object_1;
+  json_object_1["branch_a"] = Json::Value(1.);
+  EXPECT_FALSE(not_req_proc.HasUnknownBranches(json_object_1));
+
+  json_object_1["branch_c"] = Json::Value(3.);
+  EXPECT_TRUE(not_req_proc.HasUnknownBranches(json_object_1));
+
+  EXPECT_THROW(not_req_proc.JsonToCpp(json_object_1), Squeal);
+  not_req_proc.SetThrowsIfUnknownBranches(false);
+  TestObject* cpp_object = NULL;
+  EXPECT_NO_THROW(cpp_object = not_req_proc.JsonToCpp(json_object_1));
+  if (cpp_object != NULL) 
+    delete cpp_object;
+}
+
 
 TEST_F(ObjectProcessorTest, JsonToCppRequiredTest) {
   Json::Value json_int(1);
@@ -110,17 +134,6 @@ TEST_F(ObjectProcessorTest, JsonToCppRequiredTest) {
   json_object["branch_b"] = Json::Value(2.);
   json_object["branch_a"] = Json::Value("string");
   EXPECT_THROW(req_proc.JsonToCpp(json_object), Squeal);
-}
-
-TEST_F(ObjectProcessorTest, HasSameJsonPropertiesTest) {
-  Json::Value json_int = Json::Value(1.);
-  EXPECT_THROW(not_req_proc.HasSameJsonProperties(json_int), Squeal);
-  Json::Value json_object_1;
-  json_object_1["branch_a"] = Json::Value(1.);
-  json_object_1["branch_b"] = Json::Value(2.);
-  json_object_1["branch_c"] = Json::Value(3.);
-  EXPECT_FALSE(not_req_proc.JsonToCpp(json_object_1));
-
 }
 
 TEST_F(ObjectProcessorTest, JsonToCppNotRequiredTest) {
@@ -186,10 +199,6 @@ TEST_F(ObjectProcessorTest, CppToJsonNotRequiredTest) {
   json_value = not_req_proc.CppToJson(test);
   EXPECT_FALSE(json_value->isMember("branch_b"));
   delete json_value;
-}
-
-TEST_F(ObjectProcessorTest, CppToJsonThrowIfDifferentTest) {
-  EXPECT_TRUE(false) << "Need to check: HasSameJsonProperties, and calling in JsonToCpp";
 }
 }
 

@@ -147,7 +147,15 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
      *  @param value Json::Value to check against. Throw an exception if value
      *         is not an object type.
      */
-    bool HasSameJsonProperties(const Json::Value& value) const;
+    bool HasUnknownBranches(const Json::Value& value) const;
+
+    /** Set _throws_if_different_properties
+     */
+    void SetThrowsIfUnknownBranches(bool will_throw);
+
+    /** Get _throws_if_different_properties
+     */
+    bool GetThrowsIfUnknownBranches() const;
 
     /** Destructor frees memory allocated to items vector
      */
@@ -160,10 +168,11 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
      *  throw an exception if the json branch has properties that are not
      *  registered in the processor. Default is true.
      */
-    bool _throws_if_different_properties;
+    bool _throws_if_unknown_branches;
 
   private:
-    std::vector< BaseItem<ObjectType>* > _items;
+    typedef typename std::map< std::string, BaseItem<ObjectType>* >::iterator my_iter;
+    std::map< std::string, BaseItem<ObjectType>* > _items;
 };
 }
 
