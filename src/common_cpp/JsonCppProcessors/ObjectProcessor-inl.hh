@@ -78,9 +78,9 @@ class PointerItem : public BaseItem<ParentType> {
      *  where memory is still owned by the ObjectProcessor
      *  @param SetMethod callback that will set a pointer to the child data,
      *  where memory is given to the ObjectProcessor
-     *  @param is_required if the branch doesnt exist in json or is NULL in C++,
-     *  throw Squeal if is_required is set to true when Set...Child methods are
-     *  called
+     *  @param is_required if the branch doesnt exist in json, is null in json
+     *  or is NULL in C++, throw Squeal if is_required is set to true when
+     *  Set...Child methods are called
      */
     PointerItem(std::string branch_name, ProcessorBase<ChildType>* child_processor,
                 GetMethod getter, SetMethod setter, bool is_required)
@@ -100,6 +100,15 @@ class PointerItem : public BaseItem<ParentType> {
             if (_required) {
                 throw Squeal(Squeal::recoverable,
                 "Missing required branch "+_branch+" converting json->cpp",
+                "PointerItem::SetCppChild");
+            } else {
+                return;
+            }
+        }
+        if (parent_json[_branch].isNull()) {
+            if (_required) {
+                throw Squeal(Squeal::recoverable,
+                "Null branch "+_branch+" converting json->cpp",
                 "PointerItem::SetCppChild");
             } else {
                 return;
@@ -229,7 +238,7 @@ class ValueItem : public BaseItem<ParentType> {
 
 template <class ObjectType>
 ObjectProcessor<ObjectType>::ObjectProcessor()
-    : _throws_if_different_properties(false), _items() {//BUG SHOULD BE TRUE (STYLE GUIDE SHOULD PICK ME UP...)
+    : _throws_if_different_properties(true), _items() {
 }
 
 template <class ObjectType>

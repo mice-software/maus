@@ -154,6 +154,12 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
     virtual ~ObjectProcessor();
 
   protected:
+    /** Set this to true to throw if json value has extra properties
+     *
+     *  When converting from json to cpp, if this is set to true the class will
+     *  throw an exception if the json branch has properties that are not
+     *  registered in the processor. Default is true.
+     */
     bool _throws_if_different_properties;
 
   private:

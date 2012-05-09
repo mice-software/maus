@@ -43,6 +43,10 @@ class TestObject {
       _b = data;
     }
 
+    void SetThrowsIfDifferentProperties(bool will_throw) {
+      _throws_if_different_properties = will_throw;
+    }
+
   private:
     double _a;
     double* _b;
@@ -85,6 +89,11 @@ TEST_F(ObjectProcessorTest, JsonToCppRequiredTest) {
   EXPECT_DOUBLE_EQ(*cpp_object->GetB(), 2.);
   delete cpp_object;
 
+  // should throw on NULL
+  json_object["branch_a"] = Json::Value(1.);
+  json_object["branch_b"] = Json::Value();
+  EXPECT_THROW(req_proc.JsonToCpp(json_object), Squeal);
+
   // should throw if object is missing
   Json::Value json_object_missing_a(Json::objectValue);
   json_object_missing_a["branch_b"] = Json::Value(2.);
@@ -101,6 +110,17 @@ TEST_F(ObjectProcessorTest, JsonToCppRequiredTest) {
   json_object["branch_b"] = Json::Value(2.);
   json_object["branch_a"] = Json::Value("string");
   EXPECT_THROW(req_proc.JsonToCpp(json_object), Squeal);
+}
+
+TEST_F(ObjectProcessorTest, HasSameJsonPropertiesTest) {
+  Json::Value json_int = Json::Value(1.);
+  EXPECT_THROW(not_req_proc.HasSameJsonProperties(json_int), Squeal);
+  Json::Value json_object_1;
+  json_object_1["branch_a"] = Json::Value(1.);
+  json_object_1["branch_b"] = Json::Value(2.);
+  json_object_1["branch_c"] = Json::Value(3.);
+  EXPECT_FALSE(not_req_proc.JsonToCpp(json_object_1));
+
 }
 
 TEST_F(ObjectProcessorTest, JsonToCppNotRequiredTest) {
@@ -131,7 +151,15 @@ TEST_F(ObjectProcessorTest, JsonToCppNotRequiredTest) {
 
   json_object["branch_b"] = Json::Value(2.);
   json_object["branch_a"] = Json::Value("string");
-  EXPECT_THROW(req_proc.JsonToCpp(json_object), Squeal);
+  EXPECT_THROW(not_req_proc.JsonToCpp(json_object), Squeal);
+
+  // should return NULL on nullValue
+  double* null_value = NULL;
+  json_object["branch_a"] = Json::Value(1.);
+  json_object["branch_b"] = Json::Value();
+  cpp_object = not_req_proc.JsonToCpp(json_object);
+  EXPECT_EQ(not_req_proc.JsonToCpp(json_object)->GetB(), null_value);
+  delete cpp_object;
 }
 
 TEST_F(ObjectProcessorTest, CppToJsonRequiredTest) {
@@ -161,7 +189,7 @@ TEST_F(ObjectProcessorTest, CppToJsonNotRequiredTest) {
 }
 
 TEST_F(ObjectProcessorTest, CppToJsonThrowIfDifferentTest) {
-  EXPECT_TRUE(false) << "Need to check: handling of NULL/nullValue, HasSameJsonProperties, and calling in JsonToCpp";
+  EXPECT_TRUE(false) << "Need to check: HasSameJsonProperties, and calling in JsonToCpp";
 }
 }
 
