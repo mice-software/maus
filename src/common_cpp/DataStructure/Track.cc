@@ -42,7 +42,7 @@ Track& Track::operator=(const Track& track) {
     if (track._steps == NULL) {
         _steps = NULL;
     } else {
-        _steps = new std::vector<Step>(*(track._steps));
+        _steps = new StepArray(*(track._steps));
     }
     _initial_position = track._initial_position;
     _final_position = track._final_position;
@@ -117,11 +117,11 @@ void Track::SetParentTrackId(int id) {
     _parent_track_id = id;
 }
 
-std::vector<Step>* Track::GetSteps() const {
+StepArray* Track::GetSteps() const {
     return _steps;
 }
 
-void Track::SetSteps(std::vector<Step>* steps) {
+void Track::SetSteps(StepArray* steps) {
     _steps = steps;
 }
 }

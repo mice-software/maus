@@ -18,12 +18,15 @@
 #define _SRC_COMMON_CPP_DATASTRUCTURE_TRACK_HH_
 
 #include <vector>
-#include "src/common_cpp/DataStructure/ThreeVector.hh"
-#include "src/common_cpp/DataStructure/Step.hh"
 
 #include "Rtypes.h" // ROOT
 
+#include "src/common_cpp/DataStructure/ThreeVector.hh"
+#include "src/common_cpp/DataStructure/Step.hh"
+
 namespace MAUS {
+
+typedef std::vector<Step> StepArray;
 
 /** @class Track stores data pertaining to a single particle in the geometry
  *
@@ -45,7 +48,7 @@ class Track {
     Track& operator=(const Track& track);
 
     /** Destructor - frees memory allocated to steps */
-    ~Track();
+    virtual ~Track();
 
     /** Get the position of the track where it was spawned */
     ThreeVector GetInitialPosition() const;
@@ -90,15 +93,15 @@ class Track {
     void SetParentTrackId(int id);
 
     /** Get the vector of step points associated with this track */
-    std::vector<Step>* GetSteps() const;
+    StepArray* GetSteps() const;
 
     /** Set the vector of step points associated with this track (deleting
      *  existing steps
      */
-    void SetSteps(std::vector<Step>* steps);
+    void SetSteps(StepArray* steps);
 
   private:
-    std::vector<Step>* _steps;
+    StepArray* _steps;
 
     ThreeVector _initial_position;
     ThreeVector _final_position;
@@ -108,6 +111,8 @@ class Track {
     int _particle_id;
     int _track_id;
     int _parent_track_id;
+
+    ClassDef(Track, 1)
 };
 }
 

@@ -52,6 +52,7 @@ class SpillProcessor : public ObjectProcessor<Spill> {
     PointerArrayProcessor<ReconEvent> _recon_array_proc;
     ObjectMapValueProcessor<std::string> _error_proc;
     IntProcessor _int_proc;
+    StringProcessor _string_proc;
 };
 }
 #endif

@@ -19,6 +19,7 @@
 
 #include <vector>
 #include <string>
+#include <map>
 
 #include "json/json.h"
 
@@ -55,6 +56,10 @@ class ValueItem; // defined in ObjectProcessor-inl
 template <class ObjectType>
 class ObjectProcessor : public ProcessorBase<ObjectType> {
   public:
+    /** Default constructor sets _throws_if_different_properties to true
+     */
+    ObjectProcessor();
+
     /** Convert from a Json object to a C++ instance
      *
      *  Iterate over each registered branch. If the branch is of pointer type,
@@ -134,12 +139,41 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
                     void (ObjectType::*SetMethod)(ChildType value),
                     bool is_required);
 
+    /** Return true if json value properties not the same as branches
+     *
+     *  Compare the list of properties on the json value and compare with the
+     *  list of registered branches. If they are different return false. Else
+     *  return true.
+     *
+     *  @param value Json::Value to check against. Throw an exception if value
+     *         is not an object type.
+     */
+    bool HasUnknownBranches(const Json::Value& value) const;
+
+    /** Set _throws_if_different_properties
+     */
+    void SetThrowsIfUnknownBranches(bool will_throw);
+
+    /** Get _throws_if_different_properties
+     */
+    bool GetThrowsIfUnknownBranches() const;
+
     /** Destructor frees memory allocated to items vector
      */
     virtual ~ObjectProcessor();
 
+  protected:
+    /** Set this to true to throw if json value has extra properties
+     *
+     *  When converting from json to cpp, if this is set to true the class will
+     *  throw an exception if the json branch has properties that are not
+     *  registered in the processor. Default is true.
+     */
+    bool _throws_if_unknown_branches;
+
   private:
-    std::vector< BaseItem<ObjectType>* > items;
+    typedef typename std::map< std::string, BaseItem<ObjectType>* >::iterator my_iter;
+    std::map< std::string, BaseItem<ObjectType>* > _items;
 };
 }
 

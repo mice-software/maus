@@ -89,6 +89,12 @@ class MCEvent {
    */
   void SetVirtualHits(VirtualHitArray* hits);
 
+  /** Get a single MC event (needed for PyROOT) */
+  VirtualHit& GetAVirtualHit(size_t i) const;
+
+  /** Get the MC event size (needed for PyROOT)*/
+  size_t GetVirtualHitsSize() const;
+
   /** Get the hits pertaining to this event MCEvent still owns HitArray*.
    */
   SciFiHitArray* GetSciFiHits() const;

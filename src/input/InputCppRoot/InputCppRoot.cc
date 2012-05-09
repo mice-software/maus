@@ -111,10 +111,5 @@ std::string InputCppRoot::getNextEvent() {
         return "";
     }
 }
-
-int InputCppRoot::my_sizeof() {
-  Data spill;
-  return sizeof(spill);
-}
 }
 
