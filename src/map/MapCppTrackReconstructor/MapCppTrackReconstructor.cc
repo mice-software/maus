@@ -98,12 +98,19 @@ std::cout << "Entering MapCppTrackReconstructor::process()" << std::endl;
 
 std::cout << "CHECKPOINT(-1) MapCppTrackReconstructor::process()" << std::endl;
   // Populate ReconstructionInput instance from JSON data
+// FIXME(plane1@hawk.iit.edu) this if-else block is not working
   if (run_data_.isMember("ReconstructionTestingData")) {
     LoadTestingData();
   } else if (run_data_.isMember("mc")) {
     LoadSimulationData();
   } else {
     LoadLiveData();
+  }
+  
+  if (reconstruction_input_ == NULL) {
+    throw(Squeal(Squeal::recoverable,
+                 "Null reconstruction input.",
+                 "MapCppTrackReconstructor::process()"));
   }
 
 std::cout << "CHECKPOINT(-0.5) MapCppTrackReconstructor::process()" << std::endl;

@@ -26,17 +26,21 @@ namespace MAUS {
 Track::Track() : std::vector<TrackPoint>(), particle_id_(0)
 { }
 
+Track::Track(const int particle_id)
+    : std::vector<TrackPoint>(), particle_id_(particle_id)
+{ }
+
 Track::Track(const std::vector<TrackPoint>& tracks,
              const int particle_id)
     : std::vector<TrackPoint>(tracks), particle_id_(particle_id)
 { }
 
-Track::~Track()
-{ }
-
 Track::Track(const Track & original_instance)
     : std::vector<TrackPoint>(original_instance),
       particle_id_(original_instance.particle_id_)
+{ }
+
+Track::~Track()
 { }
 
 int Track::particle_id() const {
