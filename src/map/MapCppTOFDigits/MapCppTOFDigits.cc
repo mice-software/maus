@@ -134,7 +134,9 @@ std::string MapCppTOFDigits::process(std::string document) {
             Json::Value xDocDetectorData = JsonWrapper::GetProperty(xDaqData,
                                                                     _stationKeys[n_station],
                                                                     JsonWrapper::arrayValue);
-            xDocAllDigits[n_station] = makeDigits(xDocDetectorData, xDocTrigReq, xDocTrig);  // list of events for station n_station
+            // list of events for station n_station
+            xDocAllDigits[n_station] = makeDigits
+                                    (xDocDetectorData, xDocTrigReq, xDocTrig);
             n_events = xDocAllDigits[n_station].size();
           }
         }

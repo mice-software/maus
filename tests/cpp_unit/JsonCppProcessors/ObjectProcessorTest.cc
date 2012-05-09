@@ -93,7 +93,7 @@ TEST_F(ObjectProcessorTest, HasUnknownBranches) {
   not_req_proc.SetThrowsIfUnknownBranches(false);
   TestObject* cpp_object = NULL;
   EXPECT_NO_THROW(cpp_object = not_req_proc.JsonToCpp(json_object_1));
-  if (cpp_object != NULL) 
+  if (cpp_object != NULL)
     delete cpp_object;
 }
 

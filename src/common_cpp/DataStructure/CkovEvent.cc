@@ -43,7 +43,7 @@ CkovDigitArray CkovEvent::GetCkovDigitArray() const {
     return _ckov_digits;
 }
 
-CkovDigit CkovEvent::GetCkovDigitArrayElement(size_t index) const{
+CkovDigit CkovEvent::GetCkovDigitArrayElement(size_t index) const {
     return _ckov_digits[index];
 }
 

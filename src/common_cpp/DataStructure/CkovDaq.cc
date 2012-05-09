@@ -43,7 +43,7 @@ V1731Array CkovDaq::GetV1731Array() const {
     return _V1731;
 }
 
-V1731 CkovDaq::GetV1731ArrayElement(size_t index) const{
+V1731 CkovDaq::GetV1731ArrayElement(size_t index) const {
     return _V1731[index];
 }
 

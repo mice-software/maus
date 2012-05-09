@@ -17,8 +17,10 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_TOFEVENTDIGIT_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_TOFEVENTDIGIT_
 
-#include "Rtypes.h"  // ROOT
 #include <vector>
+
+#include "Rtypes.h"  // ROOT
+
 #include "src/common_cpp/DataStructure/TOFDigit.hh"
 
 namespace MAUS {

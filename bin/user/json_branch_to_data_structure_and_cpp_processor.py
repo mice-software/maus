@@ -221,7 +221,7 @@ class DataStructureImplementation:
 
     def getter_array_extras(self, variable):
         extras = variable.element_type()+" "+self.class_name+"::Get"+\
-                      variable['upper_name']+"Element(size_t index) const{\n"
+                      variable['upper_name']+"Element(size_t index) const {\n"
         extras += "    return "+variable['var_name']+"[index];\n}\n\n"
         extras += "size_t "+self.class_name+"::Get"+variable['upper_name']+\
                                                               "Size() const {\n"

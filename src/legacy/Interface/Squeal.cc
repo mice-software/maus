@@ -39,7 +39,7 @@ Squeal::Squeal(exceptionLevel level, std::string errorMessage,
         _stacktrace(MakeStackTrace(2)), _what(), _level(level) {
   Squeak::mout();  // make sure we initialise Squeak otherwise can get segv
   // use std::vector as dynamic array
-  SetWhat(_message+" at "+_location); 
+  SetWhat(_message+" at "+_location);
 }
 
 void Squeal::Print() {

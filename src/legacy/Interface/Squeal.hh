@@ -72,7 +72,7 @@ class Squeal : public std::exception {
   /// Set the error message
   void           SetMessage(std::string new_message) {
     _message = new_message;
-    SetWhat(_message+" at "+_location); 
+    SetWhat(_message+" at "+_location);
   }
   /// Get the location (as defined by constructor) of the error
   std::string    GetLocation() const {return _location;}

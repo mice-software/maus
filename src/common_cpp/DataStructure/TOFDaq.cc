@@ -44,7 +44,7 @@ V1724Array TOFDaq::GetV1724Array() const {
     return _V1724;
 }
 
-V1724 TOFDaq::GetV1724ArrayElement(size_t index) const{
+V1724 TOFDaq::GetV1724ArrayElement(size_t index) const {
     return _V1724[index];
 }
 
@@ -60,7 +60,7 @@ V1290Array TOFDaq::GetV1290Array() const {
     return _V1290;
 }
 
-V1290 TOFDaq::GetV1290ArrayElement(size_t index) const{
+V1290 TOFDaq::GetV1290ArrayElement(size_t index) const {
     return _V1290[index];
 }
 

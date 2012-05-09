@@ -17,9 +17,11 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_TOFEVENTSLABHIT_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_TOFEVENTSLABHIT_
 
-#include "src/common_cpp/DataStructure/TOFSlabHit.hh"
-#include "Rtypes.h"  // ROOT
 #include <vector>
+
+#include "Rtypes.h"  // ROOT
+
+#include "src/common_cpp/DataStructure/TOFSlabHit.hh"
 
 namespace MAUS {
 // Needed for ROOT

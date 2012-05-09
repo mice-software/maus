@@ -62,7 +62,7 @@ TriggerRequestArray DAQData::GetTriggerRequestArray() const {
     return _trigger_request;
 }
 
-TriggerRequest* DAQData::GetTriggerRequestArrayElement(size_t index) const{
+TriggerRequest* DAQData::GetTriggerRequestArrayElement(size_t index) const {
     return _trigger_request[index];
 }
 
@@ -78,7 +78,7 @@ TOF1DaqArray DAQData::GetTOF1DaqArray() const {
     return _tof1;
 }
 
-TOFDaq* DAQData::GetTOF1DaqArrayElement(size_t index) const{
+TOFDaq* DAQData::GetTOF1DaqArrayElement(size_t index) const {
     return _tof1[index];
 }
 
@@ -94,7 +94,7 @@ CkovArray DAQData::GetCkovArray() const {
     return _ckov;
 }
 
-CkovDaq* DAQData::GetCkovArrayElement(size_t index) const{
+CkovDaq* DAQData::GetCkovArrayElement(size_t index) const {
     return _ckov[index];
 }
 
@@ -110,7 +110,7 @@ TOF2DaqArray DAQData::GetTOF2DaqArray() const {
     return _tof2;
 }
 
-TOFDaq* DAQData::GetTOF2DaqArrayElement(size_t index) const{
+TOFDaq* DAQData::GetTOF2DaqArrayElement(size_t index) const {
     return _tof2[index];
 }
 
@@ -126,7 +126,7 @@ UnknownArray DAQData::GetUnknownArray() const {
     return _unknown;
 }
 
-Unknown* DAQData::GetUnknownArrayElement(size_t index) const{
+Unknown* DAQData::GetUnknownArrayElement(size_t index) const {
     return _unknown[index];
 }
 
@@ -142,7 +142,7 @@ KLArray DAQData::GetKLArray() const {
     return _kl;
 }
 
-KLDaq* DAQData::GetKLArrayElement(size_t index) const{
+KLDaq* DAQData::GetKLArrayElement(size_t index) const {
     return _kl[index];
 }
 
@@ -158,7 +158,7 @@ TagArray DAQData::GetTagArray() const {
     return _tag;
 }
 
-Tag* DAQData::GetTagArrayElement(size_t index) const{
+Tag* DAQData::GetTagArrayElement(size_t index) const {
     return _tag[index];
 }
 
@@ -174,7 +174,7 @@ TOF0DaqArray DAQData::GetTOF0DaqArray() const {
     return _tof0;
 }
 
-TOFDaq* DAQData::GetTOF0DaqArrayElement(size_t index) const{
+TOFDaq* DAQData::GetTOF0DaqArrayElement(size_t index) const {
     return _tof0[index];
 }
 
@@ -190,7 +190,7 @@ TriggerArray DAQData::GetTriggerArray() const {
     return _trigger;
 }
 
-Trigger* DAQData::GetTriggerArrayElement(size_t index) const{
+Trigger* DAQData::GetTriggerArrayElement(size_t index) const {
     return _trigger[index];
 }
 

@@ -17,6 +17,10 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_DAQDATA_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_DAQDATA_
 
+#include <vector>
+
+#include "Rtypes.h"  // ROOT
+
 #include "src/common_cpp/DataStructure/KLDaq.hh"
 #include "src/common_cpp/DataStructure/Trigger.hh"
 #include "src/common_cpp/DataStructure/TOFDaq.hh"
@@ -24,9 +28,7 @@
 #include "src/common_cpp/DataStructure/CkovDaq.hh"
 #include "src/common_cpp/DataStructure/Unknown.hh"
 #include "src/common_cpp/DataStructure/TriggerRequest.hh"
-#include "Rtypes.h"  // ROOT
 #include "src/common_cpp/DataStructure/Tag.hh"
-#include <vector>
 
 namespace MAUS {
 // Needed for ROOT

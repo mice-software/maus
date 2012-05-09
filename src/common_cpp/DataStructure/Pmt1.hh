@@ -17,8 +17,9 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_PMT1_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_PMT1_
 
-#include "Rtypes.h"  // ROOT
 #include <string>
+
+#include "Rtypes.h"  // ROOT
 
 namespace MAUS {
 

@@ -135,7 +135,7 @@ class Spill {
   ReconEventArray* _recon;
   int _spill_number;
   int _run_number;
-  std::string _daq_event_type; 
+  std::string _daq_event_type;
 
   std::map<std::string, std::string> _errors;
 

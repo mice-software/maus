@@ -17,9 +17,10 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_V1731_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_V1731_
 
-#include "Rtypes.h"  // ROOT
 #include <vector>
 #include <string>
+
+#include "Rtypes.h"  // ROOT
 
 namespace MAUS {
 // Needed for ROOT

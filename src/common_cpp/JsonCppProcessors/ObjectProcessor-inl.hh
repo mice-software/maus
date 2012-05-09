@@ -327,12 +327,12 @@ bool ObjectProcessor<ObjectType>::HasUnknownBranches
                      "ObjectProcessor::HasUnknownBranches(...)"));
     }
     Json::Value::Members members = value.getMemberNames();
-    for (Json::Value::Members::iterator it=members.begin();
+    for (Json::Value::Members::iterator it = members.begin();
                                                     it != members.end(); ++it) {
         if (_items.find(*it) == _items.end()) {
             return true;
         }
-    } 
+    }
     return false;
 }
 

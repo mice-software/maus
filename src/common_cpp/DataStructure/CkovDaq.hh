@@ -17,8 +17,10 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_CKOVDAQ_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_CKOVDAQ_
 
-#include "Rtypes.h"  // ROOT
 #include <vector>
+
+#include "Rtypes.h"  // ROOT
+
 #include "src/common_cpp/DataStructure/V1731.hh"
 
 namespace MAUS {

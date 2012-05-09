@@ -108,11 +108,14 @@ std::string MapCppTOFSpacePoints::process(std::string document) {
       Json::Value xRecEvent = JsonWrapper::GetProperty(root,
                                                        "recon_events",
                                                      JsonWrapper::arrayValue);
-      for (unsigned int n_event = 0; n_event < xRecEvent.size(); n_event++) { 
-        Json::Value xTofEvent = JsonWrapper::GetItem(xRecEvent, n_event, JsonWrapper::objectValue);
-        xTofEvent = JsonWrapper::GetProperty(xTofEvent, "tof_event", JsonWrapper::objectValue);
+      for (unsigned int n_event = 0; n_event < xRecEvent.size(); n_event++) {
+        Json::Value xTofEvent = JsonWrapper::GetItem
+                                 (xRecEvent, n_event, JsonWrapper::objectValue);
+        xTofEvent = JsonWrapper::GetProperty
+                             (xTofEvent, "tof_event", JsonWrapper::objectValue);
         if (xTofEvent.isMember("tof_slab_hits")) {
-          Json::Value xSlabHits = JsonWrapper::GetProperty(xTofEvent, "tof_slab_hits", JsonWrapper::objectValue);
+          Json::Value xSlabHits = JsonWrapper::GetProperty
+                         (xTofEvent, "tof_slab_hits", JsonWrapper::objectValue);
 
           // NOTE: DR March15
           // Cheating -- until I figure out how to handle trig-req-time in MC:
@@ -133,7 +136,8 @@ std::string MapCppTOFSpacePoints::process(std::string document) {
           for (unsigned int n_station = 0; n_station < _stationKeys.size(); n_station++) {
             std::string detector = _stationKeys[n_station];
             if (xSlabHits.isMember(detector))
-              root["recon_events"][n_event]["tof_event"]["tof_space_points"][detector] = processTOFStation(xSlabHits, detector, n_event);
+              root["recon_events"][n_event]["tof_event"]["tof_space_points"]
+                   [detector] = processTOFStation(xSlabHits, detector, n_event);
           }
           // The slab hit document is now modified. The calibrated time measurements are added.
           // Save the modifications.

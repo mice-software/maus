@@ -43,7 +43,7 @@ V1290Array Trigger::GetV1290Array() const {
     return _V1290;
 }
 
-V1290 Trigger::GetV1290ArrayElement(size_t index) const{
+V1290 Trigger::GetV1290ArrayElement(size_t index) const {
     return _V1290[index];
 }
 

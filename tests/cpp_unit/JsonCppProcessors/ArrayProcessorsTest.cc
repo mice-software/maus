@@ -115,7 +115,7 @@ TEST(ArrayProcessorsTest, PointerArrayCppToJsonNullTest) {
     for (int i = 0; i < 3; ++i) {
         vec.push_back(NULL);
     }
-    Json::Value* test_value = proc.CppToJson(vec);    
+    Json::Value* test_value = proc.CppToJson(vec);
     for (int i = 0; i < 3; ++i) {
         EXPECT_EQ((*test_value)[i], Json::Value());
     }

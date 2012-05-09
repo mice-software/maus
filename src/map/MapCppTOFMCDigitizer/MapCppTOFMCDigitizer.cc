@@ -108,9 +108,8 @@ std::string MapCppTOFMCDigitizer::process(std::string document) {
        tof_evt[i] = fill_tof_evt(i, snum, all_tof_digits);
        if (fDebug) {
           std::cout << "mcevt: " << i << " tof" << snum << " " << _hits.size()
-                    << " hits, " << all_tof_digits.size() << " digits" << std::endl;
+                    << " hits, " << all_tof_digits.size() << std::endl;
        }
-       //root["digits"][_stationKeys[snum]].append(tof_evt[i]);
        Json::Value tof_digs = fill_tof_evt(i, snum, all_tof_digits);
        root["recon_events"][i]["tof_event"]["tof_digits"][_stationKeys[snum]]
                                                                      = tof_digs;
@@ -141,7 +140,8 @@ std::vector<Json::Value> MapCppTOFMCDigitizer::make_tof_digits(Json::Value hits)
 
       if (fDebug) {
          std::cout << "tofhit: " << hit["channel_id"] << " "
-                   << hit["position"] << " " << hit["momentum"] << " " << hit["time"] << std::endl;
+                   << hit["position"] << " " << hit["momentum"]
+                   << " " << hit["time"] << std::endl;
       }
 
       int stn = hit["channel_id"]["station_number"].asInt();
@@ -431,8 +431,8 @@ Json::Value MapCppTOFMCDigitizer::fill_tof_evt(int evnum, int snum,
       digit["trigger_request_leading_time"] =
                          all_tof_digits[i]["trigger_request_leading_time"].asInt();
       // ROGERS addition to maintain data integrity 03-May-2012
-      //  - trigger_leading_time 
-      //  - trigger_trailing_time 
+      //  - trigger_leading_time
+      //  - trigger_trailing_time
       //  - trigger_request_trailing_timr
       digit["trigger_leading_time"] = 0;
       digit["trigger_trailing_time"] = 0;

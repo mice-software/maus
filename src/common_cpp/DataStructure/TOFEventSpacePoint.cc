@@ -45,7 +45,7 @@ TOF0SpacePointArray TOFEventSpacePoint::GetTOF0SpacePointArray() const {
     return _tof0;
 }
 
-TOFSpacePoint TOFEventSpacePoint::GetTOF0SpacePointArrayElement(size_t index) const{
+TOFSpacePoint TOFEventSpacePoint::GetTOF0SpacePointArrayElement(size_t index) const {
     return _tof0[index];
 }
 
@@ -62,7 +62,7 @@ TOF1SpacePointArray TOFEventSpacePoint::GetTOF1SpacePointArray() const {
     return _tof1;
 }
 
-TOFSpacePoint TOFEventSpacePoint::GetTOF1SpacePointArrayElement(size_t index) const{
+TOFSpacePoint TOFEventSpacePoint::GetTOF1SpacePointArrayElement(size_t index) const {
     return _tof1[index];
 }
 
@@ -78,7 +78,7 @@ TOF2SpacePointArray TOFEventSpacePoint::GetTOF2SpacePointArray() const {
     return _tof2;
 }
 
-TOFSpacePoint TOFEventSpacePoint::GetTOF2SpacePointArrayElement(size_t index) const{
+TOFSpacePoint TOFEventSpacePoint::GetTOF2SpacePointArrayElement(size_t index) const {
     return _tof2[index];
 }
 

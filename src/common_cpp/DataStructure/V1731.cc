@@ -16,7 +16,6 @@
 
 #include "src/common_cpp/DataStructure/V1731.hh"
 
-
 namespace MAUS {
 
 V1731::V1731()
@@ -76,7 +75,7 @@ SampleArray V1731::GetSampleArray() const {
     return _samples;
 }
 
-int V1731::GetSampleArrayElement(size_t index) const{
+int V1731::GetSampleArrayElement(size_t index) const {
     return _samples[index];
 }
 

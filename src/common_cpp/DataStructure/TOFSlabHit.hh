@@ -17,9 +17,11 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_TOFSLABHIT_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_TOFSLABHIT_
 
-#include "Rtypes.h"  // ROOT
-#include "src/common_cpp/DataStructure/Pmt1.hh"
 #include <string>
+
+#include "Rtypes.h"  // ROOT
+
+#include "src/common_cpp/DataStructure/Pmt1.hh"
 #include "src/common_cpp/DataStructure/Pmt0.hh"
 
 namespace MAUS {

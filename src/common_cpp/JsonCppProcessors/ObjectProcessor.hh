@@ -19,6 +19,7 @@
 
 #include <vector>
 #include <string>
+#include <map>
 
 #include "json/json.h"
 

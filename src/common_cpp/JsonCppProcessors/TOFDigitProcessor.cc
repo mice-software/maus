@@ -30,16 +30,20 @@ TOFDigitProcessor::TOFDigitProcessor()
           ("pmt", &_pmt_proc, &TOFDigit::GetPmt,
           &TOFDigit::SetPmt, true);
     RegisterValueBranch
-          ("trigger_leading_time", &_trigger_leading_time_proc, &TOFDigit::GetTriggerLeadingTime,
+          ("trigger_leading_time", &_trigger_leading_time_proc,
+          &TOFDigit::GetTriggerLeadingTime,
           &TOFDigit::SetTriggerLeadingTime, true);
     RegisterValueBranch
-          ("trigger_request_leading_time", &_trigger_request_leading_time_proc, &TOFDigit::GetTriggerRequestLeadingTime,
+          ("trigger_request_leading_time", &_trigger_request_leading_time_proc,
+          &TOFDigit::GetTriggerRequestLeadingTime,
           &TOFDigit::SetTriggerRequestLeadingTime, true);
     RegisterValueBranch
-          ("trigger_trailing_time", &_trigger_trailing_time_proc, &TOFDigit::GetTriggerTrailingTime,
+          ("trigger_trailing_time", &_trigger_trailing_time_proc,
+          &TOFDigit::GetTriggerTrailingTime,
           &TOFDigit::SetTriggerTrailingTime, true);
     RegisterValueBranch
-          ("trigger_request_trailing_time", &_trigger_request_trailing_time_proc, &TOFDigit::GetTriggerRequestTrailingTime,
+          ("trigger_request_trailing_time", &_trigger_request_trailing_time_proc,
+          &TOFDigit::GetTriggerRequestTrailingTime,
           &TOFDigit::SetTriggerRequestTrailingTime, true);
     RegisterValueBranch
           ("charge_mm", &_charge_mm_proc, &TOFDigit::GetChargeMm,
@@ -54,7 +58,8 @@ TOFDigitProcessor::TOFDigitProcessor()
           ("charge_pm", &_charge_pm_proc, &TOFDigit::GetChargePm,
           &TOFDigit::SetChargePm, false);
     RegisterValueBranch
-          ("phys_event_number", &_phys_event_number_proc, &TOFDigit::GetPhysEventNumber,
+          ("phys_event_number", &_phys_event_number_proc,
+          &TOFDigit::GetPhysEventNumber,
           &TOFDigit::SetPhysEventNumber, true);
     RegisterValueBranch
           ("station", &_station_proc, &TOFDigit::GetStation,
@@ -69,10 +74,12 @@ TOFDigitProcessor::TOFDigitProcessor()
           ("tof_key", &_tof_key_proc, &TOFDigit::GetTofKey,
           &TOFDigit::SetTofKey, true);
     RegisterValueBranch
-          ("trigger_time_tag", &_trigger_time_tag_proc, &TOFDigit::GetTriggerTimeTag,
+          ("trigger_time_tag", &_trigger_time_tag_proc,
+          &TOFDigit::GetTriggerTimeTag,
           &TOFDigit::SetTriggerTimeTag, true);
     RegisterValueBranch
-          ("part_event_number", &_part_event_number_proc, &TOFDigit::GetPartEventNumber,
+          ("part_event_number", &_part_event_number_proc,
+          &TOFDigit::GetPartEventNumber,
           &TOFDigit::SetPartEventNumber, true);
     RegisterValueBranch
           ("slab", &_slab_proc, &TOFDigit::GetSlab,

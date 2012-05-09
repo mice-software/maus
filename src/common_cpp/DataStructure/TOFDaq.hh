@@ -17,10 +17,12 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_TOFDAQ_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_TOFDAQ_
 
-#include "src/common_cpp/DataStructure/V1724.hh"
-#include "Rtypes.h"  // ROOT
 #include <vector>
+
+#include "Rtypes.h"  // ROOT
+
 #include "src/common_cpp/DataStructure/V1290.hh"
+#include "src/common_cpp/DataStructure/V1724.hh"
 
 namespace MAUS {
 // Needed for ROOT

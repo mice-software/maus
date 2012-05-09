@@ -43,7 +43,7 @@ V1724Array Tag::GetV1724Array() const {
     return _V1724;
 }
 
-V1724 Tag::GetV1724ArrayElement(size_t index) const{
+V1724 Tag::GetV1724ArrayElement(size_t index) const {
     return _V1724[index];
 }
 

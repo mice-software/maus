@@ -17,9 +17,11 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_CKOVEVENT_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_CKOVEVENT_
 
-#include "src/common_cpp/DataStructure/CkovDigit.hh"
-#include "Rtypes.h"  // ROOT
 #include <vector>
+
+#include "Rtypes.h"  // ROOT
+
+#include "src/common_cpp/DataStructure/CkovDigit.hh"
 
 namespace MAUS {
 // Needed for ROOT

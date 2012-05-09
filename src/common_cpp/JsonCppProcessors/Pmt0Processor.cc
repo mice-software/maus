@@ -37,7 +37,8 @@ Pmt0Processor::Pmt0Processor()
           ("tof_key", &_tof_key_proc, &Pmt0::GetTofKey,
           &Pmt0::SetTofKey, true);
     RegisterValueBranch
-          ("trigger_request_leading_time", &_trigger_request_leading_time_proc, &Pmt0::GetTriggerRequestLeadingTime,
+          ("trigger_request_leading_time", &_trigger_request_leading_time_proc,
+          &Pmt0::GetTriggerRequestLeadingTime,
           &Pmt0::SetTriggerRequestLeadingTime, true);
 }
 }  // namespace MAUS
