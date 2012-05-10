@@ -54,7 +54,7 @@ class InputPySpillGeneratorTestCase(unittest.TestCase):
         for doc in my_input.emitter():
             json_doc = json.loads(doc)
             n_spills += 1
-            self.assertEqual(json_doc, {"run_num":7, "spill_num":n_spills,
+            self.assertEqual(json_doc, {"run_number":7, "spill_number":n_spills,
                                         "daq_event_type":"physics_event"})
         self.assertEqual(n_spills, 100)
         self.assertTrue(my_input.death())

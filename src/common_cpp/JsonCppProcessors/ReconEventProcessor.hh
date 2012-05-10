@@ -19,25 +19,20 @@
 
 #include "json/value.h"
 
+#include "src/common_cpp/JsonCppProcessors/PrimitivesProcessors.hh"
 #include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
+
+#include "src/common_cpp/JsonCppProcessors/TOFEventProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/SciFiEventProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/CkovEventProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/KLEventProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/EMREventProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/TriggerEventProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/GlobalEventProcessor.hh"
 
 #include "src/common_cpp/DataStructure/ReconEvent.hh"
 
 namespace MAUS {
-
-class TOFEventProcessor : public ObjectProcessor<TOFEvent> {};
-
-class SciFiEventProcessor : public ObjectProcessor<SciFiEvent> {};
-
-class CkovEventProcessor : public ObjectProcessor<CkovEvent> {};
-
-class KLEventProcessor : public ObjectProcessor<KLEvent> {};
-
-class EMREventProcessor : public ObjectProcessor<EMREvent> {};
-
-class TriggerEventProcessor : public ObjectProcessor<TriggerEvent> {};
-
-class GlobalEventProcessor : public ObjectProcessor<GlobalEvent> {};
 
 /** @class ReconEventProcessor processes the data for ReconEvent class
  *  
@@ -51,8 +46,9 @@ class ReconEventProcessor : public ObjectProcessor<ReconEvent> {
     ReconEventProcessor();
 
   private:
+    IntProcessor _int_proc;
     TOFEventProcessor _tof_proc;
-    SciFiEventProcessor _scifi_proc;
+    SciFiEventProcessor _sci_fi_proc;
     CkovEventProcessor _ckov_proc;
     KLEventProcessor _kl_proc;
     EMREventProcessor _emr_proc;

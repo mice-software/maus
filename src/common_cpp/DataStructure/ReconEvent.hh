@@ -21,21 +21,15 @@
 
 #include "Rtypes.h" // ROOT
 
+#include "src/common_cpp/DataStructure/TOFEvent.hh"
+#include "src/common_cpp/DataStructure/SciFiEvent.hh"
+#include "src/common_cpp/DataStructure/CkovEvent.hh"
+#include "src/common_cpp/DataStructure/KLEvent.hh"
+#include "src/common_cpp/DataStructure/EMREvent.hh"
+#include "src/common_cpp/DataStructure/TriggerEvent.hh"
+#include "src/common_cpp/DataStructure/GlobalEvent.hh"
+
 namespace MAUS {
-
-class TOFEvent {};  // placeholder for the Tof Event
-
-class SciFiEvent {};  // placeholder for the SciFi Event
-
-class CkovEvent {};  // placeholder for the Ckov Event
-
-class KLEvent {};  // placeholder for the KL Event
-
-class EMREvent {};  // placeholder for the EMR Event
-
-class TriggerEvent {};  // placeholder for the Trigger Event
-
-class GlobalEvent {};  // placeholder for the Global recon event
 
 /** @class ReconEvent contains reconstruction data pertaining to a DAQ particle
  *         event
@@ -57,6 +51,12 @@ class ReconEvent {
 
     /** Destructor */
     virtual ~ReconEvent();
+
+    /** Get the DAQ particle event number */
+    int GetPartEventNumber() const;
+
+    /** Set the DAQ particle event number */
+    void SetPartEventNumber(int event);
 
     /** Get the TOF detector event */
     TOFEvent* GetTOFEvent() const;
@@ -109,6 +109,8 @@ class ReconEvent {
     EMREvent* _emr_event;
     TriggerEvent* _trigger_event;
     GlobalEvent* _global_event;
+
+    int _part_event_number;
 
     ClassDef(ReconEvent, 1)
 };

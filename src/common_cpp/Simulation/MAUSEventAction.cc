@@ -33,7 +33,7 @@ MAUSEventAction::MAUSEventAction()
 void MAUSEventAction::BeginOfEventAction(const G4Event *anEvent) {
     _virtPlanes->StartOfEvent();
     if (_tracking->GetWillKeepTracks())
-        _tracking->SetTracks(Json::Value(Json::objectValue));
+        _tracking->SetTracks(Json::Value(Json::arrayValue));
     if (_stepping->GetWillKeepSteps())
         _stepping->SetSteps(Json::Value(Json::arrayValue));
     _geometry->ClearSDHits();

@@ -67,14 +67,17 @@ class MapCppTOFSpacePointsTestCase(unittest.TestCase): #pylint: disable = R0904
         spill_out = json.loads(result)
         self.assertFalse('space_points' in spill_out)
 
+    def __get_space_point(self, spill, tof, event): # pylint: disable=R0201
+        """Return the space point for given tof and particle event"""
+        return spill['recon_events'][event]['tof_event']\
+                                            ['tof_space_points']['tof'+str(tof)]
+
     def __test_process_tof_0(self, spill_out):
         """Check the MapCppTOFSpacePoints process function for tof0"""
-        n_part_events = len(spill_out['space_points']['tof0'])
-        self.assertEqual(n_part_events, 4)
-        self.assertFalse(spill_out['space_points']['tof0'][0])
-        self.assertFalse(spill_out['space_points']['tof0'][2])
-        self.assertFalse(spill_out['space_points']['tof0'][3])
-        part_ev1_tof0 = spill_out['space_points']['tof0'][1]
+        self.assertFalse(self.__get_space_point(spill_out, 0, 0))
+        self.assertFalse(self.__get_space_point(spill_out, 0, 2))
+        self.assertFalse(self.__get_space_point(spill_out, 0, 3))
+        part_ev1_tof0 = self.__get_space_point(spill_out, 0, 1)
         self.assertEqual(len(part_ev1_tof0), 2)
         # test the calculations
         sp_time = (-11.025 -10.075 -11.025 -11.075)/4.
@@ -92,23 +95,19 @@ class MapCppTOFSpacePointsTestCase(unittest.TestCase): #pylint: disable = R0904
 
     def __test_process_tof_1(self, spill_out):
         """Check the MapCppTOFSpacePoints process function for tof1"""
-        n_part_events = len(spill_out['space_points']['tof1'])
-        self.assertEqual(n_part_events, 4)
-        self.assertFalse(spill_out['space_points']['tof1'][2])
-        self.assertFalse(spill_out['space_points']['tof1'][3])
-        part_ev0_tof1 = spill_out['space_points']['tof1'][0]
-        part_ev1_tof1 = spill_out['space_points']['tof1'][1]
+        self.assertFalse(self.__get_space_point(spill_out, 1, 2))
+        self.assertFalse(self.__get_space_point(spill_out, 1, 3))
+        part_ev0_tof1 = self.__get_space_point(spill_out, 1, 0)
+        part_ev1_tof1 = self.__get_space_point(spill_out, 1, 1)
         self.assertEqual(len(part_ev0_tof1), 2)
         self.assertEqual(len(part_ev1_tof1), 1)
 
     def __test_process_tof_2(self, spill_out):
         """Check the MapCppTOFSpacePoints process function for tof2"""
-        n_part_events = len(spill_out['space_points']['tof2'])
-        self.assertEqual(n_part_events, 4)
-        self.assertFalse(spill_out['space_points']['tof2'][0])
-        self.assertFalse(spill_out['space_points']['tof2'][1])
-        self.assertFalse(spill_out['space_points']['tof2'][3])
-        part_ev2_tof2 = spill_out['space_points']['tof2'][2]
+        self.assertFalse(self.__get_space_point(spill_out, 2, 0))
+        self.assertFalse(self.__get_space_point(spill_out, 2, 1))
+        self.assertFalse(self.__get_space_point(spill_out, 2, 3))
+        part_ev2_tof2 = self.__get_space_point(spill_out, 2, 2)
         self.assertEqual(len(part_ev2_tof2), 1)
 
     def test_process(self):

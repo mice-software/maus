@@ -24,7 +24,8 @@ import json
 
 MAUS_ROOT_DIR = os.getenv("MAUS_ROOT_DIR")
 ANA_PATH = os.path.join(MAUS_ROOT_DIR, "bin", "analyze_data_offline.py")
-OUT_PATH = os.path.join(MAUS_ROOT_DIR, "tmp", "analysis.out")
+OUT_PATH = os.path.join(MAUS_ROOT_DIR, "tmp", "test_analyze_data_offline")
+CONV_PATH = os.path.join(MAUS_ROOT_DIR, "bin", "utilities", "root_to_json.py")
 
 class AnalyzeOfflineTest(unittest.TestCase): # pylint: disable = R0904
     """
@@ -39,10 +40,14 @@ class AnalyzeOfflineTest(unittest.TestCase): # pylint: disable = R0904
             os.remove(OUT_PATH)
         except OSError:
             pass
-        subproc = subprocess.Popen([ANA_PATH, "-output_json_file_name",
-                                    OUT_PATH])
+        subproc = subprocess.Popen([ANA_PATH, "-output_root_file_name",
+                                    OUT_PATH+".root"])
         subproc.wait()
-        fin = open(OUT_PATH)
+        subproc = subprocess.Popen([CONV_PATH,
+                                    "-input_root_file_name", OUT_PATH+".root",
+                                    "-output_json_file_name", OUT_PATH+".json"])
+        subproc.wait()
+        fin = open(OUT_PATH+".json")
         all_lines = fin.readlines()
         self.assertGreater(len(all_lines), 0)
         for line in all_lines:

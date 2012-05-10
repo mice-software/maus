@@ -1,10 +1,5 @@
 #!/usr/bin/env python
 
-#################################################################
-###!!! YOU ARE NOT ALLOWED TO MODIFY THIS FILE DIRECTLY    !!!###
-###!!! PLEASE MAKE A COPY OF THIS FILE WITH THE CP COMMAND !!!###
-#################################################################
-
 """Simulate the MICE experiment, saving ADC/TDC counts as histograms
 
 This will simulate 'number_of_spills' MICE events through the entirity

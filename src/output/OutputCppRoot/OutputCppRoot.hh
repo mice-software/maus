@@ -23,7 +23,7 @@
 // TODO (Rogers): looks okay - but throws a segmentation fault if we forget to
 //                call death(); needs proper error handler calling
 
-class Spill;
+class Data;
 class JsonCppConverter;
 class orstream;
 
@@ -66,7 +66,7 @@ class OutputCppRoot {
 
  private:
   orstream* _outfile;
-  Spill* _spill;
+  Data* _data;
   JsonCppConverter* _jsonCppConverter;
   std::string _classname;
 };
