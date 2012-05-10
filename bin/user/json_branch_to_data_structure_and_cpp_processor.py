@@ -14,6 +14,51 @@
 # along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+"""
+json_branch_to_ ... builds a C++ tree from a json data file.
+
+json_branch_to_ ... builds both the C++ classes necessary to represent the data
+file in C++, a set of converters that will perform conversions between C++ and
+JSON, and a .dot file that can be used to create a graphical representation of
+the data tree.
+
+Output files are placed in 
+DATA_DIR - for DataStructure files
+PROC_DIR - for Json <-> C++ converter files
+Generally one file/class is created for each object (python dictionary) at each
+branch in the tree. Arrays (python lists) are handled by STL vectors.
+
+Note that this script is intended to create a framework that can be developed
+on top of, but it is intended that a real person checks the output and makes
+alterations, for example specifying that some branches are optional, tweaking
+names, etc.
+
+The script is not tested.
+
+Several classes are implemented:
+- DataStructureItem performs the analysis of the data structure at a particular
+  level in the tree. DataStructureItem is called recursively on the tree to
+  build a representation of a given data structure. There is some class data
+  in here which can be used to e.g. override the default naming scheme for
+  classes. 
+- DataStructureDeclaration handles the header file of a class in the data
+  structure. There is one main member function, class_declaration(...), which
+  generates the file.
+- DataStructureImplementation handles the source file of a class in the data
+  structure. There is one main member function, class_implementation(...), which
+  generates the file.
+- JsonCppProcessorDeclaration handles the header file of the C++ <-> JSON 
+  converter. There is one main member function, class_declaration(...), which
+  generates the file.
+- JsonCppProcessorImplementation handles the source file of each C++ <-> JSON
+  converter. There is one main member function, class_implementation(...), which
+  generates the file.
+- DotGenerator handles the generation of the dot (graphviz) file.
+
+The main() function works as an example for calling the code... note that there
+are some hardcoded input files in here (hack as you see fit).
+"""
+
 import logging
 import string
 import os   
@@ -37,16 +82,6 @@ COPYRIGHT= """/* This file is part of MAUS: http://micewww.pp.rl.ac.uk/projects/
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 """
-
-TEST_BRANCH = {
-    "a_float":1.,
-    "a_object":{},
-    "a_string":"",
-    "a_bool":True,
-    "a_int":1,
-    "a_list":[],
-    "a_pointer":1,
-}
 
 DATA_DIR = "/home/cr67/MAUS/work/delete/DataStructure"
 PROC_DIR = "/home/cr67/MAUS/work/delete/JsonCppProcessors"
@@ -285,7 +320,8 @@ class DataStructureImplementation:
     def copy_constructor(self):
         ctor = self.class_name+"::"+self.class_name+\
                              "(const "+self.class_name+"& "+self.class_var+")"
-        ctor += self.__get_initialisation()+" {\n"
+        ctor += self.__get_initialisation(
+)+" {\n"
         ctor += "    *this = "+self.class_var+";\n}"
         return ctor
 
@@ -331,10 +367,6 @@ class DataStructureImplementation:
                 class_out += "\n\n"+self.setter(var)
         class_out += "\n"+self.bottom_matter()
         return class_out
-
-class DataStructureTest:
-    def __init__(self, class_name, variables):
-      self.class_name = 
 
 class JsonCppProcessorDeclaration:
     def __init__(self, class_name, variables):
