@@ -32,7 +32,7 @@ def main():
     print "Generating some data"
     my_file_name = os.path.join\
              (os.environ["MAUS_ROOT_DIR"], "tmp", "example_load_root_file.root")
-    #generate_some_data(my_file_name)
+    generate_some_data(my_file_name)
     
     # now load the ROOT file
     print "Loading ROOT file", my_file_name
