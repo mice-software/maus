@@ -97,18 +97,18 @@ TEST_F(MAUSSteppingActionTest, UserSteppingActionMaxNStepsTest) {
                (conf, "maximum_number_of_steps", JsonWrapper::intValue).asInt();
   MAUSTrackingAction* tracking = MAUSGeant4Manager::GetInstance()->GetTracking();
   tracking->SetWillKeepTracks(true);
-  tracking->SetTracks(Json::Value(Json::objectValue));
+  tracking->SetTracks(Json::Value(Json::arrayValue));
   tracking->PreUserTrackingAction(step->GetTrack());
   stepping->SetSteps(Json::Value(Json::arrayValue));
   stepping->UserSteppingAction(step);
 
-  ASSERT_TRUE(tracking->GetTracks()["track_0"].isObject());
-  EXPECT_TRUE(tracking->GetTracks()["track_0"]["KillReason"].type() ==
-                                                             Json::nullValue);
+  ASSERT_TRUE(tracking->GetTracks()[Json::Value::UInt(0)].isObject());
+  EXPECT_TRUE(tracking->GetTracks()[Json::Value::UInt(0)]["KillReason"].type()
+                                                            == Json::nullValue);
   for (int i = 0; i < maxNSteps+1; ++i)
     track->IncrementCurrentStepNumber();
   stepping->UserSteppingAction(step);
-  EXPECT_EQ(tracking->GetTracks()["track_0"]["KillReason"].type(),
+  EXPECT_EQ(tracking->GetTracks()[Json::Value::UInt(0)]["KillReason"].type(),
                                                              Json::stringValue);
   EXPECT_EQ(track->GetTrackStatus(), fStopAndKill);
 

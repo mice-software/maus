@@ -19,7 +19,7 @@
 namespace MAUS {
 
 SciFiChannelIdProcessor::SciFiChannelIdProcessor() {
-    RegisterValueBranch("fiber_number", &_int_proc,
+    RegisterValueBranch("fibre_number", &_int_proc,
                         &SciFiChannelId::GetFiberNumber,
                         &SciFiChannelId::SetFiberNumber, true);
     RegisterValueBranch("station_number", &_int_proc,

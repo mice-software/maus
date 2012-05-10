@@ -44,8 +44,9 @@ class TestOutputCppRoot(unittest.TestCase): # pylint: disable=R0904
         self.test_data = {
             "scalars":{},
             "emr_spill_data":{},
-            "daq_data":{},
             "spill_number":1,
+            "run_number":1,
+            "daq_event_type":"physics_event",
             "recon_events":[],
             "mc_events":[]
         }

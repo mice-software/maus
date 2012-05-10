@@ -34,6 +34,7 @@ PLOT_DIR = os.path.join(MAUS_ROOT_DIR, "tests", "integration", \
 TEST_DIR = os.path.join(MAUS_ROOT_DIR, "tests", "integration", \
                                     "test_simulation", "test_physics_model")
 SETUP_DONE = False
+CONV_PATH = os.path.join(MAUS_ROOT_DIR, "bin", "utilities", "root_to_json.py")
 
 def make_plot_dir():
     """
@@ -52,7 +53,7 @@ def run_simulation(ref_phys, phys, dec, pi_half, mu_half, prod): #pylint: disabl
     out_name = os.path.join(MAUS_ROOT_DIR, "tmp", "simulation.")
     for value in [ref_phys, phys, dec, pi_half, mu_half]:
         out_name += str(value)+"_"
-    out_name += str(prod)+".out"
+    out_name += str(prod)
     log_file = open(out_name+".log", "w")
     config = os.path.join(TEST_DIR, 'physics_model_config.py')
     proc = subprocess.Popen([SIM_PATH, '-configuration_file', config, 
@@ -62,10 +63,15 @@ def run_simulation(ref_phys, phys, dec, pi_half, mu_half, prod): #pylint: disabl
       "-charged_pion_half_life", str(pi_half),
       "-muon_half_life", str(mu_half),
       "-production_threshold", str(prod),
-      "-output_json_file_name", str(out_name),
-    ], stdout=log_file)
+      "-output_root_file_name", str(out_name)+".root",
+    ], stdout=log_file, stderr=subprocess.STDOUT)
     proc.wait()
-    return out_name
+    proc = subprocess.Popen([CONV_PATH,
+                            "-input_root_file_name", str(out_name)+".root",
+                            "-output_json_file_name", str(out_name)+".json"],
+                            stdout=log_file)
+    proc.wait()
+    return out_name+".json"
 
 
 class PhysicsModelTest(unittest.TestCase): # pylint: disable = R0904

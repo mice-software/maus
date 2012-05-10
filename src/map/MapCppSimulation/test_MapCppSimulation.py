@@ -88,7 +88,7 @@ class MapCppSimulationTestCase(unittest.TestCase):
 
     def test_mc_bad_type(self):
         """Check mapper runs for mc with wrong type, returning an error"""
-        result = self.mapper.process("""{"mc" : 0.0}""")
+        result = self.mapper.process("""{"mc_events" : 0.0}""")
         doc = json.loads(result)
         self.assertIn("errors", doc)
         self.assertIn("MapCppSimulation", doc["errors"])
@@ -96,16 +96,16 @@ class MapCppSimulationTestCase(unittest.TestCase):
     def test_mc_good(self):
         """
         Check mapper runs for mc good. Check it tracks primaries by testing
-        the initial value of track_1, etc
+        the initial value of track[0], etc
         """
         good_event = {
-            "mc":[self.particle,self.particle]
+            "mc_events":[self.particle,self.particle]
         }
         result = self.mapper.process(json.dumps(good_event))
         doc = json.loads(result)
         self.assertNotIn("errors", doc)
-        ev_0 = doc["mc"][0]["tracks"]["track_1"]
-        ev_1 = doc["mc"][1]["tracks"]["track_1"]
+        ev_0 = doc["mc_events"][0]["tracks"][0]
+        ev_1 = doc["mc_events"][1]["tracks"][0]
         for event in [ev_0, ev_1]:
             for pos in ["x", "y", "z"]:
                 self.assertAlmostEqual(

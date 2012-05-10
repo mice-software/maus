@@ -18,6 +18,8 @@
 #define _SRC_COMMON_CPP_DATASTRUCTURE_MAUS_SPILL_HH_
 
 #include <vector>
+#include <map>
+#include <string>
 
 #include "Rtypes.h"
 
@@ -30,11 +32,12 @@
 namespace MAUS {
 typedef std::vector<ReconEvent*> ReconEventArray;
 typedef std::vector<MCEvent*> MCEventArray;
+typedef std::map<std::string, std::string> ErrorsMap;
 
 /** @class Spill stores data for all items in a given spill
  *
  *  The Spill is the fundamental "event" type for MAUS. Branches for spill-level
- *  objects; Scalars, DAQ, EMR, plus Recon event and MC Event
+ *  objects; Scalars, DAQ, EMR, plus Recon event and MC Event vectors.
  */
 class Spill {
  public:
@@ -74,17 +77,55 @@ class Spill {
   /** Get the MC events */
   MCEventArray* GetMCEvents() const;
 
+  /** Get a single MC event (needed for PyROOT) */
+  MCEvent& GetAnMCEvent(size_t i) const {
+    return (*(*_mc)[i]);
+  }
+
+  /** Get the MC event size (needed for PyROOT)*/
+  size_t GetMCEventSize() const {
+    return _mc->size();
+  }
+
   /** Set the Recon events */
   void SetReconEvents(ReconEventArray* ReconEvent);
 
   /** Get the Recon events */
   ReconEventArray* GetReconEvents() const;
 
+  /** Get a single Recon event (needed for PyROOT) */
+  ReconEvent& GetAReconEvent(int i) const {
+    return (*(*_recon)[i]);
+  }
+
+  /** Get the Recon event size (needed for PyROOT)*/
+  size_t GetReconEventSize() const {
+    return _recon->size();
+  }
+
   /** Set the spill number */
   void SetSpillNumber(int spill);
 
   /** Get the spill number */
   int GetSpillNumber() const;
+
+  /** Set the event type */
+  void SetDaqEventType(std::string type);
+
+  /** Get the event type */
+  std::string GetDaqEventType() const;
+
+  /** Set the run number */
+  void SetRunNumber(int run);
+
+  /** Get the run number */
+  int GetRunNumber() const;
+
+  /** Set the errors on this spill */
+  void SetErrors(ErrorsMap errors);
+
+  /** Get the errors on this spill */
+  ErrorsMap GetErrors() const;
 
  private:
   DAQData* _daq;
@@ -93,6 +134,11 @@ class Spill {
   MCEventArray* _mc;
   ReconEventArray* _recon;
   int _spill_number;
+  int _run_number;
+  std::string _daq_event_type;
+
+  std::map<std::string, std::string> _errors;
+
   ClassDef(Spill, 1)
 };
 }

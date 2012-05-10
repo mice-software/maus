@@ -1,10 +1,5 @@
 #!/usr/bin/env python
 
-#################################################################
-###!!! YOU ARE NOT ALLOWED TO MODIFY THIS FILE DIRECTLY    !!!###
-###!!! PLEASE MAKE A COPY OF THIS FILE WITH THE CP COMMAND !!!###
-#################################################################
-
 """
 Simple example showing use of ReducePyScalersTable and OutputPyJSON.
 """

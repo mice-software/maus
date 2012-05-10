@@ -16,9 +16,7 @@ class MapPyDoNothingTestCase(unittest.TestCase):
 
     def test_empty(self):
         result = self.mapper.process("")
-        doc = json.loads(result)
-        self.assertTrue("errors" in doc)
-        self.assertTrue("bad_json_document" in doc["errors"])        
+        self.assertTrue(result == "")
 
     def test_document(self):
         result = self.mapper.process(self.testString)
