@@ -225,10 +225,10 @@ PrimaryGeneratorParticle(const TrackPoint & point, const int pid) {
 }
 
 std::ostream& operator<<(std::ostream& out, const TrackPoint& vector) {
-  out << "t: " << vector[0]  << "E: "   << vector[1]
-      << "x: " << vector[2]  << "Px: "  << vector[3]
-      << "y: " << vector[4]  << "Py: "  << vector[5]
-      << "z: " << vector.z() << "Pz: "  << vector.Pz();
+  out << "t: " << vector[0]  << " E: "   << vector[1]
+      << " x: " << vector[2]  << " Px: "  << vector[3]
+      << " y: " << vector[4]  << " Py: "  << vector[5]
+      << " z: " << vector.z() << " Pz: "  << vector.Pz();
   return out;
 }
 

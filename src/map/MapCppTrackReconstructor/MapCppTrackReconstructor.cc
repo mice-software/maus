@@ -67,7 +67,6 @@ MapCppTrackReconstructor::~MapCppTrackReconstructor() {
 }
 
 bool MapCppTrackReconstructor::birth(std::string configuration) {
-std::cout << "Entering MapCppTrackReconstructor::birth()" << std::endl;
   // parse the JSON document.
   try {
     configuration_ = JsonWrapper::StringToJson(configuration);
@@ -81,12 +80,10 @@ std::cout << "Entering MapCppTrackReconstructor::birth()" << std::endl;
       exc, MapCppTrackReconstructor::kClassname);
   }
 
-std::cout << "Leaving MapCppTrackReconstructor::birth()" << std::endl;
   return true;  // Sucessful parsing
 }
 
 std::string MapCppTrackReconstructor::process(std::string run_data) {
-std::cout << "Entering MapCppTrackReconstructor::process()" << std::endl;
   // parse the JSON document.
   try {
     run_data_ = Json::Value(JsonWrapper::StringToJson(run_data));
@@ -96,7 +93,6 @@ std::cout << "Entering MapCppTrackReconstructor::process()" << std::endl;
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, kClassname);
   }
 
-std::cout << "CHECKPOINT(-1) MapCppTrackReconstructor::process()" << std::endl;
   // Populate ReconstructionInput instance from JSON data
   Json::Value data_acquisition_mode_names = JsonWrapper::GetProperty(
       configuration_,
@@ -131,7 +127,6 @@ return output;
 */
   }
 
-std::cout << "CHECKPOINT(-0.5) MapCppTrackReconstructor::process()" << std::endl;
   // TODO(plane1@hawk.iit.edu) Implement Kalman Filter and TOF track fitters
   //  in addition to Minuit, and select between them based on the configuration
  
@@ -140,7 +135,6 @@ std::cout << "CHECKPOINT(-0.5) MapCppTrackReconstructor::process()" << std::endl
   CorrelateTrackPoints(tracks);
   
   int particle_id;
-std::cout << "CHECKPOINT(0) MapCppTrackReconstructor::process()" << std::endl;
   if (reconstruction_input_->beam_polarity_negative()) {
     particle_id = Particle::kMuMinus;
   } else {
@@ -172,7 +166,6 @@ std::cout << "CHECKPOINT(0) MapCppTrackReconstructor::process()" << std::endl;
   Json::FastWriter writer;
   std::string output = writer.write(run_data_);
 
-std::cout << "Leaving MapCppTrackReconstructor::process()" << std::endl;
   return output;
 }
 
@@ -331,7 +324,6 @@ void MapCppTrackReconstructor::SetupTrackFitter() {
 }
 
 void MapCppTrackReconstructor::LoadTestingData() {
-std::cout << "Entering MapCppTrackReconstructor::LoadTestingData()" << std::endl;
   // TODO(plane1@hawk.iit.edu) reconstruction_input_ = new ReconstructionInput(...);
   // Create random track points for TOF0, TOF1, Tracker 1, Tracker 2, and TOF 2
   srand((unsigned)time(NULL));
@@ -346,15 +338,14 @@ std::cout << "Entering MapCppTrackReconstructor::LoadTestingData()" << std::endl
 
   // generate mock detector info and random muon detector event data
   for (size_t id = Detector::kTOF0; id <= Detector::kCalorimeter; ++id) {
-    plane = ((double)rand()/(double)RAND_MAX) * 20;  // 0.0 - 20.0 meters
+    //plane = ((double)rand()/(double)RAND_MAX) * 20;  // 0.0 - 20.0 meters
+    plane = id * 1.4;  // 0.0 - 20.0 meters
     for (int index = 0; index < 36; ++index) {
       uncertainty_data[index] = ((double)rand()/(double)RAND_MAX) * 100;
     }
     CovarianceMatrix uncertainties(uncertainty_data);
     Detector detector(id, plane, uncertainties);
     detectors.push_back(detector);
-
-std::cout << "CHECKPOINT(0) MapCppTrackReconstructor::LoadTestingData()" << std::endl;
 
     // skip detectors we're not using
     if ((id == Detector::kCherenkov1) ||
@@ -371,24 +362,18 @@ std::cout << "CHECKPOINT(0) MapCppTrackReconstructor::LoadTestingData()" << std:
       momentum[coordinate] = ((double)rand()/(double)RAND_MAX) * 500;  // MeV
     }
 
-std::cout << "CHECKPOINT(+1) MapCppTrackReconstructor::LoadTestingData()" << std::endl;
-
     TrackPoint track_point(position[0], momentum[0],
                            position[1], momentum[1],
                            position[2], momentum[2],
                            position[3], momentum[3],
                            detector);
-std::cout << "CHECKPOINT(+1.25) MapCppTrackReconstructor::LoadTestingData()" << std::endl;
     events.push_back(track_point);
-std::cout << "CHECKPOINT(+1.5) MapCppTrackReconstructor::LoadTestingData()" << std::endl;
   }
 
 
-std::cout << "CHECKPOINT(+2) MapCppTrackReconstructor::LoadTestingData()" << std::endl;
   reconstruction_input_ = new ReconstructionInput(beam_polarity_negative,
                                                   detectors,
                                                   events);
-std::cout << "Leaving MapCppTrackReconstructor::LoadTestingData()" << std::endl;
 }
 
 void MapCppTrackReconstructor::LoadSimulationData() {

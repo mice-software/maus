@@ -42,6 +42,9 @@ void common_cpp_optics_reconstruction_minuit_track_fitter_score_function(
     Double_t & score,
     Double_t * phase_space_coordinate_values,
     Int_t      execution_stage_flag) {
+for (int index = 0; index < 6; ++index) {
+  std::cout << "Parameter " << index+1 << " value: " << phase_space_coordinate_values[index] << std::endl;
+}
   // common_cpp_optics_reconstruction_minuit_track_fitter_minuit is defined
   // globally in the header file
   TMinuit * minuit
@@ -59,21 +62,23 @@ MinuitTrackFitter::MinuitTrackFitter(
   // Setup *global* scope Minuit object
   common_cpp_optics_reconstruction_minuit_track_fitter_minuit
     = new TMinuit(kPhaseSpaceDimension);
+
   TMinuit * minimiser
     = common_cpp_optics_reconstruction_minuit_track_fitter_minuit;
   minimiser->SetMaxIterations(100);
-  int error_flag = 0;
+  minimiser->SetObjectFit(this);
+  minimiser->SetFCN(
+    common_cpp_optics_reconstruction_minuit_track_fitter_score_function);
+
   // setup the index, name, init value, step size, min, and max value for each
   // phase space variable (mins and maxes calculated from 800MeV/c ISIS beam)
+  int error_flag = 0;
   minimiser->mnparm(0, "Time", 20, 0.1, 0.001, 100, error_flag);   // ns
   minimiser->mnparm(1, "Energy", 900, 1, 105.7, 1860, error_flag);  // MeV
   minimiser->mnparm(2, "X", 0, 0.001, -1.5, 1.5, error_flag);      // m
   minimiser->mnparm(3, "Px", 900, 0.1, 30., 1860, error_flag);    // MeV/c
   minimiser->mnparm(4, "Y", 0, 0.001, -1.5, 1.5, error_flag);      // m
   minimiser->mnparm(5, "Py", 900, 0.1, 30., 1860, error_flag);    // MeV/c
-  minimiser->SetObjectFit(this);
-  minimiser->SetFCN(
-    common_cpp_optics_reconstruction_minuit_track_fitter_score_function);
 }
 
 MinuitTrackFitter::~MinuitTrackFitter() {
@@ -84,7 +89,9 @@ void MinuitTrackFitter::Fit(const Track & detector_events, Track & track) {
   detector_events_ = &detector_events;
   track_ = &track;
 
-  int particle_id = detector_events_->particle_id();
+  // TODO(plane1@hawk.iit.edu) Fit to multiple masses or use mass as a fit
+  // parameter to find the likely particle identity
+  int particle_id = Particle::kMuMinus;
   mass_ = Particle::GetInstance()->GetMass(particle_id);
 
   if (detector_events_->size() < 2) {
@@ -134,7 +141,9 @@ Double_t MinuitTrackFitter::ScoreTrack(
     // calculate the next guess
     transfer_map
       = optics_model_->GenerateTransferMap(start_plane, events->z(), mass_);
+std::cout << "Previous guess: " << guess << std::endl;
     guess = TrackPoint(transfer_map->Transport(guess));
+std::cout << "New guess: " << guess << std::endl;
     delete transfer_map;
 
     guess.FillInAxialCoordinates(mass_);
@@ -148,7 +157,11 @@ Double_t MinuitTrackFitter::ScoreTrack(
     // Sum the squares of the differences between the calculated phase space
     // coordinates and the measured coordinates.
     delta = TrackPoint(guess - (*events));
+std::cout << "event: " << (*events) << std::endl;
     chi_squared += (transpose(delta) * (*uncertainties) * delta)[0];
+std::cout << "delta: " << delta << std::endl;
+std::cout << "uncertainties: " << *uncertainties << std::endl;
+std::cout << "chi_squared: " << chi_squared << std::endl;
 
     start_plane = events->z();
     ++events;

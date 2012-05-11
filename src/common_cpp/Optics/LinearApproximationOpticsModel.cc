@@ -21,6 +21,7 @@
 
 #include <cmath>
 #include <vector>
+#include <iostream>
 
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
@@ -51,16 +52,24 @@ PhaseSpaceVector LinearApproximationTransferMap::Transport(
   // be if it were traveling in free space from start_plane_ to end_plane_.
   PhaseSpaceVector transported_vector(vector);
   double delta_z = end_plane_ - start_plane_;
-  // delta_t = delta_z / beta = delta_z * E / Pz
-  double delta_t = delta_z * vector.E()
-                 / ::sqrt(  vector.E()*vector.E()
-                          - mass_*mass_
-                          - vector.Px()*vector.Px()
-                          - vector.Py()*vector.Py());
+std::cout << "Delta Z: " << delta_z << std::endl;
+
+  const double momentum = ::sqrt(vector.E()*vector.E() - mass_*mass_);
+std::cout << "Momentum: " << momentum << std::endl;
+  const double velocity = ::CLHEP::c_light * momentum / vector.E();
+std::cout << "Velocity: " << velocity << std::endl;
+
+  // delta_t = delta_z / v_z ~= delta_z / velocity
+  double delta_t = delta_z / velocity;
+std::cout << "Delta T: " << delta_t << std::endl;
+
   // delta_x = v_x * delta_t
   double delta_x = vector.Px() * delta_t / mass_;
+std::cout << "Delta X: " << delta_x << std::endl;
+
   // delta_y = v_y * delta_t
   double delta_y = vector.Py() * delta_t / mass_;
+std::cout << "Delta Y: " << delta_y << std::endl;
 
   transported_vector[0] += delta_t;
   transported_vector[2] += delta_x;
