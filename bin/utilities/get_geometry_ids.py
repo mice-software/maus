@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+"""
+get_geometry_ids.py
+"""
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 # 
 #  MAUS is free software: you can redistribute it and/or modify
@@ -18,7 +22,10 @@ import cdb
 import os
 
 def main():
-    
+    """
+    This file prints either to screen or file a list of added geometries to the
+    configuration DB within the time period specified.
+    """
     configuration = Configreader()
     if configuration.get_ids_start_time == "":
         raise IOError('Start time not entered!')
@@ -27,7 +34,8 @@ def main():
     else:
         stop_time = configuration.get_ids_stop_time
     server = cdb.GeometrySuperMouse()
-    server_name = configuration.cdb_download_url + configuration.geometry_download_wsdl
+    server_name = configuration.cdb_download_url + \
+                                            configuration.geometry_download_wsdl
     server.set_url(server_name)
     id_dict = server.get_ids(configuration.get_ids_start_time, stop_time)
     id_numbers = id_dict.keys()
@@ -38,17 +46,22 @@ def main():
         fin = open(file_path, 'w')
         for num in range(0, length):
             fin.write("Geometry Number = " + str(id_numbers[num]) + '\n')
-            fin.write("Geometry Note   = " + str(id_dict[id_numbers[num]]['notes']) + '\n')
-            fin.write("ValidFrom       = " + str(id_dict[id_numbers[num]]['validFrom']) + '\n')
-            fin.write("Date Created    = " + str(id_dict[id_numbers[num]]['created']) + '\n\n')
+            fin.write("Geometry Note   = " + \
+                                  str(id_dict[id_numbers[num]]['notes']) + '\n')
+            fin.write("ValidFrom       = " + \
+                              str(id_dict[id_numbers[num]]['validFrom']) + '\n')
+            fin.write("Date Created    = " + \
+                              str(id_dict[id_numbers[num]]['created']) + '\n\n')
         fin.close()
         print "File saved to " + file_path
     else:
         for num in range(0, length):
             print "Geometry Number = " + str(id_numbers[num])
             print "Geometry Note   = " + str(id_dict[id_numbers[num]]['notes'])
-            print "ValidFrom       = " + str(id_dict[id_numbers[num]]['validFrom'])
-            print "Date Created    = " + str(id_dict[id_numbers[num]]['created']) + '\n'
+            print "ValidFrom       = " + \
+                                      str(id_dict[id_numbers[num]]['validFrom'])
+            print "Date Created    = " + \
+                                 str(id_dict[id_numbers[num]]['created']) + '\n'
         
 if __name__ == "__main__":
     main()
