@@ -87,6 +87,8 @@ class TrackPoint : public MAUS::PhaseSpaceVector {
 
   ~TrackPoint();
 
+  TrackPoint & operator=(const TrackPoint& rhs);
+
   const bool operator==(const TrackPoint& rhs) const;
 
   // *************************

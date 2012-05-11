@@ -34,6 +34,10 @@ class Detector {
            const double plane,
            const CovarianceMatrix & uncertainties);
 
+  Detector(const Detector & original_instance)
+      : id_(original_instance.id_), plane_(original_instance.plane_),
+        uncertainties_(original_instance.uncertainties_) { }
+
   ~Detector();
 
   const unsigned int id() const;

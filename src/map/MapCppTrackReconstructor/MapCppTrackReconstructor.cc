@@ -70,7 +70,7 @@ bool MapCppTrackReconstructor::birth(std::string configuration) {
 std::cout << "Entering MapCppTrackReconstructor::birth()" << std::endl;
   // parse the JSON document.
   try {
-    configuration_ = new Json::Value(JsonWrapper::StringToJson(configuration));
+    configuration_ = JsonWrapper::StringToJson(configuration);
     SetupOpticsModel();
     SetupTrackFitter();
   } catch(Squeal& squee) {
@@ -98,19 +98,37 @@ std::cout << "Entering MapCppTrackReconstructor::process()" << std::endl;
 
 std::cout << "CHECKPOINT(-1) MapCppTrackReconstructor::process()" << std::endl;
   // Populate ReconstructionInput instance from JSON data
-// FIXME(plane1@hawk.iit.edu) this if-else block is not working
-  if (run_data_.isMember("ReconstructionTestingData")) {
+  Json::Value data_acquisition_mode_names = JsonWrapper::GetProperty(
+      configuration_,
+      "data_acquisition_modes",
+      JsonWrapper::arrayValue);
+  Json::Value data_acquisition_mode = JsonWrapper::GetProperty(
+      configuration_,
+      "data_acquisition_mode",
+      JsonWrapper::stringValue);
+  if (data_acquisition_mode == "Testing") {
     LoadTestingData();
-  } else if (run_data_.isMember("mc")) {
+  } else if (data_acquisition_mode == "Simulation") {
     LoadSimulationData();
-  } else {
+  } else if (data_acquisition_mode == "Live") {
     LoadLiveData();
+  } else {
+    std::string message = "Invalid data acquisition mode: ";
+    message += data_acquisition_mode.asString();
+    throw(Squeal(Squeal::recoverable,
+                 message,
+                 "MapCppTrackReconstructor::process()"));
   }
-  
+
   if (reconstruction_input_ == NULL) {
+  Json::FastWriter writer;
+  std::string output = writer.write(run_data_);
+return output;
+/*
     throw(Squeal(Squeal::recoverable,
                  "Null reconstruction input.",
                  "MapCppTrackReconstructor::process()"));
+*/
   }
 
 std::cout << "CHECKPOINT(-0.5) MapCppTrackReconstructor::process()" << std::endl;
@@ -162,7 +180,7 @@ void MapCppTrackReconstructor::SetupOpticsModel() {
   Json::Value optics_model_names = JsonWrapper::GetProperty(
       configuration_,
       "reconstruction_optics_models",
-      JsonWrapper::stringValue);
+      JsonWrapper::arrayValue);
   Json::Value optics_model_name = JsonWrapper::GetProperty(
       configuration_,
       "reconstruction_optics_model",
@@ -262,7 +280,7 @@ void MapCppTrackReconstructor::SetupTrackFitter() {
   Json::Value fitter_names = JsonWrapper::GetProperty(
       configuration_,
       "reconstruction_track_fitters",
-      JsonWrapper::stringValue);
+      JsonWrapper::arrayValue);
   Json::Value fitter_name = JsonWrapper::GetProperty(
       configuration_,
       "reconstruction_track_fitter",
@@ -325,16 +343,18 @@ std::cout << "Entering MapCppTrackReconstructor::LoadTestingData()" << std::endl
   double uncertainty_data[36];
   std::vector<TrackPoint> events;
   double position[4], momentum[4];
-  Detector const * detector;
 
   // generate mock detector info and random muon detector event data
-  for (size_t id = 1; id <= Detector::kCalorimeter; ++id) {
+  for (size_t id = Detector::kTOF0; id <= Detector::kCalorimeter; ++id) {
     plane = ((double)rand()/(double)RAND_MAX) * 20;  // 0.0 - 20.0 meters
     for (int index = 0; index < 36; ++index) {
       uncertainty_data[index] = ((double)rand()/(double)RAND_MAX) * 100;
     }
     CovarianceMatrix uncertainties(uncertainty_data);
-    detectors.push_back(Detector(id, plane, uncertainties));
+    Detector detector(id, plane, uncertainties);
+    detectors.push_back(detector);
+
+std::cout << "CHECKPOINT(0) MapCppTrackReconstructor::LoadTestingData()" << std::endl;
 
     // skip detectors we're not using
     if ((id == Detector::kCherenkov1) ||
@@ -342,8 +362,6 @@ std::cout << "Entering MapCppTrackReconstructor::LoadTestingData()" << std::endl
         (id == Detector::kCalorimeter)) {
       continue;
     }
-
-    detector = &detectors[id];
 
     for (int coordinate = 0; coordinate < 4; ++coordinate) {
       position[coordinate] = ((double)rand()/(double)RAND_MAX) * 20;  // meters
@@ -353,13 +371,20 @@ std::cout << "Entering MapCppTrackReconstructor::LoadTestingData()" << std::endl
       momentum[coordinate] = ((double)rand()/(double)RAND_MAX) * 500;  // MeV
     }
 
-    events.push_back(TrackPoint(position[0], momentum[0],
-                                position[1], momentum[1],
-                                position[2], momentum[2],
-                                position[3], momentum[3],
-                                *detector));
+std::cout << "CHECKPOINT(+1) MapCppTrackReconstructor::LoadTestingData()" << std::endl;
+
+    TrackPoint track_point(position[0], momentum[0],
+                           position[1], momentum[1],
+                           position[2], momentum[2],
+                           position[3], momentum[3],
+                           detector);
+std::cout << "CHECKPOINT(+1.25) MapCppTrackReconstructor::LoadTestingData()" << std::endl;
+    events.push_back(track_point);
+std::cout << "CHECKPOINT(+1.5) MapCppTrackReconstructor::LoadTestingData()" << std::endl;
   }
 
+
+std::cout << "CHECKPOINT(+2) MapCppTrackReconstructor::LoadTestingData()" << std::endl;
   reconstruction_input_ = new ReconstructionInput(beam_polarity_negative,
                                                   detectors,
                                                   events);

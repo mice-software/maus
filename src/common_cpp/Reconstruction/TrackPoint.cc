@@ -59,8 +59,7 @@ TrackPoint::TrackPoint(const double t, const double E,
                                    const CovarianceMatrix & uncertainties)
     : PhaseSpaceVector(t, E, x, Px, y, Py),
       z_(z), z_momentum_(Pz), detector_id_(Detector::kNone),
-      uncertainties_(new CovarianceMatrix(uncertainties)) {
-}
+      uncertainties_(new CovarianceMatrix(uncertainties)) { }
 
 TrackPoint::TrackPoint(const double t, const double E,
                                    const double x, const double Px,
@@ -69,8 +68,7 @@ TrackPoint::TrackPoint(const double t, const double E,
                                    const Detector & detector)
     : PhaseSpaceVector(t, E, x, Px, y, Py), z_(z), z_momentum_(Pz),
       detector_id_(detector.id()),
-      uncertainties_(new CovarianceMatrix(detector.uncertainties())) {
-}
+      uncertainties_(new CovarianceMatrix(detector.uncertainties())) { }
 
 TrackPoint::TrackPoint(double const * const array)
     : PhaseSpaceVector(array), z_(array[6]), z_momentum_(array[7]),
@@ -79,6 +77,17 @@ TrackPoint::TrackPoint(double const * const array)
 
 TrackPoint::~TrackPoint() {
   delete uncertainties_;
+}
+
+TrackPoint & TrackPoint::operator=(const TrackPoint& rhs) {
+  PhaseSpaceVector::operator=(rhs);
+  z_ = rhs.z_;
+  z_momentum_ = rhs.z_momentum_;
+  detector_id_ = rhs.detector_id_;
+
+  delete uncertainties_;
+  uncertainties_ = new CovarianceMatrix(*rhs.uncertainties_);
+  
 }
  
 const bool TrackPoint::operator==(const TrackPoint& rhs) const {

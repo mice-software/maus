@@ -20,6 +20,7 @@
 #include "Reconstruction/MinuitTrackFitter.hh"
  
 #include <cmath>
+#include <iostream>
 #include <vector>
 
 #include "TMinuit.h"
@@ -109,20 +110,21 @@ Double_t MinuitTrackFitter::ScoreTrack(
   track_->clear();
   
   // Setup the start plane track point based on the Minuit initial conditions
+  CovarianceMatrix null_uncertainties;
   TrackPoint guess(start_plane_track_coordinates[0],
                    start_plane_track_coordinates[1],
                    start_plane_track_coordinates[2],
                    start_plane_track_coordinates[3],
                    start_plane_track_coordinates[4],
                    start_plane_track_coordinates[5],
-                   start_plane_, 0.0, CovarianceMatrix());
+                   start_plane_, 0.0, null_uncertainties);
   guess.FillInAxialCoordinates(mass_);
   double start_plane = start_plane_;
   track_->push_back(guess);
 
   PhaseSpaceVector delta;  // difference between the guess and the measurement
   TransferMap const * transfer_map = NULL;
-  CovarianceMatrix const * uncertainties = &guess.uncertainties();
+  CovarianceMatrix const * uncertainties = NULL;
   std::vector<TrackPoint>::const_iterator events
     = detector_events_->begin();
 
@@ -136,7 +138,7 @@ Double_t MinuitTrackFitter::ScoreTrack(
     delete transfer_map;
 
     guess.FillInAxialCoordinates(mass_);
-    uncertainties = &(*events).uncertainties();
+    uncertainties = &events->uncertainties();
     guess.set_uncertainties(*uncertainties);
 
     // save the calculated track in case this is the last one

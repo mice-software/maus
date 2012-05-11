@@ -19,6 +19,8 @@
 
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
 
+#include <iostream>
+
 #include "Interface/Squeak.hh"
 #include "Maths/Vector.hh"
 

@@ -29,6 +29,7 @@
 
 #include "Maths/Matrix.hh"
 
+#include <iostream>
 #include <limits>
 
 #include "CLHEP/Matrix/Matrix.h"
@@ -632,7 +633,7 @@ void MatrixBase<complex, gsl_matrix_complex>::delete_matrix() {
 
 template <>
 void MatrixBase<double, gsl_matrix>::build_matrix(
-  const size_t rows, const size_t columns, const bool initialize) {
+    const size_t rows, const size_t columns, const bool initialize) {
   delete_matrix();
 
   if ((rows > (size_t) 0) && (columns > (size_t) 0)) {
@@ -646,7 +647,7 @@ void MatrixBase<double, gsl_matrix>::build_matrix(
 
 template <>
 void MatrixBase<complex, gsl_matrix_complex>::build_matrix(
-  const size_t rows, const size_t columns, const bool initialize) {
+    const size_t rows, const size_t columns, const bool initialize) {
   delete_matrix();
 
   if ((rows > (size_t) 0) && (columns > (size_t) 0)) {
