@@ -145,8 +145,9 @@ def force_kill_maus_web_app():
            words = line.split()
            pid = int(words[1])
            print "Found lurking maus-web-app process"
-    os.kill(pid, signal.SIGKILL)
-    print "Killed", pid
+    if pid != None:
+        os.kill(pid, signal.SIGKILL)
+        print "Killed", pid
 
 def clear_lockfile():
     """
@@ -208,8 +209,11 @@ def main():
     """
     Make a lockfile; spawn child processes; and poll subprocesses until user
     hits ctrl-c
+
+    If the subprocesses fail, have a go at setting up rabbitmcq and mongo
     """
     try:
+        force_kill_maus_web_app()
         clear_lockfile()
         log_dir = os.environ['MAUS_WEB_MEDIA_RAW']
 
@@ -224,11 +228,13 @@ def main():
             reduce_log = os.path.join(log_dir, reducer[0:-3]+'.log')
             PROCESSES.append(maus_merge_output_process(reduce_log,
                                                        reducer))
-            
+
         make_lockfile(PROCESSES)
         print '\nCTRL-C to quit\n'
         while poll_processes(PROCESSES):
            time.sleep(POLL_TIME)
+    except KeyboardInterrupt:
+        print "Closing"
     except Exception:
         sys.excepthook(*sys.exc_info())
     finally:
