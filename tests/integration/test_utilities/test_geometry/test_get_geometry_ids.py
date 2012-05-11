@@ -19,8 +19,6 @@ test_get_geometry_ids.py
 import unittest
 import os
 import subprocess
-import json
-import glob
 
 MAUS_ROOT_DIR = os.getenv("MAUS_ROOT_DIR")
 TMP_PATH = os.path.join(MAUS_ROOT_DIR, "tmp")
@@ -38,16 +36,16 @@ def run_simulations():
     """
     file_name = os.environ['MAUS_ROOT_DIR']+'/tmp/get_geometry_ids_output'
     test_out = open(file_name, 'w')
-    subproc=subprocess.Popen([SIM_PATH, \
+    subproc = subprocess.Popen([SIM_PATH, \
                            '-configuration_file', CONFIG_PATH_NO_FILE],\
                                       stdout=test_out, stderr=subprocess.STDOUT)
     subproc.wait()
     test_out.close()
-    subproc=subprocess.Popen([SIM_PATH, \
+    subproc = subprocess.Popen([SIM_PATH, \
                            '-configuration_file', CONFIG_PATH_FILE])
     subproc.wait()
 
-class accumulate_coloured_particles(unittest.TestCase): #pylint: disable = R0904
+class TestAccumulateColouredParticles(unittest.TestCase): #pylint:disable= R0904
     """
     This class has two tests. One checks that particles are accumulated into one
     vrml output file when the tag is selected in configuration defaults. The 
