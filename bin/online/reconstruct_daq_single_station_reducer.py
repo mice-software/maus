@@ -55,11 +55,11 @@ def run():
     # Create an empty array of mappers, then populate it
     # with the functionality you want to use.
     my_map = MAUS.MapPyGroup()
-    my_map.append(MAUS.MapCppTOFDigits())
-    my_map.append(MAUS.MapCppTOFSlabHits())
-    my_map.append(MAUS.MapCppTOFSpacePoints())
-    my_map.append(MAUS.MapPyCkov())
-    #my_map.append(MAUS.MapCppSingleStationRecon())
+    #my_map.append(MAUS.MapCppTOFDigits())
+    #my_map.append(MAUS.MapCppTOFSlabHits())
+    #my_map.append(MAUS.MapCppTOFSpacePoints())
+    #my_map.append(MAUS.MapPyCkov())
+    my_map.append(MAUS.MapCppSingleStationRecon())
     # Histogram reducer.
     reducer = MAUS.ReduceCppSingleStation()
     #reducer = MAUS.ReducePyDoNothing()

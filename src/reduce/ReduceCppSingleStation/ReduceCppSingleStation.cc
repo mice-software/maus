@@ -29,22 +29,33 @@ bool ReduceCppSingleStation::birth(std::string argJsonConfigDocument) {
   _filename = "se.root";
   _nSpills = 0;
 
-  TCanvas *c1 = new TCanvas("c1", "ADC Values", 200, 10, 700, 500);
+  TCanvas *c1 = new TCanvas("c1", "adc Values", 200, 10, 700, 500);
   TCanvas *c2 = new TCanvas("c2", "Digits", 200, 10, 700, 500);
   TCanvas *c3 = new TCanvas("c3", "SpacePoints", 200, 10, 700, 500);
 
+  triplets = new TH2F("triplets", "Spacepoints (x, y)", 300, -150, 150, 300, -150, 150);
+  duplets  = new TH2F("duplets", "Spacepoints (x, y)", 300, -150, 150, 300, -150, 150);
+  _trig_efficiency  = new TH2F("_trig_efficiency", "Trigger Eff: SE/TOF1", 30, 0, 30, 50, 0, 1.2);
+  _graph = new TGraph();
+
+  _trig_efficiency->SetMarkerStyle(20);
+  _trig_efficiency->SetMarkerSize(0.6);
+  _trig_efficiency->SetMarkerColor(kBlack);
+
   _unpacked.SetNameTitle("unpacked", "unpacked");
   _unpacked.Branch("adc", &_adc, "adc/I");
+  _unpacked.Branch("tdc", &_tdc, "tdc/I");
   _unpacked.Branch("bank", &_bank, "bank/I");
   _unpacked.Branch("chan", &_chan, "chan/I");
+  _unpacked.Branch("activebank", &_activebank, "activebank/I");
 
   _digits.SetNameTitle("digits", "digits");
   _digits.Branch("plane", &_plane, "plane/I");
   _digits.Branch("channel", &_channel, "channel/D");
   _digits.Branch("npe", &_npe, "npe/D");
 
-  _spacepoints.SetNameTitle("spacepoints","spacepoints");
-  _spacepoints.Branch("pe", &_pe,"pe/D");
+  _spacepoints.SetNameTitle("spacepoints", "spacepoints");
+  _spacepoints.Branch("pe", &_pe, "pe/D");
   _spacepoints.Branch("x", &_x, "x/D");
   _spacepoints.Branch("y", &_y, "y/D");
   _spacepoints.Branch("z", &_z, "z/D");
@@ -56,19 +67,19 @@ bool ReduceCppSingleStation::birth(std::string argJsonConfigDocument) {
   c1->GetFrame()->SetBorderSize(6);
   c1->GetFrame()->SetBorderMode(-1);
 
-  c2->Divide(3, 1);
+  c2->Divide(2, 1);
   c2->SetFillColor(21);
   c2->GetFrame()->SetFillColor(42);
   c2->GetFrame()->SetBorderSize(6);
   c2->GetFrame()->SetBorderMode(-1);
 
-  c3->Divide(2, 1);
-  gStyle->SetMarkerStyle(7);
-  gStyle->SetLabelSize(0.07,"xyz");
-  gStyle->SetTitleSize(0.07,"xy");
-  gStyle->SetTitleOffset(0.41,"x");
-  gStyle->SetTitleOffset(0.46,"y");
-
+  c3->Divide(3, 1);
+  gStyle->SetLabelSize(0.07, "xyz");
+  gStyle->SetTitleSize(0.07, "xy");
+  gStyle->SetTitleOffset(0.6, "x");
+  gStyle->SetTitleOffset(0.5, "y");
+  // gStyle->SetMarkerStyle(34);
+  // gStyle->SetMarkerSize(0.6);
   // JsonCpp setup
   Json::Value configJSON;
   try {
@@ -91,7 +102,7 @@ bool ReduceCppSingleStation::death()  {
 }
 
 std::string  ReduceCppSingleStation::process(std::string document) {
-  //  JsonCpp setup
+  // JsonCpp setup
   Json::FastWriter writer;
   Json::Value root;
   Json::Value xEventType;
@@ -103,7 +114,7 @@ std::string  ReduceCppSingleStation::process(std::string document) {
 
   Squeak::activateCout(1);
 
-  //std::cerr << "Begin Reducer Process" << std::endl;
+  // std::cerr << "Begin Reducer Process" << std::endl;
   try {
     root = JsonWrapper::StringToJson(document);
     // std::cerr << root.type() << " obj:" << Json::Value(Json::objectValue).type()
@@ -120,21 +131,18 @@ std::string  ReduceCppSingleStation::process(std::string document) {
     return writer.write(root);
   }
   try {
-    if ( is_physics_daq_event(root) ){
-      std::cerr << root["daq_data"]["single_station"] << std::endl;
+    std::cerr << "****** SingleStation: " << root["daq_data"]["single_station"].size() << std::endl;
+    if ( is_physics_daq_event(root) )
       unpacked_data_histograms(root);
-    } else {
-      std::cerr << root["daq_data"] << std::endl;
-    }
 
-    //if ( root.isMember("digits") )
-     // digits_histograms(root);
+    if ( root.isMember("digits") )
+      digits_histograms(root);
 
-//    if ( root.isMember("space_points") )
-  //    draw_spacepoints(root);
+    if ( root.isMember("space_points") )
+      draw_spacepoints(root);
 
-    //count_particle_events();
-
+    //if ( is_physics_daq_event(root) && root.isMember("space_points") )
+      //count_particle_events(root);
   } catch(Squeal squee) {
     Squeak::mout(Squeak::error) << squee.GetMessage() << std::endl;
     root = MAUS::CppErrorHandler::getInstance()->HandleSqueal(root, squee, _classname);
@@ -177,24 +185,92 @@ std::string  ReduceCppSingleStation::process(std::string document) {
     c1->Update();
 
     c2->cd(1);
-    _digits.Draw("npe:channel","plane==0");
+    _unpacked.Draw("adc", "activebank==1");
     c2->cd(2);
-    _digits.Draw("npe:channel","plane==1");
-    c2->cd(3);
-    _digits.Draw("npe:channel","plane==2");
+    _unpacked.Draw("tdc", "activebank==1");
+    // c2->SetLogy();
+    // c2->cd(3);
+    // _digits.Draw("npe:channel","plane==2");
     c2->Update();
 
     c3->cd(1);
-    _spacepoints.Draw("x:y:pe");
+    _spacepoints.Draw("x:y>>duplets", "type==2");
+    duplets->SetMarkerStyle(20);
+    duplets->SetMarkerColor(kRed);
+    duplets->Draw("same");
+    // gStyle->SetMarkerStyle(34);
+    // gStyle->SetMarkerSize(0.6);
+    _spacepoints.Draw("x:y>>triplets", "type==3", "same");
+    triplets->SetMarkerStyle(20);
+    triplets->SetMarkerColor(kBlue);
+    triplets->Draw("same");
     c3->Update();
     c3->cd(2);
     _spacepoints.Draw("type");
     c3->Update();
+    c3->cd(3);
+    // _trig_efficiency->Draw();
+    //_graph->Draw("ac*");
+    c3->Update();
+/*
+    c4->cd(1);
+    _unpacked.Draw("tdc:chan", "bank == 0 ");
+    c4->cd(2);
+    _unpacked.Draw("tdc:chan", "bank == 2 ");
+    c4->cd(3);
+    _unpacked.Draw("tdc:chan", "bank == 5 ");
+    c4->cd(4);
+    _unpacked.Draw("tdc:chan", "bank == 7 ");
+    c4->cd(5);
+    _unpacked.Draw("tdc:chan", "bank == 9 ");
+    c4->cd(6);
+    _unpacked.Draw("tdc:chan", "bank == 10 ");
+    c4->cd(7);
+    _unpacked.Draw("tdc:chan", "bank == 11 ");
+    c4->cd(8);
+    _unpacked.Draw("tdc:chan", "bank == 12 ");
+    c4->cd(9);
+    _unpacked.Draw("tdc:chan", "bank == 13 ");
+    c4->cd(10);
+    _unpacked.Draw("tdc:chan", "bank == 14 ");
+    c4->Update();
+*/
   }
 
-  //std::cerr << "End Reducer Process" << std::endl;
+  // std::cerr << "End Reducer Process" << std::endl;
   return document;
 }
+
+void ReduceCppSingleStation::count_particle_events(Json::Value root) {
+  _spill_counter += 1.;
+  int numb_triggers = root["daq_data"]["tof1"].size();
+  int numb_spacepoints = 0;
+
+  int n_events = root["spacepoints"]["single_station"].size();
+  for ( int event_i = 0; event_i < n_events; event_i++ ) {
+    if ( !root["spacepoints"]["single_station"][event_i].isNull() ) {
+      numb_spacepoints += 1;
+    }
+  }
+
+  float effic = static_cast<float>(numb_spacepoints)/numb_triggers;
+  _graph->SetPoint(_spill_counter, _spill_counter, effic);
+/*
+  TAxis *axis = _trig_efficiency->GetXaxis();
+  std::cout << numb_spacepoints << " " << axis->GetXmax() << std::endl;
+  if ( _spill_counter > axis->GetXmax() ) {
+    std::cout << "REBINING" << std::endl;
+    double new_X_max = _spill_counter+30;
+    _trig_efficiency->RebinAxis(new_X_max, axis);
+  }
+  TAxis *axis_y = _trig_efficiency->GetYaxis();
+  if ( effic > axis_y->GetXmax() ) {
+    double new_Y_max = effic+0.3;
+    _trig_efficiency->RebinAxis(new_Y_max, axis_y);
+  }
+*/
+}
+
 
 bool ReduceCppSingleStation::is_physics_daq_event(Json::Value root) {
   if (root.isMember("daq_data") &&
@@ -233,11 +309,11 @@ void ReduceCppSingleStation::draw_spacepoints(Json::Value root) {
         _spacepoints.Fill();
       }
     }
-  //} else {
+  // } else {
   //  throw(Squeal(Squeal::recoverable,
   //        std::string("SpacePoints branch is corrupted!"),
   //        "ReduceCppSingleStation::draw_spacepoints"));
-  //}
+  // }
 }
 
 void ReduceCppSingleStation::digits_histograms(Json::Value root) {
@@ -258,7 +334,7 @@ void ReduceCppSingleStation::digits_histograms(Json::Value root) {
       _digits.Fill();
     }
   }
-  //} else {
+  // } else {
   //  throw(Squeal(Squeal::recoverable,
   //        std::string("Digits branch is corrupted!"),
   //        "ReduceCppSingleStation::digits_histograms"));
@@ -273,15 +349,24 @@ void ReduceCppSingleStation::unpacked_data_histograms(Json::Value root) {
   // Loop over events.
   for (int event_i = 0; event_i < n_events; event_i++) {
     if ( daq_data["single_station"][event_i].isNull() ) continue;
-    //Json::Value i_PartEvent = JsonWrapper::GetProperty(daq_data["single_station"][event_i],
-    //                                    "VLSB",
+    // Json::Value i_PartEvent = JsonWrapper::GetProperty(daq_data["single_station"][event_i],
+    //                                    "VLSB_bank",
     //                                    JsonWrapper::objectValue);
     Json::Value i_PartEvent = daq_data["single_station"][event_i];
     int number_channels_within = i_PartEvent["VLSB"].size();
     for ( int i = 0; i < number_channels_within; i++ ) {
+      _tdc  = i_PartEvent["VLSB"][i]["tdc"].asInt();
       _adc  = i_PartEvent["VLSB"][i]["adc"].asInt();
       _bank = i_PartEvent["VLSB"][i]["bank_id"].asInt();
       _chan = i_PartEvent["VLSB"][i]["channel"].asInt();
+      if ( _bank == 0 || _bank == 2 || _bank == 5 ||
+           _bank == 7 || _bank == 9 || _bank == 10 ||
+           _bank == 11 || _bank == 12 || _bank == 13 ||
+           _bank == 14) {
+        _activebank = 1;
+      } else {
+       _activebank = 0;
+      }
       _unpacked.Fill();
     }
   }
