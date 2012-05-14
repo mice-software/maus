@@ -1,5 +1,0 @@
-verbose_level = 0
-accumulate_tracks = 1 
-simulation_geometry_filename = "Test.dat" 
-spill_generator_number_of_spills = 1 
-geant4_visualisation = True
