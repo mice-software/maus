@@ -16,6 +16,8 @@
 
 #include <vector>
 
+#include "src/common_cpp/Utils/JsonWrapper.hh"
+
 namespace MAUS {
 
 template <class ArrayContents>
@@ -38,7 +40,9 @@ std::vector<ArrayContents*>* PointerArrayProcessor<ArrayContents>::JsonToCpp
     if (!json_array.isConvertibleTo(Json::arrayValue)) {
         // no memory allocated yet...
         throw(Squeal(Squeal::recoverable,
-                    "\nFailed to resolve Json::Value to array",
+                    "Failed to resolve Json::Value of type "+
+                    JsonWrapper::ValueTypeToString(json_array.type())+
+                    " to array",
                     "PointerArrayProcessor::JsonToCpp()"
                     ) );
     }
@@ -113,7 +117,9 @@ std::vector<ArrayContents>* ValueArrayProcessor<ArrayContents>::JsonToCpp
     if (!json_array.isConvertibleTo(Json::arrayValue)) {
         // no memory allocated yet...
         throw(Squeal(Squeal::recoverable,
-                    "\nFailed to resolve Json::Value to array",
+                    "Failed to resolve Json::Value of type "+
+                    JsonWrapper::ValueTypeToString(json_array.type())+
+                    " to array",
                     "ValueArrayProcessor::JsonToCpp()"
                     ) );
     }

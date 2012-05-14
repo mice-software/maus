@@ -40,15 +40,6 @@ void MAUSTrackingAction::PreUserTrackingAction(const G4Track* aTrack) {
            _stepping = MAUSGeant4Manager::GetInstance()->GetStepping();
         }
 
-        // I store tracks as an object type rather than array type because I am
-        // not convinced that TrackID increments by 1 each time
-        std::string name = TrackName(aTrack->GetTrackID());
-        if (_tracks[name].type() != Json::nullValue) {
-          throw(Squeal(Squeal::recoverable,
-                       "Json "+name+" already exists",
-                       "MAUSTrackingAction::PreUserTrackingAction"));
-        }
-
         Json::Value position(Json::objectValue);
         position["x"] = aTrack->GetPosition().x();
         position["y"] = aTrack->GetPosition().y();
@@ -67,18 +58,18 @@ void MAUSTrackingAction::PreUserTrackingAction(const G4Track* aTrack) {
         json_track["parent_track_id"] = aTrack->GetParentID();
         if (_stepping->GetWillKeepSteps())
             _stepping->SetSteps(Json::Value(Json::arrayValue));
-        _tracks[name] = json_track;
+        _tracks.append(json_track);
     }
 }
 
 void MAUSTrackingAction::PostUserTrackingAction(const G4Track* aTrack) {
     if (_keepTracks && aTrack) {
-        std::string name = TrackName(aTrack->GetTrackID());
-        Json::Value json_track = _tracks[name];
-        if (json_track.type() == Json::nullValue)
-          throw(Squeal(Squeal::recoverable,
-                       "Failed to find Json "+name,
-                       "MAUSTrackingAction::PostUserTrackingAction"));
+        Json::Value json_track = _tracks[_tracks.size()-1];
+        if (json_track["track_id"] != aTrack->GetTrackID()) {
+            throw Squeal(Squeal::recoverable,
+                         "Track ID misalignment",
+                         "MAUSTrackingAction::PostUserTrackingAction");
+        }
 
         Json::Value position;
         position["x"] = aTrack->GetPosition().x();
@@ -94,27 +85,25 @@ void MAUSTrackingAction::PostUserTrackingAction(const G4Track* aTrack) {
         json_track["final_momentum"] = momentum;
         if (_stepping->GetWillKeepSteps())
             json_track["steps"] = _stepping->GetSteps();
-        _tracks[name] = json_track;
+        _tracks[_tracks.size()-1] = json_track;
     }
 }
 
 void MAUSTrackingAction::SetTracks(Json::Value tracks) {
-    if (!tracks.isObject())
+    if (!tracks.isArray())
         throw(Squeal(Squeal::recoverable,
-              "Attempt to set tracks to non-object type",
+              "Attempt to set tracks to non-array of type "
+              +JsonWrapper::ValueTypeToString(tracks.type()),
               "MAUSTrackingAction::SetTracks()"));
     _tracks = tracks;
 }
 
-std::string MAUSTrackingAction::TrackName(int id) {
-    std::stringstream ss;
-    ss << "track_" << id;
-    return ss.str();
-}
-
 void MAUSTrackingAction::SetKillReason(G4Track* aTrack, std::string reason) {
-    std::string name = TrackName(aTrack->GetTrackID());
-    _tracks[name]["KillReason"] = Json::Value(reason);
+    for (size_t i = 0; i < _tracks.size(); ++i) {
+        if (_tracks[i]["track_id"] == aTrack->GetTrackID()) {
+            _tracks[i]["KillReason"] = Json::Value(reason);
+        }
+    }
 }
 
 }  //  ends MAUS namespace

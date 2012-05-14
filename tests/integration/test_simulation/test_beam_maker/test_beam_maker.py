@@ -81,8 +81,8 @@ def run_simulations():
     subproc.wait()
     # run format conversion
     subproc = subprocess.Popen([CONV_PATH, '-configuration_file', \
-                           os.path.join(TEST_DIR, 'default_beam_config.py'),
-                          '-output_json_file_name', DEF_SIM], \
+                           os.path.join(TEST_DIR, 'binomial_beam_config.py'),
+                          '-output_json_file_name', BIN_SIM], \
                            stdout = out)
     subproc.wait()
 

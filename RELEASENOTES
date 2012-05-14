@@ -4,6 +4,16 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v0.2.3
+  The following functionality was added:
+    - The default data format is now ROOT. For further information on handling
+      this data format, please see the instructions in the MAUS user guide
+      (doc/maus_user_guide.pdf) 
+    - MAUS now builds on Ubuntu 11.10 (tested against Linux Mint 12)
+  If upgrading from the previous version, the following third party library scripts need to be rerun:
+    - third_party/bash/21root.bash
+    - third_party/bash/51xboa.bash
+
 MAUS-v0.2.2
   The following functionality was added:
     - Production version of the distributed processing framework and online histogramming
