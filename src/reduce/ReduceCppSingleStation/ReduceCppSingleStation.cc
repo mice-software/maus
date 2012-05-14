@@ -132,6 +132,7 @@ std::string  ReduceCppSingleStation::process(std::string document) {
   }
   try {
     std::cerr << "****** SingleStation: " << root["daq_data"]["single_station"].size() << std::endl;
+    std::cerr << root << std::endl;
     if ( is_physics_daq_event(root) )
       unpacked_data_histograms(root);
 
@@ -275,8 +276,9 @@ void ReduceCppSingleStation::count_particle_events(Json::Value root) {
 bool ReduceCppSingleStation::is_physics_daq_event(Json::Value root) {
   if (root.isMember("daq_data") &&
       !root["daq_data"].isNull() &&
-      root["daq_data"].isMember("single_station") &&
-      root["daq_event_type"].asString() == "physics_event") {
+      root["daq_data"].isMember("single_station")
+      //root["daq_event_type"].asString() == "physics_event"
+     ) {
     return true;
   } else {
     return false;
