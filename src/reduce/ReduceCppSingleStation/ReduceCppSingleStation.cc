@@ -35,7 +35,7 @@ bool ReduceCppSingleStation::birth(std::string argJsonConfigDocument) {
 
   triplets = new TH2F("triplets", "Spacepoints (x, y)", 300, -150, 150, 300, -150, 150);
   duplets  = new TH2F("duplets", "Spacepoints (x, y)", 300, -150, 150, 300, -150, 150);
-  _trig_efficiency  = new TH2F("_trig_efficiency", "Trigger Eff: SE/TOF1", 30, 0, 30, 50, 0, 1.2);
+  // _trig_efficiency  = new TH2F("_trig_efficiency", "Trigger Eff: SE/TOF1", 30, 0, 30, 50, 0, 1.2);
   _graph = new TGraph();
 
   _trig_efficiency->SetMarkerStyle(20);
@@ -131,8 +131,8 @@ std::string  ReduceCppSingleStation::process(std::string document) {
     return writer.write(root);
   }
   try {
-    std::cerr << "****** SingleStation: " << root["daq_data"]["single_station"].size() << std::endl;
-    std::cerr << root << std::endl;
+    // std::cerr << "****** SingleStation: " << root["daq_data"]["single_station"].size() << std::endl;
+    // std::cerr << root << std::endl;
     if ( is_physics_daq_event(root) )
       unpacked_data_histograms(root);
 
@@ -186,9 +186,9 @@ std::string  ReduceCppSingleStation::process(std::string document) {
     c1->Update();
 
     c2->cd(1);
-    _unpacked.Draw("adc", "activebank==1");
+    _unpacked.Draw("adc", "bank==0 && chan>65 && chan<90");
     c2->cd(2);
-    _unpacked.Draw("tdc", "activebank==1");
+    _unpacked.Draw("tdc", "bank==0 && chan>65 && chan<90");
     // c2->SetLogy();
     // c2->cd(3);
     // _digits.Draw("npe:channel","plane==2");
