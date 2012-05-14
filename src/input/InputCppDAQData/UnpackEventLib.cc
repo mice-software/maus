@@ -285,7 +285,7 @@ int VLSBDataProcessor::Process(MDdataContainer* aFragPtr) {
   pBoardDoc["ldc_id"]        = xLdc = this->GetLdcId();
 
   if (xLdc == 0)
-    xDetector = "tracker1";
+    xDetector = "single_station"; // 11/05/2012 - CTR hack to get things working in MLCR
   if (xLdc == 2)
     xDetector = "tracker2";
   if (xLdc == 3)

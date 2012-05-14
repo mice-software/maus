@@ -47,7 +47,7 @@ if __name__ == '__main__':
     # Temporary values for the data path and data file
 
     data_path = '%s/src/map/MapCppSingleStationRecon/' % os.environ.get("MAUS_ROOT_DIR")
-    data_file = '3758.000'
+    data_file = '3942.000'
     
     # Check command line arguments for path to data and file name
     if len(sys.argv) == 1:

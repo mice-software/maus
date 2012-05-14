@@ -44,6 +44,9 @@
 #include "TVirtualPad.h"
 #include "TFrame.h"
 
+#include "Interface/Squeak.hh"
+#include "Interface/Squeal.hh"
+
 class ReduceCppSingleStation {
 
  public:
@@ -68,12 +71,17 @@ class ReduceCppSingleStation {
   */
   std::string process(std::string document);
 
+  void unpacked_data_histograms(Json::Value root);
+
+  void digits_histograms(Json::Value root);
+
+  void draw_spacepoints(Json::Value root);
+
+  bool is_physics_daq_event(Json::Value root);
+
  private:
-
-  Json::Value GetPartEvent(Json::Value root, std::string entry_type,
-                           std::string detector, int part_event);
-
   std::string _classname;
+
   std::string _filename;
 
   int _nSpills;
@@ -81,9 +89,15 @@ class ReduceCppSingleStation {
   void Save();
 
   TTree _unpacked;
-  int _adc;
-  int _bank;
-  int _chan;
+  int _adc, _bank, _chan;
+
+  TTree _digits;
+  int _plane;
+  double _npe, _channel;
+
+  TTree _spacepoints;
+  double _x, _y, _z, _pe;
+  int _type;
 };
 
 #endif
