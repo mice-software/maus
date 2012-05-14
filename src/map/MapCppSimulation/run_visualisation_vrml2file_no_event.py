@@ -56,21 +56,23 @@ class MapCppSimulationVisualisationTestCase(unittest.TestCase):
         self.mapper = None
 
     ######## tests on Process #########
-    def test_mc_vrml2file(self):  # should make a vrml file
+    def test_mc_vrml2file_no_event(self):  # should make a vrml file
         """
-        Check we can make a vrml file
-        
+        Check we can make a vrml file even when there is no G4 event.
+
         Only supported option right now is vrml as we need this to feed into the
         event viewer.
         """
+        for filename in glob.glob('g4_*.wrl'):
+            os.rename(filename, os.environ['MAUS_ROOT_DIR']+'/tmp/'+filename) 
         good_event = {
-            "mc_events":[self.particle,self.particle]
+            "mc_events":[]
         }
         result = self.mapper.process(json.dumps(good_event))
         if "errors" in result:
             raise Exception('test_mc_vis made an error')
         if len(glob.glob('g4_*.wrl')) < 1:
-            raise Exception('test_mc_vis failed to make a VRML file')
+            raise Exception('test_mc_vis_no_event failed to make a VRML file')
         for filename in glob.glob('g4_*.wrl'):
             os.rename(filename, os.environ['MAUS_ROOT_DIR']+'/tmp/'+filename) 
 
@@ -112,5 +114,6 @@ class MapCppSimulationVisualisationTestCase(unittest.TestCase):
       "muon_half_life":-1.,
       "production_threshold":0.5,
     }
+
 if __name__ == '__main__':
     unittest.main()
