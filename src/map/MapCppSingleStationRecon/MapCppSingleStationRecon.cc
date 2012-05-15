@@ -34,8 +34,10 @@ bool MapCppSingleStationRecon::birth(std::string argJsonConfigDocument) {
   std::string filename;
   filename = _configJSON["reconstruction_geometry_filename"].asString();
   MiceModule* _module;
+  // std::cout << "Looking up modules...";
   _module = new MiceModule(filename);
-  modules = _module->findModulesByPropertyString("SensitiveDetector", "SE");
+  modules = _module->findModulesByPropertyString("SensitiveDetector", "SciFi");
+  // assert(modules.size()>0);
 
   // Get minPE cut value.
   assert(_configJSON.isMember("SciFiNPECut"));
@@ -56,6 +58,7 @@ std::string MapCppSingleStationRecon::process(std::string document) {
   // Writes a line in the JSON document.
   Json::FastWriter writer;
   SESpill spill;
+  // std::cout << "Start Recon" << std::endl;
 /*
   try {
     root = JsonWrapper::StringToJson(document);
@@ -71,6 +74,9 @@ std::string MapCppSingleStationRecon::process(std::string document) {
 
   try { // ================= Reconstruction =========================
     root = JsonWrapper::StringToJson(document);
+
+    if ( root["daq_event_type"].asString() == "physics_event" ) {
+
     digitization(spill, root);
 
     for ( unsigned int k = 0; k < spill.events().size(); k++ ) {
@@ -86,6 +92,7 @@ std::string MapCppSingleStationRecon::process(std::string document) {
 
       print_event_info(event);
       save_to_json(event);
+      }
     } // ==========================================================
   } catch(...) {
     Json::Value errors;
@@ -95,7 +102,7 @@ std::string MapCppSingleStationRecon::process(std::string document) {
     root["errors"] = errors;
     return writer.write(root);
   }
-
+  // std::cout << "End Recon" << std::endl;
   return writer.write(root);
 }
 
@@ -131,7 +138,7 @@ void MapCppSingleStationRecon::save_to_json(SEEvent &evt) {
     digits_in_event["time"]   = evt.digits()[dig_i]->get_time();
     digits.append(digits_in_event);
   }
-  root["digits"].append(digits);
+  root["digits"]["single_station"].append(digits);
 
   Json::Value se_sp;
   Json::Value channels;

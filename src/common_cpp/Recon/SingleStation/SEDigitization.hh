@@ -39,6 +39,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cmath>
+#include "src/common_cpp/Utils/JsonWrapper.hh"
 
 // G4MICE from commonCpp
 #include "Interface/dataCards.hh"
@@ -79,7 +80,7 @@ class SEDigitization {
 
   /** @brief Converts read-out map into SE Fibre map
    */
-  void get_StatPlaneChannel(int &board, int &bank, int &chan_ro,
+  void get_StatPlaneChannel(int &bank, int &chan_ro,
                             int &plane, int &channel);
 
   /** @brief Reads the bad channel list from file.
@@ -91,22 +92,16 @@ class SEDigitization {
   bool is_good_channel(int bank, int chan_ro);
 
  private:
-  /// A vector containing calibration values for every 4 banks of the 16 boards.
-  std::vector<Json::Value> _calibration[2][4];
+  /// A vector containing calibration values for all 16 banks.
+  std::vector<Json::Value> _calibration[16];
 
   /// This is a vector storing the goodness of each channel.
-  bool good_chan[2][4][128];
+  bool good_chan[16][128];
 
-  // std::vector<int> _cryo;
-  // std::vector<int> _cass;
-  std::vector<int> _board;
   std::vector<int> _bank;
   std::vector<int> _chan_ro;
   std::vector<int> _view;
   std::vector<int> _fibre;
-  std::vector<int> _extWG;
-  std::vector<int> _inWG;
-  std::vector<int> _WGfib;
 };  // Don't forget this trailing colon!!!!
 // } // ~namespace MAUS
 

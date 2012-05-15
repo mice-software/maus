@@ -77,6 +77,7 @@ void SEClusterRec::construct(SECluster *clust, std::vector<const MiceModule*> mo
   Hep3Vector perp(-1., 0., 0.);
   Hep3Vector dir(0, 1, 0);
   const MiceModule* this_plane = NULL;
+  // std::cout << "Modules size: "  << modules.size() << std::endl;
   for ( unsigned int j = 0; !this_plane && j < modules.size(); j++ ) {
     // Find the right module
     if ( modules[j]->propertyInt("Plane") ==
@@ -85,6 +86,7 @@ void SEClusterRec::construct(SECluster *clust, std::vector<const MiceModule*> mo
       this_plane = modules[j];
     }
   }
+  // std::cout << clust->get_plane() << std::endl;
 
   assert(this_plane != NULL);
 

@@ -90,7 +90,11 @@ class ReduceCppSingleStation {
 
   TH2F *duplets;
 
-  TH2F *_trig_efficiency;
+  TH2F *triplets_copy;
+
+  TH2F *duplets_copy;
+
+  //TH2F *_trig_efficiency;
 
   std::string _classname;
 
@@ -108,6 +112,7 @@ class ReduceCppSingleStation {
   double _npe, _channel;
 
   TTree _spacepoints;
+  TTree _spacepointscopy;
   double _x, _y, _z, _pe;
   int _type;
 };

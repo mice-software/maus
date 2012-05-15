@@ -84,12 +84,12 @@ std::string MapCppTrackerRecon::process(std::string document) {
         std::cout << "Calling Pattern Recognition..." << std::endl;
         pattern_recognition(event);
       }
-/*
+
       // Kalman Track Fit.
-      if ( event.straightprtracks().size() ) {
-        track_fit(event);
-      }
-*/
+      // if ( event.straightprtracks().size() ) {
+        // track_fit(event);
+      // }
+
       print_event_info(event);
       save_to_json(event);
     }  // ==========================================================

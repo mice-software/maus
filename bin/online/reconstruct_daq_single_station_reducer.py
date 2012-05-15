@@ -27,7 +27,7 @@ def run():
     # will get refreshed every N spills set by the refresh_rate data
     # card. 
     data_cards_list.append("root_batch_mode='%d'\n" % 0)
-    data_cards_list.append("Do_VLSB_Zero_Suppression=%s\n" % True)
+    data_cards_list.append("Do_VLSB_Zero_Suppression=%s\n" % False)
     data_cards_list.append("Do_VLSB_Zero_Suppression_Threshold=%d\n" % 40)
     # refresh_rate = once in how many spills should canvases be updated
     data_cards_list.append("refresh_rate='%d'\n" % 1)
@@ -55,10 +55,10 @@ def run():
     # Create an empty array of mappers, then populate it
     # with the functionality you want to use.
     my_map = MAUS.MapPyGroup()
-    # my_map.append(MAUS.MapCppTOFDigits())
-    # my_map.append(MAUS.MapCppTOFSlabHits())
-    # my_map.append(MAUS.MapCppTOFSpacePoints())
-    # my_map.append(MAUS.MapPyCkov())
+    #my_map.append(MAUS.MapCppTOFDigits())
+    #my_map.append(MAUS.MapCppTOFSlabHits())
+    #my_map.append(MAUS.MapCppTOFSpacePoints())
+    #my_map.append(MAUS.MapPyCkov())
     my_map.append(MAUS.MapCppSingleStationRecon())
     # Histogram reducer.
     reducer = MAUS.ReduceCppSingleStation()

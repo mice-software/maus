@@ -46,7 +46,7 @@ if __name__ == '__main__':
 
     # Temporary values for the data path and data file
 
-    data_path = '../../../cosmic_data/'  #'%s/src/input/InputCppDAQData' % os.environ.get("MAUS_ROOT_DIR")
+    data_path = '../../../../cosmic_raw/'  #'%s/src/input/InputCppDAQData' % os.environ.get("MAUS_ROOT_DIR")
     data_file = 'gdc1901.000 gdc1901.001'
     
     # Check command line arguments for path to data and file name
