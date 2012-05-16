@@ -211,13 +211,13 @@ std::string  ReduceCppSingleStation::process(std::string document) {
     _spacepointscopy.Draw("type");
     c3->Update();
 
-   c4->cd(1);
+    c4->cd(1);
     _npe_plane0->Draw();
-   c4->cd(2);
-   _npe_plane1->Draw();
-   c4->cd(3);
-   _npe_plane2->Draw();
-   c4->Update();
+    c4->cd(2);
+    _npe_plane1->Draw();
+    c4->cd(3);
+    _npe_plane2->Draw();
+    c4->Update();
   }
 
   // std::cerr << "End Reducer Process" << std::endl;
