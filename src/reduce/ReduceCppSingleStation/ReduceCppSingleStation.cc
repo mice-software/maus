@@ -66,7 +66,7 @@ bool ReduceCppSingleStation::birth(std::string argJsonConfigDocument) {
   _spacepointscopy.Branch("z", &_z, "z/D");
   _spacepointscopy.Branch("type", &_type, "type/I");
 
-  c1->Divide(1, 1);
+  c1->Divide(5, 2);
   c1->SetFillColor(21);
   c1->GetFrame()->SetFillColor(42);
   c1->GetFrame()->SetBorderSize(6);
@@ -173,8 +173,8 @@ std::string  ReduceCppSingleStation::process(std::string document) {
   _nSpills++;
   if (!(_nSpills%1)) {
    c1->cd(1);
-   _unpacked.Draw("adc", "activebank==1");
- /*   _unpacked.Draw("adc:chan", "bank == 0 ");
+   //_unpacked.Draw("adc", "activebank==1");
+    _unpacked.Draw("adc:chan", "bank == 0 ");
     c1->Update();
     c1->cd(2);
     _unpacked.Draw("adc:chan", "bank == 2 ");
@@ -202,7 +202,7 @@ std::string  ReduceCppSingleStation::process(std::string document) {
     c1->Update();
     c1->cd(10);
     _unpacked.Draw("adc:chan", "bank == 14 ");
-*/
+
     c1->Update();
     c2->cd(1);
     _digits.Draw("channel","plane==0");
