@@ -29,16 +29,25 @@ bool ReduceCppSingleStation::birth(std::string argJsonConfigDocument) {
   _filename = "se.root";
   _nSpills = 0;
 
-  TCanvas *c1 = new TCanvas("c1", "adc Values", 200, 10, 700, 500);
-  TCanvas *c2 = new TCanvas("c2", "Digits", 200, 10, 700, 500);
+  TCanvas *c1 = new TCanvas("c1", "Efficiency (SE/TOF1)", 200, 10, 700, 500);
+  TCanvas *c2 = new TCanvas("c2", "Channel Hits", 200, 10, 700, 500);
   TCanvas *c3 = new TCanvas("c3", "SpacePoints", 200, 10, 700, 500);
-  TCanvas *c4 = new TCanvas("c4", "Efficiency", 200, 10, 700, 500);
+  TCanvas *c4 = new TCanvas("c4", "Cluster NPE", 200, 10, 700, 500);
 
   triplets = new TH2F("triplets", "Current Spill (x, y)", 300, -150, 150, 300, -150, 150);
   duplets  = new TH2F("duplets",  "Current Spill (x, y)", 300, -150, 150, 300, -150, 150);
   triplets_copy = new TH2F("triplets_copy", "All Spills (x, y)", 300, -150, 150, 300, -150, 150);
   duplets_copy  = new TH2F("duplets_copy", "All Spills (x, y)", 300, -150, 150, 300, -150, 150);
   _graph = new TGraph();
+
+  _hist_plane0 = new TH1F("_hist_plane0","plane 0", 215, 0, 214);
+  _hist_plane1 = new TH1F("_hist_plane1","plane 1", 215, 0, 214);
+  _hist_plane2 = new TH1F("_hist_plane2","plane 2", 215, 0, 214);
+  _chan_sum = new TH1F("_hist_plane2","Sum Of Channel Numb", 641, 0, 640);
+
+  _npe_plane0 = new TH1F("_npe_plane0","plane 0", 31, 0, 30);
+  _npe_plane1 = new TH1F("_npe_plane1","plane 1", 31, 0, 30);
+  _npe_plane2 = new TH1F("_npe_plane2","plane 2", 31, 0, 30);
 
   _unpacked.SetNameTitle("unpacked", "unpacked");
   _unpacked.Branch("adc", &_adc, "adc/I");
@@ -66,7 +75,7 @@ bool ReduceCppSingleStation::birth(std::string argJsonConfigDocument) {
   _spacepointscopy.Branch("z", &_z, "z/D");
   _spacepointscopy.Branch("type", &_type, "type/I");
 
-  c1->Divide(5, 2);
+  c1->Divide(1, 1);
   c1->SetFillColor(21);
   c1->GetFrame()->SetFillColor(42);
   c1->GetFrame()->SetBorderSize(6);
@@ -84,7 +93,7 @@ bool ReduceCppSingleStation::birth(std::string argJsonConfigDocument) {
   gStyle->SetTitleOffset(0.6, "x");
   gStyle->SetTitleOffset(0.4, "y");
 
-  c4->Divide(1,1);
+  c4->Divide(3,1);
   triplets->SetMarkerStyle(20);
   triplets->SetMarkerColor(kBlue);
   triplets_copy->SetMarkerStyle(20);
@@ -172,53 +181,16 @@ std::string  ReduceCppSingleStation::process(std::string document) {
 
   _nSpills++;
   if (!(_nSpills%1)) {
-   c1->cd(1);
-   //_unpacked.Draw("adc", "activebank==1");
-    _unpacked.Draw("adc:chan", "bank == 0 ");
+    c1->cd(1);
+    _graph->Draw("ac*");
     c1->Update();
-    c1->cd(2);
-    _unpacked.Draw("adc:chan", "bank == 2 ");
-    c1->Update();
-    c1->cd(3);
-    _unpacked.Draw("adc:chan", "bank == 5 ");
-    c1->Update();
-    c1->cd(4);
-    _unpacked.Draw("adc:chan", "bank == 7 ");
-    c1->Update();
-    c1->cd(5);
-    _unpacked.Draw("adc:chan", "bank == 9 ");
-    c1->Update();
-    c1->cd(6);
-    _unpacked.Draw("adc:chan", "bank == 10 ");
-    c1->Update();
-    c1->cd(7);
-    _unpacked.Draw("adc:chan", "bank == 11 ");
-    c1->Update();
-    c1->cd(8);
-    _unpacked.Draw("adc:chan", "bank == 12 ");
-    c1->Update();
-    c1->cd(9);
-    _unpacked.Draw("adc:chan", "bank == 13 ");
-    c1->Update();
-    c1->cd(10);
-    _unpacked.Draw("adc:chan", "bank == 14 ");
 
-    c1->Update();
     c2->cd(1);
-    _digits.Draw("channel","plane==0");
-    //c2->cd(1);
-    //_unpacked.Draw("adc", "bank==0 && chan>65 && chan<90");
-    //_unpacked.Draw("adc", "activebank==1");
-    //c2->SetLogy();
-    // _unpacked.Draw("adc", "activebank==1");
+    _hist_plane0->Draw();
     c2->cd(2);
-    //_unpacked.Draw("tdc", "bank==0 && chan>65 && chan<90");
-    //_unpacked.Draw("tdc", "activebank==1");
-    _digits.Draw("channel","plane==1");
-    // _digits.Draw("npe");
+    _hist_plane1->Draw();
     c2->cd(3);
-    //_unpacked.Draw("adc:tdc", "activebank==1");
-    _digits.Draw("channel","plane==2");
+    _hist_plane2->Draw();
     c2->Update();
 
     c3->cd(1);
@@ -240,7 +212,11 @@ std::string  ReduceCppSingleStation::process(std::string document) {
     c3->Update();
 
    c4->cd(1);
-   _graph->Draw("ac*");
+    _npe_plane0->Draw();
+   c4->cd(2);
+   _npe_plane1->Draw();
+   c4->cd(3);
+   _npe_plane2->Draw();
    c4->Update();
   }
 
@@ -253,14 +229,14 @@ void ReduceCppSingleStation::count_particle_events(Json::Value root) {
   int numb_triggers = root["daq_data"]["tof1"].size();
   int numb_spacepoints = 0;
 
-  int n_events = root["spacepoints"]["single_station"].size();
+  int n_events = root["space_points"]["single_station"].size();
   for ( int event_i = 0; event_i < n_events; event_i++ ) {
-    if ( !root["spacepoints"]["single_station"][event_i].isNull() ) {
+    if ( !root["space_points"]["single_station"][event_i].isNull() ) {
       numb_spacepoints += 1;
     }
   }
 
-  float effic = static_cast<float>(numb_spacepoints)/static_cast<float>(numb_triggers);
+  float effic = static_cast<float>(numb_spacepoints)/numb_triggers;
   float _spill_counter_copy = static_cast<float>(_spill_counter);
   _graph->SetPoint(_spill_counter, _spill_counter_copy, effic);
 /*
@@ -336,12 +312,25 @@ void ReduceCppSingleStation::digits_histograms(Json::Value root) {
                                         event_i,
                                         JsonWrapper::arrayValue);
     int numb_digits = i_PartEvent.size();
+    double chan_sum = 0;
     for ( int digit_j = 0; digit_j < numb_digits; digit_j++ ) {
       _plane      = i_PartEvent[digit_j]["plane"].asInt();
       _channel = i_PartEvent[digit_j]["channel"].asDouble();
       _npe     = i_PartEvent[digit_j]["npe"].asDouble();
       _digits.Fill();
+      chan_sum += _channel;
+      if ( _plane == 0 ) {
+        _hist_plane0->Fill(_channel);
+        _npe_plane0->Fill(_npe);
+      } else if ( _plane == 1 ) {
+        _hist_plane1->Fill(_channel);
+        _npe_plane1->Fill(_npe);
+      } else if ( _plane == 2 ) {
+        _hist_plane2->Fill(_channel);
+        _npe_plane2->Fill(_npe);
+      }
     }
+    _chan_sum->Fill(chan_sum);
   }
   // } else {
   //  throw(Squeal(Squeal::recoverable,

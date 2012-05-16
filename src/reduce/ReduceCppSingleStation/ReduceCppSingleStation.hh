@@ -44,6 +44,7 @@
 #include "TVirtualPad.h"
 #include "TFrame.h"
 #include "TH2F.h"
+#include "TH1F.h"
 
 #include "Interface/Squeak.hh"
 #include "Interface/Squeal.hh"
@@ -94,7 +95,20 @@ class ReduceCppSingleStation {
 
   TH2F *duplets_copy;
 
+  TH1F *_hist_plane0;
+
+  TH1F *_hist_plane1;
+
+  TH1F *_hist_plane2;
+
+  TH1F *_chan_sum;
   //TH2F *_trig_efficiency;
+
+  TH1F *_npe_plane0;
+
+  TH1F *_npe_plane1;
+
+  TH1F *_npe_plane2;
 
   std::string _classname;
 
