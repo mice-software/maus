@@ -223,7 +223,7 @@ std::string  ReduceCppSingleStation::process(std::string document) {
     c4->Update();
 
     c5->cd(1);
-    // _unpacked.Draw("adc", "bank == 0 || bank == 2 || bank == 5 || 
+    // _unpacked.Draw("adc", "bank == 0 || bank == 2 || bank == 5 ||
     // bank == 7 || bank == 9 || bank == 10|| bank == 11
     // ||bank == 12 || bank ==13 || bank == 14");
     _unpacked.Draw("adc");
