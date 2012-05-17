@@ -33,6 +33,7 @@ bool ReduceCppSingleStation::birth(std::string argJsonConfigDocument) {
   TCanvas *c2 = new TCanvas("c2", "Channel Hits", 200, 10, 700, 500);
   TCanvas *c3 = new TCanvas("c3", "SpacePoints", 200, 10, 700, 500);
   TCanvas *c4 = new TCanvas("c4", "Cluster NPE", 200, 10, 700, 500);
+  TCanvas *c5 = new TCanvas("c5", "ADCs", 200, 10, 700, 500);
 
   triplets = new TH2F("triplets", "Current Spill (x, y)", 300, -150, 150, 300, -150, 150);
   duplets  = new TH2F("duplets",  "Current Spill (x, y)", 300, -150, 150, 300, -150, 150);
@@ -75,6 +76,7 @@ bool ReduceCppSingleStation::birth(std::string argJsonConfigDocument) {
   _spacepointscopy.Branch("z", &_z, "z/D");
   _spacepointscopy.Branch("type", &_type, "type/I");
 
+  c5->Divide(1,1);
   c1->Divide(1, 1);
   c1->SetFillColor(21);
   c1->GetFrame()->SetFillColor(42);
@@ -138,6 +140,7 @@ std::string  ReduceCppSingleStation::process(std::string document) {
   TCanvas *c2 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c2"));
   TCanvas *c3 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c3"));
   TCanvas *c4 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c4"));
+  TCanvas *c5 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c5"));
 
   Squeak::activateCout(1);
 
@@ -218,6 +221,12 @@ std::string  ReduceCppSingleStation::process(std::string document) {
     c4->cd(3);
     _npe_plane2->Draw();
     c4->Update();
+
+    c5->cd(1);
+    _unpacked.Draw("adc","bank==0 || bank==2 || bank==5 || bank==7 || bank==9|| bank==10|| bank==11 ||bank==12 || bank==13|| bank==14");
+
+    c5->Update();
+
   }
 
   // std::cerr << "End Reducer Process" << std::endl;
