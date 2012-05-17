@@ -24,7 +24,7 @@ SESpacePointRec::SESpacePointRec() {}
 SESpacePointRec::~SESpacePointRec() {}
 
 void SESpacePointRec::process(SEEvent &evt) {
-  int tracker, station, plane;
+  int plane;
   int clusters_size = evt.clusters().size();
   // Store clusters in a vector.
   std::vector<SECluster*> clusters[3];
@@ -62,12 +62,12 @@ void SESpacePointRec::process(SEEvent &evt) {
   }  // ends plane 0
 
   // Run over left-overs and make duplets without any selection criteria
-  for ( int a_plane = 0; a_plane < 2; a_plane++ ) {
-    for ( int another_plane = a_plane+1; another_plane < 3; another_plane++ ) {
+  for ( int a_plane = 0; a_plane < 2; ++a_plane ) {
+    for ( int another_plane = a_plane+1; another_plane < 3; ++another_plane ) {
       // Make all possible combinations of doublet clusters from views 0 & 1
       // looping over all clusters in view 0, then 1
       for ( unsigned int cla = 0;
-            cla < clusters[a_plane].size(); cla++ ) {
+            cla < clusters[a_plane].size(); ++cla ) {
       SECluster* candidate_A =
                       (clusters[a_plane])[cla];
 

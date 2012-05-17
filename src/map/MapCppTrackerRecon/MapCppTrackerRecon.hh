@@ -104,7 +104,7 @@ class MapCppTrackerRecon {
 
   void pattern_recognition(SciFiEvent &evt);
 
-  // void track_fit(SciFiEvent &evt);
+  //  void track_fit(SciFiEvent &evt);
 
   void save_to_json(SciFiEvent &evt);
 

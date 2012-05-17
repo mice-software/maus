@@ -43,6 +43,11 @@
 #include "TGFrame.h"
 #include "TVirtualPad.h"
 #include "TFrame.h"
+#include "TH2F.h"
+#include "TH1F.h"
+
+#include "Interface/Squeak.hh"
+#include "Interface/Squeal.hh"
 
 class ReduceCppSingleStation {
 
@@ -68,12 +73,44 @@ class ReduceCppSingleStation {
   */
   std::string process(std::string document);
 
- private:
+  void unpacked_data_histograms(Json::Value root);
 
-  Json::Value GetPartEvent(Json::Value root, std::string entry_type,
-                           std::string detector, int part_event);
+  void digits_histograms(Json::Value root);
+
+  void draw_spacepoints(Json::Value root);
+
+  bool is_physics_daq_event(Json::Value root);
+
+  void count_particle_events(Json::Value root);
+
+ private:
+  TGraph *_graph;
+  int _spill_counter;
+
+  TH2F *triplets;
+
+  TH2F *duplets;
+
+  TH2F *triplets_copy;
+
+  TH2F *duplets_copy;
+
+  TH1F *_hist_plane0;
+
+  TH1F *_hist_plane1;
+
+  TH1F *_hist_plane2;
+
+  TH1F *_chan_sum;
+
+  TH1F *_npe_plane0;
+
+  TH1F *_npe_plane1;
+
+  TH1F *_npe_plane2;
 
   std::string _classname;
+
   std::string _filename;
 
   int _nSpills;
@@ -81,9 +118,16 @@ class ReduceCppSingleStation {
   void Save();
 
   TTree _unpacked;
-  int _adc;
-  int _bank;
-  int _chan;
+  int _adc, _tdc, _bank, _chan, _activebank;
+
+  TTree _digits;
+  int _plane;
+  double _npe, _channel;
+
+  TTree _spacepoints;
+  TTree _spacepointscopy;
+  double _x, _y, _z, _pe;
+  int _type;
 };
 
 #endif
