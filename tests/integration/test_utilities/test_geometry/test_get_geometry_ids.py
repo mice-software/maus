@@ -19,6 +19,7 @@ test_get_geometry_ids.py
 import unittest
 import os
 import subprocess
+import urllib2
 
 MAUS_ROOT_DIR = os.getenv("MAUS_ROOT_DIR")
 TMP_PATH = os.path.join(MAUS_ROOT_DIR, "tmp")
@@ -29,7 +30,7 @@ TEST_DIR = os.path.join(MAUS_ROOT_DIR, "tests", "integration", \
 CONFIG_PATH_FILE = os.path.join(TEST_DIR, "test_get_ids_config.txt")
 CONFIG_PATH_NO_FILE = os.path.join(TEST_DIR, "test_get_ids_config_nofile.txt")
 
-def run_simulations():
+def run_get_geometries():
     """
     Run get_ids to generate some data. We only want to do this once, so I
     pull it out into a separate part of the test.
@@ -45,7 +46,7 @@ def run_simulations():
                            '-configuration_file', CONFIG_PATH_FILE])
     subproc.wait()
 
-class TestAccumulateColouredParticles(unittest.TestCase): #pylint:disable= R0904
+class TestGetGeometryIDS(unittest.TestCase): #pylint:disable= R0904
     """
     This class has two tests. One checks that particles are accumulated into one
     vrml output file when the tag is selected in configuration defaults. The 
@@ -54,39 +55,55 @@ class TestAccumulateColouredParticles(unittest.TestCase): #pylint:disable= R0904
     """
     def setUp(self): # pylint: disable=C0103, C0202
         """ Run Simulation """
-        run_simulations()
-    
+        self.internet_connection = True
+        try:
+            urllib2.urlopen("http://google.com")
+        except urllib2.URLError:
+            unittest.TestCase.skipTest(self, "No Internet Connection")
+        if self.internet_connection == True:
+            run_get_geometries()
+
     def test_get_geometry_ids_file(self): 
         """ Check that get_geometry_ids creates a file with the correct geoms"""
-        geometry_id_file = os.path.join(TMP_PATH, "geometry_ids.txt")
-        if os.path.isfile(geometry_id_file) == False:
-            raise Exception('geometry ids not saved to file')
-        fin = open(geometry_id_file, 'r')
-        geometry_lines_found = 0
-        for lines in fin.readlines():
-            if lines.find('Geometry Number = 1') >= 0:
-                geometry_lines_found += 1
-            if lines.find('ValidFrom       = 2012-04-25 14:17:45.447614') >= 0:
-                geometry_lines_found += 1
-            if lines.find('Date Created    = 2012-04-25 14:17:45.527000') >= 0:
-                geometry_lines_found += 1
-        self.assertEqual(geometry_lines_found, 3, \
+        if self.internet_connection == False:
+            print "SKIP test no internet connection"
+        else:
+            geometry_id_file = os.path.join(TMP_PATH, "geometry_ids.txt")
+            if os.path.isfile(geometry_id_file) == False:
+                raise Exception('geometry ids not saved to file')
+            fin = open(geometry_id_file, 'r')
+            geometry_lines_found = 0
+            for lines in fin.readlines():
+                if lines.find('Geometry Number = 1') >= 0:
+                    geometry_lines_found += 1
+                if lines.find('ValidFrom       = 2012-04-25 14:17:45.447614') \
+                                                                           >= 0:
+                    geometry_lines_found += 1
+                if lines.find('Date Created    = 2012-04-25 14:17:45.527000') \
+                                                                           >= 0:
+                    geometry_lines_found += 1
+            self.assertEqual(geometry_lines_found, 3, \
                            'First geometry not found check ' + geometry_id_file)
 
     def test_get_geometry_ids_nofile(self):  
         """ Check that get_geometry_ids outputs the geometries """
-        geometry_id_file = os.path.join(TMP_PATH, "get_geometry_ids_output")
-        fin = open(geometry_id_file, 'r')
-        geometry_lines_found = 0
-        for lines in fin.readlines():
-            if lines.find('Geometry Number = 1') >= 0:
-                geometry_lines_found += 1
-            if lines.find('ValidFrom       = 2012-04-25 14:17:45.447614') >= 0:
-                geometry_lines_found += 1
-            if lines.find('Date Created    = 2012-04-25 14:17:45.527000') >= 0:
-                geometry_lines_found += 1
-        self.assertEqual(geometry_lines_found, 3, \
+        if self.internet_connection == False:
+            print "SKIP test no internet connection"
+        else:
+            geometry_id_file = os.path.join(TMP_PATH, "get_geometry_ids_output")
+            fin = open(geometry_id_file, 'r')
+            geometry_lines_found = 0
+            for lines in fin.readlines():
+                if lines.find('Geometry Number = 1') >= 0:
+                    geometry_lines_found += 1
+                if lines.find('ValidFrom       = 2012-04-25 14:17:45.447614') \
+                                                                           >= 0:
+                    geometry_lines_found += 1
+                if lines.find('Date Created    = 2012-04-25 14:17:45.527000') \
+                                                                           >= 0:
+                    geometry_lines_found += 1
+            self.assertEqual(geometry_lines_found, 3, \
                            'First geometry not found check ' + geometry_id_file)
-
+    
 if __name__ == '__main__':
     unittest.main()
