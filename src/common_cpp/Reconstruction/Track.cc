@@ -51,4 +51,12 @@ void Track::set_particle_id(const int particle_id) {
   particle_id_ = particle_id;
 }
 
+std::ostream& operator<<(std::ostream& out, const Track& track) {
+  out << track.size();
+  for (int index = 0; index < track.size(); ++index) {
+    out << std::endl << track[index];
+  }
+  return out;
+}
+
 }  // namespace MAUS

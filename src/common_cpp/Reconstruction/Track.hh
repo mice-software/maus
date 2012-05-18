@@ -52,6 +52,8 @@ class Track : public std::vector<TrackPoint> {
  protected:
   int particle_id_;
 };
+
+std::ostream& operator<<(std::ostream & out, const Track & vector);
 }  // namespace MAUS
 
 #endif

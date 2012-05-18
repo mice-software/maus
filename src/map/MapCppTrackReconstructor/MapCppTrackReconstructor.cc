@@ -102,7 +102,9 @@ std::string MapCppTrackReconstructor::process(std::string run_data) {
       configuration_,
       "data_acquisition_mode",
       JsonWrapper::stringValue);
-  if (data_acquisition_mode == "Testing") {
+  if (data_acquisition_mode == "Random") {
+    LoadRandomData();
+  } else if (data_acquisition_mode == "Testing") {
     LoadTestingData();
   } else if (data_acquisition_mode == "Simulation") {
     LoadSimulationData();
@@ -151,6 +153,8 @@ return output;
     best_fit_track.set_particle_id(particle_id);
     best_fit_track.clear();
     track_fitter_->Fit(*measured_tracks, best_fit_track);
+std::cout << "Measured Track: " << (*measured_tracks) << std::endl;
+std::cout << "Best Fit Track: " << best_fit_track << std::endl;
 
     // TODO(plane1@hawk.iit.edu) Reconstruct track at the desired locations
     //  specified in the configuration.
@@ -323,12 +327,12 @@ void MapCppTrackReconstructor::SetupTrackFitter() {
   }
 }
 
-void MapCppTrackReconstructor::LoadTestingData() {
+void MapCppTrackReconstructor::LoadRandomData() {
   // TODO(plane1@hawk.iit.edu) reconstruction_input_ = new ReconstructionInput(...);
   // Create random track points for TOF0, TOF1, Tracker 1, Tracker 2, and TOF 2
   srand((unsigned)time(NULL));
 
-  const bool beam_polarity_negative = true;  // e-, mu-, pi-
+  const bool beam_polarity_negative = false;  // mu+
 
   std::vector<Detector> detectors;
   double plane;
@@ -365,7 +369,60 @@ void MapCppTrackReconstructor::LoadTestingData() {
     TrackPoint track_point(position[0], momentum[0],
                            position[1], momentum[1],
                            position[2], momentum[2],
-                           position[3], momentum[3],
+                           plane, momentum[3],
+                           detector);
+    events.push_back(track_point);
+  }
+
+
+  reconstruction_input_ = new ReconstructionInput(beam_polarity_negative,
+                                                  detectors,
+                                                  events);
+}
+
+void MapCppTrackReconstructor::LoadTestingData() {
+  // TODO(plane1@hawk.iit.edu) reconstruction_input_ = new ReconstructionInput(...);
+  // Create random track points for TOF0, TOF1, Tracker 1, Tracker 2, and TOF 2
+  srand((unsigned)time(NULL));
+
+  const bool beam_polarity_negative = false;  // mu+
+
+  std::vector<Detector> detectors;
+  double plane;
+  double uncertainty_data[36];
+  std::vector<TrackPoint> events;
+  double position[4], momentum[4];
+
+  // generate mock detector info and random muon detector event data
+  for (size_t id = Detector::kTOF0; id <= Detector::kCalorimeter; ++id) {
+    //plane = ((double)rand()/(double)RAND_MAX) * 20;  // 0.0 - 20.0 meters
+    plane = id * 1.4;  // 0.0 - 20.0 meters
+    for (int index = 0; index < 36; ++index) {
+      uncertainty_data[index] = ((double)rand()/(double)RAND_MAX) * 100;
+    }
+    CovarianceMatrix uncertainties(uncertainty_data);
+    Detector detector(id, plane, uncertainties);
+    detectors.push_back(detector);
+
+    // skip detectors we're not using
+    if ((id == Detector::kCherenkov1) ||
+        (id == Detector::kCherenkov2) ||
+        (id == Detector::kCalorimeter)) {
+      continue;
+    }
+
+    for (int coordinate = 0; coordinate < 4; ++coordinate) {
+      position[coordinate] = ((double)rand()/(double)RAND_MAX) * 20;  // meters
+    }
+
+    for (int coordinate = 0; coordinate < 4; ++coordinate) {
+      momentum[coordinate] = ((double)rand()/(double)RAND_MAX) * 500;  // MeV
+    }
+
+    TrackPoint track_point(position[0], momentum[0],
+                           position[1], momentum[1],
+                           position[2], momentum[2],
+                           plane, momentum[3],
                            detector);
     events.push_back(track_point);
   }
@@ -377,12 +434,14 @@ void MapCppTrackReconstructor::LoadTestingData() {
 }
 
 void MapCppTrackReconstructor::LoadSimulationData() {
+  // TODO(plane1@hawk.iit.edu) use "digitized" data (simulated DAQ output)
+  // instead of Monte Carlo truth data
+
   try {
     // MapCppSimulation puts the simulated spill in run_data_["mc"]
     Json::Value mc = JsonWrapper::GetProperty(run_data_,
                                               "mc",
                                               JsonWrapper::arrayValue);
-    //mc --> Json::Value[mc.size()] --> "primary"
 
     // TODO(plane1@hawk.iit.edu) Collect tracks from the detectors and
     // dynamically allocate the ReconstructionInput instance

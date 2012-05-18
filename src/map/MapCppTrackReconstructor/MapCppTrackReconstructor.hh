@@ -92,9 +92,12 @@ class MapCppTrackReconstructor {
 
   void SetupOpticsModel();
   void SetupTrackFitter();
+
+  void LoadRandomData();
   void LoadTestingData();
   void LoadSimulationData();
   void LoadLiveData();
+
   void CorrelateTrackPoints(std::vector<Track> & tracks);
 
   static Json::Value TrackToJson(const Track & track);
