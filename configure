@@ -59,27 +59,43 @@ fi
 # 2. Any existing environment variable called "maus_third_party" e.g. if set by user's .bashrc file
 # 3. The current maus working directory, as held by the variable maus_root_dir  
 if [ "$1" ]; then
-    maus_third_party=$1 #if a command line argument is entered, set third party directory from it
+    #if a command line argument is entered, set third party directory from it - 
+    #cd $1; pwd forces to absolute path; -P gives physical path (no links)
+    maus_third_party=`cd $1; pwd -P`
 elif [ -z "${maus_third_party}" ]; then
-    maus_third_party="${maus_root_dir}/third_party" #if not set above or anywhere else use the local maus working directory
+    maus_third_party=${maus_root_dir} #if not set above or anywhere else use the local maus working directory
 fi
 
 # Temporarily setup the environment (this gets repeated in the env.sh output)
 #      maus_central says where the precompiled third party libraries are (if any)
 #      PATH says where the binaries are
 #      DYLIB_VAR says where your shared libraries are
-echo "INFO: Attempting to use third party libraries from " ${maus_third_party}
-echo
-if [ -z "${PATH}" ]; then  # see if the variable exists yet
-    PATH="${maus_third_party}/install/bin"       # if not, initialize it
-else
-    PATH="${maus_third_party}/install/bin:$PATH" # else add to it
-fi
+if [ "${maus_third_party}" ]; then
+    echo "INFO: Attempting to use third party libraries from " ${maus_third_party}
+    echo
+    if [ -z "${PATH}" ]; then  # see if the variable exists yet
+        PATH="${maus_third_party}/third_party/install/bin"       # if not, initialize it
+    else
+        PATH="${maus_third_party}/third_party/install/bin:$PATH" # else add to it
+    fi
 
-if [ -z "${!DYLIB_VAR}" ]; then  # see if the variable exists yet
-    eval ${DYLIB_VAR}="${maus_third_party}/install/lib"                  # if not, initialize it
+    if [ -z "${!DYLIB_VAR}" ]; then  # see if the variable exists yet
+        eval ${DYLIB_VAR}="${maus_third_party}/third_party/install/lib"                  # if not, initialize it
+    else
+        eval ${DYLIB_VAR}="${maus_third_party}/third_party/install/lib:${!DYLIB_VAR}" # else add to to it
+    fi
 else
-    eval ${DYLIB_VAR}="${maus_third_party}/install/lib:${!DYLIB_VAR}" # else add to to it
+    if [ -z "${PATH}" ]; then  # see if the variable exists yet
+        PATH="${maus_root_dir}/third_party/install/bin"       # if not, initialize it
+    else
+        PATH="${maus_root_dir}/third_party/install/bin:$PATH" # else add to it
+    fi
+
+    if [ -z "${!DYLIB_VAR}" ]; then  # see if the variable exists yet
+        eval ${DYLIB_VAR}="${maus_root_dir}/third_party/install/lib"                  # if not, initialize it
+    else
+        eval ${DYLIB_VAR}="${maus_root_dir}/third_party/install/lib:${!DYLIB_VAR}" # else add to to it
+    fi
 fi
 
 # Check for Python
@@ -174,9 +190,9 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      export MAUS_THIRD_PARTY="${maus_third_party}"
      echo "INFO: Using third party libraries from ${maus_third_party}"
 
-     maus_bin_dirs="\${MAUS_THIRD_PARTY}/install/bin"
+     maus_bin_dirs="\${MAUS_THIRD_PARTY}/third_party/install/bin"
      if [ "$arch" == "Darwin" ]; then
-         maus_bin_dirs="\${MAUS_THIRD_PARTY}/install/Python.framework/Versions/2.7/bin:\${maus_bin_dirs}"
+         maus_bin_dirs="\${MAUS_THIRD_PARTY}/third_party/install/Python.framework/Versions/2.7/bin:\${maus_bin_dirs}"
      fi
 
      if [ -z "\${PATH}" ]; then  # see if the variable exists yet
@@ -185,9 +201,9 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
          export PATH="\${maus_bin_dirs}:\${PATH}" # else add it
      fi
 
-     maus_lib_dirs="\${MAUS_THIRD_PARTY}/install/lib"
+     maus_lib_dirs="\${MAUS_THIRD_PARTY}/third_party/install/lib"
      if [ "$arch" == "Darwin" ]; then
-         maus_lib_dirs="\${MAUS_THIRD_PARTY}/install/Python.framework/Versions/2.7/lib:\${maus_lib_dirs}"
+         maus_lib_dirs="\${MAUS_THIRD_PARTY}/third_party/install/Python.framework/Versions/2.7/lib:\${maus_lib_dirs}"
      fi
 
      if [ -z "\${$DYLIB_VAR}" ]; then  # see if the variable exists yet
@@ -209,19 +225,13 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      export PYTHONPATH="\$MAUS_ROOT_DIR/src/common_py:\$PYTHONPATH"
      export $DYLIB_VAR="\$MAUS_ROOT_DIR/src/common_py:\$$DYLIB_VAR"
 
-     export PYTHONPATH="\$MAUS_ROOT_DIR/src/common_py/docstore:\$PYTHONPATH" 
-
-     export PYTHONPATH="\$MAUS_ROOT_DIR/src/common_py/mauscelery:\$PYTHONPATH"
-     export LD_LIBRARY_PATH="\$MAUS_ROOT_DIR/src/common_py/mauscelery:\$LD_LIBRARY_PATH"
-     export CELERY_LOADER="mausloader.CeleryLoader"
-
-     export PYTHONPATH="\$MAUS_ROOT_DIR/src/common_py/docstore:\$PYTHONPATH"
-     export LD_LIBRARY_PATH="\$MAUS_ROOT_DIR/src/common_py/docstore:\$LD_LIBRARY_PATH"
+     # Celery
+     export CELERY_CONFIG_MODULE="mauscelery.celeryconfig"
 
      export G4DEBUG=1
      export G4VERS=geant4.9.2.p04
      export G4SYSTEM=$arch-g++
-     export G4INSTALL="\${MAUS_THIRD_PARTY}/build/\${G4VERS}"
+     export G4INSTALL="\${MAUS_THIRD_PARTY}/third_party/build/\${G4VERS}"
      export G4LIB="\${G4INSTALL}/lib"
      export $DYLIB_VAR="\${G4LIB}/\${G4SYSTEM}:\${$DYLIB_VAR}"
      export G4INCLUDE="\${G4INSTALL}/include/"
@@ -242,7 +252,8 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      export maus_no_optimize=0 # force gcc not to optimise
      export maus_lcov=0 # enable cpp coverage - requires lcov
      export maus_debug=0 # enable debugging
-     export maus_gprof=0 # enable cpp profiling - requires gprof
+     export maus_gprof=0 # enable cpp profiling of cpp unit tests 
+                         # requires gprof
 
      echo "SUCCESS: MAUS setup"
 else
@@ -250,9 +261,9 @@ else
 fi
 
 # setup ROOT
-if [ -f \${MAUS_THIRD_PARTY}/build/$root_version/bin/thisroot.sh ]
+if [ -f \${MAUS_THIRD_PARTY}/third_party/build/$root_version/bin/thisroot.sh ]
 then
-     source \${MAUS_THIRD_PARTY}/build/$root_version/bin/thisroot.sh
+     source \${MAUS_THIRD_PARTY}/third_party/build/$root_version/bin/thisroot.sh
 fi
 
 EOF

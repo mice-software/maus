@@ -13,7 +13,14 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+InputPyJSON inputs data as a json document into the MAUS framework
+"""
+
 import json
+import gzip
+
+import ErrorHandler
 
 class InputPyJSON:
     """Reads JSON documents from files/sockets
@@ -50,18 +57,37 @@ class InputPyJSON:
         the end of the file.
         <b>Default: -1</b>
         """
-        if arg_file == None: # pragma: no cover
-            arg_file = open('mausput','r')
         self._file = arg_file
-
         self._number_of_events = arg_number_of_events
         self._current_event = 0
 
-    def birth(self, json_config = "{}"):
+    def birth(self, config_document = "{}"):
         """
-        birth() does nothing
+        birth() opens the json file based on datacards
+
+        @param json_config json string holding a dict of json parameters
+        - input_json_file_name datacard controls file name to open
+        - input_json_file_type datacard controls file type (either 'text' or 
+          'gzip'
+        @returns True on success, False on failure
+
+        If self._file is opens self._file file.
         """
-        return True
+        try:
+            if self._file == None:
+                config = json.loads(config_document)
+                fname = config["input_json_file_name"]
+                if config["input_json_file_type"] == "gzip":
+                    self._file = gzip.GzipFile(fname, 'r')
+                elif config["input_json_file_type"] == "text":
+                    self._file = open(fname, 'r')
+                else:
+                    raise IOError('Did not recognise input_json_file_type '+\
+                                  str(config["input_json_file_type"]))
+            return True
+        except Exception: #pylint: disable=W0703
+            ErrorHandler.HandleException({}, self)
+            return False
 
     def emitter(self):
         """Emit JSON documents

@@ -4,6 +4,9 @@
 //Has simply a GetFieldValue method
 
 #include "Config/MiceModule.hh"
+#include "src/legacy/Interface/STLUtils.hh"
+
+#include "src/common_cpp/FieldTools/SectorMagneticFieldMap.hh"
 
 #include "BeamTools/BTFieldConstructor.hh"
 #include "BeamTools/BTMultipole.hh"
@@ -17,13 +20,14 @@
 #include "BeamTools/BT3dFieldMap.hh"
 #include "BeamTools/BTPillBox.hh"
 #include "BeamTools/BTRFFieldMap.hh"
+#include "src/legacy/BeamTools/BTFieldConstructor.hh"
 
 std::string       BTFieldConstructor::_defaultSolenoidMode = "";
-const int         BTFieldConstructor::_numberOfFieldTypes  = 13;
-const std::string BTFieldConstructor::_fieldTypes[14] 
+const int         BTFieldConstructor::_numberOfFieldTypes  = 14;
+const std::string BTFieldConstructor::_fieldTypes[15] 
            = {"Solenoid","PillBox","MagneticFieldMap", "Quadrupole", "RFFieldMap", 
               "RectangularField", "CylindricalField", "Dipole1", "Dipole2", "Multipole", "CombinedFunction", "FastSolenoid", 
-              "FieldAmalgamation",""};
+              "FieldAmalgamation","SectorMagneticFieldMap",""};
 int               BTFieldConstructor::_fieldNameIndex = 0;
 
 BTFieldConstructor::BTFieldConstructor() :
@@ -47,6 +51,10 @@ BTFieldConstructor::BTFieldConstructor(MiceModule * rootModule) :
   _electroMagneticField->AddField(_magneticField, Hep3Vector(0,0,0));
   AddField(_electroMagneticField, Hep3Vector(0,0,0));
   BuildFields(rootModule);
+}
+
+BTFieldConstructor::~BTFieldConstructor() {
+    MAUS::SectorMagneticFieldMap::ClearFieldCache();
 }
 
 void BTFieldConstructor::BuildFields(MiceModule * rootModule)
@@ -124,6 +132,8 @@ BTField * BTFieldConstructor::GetField(const MiceModule * theModule)
 		return GetRFCavity(theModule);
 	else if(field == "MagneticFieldMap")
 		return GetMagFieldMap(theModule);
+	else if(field == "SectorMagneticFieldMap")
+		return GetSectorMagFieldMap(theModule);
 	else if(field == "RFFieldMap")
 		return GetRFCavity(theModule);
 	else if(field == "RectangularField" || field == "CylindricalField")
@@ -254,6 +264,7 @@ BTField * BTFieldConstructor::GetRFCavity(const MiceModule * theModule)
 	}
 	else
 	{
+		frequency = theModule->propertyDoubleThis("Frequency");
 		energyGain = theModule->propertyDoubleThis("PeakEField");
 		timeDelay  = theModule->propertyDoubleThis("TimeDelay");
 		if(theModule->propertyStringThis("FieldType") == "PillBox")
@@ -296,6 +307,23 @@ BTField * BTFieldConstructor::GetMagFieldMap(const MiceModule * theModule)
 		return new BT3dFieldMap("", filename, filetype, symmetry);
 	}
 	return new BTMagFieldMap(filename, filetype, "interpolation");
+}
+
+BTField * BTFieldConstructor::GetSectorMagFieldMap
+                                                (const MiceModule * theModule) {
+    std::string filename = theModule->propertyStringThis("FileName");
+    std::string filetype = theModule->propertyStringThis("FileType");
+    std::string symmetry = "None";
+	if(theModule->propertyExistsThis( "Symmetry", "string"))
+		symmetry = theModule->propertyStringThis("Symmetry");
+    std::vector<double> units(6, 1.);
+    for (int i = 0; i < 6; ++i) {
+        std::string name = "Unit"+STLUtils::ToString(i+1);
+	    if(theModule->propertyExistsThis(name, "double"))
+		    units[i] = theModule->propertyDoubleThis(name);
+    }
+
+    return new MAUS::SectorMagneticFieldMap(filename, filetype, units, symmetry);
 }
 
 BTField * BTFieldConstructor::GetConstantField(const MiceModule * theModule)

@@ -22,9 +22,7 @@
 #endif
 
 #include <ostream>
-#include <cstdio>
 #include <sstream>
-#include <cstring>
 
 #include "Interface/Squeal.hh"
 #include "Interface/Squeak.hh"
@@ -38,12 +36,10 @@ Squeal::Squeal() throw() {
 Squeal::Squeal(exceptionLevel level, std::string errorMessage,
                                                    std::string location) throw()
       : exception(), _message(errorMessage), _location(location),
-        _stacktrace(MakeStackTrace(2)), _level(level), _what(NULL) {
+        _stacktrace(MakeStackTrace(2)), _what(), _level(level) {
   Squeak::mout();  // make sure we initialise Squeak otherwise can get segv
   // use std::vector as dynamic array
-  std::string what_str = _message+" at "+_location;
-  _what = std::vector<char>(what_str.size()+1);
-  snprintf(&_what[0], what_str.size()+1, "%s", what_str.c_str());
+  SetWhat(_message+" at "+_location);
 }
 
 void Squeal::Print() {

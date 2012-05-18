@@ -1,0 +1,8 @@
+require_root = True
+require_g4 = True
+
+#get environment and project
+Import('env', 'project')
+localenv = env.Clone()
+
+env.jDev.build_project(localenv, project)

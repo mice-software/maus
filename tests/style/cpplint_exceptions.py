@@ -167,3 +167,80 @@ exceptions[os.path.join(TST, 'Optics', 'CovarianceMatrixTest.cc')] = [
 ('  } catch (Squeal squeal) {}',
  '"catch" is a keyword like "for" and "if", not a function', 'lane')
 ]
+
+exceptions[os.path.join(CPP_CM, 'JsonCppStreamer','ORStream.hh')] = [
+('template<>           orstream& orstream::operator<< <short> (short&  d) {', 'doesnt like the necessary specialisation', 'richards'),
+('template<>           orstream& orstream::operator<< <long>  (long&   d) {', 'doesnt like the necessary specialisation', 'richards'),
+('template<>           orstream& orstream::operator<< <short> (short* &  d) {', 'doesnt like the necessary specialisation', 'richards'),
+('template<>           orstream& orstream::operator<< <long>  (long* &   d) {', 'doesnt like the necessary specialisation', 'richards'),
+
+]
+
+exceptions[os.path.join(CPP_CM, 'JsonCppStreamer','ORStream.cc')] = [
+('  strcpy(m_branchName, "");', '', 'richards'),
+('  strcpy(m_branchName, "");', '', 'richards'),
+
+]
+exceptions[os.path.join(TST, 'JsonCppStreamer','ORStreamTest.cc')] = [
+('  strcpy(os.m_branchName, "");', '', 'richards'),
+('  strcpy(os.m_branchName, "Test");', '', 'richards'),
+('  strcpy(os.m_branchName, "");', '', 'richards'),
+('  strcpy(os.m_branchName, "HelloWorld");', '', 'richards'),
+('  strcpy(os.m_branchName, "");', '', 'richards'),
+('  long nevent = 0;', 'root uses longs', 'richards'),
+]
+exceptions[os.path.join(CPP_CM, 'JsonCppStreamer','IRStream.hh')] = [
+('template<>           irstream& irstream::operator>> <short> (short&  d) {', 'doesnt like the necessary specialisation', 'richards'),
+('template<>           irstream& irstream::operator>> <long>  (long&   d) {', 'doesnt like the necessary specialisation', 'richards'),
+('template<>           irstream& irstream::operator>> <short> (short* &  d) {', 'doesnt like the necessary specialisation', 'richards'),
+('template<>           irstream& irstream::operator>> <long>  (long* &   d) {', 'doesnt like the necessary specialisation', 'richards'),
+
+]
+
+exceptions[os.path.join(CPP_CM, 'JsonCppStreamer','IRStream.cc')] = [
+('  long nextEvent = irs.m_tree->GetReadEntry() + 1;', 'root can return a long', 'richards'),
+('  strcpy(m_branchName, "");', '', 'richards'),
+('  strcpy(m_branchName, "");', '', 'richards')
+
+]
+
+exceptions[os.path.join(TST, 'JsonCppStreamer','IRStreamTest.cc')] = [
+('  strcpy(is.m_branchName, "Test");', '', 'richards'),
+('  strcpy(is.m_branchName, "");', '', 'richards'),
+('  strcpy(is.m_branchName, "");', '', 'richards'),
+
+]
+
+exceptions[os.path.join(CPP_CM, 'JsonCppStreamer','RStream.hh')] = [
+('  long m_evtCount;', 'root can return a long', 'richards'),
+('    strcpy(m_branchName, "");', '', 'richards'),
+('    strcpy(m_branchName, "");', '', 'richards'),
+('  strcpy(m_branchName, "");', '', 'richards'),
+('    strcpy(m_branchName, "");', '', 'richards'),
+('    strcpy(m_branchName, "");', '', 'richards'),
+('  strcpy(m_branchName, "");', '', 'richards'),
+
+]
+
+exceptions[os.path.join(CPP_CM, 'JsonCppStreamer','RStream.cc')] = [
+('  strcpy(m_branchName, "");', '', 'richards'),
+('  strcpy(rs.m_branchName, name);', '', 'richards'),
+
+
+]
+
+exceptions[os.path.join(TST, 'JsonCppStreamer','RStreamTest.cc')] = [
+('    strcpy(t.m_branchName, "TestBranch1");', '', 'richards'),
+('    strcpy(t.m_branchName, "TestBranch1");', '', 'richards'),
+('    strcpy(t.m_branchName, "TestBranch2");', '', 'richards'),
+('    strcpy(t.m_branchName, "TestBranch2");', '', 'richards'),
+('    strcpy(t.m_branchName, "TestBranch1");', '', 'richards'),
+('    strcpy(t.m_branchName, "TestBranch2");', '', 'richards'),
+('    strcpy(t.m_branchName, "TestBranch1");', '', 'richards'),
+('    strcpy(t.m_branchName, "TestBranch1");', '', 'richards'),
+('    strcpy(t.m_branchName, "TestBranch2");', '', 'richards'),
+('    strcpy(t.m_branchName, "TestBranch2");', '', 'richards'),
+('    strcpy(t.m_branchName, "TestBranch1");', '', 'richards'),
+('    strcpy(t.m_branchName, "TestBranch2");', '', 'richards'),
+
+]

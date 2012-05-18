@@ -35,18 +35,20 @@
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
 //#include "src/common_cpp/Optics/LeastSquaresOpticsModel.hh"
 #include "src/common_cpp/Optics/LinearApproximationOpticsModel.hh"
-#include "src/common_cpp/Reconstruction/Detector.hh"
-#include "src/common_cpp/Reconstruction/MinuitTrackFitter.hh"
-#include "src/common_cpp/Reconstruction/Particle.hh"
-#include "src/common_cpp/Reconstruction/ReconstructionInput.hh"
-#include "src/common_cpp/Reconstruction/Track.hh"
-#include "src/common_cpp/Reconstruction/TrackFitter.hh"
-#include "src/common_cpp/Reconstruction/TrackPoint.hh"
+#include "src/common_cpp/Reconstruction/Global/Detector.hh"
+#include "src/common_cpp/Reconstruction/Global/MinuitTrackFitter.hh"
+#include "src/common_cpp/Reconstruction/Global/Particle.hh"
+#include "src/common_cpp/Reconstruction/Global/ReconstructionInput.hh"
+#include "src/common_cpp/Reconstruction/Global/Track.hh"
+#include "src/common_cpp/Reconstruction/Global/TrackFitter.hh"
+#include "src/common_cpp/Reconstruction/Global/TrackPoint.hh"
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 
 namespace MAUS {
+
+using MAUS::reconstruction::global::ReconstructionInput;
 
 MapCppTrackReconstructor::MapCppTrackReconstructor()
     : optics_model_(NULL), track_fitter_(NULL), reconstruction_input_(NULL) {

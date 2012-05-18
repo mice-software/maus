@@ -5,7 +5,9 @@ transverse beta functions.
 
 import os
 import unittest
+import subprocess
 import xboa.Common as Common #pylint: disable=F0401
+
 
 TEST_NAMES = ['mapping', 'optimiser'] #, 'rf', '6d', 'polyfit']
 TARGET_BETA = {'mapping':0.655994338, 'optimiser':0.652749967}
@@ -15,9 +17,11 @@ def run_optics(test):
     Runs optics application and produces some output
     """
     os.chdir(os.getenv('MAUS_ROOT_DIR')+'/tests/integration/test_optics')
-    run_command = './optics files/cards.'+test+' >& log.'+test
-    print run_command
-    os.system(run_command)
+    print 'Running optics test', test,
+    proc = subprocess.Popen(['./optics', 'files/cards.'+test], \
+																						stdout = open('log.'+test, 'w'))
+    proc.wait()
+    print 'with return code', proc.returncode
 
 def get_data(test):
     """

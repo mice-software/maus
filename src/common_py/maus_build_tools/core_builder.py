@@ -19,8 +19,7 @@ Tools to build core library (libMausCpp) and core library unit tests
 
 import os
 import glob
-import shutil
-import SCons # pylint: disable=F0401
+import subprocess
 
 MAUS_ROOT_DIR = os.environ['MAUS_ROOT_DIR']
 
@@ -43,25 +42,8 @@ def install_python_tests(maus_root_dir, env):
         if os.path.isdir(subdir):
             pos = len(target)
             subdir_mod = subdir[pos:]
-            test_files = glob.glob(subdir+"/test_*.py")                   
+            test_files = glob.glob(subdir+"/*.py")                   
             env.Install(build+subdir_mod, test_files)
-
-def duplicate_dylib_as_so(target, source, env): # pylint: disable=W0613
-    """
-    Wrapper for shutil.copyfile for dylib2so tool
-
-    @param source - the file source
-    @param target - the target file
-    @param env - the SCons environment
-    """
-    print "Duplicating %s as %s." % (source[0], target[0])
-    shutil.copyfile(str(source[0]), str(target[0]))
-    return None
-
-
-DYLIB2SO = SCons.Builder.Builder(action = duplicate_dylib_as_so,
-                                 suffix = '.so',
-                                 src_suffix = '.dylib')
 
 def build_lib_maus_cpp(env):
     """
@@ -70,9 +52,6 @@ def build_lib_maus_cpp(env):
     Build libMausCpp.so shared object - containing all the code in 
     src/common_cpp/* and src/legacy/*
     """
-
-    env.Append(BUILDERS = {'Dylib2SO' : DYLIB2SO}) # pylint: disable-msg=E0602
-
     common_cpp_files = glob.glob("src/legacy/*/*cc") + \
         glob.glob("src/legacy/*/*/*cc") + \
         glob.glob("src/common_cpp/*/*cc") + \
@@ -87,7 +66,7 @@ def build_lib_maus_cpp(env):
     if (os.uname()[0] == 'Darwin'):
         maus_cpp_so = env.Dylib2SO(targetpath)
         # Depends == SCons global variable??
-        env.Depends(maus_cpp_so, maus_cpp) #pylint: disable = E0602
+        Depends(maus_cpp_so, maus_cpp) #pylint: disable = E0602
         env.Install("build", maus_cpp_so)
 
 
@@ -118,4 +97,32 @@ def build_cpp_tests(env):
                                source = test_optics_files, \
                                LIBS= env['LIBS'] + ['MausCpp'])
     env.Install('build', test_optics)
+
+def build_data_structure(env):
+    """
+    Build the data structure library
+
+    ROOT needs a .so containing the data structure
+    class symbols and this needs to be ported to wherever the data structure is
+    called. We build this by calling root and letting it do it's dynamic linker 
+    stuff
+    """
+    maus_root_dir = os.environ['MAUS_ROOT_DIR']
+    data_struct = os.path.join(maus_root_dir, 'src/common_cpp/DataStructure/') 
+    here = os.getcwd()
+    os.chdir(maus_root_dir)
+    data_items = glob.glob(data_struct+'/*.hh')
+    data_items = [item for item in data_items if item[-7:] != '-inl.hh']
+    # LinkDef.hh must be last
+    data_items.sort(key = lambda x: x.find('LinkDef.hh')) 
+    dict_target = (data_struct+'/MausDataStructure.cc')
+    proc_target = ['rootcint']+['-f', dict_target, '-c']
+    for include in env['CPPPATH']:
+        proc_target.append('-I'+include)
+    proc_target += data_items
+    print proc_target
+    proc = subprocess.Popen(proc_target)
+    proc.wait()
+    os.chdir(here)
+
 

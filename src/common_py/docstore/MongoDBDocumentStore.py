@@ -17,9 +17,13 @@ MongoDB-based document store.
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+from datetime import datetime
+import time
 import pymongo
 
-class MongoDBDocumentStore:
+from docstore.DocumentStore import DocumentStore
+
+class MongoDBDocumentStore(DocumentStore):
     """
     MongoDB-based document store.
     """
@@ -32,7 +36,7 @@ class MongoDBDocumentStore:
         self.__mongodb = None
         self.__data_store = None
         
-    def connect(self, parameters):
+    def connect(self, parameters = None):
         """ 
         Connect to the data store. The connection is configured
         via the following parameters:
@@ -42,77 +46,138 @@ class MongoDBDocumentStore:
         -mongodb_database_name - MongoDB database name. This is a
          mandatory parameter. If the database does not exist then it
          is created.
-        -mongodb_collection_name - MongoDB collection name. This is a
-         mandatory parameter. If the collection does not exist then it
-         is created.
 
         @param self Object reference.
         @param parameters Connection information.
-        @throws KeyError. If mongodb_host, mongodb_port,
-        mongodb_database_name or mongo_collection_name are not
-        provided. 
+        @throws KeyError. If mongodb_host, mongodb_port or
+        mongodb_database_name are not provided. 
         @throws pymongo.errors.AutoReconnect. If the database cannot
         be contacted using the given host and port.
         """
         self.__mongodb = pymongo.Connection(
             parameters["mongodb_host"],
             parameters["mongodb_port"])
-        database = self.__mongodb[parameters["mongodb_database_name"]]
-        self.__data_store = database[parameters["mongodb_collection_name"]]
+        self.__data_store = \
+            self.__mongodb[parameters["mongodb_database_name"]]
 
-    def __len__(self):
+    def collection_names(self):
         """ 
-        Get number of documents in the data store.
+        Get a list of collection names.
         @param self Object reference.
-        @return number >= 0.
+        @return list.
         """
-        return self.__data_store.count()
+        return self.__data_store.collection_names()
 
-    def ids(self):
+    def create_collection(self, collection):
         """ 
-        Get a list of IDs of the documents in the data store.
+        Create a collection. If it already exists, this is a no-op.
+        An index is created on the "date" field.
         @param self Object reference.
+        @param collection Collection name.
+        """
+        if (not collection in self.__data_store.collection_names()):
+            self.__data_store.create_collection(collection)
+            collection = self.__data_store[collection]
+            collection.create_index("date")
+        
+    def has_collection(self, collection):
+        """ 
+        Check if collection exists.
+        @param self Object reference.
+        @param collection Collection name.
+        @return True if collection exists else False.
+        """
+        return collection in self.__data_store.collection_names()
+
+    def get_ids(self, collection):
+        """ 
+        Get a list of IDs of the documents in the collection.
+        @param self Object reference.
+        @param collection Collection name.
         @return ID list.
         """
-        return self.__data_store.distinct("_id")
+        return self.__data_store[collection].distinct("_id")
 
-    def put(self, docid, doc):
+    def count(self, collection):
+        """ 
+        Get number of documents in the collection.
+        @param self Object reference.
+        @param collection Collection name.
+        @return number >= 0.
+        """
+        return self.__data_store[collection].count()
+
+    def put(self, collection, docid, doc):
         """ 
         Put a document with the given ID into the data store. Any existing
-        document with the same ID is overwritten.
+        document with the same ID is overwritten. The time of addition
+        is also recorded.
         @param self Object reference.
+        @param collection Collection name.
         @param docid Document ID.
         @param doc Document.
         """
-        self.__data_store.save({'_id':docid, 'doc':doc})
+        # Get (YYYY,MM,DD,HH,MM,SS,MILLI)
+        current_time = datetime.fromtimestamp(time.time())
+        self.__data_store[collection].save( \
+            {'_id':docid, 'date':current_time, 'doc':doc})
 
-    def get(self, docid):
+    def get(self, collection, docid):
         """ 
         Get the document with the given ID from the data store or
         None if there is none.
         @param self Object reference.
+        @param collection Collection name.
         @param docid Document ID.
         @return document or None.
         """
-        doc = self.__data_store.find_one({"_id":docid})
+        doc = self.__data_store[collection].find_one({"_id":docid})
         if doc != None:
             return doc['doc']
         else:
             return None
 
-    def delete(self, docid):
+    def get_since(self, collection, earliest = None):
+        """ 
+        Get the documents added since the given date from the data 
+        store or None if there is none.
+        @param self Object reference.
+        @param collection Collection name.
+        @param earliest datetime representing date of interest. If
+        None then all are returned.
+        @return iterable serving up the documents in the form
+        {'_id':id, 'date':date, 'doc':doc} where date is in the
+        Python datetime format e.g. YYYY-MM-DD HH:MM:SS.MILLIS.
+        Documents are sorted earliest to latest.
+        """
+        if (earliest == None):
+            result = self.__data_store[collection].find().sort("date")
+        else:
+            result = self.__data_store[collection].find(\
+                {"date":{"$gt":earliest}}).sort("date")
+        return result
+
+    def delete_document(self, collection, docid):
         """ 
         Delete the document with the given ID from the data store.
         If there is no such document then this is a no-op.
         @param self Object reference.
+        @param collection Collection name.
         @param docid Document ID.
-        @param doc Document.
         """
-        self.__data_store.remove({"_id":docid})
+        self.__data_store[collection].remove({"_id":docid})
 
-    def clear(self):
+    def delete_collection(self, collection):
         """ 
-        Clear all the documents from the data store.
+        Delete collection.
+        @param self Object reference.
+        @param collection Collection name.
+        """
+        self.__data_store.drop_collection(collection)
+
+    def disconnect(self):
+        """
+        Disconnect. 
         @param self Object reference.
         """
-        self.__data_store.remove()
+        self.__mongodb.disconnect()

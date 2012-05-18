@@ -1,10 +1,5 @@
 #!/usr/bin/env python
 
-#################################################################
-###!!! YOU ARE NOT ALLOWED TO MODIFY THIS FILE DIRECTLY    !!!###
-###!!! PLEASE MAKE A COPY OF THIS FILE WITH THE CP COMMAND !!!###
-#################################################################
-
 """Simulate the MICE experiment, saving ADC/TDC counts as histograms
 
 This will simulate 'number_of_spills' MICE events through the entirity
@@ -32,7 +27,7 @@ def run():
     my_map = MAUS.MapPyGroup()
     my_map.append(MAUS.MapPyBeamMaker()) # beam construction
     my_map.append(MAUS.MapCppSimulation())  #  geant4 simulation
-    my_map.append(MAUS.MapCppTrackerDigitization())  # SciFi electronics model
+    my_map.append(MAUS.MapCppTrackerMCDigitization())  # SciFi electronics model
 
     # Create a reducer. Image type specified in datacards below.
     my_reduce = MAUS.ReducePyHistogramTDCADCCounts()

@@ -104,22 +104,45 @@ std::string MapCppTOFSpacePoints::process(std::string document) {
                                           "daq_event_type",
                                           JsonWrapper::stringValue);
     if (xEventType == "physics_event" || xEventType == "calibration_event") {
-      if (root.isMember("slab_hits")) {
-        _triggerhit_pixels.clear();
+      _triggerhit_pixels.clear();
+      Json::Value xRecEvent = JsonWrapper::GetProperty(root,
+                                                       "recon_events",
+                                                     JsonWrapper::arrayValue);
+      for (unsigned int n_event = 0; n_event < xRecEvent.size(); n_event++) {
+        Json::Value xTofEvent = JsonWrapper::GetItem
+                                 (xRecEvent, n_event, JsonWrapper::objectValue);
+        xTofEvent = JsonWrapper::GetProperty
+                             (xTofEvent, "tof_event", JsonWrapper::objectValue);
+        if (xTofEvent.isMember("tof_slab_hits")) {
+          Json::Value xSlabHits = JsonWrapper::GetProperty
+                         (xTofEvent, "tof_slab_hits", JsonWrapper::objectValue);
 
-        Json::Value xSlabHits = JsonWrapper::GetProperty(root,
-                                                         "slab_hits",
-                                                         JsonWrapper::objectValue);
+          // NOTE: DR March15
+          // Cheating -- until I figure out how to handle trig-req-time in MC:
+          //   I have to change the triggerpixelcut for MC in order for the calib
+          //   corrections to be applied correctly.
+          //   2 options --
+          //   a) change the cut in ConfigDefaults
+          //      but this <may> mess up data -- though I did run on real data
+          //      with this modified cut and things (resol,time) look OK @ 1st glance
+          //   b) use a different cut if it's MC
+          //      this breaks the agreement that we'll treat real data/MC same way
+          //      but for now it at least lets MC get reconstructed without clobbering real data
+          // For now I have chosen option a) with option b) commented out below
+          // need to be sure to change configdefaults for switching between data<->mc
+          if (root.isMember("mc")) _findTriggerPixelCut = 50.0;
 
-        // Loop over each station starting from the trigger station.
-        for (unsigned int n_station = 0; n_station < _stationKeys.size(); n_station++) {
-          std::string detector = _stationKeys[n_station];
-          if (xSlabHits.isMember(detector))
-            root["space_points"][detector] = processTOFStation(xSlabHits, detector);
+          // Loop over each station starting from the trigger station.
+          for (unsigned int n_station = 0; n_station < _stationKeys.size(); n_station++) {
+            std::string detector = _stationKeys[n_station];
+            if (xSlabHits.isMember(detector))
+              root["recon_events"][n_event]["tof_event"]["tof_space_points"]
+                   [detector] = processTOFStation(xSlabHits, detector, n_event);
+          }
+          // The slab hit document is now modified. The calibrated time measurements are added.
+          // Save the modifications.
+          root["recon_events"][n_event]["tof_event"]["tof_slab_hits"] = xSlabHits;
         }
-        // The slab hit document is now modified. The calibrated time measurements are added.
-        // Save the modifications.
-        root["slab_hits"] = xSlabHits;
       }
     }
   } catch(Squeal squee) {
@@ -136,72 +159,58 @@ std::string MapCppTOFSpacePoints::process(std::string document) {
 }
 
 Json::Value MapCppTOFSpacePoints::processTOFStation(Json::Value &xSlabHits,
-                                                    std::string detector) {
+                                                    std::string detector,
+                                                    unsigned int part_event) {
   // Get the slab hits document for this TOF station.
-  Json::Value xDocDetectorSlabHits = JsonWrapper::GetProperty(xSlabHits,
-                                                              detector,
-                                                              JsonWrapper::arrayValue);
-
-  Json::Value xDocSpacePoints;
-  if (xDocDetectorSlabHits.isArray()) {
-    int n_part_events = xDocDetectorSlabHits.size();
-    // Loop over the particle events.
-    for (int PartEvent = 0; PartEvent < n_part_events; PartEvent++) {
-      Json::Value xDocPartEvent = JsonWrapper::GetItem(xDocDetectorSlabHits,
-                                                       PartEvent,
+  Json::Value xDocPartEvent = JsonWrapper::GetProperty(xSlabHits,
+                                                       detector,
                                                        JsonWrapper::anyValue);
-      if (xDocPartEvent.isArray()) {
-        int n_slab_hits = xDocPartEvent.size();
-        // Delete the information from the previous particle event.
-        xPlane0Hits.resize(0);
-        xPlane1Hits.resize(0);
+  Json::Value xDocPartEventSpacePoints(Json::arrayValue);
+  if (xDocPartEvent.isArray()) {
+    int n_slab_hits = xDocPartEvent.size();
+    // Delete the information from the previous particle event.
+    xPlane0Hits.resize(0);
+    xPlane1Hits.resize(0);
 
-        // Loop ovew the slab hits and select the hits in
-        // plane0 (horizontal) and plane1 (vertical).
-        for (int SlHit = 0; SlHit < n_slab_hits; SlHit++) {
-          // Get the slab hit.
-          Json::Value xThisSlabHit = JsonWrapper::GetItem(xDocPartEvent,
-                                                          SlHit,
-                                                          JsonWrapper::objectValue);
+    // Loop ovew the slab hits and select the hits in
+    // plane0 (horizontal) and plane1 (vertical).
+    for (int SlHit = 0; SlHit < n_slab_hits; SlHit++) {
+      // Get the slab hit.
+      Json::Value xThisSlabHit = JsonWrapper::GetItem(xDocPartEvent,
+                                                      SlHit,
+                                                      JsonWrapper::objectValue);
 
-          int xPlane  = JsonWrapper::GetProperty(xThisSlabHit,
-                                                 "plane",
-                                                 JsonWrapper::intValue).asInt();
+      int xPlane  = JsonWrapper::GetProperty(xThisSlabHit,
+                                             "plane",
+                                             JsonWrapper::intValue).asInt();
 
-          // According to the convention used in the cabling file the horizontal slabs
-          // are always in plane 0 and the vertical slabs are always in plane 1.
-          switch (xPlane) {
-            case 0 :
-              xPlane0Hits.push_back(SlHit);
-              break;
-            case 1 :
-              xPlane1Hits.push_back(SlHit);
-              break;
-          }
-        }
-
-        // If this is the trigger station find the pixel that is giving the trigger.
-        if (detector == _triggerStation)
-          _triggerhit_pixels[PartEvent] = findTriggerPixel(xDocPartEvent);
-        // std::cout << "processTOFStation " << detector << "  trigger : "
-        // << _triggerhit_pixels[PartEvent] <<std::endl;
-
-        Json::Value xDocPartEventSpacePoints;
-        // If we do not know the trigger pixel there is no way to reconstruct the time.
-        if (_triggerhit_pixels[PartEvent] != "unknown") {
-          // Create the space point. Add the calibrated value of the time to the slab hits.
-          xDocPartEventSpacePoints = makeSpacePoints(xDocPartEvent);
-
-          // The slab hit document is now modified. The calibrated time measurements are added.
-          // Save the modifications.
-          xSlabHits[detector][PartEvent] = xDocPartEvent;
-        }
-        xDocSpacePoints[PartEvent] = xDocPartEventSpacePoints;
+      // According to the convention used in the cabling file the horizontal slabs
+      // are always in plane 0 and the vertical slabs are always in plane 1.
+      switch (xPlane) {
+        case 0 :
+          xPlane0Hits.push_back(SlHit);
+          break;
+        case 1 :
+          xPlane1Hits.push_back(SlHit);
+          break;
       }
+    }
+
+    // If this is the trigger station find the pixel that is giving the trigger.
+    if (detector == _triggerStation)
+      _triggerhit_pixels[part_event] = findTriggerPixel(xDocPartEvent);
+    // If we do not know the trigger pixel there is no way to reconstruct the time.
+    if (_triggerhit_pixels[part_event] != "unknown") {
+      // Create the space point. Add the calibrated value of the time to the slab hits.
+      xDocPartEventSpacePoints = makeSpacePoints(xDocPartEvent);
+
+      // The slab hit document is now modified. The calibrated time measurements are added.
+      // Save the modifications.
+      xSlabHits[detector] = xDocPartEvent;
     }
   }
 
-  return xDocSpacePoints;
+  return xDocPartEventSpacePoints;
 }
 
 std::string MapCppTOFSpacePoints::findTriggerPixel(Json::Value xDocPartEvent) {
@@ -238,7 +247,7 @@ std::string MapCppTOFSpacePoints::findTriggerPixel(Json::Value xDocPartEvent) {
 }
 
 Json::Value MapCppTOFSpacePoints::makeSpacePoints(Json::Value &xDocPartEvent) {
-  Json::Value xDocSpacePoints;
+  Json::Value xDocSpacePoints(Json::arrayValue);
   // Loop over all possible combinations of slab hits in the trigger station.
   for (unsigned int nX = 0; nX < xPlane0Hits.size(); nX++) {
     for (unsigned int nY = 0; nY < xPlane1Hits.size(); nY++) {

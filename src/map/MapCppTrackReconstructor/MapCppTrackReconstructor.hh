@@ -31,14 +31,21 @@
 #include "Interface/Squeak.hh"
 
 // MAUS
-#include "Reconstruction/Track.hh"
-#include "Reconstruction/TrackPoint.hh"
+#include "Reconstruction/Global/Track.hh"
+#include "Reconstruction/Global/TrackPoint.hh"
 
 namespace MAUS {
 
 class OpticsModel;
 class TrackFitter;
+
+namespace reconstruction {
+namespace global {
+
 class ReconstructionInput;
+
+}  // namespace global
+}  // namespace reconstruction
 
 /** @class MapCppTrackReconstructor
  *  Reconstruct tracks at the desired longitudinal spacing using the desired
@@ -84,7 +91,7 @@ class MapCppTrackReconstructor {
   TrackFitter * track_fitter_;
 
   Json::Value run_data_;
-  ReconstructionInput * reconstruction_input_;
+  MAUS::reconstruction::global::ReconstructionInput * reconstruction_input_;
   std::vector<Track> reconstructed_tracks_;
   
   static const std::string kClassname;
