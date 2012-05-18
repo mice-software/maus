@@ -85,10 +85,11 @@ void SEDigitization::process(SESpill &spill, Json::Value const &daq) {
       int plane, channel;
       get_StatPlaneChannel(bank, channel_ro, plane, channel);
 
+      int my_adc = adc - pedestal;
       // Exclude missing modules.
       if ( pe > 1.0 && plane != -1 ) {
        // std::cout << "Making digit: " << plane << " " << channel << " " << pe << std::endl;
-        SEDigit *digit = new SEDigit(plane, channel, pe, tdc);
+        SEDigit *digit = new SEDigit(plane, channel, pe, tdc, my_adc);
         event->add_digit(digit);
       }
     }  // ends loop over channels (j)

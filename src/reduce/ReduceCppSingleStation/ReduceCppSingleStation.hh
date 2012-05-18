@@ -101,6 +101,12 @@ class ReduceCppSingleStation {
 
   TH1F *_hist_plane2;
 
+  TH1F *_adc_plane0;
+
+  TH1F *_adc_plane1;
+
+  TH1F *_adc_plane2;
+
   TH1F *_chan_sum;
   //TH2F *_trig_efficiency;
 
@@ -119,6 +125,7 @@ class ReduceCppSingleStation {
   void Save();
 
   TTree _unpacked;
+  int _myadc;
   int _adc, _tdc, _bank, _chan, _activebank;
 
   TTree _digits;

@@ -34,6 +34,8 @@ bool ReduceCppSingleStation::birth(std::string argJsonConfigDocument) {
   TCanvas *c3 = new TCanvas("c3", "SpacePoints", 200, 10, 700, 500);
   TCanvas *c4 = new TCanvas("c4", "Cluster NPE", 200, 10, 700, 500);
   TCanvas *c5 = new TCanvas("c5", "ADCs", 200, 10, 700, 500);
+  TCanvas *c6 = new TCanvas("c6", "adc-pedestal", 200, 10, 700, 500);
+  // TCanvas *c7 = new TCanvas("c7", "adc-pedestal versus channel", 200, 10, 700, 500);
 
   triplets = new TH2F("triplets", "Current Spill (x, y)", 300, -150, 150, 300, -150, 150);
   duplets  = new TH2F("duplets",  "Current Spill (x, y)", 300, -150, 150, 300, -150, 150);
@@ -44,11 +46,18 @@ bool ReduceCppSingleStation::birth(std::string argJsonConfigDocument) {
   _hist_plane0 = new TH1F("_hist_plane0","plane 0", 215, 0, 214);
   _hist_plane1 = new TH1F("_hist_plane1","plane 1", 215, 0, 214);
   _hist_plane2 = new TH1F("_hist_plane2","plane 2", 215, 0, 214);
+  _adc_plane0 = new TH1F("_adc_plane0","plane 0", 256, 0, 255);
+  _adc_plane1 = new TH1F("_adc_plane1","plane 1", 256, 0, 255);
+  _adc_plane2 = new TH1F("_adc_plane2","plane 2", 256, 0, 255);
   _chan_sum = new TH1F("_hist_plane2","Sum Of Channel Numb", 641, 0, 640);
 
   _npe_plane0 = new TH1F("_npe_plane0","plane 0", 31, 0, 30);
   _npe_plane1 = new TH1F("_npe_plane1","plane 1", 31, 0, 30);
   _npe_plane2 = new TH1F("_npe_plane2","plane 2", 31, 0, 30);
+
+  //_adc_plane0 = new TH1F("_adc_plane0","plane 0", 256, 0, 255);
+  //_adc_plane1 = new TH1F("_adc_plane1","plane 1", 256, 0, 255);
+  //_adc_plane2 = new TH1F("_adc_plane2","plane 2", 256, 0, 255);
 
   _unpacked.SetNameTitle("unpacked", "unpacked");
   _unpacked.Branch("adc", &_adc, "adc/I");
@@ -61,6 +70,7 @@ bool ReduceCppSingleStation::birth(std::string argJsonConfigDocument) {
   _digits.Branch("plane", &_plane, "plane/I");
   _digits.Branch("channel", &_channel, "channel/D");
   _digits.Branch("npe", &_npe, "npe/D");
+  _digits.Branch("adc", &_myadc, "adc/I");
 
   _spacepoints.SetNameTitle("spacepoints", "spacepoints");
   _spacepoints.Branch("pe", &_pe, "pe/D");
@@ -95,12 +105,14 @@ bool ReduceCppSingleStation::birth(std::string argJsonConfigDocument) {
   gStyle->SetTitleOffset(0.6, "x");
   gStyle->SetTitleOffset(0.4, "y");
 
-  c4->Divide(3,1);
+  c4->Divide(3, 1);
   triplets->SetMarkerStyle(20);
   triplets->SetMarkerColor(kBlue);
   triplets_copy->SetMarkerStyle(20);
   triplets_copy->SetMarkerColor(kBlue);
 
+  c6->Divide(3, 1);
+  // c7->Divide(3, 1);
   duplets->SetMarkerStyle(20);
   duplets->SetMarkerColor(kRed);
   duplets_copy->SetMarkerStyle(20);
@@ -141,6 +153,8 @@ std::string  ReduceCppSingleStation::process(std::string document) {
   TCanvas *c3 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c3"));
   TCanvas *c4 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c4"));
   TCanvas *c5 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c5"));
+  TCanvas *c6 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c6"));
+ // TCanvas *c7 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c7"));
 
   Squeak::activateCout(1);
 
@@ -224,9 +238,24 @@ std::string  ReduceCppSingleStation::process(std::string document) {
 
     c5->cd(1);
     _unpacked.Draw("adc","bank==0 || bank==2 || bank==5 || bank==7 || bank==9|| bank==10|| bank==11 ||bank==12 || bank==13|| bank==14");
-
     c5->Update();
 
+    c6->cd(1);
+    _adc_plane0->Draw();
+    c6->Divide(2);
+    _adc_plane1->Draw();
+    c6->Divide(3);
+    _adc_plane2->Draw();
+    c6->Update();
+/*
+    c7->cd(1);
+    _digits.Draw("adc:channel","plane==0");
+    c7->cd(2);
+    _digits.Draw("adc:channel","plane==1");
+    c7->cd(3);
+    _digits.Draw("adc:channel","plane==2");
+    c7->Update();
+*/
   }
 
   // std::cerr << "End Reducer Process" << std::endl;
@@ -323,21 +352,27 @@ void ReduceCppSingleStation::digits_histograms(Json::Value root) {
     int numb_digits = i_PartEvent.size();
     double chan_sum = 0;
     for ( int digit_j = 0; digit_j < numb_digits; digit_j++ ) {
-      _plane      = i_PartEvent[digit_j]["plane"].asInt();
+      _plane   = i_PartEvent[digit_j]["plane"].asInt();
       _channel = i_PartEvent[digit_j]["channel"].asDouble();
       _npe     = i_PartEvent[digit_j]["npe"].asDouble();
-      _digits.Fill();
+      _myadc   = i_PartEvent[digit_j]["adc"].asInt();
+      std::cout << _myadc << std::endl;
+      //_digits.Fill();
       chan_sum += _channel;
       if ( _plane == 0 ) {
         _hist_plane0->Fill(_channel);
         _npe_plane0->Fill(_npe);
+        _adc_plane0->Fill(_myadc);
       } else if ( _plane == 1 ) {
         _hist_plane1->Fill(_channel);
         _npe_plane1->Fill(_npe);
+        _adc_plane1->Fill(_myadc);
       } else if ( _plane == 2 ) {
         _hist_plane2->Fill(_channel);
         _npe_plane2->Fill(_npe);
+        _adc_plane2->Fill(_myadc);
       }
+      _digits.Fill();
     }
     _chan_sum->Fill(chan_sum);
   }
@@ -366,6 +401,10 @@ void ReduceCppSingleStation::unpacked_data_histograms(Json::Value root) {
       _adc  = i_PartEvent["VLSB"][i]["adc"].asInt();
       _bank = i_PartEvent["VLSB"][i]["bank_id"].asInt();
       _chan = i_PartEvent["VLSB"][i]["channel"].asInt();
+      int _disc = i_PartEvent["VLSB"][i]["discriminator"].asInt();
+      if ( _disc != 0 ) {
+        std::cerr << "********************* DISCRIMINATOR IS != 0 *********************" << std::endl;
+      }
       if ( _bank == 0 || _bank == 2 || _bank == 5 ||
            _bank == 7 || _bank == 9 || _bank == 10 ||
            _bank == 11 || _bank == 12 || _bank == 13 ||
