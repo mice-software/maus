@@ -27,6 +27,8 @@ A few helper functions also in there.
 
 import sys
 import os
+import shutil
+
 import SCons # pylint: disable=F0401
 
 def my_exit(code = 1):
@@ -36,6 +38,21 @@ def my_exit(code = 1):
     warning.
     """
     sys.exit(code) # pylint: disable-msg=E0602
+
+def duplicate_dylib_as_so(target, source, env): # pylint: disable=W0613
+    """
+    Wrapper for shutil.copyfile for dylib2so tool
+
+    @param source - the file source
+    @param target - the target file
+    @param env - the SCons environment
+    """
+    print "Duplicating %s as %s." % (source[0], target[0])
+    shutil.copyfile(str(source[0]), str(target[0]))
+    return None
+
+DYLIB2SO = SCons.Builder.Builder(action = duplicate_dylib_as_so, suffix = '.so',
+                   src_suffix = '.dylib')
 
 def which(program):
     """
@@ -101,14 +118,14 @@ def get_environment():
    #  NOTE: SHLIBPREFIX means that shared libraries don't
     # have a 'lib' prefix, which is needed for python to find SWIG generated
     # libraries
-    env = SCons.Environment.Environment(SHLIBPREFIX="") \
-        # pylint: disable-msg=E0602
+    env = SCons.Environment.Environment(SHLIBPREFIX="",
+                 BUILDERS = {'Dylib2SO' : DYLIB2SO}) # pylint: disable-msg=E0602
     if os.path.isfile('.use_llvm_with_maus'):
         env['CC'] = "llvm-gcc"
         env['CXX'] = "llvm-g++"
 
     env.Tool \
-          ('swig', '%s/swig-2.0.1' % os.environ['MAUS_THIRD_PARTY'])
+          ('swig', '%s/third_party/swig-2.0.1' % os.environ['MAUS_THIRD_PARTY'])
     # tell SWIG to make python bindings for C++
     env.Append(SWIGFLAGS=['-python', '-c++']) 
 
@@ -125,17 +142,12 @@ def get_environment():
                                   ["%s/build" % os.environ['MAUS_THIRD_PARTY']])
 
     maus_root = os.environ['MAUS_ROOT_DIR']
-    maus_third_party = os.environ['MAUS_THIRD_PARTY']
-    env.Append(CPPPATH=["%s/install/include" % maus_third_party,
-                        "%s/install/include/root" % maus_third_party,
+    maus_third = os.environ['MAUS_THIRD_PARTY']
+    env.Append(CPPPATH=["%s/third_party/install/include" % maus_third,
+                        "%s/third_party/install/include/python2.7" % maus_third,
+                        "%s/third_party/install/include/root" % maus_third,
                         "%s/src/legacy" % maus_root,
                         "%s/src/common_cpp" % maus_root, ""])
-    if (sys.platform == 'darwin'):
-        env.Append(CPPPATH=[
-          "%s/install/Python.framework/Versions/2.7/include/python2.7"
-          % maus_third_party])
-    else:
-        env.Append(CPPPATH=["%s/install/include/python2.7" % maus_third_party])
 
     env['USE_G4'] = False
     env['USE_ROOT'] = False
@@ -252,15 +264,15 @@ def set_gsl(conf, env): # pylint: disable=W0613
     """
     Setup gsl
     """
-    if not conf.CheckLib('gslcblas'):
-        print "ERROR: Cound't find GSL (required for ROOT)."
-        my_exit(1)
-    else:
-        conf.env.Append(LIBS = ['gslcblas'])
-
+    conf.env.Append(LIBS = ['gsl'])
+    conf.env.Append(LIBS = ['gslcblas'])
     if not conf.CheckLib('gsl'):
         print "ERROR: Cound't find GSL"
         my_exit(1)
+    if not conf.CheckLib('gslcblas'):
+        print "ERROR: Cound't find GSL (required for ROOT)."
+        my_exit(1)
+
 
 def get_root_libs():
     """ROOT libs
@@ -273,10 +285,10 @@ def get_root_libs():
                 'Gpad', \
                 'Graf', \
                 'Graf3d', \
-                'Hist', \
                 'MathCore', \
-                'Matrix', \
                 'Minuit', \
+                'Hist', \
+                'Matrix', \
                 'Spectrum',\
                 'Net', \
                 'Physics', \
@@ -354,10 +366,9 @@ def get_g4_libs(): # pylint: disable=W0511
              'G4cuts',
              'G4decay',
              'G4detector',
-             'G4detscorer',
              'G4detutils',
+             'G4detscorer',
              'G4digits',
-             'G4emhighenergy',
              'G4emlowenergy',
              'G4empolar',
              'G4emstandard',
@@ -372,11 +383,9 @@ def get_g4_libs(): # pylint: disable=W0511
              'G4gflash',
              'G4globman',
              'G4graphics_reps',
-             'G4had_im_r_matrix',
              'G4had_lll_fis',
              'G4had_mod_man',
              'G4had_mod_util',
-             'G4had_muon_nuclear',
              'G4had_neu_hp',
              'G4had_preequ_exciton',
              'G4had_string_diff',
@@ -390,13 +399,12 @@ def get_g4_libs(): # pylint: disable=W0511
              'G4hadronic_abrasion',
              'G4hadronic_bert_cascade',
              'G4hadronic_binary',
-             'G4hadronic_body_ci',
-             'G4hadronic_coherent_elastic',
-             'G4hadronic_deex_evaporation',
+             'G4had_im_r_matrix',
              'G4hadronic_deex_fermi_breakup',
+             'G4hadronic_deex_handler',
+             'G4hadronic_deex_evaporation',
              'G4hadronic_deex_fission',
              'G4hadronic_deex_gem_evaporation',
-             'G4hadronic_deex_handler',
              'G4hadronic_deex_management',
              'G4hadronic_deex_multifragmentation',
              'G4hadronic_deex_photon_evaporation',
@@ -406,6 +414,7 @@ def get_g4_libs(): # pylint: disable=W0511
              'G4hadronic_hetcpp_utils',
              'G4hadronic_incl_cascade',
              'G4hadronic_interface_ci',
+             'G4hadronic_body_ci',
              'G4hadronic_iso',
              'G4hadronic_leading_particle',
              'G4hadronic_mgt',
@@ -434,6 +443,9 @@ def get_g4_libs(): # pylint: disable=W0511
              'G4partman',
              'G4partutils',
              'G4phys_builders',
+             'G4had_muon_nuclear',
+             'G4hadronic_coherent_elastic',
+             'G4emhighenergy.so',
              'G4phys_lists',
              'G4procman',
              'G4readout',

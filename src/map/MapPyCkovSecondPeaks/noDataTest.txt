@@ -1,0 +1,1 @@
+{"daq_data":null,"daq_event_type":"end_of_burst","spill_num":-1}

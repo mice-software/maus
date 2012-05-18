@@ -19,7 +19,8 @@
 #ifndef Squeal_hh
 #define Squeal_hh 1
 
-
+#include <cstdio>
+#include <cstring>
 
 #include <exception>
 #include <string>
@@ -65,13 +66,18 @@ class Squeal : public std::exception {
   /// Squeak::mout(Squeak::debug)
   void Print();
   /// Get the severity of the exception
-  exceptionLevel GetErrorLevel() {return _level;}
+  exceptionLevel GetErrorLevel() const {return _level;}
   /// Get the error message (as defined by constructor)
-  std::string    GetMessage()    {return _message;}
+  std::string    GetMessage() const {return _message;}
+  /// Set the error message
+  void           SetMessage(std::string new_message) {
+    _message = new_message;
+    SetWhat(_message+" at "+_location);
+  }
   /// Get the location (as defined by constructor) of the error
-  std::string    GetLocation()   {return _location;}
+  std::string    GetLocation() const {return _location;}
   /// Return the stack trace if it was stored
-  std::string    GetStackTrace() {return _stacktrace;}
+  std::string    GetStackTrace() const {return _stacktrace;}
   /// Gcc-specific code to recover the stack trace as a string.
 
   /// Will skip traces below skipTrace (so, for example, if we want to know
@@ -80,6 +86,12 @@ class Squeal : public std::exception {
   static std::string    MakeStackTrace(size_t skipTrace);
 
  private:
+
+  void SetWhat(std::string what_str) {
+    _what = std::vector<char>(what_str.size()+1);
+    snprintf(&_what[0], what_str.size()+1, "%s", what_str.c_str());
+  }
+
   static const size_t    _maxStackSize;
 
   std::string       _message;

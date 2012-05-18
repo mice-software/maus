@@ -1,4 +1,8 @@
 \documentclass[a4paper, 10pt] {report}
+
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{graphicx}
 \begin{document}
 
 \vspace*{2.0cm}
@@ -9,24 +13,30 @@
 \Large{ \bf{User Guide} }
 \end{center}
 
-\chapter{Running for the First Time}
-\include{first_time_running}
+%\chapter{Running for the First Time}
+%\include{first_time_running}
 
-\chapter{Detector Description}
-\include{detectors/tof}
-\include{detectors/tracker}
-\include{detectors/emr}
-\include{detectors/ckov}
-\include{detectors/kl}
+\chapter{Data Structure}
+\input{data_structure}
 
-\chapter{Setting up a Geometry}
-\include{geometry_definitions}
+\chapter{Monte Carlo}
+\input{simulation}
 
-\chapter{Appendix A: Run Control Variables}
-\include{run_controls} % automatically constructed by build script
+%\chapter{Detector Description}
+%\include{detectors/tof}
+%\include{detectors/tracker}
+%\include{detectors/emr}
+%\include{detectors/ckov}
+%\include{detectors/kl}
 
-\chapter{Appendix B: Spill Structure}
-\include{spill_schema} % automatically constructed by build script
+%\chapter{Geometry}
+%\include{geometry_definitions}
+
+%\chapter{Appendix A: Run Control Variables}
+%\include{run_controls} % automatically constructed by build script
+
+%\chapter{Appendix B: Spill Structure}
+%\include{spill_schema} % automatically constructed by build script
 
 \end{document}
 

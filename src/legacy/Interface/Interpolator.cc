@@ -328,6 +328,7 @@ void Interpolator3dGridTo1d::DeleteFunc(double*** func)
 
 TriLinearInterpolator::TriLinearInterpolator(const TriLinearInterpolator& lhs)
 {
+	_coordinates = new ThreeDGrid(*lhs._coordinates);
 	_F = new double**[_coordinates->xSize()];
 	for(int i=0; i<_coordinates->xSize(); i++)
 	{
@@ -339,7 +340,6 @@ TriLinearInterpolator::TriLinearInterpolator(const TriLinearInterpolator& lhs)
 				_F[i][j][k] = lhs._F[i][j][k];
 		}
 	}
-	_coordinates = new ThreeDGrid(*lhs._coordinates);
 	_coordinates->Add(this);
 }
 

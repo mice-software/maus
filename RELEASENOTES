@@ -4,6 +4,43 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v0.2.3
+  The following functionality was added:
+    - The default data format is not ROOT. For further information on handling
+      this data format, please see the instructions in the MAUS user guide
+      (doc/maus_user_guide.pdf) 
+    - MAUS now builds on Ubuntu 11.10 (tested against Linux Mint 12)
+  If upgrading from the previous version, the following third party library scripts need to be rerun:
+    - third_party/bash/21root.bash
+    - third_party/bash/51xboa.bash
+
+MAUS-v0.2.2
+  The following functionality was added:
+    - Production version of the distributed processing framework and online histogramming
+  If upgrading from the previous version, the following third party library scripts need to be rerun:
+    - third_party/bash/40python_extras.bash   
+
+MAUS-v0.2.1
+  The following functionality was added:
+    - Fixed a bug preventing the code from building on some machines
+
+MAUS-v0.2.0
+  The following functionality was added:
+    - Ckov reconstruction to digits
+    - First TOF digitisation
+    - Documentation was added for Monte Carlo Simulation 
+  If upgrading from the previous version, the following third party library scripts need to be rerun:
+    - third_party/bash/44cdb.bash
+
+MAUS-v0.1.4
+  The following functionality was added:
+    - Tracker reconstruction to space points
+  If upgrading from the previous version, the following third party library scripts need to be rerun:
+    - third_party/bash/01python.bash
+    - third_party/bash/21root.bash
+    - third_party/bash/40python_extras.bash
+    - third_party/bash/60recpack.bash
+
 MAUS-v0.1.3
   The following functionality was added:
     - A python interface to ROOT for online histogramming has been introduced

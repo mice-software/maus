@@ -77,28 +77,29 @@ std::string MapCppTOFSlabHits::process(std::string document) {
                                           "daq_event_type",
                                           JsonWrapper::stringValue);
     if (xEventType== "physics_event" || xEventType == "calibration_event") {
-      if (root.isMember("digits")) {
-        Json::Value digits = JsonWrapper::GetProperty(root, "digits", JsonWrapper::objectValue);
-
-        // Loop over each station.
-        for (unsigned int n_station = 0; n_station < _stationKeys.size(); n_station++) {
-          if (digits.isMember(_stationKeys[n_station])) {
-            Json::Value xDocDetectorDigits = JsonWrapper::GetProperty(digits,
-                                                                      _stationKeys[n_station],
-                                                                      JsonWrapper::arrayValue);
-
-            if (xDocDetectorDigits.isArray()) {
-              int n_part_events = xDocDetectorDigits.size();
-              // Loop over the particle events.
-              for (int PartEvent = 0; PartEvent < n_part_events; PartEvent++) {
-                Json::Value xDocPartEvent = JsonWrapper::GetItem(xDocDetectorDigits,
-                                                                 PartEvent,
-                                                                 JsonWrapper::anyValue);
-
-                Json::Value xDocSlabHits = makeSlabHits(xDocPartEvent);
-                root["slab_hits"][_stationKeys[n_station]][PartEvent] = xDocSlabHits;
-              }
-            }
+      Json::Value events = JsonWrapper::GetProperty(root, "recon_events", JsonWrapper::arrayValue);
+      // Loop over each station.
+      for (unsigned int n_event = 0; n_event < events.size(); n_event++) {
+        Json::Value xDocTofEvent = JsonWrapper::GetItem(events,
+                                                        n_event,
+                                                        JsonWrapper::objectValue);
+        xDocTofEvent = JsonWrapper::GetProperty(xDocTofEvent,
+                                                "tof_event",
+                                                JsonWrapper::objectValue);
+        if (root["recon_events"][n_event]["tof_event"].isMember("tof_digits")) {
+          root["recon_events"][n_event]["tof_event"]["tof_slab_hits"] =
+                                                   Json::Value(Json::objectValue);
+          for (unsigned int n_station = 0; n_station < _stationKeys.size(); n_station++) {
+            Json::Value xDocPartEvent = JsonWrapper::GetProperty(xDocTofEvent,
+                                                        "tof_digits",
+                                                        JsonWrapper::objectValue);
+            // Ack! sometimes tofn is a nullValue
+            xDocPartEvent = JsonWrapper::GetProperty(xDocPartEvent,
+                                                    _stationKeys[n_station],
+                                                    JsonWrapper::anyValue);
+            Json::Value xDocSlabHits = makeSlabHits(xDocPartEvent);
+            root["recon_events"][n_event]["tof_event"]["tof_slab_hits"]
+                                       [_stationKeys[n_station]] = xDocSlabHits;
           }
         }
       }

@@ -102,61 +102,27 @@ void SpecialVirtualSD::Initialize(G4HCofThisEvent* HCE)
 G4bool SpecialVirtualSD::ProcessHits(G4Step* aStep, G4TouchableHistory*
              History)
 {
-  G4double edep = aStep->GetTotalEnergyDeposit();
+  Json::Value hit_i, channel_id, threeVectorValue;
+  channel_id[ "station" ] = _stationNumber;
 
-  G4StepPoint* thePrePoint  = aStep->GetPreStepPoint();
-  G4StepPoint* thePostPoint = aStep->GetPostStepPoint();
-  G4VPhysicalVolume* thePrePV  = thePrePoint->GetPhysicalVolume();
-  G4String preName  = thePrePV->GetName();
-
-
-  int istat = 0;
-  G4StepStatus prestat  = thePrePoint->GetStepStatus();
-  G4StepStatus poststat = thePostPoint->GetStepStatus();
-  if (prestat  == fGeomBoundary) istat = 1;  // entering volume
-  if (poststat == fGeomBoundary) istat = -1; // leaving
-  // unless it's a single internal step across the volume
-  if (prestat == fGeomBoundary && poststat == fGeomBoundary) istat = 2;
-
-  // we want to accumulate all energy depoited and write hit on exit of volume
-
-  //  const G4VTouchable* fondle = thePrePoint->GetTouchable();
-
-  
-  int copyIDinZ = 0;
-  int copyIDinPhi = 0;
-  int copyIDinR =0;
-
-  if(_numberCellsInZ != 1 || _numberCellsInPhi != 1 ||_numberCellsInR != 1)
-  {
-    getCellIndeces(aStep);
-    copyIDinR = _iCellR; // fondle->GetReplicaNumber(2);
-    copyIDinZ = _iCellZ; //fondle->GetReplicaNumber(1);
-    copyIDinPhi = _iCellPhi;  // fondle->GetReplicaNumber();
-  }
-  else
-  {
-    _iCellZ = 0;
-    _iCellR = 0;
-    _iCellPhi = 0;
-  }
-
-  //int indx = index(copyIDinZ, copyIDinPhi, copyIDinR);
-  //  if(_cellID[indx] =  -1)
-  Json::Value hit_i, channel_id;
-  channel_id["type"] = "SpecialVirtual";
-  hit_i["track_id"] = aStep->GetTrack()->GetTrackID();
-  channel_id[ "station_number" ] = _stationNumber;
   hit_i["channel_id"] = channel_id;
-  hit_i["energy_deposited"] = edep;
-  
+  hit_i["track_id"] = aStep->GetTrack()->GetTrackID();
+  hit_i["energy_deposited"] = aStep->GetTotalEnergyDeposit();
   hit_i["time"] = aStep->GetPostStepPoint()->GetGlobalTime();
   hit_i["energy"] = aStep->GetTrack()->GetTotalEnergy();
-  hit_i["pid"] = aStep->GetTrack()->GetDefinition()->GetPDGEncoding();
+  hit_i["particle_id"] = aStep->GetTrack()->GetDefinition()->GetPDGEncoding();
   hit_i["charge"] =  aStep->GetTrack()->GetDefinition()->GetPDGCharge();
-  hit_i["mass"] = aStep->GetTrack()->GetDefinition()->GetPDGMass();
 
-  _hits.push_back(hit_i);
+  threeVectorValue["x"] = aStep->GetPostStepPoint()->GetPosition().x();
+  threeVectorValue["y"] = aStep->GetPostStepPoint()->GetPosition().y();
+  threeVectorValue["z"] = aStep->GetPostStepPoint()->GetPosition().z(); 
+  hit_i["position"] = threeVectorValue;
+  threeVectorValue["x"] = aStep->GetPostStepPoint()->GetMomentum().x();
+  threeVectorValue["y"] = aStep->GetPostStepPoint()->GetMomentum().y();
+  threeVectorValue["z"] = aStep->GetPostStepPoint()->GetMomentum().z(); 
+  hit_i["momentum"] = threeVectorValue;
+
+  _hits["special_virtual_hits"].append(hit_i);
   return true;
 }
 

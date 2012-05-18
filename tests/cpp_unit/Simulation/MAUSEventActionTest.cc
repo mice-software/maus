@@ -39,8 +39,8 @@ TEST(MAUSEventActionTest, SetGetEventsTest) {
 
 TEST(MAUSEventActionTest, BeginOfEventActionTest) {
     MAUSGeant4Manager* _g4 = MAUSGeant4Manager::GetInstance();
-    Json::Value tracks;
-    tracks["track_1"] = Json::Value(1);
+    Json::Value tracks(Json::arrayValue);
+    tracks[Json::Value::UInt(0)] = Json::Value(1);
     Json::Value virtual_hits;
     virtual_hits[1] = Json::Value(0);
     _g4->GetTracking()->SetTracks(Json::Value(tracks));
@@ -65,8 +65,8 @@ TEST(MAUSEventActionTest, EndOfEventActionTest) {
     _g4->GetEventAction()->SetEvents(events);
 
     // put some data into tracking, virtual planes
-    Json::Value tracks;
-    tracks["track_1"] = Json::Value(1);
+    Json::Value tracks(Json::arrayValue);
+    tracks[Json::Value::UInt(0)] = Json::Value(1);
     Json::Value virtual_hits;
     virtual_hits[1] = Json::Value(zero);
     _g4->GetTracking()->SetTracks(Json::Value(tracks));
@@ -78,8 +78,6 @@ TEST(MAUSEventActionTest, EndOfEventActionTest) {
     _g4->GetEventAction()->EndOfEventAction(NULL);
     _g4->GetEventAction()->EndOfEventAction(NULL);
 
-    events[zero]["hits"] = Json::Value(Json::arrayValue);
-    events[1]["hits"] = Json::Value(Json::arrayValue);
     EXPECT_EQ(_g4->GetEventAction()->GetEvents(), events);
     // _events out of range
     EXPECT_THROW(_g4->GetEventAction()->EndOfEventAction(NULL), Squeal);

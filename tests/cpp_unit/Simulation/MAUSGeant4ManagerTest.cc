@@ -54,7 +54,7 @@ TEST(MAUSGeant4ManagerTest, GetReferenceParticleTest) {
     (*conf)["simulation_reference_particle"]["momentum"] = pos;
     (*conf)["simulation_reference_particle"]["energy"] = -1.;
     (*conf)["simulation_reference_particle"]["time"] = -2.;
-    (*conf)["simulation_reference_particle"]["random_seed"] = -2;
+    (*conf)["simulation_reference_particle"]["random_seed"] = Json::Int(2);
     EXPECT_EQ(MAUSGeant4Manager::GetInstance()->GetReferenceParticle().pid, 111);
 }
 
@@ -77,9 +77,9 @@ TEST(MAUSGeant4ManagerTest, RunParticlePGTest) {
 
     // test that track is set ok
     Json::Value val = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
-    ASSERT_TRUE(val["tracks"].isObject());
-    ASSERT_TRUE(val["tracks"]["track_1"].isObject());
-    Json::Value track = val["tracks"]["track_1"];
+    ASSERT_TRUE(val["tracks"].isArray());
+    ASSERT_TRUE(val["tracks"][Json::Value::UInt(0)].isObject());
+    Json::Value track = val["tracks"][Json::Value::UInt(0)];
     EXPECT_NEAR(track["initial_position"]["x"].asDouble(), 1., 1e-9);
     EXPECT_NEAR(track["initial_position"]["y"].asDouble(), 2., 1e-9);
     EXPECT_NEAR(track["initial_position"]["z"].asDouble(), 3., 1e-9);
@@ -90,15 +90,15 @@ TEST(MAUSGeant4ManagerTest, RunParticlePGTest) {
     EXPECT_TRUE(val["tracks"].isNull());
     MAUSGeant4Manager::GetInstance()->GetTracking()->SetWillKeepTracks(true);
     val = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
-    EXPECT_EQ(val["tracks"].type(), Json::objectValue);
+    EXPECT_EQ(val["tracks"].type(), Json::arrayValue);
 
     // test that steps can be switched on and off
     MAUSGeant4Manager::GetInstance()->GetStepping()->SetWillKeepSteps(false);
     val = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
-    EXPECT_TRUE(val["tracks"]["track_1"]["steps"].isNull());
+    EXPECT_TRUE(val["tracks"][Json::Value::UInt(0)]["steps"].isNull());
     MAUSGeant4Manager::GetInstance()->GetStepping()->SetWillKeepSteps(true);
     val = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
-    EXPECT_EQ(val["tracks"]["track_1"]["steps"].type(), Json::arrayValue);
+    EXPECT_EQ(val["tracks"][Json::Value::UInt(0)]["steps"].type(), Json::arrayValue);
 
     // test that virtuals can be switched on and off
     MAUSGeant4Manager::GetInstance()->
@@ -114,18 +114,19 @@ TEST(MAUSGeant4ManagerTest, RunParticlePGTest) {
     // note dependency on random seed (require we get the same hit twice)
     Json::Value val_sd_1 = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
     Json::Value val_sd_2 = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
-    EXPECT_TRUE(val_sd_1["hits"].isArray());
-    EXPECT_TRUE(val_sd_1["hits"].size() > 0);
-    EXPECT_EQ(val_sd_1["hits"].size(), val_sd_2["hits"].size());
+    EXPECT_TRUE(val_sd_1["special_virtual_hits"].isArray());
+    EXPECT_TRUE(val_sd_1["special_virtual_hits"].size() > 0) << val_sd_1;
+    EXPECT_EQ(val_sd_1["special_virtual_hits"].size(),
+              val_sd_2["special_virtual_hits"].size());
 }
 
 TEST(MAUSGeant4ManagerTest, RunParticleJsonTest) {
-    std::string pg_string = 
+    std::string pg_string =
       "{\"primary\":{\"position\":{\"x\":1.0, \"y\":2.0, \"z\":3.0}, \"momentum\":{\"x\":0.0, \"y\":0.0, \"z\":1.0}, \"particle_id\":-13, \"energy\":226.0, \"time\":0.0, \"random_seed\":10}}";
     Json::Value pg = JsonWrapper::StringToJson(pg_string);
     MAUSGeant4Manager::GetInstance()->GetStepping()->SetWillKeepSteps(false);
     Json::Value out = MAUSGeant4Manager::GetInstance()->RunParticle(pg);
-    Json::Value track = out["tracks"]["track_1"];
+    Json::Value track = out["tracks"][Json::Value::UInt(0)];
     ASSERT_TRUE(track["initial_position"]["x"].isDouble());
     EXPECT_NEAR(track["initial_position"]["x"].asDouble(), 1., 1e-9);
     EXPECT_NEAR(track["initial_position"]["y"].asDouble(), 2., 1e-9);
@@ -145,11 +146,11 @@ TEST(MAUSGeant4ManagerTest, RunManyParticlesTest) {
     MAUSGeant4Manager::GetInstance()->GetStepping()->SetWillKeepSteps(false);
     Json::Value out = MAUSGeant4Manager::GetInstance()->RunManyParticles(pg);
     for (size_t i = 0; i < out.size(); ++i) {
-      Json::Value track = out[i]["tracks"]["track_1"];
+      Json::Value track = out[i]["tracks"][Json::Value::UInt(0)];
       ASSERT_TRUE(out.isArray());
       ASSERT_TRUE(out[i].isObject());
-      ASSERT_TRUE(out[i]["tracks"].isObject());
-      ASSERT_TRUE(out[i]["tracks"]["track_1"].isObject());
+      ASSERT_TRUE(out[i]["tracks"].isArray());
+      ASSERT_TRUE(out[i]["tracks"][Json::Value::UInt(0)].isObject());
       ASSERT_TRUE(track["initial_position"]["x"].isDouble());
       EXPECT_NEAR(track["initial_position"]["x"].asDouble(), 1., 1e-9);
       EXPECT_NEAR(track["initial_position"]["y"].asDouble(), 2., 1e-9);

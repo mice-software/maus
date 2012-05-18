@@ -51,7 +51,7 @@ class MAUSTrackingAction : public G4UserTrackingAction {
      */
     void PostUserTrackingAction(const G4Track*);
 
-    /** @brief Set the tracks; must be a json object
+    /** @brief Set the tracks; must be a json array, else throws a Squeal
      */
     void SetTracks(Json::Value tracks);
 
@@ -71,10 +71,6 @@ class MAUSTrackingAction : public G4UserTrackingAction {
     /** @brief Returns true is tracks are stored.
      */
     bool GetWillKeepTracks() {return _keepTracks;}
-
-    /** @brief Return track name for track with given id
-     */
-    std::string TrackName(int id);
 
     /** @brief If MAUS kills a particle, give the reason here
      */

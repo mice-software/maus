@@ -31,7 +31,8 @@ class ReducePyHistogramTDCADCCounts(ReducePyMatplotlibHistogram):
     Histograms are output as JSON documents of form:
 
     @verbatim
-    {"image": {"content":"Total TDC and ADC counts to spill 2",
+    {"image": {"keywords":["TDC", "ADC", "counts"],
+               "description":"Total TDC and ADC counts to spill 2",
                "tag": TAG,
                "image_type": "eps", 
                "data": "...base 64 encoded image..."}}
@@ -74,7 +75,8 @@ class ReducePyHistogramTDCADCCounts(ReducePyMatplotlibHistogram):
         self.__max_adc_count = 1
         self.__max_tdc_count = 1
         self._tag = "tdcadc"
-        self._content = ""
+        self._keywords = ["TDC", "ADC", "counts"]
+        self._description = ""
         self._tdcadchistogram = None
 
     def _configure_at_birth(self, config_doc):
@@ -107,7 +109,8 @@ class ReducePyHistogramTDCADCCounts(ReducePyMatplotlibHistogram):
         @returns list with histogram JSON document.
         @throws KeyError if "digits" is not in spill.
         """
-        if "END_OF_RUN" in spill:
+        if (spill.has_key("daq_event_type") and
+            spill["daq_event_type"] == "end_of_run"):
             return [{}]
 
         # Do validation specific to this class while getting the
@@ -135,11 +138,11 @@ class ReducePyHistogramTDCADCCounts(ReducePyMatplotlibHistogram):
             spill_max_adc_count = max(adcs)
         self.__max_adc_count = max(self.__max_adc_count, spill_max_adc_count)
 
-        # Set description of content of histogram and histogram title.
-        self._content = \
+        # Set description of histogram and histogram title.
+        self._description = \
             "Total TDC and ADC counts"
         self._tdcadchistogram.figure.get_axes()[0].set_title(
-            self._content, fontsize=14)
+            self._description, fontsize=14)
 
         # Plot the data.
         if (len(tdcs) > 0):
@@ -150,9 +153,9 @@ class ReducePyHistogramTDCADCCounts(ReducePyMatplotlibHistogram):
         ReducePyMatplotlibHistogram._rescale_axes( \
             self, self._tdcadchistogram, \
             0, self.__max_tdc_count, 0, self.__max_adc_count)
-
-        image_doc = ReducePyMatplotlibHistogram._create_image_json( \
-            self, self._content, self._tag, self._tdcadchistogram)
+        image_doc = ReducePyMatplotlibHistogram._get_image_doc( \
+            self, self._keywords, self._description, self._tag, \
+            self._tdcadchistogram)
         return [image_doc]
 
     def __filter_trackers(self, digit): #pylint: disable=R0201

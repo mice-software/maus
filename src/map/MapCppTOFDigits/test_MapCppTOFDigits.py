@@ -58,13 +58,14 @@ class MapCppTOFDigitsTestCase(unittest.TestCase): # pylint: disable = R0904
 
     def __test_process_tof0_digits(self, spill_in, spill_out):
         """Test tof0 digits"""
-        n_part_events = len(spill_out['digits']['tof0'])
-        self.assertEqual(n_part_events, 2)
-        n_digits_part_ev0 = len(spill_out['digits']['tof0'][0])
+        n_digits_part_ev0 = len\
+              (spill_out['recon_events'][0]['tof_event']['tof_digits']['tof0'])
         self.assertEqual(n_digits_part_ev0, 3)
-        self.assertFalse(spill_out['digits']['tof0'][1])
+        self.assertFalse\
+               (spill_out['recon_events'][1]['tof_event']['tof_digits']['tof0'])
         # test the creation of the digit
-        digit0_part_ev0_tof0 = spill_out['digits']['tof0'][0][0]
+        digit0_part_ev0_tof0 = \
+              spill_out['recon_events'][0]['tof_event']['tof_digits']['tof0'][0]
         l_time = spill_in['daq_data']['tof0'][0]['V1290'][0]['leading_time']
         charge_mm = spill_in['daq_data']['tof0'][0]['V1724'][0]['charge_mm']
         trig = spill_in['daq_data']['trigger'][0]['V1290'][1]['leading_time']
@@ -78,22 +79,23 @@ class MapCppTOFDigitsTestCase(unittest.TestCase): # pylint: disable = R0904
 
     def __test_process_tof1_digits(self, spill_out):
         """Test tof1 digits"""
-        n_part_events = len(spill_out['digits']['tof1'])
-        self.assertEqual(n_part_events, 2)
-        n_digits_part_ev0_tof1 = len(spill_out['digits']['tof1'][0])
+        n_digits_part_ev0_tof1 = len(\
+                spill_out['recon_events'][0]['tof_event']['tof_digits']['tof1'])
         self.assertEqual(n_digits_part_ev0_tof1, 3)
-        n_digits_part_ev1_tof1 = len(spill_out['digits']['tof1'][1])
+        n_digits_part_ev1_tof1 = len(\
+                spill_out['recon_events'][1]['tof_event']['tof_digits']['tof1'])
         self.assertEqual(n_digits_part_ev1_tof1, 3)
-        digit2_part_ev1_tof1 = spill_out['digits']['tof1'][1][2]
+        digit2_part_ev1_tof1 = \
+              spill_out['recon_events'][1]['tof_event']['tof_digits']['tof1'][2]
         self.assertFalse('charge_mm' in digit2_part_ev1_tof1)
         self.assertFalse('charge_pm' in digit2_part_ev1_tof1)
 
     def __test_process_tof2_digits(self, spill_out):
         """Test tof2 digits"""
-        n_part_events = len(spill_out['digits']['tof2'])
-        self.assertEqual(n_part_events, 2)
-        self.assertFalse(spill_out['digits']['tof2'][0])
-        self.assertFalse(spill_out['digits']['tof2'][1])
+        self.assertFalse(spill_out\
+                         ['recon_events'][0]['tof_event']['tof_digits']['tof2'])
+        self.assertFalse(spill_out\
+                         ['recon_events'][1]['tof_event']['tof_digits']['tof2'])
 
     def test_process(self):
         """Test MapCppTOFDigits process method"""

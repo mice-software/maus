@@ -1,3 +1,40 @@
+MAUS-v0.2.3 (http://micewww.pp.rl.ac.uk/versions/show/25)
+  Bug #819: Copy pasting third_party means Python can't use site-packages
+  Bug #853: SpecialVirtual hit and TOF hit have different particle id field
+  Feature #589: ROOT IO
+  Feature #955: Online shifter documentation
+  Feature #956: Online recon machine spring clean
+
+MAUS-v0.2.2 (http://micewww.pp.rl.ac.uk/versions/show/24)
+  Feature #691: Online Data Quality (SSI collaborative effort)
+  Feature #706: Web-based interface for live execution monitoring
+  Feature #747: Document customisation of histogram reducer use case
+
+MAUS-v0.2.1 (http://micewww.pp.rl.ac.uk/versions/show/23)
+  Bug #952: MAUS_0.2 build error
+
+MAUS-v0.2.0 (http://micewww.pp.rl.ac.uk/versions/show/22)
+  Bug #498: Compiler warnings
+  Bug #806: ReduceCpp... doesn't build
+  Bug #862: PyRoot Plotting example
+  Bug #906: CavityMode == Phased gives Electrostatic cavity
+  Bug #923: celery version makes error
+  Bug #932: Negative pz gives forward going beam
+  Feature #704: Distributed task queue
+  Feature #705: Data cache
+  Feature #797: TOF online histograms
+  Feature #856: Update cdb version for next release
+  Feature #866: Overview of online reconstruction
+  Feature #898: Simulation documentation
+  Feature #927: Cerenkov merge/Review
+
+MAUS-v0.1.4 (http://micewww.pp.rl.ac.uk/versions/show/21)
+  Bug #896: MapPyGroup birth and death
+	Bug #897: Optics test fails on Ubuntu
+	Bug #909: MAUS_THIRD_PARTY fails if relative path supplied
+	Feature #476: PhaseSpaceVector clean up
+	Feature #624: TransferMap cleanup
+
 MAUS-v0.1.3 (http://micewww.pp.rl.ac.uk/versions/show/20)
   Feature #342: scons cleanup
   Feature #707: PyROOT histogram reducer
