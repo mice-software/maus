@@ -102,14 +102,12 @@ def maus_input_transform_process(maus_input_log):
     """
     print 'Starting reconstruction with log file ', maus_input_log,
     log = open(maus_input_log, 'w')
-    stderr_out = open('delete.log', 'w')
     maus_inp = os.path.join(os.environ['MAUS_ROOT_DIR'],
                                    'bin/online/analyze_data_online_input_transform.py')
     proc = subprocess.Popen(
                        ['python', maus_inp, '-mongodb_database_name=maus-new',
-                        '-type_of_dataflow=multi_process_input_transform',
-                        '-verbose_level=0'],
-                       stdout=log, stderr=stderr_out)
+                        '-type_of_dataflow=multi_process_input_transform'],
+                       stdout=log, stderr=subprocess.STDOUT)
     print 'with pid', proc.pid
     return proc
     

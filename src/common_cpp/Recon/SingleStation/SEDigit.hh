@@ -45,7 +45,7 @@ class SEDigit {
 
   /** @brief Constructs a SE digit initializing member variables.
    */
-  SEDigit(int plane, int channel, double npe, double time, int adc );
+  SEDigit(int plane, int channel, double npe, double time );
 
   ~SEDigit();
 
@@ -67,11 +67,7 @@ class SEDigit {
 
   void set_npe(double npe) { _npe = npe; }
 
-  double get_npe()     const { return _npe; }
-
-  void set_adc(int adc) { _adc = adc; }
-
-  int get_adc()     const { return _adc; }
+  double get_npe()     const { return _npe;     }
 
   void set_time(double time) { _time = time; }
 
@@ -84,7 +80,6 @@ class SEDigit {
  private:
 
   // int _spill, _eventNo;
-  int _adc;
 
   int _plane, _channel;
 

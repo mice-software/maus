@@ -81,10 +81,10 @@ class ReduceCppSingleStation {
 
   bool is_physics_daq_event(Json::Value root);
 
-  void count_particle_events(Json::Value root);
+  //void count_particle_events(Json::Value root);
 
  private:
-  TGraph *_graph;
+  //TGraph *_graph;
   int _spill_counter;
 
   TH2F *triplets;
@@ -101,13 +101,7 @@ class ReduceCppSingleStation {
 
   TH1F *_hist_plane2;
 
-  TH1F *_adc_plane0;
-
-  TH1F *_adc_plane1;
-
-  TH1F *_adc_plane2;
-
-  TH1F *_chan_sum;
+  //TH1F *_chan_sum;
   //TH2F *_trig_efficiency;
 
   TH1F *_npe_plane0;
@@ -125,7 +119,6 @@ class ReduceCppSingleStation {
   void Save();
 
   TTree _unpacked;
-  int _myadc;
   int _adc, _tdc, _bank, _chan, _activebank;
 
   TTree _digits;

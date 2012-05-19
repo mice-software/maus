@@ -29,35 +29,26 @@ bool ReduceCppSingleStation::birth(std::string argJsonConfigDocument) {
   _filename = "se.root";
   _nSpills = 0;
 
-  TCanvas *c1 = new TCanvas("c1", "Efficiency (SE/TOF1)", 200, 10, 700, 500);
+  TCanvas *c1 = new TCanvas("c1", "TDCs", 200, 10, 700, 500);
   TCanvas *c2 = new TCanvas("c2", "Channel Hits", 200, 10, 700, 500);
   TCanvas *c3 = new TCanvas("c3", "SpacePoints", 200, 10, 700, 500);
   TCanvas *c4 = new TCanvas("c4", "Cluster NPE", 200, 10, 700, 500);
-  TCanvas *c5 = new TCanvas("c5", "ADCs", 200, 10, 700, 500);
-  TCanvas *c6 = new TCanvas("c6", "adc-pedestal", 200, 10, 700, 500);
-  // TCanvas *c7 = new TCanvas("c7", "adc-pedestal versus channel", 200, 10, 700, 500);
+  //TCanvas *c5 = new TCanvas("c5", "ADCs", 200, 10, 700, 500);
 
   triplets = new TH2F("triplets", "Current Spill (x, y)", 300, -150, 150, 300, -150, 150);
   duplets  = new TH2F("duplets",  "Current Spill (x, y)", 300, -150, 150, 300, -150, 150);
   triplets_copy = new TH2F("triplets_copy", "All Spills (x, y)", 300, -150, 150, 300, -150, 150);
   duplets_copy  = new TH2F("duplets_copy", "All Spills (x, y)", 300, -150, 150, 300, -150, 150);
-  _graph = new TGraph();
+  //_graph = new TGraph();
 
   _hist_plane0 = new TH1F("_hist_plane0","plane 0", 215, 0, 214);
   _hist_plane1 = new TH1F("_hist_plane1","plane 1", 215, 0, 214);
   _hist_plane2 = new TH1F("_hist_plane2","plane 2", 215, 0, 214);
-  _adc_plane0 = new TH1F("_adc_plane0","plane 0", 256, 0, 255);
-  _adc_plane1 = new TH1F("_adc_plane1","plane 1", 256, 0, 255);
-  _adc_plane2 = new TH1F("_adc_plane2","plane 2", 256, 0, 255);
-  _chan_sum = new TH1F("_hist_plane2","Sum Of Channel Numb", 641, 0, 640);
+  //_chan_sum = new TH1F("_hist_plane2","Sum Of Channel Numb", 641, 0, 640);
 
   _npe_plane0 = new TH1F("_npe_plane0","plane 0", 31, 0, 30);
   _npe_plane1 = new TH1F("_npe_plane1","plane 1", 31, 0, 30);
   _npe_plane2 = new TH1F("_npe_plane2","plane 2", 31, 0, 30);
-
-  //_adc_plane0 = new TH1F("_adc_plane0","plane 0", 256, 0, 255);
-  //_adc_plane1 = new TH1F("_adc_plane1","plane 1", 256, 0, 255);
-  //_adc_plane2 = new TH1F("_adc_plane2","plane 2", 256, 0, 255);
 
   _unpacked.SetNameTitle("unpacked", "unpacked");
   _unpacked.Branch("adc", &_adc, "adc/I");
@@ -70,7 +61,6 @@ bool ReduceCppSingleStation::birth(std::string argJsonConfigDocument) {
   _digits.Branch("plane", &_plane, "plane/I");
   _digits.Branch("channel", &_channel, "channel/D");
   _digits.Branch("npe", &_npe, "npe/D");
-  _digits.Branch("adc", &_myadc, "adc/I");
 
   _spacepoints.SetNameTitle("spacepoints", "spacepoints");
   _spacepoints.Branch("pe", &_pe, "pe/D");
@@ -86,7 +76,7 @@ bool ReduceCppSingleStation::birth(std::string argJsonConfigDocument) {
   _spacepointscopy.Branch("z", &_z, "z/D");
   _spacepointscopy.Branch("type", &_type, "type/I");
 
-  c5->Divide(1,1);
+  //c5->Divide(1,1);
   c1->Divide(1, 1);
   c1->SetFillColor(21);
   c1->GetFrame()->SetFillColor(42);
@@ -105,14 +95,12 @@ bool ReduceCppSingleStation::birth(std::string argJsonConfigDocument) {
   gStyle->SetTitleOffset(0.6, "x");
   gStyle->SetTitleOffset(0.4, "y");
 
-  c4->Divide(3, 1);
+  c4->Divide(3,1);
   triplets->SetMarkerStyle(20);
   triplets->SetMarkerColor(kBlue);
   triplets_copy->SetMarkerStyle(20);
   triplets_copy->SetMarkerColor(kBlue);
 
-  c6->Divide(3, 1);
-  // c7->Divide(3, 1);
   duplets->SetMarkerStyle(20);
   duplets->SetMarkerColor(kRed);
   duplets_copy->SetMarkerStyle(20);
@@ -136,7 +124,7 @@ bool ReduceCppSingleStation::birth(std::string argJsonConfigDocument) {
 }
 
 bool ReduceCppSingleStation::death()  {
-  Save();
+  //Save();
   std::cout << "************ Dead of Single Station Reducer ************" << std::endl;
   return true;
 }
@@ -152,9 +140,7 @@ std::string  ReduceCppSingleStation::process(std::string document) {
   TCanvas *c2 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c2"));
   TCanvas *c3 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c3"));
   TCanvas *c4 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c4"));
-  TCanvas *c5 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c5"));
-  TCanvas *c6 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c6"));
- // TCanvas *c7 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c7"));
+  //TCanvas *c5 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c5"));
 
   Squeak::activateCout(1);
 
@@ -186,8 +172,8 @@ std::string  ReduceCppSingleStation::process(std::string document) {
     if ( root.isMember("space_points") )
       draw_spacepoints(root);
 
-    if ( is_physics_daq_event(root) && root.isMember("space_points") )
-      count_particle_events(root);
+    //if ( is_physics_daq_event(root) && root.isMember("space_points") )
+      //count_particle_events(root);
   } catch(Squeal squee) {
     Squeak::mout(Squeak::error) << squee.GetMessage() << std::endl;
     root = MAUS::CppErrorHandler::getInstance()->HandleSqueal(root, squee, _classname);
@@ -199,7 +185,8 @@ std::string  ReduceCppSingleStation::process(std::string document) {
   _nSpills++;
   if (!(_nSpills%1)) {
     c1->cd(1);
-    _graph->Draw("ac*");
+    _unpacked.Draw("tdc","bank==0 || bank==2 || bank==5 || bank==7 || bank==9|| bank==10|| bank==11 ||bank==12 || bank==13|| bank==14");
+    //_graph->Draw("ac*");
     c1->Update();
 
     c2->cd(1);
@@ -236,32 +223,17 @@ std::string  ReduceCppSingleStation::process(std::string document) {
     _npe_plane2->Draw();
     c4->Update();
 
-    c5->cd(1);
-    _unpacked.Draw("adc","bank==0 || bank==2 || bank==5 || bank==7 || bank==9|| bank==10|| bank==11 ||bank==12 || bank==13|| bank==14");
-    c5->Update();
-
-    c6->cd(1);
-    _adc_plane0->Draw();
-    c6->Divide(2);
-    _adc_plane1->Draw();
-    c6->Divide(3);
-    _adc_plane2->Draw();
-    c6->Update();
-/*
-    c7->cd(1);
-    _digits.Draw("adc:channel","plane==0");
-    c7->cd(2);
-    _digits.Draw("adc:channel","plane==1");
-    c7->cd(3);
-    _digits.Draw("adc:channel","plane==2");
-    c7->Update();
-*/
+    //c5->cd(1);
+    //c5->SetLogy();
+    //_unpacked.Draw("adc","bank==0 || bank==2 || bank==5 || bank==7 || bank==9|| bank==10|| bank==11 ||bank==12 || bank==13|| bank==14");
+    //c5->Update();
   }
 
   // std::cerr << "End Reducer Process" << std::endl;
   return document;
 }
 
+/*
 void ReduceCppSingleStation::count_particle_events(Json::Value root) {
   _spill_counter += 1.;
   int numb_triggers = root["daq_data"]["tof1"].size();
@@ -276,8 +248,8 @@ void ReduceCppSingleStation::count_particle_events(Json::Value root) {
 
   float effic = static_cast<float>(numb_spacepoints)/numb_triggers;
   float _spill_counter_copy = static_cast<float>(_spill_counter);
-  _graph->SetPoint(_spill_counter, _spill_counter_copy, effic);
-/*
+  //_graph->SetPoint(_spill_counter, _spill_counter_copy, effic);
+
   TAxis *axis = _trig_efficiency->GetXaxis();
   std::cout << numb_spacepoints << " " << axis->GetXmax() << std::endl;
   if ( _spill_counter > axis->GetXmax() ) {
@@ -290,9 +262,9 @@ void ReduceCppSingleStation::count_particle_events(Json::Value root) {
     double new_Y_max = effic+0.3;
     _trig_efficiency->RebinAxis(new_Y_max, axis_y);
   }
-*/
-}
 
+}
+*/
 
 bool ReduceCppSingleStation::is_physics_daq_event(Json::Value root) {
   if (root.isMember("daq_data") &&
@@ -350,31 +322,25 @@ void ReduceCppSingleStation::digits_histograms(Json::Value root) {
                                         event_i,
                                         JsonWrapper::arrayValue);
     int numb_digits = i_PartEvent.size();
-    double chan_sum = 0;
+    //double chan_sum = 0;
     for ( int digit_j = 0; digit_j < numb_digits; digit_j++ ) {
-      _plane   = i_PartEvent[digit_j]["plane"].asInt();
+      _plane      = i_PartEvent[digit_j]["plane"].asInt();
       _channel = i_PartEvent[digit_j]["channel"].asDouble();
       _npe     = i_PartEvent[digit_j]["npe"].asDouble();
-      _myadc   = i_PartEvent[digit_j]["adc"].asInt();
-      std::cout << _myadc << std::endl;
-      //_digits.Fill();
-      chan_sum += _channel;
+      _digits.Fill();
+      //chan_sum += _channel;
       if ( _plane == 0 ) {
         _hist_plane0->Fill(_channel);
         _npe_plane0->Fill(_npe);
-        _adc_plane0->Fill(_myadc);
       } else if ( _plane == 1 ) {
         _hist_plane1->Fill(_channel);
         _npe_plane1->Fill(_npe);
-        _adc_plane1->Fill(_myadc);
       } else if ( _plane == 2 ) {
         _hist_plane2->Fill(_channel);
         _npe_plane2->Fill(_npe);
-        _adc_plane2->Fill(_myadc);
       }
-      _digits.Fill();
     }
-    _chan_sum->Fill(chan_sum);
+    //_chan_sum->Fill(chan_sum);
   }
   // } else {
   //  throw(Squeal(Squeal::recoverable,
@@ -391,20 +357,14 @@ void ReduceCppSingleStation::unpacked_data_histograms(Json::Value root) {
   // Loop over events.
   for (int event_i = 0; event_i < n_events; event_i++) {
     if ( daq_data["single_station"][event_i].isNull() ) continue;
-    // Json::Value i_PartEvent = JsonWrapper::GetProperty(daq_data["single_station"][event_i],
-    //                                    "VLSB_bank",
-    //                                    JsonWrapper::objectValue);
     Json::Value i_PartEvent = daq_data["single_station"][event_i];
     int number_channels_within = i_PartEvent["VLSB"].size();
     for ( int i = 0; i < number_channels_within; i++ ) {
       _tdc  = i_PartEvent["VLSB"][i]["tdc"].asInt();
       _adc  = i_PartEvent["VLSB"][i]["adc"].asInt();
+      _tdc  = i_PartEvent["VLSB"][i]["tdc"].asInt();
       _bank = i_PartEvent["VLSB"][i]["bank_id"].asInt();
       _chan = i_PartEvent["VLSB"][i]["channel"].asInt();
-      int _disc = i_PartEvent["VLSB"][i]["discriminator"].asInt();
-      if ( _disc != 0 ) {
-        std::cerr << "********************* DISCRIMINATOR IS != 0 *********************" << std::endl;
-      }
       if ( _bank == 0 || _bank == 2 || _bank == 5 ||
            _bank == 7 || _bank == 9 || _bank == 10 ||
            _bank == 11 || _bank == 12 || _bank == 13 ||

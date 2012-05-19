@@ -57,7 +57,7 @@ def run():
     my_map.append(MAUS.MapCppTOFSlabHits())
     my_map.append(MAUS.MapCppTOFSpacePoints())
     my_map.append(MAUS.MapPyCkov())
-    my_map.append(MAUS.MapCppSingleStationRecon())
+    #my_map.append(MAUS.MapCppSingleStationRecon())
     # Histogram reducer.
     reducer = MAUS.ReducePyCkov()
     #reducer = MAUS.ReducePyDoNothing()
