@@ -358,9 +358,6 @@ void ReduceCppSingleStation::unpacked_data_histograms(Json::Value root) {
   // Loop over events.
   for (int event_i = 0; event_i < n_events; event_i++) {
     if ( daq_data["single_station"][event_i].isNull() ) continue;
-    // Json::Value i_PartEvent = JsonWrapper::GetProperty(daq_data["single_station"][event_i],
-    //                                    "VLSB_bank",
-    //                                    JsonWrapper::objectValue);
     Json::Value i_PartEvent = daq_data["single_station"][event_i];
     int number_channels_within = i_PartEvent["VLSB"].size();
     for ( int i = 0; i < number_channels_within; i++ ) {
