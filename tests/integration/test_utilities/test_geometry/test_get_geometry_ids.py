@@ -20,6 +20,7 @@ import unittest
 import os
 import subprocess
 import urllib2
+from geometry.ConfigReader import Configreader
 
 MAUS_ROOT_DIR = os.getenv("MAUS_ROOT_DIR")
 TMP_PATH = os.path.join(MAUS_ROOT_DIR, "tmp")
@@ -56,9 +57,13 @@ class TestGetGeometryIDS(unittest.TestCase): #pylint:disable= R0904
     def setUp(self): # pylint: disable=C0103, C0202
         """ Run Simulation """
         self.internet_connection = True
+        self.configuration = Configreader()
+        self.server_name = self.configuration.cdb_download_url + \
+                                       self.configuration.geometry_download_wsdl
         try:
-            urllib2.urlopen("http://google.com")
+            urllib2.urlopen(self.server_name)
         except urllib2.URLError:
+            self.internet_connection == False
             unittest.TestCase.skipTest(self, "No Internet Connection")
         if self.internet_connection == True:
             run_get_geometries()
