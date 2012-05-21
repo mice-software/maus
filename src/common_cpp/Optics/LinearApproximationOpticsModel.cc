@@ -29,7 +29,7 @@
 #include "Maths/Vector.hh"
 
 namespace MAUS {
-  
+
 void LinearApproximationOpticsModel::Build(const Json::Value & configuration) {
   // Nothing to do here
 }
@@ -74,7 +74,7 @@ std::cout << "Delta Y: " << delta_y << std::endl;
   transported_vector[0] += delta_t;
   transported_vector[2] += delta_x;
   transported_vector[4] += delta_y;
-  
+
   return transported_vector;
 }
 

@@ -17,9 +17,9 @@
 
 #include "gtest/gtest.h"
 
-#include "src/common_cpp/Recon/SciFi/SciFiEvent.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiDigit.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
+#include "src/common_cpp/Reconstruction/SciFi/SciFiEvent.hh"
+#include "src/common_cpp/Reconstruction/SciFi/SciFiDigit.hh"
+#include "src/common_cpp/Reconstruction/SciFi/SciFiSpacePoint.hh"
 
 namespace {
 class SciFiEventTest : public ::testing::Test {

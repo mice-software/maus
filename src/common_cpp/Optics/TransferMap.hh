@@ -35,6 +35,7 @@ class PhaseSpaceVector;
 class TransferMap {
  public:
   TransferMap() { }
+  virtual ~TransferMap() { }
   // ******************************
   //      Transport functions
   // ******************************

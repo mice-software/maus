@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef _SRC_MAP_MAPCPPTRACKRECONSTRUCTOR_HH_
-#define _SRC_MAP_MAPCPPTRACKRECONSTRUCTOR_HH_
+#ifndef _SRC_MAP_MAPCPPGLOBALTRACKRECONSTRUCTOR_HH_
+#define _SRC_MAP_MAPCPPGLOBALTRACKRECONSTRUCTOR_HH_
 
 // C++ headers
 #include <string>
@@ -37,31 +37,31 @@
 namespace MAUS {
 
 class OpticsModel;
-class TrackFitter;
 
 namespace reconstruction {
 namespace global {
 
+class TrackFitter;
 class ReconstructionInput;
 
 }  // namespace global
 }  // namespace reconstruction
 
-/** @class MapCppTrackReconstructor
+/** @class MapCppGlobalTrackReconstructor
  *  Reconstruct tracks at the desired longitudinal spacing using the desired
  *  track fitting method.
  */
-class MapCppTrackReconstructor {
+class MapCppGlobalTrackReconstructor {
  public:
   /** @brief Allocates the global-scope Minuit instance used for minimization.
    */
-  MapCppTrackReconstructor();
+  MapCppGlobalTrackReconstructor();
 
   /** @brief Destroys the *global* scope Minuit object
    *
    *  This takes no arguments.
    */
-  ~MapCppTrackReconstructor();
+  ~MapCppGlobalTrackReconstructor();
 
   /** @brief Begin the startup procedure for TrackReconstructor
    *
@@ -88,12 +88,12 @@ class MapCppTrackReconstructor {
  private:
   Json::Value configuration_;
   OpticsModel * optics_model_;
-  TrackFitter * track_fitter_;
+  MAUS::reconstruction::global::TrackFitter * track_fitter_;
 
   Json::Value run_data_;
   MAUS::reconstruction::global::ReconstructionInput * reconstruction_input_;
-  std::vector<Track> reconstructed_tracks_;
-  
+  std::vector<MAUS::reconstruction::global::Track> reconstructed_tracks_;
+
   static const std::string kClassname;
   BTField * electromagnetic_field_;
 
@@ -105,12 +105,15 @@ class MapCppTrackReconstructor {
   void LoadSimulationData();
   void LoadLiveData();
 
-  void CorrelateTrackPoints(std::vector<Track> & tracks);
+  void CorrelateTrackPoints(
+      std::vector<MAUS::reconstruction::global::Track> & tracks);
 
-  static Json::Value TrackToJson(const Track & track);
-  static Json::Value TrackPointToJson(const TrackPoint & track_point);
+  static Json::Value TrackToJson(
+      const MAUS::reconstruction::global::Track & track);
+  static Json::Value TrackPointToJson(
+      const MAUS::reconstruction::global::TrackPoint & track_point);
 };
 
 }  // namespace MAUS
 
-#endif  // _SRC_MAP_MAPCPPTRACKRECONSTRUCTOR_HH_
+#endif  // _SRC_MAP_MapCppGlobalTrackReconstructor_HH_

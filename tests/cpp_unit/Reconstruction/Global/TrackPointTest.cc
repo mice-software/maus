@@ -30,8 +30,8 @@
 
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
-#include "Reconstruction/Detector.hh"
-#include "Reconstruction/TrackPoint.hh"
+#include "Reconstruction/Global/Detector.hh"
+#include "Reconstruction/Global/TrackPoint.hh"
 
 using MAUS::CovarianceMatrix;
 using MAUS::Detector;
@@ -59,10 +59,10 @@ class TrackPointTest : public ::testing::Test {
 const double TrackPointTest::kDetectorPlane = 78.6;
 
 const double TrackPointTest::kUncertaintyData[36] = {
-   0.,      1.,       2.,       3.,      -5.,      -6.,
-   1.,    -13.,     -21.,      34.5,     55.7,     13.2,
-   2.,    -21.,     -32.5,    -57.5,    -91.2,    -23.4,
-   3.,     34.5,    -57.5,      2.65,    -3.58,    59.9,
+  +0.,      1.,       2.,       3.,      -5.,      -6.,
+  +1.,    -13.,     -21.,      34.5,     55.7,     13.2,
+  +2.,    -21.,     -32.5,    -57.5,    -91.2,    -23.4,
+  +3.,     34.5,    -57.5,      2.65,    -3.58,    59.9,
   -5.,    -55.7,    -91.2,     -3.58,     3.38,    67.4,
   -6.,     13.2,    -23.4,     59.9,     67.4,      5.12
 };
@@ -143,7 +143,7 @@ TEST_F(TrackPointTest, Equality) {
   // Test inequality with a null point
   const TrackPoint default_point;
   ASSERT_NE(default_point, point);
-  
+
   // Test general inequality
   test_point.set_t(1.0);
   test_point.set_E(2.1);
@@ -229,14 +229,14 @@ TEST_F(TrackPointTest, FillInCoordinates) {
                    0.0, 0.0,
                    TrackPointTest::kUncertainties);
 
-  point.FillInAxialCoordinates(mass);  
+  point.FillInAxialCoordinates(mass);
 
   ASSERT_DOUBLE_EQ(test_point.z(), point.z());
   ASSERT_DOUBLE_EQ(test_point.Pz(), point.Pz());
-  
+
   point.set_t(0.0);
   point.set_E(0.0);
-  point.FillInTemporalCoordinates(mass);  
+  point.FillInTemporalCoordinates(mass);
 
   ASSERT_DOUBLE_EQ(test_point.t(), point.t());
   ASSERT_DOUBLE_EQ(test_point.E(), point.E());

@@ -31,10 +31,10 @@
 
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
-#include "Reconstruction/Detector.hh"
-#include "Reconstruction/Particle.hh"
-#include "Reconstruction/Track.hh"
-#include "Reconstruction/TrackPoint.hh"
+#include "Reconstruction/Global/Detector.hh"
+#include "Reconstruction/Global/Particle.hh"
+#include "Reconstruction/Global/Track.hh"
+#include "Reconstruction/Global/TrackPoint.hh"
 
 using MAUS::CovarianceMatrix;
 using MAUS::Detector;
@@ -65,10 +65,10 @@ class TrackTest : public ::testing::Test {
 const double TrackTest::kDetectorPlane = 78.6;
 
 const double TrackTest::kUncertaintyData[36] = {
-   0.,      1.,       2.,       3.,      -5.,      -6.,
-   1.,    -13.,     -21.,      34.5,     55.7,     13.2,
-   2.,    -21.,     -32.5,    -57.5,    -91.2,    -23.4,
-   3.,     34.5,    -57.5,      2.65,    -3.58,    59.9,
+  +0.,      1.,       2.,       3.,      -5.,      -6.,
+  +1.,    -13.,     -21.,      34.5,     55.7,     13.2,
+  +2.,    -21.,     -32.5,    -57.5,    -91.2,    -23.4,
+  +3.,     34.5,    -57.5,      2.65,    -3.58,    59.9,
   -5.,    -55.7,    -91.2,     -3.58,     3.38,    67.4,
   -6.,     13.2,    -23.4,     59.9,     67.4,      5.12
 };
@@ -86,14 +86,14 @@ const TrackPoint TrackTest::kPoint
 
 TEST_F(TrackTest, DefaultConstructor) {
   Track empty_track;
-  
+
   ASSERT_EQ((size_t) 0, empty_track.size());
   ASSERT_EQ(Particle::kNone, empty_track.particle_id());
 }
 
 TEST_F(TrackTest, IdentifiedConstructor) {
   Track track(Particle::kMuMinus);
-  
+
   ASSERT_EQ((size_t) 0, track.size());
   ASSERT_EQ(Particle::kMuMinus, track.particle_id());
 }
@@ -106,7 +106,7 @@ TEST_F(TrackTest, ContentConstructor) {
   std::vector<TrackPoint> track_points(track_point_array, track_point_array+2);
 
   Track track(track_points, Particle::kMuMinus);
-  
+
   ASSERT_EQ((size_t) 2, track.size());
   for (int index = 0; index < 2; ++index) {
     ASSERT_EQ(track_point_array[index], track[index]);

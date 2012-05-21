@@ -20,8 +20,8 @@
 
 // Other headers
 #include "Config/MiceModule.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiCluster.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiDigit.hh"
+#include "src/common_cpp/Reconstruction/SciFi/SciFiCluster.hh"
+#include "src/common_cpp/Reconstruction/SciFi/SciFiDigit.hh"
 
 #include "gtest/gtest.h"
 

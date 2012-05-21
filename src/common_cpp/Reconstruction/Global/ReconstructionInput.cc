@@ -17,32 +17,36 @@
 /* Author: Peter Lane
  */
 
-#ifndef SRC_COMMON_CPP_OPTICS_OPTICS_MODEL_HH
-#define SRC_COMMON_CPP_OPTICS_OPTICS_MODEL_HH
+#include <iostream>
+#include <vector>
 
-#include "src/common_cpp/Optics/TransferMap.hh"
-
-namespace Json {
-  class Value;
-}
+#include "src/common_cpp/Reconstruction/Global/ReconstructionInput.hh"
 
 namespace MAUS {
+namespace reconstruction {
+namespace global {
 
-class OpticsModel {
- public:
-  virtual ~OpticsModel() { }
-
-  virtual void Build(const Json::Value & configuration) = 0;
-
-  /* @brief Dynamically allocate a new TransferMap between two z-axis.
-   *
-   * The user of this function takes ownership of the dynamically allocated
-   * memory and is responsible for deallocating it.
-   */
-  virtual TransferMap * GenerateTransferMap(
-      double start_plane, double end_plane, double mass) const = 0;
- protected:
-};
+ReconstructionInput::ReconstructionInput(
+    const bool beam_polarity_negative,
+    const std::vector<Detector> & detectors,
+    const std::vector<TrackPoint> & events)
+    : beam_polarity_negative_(beam_polarity_negative),
+      detectors_(detectors), events_(events) {
 }
 
-#endif
+bool ReconstructionInput::beam_polarity_negative() {
+  return beam_polarity_negative_;
+}
+
+const std::vector<Detector> & ReconstructionInput::detectors() {
+  return detectors_;
+}
+
+const std::vector<TrackPoint> & ReconstructionInput::events() {
+  return events_;
+}
+
+}  // namespace global
+}  // namespace reconstruction
+}  // namespace MAUS
+

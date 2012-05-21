@@ -17,7 +17,7 @@
 
 #include "gtest/gtest.h"
 
-#include "src/common_cpp/Recon/SciFi/SciFiDigit.hh"
+#include "src/common_cpp/Reconstruction/SciFi/SciFiDigit.hh"
 
 // MAUS namespace {
 class SciFiDigitTest : public ::testing::Test {

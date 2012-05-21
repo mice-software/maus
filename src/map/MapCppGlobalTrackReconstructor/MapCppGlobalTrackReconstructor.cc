@@ -17,7 +17,7 @@
  /* Author: Peter Lane
  */
 
-#include "src/map/MapCppTrackReconstructor/MapCppTrackReconstructor.hh"
+#include "src/map/MapCppGlobalTrackReconstructor/MapCppGlobalTrackReconstructor.hh"
 
 // C++
 #include <vector>
@@ -33,7 +33,7 @@
 
 // MAUS
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
-//#include "src/common_cpp/Optics/LeastSquaresOpticsModel.hh"
+// #include "src/common_cpp/Optics/LeastSquaresOpticsModel.hh"
 #include "src/common_cpp/Optics/LinearApproximationOpticsModel.hh"
 #include "src/common_cpp/Reconstruction/Global/Detector.hh"
 #include "src/common_cpp/Reconstruction/Global/MinuitTrackFitter.hh"
@@ -48,13 +48,19 @@
 
 namespace MAUS {
 
+using MAUS::reconstruction::global::Detector;
+using MAUS::reconstruction::global::MinuitTrackFitter;
+using MAUS::reconstruction::global::Particle;
 using MAUS::reconstruction::global::ReconstructionInput;
+using MAUS::reconstruction::global::Track;
+using MAUS::reconstruction::global::TrackFitter;
+using MAUS::reconstruction::global::TrackPoint;
 
-MapCppTrackReconstructor::MapCppTrackReconstructor()
+MapCppGlobalTrackReconstructor::MapCppGlobalTrackReconstructor()
     : optics_model_(NULL), track_fitter_(NULL), reconstruction_input_(NULL) {
 }
 
-MapCppTrackReconstructor::~MapCppTrackReconstructor() {
+MapCppGlobalTrackReconstructor::~MapCppGlobalTrackReconstructor() {
   if (reconstruction_input_ != NULL) {
     delete reconstruction_input_;
   }
@@ -68,7 +74,7 @@ MapCppTrackReconstructor::~MapCppTrackReconstructor() {
   }
 }
 
-bool MapCppTrackReconstructor::birth(std::string configuration) {
+bool MapCppGlobalTrackReconstructor::birth(std::string configuration) {
   // parse the JSON document.
   try {
     configuration_ = JsonWrapper::StringToJson(configuration);
@@ -76,16 +82,16 @@ bool MapCppTrackReconstructor::birth(std::string configuration) {
     SetupTrackFitter();
   } catch(Squeal& squee) {
     MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(
-      squee, MapCppTrackReconstructor::kClassname);
+      squee, MapCppGlobalTrackReconstructor::kClassname);
   } catch(std::exception& exc) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(
-      exc, MapCppTrackReconstructor::kClassname);
+      exc, MapCppGlobalTrackReconstructor::kClassname);
   }
 
   return true;  // Sucessful parsing
 }
 
-std::string MapCppTrackReconstructor::process(std::string run_data) {
+std::string MapCppGlobalTrackReconstructor::process(std::string run_data) {
   // parse the JSON document.
   try {
     run_data_ = Json::Value(JsonWrapper::StringToJson(run_data));
@@ -117,7 +123,7 @@ std::string MapCppTrackReconstructor::process(std::string run_data) {
     message += data_acquisition_mode.asString();
     throw(Squeal(Squeal::recoverable,
                  message,
-                 "MapCppTrackReconstructor::process()"));
+                 "MapCppGlobalTrackReconstructor::process()"));
   }
 
   if (reconstruction_input_ == NULL) {
@@ -127,29 +133,31 @@ return output;
 /*
     throw(Squeal(Squeal::recoverable,
                  "Null reconstruction input.",
-                 "MapCppTrackReconstructor::process()"));
+                 "MapCppGlobalTrackReconstructor::process()"));
 */
   }
 
   // TODO(plane1@hawk.iit.edu) Implement Kalman Filter and TOF track fitters
   //  in addition to Minuit, and select between them based on the configuration
- 
+
   // associate tracks with individual particles
-  std::vector<Track> tracks;
+  std::vector<MAUS::reconstruction::global::Track> tracks;
   CorrelateTrackPoints(tracks);
-  
+
   int particle_id;
   if (reconstruction_input_->beam_polarity_negative()) {
-    particle_id = Particle::kMuMinus;
+    particle_id = MAUS::reconstruction::global::Particle::kMuMinus;
   } else {
-    particle_id = Particle::kMuPlus;
+    particle_id = MAUS::reconstruction::global::Particle::kMuPlus;
   }
 
   Json::Value global_tracks;
 
   // Find the best fit track for each particle traversing the lattice
-  Track best_fit_track;
-  for (std::vector<Track>::const_iterator measured_tracks = tracks.begin();
+  MAUS::reconstruction::global::Track best_fit_track;
+
+  for (std::vector<MAUS::reconstruction::global::Track>::const_iterator
+          measured_tracks = tracks.begin();
        measured_tracks < tracks.end();
        ++measured_tracks) {
     best_fit_track.set_particle_id(particle_id);
@@ -175,7 +183,7 @@ std::cout << "Best Fit Track: " << best_fit_track << std::endl;
   return output;
 }
 
-void MapCppTrackReconstructor::SetupOpticsModel() {
+void MapCppGlobalTrackReconstructor::SetupOpticsModel() {
   Json::Value optics_model_names = JsonWrapper::GetProperty(
       configuration_,
       "reconstruction_optics_models",
@@ -190,7 +198,7 @@ void MapCppTrackReconstructor::SetupOpticsModel() {
       break;  // leave the current index into optics_model_names in model
     }
   }
-  
+
   switch (model) {
     case 0: {
       // "Differentiating"
@@ -199,7 +207,7 @@ void MapCppTrackReconstructor::SetupOpticsModel() {
       */
       throw(Squeal(Squeal::nonRecoverable,
                    "DifferentiatingOpticsModel is not yet implemented.",
-                   "MapCppTrackReconstructor::process()"));
+                   "MapCppGlobalTrackReconstructor::process()"));
       break;
     }
     case 1: {
@@ -209,7 +217,7 @@ void MapCppTrackReconstructor::SetupOpticsModel() {
       */
       throw(Squeal(Squeal::nonRecoverable,
                    "IntegratingOpticsModel is not yet implemented.",
-                   "MapCppTrackReconstructor::SetupOpticsModel()()"));
+                   "MapCppGlobalTrackReconstructor::SetupOpticsModel()()"));
       break;
     }
     case 2: {
@@ -255,7 +263,7 @@ void MapCppTrackReconstructor::SetupOpticsModel() {
       */
       throw(Squeal(Squeal::nonRecoverable,
                    "RungeKuttaOpticsModel is not yet implemented.",
-                   "MapCppTrackReconstructor::SetupOpticsModel()()"));
+                   "MapCppGlobalTrackReconstructor::SetupOpticsModel()()"));
       break;
     }
     case 4: {
@@ -269,13 +277,13 @@ void MapCppTrackReconstructor::SetupOpticsModel() {
       message += std::string("\" in reconstruction configuration.");
       throw(Squeal(Squeal::nonRecoverable,
                    message.c_str(),
-                   "MapCppTrackReconstructor::SetupOpticsModel()()"));
+                   "MapCppGlobalTrackReconstructor::SetupOpticsModel()()"));
     }
   }
   optics_model_->Build(configuration_);
 }
 
-void MapCppTrackReconstructor::SetupTrackFitter() {
+void MapCppGlobalTrackReconstructor::SetupTrackFitter() {
   Json::Value fitter_names = JsonWrapper::GetProperty(
       configuration_,
       "reconstruction_track_fitters",
@@ -290,7 +298,7 @@ void MapCppTrackReconstructor::SetupTrackFitter() {
       break;  // leave the current index into fitter_names in fitter
     }
   }
-  
+
   switch (fitter) {
     case 0: {
       // Minuit
@@ -305,7 +313,7 @@ void MapCppTrackReconstructor::SetupTrackFitter() {
       */
       throw(Squeal(Squeal::nonRecoverable,
                    "KalmanFilterTrackFitter is not yet implemented.",
-                   "MapCppTrackReconstructor::SetupTrackFitter()"));
+                   "MapCppGlobalTrackReconstructor::SetupTrackFitter()"));
       break;
     }
     case 2: {
@@ -315,7 +323,7 @@ void MapCppTrackReconstructor::SetupTrackFitter() {
       */
       throw(Squeal(Squeal::nonRecoverable,
                    "TOFTrackFitter is not yet implemented.",
-                   "MapCppTrackReconstructor::SetupTrackFitter()"));
+                   "MapCppGlobalTrackReconstructor::SetupTrackFitter()"));
       break;
     }
     default: {
@@ -324,12 +332,12 @@ void MapCppTrackReconstructor::SetupTrackFitter() {
       message += std::string("\" in reconstruction configuration.");
       throw(Squeal(Squeal::nonRecoverable,
                    message.c_str(),
-                   "MapCppTrackReconstructor::SetupTrackFitter()"));
+                   "MapCppGlobalTrackReconstructor::SetupTrackFitter()"));
     }
   }
 }
 
-void MapCppTrackReconstructor::LoadRandomData() {
+void MapCppGlobalTrackReconstructor::LoadRandomData() {
   // TODO(plane1@hawk.iit.edu) reconstruction_input_ = new ReconstructionInput(...);
   // Create random track points for TOF0, TOF1, Tracker 1, Tracker 2, and TOF 2
   srand((unsigned)time(NULL));
@@ -344,10 +352,11 @@ void MapCppTrackReconstructor::LoadRandomData() {
 
   // generate mock detector info and random muon detector event data
   for (size_t id = Detector::kTOF0; id <= Detector::kCalorimeter; ++id) {
-    //plane = ((double)rand()/(double)RAND_MAX) * 20;  // 0.0 - 20.0 meters
+    // plane = ((double)rand()/(double)RAND_MAX) * 20;  // 0.0 - 20.0 meters
     plane = id * 1.4;  // 0.0 - 20.0 meters
     for (int index = 0; index < 36; ++index) {
-      uncertainty_data[index] = ((double)rand()/(double)RAND_MAX) * 100;
+      uncertainty_data[index] = static_cast<double>(rand()) / RAND_MAX
+                              * 100.0;
     }
     CovarianceMatrix uncertainties(uncertainty_data);
     Detector detector(id, plane, uncertainties);
@@ -361,11 +370,13 @@ void MapCppTrackReconstructor::LoadRandomData() {
     }
 
     for (int coordinate = 0; coordinate < 4; ++coordinate) {
-      position[coordinate] = ((double)rand()/(double)RAND_MAX) * 20;  // meters
+      position[coordinate] = static_cast<double>(rand()) / RAND_MAX
+                           * 20.0;  // meters
     }
 
     for (int coordinate = 0; coordinate < 4; ++coordinate) {
-      momentum[coordinate] = ((double)rand()/(double)RAND_MAX) * 500;  // MeV
+      momentum[coordinate] = static_cast<double>(rand()) / RAND_MAX
+                           * 500.0;  // MeV
     }
 
     TrackPoint track_point(position[0], momentum[0],
@@ -382,7 +393,7 @@ void MapCppTrackReconstructor::LoadRandomData() {
                                                   events);
 }
 
-void MapCppTrackReconstructor::LoadTestingData() {
+void MapCppGlobalTrackReconstructor::LoadTestingData() {
   // TODO(plane1@hawk.iit.edu) reconstruction_input_ = new ReconstructionInput(...);
   // Create random track points for TOF0, TOF1, Tracker 1, Tracker 2, and TOF 2
   srand((unsigned)time(NULL));
@@ -397,10 +408,11 @@ void MapCppTrackReconstructor::LoadTestingData() {
 
   // generate mock detector info and random muon detector event data
   for (size_t id = Detector::kTOF0; id <= Detector::kCalorimeter; ++id) {
-    //plane = ((double)rand()/(double)RAND_MAX) * 20;  // 0.0 - 20.0 meters
+    // plane = ((double)rand()/(double)RAND_MAX) * 20;  // 0.0 - 20.0 meters
     plane = id * 1.4;  // 0.0 - 20.0 meters
     for (int index = 0; index < 36; ++index) {
-      uncertainty_data[index] = ((double)rand()/(double)RAND_MAX) * 100;
+      uncertainty_data[index] = static_cast<double>(rand()) / RAND_MAX
+                              * 100.0;
     }
     CovarianceMatrix uncertainties(uncertainty_data);
     Detector detector(id, plane, uncertainties);
@@ -414,11 +426,13 @@ void MapCppTrackReconstructor::LoadTestingData() {
     }
 
     for (int coordinate = 0; coordinate < 4; ++coordinate) {
-      position[coordinate] = ((double)rand()/(double)RAND_MAX) * 20;  // meters
+      position[coordinate] = static_cast<double>(rand()) / RAND_MAX
+                           * 20.0;  // meters
     }
 
     for (int coordinate = 0; coordinate < 4; ++coordinate) {
-      momentum[coordinate] = ((double)rand()/(double)RAND_MAX) * 500;  // MeV
+      momentum[coordinate] = static_cast<double>(rand()) / RAND_MAX
+                           * 500.0;  // MeV
     }
 
     TrackPoint track_point(position[0], momentum[0],
@@ -435,7 +449,7 @@ void MapCppTrackReconstructor::LoadTestingData() {
                                                   events);
 }
 
-void MapCppTrackReconstructor::LoadSimulationData() {
+void MapCppGlobalTrackReconstructor::LoadSimulationData() {
   // TODO(plane1@hawk.iit.edu) use "digitized" data (simulated DAQ output)
   // instead of Monte Carlo truth data
 
@@ -450,19 +464,19 @@ void MapCppTrackReconstructor::LoadSimulationData() {
     // reconstruction_input_ = new ReconstructionInput(...);
   } catch(Squeal& squee) {
     run_data_ = MAUS::CppErrorHandler::getInstance()->HandleSqueal(
-        run_data_, squee, "MAUS::MapCppTrackReconstructor");
+        run_data_, squee, "MAUS::MapCppGlobalTrackReconstructor");
   } catch(std::exception& exc) {
     run_data_ = MAUS::CppErrorHandler::getInstance()->HandleStdExc(
-        run_data_, exc, "MAUS::MapCppTrackReconstructor");
+        run_data_, exc, "MAUS::MapCppGlobalTrackReconstructor");
   }
 }
 
-void MapCppTrackReconstructor::LoadLiveData() {
+void MapCppGlobalTrackReconstructor::LoadLiveData() {
   // reconstruction_input_ = new ReconstructionInput(...);
 }
 
 
-void MapCppTrackReconstructor::CorrelateTrackPoints(
+void MapCppGlobalTrackReconstructor::CorrelateTrackPoints(
     std::vector<Track> & tracks) {
   const std::vector<TrackPoint> & track_points
       = reconstruction_input_->events();
@@ -473,11 +487,11 @@ void MapCppTrackReconstructor::CorrelateTrackPoints(
   tracks.push_back(Track(track_points, Particle::kNone));
 }
 
-bool MapCppTrackReconstructor::death() {
+bool MapCppGlobalTrackReconstructor::death() {
   return true;  // successful
 }
 
-Json::Value MapCppTrackReconstructor::TrackToJson(const Track & track) {
+Json::Value MapCppGlobalTrackReconstructor::TrackToJson(const Track & track) {
   Json::Value track_node;
 
   // track points
@@ -486,14 +500,14 @@ Json::Value MapCppTrackReconstructor::TrackToJson(const Track & track) {
     track_points.append(TrackPointToJson(track[index]));
   }
   track_node["track_points"] = track_points;
-  
+
   // particle ID
   track_node["PID"] = Json::Value(track.particle_id());
 
   return track_node;
 }
 
-Json::Value MapCppTrackReconstructor::TrackPointToJson(
+Json::Value MapCppGlobalTrackReconstructor::TrackPointToJson(
     const TrackPoint & track_point) {
   Json::Value track_point_node;
 
@@ -509,10 +523,10 @@ Json::Value MapCppTrackReconstructor::TrackPointToJson(
   coordinates["Pz"] = track_point.Pz();
   coordinates["Pz"] = track_point.Pz();
   track_point_node["coordinates"] = coordinates;
-  
+
   // detector ID
   track_point_node["detector_id"] = Json::Value(track_point.detector_id());
-  
+
   // uncertainty matrix
   Json::Value uncertainties;
   size_t size = track_point.uncertainties().size();
@@ -528,8 +542,8 @@ Json::Value MapCppTrackReconstructor::TrackPointToJson(
   return track_point_node;
 }
 
-const std::string MapCppTrackReconstructor::kClassname
-  = "MapCppTrackReconstructor";
+const std::string MapCppGlobalTrackReconstructor::kClassname
+  = "MapCppGlobalTrackReconstructor";
 
 }  // namespace MAUS
 

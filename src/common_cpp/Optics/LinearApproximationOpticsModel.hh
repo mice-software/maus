@@ -32,7 +32,7 @@ class LinearApproximationOpticsModel : public OpticsModel {
   //  Constructors
   // *************************
 
-  LinearApproximationOpticsModel() { };
+  LinearApproximationOpticsModel() { }
 
   ~LinearApproximationOpticsModel() { }
   void Build(const Json::Value & configuration);

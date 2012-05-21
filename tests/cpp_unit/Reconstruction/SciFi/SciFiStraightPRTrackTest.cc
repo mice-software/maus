@@ -20,9 +20,9 @@
 
 // Other headers
 #include "Config/MiceModule.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiStraightPRTrack.hh"
-#include "src/common_cpp/Recon/SciFi/PatternRecognition.hh"
+#include "src/common_cpp/Reconstruction/SciFi/SciFiSpacePoint.hh"
+#include "src/common_cpp/Reconstruction/SciFi/SciFiStraightPRTrack.hh"
+#include "src/common_cpp/Reconstruction/SciFi/PatternRecognition.hh"
 
 #include "gtest/gtest.h"
 

@@ -40,15 +40,15 @@
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 
-#include "src/common_cpp/Recon/SciFi/SciFiSpill.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiEvent.hh"
-#include "src/common_cpp/Recon/SciFi/RealDataDigitization.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiClusterRec.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiSpacePointRec.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiDigit.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiCluster.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
-#include "src/common_cpp/Recon/SciFi/PatternRecognition.hh"
+#include "src/common_cpp/Reconstruction/SciFi/SciFiSpill.hh"
+#include "src/common_cpp/Reconstruction/SciFi/SciFiEvent.hh"
+#include "src/common_cpp/Reconstruction/SciFi/RealDataDigitization.hh"
+#include "src/common_cpp/Reconstruction/SciFi/SciFiClusterRec.hh"
+#include "src/common_cpp/Reconstruction/SciFi/SciFiSpacePointRec.hh"
+#include "src/common_cpp/Reconstruction/SciFi/SciFiDigit.hh"
+#include "src/common_cpp/Reconstruction/SciFi/SciFiCluster.hh"
+#include "src/common_cpp/Reconstruction/SciFi/SciFiSpacePoint.hh"
+#include "src/common_cpp/Reconstruction/SciFi/PatternRecognition.hh"
 
 class MapCppTrackerRecon {
  public:

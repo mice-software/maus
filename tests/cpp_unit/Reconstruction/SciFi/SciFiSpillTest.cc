@@ -17,8 +17,8 @@
 
 #include "gtest/gtest.h"
 
-#include "src/common_cpp/Recon/SciFi/SciFiSpill.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiEvent.hh"
+#include "src/common_cpp/Reconstruction/SciFi/SciFiSpill.hh"
+#include "src/common_cpp/Reconstruction/SciFi/SciFiEvent.hh"
 
 namespace {
 class SciFiSpillTest : public ::testing::Test {

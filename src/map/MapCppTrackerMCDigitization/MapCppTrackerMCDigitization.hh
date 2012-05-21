@@ -38,8 +38,8 @@
 
 #include "Config/MiceModule.hh"
 #include "Interface/Squeak.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiHit.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiSpill.hh"
+#include "src/common_cpp/Reconstruction/SciFi/SciFiHit.hh"
+#include "src/common_cpp/Reconstruction/SciFi/SciFiSpill.hh"
 
 
 class MapCppTrackerMCDigitization {
