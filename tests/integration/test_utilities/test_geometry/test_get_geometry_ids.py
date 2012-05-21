@@ -21,7 +21,6 @@ import os
 import subprocess
 import urllib2
 from geometry.ConfigReader import Configreader
-import cdb
 
 MAUS_ROOT_DIR = os.getenv("MAUS_ROOT_DIR")
 TMP_PATH = os.path.join(MAUS_ROOT_DIR, "tmp")
@@ -63,7 +62,7 @@ class TestGetGeometryIDS(unittest.TestCase): #pylint:disable= R0904
                                             configuration.geometry_download_wsdl
         try:
             urllib2.urlopen(server_name)
-        except:
+        except Exception: # pylint: disable=W0703
             unittest.TestCase.skipTest(self, "No Internet Connection")
 
     def test_get_geometry_ids_file(self): 
