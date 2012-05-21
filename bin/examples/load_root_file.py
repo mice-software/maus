@@ -92,6 +92,11 @@ def main():
     # note it is a feature of ROOT that if you close the file it will delete
     # existing histograms...
     print "Closing root file"
+
+    # A feature of ROOT is that closing the root file has weird effects like
+    # deleting the histograms drawn above from memory - beware. Probably also
+    # silently deallocates memory assigned to data. Probably does some other
+    # sinister stuff.
     root_file.Close()
 
 if __name__ == "__main__":

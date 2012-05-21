@@ -114,11 +114,11 @@ void V1724::SetChannelKey(std::string channel_key) {
     _channel_key = channel_key;
 }
 
-int V1724::GetTriggerTimeTag() const {
+double V1724::GetTriggerTimeTag() const {
     return _trigger_time_tag;
 }
 
-void V1724::SetTriggerTimeTag(int trigger_time_tag) {
+void V1724::SetTriggerTimeTag(double trigger_time_tag) {
     _trigger_time_tag = trigger_time_tag;
 }
 
