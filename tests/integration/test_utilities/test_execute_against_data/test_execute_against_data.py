@@ -27,7 +27,7 @@ import subprocess
 import tarfile
 import time
 import ROOT
-import libMausCpp
+import libMausCpp # pylint: disable=W0611
 
 RUN_NUMBER = "03541"
 TEST_URL = "http://www.hep.ph.ic.ac.uk/micedata/MICE/Step1/03500/"
@@ -92,16 +92,6 @@ def clean_dir():
             print 'removing file', item
             os.remove(item)
 
-def read_root_file(filename):
-    """
-    Return a tuple of (nentries, root_file, root_tree, maus_data)
-    """
-    root_file = ROOT.TFile(filename, "READ") # pylint: disable = E1101
-    data = ROOT.MAUS.Data() # pylint: disable = E1101
-    tree = root_file.Get("Spill")
-    tree.SetBranchAddress("data", data)
-    return (tree.GetEntries(), root_file, tree, data)
-
 class TestMain(unittest.TestCase): # pylint: disable = R0904
     """
     Test the main method of the batch script
@@ -110,7 +100,8 @@ class TestMain(unittest.TestCase): # pylint: disable = R0904
         """
         Make some simple data integrity checks on the simulation file
         """
-        root_file = ROOT.TFile(RUN_NUMBER+'_sim.root', "READ") # pylint: disable = E1101
+        root_file = ROOT.TFile(RUN_NUMBER+'_sim.root', # pylint: disable = E1101
+                                               "READ")
         data = ROOT.MAUS.Data() # pylint: disable = E1101
         tree = root_file.Get("Spill")
         tree.SetBranchAddress("data", data)
@@ -123,7 +114,8 @@ class TestMain(unittest.TestCase): # pylint: disable = R0904
         """
         Make some simple data integrity checks on the simulation file
         """
-        root_file = ROOT.TFile(RUN_NUMBER+'_recon.root', "READ") # pylint: disable = E1101
+        root_file = ROOT.TFile(RUN_NUMBER+'_recon.root', # pylint: disable=E1101
+                                               "READ")
         data = ROOT.MAUS.Data() # pylint: disable = E1101
         tree = root_file.Get("Spill")
         tree.SetBranchAddress("data", data)
@@ -167,17 +159,6 @@ class TestMain(unittest.TestCase): # pylint: disable = R0904
             self.assertTrue(os.path.isfile(file_name), file_name)
         self.__check_sim_file()
         self.__check_recon_file()
-        return
-        # start of run twice (?), start of burst 
-        for i in range(10):
-            print i, data.GetSpill(),
-            try:
-                print data.GetSpill().GetDaqEventType(),
-            except:
-                print
-        tree.GetEntry(3)
-        self.assertGreater(data.GetSpill().GetReconEventSize(), 0) #.GetTofEvent().GetTofEventDigit().GetTof1DigitArraySize()
-#        self.assertGreater(data.GetSpill().GetAReconEvent(0).GetTofEvent().GetTofEventDigit().GetTof1DigitArraySize(), 0)
         os.chdir(here)
 
 if __name__ == "__main__":
