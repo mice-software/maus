@@ -63,7 +63,7 @@ class TestGetGeometryIDS(unittest.TestCase): #pylint:disable= R0904
         try:
             urllib2.urlopen(self.server_name)
         except urllib2.URLError:
-            self.internet_connection == False
+            self.internet_connection = False
             unittest.TestCase.skipTest(self, "No Internet Connection")
         if self.internet_connection == True:
             run_get_geometries()
