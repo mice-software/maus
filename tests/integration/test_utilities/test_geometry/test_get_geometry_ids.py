@@ -16,6 +16,7 @@ test_get_geometry_ids.py
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+import sys
 import unittest
 import os
 import subprocess
@@ -56,7 +57,12 @@ class TestGetGeometryIDS(unittest.TestCase): #pylint:disable= R0904
     particles will have specified colours in the vrml.
     """
     def setUp(self): # pylint: disable=C0103, C0202
-        """ Run Simulation """
+        """
+        Run Simulation - temporarily store command line arguments somewhere
+        else
+        """
+        self.temp_argv = sys.argv
+        sys.argv = sys.argv[0:1]
         configuration = Configreader()
         server_name = configuration.cdb_download_url + \
                                             configuration.geometry_download_wsdl
@@ -64,6 +70,10 @@ class TestGetGeometryIDS(unittest.TestCase): #pylint:disable= R0904
             urllib2.urlopen(server_name)
         except Exception: # pylint: disable=W0703
             unittest.TestCase.skipTest(self, "No Internet Connection")
+
+    def tearDown(self):
+        """Replace the system arguments"""
+        sys.argv = self.temp_argv
 
     def test_get_geometry_ids_file(self): 
         """ Check that get_geometry_ids creates a file with the correct geoms"""
@@ -73,7 +83,7 @@ class TestGetGeometryIDS(unittest.TestCase): #pylint:disable= R0904
             raise Exception('geometry ids not saved to file')
         fin = open(geometry_id_file, 'r')
         geometry_lines_found = 0
-        for lines in fin.readlines():            
+        for lines in fin.readlines():
             if lines.find('Geometry Number = 1') >= 0:
                 geometry_lines_found += 1
             if lines.find('ValidFrom       = 2012-04-25 14:17:45.447614') \
@@ -85,7 +95,7 @@ class TestGetGeometryIDS(unittest.TestCase): #pylint:disable= R0904
         self.assertEqual(geometry_lines_found, 3, \
                            'First geometry not found check ' + geometry_id_file)
 
-    def test_get_geometry_ids_nofile(self):        
+    def test_get_geometry_ids_nofile(self):
         """ Check that get_geometry_ids outputs the geometries """
         run_get_geometries()        
         geometry_id_file = os.path.join(TMP_PATH, "get_geometry_ids_output")
