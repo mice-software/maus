@@ -28,12 +28,13 @@ def main():
     """
     configuration = Configreader()
     if configuration.get_ids_start_time == "":
-        raise IOError('Start time not entered!')
+        raise IOError('Start time not entered!' + \
+                                         ' Have you used a configuration file?')
     if configuration.get_ids_stop_time == "":
         stop_time = None
     else:
         stop_time = configuration.get_ids_stop_time
-    server = cdb.GeometrySuperMouse()
+    server = cdb.Geometry()
     server_name = configuration.cdb_download_url + \
                                             configuration.geometry_download_wsdl
     server.set_url(server_name)
