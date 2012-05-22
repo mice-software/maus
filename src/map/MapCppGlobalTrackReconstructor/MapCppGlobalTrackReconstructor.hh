@@ -37,6 +37,7 @@
 namespace MAUS {
 
 class OpticsModel;
+class CovarianceMatrix;
 
 namespace reconstruction {
 namespace global {
@@ -104,6 +105,9 @@ class MapCppGlobalTrackReconstructor {
   void LoadTestingData();
   void LoadSimulationData();
   void LoadLiveData();
+  
+  static CovarianceMatrix const & matrix GetJsonCovarianceMatrix(
+      Json::Value const & const value);
 
   void CorrelateTrackPoints(
       std::vector<MAUS::reconstruction::global::Track> & tracks);
