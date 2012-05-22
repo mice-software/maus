@@ -71,7 +71,7 @@ class TestGetGeometryIDS(unittest.TestCase): #pylint:disable= R0904
         except Exception: # pylint: disable=W0703
             unittest.TestCase.skipTest(self, "No Internet Connection")
 
-    def tearDown(self):
+    def tearDown(self): # pylint: disable=C0103
         """Replace the system arguments"""
         sys.argv = self.temp_argv
 
