@@ -59,7 +59,7 @@ beam = {
 
 # Additional global track reconstruction settings
 data_acquisition_modes = ['Random', 'Testing', 'Simulation', 'Live']
-data_acquisition_mode = 'Random'
+data_acquisition_mode = 'Testing'
 testing_data = {
   "beam_polarity_negative":False,
   "detectors":[
