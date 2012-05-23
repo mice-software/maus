@@ -38,8 +38,9 @@ namespace MAUS {
   template <typename T>
   bool OutputBase<T>::save (T* t) {
     if(!t){ throw NullInputException(_classname); }
+    bool ret = false;
     try {
-      return _save(t);
+      ret = _save(t);
     }
     catch (Squeal& s) {
       CppErrorHandler::getInstance()->HandleSquealNoJson(s, _classname);
@@ -50,6 +51,7 @@ namespace MAUS {
     catch (...){
       throw UnhandledException(_classname);
     }
+    return ret;
   }
   
 }//end of namespace

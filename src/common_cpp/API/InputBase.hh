@@ -37,8 +37,9 @@ namespace MAUS {
   
   template <typename T>
   T* InputBase<T>::emitter() {
+    T* o = 0;
     try {
-      return _emitter();
+      o = _emitter();
     }
     catch (Squeal& s) {
       CppErrorHandler::getInstance()->HandleSquealNoJson(s, _classname);
@@ -49,6 +50,7 @@ namespace MAUS {
     catch (...){
       throw UnhandledException(_classname);
     }
+    return o;
   }
   
 }//end of namespace

@@ -44,11 +44,12 @@ namespace MAUS {
     catch (ConverterNotFoundException& e) {
       if(c){ delete c; }
       CppErrorHandler::getInstance()->HandleStdExcNoJson(e, "ConverterFactory");
+      return 0;
     }
     
     // Convert input using converter.
     // Still have to catch all as user may have custom converter inheriting from IConverter not ConverterBase
-    OUTPUT* o;
+    OUTPUT* o = 0;
     try{
       o = c->convert(i);
     }
@@ -56,7 +57,7 @@ namespace MAUS {
       CppErrorHandler::getInstance()->HandleSquealNoJson(s, "ConverterFactory");
     }
     catch (std::exception& e) {
-      if(c){ delete c; }
+//       if(c){ delete c; }
       CppErrorHandler::getInstance()->HandleStdExcNoJson(e, "ConverterFactory");
     }
     catch (...){

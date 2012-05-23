@@ -3,11 +3,14 @@
 
 #include <exception>
 
-class ConverterNotFoundException: public std::exception {
-public:
-  virtual const char* what() const throw() {
-    return "The required converter was not found";
-  }
-};
+namespace MAUS {
 
+  class ConverterNotFoundException: public std::exception {
+  public:
+    virtual const char* what() const throw() {
+      return "The required converter was not found";
+    }
+  };
+
+}//end of namespace
 #endif

@@ -38,8 +38,9 @@ namespace MAUS {
   template <typename T>
   T* ReduceBase<T>::process(T* t) {
     if(!t){ throw NullInputException(_classname); }
+    T* o = 0;
     try {
-      return _process(t);
+      o = _process(t);
     }
     catch (Squeal& s) {
       CppErrorHandler::getInstance()->HandleSquealNoJson(s, _classname);
@@ -50,6 +51,7 @@ namespace MAUS {
     catch (...){
       throw UnhandledException(_classname);
     }
+    return o;
   }
   
 }//end of namespace
