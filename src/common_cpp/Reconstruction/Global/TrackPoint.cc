@@ -107,16 +107,12 @@ const bool TrackPoint::operator==(const TrackPoint& rhs) const {
     fprintf(stdout, "CovarianceMatrices are not equal!\n");
     return false;
   }
-/*
-  if (operator!=((PhaseSpaceVector) rhs) ||
-      (rhs.z_ != z_) || (rhs.z_momentum_ != z_momentum_) ||
-      (rhs.detector_id_ != detector_id_) ||
-      (rhs.uncertainties_ != uncertainties_)) {
-    return false;
-  }
-*/
 
   return true;
+}
+
+const bool TrackPoint::operator<(const TrackPoint& rhs) const {
+  return t() < rhs.t();
 }
 
 double TrackPoint::z() const {

@@ -95,6 +95,10 @@ class TrackPoint : public MAUS::PhaseSpaceVector {
 
   const bool operator==(const TrackPoint& rhs) const;
 
+  /* @brief Determines if the track point occurs earlier in time than another.
+   */
+  const bool operator<(const TrackPoint& rhs) const;
+
   // *************************
   //       Accessors
   // *************************

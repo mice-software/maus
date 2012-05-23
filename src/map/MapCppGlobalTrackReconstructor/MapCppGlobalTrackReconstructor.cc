@@ -20,6 +20,7 @@
 #include "src/map/MapCppGlobalTrackReconstructor/MapCppGlobalTrackReconstructor.hh"
 
 // C++
+#include <algorithm>
 #include <vector>
 #include <string>
 
@@ -566,6 +567,9 @@ void MapCppGlobalTrackReconstructor::LoadTestingData() {
     run_data_ = MAUS::CppErrorHandler::getInstance()->HandleStdExc(
         run_data_, exc, "MAUS::MapCppGlobalTrackReconstructor");
   }
+
+  // TODO(plan1@hawk.iit.edu) do an insertion sort instead of sorting afterwards
+  std::sort(events.begin(), events.end());  // sort in chronological order
 
   reconstruction_input_ = new ReconstructionInput(beam_polarity_negative,
                                                   detectors,
