@@ -15,12 +15,13 @@
  *
  */
 #include <iostream>
+#include <fstream>
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "Interface/Squeak.hh"
 #include "Interface/Squeal.hh"
 #include "Interface/dataCards.hh"
-
+#include <cmath>
 #include "src/reduce/ReduceCppSingleStation/ReduceCppSingleStation.hh"
 
 bool ReduceCppSingleStation::birth(std::string argJsonConfigDocument) {
@@ -29,6 +30,19 @@ bool ReduceCppSingleStation::birth(std::string argJsonConfigDocument) {
   _filename = "se.root";
   _nSpills = 0;
 
+  //Efficiencies
+  for ( int j = 0; j < 3; ++j ) {
+    _plane_array[j] = j;
+  }
+  for ( int i = 0; i < 214; ++i ) {
+    _plane_0_map[i][0]=0.0;
+    _plane_0_map[i][1]=0.0;
+    _plane_1_map[i][0]=0.0;
+    _plane_1_map[i][1]=0.0;
+    _plane_2_map[i][0]=0.0;
+    _plane_2_map[i][1]=0.0;
+    _channel_array[i] = i;
+  }
   //
   // Canvases
   //
@@ -36,14 +50,17 @@ bool ReduceCppSingleStation::birth(std::string argJsonConfigDocument) {
   TCanvas *c2 = new TCanvas("c2", "Channel Hits", 200, 10, 700, 500);
   TCanvas *c3 = new TCanvas("c3", "SpacePoints", 200, 10, 700, 500);
   TCanvas *c4 = new TCanvas("c4", "Cluster NPE", 200, 10, 700, 500);
-  TCanvas *c5 = new TCanvas("c5", "ADCs", 200, 10, 700, 500);
+  TCanvas *c5 = new TCanvas("c5", "ADCs and TDCs", 200, 10, 700, 500);
   TCanvas *c6 = new TCanvas("c6", "Digits", 200, 10, 700, 500);
+  TCanvas *c7 = new TCanvas("c7", "Station Efficiency", 200, 10, 700, 500);
+
   c1->Divide(1, 1);
   c2->Divide(3, 1);
   c3->Divide(2, 2);
   c4->Divide(3, 1);
   c5->Divide(1, 1);
   c6->Divide(3, 2);
+  c7->Divide(4, 1);
   // c1->SetFillColor(21);
   // c1->GetFrame()->SetFillColor(42);
   // c1->GetFrame()->SetBorderSize(6);
@@ -74,7 +91,11 @@ bool ReduceCppSingleStation::birth(std::string argJsonConfigDocument) {
   duplets->SetMarkerColor(kRed);
   duplets_copy->SetMarkerStyle(20);
   duplets_copy->SetMarkerColor(kRed);
-  _graph = new TGraph();
+  _graph   = new TGraph();
+  _station = new TGraph();
+  _plane0  = new TGraph();
+  _plane1  = new TGraph();
+  _plane2  = new TGraph();
 
   // Clusters
   _hist_plane0 = new TH1F("_hist_plane0", "plane 0", 215, 0, 214);
@@ -128,26 +149,21 @@ bool ReduceCppSingleStation::birth(std::string argJsonConfigDocument) {
   _spacepointscopy.Branch("z", &_z, "z/D");
   _spacepointscopy.Branch("type", &_type, "type/I");
 
-  c5->Divide(1, 1);
-  c1->Divide(1, 1);
   c1->SetFillColor(21);
   c1->GetFrame()->SetFillColor(42);
   c1->GetFrame()->SetBorderSize(6);
   c1->GetFrame()->SetBorderMode(-1);
 
-  c2->Divide(3, 1);
   c2->SetFillColor(21);
   c2->GetFrame()->SetFillColor(42);
   c2->GetFrame()->SetBorderSize(6);
   c2->GetFrame()->SetBorderMode(-1);
 
-  c3->Divide(2, 2);
   gStyle->SetLabelSize(0.07, "xyz");
   gStyle->SetTitleSize(0.07, "xy");
   gStyle->SetTitleOffset(0.6, "x");
   gStyle->SetTitleOffset(0.4, "y");
 
-  c4->Divide(3, 1);
   triplets->SetMarkerStyle(20);
   triplets->SetMarkerColor(kBlue);
   triplets_copy->SetMarkerStyle(20);
@@ -194,7 +210,11 @@ std::string  ReduceCppSingleStation::process(std::string document) {
   TCanvas *c4 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c4"));
   TCanvas *c5 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c5"));
   TCanvas *c6 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c6"));
+  TCanvas *c7 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c7"));
 
+  std::ofstream file1;
+  std::ofstream file2;
+  std::ofstream file3;
   // TPad* c5_1 = (TPad*)(c5->GetPrimitive("c5_1"));
   Squeak::activateCout(1);
 
@@ -218,8 +238,8 @@ std::string  ReduceCppSingleStation::process(std::string document) {
     if ( is_physics_daq_event(root) )
       unpacked_data_histograms(root);
 
-    if ( root.isMember("digits") )
-      digits_histograms(root);
+    //if ( root.isMember("digits") )
+    //  digits_histograms(root);
 
     if ( root.isMember("doublet_clusters") )
       doublet_clusters_histograms(root);
@@ -228,11 +248,12 @@ std::string  ReduceCppSingleStation::process(std::string document) {
     _spacepoints.Reset();
     if ( root.isMember("space_points") )
       draw_spacepoints(root);
-
+/*
     if ( is_physics_daq_event(root) && root.isMember("space_points") ) {
       count_particle_events(root);
       compute_station_efficiencies(root);
     }
+*/
   } catch(Squeal squee) {
     Squeak::mout(Squeak::error) << squee.GetMessage() << std::endl;
     root = MAUS::CppErrorHandler::getInstance()->HandleSqueal(root, squee, _classname);
@@ -242,6 +263,33 @@ std::string  ReduceCppSingleStation::process(std::string document) {
   }
 
   _nSpills++;
+  if (!(_nSpills%5)) {
+    file1.open ("efficiency_plane0.txt");
+    file2.open ("efficiency_plane1.txt");
+    file3.open ("efficiency_plane2.txt");
+    for ( int i = 0; i < 214; ++i ) {
+      file1 << i << " " << _plane_0_map[i][0] << " " << _plane_0_map[i][1] << "\n";
+      file2 << i << " " << _plane_1_map[i][0] << " " << _plane_1_map[i][1] << "\n";
+      file3 << i << " " << _plane_2_map[i][0] << " " << _plane_2_map[i][1] << "\n";
+    }
+    file1.close();
+    file2.close();
+    file3.close();
+    // c7->cd(1);
+    // _station = new TGraph(3,_plane_array,_station_eff);
+    // _station->Draw("AC*");
+    // c7->cd(2);
+    // _plane0 = new TGraph(214,_channel_array,_plane0_eff);
+    // _plane0->Draw("AC*");
+    /*  c7->cd(3);
+    _plane0 = new TGraph(214,_channel_array,_plane1_eff);
+    _plane0->Draw("AC*");
+    c7->cd(4);
+    _plane0 = new TGraph(214,_channel_array,_plane2_eff);
+    _plane0->Draw("AC*");*/
+    // c7->Update();
+  }
+
   if (!(_nSpills%1)) {
     c1->cd(1);
     _graph->Draw("ac*");
@@ -284,10 +332,7 @@ std::string  ReduceCppSingleStation::process(std::string document) {
     c5->cd(1);
     // c5_1->SetLogy(1);
     // c5_1->SetGrid(1,1);
-    _unpacked.Draw("adc");
-    // _unpacked.Draw("adc", "bank==0 || bank==2 || bank==5
-    // || bank==7 || bank==9|| bank==10|| bank==11 ||bank==12
-    // || bank==13|| bank==14");
+    _unpacked.Draw("adc", "bank==0 || bank==2 || bank==5 || bank==7 || bank==9|| bank==10|| bank==11 ||bank==12 || bank==13|| bank==14");
     c5->Update();
 
     c6->cd(1);
@@ -321,6 +366,7 @@ void ReduceCppSingleStation::compute_station_efficiencies(Json::Value root) {
                                                    event_i,
                                                    JsonWrapper::arrayValue);
     int numb_spacepoints = i_PartEvent.size();
+    // std::cerr << "Numb spacepoints: " << numb_spacepoints << std::endl;
     for ( int sp_j = 0; sp_j < numb_spacepoints; sp_j++ ) {
       // looping over spacepoints in an event.
       bool plane_0_is_hit = false;
@@ -331,24 +377,67 @@ void ReduceCppSingleStation::compute_station_efficiencies(Json::Value root) {
       double chan_2 = -10.;
 
       int numb_clusters = i_PartEvent[sp_j]["channels"].size();
+      // std::cerr << "Numb clusters: " << numb_clusters << std::endl;
       for ( int clust_k = 0; clust_k < numb_clusters; ++clust_k ) {
-        if ( i_PartEvent[sp_j]["channels"][clust_k]["plane_number"] == 0 ) {
+        if ( i_PartEvent[sp_j]["channels"][clust_k]["plane_number"].asInt() == 0 ) {
           plane_0_is_hit = true;
           chan_0 = i_PartEvent[sp_j]["channels"][clust_k]["channel_number"].asDouble();
         }
-        if ( i_PartEvent[sp_j]["channels"][clust_k]["plane_number"] == 1 ) {
+        if ( i_PartEvent[sp_j]["channels"][clust_k]["plane_number"].asInt() == 1 ) {
           plane_1_is_hit = true;
           chan_1 = i_PartEvent[sp_j]["channels"][clust_k]["channel_number"].asDouble();
         }
-        if ( i_PartEvent[sp_j]["channels"][clust_k]["plane_number"] == 2 ) {
+        if ( i_PartEvent[sp_j]["channels"][clust_k]["plane_number"].asInt() == 2 ) {
           plane_2_is_hit = true;
           chan_2 = i_PartEvent[sp_j]["channels"][clust_k]["channel_number"].asDouble();
         }
+        // Plane 0 efficiencies.
         if ( plane_1_is_hit && plane_2_is_hit ) {
+          _plane_0_counter += 1;
+          if ( plane_0_is_hit ) {
+            _plane_0_hits += 1;
+            _plane_0_map[static_cast<int>(chan_0+0.5)][0] += 1;
+            _plane_0_map[static_cast<int>(chan_0+0.5)][1] += 1;
+          } else {
+            int chan = 318-chan_1-chan_2;
+            _plane_0_map[chan][1] += 1;
+          }
+        }
+        // Plane 1 efficiencies.
+        if ( plane_0_is_hit && plane_2_is_hit ) {
+          _plane_1_counter += 1;
+          if ( plane_1_is_hit ) {
+            _plane_1_hits += 1;
+            _plane_1_map[static_cast<int>(chan_1+0.5)][0] += 1;
+            _plane_1_map[static_cast<int>(chan_1+0.5)][1] += 1;
+          } else {
+            int chan = 318-chan_0-chan_2;
+            _plane_1_map[chan][1] += 1;
+          }
+        }
+        // Plane 2 efficiencies.
+        if ( plane_0_is_hit && plane_1_is_hit ) {
+          _plane_2_counter += 1;
+          if ( plane_2_is_hit ) {
+            _plane_2_hits += 1;
+            _plane_2_map[static_cast<int>(chan_2+0.5)][0] += 1;
+            _plane_2_map[static_cast<int>(chan_2+0.5)][1] += 1;
+          } else {
+            int chan = 318-chan_0-chan_1;
+            _plane_2_map[chan][1] += 1;
+          }
         }
       }
     }
   }
+  //for ( int i = 0; i < 214; ++i ) {
+    //_plane0_eff[i] = _plane_0_map[i][0]/_plane_0_map[i][1];
+    //_plane1_eff[i] = _plane_0_map[i][0]/_plane_0_map[i][1];
+    //_plane2_eff[i] = _plane_0_map[i][0]/_plane_0_map[i][1];
+  //}
+  //_station_eff[0] = static_cast<double>(_plane_0_hits)/_plane_0_counter;
+  //_station_eff[1] = static_cast<double>(_plane_1_hits)/_plane_1_counter;
+  //_station_eff[2] = static_cast<double>(_plane_2_hits)/_plane_2_counter;
 }
 
 void ReduceCppSingleStation::count_particle_events(Json::Value root) {
@@ -376,8 +465,36 @@ void ReduceCppSingleStation::count_particle_events(Json::Value root) {
     std::cerr << "SE SpacePoints size: " << root["space_points"]["single_station"].size()
               << std::endl;
   }
-
 /*
+  int exp_events_t0 = root["space_points"]["tof0"].size();
+  int raw_tof0_triggers = 0;
+  for ( int event_i = 0; event_i < exp_events_t0; event_i++ ) {
+    if ( !root["space_points"]["tof0"][event_i].isNull() ) {
+      raw_tof0_triggers += 1;
+    }
+  }
+
+  int exp_events_se = root["space_points"]["single_station"].size();
+  int raw_single_station_triggers = 0;
+  for ( int event_i = 0; event_i < exp_events_t0; event_i++ ) {
+    if ( !root["space_points"]["single_station"][event_i].isNull() ) {
+      raw_single_station_triggers+= 1;
+    }
+  }
+
+  int exp_events_t1 = root["space_points"]["tof1"].size();
+  int raw_tof1_triggers = 0;
+  for ( int event_i = 0; event_i < exp_events_t1; event_i++ ) {
+    if ( !root["space_points"]["tof1"][event_i].isNull() ) {
+      raw_tof1_triggers += 1;
+    }
+  }
+
+  std::cerr << "$$$$$$$$$$$$$$$$$ Triggers $$$$$$$$$$$$$$$$$" << std::endl;
+  std::cerr << raw_tof0_triggers << " " << raw_single_station_triggers << " " << raw_tof1_triggers << std::endl;
+
+
+
   TAxis *axis = _trig_efficiency->GetXaxis();
   std::cout << numb_spacepoints << " " << axis->GetXmax() << std::endl;
   if ( _spill_counter > axis->GetXmax() ) {
@@ -524,13 +641,13 @@ void ReduceCppSingleStation::unpacked_data_histograms(Json::Value root) {
   for (int event_i = 0; event_i < n_events; event_i++) {
     if ( daq_data["single_station"][event_i].isNull() ) continue;
     Json::Value i_PartEvent = daq_data["single_station"][event_i];
-    int number_channels_within = i_PartEvent["VLSB_bank"].size();
+    int number_channels_within = i_PartEvent["VLSB"].size();
     for ( int i = 0; i < number_channels_within; i++ ) {
-      _tdc  = i_PartEvent["VLSB_bank"][i]["tdc"].asInt();
-      _adc  = i_PartEvent["VLSB_bank"][i]["adc"].asInt();
-      _bank = i_PartEvent["VLSB_bank"][i]["bank_id"].asInt();
-      _chan = i_PartEvent["VLSB_bank"][i]["channel"].asInt();
-      int dicrim = _chan = i_PartEvent["VLSB_bank"][i]["discriminator"].asInt();
+      _tdc  = i_PartEvent["VLSB"][i]["tdc"].asInt();
+      _adc  = i_PartEvent["VLSB"][i]["adc"].asInt();
+      _bank = i_PartEvent["VLSB"][i]["bank_id"].asInt();
+      _chan = i_PartEvent["VLSB"][i]["channel"].asInt();
+      int dicrim = _chan = i_PartEvent["VLSB"][i]["discriminator"].asInt();
       if ( dicrim != 0 ) {
         std::cerr << "*************** DISCRIMINATOR != 0 ***************" << std::endl;
       }

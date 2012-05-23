@@ -94,9 +94,13 @@ class MapCppSingleStationRecon {
    */
   void spacepoint_recon(SEEvent &evt);
 
+  void global_track_fit(Json::Value root, SEEvent &event, int k);
+
+  bool is_good_for_track(Json::Value root, SEEvent &event, int k);
+
   void save_to_json(SEEvent &evt);
 
-  void print_event_info(SEEvent &event);
+  void print_event_info(SEEvent &event, int k);
 
   Json::Value ConvertToJson(std::string jsonString);
 

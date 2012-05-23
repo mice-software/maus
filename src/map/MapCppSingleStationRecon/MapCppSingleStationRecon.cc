@@ -90,7 +90,12 @@ std::string MapCppSingleStationRecon::process(std::string document) {
         spacepoint_recon(event);
       }
 
-      print_event_info(event);
+      // Build Global Track.
+      if ( is_good_for_track(root, event, k) ) {
+        global_track_fit(root, event, k);
+      }
+
+      print_event_info(event, k);
       save_to_json(event);
       }
     } // ==========================================================
@@ -126,6 +131,28 @@ void MapCppSingleStationRecon::cluster_recon(SEEvent &evt) {
 void MapCppSingleStationRecon::spacepoint_recon(SEEvent &evt) {
   SESpacePointRec spacepoints;
   spacepoints.process(evt);
+}
+
+void MapCppSingleStationRecon::global_track_fit(Json::Value root, SEEvent &event, int k) {
+  // assert(root["space_points"]["tof0"][k][(Json::Value::ArrayIndex)0].isMember("slabX"));
+  // assert(root["space_points"]["tof1"][k][(Json::Value::ArrayIndex)0].isMember("slabX"));
+
+  Json::Value tof0_spacepoint = root["space_points"]["tof0"][k][(Json::Value::ArrayIndex)0];
+  Json::Value tof1_spacepoint = root["space_points"]["tof1"][k][(Json::Value::ArrayIndex)0];
+
+  int tof0_slabx = tof0_spacepoint["slabX"].asInt();
+  int tof0_slaby = tof0_spacepoint["slabY"].asInt();
+  double tof0_time  = tof0_spacepoint["time"].asDouble();
+
+  int tof1_slabx = tof1_spacepoint["slabX"].asInt();
+  int tof1_slaby = tof1_spacepoint["slabY"].asInt();
+  double tof1_time  = tof1_spacepoint["time"].asDouble();
+
+  // std::cout << tof0_slabx << " " << tof0_slaby << " " << tof0_time << std::endl;
+  // std::cout << tof1_slabx << " " << tof1_slaby << " " << tof1_time << std::endl;
+
+  // KalmanTrackFit fit;
+  // fit.process(evt);
 }
 
 void MapCppSingleStationRecon::save_to_json(SEEvent &evt) {
@@ -180,10 +207,50 @@ void MapCppSingleStationRecon::save_to_json(SEEvent &evt) {
   root["space_points"]["single_station"].append(se_sp);
 }
 
-void MapCppSingleStationRecon::print_event_info(SEEvent &event) {
+bool MapCppSingleStationRecon::is_good_for_track(Json::Value root, SEEvent &event, int k) {
+  int exp_events_t1 = root["space_points"]["tof1"][k].size();
+  int tof1_spacepoints = 0;
+  for ( int sp_i = 0; sp_i < exp_events_t1; sp_i++ ) {
+    if ( !root["space_points"]["tof1"][k][sp_i].isNull() ) {
+      tof1_spacepoints += 1;
+    }
+  }
+  int exp_events_t0 = root["space_points"]["tof0"].size();
+  int tof0_spacepoints = 0;
+  for ( int sp_i = 0; sp_i < exp_events_t0; sp_i++ ) {
+    if ( !root["space_points"]["tof0"][k][sp_i].isNull() ) {
+      tof0_spacepoints += 1;
+    }
+  }
+
+  if ( tof0_spacepoints == 1 && tof1_spacepoints == 1 && event.spacepoints().size() == 1 ) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+void MapCppSingleStationRecon::print_event_info(SEEvent &event, int k) {
+  int exp_events_t1 = root["space_points"]["tof1"][k].size();
+  int tof1_spacepoints = 0;
+  for ( int sp_i = 0; sp_i < exp_events_t1; sp_i++ ) {
+    if ( !root["space_points"]["tof1"][k][sp_i].isNull() ) {
+      tof1_spacepoints += 1;
+    }
+  }
+  int exp_events_t0 = root["space_points"]["tof0"].size();
+  int tof0_spacepoints = 0;
+  for ( int sp_i = 0; sp_i < exp_events_t0; sp_i++ ) {
+    if ( !root["space_points"]["tof0"][k][sp_i].isNull() ) {
+      tof0_spacepoints += 1;
+    }
+  }
+
   std::cout << event.digits().size() << " "
             << event.clusters().size() << " "
-            << event.spacepoints().size() << std::endl;
+            << event.spacepoints().size() << " "
+            << tof0_spacepoints << " " << tof1_spacepoints << std::endl;
+
 }
 
 // The following two functions are added for testing purposes only
