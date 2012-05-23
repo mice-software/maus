@@ -106,8 +106,8 @@ class MapCppGlobalTrackReconstructor {
   void LoadSimulationData();
   void LoadLiveData();
   
-  static CovarianceMatrix const & matrix GetJsonCovarianceMatrix(
-      Json::Value const & const value);
+  static CovarianceMatrix const GetJsonCovarianceMatrix(
+      Json::Value const & value);
 
   void CorrelateTrackPoints(
       std::vector<MAUS::reconstruction::global::Track> & tracks);
