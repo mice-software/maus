@@ -11,6 +11,8 @@ def emitter(self):
   next_event = "No Event"
   while (next_event != ""):
     next_event = self.getNextEvent()
+    if next_event == "":
+        return
     yield next_event
 %}
 

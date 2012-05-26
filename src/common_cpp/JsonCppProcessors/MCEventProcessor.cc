@@ -33,17 +33,17 @@ MCEventProcessor::MCEventProcessor()
                                                     &MCEvent::SetPrimary, true);
     RegisterPointerBranch
         ("sci_fi_hits", &_sci_fi_hit_proc, &MCEvent::GetSciFiHits,
-                                           &MCEvent::SetSciFiHits, true);
+                                           &MCEvent::SetSciFiHits, false);
     RegisterPointerBranch
         ("tof_hits", &_tof_hit_proc, &MCEvent::GetTOFHits,
-                                     &MCEvent::SetTOFHits, true);
+                                     &MCEvent::SetTOFHits, false);
     RegisterPointerBranch("special_virtual_hits", &_special_virtual_hit_proc,
                           &MCEvent::GetSpecialVirtualHits,
-                          &MCEvent::SetSpecialVirtualHits, true);
+                          &MCEvent::SetSpecialVirtualHits, false);
     RegisterPointerBranch
-       ("tracks", &_track_proc, &MCEvent::GetTracks, &MCEvent::SetTracks, true);
+       ("tracks", &_track_proc, &MCEvent::GetTracks, &MCEvent::SetTracks, false);
     RegisterPointerBranch("virtual_hits", &_virtual_hit_proc,
-                      &MCEvent::GetVirtualHits, &MCEvent::SetVirtualHits, true);
+                      &MCEvent::GetVirtualHits, &MCEvent::SetVirtualHits, false);
 }
 }
 

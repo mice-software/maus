@@ -258,3 +258,22 @@ Json::Value JsonWrapper::ArrayMerge(Json::Value array_1, Json::Value array_2) {
     return array_merge;
 }
 
+std::string JsonWrapper::ValueTypeToString(Json::ValueType tp) {
+  switch (tp) {
+    case Json::nullValue: return "nullValue";
+    case Json::intValue: return "intValue";
+    case Json::uintValue: return "uintValue";
+    case Json::realValue: return "realValue";
+    case Json::stringValue: return "stringValue";
+    case Json::booleanValue: return "booleanValue";
+    case Json::arrayValue: return "arrayValue";
+    case Json::objectValue: return "objectValue";
+    default:
+      throw(Squeal(Squeal::recoverable,
+                   "Json ValueType not recognised",
+                   "JsonWrapper::ValueTypeToJsonType"));
+  }
+  return "";
+}
+
+

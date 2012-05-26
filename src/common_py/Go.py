@@ -141,9 +141,8 @@ class Go: # pylint: disable=R0921, R0903
         # script is being executed. This warns the user to many common
         # errors. 
         if maus_root_dir not in os.getcwd():
-            print("\nWARNING: YOU ARE RUNNING MAUS OUTSIDE ITS MAUS_ROOT_DIR")
-            print("WARNING:\tMAUS_ROOT_DIR = %s" % (maus_root_dir))
-            print("WARNING:\tCURRENT DIRECTORY = %s\n" % (os.getcwd()))
+            print("MAUS_ROOT_DIR = %s" % (maus_root_dir))
+            print("Current working directory = %s\n" % (os.getcwd()))
     
     @staticmethod
     def get_possible_dataflows():

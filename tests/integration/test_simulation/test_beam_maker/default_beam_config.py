@@ -26,4 +26,6 @@ simulation_geometry_filename = os.path.join(
   mrd, "tests", "integration", "test_simulation", "test_beam_maker", 
   "BeamTest.dat"
 )
+output_root_file_name = os.path.join(mrd, "tmp", "test_beammaker_output.root")
+input_root_file_name = output_root_file_name # for conversion
 

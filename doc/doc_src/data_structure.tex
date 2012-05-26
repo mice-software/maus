@@ -1,14 +1,70 @@
 \section{Data Structure}
-The event in MAUS is the MICE spill. The major part of the MAUS data structure therefore is a tree corresponding to one spill. The spill is separated into two main sections: the MCEventArray contains an array of data each member of which represents the Monte Carlo of a single primary particle crossing the system; the ReconEventArray contains an array of data each member of which corresponds to a particle event (i.e. set of DAQ triggers).
+The event in MAUS is the MICE spill. The major part of the MAUS data structure therefore is a tree of which each entry corresponds to the data associated with one spill. The spill is separated into three main sections: the MCEventArray contains an array of data each member of which represents the Monte Carlo of a single primary particle crossing the system; the ReconEventArray contains an array of data each member of which corresponds to a particle event (i.e. set of DAQ triggers); and the DAQData corresponds to the raw data readout. Additionally there are branches for reconstructed scalars, which are handled spill by spill and EMR data, which also read out on the spill rather than event by event.
 
-\subsection{Spill Data}
+\begin{figure}[!p]
+\centering
+\includegraphics[totalheight=0.2\textwidth, angle=90]{data_structure.png}
+\caption{The MAUS output data structure}
+\end{figure}
 
-\subsection{MCEvent}
-The MCEvent is subdivided into sensitive detector hits and some pure Monte Carlo outputs. The primary that led to data being created is held in the Primary branch. Here the random seed, primary position momentum and so forth is stored. Sensitive detector hits have Hit data (energy deposited, position, momentum, etc) and a detector specific ChannelId that represents the channel of the detector that was hit - e.g. for TOF this indexes the slab, plane and station. Virtual hits are also stored - these are not sensitive detector hits, rather output position, momenta etc of particles that cross a particular plane in space, time or proper time is recorded. Note virtual hits do not inherit from the Hit class.
+The MCEvent is subdivided into sensitive detector hits and some pure Monte Carlo outputs. The primary that led to data being created is held in the Primary branch. Here the random seed, primary position momentum and so forth is stored. Sensitive detector hits have Hit data (energy deposited, position, momentum, etc) and a detector specific ChannelId that represents the channel of the detector that was hit - e.g. for TOF this indexes the slab, plane and station. Virtual hits are also stored - these are not sensitive detector hits, rather output position, momenta etc of particles that cross a particular plane in space, time or proper time is recorded. Note virtual hits do not inherit from the Hit class and have a slightly different data structure.
 
-\subsection{ReconEvent}
+The ReconEvent and DAQEvents are subdivided by detector. ReconEvents contain reconstructed particle data for each detector and the trigger. There is an additional branch that contains global reconstruction output, that is the track fitting between detectors.
+
+The data can be written in two formats. The main data format is a ROOT binary format. This requires the ROOT package to read and write, which is a standard analysis/plotting package in High Energy Physics and is installed by the MAUS build script. The secondary data format is JSON. This is an ascii data-tree format that in principle can be read by any text editor. Specific JSON parsers are also available - for example, the python \emph{json} module is available and comes prepackaged with MAUS.
+
+\subsection{Loading ROOT Files in Python Using PyROOT}
+The standard scripting tool in MAUS is python. The ROOT data structure can be loaded in python using the PyROOT package. An example of how to perform a simple analysis with PyROOT is available in \verb|bin/examples/load_root_file.py|.
+
+\subsection{Loading ROOT Files on the ROOT Command Line}
+One can load ROOT files from the command line using the ROOT interactive display. It is first necessary to load the MAUS class dictionary. Then The TBrowser ROOT GUI can be used to browse to the desired location and interrogate the data structure interactively. For example,
+
+\begin{verbatim}
+$ source env.sh
+$ root
+
+  *******************************************
+  *                                         *
+  *        W E L C O M E  to  R O O T       *
+  *                                         *
+  *   Version   5.30/03   20 October 2011   *
+  *                                         *
+  *  You are welcome to visit our Web site  *
+  *          http://root.cern.ch            *
+  *                                         *
+  *******************************************
+
+ROOT 5.30/03 (tags/v5-30-03@41540, Oct 24 2011, 11:51:36 on linuxx8664gcc)
+
+CINT/ROOT C/C++ Interpreter version 5.18.00, July 2, 2010
+Type ? for help. Commands must be C++ statements.
+Enclose multiple statements between { }.
+root [0] .L $MAUS_ROOT_DIR/build/libMausCpp.so
+root [1] TBrowser b
+\end{verbatim}
+
+\subsection{Conversion to, and Working With, JSON}
+MAUS also provides output in the JSON data format. This is an ascii format with IO libraries available for C++, Python and other languages. Two utilities are provided to perform conversions, \verb|bin/utilities/json_to_root.py| and \verb|bin/utilities/root_to_json.py| for conversion from and to JSON format respectively. JSON Input and Output modules are provided, \verb|InputPyJson| and \verb|OutputPyJson|.
+
+Accessing JSON is possible using the \verb|json| python module that comes built-in to python 2.7. Each DAQ Event (real data) or Spill (Monte Carlo) in MAUS is written to a separate line, comprising a single json document, which can be loaded as a series of python dictionaries and arrays using \verb|json.loads(a_line)| or written as a string using \verb|json.dumps(a_line)|
 
 \subsection{Extending the Data Structure}
+The data structure can be extended in MAUS by adding extra classes to the existing data structure. The data classes are in \verb|src/common_cpp/DataStructure|. In order to make these classes accessible to ROOT, the following steps must be taken:
+\begin{itemize}
+\item Add a new class
+\item Ensure that default constructor, copy constructor, equality operator and destructor is present
+\item Make a typedef for each type of STL object you wish to use. ROOT does not handle STL objects terribly well otherwise (and even then there are limitations).
+\item Add a call to the ClassDef() macro at the end of the class definition before the closing braces.
+\item Add the class to the list of classes in \verb|src/common_cpp/DataStructure/LinkDef.hh|
+\end{itemize}
+In order to make these classes accessible to JSON, it is necessary to add a new processor in \verb|src/common_cpp/JsonCppProcessors|. There are a few default processors available.
+\begin{itemize}
+\item \verb|src/common_cpp/JsonCppProcessors/ProcessorBase.hh| contains IProcessor pure interface class for all processors and ProcessorBase base class (which may contain some implementation)
+\item \verb|src/common_cpp/JsonCppProcessors/PrimitivesProcessors.hh| contains processors for primitive types; BoolProcessor, IntProcessor, UIntProcessor, StringProcessor, DoubleProcessor
+\item \verb|src/common_cpp/JsonCppProcessors/ArrayProcessors.hh| contains processors for array types. Two processors are available: PointerArrayProcessor which converts an STL vector of pointers to data; and ValueArrayProcessor which converts an STL vector of values to data.
+\item \verb|src/common_cpp/JsonCppProcessors/ObjectProcessor.hh| contains a processor for object types. Most of the classes in the MAUS data structure are represented in JSON as objects (string value pairs) where each string names a branch and each value contains data, which may be another class.
+\item \verb|src/common_cpp/JsonCppProcessors/ObjectMapProcessors.hh| contains a processor for converting from JSON objects to STL maps. This is useful for JSON objects that contain lots of branches all of the same type.
+\end{itemize}
 
-
+A script, \verb|bin/user/json_branch_to_data_structure_and_cpp_processor.py| is available that analyses a JSON object or JSON tree of nested objects and converts to C++ classes. The script is provided "as-is" and it is expected that developers will check the output, adding comments and tests where appropriate.
 
