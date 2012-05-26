@@ -33,6 +33,9 @@ SESpacePoint::SESpacePoint(SECluster *clust1, SECluster *clust2, SECluster *clus
   _channels.push_back(clust2);
   _channels.push_back(clust3);
 
+  _spill = clust1->get_spill();
+  _event = clust1->get_event();
+
   _npe = clust1->get_npe()+clust2->get_npe()+clust3->get_npe();
 
   _chi2 = 0;
@@ -45,6 +48,8 @@ SESpacePoint::SESpacePoint(SECluster *clust1, SECluster *clust2, SECluster *clus
 SESpacePoint::SESpacePoint(SECluster *clust1, SECluster *clust2) {
   _used = false;
   _type = "duplet";
+  _spill = clust1->get_spill();
+  _event = clust1->get_event();
   clust1->set_used();
   clust2->set_used();
   _channels.push_back(clust1);

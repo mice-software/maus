@@ -15,17 +15,23 @@
  *
  */
 
-#include "src/common_cpp/Recon/SingleStation/SEDigit.hh"
 
-// namespace MAUS {
+#ifndef HELICALTRACK_HH
+#define HELICALTRACK_HH
 
-SEDigit::SEDigit():_used(false) {}
+// C headers
+#include <assert.h>
 
-SEDigit::SEDigit(int spill, int event, int plane, int channel, double npe, double time, int adc)
-                 :_spill(spill), _event(event),
-                  _plane(plane), _channel(channel), _npe(npe),
-                  _time(time), _adc(adc), _used(false) {
-}
+// C++ headers
+#include <string>
+#include <vector>
 
-SEDigit::~SEDigit() {}
-// } // ends namespace MAUS
+class HelicalTrack {
+ public:
+  HelicalTrack();
+
+  ~HelicalTrack();
+// private:
+};
+
+#endif

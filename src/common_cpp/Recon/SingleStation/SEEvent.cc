@@ -16,15 +16,16 @@
  */
 #include "src/common_cpp/Recon/SingleStation/SEEvent.hh"
 
-// namespace MAUS {
-
 SEEvent::SEEvent() {
   _SEdigits.resize(0);
   _SEclusters.resize(0);
   _SEspacepoints.resize(0);
+  _TOF0spacepoints.resize(0);
+  _TOF1spacepoints.resize(0);
 }
 
 SEEvent::~SEEvent() {
+  std::cerr << "SEEVENT DESTRUCTOR CALLED" << std::endl;
   std::vector<SEDigit*>::iterator digit;
   for (digit = _SEdigits.begin(); digit!= _SEdigits.end(); ++digit) {
     delete (*digit);
@@ -35,4 +36,25 @@ SEEvent::~SEEvent() {
     delete (*spacepoint);
   }
 }
-// }// ~namespace MAUS
+
+SEEvent::SEEvent(const SEEvent &event) {
+  _phys_event_no = event.get_phys_event_no();
+  _part_event_no = event.get_part_event_no();
+
+  _SEdigits        = event.digits();
+  _SEclusters      = event.clusters();
+  _SEspacepoints   = event.spacepoints();
+  _TOF0spacepoints = event.TOF0spacepoints();
+  _TOF1spacepoints = event.TOF1spacepoints();
+}
+
+SEEvent& SEEvent::operator=(const SEEvent &event) {
+  _phys_event_no = event.get_phys_event_no();
+  _part_event_no = event.get_part_event_no();
+
+  _SEdigits        = event.digits();
+  _SEclusters      = event.clusters();
+  _SEspacepoints   = event.spacepoints();
+  _TOF0spacepoints = event.TOF0spacepoints();
+  _TOF1spacepoints = event.TOF1spacepoints();
+}

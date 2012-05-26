@@ -25,12 +25,12 @@ SEClusterRec::SEClusterRec(int cluster_exception, double min_npe)
 
 SEClusterRec::~SEClusterRec() {}
 
-void SEClusterRec::process(SEEvent &evt, std::vector<const MiceModule*> modules) {
+void SEClusterRec::process(SEEvent *evt, std::vector<const MiceModule*> modules) {
   // Create and fill the seeds vector.
   std::vector<SEDigit*>   seeds;
-  for ( unsigned int dig = 0; dig < evt.digits().size(); dig++ ) {
-    if ( evt.digits()[dig]->get_npe() > _min_npe/2.0 )
-      seeds.push_back(evt.digits()[dig]);
+  for ( unsigned int dig = 0; dig < evt->digits().size(); dig++ ) {
+    if ( evt->digits()[dig]->get_npe() > _min_npe/2.0 )
+      seeds.push_back(evt->digits()[dig]);
   }
 
   // Get the number of clusters. If too large, abort reconstruction.
@@ -51,8 +51,7 @@ void SEClusterRec::process(SEEvent &evt, std::vector<const MiceModule*> modules)
       double pe   = seed->get_npe();
       // Look for a neighbour.
       for ( int j = i+1; j < seeds_size; j++ ) {
-        if ( !seeds[j]->is_used() && seeds[j]->get_plane() == plane &&
-             abs(seeds[j]->get_channel() - fibre) < 2.0 ) {
+        if ( are_neighbours(seeds[i], seeds[j]) ) {
           neigh = seeds[j];
         }
       }
@@ -65,10 +64,9 @@ void SEClusterRec::process(SEEvent &evt, std::vector<const MiceModule*> modules)
         SECluster* clust = new SECluster(seed);
         if ( neigh ) {
           clust->add_digit(neigh);
-          // std::cerr << "Clustering" << std::endl;
         }
         construct(clust, modules);
-        evt.add_cluster(clust);
+        evt->add_cluster(clust);
       }
     }
   } // ends loop over seeds
@@ -103,6 +101,20 @@ void SEClusterRec::construct(SECluster *clust, std::vector<const MiceModule*> mo
   // The position in the (x, y) plane.
   clust->set_position(position);
   clust->set_direction(dir);
+}
+
+bool SEClusterRec::are_neighbours(SEDigit *seed_i, SEDigit *seed_j) {
+  bool neigh = false;
+
+  if ( !seed_j->is_used() && // seed is unused
+       seed_j->get_spill() == seed_i->get_spill() && // same spill
+       seed_j->get_event() == seed_i->get_event() && // same event
+       seed_j->get_plane() == seed_i->get_plane() && // seeds belong to same plane
+       abs(seed_j->get_channel() - seed_i->get_channel()) < 2.0 ) { // and are neighbours
+    neigh = true;
+  }
+
+  return neigh;
 }
 
 // } // ~namespace MAUS

@@ -14,18 +14,9 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+#include <math.h>
+#include "src/common_cpp/Recon/Kalman/QuadDrift.hh"
 
-#include "src/common_cpp/Recon/SingleStation/SEDigit.hh"
+QuadDrift::QuadDrift() {}
 
-// namespace MAUS {
-
-SEDigit::SEDigit():_used(false) {}
-
-SEDigit::SEDigit(int spill, int event, int plane, int channel, double npe, double time, int adc)
-                 :_spill(spill), _event(event),
-                  _plane(plane), _channel(channel), _npe(npe),
-                  _time(time), _adc(adc), _used(false) {
-}
-
-SEDigit::~SEDigit() {}
-// } // ends namespace MAUS
+QuadDrift::~QuadDrift() {}

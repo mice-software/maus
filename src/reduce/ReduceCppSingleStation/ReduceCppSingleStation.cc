@@ -215,6 +215,7 @@ std::string  ReduceCppSingleStation::process(std::string document) {
   std::ofstream file1;
   std::ofstream file2;
   std::ofstream file3;
+  std::ofstream file4;
   // TPad* c5_1 = (TPad*)(c5->GetPrimitive("c5_1"));
   Squeak::activateCout(1);
 
@@ -248,12 +249,12 @@ std::string  ReduceCppSingleStation::process(std::string document) {
     _spacepoints.Reset();
     if ( root.isMember("space_points") )
       draw_spacepoints(root);
-/*
-    if ( is_physics_daq_event(root) && root.isMember("space_points") ) {
-      count_particle_events(root);
-      compute_station_efficiencies(root);
-    }
-*/
+
+   // if ( is_physics_daq_event(root) && root.isMember("space_points") ) {
+      // count_particle_events(root);
+      //compute_station_efficiencies(root);
+    //}
+
   } catch(Squeal squee) {
     Squeak::mout(Squeak::error) << squee.GetMessage() << std::endl;
     root = MAUS::CppErrorHandler::getInstance()->HandleSqueal(root, squee, _classname);
@@ -263,6 +264,7 @@ std::string  ReduceCppSingleStation::process(std::string document) {
   }
 
   _nSpills++;
+/*
   if (!(_nSpills%5)) {
     file1.open ("efficiency_plane0.txt");
     file2.open ("efficiency_plane1.txt");
@@ -275,6 +277,12 @@ std::string  ReduceCppSingleStation::process(std::string document) {
     file1.close();
     file2.close();
     file3.close();
+    file4.open ("efficiency_station.txt");
+    file4 << 0 << " " << _plane_0_hits << " " << _plane_0_counter << "\n";
+    file4 << 1 << " " << _plane_1_hits << " " << _plane_1_counter << "\n";
+    file4 << 2 << " " << _plane_2_hits << " " << _plane_2_counter << "\n";
+    file4.close();
+  }*/
     // c7->cd(1);
     // _station = new TGraph(3,_plane_array,_station_eff);
     // _station->Draw("AC*");
@@ -288,7 +296,7 @@ std::string  ReduceCppSingleStation::process(std::string document) {
     _plane0 = new TGraph(214,_channel_array,_plane2_eff);
     _plane0->Draw("AC*");*/
     // c7->Update();
-  }
+
 
   if (!(_nSpills%1)) {
     c1->cd(1);
@@ -391,41 +399,42 @@ void ReduceCppSingleStation::compute_station_efficiencies(Json::Value root) {
           plane_2_is_hit = true;
           chan_2 = i_PartEvent[sp_j]["channels"][clust_k]["channel_number"].asDouble();
         }
-        // Plane 0 efficiencies.
-        if ( plane_1_is_hit && plane_2_is_hit ) {
-          _plane_0_counter += 1;
-          if ( plane_0_is_hit ) {
-            _plane_0_hits += 1;
-            _plane_0_map[static_cast<int>(chan_0+0.5)][0] += 1;
-            _plane_0_map[static_cast<int>(chan_0+0.5)][1] += 1;
-          } else {
-            int chan = 318-chan_1-chan_2;
-            _plane_0_map[chan][1] += 1;
-          }
+      }
+      std::cerr << chan_0 << " " << chan_1 << " " << chan_2 << std::endl;
+      // Plane 0 efficiencies.
+      if ( plane_1_is_hit && plane_2_is_hit ) {
+        _plane_0_counter += 1;
+        if ( plane_0_is_hit ) {
+          _plane_0_hits += 1;
+          _plane_0_map[static_cast<int>(chan_0+0.5)][0] += 1;
+          _plane_0_map[static_cast<int>(chan_0+0.5)][1] += 1;
+        } else {
+          int chan = 318-chan_1-chan_2;
+          _plane_0_map[chan][1] += 1;
         }
-        // Plane 1 efficiencies.
-        if ( plane_0_is_hit && plane_2_is_hit ) {
-          _plane_1_counter += 1;
-          if ( plane_1_is_hit ) {
-            _plane_1_hits += 1;
-            _plane_1_map[static_cast<int>(chan_1+0.5)][0] += 1;
-            _plane_1_map[static_cast<int>(chan_1+0.5)][1] += 1;
-          } else {
-            int chan = 318-chan_0-chan_2;
-            _plane_1_map[chan][1] += 1;
-          }
+      }
+      // Plane 1 efficiencies.
+      if ( plane_0_is_hit && plane_2_is_hit ) {
+        _plane_1_counter += 1;
+        if ( plane_1_is_hit ) {
+          _plane_1_hits += 1;
+          _plane_1_map[static_cast<int>(chan_1+0.5)][0] += 1;
+          _plane_1_map[static_cast<int>(chan_1+0.5)][1] += 1;
+        } else {
+          int chan = 318-chan_0-chan_2;
+          _plane_1_map[chan][1] += 1;
         }
-        // Plane 2 efficiencies.
-        if ( plane_0_is_hit && plane_1_is_hit ) {
-          _plane_2_counter += 1;
-          if ( plane_2_is_hit ) {
-            _plane_2_hits += 1;
-            _plane_2_map[static_cast<int>(chan_2+0.5)][0] += 1;
-            _plane_2_map[static_cast<int>(chan_2+0.5)][1] += 1;
-          } else {
-            int chan = 318-chan_0-chan_1;
-            _plane_2_map[chan][1] += 1;
-          }
+      }
+      // Plane 2 efficiencies.
+      if ( plane_0_is_hit && plane_1_is_hit ) {
+        _plane_2_counter += 1;
+        if ( plane_2_is_hit ) {
+          _plane_2_hits += 1;
+          _plane_2_map[static_cast<int>(chan_2+0.5)][0] += 1;
+          _plane_2_map[static_cast<int>(chan_2+0.5)][1] += 1;
+        } else {
+          int chan = 318-chan_0-chan_1;
+          _plane_2_map[chan][1] += 1;
         }
       }
     }

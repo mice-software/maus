@@ -48,7 +48,9 @@
 #include "src/common_cpp/Recon/SingleStation/SEDigit.hh"
 #include "src/common_cpp/Recon/SingleStation/SECluster.hh"
 #include "src/common_cpp/Recon/SingleStation/SESpacePoint.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanGlobalFit.hh"
 
+#include "src/common_cpp/Recon/SingleStation/TOFSpacePoint.hh"
 
 class MapCppSingleStationRecon {
  public:
@@ -86,21 +88,23 @@ class MapCppSingleStationRecon {
    *
    *  \param evt the current SEEvent
    */
-  void cluster_recon(SEEvent &evt);
+  void cluster_recon(SEEvent *evt);
 
   /** performs the spacepoint reconstruction
    *
    *  \param evt the current SEEvent
    */
-  void spacepoint_recon(SEEvent &evt);
+  void spacepoint_recon(SEEvent *evt);
 
   void global_track_fit(Json::Value root, SEEvent &event, int k);
 
   bool is_good_for_track(Json::Value root, SEEvent &event, int k);
 
-  void save_to_json(SEEvent &evt);
+  //void combine(SESpill &spill, Json::Value root);
 
-  void print_event_info(SEEvent &event, int k);
+  void save_to_json(SEEvent *evt);
+
+  void print_event_info(SEEvent *event, int k);
 
   Json::Value ConvertToJson(std::string jsonString);
 

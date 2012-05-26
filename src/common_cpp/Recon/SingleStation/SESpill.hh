@@ -46,6 +46,7 @@ class SESpill {
  private:
   /// This is a vector containing the events of a spill.
   std::vector<SEEvent*>   _events_in_spill;
+
 };  // Don't forget this trailing colon!!!!
 // } // ~namespace MAUS
 

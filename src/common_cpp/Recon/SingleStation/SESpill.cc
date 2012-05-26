@@ -16,11 +16,9 @@
  */
 #include "src/common_cpp/Recon/SingleStation/SESpill.hh"
 
-// namespace MAUS {
 
 SESpill::SESpill() {
   _events_in_spill.resize(0);
 }
 
 SESpill::~SESpill() {}
-// }// ~namespace MAUS

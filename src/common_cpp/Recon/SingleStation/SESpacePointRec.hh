@@ -52,7 +52,7 @@ class SESpacePointRec {
 
   ~SESpacePointRec();
 
-  void process(SEEvent &evt);
+  void process(SEEvent *evt);
 
   void build_duplet(SESpacePoint* duplet);
 
