@@ -44,7 +44,7 @@ TEST_F(SciFiSpillTest, memory_test) {
     if (1) {
       SciFiEvent* event = new SciFiEvent();
       SciFiDigit* digit = new SciFiDigit();
-      event->scifidigits.push_back(digit);
+      event->add_digit(digit);
       spill.add_event(event);
       // digit is a non-NULL pointer,
       // scifigits has size 1

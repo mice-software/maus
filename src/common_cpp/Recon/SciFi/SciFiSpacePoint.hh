@@ -78,7 +78,11 @@ class SciFiSpacePoint {
 
   double get_chi2()    const { return _chi2; }
 
+  void set_used() { _used = true; }
+
   void set_used(bool used) { _used = used; }
+
+  bool is_used() const { return _used; }
 
   bool get_used() const { return _used; }
 

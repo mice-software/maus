@@ -308,7 +308,7 @@ int VLSBDataProcessor::Process(MDdataContainer* aFragPtr) {
     xVLSB_CHit["adc"] = xAdc = xVLSBFragment->GetAdc(xWordCount);
     if (!_zero_suppression ||
         (_zero_suppression && xAdc > _zs_threshold) ) {
-      xVLSB_CHit["part_event_number"] = xPartEv = xVLSBFragment->GetEventNum(xWordCount);
+      xVLSB_CHit["part_event_number"] = xPartEv = xVLSBFragment->GetEventNum(xWordCount)-1;
       xVLSB_CHit["channel"] = xVLSBFragment->GetChannel(xWordCount);
       xVLSB_CHit["tdc"] = xVLSBFragment->GetTdc(xWordCount);
       xVLSB_CHit["discriminator"] = xVLSBFragment->GetDiscriBit(xWordCount);
@@ -360,7 +360,7 @@ int VLSB_CDataProcessor::Process(MDdataContainer* aFragPtr) {
       xVLSB_CHit["adc"] = xAdc = xDataWord.GetAdc();
       if ( !_zero_suppression ||
           (_zero_suppression && xAdc > _zs_threshold) ) {
-        xVLSB_CHit["part_event_number"] = xPartEv = xDataWord.GetEventNum();
+        xVLSB_CHit["part_event_number"] = xPartEv = xDataWord.GetEventNum()-1;
         xVLSB_CHit["bank"] = iban;
         xVLSB_CHit["channel"] = xDataWord.GetChannel();
         xVLSB_CHit["tdc"] = xDataWord.GetTdc();

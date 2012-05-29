@@ -60,14 +60,10 @@ TEST_F(SciFiSpacePointTest, test_setters_getters) {
 }
 
 TEST_F(SciFiSpacePointTest, test_used_flag) {
-  SciFiCluster *spacepoint = new SciFiCluster();
-  spacepoint->set_used(false)
-  EXPECT_FALSE(spacepoint->get_used());
-  spacepoint->set_used(true)
-  EXPECT_TRUE(spacepoint->get_used());
-
-  Cluster->set_used();
-  EXPECT_TRUE(Cluster->is_used());
+  SciFiSpacePoint *spacepoint = new SciFiSpacePoint();
+  EXPECT_FALSE(spacepoint->is_used());
+  spacepoint->set_used();
+  EXPECT_TRUE(spacepoint->is_used());
 }
 
 TEST_F(SciFiSpacePointTest, test_triplet_constructor) {

@@ -185,14 +185,14 @@ void KalmanTrackFit::initialise(SciFiEvent &event, std::vector<KalmanSite> &site
   KalmanSite first_plane;
   first_plane.set_state_vector(x0, y0, mx, my, p);
   TMatrixD C(5, 5);
-  C(0,0) = 70;
-  C(1,1) = 70;
-  C(2,2) = 0.5;
-  C(3,3) = 0.5;
-  C(4,4) = 1000;
-  //for ( int i = 0; i < 5; ++i ) {
-  //  C(i, i) = 200; // dummy values
-  //}
+  C(0, 0) = 70;
+  C(1, 1) = 70;
+  C(2, 2) = 0.5;
+  C(3, 3) = 0.5;
+  C(4, 4) = 1000;
+  // for ( int i = 0; i < 5; ++i ) {
+  //   C(i, i) = 200; // dummy values
+  // }
   first_plane.set_covariance_matrix(C);
   first_plane.set_measurement(clusters[0]->get_alpha());
   first_plane.set_direction(clusters[0]->get_direction());

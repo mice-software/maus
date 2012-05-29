@@ -96,13 +96,7 @@ class MapCppSingleStationRecon {
    */
   void spacepoint_recon(SEEvent *evt);
 
-  void global_track_fit(Json::Value root, SEEvent &event, int k);
-
-  bool is_good_for_track(Json::Value root, SEEvent &event, int k);
-
-  //void combine(SESpill &spill, Json::Value root);
-
-  void save_to_json(SEEvent *evt);
+  void save_to_json(SEEvent *evt, int event_num);
 
   void print_event_info(SEEvent *event, int k);
 

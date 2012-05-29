@@ -52,25 +52,21 @@ class SEEvent {
 
   /// Digits
   void add_digit(SEDigit* digit) { _SEdigits.push_back(digit); }
-  //void set_digits(std::vector<SEDigit*> digits) { _SEdigits = digits; }
   std::vector<SEDigit*> digits() const { return _SEdigits; }
 
   /// Clusters
   void add_cluster(SECluster* cluster) { _SEclusters.push_back(cluster); }
-  //void set_clusters(std::vector<SECluster*> clusters) { _SEclusters=clusters; }
+  // void set_clusters(std::vector<SECluster*> clusters) { _SEclusters=clusters; }
   std::vector<SECluster*> clusters() const { return _SEclusters; }
 
   /// Spacepoints
   void add_spacepoint(SESpacePoint* spacepoint) { _SEspacepoints.push_back(spacepoint); }
-  //void set_spacepoints(std::vector<SESpacePoint*> spacepoints) { _SEspacepoints=spacepoints; }
   std::vector<SESpacePoint*> spacepoints() const { return _SEspacepoints; }
 
   void add_TOF0spacepoint(TOFSpacePoint* spacepoint) { _TOF0spacepoints.push_back(spacepoint); }
-  //void set_TOF0spacepoints(std::vector<TOFSpacePoint*> TOF0spacepoints) {_TOF0spacepoints=TOF0spacepoints;}
   std::vector<TOFSpacePoint*> TOF0spacepoints() const { return _TOF0spacepoints; }
 
   void add_TOF1spacepoint(TOFSpacePoint* spacepoint) { _TOF1spacepoints.push_back(spacepoint); }
-  //void set_TOF1spacepoints(std::vector<TOFSpacePoint*> TOF1spacepoints) {_TOF1spacepoints=TOF1spacepoints;}
   std::vector<TOFSpacePoint*> TOF1spacepoints() const { return _TOF1spacepoints; }
 
   ///
@@ -95,8 +91,8 @@ class SEEvent {
   std::vector<SESpacePoint*>     _SEspacepoints;
 
   std::vector<TOFSpacePoint*>     _TOF0spacepoints;
-  std::vector<TOFSpacePoint*>     _TOF1spacepoints;
 
+  std::vector<TOFSpacePoint*>     _TOF1spacepoints;
 };  // Don't forget this trailing colon!!!!
 
 #endif

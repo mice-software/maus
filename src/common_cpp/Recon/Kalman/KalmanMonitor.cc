@@ -18,19 +18,19 @@
 #include "src/common_cpp/Recon/Kalman/KalmanMonitor.hh"
 
 KalmanMonitor::KalmanMonitor() {
-  //histo = new TH1F("h","monitor; site; alpha",30, 0, 30);
+  // histo = new TH1F("h","monitor; site; alpha",30, 0, 30);
 }
 
 KalmanMonitor::~KalmanMonitor() {
-  TFile f("hist.root","update");
-  //file->Write();
+  TFile f("hist.root", "update");
+  // file->Write();
   TGraph *gr = new TGraph(30, &(_site[0]), &(_alpha_extrap[0]));
   gr->SetName("extrapolation");
   TGraph *gr2 = new TGraph(30, &(_site[0]), &(_alpha_meas[0]));
   gr2->SetName("measurement");
   TMultiGraph *mgr = new TMultiGraph();
-  mgr->Add(gr,"p");
-  mgr->Add(gr2,"p");
+  mgr->Add(gr, "p");
+  mgr->Add(gr2, "p");
   mgr->Write();
 }
 
@@ -47,17 +47,17 @@ void KalmanMonitor::save(std::vector<KalmanSite> &sites) {
     _alpha_meas.push_back(site.get_alpha());
     double pull = _alpha_meas[i] - _alpha_extrap[i];
 
-    TMatrixD a(5,1);
+    TMatrixD a(5, 1);
     a = site.get_state_vector();
-    TMatrixD C(5,5);
+    TMatrixD C(5, 5);
     C = site.get_covariance_matrix();
-    //double observed = pow(pow(a(0, 0), 2.)+pow(a(1, 0), 2.), 0.5);
-    //double expected = pow(pow(a_filt(0, 0), 2.)+pow(a_filt(1, 0), 2.), 0.5);
-    //double chi2 = pow(observed-expected, 2.)/expected;
+    // double observed = pow(pow(a(0, 0), 2.)+pow(a(1, 0), 2.), 0.5);
+    // double expected = pow(pow(a_filt(0, 0), 2.)+pow(a_filt(1, 0), 2.), 0.5);
+    // double chi2 = pow(observed-expected, 2.)/expected;
     std::ofstream out2("kalman.txt", std::ios::out | std::ios::app);
     int id = site.get_id();
-    out2 << a(0,0)    << " " << C(0,0) << " "
-         << a(1,0)    << " " << C(1,1) << " "
+    out2 << a(0, 0)    << " " << C(0, 0) << " "
+         << a(1, 0)    << " " << C(1, 1) << " "
          << pull << " " << id     << "\n";
     out2.close();
   }

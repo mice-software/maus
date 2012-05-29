@@ -41,6 +41,9 @@ void SEDigitization::process(SESpill &spill, Json::Value const &daq) {
   // -------------------------------------------------
   // Pick up JSON daq event.
   Json::Value _events = daq["single_station"];
+  std::cerr << daq["single_station"].size() << " " << daq["tof1"].size() << std::endl;
+  assert(daq["single_station"].size() == daq["tof1"].size());
+
   std::cout <<  _events.size() << std::endl;
   for ( unsigned int i = 1; i < _events.size(); ++i ) {
 
@@ -86,7 +89,7 @@ void SEDigitization::process(SESpill &spill, Json::Value const &daq) {
       }
       // Calculate the time
       double time;
-      if ( tdc_y > 0. && tdc_slope > 0 ) {
+      if ( tdc_y > 0. && tdc_slope > 0. ) {
         time = (tdc-tdc_y)/tdc_slope;
       } else {
         time = -10.0;
@@ -101,7 +104,6 @@ void SEDigitization::process(SESpill &spill, Json::Value const &daq) {
       int adc_ped = adc - pedestal;
       // Exclude missing modules.
       if ( plane != -1 ) { // pe > 1.0 &&
-        // std::cout << "Making digit: " <<spill << " " <<eventNo << " " << plane << " " << channel << " " << pe << std::endl;
         SEDigit *digit = new SEDigit(spill, eventNo, plane, channel, pe, time, adc_ped);
         event->add_digit(digit);
       }

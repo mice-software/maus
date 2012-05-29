@@ -69,7 +69,7 @@ class SEDigit {
 
   double get_npe()     const { return _npe; }
 
-  void set_adc(double adc) { _adc = adc; }
+  void set_adc(int adc) { _adc = adc; }
 
   double get_adc()     const { return _adc; }
 

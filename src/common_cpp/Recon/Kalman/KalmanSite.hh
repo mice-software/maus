@@ -94,7 +94,7 @@ class KalmanSite {
 
   double get_extrapolated_alpha() const { return _alpha_extrapolated; }
 
-  //void set_alpha(double alpha) { _alpha = alpha; }
+  // void set_alpha(double alpha) { _alpha = alpha; }
 
   double get_alpha() const { return _v(0, 0); }
 

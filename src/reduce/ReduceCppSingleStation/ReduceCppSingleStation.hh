@@ -140,7 +140,7 @@ class ReduceCppSingleStation {
 
   TTree _digits;
   int _plane_dig, _adc_dig;
-  double _npe_dig, _channel_dig;
+  double _npe_dig, _channel_dig, _time;
 
   TTree _doublet_clusters;
   int _plane;
@@ -157,17 +157,14 @@ class ReduceCppSingleStation {
 
   int _plane_0_counter;
   double _plane_0_map[214][2];
-  //double _plane0_eff[214];
   int _plane_0_hits;
 
   int _plane_1_counter;
   double _plane_1_map[214][2];
-  //double _plane1_eff[214];
   int _plane_1_hits;
 
   int _plane_2_counter;
   double _plane_2_map[214][2];
-  //double _plane2_eff[214];
   int _plane_2_hits;
 
   double _channel_array[214];
