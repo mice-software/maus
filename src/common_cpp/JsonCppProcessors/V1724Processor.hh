@@ -57,7 +57,7 @@ class V1724Processor : public ObjectProcessor<V1724> {
     IntProcessor _phys_event_number_proc;
     IntProcessor _charge_pm_proc;
     StringProcessor _channel_key_proc;
-    IntProcessor _trigger_time_tag_proc;
+    DoubleProcessor _trigger_time_tag_proc;
     IntProcessor _time_stamp_proc;
     IntProcessor _pedestal_proc;
     IntProcessor _part_event_number_proc;

@@ -23,9 +23,7 @@ import json
 import unittest
 import os
 import subprocess
-import sys  
 
-import Configuration
 from MapCppSimulation import MapCppSimulation
 
 class MapCppSimulationTestCase(unittest.TestCase):
@@ -78,7 +76,6 @@ class MapCppSimulationTestCase(unittest.TestCase):
         self.assertIn("errors", doc)
         self.assertIn("bad_json_document", doc["errors"])
 
-
     def test_no_mc_branch(self):
         """Check mapper runs for no mc string, returning an error"""
         result = self.mapper.process("{}")
@@ -120,11 +117,22 @@ class MapCppSimulationTestCase(unittest.TestCase):
             self.assertIn("final_position", event)
 
     def test_visualisation(self):
-        test = os.path.join(os.environ['MAUS_ROOT_DIR'], 'src', 'map',\
+        """ Call test_visualisation """
+        test = os.path.join(os.environ['MAUS_ROOT_DIR'], 'src', 'map', \
                            'MapCppSimulation', 'run_visualisation_for_tests.py')
         ps = subprocess.Popen(['python', test])
         ps.wait()
         self.assertEqual(ps.returncode, 0, msg='Failed to run visualisation')
+
+    def test_visualisation_no_event(self):
+        """ Call test_visualisation_no_event """
+        test = os.path.join(os.environ['MAUS_ROOT_DIR'], 'src', 'map', \
+                           'MapCppSimulation', \
+                                      'run_visualisation_vrml2file_no_event.py')
+        ps = subprocess.Popen(['python', test])
+        ps.wait()
+        self.assertEqual(ps.returncode, 0, msg='Failed to run visualisation')
+
 
     configuration = {
       "verbose_level":2,

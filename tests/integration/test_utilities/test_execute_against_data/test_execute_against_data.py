@@ -25,8 +25,9 @@ import glob
 import urllib
 import subprocess
 import tarfile
-import json
 import time
+import ROOT
+import libMausCpp # pylint: disable=W0611
 
 RUN_NUMBER = "03541"
 TEST_URL = "http://www.hep.ph.ic.ac.uk/micedata/MICE/Step1/03500/"
@@ -95,6 +96,38 @@ class TestMain(unittest.TestCase): # pylint: disable = R0904
     """
     Test the main method of the batch script
     """
+    def __check_sim_file(self):
+        """
+        Make some simple data integrity checks on the simulation file
+        """
+        root_file = ROOT.TFile(RUN_NUMBER+'_sim.root', # pylint: disable = E1101
+                                               "READ")
+        data = ROOT.MAUS.Data() # pylint: disable = E1101
+        tree = root_file.Get("Spill")
+        tree.SetBranchAddress("data", data)
+        self.assertGreater(tree.GetEntries(), 0)
+        tree.GetEntry(0)
+        self.assertGreater(data.GetSpill().GetMCEventSize(), 1)
+        root_file.Close()
+
+    def __check_recon_file(self):
+        """
+        Make some simple data integrity checks on the simulation file
+        """
+        root_file = ROOT.TFile(RUN_NUMBER+'_recon.root', # pylint: disable=E1101
+                                               "READ")
+        data = ROOT.MAUS.Data() # pylint: disable = E1101
+        tree = root_file.Get("Spill")
+        tree.SetBranchAddress("data", data)
+        self.assertGreater(tree.GetEntries(), 0)
+        tree.GetEntry(3)
+        self.assertEqual(data.GetSpill().GetDaqEventType(), "physics_event")
+        self.assertGreater(data.GetSpill().GetReconEventSize(), 0)
+        self.assertGreater(data.GetSpill().GetAReconEvent(0).GetTOFEvent().\
+                                  GetTOFEventDigit().GetTOF1DigitArraySize(), 0)
+        root_file.Close()
+
+
     # want to test also each of the return codes is okay
     def test_main_success(self):
         """
@@ -121,19 +154,11 @@ class TestMain(unittest.TestCase): # pylint: disable = R0904
         tar_out = tarfile.open(TEST_OUT, 'r:*')
         tar_out.extractall()
         for file_name in [TEST_OUT, TEST_FILE, 'batch.log', 'download.log', \
-                   'reco.log', 'sim.log', RUN_NUMBER+'_recon.json', \
-                   RUN_NUMBER+'_sim.json']:
+                   'reco.log', 'sim.log', RUN_NUMBER+'_recon.root', \
+                   RUN_NUMBER+'_sim.root']:
             self.assertTrue(os.path.isfile(file_name), file_name)
-        sim_first_line = open(RUN_NUMBER+'_sim.json').readline()
-        sim_first_spill = json.loads(sim_first_line)
-        self.assertGreater(len(sim_first_spill['mc']), 1)
-        rec_in = open(RUN_NUMBER+'_recon.json')
-        # start of run twice (?), start of burst 
-        for i in range(3): # pylint: disable = W0612
-            rec_in.readline()
-        rec_first_spill = json.loads(rec_in.readline())
-        self.assertTrue('mc' not in rec_first_spill.keys())
-        self.assertGreater(len(rec_first_spill['digits']['tof1']), 0)
+        self.__check_sim_file()
+        self.__check_recon_file()
         os.chdir(here)
 
 if __name__ == "__main__":
