@@ -4,20 +4,30 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v0.2.4
+  The following functionality was added:
+    - Visualisation options were added to select colour of different particle
+      species and to accumulate tracks into one file
+    - A new utility was added to find a list of valid geometries within a
+      specified time period.
+
 MAUS-v0.2.3
   The following functionality was added:
     - The default data format is now ROOT. For further information on handling
       this data format, please see the instructions in the MAUS user guide
       (doc/maus_user_guide.pdf) 
     - MAUS now builds on Ubuntu 11.10 (tested against Linux Mint 12)
-  If upgrading from the previous version, the following third party library scripts need to be rerun:
+  If upgrading from the previous version, the following third party library
+  scripts need to be rerun:
     - third_party/bash/21root.bash
     - third_party/bash/51xboa.bash
 
 MAUS-v0.2.2
   The following functionality was added:
-    - Production version of the distributed processing framework and online histogramming
-  If upgrading from the previous version, the following third party library scripts need to be rerun:
+    - Production version of the distributed processing framework and online
+      histogramming
+  If upgrading from the previous version, the following third party library
+  scripts need to be rerun:
     - third_party/bash/40python_extras.bash   
 
 MAUS-v0.2.1
@@ -29,13 +39,15 @@ MAUS-v0.2.0
     - Ckov reconstruction to digits
     - First TOF digitisation
     - Documentation was added for Monte Carlo Simulation 
-  If upgrading from the previous version, the following third party library scripts need to be rerun:
+  If upgrading from the previous version, the following third party library
+  scripts need to be rerun:
     - third_party/bash/44cdb.bash
 
 MAUS-v0.1.4
   The following functionality was added:
     - Tracker reconstruction to space points
-  If upgrading from the previous version, the following third party library scripts need to be rerun:
+  If upgrading from the previous version, the following third party library
+  scripts need to be rerun:
     - third_party/bash/01python.bash
     - third_party/bash/21root.bash
     - third_party/bash/40python_extras.bash
@@ -48,12 +60,14 @@ MAUS-v0.1.3
 
 MAUS-v0.1.2
   The following functionality was added:
-    - Input beams can now be read from maus, ICOOL and G4Beamline formatted files
+    - Input beams can now be read from maus, ICOOL and G4Beamline formatted
+      files
 
 MAUS-v0.1.1
   The following functionality was added:
     - Prototype functionality to run MAUS online added
-  If upgrading from the previous version, the following third party libraries need to be rerun:
+  If upgrading from the previous version, the following third party libraries
+  need to be rerun:
     - third_party/bash/40python_extras.bash
     - third_party/bash/51xboas.bash
     - third_party/bash/53unpacking.bash
@@ -61,7 +75,8 @@ MAUS-v0.1.1
 
 MAUS-v0.1.0
   The following functionality was added:
-    - Functionality to import geometries direct from GDML files into GEANT4 added
+    - Functionality to import geometries direct from GDML files into GEANT4
+      added
 
 MAUS-v0.0.9
   The following functionality was added:
@@ -71,7 +86,8 @@ MAUS-v0.0.9
     - Skeleton documentation outline added
     - Tracker geant4 modelling code was added
     - Tracker digitization code was added
-    - TOF digitization code was removed as it did not meet required quality checks
+    - TOF digitization code was removed as it did not meet required quality#
+      checks
   The following third party libraries need to be rerun:
     - 40python_extras.bash
 
@@ -80,26 +96,32 @@ MAUS-v0.0.8
   - Refactor of execution framework to prepare for multiprocessing and online
     reconstruction
   - Documentation skeleton introduced
-  - Executable (bin/utilities/json_browser.py) to browse formatted json output in
-    more human readable form 
+  - Executable (bin/utilities/json_browser.py) to browse formatted json output
+    in more human readable form 
 
 MAUS-v0.0.7
   - New functions to generate input beam
     -- Multivariate gaussian in x, px, y, py, time, energy
     -- Additionally sawtooth or uniform distribution in time
-    -- Either fixed number of particles or selected from binomial distribution per spill
-    -- Multiple distributions can be generated with difference particle types, etc
+    -- Either fixed number of particles or selected from binomial distribution
+       per spill
+    -- Multiple distributions can be generated with difference particle types,
+       etc
   - simulate_mice run control is now entirely through datacards
-    -- Number of spills input and output filenames can all be selected in datacards
+    -- Number of spills input and output filenames can all be selected in
+       datacards
   - datacards can be specified on the command line or in an external file
-    -- -configuration_file <file> specifies the python file to use for datacards
+    -- -configuration_file <file> specifies the python file to use for
+       datacards
 
 MAUS-v0.0.6
   - Added calls to geant4 inline visualisation
 
 MAUS-v0.0.5
-  - Added some new compile flags to control C++ optimisation, profiling, debugging, code coverage
-  - Added documentation for the Monte Carlo data structure (doc/run_control/spill.pdf)
+  - Added some new compile flags to control C++ optimisation, profiling,
+    debugging, code coverage
+  - Added documentation for the Monte Carlo data structure
+    (doc/run_control/spill.pdf)
   - Better testing and speed optimisation in Simulation
 
 MAUS-v0.0.4

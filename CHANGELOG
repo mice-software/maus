@@ -1,3 +1,10 @@
+MAUS-v0.2.3 (http://micewww.pp.rl.ac.uk/versions/show/26)
+  Bug #978: Simulation - Coloured Particles and Accumulated Tracks
+  Bug #989: GRID batch script incorrect file name
+  Bug #997: Some features in the data structure
+  Feature #689: Specify G4Beamline interface to MAUS
+  Feature #988: get_geometry_ids.py executable file
+
 MAUS-v0.2.3 (http://micewww.pp.rl.ac.uk/versions/show/25)
   Bug #819: Copy pasting third_party means Python can't use site-packages
   Bug #853: SpecialVirtual hit and TOF hit have different particle id field
