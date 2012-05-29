@@ -251,7 +251,6 @@ int TransferMapCalculator::FullFunc(double z, const double y[], double f[], void
   double field    [6]    = {0.,0.,0.,0.,0.,0.};
   _field->GetFieldValue(xfield, field);
 
-  double field_der[4][6];
   for(int i=0; i<4; i++)
   {
     double der_pos[6]   = {0,0,0,0,0,0};
@@ -261,8 +260,6 @@ int TransferMapCalculator::FullFunc(double z, const double y[], double f[], void
     _field->GetFieldValue(pos_field, der_pos);
     pos_field[i]        = -_delta[i];
     _field->GetFieldValue(pos_field, der_neg);
-    for(int j=0; j<6; j++)
-      field_der[i][j] = (der_pos[j] - der_neg[j])/2./_delta[i];
   }
 
   //constants
