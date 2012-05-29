@@ -89,7 +89,7 @@ std::string MapCppSingleStationRecon::process(std::string document) {
     root["errors"] = errors;
     return writer.write(root);
   }
-  // std::cout << "End Recon" << std::endl;
+
   return writer.write(root);
 }
 

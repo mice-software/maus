@@ -348,7 +348,7 @@ int VLSB_CDataProcessor::Process(MDdataContainer* aFragPtr) {
   pBoardDoc["detector"]          = xDetector;
   pBoardDoc["equip_type"]        = this->GetEquipmentType();
   pBoardDoc["time_stamp"]        = this->GetTimeStamp();
-  pBoardDoc["phys_event_number"] = this->GetPhysEventNumber();
+  pBoardDoc["phys_event_number"] = this->GetPhysEventNumber()-1;
   pBoardDoc["geo"]               = xVLSB_CFragment->GetGeo();
 
   MDdataWordVLSB xDataWord;

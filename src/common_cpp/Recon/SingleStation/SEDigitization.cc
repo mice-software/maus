@@ -42,7 +42,7 @@ void SEDigitization::process(SESpill &spill, Json::Value const &daq) {
   // Pick up JSON daq event.
   Json::Value _events = daq["single_station"];
   std::cerr << daq["single_station"].size() << " " << daq["tof1"].size() << std::endl;
-  assert(daq["single_station"].size() == daq["tof1"].size());
+  // assert(daq["single_station"].size() == daq["tof1"].size());
 
   std::cout <<  _events.size() << std::endl;
   for ( unsigned int i = 1; i < _events.size(); ++i ) {
