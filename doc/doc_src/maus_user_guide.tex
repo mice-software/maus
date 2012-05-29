@@ -3,6 +3,7 @@
 \usepackage{tabularx}
 \usepackage{multirow}
 \usepackage{graphicx}
+\usepackage{hyperref}
 \begin{document}
 
 \vspace*{2.0cm}
@@ -13,14 +14,21 @@
 \Large{ \bf{User Guide} }
 \end{center}
 
-%\chapter{Running for the First Time}
-%\include{first_time_running}
+\tableofcontents
 
-%\chapter{Data Structure}
-%\input{data_structure}
+\newpage
+
+\chapter{Introduction}
+\include{introduction}
+
+\chapter{Data Structure}
+\input{data_structure}
 
 \chapter{Monte Carlo}
 \input{simulation}
+
+\chapter{Geometry}
+\input{geometry}
 
 %\chapter{Detector Description}
 %\include{detectors/tof}
@@ -29,8 +37,7 @@
 %\include{detectors/ckov}
 %\include{detectors/kl}
 
-\chapter{Geometry}
-\input{geometry}
+%\chapter{Geometry}
 %\include{geometry_definitions}
 
 %\chapter{Appendix A: Run Control Variables}
