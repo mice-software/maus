@@ -8,6 +8,9 @@ import sys
 
 import Configuration
 
+# TODO: add version number to docs
+# TODO: add tarball manufacture
+
 CPP_COVERAGE = os.path.join(os.environ['MAUS_ROOT_DIR'], 'doc', 'cpp_coverage')
 TEST_LOG = os.path.join(os.environ['MAUS_ROOT_DIR'], 'tmp', 'all_test.log')
 TEST_PLOTS = os.path.join(os.environ['MAUS_ROOT_DIR'], 'tests', 'integration', 'plots')
@@ -66,12 +69,6 @@ def build_user_guide():
     COPY_TARGETS.append(os.path.join(os.getcwd(), 'maus_user_guide'))
     os.chdir(here)
 
-def make_tarball(version):
-    v_number = version.split('_')[-1]
-    release_log = open(RELEASE_LOG, 'w')
-    subprocess.Popen('bzr', 'release', 'maus_v'+v_number+'.tar.gz', 
-                      stdout=release_log, stderr=subprocess.STDOUT))
-
 def copy_targets():
     print "Copying to tmp"
     global TEMP_DST, COPY_TARGETS
@@ -104,7 +101,6 @@ def main():
     build_user_guide()
     build_doxygen()
     build_test_output()
-    making_tarball()
     scp_in, version = copy_targets()
     scp_out = os.path.join(sys.argv[1], version)
     scp(scp_in, scp_out)
