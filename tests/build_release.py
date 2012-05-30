@@ -1,5 +1,17 @@
 #!/usr/bin/env python
 
+"""
+Script to generate release data and put it on the micewww server. Generates:
+- test log
+- test plots
+- C++ coverage report
+- doxygen
+- maus user guide in pdf and html
+
+Then scps to a location specified on the command line (as a single directory
+called <MAUS version>)
+"""
+
 import glob
 import subprocess
 import os
@@ -8,12 +20,13 @@ import sys
 
 import Configuration
 
-# TODO: add version number to docs
-# TODO: add tarball manufacture
+# want to add version number to docs
+# want to add tarball manufacture
 
 CPP_COVERAGE = os.path.join(os.environ['MAUS_ROOT_DIR'], 'doc', 'cpp_coverage')
 TEST_LOG = os.path.join(os.environ['MAUS_ROOT_DIR'], 'tmp', 'all_test.log')
-TEST_PLOTS = os.path.join(os.environ['MAUS_ROOT_DIR'], 'tests', 'integration', 'plots')
+TEST_PLOTS = os.path.join(os.environ['MAUS_ROOT_DIR'], 'tests', 'integration',
+                                                                        'plots')
 DOXY_LOG = os.path.join(os.environ['MAUS_ROOT_DIR'], 'tmp', 'doxygen.log')
 LATEX_LOG = os.path.join(os.environ['MAUS_ROOT_DIR'], 'tmp', 'pdflatex.log')
 TEMP_DST = os.path.join(os.environ['MAUS_ROOT_DIR'], 'tmp', 'server_build')
@@ -21,21 +34,23 @@ COPY_TARGETS = []
 
 
 def build_test_output():
+    """Build test output and coverage, add to copy targets"""
     print "Building test output"
     test_log = open(TEST_LOG, 'w')
     testproc = subprocess.Popen(['bash', 'run_tests.bash'], stdout=test_log,
                                                        stderr=subprocess.STDOUT)
     testproc.wait()
     if testproc.returncode != 0:
-      print "ERROR - tests failed"
+        print "ERROR - tests failed"
     else:
-      COPY_TARGETS.append(TEST_PLOTS)
-      COPY_TARGETS.append(TEST_LOG)
-      COPY_TARGETS.append(CPP_COVERAGE)
+        COPY_TARGETS.append(TEST_PLOTS)
+        COPY_TARGETS.append(TEST_LOG)
+        COPY_TARGETS.append(CPP_COVERAGE)
 
 def build_doxygen():
+    """Build doxygen add to copy targets"""
+    global COPY_TARGETS # pylint: disable=W0603
     print "Building doxygen"
-    global COPY_TARGETS, DOXY_LOG
     doc_tools = os.path.join(os.environ['MAUS_ROOT_DIR'], 'doc', 'doc_tools')
     doxy_log = open(DOXY_LOG, 'w')
     for doxyfile in ['Doxyfile.framework', 'Doxyfile.backend']:
@@ -44,17 +59,17 @@ def build_doxygen():
                                                        stderr=subprocess.STDOUT)
         doxyproc.wait()
         if doxyproc.returncode != 0:
-          print "ERROR - doxygen failed for doxyfile: "+path
+            print "ERROR - doxygen failed for doxyfile: "+path
     COPY_TARGETS += glob.glob(os.path.join(os.environ['MAUS_ROOT_DIR'], 'doc',
                                                                    'doxygen_*'))
 
 def build_user_guide():
+    """Build user guide (html and pdf) add to copy targets"""
     print "Building user guide"
-    latex_dir = os.path.join(os.environ['MAUS_ROOT_DIR'], 'doc', 'doc_src')
     here = os.getcwd()
     os.chdir(os.path.join(os.environ['MAUS_ROOT_DIR'], 'doc', 'doc_src'))
     latex_log = open(LATEX_LOG, 'w')
-    for i in range(2):
+    for index in range(2): #pylint: disable = W0612
         latexproc = subprocess.Popen(['pdflatex', 'maus_user_guide.tex'],
                                      stdout=latex_log, stderr=subprocess.STDOUT)
         latexproc.wait()
@@ -70,8 +85,8 @@ def build_user_guide():
     os.chdir(here)
 
 def copy_targets():
+    """Copy targets to a temporary store in tmp"""
     print "Copying to tmp"
-    global TEMP_DST, COPY_TARGETS
     if os.path.exists(TEMP_DST):
         shutil.rmtree(TEMP_DST)
     os.mkdir(TEMP_DST)
@@ -90,6 +105,7 @@ def copy_targets():
     return out_dir, version
 
 def scp(scp_in, scp_out):
+    """scp targets across"""
     print "Final scp from", scp_in, 'to', scp_out
     scp_proc = subprocess.Popen(['scp', '-r', scp_in, scp_out])
     scp_proc.wait()
@@ -97,6 +113,7 @@ def scp(scp_in, scp_out):
         print "ERROR - scp failed"
 
 def main():
+    """main function"""
     print "Doing server build"
     build_user_guide()
     build_doxygen()
