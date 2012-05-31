@@ -242,7 +242,7 @@ std::string  ReduceCppSingleStation::process(std::string document) {
     file1.close();
     file2.close();
     file3.close();
-    file4.open ("efficiency_station.txt");
+    file4.open("efficiency_station.txt");
     file4 << 0 << " " << _plane_0_hits << " " << _plane_0_counter << "\n";
     file4 << 1 << " " << _plane_1_hits << " " << _plane_1_counter << "\n";
     file4 << 2 << " " << _plane_2_hits << " " << _plane_2_counter << "\n";
@@ -333,16 +333,15 @@ std::string  ReduceCppSingleStation::process(std::string document) {
 void ReduceCppSingleStation::compute_station_efficiencies(Json::Value root) {
   int n_events = root["recon_events"].size();
 
-  // root["recon_events"][5]["sci_fi_event"]["sci_fi_space_points"]["single_station"][0];
-  // std::cerr << n_events << std::endl;
   for ( int event_i = 0; event_i < n_events; event_i++ ) {
-    if ( root["recon_events"][event_i]["sci_fi_event"]["sci_fi_space_points"]["single_station"].isNull() )
+    if ( root["recon_events"][event_i]["sci_fi_event"]
+             ["sci_fi_space_points"]["single_station"].isNull() )
       continue;
     Json::Value spacepoints = JsonWrapper::GetProperty(
           root["recon_events"][event_i]["sci_fi_event"]["sci_fi_space_points"],
           "single_station" ,
           JsonWrapper::arrayValue);
-    // std::cerr << spacepoints.size() << std::endl;
+
     int numb_spacepoints = spacepoints.size();
     for ( int sp_j = 0; sp_j < numb_spacepoints; sp_j++ ) {
       // looping over spacepoints in an event.
@@ -354,7 +353,6 @@ void ReduceCppSingleStation::compute_station_efficiencies(Json::Value root) {
       double chan_2 = -10.;
 
       int numb_clusters = spacepoints[sp_j]["channels"].size();
-      // std::cerr << "Numb clusters: " << numb_clusters << std::endl;
       for ( int clust_k = 0; clust_k < numb_clusters; ++clust_k ) {
         if ( spacepoints[sp_j]["channels"][clust_k]["plane_number"].asInt() == 0 ) {
           plane_0_is_hit = true;
@@ -369,7 +367,6 @@ void ReduceCppSingleStation::compute_station_efficiencies(Json::Value root) {
           chan_2 = spacepoints[sp_j]["channels"][clust_k]["channel_number"].asDouble();
         }
       }
-      // std::cerr << chan_0 << " " << chan_1 << " " << chan_2 << std::endl;
       // Plane 0 efficiencies.
       if ( plane_1_is_hit && plane_2_is_hit ) {
         _plane_0_counter += 1;
@@ -454,7 +451,8 @@ void ReduceCppSingleStation::draw_spacepoints(Json::Value root) {
   // root["recon_events"][5]["sci_fi_event"]["sci_fi_space_points"]["single_station"][0];
   // std::cerr << n_events << std::endl;
   for ( int event_i = 0; event_i < n_events; event_i++ ) {
-    if ( root["recon_events"][event_i]["sci_fi_event"]["sci_fi_space_points"]["single_station"].isNull() ) continue;
+    if ( root["recon_events"][event_i]["sci_fi_event"]
+             ["sci_fi_space_points"]["single_station"].isNull() ) continue;
     Json::Value spacepoints = JsonWrapper::GetProperty(
           root["recon_events"][event_i]["sci_fi_event"]["sci_fi_space_points"],
           "single_station" ,
@@ -488,7 +486,8 @@ void ReduceCppSingleStation::doublet_clusters_histograms(Json::Value root) {
   int n_events = root["recon_events"].size();
 
   for ( int event_i = 0; event_i < n_events; event_i++ ) {
-    if ( root["recon_events"][event_i]["sci_fi_event"]["sci_fi_clusters"]["single_station"].isNull() ) continue;
+    if ( root["recon_events"][event_i]["sci_fi_event"]
+             ["sci_fi_clusters"]["single_station"].isNull() ) continue;
     Json::Value clusters = JsonWrapper::GetProperty(
           root["recon_events"][event_i]["sci_fi_event"]["sci_fi_clusters"],
           "single_station" ,
@@ -527,7 +526,8 @@ void ReduceCppSingleStation::digits_histograms(Json::Value root) {
   int n_events = root["recon_events"].size();
 
   for ( int event_i = 0; event_i < n_events; event_i++ ) {
-    if ( root["recon_events"][event_i]["sci_fi_event"]["sci_fi_digits"]["single_station"].isNull() ) continue;
+    if ( root["recon_events"][event_i]["sci_fi_event"]
+             ["sci_fi_digits"]["single_station"].isNull() ) continue;
     Json::Value digits = JsonWrapper::GetProperty(
           root["recon_events"][event_i]["sci_fi_event"]["sci_fi_digits"],
           "single_station" ,
