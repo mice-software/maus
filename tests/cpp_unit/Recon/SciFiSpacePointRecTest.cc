@@ -98,6 +98,3 @@ TEST_F(SciFiSpacePointRecTest, test_duplet_radius) {
   bool test_2 = a_test.duplet_within_radius(c1, c2);
   EXPECT_FALSE(test_2);
 }
-
-//} // namespace
-// } // namespace

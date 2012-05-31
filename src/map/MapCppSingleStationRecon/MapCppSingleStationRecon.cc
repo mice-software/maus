@@ -180,9 +180,12 @@ void MapCppSingleStationRecon::save_to_json(SEEvent *evt, int event_i) {
   //
   // Save everything in data structrure tree.
   //
-  root["recon_events"][event_i]["sci_fi_event"]["sci_fi_digits"]["single_station"].append(sci_fi_digits);
-  root["recon_events"][event_i]["sci_fi_event"]["sci_fi_clusters"]["single_station"].append(sci_fi_clusters);
-  root["recon_events"][event_i]["sci_fi_event"]["sci_fi_space_points"]["single_station"].append(sci_fi_space_points);
+  root["recon_events"][event_i]["sci_fi_event"]["sci_fi_digits"]["single_station"]
+                                               = sci_fi_digits;
+  root["recon_events"][event_i]["sci_fi_event"]["sci_fi_clusters"]["single_station"]
+                                               = sci_fi_clusters;
+  root["recon_events"][event_i]["sci_fi_event"]["sci_fi_space_points"]["single_station"]
+                                               = sci_fi_space_points;
 }
 /*
 bool MapCppSingleStationRecon::is_good_for_track(Json::Value root, SEEvent &event, int k) {
