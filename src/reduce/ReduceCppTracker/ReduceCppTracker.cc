@@ -89,8 +89,8 @@ std::string  ReduceCppTracker::process(std::string document) {
   TCanvas *c3 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c3"));
 
   try {
-    root = JsonWrapper::StringToJson(document);}
-  catch(...) {
+    root = JsonWrapper::StringToJson(document);
+  } catch(...) {
     Json::Value errors;
     std::stringstream ss;
     ss << _classname << " says: Failed to parse input document";
@@ -103,7 +103,7 @@ std::string  ReduceCppTracker::process(std::string document) {
       show_light_yield(root);
 
       show_efficiency(root);
-  }
+    }
   } catch(Squeal squee) {
      Squeak::mout(Squeak::error) << squee.GetMessage() << std::endl;
     root = MAUS::CppErrorHandler::getInstance()->HandleSqueal(root, squee, _classname);
@@ -116,9 +116,9 @@ std::string  ReduceCppTracker::process(std::string document) {
   // Display light yield.
   if (!(_nSpills%2)) {
     c1->cd(1);
-    _digits.Draw("npe", "tracker==1");
+    _digits.Draw("npe", "tracker==0");
     c1->cd(2);
-    _digits.Draw("npe", "tracker==2");
+    _digits.Draw("npe", "tracker==1");
     c1->Modified();
     c1->Update();
   }
@@ -126,35 +126,35 @@ std::string  ReduceCppTracker::process(std::string document) {
   // display_spacepoints();
   if (!(_nSpills%2)) {
     c2->cd(1);
-    _spacepoints.Draw("type", "tracker==1 && station==1 ");
+    _spacepoints.Draw("type", "tracker==0 && station==1 ");
     c2->Update();
     c2->cd(2);
-    _spacepoints.Draw("type", "tracker==1 && station==2 ");
+    _spacepoints.Draw("type", "tracker==0 && station==2 ");
     c2->Update();
     c2->cd(3);
-    _spacepoints.Draw("type", "tracker==1 && station==3 ");
+    _spacepoints.Draw("type", "tracker==0 && station==3 ");
     c2->Update();
     c2->cd(4);
-    _spacepoints.Draw("type", "tracker==1 && station==4 ");
+    _spacepoints.Draw("type", "tracker==0 && station==4 ");
     c2->Update();
     c2->cd(5);
-    _spacepoints.Draw("type", "tracker==1 && station==5 ");
+    _spacepoints.Draw("type", "tracker==0 && station==5 ");
     c2->Update();
     // tracker 1
     c2->cd(6);
-    _spacepoints.Draw("type", "tracker==2 && station==1 ");
+    _spacepoints.Draw("type", "tracker==1 && station==1 ");
     c2->Update();
     c2->cd(7);
-    _spacepoints.Draw("type", "tracker==2 && station==2 ");
+    _spacepoints.Draw("type", "tracker==1 && station==2 ");
     c2->Update();
     c2->cd(8);
-    _spacepoints.Draw("type", "tracker==2 && station==3 ");
+    _spacepoints.Draw("type", "tracker==1 && station==3 ");
     c2->Update();
     c2->cd(9);
-    _spacepoints.Draw("type", "tracker==2 && station==4 ");
+    _spacepoints.Draw("type", "tracker==1 && station==4 ");
     c2->Update();
     c2->cd(10);
-    _spacepoints.Draw("type", "tracker==2 && station==5 ");
+    _spacepoints.Draw("type", "tracker==1 && station==5 ");
     c2->Update();
   }
 
@@ -162,9 +162,9 @@ std::string  ReduceCppTracker::process(std::string document) {
   // display_efficiency();
   if (!(_nSpills%2)) {
     c3->cd(1);
-    _events.Draw("station_hits", "tracker==1");
+    _events.Draw("station_hits", "tracker==0");
     c3->cd(2);
-    _events.Draw("station_hits", "tracker==2");
+    _events.Draw("station_hits", "tracker==1");
   }
   return document;
 }
@@ -235,7 +235,7 @@ void ReduceCppTracker::show_efficiency(Json::Value const &root) {
       if ( type == "duplet" ) {
         _type = 2;
       }
-      _tracker = 1;
+      _tracker = 0;
       _x = spacepoints_tracker0[sp_i]["position"]["x"].asDouble();
       _y = spacepoints_tracker0[sp_i]["position"]["y"].asDouble();
       _z = spacepoints_tracker0[sp_i]["position"]["z"].asDouble();
@@ -255,7 +255,7 @@ void ReduceCppTracker::show_efficiency(Json::Value const &root) {
       if ( type == "duplet" ) {
         _type = 2;
       }
-      _tracker = 2;
+      _tracker = 1;
       _x = spacepoints_tracker1[sp_i]["position"]["x"].asDouble();
       _y = spacepoints_tracker1[sp_i]["position"]["y"].asDouble();
       _z = spacepoints_tracker1[sp_i]["position"]["z"].asDouble();
@@ -271,7 +271,7 @@ void ReduceCppTracker::show_efficiency(Json::Value const &root) {
           hit_counter+=1;
         }
         _station_hits = hit_counter+2;
-        _tracker_event = tr+1;
+        _tracker_event = tr;
         _events.Fill();
       }
     }

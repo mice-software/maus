@@ -84,12 +84,10 @@ std::string MapCppTrackerRecon::process(std::string document) {
         std::cout << "Calling Pattern Recognition..." << std::endl;
         pattern_recognition(event);
       }
-
       // Kalman Track Fit.
-      // if ( event.straightprtracks().size() ) {
-        // track_fit(event);
-      // }
-
+      if ( event.straightprtracks().size() ) {
+        track_fit(event);
+      }
       print_event_info(event);
       save_to_json(event, k);
     }  // ==========================================================
@@ -160,13 +158,11 @@ void MapCppTrackerRecon::pattern_recognition(SciFiEvent &evt) {
   PatternRecognition pr1;
   pr1.process(evt);
 }
-/*
+
 void MapCppTrackerRecon::track_fit(SciFiEvent &evt) {
   KalmanTrackFit fit;
   fit.process(evt);
 }
-*/
-
 
 void MapCppTrackerRecon::save_to_json(SciFiEvent &evt, int event_i) {
   // ------- DIGITS -------------------------------------------------------
@@ -244,10 +240,11 @@ void MapCppTrackerRecon::save_to_json(SciFiEvent &evt, int event_i) {
     track["my"] = evt.straightprtracks()[track_i].get_my();
     track["x_chisq"] = evt.straightprtracks()[track_i].get_x_chisq();
     track["y_chisq"] = evt.straightprtracks()[track_i].get_y_chisq();
-    track["tracker"] = evt.straightprtracks()[track_i].get_tracker();
-    if ( evt.straightprtracks()[track_i].get_tracker() == 0 ) {
+    int tracker = evt.straightprtracks()[track_i].get_tracker();
+    track["tracker"] = tracker;
+    if ( tracker == 0 ) {
       tracks_tracker0.append(track);
-    } else if ( evt.straightprtracks()[track_i].get_tracker() == 1 ) {
+    } else if ( tracker == 1 ) {
       tracks_tracker1.append(track);
     }
   }

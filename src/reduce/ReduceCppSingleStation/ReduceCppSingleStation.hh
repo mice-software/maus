@@ -124,7 +124,9 @@ class ReduceCppSingleStation {
   TH1F *_adc_plane2;
 
   TH1F *_dig_npe_plane0;
+
   TH1F *_dig_npe_plane1;
+
   TH1F *_dig_npe_plane2;
 
   std::string _classname;
@@ -132,8 +134,6 @@ class ReduceCppSingleStation {
   std::string _filename;
 
   int _nSpills;
-
-  void Save();
 
   TTree _unpacked;
   int _adc, _tdc, _bank, _chan, _activebank;

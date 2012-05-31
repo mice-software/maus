@@ -173,7 +173,6 @@ bool ReduceCppSingleStation::birth(std::string argJsonConfigDocument) {
 }
 
 bool ReduceCppSingleStation::death()  {
-  Save();
   std::cout << "************ Dead of Single Station Reducer ************" << std::endl;
   return true;
 }
@@ -592,16 +591,4 @@ void ReduceCppSingleStation::unpacked_data_histograms(Json::Value root) {
       _unpacked.Fill();
     }
   }
-}
-
-void ReduceCppSingleStation::Save() {
-  TFile datafile(_filename.c_str(), "recreate" );
-  datafile.cd();
-
-  _unpacked.Write();
-  _digits.Write();
-  _spacepointscopy.Write();
-
-  datafile.Close();
-  Squeak::mout(Squeak::info) << _filename << " is updated." << std::endl;
 }
