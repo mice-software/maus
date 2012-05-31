@@ -71,8 +71,7 @@ class MapCppTrackerReconTestCase(unittest.TestCase):
         # Spill 2 is sain.
         spill_2 = _file.readline().rstrip()
         output_2 = self.mapper.process(spill_2)
-        # self.assertTrue("sci_fi_digits" in json.loads(output_2))
-        # self.assertTrue("sci_fi_space_points" in json.loads(output_2))
+        self.assertTrue("recon_events" in json.loads(output_2))
         # spill 3 is end of event
         spill_3 = _file.readline().rstrip()
         output_3 = self.mapper.process(spill_3)
