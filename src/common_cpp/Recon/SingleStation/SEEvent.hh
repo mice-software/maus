@@ -37,7 +37,7 @@
 #include "src/common_cpp/Recon/SingleStation/SEDigit.hh"
 #include "src/common_cpp/Recon/SingleStation/SECluster.hh"
 #include "src/common_cpp/Recon/SingleStation/SESpacePoint.hh"
-#include "src/common_cpp/Recon/SingleStation/TOFSpacePoint.hh"
+// #include "src/common_cpp/Recon/SingleStation/TOFSpacePoint.hh"
 
 class SEEvent {
  public:
@@ -62,13 +62,13 @@ class SEEvent {
   /// Spacepoints
   void add_spacepoint(SESpacePoint* spacepoint) { _SEspacepoints.push_back(spacepoint); }
   std::vector<SESpacePoint*> spacepoints() const { return _SEspacepoints; }
-
+/*
   void add_TOF0spacepoint(TOFSpacePoint* spacepoint) { _TOF0spacepoints.push_back(spacepoint); }
   std::vector<TOFSpacePoint*> TOF0spacepoints() const { return _TOF0spacepoints; }
 
   void add_TOF1spacepoint(TOFSpacePoint* spacepoint) { _TOF1spacepoints.push_back(spacepoint); }
   std::vector<TOFSpacePoint*> TOF1spacepoints() const { return _TOF1spacepoints; }
-
+*/
   ///
   void set_phys_event_no(int phys_event_no) { _phys_event_no = phys_event_no; }
   int get_phys_event_no()    const { return _phys_event_no; }
@@ -90,9 +90,9 @@ class SEEvent {
   /// Spacepoints in an event.
   std::vector<SESpacePoint*>     _SEspacepoints;
 
-  std::vector<TOFSpacePoint*>     _TOF0spacepoints;
+  // std::vector<TOFSpacePoint*>     _TOF0spacepoints;
 
-  std::vector<TOFSpacePoint*>     _TOF1spacepoints;
+  // std::vector<TOFSpacePoint*>     _TOF1spacepoints;
 };  // Don't forget this trailing colon!!!!
 
 #endif

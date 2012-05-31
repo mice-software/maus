@@ -48,9 +48,6 @@
 #include "src/common_cpp/Recon/SingleStation/SEDigit.hh"
 #include "src/common_cpp/Recon/SingleStation/SECluster.hh"
 #include "src/common_cpp/Recon/SingleStation/SESpacePoint.hh"
-#include "src/common_cpp/Recon/Kalman/KalmanGlobalFit.hh"
-
-#include "src/common_cpp/Recon/SingleStation/TOFSpacePoint.hh"
 
 class MapCppSingleStationRecon {
  public:

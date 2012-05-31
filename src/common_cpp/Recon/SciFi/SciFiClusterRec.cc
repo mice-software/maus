@@ -53,9 +53,7 @@ void SciFiClusterRec::process(SciFiEvent &evt, std::vector<const MiceModule*> mo
       double pe   = seed->get_npe();
       // Look for a neighbour.
       for ( int j = i+1; j < seeds_size; j++ ) {
-        if ( !seeds[j]->is_used() && seeds[j]->get_tracker() == tracker &&
-             seeds[j]->get_station() == station && seeds[j]->get_plane()   == plane &&
-             abs(seeds[j]->get_channel() - fibre) < 2 ) {
+        if ( are_neighbours(seeds[i], seeds[j]) ) {
           neigh = seeds[j];
         }
       }
@@ -149,5 +147,19 @@ Hep3Vector SciFiClusterRec::get_reference_frame_pos(int tracker,
   assert(reference_plane != NULL);
   Hep3Vector reference_pos =  reference_plane->globalPosition();
   return reference_pos;
+}
+
+bool SciFiClusterRec::are_neighbours(SciFiDigit *seed_i, SciFiDigit *seed_j) {
+  bool neigh = false;
+
+  if ( !seed_j->is_used() && // seed is unused
+       seed_j->get_spill() == seed_i->get_spill() && // same spill
+       seed_j->get_event() == seed_i->get_event() && // same event
+       seed_j->get_plane() == seed_i->get_plane() && // seeds belong to same plane
+       abs(seed_j->get_channel() - seed_i->get_channel()) < 2.0 ) { // and are neighbours
+    neigh = true;
+  }
+
+  return neigh;
 }
 // } // ~namespace MAUS

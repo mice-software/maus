@@ -20,8 +20,8 @@ SEEvent::SEEvent() {
   _SEdigits.resize(0);
   _SEclusters.resize(0);
   _SEspacepoints.resize(0);
-  _TOF0spacepoints.resize(0);
-  _TOF1spacepoints.resize(0);
+  // _TOF0spacepoints.resize(0);
+  // _TOF1spacepoints.resize(0);
 }
 
 SEEvent::~SEEvent() {
@@ -44,8 +44,8 @@ SEEvent::SEEvent(const SEEvent &event) {
   _SEdigits        = event.digits();
   _SEclusters      = event.clusters();
   _SEspacepoints   = event.spacepoints();
-  _TOF0spacepoints = event.TOF0spacepoints();
-  _TOF1spacepoints = event.TOF1spacepoints();
+  // _TOF0spacepoints = event.TOF0spacepoints();
+  // _TOF1spacepoints = event.TOF1spacepoints();
 }
 
 SEEvent& SEEvent::operator=(const SEEvent &event) {
@@ -55,6 +55,6 @@ SEEvent& SEEvent::operator=(const SEEvent &event) {
   _SEdigits        = event.digits();
   _SEclusters      = event.clusters();
   _SEspacepoints   = event.spacepoints();
-  _TOF0spacepoints = event.TOF0spacepoints();
-  _TOF1spacepoints = event.TOF1spacepoints();
+  // _TOF0spacepoints = event.TOF0spacepoints();
+  // _TOF1spacepoints = event.TOF1spacepoints();
 }

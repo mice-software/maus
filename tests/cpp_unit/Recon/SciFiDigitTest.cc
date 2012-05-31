@@ -29,6 +29,8 @@ class SciFiDigitTest : public ::testing::Test {
 };
 
 TEST_F(SciFiDigitTest, test_setters_getters) {
+  int spill = 1;
+  int event = 2;
   int tracker = 1;
   int station = 2;
   int plane = 0;
@@ -37,6 +39,8 @@ TEST_F(SciFiDigitTest, test_setters_getters) {
   double time = 12.2;
   SciFiDigit *digit = new SciFiDigit();
 
+  digit->set_spill(spill);
+  digit->set_event(event);
   digit->set_tracker(tracker);
   digit->set_station(station);
   digit->set_plane(plane);
@@ -44,6 +48,8 @@ TEST_F(SciFiDigitTest, test_setters_getters) {
   digit->set_npe(npe);
   digit->set_time(time);
 
+  EXPECT_EQ(digit->get_spill(), spill);
+  EXPECT_EQ(digit->get_event(), event);
   EXPECT_EQ(digit->get_tracker(), tracker);
   EXPECT_EQ(digit->get_station(), station);
   EXPECT_EQ(digit->get_plane(), plane);
@@ -61,6 +67,8 @@ TEST_F(SciFiDigitTest, test_used_flag) {
 }
 
 TEST_F(SciFiDigitTest, test_constructor) {
+  int spill = 1;
+  int event = 2;
   int tracker = 1;
   int station = 2;
   int plane = 0;
@@ -68,8 +76,10 @@ TEST_F(SciFiDigitTest, test_constructor) {
   double npe = 3.2;
   double time = 12.2;
 
-  SciFiDigit *digit = new SciFiDigit(tracker, station, plane, channel, npe, time);
+  SciFiDigit *digit = new SciFiDigit(spill, event, tracker, station, plane, channel, npe, time);
 
+  EXPECT_EQ(digit->get_spill(), spill);
+  EXPECT_EQ(digit->get_event(), event);
   EXPECT_EQ(digit->get_tracker(), tracker);
   EXPECT_EQ(digit->get_station(), station);
   EXPECT_EQ(digit->get_plane(), plane);

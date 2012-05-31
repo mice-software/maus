@@ -50,6 +50,14 @@ class SciFiSpacePoint {
 
   ~SciFiSpacePoint();
 
+  void set_spill(int spill) { _spill = spill; }
+
+  int get_spill()   const { return _spill; }
+
+  void set_event(int event) { _event = event; }
+
+  int get_event() const { return _event; }
+
   void set_tracker(int tracker) { _tracker = tracker; }
 
   int get_tracker() const { return _tracker; }
@@ -91,6 +99,8 @@ class SciFiSpacePoint {
   std::vector<SciFiCluster*> get_channels()  const { return _channels; }
 
  private:
+  int _spill, _event;
+
   int _tracker, _station;
 
   double _npe;

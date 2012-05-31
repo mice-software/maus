@@ -35,6 +35,8 @@ class SciFiClusterTest : public ::testing::Test {
 };
 
 TEST_F(SciFiClusterTest, test_setters_getters) {
+  int spill = 1;
+  int event = 2;
   int tracker = 1;
   int station = 2;
   int plane = 0;
@@ -46,6 +48,8 @@ TEST_F(SciFiClusterTest, test_setters_getters) {
 
   SciFiCluster *Cluster = new SciFiCluster();
 
+  Cluster->set_spill(spill);
+  Cluster->set_event(event);
   Cluster->set_tracker(tracker);
   Cluster->set_station(station);
   Cluster->set_plane(plane);
@@ -55,6 +59,8 @@ TEST_F(SciFiClusterTest, test_setters_getters) {
   Cluster->set_direction(direction);
   Cluster->set_position(position);
 
+  EXPECT_EQ(Cluster->get_spill(), spill);
+  EXPECT_EQ(Cluster->get_event(), event);
   EXPECT_EQ(Cluster->get_tracker(), tracker);
   EXPECT_EQ(Cluster->get_station(), station);
   EXPECT_EQ(Cluster->get_plane(), plane);
@@ -74,6 +80,8 @@ TEST_F(SciFiClusterTest, test_used_flag) {
 }
 
 TEST_F(SciFiClusterTest, test_constructor) {
+  int spill = 1;
+  int event = 2;
   int tracker = 1;
   int station = 2;
   int plane = 0;
@@ -81,11 +89,14 @@ TEST_F(SciFiClusterTest, test_constructor) {
   double npe = 3.2;
   double time = 12.2;
 
-  SciFiDigit *digit = new SciFiDigit(tracker, station, plane, channel, npe, time);
+  SciFiDigit *digit = new SciFiDigit(spill, event,
+                                     tracker, station, plane, channel, npe, time);
   EXPECT_FALSE(digit->is_used());
 
   SciFiCluster *cluster = new SciFiCluster(digit);
 
+  EXPECT_EQ(cluster->get_spill(), spill);
+  EXPECT_EQ(cluster->get_event(), event);
   EXPECT_EQ(tracker, cluster->get_tracker());
   EXPECT_EQ(station, cluster->get_station());
   EXPECT_EQ(plane, cluster->get_plane());
@@ -97,6 +108,8 @@ TEST_F(SciFiClusterTest, test_constructor) {
 }
 
 TEST_F(SciFiClusterTest, test_add_digit) {
+  int spill = 1;
+  int event = 2;
   int tracker = 1;
   int station = 2;
   int plane = 0;
@@ -104,13 +117,15 @@ TEST_F(SciFiClusterTest, test_add_digit) {
   double npe1 = 3.2;
   double time = 12.2;
   // Construct a digit.
-  SciFiDigit *digit = new SciFiDigit(tracker, station, plane, channel1, npe1, time);
+  SciFiDigit *digit = new SciFiDigit(spill, event,
+                                     tracker, station, plane, channel1, npe1, time);
   // Start a cluster from "digit"
   SciFiCluster *cluster = new SciFiCluster(digit);
   // Construct a neighbour.
   double npe2 = 2.0;
   int channel2 = 107;
-  SciFiDigit *neighbour = new SciFiDigit(tracker, station, plane, channel2, npe2, time);
+  SciFiDigit *neighbour = new SciFiDigit(spill, event,
+                                         tracker, station, plane, channel2, npe2, time);
   EXPECT_FALSE(neighbour->is_used());
   // Add neighbour.
   cluster->add_digit(neighbour);

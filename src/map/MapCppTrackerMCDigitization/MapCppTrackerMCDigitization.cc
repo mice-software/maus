@@ -181,7 +181,10 @@ void MapCppTrackerMCDigitization::construct_digits(SciFiEvent &evt) {
       int tracker = a_hit->get_tracker();
       int station = a_hit->get_station();
       int plane = a_hit->get_plane();
-      SciFiDigit *a_digit = new SciFiDigit(tracker, station, plane, chanNo, nPE, time);
+      int spill = 99;
+      int event = 99;
+      SciFiDigit *a_digit = new SciFiDigit(spill, event,
+                                           tracker, station, plane, chanNo, nPE, time);
       evt.add_digit(a_digit);
     }
   }  // ends 'for' loop over hits

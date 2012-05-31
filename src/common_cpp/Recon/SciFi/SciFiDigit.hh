@@ -45,17 +45,18 @@ class SciFiDigit {
 
   /** @brief Constructs a scifi digit initializing member variables.
    */
-  SciFiDigit(int tracker, int station, int plane, int channel, double npe, double time );
+  SciFiDigit(int spill, int event, int tracker, int station,
+             int plane, int channel, double npe, double time );
 
   ~SciFiDigit();
 
-//  void set_spill(int spillNo) { _spill = spillNo; }
+  void set_spill(int spill) { _spill = spill; }
 
-//  int get_spill()   const { return _spill;   }
+  int get_spill()   const { return _spill; }
 
-//  void set_eventNo(int eventNo) { _eventNo = eventNo; }
+  void set_event(int event) { _event = event; }
 
-//  int get_eventNo() const { return _eventNo; }
+  int get_event() const { return _event; }
 
   // list of getters and setters.
   void set_tracker(int trackerNo) { _tracker = trackerNo; }
@@ -88,7 +89,7 @@ class SciFiDigit {
 
  private:
 
-  // int _spill, _eventNo;
+  int _spill, _event;
 
   int _tracker, _station, _plane, _channel;
 
