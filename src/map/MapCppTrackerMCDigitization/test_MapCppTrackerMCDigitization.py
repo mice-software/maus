@@ -7,7 +7,7 @@ from Configuration import Configuration
 
 from MapCppTrackerMCDigitization import MapCppTrackerMCDigitization
 
-class MapCppTrackerMCDigitizationTestCase(unittest.TestCase):
+class MapCppTrackerMCDigitizationTestCase(unittest.TestCase): # pylint: disable=R0904
     """ The MapCppTrackerRecon test.
     Member functions are:
 

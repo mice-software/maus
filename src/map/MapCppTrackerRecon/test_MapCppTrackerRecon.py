@@ -2,7 +2,6 @@
 import json
 import unittest
 import os
-import random
 from Configuration import Configuration
 
 from MapCppTrackerRecon import MapCppTrackerRecon
@@ -36,7 +35,7 @@ class MapCppTrackerReconTestCase(unittest.TestCase):
     (check the tests/cpp_unit/Recon/ directory).
 
     This python test will work over the process
-    """    
+    """
     @classmethod
     def setUpClass(self):
         """ Class Initializer.

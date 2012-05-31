@@ -1,8 +1,6 @@
-"""  Test for MapCppTrackerSE """
-import json
+"""  test_mapcpptrackerse """
 import unittest
 import os
-import random
 from Configuration import Configuration
 
 from MapCppSingleStationRecon import MapCppSingleStationRecon
@@ -55,7 +53,7 @@ class MapCppTrackerSETestCase(unittest.TestCase):
         """ Test to make sure death occurs """
         self.assertTrue(self.mapper.death())
 
-    def test_process(self):
+    def test_process(self): # pylint: disable=R0201
         """ Test of the process function """
         root_dir = os.environ.get("MAUS_ROOT_DIR")
         assert root_dir != None
