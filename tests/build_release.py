@@ -22,14 +22,17 @@ import Configuration
 
 # want to add version number to docs
 # want to add tarball manufacture
+# want to add coverage information
 
+TMP = os.path.join(os.environ['MAUS_ROOT_DIR'], 'tmp', 'build_release.')
 CPP_COVERAGE = os.path.join(os.environ['MAUS_ROOT_DIR'], 'doc', 'cpp_coverage')
-TEST_LOG = os.path.join(os.environ['MAUS_ROOT_DIR'], 'tmp', 'all_test.log')
+TEST_LOG = TMP+'all_test.log'
 TEST_PLOTS = os.path.join(os.environ['MAUS_ROOT_DIR'], 'tests', 'integration',
                                                                         'plots')
-DOXY_LOG = os.path.join(os.environ['MAUS_ROOT_DIR'], 'tmp', 'doxygen.log')
-LATEX_LOG = os.path.join(os.environ['MAUS_ROOT_DIR'], 'tmp', 'pdflatex.log')
+DOXY_LOG = TMP+'doxygen.log'
+LATEX_LOG = TMP+'pdflatex.log'
 TEMP_DST = os.path.join(os.environ['MAUS_ROOT_DIR'], 'tmp', 'server_build')
+SCP_LOG = TMP+'scp.log'
 COPY_TARGETS = []
 
 
@@ -37,7 +40,9 @@ def build_test_output():
     """Build test output and coverage, add to copy targets"""
     print "Building test output"
     test_log = open(TEST_LOG, 'w')
-    testproc = subprocess.Popen(['bash', 'run_tests.bash'], stdout=test_log,
+    run_tests_bash = os.path.join(os.environ["MAUS_ROOT_DIR"], "tests",
+                                                              "run_tests.bash")
+    testproc = subprocess.Popen(['bash', run_tests_bash], stdout=test_log,
                                                        stderr=subprocess.STDOUT)
     testproc.wait()
     if testproc.returncode != 0:
@@ -45,7 +50,8 @@ def build_test_output():
     else:
         COPY_TARGETS.append(TEST_PLOTS)
         COPY_TARGETS.append(TEST_LOG)
-        COPY_TARGETS.append(CPP_COVERAGE)
+        if os.path.isdir(CPP_COVERAGE):
+            COPY_TARGETS.append(CPP_COVERAGE)
 
 def build_doxygen():
     """Build doxygen add to copy targets"""
@@ -75,7 +81,8 @@ def build_user_guide():
         latexproc.wait()
         if latexproc.returncode != 0:
             print "ERROR - latex failed"
-        latexproc = subprocess.Popen(['latex2html', 'maus_user_guide.tex'],
+        latexproc = subprocess.Popen(['latex2html', 'maus_user_guide.tex',
+                                         "-split", "3", "-html_version", "3.2"],
                                      stdout=latex_log, stderr=subprocess.STDOUT)
         latexproc.wait()
         if latexproc.returncode != 0:
@@ -107,7 +114,9 @@ def copy_targets():
 def scp(scp_in, scp_out):
     """scp targets across"""
     print "Final scp from", scp_in, 'to', scp_out
-    scp_proc = subprocess.Popen(['scp', '-r', scp_in, scp_out])
+    scp_log = open(SCP_LOG, 'w')
+    scp_proc = subprocess.Popen(['scp', '-r', scp_in, scp_out], stdout=scp_log,
+                                                       stderr=subprocess.STDOUT)
     scp_proc.wait()
     if scp_proc.returncode != 0:
         print "ERROR - scp failed"

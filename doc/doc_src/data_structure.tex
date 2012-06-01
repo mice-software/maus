@@ -1,4 +1,4 @@
-\section{Data Structure}
+\label{chapter:data_structure}
 The event in MAUS is the MICE spill. The major part of the MAUS data structure therefore is a tree of which each entry corresponds to the data associated with one spill. The spill is separated into three main sections: the MCEventArray contains an array of data each member of which represents the Monte Carlo of a single primary particle crossing the system; the ReconEventArray contains an array of data each member of which corresponds to a particle event (i.e. set of DAQ triggers); and the DAQData corresponds to the raw data readout. Additionally there are branches for reconstructed scalars, which are handled spill by spill and EMR data, which also read out on the spill rather than event by event.
 
 \begin{figure}[!p]
@@ -13,15 +13,15 @@ The ReconEvent and DAQEvents are subdivided by detector. ReconEvents contain rec
 
 The data can be written in two formats. The main data format is a ROOT binary format. This requires the ROOT package to read and write, which is a standard analysis/plotting package in High Energy Physics and is installed by the MAUS build script. The secondary data format is JSON. This is an ascii data-tree format that in principle can be read by any text editor. Specific JSON parsers are also available - for example, the python \emph{json} module is available and comes prepackaged with MAUS.
 
-\subsection{Accessing ROOT files}
+\section{Accessing ROOT files}
 For details on how to access the ROOT files, please see the introduction section of this document.
 
-\subsection{Conversion to, and Working With, JSON}
+\section{Conversion to, and Working With, JSON}
 MAUS also provides output in the JSON data format. This is an ascii format with IO libraries available for C++, Python and other languages. Two utilities are provided to perform conversions, \verb|bin/utilities/json_to_root.py| and \verb|bin/utilities/root_to_json.py| for conversion from and to JSON format respectively. JSON Input and Output modules are provided, \verb|InputPyJson| and \verb|OutputPyJson|.
 
 Accessing JSON is possible using the \verb|json| python module that comes built-in to python 2.7. Each DAQ Event (real data) or Spill (Monte Carlo) in MAUS is written to a separate line, comprising a single json document, which can be loaded as a series of python dictionaries and arrays using \verb|json.loads(a_line)| or written as a string using \verb|json.dumps(a_line)|
 
-\subsection{Extending the Data Structure}
+\section{Extending the Data Structure}
 The data structure can be extended in MAUS by adding extra classes to the existing data structure. The data classes are in \verb|src/common_cpp/DataStructure|. In order to make these classes accessible to ROOT, the following steps must be taken:
 \begin{itemize}
 \item Add a new class
