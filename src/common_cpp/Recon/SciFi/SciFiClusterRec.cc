@@ -46,10 +46,10 @@ void SciFiClusterRec::process(SciFiEvent &evt, std::vector<const MiceModule*> mo
       SciFiDigit* neigh = NULL;
       SciFiDigit* seed = seeds[i];
 
-      int tracker = seed->get_tracker();
-      int station = seed->get_station();
-      int plane   = seed->get_plane();
-      int fibre   = seed->get_channel();
+      // int tracker = seed->get_tracker();
+      // int station = seed->get_station();
+      // int plane   = seed->get_plane();
+      // int fibre   = seed->get_channel();
       double pe   = seed->get_npe();
       // Look for a neighbour.
       for ( int j = i+1; j < seeds_size; j++ ) {

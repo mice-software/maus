@@ -14,7 +14,6 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#include <math.h>
 #include "src/common_cpp/Recon/Kalman/StraightTrack.hh"
 
 StraightTrack::StraightTrack() {

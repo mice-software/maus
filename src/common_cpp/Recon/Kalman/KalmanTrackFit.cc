@@ -16,6 +16,7 @@
  */
 
 #include "src/common_cpp/Recon/Kalman/KalmanTrackFit.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
 #include <algorithm>
 
 KalmanTrackFit::KalmanTrackFit() {
@@ -31,7 +32,8 @@ bool sort_by_id(SciFiCluster *a, SciFiCluster *b ) {
 }
 
 void KalmanTrackFit::process(SciFiEvent &event) {
-  StraightTrack track;
+  KalmanTrack *track = new StraightTrack();
+  //StraightTrack track;
 
   std::vector<KalmanSite> sites;
 
@@ -62,28 +64,29 @@ void KalmanTrackFit::process(SciFiEvent &event) {
 
   KalmanMonitor monitor;
   monitor.save(sites);
+
 }
 
 void KalmanTrackFit::filter(std::vector<KalmanSite> &sites,
-                            StraightTrack &track, int current_site) {
+                            KalmanTrack *track, int current_site) {
   // Get Site...
   KalmanSite *a_site = &sites[current_site];
 
   // Update measurement error:
   // (non-const std for the perp direction)
-  track.update_G(a_site);
+  track->update_G(a_site);
 
   // Update H (depends on plane direction.
-  track.update_H(a_site);
+  track->update_H(a_site);
 
   // Ck = ( (C_k^k-1)-1 + HT*G*H )-1
-  track.update_covariance(a_site);
+  track->update_covariance(a_site);
 
   // a_k = a_k^k-1 + K_k x pull
-  track.calc_filtered_state(a_site);
+  track->calc_filtered_state(a_site);
 }
 
-void KalmanTrackFit::extrapolate(std::vector<KalmanSite> &sites, StraightTrack &track, int i) {
+void KalmanTrackFit::extrapolate(std::vector<KalmanSite> &sites, KalmanTrack *track, int i) {
   // Get current site...
   KalmanSite *new_site = &sites[i];
 
@@ -91,19 +94,19 @@ void KalmanTrackFit::extrapolate(std::vector<KalmanSite> &sites, StraightTrack &
   KalmanSite *old_site = &sites[i-1];
 
   // The propagator matrix must be constructed...
-  track.update_propagator(old_site, new_site);
+  track->update_propagator(old_site, new_site);
 
   // Now, calculate prediction.
-  track.calc_predicted_state(old_site, new_site);
+  track->calc_predicted_state(old_site, new_site);
 
   // .. so has the sistem noise matrix...
   // track.calc_system_noise(old_site, new_site);
   // ... so that we can compute the prediction for the
   // covariance matrix.
-  track.calc_covariance(old_site, new_site);
+  track->calc_covariance(old_site, new_site);
 }
 
-void KalmanTrackFit::smooth(std::vector<KalmanSite> &sites, StraightTrack &track, int k) {
+void KalmanTrackFit::smooth(std::vector<KalmanSite> &sites, KalmanTrack *track, int k) {
   // Get site to be smoothed...
   KalmanSite *smoothing_site = &sites[k];
 
@@ -111,13 +114,13 @@ void KalmanTrackFit::smooth(std::vector<KalmanSite> &sites, StraightTrack &track
   KalmanSite *optimum_site = &sites[k+1];
 
   // Set the propagator right.
-  track.update_propagator(optimum_site, smoothing_site);
+  track->update_propagator(optimum_site, smoothing_site);
 
   // Compute A_k.
-  track.update_back_transportation_matrix(optimum_site, smoothing_site);
+  track->update_back_transportation_matrix(optimum_site, smoothing_site);
 
   // Compute smoothed a_k and C_k.
-  track.smooth_back(optimum_site, smoothing_site);
+  track->smooth_back(optimum_site, smoothing_site);
 }
 
 /*

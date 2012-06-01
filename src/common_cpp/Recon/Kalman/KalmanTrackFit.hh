@@ -50,11 +50,11 @@ class KalmanTrackFit {
 
   void process_clusters(SciFiEvent &event, std::vector<SciFiCluster*> &clusters);
 
-  void extrapolate(std::vector<KalmanSite> &sites, StraightTrack &track, int current_site);
+  void extrapolate(std::vector<KalmanSite> &sites, KalmanTrack *track, int current_site);
 
-  void filter(std::vector<KalmanSite> &sites, StraightTrack &track, int current_site);
+  void filter(std::vector<KalmanSite> &sites, KalmanTrack *track, int current_site);
 
-  void smooth(std::vector<KalmanSite> &sites, StraightTrack &track, int current_site);
+  void smooth(std::vector<KalmanSite> &sites, KalmanTrack *track, int current_site);
 
 // private:
 };

@@ -21,6 +21,7 @@
 
 // C headers
 #include <assert.h>
+#include <math.h>
 
 // C++ headers
 #include <string>
@@ -31,8 +32,9 @@
 
 
 #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
 
-class StraightTrack {
+class StraightTrack : public KalmanTrack {
  public:
   StraightTrack();
 

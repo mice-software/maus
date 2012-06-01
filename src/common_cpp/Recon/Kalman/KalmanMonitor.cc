@@ -45,8 +45,9 @@ void KalmanMonitor::save(std::vector<KalmanSite> &sites) {
     _alpha_extrap.push_back(site.get_extrapolated_alpha());
     _site.push_back(site.get_id());
     _alpha_meas.push_back(site.get_alpha());
-    double pull = _alpha_meas[i] - _alpha_extrap[i];
 
+    double pull = _alpha_meas[i] - _alpha_extrap[i];
+    std::cerr << "PULL: " << _alpha_meas[i] << " " << _alpha_extrap[i] << std::endl;
     TMatrixD a(5, 1);
     a = site.get_state_vector();
     TMatrixD C(5, 5);
