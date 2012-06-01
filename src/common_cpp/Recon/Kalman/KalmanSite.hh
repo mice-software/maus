@@ -75,9 +75,11 @@ class KalmanSite {
   TMatrixD get_projected_covariance_matrix() const { return _projected_C; }
 
   void set_measurement(double alpha) { _v(0, 0) = alpha;
-                                       _v(1, 0) = 0.0; }
+                                       _v(1, 0) = 0.0;
+                                       _alpha   = alpha; }
 
-  void set_measurement(TMatrixD m) { _v = m; }
+  void set_measurement(TMatrixD m) { _v = m;
+                                     _alpha = _v(0, 0); }
 
   TMatrixD get_measurement() const { return _v; }
 
@@ -99,7 +101,11 @@ class KalmanSite {
 
   // void set_alpha(double alpha) { _alpha = alpha; }
 
-  double get_alpha() const { return _v(0, 0); }
+  double get_alpha() const { return _alpha; }
+
+  // void set_state(state new_state) { _site_state = new_state; }
+
+  // int get_state() const { return _site_state; }
 
  private:
   /// The state vector.
@@ -122,6 +128,10 @@ class KalmanSite {
   int _id;
 
   Hep3Vector _direction;
+
+  // enum state { INVALID = 0, PROJECTED, FILTERED, SMOOTHED };
+
+  // state _site_state;
 };
 
 #endif

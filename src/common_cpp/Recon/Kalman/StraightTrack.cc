@@ -124,11 +124,12 @@ void StraightTrack::update_covariance(KalmanSite *a_site) {
   Cp = TMatrixD(C_inv, TMatrixD::kPlus, temp2);
   Cp.Invert();
   a_site->set_covariance_matrix(Cp);
+  // assert(site.state() == "filtered");
 }
 
 // h1(a_1^0)
 void StraightTrack::calc_filtered_state(KalmanSite *a_site) {
-  //
+  /////////////////////////////////////////////////////////////////////
   // PULL = m - ha
   //
   TMatrixD m(2, 1);
@@ -141,20 +142,22 @@ void StraightTrack::calc_filtered_state(KalmanSite *a_site) {
   TMatrixD ha(2, 1);
   ha(0, 0) = alpha;
   ha(1, 0) = beta;
+  // Extrapolation converted to expected measurement.
   a_site->set_extrapolated_alpha(alpha);
 
   TMatrixD pull(2, 1);
   pull = TMatrixD(m, TMatrixD::kMinus, ha);
-//////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////
+  //
+  // Kalman Gain: K = Cp Ht G
+  //
   TMatrixD C(5, 5);
   C = a_site->get_covariance_matrix();
-  // Kalman Gain
-  // K= Cp Ht G;
   TMatrixD temp3(5, 2);
   temp3 = TMatrixD(C, TMatrixD::kMultTranspose, _H);
   TMatrixD K(5, 2);
   K = TMatrixD(temp3, TMatrixD::kMult, _G);
-////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
 
   // ap = a + K*pull;
   TMatrixD temp4(5, 1);
@@ -163,7 +166,7 @@ void StraightTrack::calc_filtered_state(KalmanSite *a_site) {
   a_filt = TMatrixD(a, TMatrixD::kPlus, temp4);
   a_site->set_state_vector(a_filt);
 
-////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////
 /*  std::cout <<  "******************* STATE VECTOR *******************" << std::endl;
   std::cout << "predicted: ";
   a.Print();

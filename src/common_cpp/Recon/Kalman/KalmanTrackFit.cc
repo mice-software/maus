@@ -31,7 +31,6 @@ bool sort_by_id(SciFiCluster *a, SciFiCluster *b ) {
 
 void KalmanTrackFit::process(SciFiEvent &event) {
   KalmanTrack *track = new StraightTrack();
-  // StraightTrack track;
 
   std::vector<KalmanSite> sites;
 
@@ -212,7 +211,7 @@ void KalmanTrackFit::initialise(SciFiEvent &event, std::vector<KalmanSite> &site
 }
 
 void KalmanTrackFit::process_clusters(SciFiEvent &event, std::vector<SciFiCluster*> &clusters) {
-  // this admits there is only one track...
+  // This admits there is only one track...
   SciFiStraightPRTrack seed = event.straightprtracks()[0];
   std::vector<SciFiSpacePoint> spacepoints = seed.get_spacepoints(); // Get CLUSTERS!
   int numb_spacepoints = spacepoints.size();
@@ -225,6 +224,6 @@ void KalmanTrackFit::process_clusters(SciFiEvent &event, std::vector<SciFiCluste
       clusters.push_back(cluster);
     }
   }
-  // plane 0 of station 1 will be the first plane
+  // Plane 0 of station 1 will be the first plane
   std::sort(clusters.begin(), clusters.end(), sort_by_id); // sort according to station and plane.
 }
