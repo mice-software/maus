@@ -16,8 +16,6 @@
  */
 
 #include "src/common_cpp/Recon/Kalman/KalmanTrackFit.hh"
-#include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
-#include <algorithm>
 
 KalmanTrackFit::KalmanTrackFit() {
   std::cout << "---------------------Birth of Kalman Filter--------------------" << std::endl;
@@ -33,7 +31,7 @@ bool sort_by_id(SciFiCluster *a, SciFiCluster *b ) {
 
 void KalmanTrackFit::process(SciFiEvent &event) {
   KalmanTrack *track = new StraightTrack();
-  //StraightTrack track;
+  // StraightTrack track;
 
   std::vector<KalmanSite> sites;
 
@@ -64,7 +62,6 @@ void KalmanTrackFit::process(SciFiEvent &event) {
 
   KalmanMonitor monitor;
   monitor.save(sites);
-
 }
 
 void KalmanTrackFit::filter(std::vector<KalmanSite> &sites,

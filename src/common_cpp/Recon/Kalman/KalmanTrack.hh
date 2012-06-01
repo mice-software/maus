@@ -30,11 +30,13 @@
 #include "TMatrixD.h"
 
 
-//#include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
+class KalmanSite;
 
 class KalmanTrack {
  public:
   KalmanTrack() {}
+
+  virtual ~KalmanTrack() {}
 
   virtual void update_propagator(KalmanSite *old_site, KalmanSite *new_site) = 0;
 
@@ -52,7 +54,8 @@ class KalmanTrack {
 
   virtual void calc_covariance(KalmanSite *old_site, KalmanSite *new_site) = 0;
 
-  virtual void update_back_transportation_matrix(KalmanSite *optimum_site, KalmanSite *smoothing_site) = 0;
+  virtual void update_back_transportation_matrix(KalmanSite *optimum_site,
+                                                 KalmanSite *smoothing_site) = 0;
 
   virtual void smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_site) = 0;
 

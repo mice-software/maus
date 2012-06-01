@@ -34,7 +34,7 @@ KalmanMonitor::~KalmanMonitor() {
   mgr->Write();
 }
 
-void KalmanMonitor::save(std::vector<KalmanSite> &sites) {
+void KalmanMonitor::save(std::vector<KalmanSite> const &sites) {
   int numb_sites = sites.size();
   _alpha_meas.resize(numb_sites);
   _site.resize(numb_sites);
@@ -44,6 +44,8 @@ void KalmanMonitor::save(std::vector<KalmanSite> &sites) {
     KalmanSite site = sites[i];
     _alpha_extrap.push_back(site.get_extrapolated_alpha());
     _site.push_back(site.get_id());
+    std::cerr << "SITE ID: " << site.get_id() << std::endl;
+    std::cerr << "SITE extrap alpha: " << site.get_extrapolated_alpha() << std::endl;
     _alpha_meas.push_back(site.get_alpha());
 
     double pull = _alpha_meas[i] - _alpha_extrap[i];
