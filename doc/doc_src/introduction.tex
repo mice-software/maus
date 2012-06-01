@@ -17,7 +17,7 @@ MAUS is intended to be used by physicists interested in studying the MICE data. 
 Installation is described in a separate document, available at \url{http://micewww.pp.rl.ac.uk/projects/maus/wiki/Install}
 
 \section{Running MAUS}
-MAUS contains several applications to perform various tasks. Two main applications are provided. \verb|bin/simulate_mice.py| makes a Monte Carlo simulation of the experiment and \verb|bin/analyze_data_offline.py| reconstructs an existing data file. To run the applications, first open a terminal window and move to the root directory of MAUS. Then type
+MAUS contains several applications to perform various tasks. Two main applications are provided. \verb|bin/simulate_mice.py| makes a Monte Carlo simulation of the experiment and \verb|bin/analyze_data_offline.py| reconstructs an existing data file. The applications can be run simply by calling from the command line
 \begin{verbatim}
  > source env.sh
  > ${MAUS_ROOT_DIR}/bin/simulate_mice.py
@@ -65,7 +65,7 @@ There are several other applications in the \verb|bin| directory and associated 
 \end{itemize}
 
 \section{Accessing Data}
-By default, MAUS writes data as a ROOT file. ROOT \hyperref{http://root.cern.ch} is a standard package for data analysis in high energy physics. Two techniques are foreseen for accessing the data.
+By default, MAUS writes data as a ROOT file. Two techniques are foreseen for accessing the data.
 
 \subsection{Loading ROOT Files in Python Using PyROOT}
 The standard scripting tool in MAUS is python. The ROOT data structure can be loaded in python using the PyROOT package. An example of how to perform a simple analysis with PyROOT is available in \verb|bin/examples/load_root_file.py|.
