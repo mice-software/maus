@@ -88,9 +88,7 @@ def main():
     tof1_digits_1_hist.Draw()
     canvas_1.Draw()
     canvas_1.Print('tof1_digits_1.png')
-    # wait for user to say we are done
-    # note it is a feature of ROOT that if you close the file it will delete
-    # existing histograms...
+
     print "Closing root file"
 
     # A feature of ROOT is that closing the root file has weird effects like
