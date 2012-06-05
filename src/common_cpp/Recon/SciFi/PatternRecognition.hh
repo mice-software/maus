@@ -74,7 +74,7 @@ class PatternRecognition {
      *  @param trks - A vector of the output Pattern Recognition tracks
      */
     void make_5tracks(std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
-                      std::vector<SciFiStraightPRTrack> &trks, std::vector< std::vector<int> >
+                      std::vector<SciFiHelicalPRTrack> &trks, std::vector< std::vector<int> >
 &residuals );
 
     /** @brief Make Pattern Recognition tracks with 4 spacepoints
@@ -87,7 +87,7 @@ class PatternRecognition {
      *  @param trks - A vector of the output Pattern Recognition tracks
      */
     void make_4tracks(std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
-                      std::vector<SciFiStraightPRTrack> &trks, std::vector< std::vector<int> >
+                      std::vector<SciFiHelicalPRTrack> &trks, std::vector< std::vector<int> >
 &residuals );
 
     /** @brief Make Pattern Recognition tracks with 3 spacepoints
@@ -100,7 +100,7 @@ class PatternRecognition {
      *  @param trks - A vector of the output Pattern Recognition tracks
      */
     void make_3tracks(std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
-                      std::vector<SciFiStraightPRTrack>& trks, std::vector< std::vector<int> >
+                      std::vector<SciFiHelicalPRTrack>& trks, std::vector< std::vector<int> >
 &residuals );
 
     /** @brief Fits a straight track for a given set of stations
@@ -148,7 +148,7 @@ class PatternRecognition {
      */
     void make_helix(const int num_points, const std::vector<int> ignore_stations,
                     std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
-                    std::vector<SciFiStraightPRTrack> &trks);
+                    std::vector<SciFiHelicalPRTrack> &trks);
 
     /** @brief Find points from intermediate stations which fit to the "trial track"
      *
@@ -182,7 +182,7 @@ class PatternRecognition {
      */
     void calculate_dipangle(const std::vector<SciFiSpacePoint*> &spnts,
                             const SimpleCircle &circle, std::vector<double> &dphi,
-                            SimpleLine &line_sz);
+                            SimpleLine &line_sz, double &Phi_0);
 
     /** @brief Calculate the turning angle of a spacepoint w.r.t. helix center
      *
@@ -217,7 +217,7 @@ class PatternRecognition {
      *  @param dz_ji - dz_j - dz_i where j > i
      *
      */
-    bool AB_ratio(double &dphi_kj, double &dphi_ji, double dz_kj, double dz_ji);
+    bool AB_ratio(double &dphi_ji, double &dphi_kj, double dz_ji, double dz_kj);
 
     /** @brief Changes dphi vector to ds vector
      *
@@ -257,7 +257,7 @@ class PatternRecognition {
      *  @param zi - Helix value z at point i
      *
      */
-    void helix_function_at_i(double R, double phi_0, double tan_lambda, double A, double B,
+    void helix_function_at_i(double R, double phi_0, double dsdz, double A, double B,
                              double C, double phi_i, double &xi, double &yi, double &zi);
 
     /** @brief Calculates helix chisq
@@ -275,7 +275,7 @@ class PatternRecognition {
      */
     double calculate_chisq(const std::vector<SciFiSpacePoint*> &spnts,
                            const std::vector<double> &turning_angles, double Phi_0,
-                           double tan_lambda, double R);
+                           double dsdz, double R);
 
     /** @brief Calculates the adjustments to the seed parameters
      *
@@ -297,8 +297,8 @@ class PatternRecognition {
      *
      */
     void calculate_adjustments(const std::vector<SciFiSpacePoint*> &spnts,
-                               const std::vector<double> &turning_angles, double &R, double &phi_0,
-                               double &tan_lambda, double &dR, double &dphi_0, double &dtan_lambda);
+                               const std::vector<double> &turning_angles, double R, double phi_0,
+                               double tan_lambda, double &dR, double &dphi_0, double &dtan_lambda);
 
     /** @brief Determine which two stations the initial line should be drawn between
      * 
@@ -317,6 +317,27 @@ class PatternRecognition {
      */
     void set_end_stations(const std::vector<int> ignore_stations,
                           int &outer_station_num, int &inner_station_num);
+
+    /** @brief Determine which three stations the initial circle should be fit to
+     *
+     *  The initial circle is to be fit between the two outermost stations being used, and a middle
+     *  station needs to be picked as well (need three points for a circle fit).
+     *  This in turn depends on which stations are presently being ignored
+     *  e.g. for a 5 pt track, station 5 and station 1 are always  the outer and inner
+     *  stations respectively, and station 3 is the middle station.
+     *  This function returns the correct outer, inner, and middle
+     *  station numbers, given which stations are presently being ignored.
+     *
+     *  NB Stations are number 0 - 4 in the code, not 1 - 5 as in the outside world
+     *
+     *  @param ignore_stations - Vector of ints, holding which stations should be ignored
+     *  @param outer_station_num - The outermost station number used for a given track fit
+     *  @param inner_station_num - The innermost station number used for a given track fit
+     *  @param middle_station_num - the middle station number used for a given track fit
+     *
+     */
+    void set_seed_stations(const std::vector<int> ignore_stations, int &outer_station_num,
+                           int &inner_station_num, int &middle_station_num);
 
     /** @brief Create a 2D vector of SciFi spacepoints sorted by tracker station
      *
@@ -359,13 +380,15 @@ class PatternRecognition {
     bool add_residuals(const bool passed, const double dx, const double dy,
                        std::vector< std::vector<int> > &residuals);
 
+    double parabola_fit(const std::vector<double> chisqs, const std::vector<double> Dparams);
+
     static const int _n_trackers = 2;
     static const int _n_stations = 5;
     static const int _n_bins = 100;         // Number of bins in each residuals histogram
     static const double _sd_1to4 = 0.3844;  // Position error associated with stations 1 through 4
     static const double _sd_5 = 0.4298;     // Position error associated with station 5
     static const double _res_cut = 10;      // Road cut for linear fit in mm
-    static const double _R_res_cut = 14;    // Road cut for circle radius in mm
+    static const double _R_res_cut = 20.;    // Road cut for circle radius in mm
     static const double _chisq_cut = 15;    // Cut on the chi^2 of the least squares fit in mm
     static const double _AB_cut = .1;       // Need to calculate appropriate cut here!!!
     static const double _sd_phi_1to4 = 1.;  // Still needs to be calculated!!!!

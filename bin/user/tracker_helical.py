@@ -20,11 +20,15 @@ import MAUS
 
 def run(data_path, run_num):
 
-    my_input = MAUS.InputCppDAQOfflineData(data_path, run_num)
+    # input_file = open('helixspacepoints_10000_at200pz_fullrange.txt', 'r')
+
+    input_file = open('bfield.out', 'r')
+
+    my_input = MAUS.InputPyJSON(input_file)
 
     my_map = MAUS.MapPyGroup()
 
-    my_map.append(MAUS.MapCppPatternRecognition())  # SciFi recon for helical tracks
+    my_map.append(MAUS.MapCppPatternRecognition())  # SciFi recon
 
     datacards = io.StringIO(u"")
 
@@ -37,8 +41,8 @@ if __name__ == '__main__':
     raise Exception('InitializeFail', 'MAUS_ROOT_DIR unset!')
 
   # Temporary values for the data path and data file
-  data_path = os.environ.get("MAUS_ROOT_DIR") + '/bin/user/summer'
-  data_file = 'helical_spacepoints.txt'
+  data_path = os.environ.get("MAUS_ROOT_DIR") + ''
+  data_file = 'helixspacepoints_test_2.txt'
 
   # Check command line arguments for path to data and file name
   if len(sys.argv) == 1:

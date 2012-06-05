@@ -59,10 +59,71 @@ std::string MapCppPatternRecognition::process(std::string document) {
 
   try {
     root = JsonWrapper::StringToJson(document);
-    Json::Value spacepoints_array = JsonWrapper::GetProperty(root, "spacepoints",
-                                                              JsonWrapper::arrayValue);
+  //  Json::Value spacepoints_array = JsonWrapper::GetProperty(root, "spacepoints",
+  //                                                            JsonWrapper::arrayValue);
+    Json::Value spacepoints_value = JsonWrapper::GetProperty(root, "space_points",
+                                                             JsonWrapper::objectValue);
+
+    Json::Value spacepoints_array = JsonWrapper::GetProperty(spacepoints_value, "tracker1",
+                                                             JsonWrapper::arrayValue);
+
+  /*  Json::Value mc = JsonWrapper::GetProperty(root, "mc", JsonWrapper::arrayValue);
+    for ( int i = 0; i < mc.size(); ++i ) {
+      Json::Value mc_event = mc[i];
+      Json::Value scifi_hits = JsonWrapper::GetProperty(mc_event, "sci_fi_hits", JsonWrapper::arrayValue);
+      for (int j = 0; j < scifi_hits.size(); ++j) {
+        int station_no, tracker_no, plane_no, fibre_no;
+        CLHEP::Hep3Vector momentum, position;
+        tracker_no = scifi_hits[j]["channel_id"]["tracker_number"].asInt();
+        station_no = scifi_hits[j]["channel_id"]["station_number"].asInt();
+        plane_no = scifi_hits[j]["channel_id"]["plane_number"].asInt();
+        fibre_no = scifi_hits[j]["channel_id"]["fibre_number"].asInt();
+        momentum = JsonWrapper::JsonToThreeVector(scifi_hits[j]["momentum"]);
+        position = JsonWrapper::JsonToThreeVector(scifi_hits[j]["position"]);
+
+        double px = momentum.x();
+        double py = momentum.y();
+        double pz = momentum.z();
+        double pt = sqrt((px*px)+(py*py));
+       // mc_test[tracker_no][station_no][plane_no][fibre_no].push_back(momentum);
+       if (tracker_no ==0 && plane_no == 0) {
+        std::ofstream outdR("mc_helical.txt", std::ios::out | std::ios::app);
+        outdR << tracker_no << "\t" <<station_no << "\t" <<plane_no << "\t" <<fibre_no << "\t" << pt << "\t" << pz <<std::endl;}
+        }*/
+   /*     for (int j = 0; j < 2; ++j) {
+          for ( int k = 0; k < 5; ++k ) {
+            for ( int l = 0; l < 3; ++l ) {
+              for ( int m = 0; m < 1484; ++m ) {
+                int N =  mc_test[j][k][l][m].size();
+                if ( mc_test[j][k][l][m].size() > 1 ) {
+                  std::cout << "fiber no = " << m << std::endl;
+                  double px_avg = 0.;
+                  double py_avg = 0.;
+                  double pz_avg = 0.;
+                  for ( int n = 0; n <  N; ++n ) {
+                    px_avg += mc_test[j][k][l][m][n].x();
+                    py_avg += mc_test[j][k][l][m][n].y();
+                    pz_avg += mc_test[j][k][l][m][n].z();
+                    std::cout << mc_test[j][k][l][m][n].x() << " , ";
+                    std::cout << mc_test[j][k][l][m][n].y() << " , ";
+                    std::cout << mc_test[j][k][l][m][n].z() << std::endl;
+                  }
+                  px_avg = px_avg/N;
+                  py_avg = py_avg/N;
+                  pz_avg = pz_avg/N;
+                  CLHEP::Hep3Vector boom( px_avg, py_avg, pz_avg);
+                  std::cout <<"Average = " << boom << std::endl;
+                  mc_test[j][k][l][m].clear();
+       //           mc_test[j][k][l][m].push_back(boom);
+                }
+              }
+            }
+          }
+        }*/
+    // }
     // assert(spacepoints_array.isArray());
     make_SciFiSpill(spacepoints_array, spill);
+    std::cout<< "number of events in spill is " << spill.events().size() <<std::endl;
     // digitization(spill, root);
   } catch(...) {
     Json::Value errors;
@@ -78,6 +139,18 @@ std::string MapCppPatternRecognition::process(std::string document) {
       // Pattern Recognition.
       if ( event.spacepoints().size() ) {
         std::cout << "Calling Pattern Recognition..." << std::endl;
+        if (event.spacepoints().size() < 3) {
+          std::ofstream out1("params_recon.txt", std::ios::out | std::ios::app);
+          out1 << "Less than 3 spacepoints in event" << std::endl;
+        }
+        std::ofstream out("circle.txt", std::ios::out | std::ios::app);
+        for ( int l = 0; l < event.spacepoints().size(); ++l ) {
+          out << event.spacepoints()[l]->get_position().x() << "\t";
+        }
+        for ( int l = 0; l < event.spacepoints().size(); ++l ) {
+          out << event.spacepoints()[l]->get_position().y() << "\t";
+        }
+        out << std::endl;
         pattern_recognition(event);
       }
 
@@ -106,16 +179,44 @@ void MapCppPatternRecognition::make_SciFiSpill(Json::Value spacepoint_array, Sci
       int tracker, station;
       CLHEP::Hep3Vector position;
       tracker  = spacepoint["tracker"].asInt();
+      // tracker -= 1;
       station  = spacepoint["station"].asInt();
+      double _x, _y, _z;
+      // Protection against improper input not being of form 0.0, where the decimal is important!
+      if ( spacepoint["position"]["x"].isInt() || spacepoint["position"]["y"].isInt()
+           || spacepoint["position"]["z"].isInt() ) {
+        if ( spacepoint["position"]["x"].isInt() ) {
+          int tmpx = spacepoint["position"]["x"].asInt();
+          _x = static_cast<double>(tmpx);
+          _x +=.0001;
+          double _y = spacepoint["position"]["y"].asDouble();
+        } else if ( spacepoint["position"]["y"].isInt() ) {
+          int tmpy = spacepoint["position"]["y"].asInt();
+          _y = static_cast<double>(tmpy);
+          _y +=.0001;
+          double _x = spacepoint["position"]["x"].asDouble();
+        } else if ( spacepoint["position"]["x"].isInt() && spacepoint["position"]["y"].isInt() ) {
+          int tmpx = spacepoint["position"]["x"].asInt();
+          _x = static_cast<double>(tmpx);
+          _x +=.0001;
+          int tmpy = spacepoint["position"]["y"].asInt();
+          _y = static_cast<double>(tmpy);
+          _y +=.0001;
+        }
+        _z = spacepoint["position"]["z"].asDouble();
+        CLHEP::Hep3Vector pos(_x, _y, _z);
+        position = pos;
+      } else {
       position = JsonWrapper::JsonToThreeVector(spacepoint["position"]);
-       // creates spacepoint pointer and initializes used condition to false
+      std::cout << position <<std::endl;
+      }
+      // creates spacepoint pointer and initializes used condition to false
       SciFiSpacePoint* a_spacepoint = new SciFiSpacePoint();
       a_spacepoint->set_position(position);
       a_spacepoint->set_tracker(tracker);
       a_spacepoint->set_station(station);
-
       an_event->add_spacepoint(a_spacepoint);
-    } // ends loop over spacepoints in the event
+     }     // ends loop over spacepoints in the event
     spill.add_event(an_event);
   } // ends loop over events.
 }
