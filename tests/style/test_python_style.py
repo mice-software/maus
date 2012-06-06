@@ -149,6 +149,7 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
             if key not in ref_dict:
                 print 'FAILS:\nExpected: 0 found:', err_dict[key], \
                                                              'errors', key
+                passes = False
 
             elif err_dict[key] != ref_dict[key]:
                 if err_dict[key] > ref_dict[key]:

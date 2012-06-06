@@ -109,6 +109,10 @@ class JsonWrapper {
    */
   static JsonType ValueTypeToJsonType(Json::ValueType tp);
 
+  /** @brief Convert from Json::Value type to string
+   */
+  static std::string ValueTypeToString(Json::ValueType tp);
+
   /** @brief Convert from JsonType to Json::ValueType
    */
   static Json::ValueType JsonTypeToValueType(JsonType tp) throw(Squeal);

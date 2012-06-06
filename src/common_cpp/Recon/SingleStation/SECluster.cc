@@ -21,6 +21,8 @@
 SECluster::SECluster(): _used(false) {}
 
 SECluster::SECluster(SEDigit *digit):_used(false),
+                                     _spill(digit->get_spill()),
+                                     _event(digit->get_event()),
                                      _plane(digit->get_plane()),
                                      _channel_w(digit->get_channel()),
                                      _npe(digit->get_npe()),

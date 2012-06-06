@@ -30,7 +30,10 @@ def run(data_path, run_num):
 
     my_output = MAUS.OutputPyJSON()
 
-    MAUS.Go(my_input, my_map, MAUS.ReducePyDoNothing(), my_output, datacards)
+    my_reduce = MAUS.ReducePyDoNothing()
+    # my_reduce = MAUS.ReduceCppPatternRecognition()
+
+    MAUS.Go(my_input, my_map, my_reduce, my_output, datacards)
 
 if __name__ == '__main__':
   if not os.environ.get("MAUS_ROOT_DIR"):

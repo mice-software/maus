@@ -19,6 +19,8 @@
 
 #include <vector>
 
+#include "Rtypes.h" // ROOT
+
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
 
 namespace MAUS {
@@ -42,7 +44,7 @@ class Step {
     Step& operator=(const Step& step);
 
     /** Destructor - does nothing */
-    ~Step();
+    virtual ~Step();
 
     /** Returns the position of the step */
     ThreeVector GetPosition() const;
@@ -93,9 +95,9 @@ class Step {
     double _time;
     double _energy;
     double _energy_deposited;
-};
 
-typedef std::vector<Step> StepArray;
+    ClassDef(Step, 1)
+};
 }
 
 #endif

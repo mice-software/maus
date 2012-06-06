@@ -21,8 +21,10 @@
 
 SciFiDigit::SciFiDigit():_used(false) {}
 
-SciFiDigit::SciFiDigit(int tracker, int station, int plane, int channel, double npe, double time )
-                       :_tracker(tracker), _station(station), _plane(plane),
+SciFiDigit::SciFiDigit(int spill, int event, int tracker, int station,
+                       int plane, int channel, double npe, double time )
+                       :_spill(spill), _event(event),
+                        _tracker(tracker), _station(station), _plane(plane),
                         _channel(channel), _npe(npe), _time(time), _used(false) {
 }
 

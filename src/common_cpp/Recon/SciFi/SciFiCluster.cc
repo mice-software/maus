@@ -21,6 +21,8 @@
 SciFiCluster::SciFiCluster(): _used(false) {}
 
 SciFiCluster::SciFiCluster(SciFiDigit *digit):_used(false),
+                                              _spill(digit->get_spill()),
+                                              _event(digit->get_event()),
                                               _tracker(digit->get_tracker()),
                                               _station(digit->get_station()),
                                               _plane(digit->get_plane()),

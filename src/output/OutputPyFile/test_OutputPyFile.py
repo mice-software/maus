@@ -120,8 +120,7 @@ class OutputPyFileTestCase(unittest.TestCase): # pylint: disable=R0904
         Test "birth" with "output_file_name".
         @param self Object reference.
         """
-        success = \
-            self.__worker.birth("""{"output_file_name":"test_name"}""")
+        self.__worker.birth("""{"output_file_name":"test_name"}""")
         self.assertEquals("test_name", self.__worker.file_name, 
             "Unexpected worker.file_name")
 
@@ -130,8 +129,7 @@ class OutputPyFileTestCase(unittest.TestCase): # pylint: disable=R0904
         Test "birth" with "output_file_extension".
         @param self Object reference.
         """
-        success = \
-            self.__worker.birth("""{"output_file_extension":"test_ext"}""")
+        self.__worker.birth("""{"output_file_extension":"test_ext"}""")
         self.assertEquals("test_ext", self.__worker.file_extension, 
             "Unexpected worker.file_extension")
 
@@ -144,7 +142,7 @@ class OutputPyFileTestCase(unittest.TestCase): # pylint: disable=R0904
         birth_doc["output_file_name"] = "test_outputpyfile_auto"
         birth_doc["output_file_extension"] = "json"
         birth_doc["output_file_auto_number"] = True
-        success = self.__worker.birth(json.dumps(birth_doc))
+        self.__worker.birth(json.dumps(birth_doc))
         expected = []
         for i in range(0, 3):
             name = '%s%06d.%s' % \
@@ -163,7 +161,7 @@ class OutputPyFileTestCase(unittest.TestCase): # pylint: disable=R0904
         birth_doc = {}
         birth_doc["output_file_name"] = "test_outputpyfile"
         birth_doc["output_file_extension"] = "json"
-        success = self.__worker.birth(json.dumps(birth_doc))
+        self.__worker.birth(json.dumps(birth_doc))
         for i in range(0, 3):
             json_doc = {"test_output_py_file": i}
             json_str = json.dumps(json_doc)
@@ -209,8 +207,6 @@ class OutputPyFileTestCase(unittest.TestCase): # pylint: disable=R0904
         # Clean up any temporary directories and files.
         if (self.__tmpdir != ""):
             shutil.rmtree(self.__tmpdir)
-        pattern = '%s*.%s' % \
-            (self.__worker.file_name, self.__worker.file_extension)
         for afile in os.listdir(os.getcwd()):
             if fnmatch.fnmatch(afile, '*.%s' % self.__worker.file_extension):
                 os.remove(afile)

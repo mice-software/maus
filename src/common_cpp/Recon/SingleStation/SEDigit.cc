@@ -21,9 +21,10 @@
 
 SEDigit::SEDigit():_used(false) {}
 
-SEDigit::SEDigit(int plane, int channel, double npe, double time )
-                 :_plane(plane), _channel(channel), _npe(npe),
-                  _time(time), _used(false) {
+SEDigit::SEDigit(int spill, int event, int plane, int channel, double npe, double time, int adc)
+                 :_spill(spill), _event(event),
+                  _plane(plane), _channel(channel), _npe(npe),
+                  _time(time), _adc(adc), _used(false) {
 }
 
 SEDigit::~SEDigit() {}

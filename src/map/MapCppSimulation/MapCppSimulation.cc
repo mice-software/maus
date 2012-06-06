@@ -56,9 +56,10 @@ std::string MapCppSimulation::process(std::string document) {
     if (_doVis) {
         MAUS::MAUSGeant4Manager::GetInstance()->GetVisManager()->SetupRun();
     }
-    Json::Value mc   = JsonWrapper::GetProperty
-                                        (spill, "mc", JsonWrapper::arrayValue);
-    spill["mc"] = MAUS::MAUSGeant4Manager::GetInstance()->RunManyParticles(mc);
+    Json::Value mc = JsonWrapper::GetProperty
+                                  (spill, "mc_events", JsonWrapper::arrayValue);
+    spill["mc_events"] =
+                   MAUS::MAUSGeant4Manager::GetInstance()->RunManyParticles(mc);
     if (_doVis)
         MAUS::MAUSGeant4Manager::GetInstance()->GetVisManager()->TearDownRun();
   }

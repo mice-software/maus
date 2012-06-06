@@ -2,6 +2,8 @@
 
 \usepackage{tabularx}
 \usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{hyperref}
 \begin{document}
 
 \vspace*{2.0cm}
@@ -12,9 +14,15 @@
 \Large{ \bf{User Guide} }
 \end{center}
 
-%\chapter{Running for the First Time}
-%\include{first_time_running}
+\tableofcontents
 
+\newpage
+
+\chapter{Introduction}
+\include{introduction}
+
+\chapter{Data Structure}
+\input{data_structure}
 
 \chapter{Monte Carlo}
 \input{simulation}

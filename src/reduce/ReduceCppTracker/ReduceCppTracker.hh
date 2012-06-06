@@ -68,19 +68,14 @@ class ReduceCppTracker {
   */
   std::string process(std::string document);
 
-  void light_yield(Json::Value &root);
+  void show_light_yield(Json::Value const &root);
+
+  void show_efficiency(Json::Value const &root);
 
  private:
-
-  Json::Value GetPartEvent(Json::Value root, std::string entry_type,
-                           std::string detector, int part_event);
-
   std::string _classname;
-  std::string _filename;
 
   int _nSpills;
-
-  void Save();
 
   TTree _digits;
   double _npe;

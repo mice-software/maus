@@ -238,36 +238,36 @@ class MapPyBeamMaker: #pylint: disable=R0902
         no branch, make one. If branch is of wrong type, raise a KeyError.
         Returns a copy of the spill
         """
-        if "mc" not in spill:
-            spill["mc"] = []
-        if type(spill["mc"]) != type([]):
-            raise KeyError("mc branch should be an array type")
+        if "mc_events" not in spill:
+            spill["mc_events"] = []
+        if type(spill["mc_events"]) != type([]):
+            raise KeyError("mc_events branch should be an array type")
         return spill
 
     def __process_gen_empty(self, spill):
         """
         Generate empty primaries
         """
-        spill_length = len(spill["mc"])
+        spill_length = len(spill["mc_events"])
         if self.particle_generator == "overwrite_existing":
-            for particle in spill["mc"]:
+            for particle in spill["mc_events"]:
                 particle["primary"] = {}
-            return spill["mc"]
+            return spill["mc_events"]
         elif self.particle_generator == "binomial":
             n_p = numpy.random.binomial(self.binomial_n, self.binomial_p)
             for i in range(n_p): #pylint: disable=W0612
-                spill["mc"].append({"primary":{}})
+                spill["mc_events"].append({"primary":{}})
         elif self.particle_generator == "counter":
             for a_beam in self.beams:
                 for i in range(a_beam.n_particles_per_spill):
-                    spill["mc"].append({"primary":{}})
+                    spill["mc_events"].append({"primary":{}})
         elif self.particle_generator == "file":
             for i in range(self.file_particles_per_spill):
-                spill["mc"].append({"primary":{}})
+                spill["mc_events"].append({"primary":{}})
         else:
             raise RuntimeError("Didn't recognise particle_generator command "+\
                                str(self.particle_generator))
-        return spill["mc"][spill_length:]
+        return spill["mc_events"][spill_length:]
 
     def __process_choose_beam(self, index):
         """

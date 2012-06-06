@@ -33,6 +33,8 @@ SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2, Sci
   _channels.push_back(clust2);
   _channels.push_back(clust3);
 
+  _spill   = clust1->get_spill();
+  _event   = clust1->get_event();
   _npe = clust1->get_npe()+clust2->get_npe()+clust3->get_npe();
   _tracker = clust1->get_tracker();
   _station = clust1->get_station();
@@ -52,6 +54,8 @@ SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2) {
   _channels.push_back(clust1);
   _channels.push_back(clust2);
 
+  _spill   = clust1->get_spill();
+  _event   = clust1->get_event();
   _tracker = clust1->get_tracker();
   _station = clust1->get_station();
   _npe = clust1->get_npe()+clust2->get_npe();

@@ -199,11 +199,13 @@ std::string InputCppDAQData::getCurEvent() {
   }
 
   // Finally attach the spill to the document root
-  xDocRoot["daq_data"] = xDocSpill;
-  xDocRoot["spill_num"] = _dataProcessManager.GetSpillNumber();
+  if (xDocSpill.type() != Json::nullValue) {
+    xDocRoot["daq_data"] = xDocSpill;
+  }
+  xDocRoot["spill_number"] = _dataProcessManager.GetSpillNumber();
   unsigned int event_type = _dataProcessManager.GetEventType();
   xDocRoot["daq_event_type"] = event_type_to_str(event_type);
-  xDocRoot["run_num"] = _dataProcessManager.GetRunNumber();
+  xDocRoot["run_number"] = _dataProcessManager.GetRunNumber();
   // cout << xDocRoot << endl;
 
   _eventsCount++;

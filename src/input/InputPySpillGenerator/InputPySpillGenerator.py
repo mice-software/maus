@@ -62,13 +62,12 @@ class InputPySpillGenerator:
         while self._current_event < self._number_of_events:
             # remove \n and whitespace
             next_value = {}
-            next_value["spill_num"] = self._current_event+1
-            next_value["run_num"] = self._run_number
+            next_value["spill_number"] = self._current_event+1
+            next_value["run_number"] = self._run_number
             next_value["daq_event_type"] = "physics_event"
-
+            self._current_event += 1
             # yield the current event (google 'python generators' if confused)
             yield json.dumps(next_value)
-            self._current_event += 1
 
 
     def death(self):

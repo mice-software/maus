@@ -60,6 +60,14 @@ class SECluster {
   */
   void add_digit(SEDigit* neigh);
 
+  void set_spill(int spill) { _spill = spill; }
+
+  int get_spill()  const  { return _spill; }
+
+  void set_event(int event) { _event = event; }
+
+  int get_event()  const  { return _event;   }
+
   void set_plane(int planeNo) { _plane = planeNo; }
 
   int get_plane()  const  { return _plane;   }
@@ -89,6 +97,8 @@ class SECluster {
   Hep3Vector get_position() const { return _position; }
 
  private:
+  int _spill, _event;
+
   bool _used;
 
   int _plane;

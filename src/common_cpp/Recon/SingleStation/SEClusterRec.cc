@@ -25,12 +25,12 @@ SEClusterRec::SEClusterRec(int cluster_exception, double min_npe)
 
 SEClusterRec::~SEClusterRec() {}
 
-void SEClusterRec::process(SEEvent &evt, std::vector<const MiceModule*> modules) {
+void SEClusterRec::process(SEEvent *evt, std::vector<const MiceModule*> modules) {
   // Create and fill the seeds vector.
   std::vector<SEDigit*>   seeds;
-  for ( unsigned int dig = 0; dig < evt.digits().size(); dig++ ) {
-    if ( evt.digits()[dig]->get_npe() > _min_npe/2.0 )
-      seeds.push_back(evt.digits()[dig]);
+  for ( unsigned int dig = 0; dig < evt->digits().size(); dig++ ) {
+    if ( evt->digits()[dig]->get_npe() > _min_npe/2.0 )
+      seeds.push_back(evt->digits()[dig]);
   }
 
   // Get the number of clusters. If too large, abort reconstruction.
@@ -51,8 +51,7 @@ void SEClusterRec::process(SEEvent &evt, std::vector<const MiceModule*> modules)
       double pe   = seed->get_npe();
       // Look for a neighbour.
       for ( int j = i+1; j < seeds_size; j++ ) {
-        if ( !seeds[j]->is_used() && seeds[j]->get_plane() == plane &&
-             abs(seeds[j]->get_channel() - fibre) < 2 ) {
+        if ( are_neighbours(seeds[i], seeds[j]) ) {
           neigh = seeds[j];
         }
       }
@@ -61,13 +60,13 @@ void SEClusterRec::process(SEEvent &evt, std::vector<const MiceModule*> modules)
         pe += neigh->get_npe();
       }
       // Save cluster if it's above npe cut.
-      if ( pe > _min_npe ) {
+      if ( pe > 2.0 ) {
         SECluster* clust = new SECluster(seed);
         if ( neigh ) {
           clust->add_digit(neigh);
         }
         construct(clust, modules);
-        evt.add_cluster(clust);
+        evt->add_cluster(clust);
       }
     }
   } // ends loop over seeds
@@ -77,6 +76,7 @@ void SEClusterRec::construct(SECluster *clust, std::vector<const MiceModule*> mo
   Hep3Vector perp(-1., 0., 0.);
   Hep3Vector dir(0, 1, 0);
   const MiceModule* this_plane = NULL;
+  // std::cout << "Modules size: "  << modules.size() << std::endl;
   for ( unsigned int j = 0; !this_plane && j < modules.size(); j++ ) {
     // Find the right module
     if ( modules[j]->propertyInt("Plane") ==
@@ -85,6 +85,7 @@ void SEClusterRec::construct(SECluster *clust, std::vector<const MiceModule*> mo
       this_plane = modules[j];
     }
   }
+  // std::cout << clust->get_plane() << std::endl;
 
   assert(this_plane != NULL);
 
@@ -100,6 +101,20 @@ void SEClusterRec::construct(SECluster *clust, std::vector<const MiceModule*> mo
   // The position in the (x, y) plane.
   clust->set_position(position);
   clust->set_direction(dir);
+}
+
+bool SEClusterRec::are_neighbours(SEDigit *seed_i, SEDigit *seed_j) {
+  bool neigh = false;
+
+  if ( !seed_j->is_used() && // seed is unused
+       seed_j->get_spill() == seed_i->get_spill() && // same spill
+       seed_j->get_event() == seed_i->get_event() && // same event
+       seed_j->get_plane() == seed_i->get_plane() && // seeds belong to same plane
+       abs(seed_j->get_channel() - seed_i->get_channel()) < 2.0 ) { // and are neighbours
+    neigh = true;
+  }
+
+  return neigh;
 }
 
 // } // ~namespace MAUS

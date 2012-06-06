@@ -43,6 +43,11 @@
 #include "TGFrame.h"
 #include "TVirtualPad.h"
 #include "TFrame.h"
+#include "TH2F.h"
+#include "TH1F.h"
+
+#include "Interface/Squeak.hh"
+#include "Interface/Squeal.hh"
 
 class ReduceCppSingleStation {
 
@@ -68,22 +73,101 @@ class ReduceCppSingleStation {
   */
   std::string process(std::string document);
 
- private:
+  void unpacked_data_histograms(Json::Value root);
 
-  Json::Value GetPartEvent(Json::Value root, std::string entry_type,
-                           std::string detector, int part_event);
+  void digits_histograms(Json::Value root);
+
+  void doublet_clusters_histograms(Json::Value root);
+
+  void draw_spacepoints(Json::Value root);
+
+  bool is_physics_daq_event(Json::Value root);
+
+  void count_particle_events(Json::Value root);
+
+  void compute_station_efficiencies(Json::Value root);
+ private:
+  TGraph *_graph;
+  TGraph *_station;
+  TGraph *_plane0;
+  TGraph *_plane1;
+  TGraph *_plane2;
+
+  int _spill_counter;
+
+  TH2F *triplets;
+
+  TH2F *duplets;
+
+  TH2F *triplets_copy;
+
+  TH2F *duplets_copy;
+
+  TH1F *_hist_plane0;
+
+  TH1F *_hist_plane1;
+
+  TH1F *_hist_plane2;
+
+  TH1F *_chan_sum;
+
+  TH1F *_npe_plane0;
+
+  TH1F *_npe_plane1;
+
+  TH1F *_npe_plane2;
+
+  TH1F *_adc_plane0;
+
+  TH1F *_adc_plane1;
+
+  TH1F *_adc_plane2;
+
+  TH1F *_dig_npe_plane0;
+
+  TH1F *_dig_npe_plane1;
+
+  TH1F *_dig_npe_plane2;
 
   std::string _classname;
+
   std::string _filename;
 
   int _nSpills;
 
-  void Save();
-
   TTree _unpacked;
-  int _adc;
-  int _bank;
-  int _chan;
+  int _adc, _tdc, _bank, _chan, _activebank;
+
+  TTree _digits;
+  int _plane_dig, _adc_dig;
+  double _npe_dig, _channel_dig, _time;
+
+  TTree _doublet_clusters;
+  int _plane;
+  double _npe, _channel;
+
+  TTree _spacepoints;
+  TTree _spacepointscopy;
+  double _x, _y, _z, _pe;
+  int _type;
+
+  // Efficiencies.
+  double _plane_array[3];
+  double _station_eff[3];
+
+  int _plane_0_counter;
+  double _plane_0_map[214][2];
+  int _plane_0_hits;
+
+  int _plane_1_counter;
+  double _plane_1_map[214][2];
+  int _plane_1_hits;
+
+  int _plane_2_counter;
+  double _plane_2_map[214][2];
+  int _plane_2_hits;
+
+  double _channel_array[214];
 };
 
 #endif

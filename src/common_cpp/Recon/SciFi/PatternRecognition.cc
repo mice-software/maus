@@ -336,7 +336,7 @@ void PatternRecognition::make_straight_tracks(const int num_points,
 
                   add_residuals(false, dx, dy, residuals);
 
-                  // Apply roadcuts & find the spacepoints with the smallest residuals for the line
+                  // Apply roadcuts & find the spoints with the smallest residuals for the line
                   if ( fabs(dx) < _res_cut && fabs(dy) < _res_cut && delta_sq > (dx*dx + dy*dy) ) {
                     delta_sq = dx*dx + dy*dy;
                     good_spnts.push_back(spnts_by_station[station_num][sp_no]);

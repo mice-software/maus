@@ -61,10 +61,10 @@ class MapPyCkovTestCase(unittest.TestCase):# pylint: disable = R0904
         
     def test_process(self):
         """Check MapPyCkov process function"""
-        test2 = ('%s/src/map/MapPyCkov/goodmap.txt' %
+        test2 = ('%s/src/map/MapPyCkov/goodmap2.txt' %
                  os.environ.get("MAUS_ROOT_DIR"))
         fin = open(test2, 'r')
-        data = fin.read()
+        data = fin.readline()
         #test with some events.
         result = self.mapper.process(data)
         spill = json.loads(result)
@@ -73,10 +73,10 @@ class MapPyCkovTestCase(unittest.TestCase):# pylint: disable = R0904
             print 'no digits'
 
         #test the ckov output
-        n_part_events = int(len(spill['digits']['ckov'])) - 1
+        n_part_events = int(len(spill['recon_events'])) - 1
         #test there are no dupilcate events
-        last_part_event_number = \
-             spill['digits']['ckov'][n_part_events]['A']['part_event_number']
+        last_part_event_number = spill['recon_events'][-1]['ckov_event']\
+                                   ['ckov_digits'][-1]['A']['part_event_number']
         self.assertEqual(last_part_event_number, n_part_events)
 
     def tearDown(self): #pylint: disable = C0103

@@ -13,29 +13,31 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+MapPyDoNothing
 
-## @class MapPyDoNothing.MapPyDoNothing
-#  MapPyDoNothing does nothing except return input to output
-#
-#  Useful for debugging.
-#
-import json
+MapPyDoNothing does nothing except return input to output
+
+Intended for testing.
+"""
 
 class MapPyDoNothing:
-    def birth(self, argJsonConfigDocument):
+    """Test class for debugging"""
+
+    def __init__(self):
+        """Nothing to initialise"""
+        pass
+
+    def birth(self, input_json_config): # pylint: disable=W0613, R0201
+        """Nothing to birth, just returns true"""
         return True
 
-    ## process to pass input to output
-    def process(self, str):
-        # check if valid document
-        try:
-            doc = json.loads(str)
-        except ValueError:
-            doc = {"errors": {"bad_json_document": "unable to do json.loads on input"} }
+    def process(self, input_json_doc): # pylint: disable=R0201
+        """Just return the input"""
+        return input_json_doc
 
-        return json.dumps(doc)
-
-    def death(self):
+    def death(self): # pylint: disable=R0201
+        """Just return true"""
         return True
 
 

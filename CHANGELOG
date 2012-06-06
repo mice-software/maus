@@ -1,7 +1,26 @@
-MAUS-v0.2.1 (http://micewww.pp.rl.ac.uk/versions/show/21)
+MAUS-v0.2.3 (http://micewww.pp.rl.ac.uk/versions/show/26)
+  Bug #978: Simulation - Coloured Particles and Accumulated Tracks
+  Bug #989: GRID batch script incorrect file name
+  Bug #997: Some features in the data structure
+  Feature #689: Specify G4Beamline interface to MAUS
+  Feature #988: get_geometry_ids.py executable file
+
+MAUS-v0.2.3 (http://micewww.pp.rl.ac.uk/versions/show/25)
+  Bug #819: Copy pasting third_party means Python can't use site-packages
+  Bug #853: SpecialVirtual hit and TOF hit have different particle id field
+  Feature #589: ROOT IO
+  Feature #955: Online shifter documentation
+  Feature #956: Online recon machine spring clean
+
+MAUS-v0.2.2 (http://micewww.pp.rl.ac.uk/versions/show/24)
+  Feature #691: Online Data Quality (SSI collaborative effort)
+  Feature #706: Web-based interface for live execution monitoring
+  Feature #747: Document customisation of histogram reducer use case
+
+MAUS-v0.2.1 (http://micewww.pp.rl.ac.uk/versions/show/23)
   Bug #952: MAUS_0.2 build error
 
-MAUS-v0.2.0 (http://micewww.pp.rl.ac.uk/versions/show/21)
+MAUS-v0.2.0 (http://micewww.pp.rl.ac.uk/versions/show/22)
   Bug #498: Compiler warnings
   Bug #806: ReduceCpp... doesn't build
   Bug #862: PyRoot Plotting example

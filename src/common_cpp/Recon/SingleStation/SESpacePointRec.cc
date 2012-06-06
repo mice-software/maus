@@ -23,13 +23,13 @@ SESpacePointRec::SESpacePointRec() {}
 
 SESpacePointRec::~SESpacePointRec() {}
 
-void SESpacePointRec::process(SEEvent &evt) {
-  int tracker, station, plane;
-  int clusters_size = evt.clusters().size();
+void SESpacePointRec::process(SEEvent *evt) {
+  int plane;
+  int clusters_size = evt->clusters().size();
   // Store clusters in a vector.
   std::vector<SECluster*> clusters[3];
   for ( int cl = 0; cl < clusters_size; cl++ ) {
-    SECluster* a_cluster = evt.clusters()[cl];
+    SECluster* a_cluster = evt->clusters()[cl];
     plane   = a_cluster->get_plane();
     clusters[plane].push_back(a_cluster);
   }
@@ -55,19 +55,21 @@ void SESpacePointRec::process(SEEvent &evt) {
              clusters_are_not_used(candidate_A, candidate_B, candidate_C) ) {
           SESpacePoint* triplet = new SESpacePoint(candidate_A, candidate_B, candidate_C);
           build_triplet(triplet);
-          evt.add_spacepoint(triplet);
+          evt->add_spacepoint(triplet);
+          evt->set_part_event_no(triplet->get_event());
+          evt->set_phys_event_no(triplet->get_spill());
         }
       }  // ends plane 2
     }  // ends plane 1
   }  // ends plane 0
 
   // Run over left-overs and make duplets without any selection criteria
-  for ( int a_plane = 0; a_plane < 2; a_plane++ ) {
-    for ( int another_plane = a_plane+1; another_plane < 3; another_plane++ ) {
+  for ( int a_plane = 0; a_plane < 2; ++a_plane ) {
+    for ( int another_plane = a_plane+1; another_plane < 3; ++another_plane ) {
       // Make all possible combinations of doublet clusters from views 0 & 1
       // looping over all clusters in view 0, then 1
       for ( unsigned int cla = 0;
-            cla < clusters[a_plane].size(); cla++ ) {
+            cla < clusters[a_plane].size(); ++cla ) {
       SECluster* candidate_A =
                       (clusters[a_plane])[cla];
 
@@ -83,7 +85,9 @@ void SESpacePointRec::process(SEEvent &evt) {
                duplet_within_radius(candidate_A, candidate_B) ) {
             SESpacePoint* duplet = new SESpacePoint(candidate_A, candidate_B);
             build_duplet(duplet);
-            evt.add_spacepoint(duplet);
+            evt->add_spacepoint(duplet);
+            evt->set_part_event_no(duplet->get_event());
+            evt->set_phys_event_no(duplet->get_spill());
           }
         }
       }

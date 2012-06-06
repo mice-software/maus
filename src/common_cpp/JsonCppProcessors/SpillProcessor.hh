@@ -18,6 +18,7 @@
 #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_SPILLPROCESSOR_HH_
 
 #include <vector>
+#include <string>
 
 #include "json/value.h"
 
@@ -27,6 +28,7 @@
 #include "src/common_cpp/JsonCppProcessors/MCEventProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/PrimitivesProcessors.hh"
 #include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
+#include "src/common_cpp/JsonCppProcessors/ObjectMapProcessors.hh"
 
 #include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
@@ -48,7 +50,9 @@ class SpillProcessor : public ObjectProcessor<Spill> {
     EMRSpillDataProcessor _emr_proc;
     PointerArrayProcessor<MCEvent> _mc_array_proc;
     PointerArrayProcessor<ReconEvent> _recon_array_proc;
+    ObjectMapValueProcessor<std::string> _error_proc;
     IntProcessor _int_proc;
+    StringProcessor _string_proc;
 };
 }
 #endif
