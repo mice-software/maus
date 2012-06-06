@@ -40,6 +40,7 @@
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiStraightPRTrack.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiHelicalPRTrack.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiPRTrack.hh"
 
 // namespace MAUS {
 
@@ -74,7 +75,7 @@ class PatternRecognition {
      *  @param trks - A vector of the output Pattern Recognition tracks
      */
     void make_5tracks(std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
-                      std::vector<SciFiHelicalPRTrack> &trks, std::vector< std::vector<int> >
+                      std::vector<SciFiPRTrack> &trks, std::vector< std::vector<int> >
 &residuals );
 
     /** @brief Make Pattern Recognition tracks with 4 spacepoints
@@ -87,7 +88,7 @@ class PatternRecognition {
      *  @param trks - A vector of the output Pattern Recognition tracks
      */
     void make_4tracks(std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
-                      std::vector<SciFiHelicalPRTrack> &trks, std::vector< std::vector<int> >
+                      std::vector<SciFiPRTrack> &trks, std::vector< std::vector<int> >
 &residuals );
 
     /** @brief Make Pattern Recognition tracks with 3 spacepoints
@@ -100,7 +101,7 @@ class PatternRecognition {
      *  @param trks - A vector of the output Pattern Recognition tracks
      */
     void make_3tracks(std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
-                      std::vector<SciFiHelicalPRTrack>& trks, std::vector< std::vector<int> >
+                      std::vector<SciFiPRTrack>& trks, std::vector< std::vector<int> >
 &residuals );
 
     /** @brief Fits a straight track for a given set of stations
@@ -148,7 +149,7 @@ class PatternRecognition {
      */
     void make_helix(const int num_points, const std::vector<int> ignore_stations,
                     std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
-                    std::vector<SciFiHelicalPRTrack> &trks);
+                    std::vector<SciFiPRTrack> &trks);
 
     /** @brief Find points from intermediate stations which fit to the "trial track"
      *

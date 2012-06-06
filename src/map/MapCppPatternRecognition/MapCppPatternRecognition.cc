@@ -67,60 +67,6 @@ std::string MapCppPatternRecognition::process(std::string document) {
     Json::Value spacepoints_array = JsonWrapper::GetProperty(spacepoints_value, "tracker1",
                                                              JsonWrapper::arrayValue);
 
-  /*  Json::Value mc = JsonWrapper::GetProperty(root, "mc", JsonWrapper::arrayValue);
-    for ( int i = 0; i < mc.size(); ++i ) {
-      Json::Value mc_event = mc[i];
-      Json::Value scifi_hits = JsonWrapper::GetProperty(mc_event, "sci_fi_hits", JsonWrapper::arrayValue);
-      for (int j = 0; j < scifi_hits.size(); ++j) {
-        int station_no, tracker_no, plane_no, fibre_no;
-        CLHEP::Hep3Vector momentum, position;
-        tracker_no = scifi_hits[j]["channel_id"]["tracker_number"].asInt();
-        station_no = scifi_hits[j]["channel_id"]["station_number"].asInt();
-        plane_no = scifi_hits[j]["channel_id"]["plane_number"].asInt();
-        fibre_no = scifi_hits[j]["channel_id"]["fibre_number"].asInt();
-        momentum = JsonWrapper::JsonToThreeVector(scifi_hits[j]["momentum"]);
-        position = JsonWrapper::JsonToThreeVector(scifi_hits[j]["position"]);
-
-        double px = momentum.x();
-        double py = momentum.y();
-        double pz = momentum.z();
-        double pt = sqrt((px*px)+(py*py));
-       // mc_test[tracker_no][station_no][plane_no][fibre_no].push_back(momentum);
-       if (tracker_no ==0 && plane_no == 0) {
-        std::ofstream outdR("mc_helical.txt", std::ios::out | std::ios::app);
-        outdR << tracker_no << "\t" <<station_no << "\t" <<plane_no << "\t" <<fibre_no << "\t" << pt << "\t" << pz <<std::endl;}
-        }*/
-   /*     for (int j = 0; j < 2; ++j) {
-          for ( int k = 0; k < 5; ++k ) {
-            for ( int l = 0; l < 3; ++l ) {
-              for ( int m = 0; m < 1484; ++m ) {
-                int N =  mc_test[j][k][l][m].size();
-                if ( mc_test[j][k][l][m].size() > 1 ) {
-                  std::cout << "fiber no = " << m << std::endl;
-                  double px_avg = 0.;
-                  double py_avg = 0.;
-                  double pz_avg = 0.;
-                  for ( int n = 0; n <  N; ++n ) {
-                    px_avg += mc_test[j][k][l][m][n].x();
-                    py_avg += mc_test[j][k][l][m][n].y();
-                    pz_avg += mc_test[j][k][l][m][n].z();
-                    std::cout << mc_test[j][k][l][m][n].x() << " , ";
-                    std::cout << mc_test[j][k][l][m][n].y() << " , ";
-                    std::cout << mc_test[j][k][l][m][n].z() << std::endl;
-                  }
-                  px_avg = px_avg/N;
-                  py_avg = py_avg/N;
-                  pz_avg = pz_avg/N;
-                  CLHEP::Hep3Vector boom( px_avg, py_avg, pz_avg);
-                  std::cout <<"Average = " << boom << std::endl;
-                  mc_test[j][k][l][m].clear();
-       //           mc_test[j][k][l][m].push_back(boom);
-                }
-              }
-            }
-          }
-        }*/
-    // }
     // assert(spacepoints_array.isArray());
     make_SciFiSpill(spacepoints_array, spill);
     std::cout<< "number of events in spill is " << spill.events().size() <<std::endl;
@@ -263,44 +209,21 @@ void MapCppPatternRecognition::save_to_json(SciFiEvent &evt) {
   root["space_points"]["tracker1"].append(sp_tracker0);
   root["space_points"]["tracker2"].append(sp_tracker1);
 
-  // Straight Tracks.
-  Json::Value tracks_tracker0;
-  Json::Value tracks_tracker1;
-  for ( unsigned int track_i = 0; track_i < evt.straightprtracks().size(); track_i++ ) {
-    Json::Value a_track;
-    a_track["num_points"] = evt.straightprtracks()[track_i].get_num_points();
-    a_track["x0"] = evt.straightprtracks()[track_i].get_x0();
-    a_track["y0"] = evt.straightprtracks()[track_i].get_y0();
-    a_track["mx"] = evt.straightprtracks()[track_i].get_mx();
-    a_track["my"] = evt.straightprtracks()[track_i].get_my();
-    a_track["x_chisq"] = evt.straightprtracks()[track_i].get_x_chisq();
-    a_track["y_chisq"] = evt.straightprtracks()[track_i].get_y_chisq();
-    a_track["tracker"] = evt.straightprtracks()[track_i].get_tracker();
-    if ( evt.straightprtracks()[track_i].get_tracker() == 0 ) {
-      tracks_tracker0.append(a_track);
-    } else if ( evt.straightprtracks()[track_i].get_tracker() == 1 ) {
-      tracks_tracker1.append(a_track);
-    }
-  }
-  root["tracks"]["tracker1"].append(tracks_tracker0);
-  root["tracks"]["tracker2"].append(tracks_tracker1);
-
   // Helical Tracks.
   Json::Value h_tracks_tracker0;
   Json::Value h_tracks_tracker1;
-  for ( unsigned int track_i = 0; track_i < evt.helicalprtracks().size(); track_i++ ) {
+  for ( unsigned int track_i = 0; track_i < evt.prtracks().size(); track_i++ ) {
     Json::Value a_track;
-    a_track["num_points"] = evt.helicalprtracks()[track_i].get_num_points();
-    a_track["R"]          = evt.helicalprtracks()[track_i].get_R();
-    a_track["dzds"]       = evt.helicalprtracks()[track_i].get_dzds();
-    a_track["Phi_0"]      = evt.helicalprtracks()[track_i].get_phi0();
-    a_track["num_points"] = evt.helicalprtracks()[track_i].get_R();
-    a_track["starting_point"]["x"] = evt.helicalprtracks()[track_i].get_x0();
-    a_track["starting_point"]["y"] = evt.helicalprtracks()[track_i].get_y0();
-    a_track["starting_point"]["z"] = evt.helicalprtracks()[track_i].get_z0();
-    if ( evt.helicalprtracks()[track_i].get_tracker() == 0 ) {
+    a_track["num_points"] = evt.prtracks()[track_i].get_num_points();
+    a_track["R"]          = evt.prtracks()[track_i].get_R();
+    a_track["dzds"]       = evt.prtracks()[track_i].get_dzds();
+    a_track["Phi_0"]      = evt.prtracks()[track_i].get_phi0();
+    a_track["starting_point"]["x"] = evt.prtracks()[track_i].get_x0();
+    a_track["starting_point"]["y"] = evt.prtracks()[track_i].get_y0();
+    a_track["starting_point"]["z"] = evt.prtracks()[track_i].get_z0();
+    if ( evt.prtracks()[track_i].get_tracker() == 0 ) {
       h_tracks_tracker0.append(a_track);
-    } else if ( evt.helicalprtracks()[track_i].get_tracker() == 1 ) {
+    } else if ( evt.prtracks()[track_i].get_tracker() == 1 ) {
       h_tracks_tracker1.append(a_track);
     }
   }
@@ -312,8 +235,8 @@ void MapCppPatternRecognition::print_event_info(SciFiEvent &event) {
   std::cout << event.digits().size() << " "
             << event.clusters().size() << " "
             << event.spacepoints().size() << " "
-            << event.helicalprtracks().size() << " "
-        << event.straightprtracks().size() << " " << std::endl;
+            << event.prtracks().size() << " "
+            << std::endl;
 }
 
 // The following two functions are added for testing purposes only

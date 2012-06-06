@@ -70,7 +70,6 @@ class SciFiHelicalPRTrack {
 
     // Setters
     void set_spacepoints(std::vector<SciFiSpacePoint> spoints) { _spoints = spoints; }
-    // void set_r0(std::vector<double> r0) { _r0 = r0; }
 
     void set_x0(double x0) { _x0 = x0; }
     void set_y0(double y0) { _y0 = y0; }
