@@ -61,7 +61,7 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
     return writer.write(root);
   }
   // Check if the JSON document has a 'mc' branch, else return error
-  if (!root.isMember("mc")) {
+  if (!root.isMember("mc_events")) {
     Json::Value errors;
     std::stringstream ss;
     ss << _classname << " says:" << "I need an MC branch to simulate.";
@@ -71,7 +71,7 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
   }
 
   Json::Value mc;
-  mc = root.get("mc", 0);
+  mc = root.get("mc_events", 0);
   // check sanity of json input file and mc brach
   if ( !check_sanity_mc(mc) ) {
     // if bad, write error file
@@ -90,17 +90,16 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
     json_to_cpp(json_event, spill);
   } // ends loop particles
   // ================= Reconstruction =========================
-  for ( unsigned int k = 0; k < spill.events().size(); k++ ) {
-    SciFiEvent event = *(spill.events()[k]);
+  for ( unsigned int event_i = 0; event_i < spill.events().size(); event_i++ ) {
+    SciFiEvent event = *(spill.events()[event_i]);
 
-    // std::cout << "Hits in event: " << event.hits().size() << std::endl;
+    // std::cerr << "Hits in event: " << event.hits().size() << std::endl;
     if ( event.hits().size() ) {
       // for each fiber-hit, make a digit
       construct_digits(event);
     }
-    // std::cout << "Digits in Event: " << event.digits().size() << " " << std::endl;
-
-    save_to_json(event);
+    // std::cerr << "Digits in Event: " << event.digits().size() << " " << std::endl;
+    save_to_json(event, event_i);
   }
 
   // ==========================================================
@@ -314,19 +313,23 @@ bool MapCppTrackerMCDigitization::check_param(SciFiHit *hit1, SciFiHit *hit2) {
   }
 }
 
-void MapCppTrackerMCDigitization::save_to_json(SciFiEvent &evt) {
-  Json::Value js_event;
-  Json::Value digits_in_event;
-  for ( unsigned int evt_i = 0; evt_i < evt.digits().size(); evt_i++ ) {
-    Json::Value digits_in_event;
-    digits_in_event["tracker"]= evt.digits()[evt_i]->get_tracker();
-    digits_in_event["station"]= evt.digits()[evt_i]->get_station();
-    digits_in_event["plane"]  = evt.digits()[evt_i]->get_plane();
-    digits_in_event["channel"]= evt.digits()[evt_i]->get_channel();
-    digits_in_event["npe"]    = evt.digits()[evt_i]->get_npe();
-    digits_in_event["time"]   = evt.digits()[evt_i]->get_time();
-    js_event.append(digits_in_event);
+void MapCppTrackerMCDigitization::save_to_json(SciFiEvent &evt, int event_i) {
+  Json::Value digits_tracker0;
+  Json::Value digits_tracker1;
+  for ( unsigned int dig_i = 0; dig_i < evt.digits().size(); dig_i++ ) {
+    Json::Value digit;
+    int tracker = evt.digits()[dig_i]->get_tracker();
+    digit["tracker"]= tracker;
+    digit["station"]= evt.digits()[dig_i]->get_station();
+    digit["plane"]  = evt.digits()[dig_i]->get_plane();
+    digit["channel"]= evt.digits()[dig_i]->get_channel();
+    digit["npe"]    = evt.digits()[dig_i]->get_npe();
+    digit["time"]   = evt.digits()[dig_i]->get_time();
+    if ( tracker == 0 )
+      digits_tracker0.append(digit);
+    if ( tracker == 1 )
+      digits_tracker1.append(digit);
   }
-  if (!js_event.isNull())
-    root["tracker_digits"].append(js_event);
+  root["recon_events"][event_i]["sci_fi_event"]["sci_fi_digits"]["tracker0"] = digits_tracker0;
+  root["recon_events"][event_i]["sci_fi_event"]["sci_fi_digits"]["tracker1"] = digits_tracker1;
 }

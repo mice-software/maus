@@ -109,22 +109,29 @@ void MapCppTrackerRecon::digitization(SciFiSpill &spill, Json::Value &root) {
     Json::Value daq = root.get("daq_data", 0);
     RealDataDigitization real;
     real.process(spill, daq);
-  } else if ( root.isMember("tracker_digits") ) {
-    Json::Value digits = root.get("tracker_digits", 0);
+  } else if ( root.isMember("mc_events") ) {
+    // Json::Value digits = root.get("tracker_digits", 0);
+    Json::Value digits = root["recon_events"];
     fill_digits_vector(digits, spill);
   } else {
     throw 0;
   }
 }
 
-void MapCppTrackerRecon::fill_digits_vector(Json::Value &digits_event, SciFiSpill &a_spill) {
-  for ( unsigned int i = 0; i < digits_event.size(); i++ ) {
+void MapCppTrackerRecon::fill_digits_vector(Json::Value &mc_event, SciFiSpill &a_spill) {
+  int number_events = mc_event.size();
+  for ( unsigned int event_i = 0; event_i < number_events; event_i++ ) {
     SciFiEvent* an_event = new SciFiEvent();
-    Json::Value digits;
-    digits = digits_event[i];
-    for ( unsigned int j = 0; j < digits.size(); j++ ) {
+    // Json::Value digits;
+    Json::Value digits_tracker0 = mc_event[event_i]["sci_fi_event"]["sci_fi_digits"]["tracker0"];
+    Json::Value digits_tracker1 = mc_event[event_i]["sci_fi_event"]["sci_fi_digits"]["tracker1"];
+    Json::Value digits_merged = digits_tracker0;
+    for ( unsigned int idig = 0; idig < digits_tracker1.size(); ++idig ) {
+      digits_merged[digits_merged.size()] = digits_tracker1[idig];
+    }
+    for ( unsigned int j = 0; j < digits_merged.size(); j++ ) {
       Json::Value digit;
-      digit = digits[j];
+      digit = digits_merged[j];
       int tracker, station, plane, channel;
       double npe, time;
       int spill = 99;

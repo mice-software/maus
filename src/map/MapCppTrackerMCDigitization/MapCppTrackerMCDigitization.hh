@@ -102,7 +102,7 @@ class MapCppTrackerMCDigitization {
 
   /** @brief saves digits to json.
    */
-  void save_to_json(SciFiEvent &evt);
+  void save_to_json(SciFiEvent &evt, int event_i);
 
  private:
   /// This is the Mice Module

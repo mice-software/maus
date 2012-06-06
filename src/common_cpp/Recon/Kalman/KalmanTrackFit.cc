@@ -26,7 +26,10 @@ KalmanTrackFit::~KalmanTrackFit() {
 }
 
 bool sort_by_id(SciFiCluster *a, SciFiCluster *b ) {
-  return ( a->get_id() < b->get_id() );
+  if (a->get_tracker() == 0 )
+    return ( a->get_id() > b->get_id() ); //  descending order
+  if (a->get_tracker() == 1 )
+    return ( a->get_id() < b->get_id() ); //  ascending order
 }
 
 void KalmanTrackFit::process(SciFiEvent &event) {
@@ -174,6 +177,14 @@ void KalmanTrackFit::initialise(SciFiEvent &event, std::vector<KalmanSite> &site
   double mx = seed.get_mx();
   double my = seed.get_my();
   double p  = 210.0; // MeV/c
+
+  if ( (seed.get_spacepoints())[0].get_tracker() == 0 ) {
+    x0 = -x0;
+    y0 = -y0;
+    mx = -mx;
+    my = -my;
+  }
+
 
   std::vector<SciFiCluster*> clusters;
   process_clusters(event, clusters);
