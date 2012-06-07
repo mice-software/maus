@@ -61,8 +61,6 @@ class SciFiStraightPRTrack {
     int get_tracker() const { return _tracker; }
     int get_num_points() const { return _num_points; }
 
-    std::vector<double> get_vsl();
-
     // Setters
     void set_spacepoints(std::vector<SciFiSpacePoint> spoints) { _spoints = spoints; }
 
@@ -80,8 +78,6 @@ class SciFiStraightPRTrack {
 
   private:
     std::vector<SciFiSpacePoint> _spoints;
-
-    std::vector<double> _vsl;
 
     int _tracker;
     int _num_points;

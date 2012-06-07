@@ -31,13 +31,7 @@ SciFiStraightPRTrack::SciFiStraightPRTrack() {
 
   _tracker = -1;
   _num_points = -1;
-
-  _vsl.resize(4);
-  for ( int i = 0; i < static_cast<int>(_vsl.size()); ++i ) {
-    _vsl[i] = -1.0;
-  }
 }
-
 
 SciFiStraightPRTrack::SciFiStraightPRTrack(int tracker, int num_points,
                                            double x0, double mx, double x_chisq,
@@ -51,12 +45,6 @@ SciFiStraightPRTrack::SciFiStraightPRTrack(int tracker, int num_points,
 
   _num_points = num_points;
   _tracker = tracker;
-
-  _vsl.resize(4);
-  _vsl[0] = _x0;
-  _vsl[1] = _mx;
-  _vsl[2] = _y0;
-  _vsl[3] = _my;
 }
 
 SciFiStraightPRTrack::SciFiStraightPRTrack(int tracker, int num_points,
@@ -72,24 +60,10 @@ SciFiStraightPRTrack::SciFiStraightPRTrack(int tracker, int num_points,
 
   _num_points = num_points;
   _tracker = tracker;
-
-  _vsl.resize(4);
-  _vsl[0] = _x0;
-  _vsl[1] = _mx;
-  _vsl[2] = _y0;
-  _vsl[3] = _my;
 }
 
 // Destructor
 SciFiStraightPRTrack::~SciFiStraightPRTrack() {}
-
-std::vector<double> SciFiStraightPRTrack::get_vsl() {
-  _vsl[0] = _x0;
-  _vsl[1] = _mx;
-  _vsl[2] = _y0;
-  _vsl[3] = _my;
-  return _vsl;
-}
 
 void SciFiStraightPRTrack::print_params() {
   std::cout << " x0 is " << _x0 << std::endl;
