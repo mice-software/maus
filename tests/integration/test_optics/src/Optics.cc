@@ -191,6 +191,11 @@ void Envelope(const MiceModule* root, std::vector< ::CovarianceMatrix>& env_out,
   try{delta[3] = mod->propertyDouble("Delta_Px");} catch(...) {}
   try{delta[4] = mod->propertyDouble("Delta_y" );} catch(...) {}
   try{delta[5] = mod->propertyDouble("Delta_Py");} catch(...) {}
+  for (size_t i = 0; i < 6; ++i) {
+      if (delta[i] <= 0.) {
+          throw(Squeal(Squeal::recoverable, "Deltas should be > 0. in Envelope module "+mod->fullName(), "Optics::GetDelta"));
+      }
+  }
   return delta;
 }
 
@@ -488,10 +493,9 @@ void LongTextOutput(std::vector< ::CovarianceMatrix> matrix, std::vector< ::Tran
     double alpha_x=cov.GetTwoDAlpha(1), gamma_x=cov.GetTwoDGamma(1), alpha_y=cov.GetTwoDAlpha(2),     gamma_y=cov.GetTwoDGamma(2), 
            alpha_t=cov.GetTwoDAlpha(0), gamma_t=cov.GetTwoDGamma(0), alpha_trans=cov.GetAlphaTrans(), gamma_trans=cov.GetGammaTrans(),
            disp_x=cov.GetDispersion(1), disp_y=cov.GetDispersion(1);
-    double phi_trans(0), phi_x(0), phi_y(0), phi_t(0);
+    double phi_trans(0), phi_x(0), phi_y(0);
     if(i>0)
     {
-      try{phi_t     = tms[i-1]->PhaseAdvance(0);} catch(Squeal squee) {}
       try{phi_x     = tms[i-1]->PhaseAdvance(1);} catch(Squeal squee) {}
       try{phi_y     = tms[i-1]->PhaseAdvance(2);} catch(Squeal squee) {}
       phi_trans = (phi_x+phi_y)/2.;
@@ -574,10 +578,9 @@ void RootOutput(std::vector< ::CovarianceMatrix> matrix, std::vector< ::Transfer
     double alpha_x=cov.GetTwoDAlpha(1), gamma_x=cov.GetTwoDGamma(1), alpha_y=cov.GetTwoDAlpha(2),     gamma_y=cov.GetTwoDGamma(2), 
            alpha_t=cov.GetTwoDAlpha(0), gamma_t=cov.GetTwoDGamma(0), alpha_trans=cov.GetAlphaTrans(), gamma_trans=cov.GetGammaTrans(),
            disp_x=cov.GetDispersion(1), disp_y=cov.GetDispersion(1);
-    double phi_trans(0), phi_x(0), phi_y(0), phi_t(0);
+    double phi_trans(0), phi_x(0), phi_y(0);
     if(i>0)
     {
-      try{phi_t     = tms[i-1]->PhaseAdvance(0);} catch(Squeal squee) {}
       try{phi_x     = tms[i-1]->PhaseAdvance(1);} catch(Squeal squee) {}
       try{phi_y     = tms[i-1]->PhaseAdvance(2);} catch(Squeal squee) {}
       phi_trans = (phi_x+phi_y)/2.;
