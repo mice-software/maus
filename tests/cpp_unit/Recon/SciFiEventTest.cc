@@ -30,21 +30,23 @@ class SciFiEventTest : public ::testing::Test {
   virtual void TearDown() {}
 };
 
-// SciFiEvent does very little work.
-// This simple test is here for further development,
-// once more work is added to SciFiEvent.
-TEST_F(SciFiEventTest, memory_test) {
+
+TEST_F(SciFiEventTest, test_default_contructor) {
   SciFiEvent* event = new SciFiEvent();
   EXPECT_EQ(0, event->hits().size());
   EXPECT_EQ(0, event->digits().size());
   EXPECT_EQ(0, event->clusters().size());
   EXPECT_EQ(0, event->spacepoints().size());
   EXPECT_EQ(0, event->seeds().size());
-  // EXPECT_EQ(0, event->scifistraightprtracks.size());
+  EXPECT_EQ(0, event->straightprtracks().size());
+}
 
+TEST_F(SciFiEventTest, test_spoint_getters_setters) {
+  SciFiEvent* event = new SciFiEvent();
   SciFiSpacePoint* spacepoint = new SciFiSpacePoint();
   event->add_spacepoint(spacepoint);
   EXPECT_EQ(1, event->spacepoints().size());
+  EXPECT_EQ(spacepoint, event->spacepoints()[0]);
 }
 
 } // namespace

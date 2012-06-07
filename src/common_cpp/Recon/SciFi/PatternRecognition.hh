@@ -75,7 +75,7 @@ class PatternRecognition {
      *  @param trks - A vector of the output Pattern Recognition tracks
      */
     void make_5tracks(std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
-                      std::vector<SciFiPRTrack> &trks, std::vector< std::vector<int> >
+                      std::vector<SciFiStraightPRTrack> &trks, std::vector< std::vector<int> >
 &residuals );
 
     /** @brief Make Pattern Recognition tracks with 4 spacepoints
@@ -88,7 +88,7 @@ class PatternRecognition {
      *  @param trks - A vector of the output Pattern Recognition tracks
      */
     void make_4tracks(std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
-                      std::vector<SciFiPRTrack> &trks, std::vector< std::vector<int> >
+                      std::vector<SciFiStraightPRTrack> &trks, std::vector< std::vector<int> >
 &residuals );
 
     /** @brief Make Pattern Recognition tracks with 3 spacepoints
@@ -101,7 +101,7 @@ class PatternRecognition {
      *  @param trks - A vector of the output Pattern Recognition tracks
      */
     void make_3tracks(std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
-                      std::vector<SciFiPRTrack>& trks, std::vector< std::vector<int> >
+                      std::vector<SciFiStraightPRTrack>& trks, std::vector< std::vector<int> >
 &residuals );
 
     /** @brief Fits a straight track for a given set of stations
