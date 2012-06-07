@@ -50,6 +50,7 @@
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
 #include "src/common_cpp/Recon/SciFi/PatternRecognition.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanTrackFit.hh"
+#include "src/common_cpp/Recon/SciFi/SeedFinder.hh"
 
 class MapCppTrackerRecon {
  public:
@@ -103,6 +104,8 @@ class MapCppTrackerRecon {
   void spacepoint_recon(SciFiEvent &evt);
 
   void pattern_recognition(SciFiEvent &evt);
+
+  void make_seed_and_fit(SciFiEvent &event);
 
   void track_fit(SciFiEvent &evt);
 

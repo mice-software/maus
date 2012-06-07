@@ -16,6 +16,9 @@
  */
 
 #include "src/common_cpp/Recon/Kalman/KalmanTrackFit.hh"
+#include <math.h>
+
+#define PI 3.14159265
 
 KalmanTrackFit::KalmanTrackFit() {
   std::cout << "---------------------Birth of Kalman Filter--------------------" << std::endl;
@@ -32,10 +35,59 @@ bool sort_by_id(SciFiCluster *a, SciFiCluster *b ) {
     return ( a->get_id() < b->get_id() ); //  ascending order
 }
 
-void KalmanTrackFit::process(SciFiEvent &event) {
-  KalmanTrack *track = new StraightTrack();
-
+// Helical track fit.
+void KalmanTrackFit::process(std::vector<SciFiSpacePoint*> spacepoints,
+                             double x0, double y0, double r, double pt, double pz) {
   std::vector<KalmanSite> sites;
+  KalmanTrack *track = new HelicalTrack();
+  initialise_helix(spacepoints, sites, x0, y0, r, pt, pz);
+}
+
+void KalmanTrackFit::initialise_helix(std::vector<SciFiSpacePoint*> &spacepoints,
+                                      std::vector<KalmanSite> &sites,
+                                      double x0, double y0, double r,
+                                      double pt, double pz, double phi_0) {
+  std::vector<SciFiCluster*> clusters;
+  process_clusters(spacepoints, clusters);
+  // the clusters are sorted by now.
+
+  int numb_sites = clusters.size();
+
+  KalmanSite first_plane;
+  double x = x0+r*cos(phi_0*PI/180.);
+  double y = y0+r*sin(phi_0*PI/180.);
+  first_plane.set_state_vector(x, y, mx, my, p);
+  TMatrixD C(5, 5);
+  C(0, 0) = 70;
+  C(1, 1) = 70;
+  C(2, 2) = 0.5;
+  C(3, 3) = 0.5;
+  C(4, 4) = 1000;
+  // for ( int i = 0; i < 5; ++i ) {
+  //   C(i, i) = 200; // dummy values
+  // }
+  first_plane.set_covariance_matrix(C);
+  first_plane.set_measurement(clusters[0]->get_alpha());
+  first_plane.set_direction(clusters[0]->get_direction());
+  first_plane.set_z(clusters[0]->get_position().z());
+  first_plane.set_id(clusters[0]->get_id());
+  // first_plane
+  sites.push_back(first_plane);
+
+  for ( int j = 1; j < numb_sites; ++j ) {
+    KalmanSite a_site;
+    a_site.set_measurement(clusters[j]->get_alpha());
+    a_site.set_direction(clusters[j]->get_direction());
+    a_site.set_z(clusters[j]->get_position().z());
+    a_site.set_id(clusters[j]->get_id());
+    sites.push_back(a_site);
+  }
+}
+
+void KalmanTrackFit::process(SciFiEvent &event) {
+  std::vector<KalmanSite> sites;
+  // Straight Track.
+  KalmanTrack *track = new StraightTrack();
 
   // This will: initialise the state vector;
   // Set covariance matrix;
@@ -184,10 +236,11 @@ void KalmanTrackFit::initialise(SciFiEvent &event, std::vector<KalmanSite> &site
     mx = -mx;
     my = -my;
   }
-
-
+  // this admits there is only one track...
+  SciFiStraightPRTrack seed = event.straightprtracks()[0];
+  std::vector<SciFiSpacePoint> spacepoints = seed.get_spacepoints();
   std::vector<SciFiCluster*> clusters;
-  process_clusters(event, clusters);
+  process_clusters(spacepoints, clusters);
   // the clusters are sorted by now.
 
   int numb_sites = clusters.size();
@@ -221,10 +274,10 @@ void KalmanTrackFit::initialise(SciFiEvent &event, std::vector<KalmanSite> &site
   }
 }
 
-void KalmanTrackFit::process_clusters(SciFiEvent &event, std::vector<SciFiCluster*> &clusters) {
+void KalmanTrackFit::process_clusters(std::vector<SciFiSpacePoint> spacepoints, std::vector<SciFiCluster*> &clusters) {
   // This admits there is only one track...
-  SciFiStraightPRTrack seed = event.straightprtracks()[0];
-  std::vector<SciFiSpacePoint> spacepoints = seed.get_spacepoints(); // Get CLUSTERS!
+  // SciFiStraightPRTrack seed = event.straightprtracks()[0];
+  //std::vector<SciFiSpacePoint> spacepoints = seed.get_spacepoints(); // Get CLUSTERS!
   int numb_spacepoints = spacepoints.size();
 
   for ( unsigned int i = 0; i < numb_spacepoints; ++i ) {
@@ -235,6 +288,6 @@ void KalmanTrackFit::process_clusters(SciFiEvent &event, std::vector<SciFiCluste
       clusters.push_back(cluster);
     }
   }
-  // Plane 0 of station 1 will be the first plane
-  std::sort(clusters.begin(), clusters.end(), sort_by_id); // sort according to station and plane.
+
+  std::sort(clusters.begin(), clusters.end(), sort_by_id);
 }

@@ -80,14 +80,19 @@ std::string MapCppTrackerRecon::process(std::string document) {
         spacepoint_recon(event);
       }
       // Pattern Recognition.
-      if ( event.spacepoints().size() ) {
-        std::cout << "Calling Pattern Recognition..." << std::endl;
-        pattern_recognition(event);
-      }
-      // Kalman Track Fit.
-      if ( event.straightprtracks().size() ) {
-        track_fit(event);
-      }
+      // if ( event.spacepoints().size() ) {
+      //  std::cout << "Calling Pattern Recognition..." << std::endl;
+      //  pattern_recognition(event);
+      // }
+      // Kalman Track Fit for cosmics.
+      // if ( event.straightprtracks().size() ) {
+        // track_fit(event);
+      // }
+      // Kalman Track Fit for Stage4 (mc).
+       if ( root.isMember("mc_events") ) {
+         make_seed_and_fit(event);
+       }
+
       print_event_info(event);
       save_to_json(event, k);
     }  // ==========================================================
@@ -164,6 +169,39 @@ void MapCppTrackerRecon::spacepoint_recon(SciFiEvent &evt) {
 void MapCppTrackerRecon::pattern_recognition(SciFiEvent &evt) {
   PatternRecognition pr1;
   pr1.process(evt);
+}
+
+/// Temporary function for helical tracks.
+void MapCppTrackerRecon::make_seed_and_fit(SciFiEvent &event) {
+  int number_spacepoints = event.spacepoints().size();
+  std::vector<SciFiSpacePoint*> spacepoints_tracker0;
+  std::vector<SciFiSpacePoint*> spacepoints_tracker1;
+  for ( int sp_i = 0; sp_i < event.spacepoints().size(); sp_i++ ) {
+    SciFiSpacePoint* spacepoint = event.spacepoints()[sp_i];
+    int tracker = spacepoint->get_tracker();
+    if ( tracker == 0 )
+      spacepoints_tracker0.push_back(spacepoint);
+    if ( tracker == 1 )
+      spacepoints_tracker1.push_back(spacepoint);
+  }
+
+  if ( spacepoints_tracker0.size() > 3 ) {
+    SeedFinder seeds;
+    double x0, y0, r, pt, pz;
+    seeds.process(spacepoints_tracker0, x0, y0, r, pt, pz);
+    KalmanTrackFit fit;
+    std::cerr << "Fitting tracker 0." << std::endl;
+    fit.process(spacepoints_tracker0, x0, y0, r, pt, pz);
+  }
+
+  if ( spacepoints_tracker1.size() > 3 ) {
+    SeedFinder seeds;
+    double x0, y0, r, pt, pz, phi_0;
+    seeds.process(spacepoints_tracker1, x0, y0, r, pt, pz, phi_0);
+    KalmanTrackFit fit;
+    std::cerr << "Fitting tracker 1." << std::endl;
+    fit.process(spacepoints_tracker1, x0, y0, r, pt, pz, phi_0);
+  }
 }
 
 void MapCppTrackerRecon::track_fit(SciFiEvent &evt) {

@@ -47,9 +47,12 @@ class KalmanTrackFit {
 
   void process(SciFiEvent &evt);
 
+  void process(std::vector<SciFiSpacePoint*> spacepoints,
+               double x0, double y0, double r, double pt, double pz, double phi_0);
+
   void initialise(SciFiEvent &evt, std::vector<KalmanSite> &sites);
 
-  void process_clusters(SciFiEvent &event, std::vector<SciFiCluster*> &clusters);
+  void process_clusters(std::vector<SciFiSpacePoint> spacepoints, std::vector<SciFiCluster*> &clusters);
 
   void extrapolate(std::vector<KalmanSite> &sites, KalmanTrack *track, int current_site);
 
