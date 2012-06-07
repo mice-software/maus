@@ -25,6 +25,7 @@ import ErrorHandler
 import numpy
 import bisect
 import beam
+import os
 from xboa.Hit import Hit #pylint: disable=F0401
 
 class MapPyBeamMaker: #pylint: disable=R0902
@@ -140,7 +141,7 @@ class MapPyBeamMaker: #pylint: disable=R0902
                                " should be > 0")
         self.use_beam_file = beam_def["particle_generator"] == "file"
         if self.use_beam_file:
-            self.beam_file = beam_def["beam_file"]
+            self.beam_file = os.path.expandvars(beam_def["beam_file"])
             self.beam_file_format = beam_def["beam_file_format"]
             self.file_particles_per_spill = beam_def["file_particles_per_spill"]
 
