@@ -26,6 +26,9 @@
 
 #include "CLHEP/Random/Random.h"
 
+#include "src/legacy/Interface/MICERun.hh"
+#include "src/legacy/Config/MiceModule.hh"
+
 #include "src/common_cpp/Simulation/MAUSPrimaryGeneratorAction.hh"
 
 namespace MAUS {
@@ -64,7 +67,11 @@ void MAUSPrimaryGeneratorAction::GeneratePrimaries(G4Event* argEvent) {
     throw(Squeal(Squeal::recoverable,
                  "Particle total energy less than particle mass",
                  "MAUSPrimaryGeneratorAction::GeneratePrimaries"));
-
+  if (!isInWorldVolume(part.x, part.y, part.z)) {
+    throw(Squeal(Squeal::recoverable,
+                 "Particle is outside world volume",
+                 "MAUSPrimaryGeneratorAction::GeneratePrimaries"));
+  }
   gun->SetParticleDefinition(particle);
 
   // Get this class' variables to define next event.
@@ -83,6 +90,17 @@ void MAUSPrimaryGeneratorAction::GeneratePrimaries(G4Event* argEvent) {
   }
 
   CLHEP::HepRandom::setTheSeed(part.seed);
+}
+
+bool MAUSPrimaryGeneratorAction::isInWorldVolume(double x, double y, double z) {
+  MiceModule* root = MICERun::getInstance()->miceModule;
+  if (root == NULL) {
+      return true;
+  }
+  bool isInside = fabs(x) < root->dimensions().x()/2. &&
+                  fabs(y) < root->dimensions().y()/2. &&
+                  fabs(z) < root->dimensions().z()/2.;
+  return isInside;
 }
 
 MAUSPrimaryGeneratorAction::PGParticle::PGParticle()

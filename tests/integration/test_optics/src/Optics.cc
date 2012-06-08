@@ -666,6 +666,9 @@ void CloseGzFile()
 
 namespace Optimiser
 {
+  // Note method inline void G4RunManager::GeometryHasBeenModified() - can be
+  // used to reload the geometry...
+
   //Variables
   MiceModule*             g_root_mod = NULL;
   std::vector<Parameter*> g_parameters;
