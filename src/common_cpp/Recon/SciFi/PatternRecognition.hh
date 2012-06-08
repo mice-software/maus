@@ -73,8 +73,9 @@ class PatternRecognition {
      *  @param trks - A vector of the output Pattern Recognition tracks
      */
     void make_5tracks(std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
-                      std::vector<SciFiStraightPRTrack> &trks, std::vector< std::vector<int> >
-&residuals );
+                      std::vector<SciFiStraightPRTrack> &strks,
+                      std::vector<SciFiHelicalPRTrack> &htrks,
+                      std::vector< std::vector<int> > &residuals );
 
     /** @brief Make Pattern Recognition tracks with 4 spacepoints
      *
@@ -86,8 +87,9 @@ class PatternRecognition {
      *  @param trks - A vector of the output Pattern Recognition tracks
      */
     void make_4tracks(std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
-                      std::vector<SciFiStraightPRTrack> &trks, std::vector< std::vector<int> >
-&residuals );
+                      std::vector<SciFiStraightPRTrack> &strks,
+                      std::vector<SciFiHelicalPRTrack> &htrks,
+                      std::vector< std::vector<int> > &residuals );
 
     /** @brief Make Pattern Recognition tracks with 3 spacepoints
      *
@@ -99,8 +101,9 @@ class PatternRecognition {
      *  @param trks - A vector of the output Pattern Recognition tracks
      */
     void make_3tracks(std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
-                      std::vector<SciFiStraightPRTrack>& trks, std::vector< std::vector<int> >
-&residuals );
+                      std::vector<SciFiStraightPRTrack>& strks,
+                      std::vector<SciFiHelicalPRTrack> &htrks,
+                      std::vector< std::vector<int> > &residuals );
 
     /** @brief Fits a straight track for a given set of stations
      * 
@@ -114,7 +117,7 @@ class PatternRecognition {
      */
     void make_straight_tracks(const int num_points, const std::vector<int> ignore_stations,
                      std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
-                     std::vector<SciFiStraightPRTrack> &trks, std::vector< std::vector<int> >
+                     std::vector<SciFiStraightPRTrack> &strks, std::vector< std::vector<int> >
 &residuals );
 
     /** @brief Least-squares straight line fit

@@ -81,16 +81,12 @@ class SciFiEvent {
     _scifistraightprtracks = tracks; }
   std::vector<SciFiStraightPRTrack> straightprtracks() const { return _scifistraightprtracks; }
 
-/*  /// Helical Pattern Recognition tracks
+  /// Helical Pattern Recognition tracks
   void add_helicalprtrack(SciFiHelicalPRTrack track) { _scifihelicalprtracks.push_back(track); }
   void set_helicalprtrack(std::vector<SciFiHelicalPRTrack> tracks) {
                           _scifihelicalprtracks = tracks; }
   std::vector<SciFiHelicalPRTrack> helicalprtracks() const {return _scifihelicalprtracks; }
-*/
-  /// General Pattern Recognition tracks
-  void add_prtrack(SciFiPRTrack track) { _scifiprtracks.push_back(track); }
-  void set_prtrack(std::vector<SciFiPRTrack> tracks) { _scifiprtracks = tracks; }
-  std::vector<SciFiPRTrack> prtracks() const {return _scifiprtracks; }
+
 
  private:
 
@@ -116,8 +112,8 @@ class SciFiEvent {
   std::vector<SciFiStraightPRTrack>   _scifistraightprtracks;
 
   /// Helical tracks.
-  // std::vector<SciFiHelicalPRTrack>    _scifihelicalprtracks; // **********************
-  std::vector<SciFiPRTrack>    _scifiprtracks;
+  std::vector<SciFiHelicalPRTrack>    _scifihelicalprtracks;
+
 };  // Don't forget this trailing colon!!!!
 // } // ~namespace MAUS
 

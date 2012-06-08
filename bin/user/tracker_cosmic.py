@@ -30,8 +30,8 @@ def run(data_path, run_num):
 
     my_output = MAUS.OutputPyJSON()
 
-    my_reduce = MAUS.ReducePyDoNothing()
-    # my_reduce = MAUS.ReduceCppPatternRecognition()
+    # my_reduce = MAUS.ReducePyDoNothing()
+    my_reduce = MAUS.ReduceCppPatternRecognition()
 
     MAUS.Go(my_input, my_map, my_reduce, my_output, datacards)
 
