@@ -25,12 +25,13 @@
 #include <string>
 #include <vector>
 #include <map>
+
 #include "json/json.h"
+
+// Root
 #include "TTree.h"
 #include "TH1I.h"
 #include "TFile.h"
-
-// Root
 #include "TAxis.h"
 #include "TGraph.h"
 #include "TMultiGraph.h"
@@ -43,6 +44,8 @@
 #include "TGFrame.h"
 #include "TVirtualPad.h"
 #include "TFrame.h"
+#include "TF1.h"
+#include "TPaveText.h"
 
 class ReduceCppPatternRecognition {
 
@@ -68,25 +71,25 @@ class ReduceCppPatternRecognition {
   */
   std::string process(std::string document);
 
-  void light_yield(Json::Value &root);
+  int const get_num_tracks() { return _tracks.GetEntries(); }
 
  private:
-
-  Json::Value GetPartEvent(Json::Value root, std::string entry_type,
-                           std::string detector, int part_event);
 
   std::string _classname;
   std::string _filename;
 
   int _nSpills;
-
-  void Save();
+  // int _number_spacepoints;
+  static const int _trk_lower_bound = -1300;
+  static const int _trk_upper_bound = 0;
+  double tracker2;
 
   TTree _digits;
   double _npe;
   int _tracker_dig;
 
   TTree _spacepoints;
+  TTree _spacepoints_1spill;
   int _tracker;
   int _station;
   int _type;
@@ -94,17 +97,29 @@ class ReduceCppPatternRecognition {
   double _y;
   double _z;
 
-  TTree _events;
+  TTree _tracks;
   int _tracker_event;
-  int _station_hits;
+  int _num_points;
+  // int _station_hits
   double _mx;
   double _my;
   double _x0;
   double _y0;
 
-  // int _number_spacepoints;
+  // Vectors to hold the tracks in each projection in each tracker
+  std::vector<TF1> _trks_zx_trkr0;
+  std::vector<TF1> _trks_zy_trkr0;
+  std::vector<TF1> _trks_zx_trkr1;
+  std::vector<TF1> _trks_zy_trkr1;
 
-  double tracker2;
+  void draw_histos(TTree * t1, TCanvas * c1);
+  void draw_graphs(TTree * t1, TCanvas * c1);
+  void draw_tracks(TCanvas * c1);
+  TF1 make_track(double c, double m);
+  void clear_tracks();
+
+  void Save();
+  void update_info(TCanvas * c1, TPaveText *pt);
 };
 
 #endif

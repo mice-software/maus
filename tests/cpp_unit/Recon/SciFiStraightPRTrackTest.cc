@@ -37,51 +37,56 @@ class SciFiStraightPRTrackTest : public ::testing::Test {
 
 TEST_F(SciFiStraightPRTrackTest, test_default_constructor) {
   SciFiStraightPRTrack prtrack;
-  std::vector<double> vsl = prtrack.get_vsl();
-
-  EXPECT_EQ(prtrack.get_x0(), -1);
-  EXPECT_EQ(prtrack.get_mx(), -1);
-  EXPECT_EQ(prtrack.get_y0(), -1);
-  EXPECT_EQ(prtrack.get_my(), -1);
+  EXPECT_EQ(prtrack.get_x0(), -1.0);
+  EXPECT_EQ(prtrack.get_mx(), -1.0);
+  EXPECT_EQ(prtrack.get_x_chisq(), -1.0);
+  EXPECT_EQ(prtrack.get_y0(), -1.0);
+  EXPECT_EQ(prtrack.get_my(), -1.0);
+  EXPECT_EQ(prtrack.get_y_chisq(), -1.0);
   EXPECT_EQ(prtrack.get_tracker(), -1);
-
-  EXPECT_EQ(vsl[0], -1);
-  EXPECT_EQ(vsl[1], -1);
-  EXPECT_EQ(vsl[2], -1);
-  EXPECT_EQ(vsl[3], -1);
+  EXPECT_EQ(prtrack.get_num_points(), -1);
 }
 
-TEST_F(SciFiStraightPRTrackTest, test_other_contructor) {
-/*
-  double x0 = 1.0;
-  double mx = 2.0;
-  double y0 = 3.0;
-  double my = 4.0;
-  int tracker = 1;
+TEST_F(SciFiStraightPRTrackTest, test_explicit_constructor) {
+  SciFiStraightPRTrack prtrack(0, 3, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0);
+  EXPECT_EQ(prtrack.get_x0(), 1.0);
+  EXPECT_EQ(prtrack.get_mx(), 2.0);
+  EXPECT_EQ(prtrack.get_x_chisq(), 3.0);
+  EXPECT_EQ(prtrack.get_y0(), 4.0);
+  EXPECT_EQ(prtrack.get_my(), 5.0);
+  EXPECT_EQ(prtrack.get_y_chisq(), 6.0);
+  EXPECT_EQ(prtrack.get_tracker(), 0);
+  EXPECT_EQ(prtrack.get_num_points(), 3);
+}
 
-  SciFiStraightPRTrack prtrack(tracker, x0, mx, y0, my);
-
-  std::vector<double> vsl = prtrack.get_vsl();
-
-  EXPECT_EQ(prtrack.get_x0(), x0);
-  EXPECT_EQ(prtrack.get_mx(), mx);
-  EXPECT_EQ(prtrack.get_y0(), y0);
-  EXPECT_EQ(prtrack.get_my(), my);
-  EXPECT_EQ(prtrack.get_tracker(), tracker);
-
-  EXPECT_EQ(vsl[0], x0);
-  EXPECT_EQ(vsl[1], mx);
-  EXPECT_EQ(vsl[2], y0);
-  EXPECT_EQ(vsl[3], my);
-*/
+TEST_F(SciFiStraightPRTrackTest, test_simpleline_constructor) {
+  SimpleLine lx, ly;
+  lx.set_c(1.0);
+  lx.set_m(2.0);
+  lx.set_chisq(3.0);
+  ly.set_c(4.0);
+  ly.set_m(5.0);
+  ly.set_chisq(6.0);
+  SciFiStraightPRTrack prtrack(0, 3, lx, ly);
+  EXPECT_EQ(prtrack.get_x0(), 1.0);
+  EXPECT_EQ(prtrack.get_mx(), 2.0);
+  EXPECT_EQ(prtrack.get_x_chisq(), 3.0);
+  EXPECT_EQ(prtrack.get_y0(), 4.0);
+  EXPECT_EQ(prtrack.get_my(), 5.0);
+  EXPECT_EQ(prtrack.get_y_chisq(), 6.0);
+  EXPECT_EQ(prtrack.get_tracker(), 0);
+  EXPECT_EQ(prtrack.get_num_points(), 3);
 }
 
 TEST_F(SciFiStraightPRTrackTest, test_setters_getters) {
   double x0 = 1.0;
   double mx = 2.0;
-  double y0 = 3.0;
-  double my = 4.0;
+  double x_chisq = 3.0;
+  double y0 = 4.0;
+  double my = 5.0;
+  double y_chisq = 6.0;
   int tracker = 1;
+  int num_points = 5;
 
   SciFiSpacePoint spoint;
   spoint.set_tracker(tracker);
@@ -92,24 +97,23 @@ TEST_F(SciFiStraightPRTrackTest, test_setters_getters) {
 
   prtrack.set_x0(x0);
   prtrack.set_mx(mx);
+  prtrack.set_x_chisq(x_chisq);
   prtrack.set_y0(y0);
   prtrack.set_my(my);
+  prtrack.set_y_chisq(y_chisq);
   prtrack.set_tracker(tracker);
-
-  std::vector<double> vsl = prtrack.get_vsl();
+  prtrack.set_num_points(num_points);
 
   prtrack.set_spacepoints(spoints);
 
   EXPECT_EQ(prtrack.get_x0(), x0);
   EXPECT_EQ(prtrack.get_mx(), mx);
+  EXPECT_EQ(prtrack.get_x_chisq(), x_chisq);
   EXPECT_EQ(prtrack.get_y0(), y0);
   EXPECT_EQ(prtrack.get_my(), my);
+  EXPECT_EQ(prtrack.get_y_chisq(), y_chisq);
   EXPECT_EQ(prtrack.get_tracker(), tracker);
-
-  EXPECT_EQ(vsl[0], x0);
-  EXPECT_EQ(vsl[1], mx);
-  EXPECT_EQ(vsl[2], y0);
-  EXPECT_EQ(vsl[3], my);
+  EXPECT_EQ(prtrack.get_num_points(), num_points);
 
   EXPECT_EQ(prtrack.get_spacepoints()[0].get_tracker(), tracker);
 }

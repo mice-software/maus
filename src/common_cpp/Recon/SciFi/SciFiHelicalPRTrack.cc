@@ -61,6 +61,31 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, double x0, double y0,
   _vsl[5] = _dzds;
   _vsl[6] = _R;
 }
+
+SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int num_points, CLHEP::Hep3Vector pos0,
+                                         SimpleHelix helix) {
+
+  _x0        = pos0.x();
+  _y0        = pos0.y();
+  _z0        = pos0.z();
+  _R         = helix.get_R();
+  _phi0      = helix.get_Phi_0();
+  _dzds      = helix.get_tan_lambda();
+  _chisq     = helix.get_chisq();
+  _chisq_dof = helix.get_chisq_dof(); // already reduced chisq
+
+  _num_points = num_points;
+  _tracker = tracker;
+
+  _vsl.resize(6);
+  _vsl[0] = _x0;
+  _vsl[1] = _y0;
+  _vsl[2] = _z0;
+  _vsl[3] = _R;
+  _vsl[4] = _phi0;
+  _vsl[5] = _dzds;
+}
+
 // Destructor
 SciFiHelicalPRTrack::~SciFiHelicalPRTrack() {}
 

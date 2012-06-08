@@ -80,19 +80,14 @@ std::string MapCppTrackerRecon::process(std::string document) {
         spacepoint_recon(event);
       }
       // Pattern Recognition.
-      // if ( event.spacepoints().size() ) {
-      //  std::cout << "Calling Pattern Recognition..." << std::endl;
-      //  pattern_recognition(event);
-      // }
-      // Kalman Track Fit for cosmics.
-      // if ( event.straightprtracks().size() ) {
+      if ( event.spacepoints().size() ) {
+        std::cout << "Calling Pattern Recognition..." << std::endl;
+        pattern_recognition(event);
+      }
+      // Kalman Track Fit.
+      if ( event.straightprtracks().size() ) {
         // track_fit(event);
-      // }
-      // Kalman Track Fit for Stage4 (mc).
-       if ( root.isMember("mc_events") ) {
-         make_seed_and_fit(event);
-       }
-
+      }
       print_event_info(event);
       save_to_json(event, k);
     }  // ==========================================================
