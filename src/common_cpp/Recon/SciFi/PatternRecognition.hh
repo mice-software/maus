@@ -63,8 +63,6 @@ class PatternRecognition {
       */
     void process(SciFiEvent &evt);
 
-  private:
-
     /** @brief Make Pattern Recognition tracks with 5 spacepoints
      *
      *  Make a Pattern Recognition track/s when there are spacepoints
@@ -383,6 +381,7 @@ class PatternRecognition {
 
     double parabola_fit(const std::vector<double> chisqs, const std::vector<double> Dparams);
 
+  private:
     static const int _n_trackers = 2;
     static const int _n_stations = 5;
     static const int _n_bins = 100;         // Number of bins in each residuals histogram
