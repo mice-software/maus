@@ -113,7 +113,6 @@ class SciFiEvent {
 
   /// Helical tracks.
   std::vector<SciFiHelicalPRTrack>    _scifihelicalprtracks;
-
 };  // Don't forget this trailing colon!!!!
 // } // ~namespace MAUS
 
