@@ -21,17 +21,58 @@
 
 // C headers
 #include <assert.h>
+#include <math.h>
 
 // C++ headers
 #include <string>
 #include <vector>
 
-class HelicalTrack {
+#include "TMath.h"
+#include "TMatrixD.h"
+
+
+#include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
+
+class HelicalTrack : public KalmanTrack {
  public:
   HelicalTrack();
 
   ~HelicalTrack();
-// private:
+  void update_propagator(KalmanSite *old_site, KalmanSite *new_site);
+
+  void calc_filtered_state(KalmanSite *a_site);
+
+  void update_G(KalmanSite *a_site);
+
+  void update_covariance(KalmanSite *a_site);
+
+  void update_H(KalmanSite *a_site);
+
+  void calc_predicted_state(KalmanSite *old_site, KalmanSite *new_site);
+
+  // void calc_system_noise(KalmanSite &site);
+
+  void calc_covariance(KalmanSite *old_site, KalmanSite *new_site);
+
+  void update_back_transportation_matrix(KalmanSite *optimum_site, KalmanSite *smoothing_site);
+
+  void smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_site);
+
+ private:
+  TMatrixD _H;
+
+  TMatrixD _G;
+
+  TMatrixD _Q;
+
+  TMatrixD _A;
+
+  TMatrixD _F;
+
+  static const double sigma_x = 0.64; // x measurement resolution
+
+  static const double A = 2./(7.*0.427); // mm to channel convertion factor.
 };
 
 #endif
