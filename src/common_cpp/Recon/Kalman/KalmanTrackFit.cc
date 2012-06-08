@@ -36,17 +36,48 @@ bool sort_by_id(SciFiCluster *a, SciFiCluster *b ) {
 }
 
 // Helical track fit.
-void KalmanTrackFit::process(std::vector<SciFiSpacePoint*> spacepoints,
-                             double x0, double y0, double r, double pt, double pz) {
+void KalmanTrackFit::process(std::vector<SciFiSpacePoint> spacepoints,
+                             SeedFinder seed) {
   std::vector<KalmanSite> sites;
   KalmanTrack *track = new HelicalTrack();
-  initialise_helix(spacepoints, sites, x0, y0, r, pt, pz);
+  initialise_helix(spacepoints, sites, seed);
+
+  // Filter the first state.
+  std::cout << "Filtering site 0" << std::endl;
+  filter(sites, track, 0);
+
+  int numb_measurements = sites.size();
+
+  for ( int i = 1; i < numb_measurements; ++i ) {
+    // Predict the state vector at site i...
+    std::cout << "Extrapolating to site " << i << std::endl;
+    extrapolate(sites, track, i);
+    // ... Filter...
+    std::cout << "Filtering site " << i << std::endl;
+    filter(sites, track, i);
+  }
+/*
+  // ...and Smooth back all sites.
+  for ( int i = numb_measurements-2; i >= 0; --i ) {
+    std::cerr << "Smoothing site " << i << std::endl;
+    smooth(sites, track, i);
+  }
+*/
+  KalmanMonitor monitor;
+  monitor.save(sites);
 }
 
-void KalmanTrackFit::initialise_helix(std::vector<SciFiSpacePoint*> &spacepoints,
+void KalmanTrackFit::initialise_helix(std::vector<SciFiSpacePoint> &spacepoints,
                                       std::vector<KalmanSite> &sites,
-                                      double x0, double y0, double r,
-                                      double pt, double pz, double phi_0) {
+                                      SeedFinder &seed) {
+  double x0 = seed.get_x0();
+  double y0 = seed.get_y0();
+  double r = seed.get_r();
+  double pt = seed.get_pt();
+  double pz = seed.get_pz();
+  double phi_0 = seed.get_phi_0();
+  double tan_lambda = seed.get_tan_lambda();
+
   std::vector<SciFiCluster*> clusters;
   process_clusters(spacepoints, clusters);
   // the clusters are sorted by now.
@@ -56,7 +87,10 @@ void KalmanTrackFit::initialise_helix(std::vector<SciFiSpacePoint*> &spacepoints
   KalmanSite first_plane;
   double x = x0+r*cos(phi_0*PI/180.);
   double y = y0+r*sin(phi_0*PI/180.);
-  first_plane.set_state_vector(x, y, mx, my, p);
+  double kappa = 1./230.0;
+  std::cout << "Seed state-vector " << x << " " << y << " "
+            << tan_lambda << " " << phi_0 << " " << kappa << std::endl;
+  first_plane.set_state_vector(x, y, tan_lambda, phi_0, kappa);
   TMatrixD C(5, 5);
   C(0, 0) = 70;
   C(1, 1) = 70;
@@ -237,7 +271,6 @@ void KalmanTrackFit::initialise(SciFiEvent &event, std::vector<KalmanSite> &site
     my = -my;
   }
   // this admits there is only one track...
-  SciFiStraightPRTrack seed = event.straightprtracks()[0];
   std::vector<SciFiSpacePoint> spacepoints = seed.get_spacepoints();
   std::vector<SciFiCluster*> clusters;
   process_clusters(spacepoints, clusters);
@@ -274,10 +307,11 @@ void KalmanTrackFit::initialise(SciFiEvent &event, std::vector<KalmanSite> &site
   }
 }
 
-void KalmanTrackFit::process_clusters(std::vector<SciFiSpacePoint> spacepoints, std::vector<SciFiCluster*> &clusters) {
+void KalmanTrackFit::process_clusters(std::vector<SciFiSpacePoint> &spacepoints,
+                                      std::vector<SciFiCluster*> &clusters) {
   // This admits there is only one track...
   // SciFiStraightPRTrack seed = event.straightprtracks()[0];
-  //std::vector<SciFiSpacePoint> spacepoints = seed.get_spacepoints(); // Get CLUSTERS!
+  // std::vector<SciFiSpacePoint> spacepoints = seed.get_spacepoints(); // Get CLUSTERS!
   int numb_spacepoints = spacepoints.size();
 
   for ( unsigned int i = 0; i < numb_spacepoints; ++i ) {

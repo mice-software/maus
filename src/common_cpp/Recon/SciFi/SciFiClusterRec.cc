@@ -155,6 +155,8 @@ bool SciFiClusterRec::are_neighbours(SciFiDigit *seed_i, SciFiDigit *seed_j) {
   if ( !seed_j->is_used() && // seed is unused
        seed_j->get_spill() == seed_i->get_spill() && // same spill
        seed_j->get_event() == seed_i->get_event() && // same event
+       seed_j->get_tracker() == seed_i->get_tracker() && // same tracker
+       seed_j->get_station() == seed_i->get_station() && // same station
        seed_j->get_plane() == seed_i->get_plane() && // seeds belong to same plane
        abs(seed_j->get_channel() - seed_i->get_channel()) < 2.0 ) { // and are neighbours
     neigh = true;

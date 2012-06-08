@@ -159,7 +159,7 @@ void HelicalTrack::calc_filtered_state(KalmanSite *a_site) {
   temp3 = TMatrixD(C, TMatrixD::kMultTranspose, _H);
   TMatrixD K(5, 2);
   K = TMatrixD(temp3, TMatrixD::kMult, _G);
-  //////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////
 
   // ap = a + K*pull;
   TMatrixD temp4(5, 1);
@@ -167,9 +167,9 @@ void HelicalTrack::calc_filtered_state(KalmanSite *a_site) {
   TMatrixD a_filt(5, 1);
   a_filt = TMatrixD(a, TMatrixD::kPlus, temp4);
   a_site->set_state_vector(a_filt);
-
-  //////////////////////////////////////////////////////////////////////////
-/*  std::cout <<  "******************* STATE VECTOR *******************" << std::endl;
+/*
+  /////////////////////////////////////////////////////////////////////
+  std::cout <<  "******************* STATE VECTOR *******************" << std::endl;
   std::cout << "predicted: ";
   a.Print();
   std::cout << "filtered ";
