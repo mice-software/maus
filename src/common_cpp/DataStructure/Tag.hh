@@ -44,7 +44,7 @@ class Tag {
     Tag& operator=(const Tag& _tag);
 
     /** Destructor - any member pointers are deleted */
-    ~Tag();
+    virtual ~Tag();
 
 
     /** Returns V1724Array */

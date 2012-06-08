@@ -53,7 +53,7 @@ class CkovA {
     CkovA& operator=(const CkovA& _ckova);
 
     /** Destructor - any member pointers are deleted */
-    ~CkovA();
+    virtual ~CkovA();
 
 
     /** Returns PositionMin0 */

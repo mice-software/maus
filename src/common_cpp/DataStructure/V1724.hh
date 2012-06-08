@@ -53,7 +53,7 @@ class V1724 {
     V1724& operator=(const V1724& _v1724);
 
     /** Destructor - any member pointers are deleted */
-    ~V1724();
+    virtual ~V1724();
 
 
     /** Returns LdcId */

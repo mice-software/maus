@@ -56,7 +56,7 @@ class TOFDigit {
     TOFDigit& operator=(const TOFDigit& _tofdigit);
 
     /** Destructor - any member pointers are deleted */
-    ~TOFDigit();
+    virtual ~TOFDigit();
 
 
     /** Returns Pmt */

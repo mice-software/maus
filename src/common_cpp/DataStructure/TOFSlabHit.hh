@@ -54,7 +54,7 @@ class TOFSlabHit {
     TOFSlabHit& operator=(const TOFSlabHit& _tofslabhit);
 
     /** Destructor - any member pointers are deleted */
-    ~TOFSlabHit();
+    virtual ~TOFSlabHit();
 
 
     /** Returns Slab */

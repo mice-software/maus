@@ -37,7 +37,7 @@ class TriggerEvent {
     TriggerEvent& operator=(const TriggerEvent& _triggerevent);
 
     /** Destructor - any member pointers are deleted */
-    ~TriggerEvent();
+    virtual ~TriggerEvent();
 
 
   private:
