@@ -150,7 +150,7 @@ class PatternRecognition {
      */
     void make_helix(const int num_points, const std::vector<int> ignore_stations,
                     std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
-                    std::vector<SciFiPRTrack> &trks);
+                    std::vector<SciFiHelicalPRTrack> &htrks);
 
     /** @brief Find points from intermediate stations which fit to the "trial track"
      *

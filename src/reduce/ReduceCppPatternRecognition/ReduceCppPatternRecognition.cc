@@ -191,9 +191,9 @@ std::string  ReduceCppPatternRecognition::process(std::string document) {
         }
 
         Json::Value tracks_tracker0 = root["recon_events"][event_i]["sci_fi_event"]
-        ["sci_fi_tracks"]["tracker0"];
+        ["sci_fi_pr_tracks"]["straight"]["tracker0"];
         Json::Value tracks_tracker1 = root["recon_events"][event_i]["sci_fi_event"]
-        ["sci_fi_tracks"]["tracker1"];
+        ["sci_fi_pr_tracks"]["straight"]["tracker1"];
 
         for ( int trk_i = 0; trk_i < static_cast<int>(tracks_tracker0.size()); trk_i++ ) {
           _mx = tracks_tracker0[trk_i]["mx"].asDouble();
