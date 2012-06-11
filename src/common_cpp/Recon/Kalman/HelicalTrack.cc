@@ -56,7 +56,7 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   double old_site_y   = prev_site(1, 0);
   double old_site_tan_lambda = prev_site(2, 0);
   double old_site_phi  = prev_site(3, 0);
-  double old_site_kappa=prev_site(4,0);
+  double old_site_kappa = prev_site(4, 0);
 
   // Find d_rho
   double circle_x = _x0+_r*cos(old_site_phi*PI/180.);
@@ -74,10 +74,12 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   _F(0, 2) = deltaZ;
   _F(1, 3) = deltaZ;
 */
-  _F(0, 3) = -d_rho*sin(old_site_phi) + (_alpha/old_site_kappa) * (-sin(old_site_phi) + sin(old_site_phi+new_phi));
+  _F(0, 3) = -d_rho*sin(old_site_phi) + (_alpha/old_site_kappa) *
+             (-sin(old_site_phi) + sin(old_site_phi+new_phi));
   _F(0, 4) = - (_alpha/pow(old_site_kappa, 2)) * (cos(old_site_phi) - cos(old_site_phi+new_phi));
 
-  _F(1, 3) =  d_rho*cos(old_site_phi) + (_alpha/old_site_kappa) * ( cos(old_site_phi) - cos(old_site_phi+new_phi));
+  _F(1, 3) =  d_rho*cos(old_site_phi) + (_alpha/old_site_kappa) *
+              (cos(old_site_phi) - cos(old_site_phi+new_phi));
   _F(1, 4) = - (_alpha/pow(old_site_kappa, 2)) * (sin(old_site_phi) - sin(old_site_phi+new_phi));
 }
 

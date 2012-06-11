@@ -39,7 +39,7 @@ class HelicalTrack : public KalmanTrack {
  public:
   HelicalTrack();
 
-  HelicalTrack(SeedFinder const &seed);
+  explicit HelicalTrack(SeedFinder const &seed);
 
   ~HelicalTrack();
   void update_propagator(KalmanSite *old_site, KalmanSite *new_site);
