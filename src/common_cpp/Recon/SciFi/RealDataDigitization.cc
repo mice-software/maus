@@ -103,7 +103,7 @@ void RealDataDigitization::process(SciFiSpill &spill, Json::Value const &daq) {
 
 bool RealDataDigitization::load_calibration(std::string file) {
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
-  std::string fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerRecon/"+file;
+  std::string fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerDigits/"+file;
 
   std::ifstream inf(fname.c_str());
 
@@ -154,7 +154,7 @@ void RealDataDigitization::read_in_all_Boards(std::ifstream &inf) {
 
 bool RealDataDigitization::load_mapping(std::string file) {
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
-  std::string fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerRecon/"+file;
+  std::string fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerDigits/"+file;
 
   std::ifstream inf(fname.c_str());
   if (!inf) {
@@ -210,7 +210,7 @@ bool RealDataDigitization::is_good_channel(const int board, const int bank, cons
 
 bool RealDataDigitization::load_bad_channels() {
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
-  std::string fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerRecon/bad_chan_list.txt";
+  std::string fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerDigits/bad_chan_list.txt";
 
   std::ifstream inf(fname.c_str());
   if (!inf) {

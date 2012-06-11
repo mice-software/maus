@@ -43,7 +43,8 @@ KalmanSite::KalmanSite(const KalmanSite &site) {
   _z = site.get_z();
   _id= site.get_id();
   _direction = site.get_direction();
-  _alpha_extrapolated =site.get_extrapolated_alpha();
+  _alpha_extrapolated = site.get_extrapolated_alpha();
+  _residual = site.get_residual();
 }
 
 KalmanSite& KalmanSite::operator=(const KalmanSite &site) {
@@ -57,4 +58,5 @@ KalmanSite& KalmanSite::operator=(const KalmanSite &site) {
   _id= site.get_id();
   _direction = site.get_direction();
   _alpha_extrapolated =site.get_extrapolated_alpha();
+  _residual = site.get_residual();
 }

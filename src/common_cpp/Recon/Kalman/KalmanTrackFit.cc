@@ -39,7 +39,7 @@ bool sort_by_id(SciFiCluster *a, SciFiCluster *b ) {
 void KalmanTrackFit::process(std::vector<SciFiSpacePoint> spacepoints,
                              SeedFinder seed) {
   std::vector<KalmanSite> sites;
-  KalmanTrack *track = new HelicalTrack();
+  KalmanTrack *track = new HelicalTrack(seed);
   initialise_helix(spacepoints, sites, seed);
 
   // Filter the first state.
@@ -94,9 +94,9 @@ void KalmanTrackFit::initialise_helix(std::vector<SciFiSpacePoint> &spacepoints,
   TMatrixD C(5, 5);
   C(0, 0) = 70;
   C(1, 1) = 70;
-  C(2, 2) = 0.5;
-  C(3, 3) = 0.5;
-  C(4, 4) = 1000;
+  C(2, 2) = 1;
+  C(3, 3) = 1;
+  C(4, 4) = 1;
   // for ( int i = 0; i < 5; ++i ) {
   //   C(i, i) = 200; // dummy values
   // }

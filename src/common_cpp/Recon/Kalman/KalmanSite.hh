@@ -107,6 +107,10 @@ class KalmanSite {
 
   // int get_state() const { return _site_state; }
 
+  void set_residual(double residual) { _residual = residual; }
+
+  double get_residual() const { return _residual; }
+
  private:
   /// The state vector.
   TMatrixD _a;
@@ -128,6 +132,9 @@ class KalmanSite {
   int _id;
 
   Hep3Vector _direction;
+
+  /// The residual at this site. (filtered-meas)
+  double _residual;
 
   // enum state { INVALID = 0, PROJECTED, FILTERED, SMOOTHED };
 

@@ -53,7 +53,7 @@ TEST_F(RealDataDigitizationTest, test_mapping_load) {
   RealDataDigitization test_case;
   bool bad_map = test_case.load_mapping("nonsense.txt");
   EXPECT_FALSE(bad_map);
-  bool good_map = test_case.load_mapping("mapping_2.txt");
+  bool good_map = test_case.load_mapping("mapping_7.txt");
   EXPECT_TRUE(good_map);
   int missing_channel_counter = 0;
   for ( int board = 0; board < 16; board++ ) {
