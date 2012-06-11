@@ -181,7 +181,7 @@ void HelicalTrack::calc_filtered_state(KalmanSite *a_site) {
   std::cerr << "Measurement: " << m(0, 0) << ". Expected: " << alpha << std::endl;
   TMatrixD pull(2, 1);
   pull = TMatrixD(m, TMatrixD::kMinus, ha);
-  assert(pull(0, 0) < 5 );
+  // assert(pull(0, 0) < 5 );
   /////////////////////////////////////////////////////////////////////
   //
   // Kalman Gain: K = Cp Ht G
