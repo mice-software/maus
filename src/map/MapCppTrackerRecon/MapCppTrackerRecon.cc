@@ -59,7 +59,8 @@ std::string MapCppTrackerRecon::process(std::string document) {
 
   try {
     root = JsonWrapper::StringToJson(document);
-    digitization(spill, root);
+    Json::Value input_digits = root["recon_events"];
+    fill_digits_vector(input_digits, spill);
   } catch(...) {
     Json::Value errors;
     std::stringstream ss;
@@ -106,29 +107,13 @@ std::string MapCppTrackerRecon::process(std::string document) {
   return writer.write(root);
 }
 
-// === The Digits vectors is filled, either by running real data ==========
-// === digitization or by reading-in an already existing digits branch.====
-void MapCppTrackerRecon::digitization(SciFiSpill &spill, Json::Value &root) {
-  if ( root.isMember("daq_data") && !root["daq_data"].isNull() ) {
-    Json::Value daq = root.get("daq_data", 0);
-    RealDataDigitization real;
-    real.process(spill, daq);
-  } else if ( root.isMember("mc_events") ) {
-    // Json::Value digits = root.get("tracker_digits", 0);
-    Json::Value digits = root["recon_events"];
-    fill_digits_vector(digits, spill);
-  } else {
-    throw 0;
-  }
-}
-
-void MapCppTrackerRecon::fill_digits_vector(Json::Value &mc_event, SciFiSpill &a_spill) {
-  int number_events = mc_event.size();
+void MapCppTrackerRecon::fill_digits_vector(Json::Value &digits, SciFiSpill &a_spill) {
+  int number_events = digits.size();
   for ( unsigned int event_i = 0; event_i < number_events; event_i++ ) {
     SciFiEvent* an_event = new SciFiEvent();
     // Json::Value digits;
-    Json::Value digits_tracker0 = mc_event[event_i]["sci_fi_event"]["sci_fi_digits"]["tracker0"];
-    Json::Value digits_tracker1 = mc_event[event_i]["sci_fi_event"]["sci_fi_digits"]["tracker1"];
+    Json::Value digits_tracker0 = digits[event_i]["sci_fi_event"]["sci_fi_digits"]["tracker0"];
+    Json::Value digits_tracker1 = digits[event_i]["sci_fi_event"]["sci_fi_digits"]["tracker1"];
     Json::Value digits_merged = digits_tracker0;
     for ( unsigned int idig = 0; idig < digits_tracker1.size(); ++idig ) {
       digits_merged[digits_merged.size()] = digits_tracker1[idig];
@@ -224,21 +209,6 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) {
 }
 
 void MapCppTrackerRecon::save_to_json(SciFiEvent &evt, int event_i) {
-  // ------- DIGITS -------------------------------------------------------
-  Json::Value sci_fi_digits_tracker0;
-  Json::Value sci_fi_digits_tracker1;
-  for ( unsigned int dig_i = 0; dig_i < evt.digits().size(); dig_i++ ) {
-    Json::Value digit;
-    int tracker = evt.digits()[dig_i]->get_tracker();
-    digit["tracker"]= tracker;
-    digit["station"]= evt.digits()[dig_i]->get_station();
-    digit["plane"]  = evt.digits()[dig_i]->get_plane();
-    digit["channel"]= evt.digits()[dig_i]->get_channel();
-    digit["npe"]    = evt.digits()[dig_i]->get_npe();
-    digit["time"]   = evt.digits()[dig_i]->get_time();
-    if ( tracker == 0 ) sci_fi_digits_tracker0.append(digit);
-    if ( tracker == 1 ) sci_fi_digits_tracker1.append(digit);
-  }
   // ------- CLUSTERS -------------------------------------------------------
   Json::Value sci_fi_clusters_tracker0;
   Json::Value sci_fi_clusters_tracker1;
@@ -288,6 +258,7 @@ void MapCppTrackerRecon::save_to_json(SciFiEvent &evt, int event_i) {
     if ( tracker == 1 ) sci_fi_space_points_tracker1.append(spacepoint);
   }
   // ------- TRACKS ----------------------------------------------------
+  // Straight tracks
   Json::Value tracks_tracker0;
   Json::Value tracks_tracker1;
   for ( unsigned int track_i = 0; track_i < evt.straightprtracks().size(); track_i++ ) {
@@ -307,12 +278,34 @@ void MapCppTrackerRecon::save_to_json(SciFiEvent &evt, int event_i) {
       tracks_tracker1.append(track);
     }
   }
+
+  // Helical Tracks.
+  /*
+  Json::Value h_tracks_tracker0;
+  Json::Value h_tracks_tracker1;
+  for ( unsigned int track_i = 0; track_i < evt.helicalprtracks().size(); track_i++ ) {
+    Json::Value a_track;
+    a_track["num_points"] = evt.helicalprtracks()[track_i].get_num_points();
+    a_track["R"]          = evt.helicalprtracks()[track_i].get_R();
+    a_track["dzds"]       = evt.helicalprtracks()[track_i].get_dzds();
+    a_track["Phi_0"]      = evt.helicalprtracks()[track_i].get_phi0();
+    a_track["starting_point"]["x"] = evt.helicalprtracks()[track_i].get_x0();
+    a_track["starting_point"]["y"] = evt.helicalprtracks()[track_i].get_y0();
+    a_track["starting_point"]["z"] = evt.helicalprtracks()[track_i].get_z0();
+    if ( evt.helicalprtracks()[track_i].get_tracker() == 0 ) {
+      h_tracks_tracker0.append(a_track);
+    } else if ( evt.helicalprtracks()[track_i].get_tracker() == 1 ) {
+      h_tracks_tracker1.append(a_track);
+    }
+  }
+  root["tracks"]["tracker1"].append(h_tracks_tracker0);
+  root["tracks"]["tracker2"].append(h_tracks_tracker1);
+  }
+  */
   //
   // Save everything in data structrure tree.
   //
   // Tracker 0 -------------------------------------------------------------------
-  root["recon_events"][event_i]["sci_fi_event"]["sci_fi_digits"]["tracker0"]
-                                               = sci_fi_digits_tracker0;
   root["recon_events"][event_i]["sci_fi_event"]["sci_fi_clusters"]["tracker0"]
                                                = sci_fi_clusters_tracker0;
   root["recon_events"][event_i]["sci_fi_event"]["sci_fi_space_points"]["tracker0"]
@@ -320,8 +313,6 @@ void MapCppTrackerRecon::save_to_json(SciFiEvent &evt, int event_i) {
   root["recon_events"][event_i]["sci_fi_event"]["sci_fi_tracks"]["tracker0"]
                                                = tracks_tracker0;
   // Tracker 1 -------------------------------------------------------------------
-  root["recon_events"][event_i]["sci_fi_event"]["sci_fi_digits"]["tracker1"]
-                                               = sci_fi_digits_tracker1;
   root["recon_events"][event_i]["sci_fi_event"]["sci_fi_clusters"]["tracker1"]
                                                = sci_fi_clusters_tracker1;
   root["recon_events"][event_i]["sci_fi_event"]["sci_fi_space_points"]["tracker1"]
