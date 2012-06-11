@@ -80,14 +80,18 @@ std::string MapCppTrackerRecon::process(std::string document) {
         spacepoint_recon(event);
       }
       // Pattern Recognition.
-      if ( event.spacepoints().size() ) {
-        std::cout << "Calling Pattern Recognition..." << std::endl;
-        pattern_recognition(event);
-      }
+      // if ( event.spacepoints().size() ) {
+        // std::cout << "Calling Pattern Recognition..." << std::endl;
+        // pattern_recognition(event);
+      // }
       // Kalman Track Fit.
-      if ( event.straightprtracks().size() ) {
+      // if ( event.straightprtracks().size() ) {
         // track_fit(event);
+      //}
+      if ( root.isMember("mc_events") ) {
+        make_seed_and_fit(event);
       }
+
       print_event_info(event);
       save_to_json(event, k);
     }  // ==========================================================
@@ -145,6 +149,19 @@ void MapCppTrackerRecon::fill_digits_vector(Json::Value &mc_event, SciFiSpill &a
       SciFiDigit* a_digit = new SciFiDigit(spill, event,
                                            tracker, station, plane, channel,
                                            npe, time);
+      // temp stuff
+      double x, y, z, px, py, pz;
+      x = digit["true_position"]["x"].asDouble();
+      y = digit["true_position"]["y"].asDouble();
+      z = digit["true_position"]["z"].asDouble();
+      px = digit["true_momentum"]["x"].asDouble();
+      py = digit["true_momentum"]["y"].asDouble();
+      pz = digit["true_momentum"]["z"].asDouble();
+      Hep3Vector position(x, y, z);
+      Hep3Vector momentum(px, py, pz);
+      a_digit->set_true_position(position);
+      a_digit->set_true_momentum(momentum);
+      // temp stuff
       an_event->add_digit(a_digit);
     } // ends loop over digits in the event
     a_spill.add_event(an_event);
@@ -182,7 +199,7 @@ void MapCppTrackerRecon::make_seed_and_fit(SciFiEvent &event) {
 
   if ( spacepoints_tracker0.size() > 3 ) {
     SeedFinder seeds;
-    double x0, y0, r, pt, pz, phi_0, tan_lambda;
+    // double x0, y0, r, pt, pz, phi_0, tan_lambda;
     std::cerr << "Looking up seeds for tracker 0." << std::endl;
     seeds.process(spacepoints_tracker0);
     KalmanTrackFit fit;
@@ -192,7 +209,7 @@ void MapCppTrackerRecon::make_seed_and_fit(SciFiEvent &event) {
 
   if ( spacepoints_tracker1.size() > 3 ) {
     SeedFinder seeds;
-    double x0, y0, r, pt, pz, phi_0, tan_lambda;
+    // double x0, y0, r, pt, pz, phi_0, tan_lambda;
     std::cerr << "Looking up seeds for tracker 1." << std::endl;
     seeds.process(spacepoints_tracker1);
     KalmanTrackFit fit;

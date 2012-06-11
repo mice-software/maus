@@ -127,7 +127,20 @@ void MapCppTrackerMCDigitization::
     time    = hit["time"].asDouble();
     SciFiHit *a_hit = new SciFiHit(tracker, station, plane, fibre, edep, time);
     event->add_hit(a_hit);
-    // std::cout << "Number of hits stored in event: " << event->hits().size() << std::endl;
+
+    // .start. TO BE REMOVED .start.//
+    double px, py, pz, x, y, z;
+    px = hit["momentum"]["x"].asDouble();
+    py = hit["momentum"]["x"].asDouble();
+    pz = hit["momentum"]["x"].asDouble();
+    x  = hit["position"]["x"].asDouble();
+    y  = hit["position"]["y"].asDouble();
+    z  = hit["position"]["z"].asDouble();
+    Hep3Vector position(x, y, z);
+    Hep3Vector momentum(px, py, pz);
+    a_hit->set_true_position(position);
+    a_hit->set_true_momentum(momentum);
+    // .end. TO BE REMOVED .end.//
   }
   spill.add_event(event);
 }
@@ -184,6 +197,12 @@ void MapCppTrackerMCDigitization::construct_digits(SciFiEvent &evt) {
       int event = 99;
       SciFiDigit *a_digit = new SciFiDigit(spill, event,
                                            tracker, station, plane, chanNo, nPE, time);
+      // .start. TO BE REMOVED .start.//
+      Hep3Vector position = a_hit->get_true_position();
+      Hep3Vector momentum = a_hit->get_true_momentum();
+      a_digit->set_true_position(position);
+      a_digit->set_true_momentum(momentum);
+      // .end. TO BE REMOVED .end.//
       evt.add_digit(a_digit);
     }
   }  // ends 'for' loop over hits
@@ -325,6 +344,16 @@ void MapCppTrackerMCDigitization::save_to_json(SciFiEvent &evt, int event_i) {
     digit["channel"]= evt.digits()[dig_i]->get_channel();
     digit["npe"]    = evt.digits()[dig_i]->get_npe();
     digit["time"]   = evt.digits()[dig_i]->get_time();
+    Hep3Vector position;
+    position = evt.digits()[dig_i]->get_true_position();
+    Hep3Vector momentum;
+    momentum = evt.digits()[dig_i]->get_true_momentum();
+    digit["true_position"]["x"] = position.x();
+    digit["true_position"]["y"] = position.y();
+    digit["true_position"]["z"] = position.z();
+    digit["true_momentum"]["x"] = momentum.x();
+    digit["true_momentum"]["y"] = momentum.y();
+    digit["true_momentum"]["z"] = momentum.z();
     if ( tracker == 0 )
       digits_tracker0.append(digit);
     if ( tracker == 1 )

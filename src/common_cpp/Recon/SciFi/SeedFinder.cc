@@ -21,7 +21,7 @@
 #include "src/common_cpp/Recon/SciFi/SeedFinder.hh"
 
 SeedFinder::SeedFinder() {
-  _B    = 4.;
+  _B    = -4.;
   _Q    = 1.;
   _sigx = 0.5;
   _sigy = 0.5;

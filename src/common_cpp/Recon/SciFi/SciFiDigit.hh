@@ -29,6 +29,7 @@
 #include <CLHEP/Random/RandGauss.h>
 #include <CLHEP/Random/RandExponential.h>
 #include <CLHEP/Units/PhysicalConstants.h>
+#include "CLHEP/Vector/ThreeVector.h"
 
 // C++ headers
 #include <cmath>
@@ -87,7 +88,16 @@ class SciFiDigit {
 
   bool is_used()     const { return _used; }
 
+  void set_true_momentum(CLHEP::Hep3Vector p) { _p = p; }
+
+  CLHEP::Hep3Vector get_true_momentum() const { return _p; }
+
+  void set_true_position(CLHEP::Hep3Vector position) { _position = position; }
+
+  CLHEP::Hep3Vector get_true_position() const { return _position; }
+
  private:
+  CLHEP::Hep3Vector _position, _p;
 
   int _spill, _event;
 

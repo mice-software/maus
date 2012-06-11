@@ -33,10 +33,13 @@
 
 #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
+#include "src/common_cpp/Recon/SciFi/SeedFinder.hh"
 
 class HelicalTrack : public KalmanTrack {
  public:
   HelicalTrack();
+
+  HelicalTrack(SeedFinder const &seed);
 
   ~HelicalTrack();
   void update_propagator(KalmanSite *old_site, KalmanSite *new_site);
@@ -60,6 +63,8 @@ class HelicalTrack : public KalmanTrack {
   void smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_site);
 
  private:
+  double _x0, _y0, _r;
+
   TMatrixD _H;
 
   TMatrixD _G;
@@ -71,6 +76,8 @@ class HelicalTrack : public KalmanTrack {
   TMatrixD _F;
 
   static const double sigma_x = 0.64; // x measurement resolution
+
+  static const double _alpha = -1.0/(300000000.*4.);
 
   static const double A = 2./(7.*0.427); // mm to channel convertion factor.
 };
