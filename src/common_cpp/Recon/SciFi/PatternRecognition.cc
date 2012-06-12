@@ -635,7 +635,11 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
                     SimpleHelix helix; // create a helix to hold the helix seed parameters
                     helix.set_Phi_0(Phi_0);
                     double dsdz = line_sz.get_m();
-                    double tan_lambda = 1/dsdz;
+                    if ( dsdz == 0 )
+                      dsdz = .01;
+                      double tan_lambda = 1/dsdz;
+                    else
+                      double tan_lambda = 1/dsdz;
 
                     bool good_helix = full_helix_fit(good_spnts, circle, line_sz, helix);
                     if ( good_helix ) {
@@ -1046,7 +1050,7 @@ bool PatternRecognition::full_helix_fit(const std::vector<SciFiSpacePoint*> &spn
   CLHEP::Hep3Vector starting_point = spnts[0]->get_position();
 
   // Calculate chisq with initial params
-  double best_chisq = calculate_chisq(spnts, circle.get_turning_angle(), Phi_0, dsdz, R);
+  double best_chisq = calculate_chisq(spnts, circle.get_turning_angle(), Phi_0, tan_lambda, R);
   double best_chi2dof = best_chisq / static_cast<int>(spnts.size());
 
   std::cout<< "initial best chisq = " << best_chisq << std::endl;
@@ -1070,11 +1074,11 @@ bool PatternRecognition::full_helix_fit(const std::vector<SciFiSpacePoint*> &spn
     calculate_adjustments(spnts, circle.get_turning_angle(), R, Phi_0, tan_lambda, dR, dPhi_0,
                           dtan_lambda);
 
-    R -= dR;
-    Phi_0 -= dPhi_0;
-    tan_lambda -= dtan_lambda;
+    R += dR;
+    Phi_0 += dPhi_0;
+    tan_lambda += dtan_lambda;
     dsdz = 1/tan_lambda;
-    double chisq = calculate_chisq(spnts, circle.get_turning_angle(), Phi_0, dsdz, R);
+    double chisq = calculate_chisq(spnts, circle.get_turning_angle(), Phi_0, tan_lambda, R);
     if ( chisq > best_chisq && fabs(best_chisq - chisq) > 1. ) {
       std::cout << "********** chisq > best_chisq.... and chisq = " << chisq << std::endl;
 
@@ -1089,7 +1093,7 @@ bool PatternRecognition::full_helix_fit(const std::vector<SciFiSpacePoint*> &spn
         tan_lambda += dtan_lambda;
         dsdz = 1/ tan_lambda;
         ++i; // This counts as an iteration.
-        chisq = calculate_chisq(spnts, circle.get_turning_angle(), Phi_0, dsdz, R);
+        chisq = calculate_chisq(spnts, circle.get_turning_angle(), Phi_0, tan_lambda, R);
         double chisq_dof = chisq / static_cast<int>(spnts.size());
 
         if ( i == 10 )
@@ -1166,7 +1170,7 @@ bool PatternRecognition::full_helix_fit(const std::vector<SciFiSpacePoint*> &spn
 
 double PatternRecognition::calculate_chisq(const std::vector<SciFiSpacePoint*> &spnts,
                                            const std::vector<double> &turning_angles, double Phi_0,
-                                           double dsdz, double R) {
+                                           double tan_lambda, double R) {
   double chi2 = 0;
   for ( int i = 0; i < static_cast<int>(spnts.size()); ++i ) {
     CLHEP::Hep3Vector p = spnts[i]->get_position();
@@ -1178,7 +1182,7 @@ double PatternRecognition::calculate_chisq(const std::vector<SciFiSpacePoint*> &
     C = spnts[0]->get_position().z();
 
     double xi, yi, zi;
-    helix_function_at_i(R, Phi_0, dsdz, A, B, C, phi_i, xi, yi, zi);
+    helix_function_at_i(R, Phi_0, tan_lambda, A, B, C, phi_i, xi, yi, zi);
     std::cout << "Making sure helix is reconstructing properly..." << std::endl;
     std::cout << "x_recon = " << xi<< " should equal   x_sp = " << p.x() << std::endl;
     std::cout << "y_recon = " << yi<< " should equal   y_sp = " << p.y() << std::endl;
@@ -1189,12 +1193,12 @@ double PatternRecognition::calculate_chisq(const std::vector<SciFiSpacePoint*> &
   return chi2;
 }
 
-void PatternRecognition::helix_function_at_i(double R, double phi_0, double dsdz,
+void PatternRecognition::helix_function_at_i(double R, double phi_0, double tan_lambda,
                                              double A, double B, double C, double phi_i,
                                              double &xi, double &yi, double &zi) {
     xi = A + R * (cos(phi_i) - 1) * cos(phi_0) - R * sin(phi_i) * sin(phi_0);
     yi = B + R * (cos(phi_i) - 1) * sin(phi_0) + R * sin(phi_i) * cos(phi_0);
-    zi = C + (R * phi_i / dsdz);
+    zi = C + (R * phi_i * tan_lambda);
 }
 
 void PatternRecognition::calculate_adjustments(const std::vector<SciFiSpacePoint*> &spnts,
@@ -1231,7 +1235,7 @@ void PatternRecognition::calculate_adjustments(const std::vector<SciFiSpacePoint
 
     double xi, yi, zi;
     double dsdz = 1/tan_lambda;
-    helix_function_at_i(R, phi_0, dsdz, A, B, C, phi_i, xi, yi, zi);
+    helix_function_at_i(R, phi_0, tan_lambda, A, B, C, phi_i, xi, yi, zi);
 
     // Calculate the elements of the gradient vector g
     g_r += w * (((p.x() - xi)*(xi - A)) + ((p.y() - yi)*(yi - B))) + ((p.z() - zi)*(zi - C));

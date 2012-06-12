@@ -255,6 +255,25 @@ void MapCppTrackerRecon::save_to_json(SciFiEvent &evt, int event_i) {
       tracks_tracker1.append(track);
     }
   }
+  // ------ Helical Tracks -----------------------------------------------
+  Json::Value h_tracks_tracker0;
+  Json::Value h_tracks_tracker1;
+  for ( unsigned int track_i = 0; track_i < evt.prtracks().size(); track_i++ ) {
+    Json::Value a_track;
+    a_track["num_points"] = evt.prtracks()[track_i].get_num_points();
+    a_track["R"]          = evt.prtracks()[track_i].get_R();
+    a_track["dzds"]       = evt.prtracks()[track_i].get_dzds();
+    a_track["Phi_0"]      = evt.prtracks()[track_i].get_phi0();
+    a_track["starting_point"]["x"] = evt.prtracks()[track_i].get_x0();
+    a_track["starting_point"]["y"] = evt.prtracks()[track_i].get_y0();
+    a_track["starting_point"]["z"] = evt.prtracks()[track_i].get_z0();
+    if ( evt.prtracks()[track_i].get_tracker() == 0 ) {
+      h_tracks_tracker0.append(a_track);
+    } else if ( evt.prtracks()[track_i].get_tracker() == 1 ) {
+      h_tracks_tracker1.append(a_track);
+    }
+  }
+
   //
   // Save everything in data structrure tree.
   //
@@ -265,8 +284,10 @@ void MapCppTrackerRecon::save_to_json(SciFiEvent &evt, int event_i) {
                                                = sci_fi_clusters_tracker0;
   root["recon_events"][event_i]["sci_fi_event"]["sci_fi_space_points"]["tracker0"]
                                                = sci_fi_space_points_tracker0;
+  // root["recon_events"][event_i]["sci_fi_event"]["sci_fi_tracks"]["tracker0"]
+  //                                             = tracks_tracker0;
   root["recon_events"][event_i]["sci_fi_event"]["sci_fi_tracks"]["tracker0"]
-                                               = tracks_tracker0;
+                                               = h_tracks_tracker0;
   // Tracker 1 -------------------------------------------------------------------
   root["recon_events"][event_i]["sci_fi_event"]["sci_fi_digits"]["tracker1"]
                                                = sci_fi_digits_tracker1;
@@ -274,8 +295,10 @@ void MapCppTrackerRecon::save_to_json(SciFiEvent &evt, int event_i) {
                                                = sci_fi_clusters_tracker1;
   root["recon_events"][event_i]["sci_fi_event"]["sci_fi_space_points"]["tracker1"]
                                                = sci_fi_space_points_tracker1;
+  // root["recon_events"][event_i]["sci_fi_event"]["sci_fi_tracks"]["tracker1"]
+  //                                             = tracks_tracker1;
   root["recon_events"][event_i]["sci_fi_event"]["sci_fi_tracks"]["tracker1"]
-                                               = tracks_tracker1;
+                                               = h_tracks_tracker1;
 }
 
 void MapCppTrackerRecon::print_event_info(SciFiEvent &event) {
