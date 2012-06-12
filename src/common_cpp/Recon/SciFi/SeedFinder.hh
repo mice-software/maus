@@ -47,12 +47,25 @@ class SeedFinder {
 
   void print_event_info();
 
+  void set_x0(double x0) { _x0 = x0; }
   double get_x0() const { return _x0; }
+
+  void set_y0(double y0) { _y0 = y0; }
   double get_y0() const { return _y0; }
+
+  void set_r(double r) { _r = r; }
   double get_r() const { return _r; }
+
+  void set_pt(double pt) { _pt = pt; }
   double get_pt() const { return _pt; }
+
+  void set_pz(double pz) { _pz = pz; }
   double get_pz() const { return _pz; }
+
+  void set_phi_0(double phi_0) { _phi_0 = phi_0; }
   double get_phi_0() const { return _phi_0; }
+
+  void set_tan_lambda(double tan_lambda) { _tan_lambda = tan_lambda; }
   double get_tan_lambda() const { return _tan_lambda; }
 
  private:

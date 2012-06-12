@@ -29,38 +29,37 @@
 #include "TMath.h"
 #include "TMatrixD.h"
 
+#include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
 
 class KalmanSite;
 
 class KalmanTrack {
  public:
-  KalmanTrack() {}
+  KalmanTrack();
 
   virtual ~KalmanTrack() {}
 
   virtual void update_propagator(KalmanSite *old_site, KalmanSite *new_site) = 0;
 
-  virtual void calc_filtered_state(KalmanSite *a_site) = 0;
+  void calc_filtered_state(KalmanSite *a_site);
 
-  virtual void update_G(KalmanSite *a_site) = 0;
+  void update_G(KalmanSite *a_site);
 
-  virtual void update_covariance(KalmanSite *a_site) = 0;
+  void update_covariance(KalmanSite *a_site);
 
-  virtual void update_H(KalmanSite *a_site) = 0;
+  void update_H(KalmanSite *a_site);
 
-  virtual void calc_predicted_state(KalmanSite *old_site, KalmanSite *new_site) = 0;
+  void calc_predicted_state(KalmanSite *old_site, KalmanSite *new_site);
 
   // void calc_system_noise(KalmanSite &site);
 
-  virtual void calc_covariance(KalmanSite *old_site, KalmanSite *new_site) = 0;
+  void calc_covariance(KalmanSite *old_site, KalmanSite *new_site);
 
-  virtual void update_back_transportation_matrix(KalmanSite *optimum_site,
-                                                 KalmanSite *smoothing_site) = 0;
+  void update_back_transportation_matrix(KalmanSite *optimum_site, KalmanSite *smoothing_site);
 
-  virtual void smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_site) = 0;
+  void smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_site);
 
-/*
- private:
+ protected:
   TMatrixD _H;
 
   TMatrixD _G;
@@ -70,10 +69,11 @@ class KalmanTrack {
   TMatrixD _A;
 
   TMatrixD _F;
-*/
-  // static const double sigma_x = 0.64; // x measurement resolution
 
-  // static const double A = 2./(7.*0.427); // mm to channel convertion factor.
+  static const double sigma_x = 0.64; // x measurement resolution
+
+  static const double A = 2./(7.*0.427); // mm to channel convertion factor.
 };
 
 #endif
+
