@@ -62,7 +62,7 @@ std::string MapCppPatternRecognition::process(std::string document) {
     Json::Value spacepoints_array = JsonWrapper::GetProperty(root, "spacepoints",
                                                               JsonWrapper::arrayValue);
   //  Json::Value spacepoints_value = JsonWrapper::GetProperty(root, "space_points",
-   //                                                          JsonWrapper::objectValue);
+  //                                                          JsonWrapper::objectValue);
 
   //  Json::Value spacepoints_array = JsonWrapper::GetProperty(spacepoints_value, "tracker1",
     //                                                         JsonWrapper::arrayValue);
