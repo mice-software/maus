@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _SRC_MAP_MAPCPPTrackerRecon_H_
-#define _SRC_MAP_MAPCPPTrackerRecon_H_
+#ifndef _SRC_MAP_MAPCPPTrackerDigits_H_
+#define _SRC_MAP_MAPCPPTrackerDigits_H_
 // C headers
 #include <assert.h>
 #include <json/json.h>
@@ -43,16 +43,10 @@
 #include "src/common_cpp/Recon/SciFi/SciFiSpill.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiEvent.hh"
 #include "src/common_cpp/Recon/SciFi/RealDataDigitization.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiClusterRec.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiSpacePointRec.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiDigit.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiCluster.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
-#include "src/common_cpp/Recon/SciFi/PatternRecognition.hh"
-#include "src/common_cpp/Recon/Kalman/KalmanTrackFit.hh"
-#include "src/common_cpp/Recon/SciFi/SeedFinder.hh"
 
-class MapCppTrackerRecon {
+
+class MapCppTrackerDigits {
  public:
   /** Sets up the worker
    *
@@ -75,34 +69,7 @@ class MapCppTrackerRecon {
    */
   std::string process(std::string document);
 
-  /** fills digits from MC digitization
-   *
-   *  \param digits the MC digits
-   *  \param a_spill the SciFiSpill we are processing
-   */
-  void fill_digits_vector(Json::Value &digits, SciFiSpill &a_spill);
-
-  /** performs the cluster reconstruction
-   *
-   *  \param evt the current SciFiEvent
-   */
-  void cluster_recon(SciFiEvent &evt);
-
-  /** performs the spacepoint reconstruction
-   *
-   *  \param evt the current SciFiEvent
-   */
-  void spacepoint_recon(SciFiEvent &evt);
-
-  void pattern_recognition(SciFiEvent &evt);
-
-  void make_seed_and_fit(SciFiEvent &event);
-
-  void track_fit(SciFiEvent &evt);
-
-  void save_to_json(SciFiEvent &evt, int event_i);
-
-  void print_event_info(SciFiEvent &event);
+  void save_to_json(SciFiSpill &spill);
 
   Json::Value ConvertToJson(std::string jsonString);
 
@@ -119,8 +86,6 @@ class MapCppTrackerRecon {
   Json::Reader reader;
   ///  Cut value for npe.
   double minPE;
-  /// Value above which reconstruction is aborted.
-  int ClustException;
   ///  Vector with the MICE SciFi Modules.
   std::vector<const MiceModule*> modules;
 

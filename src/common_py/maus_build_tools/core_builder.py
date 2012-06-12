@@ -86,7 +86,8 @@ def build_cpp_tests(env):
         env.Append(LINKFLAGS=['-undefined', 'suppress','-flat_namespace'])
 
     test_cpp_files = glob.glob("tests/cpp_unit/*/*cc")+\
-        glob.glob("tests/cpp_unit/*cc")
+                     glob.glob("tests/cpp_unit/*cc")+\
+                     glob.glob("tests/cpp_unit/*/*/*cc")
 
     env.Program(target = 'tests/cpp_unit/test_cpp_unit', \
                 source = test_cpp_files, \

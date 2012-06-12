@@ -59,13 +59,13 @@ std::string MapCppPatternRecognition::process(std::string document) {
 
   try {
     root = JsonWrapper::StringToJson(document);
-  //  Json::Value spacepoints_array = JsonWrapper::GetProperty(root, "spacepoints",
-  //                                                            JsonWrapper::arrayValue);
-    Json::Value spacepoints_value = JsonWrapper::GetProperty(root, "space_points",
-                                                             JsonWrapper::objectValue);
+    Json::Value spacepoints_array = JsonWrapper::GetProperty(root, "spacepoints",
+                                                              JsonWrapper::arrayValue);
+  //  Json::Value spacepoints_value = JsonWrapper::GetProperty(root, "space_points",
+   //                                                          JsonWrapper::objectValue);
 
-    Json::Value spacepoints_array = JsonWrapper::GetProperty(spacepoints_value, "tracker1",
-                                                             JsonWrapper::arrayValue);
+  //  Json::Value spacepoints_array = JsonWrapper::GetProperty(spacepoints_value, "tracker1",
+    //                                                         JsonWrapper::arrayValue);
 
     // assert(spacepoints_array.isArray());
     make_SciFiSpill(spacepoints_array, spill);
@@ -124,7 +124,7 @@ void MapCppPatternRecognition::make_SciFiSpill(Json::Value spacepoint_array, Sci
       spacepoint = event[j];
       int tracker, station;
       CLHEP::Hep3Vector position;
-      tracker  = spacepoint["tracker"].asInt();
+      tracker  = spacepoint["tracker"].asInt() - 1;
       // tracker -= 1;
       station  = spacepoint["station"].asInt();
       double _x, _y, _z;
@@ -212,18 +212,18 @@ void MapCppPatternRecognition::save_to_json(SciFiEvent &evt) {
   // Helical Tracks.
   Json::Value h_tracks_tracker0;
   Json::Value h_tracks_tracker1;
-  for ( unsigned int track_i = 0; track_i < evt.prtracks().size(); track_i++ ) {
+  for ( unsigned int track_i = 0; track_i < evt.helicalprtracks().size(); track_i++ ) {
     Json::Value a_track;
-    a_track["num_points"] = evt.prtracks()[track_i].get_num_points();
-    a_track["R"]          = evt.prtracks()[track_i].get_R();
-    a_track["dzds"]       = evt.prtracks()[track_i].get_dzds();
-    a_track["Phi_0"]      = evt.prtracks()[track_i].get_phi0();
-    a_track["starting_point"]["x"] = evt.prtracks()[track_i].get_x0();
-    a_track["starting_point"]["y"] = evt.prtracks()[track_i].get_y0();
-    a_track["starting_point"]["z"] = evt.prtracks()[track_i].get_z0();
-    if ( evt.prtracks()[track_i].get_tracker() == 0 ) {
+    a_track["num_points"] = evt.helicalprtracks()[track_i].get_num_points();
+    a_track["R"]          = evt.helicalprtracks()[track_i].get_R();
+    a_track["dzds"]       = evt.helicalprtracks()[track_i].get_dzds();
+    a_track["Phi_0"]      = evt.helicalprtracks()[track_i].get_phi0();
+    a_track["starting_point"]["x"] = evt.helicalprtracks()[track_i].get_x0();
+    a_track["starting_point"]["y"] = evt.helicalprtracks()[track_i].get_y0();
+    a_track["starting_point"]["z"] = evt.helicalprtracks()[track_i].get_z0();
+    if ( evt.helicalprtracks()[track_i].get_tracker() == 0 ) {
       h_tracks_tracker0.append(a_track);
-    } else if ( evt.prtracks()[track_i].get_tracker() == 1 ) {
+    } else if ( evt.helicalprtracks()[track_i].get_tracker() == 1 ) {
       h_tracks_tracker1.append(a_track);
     }
   }
@@ -235,7 +235,7 @@ void MapCppPatternRecognition::print_event_info(SciFiEvent &event) {
   std::cout << event.digits().size() << " "
             << event.clusters().size() << " "
             << event.spacepoints().size() << " "
-            << event.prtracks().size() << " "
+            << event.helicalprtracks().size() << " "
             << std::endl;
 }
 

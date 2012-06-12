@@ -25,6 +25,8 @@
 #define PATTERNRECOGNITION_HH
 
 // C++ headers
+#include <iostream>
+#include <fstream>
 #include <vector>
 #include <map>
 #include <string>
@@ -63,8 +65,6 @@ class PatternRecognition {
       */
     void process(SciFiEvent &evt);
 
-  private:
-
     /** @brief Make Pattern Recognition tracks with 5 spacepoints
      *
      *  Make a Pattern Recognition track/s when there are spacepoints
@@ -75,8 +75,9 @@ class PatternRecognition {
      *  @param trks - A vector of the output Pattern Recognition tracks
      */
     void make_5tracks(std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
-                      std::vector<SciFiPRTrack> &trks, std::vector< std::vector<int> >
-&residuals );
+                      std::vector<SciFiStraightPRTrack> &strks,
+                      std::vector<SciFiHelicalPRTrack> &htrks,
+                      std::vector< std::vector<int> > &residuals );
 
     /** @brief Make Pattern Recognition tracks with 4 spacepoints
      *
@@ -88,8 +89,9 @@ class PatternRecognition {
      *  @param trks - A vector of the output Pattern Recognition tracks
      */
     void make_4tracks(std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
-                      std::vector<SciFiPRTrack> &trks, std::vector< std::vector<int> >
-&residuals );
+                      std::vector<SciFiStraightPRTrack> &strks,
+                      std::vector<SciFiHelicalPRTrack> &htrks,
+                      std::vector< std::vector<int> > &residuals );
 
     /** @brief Make Pattern Recognition tracks with 3 spacepoints
      *
@@ -101,8 +103,9 @@ class PatternRecognition {
      *  @param trks - A vector of the output Pattern Recognition tracks
      */
     void make_3tracks(std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
-                      std::vector<SciFiPRTrack>& trks, std::vector< std::vector<int> >
-&residuals );
+                      std::vector<SciFiStraightPRTrack>& strks,
+                      std::vector<SciFiHelicalPRTrack> &htrks,
+                      std::vector< std::vector<int> > &residuals );
 
     /** @brief Fits a straight track for a given set of stations
      * 
@@ -116,7 +119,7 @@ class PatternRecognition {
      */
     void make_straight_tracks(const int num_points, const std::vector<int> ignore_stations,
                      std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
-                     std::vector<SciFiStraightPRTrack> &trks, std::vector< std::vector<int> >
+                     std::vector<SciFiStraightPRTrack> &strks, std::vector< std::vector<int> >
 &residuals );
 
     /** @brief Least-squares straight line fit
@@ -149,7 +152,7 @@ class PatternRecognition {
      */
     void make_helix(const int num_points, const std::vector<int> ignore_stations,
                     std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
-                    std::vector<SciFiPRTrack> &trks);
+                    std::vector<SciFiHelicalPRTrack> &htrks);
 
     /** @brief Find points from intermediate stations which fit to the "trial track"
      *
@@ -258,7 +261,7 @@ class PatternRecognition {
      *  @param zi - Helix value z at point i
      *
      */
-    void helix_function_at_i(double R, double phi_0, double dsdz, double A, double B,
+    void helix_function_at_i(double R, double phi_0, double tan_lambda, double A, double B,
                              double C, double phi_i, double &xi, double &yi, double &zi);
 
     /** @brief Calculates helix chisq
@@ -276,7 +279,7 @@ class PatternRecognition {
      */
     double calculate_chisq(const std::vector<SciFiSpacePoint*> &spnts,
                            const std::vector<double> &turning_angles, double Phi_0,
-                           double dsdz, double R);
+                           double tan_lambda, double R);
 
     /** @brief Calculates the adjustments to the seed parameters
      *
@@ -383,6 +386,7 @@ class PatternRecognition {
 
     double parabola_fit(const std::vector<double> chisqs, const std::vector<double> Dparams);
 
+  private:
     static const int _n_trackers = 2;
     static const int _n_stations = 5;
     static const int _n_bins = 100;         // Number of bins in each residuals histogram
@@ -395,6 +399,10 @@ class PatternRecognition {
     static const double _sd_phi_1to4 = 1.;  // Still needs to be calculated!!!!
     static const double _sd_phi_5 = 1.;     // Still needs to be calculated!!!!
     static const double _active_diameter = 300.0;  // Active volume diameter a tracker in mm
+    static const bool _helical_pr_on = 1;   // Flag to turn on helical pr (0 off, 1 on)
+    static const bool _straight_pr_on = 0;  // Flag to turn on straight pr (0 off, 1 on)
+
+    // ofstream _f_res, _f_trks;  // Some output files - only to be kept when in development stages
 };
 // } // ~namespace MAUS
 

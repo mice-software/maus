@@ -28,6 +28,7 @@
 #include <CLHEP/Random/RandPoisson.h>
 #include <CLHEP/Random/RandGauss.h>
 #include <CLHEP/Random/RandExponential.h>
+#include <CLHEP/Vector/ThreeVector.h>
 
 // C++ headers
 #include <cmath>
@@ -117,7 +118,17 @@ class SciFiCluster {
 
   int get_id() const { return _id; }
 
+  void set_true_momentum(Hep3Vector p) { _p = p; }
+
+  Hep3Vector get_true_momentum() const { return _p; }
+
+  void set_true_position(Hep3Vector position) { _pos = position; }
+
+  Hep3Vector get_true_position() const { return _pos; }
+
  private:
+  Hep3Vector _pos, _p;
+
   bool _used;
 
   int _spill, _event;
