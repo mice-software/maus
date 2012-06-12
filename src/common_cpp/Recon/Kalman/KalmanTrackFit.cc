@@ -91,6 +91,13 @@ void KalmanTrackFit::initialise_helix(std::vector<SciFiSpacePoint> &spacepoints,
   double kappa = 1./230.0;
   std::cout << "Seed state-vector " << x << " " << y << " "
             << tan_lambda << " " << phi_0 << " " << kappa << std::endl;
+  TMatrixD a(5, 1);
+  a(0, 0) = x;
+  a(1, 0) = y;
+  a(2, 0) = tan_lambda;
+  a(3, 0) = phi_0;
+  a(4, 0) = kappa;
+
   first_plane.set_state_vector(x, y, tan_lambda, phi_0, kappa);
   TMatrixD C(5, 5);
   C(0, 0) = 70;
