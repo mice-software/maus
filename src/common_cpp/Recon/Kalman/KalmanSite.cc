@@ -34,29 +34,29 @@ KalmanSite::KalmanSite(const KalmanSite &site) {
   _projected_C.ResizeTo(5, 5);
   _projected_a.ResizeTo(5, 1);
 
-  _a = site.get_state_vector();
+  _a = site.get_a();
   _C = site.get_covariance_matrix();
   _v = site.get_measurement();
   _alpha = _v(0, 0);
   _projected_C = site.get_projected_covariance_matrix();
-  _projected_a = site.get_projected_state_vector();
+  _projected_a = site.get_projected_a();
   _z = site.get_z();
   _id= site.get_id();
   _direction = site.get_direction();
-  _alpha_extrapolated = site.get_extrapolated_alpha();
+  _alpha_projected = site.get_projected_alpha();
   _residual = site.get_residual();
 }
 
 KalmanSite& KalmanSite::operator=(const KalmanSite &site) {
-  _a = site.get_state_vector();
+  _a = site.get_a();
   _C = site.get_covariance_matrix();
-  _projected_C = site.get_projected_covariance_matrix();
-  _projected_a = site.get_projected_state_vector();
   _v = site.get_measurement();
   _alpha = _v(0, 0);
+  _projected_C = site.get_projected_covariance_matrix();
+  _projected_a = site.get_projected_a();
   _z = site.get_z();
   _id= site.get_id();
   _direction = site.get_direction();
-  _alpha_extrapolated =site.get_extrapolated_alpha();
+  _alpha_projected = site.get_projected_alpha();
   _residual = site.get_residual();
 }

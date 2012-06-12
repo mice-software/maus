@@ -89,16 +89,15 @@ void KalmanTrackFit::initialise_helix(std::vector<SciFiSpacePoint> &spacepoints,
   double x = x0+r*cos(phi_0*PI/180.);
   double y = y0+r*sin(phi_0*PI/180.);
   double kappa = 1./230.0;
-  std::cout << "Seed state-vector " << x << " " << y << " "
-            << tan_lambda << " " << phi_0 << " " << kappa << std::endl;
+
   TMatrixD a(5, 1);
   a(0, 0) = x;
   a(1, 0) = y;
   a(2, 0) = tan_lambda;
   a(3, 0) = phi_0;
   a(4, 0) = kappa;
-
-  first_plane.set_state_vector(x, y, tan_lambda, phi_0, kappa);
+  first_plane.set_projected_a(a);
+  // first_plane.set_state_vector(x, y, tan_lambda, phi_0, kappa);
   TMatrixD C(5, 5);
   C(0, 0) = 70;
   C(1, 1) = 70;
@@ -108,7 +107,7 @@ void KalmanTrackFit::initialise_helix(std::vector<SciFiSpacePoint> &spacepoints,
   // for ( int i = 0; i < 5; ++i ) {
   //   C(i, i) = 200; // dummy values
   // }
-  first_plane.set_covariance_matrix(C);
+  first_plane.set_projected_covariance_matrix(C);
   first_plane.set_measurement(clusters[0]->get_alpha());
   first_plane.set_direction(clusters[0]->get_direction());
   first_plane.set_z(clusters[0]->get_position().z());
@@ -187,7 +186,15 @@ void KalmanTrackFit::initialise(SciFiEvent &event, std::vector<KalmanSite> &site
   int numb_sites = clusters.size();
 
   KalmanSite first_plane;
-  first_plane.set_state_vector(x0, y0, mx, my, p);
+  // first_plane.set_state_vector(x0, y0, mx, my, p);
+  TMatrixD a(5, 1);
+  a(0, 0) = x0;
+  a(1, 0) = y0;
+  a(2, 0) = mx;
+  a(3, 0) = my;
+  a(4, 0) = p;
+  first_plane.set_projected_a(a);
+
   TMatrixD C(5, 5);
   C(0, 0) = 70;
   C(1, 1) = 70;
@@ -197,7 +204,7 @@ void KalmanTrackFit::initialise(SciFiEvent &event, std::vector<KalmanSite> &site
   // for ( int i = 0; i < 5; ++i ) {
   //   C(i, i) = 200; // dummy values
   // }
-  first_plane.set_covariance_matrix(C);
+  first_plane.set_projected_covariance_matrix(C);
   first_plane.set_measurement(clusters[0]->get_alpha());
   first_plane.set_direction(clusters[0]->get_direction());
   first_plane.set_z(clusters[0]->get_position().z());

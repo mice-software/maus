@@ -46,14 +46,14 @@ void KalmanMonitor::save(std::vector<KalmanSite> const &sites) {
     // std::cerr << "SITE extrap alpha: " << site.get_extrapolated_alpha() << std::endl;
     // std::cerr << "SITE measured alpha: " << site.get_alpha() << std::endl;
 
-    _alpha_extrap.at(i) = site.get_extrapolated_alpha();
+    _alpha_extrap.at(i) = site.get_projected_alpha();
     _site.at(i) = site.get_id();
     _alpha_meas.at(i) = site.get_alpha();
 
     double pull = _alpha_meas.at(i) - _alpha_extrap.at(i);
     // std::cerr << "PULL: " << _alpha_meas.at(i) << " " << _alpha_extrap.at(i) << std::endl;
     TMatrixD a(5, 1);
-    a = site.get_state_vector();
+    a = site.get_a();
     TMatrixD C(5, 5);
     C = site.get_covariance_matrix();
     // double observed = pow(pow(a(0, 0), 2.)+pow(a(1, 0), 2.), 0.5);

@@ -35,11 +35,10 @@ KalmanTrack::KalmanTrack() {
 // }
 
 void KalmanTrack::calc_predicted_state(KalmanSite *old_site, KalmanSite *new_site) {
-  TMatrixD a = old_site->get_state_vector();
+  TMatrixD a = old_site->get_a();
 
-  TMatrixD a_pred = TMatrixD(_F, TMatrixD::kMult, a);
-  new_site->set_state_vector(a_pred);
-  new_site->set_projected_state_vector(a_pred);
+  TMatrixD a_projected = TMatrixD(_F, TMatrixD::kMult, a);
+  new_site->set_projected_a(a_projected);
 }
 
 //
@@ -56,7 +55,6 @@ void KalmanTrack::calc_covariance(KalmanSite *old_site, KalmanSite *new_site) {
 
   TMatrixD C_pred(5, 5);
   C_pred = TMatrixD(temp2, TMatrixD::kPlus, _Q);
-  new_site->set_covariance_matrix(C_pred);
   new_site->set_projected_covariance_matrix(C_pred);
 }
 
@@ -94,7 +92,7 @@ void KalmanTrack::update_H(KalmanSite *a_site) {
 void KalmanTrack::update_covariance(KalmanSite *a_site) {
   // calc_covariance_matrix_of_residual
   // Cp = ( C_inv + Ht*G*H )-1;
-  TMatrixD C = a_site->get_covariance_matrix();
+  TMatrixD C = a_site->get_projected_covariance_matrix();
   TMatrixD C_inv = C.Invert();
 
   TMatrixD temp1(5, 2);
@@ -117,14 +115,14 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
   m = a_site->get_measurement();
 
   TMatrixD a(5, 1);
-  a = a_site->get_state_vector();
+  a = a_site->get_projected_a();
   double beta  = 0;
   double alpha = a(0, 0)*_H(0, 0) + a(1, 0)*_H(0, 1);
   TMatrixD ha(2, 1);
   ha(0, 0) = alpha;
   ha(1, 0) = beta;
   // Extrapolation converted to expected measurement.
-  a_site->set_extrapolated_alpha(alpha);
+  a_site->set_projected_alpha(alpha);
 
   TMatrixD pull(2, 1);
   pull = TMatrixD(m, TMatrixD::kMinus, ha);
@@ -145,7 +143,7 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
   temp4 = TMatrixD(K, TMatrixD::kMult, pull);
   TMatrixD a_filt(5, 1);
   a_filt = TMatrixD(a, TMatrixD::kPlus, temp4);
-  a_site->set_state_vector(a_filt);
+  a_site->set_a(a_filt);
 
   //////////////////////////////////////////////////////////////////////////
 /*  std::cout <<  "******************* STATE VECTOR *******************" << std::endl;
@@ -195,13 +193,13 @@ void KalmanTrack::update_back_transportation_matrix(KalmanSite *optimum_site,
 void KalmanTrack::smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_site) {
 
   TMatrixD a(5, 1);
-  a = smoothing_site->get_state_vector();
+  a = smoothing_site->get_a();
   a.Print();
   TMatrixD a_opt(5, 1);
-  a_opt = optimum_site->get_state_vector();
+  a_opt = optimum_site->get_a();
 
   TMatrixD ap(5, 1);
-  ap = optimum_site->get_projected_state_vector();
+  ap = optimum_site->get_projected_a();
 
   TMatrixD temp1(5, 1);
   temp1 == TMatrixD(a_opt, TMatrixD::kMinus, ap);
@@ -212,7 +210,7 @@ void KalmanTrack::smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_si
 
   TMatrixD a_smooth(5, 1);
   a_smooth =  TMatrixD(a, TMatrixD::kPlus, temp2);
-  smoothing_site->set_state_vector(a_smooth);
+  smoothing_site->set_a(a_smooth);
   // a_smooth.Print();
 
   // do the same for covariance matrix
