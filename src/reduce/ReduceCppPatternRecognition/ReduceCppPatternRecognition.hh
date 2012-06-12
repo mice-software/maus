@@ -72,6 +72,7 @@ class ReduceCppPatternRecognition {
   std::string process(std::string document);
 
   int const get_num_tracks() { return _tracks.GetEntries(); }
+  int const get_num_spoints() { return _spacepoints.GetEntries(); }
 
  private:
 

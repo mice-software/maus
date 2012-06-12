@@ -315,6 +315,8 @@ void MapCppTrackerRecon::save_to_json(SciFiEvent &evt, int event_i) {
                                                = sci_fi_clusters_tracker1;
   root["recon_events"][event_i]["sci_fi_event"]["sci_fi_space_points"]["tracker1"]
                                                = sci_fi_space_points_tracker1;
+  root["recon_events"][event_i]["sci_fi_event"]["sci_fi_pr_tracks"]["straight"]["tracker1"]
+                                               = s_tracks_tracker1;
   root["recon_events"][event_i]["sci_fi_event"]["sci_fi_pr_tracks"]["helical"]["tracker1"]
                                                = h_tracks_tracker1;
 }

@@ -25,6 +25,8 @@
 #define PATTERNRECOGNITION_HH
 
 // C++ headers
+#include <iostream>
+#include <fstream>
 #include <vector>
 #include <map>
 #include <string>
@@ -397,6 +399,10 @@ class PatternRecognition {
     static const double _sd_phi_1to4 = 1.;  // Still needs to be calculated!!!!
     static const double _sd_phi_5 = 1.;     // Still needs to be calculated!!!!
     static const double _active_diameter = 300.0;  // Active volume diameter a tracker in mm
+    static const bool _helical_pr_on = 0;   // Flag to turn on helical pr (0 off, 1 on)
+    static const bool _straight_pr_on = 1;  // Flag to turn on straight pr (0 off, 1 on)
+
+    // ofstream _f_res, _f_trks;  // Some output files - only to be kept when in development stages
 };
 // } // ~namespace MAUS
 
