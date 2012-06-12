@@ -182,7 +182,6 @@ CLHEP::HepLorentzVector BTPillBox::GetVectorPotential(CLHEP::HepLorentzVector po
 	HepLorentzVector A(0,0,0,0);
 	if(fabs(position.z()) > _fieldLength/2.) return A;
 	int    ORDER = 3;
-	double J_old = 0;
 	double J_new = 0;
 	int    ll    = 0;
 	int    lFact = 1;
@@ -194,8 +193,6 @@ CLHEP::HepLorentzVector BTPillBox::GetVectorPotential(CLHEP::HepLorentzVector po
 	double krPow = kr2; //(k*r)^(2l)
 	while(ll < ORDER)
 	{
-		
-		J_old  = J_new;
 		J_new += neg*krPow/(lFact*lFact); 
 		ll++;
 		lFact *= ll;

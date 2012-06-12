@@ -48,7 +48,7 @@ class TOFEventDigit {
     TOFEventDigit& operator=(const TOFEventDigit& _tofeventdigit);
 
     /** Destructor - any member pointers are deleted */
-    ~TOFEventDigit();
+    virtual ~TOFEventDigit();
 
 
     /** Returns TOF1DigitArray */

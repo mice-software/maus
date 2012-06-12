@@ -23,8 +23,12 @@ import os
 
 def main():
     """
-    This file prints either to screen or file a list of added geometries to the
-    configuration DB within the time period specified.
+    This is the executbale which gets information relating to geometries stored
+    on the configuration Database. It will print either to screen or to file
+    the ID number, geometry description and valid from and to date. It takes 
+    arguments in the form of a time window of which to search the Database and 
+    also whether the user wants the information printed to screen or file. These
+    arguments can be specified in the ConfigurationDefaults file.
     """
     configuration = Configreader()
     if configuration.get_ids_start_time == "":

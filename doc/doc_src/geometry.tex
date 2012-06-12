@@ -1,0 +1,89 @@
+\chapter{Geometry}
+\label{chapter:geometry}
+MAUS uses the online Configuration Database to store all of its geometries. These geometries have been transferred from CAD drawings which are
+modelling using the latest surveys and technical drawings available. The following section shall describe how to use the available executables to
+access and use these models. 
+
+\section{Geometry Download}
+
+There are two executable files available to users both can be found in the directory /bin/utilities found within your copy of MAUS. The two files of
+interest are download\_geometry.py and get\_geometry\_ids.py. These files do the following.
+
+\begin{description}
+  \item[Upload Geometry] \hfill 
+  \begin{enumerate}
+   \item Set up the Configreader class and read the values provided by ConfigurationDefaults.py or by custom config files.
+   \item Instantiate an Uploader class object using the upload directory and geometry note taken from the configuration file.
+   \item The list of files which is created by the Uploader class is used to compress the geometry files into one zip file.
+   \item This zip file is then used as the argument for the upload\_to\_CDB method which takes the contents of the zip and then uploads this, as a
+single string to the CDB.
+   \item[Optional] If cleanup is specified in the configuration file then the file list and the original GDML files are the deleted leaving only the
+zip file.
+  \end{enumerate}
+
+  \item[Download Geometry] \hfill
+  \begin{enumerate}
+   \item Set up the Configreader() class and read the values provided by ConfigurationDefaults.py or by custom config files.
+   \item Instantiate a Downloader class object and downloads either the current, time specified or run number zipped geometry to a temporary cache
+location.
+   \item The zip file is then unzipped in this location.
+   \item The Formatter class is then called and this class formats the GDMLs. The formatting alters the schema location of these files and points
+them to the correct local locations of the Materials GDML file. This formatting leaves the original GDMLs in the tmeporary cache and places the new
+formatted files in the download directory specified in the configuration file.
+   \item GDMLtoMAUS is then called with the location of the new formatted files as its argument. This class converts the GDMLs to the MICE Module
+text files using the XSLT stylesheets previously described.
+   \item[Optional] If specified in the configuration file the temporary cache location is removed along with the zip file and unzipped files.
+  \end{enumerate}
+
+  \item[Get Geometry IDs]
+  \begin{enumerate}
+   \item Set up the Configreader() class and read the values provided by ConfigurationDefaults.py or by custom config files. This file takes start
+and stop time arguments to specify a period to search the CDB.
+   \item A CDB class object is then instantiated with the server specified in the configuration file.
+   \item The get ids method from the CDB class is called and the python dict which is downloaded is formatted and either printed to screen or to file
+as specified in the configuration file.
+  \end{enumerate}
+\end{description}
+
+To use these files the user must use the arguments in the ConfigurationDefaults.py file. The arguments relating to these executables are as follows.
+
+\begin{table*}
+\begin{center}
+\caption{Geometry control parameters.}
+\begin{tabularx}{\textwidth}{lX}
+\hline
+\multicolumn{2}{l}{\emph{Geometry controls.}} \\
+\hline
+\verb|cdb_upload_url| & Sets the upload url relating the the Configuration Database.\\
+\verb|cdb_download_url| & Sets the download url relating the the Configuration Database.\\
+\verb|geometry_download_wsdl| & Name of the web service used for downloads.\\
+\verb|geometry_download_directory| & Set the directory where you wish the geometry to be downloaded to.\\
+\verb|geometry_download_by| & This can be set to either \textit{current, id or run\_number}. Current will download the current valid geometry stored
+on the CDB. ID will download the geometry for the ID specified N.B ID numbers can be found using the get geometry ids executable. Run\_number will
+download the geometry along with control room information for specified run. \\ 
+\verb|geometry_download_run_number| & Set the number of the run to be downloaded.\\
+\verb|geometry_download_id| & Set the number of the geometry ID to be downloaded.\\
+\verb|geometry_download_cleanup| & Set to True in order to cleanup the temporary files creaated during the download process. These are the zip file
+downloaded and the original GDML files from this zip file.\\
+\verb|g4_step_max| & Set the G4 step max number which will be set in the ParentGeometryFile. This relates to the size of steps carried out during
+the simulation.\\
+\verb|geometry_upload_wsdl| & Name of the web service used for uploads. For developers use only.\\
+\verb|geometry_upload_directory| & Set the the directory which stores the FastRad produced GDML files which will be stored on the CDB. For Developers
+use only.\\
+\verb|geometry_upload_note| & Write the description of the geometry which is going to be uploaded. This should describe what is in the beam line
+specifically what is new to the model. It should also include any other information the developer wishes the user to know. For developers use only.\\
+\verb|geometry_upload_valid_from| & Set the date-time format of the date when this geometry about to be uploaded is valid from. For developers use
+only.\\
+\verb|geometry_upload_cleanup| & Set to True in order to cleanup the temporary files creaated during the upload process. These are the file
+containing the list of GDMLs to be uploaded and also the original GDML files. For developers use only.\\
+\verb|get_ids_start_time| & Set the start time of the period which you would like to get the ids from the configuration database. Must be in
+date-time format.\\
+\verb|get_ids_stop_time| & Set the stop time of the period which you would like to get the ids from the configuration database. Must be in
+date-time format.\\
+\verb|get_ids_create_file| & Set to True in order to create a file which lists the geometries available within the time period specified. If set to
+False the geometry information will be printed to screen.\\
+\begin{makeimage} % force latex2html to render as an html table 
+\end{makeimage} 
+\end{tabularx}
+\end{center}
+\end{table*}

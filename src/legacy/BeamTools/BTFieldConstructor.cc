@@ -608,9 +608,7 @@ void BTFieldConstructor::SetDefaults()
 	//use default for now BTPillBox::SetStaticPhaseModel(RFParams->phaseModel());
 	//Defaults for Quadrupoles
 	vector<double> AVec = MagParams->QuadrupoleFringeParameters();
-	double AArray[6];
 	if(AVec.size()==0) AVec = vector<double>(6);
-	for(unsigned int i=0; i<6; i++) AArray[i] = AVec[i];
 	BTPhaser::GetInstance()->SetPhaseTolerance (RFParams->rfPhaseTolerance());
 	int gridSpace[3] = {MagParams->FieldGridX(),MagParams->FieldGridY(),MagParams->FieldGridZ()};
 	BTFieldGroup::SetGridDefault(std::vector<int>(gridSpace, gridSpace+3));
