@@ -44,7 +44,7 @@ class Trigger {
     Trigger& operator=(const Trigger& _trigger);
 
     /** Destructor - any member pointers are deleted */
-    ~Trigger();
+    virtual ~Trigger();
 
 
     /** Returns V1290Array */

@@ -37,7 +37,7 @@ class SciFiEvent {
     SciFiEvent& operator=(const SciFiEvent& _scifievent);
 
     /** Destructor - any member pointers are deleted */
-    ~SciFiEvent();
+    virtual ~SciFiEvent();
 
 
   private:

@@ -41,7 +41,7 @@ class CkovDigit {
     CkovDigit& operator=(const CkovDigit& _ckovdigit);
 
     /** Destructor - any member pointers are deleted */
-    ~CkovDigit();
+    virtual ~CkovDigit();
 
 
     /** Returns CkovA */

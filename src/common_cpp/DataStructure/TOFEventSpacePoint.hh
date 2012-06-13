@@ -48,7 +48,7 @@ class TOFEventSpacePoint {
     TOFEventSpacePoint& operator=(const TOFEventSpacePoint& _tofeventspacepoint);
 
     /** Destructor - any member pointers are deleted */
-    ~TOFEventSpacePoint();
+    virtual ~TOFEventSpacePoint();
 
     /** Returns TOF0SpacePointArray */
     TOF0SpacePointArray GetTOF0SpacePointArray() const;
