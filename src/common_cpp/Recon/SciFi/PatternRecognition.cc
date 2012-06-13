@@ -38,13 +38,11 @@
 // namespace MAUS {
 
 PatternRecognition::PatternRecognition() {
-  // _f_res.open("residuals.dat", std::ios::out);
-  // _f_trks.open("tracks.dat", std::ios::out);
+  // Do nothing
 };
 
 PatternRecognition::~PatternRecognition() {
-  // _f_res.close();
-  // _f_trks.close();
+  // Do nothing
 };
 
 void PatternRecognition::process(SciFiEvent &evt) {
@@ -52,6 +50,14 @@ void PatternRecognition::process(SciFiEvent &evt) {
   std::cout << "\nBegining Pattern Recognition" << std::endl;
   std::cout << "Number of spacepoints in spill: " << evt.spacepoints().size() << std::endl;
 
+  _f_res = new ofstream();
+  _f_res->open("residuals.dat", std::ios::app);
+
+  _f_res_good = new ofstream();
+  _f_res_good->open("residuals_good.dat", std::ios::app);
+
+  _f_trks = new ofstream();
+  _f_trks->open("tracks.dat", std::ios::app);
 
   if ( static_cast<int>(evt.spacepoints().size()) > 0 ) {
 
@@ -127,6 +133,15 @@ void PatternRecognition::process(SciFiEvent &evt) {
   } else {
     std::cout << "No spacepoints in event" << std::endl;
   }
+
+  _f_res->close();
+  delete _f_res;
+
+  _f_res_good->close();
+  delete _f_res_good;
+
+  _f_trks->close();
+  delete _f_trks;
 };
 
 void PatternRecognition::make_5tracks(
@@ -363,12 +378,16 @@ void PatternRecognition::make_straight_tracks(const int num_points,
                   // Calculate the residuals
                   double dx = pos.x() - ( line_x.get_c() + ( pos.z() * line_x.get_m() ) );
                   double dy = pos.y() - ( line_y.get_c() + ( pos.z() * line_y.get_m() ) );
+                  *_f_res << station_num << "\t" << num_points << "\t" << dx << "\t" << dy << "\n";
                   // add_residuals(false, dx, dy, residuals);
 
                   // Apply roadcuts & find the spoints with the smallest residuals for the line
-                  if ( fabs(dx) < _res_cut && fabs(dy) < _res_cut && delta_sq > (dx*dx + dy*dy) ) {
-                    delta_sq = dx*dx + dy*dy;
-                    best_sp = sp_no;
+                  if ( fabs(dx) < _res_cut && fabs(dy) < _res_cut )  {
+                    *_f_res_good << station_num << "\t" << num_points << "\t";
+                    *_f_res_good << dx << "\t" << dy << "\n";
+                    if ( delta_sq > (dx*dx + dy*dy) )
+                      delta_sq = dx*dx + dy*dy;
+                      best_sp = sp_no;
                     // add_residuals(true, dx, dy, residuals);
                   } // ~If pass roadcuts and beats previous best fit point
                 } // ~If spacepoint is unused
@@ -428,6 +447,9 @@ void PatternRecognition::make_straight_tracks(const int num_points,
               SciFiStraightPRTrack track(-1, num_points, line_x, line_y);
               std::cout << "x0 = " << track.get_x0() << "mx = " << track.get_mx();
               std::cout << "y0 = " << track.get_y0() << "my = " << track.get_my() << std::endl;
+              *_f_trks << num_points << "\t" << track.get_x0() << "\t" << track.get_mx() << "\t";
+              *_f_trks << track.get_x_chisq() << "\t" << track.get_y0() << "\t";
+              *_f_trks << track.get_my() << "\t" << track.get_y_chisq() << "\t" << 1 << "\n";
 
               // Set all the good sp to used and convert pointers to variables
               std::vector<SciFiSpacePoint> good_spnts_variables;
@@ -445,6 +467,12 @@ void PatternRecognition::make_straight_tracks(const int num_points,
               std::cout << "x_chisq = " << line_x.get_chisq();
               std::cout << "\ty_chisq = " << line_y.get_chisq() << std::endl;
               std::cout << "chisq test failed, " << num_points << "pt track rejected" << std::endl;
+
+              SciFiStraightPRTrack bad_track(-1, num_points, line_x, line_y);
+              *_f_trks << num_points << "\t" << bad_track.get_x0() << "\t";
+              *_f_trks << bad_track.get_mx() << "\t" << bad_track.get_x_chisq() << "\t";
+              *_f_trks << bad_track.get_y0() << "\t" << bad_track.get_my() << "\t";
+              *_f_trks << bad_track.get_y_chisq() << "\t" << 0 << "\n";
             } // ~Check track passes chisq test
           } // ~ if ( good_spnts.size() > 1 )
         } else {
