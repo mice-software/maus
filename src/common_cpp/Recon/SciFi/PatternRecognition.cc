@@ -670,6 +670,7 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
                     SimpleHelix helix; // create a helix to hold the helix seed parameters
                     helix.set_Phi_0(Phi_0);
                     double dsdz = line_sz.get_m();
+                    std::cout << "dsdz = " << dsdz << std:: endl;
                     double tan_lambda = 1/dsdz;
 
                     bool good_helix = full_helix_fit(good_spnts, circle, line_sz, helix);
@@ -721,12 +722,12 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
                     } else { // Debugging **************
                       std::cout << "Helix fit did not converge within reasonable # of interations.";
                       std::cout << " Track is rejected...." << std::endl;
-                      std::ofstream out5("rejected_tracks_helix_fit.txt",
-                                         std::ios::out | std::ios::app);
-                      for (int t = 0; t < static_cast<int>(good_spnts.size()); ++t) {
-                        out5 << good_spnts[t]->get_position() << "\t";
-                      }
-                      out5 <<  circle.get_R() << "\t"<< Phi_0 <<"\t"<< tan_lambda << std::endl;
+                      // std::ofstream out5("rejected_tracks_helix_fit.txt",
+                      //                   std::ios::out | std::ios::app);
+                      // for (int t = 0; t < static_cast<int>(good_spnts.size()); ++t) {
+                      //  out5 << good_spnts[t]->get_position() << "\t";
+                      // }
+                      // out5 <<  circle.get_R() << "\t"<< Phi_0 <<"\t"<< tan_lambda << std::endl;
                     }
                   } else { // Debugging **************
                     std::cout << "sz chisq = " << line_sz.get_chisq();
@@ -940,7 +941,7 @@ void PatternRecognition::calculate_dipangle(const std::vector<SciFiSpacePoint*> 
   for ( int i = 1; i < static_cast<int>(spnts.size()); ++i ) {
 
     double z_i = spnts[i]->get_position().z();
-    double dz_ji = z_i - z0;
+    double dz_ji = fabs(z_i) - fabs(z0);
     dz.push_back(dz_ji);
 
     double x_i = spnts[i]->get_position().x();
@@ -1060,7 +1061,7 @@ bool PatternRecognition::full_helix_fit(const std::vector<SciFiSpacePoint*> &spn
 
   double dsdz = line_sz.get_m();
   if ( dsdz == 0 )
-    dsdz = -.01;
+    dsdz = .1;
 
   double tan_lambda = 1 / dsdz;
 
@@ -1108,15 +1109,15 @@ bool PatternRecognition::full_helix_fit(const std::vector<SciFiSpacePoint*> &spn
       dPhi_0 /= 2;
       dtan_lambda /= 2;
       while ( chisq > best_chisq ) {
-        R += dR;
-        Phi_0 += dPhi_0;
-        tan_lambda += dtan_lambda;
+        R -= dR;
+        Phi_0 -= dPhi_0;
+        tan_lambda -= dtan_lambda;
         dsdz = 1/ tan_lambda;
         ++i; // This counts as an iteration.
         chisq = calculate_chisq(spnts, circle.get_turning_angle(), Phi_0, tan_lambda, R);
         // double chisq_dof = chisq / static_cast<int>(spnts.size());
 
-        if ( i == 10 )
+        if ( i == 10 || fabs(chisq - best_chisq) < 1)
           break;
       }
     } // ~ chisq > best_chisq && fabs(chisq - best_chisq) > 1
@@ -1194,12 +1195,17 @@ double PatternRecognition::calculate_chisq(const std::vector<SciFiSpacePoint*> &
   double chi2 = 0;
   for ( int i = 0; i < static_cast<int>(spnts.size()); ++i ) {
     CLHEP::Hep3Vector p = spnts[i]->get_position();
-    double phi_i = turning_angles[i];
+    double phi_i;
+    if ( i == 0 )
+      phi_i = Phi_0;
+    else
+      phi_i = turning_angles[i];
+
     phi_i -= Phi_0;
     double A, B, C;
     A = spnts[0]->get_position().x();
     B = spnts[0]->get_position().y();
-    C = spnts[0]->get_position().z();
+    C = fabs(spnts[0]->get_position().z());
 
     double xi, yi, zi;
 
@@ -1207,9 +1213,9 @@ double PatternRecognition::calculate_chisq(const std::vector<SciFiSpacePoint*> &
     std::cout << "Making sure helix is reconstructing properly..." << std::endl;
     std::cout << "x_recon = " << xi<< " should equal   x_sp = " << p.x() << std::endl;
     std::cout << "y_recon = " << yi<< " should equal   y_sp = " << p.y() << std::endl;
-    std::cout << "z_recon = " << zi<< " should equal   z_sp = " << p.z() << std::endl;
+    std::cout << "z_recon = " << zi<< " should equal   z_sp = " << fabs(p.z()) << std::endl;
 
-    chi2 += ((p.x() - xi)*(p.x() - xi)) + ((p.y() - yi)*(p.y() - yi)) + ((p.z() - zi)*(p.z() - zi));
+    chi2 += ((p.x()-xi)*(p.x()-xi))+((p.y()-yi)*(p.y()-yi))+((fabs(p.z())-zi)*(fabs(p.z())-zi));
   }
   return chi2;
 }
@@ -1232,7 +1238,7 @@ void PatternRecognition::calculate_adjustments(const std::vector<SciFiSpacePoint
   double A, B, C;
   A = spnts[0]->get_position().x();
   B = spnts[0]->get_position().y();
-  C = spnts[0]->get_position().z();
+  C = fabs(spnts[0]->get_position().z());
 
   // construct the individual matrix elements as 0 to begin with.
   double G_rr = 0., G_bb = 0., G_ll = 0., G_rb = 0., G_br = 0., G_rl = 0., G_lr = 0.;
@@ -1242,7 +1248,12 @@ void PatternRecognition::calculate_adjustments(const std::vector<SciFiSpacePoint
 
   for ( int i = 0; i < static_cast<int>(spnts.size()); ++i ) {
     CLHEP::Hep3Vector p = spnts[i]->get_position();
-    double phi_i = turning_angles[i];
+    double phi_i;
+    if ( i == 0 )
+      phi_i = phi_0;
+    else
+      double phi_i = turning_angles[i];
+
     phi_i -= phi_0; // Everything relative to starting point.
 
     // Get errors on x and y measurements (equal).  Note error on z negligible.
@@ -1258,14 +1269,14 @@ void PatternRecognition::calculate_adjustments(const std::vector<SciFiSpacePoint
     helix_function_at_i(R, phi_0, tan_lambda, A, B, C, phi_i, xi, yi, zi);
 
     // Calculate the elements of the gradient vector g
-    g_r += w * (((p.x() - xi)*(xi - A)) + ((p.y() - yi)*(yi - B))) + ((p.z() - zi)*(zi - C));
+    g_r += w * (((p.x()-xi)*(xi-A))+((p.y()-yi)*(yi-B)))+((fabs(p.z())-zi)*(zi - C));
     g_b += w * (-1*((p.x() - xi)*(yi - B)) + ((p.y() - yi)*(xi - A)));
-    g_l += (p.z() - zi) * phi_i;
+    g_l += (fabs(p.z()) - zi) * phi_i;
 
     // Calculate the elements of the matrix G
     G_rr += (w*((xi - A)*(xi - A) + (yi - B)*(yi - B))) + (zi - C)*(zi - C);
     G_rb += w *(((p.x() - xi)*(yi - B)) - ((p.y() - yi)*(xi - A)));
-    G_rl += ((zi - C) - (p.z() - zi)) * phi_i;
+    G_rl += ((zi - C) - (fabs(p.z()) - zi)) * phi_i;
     G_bb += w * ((p.x() - A) * (xi - A) + (p.y() - B) * (yi - B));
     G_ll += phi_i * phi_i;
   } // end i

@@ -20,9 +20,9 @@ import MAUS
 
 def run(data_path, run_num):
 
-    input_file = open('helixspacepoints_10000_at200pz_fullrange.txt', 'r')
+    #input_file = open('helixspacepoints_10000_at200pz_fullrange.txt', 'r')
 
-    #input_file = open('bfield.out', 'r')
+    input_file = open('bfield.out', 'r')
 
     my_input = MAUS.InputPyJSON(input_file)
 
