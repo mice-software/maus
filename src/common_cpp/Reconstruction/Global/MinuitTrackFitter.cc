@@ -76,12 +76,13 @@ MinuitTrackFitter::MinuitTrackFitter(
   // setup the index, name, init value, step size, min, and max value for each
   // phase space variable (mins and maxes calculated from 800MeV/c ISIS beam)
   int error_flag = 0;
-  minimiser->mnparm(0, "Time", 20, 0.1, 0.001, 100, error_flag);   // ns
-  minimiser->mnparm(1, "Energy", 900, 1, 105.7, 1860, error_flag);  // MeV
-  minimiser->mnparm(2, "X", 0, 0.001, -1.5, 1.5, error_flag);      // m
-  minimiser->mnparm(3, "Px", 900, 0.1, 30., 1860, error_flag);    // MeV/c
-  minimiser->mnparm(4, "Y", 0, 0.001, -1.5, 1.5, error_flag);      // m
-  minimiser->mnparm(5, "Py", 900, 0.1, 30., 1860, error_flag);    // MeV/c
+  // TODO(plane1@hawk.iit.edu) put this in the configuration file
+  minimiser->mnparm(0, "Time", 0., 0.1, -10000000., 10000000., error_flag);   // ns
+  minimiser->mnparm(1, "Energy", 200., 1, 105.7, 1860., error_flag);  // MeV
+  minimiser->mnparm(2, "X", 0, 0.001, -150., 150., error_flag);      // mm
+  minimiser->mnparm(3, "Px", 0., 0.1, -100., 100, error_flag);    // MeV/c
+  minimiser->mnparm(4, "Y", 0, 0.001, -150., 150., error_flag);      // mm
+  minimiser->mnparm(5, "Py", 0., 0.1, -100., 100, error_flag);    // MeV/c
 }
 
 MinuitTrackFitter::~MinuitTrackFitter() {

@@ -7,20 +7,20 @@
 #include "gsl/gsl_sf_gamma.h"
 
 #include "Maths/Matrix.hh"
-#include "Maths/PolynomialVector.hh"
+#include "Maths/PolynomialMap.hh"
 #include "Maths/Vector.hh"
 
 ////////////////////////// DIFFERENTIATOR ///////////////////////////
 
 Differentiator::Differentiator (VectorMap* in, std::vector<double> delta, std::vector<double> magnitude)
- : _inSize(in->PointDimension()), _outSize(MAUS::PolynomialVector::NumberOfPolynomialCoefficients(_inSize, magnitude.size())*in->ValueDimension()), _diffKey(), _factKey(),
+ : _inSize(in->PointDimension()), _outSize(MAUS::PolynomialMap::NumberOfPolynomialCoefficients(_inSize, magnitude.size())*in->ValueDimension()), _diffKey(), _factKey(),
    _delta(delta), _magnitude(magnitude), _diffOrder(magnitude.size()), _y(in)
 {
-    for(int i=0; i<int(MAUS::PolynomialVector::NumberOfPolynomialCoefficients(_inSize, magnitude.size()) ); i++) 
+    for(int i=0; i<int(MAUS::PolynomialMap::NumberOfPolynomialCoefficients(_inSize, magnitude.size()) ); i++) 
     {
-        _diffKey.push_back(MAUS::PolynomialVector::IndexByVector(i,_inSize));
+        _diffKey.push_back(MAUS::PolynomialMap::IndexByVector(i,_inSize));
         _factKey.push_back(1);
-        std::vector<int> powerKey = MAUS::PolynomialVector::IndexByPower(i,_inSize);
+        std::vector<int> powerKey = MAUS::PolynomialMap::IndexByPower(i,_inSize);
         for(int j=0; j<int(powerKey.size()); j++) 
             _factKey[i] *= gsl_sf_fact(powerKey[j]);
     }
@@ -133,12 +133,12 @@ void Differentiator::F(const MAUS::Vector<double>& point, MAUS::Matrix<double>& 
     }
 }
 
-MAUS::PolynomialVector* Differentiator::PolynomialFromDifferentials(const MAUS::Vector<double>& point) const
+MAUS::PolynomialMap* Differentiator::PolynomialFromDifferentials(const MAUS::Vector<double>& point) const
 {
-    return new MAUS::PolynomialVector(_inSize, PolynomialMap(point) );
+    return new MAUS::PolynomialMap(_inSize, PolynomialMap(point) );
 }
 
-MAUS::PolynomialVector* Differentiator::PolynomialFromDifferentials(double* point) const
+MAUS::PolynomialMap* Differentiator::PolynomialFromDifferentials(double* point) const
 {
     MAUS::Vector<double> pointHep(PointDimension());
     for(int i=0; i<int(PointDimension()); i++) pointHep(i+1) = point[i];
@@ -159,8 +159,8 @@ PolynomialInterpolator::PolynomialInterpolator(Mesh* mesh, VectorMap* F, int dif
     : _mesh(mesh), _func(F), _differentialOrder(differentialOrder), _totalOrder(interpolationOrder+differentialOrder), 
       _inSize(F->PointDimension()), _outSize(F->ValueDimension()), _delta(delta), _magnitude(magnitude), _muIndex(), _alphaIndex(), _taylorCoefficient()
 {
-    for(unsigned int i=0; i<NumberOfDiffIndices(); i++) _muIndex.   push_back(MAUS::PolynomialVector::IndexByPower(i, _inSize)); //index of differentials at each point
-    for(unsigned int i=0; i<NumberOfIndices();     i++) _alphaIndex.push_back(MAUS::PolynomialVector::IndexByPower(i, _inSize)); //index of polynomials at each interpolation
+    for(unsigned int i=0; i<NumberOfDiffIndices(); i++) _muIndex.   push_back(MAUS::PolynomialMap::IndexByPower(i, _inSize)); //index of differentials at each point
+    for(unsigned int i=0; i<NumberOfIndices();     i++) _alphaIndex.push_back(MAUS::PolynomialMap::IndexByPower(i, _inSize)); //index of polynomials at each interpolation
     for(unsigned int i=0; i<_muIndex.size(); i++)
     {
         _taylorCoefficient.push_back(std::vector<double>(_alphaIndex.size(), 1));
@@ -176,10 +176,20 @@ PolynomialInterpolator::PolynomialInterpolator(Mesh* mesh, VectorMap* F, int dif
     _meshCounter[this] = _mesh;
 }
 
+unsigned int PolynomialInterpolator::NumberOfDiffIndices() const {
+  return MAUS::PolynomialMap::NumberOfPolynomialCoefficients(
+    PointDimension(), DifferentialOrder()+1);
+}
+
+unsigned int PolynomialInterpolator::NumberOfIndices() const {
+  return MAUS::PolynomialMap::NumberOfPolynomialCoefficients(
+    _inSize, _totalOrder+1);
+}
+
 PolynomialInterpolator* PolynomialInterpolator::Clone()       const
 {
     PolynomialInterpolator * clone =  new PolynomialInterpolator(*this);
-    clone->_points = new MAUS::PolynomialVector*[_mesh->End().ToInteger()];
+    clone->_points = new MAUS::PolynomialMap*[_mesh->End().ToInteger()];
     for(int i=0; i<_mesh->End().ToInteger(); i++) clone->_points[i] = _points[i]->Clone(); 
     _meshCounter[clone] = _mesh;
     return clone;
@@ -205,7 +215,7 @@ PolynomialInterpolator::~PolynomialInterpolator()
 void PolynomialInterpolator::BuildFixedMeshPolynomials(VectorMap* F)
 {
     Differentiator*    diff     = new Differentiator(F, _delta, _magnitude);
-    _points     = new MAUS::PolynomialVector*[_mesh->End().ToInteger()];
+    _points     = new MAUS::PolynomialMap*[_mesh->End().ToInteger()];
     for(Mesh::Iterator it=_mesh->Begin(); it<_mesh->End(); it++)
     {
         _points[it.ToInteger()] = PolynomialFromDiffs(it, diff);
@@ -218,7 +228,7 @@ void PolynomialInterpolator::F(const double* point, double* value) const
     Mesh::Iterator      it  = _mesh->Nearest(point);
     std::vector<double> pos = it.Position();
     for(unsigned int i=0; i<PointDimension(); i++) pos[i] = point[i] - pos[i];
-    MAUS::PolynomialVector* vecP = _points[it.ToInteger()];
+    MAUS::PolynomialMap* vecP = _points[it.ToInteger()];
     vecP->F(&pos[0], value);
 }
 
@@ -254,14 +264,14 @@ bool PolynomialInterpolator::M1_LT_M2(const Mesh::Iterator& m1, const Mesh::Iter
     return dist < 0;
 }
 
-MAUS::PolynomialVector* PolynomialInterpolator::PolynomialFromDiffs(Mesh::Iterator dualPoint, Differentiator* diff)
+MAUS::PolynomialMap* PolynomialInterpolator::PolynomialFromDiffs(Mesh::Iterator dualPoint, Differentiator* diff)
 {
     std::vector< Mesh::Iterator > points = GetFixedMeshPoints(dualPoint, _muIndex.size());
     MAUS::Matrix<double> X = GetX(points);
     MAUS::Matrix<double> D = GetD(points, diff);
     MAUS::Matrix<double> A = transpose(D) * inverse(X);
 
-    return new MAUS::PolynomialVector(_inSize, A );
+    return new MAUS::PolynomialMap(_inSize, A );
 }
 
 MAUS::Matrix<double> PolynomialInterpolator::GetX(std::vector< Mesh::Iterator> points )

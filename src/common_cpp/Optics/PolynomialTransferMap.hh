@@ -32,8 +32,8 @@ class OpticsModel;
 
 namespace MAUS {
 
-// Forward declarations for src/legacy/Interface/PolynomialVector.hh
-class PolynomialVector;
+// Forward declarations for src/legacy/Interface/PolynomialMap.hh
+class PolynomialMap;
 
 // Forward declarations for PhaseSpaceVector.hh
 class PhaseSpaceVector;
@@ -57,19 +57,19 @@ class PolynomialTransferMap : public TransferMap {
   // ******************************
 
   /* @brief constructor for different input and output reference trajectories.
-   * @params polynomial                the mapping as a polynomial vector
-   * @params reference_trajectory_in   input reference trajectory
-   * @params reference_trajectory_out  output reference trajectory
+   * @params polynomial_map           the actual polynomial map
+   * @params reference_trajectory_in  input reference trajectory
+   * @params reference_trajectory_out output reference trajectory
    */
-  PolynomialTransferMap(const PolynomialVector& polynomial,
+  PolynomialTransferMap(const PolynomialMap& polynomial_map,
                         const PhaseSpaceVector& reference_trajectory_in,
                         const PhaseSpaceVector& reference_trajectory_out);
 
   /* @brief constructor for identical input and output reference trajectories.
-   * @params polynomial            the mapping as a polynomial vector
+   * @params polynomial_map        the actual polynomial map
    * @params reference_trajectory  input/output reference trajectory
    */
-  PolynomialTransferMap(const PolynomialVector& polynomial,
+  PolynomialTransferMap(const PolynomialMap& polynomial_map,
                         const PhaseSpaceVector& reference_trajectory);
 
   /* @brief copy constructor
@@ -96,7 +96,7 @@ class PolynomialTransferMap : public TransferMap {
 
   Matrix<double> CreateTransferMatrix() const;
 
-  const PolynomialVector& polynomial_;
+  const PolynomialMap& polynomial_map_;
   const PhaseSpaceVector& reference_trajectory_in_;
   const PhaseSpaceVector& reference_trajectory_out_;
 };

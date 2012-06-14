@@ -27,7 +27,7 @@
 #include "gtest/gtest.h"
 
 #include "Maths/Matrix.hh"
-#include "Maths/PolynomialVector.hh"
+#include "Maths/PolynomialMap.hh"
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
 #include "src/common_cpp/Optics/PolynomialTransferMap.hh"
@@ -48,7 +48,7 @@ class PolynomialTransferMapTest : public ::testing::Test {
   static const double reflected_covariance_matrix_data_[36];
 
   static const MAUS::Matrix<double> reflection_polynomial_coefficient_matrix_;
-  static const MAUS::PolynomialVector reflection_polynomial_map_;
+  static const MAUS::PolynomialMap reflection_polynomial_map_;
   static const MAUS::PhaseSpaceVector null_reference_trajectory_;
   static const MAUS::PhaseSpaceVector phase_space_vector_;
   static const MAUS::PhaseSpaceVector reflected_phase_space_vector_;
@@ -105,8 +105,8 @@ PolynomialTransferMapTest::reflection_polynomial_coefficient_matrix_
   = MAUS::Matrix<double>(6, 7,
       PolynomialTransferMapTest::reflection_polynomial_coefficient_matrix_data_);
 
-const MAUS::PolynomialVector PolynomialTransferMapTest::reflection_polynomial_map_
-  = MAUS::PolynomialVector(6,
+const MAUS::PolynomialMap PolynomialTransferMapTest::reflection_polynomial_map_
+  = MAUS::PolynomialMap(6,
       PolynomialTransferMapTest::reflection_polynomial_coefficient_matrix_);
 
 const MAUS::PhaseSpaceVector PolynomialTransferMapTest::null_reference_trajectory_

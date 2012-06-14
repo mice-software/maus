@@ -18,7 +18,7 @@
  * Author: Peter Lane (MAUS update)
  */
 
-#include "Maths/PolynomialVector.hh"
+#include "Maths/PolynomialMap.hh"
 
 #include <math.h>
 
@@ -37,23 +37,23 @@
 
 namespace MAUS {
 
-bool PolynomialVector::print_headers_ = true;
+bool PolynomialMap::print_headers_ = true;
 
-PolynomialVector::PolynomialVector(int numberOfInputVariables,
+PolynomialMap::PolynomialMap(int numberOfInputVariables,
                                    Matrix<double> polynomialCoefficients)
   :  point_dimension_(numberOfInputVariables), index_key_by_power_(),
     index_key_by_vector_(), coefficient_matrix_(polynomialCoefficients) {
   SetCoefficients(numberOfInputVariables, polynomialCoefficients);
 }
 
-PolynomialVector::PolynomialVector(
+PolynomialMap::PolynomialMap(
   std::vector<PolynomialCoefficient>  coefficients)
   :  point_dimension_(0), index_key_by_power_(), index_key_by_vector_(),
     coefficient_matrix_() {
   SetCoefficients(coefficients);
 }
 
-void PolynomialVector::SetCoefficients(int pointDim, Matrix<double> coeff) {
+void PolynomialMap::SetCoefficients(int pointDim, Matrix<double> coeff) {
   int nPCoeff      = coeff.number_of_columns();
   point_dimension_        = pointDim;
   index_key_by_power_  = std::vector< std::vector<int> >();
@@ -67,13 +67,13 @@ void PolynomialVector::SetCoefficients(int pointDim, Matrix<double> coeff) {
   for (size_t i = 0; i < coefficient_matrix_.number_of_rows(); ++i)
     for (int j = 0; j < nPCoeff; ++j)
       polynomial_vector_.push_back(
-          PolynomialVector::PolynomialCoefficient(index_key_by_vector_[j],
+          PolynomialMap::PolynomialCoefficient(index_key_by_vector_[j],
           i,
           coefficient_matrix_(i+1, j+1) ) );
 }
 
-void PolynomialVector::SetCoefficients
-                                    (std::vector<PolynomialCoefficient> coeff) {
+void PolynomialMap::SetCoefficients(
+    std::vector<PolynomialCoefficient> coeff) {
   point_dimension_        = 0;
   index_key_by_power_  = std::vector< std::vector<int> >();
   index_key_by_vector_ = std::vector< std::vector<int> >();
@@ -110,7 +110,7 @@ void PolynomialVector::SetCoefficients
   }
 }
 
-void PolynomialVector::SetCoefficients(Matrix<double> coeff) {
+void PolynomialMap::SetCoefficients(Matrix<double> coeff) {
   for (size_t i = 0; i < coeff.number_of_rows() &&
                      i < coefficient_matrix_.number_of_rows(); ++i) {
     for (size_t j = 0; j < coeff.number_of_columns() &&
@@ -120,20 +120,20 @@ void PolynomialVector::SetCoefficients(Matrix<double> coeff) {
   }
 }
 
-Matrix<double> PolynomialVector::GetCoefficientsAsMatrix() const {
+Matrix<double> PolynomialMap::GetCoefficientsAsMatrix() const {
   return coefficient_matrix_;
 }
 
-std::vector<PolynomialVector::PolynomialCoefficient>
-PolynomialVector::GetCoefficientsAsVector() const {
+std::vector<PolynomialMap::PolynomialCoefficient>
+PolynomialMap::GetCoefficientsAsVector() const {
   return polynomial_vector_;
 }
 
-PolynomialVector* PolynomialVector::Recentred(double * point) const {
-  throw(Squeal(Squeal::nonRecoverable, "Recentred not implemented", "PolynomialVector::Recentred"));
+PolynomialMap* PolynomialMap::Recentred(double * point) const {
+  throw(Squeal(Squeal::nonRecoverable, "Recentred not implemented", "PolynomialMap::Recentred"));
 }
 
-void  PolynomialVector::F(const double* point, double* value) const {
+void  PolynomialMap::F(const double* point, double* value) const {
   Vector<double> pointV(PointDimension(), 1.);
   Vector<double> valueV(ValueDimension(), 1.);
   for (size_t i = 0; i < PointDimension(); ++i) {
@@ -147,24 +147,24 @@ void  PolynomialVector::F(const double* point, double* value) const {
   }
 }
 
-void  PolynomialVector::F(const Vector<double>& point, Vector<double>& value)
+void  PolynomialMap::F(const Vector<double>& point, Vector<double>& value)
   const {
   // create a vector of point coordinate products that form, together with the
   // coefficents, the polynomial terms
   Vector<double> polynomial_vector(index_key_by_vector_.size(), 1.);
-  MakePolyVector(point, polynomial_vector);
+  MakePolynomialVector(point, polynomial_vector);
   value = coefficient_matrix_ * polynomial_vector;
 }
 
-unsigned int PolynomialVector::PointDimension() const {
+unsigned int PolynomialMap::PointDimension() const {
   return point_dimension_;
 }
 
-unsigned int PolynomialVector::ValueDimension() const {
+unsigned int PolynomialMap::ValueDimension() const {
   return coefficient_matrix_.number_of_rows();
 }
 
-unsigned int PolynomialVector::PolynomialOrder() const {
+unsigned int PolynomialMap::PolynomialOrder() const {
   if (index_key_by_vector_.size() > 0) {
     return index_key_by_vector_.back().size()+1;
   } else {
@@ -172,36 +172,36 @@ unsigned int PolynomialVector::PolynomialOrder() const {
   }
 }
 
-PolynomialVector * PolynomialVector::Clone() const {
-  return new PolynomialVector(*this);
+PolynomialMap * PolynomialMap::Clone() const {
+  return new PolynomialMap(*this);
 }
 
-
-Vector<double>&  PolynomialVector::MakePolyVector(const Vector<double>& point,
-                                                  Vector<double>& polyVector)
-                                                 const {
-    for (size_t i = 0; i < index_key_by_vector_.size(); ++i) {
-        for (size_t j = 0; j < index_key_by_vector_[i].size(); ++j) {
-            polyVector(i+1) *= point(index_key_by_vector_[i][j]+1);
-        }
+Vector<double>&  PolynomialMap::MakePolynomialVector(const Vector<double>& point,
+                                                     Vector<double>& polyVector)
+    const {
+  for (size_t i = 0; i < index_key_by_vector_.size(); ++i) {
+    for (size_t j = 0; j < index_key_by_vector_[i].size(); ++j) {
+      polyVector(i+1) *= point(index_key_by_vector_[i][j]+1);
     }
-    return polyVector;
+  }
+  return polyVector;
 }
 
-double*  PolynomialVector::MakePolyVector(const double* point,
-                                          double* polyVector) const {
-    for (size_t i = 0; i < index_key_by_vector_.size(); ++i) {
-        polyVector[i] = 1.;
-        for (size_t j = 0; j < index_key_by_vector_[i].size(); ++j)
-            polyVector[i] *= point[ index_key_by_vector_[i][j] ];
-    }
+double*  PolynomialMap::MakePolynomialVector(const double* point,
+                                             double* polyVector)
+    const {
+  for (size_t i = 0; i < index_key_by_vector_.size(); ++i) {
+    polyVector[i] = 1.;
+    for (size_t j = 0; j < index_key_by_vector_[i].size(); ++j)
+      polyVector[i] *= point[ index_key_by_vector_[i][j] ];
+  }
     return polyVector;
 }
 
 // Turn int index into a std::vector<int> 'a' of length 'd' with values
 //    x_1^a_1 x_2^a_2 ... x_d^a_d
 // e.g. x_1^4 x_2^3 = {4,3,0,0}
-std::vector<int> PolynomialVector::IndexByPower
+std::vector<int> PolynomialMap::IndexByPower
                                               (int index, int nInputVariables) {
     std::vector<int> powerIndex(nInputVariables, 0);
     std::vector<int> vectorIndex = IndexByVector(index, nInputVariables);
@@ -213,7 +213,7 @@ std::vector<int> PolynomialVector::IndexByPower
 
 // Turn int index into an index for element of polynomial
 // e.g. x_1^4 x_2^3 = {1,1,1,1,2,2,2}
-std::vector<int> PolynomialVector::IndexByVector
+std::vector<int> PolynomialMap::IndexByVector
                                               (int index, int nInputVariables) {
     if (index == 0) return std::vector<int>();
     std::vector<int> indices(1, -1);
@@ -236,8 +236,8 @@ std::vector<int> PolynomialVector::IndexByVector
     return indices;
 }
 
-size_t PolynomialVector::NumberOfPolynomialCoefficients(int pointDimension,
-                                                                    int order) {
+size_t PolynomialMap::NumberOfPolynomialCoefficients(int pointDimension,
+                                                        int order) {
     int n = 0;
     if (order <= 0) return 0;
     for (int i = 1; i < order; ++i) {
@@ -246,8 +246,8 @@ size_t PolynomialVector::NumberOfPolynomialCoefficients(int pointDimension,
     return n+1;
 }
 
-std::ostream& operator<<(std::ostream& out, const PolynomialVector& pv) {
-    if (PolynomialVector::print_headers_) {
+std::ostream& operator<<(std::ostream& out, const PolynomialMap& pv) {
+    if (PolynomialMap::print_headers_) {
         pv.PrintHeader(out, '.', ' ', 14, true);
     }
     out << '\n' << pv.GetCoefficientsAsMatrix();
@@ -255,7 +255,7 @@ std::ostream& operator<<(std::ostream& out, const PolynomialVector& pv) {
 }
 
 template <class Container >
-void PolynomialVector::PrintContainer(std::ostream& out,
+void PolynomialMap::PrintContainer(std::ostream& out,
      const Container& container, char T_separator, char str_separator,
      size_t length, bool pad_at_start) {
   // class Container::iterator it;
@@ -287,7 +287,7 @@ void PolynomialVector::PrintContainer(std::ostream& out,
   out << strstr2.str();
 }
 
-void PolynomialVector::PrintHeader(std::ostream& out, char int_separator,
+void PolynomialMap::PrintHeader(std::ostream& out, char int_separator,
                       char str_separator, int length, bool pad_at_start) const {
   if (index_key_by_power_.size() > 0) {
     PrintContainer< std::vector<int> >(out, index_key_by_power_[0],
@@ -299,15 +299,15 @@ void PolynomialVector::PrintHeader(std::ostream& out, char int_separator,
   }
 }
 
-Vector<double> PolynomialVector::Means
+Vector<double> PolynomialMap::Means
        (std::vector<std::vector<double> > values, std::vector<double> weights) {
   if (values.size() < 1) {
     throw(Squeal
-           (Squeal::recoverable, "No input values", "PolynomialVector::Means"));
+           (Squeal::recoverable, "No input values", "PolynomialMap::Means"));
   }
   if (values[0].size() < 1) {
     throw(Squeal
-            (Squeal::recoverable, "Dimension < 1", "PolynomialVector::Means"));
+            (Squeal::recoverable, "Dimension < 1", "PolynomialMap::Means"));
   }
   if (weights.size() != values.size()) {
     weights = std::vector<double>(values.size(), 1.);
@@ -336,7 +336,7 @@ Vector<double> PolynomialVector::Means
   return means;
 }
 
-SymmetricMatrix PolynomialVector::Covariances(
+SymmetricMatrix PolynomialMap::Covariances(
     const std::vector<std::vector<double> >&          values,
     const std::vector<double>&                        weights,
     const Vector<double>&                             means) {
@@ -344,13 +344,13 @@ SymmetricMatrix PolynomialVector::Covariances(
   if (npoints < 1) {
     throw(Squeal(Squeal::recoverable,
                  "No input values",
-                 "PolynomialVector::Covariances()"));
+                 "PolynomialMap::Covariances()"));
   }
   size_t dim = values[0].size();
   if (dim < 1) {
     throw(Squeal(Squeal::recoverable,
                  "Dimension < 1",
-                 "PolynomialVector::Covariances()"));
+                 "PolynomialMap::Covariances()"));
   }
   Vector<double> means_vector(dim);
   if (means.size() != dim) {
@@ -390,7 +390,7 @@ SymmetricMatrix PolynomialVector::Covariances(
   return covariances;
 }
 
-PolynomialVector* PolynomialVector::PolynomialLeastSquaresFit(
+PolynomialMap* PolynomialMap::PolynomialLeastSquaresFit(
   const std::vector< std::vector<double> >& points,
   const std::vector< std::vector<double> >& values,
   unsigned int                              polynomialOrder,
@@ -406,7 +406,7 @@ PolynomialVector* PolynomialVector::PolynomialLeastSquaresFit(
   }
 }
 
-PolynomialVector* PolynomialVector::PolynomialLeastSquaresFit(
+PolynomialMap* PolynomialMap::PolynomialLeastSquaresFit(
   const std::vector< std::vector<double> >& points,
   const std::vector< std::vector<double> >& values,
   unsigned int                                        polynomialOrder,
@@ -426,7 +426,7 @@ PolynomialVector* PolynomialVector::PolynomialLeastSquaresFit(
   for (int i = 0; i < valueDim; ++i)
     for (int j = 0; j < nCoeffs; ++j)
       dummy(i+1, j+1) = 1;
-  PolynomialVector* temp = new PolynomialVector(pointDim, dummy);
+  PolynomialMap* temp = new PolynomialMap(pointDim, dummy);
 
   std::vector<double> tempFx(nCoeffs, 0);  // tempfx = x_i^j
   std::vector<double> wt(nPoints, 1);
@@ -434,7 +434,7 @@ PolynomialVector* PolynomialVector::PolynomialLeastSquaresFit(
 
   // sum over points, values
   for (int i = 0; i < nPoints;   ++i) {
-    temp->MakePolyVector(&points[i][0], &tempFx[0]);
+    temp->MakePolynomialVector(&points[i][0], &tempFx[0]);
     for (int k = 0; k < nCoeffs;  k++)
       for (int j = 0; j < nCoeffs;    ++j)
         F2(j+1, k+1) += tempFx[k]*tempFx[j]*wt[i];
@@ -450,19 +450,19 @@ PolynomialVector* PolynomialVector::PolynomialLeastSquaresFit(
     delete temp;
     throw(Squeal(Squeal::recoverable,
                  "Could not find least squares fit for data",
-                 "PolynomialVector::PolynomialLeastSquaresFit"));
+                 "PolynomialMap::PolynomialLeastSquaresFit"));
   }
   Matrix<double> A = F2_inverse * Fy;
   delete temp;
-  temp = new PolynomialVector(pointDim, transpose(A));
+  temp = new PolynomialMap(pointDim, transpose(A));
   return temp;
 }
 
-PolynomialVector* PolynomialVector::ConstrainedPolynomialLeastSquaresFit(
+PolynomialMap* PolynomialMap::ConstrainedPolynomialLeastSquaresFit(
   const std::vector< std::vector<double> >&                points,
   const std::vector< std::vector<double> >&                values,
   unsigned int                                                   polynomialOrder,
-  std::vector< PolynomialVector::PolynomialCoefficient >  coeffs,
+  std::vector< PolynomialMap::PolynomialCoefficient >  coeffs,
   const std::vector<double>&                              weights) {
   // Algorithm: we want g(x) = old_f(x) + new_f(x), where old_f has polynomial
   // terms in poly, new_f has all the rest. Use value - f(point) as input and
@@ -474,13 +474,13 @@ PolynomialVector* PolynomialVector::ConstrainedPolynomialLeastSquaresFit(
     throw(Squeal(
       Squeal::recoverable,
       "No data for LLS Fit",
-      "PolynomialVector::ConstrainedPolynomialLeastSquaresFit(...)"));
+      "PolynomialMap::ConstrainedPolynomialLeastSquaresFit(...)"));
   }
   if (values.size() != nPoints) {
     throw(Squeal(
       Squeal::recoverable,
       "Misaligned array in LLS Fit",
-      "PolynomialVector::ConstrainedPolynomialLeastSquaresFit(...)"));
+      "PolynomialMap::ConstrainedPolynomialLeastSquaresFit(...)"));
   }
   int pointDim   = points[0].size();
   int valueDim   = values[0].size();
@@ -491,20 +491,20 @@ PolynomialVector* PolynomialVector::ConstrainedPolynomialLeastSquaresFit(
   if (weights.size() > 0) wt = weights;
 
   // guaranteed to be of right order
-  PolynomialVector  newPolyVector1D(pointDim, Matrix<double>(1, nCoeffsNew));
+  PolynomialMap  newPolyMap1D(pointDim, Matrix<double>(1, nCoeffsNew));
   std::vector< std::vector<double> > tempFx(nPoints, std::vector<double>(nCoeffsNew) );
   for (size_t i = 0; i < nPoints; ++i)
-    newPolyVector1D.MakePolyVector(&points[i][0], &tempFx[i][0]);
+    newPolyMap1D.MakePolynomialVector(&points[i][0], &tempFx[i][0]);
 
   for (int dim = 0; dim < valueDim ; dim++) {
-    std::vector<PolynomialVector::PolynomialCoefficient> oldCoeffs1D;
+    std::vector<PolynomialMap::PolynomialCoefficient> oldCoeffs1D;
     for (size_t i = 0; i < coeffs.size(); ++i) {
       if (coeffs[i].OutVariable() == dim &&
           coeffs[i].InVariables().size() < polynomialOrder) {
         oldCoeffs1D.push_back(coeffs[i]);
       }
     }
-    PolynomialVector oldPolyVector1D(oldCoeffs1D);
+    PolynomialMap oldPolyMap1D(oldCoeffs1D);
     int              nCoeffsOld = oldCoeffs1D.size();
     int              deltaCoeff = nCoeffsNew - nCoeffsOld;
     if (deltaCoeff <= 0) break;
@@ -525,7 +525,7 @@ PolynomialVector* PolynomialVector::ConstrainedPolynomialLeastSquaresFit(
     // optimisation note - this algorithm spends all its time in this loop
     for (size_t i = 0; i < nPoints && needsCalculation.size() > 0; ++i) {
       std::vector<double> oldValue(valueDim);
-      oldPolyVector1D.F(&points[i][0], &oldValue[0]);
+      oldPolyMap1D.F(&points[i][0], &oldValue[0]);
       for (int k = 0; k < deltaCoeff; k++) {
         Fy(k+1) += (values[i][dim] -  // ynew - yold
               oldValue[dim])*tempFx[i][needsCalculation[k]]*wt[i];
@@ -541,28 +541,28 @@ PolynomialVector* PolynomialVector::ConstrainedPolynomialLeastSquaresFit(
     } catch(Squeal squee) {
       throw(Squeal(Squeal::recoverable,
             "Could not find least squares fit for data",
-            "PolynomialVector::ConstrainedPolynomialLeastSquaresFit"));
+            "PolynomialMap::ConstrainedPolynomialLeastSquaresFit"));
     }
     Vector<double> AVec = F2_inverse * Fy;
     for (int i = 0; i < deltaCoeff; ++i) A(dim+1, needsCalculation[i]+1) = AVec(i+1);
   }
 
-  PolynomialVector tempPoly(coeffs);
+  PolynomialMap tempPoly(coeffs);
   for (size_t i = 0; i < coeffs.size(); ++i)
     for (size_t j = 0; j < tempPoly.index_key_by_vector_.size(); ++j)
       if (tempPoly.index_key_by_vector_[j] == coeffs[i].InVariables()) {
         A(coeffs[i].OutVariable()+1, j+1) = coeffs[i].Coefficient();
       }
 
-  return new PolynomialVector(pointDim, A);
+  return new PolynomialMap(pointDim, A);
 }
 
 
-PolynomialVector* PolynomialVector::Chi2ConstrainedLeastSquaresFit(
+PolynomialMap* PolynomialMap::Chi2ConstrainedLeastSquaresFit(
   const std::vector< std::vector<double> >&                xin,
   const std::vector< std::vector<double> >&                xout,
   unsigned int                                             polynomialOrder,
-  std::vector< PolynomialVector::PolynomialCoefficient >  coeffs,
+  std::vector< PolynomialMap::PolynomialCoefficient >  coeffs,
   double                                                  chi2Start,
   double                                                  discardStep,
   double *                                                chi2End,
@@ -593,13 +593,13 @@ PolynomialVector* PolynomialVector::Chi2ConstrainedLeastSquaresFit(
   catch(Squeal squee) {
     throw(Squeal(Squeal::recoverable,
                  "Failed to find least squares fit for data",
-                 "PolynomialVector::Chi2ConstrainedLeastSquaresFit"));
+                 "PolynomialMap::Chi2ConstrainedLeastSquaresFit"));
   }
 
   double totalWeight = 0.;
   double discard       = chi2Start;
   double chi2          = chi2Limit*2.;
-  int    nCoefficients = PolynomialVector::NumberOfPolynomialCoefficients(
+  int    nCoefficients = PolynomialMap::NumberOfPolynomialCoefficients(
                             xin[0].size(), polynomialOrder)
                        * xout[0].size();
   int    nGood         = nParticles;
@@ -618,27 +618,27 @@ PolynomialVector* PolynomialVector::Chi2ConstrainedLeastSquaresFit(
   }
   discard /= discardStep; // Set discard to the largest amplitude in the data
 
-  PolynomialVector* pvec = new PolynomialVector(
-    std::vector<PolynomialVector::PolynomialCoefficient>());
+  PolynomialMap* map = new PolynomialMap(
+    std::vector<PolynomialMap::PolynomialCoefficient>());
   while (nGood >= nCoefficients && chi2 > chi2Limit) {
     chi2               = 0.;
     nGood              = nParticles;
-    if (pvec != NULL) delete pvec;
+    if (map != NULL) delete map;
 
     // optimisation note - algorithm spends all its time doing the CPLS Fit
     try {
-      pvec = PolynomialVector::ConstrainedPolynomialLeastSquaresFit(
+      map = PolynomialMap::ConstrainedPolynomialLeastSquaresFit(
                 xin, xout, polynomialOrder, coeffs, weights);
     }
     catch(Squeal squee) {
-      pvec = NULL;
+      map = NULL;
       chi2 = chi2Limit * 2.;
     }
 
-    for (size_t i = 0; i < nParticles && pvec != NULL; ++i) {
+    for (size_t i = 0; i < nParticles && map != NULL; ++i) {
       if (fabs(weights[i]) > 1.e-9) {
         std::vector<double> pout(dimensionOut, 0.);
-        pvec->F(&xin[i][0], &pout[0]);
+        map->F(&xin[i][0], &pout[0]);
         Vector<double> residualVec(dimensionOut, 0);
         for (size_t j = 0; j < dimensionOut; ++j) {
           residualVec(j+1) = pout[j] - xout[i][j];
@@ -658,24 +658,24 @@ PolynomialVector* PolynomialVector::Chi2ConstrainedLeastSquaresFit(
     discard /= discardStep;
     std::cout << "ConstrainedPolynomialLeastSquaresFit - chi2: " << chi2
               << " cut: " << discard << " cut_step: " << discardStep
-              << " weight: " << totalWeight << " pvec: " << pvec << std::endl;
+              << " weight: " << totalWeight << " map: " << map << std::endl;
   }
-  if (chi2 > chi2Limit || pvec == NULL) {
+  if (chi2 > chi2Limit || map == NULL) {
     std::stringstream err;
-    err << "PolynomialVector::Chi2ConstrainedLeastSquaresFit failed to "
+    err << "PolynomialMap::Chi2ConstrainedLeastSquaresFit failed to "
         << "converge. Best fit had <chi2> = " << chi2
         << " compared to limit " << chi2Limit << std::endl;
     throw(Squeal(Squeal::recoverable, err.str(),
-          "PolynomialVector::Chi2ConstrainedLeastSquaresFit(...)"));
+          "PolynomialMap::Chi2ConstrainedLeastSquaresFit(...)"));
   }
   if (chi2End != NULL) *chi2End = discard; // save discard at end for future use
-  return pvec;
+  return map;
 }
 
-PolynomialVector* PolynomialVector::Chi2SweepingLeastSquaresFit(
+PolynomialMap* PolynomialMap::Chi2SweepingLeastSquaresFit(
     const                                                   VectorMap& vec,
     unsigned int                                            polynomialOrder,
-    std::vector< PolynomialVector::PolynomialCoefficient >  coeffs,
+    std::vector< PolynomialMap::PolynomialCoefficient >  coeffs,
     double                                                  chi2Max,
     std::vector<double>&                                    delta,
     double                                                  deltaFactor,
@@ -684,8 +684,8 @@ PolynomialVector* PolynomialVector::Chi2SweepingLeastSquaresFit(
   // try to do chi2 fit
   // if chi2 fit works, increase shell size
   // else increase polynomial order, revise fit
-  PolynomialVector*   pvec1 = NULL;
-  PolynomialVector*   pvec2 = NULL;
+  PolynomialMap*   map1 = NULL;
+  PolynomialMap*   map2 = NULL;
   int    step = 0;
   for (size_t i_order = 1; i_order <= polynomialOrder; i_order++) {
     std::vector<std::vector<double> > in;
@@ -697,34 +697,33 @@ PolynomialVector* PolynomialVector::Chi2SweepingLeastSquaresFit(
       std::vector<std::vector<double> > in_mod = PointBox(delta, i_order+1);
       for (size_t i = 0; i < in_mod.size(); ++i) in.push_back(in_mod[i]);
       vec.FAppend(in, out);
-      if (pvec2 != NULL && pvec1 != NULL) delete  pvec2;
-      if (pvec1 != NULL) pvec2 = pvec1;
-      pvec1 = ConstrainedPolynomialLeastSquaresFit(in, out, i_order, coeffs);
-      chi2  = pvec1->GetAvgChi2OfDifference(in, out);
+      if (map2 != NULL && map1 != NULL) delete  map2;
+      if (map1 != NULL) map2 = map1;
+      map1 = ConstrainedPolynomialLeastSquaresFit(in, out, i_order, coeffs);
+      chi2  = map1->GetAvgChi2OfDifference(in, out);
       if (chi2 < chi2Max)
         for (size_t i = 0; i < delta.size(); ++i) delta[i] *= deltaFactor;
     }
-    delete pvec1;
-    pvec1 = NULL;
+    delete map1;
+    map1 = NULL;
   }
   for (size_t i = 0; i < delta.size(); ++i) delta[i] /= deltaFactor;
-  return pvec2;
+  return map2;
 }
 
-PolynomialVector* PolynomialVector::Chi2SweepingLeastSquaresFitVariableWalls
-      (const VectorMap& vec,
-      unsigned int polynomialOrder,
-      std::vector< PolynomialVector::PolynomialCoefficient > coeffs,
-      double chi2Max, std::vector<double>& delta,
-      double deltaFactor, int maxNumberOfSteps,
-      std::vector<double> max_delta) {
-  PolynomialVector*   pvec1 = Chi2SweepingLeastSquaresFit
-                                         (vec, polynomialOrder, coeffs, chi2Max,
-                                          delta, deltaFactor, maxNumberOfSteps);
-  if (pvec1 == NULL) return NULL;
-  PolynomialVector* pvec2 = NULL;
+PolynomialMap * PolynomialMap::Chi2SweepingLeastSquaresFitVariableWalls(
+    const VectorMap& vec, unsigned int polynomialOrder,
+    std::vector< PolynomialMap::PolynomialCoefficient > coeffs,
+    double chi2Max, std::vector<double>& delta,
+    double deltaFactor, int maxNumberOfSteps,
+    std::vector<double> max_delta) {
+  PolynomialMap * map1
+    = Chi2SweepingLeastSquaresFit(vec, polynomialOrder, coeffs, chi2Max,
+                                  delta, deltaFactor, maxNumberOfSteps);
+  if (map1 == NULL) return NULL;
+  PolynomialMap* map2 = NULL;
   int    step = 0;
-  for (size_t i_order = pvec1->PolynomialOrder(); i_order <= polynomialOrder;
+  for (size_t i_order = map1->PolynomialOrder(); i_order <= polynomialOrder;
        i_order++) {
     for (size_t i = 0; i < delta.size(); ++i) {
       double chi2 = -1;
@@ -737,22 +736,22 @@ PolynomialVector* PolynomialVector::Chi2SweepingLeastSquaresFitVariableWalls
         in.push_back(std::vector<double>(delta.size(), 0.));
         std::vector<std::vector<double> > out;
         vec.FAppend(in, out);
-        if (pvec2 != NULL && pvec1 != NULL) delete  pvec2;
-        if (pvec1 != NULL) pvec2 = pvec1;
-        pvec1 = ConstrainedPolynomialLeastSquaresFit(in, out, i_order, coeffs);
-        chi2  = pvec1->GetAvgChi2OfDifference(in, out);
+        if (map2 != NULL && map1 != NULL) delete  map2;
+        if (map1 != NULL) map2 = map1;
+        map1 = ConstrainedPolynomialLeastSquaresFit(in, out, i_order, coeffs);
+        chi2  = map1->GetAvgChi2OfDifference(in, out);
         if (chi2 > chi2Max)
           delta[i] /= deltaFactor;
       }
     }
-    delete pvec1;
-    pvec1 = NULL;
+    delete map1;
+    map1 = NULL;
   }
-  return pvec2;
+  return map2;
 }
 
 
-void PolynomialVector::PolynomialCoefficient::SpaceTransform
+void PolynomialMap::PolynomialCoefficient::SpaceTransform
                        (std::vector<int> space_in, std::vector<int> space_out) {
   std::map<int, int> mapping; // probably optimise this
   for (size_t i = 0; i < space_out.size(); ++i)
@@ -766,7 +765,7 @@ void PolynomialVector::PolynomialCoefficient::SpaceTransform
       in_variables[con] = mapping[in_variables[con]];
     } else { throw(Squeal(Squeal::recoverable,
                     "Input variable not found in space transform",
-                    "PolynomialVector::PolynomialCoefficient::SpaceTransform"));
+                    "PolynomialMap::PolynomialCoefficient::SpaceTransform"));
     }
   }
   if (mapping.find(_outVar) != mapping.end()) {
@@ -774,32 +773,32 @@ void PolynomialVector::PolynomialCoefficient::SpaceTransform
   } else {
     throw(Squeal(Squeal::recoverable,
                  "Output variable not found in space transform",
-                 "PolynomialVector::PolynomialCoefficient::SpaceTransform"));
+                 "PolynomialMap::PolynomialCoefficient::SpaceTransform"));
   }
   _inVarByVec = in_variables;
 }
 
 // Return chi2 of some set of output variables compared with the polynomial
 // vector of some set of input variables
-double PolynomialVector::GetAvgChi2OfDifference(
+double PolynomialMap::GetAvgChi2OfDifference(
     std::vector< std::vector<double> > in,
     std::vector< std::vector<double> > out) {
   std::vector< std::vector<double> > out_p;
   if (in.size() < 1) {
     throw(Squeal(Squeal::recoverable,
                  "No data in input",
-                 "PolynomialVector::GetAvgChi2OfDifference(...)"));
+                 "PolynomialMap::GetAvgChi2OfDifference(...)"));
   }
   if (in.size() != out.size()) {
     throw(Squeal(Squeal::recoverable,
      "Input data and output data misaligned for calculation of chi2 difference",
-     "PolynomialVector::GetAvgChi2OfDifference(...)"));
+     "PolynomialMap::GetAvgChi2OfDifference(...)"));
   }
   for (size_t i = 0; i < in.size(); ++i) {
     if (in[i].size() != PointDimension() || out[i].size() != ValueDimension())
       throw(Squeal(Squeal::recoverable,
                    "Bad input data for calculation of chi2 difference",
-                   "PolynomialVector::GetAvgChi2OfDifference(...)"));
+                   "PolynomialMap::GetAvgChi2OfDifference(...)"));
   }
   this->FAppend(in, out_p);
 
@@ -830,7 +829,7 @@ double PolynomialVector::GetAvgChi2OfDifference(
 // factor 2) Require evenly spaced points, sometimes this means I make more
 // points on the shell
 static const double PI = atan(1)*4.;
-std::vector< std::vector<double> > PolynomialVector::PointBox(
+std::vector< std::vector<double> > PolynomialMap::PointBox(
   std::vector<double>  delta,
   int                  i_order) {
   int min_size         = 3*NumberOfPolynomialCoefficients(i_order, delta.size());
@@ -867,7 +866,7 @@ std::vector< std::vector<double> > PolynomialVector::PointBox(
 
 // Algorithm - take the PointBox output and scale so that length is 1 in
 // scale_matrix coordinate system
-std::vector< std::vector<double> > PolynomialVector::PointShell(
+std::vector< std::vector<double> > PolynomialMap::PointShell(
   Matrix<double>  scale_matrix,
   int             i_order) {
   size_t point_dim = scale_matrix.number_of_rows();

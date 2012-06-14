@@ -177,6 +177,9 @@ void TrackPoint::FillInAxialCoordinates(const double mass) {
 
   // fill in the z coordinate
   z_ = ::sqrt(position*position - x*x - y*y);
+  if (time < 0) {
+    z_ = -z_;
+  }
 }
 
 /* Fills in t and E from z, Pz, and the given mass parameter.
@@ -202,6 +205,9 @@ void TrackPoint::FillInTemporalCoordinates(const double mass) {
 
   // fill in the time coordinate
   time_ = position / velocity;
+  if (z < 0) {
+    time_ = -time_;
+  }
 }
 
 MAUS::MAUSPrimaryGeneratorAction::PGParticle

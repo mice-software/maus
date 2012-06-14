@@ -21,7 +21,7 @@
 
 #include "CLHEP/Units/PhysicalConstants.h"
 
-#include "Maths/PolynomialVector.hh"
+#include "Maths/PolynomialMap.hh"
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
 
@@ -35,23 +35,23 @@ namespace MAUS {
 // ******************************
 
 PolynomialTransferMap::PolynomialTransferMap(
-  const PolynomialVector& polynomial,
+  const PolynomialMap& polynomial_map,
   const PhaseSpaceVector& reference_trajectory_in,
   const PhaseSpaceVector& reference_trajectory_out)
-  : polynomial_(polynomial), reference_trajectory_in_(reference_trajectory_in),
+  : polynomial_map_(polynomial_map), reference_trajectory_in_(reference_trajectory_in),
     reference_trajectory_out_(reference_trajectory_out)
 { }
 
 PolynomialTransferMap::PolynomialTransferMap(
-  const PolynomialVector& polynomial,
+  const PolynomialMap& polynomial_map,
   const PhaseSpaceVector& reference_trajectory)
-  : polynomial_(polynomial), reference_trajectory_in_(reference_trajectory),
+  : polynomial_map_(polynomial_map), reference_trajectory_in_(reference_trajectory),
     reference_trajectory_out_(reference_trajectory)
 { }
 
 PolynomialTransferMap::PolynomialTransferMap(
   const PolynomialTransferMap& original_instance)
-  : polynomial_(original_instance.polynomial_),
+  : polynomial_map_(original_instance.polynomial_map_),
     reference_trajectory_in_(original_instance.reference_trajectory_in_),
     reference_trajectory_out_(original_instance.reference_trajectory_out_)
 { }
@@ -81,7 +81,7 @@ PhaseSpaceVector PolynomialTransferMap::Transport(
 
   // operate on the phase space delta with the polynomial map
   Vector<double> transformed_delta;
-  polynomial_.F(phase_space_delta, transformed_delta);
+  polynomial_map_.F(phase_space_delta, transformed_delta);
 
   // add the transformed phase space delta to the output reference trajectory
   PhaseSpaceVector output_vector
@@ -95,7 +95,7 @@ PhaseSpaceVector PolynomialTransferMap::Transport(
 // ******************************
 
 Matrix<double> PolynomialTransferMap::CreateTransferMatrix() const {
-  return polynomial_.GetCoefficientsAsMatrix().submatrix(1, 6, 2, 6);
+  return polynomial_map_.GetCoefficientsAsMatrix().submatrix(1, 6, 2, 6);
 }
 
 // ##############################
@@ -110,7 +110,7 @@ std::ostream& operator<<(std::ostream& out, const PolynomialTransferMap& tm) {
   out  << "Incomming Reference Trajectory: "
       << tm.reference_trajectory_in_ << std::endl
       << tm.reference_trajectory_out_ << std::endl
-      << tm.polynomial_ << std::endl;
+      << tm.polynomial_map_ << std::endl;
 
   return out;
 }

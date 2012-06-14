@@ -1,7 +1,7 @@
 #include "TransferMapCalculator.hh"
 
 #include "src/legacy/BeamTools/BTTracker.hh"
-#include "Maths/PolynomialVector.hh"
+#include "Maths/PolynomialMap.hh"
 
 OpticsModel TransferMapCalculator::_optics;
 vector<PhaseSpaceVector>  TransferMapCalculator::_referenceTrajectory = vector<PhaseSpaceVector>();
@@ -60,9 +60,9 @@ TransferMap TransferMapCalculator::GetPolynomialTransferMap(PhaseSpaceVector ref
 
   Function*         func = new Function(TransferMapCalculator::TransportWrapper, dimension, dimension);
   Differentiator*   diff = new Differentiator(func, delta, magnitude);
-  MAUS::PolynomialVector* poly = diff->PolynomialFromDifferentials(MAUS::Vector<double>(referenceIn.getSixVector()));
+  MAUS::PolynomialMap* poly = diff->PolynomialFromDifferentials(MAUS::Vector<double>(referenceIn.getSixVector()));
   TransferMap       map;
-  map.SetPolynomialVector(poly);
+  map.SetPolynomialMap(poly);
   map.SetReferenceIn (_wrapperReferenceIn);
   map.SetReferenceOut(_wrapperReferenceOut);
   map.IsCanonical    (false);
@@ -88,9 +88,9 @@ TransferMap TransferMapCalculator::GetPolynomialTransferMap(std::vector<PhaseSpa
       out_v[i][j] = outSixVec[j];
     }
   }
-  MAUS::PolynomialVector* poly  = MAUS::PolynomialVector::PolynomialLeastSquaresFit(in_v, out_v, order);
+  MAUS::PolynomialMap* poly  = MAUS::PolynomialMap::PolynomialLeastSquaresFit(in_v, out_v, order);
   TransferMap       map;
-  map.SetPolynomialVector(poly);
+  map.SetPolynomialMap(poly);
   map.SetReferenceIn (in [0]);
   map.SetReferenceOut(out[0]);
   return map;
@@ -102,13 +102,13 @@ TransferMap TransferMapCalculator::GetSweepingPolynomialTransferMap(const Vector
   std::vector<double> deltaV(6), deltaMaxV(6);
   deltaV[0]=delta[0]; deltaV[1]=delta[1]; deltaV[2]=delta[2]; deltaV[3]=delta[3]; deltaV[4]=delta[4]; deltaV[5]=delta[5]; 
   deltaMaxV[0]=deltaMax[0]; deltaMaxV[1]=deltaMax[1]; deltaMaxV[2]=deltaMax[2]; deltaMaxV[3]=deltaMax[3]; deltaMaxV[4]=deltaMax[4]; deltaMaxV[5]=deltaMax[5]; 
-  MAUS::PolynomialVector* pvec = MAUS::PolynomialVector::Chi2SweepingLeastSquaresFitVariableWalls(
-    *trackingOutput, order, std::vector< MAUS::PolynomialVector::PolynomialCoefficient >(), 
+  MAUS::PolynomialMap* pvec = MAUS::PolynomialMap::Chi2SweepingLeastSquaresFitVariableWalls(
+    *trackingOutput, order, std::vector< MAUS::PolynomialMap::PolynomialCoefficient >(), 
                                chi2Max, deltaV, deltaFactor, maxNumberOfSteps, deltaMaxV);
   if(!pvec) throw(Squeal(Squeal::recoverable, "Failed to make any polynomial fit at all - try tweaking control parameters", "TransferMapCalculator::GetSweepingPolynomialTransferMap"));
   for(size_t i=0; i<deltaV.size(); i++) delta[i] = deltaV[i];
   TransferMap       map;
-  map.SetPolynomialVector(pvec);
+  map.SetPolynomialMap(pvec);
   map.SetReferenceIn (refIn );
   map.SetReferenceOut(refOut);
   return map;

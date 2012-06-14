@@ -11,10 +11,10 @@
 #include "Interface/Squeak.hh"
 #include "Interface/Differentiator.hh"
 #include "Maths/Matrix.hh"
-#include "Maths/PolynomialVector.hh"
+#include "Maths/PolynomialMap.hh"
 #include "Maths/Vector.hh"
 
-/// NOTE: tests MAUS::PolynomialVector, Differentiator and PolynomialInterpolator classes ///
+/// NOTE: tests MAUS::PolynomialMap, Differentiator and PolynomialInterpolator classes ///
 /// Three classes that are very closely related anyway... ///
 bool DifferentiatorTest();
 bool PolynomialInterpolatorTest();
@@ -29,7 +29,7 @@ bool DifferentiatorTest()
     for(unsigned int i=0; i<6; i++) coeffHep[1][i] =  i*i;
     for(unsigned int i=0; i<6; i++) coeffHep[2][i] = -int(i)-1;
     Squeak::mout(Squeak::debug) << coeffHep << std::endl;
-    MAUS::PolynomialVector* vecP  = new MAUS::PolynomialVector(2, MAUS::Matrix<double>(coeffHep));
+    MAUS::PolynomialMap* vecP  = new MAUS::PolynomialMap(2, MAUS::Matrix<double>(coeffHep));
 
     std::vector<double> delta(2, 0.1);
     std::vector<double> mag  (3, 1);
@@ -41,7 +41,7 @@ bool DifferentiatorTest()
     Squeak::mout(Squeak::debug) << "FunctionMap: " << testpass << std::endl;
     testpass &= vecP->PointDimension() == clone->PointDimension();
     Squeak::mout(Squeak::debug) << "PointDimension: " << testpass << std::endl;
-    testpass &= clone->NumberOfDiffRows() == MAUS::PolynomialVector::NumberOfPolynomialCoefficients(delta.size(),mag.size());
+    testpass &= clone->NumberOfDiffRows() == MAUS::PolynomialMap::NumberOfPolynomialCoefficients(delta.size(),mag.size());
     Squeak::mout(Squeak::debug) << "NumberOfDiffRows: " << testpass << std::endl;
     testpass &= clone->ValueDimension() == clone->NumberOfDiffRows()*clone->FunctionMap()->ValueDimension();
     Squeak::mout(Squeak::debug) << "ValueDim: " << testpass << std::endl;
@@ -53,7 +53,7 @@ bool DifferentiatorTest()
     testpass &= fabs(value[0] - 31)<1e-9 && (value[1]- 80)<1e-9 && (value[2]- (-31))<1e-9;
     Squeak::mout(Squeak::debug) << "Y: " << value[0] << " " << value[1] << " " << value[2] << " * " << testpass << std::endl;
     ///PolyFromDiffs
-    MAUS::PolynomialVector* vecP2 = clone->PolynomialFromDifferentials(point);
+    MAUS::PolynomialMap* vecP2 = clone->PolynomialFromDifferentials(point);
     vecP2->F(point, value2);
     testpass &= fabs(value[0] - value2[0]) < 1e-5 && fabs(value[1] - value2[1]) < 1e-5 && fabs(value[2] - value2[2]) < 1e-5;
     Squeak::mout(Squeak::debug) << "PolyFromDiffs:  " << value2[0] << " " << value2[1] << " " << value2[2] << " * " << testpass << std::endl;
@@ -111,7 +111,7 @@ bool PolynomialInterpolatorTest()
     for(unsigned int i=0; i<6; i++) coeffHep[1][i] =  i*i;
     for(unsigned int i=0; i<6; i++) coeffHep[2][i] = -int(i)-1;
     Squeak::mout(Squeak::debug) << coeffHep << std::endl;
-    MAUS::PolynomialVector* vecP = new MAUS::PolynomialVector(2, MAUS::Matrix<double>(coeffHep) );
+    MAUS::PolynomialMap* vecP = new MAUS::PolynomialMap(2, MAUS::Matrix<double>(coeffHep) );
     Function*         vecF = new Function(TrackingFunction, 2, 2);
 
     int     size   [4] = {9, 9, 12, 16};
@@ -131,9 +131,9 @@ bool PolynomialInterpolatorTest()
     Squeak::mout(Squeak::debug) << "Ctor etc: " << true << " " << std::flush;
     bool sizepass  = pInt->PointDimension()  == vecF->PointDimension() && pInt->ValueDimension()  == vecF->ValueDimension() &&
                      pInt->PolynomialOrder() == diffOrder+pointOrder && pInt->DifferentialOrder() == diffOrder && pInt->PointOrder() == pointOrder;
-    sizepass      &= pInt->NumberOfIndices() == MAUS::PolynomialVector::NumberOfPolynomialCoefficients(vecP->PointDimension(), diffOrder+pointOrder+1);
+    sizepass      &= pInt->NumberOfIndices() == MAUS::PolynomialMap::NumberOfPolynomialCoefficients(vecP->PointDimension(), diffOrder+pointOrder+1);
     sizepass      &= pInt->NumberOfPoints()  == ceil(pInt->NumberOfIndices()/pInt->NumberOfDiffIndices());
-    sizepass      &= pInt->NumberOfDiffIndices() == MAUS::PolynomialVector::NumberOfPolynomialCoefficients(vecP->PointDimension(), diffOrder+1);
+    sizepass      &= pInt->NumberOfDiffIndices() == MAUS::PolynomialMap::NumberOfPolynomialCoefficients(vecP->PointDimension(), diffOrder+1);
     sizepass      &= pInt->GetMesh() == grid;
     Squeak::mout(Squeak::debug) << "Bureaucracy: " << sizepass << " " << std::flush;
 
