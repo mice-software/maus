@@ -45,7 +45,7 @@ bool ReduceCppPatternRecognition::birth(std::string argJsonConfigDocument) {
   TCanvas *c4 = new TCanvas("c4", "Spacepoint RealSpace Projections (1 Spill)", 200, 10, 700, 500);
   c4->Divide(3, 2);
 
-  TCanvas *c5 = new TCanvas("c5", "Info Box", 200, 10, 300, 110);
+  TCanvas *c5 = new TCanvas("c5", "Info Box", 200, 10, 300, 170);
   c5->Update();  // Just to get rid of a compiler warning for an unused variable
 
 
@@ -210,7 +210,6 @@ std::string  ReduceCppPatternRecognition::process(std::string document) {
         }
 
         for ( int trk_i = 0; trk_i < static_cast<int>(tracks_tracker1.size()); trk_i++ ) {
-
           _mx = tracks_tracker1[trk_i]["mx"].asDouble();
           _my = tracks_tracker1[trk_i]["my"].asDouble();
           _x0 = tracks_tracker1[trk_i]["x0"].asDouble();
@@ -219,6 +218,9 @@ std::string  ReduceCppPatternRecognition::process(std::string document) {
           _tracks.Fill();
           _trks_zx_trkr1.push_back(make_track(_x0, _mx));
           _trks_zy_trkr1.push_back(make_track(_y0, _my));
+          std::cout << "reducer t1 tracks: " << tracks_tracker1.size();
+          std::cout << " x0 = " << _x0 << " mx = " << _mx;
+          std::cout << " y0 = " << _y0 << " my = " << _my << std::endl;
         }
       } // ends loop over particle events
     } else {
@@ -422,9 +424,20 @@ void ReduceCppPatternRecognition::update_info(TCanvas * c1, TPaveText *pt) {
   std::string s1;
   ss1 << "Spill #: " << _nSpills;
   s1 = ss1.str();
-
   c1->cd(1);
   pt->AddText(s1.c_str());
+  ss1.str("");
+
+  ss1 << "Cumulative spoints: " << get_num_spoints();
+  s1 = ss1.str();
+  pt->AddText(s1.c_str());
+  ss1.str("");
+
+  ss1 << "Cumulative tracks: " << get_num_tracks();
+  s1 = ss1.str();
+  pt->AddText(s1.c_str());
+  ss1.str("");
+
   pt->Draw();
   c1->Update();
 }

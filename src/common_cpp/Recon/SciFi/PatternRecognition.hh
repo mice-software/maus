@@ -25,6 +25,8 @@
 #define PATTERNRECOGNITION_HH
 
 // C++ headers
+#include <iostream>
+#include <fstream>
 #include <vector>
 #include <map>
 #include <string>
@@ -259,7 +261,7 @@ class PatternRecognition {
      *  @param zi - Helix value z at point i
      *
      */
-    void helix_function_at_i(double R, double phi_0, double dsdz, double A, double B,
+    void helix_function_at_i(double R, double phi_0, double tan_lambda, double A, double B,
                              double C, double phi_i, double &xi, double &yi, double &zi);
 
     /** @brief Calculates helix chisq
@@ -277,7 +279,7 @@ class PatternRecognition {
      */
     double calculate_chisq(const std::vector<SciFiSpacePoint*> &spnts,
                            const std::vector<double> &turning_angles, double Phi_0,
-                           double dsdz, double R);
+                           double tan_lambda, double R);
 
     /** @brief Calculates the adjustments to the seed parameters
      *
@@ -397,6 +399,13 @@ class PatternRecognition {
     static const double _sd_phi_1to4 = 1.;  // Still needs to be calculated!!!!
     static const double _sd_phi_5 = 1.;     // Still needs to be calculated!!!!
     static const double _active_diameter = 300.0;  // Active volume diameter a tracker in mm
+    static const bool _helical_pr_on = 0;   // Flag to turn on helical pr (0 off, 1 on)
+    static const bool _straight_pr_on = 1;  // Flag to turn on straight pr (0 off, 1 on)
+
+    // Some output files - only to be kept when in development stages
+    ofstream * _f_res;
+    ofstream * _f_res_good;
+    ofstream * _f_trks;
 };
 // } // ~namespace MAUS
 
