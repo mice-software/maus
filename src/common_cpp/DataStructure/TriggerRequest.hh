@@ -44,7 +44,7 @@ class TriggerRequest {
     TriggerRequest& operator=(const TriggerRequest& _triggerrequest);
 
     /** Destructor - any member pointers are deleted */
-    ~TriggerRequest();
+    virtual ~TriggerRequest();
 
 
     /** Returns V1290Array */

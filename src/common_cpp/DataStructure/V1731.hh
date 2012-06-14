@@ -60,7 +60,7 @@ class V1731 {
     V1731& operator=(const V1731& _v1731);
 
     /** Destructor - any member pointers are deleted */
-    ~V1731();
+    virtual ~V1731();
 
 
     /** Returns LdcId */

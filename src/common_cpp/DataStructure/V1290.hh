@@ -52,7 +52,7 @@ class V1290 {
     V1290& operator=(const V1290& _v1290);
 
     /** Destructor - any member pointers are deleted */
-    ~V1290();
+    virtual ~V1290();
 
 
     /** Returns BunchId */

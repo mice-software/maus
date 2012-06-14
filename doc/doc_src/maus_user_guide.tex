@@ -1,5 +1,5 @@
 \documentclass[a4paper, 10pt] {report}
-
+\usepackage{html}
 \usepackage{tabularx}
 \usepackage{multirow}
 \usepackage{graphicx}
@@ -18,16 +18,11 @@
 
 \newpage
 
-\chapter{Introduction}
 \include{introduction}
-
-\chapter{Data Structure}
 \input{data_structure}
-
-\chapter{Monte Carlo}
 \input{simulation}
+\input{geometry}
 
-%\chapter{Detector Description}
 %\include{detectors/tof}
 %\include{detectors/tracker}
 %\include{detectors/emr}

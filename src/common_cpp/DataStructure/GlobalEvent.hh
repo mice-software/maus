@@ -37,7 +37,7 @@ class GlobalEvent {
     GlobalEvent& operator=(const GlobalEvent& _globalevent);
 
     /** Destructor - any member pointers are deleted */
-    ~GlobalEvent();
+    virtual ~GlobalEvent();
 
 
   private:

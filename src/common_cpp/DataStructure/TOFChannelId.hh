@@ -35,7 +35,7 @@ class TOFChannelId {
     TOFChannelId& operator=(const TOFChannelId& channel);
 
     /** Destructor (does nothing)*/
-    ~TOFChannelId();
+    virtual ~TOFChannelId();
 
     /** Get the slab that was hit */
     int GetSlab() const;
