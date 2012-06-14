@@ -6,14 +6,9 @@ if [ -z "${MAUS_ROOT_DIR}" ]; then  # see if the variable exists yet
     exit 1;
 fi
 
-echo "Your current directory is:"
-pwd
-echo
-echo "Your MAUS_ROOT_DIR is:"
-echo ${MAUS_ROOT_DIR}
-echo
-echo "These should agree"
-
+# some naughty devs are spitting out junk into cwd from their tests...
+here=`pwd`
+cd ${MAUS_ROOT_DIR}/tmp/
 
 if [ $maus_lcov ]; then
     if [ $maus_lcov -ne "0" ]; then # if set, request coverage stats for cpp using lcov
@@ -38,4 +33,6 @@ if [ $maus_lcov ]; then
         genhtml -o doc/cpp_coverage/ maus.info
     fi
 fi
+
+cd $here
 
