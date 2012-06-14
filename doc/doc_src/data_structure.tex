@@ -25,7 +25,7 @@ Accessing JSON is possible using the \verb|json| python module that comes built-
 The data structure can be extended in MAUS by adding extra classes to the existing data structure. The data classes are in \verb|src/common_cpp/DataStructure|. In order to make these classes accessible to ROOT, the following steps must be taken:
 \begin{itemize}
 \item Add a new class
-\item Ensure that default constructor, copy constructor, equality operator and destructor is present
+\item Ensure that default constructor, copy constructor, equality operator and destructor is present. The destructor must be virtual.
 \item Make a typedef for each type of STL object you wish to use. ROOT does not handle STL objects terribly well otherwise (and even then there are limitations).
 \item Add a call to the ClassDef() macro at the end of the class definition before the closing braces.
 \item Add the class to the list of classes in \verb|src/common_cpp/DataStructure/LinkDef.hh|
