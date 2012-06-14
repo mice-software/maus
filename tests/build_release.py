@@ -131,7 +131,7 @@ def main():
     if len(sys.argv > 1):
         scp_out = os.path.join(sys.argv[1], version)
         scp(scp_in, scp_out)
-    else
+    else:
         print "No copy target found, I am done"
 
 if __name__ == "__main__":
