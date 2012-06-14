@@ -26,7 +26,7 @@ An example json analysis is available in \verb|bin/examples/load_json_file.py|/
 The data structure can be extended in MAUS by adding extra classes to the existing data structure. The data classes are in \verb|src/common_cpp/DataStructure|. In order to make these classes accessible to ROOT, the following steps must be taken:
 \begin{itemize}
 \item Add a new class in \verb|src/common_cpp/DataStructure|.
-\item Ensure that default constructor, copy constructor, equality operator and destructor is present.
+\item Ensure that default constructor, copy constructor, equality operator and destructor is present. The destructor must be virtual.
 \item Make a typedef for each type of STL object you wish to use. ROOT does not handle STL objects terribly well otherwise. Even then there are limitations, for example accessing STL vector objects can cause a segmentation fault in PyROOT. Specific accessors are required to access data from STL objects for PyROOT interface.
 \item Add a call to the ClassDef() macro at the end of the class definition before the closing braces. The ClassDef() macro is defined by the ROOT \verb|Rtypes.h| header file, and generates metaclasses based on information in the class which is put into the (dynamically generated) \verb|MausDataStructure.h| class.
 \item Add the class to the list of classes in \verb|src/common_cpp/DataStructure/LinkDef.hh|. This is required for the class to be linked properly to the main library, and a linker error will result if this step is not taken.

@@ -128,8 +128,11 @@ def main():
     build_doxygen()
     build_test_output()
     scp_in, version = copy_targets()
-    scp_out = os.path.join(sys.argv[1], version)
-    scp(scp_in, scp_out)
+    if len(sys.argv > 1):
+        scp_out = os.path.join(sys.argv[1], version)
+        scp(scp_in, scp_out)
+    else:
+        print "No copy target found, I am done"
 
 if __name__ == "__main__":
     main()
