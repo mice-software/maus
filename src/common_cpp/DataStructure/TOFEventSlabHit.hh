@@ -48,7 +48,7 @@ class TOFEventSlabHit {
     TOFEventSlabHit& operator=(const TOFEventSlabHit& _tofeventslabhit);
 
     /** Destructor - any member pointers are deleted */
-    ~TOFEventSlabHit();
+    virtual ~TOFEventSlabHit();
 
 
     /** Returns TOF1SlabHitArray */

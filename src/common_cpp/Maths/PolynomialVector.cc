@@ -840,9 +840,6 @@ std::vector< std::vector<double> > PolynomialVector::PointBox(
          <= min_size) {
     n_points_per_dim++;
   }
-  int max_point = n_points_per_dim/2;
-  if ( 2*(n_points_per_dim/2) != n_points_per_dim ) // odd n_points
-    max_point = (n_points_per_dim-1)/2;
 
   std::vector< std::vector<double> > pos;
   std::vector<int>    grid_size(dim, n_points_per_dim);

@@ -68,7 +68,7 @@ class DAQData {
     DAQData& operator=(const DAQData& _daqdata);
 
     /** Destructor - any member pointers are deleted */
-    ~DAQData();
+    virtual ~DAQData();
 
 
     /** Returns V830 */

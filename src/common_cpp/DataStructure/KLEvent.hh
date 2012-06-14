@@ -37,7 +37,7 @@ class KLEvent {
     KLEvent& operator=(const KLEvent& _klevent);
 
     /** Destructor - any member pointers are deleted */
-    ~KLEvent();
+    virtual ~KLEvent();
 
 
   private:

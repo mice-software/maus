@@ -50,7 +50,7 @@ class TOFSpacePoint {
     TOFSpacePoint& operator=(const TOFSpacePoint& _tofspacepoint);
 
     /** Destructor - any member pointers are deleted */
-    ~TOFSpacePoint();
+    virtual ~TOFSpacePoint();
 
 
     /** Returns PhysEventNumber */

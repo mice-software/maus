@@ -44,7 +44,7 @@ class KLDaq {
     KLDaq& operator=(const KLDaq& _kldaq);
 
     /** Destructor - any member pointers are deleted */
-    ~KLDaq();
+    virtual ~KLDaq();
 
 
     /** Returns V1724Array */

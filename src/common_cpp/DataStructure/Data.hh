@@ -41,7 +41,7 @@ class Data {
     Data& operator=(const Data& data);
 
     /** Deletes the spill data */
-    ~Data();
+    virtual ~Data();
 
     /** Set the spill data
      *

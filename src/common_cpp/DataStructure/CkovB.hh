@@ -53,7 +53,7 @@ class CkovB {
     CkovB& operator=(const CkovB& _ckovb);
 
     /** Destructor - any member pointers are deleted */
-    ~CkovB();
+    virtual ~CkovB();
 
 
     /** Returns ArrivalTime6 */
