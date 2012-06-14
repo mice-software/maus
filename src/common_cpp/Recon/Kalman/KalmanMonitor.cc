@@ -24,7 +24,7 @@ KalmanMonitor::KalmanMonitor() {
 KalmanMonitor::~KalmanMonitor() {
   TFile f("hist.root", "update");
   // file->Write();
-  TGraph *gr = new TGraph(30, &(_site[0]), &(_alpha_extrap[0]));
+  TGraph *gr = new TGraph(30, &(_site[0]), &(_alpha_projected[0]));
   gr->SetName("extrapolation");
   TGraph *gr2 = new TGraph(30, &(_site[0]), &(_alpha_meas[0]));
   gr2->SetName("measurement");
@@ -38,7 +38,7 @@ void KalmanMonitor::save(std::vector<KalmanSite> const &sites) {
   int numb_sites = sites.size();
   _alpha_meas.resize(numb_sites);
   _site.resize(numb_sites);
-  _alpha_extrap.resize(numb_sites);
+  _alpha_projected.resize(numb_sites);
 
   for ( int i = 0; i < numb_sites; ++i ) {
     KalmanSite site = sites[i];
@@ -46,11 +46,11 @@ void KalmanMonitor::save(std::vector<KalmanSite> const &sites) {
     // std::cerr << "SITE extrap alpha: " << site.get_extrapolated_alpha() << std::endl;
     // std::cerr << "SITE measured alpha: " << site.get_alpha() << std::endl;
 
-    _alpha_extrap.at(i) = site.get_projected_alpha();
+    _alpha_projected.at(i) = site.get_projected_alpha();
     _site.at(i) = site.get_id();
     _alpha_meas.at(i) = site.get_alpha();
 
-    double pull = _alpha_meas.at(i) - _alpha_extrap.at(i);
+    double pull = _alpha_meas.at(i) - _alpha_projected.at(i);
     // std::cerr << "PULL: " << _alpha_meas.at(i) << " " << _alpha_extrap.at(i) << std::endl;
     TMatrixD a(5, 1);
     a = site.get_a();

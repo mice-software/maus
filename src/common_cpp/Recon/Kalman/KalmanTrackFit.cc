@@ -29,10 +29,8 @@ KalmanTrackFit::~KalmanTrackFit() {
 }
 
 bool sort_by_id(SciFiCluster *a, SciFiCluster *b ) {
-  if (a->get_tracker() == 0 )
-    return ( a->get_id() > b->get_id() ); //  descending order
-  if (a->get_tracker() == 1 )
-    return ( a->get_id() < b->get_id() ); //  ascending order
+  //  Ascending station number.
+  return ( a->get_id() < b->get_id() ); 
 }
 //
 // Helical track fit.
@@ -152,11 +150,12 @@ void KalmanTrackFit::process(SciFiEvent &event) {
     filter(sites, track, i);
   }
   // ...and Smooth back all sites.
+  /*
   for ( int i = numb_measurements-2; i >= 0; --i ) {
     std::cerr << "Smoothing site " << i << std::endl;
     smooth(sites, track, i);
   }
-
+  */
   KalmanMonitor monitor;
   monitor.save(sites);
 }

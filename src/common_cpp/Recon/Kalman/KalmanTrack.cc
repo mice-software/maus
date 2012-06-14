@@ -64,18 +64,13 @@ void KalmanTrack::calc_covariance(KalmanSite *old_site, KalmanSite *new_site) {
 
 void KalmanTrack::update_G(KalmanSite *a_site) {
   double alpha = (a_site->get_measurement())(0, 0);
-  double R = 160.;
-  double chan_w = 1.4945; // effective channel width without overlap
-
-  double sig_beta;
-
-  double l = pow(R*R-(alpha*chan_w)*(alpha*chan_w), 0.5);
-
-  sig_beta = l/chan_w;
-  double sig_alpha = 1.0;
+  double l = pow(ACTIVE_RADIUS*ACTIVE_RADIUS -
+                 (alpha*CHAN_WIDTH)*(alpha*CHAN_WIDTH), 0.5);
+  double sig_beta = l/CHAN_WIDTH;
+  double SIG_ALPHA = 1.0;
   _G.Zero();
-  _G(0, 0) = sig_alpha*sig_alpha; // sigma_x*sigma_x;
-  _G(1, 1) = sig_beta*sig_beta; // sigma_x*sigma_x;
+  _G(0, 0) = SIG_ALPHA*SIG_ALPHA;
+  _G(1, 1) = sig_beta*sig_beta;
   _G.Invert();
 }
 

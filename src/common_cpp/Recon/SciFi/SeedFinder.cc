@@ -21,7 +21,7 @@
 #include "src/common_cpp/Recon/SciFi/SeedFinder.hh"
 
 SeedFinder::SeedFinder() {
-  _B    = -4.;
+  // _B    = 4.;
   _Q    = 1.;
   _sigx = 0.5;
   _sigy = 0.5;
@@ -34,7 +34,11 @@ SeedFinder::SeedFinder() {
 
 SeedFinder::~SeedFinder() {}
 
-bool increazing_station_no(const SciFiSpacePoint& pnt1, const SciFiSpacePoint& pnt2) {
+bool descending_station_numb(const SciFiSpacePoint& pnt1, const SciFiSpacePoint& pnt2) {
+      return pnt1.get_station() > pnt2.get_station();
+}
+
+bool ascending_station_numb(const SciFiSpacePoint& pnt1, const SciFiSpacePoint& pnt2) {
       return pnt1.get_station() < pnt2.get_station();
 }
 
@@ -50,14 +54,14 @@ bool SeedFinder::process(std::vector<SciFiSpacePoint> spacepoints) {
   pos3 = sp3.get_position();
 
   _tracker = sp1.get_tracker();
-/*
+
   if ( _tracker == 0 ) {
-    _B    = 4.;
-  }
-  if ( _tracker == 1 ) {
     _B    = -4.;
   }
-*/
+  if ( _tracker == 1 ) {
+    _B    = 4.;
+  }
+
   try {
     // order points by increazing z
     // order_points();
@@ -93,12 +97,12 @@ void SeedFinder::momentumFromPoints(SciFiSpacePoint pnt1,
   spacepoints.push_back(pnt3);
   // ============================================
   // MUCH ATTENTION NEEDED HERE... coordinate reference frame...
-/*  if ( pnt1.get_tracker() == 0 ) {
+  if ( pnt1.get_tracker() == 0 ) {
     sort(spacepoints.begin(), spacepoints.end(), descending_station_numb);
   } else if( pnt1.get_tracker() == 1 ) {
     sort(spacepoints.begin(), spacepoints.end(), ascending_station_numb);
   }
-
+/*
   if ( pnt1.get_tracker() == 0 ) {
     sort(spacepoints.begin(), spacepoints.end(), increazing_station_no);
   } else if ( pnt1.get_tracker() == 1 ) {
@@ -275,7 +279,8 @@ void SeedFinder::determinePtFromR() { // double& r, double& B, double& pt ) {
 }
 
 void SeedFinder::determinePhi(Hep3Vector& pos, double& phi ) {
-  phi = atan2(pos.x() - _x0, pos.y() - _y0);
+  //phi = atan2(pos.x() - _x0, pos.y() - _y0);
+  phi = atan2(pos.y() - _y0, pos.x() - _x0); // correction
 
   if ( phi < 0. )
     phi += 2. * pi;

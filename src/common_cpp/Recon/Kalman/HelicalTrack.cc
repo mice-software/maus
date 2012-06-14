@@ -40,7 +40,7 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   // Find dz.
   double new_z = new_site->get_z();
   double old_z = old_site->get_z();
-  double deltaZ = new_z-old_z;
+  double deltaZ = new_z;
 
   TMatrixD prev_site(5, 1);
   prev_site = old_site->get_a();

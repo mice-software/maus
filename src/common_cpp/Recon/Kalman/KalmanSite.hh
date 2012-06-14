@@ -40,18 +40,7 @@ class KalmanSite {
   KalmanSite(const KalmanSite &site);
 
   KalmanSite& operator=(const KalmanSite& site);
-/*
-  /// Sets state vector's components at the site.
-  void set_state_vector(double x0,
-                        double y0,
-                        double mx,
-                        double my,
-                        double p) { _a(0, 0) = x0;
-                                    _a(1, 0) = y0;
-                                    _a(2, 0) = mx;
-                                    _a(3, 0) = my;
-                                    _a(4, 0) = p; }
-*/
+
   /// Assigns PROJECTED state vector at the site.
   void set_projected_a(TMatrixD projected_a) { _projected_a = projected_a; }
 
@@ -78,10 +67,12 @@ class KalmanSite {
                                        _v(1, 0) = 0.0;
                                        _alpha   = alpha; }
 
-  void set_measurement(TMatrixD m) { _v = m;
-                                     _alpha = _v(0, 0); }
+  // void set_measurement(TMatrixD m) { _v = m;
+  //                                   _alpha = _v(0, 0); }
 
   TMatrixD get_measurement() const { return _v; }
+
+  double get_alpha() const { return _alpha; }
 
   void set_direction(Hep3Vector dir) { _direction = dir; }
 
@@ -100,8 +91,6 @@ class KalmanSite {
   double get_projected_alpha() const { return _alpha_projected; }
 
   // void set_alpha(double alpha) { _alpha = alpha; }
-
-  double get_alpha() const { return _alpha; }
 
   // void set_state(state new_state) { _site_state = new_state; }
 
