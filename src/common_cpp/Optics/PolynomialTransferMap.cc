@@ -38,23 +38,33 @@ PolynomialTransferMap::PolynomialTransferMap(
   const PolynomialMap& polynomial_map,
   const PhaseSpaceVector& reference_trajectory_in,
   const PhaseSpaceVector& reference_trajectory_out)
-  : polynomial_map_(polynomial_map), reference_trajectory_in_(reference_trajectory_in),
-    reference_trajectory_out_(reference_trajectory_out)
+  : polynomial_map_(polynomial_map.Clone()),
+    reference_trajectory_in_(new PhaseSpaceVector(reference_trajectory_in)),
+    reference_trajectory_out_(new PhaseSpaceVector(reference_trajectory_out))
 { }
 
 PolynomialTransferMap::PolynomialTransferMap(
   const PolynomialMap& polynomial_map,
   const PhaseSpaceVector& reference_trajectory)
-  : polynomial_map_(polynomial_map), reference_trajectory_in_(reference_trajectory),
-    reference_trajectory_out_(reference_trajectory)
+  : polynomial_map_(polynomial_map.Clone()),
+    reference_trajectory_in_(new PhaseSpaceVector(reference_trajectory)),
+    reference_trajectory_out_(new PhaseSpaceVector(reference_trajectory))
 { }
 
 PolynomialTransferMap::PolynomialTransferMap(
   const PolynomialTransferMap& original_instance)
-  : polynomial_map_(original_instance.polynomial_map_),
-    reference_trajectory_in_(original_instance.reference_trajectory_in_),
-    reference_trajectory_out_(original_instance.reference_trajectory_out_)
+  : polynomial_map_(original_instance.polynomial_map_.Clone()),
+    reference_trajectory_in_(
+      new PhaseSpaceVector(original_instance.reference_trajectory_in_)),
+    reference_trajectory_out_(
+      new PhaseSpaceVector(original_instance.reference_trajectory_out_))
 { }
+
+PolynomialTransferMap::~PolynomialTransferMap() {
+  delete polynomial_map_;
+  delete reference_trajectory_in_;
+  delete reference_trajectory_out_;
+}
 
 /**
  *  Name: Transport(CovarianceMatrix const &)

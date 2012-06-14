@@ -78,7 +78,7 @@ class PolynomialTransferMap : public TransferMap {
 
   /* @brief destructor
    */
-  ~PolynomialTransferMap() {;}
+  ~PolynomialTransferMap();
 
   friend std::ostream& operator<<(std::ostream& out,
                                   const PolynomialTransferMap& tm);
@@ -96,9 +96,9 @@ class PolynomialTransferMap : public TransferMap {
 
   Matrix<double> CreateTransferMatrix() const;
 
-  const PolynomialMap& polynomial_map_;
-  const PhaseSpaceVector& reference_trajectory_in_;
-  const PhaseSpaceVector& reference_trajectory_out_;
+  PolynomialMap const * const polynomial_map_;
+  PhaseSpaceVector const * const reference_trajectory_in_;
+  PhaseSpaceVector const * const reference_trajectory_out_;
 };
 
 std::ostream& operator<<(std::ostream& out, const PolynomialTransferMap& map);

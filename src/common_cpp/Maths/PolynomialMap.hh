@@ -56,8 +56,6 @@ namespace MAUS {
  * \n
  */
 
-// TODO: divorce the actual vector from the collection of vectors that form a
-//       transform
 class PolynomialMap : public VectorMap {
  public:
   // forward declaration of embedded class
