@@ -2,7 +2,7 @@
 
 FILE_STD=install_log_std
 
-if [ -z "$MAUS_ROOT_DIR" ]; then
+if [ ! -z "$MAUS_ROOT_DIR" ]; then
    echo "FATAL: Trying to build with \$MAUS_ROOT_DIR set. Please start a new"
    echo "FATAL: session (and don't source an existing MAUS installation)"
    echo "FATAL: before attempting to build"
