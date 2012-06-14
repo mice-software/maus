@@ -23,7 +23,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     #
 
     ${MAUS_ROOT_DIR}/third_party/bash/01python.bash
-    python ${MAUS_ROOT_DIR}/third_parth/check_path.py
+    python ${MAUS_ROOT_DIR}/third_party/check_path.py
     if [ $? != 0 ]; then
         echo "FATAL: Found a bad MAUS_ROOT_DIR"
     fi
