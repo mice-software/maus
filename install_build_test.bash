@@ -6,20 +6,12 @@ if [ -z "$MAUS_ROOT_DIR" ]; then
    echo "FATAL: Trying to build with \$MAUS_ROOT_DIR set. Please start a new"
    echo "FATAL: session (and don't source an existing MAUS installation)"
    echo "FATAL: before attempting to build"
+   exit 1;
+fi
 
 if [ -f $FILE_STD ];
 then
     rm $FILE_STD
-fi
-
-if [ "${MAUS_ROOT_DIR}" ]; then  # see if the variable exists yet                                                                                                                
-    echo "Your current directory is:"
-    pwd
-    echo
-    echo "Your MAUS_ROOT_DIR is:"
-    echo ${MAUS_ROOT_DIR}
-    echo
-    echo "These should agree"
 fi
 
 echo
