@@ -37,7 +37,7 @@ class EMREvent {
     EMREvent& operator=(const EMREvent& _emrevent);
 
     /** Destructor - any member pointers are deleted */
-    ~EMREvent();
+    virtual ~EMREvent();
 
 
   private:

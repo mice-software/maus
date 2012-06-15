@@ -43,7 +43,7 @@ class TOFEvent {
     TOFEvent& operator=(const TOFEvent& _tofevent);
 
     /** Destructor - any member pointers are deleted */
-    ~TOFEvent();
+    virtual ~TOFEvent();
 
 
     /** Returns TOFEventSlabHit */

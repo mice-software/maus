@@ -31,6 +31,8 @@ SimpleHelix::SimpleHelix() {
   _Psi_0_err = 0.0;
   _chisq = 0.0;
   _chisq_dof = 0.0;
+  _dsdz = 0.0;
+  _dsdz_err = 0.0;
 }
 
 SimpleHelix::SimpleHelix(double Phi_0, double Phi_0_err, double R, double R_err, double tan_lambda,
@@ -62,6 +64,8 @@ void SimpleHelix::clear() {
   _Psi_0_err = 0.0;
   _chisq = 0.0;
   _chisq_dof = 0.0;
+  _dsdz = 0.0;
+  _dsdz_err = 0.0;
 }
 
 void SimpleHelix::set_parameters(double Phi_0, double Phi_0_err, double R, double R_err,

@@ -58,7 +58,7 @@ keep_only_muon_tracks = False
 keep_tracks = False # set to true to keep start and end point of every track
 keep_steps = False # set to true to keep start and end point of every track and
                    # every step point
-simulation_geometry_filename = "Stage6.dat" # geometry used by simulation
+simulation_geometry_filename = "Stage4.dat" # geometry used by simulation
 maximum_number_of_steps = 10000 # particles are killed after this number of
                                 # steps (assumed to be stuck in the fields)
 simulation_reference_particle = { # used for setting particle phase
@@ -238,7 +238,7 @@ V1724_Zero_Suppression_Threshold = 100
 Do_VLSB_Zero_Suppression = False
 VLSB_Zero_Suppression_Threshold = 60
 Do_VLSB_C_Zero_Suppression = True
-VLSB_C_Zero_Suppression_Threshold = 30
+VLSB_C_Zero_Suppression_Threshold = 50
 Enable_TOF = True
 Enable_EMR = True
 Enable_KL = True

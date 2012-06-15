@@ -44,7 +44,7 @@ class Unknown {
     Unknown& operator=(const Unknown& _unknown);
 
     /** Destructor - any member pointers are deleted */
-    ~Unknown();
+    virtual ~Unknown();
 
 
     /** Returns V1290Array */

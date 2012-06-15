@@ -41,28 +41,17 @@ class KalmanSite {
 
   KalmanSite& operator=(const KalmanSite& site);
 
-  /// Sets state vector's components at the site.
-  void set_state_vector(double x0,
-                        double y0,
-                        double mx,
-                        double my,
-                        double p) { _a(0, 0) = x0;
-                                    _a(1, 0) = y0;
-                                    _a(2, 0) = mx;
-                                    _a(3, 0) = my;
-                                    _a(4, 0) = p; }
+  /// Assigns PROJECTED state vector at the site.
+  void set_projected_a(TMatrixD projected_a) { _projected_a = projected_a; }
+
+  /// Returns PROJECTED state vector at the site.
+  TMatrixD get_projected_a() const { return _projected_a; }
 
   /// Assigns state vector at the site.
-  void set_state_vector(TMatrixD a) { _a = a; }
+  void set_a(TMatrixD a) { _a = a; }
 
   /// Returns state vector at the site.
-  TMatrixD get_state_vector() const { return _a; }
-
-  /// Sets a projection.
-  void set_projected_state_vector(TMatrixD ap) { _projected_a = ap; }
-
-  /// Returns the projected state at the site.
-  TMatrixD get_projected_state_vector() const { return _projected_a; }
+  TMatrixD get_a() const { return _a; }
 
   /// Sets the covariance matrix.
   void set_covariance_matrix(TMatrixD C) { _C = C; }
@@ -78,10 +67,12 @@ class KalmanSite {
                                        _v(1, 0) = 0.0;
                                        _alpha   = alpha; }
 
-  void set_measurement(TMatrixD m) { _v = m;
-                                     _alpha = _v(0, 0); }
+  // void set_measurement(TMatrixD m) { _v = m;
+  //                                   _alpha = _v(0, 0); }
 
   TMatrixD get_measurement() const { return _v; }
+
+  double get_alpha() const { return _alpha; }
 
   void set_direction(Hep3Vector dir) { _direction = dir; }
 
@@ -95,17 +86,19 @@ class KalmanSite {
 
   int get_id() const { return _id; }
 
-  void set_extrapolated_alpha(double alpha) { _alpha_extrapolated = alpha; }
+  void set_projected_alpha(double alpha) { _alpha_projected = alpha; }
 
-  double get_extrapolated_alpha() const { return _alpha_extrapolated; }
+  double get_projected_alpha() const { return _alpha_projected; }
 
   // void set_alpha(double alpha) { _alpha = alpha; }
-
-  double get_alpha() const { return _alpha; }
 
   // void set_state(state new_state) { _site_state = new_state; }
 
   // int get_state() const { return _site_state; }
+
+  void set_residual(double residual) { _residual = residual; }
+
+  double get_residual() const { return _residual; }
 
  private:
   /// The state vector.
@@ -114,20 +107,23 @@ class KalmanSite {
   /// The projected state.
   TMatrixD _projected_a;
 
-  /// The measurement.
-  TMatrixD _v;
-
   /// The covariance matrix.
   TMatrixD _C;
 
   /// The projected cov matrix.
   TMatrixD _projected_C;
 
-  double _z, _alpha, _alpha_extrapolated;
+  /// The measurement.
+  TMatrixD _v;
+
+  double _z, _alpha, _alpha_projected;
 
   int _id;
 
   Hep3Vector _direction;
+
+  /// The residual at this site. (filtered-meas)
+  double _residual;
 
   // enum state { INVALID = 0, PROJECTED, FILTERED, SMOOTHED };
 

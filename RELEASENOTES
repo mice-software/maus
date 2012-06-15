@@ -1,9 +1,19 @@
 This file contains a brief overview of the changes made in each release. A
 detailed description of changes is available at:
+
 http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v0.2.5
+  The following functionality was added:
+    - A new example for json analysis was added
+    - The CDB version was update to 0.3.0
+    - The documentation was extended and is now available from the MAUS wiki
+  If upgrading from the previous version, the following third party library
+  scripts need to be rerun:
+    - third_party/bash/44cdb.bash   
+
 MAUS-v0.2.4
   The following functionality was added:
     - Visualisation options were added to select colour of different particle

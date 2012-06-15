@@ -69,7 +69,7 @@ class Channels {
     Channels& operator=(const Channels& _channels);
 
     /** Destructor - any member pointers are deleted */
-    ~Channels();
+    virtual ~Channels();
 
 
     /** Returns Ch27 */

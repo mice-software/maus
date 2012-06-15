@@ -40,6 +40,7 @@
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiStraightPRTrack.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiHelicalPRTrack.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiPRTrack.hh"
 
 // namespace MAUS {
 
@@ -85,6 +86,7 @@ class SciFiEvent {
   void set_helicalprtrack(std::vector<SciFiHelicalPRTrack> tracks) {
                           _scifihelicalprtracks = tracks; }
   std::vector<SciFiHelicalPRTrack> helicalprtracks() const {return _scifihelicalprtracks; }
+
 
  private:
 

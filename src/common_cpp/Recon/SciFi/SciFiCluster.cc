@@ -30,6 +30,8 @@ SciFiCluster::SciFiCluster(SciFiDigit *digit):_used(false),
                                               _npe(digit->get_npe()),
                                               _time(digit->get_time()) {
   digit->set_used();
+  _pos = (0, 0, 0);
+  _p = (0, 0, 0);
 }
 
 SciFiCluster::~SciFiCluster() {}

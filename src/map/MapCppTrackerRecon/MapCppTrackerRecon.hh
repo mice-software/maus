@@ -50,6 +50,7 @@
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
 #include "src/common_cpp/Recon/SciFi/PatternRecognition.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanTrackFit.hh"
+#include "src/common_cpp/Recon/SciFi/SeedFinder.hh"
 
 class MapCppTrackerRecon {
  public:
@@ -74,15 +75,6 @@ class MapCppTrackerRecon {
    */
   std::string process(std::string document);
 
-  /** makes digits
-   *
-   *  Digits are made by either picking up
-   *  daq or MC.
-   *  \param spill a SciFiSpill object
-   *  \param root the parsed JSON input
-   */
-  void digitization(SciFiSpill &spill, Json::Value &root);
-
   /** fills digits from MC digitization
    *
    *  \param digits the MC digits
@@ -103,6 +95,8 @@ class MapCppTrackerRecon {
   void spacepoint_recon(SciFiEvent &evt);
 
   void pattern_recognition(SciFiEvent &evt);
+
+  void make_seed_and_fit(SciFiEvent &event);
 
   void track_fit(SciFiEvent &evt);
 

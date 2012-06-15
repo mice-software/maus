@@ -21,17 +21,34 @@
 
 // C headers
 #include <assert.h>
+#include <math.h>
 
 // C++ headers
 #include <string>
 #include <vector>
 
-class HelicalTrack {
- public:
-  HelicalTrack();
+#include "TMath.h"
+#include "TMatrixD.h"
 
-  ~HelicalTrack();
-// private:
+// #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
+#include "src/common_cpp/Recon/SciFi/SeedFinder.hh"
+
+class HelicalTrack : public KalmanTrack {
+ public:
+  explicit HelicalTrack(SeedFinder const &seed);
+
+  void update_propagator(KalmanSite *old_site, KalmanSite *new_site);
+
+  double get_x0() const { return _x0; }
+
+  double get_y0() const { return _y0; }
+
+  double get_r() const { return _r; }
+ private:
+  double _x0, _y0, _r;
+
+  static const double _alpha = -1.0/(300000000.*4.);
 };
 
 #endif

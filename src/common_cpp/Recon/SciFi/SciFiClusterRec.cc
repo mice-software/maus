@@ -16,8 +16,6 @@
  */
 #include "src/common_cpp/Recon/SciFi/SciFiClusterRec.hh"
 
-// namespace MAUS {
-
 SciFiClusterRec::SciFiClusterRec() {}
 
 SciFiClusterRec::SciFiClusterRec(int cluster_exception, double min_npe)
@@ -113,17 +111,21 @@ void SciFiClusterRec::construct(SciFiCluster *clust, std::vector<const MiceModul
 
   Hep3Vector tracker_ref_frame_pos;
   if ( clust->get_tracker() == 0 ) {
-    tracker_ref_frame_pos = position - reference;
-  } else {
     tracker_ref_frame_pos = - (position - reference);
+  } else {
+    tracker_ref_frame_pos = position - reference;
   }
 
-  clust->set_position(tracker_ref_frame_pos);
+  clust->set_position(position);
   clust->set_direction(dir);
+  clust->set_relative_position(tracker_ref_frame_pos);
   // Set relative position & channel number for the Kalman Filter.
-  Hep3Vector relative_position = position - this_plane->globalPosition();
+  // This is the position of the cluster relatively to station 1 of the tracker (0 or 1)
+  // with the displacement of the station centre subtracted.
+  // Hep3Vector relative_position = position - this_plane->globalPosition();
   double channel = clust->get_channel() - CentralFibre;
-  clust->set_relative_position(relative_position);
+  // clust->set_relative_position(relative_position);
+
   clust->set_alpha(channel);
   int id = 15*tracker + 3*(station-1) + (plane);
   clust->set_id(id);
@@ -146,6 +148,7 @@ Hep3Vector SciFiClusterRec::get_reference_frame_pos(int tracker,
   }
   assert(reference_plane != NULL);
   Hep3Vector reference_pos =  reference_plane->globalPosition();
+
   return reference_pos;
 }
 
@@ -155,6 +158,8 @@ bool SciFiClusterRec::are_neighbours(SciFiDigit *seed_i, SciFiDigit *seed_j) {
   if ( !seed_j->is_used() && // seed is unused
        seed_j->get_spill() == seed_i->get_spill() && // same spill
        seed_j->get_event() == seed_i->get_event() && // same event
+       seed_j->get_tracker() == seed_i->get_tracker() && // same tracker
+       seed_j->get_station() == seed_i->get_station() && // same station
        seed_j->get_plane() == seed_i->get_plane() && // seeds belong to same plane
        abs(seed_j->get_channel() - seed_i->get_channel()) < 2.0 ) { // and are neighbours
     neigh = true;
@@ -162,4 +167,3 @@ bool SciFiClusterRec::are_neighbours(SciFiDigit *seed_i, SciFiDigit *seed_j) {
 
   return neigh;
 }
-// } // ~namespace MAUS

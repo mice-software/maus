@@ -35,7 +35,7 @@ class SpecialVirtualChannelId {
     SpecialVirtualChannelId& operator=(const SpecialVirtualChannelId& channel);
 
     /** Destructor (does nothing)*/
-    ~SpecialVirtualChannelId();
+    virtual ~SpecialVirtualChannelId();
 
     /** Get index of the station that was hit */
     int GetStation() const;

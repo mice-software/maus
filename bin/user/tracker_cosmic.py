@@ -24,6 +24,8 @@ def run(data_path, run_num):
 
     my_map = MAUS.MapPyGroup()
 
+    my_map.append(MAUS.MapCppTrackerDigits())
+
     my_map.append(MAUS.MapCppTrackerRecon())  # SciFi recon
 
     datacards = io.StringIO(u"")

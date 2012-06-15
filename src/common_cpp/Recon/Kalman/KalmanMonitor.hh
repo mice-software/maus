@@ -46,7 +46,7 @@ class KalmanMonitor {
   void save(std::vector<KalmanSite> const &sites);
 
  private:
-  std::vector<double> _alpha_meas, _site, _alpha_extrap;
+  std::vector<double> _alpha_meas, _site, _alpha_projected;
 
  /* double _alpha_extrap[30], _alpha_std[30];
 

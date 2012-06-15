@@ -26,6 +26,7 @@ def run(data_path, run_num):
     # Create an empty array of mappers, then populate it
     # with the functionality you want to use.
     my_map = MAUS.MapPyGroup()
+    my_map.append(MAUS.MapCppTrackerDigits())
     my_map.append(MAUS.MapCppTrackerRecon())
 
     #reducer = MAUS.ReduceCppTracker()
