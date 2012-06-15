@@ -1,0 +1,890 @@
+\chapter{Field Properties}
+Invoke a field using PropertyString FieldType {\textless}fieldtype{\textgreater}. The field will be placed, normally
+centred on the MiceModule Position and with the appropriate Rotation. Further options for each field type are specified
+below, and relevant datacards are also given. If a fieldtype is specified some other properties must also be specified,
+while others may be optional, usually taking their value from defaults specified in the datacards. Only one fieldtype
+can be specified per module. However, fields from multiple modules are superimposed, each transformed according to the
+MiceModule specification. This enables many different field configurations to be simulated using MAUS.
+
+To use BeamTools fields, datacard FieldMode Full must be set. This is the default.
+
+\begin{center}
+\tablefirsthead{\hline
+{\bfseries Property} &
+{\bfseries Type} &
+{\bfseries Description}\\}
+\tablehead{\hline
+{\bfseries Property} &
+{\bfseries Type} &
+{\bfseries Description}\\}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{3.665cm}|m{1.278cm}|m{12.052cm}|}
+\hline
+{\itshape FieldType} &
+string &
+Set the field type of the MiceModule.\\\hline
+\end{supertabular}
+\end{center}
+\subsection{FieldType CylindricalField}
+Sets a constant magnetic field in a cylindrical region symmetric about the z-axis of the module.
+
+\begin{center}
+\tablefirsthead{\hline
+{\bfseries Property} &
+{\bfseries Type} &
+{\bfseries Description}\\}
+\tablehead{\hline
+{\bfseries Property} &
+{\bfseries Type} &
+{\bfseries Description}\\}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{3.665cm}|m{1.278cm}|m{12.052cm}|}
+\hline
+{\itshape ConstantField} &
+Hep3
+
+Vector &
+The magnetic field that will be placed in the region.\\\hline
+\multicolumn{2}{m{5.143cm}|}{\hspace*{-\tabcolsep}\begin{tabular}{|m{3.665cm}|m{1.278cm}}
+
+{\itshape Length} &
+double\\\hline
+{\itshape Radius} &
+double\\\hline
+\end{tabular}\hspace*{-\tabcolsep}
+} &
+The physical extent of the region.\\\hhline{~~-}
+\end{supertabular}
+\end{center}
+\subsection{FieldType RectangularField}
+Sets a constant magnetic field in a rectangular region.
+
+\begin{center}
+\tablefirsthead{\hline
+{\bfseries Property} &
+{\bfseries Type} &
+{\bfseries Description}\\}
+\tablehead{\hline
+{\bfseries Property} &
+{\bfseries Type} &
+{\bfseries Description}\\}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{3.665cm}|m{1.278cm}|m{12.052cm}|}
+\hline
+{\itshape ConstantField} &
+Hep3
+
+Vector &
+The magnetic field that will be placed in the region.\\\hline
+\multicolumn{2}{m{5.143cm}|}{\hspace*{-\tabcolsep}\begin{tabular}{|m{3.665cm}|m{1.278cm}}
+
+{\itshape Length} &
+double\\\hline
+{\itshape Width} &
+double\\\hline
+{\itshape Height} &
+double\\\hline
+\end{tabular}\hspace*{-\tabcolsep}
+} &
+The physical extent of the region.\\\hhline{~~-}
+\end{supertabular}
+\end{center}
+\subsection{FieldType Solenoid}
+MAUS simulates solenoids using a series of current sheets. The field for each solenoid is written to a field map on a
+rectangular grid and can then be reused. The field from each current sheet is calculated using the formula for current
+sheets detailed in MUCOOL Note 281, \textit{Modeling solenoids using coil, sheet and block conductors}.
+
+\begin{center}
+\tablefirsthead{\hline
+{\bfseries Property} &
+{\bfseries Type} &
+{\bfseries Description}\\}
+\tablehead{\hline
+{\bfseries Property} &
+{\bfseries Type} &
+{\bfseries Description}\\}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{3.665cm}|m{1.278cm}|m{12.052cm}|}
+\hline
+{\itshape FileName} &
+string &
+Read or write solenoid data to the filename. If different modules have the same filename, MAUS assumes they are the
+same.\\\hline
+FieldMapMode &
+string &
+If set to Read, MAUS will attempt to read existing data from the FileName. If set to Write, MAUS will generate new
+data and write it to the FileName. If set to Analytic, MAUS will calculate fields directly without interpolating. If
+set to WriteDynamic acts as in Write except the grid extent and grid spacing at each point is chosen dynamically to
+some tolerance defined in the FieldTolerance property. Takes default from datacard SolDataFiles (Write).\\\hline
+\multicolumn{2}{m{5.143cm}|}{\hspace*{-\tabcolsep}\begin{tabular}{|m{3.665cm}|m{1.278cm}}
+
+{\itshape Length} &
+double\\\hline
+{\itshape Thickness} &
+double\\\hline
+{\itshape InnerRadius} &
+double\\\hline
+{\itshape CurrentDensity} &
+double\\\hline
+\end{tabular}\hspace*{-\tabcolsep}
+} &
+Coil physical parameters. Only used in Write/Analytic mode where they are mandatory.\\\hhline{~~-}
+ZExtentFactor &
+double &
+Field map extends to length + ZExtentFactor*innerRadius in Write mode. Takes default from datacard SolzMapExtendFactor
+(10.). Map size is chosen dynamically in WriteDynamic mode.\\\hline
+RExtentFactor &
+double &
+Field map extends to radius RExtentFactor*innerRadius in Write mode. Takes default from datacard SolrMapExtendFactor
+(2.018...). Avoid allowing grid nodes to fall on sheets.\\\hline
+NumberOfZCoords &
+int &
+Number of coordinates in \textit{z} in field map grid in Write mode. Takes default from datacard NumberNodesZGrid
+(500).\\\hline
+NumberOfRCoords &
+int &
+Number of coordintes in \textit{r} in field map grid in Write mode. Takes default from datacard NumberNodesRGrid
+(100).\\\hline
+NumberOfSheets &
+int &
+Number of sheets used to calculate the field. Takes default from datacard DefaultNumberOfSheets (10).\\\hline
+{\itshape FieldTolerance } &
+double &
+Mandatory when FieldMapMode is WriteDynamic. If field map mode is write dynamic, this datacard controls the tolerance on
+errors in the field with which the field grid and the grid extent will be chosen. \\\hline
+Interpolation
+
+Algorithm &
+string &
+Choose the interpolation algorithm. Options are BiLinear for a linear interpolation in \textit{r} and \textit{z}, or
+LinearCubic \ for a linear interpolation in \textit{r} and a cubic spline in \textit{z}. Default is
+LinearCubic.\\\hline
+IsAmalgamated &
+bool &
+Set to 1 to add the coil to CoilAmalgamtion parent field (see below).\\\hline
+\end{supertabular}
+\end{center}
+
+\subsection{FieldType FieldAmalgamation}
+During tracking, MAUS stores a list of fields and for each one MAUS checks to see if tracking is performed through a
+particular field map's bounding box. This can be slow if a large number of fields are present. One way to speed this up
+is to store contributions from many coils in a single CoilAmalgamation. A CoilAmalgamation searches through child
+modules for solenoids with PropertyBool IsAmalgamated set to true. If it finds such a coil, it will add the field
+generated by the solenoid to its own field map and disable the coil.
+
+\begin{center}
+\tablefirsthead{\hline
+{\bfseries Property} &
+{\bfseries Type} &
+{\bfseries Description}\\}
+\tablehead{\hline
+{\bfseries Property} &
+{\bfseries Type} &
+{\bfseries Description}\\}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{3.665cm}|m{1.278cm}|m{12.052cm}|}
+\hline
+{\itshape Length} &
+double &
+The Length of the field map generated by the CoilAmalgamation.\\\hline
+{\itshape RMax} &
+double &
+The maximum radius of the field map generated by the CoilAmalgamation.\\\hline
+Interpolation
+
+Algorithm &
+string &
+Choose the interpolation algorithm. Options are BiLinear for a linear interpolation in \textit{r} and \textit{z}, or
+LinearCubic \ for a linear interpolation in \textit{r} and a cubic spline in \textit{z}. Default is
+LinearCubic.\\\hline
+\multicolumn{2}{m{5.143cm}|}{\hspace*{-\tabcolsep}\begin{tabular}{|m{3.665cm}|m{1.278cm}}
+
+{\itshape ZStep} &
+double\\\hline
+{\itshape RStep} &
+double\\\hline
+\end{tabular}\hspace*{-\tabcolsep}
+} &
+Step size of the field map generated by the CoilAmalgamation.\\\hhline{~~-}
+\end{supertabular}
+\end{center}
+
+\subsection{FieldType FastSolenoid}
+This is an alternative field model for solenoids that uses a power law expansion of the on-axis magnetic field and its
+derivatives, and an exponential fall-off for the fringe field (tanh).
+
+\begin{center}
+\tablefirsthead{\hline
+{\bfseries Property} &
+{\bfseries Type} &
+{\bfseries Description}\\}
+\tablehead{\hline
+{\bfseries Property} &
+{\bfseries Type} &
+{\bfseries Description}\\}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{3.665cm}|m{1.278cm}|m{12.052cm}|}
+\hline
+{\itshape PeakField} &
+double &
+Nominal peak field of the solenoid.\\\hline
+{\itshape EFoldLength} &
+double &
+The fall-off length for the fringe field.\\\hline
+{\itshape CentreLength} &
+double &
+Nominal length for the peak field region.\\\hline
+{\itshape Order} &
+int &
+Order to which the field will be calculated.\\\hline
+FieldTolerance &
+double &
+If positive, MAUS will abort tracking if a particle crosses through a field with estimated error {\textgreater}
+FieldTolerance. MAUS estimates the error as the field value calculated at highest order. Default is -1 (i.e.
+inactive).\\\hline
+\end{supertabular}
+\end{center}
+\subsection{Phasing Models}
+MAUS has a number of sophisticated models for phasing RF cavities. These powerful models can make setting up RF
+cavities with realistic fields both quick and easy.
+
+When CavityMode is Unphased, MAUS attempts to phase the cavity itself. When using CavityMode Unphased MAUS needs to
+know when particles enter, cross the middle, and leave cavities. This means that:
+
+\liststyleLxiii
+\begin{itemize}
+\item The cavity must sit in a rectangular or cylindrical physical volume.
+\item No other physical volumes may overlap or sit within the physical volume of the cavity.
+\end{itemize}
+If these conditions are not met the phasing algorithm is likely to fail.
+
+To phase a cavity, MAUS builds a volume in the centre of the cavity that is used for phasing and then fires a
+reference particle through the system. Stochastic processes are always disabled during this process, while mean energy
+loss can be disabled using the datacard ReferenceEnergyLossModel. If a reference particle crosses a plane through the
+centre of a cavity, it sets the phase of the cavity to the time at which the particle crosses. 
+
+The field of the cavity during phasing is controlled by the property FieldDuringPhasing. There are four modes:
+
+\liststyleLxiv
+\begin{itemize}
+\item \textit{None}: Cavity fields are disabled during phasing
+\item \textit{Electrostatic}: An electrostatic field with no positional dependence given by
+PeakEField*sin(ReferenceParticlePhase) is enabled during phasing.
+\item \textit{TimeVarying}: A standard time varying field is applied during phasing, initially with arbitrary phase
+relative to the reference particle. MAUS uses a Newton-Raphson method to find the appropriate reference phase
+iteratively, with tolerance set by the datacard PhaseTolerance.
+\item \textit{EnergyGainOptimised}: A standard time varying field is applied during phasing, initially with arbitrary
+phase and peak field relative to the reference particle. MAUS uses a 2D Newton-Raphson method to find the appropriate
+reference phase and peak field iteratively, so that the reference particle crosses the cavity centre with phase given
+by property ReferenceParticlePhase and gains energy over the whole cavity given by property EnergyGain with tolerances
+set by the datacards PhaseTolerance and RFDeltaEnergyTolerance.
+\end{itemize}
+\subsection{Tracking Stability Around RF Cavities}
+Usually RF cavities have little or no fringe field, and this can lead to some instability in the tracking algorithms.
+When MAUS makes a step into an RF cavity volume, the tracking algorithms tend to smooth out a field in a non-physical
+way. This can be prevented by either (i) making the step size rather small in the RF cavity or (ii) forcing MAUS to
+stop tracking by adding a physical volume at the entrance of the RF cavity (a window, typically made of vacuum). Doing
+this should improve stability of tracking.
+
+\subsection{FieldType PillBox}
+Sets a PillBox field in a particular region. MAUS represents pillboxes using a sinusoidally varying TM010 pill box
+field, with non-zero field vector elements given by
+
+\begin{equation*}
+\begin{gathered}B_{\phi }=J_1(k_rr)\cos (\omega t)\\E_z=J_0(k_rr)\cos (\omega t)\end{gathered}
+\end{equation*}
+Here J\textsubscript{n} are Bessel functions and k\textsubscript{r} is a constant. See, for example, SY Lee VI.1. All
+other fields are 0.
+
+\begin{center}
+\tablefirsthead{\hline
+{\bfseries Property} &
+{\bfseries Type} &
+{\bfseries Description}\\}
+\tablehead{\hline
+{\bfseries Property} &
+{\bfseries Type} &
+{\bfseries Description}\\}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{3.665cm}|m{1.278cm}|m{12.052cm}|}
+\hline
+{\itshape Length} &
+double &
+Length of the region in which the field is present.\\\hline
+{\itshape CavityMode} &
+string &
+Phasing mode of the cavity - options are Phased, Unphased and Electrostatic.\\\hline
+{\itshape FieldDuringPhasing} &
+string &
+Controls the field during cavity phasing -- options are None, Electrostatic, TimeVarying and
+EnergyGainOptimised.\\\hline
+{\itshape EnergyGain} &
+double &
+WhenFieldDuringPhasing is set to EnergyGainOptimised, controls the peak electric field.\\\hline
+{\itshape Frequency} &
+double &
+The cavity frequency.\\\hline
+{\itshape PeakEField} &
+double &
+The peak field of the cavity. Not used when the FieldDuringPhasing is EnergyGainOptimised.\\\hline
+{\itshape TimeDelay} &
+double &
+In Phased mode the time delay (absolute time) of the cavity.\\\hline
+PhasingVolume &
+string &
+Set to SpecialVirtual to make the central volume a special virtual.\\\hline
+\multicolumn{2}{m{5.143cm}|}{\hspace*{-\tabcolsep}\begin{tabular}{|m{3.665cm}|m{1.278cm}}
+
+ReferenceParticle
+
+Energy &
+double\\\hline
+ReferenceParticle
+
+Charge &
+double\\\hline
+\end{tabular}\hspace*{-\tabcolsep}
+} &
+In Electrostatic mode, MAUS calculates the peak field and the field the reference particle sees using a combination of
+the reference particle energy, charge and phase. Take defaults from datacards NominalKineticEnergy and MuonCharge
+\\\hhline{~~-}
+ReferenceParticle
+
+Phase &
+double &
+MAUS tries to phase the field so that the reference particle crosses the cavity at ReferenceParticlePhase (units are
+angular). 0\textsuperscript{o} corresponds to no energy gain, 90\textsuperscript{o} corresponds to operation on-crest.
+Default from datacard rfAcclerationPhase.\\\hline
+\end{supertabular}
+\end{center}
+\subsection{FieldType RFFieldMap}
+Sets a cavity with an RF field map in a particular region. RFFieldMap uses the same phasing algorithm as described
+above.
+
+\begin{center}
+\tablefirsthead{\hline
+{\bfseries Property} &
+{\bfseries Type} &
+{\bfseries Description}\\}
+\tablehead{\hline
+{\bfseries Property} &
+{\bfseries Type} &
+{\bfseries Description}\\}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{3.665cm}|m{1.278cm}|m{12.052cm}|}
+\hline
+{\itshape Length} &
+double &
+Length of the region in which the field is present.\\\hline
+{\itshape CavityMode} &
+string &
+Phasing mode of the cavity - options are Phased and Unphased. RFFieldMaps cannot operated in Electrostatic mode.\\\hline
+{\itshape FieldDuringPhasing} &
+string &
+Controls the field during cavity phasing -- options are None, Electrostatic, TimeVarying and
+EnergyGainOptimised.\\\hline
+{\itshape EnergyGain} &
+double &
+WhenFieldDuringPhasing is set to EnergyGainOptimised, controls the peak electric field.\\\hline
+{\itshape Frequency} &
+double &
+The cavity frequency.\\\hline
+{\itshape PeakEField} &
+double &
+The peak field of the cavity. Not used when the FieldDuringPhasing is EnergyGainOptimised.\\\hline
+{\itshape TimeDelay} &
+double &
+In Phased mode the time delay (absolute time) of the cavity.\\\hline
+PhasingVolume &
+string &
+Set to SpecialVirtual to make the central volume a special virtual.\\\hline
+\multicolumn{2}{m{5.143cm}|}{\hspace*{-\tabcolsep}\begin{tabular}{|m{3.665cm}|m{1.278cm}}
+
+ReferenceParticle
+
+Energy &
+double\\\hline
+ReferenceParticle
+
+Charge &
+double\\\hline
+\end{tabular}\hspace*{-\tabcolsep}
+} &
+In Electrostatic mode, MAUS calculates the peak. field and the field the reference particle sees using a combination
+of the reference particle energy, charge and phase. Take defaults from datacards NominalKineticEnergy and MuonCharge
+\\\hhline{~~-}
+ReferenceParticle
+
+Phase &
+double &
+MAUS tries to phase the field so that the reference particle crosses the cavity at ReferenceParticlePhase (units are
+angular). 0\textsuperscript{o} corresponds to no energy gain, 90\textsuperscript{o} corresponds to operation on-crest.
+Default from datacard rfAcclerationPhase.\\\hline
+{\itshape FileName} &
+string &
+The file name of the field map file.\\\hline
+{\itshape FileType} &
+string &
+The file type of the field map. Only supported option is SuperFishSF7.\\\hline
+\end{supertabular}
+\end{center}
+
+\subsection{FieldType Multipole}
+Creates a multipole of arbitrary order. Fields are generated using either a hard edged model, with no fringe fields at
+all; or an Enge model similar to ZGoubi and COSY. In the former case fields are calculated using a simple polynomial
+expansion. In the latter case fields are calculated using the polynomial expansion with an additional exponential drop
+off. Fields can be superimposed onto a bent coordinate system to generate a sector multipole with arbitrary fixed
+radius of curvature.
+
+Unlike most other field models in MAUS, the zero position corresponds to the center of the entrance of the multipole;
+and the multipole extends in the +z direction.
+
+The method to define end fields is described in the section EndFieldTypes below
+
+\begin{center}
+\tablefirsthead{\hline
+{\bfseries Property} &
+{\bfseries Type} &
+{\bfseries Description}\\}
+\tablehead{\hline
+{\bfseries Property} &
+{\bfseries Type} &
+{\bfseries Description}\\}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{3.691cm}|m{1.252cm}|m{12.052cm}|}
+\hline
+{\itshape Pole} &
+int &
+The reference pole of the magnet. 1=dipole, 2=quadrupole, 3=sextupole etc.\\\hline
+{\itshape FieldStrength} &
+double &
+Scale the field strength in the good field region. For dipoles, this sets the dipole field; for quadrupoles this sets
+the field gradient. Note that for some end field settings there can be no good field region (e.g. if the end length is
+{\textgreater}\~{} centre length).\\\hline
+{\itshape Height} &
+double &
+Height of the field region.\\\hline
+{\itshape Width} &
+double &
+Width or delta radius of the field region.\\\hline
+{\itshape Length} &
+double &
+Length of the field along the bent trajectory.\\\hline
+EndFieldType &
+string &
+Set to HardEdged to disable fringe fields. Set to Enge or Tanh to use those models, as described elsewhere. Default is
+HardEdged.\\\hline
+CurvatureModel &
+string &
+Choose the model for curvature. Straight forces no curvature. Constant gives a constant radius of curvature;
+StraightEnds gives a constant radius of curvature along the length of the multipole with straight end fields beyond
+this length. MomentumBased gives radius of curvature determined by a momentum and a total bending angle.\\\hline
+ReferenceCurvature &
+double &
+Radius of curvature of the magnet in Constant or StraightEnds mode. Set to 0 for a straight magnet. Default is
+0.\\\hline
+ReferenceMomentum &
+double &
+Reference momentum used to calculate the radius of curvature of a dipole in MomentumBased mode. Default is 0.\\\hline
+{\itshape BendingAngle} &
+double &
+The angle used to calculate the radius of curvature of a dipole in MomentumBased mode. Note that this is mandatory in
+MomentumBased mode.\\\hline
+\end{supertabular}
+\end{center}
+
+\subsection{FieldType CombinedFunction}
+This creates superimposed dipole, quadrupole and sextupole fields with a common radius of curvature. The field is
+intended to mimic the first few terms in a multipole expansion of a field like
+
+\begin{equation*}
+B(y=0)=B_0\left(\frac r{r_0}\right)^k
+\end{equation*}
+The field index is a user defined parameter, while the dipole field and radius of curvature can either be defined
+directly by the user or defined in terms of a reference momentum and total bending angle. Fields are calculated as in
+the multipole field type defined above.
+
+\begin{center}
+\tablefirsthead{\hline
+{\bfseries Property} &
+{\bfseries Type} &
+{\bfseries Description}\\}
+\tablehead{\hline
+{\bfseries Property} &
+{\bfseries Type} &
+{\bfseries Description}\\}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{3.689cm}|m{1.252cm}|m{12.054cm}|}
+\hline
+{\itshape Pole} &
+int &
+The reference pole of the magnet. 1=dipole, 2=quadrupole, 3=sextupole etc.\\\hline
+{\itshape BendingField} &
+double &
+The nominal dipole field \textit{B}\textit{\textsubscript{0}}. Note that this is mandatory in all cases except where
+CurvatureModel is MomentumBased, when the BendingAngle and ReferenceMomentum is used to calculate the \ dipole field
+instead.\\\hline
+{\itshape FieldIndex} &
+double &
+The field index \textit{k}.\\\hline
+{\itshape Height} &
+double &
+Height of the field region.\\\hline
+{\itshape Width} &
+double &
+Width or delta radius of the field region.\\\hline
+{\itshape Length} &
+double &
+Length of the field along the bent trajectory.\\\hline
+EndFieldType &
+string &
+Set to HardEdged to disable fringe fields. Set to Enge or Tanh to use those models, as described elsewhere. Default is
+HardEdged.\\\hline
+CurvatureModel &
+string &
+Choose the model for curvature. Straight forces no curvature. Constant gives a constant radius of curvature;
+StraightEnds gives a constant radius of curvature along the length of the multipole with straight end fields beyond
+this length. MomentumBased gives radius of curvature determined by a momentum and a total bending angle.\\\hline
+ReferenceCurvature &
+double &
+Radius of curvature of the magnet in Constant or StraightEnds mode. Set to 0 for a straight magnet. Default is
+0.\\\hline
+ReferenceMomentum &
+double &
+Reference momentum used to calculate the radius of curvature of a dipole in MomentumBased mode. Default is 0.\\\hline
+{\itshape BendingAngle} &
+double &
+The angle used to calculate the radius of curvature of a dipole in MomentumBased mode. Note that this is mandatory in
+MomentumBased mode.\\\hline
+\end{supertabular}
+\end{center}
+
+\subsection{EndFieldTypes}
+In the absence of current sources, the magnetic field can be calculated from a scalar potential using the standard
+relation
+
+\begin{equation*}
+\vec B=\nabla V_n
+\end{equation*}
+The scalar magnetic potential of the n\textsuperscript{th}{}-order multipole field is given by
+
+\begin{equation*}
+V_n=\sum _{q=0}^{q_m}\sum _{m=0}^nn!^2\frac{G^{(2q)}(s)(r^2+y^2)^q\sin (\frac{m\pi } 2)r^{n-m}y^m}{4^qq!(n+q)!m!(n-m)!}
+\end{equation*}
+where \textit{G(s)} is either the double Enge function,
+
+\begin{equation*}
+G(s)=E[(x-x_0)/\lambda ]+E[(-x-x_0)/\lambda ]-1
+\end{equation*}
+\begin{equation*}
+E(s)=\frac{B_0}{R_0^n}\frac 1{1+\exp (C_1+C_2s+C_3s^2+...)}
+\end{equation*}
+or G(s) is the double tanh function,
+
+\begin{equation*}
+G(s)=\tanh [(x+x_0)/\lambda ]/2+\tanh [(x-x_0)/\lambda ]/2
+\end{equation*}
+and \textit{(r, y, s)} is the position vector in the rotating coordinate system. Note that here s is the distance from
+the nominal end of the field map.
+
+\begin{center}
+\tablefirsthead{\hline
+{\bfseries Property} &
+{\bfseries Type} &
+{\bfseries Description}\\}
+\tablehead{\hline
+{\bfseries Property} &
+{\bfseries Type} &
+{\bfseries Description}\\}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{3.689cm}|m{1.252cm}|m{12.054cm}|}
+\hline
+EndFieldType &
+string &
+Set to HardEdged to disable fringe fields. Set to Enge or Tanh to use those models, as described elsewhere. Default is
+HardEdged.\\\hline
+\multicolumn{3}{|m{17.394999cm}|}{{\itshape The following properties are used for EndFieldType Tanh}}\\\hline
+EndLength &
+double &
+Set the l parameter that defines the rapidity of the field fall off.\\\hline
+CentreLength &
+double &
+Set the \textit{x}\textit{\textsubscript{0}} parameter that defines the length of the flat field region.\\\hline
+MaxEndPole &
+int &
+Set the maximum pole that will be calculated -- should be larger than the multipole pole.\\\hline
+\multicolumn{3}{|m{17.394999cm}|}{{\itshape The following properties are used for EndFieldType Enge}}\\\hline
+EndLength &
+double &
+Set the l parameter that defines the rapidity of the field fall off.\\\hline
+CentreLength &
+double &
+Set the \textit{x}\textit{\textsubscript{0}} parameter that defines the length of the flat field region.\\\hline
+MaxEndPole &
+int &
+Set the maximum pole that will be calculated -- should be larger than the multipole pole.\\\hline
+\multicolumn{2}{m{5.1410003cm}|}{\hspace*{-\tabcolsep}\begin{tabular}{|m{3.689cm}|m{1.252cm}}
+
+Enge1 &
+double\\\hline
+Enge2 &
+double\\\hline
+... &
+double\\\hline
+EngeN &
+double\\\hline
+\end{tabular}\hspace*{-\tabcolsep}
+} &
+Set the parameters C\textsubscript{i} as defined in the Enge function above.\\\hhline{~~-}
+\end{supertabular}
+\end{center}
+\subsection{FieldType MagneticFieldMap}
+Reads or writes a magnetic field map in a particular region. Two sorts of field maps are supported; either a 2d field
+map, in which cylindrical symmetry is assumed, or a 3d field map. 
+
+For 2d field maps, MAUS reads or writes a file that contains information about the radial and longitudinal field
+components. This is intended for solenoidal field maps where only radial and longitudinal field components are present.
+Note that in write mode, MAUS assumes cylindrical symmetry of the fields. In this case, MAUS writes the \textit{x}
+and \textit{z} components of the magnetic field at points on a grid in \textit{x} and \textit{z}. Fields with an
+electric component are excluded from this summation.
+
+For 3d field maps, MAUS reads a file that contains the position and field in cartesian coordinates and performs a
+linear interpolation. This requires quite large field map files; the file size can be slightly reduced by using certain
+symmetries, as described below. It is currently not possible to write 3d field maps.
+
+\begin{center}
+\tablefirsthead{\hline
+{\bfseries Property} &
+{\bfseries Type} &
+{\bfseries Description}\\}
+\tablehead{\hline
+{\bfseries Property} &
+{\bfseries Type} &
+{\bfseries Description}\\}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{3.665cm}|m{1.278cm}|m{12.052cm}|}
+\hline
+{\itshape FieldMapMode} &
+string &
+Set to Read to read a field map; and Write to write a field map.\\\hline
+{\itshape FileName} &
+string &
+The file name that is used for reading or writing.\\\hline
+FileType &
+string &
+The file format. Supported options in Read mode are MAUStext, MAUSbinary, g4beamline, icool, g4bl3dGrid. Only
+MAUStext is supported in Write mode. Default is MAUStext.\\\hline
+Symmetry &
+string &
+Symmetry option for g4bl3dGrid file type. Options are None, Dipole or Quadrupole. None uses the field map as is, while
+Dipole and Quadrupole reflect the octant between the positive \textit{x}, \textit{y} and \textit{z} axes to give an
+appropriate field for a dipole or quadrupole.\\\hline
+\multicolumn{2}{m{5.143cm}|}{\hspace*{-\tabcolsep}\begin{tabular}{|m{3.665cm}|m{1.278cm}}
+
+{\itshape ZStep} &
+double\\\hline
+{\itshape RStep} &
+double\\\hline
+\end{tabular}\hspace*{-\tabcolsep}
+} &
+Step size in \textit{z} and \textit{r}. Mandatory in Write mode but not used in Read mode (where step size comes from
+the map file).\\\hhline{~~-}
+\multicolumn{2}{m{5.143cm}|}{\hspace*{-\tabcolsep}\begin{tabular}{|m{3.665cm}|m{1.278cm}}
+
+{\itshape ZMin} &
+double\\\hline
+{\itshape ZMax} &
+double\\\hline
+{\itshape RMin} &
+double\\\hline
+{\itshape RMax} &
+double\\\hline
+\end{tabular}\hspace*{-\tabcolsep}
+} &
+Upper and lower bounds in \textit{z} and \textit{r}. Mandatory in Write mode but not used in Read mode (where boundaries
+come from the map file).\\\hhline{~~-}
+\end{supertabular}
+\end{center}
+Some file formats are described below. I am working towards making the file format more generic and hence possibly
+easier to use, but backwards compatibility will hopefully be maintained. 
+
+\subsubsection{MAUStext Field Map Format}
+The native field map format used by MAUS in text mode is described below.
+
+{\ttfamily
+\# GridType = Uniform N = \textbf{number\_rows}}
+
+{\ttfamily
+\# Z1 = \textbf{z\_start} Z2 = \textbf{z\_end} dZ = \textbf{z\_step}}
+
+{\ttfamily
+\# R1 = \textbf{r\_start} R2 = \textbf{r\_end} dR = \textbf{r\_step}}
+
+{\ttfamily\bfseries
+Bz\_Values\ \ Br\_Values}
+
+{\ttfamily\bfseries
+...\ \ \ \ ...}
+
+{\ttfamily\bfseries
+{\textless}Repeat as necessary{\textgreater}}
+
+In this mode, field maps are represented by field values on a regular 2d grid that is assumed to have solenoidal
+symmetry, i.e. cylindrical symmetry with no tangential component.
+
+\begin{center}
+\tablefirsthead{\hline
+{\bfseries Name} &
+{\bfseries Type} &
+{\bfseries Description}\\}
+\tablehead{\hline
+{\bfseries Name} &
+{\bfseries Type} &
+{\bfseries Description}\\}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{3.665cm}|m{2.305cm}|m{11.025001cm}|}
+\hline
+{\ttfamily\bfseries number\_rows} &
+double &
+Number of rows in the field map file.\\\hline
+{\ttfamily\bfseries z\_start} &
+double &
+Position of the grid start along the \textit{z} axis.\\\hline
+{\ttfamily\bfseries z\_end} &
+double &
+Position of the grid end along the \textit{z} axis.\\\hline
+{\ttfamily\bfseries z\_step} &
+double &
+Step size in \textit{z}.\\\hline
+{\ttfamily\bfseries r\_start} &
+double &
+Position of the grid start along the \textit{r} axis.\\\hline
+{\ttfamily\bfseries r\_end} &
+double &
+Position of the grid end along the \textit{r} axis.\\\hline
+{\ttfamily\bfseries r\_step} &
+double &
+Step size in \textit{r}.\\\hline
+{\ttfamily\bfseries Bz\_Values} &
+double &
+\textit{Bz} field value.\\\hline
+{\ttfamily\bfseries Br\_Values} &
+double &
+\textit{Br} field value.\\\hline
+\end{supertabular}
+\end{center}
+\subsubsection{g4bl3dGrid Field Map Format}
+The file format for 3d field maps is a slightly massaged version of a file format used by another code, g4beamline. In
+this mode, field maps are represented by field values on a regular cartesian 3d grid.
+
+{\ttfamily\bfseries
+number\_x\_points number\_y\_points number\_z\_points global\_scale}
+
+{\ttfamily
+1 X [\textbf{x\_scale}]}
+
+{\ttfamily
+2 Y [\textbf{y\_scale}]}
+
+{\ttfamily
+3 Z [\textbf{z\_scale}]}
+
+{\ttfamily
+4 BX [\textbf{bx\_scale}]}
+
+{\ttfamily
+5 BY [\textbf{by\_scale}]}
+
+{\ttfamily
+6 BZ [\textbf{bz\_scale}]}
+
+{\ttfamily
+0}
+
+{\ttfamily\bfseries
+X\_Values \ \ Y\_Values\ \ Z\_Values\ \ Bx\_values\ \ By\_values\ \ Bz\_values}
+
+{\ttfamily\bfseries
+...\ \ \ \ ...\ \ \ \ ...\ \ \ \ ...\ \ \ \ ...\ \ \ \ ...}
+
+{\ttfamily\bfseries
+{\textless}Repeat as necessary{\textgreater}}
+
+where text in bold indicates a value described in the following table
+
+\begin{center}
+\tablefirsthead{\hline
+{\bfseries Name} &
+{\bfseries Type} &
+{\bfseries Description}\\}
+\tablehead{\hline
+{\bfseries Name} &
+{\bfseries Type} &
+{\bfseries Description}\\}
+\tabletail{}
+\tablelasttail{}
+\begin{supertabular}{|m{3.665cm}|m{2.305cm}|m{11.025001cm}|}
+\hline
+{\ttfamily\bfseries number\_x\_points} &
+double &
+Number of points along x axis.\\\hline
+{\ttfamily\bfseries number\_y\_points} &
+double &
+Number of points along y axis.\\\hline
+{\ttfamily\bfseries number\_z\_points} &
+double &
+Number of points along z axis.\\\hline
+{\ttfamily\bfseries global\_scale} &
+double &
+Global scale factor applied to all x, y, z and Bx, By, Bz values.\\\hline
+{\ttfamily\bfseries x\_scale} &
+double &
+Scale factor applied to all x values.\\\hline
+{\ttfamily\bfseries y\_scale} &
+double &
+Scale factor applied to all y values.\\\hline
+{\ttfamily\bfseries z\_scale} &
+double &
+Scale factor applied to all z values.\\\hline
+{\ttfamily\bfseries bx\_scale} &
+double &
+Scale factor applied to all Bx values.\\\hline
+{\ttfamily\bfseries by\_scale} &
+double &
+Scale factor applied to all By values.\\\hline
+{\ttfamily\bfseries bz\_scale} &
+double &
+Scale factor applied to all Bz values.\\\hline
+{\ttfamily\bfseries X\_Values} &
+double &
+List (column) of each x value.\\\hline
+{\ttfamily\bfseries Y\_Values} &
+double &
+List (column) of each y value.\\\hline
+{\ttfamily\bfseries Z\_Values} &
+double &
+List (column) of each z value.\\\hline
+{\ttfamily\bfseries Bx\_Values} &
+double &
+List (column) of each Bx value.\\\hline
+{\ttfamily\bfseries By\_Values} &
+double &
+List (column) of each By value.\\\hline
+{\ttfamily\bfseries Bz\_Values} &
+double &
+List (column) of each Bz value.\\\hline
+\end{supertabular}
+\end{center}
