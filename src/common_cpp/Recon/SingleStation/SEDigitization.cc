@@ -28,6 +28,10 @@ void SEDigitization::process(SESpill &spill, Json::Value const &daq) {
   // std::cout << "loading calibration" << std::endl;
   bool calib = load_calibration("se_calibration.txt");
   assert(calib);
+
+  bool tdc_calib = load_tdc_calibration("se_tdc_calibration.txt");
+  assert(tdc_calib);
+
   // std::cout << "loading mapping" << std::endl;
   bool map = load_mapping("se_mapping.txt");
   assert(map);
@@ -37,12 +41,14 @@ void SEDigitization::process(SESpill &spill, Json::Value const &daq) {
   // -------------------------------------------------
   // Pick up JSON daq event.
   Json::Value _events = daq["single_station"];
-  std::cout <<  _events.size() << std::endl;
-  for ( unsigned int i = 1; i < _events.size(); ++i ) {
+  // std::cerr << daq["single_station"].size() << " " << daq["tof1"].size() << std::endl;
+  // assert(daq["single_station"].size() == daq["tof1"].size());
+  // std::cout <<  _events.size() << std::endl;
+  for ( unsigned int i = 0; i < _events.size(); ++i ) {
+
     SEEvent* event = new SEEvent();
 
     Json::Value input_event = _events[i]["VLSB"];
-
     // Loop over the digits of this event.
     for ( unsigned int j = 0; j < input_event.size(); ++j ) {
       Json::Value channel_in = input_event[j];
@@ -55,23 +61,24 @@ void SEDigitization::process(SESpill &spill, Json::Value const &daq) {
       assert(channel_in.isMember("tdc"));
       // assert(channel_in.isMember("discr"));
 
-      // int spill = channel_in["phys_event_number"].asInt();
-      // int eventNo = channel_in["part_event_number"].asInt();
+      int spill = channel_in["phys_event_number"].asInt();
+      int eventNo = channel_in["part_event_number"].asInt();
       int bank = channel_in["bank_id"].asInt();
       int channel_ro = channel_in["channel"].asInt();
       int adc = channel_in["adc"].asInt();
       int tdc = channel_in["tdc"].asInt();
 
-      // if ( !is_good_channel(bank, channel_ro) ) {
-        // continue;
-      // }
-
       // Get pedestal and gain from calibration.
       assert(_calibration[bank][channel_ro].isMember("pedestal"));
       assert(_calibration[bank][channel_ro].isMember("gain"));
+      assert(_tdc_calibration[bank][channel_ro].isMember("pedestal"));
+      assert(_tdc_calibration[bank][channel_ro].isMember("gain"));
+
       double pedestal =  _calibration[bank][channel_ro]["pedestal"].asDouble();
       double gain     = _calibration[bank][channel_ro]["gain"].asDouble();
 
+      double tdc_y     = _tdc_calibration[bank][channel_ro]["pedestal"].asDouble();
+      double tdc_slope = _tdc_calibration[bank][channel_ro]["gain"].asDouble();
       // Calculate the number of photoelectrons.
       double pe;
       if ( pedestal > 0. && gain > 0 ) {
@@ -79,6 +86,14 @@ void SEDigitization::process(SESpill &spill, Json::Value const &daq) {
       } else {
         pe = -10.0;
       }
+      // Calculate the time
+      double time;
+      if ( tdc_y > 0. && tdc_slope > 0. ) {
+        time = (tdc-tdc_y)/tdc_slope;
+      } else {
+        time = -10.0;
+      }
+
       // int unique_chan  = _calibration[board][bank][channel_ro]["unique_chan"].asDouble();
 
       // Find plane and channel.
@@ -88,13 +103,59 @@ void SEDigitization::process(SESpill &spill, Json::Value const &daq) {
       int adc_ped = adc - pedestal;
       // Exclude missing modules.
       if ( plane != -1 ) { // pe > 1.0 &&
-       // std::cout << "Making digit: " << plane << " " << channel << " " << pe << std::endl;
-        SEDigit *digit = new SEDigit(plane, channel, pe, tdc, adc_ped);
+        SEDigit *digit = new SEDigit(spill, eventNo, plane, channel, pe, time, adc_ped);
         event->add_digit(digit);
       }
     }  // ends loop over channels (j)
     spill.add_event(event);
   }  // ends loop over events (i)
+}
+
+bool SEDigitization::load_tdc_calibration(std::string file) {
+  char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
+  std::string fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppSingleStationRecon/"+file;
+
+  std::ifstream inf(fname.c_str());
+
+  if (!inf) {
+    std::cout << "Unable to open file " << fname << std::endl;
+    return false;
+  }
+
+  std::string line;
+
+  int numBanks;
+  getline(inf, line);
+  std::istringstream ist1(line.c_str());
+  ist1 >> numBanks;
+
+  read_in_tdc_calib(inf);
+
+  return true;
+}
+
+void SEDigitization::read_in_tdc_calib(std::ifstream &inf) {
+  std::string line;
+
+  // run over banks
+  for ( int i = 0; i < 16; ++i ) {
+    // run over channels
+    for ( int j = 0; j < 128; ++j ) { // running over channels
+      int bank, chan;
+      double p, g;
+
+      getline(inf, line);
+      std::istringstream ist1(line.c_str());
+      ist1 >> bank >> chan >> p >> g;
+
+        // int temp = unique_chan_no;
+
+      Json::Value channel;
+      channel["pedestal"]=p;
+      channel["gain"]=g;
+      _tdc_calibration[i].push_back(channel);
+    }
+  }
 }
 
 bool SEDigitization::load_calibration(std::string file) {
@@ -155,7 +216,7 @@ bool SEDigitization::load_mapping(std::string file) {
   }
 
   std::string line;
-  for ( int i = 1; i < 640; ++i ) {
+  for ( int i = 0; i < 640; ++i ) {
     getline(inf, line);
     std::istringstream ist1(line.c_str());
 
@@ -185,34 +246,4 @@ void SEDigitization::
   }
   // std::cerr << bank << " " << chan_ro << std::endl;
   // assert(found);
-}
-
-bool SEDigitization::is_good_channel(const int bank, const int chan_ro) {
-  return good_chan[bank][chan_ro];
-}
-
-bool SEDigitization::load_bad_channels() {
-  char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
-  std::string fname =
-  std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppSingleStationRecon/se_bad_chan_list.txt";
-
-  std::ifstream inf(fname.c_str());
-  if (!inf) {
-    std::cout << "Unable to open file " << fname << std::endl;
-    return false;
-  }
-
-  for ( int bank = 0; bank < 16; ++bank ) {
-    for ( int chan_ro = 0; chan_ro < 128; ++chan_ro ) {
-      good_chan[bank][chan_ro] = true;
-    }
-  }
-
-  int bad_bank, bad_chan_ro;
-
-  while ( !inf.eof() ) {
-    inf >> bad_bank >> bad_chan_ro;
-    good_chan[bad_bank][bad_chan_ro] = false;
-  }
-  return true;
 }

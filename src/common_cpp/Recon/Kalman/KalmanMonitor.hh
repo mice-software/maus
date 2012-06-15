@@ -21,9 +21,7 @@
 
 // C headers
 #include <assert.h>
-#include "TFile.h"
-#include "TGraph.h"
-#include "TMultiGraph.h"
+
 // C++ headers
 #include <string>
 #include <vector>
@@ -32,6 +30,9 @@
 // #include "/home/edward/boost_1_49_0/boost/numeric/ublas/lu.hpp"
 #include "TMath.h"
 #include "TMatrixD.h"
+#include "TFile.h"
+#include "TGraph.h"
+#include "TMultiGraph.h"
 
 #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
 // namespace ublas = boost::numeric::ublas;
@@ -42,7 +43,7 @@ class KalmanMonitor {
 
   ~KalmanMonitor();
 
-  void save(std::vector<KalmanSite> &sites);
+  void save(std::vector<KalmanSite> const &sites);
 
  private:
   std::vector<double> _alpha_meas, _site, _alpha_extrap;

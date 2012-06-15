@@ -44,7 +44,7 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
 
   G4double edep = aStep->GetTotalEnergyDeposit();
 
-  double pid = aStep->GetTrack()->GetDefinition()->GetPDGEncoding();
+  int pid = aStep->GetTrack()->GetDefinition()->GetPDGEncoding();
 
   if ( edep == 0. ) return false;
   if ( fabs(pid) != 13 ) return false;
@@ -73,7 +73,7 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
   _hits["sci_fi_hits"][hit_i]["energy"] = aStep->GetTrack()->GetTotalEnergy();
   _hits["sci_fi_hits"][hit_i]["charge"] =
                              aStep->GetTrack()->GetDefinition()->GetPDGCharge();
-  _hits["sci_fi_hits"][hit_i]["pid"] = pid;
+  _hits["sci_fi_hits"][hit_i]["particle_id"] = pid;
   _hits["sci_fi_hits"][hit_i]["time"] =
                                       aStep->GetPreStepPoint()->GetGlobalTime();
   _hits["sci_fi_hits"][hit_i]["energy_deposited"] = edep;

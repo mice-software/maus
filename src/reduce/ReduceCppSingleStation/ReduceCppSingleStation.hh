@@ -88,6 +88,11 @@ class ReduceCppSingleStation {
   void compute_station_efficiencies(Json::Value root);
  private:
   TGraph *_graph;
+  TGraph *_station;
+  TGraph *_plane0;
+  TGraph *_plane1;
+  TGraph *_plane2;
+
   int _spill_counter;
 
   TH2F *triplets;
@@ -119,7 +124,9 @@ class ReduceCppSingleStation {
   TH1F *_adc_plane2;
 
   TH1F *_dig_npe_plane0;
+
   TH1F *_dig_npe_plane1;
+
   TH1F *_dig_npe_plane2;
 
   std::string _classname;
@@ -128,14 +135,12 @@ class ReduceCppSingleStation {
 
   int _nSpills;
 
-  void Save();
-
   TTree _unpacked;
   int _adc, _tdc, _bank, _chan, _activebank;
 
   TTree _digits;
   int _plane_dig, _adc_dig;
-  double _npe_dig, _channel_dig;
+  double _npe_dig, _channel_dig, _time;
 
   TTree _doublet_clusters;
   int _plane;
@@ -145,6 +150,24 @@ class ReduceCppSingleStation {
   TTree _spacepointscopy;
   double _x, _y, _z, _pe;
   int _type;
+
+  // Efficiencies.
+  double _plane_array[3];
+  double _station_eff[3];
+
+  int _plane_0_counter;
+  double _plane_0_map[214][2];
+  int _plane_0_hits;
+
+  int _plane_1_counter;
+  double _plane_1_map[214][2];
+  int _plane_1_hits;
+
+  int _plane_2_counter;
+  double _plane_2_map[214][2];
+  int _plane_2_hits;
+
+  double _channel_array[214];
 };
 
 #endif

@@ -67,6 +67,8 @@ class SciFiClusterRec {
 
   Hep3Vector get_reference_frame_pos(int tracker, std::vector<const MiceModule*> modules);
 
+  bool are_neighbours(SciFiDigit *seed_i, SciFiDigit *seed_j);
+
  private:
 
   int _size_exception;

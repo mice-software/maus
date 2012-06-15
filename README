@@ -1,4 +1,4 @@
-MAUS release version 0.2.2
+MAUS release version 0.2.4
 
 1.  Introduction
 
@@ -10,14 +10,16 @@ where one can look at the installation instructions here:
 
 http://micewww.pp.rl.ac.uk/projects/maus/wiki/Install
 
-2. Citing MAUS
+2. Getting help
+
+You can get help with the MAUS software by raising a support issue on the MAUS
+website.
+
+3. Citing MAUS
 
 Please see the file called CITATION.
 
-3. License
+4. License
 
 License information for MAUS can be found in COPYING. The authors agreeing to this license can be found in AUTHORS.  This license does not apply to programs and libraries you download in the third party area.
 
-4. Coverity
-
-We thank Coverity for providing static code analysis.

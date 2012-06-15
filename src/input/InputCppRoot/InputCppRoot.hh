@@ -23,7 +23,7 @@
 #include "json/json.h"
 
 #include "src/legacy/Interface/Squeal.hh"
-#include "src/common_cpp/DataStructure/Spill.hh"
+#include "src/common_cpp/DataStructure/Data.hh"
 
 class irstream;
 
@@ -72,18 +72,10 @@ class InputCppRoot {
       return "";
     }
 
-    /** Returns sizeof the spill object
-     *
-     *  When setting up TTrees directly in ROOT, it is necessary to hand ROOT
-     *  the size of the class member. This is difficult (impossible?) to access
-     *  from python, so we provide a convenience function here.
-     */
-    int my_sizeof();
-
   private:
     irstream* _infile;
     JsonCppConverter* _jsonCppConverter;
-    Spill* _spill;
+    Data* _data;
     std::string _filename;
     std::string _classname;
 };

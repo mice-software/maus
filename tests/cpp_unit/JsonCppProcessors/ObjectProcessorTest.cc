@@ -70,6 +70,34 @@ class ObjectProcessorTest : public ::testing::Test {
   TestObject test;
 };
 
+
+TEST_F(ObjectProcessorTest, HasUnknownBranches) {
+  EXPECT_TRUE(not_req_proc.GetThrowsIfUnknownBranches());
+  EXPECT_TRUE(req_proc.GetThrowsIfUnknownBranches());
+  req_proc.SetThrowsIfUnknownBranches(false);
+  EXPECT_FALSE(req_proc.GetThrowsIfUnknownBranches());
+  req_proc.SetThrowsIfUnknownBranches(true);
+  EXPECT_TRUE(req_proc.GetThrowsIfUnknownBranches());
+
+  Json::Value json_int = Json::Value(1.);
+  EXPECT_THROW(not_req_proc.HasUnknownBranches(json_int), Squeal);
+
+  Json::Value json_object_1;
+  json_object_1["branch_a"] = Json::Value(1.);
+  EXPECT_FALSE(not_req_proc.HasUnknownBranches(json_object_1));
+
+  json_object_1["branch_c"] = Json::Value(3.);
+  EXPECT_TRUE(not_req_proc.HasUnknownBranches(json_object_1));
+
+  EXPECT_THROW(not_req_proc.JsonToCpp(json_object_1), Squeal);
+  not_req_proc.SetThrowsIfUnknownBranches(false);
+  TestObject* cpp_object = NULL;
+  EXPECT_NO_THROW(cpp_object = not_req_proc.JsonToCpp(json_object_1));
+  if (cpp_object != NULL)
+    delete cpp_object;
+}
+
+
 TEST_F(ObjectProcessorTest, JsonToCppRequiredTest) {
   Json::Value json_int(1);
   // should throw if this is not an object at all
@@ -84,6 +112,11 @@ TEST_F(ObjectProcessorTest, JsonToCppRequiredTest) {
   EXPECT_DOUBLE_EQ(cpp_object->GetA(), 1.);
   EXPECT_DOUBLE_EQ(*cpp_object->GetB(), 2.);
   delete cpp_object;
+
+  // should throw on NULL
+  json_object["branch_a"] = Json::Value(1.);
+  json_object["branch_b"] = Json::Value();
+  EXPECT_THROW(req_proc.JsonToCpp(json_object), Squeal);
 
   // should throw if object is missing
   Json::Value json_object_missing_a(Json::objectValue);
@@ -131,7 +164,15 @@ TEST_F(ObjectProcessorTest, JsonToCppNotRequiredTest) {
 
   json_object["branch_b"] = Json::Value(2.);
   json_object["branch_a"] = Json::Value("string");
-  EXPECT_THROW(req_proc.JsonToCpp(json_object), Squeal);
+  EXPECT_THROW(not_req_proc.JsonToCpp(json_object), Squeal);
+
+  // should return NULL on nullValue
+  double* null_value = NULL;
+  json_object["branch_a"] = Json::Value(1.);
+  json_object["branch_b"] = Json::Value();
+  cpp_object = not_req_proc.JsonToCpp(json_object);
+  EXPECT_EQ(not_req_proc.JsonToCpp(json_object)->GetB(), null_value);
+  delete cpp_object;
 }
 
 TEST_F(ObjectProcessorTest, CppToJsonRequiredTest) {

@@ -50,8 +50,8 @@ class MapCppTOFMCDigitizer(unittest.TestCase):  #pylint: disable = R0904
         # a real spill
         spill = _file.readline().rstrip()
         output = self.mapper.process(spill)
-        self.assertTrue("digits" in json.loads(output))
-
+        self.assertTrue("tof_digits" in \
+                             json.loads(output)["recon_events"][0]["tof_event"])
         _file.close()
 
     @classmethod

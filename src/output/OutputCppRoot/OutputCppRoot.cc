@@ -21,11 +21,12 @@
 #include "src/common_cpp/JsonCppStreamer/ORStream.hh"
 #include "src/common_cpp/JsonCppStreamer/JsonCppConverter.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
+#include "src/common_cpp/DataStructure/Data.hh"
 
 #include "src/output/OutputCppRoot/OutputCppRoot.hh"
 
 namespace MAUS {
-OutputCppRoot::OutputCppRoot() : _outfile(NULL), _spill(NULL),
+OutputCppRoot::OutputCppRoot() : _outfile(NULL), _data(NULL),
                           _jsonCppConverter(NULL), _classname("OutputCppRoot") {
 }
 
@@ -45,13 +46,14 @@ bool OutputCppRoot::birth(std::string json_datacards) {
                   "output_root_file_name", JsonWrapper::stringValue).asString();
     // Setup output stream
     _outfile = new orstream(root_output.c_str(), "Spill");
-    _spill = new Spill();
+    _data = new Data();
     _jsonCppConverter = new JsonCppConverter();
-    (*_outfile) << branchName("spill") << _spill;
+    (*_outfile) << branchName("data") << _data;
     return true;
   } catch(Squeal squee) {
     death();
     CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
+    Squeak::mout(Squeak::debug) << squee.GetStackTrace() << std::endl;
     return false;
   } catch(std::exception exc) {
     death();
@@ -62,20 +64,21 @@ bool OutputCppRoot::birth(std::string json_datacards) {
 
 bool OutputCppRoot::save(std::string json_spill_document) {
   try {
-      if (_jsonCppConverter == NULL || _spill == NULL || _outfile == NULL) {
+      if (_jsonCppConverter == NULL || _data == NULL || _outfile == NULL) {
           throw(Squeal(Squeal(
             Squeal::recoverable,
             "OutputCppRoot was not initialised properly",
             "OutputCppRoot::save"
           )));
       }
-      Json::Value json_spill = JsonWrapper::StringToJson(json_spill_document);
-      if (json_spill.isMember("END_OF_RUN")) {
-          return true; // nothing to do, we don't handle end of run yet
+      if (json_spill_document != "") {
+          Json::Value json_spill = JsonWrapper::StringToJson(json_spill_document);
+          _data->SetSpill( (*_jsonCppConverter)(json_spill) );
+          (*_outfile) << fillEvent;
+          return true;
+      } else {
+          return false;
       }
-      (*_jsonCppConverter)(json_spill);
-      (*_outfile) << fillEvent;
-      return true;
   } catch(Squeal squee) {
     CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
     return false;
@@ -90,10 +93,10 @@ bool OutputCppRoot::death() {
     _outfile->close();
     delete _outfile;
     _outfile = NULL;  // deletes spill
-    _spill = NULL;
-  } else if (_spill != NULL) {
-    delete _spill;
-    _spill = NULL;
+    _data = NULL;
+  } else if (_data != NULL) {
+    delete _data;
+    _data = NULL;
   }
   if (_jsonCppConverter != NULL) {
     delete _jsonCppConverter;

@@ -61,6 +61,14 @@ class SciFiCluster {
   void add_digit(SciFiDigit* neigh);
 
   // list of setters and getters
+  void set_spill(int spill) { _spill = spill; }
+
+  int get_spill()   const { return _spill; }
+
+  void set_event(int event) { _event = event; }
+
+  int get_event() const { return _event; }
+
   void set_tracker(int trackerNo) { _tracker = trackerNo; }
 
   int get_tracker() const { return _tracker; }
@@ -111,6 +119,8 @@ class SciFiCluster {
 
  private:
   bool _used;
+
+  int _spill, _event;
 
   int _tracker, _station, _plane;
 

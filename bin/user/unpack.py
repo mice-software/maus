@@ -28,8 +28,8 @@ def run(data_path, run_num):
     my_map = MAUS.MapPyGroup()
     my_map.append(MAUS.MapCppTrackerRecon())
 
-    reducer = MAUS.ReduceCppTracker()
-    # reducer = MAUS.ReducePyDoNothing()
+    #reducer = MAUS.ReduceCppTracker()
+    reducer = MAUS.ReducePyDoNothing()
     # reducer = MAUS.ReduceCppTrackerErrorLog()
 
     output_file = open("unpacked_1901", 'w')  #  Uncompressed

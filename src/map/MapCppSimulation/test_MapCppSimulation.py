@@ -23,9 +23,7 @@ import json
 import unittest
 import os
 import subprocess
-import sys  
 
-import Configuration
 from MapCppSimulation import MapCppSimulation
 
 class MapCppSimulationTestCase(unittest.TestCase):
@@ -78,7 +76,6 @@ class MapCppSimulationTestCase(unittest.TestCase):
         self.assertIn("errors", doc)
         self.assertIn("bad_json_document", doc["errors"])
 
-
     def test_no_mc_branch(self):
         """Check mapper runs for no mc string, returning an error"""
         result = self.mapper.process("{}")
@@ -88,7 +85,7 @@ class MapCppSimulationTestCase(unittest.TestCase):
 
     def test_mc_bad_type(self):
         """Check mapper runs for mc with wrong type, returning an error"""
-        result = self.mapper.process("""{"mc" : 0.0}""")
+        result = self.mapper.process("""{"mc_events" : 0.0}""")
         doc = json.loads(result)
         self.assertIn("errors", doc)
         self.assertIn("MapCppSimulation", doc["errors"])
@@ -96,16 +93,16 @@ class MapCppSimulationTestCase(unittest.TestCase):
     def test_mc_good(self):
         """
         Check mapper runs for mc good. Check it tracks primaries by testing
-        the initial value of track_1, etc
+        the initial value of track[0], etc
         """
         good_event = {
-            "mc":[self.particle,self.particle]
+            "mc_events":[self.particle,self.particle]
         }
         result = self.mapper.process(json.dumps(good_event))
         doc = json.loads(result)
         self.assertNotIn("errors", doc)
-        ev_0 = doc["mc"][0]["tracks"]["track_1"]
-        ev_1 = doc["mc"][1]["tracks"]["track_1"]
+        ev_0 = doc["mc_events"][0]["tracks"][0]
+        ev_1 = doc["mc_events"][1]["tracks"][0]
         for event in [ev_0, ev_1]:
             for pos in ["x", "y", "z"]:
                 self.assertAlmostEqual(
@@ -120,11 +117,22 @@ class MapCppSimulationTestCase(unittest.TestCase):
             self.assertIn("final_position", event)
 
     def test_visualisation(self):
-        test = os.path.join(os.environ['MAUS_ROOT_DIR'], 'src', 'map',\
+        """ Call test_visualisation """
+        test = os.path.join(os.environ['MAUS_ROOT_DIR'], 'src', 'map', \
                            'MapCppSimulation', 'run_visualisation_for_tests.py')
         ps = subprocess.Popen(['python', test])
         ps.wait()
         self.assertEqual(ps.returncode, 0, msg='Failed to run visualisation')
+
+    def test_visualisation_no_event(self):
+        """ Call test_visualisation_no_event """
+        test = os.path.join(os.environ['MAUS_ROOT_DIR'], 'src', 'map', \
+                           'MapCppSimulation', \
+                                      'run_visualisation_vrml2file_no_event.py')
+        ps = subprocess.Popen(['python', test])
+        ps.wait()
+        self.assertEqual(ps.returncode, 0, msg='Failed to run visualisation')
+
 
     configuration = {
       "verbose_level":2,

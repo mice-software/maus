@@ -22,7 +22,7 @@ TOFChannelIdProcessor::TOFChannelIdProcessor() {
     RegisterValueBranch("slab", &_int_proc,
                         &TOFChannelId::GetSlab,
                         &TOFChannelId::SetSlab, true);
-    RegisterValueBranch("station", &_int_proc,
+    RegisterValueBranch("station_number", &_int_proc,
                         &TOFChannelId::GetStation,
                         &TOFChannelId::SetStation, true);
     RegisterValueBranch("plane", &_int_proc,

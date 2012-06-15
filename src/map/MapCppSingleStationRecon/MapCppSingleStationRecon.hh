@@ -49,7 +49,6 @@
 #include "src/common_cpp/Recon/SingleStation/SECluster.hh"
 #include "src/common_cpp/Recon/SingleStation/SESpacePoint.hh"
 
-
 class MapCppSingleStationRecon {
  public:
   /** Sets up the worker
@@ -86,17 +85,17 @@ class MapCppSingleStationRecon {
    *
    *  \param evt the current SEEvent
    */
-  void cluster_recon(SEEvent &evt);
+  void cluster_recon(SEEvent *evt);
 
   /** performs the spacepoint reconstruction
    *
    *  \param evt the current SEEvent
    */
-  void spacepoint_recon(SEEvent &evt);
+  void spacepoint_recon(SEEvent *evt);
 
-  void save_to_json(SEEvent &evt);
+  void save_to_json(SEEvent *evt, int event_num);
 
-  void print_event_info(SEEvent &event);
+  void print_event_info(SEEvent *event, int k);
 
   Json::Value ConvertToJson(std::string jsonString);
 

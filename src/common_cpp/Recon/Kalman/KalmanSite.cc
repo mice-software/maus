@@ -37,6 +37,7 @@ KalmanSite::KalmanSite(const KalmanSite &site) {
   _a = site.get_state_vector();
   _C = site.get_covariance_matrix();
   _v = site.get_measurement();
+  _alpha = _v(0, 0);
   _projected_C = site.get_projected_covariance_matrix();
   _projected_a = site.get_projected_state_vector();
   _z = site.get_z();
@@ -46,12 +47,12 @@ KalmanSite::KalmanSite(const KalmanSite &site) {
 }
 
 KalmanSite& KalmanSite::operator=(const KalmanSite &site) {
-  std::cout << "Operator = called." << std::endl;
   _a = site.get_state_vector();
   _C = site.get_covariance_matrix();
   _projected_C = site.get_projected_covariance_matrix();
   _projected_a = site.get_projected_state_vector();
   _v = site.get_measurement();
+  _alpha = _v(0, 0);
   _z = site.get_z();
   _id= site.get_id();
   _direction = site.get_direction();

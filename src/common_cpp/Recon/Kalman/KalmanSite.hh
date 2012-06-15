@@ -26,14 +26,10 @@
 #include <string>
 #include <vector>
 #include "CLHEP/Vector/ThreeVector.h"
-// #include "/home/edward/boost_1_49_0/boost/numeric/ublas/matrix.hpp"
-// #include "/home/edward/boost_1_49_0/boost/numeric/ublas/lu.hpp"
 #include "TMath.h"
 #include "TMatrixD.h"
 
 #include "src/common_cpp/Recon/SciFi/SciFiCluster.hh"
-
-// namespace ublas = boost::numeric::ublas;
 
 class KalmanSite {
  public:
@@ -45,6 +41,7 @@ class KalmanSite {
 
   KalmanSite& operator=(const KalmanSite& site);
 
+  /// Sets state vector's components at the site.
   void set_state_vector(double x0,
                         double y0,
                         double mx,
@@ -55,16 +52,22 @@ class KalmanSite {
                                     _a(3, 0) = my;
                                     _a(4, 0) = p; }
 
+  /// Assigns state vector at the site.
   void set_state_vector(TMatrixD a) { _a = a; }
 
+  /// Returns state vector at the site.
   TMatrixD get_state_vector() const { return _a; }
 
+  /// Sets a projection.
   void set_projected_state_vector(TMatrixD ap) { _projected_a = ap; }
 
+  /// Returns the projected state at the site.
   TMatrixD get_projected_state_vector() const { return _projected_a; }
 
+  /// Sets the covariance matrix.
   void set_covariance_matrix(TMatrixD C) { _C = C; }
 
+  /// Returns the covariance matrix.
   TMatrixD get_covariance_matrix() const { return _C; }
 
   void set_projected_covariance_matrix(TMatrixD Cp) { _projected_C = Cp; }
@@ -72,7 +75,11 @@ class KalmanSite {
   TMatrixD get_projected_covariance_matrix() const { return _projected_C; }
 
   void set_measurement(double alpha) { _v(0, 0) = alpha;
-                                       _v(1, 0) = 0.0; }
+                                       _v(1, 0) = 0.0;
+                                       _alpha   = alpha; }
+
+  void set_measurement(TMatrixD m) { _v = m;
+                                     _alpha = _v(0, 0); }
 
   TMatrixD get_measurement() const { return _v; }
 
@@ -92,19 +99,28 @@ class KalmanSite {
 
   double get_extrapolated_alpha() const { return _alpha_extrapolated; }
 
-  //void set_alpha(double alpha) { _alpha = alpha; }
+  // void set_alpha(double alpha) { _alpha = alpha; }
 
-  double get_alpha() const { return _v(0, 0); }
+  double get_alpha() const { return _alpha; }
+
+  // void set_state(state new_state) { _site_state = new_state; }
+
+  // int get_state() const { return _site_state; }
 
  private:
-  TMatrixD _a;  // state vector
+  /// The state vector.
+  TMatrixD _a;
 
+  /// The projected state.
   TMatrixD _projected_a;
 
-  TMatrixD _v;  // measurement
+  /// The measurement.
+  TMatrixD _v;
 
-  TMatrixD _C;  // covariance matrix
+  /// The covariance matrix.
+  TMatrixD _C;
 
+  /// The projected cov matrix.
   TMatrixD _projected_C;
 
   double _z, _alpha, _alpha_extrapolated;
@@ -112,6 +128,10 @@ class KalmanSite {
   int _id;
 
   Hep3Vector _direction;
+
+  // enum state { INVALID = 0, PROJECTED, FILTERED, SMOOTHED };
+
+  // state _site_state;
 };
 
 #endif

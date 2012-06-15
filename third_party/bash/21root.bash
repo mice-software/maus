@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 directory=root_v5.30.03
+#directory=root_v5.32.01
 filename=${directory}.source.tar.gz 
 url=ftp://root.cern.ch/root/${filename}
 
@@ -28,18 +29,39 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 	echo
 	echo "INFO: Unpacking:"
 	echo
-        rm -Rf ${MAUS_ROOT_DIR}/third_party/build/${directory}
-        sleep 1
-        tar xvfz ${MAUS_ROOT_DIR}/third_party/source/${filename} -C ${MAUS_ROOT_DIR}/third_party/build > /dev/null
-        mv ${MAUS_ROOT_DIR}/third_party/build/root ${MAUS_ROOT_DIR}/third_party/build/${directory}
-        cd ${MAUS_ROOT_DIR}/third_party/build/${directory}
+    rm -Rf ${MAUS_ROOT_DIR}/third_party/build/${directory}
+    sleep 1
+    tar xvfz ${MAUS_ROOT_DIR}/third_party/source/${filename} -C ${MAUS_ROOT_DIR}/third_party/build > /dev/null
+    mv ${MAUS_ROOT_DIR}/third_party/build/root ${MAUS_ROOT_DIR}/third_party/build/${directory}
+    cd ${MAUS_ROOT_DIR}/third_party/build/${directory}
 		
 	echo
         echo "INFO: Configuring:"
 	echo
 	sleep 1
 
-  ./configure --disable-xrootd --enable-gsl-shared --with-gsl-incdir=${MAUS_ROOT_DIR}/third_party/install/include --with-gsl-libdir=${MAUS_ROOT_DIR}/third_party/install/lib && echo && echo && echo "INFO: Making:" && echo && sleep 1 && make || { echo "FAIL: Failed to configure/make";exit 1; }
+    x11=${MAUS_THIRD_PARTY}/third_party/install/lib/
+    # hack to find third party libraries - for ubuntu et al where they have weird and wonderful
+    # library locations to support multiple architectures. Sticks them in ${x11} directory
+    python ${MAUS_THIRD_PARTY}/third_party/install/bin/library_finder.py X11 Xext Xft
+    ./configure --disable-xrootd --enable-gsl-shared \
+              --with-gsl-incdir=${MAUS_ROOT_DIR}/third_party/install/include \
+              --with-gsl-libdir=${MAUS_ROOT_DIR}/third_party/install/lib \
+              --with-x11-libdir=${x11} \
+              --with-x11-libdir=${x11} \
+              --with-xft-libdir=${x11} \
+              --with-xext-libdir=${x11}
+    echo
+    echo "INFO: Applying ROOT patch"
+    echo
+    sed 's/PYTHONLIB\s*:=\s*-[a-z0-9.]*/& -pthread -lutil/' < config/Makefile.config > config/Makefile.tmp
+    mv config/Makefile.tmp config/Makefile.config
+    echo
+    echo
+    echo "INFO: Making:"
+    echo
+    sleep 1
+    make LDFLAGS="-Wl,--no-as-needed" || { echo "FAIL: Failed to configure/make"; exit 1; }
 
 	            ################################################## 
 	echo

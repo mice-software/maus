@@ -38,7 +38,7 @@ void RealDataDigitization::process(SciFiSpill &spill, Json::Value const &daq) {
   // Pick up JSON daq event.
   Json::Value tracker_event = daq["tracker1"];
 
-  for ( unsigned int i = 1; i < tracker_event.size(); ++i ) {
+  for ( unsigned int i = 0; i < tracker_event.size(); ++i ) {
     SciFiEvent* event = new SciFiEvent();
 
     Json::Value input_event = tracker_event[i]["VLSB_C"];
@@ -59,8 +59,8 @@ void RealDataDigitization::process(SciFiSpill &spill, Json::Value const &daq) {
       assert(channel_in.isMember("tdc"));
       // assert(channel_in.isMember("discr"));
 
-      // int spill = channel_in["phys_event_number"].asInt();
-      // int eventNo = channel_in["part_event_number"].asInt();
+      int spill = channel_in["phys_event_number"].asInt();
+      int eventNo = channel_in["part_event_number"].asInt();
       int board = channel_in["geo"].asInt()-1;
       int bank = channel_in["bank"].asInt();
       int channel_ro = channel_in["channel"].asInt();
@@ -92,7 +92,8 @@ void RealDataDigitization::process(SciFiSpill &spill, Json::Value const &daq) {
 
       // Exclude missing modules.
       if ( pe > 1.0 && tracker != -1 ) {
-        SciFiDigit *digit = new SciFiDigit(tracker, station, plane, channel, pe, tdc);
+        SciFiDigit *digit = new SciFiDigit(spill, eventNo,
+                                           tracker, station, plane, channel, pe, tdc);
         event->add_digit(digit);
       }
     }  // ends loop over channels (j)

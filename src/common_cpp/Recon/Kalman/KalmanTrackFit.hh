@@ -21,6 +21,7 @@
 
 // C headers
 #include <assert.h>
+#include <algorithm>
 
 // C++ headers
 #include <string>
@@ -30,8 +31,8 @@
 #include "TMath.h"
 #include "TMatrixD.h"
 
-
 #include "src/common_cpp/Recon/SciFi/SciFiEvent.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
 #include "src/common_cpp/Recon/Kalman/HelicalTrack.hh"
 #include "src/common_cpp/Recon/Kalman/StraightTrack.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
@@ -50,11 +51,11 @@ class KalmanTrackFit {
 
   void process_clusters(SciFiEvent &event, std::vector<SciFiCluster*> &clusters);
 
-  void extrapolate(std::vector<KalmanSite> &sites, StraightTrack &track, int current_site);
+  void extrapolate(std::vector<KalmanSite> &sites, KalmanTrack *track, int current_site);
 
-  void filter(std::vector<KalmanSite> &sites, StraightTrack &track, int current_site);
+  void filter(std::vector<KalmanSite> &sites, KalmanTrack *track, int current_site);
 
-  void smooth(std::vector<KalmanSite> &sites, StraightTrack &track, int current_site);
+  void smooth(std::vector<KalmanSite> &sites, KalmanTrack *track, int current_site);
 
 // private:
 };

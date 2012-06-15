@@ -80,7 +80,7 @@ class MapPyCkov:
             return doc
         ckov = daq_event['ckov']
 
-        digits = []
+        digits = {}
         ckov_digit = {}
 
         #initializing variables and arrays
@@ -114,7 +114,7 @@ class MapPyCkov:
                     
                     ckov_digit[ckov_sta]['coincidences']      = 0
                     ckov_digit[ckov_sta]['total_charge']      = 0
-                    ckov_digit[ckov_sta]['number_of_pes']     = 0
+                    ckov_digit[ckov_sta]['number_of_pes']     = 0.
                     ckov_digit[ckov_sta]['part_event_number'] = 0
                     
                     ckov_digit[ckov_sta][arrival_time] = \
@@ -161,7 +161,7 @@ class MapPyCkov:
                             
                         if area.count(0) == 4:
                             ckov_digit[ckov_sta]['total_charge'] = 0
-                            ckov_digit[ckov_sta]['number_of_pes'] = 0
+                            ckov_digit[ckov_sta]['number_of_pes'] = 0.
                             ckov_digit[ckov_sta]['coincidences'] = 0
                             ckov_digit[ckov_sta]['part_event_number'] = \
                                        ckov[i]['V1731'][pmt]['part_event_number']
@@ -171,7 +171,7 @@ class MapPyCkov:
                             
                         if area.count(0) == 3:
                             ckov_digit[ckov_sta]['total_charge'] = sum(area)
-                            ckov_digit[ckov_sta]['number_of_pes'] = sum(photoelectrons)
+                            ckov_digit[ckov_sta]['number_of_pes'] = float(sum(photoelectrons))
                             ckov_digit[ckov_sta]['coincidences'] = 1
                             ckov_digit[ckov_sta]['part_event_number'] = \
                                        ckov[i]['V1731'][pmt]['part_event_number']
@@ -196,7 +196,7 @@ class MapPyCkov:
                                     reducer[2][pos] = 0
                                     
                             ckov_digit[ckov_sta]['total_charge'] = sum(reducer[1])
-                            ckov_digit[ckov_sta]['number_of_pes'] = sum(reducer[2])
+                            ckov_digit[ckov_sta]['number_of_pes'] = float(sum(reducer[2]))
                             ckov_digit[ckov_sta]['coincidences'] = \
                                       len(reducer[1]) - reducer[1].count(0)
                             ckov_digit[ckov_sta]['part_event_number'] = \
@@ -204,7 +204,10 @@ class MapPyCkov:
 
                         #Append a shallow copy of the list
                         if pmt == 7:
-                            digits.append(ckov_digit.copy())
+                            event_num = ckov_digit[ckov_sta]['part_event_number']
+                            if event_num not in digits.keys():
+                                digits[event_num] = []
+                            digits[event_num].append(ckov_digit.copy())
 
                         deltas = []
                         reducer = []
@@ -213,9 +216,10 @@ class MapPyCkov:
                         position = []
 
         #spill['daq_data']['ckov'] = {}                                      
-        if 'digits' not in spill:
-            spill['digits'] = {}
-        spill['digits']['ckov'] = digits
+        for event in spill['recon_events']:
+            event['ckov_event']['ckov_digits'] = []
+            if event['part_event_number'] in digits.keys():
+                event['ckov_event']['ckov_digits'] = digits[event['part_event_number']]
 
         return json.dumps(spill)
 

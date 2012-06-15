@@ -57,13 +57,15 @@ class SEClusterRec {
    * @arg evt a SEEvent to be filled with SEClusters
    * @arg modules the SE MICE modules
    */
-  void process(SEEvent &evt, std::vector<const MiceModule*> modules);
+  void process(SEEvent *evt, std::vector<const MiceModule*> modules);
 
   /** @brief Finds the position and direction of the clusters.
    * @arg clust a SECluster
    * @arg modules the MICE modules
    */
   void construct(SECluster *clust, std::vector<const MiceModule*> modules);
+
+  bool are_neighbours(SEDigit *seed_i, SEDigit *seed_j);
 
  private:
 

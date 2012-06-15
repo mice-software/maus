@@ -117,7 +117,6 @@ void PatternRecognition::make_5tracks(
                          std::vector<SciFiStraightPRTrack> &trks,
                          std::vector< std::vector<int> > &residuals) {
   std::cout << "Making 5 point tracks" << std::endl;
-
   int num_points = 5;
   std::vector<int> ignore_stations; // A zero size vector sets that all stations are used
   make_straight_tracks(num_points, ignore_stations, spnts_by_station, trks, residuals);
@@ -323,7 +322,7 @@ void PatternRecognition::make_straight_tracks(const int num_points,
 
                   add_residuals(false, dx, dy, residuals);
 
-                  // Apply roadcuts & find the spacepoints with the smallest residuals for the line
+                  // Apply roadcuts & find the spoints with the smallest residuals for the line
                   if ( fabs(dx) < _res_cut && fabs(dy) < _res_cut && delta_sq > (dx*dx + dy*dy) ) {
                     delta_sq = dx*dx + dy*dy;
                     good_spnts.push_back(spnts_by_station[station_num][sp_no]);
@@ -379,6 +378,28 @@ void PatternRecognition::make_straight_tracks(const int num_points,
                  ( line_y.get_chisq() / ( num_points - 2 ) < _chisq_cut ) ) {
 
               std::cout << "** chisq test passed, adding " << num_points << "pt track **\n";
+              if ( num_points == 5 ) {
+                bool all_triplets = true;
+                for ( int i = 0; i < 5; i++ ) {
+                  SciFiSpacePoint * spacepoint = good_spnts[i];
+                  if (spacepoint->get_type() == "duplet") {
+                    all_triplets = false;
+                  }
+                }
+                if ( all_triplets ) {
+                  std::ofstream file("tracker.bin", std::ios::out | std::ios::app | std::ios::binary);
+                  for ( int i = 0; i < 5; i++ ) {
+                    SciFiSpacePoint * spacepoint = good_spnts[i];
+                    std::vector<SciFiCluster*> channels;
+                    channels = spacepoint->get_channels();
+                    for ( int j = 0; j < 3; j++ ) {
+                      int channel = channels[j]->get_channel();
+                      file.write(reinterpret_cast<const char*> (&channel), 1);
+                    }
+                  }
+                  file.close();
+                }
+              }
 
               SciFiStraightPRTrack track(-1, num_points, line_x, line_y);
 

@@ -26,7 +26,7 @@
 bool ReduceCppTracker::birth(std::string argJsonConfigDocument) {
   // Check if the JSON document can be parsed, else return error only
   _classname = "ReduceCppTracker";
-  _filename = "cosmics.root";
+  // _filename = "cosmics.root";
   _nSpills = 0;
 
   TCanvas *c1 = new TCanvas("c1", "Light Yield", 200, 10, 700, 500);
@@ -89,8 +89,8 @@ std::string  ReduceCppTracker::process(std::string document) {
   TCanvas *c3 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c3"));
 
   try {
-    root = JsonWrapper::StringToJson(document);}
-  catch(...) {
+    root = JsonWrapper::StringToJson(document);
+  } catch(...) {
     Json::Value errors;
     std::stringstream ss;
     ss << _classname << " says: Failed to parse input document";
@@ -99,118 +99,10 @@ std::string  ReduceCppTracker::process(std::string document) {
     return writer.write(root);
   }
   try {
-    if ( root.isMember("space_points") ) {
-      // Light Yield plots.
-      light_yield(root);
+    if ( root.isMember("recon_events") ) {
+      show_light_yield(root);
 
-      int n_events = root["space_points"]["tracker1"].size();
-
-      // Loop over events.
-      for (int PartEvent = 0; PartEvent < n_events; PartEvent++) {
-        Json::Value xPartEventTracker1_SP = GetPartEvent(root,
-                                                         "space_points",
-                                                         "tracker1",
-                                                         PartEvent);
-        Json::Value xPartEventTracker2_SP = GetPartEvent(root,
-                                                         "space_points",
-                                                         "tracker2",
-                                                         PartEvent);
-
-        int n_sp_tracker1 = xPartEventTracker1_SP.size();
-        int n_sp_tracker2 = xPartEventTracker2_SP.size();
-/*
-        _tracker_event = 1;
-        _number_spacepoints = n_sp_tracker1;
-        _events.Fill();
-        _tracker_event = 2;
-        _number_spacepoints = n_sp_tracker2;
-        _events.Fill();
-*/
-        bool station_hit[2][6] = { {false, false, false, false, false, false},
-                                   {false, false, false, false, false, false}};
-
-        for ( int i = 0; i < n_sp_tracker1; i++ ) {
-          // Fill station number.
-          int station = xPartEventTracker1_SP[i]["station"].asInt();
-          _station = station;
-          station_hit[0][station]=true;
-          // Fill type.
-          std::string type = xPartEventTracker1_SP[i]["type"].asString();
-          if ( type == "triplet" ) {
-            _type = 3;
-          }
-          if ( type == "duplet" ) {
-            _type = 2;
-          }
-          _tracker = 1;
-          _x = xPartEventTracker1_SP[i]["position"]["x"].asDouble();
-          _y = xPartEventTracker1_SP[i]["position"]["y"].asDouble();
-          _z = xPartEventTracker1_SP[i]["position"]["z"].asDouble();
-          _spacepoints.Fill();
-        }
-
-        for ( int i = 0; i < n_sp_tracker2; i++ ) {
-          // Fill station number.
-          int station = xPartEventTracker2_SP[i]["station"].asInt();
-          _station = station;
-          station_hit[1][station]=true;
-          // Fill type.
-          std::string type = xPartEventTracker2_SP[i]["type"].asString();
-          if ( type == "triplet" ) {
-            _type = 3;
-          }
-          if ( type == "duplet" ) {
-            _type = 2;
-          }
-          _tracker = 2;
-          _x = xPartEventTracker2_SP[i]["position"]["x"].asDouble();
-          _y = xPartEventTracker2_SP[i]["position"]["y"].asDouble();
-          _z = xPartEventTracker2_SP[i]["position"]["z"].asDouble();
-          _spacepoints.Fill();
-        }
-
-        if ( root.isMember("tracks") ) {
-        Json::Value tracker1_track = GetPartEvent(root,
-                                                  "tracks",
-                                                  "tracker1",
-                                                  PartEvent);
-        Json::Value tracker2_track = GetPartEvent(root,
-                                                  "tracks",
-                                                  "tracker2",
-                                                  PartEvent);
-
-        int numb_tracks = tracker1_track.size();
-        for ( int ed = 0; ed < numb_tracks; ed++ ) {
-
-        if ( !tracker1_track[ed].isNull() ) {
-          _mx = tracker1_track[ed]["mx"].asDouble();
-          _my = tracker1_track[ed]["my"].asDouble();
-          _x0 = tracker1_track[ed]["x0"].asDouble();
-          _y0 = tracker1_track[ed]["y0"].asDouble();
-        }
-        if ( !tracker2_track[ed].isNull() ) {
-          _mx = tracker1_track[ed]["mx"].asDouble();
-          _my = tracker1_track[ed]["my"].asDouble();
-          _x0 = tracker1_track[ed]["x0"].asDouble();
-          _y0 = tracker1_track[ed]["y0"].asDouble();
-        }
-        }
-        }
-
-        // Fill EVENT tree.
-         for ( int tr = 0; tr < 2; tr++ ) {
-          int hit_counter = 0;
-          if ( station_hit[tr][1] && station_hit[tr][5] ) {
-            for ( int i = 2; i < 5; i++ ) {
-              if ( station_hit[tr][i] )
-                hit_counter+=1;
-            }
-            _station_hits = hit_counter+2;
-            _tracker_event = tr+1;
-            _events.Fill();
-          }
-        }
-      } // ends loop over particle events
+      show_efficiency(root);
     }
   } catch(Squeal squee) {
      Squeak::mout(Squeak::error) << squee.GetMessage() << std::endl;
@@ -224,46 +116,45 @@ std::string  ReduceCppTracker::process(std::string document) {
   // Display light yield.
   if (!(_nSpills%2)) {
     c1->cd(1);
-    _digits.Draw("npe", "tracker==1");
+    _digits.Draw("npe", "tracker==0");
     c1->cd(2);
-    _digits.Draw("npe", "tracker==2");
+    _digits.Draw("npe", "tracker==1");
     c1->Modified();
     c1->Update();
-    Save();
   }
   // Display spacepoints type.
   // display_spacepoints();
   if (!(_nSpills%2)) {
     c2->cd(1);
-    _spacepoints.Draw("type", "tracker==1 && station==1 ");
+    _spacepoints.Draw("type", "tracker==0 && station==1 ");
     c2->Update();
     c2->cd(2);
-    _spacepoints.Draw("type", "tracker==1 && station==2 ");
+    _spacepoints.Draw("type", "tracker==0 && station==2 ");
     c2->Update();
     c2->cd(3);
-    _spacepoints.Draw("type", "tracker==1 && station==3 ");
+    _spacepoints.Draw("type", "tracker==0 && station==3 ");
     c2->Update();
     c2->cd(4);
-    _spacepoints.Draw("type", "tracker==1 && station==4 ");
+    _spacepoints.Draw("type", "tracker==0 && station==4 ");
     c2->Update();
     c2->cd(5);
-    _spacepoints.Draw("type", "tracker==1 && station==5 ");
+    _spacepoints.Draw("type", "tracker==0 && station==5 ");
     c2->Update();
     // tracker 1
     c2->cd(6);
-    _spacepoints.Draw("type", "tracker==2 && station==1 ");
+    _spacepoints.Draw("type", "tracker==1 && station==1 ");
     c2->Update();
     c2->cd(7);
-    _spacepoints.Draw("type", "tracker==2 && station==2 ");
+    _spacepoints.Draw("type", "tracker==1 && station==2 ");
     c2->Update();
     c2->cd(8);
-    _spacepoints.Draw("type", "tracker==2 && station==3 ");
+    _spacepoints.Draw("type", "tracker==1 && station==3 ");
     c2->Update();
     c2->cd(9);
-    _spacepoints.Draw("type", "tracker==2 && station==4 ");
+    _spacepoints.Draw("type", "tracker==1 && station==4 ");
     c2->Update();
     c2->cd(10);
-    _spacepoints.Draw("type", "tracker==2 && station==5 ");
+    _spacepoints.Draw("type", "tracker==1 && station==5 ");
     c2->Update();
   }
 
@@ -271,74 +162,118 @@ std::string  ReduceCppTracker::process(std::string document) {
   // display_efficiency();
   if (!(_nSpills%2)) {
     c3->cd(1);
-    _events.Draw("station_hits", "tracker==1");
+    _events.Draw("station_hits", "tracker==0");
     c3->cd(2);
-    _events.Draw("station_hits", "tracker==2");
+    _events.Draw("station_hits", "tracker==1");
   }
   return document;
 }
 
 bool ReduceCppTracker::death()  {
-  Save();
   return true;
 }
 
-void ReduceCppTracker::Save() {
-  TFile datafile(_filename.c_str(), "recreate" );
-  datafile.cd();
+void ReduceCppTracker::show_light_yield(Json::Value const &root) {
+  int n_events = root["recon_events"].size();
 
-  _digits.Write();
-  _spacepoints.Write();
-  _events.Write();
+  for (int event_i = 0; event_i < n_events; event_i++) {
+    Json::Value spacepoints_tracker0 = root["recon_events"][event_i]["sci_fi_event"]
+                                           ["sci_fi_space_points"]["tracker0"];
 
-  datafile.Close();
-  Squeak::mout(Squeak::info) << _filename << " is updated." << std::endl;
-}
+    Json::Value spacepoints_tracker1 = root["recon_events"][event_i]["sci_fi_event"]
+                                           ["sci_fi_space_points"]["tracker1"];
 
-Json::Value ReduceCppTracker::GetPartEvent(Json::Value root, std::string entry_type,
-                         std::string detector, int part_event) {
-  Json::Value xPartEvent;
-  Json::Value xHitDoc = JsonWrapper::GetProperty(root,
-                                                 entry_type ,
-                                                 JsonWrapper::objectValue);
+    int n_sp_tracker0 = spacepoints_tracker0.size();
+    int n_sp_tracker1 = spacepoints_tracker1.size();
 
-  xPartEvent = xHitDoc[detector][part_event];
-  return xPartEvent;
-}
-
-void ReduceCppTracker::light_yield(Json::Value &root) {
-  int n_events = root["space_points"]["tracker1"].size();
-
-  // Loop over events.
-  for (int PartEvent = 0; PartEvent < n_events; PartEvent++) {
-    Json::Value xPartEventTracker1_SP = GetPartEvent(root,
-                                                     "space_points",
-                                                     "tracker1",
-                                                     PartEvent);
-    Json::Value xPartEventTracker2_SP = GetPartEvent(root,
-                                                     "space_points",
-                                                     "tracker2",
-                                                     PartEvent);
-
-    int n_sp_tracker1 = xPartEventTracker1_SP.size();
-    int n_sp_tracker2 = xPartEventTracker2_SP.size();
-
-    for ( int event_i = 0; event_i < n_sp_tracker1; event_i++ ) {
-      int n_digits = xPartEventTracker1_SP[event_i]["channels"].size();
+    for ( int sp_i = 0; sp_i < n_sp_tracker0; sp_i++ ) {
+      int n_digits = spacepoints_tracker0[sp_i]["channels"].size();
       for ( int digit_j = 0; digit_j < n_digits; digit_j++ ) {
-        _npe = xPartEventTracker1_SP[event_i]["channels"][digit_j]["npe"].asDouble();
+        _npe = spacepoints_tracker0[sp_i]["channels"][digit_j]["npe"].asDouble();
+        _tracker_dig = 0;
+        _digits.Fill();
+      }
+    }
+
+    for ( int sp_i = 0; sp_i < n_sp_tracker1; sp_i++ ) {
+      int n_digits = spacepoints_tracker1[sp_i]["channels"].size();
+      for ( int digit_j = 0; digit_j < n_digits; digit_j++ ) {
+        _npe = spacepoints_tracker1[sp_i]["channels"][digit_j]["npe"].asDouble();
         _tracker_dig = 1;
         _digits.Fill();
       }
     }
+  }
+}
 
-    for ( int event_i = 0; event_i < n_sp_tracker2; event_i++ ) {
-      int n_digits = xPartEventTracker2_SP[event_i]["channels"].size();
-      for ( int digit_j = 0; digit_j < n_digits; digit_j++ ) {
-        _npe = xPartEventTracker2_SP[event_i]["channels"][digit_j]["npe"].asDouble();
-        _tracker_dig = 2;
-        _digits.Fill();
+void ReduceCppTracker::show_efficiency(Json::Value const &root) {
+  int n_events = root["recon_events"].size();
+
+  for (int event_i = 0; event_i < n_events; event_i++) {
+    Json::Value spacepoints_tracker0 = root["recon_events"][event_i]["sci_fi_event"]
+                                           ["sci_fi_space_points"]["tracker0"];
+
+    Json::Value spacepoints_tracker1 = root["recon_events"][event_i]["sci_fi_event"]
+                                           ["sci_fi_space_points"]["tracker1"];
+
+    int n_sp_tracker0 = spacepoints_tracker0.size();
+    int n_sp_tracker1 = spacepoints_tracker1.size();
+
+    bool station_hit[2][6] = { {false, false, false, false, false, false},
+                               {false, false, false, false, false, false}};
+
+    for ( int sp_i = 0; sp_i < n_sp_tracker0; sp_i++ ) {
+      // Fill station number.
+      int station = spacepoints_tracker0[sp_i]["station"].asInt();
+      _station = station;
+      station_hit[0][station]=true;
+      // Fill type.
+      std::string type = spacepoints_tracker0[sp_i]["type"].asString();
+      if ( type == "triplet" ) {
+        _type = 3;
+      }
+      if ( type == "duplet" ) {
+        _type = 2;
+      }
+      _tracker = 0;
+      _x = spacepoints_tracker0[sp_i]["position"]["x"].asDouble();
+      _y = spacepoints_tracker0[sp_i]["position"]["y"].asDouble();
+      _z = spacepoints_tracker0[sp_i]["position"]["z"].asDouble();
+      _spacepoints.Fill();
+    }
+
+    for ( int sp_i = 0; sp_i < n_sp_tracker1; sp_i++ ) {
+      // Fill station number.
+      int station = spacepoints_tracker1[sp_i]["station"].asInt();
+      _station = station;
+      station_hit[1][station]=true;
+      // Fill type.
+      std::string type = spacepoints_tracker1[sp_i]["type"].asString();
+      if ( type == "triplet" ) {
+        _type = 3;
+      }
+      if ( type == "duplet" ) {
+        _type = 2;
+      }
+      _tracker = 1;
+      _x = spacepoints_tracker1[sp_i]["position"]["x"].asDouble();
+      _y = spacepoints_tracker1[sp_i]["position"]["y"].asDouble();
+      _z = spacepoints_tracker1[sp_i]["position"]["z"].asDouble();
+      _spacepoints.Fill();
+    }
+
+    // Fill EVENT tree.
+    for ( int tr = 0; tr < 2; tr++ ) {
+    int hit_counter = 0;
+    if ( station_hit[tr][1] && station_hit[tr][5] ) {
+      for ( int i = 2; i < 5; i++ ) {
+        if ( station_hit[tr][i] )
+          hit_counter+=1;
+        }
+        _station_hits = hit_counter+2;
+        _tracker_event = tr;
+        _events.Fill();
       }
     }
-  }
+  } // ends loop over particle events
 }

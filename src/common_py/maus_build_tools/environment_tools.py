@@ -264,15 +264,15 @@ def set_gsl(conf, env): # pylint: disable=W0613
     """
     Setup gsl
     """
-    if not conf.CheckLib('gslcblas'):
-        print "ERROR: Cound't find GSL (required for ROOT)."
-        my_exit(1)
-    else:
-        conf.env.Append(LIBS = ['gslcblas'])
-
+    conf.env.Append(LIBS = ['gsl'])
+    conf.env.Append(LIBS = ['gslcblas'])
     if not conf.CheckLib('gsl'):
         print "ERROR: Cound't find GSL"
         my_exit(1)
+    if not conf.CheckLib('gslcblas'):
+        print "ERROR: Cound't find GSL (required for ROOT)."
+        my_exit(1)
+
 
 def get_root_libs():
     """ROOT libs
@@ -285,10 +285,10 @@ def get_root_libs():
                 'Gpad', \
                 'Graf', \
                 'Graf3d', \
-                'Hist', \
                 'MathCore', \
-                'Matrix', \
                 'Minuit', \
+                'Hist', \
+                'Matrix', \
                 'Spectrum',\
                 'Net', \
                 'Physics', \
@@ -366,10 +366,9 @@ def get_g4_libs(): # pylint: disable=W0511
              'G4cuts',
              'G4decay',
              'G4detector',
-             'G4detscorer',
              'G4detutils',
+             'G4detscorer',
              'G4digits',
-             'G4emhighenergy',
              'G4emlowenergy',
              'G4empolar',
              'G4emstandard',
@@ -384,11 +383,9 @@ def get_g4_libs(): # pylint: disable=W0511
              'G4gflash',
              'G4globman',
              'G4graphics_reps',
-             'G4had_im_r_matrix',
              'G4had_lll_fis',
              'G4had_mod_man',
              'G4had_mod_util',
-             'G4had_muon_nuclear',
              'G4had_neu_hp',
              'G4had_preequ_exciton',
              'G4had_string_diff',
@@ -402,13 +399,12 @@ def get_g4_libs(): # pylint: disable=W0511
              'G4hadronic_abrasion',
              'G4hadronic_bert_cascade',
              'G4hadronic_binary',
-             'G4hadronic_body_ci',
-             'G4hadronic_coherent_elastic',
-             'G4hadronic_deex_evaporation',
+             'G4had_im_r_matrix',
              'G4hadronic_deex_fermi_breakup',
+             'G4hadronic_deex_handler',
+             'G4hadronic_deex_evaporation',
              'G4hadronic_deex_fission',
              'G4hadronic_deex_gem_evaporation',
-             'G4hadronic_deex_handler',
              'G4hadronic_deex_management',
              'G4hadronic_deex_multifragmentation',
              'G4hadronic_deex_photon_evaporation',
@@ -418,6 +414,7 @@ def get_g4_libs(): # pylint: disable=W0511
              'G4hadronic_hetcpp_utils',
              'G4hadronic_incl_cascade',
              'G4hadronic_interface_ci',
+             'G4hadronic_body_ci',
              'G4hadronic_iso',
              'G4hadronic_leading_particle',
              'G4hadronic_mgt',
@@ -446,6 +443,9 @@ def get_g4_libs(): # pylint: disable=W0511
              'G4partman',
              'G4partutils',
              'G4phys_builders',
+             'G4had_muon_nuclear',
+             'G4hadronic_coherent_elastic',
+             'G4emhighenergy.so',
              'G4phys_lists',
              'G4procman',
              'G4readout',

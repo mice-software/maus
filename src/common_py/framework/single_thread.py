@@ -88,15 +88,6 @@ class PipelineSingleThreadDataflowExecutor:
             print "Processed %d spills so far," % i,
             print "%d spills in buffer." % (len(map_buffer))
 
-        print("CLOSING PIPELINE: Sending END_OF_RUN to merger")
-
-        end_of_run = {"daq_data":None, "daq_event_type":"end_of_run",
-            "run_num":1,
-            "spill_num":-1}
-        end_of_run_spill = json.dumps(end_of_run)
-        spill = self.merger.process(end_of_run_spill)
-        self.outputer.save(spill)
-
         print("TRANSFORM: Shutting down transformer")
         assert(self.transformer.death() == True)
 
