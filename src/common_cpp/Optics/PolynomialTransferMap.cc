@@ -53,11 +53,11 @@ PolynomialTransferMap::PolynomialTransferMap(
 
 PolynomialTransferMap::PolynomialTransferMap(
   const PolynomialTransferMap& original_instance)
-  : polynomial_map_(original_instance.polynomial_map_.Clone()),
+  : polynomial_map_(original_instance.polynomial_map_->Clone()),
     reference_trajectory_in_(
-      new PhaseSpaceVector(original_instance.reference_trajectory_in_)),
+      new PhaseSpaceVector(*original_instance.reference_trajectory_in_)),
     reference_trajectory_out_(
-      new PhaseSpaceVector(original_instance.reference_trajectory_out_))
+      new PhaseSpaceVector(*original_instance.reference_trajectory_out_))
 { }
 
 PolynomialTransferMap::~PolynomialTransferMap() {
@@ -87,15 +87,15 @@ CovarianceMatrix PolynomialTransferMap::Transport(
 PhaseSpaceVector PolynomialTransferMap::Transport(
     PhaseSpaceVector const & input_vector) const {
   // subtract off the input reference trajectory to obtain phase space delta
-  Vector<double> phase_space_delta(input_vector - reference_trajectory_in_);
+  Vector<double> phase_space_delta(input_vector - (*reference_trajectory_in_));
 
   // operate on the phase space delta with the polynomial map
   Vector<double> transformed_delta;
-  polynomial_map_.F(phase_space_delta, transformed_delta);
+  polynomial_map_->F(phase_space_delta, transformed_delta);
 
   // add the transformed phase space delta to the output reference trajectory
   PhaseSpaceVector output_vector
-    = PhaseSpaceVector(reference_trajectory_out_ + transformed_delta);
+    = PhaseSpaceVector((*reference_trajectory_out_) + transformed_delta);
 
   return output_vector;
 }
@@ -105,7 +105,7 @@ PhaseSpaceVector PolynomialTransferMap::Transport(
 // ******************************
 
 Matrix<double> PolynomialTransferMap::CreateTransferMatrix() const {
-  return polynomial_map_.GetCoefficientsAsMatrix().submatrix(1, 6, 2, 6);
+  return polynomial_map_->GetCoefficientsAsMatrix().submatrix(1, 6, 2, 6);
 }
 
 // ##############################

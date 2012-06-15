@@ -26,6 +26,7 @@
 #include "src/common_cpp/Simulation/MAUSPrimaryGeneratorAction.hh"
 #include "Interface/Squeak.hh"
 #include "Reconstruction/Global/Detector.hh"
+#include "Reconstruction/Global/Particle.hh"
 
 namespace MAUS {
 namespace reconstruction {
@@ -33,47 +34,63 @@ namespace global {
 
 TrackPoint::TrackPoint()
     : PhaseSpaceVector(),
-      z_(0.), z_momentum_(0.), detector_id_(Detector::kNone),
+      detector_id_(Detector::kNone),
+      uncertainties_(new CovarianceMatrix())
+{ }
+
+TrackPoint::TrackPoint(const PhaseSpaceType type)
+    : PhaseSpaceVector(type),
+      detector_id_(Detector::kNone),
       uncertainties_(new CovarianceMatrix())
 { }
 
 TrackPoint::TrackPoint(const TrackPoint& original_instance)
     : PhaseSpaceVector(original_instance),
-      z_(original_instance.z_), z_momentum_(original_instance.z_momentum_),
       detector_id_(original_instance.detector_id_),
       uncertainties_(new CovarianceMatrix(*original_instance.uncertainties_))
 { }
 
-TrackPoint::TrackPoint(const PhaseSpaceVector & original_instance)
-    : PhaseSpaceVector(original_instance),
+TrackPoint::TrackPoint(const TrackPoint& original_instance,
+                       const double mass,
+                       const PhaseSpaceType type)
+    : PhaseSpaceVector(original_instance, mass, type),
+      detector_id_(original_instance.detector_id_),
+      uncertainties_(new CovarianceMatrix(*original_instance.uncertainties_))
+{ }
+
+TrackPoint::TrackPoint(const PhaseSpaceVector & original_instance,
+                       const PhaseSpaceType type)
+    : PhaseSpaceVector(original_instance, type),
       detector_id_(Detector::kNone), uncertainties_(new CovarianceMatrix())
 { }
 
-TrackPoint::TrackPoint(const Vector<double> & original_instance)
-    : PhaseSpaceVector(original_instance),
+TrackPoint::TrackPoint(const Vector<double> & original_instance,
+                       const PhaseSpaceType type)
+    : PhaseSpaceVector(original_instance, type),
       detector_id_(Detector::kNone), uncertainties_(new CovarianceMatrix())
 { }
 
-TrackPoint::TrackPoint(const double t, const double E,
-                                   const double x, const double Px,
-                                   const double y, const double Py,
-                                   const double z, const double Pz,
-                                   const CovarianceMatrix & uncertainties)
-    : PhaseSpaceVector(t, E, x, Px, y, Py),
-      z_(z), z_momentum_(Pz), detector_id_(Detector::kNone),
+TrackPoint::TrackPoint(const double x1, const double p1,
+                       const double x2, const double p2,
+                       const double x3, const double p3,
+                       const CovarianceMatrix & uncertainties,
+                       const PhaseSpaceType type)
+    : PhaseSpaceVector(x1, p1, x2, p2, x3, p3, type),
+      detector_id_(Detector::kNone),
       uncertainties_(new CovarianceMatrix(uncertainties)) { }
 
-TrackPoint::TrackPoint(const double t, const double E,
-                                   const double x, const double Px,
-                                   const double y, const double Py,
-                                   const double z, const double Pz,
-                                   const Detector & detector)
-    : PhaseSpaceVector(t, E, x, Px, y, Py), z_(z), z_momentum_(Pz),
+TrackPoint::TrackPoint(const double x1, const double p1,
+                       const double x2, const double p2,
+                       const double x3, const double p3,
+                       const Detector & detector,
+                       const PhaseSpaceType type)
+    : PhaseSpaceVector(x1, p1, x2, p2, x3, p3, type),
       detector_id_(detector.id()),
       uncertainties_(new CovarianceMatrix(detector.uncertainties())) { }
 
-TrackPoint::TrackPoint(double const * const array)
-    : PhaseSpaceVector(array), z_(array[6]), z_momentum_(array[7]),
+TrackPoint::TrackPoint(double const * const array,
+                       const PhaseSpaceType type)
+    : PhaseSpaceVector(array, type),
       detector_id_(Detector::kNone), uncertainties_(new CovarianceMatrix()) {
 }
 
@@ -83,22 +100,16 @@ TrackPoint::~TrackPoint() {
 
 TrackPoint & TrackPoint::operator=(const TrackPoint& rhs) {
   PhaseSpaceVector::operator=(rhs);
-  z_ = rhs.z_;
-  z_momentum_ = rhs.z_momentum_;
   detector_id_ = rhs.detector_id_;
 
   delete uncertainties_;
   uncertainties_ = new CovarianceMatrix(*rhs.uncertainties_);
+
+  return *this;
 }
 
 const bool TrackPoint::operator==(const TrackPoint& rhs) const {
   if ((*this) != ((PhaseSpaceVector) rhs)) {
-    return false;
-  } else if (rhs.z_ != z_) {
-    fprintf(stdout, "z coordinates are not equal!\n");
-    return false;
-  } else if (rhs.z_momentum_ != z_momentum_) {
-    fprintf(stdout, "z momenta are not equal!\n");
     return false;
   } else if (rhs.detector_id_ != detector_id_) {
     fprintf(stdout, "Detector IDs are not equal!\n");
@@ -113,30 +124,6 @@ const bool TrackPoint::operator==(const TrackPoint& rhs) const {
 
 const bool TrackPoint::operator<(const TrackPoint& rhs) const {
   return t() < rhs.t();
-}
-
-double TrackPoint::z() const {
-  return z_;
-}
-
-void TrackPoint::set_z(const double z) {
-  z_ = z;
-}
-
-double TrackPoint::z_momentum() const {
-  return z_momentum_;
-}
-
-void TrackPoint::set_z_momentum(const double z_momentum) {
-  z_momentum_ = z_momentum;
-}
-
-double TrackPoint::Pz() const {
-  return z_momentum_;
-}
-
-void TrackPoint::set_Pz(const double Pz) {
-  z_momentum_ = Pz;
 }
 
 void TrackPoint::set_detector_id(unsigned int id) {
@@ -156,83 +143,39 @@ const CovarianceMatrix & TrackPoint::uncertainties() const {
   return *uncertainties_;
 }
 
-/* Fills in z and Pz from t, E, and the mass.
- */
-void TrackPoint::FillInAxialCoordinates(const double mass) {
-  double energy = (*this)[1];
-  const double px = (*this)[3];
-  const double py = (*this)[5];
-
-  const double momentum = ::sqrt(energy*energy - mass*mass);
-
-  // fill in the Pz coordinate
-  z_momentum_ = ::sqrt(momentum*momentum - px*px - py*py);
-
-  const double time = (*this)[0];
-  const double x = (*this)[2];
-  const double y = (*this)[4];
-
-  double velocity = ::CLHEP::c_light * momentum / energy;
-  double position = velocity * time;
-
-  // fill in the z coordinate
-  z_ = ::sqrt(position*position - x*x - y*y);
-  if (time < 0) {
-    z_ = -z_;
-  }
-}
-
-/* Fills in t and E from z, Pz, and the given mass parameter.
- */
-void TrackPoint::FillInTemporalCoordinates(const double mass) {
-  double & energy_ = (*this)[1];
-  const double px = (*this)[3];
-  const double py = (*this)[5];
-  const double pz = z_momentum_;
-
-  const double momentum = ::sqrt(px*px + py*py + pz*pz);
-
-  // fill in the energy coordinate
-  energy_ = ::sqrt(mass*mass + momentum*momentum);
-
-  double & time_ = (*this)[0];
-  const double x = (*this)[2];
-  const double y = (*this)[4];
-  const double z = z_;
-
-  const double position = ::sqrt(x*x + y*y + z*z);
-  const double velocity = ::CLHEP::c_light * momentum / energy_;
-
-  // fill in the time coordinate
-  time_ = position / velocity;
-  if (z < 0) {
-    time_ = -time_;
-  }
-}
-
 MAUS::MAUSPrimaryGeneratorAction::PGParticle
 PrimaryGeneratorParticle(const TrackPoint & point, const int pid) {
+  const double mass = Particle::GetInstance()->GetMass(pid);
+  TrackPoint const * temporal_point = NULL;
+  TrackPoint const * positional_point = NULL;
+  if (point.type() == PhaseSpaceVector::PhaseSpaceType::kTemporal) {
+    temporal_point = &point;
+    positional_point
+      = new TrackPoint(point, mass,
+                        PhaseSpaceVector::PhaseSpaceType::kPositional);
+  } else {
+    temporal_point 
+      = new TrackPoint(point, mass,
+                        PhaseSpaceVector::PhaseSpaceType::kTemporal);
+    positional_point = &point;
+  }
+
   MAUSPrimaryGeneratorAction::PGParticle particle;
-  particle.time = point.t();
-  particle.energy = point.E();
+  particle.time = temporal_point->t();
+  particle.energy = temporal_point->E();
   particle.x = point.x();
   particle.px = point.Px();
   particle.y = point.y();
   particle.py = point.Py();
-  particle.z = point.z();
-  particle.pz = point.Pz();
+  particle.z = positional_point->z();
+  particle.pz = positional_point->Pz();
   particle.pid = pid;
   particle.seed = 0;
+  
+  delete temporal_point;
+  delete positional_point;
 
   return particle;
-}
-
-std::ostream& operator<<(std::ostream& out, const TrackPoint& vector) {
-  out << "t: " << vector[0]  << " E: "   << vector[1]
-      << " x: " << vector[2]  << " Px: "  << vector[3]
-      << " y: " << vector[4]  << " Py: "  << vector[5]
-      << " z: " << vector.z() << " Pz: "  << vector.Pz();
-  return out;
 }
 
 }  // namespace global

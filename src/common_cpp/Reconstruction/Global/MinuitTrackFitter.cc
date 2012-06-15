@@ -128,8 +128,7 @@ Double_t MinuitTrackFitter::ScoreTrack(
                    start_plane_track_coordinates[3],
                    start_plane_track_coordinates[4],
                    start_plane_track_coordinates[5],
-                   start_plane_, 0.0, null_uncertainties);
-  guess.FillInAxialCoordinates(mass_);
+                   null_uncertainties);
   double start_plane = start_plane_;
   track_->push_back(guess);
 
@@ -150,7 +149,6 @@ std::cout << "Previous guess: " << guess << std::endl;
 std::cout << "New guess: " << guess << std::endl;
     delete transfer_map;
 
-    guess.FillInAxialCoordinates(mass_);
     uncertainties = &events->uncertainties();
     guess.set_uncertainties(*uncertainties);
 
@@ -167,7 +165,13 @@ std::cout << "delta: " << delta << std::endl;
 std::cout << "uncertainties: " << *uncertainties << std::endl;
 std::cout << "chi_squared: " << chi_squared << std::endl;
 
-    start_plane = events->z();
+    // Calculate the next start plane from the current event's
+    // time, energy, and mass.
+    TrackPoint event(*events,
+                     mass_,
+                     PhaseSpaceVector::PhaseSpaceType::kPositional);
+    start_plane = event.z();
+
     ++events;
   }
 
