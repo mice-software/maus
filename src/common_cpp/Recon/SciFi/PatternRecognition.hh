@@ -384,6 +384,10 @@ class PatternRecognition {
     bool add_residuals(const bool passed, const double dx, const double dy,
                        std::vector< std::vector<int> > &residuals);
 
+    void calc_residual(const SciFiSpacePoint *sp,
+                       const SimpleLine &line_x, const SimpleLine &line_y,
+                       double &dx, double &dy);
+
     double parabola_fit(const std::vector<double> chisqs, const std::vector<double> Dparams);
 
   private:
@@ -405,6 +409,7 @@ class PatternRecognition {
     // Some output files - only to be kept when in development stages
     ofstream * _f_res;
     ofstream * _f_res_good;
+    ofstream * _f_res_chosen;
     ofstream * _f_trks;
 };
 // } // ~namespace MAUS

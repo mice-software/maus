@@ -119,8 +119,6 @@ void SciFiClusterRec::construct(SciFiCluster *clust, std::vector<const MiceModul
   clust->set_position(position);
   clust->set_direction(dir);
   clust->set_relative_position(tracker_ref_frame_pos);
-  //std::cerr << "Is this..." << tracker_ref_frame_pos << " equal to this.. " << clust_relativePosition << std::endl;
-  //std::cerr << "Is this..." << dir << " equal to this.. " << _clust_relativeRotation << std::endl;
   // Set relative position & channel number for the Kalman Filter.
   // This is the position of the cluster relatively to station 1 of the tracker (0 or 1)
   // with the displacement of the station centre subtracted.

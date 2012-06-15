@@ -56,6 +56,9 @@ void PatternRecognition::process(SciFiEvent &evt) {
   _f_res_good = new ofstream();
   _f_res_good->open("residuals_good.dat", std::ios::app);
 
+  _f_res_chosen = new ofstream();
+  _f_res_chosen->open("residuals_chosen.dat", std::ios::app);
+
   _f_trks = new ofstream();
   _f_trks->open("tracks.dat", std::ios::app);
 
@@ -139,6 +142,9 @@ void PatternRecognition::process(SciFiEvent &evt) {
 
   _f_res_good->close();
   delete _f_res_good;
+
+  _f_res_chosen->close();
+  delete  _f_res_chosen;
 
   _f_trks->close();
   delete _f_trks;
@@ -373,11 +379,9 @@ void PatternRecognition::make_straight_tracks(const int num_points,
 
                 // If the spacepoint has not already been used in a track fit
                 if ( !spnts_by_station[station_num][sp_no]->get_used() ) {
-                  Hep3Vector pos = spnts_by_station[station_num][sp_no]->get_position();
-
-                  // Calculate the residuals
-                  double dx = pos.x() - ( line_x.get_c() + ( pos.z() * line_x.get_m() ) );
-                  double dy = pos.y() - ( line_y.get_c() + ( pos.z() * line_y.get_m() ) );
+                  SciFiSpacePoint *sp = spnts_by_station[station_num][sp_no];
+                  double dx = 0, dy = 0;
+                  calc_residual(sp, line_x, line_y, dx, dy);
                   *_f_res << station_num << "\t" << num_points << "\t" << dx << "\t" << dy << "\n";
                   // add_residuals(false, dx, dy, residuals);
 
@@ -394,7 +398,12 @@ void PatternRecognition::make_straight_tracks(const int num_points,
               } // ~Loop over spacepoints
               // Push back the best spacepoint found for the current station
               if (best_sp > -1) {
-                good_spnts.push_back(spnts_by_station[station_num][best_sp]);
+                SciFiSpacePoint * sp = spnts_by_station[station_num][best_sp];
+                good_spnts.push_back(sp);
+                double dx = 0, dy = 0;
+                calc_residual(sp, line_x, line_y, dx, dy);
+                *_f_res_chosen << station_num << "\t" << num_points << "\t";
+                *_f_res_chosen << dx << "\t" << dy << "\n";
               }// ~if (counter > 0)
             } // ~if (station_num != ignore_station)
           } // ~Loop over intermediate stations
@@ -1597,6 +1606,14 @@ bool PatternRecognition::add_residuals(const bool passed, const double dx, const
     std::cout << "Warning: Bad residuals vector passed to add_residuals function" << std::endl;
     return false;
   }
+}
+
+void PatternRecognition::calc_residual(const SciFiSpacePoint *sp,
+                                       const SimpleLine &line_x, const SimpleLine &line_y,
+                                       double &dx, double &dy) {
+    Hep3Vector pos = sp->get_position();
+    dx = pos.x() - ( line_x.get_c() + ( pos.z() * line_x.get_m() ) );
+    dy = pos.y() - ( line_y.get_c() + ( pos.z() * line_y.get_m() ) );
 }
 
 // } // ~namespace MAUS

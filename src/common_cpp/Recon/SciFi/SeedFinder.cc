@@ -99,7 +99,7 @@ void SeedFinder::momentumFromPoints(SciFiSpacePoint pnt1,
   // MUCH ATTENTION NEEDED HERE... coordinate reference frame...
   if ( pnt1.get_tracker() == 0 ) {
     sort(spacepoints.begin(), spacepoints.end(), descending_station_numb);
-  } else if( pnt1.get_tracker() == 1 ) {
+  } else if ( pnt1.get_tracker() == 1 ) {
     sort(spacepoints.begin(), spacepoints.end(), ascending_station_numb);
   }
 /*
@@ -279,7 +279,7 @@ void SeedFinder::determinePtFromR() { // double& r, double& B, double& pt ) {
 }
 
 void SeedFinder::determinePhi(Hep3Vector& pos, double& phi ) {
-  //phi = atan2(pos.x() - _x0, pos.y() - _y0);
+  // phi = atan2(pos.x() - _x0, pos.y() - _y0);
   phi = atan2(pos.y() - _y0, pos.x() - _x0); // correction
 
   if ( phi < 0. )

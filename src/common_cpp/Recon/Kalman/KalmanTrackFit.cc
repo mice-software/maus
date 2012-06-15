@@ -30,7 +30,7 @@ KalmanTrackFit::~KalmanTrackFit() {
 
 bool sort_by_id(SciFiCluster *a, SciFiCluster *b ) {
   //  Ascending station number.
-  return ( a->get_id() < b->get_id() ); 
+  return ( a->get_id() < b->get_id() );
 }
 //
 // Helical track fit.
