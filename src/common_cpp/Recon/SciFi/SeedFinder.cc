@@ -66,12 +66,13 @@ bool SeedFinder::process(std::vector<SciFiSpacePoint> spacepoints) {
     // order points by increazing z
     // order_points();
     // determine the center and radius of the circle
+    std::cout << "Determining Centre..." << std::endl;
     determineCentre(pos1, pos2, pos3);
 
     // calculate Pt
     // from the radius of the circle and the magnetic field
     determinePtFromR();
-
+    std::cout << "momentum from points." << std::endl;
     // determine the phi angles of each three points
     momentumFromPoints(sp1, sp2, sp3);
 
@@ -81,7 +82,7 @@ bool SeedFinder::process(std::vector<SciFiSpacePoint> spacepoints) {
   } catch(char * str) {
     std::cerr << "Exception: " << str << std::endl;
   }
-
+  std::cout << "Finished without errors" << std::endl;
   return true;
 }
 

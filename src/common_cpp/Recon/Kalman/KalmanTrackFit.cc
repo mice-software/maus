@@ -91,8 +91,8 @@ void KalmanTrackFit::initialise_helix(std::vector<SciFiSpacePoint> &spacepoints,
   TMatrixD a(5, 1);
   a(0, 0) = x;
   a(1, 0) = y;
-  a(2, 0) = tan_lambda;
-  a(3, 0) = phi_0;
+  a(2, 0) = phi_0;
+  a(3, 0) = tan_lambda;
   a(4, 0) = kappa;
   first_plane.set_projected_a(a);
   // first_plane.set_state_vector(x, y, tan_lambda, phi_0, kappa);

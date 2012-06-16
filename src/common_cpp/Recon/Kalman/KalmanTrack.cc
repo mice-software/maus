@@ -141,7 +141,7 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
   a_site->set_a(a_filt);
 
   //////////////////////////////////////////////////////////////////////////
-/*  std::cout <<  "******************* STATE VECTOR *******************" << std::endl;
+  std::cout <<  "******************* STATE VECTOR *******************" << std::endl;
   std::cout << "predicted: ";
   a.Print();
   std::cout << "filtered ";
@@ -163,7 +163,7 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
   pull.Print();
   std::cout << "K: ";
   K.Print();
-*/
+
 }
 
 //
