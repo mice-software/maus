@@ -21,7 +21,7 @@
 #include "src/common_cpp/Recon/SciFi/SeedFinder.hh"
 
 SeedFinder::SeedFinder() {
-  // _B    = 4.;
+  _B    = 4.;
   _Q    = 1.;
   _sigx = 0.5;
   _sigy = 0.5;
@@ -54,14 +54,14 @@ bool SeedFinder::process(std::vector<SciFiSpacePoint> spacepoints) {
   pos3 = sp3.get_position();
 
   _tracker = sp1.get_tracker();
-
+/*
   if ( _tracker == 0 ) {
     _B    = -4.;
   }
   if ( _tracker == 1 ) {
     _B    = 4.;
   }
-
+*/
   try {
     // order points by increazing z
     // order_points();
@@ -98,12 +98,13 @@ void SeedFinder::momentumFromPoints(SciFiSpacePoint pnt1,
   spacepoints.push_back(pnt3);
   // ============================================
   // MUCH ATTENTION NEEDED HERE... coordinate reference frame...
-  if ( pnt1.get_tracker() == 0 ) {
+/*  if ( pnt1.get_tracker() == 0 ) {
     sort(spacepoints.begin(), spacepoints.end(), descending_station_numb);
   } else if ( pnt1.get_tracker() == 1 ) {
     sort(spacepoints.begin(), spacepoints.end(), ascending_station_numb);
   }
-/*
+  std::cout << "done sorting." << std::endl;
+
   if ( pnt1.get_tracker() == 0 ) {
     sort(spacepoints.begin(), spacepoints.end(), increazing_station_no);
   } else if ( pnt1.get_tracker() == 1 ) {
@@ -303,6 +304,6 @@ void SeedFinder::print_to_file() {
   std::ofstream myfile;
   myfile.open("tracks.txt", std::ios::app);
   myfile << _tracker << " " << _r << " " << _x0 << " " << _y0 << " "
-         << _pt << " " << _pz << _phi_0 << " " << _tan_lambda << std::endl;
+         << _pt << " " << _pz << " " << _phi_0 << " " << _tan_lambda << std::endl;
   myfile.close();
 }

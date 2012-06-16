@@ -64,6 +64,7 @@ void KalmanTrack::calc_covariance(KalmanSite *old_site, KalmanSite *new_site) {
 
 void KalmanTrack::update_G(KalmanSite *a_site) {
   double alpha = (a_site->get_measurement())(0, 0);
+  std::cerr << alpha << std::endl;
   double l = pow(ACTIVE_RADIUS*ACTIVE_RADIUS -
                  (alpha*CHAN_WIDTH)*(alpha*CHAN_WIDTH), 0.5);
   double sig_beta = l/CHAN_WIDTH;
@@ -88,6 +89,7 @@ void KalmanTrack::update_covariance(KalmanSite *a_site) {
   // calc_covariance_matrix_of_residual
   // Cp = ( C_inv + Ht*G*H )-1;
   TMatrixD C = a_site->get_projected_covariance_matrix();
+  std::cout << "C invertion" << std::endl;
   TMatrixD C_inv = C.Invert();
 
   TMatrixD temp1(5, 2);
@@ -96,6 +98,10 @@ void KalmanTrack::update_covariance(KalmanSite *a_site) {
   temp2 = TMatrixD(temp1, TMatrixD::kMult, _H);
   TMatrixD Cp(5, 5);
   Cp = TMatrixD(C_inv, TMatrixD::kPlus, temp2);
+  std::cout << "Cp invertion" << std::endl;
+  _H.Print();
+  _G.Print();
+  Cp.Print();
   Cp.Invert();
   a_site->set_covariance_matrix(Cp);
   // assert(site.state() == "filtered");
@@ -106,6 +112,7 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
   /////////////////////////////////////////////////////////////////////
   // PULL = m - ha
   //
+  std::cout << "pull" << std::endl;
   TMatrixD m(2, 1);
   m = a_site->get_measurement();
 
@@ -125,6 +132,7 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
   //
   // Kalman Gain: K = Cp Ht G
   //
+  std::cout << "Kalman gain" << std::endl;
   TMatrixD C(5, 5);
   C = a_site->get_covariance_matrix();
   TMatrixD temp3(5, 2);
@@ -132,14 +140,14 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
   TMatrixD K(5, 2);
   K = TMatrixD(temp3, TMatrixD::kMult, _G);
   //////////////////////////////////////////////////////////////////////
-
+  std::cout << "final" << std::endl;
   // ap = a + K*pull;
   TMatrixD temp4(5, 1);
   temp4 = TMatrixD(K, TMatrixD::kMult, pull);
   TMatrixD a_filt(5, 1);
   a_filt = TMatrixD(a, TMatrixD::kPlus, temp4);
   a_site->set_a(a_filt);
-
+/*
   //////////////////////////////////////////////////////////////////////////
   std::cout <<  "******************* STATE VECTOR *******************" << std::endl;
   std::cout << "predicted: ";
@@ -163,7 +171,7 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
   pull.Print();
   std::cout << "K: ";
   K.Print();
-
+*/
 }
 
 //

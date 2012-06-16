@@ -40,19 +40,20 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   // Find dz.
   double new_z = new_site->get_z();
   double old_z = old_site->get_z();
-  double deltaZ = new_z;
+  double deltaZ = new_z-old_z;
 
+  // Find drho.
   TMatrixD prev_site(5, 1);
   prev_site = old_site->get_a();
   double old_site_x   = prev_site(0, 0);
   double old_site_y   = prev_site(1, 0);
-  double old_site_tan_lambda = prev_site(2, 0);
-  double old_site_phi  = prev_site(3, 0);
+  double old_site_phi  = prev_site(2, 0);
+  double old_site_tan_lambda = prev_site(3, 0);
   double old_site_kappa = prev_site(4, 0);
 
   // Find d_rho.
-  double circle_x = _x0+_r*cos(old_site_phi*PI/180.);
-  double circle_y = _y0+_r*sin(old_site_phi*PI/180.);
+  double circle_x = _x0+_r*cos(old_site_phi);
+  double circle_y = _y0+_r*sin(old_site_phi);
   double d_rho = pow(pow(old_site_x-circle_x, 2) +
                      pow(old_site_y-circle_y, 2), 0.5);
 
@@ -60,8 +61,8 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
 
   // double new_phi = - old_site_kappa * deltaZ/(_alpha * old_site_tan_lambda);
   double delta_phi = old_site_kappa*deltaZ/(ALPHA * old_site_tan_lambda);
-  double new_phi_degrees = (old_site_phi+delta_phi)*PI/180.;
-  double old_phi_degrees = old_site_phi*PI/180.;
+  double new_phi_degrees = (old_site_phi+delta_phi);
+  double old_phi_degrees = old_site_phi;
   // Build _F.
   _F(0, 0) = 1.0;
   _F(1, 0) = 0.0;

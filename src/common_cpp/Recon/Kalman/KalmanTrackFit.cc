@@ -29,8 +29,14 @@ KalmanTrackFit::~KalmanTrackFit() {
 }
 
 bool sort_by_id(SciFiCluster *a, SciFiCluster *b ) {
+  int tracker = a->get_tracker();
+  if ( tracker == 0 ) {
+  //  Descending station number.
+  return ( a->get_id() > b->get_id() );
+  } else if ( tracker == 1 ) {
   //  Ascending station number.
   return ( a->get_id() < b->get_id() );
+  }
 }
 //
 // Helical track fit.
@@ -95,6 +101,8 @@ void KalmanTrackFit::initialise_helix(std::vector<SciFiSpacePoint> &spacepoints,
   a(3, 0) = tan_lambda;
   a(4, 0) = kappa;
   first_plane.set_projected_a(a);
+  std::cout << "Seed state: " << std::endl;
+  a.Print();
   // first_plane.set_state_vector(x, y, tan_lambda, phi_0, kappa);
   TMatrixD C(5, 5);
   C(0, 0) = 70;
