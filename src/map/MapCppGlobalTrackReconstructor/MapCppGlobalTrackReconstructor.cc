@@ -388,13 +388,15 @@ void MapCppGlobalTrackReconstructor::LoadRandomData() {
       position[2] += last_point.z();
     }
 
-    TrackPoint track_point(0.0, 0.0,
-                           position[0], momentum[0]/100.0,
+    TrackPoint track_point(position[0], momentum[0]/100.0,
                            position[1], momentum[1]/100.0,
                            position[2], momentum[2],
-                           detector);
-    track_point.FillInTemporalCoordinates(mass);
-    events.push_back(track_point);
+                           detector,
+                           PhaseSpaceVector::PhaseSpaceType::kPositional);
+    TrackPoint temporal_track_point(
+        track_point, mass,
+        PhaseSpaceVector::PhaseSpaceType::kPositional);
+    events.push_back(temporal_track_point);
   }
 
 
