@@ -1,7 +1,24 @@
-#ifndef MAP_BASE_H
-#define MAP_BASE_H
-#include "IMap.hh"
-#include "ModuleBase.hh"
+/* This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
+ *
+ * MAUS is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MAUS is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+#ifndef _MAUS_API_MAP_BASE_H
+#define _MAUS_API_MAP_BASE_H
+#include <string>
+#include "API/IMap.hh"
+#include "API/ModuleBase.hh"
 #include "API/APIExceptions.hh"
 #include "Interface/Squeal.hh"
 #include "Utils/CppErrorHandler.hh"
@@ -12,83 +29,87 @@ namespace MAUS {
 
   template <typename INPUT, typename OUTPUT>
   class MapBase : public virtual IMap<INPUT, OUTPUT>, public ModuleBase {
-    
+
   public:
     explicit MapBase(const std::string&);
     MapBase(const MapBase&);
     virtual ~MapBase();
-    
+
   public:
-    OUTPUT* process(INPUT*) const;
-    template <typename OTHER> OUTPUT* process(OTHER*) const;
+    OUTPUT* process(INPUT* i) const;
+    template <typename OTHER> OUTPUT* process(OTHER* o) const;
 
   private:
-    virtual OUTPUT* _process(INPUT*) const = 0;
+    virtual OUTPUT* _process(INPUT* i) const = 0;
   };
   template <typename OUTPUT>
   class MapBase<Json::Value, OUTPUT> : public virtual IMap<Json::Value, OUTPUT>, public ModuleBase {
-    
+
   public:
     explicit MapBase(const std::string&);
     MapBase(const MapBase&);
     virtual ~MapBase();
-    
+
   public:
     OUTPUT* process(Json::Value*) const;
-    template <typename OTHER> OUTPUT* process(OTHER*) const;
-    
+    template <typename OTHER> OUTPUT* process(OTHER* o) const;
+
   private:
     virtual OUTPUT* _process(Json::Value*) const = 0;
   };
-  
+
 
   template <typename INPUT, typename OUTPUT>
-  MapBase<INPUT, OUTPUT>::MapBase(const std::string& s) : IMap<INPUT, OUTPUT>(), ModuleBase(s) {}
+  MapBase<INPUT, OUTPUT>::MapBase(const std::string& s) :
+    IMap<INPUT, OUTPUT>(), ModuleBase(s) {}
   template <typename OUTPUT>
-  MapBase<Json::Value, OUTPUT>::MapBase(const std::string& s) : IMap<Json::Value, OUTPUT>(), ModuleBase(s) {}
-  
+  MapBase<Json::Value, OUTPUT>::MapBase(const std::string& s) :
+    IMap<Json::Value, OUTPUT>(), ModuleBase(s) {}
+
   template <typename INPUT, typename OUTPUT>
-  MapBase<INPUT, OUTPUT>::MapBase(const MapBase& mb) : IMap<INPUT, OUTPUT>(), ModuleBase(mb._classname)  {}
+  MapBase<INPUT, OUTPUT>::MapBase(const MapBase& mb) :
+    IMap<INPUT, OUTPUT>(), ModuleBase(mb._classname) {}
   template <typename OUTPUT>
-  MapBase<Json::Value, OUTPUT>::MapBase(const MapBase& mb) : IMap<Json::Value, OUTPUT>(), ModuleBase(mb._classname)  {}
-  
+  MapBase<Json::Value, OUTPUT>::MapBase(const MapBase& mb) :
+    IMap<Json::Value, OUTPUT>(), ModuleBase(mb._classname) {}
+
   template <typename INPUT, typename OUTPUT>
   MapBase<INPUT, OUTPUT>::~MapBase() {}
   template <typename OUTPUT>
   MapBase<Json::Value, OUTPUT>::~MapBase() {}
-  
+
   template<typename INPUT, typename OUTPUT>
   OUTPUT* MapBase<INPUT, OUTPUT>::process(INPUT* i) const {
-    if(!i){ throw NullInputException(_classname); }
+    if (!i) { throw NullInputException(_classname); }
     OUTPUT* o = 0;
     try {
       o =  _process(i);
     }
-    catch (Squeal& s) {
+    catch(Squeal& s) {
       CppErrorHandler::getInstance()->HandleSquealNoJson(s, _classname);
     }
-    catch (std::exception& e) {
+    catch(std::exception& e) {
       CppErrorHandler::getInstance()->HandleStdExcNoJson(e, _classname);
     }
-    catch (...){
+    catch(...) {
       throw UnhandledException(_classname);
     }
     return o;
   }
   template<typename OUTPUT>
   OUTPUT* MapBase<Json::Value, OUTPUT>::process(Json::Value* i) const {
-    if(!i){ throw NullInputException(_classname); }
+    if (!i) { throw NullInputException(_classname); }
     OUTPUT* o = 0;
     try {
       o = _process(i);
     }
-    catch (Squeal& s) {
+    catch(Squeal& s) {
       CppErrorHandler::getInstance()->HandleSqueal(*i, s, _classname);
     }
-    catch (std::exception& e) {
+    catch(std::exception& e) {
       CppErrorHandler::getInstance()->HandleStdExc(*i, e, _classname);
     }
-    catch (...){
+    catch(...) {
       throw UnhandledException(_classname);
     }
     return o;
@@ -97,22 +118,22 @@ namespace MAUS {
   template<typename INPUT, typename OUTPUT>
   template<typename OTHER>
   OUTPUT* MapBase<INPUT, OUTPUT>::process(OTHER* o) const {
-    
+
     ConverterFactory c;
     INPUT* tmp = 0;
     OUTPUT* ret = 0;
-    try{
-      tmp = c.convert<OTHER,INPUT>(o);
-      ret =  process( tmp );
+    try {
+      tmp = c.convert<OTHER, INPUT>(o);
+      ret =  process(tmp);
     }
-    catch (std::exception& e) {
-      if(tmp) { delete tmp; }
+    catch(std::exception& e) {
+      if (tmp) { delete tmp; }
       CppErrorHandler::getInstance()->HandleStdExcNoJson(e, _classname);
       return ret;
     }
-    
-    if((void*)tmp != (void*)o  && 
-       (void*)tmp != (void*)ret){ // catch the pass through case
+
+    if (reinterpret_cast<void*>(tmp) != reinterpret_cast<void*>(o)  &&
+	reinterpret_cast<void*>(tmp) != reinterpret_cast<void*>(ret)   ) { // catch the pass through case
       delete tmp;
     }
     return ret;
@@ -120,27 +141,27 @@ namespace MAUS {
   template<typename OUTPUT>
   template<typename OTHER>
   OUTPUT* MapBase<Json::Value, OUTPUT>::process(OTHER* o) const {
-    
+
     ConverterFactory c;
     Json::Value* tmp;
     OUTPUT* ret;
-    try{
-      tmp = c.convert<OTHER,Json::Value>(o);
-      ret =  process( tmp );
+    try {
+      tmp = c.convert<OTHER, Json::Value>(o);
+      ret =  process(tmp);
     }
-    catch (std::exception& e) {
-      if(tmp) { delete tmp; }
+    catch(std::exception& e) {
+      if (tmp) { delete tmp; }
       CppErrorHandler::getInstance()->HandleStdExcNoJson(e, _classname);
       return ret;
     }
-    
-    if((void*)tmp != (void*)o  && 
-       (void*)tmp != (void*)ret){ // catch the pass through case
+
+    if (reinterpret_cast<void*>(tmp) != reinterpret_cast<void*>(o)  &&
+	reinterpret_cast<void*>(tmp) != reinterpret_cast<void*>(ret)   ) { // catch the pass through case
       delete tmp;
     }
     return ret;
   }
- 
-}//end of namespace
+
+}// end of namespace
 #endif
 

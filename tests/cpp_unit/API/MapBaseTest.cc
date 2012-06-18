@@ -1,103 +1,119 @@
+/* This file is part of MAUS: http://micewww.pp.rl.ac.uk/projects/maus
+ *
+ * MAUS is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MAUS is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+#include <fstream>
 #include "gtest/gtest.h"
 #include "gtest/gtest_prod.h"
-#include "src/common_cpp/API/MapBase.hh"
-#include "src/common_cpp/DataStructure/Spill.hh"
+#include "API/MapBase.hh"
+#include "DataStructure/Spill.hh"
 #include "json/json.h"
-#include <fstream>
-//#include "Interface/Squeal.hh"
+// #include "Interface/Squeal.hh"
 // #include "API/APIExceptions.hh"
 
 namespace MAUS {
 
 
-  class MyMapper: public MapBase<double, int>{
+  class MyMapper : public MapBase<double, int> {
   public:
-    MyMapper():MapBase<double,int>("TestClass"){}
-    MyMapper(const MyMapper& mm) : MapBase<double,int>(mm){}
-    virtual ~MyMapper(){}
-    
+    MyMapper() : MapBase<double, int>("TestClass") {}
+    MyMapper(const MyMapper& mm) : MapBase<double, int>(mm) {}
+    virtual ~MyMapper() {}
+
   private:
-    virtual void _birth(const std::string&){}
-    virtual void _death(){}
-    
-    virtual int* _process(double* t) const{
+    virtual void _birth(const std::string&) {}
+    virtual void _death() {}
+
+    virtual int* _process(double* t) const {
       return new int(*t);
     }
-    
+
   private:
     FRIEND_TEST(MapBaseTest, TestConstructor);
-    FRIEND_TEST(MapBaseTest, TestCopyConstructor);  
+    FRIEND_TEST(MapBaseTest, TestCopyConstructor);
   };
-  
-  class MyMapper_squeal: public MyMapper{
+
+  class MyMapper_squeal : public MyMapper {
   public:
-    MyMapper_squeal():MyMapper(){}
-    
+    MyMapper_squeal() : MyMapper() {}
+
   private:
-    virtual int* _process(double* t) const{
+    virtual int* _process(double* t) const {
       throw Squeal(Squeal::recoverable,
 		   "Expected Test Squeal in _process",
 		   "int* _process(double* t) const");
     }
   };
-  
-  class MyMapper_exception: public MyMapper{
+
+  class MyMapper_exception : public MyMapper {
   public:
-    MyMapper_exception():MyMapper(){}
-    
+    MyMapper_exception() : MyMapper() {}
+
   private:
-    virtual int* _process(double* t) const{
+    virtual int* _process(double* t) const {
       throw std::exception();
     }
   };
-  
-  class MyMapper_otherexcept: public MyMapper{
+
+  class MyMapper_otherexcept : public MyMapper {
   public:
-    MyMapper_otherexcept():MyMapper(){}
-    
+    MyMapper_otherexcept() : MyMapper() {}
+
   private:
-    virtual int* _process(double* t) const{throw 17;}
+    virtual int* _process(double* t) const {throw 17;}
   };
 
-  class MyMapper_converter: public MapBase<Spill, int>{
+  class MyMapper_converter : public MapBase<Spill, int> {
   public:
-    MyMapper_converter():MapBase<Spill,int>("TestClass"){}
-    MyMapper_converter(const MyMapper_converter& mm) : MapBase<Spill,int>(mm){}
-    virtual ~MyMapper_converter(){}
-    
+    MyMapper_converter() : MapBase<Spill, int>("TestClass") {}
+    MyMapper_converter(const MyMapper_converter& mm) : MapBase<Spill, int>(mm) {}
+    virtual ~MyMapper_converter() {}
+
   private:
-    virtual void _birth(const std::string&){}
-    virtual void _death(){}
-    
-    virtual int* _process(Spill* t) const{
+    virtual void _birth(const std::string&) {}
+    virtual void _death() {}
+
+    virtual int* _process(Spill* t) const {
       return 0;
     }
   };
-  
+
 
   TEST(MapBaseTest, TestConstructor) {
     MyMapper m;
-    
-    ASSERT_FALSE(strcmp("TestClass",m._classname.c_str()))
+
+    ASSERT_FALSE(strcmp("TestClass", m._classname.c_str()))
       << "Fail: Constructor failed, Classname not set properly"
       << std::endl;
   }
-  
+
   TEST(MapBaseTest, TestCopyConstructor) {
     MyMapper tc1;
     MyMapper tc2(tc1);
 
-    ASSERT_FALSE(strcmp("TestClass",tc2._classname.c_str()))
+    ASSERT_FALSE(strcmp("TestClass", tc2._classname.c_str()))
       << "Fail: Copy Constructor failed, Classname not set properly"
       << std::endl;
   }
-  
+
   TEST(MapBaseTest, TestBirth) {
     MyMapper tc1;
-    try{
+    try {
       tc1.birth("TestConfig");
     }
-    catch(...){
+    catch(...) {
       ASSERT_TRUE(false)
 	<<"Fail: Birth function failed. Check ModuleBaseTest"
 	<< std::endl;
@@ -106,10 +122,10 @@ namespace MAUS {
 
   TEST(MapBaseTest, TestDeath) {
     MyMapper tc1;
-    try{
+    try {
       tc1.death();
     }
-    catch(...){
+    catch(...) {
       ASSERT_TRUE(false)
 	<<"Fail: Death function failed. Check ModuleBaseTest"
 	<< std::endl;
@@ -118,75 +134,77 @@ namespace MAUS {
 
   TEST(MapBaseTest, TestSameTypeProcess) {
     MyMapper mm;
-    
+
     double* d = new double(27.3445);
 
-    int* i = mm.process(d); 
-    
-    ASSERT_TRUE(*i==27)
+    int* i = mm.process(d);
+
+    ASSERT_TRUE(*i == 27)
       <<"Fail: _process method not called properly"
       <<std::endl;
-    
+
     /////////////////////////////////////////////////////
     MyMapper mm2;
-    try{
+    try {
       double* dub = 0;
       mm2.process(dub);
       ASSERT_TRUE(false)
 	<< "Fail: No exception thrown"
 	<< std::endl;
     }
-    catch(NullInputException& e){}
-    catch(...){
+    catch(NullInputException& e) {}
+    catch(...) {
       ASSERT_TRUE(false)
 	<< "Fail: Expected exception of type NullInputException to be thrown"
-	<< std::endl;      
+	<< std::endl;
     }
     /////////////////////////////////////////////////////
     MyMapper_squeal mm_s;
-    try{
+    try {
       mm_s.process(d);
     }
-    catch(...){
+    catch(...) {
       ASSERT_TRUE(false)
 	<< "Fail: Squeal should have been handled"
 	<< std::endl;
     }
-    
+
     /////////////////////////////////////////////////////
     MyMapper_exception mm_e;
-    try{
+    try {
       mm_e.process(d);
     }
-    catch(...){
+    catch(...) {
       ASSERT_TRUE(false)
 	<< "Fail: Exception should have been handled"
-	<< std::endl;     
-   }
+	<< std::endl;
+    }
 
     /////////////////////////////////////////////////////
     MyMapper_otherexcept mm_oe;
-    try{
+    try {
       mm_oe.process(d);
       ASSERT_TRUE(false)
 	<< "Fail: No exception thrown"
 	<< std::endl;
     }
-    catch(UnhandledException& e){}
-    catch(...){
+    catch(UnhandledException& e) {}
+    catch(...) {
       ASSERT_TRUE(false)
 	<< "Fail: Expected exception of type UnhandledException to be thrown"
-	<< std::endl;      
+	<< std::endl;
     }
 
     delete d;
     delete i;
   }
+
   TEST(MapBaseTest, TestOtherTypeProcess) {
     Json::Value *jv = new Json::Value();
     Json::Reader r;
-    std::ifstream f("/home/hep/arichard/tmp/pythontest/new/data/tmp.json",std::ios::in/*|std::ios::beg*/);
-    bool b = r.parse(f,*jv);
+    std::ifstream f("/home/hep/arichard/tmp/pythontest/new/data/tmp.json",
+		    std::ios::in/*|std::ios::beg*/);
+    bool b = r.parse(f, *jv);
     MyMapper_converter mm_c;
     mm_c.process(jv);
     delete jv;
@@ -200,5 +218,4 @@ namespace MAUS {
 //       << std::endl;
 //   }
 
-
-}//end of namespace
+}// end of namespace

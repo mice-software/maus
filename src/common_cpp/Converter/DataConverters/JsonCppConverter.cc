@@ -15,7 +15,7 @@
  *
  */
 
-//#include "src/common_cpp/JsonCppStreamer/JsonCppConverter.hh"
+// #include "src/common_cpp/JsonCppStreamer/JsonCppConverter.hh"
 #include "src/common_cpp/Converter/DataConverters/JsonCppConverter.hh"
 
 #include "src/common_cpp/DataStructure/Spill.hh"
@@ -23,7 +23,7 @@
 
 namespace MAUS {
 
-Spill* JsonCppConverter::_convert(const Json::Value* data) const{
+Spill* JsonCppConverter::_convert(const Json::Value* data) const {
   return SpillProcessor().JsonToCpp(*data);
 }
 

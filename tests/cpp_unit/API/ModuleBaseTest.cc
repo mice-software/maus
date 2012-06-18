@@ -19,18 +19,18 @@
 #include "gtest/gtest_prod.h"
 
 #include "API/APIExceptions.hh"
-#include "src/common_cpp/API/ModuleBase.hh"
+#include "API/ModuleBase.hh"
 #include "Interface/Squeal.hh"
 
 namespace MAUS {
 
-  class testclass : public ModuleBase{
+  class testclass : public ModuleBase {
   public:
-    testclass(): ModuleBase("TestClass"),run_birth(false),run_death(false){}
-    testclass(const testclass& tc): ModuleBase(tc),run_birth(false),run_death(false){}
+    testclass(): ModuleBase("TestClass"), run_birth(false), run_death(false) {}
+    testclass(const testclass& tc): ModuleBase(tc), run_birth(false), run_death(false) {}
   private:
-    virtual void _birth (const std::string&){run_birth = true;}
-    virtual void _death (){run_death = true;}
+    virtual void _birth(const std::string&) {run_birth = true;}
+    virtual void _death() {run_death = true;}
     bool run_birth;
     bool run_death;
 
@@ -41,16 +41,16 @@ namespace MAUS {
     FRIEND_TEST(ModuleBaseTest, TestDeath);
   };
 
-  class testclass_squeal : public ModuleBase{
+  class testclass_squeal : public ModuleBase {
   public:
-    testclass_squeal(): ModuleBase("TestClass"){}
+    testclass_squeal(): ModuleBase("TestClass") {}
   private:
-    virtual void _birth (const std::string&){
+    virtual void _birth(const std::string&) {
       throw Squeal(Squeal::recoverable,
 		   "Expected Test Squeal in _birth",
 		   "void _birth (const std::string&)");
     }
-    virtual void _death (){
+    virtual void _death() {
       throw Squeal(Squeal::recoverable,
 		   "Expected Test Squeal in _death",
 		   "void _death ()");
@@ -59,60 +59,56 @@ namespace MAUS {
   private:
     FRIEND_TEST(ModuleBaseTest, TestBirth);
     FRIEND_TEST(ModuleBaseTest, TestDeath);
-
   };
 
-  class testclass_exception : public ModuleBase{
+  class testclass_exception : public ModuleBase {
   public:
-    testclass_exception(): ModuleBase("TestClass"){}
+    testclass_exception(): ModuleBase("TestClass") {}
   private:
-    virtual void _birth (const std::string&){
+    virtual void _birth(const std::string&) {
       throw std::exception();
     }
-    virtual void _death (){
+    virtual void _death() {
       throw std::exception();
     }
 
   private:
     FRIEND_TEST(ModuleBaseTest, TestBirth);
     FRIEND_TEST(ModuleBaseTest, TestDeath);
-
   };
 
-  class testclass_otherexcept : public ModuleBase{
+  class testclass_otherexcept : public ModuleBase {
   public:
-    testclass_otherexcept(): ModuleBase("TestClass"){}
+    testclass_otherexcept(): ModuleBase("TestClass") {}
   private:
-    virtual void _birth (const std::string&){ throw 17;}
-    virtual void _death (){throw 17;}
+    virtual void _birth(const std::string&) { throw 17;}
+    virtual void _death() {throw 17;}
 
   private:
     FRIEND_TEST(ModuleBaseTest, TestBirth);
     FRIEND_TEST(ModuleBaseTest, TestDeath);
-
   };
-
 
   TEST(ModuleBaseTest, TestConstructor) {
     testclass tc;
-    
-    ASSERT_FALSE(strcmp("TestClass",tc._classname.c_str()))
+
+    ASSERT_FALSE(strcmp("TestClass", tc._classname.c_str()))
       << "Fail: Constructor failed, Classname not set properly"
       << std::endl;
   }
-  
+
   TEST(ModuleBaseTest, TestCopyConstructor) {
     testclass tc1;
     testclass tc2(tc1);
 
-    ASSERT_FALSE(strcmp("TestClass",tc2._classname.c_str()))
+    ASSERT_FALSE(strcmp("TestClass", tc2._classname.c_str()))
       << "Fail: Copy Constructor failed, Classname not set properly"
       << std::endl;
   }
-  
+
   TEST(ModuleBaseTest, TestBirth) {
     testclass tc;
-    
+
     ASSERT_FALSE(tc.run_birth)
       << "Fail: Didn't set up the run_birth flag properly"
       << std::endl;
@@ -124,10 +120,10 @@ namespace MAUS {
       << std::endl;
     /////////////////////////////////////////////////////
     testclass_squeal tc_s;
-    try{
+    try {
       tc_s.birth("TestConfig");
     }
-    catch(...){
+    catch(...) {
       ASSERT_TRUE(false)
 	<< "Fail: Squeal should have been handled"
 	<< std::endl;
@@ -135,34 +131,34 @@ namespace MAUS {
 
     /////////////////////////////////////////////////////
     testclass_exception tc_e;
-    try{
+    try {
       tc_e.birth("TestConfig");
     }
-    catch(...){
+    catch(...) {
       ASSERT_TRUE(false)
 	<< "Fail: Exception should have been handled"
-	<< std::endl;     
+	<< std::endl;
     }
 
     /////////////////////////////////////////////////////
     testclass_otherexcept tc_oe;
-    try{
+    try {
       tc_oe.birth("TestConfig");
       ASSERT_TRUE(false)
 	<< "Fail: No exception thrown"
 	<< std::endl;
     }
-    catch(UnhandledException& e){}
-    catch(...){
+    catch(UnhandledException& e) {}
+    catch(...) {
       ASSERT_TRUE(false)
 	<< "Fail: Expected exception of type UnhandledException to be thrown"
-	<< std::endl;      
+	<< std::endl;
     }
   }
 
   TEST(ModuleBaseTest, TestDeath) {
     testclass tc;
-    
+
     ASSERT_FALSE(tc.run_death)
       << "Fail: Didn't set up the run_birth flag properly"
       << std::endl;
@@ -175,10 +171,10 @@ namespace MAUS {
 
     /////////////////////////////////////////////////////
     testclass_squeal tc_s;
-    try{
+    try {
       tc_s.death();
     }
-    catch(...){
+    catch(...) {
       ASSERT_TRUE(false)
 	<< "Fail: Squeal should have been handled"
 	<< std::endl;
@@ -186,29 +182,29 @@ namespace MAUS {
 
     /////////////////////////////////////////////////////
     testclass_exception tc_e;
-    try{
+    try {
       tc_e.death();
     }
-    catch(...){
+    catch(...) {
       ASSERT_TRUE(false)
 	<< "Fail: Exception should have been handled"
-	<< std::endl;     
+	<< std::endl;
     }
 
     /////////////////////////////////////////////////////
     testclass_otherexcept tc_oe;
-    try{
+    try {
       tc_oe.death();
       ASSERT_TRUE(false)
 	<< "Fail: No exception thrown"
 	<< std::endl;
     }
-    catch(UnhandledException& e){}
-    catch(...){
+    catch(UnhandledException& e) {}
+    catch(...) {
       ASSERT_TRUE(false)
 	<< "Fail: Expected exception of type UnhandledException to be thrown"
-	<< std::endl;      
+	<< std::endl;
     }
   }
 
-}//end of namespace
+}// end of namespace
