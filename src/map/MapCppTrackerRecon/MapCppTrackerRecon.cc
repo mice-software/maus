@@ -94,7 +94,7 @@ std::string MapCppTrackerRecon::process(std::string document) {
       // }
 
       print_event_info(event);
-      save_to_json(event, k);
+      // save_to_json(event, k);
     }  // ==========================================================
   } catch(...) {
     Json::Value errors;
