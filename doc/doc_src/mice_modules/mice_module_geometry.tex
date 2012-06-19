@@ -662,40 +662,36 @@ The Optics application can be used to track a trajectory and associated beam env
 Optics works by finding the Jacobian around some arbitrary trajectory using a numerical differentiation. This is used
 to define a linear mapping about this trajectory, which can then be used to transport the beam envelope.
 
-The Simulation application can be used to generate a random particle beam with a Gaussian distribution and RMS
-parameters defined in the same way as the Optics beam envelope. Alternatively, pencil beams and beams from some input
-file can also be defined here.
-
 A beam envelope is defined by a reference trajectory and a beam ellipse. The reference trajectory takes its position and
-direction from the position and rotation of the module. No rotation builds a reference trajectory along the z-axis. The
-magnitude of the momentum and the initial time of the reference trajectory is defined by properties. RF cavities are
-phased using the reference trajectory defined here.
+direction from the position and rotation of the module. If no rotation is defined the reference trajectory is taken along
+the z-axis. The magnitude of the momentum and the initial time of the reference trajectory is defined by properties. RF
+cavities are phased using the reference trajectory defined here.
 
 The beam ellipse is represented by a matrix, which can either be set using 
 
-\liststyleLxii
 \begin{itemize}
-\item Twiss-style parameters in (x,px),(y,py) and (t,E) spaces.
-\item Twiss-style parameters in (t,E) space and Penn-style parameters in a cylindrically symmetric (x,px,y,py) space.
-\item A 6x6 beam ellipse matrix where the ellipse equation is given by \textbf{X}.\textbf{T}() \textbf{M} \textbf{X} =
-1.
+\item Twiss-style parameters in $(x,px)$, $(y,py)$ and $(t,E)$ spaces.
+\item Twiss-style parameters in $(t,E)$ space and Penn-style parameters in a cylindrically symmetric $(x,px,y,py)$ space.
+\item A 6x6 beam ellipse matrix where the ellipse equation is given by $\mathbf{X}.\mathbf{T}() \mathbf{M} \mathbf{X} =
+1$.
 \end{itemize}
 The Penn ellipse matrix is given by
 
 \begin{equation*}
-M=\left(\begin{matrix}\epsilon _Lmc\frac{\beta _L}{p}&-\epsilon _Lmc\alpha _L&0&0&0&0\\&\epsilon _Lmc\gamma
-_Lp&\frac{D_x}{E}V(E)&\frac{D_x'}{E}V(E)&\frac{D_y}{E}V(E)&\frac{D_y'}{E}V(E)\\&&\epsilon _Tmc\frac{\beta _T}{p}&-\epsilon
-_Tmc\alpha _T&0&-\epsilon _Tmc(\frac{q}{2}\beta _T\frac{B_z}{P}-L)\\&&&\epsilon _Tmc\gamma _Tp&\epsilon _Tmc(\frac{q}{
+M=\left(\begin{matrix}\epsilon_Lmc\frac{\beta_L}{p}&-\epsilon_Lmc\alpha _L&0&0&0&0\\
+       &\epsilon_Lmc\gamma_Lp&\frac{D_x}{E}V(E)&\frac{D_x'}{E}V(E)&\frac{D_y}{E}V(E)&\frac{D_y'}{E}V(E)\\
+       &&\epsilon _Tmc\frac{\beta _T}{p}&-\epsilon_Tmc\alpha_T&0&-\epsilon _Tmc(\frac{q}{2}\beta _T\frac{B_z}{P}-L)\\
+      &&&\epsilon _Tmc\gamma _Tp&\epsilon _Tmc(\frac{q}{
 2}\beta _T\frac{B_z}{P}-L)&0\\&&&&\epsilon _Tmc\frac{\beta _T}{p}&-\epsilon _Tmc\alpha _T\\&&&&&\epsilon _Lmc\gamma
 _Tp\end{matrix}\right)
 \end{equation*}
-Here L is a normalised canonical angular momentum, \textit{q} is the reference particle charge,
-\textit{B}\textit{\textsubscript{z}} is the nominal on-axis magnetic field, \textit{p} is the reference momentum,
-\textit{m} is the reference mass, e\textsubscript{T} is the transverse emittance, b\textsubscript{T} and
-a\textsubscript{T} are the transverse Twiss-like functions, e\textsubscript{L} is the longitudinal emittance and
-b\textsubscript{L} and a\textsubscript{L} are the longitudinal Twiss-like functions. Additionally D\textsubscript{x},
-D\textsubscript{y}, D'\textsubscript{x}, D'\textsubscript{y} are the dispersions and their derivatives with respect to
-z and V(E) is the variance of energy (given by the (2,2) term in the matrix above).
+Here $L$ is a normalised canonical angular momentum, $q$ is the reference particle charge,
+$B_{z}$ is the nominal on-axis magnetic field, $p$ is the reference momentum,
+$m$ is the reference mass, $\epsilon_T$ is the transverse emittance, $\beta_T$ and
+$\alpha_{T}$ are the transverse Twiss-like functions, $\epsilon_{L}$ is the longitudinal emittance and
+$\beta_{L}$ and $\alpha_{L}$ are the longitudinal Twiss-like functions. Additionally $D_{x}$,
+$D_{y}$, $D'_{x}$ and $D'_{y}$ are the dispersions and their derivatives with respect to
+$z$ and $V(E)$ is the variance of energy (given by the $(2,2)$ term in the matrix above).
 
 The Twiss ellipse matrix is given by
 
@@ -989,7 +985,8 @@ If required, set to the minimum value that the parameter can hold.\\\hline
 Parameter1\_Max &
 double &
 If required, set to the maximum value that the parameter can hold.\\\hline
-\multicolumn{2}{m{4.721cm}}{\hspace*{-\tabcolsep}\begin{tabular}{|m{3.319cm}|m{1.2019999cm}}
+
+\multicolumn{2}{m{4.721cm}}{\hspace*{-\tabcolsep}\begin{tabular}{|m{3.319cm}|m{1.2019999cm}|}
 
 Parameter2\_Start &
 ...\\\hline
@@ -1005,13 +1002,8 @@ Score2 &
 ...\\\hline
 \end{tabular}\hspace*{-\tabcolsep}
 } &
-\multicolumn{1}{m{11.974cm}}{\hspace*{-\tabcolsep}\begin{tabular}{|m{11.974cm}|}
-
 Define an arbitrary number of parameters. Parameters must be numbered consecutively, and each parameter must have at
-least the start value and name defined.\\\hline
-The optimiser will attempt to optimise against a score that is calculated by summing the Score1, Score2,... parameters
+least the start value and name defined. The optimiser will attempt to optimise against a score that is calculated by summing the Score1, Score2,... parameters
 on each iteration.\\\hline
-\end{tabular}\hspace*{-\tabcolsep}
-}\\
 \end{supertabular}
 \end{center}
