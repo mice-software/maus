@@ -105,7 +105,7 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   _F(4, 4) = 1.0;
   // for ( int i = 0; i < 5; i++ ) {
     // _F(i, i) = 1.;
-  //}
+  // }
 
   // _F(0, 3) = -d_rho*sin(old_site_phi) + (_alpha/old_site_kappa) *
   //           (-sin(old_site_phi) + sin(old_site_phi+new_phi));

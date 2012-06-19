@@ -34,17 +34,14 @@ TEST_F(KalmanTrackTest, test_updateG) {
   a_site->set_measurement(0);
   KalmanTrack *track = new StraightTrack();
   track->update_G(a_site);
-  
 }
 
 TEST_F(KalmanTrackTest, test_propagator) {
-
 }
 
 } // namespace
 
-
-
+/*
 void KalmanTrack::update_G(KalmanSite *a_site) {
   double alpha = (a_site->get_measurement())(0, 0);
   double l = pow(ACTIVE_RADIUS*ACTIVE_RADIUS -
@@ -56,3 +53,4 @@ void KalmanTrack::update_G(KalmanSite *a_site) {
   _G(1, 1) = sig_beta*sig_beta;
   _G.Invert();
 }
+*/
