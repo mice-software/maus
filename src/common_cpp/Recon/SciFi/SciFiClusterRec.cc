@@ -109,15 +109,15 @@ void SciFiClusterRec::construct(SciFiCluster *clust, std::vector<const MiceModul
 
   Hep3Vector reference = get_reference_frame_pos(clust->get_tracker(), modules);
 
-  Hep3Vector tracker_ref_frame_pos = position - reference;
-  /*
+  // Hep3Vector tracker_ref_frame_pos = position - reference;
+
   Hep3Vector tracker_ref_frame_pos;
   if ( clust->get_tracker() == 0 ) {
     tracker_ref_frame_pos = - (position - reference);
   } else {
     tracker_ref_frame_pos = position - reference;
   }
-  */
+
   clust->set_position(tracker_ref_frame_pos);
   clust->set_direction(dir);
   clust->set_relative_position(tracker_ref_frame_pos);
@@ -125,10 +125,12 @@ void SciFiClusterRec::construct(SciFiCluster *clust, std::vector<const MiceModul
   // This is the position of the cluster relatively to station 1 of the tracker (0 or 1)
   // with the displacement of the station centre subtracted.
   // Hep3Vector relative_position = position - this_plane->globalPosition();
-  double channel = clust->get_channel() - CentralFibre;
+  double alpha = clust->get_channel() - CentralFibre;
   // clust->set_relative_position(relative_position);
-
-  clust->set_alpha(channel);
+  if ( tracker == 1 ) {
+    alpha = -alpha;
+  }
+  clust->set_alpha(alpha);
   int id = 15*tracker + 3*(station-1) + (plane);
   clust->set_id(id);
 }
@@ -136,15 +138,11 @@ void SciFiClusterRec::construct(SciFiCluster *clust, std::vector<const MiceModul
 Hep3Vector SciFiClusterRec::get_reference_frame_pos(int tracker,
                                                     std::vector<const MiceModule*> modules) {
   const MiceModule* reference_plane = NULL;
-  int station, plane;
-  if ( tracker == 0 ) {
-    station = 5;
-    plane = 2;
-  }
-  if ( tracker == 1 ) {
-    station = 1;
-    plane = 0;
-  }
+
+  // Reference plane is plane 0, station 1 of current tracker.
+  int station = 1;
+  int plane   = 0;
+
   for ( unsigned int j = 0; !reference_plane && j < modules.size(); j++ ) {
     // Find the right module
     if ( modules[j]->propertyExists("Tracker", "int") &&

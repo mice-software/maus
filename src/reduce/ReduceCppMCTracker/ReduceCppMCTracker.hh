@@ -16,22 +16,21 @@
  */
 
 
-/** @class 
+/** @class
  *
  */
-#ifndef _REDUCECPPPATTERNRECOGNITION_H
-#define _REDUCECPPPATTERNRECOGNITION_H
+#ifndef _REDUCECPPTRACKER_H
+#define _REDUCECPPTRACKER_H
 
 #include <string>
 #include <vector>
 #include <map>
-
 #include "json/json.h"
-
-// Root
 #include "TTree.h"
 #include "TH1I.h"
 #include "TFile.h"
+
+// Root
 #include "TAxis.h"
 #include "TGraph.h"
 #include "TMultiGraph.h"
@@ -44,10 +43,8 @@
 #include "TGFrame.h"
 #include "TVirtualPad.h"
 #include "TFrame.h"
-#include "TF1.h"
-#include "TPaveText.h"
 
-class ReduceCppPatternRecognition {
+class ReduceCppMCTracker {
 
  public:
 
@@ -71,56 +68,52 @@ class ReduceCppPatternRecognition {
   */
   std::string process(std::string document);
 
-  int const get_num_tracks() { return _tracks.GetEntries(); }
-  int const get_num_spoints() { return _spacepoints.GetEntries(); }
 
  private:
 
   std::string _classname;
   std::string _filename;
-
   int _nSpills;
-  // int _number_spacepoints;
-  static const int _trk_lower_bound = 1300;
-  static const int _trk_upper_bound = 0;
-  double tracker2;
 
+  TTree _mctrue;
+  TTree _sci_fi;
+  TTree _virt;
+  TTree _sp;
   TTree _digits;
-  double _npe;
-  int _tracker_dig;
+  TTree _other;
 
-  TTree _spacepoints;
-  TTree _spacepoints_1spill;
-  int _tracker;
-  int _station;
-  int _type;
   double _x;
   double _y;
   double _z;
 
-  TTree _tracks;
-  int _tracker_event;
-  int _num_points;
-  // int _station_hits
-  double _mx;
-  double _my;
-  double _x0;
-  double _y0;
+  double _px;
+  double _py;
+  double _pz;
+  double _pT;
 
-  // Vectors to hold the tracks in each projection in each tracker
-  std::vector<TF1> _trks_zx_trkr0;
-  std::vector<TF1> _trks_zy_trkr0;
-  std::vector<TF1> _trks_zx_trkr1;
-  std::vector<TF1> _trks_zy_trkr1;
+  double _bx;
+  double _by;
+  double _bz;
 
-  void draw_histos(TTree * t1, TCanvas * c1);
-  void draw_graphs(TTree * t1, TCanvas * c1);
-  void draw_tracks(TCanvas * c1);
-  TF1 make_track(double c, double m);
-  void clear_tracks();
+  double _energy;
+  double _de;
+
+  int _tracker;
+  int _station;
+  int _plane;
+  int _type;
+  double _npe;
+  int _part_event;
+
+  double cluster_eff1;
+  double cluster_eff2;
+  double space_eff1;
+  double space_eff2;
 
   void Save();
-  void update_info(TCanvas * c1, TPaveText *pt);
+  bool Trigger(Json::Value path);
+
+  static const bool _STPD = 1;
 };
 
 #endif

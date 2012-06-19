@@ -53,6 +53,12 @@ class KalmanSite {
   /// Returns state vector at the site.
   TMatrixD get_a() const { return _a; }
 
+  /// Assigns PROJECTED state vector at the site.
+  void set_smoothed_a(TMatrixD smoothed_a) { _smoothed_a = smoothed_a; }
+
+  /// Returns PROJECTED state vector at the site.
+  TMatrixD get_smoothed_a() const { return _smoothed_a; }
+
   /// Sets the covariance matrix.
   void set_covariance_matrix(TMatrixD C) { _C = C; }
 
@@ -63,12 +69,13 @@ class KalmanSite {
 
   TMatrixD get_projected_covariance_matrix() const { return _projected_C; }
 
+  void set_smoothed_covariance_matrix(TMatrixD C) { _smoothed_C = C; }
+
+  TMatrixD get_smoothed_covariance_matrix() const { return _smoothed_C; }
+
   void set_measurement(double alpha) { _v(0, 0) = alpha;
                                        _v(1, 0) = 0.0;
                                        _alpha   = alpha; }
-
-  // void set_measurement(TMatrixD m) { _v = m;
-  //                                   _alpha = _v(0, 0); }
 
   TMatrixD get_measurement() const { return _v; }
 
@@ -90,28 +97,46 @@ class KalmanSite {
 
   double get_projected_alpha() const { return _alpha_projected; }
 
-  // void set_alpha(double alpha) { _alpha = alpha; }
+  void set_residual_x(double residual_x) { _residual_x = residual_x; }
 
-  // void set_state(state new_state) { _site_state = new_state; }
+  double get_residual_x() const { return _residual_x; }
 
-  // int get_state() const { return _site_state; }
+  void set_residual_y(double residual_y) { _residual_y = residual_y; }
 
-  void set_residual(double residual) { _residual = residual; }
+  double get_residual_y() const { return _residual_y; }
 
-  double get_residual() const { return _residual; }
+  /////////////////////////////////////
+  void set_true_momentum(Hep3Vector mc_mom) { _mc_mom = mc_mom; }
+
+  Hep3Vector get_true_momentum() const { return _mc_mom; }
+
+  void set_true_position(Hep3Vector mc_pos) { _mc_pos = mc_pos; }
+
+  Hep3Vector get_true_position() const { return _mc_pos; }
+  /////////////////////////////////////
 
  private:
+  Hep3Vector _mc_pos;
+
+  Hep3Vector _mc_mom;
+
   /// The state vector.
   TMatrixD _a;
 
   /// The projected state.
   TMatrixD _projected_a;
 
+  /// The smoothed state.
+  TMatrixD _smoothed_a;
+
   /// The covariance matrix.
   TMatrixD _C;
 
   /// The projected cov matrix.
   TMatrixD _projected_C;
+
+  /// The projected cov matrix.
+  TMatrixD _smoothed_C;
 
   /// The measurement.
   TMatrixD _v;
@@ -123,7 +148,7 @@ class KalmanSite {
   Hep3Vector _direction;
 
   /// The residual at this site. (filtered-meas)
-  double _residual;
+  double _residual_x, _residual_y;
 
   // enum state { INVALID = 0, PROJECTED, FILTERED, SMOOTHED };
 

@@ -244,7 +244,7 @@ int MapCppTrackerMCDigitization::compute_chan_no(SciFiHit *ahit) {
       // save the module corresponding to this plane
       this_plane = modules[j];
   }
-
+  // std::cerr << tracker << " " << station << " " << plane << std::endl;
   assert(this_plane != NULL);
 
   int numberFibres = static_cast<int> (7*2*(this_plane->propertyDouble("CentralFibre")+0.5));
@@ -354,6 +354,7 @@ void MapCppTrackerMCDigitization::save_to_json(SciFiEvent &evt, int event_i) {
     digit["true_momentum"]["x"] = momentum.x();
     digit["true_momentum"]["y"] = momentum.y();
     digit["true_momentum"]["z"] = momentum.z();
+
     if ( tracker == 0 )
       digits_tracker0.append(digit);
     if ( tracker == 1 )

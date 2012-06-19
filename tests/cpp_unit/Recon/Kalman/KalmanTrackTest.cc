@@ -29,20 +29,17 @@ class KalmanTrackTest : public ::testing::Test {
   virtual void TearDown() {}
   KalmanSite *a_site;
 };
-
+/*
 TEST_F(KalmanTrackTest, test_updateG) {
   a_site->set_measurement(0);
   KalmanTrack *track = new StraightTrack();
   track->update_G(a_site);
-  
 }
 
 TEST_F(KalmanTrackTest, test_propagator) {
-
 }
 
 } // namespace
-
 
 
 void KalmanTrack::update_G(KalmanSite *a_site) {
@@ -55,4 +52,6 @@ void KalmanTrack::update_G(KalmanSite *a_site) {
   _G(0, 0) = SIG_ALPHA*SIG_ALPHA;
   _G(1, 1) = sig_beta*sig_beta;
   _G.Invert();
+}
+*/
 }

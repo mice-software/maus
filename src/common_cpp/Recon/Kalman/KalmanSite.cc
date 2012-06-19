@@ -22,7 +22,9 @@ KalmanSite::KalmanSite() {
   _a.ResizeTo(5, 1);
   _v.ResizeTo(2, 1);
   _projected_C.ResizeTo(5, 5);
+  _smoothed_C.ResizeTo(5, 5);
   _projected_a.ResizeTo(5, 1);
+  _smoothed_a.ResizeTo(5, 1);
 }
 
 KalmanSite::~KalmanSite() {}
@@ -32,19 +34,27 @@ KalmanSite::KalmanSite(const KalmanSite &site) {
   _C.ResizeTo(5, 5);
   _v.ResizeTo(2, 1);
   _projected_C.ResizeTo(5, 5);
+  _smoothed_C.ResizeTo(5, 5);
   _projected_a.ResizeTo(5, 1);
+  _smoothed_a.ResizeTo(5, 1);
 
   _a = site.get_a();
   _C = site.get_covariance_matrix();
   _v = site.get_measurement();
   _alpha = _v(0, 0);
   _projected_C = site.get_projected_covariance_matrix();
+  _smoothed_C  = site.get_smoothed_covariance_matrix();
   _projected_a = site.get_projected_a();
+  _smoothed_a  = site.get_smoothed_a();
   _z = site.get_z();
   _id= site.get_id();
   _direction = site.get_direction();
   _alpha_projected = site.get_projected_alpha();
-  _residual = site.get_residual();
+  _residual_x = site.get_residual_x();
+  _residual_y = site.get_residual_y();
+
+  _mc_pos = site.get_true_position();
+  _mc_mom = site.get_true_momentum();
 }
 
 KalmanSite& KalmanSite::operator=(const KalmanSite &site) {
@@ -53,10 +63,16 @@ KalmanSite& KalmanSite::operator=(const KalmanSite &site) {
   _v = site.get_measurement();
   _alpha = _v(0, 0);
   _projected_C = site.get_projected_covariance_matrix();
+  _smoothed_C  = site.get_smoothed_covariance_matrix();
   _projected_a = site.get_projected_a();
+  _smoothed_a  = site.get_smoothed_a();
   _z = site.get_z();
   _id= site.get_id();
   _direction = site.get_direction();
   _alpha_projected = site.get_projected_alpha();
-  _residual = site.get_residual();
+  _residual_x = site.get_residual_x();
+  _residual_y = site.get_residual_y();
+
+  _mc_pos = site.get_true_position();
+  _mc_mom = site.get_true_momentum();
 }

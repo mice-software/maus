@@ -24,22 +24,32 @@ Module Tracker0
   }
   Module Tracker/TrackerStation2.dat
   {
-    Position 0.0 0.0 349.9143 mm
+    Position -0.5709 -0.7375 349.9143 mm
     Rotation 0.0 0.0 0.0 degree
   }
   Module Tracker/TrackerStation3.dat
   {
-    Position 0.0 0.0 100.0513 mm
+    Position -1.2021 -0.1657 100.0513 mm
     Rotation 0.0 0.0 0.0 degree
   }
   Module Tracker/TrackerStation4.dat
   {
-    Position 0.0 0.0 -199.949 mm
+    Position -0.5694 -0.6040 -199.949 mm
     Rotation 0.0 0.0 0.0 degree
   }
   Module Tracker/TrackerStation5.dat
   {
     Position 0.0 0.0 -54.98789 cm
     Rotation 0.0 0.0 0.0 degree
+  }
+  Module Tests/VirtualPlane.dat
+  {
+    Position 0. 0. 55.4 cm
+    Rotation 0. 0. 0. degree
+  }
+  Module Tests/VirtualPlane.dat
+  {
+    Position 0. 0. -55.4 m
+    Rotation 0. 0. 0. degree
   }
 }
