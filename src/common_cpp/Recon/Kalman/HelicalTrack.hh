@@ -48,7 +48,7 @@ class HelicalTrack : public KalmanTrack {
  private:
   double _x0, _y0, _r;
 
-  static const double _alpha = -1.0/(300000000.*4.);
+  static const double ALPHA = -1.0/(300000000.*4.);
 };
 
 #endif

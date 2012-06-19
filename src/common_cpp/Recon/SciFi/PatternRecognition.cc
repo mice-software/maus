@@ -156,7 +156,6 @@ void PatternRecognition::make_5tracks(
                          std::vector<SciFiHelicalPRTrack> &htrks,
                          std::vector< std::vector<int> > &residuals) {
   std::cout << "Making 5 point tracks" << std::endl;
-
   int num_points = 5;
   std::vector<int> ignore_stations; // A zero size vector sets that all stations are used
   if ( _straight_pr_on )
