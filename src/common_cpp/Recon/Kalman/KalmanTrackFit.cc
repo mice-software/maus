@@ -92,7 +92,7 @@ void KalmanTrackFit::initialise_helix(std::vector<SciFiSpacePoint> &spacepoints,
   KalmanSite first_plane;
   double x = x0+r*cos(phi_0*PI/180.);
   double y = y0+r*sin(phi_0*PI/180.);
-  double kappa = 1./230.0;
+  double kappa = 1./pt;
 
   TMatrixD a(5, 1);
   a(0, 0) = x;
@@ -105,11 +105,11 @@ void KalmanTrackFit::initialise_helix(std::vector<SciFiSpacePoint> &spacepoints,
   a.Print();
   // first_plane.set_state_vector(x, y, tan_lambda, phi_0, kappa);
   TMatrixD C(5, 5);
-  C(0, 0) = 70;
-  C(1, 1) = 70;
-  C(2, 2) = 1;
-  C(3, 3) = 1;
-  C(4, 4) = 1;
+  C(0, 0) = 150*150;
+  C(1, 1) = 150*150;
+  C(2, 2) = 4;
+  C(3, 3) = 4;
+  C(4, 4) = 1000;
   // for ( int i = 0; i < 5; ++i ) {
   //   C(i, i) = 200; // dummy values
   // }
@@ -177,13 +177,14 @@ void KalmanTrackFit::initialise(SciFiEvent &event, std::vector<KalmanSite> &site
   double mx = seed.get_mx();
   double my = seed.get_my();
   double p  = 210.0; // MeV/c
-
+/*
   if ( (seed.get_spacepoints())[0].get_tracker() == 0 ) {
     x0 = -x0;
     y0 = -y0;
     mx = -mx;
     my = -my;
   }
+*/
   // this admits there is only one track...
   std::vector<SciFiSpacePoint> spacepoints = seed.get_spacepoints();
   std::vector<SciFiCluster*> clusters;
@@ -199,14 +200,14 @@ void KalmanTrackFit::initialise(SciFiEvent &event, std::vector<KalmanSite> &site
   a(1, 0) = y0;
   a(2, 0) = mx;
   a(3, 0) = my;
-  a(4, 0) = p;
+  a(4, 0) = 1/p;
   first_plane.set_projected_a(a);
 
   TMatrixD C(5, 5);
-  C(0, 0) = 70;
-  C(1, 1) = 70;
-  C(2, 2) = 0.5;
-  C(3, 3) = 0.5;
+  C(0, 0) = 150*150;
+  C(1, 1) = 150*150;
+  C(2, 2) = 4;
+  C(3, 3) = 4;
   C(4, 4) = 1000;
   // for ( int i = 0; i < 5; ++i ) {
   //   C(i, i) = 200; // dummy values
