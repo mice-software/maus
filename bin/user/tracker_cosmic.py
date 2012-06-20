@@ -23,17 +23,15 @@ def run(data_path, run_num):
     my_input = MAUS.InputCppDAQOfflineData(data_path, run_num)
 
     my_map = MAUS.MapPyGroup()
-
     my_map.append(MAUS.MapCppTrackerDigits())
-
     my_map.append(MAUS.MapCppTrackerRecon())  # SciFi recon
 
-    datacards = io.StringIO(u"")
+    # my_reduce = MAUS.ReducePyDoNothing()
+    my_reduce = MAUS.ReduceCppPatternRecognition()
 
     my_output = MAUS.OutputPyJSON()
 
-    my_reduce = MAUS.ReducePyDoNothing()
-    # my_reduce = MAUS.ReduceCppPatternRecognition()
+    datacards = io.StringIO(u"")
 
     MAUS.Go(my_input, my_map, my_reduce, my_output, datacards)
 

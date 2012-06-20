@@ -81,7 +81,7 @@ class ReduceCppPatternRecognition {
 
   int _nSpills;
   // int _number_spacepoints;
-  static const int _trk_lower_bound = -1300;
+  static const int _trk_lower_bound = 1300;
   static const int _trk_upper_bound = 0;
   double tracker2;
 

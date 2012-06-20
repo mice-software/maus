@@ -247,8 +247,11 @@ std::string  ReduceCppPatternRecognition::process(std::string document) {
     draw_graphs(p_spoints_1spill, c4);
   }
 
-  if ( get_num_tracks() > 0 )
+  if ( get_num_tracks() > 0 ) {
+    std::cout << "Drawing tracks...\n";
     draw_tracks(c4);
+    c4->Update();
+  }
 
   clear_tracks();
 
@@ -289,6 +292,7 @@ void ReduceCppPatternRecognition::draw_tracks(TCanvas * c1) {
 
   for (int i = 0; i < static_cast<int>(_trks_zx_trkr0.size()); ++i) {
     c1->cd(2);
+    std::cout << "Drawing...\n";
     _trks_zx_trkr0[i].Draw("same");
     c1->Update();
   }
