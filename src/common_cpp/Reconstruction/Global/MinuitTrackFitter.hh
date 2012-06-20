@@ -63,7 +63,7 @@ class MinuitTrackFitter : public TrackFitter, public TObject {
 
   Track const * detector_events_;
   Track * track_;
-  double mass_;
+  int particle_id_;
 
   MinuitTrackFitter();
 };

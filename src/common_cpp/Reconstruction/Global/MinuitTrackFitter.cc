@@ -95,8 +95,7 @@ void MinuitTrackFitter::Fit(const Track & detector_events, Track & track) {
 
   // TODO(plane1@hawk.iit.edu) Fit to multiple masses or use mass as a fit
   // parameter to find the likely particle identity
-  int particle_id = Particle::kMuMinus;
-  mass_ = Particle::GetInstance()->GetMass(particle_id);
+  particle_id_ = Particle::kMuMinus;
 
   if (detector_events_->size() < 2) {
     throw(Squeal(Squeal::recoverable,
@@ -122,13 +121,14 @@ Double_t MinuitTrackFitter::ScoreTrack(
 
   // Setup the start plane track point based on the Minuit initial conditions
   CovarianceMatrix null_uncertainties;
-  TrackPoint guess(start_plane_track_coordinates[0],
-                   start_plane_track_coordinates[1],
-                   start_plane_track_coordinates[2],
-                   start_plane_track_coordinates[3],
-                   start_plane_track_coordinates[4],
-                   start_plane_track_coordinates[5],
-                   null_uncertainties);
+  const TrackPoint guess(start_plane_track_coordinates[0],
+                         start_plane_track_coordinates[1],
+                         start_plane_track_coordinates[2],
+                         start_plane_track_coordinates[3],
+                         start_plane_track_coordinates[4],
+                         start_plane_track_coordinates[5],
+                         particle_id_);
+std::cout << "Guess: " << guess << std::endl;
   double start_plane = start_plane_;
   track_->push_back(guess);
 
@@ -143,34 +143,26 @@ Double_t MinuitTrackFitter::ScoreTrack(
   for (size_t index = 0; events < detector_events_->end(); ++index) {
     // calculate the next guess
     transfer_map
-      = optics_model_->GenerateTransferMap(start_plane, events->z(), mass_);
-std::cout << "Previous guess: " << guess << std::endl;
-    guess = TrackPoint(transfer_map->Transport(guess));
-std::cout << "New guess: " << guess << std::endl;
+      = optics_model_->GenerateTransferMap(events->z());
+    TrackPoint point = TrackPoint(transfer_map->Transport(guess));
+std::cout << "Station Point: " << point << std::endl;
     delete transfer_map;
 
     uncertainties = &events->uncertainties();
-    guess.set_uncertainties(*uncertainties);
+    point.set_uncertainties(*uncertainties);
 
-    // save the calculated track in case this is the last one
-    // (i.e. the best fit track).
-    track_->push_back(guess);
+    // save the calculated track point in case this is the
+    // last (best fitting) track
+    track_->push_back(point);
 
     // Sum the squares of the differences between the calculated phase space
     // coordinates and the measured coordinates.
-    delta = TrackPoint(guess - (*events));
+    delta = TrackPoint(point - (*events));
 std::cout << "event: " << (*events) << std::endl;
     chi_squared += (transpose(delta) * (*uncertainties) * delta)[0];
 std::cout << "delta: " << delta << std::endl;
 std::cout << "uncertainties: " << *uncertainties << std::endl;
 std::cout << "chi_squared: " << chi_squared << std::endl;
-
-    // Calculate the next start plane from the current event's
-    // time, energy, and mass.
-    TrackPoint event(*events,
-                     mass_,
-                     PhaseSpaceVector::PhaseSpaceType::kPositional);
-    start_plane = event.z();
 
     ++events;
   }

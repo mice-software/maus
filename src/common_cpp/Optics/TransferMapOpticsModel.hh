@@ -26,6 +26,7 @@
 
 #include "Interface/Squeal.hh"
 #include "Simulation/MAUSPrimaryGeneratorAction.hh"
+#include "src/common_cpp/Optics/OpticsModel.hh"
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
 #include "Reconstruction/Global/TrackPoint.hh"
 
@@ -43,7 +44,7 @@ class TransferMap;
  *  models. The derived classes must implement CalculateTransferMap() which is
  *  called by Build().
  */
-class TransferMapOpticsModel {
+class TransferMapOpticsModel : public OpticsModel {
  public:
   // ******************************
   //  Constructors
@@ -60,9 +61,9 @@ class TransferMapOpticsModel {
    */
   void Build();
   
-  const TransferMap * transfer_map(const int station_id) const;
+  const TransferMap * GenerateTransferMap(const double end_plane) const;
  protected:
-  std::map<int, const TransferMap *> transfer_maps_;
+  std::map<double, const TransferMap *> transfer_maps_;
   MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle_;
   reconstruction::global::TrackPoint reference_particle_;
   double time_offset_;

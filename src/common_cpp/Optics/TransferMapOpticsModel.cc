@@ -112,7 +112,7 @@ TransferMapOpticsModel::TransferMapOpticsModel(
 }
 
 TransferMapOpticsModel::~TransferMapOpticsModel() {
-  std::map<int, const TransferMap *>::iterator transfer_map;
+  std::map<double, const TransferMap *>::iterator transfer_map;
   for (transfer_map = transfer_maps_.begin();
        transfer_map != transfer_maps_.end();
        ++transfer_map) {
@@ -145,17 +145,46 @@ void TransferMapOpticsModel::Build() {
   for (station_hits = station_hits_map.begin();
        station_hits != station_hits_map.end();
        ++ station_hits) {
+    // find the average z coordinate for the station
+    std::vector<TrackPoint>::iterator station_hit;
+    double total_z = 0.0;
+    for (station_hit = station_hits->second.begin();
+         station_hit != station_hits->second.end();
+         ++ station_hit) {
+      total_z += station_hit->z();
+    }
+    double station_plane = total_z / station_hit->size();
+
     // Generate a transfer map between the start plane and the current station
     // and map the station ID to the transfer map
-    transfer_maps_[(*station_hits).first]
-      = CalculateTransferMap(start_plane_hits, (*station_hits).second);
+    transfer_maps_[station_plane]
+      = CalculateTransferMap(start_plane_hits, station_hits->second);
   }
 }
 
-const TransferMap * TransferMapOpticsModel::transfer_map(const int station_id)
-    const {
-  std::map<int, const TransferMap *>::const_iterator transfer_map_entry
-    = transfer_maps_.find(station_id);
+const TransferMap * TransferMapOpticsModel::GenerateTransferMap(
+    const double end_plane) const {
+  // find the transfer map that transports a particle from the start plane
+  // to the station that is nearest to the desired end_plane
+  std::map<double, const TransferMap *>::const_iterator transfer_map_entry;
+  for (transfer_map_entry = transfer_maps_.begin();
+       transfer_map_entry != transfer_maps_.end();
+       ++transfer_map_entry) {
+    // determine whether the station before or after end_plane is closest
+    if (end_plane > transfer_map_entry->first) {
+      double before_delta = end_plane - transfer_map_entry->first;
+      double after_delta = 0.0;
+      ++transfer_map_entry;
+      if (transfer_map_entry != transfer_maps_.end()) {
+        after_delta = end_plane - transfer_map_entry->first;
+        if (before_delta < after_delta) {
+          --transfer_map_entry;
+        }
+      }
+
+      break;  // found a close station so beak off the search
+    }
+  }
   return transfer_map_entry->second;
 }
 

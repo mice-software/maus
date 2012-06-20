@@ -30,7 +30,7 @@ namespace MAUS {
 
 class OpticsModel {
  public:
-  OpticsModel(const Json::Value & configuration) { }
+  OpticsModel() { }
   virtual ~OpticsModel() { }
 
   virtual void Build() = 0;
@@ -40,7 +40,8 @@ class OpticsModel {
    * The user of this function takes ownership of the dynamically allocated
    * memory and is responsible for deallocating it.
    */
-  virtual const TransferMap * transfer_map(const int station_id) const = 0;
+  virtual const TransferMap * GenerateTransferMap(const double end_plane)
+    const = 0;
  protected:
 };
 }

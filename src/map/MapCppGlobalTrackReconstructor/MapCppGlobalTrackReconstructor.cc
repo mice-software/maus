@@ -269,7 +269,7 @@ void MapCppGlobalTrackReconstructor::SetupOpticsModel() {
     }
     case 4: {
       // "Linear Approximation"
-      optics_model_ = new LinearApproximationOpticsModel();
+      optics_model_ = new LinearApproximationOpticsModel(configuration_);
       break;
     }
     default: {
@@ -281,7 +281,7 @@ void MapCppGlobalTrackReconstructor::SetupOpticsModel() {
                    "MapCppGlobalTrackReconstructor::SetupOpticsModel()()"));
     }
   }
-  optics_model_->Build(configuration_);
+  optics_model_->Build();
 }
 
 void MapCppGlobalTrackReconstructor::SetupTrackFitter() {

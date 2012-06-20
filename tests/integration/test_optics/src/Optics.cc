@@ -294,7 +294,7 @@ std::vector< ::TransferMap*> MakePolyfitMaps(
     std::vector< ::PhaseSpaceVector>                        hitsIn,
     std::map<StationId, std::vector< ::PhaseSpaceVector> >  hits,
     int                                                     order) {
-  typedef std::map<StationId,std::vector<::PhaseSpaceVector> >::iterator vec_it;
+  typedef std::map<StationId,std::vector< ::PhaseSpaceVector> >::iterator vec_it;
   std::vector< ::TransferMap*> maps;
 
   // Iterate over each station.

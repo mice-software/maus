@@ -35,22 +35,22 @@ namespace global {
 TrackPoint::TrackPoint()
     : PhaseSpaceVector(),
       detector_id_(Detector::kNone),
-      uncertainties_(new CovarianceMatrix(),
-      particle_id_(Particle::kNone))
+      uncertainties_(new CovarianceMatrix()),
+      particle_id_(Particle::kNone)
 { }
 
 TrackPoint::TrackPoint(const PhaseSpaceType type)
     : PhaseSpaceVector(type),
       detector_id_(Detector::kNone),
-      uncertainties_(new CovarianceMatrix(),
-      particle_id_(Particle::kNone))
+      uncertainties_(new CovarianceMatrix()),
+      particle_id_(Particle::kNone)
 { }
 
 TrackPoint::TrackPoint(const TrackPoint& original_instance)
     : PhaseSpaceVector(original_instance),
       detector_id_(original_instance.detector_id_),
-      uncertainties_(new CovarianceMatrix(*original_instance.uncertainties_),
-      particle_id_(Particle::kNone))
+      uncertainties_(new CovarianceMatrix(*original_instance.uncertainties_)),
+      particle_id_(Particle::kNone)
 { }
 
 TrackPoint::TrackPoint(const TrackPoint& original_instance,
@@ -58,15 +58,15 @@ TrackPoint::TrackPoint(const TrackPoint& original_instance,
                        const PhaseSpaceType type)
     : PhaseSpaceVector(original_instance, mass, type),
       detector_id_(original_instance.detector_id_),
-      uncertainties_(new CovarianceMatrix(*original_instance.uncertainties_),
-      particle_id_(Particle::kNone))
+      uncertainties_(new CovarianceMatrix(*original_instance.uncertainties_)),
+      particle_id_(Particle::kNone)
 { }
 
 TrackPoint::TrackPoint(const PhaseSpaceVector & original_instance,
                        const PhaseSpaceType type)
     : PhaseSpaceVector(original_instance, type),
-      detector_id_(Detector::kNone), uncertainties_(new CovarianceMatrix(),
-      particle_id_(Particle::kNone))
+      detector_id_(Detector::kNone), uncertainties_(new CovarianceMatrix()),
+      particle_id_(Particle::kNone)
 { }
 
 TrackPoint::TrackPoint(const Vector<double> & original_instance,
@@ -83,8 +83,8 @@ TrackPoint::TrackPoint(const double x1, const double p1,
                        const PhaseSpaceType type)
     : PhaseSpaceVector(x1, p1, x2, p2, x3, p3, type),
       detector_id_(Detector::kNone),
-      uncertainties_(new CovarianceMatrix(uncertainties),
-      particle_id_(Particle::kNone)) { }
+      uncertainties_(new CovarianceMatrix(uncertainties)),
+      particle_id_(Particle::kNone) { }
 
 TrackPoint::TrackPoint(const double x1, const double p1,
                        const double x2, const double p2,
@@ -93,8 +93,8 @@ TrackPoint::TrackPoint(const double x1, const double p1,
                        const PhaseSpaceType type)
     : PhaseSpaceVector(x1, p1, x2, p2, x3, p3, type),
       detector_id_(detector.id()),
-      uncertainties_(new CovarianceMatrix(detector.uncertainties()),
-      particle_id_(Particle::kNone)) { }
+      uncertainties_(new CovarianceMatrix(detector.uncertainties())),
+      particle_id_(Particle::kNone) { }
 
 TrackPoint::TrackPoint(const double x1, const double p1,
                        const double x2, const double p2,
@@ -104,13 +104,13 @@ TrackPoint::TrackPoint(const double x1, const double p1,
     : PhaseSpaceVector(x1, p1, x2, p2, x3, p3, type),
       detector_id_(Detector::kNone),
       uncertainties_(new CovarianceMatrix()),
-      particle_id_(particle_id)) { }
+      particle_id_(particle_id) { }
 
 TrackPoint::TrackPoint(double const * const array,
                        const PhaseSpaceType type)
     : PhaseSpaceVector(array, type),
-      detector_id_(Detector::kNone), uncertainties_(new CovarianceMatrix(),
-      particle_id_(Particle::kNone)) {
+      detector_id_(Detector::kNone), uncertainties_(new CovarianceMatrix()),
+      particle_id_(Particle::kNone) {
 }
 
 TrackPoint::~TrackPoint() {
@@ -188,7 +188,7 @@ const CovarianceMatrix & TrackPoint::uncertainties() const {
 double TrackPoint::time() const {
   if (type_ == PhaseSpaceType::kPositional) {
     const double mass = Particle::GetInstance()->GetMass(particle_id_);
-    const double energy = energy();
+    const double energy = this->energy();
     const double x = (*this)[0];
     const double y = (*this)[2];
     const double z = (*this)[4];
@@ -196,7 +196,7 @@ double TrackPoint::time() const {
     const double momentum = ::sqrt(energy*energy - mass*mass);
     const double velocity = ::CLHEP::c_light * momentum / energy;
     const double position = ::sqrt(x*x + y*y + z*z);
-    const double time = position / velocity;
+    double time = position / velocity;
 
     if (z < 0) {
       time = -time;
@@ -229,10 +229,11 @@ double TrackPoint::z() const {
     const double x = (*this)[2];
     const double y = (*this)[4];
 
+    const double mass = Particle::GetInstance()->GetMass(particle_id_);
     const double momentum = ::sqrt(energy*energy - mass*mass);
     double velocity = ::CLHEP::c_light * momentum / energy;
     double position = velocity * time;
-    const double z = ::sqrt(position*position - x*x - y*y);
+    double z = ::sqrt(position*position - x*x - y*y);
 
     if (time < 0) {
       z = -z;
@@ -264,10 +265,11 @@ void TrackPoint::set_time(double time) {
     const double x = (*this)[2];
     const double y = (*this)[4];
 
+    const double mass = Particle::GetInstance()->GetMass(particle_id_);
     const double momentum = ::sqrt(energy*energy - mass*mass);
     double velocity = ::CLHEP::c_light * momentum / energy;
     double position = velocity * time;
-    const double z = ::sqrt(position*position - x*x - y*y);
+    double z = ::sqrt(position*position - x*x - y*y);
 
     if (time < 0) {
       z = -z;
@@ -296,14 +298,14 @@ void TrackPoint::set_z(double z) {
   if (type_ == PhaseSpaceType::kTemporal) {
     // set time instead
     const double mass = Particle::GetInstance()->GetMass(particle_id_);
-    const double energy = energy();
+    const double energy = this->energy();
     const double x = (*this)[0];
     const double y = (*this)[2];
 
     const double momentum = ::sqrt(energy*energy - mass*mass);
     const double velocity = ::CLHEP::c_light * momentum / energy;
     const double position = ::sqrt(x*x + y*y + z*z);
-    const double time = position / velocity;
+    double time = position / velocity;
 
     if (z < 0) {
       time = -time;
@@ -332,7 +334,7 @@ void TrackPoint::set_z_momentum(double z_momentum) {
 
 MAUS::MAUSPrimaryGeneratorAction::PGParticle
 PrimaryGeneratorParticle(const TrackPoint & point) {
-  const double mass = Particle::GetInstance()->GetMass(pid);
+  const double mass = Particle::GetInstance()->GetMass(point.particle_id());
 
   MAUSPrimaryGeneratorAction::PGParticle particle;
   particle.time = point.t();
