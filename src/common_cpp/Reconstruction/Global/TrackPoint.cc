@@ -50,7 +50,7 @@ TrackPoint::TrackPoint(const TrackPoint& original_instance)
     : PhaseSpaceVector(original_instance),
       detector_id_(original_instance.detector_id_),
       uncertainties_(new CovarianceMatrix(*original_instance.uncertainties_)),
-      particle_id_(Particle::kNone)
+      particle_id_(original_instance.particle_id_)
 { }
 
 TrackPoint::TrackPoint(const TrackPoint& original_instance,
@@ -59,7 +59,7 @@ TrackPoint::TrackPoint(const TrackPoint& original_instance,
     : PhaseSpaceVector(original_instance, mass, type),
       detector_id_(original_instance.detector_id_),
       uncertainties_(new CovarianceMatrix(*original_instance.uncertainties_)),
-      particle_id_(Particle::kNone)
+      particle_id_(original_instance.particle_id_)
 { }
 
 TrackPoint::TrackPoint(const PhaseSpaceVector & original_instance,
@@ -242,7 +242,7 @@ double TrackPoint::z() const {
     return z;
   }
   
-  return PhaseSpaceVector::time();
+  return PhaseSpaceVector::z();
 }
 
 double TrackPoint::z_momentum() const {
@@ -255,7 +255,7 @@ double TrackPoint::z_momentum() const {
     return ::sqrt(energy*energy - mass*mass - px*px - py*py);
   }
   
-  return PhaseSpaceVector::energy();
+  return PhaseSpaceVector::z_momentum();
 }
 
 void TrackPoint::set_time(double time) {
@@ -334,8 +334,6 @@ void TrackPoint::set_z_momentum(double z_momentum) {
 
 MAUS::MAUSPrimaryGeneratorAction::PGParticle
 PrimaryGeneratorParticle(const TrackPoint & point) {
-  const double mass = Particle::GetInstance()->GetMass(point.particle_id());
-
   MAUSPrimaryGeneratorAction::PGParticle particle;
   particle.time = point.t();
   particle.energy = point.E();

@@ -141,13 +141,19 @@ class TrackPoint : public MAUS::PhaseSpaceVector {
   const CovarianceMatrix & uncertainties() const;
 
   double time()       const;
+  double t()          const {return time();}
   double energy()     const;
+  double E()          const {return energy();}
   double z()          const;
   double z_momentum() const;
+  double Pz()         const {return z_momentum();}
   void set_time(double time);
+  void set_t(double time)         {set_time(time);}
   void set_energy(double energy);
+  void set_E(double energy)       {set_energy(energy);}
   void set_z(double z);
   void set_z_momentum(double z_momentum);
+  void set_Pz(double z_momentum)  {set_z_momentum(z_momentum);}
 
  protected:
   unsigned int detector_id_;  // = 0 if this was not measured in a detector

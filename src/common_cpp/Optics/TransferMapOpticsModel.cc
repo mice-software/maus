@@ -41,10 +41,13 @@ using reconstruction::global::TrackPoint;
 // ******************************
 
 TransferMapOpticsModel::TransferMapOpticsModel(
-    const Json::Value & configuration) {
+    const Json::Value & configuration)
+    : reference_particle_(
+        TrackPoint(PhaseSpaceVector::PhaseSpaceType::kPositional)) {
   // Prepare for simulating start plane particles through MICE
   MICERun & simulation = *MICERun::getInstance();
-  simulation.jsonConfiguration = new Json::Value(Json::objectValue);
+  //simulation.jsonConfiguration = new Json::Value(Json::objectValue);
+  simulation.jsonConfiguration = new Json::Value(configuration);
   Json::Value& config = *simulation.jsonConfiguration;
   config["verbose_level"] = Json::Value(0);
 
@@ -65,14 +68,17 @@ TransferMapOpticsModel::TransferMapOpticsModel(
   // std::cerr depending on VerboseLevel
   Squeak::setStandardOutputs();
 
+  // Data Cards setup
+  simulation.DataCards = new dataCards("Simulation");
+
   // Materials
   simulation.miceMaterials = new MiceMaterials();
 
   // MICE Model setup
-  Json::Value modname = JsonWrapper::GetProperty(config,
+  Json::Value module_name = JsonWrapper::GetProperty(config,
                                                  "simulation_geometry_filename",
                                                  JsonWrapper::stringValue);
-  simulation.miceModule = new MiceModule(modname.asString());
+  simulation.miceModule = new MiceModule(module_name.asString());
 
   // G4 Materials
   fillMaterials(simulation);
@@ -140,38 +146,57 @@ void TransferMapOpticsModel::Build() {
     MapStationsToHits(station_hits_map);
   }
 
+std::cout << "CHECKPOINT Build() 1" << std::endl; std::cout.flush();
   // Iterate through each station
+std::cout << "DEBUG Build(): # Stations = " << station_hits_map.size() << std::endl; std::cout.flush();
   std::map<int, std::vector<TrackPoint> >::iterator station_hits;
   for (station_hits = station_hits_map.begin();
        station_hits != station_hits_map.end();
        ++ station_hits) {
+std::cout << "DEBUG Build(): # Station Hits = " << station_hits->second.size() << std::endl; std::cout.flush();
     // find the average z coordinate for the station
     std::vector<TrackPoint>::iterator station_hit;
-    double total_z = 0.0;
-    for (station_hit = station_hits->second.begin();
-         station_hit != station_hits->second.end();
-         ++ station_hit) {
-      total_z += station_hit->z();
-    }
-    double station_plane = total_z / station_hit->size();
+
+    double station_plane = station_hits->second.begin()->z();
+std::cout << "DEBUG Build(): # Station Hit Z = " << station_plane << std::endl; std::cout.flush();
 
     // Generate a transfer map between the start plane and the current station
     // and map the station ID to the transfer map
+std::cout << "CHECKPOINT Build() 1.1" << std::endl; std::cout.flush();
     transfer_maps_[station_plane]
       = CalculateTransferMap(start_plane_hits, station_hits->second);
+std::cout << "CHECKPOINT Build() 1.2" << std::endl; std::cout.flush();
+std::cout << "DEBUG Build(): # Transfer Maps = " << transfer_maps_.size() << std::endl; std::cout.flush();
   }
 }
 
 const TransferMap * TransferMapOpticsModel::GenerateTransferMap(
     const double end_plane) const {
+std::cout << "DEBUG GenerateTransferMap(): # Transfer Maps = " << transfer_maps_.size() << std::endl;
+  if (transfer_maps_.size() == 0) {
+    throw(Squeal(Squeal::nonRecoverable,
+                 "No transfer maps to choose from.",
+                 "MAUS::TransferMapOpticsModel::GenerateTransferMap()"));
+  }
   // find the transfer map that transports a particle from the start plane
   // to the station that is nearest to the desired end_plane
+std::cout << "DEBUG GenerateTransferMap(): End Plane = " << end_plane << std::endl;
   std::map<double, const TransferMap *>::const_iterator transfer_map_entry;
+  size_t map_index = 0;
   for (transfer_map_entry = transfer_maps_.begin();
        transfer_map_entry != transfer_maps_.end();
        ++transfer_map_entry) {
     // determine whether the station before or after end_plane is closest
-    if (end_plane > transfer_map_entry->first) {
+    double station_plane = transfer_map_entry->first;
+std::cout << "DEBUG GenerateTransferMap(): Station Plane = " << station_plane << std::endl;
+    if (station_plane >= end_plane) {
+std::cout << "DEBUG GenerateTransferMap(): Station # = " << map_index << std::endl;
+      if (transfer_map_entry == transfer_maps_.begin()) {
+        throw(Squeal(Squeal::nonRecoverable,
+                     "Mapping detectors are all positioned downstream from one "
+                     "or more hits.",
+                     "MAUS::TransferMapOpticsModel::GenerateTransferMap()"));
+      }
       double before_delta = end_plane - transfer_map_entry->first;
       double after_delta = 0.0;
       ++transfer_map_entry;
@@ -184,7 +209,13 @@ const TransferMap * TransferMapOpticsModel::GenerateTransferMap(
 
       break;  // found a close station so beak off the search
     }
+    ++map_index;
   }
+
+  if (transfer_map_entry == transfer_maps_.end()) {
+    --transfer_map_entry;
+  }
+
   return transfer_map_entry->second;
 }
 
@@ -218,9 +249,21 @@ void TransferMapOpticsModel::MapStationsToHits(
   // Iterate through each event of the simulation
   MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
   const Json::Value events = simulator->GetEventAction()->GetEvents();
+  if (events.size() == 0) {
+    throw(Squeal(Squeal::nonRecoverable,
+                 "No events were generated during simulation.",
+                 "MAUS::TransferMapOpticsModel::MapStationsToHits()"));
+  }
+std::cout << "DEBUG MapStationsToHits(): # Events = " << events.size() << std::endl;
+  if (events.size() == 0) {
+    throw(Squeal(Squeal::nonRecoverable,
+                  "No virtual hits were generated during simulation.",
+                  "MAUS::TransferMapOpticsModel::MapStationsToHits()"));
+  }
   for (size_t event_index = 0; event_index < events.size(); ++event_index) {
     // Iterate through each hit recorded during the current event
     const Json::Value hits = events[event_index]["virtual_hits"];
+std::cout << "DEBUG MapStationsToHits(): # Virtual Hits = " << hits.size() << std::endl;
     for (size_t hit_index = 0; hit_index < hits.size(); ++hit_index) {
       const Json::Value hit = hits[hit_index];
       TrackPoint hit_vector(

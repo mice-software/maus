@@ -68,6 +68,7 @@ CovarianceMatrix LinearApproximationTransferMap::Transport(
 
 PhaseSpaceVector LinearApproximationTransferMap::Transport(
     const PhaseSpaceVector & vector) const {
+fprintf(stdout, "CHECKPOINT Transport() 0\n"); fflush(stdout);
   // Use the energy and momentum to determine when and where the particle would
   // be if it were traveling in free space from start_plane_ to end_plane_.
   PhaseSpaceVector transported_vector(vector);
@@ -95,6 +96,7 @@ std::cout << "Delta Y: " << delta_y << std::endl;
   transported_vector[2] += delta_x;
   transported_vector[4] += delta_y;
 
+fprintf(stdout, "CHECKPOINT Transport() 999\n"); fflush(stdout);
   return transported_vector;
 }
 

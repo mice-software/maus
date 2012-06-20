@@ -44,6 +44,7 @@ void common_cpp_optics_reconstruction_minuit_track_fitter_score_function(
     Double_t & score,
     Double_t * phase_space_coordinate_values,
     Int_t      execution_stage_flag) {
+fprintf(stdout, "CHECKPOINT: ..._score_function() 0"); fflush(stdout);
 for (int index = 0; index < 6; ++index) {
   std::cout << "Parameter " << index+1 << " value: "
             << phase_space_coordinate_values[index] << std::endl;
@@ -55,7 +56,9 @@ for (int index = 0; index < 6; ++index) {
 
   MinuitTrackFitter * track_fitter
     = static_cast<MinuitTrackFitter *>(minuit->GetObjectFit());
+fprintf(stdout, "CHECKPOINT: ..._score_function() 1"); fflush(stdout);
   score = track_fitter->ScoreTrack(phase_space_coordinate_values);
+fprintf(stdout, "CHECKPOINT: ..._score_function() 2"); fflush(stdout);
 }
 
 MinuitTrackFitter::MinuitTrackFitter(
@@ -77,7 +80,7 @@ MinuitTrackFitter::MinuitTrackFitter(
   // phase space variable (mins and maxes calculated from 800MeV/c ISIS beam)
   int error_flag = 0;
   // TODO(plane1@hawk.iit.edu) put this in the configuration file
-  minimiser->mnparm(0, "Time", 0., 0.1, -10000000., 10000000., error_flag);   // ns
+  minimiser->mnparm(0, "Time", 0., 0.1, -1000., 1., error_flag);   // ns
   minimiser->mnparm(1, "Energy", 200., 1, 105.7, 1860., error_flag);  // MeV
   minimiser->mnparm(2, "X", 0, 0.001, -150., 150., error_flag);      // mm
   minimiser->mnparm(3, "Px", 0., 0.1, -100., 100, error_flag);    // MeV/c
@@ -90,6 +93,7 @@ MinuitTrackFitter::~MinuitTrackFitter() {
 }
 
 void MinuitTrackFitter::Fit(const Track & detector_events, Track & track) {
+fprintf(stdout, "CHECKPOINT: Fit() 0"); fflush(stdout);
   detector_events_ = &detector_events;
   track_ = &track;
 
@@ -109,7 +113,9 @@ void MinuitTrackFitter::Fit(const Track & detector_events, Track & track) {
   TMinuit * minimiser
     = common_cpp_optics_reconstruction_minuit_track_fitter_minuit;
   // Int_t status = minimiser->Migrad();
+fprintf(stdout, "CHECKPOINT: Fit() 1"); fflush(stdout);
   minimiser->Migrad();
+fprintf(stdout, "CHECKPOINT: Fit() 2"); fflush(stdout);
 
   // TODO(plane1@hawk.iit.edu) Handle status from minimiser
 }
@@ -130,6 +136,7 @@ Double_t MinuitTrackFitter::ScoreTrack(
                          particle_id_);
 std::cout << "Guess: " << guess << std::endl;
   double start_plane = start_plane_;
+fprintf(stdout, "CHECKPOINT: ScoreTrack() 0\n"); fflush(stdout);
   track_->push_back(guess);
 
   PhaseSpaceVector delta;  // difference between the guess and the measurement
@@ -144,7 +151,14 @@ std::cout << "Guess: " << guess << std::endl;
     // calculate the next guess
     transfer_map
       = optics_model_->GenerateTransferMap(events->z());
-    TrackPoint point = TrackPoint(transfer_map->Transport(guess));
+fprintf(stdout, "CHECKPOINT: ScoreTrack() 1\n"); fflush(stdout);
+if (transfer_map == NULL) {
+  fprintf(stdout, "ERROR: transfer_map is NULL! Everybody panic!\n");
+}
+    PhaseSpaceVector transported_psv = transfer_map->Transport(guess);
+fprintf(stdout, "CHECKPOINT: ScoreTrack() 2\n"); fflush(stdout);
+    TrackPoint point = TrackPoint(transported_psv);
+fprintf(stdout, "CHECKPOINT: ScoreTrack() 3\n"); fflush(stdout);
 std::cout << "Station Point: " << point << std::endl;
     delete transfer_map;
 
@@ -167,6 +181,7 @@ std::cout << "chi_squared: " << chi_squared << std::endl;
     ++events;
   }
 
+fprintf(stdout, "CHECKPOINT: ScoreTrack() 4"); fflush(stdout);
   return chi_squared;
 }
 

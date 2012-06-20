@@ -230,7 +230,7 @@ double PhaseSpaceVector::y_momentum() const {
 }
 
 double PhaseSpaceVector::z() const {
-  if (type_ == PhaseSpaceType::kPositional) {
+  if (type_ == PhaseSpaceType::kTemporal) {
     throw(Squeal(
       Squeal::recoverable,
       "Attempted to get the z coordinate from a phase space vector with "
@@ -243,7 +243,7 @@ double PhaseSpaceVector::z() const {
 }
 
 double PhaseSpaceVector::z_momentum() const {
-  if (type_ == PhaseSpaceType::kPositional) {
+  if (type_ == PhaseSpaceType::kTemporal) {
     throw(Squeal(
       Squeal::recoverable,
       "Attempted to get the z momentum from a phase space vector with "
@@ -313,7 +313,7 @@ void PhaseSpaceVector::set_y_momentum(double y_momentum) {
 }
 
 void PhaseSpaceVector::set_z(double z) {
-  if (type_ == PhaseSpaceType::kPositional) {
+  if (type_ == PhaseSpaceType::kTemporal) {
     throw(Squeal(
       Squeal::recoverable,
       "Attempted to set the z coordinate of a phase space vector with "
@@ -325,7 +325,7 @@ void PhaseSpaceVector::set_z(double z) {
   (*this)[4] = z;
 }
 void PhaseSpaceVector::set_z_momentum(double z_momentum) {
-  if (type_ == PhaseSpaceType::kPositional) {
+  if (type_ == PhaseSpaceType::kTemporal) {
     throw(Squeal(
       Squeal::recoverable,
       "Attempted to set the z momentum of a phase space vector with "

@@ -128,14 +128,14 @@ std::string MapCppGlobalTrackReconstructor::process(std::string run_data) {
   }
 
   if (reconstruction_input_ == NULL) {
-  Json::FastWriter writer;
-  std::string output = writer.write(run_data_);
-return output;
 /*
+    Json::FastWriter writer;
+    std::string output = writer.write(run_data_);
+    return output;
+*/
     throw(Squeal(Squeal::recoverable,
                  "Null reconstruction input.",
                  "MapCppGlobalTrackReconstructor::process()"));
-*/
   }
 
   // TODO(plane1@hawk.iit.edu) Implement Kalman Filter and TOF track fitters
@@ -158,13 +158,15 @@ return output;
   MAUS::reconstruction::global::Track best_fit_track;
 
   for (std::vector<MAUS::reconstruction::global::Track>::const_iterator
-          measured_tracks = tracks.begin();
-       measured_tracks < tracks.end();
-       ++measured_tracks) {
+          measured_track = tracks.begin();
+       measured_track < tracks.end();
+       ++measured_track) {
     best_fit_track.set_particle_id(particle_id);
     best_fit_track.clear();
-    track_fitter_->Fit(*measured_tracks, best_fit_track);
-std::cout << "Measured Track: " << (*measured_tracks) << std::endl;
+fprintf(stdout, "CHECKPOINT: Before Fit()");
+    track_fitter_->Fit(*measured_track, best_fit_track);
+fprintf(stdout, "CHECKPOINT: After Fit()");
+std::cout << "Measured Track: " << (*measured_track) << std::endl;
 std::cout << "Best Fit Track: " << best_fit_track << std::endl;
 
     // TODO(plane1@hawk.iit.edu) Reconstruct track at the desired locations
@@ -185,6 +187,7 @@ std::cout << "Best Fit Track: " << best_fit_track << std::endl;
 }
 
 void MapCppGlobalTrackReconstructor::SetupOpticsModel() {
+fprintf(stdout, "CHECKPOINT: SetupOpticsModel() 0\n"); fflush(stdout);
   Json::Value optics_model_names = JsonWrapper::GetProperty(
       configuration_,
       "reconstruction_optics_models",
@@ -200,6 +203,7 @@ void MapCppGlobalTrackReconstructor::SetupOpticsModel() {
     }
   }
 
+fprintf(stdout, "CHECKPOINT: SetupOpticsModel() 1"); fflush(stdout);
   switch (model) {
     case 0: {
       // "Differentiating"
@@ -269,7 +273,8 @@ void MapCppGlobalTrackReconstructor::SetupOpticsModel() {
     }
     case 4: {
       // "Linear Approximation"
-      optics_model_ = new LinearApproximationOpticsModel(configuration_);
+fprintf(stdout, "CHECKPOINT: SetupOpticsModel() 1.1\n"); fflush(stdout);
+     optics_model_ = new LinearApproximationOpticsModel(configuration_);
       break;
     }
     default: {
@@ -281,7 +286,9 @@ void MapCppGlobalTrackReconstructor::SetupOpticsModel() {
                    "MapCppGlobalTrackReconstructor::SetupOpticsModel()()"));
     }
   }
+fprintf(stdout, "CHECKPOINT: SetupOpticsModel() 2\n"); fflush(stdout);
   optics_model_->Build();
+fprintf(stdout, "CHECKPOINT: SetupOpticsModel() 3\n"); fflush(stdout);
 }
 
 void MapCppGlobalTrackReconstructor::SetupTrackFitter() {
@@ -453,39 +460,40 @@ void MapCppGlobalTrackReconstructor::LoadTestingData() {
     for (size_t index = 0; index < sci_fi_hit_count; ++index) {
       const Json::Value sci_fi_hit = sci_fi_hits[index];
 
-      double coordinates[8];
+      double coordinates[6];
 
       const Json::Value time = JsonWrapper::GetProperty(
           sci_fi_hit, "time", JsonWrapper::realValue);
-      coordinates[0] = time.asDouble();
+
       const Json::Value position_json = JsonWrapper::GetProperty(
           sci_fi_hit, "position", JsonWrapper::objectValue);
       const Json::Value x = JsonWrapper::GetProperty(
           position_json, "x", JsonWrapper::realValue);
-      coordinates[2] = x.asDouble();
+      coordinates[0] = x.asDouble();
       const Json::Value y = JsonWrapper::GetProperty(
           position_json, "y", JsonWrapper::realValue);
-      coordinates[4] = y.asDouble();
+      coordinates[2] = y.asDouble();
       const Json::Value z = JsonWrapper::GetProperty(
           position_json, "z", JsonWrapper::realValue);
-      coordinates[6] = z.asDouble();
+      coordinates[4] = z.asDouble();
 
       const Json::Value energy = JsonWrapper::GetProperty(
           sci_fi_hit, "energy", JsonWrapper::realValue);
-      coordinates[1] = energy.asDouble();
+
       const Json::Value momentum_json = JsonWrapper::GetProperty(
           sci_fi_hit, "momentum", JsonWrapper::objectValue);
       const Json::Value px = JsonWrapper::GetProperty(
           momentum_json, "x", JsonWrapper::realValue);
-      coordinates[3] = px.asDouble();
+      coordinates[1] = px.asDouble();
       const Json::Value py = JsonWrapper::GetProperty(
           momentum_json, "y", JsonWrapper::realValue);
-      coordinates[5] = py.asDouble();
+      coordinates[3] = py.asDouble();
       const Json::Value pz = JsonWrapper::GetProperty(
           momentum_json, "z", JsonWrapper::realValue);
-      coordinates[7] = pz.asDouble();
+      coordinates[5] = pz.asDouble();
 
-      TrackPoint track_point(coordinates);
+      TrackPoint track_point(coordinates,
+                             PhaseSpaceVector::PhaseSpaceType::kPositional);
 
       const Json::Value channel_id = JsonWrapper::GetProperty(
           sci_fi_hit, "channel_id", JsonWrapper::objectValue);
@@ -511,39 +519,40 @@ void MapCppGlobalTrackReconstructor::LoadTestingData() {
     for (size_t index = 0; index < tof_hit_count; ++index) {
       const Json::Value tof_hit = tof_hits[index];
 
-      double coordinates[8];
+      double coordinates[6];
 
       const Json::Value time = JsonWrapper::GetProperty(
           tof_hit, "time", JsonWrapper::realValue);
-      coordinates[0] = time.asDouble();
+
       const Json::Value position_json = JsonWrapper::GetProperty(
           tof_hit, "position", JsonWrapper::objectValue);
       const Json::Value x = JsonWrapper::GetProperty(
           position_json, "x", JsonWrapper::realValue);
-      coordinates[2] = x.asDouble();
+      coordinates[0] = x.asDouble();
       const Json::Value y = JsonWrapper::GetProperty(
           position_json, "y", JsonWrapper::realValue);
-      coordinates[4] = y.asDouble();
+      coordinates[2] = y.asDouble();
       const Json::Value z = JsonWrapper::GetProperty(
           position_json, "z", JsonWrapper::realValue);
-      coordinates[6] = z.asDouble();
+      coordinates[4] = z.asDouble();
 
       const Json::Value energy = JsonWrapper::GetProperty(
           tof_hit, "energy", JsonWrapper::realValue);
-      coordinates[1] = energy.asDouble();
+
       const Json::Value momentum_json = JsonWrapper::GetProperty(
           tof_hit, "momentum", JsonWrapper::objectValue);
       const Json::Value px = JsonWrapper::GetProperty(
           momentum_json, "x", JsonWrapper::realValue);
-      coordinates[3] = px.asDouble();
+      coordinates[2] = px.asDouble();
       const Json::Value py = JsonWrapper::GetProperty(
           momentum_json, "y", JsonWrapper::realValue);
-      coordinates[5] = py.asDouble();
+      coordinates[3] = py.asDouble();
       const Json::Value pz = JsonWrapper::GetProperty(
           momentum_json, "z", JsonWrapper::realValue);
-      coordinates[7] = pz.asDouble();
+      coordinates[5] = pz.asDouble();
 
-      TrackPoint track_point(coordinates);
+      TrackPoint track_point(coordinates,
+                             PhaseSpaceVector::PhaseSpaceType::kPositional);
 
       const Json::Value channel_id = JsonWrapper::GetProperty(
           tof_hit, "channel_id", JsonWrapper::objectValue);

@@ -80,7 +80,7 @@ MICEDetectorConstruction::MICEDetectorConstruction( MICERun& run ) : _simRun(*MI
   if (_simRun.DataCards == NULL)
     throw(Squeal(Squeal::recoverable,
                  "Failed to acquire datacards",
-                 "MiceDetectorConstruction::MiceDetectorConstruction()"));
+                 "MICEDetectorConstruction::MICEDetectorConstruction()"));
   _checkVolumes = (_simRun.DataCards->fetchValueInt("CheckVolumeOverlaps") == 1);
   _hasBTFields = false;
 
