@@ -22,10 +22,20 @@
 
 #include <ostream>
 #include <vector>
+#include <map>
 
 #include "Interface/Squeal.hh"
+#include "Simulation/MAUSPrimaryGeneratorAction.hh"
+#include "src/common_cpp/Optics/PhaseSpaceVector.hh"
+#include "Reconstruction/Global/TrackPoint.hh"
+
+namespace Json {
+  class Value;
+}
 
 namespace MAUS {
+
+class TransferMap;
 
 /** @class TransferMapOpticsModel simulates test particles through MICE and
  *  generates intermediate hits which are then used to build optics model
@@ -44,33 +54,44 @@ class TransferMapOpticsModel {
    */
   TransferMapOpticsModel(const Json::Value & configuration);
 
+  ~TransferMapOpticsModel();
+
   /* @brief 
    */
   void Build();
+  
+  const TransferMap * transfer_map(const int station_id) const;
  protected:
-  std::vector<TransferMap *> transfer_maps_;
+  std::map<int, const TransferMap *> transfer_maps_;
+  MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle_;
+  reconstruction::global::TrackPoint reference_particle_;
+  double time_offset_;
+  PhaseSpaceVector deltas_;
+
   TransferMapOpticsModel();
 
-  /* @brief Build a set of PhaseSpaceVectors displaced from the start plane
+  /* @brief Build a set of TrackPoints displaced from the start plane
    * reference trajectory by a configuration-specified amount in one of the six
    * phase space coordinates. The set is used as test particles to extrapolate
    * transfer matrices to other detector station planes.
    */
-  const std::vector<PhaseSpaceVector> BuildStartPlaneHits();
+  const std::vector<reconstruction::global::TrackPoint> BuildStartPlaneHits();
 
   /* @brief Identify simulated hits by station and add them to the mappings
    * from station ID to hits recorded by that station.
    */
   void MapStationsToHits(
-      std::map<int, std::vector<PhaseSpaceVector> > & station_hits);
+      std::map<int, std::vector<reconstruction::global::TrackPoint> > &
+        station_hits);
 
   /* @brief called by Build() to calculate transfer maps between the start plane
    * and the station planes. The returned pointer points to a newly allocated
    * TranferMap. The caller assumes all responsibility for the allocated memory.
    */
-  virtual TransferMap * CalculateTransferMap(
-      std::vector<PhaseSpaceVector> start_plane_hits,
-      std::vector<PhaseSpaceVector> station_hits) = 0;
+  virtual const TransferMap * CalculateTransferMap(
+      const std::vector<reconstruction::global::TrackPoint> & start_plane_hits,
+      const std::vector<reconstruction::global::TrackPoint> & station_hits)
+      const = 0;
 };
 
 std::ostream& operator<<(std::ostream& out, const TransferMapOpticsModel& map);

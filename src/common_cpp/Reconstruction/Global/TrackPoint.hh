@@ -104,6 +104,15 @@ class TrackPoint : public MAUS::PhaseSpaceVector {
              const Detector & detector,
              const PhaseSpaceType type=PhaseSpaceType::kTemporal);
 
+  /* @brief	This constructor is used when to create well-defined particle tracks
+   * for simulating through MICE.
+   */
+  TrackPoint(const double x1, const double p1,
+             const double x2, const double p2,
+             const double x3, const double p3,
+             const int particle_id,
+             const PhaseSpaceType type=PhaseSpaceType::kTemporal);
+
   ~TrackPoint();
 
   TrackPoint & operator=(const TrackPoint& rhs);
@@ -114,22 +123,40 @@ class TrackPoint : public MAUS::PhaseSpaceVector {
    */
   const bool operator<(const TrackPoint& rhs) const;
 
+  /* @brief Determines if the track point occurs later in time than another.
+   */
+  const bool operator>(const TrackPoint& rhs) const;
+
   // *************************
   //       Accessors
   // *************************
+
+  void set_particle_id(unsigned int id);
+  unsigned int particle_id() const;
 
   void set_detector_id(unsigned int id);
   unsigned int detector_id() const;
 
   void set_uncertainties(const CovarianceMatrix & uncertainties);
   const CovarianceMatrix & uncertainties() const;
+
+  double time()       const;
+  double energy()     const;
+  double z()          const;
+  double z_momentum() const;
+  void set_time(double time);
+  void set_energy(double energy);
+  void set_z(double z);
+  void set_z_momentum(double z_momentum);
+
  protected:
   unsigned int detector_id_;  // = 0 if this was not measured in a detector
   CovarianceMatrix * uncertainties_;
+  int particle_id_;
 };
 
 MAUS::MAUSPrimaryGeneratorAction::PGParticle PrimaryGeneratorParticle(
-    const TrackPoint & point, const int pid);
+    const TrackPoint & point);
 
 }  // namespace global
 }  // namespace reconstruction

@@ -22,30 +22,33 @@
 #include <vector>
 
 #include "src/common_cpp/Optics/TransferMap.hh"
+#include "src/common_cpp/Optics/TransferMapOpticsModel.hh"
 #include "src/common_cpp/Optics/OpticsModel.hh"
 
 namespace MAUS {
 
-class LinearApproximationOpticsModel : public OpticsModel {
+namespace reconstruction {
+namespace global {
+  class TrackPoint;
+}
+}
+
+class LinearApproximationOpticsModel : public TransferMapOpticsModel {
  public:
   // *************************
   //  Constructors
   // *************************
 
-  LinearApproximationOpticsModel() { }
+  LinearApproximationOpticsModel(const Json::Value & configuration)
+      : TransferMapOpticsModel(configuration) { }
 
   ~LinearApproximationOpticsModel() { }
-  void Build(const Json::Value & configuration);
-
-  /* @brief Dynamically allocate a new TransferMap between two z-axis.
-   *
-   * The user of this function takes ownership of the dynamically allocated
-   * memory and is responsible for deallocating it.
-   */
-  TransferMap * GenerateTransferMap(
-      double start_plane, double end_plane, double mass) const;
 
  protected:
+  const TransferMap * CalculateTransferMap(
+      const std::vector<reconstruction::global::TrackPoint> & start_plane_hits,
+      const std::vector<reconstruction::global::TrackPoint> & station_hits)
+      const;
 };
 
 class LinearApproximationTransferMap : public TransferMap {

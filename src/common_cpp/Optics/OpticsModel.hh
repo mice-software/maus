@@ -30,17 +30,17 @@ namespace MAUS {
 
 class OpticsModel {
  public:
+  OpticsModel(const Json::Value & configuration) { }
   virtual ~OpticsModel() { }
 
-  virtual void Build(const Json::Value & configuration) = 0;
+  virtual void Build() = 0;
 
   /* @brief Dynamically allocate a new TransferMap between two z-axis.
    *
    * The user of this function takes ownership of the dynamically allocated
    * memory and is responsible for deallocating it.
    */
-  virtual TransferMap * GenerateTransferMap(
-      double start_plane, double end_plane, double mass) const = 0;
+  virtual const TransferMap * transfer_map(const int station_id) const = 0;
  protected:
 };
 }
