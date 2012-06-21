@@ -89,9 +89,9 @@ std::string MapCppTrackerRecon::process(std::string document) {
       // if ( event.straightprtracks().size() ) {
         // track_fit(event);
       // }
-      if ( root.isMember("mc_events") ) {
-        make_seed_and_fit(event);
-      }
+      // if ( root.isMember("mc_events") ) {
+      //   make_seed_and_fit(event);
+      // }
 
       print_event_info(event);
       save_to_json(event, k);

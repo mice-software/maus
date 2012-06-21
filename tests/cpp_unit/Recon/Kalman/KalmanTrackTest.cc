@@ -29,8 +29,6 @@ class KalmanTrackTest : public ::testing::Test {
   virtual void TearDown() {}
   KalmanSite *a_site;
 };
-}
-
 /*
 TEST_F(KalmanTrackTest, test_updateG) {
   a_site->set_measurement(0);
@@ -42,6 +40,7 @@ TEST_F(KalmanTrackTest, test_propagator) {
 }
 
 } // namespace
+
 
 void KalmanTrack::update_G(KalmanSite *a_site) {
   double alpha = (a_site->get_measurement())(0, 0);

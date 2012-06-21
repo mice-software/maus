@@ -297,7 +297,13 @@ std::string  ReduceCppMCTracker::process(std::string document) {
           //   << "   Tracker 2: " << space_count2 << std::endl;
         // }
         // End of Space Points
+<<<<<<< TREE
       } else {cut_recon_size--;}
+=======
+      } else {
+        cut_recon_size--;
+      }
+>>>>>>> MERGE-SOURCE
     }
 
     // pyfile << std::endl << "At the end of the spill we have " << cut_recon_size

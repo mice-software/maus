@@ -125,10 +125,12 @@ void SciFiClusterRec::construct(SciFiCluster *clust, std::vector<const MiceModul
   // This is the position of the cluster relatively to station 1 of the tracker (0 or 1)
   // with the displacement of the station centre subtracted.
   // Hep3Vector relative_position = position - this_plane->globalPosition();
-  double channel = clust->get_channel() - CentralFibre;
+  double alpha = clust->get_channel() - CentralFibre;
   // clust->set_relative_position(relative_position);
-
-  clust->set_alpha(channel);
+  if ( tracker == 0 ) {
+    alpha = -alpha;
+  }
+  clust->set_alpha(alpha);
   int id = 15*tracker + 3*(station-1) + (plane);
   clust->set_id(id);
 }

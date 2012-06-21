@@ -56,6 +56,8 @@ void KalmanMonitor::save(std::vector<KalmanSite> const &sites) {
     a = site.get_a();
     TMatrixD C(5, 5);
     C = site.get_covariance_matrix();
+    double res_x = site.get_residual_x();
+    double res_y = site.get_residual_y();
     // double observed = pow(pow(a(0, 0), 2.)+pow(a(1, 0), 2.), 0.5);
     // double expected = pow(pow(a_filt(0, 0), 2.)+pow(a_filt(1, 0), 2.), 0.5);
     // double chi2 = pow(observed-expected, 2.)/expected;
@@ -63,7 +65,51 @@ void KalmanMonitor::save(std::vector<KalmanSite> const &sites) {
     int id = site.get_id();
     out2 << a(0, 0)    << " " << C(0, 0) << " "
          << a(1, 0)    << " " << C(1, 1) << " "
+         << res_x      << " " << res_y << " "
          << pull << " " << id     << "\n";
     out2.close();
   }
 }
+
+void KalmanMonitor::print_info(std::vector<KalmanSite> const &sites) {
+  int numb_sites = sites.size();
+  _alpha_meas.resize(numb_sites);
+  _site.resize(numb_sites);
+  _alpha_projected.resize(numb_sites);
+
+  for ( int i = 0; i < numb_sites; ++i ) {
+    KalmanSite site = sites[i];
+    std::cerr << "SITE ID: " << site.get_id() << std::endl;
+    std::cerr << "SITE Direction: " << "(" << site.get_direction().x() << ", " <<
+                                       site.get_direction().y() << ", " <<
+                                       site.get_direction().z() << ")" << std::endl;
+
+    std::cerr << "SITE residual (mm): " << site.get_residual_x() << ", "
+              << site.get_residual_y() << std::endl;
+    std::cerr << "SITE measured alpha: " << site.get_alpha() << std::endl;
+  }
+}
+/*
+  //////////////////////////////////////////////////////////////////////////
+  std::cout <<  "******************* STATE VECTOR *******************" << std::endl;
+  std::cout << "predicted: ";
+  a.Print();
+  std::cout << "filtered ";
+  a_filt.Print();
+  std::cout <<  "******************* COVARIANCE MATRIX *******************" << std::endl;
+ // std::cout << "predicted: ";
+ // C.Invert().Print();
+  std::cout << "updated ";
+  C.Print();
+  std::cout <<  "******************* OTHER MATRICES*******************" << std::endl;
+  //std::cout << "H";
+  //_H.Print();
+  std::cout << "Measurement: ";
+  m.Print();
+  std::cout << "ha= aH";
+  ha.Print();
+  std::cout << "Pull: ";
+  pull.Print();
+  std::cout << "K: ";
+  K.Print();
+*/
