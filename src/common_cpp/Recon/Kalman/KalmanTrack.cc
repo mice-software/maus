@@ -55,6 +55,7 @@ void KalmanTrack::calc_covariance(KalmanSite *old_site, KalmanSite *new_site) {
   TMatrixD C_pred(5, 5);
   C_pred = TMatrixD(temp2, TMatrixD::kPlus, _Q);
   new_site->set_projected_covariance_matrix(C_pred);
+  C_pred.Print();
 }
 
 //

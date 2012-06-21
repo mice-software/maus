@@ -71,6 +71,7 @@ void KalmanTrackFit::process(std::vector<SciFiSpacePoint> spacepoints,
   KalmanMonitor monitor;
   monitor.save(sites);
   monitor.print_info(sites);
+  delete track;
 }
 
 void KalmanTrackFit::initialise_helix(std::vector<SciFiSpacePoint> &spacepoints,
@@ -106,11 +107,11 @@ void KalmanTrackFit::initialise_helix(std::vector<SciFiSpacePoint> &spacepoints,
   // a.Print();
   // first_plane.set_state_vector(x, y, tan_lambda, phi_0, kappa);
   TMatrixD C(5, 5);
-  C(0, 0) = 150*150;
-  C(1, 1) = 150*150;
-  C(2, 2) = 10;
-  C(3, 3) = 10;
-  C(4, 4) = 100;
+  C(0, 0) = 150.*150./12.;
+  C(1, 1) = 150.*150./12.;
+  C(2, 2) = 10.;
+  C(3, 3) = 10.;
+  C(4, 4) = 100.;
   // for ( int i = 0; i < 5; ++i ) {
   //   C(i, i) = 200; // dummy values
   // }
@@ -167,7 +168,8 @@ void KalmanTrackFit::process(SciFiEvent &event) {
   */
   KalmanMonitor monitor;
   monitor.save(sites);
-  // monitor.print_info(sites);
+  monitor.print_info(sites);
+  delete track;
 }
 
 void KalmanTrackFit::initialise(SciFiEvent &event, std::vector<KalmanSite> &sites) {
@@ -176,11 +178,11 @@ void KalmanTrackFit::initialise(SciFiEvent &event, std::vector<KalmanSite> &site
   int num_tracks = event.straightprtracks().size();
   for ( int i = 0; i < num_tracks; ++i ) {
     SciFiStraightPRTrack seed = event.straightprtracks()[i];
-    double x0 = seed.get_x0();
-    double y0 = seed.get_y0();
-    double mx = seed.get_mx();
-    double my = seed.get_my();
-    double p  = 210.0; // MeV/c
+    double x_pr = seed.get_x0();
+    double y_pr = seed.get_y0();
+    double mx_pr = seed.get_mx();
+    double my_pr = seed.get_my();
+    double p_pr  = 210.0; // MeV/c
 
     std::vector<SciFiSpacePoint> spacepoints = seed.get_spacepoints();
     std::vector<SciFiCluster*> clusters;
@@ -189,21 +191,36 @@ void KalmanTrackFit::initialise(SciFiEvent &event, std::vector<KalmanSite> &site
 
     int numb_sites = clusters.size();
 
+    double z = clusters[0]->get_position().z();
+    int tracker = clusters[0]->get_tracker();
+    double mx, my, x, y;
+    if ( tracker == 0 ) {
+      mx = - mx_pr;
+      my = - my_pr;
+      x = - x_pr + mx*z;
+      y = - y_pr + my*z;
+    } else if ( tracker == 1 ) {
+      mx = mx_pr;
+      my = my_pr;
+      x = x_pr + mx*z;
+      y = y_pr + my*z;
+    }
+
     KalmanSite first_plane;
     TMatrixD a(5, 1);
-    a(0, 0) = x0;
-    a(1, 0) = y0;
+    a(0, 0) = x;
+    a(1, 0) = y;
     a(2, 0) = mx;
     a(3, 0) = my;
-    a(4, 0) = 1/p;
+    a(4, 0) = 1/p_pr;
     first_plane.set_projected_a(a);
 
     TMatrixD C(5, 5);
-    C(0, 0) = 150*150;
-    C(1, 1) = 150*150;
-    C(2, 2) = 10;
-    C(3, 3) = 10;
-    C(4, 4) = 100;
+    C(0, 0) = 70.*70./12.;
+    C(1, 1) = 70.*70./12.;
+    C(2, 2) = 10.;
+    C(3, 3) = 10.;
+    C(4, 4) = 100.;
 
     first_plane.set_projected_covariance_matrix(C);
     first_plane.set_measurement(clusters[0]->get_alpha());
