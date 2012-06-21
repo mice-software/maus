@@ -30,7 +30,6 @@ KalmanTrack::KalmanTrack() {
 //
 // ------- Prediction ------------
 //
-
 // void KalmanTrack::calc_system_noise(KalmanSite &site) {
 // }
 
@@ -61,10 +60,8 @@ void KalmanTrack::calc_covariance(KalmanSite *old_site, KalmanSite *new_site) {
 //
 // ------- Filtering ------------
 //
-
 void KalmanTrack::update_G(KalmanSite *a_site) {
   double alpha = (a_site->get_measurement())(0, 0);
-  std::cerr << alpha << std::endl;
   double l = pow(ACTIVE_RADIUS*ACTIVE_RADIUS -
                  (alpha*CHAN_WIDTH)*(alpha*CHAN_WIDTH), 0.5);
   double sig_beta = l/CHAN_WIDTH;
@@ -89,7 +86,6 @@ void KalmanTrack::update_covariance(KalmanSite *a_site) {
   // calc_covariance_matrix_of_residual
   // Cp = ( C_inv + Ht*G*H )-1;
   TMatrixD C = a_site->get_projected_covariance_matrix();
-  std::cout << "C invertion" << std::endl;
   TMatrixD C_inv = C.Invert();
 
   TMatrixD temp1(5, 2);
@@ -98,7 +94,6 @@ void KalmanTrack::update_covariance(KalmanSite *a_site) {
   temp2 = TMatrixD(temp1, TMatrixD::kMult, _H);
   TMatrixD Cp(5, 5);
   Cp = TMatrixD(C_inv, TMatrixD::kPlus, temp2);
-  std::cout << "Cp invertion" << std::endl;
   _H.Print();
   _G.Print();
   Cp.Print();
@@ -112,18 +107,19 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
   /////////////////////////////////////////////////////////////////////
   // PULL = m - ha
   //
-  std::cout << "pull" << std::endl;
   TMatrixD m(2, 1);
   m = a_site->get_measurement();
 
   TMatrixD a(5, 1);
   a = a_site->get_projected_a();
-  double beta  = 0;
-  double alpha = a(0, 0)*_H(0, 0) + a(1, 0)*_H(0, 1);
   TMatrixD ha(2, 1);
-  ha(0, 0) = alpha;
-  ha(1, 0) = beta;
+  // double beta  = 0;
+  // double alpha = a(0, 0)*_H(0, 0) + a(1, 0)*_H(0, 1);
+  // ha(0, 0) = alpha;
+  // ha(1, 0) = beta;
+  ha = TMatrixD(_H, TMatrixD::kMult, a);
   // Extrapolation converted to expected measurement.
+  double alpha = ha(0, 0);
   a_site->set_projected_alpha(alpha);
 
   TMatrixD pull(2, 1);
@@ -132,7 +128,6 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
   //
   // Kalman Gain: K = Cp Ht G
   //
-  std::cout << "Kalman gain" << std::endl;
   TMatrixD C(5, 5);
   C = a_site->get_covariance_matrix();
   TMatrixD temp3(5, 2);
@@ -140,44 +135,22 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
   TMatrixD K(5, 2);
   K = TMatrixD(temp3, TMatrixD::kMult, _G);
   //////////////////////////////////////////////////////////////////////
-  std::cout << "final" << std::endl;
   // ap = a + K*pull;
   TMatrixD temp4(5, 1);
   temp4 = TMatrixD(K, TMatrixD::kMult, pull);
   TMatrixD a_filt(5, 1);
   a_filt = TMatrixD(a, TMatrixD::kPlus, temp4);
   a_site->set_a(a_filt);
-/*
-  //////////////////////////////////////////////////////////////////////////
-  std::cout <<  "******************* STATE VECTOR *******************" << std::endl;
-  std::cout << "predicted: ";
-  a.Print();
-  std::cout << "filtered ";
-  a_filt.Print();
-  std::cout <<  "******************* COVARIANCE MATRIX *******************" << std::endl;
- // std::cout << "predicted: ";
- // C.Invert().Print();
-  std::cout << "updated ";
-  C.Print();
-  std::cout <<  "******************* OTHER MATRICES*******************" << std::endl;
-
-  std::cout << "H";
-  _H.Print();
-  std::cout << "Measurement: ";
-  m.Print();
-  std::cout << "ha= aH";
-  ha.Print();
-  std::cout << "Pull: ";
-  pull.Print();
-  std::cout << "K: ";
-  K.Print();
-*/
+  // Residuals. x and y.
+  double res_x = a_filt(0, 0) - a(0, 0);
+  double res_y = a_filt(1, 0) - a(1, 0);
+  a_site->set_residual_x(res_x);
+  a_site->set_residual_y(res_y);
 }
 
 //
 // Smoothing
 //
-
 void KalmanTrack::update_back_transportation_matrix(KalmanSite *optimum_site,
                                                       KalmanSite *smoothing_site) {
   // update_propagator(smoothing_site, optimum_site);
@@ -190,11 +163,9 @@ void KalmanTrack::update_back_transportation_matrix(KalmanSite *optimum_site,
   TMatrixD temp(5, 5);
   temp = TMatrixD(C, TMatrixD::kMultTranspose, _F);
   _A = TMatrixD(temp, TMatrixD::kMult, Cp);
-  // _A.Print();
 }
 
 void KalmanTrack::smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_site) {
-
   TMatrixD a(5, 1);
   a = smoothing_site->get_a();
   a.Print();
@@ -206,7 +177,6 @@ void KalmanTrack::smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_si
 
   TMatrixD temp1(5, 1);
   temp1 == TMatrixD(a_opt, TMatrixD::kMinus, ap);
-  // temp1.Print();
 
   TMatrixD temp2(5, 1);
   temp2 = TMatrixD(_A, TMatrixD::kMult, temp1);
@@ -214,19 +184,18 @@ void KalmanTrack::smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_si
   TMatrixD a_smooth(5, 1);
   a_smooth =  TMatrixD(a, TMatrixD::kPlus, temp2);
   smoothing_site->set_a(a_smooth);
-  // a_smooth.Print();
 
   // do the same for covariance matrix
   TMatrixD C(5, 5);
   C = smoothing_site->get_covariance_matrix();
-  // C.Print();
+
   TMatrixD C_opt(5, 5);
   C_opt = optimum_site->get_covariance_matrix();
   TMatrixD Cp(5, 5);
   Cp = optimum_site->get_projected_covariance_matrix();
   TMatrixD temp3(5, 5);
   temp3 = TMatrixD(C_opt, TMatrixD::kMinus, Cp);
-  // temp3.Print();
+
   TMatrixD temp4(5, 5);
   temp4 = TMatrixD(_A, TMatrixD::kMult, temp3);
   TMatrixD temp5(5, 5);
@@ -234,33 +203,5 @@ void KalmanTrack::smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_si
   TMatrixD C_smooth(5, 5);
   C_smooth =  TMatrixD(C, TMatrixD::kPlus, temp5);
   smoothing_site->set_covariance_matrix(C_smooth);
-  // C_smooth.Print();
+
 }
-
-// void KalmanTrack::dump_info() {
-// }
-/*
-// measurement-h1(a_1^0);
-void KalmanTrack::calc_pull(KalmanSite &site) {
-  TMatrixD m = site->get_measurement();
-
-  pull = m - h_a;
-}
-
-// C_k = [ (H_k)^T   G_k   H_k ]^-1
-void KalmanTrack::calc_covariance_matrix_of_residual(KalmanSite &site) {
-  TMatrixD Ht = H.transpose();
-  C = ( (old_C)-1 + Ht*G*H )-1;
-}
-
-// K=CHtG
-void KalmanTrack::calc_kalman_gain(KalmanSite &site) {
-  K=C Ht G;
-}
-
-void KalmanTrack::calc_filtered_state(KalmanSite &site) {
-  a = site->get_state_vector();
-
-  ap = a + _K*pull;
-}
-*/

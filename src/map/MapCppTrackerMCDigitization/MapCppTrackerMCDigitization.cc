@@ -244,7 +244,7 @@ int MapCppTrackerMCDigitization::compute_chan_no(SciFiHit *ahit) {
       // save the module corresponding to this plane
       this_plane = modules[j];
   }
-
+  // std::cerr << tracker << " " << station << " " << plane << std::endl;
   assert(this_plane != NULL);
 
   int numberFibres = static_cast<int> (7*2*(this_plane->propertyDouble("CentralFibre")+0.5));

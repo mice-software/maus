@@ -67,9 +67,6 @@ class KalmanSite {
                                        _v(1, 0) = 0.0;
                                        _alpha   = alpha; }
 
-  // void set_measurement(TMatrixD m) { _v = m;
-  //                                   _alpha = _v(0, 0); }
-
   TMatrixD get_measurement() const { return _v; }
 
   double get_alpha() const { return _alpha; }
@@ -90,15 +87,13 @@ class KalmanSite {
 
   double get_projected_alpha() const { return _alpha_projected; }
 
-  // void set_alpha(double alpha) { _alpha = alpha; }
+  void set_residual_x(double residual_x) { _residual_x = residual_x; }
 
-  // void set_state(state new_state) { _site_state = new_state; }
+  double get_residual_x() const { return _residual_x; }
 
-  // int get_state() const { return _site_state; }
+  void set_residual_y(double residual_y) { _residual_y = residual_y; }
 
-  void set_residual(double residual) { _residual = residual; }
-
-  double get_residual() const { return _residual; }
+  double get_residual_y() const { return _residual_y; }
 
  private:
   /// The state vector.
@@ -123,7 +118,7 @@ class KalmanSite {
   Hep3Vector _direction;
 
   /// The residual at this site. (filtered-meas)
-  double _residual;
+  double _residual_x, _residual_y;
 
   // enum state { INVALID = 0, PROJECTED, FILTERED, SMOOTHED };
 
