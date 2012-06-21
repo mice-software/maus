@@ -138,7 +138,9 @@ void SciFiClusterRec::construct(SciFiCluster *clust, std::vector<const MiceModul
 Hep3Vector SciFiClusterRec::get_reference_frame_pos(int tracker,
                                                     std::vector<const MiceModule*> modules) {
   const MiceModule* reference_plane = NULL;
-  int station, plane;
+  int station = 1;
+  int plane   = 0;
+/*
   if ( tracker == 0 ) {
     station = 5;
     plane = 2;
@@ -147,6 +149,7 @@ Hep3Vector SciFiClusterRec::get_reference_frame_pos(int tracker,
     station = 1;
     plane = 0;
   }
+*/
   for ( unsigned int j = 0; !reference_plane && j < modules.size(); j++ ) {
     // Find the right module
     if ( modules[j]->propertyExists("Tracker", "int") &&
