@@ -111,6 +111,7 @@ class ReduceCppMCTracker {
   double space_eff2;
 
   void Save();
+  bool Trigger(Json::Value path);
 };
 
 #endif

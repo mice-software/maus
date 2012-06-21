@@ -30,9 +30,9 @@ bool ReduceCppMCTracker::birth(std::string argJsonConfigDocument) {
   _classname = "ReduceCppMCTracker";
   _filename = "MCTracker.root";
   _nSpills = 0;
-  ofstream myfile;
-  myfile.open("test2.txt");
-  myfile.close();
+  // ofstream myfile;
+  // myfile.open("test2.txt");
+  // myfile.close();
 
   TCanvas *c1 = new TCanvas("c1", "Efficiencies", 200, 10, 600, 500);
   c1->SetFillColor(0);
@@ -156,28 +156,30 @@ std::string  ReduceCppMCTracker::process(std::string document) {
 
 
       // Start Sci Fi Hits
-      int hit_size = root["mc_events"][a]["sci_fi_hits"].size();
-      for (int b = 0; b < hit_size; b++) {
-        scuts = root["mc_events"][a]["sci_fi_hits"][b];
-        _x = scuts["position"]["x"].asDouble();
-        _y = scuts["position"]["y"].asDouble();
-        _z = scuts["position"]["z"].asDouble();
-        _px = scuts["momentum"]["x"].asDouble();
-        _py = scuts["momentum"]["y"].asDouble();
-        _pz = scuts["momentum"]["z"].asDouble();
-        _energy = scuts["energy"].asDouble();
-        _de = scuts["energy_deposited"].asDouble();
-        _tracker = scuts["channel_id"]["tracker_number"].asDouble();
-        _station = scuts["channel_id"]["station_number"].asDouble();
-        _plane = scuts["channel_id"]["plane_number"].asDouble();
-        _mctrue.Fill();
-        _sci_fi.Fill();
-        }
+      // if (root["mc_events"][a].isMember("sci_fi_hits")) {
+        int hit_size = root["mc_events"][a]["sci_fi_hits"].size();
+        for (int b = 0; b < hit_size; b++) {
+          scuts = root["mc_events"][a]["sci_fi_hits"][b];
+          _x = scuts["position"]["x"].asDouble();
+          _y = scuts["position"]["y"].asDouble();
+          _z = scuts["position"]["z"].asDouble();
+          _px = scuts["momentum"]["x"].asDouble();
+          _py = scuts["momentum"]["y"].asDouble();
+          _pz = scuts["momentum"]["z"].asDouble();
+          _energy = scuts["energy"].asDouble();
+          _de = scuts["energy_deposited"].asDouble();
+          _tracker = scuts["channel_id"]["tracker_number"].asDouble();
+          _station = scuts["channel_id"]["station_number"].asDouble();
+          _plane = scuts["channel_id"]["plane_number"].asDouble();
+          _mctrue.Fill();
+          _sci_fi.Fill();
+          }
+        // }
         // End Sci Fi Hits
 
 
         // Start Virtual Hits
-        if (root["mc_events"][a].isMember("virtual_hits")) {
+        // if (root["mc_events"][a].isMember("virtual_hits")) {
           int virtual_size = root["mc_events"][a]["virtual_hits"].size();
           for (int c = 0; c < virtual_size; c++) {
             scuts = root["mc_events"][a]["virtual_hits"][c];
@@ -197,114 +199,125 @@ std::string  ReduceCppMCTracker::process(std::string document) {
             _mctrue.Fill();
             _virt.Fill();
           }
-        }
+        // }
         // End Virtual Hits
       }
 
 
 // Recon events
     int recon_size = root["recon_events"].size();
+    int cut_recon_size = recon_size;
     int cluster_count1 = 0;
     int cluster_count2 = 0;
     int space_count1 = 0;
     int space_count2 = 0;
-    ofstream pyfile;
-    pyfile.open("test2.txt" , fstream::app);
-    pyfile << "Total number of particles this spill: " << recon_size << std::endl;
+    // ofstream pyfile;
+    // pyfile.open("test2.txt" , fstream::app);
+    // pyfile << "Total number of particles this spill: " << recon_size << std::endl;
     for (int h = 0; h < recon_size; h++) {
-      pyfile << "Spill number: " << _nSpills << " Particle number: " << h << std::endl;
+      scuts = root["recon_events"][h]["sci_fi_event"]["sci_fi_digits"]["tracker1"];
+      if (Trigger(scuts)) {
+        // pyfile << "Spill number: " << _nSpills << " Particle number: " << h << std::endl;
 
 
-      // Start of Digits
-      scuts = root["recon_events"][h]["sci_fi_event"]["sci_fi_digits"];
-      int digit0_size = scuts["tracker0"].size();
-      for (int i = 0; i < digit0_size; i++) {
-        _npe = scuts["tracker0"][i]["npe"].asDouble();
-        _tracker = scuts["tracker0"][i]["tracker"].asInt();
-        _station = scuts["tracker0"][i]["station"].asInt();
-        _plane = scuts["tracker0"][i]["plane"].asInt();
-        _x = scuts["tracker0"][i]["true_position"]["x"].asDouble();
-        _y = scuts["tracker0"][i]["true_position"]["y"].asDouble();
-        _z = scuts["tracker0"][i]["true_position"]["z"].asDouble();
-        _digits.Fill();
-        }
-      int digit1_size = scuts["tracker1"].size();
-      for (int j = 0; j < digit1_size; j++) {
-        _npe = scuts["tracker1"][j]["npe"].asDouble();
-        _tracker = scuts["tracker1"][j]["tracker"].asInt();
-        _station = scuts["tracker1"][j]["station"].asInt();
-        _plane = scuts["tracker1"][j]["plane"].asInt();
-        _x = scuts["tracker1"][j]["true_position"]["x"].asDouble();
-        _y = scuts["tracker1"][j]["true_position"]["y"].asDouble();
-        _z = scuts["tracker1"][j]["true_position"]["z"].asDouble();
-        _digits.Fill();
+        // Start of Digits
+        // if (root["recon_events"][h]["sci_fi_event"].isMember("sci_fi_digits")) {
+          scuts = root["recon_events"][h]["sci_fi_event"]["sci_fi_digits"];
+          int digit0_size = scuts["tracker0"].size();
+          for (int i = 0; i < digit0_size; i++) {
+            _npe = scuts["tracker0"][i]["npe"].asDouble();
+            _tracker = scuts["tracker0"][i]["tracker"].asInt();
+            _station = scuts["tracker0"][i]["station"].asInt();
+            _plane = scuts["tracker0"][i]["plane"].asInt();
+            _x = scuts["tracker0"][i]["true_position"]["x"].asDouble();
+            _y = scuts["tracker0"][i]["true_position"]["y"].asDouble();
+            _z = scuts["tracker0"][i]["true_position"]["z"].asDouble();
+            _digits.Fill();
+            }
+          int digit1_size = scuts["tracker1"].size();
+          for (int j = 0; j < digit1_size; j++) {
+            _npe = scuts["tracker1"][j]["npe"].asDouble();
+            _tracker = scuts["tracker1"][j]["tracker"].asInt();
+            _station = scuts["tracker1"][j]["station"].asInt();
+            _plane = scuts["tracker1"][j]["plane"].asInt();
+            _x = scuts["tracker1"][j]["true_position"]["x"].asDouble();
+            _y = scuts["tracker1"][j]["true_position"]["y"].asDouble();
+            _z = scuts["tracker1"][j]["true_position"]["z"].asDouble();
+            _digits.Fill();
+          }
+        // }
+        // End of Digits
+
+
+        // Start of Clusters
+        // if (root["recon_events"][h]["sci_fi_event"].isMember("sci_fi_clusters")) {
+          scuts = root["recon_events"][h]["sci_fi_event"]["sci_fi_clusters"];
+          int cluster0_size = scuts["tracker0"].size();
+          int cluster1_size = scuts["tracker1"].size();
+          cluster_count1 += cluster0_size;
+          cluster_count2 += cluster1_size;
+          // pyfile << "Total number of clusters: Tracker 1: " << cluster_count1
+          //   << "   Tracker 2: " << cluster_count2 << std::endl;
+        // }  
+        // End of Clusters
+
+
+        // Start of Space Points
+        // if (root["recon_events"][h]["sci_fi_event"].isMember("sci_fi_space_points")) {
+          scuts = root["recon_events"][h]["sci_fi_event"]["sci_fi_space_points"];
+          int space0_size = scuts["tracker0"].size();
+          int space1_size = scuts["tracker1"].size();
+          for (int k = 0; k < space0_size; k++) {
+            _x = scuts["tracker0"][k]["position"]["x"].asDouble();
+            _y = scuts["tracker0"][k]["position"]["y"].asDouble();
+            _z = scuts["tracker0"][k]["position"]["z"].asDouble();
+            _station = scuts["tracker0"][k]["station"].asInt();
+            _tracker = scuts["tracker0"][k]["tracker"].asInt();
+            std::string type = scuts["tracker0"][k]["type"].asString();
+            if (type == "triplet") {_type = 3;}
+            if (type == "duplet") {_type = 2;}
+            _part_event = scuts["tracker0"][k]["part_event_number"].asInt();
+            _sp.Fill();
+          }
+          for (int l = 0; l < space1_size; l++) {
+            _x = scuts["tracker1"][l]["position"]["x"].asDouble();
+            _y = scuts["tracker1"][l]["position"]["y"].asDouble();
+            _z = scuts["tracker1"][l]["position"]["z"].asDouble();
+            _station = scuts["tracker1"][l]["station"].asInt();
+            _tracker = scuts["tracker1"][l]["tracker"].asInt();
+            std::string type = scuts["tracker1"][l]["type"].asString();
+            if (type == "triplet") {_type = 3;}
+            if (type == "duplet") {_type = 2;}
+            _part_event = scuts["tracker1"][l]["part_event_number"].asInt();
+            _sp.Fill();
+          }
+          space_count1 += space0_size;
+          space_count2 += space1_size;
+          // pyfile << "Total number of space points: Tracker 1: " << space_count1
+          //   << "   Tracker 2: " << space_count2 << std::endl;
+        // }
+        // End of Space Points
       }
-      // End of Digits
-
-
-      // Start of Clusters
-      scuts = root["recon_events"][h]["sci_fi_event"]["sci_fi_clusters"];
-      int cluster0_size = scuts["tracker0"].size();
-      int cluster1_size = scuts["tracker1"].size();
-      cluster_count1 += cluster0_size;
-      cluster_count2 += cluster1_size;
-      pyfile << "Total number of clusters: Tracker 1: " << cluster_count1
-        << "   Tracker 2: " << cluster_count2 << std::endl;
-      // End of Clusters
-
-
-      // Start of Space Points
-      scuts = root["recon_events"][h]["sci_fi_event"]["sci_fi_space_points"];
-      int space0_size = scuts["tracker0"].size();
-      int space1_size = scuts["tracker1"].size();
-      for (int k = 0; k < space0_size; k++) {
-        _x = scuts["tracker0"][k]["position"]["x"].asDouble();
-        _y = scuts["tracker0"][k]["position"]["y"].asDouble();
-        _z = scuts["tracker0"][k]["position"]["z"].asDouble();
-        _station = scuts["tracker0"][k]["station"].asInt();
-        _tracker = scuts["tracker0"][k]["tracker"].asInt();
-        std::string type = scuts["tracker0"][k]["type"].asString();
-        if (type == "triplet") {_type = 3;}
-        if (type == "duplet") {_type = 2;}
-        _part_event = scuts["tracker0"][k]["part_event_number"].asInt();
-        _sp.Fill();
-      }
-      for (int l = 0; l < space1_size; l++) {
-        _x = scuts["tracker1"][l]["position"]["x"].asDouble();
-        _y = scuts["tracker1"][l]["position"]["y"].asDouble();
-        _z = scuts["tracker1"][l]["position"]["z"].asDouble();
-        _station = scuts["tracker1"][l]["station"].asInt();
-        _tracker = scuts["tracker1"][l]["tracker"].asInt();
-        std::string type = scuts["tracker1"][l]["type"].asString();
-        if (type == "triplet") {_type = 3;}
-        if (type == "duplet") {_type = 2;}
-        _part_event = scuts["tracker1"][l]["part_event_number"].asInt();
-        _sp.Fill();
-      }
-      space_count1 += space0_size;
-      space_count2 += space1_size;
-      pyfile << "Total number of space points: Tracker 1: " << space_count1
-        << "   Tracker 2: " << space_count2 << std::endl;
-      // End of Space Points
+      else {cut_recon_size--;}
     }
 
-    pyfile << "At the end of the spill we have:" << std::endl;
+    // pyfile << std::endl << "At the end of the spill we have " << cut_recon_size
+    //   << " number of particles that made it through tracker 2." << std::endl;
+    // pyfile << "  Total number of space points: Tracker 1: " << space_count1
+    //   << "   Tracker 2: " << space_count2 << std::endl;
+    // pyfile << "  Total number of clusters: Tracker 1: " << cluster_count1
+    //   << "   Tracker 2: " << cluster_count2 << std::endl;
 
-    pyfile << "  Total number of space points: Tracker 1: " << space_count1
-      << "   Tracker 2: " << space_count2 << std::endl;
-    pyfile << "  Total number of clusters: Tracker 1: " << cluster_count1
-      << "   Tracker 2: " << cluster_count2 << std::endl;
-
-    space_eff1 = space_count1/(recon_size*5.0);
-    space_eff2 = space_count2/(recon_size*5.0);
-    cluster_eff1 = cluster_count1/(recon_size*15.0);
-    cluster_eff2 = cluster_count2/(recon_size*15.0);
-    pyfile << std::endl << "  Total cluster efficiency: Tracker 1: " << cluster_eff1
-      << "   Tracker 2: " << cluster_eff2 << std::endl;
-    pyfile << "  Total space point efficiency: Tracker 1: " << space_eff1
-      << "   Tracker 2: " << space_eff2 << std::endl << std::endl;
+    space_eff1 = space_count1/(cut_recon_size*5.0);
+    space_eff2 = space_count2/(cut_recon_size*5.0);
+    cluster_eff1 = cluster_count1/(cut_recon_size*15.0);
+    cluster_eff2 = cluster_count2/(cut_recon_size*15.0);
+    // pyfile << std::endl << "  Total cluster efficiency: Tracker 1: " << cluster_eff1
+    //   << "   Tracker 2: " << cluster_eff2 << std::endl;
+    // pyfile << "  Total space point efficiency: Tracker 1: " << space_eff1
+    //   << "   Tracker 2: " << space_eff2 << std::endl << std::endl;
     _other.Fill();
-    pyfile.close();
+    // pyfile.close();
   } catch(Squeal squee) {
     Squeak::mout(Squeak::error) << squee.GetMessage() << std::endl;
     root = MAUS::CppErrorHandler::getInstance()->HandleSqueal(root, squee, _classname);
@@ -353,6 +366,14 @@ void ReduceCppMCTracker::Save() {
   datafile.ls();
   datafile.Close();
   Squeak::mout(Squeak::info) << _filename << " is updated." << std::endl;
+}
+
+bool ReduceCppMCTracker::Trigger(Json::Value path) {
+  int path_size = path.size();
+  for (int m = 0; m < path_size; m++) {
+    if (path[m]["station"] == 5) {return true;}
+  }
+  return false;
 }
 
 
