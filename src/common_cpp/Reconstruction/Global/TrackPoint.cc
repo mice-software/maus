@@ -160,11 +160,11 @@ const bool TrackPoint::operator>(const TrackPoint& rhs) const {
     
 }
 
-void TrackPoint::set_particle_id(unsigned int id) {
+void TrackPoint::set_particle_id(int id) {
   particle_id_ = id;
 }
 
-unsigned int TrackPoint::particle_id() const {
+int TrackPoint::particle_id() const {
   return particle_id_;
 }
 

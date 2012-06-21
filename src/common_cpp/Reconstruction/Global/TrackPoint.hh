@@ -131,8 +131,8 @@ class TrackPoint : public MAUS::PhaseSpaceVector {
   //       Accessors
   // *************************
 
-  void set_particle_id(unsigned int id);
-  unsigned int particle_id() const;
+  void set_particle_id(int id);
+  int particle_id() const;
 
   void set_detector_id(unsigned int id);
   unsigned int detector_id() const;

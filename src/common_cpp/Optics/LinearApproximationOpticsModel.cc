@@ -36,6 +36,7 @@ const TransferMap * LinearApproximationOpticsModel::CalculateTransferMap(
     const std::vector<reconstruction::global::TrackPoint> & start_plane_hits,
     const std::vector<reconstruction::global::TrackPoint> & station_hits)
     const {
+std::cout << "DEBUG CalculateTransferMap(): Start Plane Hits back() (1) PID = " << start_plane_hits.back().particle_id() << std::endl;
   std::vector<reconstruction::global::TrackPoint>::const_iterator hit;
 
   double hit_total = 0.0;
@@ -44,7 +45,9 @@ const TransferMap * LinearApproximationOpticsModel::CalculateTransferMap(
   }
   double start_plane = hit_total / start_plane_hits.size();
   
+  --hit;
   const int particle_id = hit->particle_id();
+std::cout << "DEBUG CalculateTransferMap(): Start Plane Hit's PID = " << hit->particle_id() << std::endl;
 
   hit_total = 0.0;
   for (hit = station_hits.begin(); hit != station_hits.end(); ++hit) {
@@ -73,24 +76,24 @@ fprintf(stdout, "CHECKPOINT Transport() 0\n"); fflush(stdout);
   // be if it were traveling in free space from start_plane_ to end_plane_.
   PhaseSpaceVector transported_vector(vector);
   double delta_z = end_plane_ - start_plane_;
-std::cout << "Delta Z: " << delta_z << std::endl;
+std::cout << "Delta Z: " << delta_z << " mm" << std::endl;
 
   const double momentum = ::sqrt(vector.E()*vector.E() - mass_*mass_);
-std::cout << "Momentum: " << momentum << std::endl;
+std::cout << "Momentum: " << momentum << " MeV/c" << std::endl;
   const double velocity = ::CLHEP::c_light * momentum / vector.E();
-std::cout << "Velocity: " << velocity << std::endl;
+std::cout << "Velocity: " << velocity << " mm/ns" << std::endl;
 
   // delta_t = delta_z / v_z ~= delta_z / velocity
   double delta_t = delta_z / velocity;
-std::cout << "Delta T: " << delta_t << std::endl;
+std::cout << "Delta T: " << delta_t << " ns" << std::endl;
 
   // delta_x = v_x * delta_t
   double delta_x = vector.Px() * delta_t / mass_;
-std::cout << "Delta X: " << delta_x << std::endl;
+std::cout << "Delta X: " << delta_x << " mm" << std::endl;
 
   // delta_y = v_y * delta_t
   double delta_y = vector.Py() * delta_t / mass_;
-std::cout << "Delta Y: " << delta_y << std::endl;
+std::cout << "Delta Y: " << delta_y << " mm" << std::endl;
 
   transported_vector[0] += delta_t;
   transported_vector[2] += delta_x;

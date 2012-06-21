@@ -155,12 +155,10 @@ fprintf(stdout, "CHECKPOINT: ScoreTrack() 1\n"); fflush(stdout);
 if (transfer_map == NULL) {
   fprintf(stdout, "ERROR: transfer_map is NULL! Everybody panic!\n");
 }
-    PhaseSpaceVector transported_psv = transfer_map->Transport(guess);
 fprintf(stdout, "CHECKPOINT: ScoreTrack() 2\n"); fflush(stdout);
-    TrackPoint point = TrackPoint(transported_psv);
+    TrackPoint point = TrackPoint(transfer_map->Transport(guess));
 fprintf(stdout, "CHECKPOINT: ScoreTrack() 3\n"); fflush(stdout);
-std::cout << "Station Point: " << point << std::endl;
-    delete transfer_map;
+std::cout << "DEBUG ScoreTrack(): Station Point: " << point << std::endl;
 
     uncertainties = &events->uncertainties();
     point.set_uncertainties(*uncertainties);
@@ -172,11 +170,11 @@ std::cout << "Station Point: " << point << std::endl;
     // Sum the squares of the differences between the calculated phase space
     // coordinates and the measured coordinates.
     delta = TrackPoint(point - (*events));
-std::cout << "event: " << (*events) << std::endl;
+std::cout << "DEBUG ScoreTrack(): event: " << (*events) << std::endl;
     chi_squared += (transpose(delta) * (*uncertainties) * delta)[0];
-std::cout << "delta: " << delta << std::endl;
-std::cout << "uncertainties: " << *uncertainties << std::endl;
-std::cout << "chi_squared: " << chi_squared << std::endl;
+std::cout << "DEBUG ScoreTrack(): delta: " << delta << std::endl;
+std::cout << "DEBUG ScoreTrack(): uncertainties: " << *uncertainties << std::endl;
+std::cout << "DEBUG ScoreTrack(): chi_squared: " << chi_squared << std::endl;
 
     ++events;
   }
