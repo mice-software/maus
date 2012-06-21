@@ -90,7 +90,7 @@ SciFiPlane::SciFiPlane(MiceModule* mod,
                                                false, 0);
 
   // lenght of the tube of fibre
-  G4double tlen = 190.0 * mm;
+  G4double tlen = 150.0 * mm;
 
   // the number of fibres to be simulated
   _numFibres = (G4int)floor(2. * ar / (0.5 * fp));

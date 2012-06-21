@@ -86,15 +86,15 @@ std::string MapCppTrackerRecon::process(std::string document) {
         pattern_recognition(event);
       }
       // Kalman Track Fit.
-      if ( event.straightprtracks().size() ) {
-        track_fit(event);
-      }
+      // if ( event.straightprtracks().size() ) {
+        // track_fit(event);
+      // }
       // if ( root.isMember("mc_events") ) {
-        // make_seed_and_fit(event);
+      //   make_seed_and_fit(event);
       // }
 
       print_event_info(event);
-      // save_to_json(event, k);
+      save_to_json(event, k);
     }  // ==========================================================
   } catch(...) {
     Json::Value errors;
