@@ -258,7 +258,7 @@ std::string  ReduceCppMCTracker::process(std::string document) {
           cluster_count2 += cluster1_size;
           // pyfile << "Total number of clusters: Tracker 1: " << cluster_count1
           //   << "   Tracker 2: " << cluster_count2 << std::endl;
-        // }  
+        // }
         // End of Clusters
 
 
@@ -297,8 +297,9 @@ std::string  ReduceCppMCTracker::process(std::string document) {
           //   << "   Tracker 2: " << space_count2 << std::endl;
         // }
         // End of Space Points
+      } else {
+        cut_recon_size--;
       }
-      else {cut_recon_size--;}
     }
 
     // pyfile << std::endl << "At the end of the spill we have " << cut_recon_size
