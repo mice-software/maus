@@ -84,7 +84,8 @@ void KalmanMonitor::print_info(std::vector<KalmanSite> const &sites) {
                                        site.get_direction().y() << ", " <<
                                        site.get_direction().z() << ")" << std::endl;
 
-    std::cerr << "SITE residual (mm): " << site.get_residual_x() << ", " << site.get_residual_x() << std::endl;
+    std::cerr << "SITE residual (mm): " << site.get_residual_x() << ", "
+              << site.get_residual_y() << std::endl;
     std::cerr << "SITE measured alpha: " << site.get_alpha() << std::endl;
   }
 }

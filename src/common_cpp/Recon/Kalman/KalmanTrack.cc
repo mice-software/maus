@@ -94,9 +94,6 @@ void KalmanTrack::update_covariance(KalmanSite *a_site) {
   temp2 = TMatrixD(temp1, TMatrixD::kMult, _H);
   TMatrixD Cp(5, 5);
   Cp = TMatrixD(C_inv, TMatrixD::kPlus, temp2);
-  _H.Print();
-  _G.Print();
-  Cp.Print();
   Cp.Invert();
   a_site->set_covariance_matrix(Cp);
   // assert(site.state() == "filtered");
@@ -144,6 +141,8 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
   // Residuals. x and y.
   double res_x = a_filt(0, 0) - a(0, 0);
   double res_y = a_filt(1, 0) - a(1, 0);
+  // a_filt.Print();
+  // a.Print();
   a_site->set_residual_x(res_x);
   a_site->set_residual_y(res_y);
 }
@@ -168,7 +167,7 @@ void KalmanTrack::update_back_transportation_matrix(KalmanSite *optimum_site,
 void KalmanTrack::smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_site) {
   TMatrixD a(5, 1);
   a = smoothing_site->get_a();
-  a.Print();
+
   TMatrixD a_opt(5, 1);
   a_opt = optimum_site->get_a();
 
@@ -203,5 +202,4 @@ void KalmanTrack::smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_si
   TMatrixD C_smooth(5, 5);
   C_smooth =  TMatrixD(C, TMatrixD::kPlus, temp5);
   smoothing_site->set_covariance_matrix(C_smooth);
-
 }

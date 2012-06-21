@@ -167,7 +167,7 @@ void KalmanTrackFit::process(SciFiEvent &event) {
   */
   KalmanMonitor monitor;
   monitor.save(sites);
-  monitor.print_info(sites);
+  // monitor.print_info(sites);
 }
 
 void KalmanTrackFit::initialise(SciFiEvent &event, std::vector<KalmanSite> &sites) {
@@ -355,5 +355,4 @@ void KalmanTrackFit::process_clusters(std::vector<SciFiSpacePoint> &spacepoints,
     }
     myfile.close();
   }*/
-
 }
