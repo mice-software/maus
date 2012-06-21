@@ -120,9 +120,8 @@ def get_environment():
     # libraries
     env = SCons.Environment.Environment(SHLIBPREFIX="",
                  BUILDERS = {'Dylib2SO' : DYLIB2SO}) # pylint: disable-msg=E0602
-    if os.path.isfile('.use_llvm_with_maus'):
-        env['CC'] = "llvm-gcc"
-        env['CXX'] = "llvm-g++"
+    env['CC'] = os.environ["CC"]
+    env['CXX'] = os.environ["CXX"]
 
     env.Tool \
           ('swig', '%s/third_party/swig-2.0.1' % os.environ['MAUS_THIRD_PARTY'])
