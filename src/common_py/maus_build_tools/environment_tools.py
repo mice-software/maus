@@ -120,8 +120,10 @@ def get_environment():
     # libraries
     env = SCons.Environment.Environment(SHLIBPREFIX="",
                  BUILDERS = {'Dylib2SO' : DYLIB2SO}) # pylint: disable-msg=E0602
-    env['CC'] = os.environ["CC"]
-    env['CXX'] = os.environ["CXX"]
+    if os.getenv('CC') != None:
+        env['CC'] = os.getenv["CC"]
+    if os.getenv('CXX') != None:
+        env['CXX'] = os.getenv["CXX"]
 
     env.Tool \
           ('swig', '%s/third_party/swig-2.0.1' % os.environ['MAUS_THIRD_PARTY'])
