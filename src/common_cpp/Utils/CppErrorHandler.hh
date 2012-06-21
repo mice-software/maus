@@ -120,8 +120,13 @@ class CppErrorHandler {
     return getInstance()->HandleExceptionFunction;
   }
 
+  /** @brief Get the CppErrorHandler instance
+   */
   static CppErrorHandler* getInstance();
 
+  /** @brief Delete the CppErrorHandler instance
+   */
+  ~CppErrorHandler();
  private:
   static CppErrorHandler* instance;
   PyObject* HandleExceptionFunction;  // set by callback defined in PyMausCpp
@@ -130,7 +135,6 @@ class CppErrorHandler {
              (std::string what, Json::Value json_value, std::string class_name);
 
   CppErrorHandler();
-  ~CppErrorHandler();
 };
 
 }  // namespace MAUS

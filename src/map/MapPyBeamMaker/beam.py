@@ -140,6 +140,7 @@ class Beam(): # pylint: disable=R0902
         self.momentum_defined_by = "energy"
         self.beam_seed = 0
         self.particle_seed_algorithm = ""
+        self.rotation = None
 
     def birth(self, beam_def, particle_generator, random_seed):
         """
@@ -159,6 +160,7 @@ class Beam(): # pylint: disable=R0902
         self.__birth_transverse_ellipse(beam_def["transverse"])
         self.__birth_longitudinal_ellipse(beam_def["longitudinal"])
         self.__birth_trans_long_coupling(beam_def["coupling"])
+        self.__birth_rotation(beam_def)
         self.__birth_beam_mean()
 
     def __birth_particle_generator(self, beam_def, particle_generator):
@@ -311,6 +313,22 @@ class Beam(): # pylint: disable=R0902
             self.beam_mean[i] = self.reference[key]
         self.beam_mean[5] = self.reference[self.momentum_defined_by]
 
+    def __birth_rotation(self, beam_def):
+        """
+        Setup beam rotation if defined
+
+        Set self.rotation to the "rotation" parameter if that is defined. Else
+        set it to None.
+        """
+        if "rotation" in beam_def.keys():
+            rot = beam_def["rotation"]
+        else:
+            self.rotation = None
+            return
+        if type(rot) != type({}) or ["x", "y", "z"] != sorted(rot.keys()):
+            raise ValueError("Failed to parse beam rotation "+str(rot))
+        self.rotation = rot # don't check they are floats...
+
     def make_one_primary(self):
         """
         Make a primary particle.
@@ -338,6 +356,37 @@ class Beam(): # pylint: disable=R0902
         return self.__process_array_to_primary(particle_array, 
                                 self.reference["pid"], self.momentum_defined_by)
 
+    def __process_rotate_hit(self, hit):
+        """
+        Rotate the particle defined in hit
+
+        Rotate the particle defined in hit. Rotation is performed of momentum
+        and position variables about the z, y, and x axes in that order by the
+        angle specified in the rotation vector (taken as radians). Returns the
+        rotated hit.
+
+        If self.rotation is None, return the hit unchanged.
+        """
+        if self.rotation == None:
+            return hit
+        cx = math.cos(self.rotation["x"])
+        sx = math.sin(self.rotation["x"])
+        cy = math.cos(self.rotation["y"])
+        sy = math.sin(self.rotation["y"])
+        cz = math.cos(self.rotation["z"])
+        sz = math.sin(self.rotation["z"])
+        rot_matrix = numpy.matrix([[1., 0.,  0.],
+                                  [0., cx, -sx],
+                                  [0., sx,  cx],])*\
+                     numpy.matrix([[cy, 0.,   sy],
+                                  [0., 1.,   0.],
+                                  [-sy, 0.,  cy],])*\
+                     numpy.matrix([[cz, -sz, 0.],
+                                  [sz, cz,  0.],
+                                  [0., 0.,  0.],])
+        print rot_matrix
+
+
     def __process_array_to_primary(self, particle_array, pid,
                                                          longitudinal_variable):
         """
@@ -360,6 +409,7 @@ class Beam(): # pylint: disable=R0902
             hit["energy"] = particle_array[5]
             hit.mass_shell_condition("pz")
         hit["pz"] *= self.reference['pz']/abs(self.reference['pz'])
+        hit = self.__process_rotate_hit(hit)
         primary = hit.get_maus_dict('maus_primary')[0]
         primary["position"]["z"] = self.reference["z"]
         primary["random_seed"] = self.__process_get_seed()

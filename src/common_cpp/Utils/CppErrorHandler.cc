@@ -106,5 +106,10 @@ CppErrorHandler* CppErrorHandler::getInstance() {
   return instance;
 }
 
+CppErrorHandler::~CppErrorHandler() {
+  if (this == instance) {  // should always be true
+    instance = NULL;
+  }
+}
 }  // namespace MAUS
 

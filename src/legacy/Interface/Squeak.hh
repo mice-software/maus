@@ -138,7 +138,10 @@ class Squeak {
   static void        setSqueal();
 };
 
-
+// at some point we want to be in MAUS namespace
+namespace MAUS {
+    typedef Squeak Logging;
+}
 
 #endif
 

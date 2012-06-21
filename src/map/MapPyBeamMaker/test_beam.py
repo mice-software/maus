@@ -372,6 +372,21 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
             self.assertAlmostEqual(self._beam.reference[mom_var],
                                    self._beam.beam_mean[5])
 
+    def test_birth_rotation(self):
+        """Check the rotation is set - or not - okay"""
+        self._beam._Beam__birth_rotation(
+                                      {"rotation":{"x":"a", "y":0, "z":1.}})
+        self.assertEqual(self._beam.rotation, {"x":"a", "y":0, "z":1.})
+        self._beam._Beam__birth_rotation({})
+        self.assertEqual(self._beam.rotation, None)
+        self.assertRaises(ValueError,
+                          self._beam._Beam__birth_rotation,
+                          {"rotation":"hello"})
+        self.assertRaises(ValueError,
+                          self._beam._Beam__birth_rotation,
+                          {"rotation":{"x":0, "y":1}})
+        self.assertEqual(self._beam.rotation, None)
+
     def test_birth(self):
         """Overall check birth works"""
         a_beam = beam.Beam()
@@ -427,6 +442,11 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
         primary = self._beam._Beam__process_array_to_primary(mean, 13, 'energy')
         self.assertLess(primary["momentum"]["z"], 0.)
 
+    def test_process_array_to_primary_rotation(self):
+        """Check function that perform rotation of input beam"""
+        hit = Hit.new_from_dict({"x":1., "y":2., "z":3.,
+                                 "px":10., "py":11., "pz":12.})
+        hit = Hit.new
 
     def test_make_one_primary_gaus(self):
         """Check function that throws a particle - for gaussian distribution"""
