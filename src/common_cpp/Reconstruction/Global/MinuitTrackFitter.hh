@@ -65,6 +65,7 @@ class MinuitTrackFitter : public TrackFitter, public TObject {
   Track * track_;
   int particle_id_;
 
+  bool ValidGuess(const TrackPoint & guess) const;
   MinuitTrackFitter();
 };
 

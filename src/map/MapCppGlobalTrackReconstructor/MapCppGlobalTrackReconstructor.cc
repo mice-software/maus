@@ -310,7 +310,7 @@ void MapCppGlobalTrackReconstructor::SetupTrackFitter() {
   switch (fitter) {
     case 0: {
       // Minuit
-      double start_plane = 0.0;
+      double start_plane = optics_model_->start_plane();
       track_fitter_ = new MinuitTrackFitter(*optics_model_, start_plane);
       break;
     }

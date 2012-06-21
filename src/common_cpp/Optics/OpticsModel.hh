@@ -42,7 +42,10 @@ class OpticsModel {
    */
   virtual const TransferMap * GenerateTransferMap(const double end_plane)
     const = 0;
+
+  double start_plane() {return start_plane_;}
  protected:
+  double start_plane_;
 };
 }
 

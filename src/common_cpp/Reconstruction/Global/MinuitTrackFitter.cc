@@ -21,6 +21,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <limits>
 #include <vector>
 
 #include "TMinuit.h"
@@ -44,9 +45,8 @@ void common_cpp_optics_reconstruction_minuit_track_fitter_score_function(
     Double_t & score,
     Double_t * phase_space_coordinate_values,
     Int_t      execution_stage_flag) {
-fprintf(stdout, "CHECKPOINT: ..._score_function() 0"); fflush(stdout);
-for (int index = 0; index < 6; ++index) {
-  std::cout << "Parameter " << index+1 << " value: "
+for (size_t index = 0; index < 6; ++index) {
+  std::cout << "DEBUG ..._score_function: coordinate[" << index << "] = "
             << phase_space_coordinate_values[index] << std::endl;
 }
   // common_cpp_optics_reconstruction_minuit_track_fitter_minuit is defined
@@ -56,9 +56,7 @@ for (int index = 0; index < 6; ++index) {
 
   MinuitTrackFitter * track_fitter
     = static_cast<MinuitTrackFitter *>(minuit->GetObjectFit());
-fprintf(stdout, "CHECKPOINT: ..._score_function() 1"); fflush(stdout);
   score = track_fitter->ScoreTrack(phase_space_coordinate_values);
-fprintf(stdout, "CHECKPOINT: ..._score_function() 2"); fflush(stdout);
 }
 
 MinuitTrackFitter::MinuitTrackFitter(
@@ -80,12 +78,17 @@ MinuitTrackFitter::MinuitTrackFitter(
   // phase space variable (mins and maxes calculated from 800MeV/c ISIS beam)
   int error_flag = 0;
   // TODO(plane1@hawk.iit.edu) put this in the configuration file
-  minimiser->mnparm(0, "Time", 0., 0.1, -1000., 1., error_flag);   // ns
-  minimiser->mnparm(1, "Energy", 200., 1, 105.7, 1860., error_flag);  // MeV
-  minimiser->mnparm(2, "X", 0, 0.001, -150., 150., error_flag);      // mm
-  minimiser->mnparm(3, "Px", 0., 0.1, -100., 100, error_flag);    // MeV/c
-  minimiser->mnparm(4, "Y", 0, 0.001, -150., 150., error_flag);      // mm
-  minimiser->mnparm(5, "Py", 0., 0.1, -100., 100, error_flag);    // MeV/c
+//  minimiser->mnparm(0, "Time", 0., 0.1, -1000., 1., error_flag);   // ns
+//  minimiser->mnparm(1, "Energy", 200., 1, 105.7, 1860., error_flag);  // MeV
+  minimiser->mnparm(0, "X", 0, 0.001, -150., 150., error_flag);      // mm
+  minimiser->mnparm(1, "Px", 0., 0.1, -100., 100, error_flag);    // MeV/c
+  minimiser->mnparm(2, "Y", 0, 0.001, -150., 150., error_flag);      // mm
+  minimiser->mnparm(3, "Py", 0., 0.1, -100., 100, error_flag);    // MeV/c
+  minimiser->mnparm(4, "Z", start_plane, 0.001, -15000., 200000., error_flag);      // mm
+  minimiser->mnparm(5, "Pz", 1., 0.1, -1., 500, error_flag);    // MeV/c
+  minimiser->FixParameter(4);
+//Int_t DefineParameter( Int_t parNo, const char *name, Double_t initVal, Double_t initErr, Double_t lowerLimit, Double_t upperLimit )
+
 }
 
 MinuitTrackFitter::~MinuitTrackFitter() {
@@ -93,7 +96,6 @@ MinuitTrackFitter::~MinuitTrackFitter() {
 }
 
 void MinuitTrackFitter::Fit(const Track & detector_events, Track & track) {
-fprintf(stdout, "CHECKPOINT: Fit() 0"); fflush(stdout);
   detector_events_ = &detector_events;
   track_ = &track;
 
@@ -113,9 +115,7 @@ fprintf(stdout, "CHECKPOINT: Fit() 0"); fflush(stdout);
   TMinuit * minimiser
     = common_cpp_optics_reconstruction_minuit_track_fitter_minuit;
   // Int_t status = minimiser->Migrad();
-fprintf(stdout, "CHECKPOINT: Fit() 1"); fflush(stdout);
   minimiser->Migrad();
-fprintf(stdout, "CHECKPOINT: Fit() 2"); fflush(stdout);
 
   // TODO(plane1@hawk.iit.edu) Handle status from minimiser
 }
@@ -124,6 +124,7 @@ Double_t MinuitTrackFitter::ScoreTrack(
     Double_t const * const start_plane_track_coordinates) {
   // clear the last saved track
   track_->clear();
+Track residuals;
 
   // Setup the start plane track point based on the Minuit initial conditions
   CovarianceMatrix null_uncertainties;
@@ -133,13 +134,17 @@ Double_t MinuitTrackFitter::ScoreTrack(
                          start_plane_track_coordinates[3],
                          start_plane_track_coordinates[4],
                          start_plane_track_coordinates[5],
-                         particle_id_);
-std::cout << "Guess: " << guess << std::endl;
-  double start_plane = start_plane_;
-fprintf(stdout, "CHECKPOINT: ScoreTrack() 0\n"); fflush(stdout);
+                         particle_id_,
+                         PhaseSpaceVector::PhaseSpaceType::kPositional);
+std::cout << "DEBUG ScoreTrack(): particle ID = " << particle_id_ << std::endl;
+  // If the guess is not physical then return a horrible score
+  if (!ValidGuess(guess)) {
+std::cout << "DEBUG ScoreTrack(): Returning maximum score for invalid guess." << std::endl;
+//    return std::numeric_limits<double>::max();
+    return 1.0e+15;
+  }
   track_->push_back(guess);
 
-  PhaseSpaceVector delta;  // difference between the guess and the measurement
   TransferMap const * transfer_map = NULL;
   CovarianceMatrix const * uncertainties = NULL;
   std::vector<TrackPoint>::const_iterator events
@@ -148,17 +153,20 @@ fprintf(stdout, "CHECKPOINT: ScoreTrack() 0\n"); fflush(stdout);
   // calculate chi^2
   Double_t chi_squared = 0.0;
   for (size_t index = 0; events < detector_events_->end(); ++index) {
+std::cout << "DEBUG ScoreTrack(): Guess: " << guess << std::endl;
+std::cout << "DEBUG ScoreTrack(): Measured: " << *events << std::endl;
     // calculate the next guess
     transfer_map
       = optics_model_->GenerateTransferMap(events->z());
-fprintf(stdout, "CHECKPOINT: ScoreTrack() 1\n"); fflush(stdout);
-if (transfer_map == NULL) {
-  fprintf(stdout, "ERROR: transfer_map is NULL! Everybody panic!\n");
-}
-fprintf(stdout, "CHECKPOINT: ScoreTrack() 2\n"); fflush(stdout);
-    TrackPoint point = TrackPoint(transfer_map->Transport(guess));
-fprintf(stdout, "CHECKPOINT: ScoreTrack() 3\n"); fflush(stdout);
-std::cout << "DEBUG ScoreTrack(): Station Point: " << point << std::endl;
+    if (transfer_map == NULL) {
+    throw(Squeal(Squeal::nonRecoverable,
+                 "Got NULL transfer map.",
+                 "MAUS::MinuitTrackFitter::ScoreTrack()"));
+    }
+    TrackPoint point = TrackPoint(
+      transfer_map->Transport(guess),
+      PhaseSpaceVector::PhaseSpaceType::kPositional);
+std::cout << "DEBUG ScoreTrack(): Calculated: " << point << std::endl;
 
     uncertainties = &events->uncertainties();
     point.set_uncertainties(*uncertainties);
@@ -169,19 +177,59 @@ std::cout << "DEBUG ScoreTrack(): Station Point: " << point << std::endl;
 
     // Sum the squares of the differences between the calculated phase space
     // coordinates and the measured coordinates.
-    delta = TrackPoint(point - (*events));
-std::cout << "DEBUG ScoreTrack(): event: " << (*events) << std::endl;
-    chi_squared += (transpose(delta) * (*uncertainties) * delta)[0];
-std::cout << "DEBUG ScoreTrack(): delta: " << delta << std::endl;
-std::cout << "DEBUG ScoreTrack(): uncertainties: " << *uncertainties << std::endl;
-std::cout << "DEBUG ScoreTrack(): chi_squared: " << chi_squared << std::endl;
+    TrackPoint residual = TrackPoint(
+      point - (*events),
+      PhaseSpaceVector::PhaseSpaceType::kPositional);
+    chi_squared += (transpose(residual) * (*uncertainties) * residual)[0];
+//std::cout << "DEBUG ScoreTrack(): Residual: " << residual << std::endl;
+residuals.push_back(residual);
+std::cout << "DEBUG ScoreTrack(): Uncertainties: " << *uncertainties << std::endl;
+std::cout << "DEBUG ScoreTrack(): Chi Squared: " << chi_squared << std::endl;
 
     ++events;
   }
 
-fprintf(stdout, "CHECKPOINT: ScoreTrack() 4"); fflush(stdout);
+std::cout << "Residuals: " << std::endl << residuals;
+
   return chi_squared;
 }
+
+bool MinuitTrackFitter::ValidGuess(const TrackPoint & guess) const {
+  bool valid = true;
+  
+  if (guess != guess) {
+    // No NaN guesses
+    valid = false;
+  }
+
+  return valid;
+}
+/*
+bool MinuitTrackFitter::ValidGuess(const TrackPoint & guess) const {
+  const double mass = Particle::GetInstance()->GetMass(guess.particle_id());
+  const double E = guess.E();
+  const double px = guess.Px();
+  const double py = guess.Py();
+
+  bool valid = true;
+  
+  if (guess != guess) {
+    // No NaN guesses
+    valid = false;
+  } else if (::sqrt(px*px + py*py + mass*mass) > E) {
+    // Energy cannot be greater than the sum of the squares of the transverse
+    // momenta and mass
+std::cout << "DEBUG ValidGuess(): Energy is less than the sum of the squares of the transverse momenta and mass." << std::endl;
+    valid = false;
+  } else if (::abs(start_plane_ - guess.z()) > 1) {
+    // The z coordinate cannot be significantly different from the start plane
+std::cout << "DEBUG ValidGuess(): The z coordinate differs significantly from the start plane." << std::endl;
+    valid = false;
+  }
+
+  return valid;
+}
+*/
 
 const size_t MinuitTrackFitter::kPhaseSpaceDimension = 6;
 

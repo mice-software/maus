@@ -20,6 +20,7 @@
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
 
 #include <cmath>
+#include <iostream>
 #include "CLHEP/Units/PhysicalConstants.h"
 
 #include "Interface/Squeal.hh"
@@ -87,22 +88,25 @@ PhaseSpaceVector::PhaseSpaceVector(const PhaseSpaceVector& original_instance,
       (*this).Vector<double>::operator=(original_instance);
     } else {
       // convert from positional to temporal
-      const double pz = original_instance[5];
-      (*this)[5] = original_instance[3];
       (*this)[3] = original_instance[1];
+      (*this)[5] = original_instance[3];
+      const double pz = original_instance[5];
 
       double & energy_ = (*this)[1];
       const double px = (*this)[3];
       const double py = (*this)[5];
+std::cout << "DEBUG PhaseSpaceVector(): (px, py, pz) = " << "(" << px << ", " << py << ", " << pz << ")" << std::endl;
 
       const double momentum = ::sqrt(px*px + py*py + pz*pz);
+std::cout << "DEBUG PhaseSpaceVector(): momentum = " << momentum << " MeV/c" << std::endl;
 
       // fill in the energy coordinate
       energy_ = ::sqrt(mass*mass + momentum*momentum);
+std::cout << "DEBUG PhaseSpaceVector(): energy = " << (*this)[1] << " MeV" << std::endl;
 
-      const double z = original_instance[4];
-      (*this)[4] = original_instance[2];
       (*this)[2] = original_instance[0];
+      (*this)[4] = original_instance[2];
+      const double z = original_instance[4];
 
       double & time_ = (*this)[0];
       const double x = (*this)[2];

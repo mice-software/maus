@@ -36,20 +36,10 @@ const TransferMap * LinearApproximationOpticsModel::CalculateTransferMap(
     const std::vector<reconstruction::global::TrackPoint> & start_plane_hits,
     const std::vector<reconstruction::global::TrackPoint> & station_hits)
     const {
-std::cout << "DEBUG CalculateTransferMap(): Start Plane Hits back() (1) PID = " << start_plane_hits.back().particle_id() << std::endl;
-  std::vector<reconstruction::global::TrackPoint>::const_iterator hit;
+  const int particle_id = start_plane_hits[0].particle_id();
 
   double hit_total = 0.0;
-  for (hit = start_plane_hits.begin(); hit != start_plane_hits.end(); ++hit) {
-    hit_total += hit->z();
-  }
-  double start_plane = hit_total / start_plane_hits.size();
-  
-  --hit;
-  const int particle_id = hit->particle_id();
-std::cout << "DEBUG CalculateTransferMap(): Start Plane Hit's PID = " << hit->particle_id() << std::endl;
-
-  hit_total = 0.0;
+  std::vector<reconstruction::global::TrackPoint>::const_iterator hit;
   for (hit = station_hits.begin(); hit != station_hits.end(); ++hit) {
     hit_total += hit->z();
   }
@@ -58,7 +48,7 @@ std::cout << "DEBUG CalculateTransferMap(): Start Plane Hit's PID = " << hit->pa
   const double mass
     = reconstruction::global::Particle::GetInstance()->GetMass(particle_id);
   
-  return new LinearApproximationTransferMap(start_plane, end_plane, mass);
+  return new LinearApproximationTransferMap(start_plane_, end_plane, mass);
     
 }
 
@@ -78,26 +68,80 @@ fprintf(stdout, "CHECKPOINT Transport() 0\n"); fflush(stdout);
   double delta_z = end_plane_ - start_plane_;
 std::cout << "Delta Z: " << delta_z << " mm" << std::endl;
 
-  const double momentum = ::sqrt(vector.E()*vector.E() - mass_*mass_);
+  const double px = vector.Px();
+  const double py = vector.Py();
+
+  double time;
+  double energy;
+  double z;
+  double pz;
+  if (vector.type() == PhaseSpaceVector::PhaseSpaceType::kTemporal) {
+std::cout << "DEBUG Transport(): vector is temporal" << std::endl;
+    time = vector.t();
+    energy = vector.E();
+    const PhaseSpaceVector pos_vector(
+      vector,
+      mass_,
+      PhaseSpaceVector::PhaseSpaceType::kPositional);
+    z = pos_vector.z();
+    pz = pos_vector.Pz();
+  } else {
+std::cout << "DEBUG Transport(): vector is positional" << std::endl;
+    z = vector.z();
+    pz = vector.Pz();
+    const PhaseSpaceVector temp_vector(
+      vector,
+      mass_,
+      PhaseSpaceVector::PhaseSpaceType::kTemporal);
+    time = temp_vector.t();
+    energy = temp_vector.E();
+  }
+std::cout << "Time: " << time << " ns" << std::endl;
+std::cout << "Energy: " << energy << " MeV" << std::endl;
+std::cout << "Pz: " << pz << " MeV/c" << std::endl;
+  const double momentum = ::sqrt(energy*energy - mass_*mass_);
 std::cout << "Momentum: " << momentum << " MeV/c" << std::endl;
-  const double velocity = ::CLHEP::c_light * momentum / vector.E();
-std::cout << "Velocity: " << velocity << " mm/ns" << std::endl;
+std::cout << "c: " << ::CLHEP::c_light << " mm/ns" << std::endl;
+  const double beta = momentum / energy;
+std::cout << "Beta: " << beta << std::endl;
+std::cout << "Velocity: " << beta * ::CLHEP::c_light << " mm/ns" << std::endl;
 
   // delta_t = delta_z / v_z ~= delta_z / velocity
-  double delta_t = delta_z / velocity;
+  double delta_t = delta_z / beta;
 std::cout << "Delta T: " << delta_t << " ns" << std::endl;
 
-  // delta_x = v_x * delta_t
-  double delta_x = vector.Px() * delta_t / mass_;
+  const double gamma = energy / mass_;
+std::cout << "Gamma: " << gamma << std::endl;
+
+  if (vector.type() == PhaseSpaceVector::PhaseSpaceType::kTemporal) {
+    // delta_x = v_x * delta_t, px = gamma * m * v_x
+    double delta_x = px * delta_t / gamma / mass_;
 std::cout << "Delta X: " << delta_x << " mm" << std::endl;
 
-  // delta_y = v_y * delta_t
-  double delta_y = vector.Py() * delta_t / mass_;
+    // delta_y = v_y * delta_t, py = gamma * m v_y
+    double delta_y = py * delta_t / gamma / mass_;
 std::cout << "Delta Y: " << delta_y << " mm" << std::endl;
 
-  transported_vector[0] += delta_t;
-  transported_vector[2] += delta_x;
-  transported_vector[4] += delta_y;
+    transported_vector[0] += delta_t;
+    transported_vector[2] += delta_x;
+    transported_vector[4] += delta_y;
+  } else {
+    // delta_x = v_x * delta_t, pz = gamma * m v_z
+    double delta_x = px * delta_t / gamma / mass_;
+std::cout << "Delta X: " << delta_x << " mm" << std::endl;
+
+    // delta_y = v_y * delta_t
+    double delta_y = py * delta_t / gamma/ mass_;
+std::cout << "Delta Y: " << delta_y << " mm" << std::endl;
+
+    // delta_z = v_z * delta_t
+    double delta_z = pz * delta_t / gamma / mass_;
+std::cout << "Delta Z: " << delta_z << " mm" << std::endl;
+
+    transported_vector[0] += delta_x;
+    transported_vector[2] += delta_y;
+    transported_vector[4] += delta_z;
+  }
 
 fprintf(stdout, "CHECKPOINT Transport() 999\n"); fflush(stdout);
   return transported_vector;

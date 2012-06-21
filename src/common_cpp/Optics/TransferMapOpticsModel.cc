@@ -92,14 +92,14 @@ TransferMapOpticsModel::TransferMapOpticsModel(
 
   // Reference Particle
   reference_pgparticle_ = simulator->GetReferenceParticle();
-std::cout << "DEBUG TransferMapOpticsModel(): reference PG particle's PID = " << reference_pgparticle_.pid << std::endl;
+  start_plane_ = reference_pgparticle_.z;
+
   reference_particle_ = TrackPoint(
     reference_pgparticle_.x, reference_pgparticle_.px,
     reference_pgparticle_.y, reference_pgparticle_.py,
     reference_pgparticle_.z, reference_pgparticle_.pz,
     reference_pgparticle_.pid,
     PhaseSpaceVector::PhaseSpaceType::kPositional);
-std::cout << "DEBUG TransferMapOpticsModel(): reference particle's PID = " << reference_particle_.particle_id() << std::endl;
 
   // Calculate time offset from t=0 at z=0
   const double start_plane_time = reference_pgparticle_.time;
@@ -131,7 +131,6 @@ TransferMapOpticsModel::~TransferMapOpticsModel() {
 void TransferMapOpticsModel::Build() {
   // Create some test hits at the desired start plane
   const std::vector<TrackPoint> start_plane_hits = BuildStartPlaneHits();
-std::cout << "DEBUG Build(): Start Plane Hits back() (1) PID = " << start_plane_hits.back().particle_id() << std::endl;
 
   // Iterate through each start plane hit
   MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
@@ -143,42 +142,31 @@ std::cout << "DEBUG Build(): Start Plane Hits back() (1) PID = " << start_plane_
     // Simulate the current particle (start plane hit) through MICE.
     simulator->RunParticle(
       reconstruction::global::PrimaryGeneratorParticle(*start_plane_hit));
-std::cout << "DEBUG Build(): Start Plane Hits back() (2) PID = " << start_plane_hits.back().particle_id() << std::endl;
 
     // Identify the hits by station and add them to the mappings from stations
     // to the hits they recorded.
     MapStationsToHits(station_hits_map);
   }
 
-std::cout << "CHECKPOINT Build() 1" << std::endl; std::cout.flush();
   // Iterate through each station
-std::cout << "DEBUG Build(): # Stations = " << station_hits_map.size() << std::endl; std::cout.flush();
   std::map<int, std::vector<TrackPoint> >::iterator station_hits;
   for (station_hits = station_hits_map.begin();
        station_hits != station_hits_map.end();
        ++ station_hits) {
-std::cout << "DEBUG Build(): # Station Hits = " << station_hits->second.size() << std::endl; std::cout.flush();
     // find the average z coordinate for the station
     std::vector<TrackPoint>::iterator station_hit;
 
     double station_plane = station_hits->second.begin()->z();
-std::cout << "DEBUG Build(): # Station Hit Z = " << station_plane << std::endl; std::cout.flush();
 
     // Generate a transfer map between the start plane and the current station
     // and map the station ID to the transfer map
-std::cout << "CHECKPOINT Build() 1.1" << std::endl; std::cout.flush();
     transfer_maps_[station_plane]
       = CalculateTransferMap(start_plane_hits, station_hits->second);
-std::cout << "DEBUG Build(): Start Plane Hits back() (3) PID = " << start_plane_hits.back().particle_id() << std::endl;
-std::cout << "CHECKPOINT Build() 1.2" << std::endl; std::cout.flush();
-std::cout << "DEBUG Build(): # Transfer Maps = " << transfer_maps_.size() << std::endl; std::cout.flush();
-std::cout << "DEBUG Build(): Transfer Map Address = " << (long) transfer_maps_[station_plane] << std::endl; std::cout.flush();
   }
 }
 
 const TransferMap * TransferMapOpticsModel::GenerateTransferMap(
     const double end_plane) const {
-std::cout << "DEBUG GenerateTransferMap(): # Transfer Maps = " << transfer_maps_.size() << std::endl;
   if (transfer_maps_.size() == 0) {
     throw(Squeal(Squeal::nonRecoverable,
                  "No transfer maps to choose from.",
@@ -186,7 +174,6 @@ std::cout << "DEBUG GenerateTransferMap(): # Transfer Maps = " << transfer_maps_
   }
   // find the transfer map that transports a particle from the start plane
   // to the station that is nearest to the desired end_plane
-std::cout << "DEBUG GenerateTransferMap(): End Plane = " << end_plane << std::endl;
   std::map<double, const TransferMap *>::const_iterator transfer_map_entry;
   size_t map_index = 0;
   bool found_entry = false;
@@ -195,9 +182,7 @@ std::cout << "DEBUG GenerateTransferMap(): End Plane = " << end_plane << std::en
        ++transfer_map_entry) {
     // determine whether the station before or after end_plane is closest
     double station_plane = transfer_map_entry->first;
-std::cout << "DEBUG GenerateTransferMap(): Station Plane = " << station_plane << std::endl;
     if (station_plane >= end_plane) {
-std::cout << "DEBUG GenerateTransferMap(): Station # = " << map_index << std::endl;
       if (transfer_map_entry == transfer_maps_.begin()) {
         throw(Squeal(Squeal::nonRecoverable,
                      "Mapping detectors are all positioned downstream from one "
@@ -223,7 +208,6 @@ std::cout << "DEBUG GenerateTransferMap(): Station # = " << map_index << std::en
     --transfer_map_entry;
   }
 
-std::cout << "DEBUG GenerateTransferMap(): Transfer Map Address = " << (long) transfer_map_entry->second << std::endl; std::cout.flush();
   return transfer_map_entry->second;
 }
 
@@ -234,13 +218,11 @@ const std::vector<TrackPoint> TransferMapOpticsModel::BuildStartPlaneHits() {
   for(int coordinate_index = 0; coordinate_index < 6; ++coordinate_index) {
     // Make a copy of the reference trajectory vector
     TrackPoint start_plane_hit = reference_particle_;
-std::cout << "DEBUG BuildStartPlaneHits(): Start Plane Hit's PID = " << start_plane_hit.particle_id() << std::endl;
 
     // Add to the current coordinate of the reference trajectory vector
     // the appropriate delta value and save the modified vector
     start_plane_hit[coordinate_index] += deltas_[coordinate_index];
     start_plane_hits.push_back(start_plane_hit);
-std::cout << "DEBUG BuildStartPlaneHits(): Start Plane Hits back() (1) PID = " << start_plane_hits.back().particle_id() << std::endl;
 
     // Subtract from the current coordinate of the reference trajectory vector
     // the appropriate delta value and save the modified vector
@@ -249,7 +231,6 @@ std::cout << "DEBUG BuildStartPlaneHits(): Start Plane Hits back() (1) PID = " <
       start_plane_hit[coordinate_index] *= -1.;
     }
     start_plane_hits.push_back(start_plane_hit);
-std::cout << "DEBUG BuildStartPlaneHits(): Start Plane Hits back() (2) PID = " << start_plane_hits.back().particle_id() << std::endl;
   }
 
   return start_plane_hits;
@@ -265,7 +246,6 @@ void TransferMapOpticsModel::MapStationsToHits(
                  "No events were generated during simulation.",
                  "MAUS::TransferMapOpticsModel::MapStationsToHits()"));
   }
-std::cout << "DEBUG MapStationsToHits(): # Events = " << events.size() << std::endl;
   if (events.size() == 0) {
     throw(Squeal(Squeal::nonRecoverable,
                   "No virtual hits were generated during simulation.",
@@ -274,7 +254,6 @@ std::cout << "DEBUG MapStationsToHits(): # Events = " << events.size() << std::e
   for (size_t event_index = 0; event_index < events.size(); ++event_index) {
     // Iterate through each hit recorded during the current event
     const Json::Value hits = events[event_index]["virtual_hits"];
-std::cout << "DEBUG MapStationsToHits(): # Virtual Hits = " << hits.size() << std::endl;
     for (size_t hit_index = 0; hit_index < hits.size(); ++hit_index) {
       const Json::Value hit = hits[hit_index];
       TrackPoint hit_vector(
