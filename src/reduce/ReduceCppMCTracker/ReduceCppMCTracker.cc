@@ -150,12 +150,12 @@ std::string  ReduceCppMCTracker::process(std::string document) {
   try {
     _nSpills = root["spill_number"].asInt();
 
-// MC events
+// Start MC Events==============================================================
     int mc_part_size = root["mc_events"].size();
     for (int a = 0; a < mc_part_size; a++) {
 
 
-      // Start Sci Fi Hits
+  // Start Sci Fi Hits==========================================================
       // if (root["mc_events"][a].isMember("sci_fi_hits")) {
         int hit_size = root["mc_events"][a]["sci_fi_hits"].size();
         for (int b = 0; b < hit_size; b++) {
@@ -175,10 +175,10 @@ std::string  ReduceCppMCTracker::process(std::string document) {
           _sci_fi.Fill();
           }
         // }
-        // End Sci Fi Hits
+  // End Sci Fi Hits============================================================
 
 
-        // Start Virtual Hits
+  // Start Virtual Hits=========================================================
         // if (root["mc_events"][a].isMember("virtual_hits")) {
           int virtual_size = root["mc_events"][a]["virtual_hits"].size();
           for (int c = 0; c < virtual_size; c++) {
@@ -200,11 +200,12 @@ std::string  ReduceCppMCTracker::process(std::string document) {
             _virt.Fill();
           }
         // }
-        // End Virtual Hits
+  // End Virtual Hits===========================================================
       }
+// End MC=======================================================================
 
 
-// Recon events
+// Start Recon Events===========================================================
     int recon_size = root["recon_events"].size();
     int cut_recon_size = recon_size;
     int cluster_count1 = 0;
@@ -213,15 +214,19 @@ std::string  ReduceCppMCTracker::process(std::string document) {
     int space_count2 = 0;
     ofstream pyfile;
     pyfile.open("test2.txt" , fstream::app);
-    pyfile << "Total number of particles this spill: " << recon_size << std::endl;
+    pyfile << "Total number of particles this spill: "
+      << recon_size << std::endl;
     for (int h = 0; h < recon_size; h++) {
-      scuts = root["recon_events"][h]["sci_fi_event"]["sci_fi_digits"]["tracker1"];
+      scuts = root["recon_events"][h]["tof_event"]["tof_slab_hits"]["tof2"];
+      pyfile << "Slab hits in TOF2 = " << scuts.size() << std::endl;
       if (Trigger(scuts)) {
-        pyfile << "Spill number: " << _nSpills << " Particle number: " << h << std::endl;
+        pyfile << "Spill number: " << _nSpills << " Particle number: " << h
+          << std::endl;
 
 
-        // Start of Digits
-        // if (root["recon_events"][h]["sci_fi_event"].isMember("sci_fi_digits")) {
+  // Start of Digits============================================================
+        // if (root["recon_events"][h]["sci_fi_event"].
+        //     isMember("sci_fi_digits")) {
           scuts = root["recon_events"][h]["sci_fi_event"]["sci_fi_digits"];
           int digit0_size = scuts["tracker0"].size();
           for (int i = 0; i < digit0_size; i++) {
@@ -246,11 +251,12 @@ std::string  ReduceCppMCTracker::process(std::string document) {
             _digits.Fill();
           }
         // }
-        // End of Digits
+  // End of Digits==============================================================
 
 
-        // Start of Clusters
-        // if (root["recon_events"][h]["sci_fi_event"].isMember("sci_fi_clusters")) {
+  // Start of Clusters==========================================================
+        // if (root["recon_events"][h]["sci_fi_event"].
+        //   isMember("sci_fi_clusters")) {
           scuts = root["recon_events"][h]["sci_fi_event"]["sci_fi_clusters"];
           int cluster0_size = scuts["tracker0"].size();
           int cluster1_size = scuts["tracker1"].size();
@@ -259,11 +265,12 @@ std::string  ReduceCppMCTracker::process(std::string document) {
           pyfile << "Total number of clusters: Tracker 1: " << cluster_count1
             << "   Tracker 2: " << cluster_count2 << std::endl;
         // }
-        // End of Clusters
+  // End of Clusters============================================================
 
 
-        // Start of Space Points
-        // if (root["recon_events"][h]["sci_fi_event"].isMember("sci_fi_space_points")) {
+  // Start of Space Points======================================================
+        // if (root["recon_events"][h]["sci_fi_event"].
+        //   isMember("sci_fi_space_points")) {
           scuts = root["recon_events"][h]["sci_fi_event"]["sci_fi_space_points"];
           int space0_size = scuts["tracker0"].size();
           int space1_size = scuts["tracker1"].size();
@@ -296,12 +303,14 @@ std::string  ReduceCppMCTracker::process(std::string document) {
           pyfile << "Total number of space points: Tracker 1: " << space_count1
             << "   Tracker 2: " << space_count2 << std::endl;
         // }
-        // End of Space Points
+  // End of Space Points========================================================
       } else {cut_recon_size--;}
     }
+//End Recon Events==============================================================
+
 
     pyfile << std::endl << "At the end of the spill we have " << cut_recon_size
-      << " number of particles that made it through tracker 2." << std::endl;
+      << " particles that made it through to TOF2s." << std::endl;
     pyfile << "  Total number of space points: Tracker 1: " << space_count1
       << "   Tracker 2: " << space_count2 << std::endl;
     pyfile << "  Total number of clusters: Tracker 1: " << cluster_count1
@@ -368,10 +377,7 @@ void ReduceCppMCTracker::Save() {
 }
 
 bool ReduceCppMCTracker::Trigger(Json::Value path) {
-  int path_size = path.size();
-  for (int m = 0; m < path_size; m++) {
-    if (path[m]["station"] == 5) {return true;}
-  }
+  if (path.size() > 0) {return true;}
   return false;
 }
 
