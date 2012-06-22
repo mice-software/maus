@@ -197,13 +197,13 @@ void KalmanTrackFit::initialise(SciFiEvent &event, std::vector<KalmanSite> &site
     if ( tracker == 0 ) {
       mx = - mx_pr;
       my = - my_pr;
-      x = - x_pr + mx*z;
-      y = - y_pr + my*z;
+      x  = - x_pr + mx*z;
+      y  = - y_pr + my*z;
     } else if ( tracker == 1 ) {
       mx = mx_pr;
       my = my_pr;
-      x = x_pr + mx*z;
-      y = y_pr + my*z;
+      x  = x_pr + mx*z;
+      y  = y_pr + my*z;
     }
 
     KalmanSite first_plane;
@@ -216,8 +216,8 @@ void KalmanTrackFit::initialise(SciFiEvent &event, std::vector<KalmanSite> &site
     first_plane.set_projected_a(a);
 
     TMatrixD C(5, 5);
-    C(0, 0) = 70.*70./12.;
-    C(1, 1) = 70.*70./12.;
+    C(0, 0) = 150.*150./12.;
+    C(1, 1) = 150.*150./12.;
     C(2, 2) = 10.;
     C(3, 3) = 10.;
     C(4, 4) = 100.;

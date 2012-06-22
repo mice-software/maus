@@ -29,7 +29,7 @@ void StraightTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site
   for ( int i = 0; i < 5; i++ ) {
     _F(i, i) = 1.;
   }
-  _F(0, 2) = deltaZ;
-  _F(1, 3) = deltaZ;
+  _F(0, 2) = fabs(deltaZ);
+  _F(1, 3) = fabs(deltaZ);
   _F.Print();
 }
