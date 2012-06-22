@@ -76,8 +76,7 @@ class PatternRecognition {
      */
     void make_5tracks(std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
                       std::vector<SciFiStraightPRTrack> &strks,
-                      std::vector<SciFiHelicalPRTrack> &htrks,
-                      std::vector< std::vector<int> > &residuals );
+                      std::vector<SciFiHelicalPRTrack> &htrks);
 
     /** @brief Make Pattern Recognition tracks with 4 spacepoints
      *
@@ -90,8 +89,7 @@ class PatternRecognition {
      */
     void make_4tracks(std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
                       std::vector<SciFiStraightPRTrack> &strks,
-                      std::vector<SciFiHelicalPRTrack> &htrks,
-                      std::vector< std::vector<int> > &residuals );
+                      std::vector<SciFiHelicalPRTrack> &htrks);
 
     /** @brief Make Pattern Recognition tracks with 3 spacepoints
      *
@@ -104,8 +102,7 @@ class PatternRecognition {
      */
     void make_3tracks(std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
                       std::vector<SciFiStraightPRTrack>& strks,
-                      std::vector<SciFiHelicalPRTrack> &htrks,
-                      std::vector< std::vector<int> > &residuals );
+                      std::vector<SciFiHelicalPRTrack> &htrks);
 
     /** @brief Fits a straight track for a given set of stations
      * 
@@ -119,8 +116,7 @@ class PatternRecognition {
      */
     void make_straight_tracks(const int num_points, const std::vector<int> ignore_stations,
                      std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
-                     std::vector<SciFiStraightPRTrack> &strks, std::vector< std::vector<int> >
-&residuals );
+                     std::vector<SciFiStraightPRTrack> &strks);
 
     /** @brief Least-squares straight line fit
      *
@@ -381,9 +377,6 @@ class PatternRecognition {
     void draw_line(const SciFiSpacePoint *sp1, const SciFiSpacePoint *sp2,
                    SimpleLine &line_x, SimpleLine &line_y);
 
-    bool add_residuals(const bool passed, const double dx, const double dy,
-                       std::vector< std::vector<int> > &residuals);
-
     void calc_residual(const SciFiSpacePoint *sp,
                        const SimpleLine &line_x, const SimpleLine &line_y,
                        double &dx, double &dy);
@@ -396,7 +389,7 @@ class PatternRecognition {
     static const int _n_bins = 100;         // Number of bins in each residuals histogram
     static const double _sd_1to4 = 0.3844;  // Position error associated with stations 1 through 4
     static const double _sd_5 = 0.4298;     // Position error associated with station 5
-    static const double _res_cut = 10;      // Road cut for linear fit in mm
+    static const double _res_cut = 2;      // Road cut for linear fit in mm
     static const double _R_res_cut = 20.;    // Road cut for circle radius in mm
     static const double _chisq_cut = 15;    // Cut on the chi^2 of the least squares fit in mm
     static const double _AB_cut = .1;       // Need to calculate appropriate cut here!!!
