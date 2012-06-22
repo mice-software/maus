@@ -109,7 +109,7 @@ void SciFiClusterRec::construct(SciFiCluster *clust, std::vector<const MiceModul
 
   Hep3Vector reference = get_reference_frame_pos(clust->get_tracker(), modules);
 
-  Hep3Vector tracker_ref_frame_pos = position - reference;
+  // Hep3Vector tracker_ref_frame_pos = position - reference;
 
   Hep3Vector tracker_ref_frame_pos;
   if ( clust->get_tracker() == 0 ) {
