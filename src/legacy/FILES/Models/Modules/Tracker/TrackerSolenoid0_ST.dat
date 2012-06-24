@@ -12,7 +12,7 @@ Module TrackerSolenoid0_ST
   PropertyString Material Galactic
   PropertyBool Invisible 1
   PropertyInt KalmanSolenoid 1
-  Module Tracker/Tracker0.dat
+  Module Tracker/Tracker0_ST.dat
   {
     Position 0.0 0.0 -416.5 mm
     Rotation 0.0 0.0 0.0 degree

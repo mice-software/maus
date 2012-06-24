@@ -112,6 +112,8 @@ class ReduceCppMCTracker {
 
   void Save();
   bool Trigger(Json::Value path);
+
+  static const bool _STPD = 1;
 };
 
 #endif
