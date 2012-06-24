@@ -93,6 +93,11 @@ class MapCppSingleStationRecon {
    */
   void spacepoint_recon(SEEvent *evt);
 
+  void reconstruct_tofs(Json::Value &root, int k, double &tof0_x,
+                        double &tof0_y, double &tof1_x, double &tof1_y,
+                        double &tof0_time, double &tof1_time, bool &success);
+
+
   void save_to_json(SEEvent *evt, int event_num);
 
   void print_event_info(SEEvent *event, int k);

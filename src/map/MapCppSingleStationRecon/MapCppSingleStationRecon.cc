@@ -76,6 +76,21 @@ std::string MapCppSingleStationRecon::process(std::string document) {
         if ( event->clusters().size() ) {
           spacepoint_recon(event);
         }
+        double tof0_x, tof0_y, tof1_x, tof1_y;
+        double tof0_time, tof1_time;
+        bool success = false;
+        double eff_counter = 0.;
+        if ( event->spacepoints().size() == 1 ) {
+          reconstruct_tofs(root, k, tof0_x, tof0_y, tof1_x, tof1_y,
+                                    tof0_time, tof1_time, success);
+        }
+        if ( success ) {
+          std::cerr << "Starting Global Recon" << std::endl;
+          eff_counter += 1.;
+        }
+
+        std::cerr << "Efficiency of 1:1:1 assumption: "
+                  << spill.events().size()/eff_counter << std::endl;
 
         print_event_info(event, k);
         save_to_json(event, k);
@@ -187,6 +202,35 @@ void MapCppSingleStationRecon::save_to_json(SEEvent *evt, int event_i) {
   root["recon_events"][event_i]["sci_fi_event"]["sci_fi_space_points"]["single_station"]
                                                = sci_fi_space_points;
 }
+
+void MapCppSingleStationRecon::reconstruct_tofs(Json::Value &root, int event_i, double &tof0_x,
+                                                double &tof0_y, double &tof1_x, double &tof1_y,
+                                                double &tof0_time, double &tof1_time,
+                                                bool &success) {
+  Json::Value tof0_sps = root["recon_events"][event_i]["tof_event"]["tof_space_points"]["tof0"];
+  Json::Value tof1_sps = root["recon_events"][event_i]["tof_event"]["tof_space_points"]["tof1"];
+  int numb_sp_tof_0 = tof0_sps.size();
+  int numb_sp_tof_1 = tof1_sps.size();
+  static const int tof0_num_slabs = 10;
+  static const int tof1_num_slabs = 7;
+  static const double tof0_a = 4.; // cm
+  static const double tof1_a = 6.; // cm
+  if ( numb_sp_tof_0 == 1 && numb_sp_tof_1 == 1 ) {
+    // Do TOF reconstruction
+    double tof0_slabx = tof0_sps[(Json::Value::ArrayIndex)0]["slabx"].asDouble();
+    double tof0_slaby = tof0_sps[(Json::Value::ArrayIndex)0]["slaby"].asDouble();
+    double tof1_slabx = tof1_sps[(Json::Value::ArrayIndex)0]["slabx"].asDouble();
+    double tof1_slaby = tof1_sps[(Json::Value::ArrayIndex)0]["slaby"].asDouble();
+    tof0_time         = tof0_sps[(Json::Value::ArrayIndex)0]["time"].asDouble();
+    tof1_time         = tof1_sps[(Json::Value::ArrayIndex)0]["time"].asDouble();
+    tof0_x = (tof0_slabx - (tof0_num_slabs - 1.)/2.)*tof0_a;
+    tof0_y = (tof0_slaby - (tof0_num_slabs - 1.)/2.)*tof0_a;
+
+    tof1_x = (tof1_slabx - (tof1_num_slabs - 1.)/2.)*tof1_a;
+    tof1_y = (tof1_slaby - (tof1_num_slabs - 1.)/2.)*tof1_a;
+    success = true;
+  }
+}
 /*
 bool MapCppSingleStationRecon::is_good_for_track(Json::Value root, SEEvent &event, int k) {
   int exp_events_t1 = root["space_points"]["tof1"][k].size();
@@ -211,6 +255,7 @@ bool MapCppSingleStationRecon::is_good_for_track(Json::Value root, SEEvent &even
   }
 }
 */
+
 void MapCppSingleStationRecon::print_event_info(SEEvent *event, int k) {
   int exp_events = root["recon_events"].size();
 /*

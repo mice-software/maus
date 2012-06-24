@@ -55,7 +55,7 @@ void KalmanTrack::calc_covariance(KalmanSite *old_site, KalmanSite *new_site) {
   TMatrixD C_pred(5, 5);
   C_pred = TMatrixD(temp2, TMatrixD::kPlus, _Q);
   new_site->set_projected_covariance_matrix(C_pred);
-  C_pred.Print();
+  // C_pred.Print();
 }
 
 //
@@ -153,7 +153,7 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
 //
 void KalmanTrack::update_back_transportation_matrix(KalmanSite *optimum_site,
                                                       KalmanSite *smoothing_site) {
-  // update_propagator(smoothing_site, optimum_site);
+  update_propagator(smoothing_site, optimum_site);
   TMatrixD Cp(5, 5);
   Cp = optimum_site->get_projected_covariance_matrix();
   Cp.Invert();
@@ -170,7 +170,7 @@ void KalmanTrack::smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_si
   a = smoothing_site->get_a();
 
   TMatrixD a_opt(5, 1);
-  a_opt = optimum_site->get_a();
+  a_opt = optimum_site->get_smoothed_a();
 
   TMatrixD ap(5, 1);
   ap = optimum_site->get_projected_a();
@@ -183,7 +183,7 @@ void KalmanTrack::smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_si
 
   TMatrixD a_smooth(5, 1);
   a_smooth =  TMatrixD(a, TMatrixD::kPlus, temp2);
-  smoothing_site->set_a(a_smooth);
+  smoothing_site->set_smoothed_a(a_smooth);
 
   // do the same for covariance matrix
   TMatrixD C(5, 5);
@@ -202,5 +202,5 @@ void KalmanTrack::smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_si
   temp5= TMatrixD(temp4, TMatrixD::kMultTranspose, _A);
   TMatrixD C_smooth(5, 5);
   C_smooth =  TMatrixD(C, TMatrixD::kPlus, temp5);
-  smoothing_site->set_covariance_matrix(C_smooth);
+  smoothing_site->set_smoothed_covariance_matrix(C_smooth);
 }

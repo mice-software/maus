@@ -31,5 +31,5 @@ void StraightTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site
   }
   _F(0, 2) = fabs(deltaZ);
   _F(1, 3) = fabs(deltaZ);
-  _F.Print();
+  // _F.Print();
 }

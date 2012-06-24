@@ -30,8 +30,8 @@ SciFiCluster::SciFiCluster(SciFiDigit *digit):_used(false),
                                               _npe(digit->get_npe()),
                                               _time(digit->get_time()) {
   digit->set_used();
-  _pos = (0, 0, 0);
-  _p = (0, 0, 0);
+  _pos = digit->get_true_position();
+  _p   = digit->get_true_momentum();
 }
 
 SciFiCluster::~SciFiCluster() {}
@@ -43,4 +43,43 @@ void SciFiCluster::add_digit(SciFiDigit* neigh) {
   _channel_w /= 2.0;
   _channel_w += (neigh->get_channel())/2.0;
 }
+
+SciFiCluster::SciFiCluster(const SciFiCluster &cluster) {
+  _pos       = cluster.get_true_position();
+  _p         = cluster.get_true_momentum();
+  _used      = cluster.is_used();
+  _spill     = cluster.get_spill();
+  _event     = cluster.get_event();
+  _tracker   = cluster.get_tracker();
+  _station   = cluster.get_station();
+  _plane     = cluster.get_plane();
+  _channel_w = cluster.get_channel();
+  _npe       = cluster.get_npe();
+  _time      = cluster.get_time();
+  _direction = cluster.get_direction();
+  _position  = cluster.get_position();
+  _relat_pos = cluster.get_relative_position();
+  _alpha     = cluster.get_alpha();
+  _id        = cluster.get_id();
+}
+
+SciFiCluster& SciFiCluster::operator=(const SciFiCluster &cluster) {
+  _pos       = cluster.get_true_position();
+  _p         = cluster.get_true_momentum();
+  _used      = cluster.is_used();
+  _spill     = cluster.get_spill();
+  _event     = cluster.get_event();
+  _tracker   = cluster.get_tracker();
+  _station   = cluster.get_station();
+  _plane     = cluster.get_plane();
+  _channel_w = cluster.get_channel();
+  _npe       = cluster.get_npe();
+  _time      = cluster.get_time();
+  _direction = cluster.get_direction();
+  _position  = cluster.get_position();
+  _relat_pos = cluster.get_relative_position();
+  _alpha     = cluster.get_alpha();
+  _id        = cluster.get_id();
+}
+
 // } // ~namespace MAUS

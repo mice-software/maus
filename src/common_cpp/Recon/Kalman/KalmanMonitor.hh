@@ -45,6 +45,8 @@ class KalmanMonitor {
 
   void save(std::vector<KalmanSite> const &sites);
 
+  void save_mc(std::vector<KalmanSite> const &sites);
+
   void print_info(std::vector<KalmanSite> const &sites);
 
  private:

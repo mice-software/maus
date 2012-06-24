@@ -20,16 +20,16 @@
 #define KALMANTRACKFIT_HH
 
 // C headers
+#include <CLHEP/Vector/ThreeVector.h>
 #include <assert.h>
 #include <algorithm>
 
 // C++ headers
 #include <string>
 #include <vector>
-// #include "/home/edward/boost_1_49_0/boost/numeric/ublas/matrix.hpp"
-// #include "/home/edward/boost_1_49_0/boost/numeric/ublas/lu.hpp"
 #include "TMath.h"
 #include "TMatrixD.h"
+
 
 #include "src/common_cpp/Recon/SciFi/SciFiEvent.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
@@ -52,7 +52,7 @@ class KalmanTrackFit {
   void process(std::vector<SciFiSpacePoint> spacepoints,
                SeedFinder seed);
 
-  void initialise(SciFiEvent &evt, std::vector<KalmanSite> &sites);
+  void initialise(SciFiStraightPRTrack &evt, std::vector<KalmanSite> &sites);
 
   void initialise_helix(std::vector<SciFiSpacePoint> &spacepoints,
                         std::vector<KalmanSite> &sites,
@@ -67,6 +67,8 @@ class KalmanTrackFit {
 
   void smooth(std::vector<KalmanSite> &sites, KalmanTrack *track, int current_site);
 
+ private:
+  static const bool _mc_run = 1;
 // private:
 };
 
