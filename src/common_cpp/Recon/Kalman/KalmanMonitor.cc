@@ -143,7 +143,6 @@ void KalmanMonitor::save_mc(std::vector<KalmanSite> const &sites) {
          << mc_x << " " << mc_y << " " << mc_px << " " << mc_py << " " << mc_pz << " "
          << pull << " " << id     << "\n";
     out2.close();
-    std::cerr << a_smooth(0, 0) << " " << mc_x << " " << a_smooth(1, 0) << " " << mc_y << std::endl;
   }
 }
 /*

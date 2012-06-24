@@ -246,7 +246,6 @@ void KalmanTrackFit::initialise(SciFiStraightPRTrack &seed, std::vector<KalmanSi
     for ( int j = 0; j < numb_sites; ++j ) {
       CLHEP::Hep3Vector true_position = clusters[j]->get_true_position();
       CLHEP::Hep3Vector true_momentum = clusters[j]->get_true_momentum();
-      std::cerr << "GGGGGGGGGGGGGGGGGGGGGG " << true_position.x() << std::endl;
       sites[j].set_true_position(true_position);
       sites[j].set_true_momentum(true_momentum);
     }
