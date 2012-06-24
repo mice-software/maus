@@ -134,12 +134,21 @@ void KalmanMonitor::save_mc(std::vector<KalmanSite> const &sites) {
     // double observed = pow(pow(a(0, 0), 2.)+pow(a(1, 0), 2.), 0.5);
     // double expected = pow(pow(a_filt(0, 0), 2.)+pow(a_filt(1, 0), 2.), 0.5);
     // double chi2 = pow(observed-expected, 2.)/expected;
+
+    TMatrixD a_projected(5, 1);
+    a_projected = site.get_projected_a();
+    double pr_x0 = a_projected(0, 0);
+    double pr_y0 = a_projected(1, 0);
+    double pr_mx = a_projected(2, 0);
+    double pr_my = a_projected(3, 0);
+
     std::ofstream out2("kalman_mc.txt", std::ios::out | std::ios::app);
     int id = site.get_id();
     out2 << a(0, 0)    << " " << C(0, 0) << " "
          << a(1, 0)    << " " << C(1, 1) << " "
          << res_x      << " " << res_y << " "
          << a_smooth(0, 0) << " " << a_smooth(1, 0) << " "
+         << pr_x0+pr_mx*site.get_z() << " " << pr_y0+pr_my*site.get_z() << " "
          << mc_x << " " << mc_y << " " << mc_px << " " << mc_py << " " << mc_pz << " "
          << pull << " " << id     << "\n";
     out2.close();
