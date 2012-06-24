@@ -181,6 +181,9 @@ void KalmanTrack::smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_si
   TMatrixD temp2(5, 1);
   temp2 = TMatrixD(_A, TMatrixD::kMult, temp1);
 
+  _A.Print();
+  temp2.Print();
+
   TMatrixD a_smooth(5, 1);
   a_smooth =  TMatrixD(a, TMatrixD::kPlus, temp2);
   smoothing_site->set_smoothed_a(a_smooth);

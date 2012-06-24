@@ -24,17 +24,17 @@ Module Tracker1
   }
   Module Tracker/Tracker1Station2.dat
   {
-    Position -0.06341 0.0037 35.0 cm
+    Position 0.0 0.0 35.0 cm
     Rotation 0.0 0.0 0.0 degree
   }
   Module Tracker/Tracker1Station3.dat
   {
-    Position -0.0856 -0.0028 10.0 cm
+    Position 0.0 0.0 10.0 cm
     Rotation 0.0 0.0 0.0 degree
   }
   Module Tracker/Tracker1Station4.dat
   {
-    Position -0.0318 -0.0038 -20.0 cm
+    Position 0.0 0.0 -20.0 cm
     Rotation 0.0 0.0 0.0 degree
   }
   Module Tracker/Tracker1Station5.dat
