@@ -59,9 +59,13 @@ Json::Value SetupConfig() {
   return config;
 }
 
+#include "src/common_cpp/Utils/JsonWrapper.hh"
+
 int main(int argc, char **argv) {
   ///// Try to keep static set up to a minimum (not very unit testy)
   MICERun::getInstance()->jsonConfiguration = new Json::Value(SetupConfig());
+  std::cerr << MICERun::getInstance()->jsonConfiguration << std::endl;
+  std::cerr << JsonWrapper::JsonToString(*(MICERun::getInstance()->jsonConfiguration)) << std::endl;
   dataCards MyDataCards(0);
   MICERun::getInstance()->DataCards = &MyDataCards;
   MICERun::getInstance()->miceModule = new MiceModule("Test.dat");  // delete
