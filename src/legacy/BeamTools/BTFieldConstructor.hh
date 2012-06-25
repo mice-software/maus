@@ -96,8 +96,8 @@ public:
 	BTField * GetField            (const MiceModule * theModule);
   /// Get a solenoidal field map
 	BTField * GetSolenoid         (const MiceModule * theModule);
-  /// Get a fast solenoid field map - found from a field expansion
-	BTField * GetFastSolenoid     (const MiceModule * theModule);
+  /// Get a derivatives solenoid field map - found from a field expansion
+	BTField * GetDerivativesSolenoid     (const MiceModule * theModule);
   /// Read a magnetic field map
 	BTField * GetMagFieldMap      (const MiceModule * theModule);
   /// Read a sector magnetic field map
