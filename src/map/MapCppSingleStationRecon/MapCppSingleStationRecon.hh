@@ -26,6 +26,7 @@
 #include <assert.h>
 #include <json/json.h>
 #include <CLHEP/Units/PhysicalConstants.h>
+#include <CLHEP/Vector/ThreeVector.h>
 
 // C++ headers
 #include <cmath>
@@ -93,9 +94,8 @@ class MapCppSingleStationRecon {
    */
   void spacepoint_recon(SEEvent *evt);
 
-  void reconstruct_tofs(Json::Value &root, int k, double &tof0_x,
-                        double &tof0_y, double &tof1_x, double &tof1_y,
-                        double &tof0_time, double &tof1_time, bool &success);
+  void reconstruct_tofs(Json::Value &root, int event_i, Hep3Vector &tof0,
+                        Hep3Vector &tof1, bool &success);
 
 
   void save_to_json(SEEvent *evt, int event_num);

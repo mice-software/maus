@@ -38,6 +38,109 @@ bool sort_by_id(SciFiCluster *a, SciFiCluster *b ) {
   return ( a->get_id() < b->get_id() );
   }
 }
+
+//
+// Global track fit.
+//
+void KalmanTrackFit::process(Hep3Vector &tof0, Hep3Vector &se, Hep3Vector &tof1) {
+/*  std::vector<KalmanSite> sites;
+  KalmanTrack *track = new GlobalTrack();
+  initialise_global_track(tof0, se, tof1, sites);
+  // Filter the first state.
+  std::cout << "Filtering site 0" << std::endl;
+  filter(sites, track, 0);
+
+  int numb_measurements = sites.size();
+  assert(numb_measurements==3);
+
+  for ( int i = 1; i < numb_measurements; ++i ) {
+    // Predict the state vector at site i...
+    std::cout << "Extrapolating to site " << i << std::endl;
+    extrapolate(sites, track, i);
+    // ... Filter...
+    std::cout << "Filtering site " << i << std::endl;
+    filter(sites, track, i);
+  }
+
+  // ...and Smooth back all sites.
+  for ( int i = numb_measurements-2; i >= 0; --i ) {
+    std::cerr << "Smoothing site " << i << std::endl;
+    smooth(sites, track, i);
+  }
+
+  KalmanMonitor monitor;
+  monitor.save(sites);
+  monitor.save_mc(sites);
+  monitor.print_info(sites);
+  delete track;
+  */
+}
+
+void KalmanTrackFit::initialise_global_track(Hep3Vector &tof0, Hep3Vector &se,
+                                             Hep3Vector &tof1, std::vector<KalmanSite> &sites) {
+/*  double x_pr = seed.get_x0();
+  double y_pr = seed.get_y0();
+  double mx_pr = seed.get_mx();
+  double my_pr = seed.get_my();
+  double p_pr  = 210.0; // MeV/c
+
+  std::vector<SciFiSpacePoint> spacepoints = seed.get_spacepoints();
+  std::vector<SciFiCluster*> clusters;
+  process_clusters(spacepoints, clusters);
+  // the clusters are sorted by now.
+
+  int numb_sites = clusters.size();
+
+  double z = clusters[0]->get_position().z();
+  int tracker = clusters[0]->get_tracker();
+  double mx, my, x, y;
+  if ( tracker == 0 ) {
+    mx = mx_pr;
+    my = my_pr;
+    x  = - x_pr - mx*z;
+    y  = - y_pr - my*z;
+  } else if ( tracker == 1 ) {
+    mx = mx_pr;
+    my = my_pr;
+    x  = x_pr + mx*z;
+    y  = y_pr + my*z;
+  }
+
+  KalmanSite first_plane;
+  TMatrixD a(5, 1);
+  a(0, 0) = x;
+  a(1, 0) = y;
+  a(2, 0) = mx;
+  a(3, 0) = my;
+  a(4, 0) = 1/p_pr;
+  first_plane.set_projected_a(a);
+
+  TMatrixD C(5, 5);
+  C(0, 0) = 150.*150./12.;
+  C(1, 1) = 150.*150./12.;
+  C(2, 2) = 10.;
+  C(3, 3) = 10.;
+  C(4, 4) = 100.;
+
+  first_plane.set_projected_covariance_matrix(C);
+  first_plane.set_measurement(clusters[0]->get_alpha());
+  first_plane.set_direction(clusters[0]->get_direction());
+  first_plane.set_z(clusters[0]->get_position().z());
+  first_plane.set_id(clusters[0]->get_id());
+  // first_plane
+  sites.push_back(first_plane);
+
+  for ( int j = 1; j < numb_sites; ++j ) {
+    KalmanSite a_site;
+    a_site.set_measurement(clusters[j]->get_alpha());
+    a_site.set_direction(clusters[j]->get_direction());
+    a_site.set_z(clusters[j]->get_position().z());
+    a_site.set_id(clusters[j]->get_id());
+    sites.push_back(a_site);
+  }
+  */
+}
+
 //
 // Helical track fit.
 //

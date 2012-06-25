@@ -411,24 +411,29 @@ void ReduceCppSingleStation::count_particle_events(Json::Value root) {
   int n_events = root["recon_events"].size();
 
   int numb_triggers = root["recon_events"].size();
-  int numb_spacepoints = 0;
+  int numb_se_spacepoints = 0;
+  int numb_tof1_spacepoints = 0;
 
   for ( int event_i = 0; event_i < numb_triggers; event_i++ ) {
     if ( !root["recon_events"][event_i]["sci_fi_event"]
           ["sci_fi_space_points"]["single_station"].isNull() ) {
-      numb_spacepoints += 1;
+      numb_se_spacepoints += 1;
+    }
+    if ( !root["recon_events"][event_i]["tof_event"]
+          ["tof_space_points"]["tof1"].isNull() ) {
+      numb_tof1_spacepoints += 1;
     }
   }
 
-  float effic = static_cast<float>(numb_spacepoints)/numb_triggers;
+  float effic = static_cast<float>(numb_se_spacepoints)/numb_tof1_spacepoints;
   float _spill_counter_copy = static_cast<float>(_spill_counter);
   _graph->SetPoint(_spill_counter, _spill_counter_copy, effic);
 
   if ( effic > 1.0 ) {
     std::cerr << " WARNING: Efficiency = " << effic << "!" << std::endl;
-    std::cerr << "TOF1 triggers: " << numb_triggers << std::endl;
-    std::cerr << "SE daq triggers: " << root["daq_data"]["single_station"].size()
-              << std::endl;
+    // std::cerr << "TOF1 triggers: " << numb_triggers << std::endl;
+    // std::cerr << "SE daq triggers: " << root["daq_data"]["single_station"].size()
+    //          << std::endl;
   }
 }
 

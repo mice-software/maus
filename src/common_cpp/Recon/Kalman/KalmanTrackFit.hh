@@ -52,11 +52,16 @@ class KalmanTrackFit {
   void process(std::vector<SciFiSpacePoint> spacepoints,
                SeedFinder seed);
 
+  void process(Hep3Vector &tof0, Hep3Vector &se, Hep3Vector &tof1);
+
   void initialise(SciFiStraightPRTrack &evt, std::vector<KalmanSite> &sites);
 
   void initialise_helix(std::vector<SciFiSpacePoint> &spacepoints,
                         std::vector<KalmanSite> &sites,
                         SeedFinder &seed);
+
+  void initialise_global_track(Hep3Vector &tof0, Hep3Vector &se,
+                               Hep3Vector &tof1, std::vector<KalmanSite> &sites);
 
   void process_clusters(std::vector<SciFiSpacePoint> &spacepoints,
                         std::vector<SciFiCluster*> &clusters);
