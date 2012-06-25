@@ -51,7 +51,7 @@ class KalmanTrack {
 
   void calc_predicted_state(KalmanSite *old_site, KalmanSite *new_site);
 
-  // void calc_system_noise(KalmanSite &site);
+  void calc_system_noise(KalmanSite *site);
 
   void calc_covariance(KalmanSite *old_site, KalmanSite *new_site);
 

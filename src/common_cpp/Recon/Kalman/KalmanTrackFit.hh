@@ -30,11 +30,11 @@
 #include "TMath.h"
 #include "TMatrixD.h"
 
-
 #include "src/common_cpp/Recon/SciFi/SciFiEvent.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
 #include "src/common_cpp/Recon/Kalman/HelicalTrack.hh"
 #include "src/common_cpp/Recon/Kalman/StraightTrack.hh"
+#include "src/common_cpp/Recon/Kalman/GlobalTrack.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanMonitor.hh"
 #include "src/common_cpp/Recon/SciFi/SeedFinder.hh"
@@ -52,11 +52,16 @@ class KalmanTrackFit {
   void process(std::vector<SciFiSpacePoint> spacepoints,
                SeedFinder seed);
 
+  void process(Hep3Vector &tof0, Hep3Vector &se, Hep3Vector &tof1);
+
   void initialise(SciFiStraightPRTrack &evt, std::vector<KalmanSite> &sites);
 
   void initialise_helix(std::vector<SciFiSpacePoint> &spacepoints,
                         std::vector<KalmanSite> &sites,
                         SeedFinder &seed);
+
+  void initialise_global_track(Hep3Vector &tof0, Hep3Vector &se,
+                               Hep3Vector &tof1, std::vector<KalmanSite> &sites);
 
   void process_clusters(std::vector<SciFiSpacePoint> &spacepoints,
                         std::vector<SciFiCluster*> &clusters);
