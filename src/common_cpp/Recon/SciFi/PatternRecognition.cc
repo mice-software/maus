@@ -38,19 +38,6 @@
 // namespace MAUS {
 
 PatternRecognition::PatternRecognition() {
-  // Do nothing
-};
-
-PatternRecognition::~PatternRecognition() {
-  // Do nothing
-};
-
-void PatternRecognition::process(SciFiEvent &evt) {
-
-  std::cout << "\nBegining Pattern Recognition" << std::endl;
-  std::cout << "Number of spacepoints in spill: " << evt.spacepoints().size() << std::endl;
-
-  /*
   _f_res = new ofstream();
   _f_res->open("residuals.dat", std::ios::app);
 
@@ -62,7 +49,41 @@ void PatternRecognition::process(SciFiEvent &evt) {
 
   _f_trks = new ofstream();
   _f_trks->open("tracks.dat", std::ios::app);
-  */
+};
+
+PatternRecognition::~PatternRecognition() {
+  if ( _f_res ) {
+    _f_res->close();
+    delete _f_res;
+    _f_res = NULL;
+  }
+
+  if ( _f_res_good ) {
+    _f_res_good->close();
+    delete _f_res_good;
+    _f_res_good = NULL;
+  }
+
+  if ( _f_res_chosen ) {
+    _f_res_chosen->close();
+    delete  _f_res_chosen;
+    _f_res_chosen = NULL;
+  }
+
+  if ( _f_trks ) {
+    _f_trks->close();
+    delete _f_trks;
+    _f_trks = NULL;
+  }
+};
+
+void PatternRecognition::process(SciFiEvent &evt) {
+
+  std::cout << "\nBegining Pattern Recognition" << std::endl;
+  std::cout << "Number of spacepoints in spill: " << evt.spacepoints().size() << std::endl;
+
+
+
 
   if ( static_cast<int>(evt.spacepoints().size()) > 0 ) {
 
@@ -135,23 +156,6 @@ void PatternRecognition::process(SciFiEvent &evt) {
   } else {
     std::cout << "No spacepoints in event" << std::endl;
   }
-
-  /*
-  if( _F_RES ){
-  _f_res->close();
-  delete _f_res;
-  _F_RES=NULL;
-}
-  
-  _f_res_good->close();
-  delete _f_res_good;
-
-  _f_res_chosen->close();
-  delete  _f_res_chosen;
-
-  _f_trks->close();
-  delete _f_trks;
-  */
 };
 
 void PatternRecognition::make_5tracks(
@@ -378,13 +382,13 @@ void PatternRecognition::make_straight_tracks(const int num_points,
                     SciFiSpacePoint *sp = spnts_by_station[station_num][sp_no];
                     double dx = 0, dy = 0;
                     calc_residual(sp, line_x, line_y, dx, dy);
-                    // *_f_res << station_num << "\t" << num_points << "\t";
-                    // *_f_res << dx << "\t" << dy << "\n";
+                    *_f_res << station_num << "\t" << num_points << "\t";
+                    *_f_res << dx << "\t" << dy << "\n";
 
                     // Apply roadcuts & find the spoints with the smallest residuals for the line
                     if ( fabs(dx) < _res_cut && fabs(dy) < _res_cut )  {
-                      //  *_f_res_good << station_num << "\t" << num_points << "\t";
-                      //  *_f_res_good << dx << "\t" << dy << "\n";
+                      *_f_res_good << station_num << "\t" << num_points << "\t";
+                      *_f_res_good << dx << "\t" << dy << "\n";
                       if ( delta_sq > (dx*dx + dy*dy) )
                         delta_sq = dx*dx + dy*dy;
                         best_sp = sp_no;
@@ -398,8 +402,8 @@ void PatternRecognition::make_straight_tracks(const int num_points,
                   good_spnts.push_back(sp);
                   double dx = 0, dy = 0;
                   calc_residual(sp, line_x, line_y, dx, dy);
-                  // *_f_res_chosen << station_num << "\t" << num_points << "\t";
-                  // *_f_res_chosen << dx << "\t" << dy << "\n";
+                  *_f_res_chosen << station_num << "\t" << num_points << "\t";
+                  *_f_res_chosen << dx << "\t" << dy << "\n";
                 }// ~if (counter > 0)
               } // ~if (station_num != ignore_station)
             } // ~Loop over intermediate stations
@@ -965,7 +969,7 @@ void PatternRecognition::calculate_dipangle(const std::vector<SciFiSpacePoint*> 
       std::vector<double> ds;
       // Multiply each element of dphi by R so that each element dphi_ji goes to ds_ji
       dphi_to_ds(R, dphi, ds);
-      for ( int i = 0; i < ds.size(); i++) {
+      for ( int i = 0; i < ds.size(); i++ ) {
         std::cout << "ds = " << ds[i] << std::endl;
         std::cout << "dz = " << dz[i] << std::endl;
     }
