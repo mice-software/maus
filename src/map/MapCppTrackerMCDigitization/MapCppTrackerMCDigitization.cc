@@ -131,8 +131,8 @@ void MapCppTrackerMCDigitization::
     // .start. TO BE REMOVED .start.//
     double px, py, pz, x, y, z;
     px = hit["momentum"]["x"].asDouble();
-    py = hit["momentum"]["x"].asDouble();
-    pz = hit["momentum"]["x"].asDouble();
+    py = hit["momentum"]["y"].asDouble();
+    pz = hit["momentum"]["z"].asDouble();
     x  = hit["position"]["x"].asDouble();
     y  = hit["position"]["y"].asDouble();
     z  = hit["position"]["z"].asDouble();
@@ -335,6 +335,8 @@ bool MapCppTrackerMCDigitization::check_param(SciFiHit *hit1, SciFiHit *hit2) {
 void MapCppTrackerMCDigitization::save_to_json(SciFiEvent &evt, int event_i) {
   Json::Value digits_tracker0;
   Json::Value digits_tracker1;
+  std::vector<Hep3Vector> tmp0;
+  std::vector<Hep3Vector> tmp1;
   for ( unsigned int dig_i = 0; dig_i < evt.digits().size(); dig_i++ ) {
     Json::Value digit;
     int tracker = evt.digits()[dig_i]->get_tracker();
@@ -355,11 +357,46 @@ void MapCppTrackerMCDigitization::save_to_json(SciFiEvent &evt, int event_i) {
     digit["true_momentum"]["y"] = momentum.y();
     digit["true_momentum"]["z"] = momentum.z();
 
+    if ( evt.digits()[dig_i]->get_tracker() == 0)
+      tmp0.push_back(momentum);
+    // && evt.digits()[dig_i]->get_plane() == 1
+    else if ( evt.digits()[dig_i]->get_tracker() == 1)
+      tmp1.push_back(momentum);
+
     if ( tracker == 0 )
       digits_tracker0.append(digit);
     if ( tracker == 1 )
       digits_tracker1.append(digit);
   }
+  /*
+  std::ofstream out1("mc_out.txt", std::ios::out | std::ios::app);
+
+  if (tmp0.size() > 0 ) {
+    double px0 = tmp0[0].x();
+    double py0 = tmp0[0].y();
+    double pz0 = tmp0[0].z();
+
+    double pt0 = sqrt(px0*px0 + py0*py0);
+
+    double R0 = pt0/(.3*4);
+    double tl0 = pz0/pt0;
+
+    double phi00 = 0; // for now
+    out1 << R0 << "\t" << tl0 << "\t" << phi00 << "\t" <<  pt0 << "\t" << pz0 << "\t" << std::endl;
+  }
+
+  if ( tmp1.size() > 0) {
+    double px1 = tmp1[0].x();
+    double py1 = tmp1[0].y();
+    double pz1 = tmp1[0].z();
+
+    double pt1 = sqrt(px1*px1 +py1*py1);
+    double R1 = pt1/(.3*4);
+    double tl1 = pz1/pt1;
+
+    double phi01 = 0; // for now
+    out1 << R1 << "\t" << tl1 << "\t" << phi01 << "\t" <<  pt1 << "\t" << pz1 << "\t" << std::endl;
+  } */
   root["recon_events"][event_i]["sci_fi_event"]["sci_fi_digits"]["tracker0"] = digits_tracker0;
   root["recon_events"][event_i]["sci_fi_event"]["sci_fi_digits"]["tracker1"] = digits_tracker1;
 }
