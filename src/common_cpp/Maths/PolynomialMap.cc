@@ -445,7 +445,9 @@ PolynomialMap* PolynomialMap::PolynomialLeastSquaresFit(
 
   Matrix<double> F2_inverse;
   try {
+std::cout << "CHECKPOINT PolynomialLeastSquaresFit(): 1" << std::endl; std::cout.flush();
     F2_inverse = inverse(F2);
+std::cout << "CHECKPOINT PolynomialLeastSquaresFit(): 2" << std::endl; std::cout.flush();
   } catch(Squeal squee) {
     delete temp;
     throw(Squeal(Squeal::recoverable,

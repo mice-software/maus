@@ -115,13 +115,16 @@ void MinuitTrackFitter::Fit(const Track & detector_events, Track & track) {
   TMinuit * minimiser
     = common_cpp_optics_reconstruction_minuit_track_fitter_minuit;
   // Int_t status = minimiser->Migrad();
+std::cout << "CHECKPOINT Fit(): 1" << std::endl; std::cout.flush();
   minimiser->Migrad();
+std::cout << "CHECKPOINT Fit(): 2" << std::endl; std::cout.flush();
 
   // TODO(plane1@hawk.iit.edu) Handle status from minimiser
 }
 
 Double_t MinuitTrackFitter::ScoreTrack(
     Double_t const * const start_plane_track_coordinates) {
+std::cout << "CHECKPOINT ScoreTrack(): 0" << std::endl; std::cout.flush();
   // clear the last saved track
   track_->clear();
 Track residuals;
@@ -156,8 +159,10 @@ std::cout << "DEBUG ScoreTrack(): Returning maximum score for invalid guess." <<
 std::cout << "DEBUG ScoreTrack(): Guess: " << guess << std::endl;
 std::cout << "DEBUG ScoreTrack(): Measured: " << *events << std::endl;
     // calculate the next guess
+std::cout << "CHECKPOINT ScoreTrack(): 1" << std::endl; std::cout.flush();
     transfer_map
       = optics_model_->GenerateTransferMap(events->z());
+std::cout << "CHECKPOINT ScoreTrack(): 2" << std::endl; std::cout.flush();
     if (transfer_map == NULL) {
     throw(Squeal(Squeal::nonRecoverable,
                  "Got NULL transfer map.",

@@ -34,8 +34,8 @@
 
 // MAUS
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
-// #include "src/common_cpp/Optics/LeastSquaresOpticsModel.hh"
 #include "src/common_cpp/Optics/LinearApproximationOpticsModel.hh"
+#include "src/common_cpp/Optics/PolynomialOpticsModel.hh"
 #include "src/common_cpp/Reconstruction/Global/Detector.hh"
 #include "src/common_cpp/Reconstruction/Global/MinuitTrackFitter.hh"
 #include "src/common_cpp/Reconstruction/Global/Particle.hh"
@@ -203,7 +203,7 @@ fprintf(stdout, "CHECKPOINT: SetupOpticsModel() 0\n"); fflush(stdout);
     }
   }
 
-fprintf(stdout, "CHECKPOINT: SetupOpticsModel() 1"); fflush(stdout);
+fprintf(stdout, "CHECKPOINT: SetupOpticsModel() 1\n"); fflush(stdout);
   switch (model) {
     case 0: {
       // "Differentiating"
@@ -226,39 +226,8 @@ fprintf(stdout, "CHECKPOINT: SetupOpticsModel() 1"); fflush(stdout);
       break;
     }
     case 2: {
-    /*
-      // "Least Squares"
-      Json::Value algorithm_names = JsonWrapper::GetProperty(
-          configuration_,
-          "LeastSquaresOpticsModel_algorithms",
-          JsonWrapper::stringValue);
-      Json::Value algorithm_name = JsonWrapper::GetProperty(
-          configuration_,
-          "LeastSquaresOpticsModel_algorithm",
-          JsonWrapper::stringValue);
-      int algorithm_number;
-      for (algorithm_number = 0;
-           algorithm_number < algorithm_names.size();
-           ++algorithm_number) {
-        if (algorithm_name == algorithm_names[algorithm_number]) {
-          // leave the current index into algorithm_names in algorithm_number
-          break;
-        }
-      }
-
-      Algorithm algorithm;
-
-      switch (algorithm_number) {
-        case 4: algorithm = Algorithm::kSweepingChiSquaredWithVariableWalls;
-                break;
-        case 3: algorithm = Algorithm::kSweepingChiSquared;       break;
-        case 2: algorithm = Algorithm::kConstrainedChiSquared;    break;
-        case 1: algorithm = Algorithm::kConstrainedPolynomial;    break;
-        case 0:
-        default: algorithm = Algorithm::kUnconstrainedPolynomial;      
-      }
-      optics_model_ = new LeastSquaresOpticsModel(algorithm);
-    */
+fprintf(stdout, "CHECKPOINT SetupOpticsModel() 1.1c\n"); fflush(stdout);
+     optics_model_ = new PolynomialOpticsModel(configuration_);
       break;
     }
     case 3: {
@@ -273,7 +242,7 @@ fprintf(stdout, "CHECKPOINT: SetupOpticsModel() 1"); fflush(stdout);
     }
     case 4: {
       // "Linear Approximation"
-fprintf(stdout, "CHECKPOINT: SetupOpticsModel() 1.1\n"); fflush(stdout);
+fprintf(stdout, "CHECKPOINT SetupOpticsModel() 1.1e\n"); fflush(stdout);
      optics_model_ = new LinearApproximationOpticsModel(configuration_);
       break;
     }
