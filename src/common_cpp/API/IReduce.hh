@@ -14,18 +14,44 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
+/*!
+ * \file IReduce.hh
+ *
+ * \author Alexander Richards, Imperial College London
+ * \date 06/06/2012
+ *
+ * This is the interface class for all reducers.
+ *
+ */
 #ifndef _MAUS_API_IREDUCE_H
 #define _MAUS_API_IREDUCE_H
 #include "API/IModule.hh"
 
 namespace MAUS {
 
+  /*!
+   * \class IReduce
+   *
+   * \brief Interface class for all reducers
+   *
+   * \author Alexander Richards, Imperial College London
+   * \date 06/06/2012
+   */
   template<typename T>
   class IReduce : public virtual IModule {
   public:
+    // ! Destructor
     virtual ~IReduce() {}
 
   public:
+    /*!\brief Process data
+     *
+     * Pure virtual function to process the input data
+     * and return the results
+     * \param T* Pointer to the input data
+     * \return T* Pointer to the output data
+     */
     virtual T* process(T* t) = 0;
   };
 

@@ -14,6 +14,16 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
+/*!
+ * \file OutputBase.hh
+ *
+ * \author Alexander Richards, Imperial College London
+ * \date 06/06/2012
+ *
+ * This is the abstract base class for all outputters.
+ *
+ */
 #ifndef _MAUS_API_OUTPUT_BASE_H
 #define _MAUS_API_OUTPUT_BASE_H
 #include <string>
@@ -26,18 +36,47 @@
 
 namespace MAUS {
 
+  /*!
+   * \class OutputBase
+   *
+   * \brief Abstract base class for all outputters
+   *
+   * \author Alexander Richards, Imperial College London
+   * \date 06/06/2012
+   */
   template <typename T>
   class OutputBase : public virtual IOutput<T>, public ModuleBase {
 
   public:
+    /*!\brief Constructor
+     * \param std::string& The name of the outputter.
+     */
     explicit OutputBase(const std::string&);
+    /*!\brief Copy Constructor
+     * \param OutputBase& An outputter to copy from.
+     */
     OutputBase(const OutputBase&);
+    // ! Destructor
     virtual ~OutputBase();
 
   public:
+    /*!\brief Save data
+     *
+     * Implementation of the interface. Wraps the _save function
+     * providing additional control/checking.
+     * \param T* Pointer to the input data
+     * \return boolean save status
+     */
     bool save(T* t);
 
   private:
+    /*!\brief Save data
+     *
+     * Pure virtual private function to be implemented by the
+     * derived outputter author to correctly save the input data type.
+     * \param T* Pointer to the input data
+     * \return boolean save status
+     */
     virtual bool _save(T* t) = 0;
   };
 

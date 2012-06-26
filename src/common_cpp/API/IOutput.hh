@@ -14,18 +14,44 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
+/*!
+ * \file IOutput.hh
+ *
+ * \author Alexander Richards, Imperial College London
+ * \date 06/06/2012
+ *
+ * This is the interface class for all outputters.
+ *
+ */
 #ifndef _MAUS_API_IOUTPUT_H
 #define _MAUS_API_IOUTPUT_H
 #include "API/IModule.hh"
 
 namespace MAUS {
 
+  /*!
+   * \class IOutput
+   *
+   * \brief Interface class for all outputters
+   *
+   * \author Alexander Richards, Imperial College London
+   * \date 06/06/2012
+   */
   template<typename T>
   class IOutput : public virtual IModule {
   public:
+    // ! Destructor
     virtual ~IOutput() {}
 
   public:
+    /*!\brief Save data
+     *
+     * Pure virtual function to save the input data
+     * and return the boolean status
+     * \param T* Pointer to the input data
+     * \return boolean save status
+     */
     virtual bool save(T* t) = 0;
   };
 

@@ -14,18 +14,42 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
+/*!
+ * \file IInput.hh
+ *
+ * \author Alexander Richards, Imperial College London
+ * \date 06/06/2012
+ *
+ * This is the interface class for all inputters.
+ *
+ */
 #ifndef _MAUS_API_IINPUT_H
 #define _MAUS_API_IINPUT_H
 #include "API/IModule.hh"
 
 namespace MAUS {
 
+  /*!
+   * \class IInput
+   *
+   * \brief Interface class for all inputters
+   *
+   * \author Alexander Richards, Imperial College London
+   * \date 06/06/2012
+   */
   template<typename T>
   class IInput : public virtual IModule {
   public:
+    // ! Destructor
     virtual ~IInput() {}
 
   public:
+    /*!\brief Generate data
+     *
+     * Pure virtual function to generate data
+     * \return The data generated
+     */
     virtual T* emitter() = 0;
   };
 

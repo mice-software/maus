@@ -53,10 +53,10 @@ class ModuleBase(IModule):
         raise NotImplementedError('_birth function not implemented in class %s' % self.__class__.__name__)
 
     def _death(self):
-         """
+        """
         Handles the finalisation of the module
-
+        
         This is the private method which must be overridden in derived classes
         to provide the finalisation behaviour for the module
         """
-       raise NotImplementedError('_death function not implemented in class %s' % self.__class__.__name__)
+        raise NotImplementedError('_death function not implemented in class %s' % self.__class__.__name__)

@@ -14,18 +14,46 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
+/*!
+ * \file IModule.hh
+ *
+ * \author Alexander Richards, Imperial College London
+ * \date 06/06/2012
+ *
+ * This is the top level interface for all modules.
+ *
+ */
 #ifndef _MAUS_API_IMODULE_H
 #define _MAUS_API_IMODULE_H
 #include <string>
 
 namespace MAUS {
 
+  /*!
+   * \class IModule
+   *
+   * \brief Top level interface for all modules
+   *
+   * \author Alexander Richards, Imperial College London
+   * \date 06/06/2012
+   */
   class IModule {
   public:
+    // ! Destructor
     virtual ~IModule() {}
 
   public:
+    /*!\brief Module initialisation
+     *
+     * Pure virtual function to initialise the module
+     * \param std::string& the configuration string
+     */
     virtual void birth(const std::string&) = 0;
+    /*!\brief Module finalisation
+     *
+     * Pure virtual function to finalise the module
+     */
     virtual void death()                   = 0;
   };
 

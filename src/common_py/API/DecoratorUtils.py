@@ -1,9 +1,34 @@
+#  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
+#
+#  MAUS is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  MAUS is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
+
 ## Now handles default args correctly and __doc__ strings
 ## wrapper defined by user decorator should generally take just *args and **kw
 ## as these will be modified anyway. Any doc strings defined by user wrapper will
 ## be picked up
-
 def smartDecorator(decor):
+    """
+    Smart decorator for decorating decorators
+    
+    Decorator which wraps a decorator function
+    and allows it to dynamically assume the same signature
+    as the wrapped function. It also allows for pass through of
+    method doc strings
+
+    @param decor the decorator function to be wrapped
+    """
+
     from inspect import getargspec
     argSpec = getargspec(decor)
     
