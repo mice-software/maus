@@ -548,9 +548,9 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
   int outer_station_num = -1, inner_station_num = -1, middle_station_num = -1;
   set_seed_stations(ignore_stations, outer_station_num, inner_station_num, middle_station_num);
 
-  if ( ignore_stations.size() == 2 && ignore_stations[0] == ignore_stations[1] )
+  if ( ignore_stations.size() == 2 && ignore_stations[0] == ignore_stations[1] ) {
     std::cout<< "ignore_stations[0] == ignore_stations[1]" << std::endl;
-  else {
+  } else {
   // Loop over spacepoints in outer station
   for ( int station_outer_sp = 0;
         station_outer_sp < static_cast<int>(spnts_by_station[outer_station_num].size());
@@ -1136,7 +1136,7 @@ bool PatternRecognition::full_helix_fit(const std::vector<SciFiSpacePoint*> &spn
 
       // If the new chi2 you calculate is larger than previous, then the minimum has been passed
 
-      while ( chisq > best_chisq && chisq/(static_cast<int>(spnts.size()) - 2) > _helix_chisq_cut) {
+      while (chisq > best_chisq && chisq/(static_cast<int>(spnts.size()) - 2) > _helix_chisq_cut) {
         dR /= 2;
         dPhi_0 /= 2;
         dtan_lambda /= 2;
