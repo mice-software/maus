@@ -548,9 +548,6 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
   int outer_station_num = -1, inner_station_num = -1, middle_station_num = -1;
   set_seed_stations(ignore_stations, outer_station_num, inner_station_num, middle_station_num);
 
-  if ( ignore_stations.size() == 2 && ignore_stations[0] == ignore_stations[1] ) {
-    std::cout<< "ignore_stations[0] == ignore_stations[1]" << std::endl;
-  } else {
   // Loop over spacepoints in outer station
   for ( int station_outer_sp = 0;
         station_outer_sp < static_cast<int>(spnts_by_station[outer_station_num].size());
@@ -617,11 +614,9 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
 
                       // Calculate the residual dR
                       double dR = delta_R(circle, pos);
-                      // std::cout<< spnts_by_station[station_num][sp_no]->get_position();
-                      // std::cout << std::endl;
                       std::ofstream outdR_all("dR_all.txt", std::ios::out | std::ios::app);
                       outdR_all << dR <<std::endl;
-                      // std::cout << dR << std::endl;
+                      std::cout << dR << std::endl;
                       // Apply roadcut to see if spacepoint belongs to same circle
                       if ( fabs(dR) < _R_res_cut && fabs(dR) < fabs(best_from_this_station) ) {
                          std::ofstream outdR_passed_cut("dR_passed_cut.txt", std::ios::out |
@@ -689,6 +684,12 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
                 }
                 gROOT->ProcessLine(" .x fitCircle.C(num) "); */
                 // Check circle fit passes chisq test
+                std::ofstream out_circ("circle_red_chisq.txt", std::ios::out | std::ios::app);
+                out_circ << circle.get_chisq() / (num_points - 2) << std::endl;
+
+                std::ofstream out_circ2("circle_chisq.txt", std::ios::out | std::ios::app);
+                out_circ2 << circle.get_chisq() << std::endl;
+
                 if ( circle.get_chisq() / ( num_points - 2 ) < _chisq_cut ) {
                   std::cout << "** chisq circle test passed, moving onto linear fit in s-z **\n";
                   SimpleLine line_sz;
@@ -697,6 +698,13 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
 
                   calculate_dipangle(good_spnts, circle, dphi, line_sz, Phi_0);
                   // Check linear fit passes chisq test, then perform full helix fit
+
+                  std::ofstream out_line("szline_red_chisq.txt", std::ios::out | std::ios::app);
+                  out_line << line_sz.get_chisq() / (num_points - 2) << std::endl;
+
+                  std::ofstream out_line2("circle_chisq.txt", std::ios::out | std::ios::app);
+                  out_line2 << line_sz.get_chisq() << std::endl;
+
                   if ( line_sz.get_chisq() / ( num_points - 2 ) < _sz_chisq_cut ) {
                     std::cout << "** line in sz chisq test passed, moving on to full helix fit**\n";
                     std::vector<double> azm_angles;
@@ -719,6 +727,13 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
                     double tan_lambda = 1/dsdz;
 
                     bool good_helix = full_helix_fit(good_spnts, circle, line_sz, helix);
+
+                    std::ofstream out_helix("helix_red_chisq.txt", std::ios::out | std::ios::app);
+                    out_helix << helix.get_chisq() / (num_points - 2) << std::endl;
+
+                    std::ofstream out_circ2("circle_chisq.txt", std::ios::out | std::ios::app);
+                    out_circ2 << circle.get_chisq() << std::endl;
+
                     if ( good_helix ) {
                       // push helix back into track object once its made
                       std::cout << "Helix fit found, adding " << num_points << "pt track **\n";
@@ -771,7 +786,8 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
                       //                   std::ios::out | std::ios::app);
                       // for (int t = 0; t < static_cast<int>(good_spnts.size()); ++t) {
                       //  out5 << good_spnts[t]->get_position() << "\t";
-                      // }
+                      // }  // } // ************************************************Dbugging
+
                       // out5 <<  circle.get_R() << "\t"<< Phi_0 <<"\t"<< tan_lambda << std::endl;
                     }
                   } else { // Debugging **************
@@ -804,7 +820,6 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
       } // ~Loop over inner station spacepoints
     } // ~if outer station spacepoint is unused
   } // ~Loop over outer station spacepoints
-  }
 } // ~make_helix(...)
 
 void PatternRecognition::circle_fit(const std::vector<SciFiSpacePoint*> &spnts,
@@ -1397,12 +1412,6 @@ void PatternRecognition::set_seed_stations(const std::vector<int> ignore_station
        else
          middle_station_num = 1;
   } else if ( static_cast<int>(ignore_stations.size()) == 2 ) { // 3pt track case
-      if ( ignore_stations[0] == ignore_stations[1] ) {
-        std::cout << "ignore_stations vector was filled improperly!!!! QUITTING RECONSTRUCTION";
-        std::cout << std::endl;
-      }
-      std::cout << " ignoring stations " << ignore_stations[0] << " and " << ignore_stations[1];
-      std::cout << std::endl;
       // Set outer station number
       if ( ignore_stations[1] != 4 )
         outer_station_num = 4;
@@ -1418,26 +1427,18 @@ void PatternRecognition::set_seed_stations(const std::vector<int> ignore_station
       else
         inner_station_num = 2;
       // Set middle station number
-      if ( ignore_stations[0] == 0 && ignore_stations[1] == 1 )
-        middle_station_num = 3;
-      else if ( ignore_stations[0] == 0 && ignore_stations[1] == 2 )
-        middle_station_num = 3;
-      else if ( ignore_stations[0] == 0 && ignore_stations[1] == 3 )
-        middle_station_num = 2;
-      else if ( ignore_stations[0] == 0 && ignore_stations[1] == 4 )
-        middle_station_num = 2;
-      else if ( ignore_stations[0] == 1 && ignore_stations[1] == 2 )
-        middle_station_num = 3;
-      else if ( ignore_stations[0] == 1 && ignore_stations[1] == 3 )
-        middle_station_num = 2;
-      else if ( ignore_stations[0] == 1 && ignore_stations[1] == 4 )
-        middle_station_num = 2;
-      else if ( ignore_stations[0] == 2 && ignore_stations[1] == 3 )
+      if ( ignore_stations[0] != 0 && ignore_stations[1] != 1 )
         middle_station_num = 1;
-      else if ( ignore_stations[0] == 2 && ignore_stations[1] == 4 )
-        middle_station_num = 1;
-      else if ( ignore_stations[0] == 3 && ignore_stations[1] == 4 )
-        middle_station_num = 1;
+      else if ( ignore_stations[0] != 0 && ignore_stations[1] != 2 )
+        middle_station_num = 2;
+      else if ( ignore_stations[0] != 0 && ignore_stations[1] != 3 )
+        middle_station_num = 3;
+      else if ( ignore_stations[0] != 1 && ignore_stations[1] != 2 )
+        middle_station_num = 2;
+      else if ( ignore_stations[0] != 1 && ignore_stations[1] != 3 )
+        middle_station_num = 3;
+      else // case where   ignore_stations[0] != 2 && ignore_stations[1] != 3
+        middle_station_num = 3;
     } else {
     std::cout << "Error: Invalid ignore station argument." << std::endl;
   }
