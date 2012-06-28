@@ -106,7 +106,7 @@ void DerivativesSolenoid::
 
 void DerivativesSolenoid::Print(std::ostream &out) const {
   out << "DerivativesSolenoid PeakField: " << _peak_field
-      << " Order: " << _highest_order;
+      << " Order: " << _highest_order << " ";
   _end_field->Print(out);
   this->BTField::Print(out);
 }
