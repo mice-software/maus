@@ -44,7 +44,7 @@ bool sort_by_id(SciFiCluster *a, SciFiCluster *b ) {
 //
 void KalmanTrackFit::process(Hep3Vector &tof0, Hep3Vector &se, Hep3Vector &tof1) {
   std::vector<KalmanSite> sites;
-/*  KalmanTrack *track = new GlobalTrack();
+  KalmanTrack *track = new GlobalTrack();
   initialise_global_track(tof0, se, tof1, sites);
   // Filter the first state.
   std::cout << "Filtering site 0" << std::endl;
@@ -67,7 +67,7 @@ void KalmanTrackFit::process(Hep3Vector &tof0, Hep3Vector &se, Hep3Vector &tof1)
     std::cerr << "Smoothing site " << i << std::endl;
     smooth(sites, track, i);
   }
-*/
+
   KalmanMonitor monitor;
   monitor.save_global_track(sites);
   monitor.print_info(sites);
