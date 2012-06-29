@@ -699,10 +699,12 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
                   calculate_dipangle(good_spnts, circle, dphi, line_sz, Phi_0);
                   // Check linear fit passes chisq test, then perform full helix fit
 
+                  std::cout << "linesz chisq = " << line_sz.get_chisq() << std::endl;
+
                   std::ofstream out_line("szline_red_chisq.txt", std::ios::out | std::ios::app);
                   out_line << line_sz.get_chisq() / (num_points - 2) << std::endl;
 
-                  std::ofstream out_line2("circle_chisq.txt", std::ios::out | std::ios::app);
+                  std::ofstream out_line2("szline_chisq.txt", std::ios::out | std::ios::app);
                   out_line2 << line_sz.get_chisq() << std::endl;
 
                   if ( line_sz.get_chisq() / ( num_points - 2 ) < _sz_chisq_cut ) {
@@ -731,8 +733,8 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
                     std::ofstream out_helix("helix_red_chisq.txt", std::ios::out | std::ios::app);
                     out_helix << helix.get_chisq() / (num_points - 2) << std::endl;
 
-                    std::ofstream out_circ2("circle_chisq.txt", std::ios::out | std::ios::app);
-                    out_circ2 << circle.get_chisq() << std::endl;
+                    std::ofstream out_helix2("helix_chisq.txt", std::ios::out | std::ios::app);
+                    out_helix2 << helix.get_chisq() << std::endl;
 
                     if ( good_helix ) {
                       // push helix back into track object once its made
@@ -1013,7 +1015,32 @@ bool PatternRecognition::turns_between_stations(const std::vector<double> &dz,
   // Make sure that you have enough points to make a line (2)
   if ( dz.size() < 2 || dphi.size() < 2 )
     return false;
+  for ( int n = 0; n < 2; ++n ) {
+    for ( int i = 0; i < static_cast<int>(dphi.size()) - 1; ++i ) {
+      if ( dphi[i] < 0 )
+        dphi[i] += 2. * pi;
 
+      int j = i + 1;
+      if ( dphi[j] < dphi[i] )
+        dphi[j] += 2. * pi;
+
+      double z_ratio = dz[j] / dz[i];
+      double phi_ratio = dphi[j] / dphi[i];
+
+      std::cout << "RATIOS.... " << fabs( phi_ratio - z_ratio ) /  z_ratio << std::endl;
+
+      if ( fabs( phi_ratio - z_ratio ) /  z_ratio > _AB_cut ) {
+        // try
+        bool passed_cut = AB_ratio(dphi[i], dphi[j], dz[i], dz[j]);
+        if ( !passed_cut )
+          return false;
+      }
+    }
+  }
+
+  return true;
+
+/*
   if ( dphi[0] < 0 )
     dphi[0] += 2 * pi;
 
@@ -1034,7 +1061,6 @@ bool PatternRecognition::turns_between_stations(const std::vector<double> &dz,
     ++counter;
     // if good_AB is returned as false at any point, this loop will stop iterating.
   }
-
   //  Again make sure that dphi is always increasing between stations **need something better here!
   for ( int i = 0; i < static_cast<int>(dphi.size()); i++ ) {
     while ( dphi[i] > dphi[i+1] ) {
@@ -1048,26 +1074,28 @@ bool PatternRecognition::turns_between_stations(const std::vector<double> &dz,
   else
     return false; // if i < dphi.size(), then the iterations were stopped after some AB_ratio was
                   // returned false.
+
+   */
 }
 
 bool PatternRecognition::AB_ratio(double &dphi_ji, double &dphi_kj, double dz_ji,
                                   double dz_kj) {
   // double A, B;
 
-  for ( int n = 0; n < 5; ++n ) {
-    for ( int m = 0; m < 5; ++m ) {
+  for ( int n = 0; n < 5; ++n ) // {
+    for ( int m = 0; m < n+1; ++m ) { // m always less than or equal to n
       double A, B;
-      A = ( dphi_kj + ( 2 * n * pi ) ) / ( dphi_ji + ( 2 * m * pi ) );
-      B = dz_kj / dz_ji;
-      std::cout <<  " A - B  = " << fabs(A - B) << std::endl;
-      if ( fabs(A - B) < _AB_cut ) {
+      A = ( dphi_kj + ( 2 * n * pi ) ) / ( dphi_ji + ( 2 * m * pi ) ); // phi_ratio
+      B = dz_kj / dz_ji; // z_ratio
+      std::cout <<  " A - B  = " << fabs(A - B)/B << std::endl;
+      if ( fabs(A - B) / B < _AB_cut ) {
         dphi_kj += 2 * n * pi;
         dphi_ji += 2 * m * pi;
 
         return true;
       }
     } // end m loop
-  } // end n loop
+ // } // end n loop
   return false; // Return false if _ABcut is never satisfied
 }
 
@@ -1091,8 +1119,6 @@ bool PatternRecognition::full_helix_fit(const std::vector<SciFiSpacePoint*> &spn
   double Phi_0 = helix.get_Phi_0();
 
   double dsdz = line_sz.get_m();
-  if ( dsdz == 0 )
-    dsdz = .1;
 
   double tan_lambda = 1 / dsdz;
 
@@ -1117,6 +1143,7 @@ bool PatternRecognition::full_helix_fit(const std::vector<SciFiSpacePoint*> &spn
     helix.set_dsdz(dsdz);
     helix.set_tan_lambda(tan_lambda);
     helix.set_chisq_dof(best_chisq / static_cast<int>(spnts.size()));
+    helix.set_chisq(best_chisq);
     return true;
   }
 
@@ -1142,6 +1169,7 @@ bool PatternRecognition::full_helix_fit(const std::vector<SciFiSpacePoint*> &spn
       helix.set_dsdz(dsdz);
       helix.set_tan_lambda(tan_lambda);
       helix.set_chisq_dof(best_chisq / (static_cast<int>(spnts.size()) -2 ));
+      helix.set_chisq(best_chisq);
       return true;
       // returns the helix too
     }
@@ -1175,6 +1203,8 @@ bool PatternRecognition::full_helix_fit(const std::vector<SciFiSpacePoint*> &spn
           helix.set_dsdz(dsdz);
           helix.set_tan_lambda(tan_lambda);
           helix.set_chisq_dof(best_chisq / (static_cast<int>(spnts.size()) -2 ));
+          helix.set_chisq(best_chisq);
+
           return true;
           // returns the helix too
         }
@@ -1196,6 +1226,7 @@ bool PatternRecognition::full_helix_fit(const std::vector<SciFiSpacePoint*> &spn
         helix.set_dsdz(dsdz);
         helix.set_tan_lambda(tan_lambda);
         helix.set_chisq_dof(best_chisq / (static_cast<int>(spnts.size()) -2 ));
+        helix.set_chisq(best_chisq);
         return true;
         // returns the helix too
       } else if ( chisq < best_chisq && fabs(best_chisq - chisq) > _chisq_diff ) {
@@ -1233,7 +1264,15 @@ double PatternRecognition::calculate_chisq(const std::vector<SciFiSpacePoint*> &
     std::cout << "y_recon = " << yi<< " should equal   y_sp = " << p.y() << std::endl;
     std::cout << "z_recon = " << zi<< " should equal   z_sp = " << p.z() << std::endl;
 
-    chi2 += ((p.x() - xi)*(p.x() - xi)) + ((p.y() - yi)*(p.y() - yi)) + ((p.z() - zi)*(p.z() - zi));
+    double sd = -1;
+    if ( spnts[i]->get_station() == 5 )
+      sd = _sd_5;
+    else
+      sd = _sd_1to4;
+
+    double w = 1 / (sd * sd);
+
+    chi2 += w*((p.x()-xi)*(p.x()-xi)) + w*((p.y()-yi)*(p.y()-yi)) + ((p.z()-zi)*(p.z()-zi));
   }
   return chi2;
 }
