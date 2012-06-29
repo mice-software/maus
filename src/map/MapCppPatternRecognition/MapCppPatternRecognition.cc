@@ -59,13 +59,13 @@ std::string MapCppPatternRecognition::process(std::string document) {
 
   try {
     root = JsonWrapper::StringToJson(document);
-    // Json::Value spacepoints_array = JsonWrapper::GetProperty(root, "spacepoints",
-    //                                                          JsonWrapper::arrayValue);
-    Json::Value spacepoints_value = JsonWrapper::GetProperty(root, "space_points",
-                                                            JsonWrapper::objectValue);
+    Json::Value spacepoints_array = JsonWrapper::GetProperty(root, "spacepoints",
+                                                              JsonWrapper::arrayValue);
+    // Json::Value spacepoints_value = JsonWrapper::GetProperty(root, "space_points",
+    //                                                        JsonWrapper::objectValue);
 
-    Json::Value spacepoints_array = JsonWrapper::GetProperty(spacepoints_value, "tracker1",
-                                                             JsonWrapper::arrayValue);
+    // Json::Value spacepoints_array = JsonWrapper::GetProperty(spacepoints_value, "tracker1",
+    //                                                         JsonWrapper::arrayValue);
 
     // assert(spacepoints_array.isArray());
     make_SciFiSpill(spacepoints_array, spill);
