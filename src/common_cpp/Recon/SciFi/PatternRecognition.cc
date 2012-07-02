@@ -701,15 +701,15 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
 
                   std::cout << "linesz chisq = " << line_sz.get_chisq() << std::endl;
 
+                  if ( line_sz.get_chisq() / ( num_points - 2 ) < _sz_chisq_cut ) {
+                    std::cout << "** line in sz chisq test passed, moving on to full helix fit**\n";
+                    std::vector<double> azm_angles;
+
                   std::ofstream out_line("szline_red_chisq.txt", std::ios::out | std::ios::app);
                   out_line << line_sz.get_chisq() / (num_points - 2) << std::endl;
 
                   std::ofstream out_line2("szline_chisq.txt", std::ios::out | std::ios::app);
                   out_line2 << line_sz.get_chisq() << std::endl;
-
-                  if ( line_sz.get_chisq() / ( num_points - 2 ) < _sz_chisq_cut ) {
-                    std::cout << "** line in sz chisq test passed, moving on to full helix fit**\n";
-                    std::vector<double> azm_angles;
 
                     // Calculate turning angles w.r.t. Phi_0
                     azm_angles.push_back(Phi_0);
@@ -736,6 +736,7 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
                     out1 << Phi_0 << "\t" << pt << "\t" << pz << "\t";
                     out1 << 0 << std::endl;
 
+                    // NOTE this isn't working right now.
                     bool good_helix = full_helix_fit(good_spnts, circle, line_sz, helix);
 
                     std::ofstream out_helix("helix_red_chisq.txt", std::ios::out | std::ios::app);
@@ -1020,29 +1021,27 @@ bool PatternRecognition::turns_between_stations(const std::vector<double> &dz,
       if ( dphi[i] < 0 )
         dphi[i] += 2. * pi;
 
-      int j = i + 1;
-      if ( dphi[j] < dphi[i] )
-        dphi[j] += 2. * pi;
+        int j = i + 1;
+        if ( dphi[j] < dphi[i] )
+          dphi[j] += 2. * pi;
 
-      std::cout <<"dphi_i = "<< dphi[i] << std::endl;
-      std::cout <<"dphi_j = "<< dphi[j] << std::endl;
+        std::cout <<"dphi_i = "<< dphi[i] << std::endl;
+        std::cout <<"dphi_j = "<< dphi[j] << std::endl;
 
-      double z_ratio = dz[j] / dz[i];
-      double phi_ratio = dphi[j] / dphi[i];
+        double z_ratio = dz[j] / dz[i];
+        double phi_ratio = dphi[j] / dphi[i];
 
-      std::cout << "RATIOS.... " << fabs( phi_ratio - z_ratio ) /  z_ratio << std::endl;
+        std::cout << "RATIOS.... " << fabs( phi_ratio - z_ratio ) /  z_ratio << std::endl;
 
-      if ( fabs( phi_ratio - z_ratio ) /  z_ratio > _AB_cut ) {
-        // try
-        bool passed_cut = AB_ratio(dphi[i], dphi[j], dz[i], dz[j]);
-        if ( !passed_cut )
-          return false;
+        if ( fabs( phi_ratio - z_ratio ) /  z_ratio > _AB_cut ) {
+          // try
+          bool passed_cut = AB_ratio(dphi[i], dphi[j], dz[i], dz[j]);
+          if ( !passed_cut )
+            return false;
+        }
       }
     }
-  }
-
   return true;
-
 /*
   if ( dphi[0] < 0 )
     dphi[0] += 2 * pi;
@@ -1085,7 +1084,7 @@ bool PatternRecognition::AB_ratio(double &dphi_ji, double &dphi_kj, double dz_ji
                                   double dz_kj) {
   // double A, B;
 
-  for ( int n = 0; n < 5; ++n ) // {
+  for ( int n = 0; n < 10; ++n ) // {
     for ( int m = 0; m < n+1; ++m ) { // m always less than or equal to n
       double A, B;
       A = ( dphi_kj + ( 2 * n * pi ) ) / ( dphi_ji + ( 2 * m * pi ) ); // phi_ratio
