@@ -53,3 +53,6 @@ doc/coverage
 src/common_cpp/DataStructure/MausDataStructure.cc
 src/common_cpp/DataStructure/MausDataStructure.h
 
+third_party/install/man/man1
+third_party/install/man/man3
+install_log_std

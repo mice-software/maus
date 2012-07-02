@@ -60,7 +60,7 @@ def build_lib_maus_cpp(env):
     targetpath = 'src/common_cpp/libMausCpp'
     maus_cpp = env.SharedLibrary(target = targetpath,
                                  source = common_cpp_files,
-                                 LIBS=env['LIBS'] + ['recpack'])
+                                 LIBS=env['LIBS'])
     env.Install("build", maus_cpp)
     #Build an extra copy with the .dylib extension for linking on OS X
     if (os.uname()[0] == 'Darwin'):
@@ -89,7 +89,7 @@ def build_cpp_tests(env):
 
     env.Program(target = 'tests/cpp_unit/test_cpp_unit', \
                 source = test_cpp_files, \
-                LIBS= env['LIBS'] + ['recpack'] + ['MausCpp'])
+                LIBS= env['LIBS'] + ['MausCpp'])
     env.Install('build', ['tests/cpp_unit/test_cpp_unit'])
 
     test_optics_files = glob.glob("tests/integration/test_optics/src/*cc")
