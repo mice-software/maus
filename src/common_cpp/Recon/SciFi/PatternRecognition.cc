@@ -1021,24 +1021,20 @@ bool PatternRecognition::turns_between_stations(const std::vector<double> &dz,
       if ( dphi[i] < 0 )
         dphi[i] += 2. * pi;
 
-        int j = i + 1;
-        if ( dphi[j] < dphi[i] )
-          dphi[j] += 2. * pi;
+      int j = i + 1;
+      if ( dphi[j] < dphi[i] )
+        dphi[j] += 2. * pi;
 
-        std::cout <<"dphi_i = "<< dphi[i] << std::endl;
-        std::cout <<"dphi_j = "<< dphi[j] << std::endl;
+      double z_ratio = dz[j] / dz[i];
+      double phi_ratio = dphi[j] / dphi[i];
 
-        double z_ratio = dz[j] / dz[i];
-        double phi_ratio = dphi[j] / dphi[i];
+      std::cout << "RATIOS.... " << fabs(phi_ratio - z_ratio) /  z_ratio << std::endl;
 
-        std::cout << "RATIOS.... " << fabs( phi_ratio - z_ratio ) /  z_ratio << std::endl;
-
-        if ( fabs( phi_ratio - z_ratio ) /  z_ratio > _AB_cut ) {
-          // try
-          bool passed_cut = AB_ratio(dphi[i], dphi[j], dz[i], dz[j]);
-          if ( !passed_cut )
-            return false;
-        }
+      if ( fabs(phi_ratio - z_ratio) /  z_ratio > _AB_cut ) {
+        // try
+        bool passed_cut = AB_ratio(dphi[i], dphi[j], dz[i], dz[j]);
+        if ( !passed_cut )
+          return false;
       }
     }
   return true;
@@ -1097,7 +1093,7 @@ bool PatternRecognition::AB_ratio(double &dphi_ji, double &dphi_kj, double dz_ji
         return true;
       }
     } // end m loop
- // } // end n loop
+  // } // end n loop
   return false; // Return false if _ABcut is never satisfied
 }
 

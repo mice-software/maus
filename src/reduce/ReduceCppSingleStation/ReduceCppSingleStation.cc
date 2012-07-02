@@ -211,11 +211,11 @@ std::string  ReduceCppSingleStation::process(std::string document) {
   }
   try {
     if ( is_physics_daq_event(root) ) {
-      unpacked_data_histograms(root);
-      digits_histograms(root);
-      doublet_clusters_histograms(root);
-      _spacepoints.Reset();
-      draw_spacepoints(root);
+      // unpacked_data_histograms(root);
+      // digits_histograms(root);
+      // doublet_clusters_histograms(root);
+      // _spacepoints.Reset();
+      // draw_spacepoints(root);
       count_particle_events(root);
       compute_station_efficiencies(root);
     }

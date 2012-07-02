@@ -43,7 +43,7 @@ bool sort_by_id(SciFiCluster *a, SciFiCluster *b ) {
 // Global track fit.
 //
 void KalmanTrackFit::process(Hep3Vector &tof0, Hep3Vector &se, Hep3Vector &tof1) {
-/*  std::vector<KalmanSite> sites;
+  std::vector<KalmanSite> sites;
   KalmanTrack *track = new GlobalTrack();
   initialise_global_track(tof0, se, tof1, sites);
   // Filter the first state.
@@ -51,7 +51,7 @@ void KalmanTrackFit::process(Hep3Vector &tof0, Hep3Vector &se, Hep3Vector &tof1)
   filter(sites, track, 0);
 
   int numb_measurements = sites.size();
-  assert(numb_measurements==3);
+  assert(numb_measurements == 3);
 
   for ( int i = 1; i < numb_measurements; ++i ) {
     // Predict the state vector at site i...
@@ -69,30 +69,31 @@ void KalmanTrackFit::process(Hep3Vector &tof0, Hep3Vector &se, Hep3Vector &tof1)
   }
 
   KalmanMonitor monitor;
-  monitor.save(sites);
-  monitor.save_mc(sites);
+  monitor.save_global_track(sites);
   monitor.print_info(sites);
   delete track;
-  */
 }
 
 void KalmanTrackFit::initialise_global_track(Hep3Vector &tof0, Hep3Vector &se,
                                              Hep3Vector &tof1, std::vector<KalmanSite> &sites) {
-/*  double x_pr = seed.get_x0();
-  double y_pr = seed.get_y0();
-  double mx_pr = seed.get_mx();
-  double my_pr = seed.get_my();
-  double p_pr  = 210.0; // MeV/c
+  double se_tof1_sep = 60.0; // cm
+  double se_tof0_sep = 720.0; // cm
 
-  std::vector<SciFiSpacePoint> spacepoints = seed.get_spacepoints();
-  std::vector<SciFiCluster*> clusters;
-  process_clusters(spacepoints, clusters);
+  double mx_pr = ( tof1.x()-se.x() ) / se_tof1_sep;
+  double x_pr = se_tof0_sep*(1.-mx_pr);
+  double my_pr = ( tof1.y()-se.y() ) / se_tof1_sep;
+  double y_pr = se_tof0_sep*(1.-my_pr);
+  double p_z  = 423.0; // MeV/c
+
+  // std::vector<SciFiSpacePoint> spacepoints = seed.get_spacepoints();
+  // std::vector<SciFiCluster*> clusters;
+  // process_clusters(spacepoints, clusters);
   // the clusters are sorted by now.
 
-  int numb_sites = clusters.size();
+  int numb_sites = 3; // clusters.size();
 
-  double z = clusters[0]->get_position().z();
-  int tracker = clusters[0]->get_tracker();
+  /* double z = clusters[0]->get_position().z();
+  // int tracker = clusters[0]->get_tracker();
   double mx, my, x, y;
   if ( tracker == 0 ) {
     mx = mx_pr;
@@ -106,13 +107,13 @@ void KalmanTrackFit::initialise_global_track(Hep3Vector &tof0, Hep3Vector &se,
     y  = y_pr + my*z;
   }
 
-  KalmanSite first_plane;
+  KalmanSite first_site;
   TMatrixD a(5, 1);
-  a(0, 0) = x;
-  a(1, 0) = y;
-  a(2, 0) = mx;
-  a(3, 0) = my;
-  a(4, 0) = 1/p_pr;
+  a(0, 0) = x_pr;
+  a(1, 0) = mx_pr;
+  a(2, 0) = y_pr;
+  a(3, 0) = my_pr;
+  a(4, 0) = 1/p_z;
   first_plane.set_projected_a(a);
 
   TMatrixD C(5, 5);
@@ -138,7 +139,7 @@ void KalmanTrackFit::initialise_global_track(Hep3Vector &tof0, Hep3Vector &se,
     a_site.set_id(clusters[j]->get_id());
     sites.push_back(a_site);
   }
-  */
+*/
 }
 
 //
@@ -277,7 +278,7 @@ void KalmanTrackFit::process(SciFiEvent &event) {
     }
 
     KalmanMonitor monitor;
-    monitor.save(sites);
+    // monitor.save(sites);
     monitor.save_mc(sites);
     monitor.print_info(sites);
     delete track;
@@ -383,7 +384,10 @@ void KalmanTrackFit::extrapolate(std::vector<KalmanSite> &sites, KalmanTrack *tr
   // ... and the site we will extrapolate from.
   KalmanSite *old_site = &sites[i-1];
 
-  // The propagator matrix must be constructed...
+  // Calculate the system noise...
+  track->calc_system_noise(old_site);
+
+  // The propagator matrix...
   track->update_propagator(old_site, new_site);
 
   // Now, calculate prediction.

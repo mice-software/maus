@@ -30,11 +30,11 @@
 #include "TMath.h"
 #include "TMatrixD.h"
 
-
 #include "src/common_cpp/Recon/SciFi/SciFiEvent.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
 #include "src/common_cpp/Recon/Kalman/HelicalTrack.hh"
 #include "src/common_cpp/Recon/Kalman/StraightTrack.hh"
+#include "src/common_cpp/Recon/Kalman/GlobalTrack.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanMonitor.hh"
 #include "src/common_cpp/Recon/SciFi/SeedFinder.hh"

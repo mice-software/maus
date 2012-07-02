@@ -30,7 +30,7 @@ class InputCppDAQOfflineData : public InputCppDAQData {
  public:
 
   /** Create an instance of InputCppDAQData.
-  *
+  * 
   * This is the constructor for InputCppDAQData.
   *
   * \param[in] pDataPath The (directory) path to read the data from
@@ -72,7 +72,7 @@ class InputCppDAQOfflineData : public InputCppDAQData {
   std::string _datafiles;
 
  /** Max number of DAQ events to be processed.
-  */
+  */ 
   int _maxNumEvents;
 
  /** Counter of the DAQ events.
@@ -89,3 +89,7 @@ class InputCppDAQOfflineData : public InputCppDAQData {
 };
 
 #endif
+
+
+
+

@@ -76,6 +76,7 @@ std::string MapCppSingleStationRecon::process(std::string document) {
         if ( event->clusters().size() ) {
           spacepoint_recon(event);
         }
+        /*
         Hep3Vector tof0, tof1, se;
         // double tof0_x, tof0_y, tof1_x, tof1_y;
         // double tof0_time, tof1_time;
@@ -88,6 +89,7 @@ std::string MapCppSingleStationRecon::process(std::string document) {
           std::cerr << "Starting Global Recon" << std::endl;
           ++eff_counter;
         }
+        */
         print_event_info(event, k);
         save_to_json(event, k);
       }
