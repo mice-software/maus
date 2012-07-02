@@ -25,19 +25,19 @@ namespace MAUS {
 template <>
 HitProcessor<SciFiChannelId>::HitProcessor()
     : _channel_id_proc(new SciFiChannelIdProcessor()) {
-    RegisterBranches();
+    this->RegisterBranches();
 }
 
 template <>
 HitProcessor<TOFChannelId>::HitProcessor()
     : _channel_id_proc(new TOFChannelIdProcessor()) {
-    RegisterBranches();
+    this->RegisterBranches();
 }
 
 template <>
 HitProcessor<SpecialVirtualChannelId>::HitProcessor()
     : _channel_id_proc(new SpecialVirtualChannelIdProcessor()) {
-    RegisterBranches();
+    this->RegisterBranches();
 }
 }
 

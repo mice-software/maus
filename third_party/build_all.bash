@@ -22,7 +22,16 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     # ls ${MAUS_ROOT_DIR}/third_party/bash | grep bash | sort| xargs -i echo '${MAUS_ROOT_DIR}/third_party/bash/{}'
     #
 
+    ${MAUS_ROOT_DIR}/third_party/bash/00get_all_libs.bash
+    if [ $? != 0 ]; then
+        echo "WARNING: Failed to download the third party tarball. I will try"
+        echo "WARNING: to download them individually"
+    fi
     ${MAUS_ROOT_DIR}/third_party/bash/01python.bash
+    python ${MAUS_ROOT_DIR}/third_party/check_path.py
+    if [ $? != 0 ]; then
+        echo "FATAL: Found a bad MAUS_ROOT_DIR"
+    fi
     ${MAUS_ROOT_DIR}/third_party/bash/02swig.bash
     ${MAUS_ROOT_DIR}/third_party/bash/10setuptools.bash
     ${MAUS_ROOT_DIR}/third_party/bash/11gtest.bash
