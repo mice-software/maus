@@ -44,12 +44,12 @@ TEST(DerivativesSolenoidTest, TestConstructorDestructor) {
     DerivativesSolenoid sol_value(2., 10., 11., 3, end);
     EXPECT_EQ(sol_value.GetPeakField(), 2.);
     EXPECT_EQ(sol_value.GetRMax(), 10.);
-    EXPECT_EQ(sol_value.GetZMax(), 11.); 
+    EXPECT_EQ(sol_value.GetZMax(), 11.);
     EXPECT_EQ(sol_value.GetHighestOrder(), 3);
     EXPECT_EQ(sol_value.GetEndFieldModel(), end);
 }
 
-// all 
+// all
 TEST(DerivativesSolenoidTest, TestNullCopyConstructorCloneEquality) {
     DerivativesSolenoid sol_null;
     DerivativesSolenoid sol_null_copy(sol_null);
@@ -126,14 +126,14 @@ TEST(DerivativesSolenoidTest, TestBoundingBox) {
     // centre
     EXPECT_NEAR(test_get_field_value(sol, 0., 0., 0.)[2], 2., 1e-6);
     // in bounding box
-    EXPECT_GT(test_get_field_value(sol, 2.-1e-9, 0., 1.-1e-9)[2], 1e-3); 
-    EXPECT_GT(test_get_field_value(sol, 2.-1e-9, 0., 1.-1e-9)[0], 1e-3); 
+    EXPECT_GT(test_get_field_value(sol, 2.-1e-9, 0., 1.-1e-9)[2], 1e-3);
+    EXPECT_GT(test_get_field_value(sol, 2.-1e-9, 0., 1.-1e-9)[0], 1e-3);
     // out of bounding box
-    EXPECT_NEAR(test_get_field_value(sol, 2.-1e-9, 0., 1.+1e-9)[0], 0., 1e-12); 
-    EXPECT_NEAR(test_get_field_value(sol, 2.-1e-9, 0., 1.+1e-9)[2], 0., 1e-12); 
+    EXPECT_NEAR(test_get_field_value(sol, 2.-1e-9, 0., 1.+1e-9)[0], 0., 1e-12);
+    EXPECT_NEAR(test_get_field_value(sol, 2.-1e-9, 0., 1.+1e-9)[2], 0., 1e-12);
     // out of bounding box
-    EXPECT_NEAR(test_get_field_value(sol, 2.+1e-9, 0., 1.-1e-9)[0], 0., 1e-12); 
-    EXPECT_NEAR(test_get_field_value(sol, 2.+1e-9, 0., 1.-1e-9)[2], 0., 1e-12); 
+    EXPECT_NEAR(test_get_field_value(sol, 2.+1e-9, 0., 1.-1e-9)[0], 0., 1e-12);
+    EXPECT_NEAR(test_get_field_value(sol, 2.+1e-9, 0., 1.-1e-9)[2], 0., 1e-12);
 }
 
 TEST(DerivativesSolenoidTest, TestFieldOnAxis) {
@@ -141,7 +141,7 @@ TEST(DerivativesSolenoidTest, TestFieldOnAxis) {
     DerivativesSolenoid sol(2., 2., 10., 3, end);
     for (double z = -10.; z < 10.; z+= 0.1)
       EXPECT_NEAR(
-        test_get_field_value(sol, 0., 0., z)[2], end->Function(z, 0)*2., 1e-9); 
+        test_get_field_value(sol, 0., 0., z)[2], end->Function(z, 0)*2., 1e-9);
 }
 
 TEST(DerivativesSolenoidTest, TestFieldMaxwellianness) {

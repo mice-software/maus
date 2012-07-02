@@ -15,9 +15,9 @@
  *
  */
 
-#include "math.h"
-
 #include <algorithm>
+
+#include "math.h"
 
 #include "gsl/gsl_sf_gamma.h"
 #include "gsl/gsl_sf_pow_int.h"
@@ -29,7 +29,7 @@ namespace MAUS {
 
 DerivativesSolenoid::DerivativesSolenoid(double peak_field, double r_max,
                     double z_max, int highest_order,
-                    EndFieldModel* end_field) 
+                    EndFieldModel* end_field)
     : _peak_field(peak_field), _r_max(r_max), _z_max(z_max),
       _highest_order(highest_order), _end_field(end_field) {
 }
@@ -65,7 +65,7 @@ DerivativesSolenoid& DerivativesSolenoid::operator=
     _end_field = rhs._end_field->Clone();
   } else {
     _end_field = NULL;
-  }  
+  }
   return *this;
 }
 
@@ -75,7 +75,7 @@ DerivativesSolenoid::DerivativesSolenoid()
 }
 
 void DerivativesSolenoid::
-                 GetFieldValue( const  double Point[4], double *Bfield ) const {
+                 GetFieldValue(const  double Point[4], double *Bfield) const {
   if (fabs(Point[2]) > _z_max) return;
   double r = sqrt(Point[0]*Point[0]+Point[1]*Point[1]);
   if (r > _r_max) return;
@@ -83,12 +83,12 @@ void DerivativesSolenoid::
 
   int    n = 0;
   while (n < _highest_order) {
-    double n_fact = double(gsl_sf_fact(n));
+    double n_fact = static_cast<double>(gsl_sf_fact(n));
 
-    double deltaBr = -pow(-1,n)*pow(r/2., 2*n+1)*
+    double deltaBr = -pow(-1, n)*pow(r/2., 2*n+1)*
                       BzDifferential(Point[2], 2*n+1)
-                      /n_fact/double(gsl_sf_fact(n+1));
-    double deltaBz = pow(-1,n)*pow(r/2., 2*n)*
+                      /n_fact/static_cast<double>(gsl_sf_fact(n+1));
+    double deltaBz = pow(-1, n)*pow(r/2., 2*n)*
                      BzDifferential(Point[2], 2*n)/n_fact/n_fact;
     Bfield[2] += deltaBz;
     Br += deltaBr;
@@ -135,7 +135,7 @@ int DerivativesSolenoid::GetHighestOrder() const {
 THIS ALL LOOKS OKAY - BUT NOT TESTED
 
 void DerivativesSolenoid::GetVectorPotential(const double point[4],
-                                        double * potential) const 
+                                        double * potential) const
 {
   if (fabs(point[2]) > _z_max) return;
   double r2       = point[0]*point[0]+point[1]*point[1];
@@ -150,7 +150,7 @@ void DerivativesSolenoid::GetVectorPotential(const double point[4],
 }
 
 void DerivativesSolenoid::GetVectorPotentialDifferential
-                          (const double point[4], double * diff, int axis) const 
+                          (const double point[4], double * diff, int axis) const
 {
   if (fabs(point[2]) > _z_max) return;
   double r2 = point[0]*point[0]+point[1]*point[1];
@@ -195,9 +195,6 @@ void DerivativesSolenoid::GetVectorPotentialDifferential
   }
 }
 */
-
 }
-
-
 
 

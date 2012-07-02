@@ -91,6 +91,21 @@ def build_user_guide():
     COPY_TARGETS.append(os.path.join(os.getcwd(), 'maus_user_guide'))
     os.chdir(here)
 
+def build_third_party_tarball():
+    """Build tarball of third party libraries"""
+    print """Building third party tarball"""
+    os.chdir(os.path.join(os.environ['MAUS_ROOT_DIR'], "third_party"))
+    glob_list = ["source/*.tar.gz", "source/*.egg", "source/*.tgz"]
+    tarball_targets = []
+    tarball_name = "third_party_libraries.tar.gz"
+    for targets in glob_list:
+        tarball_targets += glob.glob(targets)
+    proc = subprocess.Popen(["tar", "-czf",
+                             tarball_name]
+                             +tarball_targets)
+    proc.wait()
+    COPY_TARGETS.append(os.path.join(os.getcwd(), tarball_name))
+
 def copy_targets():
     """Copy targets to a temporary store in tmp"""
     print "Copying to tmp"
@@ -127,12 +142,13 @@ def main():
     build_user_guide()
     build_doxygen()
     build_test_output()
+    build_third_party_tarball()
     scp_in, version = copy_targets()
-    if len(sys.argv > 1):
+    if len(sys.argv) > 1:
         scp_out = os.path.join(sys.argv[1], version)
         scp(scp_in, scp_out)
     else:
-        print "No copy target found, I am done"
+        print "No scp target found, I am done"
 
 if __name__ == "__main__":
     main()

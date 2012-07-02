@@ -51,31 +51,31 @@ typedef HitProcessor<SpecialVirtualChannelId> SpecialVirtualHitProcessor;
 
 template <class ChannelId>
 void HitProcessor<ChannelId>::RegisterBranches() {
-    RegisterValueBranch("track_id", &_int_proc,
+    this->RegisterValueBranch("track_id", &_int_proc,
                         &Hit<ChannelId>::GetTrackId,
                         &Hit<ChannelId>::SetTrackId, true);
-    RegisterValueBranch("particle_id", &_int_proc,
+    this->RegisterValueBranch("particle_id", &_int_proc,
                         &Hit<ChannelId>::GetParticleId,
                         &Hit<ChannelId>::SetParticleId, true);
-    RegisterValueBranch("energy", &_double_proc,
+    this->RegisterValueBranch("energy", &_double_proc,
                         &Hit<ChannelId>::GetEnergy,
                         &Hit<ChannelId>::SetEnergy, true);
-    RegisterValueBranch("charge", &_double_proc,
+    this->RegisterValueBranch("charge", &_double_proc,
                         &Hit<ChannelId>::GetCharge,
                         &Hit<ChannelId>::SetCharge, true);
-    RegisterValueBranch("time", &_double_proc,
+    this->RegisterValueBranch("time", &_double_proc,
                         &Hit<ChannelId>::GetTime,
                         &Hit<ChannelId>::SetTime, true);
-    RegisterValueBranch("energy_deposited", &_double_proc,
+    this->RegisterValueBranch("energy_deposited", &_double_proc,
                         &Hit<ChannelId>::GetEnergyDeposited,
                         &Hit<ChannelId>::SetEnergyDeposited, true);
-    RegisterValueBranch("position", &_three_vec_proc,
+    this->RegisterValueBranch("position", &_three_vec_proc,
                         &Hit<ChannelId>::GetPosition,
                         &Hit<ChannelId>::SetPosition, true);
-    RegisterValueBranch("momentum", &_three_vec_proc,
+    this->RegisterValueBranch("momentum", &_three_vec_proc,
                         &Hit<ChannelId>::GetMomentum,
                         &Hit<ChannelId>::SetMomentum, true);
-    RegisterPointerBranch("channel_id", _channel_id_proc,
+    this->RegisterPointerBranch("channel_id", _channel_id_proc,
                         &Hit<ChannelId>::GetChannelId,
                         &Hit<ChannelId>::SetChannelId, true);
 }

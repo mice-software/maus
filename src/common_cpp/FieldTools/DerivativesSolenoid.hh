@@ -37,7 +37,7 @@ typedef BTMultipole::EndFieldModel EndFieldModel;
  */
 
 class DerivativesSolenoid : public BTField {
-public:
+ public:
   /** Construct a new DerivativesSolenoid.
    *
    *  - peak_field is the nominal peak field at the magnet centre. Note that
@@ -82,7 +82,7 @@ public:
    *  is put into the field vector Bfield = (bx, by, bz, ex, ey, ez), assumed to
    *  be initialised as a six-vector. Caller owns memory allocatd to Bfield.
    */
-  void GetFieldValue ( const double Point[4], double *Bfield ) const;
+  void GetFieldValue(const double Point[4], double *Bfield) const;
 
   /** Print vital statistics of the class
    */
@@ -103,8 +103,8 @@ public:
   /** Get the highest order derivative used in calculating fields */
   int GetHighestOrder() const;
 
-private:
-  inline double BzDifferential( const double& z, const int& order) const;
+ private:
+  inline double BzDifferential(const double& z, const int& order) const;
 
   double _peak_field;
   double _r_max;
@@ -119,5 +119,5 @@ double DerivativesSolenoid::
 }
 }
 
-#endif  //_SRC_COMMON_CPP_FIELDTOOLS_ANALYTICALSOLENOID_HH_
+#endif  // _SRC_COMMON_CPP_FIELDTOOLS_ANALYTICALSOLENOID_HH_
 
