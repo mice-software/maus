@@ -166,7 +166,7 @@ def set_lib(conf, env, lib):
     """
     if lib not in LIBS.keys():
         raise KeyError('Library '+str(lib)+' is not registered for '+\
-                       'linking. Should be one of '+LIBS.keys())
+                       'linking. Should be one of '+str(LIBS.keys()))
     set_lib_func = LIBS[lib]
     set_lib_func(conf, env)
 
@@ -496,14 +496,6 @@ def set_geant4(conf, env):
 
         geant4_extras(env, conf)
 
-def set_recpack(conf, env): # pylint: disable=W0613
-    """
-    Setup recpack
-    """
-    if not conf.CheckLib('recpack', language='c++') or\
-       not conf.CheckCXXHeader('recpack/RecpackManager.h'):
-        my_exit(1)
-
 def set_gtest(conf, env): # pylint: disable=W0613
     """
     Setup google tests (framework for cpp tests)
@@ -558,7 +550,6 @@ LIBS = {
     'root':set_root,
     'clhep':set_clhep,
     'geant4':set_geant4,
-    'recpack':set_recpack,
     'gtest':set_gtest,
     'unpacker':set_unpacker,
 }
