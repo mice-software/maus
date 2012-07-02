@@ -368,7 +368,7 @@ void MapCppTrackerMCDigitization::save_to_json(SciFiEvent &evt, int event_i) {
     if ( tracker == 1 )
       digits_tracker1.append(digit);
   }
-  /*
+
   std::ofstream out1("mc_out.txt", std::ios::out | std::ios::app);
 
   if (tmp0.size() > 0 ) {
@@ -396,7 +396,7 @@ void MapCppTrackerMCDigitization::save_to_json(SciFiEvent &evt, int event_i) {
 
     double phi01 = 0; // for now
     out1 << R1 << "\t" << tl1 << "\t" << phi01 << "\t" <<  pt1 << "\t" << pz1 << "\t" << std::endl;
-  } */
+  }
   root["recon_events"][event_i]["sci_fi_event"]["sci_fi_digits"]["tracker0"] = digits_tracker0;
   root["recon_events"][event_i]["sci_fi_event"]["sci_fi_digits"]["tracker1"] = digits_tracker1;
 }

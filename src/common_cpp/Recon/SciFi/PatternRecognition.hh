@@ -391,7 +391,7 @@ class PatternRecognition {
     static const double _R_res_cut = 20.;    // Road cut for circle radius in mm
     static const double _chisq_cut = 15;    // Cut on the chi^2 of the least squares fit in mm
     static const double _sz_chisq_cut = 20; // Cut on the sz chi^2 from least squares fit in mm
-    static const double _helix_chisq_cut = 50;
+    static const double _helix_chisq_cut = 5000;
     static const double _chisq_diff = 3.;
     static const double _AB_cut = .2;       // Need to decide on appropriate cut here!!!
     static const double _active_diameter = 300.0;  // Active volume diameter a tracker in mm

@@ -728,6 +728,14 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
                     std::cout << "dsdz = " << dsdz << std:: endl;
                     double tan_lambda = 1/dsdz;
 
+                    double pt = circle.get_R() * 1.2;
+                    double pz = pt / dsdz;
+
+                    std::ofstream out1("params_recon.txt", std::ios::out | std::ios::app);
+                    out1 << circle.get_R() << "\t" << tan_lambda << "\t";
+                    out1 << Phi_0 << "\t" << pt << "\t" << pz << "\t";
+                    out1 << 0 << std::endl;
+
                     bool good_helix = full_helix_fit(good_spnts, circle, line_sz, helix);
 
                     std::ofstream out_helix("helix_red_chisq.txt", std::ios::out | std::ios::app);
@@ -739,14 +747,6 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
                     if ( good_helix ) {
                       // push helix back into track object once its made
                       std::cout << "Helix fit found, adding " << num_points << "pt track **\n";
-
-                      double pt = helix.get_R() * 1.2;
-                      double pz = pt / helix.get_dsdz();
-
-                      std::ofstream out1("params_recon.txt", std::ios::out | std::ios::app);
-                      out1 << helix.get_R() << "\t" << helix.get_tan_lambda() << "\t";
-                      out1 << helix.get_Phi_0() << "\t" << pt << "\t" << pz << "\t";
-                      out1 << helix.get_chisq() << std::endl;
 
                       CLHEP::Hep3Vector pos_0 = good_spnts[0]->get_position();
                       SciFiHelicalPRTrack track(-1, num_points, pos_0, helix);
@@ -1024,6 +1024,9 @@ bool PatternRecognition::turns_between_stations(const std::vector<double> &dz,
       if ( dphi[j] < dphi[i] )
         dphi[j] += 2. * pi;
 
+      std::cout <<"dphi_i = "<< dphi[i] << std::endl;
+      std::cout <<"dphi_j = "<< dphi[j] << std::endl;
+
       double z_ratio = dz[j] / dz[i];
       double phi_ratio = dphi[j] / dphi[i];
 
@@ -1245,9 +1248,9 @@ double PatternRecognition::calculate_chisq(const std::vector<SciFiSpacePoint*> &
   for ( int i = 0; i < static_cast<int>(spnts.size()); ++i ) {
     CLHEP::Hep3Vector p = spnts[i]->get_position();
     double phi_i;
-    if ( i == 0 )
-      phi_i = Phi_0;
-    else
+    // if ( i == 0 )
+    //  phi_i = Phi_0;
+    // else
       phi_i = turning_angles[i];
 
     phi_i -= Phi_0;
@@ -1310,9 +1313,9 @@ void PatternRecognition::calculate_adjustments(const std::vector<SciFiSpacePoint
   for ( int i = 0; i < static_cast<int>(spnts.size()); ++i ) {
     CLHEP::Hep3Vector p = spnts[i]->get_position();
     double phi_i;
-    if ( i == 0 )
-      phi_i = phi_0;
-    else
+    // if ( i == 0 )
+    //  phi_i = phi_0;
+    // else
       phi_i = turning_angles[i];
 
     phi_i -= phi_0; // Everything relative to starting point.
