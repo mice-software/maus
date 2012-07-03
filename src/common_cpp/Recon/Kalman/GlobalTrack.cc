@@ -14,9 +14,9 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#include "src/common_cpp/Recon/Kalman/StraightTrack.hh"
+#include "src/common_cpp/Recon/Kalman/GlobalTrack.hh"
 
-void StraightTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site) {
+void GlobalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site) {
   // Reset.
   _F.Zero();
 

@@ -14,22 +14,27 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#include "src/common_cpp/Recon/Kalman/StraightTrack.hh"
 
-void StraightTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site) {
-  // Reset.
-  _F.Zero();
+#ifndef GLOBALTRACK_HH
+#define GLOBALTRACK_HH
 
-  // Find dz between sites.
-  double new_z = new_site->get_z();
-  double old_z = old_site->get_z();
-  double deltaZ = new_z-old_z;
+// C headers
+#include <assert.h>
+#include <math.h>
 
-  // Build _F.
-  for ( int i = 0; i < 5; i++ ) {
-    _F(i, i) = 1.;
-  }
-  _F(0, 2) = fabs(deltaZ);
-  _F(1, 3) = fabs(deltaZ);
-  // _F.Print();
-}
+// C++ headers
+#include <string>
+#include <vector>
+
+#include "TMath.h"
+#include "TMatrixD.h"
+
+#include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
+
+class GlobalTrack : public KalmanTrack {
+ public:
+
+  void update_propagator(KalmanSite *old_site, KalmanSite *new_site);
+};
+
+#endif

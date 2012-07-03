@@ -127,7 +127,7 @@ void SciFiClusterRec::construct(SciFiCluster *clust, std::vector<const MiceModul
   // Hep3Vector relative_position = position - this_plane->globalPosition();
   double alpha = clust->get_channel() - CentralFibre;
   // clust->set_relative_position(relative_position);
-  if ( tracker == 0 ) {
+  if ( tracker == 1 ) {
     alpha = -alpha;
   }
   clust->set_alpha(alpha);
@@ -138,18 +138,11 @@ void SciFiClusterRec::construct(SciFiCluster *clust, std::vector<const MiceModul
 Hep3Vector SciFiClusterRec::get_reference_frame_pos(int tracker,
                                                     std::vector<const MiceModule*> modules) {
   const MiceModule* reference_plane = NULL;
+
+  // Reference plane is plane 0, station 1 of current tracker.
   int station = 1;
   int plane   = 0;
-/*
-  if ( tracker == 0 ) {
-    station = 5;
-    plane = 2;
-  }
-  if ( tracker == 1 ) {
-    station = 1;
-    plane = 0;
-  }
-*/
+
   for ( unsigned int j = 0; !reference_plane && j < modules.size(); j++ ) {
     // Find the right module
     if ( modules[j]->propertyExists("Tracker", "int") &&

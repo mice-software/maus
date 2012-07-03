@@ -222,7 +222,7 @@ std::string  ReduceCppMCTracker::process(std::string document) {
           _pz = scuts["momentum"]["z"].asDouble();
           _energy = scuts["energy"].asDouble();
           _primary.Fill();
-        
+
   // End Primary================================================================
       }
 // End MC=======================================================================

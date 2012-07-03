@@ -354,6 +354,7 @@ void MapCppTrackerMCDigitization::save_to_json(SciFiEvent &evt, int event_i) {
     digit["true_momentum"]["x"] = momentum.x();
     digit["true_momentum"]["y"] = momentum.y();
     digit["true_momentum"]["z"] = momentum.z();
+
     if ( tracker == 0 )
       digits_tracker0.append(digit);
     if ( tracker == 1 )

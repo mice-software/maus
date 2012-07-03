@@ -61,6 +61,10 @@ class SciFiCluster {
   */
   void add_digit(SciFiDigit* neigh);
 
+  SciFiCluster(const SciFiCluster &cluster);
+
+  SciFiCluster& operator=(const SciFiCluster &cluster);
+
   // list of setters and getters
   void set_spill(int spill) { _spill = spill; }
 
