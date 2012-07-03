@@ -1074,6 +1074,8 @@ bool PatternRecognition::turns_between_stations(const std::vector<double> &dz,
                   // returned false.
 
    */
+  }
+                                                    
 }
 
 bool PatternRecognition::AB_ratio(double &dphi_ji, double &dphi_kj, double dz_ji,
