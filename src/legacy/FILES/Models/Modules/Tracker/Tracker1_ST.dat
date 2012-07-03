@@ -44,12 +44,27 @@ Module Tracker1
   }
   Module Tests/VirtualPlane.dat
   {
-    Position 0. 0. 55.4 cm
+    Position 0. 0. 55.0 cm
     Rotation 0. 0. 0. degree
   }
   Module Tests/VirtualPlane.dat
   {
-    Position 0. 0. -55.4 m
+    Position 0. 0. 35.0 cm
+    Rotation 0. 0. 0. degree
+  }
+  Module Tests/VirtualPlane.dat
+  {
+    Position 0. 0. 10.0 cm
+    Rotation 0. 0. 0. degree
+  }
+  Module Tests/VirtualPlane.dat
+  {
+    Position 0. 0. -20.0 cm
+    Rotation 0. 0. 0. degree
+  }
+  Module Tests/VirtualPlane.dat
+  {
+    Position 0. 0. -55.0 cm
     Rotation 0. 0. 0. degree
   }
 }

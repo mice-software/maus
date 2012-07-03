@@ -109,6 +109,15 @@ bool ReduceCppMCTracker::birth(std::string argJsonConfigDocument) {
   _other.Branch("space_eff2", &space_eff2, "space_eff2/D");
   _other.Branch("nSpills", &_nSpills, "nSpills/I");
 
+  _primary.SetNameTitle("Primary" , "Primary");
+  _primary.Branch("x", &_x, "x/D");
+  _primary.Branch("y", &_y, "y/D");
+  _primary.Branch("z", &_z, "z/D");
+  _primary.Branch("px", &_px, "px/D");
+  _primary.Branch("py", &_py, "py/D");
+  _primary.Branch("pz", &_pz, "pz/D");
+  _primary.Branch("energy", &_energy, "energy/D");
+
   // JsonCpp setup
   Json::Value configJSON;
   try {
@@ -201,6 +210,20 @@ std::string  ReduceCppMCTracker::process(std::string document) {
           }
         // }
   // End Virtual Hits===========================================================
+
+
+  // Start Primary==============================================================
+          scuts = root["mc_events"][a]["primary"];
+          _x = scuts["position"]["x"].asDouble();
+          _y = scuts["position"]["y"].asDouble();
+          _z = scuts["position"]["z"].asDouble();
+          _px = scuts["momentum"]["x"].asDouble();
+          _py = scuts["momentum"]["y"].asDouble();
+          _pz = scuts["momentum"]["z"].asDouble();
+          _energy = scuts["energy"].asDouble();
+          _primary.Fill();
+
+  // End Primary================================================================
       }
 // End MC=======================================================================
 
@@ -316,9 +339,9 @@ std::string  ReduceCppMCTracker::process(std::string document) {
     pyfile << "  Total number of clusters: Tracker 1: " << cluster_count1
       << "   Tracker 2: " << cluster_count2 << std::endl;
 
-    space_eff1 = space_count1/(cut_recon_size*5.0);
+    space_eff1 = space_count1/(cut_recon_size*4.0);
     space_eff2 = space_count2/(cut_recon_size*5.0);
-    cluster_eff1 = cluster_count1/(cut_recon_size*15.0);
+    cluster_eff1 = cluster_count1/(cut_recon_size*12.0);
     cluster_eff2 = cluster_count2/(cut_recon_size*15.0);
     pyfile << std::endl << "  Total cluster efficiency: Tracker 1: " << cluster_eff1
       << "   Tracker 2: " << cluster_eff2 << std::endl;
@@ -370,6 +393,7 @@ void ReduceCppMCTracker::Save() {
   _sp.Write();
   _digits.Write();
   _other.Write();
+  _primary.Write();
 
   datafile.ls();
   datafile.Close();
