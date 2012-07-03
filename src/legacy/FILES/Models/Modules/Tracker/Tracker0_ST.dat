@@ -1,11 +1,11 @@
-// FILES/Models/Modules/Tracker/Tracker0.dat
+// FILES/Models/Modules/Tracker/Tracker0_ST.dat
 //
 // A tracker in the muon cooling device
 //
 // 
 // 
 
-Module Tracker0
+Module Tracker0_ST
 {
   Volume Cylinder
   Dimensions 20.0 113.0 cm
@@ -49,7 +49,22 @@ Module Tracker0
   }
   Module Tests/VirtualPlane.dat
   {
-    Position 0. 0. -55.4 m
+    Position 0. 0. 349.9143 mm
+    Rotation 0. 0. 0. degree
+  }
+  Module Tests/VirtualPlane.dat
+  {
+    Position 0. 0. 100.0513 mm
+    Rotation 0. 0. 0. degree
+  }
+  Module Tests/VirtualPlane.dat
+  {
+    Position 0. 0. -199.949 mm
+    Rotation 0. 0. 0. degree
+  }
+  Module Tests/VirtualPlane.dat
+  {
+    Position 0. 0. -55.98789 cm
     Rotation 0. 0. 0. degree
   }
 }
