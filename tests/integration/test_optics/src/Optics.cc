@@ -67,14 +67,14 @@ void SetupSimulation(MiceModule* root, std::vector< ::CovarianceMatrix> envelope
   simRun.miceMaterials = new MiceMaterials();
   simRun.jsonConfiguration = new Json::Value(Json::objectValue);
   (*simRun.jsonConfiguration)["verbose_level"] = Json::Value(0);
-  (*simRun.jsonConfiguration)["maximum_number_of_steps"] = Json::Value(10000);
+  (*simRun.jsonConfiguration)["maximum_number_of_steps"] = Json::Value(25000);
   (*simRun.jsonConfiguration)["geant4_visualisation"] = Json::Value(false);
   (*simRun.jsonConfiguration)["keep_steps"] = Json::Value(false);
   (*simRun.jsonConfiguration)["keep_tracks"] = Json::Value(false);
   (*simRun.jsonConfiguration)["physics_model"] = Json::Value("QGSP_BERT");
   (*simRun.jsonConfiguration)["reference_physics_processes"] = Json::Value("mean_energy_loss");//
-  (*simRun.jsonConfiguration)["physics_processes"] = Json::Value("standard");//
-  (*simRun.jsonConfiguration)["particle_decay"] = Json::Value(true);// # set to true to activate particle decay, or False to inactivate particle decay
+  (*simRun.jsonConfiguration)["physics_processes"] = Json::Value("mean_energy_loss");//
+  (*simRun.jsonConfiguration)["particle_decay"] = Json::Value(false);// # set to true to activate particle decay, or False to inactivate particle decay
   (*simRun.jsonConfiguration)["charged_pion_half_life"] = Json::Value(-1.);// # set the pi+, pi- half life [ns]. Negative value means use geant4 default
   (*simRun.jsonConfiguration)["muon_half_life"] = Json::Value(-1.);// # set the mu+, mu- half life [ns]. Negative value means use geant4 default
   (*simRun.jsonConfiguration)["production_threshold"] = Json::Value(0.5);// # set the threshold for delta ray production [mm]
@@ -174,6 +174,14 @@ void Envelope(const MiceModule* root, std::vector< ::CovarianceMatrix>& env_out,
   try{deltaMax[3] = mod->propertyDouble("Delta_Px_Max");} catch(...) {}
   try{deltaMax[4] = mod->propertyDouble("Delta_y_Max" );} catch(...) {}
   try{deltaMax[5] = mod->propertyDouble("Delta_Py_Max");} catch(...) {}
+  for (size_t i = 0; i < 6; ++i) {
+      if (deltaMax[i] <= 0.) {
+          throw(Squeal(Squeal::recoverable,
+                  "DeltaMax should be > 0. in Envelope module "+mod->fullName(),
+                  "Optics::GetDelta"));
+      }
+  }
+
   return deltaMax;
 }
 
@@ -193,9 +201,12 @@ void Envelope(const MiceModule* root, std::vector< ::CovarianceMatrix>& env_out,
   try{delta[5] = mod->propertyDouble("Delta_Py");} catch(...) {}
   for (size_t i = 0; i < 6; ++i) {
       if (delta[i] <= 0.) {
-          throw(Squeal(Squeal::recoverable, "Deltas should be > 0. in Envelope module "+mod->fullName(), "Optics::GetDelta"));
+          throw(Squeal(Squeal::recoverable,
+                  "DeltaMax should be > 0. in Envelope module "+mod->fullName(),
+                  "Optics::GetDelta"));
       }
   }
+
   return delta;
 }
 
@@ -515,7 +526,14 @@ void LongTextOutput(std::vector< ::CovarianceMatrix> matrix, std::vector< ::Tran
       out << std::endl;
     }
   }
+  out.close();
 
+  ofstream out_tm(("tm_"+outfile).c_str());
+  if(!out_tm) throw(Squeal(Squeal::recoverable, "Failed to open "+outfile, "Optics::TextOutput"));
+  for(unsigned int i=0; i<tms.size(); i++) {
+    out_tm << *tms[i];
+  }
+  out_tm.close();
 }
 
 

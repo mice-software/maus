@@ -53,7 +53,7 @@ PyMODINIT_FUNC initlibMausCpp(void);
 
 /* @brief Call back to make Python ErrorHandler by the CppErrorHandler
  *
- * Tell C which python function to call in the event of an error by calling the
+ * Tell C++ which python function to call in the event of an error. Calls the
  * SetHandleExceptionFunction. Aim is to use the same python code to manage
  * errors arising from both C and Python; argument is a function with callsign
  * like\n
