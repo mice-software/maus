@@ -29,39 +29,130 @@ bool ReduceCppTracker::birth(std::string argJsonConfigDocument) {
   // _filename = "cosmics.root";
   _nSpills = 0;
 
-  TCanvas *c1 = new TCanvas("c1", "Light Yield", 200, 10, 700, 500);
-  TCanvas *c2 = new TCanvas("c2", "Spacepoints Type", 200, 10, 700, 500);
-  TCanvas *c3 = new TCanvas("c3", "Efficiency", 200, 10, 700, 500);
+  // Efficiencies: initialise arrays.
+  for ( int j = 0; j < 3; ++j ) {
+    _plane_array[j] = j;
+  }
+  for ( int i = 0; i < 214; ++i ) {
+    _channel_array[i] = i;
+  }
+  //
+  // Canvases
+  //
+  TCanvas *c1 = new TCanvas("c1", "Efficiency (SE/TOF1)", 200, 10, 700, 500);
+  TCanvas *c2 = new TCanvas("c2", "Plane Profiles", 200, 10, 700, 500);
+  TCanvas *c3 = new TCanvas("c3", "SpacePoints", 200, 10, 700, 500);
+  TCanvas *c4 = new TCanvas("c4", "Cluster NPE", 200, 10, 700, 500);
+  TCanvas *c5 = new TCanvas("c5", "Digits Time", 200, 10, 700, 500);
+
+  c1->Divide(1, 1);
+  c2->Divide(3, 1);
+  c3->Divide(2, 2);
+  c4->Divide(3, 1);
+  c5->Divide(1, 1);
+
+  gStyle->SetLabelSize(0.07, "xyz");
+  gStyle->SetTitleSize(0.07, "xy");
+  gStyle->SetTitleOffset(0.6, "x");
+  gStyle->SetTitleOffset(0.4, "y");
+
+  //
+  // Histograms
+  //
+  triplets = new TH2F("triplets", "Current Spill (x, y)", 300, -150, 150, 300, -150, 150);
+  duplets  = new TH2F("duplets",  "Current Spill (x, y)", 300, -150, 150, 300, -150, 150);
+  triplets_copy = new TH2F("triplets_copy", "All Spills (x, y)", 300, -150, 150, 300, -150, 150);
+  duplets_copy  = new TH2F("duplets_copy", "All Spills (x, y)", 300, -150, 150, 300, -150, 150);
+  triplets->SetMarkerStyle(20);
+  triplets->SetMarkerColor(kBlue);
+  triplets_copy->SetMarkerStyle(20);
+  triplets_copy->SetMarkerColor(kBlue);
+  duplets->SetMarkerStyle(20);
+  duplets->SetMarkerColor(kRed);
+  duplets_copy->SetMarkerStyle(20);
+  duplets_copy->SetMarkerColor(kRed);
+
+  // Clusters
+  _hist_plane0 = new TH1F("_hist_plane0", "plane 0", 215, 0, 214);
+  _hist_plane1 = new TH1F("_hist_plane1", "plane 1", 215, 0, 214);
+  _hist_plane2 = new TH1F("_hist_plane2", "plane 2", 215, 0, 214);
+  _chan_sum = new TH1F("_hist_plane2", "Sum Of Channel Numb", 641, 0, 640);
+  _npe_plane0 = new TH1F("_npe_plane0", "plane 0", 31, 0, 30);
+  _npe_plane1 = new TH1F("_npe_plane1", "plane 1", 31, 0, 30);
+  _npe_plane2 = new TH1F("_npe_plane2", "plane 2", 31, 0, 30);
+
+  // Digits
+  _adc_plane0 = new TH1F("_adc_plane0", "plane 0 (ADC-PEDESTAL)", 256, 0, 255);
+  _adc_plane1 = new TH1F("_adc_plane1", "plane 1 (ADC-PEDESTAL)", 256, 0, 255);
+  _adc_plane2 = new TH1F("_adc_plane2", "plane 2 (ADC-PEDESTAL)", 256, 0, 255);
+  _dig_npe_plane0 = new TH1F("_dig_npe_plane0", "plane 0 (NPE)", 31, 0, 30);
+  _dig_npe_plane1 = new TH1F("_dig_npe_plane1", "plane 1 (NPE)", 31, 0, 30);
+  _dig_npe_plane2 = new TH1F("_dig_npe_plane2", "plane 2 (NPE)", 31, 0, 30);
+
+  //
+  // Trees
+  //
+  _unpacked.SetNameTitle("daq", "daq");
+  _unpacked.Branch("adc", &_adc, "adc/I");
+  _unpacked.Branch("tdc", &_tdc, "tdc/I");
+  _unpacked.Branch("bank", &_bank, "bank/I");
+  _unpacked.Branch("chan", &_chan, "chan/I");
+  _unpacked.Branch("board", &_board, "board/I");
 
   _digits.SetNameTitle("digits", "digits");
-  _digits.Branch("npe", &_npe, "npe/D");
   _digits.Branch("tracker", &_tracker_dig, "tracker/I");
+  _digits.Branch("station", &_station_dig, "station/I");
+  _digits.Branch("plane", &_plane_dig, "plane/I");
+  _digits.Branch("channel", &_channel_dig, "channel/D");
+  _digits.Branch("npe", &_npe_dig, "npe/D");
+  _digits.Branch("time", &_time, "time/D");
+  _digits.Branch("adc", &_adc_dig, "adc/I");
+
+  _doublet_clusters.SetNameTitle("clusters", "clusters");
+  _doublet_clusters.Branch("tracker", &_tracker, "tracker/I");
+  _doublet_clusters.Branch("station", &_station, "station/I");
+  _doublet_clusters.Branch("plane", &_plane, "plane/I");
+  _doublet_clusters.Branch("channel", &_channel, "channel/D");
+  _doublet_clusters.Branch("npe", &_npe, "npe/D");
 
   _spacepoints.SetNameTitle("spacepoints", "spacepoints");
-  _spacepoints.Branch("tracker", &_tracker, "tracker/I");
-  _spacepoints.Branch("station", &_station, "station/I");
+  _spacepoints.Branch("pe", &_pe, "pe/D");
   _spacepoints.Branch("x", &_x, "x/D");
   _spacepoints.Branch("y", &_y, "y/D");
   _spacepoints.Branch("z", &_z, "z/D");
   _spacepoints.Branch("type", &_type, "type/I");
 
-  _events.SetNameTitle("tracks", "tracks");
-  _events.Branch("station_hits", &_station_hits, "station_hits/I");
-  _events.Branch("tracker", &_tracker_event, "tracker/I");
-  _events.Branch("mx", &_mx, "mx/D");
-  _events.Branch("my", &_my, "my/D");
-  _events.Branch("x0", &_x0, "x0/D");
-  _events.Branch("y0", &_y0, "y0/D");
-  // _events.Branch("n_sp", &_number_spacepoints, "n_sp/I");
+  _spacepointscopy.SetNameTitle("spacepoints_copy", "spacepoints_copy");
+  _spacepointscopy.Branch("pe", &_pe, "pe/D");
+  _spacepointscopy.Branch("x", &_x, "x/D");
+  _spacepointscopy.Branch("y", &_y, "y/D");
+  _spacepointscopy.Branch("z", &_z, "z/D");
+  _spacepointscopy.Branch("type", &_type, "type/I");
 
   c1->SetFillColor(21);
   c1->GetFrame()->SetFillColor(42);
   c1->GetFrame()->SetBorderSize(6);
   c1->GetFrame()->SetBorderMode(-1);
-  c1->Divide(2, 1);
 
-  c2->Divide(5, 2);
-  c3->Divide(2, 1);
+  c2->SetFillColor(21);
+  c2->GetFrame()->SetFillColor(42);
+  c2->GetFrame()->SetBorderSize(6);
+  c2->GetFrame()->SetBorderMode(-1);
+
+  gStyle->SetLabelSize(0.07, "xyz");
+  gStyle->SetTitleSize(0.07, "xy");
+  gStyle->SetTitleOffset(0.6, "x");
+  gStyle->SetTitleOffset(0.4, "y");
+
+  triplets->SetMarkerStyle(20);
+  triplets->SetMarkerColor(kBlue);
+  triplets_copy->SetMarkerStyle(20);
+  triplets_copy->SetMarkerColor(kBlue);
+
+  duplets->SetMarkerStyle(20);
+  duplets->SetMarkerColor(kRed);
+  duplets_copy->SetMarkerStyle(20);
+  duplets_copy->SetMarkerColor(kRed);
   // JsonCpp setup
   Json::Value configJSON;
   try {
@@ -82,8 +173,14 @@ std::string  ReduceCppTracker::process(std::string document) {
   Json::FastWriter writer;
   Json::Value root;
   Json::Value xEventType;
-  // Check if the JSON document can be parsed, else return error only
 
+  std::ofstream file1;
+  std::ofstream file2;
+  std::ofstream file3;
+  std::ofstream file4;
+
+  Squeak::activateCout(1);
+  // Check if the JSON document can be parsed, else return error only
   try {
     root = JsonWrapper::StringToJson(document);
   } catch(...) {
@@ -115,6 +212,26 @@ std::string  ReduceCppTracker::process(std::string document) {
   }
 
   _nSpills++;
+
+  if (!(_nSpills%5)) {
+    file1.open("efficiency_plane0.txt");
+    file2.open("efficiency_plane1.txt");
+    file3.open("efficiency_plane2.txt");
+    for ( int i = 0; i < 214; ++i ) {
+      file1 << i << " " << _plane_0_map[i][0] << " " << _plane_0_map[i][1] << "\n";
+      file2 << i << " " << _plane_1_map[i][0] << " " << _plane_1_map[i][1] << "\n";
+      file3 << i << " " << _plane_2_map[i][0] << " " << _plane_2_map[i][1] << "\n";
+    }
+    file1.close();
+    file2.close();
+    file3.close();
+    file4.open("efficiency_station.txt");
+    file4 << 0 << " " << _plane_0_hits << " " << _plane_0_counter << "\n";
+    file4 << 1 << " " << _plane_1_hits << " " << _plane_1_counter << "\n";
+    file4 << 2 << " " << _plane_2_hits << " " << _plane_2_counter << "\n";
+    file4.close();
+  }
+
   diplay_histograms();
   return document;
 }
@@ -126,7 +243,7 @@ bool ReduceCppTracker::death()  {
 bool ReduceCppTracker::is_physics_daq_event(Json::Value root) {
   if (root.isMember("daq_data") &&
       !root["daq_data"].isNull() &&
-      root["daq_data"].isMember("single_station") &&
+      ( root["daq_data"].isMember("tracker1") || root["daq_data"].isMember("tracker2") ) &&
       root["daq_event_type"].asString() == "physics_event") {
     return true;
   } else {
@@ -139,11 +256,11 @@ void ReduceCppTracker::compute_stations_efficiencies(Json::Value root) {
 
   for ( int event_i = 0; event_i < n_events; event_i++ ) {
     if ( root["recon_events"][event_i]["sci_fi_event"]
-             ["sci_fi_space_points"]["single_station"].isNull() )
+             ["sci_fi_space_points"]["tracker0"].isNull() )
       continue;
     Json::Value spacepoints = JsonWrapper::GetProperty(
           root["recon_events"][event_i]["sci_fi_event"]["sci_fi_space_points"],
-          "single_station" ,
+          "tracker0" ,
           JsonWrapper::arrayValue);
 
     int numb_spacepoints = spacepoints.size();
@@ -218,10 +335,10 @@ void ReduceCppTracker::draw_spacepoints(Json::Value root) {
   // std::cerr << n_events << std::endl;
   for ( int event_i = 0; event_i < n_events; event_i++ ) {
     if ( root["recon_events"][event_i]["sci_fi_event"]
-             ["sci_fi_space_points"]["single_station"].isNull() ) continue;
+             ["sci_fi_space_points"]["tracker0"].isNull() ) continue;
     Json::Value spacepoints = JsonWrapper::GetProperty(
           root["recon_events"][event_i]["sci_fi_event"]["sci_fi_space_points"],
-          "single_station" ,
+          "tracker0" ,
           JsonWrapper::arrayValue);
     // std::cerr << spacepoints.size() << std::endl;
     int numb_spacepoints = spacepoints.size();
@@ -253,10 +370,10 @@ void ReduceCppTracker::doublet_clusters_histograms(Json::Value root) {
 
   for ( int event_i = 0; event_i < n_events; event_i++ ) {
     if ( root["recon_events"][event_i]["sci_fi_event"]
-             ["sci_fi_clusters"]["single_station"].isNull() ) continue;
+             ["sci_fi_clusters"]["tracker1"].isNull() ) continue;
     Json::Value clusters = JsonWrapper::GetProperty(
           root["recon_events"][event_i]["sci_fi_event"]["sci_fi_clusters"],
-          "single_station" ,
+          "tracker0" ,
           JsonWrapper::arrayValue);
 
     int numb_clusters = clusters.size();
@@ -293,10 +410,10 @@ void ReduceCppTracker::digits_histograms(Json::Value root) {
 
   for ( int event_i = 0; event_i < n_events; event_i++ ) {
     if ( root["recon_events"][event_i]["sci_fi_event"]
-             ["sci_fi_digits"]["single_station"].isNull() ) continue;
+             ["sci_fi_digits"]["tracker0"].isNull() ) continue;
     Json::Value digits = JsonWrapper::GetProperty(
           root["recon_events"][event_i]["sci_fi_event"]["sci_fi_digits"],
-          "single_station" ,
+          "tracker0" ,
           JsonWrapper::arrayValue);
 
     int numb_digits = digits.size();
@@ -380,19 +497,12 @@ void ReduceCppTracker::unpacked_data_histograms(Json::Value root) {
       if ( dicrim != 0 ) {
         std::cerr << "*************** DISCRIMINATOR != 0 ***************" << std::endl;
       }
-      if ( _bank == 0 || _bank == 2 || _bank == 5 ||
-           _bank == 7 || _bank == 9 || _bank == 10 ||
-           _bank == 11 || _bank == 12 || _bank == 13 ||
-           _bank == 14) {
-        _activebank = 1;
-      } else {
-       _activebank = 0;
-      }
       _unpacked.Fill();
     }
   }
 }
 
+/*
 void ReduceCppTracker::show_efficiency(Json::Value const &root) {
   int n_events = root["recon_events"].size();
 
@@ -464,23 +574,73 @@ void ReduceCppTracker::show_efficiency(Json::Value const &root) {
     }
   } // ends loop over particle events
 }
+*/
 
 void ReduceCppTracker::diplay_histograms() {
   TCanvas *c1 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c1"));
   TCanvas *c2 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c2"));
   TCanvas *c3 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c3"));
+  TCanvas *c4 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c4"));
+  TCanvas *c5 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c5"));
 
-  // Display light yield.
-  if (!(_nSpills%2)) {
-    c1->cd(1);
-    _digits.Draw("npe", "tracker==0");
-    c1->cd(2);
-    _digits.Draw("npe", "tracker==1");
-    c1->Modified();
-    c1->Update();
-  }
+    c2->cd(1);
+    _hist_plane0->Draw();
+    c2->cd(2);
+    _hist_plane1->Draw();
+    c2->cd(3);
+    _hist_plane2->Draw();
+    c2->Update();
+
+    c3->cd(1);
+    _spacepoints.Draw("x:y>>duplets", "type==2");
+    duplets->Draw("same");
+    _spacepoints.Draw("x:y>>triplets", "type==3", "same");
+    triplets->Draw("same");
+    c3->cd(2);
+    _spacepoints.Draw("type");
+    c3->Update();
+
+    c3->cd(3);
+    _spacepointscopy.Draw("x:y>>duplets_copy", "type==2");
+    duplets_copy->Draw("same");
+    _spacepointscopy.Draw("x:y>>triplets_copy", "type==3", "same");
+    triplets_copy->Draw("same");
+    c3->cd(4);
+    _spacepointscopy.Draw("type");
+    c3->Update();
+
+    c4->cd(1);
+    _npe_plane0->Draw();
+    c4->cd(2);
+    _npe_plane1->Draw();
+    c4->cd(3);
+    _npe_plane2->Draw();
+    c4->Update();
+
+    c5->cd(1);
+    _digits.Draw("time");
+    // c5_1->SetLogy(1);
+    // c5_1->SetGrid(1,1);
+    // _unpacked.Draw("adc", "bank==0 || bank==2 || bank==5 ||
+    // bank==7 || bank==9|| bank==10|| bank==11 ||bank==12 ||
+    // bank==13|| bank==14");
+    c5->Update();
+/*
+    c6->cd(1);
+    _adc_plane0->Draw();
+    c6->cd(2);
+    _adc_plane1->Draw();
+    c6->cd(3);
+    _adc_plane2->Draw();
+    c6->cd(4);
+    _dig_npe_plane0->Draw();
+    c6->cd(5);
+    _dig_npe_plane1->Draw();
+    c6->cd(6);
+    _dig_npe_plane2->Draw();
+    c6->Update();
+
   // Display spacepoints type.
-  if (!(_nSpills%2)) {
     c2->cd(1);
     _spacepoints.Draw("type", "tracker==0 && station==1 ");
     c2->Update();
@@ -512,13 +672,13 @@ void ReduceCppTracker::diplay_histograms() {
     c2->cd(10);
     _spacepoints.Draw("type", "tracker==1 && station==5 ");
     c2->Update();
-  }
+
   // Display efficiency.
-  if (!(_nSpills%2)) {
+
     c3->cd(1);
     _events.Draw("station_hits", "tracker==0");
     c3->cd(2);
     _events.Draw("station_hits", "tracker==1");
-  }
+*/
 }
 

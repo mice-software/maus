@@ -43,6 +43,8 @@
 #include "TGFrame.h"
 #include "TVirtualPad.h"
 #include "TFrame.h"
+#include "TH2F.h"
+#include "TH1F.h"
 
 class ReduceCppTracker {
 
@@ -89,7 +91,7 @@ class ReduceCppTracker {
   std::string _classname;
 
   int _nSpills;
-
+/*
   TTree _digits;
   double _npe;
   int _tracker_dig;
@@ -101,7 +103,7 @@ class ReduceCppTracker {
   double _x;
   double _y;
   double _z;
-
+*/
   TTree _events;
   int _tracker_event;
   int _station_hits;
@@ -113,6 +115,87 @@ class ReduceCppTracker {
   // int _number_spacepoints;
 
   double tracker2;
+
+///////////////////////////////
+  int _spill_counter;
+
+  TH2F *triplets;
+
+  TH2F *duplets;
+
+  TH2F *triplets_tracker2;
+
+  TH2F *duplets_tracker2;
+
+  TH2F *triplets_copy;
+
+  TH2F *duplets_copy;
+
+  TH2F *triplets_tracker2_copy;
+
+  TH2F *duplets_tracker2_copy;
+
+  TH1F *_hist_plane0;
+
+  TH1F *_hist_plane1;
+
+  TH1F *_hist_plane2;
+
+  TH1F *_chan_sum;
+
+  TH1F *_npe_plane0;
+
+  TH1F *_npe_plane1;
+
+  TH1F *_npe_plane2;
+
+  TH1F *_adc_plane0;
+
+  TH1F *_adc_plane1;
+
+  TH1F *_adc_plane2;
+
+  TH1F *_dig_npe_plane0;
+
+  TH1F *_dig_npe_plane1;
+
+  TH1F *_dig_npe_plane2;
+
+  std::string _filename;
+
+  TTree _unpacked;
+  int _adc, _tdc, _bank, _chan, _board;
+
+  TTree _digits;
+  int _tracker_dig, _station_dig, _plane_dig, _adc_dig;
+  double _npe_dig, _channel_dig, _time;
+
+  TTree _doublet_clusters;
+  int _tracker, _station, _plane;
+  double _channel, _npe;
+
+  TTree _spacepoints;
+  TTree _spacepointscopy;
+  double _x, _y, _z, _pe;
+  int _type;
+
+  // Efficiencies.
+  double _plane_array[3];
+  double _station_eff[3];
+
+  int _plane_0_counter;
+  double _plane_0_map[214][2];
+  int _plane_0_hits;
+
+  int _plane_1_counter;
+  double _plane_1_map[214][2];
+  int _plane_1_hits;
+
+  int _plane_2_counter;
+  double _plane_2_map[214][2];
+  int _plane_2_hits;
+
+  double _channel_array[214];
 };
 
 #endif
