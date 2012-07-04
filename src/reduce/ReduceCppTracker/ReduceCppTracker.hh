@@ -68,10 +68,23 @@ class ReduceCppTracker {
   */
   std::string process(std::string document);
 
-  void show_light_yield(Json::Value const &root);
+  bool is_physics_daq_event(Json::Value root);
 
-  void show_efficiency(Json::Value const &root);
+  void unpacked_data_histograms(Json::Value root);
 
+  void draw_spacepoints(Json::Value root);
+
+  void doublet_clusters_histograms(Json::Value root);
+
+  void digits_histograms(Json::Value root);
+
+  void save_light_yield(Json::Value const &root);
+
+  void save_efficiency(Json::Value const &root);
+
+  void compute_stations_efficiencies(Json::Value root);
+
+  void diplay_histograms();
  private:
   std::string _classname;
 

@@ -84,10 +84,6 @@ std::string  ReduceCppTracker::process(std::string document) {
   Json::Value xEventType;
   // Check if the JSON document can be parsed, else return error only
 
-  TCanvas *c1 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c1"));
-  TCanvas *c2 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c2"));
-  TCanvas *c3 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c3"));
-
   try {
     root = JsonWrapper::StringToJson(document);
   } catch(...) {
@@ -99,10 +95,16 @@ std::string  ReduceCppTracker::process(std::string document) {
     return writer.write(root);
   }
   try {
-    if ( root.isMember("recon_events") ) {
-      show_light_yield(root);
+    if ( is_physics_daq_event(root) ) {
+      unpacked_data_histograms(root);
 
-      show_efficiency(root);
+      digits_histograms(root);
+
+      doublet_clusters_histograms(root);
+
+      draw_spacepoints(root);
+
+      save_efficiency(root);
     }
   } catch(Squeal squee) {
      Squeak::mout(Squeak::error) << squee.GetMessage() << std::endl;
@@ -113,59 +115,7 @@ std::string  ReduceCppTracker::process(std::string document) {
   }
 
   _nSpills++;
-  // Display light yield.
-  if (!(_nSpills%2)) {
-    c1->cd(1);
-    _digits.Draw("npe", "tracker==0");
-    c1->cd(2);
-    _digits.Draw("npe", "tracker==1");
-    c1->Modified();
-    c1->Update();
-  }
-  // Display spacepoints type.
-  // display_spacepoints();
-  if (!(_nSpills%2)) {
-    c2->cd(1);
-    _spacepoints.Draw("type", "tracker==0 && station==1 ");
-    c2->Update();
-    c2->cd(2);
-    _spacepoints.Draw("type", "tracker==0 && station==2 ");
-    c2->Update();
-    c2->cd(3);
-    _spacepoints.Draw("type", "tracker==0 && station==3 ");
-    c2->Update();
-    c2->cd(4);
-    _spacepoints.Draw("type", "tracker==0 && station==4 ");
-    c2->Update();
-    c2->cd(5);
-    _spacepoints.Draw("type", "tracker==0 && station==5 ");
-    c2->Update();
-    // tracker 1
-    c2->cd(6);
-    _spacepoints.Draw("type", "tracker==1 && station==1 ");
-    c2->Update();
-    c2->cd(7);
-    _spacepoints.Draw("type", "tracker==1 && station==2 ");
-    c2->Update();
-    c2->cd(8);
-    _spacepoints.Draw("type", "tracker==1 && station==3 ");
-    c2->Update();
-    c2->cd(9);
-    _spacepoints.Draw("type", "tracker==1 && station==4 ");
-    c2->Update();
-    c2->cd(10);
-    _spacepoints.Draw("type", "tracker==1 && station==5 ");
-    c2->Update();
-  }
-
-  // Display efficiency.
-  // display_efficiency();
-  if (!(_nSpills%2)) {
-    c3->cd(1);
-    _events.Draw("station_hits", "tracker==0");
-    c3->cd(2);
-    _events.Draw("station_hits", "tracker==1");
-  }
+  diplay_histograms();
   return document;
 }
 
@@ -173,6 +123,211 @@ bool ReduceCppTracker::death()  {
   return true;
 }
 
+bool ReduceCppTracker::is_physics_daq_event(Json::Value root) {
+  if (root.isMember("daq_data") &&
+      !root["daq_data"].isNull() &&
+      root["daq_data"].isMember("single_station") &&
+      root["daq_event_type"].asString() == "physics_event") {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+void ReduceCppTracker::compute_stations_efficiencies(Json::Value root) {
+  int n_events = root["recon_events"].size();
+
+  for ( int event_i = 0; event_i < n_events; event_i++ ) {
+    if ( root["recon_events"][event_i]["sci_fi_event"]
+             ["sci_fi_space_points"]["single_station"].isNull() )
+      continue;
+    Json::Value spacepoints = JsonWrapper::GetProperty(
+          root["recon_events"][event_i]["sci_fi_event"]["sci_fi_space_points"],
+          "single_station" ,
+          JsonWrapper::arrayValue);
+
+    int numb_spacepoints = spacepoints.size();
+    for ( int sp_j = 0; sp_j < numb_spacepoints; sp_j++ ) {
+      // looping over spacepoints in an event.
+      bool plane_0_is_hit = false;
+      bool plane_1_is_hit = false;
+      bool plane_2_is_hit = false;
+      double chan_0 = -10.;
+      double chan_1 = -10.;
+      double chan_2 = -10.;
+
+      int numb_clusters = spacepoints[sp_j]["channels"].size();
+      for ( int clust_k = 0; clust_k < numb_clusters; ++clust_k ) {
+        if ( spacepoints[sp_j]["channels"][clust_k]["plane_number"].asInt() == 0 ) {
+          plane_0_is_hit = true;
+          chan_0 = spacepoints[sp_j]["channels"][clust_k]["channel_number"].asDouble();
+        }
+        if ( spacepoints[sp_j]["channels"][clust_k]["plane_number"].asInt() == 1 ) {
+          plane_1_is_hit = true;
+          chan_1 = spacepoints[sp_j]["channels"][clust_k]["channel_number"].asDouble();
+        }
+        if ( spacepoints[sp_j]["channels"][clust_k]["plane_number"].asInt() == 2 ) {
+          plane_2_is_hit = true;
+          chan_2 = spacepoints[sp_j]["channels"][clust_k]["channel_number"].asDouble();
+        }
+      }
+      // Plane 0 efficiencies.
+      if ( plane_1_is_hit && plane_2_is_hit ) {
+        _plane_0_counter += 1;
+        if ( plane_0_is_hit ) {
+          _plane_0_hits += 1;
+          _plane_0_map[static_cast<int>(chan_0+0.5)][0] += 1;
+          _plane_0_map[static_cast<int>(chan_0+0.5)][1] += 1;
+        } else {
+          int chan = 318-chan_1-chan_2;
+          _plane_0_map[chan][1] += 1;
+        }
+      }
+      // Plane 1 efficiencies.
+      if ( plane_0_is_hit && plane_2_is_hit ) {
+        _plane_1_counter += 1;
+        if ( plane_1_is_hit ) {
+          _plane_1_hits += 1;
+          _plane_1_map[static_cast<int>(chan_1+0.5)][0] += 1;
+          _plane_1_map[static_cast<int>(chan_1+0.5)][1] += 1;
+        } else {
+          int chan = 318-chan_0-chan_2;
+          _plane_1_map[chan][1] += 1;
+        }
+      }
+      // Plane 2 efficiencies.
+      if ( plane_0_is_hit && plane_1_is_hit ) {
+        _plane_2_counter += 1;
+        if ( plane_2_is_hit ) {
+          _plane_2_hits += 1;
+          _plane_2_map[static_cast<int>(chan_2+0.5)][0] += 1;
+          _plane_2_map[static_cast<int>(chan_2+0.5)][1] += 1;
+        } else {
+          int chan = 318-chan_0-chan_1;
+          _plane_2_map[chan][1] += 1;
+        }
+      }
+    }
+  }
+}
+
+void ReduceCppTracker::draw_spacepoints(Json::Value root) {
+  int n_events = root["recon_events"].size();
+
+  // root["recon_events"][5]["sci_fi_event"]["sci_fi_space_points"]["single_station"][0];
+  // std::cerr << n_events << std::endl;
+  for ( int event_i = 0; event_i < n_events; event_i++ ) {
+    if ( root["recon_events"][event_i]["sci_fi_event"]
+             ["sci_fi_space_points"]["single_station"].isNull() ) continue;
+    Json::Value spacepoints = JsonWrapper::GetProperty(
+          root["recon_events"][event_i]["sci_fi_event"]["sci_fi_space_points"],
+          "single_station" ,
+          JsonWrapper::arrayValue);
+    // std::cerr << spacepoints.size() << std::endl;
+    int numb_spacepoints = spacepoints.size();
+    for ( int sp_j = 0; sp_j < numb_spacepoints; sp_j++ ) {
+        _x =  spacepoints[sp_j]["position"]["x"].asDouble();
+        _y =  spacepoints[sp_j]["position"]["y"].asDouble();
+        _z =  spacepoints[sp_j]["position"]["z"].asDouble();
+        _pe = spacepoints[sp_j]["npe"].asDouble();
+        std::string type = spacepoints[sp_j]["type"].asString();
+        if ( type == "triplet" ) {
+          _type = 3;
+        }
+        if ( type == "duplet" ) {
+          _type = 2;
+        }
+        _spacepoints.Fill();
+        _spacepointscopy.Fill();
+    }
+  }
+  // } else {
+  //  throw(Squeal(Squeal::recoverable,
+  //        std::string("SpacePoints branch is corrupted!"),
+  //        "ReduceCppSingleStation::draw_spacepoints"));
+  // }
+}
+
+void ReduceCppTracker::doublet_clusters_histograms(Json::Value root) {
+  int n_events = root["recon_events"].size();
+
+  for ( int event_i = 0; event_i < n_events; event_i++ ) {
+    if ( root["recon_events"][event_i]["sci_fi_event"]
+             ["sci_fi_clusters"]["single_station"].isNull() ) continue;
+    Json::Value clusters = JsonWrapper::GetProperty(
+          root["recon_events"][event_i]["sci_fi_event"]["sci_fi_clusters"],
+          "single_station" ,
+          JsonWrapper::arrayValue);
+
+    int numb_clusters = clusters.size();
+
+    double chan_sum = 0;
+    for ( int clust_j = 0; clust_j < numb_clusters; clust_j++ ) {
+      _plane   = clusters[clust_j]["plane"].asInt();
+      _channel = clusters[clust_j]["channel"].asDouble();
+      _npe     = clusters[clust_j]["npe"].asDouble();
+      _doublet_clusters.Fill();
+      chan_sum += _channel;
+      if ( _plane == 0 ) {
+        _hist_plane0->Fill(_channel);
+        _npe_plane0->Fill(_npe);
+      } else if ( _plane == 1 ) {
+        _hist_plane1->Fill(_channel);
+        _npe_plane1->Fill(_npe);
+      } else if ( _plane == 2 ) {
+        _hist_plane2->Fill(_channel);
+        _npe_plane2->Fill(_npe);
+      }
+    }
+    _chan_sum->Fill(chan_sum);
+  }
+  // } else {
+  //  throw(Squeal(Squeal::recoverable,
+  //        std::string("Digits branch is corrupted!"),
+  //        "ReduceCppSingleStation::digits_histograms"));
+  // }
+}
+
+void ReduceCppTracker::digits_histograms(Json::Value root) {
+  int n_events = root["recon_events"].size();
+
+  for ( int event_i = 0; event_i < n_events; event_i++ ) {
+    if ( root["recon_events"][event_i]["sci_fi_event"]
+             ["sci_fi_digits"]["single_station"].isNull() ) continue;
+    Json::Value digits = JsonWrapper::GetProperty(
+          root["recon_events"][event_i]["sci_fi_event"]["sci_fi_digits"],
+          "single_station" ,
+          JsonWrapper::arrayValue);
+
+    int numb_digits = digits.size();
+
+    double chan_sum = 0;
+    for ( int digit_j = 0; digit_j < numb_digits; digit_j++ ) {
+      _plane_dig   = digits[digit_j]["plane"].asInt();
+      _channel_dig = digits[digit_j]["channel"].asDouble();
+      _npe_dig     = digits[digit_j]["npe"].asDouble();
+      _adc_dig     = digits[digit_j]["adc"].asInt();
+      _time        = digits[digit_j]["time"].asDouble();
+      _digits.Fill();
+      if ( _plane_dig == 0 ) {
+        _adc_plane0->Fill(_adc_dig);
+        _dig_npe_plane0->Fill(_npe_dig);
+      } else if ( _plane_dig == 1 ) {
+        _adc_plane1->Fill(_adc_dig);
+        _dig_npe_plane1->Fill(_npe_dig);
+      } else if ( _plane_dig == 2 ) {
+        _adc_plane2->Fill(_adc_dig);
+        _dig_npe_plane2->Fill(_npe_dig);
+      }
+    }
+  }
+  // } else {
+  //  throw(Squeal(Squeal::recoverable,
+  //        std::string("Digits branch is corrupted!"),
+  //        "ReduceCppSingleStation::digits_histograms"));
+  // }
+}
+/*
 void ReduceCppTracker::show_light_yield(Json::Value const &root) {
   int n_events = root["recon_events"].size();
 
@@ -202,6 +357,38 @@ void ReduceCppTracker::show_light_yield(Json::Value const &root) {
         _tracker_dig = 1;
         _digits.Fill();
       }
+    }
+  }
+}
+*/
+void ReduceCppTracker::unpacked_data_histograms(Json::Value root) {
+  Json::Value daq_data = JsonWrapper::GetProperty(root,
+                                                  "daq_data" ,
+                                                  JsonWrapper::objectValue);
+  int n_events = daq_data["tracker1"].size();
+  // Loop over events.
+  for (int event_i = 0; event_i < n_events; event_i++) {
+    if ( daq_data["tracker1"][event_i].isNull() ) continue;
+    Json::Value i_PartEvent = daq_data["tracker1"][event_i];
+    int number_channels_within = i_PartEvent["VLSB_C"].size();
+    for ( int i = 0; i < number_channels_within; i++ ) {
+      _tdc  = i_PartEvent["VLSB_C"][i]["tdc"].asInt();
+      _adc  = i_PartEvent["VLSB_C"][i]["adc"].asInt();
+      _bank = i_PartEvent["VLSB_C"][i]["bank_id"].asInt();
+      _chan = i_PartEvent["VLSB_C"][i]["channel"].asInt();
+      int dicrim = _chan = i_PartEvent["VLSB_C"][i]["discriminator"].asInt();
+      if ( dicrim != 0 ) {
+        std::cerr << "*************** DISCRIMINATOR != 0 ***************" << std::endl;
+      }
+      if ( _bank == 0 || _bank == 2 || _bank == 5 ||
+           _bank == 7 || _bank == 9 || _bank == 10 ||
+           _bank == 11 || _bank == 12 || _bank == 13 ||
+           _bank == 14) {
+        _activebank = 1;
+      } else {
+       _activebank = 0;
+      }
+      _unpacked.Fill();
     }
   }
 }
@@ -277,3 +464,61 @@ void ReduceCppTracker::show_efficiency(Json::Value const &root) {
     }
   } // ends loop over particle events
 }
+
+void ReduceCppTracker::diplay_histograms() {
+  TCanvas *c1 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c1"));
+  TCanvas *c2 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c2"));
+  TCanvas *c3 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c3"));
+
+  // Display light yield.
+  if (!(_nSpills%2)) {
+    c1->cd(1);
+    _digits.Draw("npe", "tracker==0");
+    c1->cd(2);
+    _digits.Draw("npe", "tracker==1");
+    c1->Modified();
+    c1->Update();
+  }
+  // Display spacepoints type.
+  if (!(_nSpills%2)) {
+    c2->cd(1);
+    _spacepoints.Draw("type", "tracker==0 && station==1 ");
+    c2->Update();
+    c2->cd(2);
+    _spacepoints.Draw("type", "tracker==0 && station==2 ");
+    c2->Update();
+    c2->cd(3);
+    _spacepoints.Draw("type", "tracker==0 && station==3 ");
+    c2->Update();
+    c2->cd(4);
+    _spacepoints.Draw("type", "tracker==0 && station==4 ");
+    c2->Update();
+    c2->cd(5);
+    _spacepoints.Draw("type", "tracker==0 && station==5 ");
+    c2->Update();
+    // tracker 1
+    c2->cd(6);
+    _spacepoints.Draw("type", "tracker==1 && station==1 ");
+    c2->Update();
+    c2->cd(7);
+    _spacepoints.Draw("type", "tracker==1 && station==2 ");
+    c2->Update();
+    c2->cd(8);
+    _spacepoints.Draw("type", "tracker==1 && station==3 ");
+    c2->Update();
+    c2->cd(9);
+    _spacepoints.Draw("type", "tracker==1 && station==4 ");
+    c2->Update();
+    c2->cd(10);
+    _spacepoints.Draw("type", "tracker==1 && station==5 ");
+    c2->Update();
+  }
+  // Display efficiency.
+  if (!(_nSpills%2)) {
+    c3->cd(1);
+    _events.Draw("station_hits", "tracker==0");
+    c3->cd(2);
+    _events.Draw("station_hits", "tracker==1");
+  }
+}
+
