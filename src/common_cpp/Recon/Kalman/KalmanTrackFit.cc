@@ -69,8 +69,8 @@ void KalmanTrackFit::process(Hep3Vector &tof0, Hep3Vector &se, Hep3Vector &tof1)
   }
 
   KalmanMonitor monitor;
-  // monitor.save_global_track(sites);
-  // monitor.print_info(sites);
+  monitor.save_global_track(sites);
+  monitor.print_info(sites);
   delete track;
 }
 
@@ -173,9 +173,9 @@ void KalmanTrackFit::process(std::vector<SciFiSpacePoint> spacepoints,
   }
 */
   KalmanMonitor monitor;
-  // monitor.save(sites);
-  // monitor.save_mc(sites);
-  // monitor.print_info(sites);
+  monitor.save(sites);
+  monitor.save_mc(sites);
+  monitor.print_info(sites);
   delete track;
 }
 
@@ -279,8 +279,8 @@ void KalmanTrackFit::process(SciFiEvent &event) {
 
     KalmanMonitor monitor;
     // monitor.save(sites);
-    // monitor.save_mc(sites);
-    // monitor.print_info(sites);
+    monitor.save_mc(sites);
+    monitor.print_info(sites);
     delete track;
   }
 }

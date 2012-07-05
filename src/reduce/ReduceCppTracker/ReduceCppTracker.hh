@@ -46,6 +46,8 @@
 #include "TH2F.h"
 #include "TH1F.h"
 
+// #include "src/reduce/ReduceCppTracker/RootEvent.hh"
+
 class ReduceCppTracker {
 
  public:
@@ -80,13 +82,16 @@ class ReduceCppTracker {
 
   void digits_histograms(Json::Value root);
 
-  void save_light_yield(Json::Value const &root);
+  // void save_light_yield(Json::Value const &root);
 
-  void save_efficiency(Json::Value const &root);
+  // void save_efficiency(Json::Value const &root);
 
   void compute_stations_efficiencies(Json::Value root);
 
-  void diplay_histograms();
+  void display_histograms();
+
+  void save();
+
  private:
   std::string _classname;
 
@@ -177,7 +182,7 @@ class ReduceCppTracker {
   TTree _spacepoints;
   TTree _spacepointscopy;
   double _x, _y, _z, _pe;
-  int _type;
+  int _type, _tracker_cop, _station_cop;
 
   // Efficiencies.
   double _plane_array[3];
