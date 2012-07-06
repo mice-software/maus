@@ -62,8 +62,28 @@ SciFiStraightPRTrack::SciFiStraightPRTrack(int tracker, int num_points,
   _tracker = tracker;
 }
 
-// Destructor
+SciFiStraightPRTrack::SciFiStraightPRTrack(const SciFiStraightPRTrack &_strk)
+  :  _x0(-1.0), _mx(-1.0), _x_chisq(-1.0), _y0(-1.0), _my(-1.0), _y_chisq(-1.0), _num_points(-1),
+     _tracker(-1), _spoints(0) {
+  *this = _strk;
+}
+
 SciFiStraightPRTrack::~SciFiStraightPRTrack() {}
+
+SciFiStraightPRTrack &SciFiStraightPRTrack::operator=(const SciFiStraightPRTrack &_strk) {
+    if (this == &_strk) {
+        return *this;
+    }
+    _x0 = _strk.get_x0();
+    _mx = _strk.get_mx();
+    _x_chisq = _strk.get_x_chisq();
+    _y0 = _strk.get_y0();
+    _my = _strk.get_my();
+    _y_chisq = _strk.get_y_chisq();
+    _num_points = _strk.get_num_points();
+    _tracker = _strk.get_tracker();
+    _spoints = _strk.get_spacepoints();
+}
 
 void SciFiStraightPRTrack::print_params() {
   std::cout << " x0 is " << _x0 << std::endl;
