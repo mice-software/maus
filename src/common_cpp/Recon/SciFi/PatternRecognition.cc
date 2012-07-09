@@ -124,6 +124,7 @@ void PatternRecognition::process(SciFiEvent &evt) {
           // evt.set_residuals(residuals);
         }
         for ( int i = 0; i < static_cast<int>(htrks.size()); ++i ) {
+          htrks[i].set_tracker(trker_no);
           evt.add_helicalprtrack(htrks[i]);
         }
       }
@@ -137,6 +138,7 @@ void PatternRecognition::process(SciFiEvent &evt) {
           // evt.set_residuals(residuals);
         }
         for ( int i = 0; i < static_cast<int>(htrks.size()); ++i ) {
+          htrks[i].set_tracker(trker_no);
           evt.add_helicalprtrack(htrks[i]);
         }
       }
@@ -150,6 +152,7 @@ void PatternRecognition::process(SciFiEvent &evt) {
           // evt.set_residuals(residuals);
         }
         for ( int i = 0; i < static_cast<int>(htrks.size()); ++i ) {
+          htrks[i].set_tracker(trker_no);
           evt.add_helicalprtrack(htrks[i]);
         }
       }
