@@ -14,6 +14,16 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
+/*!
+ * \file ReduceBase.hh
+ *
+ * \author Alexander Richards, Imperial College London
+ * \date 06/06/2012
+ *
+ * This is the abstract base class for all reducers.
+ *
+ */
 #ifndef _MAUS_API_REDUCE_BASE_H
 #define _MAUS_API_REDUCE_BASE_H
 #include <string>
@@ -22,18 +32,48 @@
 
 namespace MAUS {
 
+  /*!
+   * \class ReduceBase
+   *
+   * \brief Abstract base class for all reducers
+   *
+   * \author Alexander Richards, Imperial College London
+   * \date 06/06/2012
+   */
   template <typename T>
   class ReduceBase : public virtual IReduce<T>, public ModuleBase {
 
   public:
+    /*!\brief Constructor
+     * \param std::string& The name of the reducer.
+     */
     explicit ReduceBase(const std::string&);
+    /*!\brief Copy Constructor
+     * \param ReduceBase& An reducer to copy from.
+     */
     ReduceBase(const ReduceBase&);
+    // ! Destructor
     virtual ~ReduceBase();
 
   public:
+    /*!\brief Reduce data
+     *
+     * Implementation of the interface. Wraps the _process function
+     * providing additional control/checking.
+     * \param T* The input data to be reduced
+     * \return The reduced data
+     */
     T* process(T* t);
 
   private:
+    /*!\brief Reduce data
+     *
+     * Pure virtual private function to be implemented by the
+     * derived reducer author to correctly apply the specific reduction 
+     * process.
+     * \param T* The input data to be reduced
+     * \return The reduced data
+     */
     virtual T* _process(T* t) = 0;
   };
 

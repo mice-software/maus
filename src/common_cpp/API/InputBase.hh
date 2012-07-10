@@ -45,7 +45,7 @@ namespace MAUS {
 
   public:
     /*!\brief Constructor
-     * \param std::string& The name of the outputter.
+     * \param std::string& The name of the inputter.
      */
     explicit InputBase(const std::string&);
     /*!\brief Copy Constructor
