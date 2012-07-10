@@ -19,9 +19,6 @@
 #include <string>
 #include "API/IReduce.hh"
 #include "API/ModuleBase.hh"
-#include "API/APIExceptions.hh"
-#include "Interface/Squeal.hh"
-#include "Utils/CppErrorHandler.hh"
 
 namespace MAUS {
 
@@ -40,34 +37,8 @@ namespace MAUS {
     virtual T* _process(T* t) = 0;
   };
 
-  template <typename T>
-  ReduceBase<T>::ReduceBase(const std::string& s) : IReduce<T>(), ModuleBase(s) {}
-
-  template <typename T>
-  ReduceBase<T>::ReduceBase(const ReduceBase& rb) : IReduce<T>(), ModuleBase(rb._classname) {}
-
-  template <typename T>
-  ReduceBase<T>::~ReduceBase() {}
-
-  template <typename T>
-  T* ReduceBase<T>::process(T* t) {
-    if (!t) { throw NullInputException(_classname); }
-    T* o = 0;
-    try {
-      o = _process(t);
-    }
-    catch(Squeal& s) {
-      CppErrorHandler::getInstance()->HandleSquealNoJson(s, _classname);
-    }
-    catch(std::exception& e) {
-      CppErrorHandler::getInstance()->HandleStdExcNoJson(e, _classname);
-    }
-    catch(...) {
-      throw UnhandledException(_classname);
-    }
-    return o;
-  }
-
 }// end of namespace
+
+#include "API/ReduceBase-inl.hh"
 #endif
 

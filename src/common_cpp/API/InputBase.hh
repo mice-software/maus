@@ -27,12 +27,8 @@
 #ifndef _MAUS_API_INPUT_BASE_H
 #define _MAUS_API_INPUT_BASE_H
 #include <string>
-#include <exception>
 #include "API/IInput.hh"
 #include "API/ModuleBase.hh"
-#include "API/APIExceptions.hh"
-#include "Interface/Squeal.hh"
-#include "Utils/CppErrorHandler.hh"
 
 namespace MAUS {
 
@@ -78,33 +74,8 @@ namespace MAUS {
     virtual T* _emitter() = 0;
   };
 
-  template <typename T>
-  InputBase<T>::InputBase(const std::string& s) : IInput<T>(), ModuleBase(s) {}
-
-  template <typename T>
-  InputBase<T>::InputBase(const InputBase& ib) : IInput<T>(), ModuleBase(ib._classname) {}
-
-  template <typename T>
-  InputBase<T>::~InputBase() {}
-
-  template <typename T>
-  T* InputBase<T>::emitter() {
-    T* o = 0;
-    try {
-      o = _emitter();
-    }
-    catch(Squeal& s) {
-      CppErrorHandler::getInstance()->HandleSquealNoJson(s, _classname);
-    }
-    catch(std::exception& e) {
-      CppErrorHandler::getInstance()->HandleStdExcNoJson(e, _classname);
-    }
-    catch(...) {
-      throw UnhandledException(_classname);
-    }
-    return o;
-  }
-
 }// end of namespace
+
+#include "API/InputBase-inl.hh"
 #endif
 

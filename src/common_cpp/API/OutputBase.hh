@@ -27,12 +27,8 @@
 #ifndef _MAUS_API_OUTPUT_BASE_H
 #define _MAUS_API_OUTPUT_BASE_H
 #include <string>
-#include <exception>
 #include "API/IOutput.hh"
 #include "API/ModuleBase.hh"
-#include "API/APIExceptions.hh"
-#include "Interface/Squeal.hh"
-#include "Utils/CppErrorHandler.hh"
 
 namespace MAUS {
 
@@ -80,33 +76,7 @@ namespace MAUS {
     virtual bool _save(T* t) = 0;
   };
 
-  template <typename T>
-  OutputBase<T>::OutputBase(const std::string& s) : IOutput<T>(), ModuleBase(s) {}
-
-  template <typename T>
-  OutputBase<T>::OutputBase(const OutputBase& ob) : IOutput<T>(), ModuleBase(ob._classname) {}
-
-  template <typename T>
-  OutputBase<T>::~OutputBase() {}
-
-  template <typename T>
-  bool OutputBase<T>::save(T* t) {
-    if (!t) { throw NullInputException(_classname); }
-    bool ret = false;
-    try {
-      ret = _save(t);
-    }
-    catch(Squeal& s) {
-      CppErrorHandler::getInstance()->HandleSquealNoJson(s, _classname);
-    }
-    catch(std::exception& e) {
-      CppErrorHandler::getInstance()->HandleStdExcNoJson(e, _classname);
-    }
-    catch(...) {
-      throw UnhandledException(_classname);
-    }
-    return ret;
-  }
-
 }// end of namespace
+
+#include "API/OutputBase-inl.hh"
 #endif
