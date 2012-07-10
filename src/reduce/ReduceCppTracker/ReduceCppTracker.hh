@@ -74,14 +74,17 @@ class ReduceCppTracker {
 
   bool is_physics_daq_event(Json::Value root);
 
-  void unpacked_data_histograms(Json::Value root);
+  bool is_good_event();
+
+  void unpacked_data_tree(Json::Value root);
 
   void draw_spacepoints(Json::Value root);
 
-  void doublet_clusters_histograms(Json::Value root);
+  void doublet_clusters_tree();
 
-  void digits_histograms(Json::Value root);
+  void digits_tree();
 
+  void spacepoints_tree();
   // void save_light_yield(Json::Value const &root);
 
   // void save_efficiency(Json::Value const &root);
@@ -92,7 +95,15 @@ class ReduceCppTracker {
 
   void save();
 
+  void merge_tracker_events(Json::Value &root);
+
  private:
+  bool _this_is_tracker0_event;
+
+  bool _this_is_tracker1_event;
+
+  Json::Value json_daq, json_digits, json_clusters, json_spacepoints;
+
   std::string _classname;
 
   int _nSpills;
@@ -182,7 +193,7 @@ class ReduceCppTracker {
   TTree _spacepoints;
   TTree _spacepointscopy;
   double _x, _y, _z, _pe;
-  int _type, _tracker_cop, _station_cop;
+  int _type, _tracker_sp, _station_sp;
 
   // Efficiencies.
   double _plane_array[3];
