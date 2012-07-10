@@ -107,6 +107,11 @@ class ReduceCppTracker {
   std::string _classname;
 
   int _nSpills;
+
+  int _map_planes_total[30][214];
+
+  int _map_planes_hit[30][214];
+
 /*
   TTree _digits;
   double _npe;

@@ -167,17 +167,10 @@ bool ReduceCppTracker::birth(std::string argJsonConfigDocument) {
 }
 
 std::string  ReduceCppTracker::process(std::string document) {
-  // TFile hfile("Event.root","RECREATE");
-  // TFile root_file("cosmics.root","RECREATE");
   //  JsonCpp setup
   Json::FastWriter writer;
   Json::Value root;
   Json::Value xEventType;
-
-  std::ofstream file1;
-  std::ofstream file2;
-  std::ofstream file3;
-  std::ofstream file4;
 
   Squeak::activateCout(1);
   // Check if the JSON document can be parsed, else return error only
@@ -231,27 +224,10 @@ std::string  ReduceCppTracker::process(std::string document) {
     Squeak::mout(Squeak::error) << exc.what() << std::endl;
     root = MAUS::CppErrorHandler::getInstance()->HandleStdExc(root, exc, _classname);
   }
-  // tree->Fill();
-  _nSpills++;
-  // hfile.Close();
-  if (!(_nSpills%100)) {
-    file1.open("efficiency_plane0.txt");
-    file2.open("efficiency_plane1.txt");
-    file3.open("efficiency_plane2.txt");
-    for ( int i = 0; i < 214; ++i ) {
-      file1 << i << " " << _plane_0_map[i][0] << " " << _plane_0_map[i][1] << "\n";
-      file2 << i << " " << _plane_1_map[i][0] << " " << _plane_1_map[i][1] << "\n";
-      file3 << i << " " << _plane_2_map[i][0] << " " << _plane_2_map[i][1] << "\n";
-    }
-    file1.close();
-    file2.close();
-    file3.close();
-    file4.open("efficiency_station.txt");
-    file4 << 0 << " " << _plane_0_hits << " " << _plane_0_counter << "\n";
-    file4 << 1 << " " << _plane_1_hits << " " << _plane_1_counter << "\n";
-    file4 << 2 << " " << _plane_2_hits << " " << _plane_2_counter << "\n";
-    file4.close();
 
+  _nSpills++;
+
+  if ( !(_nSpills%100) ) {
     save();
   }
 
@@ -260,10 +236,29 @@ std::string  ReduceCppTracker::process(std::string document) {
 }
 
 bool ReduceCppTracker::death()  {
+  save();
   return true;
 }
 
 void ReduceCppTracker::save()  {
+  std::ofstream file1;
+  file1.open("efficiency_fibres.txt");
+  for ( int plane_i = 0; plane_i < 30; ++plane_i ) {
+    for ( int fibre_j = 0; fibre_j < 214; ++fibre_j ) {
+      file1 << plane_i << " " << fibre_j << " "
+            << _map_planes_total[plane_i][fibre_j] << " "
+            << _map_planes_hit[plane_i][fibre_j] << "\n";
+    }
+  }
+  file1.close();
+/*
+    file4.open("efficiency_station.txt");
+    file4 << 0 << " " << _plane_0_hits << " " << _plane_0_counter << "\n";
+    file4 << 1 << " " << _plane_1_hits << " " << _plane_1_counter << "\n";
+    file4 << 2 << " " << _plane_2_hits << " " << _plane_2_counter << "\n";
+    file4.close();
+*/
+
   TFile root_file("cosmics.root", "RECREATE");
   _unpacked.Write();
   _digits.Write();
@@ -377,59 +372,66 @@ void ReduceCppTracker::compute_stations_efficiencies(Json::Value root) {
     bool plane_0_is_hit = false;
     bool plane_1_is_hit = false;
     bool plane_2_is_hit = false;
-    double chan_0 = -10.;
-    double chan_1 = -10.;
-    double chan_2 = -10.;
+    int chan_0 = -10.;
+    int chan_1 = -10.;
+    int chan_2 = -10.;
+    int plane_0_id = 99;
+    int plane_1_id = 99;
+    int plane_2_id = 99;
+
+    int tracker = json_spacepoints[sp_j]["tracker"].asInt();
+    int station = json_spacepoints[sp_j]["station"].asInt();
 
     int numb_clusters = json_spacepoints[sp_j]["channels"].size();
+
     for ( int clust_k = 0; clust_k < numb_clusters; ++clust_k ) {
       if ( json_spacepoints[sp_j]["channels"][clust_k]["plane_number"].asInt() == 0 ) {
+        plane_0_id = 15*tracker + 3*(station-1) + (0);
         plane_0_is_hit = true;
         chan_0 = json_spacepoints[sp_j]["channels"][clust_k]["channel_number"].asDouble();
       }
       if ( json_spacepoints[sp_j]["channels"][clust_k]["plane_number"].asInt() == 1 ) {
+        plane_1_id = 15*tracker + 3*(station-1) + (1);
         plane_1_is_hit = true;
         chan_1 = json_spacepoints[sp_j]["channels"][clust_k]["channel_number"].asDouble();
       }
       if ( json_spacepoints[sp_j]["channels"][clust_k]["plane_number"].asInt() == 2 ) {
+        plane_2_id = 15*tracker + 3*(station-1) + (2);
         plane_2_is_hit = true;
         chan_2 = json_spacepoints[sp_j]["channels"][clust_k]["channel_number"].asDouble();
       }
     }
+
     // Plane 0 efficiencies.
     if ( plane_1_is_hit && plane_2_is_hit ) {
-      _plane_0_counter += 1;
       if ( plane_0_is_hit ) {
-        _plane_0_hits += 1;
-        _plane_0_map[static_cast<int>(chan_0+0.5)][0] += 1;
-        _plane_0_map[static_cast<int>(chan_0+0.5)][1] += 1;
+        _map_planes_total[plane_0_id][chan_0] += 1;
+        _map_planes_hit[plane_0_id][chan_0]   += 1;
+        // _plane_0_map[static_cast<int>(chan_0+0.5)][0] += 1;
+        // _plane_0_map[static_cast<int>(chan_0+0.5)][1] += 1;
       } else {
         int chan = 318-chan_1-chan_2;
-        _plane_0_map[chan][1] += 1;
+        _map_planes_total[plane_0_id][chan] += 1;
       }
     }
     // Plane 1 efficiencies.
     if ( plane_0_is_hit && plane_2_is_hit ) {
-      _plane_1_counter += 1;
       if ( plane_1_is_hit ) {
-        _plane_1_hits += 1;
-        _plane_1_map[static_cast<int>(chan_1+0.5)][0] += 1;
-        _plane_1_map[static_cast<int>(chan_1+0.5)][1] += 1;
+        _map_planes_total[plane_1_id][chan_1] += 1;
+        _map_planes_hit[plane_1_id][chan_1]   += 1;
       } else {
         int chan = 318-chan_0-chan_2;
-        _plane_1_map[chan][1] += 1;
+        _map_planes_total[plane_1_id][chan] += 1;
       }
     }
     // Plane 2 efficiencies.
     if ( plane_0_is_hit && plane_1_is_hit ) {
-      _plane_2_counter += 1;
       if ( plane_2_is_hit ) {
-        _plane_2_hits += 1;
-        _plane_2_map[static_cast<int>(chan_2+0.5)][0] += 1;
-        _plane_2_map[static_cast<int>(chan_2+0.5)][1] += 1;
+        _map_planes_total[plane_2_id][chan_2] += 1;
+        _map_planes_hit[plane_2_id][chan_2]   += 1;
       } else {
         int chan = 318-chan_0-chan_1;
-        _plane_2_map[chan][1] += 1;
+        _map_planes_total[plane_2_id][chan] += 1;
       }
     }
   }
@@ -589,6 +591,12 @@ void ReduceCppTracker::digits_tree() {
   for ( int digit_j = 0; digit_j < numb_digits; digit_j++ ) {
     Json::Value a_digit = digit_event[digit_j];
     if ( a_digit.isNull() ) continue;
+    assert(a_digit.isMember("tracker"));
+    assert(a_digit.isMember("station"));
+    assert(a_digit.isMember("plane"));
+    assert(a_digit.isMember("channel"));
+    assert(a_digit.isMember("npe"));
+    assert(a_digit.isMember("time"));
     _tracker_dig   = a_digit["tracker"].asInt();
     _station_dig   = a_digit["station"].asInt();
     _plane_dig   = a_digit["plane"].asInt();
@@ -614,40 +622,7 @@ void ReduceCppTracker::digits_tree() {
   //        "ReduceCppSingleStation::digits_histograms"));
   // }
 }
-/*
-void ReduceCppTracker::show_light_yield(Json::Value const &root) {
-  int n_events = root["recon_events"].size();
 
-  for (int event_i = 0; event_i < n_events; event_i++) {
-    Json::Value spacepoints_tracker0 = root["recon_events"][event_i]["sci_fi_event"]
-                                           ["sci_fi_space_points"]["tracker0"];
-
-    Json::Value spacepoints_tracker1 = root["recon_events"][event_i]["sci_fi_event"]
-                                           ["sci_fi_space_points"]["tracker1"];
-
-    int n_sp_tracker0 = spacepoints_tracker0.size();
-    int n_sp_tracker1 = spacepoints_tracker1.size();
-
-    for ( int sp_i = 0; sp_i < n_sp_tracker0; sp_i++ ) {
-      int n_digits = spacepoints_tracker0[sp_i]["channels"].size();
-      for ( int digit_j = 0; digit_j < n_digits; digit_j++ ) {
-        _npe = spacepoints_tracker0[sp_i]["channels"][digit_j]["npe"].asDouble();
-        _tracker_dig = 0;
-        _digits.Fill();
-      }
-    }
-
-    for ( int sp_i = 0; sp_i < n_sp_tracker1; sp_i++ ) {
-      int n_digits = spacepoints_tracker1[sp_i]["channels"].size();
-      for ( int digit_j = 0; digit_j < n_digits; digit_j++ ) {
-        _npe = spacepoints_tracker1[sp_i]["channels"][digit_j]["npe"].asDouble();
-        _tracker_dig = 1;
-        _digits.Fill();
-      }
-    }
-  }
-}
-*/
 void ReduceCppTracker::unpacked_data_tree(Json::Value root) {
   Json::Value daq_data = JsonWrapper::GetProperty(root,
                                                   "daq_data",
@@ -704,60 +679,31 @@ void ReduceCppTracker::unpacked_data_tree(Json::Value root) {
 
 /*
 void ReduceCppTracker::show_efficiency(Json::Value const &root) {
-  int n_events = root["recon_events"].size();
+  int numb_spacepoints = json_spacepoints.size();
 
-  for (int event_i = 0; event_i < n_events; event_i++) {
-    Json::Value spacepoints_tracker0 = root["recon_events"][event_i]["sci_fi_event"]
-                                           ["sci_fi_space_points"]["tracker0"];
+  bool station_hit[2][6] = { {false, false, false, false, false, false},
+                             {false, false, false, false, false, false}};
 
-    Json::Value spacepoints_tracker1 = root["recon_events"][event_i]["sci_fi_event"]
-                                           ["sci_fi_space_points"]["tracker1"];
+  for ( int sp_i = 0; sp_i < numb_spacepoints; sp_i++ ) {
+    // Fill station number.
+    int tracker = json_spacepoints[sp_i]["tracker"].asInt();
+    int station = json_spacepoints[sp_i]["station"].asInt();
+    //_station = station;
 
-    int n_sp_tracker0 = spacepoints_tracker0.size();
-    int n_sp_tracker1 = spacepoints_tracker1.size();
-
-    bool station_hit[2][6] = { {false, false, false, false, false, false},
-                               {false, false, false, false, false, false}};
-
-    for ( int sp_i = 0; sp_i < n_sp_tracker0; sp_i++ ) {
-      // Fill station number.
-      int station = spacepoints_tracker0[sp_i]["station"].asInt();
-      _station = station;
-      station_hit[0][station]=true;
-      // Fill type.
-      std::string type = spacepoints_tracker0[sp_i]["type"].asString();
-      if ( type == "triplet" ) {
-        _type = 3;
-      }
-      if ( type == "duplet" ) {
-        _type = 2;
-      }
-      _tracker = 0;
-      _x = spacepoints_tracker0[sp_i]["position"]["x"].asDouble();
-      _y = spacepoints_tracker0[sp_i]["position"]["y"].asDouble();
-      _z = spacepoints_tracker0[sp_i]["position"]["z"].asDouble();
-      _spacepoints.Fill();
+    station_hit[tracker][station]=true;
+    // Fill type.
+    std::string type = spacepoints_tracker0[sp_i]["type"].asString();
+    if ( type == "triplet" ) {
+      _type = 3;
     }
-
-    for ( int sp_i = 0; sp_i < n_sp_tracker1; sp_i++ ) {
-      // Fill station number.
-      int station = spacepoints_tracker1[sp_i]["station"].asInt();
-      _station = station;
-      station_hit[1][station]=true;
-      // Fill type.
-      std::string type = spacepoints_tracker1[sp_i]["type"].asString();
-      if ( type == "triplet" ) {
-        _type = 3;
-      }
-      if ( type == "duplet" ) {
-        _type = 2;
-      }
-      _tracker = 1;
-      _x = spacepoints_tracker1[sp_i]["position"]["x"].asDouble();
-      _y = spacepoints_tracker1[sp_i]["position"]["y"].asDouble();
-      _z = spacepoints_tracker1[sp_i]["position"]["z"].asDouble();
-      _spacepoints.Fill();
+    if ( type == "duplet" ) {
+      _type = 2;
     }
+    // _x = spacepoints_tracker0[sp_i]["position"]["x"].asDouble();
+    // _y = spacepoints_tracker0[sp_i]["position"]["y"].asDouble();
+    // _z = spacepoints_tracker0[sp_i]["position"]["z"].asDouble();
+    // _spacepoints.Fill();
+  }
 
     // Fill EVENT tree.
     for ( int tr = 0; tr < 2; tr++ ) {
