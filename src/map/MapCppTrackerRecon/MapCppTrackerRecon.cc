@@ -84,11 +84,12 @@ std::string MapCppTrackerRecon::process(std::string document) {
       if ( event.spacepoints().size() ) {
         std::cout << "Calling Pattern Recognition..." << std::endl;
         pattern_recognition(event);
+        std::cout << "Pattern Recognition complete." << std::endl;
       }
       // Kalman Track Fit.
-      if ( event.straightprtracks().size() ) {
-        track_fit(event);
-      }
+      // if ( event.straightprtracks().size() ) {
+      // track_fit(event);
+      // }
       // if ( root.isMember("mc_events") ) {
       //   make_seed_and_fit(event);
       // }
@@ -291,9 +292,11 @@ void MapCppTrackerRecon::save_to_json(SciFiEvent &evt, int event_i) {
     track["starting_point"]["x"] = evt.helicalprtracks()[track_i].get_x0();
     track["starting_point"]["y"] = evt.helicalprtracks()[track_i].get_y0();
     track["starting_point"]["z"] = evt.helicalprtracks()[track_i].get_z0();
-    if ( evt.helicalprtracks()[track_i].get_tracker() == 0 ) {
+    int tracker = evt.helicalprtracks()[track_i].get_tracker();
+    track["tracker"] = tracker;
+    if ( tracker == 0 ) {
       h_tracks_tracker0.append(track);
-    } else if ( evt.helicalprtracks()[track_i].get_tracker() == 1 ) {
+    } else if ( tracker == 1 ) {
       h_tracks_tracker1.append(track);
     }
   }

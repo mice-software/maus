@@ -382,6 +382,7 @@ class PatternRecognition {
                        double &dx, double &dy);
 
   private:
+    static const int debug = 0; // Set output level, 0 = little, 1 = more couts, 2 = files as well
     static const int _n_trackers = 2;
     static const int _n_stations = 5;
     static const int _n_bins = 100;         // Number of bins in each residuals histogram
@@ -396,7 +397,7 @@ class PatternRecognition {
     static const double _AB_cut = .7;       // Need to decide on appropriate cut here!!!
     static const double _active_diameter = 300.0;  // Active volume diameter a tracker in mm
     static const bool _helical_pr_on = 1;   // Flag to turn on helical pr (0 off, 1 on)
-    static const bool _straight_pr_on = 0;  // Flag to turn on straight pr (0 off, 1 on)
+    static const bool _straight_pr_on = 1;  // Flag to turn on straight pr (0 off, 1 on)
 
     // Some output files - only to be kept when in development stages
     ofstream * _f_res;

@@ -30,6 +30,9 @@
 #include <sstream>
 #include <vector>
 
+// ROOT headers
+#include "Rtypes.h"
+
 // MAUS headers
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
 #include "src/common_cpp/Recon/SciFi/SimpleLine.hh"
@@ -38,15 +41,25 @@
 
 class SciFiStraightPRTrack {
   public:
-    // Constructors
+    /** Default constructor */
     SciFiStraightPRTrack();
+
+    /** Constructor using explicit parameters */
     SciFiStraightPRTrack(int tracker, int num_points,
                          double x0, double mx, double x_chisq,
                          double y0, double my, double y_chisq);
+
+    /** Constructor using SimpleLines */
     SciFiStraightPRTrack(int tracker, int num_points, SimpleLine line_x, SimpleLine line_y);
 
-    // Destructors
-    ~SciFiStraightPRTrack();  // Default destructor
+    /** Copy constructor */
+    SciFiStraightPRTrack(const SciFiStraightPRTrack &_strk);
+
+    /** Default destructor */
+    virtual ~SciFiStraightPRTrack();
+
+    /** Equality operator - any pointers are deep copied */
+    SciFiStraightPRTrack& operator=(const SciFiStraightPRTrack &_strk);
 
     // Getters
     std::vector<SciFiSpacePoint> get_spacepoints() const { return _spoints; }
@@ -88,6 +101,8 @@ class SciFiStraightPRTrack {
     double _my;
     double _x_chisq;
     double _y_chisq;
+
+    // ClassDef(SciFiStraightPRTrack, 1)
 };
 // } // ~namespace MAUS
 
