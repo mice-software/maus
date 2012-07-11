@@ -643,8 +643,10 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
                       double dR = delta_R(circle, pos);
 
                       if ( debug > 1 ) {
-                      outdR_all << dR << "\t";
-                      outdR_all << spnts_by_station[station_num][sp_no]->get_tracker() << std::endl;
+                        std::ofstream outdR_all("dR_all.txt", std::ios::out |
+                                                        std::ios::app);
+                        outdR_all << dR << "\t";
+                        outdR_all << spnts_by_station[station_num][sp_no]->get_tracker() << std::endl;
                       }
                       if ( debug > 0 ) std::cout << dR << std::endl;
 
@@ -656,10 +658,6 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
                            outdR_passed_cut << dR <<"\t";
                            outdR_passed_cut << spnts_by_station[station_num][sp_no]->get_tracker();
                            outdR_passed_cut << std::endl;
-
-                           std::ofstream outdR_passed_cut("dR_passed_cut.txt",
-                                                          std::ios::out | std::ios::app);
-                           outdR_passed_cut << dR << std::endl;
                          }
 
                          best_from_this_station = dR;
@@ -1111,11 +1109,11 @@ bool PatternRecognition::turns_between_stations(const std::vector<double> &dz,
       if ( dphi[j] < 0 )
         dphi[j] += 2. * pi;
 
-        if ( dphi[j] < dphi[i] )
+      if ( dphi[j] < dphi[i] )
         dphi[j] += 2. * pi;
 
-        double z_ratio = dz[j] / dz[i];
-        double phi_ratio = dphi[j] / dphi[i];
+      double z_ratio = dz[j] / dz[i];
+      double phi_ratio = dphi[j] / dphi[i];
 
       if ( debug > 0 )
         std::cout << "RATIOS.... " << fabs(phi_ratio - z_ratio) /  z_ratio << std::endl;
