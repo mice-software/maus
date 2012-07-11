@@ -641,7 +641,6 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
 
                       // Calculate the residual dR
                       double dR = delta_R(circle, pos);
-<<<<<<< TREE
 
                       if ( debug > 1 ) {
                       outdR_all << dR << "\t";
@@ -649,17 +648,8 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
                       }
                       if ( debug > 0 ) std::cout << dR << std::endl;
 
-=======
-                      if ( debug > 1 ) {
-                        std::ofstream outdR_all("dR_all.txt", std::ios::out | std::ios::app);
-                        outdR_all << dR <<std::endl;
-                      }
-                      if ( debug > 0 ) std::cout << dR << std::endl;
-
->>>>>>> MERGE-SOURCE
                       // Apply roadcut to see if spacepoint belongs to same circle
                       if ( fabs(dR) < _R_res_cut && fabs(dR) < fabs(best_from_this_station) ) {
-<<<<<<< TREE
                          if ( debug > 1 ) {
                            std::ofstream outdR_passed_cut("dR_passed_cut.txt", std::ios::out |
                                                           std::ios::app);
@@ -672,25 +662,13 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
                            outdR_passed_cut << dR << std::endl;
                          }
 
-=======
-                         if ( debug > 1 ) {
-                           std::ofstream outdR_passed_cut("dR_passed_cut.txt",
-                                                          std::ios::out | std::ios::app);
-                           outdR_passed_cut << dR << std::endl;
-                         }
->>>>>>> MERGE-SOURCE
                          best_from_this_station = dR;
                          dR_passed = true;
                          // std::cout <<tmp_best_sp->get_position()<<std::endl;
                          // std::cout << dR <<std::endl;
                          tmp_best_sp = spnts_by_station[station_num][sp_no];
                       } else if ( fabs(dR) > _R_res_cut || fabs(best_from_this_station) < (dR) ) {
-<<<<<<< TREE
-                        if ( debug > 0 )
-                          std::cout << "dR test not passed..." <<std::endl;
-=======
                         if ( debug > 0 ) std::cout << "dR test not passed..." <<std::endl;
->>>>>>> MERGE-SOURCE
                         // bool dR_passed = false;
                       }
                     } // ~If intermediate station spacepoint is unused
@@ -992,9 +970,6 @@ void PatternRecognition::circle_fit(const std::vector<SciFiSpacePoint*> &spnts,
   else
     R = sqrt((4 * alpha) + (beta * beta) + (gamma * gamma)) / (2 * alpha);
 
-<<<<<<< TREE
-<<<<<<< TREE
-=======
   if ( debug > 0 ) {
     std::cout << "alpha = " << alpha << std::endl;
     std::cout << "beta = " << beta << std::endl;
@@ -1003,17 +978,6 @@ void PatternRecognition::circle_fit(const std::vector<SciFiSpacePoint*> &spnts,
       std::cout << "R was < 0 geometrically but taking abs_val for physical correctness\n";
   }
 
->>>>>>> MERGE-SOURCE
-=======
-  if ( debug > 0 ) {
-    std::cout << "alpha = " << alpha << std::endl;
-    std::cout << "beta = " << beta << std::endl;
-    std::cout << "gamma = " << gamma << std::endl;
-    if ( R < 0. )
-      std::cout << "R was < 0 geometrically but taking abs_val for physical correctness\n";
-  }
-
->>>>>>> MERGE-SOURCE
   R = fabs(R);
 
   circle.set_x0(x0);
@@ -1143,7 +1107,7 @@ bool PatternRecognition::turns_between_stations(const std::vector<double> &dz,
       int j = i + 1;
       if ( dphi[i] < 0 )
         dphi[i] += 2. * pi;
-<<<<<<< TREE
+
       if ( dphi[j] < 0 )
         dphi[j] += 2. * pi;
 
@@ -1153,50 +1117,18 @@ bool PatternRecognition::turns_between_stations(const std::vector<double> &dz,
         double z_ratio = dz[j] / dz[i];
         double phi_ratio = dphi[j] / dphi[i];
 
-=======
-
-      int j = i + 1;
-      if ( dphi[j] < dphi[i] )
-        dphi[j] += 2. * pi;
-
-      double z_ratio = dz[j] / dz[i];
-      double phi_ratio = dphi[j] / dphi[i];
-
-<<<<<<< TREE
-      if ( debug > 0 )
->>>>>>> MERGE-SOURCE
-        std::cout << "RATIOS.... " << fabs(phi_ratio - z_ratio) /  z_ratio << std::endl;
-=======
       if ( debug > 0 )
         std::cout << "RATIOS.... " << fabs(phi_ratio - z_ratio) /  z_ratio << std::endl;
->>>>>>> MERGE-SOURCE
 
-<<<<<<< TREE
-        if ( fabs(phi_ratio - z_ratio) /  z_ratio > _AB_cut ) {
-          // try
-          bool passed_cut = AB_ratio(dphi[i], dphi[j], dz[i], dz[j]);
-          if ( !passed_cut )
-            return false;
-        }
-=======
       if ( fabs(phi_ratio - z_ratio) /  z_ratio > _AB_cut ) {
         // try
         bool passed_cut = AB_ratio(dphi[i], dphi[j], dz[i], dz[j]);
         if ( !passed_cut )
           return false;
       }
->>>>>>> MERGE-SOURCE
     }
-<<<<<<< TREE
-<<<<<<< TREE
   }
   return true;
-=======
-    return true;
->>>>>>> MERGE-SOURCE
-=======
-    return true;
->>>>>>> MERGE-SOURCE
 /*
   if ( dphi[0] < 0 )
     dphi[0] += 2 * pi;
@@ -1233,13 +1165,6 @@ bool PatternRecognition::turns_between_stations(const std::vector<double> &dz,
                   // returned false.
 
    */
-<<<<<<< TREE
-=======
-  }
-<<<<<<< TREE
->>>>>>> MERGE-SOURCE
-=======
->>>>>>> MERGE-SOURCE
 }
 
 bool PatternRecognition::AB_ratio(double &dphi_ji, double &dphi_kj, double dz_ji,
@@ -1427,29 +1352,13 @@ double PatternRecognition::calculate_chisq(const std::vector<SciFiSpacePoint*> &
     double xi, yi, zi;
 
     helix_function_at_i(R, Phi_0, tan_lambda, A, B, C, phi_i, xi, yi, zi);
-<<<<<<< TREE
-<<<<<<< TREE
-    std::cout << "Making sure helix is reconstructing properly..." << std::endl;
 
-    std::cout << "x_recon = " << xi<< " should equal   x_sp = " << p.x() << std::endl;
-    std::cout << "y_recon = " << yi<< " should equal   y_sp = " << p.y() << std::endl;
-    std::cout << "z_recon = " << zi<< " should equal   z_sp = " << p.z() << std::endl;
-=======
     if ( debug > 0 ) {
       std::cout << "Making sure helix is reconstructing properly..." << std::endl;
       std::cout << "x_recon = " << xi<< " should equal   x_sp = " << p.x() << std::endl;
       std::cout << "y_recon = " << yi<< " should equal   y_sp = " << p.y() << std::endl;
       std::cout << "z_recon = " << zi<< " should equal   z_sp = " << p.z() << std::endl;
     }
->>>>>>> MERGE-SOURCE
-=======
-    if ( debug > 0 ) {
-      std::cout << "Making sure helix is reconstructing properly..." << std::endl;
-      std::cout << "x_recon = " << xi<< " should equal   x_sp = " << p.x() << std::endl;
-      std::cout << "y_recon = " << yi<< " should equal   y_sp = " << p.y() << std::endl;
-      std::cout << "z_recon = " << zi<< " should equal   z_sp = " << p.z() << std::endl;
-    }
->>>>>>> MERGE-SOURCE
 
     double sd = -1;
     if ( spnts[i]->get_station() == 5 )
