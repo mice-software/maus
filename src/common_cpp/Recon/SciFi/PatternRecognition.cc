@@ -646,7 +646,7 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
                         std::ofstream outdR_all("dR_all.txt", std::ios::out |
                                                         std::ios::app);
                         outdR_all << dR << "\t";
-                        outdR_all << spnts_by_station[station_num][sp_no]->get_tracker() << std::endl;
+                        outdR_all << spnts_by_station[station_num][sp_no]->get_tracker() << "\n";
                       }
                       if ( debug > 0 ) std::cout << dR << std::endl;
 
@@ -732,7 +732,7 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
                   out_circ << good_spnts[0]->get_tracker() << std::endl;
 
                   std::ofstream out_circ2("circle_chisq.txt", std::ios::out | std::ios::app);
-                  out_circ2 << circle.get_chisq() << "\t"<< good_spnts[0]->get_tracker() << std::endl;
+                  out_circ2 << circle.get_chisq() << "\t"<< good_spnts[0]->get_tracker() << "\n";
                 }
 
 
