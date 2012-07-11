@@ -131,8 +131,8 @@ void MapCppTrackerMCDigitization::
     // .start. TO BE REMOVED .start.//
     double px, py, pz, x, y, z;
     px = hit["momentum"]["x"].asDouble();
-    py = hit["momentum"]["x"].asDouble();
-    pz = hit["momentum"]["x"].asDouble();
+    py = hit["momentum"]["y"].asDouble();
+    pz = hit["momentum"]["z"].asDouble();
     x  = hit["position"]["x"].asDouble();
     y  = hit["position"]["y"].asDouble();
     z  = hit["position"]["z"].asDouble();
@@ -360,6 +360,7 @@ void MapCppTrackerMCDigitization::save_to_json(SciFiEvent &evt, int event_i) {
     if ( tracker == 1 )
       digits_tracker1.append(digit);
   }
+
   root["recon_events"][event_i]["sci_fi_event"]["sci_fi_digits"]["tracker0"] = digits_tracker0;
   root["recon_events"][event_i]["sci_fi_event"]["sci_fi_digits"]["tracker1"] = digits_tracker1;
 }

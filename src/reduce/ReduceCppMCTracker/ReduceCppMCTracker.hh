@@ -81,6 +81,7 @@ class ReduceCppMCTracker {
   TTree _sp;
   TTree _digits;
   TTree _other;
+  TTree _primary;
 
   double _x;
   double _y;
