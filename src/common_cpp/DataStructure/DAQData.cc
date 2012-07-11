@@ -48,6 +48,15 @@ DAQData& DAQData::operator=(const DAQData& _daqdata) {
 }
 
 DAQData::~DAQData() {
+    SetTriggerRequestArray(TriggerRequestArray());
+    SetTOF1DaqArray(TOF1DaqArray());
+    SetCkovArray(CkovArray());
+    SetTOF2DaqArray(TOF2DaqArray());
+    SetUnknownArray(UnknownArray());
+    SetKLArray(KLArray());
+    SetTagArray(TagArray());
+    SetTOF0DaqArray(TOF0DaqArray());
+    SetTriggerArray(TriggerArray());
 }
 
 V830 DAQData::GetV830() const {
@@ -71,6 +80,11 @@ size_t DAQData::GetTriggerRequestArraySize() const {
 }
 
 void DAQData::SetTriggerRequestArray(TriggerRequestArray trigger_request) {
+    for (size_t i = 0; i < _trigger_request.size(); ++i) {
+        if (_trigger_request[i] != NULL) {
+            delete _trigger_request[i];
+        }
+    }
     _trigger_request = trigger_request;
 }
 
@@ -87,6 +101,11 @@ size_t DAQData::GetTOF1DaqArraySize() const {
 }
 
 void DAQData::SetTOF1DaqArray(TOF1DaqArray tof1) {
+    for (size_t i = 0; i < _tof1.size(); ++i) {
+        if (_tof1[i] != NULL) {
+            delete _tof1[i];
+        }
+    }
     _tof1 = tof1;
 }
 
@@ -103,6 +122,11 @@ size_t DAQData::GetCkovArraySize() const {
 }
 
 void DAQData::SetCkovArray(CkovArray ckov) {
+    for (size_t i = 0; i < _ckov.size(); ++i) {
+        if (_ckov[i] != NULL) {
+            delete _ckov[i];
+        }
+    }
     _ckov = ckov;
 }
 
@@ -119,6 +143,11 @@ size_t DAQData::GetTOF2DaqArraySize() const {
 }
 
 void DAQData::SetTOF2DaqArray(TOF2DaqArray tof2) {
+    for (size_t i = 0; i < _tof2.size(); ++i) {
+        if (_tof2[i] != NULL) {
+            delete _tof2[i];
+        }
+    }
     _tof2 = tof2;
 }
 
@@ -135,6 +164,11 @@ size_t DAQData::GetUnknownArraySize() const {
 }
 
 void DAQData::SetUnknownArray(UnknownArray unknown) {
+    for (size_t i = 0; i < _unknown.size(); ++i) {
+        if (_unknown[i] != NULL) {
+            delete _unknown[i];
+        }
+    }
     _unknown = unknown;
 }
 
@@ -151,6 +185,11 @@ size_t DAQData::GetKLArraySize() const {
 }
 
 void DAQData::SetKLArray(KLArray kl) {
+    for (size_t i = 0; i < _kl.size(); ++i) {
+        if (_kl[i] != NULL) {
+            delete _kl[i];
+        }
+    }
     _kl = kl;
 }
 
@@ -167,6 +206,11 @@ size_t DAQData::GetTagArraySize() const {
 }
 
 void DAQData::SetTagArray(TagArray tag) {
+    for (size_t i = 0; i < _tag.size(); ++i) {
+        if (_tag[i] != NULL) {
+            delete _tag[i];
+        }
+    }
     _tag = tag;
 }
 
@@ -183,6 +227,11 @@ size_t DAQData::GetTOF0DaqArraySize() const {
 }
 
 void DAQData::SetTOF0DaqArray(TOF0DaqArray tof0) {
+    for (size_t i = 0; i < _tof0.size(); ++i) {
+        if (_tof0[i] != NULL) {
+            delete _tof0[i];
+        }
+    }
     _tof0 = tof0;
 }
 
@@ -199,6 +248,11 @@ size_t DAQData::GetTriggerArraySize() const {
 }
 
 void DAQData::SetTriggerArray(TriggerArray trigger) {
+    for (size_t i = 0; i < _trigger.size(); ++i) {
+        if (_trigger[i] != NULL) {
+            delete _trigger[i];
+        }
+    }
     _trigger = trigger;
 }
 }
