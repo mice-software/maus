@@ -319,7 +319,7 @@ void ReduceCppTracker::show_efficiency() {
     // Fill station number.
     int tracker = json_spacepoints[sp_i]["tracker"].asInt();
     int station = json_spacepoints[sp_i]["station"].asInt();
-    //_station = station;
+    // _station = station;
 
     station_hit[tracker][station]=true;
     /*
