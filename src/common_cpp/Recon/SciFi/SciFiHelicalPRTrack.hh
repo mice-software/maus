@@ -63,8 +63,8 @@ class SciFiHelicalPRTrack {
     int get_tracker() const { return _tracker; }
     // int get_station() const { return _station; }
     int get_num_points() const { return _num_points; }
-    int get_chisq() const { return _chisq; }
-    int get_chisq_dof() const { return _chisq_dof; }
+    double get_chisq() const { return _chisq; }
+    double get_chisq_dof() const { return _chisq_dof; }
 
     std::vector<double> get_vsl();
 

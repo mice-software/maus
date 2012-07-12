@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 directory=root_v5.30.03
 filename=${directory}.source.tar.gz 
-#url=ftp://root.cern.ch/root/${filename}
-url=http://www.hep.ph.ic.ac.uk/~adobbs/Files/${filename}
+url=ftp://root.cern.ch/root/${filename}
+#url=http://www.hep.ph.ic.ac.uk/~adobbs/Files/${filename}
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 

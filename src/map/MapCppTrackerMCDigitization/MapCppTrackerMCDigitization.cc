@@ -131,8 +131,8 @@ void MapCppTrackerMCDigitization::
     // .start. TO BE REMOVED .start.//
     double px, py, pz, x, y, z;
     px = hit["momentum"]["x"].asDouble();
-    py = hit["momentum"]["x"].asDouble();
-    pz = hit["momentum"]["x"].asDouble();
+    py = hit["momentum"]["y"].asDouble();
+    pz = hit["momentum"]["z"].asDouble();
     x  = hit["position"]["x"].asDouble();
     y  = hit["position"]["y"].asDouble();
     z  = hit["position"]["z"].asDouble();

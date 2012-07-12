@@ -47,7 +47,7 @@ TEST_F(SciFiStraightPRTrackTest, test_default_constructor) {
   EXPECT_EQ(prtrack.get_num_points(), -1);
 }
 
-TEST_F(SciFiStraightPRTrackTest, test_explicit_constructor) {
+TEST_F(SciFiStraightPRTrackTest, test_parameter_constructor) {
   SciFiStraightPRTrack prtrack(0, 3, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0);
   EXPECT_EQ(prtrack.get_x0(), 1.0);
   EXPECT_EQ(prtrack.get_mx(), 2.0);
@@ -76,6 +76,52 @@ TEST_F(SciFiStraightPRTrackTest, test_simpleline_constructor) {
   EXPECT_EQ(prtrack.get_y_chisq(), 6.0);
   EXPECT_EQ(prtrack.get_tracker(), 0);
   EXPECT_EQ(prtrack.get_num_points(), 3);
+}
+
+TEST_F(SciFiStraightPRTrackTest, test_copy_constructor) {
+  SciFiStraightPRTrack trk1(0, 3, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0);
+
+  SciFiSpacePoint spoint;
+  spoint.set_tracker(1);
+  std::vector<SciFiSpacePoint> spoints;
+  spoints.push_back(spoint);
+  trk1.set_spacepoints(spoints);
+
+  SciFiStraightPRTrack trk2(trk1);
+
+  EXPECT_EQ(trk2.get_x0(), 1.0);
+  EXPECT_EQ(trk2.get_mx(), 2.0);
+  EXPECT_EQ(trk2.get_x_chisq(), 3.0);
+  EXPECT_EQ(trk2.get_y0(), 4.0);
+  EXPECT_EQ(trk2.get_my(), 5.0);
+  EXPECT_EQ(trk2.get_y_chisq(), 6.0);
+  EXPECT_EQ(trk2.get_tracker(), 0);
+  EXPECT_EQ(trk2.get_num_points(), 3);
+  EXPECT_EQ(trk2.get_spacepoints()[0].get_tracker(), 1);
+}
+
+TEST_F(SciFiStraightPRTrackTest, test_equality_operator) {
+  SciFiStraightPRTrack trk1(0, 3, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0);
+
+  SciFiSpacePoint spoint;
+  spoint.set_tracker(1);
+  std::vector<SciFiSpacePoint> spoints;
+  spoints.push_back(spoint);
+  trk1.set_spacepoints(spoints);
+
+  SciFiStraightPRTrack trk2;
+
+  trk2 = trk1;
+
+  EXPECT_EQ(trk2.get_x0(), 1.0);
+  EXPECT_EQ(trk2.get_mx(), 2.0);
+  EXPECT_EQ(trk2.get_x_chisq(), 3.0);
+  EXPECT_EQ(trk2.get_y0(), 4.0);
+  EXPECT_EQ(trk2.get_my(), 5.0);
+  EXPECT_EQ(trk2.get_y_chisq(), 6.0);
+  EXPECT_EQ(trk2.get_tracker(), 0);
+  EXPECT_EQ(trk2.get_num_points(), 3);
+  EXPECT_EQ(trk2.get_spacepoints()[0].get_tracker(), 1);
 }
 
 TEST_F(SciFiStraightPRTrackTest, test_setters_getters) {

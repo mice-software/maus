@@ -69,8 +69,8 @@ class SciFiPRTrack {
     double get_R() const { return _R; }
     int get_tracker() const { return _tracker; }
     int get_num_points() const { return _num_points; }
-    int get_chisq() const { return _chisq; }
-    int get_chisq_dof() const { return _chisq_dof; }
+    double get_chisq() const { return _chisq; }
+    double get_chisq_dof() const { return _chisq_dof; }
 
     std::vector<double> get_vsl();
 
@@ -100,7 +100,7 @@ class SciFiPRTrack {
     void set_track_isHelix(bool isHelix) { _isHelix = isHelix; }
 
 
-     void set_tracker(int tracker) { _tracker = tracker; }
+    void set_tracker(int tracker) { _tracker = tracker; }
     // void set_station(double station) { _station = station; }
 
     // Print track parameters
