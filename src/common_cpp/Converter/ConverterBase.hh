@@ -14,96 +14,83 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
+/*!
+ * \file ConverterBase.hh
+ *
+ * \author Alexander Richards, Imperial College London
+ * \date 06/06/2012
+ *
+ * This is the top level abstract base class for all converters.
+ *
+ */
 #ifndef _MAUS_CONVERTER_BASE_H
 #define _MAUS_CONVERTER_BASE_H
 #include <string>
 #include "Converter/IConverter.hh"
-#include "Interface/Squeal.hh"
-#include "Utils/CppErrorHandler.hh"
-#include "API/APIExceptions.hh"
-
 
 namespace MAUS {
 
+  /*!
+   * \class ConverterBase
+   *
+   * \brief Top level abstract base class for all converters
+   *
+   * \author Alexander Richards, Imperial College London
+   * \date 06/06/2012
+   *
+   * Templated base class taking INPUT and OUTPUT types.
+   */
   template <typename INPUT, typename OUTPUT>
   class ConverterBase : public IConverter<INPUT, OUTPUT> {
 
   public:
+    /*!\brief ConstructorBase
+     * \param std::string& The name of the converter.
+     */
     explicit ConverterBase(const std::string&);
+    /*!\brief Copy Constructor
+     * \param ConverterBase& A converter to copy from.
+     */
     ConverterBase(const ConverterBase& cb);
+    // ! Destructor
     virtual ~ConverterBase();
 
   public:
+    /*!\brief Convert data
+     *
+     * Implementation of the interface. Wraps the convert function
+     * \param INPUT* Pointer to the input data
+     * \return output data type OUTPUT*
+     */
     OUTPUT* operator()(const INPUT* ) const;
-//     INPUT*  operator()(const OUTPUT*) const;
+    /*!\brief Convert data
+     *
+     * Implementation of the interface. Wraps the _convert function
+     * \param INPUT* Pointer to the input data
+     * \return output data type OUTPUT*
+     */
     OUTPUT* convert(const INPUT* )    const;
-//     INPUT*  convert   (const OUTPUT*) const;
 
   protected:
+    /*!\var std::string _classname
+     * \brief The name of the derived converter class
+     */
     std::string _classname;
 
   private:
+    /*!\brief Convert data
+     *
+     * Pure virtual private function to be implemented by the
+     * derived converter author to correctly convert the data from
+     * type INPUT* to type OUTPUT*.
+     * \param INPUT* Pointer to the input data
+     * \return output data type OUTPUT*
+     */
     virtual OUTPUT* _convert(const INPUT* ) const = 0;
-//     virtual INPUT*  _convert(const OUTPUT*) const = 0;
   };
 
-  template <typename INPUT, typename OUTPUT>
-  ConverterBase<INPUT, OUTPUT>::ConverterBase(const std::string& name) :
-    IConverter<INPUT, OUTPUT>(), _classname(name) {}
-
-  template <typename INPUT, typename OUTPUT>
-  ConverterBase<INPUT, OUTPUT>::ConverterBase(const ConverterBase& cb) :
-    IConverter<INPUT, OUTPUT>(), _classname(cb._classname) {}
-
-  template <typename INPUT, typename OUTPUT>
-  ConverterBase<INPUT, OUTPUT>::~ConverterBase() {}
-
-  template <typename INPUT, typename OUTPUT>
-  OUTPUT* ConverterBase<INPUT, OUTPUT>::operator()(const INPUT* i) const {
-    return convert(i);
-  }
-
-//   template <typename INPUT, typename OUTPUT>
-//   INPUT* ConverterBase<INPUT, OUTPUT>::operator()(const OUTPUT* o) const {
-//     return convert(o);
-//   }
-
-  template <typename INPUT, typename OUTPUT>
-  OUTPUT* ConverterBase<INPUT, OUTPUT>::convert(const INPUT* i) const {
-    if (!i) { throw NullInputException(_classname); }
-    OUTPUT* o = 0;
-    try {
-      o =  _convert(i);
-    }
-    catch(Squeal& s) {
-      CppErrorHandler::getInstance()->HandleSquealNoJson(s, _classname);
-    }
-    catch(std::exception& e) {
-      CppErrorHandler::getInstance()->HandleStdExcNoJson(e, _classname);
-    }
-    catch(...) {
-      throw UnhandledException(_classname);
-    }
-    return o;
-  }
-
-
-//   template <typename INPUT, typename OUTPUT>
-//   INPUT* ConverterBase<INPUT, OUTPUT>::convert(const OUTPUT* o) const {
-//     if(!o){ throw NullInputException(_classname); }
-//     try {
-//       return _convert(o);
-//     }
-//     catch (Squeal& s) {
-//       CppErrorHandler::getInstance()->HandleSquealNoJson(s, _classname);
-//     }
-//     catch (std::exception& e) {
-//       CppErrorHandler::getInstance()->HandleStdExcNoJson(e, _classname);
-//     }
-//     catch (...){
-//       throw UnhandledException(_classname);
-//     }
-//   }
-
 }// end of namespace
+
+#include "Converter/ConverterBase-inl.hh"
 #endif

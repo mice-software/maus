@@ -14,21 +14,52 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
+/*!
+ * \file IConverter.hh
+ *
+ * \author Alexander Richards, Imperial College London
+ * \date 06/06/2012
+ *
+ * This is the interface class for all converters.
+ *
+ */
 #ifndef _MAUS_ICONVERTER_H
 #define _MAUS_ICONVERTER_H
 
 namespace MAUS {
 
+  /*!
+   * \class IConverter
+   *
+   * \brief Interface class for all converters
+   *
+   * \author Alexander Richards, Imperial College London
+   * \date 06/06/2012
+   */
   template <typename INPUT, typename OUTPUT>
   class IConverter {
   public:
+    // ! Destructor
     virtual ~IConverter() {}
 
   public:
+    /*!\brief Convert data
+     *
+     * Pure virtual function to convert the input data
+     * and return it as type OUTPUT*
+     * \param INPUT* Pointer to the input data
+     * \return output data type OUTPUT*
+     */
     virtual OUTPUT* operator()(const INPUT* ) const = 0;
-//     virtual INPUT*  operator()(const OUTPUT*) const = 0;
+    /*!\brief Convert data
+     *
+     * Pure virtual function to convert the input data
+     * and return it as type OUTPUT*
+     * \param INPUT* Pointer to the input data
+     * \return output data type OUTPUT*
+     */
     virtual OUTPUT* convert(const INPUT* )    const = 0;
-//     virtual INPUT*  convert   (const OUTPUT*) const = 0;
   };
 
 } // end of namespace
