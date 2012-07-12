@@ -89,7 +89,9 @@ class ReduceCppTracker {
 
   // void save_efficiency(Json::Value const &root);
 
-  void compute_stations_efficiencies(Json::Value root);
+  void show_efficiency();
+
+  void compute_stations_efficiencies();
 
   void display_histograms();
 
@@ -111,6 +113,10 @@ class ReduceCppTracker {
   int _map_planes_total[30][214];
 
   int _map_planes_hit[30][214];
+
+  int map_stations_total[2][6];
+
+  int map_stations_hits[2][6];
 
 /*
   TTree _digits;
