@@ -80,7 +80,7 @@ TEST_F(RealDataDigitizationTest, test_bad_channel_load) {
   RealDataDigitization test_case;
   bool bad_channels = test_case.load_bad_channels();
   EXPECT_TRUE(bad_channels);
-  int bad_channel[3] = {0, 1, 17};
+  int bad_channel[3] = {1, 1, 17};
   int good_channel[3]= {1, 2, 3};
   int out_of_range[3]= {16, 4, 128};
   EXPECT_FALSE(test_case.is_good_channel(bad_channel[0], bad_channel[1], bad_channel[2]));
