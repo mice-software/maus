@@ -95,6 +95,7 @@ class SciFiHelicalPRTrack {
     // std::vector<double> r0;
 
     int _tracker;
+    int _num_points;
     // int _station;
     double _x0;
     double _y0;
@@ -105,7 +106,6 @@ class SciFiHelicalPRTrack {
     double _R;
     double _chisq;
     double _chisq_dof;
-    double _num_points;
 };
 // } // ~namespace MAUS
 
