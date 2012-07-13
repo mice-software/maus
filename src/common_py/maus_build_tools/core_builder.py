@@ -70,7 +70,7 @@ def build_lib_maus_cpp(env):
         env.Install("build", maus_cpp_so)
 
 
-def build_cpp_tests(env):
+def build_cpp_tests(env, module_list):
     """
     Build cpp unit tests
 
@@ -89,7 +89,7 @@ def build_cpp_tests(env):
 
     env.Program(target = 'tests/cpp_unit/test_cpp_unit', \
                 source = test_cpp_files, \
-                LIBS= env['LIBS'] + ['recpack'] + ['MausCpp'])
+                LIBS= env['LIBS'] + ['recpack'] + ['MausCpp'] + module_list)
     env.Install('build', ['tests/cpp_unit/test_cpp_unit'])
 
     test_optics_files = glob.glob("tests/integration/test_optics/src/*cc")
