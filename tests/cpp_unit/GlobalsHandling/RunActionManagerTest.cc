@@ -22,17 +22,17 @@
 #include "src/common_cpp/DataStructure/RunHeader.hh"
 #include "src/common_cpp/DataStructure/RunFooter.hh"
 
-#include "src/common_cpp/GlobalsHandling/PerRunDataBase.hh"
-#include "src/common_cpp/GlobalsHandling/PerRunDataManager.hh"
+#include "src/common_cpp/GlobalsHandling/RunActionBase.hh"
+#include "src/common_cpp/GlobalsHandling/RunActionManager.hh"
 
 namespace MAUS {
 
-class DataRunActionTest : public DataRunActionBase {
+class RunActionTest : public RunActionBase {
   public:
-    DataRunActionTest() : _my_run_number(0) {reference_count++;}
-    ~DataRunActionTest() {reference_count--;}
+    RunActionTest() : _my_run_number(0) {reference_count++;}
+    ~RunActionTest() {reference_count--;}
 
-    DataRunActionTest* Clone() {return new DataRunActionTest();};
+    RunActionTest* Clone() {return new RunActionTest();};
 
     void StartOfRun(RunHeader* run_header) {
         _my_run_number = run_header->GetRunNumber();
@@ -46,37 +46,37 @@ class DataRunActionTest : public DataRunActionBase {
   private:
 };
 
-int DataRunActionTest::reference_count = 0;
+int RunActionTest::reference_count = 0;
 
-TEST(DataRunActionManagerTest, TestConstructDestruct) {
-    DataRunActionManager* data_run = new DataRunActionManager();
+TEST(RunActionManagerTest, TestConstructDestruct) {
+    RunActionManager* data_run = new RunActionManager();
     delete data_run;
 }
 
-TEST(DataRunActionManagerTest, TestPushBack) {
-    DataRunActionManager* data_run = new DataRunActionManager();
-    data_run->PushBack(new DataRunActionTest());
-    data_run->PushBack(new DataRunActionTest());
-    data_run->PushBack(new DataRunActionTest());
+TEST(RunActionManagerTest, TestPushBack) {
+    RunActionManager* data_run = new RunActionManager();
+    data_run->PushBack(new RunActionTest());
+    data_run->PushBack(new RunActionTest());
+    data_run->PushBack(new RunActionTest());
     delete data_run;
-    ASSERT_EQ(DataRunActionTest::reference_count, 0);
-    data_run = new DataRunActionManager();
+    ASSERT_EQ(RunActionTest::reference_count, 0);
+    data_run = new RunActionManager();
     EXPECT_THROW(data_run->PushBack(NULL), Squeal);
     delete data_run;
 
-    DataRunActionTest* data_run_action = new DataRunActionTest();
-    data_run = new DataRunActionManager();
+    RunActionTest* data_run_action = new RunActionTest();
+    data_run = new RunActionManager();
     data_run->PushBack(data_run_action);
     EXPECT_THROW(data_run->PushBack(data_run_action), Squeal);
     delete data_run;
 }
 
-TEST(DataRunActionManagerTest, TestStartOfRunAction) {
+TEST(RunActionManagerTest, TestStartOfRunAction) {
     RunHeader header;
     header.SetRunNumber(10);
-    DataRunActionManager* data_run = new DataRunActionManager();
-    DataRunActionTest* run_action_1 = new DataRunActionTest();
-    DataRunActionTest* run_action_2 = new DataRunActionTest();
+    RunActionManager* data_run = new RunActionManager();
+    RunActionTest* run_action_1 = new RunActionTest();
+    RunActionTest* run_action_2 = new RunActionTest();
     // check it's okay if the run_action_list is empty
     data_run->StartOfRun(&header);
     // check that we update run actions
@@ -88,12 +88,12 @@ TEST(DataRunActionManagerTest, TestStartOfRunAction) {
     delete data_run; // clean up
 }
 
-TEST(DataRunActionManagerTest, TestEndOfRunAction) {
+TEST(RunActionManagerTest, TestEndOfRunAction) {
     RunFooter footer;
     footer.SetRunNumber(10);
-    DataRunActionManager* data_run = new DataRunActionManager();
-    DataRunActionTest* run_action_1 = new DataRunActionTest(); 
-    DataRunActionTest* run_action_2 = new DataRunActionTest(); 
+    RunActionManager* data_run = new RunActionManager();
+    RunActionTest* run_action_1 = new RunActionTest(); 
+    RunActionTest* run_action_2 = new RunActionTest(); 
     // check it's okay if the run_action_list is empty
     data_run->EndOfRun(&footer);
     // check that we update run actions
@@ -105,11 +105,11 @@ TEST(DataRunActionManagerTest, TestEndOfRunAction) {
     delete data_run; // clean up
 }
 
-TEST(DataRunActionManagerTest, TestSwap) {
-    DataRunActionManager* data_run = new DataRunActionManager();
-    DataRunActionTest* run_action_1 = new DataRunActionTest();
-    DataRunActionTest* run_action_2 = new DataRunActionTest();
-    DataRunActionTest* run_action_3 = new DataRunActionTest();
+TEST(RunActionManagerTest, TestSwap) {
+    RunActionManager* data_run = new RunActionManager();
+    RunActionTest* run_action_1 = new RunActionTest();
+    RunActionTest* run_action_2 = new RunActionTest();
+    RunActionTest* run_action_3 = new RunActionTest();
     data_run->PushBack(run_action_1);
     RunHeader header;
     header.SetRunNumber(10);
@@ -132,8 +132,8 @@ TEST(DataRunActionManagerTest, TestSwap) {
     delete run_action_1;
 }
 
-TEST(DataRunActionManagerTest, TestReferenceCount) {
-    EXPECT_EQ(DataRunActionTest::reference_count, 0);
+TEST(RunActionManagerTest, TestReferenceCount) {
+    EXPECT_EQ(RunActionTest::reference_count, 0);
 }
 }
 

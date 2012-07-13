@@ -22,63 +22,63 @@
 #include "src/common_cpp/DataStructure/RunHeader.hh"
 #include "src/common_cpp/DataStructure/RunFooter.hh"
 
-#include "src/common_cpp/GlobalsHandling/PerRunDataBase.hh"
-#include "src/common_cpp/GlobalsHandling/PerRunDataManager.hh"
+#include "src/common_cpp/GlobalsHandling/RunActionBase.hh"
+#include "src/common_cpp/GlobalsHandling/RunActionManager.hh"
 
 namespace MAUS {
 
-DataRunActionManager::DataRunActionManager() : _run_actions() {
+RunActionManager::RunActionManager() : _run_actions() {
 }
 
-DataRunActionManager::~DataRunActionManager() {
+RunActionManager::~RunActionManager() {
     for (size_t i = 0; i < _run_actions.size(); ++i) {
         delete _run_actions[i];
     }
 }
 
-void DataRunActionManager::StartOfRun(RunHeader* run_header) {
+void RunActionManager::StartOfRun(RunHeader* run_header) {
     for (size_t i = 0; i < _run_actions.size(); ++i) {
        _run_actions[i]->StartOfRun(run_header);
     }
 }
 
-void DataRunActionManager::EndOfRun(RunFooter* run_footer) {
+void RunActionManager::EndOfRun(RunFooter* run_footer) {
     for (size_t i = 0; i < _run_actions.size(); ++i) {
        _run_actions[i]->EndOfRun(run_footer);
     }
 }
 
-void DataRunActionManager::PushBack(DataRunActionBase* datum) {
+void RunActionManager::PushBack(RunActionBase* datum) {
     if (datum == NULL) {
         throw(Squeal(Squeal::recoverable,
-                     "Trying to append a NULL to the DataRunActionManager",
-                     "DataRunActionManager::PushBack"));
+                     "Trying to append a NULL to the RunActionManager",
+                     "RunActionManager::PushBack"));
     } else if (std::find(_run_actions.begin(), _run_actions.end(), datum) !=
                                                            _run_actions.end()) {
         throw(Squeal(Squeal::recoverable,
-                 "Trying to append same item twice to the DataRunActionManager",
-                 "DataRunActionManager::PushBack"));
+                 "Trying to append same item twice to the RunActionManager",
+                 "RunActionManager::PushBack"));
     } else {
         _run_actions.push_back(datum);
     }
 }
 
-void DataRunActionManager::Swap(DataRunActionBase* current_item,
-                                DataRunActionBase* new_item) {
-    typedef std::vector<DataRunActionBase*>::iterator RunDataIt;
+void RunActionManager::Swap(RunActionBase* current_item,
+                                RunActionBase* new_item) {
+    typedef std::vector<RunActionBase*>::iterator RunDataIt;
     RunDataIt place = std::find
                        (_run_actions.begin(), _run_actions.end(), current_item);
     if (place == _run_actions.end()) {
         throw(Squeal(Squeal::recoverable,
                      "Failed to find item in per run data list",
-                     "DataRunActionManager::Swap"));
+                     "RunActionManager::Swap"));
     }
     RunDataIt check = std::find
                            (_run_actions.begin(), _run_actions.end(), new_item);
     if (check != _run_actions.end()) {
         throw(Squeal(Squeal::recoverable,
                      "New item already in per run data list",
-                     "DataRunActionManager::Swap"));
+                     "RunActionManager::Swap"));
     }
     *place = new_item;
 }

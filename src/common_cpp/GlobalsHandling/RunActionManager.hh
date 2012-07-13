@@ -15,52 +15,52 @@
  *
  */
 
-#ifndef _SRC_COMMON_CPP_GLOBALSHANDLING_PERRUNDATAMANAGER_HH_
-#define _SRC_COMMON_CPP_GLOBALSHANDLING_PERRUNDATAMANAGER_HH_
+#ifndef _SRC_COMMON_CPP_GLOBALSHANDLING_RUNACTIONMANAGER_HH_
+#define _SRC_COMMON_CPP_GLOBALSHANDLING_RUNACTIONMANAGER_HH_
 
 #include <vector>
 
 namespace MAUS {
 
-class DataRunActionBase;
+class RunActionBase;
 class RunHeader;
 class RunFooter;
 
-/** @class DataRunActionManager is responsible for objects that need to be
- *  updated every run.
+/** @class RunActionManager is responsible for objects that need to be
+ *  updated every data run.
  *
- *  DataRunActionManager maintains a list of objects (DataRunActions) that need
- *  to be updated every run (interface class is DataRunActionBase). Get/Set
+ *  RunActionManager maintains a list of objects (RunActions) that need
+ *  to be updated every run (interface class is RunActionBase). Get/Set
  *  methods are provided for some specific items.
  *
- *  DataRunActionManager has two functions - StartOfRun calls each of the
- *  DataRunActionBase StartOfRun methods in turn, while EndOfRun calls
- *  each of the DataRunActionBase EndOfDataRun methods in turn.
+ *  RunActionManager has two functions - StartOfRun calls each of the
+ *  RunActionBase StartOfRun methods in turn, while EndOfRun calls
+ *  each of the RunActionBase EndOfRun methods in turn.
  *
  *  The only communication between worker nodes in MAUS is the Spill, so MAUS
- *  calls EndOfDataRun then StartOfRun when it detects a change in the spill
+ *  calls EndOfRun then StartOfRun when it detects a change in the spill
  *  number. An additional call to EndOfRun is made before exiting.
  */
 
-class DataRunActionManager {
+class RunActionManager {
   public:
     /** Initialises everything to NULL
      */
-    DataRunActionManager();
+    RunActionManager();
 
-    /** Deletes all DataRunActionBase objects in the run_data vector (should be
+    /** Deletes all RunActionBase objects in the run_data vector (should be
      *  everything then)
      */
-    ~DataRunActionManager();
+    ~RunActionManager();
 
-    /** Calls the StartOfRun method on each of the DataRunActions
+    /** Calls the StartOfRun method on each of the RunActions
      *
      *  StartOfRun methods are called in the order items are loaded into the
      *  _run_actions vector.
      */
     void StartOfRun(RunHeader* run_header);
 
-    /** Calls the EndOfRun method on each of the DataRunActions.
+    /** Calls the EndOfRun method on each of the RunActions.
      *
      *  EndOfRun methods are called in the order items are loaded into the
      *  _run_actions vector.
@@ -74,22 +74,22 @@ class DataRunActionManager {
      *  a Squeal.
      *
      *  Memory allocated to current_item is still allocated, but no longer owned
-     *  by DataRunActionManager (i.e. now owned by caller).
+     *  by RunActionManager (i.e. now owned by caller).
      */
-    void Swap(DataRunActionBase* current_item, DataRunActionBase* new_item);
+    void Swap(RunActionBase* current_item, RunActionBase* new_item);
 
-    /** Add item to the PerRunDataManager
+    /** Add item to the RunActionManager
      *
-     *  PerRunDataManager now owns this memory (will clean it on delete). Throw
+     *  RunActionManager now owns this memory (will clean it on delete). Throw
      *  a Squeal if item is already in the run_actions or item is NULL.
      */
-    void PushBack(DataRunActionBase* item);
+    void PushBack(RunActionBase* item);
 
   private:
-    std::vector<DataRunActionBase*> _run_actions;
+    std::vector<RunActionBase*> _run_actions;
 
-    DataRunActionManager(const DataRunActionManager& run);
-    DataRunActionManager& operator=(const DataRunActionManager& run);
+    RunActionManager(const RunActionManager& run);
+    RunActionManager& operator=(const RunActionManager& run);
 };
 }
 

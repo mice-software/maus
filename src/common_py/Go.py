@@ -70,17 +70,18 @@ class Go: # pylint: disable=R0921, R0903
         any other execution problems.
         """
         # Check MAUS_ROOT_DIR.
+        self.json_config_doc = json.dumps({})
         Go.check_maus_root_dir()
 
         # Load the MAUS JSON configuration overriding it with the
         # contents of the given configuration file and command
         # line arguments.
         configuration  = Configuration()
-        json_config_doc = configuration.getConfigJSON(
+        self.json_config_doc = configuration.getConfigJSON(
             config_file, command_line_args)
 
         # Parse the configuration JSON.
-        json_config_dictionary = json.loads(json_config_doc)
+        json_config_dictionary = json.loads(self.json_config_doc)
         # How should we 'drive' the components?
         type_of_dataflow = json_config_dictionary['type_of_dataflow']
         # Grab version
@@ -101,16 +102,16 @@ class Go: # pylint: disable=R0921, R0903
         # Set up the dataflow executor.
         if type_of_dataflow == 'pipeline_single_thread':
             executor = PipelineSingleThreadDataflowExecutor(
-                inputer, transformer, merger, outputer, json_config_doc)
+                inputer, transformer, merger, outputer, self.json_config_doc)
         elif type_of_dataflow == 'multi_process':
             executor = MultiProcessExecutor(
-                inputer, transformer, merger, outputer, json_config_doc)
+                inputer, transformer, merger, outputer, self.json_config_doc)
         elif type_of_dataflow == 'multi_process_input_transform':
             executor = InputTransformExecutor( \
-                inputer, transformer, json_config_doc)
+                inputer, transformer, self.json_config_doc)
         elif type_of_dataflow == 'multi_process_merge_output':
             executor = MergeOutputExecutor( \
-                merger, outputer, json_config_doc)
+                merger, outputer, self.json_config_doc)
         elif type_of_dataflow == 'many_local_threads':
             raise NotImplementedError()
         else:
