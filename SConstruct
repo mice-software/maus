@@ -79,15 +79,15 @@ def build_libraries(maus_root_dir, env):
     maus_build_tools.core_builder.build_data_structure(env)
     # build the maus cpp core library (libMausCpp.so)
     maus_build_tools.core_builder.build_lib_maus_cpp(env)
-    # build the cpp tests (test_cpp_unit)
-    maus_build_tools.core_builder.build_cpp_tests(env)
     # install the python tests (pure python, no build to do)
     maus_build_tools.core_builder.install_python_tests(maus_root_dir, env)
     # build the modules - inputters, mappers, reducers, outputters
-    stuff_to_import = SConsEnvironment.jDev.register_modules()
+    (cpp_libs, python_libs) = SConsEnvironment.jDev.register_modules()
     # build the MAUS python library (MAUS.py)
     maus_build_tools.module_builder.build_maus_lib \
-                           ('%s/build/MAUS.py' % maus_root_dir, stuff_to_import)
+                      ('%s/build/MAUS.py' % maus_root_dir, cpp_libs+python_libs)
+    # build the cpp tests (test_cpp_unit)
+    maus_build_tools.core_builder.build_cpp_tests(env, cpp_libs)
 
 def main():
     """
