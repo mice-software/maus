@@ -16,8 +16,8 @@ from DecoratorUtils import smartDecorator
 
 
 class ConstMethodAttrModError(Exception):
-    def __init__(self,*args):
-        super(ConstMethodAttrModError,self).__init__(*args)
+    def __init__(self, *args):
+        super(ConstMethodAttrModError, self).__init__(*args)
 
 ## works for both old and new style python classes
 @smartDecorator
@@ -26,7 +26,7 @@ def const(fn):
     Constness decorator
     
     Decorator to force class methods to obey const-like
-    behaviour.
+    behaviour. Warning, this is not thread safe.
 
     @param fn the function to be wrapped
     """
@@ -77,7 +77,7 @@ if __name__ == '__main__':
         
         @const
         def b(self):
-            self.b=98
+            self.b = 98
             
         @const
         def c(self):
@@ -91,7 +91,7 @@ if __name__ == '__main__':
         
         @const
         def b(self):
-            self.b=98
+            self.b = 98
             
         @const
         def c(self):
