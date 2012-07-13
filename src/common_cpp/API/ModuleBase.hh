@@ -24,10 +24,10 @@
  * This is the top level abstract base class for all modules.
  *
  */
-#ifndef _MAUS_API_MODULE_BASE_H
-#define _MAUS_API_MODULE_BASE_H
+#ifndef _SRC_COMMON_CPP_API_MODULEBASE_
+#define _SRC_COMMON_CPP_API_MODULEBASE_
 #include <string>
-#include "API/IModule.hh"
+#include "src/common_cpp/API/IModule.hh"
 
 namespace MAUS {
 

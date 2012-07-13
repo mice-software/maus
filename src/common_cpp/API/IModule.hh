@@ -24,8 +24,8 @@
  * This is the top level interface for all modules.
  *
  */
-#ifndef _MAUS_API_IMODULE_H
-#define _MAUS_API_IMODULE_H
+#ifndef _SRC_COMMON_CPP_API_IMODULE_
+#define _SRC_COMMON_CPP_API_IMODULE_
 #include <string>
 
 namespace MAUS {

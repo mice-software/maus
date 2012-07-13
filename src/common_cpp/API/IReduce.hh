@@ -24,9 +24,9 @@
  * This is the interface class for all reducers.
  *
  */
-#ifndef _MAUS_API_IREDUCE_H
-#define _MAUS_API_IREDUCE_H
-#include "API/IModule.hh"
+#ifndef _SRC_COMMON_CPP_API_IREDUCE_
+#define _SRC_COMMON_CPP_API_IREDUCE_
+#include "src/common_cpp/API/IModule.hh"
 
 namespace MAUS {
 

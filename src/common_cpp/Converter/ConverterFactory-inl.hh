@@ -14,16 +14,12 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#ifndef _MAUS_CONVERTER_FACTORY_INL_H
-#define _MAUS_CONVERTER_FACTORY_INL_H
-#include <iostream>
-#include "Converter/IConverter.hh"
-#include "Converter/ConverterExceptions.hh"
-#include "API/APIExceptions.hh"
-#include "Interface/Squeal.hh"
-#include "Utils/CppErrorHandler.hh"
-#include "Converter/DataConverters/JsonCppConverter.hh"
-#include "Converter/DataConverters/CppJsonConverter.hh"
+#ifndef _SRC_COMMON_CPP_CONVERTER_CONVERTERFACTORY_INL_
+#define _SRC_COMMON_CPP_CONVERTER_CONVERTERFACTORY_INL_
+#include "src/legacy/Interface/Squeal.hh"
+#include "src/common_cpp/Utils/CppErrorHandler.hh"
+#include "src/common_cpp/Converter/DataConverters/JsonCppConverter.hh"
+#include "src/common_cpp/Converter/DataConverters/CppJsonConverter.hh"
 
 namespace Json {
   class Value;
@@ -82,7 +78,7 @@ namespace MAUS {
   IConverter<INPUT, OUTPUT>* ConverterFactory::getConverter() const
     throw(ConverterNotFoundException) {
 
-    throw ConverterNotFoundException();
+    throw ConverterNotFoundException("ConverterFactory");
   }
   template <>
   IConverter<Json::Value, Spill>* ConverterFactory::getConverter<Json::Value, Spill>() const

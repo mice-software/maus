@@ -14,62 +14,52 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#ifndef _MAUS_API_EXCEPTIONS
-#define _MAUS_API_EXCEPTIONS
-#include <exception>
+#ifndef _SRC_COMMON_CPP_API_APIEXCEPTIONS_
+#define _SRC_COMMON_CPP_API_APIEXCEPTIONS_
 #include <string>
 #include "gtest/gtest_prod.h"
+#include "src/common_cpp/API/MAUSExceptionBase.hh"
 
 namespace MAUS {
 
-  class NullInputException: public std::exception {
+  class NullInputException: public MAUSExceptionBase {
 
   public:
     explicit NullInputException(const std::string& classname) :
-      std::exception(), _classname(classname) {}
+      MAUSExceptionBase(classname) {}
 
     virtual ~NullInputException() throw() {}
 
-  public:
-    virtual const char* what() const throw() {
+  private:
+    virtual const char* _what() const throw() {
       std::string* ret = new std::string();
       *ret += "The input to '";
       *ret += _classname;
       *ret += "' was a null pointer";
       return ret->c_str();
     }
-
-  protected:
-    std::string _classname;
-
-  private:
     FRIEND_TEST(APIExceptionsTest, TestNullInputExceptionConstructor);
-    FRIEND_TEST(APIExceptionsTest, TestNullInputExceptionWhat);
+    FRIEND_TEST(APIExceptionsTest, TestNullInputException_What);
   };
 
-  class UnhandledException: public std::exception {
+  class UnhandledException: public MAUSExceptionBase {
 
   public:
     explicit UnhandledException(const std::string& classname) :
-      std::exception(), _classname(classname) {}
+      MAUSExceptionBase(classname) {}
 
     virtual ~UnhandledException() throw() {}
 
-  public:
-    virtual const char* what() const throw() {
+  private:
+    virtual const char* _what() const throw() {
       std::string* ret = new std::string();
       *ret +="An unhandled exception was thrown by '";
       *ret += _classname;
       *ret += "' which was not of type 'Squeal' or deriving from 'std::exception'";
       return ret->c_str();
     }
-
-  protected:
-    std::string _classname;
-
-  private:
     FRIEND_TEST(APIExceptionsTest, TestUnhandledExceptionConstructor);
-    FRIEND_TEST(APIExceptionsTest, TestUnhandledExceptionWhat);
+    FRIEND_TEST(APIExceptionsTest, TestUnhandledException_What);
   };
 
 }// end of namespace

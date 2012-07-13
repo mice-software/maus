@@ -24,11 +24,11 @@
  * This is the abstract base class for all inputters.
  *
  */
-#ifndef _MAUS_API_INPUT_BASE_H
-#define _MAUS_API_INPUT_BASE_H
+#ifndef _SRC_COMMON_CPP_API_INPUTBASE_
+#define _SRC_COMMON_CPP_API_INPUTBASE_
 #include <string>
-#include "API/IInput.hh"
-#include "API/ModuleBase.hh"
+#include "src/common_cpp/API/IInput.hh"
+#include "src/common_cpp/API/ModuleBase.hh"
 
 namespace MAUS {
 
@@ -76,6 +76,6 @@ namespace MAUS {
 
 }// end of namespace
 
-#include "API/InputBase-inl.hh"
+#include "src/common_cpp/API/InputBase-inl.hh"
 #endif
 

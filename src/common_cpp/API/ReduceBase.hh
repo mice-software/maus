@@ -24,11 +24,11 @@
  * This is the abstract base class for all reducers.
  *
  */
-#ifndef _MAUS_API_REDUCE_BASE_H
-#define _MAUS_API_REDUCE_BASE_H
+#ifndef _SRC_COMMON_CPP_API_REDUCEBASE_
+#define _SRC_COMMON_CPP_API_REDUCEBASE_
 #include <string>
-#include "API/IReduce.hh"
-#include "API/ModuleBase.hh"
+#include "src/common_cpp/API/IReduce.hh"
+#include "src/common_cpp/API/ModuleBase.hh"
 
 namespace MAUS {
 
@@ -79,6 +79,6 @@ namespace MAUS {
 
 }// end of namespace
 
-#include "API/ReduceBase-inl.hh"
+#include "src/common_cpp/API/ReduceBase-inl.hh"
 #endif
 

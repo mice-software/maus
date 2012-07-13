@@ -14,28 +14,40 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#ifndef _SRC_COMMON_CPP_CONVERTER_CONVERTEREXCEPTIONS_
-#define _SRC_COMMON_CPP_CONVERTER_CONVERTEREXCEPTIONS_
-
+#ifndef _SRC_COMMON_CPP_API_MAUSEXCEPTIONBASE_
+#define _SRC_COMMON_CPP_API_MAUSEXCEPTIONBASE_
+#include <exception>
 #include <string>
 #include "gtest/gtest_prod.h"
-#include "API/MAUSExceptionBase.hh"
 
 namespace MAUS {
 
-  class ConverterNotFoundException: public MAUSExceptionBase {
-  public:
-    explicit ConverterNotFoundException(const std::string& classname) :
-      MAUSExceptionBase(classname) {}
+  class MAUSExceptionBase: public std::exception {
 
-    virtual ~ConverterNotFoundException() throw() {}
+  public:
+    explicit MAUSExceptionBase(const std::string& classname) :
+      std::exception(), _classname(classname) {}
+    virtual ~MAUSExceptionBase() throw() {}
+
+  public:
+    const char* what() const throw() {
+      return _what();
+    }
+
+  protected:
+    std::string _classname;
 
   private:
     virtual const char* _what() const throw() {
-      return "The required converter was not found";
+      std::string* ret = new std::string();
+      *ret += "A MAUSException was thrown by '";
+      *ret += _classname;
+      *ret += "'";
+      return ret->c_str();
     }
-    FRIEND_TEST(ConverterExceptionsTest, TestConverterNotFoundExceptionConstructor);
-    FRIEND_TEST(ConverterExceptionsTest, TestConverterNotFoundException_What);
+    FRIEND_TEST(MAUSExceptionBaseTest, TestMausExceptionBaseConstructor);
+    FRIEND_TEST(MAUSExceptionBaseTest, TestMausExceptionBase_What);
+    FRIEND_TEST(MAUSExceptionBaseTest, TestMausExceptionBaseWhat);
   };
 
 }// end of namespace

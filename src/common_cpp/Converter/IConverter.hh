@@ -24,8 +24,8 @@
  * This is the interface class for all converters.
  *
  */
-#ifndef _MAUS_ICONVERTER_H
-#define _MAUS_ICONVERTER_H
+#ifndef _SRC_COMMON_CPP_CONVERTER_ICONVERTER_
+#define _SRC_COMMON_CPP_CONVERTER_ICONVERTER_
 
 namespace MAUS {
 

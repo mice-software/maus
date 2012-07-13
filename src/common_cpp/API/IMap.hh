@@ -24,9 +24,9 @@
  * This is the interface class for all maps.
  *
  */
-#ifndef _MAUS_API_IMAP_H
-#define _MAUS_API_IMAP_H
-#include "API/IModule.hh"
+#ifndef _SRC_COMMON_CPP_API_IMAP_
+#define _SRC_COMMON_CPP_API_IMAP_
+#include "src/common_cpp/API/IModule.hh"
 
 namespace MAUS {
 

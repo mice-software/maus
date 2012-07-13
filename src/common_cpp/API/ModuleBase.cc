@@ -14,10 +14,10 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#include "API/ModuleBase.hh"
-#include "API/APIExceptions.hh"
-#include "Interface/Squeal.hh"
-#include "Utils/CppErrorHandler.hh"
+#include "src/common_cpp/API/ModuleBase.hh"
+#include "src/common_cpp/API/APIExceptions.hh"
+#include "src/legacy/Interface/Squeal.hh"
+#include "src/common_cpp/Utils/CppErrorHandler.hh"
 
 namespace MAUS {
 

@@ -14,8 +14,9 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#ifndef _MAUS_CONVERTER_BASE_INL_H
-#define _MAUS_CONVERTER_BASE_INL_H
+#ifndef _SRC_COMMON_CPP_CONVERTER_CONVERTERBASE_INL_
+#define _SRC_COMMON_CPP_CONVERTER_CONVERTERBASE_INL_
+#include <string>
 #include "Interface/Squeal.hh"
 #include "Utils/CppErrorHandler.hh"
 #include "API/APIExceptions.hh"

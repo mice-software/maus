@@ -24,11 +24,11 @@
  * This is the abstract base class for all outputters.
  *
  */
-#ifndef _MAUS_API_OUTPUT_BASE_H
-#define _MAUS_API_OUTPUT_BASE_H
+#ifndef _SRC_COMMON_CPP_API_OUTPUTBASE_
+#define _SRC_COMMON_CPP_API_OUTPUTBASE_
 #include <string>
-#include "API/IOutput.hh"
-#include "API/ModuleBase.hh"
+#include "src/common_cpp/API/IOutput.hh"
+#include "src/common_cpp/API/ModuleBase.hh"
 
 namespace MAUS {
 
@@ -78,5 +78,5 @@ namespace MAUS {
 
 }// end of namespace
 
-#include "API/OutputBase-inl.hh"
+#include "src/common_cpp/API/OutputBase-inl.hh"
 #endif

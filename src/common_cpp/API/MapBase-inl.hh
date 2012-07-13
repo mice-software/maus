@@ -14,13 +14,14 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#ifndef _MAUS_API_MAP_BASE_INL_H
-#define _MAUS_API_MAP_BASE_INL_H
+#ifndef _SRC_COMMON_CPP_API_MAPBASE_INL_
+#define _SRC_COMMON_CPP_API_MAPBASE_INL_
 
-#include "API/APIExceptions.hh"
-#include "Interface/Squeal.hh"
-#include "Utils/CppErrorHandler.hh"
-#include "Converter/ConverterFactory.hh"
+#include <string>
+#include "src/common_cpp/API/APIExceptions.hh"
+#include "src/legacy/Interface/Squeal.hh"
+#include "src/common_cpp/Utils/CppErrorHandler.hh"
+#include "src/common_cpp/Converter/ConverterFactory.hh"
 
 namespace MAUS {
 

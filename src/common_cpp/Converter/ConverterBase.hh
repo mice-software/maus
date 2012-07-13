@@ -24,10 +24,10 @@
  * This is the top level abstract base class for all converters.
  *
  */
-#ifndef _MAUS_CONVERTER_BASE_H
-#define _MAUS_CONVERTER_BASE_H
+#ifndef _SRC_COMMON_CPP_CONVERTER_CONVERTERBASE_
+#define _SRC_COMMON_CPP_CONVERTER_CONVERTERBASE_
 #include <string>
-#include "Converter/IConverter.hh"
+#include "src/common_cpp/Converter/IConverter.hh"
 
 namespace MAUS {
 
@@ -92,5 +92,5 @@ namespace MAUS {
 
 }// end of namespace
 
-#include "Converter/ConverterBase-inl.hh"
+#include "src/common_cpp/Converter/ConverterBase-inl.hh"
 #endif

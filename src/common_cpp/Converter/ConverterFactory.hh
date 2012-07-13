@@ -14,19 +14,43 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#ifndef _MAUS_CONVERTER_FACTORY_H
-#define _MAUS_CONVERTER_FACTORY_H
+
+/*!
+ * \file ConverterFactory.hh
+ *
+ * \author Alexander Richards, Imperial College London
+ * \date 06/06/2012
+ *
+ * This class is responsible for managing the converters and retrieving
+ * the correct converter for the INPUT/OUTPUT types in question. It can
+ * be used to generically convert from one type to another without 
+ * knowledge of the correct conversion object required for the specific
+ * data types.
+ *
+ */
+#ifndef _SRC_COMMON_CPP_CONVERTER_CONVERTERFACTORY_
+#define _SRC_COMMON_CPP_CONVERTER_CONVERTERFACTORY_
 #include <iostream>
-#include "Converter/IConverter.hh"
-#include "Converter/ConverterExceptions.hh"
-#include "API/APIExceptions.hh"
-#include "Interface/Squeal.hh"
-#include "Utils/CppErrorHandler.hh"
-#include "Converter/DataConverters/JsonCppConverter.hh"
-#include "Converter/DataConverters/CppJsonConverter.hh"
+#include "src/common_cpp/Converter/IConverter.hh"
+#include "src/common_cpp/Converter/ConverterExceptions.hh"
+#include "src/common_cpp/API/APIExceptions.hh"
 
 namespace MAUS {
 
+  /*!
+   * \class ConverterFactory
+   *
+   * \brief Factory class for converter objects
+   *
+   * \author Alexander Richards, Imperial College London
+   * \date 06/06/2012
+   *
+   * This class is responsible for managing the converters and retrieving
+   * the correct converter for the INPUT/OUTPUT types in question. It can
+   * be used to generically convert from one type to another without 
+   * knowledge of the correct conversion object required for the specific
+   * data types.
+   */
   class ConverterFactory {
   public:
     template <typename INPUT, typename OUTPUT>
@@ -38,5 +62,5 @@ namespace MAUS {
 
 } // end of namespace
 
-#include "Converter/ConverterFactory-inl.hh"
+#include "src/common_cpp/Converter/ConverterFactory-inl.hh"
 #endif

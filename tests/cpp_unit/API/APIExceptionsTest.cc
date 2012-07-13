@@ -16,12 +16,11 @@
  */
 #include <cstring>
 #include "gtest/gtest.h"
-
 #include "API/APIExceptions.hh"
 
 namespace MAUS {
 
-  TEST(APIExceptionsTest, TestNullInputExceptionConstructor ) {
+  TEST(APIExceptionsTest, TestNullInputExceptionConstructor) {
     NullInputException npe("MyClass");
 
     ASSERT_FALSE(strcmp("MyClass", npe._classname.c_str()))
@@ -30,19 +29,17 @@ namespace MAUS {
   }
 
 
-  TEST(APIExceptionsTest, TestNullInputExceptionWhat ) {
+  TEST(APIExceptionsTest, TestNullInputException_What) {
     NullInputException npe("MyClass");
 
-    std::string ret = "The input to '";
-    ret            += npe._classname;
-    ret            += "' was a null pointer";
+    std::string ret = "The input to 'MyClass' was a null pointer";
 
-    ASSERT_FALSE(strcmp(ret.c_str(), npe.what()))
-      << "Fail: What() failed, didn't return the expected string"
+    ASSERT_FALSE(strcmp(ret.c_str(), npe._what()))
+      << "Fail: _what() failed, didn't return the expected string"
       << std::endl;
   }
 
-  TEST(APIExceptionsTest, TestUnhandledExceptionConstructor ) {
+  TEST(APIExceptionsTest, TestUnhandledExceptionConstructor) {
     UnhandledException ue("MyClass");
 
     ASSERT_FALSE(strcmp("MyClass", ue._classname.c_str()))
@@ -51,15 +48,14 @@ namespace MAUS {
   }
 
 
-  TEST(APIExceptionsTest, TestUnhandledExceptionWhat ) {
+  TEST(APIExceptionsTest, TestUnhandledException_What) {
     UnhandledException ue("MyClass");
 
-    std::string ret = "An unhandled exception was thrown by '";
-    ret            += ue._classname;
-    ret            += "' which was not of type 'Squeal' or deriving from 'std::exception'";
+    std::string ret = "An unhandled exception was thrown by 'MyClass'"\
+      " which was not of type 'Squeal' or deriving from 'std::exception'";
 
-    ASSERT_FALSE(strcmp(ret.c_str(), ue.what()))
-      << "Fail: What() failed, didn't return the expected string"
+    ASSERT_FALSE(strcmp(ret.c_str(), ue._what()))
+      << "Fail: _what() failed, didn't return the expected string"
       << std::endl;
   }
 

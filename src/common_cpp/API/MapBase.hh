@@ -24,12 +24,12 @@
  * This is the abstract base class for all mappers.
  *
  */
-#ifndef _MAUS_API_MAP_BASE_H
-#define _MAUS_API_MAP_BASE_H
+#ifndef _SRC_COMMON_CPP_API_MAPBASE_
+#define _SRC_COMMON_CPP_API_MAPBASE_
 #include <string>
-#include "API/IMap.hh"
-#include "API/ModuleBase.hh"
 #include "json/json.h"
+#include "src/common_cpp/API/IMap.hh"
+#include "src/common_cpp/API/ModuleBase.hh"
 
 namespace MAUS {
 
@@ -107,6 +107,6 @@ namespace MAUS {
 
 }// end of namespace
 
-#include "API/MapBase-inl.hh"
+#include "src/common_cpp/API/MapBase-inl.hh"
 #endif
 

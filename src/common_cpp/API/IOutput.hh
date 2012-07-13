@@ -24,9 +24,9 @@
  * This is the interface class for all outputters.
  *
  */
-#ifndef _MAUS_API_IOUTPUT_H
-#define _MAUS_API_IOUTPUT_H
-#include "API/IModule.hh"
+#ifndef _SRC_COMMON_CPP_API_IOUTPUT_
+#define _SRC_COMMON_CPP_API_IOUTPUT_
+#include "src/common_cpp/API/IModule.hh"
 
 namespace MAUS {
 
