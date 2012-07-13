@@ -16,9 +16,7 @@
  */
 #include <cstring>
 #include "gtest/gtest.h"
-
-#include "API/MAUSExceptionBase.hh"
-
+#include "src/common_cpp/API/MAUSExceptionBase.hh"
 
 namespace MAUS {
 

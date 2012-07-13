@@ -16,7 +16,7 @@
  */
 #include "gtest/gtest.h"
 #include "gtest/gtest_prod.h"
-#include "API/ReduceBase.hh"
+#include "src/common_cpp/API/ReduceBase.hh"
 
 namespace MAUS {
 

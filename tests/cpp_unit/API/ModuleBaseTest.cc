@@ -18,9 +18,9 @@
 #include "gtest/gtest.h"
 #include "gtest/gtest_prod.h"
 
-#include "API/APIExceptions.hh"
-#include "API/ModuleBase.hh"
-#include "Interface/Squeal.hh"
+#include "src/common_cpp/API/APIExceptions.hh"
+#include "src/common_cpp/API/ModuleBase.hh"
+#include "src/legacy/Interface/Squeal.hh"
 
 namespace MAUS {
 

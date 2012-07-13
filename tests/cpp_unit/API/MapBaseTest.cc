@@ -15,11 +15,11 @@
  *
  */
 #include <fstream>
+#include "json/json.h"
 #include "gtest/gtest.h"
 #include "gtest/gtest_prod.h"
-#include "API/MapBase.hh"
-#include "DataStructure/Spill.hh"
-#include "json/json.h"
+#include "src/common_cpp/API/MapBase.hh"
+#include "src/common_cpp/DataStructure/Spill.hh"
 // #include "Interface/Squeal.hh"
 // #include "API/APIExceptions.hh"
 

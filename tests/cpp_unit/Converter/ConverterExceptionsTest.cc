@@ -16,7 +16,7 @@
  */
 #include <cstring>
 #include "gtest/gtest.h"
-#include "Converter/ConverterExceptions.hh"
+#include "src/common_cpp/Converter/ConverterExceptions.hh"
 
 namespace MAUS {
 
@@ -26,10 +26,9 @@ namespace MAUS {
     ASSERT_FALSE(strcmp("MyClass", cnfe._classname.c_str()))
       << "Fail: Constructor failed, Classname not set properly"
       << std::endl;
-    
   }
-  
-  TEST(ConverterExceptionsTest, TestConverterNotFoundException_What){
+
+  TEST(ConverterExceptionsTest, TestConverterNotFoundException_What) {
     ConverterNotFoundException cnfe("MyClass");
 
     std::string ret = "The required converter was not found";
@@ -37,6 +36,5 @@ namespace MAUS {
     ASSERT_FALSE(strcmp(ret.c_str(), cnfe._what()))
       << "Fail: _what() failed, didn't return the expected string"
       << std::endl;
-    
   }
 }// end of namespace

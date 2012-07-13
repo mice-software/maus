@@ -16,7 +16,7 @@
  */
 #include <cstring>
 #include "gtest/gtest.h"
-#include "API/APIExceptions.hh"
+#include "src/common_cpp/API/APIExceptions.hh"
 
 namespace MAUS {
 

@@ -16,7 +16,7 @@
  */
 #include "gtest/gtest.h"
 #include "gtest/gtest_prod.h"
-#include "API/InputBase.hh"
+#include "src/common_cpp/API/InputBase.hh"
 
 namespace MAUS {
 
