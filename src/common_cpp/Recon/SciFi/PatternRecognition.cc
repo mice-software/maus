@@ -793,7 +793,8 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
                       bool good_helix = full_helix_fit(good_spnts, circle, line_sz, helix);
 
                       if ( debug > 1 ) {
-                        std::ofstream out_helix("helix_red_chisq.txt", std::ios::out | std::ios::app);
+                        std::ofstream out_helix("helix_red_chisq.txt",
+                                                std::ios::out | std::ios::app);
                         out_helix << helix.get_chisq() / (num_points - 2) <<"\t";
                         out_helix << good_spnts[0]->get_tracker()<< std::endl;
 
@@ -811,8 +812,9 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
                         SciFiHelicalPRTrack track(-1, num_points, pos_0, helix);
 
                         if ( debug > 1 ) {
-                          std::ofstream outblank("sp_per_track.txt", std::ios::out | std::ios::app);
-                          outblank << num_points << "\t" << good_spnts[0]->get_tracker() << std::endl;
+                          std::ofstream outblank("sp_per_track.txt",
+                                                 std::ios::out | std::ios::app);
+                          outblank << num_points << "\t" << good_spnts[0]->get_tracker() << "\n";
                         }
 
                         // Set all the good sp to used and convert pointers to variables
@@ -823,7 +825,7 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
                           good_spnts[i]->set_used(true);
                           good_spnts_variables[i] = *good_spnts[i];
                         }
-                        // Populate the sp of the track and then push the track back into trks vector
+                        // Populate the sp of the track and then push the trk back into trks vect
                         track.set_spacepoints(good_spnts_variables);
                         htrks.push_back(track);
                       } else { // Debugging **************
