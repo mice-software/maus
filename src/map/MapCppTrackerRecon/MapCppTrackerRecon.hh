@@ -108,6 +108,10 @@ class MapCppTrackerRecon {
 
   std::string JsonToString(Json::Value json_in);
 
+  void perform_alignment_study(SciFiEvent &evt);
+
+  void fit(std::vector<SciFiSpacePoint*> spacepoints, double &x_const, double &x_slope, double &y_const, double &y_slope);
+
  private:
   /// This should be the classname
   std::string _classname;

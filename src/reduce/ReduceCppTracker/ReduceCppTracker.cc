@@ -147,7 +147,7 @@ std::string  ReduceCppTracker::process(std::string document) {
         spacepoints_tree();
         // _spacepoints.Reset();
         // draw_spacepoints(root);
-
+        // perform_alignment_study();
         compute_stations_efficiencies();
         show_efficiency();
         json_daq.clear();

@@ -17,6 +17,14 @@
 
 #include "src/map/MapCppTrackerRecon/MapCppTrackerRecon.hh"
 
+#include "Riostream.h"
+#include "TMatrixD.h"
+#include "TVectorD.h"
+#include "TGraphErrors.h"
+#include "TDecompChol.h"
+#include "TDecompSVD.h"
+#include "TF1.h"
+
 bool MapCppTrackerRecon::birth(std::string argJsonConfigDocument) {
   _classname = "MapCppTrackerRecon";
 
@@ -52,6 +60,17 @@ bool MapCppTrackerRecon::death() {
   return true;
 }
 
+bool sort_by_station(SciFiSpacePoint *a, SciFiSpacePoint *b ) {
+  // int tracker = a->get_tracker();
+  // if ( tracker == 0 ) {
+  //  Descending site number.
+  // return ( a->get_station() > b->get_station() );
+  // } else if ( tracker == 1 ) {
+  //  Ascending site number.
+  return ( a->get_station() < b->get_station() );
+  // }
+}
+
 std::string MapCppTrackerRecon::process(std::string document) {
   // Writes a line in the JSON document.
   Json::FastWriter writer;
@@ -81,15 +100,22 @@ std::string MapCppTrackerRecon::process(std::string document) {
         spacepoint_recon(event);
       }
       // Pattern Recognition.
-      if ( event.spacepoints().size() ) {
+      /*if ( event.spacepoints().size() ) {
         std::cout << "Calling Pattern Recognition..." << std::endl;
         pattern_recognition(event);
         std::cout << "Pattern Recognition complete." << std::endl;
       }
       // Kalman Track Fit.
-      // if ( event.straightprtracks().size() ) {
-      // track_fit(event);
-      // }
+      if ( event.straightprtracks().size() ) {
+        track_fit(event);
+      }
+      */
+      // Perform alignment study.
+      if ( event.spacepoints().size() == 5 ) {
+        perform_alignment_study(event);
+      }
+
+
       // if ( root.isMember("mc_events") ) {
       //   make_seed_and_fit(event);
       // }
@@ -106,6 +132,105 @@ std::string MapCppTrackerRecon::process(std::string document) {
     return writer.write(root);
   }
   return writer.write(root);
+}
+
+void MapCppTrackerRecon::perform_alignment_study(SciFiEvent &evt) {
+  std::vector<SciFiSpacePoint*> spacepoints = evt.spacepoints();
+  int numb_spacepoints = spacepoints.size();
+  std::sort(spacepoints.begin(), spacepoints.end(), sort_by_station);
+  int tracker = spacepoints[0]->get_tracker();
+  for ( int i = 0; i < 5; ++i ) {
+    if ( spacepoints[i]->get_tracker() != tracker ) return;
+    if ( spacepoints[i]->get_station() != i+1 ) return;
+  }
+
+  double x_const, x_slope, y_const, y_slope;
+  fit(spacepoints, x_const, x_slope, y_const, y_slope);
+
+  // Values of full fit.
+  double full_x_st2 = x_const + x_slope*spacepoints[1]->get_position().z();
+  double full_x_st3 = x_const + x_slope*spacepoints[2]->get_position().z();
+  double full_x_st4 = x_const + x_slope*spacepoints[3]->get_position().z();
+  double full_y_st2 = y_const + y_slope*spacepoints[1]->get_position().z();
+  double full_y_st3 = y_const + y_slope*spacepoints[2]->get_position().z();
+  double full_y_st4 = y_const + y_slope*spacepoints[3]->get_position().z();
+
+  // -- Exclude station 2 from the fit.---------------------
+  std::vector<SciFiSpacePoint*> sp_copy_2 = spacepoints;
+  sp_copy_2.erase(sp_copy_2.begin()+1);
+  double x_const_2, x_slope_2, y_const_2, y_slope_2;
+  fit(sp_copy_2, x_const_2, x_slope_2, y_const_2, y_slope_2);
+  double excluded_x_st2 = x_const_2 + x_slope_2*spacepoints[1]->get_position().z();
+  double excluded_y_st2 = y_const_2 + y_slope_2*spacepoints[1]->get_position().z();
+
+  // -------------------------------------------------------------
+  // -- Exclude station 3 from the fit.---------------------
+  std::vector<SciFiSpacePoint*> sp_copy_3 = spacepoints;
+  sp_copy_3.erase(sp_copy_3.begin()+2);
+  double x_const_3, x_slope_3, y_const_3, y_slope_3;
+  fit(sp_copy_3, x_const_3, x_slope_3, y_const_3, y_slope_3);
+  double excluded_x_st3 = x_const_3 + x_slope_3*spacepoints[2]->get_position().z();
+  double excluded_y_st3 = y_const_3 + y_slope_3*spacepoints[2]->get_position().z();
+
+  // -------------------------------------------------------------
+  // -- Exclude station 4 from the fit.---------------------
+  // -------------------------------------------------------------
+  std::vector<SciFiSpacePoint*> sp_copy_4 = spacepoints;
+  sp_copy_4.erase(sp_copy_4.begin()+3);
+  double x_const_4, x_slope_4, y_const_4, y_slope_4;
+  fit(sp_copy_4, x_const_4, x_slope_4, y_const_4, y_slope_4);
+  double excluded_x_st4 = x_const_4 + x_slope_4*spacepoints[3]->get_position().z();
+  double excluded_y_st4 = y_const_4 + y_slope_4*spacepoints[3]->get_position().z();
+
+  std::ofstream out("align.txt", std::ios::out | std::ios::app);
+  out << tracker << " " << full_x_st2 << " " << excluded_x_st2 << " "
+      << full_x_st3 << " " << excluded_x_st3 << " "
+      << full_x_st4 << " " << excluded_x_st4 << " "
+      << full_y_st2 << " " << excluded_y_st2 << " "
+      << full_y_st3 << " " << excluded_y_st3 << " "
+      << full_y_st4 << " " << excluded_y_st4 << std::endl;
+  out.close();
+}
+
+void MapCppTrackerRecon::fit(std::vector<SciFiSpacePoint*> spacepoints, double &x_const, double &x_slope, double &y_const, double &y_slope) {
+#ifdef __CINT__
+  gSystem->Load("libMatrix");
+#endif
+  const Int_t nrVar  = 2;
+  // const Int_t nrPnts = 5;
+  int nrPnts = spacepoints.size();
+  double az[nrPnts];
+  double ax[nrPnts];
+  double ay[nrPnts];
+  double ae[nrPnts];
+  for ( int i = 0; i < nrPnts; ++i ) {
+    az[i] = spacepoints[i]->get_position().z();
+    ax[i] = spacepoints[i]->get_position().x();
+    ay[i] = spacepoints[i]->get_position().y();
+    ae[i] = 0.9;
+  }
+
+  TVectorD z; z.Use(nrPnts,az);
+  TVectorD x; x.Use(nrPnts,ax);
+  TVectorD y; y.Use(nrPnts,ay);
+  TVectorD e; e.Use(nrPnts,ae);
+
+  TMatrixD A(nrPnts,nrVar);
+  TMatrixDColumn(A,0) = 1.0;
+  TMatrixDColumn(A,1) = z;
+  TMatrixD B(nrPnts,nrVar);
+  TMatrixDColumn(B,0) = 1.0;
+  TMatrixDColumn(B,1) = y;
+
+  const TVectorD solve_x = NormalEqn(A,x,e);
+  solve_x.Print();
+  x_const = solve_x(0);
+  x_slope = solve_x(1);
+
+  const TVectorD solve_y = NormalEqn(A,y,e);
+  solve_y.Print();
+  y_const = solve_y(0);
+  y_slope = solve_y(1);
 }
 
 void MapCppTrackerRecon::fill_digits_vector(Json::Value &digits, SciFiSpill &a_spill) {
@@ -327,8 +452,9 @@ void MapCppTrackerRecon::save_to_json(SciFiEvent &evt, int event_i) {
 void MapCppTrackerRecon::print_event_info(SciFiEvent &event) {
   std::cout << event.digits().size() << " "
             << event.clusters().size() << " "
-            << event.spacepoints().size() << " "
-            << event.straightprtracks().size() << " " << std::endl;
+            << event.spacepoints().size() << "; "
+            << event.straightprtracks().size() << " "
+            << event.helicalprtracks().size() << " " << std::endl;
 }
 
 // The following two functions are added for testing purposes only

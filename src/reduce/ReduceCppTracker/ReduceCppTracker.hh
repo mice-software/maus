@@ -99,6 +99,7 @@ class ReduceCppTracker {
 
   void merge_tracker_events(Json::Value &root);
 
+  // void perform_alignment_study();
  private:
   bool _this_is_tracker0_event;
 

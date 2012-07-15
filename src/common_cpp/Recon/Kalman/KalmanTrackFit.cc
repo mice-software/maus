@@ -255,7 +255,7 @@ void KalmanTrackFit::process(SciFiEvent &event) {
     initialise(seed, sites);
 
     // Filter the first state.
-    std::cout << "Filtering site 0" << std::endl;
+    std::cerr << "Filtering site 0" << std::endl;
     filter(sites, track, 0);
 
     int numb_measurements = sites.size();
@@ -264,10 +264,10 @@ void KalmanTrackFit::process(SciFiEvent &event) {
 
     for ( int i = 1; i < numb_measurements; ++i ) {
       // Predict the state vector at site i...
-      std::cout << "Extrapolating to site " << i << std::endl;
+      std::cerr << "Extrapolating to site " << i << std::endl;
       extrapolate(sites, track, i);
       // ... Filter...
-      std::cout << "Filtering site " << i << std::endl;
+      std::cerr << "Filtering site " << i << std::endl;
       filter(sites, track, i);
     }
     sites[numb_measurements-1].set_smoothed_a(sites[numb_measurements-1].get_a());
@@ -279,8 +279,8 @@ void KalmanTrackFit::process(SciFiEvent &event) {
 
     KalmanMonitor monitor;
     // monitor.save(sites);
-    monitor.save_mc(sites);
-    monitor.print_info(sites);
+    // monitor.save_mc(sites);
+    // monitor.print_info(sites);
     delete track;
   }
 }
@@ -291,6 +291,8 @@ void KalmanTrackFit::initialise(SciFiStraightPRTrack &seed, std::vector<KalmanSi
   double mx_pr = seed.get_mx();
   double my_pr = seed.get_my();
   double p_pr  = 210.0; // MeV/c
+
+  std::cout << "PATTERN RECOGNITION: " << x_pr << " " << mx_pr << std::endl;
 
   std::vector<SciFiSpacePoint> spacepoints = seed.get_spacepoints();
   std::vector<SciFiCluster*> clusters;
