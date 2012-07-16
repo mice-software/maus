@@ -154,7 +154,7 @@ void MapCppTrackerRecon::perform_alignment_study(SciFiEvent &evt) {
   double full_y_st2 = y_const + y_slope*spacepoints[1]->get_position().z();
   double full_y_st3 = y_const + y_slope*spacepoints[2]->get_position().z();
   double full_y_st4 = y_const + y_slope*spacepoints[3]->get_position().z();
-
+/*
   // -- Exclude station 2 from the fit.---------------------
   std::vector<SciFiSpacePoint*> sp_copy_2 = spacepoints;
   sp_copy_2.erase(sp_copy_2.begin()+1);
@@ -181,6 +181,13 @@ void MapCppTrackerRecon::perform_alignment_study(SciFiEvent &evt) {
   fit(sp_copy_4, x_const_4, x_slope_4, y_const_4, y_slope_4);
   double excluded_x_st4 = x_const_4 + x_slope_4*spacepoints[3]->get_position().z();
   double excluded_y_st4 = y_const_4 + y_slope_4*spacepoints[3]->get_position().z();
+*/
+  double excluded_x_st2 = spacepoints[1]->get_position().x();
+  double excluded_x_st3 = spacepoints[2]->get_position().x();
+  double excluded_x_st4 = spacepoints[3]->get_position().x();
+  double excluded_y_st2 = spacepoints[1]->get_position().y();
+  double excluded_y_st3 = spacepoints[2]->get_position().y();
+  double excluded_y_st4 = spacepoints[3]->get_position().y();
 
   std::ofstream out("align.txt", std::ios::out | std::ios::app);
   out << tracker << " " << full_x_st2 << " " << excluded_x_st2 << " "

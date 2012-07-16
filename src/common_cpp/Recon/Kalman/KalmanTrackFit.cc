@@ -21,6 +21,8 @@
 #define PI 3.14159265
 
 KalmanTrackFit::KalmanTrackFit() {
+  _straight_track = false;
+  _helical_track = false;
   std::cout << "---------------------Birth of Kalman Filter--------------------" << std::endl;
 }
 
@@ -142,43 +144,6 @@ void KalmanTrackFit::initialise_global_track(Hep3Vector &tof0, Hep3Vector &se,
 */
 }
 
-//
-// Helical track fit.
-//
-void KalmanTrackFit::process(std::vector<SciFiSpacePoint> spacepoints,
-                             SeedFinder seed) {
-  std::vector<KalmanSite> sites;
-  KalmanTrack *track = new HelicalTrack(seed);
-  initialise_helix(spacepoints, sites, seed);
-
-  // Filter the first state.
-  std::cout << "Filtering site 0" << std::endl;
-  filter(sites, track, 0);
-
-  int numb_measurements = sites.size();
-
-  for ( int i = 1; i < numb_measurements; ++i ) {
-    // Predict the state vector at site i...
-    std::cout << "Extrapolating to site " << i << std::endl;
-    extrapolate(sites, track, i);
-    // ... Filter...
-    std::cout << "Filtering site " << i << std::endl;
-    filter(sites, track, i);
-  }
-/*
-  // ...and Smooth back all sites.
-  for ( int i = numb_measurements-2; i >= 0; --i ) {
-    std::cerr << "Smoothing site " << i << std::endl;
-    smooth(sites, track, i);
-  }
-*/
-  KalmanMonitor monitor;
-  monitor.save(sites);
-  monitor.save_mc(sites);
-  monitor.print_info(sites);
-  delete track;
-}
-
 void KalmanTrackFit::initialise_helix(std::vector<SciFiSpacePoint> &spacepoints,
                                       std::vector<KalmanSite> &sites,
                                       SeedFinder &seed) {
@@ -241,18 +206,30 @@ void KalmanTrackFit::initialise_helix(std::vector<SciFiSpacePoint> &spacepoints,
 // Straight track fit.
 //
 void KalmanTrackFit::process(SciFiEvent &event) {
-  int num_tracks = event.straightprtracks().size();
+  int num_tracks;
+  if ( event.straightprtracks().size() ) {
+    _helical_track = true;
+    num_tracks = event.straightprtracks().size();
+  } else if ( event.helicalprtracks().size() ) {
+    _straight_track = true;
+    num_tracks = event.helicalprtracks().size();
+  }
+
   std::cerr << "Processing " << num_tracks << " tracks." << std::endl;
 
   for ( int i = 0; i < num_tracks; ++i ) {
     std::vector<KalmanSite> sites;
-    // Straight Track.
-    KalmanTrack *track = new StraightTrack();
-    SciFiStraightPRTrack seed = event.straightprtracks()[i];
-    // This will: initialise the state vector;
-    // Set covariance matrix;
-    // Add plane measurents to all sites;
-    initialise(seed, sites);
+    if ( _straight_track ) {
+      KalmanTrack *track = new StraightTrack();
+      SciFiStraightPRTrack seed = event.straightprtracks()[i];
+      initialise(seed, sites);
+    } else if ( _helical_track ) {
+      KalmanTrack *track = new HelicalTrack();
+      SciFiHelicalPRTrack seed = event.helicalprtracks()[i];
+      initialise(seed, sites);
+    } else {
+      std::cerr << "No tracks to fit." << std::endl;
+    }
 
     // Filter the first state.
     std::cerr << "Filtering site 0" << std::endl;
@@ -431,7 +408,7 @@ void KalmanTrackFit::monitor() {
   hfile.Write();
 }
 
-void TKalTrackSite::DebugPrint() const
+void KalmanTrackFit::DebugPrint() const
 {
    cerr << " dchi2 = " << GetDeltaChi2()   << endl;
    cerr << " res_d = " << (*(TKalTrackSite *)this).GetResVec()(0,0) << endl;
@@ -440,7 +417,7 @@ void TKalTrackSite::DebugPrint() const
 }
 
 
-Int_t TVKalSystem::GetNDF(Bool_t self)
+Int_t KalmanTrackFit::GetNDF(Bool_t self)
 {
    Int_t ndf    = 0;
    Int_t nsites = GetEntries();
@@ -482,14 +459,4 @@ void KalmanTrackFit::process_clusters(std::vector<SciFiSpacePoint> &spacepoints,
   }
 
   std::sort(clusters.begin(), clusters.end(), sort_by_id);
-/*
-  std::ofstream myfile;
-  if ( numb_spacepoints == 5 && spacepoints[0].get_tracker() == 0 && clusters.size()==15 ) {
-    myfile.open("tracker.bin", std::ios::out | std::ios::app | std::ios::binary);
-    for ( int j = 0; j < clusters.size(); ++j ) {
-      int chan = clusters[j]->get_channel();
-      myfile.write(reinterpret_cast<const char*> (&chan), 1);
-    }
-    myfile.close();
-  }*/
 }

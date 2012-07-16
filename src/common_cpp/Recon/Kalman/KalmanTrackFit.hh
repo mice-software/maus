@@ -49,11 +49,11 @@ class KalmanTrackFit {
 
   void process(SciFiEvent &evt);
 
-  void process(std::vector<SciFiSpacePoint> spacepoints,
-               SeedFinder seed);
-
   void process(Hep3Vector &tof0, Hep3Vector &se, Hep3Vector &tof1);
 
+  // This will: initialise the state vector;
+  // Set covariance matrix;
+  // Add plane measurents to all sites;
   void initialise(SciFiStraightPRTrack &evt, std::vector<KalmanSite> &sites);
 
   void initialise_helix(std::vector<SciFiSpacePoint> &spacepoints,
@@ -74,6 +74,9 @@ class KalmanTrackFit {
 
  private:
   static const bool _mc_run = 1;
+
+  bool _helical_track, _straight_track;
+
 // private:
 };
 
