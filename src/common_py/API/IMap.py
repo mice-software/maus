@@ -1,3 +1,6 @@
+"""
+This file defines the interface for all Mappers
+"""
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 #
 #  MAUS is free software: you can redistribute it and/or modify
@@ -23,6 +26,10 @@ class IMap(IModule):
     Structure mirrors that of the C++ API and will eventually be replaced by
     a SWIGged version of it.
     """
+    def __init__(self):
+        """Constructor"""
+        super(IMap, self).__init__()
+
     @const
     def process(self, data):
         """
@@ -30,4 +37,5 @@ class IMap(IModule):
         @param data the data object
         @return modified data
         """
-        raise NotImplementedError('process function not implemented in class %s' % self.__class__.__name__)
+        raise NotImplementedError('process function not implemented '\
+                                  'in class %s' % self.__class__.__name__)

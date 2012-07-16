@@ -1,3 +1,6 @@
+"""
+This file defines the interface for all Inputters
+"""
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 #
 #  MAUS is free software: you can redistribute it and/or modify
@@ -22,9 +25,14 @@ class IInput(IModule):
     Structure mirrors that of the C++ API and will eventually be replaced by
     a SWIGged version of it.
     """
+    def __init__(self):
+        """Constructor"""
+        super(IInput, self).__init__()
+
     def emitter(self):
         """
         Handles the emitting of data
         @return the data object
         """
-        raise NotImplementedError('emitter function not implemented in class %s' % self.__class__.__name__)
+        raise NotImplementedError('emitter function not implemented '\
+                                  'in class %s' % self.__class__.__name__)

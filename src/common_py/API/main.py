@@ -20,3 +20,9 @@ class MyReduce(ReduceBase):
         self.lkj = 98
         del self.abc
 
+
+
+m=MyMap()
+m.birth('bob')
+m.death()
+m.process('frank')

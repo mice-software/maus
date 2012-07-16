@@ -1,3 +1,6 @@
+"""
+This file defines the abstract base for all Inputters
+"""
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 #
 #  MAUS is free software: you can redistribute it and/or modify
@@ -23,6 +26,10 @@ class InputBase(ModuleBase, IInput):
     abstracted behaviour to be inserted before the call to the modules
     _methods.
     """
+    def __init__(self):
+        """Constructor"""
+        super(InputBase, self).__init__()
+        
     def emitter(self):
         """
         Handles the emitting of data
@@ -43,4 +50,5 @@ class InputBase(ModuleBase, IInput):
         
         @return the data object
         """       
-        raise NotImplementedError('_emitter function not implemented in class %s' % self.__class__.__name__)
+        raise NotImplementedError('_emitter function not implemented '\
+                                  'in class %s' % self.__class__.__name__)

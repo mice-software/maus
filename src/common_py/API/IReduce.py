@@ -1,3 +1,6 @@
+"""
+This file defines the interface for all Reducers
+"""
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 #
 #  MAUS is free software: you can redistribute it and/or modify
@@ -22,10 +25,15 @@ class IReduce(IModule):
     Structure mirrors that of the C++ API and will eventually be replaced by
     a SWIGged version of it.
     """
+    def __init__(self):
+        """Constructor"""
+        super(IReduce, self).__init__()
+    
     def process(self, data):
         """
         Handles the processing of data
         @param data the data object
         @return modified data
         """
-        raise NotImplementedError('process function not implemented in class %s' % self.__class__.__name__)
+        raise NotImplementedError('process function not implemented '\
+                                  'in class %s' % self.__class__.__name__)

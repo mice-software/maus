@@ -1,3 +1,6 @@
+"""
+This file defines the interface for all Outputters
+"""
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 #
 #  MAUS is free software: you can redistribute it and/or modify
@@ -22,10 +25,15 @@ class IOutput(IModule):
     Structure mirrors that of the C++ API and will eventually be replaced by
     a SWIGged version of it.
     """
+    def __init__(self):
+        """Constructor"""
+        super(IOutput, self).__init__()
+
     def save(self, data):
         """
         Handles the saving of data
         @param data the data object
         @return bool success/failure
         """
-        raise NotImplementedError('save function not implemented in class %s' % self.__class__.__name__)
+        raise NotImplementedError('save function not implemented '\
+                                  'in class %s' % self.__class__.__name__)

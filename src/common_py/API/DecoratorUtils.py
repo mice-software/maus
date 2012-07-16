@@ -1,3 +1,6 @@
+"""
+This file defines the smart_decorator
+"""
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 #
 #  MAUS is free software: you can redistribute it and/or modify
@@ -15,9 +18,9 @@
 
 ## Now handles default args correctly and __doc__ strings
 ## wrapper defined by user decorator should generally take just *args and **kw
-## as these will be modified anyway. Any doc strings defined by user wrapper will
-## be picked up
-def smartDecorator(decor):
+## as these will be modified anyway. Any doc strings defined by user wrapper
+## will be picked up
+def smart_decorator(decor):
     """
     Smart decorator for decorating decorators
     
@@ -30,31 +33,34 @@ def smartDecorator(decor):
     """
 
     from inspect import getargspec
-    argSpec = getargspec(decor)
+    arg_spec = getargspec(decor)
     
-    argString = ''
-    argStringLessDefaults = ''
+    arg_string = ''
+    arg_string_less_defaults = ''
 
-    if argSpec[0] is not None:
-        defaultStart = None
-        if argSpec[3] is not None: defaultStart = len(argSpec[0]) - len(argSpec[3])
-        for i in range(len(argSpec[0])):
-            argString += '%s' % argSpec[0][i]
-            argStringLessDefaults += '%s' % argSpec[0][i]
-            if defaultStart is not None and i >= defaultStart: argString += ' = %s' % argSpec[3][i-defaultStart]
-            argString += ', '
-            argStringLessDefaults += ', '
+    if arg_spec[0] is not None:
+        default_start = None
+        if arg_spec[3] is not None:
+            default_start = len(arg_spec[0]) - len(arg_spec[3])
+        for i in range(len(arg_spec[0])):
+            arg_string += '%s' % arg_spec[0][i]
+            arg_string_less_defaults += '%s' % arg_spec[0][i]
+            if default_start is not None and i >= default_start:
+                arg_string += ' = %s' % arg_spec[3][i-default_start]
+            arg_string += ', '
+            arg_string_less_defaults += ', '
     else:
-        raise AttributeError("Expected decorator method to at least have a 'function' arg")
+        raise AttributeError("Expected decorator method to at least "\
+                             "have a 'function' arg")
 
-    if argSpec[1] is not None:
-        argString += '*%s, '% argSpec[1]
-        argStringLessDefaults += '*%s, '% argSpec[1]
-    if argSpec[2] is not None:
-        argString += '**%s, '% argSpec[2]
-        argStringLessDefaults += '**%s, '% argSpec[2]
-    argString = argString[:-2]
-    argStringLessDefaults = argStringLessDefaults[:-2]
+    if arg_spec[1] is not None:
+        arg_string += '*%s, '% arg_spec[1]
+        arg_string_less_defaults += '*%s, '% arg_spec[1]
+    if arg_spec[2] is not None:
+        arg_string += '**%s, '% arg_spec[2]
+        arg_string_less_defaults += '**%s, '% arg_spec[2]
+    arg_string = arg_string[:-2]
+    arg_string_less_defaults = arg_string_less_defaults[:-2]
 
     dynamic_wrapper = \
 """
@@ -67,11 +73,13 @@ def %s(%s):
 
     if argSpec[0] is not None:
         defaultStart = None
-        if argSpec[3] is not None: defaultStart = len(argSpec[0]) - len(argSpec[3])
+        if argSpec[3] is not None:
+            defaultStart = len(argSpec[0]) - len(argSpec[3])
         for i in range(len(argSpec[0])):
             argString += '%s' %s
             argStringLessDefaults += '%s' %s
-            if defaultStart is not None and i >= defaultStart: argString += ' = %s' %s
+            if defaultStart is not None and i >= defaultStart:
+                argString += ' = %s' %s
             argString += ', '
             argStringLessDefaults += ', '
     
@@ -100,8 +108,8 @@ else: %s.__doc__ = fnDocString
 %s.__doc__ = decor.__doc__
 
 """ % (decor.__name__,
-       argString,
-       argSpec[0][0],
+       arg_string,
+       arg_spec[0][0],
        '%s',
        '% argSpec[0][i]',
        '%s',
@@ -116,66 +124,22 @@ else: %s.__doc__ = fnDocString
        '% argSpec[2]',
        '%s',
        '% argSpec[2]',
-       argSpec[0][0],
+       arg_spec[0][0],
        '%s',
        '%s',
-       argStringLessDefaults,
+       arg_string_less_defaults,
        '%s',
-       argStringLessDefaults,
+       arg_string_less_defaults,
        '%s',
-       argStringLessDefaults,
+       arg_string_less_defaults,
        '%s',
-       '% ('+argSpec[0][0] + '.__name__, argString, argStringLessDefaults,'+argSpec[0][0] + '.__name__, '+argSpec[0][0] + '.__name__)',
-       '\''+argSpec[0][0]+'\':'+argSpec[0][0],
-       argSpec[0][0] + '.__name__',
+       '% ('+arg_spec[0][0] + '.__name__, argString, argStringLessDefaults,'+ \
+       arg_spec[0][0] + '.__name__, '+arg_spec[0][0] + '.__name__)',
+       '\''+arg_spec[0][0]+'\':'+arg_spec[0][0],
+       arg_spec[0][0] + '.__name__',
        decor.__name__
        )
 
-    ns={'decor':decor}
-    exec dynamic_wrapper in ns
-    return ns[decor.__name__]
-
-
-## DEMO
-##############################################################################
-
-if __name__ == '__main__':
-    @smartDecorator
-    def myDec(fn):
-        """Hello World"""
-        def wrapper(*args,**kw):
-            """NEW f label""" #comment this line out to see doc pass-through
-            print "Wrapped", args, kw
-            return fn(*args,**kw)
-        return wrapper
-
-    @myDec
-    def f(a,d,c=78,*args,**kw):
-        """Function f doc"""
-        print "f",a,d,c
-        
-    def f2(a,d,c=78, *args,**kw):
-        """Function f2 doc"""
-        print "f2",a,d,c
-
-    # allows us to check the function signature
-    from inspect import getargspec as g 
-
-    print "function f name =" ,f.__name__
-    print "function f2 name =",f2.__name__
-    print "function f signature =" ,g(f)
-    print "function f signature =" ,g(f2)
-    try: f()
-    except Exception, e:
-        print e
-        
-    try: f2()
-    except Exception, e:
-        print e
-    f(1,2,3,4,5,6)
-    f2(1,2,3,4,5,6)
-
-    f(a=5,c=98,d='bob',j='hello')
-    f2(a=5,c=98,d='bob',j='hello')
-    help(f)
-    help(f2)
+    namespace = {'decor':decor}
+    exec dynamic_wrapper in namespace #pylint: disable=W0122
+    return namespace[decor.__name__]

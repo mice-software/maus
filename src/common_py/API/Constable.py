@@ -1,3 +1,6 @@
+"""
+This file defines the const decorator function
+"""
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 #
 #  MAUS is free software: you can redistribute it and/or modify
@@ -12,30 +15,36 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
-from DecoratorUtils import smartDecorator
+from DecoratorUtils import smart_decorator
 
 
 class ConstMethodAttrModError(Exception):
+    """Exception thrown when an attempt is made to modify
+    local variables within a const method"""
     def __init__(self, *args):
         super(ConstMethodAttrModError, self).__init__(*args)
 
 ## works for both old and new style python classes
-@smartDecorator
-def const(fn):
+@smart_decorator
+def const(func):
     """
     Constness decorator
     
     Decorator to force class methods to obey const-like
     behaviour. Warning, this is not thread safe.
 
-    @param fn the function to be wrapped
+    @param func the function to be wrapped
     """
     
-    def wrapper(self, *args, **kw):
-        def nullset(self, name, value):
-            raise ConstMethodAttrModError("Method '%s' is declared const so attribute assignment is not allowed." % fn.__name__)
-        def nulldel(self, name):
-            raise ConstMethodAttrModError("Method '%s' is declared const so attribute deletion is not allowed." % fn.__name__)
+    def wrapper(self, *args, **kw):#pylint: disable=C0111
+        def nullset(self, name, value):#pylint: disable=C0111,W0613
+            raise ConstMethodAttrModError("Method '%s' is declared const so "\
+                                          "attribute assignment is not "\
+                                          "allowed." % func.__name__)
+        def nulldel(self, name):#pylint: disable=C0111,W0613
+            raise ConstMethodAttrModError("Method '%s' is declared const so "\
+                                          "attribute deletion is not allowed."\
+                                          % func.__name__)
         
         cls = self.__class__
         old_setter = None
@@ -52,7 +61,8 @@ def const(fn):
         cls.__setattr__ = nullset
         cls.__delattr__ = nulldel
         try:
-            ret = fn(self, *args, **kw)
+            ret = func(self, *args, **kw)
+            return ret
         finally:
             if old_setter is not None:
                 cls.__setattr__ = old_setter
@@ -62,87 +72,3 @@ def const(fn):
             else: del cls.__delattr__
     
     return wrapper
-
-
-## DEMO
-##############################################################################
-
-if __name__ == '__main__':
-    
-    ## old style
-    class test:
-
-        def a(self):
-            self.a = 14
-        
-        @const
-        def b(self):
-            self.b = 98
-            
-        @const
-        def c(self):
-            del self.c
-
-    ## new style
-    class test2(object):
-        
-        def a(self):
-            self.a = 14
-        
-        @const
-        def b(self):
-            self.b = 98
-            
-        @const
-        def c(self):
-            del self.c
-
-    
-
-    f=test()
-    g=test2()
-
-    f.a()
-    g.a()
-
-    print f.__dict__
-    print g.__dict__
-
-    try:
-        f.b()
-    except Exception, e:
-        print e
-        print f.__dict__
-
-    try:
-        g.b()
-    except Exception, e:
-        print e
-        print f.__dict__
-
-    try:
-        f.c()
-    except Exception, e:
-        print e
-        print f.__dict__
-
-    try:
-        g.c()
-    except Exception, e:
-        print e
-        print f.__dict__
-
-    del f.a
-    del g.a
-
-    print f.__dict__
-    print g.__dict__
-
-    f.hello = 8
-    g.World = 7
-
-    print f.__dict__
-    print g.__dict__
-
-    
-
