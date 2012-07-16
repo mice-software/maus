@@ -16,8 +16,8 @@ This file defines the interface for all Mappers
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-from IModule import IModule
-from Constable import const
+from API.IModule import IModule
+from API.Constable import const
 
 class IMap(IModule):  
     """

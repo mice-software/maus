@@ -1,5 +1,5 @@
 """
-This file defines the interface for all Inputters
+This file defines the tests for IOutput
 """
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 #
@@ -16,23 +16,28 @@ This file defines the interface for all Inputters
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+import unittest
 from API.IModule import IModule
+from API.IOutput import IOutput
 
-class IInput(IModule):
+class TestIOutput(unittest.TestCase):
     """
-    @class IInput
-    Interface for all inputter modules.
-    Structure mirrors that of the C++ API and will eventually be replaced by
-    a SWIGged version of it.
+    @class TestIOutput
+    Unit testing class for IOutput
     """
-    def __init__(self):
-        """Constructor"""
-        super(IInput, self).__init__()
+    def test___init__(self):
+        """Test Constructor"""
+        try:
+            m=IOutput()
+            self.assertIsInstance(m, IOutput, 'Not an instance of IOutput')
+            self.assertIsInstance(m, IModule, 'Not an instance of IModule')
+        except:
+            self.assertTrue(False, 'Exception thrown when constructing')
 
-    def emitter(self):
-        """
-        Handles the emitting of data
-        @return the data object
-        """
-        raise NotImplementedError('emitter function not implemented '\
-                                  'in class %s' % self.__class__.__name__)
+    def test_save(self):
+        """Test save"""
+        m=IOutput()
+        self.assertRaises(NotImplementedError, m.save, 'data')
+
+if __name__ == '__main__':
+    unittest.main()

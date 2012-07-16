@@ -1,5 +1,5 @@
 """
-This file defines the interface for all Inputters
+MAUS API
 """
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 #
@@ -15,24 +15,3 @@ This file defines the interface for all Inputters
 #
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
-
-from API.IModule import IModule
-
-class IInput(IModule):
-    """
-    @class IInput
-    Interface for all inputter modules.
-    Structure mirrors that of the C++ API and will eventually be replaced by
-    a SWIGged version of it.
-    """
-    def __init__(self):
-        """Constructor"""
-        super(IInput, self).__init__()
-
-    def emitter(self):
-        """
-        Handles the emitting of data
-        @return the data object
-        """
-        raise NotImplementedError('emitter function not implemented '\
-                                  'in class %s' % self.__class__.__name__)

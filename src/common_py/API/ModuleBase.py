@@ -13,7 +13,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-from IModule import IModule
+from API.IModule import IModule
 
 class ModuleBase(IModule):
     """

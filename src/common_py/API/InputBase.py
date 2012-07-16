@@ -16,8 +16,8 @@ This file defines the abstract base for all Inputters
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-from IInput import IInput
-from ModuleBase import ModuleBase
+from API.IInput import IInput
+from API.ModuleBase import ModuleBase
 
 class InputBase(ModuleBase, IInput):
     """

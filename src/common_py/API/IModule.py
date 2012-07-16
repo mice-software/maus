@@ -25,7 +25,7 @@ class IModule(object):
     """
     def __init__(self):
         """Constructor"""
-        seper(IModule, self).__init__()
+        super(IModule, self).__init__()
 
     def birth(self, config):
         """

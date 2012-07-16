@@ -15,7 +15,7 @@ This file defines the const decorator function
 #
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
-from DecoratorUtils import smart_decorator
+from API.DecoratorUtils import smart_decorator
 
 
 class ConstMethodAttrModError(Exception):
@@ -61,8 +61,7 @@ def const(func):
         cls.__setattr__ = nullset
         cls.__delattr__ = nulldel
         try:
-            ret = func(self, *args, **kw)
-            return ret
+            return func(self, *args, **kw)
         finally:
             if old_setter is not None:
                 cls.__setattr__ = old_setter
@@ -70,5 +69,5 @@ def const(func):
             if old_deleter is not None:
                 cls.__delattr__ = old_deleter
             else: del cls.__delattr__
-    
+
     return wrapper

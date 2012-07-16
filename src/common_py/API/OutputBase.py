@@ -16,8 +16,8 @@ This file defines the abstract base for all Outputters
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-from IOutput import IOutput
-from ModuleBase import ModuleBase
+from API.IOutput import IOutput
+from API.ModuleBase import ModuleBase
 
 class OutputBase(ModuleBase, IOutput):
     """

@@ -96,7 +96,7 @@ def %s(%s):
     dynamic_wrapper = \
 \"\"\"
 def %s(%s):
-    decor(%s)(%s)
+    return decor(%s)(%s)
 if decor(%s).__doc__: %s.__doc__ = decor(%s).__doc__
 else: %s.__doc__ = fnDocString
 \"\"\" %s

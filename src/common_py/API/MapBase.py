@@ -16,9 +16,9 @@ This file defines the abstract base for all Mappers
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-from IMap import IMap
-from ModuleBase import ModuleBase
-from Constable import const
+from API.IMap import IMap
+from API.ModuleBase import ModuleBase
+from API.Constable import const
 
 class MapBase(ModuleBase, IMap):
     """
@@ -54,6 +54,6 @@ class MapBase(ModuleBase, IMap):
         
         @param data the data object
         @return modified data
-        """       
+        """
         raise NotImplementedError('_process function not implemented '\
                                   'in class %s' % self.__class__.__name__)
