@@ -144,6 +144,7 @@ void KalmanTrackFit::initialise_global_track(Hep3Vector &tof0, Hep3Vector &se,
 */
 }
 
+/*
 void KalmanTrackFit::initialise_helix(std::vector<SciFiSpacePoint> &spacepoints,
                                       std::vector<KalmanSite> &sites,
                                       SeedFinder &seed) {
@@ -202,6 +203,8 @@ void KalmanTrackFit::initialise_helix(std::vector<SciFiSpacePoint> &spacepoints,
     sites.push_back(a_site);
   }
 }
+*/
+
 //
 // Straight track fit.
 //
@@ -224,8 +227,8 @@ void KalmanTrackFit::process(SciFiEvent &event) {
       SciFiStraightPRTrack seed = event.straightprtracks()[i];
       initialise(seed, sites);
     } else if ( _helical_track ) {
-      KalmanTrack *track = new HelicalTrack();
       SciFiHelicalPRTrack seed = event.helicalprtracks()[i];
+      KalmanTrack *track = new HelicalTrack(seed);
       initialise(seed, sites);
     } else {
       std::cerr << "No tracks to fit." << std::endl;
@@ -259,6 +262,65 @@ void KalmanTrackFit::process(SciFiEvent &event) {
     // monitor.save_mc(sites);
     // monitor.print_info(sites);
     delete track;
+  }
+}
+
+void KalmanTrackFit::initialise(SciFiHelicalPRTrack &seed, std::vector<KalmanSite> &sites) {
+  double x0 = seed.get_x0();
+  double y0 = seed.get_y0();
+  double r = seed.get_R();
+  double pt = 200.0;
+  // double pz = seed.get_pz();
+  double phi_0 = seed.get_phi0();
+  double tan_lambda = seed.get_dzds();
+
+  std::vector<SciFiCluster*> clusters;
+
+  std::vector<SciFiSpacePoint> spacepoints = seed.get_spacepoints();
+  process_clusters(spacepoints, clusters);
+  // the clusters are sorted by now.
+
+  int numb_sites = clusters.size();
+
+  KalmanSite first_plane;
+  double x = x0+r*cos(phi_0*PI/180.);
+  double y = y0+r*sin(phi_0*PI/180.);
+  double kappa = 1./pt;
+
+  TMatrixD a(5, 1);
+  a(0, 0) = x;
+  a(1, 0) = y;
+  a(2, 0) = phi_0;
+  a(3, 0) = tan_lambda;
+  a(4, 0) = kappa;
+  first_plane.set_projected_a(a);
+  // std::cout << "Seed state: " << std::endl;
+  // a.Print();
+  // first_plane.set_state_vector(x, y, tan_lambda, phi_0, kappa);
+  TMatrixD C(5, 5);
+  C(0, 0) = 150.*150./12.;
+  C(1, 1) = 150.*150./12.;
+  C(2, 2) = 10.;
+  C(3, 3) = 10.;
+  C(4, 4) = 100.;
+  // for ( int i = 0; i < 5; ++i ) {
+  //   C(i, i) = 200; // dummy values
+  // }
+  first_plane.set_projected_covariance_matrix(C);
+  first_plane.set_measurement(clusters[0]->get_alpha());
+  first_plane.set_direction(clusters[0]->get_direction());
+  first_plane.set_z(clusters[0]->get_position().z());
+  first_plane.set_id(clusters[0]->get_id());
+  // first_plane
+  sites.push_back(first_plane);
+
+  for ( int j = 1; j < numb_sites; ++j ) {
+    KalmanSite a_site;
+    a_site.set_measurement(clusters[j]->get_alpha());
+    a_site.set_direction(clusters[j]->get_direction());
+    a_site.set_z(clusters[j]->get_position().z());
+    a_site.set_id(clusters[j]->get_id());
+    sites.push_back(a_site);
   }
 }
 

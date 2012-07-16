@@ -18,7 +18,7 @@
 #include "src/common_cpp/Recon/Kalman/HelicalTrack.hh"
 #define PI 3.14159265
 
-HelicalTrack::HelicalTrack(SeedFinder const &seed) {
+HelicalTrack::HelicalTrack(SciFiHelicalPRTrack const &seed) {
   // Initialise straight-track member matrices:
   _G.ResizeTo(2, 2);
   _H.ResizeTo(2, 5);
@@ -30,7 +30,7 @@ HelicalTrack::HelicalTrack(SeedFinder const &seed) {
 
   _x0 = seed.get_x0();
   _y0 = seed.get_y0();
-  _r  = seed.get_r();
+  _r  = seed.get_R();
 }
 
 void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site) {
