@@ -16,7 +16,7 @@
  */
 
 #include "src/map/MapCppTrackerRecon/MapCppTrackerRecon.hh"
-
+#include <algorithm>
 #include "Riostream.h"
 #include "TMatrixD.h"
 #include "TVectorD.h"
@@ -24,6 +24,7 @@
 #include "TDecompChol.h"
 #include "TDecompSVD.h"
 #include "TF1.h"
+
 
 bool MapCppTrackerRecon::birth(std::string argJsonConfigDocument) {
   _classname = "MapCppTrackerRecon";
@@ -100,6 +101,7 @@ std::string MapCppTrackerRecon::process(std::string document) {
         spacepoint_recon(event);
       }
       // Pattern Recognition.
+/*
       if ( event.spacepoints().size() ) {
         std::cout << "Calling Pattern Recognition..." << std::endl;
         pattern_recognition(event);
@@ -109,7 +111,7 @@ std::string MapCppTrackerRecon::process(std::string document) {
       if ( event.straightprtracks().size() || event.helicalprtracks().size() ) {
         track_fit(event);
       }
-
+*/
       // Perform alignment study.
       // if ( event.spacepoints().size() == 5 ) {
       //  perform_alignment_study(event);
@@ -187,24 +189,28 @@ void MapCppTrackerRecon::fit(std::vector<SciFiSpacePoint*> spacepoints,
     ae[i] = 0.9;
   }
 
-  TVectorD z; z.Use(nrPnts, az);
-  TVectorD x; x.Use(nrPnts, ax);
-  TVectorD y; y.Use(nrPnts, ay);
-  TVectorD e; e.Use(nrPnts, ae);
+  TVectorD z;
+  z.Use(nrPnts, az);
+  TVectorD x;
+  x.Use(nrPnts, ax);
+  TVectorD y;
+  y.Use(nrPnts, ay);
+  TVectorD e;
+  e.Use(nrPnts, ae);
 
-  TMatrixD A(nrPnts,nrVar);
+  TMatrixD A(nrPnts, nrVar);
   TMatrixDColumn(A, 0) = 1.0;
   TMatrixDColumn(A, 1) = z;
-  TMatrixD B(nrPnts,nrVar);
+  TMatrixD B(nrPnts, nrVar);
   TMatrixDColumn(B, 0) = 1.0;
   TMatrixDColumn(B, 1) = y;
 
-  const TVectorD solve_x = NormalEqn(A,x,e);
+  const TVectorD solve_x = NormalEqn(A, x, e);
   solve_x.Print();
   x_const = solve_x(0);
   x_slope = solve_x(1);
 
-  const TVectorD solve_y = NormalEqn(A,y,e);
+  const TVectorD solve_y = NormalEqn(A, y, e);
   solve_y.Print();
   y_const = solve_y(0);
   y_slope = solve_y(1);
