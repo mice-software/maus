@@ -28,6 +28,7 @@ class dataCards;
 class MICERun;
 class MiceMaterials;
 class MiceModule;
+class BTFieldConstructor;
 
 namespace MAUS {
 
@@ -36,7 +37,6 @@ class RunActionManager;
 class CppErrorHandler;
 
 class MAUSGeant4Manager;
-class BTFieldConstructor;
 
 // I decided not to make this a user interfaceable class. I can change that if
 // we find we need lots of things set up at the beginning of the job...
@@ -58,7 +58,9 @@ class BTFieldConstructor;
  *  Note also that one feature is that (except GEANT4, which won't fix) it would
  *  be nice if we take out all of the global/static variables and initialise
  *  things here instead. So that we can in principle do a delete and
- *  reinitialise and get a completely clean set up.
+ *  reinitialise and get a completely clean set up. This is not completely fixed
+ *  yet - next thing is to remove src/legacy/MICERun.hh and fix everything that
+ *  breaks
  */
 class GlobalsManager {
   public:

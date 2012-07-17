@@ -21,6 +21,8 @@ import os
 import json
 import sys
 
+import libMausCpp
+
 # MAUS
 from Configuration import Configuration
 from framework.input_transform import InputTransformExecutor
@@ -98,28 +100,36 @@ class Go: # pylint: disable=R0921, R0903
         if json_config_dictionary["verbose_level"] == 0:
             print "Configuration: ", \
                 json.dumps(json_config_dictionary, indent=2)
+        print "Initialising Globals"
+        # Initialise field maps, geant4, etc
+        libMausCpp.initialise(json.dumps(json_config_dictionary))        
+        try:
+            # Set up the dataflow executor.
+            if type_of_dataflow == 'pipeline_single_thread':
+                executor = PipelineSingleThreadDataflowExecutor(
+                   inputer, transformer, merger, outputer, self.json_config_doc)
+            elif type_of_dataflow == 'multi_process':
+                executor = MultiProcessExecutor(
+                   inputer, transformer, merger, outputer, self.json_config_doc)
+            elif type_of_dataflow == 'multi_process_input_transform':
+                executor = InputTransformExecutor( \
+                    inputer, transformer, self.json_config_doc)
+            elif type_of_dataflow == 'multi_process_merge_output':
+                executor = MergeOutputExecutor( \
+                    merger, outputer, self.json_config_doc)
+            elif type_of_dataflow == 'many_local_threads':
+                raise NotImplementedError()
+            else:
+                raise LookupError("bad type_of_dataflow: %s" % type_of_dataflow)
 
-        # Set up the dataflow executor.
-        if type_of_dataflow == 'pipeline_single_thread':
-            executor = PipelineSingleThreadDataflowExecutor(
-                inputer, transformer, merger, outputer, self.json_config_doc)
-        elif type_of_dataflow == 'multi_process':
-            executor = MultiProcessExecutor(
-                inputer, transformer, merger, outputer, self.json_config_doc)
-        elif type_of_dataflow == 'multi_process_input_transform':
-            executor = InputTransformExecutor( \
-                inputer, transformer, self.json_config_doc)
-        elif type_of_dataflow == 'multi_process_merge_output':
-            executor = MergeOutputExecutor( \
-                merger, outputer, self.json_config_doc)
-        elif type_of_dataflow == 'many_local_threads':
-            raise NotImplementedError()
-        else:
-            raise LookupError("bad type_of_dataflow: %s" % type_of_dataflow)
-
-        # Execute the dataflow.
-        print("INITIATING EXECUTION")
-        executor.execute()
+            # Execute the dataflow.
+            print("Initiating Execution")
+            executor.execute()
+        except:
+            raise
+        finally:
+            print "Clearing Globals" 
+            libMausCpp.destruct()
         print("DONE")
 
     @staticmethod
