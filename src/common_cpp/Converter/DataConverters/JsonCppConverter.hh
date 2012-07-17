@@ -20,6 +20,7 @@
 #include "json/json.h"
 
 #include "src/common_cpp/Converter/ConverterBase.hh"
+// #include "src/common_cpp/JsonCppStreamer/ConverterBase.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
 
 namespace MAUS {
@@ -62,10 +63,10 @@ namespace MAUS {
      * \param MausData& The root \a MausData object from the cpp data structure
      * \return a pointer to the Json::Value object
      */
-     Json::Value* _convert(const Spill*) const;
+//     Json::Value* _convert(const Spill*) const;
 
   private:
 };
-}//end of namespace
+}
 
 #endif

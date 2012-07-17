@@ -27,8 +27,8 @@ Spill* JsonCppConverter::_convert(const Json::Value* data) const {
   return SpillProcessor().JsonToCpp(*data);
 }
 
-Json::Value* JsonCppConverter::_convert(const Spill* data) const{
-  return SpillProcessor().CppToJson(*data);
+// Json::Value* JsonCppConverter::_convert(const Spill* data) const{
+//   return SpillProcessor().CppToJson(*data);
+// }
 }
-}//end of namespace
 
