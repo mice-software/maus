@@ -111,7 +111,7 @@ bool ReduceCppSingleStation::birth(std::string argJsonConfigDocument) {
   _digits.Branch("channel", &_channel_dig, "channel/D");
   _digits.Branch("npe", &_npe_dig, "npe/D");
   _digits.Branch("time", &_time, "time/D");
-  _digits.Branch("adc", &_adc_dig, "adc/I");
+  // _digits.Branch("adc", &_adc_dig, "adc/I");
 
   _doublet_clusters.SetNameTitle("clusters", "clusters");
   _doublet_clusters.Branch("plane", &_plane, "plane/I");
@@ -524,7 +524,7 @@ void ReduceCppSingleStation::build_digits_tree(Json::Value root) {
       _plane_dig   = digits[digit_j]["plane"].asInt();
       _channel_dig = digits[digit_j]["channel"].asDouble();
       _npe_dig     = digits[digit_j]["npe"].asDouble();
-      _adc_dig     = digits[digit_j]["adc"].asInt();
+      // _adc_dig     = digits[digit_j]["adc"].asInt();
       _time        = digits[digit_j]["time"].asDouble();
       _digits.Fill();
       if ( _plane_dig == 0 ) {
