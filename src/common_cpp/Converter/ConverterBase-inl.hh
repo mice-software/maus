@@ -39,10 +39,6 @@ namespace MAUS {
   OUTPUT* ConverterBase<INPUT, OUTPUT>::operator()(const INPUT* i) const {
     return convert(i);
   }
-  template <typename INPUT, typename OUTPUT>
-  INPUT* ConverterBase<INPUT, OUTPUT>::operator()(const OUTPUT* o) const {
-    return convert(o);
-  }
 
   template <typename INPUT, typename OUTPUT>
   OUTPUT* ConverterBase<INPUT, OUTPUT>::convert(const INPUT* i) const {
@@ -61,24 +57,6 @@ namespace MAUS {
       throw UnhandledException(_classname);
     }
     return o;
-  }
-  template <typename INPUT, typename OUTPUT>
-  INPUT* ConverterBase<INPUT, OUTPUT>::convert(const OUTPUT* o) const {
-    if (!o) { throw NullInputException(_classname); }
-    INPUT* i = 0;
-    try {
-      i =  _convert(o);
-    }
-    catch(Squeal& s) {
-      CppErrorHandler::getInstance()->HandleSquealNoJson(s, _classname);
-    }
-    catch(std::exception& e) {
-      CppErrorHandler::getInstance()->HandleStdExcNoJson(e, _classname);
-    }
-    catch(...) {
-      throw UnhandledException(_classname);
-    }
-    return i;
   }
 
 

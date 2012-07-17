@@ -54,22 +54,12 @@ namespace MAUS {
     virtual OUTPUT* operator()(const INPUT* ) const = 0;
     /*!\brief Convert data
      *
-     * reverse conversion
-     */
-    virtual INPUT* operator()(const OUTPUT* ) const = 0;
-    /*!\brief Convert data
-     *
      * Pure virtual function to convert the input data
      * and return it as type OUTPUT*
      * \param INPUT* Pointer to the input data
      * \return output data type OUTPUT*
      */
     virtual OUTPUT* convert(const INPUT* )    const = 0;
-    /*!\brief Convert data
-     *
-     * reverse conversion
-     */
-    virtual INPUT* convert(const OUTPUT* )    const = 0;
   };
 
 } // end of namespace

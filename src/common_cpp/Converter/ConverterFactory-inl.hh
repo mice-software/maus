@@ -19,6 +19,7 @@
 #include "src/legacy/Interface/Squeal.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "src/common_cpp/Converter/DataConverters/JsonCppConverter.hh"
+#include "src/common_cpp/Converter/DataConverters/CppJsonConverter.hh"
 
 namespace Json {
   class Value;
@@ -85,12 +86,21 @@ namespace MAUS {
 
     return new JsonCppConverter();
   }
+
+  // DAMN cant do this as JsonCppConverter only inherits from one type of Converter base
+  // Must split it up
   template <>
   IConverter<Spill, Json::Value>* ConverterFactory::getConverter<Spill, Json::Value>() const
     throw(ConverterNotFoundException) {
-    
-    return new JsonCppConverter();
+
+    return new CppJsonConverter();
   }
+//   template <>
+//   IConverter<int,double>* ConverterFactory::getConverter<double, int>() const
+//     throw (ConverterNotFoundException){
+//     return new myDoubleIntConverter();
+//   }
+
 } // end of namespace
 
 #endif

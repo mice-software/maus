@@ -66,21 +66,11 @@ namespace MAUS {
     OUTPUT* operator()(const INPUT* ) const;
     /*!\brief Convert data
      *
-     * reverse conversion
-     */
-    INPUT* operator()(const OUTPUT* ) const;
-    /*!\brief Convert data
-     *
      * Implementation of the interface. Wraps the _convert function
      * \param INPUT* Pointer to the input data
      * \return output data type OUTPUT*
      */
     OUTPUT* convert(const INPUT* )    const;
-    /*!\brief Convert data
-     *
-     * reverse conversion
-     */
-    INPUT* convert(const OUTPUT* )    const;
 
   protected:
     /*!\var std::string _classname
@@ -98,11 +88,6 @@ namespace MAUS {
      * \return output data type OUTPUT*
      */
     virtual OUTPUT* _convert(const INPUT* ) const = 0;
-    /*!\brief Convert data
-     *
-     * reverse conversion
-     */
-    virtual INPUT* _convert(const OUTPUT* ) const = 0;
   };
 
 }// end of namespace
