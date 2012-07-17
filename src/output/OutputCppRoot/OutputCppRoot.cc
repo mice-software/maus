@@ -19,7 +19,7 @@
 
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/JsonCppStreamer/ORStream.hh"
-#include "src/common_cpp/JsonCppStreamer/JsonCppConverter.hh"
+#include "src/common_cpp/Converter/DataConverters/JsonCppConverter.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "src/common_cpp/DataStructure/Data.hh"
 

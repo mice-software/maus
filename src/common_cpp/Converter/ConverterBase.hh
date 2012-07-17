@@ -15,107 +15,97 @@
  *
  */
 
-
-#ifndef CONVERTERBASE_H
-#define CONVERTERBASE_H
-
-/*! \class ConverterBase
- * \brief Abstract base class for converters.
- *
- * ConverterBase is a functor (function object) class template which acts
- * to ensure that all converters define as a minimum the correct operator().
+/*!
+ * \file ConverterBase.hh
  *
  * \author Alexander Richards, Imperial College London
- * \date 06/01/2012
+ * \date 06/06/2012
  *
- * 
+ * This is the top level abstract base class for all converters.
+ *
  */
-template<class TYPE1, class TYPE2>
-  class ConverterBase {
- public:
+#ifndef _SRC_COMMON_CPP_CONVERTER_CONVERTERBASE_
+#define _SRC_COMMON_CPP_CONVERTER_CONVERTERBASE_
+#include <string>
+#include "src/common_cpp/Converter/IConverter.hh"
+
+namespace MAUS {
+
+  /*!
+   * \class ConverterBase
+   *
+   * \brief Top level abstract base class for all converters
+   *
+   * \author Alexander Richards, Imperial College London
+   * \date 06/06/2012
+   *
+   * Templated base class taking INPUT and OUTPUT types.
+   */
+  template <typename INPUT, typename OUTPUT>
+  class ConverterBase : public IConverter<INPUT, OUTPUT> {
+
+  public:
+    /*!\brief ConstructorBase
+     * \param std::string& The name of the converter.
+     */
+    explicit ConverterBase(const std::string&);
+    /*!\brief Copy Constructor
+     * \param ConverterBase& A converter to copy from.
+     */
+    ConverterBase(const ConverterBase& cb);
     // ! Destructor
-    virtual ~ConverterBase() {}
-  /*!
-   * \brief Constructor
-   *
-   * Constructor takes a pointer to a \a TYPE1 object which it will store and construct with the 
-   * correct number of elements from the TYPE2 object passed into the operator() method.
-   *
-   * \param TYPE1* a pointer to a \a TYPE1 object
-   */
-  explicit ConverterBase(TYPE1* d1) : m_d1(d1), m_d2(0) {}
-  /*!
-   * \brief Constructor
-   *
-   * Constructor takes a \a TYPE1 object which it will store and construct with the 
-   * correct number of elements from the TYPE2 object passed into the operator() method.
-   *
-   * \param TYPE1& a \a TYPE1 object
-   */
-  explicit ConverterBase(TYPE1& d1) : m_d1(&d1), m_d2(0) {}
-  /*!
-   * \brief Constructor
-   *
-   * Constructor takes a pointer to a \a TYPE2 object which it will store and construct with the 
-   * correct number of elements from the TYPE1 object passed into the operator() method.
-   *
-   * \param TYPE2* a pointer to a \a TYPE2 object
-   */
-  explicit ConverterBase(TYPE2* d2) : m_d1(0), m_d2(d2) {}
-  /*!
-   * \brief Constructor
-   *
-   * Constructor takes a \a TYPE2 object which it will store and construct with the 
-   * correct number of elements from the TYPE1 object passed into the operator() method.
-   *
-   * \param TYPE2& a \a TYPE2 object
-   */
-  explicit ConverterBase(TYPE2& d2) : m_d1(0), m_d2(&d2) {}
+    virtual ~ConverterBase();
 
-  /*!
-   * \brief Perform conversion
-   *
-   * The \a operator() member function takes a parameter of type 
-   * \a TYPE2 and performs the conversion before returning
-   * a type \a TYPE1. In this abstract base class this is a pure
-   * virtual function.
-   *
-   * \param DATA_TYPE_2 The input data to be converted
-   * \return The output data after conversion
-   */
-    virtual TYPE1* operator()(const TYPE2&) = 0;
-  /*!
-   * \brief Perform conversion
-   *
-   * The \a operator() member function takes a parameter of type 
-   * \a TYPE1 and performs the conversion before returning
-   * a type \a TYPE2. In this abstract base class this is a pure
-   * virtual function.
-   *
-   * \param DATA_TYPE_1 The input data to be converted
-   * \return The output data after conversion
-   */
-    virtual TYPE2* operator()(const TYPE1&) = 0;
- protected:
-  /*! \var int m_evtcnt
-   * \brief Event counter
-   *
-   * Event counting functionality provided by the abstract base class.
-   */
-  int m_evtcnt;
-  /*! \var TYPE1* m_d1
-   * \brief pointer to the TYPE1 object being constructed
-   * \note the memory from this variable is assumed under the control of the user
-   * and therefore they assume responsibility for it's cleanup
-   */
-  TYPE1* m_d1;
-  /*! \var TYPE2* m_d2
-   * \brief pointer to the TYPE2 object being constructed
-   * \note the memory from this variable is assumed under the control of the user
-   * and therefore they assume responsibility for it's cleanup
-   */
-  TYPE2* m_d2;
-};
+  public:
+    /*!\brief Convert data
+     *
+     * Implementation of the interface. Wraps the convert function
+     * \param INPUT* Pointer to the input data
+     * \return output data type OUTPUT*
+     */
+    OUTPUT* operator()(const INPUT* ) const;
+    /*!\brief Convert data
+     *
+     * reverse conversion
+     */
+    INPUT* operator()(const OUTPUT* ) const;
+    /*!\brief Convert data
+     *
+     * Implementation of the interface. Wraps the _convert function
+     * \param INPUT* Pointer to the input data
+     * \return output data type OUTPUT*
+     */
+    OUTPUT* convert(const INPUT* )    const;
+    /*!\brief Convert data
+     *
+     * reverse conversion
+     */
+    INPUT* convert(const OUTPUT* )    const;
 
+  protected:
+    /*!\var std::string _classname
+     * \brief The name of the derived converter class
+     */
+    std::string _classname;
 
+  private:
+    /*!\brief Convert data
+     *
+     * Pure virtual private function to be implemented by the
+     * derived converter author to correctly convert the data from
+     * type INPUT* to type OUTPUT*.
+     * \param INPUT* Pointer to the input data
+     * \return output data type OUTPUT*
+     */
+    virtual OUTPUT* _convert(const INPUT* ) const = 0;
+    /*!\brief Convert data
+     *
+     * reverse conversion
+     */
+    virtual INPUT* _convert(const OUTPUT* ) const = 0;
+  };
+
+}// end of namespace
+
+#include "src/common_cpp/Converter/ConverterBase-inl.hh"
 #endif

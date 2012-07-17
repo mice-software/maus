@@ -28,13 +28,14 @@
 #include "src/common_cpp/DataStructure/DAQData.hh"
 #include "src/common_cpp/DataStructure/MCEvent.hh"
 
-#include "src/common_cpp/JsonCppStreamer/JsonCppConverter.hh"
+#include "src/common_cpp/Converter/DataConverters/JsonCppConverter.hh"
 #include "src/common_cpp/JsonCppStreamer/IRStream.hh"
 
 namespace MAUS {
 
 InputCppRoot::InputCppRoot(std::string filename) : _infile(NULL),
               _jsonCppConverter(NULL),  _data(NULL), _filename(filename) {
+
 }
 
 InputCppRoot::~InputCppRoot() {
@@ -52,6 +53,7 @@ bool InputCppRoot::birth(std::string json_datacards) {
       _data = new Data();
       _jsonCppConverter = new JsonCppConverter();
       (*_infile) >> branchName("data") >> _data;
+
   } catch(Squeal squee) {
     death();
     CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
@@ -76,9 +78,9 @@ bool InputCppRoot::death() {
     _infile = NULL;
   }
 
-  if (_jsonCppConverter != NULL) {
-    delete _jsonCppConverter;
-    _jsonCppConverter = NULL;
+  if (_cppJsonConverter != NULL) {
+    delete _cppJsonConverter;
+    _cppJsonConverter = NULL;
   }
   return true;
 }
