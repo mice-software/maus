@@ -27,19 +27,26 @@
 namespace MAUS {
 
 std::string GlobalsManager_Initialise_DocString =
-  "Initialise MAUS globlas. Takes one argument which should be the json "+
-  std::string("datacards formatted as a string");
+  std::string("Initialise MAUS globals.\n\n")+
+  std::string("Initialise the MAUS globals such as error handling, C++ ")+
+  std::string("logging, field maps and GEANT4 interfaces. ")+
+  std::string("Takes one argument which should be the json configuration ")+
+  std::string("datacards formatted as a string. Throws an exception if ")+
+  std::string("globals are already initialised.");
 std::string GlobalsManager_Destruct_DocString =
-  "Destruct MAUS globals. Ignores all arguments.";
+  std::string("Destruct MAUS globals.\n\nIgnores all arguments. ")+
+  std::string("Throws an exception if globals are not initialised already.");
 std::string GlobalsManager_HasInstance_DocString =
-  "Check if MAUS globals have been initialised. Ignores all arguments. "+
-  std::string("Returns 1 if globals have been initialised, else 0");
+  std::string("Check if MAUS globals have been initialised. Ignores all ")+
+  std::string("arguments. Returns 1 if globals have been initialised, else 0");
 
 std::string PyField_GetFieldValue_DocString =
   std::string("Get the field value at a point in space, time.\n\n")+
-  std::string("Return the field at a point (x, y, z, t), in units of mm/ns.")+
-  std::string("Returns a 6-tuple like (bx, by, bz, ex, ey, ez) in units of")+
-  std::string("kT and GV/mm");
+  std::string("Return the field at a point (x, y, z, t), in units of mm/ns. ")+
+  std::string("Returns a 6-tuple like (bx, by, bz, ex, ey, ez) in units of ")+
+  std::string("kT and GV/mm.\ne.g. get_field_value(1000., 2000., 3000., 20.) ")+
+  std::string("will return (bx, by, bz, ex, ey, ez) at (x,y,z)=(1,2,3) m and ")+
+  std::string("20 ns");
 
 
 static PyMethodDef MausCpp_methods[] = {
