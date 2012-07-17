@@ -62,12 +62,7 @@ bool MapCppTrackerRecon::death() {
 }
 
 bool sort_by_station(SciFiSpacePoint *a, SciFiSpacePoint *b ) {
-  // int tracker = a->get_tracker();
-  // if ( tracker == 0 ) {
-  //  Descending site number.
-  // return ( a->get_station() > b->get_station() );
-  // } else if ( tracker == 1 ) {
-  //  Ascending site number.
+  //  Ascending station number.
   return ( a->get_station() < b->get_station() );
   // }
 }
@@ -101,17 +96,15 @@ std::string MapCppTrackerRecon::process(std::string document) {
         spacepoint_recon(event);
       }
       // Pattern Recognition.
-/*
       if ( event.spacepoints().size() ) {
         std::cout << "Calling Pattern Recognition..." << std::endl;
         pattern_recognition(event);
         std::cout << "Pattern Recognition complete." << std::endl;
       }
       // Kalman Track Fit.
-      if ( event.straightprtracks().size() || event.helicalprtracks().size() ) {
-        track_fit(event);
-      }
-*/
+      // if ( event.straightprtracks().size() || event.helicalprtracks().size() ) {
+      //   track_fit(event);
+      // }
       // Perform alignment study.
       // if ( event.spacepoints().size() == 5 ) {
       //  perform_alignment_study(event);
