@@ -208,31 +208,56 @@ void KalmanTrackFit::initialise_helix(std::vector<SciFiSpacePoint> &spacepoints,
 //
 // Straight track fit.
 //
-void KalmanTrackFit::process(SciFiEvent &event) {
-  int num_tracks;
-  if ( event.straightprtracks().size() ) {
-    _helical_track = true;
-    num_tracks = event.straightprtracks().size();
-  } else if ( event.helicalprtracks().size() ) {
-    _straight_track = true;
-    num_tracks = event.helicalprtracks().size();
-  }
-
-  std::cerr << "Processing " << num_tracks << " tracks." << std::endl;
+void KalmanTrackFit::process(std::vector<SciFiStraightPRTrack> straight_tracks) {
+  int num_tracks = straight_tracks.size();
 
   for ( int i = 0; i < num_tracks; ++i ) {
     std::vector<KalmanSite> sites;
-    if ( _straight_track ) {
-      KalmanTrack *track = new StraightTrack();
-      SciFiStraightPRTrack seed = event.straightprtracks()[i];
-      initialise(seed, sites);
-    } else if ( _helical_track ) {
-      SciFiHelicalPRTrack seed = event.helicalprtracks()[i];
-      KalmanTrack *track = new HelicalTrack(seed);
-      initialise(seed, sites);
-    } else {
-      std::cerr << "No tracks to fit." << std::endl;
+
+    SciFiStraightPRTrack seed = straight_tracks[i];
+    KalmanTrack *track = new StraightTrack();
+    initialise(seed, sites);
+
+    // Filter the first state.
+    std::cerr << "Filtering site 0" << std::endl;
+    filter(sites, track, 0);
+
+    int numb_measurements = sites.size();
+
+    assert(numb_measurements < 16);
+
+    for ( int i = 1; i < numb_measurements; ++i ) {
+      // Predict the state vector at site i...
+      std::cerr << "Extrapolating to site " << i << std::endl;
+      extrapolate(sites, track, i);
+      // ... Filter...
+      std::cerr << "Filtering site " << i << std::endl;
+      filter(sites, track, i);
     }
+    sites[numb_measurements-1].set_smoothed_a(sites[numb_measurements-1].get_a());
+    // ...and Smooth back all sites.
+    for ( int i = numb_measurements-2; i >= 0; --i ) {
+      std::cerr << "Smoothing site " << i << std::endl;
+      smooth(sites, track, i);
+    }
+
+    KalmanMonitor monitor;
+    // monitor.save(sites);
+    // monitor.save_mc(sites);
+    // monitor.print_info(sites);
+    delete track;
+  }
+}
+
+void KalmanTrackFit::process(std::vector<SciFiHelicalPRTrack> helical_tracks) {
+  int num_tracks  = helical_tracks.size();
+
+  for ( int i = 0; i < num_tracks; ++i ) {
+    std::vector<KalmanSite> sites;
+
+    SciFiHelicalPRTrack seed = helical_tracks[i];
+    KalmanTrack *track = new HelicalTrack(seed);
+    initialise(seed, sites);
 
     // Filter the first state.
     std::cerr << "Filtering site 0" << std::endl;

@@ -96,7 +96,7 @@ class MapCppTrackerRecon {
 
   void pattern_recognition(SciFiEvent &evt);
 
-  void make_seed_and_fit(SciFiEvent &event);
+  // void make_seed_and_fit(SciFiEvent &event);
 
   void track_fit(SciFiEvent &evt);
 
@@ -110,7 +110,9 @@ class MapCppTrackerRecon {
 
   void perform_alignment_study(SciFiEvent &evt);
 
-  void fit(std::vector<SciFiSpacePoint*> spacepoints, double &x_const, double &x_slope, double &y_const, double &y_slope);
+  void fit(std::vector<SciFiSpacePoint*> spacepoints,
+                             double &x_const, double &x_slope,
+                             double &y_const, double &y_slope);
 
  private:
   /// This should be the classname

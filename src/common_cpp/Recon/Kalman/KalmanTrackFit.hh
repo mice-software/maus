@@ -47,7 +47,9 @@ class KalmanTrackFit {
 
   ~KalmanTrackFit();
 
-  void process(SciFiEvent &evt);
+  void process(std::vector<SciFiHelicalPRTrack> helical_tracks);
+
+  void process(std::vector<SciFiStraightPRTrack> straight_tracks);
 
   void process(Hep3Vector &tof0, Hep3Vector &se, Hep3Vector &tof1);
 

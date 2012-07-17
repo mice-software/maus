@@ -100,24 +100,19 @@ std::string MapCppTrackerRecon::process(std::string document) {
         spacepoint_recon(event);
       }
       // Pattern Recognition.
-      /*if ( event.spacepoints().size() ) {
+      if ( event.spacepoints().size() ) {
         std::cout << "Calling Pattern Recognition..." << std::endl;
         pattern_recognition(event);
         std::cout << "Pattern Recognition complete." << std::endl;
       }
       // Kalman Track Fit.
-      if ( event.straightprtracks().size() ) {
+      if ( event.straightprtracks().size() || event.helicalprtracks().size() ) {
         track_fit(event);
       }
-      */
+
       // Perform alignment study.
-      if ( event.spacepoints().size() == 5 ) {
-        perform_alignment_study(event);
-      }
-
-
-      // if ( root.isMember("mc_events") ) {
-      //   make_seed_and_fit(event);
+      // if ( event.spacepoints().size() == 5 ) {
+      //  perform_alignment_study(event);
       // }
 
       print_event_info(event);
@@ -154,34 +149,7 @@ void MapCppTrackerRecon::perform_alignment_study(SciFiEvent &evt) {
   double full_y_st2 = y_const + y_slope*spacepoints[1]->get_position().z();
   double full_y_st3 = y_const + y_slope*spacepoints[2]->get_position().z();
   double full_y_st4 = y_const + y_slope*spacepoints[3]->get_position().z();
-/*
-  // -- Exclude station 2 from the fit.---------------------
-  std::vector<SciFiSpacePoint*> sp_copy_2 = spacepoints;
-  sp_copy_2.erase(sp_copy_2.begin()+1);
-  double x_const_2, x_slope_2, y_const_2, y_slope_2;
-  fit(sp_copy_2, x_const_2, x_slope_2, y_const_2, y_slope_2);
-  double excluded_x_st2 = x_const_2 + x_slope_2*spacepoints[1]->get_position().z();
-  double excluded_y_st2 = y_const_2 + y_slope_2*spacepoints[1]->get_position().z();
 
-  // -------------------------------------------------------------
-  // -- Exclude station 3 from the fit.---------------------
-  std::vector<SciFiSpacePoint*> sp_copy_3 = spacepoints;
-  sp_copy_3.erase(sp_copy_3.begin()+2);
-  double x_const_3, x_slope_3, y_const_3, y_slope_3;
-  fit(sp_copy_3, x_const_3, x_slope_3, y_const_3, y_slope_3);
-  double excluded_x_st3 = x_const_3 + x_slope_3*spacepoints[2]->get_position().z();
-  double excluded_y_st3 = y_const_3 + y_slope_3*spacepoints[2]->get_position().z();
-
-  // -------------------------------------------------------------
-  // -- Exclude station 4 from the fit.---------------------
-  // -------------------------------------------------------------
-  std::vector<SciFiSpacePoint*> sp_copy_4 = spacepoints;
-  sp_copy_4.erase(sp_copy_4.begin()+3);
-  double x_const_4, x_slope_4, y_const_4, y_slope_4;
-  fit(sp_copy_4, x_const_4, x_slope_4, y_const_4, y_slope_4);
-  double excluded_x_st4 = x_const_4 + x_slope_4*spacepoints[3]->get_position().z();
-  double excluded_y_st4 = y_const_4 + y_slope_4*spacepoints[3]->get_position().z();
-*/
   double excluded_x_st2 = spacepoints[1]->get_position().x();
   double excluded_x_st3 = spacepoints[2]->get_position().x();
   double excluded_x_st4 = spacepoints[3]->get_position().x();
@@ -199,7 +167,9 @@ void MapCppTrackerRecon::perform_alignment_study(SciFiEvent &evt) {
   out.close();
 }
 
-void MapCppTrackerRecon::fit(std::vector<SciFiSpacePoint*> spacepoints, double &x_const, double &x_slope, double &y_const, double &y_slope) {
+void MapCppTrackerRecon::fit(std::vector<SciFiSpacePoint*> spacepoints,
+                             double &x_const, double &x_slope,
+                             double &y_const, double &y_slope) {
 #ifdef __CINT__
   gSystem->Load("libMatrix");
 #endif
@@ -217,17 +187,17 @@ void MapCppTrackerRecon::fit(std::vector<SciFiSpacePoint*> spacepoints, double &
     ae[i] = 0.9;
   }
 
-  TVectorD z; z.Use(nrPnts,az);
-  TVectorD x; x.Use(nrPnts,ax);
-  TVectorD y; y.Use(nrPnts,ay);
-  TVectorD e; e.Use(nrPnts,ae);
+  TVectorD z; z.Use(nrPnts, az);
+  TVectorD x; x.Use(nrPnts, ax);
+  TVectorD y; y.Use(nrPnts, ay);
+  TVectorD e; e.Use(nrPnts, ae);
 
   TMatrixD A(nrPnts,nrVar);
-  TMatrixDColumn(A,0) = 1.0;
-  TMatrixDColumn(A,1) = z;
+  TMatrixDColumn(A, 0) = 1.0;
+  TMatrixDColumn(A, 1) = z;
   TMatrixD B(nrPnts,nrVar);
-  TMatrixDColumn(B,0) = 1.0;
-  TMatrixDColumn(B,1) = y;
+  TMatrixDColumn(B, 0) = 1.0;
+  TMatrixDColumn(B, 1) = y;
 
   const TVectorD solve_x = NormalEqn(A,x,e);
   solve_x.Print();
@@ -301,6 +271,7 @@ void MapCppTrackerRecon::pattern_recognition(SciFiEvent &evt) {
   pr1.process(evt);
 }
 
+/*
 /// Temporary function for helical tracks.
 void MapCppTrackerRecon::make_seed_and_fit(SciFiEvent &event) {
   int number_spacepoints = event.spacepoints().size();
@@ -335,10 +306,13 @@ void MapCppTrackerRecon::make_seed_and_fit(SciFiEvent &event) {
     fit.process(spacepoints_tracker1, seeds);
   }
 }
-
+*/
 void MapCppTrackerRecon::track_fit(SciFiEvent &evt) {
   KalmanTrackFit fit;
-  fit.process(evt);
+  if ( evt.helicalprtracks().size() )
+    fit.process(evt.helicalprtracks());
+  if ( evt.straightprtracks().size() )
+    fit.process(evt.straightprtracks());
 }
 
 void MapCppTrackerRecon::save_to_json(SciFiEvent &evt, int event_i) {
