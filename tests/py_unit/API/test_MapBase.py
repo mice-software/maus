@@ -43,7 +43,7 @@ class TestMapBase(unittest.TestCase):
     def test___init__(self):
         """Test Constructor"""
         try:
-            m=MapBase()
+            m = MapBase()
             self.assertIsInstance(m, MapBase, 'Not an instance of MapBase')
             self.assertIsInstance(m, IMap, 'Not an instance of IMap')
             self.assertIsInstance(m, ModuleBase, 'Not an instance of ModuleBase')
@@ -52,15 +52,15 @@ class TestMapBase(unittest.TestCase):
 
     def test_process(self):
         """Test process"""
-        m=MapBaseDummy()
+        m = MapBaseDummy()
         self.assertEqual(m.process('MyData'), 'MyData', 'process method not '\
                          'calling _process properly')
-        m=MapBaseDummyConstTest()
+        m = MapBaseDummyConstTest()
         self.assertRaises(ConstMethodAttrModError, m.process, 'MyData')
 
     def test__process(self):
         """Test _process"""
-        m=MapBase()
+        m = MapBase()
         self.assertRaises(NotImplementedError, m._process, 'MyData')
 
 if __name__ == '__main__':

@@ -28,7 +28,7 @@ class TestIMap(unittest.TestCase):
     def test___init__(self):
         """Test Constructor"""
         try:
-            m=IMap()
+            m = IMap()
             self.assertIsInstance(m, IMap, 'Not an instance of IMap')
             self.assertIsInstance(m, IModule, 'Not an instance of IModule')
         except:
@@ -36,7 +36,7 @@ class TestIMap(unittest.TestCase):
 
     def test_process(self):
         """Test process"""
-        m=IMap()
+        m = IMap()
         self.assertRaises(NotImplementedError, m.process, 'data')
 
 if __name__ == '__main__':

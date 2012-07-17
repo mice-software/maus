@@ -35,7 +35,7 @@ class TestInputBase(unittest.TestCase):
     def test___init__(self):
         """Test Constructor"""
         try:
-            m=InputBase()
+            m = InputBase()
             self.assertIsInstance(m, InputBase, 'Not an instance of InputBase')
             self.assertIsInstance(m, IInput, 'Not an instance of IInput')
             self.assertIsInstance(m, ModuleBase, 'Not an instance of ModuleBase')
@@ -44,13 +44,13 @@ class TestInputBase(unittest.TestCase):
 
     def test_emitter(self):
         """Test emitter"""
-        m=InputBaseDummy()
+        m = InputBaseDummy()
         self.assertEqual(m.emitter(), 'MyData', 'emitter method not '\
                          'calling _emitter properly')
 
     def test__emitter(self):
         """Test _emitter"""
-        m=InputBase()
+        m = InputBase()
         self.assertRaises(NotImplementedError, m._emitter)
 
 if __name__ == '__main__':

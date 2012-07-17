@@ -36,7 +36,7 @@ class TestModuleBase(unittest.TestCase):
     def test___init__(self):
         """Test Constructor"""
         try:
-            m=ModuleBase()
+            m = ModuleBase()
             self.assertIsInstance(m, ModuleBase, 'Not an instance of ModuleBase')
             self.assertIsInstance(m, IModule, 'Not an instance of IModule')
         except:
@@ -44,24 +44,24 @@ class TestModuleBase(unittest.TestCase):
 
     def test_birth(self):
         """Test birth"""
-        m=ModuleBaseDummy()
+        m = ModuleBaseDummy()
         self.assertEqual(m.birth('MyConfig'), '_birth ran', 'process method not '\
                          'calling _birth properly')
 
     def test__birth(self):
         """Test _birth"""
-        m=ModuleBase()
+        m = ModuleBase()
         self.assertRaises(NotImplementedError, m._birth, 'MyConfig')
 
     def test_death(self):
         """Test death"""
-        m=ModuleBaseDummy()
+        m = ModuleBaseDummy()
         self.assertEqual(m.death(), '_death ran', 'process method not '\
                          'calling _death properly')
 
     def test__death(self):
         """Test _death"""
-        m=ModuleBase()
+        m = ModuleBase()
         self.assertRaises(NotImplementedError, m._death)
 
 if __name__ == '__main__':

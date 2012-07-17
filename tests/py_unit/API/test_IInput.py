@@ -28,7 +28,7 @@ class TestIInput(unittest.TestCase):
     def test___init__(self):
         """Test Constructor"""
         try:
-            m=IInput()
+            m = IInput()
             self.assertIsInstance(m, IInput, 'Not an instance of IInput')
             self.assertIsInstance(m, IModule, 'Not an instance of IModule')
         except:
@@ -36,7 +36,7 @@ class TestIInput(unittest.TestCase):
 
     def test_emitter(self):
         """Test emitter"""
-        m=IInput()
+        m = IInput()
         self.assertRaises(NotImplementedError, m.emitter)
 
 if __name__ == '__main__':

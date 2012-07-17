@@ -50,7 +50,8 @@ class ModuleBase(IModule):
         
         @param config the configuration object
         """       
-        raise NotImplementedError('_birth function not implemented in class %s' % self.__class__.__name__)
+        raise NotImplementedError('_birth function not implemented '\
+                                  'in class %s' % self.__class__.__name__)
 
     def _death(self):
         """
@@ -59,4 +60,5 @@ class ModuleBase(IModule):
         This is the private method which must be overridden in derived classes
         to provide the finalisation behaviour for the module
         """
-        raise NotImplementedError('_death function not implemented in class %s' % self.__class__.__name__)
+        raise NotImplementedError('_death function not implemented '\
+                                  'in class %s' % self.__class__.__name__)

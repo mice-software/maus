@@ -35,7 +35,7 @@ class TestOutputBase(unittest.TestCase):
     def test___init__(self):
         """Test Constructor"""
         try:
-            m=OutputBase()
+            m = OutputBase()
             self.assertIsInstance(m, OutputBase, 'Not an instance of OutputBase')
             self.assertIsInstance(m, IOutput, 'Not an instance of IOutput')
             self.assertIsInstance(m, ModuleBase, 'Not an instance of ModuleBase')
@@ -44,13 +44,13 @@ class TestOutputBase(unittest.TestCase):
 
     def test_save(self):
         """Test save"""
-        m=OutputBaseDummy()
+        m = OutputBaseDummy()
         self.assertTrue(m.save('MyData'), 'save method not '\
                         'calling _save properly')
 
     def test__save(self):
         """Test _save"""
-        m=OutputBase()
+        m = OutputBase()
         self.assertRaises(NotImplementedError, m._save, 'data')
 
 if __name__ == '__main__':

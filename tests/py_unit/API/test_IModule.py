@@ -27,7 +27,7 @@ class TestIModule(unittest.TestCase):
     def test___init__(self):
         """Test Constructor"""
         try:
-            m=IModule()
+            m = IModule()
             self.assertIsInstance(m, IModule, 'Not an instance of IModule')
             self.assertIsInstance(m, object, 'Not an instance of object')
         except:
@@ -35,12 +35,12 @@ class TestIModule(unittest.TestCase):
 
     def test_birth(self):
         """Test birth"""
-        m=IModule()
+        m = IModule()
         self.assertRaises(NotImplementedError, m.birth, 'config')
 
     def test_death(self):
         """Test death"""
-        m=IModule()
+        m = IModule()
         self.assertRaises(NotImplementedError, m.death)
 
 if __name__ == '__main__':

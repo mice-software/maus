@@ -200,22 +200,21 @@ namespace MAUS {
   }
 
   TEST(MapBaseTest, TestOtherTypeProcess) {
-    Json::Value *jv = new Json::Value();
+    Json::Value *jv = new Json::Value(Json::objectValue);
     Json::Reader r;
-    std::ifstream f("/home/hep/arichard/tmp/pythontest/new/data/tmp.json",
-		    std::ios::in/*|std::ios::beg*/);
+    std::ifstream f("tests/cpp_unit/API/example_load_json_file.json",
+		    std::ios::in|std::ios::binary);
     bool b = r.parse(f, *jv);
+    ASSERT_TRUE(b)
+      << "Fail: Problem parsing the test JSON file."
+      << r.getFormatedErrorMessages()
+      << std::endl;
     MyMapper_converter mm_c;
-    mm_c.process(jv);
+    ASSERT_FALSE(mm_c.process(jv) == 0)
+      << "Fail: Processing of alternate input type failed possibly "
+      << "as a result of conversion failure."
+      << std::endl;
     delete jv;
   }
-//   TEST(MapBaseTest, TestOtherTypeProcess) {
-//     MyMapper tc1;
-//     MyMapper tc2(tc1);
-
-//     ASSERT_FALSE(strcmp("TestClass",tc2._classname.c_str()))
-//       << "Fail: Copy Constructor failed, Classname not set properly"
-//       << std::endl;
-//   }
 
 }// end of namespace

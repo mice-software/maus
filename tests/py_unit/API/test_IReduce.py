@@ -28,7 +28,7 @@ class TestIReduce(unittest.TestCase):
     def test___init__(self):
         """Test Constructor"""
         try:
-            m=IReduce()
+            m = IReduce()
             self.assertIsInstance(m, IReduce, 'Not an instance of IReduce')
             self.assertIsInstance(m, IModule, 'Not an instance of IModule')
         except:
@@ -36,7 +36,7 @@ class TestIReduce(unittest.TestCase):
 
     def test_process(self):
         """Test process"""
-        m=IReduce()
+        m = IReduce()
         self.assertRaises(NotImplementedError, m.process, 'data')
 
 if __name__ == '__main__':

@@ -35,7 +35,7 @@ class TestReduceBase(unittest.TestCase):
     def test___init__(self):
         """Test Constructor"""
         try:
-            m=ReduceBase()
+            m = ReduceBase()
             self.assertIsInstance(m, ReduceBase, 'Not an instance of ReduceBase')
             self.assertIsInstance(m, IReduce, 'Not an instance of IReduce')
             self.assertIsInstance(m, ModuleBase, 'Not an instance of ModuleBase')
@@ -44,13 +44,13 @@ class TestReduceBase(unittest.TestCase):
 
     def test_process(self):
         """Test process"""
-        m=ReduceBaseDummy()
+        m = ReduceBaseDummy()
         self.assertEqual(m.process('MyData'), 'MyData', 'process method not '\
                          'calling _process properly')
 
     def test__process(self):
         """Test _process"""
-        m=ReduceBase()
+        m = ReduceBase()
         self.assertRaises(NotImplementedError, m._process, 'MyData')
 
 if __name__ == '__main__':
