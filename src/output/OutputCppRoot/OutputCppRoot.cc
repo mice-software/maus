@@ -73,7 +73,7 @@ bool OutputCppRoot::save(std::string json_spill_document) {
       }
       if (json_spill_document != "") {
           Json::Value json_spill = JsonWrapper::StringToJson(json_spill_document);
-          _data->SetSpill( (*_jsonCppConverter)(json_spill) );
+          _data->SetSpill( (*_jsonCppConverter)(&json_spill) );
           (*_outfile) << fillEvent;
           return true;
       } else {
