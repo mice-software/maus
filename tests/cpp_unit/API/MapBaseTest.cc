@@ -15,6 +15,8 @@
  *
  */
 #include <fstream>
+#include <sstream>
+#include <cstdlib>
 #include "json/json.h"
 #include "gtest/gtest.h"
 #include "gtest/gtest_prod.h"
@@ -202,7 +204,11 @@ namespace MAUS {
   TEST(MapBaseTest, TestOtherTypeProcess) {
     Json::Value *jv = new Json::Value(Json::objectValue);
     Json::Reader r;
-    std::ifstream f("tests/cpp_unit/API/example_load_json_file.json",
+    std::stringstream ss;
+    ss << getenv("MAUS_ROOT_DIR")
+       << "/tests/cpp_unit/API/example_load_json_file.json";
+
+    std::ifstream f(ss.str().c_str(),
 		    std::ios::in|std::ios::binary);
     bool b = r.parse(f, *jv);
     ASSERT_TRUE(b)
