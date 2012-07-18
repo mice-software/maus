@@ -19,24 +19,28 @@
 
 #include "src/legacy/BeamTools/BTFieldConstructor.hh"
 
-#include "src/common_cpp/GlobalsHandling/GlobalsManager.hh"
-#include "src/common_cpp/GlobalsHandling/GlobalsManagerFactory.hh"
-#include "src/common_cpp/GlobalsHandling/PyMausCpp.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
+#include "src/common_cpp/Utils/Globals.hh"
+
+#include "src/common_cpp/Globals/GlobalsManager.hh"
+#include "src/common_cpp/Globals/PyLibMausCpp.hh"
 
 namespace MAUS {
 
-std::string GlobalsManager_Initialise_DocString =
+namespace PyLibMausCpp {
+std::string Globals_Initialise_DocString =
   std::string("Initialise MAUS globals.\n\n")+
   std::string("Initialise the MAUS globals such as error handling, C++ ")+
   std::string("logging, field maps and GEANT4 interfaces. ")+
   std::string("Takes one argument which should be the json configuration ")+
   std::string("datacards formatted as a string. Throws an exception if ")+
   std::string("globals are already initialised.");
-std::string GlobalsManager_Destruct_DocString =
+
+std::string Globals_Destruct_DocString =
   std::string("Destruct MAUS globals.\n\nIgnores all arguments. ")+
   std::string("Throws an exception if globals are not initialised already.");
-std::string GlobalsManager_HasInstance_DocString =
+
+std::string Globals_HasInstance_DocString =
   std::string("Check if MAUS globals have been initialised. Ignores all ")+
   std::string("arguments. Returns 1 if globals have been initialised, else 0");
 
@@ -50,27 +54,27 @@ std::string PyField_GetFieldValue_DocString =
 
 
 static PyMethodDef MausCpp_methods[] = {
-{"initialise", (PyCFunction)GlobalsManager_Initialise,
-    METH_VARARGS, GlobalsManager_Initialise_DocString.c_str()},
-{"destruct", (PyCFunction)GlobalsManager_Destruct,
-    METH_VARARGS, GlobalsManager_Destruct_DocString.c_str()},
-{"has_instance", (PyCFunction)GlobalsManager_HasInstance,
-    METH_VARARGS, GlobalsManager_HasInstance_DocString.c_str()},
+{"initialise", (PyCFunction)Globals_Initialise,
+    METH_VARARGS, Globals_Initialise_DocString.c_str()},
+{"destruct", (PyCFunction)Globals_Destruct,
+    METH_VARARGS, Globals_Destruct_DocString.c_str()},
+{"has_instance", (PyCFunction)Globals_HasInstance,
+    METH_VARARGS, Globals_HasInstance_DocString.c_str()},
 {"SetHandleException", (PyCFunction)CppErrorHandler_SetHandleExceptionFunction,
     METH_VARARGS, "Set the python function that is called to handle exceptions"},
 {NULL, NULL, 0, NULL}
 };
 
-PyObject* GlobalsManager_Initialise(PyObject *dummy, PyObject *args) {
+PyObject* Globals_Initialise(PyObject *dummy, PyObject *args) {
   const char* temp = NULL;
   if (!PyArg_ParseTuple(args, "s", &temp)) {
     PyErr_SetString(PyExc_TypeError,
          "Failed to recognise arguments to libMausCpp.Initialise as a string");
     return NULL;
   }
-  std::string cards(temp); 
+  std::string cards(temp);
   try {
-    GlobalsManagerFactory::InitialiseGlobalsManager(cards);
+    GlobalsManager::InitialiseGlobals(cards);
   } catch(std::exception& exc) {
     PyErr_SetString(PyExc_RuntimeError, (&exc)->what());
     return NULL;
@@ -79,9 +83,9 @@ PyObject* GlobalsManager_Initialise(PyObject *dummy, PyObject *args) {
   return Py_None;
 }
 
-PyObject* GlobalsManager_Destruct(PyObject *dummy, PyObject *args) {
+PyObject* Globals_Destruct(PyObject *dummy, PyObject *args) {
   try {
-    GlobalsManagerFactory::DeleteGlobalsManager();
+    GlobalsManager::DeleteGlobals();
   } catch(std::exception& exc) {  // shouldn't be able to throw an exception
     PyErr_SetString(PyExc_RuntimeError, (&exc)->what());
     return NULL;
@@ -91,9 +95,9 @@ PyObject* GlobalsManager_Destruct(PyObject *dummy, PyObject *args) {
 }
 
 
-PyObject* GlobalsManager_HasInstance(PyObject *dummy, PyObject *args) {
+PyObject* Globals_HasInstance(PyObject *dummy, PyObject *args) {
   try {
-    bool has_instance = GlobalsManager::HasInstance();
+    bool has_instance = Globals::HasInstance();
     if (has_instance)
       return Py_BuildValue("i", 1);
     else
@@ -131,13 +135,13 @@ PyObject* PyField_GetFieldValue(PyObject *dummy, PyObject *args) {
            "Failed to interpret get_field_value arguments as x,y,z,t");
     return NULL;
   }
-  if (!GlobalsManager::HasInstance()) {
+  if (!Globals::HasInstance()) {
     PyErr_SetString(PyExc_RuntimeError,
            "Attempt to get field when MAUS library has not been initialised");
     return NULL;
   }
   BTFieldConstructor* maus_field =
-                        GlobalsManager::GetInstance()->GetBTFieldConstructor();
+                        Globals::GetInstance()->GetBTFieldConstructor();
   if (maus_field == NULL) {
     PyErr_SetString(PyExc_RuntimeError,
            "Error - somehow MAUS library was initialised but fields are not.");
@@ -156,7 +160,7 @@ PyObject* PyField_GetFieldValue(PyObject *dummy, PyObject *args) {
 
 static PyMethodDef PyField_methods[] = {
 {"get_field_value", (PyCFunction)PyField_GetFieldValue,
-   METH_VARARGS, PyField_GetFieldValue_DocString.c_str()},
+                         METH_VARARGS, PyField_GetFieldValue_DocString.c_str()},
 {NULL, NULL, 0, NULL}
 };
 
@@ -172,6 +176,6 @@ PyMODINIT_FUNC initlibMausCpp(void) {
     // I think memory should be handled by Python garbage collection
   }
 }
-
+}  // namespace PyLibMausCpp
 }  // namespace MAUS
 

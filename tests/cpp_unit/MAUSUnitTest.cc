@@ -26,7 +26,7 @@
 #include "json/value.h"
 
 #include "src/common_cpp/Utils/JsonWrapper.hh"
-#include "src/common_cpp/GlobalsHandling/GlobalsManagerFactory.hh"
+#include "src/common_cpp/Globals/GlobalsManager.hh"
 
 Json::Value SetupConfig() {
   Json::Value config(Json::objectValue);
@@ -49,20 +49,8 @@ Json::Value SetupConfig() {
 }
 
 int main(int argc, char **argv) {
-  MAUS::GlobalsManagerFactory::InitialiseGlobalsManager
+  MAUS::GlobalsManager::InitialiseGlobals
                                      (JsonWrapper::JsonToString(SetupConfig()));
-  /*
-  MICERun::getInstance()->jsonConfiguration = new Json::Value(SetupConfig());
-  std::cerr << MICERun::getInstance()->jsonConfiguration << std::endl;
-  std::cerr << JsonWrapper::JsonToString(*(MICERun::getInstance()->jsonConfiguration)) << std::endl;
-  dataCards MyDataCards(0);
-  MICERun::getInstance()->DataCards = &MyDataCards;
-  MICERun::getInstance()->miceModule = new MiceModule("Test.dat");  // delete
-  MICERun::getInstance()->miceMaterials = new MiceMaterials();  // delete
-  fillMaterials(*MICERun::getInstance());
-  Squeak::setOutput(Squeak::debug, Squeak::nullOut());
-  Squeak::setStandardOutputs();
-  */
   ::testing::InitGoogleTest(&argc, argv);
   int test_out = -1;
   try {
@@ -73,7 +61,7 @@ int main(int argc, char **argv) {
   } catch(std::exception exc) {
       std::cerr << "Caught std::exception" << "\n" << exc.what() << std::endl;
   }
-  MAUS::GlobalsManagerFactory::DeleteGlobalsManager();
+  MAUS::GlobalsManager::DeleteGlobals();
   return test_out;
 }
 

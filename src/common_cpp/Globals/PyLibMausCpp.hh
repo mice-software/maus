@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef _SRC_COMMON_CPP_GLOBALSHANDLING_PYMAUSCPP_HH_
-#define _SRC_COMMON_CPP_GLOBALSHANDLING_PYMAUSCPP_HH_
+#ifndef _SRC_COMMON_CPP_GLOBALS_PYMAUSCPP_HH_
+#define _SRC_COMMON_CPP_GLOBALS_PYMAUSCPP_HH_
 
 // These ifdefs are required to avoid cpp compiler warning
 #ifdef _POSIX_C_SOURCE
@@ -31,6 +31,7 @@
 
 namespace MAUS {
 
+namespace PyLibMausCpp {
 /*  @brief Defines some interfaces available in Python from C
  *
  *  The interface between Python and C in MAUS is usually done using text files
@@ -71,14 +72,14 @@ static PyObject* CppErrorHandler_SetHandleExceptionFunction
  * datacards (as read by Configuration module). Throws a Runtime error if MAUS
  * globals are already set. Returns Py_None.
  */
-static PyObject* GlobalsManager_Initialise(PyObject *dummy, PyObject *args);
+static PyObject* Globals_Initialise(PyObject *dummy, PyObject *args);
 
 /* @brief Destruct MAUS
  *
  * Destruct MAUS globals. Ignores all arguments. Throws a RuntimeError if MAUS
  * globals were never set. Returns Py_None.
  */
-PyObject* GlobalsManager_Destruct(PyObject *dummy, PyObject *args);
+PyObject* Globals_Destruct(PyObject *dummy, PyObject *args);
 
 /* @brief GetFieldValue at a point in space, time
  *
@@ -92,9 +93,9 @@ PyObject* PyField_GetFieldValue(PyObject *dummy, PyObject *args);
  * Check for initalisation of MAUS globals. Ignores all arguments. Returns
  * PyObject integer 1 if library is initialised, 0 if it is not
  */
-PyObject* GlobalsManager_HasInstance(PyObject *dummy, PyObject *args);
-
+PyObject* Globals_HasInstance(PyObject *dummy, PyObject *args);
+}
 }  // namespace MAUS
 
-#endif  // _SRC_COMMON_CPP_GLOBALSHANDLING_PYMAUSCPP_HH_
+#endif  // _SRC_COMMON_CPP_GLOBALS_PYMAUSCPP_HH_
 

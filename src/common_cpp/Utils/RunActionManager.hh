@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef _SRC_COMMON_CPP_GLOBALSHANDLING_RUNACTIONMANAGER_HH_
-#define _SRC_COMMON_CPP_GLOBALSHANDLING_RUNACTIONMANAGER_HH_
+#ifndef _SRC_COMMON_CPP_UTILS_RUNACTIONMANAGER_HH_
+#define _SRC_COMMON_CPP_UTILS_RUNACTIONMANAGER_HH_
 
 #include <vector>
 
@@ -91,6 +91,6 @@ class RunActionManager {
     RunActionManager(const RunActionManager& run);
     RunActionManager& operator=(const RunActionManager& run);
 };
-}
+}  // namespace MAUS
 
-#endif
+#endif  // #ifndef _SRC_COMMON_CPP_UTILS_RUNACTIONMANAGER_HH_

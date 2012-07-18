@@ -22,8 +22,8 @@
 #include "src/common_cpp/DataStructure/RunHeader.hh"
 #include "src/common_cpp/DataStructure/RunFooter.hh"
 
-#include "src/common_cpp/GlobalsHandling/RunActionBase.hh"
-#include "src/common_cpp/GlobalsHandling/RunActionManager.hh"
+#include "src/common_cpp/Utils/RunActionBase.hh"
+#include "src/common_cpp/Utils/RunActionManager.hh"
 
 namespace MAUS {
 
@@ -82,5 +82,5 @@ void RunActionManager::Swap(RunActionBase* current_item,
     }
     *place = new_item;
 }
-}
+}  // namespace MAUS
 

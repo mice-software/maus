@@ -13,21 +13,22 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+# pylint: disable=C0103
+
 """
 Test libMausCpp
 """
 
 import StringIO
-import json
 import unittest
 
 import Configuration
 import libMausCpp
 
-class LibMausCppTestCase(unittest.TestCase):
+class LibMausCppTestCase(unittest.TestCase): # pylint: disable=R0904
     """Test libMausCpp"""
 
-    def setUp(self):
+    def setUp(self): # pylint: disable=C0103
         """Set up test"""
         config_options = StringIO.StringIO(unicode("""
 simulation_geometry_filename = "Test.dat"
@@ -60,8 +61,9 @@ reconstruction_geometry_filename = "Test.dat"
     def test_get_field_value(self):
         """Test libMausCpp.Field.get_field_value(...)"""
         libMausCpp.initialise(self.config)
-        for x in range(10):
-            field_value = libMausCpp.Field.get_field_value(x, x, x, x)
+        for x_pos in range(10):
+            field_value = libMausCpp.Field.get_field_value\
+                                                    (x_pos, x_pos, x_pos, x_pos)
             for i in range(6):
                 self.assertAlmostEqual(field_value[i], 0., 1e-12)
         libMausCpp.destruct()

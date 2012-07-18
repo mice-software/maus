@@ -76,7 +76,8 @@ class GoTestCase(unittest.TestCase): #pylint: disable = R0904
         outputer = OutputPyJSON(open(self.tmp_file, 'w'))
 
         with self.assertRaises(AssertionError):
-            Go(inputer, transformer, merger, outputer, config_file=self.config, command_line_args=False)
+            Go(inputer, transformer, merger, outputer, \
+                              config_file=self.config, command_line_args=False)
 
     def test_map_birth(self):
         """
@@ -89,7 +90,8 @@ class GoTestCase(unittest.TestCase): #pylint: disable = R0904
         outputer = OutputPyJSON(open(self.tmp_file, 'w'))
 
         with self.assertRaises(AssertionError):
-            Go(inputer, transformer, merger, outputer, config_file=self.config, command_line_args=False)
+            Go(inputer, transformer, merger, outputer, \
+                               config_file=self.config, command_line_args=False)
 
     def test_reduce_birth(self):
         """
@@ -102,7 +104,8 @@ class GoTestCase(unittest.TestCase): #pylint: disable = R0904
         outputer = OutputPyJSON(open(self.tmp_file, 'w'))
 
         with self.assertRaises(AssertionError):
-            Go(inputer, transformer, merger, outputer, config_file=self.config, command_line_args=False)
+            Go(inputer, transformer, merger, outputer, \
+                             config_file=self.config, command_line_args=False)
 
     def test_output_birth(self):
         """
@@ -115,7 +118,8 @@ class GoTestCase(unittest.TestCase): #pylint: disable = R0904
         outputer = FakeWorker()
 
         with self.assertRaises(AssertionError):
-            Go(inputer, transformer, merger, outputer, config_file=self.config, command_line_args=False)
+            Go(inputer, transformer, merger, outputer, \
+                               config_file=self.config, command_line_args=False)
 
     def test_command_line_args(self):
         """
@@ -129,16 +133,19 @@ class GoTestCase(unittest.TestCase): #pylint: disable = R0904
         arg_temp = copy.deepcopy(sys.argv)
         sys.argv = [arg_temp[0]]
     
-        Go(inputer, transformer, merger, outputer, config_file=self.config, command_line_args = True)
+        Go(inputer, transformer, merger, outputer, config_file=self.config, \
+                                                      command_line_args = True)
 
         outputer = OutputPyJSON(open(self.tmp_file, 'w'))
         arg_temp = copy.deepcopy(sys.argv)
         sys.argv = [arg_temp[0], "bob"]
         with self.assertRaises(SystemExit):
-            Go(inputer, transformer, merger, outputer, config_file=self.config, command_line_args = True)
+            Go(inputer, transformer, merger, outputer, \
+                              config_file=self.config, command_line_args = True)
 
         sys.argv = [arg_temp[0], "-verbose_level", "1"]
-        Go(inputer, transformer, merger, outputer, config_file=self.config, command_line_args = True)
+        Go(inputer, transformer, merger, outputer, \
+                             config_file=self.config, command_line_args = True)
 
         sys.argv = arg_temp
 

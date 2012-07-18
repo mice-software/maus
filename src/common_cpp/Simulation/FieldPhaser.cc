@@ -18,6 +18,7 @@
 #include <vector>
 #include <set>
 #include <limits>
+#include <utility>
 
 #include "src/common_cpp/Simulation/FieldPhaser.hh"
 
@@ -92,7 +93,6 @@ void FieldPhaser::SetPhases() {
         Squeak::mout(Squeak::debug) << "Failed to phase cavity at position " <<
                 _phaserVirtualPlanes.GetPlanes()[i]->GetPosition() << std::endl;
     }
-    
     if (_phaserVirtualPlanes.GetPlanes().size() > 0) {
         TearDown();
         throw(Squeal(Squeal::recoverable, "Failed to phase cavities",

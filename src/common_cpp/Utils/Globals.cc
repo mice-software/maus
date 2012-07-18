@@ -16,69 +16,70 @@
  */
 
 #include "src/legacy/Interface/Squeal.hh"
-#include "src/common_cpp/GlobalsHandling/GlobalsManager.hh"
+#include "src/common_cpp/Utils/Globals.hh"
 
 namespace MAUS {
 
-GlobalsManager* GlobalsManager::_process = NULL;
+Globals* Globals::_process = NULL;
 
-GlobalsManager* GlobalsManager::GetInstance() {
+Globals* Globals::GetInstance() {
     if (_process != NULL) {
         return _process;
     } else {
         // watch out here, error handler not initialised(!)
         throw(Squeal(Squeal::recoverable,
-                     std::string("Attempt to get GlobalsManager ")+
+                     std::string("Attempt to get Globals ")+
                           "instance when it has not been initialised",
-                          "GlobalsManager::GetInstance()"));
+                          "Globals::GetInstance()"));
     }
     return NULL; // appease gcc
 }
 
-GlobalsManager::~GlobalsManager() {
+Globals::~Globals() {
 }
 
-bool GlobalsManager::HasInstance() {
+bool Globals::HasInstance() {
     return _process != NULL;
 }
 
-GlobalsManager::GlobalsManager()
+Globals::Globals()
   : _configuration_cards(NULL), _legacy_mice_run(NULL), _error_handler(NULL),
     _legacy_cards(NULL), _run_action_manager(NULL), _mc_mods(NULL),
     _recon_mods(NULL), _maus_geant4_manager(NULL), _mice_materials(NULL) {
 }
 
 // in all the below I call GetInstance() to check that _process is initialised
-RunActionManager* GlobalsManager::GetRunActionManager() {
+RunActionManager* Globals::GetRunActionManager() {
     return GetInstance()->_run_action_manager;
 }
 
-CppErrorHandler* GlobalsManager::GetErrorHandler() {
+CppErrorHandler* Globals::GetErrorHandler() {
     return GetInstance()->_error_handler;
 }
 
-Json::Value* GlobalsManager::GetConfigurationCards() {
+Json::Value* Globals::GetConfigurationCards() {
     return GetInstance()->_configuration_cards;
 }
 
-dataCards* GlobalsManager::GetLegacyCards() {
+dataCards* Globals::GetLegacyCards() {
     return GetInstance()->_legacy_cards;
 }
 
-BTFieldConstructor* GlobalsManager::GetBTFieldConstructor() {
+BTFieldConstructor* Globals::GetBTFieldConstructor() {
     return GetInstance()->_field_constructor;
 }
 
-MAUSGeant4Manager* GlobalsManager::GetGeant4Manager() {
+MAUSGeant4Manager* Globals::GetGeant4Manager() {
     return GetInstance()->_maus_geant4_manager;
 }
 
-MiceModule* GlobalsManager::GetMonteCarloMiceModules() {
+MiceModule* Globals::GetMonteCarloMiceModules() {
     return GetInstance()->_mc_mods;
 }
 
-MiceModule* GlobalsManager::GetReconstructionMiceModules() {
+MiceModule* Globals::GetReconstructionMiceModules() {
     return GetInstance()->_recon_mods;
 }
+
 }  // namespace MAUS
 

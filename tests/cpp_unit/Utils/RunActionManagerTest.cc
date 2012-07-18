@@ -22,8 +22,8 @@
 #include "src/common_cpp/DataStructure/RunHeader.hh"
 #include "src/common_cpp/DataStructure/RunFooter.hh"
 
-#include "src/common_cpp/GlobalsHandling/RunActionBase.hh"
-#include "src/common_cpp/GlobalsHandling/RunActionManager.hh"
+#include "src/common_cpp/Utils/RunActionBase.hh"
+#include "src/common_cpp/Utils/RunActionManager.hh"
 
 namespace MAUS {
 
@@ -32,7 +32,9 @@ class RunActionTest : public RunActionBase {
     RunActionTest() : _my_run_number(0) {reference_count++;}
     ~RunActionTest() {reference_count--;}
 
-    RunActionTest* Clone() {return new RunActionTest();};
+    RunActionTest* Clone() {
+        return new RunActionTest();
+    }
 
     void StartOfRun(RunHeader* run_header) {
         _my_run_number = run_header->GetRunNumber();
@@ -92,8 +94,8 @@ TEST(RunActionManagerTest, TestEndOfRunAction) {
     RunFooter footer;
     footer.SetRunNumber(10);
     RunActionManager* data_run = new RunActionManager();
-    RunActionTest* run_action_1 = new RunActionTest(); 
-    RunActionTest* run_action_2 = new RunActionTest(); 
+    RunActionTest* run_action_1 = new RunActionTest();
+    RunActionTest* run_action_2 = new RunActionTest();
     // check it's okay if the run_action_list is empty
     data_run->EndOfRun(&footer);
     // check that we update run actions

@@ -35,13 +35,13 @@ class RunActionBase {
   public:
 
     /** Constructor (does nothing) */
-    RunActionBase() {};
+    RunActionBase() {}
 
     /** Copy Constructor (does nothing) */
-    RunActionBase(const RunActionBase& datum) {};
+    RunActionBase(const RunActionBase& datum) {}
 
     /** Destructor (does nothing) */
-    virtual ~RunActionBase() {};
+    virtual ~RunActionBase() {}
 
     /** Clone method is like a copy cosntructor but copies the child object */
     virtual RunActionBase* Clone() = 0;
