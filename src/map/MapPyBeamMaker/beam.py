@@ -284,7 +284,7 @@ class Beam(): # pylint: disable=R0902
             self.t_dist = self.longitudinal_mode
             self.t_start = beam_def['t_start']
             self.t_end = beam_def['t_end']
-            long_matrix[1, 1] = beam_def['sigma_'+self.momentum_defined_by]
+            long_matrix[1, 1] = beam_def['sigma_'+self.momentum_defined_by]**2.
             if beam_def['sigma_'+self.momentum_defined_by] <= 0.:
                 raise ValueError('sigma_'+self.momentum_defined_by+ \
                                  " "+str(long_matrix[0, 0])+" must be > 0")
@@ -318,9 +318,13 @@ class Beam(): # pylint: disable=R0902
 
         Returns an dict formatted for insertion into the json tree as a primary.
         See json data tree documentation for further information
+
+        Note that if the dice give us a particle that has "negative" total
+        momentum we throw again.
         """
         hit = xboa.Hit.Hit.new_from_dict({'pid':-13, "energy":float('nan')})
-        while math.isnan(hit["energy"]) or math.isnan(hit["pz"]):
+        while math.isnan(hit["energy"]) or math.isnan(hit["pz"]) or \
+              hit["energy"] < hit["mass"]:
             particle_array = self.__process_get_particle_array()
             hit = self.__process_array_to_hit(particle_array,
                                 self.reference["pid"], self.momentum_defined_by)
@@ -328,6 +332,9 @@ class Beam(): # pylint: disable=R0902
         return primary
 
     def __process_get_particle_array(self):
+        """
+        Generate a particle array like x,px,y,py,time,<p>
+        """
         particle_array = numpy.random.multivariate_normal\
                                               (self.beam_mean, self.beam_matrix)
         if self.transverse_mode == "pencil":
@@ -372,6 +379,9 @@ class Beam(): # pylint: disable=R0902
         return hit
 
     def __process_hit_to_primary(self, hit):
+        """
+        Convert an xboa hit into a MAUS primary
+        """
         primary = hit.get_maus_dict('maus_primary')[0]
         primary["position"]["z"] = self.reference["z"]
         primary["random_seed"] = self.__process_get_seed()
