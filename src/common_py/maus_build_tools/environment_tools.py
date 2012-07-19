@@ -148,7 +148,8 @@ def get_environment():
                         "%s/third_party/install/include/python2.7" % maus_third,
                         "%s/third_party/install/include/root" % maus_third,
                         "%s/src/legacy" % maus_root,
-                        "%s/src/common_cpp" % maus_root, ""])
+                        "%s/src/common_cpp" % maus_root,
+                        "%s/" % maus_root])
 
     env['USE_G4'] = False
     env['USE_ROOT'] = False

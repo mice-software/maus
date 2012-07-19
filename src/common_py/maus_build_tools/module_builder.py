@@ -121,11 +121,11 @@ class ModuleBuilder:
         Find the modules that need building and register them (call sconscripts)
         """
         directories = []
-        types = ["input", "map", "reduce", "output", "util"]
+        types = ["input", "map", "reduce", "output"]
         for my_type in types:
             directories += glob.glob(MAUS_ROOT_DIR+"/src/"+my_type+"/*")
 
-        stuff_to_import = []
+        cpp_libs, py_libs = [], []
 
         for directory in directories:
             directory = directory[len(MAUS_ROOT_DIR)+1:]
@@ -138,16 +138,15 @@ class ModuleBuilder:
                 print 'Found Python module: %s' % parts[2]
                 files = glob.glob('%s/*.py' % directory) 
                 self.env.Install("build", files)
-
-                stuff_to_import.append(parts[2])
+                py_libs.append(parts[2])
 
             for my_type in types:
                 # map -> MapCpp, input -> InputCpp, etc
                 if parts[2].find(my_type.capitalize()+'Cpp') == 0:
                     print 'Found C++ module: %s' % parts[2]
                     self.subproject(directory)
-                    stuff_to_import.append(parts[2])
-        return stuff_to_import
+                    cpp_libs.append(parts[2])
+        return cpp_libs, py_libs
 
 
 def sconscript_path(project):
