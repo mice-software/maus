@@ -66,7 +66,7 @@ def run_simulations():
     pull it out into a separate part of the test.
     """
     out = open(TMP_PATH+'/test_beam_maker_output.out', 'w')
-    """
+    
     # run simulation
     subproc = subprocess.Popen([SIM_PATH, '-configuration_file', \
                            os.path.join(TEST_DIR, 'default_beam_config.py')], \
@@ -90,7 +90,7 @@ def run_simulations():
                           '-output_json_file_name', BIN_SIM], \
                            stdout = out)
     subproc.wait()
-    """
+    
     # run simulation
     subproc = subprocess.Popen([SIM_PATH, '-configuration_file', \
                            os.path.join(TEST_DIR, 'nan_beam_config.py')], \
@@ -121,7 +121,7 @@ class BeamMakerTest(unittest.TestCase): # pylint: disable = R0904
             run_simulations()
             SETUP_DONE = True
 
-    def _test_defaults(self):
+    def test_defaults(self):
         """
         Check that the default beam parameters run and produce some number of
         primary hits > 0
@@ -129,7 +129,7 @@ class BeamMakerTest(unittest.TestCase): # pylint: disable = R0904
         bunch = Bunch.new_from_read_builtin('maus_primary', DEF_SIM)
         self.assertTrue(len(bunch) > 0)
 
-    def _test_binomial(self):
+    def test_binomial(self):
         """
         Check that we can generate a binomial distribution for event number
         """
@@ -158,7 +158,7 @@ class BeamMakerTest(unittest.TestCase): # pylint: disable = R0904
         canvas.Update()
         canvas.Print(PLOT_DIR+"/binomial_distribution_test.png")
 
-    def _test_weighting(self):
+    def test_weighting(self):
         """
         Check that the weight of each sub-beam is close to the expected weight
         """
@@ -189,7 +189,7 @@ class BeamMakerTest(unittest.TestCase): # pylint: disable = R0904
                 self.assertTrue(diff, msg_)
 
 
-    def _test_gaussian(self):
+    def test_gaussian(self):
         """
         Check that the weight of each sub-beam is close to the expected weight
         """
@@ -242,7 +242,7 @@ class BeamMakerTest(unittest.TestCase): # pylint: disable = R0904
         canvas.Print(PLOT_DIR+"/nan_energy_distribution_test.png")
         self.assertGreater(ks_value, 1e-3)
 
-    def _test_sawtooth_time(self):
+    def test_sawtooth_time(self):
         """
         Check that beam maker generates sawtooth t distribution correctly
         """
@@ -262,7 +262,7 @@ class BeamMakerTest(unittest.TestCase): # pylint: disable = R0904
         canvas.Print(PLOT_DIR+"/sawtooth_time_distribution_test.png")
         self.assertGreater(ks_value, 1e-3)
 
-    def _test_uniform_time(self):
+    def test_uniform_time(self):
         """
         Check that beam maker generates uniform t distribution correctly
         """
