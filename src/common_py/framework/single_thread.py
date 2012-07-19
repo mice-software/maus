@@ -17,6 +17,7 @@ Single-threaded dataflows module.
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
 import json
+import maus_cpp.run_action_manager
 
 from framework.utilities import DataflowUtilities
 
@@ -61,6 +62,12 @@ class PipelineSingleThreadDataflowExecutor:
         print("HINT: MAUS will process 1 event only at first...")
         map_buffer = DataflowUtilities.buffer_input(emitter, 1)
 
+        # NEEDS TO BE UNCOMMENTED - but only when I figure out how to implement
+        # in multithreaded mode also
+        #print "START OF RUN: Calling start of run"
+        #run_number=DataflowUtilities.get_run_number(json.loads(map_buffer[0]))
+        #maus_cpp.run_action_manager.start_of_run(run_number)
+
         print("TRANSFORM: Setting up transformer (this can take a while...)")
         assert(self.transformer.birth(self.json_config_doc) == True)
 
@@ -96,6 +103,7 @@ class PipelineSingleThreadDataflowExecutor:
 
         print("OUTPUT: Shutting down outputer")
         assert(self.outputer.death() == True)
+        maus_cpp.run_action_manager.end_of_run()
 
     @staticmethod
     def get_dataflow_description():

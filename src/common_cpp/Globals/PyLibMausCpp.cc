@@ -15,10 +15,27 @@
  *
  */
 
-#include "src/common_cpp/Utils/PyMausCpp.hh"
+#include <string>
+
+#include "src/legacy/BeamTools/BTFieldConstructor.hh"
+
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
+#include "src/common_cpp/Utils/Globals.hh"
+
+#include "src/common_cpp/Globals/GlobalsManager.hh"
+#include "src/common_cpp/Globals/PyLibMausCpp.hh"
 
 namespace MAUS {
+
+namespace PyLibMausCpp {
+std::string PyField_GetFieldValue_DocString =
+  std::string("Get the field value at a point in space, time.\n\n")+
+  std::string("Return the field at a point (x, y, z, t), in units of mm/ns. ")+
+  std::string("Returns a 6-tuple like (bx, by, bz, ex, ey, ez) in units of ")+
+  std::string("kT and GV/mm.\ne.g. get_field_value(1000., 2000., 3000., 20.) ")+
+  std::string("will return (bx, by, bz, ex, ey, ez) at (x,y,z)=(1,2,3) m and ")+
+  std::string("20 ns");
+
 
 static PyMethodDef MausCpp_methods[] = {
 {"SetHandleException", (PyCFunction)CppErrorHandler_SetHandleExceptionFunction,
@@ -45,11 +62,12 @@ PyObject* CppErrorHandler_SetHandleExceptionFunction
   return Py_None;
 }
 
+
 PyMODINIT_FUNC initlibMausCpp(void) {
   Py_Initialize();
-  PyObject* m = Py_InitModule("libMausCpp", MausCpp_methods);
-  if (m == NULL) return;
+  PyObject* maus_module = Py_InitModule("libMausCpp", MausCpp_methods);
+  if (maus_module == NULL) return;
 }
-
+}  // namespace PyLibMausCpp
 }  // namespace MAUS
 

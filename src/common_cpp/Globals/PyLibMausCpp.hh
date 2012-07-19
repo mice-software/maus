@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef PYMAUSCPP
-#define PYMAUSCPP
+#ifndef _SRC_COMMON_CPP_GLOBALS_PYMAUSCPP_HH_
+#define _SRC_COMMON_CPP_GLOBALS_PYMAUSCPP_HH_
 
 // These ifdefs are required to avoid cpp compiler warning
 #ifdef _POSIX_C_SOURCE
@@ -31,6 +31,7 @@
 
 namespace MAUS {
 
+namespace PyLibMausCpp {
 /*  @brief Defines some interfaces available in Python from C
  *
  *  The interface between Python and C in MAUS is usually done using text files
@@ -64,8 +65,8 @@ PyMODINIT_FUNC initlibMausCpp(void);
  */
 static PyObject* CppErrorHandler_SetHandleExceptionFunction
                                               (PyObject *dummy, PyObject *args);
-
+}
 }  // namespace MAUS
 
-#endif
+#endif  // _SRC_COMMON_CPP_GLOBALS_PYMAUSCPP_HH_
 

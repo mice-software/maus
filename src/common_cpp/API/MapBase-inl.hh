@@ -98,8 +98,9 @@ namespace MAUS {
       return ret;
     }
 
+    // catch the pass through case
     if (reinterpret_cast<void*>(tmp) != reinterpret_cast<void*>(o)  &&
-        reinterpret_cast<void*>(tmp) != reinterpret_cast<void*>(ret)   ) { // catch the pass through case
+        reinterpret_cast<void*>(tmp) != reinterpret_cast<void*>(ret)   ) {
       delete tmp;
     }
     return ret;
@@ -120,9 +121,9 @@ namespace MAUS {
       CppErrorHandler::getInstance()->HandleStdExcNoJson(e, _classname);
       return ret;
     }
-
+    // catch the pass through case
     if (reinterpret_cast<void*>(tmp) != reinterpret_cast<void*>(o)  &&
-        reinterpret_cast<void*>(tmp) != reinterpret_cast<void*>(ret)   ) { // catch the pass through case
+        reinterpret_cast<void*>(tmp) != reinterpret_cast<void*>(ret)   ) {
       delete tmp;
     }
     return ret;

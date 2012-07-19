@@ -76,13 +76,13 @@ class DataflowUtilities: # pylint: disable=W0232
     def get_run_number(spill):
         """
         Extract run number from spill. Assumes spill has a 
-        "run_num" entry.
+        "run_number" entry.
         @param spill Spill document as a dictionary.
         @return run number or None if none.
         """
         run_number = None
-        if spill.has_key("run_num"):
-            run_number = spill["run_num"]
+        if spill.has_key("run_number"):
+            run_number = spill["run_number"]
         return run_number
 
 class DocumentStoreUtilities: # pylint: disable=W0232

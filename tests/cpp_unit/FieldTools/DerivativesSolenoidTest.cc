@@ -47,6 +47,12 @@ TEST(DerivativesSolenoidTest, TestConstructorDestructor) {
     EXPECT_EQ(sol_value.GetZMax(), 11.);
     EXPECT_EQ(sol_value.GetHighestOrder(), 3);
     EXPECT_EQ(sol_value.GetEndFieldModel(), end);
+    EXPECT_EQ(sol_value.BoundingBoxMin()[0], -10.);
+    EXPECT_EQ(sol_value.BoundingBoxMin()[1], -10.);
+    EXPECT_EQ(sol_value.BoundingBoxMin()[2], -11.);
+    EXPECT_EQ(sol_value.BoundingBoxMax()[0], +10.);
+    EXPECT_EQ(sol_value.BoundingBoxMax()[1], +10.);
+    EXPECT_EQ(sol_value.BoundingBoxMax()[2], +11.);
 }
 
 // all
@@ -107,6 +113,13 @@ TEST(DerivativesSolenoidTest, TestCopyConstructorCloneEquality) {
     EXPECT_EQ(sol.GetHighestOrder(), sol_clone.GetHighestOrder());
     EXPECT_NE(sol.GetEndFieldModel(), sol_clone.GetEndFieldModel());
     EXPECT_NE(sol_clone.GetEndFieldModel(), static_cast<EndFieldModel*>(NULL));
+
+    EXPECT_EQ(sol_clone.BoundingBoxMin()[0], -10.);
+    EXPECT_EQ(sol_clone.BoundingBoxMin()[1], -10.);
+    EXPECT_EQ(sol_clone.BoundingBoxMin()[2], -11.);
+    EXPECT_EQ(sol_clone.BoundingBoxMax()[0], +10.);
+    EXPECT_EQ(sol_clone.BoundingBoxMax()[1], +10.);
+    EXPECT_EQ(sol_clone.BoundingBoxMax()[2], +11.);
 }
 
 std::vector<double> test_get_field_value

@@ -5,7 +5,7 @@
 
 Configuration Test
 {
-  Dimensions 1. 1. 1. m
+  Dimensions 1. 1. 10. m // I make it long purely so it encompasses default reference particle
   PropertyString Material Galactic
   PropertyDouble G4StepMax 100.0 mm
 }

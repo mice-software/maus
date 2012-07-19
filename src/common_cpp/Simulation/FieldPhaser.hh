@@ -69,12 +69,13 @@ class FieldPhaser {
 
   void MakeVirtualPlanes(BTPhaser::FieldForPhasing* cavity);
 
+  MAUSPrimaryGeneratorAction::PGParticle TryToPhase(Json::Value virtual_hit);
+
   MAUSPrimaryGeneratorAction::PGParticle VirtualHitToPGParticle(VirtualHit hit);
 
   VirtualPlaneManager _phaserVirtualPlanes;
   VirtualPlaneManager* _g4managerVirtualPlanes;
 };
-
 }  // namespace
 
 #endif  // ifdef _...CAVITYPHASER_HH_
