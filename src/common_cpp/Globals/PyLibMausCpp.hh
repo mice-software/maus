@@ -65,18 +65,6 @@ PyMODINIT_FUNC initlibMausCpp(void);
  */
 static PyObject* CppErrorHandler_SetHandleExceptionFunction
                                               (PyObject *dummy, PyObject *args);
-
-/* @brief Start a new run
- *
- * Initialise MAUS globals. Takes one argument which should be a string set of
- * datacards (as read by Configuration module). Throws a Runtime error if MAUS
- * globals are already set. Returns Py_None.
- */
-//static PyObject* LibMausCpp_StartOfRun(PyObject *dummy, PyObject *args);
-
-//static PyObject* LibMausCpp_EndOfRun(PyObject *dummy, PyObject *args);
-
-
 }
 }  // namespace MAUS
 

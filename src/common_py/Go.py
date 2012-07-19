@@ -22,7 +22,6 @@ import json
 import sys
 
 import maus_cpp.globals
-import libMausCpp
 
 # MAUS
 from Configuration import Configuration

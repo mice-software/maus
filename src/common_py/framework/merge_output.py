@@ -138,8 +138,6 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
         self.run_number = run_number
         self.end_of_run = None
         print "---------- START RUN %d ----------" % self.run_number
-        print "START OF RUN run_action_manager"
-        maus_cpp.run_action_manager.start_of_run(run_number)
         print("BIRTH merger %s" % self.merger.__class__)
         if (not self.merger.birth(self.config_doc)):
             raise WorkerBirthFailedException(self.merger.__class__)
@@ -176,8 +174,6 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
         print("DEATH outputer %s" % self.outputer.__class__)
         if (not self.outputer.death()):
             raise WorkerDeathFailedException(self.outputer.__class__)
-        print "END OF RUN run_action_manager"
-        maus_cpp.run_action_manager.end_of_run()
         print "---------- END RUN %d ----------" % self.run_number
 
     def execute(self):

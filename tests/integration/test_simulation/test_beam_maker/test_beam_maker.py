@@ -115,7 +115,7 @@ class BeamMakerTest(unittest.TestCase): # pylint: disable = R0904
         """
         run tests the first time the class is instantiated
         """
-        global SETUP_DONE
+        global SETUP_DONE # pylint: disable = W0603
         if not SETUP_DONE:
             make_plot_dir()
             run_simulations()
@@ -222,7 +222,7 @@ class BeamMakerTest(unittest.TestCase): # pylint: disable = R0904
         """
         bunch = Bunch.new_from_read_builtin('maus_primary', NAN_SIM)
         self.assertAlmostEqual(bunch.bunch_weight(), 1000.)
-        for i, hit in enumerate(bunch):
+        for hit in bunch:
             self.assertFalse(math.isnan(hit['energy']))
         canvas, hist = bunch.root_histogram('kinetic_energy', 'MeV', xmin=0.,
                                                           xmax=150.)

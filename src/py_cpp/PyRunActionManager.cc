@@ -57,7 +57,7 @@ PyObject* StartOfRun(PyObject *dummy, PyObject *args) {
     }
     RunHeader* run_header = new RunHeader();
     run_header->SetRunNumber(run_number);
-    maus_run_action_manager->StartOfRun(run_header);   
+    maus_run_action_manager->StartOfRun(run_header);
     delete run_header;
   } catch(std::exception& exc) {
     PyErr_SetString(PyExc_RuntimeError, (&exc)->what());
@@ -77,7 +77,7 @@ PyObject* EndOfRun(PyObject *dummy, PyObject *args) {
       return NULL;
     }
     RunFooter* run_footer = new RunFooter();
-    maus_run_action_manager->EndOfRun(run_footer);   
+    maus_run_action_manager->EndOfRun(run_footer);
     delete run_footer;
   } catch(std::exception& exc) {
     PyErr_SetString(PyExc_RuntimeError, (&exc)->what());

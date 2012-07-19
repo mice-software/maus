@@ -113,7 +113,9 @@ TEST_F(GlobalsTest, TestHasInstance) {
 // check that we can Get and Set okay. Use test as sample data - note
 // Globals now owns memory allocated by test (if not pointing at NULL).
 template <class TEMP>
-void test_accessors(TEMP* GetFunction(), void SetFunction(TEMP*), TEMP* test) {
+void test_accessors(TEMP* GetFunction(),
+                    void SetFunction(TEMP* tmp),
+                    TEMP* test) {
     TEMP* my_temp = GetFunction();
     // check that default is non-NULL
     ASSERT_NE(my_temp, static_cast<TEMP*>(NULL)) << typeid(test).name();

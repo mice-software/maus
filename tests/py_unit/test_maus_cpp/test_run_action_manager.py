@@ -16,18 +16,19 @@
 # pylint: disable=C0103
 
 """
-Test maus_cpp.field
+Test maus_cpp.run_action_manager
 """
 
 import StringIO
 import unittest
 
 import Configuration
-import maus_cpp.globals
-import maus_cpp.field
 
-class FieldTestCase(unittest.TestCase): # pylint: disable=R0904
-    """Test maus_cpp.field"""
+import maus_cpp.globals
+import maus_cpp.run_action_manager
+
+class GlobalsTestCase(unittest.TestCase): # pylint: disable=R0904
+    """Test maus_cpp.run_action_manager"""
 
     def setUp(self): # pylint: disable=C0103
         """Set up test"""
@@ -38,17 +39,11 @@ reconstruction_geometry_filename = "Test.dat"
         self.config = Configuration.Configuration().getConfigJSON(
                                                          config_options, False)
 
-    def test_get_field_value(self):
-        """Test maus_cpp.Field.get_field_value(...)"""
+    def test_start_end_of_run(self):
+        """Test maus_cpp.run_action_manager.start_of_run(...)"""
         maus_cpp.globals.birth(self.config)
-        for x_pos in range(10):
-            field_value = maus_cpp.field.get_field_value\
-                                                    (x_pos, x_pos, x_pos, x_pos)
-            for i in range(6):
-                self.assertAlmostEqual(field_value[i], 0., 1e-12)
-        maus_cpp.globals.death()
-
-if __name__ == "__main__":
-    unittest.main()
+        maus_cpp.run_action_manager.start_of_run(1)
+        maus_cpp.run_action_manager.end_of_run()
+        
 
 

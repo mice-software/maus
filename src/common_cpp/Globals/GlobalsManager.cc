@@ -135,7 +135,7 @@ void GlobalsManager::SetReconstructionMiceModules
     if (Globals::GetInstance()->_recon_mods != NULL) {
         delete Globals::_process->_recon_mods;
     }
-   Globals:: _process->_recon_mods = recon_mods;
+    Globals:: _process->_recon_mods = recon_mods;
 }
 
 void GlobalsManager::SetMonteCarloMiceModules(MiceModule* mc_mods) {

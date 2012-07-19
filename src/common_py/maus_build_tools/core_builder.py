@@ -21,7 +21,7 @@ import os
 import glob
 import subprocess
 import json
-import string
+import string # pylint: disable=W0402
 
 MAUS_ROOT_DIR = os.environ['MAUS_ROOT_DIR']
 
@@ -89,13 +89,9 @@ def build_python_modules(env):
     Build python modules
 
     For each *.cc file in src/common_cpp/Python build a corresponding *.so file.
-    These should be python modules 
+    These should be python modules. Depends on libMausCpp.so so that needs to be
+    built first.
     """
-    common_cpp_files = glob.glob("src/legacy/*/*cc") + \
-        glob.glob("src/legacy/*/*/*cc") + \
-        glob.glob("src/common_cpp/*/*cc") + \
-        glob.glob("src/common_cpp/*/*/*cc")
-
     target_files = glob.glob("src/py_cpp/*cc")
     init_all = []
 
