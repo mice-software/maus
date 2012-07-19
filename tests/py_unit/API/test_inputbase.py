@@ -22,12 +22,21 @@ from API.InputBase import InputBase
 from API.IInput import IInput
 
 class InputBaseDummy(InputBase):
+    '''TestInputter'''
     def __init__(self):
+        '''constructor'''
         super(InputBaseDummy, self).__init__()
+    def _birth(self, config):
+        '''_brith'''
+        pass
+    def _death(self):
+        '''_death'''
+        pass
     def _emitter(self):
+        '''emit'''
         return "MyData"
 
-class TestInputBase(unittest.TestCase):
+class TestInputBase(unittest.TestCase):#pylint: disable=R0904
     """
     @class TestInputBase
     Unit testing class for InputBase
@@ -35,23 +44,30 @@ class TestInputBase(unittest.TestCase):
     def test___init__(self):
         """Test Constructor"""
         try:
-            m = InputBase()
-            self.assertIsInstance(m, InputBase, 'Not an instance of InputBase')
-            self.assertIsInstance(m, IInput, 'Not an instance of IInput')
-            self.assertIsInstance(m, ModuleBase, 'Not an instance of ModuleBase')
-        except:
+            mmm = InputBase()
+            self.assertIsInstance(mmm,
+                                  InputBase,
+                                  'Not an instance of InputBase')
+            self.assertIsInstance(mmm,
+                                  IInput,
+                                  'Not an instance of IInput')
+            self.assertIsInstance(mmm,
+                                  ModuleBase,
+                                  'Not an instance of ModuleBase')
+        except: #pylint: disable=W0702
             self.assertTrue(False, 'Exception thrown when constructing')
 
     def test_emitter(self):
         """Test emitter"""
-        m = InputBaseDummy()
-        self.assertEqual(m.emitter(), 'MyData', 'emitter method not '\
+        mmm = InputBaseDummy()
+        self.assertEqual(mmm.emitter(), 'MyData', 'emitter method not '\
                          'calling _emitter properly')
 
     def test__emitter(self):
         """Test _emitter"""
-        m = InputBase()
-        self.assertRaises(NotImplementedError, m._emitter)
+        mmm = InputBase()
+        self.assertRaises(NotImplementedError,
+                          mmm._emitter)#pylint: disable=W0212
 
 if __name__ == '__main__':
     unittest.main()

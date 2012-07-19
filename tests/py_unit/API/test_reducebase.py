@@ -22,12 +22,21 @@ from API.ReduceBase import ReduceBase
 from API.IReduce import IReduce
 
 class ReduceBaseDummy(ReduceBase):
+    '''Test reducer'''
     def __init__(self):
+        '''constructor'''
         super(ReduceBaseDummy, self).__init__()
+    def _birth(self, config):
+        '''_birth'''
+        pass
+    def _death(self):
+        '''_death'''
+        pass
     def _process(self, data):
+        '''_process'''
         return data
 
-class TestReduceBase(unittest.TestCase):
+class TestReduceBase(unittest.TestCase):#pylint: disable=R0904
     """
     @class TestReduceBase
     Unit testing class for ReduceBase
@@ -35,23 +44,30 @@ class TestReduceBase(unittest.TestCase):
     def test___init__(self):
         """Test Constructor"""
         try:
-            m = ReduceBase()
-            self.assertIsInstance(m, ReduceBase, 'Not an instance of ReduceBase')
-            self.assertIsInstance(m, IReduce, 'Not an instance of IReduce')
-            self.assertIsInstance(m, ModuleBase, 'Not an instance of ModuleBase')
-        except:
+            mmm = ReduceBase()
+            self.assertIsInstance(mmm,
+                                  ReduceBase,
+                                  'Not an instance of ReduceBase')
+            self.assertIsInstance(mmm,
+                                  IReduce,
+                                  'Not an instance of IReduce')
+            self.assertIsInstance(mmm,
+                                  ModuleBase,
+                                  'Not an instance of ModuleBase')
+        except: #pylint: disable=W0702
             self.assertTrue(False, 'Exception thrown when constructing')
 
     def test_process(self):
         """Test process"""
-        m = ReduceBaseDummy()
-        self.assertEqual(m.process('MyData'), 'MyData', 'process method not '\
+        mmm = ReduceBaseDummy()
+        self.assertEqual(mmm.process('MyData'), 'MyData', 'process method not '\
                          'calling _process properly')
 
     def test__process(self):
         """Test _process"""
-        m = ReduceBase()
-        self.assertRaises(NotImplementedError, m._process, 'MyData')
+        mmm = ReduceBase()
+        self.assertRaises(NotImplementedError,
+                          mmm._process, 'MyData')#pylint: disable=W0212
 
 if __name__ == '__main__':
     unittest.main()

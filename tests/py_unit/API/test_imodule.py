@@ -1,5 +1,5 @@
 """
-This file defines the tests for IReduce
+This file defines the tests for IModule
 """
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 #
@@ -18,26 +18,30 @@ This file defines the tests for IReduce
 
 import unittest
 from API.IModule import IModule
-from API.IReduce import IReduce
 
-class TestIReduce(unittest.TestCase):
+class TestIModule(unittest.TestCase):#pylint: disable=R0904
     """
-    @class TestIReduce
-    Unit testing class for IReduce
+    @class TestIModule
+    Unit testing class for IModule
     """
     def test___init__(self):
         """Test Constructor"""
         try:
-            m = IReduce()
-            self.assertIsInstance(m, IReduce, 'Not an instance of IReduce')
-            self.assertIsInstance(m, IModule, 'Not an instance of IModule')
-        except:
+            mmm = IModule()
+            self.assertIsInstance(mmm, IModule, 'Not an instance of IModule')
+            self.assertIsInstance(mmm, object, 'Not an instance of object')
+        except: #pylint: disable=W0702
             self.assertTrue(False, 'Exception thrown when constructing')
 
-    def test_process(self):
-        """Test process"""
-        m = IReduce()
-        self.assertRaises(NotImplementedError, m.process, 'data')
+    def test_birth(self):
+        """Test birth"""
+        mmm = IModule()
+        self.assertRaises(NotImplementedError, mmm.birth, 'config')
+
+    def test_death(self):
+        """Test death"""
+        mmm = IModule()
+        self.assertRaises(NotImplementedError, mmm.death)
 
 if __name__ == '__main__':
     unittest.main()

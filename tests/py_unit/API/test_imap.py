@@ -1,5 +1,5 @@
 """
-This file defines the tests for IModule
+This file defines the tests for IMap
 """
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 #
@@ -18,30 +18,26 @@ This file defines the tests for IModule
 
 import unittest
 from API.IModule import IModule
+from API.IMap import IMap
 
-class TestIModule(unittest.TestCase):
+class TestIMap(unittest.TestCase):#pylint: disable=R0904
     """
-    @class TestIModule
-    Unit testing class for IModule
+    @class TestIMap
+    Unit testing class for IMap
     """
     def test___init__(self):
         """Test Constructor"""
         try:
-            m = IModule()
-            self.assertIsInstance(m, IModule, 'Not an instance of IModule')
-            self.assertIsInstance(m, object, 'Not an instance of object')
-        except:
+            mmm = IMap()
+            self.assertIsInstance(mmm, IMap, 'Not an instance of IMap')
+            self.assertIsInstance(mmm, IModule, 'Not an instance of IModule')
+        except: #pylint: disable=W0702
             self.assertTrue(False, 'Exception thrown when constructing')
 
-    def test_birth(self):
-        """Test birth"""
-        m = IModule()
-        self.assertRaises(NotImplementedError, m.birth, 'config')
-
-    def test_death(self):
-        """Test death"""
-        m = IModule()
-        self.assertRaises(NotImplementedError, m.death)
+    def test_process(self):
+        """Test process"""
+        mmm = IMap()
+        self.assertRaises(NotImplementedError, mmm.process, 'data')
 
 if __name__ == '__main__':
     unittest.main()

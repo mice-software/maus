@@ -20,7 +20,7 @@ import unittest
 from API.IModule import IModule
 from API.IInput import IInput
 
-class TestIInput(unittest.TestCase):
+class TestIInput(unittest.TestCase):#pylint: disable=R0904
     """
     @class TestIInput
     Unit testing class for IInput
@@ -28,16 +28,16 @@ class TestIInput(unittest.TestCase):
     def test___init__(self):
         """Test Constructor"""
         try:
-            m = IInput()
-            self.assertIsInstance(m, IInput, 'Not an instance of IInput')
-            self.assertIsInstance(m, IModule, 'Not an instance of IModule')
-        except:
+            mmm = IInput()
+            self.assertIsInstance(mmm, IInput, 'Not an instance of IInput')
+            self.assertIsInstance(mmm, IModule, 'Not an instance of IModule')
+        except: #pylint: disable=W0702
             self.assertTrue(False, 'Exception thrown when constructing')
 
     def test_emitter(self):
         """Test emitter"""
-        m = IInput()
-        self.assertRaises(NotImplementedError, m.emitter)
+        mmm = IInput()
+        self.assertRaises(NotImplementedError, mmm.emitter)
 
 if __name__ == '__main__':
     unittest.main()

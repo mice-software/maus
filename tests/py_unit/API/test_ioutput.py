@@ -1,5 +1,5 @@
 """
-This file defines the tests for OutputBase
+This file defines the tests for IOutput
 """
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 #
@@ -17,41 +17,27 @@ This file defines the tests for OutputBase
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from API.ModuleBase import ModuleBase
-from API.OutputBase import OutputBase
+from API.IModule import IModule
 from API.IOutput import IOutput
 
-class OutputBaseDummy(OutputBase):
-    def __init__(self):
-        super(OutputBaseDummy, self).__init__()
-    def _save(self, data):
-        return True
-
-class TestOutputBase(unittest.TestCase):
+class TestIOutput(unittest.TestCase):#pylint: disable=R0904
     """
-    @class TestOutputBase
-    Unit testing class for OutputBase
+    @class TestIOutput
+    Unit testing class for IOutput
     """
     def test___init__(self):
         """Test Constructor"""
         try:
-            m = OutputBase()
-            self.assertIsInstance(m, OutputBase, 'Not an instance of OutputBase')
-            self.assertIsInstance(m, IOutput, 'Not an instance of IOutput')
-            self.assertIsInstance(m, ModuleBase, 'Not an instance of ModuleBase')
-        except:
+            mmm = IOutput()
+            self.assertIsInstance(mmm, IOutput, 'Not an instance of IOutput')
+            self.assertIsInstance(mmm, IModule, 'Not an instance of IModule')
+        except: #pylint: disable=W0702
             self.assertTrue(False, 'Exception thrown when constructing')
 
     def test_save(self):
         """Test save"""
-        m = OutputBaseDummy()
-        self.assertTrue(m.save('MyData'), 'save method not '\
-                        'calling _save properly')
-
-    def test__save(self):
-        """Test _save"""
-        m = OutputBase()
-        self.assertRaises(NotImplementedError, m._save, 'data')
+        mmm = IOutput()
+        self.assertRaises(NotImplementedError, mmm.save, 'data')
 
 if __name__ == '__main__':
     unittest.main()

@@ -21,15 +21,19 @@ import inspect
 from API.DecoratorUtils import smart_decorator
 
 # regular decorator function
-def testDecorator(func):
+def test_decorator(func):
+    '''Standard decorator'''
     def wrapper(self, *args, **kw):
+        '''wrapper'''
         return func(self, *args, **kw)
     return wrapper
 
 # smart decorator function
 @smart_decorator
-def testSmartDecorator(func):
+def test_smartdecorator(func):
+    '''Smart decorated decortor'''
     def wrapper(self, *args, **kw):
+        '''wrapper'''
         return func(self, *args, **kw)
     return wrapper
 
@@ -37,35 +41,40 @@ def testSmartDecorator(func):
 # ############################################
 
 # the undecorated control function
-def testingFunc1(a, b, c, d=22, *testArgs, **testKwds):
+def testingfunc1(a, b, c, d=22, *testArgs, **testKwds):#pylint: disable=C0103,W0613,C0301
+    '''Control un-decorated function'''
     pass
 # regular 'dumb' decorator
-@testDecorator
-def testingFunc2(a, b, c, d=22, *testArgs, **testKwds):
+@test_decorator
+def testingfunc2(a, b, c, d=22, *testArgs, **testKwds):#pylint: disable=C0103,W0613,C0301
+    '''Function decorated with regular dumb decorator'''
     pass
 # smart decorator
-@testSmartDecorator
-def testingFunc3(a, b, c, d=22, *testArgs, **testKwds):
+@test_smartdecorator
+def testingfunc3(a, b, c, d=22, *testArgs, **testKwds):#pylint: disable=C0103,W0613,C0301
+    '''Function decorated with smart decorator'''
     pass
 
-class TestDecoratorUtils(unittest.TestCase):
+class TestDecoratorUtils(unittest.TestCase):#pylint: disable=R0904
     """
     @class TestDecoratorUtils
     Unit testing class for DecoratorUtils
     """
     def test_smart_decorator(self):
+        """Test that smart decorators correctly duplicate the ArgSpec and name
+        of the underlying function"""
         argspec = inspect.ArgSpec( args = ['a', 'b', 'c', 'd'],
                                    varargs = 'testArgs',
                                    keywords = 'testKwds',
                                    defaults = (22,) )
 
-        self.assertEqual(inspect.getargspec(testingFunc1), argspec)
-        self.assertNotEqual(inspect.getargspec(testingFunc2), argspec)
-        self.assertEqual(inspect.getargspec(testingFunc3), argspec)
+        self.assertEqual(inspect.getargspec(testingfunc1), argspec)
+        self.assertNotEqual(inspect.getargspec(testingfunc2), argspec)
+        self.assertEqual(inspect.getargspec(testingfunc3), argspec)
 
-        self.assertEqual(testingFunc1.__name__, 'testingFunc1')
-        self.assertNotEqual(testingFunc2.__name__, 'testingFunc2')
-        self.assertEqual(testingFunc3.__name__, 'testingFunc3')
+        self.assertEqual(testingfunc1.__name__, 'testingfunc1')
+        self.assertNotEqual(testingfunc2.__name__, 'testingfunc2')
+        self.assertEqual(testingfunc3.__name__, 'testingfunc3')
 
 if __name__ == '__main__':
     unittest.main()

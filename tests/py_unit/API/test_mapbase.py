@@ -23,19 +23,37 @@ from API.IMap import IMap
 from API.Constable import ConstMethodAttrModError
 
 class MapBaseDummy(MapBase):
+    '''Test class'''
     def __init__(self):
+        '''constructor'''
         super(MapBaseDummy, self).__init__()
+    def _birth(self, config):
+        '''_birth'''
+        pass
+    def _death(self):
+        '''_death'''
+        pass
     def _process(self, data):
+        '''_process'''
         return data
 class MapBaseDummyConstTest(MapBase):
+    '''Test class violating constness'''
     def __init__(self):
+        '''constructor'''
         super(MapBaseDummyConstTest, self).__init__()
         self.my_var = 12
+    def _birth(self, config):
+        '''_birth'''
+        pass
+    def _death(self):
+        '''_death'''
+        pass
     def _process(self, data):
+        '''_process'''
         self.my_var = 13
         return data
     
-class TestMapBase(unittest.TestCase):
+class TestMapBase(unittest.TestCase):#pylint: disable=R0904
     """
     @class TestMapBase
     Unit testing class for MapBase
@@ -43,25 +61,32 @@ class TestMapBase(unittest.TestCase):
     def test___init__(self):
         """Test Constructor"""
         try:
-            m = MapBase()
-            self.assertIsInstance(m, MapBase, 'Not an instance of MapBase')
-            self.assertIsInstance(m, IMap, 'Not an instance of IMap')
-            self.assertIsInstance(m, ModuleBase, 'Not an instance of ModuleBase')
-        except:
+            mmm = MapBase()
+            self.assertIsInstance(mmm,
+                                  MapBase,
+                                  'Not an instance of MapBase')
+            self.assertIsInstance(mmm,
+                                  IMap,
+                                  'Not an instance of IMap')
+            self.assertIsInstance(mmm,
+                                  ModuleBase,
+                                  'Not an instance of ModuleBase')
+        except: #pylint: disable=W0702
             self.assertTrue(False, 'Exception thrown when constructing')
 
     def test_process(self):
         """Test process"""
-        m = MapBaseDummy()
-        self.assertEqual(m.process('MyData'), 'MyData', 'process method not '\
+        mmm = MapBaseDummy()
+        self.assertEqual(mmm.process('MyData'), 'MyData', 'process method not '\
                          'calling _process properly')
-        m = MapBaseDummyConstTest()
-        self.assertRaises(ConstMethodAttrModError, m.process, 'MyData')
+        mmm = MapBaseDummyConstTest()
+        self.assertRaises(ConstMethodAttrModError, mmm.process, 'MyData')
 
     def test__process(self):
         """Test _process"""
-        m = MapBase()
-        self.assertRaises(NotImplementedError, m._process, 'MyData')
+        mmm = MapBase()
+        self.assertRaises(NotImplementedError,
+                          mmm._process, 'MyData')#pylint: disable=W0212
 
 if __name__ == '__main__':
     unittest.main()

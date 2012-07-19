@@ -21,14 +21,18 @@ from API.ModuleBase import ModuleBase
 from API.IModule import IModule
 
 class ModuleBaseDummy(ModuleBase):
+    '''Test Module'''
     def __init__(self):
+        '''constructor'''
         super(ModuleBaseDummy, self).__init__()
     def _birth(self, config):
+        '''_brith'''
         return '_birth ran'
     def _death(self):
+        '''_death'''
         return '_death ran'
 
-class TestModuleBase(unittest.TestCase):
+class TestModuleBase(unittest.TestCase):#pylint: disable=R0904
     """
     @class TestModuleBase
     Unit testing class for ModuleBase
@@ -36,33 +40,39 @@ class TestModuleBase(unittest.TestCase):
     def test___init__(self):
         """Test Constructor"""
         try:
-            m = ModuleBase()
-            self.assertIsInstance(m, ModuleBase, 'Not an instance of ModuleBase')
-            self.assertIsInstance(m, IModule, 'Not an instance of IModule')
-        except:
+            mmm = ModuleBase()
+            self.assertIsInstance(mmm,
+                                  ModuleBase,
+                                  'Not an instance of ModuleBase')
+            self.assertIsInstance(mmm,
+                                  IModule,
+                                  'Not an instance of IModule')
+        except: #pylint: disable=W0702
             self.assertTrue(False, 'Exception thrown when constructing')
 
     def test_birth(self):
         """Test birth"""
-        m = ModuleBaseDummy()
-        self.assertEqual(m.birth('MyConfig'), '_birth ran', 'process method not '\
-                         'calling _birth properly')
+        mmm = ModuleBaseDummy()
+        self.assertEqual(mmm.birth('MyConfig'),
+                         '_birth ran',
+                         'process method not calling _birth properly')
 
     def test__birth(self):
         """Test _birth"""
-        m = ModuleBase()
-        self.assertRaises(NotImplementedError, m._birth, 'MyConfig')
+        mmm = ModuleBase()
+        self.assertRaises(NotImplementedError,
+                          mmm._birth, 'MyConfig')#pylint: disable=W0212
 
     def test_death(self):
         """Test death"""
-        m = ModuleBaseDummy()
-        self.assertEqual(m.death(), '_death ran', 'process method not '\
+        mmm = ModuleBaseDummy()
+        self.assertEqual(mmm.death(), '_death ran', 'process method not '\
                          'calling _death properly')
 
     def test__death(self):
         """Test _death"""
-        m = ModuleBase()
-        self.assertRaises(NotImplementedError, m._death)
+        mmm = ModuleBase()
+        self.assertRaises(NotImplementedError, mmm._death)#pylint: disable=W0212
 
 if __name__ == '__main__':
     unittest.main()

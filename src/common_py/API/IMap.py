@@ -19,7 +19,7 @@ This file defines the interface for all Mappers
 from API.IModule import IModule
 from API.Constable import const
 
-class IMap(IModule):  
+class IMap(IModule):#pylint: disable=R0921
     """
     @class IMap
     Interface for all map modules.

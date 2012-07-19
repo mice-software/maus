@@ -1,5 +1,5 @@
 """
-This file defines the tests for IMap
+This file defines the tests for IReduce
 """
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 #
@@ -18,26 +18,26 @@ This file defines the tests for IMap
 
 import unittest
 from API.IModule import IModule
-from API.IMap import IMap
+from API.IReduce import IReduce
 
-class TestIMap(unittest.TestCase):
+class TestIReduce(unittest.TestCase):#pylint: disable=R0904
     """
-    @class TestIMap
-    Unit testing class for IMap
+    @class TestIReduce
+    Unit testing class for IReduce
     """
     def test___init__(self):
         """Test Constructor"""
         try:
-            m = IMap()
-            self.assertIsInstance(m, IMap, 'Not an instance of IMap')
-            self.assertIsInstance(m, IModule, 'Not an instance of IModule')
-        except:
+            mmm = IReduce()
+            self.assertIsInstance(mmm, IReduce, 'Not an instance of IReduce')
+            self.assertIsInstance(mmm, IModule, 'Not an instance of IModule')
+        except: #pylint: disable=W0702
             self.assertTrue(False, 'Exception thrown when constructing')
 
     def test_process(self):
         """Test process"""
-        m = IMap()
-        self.assertRaises(NotImplementedError, m.process, 'data')
+        mmm = IReduce()
+        self.assertRaises(NotImplementedError, mmm.process, 'data')
 
 if __name__ == '__main__':
     unittest.main()
