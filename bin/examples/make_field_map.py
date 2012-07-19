@@ -66,8 +66,7 @@ def main():
     # Clean up
     maus_globals.death()
     # Finished
-    print "Finished - press carriage return to end (closing all windows)"
-    raw_input()
+    print "Finished"
 
 if __name__ == "__main__":
     main()
