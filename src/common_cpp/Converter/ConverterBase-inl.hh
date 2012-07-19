@@ -44,18 +44,7 @@ namespace MAUS {
   OUTPUT* ConverterBase<INPUT, OUTPUT>::convert(const INPUT* i) const {
     if (!i) { throw NullInputException(_classname); }
     OUTPUT* o = 0;
-    try {
-      o =  _convert(i);
-    }
-    catch(Squeal& s) {
-      CppErrorHandler::getInstance()->HandleSquealNoJson(s, _classname);
-    }
-    catch(std::exception& e) {
-      CppErrorHandler::getInstance()->HandleStdExcNoJson(e, _classname);
-    }
-    catch(...) {
-      throw UnhandledException(_classname);
-    }
+    o =  _convert(i);
     return o;
   }
 

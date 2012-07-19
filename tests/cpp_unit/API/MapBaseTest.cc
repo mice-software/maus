@@ -22,8 +22,7 @@
 #include "gtest/gtest_prod.h"
 #include "src/common_cpp/API/MapBase.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
-// #include "Interface/Squeal.hh"
-// #include "API/APIExceptions.hh"
+#include "src/common_cpp/Utils/JsonWrapper.hh"
 
 namespace MAUS {
 
@@ -88,7 +87,7 @@ namespace MAUS {
     virtual void _death() {}
 
     virtual int* _process(Spill* t) const {
-      return 0;
+      return new int(999);
     }
   };
 
@@ -202,25 +201,20 @@ namespace MAUS {
   }
 
   TEST(MapBaseTest, TestOtherTypeProcess) {
-    Json::Value *jv = new Json::Value(Json::objectValue);
-    Json::Reader r;
-    std::stringstream ss;
-    ss << getenv("MAUS_ROOT_DIR")
-       << "/tests/cpp_unit/API/example_load_json_file.json";
-
-    std::ifstream f(ss.str().c_str(),
-		    std::ios::in|std::ios::binary);
-    bool b = r.parse(f, *jv);
-    ASSERT_TRUE(b)
-      << "Fail: Problem parsing the test JSON file."
-      << r.getFormatedErrorMessages()
-      << std::endl;
+    std::string minimal_spill =
+        std::string("{\"spill_number\":1, \"run_number\":-1, ")+
+        std::string("\"daq_event_type\":\"physics_event\", ")+
+        std::string("\"errors\":{\"an_error\":\"message\"}}");
+    Json::Value json_in;
+    ASSERT_NO_THROW(json_in = JsonWrapper::StringToJson(minimal_spill))
+                                                               << minimal_spill;
     MyMapper_converter mm_c;
-    ASSERT_FALSE(mm_c.process(jv) == 0)
+    int* out = mm_c.process(&json_in);
+    ASSERT_EQ(*out, 999)
       << "Fail: Processing of alternate input type failed possibly "
       << "as a result of conversion failure."
       << std::endl;
-    delete jv;
+    delete out;
   }
 
 }// end of namespace

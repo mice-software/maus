@@ -99,7 +99,7 @@ namespace MAUS {
     }
 
     if (reinterpret_cast<void*>(tmp) != reinterpret_cast<void*>(o)  &&
-	reinterpret_cast<void*>(tmp) != reinterpret_cast<void*>(ret)   ) { // catch the pass through case
+        reinterpret_cast<void*>(tmp) != reinterpret_cast<void*>(ret)   ) { // catch the pass through case
       delete tmp;
     }
     return ret;
@@ -122,7 +122,7 @@ namespace MAUS {
     }
 
     if (reinterpret_cast<void*>(tmp) != reinterpret_cast<void*>(o)  &&
-	reinterpret_cast<void*>(tmp) != reinterpret_cast<void*>(ret)   ) { // catch the pass through case
+        reinterpret_cast<void*>(tmp) != reinterpret_cast<void*>(ret)   ) { // catch the pass through case
       delete tmp;
     }
     return ret;
