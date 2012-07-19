@@ -16,17 +16,18 @@
 # pylint: disable=C0103
 
 """
-Test libMausCpp
+Test maus_cpp.field
 """
 
 import StringIO
 import unittest
 
 import Configuration
-import libMausCpp
+import maus_cpp.globals
+import maus_cpp.field
 
-class LibMausCppTestCase(unittest.TestCase): # pylint: disable=R0904
-    """Test libMausCpp"""
+class GlobalsTestCase(unittest.TestCase): # pylint: disable=R0904
+    """Test maus_cpp.field"""
 
     def setUp(self): # pylint: disable=C0103
         """Set up test"""
@@ -37,37 +38,17 @@ reconstruction_geometry_filename = "Test.dat"
         self.config = Configuration.Configuration().getConfigJSON(
                                                          config_options, False)
 
-    def test_initialise(self):
-        """Test libMausCpp.initialise() and libMausCpp.destruct()"""
-        self.assertRaises(RuntimeError, libMausCpp.destruct, ())
-        self.assertRaises(TypeError, libMausCpp.initialise, ())
-        self.assertRaises(RuntimeError, libMausCpp.initialise, (""))
-        libMausCpp.initialise(self.config)  # and now don't raise an error
-        libMausCpp.destruct()
-        self.assertRaises(RuntimeError, libMausCpp.destruct, ())
-
-    def test_has_instance(self):
-        """Test libMausCpp.has_instance()"""
-        self.assertEqual(libMausCpp.has_instance(), 0)
-        libMausCpp.initialise(self.config)
-        self.assertEqual(libMausCpp.has_instance(), 1)
-        libMausCpp.destruct()
-        self.assertEqual(libMausCpp.has_instance(), 0)
-        libMausCpp.initialise(self.config)
-        self.assertEqual(libMausCpp.has_instance(), 1)
-        libMausCpp.destruct()
-        self.assertEqual(libMausCpp.has_instance(), 0)
-
     def test_get_field_value(self):
-        """Test libMausCpp.Field.get_field_value(...)"""
-        libMausCpp.initialise(self.config)
+        """Test maus_cpp.Field.get_field_value(...)"""
+        maus_cpp.globals.birth(self.config)
         for x_pos in range(10):
-            field_value = libMausCpp.Field.get_field_value\
+            field_value = maus_cpp.field.get_field_value\
                                                     (x_pos, x_pos, x_pos, x_pos)
             for i in range(6):
                 self.assertAlmostEqual(field_value[i], 0., 1e-12)
-        libMausCpp.destruct()
+        maus_cpp.globals.death()
 
 if __name__ == "__main__":
     unittest.main()
+
 

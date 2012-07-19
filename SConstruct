@@ -72,7 +72,7 @@ def build_libraries(maus_root_dir, env):
     """
     Build the maus libraries
 
-    Build core libraries, cpp tests, python tests, modules
+    Build core libraries, cpp tests, python tests, python utilities, modules
     """
     # build the data structure (separate library so we can port it to external
     # deps)
@@ -88,6 +88,8 @@ def build_libraries(maus_root_dir, env):
                       ('%s/build/MAUS.py' % maus_root_dir, cpp_libs+python_libs)
     # build the cpp tests (test_cpp_unit)
     maus_build_tools.core_builder.build_cpp_tests(env, cpp_libs)
+    # build python utilities
+    maus_build_tools.core_builder.build_python_modules(env)
 
 def main():
     """

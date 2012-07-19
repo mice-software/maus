@@ -40,7 +40,8 @@ import logging
 import os 
 
 from celery.signals import worker_process_init 
-
+import maus_cpp.globals
+import maus_cpp.run_action_manager
 from mauscelery.state import MausConfiguration
 from mauscelery.state import MausTransform
 
@@ -90,6 +91,9 @@ def process_birth(pids, config_id, transform, configuration):
     # Check if processed already.  
     if (not os.getpid() in pids):
         try:
+            if maus_cpp.globals.has_instance() == 0:
+                maus_cpp.globals.birth(configuration)
+            maus_cpp.run_action_manager.start_of_run()
             if logger.isEnabledFor(logging.INFO):
                 logger.info("Birthing transform %s" % transform)
             MausTransform.initialize(transform)
@@ -126,9 +130,10 @@ def process_death(pids):
         # Only call if the transform is not already dead.
         if (not MausTransform.is_dead):
             try:
+                maus_cpp.run_action_manager.end_of_run()
                 if logger.isEnabledFor(logging.INFO):
                     logger.info("Deathing transform")
-                MausTransform.death() 
+                MausTransform.death()
             except Exception as exc: # pylint:disable = W0703
                 status = {}
                 status["error"] = str(exc.__class__)

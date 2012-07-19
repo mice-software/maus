@@ -21,6 +21,7 @@ import os
 import json
 import sys
 
+import maus_cpp.globals
 import libMausCpp
 
 # MAUS
@@ -102,7 +103,7 @@ class Go: # pylint: disable=R0921, R0903
                 json.dumps(json_config_dictionary, indent=2)
         print "Initialising Globals"
         # Initialise field maps, geant4, etc
-        libMausCpp.initialise(json.dumps(json_config_dictionary))        
+        maus_cpp.globals.birth(json.dumps(json_config_dictionary))        
         try:
             # Set up the dataflow executor.
             if type_of_dataflow == 'pipeline_single_thread':
@@ -129,7 +130,7 @@ class Go: # pylint: disable=R0921, R0903
             raise
         finally:
             print "Clearing Globals" 
-            libMausCpp.destruct()
+            maus_cpp.globals.death()
         print("DONE")
 
     @staticmethod

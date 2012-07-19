@@ -66,34 +66,17 @@ PyMODINIT_FUNC initlibMausCpp(void);
 static PyObject* CppErrorHandler_SetHandleExceptionFunction
                                               (PyObject *dummy, PyObject *args);
 
-/* @brief Initialise MAUS
+/* @brief Start a new run
  *
  * Initialise MAUS globals. Takes one argument which should be a string set of
  * datacards (as read by Configuration module). Throws a Runtime error if MAUS
  * globals are already set. Returns Py_None.
  */
-static PyObject* Globals_Initialise(PyObject *dummy, PyObject *args);
+//static PyObject* LibMausCpp_StartOfRun(PyObject *dummy, PyObject *args);
 
-/* @brief Destruct MAUS
- *
- * Destruct MAUS globals. Ignores all arguments. Throws a RuntimeError if MAUS
- * globals were never set. Returns Py_None.
- */
-PyObject* Globals_Destruct(PyObject *dummy, PyObject *args);
+//static PyObject* LibMausCpp_EndOfRun(PyObject *dummy, PyObject *args);
 
-/* @brief GetFieldValue at a point in space, time
- *
- * Get the field value at a point in x,y,z,time. args should be a tuple of 
- * (x,y,z,t). Returns a tuple of (bx,by,bz,ex,ey,ez).
- */
-PyObject* PyField_GetFieldValue(PyObject *dummy, PyObject *args);
 
-/* @brief Check if MAUS has been initialised
- *
- * Check for initalisation of MAUS globals. Ignores all arguments. Returns
- * PyObject integer 1 if library is initialised, 0 if it is not
- */
-PyObject* Globals_HasInstance(PyObject *dummy, PyObject *args);
 }
 }  // namespace MAUS
 

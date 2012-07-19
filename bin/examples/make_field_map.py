@@ -24,7 +24,8 @@ parallel to the beam axis (bz) in the region z=-8 m to z=8 m.
 """
 
 import Configuration  # MAUS configuration (datacards) module
-import libMausCpp  # MAUS C++ calls
+import maus_cpp.globals as maus_globals # MAUS C++ calls
+import maus_cpp.field as field # MAUS field map calls
 import xboa.Common  # xboa post-processor library
 
 def main():
@@ -38,7 +39,7 @@ def main():
 
     # initialise field maps and geometry
     print "Building field maps and other initialisation (this can take a while)"
-    libMausCpp.initialise(configuration)
+    maus_globals.birth(configuration)
 
     # make lists of z, bz points
     print "Getting field values"
@@ -47,7 +48,7 @@ def main():
     for z_pos in range(-8000, 8001, 50):
         z_pos = float(z_pos)
         (bx_field, by_field, bz_field, ex_field, ey_field, ez_field) = \
-                             libMausCpp.Field.get_field_value(0., 0., z_pos, 0.)
+                                        field.get_field_value(0., 0., z_pos, 0.)
         z_list.append(z_pos*1e-3)  # z in metres
         bz_list.append(bz_field*1e3)  # bz in T
         print 'z:', z_pos, ' ** b:', bx_field, by_field, bz_field, \
@@ -62,7 +63,8 @@ def main():
     graph.Draw('l')
     canvas.Update()
     canvas.Print('bfield_vs_z.png')
-
+    # Clean up
+    maus_globals.death()
     # Finished
     print "Finished - press carriage return to end (closing all windows)"
     raw_input()

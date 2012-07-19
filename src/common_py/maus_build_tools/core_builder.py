@@ -20,6 +20,8 @@ Tools to build core library (libMausCpp) and core library unit tests
 import os
 import glob
 import subprocess
+import json
+import string
 
 MAUS_ROOT_DIR = os.environ['MAUS_ROOT_DIR']
 
@@ -69,6 +71,53 @@ def build_lib_maus_cpp(env):
         Depends(maus_cpp_so, maus_cpp) #pylint: disable = E0602
         env.Install("build", maus_cpp_so)
 
+def camelback_to_underscores(string_camelback):
+    """
+    Convert from ANameLikeThis to a_name_like_this (python module naming
+    convention)
+    """
+    string_underscores = string_camelback[0].lower()
+    for char in string_camelback[1:]:
+        if char in string.ascii_uppercase:
+            string_underscores += '_'+char.lower()
+        else:
+            string_underscores += char
+    return string_underscores
+
+def build_python_modules(env):
+    """
+    Build python modules
+
+    For each *.cc file in src/common_cpp/Python build a corresponding *.so file.
+    These should be python modules 
+    """
+    common_cpp_files = glob.glob("src/legacy/*/*cc") + \
+        glob.glob("src/legacy/*/*/*cc") + \
+        glob.glob("src/common_cpp/*/*cc") + \
+        glob.glob("src/common_cpp/*/*/*cc")
+
+    target_files = glob.glob("src/py_cpp/*cc")
+    init_all = []
+
+    for ccpath in target_files:
+        path, libname = os.path.split(ccpath)
+        # strip 'Py', '.cc', make lowercase, add underscores
+        libname = camelback_to_underscores(libname[2:-3])
+        targetpath = os.path.join(path, libname)
+        maus_cpp = env.SharedLibrary(target = targetpath,
+                               source = ccpath,
+                               LIBS=env['LIBS'] + ['recpack'] + ['libMausCpp'])
+        init_all.append(libname)
+        env.Install("build/maus_cpp", maus_cpp)
+        #Build an extra copy with the .dylib extension for linking on OS X
+        if (os.uname()[0] == 'Darwin'):
+            maus_cpp_so = env.Dylib2SO(targetpath)
+            # Depends == SCons global variable??
+            Depends(maus_cpp_so, maus_cpp) #pylint: disable = E0602
+            env.Install("build", maus_cpp_so)
+    init = open("build/maus_cpp/__init__.py", 'w')
+    print >> init, '__all__ =', json.dumps(init_all)
+    init.close()
 
 def build_cpp_tests(env, module_list):
     """
