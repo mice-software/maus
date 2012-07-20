@@ -256,8 +256,7 @@ void KalmanTrackFit::initialise(SciFiHelicalPRTrack &seed, std::vector<KalmanSit
     site_0_turning_angle = (phi_0+delta_phi); // *PI/180.;
     x = -(x0 + r*cos(site_0_turning_angle));
     y = -(y0 + r*sin(site_0_turning_angle));
-  }
-  else {
+  } else {
     site_0_turning_angle = phi_0; // *PI/180.;
     x = x0 + r*cos(site_0_turning_angle);
     y = y0 + r*sin(site_0_turning_angle);

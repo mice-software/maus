@@ -35,6 +35,7 @@ void KalmanTrack::calc_predicted_state(KalmanSite *old_site, KalmanSite *new_sit
 
   TMatrixD a_projected = TMatrixD(_F, TMatrixD::kMult, a);
   new_site->set_projected_a(a_projected);
+  a_projected.Print();
 }
 
 //

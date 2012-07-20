@@ -93,12 +93,12 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
   for ( unsigned int event_i = 0; event_i < spill.events().size(); event_i++ ) {
     SciFiEvent event = *(spill.events()[event_i]);
 
-    // std::cerr << "Hits in event: " << event.hits().size() << std::endl;
+    std::cerr << "Hits in event: " << event.hits().size() << std::endl;
     if ( event.hits().size() ) {
       // for each fiber-hit, make a digit
       construct_digits(event);
     }
-    // std::cerr << "Digits in Event: " << event.digits().size() << " " << std::endl;
+    std::cerr << "Digits in Event: " << event.digits().size() << " " << std::endl;
     save_to_json(event, event_i);
   }
 
@@ -164,16 +164,11 @@ void MapCppTrackerMCDigitization::construct_digits(SciFiEvent &evt) {
   for ( int hit_i = 0; hit_i < number_of_hits; hit_i++ ) {
     if ( !evt.hits()[hit_i]->is_used() ) {
       SciFiHit *a_hit = evt.hits()[hit_i];
+      a_hit->set_used();
 
       // Get nPE from this hit.
       double edep = a_hit->get_edep();
-      // std::cout << "Edep: " << edep << std::endl;
       double nPE  = compute_npe(edep);
-      // Check whether the energy deposited is below the threshold;
-      // if it is, skip this hit.
-      if ( nPE < SciFiNPECut ) {
-        continue;
-      }
 
       // Compute tdc count.
       double time   = a_hit->get_time();

@@ -136,6 +136,7 @@ void KalmanMonitor::save_mc(std::vector<KalmanSite> const &sites) {
     double mc_px = site.get_true_momentum().x();
     double mc_py = site.get_true_momentum().y();
     double mc_pz = site.get_true_momentum().z();
+    double mc_pt = pow(mc_px*mc_px+mc_py*mc_py, 0.5);
     // double observed = pow(pow(a(0, 0), 2.)+pow(a(1, 0), 2.), 0.5);
     // double expected = pow(pow(a_filt(0, 0), 2.)+pow(a_filt(1, 0), 2.), 0.5);
     // double chi2 = pow(observed-expected, 2.)/expected;
@@ -147,14 +148,35 @@ void KalmanMonitor::save_mc(std::vector<KalmanSite> const &sites) {
     double pr_mx = a_projected(2, 0);
     double pr_my = a_projected(3, 0);
 
-    std::ofstream out2("kalman_mc.txt", std::ios::out | std::ios::app);
     int id = site.get_id();
-    out2 << a(0, 0)    << " " << C(0, 0) << " "
-         << a(1, 0)    << " " << C(1, 1) << " "
-         << res_x      << " " << res_y << " "
+    double pt, px, py, pz;
+
+    if ( id < 15 ) {
+      pt = a_smooth(2, 0)*4*0.3;
+    } else {
+      pt = -a_smooth(2, 0)*4*0.3;
+    }
+    double phi = a_smooth(3, 0);
+    double tan_l = a_smooth(4, 0);
+    px = pt*cos(phi);
+    py = pt*sin(phi);
+    pz = pt*tan_l;
+
+    double mc_radius = abs(mc_pt)/(4*0.3);
+    double mc_tan_l  = mc_pz/mc_pt;
+    double mc_phi = asin(mc_py/mc_pt);
+
+    std::ofstream out2("kalman_mc.txt", std::ios::out | std::ios::app);
+
+    out2 // << a(0, 0)    << " " << C(0, 0) << " "
+         // << a(1, 0)    << " " << C(1, 1) << " "
+         // << res_x      << " " << res_y << " "
          << a_smooth(0, 0) << " " << a_smooth(1, 0) << " "
-         << pr_x0+pr_mx*site.get_z() << " " << pr_y0+pr_my*site.get_z() << " "
+         // << pr_x0+pr_mx*site.get_z() << " " << pr_y0+pr_my*site.get_z() << " "
+         << px << " " << py << " " << pz << " "
          << mc_x << " " << mc_y << " " << mc_px << " " << mc_py << " " << mc_pz << " "
+         << a_smooth(2, 0) << " " << mc_radius << " " << a_smooth(3, 0) << " " << mc_phi << " "
+         << a_smooth(4, 0) << " " << mc_tan_l << " "
          << pull << " " << pull2 << " " << id     << "\n";
     out2.close();
   }
