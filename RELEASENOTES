@@ -5,6 +5,16 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v0.3.1
+  The following functionality was added:
+    - An example script to get the field at one or more points was added. In
+      the example, the field on-axis for MICE stage VI is plotted.
+
+MAUS-v0.3.0
+  The following functionality was added:
+    - Documentation for MiceModules was included in the main documentation
+    - The code now builds in gcc 4.7.1
+
 MAUS-v0.2.5
   The following functionality was added:
     - A new example for json analysis was added

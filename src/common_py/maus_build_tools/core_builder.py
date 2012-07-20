@@ -62,7 +62,7 @@ def build_lib_maus_cpp(env):
     targetpath = 'src/common_cpp/libMausCpp'
     maus_cpp = env.SharedLibrary(target = targetpath,
                                  source = common_cpp_files,
-                                 LIBS=env['LIBS'] + ['recpack'])
+                                 LIBS=env['LIBS'])
     env.Install("build", maus_cpp)
     #Build an extra copy with the .dylib extension for linking on OS X
     if (os.uname()[0] == 'Darwin'):
@@ -102,7 +102,7 @@ def build_python_modules(env):
         targetpath = os.path.join(path, libname)
         maus_cpp = env.SharedLibrary(target = targetpath,
                                source = ccpath,
-                               LIBS=env['LIBS'] + ['recpack'] + ['libMausCpp'])
+                               LIBS=env['LIBS'] + ['libMausCpp'])
         init_all.append(libname)
         if not os.path.exists("build/maus_cpp"):
             os.mkdir("build/maus_cpp")
@@ -136,13 +136,13 @@ def build_cpp_tests(env, module_list):
 
     env.Program(target = 'tests/cpp_unit/test_cpp_unit', \
                 source = test_cpp_files, \
-                LIBS= env['LIBS'] + ['recpack'] + ['MausCpp'] + module_list)
+                LIBS= env['LIBS'] + ['MausCpp'])
     env.Install('build', ['tests/cpp_unit/test_cpp_unit'])
 
     test_optics_files = glob.glob("tests/integration/test_optics/src/*cc")
     test_optics = env.Program(target = 'tests/integration/test_optics/optics', \
                                source = test_optics_files, \
-                               LIBS= env['LIBS'] + ['MausCpp'])
+                               LIBS= env['LIBS'] + ['MausCpp'] + module_list)
     env.Install('build', test_optics)
 
 def build_data_structure(env):
