@@ -172,12 +172,11 @@ void MapCppTrackerMCDigitization::construct_digits(SciFiEvent &evt) {
 
       // Compute tdc count.
       double time   = a_hit->get_time();
-      // std::cout << "Time: " << time << std::endl;
       // int tdcCounts = compute_tdc_counts(time);
       int chanNo = compute_chan_no(a_hit);
 
       // loop over all the other hits
-      for ( int hit_j = hit_i; hit_j < number_of_hits; hit_j++ ) {
+      for ( int hit_j = hit_i+1; hit_j < number_of_hits; hit_j++ ) {
         if ( check_param(evt.hits()[hit_i], evt.hits()[hit_j]) ) {
           SciFiHit *same_digit = evt.hits()[hit_j];
           double edep_j = same_digit->get_edep();
