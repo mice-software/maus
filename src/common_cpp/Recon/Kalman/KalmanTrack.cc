@@ -30,27 +30,6 @@ KalmanTrack::KalmanTrack() {
 //
 // ------- Prediction ------------
 //
-void KalmanTrack::calc_system_noise(KalmanSite *site) {
-  TMatrixD a(5, 1);
-  a = site->get_a();
-  double mx = a(2, 0);
-  double my = a(3, 0);
-  double kappa = a(4, 0);
-  double Z = 1.;
-  double r0 = 0.00167; // cm3/g
-  double p = 1/kappa; // MeV/c
-  double v = p/105.7;
-  double C = 13.6*Z*pow(r0, 0.5)*(1+0.038*log(r0))/(v*p);
-
-  _Q(2, 2) = (1+pow(mx, 2.))*(1+pow(mx, 2.)+pow(my, 2.))*C;
-  _Q(3, 3) = (1+pow(my, 2.))*(1+pow(mx, 2.)+pow(my, 2.))*C;
-  _Q(2, 3) = mx*my*(1+mx*mx+my*my)*C;
-  _Q(3, 2) = mx*my*(1+mx*mx+my*my)*C;
-
-  _Q(4, 4) = kappa*kappa*my*my*C/(1+mx*mx);
-  _Q(3, 4) = kappa * my * (1+mx*mx+my*my) * C /(1+mx*mx);
-}
-
 void KalmanTrack::calc_predicted_state(KalmanSite *old_site, KalmanSite *new_site) {
   TMatrixD a = old_site->get_a();
 

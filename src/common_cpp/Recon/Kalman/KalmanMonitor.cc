@@ -86,10 +86,10 @@ void KalmanMonitor::print_info(std::vector<KalmanSite> const &sites) {
   for ( int i = 0; i < numb_sites; ++i ) {
     KalmanSite site = sites[i];
     std::cerr << "SITE ID: " << site.get_id() << std::endl;
-    std::cerr << "SITE Z: " << site.get_z() << std::endl;
-    std::cerr << "SITE Direction: " << "(" << site.get_direction().x() << ", " <<
-                                       site.get_direction().y() << ", " <<
-                                       site.get_direction().z() << ")" << std::endl;
+    // std::cerr << "SITE Z: " << site.get_z() << std::endl;
+    // std::cerr << "SITE Direction: " << "(" << site.get_direction().x() << ", " <<
+    //                                   site.get_direction().y() << ", " <<
+    //                                   site.get_direction().z() << ")" << std::endl;
 
     std::cerr << "SITE residual (mm): " << site.get_residual_x() << ", "
               << site.get_residual_y() << std::endl;

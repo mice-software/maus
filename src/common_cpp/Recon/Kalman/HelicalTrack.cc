@@ -30,7 +30,16 @@ HelicalTrack::HelicalTrack(SciFiHelicalPRTrack const &seed) {
 
   _x0 = seed.get_x0();
   _y0 = seed.get_y0();
-  _r  = seed.get_R();
+  // pid -13 is mu+
+  // tracker 0: B = 4T,
+  // tracker 1: B = -4T.
+  int tracker = seed.get_tracker();
+  if ( tracker == 0 ) {
+    _sign = 1;
+  } else {
+    _sign = -1;
+  }
+  // _r  = seed.get_R();
 }
 
 void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site) {
@@ -46,63 +55,66 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
 
   TMatrixD prev_site(5, 1);
   prev_site = old_site->get_a();
-  double old_site_x   = prev_site(0, 0);
-  double old_site_y   = prev_site(1, 0);
-  double old_site_phi  = prev_site(2, 0);
-  double old_site_tan_lambda = prev_site(3, 0);
-  double old_site_kappa = prev_site(4, 0);
+  double old_x   = prev_site(0, 0);
+  double old_y   = prev_site(1, 0);
+  double old_r = prev_site(2, 0);
+  double old_phi  = prev_site(3, 0);
+  double old_tan_lambda = prev_site(4, 0);
+
 
   // Find d_rho.
-  double circle_x = _x0+_r*cos(old_site_phi);
-  double circle_y = _y0+_r*sin(old_site_phi);
-  double d_rho = pow(pow(old_site_x-circle_x, 2) +
-                     pow(old_site_y-circle_y, 2), 0.5);
+  double circle_x = _x0+old_r*cos(old_phi);
+  double circle_y = _y0+old_r*sin(old_phi);
+  double d_rho = pow(pow(old_x-circle_x, 2) +
+                     pow(old_y-circle_y, 2), 0.5);
 
-  std::cout << "Drho: " << d_rho << std::endl;
+  std::cout << "Drho: " << d_rho << " "
+            << "" << std::endl;
 
   // double new_phi = - old_site_kappa * deltaZ/(_alpha * old_site_tan_lambda);
-  double delta_phi = old_site_kappa*deltaZ/(ALPHA * old_site_tan_lambda);
-  double new_phi_degrees = (old_site_phi+delta_phi);
-  double old_phi_degrees = old_site_phi;
+  double delta_phi = _sign*deltaZ/(old_r * old_tan_lambda);
+  double new_phi = (old_phi+delta_phi);
+  std::cerr << "Phi: " << old_phi << " " << new_phi << std::endl;
+  // double old_phi_degrees = old_site_phi;
   // Build _F.
   _F(0, 0) = 1.0;
   _F(1, 0) = 0.0;
-  _F(2, 0) = -d_rho*sin(old_phi_degrees) +
-             ALPHA/old_site_kappa*(-sin(old_phi_degrees) +
-             sin(new_phi_degrees));
-  _F(3, 0) = -sin(new_phi_degrees)*
-             deltaZ/(old_site_tan_lambda*old_site_tan_lambda);
-  _F(4, 0) = -(ALPHA/old_site_kappa*old_site_kappa)*
-             ( cos(old_phi_degrees) - cos(new_phi_degrees) ) +
-             sin(new_phi_degrees)*deltaZ/(old_site_kappa*old_site_tan_lambda);
+  _F(2, 0) = _sign*( cos(old_phi) - cos(new_phi) ) -
+             sin(new_phi)*deltaZ/(old_tan_lambda*old_r);
+  _F(3, 0) = -d_rho*sin(old_phi) +
+             _sign*old_r*( -sin(old_phi) + sin(new_phi) );
+  _F(4, 0) = - sin(new_phi)*
+             deltaZ/(old_tan_lambda*old_tan_lambda);
 
   _F(0, 1) = 0.0;
   _F(1, 1) = 1.0;
-  _F(2, 1) = -d_rho*cos(old_phi_degrees) +
-             ALPHA/old_site_kappa*(cos(old_phi_degrees) - cos(new_phi_degrees));
-  _F(3, 1) = cos(new_phi_degrees)*
-             deltaZ/(old_site_tan_lambda*old_site_tan_lambda);
-  _F(4, 1) = -(ALPHA/old_site_kappa*old_site_kappa)*
-             ( sin(old_phi_degrees) - sin(new_phi_degrees) ) -
-             cos(new_phi_degrees)*deltaZ/(old_site_kappa*old_site_tan_lambda);
+  _F(2, 1) = _sign*( sin(old_phi) - sin(new_phi) ) -
+             cos(new_phi)*deltaZ/(old_tan_lambda*old_r);
+
+  _F(3, 1) = d_rho*cos(old_phi) +
+             _sign*old_r*(cos(old_phi) - cos(new_phi));
+  _F(4, 1) = cos(new_phi)*
+             deltaZ/(old_tan_lambda*old_tan_lambda);
 
   _F(0, 2) = 0.0;
   _F(1, 2) = 0.0;
   _F(2, 2) = 1.0;
-  _F(3, 2) = -deltaZ*old_site_kappa/(ALPHA*old_site_tan_lambda*old_site_tan_lambda);
-  _F(4, 2) = deltaZ/(ALPHA*old_site_tan_lambda);
+  _F(3, 2) = 0.0;
+  _F(4, 2) = 0.0;
 
   _F(0, 3) = 0.0;
   _F(1, 3) = 0.0;
-  _F(2, 3) = 0.0;
+  _F(2, 3) = -delta_phi/old_r;
   _F(3, 3) = 1.0;
-  _F(4, 3) = 0.0;
+  _F(4, 3) = -delta_phi/old_tan_lambda;
 
   _F(0, 4) = 0.0;
   _F(1, 4) = 0.0;
   _F(2, 4) = 0.0;
   _F(3, 4) = 0.0;
   _F(4, 4) = 1.0;
+
+
   // for ( int i = 0; i < 5; i++ ) {
     // _F(i, i) = 1.;
   // }
@@ -115,3 +127,27 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   //            (cos(old_site_phi) - cos(old_site_phi+new_phi));
   // _F(1, 4) = - (_alpha/pow(old_site_kappa, 2)) * (sin(old_site_phi) - sin(old_site_phi+new_phi));
 }
+
+void HelicalTrack::calc_system_noise(KalmanSite *site) {
+  _Q.Zero();
+/*  TMatrixD a(5, 1);
+  a = site->get_a();
+  double mx = a(2, 0);
+  double my = a(3, 0);
+  double kappa = a(4, 0);
+  double Z = 1.;
+  double r0 = 0.00167; // cm3/g
+  double p = 1/kappa; // MeV/c
+  double v = p/105.7;
+  double C = 13.6*Z*pow(r0, 0.5)*(1+0.038*log(r0))/(v*p);
+
+  _Q(2, 2) = (1+pow(mx, 2.))*(1+pow(mx, 2.)+pow(my, 2.))*C;
+  _Q(3, 3) = (1+pow(my, 2.))*(1+pow(mx, 2.)+pow(my, 2.))*C;
+  _Q(2, 3) = mx*my*(1+mx*mx+my*my)*C;
+  _Q(3, 2) = mx*my*(1+mx*mx+my*my)*C;
+
+  _Q(4, 4) = kappa*kappa*my*my*C/(1+mx*mx);
+  _Q(3, 4) = kappa * my * (1+mx*mx+my*my) * C /(1+mx*mx);
+*/
+}
+

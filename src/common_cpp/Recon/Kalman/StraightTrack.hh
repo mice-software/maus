@@ -36,6 +36,8 @@ class StraightTrack : public KalmanTrack {
  public:
 
   void update_propagator(KalmanSite *old_site, KalmanSite *new_site);
+
+  void calc_system_noise(KalmanSite *site);
 };
 
 #endif
