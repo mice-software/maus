@@ -24,11 +24,11 @@ import sys
 import maus_cpp.globals
 
 # MAUS
-from Configuration import Configuration
-from framework.input_transform import InputTransformExecutor
-from framework.merge_output import MergeOutputExecutor
-from framework.multi_process import MultiProcessExecutor
-from framework.single_thread import PipelineSingleThreadDataflowExecutor
+from Configuration import Configuration # pylint: disable=W0403, C0301
+from framework.input_transform import InputTransformExecutor # pylint: disable=W0403, C0301
+from framework.merge_output import MergeOutputExecutor # pylint: disable=W0403, C0301
+from framework.multi_process import MultiProcessExecutor # pylint: disable=W0403, C0301
+from framework.single_thread import PipelineSingleThreadDataflowExecutor # pylint: disable=W0403, C0301
 
 class Go: # pylint: disable=R0921, R0903
     """
