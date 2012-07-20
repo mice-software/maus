@@ -142,7 +142,7 @@ def build_cpp_tests(env, module_list):
     test_optics_files = glob.glob("tests/integration/test_optics/src/*cc")
     test_optics = env.Program(target = 'tests/integration/test_optics/optics', \
                                source = test_optics_files, \
-                               LIBS= env['LIBS'] + ['MausCpp'])
+                               LIBS= env['LIBS'] + ['MausCpp'] + module_list)
     env.Install('build', test_optics)
 
 def build_data_structure(env):
