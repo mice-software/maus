@@ -21,12 +21,14 @@ import os
 import json
 import sys
 
+import maus_cpp.globals
+
 # MAUS
-from Configuration import Configuration
-from framework.input_transform import InputTransformExecutor
-from framework.merge_output import MergeOutputExecutor
-from framework.multi_process import MultiProcessExecutor
-from framework.single_thread import PipelineSingleThreadDataflowExecutor
+from Configuration import Configuration # pylint: disable=W0403, C0301
+from framework.input_transform import InputTransformExecutor # pylint: disable=W0403, C0301
+from framework.merge_output import MergeOutputExecutor # pylint: disable=W0403, C0301
+from framework.multi_process import MultiProcessExecutor # pylint: disable=W0403, C0301
+from framework.single_thread import PipelineSingleThreadDataflowExecutor # pylint: disable=W0403, C0301
 
 class Go: # pylint: disable=R0921, R0903
     """
@@ -70,17 +72,18 @@ class Go: # pylint: disable=R0921, R0903
         any other execution problems.
         """
         # Check MAUS_ROOT_DIR.
+        self.json_config_doc = json.dumps({})
         Go.check_maus_root_dir()
 
         # Load the MAUS JSON configuration overriding it with the
         # contents of the given configuration file and command
         # line arguments.
         configuration  = Configuration()
-        json_config_doc = configuration.getConfigJSON(
+        self.json_config_doc = configuration.getConfigJSON(
             config_file, command_line_args)
 
         # Parse the configuration JSON.
-        json_config_dictionary = json.loads(json_config_doc)
+        json_config_dictionary = json.loads(self.json_config_doc)
         # How should we 'drive' the components?
         type_of_dataflow = json_config_dictionary['type_of_dataflow']
         # Grab version
@@ -97,28 +100,36 @@ class Go: # pylint: disable=R0921, R0903
         if json_config_dictionary["verbose_level"] == 0:
             print "Configuration: ", \
                 json.dumps(json_config_dictionary, indent=2)
+        print "Initialising Globals"
+        # Initialise field maps, geant4, etc
+        maus_cpp.globals.birth(json.dumps(json_config_dictionary))        
+        try:
+            # Set up the dataflow executor.
+            if type_of_dataflow == 'pipeline_single_thread':
+                executor = PipelineSingleThreadDataflowExecutor(
+                   inputer, transformer, merger, outputer, self.json_config_doc)
+            elif type_of_dataflow == 'multi_process':
+                executor = MultiProcessExecutor(
+                   inputer, transformer, merger, outputer, self.json_config_doc)
+            elif type_of_dataflow == 'multi_process_input_transform':
+                executor = InputTransformExecutor( \
+                    inputer, transformer, self.json_config_doc)
+            elif type_of_dataflow == 'multi_process_merge_output':
+                executor = MergeOutputExecutor( \
+                    merger, outputer, self.json_config_doc)
+            elif type_of_dataflow == 'many_local_threads':
+                raise NotImplementedError()
+            else:
+                raise LookupError("bad type_of_dataflow: %s" % type_of_dataflow)
 
-        # Set up the dataflow executor.
-        if type_of_dataflow == 'pipeline_single_thread':
-            executor = PipelineSingleThreadDataflowExecutor(
-                inputer, transformer, merger, outputer, json_config_doc)
-        elif type_of_dataflow == 'multi_process':
-            executor = MultiProcessExecutor(
-                inputer, transformer, merger, outputer, json_config_doc)
-        elif type_of_dataflow == 'multi_process_input_transform':
-            executor = InputTransformExecutor( \
-                inputer, transformer, json_config_doc)
-        elif type_of_dataflow == 'multi_process_merge_output':
-            executor = MergeOutputExecutor( \
-                merger, outputer, json_config_doc)
-        elif type_of_dataflow == 'many_local_threads':
-            raise NotImplementedError()
-        else:
-            raise LookupError("bad type_of_dataflow: %s" % type_of_dataflow)
-
-        # Execute the dataflow.
-        print("INITIATING EXECUTION")
-        executor.execute()
+            # Execute the dataflow.
+            print("Initiating Execution")
+            executor.execute()
+        except:
+            raise
+        finally:
+            print "Clearing Globals" 
+            maus_cpp.globals.death()
         print("DONE")
 
     @staticmethod
