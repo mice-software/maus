@@ -25,25 +25,13 @@
 
 #include "json/value.h"
 
-/////////// Needed until persistency move is done /////////////
-#include "src/legacy/Interface/dataCards.hh"
-#include "src/legacy/Interface/MICEEvent.hh"
-#include "src/legacy/Interface/MICERun.hh"
-
-#include "src/legacy/Config/MiceModule.hh"
-#include "src/legacy/Interface/MiceMaterials.hh"
-#include "src/legacy/Simulation/FillMaterials.hh"
-/////////// Needed until persistency move is done //////////////
-
-/////////// Needed until I clean up legacy tests to gtest framework //////////
-#include "src/legacy/Interface/Squeak.hh"
-/////////// Needed until I clean up legacy tests to gtest framework //////////
-
-#include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
-
+#include "src/common_cpp/Utils/JsonWrapper.hh"
+#include "src/common_cpp/Globals/GlobalsManager.hh"
 
 Json::Value SetupConfig() {
   Json::Value config(Json::objectValue);
+  config["reconstruction_geometry_filename"] = "Test.dat";
+  config["simulation_geometry_filename"] = "Test.dat";
   config["maximum_number_of_steps"] = 10000;
   config["keep_tracks"] = true;
   config["keep_steps"] = true;
@@ -56,19 +44,13 @@ Json::Value SetupConfig() {
   config["charged_pion_half_life"] = -1.;
   config["muon_half_life"] = -1.;
   config["production_threshold"] = 0.5;
+  config["production_threshold"] = 0.5;
   return config;
 }
 
 int main(int argc, char **argv) {
-  ///// Try to keep static set up to a minimum (not very unit testy)
-  MICERun::getInstance()->jsonConfiguration = new Json::Value(SetupConfig());
-  dataCards MyDataCards(0);
-  MICERun::getInstance()->DataCards = &MyDataCards;
-  MICERun::getInstance()->miceModule = new MiceModule("Test.dat");  // delete
-  MICERun::getInstance()->miceMaterials = new MiceMaterials();  // delete
-  fillMaterials(*MICERun::getInstance());
-  Squeak::setOutput(Squeak::debug, Squeak::nullOut());
-  Squeak::setStandardOutputs();
+  MAUS::GlobalsManager::InitialiseGlobals
+                                     (JsonWrapper::JsonToString(SetupConfig()));
   ::testing::InitGoogleTest(&argc, argv);
   int test_out = -1;
   try {
@@ -79,7 +61,7 @@ int main(int argc, char **argv) {
   } catch(std::exception exc) {
       std::cerr << "Caught std::exception" << "\n" << exc.what() << std::endl;
   }
-  delete MAUS::MAUSGeant4Manager::GetInstance();
+  MAUS::GlobalsManager::DeleteGlobals();
   return test_out;
 }
 

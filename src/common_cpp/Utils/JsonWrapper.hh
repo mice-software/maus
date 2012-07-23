@@ -71,6 +71,12 @@ class JsonWrapper {
    */
   static Json::Value StringToJson(std::string json_in) throw(Squeal);
 
+  /** @brief Convert a Json::Value tree to a std::string
+   *
+   *  @param json_in Json::Value to convert to a string
+   */
+  static std::string JsonToString(const Json::Value& val);
+
   /** @brief Get an item from a Json array (variable length array)
    *
    *  @param array array of values from which we want to get a value

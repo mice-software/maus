@@ -40,7 +40,6 @@ import logging
 import os 
 
 from celery.signals import worker_process_init 
-
 from mauscelery.state import MausConfiguration
 from mauscelery.state import MausTransform
 
@@ -128,7 +127,7 @@ def process_death(pids):
             try:
                 if logger.isEnabledFor(logging.INFO):
                     logger.info("Deathing transform")
-                MausTransform.death() 
+                MausTransform.death()
             except Exception as exc: # pylint:disable = W0703
                 status = {}
                 status["error"] = str(exc.__class__)

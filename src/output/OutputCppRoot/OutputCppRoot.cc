@@ -19,7 +19,7 @@
 
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/JsonCppStreamer/ORStream.hh"
-#include "src/common_cpp/JsonCppStreamer/JsonCppConverter.hh"
+#include "src/common_cpp/Converter/DataConverters/JsonCppConverter.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "src/common_cpp/DataStructure/Data.hh"
 
@@ -73,7 +73,7 @@ bool OutputCppRoot::save(std::string json_spill_document) {
       }
       if (json_spill_document != "") {
           Json::Value json_spill = JsonWrapper::StringToJson(json_spill_document);
-          _data->SetSpill( (*_jsonCppConverter)(json_spill) );
+          _data->SetSpill( (*_jsonCppConverter)(&json_spill) );
           (*_outfile) << fillEvent;
           return true;
       } else {

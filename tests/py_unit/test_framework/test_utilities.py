@@ -128,18 +128,18 @@ class DataflowUtilitiesTestCase(unittest.TestCase): # pylint: disable=R0904, C03
 
     def test_get_run_number(self):
         """
-        Test with a spill that has a "run_num".
+        Test with a spill that has a "run_number".
         @param self Object reference.
         """
         spill = {}
-        spill["run_num"] = 123
+        spill["run_number"] = 123
         self.assertEquals(123,
             DataflowUtilities.get_run_number(spill),
             "Unexpected run number")
 
     def test_get_run_number_no_run_num(self):
         """
-        Test with a spill that has a no "run_num".
+        Test with a spill that has a no "run_number".
         @param self Object reference.
         """
         self.assertEquals(None,

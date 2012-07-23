@@ -136,6 +136,7 @@ namespace Output
 {
   void MakeOutput(std::vector<CovarianceMatrix> matrix, std::vector<TransferMap*> tms, MiceModule* env_mod);
   void LongTextOutput(std::vector<CovarianceMatrix> matrix, std::vector<TransferMap*> tms, std::string outfile);
+  void JsonOutput(std::vector<CovarianceMatrix> matrix, std::vector<TransferMap*> tms, std::string outfile);
   void TextOutput(std::vector<CovarianceMatrix> matrix, std::string outfile);
   void RootOutput(std::vector<CovarianceMatrix> matrix, std::vector<TransferMap*> tms, std::string outfile, std::string comment);
   void  writeEvent();
