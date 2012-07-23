@@ -20,11 +20,10 @@
 
 #include <string>
 
-#include "G4VModularPhysicsList.hh"
-#include "G4UImanager.hh"
-
-#include "G4UserSpecialCuts.hh"
-#include "G4StepLimiter.hh"
+#include "Geant4/G4VModularPhysicsList.hh"
+#include "Geant4/G4UImanager.hh"
+#include "Geant4/G4UserSpecialCuts.hh"
+#include "Geant4/G4StepLimiter.hh"
 
 namespace MAUS {
 

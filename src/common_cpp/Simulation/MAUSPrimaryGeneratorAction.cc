@@ -19,10 +19,10 @@
 #include <limits>
 #include <queue>
 
-#include "G4Event.hh"
-#include "G4PrimaryVertex.hh"
-#include "G4Track.hh"
-#include "G4ios.hh"
+#include "Geant4/G4Event.hh"
+#include "Geant4/G4PrimaryVertex.hh"
+#include "Geant4/G4Track.hh"
+#include "Geant4/G4ios.hh"
 
 #include "CLHEP/Random/Random.h"
 

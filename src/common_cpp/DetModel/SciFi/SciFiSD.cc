@@ -16,14 +16,14 @@
  */
 #include "src/common_cpp/DetModel/SciFi/SciFiSD.hh"
 
-#include <G4TransportationManager.hh>
-#include <G4FieldManager.hh>
-#include <G4Field.hh>
-#include <G4HCofThisEvent.hh>
-#include <G4Step.hh>
-#include <G4ThreeVector.hh>
-#include <G4SDManager.hh>
-#include <G4ios.hh>
+#include "Geant4/G4TransportationManager.hh"
+#include "Geant4/G4FieldManager.hh"
+#include "Geant4/G4Field.hh"
+#include "Geant4/G4HCofThisEvent.hh"
+#include "Geant4/G4Step.hh"
+#include "Geant4/G4ThreeVector.hh"
+#include "Geant4/G4SDManager.hh"
+#include "Geant4/G4ios.hh"
 
 #include <iostream>
 #include <fstream>

@@ -1,7 +1,7 @@
 #ifndef MICETrackingAction_h
 #define MICETrackingAction_h 1
 
-#include "G4UserTrackingAction.hh"
+#include "Geant4/G4UserTrackingAction.hh"
 
 class MICETrackingAction : public G4UserTrackingAction {
 

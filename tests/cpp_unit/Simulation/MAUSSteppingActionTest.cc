@@ -16,8 +16,8 @@
 
 #include "gtest/gtest.h"
 
-#include "G4Step.hh"
-#include "G4ParticleTable.hh"
+#include "Geant4/G4Step.hh"
+#include "Geant4/G4ParticleTable.hh"
 
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"

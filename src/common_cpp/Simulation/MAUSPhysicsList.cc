@@ -22,12 +22,12 @@
 
 #include "json/json.h"
 
-#include "globals.hh"
+#include "Geant4/globals.hh"
 
-#include "G4UImanager.hh"
-#include "G4ProcessTable.hh"
-#include "G4ProcessVector.hh"
-#include "G4PhysListFactory.hh"
+#include "Geant4/G4UImanager.hh"
+#include "Geant4/G4ProcessTable.hh"
+#include "Geant4/G4ProcessVector.hh"
+#include "Geant4/G4PhysListFactory.hh"
 
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Simulation/MAUSPhysicsList.hh"

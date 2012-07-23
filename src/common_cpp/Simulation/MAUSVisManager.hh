@@ -18,8 +18,8 @@
 #ifndef SRC_COMMON_CPP_SIMULATION_MAUSVISMANAGER_HH
 #define SRC_COMMON_CPP_SIMULATION_MAUSVISMANAGER_HH
 
-#include <G4VisManager.hh>
-#include <G4UImanager.hh>
+#include "Geant4/G4VisManager.hh"
+#include "Geant4/G4UImanager.hh"
 
 #include <string>
 

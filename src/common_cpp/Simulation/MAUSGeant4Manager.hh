@@ -18,8 +18,8 @@
 #ifndef _SRC_COMMON_CPP_SIMULATION_MAUSGEANT4MANAGER_HH_
 #define _SRC_COMMON_CPP_SIMULATION_MAUSGEANT4MANAGER_HH_
 
-#include <G4RunManager.hh>
-#include <G4SDManager.hh>
+#include "Geant4/G4RunManager.hh"
+#include "Geant4/G4SDManager.hh"
 
 // should all be forward declarations? yes - but be careful about namespace
 #include "src/legacy/Simulation/FillMaterials.hh"

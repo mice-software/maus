@@ -3,7 +3,7 @@
 
 #include "TTree.h"
 #include "TFile.h"
-#include "G4VSolid.hh"
+#include "Geant4/G4VSolid.hh"
 
 #include "json/json.h"
 

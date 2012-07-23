@@ -4,7 +4,7 @@
 // MAUS
 #include "DetModel/MAUSSD.hh"
 // Geant 4
-#include "G4VSensitiveDetector.hh"
+#include "Geant4/G4VSensitiveDetector.hh"
 
 class G4Step;
 class G4HCofThisEvent;

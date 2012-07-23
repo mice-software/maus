@@ -15,19 +15,19 @@
  *
  */
 
-#include <G4Material.hh>
-#include <G4Tubs.hh>
-#include <G4LogicalVolume.hh>
-#include <G4PVPlacement.hh>
-#include <G4PVParameterised.hh>
-#include <G4UserLimits.hh>
-#include <G4VisAttributes.hh>
-#include <G4Colour.hh>
-#include <G4ios.hh>
-#include <G4ThreeVector.hh>
-#include <G4RotationMatrix.hh>
-#include <globals.hh>
-#include <G4SDManager.hh>
+#include "Geant4/G4Material.hh"
+#include "Geant4/G4Tubs.hh"
+#include "Geant4/G4LogicalVolume.hh"
+#include "Geant4/G4PVPlacement.hh"
+#include "Geant4/G4PVParameterised.hh"
+#include "Geant4/G4UserLimits.hh"
+#include "Geant4/G4VisAttributes.hh"
+#include "Geant4/G4Colour.hh"
+#include "Geant4/G4ios.hh"
+#include "Geant4/G4ThreeVector.hh"
+#include "Geant4/G4RotationMatrix.hh"
+#include "Geant4/globals.hh"
+#include "Geant4/G4SDManager.hh"
 
 #include "DetModel/SciFi/SciFiPlane.hh"
 #include "DetModel/SciFi/SciFiSD.hh"

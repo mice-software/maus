@@ -12,11 +12,11 @@
 
 #include "Interface/MiceMaterials.hh"
 #include "Interface/dataCards.hh"
-#include "G4Material.hh"
-#include "G4IonisParamMat.hh"
-#include "G4Element.hh"
+#include "Geant4/G4Material.hh"
+#include "Geant4/G4IonisParamMat.hh"
+#include "Geant4/G4Element.hh"
 
-#include "G4NistManager.hh"
+#include "Geant4/G4NistManager.hh"
 #include "CLHEP/Units/PhysicalConstants.h"
 #include <math.h>
 

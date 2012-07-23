@@ -18,7 +18,7 @@
 
 #include "gtest/gtest.h"
 
-#include "G4Event.hh"
+#include "Geant4/G4Event.hh"
 
 #include "CLHEP/Random/Random.h"
 
