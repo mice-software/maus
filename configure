@@ -201,7 +201,7 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
          export PATH="\${maus_bin_dirs}:\${PATH}" # else add it
      fi
 
-     maus_lib_dirs="\${MAUS_THIRD_PARTY}/third_party/install/lib"
+     maus_lib_dirs="\${MAUS_THIRD_PARTY}/third_party/install/lib:\${MAUS_THIRD_PARTY}/third_party/install/lib64"
      if [ "$arch" == "Darwin" ]; then
          maus_lib_dirs="\${MAUS_THIRD_PARTY}/third_party/install/Python.framework/Versions/2.7/lib:\${maus_lib_dirs}"
      fi
