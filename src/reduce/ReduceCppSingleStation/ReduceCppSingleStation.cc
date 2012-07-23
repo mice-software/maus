@@ -46,12 +46,14 @@ bool ReduceCppSingleStation::birth(std::string argJsonConfigDocument) {
   TCanvas *c3 = new TCanvas("c3", "SpacePoints", 200, 10, 700, 500);
   TCanvas *c4 = new TCanvas("c4", "Cluster NPE", 200, 10, 700, 500);
   TCanvas *c5 = new TCanvas("c5", "Digits Time", 200, 10, 700, 500);
+  TCanvas *c6 = new TCanvas("c6", "Cluster Channels", 200, 10, 1100, 500);
 
   c1->Divide(1, 1);
   c2->Divide(3, 1);
   c3->Divide(2, 2);
   c4->Divide(3, 1);
   c5->Divide(1, 1);
+  c6->Divide(1, 1);
 
   gStyle->SetLabelSize(0.07, "xyz");
   gStyle->SetTitleSize(0.07, "xy");
@@ -117,6 +119,7 @@ bool ReduceCppSingleStation::birth(std::string argJsonConfigDocument) {
   _doublet_clusters.Branch("plane", &_plane, "plane/I");
   _doublet_clusters.Branch("channel", &_channel, "channel/D");
   _doublet_clusters.Branch("npe", &_npe, "npe/D");
+  _doublet_clusters.Branch("run_number", &_run_num, "run_number/I");
 
   _spacepoints.SetNameTitle("spacepoints", "spacepoints");
   _spacepoints.Branch("pe", &_pe, "pe/D");
@@ -189,6 +192,7 @@ std::string  ReduceCppSingleStation::process(std::string document) {
   TCanvas *c3 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c3"));
   TCanvas *c4 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c4"));
   TCanvas *c5 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c5"));
+  TCanvas *c6 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c6"));
 
   std::ofstream file1;
   std::ofstream file2;
@@ -213,9 +217,9 @@ std::string  ReduceCppSingleStation::process(std::string document) {
     if ( is_physics_daq_event(root) ) {
       // unpacked_data_histograms(root);
       // digits_histograms(root);
-      // doublet_clusters_histograms(root);
-      // _spacepoints.Reset();
-      // draw_spacepoints(root);
+      doublet_clusters_histograms(root);
+      _spacepoints.Reset();
+      draw_spacepoints(root);
       count_particle_events(root);
       compute_station_efficiencies(root);
     }
@@ -263,6 +267,7 @@ std::string  ReduceCppSingleStation::process(std::string document) {
 
 
   if (!(_nSpills%1)) {
+/*
     c1->cd(1);
     _graph->Draw("ac*");
     c1->Update();
@@ -324,6 +329,17 @@ std::string  ReduceCppSingleStation::process(std::string document) {
     _dig_npe_plane2->Draw();
     c6->Update();
 */
+/*
+    c6->cd(1);
+    _doublet_clusters.Draw("channel");
+    c6->Update();
+*/
+    TFile datafile(_filename.c_str(), "recreate" );
+    datafile.cd();
+    _doublet_clusters.Write();
+    datafile.ls();
+    datafile.Close();
+    Squeak::mout(Squeak::info) << _filename << " is updated." << std::endl;
   }
 
   return document;
@@ -488,6 +504,7 @@ void ReduceCppSingleStation::draw_spacepoints(Json::Value root) {
 
 void ReduceCppSingleStation::doublet_clusters_histograms(Json::Value root) {
   int n_events = root["recon_events"].size();
+  _run_num = root["run_number"].asInt();
 
   for ( int event_i = 0; event_i < n_events; event_i++ ) {
     if ( root["recon_events"][event_i]["sci_fi_event"]

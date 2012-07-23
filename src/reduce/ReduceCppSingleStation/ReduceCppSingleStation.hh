@@ -143,7 +143,7 @@ class ReduceCppSingleStation {
   double _npe_dig, _channel_dig, _time;
 
   TTree _doublet_clusters;
-  int _plane;
+  int _plane, _run_num;
   double _npe, _channel;
 
   TTree _spacepoints;
