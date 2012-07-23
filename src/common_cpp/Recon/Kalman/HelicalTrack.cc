@@ -73,7 +73,7 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
 
   // double new_phi = - old_site_kappa * deltaZ/(_alpha * old_site_tan_lambda);
   double delta_phi = _sign*deltaZ/(old_r * old_tan_lambda);
-  double new_phi = (old_phi+delta_phi);
+  double new_phi   = (old_phi+delta_phi);
   std::cerr << "Phi: " << old_phi << " " << new_phi << std::endl;
   // double old_phi_degrees = old_site_phi;
   // Build _F.

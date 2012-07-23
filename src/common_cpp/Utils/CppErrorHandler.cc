@@ -106,5 +106,8 @@ CppErrorHandler* CppErrorHandler::getInstance() {
   return instance;
 }
 
+CppErrorHandler::~CppErrorHandler() {
+  instance = NULL;
+}
 }  // namespace MAUS
 

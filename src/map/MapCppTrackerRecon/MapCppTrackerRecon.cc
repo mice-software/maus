@@ -102,7 +102,6 @@ std::string MapCppTrackerRecon::process(std::string document) {
         std::cout << "Pattern Recognition complete." << std::endl;
       }
       // Kalman Track Fit.
-      // std::cout << "HELICAL TRACKS FOUND: " << event.helicalprtracks().size() << std::endl;
       // if ( event.straightprtracks().size() || event.helicalprtracks().size() ) {
       //  track_fit(event);
       // }
