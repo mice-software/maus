@@ -99,6 +99,7 @@ class ReduceCppTracker {
 
   void merge_tracker_events(Json::Value &root);
 
+  // void perform_alignment_study();
  private:
   bool _this_is_tracker0_event;
 
@@ -118,19 +119,6 @@ class ReduceCppTracker {
 
   int map_stations_hits[2][6];
 
-/*
-  TTree _digits;
-  double _npe;
-  int _tracker_dig;
-
-  TTree _spacepoints;
-  int _tracker;
-  int _station;
-  int _type;
-  double _x;
-  double _y;
-  double _z;
-*/
   TTree _events;
   int _tracker_event;
   int _station_hits;

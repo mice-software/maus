@@ -113,9 +113,9 @@ bool ReduceCppSingleStation::birth(std::string argJsonConfigDocument) {
   _digits.Branch("channel", &_channel_dig, "channel/D");
   _digits.Branch("npe", &_npe_dig, "npe/D");
   _digits.Branch("time", &_time, "time/D");
-  _digits.Branch("adc", &_adc_dig, "adc/I");
+  // _digits.Branch("adc", &_adc_dig, "adc/I");
 
-  _doublet_clusters.SetNameTitle("digits", "digits");
+  _doublet_clusters.SetNameTitle("clusters", "clusters");
   _doublet_clusters.Branch("plane", &_plane, "plane/I");
   _doublet_clusters.Branch("channel", &_channel, "channel/D");
   _doublet_clusters.Branch("npe", &_npe, "npe/D");
@@ -177,7 +177,17 @@ bool ReduceCppSingleStation::birth(std::string argJsonConfigDocument) {
 
 bool ReduceCppSingleStation::death()  {
   std::cout << "************ Dead of Single Station Reducer ************" << std::endl;
+  save();
   return true;
+}
+
+void ReduceCppSingleStation::save()  {
+  TFile root_file("SingleStationOutput.root", "RECREATE");
+  _unpacked.Write();
+  _digits.Write();
+  _doublet_clusters.Write();
+  _spacepoints.Write();
+  root_file.Close();
 }
 
 std::string  ReduceCppSingleStation::process(std::string document) {
@@ -215,13 +225,13 @@ std::string  ReduceCppSingleStation::process(std::string document) {
   }
   try {
     if ( is_physics_daq_event(root) ) {
-      // unpacked_data_histograms(root);
-      // digits_histograms(root);
-      doublet_clusters_histograms(root);
-      _spacepoints.Reset();
-      draw_spacepoints(root);
+      build_unpacked_tree(root);
+      build_digits_tree(root);
+      build_doublet_clusters_tree(root);
+      _spacepointscopy.Reset();
+      build_spacepoints_tree(root);
       count_particle_events(root);
-      compute_station_efficiencies(root);
+      // compute_station_efficiencies(root);
     }
   } catch(Squeal squee) {
     Squeak::mout(Squeak::error) << squee.GetMessage() << std::endl;
@@ -233,7 +243,11 @@ std::string  ReduceCppSingleStation::process(std::string document) {
 
   _nSpills++;
 
-  if (!(_nSpills%5)) {
+  if (!(_nSpills%50))
+    save();
+/*
+  if (!(_nSpills%50)) {
+    save();
     file1.open("efficiency_plane0.txt");
     file2.open("efficiency_plane1.txt");
     file3.open("efficiency_plane2.txt");
@@ -251,21 +265,7 @@ std::string  ReduceCppSingleStation::process(std::string document) {
     file4 << 2 << " " << _plane_2_hits << " " << _plane_2_counter << "\n";
     file4.close();
   }
-    // c7->cd(1);
-    // _station = new TGraph(3,_plane_array,_station_eff);
-    // _station->Draw("AC*");
-    // c7->cd(2);
-    // _plane0 = new TGraph(214,_channel_array,_plane0_eff);
-    // _plane0->Draw("AC*");
-    /*  c7->cd(3);
-    _plane0 = new TGraph(214,_channel_array,_plane1_eff);
-    _plane0->Draw("AC*");
-    c7->cd(4);
-    _plane0 = new TGraph(214,_channel_array,_plane2_eff);
-    _plane0->Draw("AC*");*/
-    // c7->Update();
-
-
+*/
   if (!(_nSpills%1)) {
 /*
     c1->cd(1);
@@ -281,21 +281,21 @@ std::string  ReduceCppSingleStation::process(std::string document) {
     c2->Update();
 
     c3->cd(1);
-    _spacepoints.Draw("x:y>>duplets", "type==2");
+    _spacepointscopy.Draw("x:y>>duplets", "type==2");
     duplets->Draw("same");
-    _spacepoints.Draw("x:y>>triplets", "type==3", "same");
+    _spacepointscopy.Draw("x:y>>triplets", "type==3", "same");
     triplets->Draw("same");
     c3->cd(2);
-    _spacepoints.Draw("type");
+    _spacepointscopy.Draw("type");
     c3->Update();
 
     c3->cd(3);
-    _spacepointscopy.Draw("x:y>>duplets_copy", "type==2");
+    _spacepoints.Draw("x:y>>duplets_copy", "type==2");
     duplets_copy->Draw("same");
-    _spacepointscopy.Draw("x:y>>triplets_copy", "type==3", "same");
+    _spacepoints.Draw("x:y>>triplets_copy", "type==3", "same");
     triplets_copy->Draw("same");
     c3->cd(4);
-    _spacepointscopy.Draw("type");
+    _spacepoints.Draw("type");
     c3->Update();
 
     c4->cd(1);
@@ -308,31 +308,7 @@ std::string  ReduceCppSingleStation::process(std::string document) {
 
     c5->cd(1);
     _digits.Draw("time");
-    // c5_1->SetLogy(1);
-    // c5_1->SetGrid(1,1);
-    // _unpacked.Draw("adc", "bank==0 || bank==2 || bank==5 ||
-    // bank==7 || bank==9|| bank==10|| bank==11 ||bank==12 ||
-    // bank==13|| bank==14");
     c5->Update();
-/*
-    c6->cd(1);
-    _adc_plane0->Draw();
-    c6->cd(2);
-    _adc_plane1->Draw();
-    c6->cd(3);
-    _adc_plane2->Draw();
-    c6->cd(4);
-    _dig_npe_plane0->Draw();
-    c6->cd(5);
-    _dig_npe_plane1->Draw();
-    c6->cd(6);
-    _dig_npe_plane2->Draw();
-    c6->Update();
-*/
-/*
-    c6->cd(1);
-    _doublet_clusters.Draw("channel");
-    c6->Update();
 */
     TFile datafile(_filename.c_str(), "recreate" );
     datafile.cd();
@@ -465,7 +441,7 @@ bool ReduceCppSingleStation::is_physics_daq_event(Json::Value root) {
   }
 }
 
-void ReduceCppSingleStation::draw_spacepoints(Json::Value root) {
+void ReduceCppSingleStation::build_spacepoints_tree(Json::Value root) {
   int n_events = root["recon_events"].size();
 
   // root["recon_events"][5]["sci_fi_event"]["sci_fi_space_points"]["single_station"][0];
@@ -502,7 +478,7 @@ void ReduceCppSingleStation::draw_spacepoints(Json::Value root) {
   // }
 }
 
-void ReduceCppSingleStation::doublet_clusters_histograms(Json::Value root) {
+void ReduceCppSingleStation::build_doublet_clusters_tree(Json::Value root) {
   int n_events = root["recon_events"].size();
   _run_num = root["run_number"].asInt();
 
@@ -543,7 +519,7 @@ void ReduceCppSingleStation::doublet_clusters_histograms(Json::Value root) {
   // }
 }
 
-void ReduceCppSingleStation::digits_histograms(Json::Value root) {
+void ReduceCppSingleStation::build_digits_tree(Json::Value root) {
   int n_events = root["recon_events"].size();
 
   for ( int event_i = 0; event_i < n_events; event_i++ ) {
@@ -561,7 +537,7 @@ void ReduceCppSingleStation::digits_histograms(Json::Value root) {
       _plane_dig   = digits[digit_j]["plane"].asInt();
       _channel_dig = digits[digit_j]["channel"].asDouble();
       _npe_dig     = digits[digit_j]["npe"].asDouble();
-      _adc_dig     = digits[digit_j]["adc"].asInt();
+      // _adc_dig     = digits[digit_j]["adc"].asInt();
       _time        = digits[digit_j]["time"].asDouble();
       _digits.Fill();
       if ( _plane_dig == 0 ) {
@@ -583,7 +559,7 @@ void ReduceCppSingleStation::digits_histograms(Json::Value root) {
   // }
 }
 
-void ReduceCppSingleStation::unpacked_data_histograms(Json::Value root) {
+void ReduceCppSingleStation::build_unpacked_tree(Json::Value root) {
   Json::Value daq_data = JsonWrapper::GetProperty(root,
                                                   "daq_data" ,
                                                   JsonWrapper::objectValue);
@@ -598,7 +574,7 @@ void ReduceCppSingleStation::unpacked_data_histograms(Json::Value root) {
       _adc  = i_PartEvent["VLSB"][i]["adc"].asInt();
       _bank = i_PartEvent["VLSB"][i]["bank_id"].asInt();
       _chan = i_PartEvent["VLSB"][i]["channel"].asInt();
-      int dicrim = _chan = i_PartEvent["VLSB"][i]["discriminator"].asInt();
+      int dicrim = i_PartEvent["VLSB"][i]["discriminator"].asInt();
       if ( dicrim != 0 ) {
         std::cerr << "*************** DISCRIMINATOR != 0 ***************" << std::endl;
       }

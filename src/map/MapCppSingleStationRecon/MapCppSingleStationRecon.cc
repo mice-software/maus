@@ -63,9 +63,7 @@ std::string MapCppSingleStationRecon::process(std::string document) {
     root = JsonWrapper::StringToJson(document);
 
     if ( root["daq_event_type"].asString() == "physics_event" ) {
-
       digitization(spill, root);
-      double eff_counter = 0.;
       for ( unsigned int k = 0; k < spill.events().size(); k++ ) {
         SEEvent *event = (spill.events()[k]);
         // Build Clusters.
@@ -93,9 +91,6 @@ std::string MapCppSingleStationRecon::process(std::string document) {
         print_event_info(event, k);
         save_to_json(event, k);
       }
-      std::cerr << "Efficiency of 1:1:1 assumption: "
-                << eff_counter/static_cast<double>(spill.events().size())
-                << std::endl;
     } // ==========================================================
   } catch(...) {
     Json::Value errors;
@@ -268,27 +263,9 @@ bool MapCppSingleStationRecon::is_good_for_track(Json::Value root, SEEvent &even
 */
 
 void MapCppSingleStationRecon::print_event_info(SEEvent *event, int k) {
-  int exp_events = root["recon_events"].size();
-/*
-  // root["recon_events"][0]["tof_event"]["tof_space_points"]["tof0"]
-   int tof1_spacepoints = 0;
-  for ( int evt_i = 0; evt_i < exp_events; evt_i++ ) {
-    if ( !root["recon_events"][evt_i]["tof_event"]["tof_space_points"]["tof0"][0].isNull() ) {
-      tof1_spacepoints += 1;
-    }
-  }
-
-  int tof0_spacepoints = 0;
-  for ( int sp_i = 0; sp_i < exp_events_t0; sp_i++ ) {
-    if ( !root["space_points"]["tof0"][k][sp_i].isNull() ) {
-      tof0_spacepoints += 1;
-    }
-  }
-*/
   std::cout << event->digits().size() << " "
             << event->clusters().size() << " "
-            << event->spacepoints().size() << " "
-            << exp_events << std::endl;
+            << event->spacepoints().size() << std::endl;
 }
 
 // The following two functions are added for testing purposes only

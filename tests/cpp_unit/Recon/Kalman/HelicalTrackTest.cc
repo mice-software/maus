@@ -59,16 +59,16 @@ void HelicalTrackTest::set_up_sites() {
 
 TEST_F(HelicalTrackTest, test_constructor) {
   set_up_seed();
-  HelicalTrack *track = new HelicalTrack(seed);
-  EXPECT_EQ(x0, track->get_x0());
-  EXPECT_EQ(y0, track->get_y0());
-  EXPECT_EQ(radius, track->get_r());
+  // HelicalTrack *track = new HelicalTrack(seed);
+  // EXPECT_EQ(x0, track->get_x0());
+  // EXPECT_EQ(y0, track->get_y0());
+  // EXPECT_EQ(radius, track->get_r());
 }
 
 TEST_F(HelicalTrackTest, test_propagator) {
   set_up_seed();
   set_up_sites();
-  HelicalTrack *track = new HelicalTrack(seed);
+  // HelicalTrack *track = new HelicalTrack(seed);
 /*
 old_site.get_z();
 old_site.get_state_vector();

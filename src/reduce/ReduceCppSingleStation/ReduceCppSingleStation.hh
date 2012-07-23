@@ -73,13 +73,15 @@ class ReduceCppSingleStation {
   */
   std::string process(std::string document);
 
-  void unpacked_data_histograms(Json::Value root);
+  void save();
 
-  void digits_histograms(Json::Value root);
+  void build_unpacked_tree(Json::Value root);
 
-  void doublet_clusters_histograms(Json::Value root);
+  void build_digits_tree(Json::Value root);
 
-  void draw_spacepoints(Json::Value root);
+  void build_doublet_clusters_tree(Json::Value root);
+
+  void build_spacepoints_tree(Json::Value root);
 
   bool is_physics_daq_event(Json::Value root);
 

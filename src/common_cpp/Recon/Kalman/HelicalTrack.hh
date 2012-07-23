@@ -36,9 +36,11 @@
 
 class HelicalTrack : public KalmanTrack {
  public:
-  explicit HelicalTrack(SeedFinder const &seed);
+  explicit HelicalTrack(SciFiHelicalPRTrack const &seed);
 
   void update_propagator(KalmanSite *old_site, KalmanSite *new_site);
+
+  void calc_system_noise(KalmanSite *site);
 
   double get_x0() const { return _x0; }
 
@@ -48,7 +50,9 @@ class HelicalTrack : public KalmanTrack {
  private:
   double _x0, _y0, _r;
 
-  static const double ALPHA = -1.0/(300000000.*4.);
+  int _sign;
+
+  // static const double ALPHA = -1.0/(300000000.*4.);
 };
 
 #endif

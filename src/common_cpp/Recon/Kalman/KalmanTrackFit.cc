@@ -43,7 +43,7 @@ bool sort_by_id(SciFiCluster *a, SciFiCluster *b ) {
 // Global track fit.
 //
 void KalmanTrackFit::process(Hep3Vector &tof0, Hep3Vector &se, Hep3Vector &tof1) {
-  std::vector<KalmanSite> sites;
+/*  std::vector<KalmanSite> sites;
   KalmanTrack *track = new GlobalTrack();
   initialise_global_track(tof0, se, tof1, sites);
   // Filter the first state.
@@ -72,6 +72,7 @@ void KalmanTrackFit::process(Hep3Vector &tof0, Hep3Vector &se, Hep3Vector &tof1)
   monitor.save_global_track(sites);
   monitor.print_info(sites);
   delete track;
+*/
 }
 
 void KalmanTrackFit::initialise_global_track(Hep3Vector &tof0, Hep3Vector &se,
@@ -143,70 +144,136 @@ void KalmanTrackFit::initialise_global_track(Hep3Vector &tof0, Hep3Vector &se,
 }
 
 //
-// Helical track fit.
+// Straight track fit.
 //
-void KalmanTrackFit::process(std::vector<SciFiSpacePoint> spacepoints,
-                             SeedFinder seed) {
-  std::vector<KalmanSite> sites;
-  KalmanTrack *track = new HelicalTrack(seed);
-  initialise_helix(spacepoints, sites, seed);
+void KalmanTrackFit::process(std::vector<SciFiStraightPRTrack> straight_tracks) {
+  int num_tracks = straight_tracks.size();
 
-  // Filter the first state.
-  std::cout << "Filtering site 0" << std::endl;
-  filter(sites, track, 0);
+  for ( int i = 0; i < num_tracks; ++i ) {
+    std::vector<KalmanSite> sites;
 
-  int numb_measurements = sites.size();
+    SciFiStraightPRTrack seed = straight_tracks[i];
+    KalmanTrack *track = new StraightTrack();
+    initialise(seed, sites);
 
-  for ( int i = 1; i < numb_measurements; ++i ) {
-    // Predict the state vector at site i...
-    std::cout << "Extrapolating to site " << i << std::endl;
-    extrapolate(sites, track, i);
-    // ... Filter...
-    std::cout << "Filtering site " << i << std::endl;
-    filter(sites, track, i);
+    // Filter the first state.
+    std::cerr << "Filtering site 0" << std::endl;
+    filter(sites, track, 0);
+
+    int numb_measurements = sites.size();
+
+    assert(numb_measurements < 16);
+
+    for ( int i = 1; i < numb_measurements; ++i ) {
+      // Predict the state vector at site i...
+      std::cerr << "Extrapolating to site " << i << std::endl;
+      extrapolate(sites, track, i);
+      // ... Filter...
+      std::cerr << "Filtering site " << i << std::endl;
+      filter(sites, track, i);
+    }
+    sites[numb_measurements-1].set_smoothed_a(sites[numb_measurements-1].get_a());
+    // ...and Smooth back all sites.
+    for ( int i = numb_measurements-2; i >= 0; --i ) {
+      std::cerr << "Smoothing site " << i << std::endl;
+      smooth(sites, track, i);
+    }
+
+    KalmanMonitor monitor;
+    // monitor.save(sites);
+    // monitor.save_mc(sites);
+    // monitor.print_info(sites);
+    delete track;
   }
-/*
-  // ...and Smooth back all sites.
-  for ( int i = numb_measurements-2; i >= 0; --i ) {
-    std::cerr << "Smoothing site " << i << std::endl;
-    smooth(sites, track, i);
-  }
-*/
-  KalmanMonitor monitor;
-  monitor.save(sites);
-  monitor.save_mc(sites);
-  monitor.print_info(sites);
-  delete track;
 }
 
-void KalmanTrackFit::initialise_helix(std::vector<SciFiSpacePoint> &spacepoints,
-                                      std::vector<KalmanSite> &sites,
-                                      SeedFinder &seed) {
+//
+// Helical track fit.
+//
+void KalmanTrackFit::process(std::vector<SciFiHelicalPRTrack> helical_tracks) {
+  int num_tracks  = helical_tracks.size();
+
+  for ( int i = 0; i < num_tracks; ++i ) {
+    std::vector<KalmanSite> sites;
+
+    SciFiHelicalPRTrack seed = helical_tracks[i];
+    KalmanTrack *track = new HelicalTrack(seed);
+    initialise(seed, sites);
+
+    // Filter the first state.
+    std::cerr << "Filtering site 0" << std::endl;
+    filter(sites, track, 0);
+
+    int numb_measurements = sites.size();
+
+    assert(numb_measurements < 16);
+
+    for ( int i = 1; i < numb_measurements; ++i ) {
+      // Predict the state vector at site i...
+      std::cerr << "Extrapolating to site " << i << std::endl;
+      extrapolate(sites, track, i);
+      // ... Filter...
+      std::cerr << "Filtering site " << i << std::endl;
+      filter(sites, track, i);
+    }
+    sites[numb_measurements-1].set_smoothed_a(sites[numb_measurements-1].get_a());
+    // ...and Smooth back all sites.
+    for ( int i = numb_measurements-2; i >= 0; --i ) {
+      std::cerr << "Smoothing site " << i << std::endl;
+      smooth(sites, track, i);
+    }
+
+    KalmanMonitor monitor;
+    // monitor.save(sites);
+    monitor.save_mc(sites);
+    monitor.print_info(sites);
+    delete track;
+  }
+}
+
+void KalmanTrackFit::initialise(SciFiHelicalPRTrack &seed, std::vector<KalmanSite> &sites) {
   double x0 = seed.get_x0();
   double y0 = seed.get_y0();
-  double r = seed.get_r();
-  double pt = seed.get_pt();
-  double pz = seed.get_pz();
-  double phi_0 = seed.get_phi_0();
-  double tan_lambda = seed.get_tan_lambda();
+  double r = seed.get_R();
+  double p = 200.0;
+  // double pz = seed.get_pz();
+  double phi_0 = seed.get_phi0();
+  double tan_lambda = seed.get_dzds();
 
   std::vector<SciFiCluster*> clusters;
+
+  std::vector<SciFiSpacePoint> spacepoints = seed.get_spacepoints();
   process_clusters(spacepoints, clusters);
   // the clusters are sorted by now.
 
   int numb_sites = clusters.size();
-
+  int tracker = clusters[0]->get_tracker();
+  std::cerr << "PR: " << tracker << " " << r << " " << phi_0 << " " << tan_lambda << std::endl;
   KalmanSite first_plane;
-  double x = x0+r*cos(phi_0*PI/180.);
-  double y = y0+r*sin(phi_0*PI/180.);
-  double kappa = 1./pt;
+  double site_0_turning_angle, x, y;
+  if ( tracker == 0 ) {
+    double delta_phi = 1100./(r*tan_lambda);
+    site_0_turning_angle = (phi_0+delta_phi); // *PI/180.;
+    x = -(x0 + r*cos(site_0_turning_angle));
+    y = -(y0 + r*sin(site_0_turning_angle));
+  } else {
+    site_0_turning_angle = phi_0; // *PI/180.;
+    x = x0 + r*cos(site_0_turning_angle);
+    y = y0 + r*sin(site_0_turning_angle);
+  }
+
+  // double x = x0 + r*cos(site_0_turning_angle);
+  // double y = y0 + r*sin(site_0_turning_angle);
+  std::cerr << "SEED: " << x << " " << y << " " << site_0_turning_angle << std::endl;
+  double kappa = 1./p;
 
   TMatrixD a(5, 1);
   a(0, 0) = x;
   a(1, 0) = y;
-  a(2, 0) = phi_0;
-  a(3, 0) = tan_lambda;
-  a(4, 0) = kappa;
+  a(2, 0) = r;
+  a(3, 0) = site_0_turning_angle;
+  a(4, 0) = tan_lambda;
+
   first_plane.set_projected_a(a);
   // std::cout << "Seed state: " << std::endl;
   // a.Print();
@@ -236,52 +303,13 @@ void KalmanTrackFit::initialise_helix(std::vector<SciFiSpacePoint> &spacepoints,
     a_site.set_id(clusters[j]->get_id());
     sites.push_back(a_site);
   }
-}
-//
-// Straight track fit.
-//
-void KalmanTrackFit::process(SciFiEvent &event) {
-  int num_tracks = event.straightprtracks().size();
-  std::cerr << "Processing " << num_tracks << " tracks." << std::endl;
-
-  for ( int i = 0; i < num_tracks; ++i ) {
-    std::vector<KalmanSite> sites;
-    // Straight Track.
-    KalmanTrack *track = new StraightTrack();
-    SciFiStraightPRTrack seed = event.straightprtracks()[i];
-    // This will: initialise the state vector;
-    // Set covariance matrix;
-    // Add plane measurents to all sites;
-    initialise(seed, sites);
-
-    // Filter the first state.
-    std::cout << "Filtering site 0" << std::endl;
-    filter(sites, track, 0);
-
-    int numb_measurements = sites.size();
-
-    assert(numb_measurements < 16);
-
-    for ( int i = 1; i < numb_measurements; ++i ) {
-      // Predict the state vector at site i...
-      std::cout << "Extrapolating to site " << i << std::endl;
-      extrapolate(sites, track, i);
-      // ... Filter...
-      std::cout << "Filtering site " << i << std::endl;
-      filter(sites, track, i);
+  if ( _mc_run ) {
+    for ( int j = 0; j < numb_sites; ++j ) {
+      CLHEP::Hep3Vector true_position = clusters[j]->get_true_position();
+      CLHEP::Hep3Vector true_momentum = clusters[j]->get_true_momentum();
+      sites[j].set_true_position(true_position);
+      sites[j].set_true_momentum(true_momentum);
     }
-    sites[numb_measurements-1].set_smoothed_a(sites[numb_measurements-1].get_a());
-    // ...and Smooth back all sites.
-    for ( int i = numb_measurements-2; i >= 0; --i ) {
-      std::cerr << "Smoothing site " << i << std::endl;
-      smooth(sites, track, i);
-    }
-
-    KalmanMonitor monitor;
-    // monitor.save(sites);
-    monitor.save_mc(sites);
-    monitor.print_info(sites);
-    delete track;
   }
 }
 
@@ -429,7 +457,7 @@ void KalmanTrackFit::monitor() {
   hfile.Write();
 }
 
-void TKalTrackSite::DebugPrint() const
+void KalmanTrackFit::DebugPrint() const
 {
    cerr << " dchi2 = " << GetDeltaChi2()   << endl;
    cerr << " res_d = " << (*(TKalTrackSite *)this).GetResVec()(0,0) << endl;
@@ -438,7 +466,7 @@ void TKalTrackSite::DebugPrint() const
 }
 
 
-Int_t TVKalSystem::GetNDF(Bool_t self)
+Int_t KalmanTrackFit::GetNDF(Bool_t self)
 {
    Int_t ndf    = 0;
    Int_t nsites = GetEntries();
@@ -480,14 +508,4 @@ void KalmanTrackFit::process_clusters(std::vector<SciFiSpacePoint> &spacepoints,
   }
 
   std::sort(clusters.begin(), clusters.end(), sort_by_id);
-/*
-  std::ofstream myfile;
-  if ( numb_spacepoints == 5 && spacepoints[0].get_tracker() == 0 && clusters.size()==15 ) {
-    myfile.open("tracker.bin", std::ios::out | std::ios::app | std::ios::binary);
-    for ( int j = 0; j < clusters.size(); ++j ) {
-      int chan = clusters[j]->get_channel();
-      myfile.write(reinterpret_cast<const char*> (&chan), 1);
-    }
-    myfile.close();
-  }*/
 }
