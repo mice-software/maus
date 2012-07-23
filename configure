@@ -228,14 +228,11 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      # Celery
      export CELERY_CONFIG_MODULE="mauscelery.celeryconfig"
 
+     #export CLHEP_BASE_DIR="\${MAUS_THIRD_PARTY}/third_party/install/\${G4VERS}"
+
      export G4DEBUG=1
      export G4VERS=geant4.9.5.p01
      export G4SYSTEM=$arch-g++
-     export G4INSTALL="\${MAUS_THIRD_PARTY}/third_party/build/\${G4VERS}"
-     export G4LIB="\${G4INSTALL}/lib"
-     export $DYLIB_VAR="\${G4LIB}/\${G4SYSTEM}:\${$DYLIB_VAR}"
-     export G4INCLUDE="\${G4INSTALL}/include/"
-     export G4TMP="\${G4INSTALL}"
      export G4VIS_BUILD_DAWNFILE_DRIVER=1
      export G4VIS_USE_DAWNFILE=1
      export G4VIS_USE=0

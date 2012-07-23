@@ -30,54 +30,58 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         md5sum -c geant_config.tar.gz.md5 || { echo "FATAL: Failed to download:" >&2; echo "FATAL: geant_config.tar.gz." >&2; echo "FATAL: MD5 checksum failed.">&2; echo "FATAL: Try rerunning this command to redownload, or check" >&2; echo "FATAL: internet connection"  >&2; rm -f ${filename}; exit 1; } # todo fixme
         sleep 1
         echo
-        echo "INFO: Unpacking:"
+        echo "INFO: Unpacking geant4 source:"
         echo
+        rm -Rf ${MAUS_ROOT_DIR}/third_party/source/${directory}
         rm -Rf ${MAUS_ROOT_DIR}/third_party/build/${directory}
         sleep 1
-        tar xvfz ${MAUS_ROOT_DIR}/third_party/source/${filename} -C ${MAUS_ROOT_DIR}/third_party/build > /dev/null
+        mkdir ${MAUS_ROOT_DIR}/third_party/source/${directory}
+        mkdir ${MAUS_ROOT_DIR}/third_party/build/${directory}
+        sleep 1
+        tar xfz ${MAUS_ROOT_DIR}/third_party/source/${filename} -C ${MAUS_ROOT_DIR}/third_party/source/
         cd ${MAUS_ROOT_DIR}/third_party/build/${directory}
-        cp ${MAUS_ROOT_DIR}/third_party/source/DeflateOutputStreamBuffer.h source/visualization/HepRep/include/cheprep/DeflateOutputStreamBuffer.h
+        echo
+        echo "INFO: Unpacking geant4 data:"
+        echo
+        tar xfz ${MAUS_ROOT_DIR}/third_party/source/geant_data.tar.gz
 
         echo
-        echo "INFO: Applying patch."
-        echo 
-        grep cstdio source/visualization/HepRep/include/cheprep/DeflateOutputStreamBuffer.h || exit 1
-        
-        echo
-        echo "INFO: Unpacking data"
-        echo
-        tar xvfz ${MAUS_ROOT_DIR}/third_party/source/geant_data.tar.gz > /dev/null
-
-        echo
-        echo "INFO: Unpacking config"
-        echo
-        tar xvfz ${MAUS_ROOT_DIR}/third_party/source/geant_config.tar.gz > /dev/null
-        mkdir ${MAUS_ROOT_DIR}/third_party/build/${directory}/.config/bin/Darwin-g++
-        sed 's/Linux/Darwin/g' < ${MAUS_ROOT_DIR}/third_party/build/${directory}/.config/bin/Linux-g++/config.sh.old > ${MAUS_ROOT_DIR}/third_party/build/${directory}/.config/bin/Darwin-g++/config.sh.old
-        maus_geant4_setup.py ${MAUS_ROOT_DIR}/third_party/build/${directory}/.config/bin/`uname -s`-g++ ${MAUS_ROOT_DIR}/third_party/build/${directory} ${MAUS_ROOT_DIR}/third_party/install
-        cp ${MAUS_ROOT_DIR}/third_party/source/Configure .
-        
-        echo
-        echo "INFO: Building:"
+        echo "INFO: Generating make files:"
         echo
         sleep 1
+        cmake -DCMAKE_INSTALL_PREFIX=${MAUS_ROOT_DIR}/third_party/install/ ${MAUS_ROOT_DIR}/third_party/source/${directory}
 
-        ./Configure -f .config/bin/`uname -s`-g++/config.sh -d -e -build
+        echo
+        echo "INFO: Running make:"
+        echo
+        make
 
         echo
         echo "INFO: Installing:"
         echo
         sleep 1
-        ./Configure -install
-                ################################################## 
+        make install
+
         echo
-        echo "INFO: The package should be locally build now in your"
-        echo "INFO: third_party directory, which the rest of MAUS will"
-        echo "INFO: find."
+        echo "INFO: Cleaning up"
+        echo
+                ################################################## 
+        if [ $? == 0 ]
+        then
+            #rm -Rf ${MAUS_ROOT_DIR}/third_party/source/${directory}
+            echo
+            echo "INFO: The package should be locally build now in your"
+            echo "INFO: third_party directory, which the rest of MAUS will"
+            echo "INFO: find."
         else
-        echo "FATAL: Source archive still doesn't exist.  Please file a bug report with your operating system,">&2
-        echo "FATAL: distribution, and any other useful information at:" >&2
-        echo "FATAL: " >&2
+            echo "FATAL: Failed to build geant4"
+            exit 1
+        fi
+    else
+        echo "FATAL: Source archive still doesn't exist.  Please file a bug ">&2
+        echo "FATAL: report with your operating system, distribution, and any" >&2
+        echo "FATAL: other useful information at:" >&2
+        echo "FATAL:" >& 2
         echo "FATAL: http://micewww.pp.rl.ac.uk:8080/projects/maus/issues/" >&2
         echo "FATAL:" >&2
         echo "FATAL: Giving up, sorry..." >&2

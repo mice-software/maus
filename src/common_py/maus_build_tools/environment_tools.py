@@ -308,36 +308,25 @@ def set_root(conf, env):
     Setup root
     """
     if not conf.CheckCommand('root'):
-        print "Cound't find root.  If you want it, after installing GSL, run:"
-        print ("     MAUS_ROOT_DIR=%s ./third_party/bash/21root.bash" \
-                   % os.environ['MAUS_ROOT_DIR'])
-        print ("where you can install GSL by running:")
-        print ("     MAUS_ROOT_DIR=%s ./third_party/bash/20gsl.bash" \
-                   % os.environ['MAUS_ROOT_DIR'])
+        print "Fatal - couldn't find root library."
         my_exit(1)
 
-    else:
-        print
-        print "!! Found the program 'root', so MAUS will use it."
-        print
-        env['USE_ROOT'] = True
+    if not conf.CheckCommand('root-config'):
+        my_exit(1)
 
-        if not conf.CheckCommand('root-config'):
+    conf.env.ParseConfig("root-config --cflags --ldflags --libs")
+
+    root_libs = get_root_libs()
+
+    for lib in root_libs:
+        if not conf.CheckLib(lib, language='c++'):
             my_exit(1)
 
-        conf.env.ParseConfig("root-config --cflags --ldflags --libs")
+    if not conf.CheckCXXHeader('TH1F.h'):
+        my_exit(1)
 
-        root_libs = get_root_libs()
-
-        for lib in root_libs:
-            if not conf.CheckLib(lib, language='c++'):
-                my_exit(1)
-
-        if not conf.CheckCXXHeader('TH1F.h'):
-            my_exit(1)
-
-        if not conf.CheckCXXHeader('TMinuit.h'):
-            my_exit(1)
+    if not conf.CheckCXXHeader('TMinuit.h'):
+        my_exit(1)
 
 def set_clhep(conf, env): # pylint: disable=W0613
     """
@@ -353,116 +342,48 @@ def get_g4_libs(): # pylint: disable=W0511
     """
     List of geant4 libraries
     """
-    return [ 'G4FR', 
-             'G4RayTracer',
-             'G4Tree',
-             'G4UIGAG',
-             'G4UIbasic',
-             'G4UIcommon',
-             'G4VRML',
-             'G4baryons',
-             'G4biasing',
-             'G4bosons',
-             'G4brep',
-             'G4csg',
-             'G4cuts',
-             'G4decay',
-             'G4detector',
-             'G4detutils',
-             'G4detscorer',
-             'G4digits',
-             'G4emlowenergy',
-             'G4empolar',
-             'G4emstandard',
-             'G4emutils',
-             'G4error_propagation',
-             'G4event',
-             'G4geomBoolean',
-             'G4geombias',
-             'G4geomdivision',
-             'G4geometrymng',
-             'G4geomtext',
-             'G4gflash',
-             'G4globman',
-             'G4graphics_reps',
-             'G4had_lll_fis',
-             'G4had_mod_man',
-             'G4had_mod_util',
-             'G4had_neu_hp',
-             'G4had_preequ_exciton',
-             'G4had_string_diff',
-             'G4had_string_frag',
-             'G4had_string_man',
-             'G4had_theo_max',
-             'G4hadronic_HE',
-             'G4hadronic_LE',
-             'G4hadronic_RPG',
-             'G4hadronic_ablation',
-             'G4hadronic_abrasion',
-             'G4hadronic_bert_cascade',
-             'G4hadronic_binary',
-             'G4had_im_r_matrix',
-             'G4hadronic_deex_fermi_breakup',
-             'G4hadronic_deex_handler',
-             'G4hadronic_deex_evaporation',
-             'G4hadronic_deex_fission',
-             'G4hadronic_deex_gem_evaporation',
-             'G4hadronic_deex_management',
-             'G4hadronic_deex_multifragmentation',
-             'G4hadronic_deex_photon_evaporation',
-             'G4hadronic_deex_util',
-             'G4hadronic_em_dissociation',
-             'G4hadronic_hetcpp_evaporation',
-             'G4hadronic_hetcpp_utils',
-             'G4hadronic_incl_cascade',
-             'G4hadronic_interface_ci',
-             'G4hadronic_body_ci',
-             'G4hadronic_iso',
-             'G4hadronic_leading_particle',
-             'G4hadronic_mgt',
-             'G4hadronic_proc',
-             'G4hadronic_qgstring',
-             'G4hadronic_qmd',
-             'G4hadronic_radioactivedecay',
-             'G4hadronic_stop',
-             'G4hadronic_util',
-             'G4hadronic_xsect',
-             'G4hepnumerics',
-             'G4hits',
-             'G4intercoms',
-             'G4ions',
-             'G4leptons',
-             'G4magneticfield',
-             'G4materials',
-             'G4mctruth',
-             'G4mesons',
-             'G4modeling',
-             'G4muons',
-             'G4navigation',
-             'G4optical',
-             'G4parameterisation',
-             'G4partadj',
-             'G4partman',
-             'G4partutils',
-             'G4phys_builders',
-             'G4had_muon_nuclear',
-             'G4hadronic_coherent_elastic',
-             'G4emhighenergy.so',
-             'G4phys_lists',
-             'G4procman',
-             'G4readout',
-             'G4run',
-             'G4scoring',
-             'G4shortlived',
-             'G4specsolids',
-             'G4track',
-             'G4tracking',
-             'G4transportation',
-             'G4visHepRep',
-             'G4visXXX', #pylint: disable=W0511
-             'G4vis_management',
-             'G4volumes',
-             'G4xrays']
+    """
+    g4_libs = glob.glob(libG4*.so)
+    lib_split = g4_libs.split()
+    print lib_split
+    lib_out = []
+    for a_lib in lib_split:
+        if len(a_lib) > 5:
+            lib_out.append(a_lib[3:-2])
+    for item in lib_out:
+        print "\'"+item+"\',"
+    """
+    return ['G4analysis',
+            'G4error_propagation',
+            'G4geometry',
+            'G4graphics_reps',
+            'G4materials',
+            'G4particles',
+            'G4processes',
+            'G4run',
+            'G4Tree',
+            'G4visXXX',
+            'G4clhep',
+            'G4event',
+            'G4global',
+            'G4intercoms',
+            'G4modeling',
+            'G4persistency',
+            'G4RayTracer',
+            'G4tracking',
+            'G4visHepRep',
+            'G4VRML',
+            'G4digits_hits',
+            'G4FR',
+            'G4GMocren',
+            'G4interfaces',
+            'G4parmodels',
+            'G4physicslists',
+            'G4readout',
+            'G4track',
+            'G4vis_management',
+            'G4zlib',
+            ]
 
 
 def set_geant4(conf, env):
@@ -472,30 +393,16 @@ def set_geant4(conf, env):
     Nb: sometimes geant4 builds some but not all libraries - so we really do
     need to check for every one.
     """
-    if 'G4INSTALL' not in os.environ or \
-        (not os.path.exists(os.environ.get('G4INSTALL'))):
-        print "ERROR: Cound't find geant4"
+    if not conf.CheckCXXHeader('Geant4/G4EventManager.hh'):
         my_exit(1)
-    else:
-        print
-        print "!! Found the package 'geant4', so assume you want to use it."
-        print
-        env['USE_G4'] = True
 
-        env.Append(LIBPATH = ["%s/%s" % (os.environ.get('G4LIB'),
-                              os.environ.get('G4SYSTEM'))])
-        env.Append(CPPPATH=[os.environ.get("G4INCLUDE")])
+    env.Append(LIBS=get_g4_libs())
 
-        if not conf.CheckCXXHeader('G4EventManager.hh'):
+    for lib in get_g4_libs():
+        if not conf.CheckLib(lib, language='c++'):
             my_exit(1)
 
-        env.Append(LIBS=get_g4_libs())
-
-        for lib in get_g4_libs():
-            if not conf.CheckLib(lib, language='c++'):
-                my_exit(1)
-
-        geant4_extras(env, conf)
+    geant4_extras(env, conf)
 
 def set_gtest(conf, env): # pylint: disable=W0613
     """
