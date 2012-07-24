@@ -47,7 +47,11 @@ class SEDigit {
    */
   SEDigit(int spill, int event, int plane, int channel, double npe, double time, int adc);
 
+  SEDigit(const SEDigit &digit);
+
   ~SEDigit();
+
+  SEDigit& operator=(const SEDigit &digit);
 
   void set_spill(int spillNo) { _spill = spillNo; }
 
@@ -65,13 +69,17 @@ class SEDigit {
 
   int get_channel() const { return _channel; }
 
-  void set_npe(double npe) { _npe = npe; }
-
-  double get_npe()     const { return _npe; }
+  int get_adc() const { return _adc; }
 
   void set_adc(int adc) { _adc = adc; }
 
-  double get_adc()     const { return _adc; }
+  int get_tdc() const { return _tdc; }
+
+  void set_tdc(int tdc) { _tdc = tdc; }
+
+  void set_npe(double npe) { _npe = npe; }
+
+  double get_npe()     const { return _npe; }
 
   void set_time(double time) { _time = time; }
 
@@ -84,7 +92,8 @@ class SEDigit {
  private:
 
   int _spill, _event;
-  int _adc;
+
+  int _adc, _tdc;
 
   int _plane, _channel;
 

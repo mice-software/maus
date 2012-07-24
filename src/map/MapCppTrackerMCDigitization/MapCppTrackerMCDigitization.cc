@@ -93,12 +93,12 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
   for ( unsigned int event_i = 0; event_i < spill.events().size(); event_i++ ) {
     SciFiEvent event = *(spill.events()[event_i]);
 
-    std::cerr << "Hits in event: " << event.hits().size() << std::endl;
+    // std::cerr << "Hits in event: " << event.hits().size() << std::endl;
     if ( event.hits().size() ) {
       // for each fiber-hit, make a digit
       construct_digits(event);
     }
-    std::cerr << "Digits in Event: " << event.digits().size() << " " << std::endl;
+    // std::cerr << "Digits in Event: " << event.digits().size() << " " << std::endl;
     save_to_json(event, event_i);
   }
 

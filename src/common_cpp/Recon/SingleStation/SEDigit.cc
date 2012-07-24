@@ -28,4 +28,25 @@ SEDigit::SEDigit(int spill, int event, int plane, int channel, double npe, doubl
 }
 
 SEDigit::~SEDigit() {}
+
+SEDigit::SEDigit(const SEDigit &digit) {
+  _spill    = digit.get_spill();
+  _event    = digit.get_event();
+  _adc      = digit.get_adc();
+  _channel  = digit.get_channel();
+  _npe      = digit.get_npe();
+  _time     = digit.get_time();
+  _used     = digit.is_used();
+}
+
+SEDigit& SEDigit::operator=(const SEDigit &digit) {
+  _spill    = digit.get_spill();
+  _event    = digit.get_event();
+  _adc      = digit.get_adc();
+  _channel  = digit.get_channel();
+  _npe      = digit.get_npe();
+  _time     = digit.get_time();
+  _used     = digit.is_used();
+}
+
 // } // ends namespace MAUS

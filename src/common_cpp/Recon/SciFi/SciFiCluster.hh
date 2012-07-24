@@ -130,6 +130,10 @@ class SciFiCluster {
 
   Hep3Vector get_true_position() const { return _pos; }
 
+  // void set_digits(std::vector<SciFiDigit*> digits) { _digits = digits; }
+
+  // std::vector<SciFiDigit*> get_digits()  const { return _digits; }
+
  private:
   Hep3Vector _pos, _p;
 
@@ -150,6 +154,8 @@ class SciFiCluster {
   double _alpha;
 
   int _id;
+
+  // std::vector<SciFiDigit*>  _digits;
 };  // Don't forget this trailing colon!!!!
 // } // ~namespace MAUS
 

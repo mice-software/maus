@@ -182,6 +182,15 @@ void MapCppSingleStationRecon::save_to_json(SEEvent *evt, int event_i) {
       cluster["plane_number"] = clusters_in_spacepoint[cl]->get_plane();
       cluster["channel_number"] = clusters_in_spacepoint[cl]->get_channel();
       cluster["npe"] = clusters_in_spacepoint[cl]->get_npe();
+      std::vector<SEDigit*> digits_in_cluster = clusters_in_spacepoint[cl]->get_digits();
+      Json::Value digits;
+      for ( unsigned int dig = 0; dig < digits_in_cluster.size(); ++dig ) {
+        Json::Value digit;
+        digit["adc"] = digits_in_cluster[dig]->get_adc();
+        digit["npe"] = digits_in_cluster[dig]->get_npe();
+        digits.append(digit);
+      }
+      cluster["digits"] = digits;
       channels.append(cluster);
     }
     spacepoint["channels"] = channels;

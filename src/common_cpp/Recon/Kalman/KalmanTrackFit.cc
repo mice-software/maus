@@ -226,7 +226,7 @@ void KalmanTrackFit::process(std::vector<SciFiHelicalPRTrack> helical_tracks) {
     KalmanMonitor monitor;
     // monitor.save(sites);
     monitor.save_mc(sites);
-    monitor.print_info(sites);
+    // monitor.print_info(sites);
     delete track;
   }
 }

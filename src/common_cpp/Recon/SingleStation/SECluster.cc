@@ -28,12 +28,14 @@ SECluster::SECluster(SEDigit *digit):_used(false),
                                      _npe(digit->get_npe()),
                                      _time(digit->get_time()) {
   digit->set_used();
+  _digits.push_back(digit);
 }
 
 SECluster::~SECluster() {}
 
 void SECluster::add_digit(SEDigit* neigh) {
   neigh->set_used();
+  _digits.push_back(neigh);
 
   _npe += neigh->get_npe();
   _channel_w /= 2.0;
