@@ -78,15 +78,18 @@ MinuitTrackFitter::MinuitTrackFitter(
   // phase space variable (mins and maxes calculated from 800MeV/c ISIS beam)
   int error_flag = 0;
   // TODO(plane1@hawk.iit.edu) put this in the configuration file
-//  minimiser->mnparm(0, "Time", 0., 0.1, -1000., 1., error_flag);   // ns
-//  minimiser->mnparm(1, "Energy", 200., 1, 105.7, 1860., error_flag);  // MeV
-  minimiser->mnparm(0, "X", 0, 0.001, -150., 150., error_flag);      // mm
-  minimiser->mnparm(1, "Px", 0., 0.1, -100., 100, error_flag);    // MeV/c
-  minimiser->mnparm(2, "Y", 0, 0.001, -150., 150., error_flag);      // mm
-  minimiser->mnparm(3, "Py", 0., 0.1, -100., 100, error_flag);    // MeV/c
+  minimiser->mnparm(0, "Time", 0., 0.1, -1000., 1., error_flag);   // ns
+  minimiser->mnparm(1, "Energy", 200., 1, 105.7, 1860., error_flag);  // MeV
+  minimiser->mnparm(2, "X", 0, 0.001, -150., 150., error_flag);      // mm
+  minimiser->mnparm(3, "Px", 0., 0.1, -100., 100, error_flag);    // MeV/c
+  minimiser->mnparm(4, "Y", 0, 0.001, -150., 150., error_flag);      // mm
+  minimiser->mnparm(5, "Py", 0., 0.1, -100., 100, error_flag);    // MeV/c
+/*
   minimiser->mnparm(4, "Z", start_plane, 0.001, -15000., 200000., error_flag);      // mm
   minimiser->mnparm(5, "Pz", 1., 0.1, -1., 500, error_flag);    // MeV/c
   minimiser->FixParameter(4);
+*/
+  minimiser->FixParameter(1);
 //Int_t DefineParameter( Int_t parNo, const char *name, Double_t initVal, Double_t initErr, Double_t lowerLimit, Double_t upperLimit )
 
 }
@@ -96,6 +99,7 @@ MinuitTrackFitter::~MinuitTrackFitter() {
 }
 
 void MinuitTrackFitter::Fit(const Track & detector_events, Track & track) {
+std::cout << "CHECKPOINT Fit(): BEGIN" << std::endl; std::cout.flush();
   detector_events_ = &detector_events;
   track_ = &track;
 
@@ -115,11 +119,10 @@ void MinuitTrackFitter::Fit(const Track & detector_events, Track & track) {
   TMinuit * minimiser
     = common_cpp_optics_reconstruction_minuit_track_fitter_minuit;
   // Int_t status = minimiser->Migrad();
-std::cout << "CHECKPOINT Fit(): 1" << std::endl; std::cout.flush();
   minimiser->Migrad();
-std::cout << "CHECKPOINT Fit(): 2" << std::endl; std::cout.flush();
 
   // TODO(plane1@hawk.iit.edu) Handle status from minimiser
+std::cout << "CHECKPOINT Fit(): END" << std::endl; std::cout.flush();
 }
 
 Double_t MinuitTrackFitter::ScoreTrack(
@@ -127,7 +130,6 @@ Double_t MinuitTrackFitter::ScoreTrack(
 std::cout << "CHECKPOINT ScoreTrack(): 0" << std::endl; std::cout.flush();
   // clear the last saved track
   track_->clear();
-Track residuals;
 
   // Setup the start plane track point based on the Minuit initial conditions
   CovarianceMatrix null_uncertainties;
@@ -137,12 +139,9 @@ Track residuals;
                          start_plane_track_coordinates[3],
                          start_plane_track_coordinates[4],
                          start_plane_track_coordinates[5],
-                         particle_id_,
-                         PhaseSpaceVector::PhaseSpaceType::kPositional);
-std::cout << "DEBUG ScoreTrack(): particle ID = " << particle_id_ << std::endl;
+                         particle_id_, optics_model_->first_plane());
   // If the guess is not physical then return a horrible score
   if (!ValidGuess(guess)) {
-std::cout << "DEBUG ScoreTrack(): Returning maximum score for invalid guess." << std::endl;
 //    return std::numeric_limits<double>::max();
     return 1.0e+15;
   }
@@ -159,22 +158,23 @@ std::cout << "DEBUG ScoreTrack(): Returning maximum score for invalid guess." <<
 std::cout << "DEBUG ScoreTrack(): Guess: " << guess << std::endl;
 std::cout << "DEBUG ScoreTrack(): Measured: " << *events << std::endl;
     // calculate the next guess
-std::cout << "CHECKPOINT ScoreTrack(): 1" << std::endl; std::cout.flush();
+    const double end_plane = events->z();
     transfer_map
-      = optics_model_->GenerateTransferMap(events->z());
-std::cout << "CHECKPOINT ScoreTrack(): 2" << std::endl; std::cout.flush();
+      = optics_model_->GenerateTransferMap(end_plane);
     if (transfer_map == NULL) {
     throw(Squeal(Squeal::nonRecoverable,
                  "Got NULL transfer map.",
                  "MAUS::MinuitTrackFitter::ScoreTrack()"));
     }
     TrackPoint point = TrackPoint(
-      transfer_map->Transport(guess),
-      PhaseSpaceVector::PhaseSpaceType::kPositional);
+      transfer_map->Transport(guess), end_plane);
+    // assume the particle didn't decay
+    point.set_particle_id(events->particle_id());
 std::cout << "DEBUG ScoreTrack(): Calculated: " << point << std::endl;
 
     uncertainties = &events->uncertainties();
     point.set_uncertainties(*uncertainties);
+std::cout << "DEBUG ScoreTrack(): Uncertainties: " << *uncertainties << std::endl;
 
     // save the calculated track point in case this is the
     // last (best fitting) track
@@ -182,19 +182,13 @@ std::cout << "DEBUG ScoreTrack(): Calculated: " << point << std::endl;
 
     // Sum the squares of the differences between the calculated phase space
     // coordinates and the measured coordinates.
-    TrackPoint residual = TrackPoint(
-      point - (*events),
-      PhaseSpaceVector::PhaseSpaceType::kPositional);
+    TrackPoint residual = TrackPoint(point - (*events));
+std::cout << "DEBUG ScoreTrack(): Residual: " << residual << std::endl;
     chi_squared += (transpose(residual) * (*uncertainties) * residual)[0];
-//std::cout << "DEBUG ScoreTrack(): Residual: " << residual << std::endl;
-residuals.push_back(residual);
-std::cout << "DEBUG ScoreTrack(): Uncertainties: " << *uncertainties << std::endl;
 std::cout << "DEBUG ScoreTrack(): Chi Squared: " << chi_squared << std::endl;
 
     ++events;
   }
-
-std::cout << "Residuals: " << std::endl << residuals;
 
   return chi_squared;
 }

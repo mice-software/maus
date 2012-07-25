@@ -1,10 +1,10 @@
-// FILES/Models/Modules/Tracker/TrackerStation1.dat
+// FILES/Models/Modules/Tracker/Tracker1Station1.dat
 //
 // Description of the first tracker module
 // 
 //
 
-Module TrackerStation1
+Module Tracker1Station1
 {
   Volume Cylinder
   Dimensions 19.0 0.20 cm

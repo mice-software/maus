@@ -18,6 +18,7 @@
  */
 
 #include <iostream>
+#include <map>
 #include <vector>
 
 #include "src/common_cpp/Reconstruction/Global/ReconstructionInput.hh"
@@ -28,7 +29,7 @@ namespace global {
 
 ReconstructionInput::ReconstructionInput(
     const bool beam_polarity_negative,
-    const std::vector<Detector> & detectors,
+    const std::map<int, Detector> & detectors,
     const std::vector<TrackPoint> & events)
     : beam_polarity_negative_(beam_polarity_negative),
       detectors_(detectors), events_(events) {
@@ -38,7 +39,7 @@ bool ReconstructionInput::beam_polarity_negative() {
   return beam_polarity_negative_;
 }
 
-const std::vector<Detector> & ReconstructionInput::detectors() {
+const std::map<int, Detector> & ReconstructionInput::detectors() {
   return detectors_;
 }
 

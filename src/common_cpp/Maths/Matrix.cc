@@ -1007,7 +1007,7 @@ Matrix<double> inverse(
   size_t columns = matrix.number_of_columns();
   if (rows != columns) {
     throw(Squeal(Squeal::recoverable,
-                 "Attempt to get inverse of non-square matrix",
+                 "Attempted to get inverse of non-square matrix",
                  "MAUS::inverse()"));
   }
   Matrix<double> inverse(matrix);

@@ -48,22 +48,25 @@ const CovarianceMatrix & Detector::uncertainties() const {
 }
 
 const unsigned int Detector::kNone = 0;
-const unsigned int Detector::kTOF0 = 1;
-const unsigned int Detector::kCherenkov1 = 2;
-const unsigned int Detector::kTOF1 = 3;
-const unsigned int Detector::kTracker1_1 = 4;
-const unsigned int Detector::kTracker1_2 = 5;
-const unsigned int Detector::kTracker1_3 = 6;
-const unsigned int Detector::kTracker1_4 = 7;
-const unsigned int Detector::kTracker1_5 = 8;
-const unsigned int Detector::kTracker2_1 = 9;
-const unsigned int Detector::kTracker2_2 = 10;
-const unsigned int Detector::kTracker2_3 = 11;
-const unsigned int Detector::kTracker2_4 = 12;
-const unsigned int Detector::kTracker2_5 = 13;
-const unsigned int Detector::kTOF2 = 14;
-const unsigned int Detector::kCherenkov2 = 15;
-const unsigned int Detector::kCalorimeter = 16;
+const unsigned int Detector::kTOF0_1 = 1;
+const unsigned int Detector::kTOF0_2 = 2;
+const unsigned int Detector::kCherenkov1 = 3;
+const unsigned int Detector::kTOF1_1 = 4;
+const unsigned int Detector::kTOF1_2 = 5;
+const unsigned int Detector::kTracker1_1 = 6;
+const unsigned int Detector::kTracker1_2 = 7;
+const unsigned int Detector::kTracker1_3 = 8;
+const unsigned int Detector::kTracker1_4 = 9;
+const unsigned int Detector::kTracker1_5 = 10;
+const unsigned int Detector::kTracker2_1 = 11;
+const unsigned int Detector::kTracker2_2 = 12;
+const unsigned int Detector::kTracker2_3 = 13;
+const unsigned int Detector::kTracker2_4 = 14;
+const unsigned int Detector::kTracker2_5 = 15;
+const unsigned int Detector::kTOF2_1 = 16;
+const unsigned int Detector::kTOF2_2 = 17;
+const unsigned int Detector::kCherenkov2 = 18;
+const unsigned int Detector::kCalorimeter = 19;
 
 }  // namespace global
 }  // namespace reconstruction

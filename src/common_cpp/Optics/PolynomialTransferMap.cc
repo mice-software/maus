@@ -66,6 +66,17 @@ PolynomialTransferMap::~PolynomialTransferMap() {
   delete reference_trajectory_out_;
 }
 
+TransferMap * PolynomialTransferMap::Inverse() const {
+  PolynomialMap inverse_map = polynomial_map_->Inverse(
+    polynomial_map_->PolynomialOrder());
+  TransferMap * transfer_map =  new PolynomialTransferMap(
+      inverse_map,
+      *reference_trajectory_in_,
+      *reference_trajectory_out_);
+  
+  return transfer_map;
+}
+
 /**
  *  Name: Transport(CovarianceMatrix const &)
  */

@@ -36,6 +36,9 @@ class TransferMap {
  public:
   TransferMap() { }
   virtual ~TransferMap() { }
+
+  virtual TransferMap * Inverse() const = 0;
+
   // ******************************
   //      Transport functions
   // ******************************

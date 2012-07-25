@@ -61,6 +61,8 @@ class LinearApproximationTransferMap : public TransferMap {
     : start_plane_(map.start_plane_), end_plane_(map.end_plane_),
       mass_(map.mass_) { }
 
+  TransferMap * Inverse() const;
+
   CovarianceMatrix Transport(const CovarianceMatrix & covariances) const;
 
   /* @brief transports a phase space vector ({t, E, x, Px, y, Py}).

@@ -176,6 +176,11 @@ PolynomialMap * PolynomialMap::Clone() const {
   return new PolynomialMap(*this);
 }
 
+PolynomialMap PolynomialMap::Inverse(int max_order) const {
+  // FIXME(plane1@hawk.iit.edu): implement
+  return *this;
+}
+
 Vector<double>&  PolynomialMap::MakePolynomialVector(const Vector<double>& point,
                                                      Vector<double>& polyVector)
     const {
@@ -409,10 +414,26 @@ PolynomialMap* PolynomialMap::PolynomialLeastSquaresFit(
 PolynomialMap* PolynomialMap::PolynomialLeastSquaresFit(
   const std::vector< std::vector<double> >& points,
   const std::vector< std::vector<double> >& values,
-  unsigned int                                        polynomialOrder,
+  unsigned int                              polynomialOrder,
   const std::vector<double>&                weights) {
   // Algorithm: We have F2 = sum_i ( f_k f_l) where f are polynomial terms;
   // FY = sum_i (f_)
+  
+for (int index1=0; index1 < points.size(); ++index1) {
+  std::cout << "point " << index1 << ": " << std::endl;
+  for (int index2=0; index2 < points[index1].size(); ++index2) {
+    std::cout << points[index1][index2] << "\t";
+  }
+  std::cout << std::endl;
+}
+  
+for (int index1=0; index1 < values.size(); ++index1) {
+  std::cout << "value " << index1 << ": " << std::endl;
+  for (int index2=0; index2 < values[index1].size(); ++index2) {
+    std::cout << values[index1][index2] << "\t";
+  }
+  std::cout << std::endl;
+}
 
   int pointDim = points[0].size();
   int valueDim = values[0].size();
@@ -434,14 +455,23 @@ PolynomialMap* PolynomialMap::PolynomialLeastSquaresFit(
 
   // sum over points, values
   for (int i = 0; i < nPoints;   ++i) {
+std::cout << "F2[" << i << "]:" << std::endl;
     temp->MakePolynomialVector(&points[i][0], &tempFx[0]);
-    for (int k = 0; k < nCoeffs;  k++)
-      for (int j = 0; j < nCoeffs;    ++j)
+    for (int j = 0; j < nCoeffs;    ++j) {
+      for (int k = 0; k < nCoeffs;  ++k) {
         F2(j+1, k+1) += tempFx[k]*tempFx[j]*wt[i];
+std::cout << F2(j+1, k+1) << " ";
+      }
+std::cout << std::endl;
+    }
+
     for (int j = 0; j < nCoeffs;   ++j)
       for (int k = 0; k < valueDim; k++)
         Fy(j+1, k+1) += values[i][k]*tempFx[j]*wt[i];
   }
+  
+  double det = determinant(F2);
+  std::cout << "Determinant F2: " << det << std::endl;
 
   Matrix<double> F2_inverse;
   try {

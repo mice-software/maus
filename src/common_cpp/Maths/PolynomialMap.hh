@@ -154,7 +154,7 @@ class PolynomialMap : public VectorMap {
    *          an infinite series that does not converge, so beware!)
    *          - NOT IMPLEMENTED
    */
-  PolynomialMap  Inverse(int max_order) const;
+  PolynomialMap Inverse(int max_order) const;
 
   /** @brief  Make a vector like \f$(c, x, x^2, x^3...)\f$.
    *  @param[in] polyVector  should be of size NumberOfPolynomialCoefficients().

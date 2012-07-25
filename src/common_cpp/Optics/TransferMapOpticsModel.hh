@@ -30,6 +30,10 @@
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
 #include "Reconstruction/Global/TrackPoint.hh"
 
+class dataCards;
+class MiceMaterials;
+class MiceModule;
+
 namespace Json {
   class Value;
 }
@@ -61,8 +65,13 @@ class TransferMapOpticsModel : public OpticsModel {
    */
   void Build();
   
-  const TransferMap * GenerateTransferMap(const double end_plane) const;
+  const TransferMap * GenerateTransferMap(const double plane) const;
  protected:
+  const dataCards * data_cards_;
+  const MiceMaterials * mice_materials_;
+  const MiceModule * mice_module_;
+  const Json::Value * maus_configuration_;
+
   std::map<double, const TransferMap *> transfer_maps_;
   MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle_;
   reconstruction::global::TrackPoint reference_particle_;
@@ -76,7 +85,7 @@ class TransferMapOpticsModel : public OpticsModel {
    * phase space coordinates. The set is used as test particles to extrapolate
    * transfer matrices to other detector station planes.
    */
-  const std::vector<reconstruction::global::TrackPoint> BuildStartPlaneHits();
+  const std::vector<reconstruction::global::TrackPoint> BuildFirstPlaneHits();
 
   /* @brief Identify simulated hits by station and add them to the mappings
    * from station ID to hits recorded by that station.
@@ -84,6 +93,16 @@ class TransferMapOpticsModel : public OpticsModel {
   void MapStationsToHits(
       std::map<int, std::vector<reconstruction::global::TrackPoint> > &
         station_hits);
+
+  const TransferMap * FindTransferMap(const double end_plane) const;
+
+  CovarianceMatrix Transport(const CovarianceMatrix & covariances,
+                                     const double start_plane,
+                                     const double end_plane) const;
+
+  PhaseSpaceVector Transport(const PhaseSpaceVector & vector,
+                                     const double start_plane,
+                                     const double end_plane) const;
 
   /* @brief called by Build() to calculate transfer maps between the start plane
    * and the station planes. The returned pointer points to a newly allocated

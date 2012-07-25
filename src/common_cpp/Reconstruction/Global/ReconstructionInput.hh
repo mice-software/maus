@@ -20,6 +20,7 @@
 #ifndef COMMON_CPP_RECONSTRUCTION_RECONSTRUCTION_INPUT_HH
 #define COMMON_CPP_RECONSTRUCTION_RECONSTRUCTION_INPUT_HH
 
+#include <map>
 #include <vector>
 
 #include "src/common_cpp/Reconstruction/Global/Detector.hh"
@@ -34,19 +35,19 @@ class ReconstructionInput {
   /* @brief	Create with the given input values.
    */
   ReconstructionInput(const bool beam_polarity_negative,
-                      const std::vector<Detector> & detectors,
+                      const std::map<int, Detector> & detectors,
                       const std::vector<TrackPoint> & events);
 
   ~ReconstructionInput() { }
 
   bool beam_polarity_negative();
-  const std::vector<Detector> & detectors();
+  const std::map<int, Detector> & detectors();
   const std::vector<TrackPoint> & events();
  protected:
   ReconstructionInput();
 
   bool beam_polarity_negative_;
-  std::vector<Detector> detectors_;
+  std::map<int, Detector> detectors_;
   std::vector<TrackPoint> events_;
 };
 

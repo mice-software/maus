@@ -102,6 +102,7 @@ const TransferMap * PolynomialOpticsModel::CalculateTransferMap(
 
   std::vector< std::vector<double> > points;
   for (size_t pt_index = 0; pt_index < start_plane_hits.size(); ++pt_index) {
+std::cout << "Point[" << pt_index << "]: " << start_plane_hits[pt_index] << std::endl;
     std::vector<double> point;
     for (size_t coord_index = 0; coord_index < 6; ++coord_index) {
       point.push_back(start_plane_hits[pt_index][coord_index]);
@@ -111,12 +112,14 @@ const TransferMap * PolynomialOpticsModel::CalculateTransferMap(
 
   std::vector< std::vector<double> > values;
   for (size_t val_index = 0; val_index < start_plane_hits.size(); ++val_index) {
+std::cout << "Value[" << val_index << "]: " << station_hits[val_index] << std::endl;
     std::vector<double> value;
     for (size_t coord_index = 0; coord_index < 6; ++coord_index) {
       value.push_back(station_hits[val_index][coord_index]);
     }
     values.push_back(value);
   }
+std::cout.flush();
 
   PolynomialMap * polynomial_map = NULL;
 

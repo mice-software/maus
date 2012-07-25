@@ -46,15 +46,15 @@ class MapPySmearMC:
         
         assert isinstance(doc["mc_events"], list)
 
-        doc["mc_smear"] = copy.deepcopy(doc["mc_events"])
+        doc["mc_smeared"] = copy.deepcopy(doc["mc_events"])
 
         # iterate through each MC particle
-        for particle_index in range(len(doc["mc_smear"])):
+        for particle_index in range(len(doc["mc_smeared"])):
           # iterate through 
-          for key in doc["mc_smear"][particle_index]:
+          for key in doc["mc_smeared"][particle_index]:
               key_str = key.encode('ascii','ignore')
               if (key_str.find('hits') != -1):
-                hit_group = doc["mc_smear"][particle_index][key]
+                hit_group = doc["mc_smeared"][particle_index][key]
                 for hit in hit_group:
                   position = hit["position"]
                   position["x"] += numpy.random.normal(scale=0.5)

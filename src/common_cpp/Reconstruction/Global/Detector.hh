@@ -47,9 +47,11 @@ class Detector {
   const CovarianceMatrix & uncertainties() const;
 
   static const unsigned int kNone;
-  static const unsigned int kTOF0;
+  static const unsigned int kTOF0_1;
+  static const unsigned int kTOF0_2;
   static const unsigned int kCherenkov1;
-  static const unsigned int kTOF1;
+  static const unsigned int kTOF1_1;
+  static const unsigned int kTOF1_2;
   static const unsigned int kTracker1_1;
   static const unsigned int kTracker1_2;
   static const unsigned int kTracker1_3;
@@ -60,7 +62,8 @@ class Detector {
   static const unsigned int kTracker2_3;
   static const unsigned int kTracker2_4;
   static const unsigned int kTracker2_5;
-  static const unsigned int kTOF2;
+  static const unsigned int kTOF2_1;
+  static const unsigned int kTOF2_2;
   static const unsigned int kCherenkov2;
   static const unsigned int kCalorimeter;
  protected:

@@ -31,6 +31,7 @@
 #include "Interface/Squeak.hh"
 
 // MAUS
+#include "Reconstruction/Global/Detector.hh"
 #include "Reconstruction/Global/Track.hh"
 #include "Reconstruction/Global/TrackPoint.hh"
 
@@ -93,7 +94,6 @@ class MapCppGlobalTrackReconstructor {
 
   Json::Value run_data_;
   MAUS::reconstruction::global::ReconstructionInput * reconstruction_input_;
-  std::vector<MAUS::reconstruction::global::Track> reconstructed_tracks_;
 
   static const std::string kClassname;
   BTField * electromagnetic_field_;
@@ -104,8 +104,18 @@ class MapCppGlobalTrackReconstructor {
   void LoadRandomData();
   void LoadTestingData();
   void LoadSimulationData();
+  void LoadSmearedData();
   void LoadLiveData();
-  
+
+  void LoadSimulationData(const std::string mc_branch_name);
+
+  void LoadDetectorConfiguration(
+    std::map<int, MAUS::reconstruction::global::Detector> & detectors);
+  void LoadMonteCarloData(
+    const std::string                                             branch_name,
+    std::vector<MAUS::reconstruction::global::TrackPoint> &       events,
+    const std::map<int, MAUS::reconstruction::global::Detector> & detectors);
+
   static CovarianceMatrix const GetJsonCovarianceMatrix(
       Json::Value const & value);
 

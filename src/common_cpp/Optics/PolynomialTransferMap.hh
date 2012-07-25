@@ -83,6 +83,8 @@ class PolynomialTransferMap : public TransferMap {
   friend std::ostream& operator<<(std::ostream& out,
                                   const PolynomialTransferMap& tm);
 
+  TransferMap * Inverse() const;
+
   CovarianceMatrix Transport(const CovarianceMatrix & covariances) const;
 
   PhaseSpaceVector Transport(const PhaseSpaceVector & vector) const;
