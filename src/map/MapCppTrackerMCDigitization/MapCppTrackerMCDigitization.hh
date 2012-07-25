@@ -38,7 +38,7 @@
 
 #include "Config/MiceModule.hh"
 #include "Interface/Squeak.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiHit.hh"
+#include "src/common_cpp/DataStructure/Hit.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiSpill.hh"
 
 

@@ -30,6 +30,17 @@ SciFiEvent::SciFiEvent() {
   _scifihelicalprtracks.resize(0);
 }
 
+SciFiEvent::SciFiEvent(const SciFiEvent& _scifievent) {
+    *this = _scifievent;
+}
+
+SciFiEvent& SciFiEvent::operator=(const SciFiEvent& _scifievent) {
+    if (this == &_scifievent) {
+        return *this;
+    }
+    return *this;
+}
+
 SciFiEvent::~SciFiEvent() {
   std::vector<SciFiHit*>::iterator hit;
   for (hit = _scifihits.begin(); hit!= _scifihits.end(); ++hit) {
@@ -46,4 +57,4 @@ SciFiEvent::~SciFiEvent() {
     delete (*spacepoint);
   }
 }
-// }// ~namespace MAUS
+// } // ~namespace MAUS

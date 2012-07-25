@@ -20,6 +20,8 @@
 
 #define PI 3.14159265
 
+// namespace MAUS {
+
 KalmanTrackFit::KalmanTrackFit() {
   _straight_track = false;
   _helical_track = false;
@@ -547,3 +549,6 @@ void KalmanTrackFit::process_clusters(std::vector<SciFiSpacePoint> &spacepoints,
 
   std::sort(clusters.begin(), clusters.end(), sort_by_id);
 }
+
+// } // ~namespace MAUS
+

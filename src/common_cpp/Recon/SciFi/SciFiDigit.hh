@@ -107,6 +107,6 @@ class SciFiDigit {
 
   bool _used;
 };  // Don't forget this trailing colon!!!!
-// } // ends namespace MAUS
+// } // ~namespace MAUS
 
 #endif

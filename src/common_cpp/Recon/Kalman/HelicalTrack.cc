@@ -18,6 +18,8 @@
 #include "src/common_cpp/Recon/Kalman/HelicalTrack.hh"
 #define PI 3.14159265
 
+// namespace MAUS {
+
 HelicalTrack::HelicalTrack(SciFiHelicalPRTrack const &seed) {
   // Initialise straight-track member matrices:
   _G.ResizeTo(2, 2);
@@ -115,3 +117,5 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   //            (cos(old_site_phi) - cos(old_site_phi+new_phi));
   // _F(1, 4) = - (_alpha/pow(old_site_kappa, 2)) * (sin(old_site_phi) - sin(old_site_phi+new_phi));
 }
+
+// } // ~namespace MAUS

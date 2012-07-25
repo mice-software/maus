@@ -17,7 +17,16 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_SCIFIEVENT_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_SCIFIEVENT_
 
-#include "Rtypes.h"  // ROOT
+// C++ headers
+#include <vector>
+
+// ROOT headers
+#include "Rtypes.h"
+
+// MAUS headers
+#include "src/common_cpp/DataStructure/Hit.hh"
+
+
 
 namespace MAUS {
 
@@ -41,6 +50,9 @@ class SciFiEvent {
 
 
   private:
+
+    /// Hits in an event.
+    std::vector<SciFiHit*> _scifihits;
 
     ClassDef(SciFiEvent, 1)
 };

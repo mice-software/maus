@@ -31,6 +31,8 @@
 
 #include "src/common_cpp/Recon/SciFi/SciFiCluster.hh"
 
+// namespace MAUS {
+
 class KalmanSite {
  public:
   KalmanSite();
@@ -154,5 +156,7 @@ class KalmanSite {
 
   // state _site_state;
 };
+
+// } // ~namespace MAUS
 
 #endif

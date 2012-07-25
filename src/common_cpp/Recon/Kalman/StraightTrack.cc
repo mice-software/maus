@@ -16,6 +16,8 @@
  */
 #include "src/common_cpp/Recon/Kalman/StraightTrack.hh"
 
+// namespace MAUS {
+
 void StraightTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site) {
   // Reset.
   _F.Zero();
@@ -33,3 +35,5 @@ void StraightTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site
   _F(1, 3) = fabs(deltaZ);
   // _F.Print();
 }
+
+// } // ~namespace MAUS

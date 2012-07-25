@@ -27,4 +27,4 @@ SciFiHit::SciFiHit(int tracker, int station, int plane, int fibre, double edep, 
 }
 
 SciFiHit::~SciFiHit() {}
-// }// ~namespace MAUS
+// } // ~namespace MAUS

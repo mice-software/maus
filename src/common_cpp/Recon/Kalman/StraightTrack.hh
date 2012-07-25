@@ -32,10 +32,14 @@
 
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
 
+// namespace MAUS {
+
 class StraightTrack : public KalmanTrack {
  public:
 
   void update_propagator(KalmanSite *old_site, KalmanSite *new_site);
 };
+
+// } // ~namespace MAUS
 
 #endif

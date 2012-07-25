@@ -20,6 +20,8 @@
 #include "CLHEP/Matrix/Matrix.h"
 #include "src/common_cpp/Recon/SciFi/SeedFinder.hh"
 
+// namespace MAUS {
+
 SeedFinder::SeedFinder() {
   _B    = 4.;
   _Q    = 1.;
@@ -307,3 +309,6 @@ void SeedFinder::print_to_file() {
          << _pt << " " << _pz << " " << _phi_0 << " " << _tan_lambda << std::endl;
   myfile.close();
 }
+
+// } // ~namespace MAUS
+

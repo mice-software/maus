@@ -29,4 +29,4 @@ SciFiDigit::SciFiDigit(int spill, int event, int tracker, int station,
 }
 
 SciFiDigit::~SciFiDigit() {}
-// } // ends namespace MAUS
+// } // ~namespace MAUS

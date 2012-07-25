@@ -42,7 +42,7 @@
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiStraightPRTrack.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiHelicalPRTrack.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiPRTrack.hh"
+// #include "src/common_cpp/Recon/SciFi/SciFiPRTrack.hh"
 
 // namespace MAUS {
 

@@ -41,9 +41,8 @@
 #include "CLHEP/Units/PhysicalConstants.h"
 #include "CLHEP/Matrix/Matrix.h"
 #include "CLHEP/Vector/Rotation.h"
-
-#include "src/legacy/Config/MiceModule.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiDigit.hh"
+#include "src/legacy/Config/MiceModule.hh"
 
 // namespace MAUS {
 

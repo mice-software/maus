@@ -16,6 +16,8 @@
  */
 #include "src/common_cpp/Recon/SciFi/SciFiClusterRec.hh"
 
+// namespace MAUS {
+
 SciFiClusterRec::SciFiClusterRec() {}
 
 SciFiClusterRec::SciFiClusterRec(int cluster_exception, double min_npe)
@@ -176,3 +178,6 @@ bool SciFiClusterRec::are_neighbours(SciFiDigit *seed_i, SciFiDigit *seed_j) {
 
   return neigh;
 }
+
+// } // ~namespace MAUS
+

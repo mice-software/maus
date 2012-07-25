@@ -16,6 +16,8 @@
  */
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
 
+// namespace MAUS {
+
 KalmanTrack::KalmanTrack() {
   // Initialise member matrices:
   _G.ResizeTo(2, 2);
@@ -230,3 +232,6 @@ void KalmanTrack::smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_si
   C_smooth =  TMatrixD(C, TMatrixD::kPlus, temp5);
   smoothing_site->set_smoothed_covariance_matrix(C_smooth);
 }
+
+// } // ~namespace MAUS
+
