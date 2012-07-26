@@ -17,15 +17,6 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_SCIFIDIGIT_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_SCIFIDIGIT_
 
-// C headers
-#include <assert.h>
-
-// C++ headers
-#include <cmath>
-#include <iostream>
-#include <string>
-#include <sstream>
-#include <vector>
 
 // ROOT headers
 #include "Rtypes.h"

@@ -29,8 +29,10 @@ SciFiDigit::SciFiDigit(int spill, int event, int tracker, int station,
                         _channel(channel), _npe(npe), _time(time), _used(false) {
 }
 
-SciFiDigit::SciFiDigit(const SciFiDigit& _scifidigit) {
-    *this = _scifidigit;
+SciFiDigit::SciFiDigit(const SciFiDigit& _scifidigit)
+          : _spill(0), _event(0), _tracker(0), _station(0), _plane(0), _channel(0),
+            _npe(0.0), _time(0.0), _used(false) {
+  *this = _scifidigit;
 }
 
 SciFiDigit& SciFiDigit::operator=(const SciFiDigit& _scifidigit) {
