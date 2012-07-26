@@ -72,11 +72,11 @@ class KalmanTrack {
 
   // static const double sigma_x = 0.64; // x measurement resolution
 
-  static const double A = 2./(7.*0.427); // mm to channel convertion factor.
+  static const double A; // = 2./(7.*0.427); // mm to channel convertion factor.
 
-  static const double ACTIVE_RADIUS = 150.;
+  static const double ACTIVE_RADIUS;// = 150.;
 
-  static const double CHAN_WIDTH = 1.333; // (1.4945) effective channel width without overlap
+  static const double CHAN_WIDTH;// = 1.333; // (1.4945) effective channel width without overlap
 };
 
 #endif

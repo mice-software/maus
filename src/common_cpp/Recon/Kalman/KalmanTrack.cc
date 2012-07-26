@@ -16,6 +16,11 @@
  */
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
 
+// Initialize geometry constants.
+const double KalmanTrack::A = 2./(7.*0.427);
+const double KalmanTrack::ACTIVE_RADIUS = 150.;
+const double KalmanTrack::CHAN_WIDTH = 1.333;
+
 KalmanTrack::KalmanTrack() {
   // Initialise member matrices:
   _G.ResizeTo(2, 2);
