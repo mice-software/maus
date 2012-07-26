@@ -18,10 +18,10 @@
 #ifndef SRC_COMMON_CPP_SIMULATION_MAUSVISMANAGER_HH
 #define SRC_COMMON_CPP_SIMULATION_MAUSVISMANAGER_HH
 
+#include <string>
+
 #include "Geant4/G4VisManager.hh"
 #include "Geant4/G4UImanager.hh"
-
-#include <string>
 
 #include "src/legacy/Interface/Squeak.hh"
 

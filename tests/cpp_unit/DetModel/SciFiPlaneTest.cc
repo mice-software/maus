@@ -15,6 +15,8 @@
  *
  */
 
+#include <limits>
+
 #include "Geant4/G4VPhysicalVolume.hh"
 #include "Geant4/G4VSolid.hh"
 #include "Geant4/G4Material.hh"
@@ -28,14 +30,12 @@
 #include "Geant4/G4Tubs.hh"
 #include "Geant4/G4PVParameterised.hh"
 
-#include <limits>
+#include "gtest/gtest.h"
+#include "CLHEP/Random/Random.h"
 
 #include "src/legacy/Config/MiceModule.hh"
 
 #include "src/common_cpp/DetModel/SciFi/SciFiPlane.hh"
-
-#include "gtest/gtest.h"
-#include "CLHEP/Random/Random.h"
 
 namespace {
 class SciFiPlaneTest : public ::testing::Test {

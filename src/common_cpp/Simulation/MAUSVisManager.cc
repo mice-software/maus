@@ -15,7 +15,7 @@
  *
  */
 
-#include "src/common_cpp/Simulation/MAUSVisManager.hh"
+#include <string>
 
 #include "Geant4/G4VRML1File.hh"
 #include "Geant4/G4VRML2File.hh"
@@ -60,10 +60,10 @@
 #include "Geant4/G4VRML2.hh"
 #endif
 
-#include <string>
-
 #include "src/legacy/Interface/MICERun.hh"
 #include "src/legacy/Interface/Squeak.hh"
+#include "src/common_cpp/Simulation/MAUSVisManager.hh"
+
 
 namespace MAUS {
 
