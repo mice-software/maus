@@ -303,7 +303,7 @@ def get_root_libs():
                 'm', \
                 'pthread']
 
-def set_root(conf, env):
+def set_root(conf, env): # pylint: disable=W0613
     """
     Setup root
     """
@@ -342,17 +342,6 @@ def get_g4_libs(): # pylint: disable=W0511
     """
     List of geant4 libraries
     """
-    """
-    g4_libs = glob.glob(libG4*.so)
-    lib_split = g4_libs.split()
-    print lib_split
-    lib_out = []
-    for a_lib in lib_split:
-        if len(a_lib) > 5:
-            lib_out.append(a_lib[3:-2])
-    for item in lib_out:
-        print "\'"+item+"\',"
-    """
     return ['G4analysis',
             'G4error_propagation',
             'G4geometry',
@@ -362,7 +351,7 @@ def get_g4_libs(): # pylint: disable=W0511
             'G4processes',
             'G4run',
             'G4Tree',
-            'G4visXXX',
+            'G4visXXX', # pylint: disable = W0511
             'G4clhep',
             'G4event',
             'G4global',
