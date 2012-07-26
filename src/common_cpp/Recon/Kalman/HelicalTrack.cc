@@ -54,9 +54,8 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
     deltaZ = - deltaZ;
   }
 
-  std::cerr << new_site->get_id() << " " << old_site->get_id() << std::endl;
-  std::cerr << new_site->get_z() << " " << old_site->get_z() << std::endl;
-  // assert(deltaZ>0);
+  // std::cerr << new_site->get_id() << " " << old_site->get_id() << std::endl;
+  // std::cerr << new_site->get_z() << " " << old_site->get_z() << std::endl;
   // Find drho.
 
   TMatrixD prev_site(5, 1);
@@ -71,8 +70,8 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   // Find d_rho.
   double circle_x = _x0+old_r*cos(old_phi);
   double circle_y = _y0+old_r*sin(old_phi);
-  double d_rho = pow(pow(old_x-circle_x, 2) +
-                     pow(old_y-circle_y, 2), 0.5);
+  double d_rho = pow(pow(old_x-circle_x, 2.) +
+                     pow(old_y-circle_y, 2.), 0.5);
 
   std::cout << "Drho: " << d_rho << " "
             << "" << std::endl;
@@ -120,7 +119,6 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   _F(2, 4) = 0.0;
   _F(3, 4) = 0.0;
   _F(4, 4) = 1.0;
-
 
   // for ( int i = 0; i < 5; i++ ) {
     // _F(i, i) = 1.;
