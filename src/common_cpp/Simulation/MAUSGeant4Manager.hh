@@ -147,6 +147,8 @@ class MAUSGeant4Manager {
 
   private:
     MAUSGeant4Manager();
+    MAUSGeant4Manager(const MAUSGeant4Manager& copy);
+    MAUSGeant4Manager& operator=(const MAUSGeant4Manager& copy);
 
     G4RunManager* _runManager;
     MAUSPhysicsList* _physList;
