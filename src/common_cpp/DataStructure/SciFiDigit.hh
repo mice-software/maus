@@ -41,7 +41,7 @@ class SciFiDigit {
     /** Copy constructor - any pointers are deep copied */
     SciFiDigit(const SciFiDigit& _scifidigit);
 
-    /** Equality operator - any pointers are deep copied */
+    /** Assignment operator - any pointers are deep copied */
     SciFiDigit& operator=(const SciFiDigit& _scifidigit);
 
     /** Destructor - any member pointers are deleted */

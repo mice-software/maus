@@ -24,13 +24,15 @@
 #include "Rtypes.h"
 
 // MAUS headers
-#include "src/common_cpp/DataStructure/SciFiDigit.hh"
 #include "src/common_cpp/DataStructure/Hit.hh"
+#include "src/common_cpp/DataStructure/SciFiDigit.hh"
+#include "src/common_cpp/DataStructure/SciFiCluster.hh"
 
 namespace MAUS {
 
 typedef std::vector<SciFiHit*> SciFiHitPArray;
 typedef std::vector<SciFiDigit*> SciFiDigitPArray;
+typedef std::vector<SciFiCluster*> SciFiClusterPArray;
 
 /** @class SciFiEvent A container to hold other SciFi containers, representing a particle event
  *
@@ -58,6 +60,10 @@ class SciFiEvent {
     void add_digit(SciFiDigit* digit) { _scifidigits.push_back(digit); }
     SciFiDigitPArray digits() const { return _scifidigits; }
 
+    /** Clusters */
+    void add_cluster(SciFiCluster* cluster) { _scificlusters.push_back(cluster); }
+    SciFiClusterPArray clusters() const { return _scificlusters; }
+
   private:
 
     /** Hits in an event */
@@ -65,6 +71,9 @@ class SciFiEvent {
 
     /** Digits in an event */
     SciFiDigitPArray _scifidigits;
+
+    /** Clusters in an event */
+    SciFiClusterPArray _scificlusters;
 
     ClassDef(SciFiEvent, 1)
 };
