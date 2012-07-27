@@ -344,6 +344,7 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
         self.assertEqual(self._beam.longitudinal_mode, "uniform_time")
         self.assertAlmostEqual(self._beam.t_start, TEST_UNIFORM_T["t_start"])
         self.assertAlmostEqual(self._beam.t_end, TEST_UNIFORM_T["t_end"])
+        self.assertAlmostEqual(self._beam.beam_matrix[5,5], 1.e4)
         self.assertRaises(ValueError, 
                           self._beam._Beam__birth_longitudinal_ellipse,
                           TEST_UNIFORM_T_F1)
@@ -352,6 +353,7 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
         self.assertEqual(self._beam.longitudinal_mode, "sawtooth_time")
         self.assertAlmostEqual(self._beam.t_start, TEST_SAWTOOTH_T["t_start"])
         self.assertAlmostEqual(self._beam.t_end, TEST_SAWTOOTH_T["t_end"])
+        self.assertAlmostEqual(self._beam.beam_matrix[5,5], 1.e4)
 
     def test_birth_trans_long_coupling(self):
         """Beam transverse - longitudinal coupling"""
@@ -384,7 +386,8 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
         mass = xboa.Common.pdg_pid_to_mass[13]
         self._beam.beam_seed = 10
         self._beam.particle_seed_algorithm = "beam_seed"
-        primary = self._beam._Beam__process_array_to_primary(mean, 13, 'p')
+        primary_hit = self._beam._Beam__process_array_to_hit(mean, 13, 'p')
+        primary = self._beam._Beam__process_hit_to_primary(primary_hit)
         self.assertAlmostEqual(primary["position"]["x"], 10.)
         self.assertAlmostEqual(primary["position"]["y"], 30.)
         self.assertAlmostEqual(primary["position"]["z"], 3.) # from ref
@@ -397,34 +400,38 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
         self.assertEqual(primary["particle_id"], 13)
         self.assertEqual(primary["random_seed"], 10)
 
-        primary = self._beam._Beam__process_array_to_primary(mean, 13, 'pz')
+        primary_hit = self._beam._Beam__process_array_to_hit(mean, 13, 'pz')
+        primary = self._beam._Beam__process_hit_to_primary(primary_hit)
         self.assertAlmostEqual(primary["momentum"]["x"], 20.)
         self.assertAlmostEqual(primary["momentum"]["y"], 40.)
         self.assertAlmostEqual(primary["momentum"]["z"], 600.)
         self.assertAlmostEqual(primary["energy"],
                           (600.**2.+20.**2.+40.**2.+mass**2.)**0.5)
 
-        primary = self._beam._Beam__process_array_to_primary(mean,
+        primary_hit = self._beam._Beam__process_array_to_hit(mean,
                                                                   -13, 'energy')
+        primary = self._beam._Beam__process_hit_to_primary(primary_hit)
         self.assertAlmostEqual(primary["momentum"]["x"], 20.)
         self.assertAlmostEqual(primary["momentum"]["y"], 40.)
         self.assertAlmostEqual(primary["momentum"]["z"],
               (600.**2.-xboa.Common.pdg_pid_to_mass[13]**2.-20.**2-40.**2)**0.5)
         self.assertAlmostEqual(primary["energy"], 600.)
 
-    def test_process_array_to_primary_sign(self):
+    def test_process_array_to_primary_sign(self): # pylint: disable = C0103
         """Check function that converts from an array to a primary particle"""
         mean = numpy.array([10., 20., 30., 40., 50., 600.])
-        mass = xboa.Common.pdg_pid_to_mass[13]
         self._beam._Beam__birth_reference_particle \
                                                 ({"reference":TEST_PRIM_MU_NEG})
         self._beam.beam_seed = 10
         self._beam.particle_seed_algorithm = "beam_seed"
-        primary = self._beam._Beam__process_array_to_primary(mean, 13, 'p')
+        primary_hit = self._beam._Beam__process_array_to_hit(mean, 13, 'p')
+        primary = self._beam._Beam__process_hit_to_primary(primary_hit)
         self.assertLess(primary["momentum"]["z"], 0.)
-        primary = self._beam._Beam__process_array_to_primary(mean, 13, 'pz')
+        primary_hit = self._beam._Beam__process_array_to_hit(mean, 13, 'pz')
+        primary = self._beam._Beam__process_hit_to_primary(primary_hit)
         self.assertLess(primary["momentum"]["z"], 0.)
-        primary = self._beam._Beam__process_array_to_primary(mean, 13, 'energy')
+        primary_hit = self._beam._Beam__process_array_to_hit(mean, 13, 'energy')
+        primary = self._beam._Beam__process_hit_to_primary(primary_hit)
         self.assertLess(primary["momentum"]["z"], 0.)
 
 

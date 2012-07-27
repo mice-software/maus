@@ -103,7 +103,7 @@ std::string MapCppTrackerRecon::process(std::string document) {
       }
       // Kalman Track Fit.
       // if ( event.straightprtracks().size() || event.helicalprtracks().size() ) {
-      //   track_fit(event);
+      //  track_fit(event);
       // }
       // Perform alignment study.
       // if ( event.spacepoints().size() == 5 ) {
@@ -357,6 +357,18 @@ void MapCppTrackerRecon::save_to_json(SciFiEvent &evt, int event_i) {
       cluster["plane_number"] = clusters_in_spacepoint[cl]->get_plane();
       cluster["channel_number"] = clusters_in_spacepoint[cl]->get_channel();
       cluster["npe"] = clusters_in_spacepoint[cl]->get_npe();
+/*
+      std::vector<SciFiDigit*> digits_in_cluster = clusters_in_spacepoint[cl]->get_digits();
+      Json::Value digits;
+      for ( unsigned int dig = 0; dig < digits_in_cluster.size(); ++dig ) {
+        Json::Value digit;
+        digit["adc"] = digits_in_cluster[dig]->get_adc();
+        digit["tdc"] = digits_in_cluster[dig]->get_tdc();
+        digit["npe"] = digits_in_cluster[dig]->get_npe();
+        digits.append(digit);
+      }
+      cluster["digits"] = digits;
+*/
       channels.append(cluster);
     }
     spacepoint["channels"] = channels;

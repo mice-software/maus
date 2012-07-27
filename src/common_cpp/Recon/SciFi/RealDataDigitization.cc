@@ -94,6 +94,8 @@ void RealDataDigitization::process(SciFiSpill &spill, Json::Value const &daq) {
       if ( pe > 1.0 && tracker != -1 ) {
         SciFiDigit *digit = new SciFiDigit(spill, eventNo,
                                            tracker, station, plane, channel, pe, tdc);
+        // digit->set_adc(adc);
+        // digit->set_tdc(tdc);
         event->add_digit(digit);
       }
     }  // ends loop over channels (j)

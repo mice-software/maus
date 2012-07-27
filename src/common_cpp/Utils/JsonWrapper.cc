@@ -37,6 +37,12 @@ Json::Value JsonWrapper::StringToJson(std::string json_in) throw(Squeal) {
   return json_out;
 }
 
+std::string JsonWrapper::JsonToString(const Json::Value& val) {
+    Json::FastWriter writer;
+    std::string json_out = std::string(writer.write(val));
+    return json_out.substr(0, json_out.size()-1);  // strip carriage return
+}
+
 Json::Value JsonWrapper::GetItem
     (Json::Value array, size_t value_index, JsonType value_type) throw(Squeal) {
   if (array.type() != Json::arrayValue) {

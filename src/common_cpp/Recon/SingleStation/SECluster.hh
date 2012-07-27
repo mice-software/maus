@@ -96,6 +96,10 @@ class SECluster {
 
   Hep3Vector get_position() const { return _position; }
 
+  void set_digits(std::vector<SEDigit*> digits) { _digits = digits; }
+
+  std::vector<SEDigit*> get_digits()  const { return _digits; }
+
  private:
   int _spill, _event;
 
@@ -108,6 +112,8 @@ class SECluster {
   Hep3Vector _direction;
 
   Hep3Vector _position;
+
+  std::vector<SEDigit*>  _digits;
 };  // Don't forget this trailing colon!!!!
 // } // ~namespace MAUS
 

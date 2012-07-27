@@ -16,6 +16,7 @@
  */
 
 #include <algorithm>
+#include <vector>
 
 #include "math.h"
 
@@ -30,7 +31,8 @@ namespace MAUS {
 DerivativesSolenoid::DerivativesSolenoid(double peak_field, double r_max,
                     double z_max, int highest_order,
                     EndFieldModel* end_field)
-    : _peak_field(peak_field), _r_max(r_max), _z_max(z_max),
+    : BTField(-r_max, -r_max, -z_max, +r_max, +r_max, +z_max),
+      _peak_field(peak_field), _r_max(r_max), _z_max(z_max),
       _highest_order(highest_order), _end_field(end_field) {
 }
 
@@ -66,6 +68,10 @@ DerivativesSolenoid& DerivativesSolenoid::operator=
   } else {
     _end_field = NULL;
   }
+  double bb[] = {-_r_max, -_r_max, -_z_max, _r_max, _r_max, _z_max};
+  BTField::bbMin = std::vector<double>(&bb[0], &bb[3]);
+  BTField::bbMax = std::vector<double>(&bb[3], &bb[6]);
+
   return *this;
 }
 
@@ -106,7 +112,7 @@ void DerivativesSolenoid::
 
 void DerivativesSolenoid::Print(std::ostream &out) const {
   out << "DerivativesSolenoid PeakField: " << _peak_field
-      << " Order: " << _highest_order;
+      << " Order: " << _highest_order << " ";
   _end_field->Print(out);
   this->BTField::Print(out);
 }

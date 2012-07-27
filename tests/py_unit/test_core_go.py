@@ -28,6 +28,12 @@ from OutputPyJSON import OutputPyJSON
 
 from Go import Go
 
+CONFIG = """
+simulation_geometry_filename = "Test.dat"
+reconstruction_geometry_filename = "Test.dat"
+"""
+
+
 class FakeWorker(): #pylint: disable = W0232, R0903
     """ Mock worker that always fails to birth. """
 
@@ -49,6 +55,7 @@ class GoTestCase(unittest.TestCase): #pylint: disable = R0904
         @param self. Object reference.
         """
         self.tmp_file = tempfile.mkstemp()[1]
+        self.config = StringIO(unicode(CONFIG))
 
     def test_dataflows(self):
         """  
@@ -69,7 +76,8 @@ class GoTestCase(unittest.TestCase): #pylint: disable = R0904
         outputer = OutputPyJSON(open(self.tmp_file, 'w'))
 
         with self.assertRaises(AssertionError):
-            Go(inputer, transformer, merger, outputer, command_line_args=False)
+            Go(inputer, transformer, merger, outputer, \
+                              config_file=self.config, command_line_args=False)
 
     def test_map_birth(self):
         """
@@ -82,7 +90,8 @@ class GoTestCase(unittest.TestCase): #pylint: disable = R0904
         outputer = OutputPyJSON(open(self.tmp_file, 'w'))
 
         with self.assertRaises(AssertionError):
-            Go(inputer, transformer, merger, outputer, command_line_args=False)
+            Go(inputer, transformer, merger, outputer, \
+                               config_file=self.config, command_line_args=False)
 
     def test_reduce_birth(self):
         """
@@ -95,7 +104,8 @@ class GoTestCase(unittest.TestCase): #pylint: disable = R0904
         outputer = OutputPyJSON(open(self.tmp_file, 'w'))
 
         with self.assertRaises(AssertionError):
-            Go(inputer, transformer, merger, outputer, command_line_args=False)
+            Go(inputer, transformer, merger, outputer, \
+                             config_file=self.config, command_line_args=False)
 
     def test_output_birth(self):
         """
@@ -108,7 +118,8 @@ class GoTestCase(unittest.TestCase): #pylint: disable = R0904
         outputer = FakeWorker()
 
         with self.assertRaises(AssertionError):
-            Go(inputer, transformer, merger, outputer, command_line_args=False)
+            Go(inputer, transformer, merger, outputer, \
+                               config_file=self.config, command_line_args=False)
 
     def test_command_line_args(self):
         """
@@ -122,16 +133,19 @@ class GoTestCase(unittest.TestCase): #pylint: disable = R0904
         arg_temp = copy.deepcopy(sys.argv)
         sys.argv = [arg_temp[0]]
     
-        Go(inputer, transformer, merger, outputer, command_line_args = True)
+        Go(inputer, transformer, merger, outputer, config_file=self.config, \
+                                                      command_line_args = True)
 
         outputer = OutputPyJSON(open(self.tmp_file, 'w'))
         arg_temp = copy.deepcopy(sys.argv)
         sys.argv = [arg_temp[0], "bob"]
         with self.assertRaises(SystemExit):
-            Go(inputer, transformer, merger, outputer, command_line_args = True)
+            Go(inputer, transformer, merger, outputer, \
+                              config_file=self.config, command_line_args = True)
 
         sys.argv = [arg_temp[0], "-verbose_level", "1"]
-        Go(inputer, transformer, merger, outputer, command_line_args = True)
+        Go(inputer, transformer, merger, outputer, \
+                             config_file=self.config, command_line_args = True)
 
         sys.argv = arg_temp
 
@@ -197,6 +211,12 @@ class GoTestCase(unittest.TestCase): #pylint: disable = R0904
             with self.assertRaises(NotImplementedError):
                 Go(inputer, transformer, merger, outputer, config, \
                        command_line_args = False)
+
+    def test_initialise(self):
+        """
+        Check that initialisation of MAUS is okay
+        """
+        pass
 
 if __name__ == '__main__':
     unittest.main()

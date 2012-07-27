@@ -23,8 +23,6 @@
 // namespace MAUS {
 
 KalmanTrackFit::KalmanTrackFit() {
-  _straight_track = false;
-  _helical_track = false;
   std::cout << "---------------------Birth of Kalman Filter--------------------" << std::endl;
 }
 
@@ -47,7 +45,7 @@ bool sort_by_id(SciFiCluster *a, SciFiCluster *b ) {
 // Global track fit.
 //
 void KalmanTrackFit::process(Hep3Vector &tof0, Hep3Vector &se, Hep3Vector &tof1) {
-  std::vector<KalmanSite> sites;
+/*  std::vector<KalmanSite> sites;
   KalmanTrack *track = new GlobalTrack();
   initialise_global_track(tof0, se, tof1, sites);
   // Filter the first state.
@@ -76,6 +74,7 @@ void KalmanTrackFit::process(Hep3Vector &tof0, Hep3Vector &se, Hep3Vector &tof1)
   monitor.save_global_track(sites);
   monitor.print_info(sites);
   delete track;
+*/
 }
 
 void KalmanTrackFit::initialise_global_track(Hep3Vector &tof0, Hep3Vector &se,
@@ -146,67 +145,6 @@ void KalmanTrackFit::initialise_global_track(Hep3Vector &tof0, Hep3Vector &se,
 */
 }
 
-/*
-void KalmanTrackFit::initialise_helix(std::vector<SciFiSpacePoint> &spacepoints,
-                                      std::vector<KalmanSite> &sites,
-                                      SeedFinder &seed) {
-  double x0 = seed.get_x0();
-  double y0 = seed.get_y0();
-  double r = seed.get_r();
-  double pt = seed.get_pt();
-  double pz = seed.get_pz();
-  double phi_0 = seed.get_phi_0();
-  double tan_lambda = seed.get_tan_lambda();
-
-  std::vector<SciFiCluster*> clusters;
-  process_clusters(spacepoints, clusters);
-  // the clusters are sorted by now.
-
-  int numb_sites = clusters.size();
-
-  KalmanSite first_plane;
-  double x = x0+r*cos(phi_0*PI/180.);
-  double y = y0+r*sin(phi_0*PI/180.);
-  double kappa = 1./pt;
-
-  TMatrixD a(5, 1);
-  a(0, 0) = x;
-  a(1, 0) = y;
-  a(2, 0) = phi_0;
-  a(3, 0) = tan_lambda;
-  a(4, 0) = kappa;
-  first_plane.set_projected_a(a);
-  // std::cout << "Seed state: " << std::endl;
-  // a.Print();
-  // first_plane.set_state_vector(x, y, tan_lambda, phi_0, kappa);
-  TMatrixD C(5, 5);
-  C(0, 0) = 150.*150./12.;
-  C(1, 1) = 150.*150./12.;
-  C(2, 2) = 10.;
-  C(3, 3) = 10.;
-  C(4, 4) = 100.;
-  // for ( int i = 0; i < 5; ++i ) {
-  //   C(i, i) = 200; // dummy values
-  // }
-  first_plane.set_projected_covariance_matrix(C);
-  first_plane.set_measurement(clusters[0]->get_alpha());
-  first_plane.set_direction(clusters[0]->get_direction());
-  first_plane.set_z(clusters[0]->get_position().z());
-  first_plane.set_id(clusters[0]->get_id());
-  // first_plane
-  sites.push_back(first_plane);
-
-  for ( int j = 1; j < numb_sites; ++j ) {
-    KalmanSite a_site;
-    a_site.set_measurement(clusters[j]->get_alpha());
-    a_site.set_direction(clusters[j]->get_direction());
-    a_site.set_z(clusters[j]->get_position().z());
-    a_site.set_id(clusters[j]->get_id());
-    sites.push_back(a_site);
-  }
-}
-*/
-
 //
 // Straight track fit.
 //
@@ -251,6 +189,9 @@ void KalmanTrackFit::process(std::vector<SciFiStraightPRTrack> straight_tracks) 
   }
 }
 
+//
+// Helical track fit.
+//
 void KalmanTrackFit::process(std::vector<SciFiHelicalPRTrack> helical_tracks) {
   int num_tracks  = helical_tracks.size();
 
@@ -280,13 +221,12 @@ void KalmanTrackFit::process(std::vector<SciFiHelicalPRTrack> helical_tracks) {
     sites[numb_measurements-1].set_smoothed_a(sites[numb_measurements-1].get_a());
     // ...and Smooth back all sites.
     for ( int i = numb_measurements-2; i >= 0; --i ) {
-      std::cerr << "Smoothing site " << i << std::endl;
-      smooth(sites, track, i);
+      // std::cerr << "Smoothing site " << i << std::endl;
+      // smooth(sites, track, i);
     }
-
     KalmanMonitor monitor;
     // monitor.save(sites);
-    // monitor.save_mc(sites);
+    monitor.save_mc(sites);
     // monitor.print_info(sites);
     delete track;
   }
@@ -296,7 +236,7 @@ void KalmanTrackFit::initialise(SciFiHelicalPRTrack &seed, std::vector<KalmanSit
   double x0 = seed.get_x0();
   double y0 = seed.get_y0();
   double r = seed.get_R();
-  double pt = 200.0;
+  double p = 200.0;
   // double pz = seed.get_pz();
   double phi_0 = seed.get_phi0();
   double tan_lambda = seed.get_dzds();
@@ -308,18 +248,35 @@ void KalmanTrackFit::initialise(SciFiHelicalPRTrack &seed, std::vector<KalmanSit
   // the clusters are sorted by now.
 
   int numb_sites = clusters.size();
-
+  int tracker = clusters[0]->get_tracker();
+  std::cerr << "PR: " << tracker << " " << x0 << " " << y0 << " " << r << " "
+                      << phi_0 << " " << tan_lambda << std::endl;
   KalmanSite first_plane;
-  double x = x0+r*cos(phi_0*PI/180.);
-  double y = y0+r*sin(phi_0*PI/180.);
-  double kappa = 1./pt;
+  double site_0_turning_angle, x, y;
+  if ( tracker == 0 ) {
+    int sign = 1;
+    double delta_phi = sign*1100./(r*tan_lambda);
+    site_0_turning_angle = (phi_0-delta_phi); // *PI/180.;
+    x = -(x0 + r*cos(site_0_turning_angle));
+    y = -(y0 + r*sin(site_0_turning_angle));
+  } else {
+    site_0_turning_angle = phi_0; // *PI/180.;
+    x = x0 + r*cos(site_0_turning_angle);
+    y = y0 + r*sin(site_0_turning_angle);
+  }
+
+  // double x = x0 + r*cos(site_0_turning_angle);
+  // double y = y0 + r*sin(site_0_turning_angle);
+  std::cerr << "SEED: " << x << " " << y << " " << site_0_turning_angle << std::endl;
+  double kappa = 1./p;
 
   TMatrixD a(5, 1);
   a(0, 0) = x;
   a(1, 0) = y;
-  a(2, 0) = phi_0;
-  a(3, 0) = tan_lambda;
-  a(4, 0) = kappa;
+  a(2, 0) = r;
+  a(3, 0) = site_0_turning_angle;
+  a(4, 0) = tan_lambda;
+
   first_plane.set_projected_a(a);
   // std::cout << "Seed state: " << std::endl;
   // a.Print();
@@ -349,6 +306,14 @@ void KalmanTrackFit::initialise(SciFiHelicalPRTrack &seed, std::vector<KalmanSit
     a_site.set_id(clusters[j]->get_id());
     sites.push_back(a_site);
   }
+  if ( _mc_run ) {
+    for ( int j = 0; j < numb_sites; ++j ) {
+      CLHEP::Hep3Vector true_position = clusters[j]->get_true_position();
+      CLHEP::Hep3Vector true_momentum = clusters[j]->get_true_momentum();
+      sites[j].set_true_position(true_position);
+      sites[j].set_true_momentum(true_momentum);
+    }
+  }
 }
 
 void KalmanTrackFit::initialise(SciFiStraightPRTrack &seed, std::vector<KalmanSite> &sites) {
@@ -357,8 +322,6 @@ void KalmanTrackFit::initialise(SciFiStraightPRTrack &seed, std::vector<KalmanSi
   double mx_pr = seed.get_mx();
   double my_pr = seed.get_my();
   double p_pr  = 210.0; // MeV/c
-
-  std::cout << "PATTERN RECOGNITION: " << x_pr << " " << mx_pr << std::endl;
 
   std::vector<SciFiSpacePoint> spacepoints = seed.get_spacepoints();
   std::vector<SciFiCluster*> clusters;

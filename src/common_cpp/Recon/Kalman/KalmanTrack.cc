@@ -18,6 +18,11 @@
 
 // namespace MAUS {
 
+// Initialize geometry constants.
+const double KalmanTrack::A = 2./(7.*0.427);
+const double KalmanTrack::ACTIVE_RADIUS = 150.;
+const double KalmanTrack::CHAN_WIDTH = 1.333;
+
 KalmanTrack::KalmanTrack() {
   // Initialise member matrices:
   _G.ResizeTo(2, 2);
@@ -32,32 +37,17 @@ KalmanTrack::KalmanTrack() {
 //
 // ------- Prediction ------------
 //
-void KalmanTrack::calc_system_noise(KalmanSite *site) {
-  TMatrixD a(5, 1);
-  a = site->get_a();
-  double mx = a(2, 0);
-  double my = a(3, 0);
-  double kappa = a(4, 0);
-  double Z = 1.;
-  double r0 = 0.00167; // cm3/g
-  double p = 1/kappa; // MeV/c
-  double v = p/105.7;
-  double C = 13.6*Z*pow(r0, 0.5)*(1+0.038*log(r0))/(v*p);
-
-  _Q(2, 2) = (1+pow(mx, 2.))*(1+pow(mx, 2.)+pow(my, 2.))*C;
-  _Q(3, 3) = (1+pow(my, 2.))*(1+pow(mx, 2.)+pow(my, 2.))*C;
-  _Q(2, 3) = mx*my*(1+mx*mx+my*my)*C;
-  _Q(3, 2) = mx*my*(1+mx*mx+my*my)*C;
-
-  _Q(4, 4) = kappa*kappa*my*my*C/(1+mx*mx);
-  _Q(3, 4) = kappa * my * (1+mx*mx+my*my) * C /(1+mx*mx);
-}
-
 void KalmanTrack::calc_predicted_state(KalmanSite *old_site, KalmanSite *new_site) {
   TMatrixD a = old_site->get_a();
+  std::cerr << "Old state filtered state: " << std::endl;
+  a.Print();
 
   TMatrixD a_projected = TMatrixD(_F, TMatrixD::kMult, a);
   new_site->set_projected_a(a_projected);
+  std::cerr << "Old state filtered state: " << std::endl;
+  _F.Print();
+  std::cerr << "New projected state: " << std::endl;
+  a_projected.Print();
 }
 
 //
@@ -135,6 +125,8 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
 
   TMatrixD a(5, 1);
   a = a_site->get_projected_a();
+  std::cerr << "Projected state: " << std::endl;
+  a.Print();
   TMatrixD ha(2, 1);
   // double beta  = 0;
   // double alpha = a(0, 0)*_H(0, 0) + a(1, 0)*_H(0, 1);
@@ -147,6 +139,8 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
 
   TMatrixD pull(2, 1);
   pull = TMatrixD(m, TMatrixD::kMinus, ha);
+  std::cerr << "Pull: " << std::endl;
+  pull.Print();
   /////////////////////////////////////////////////////////////////////
   //
   // Kalman Gain: K = Cp Ht G
@@ -164,6 +158,8 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
   TMatrixD a_filt(5, 1);
   a_filt = TMatrixD(a, TMatrixD::kPlus, temp4);
   a_site->set_a(a_filt);
+  std::cerr << "Filtered state: " << std::endl;
+  a_filt.Print();
   // Residuals. x and y.
   double res_x = a_filt(0, 0) - a(0, 0);
   double res_y = a_filt(1, 0) - a(1, 0);
@@ -234,4 +230,3 @@ void KalmanTrack::smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_si
 }
 
 // } // ~namespace MAUS
-

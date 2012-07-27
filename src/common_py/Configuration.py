@@ -35,7 +35,7 @@ class Configuration:
         """        
         self.readme = os.path.join(os.environ['MAUS_ROOT_DIR'], 'README')
 
-    def getConfigJSON(self, config_file = None, command_line_args = False):
+    def getConfigJSON(self, config_file = None, command_line_args = False): # pylint:disable = C0301, C0103
         """
         Returns JSON config document
 
@@ -158,7 +158,7 @@ class Configuration:
         Hand configuration parameters to the error handler, so it can set itself
         up
         """
-        ErrorHandler.DefaultHandler().ConfigurationToErrorHandler(config_dict)
+        ErrorHandler.DefaultHandler().ConfigurationToErrorHandler(config_dict) # pylint:disable = C0301, C0103
 
     def check_config_dict(self, config_dict): #pylint:disable=R0201
         """

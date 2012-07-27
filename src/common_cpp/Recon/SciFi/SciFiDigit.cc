@@ -29,4 +29,38 @@ SciFiDigit::SciFiDigit(int spill, int event, int tracker, int station,
 }
 
 SciFiDigit::~SciFiDigit() {}
+
+SciFiDigit::SciFiDigit(const SciFiDigit &digit) {
+  _position = digit.get_true_position();
+  _p        = digit.get_true_momentum();
+  _spill    = digit.get_spill();
+  _event    = digit.get_event();
+  // _adc      = digit.get_adc();
+  // _tdc      = digit.get_tdc();
+  _tracker  = digit.get_tracker();
+  _station  = digit.get_station();
+  _plane    = digit.get_plane();
+  _channel  = digit.get_channel();
+  _npe      = digit.get_npe();
+  _time     = digit.get_time();
+  _used     = digit.is_used();
+}
+
+SciFiDigit& SciFiDigit::operator=(const SciFiDigit &digit) {
+  _position = digit.get_true_position();
+  _p        = digit.get_true_momentum();
+  _spill    = digit.get_spill();
+  _event    = digit.get_event();
+  // _adc      = digit.get_adc();
+  // _tdc      = digit.get_tdc();
+  _tracker  = digit.get_tracker();
+  _station  = digit.get_station();
+  _plane    = digit.get_plane();
+  _channel  = digit.get_channel();
+  _npe      = digit.get_npe();
+  _time     = digit.get_time();
+  _used     = digit.is_used();
+}
+
 // } // ~namespace MAUS
+
