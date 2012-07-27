@@ -66,7 +66,6 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   double old_phi  = prev_site(3, 0);
   double old_tan_lambda = prev_site(4, 0);
 
-
   // Find d_rho.
   double circle_x = _x0+old_r*cos(old_phi);
   double circle_y = _y0+old_r*sin(old_phi);
