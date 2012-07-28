@@ -27,8 +27,6 @@
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiEvent.hh"
 
-// namespace MAUS {
-
 class SeedFinder {
  public:
   SeedFinder();
@@ -93,7 +91,5 @@ class SeedFinder {
 
   double value;
 };
-
-// } // ~namespace MAUS
 
 #endif

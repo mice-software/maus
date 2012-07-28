@@ -32,7 +32,6 @@
 
 // Third party headers
 #include "TH1D.h"
-#include "Rtypes.h"
 
 // MAUS headers
 #include "src/common_cpp/Recon/SciFi/SciFiHit.hh"
@@ -41,24 +40,16 @@
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiStraightPRTrack.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiHelicalPRTrack.hh"
-// #include "src/common_cpp/Recon/SciFi/SciFiPRTrack.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiPRTrack.hh"
 
 // namespace MAUS {
 
 class SciFiEvent {
  public:
 
-  /// Constructor
+  /// Constructor and Destructor
   SciFiEvent();
-
-  /// Copy constructor
-  SciFiEvent(const SciFiEvent& _scifievent);
-
-  /// Destructor
-  virtual ~SciFiEvent();
-
-  /// Equality operator
-  SciFiEvent& operator=(const SciFiEvent& _scifievent);
+  ~SciFiEvent();
 
   /// Residual histograms
   std::vector< std::vector<int> > residuals() const { return _residuals; }
@@ -122,9 +113,6 @@ class SciFiEvent {
 
   /// Helical tracks.
   std::vector<SciFiHelicalPRTrack>    _scifihelicalprtracks;
-
-  /// Class def for MAUS data structure
-  // ClassDef(SciFiEvent, 1)
 };  // Don't forget this trailing colon!!!!
 // } // ~namespace MAUS
 

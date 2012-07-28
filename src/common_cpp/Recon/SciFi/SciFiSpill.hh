@@ -47,7 +47,6 @@ class SciFiSpill {
   /// This is a vector containing the events of a spill.
   std::vector<SciFiEvent*>   _events_in_spill;
 };  // Don't forget this trailing colon!!!!
-
 // } // ~namespace MAUS
 
 #endif

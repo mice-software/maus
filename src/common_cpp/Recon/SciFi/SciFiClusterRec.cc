@@ -16,8 +16,6 @@
  */
 #include "src/common_cpp/Recon/SciFi/SciFiClusterRec.hh"
 
-// namespace MAUS {
-
 SciFiClusterRec::SciFiClusterRec() {}
 
 SciFiClusterRec::SciFiClusterRec(int cluster_exception, double min_npe)
@@ -133,13 +131,6 @@ void SciFiClusterRec::construct(SciFiCluster *clust, std::vector<const MiceModul
     alpha = -alpha;
   }
   clust->set_alpha(alpha);
-/*
-  if ( plane == 0 ) {
-    plane = 1;
-  } else if (plane == 1 ) {
-    plane = 0;
-  }
-*/
   int id = 15*tracker + 3*(station-1) + (plane);
   clust->set_id(id);
 }
@@ -185,6 +176,3 @@ bool SciFiClusterRec::are_neighbours(SciFiDigit *seed_i, SciFiDigit *seed_j) {
 
   return neigh;
 }
-
-// } // ~namespace MAUS
-

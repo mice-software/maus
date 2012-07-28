@@ -281,5 +281,4 @@ Hep3Vector SciFiSpacePointRec::crossing_pos(SciFiCluster* c1,
 
     return an_intersection;
 }
-
 // } // ~namespace MAUS

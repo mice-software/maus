@@ -41,8 +41,9 @@
 #include "CLHEP/Units/PhysicalConstants.h"
 #include "CLHEP/Matrix/Matrix.h"
 #include "CLHEP/Vector/Rotation.h"
-#include "src/common_cpp/Recon/SciFi/SciFiDigit.hh"
+
 #include "src/legacy/Config/MiceModule.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiDigit.hh"
 
 // namespace MAUS {
 
@@ -129,10 +130,6 @@ class SciFiCluster {
 
   Hep3Vector get_true_position() const { return _pos; }
 
-  // void set_digits(std::vector<SciFiDigit*> digits) { _digits = digits; }
-
-  // std::vector<SciFiDigit*> get_digits()  const { return _digits; }
-
  private:
   Hep3Vector _pos, _p;
 
@@ -153,8 +150,6 @@ class SciFiCluster {
   double _alpha;
 
   int _id;
-
-  // std::vector<SciFiDigit*>  _digits;
 };  // Don't forget this trailing colon!!!!
 // } // ~namespace MAUS
 

@@ -49,6 +49,14 @@ class SciFiHit {
 
   ~SciFiHit();
 
+  void set_spill(int spillNo) { _spill = spillNo; }
+
+  int get_spill()   const { return _spill;   }
+
+  void set_eventNo(int eventNo) { _eventNo = eventNo; }
+
+  int get_eventNo() const { return _eventNo; }
+
   void set_tracker(int trackerNo) { _tracker = trackerNo; }
 
   int get_tracker() const { return _tracker; }
@@ -87,6 +95,8 @@ class SciFiHit {
 
  private:
   CLHEP::Hep3Vector _position, _p;
+
+  int _spill, _eventNo;
 
   int _tracker, _station, _plane, _fibre;
 

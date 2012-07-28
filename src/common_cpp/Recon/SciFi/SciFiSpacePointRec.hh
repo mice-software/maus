@@ -81,7 +81,6 @@ class SciFiSpacePointRec {
   static const int _kuno_else  = 318;
   static const int _kuno_toler = 2;
 };  // Don't forget this trailing colon!!!!
-
 // } // ~namespace MAUS
 
 #endif
