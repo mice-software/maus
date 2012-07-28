@@ -35,9 +35,9 @@ HelicalTrack::HelicalTrack(SciFiHelicalPRTrack const &seed) {
   // tracker 1: B = -4T.
   int tracker = seed.get_tracker();
   if ( tracker == 0 ) {
-    _sign = 1;
-  } else {
     _sign = -1;
+  } else {
+    _sign = 1;
   }
   // _r  = seed.get_R();
 }
@@ -62,7 +62,7 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   prev_site = old_site->get_a();
   double old_x   = prev_site(0, 0);
   double old_y   = prev_site(1, 0);
-  double old_r = prev_site(2, 0);
+  double old_r   = prev_site(2, 0);
   double old_phi  = prev_site(3, 0);
   double old_tan_lambda = prev_site(4, 0);
 
@@ -71,52 +71,54 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   double circle_y = _y0+old_r*sin(old_phi);
   double d_rho = pow(pow(old_x-circle_x, 2.) +
                      pow(old_y-circle_y, 2.), 0.5);
+  if ( pow(pow(old_x, 2.)+pow(old_y, 2.), 0.5) < old_r ) {
+    d_rho = -d_rho;
+  }
 
-  std::cout << "Drho: " << d_rho << " "
-            << "" << std::endl;
+  std::cerr << "Drho: " << d_rho << std::endl;
 
   // double new_phi = - old_site_kappa * deltaZ/(_alpha * old_site_tan_lambda);
   double delta_phi = _sign*deltaZ/(old_r * old_tan_lambda);
   double new_phi   = (old_phi+delta_phi);
   std::cerr << "Phi: " << old_phi << " " << new_phi << std::endl;
-  assert(delta_phi < 4);
+  //assert(delta_phi < 4);
   // double old_phi_degrees = old_site_phi;
   // Build _F.
   _F(0, 0) = 1.0;
-  _F(1, 0) = 0.0;
-  _F(2, 0) = _sign*( cos(old_phi) - cos(new_phi) ) -
+  _F(0, 1) = 0.0;
+  _F(0, 2) = _sign*( cos(old_phi) - cos(new_phi) ) -
              sin(new_phi)*deltaZ/(old_tan_lambda*old_r);
-  _F(3, 0) = -d_rho*sin(old_phi) +
+  _F(0, 3) = -d_rho*sin(old_phi) +
              _sign*old_r*( -sin(old_phi) + sin(new_phi) );
-  _F(4, 0) = - sin(new_phi)*
+  _F(0, 4) = - sin(new_phi)*
              deltaZ/(old_tan_lambda*old_tan_lambda);
 
-  _F(0, 1) = 0.0;
+  _F(1, 0) = 0.0;
   _F(1, 1) = 1.0;
-  _F(2, 1) = _sign*( sin(old_phi) - sin(new_phi) ) -
+  _F(1, 2) = _sign*( sin(old_phi) - sin(new_phi) ) -
              cos(new_phi)*deltaZ/(old_tan_lambda*old_r);
 
-  _F(3, 1) = d_rho*cos(old_phi) +
+  _F(1, 3) = d_rho*cos(old_phi) +
              _sign*old_r*(cos(old_phi) - cos(new_phi));
-  _F(4, 1) = cos(new_phi)*
+  _F(1, 4) = cos(new_phi)*
              deltaZ/(old_tan_lambda*old_tan_lambda);
 
-  _F(0, 2) = 0.0;
-  _F(1, 2) = 0.0;
+  _F(2, 0) = 0.0;
+  _F(2, 1) = 0.0;
   _F(2, 2) = 1.0;
-  _F(3, 2) = 0.0;
-  _F(4, 2) = 0.0;
-
-  _F(0, 3) = 0.0;
-  _F(1, 3) = 0.0;
-  _F(2, 3) = -delta_phi/old_r;
-  _F(3, 3) = 1.0;
-  _F(4, 3) = -delta_phi/old_tan_lambda;
-
-  _F(0, 4) = 0.0;
-  _F(1, 4) = 0.0;
+  _F(2, 3) = 0.0;
   _F(2, 4) = 0.0;
-  _F(3, 4) = 0.0;
+
+  _F(3, 0) = 0.0;
+  _F(3, 1) = 0.0;
+  _F(3, 2) = -delta_phi/old_r;
+  _F(3, 3) = 1.0;
+  _F(3, 4) = -delta_phi/old_tan_lambda;
+
+  _F(4, 0) = 0.0;
+  _F(4, 1) = 0.0;
+  _F(4, 2) = 0.0;
+  _F(4, 3) = 0.0;
   _F(4, 4) = 1.0;
 
   // for ( int i = 0; i < 5; i++ ) {

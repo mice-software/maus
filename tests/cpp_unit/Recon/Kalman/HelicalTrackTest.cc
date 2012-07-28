@@ -57,7 +57,7 @@ void HelicalTrackTest::set_up_seed() {
 
 void HelicalTrackTest::set_up_sites() {
   old_site.set_z(0.0);
-  new_site.set_z(1100.0);
+  new_site.set_z(-1100.0);
   new_site.set_id(10);
 
   TMatrixD a(5, 1);
@@ -67,7 +67,6 @@ void HelicalTrackTest::set_up_sites() {
   a(3, 0) = phi0;
   a(4, 0) = tan_lambda;
   old_site.set_a(a);
-
 }
 /*
 TEST_F(HelicalTrackTest, test_constructor) {
@@ -85,11 +84,22 @@ TEST_F(HelicalTrackTest, test_propagator) {
 
   HelicalTrack *track = new HelicalTrack(seed);
 
-  track->update_propagator(old_site, new_site);
+  track->update_propagator(&old_site, &new_site);
   TMatrixD F(5, 5);
   F = track->get_propagator();
-  F.Print();
+  TMatrixD a(5, 1);
+  a(0, 0) = x0+radius*cos(phi0);
+  a(1, 0) = y0+radius*sin(phi0);
+  a(2, 0) = radius;
+  a(3, 0) = phi0;
+  a(4, 0) = tan_lambda;
 
+  TMatrixD a_temp(5, 1);
+  a_temp = TMatrixD(F, TMatrixD::kMult, a);
+  a.Print();
+  F.Print();
+  a_temp.Print();
+  EXPECT_EQ(0, 0);
 /*
 old_site.get_z();
 old_site.get_state_vector();

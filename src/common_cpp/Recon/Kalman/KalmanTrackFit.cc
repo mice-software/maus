@@ -219,8 +219,8 @@ void KalmanTrackFit::process(std::vector<SciFiHelicalPRTrack> helical_tracks) {
     sites[numb_measurements-1].set_smoothed_a(sites[numb_measurements-1].get_a());
     // ...and Smooth back all sites.
     for ( int i = numb_measurements-2; i >= 0; --i ) {
-      // std::cerr << "Smoothing site " << i << std::endl;
-      // smooth(sites, track, i);
+      std::cerr << "Smoothing site " << i << std::endl;
+      smooth(sites, track, i);
     }
     KalmanMonitor monitor;
     // monitor.save(sites);
