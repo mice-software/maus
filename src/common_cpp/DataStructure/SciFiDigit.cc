@@ -1,4 +1,4 @@
-/* This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
+/* This file is part of MAUS: http://micewww.pp.rl.ac.uk/projects/maus
  *
  * MAUS is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -12,14 +12,15 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
-#include "src/common_cpp/Recon/SciFi/SciFiDigit.hh"
+#include "src/common_cpp/DataStructure/SciFiDigit.hh"
 
-// namespace MAUS {
 
-SciFiDigit::SciFiDigit():_used(false) {}
+namespace MAUS {
+
+SciFiDigit::SciFiDigit():_used(false) {
+}
 
 SciFiDigit::SciFiDigit(int spill, int event, int tracker, int station,
                        int plane, int channel, double npe, double time )
@@ -28,5 +29,29 @@ SciFiDigit::SciFiDigit(int spill, int event, int tracker, int station,
                         _channel(channel), _npe(npe), _time(time), _used(false) {
 }
 
-SciFiDigit::~SciFiDigit() {}
-// } // ends namespace MAUS
+SciFiDigit::SciFiDigit(const SciFiDigit& _scifidigit)
+          : _spill(0), _event(0), _tracker(0), _station(0), _plane(0), _channel(0),
+            _npe(0.0), _time(0.0), _used(false) {
+  *this = _scifidigit;
+}
+
+SciFiDigit& SciFiDigit::operator=(const SciFiDigit& _scifidigit) {
+    if (this == &_scifidigit) {
+        return *this;
+    }
+    _spill = _scifidigit._spill;
+    _event = _scifidigit._event;
+    _tracker = _scifidigit._tracker;
+    _station = _scifidigit._station;
+    _plane = _scifidigit._plane;
+    _channel = _scifidigit._channel;
+    _npe = _scifidigit._npe;
+    _time = _scifidigit._time;
+    _used = _scifidigit._used;
+    return *this;
+}
+
+SciFiDigit::~SciFiDigit() {
+}
+
+} // ~namespace MAUS

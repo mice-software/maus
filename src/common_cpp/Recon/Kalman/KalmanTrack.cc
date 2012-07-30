@@ -16,6 +16,13 @@
  */
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
 
+// namespace MAUS {
+
+// Initialize geometry constants.
+const double KalmanTrack::A = 2./(7.*0.427);
+const double KalmanTrack::ACTIVE_RADIUS = 150.;
+const double KalmanTrack::CHAN_WIDTH = 1.333;
+
 KalmanTrack::KalmanTrack() {
   // Initialise member matrices:
   _G.ResizeTo(2, 2);
@@ -32,9 +39,14 @@ KalmanTrack::KalmanTrack() {
 //
 void KalmanTrack::calc_predicted_state(KalmanSite *old_site, KalmanSite *new_site) {
   TMatrixD a = old_site->get_a();
+  std::cerr << "Old state filtered state: " << std::endl;
+  a.Print();
 
   TMatrixD a_projected = TMatrixD(_F, TMatrixD::kMult, a);
   new_site->set_projected_a(a_projected);
+  std::cerr << "Old state filtered state: " << std::endl;
+  _F.Print();
+  std::cerr << "New projected state: " << std::endl;
   a_projected.Print();
 }
 
@@ -113,6 +125,8 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
 
   TMatrixD a(5, 1);
   a = a_site->get_projected_a();
+  std::cerr << "Projected state: " << std::endl;
+  a.Print();
   TMatrixD ha(2, 1);
   // double beta  = 0;
   // double alpha = a(0, 0)*_H(0, 0) + a(1, 0)*_H(0, 1);
@@ -125,6 +139,8 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
 
   TMatrixD pull(2, 1);
   pull = TMatrixD(m, TMatrixD::kMinus, ha);
+  std::cerr << "Pull: " << std::endl;
+  pull.Print();
   /////////////////////////////////////////////////////////////////////
   //
   // Kalman Gain: K = Cp Ht G
@@ -142,6 +158,8 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
   TMatrixD a_filt(5, 1);
   a_filt = TMatrixD(a, TMatrixD::kPlus, temp4);
   a_site->set_a(a_filt);
+  std::cerr << "Filtered state: " << std::endl;
+  a_filt.Print();
   // Residuals. x and y.
   double res_x = a_filt(0, 0) - a(0, 0);
   double res_y = a_filt(1, 0) - a(1, 0);
@@ -210,3 +228,5 @@ void KalmanTrack::smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_si
   C_smooth =  TMatrixD(C, TMatrixD::kPlus, temp5);
   smoothing_site->set_smoothed_covariance_matrix(C_smooth);
 }
+
+// } // ~namespace MAUS

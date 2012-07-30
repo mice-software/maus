@@ -32,6 +32,8 @@
 
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
 
+// namespace MAUS {
+
 class StraightTrack : public KalmanTrack {
  public:
 
@@ -39,5 +41,7 @@ class StraightTrack : public KalmanTrack {
 
   void calc_system_noise(KalmanSite *site);
 };
+
+// } // ~namespace MAUS
 
 #endif

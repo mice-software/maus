@@ -20,6 +20,8 @@
 
 #define PI 3.14159265
 
+// namespace MAUS {
+
 KalmanTrackFit::KalmanTrackFit() {
   std::cout << "---------------------Birth of Kalman Filter--------------------" << std::endl;
 }
@@ -219,10 +221,9 @@ void KalmanTrackFit::process(std::vector<SciFiHelicalPRTrack> helical_tracks) {
     sites[numb_measurements-1].set_smoothed_a(sites[numb_measurements-1].get_a());
     // ...and Smooth back all sites.
     for ( int i = numb_measurements-2; i >= 0; --i ) {
-      std::cerr << "Smoothing site " << i << std::endl;
-      smooth(sites, track, i);
+      // std::cerr << "Smoothing site " << i << std::endl;
+      // smooth(sites, track, i);
     }
-
     KalmanMonitor monitor;
     // monitor.save(sites);
     monitor.save_mc(sites);
@@ -238,7 +239,7 @@ void KalmanTrackFit::initialise(SciFiHelicalPRTrack &seed, std::vector<KalmanSit
   double p = 200.0;
   // double pz = seed.get_pz();
   double phi_0 = seed.get_phi0();
-  double tan_lambda = seed.get_dzds();
+  double tan_lambda = seed.get_dsdz();
 
   std::vector<SciFiCluster*> clusters;
 
@@ -248,12 +249,14 @@ void KalmanTrackFit::initialise(SciFiHelicalPRTrack &seed, std::vector<KalmanSit
 
   int numb_sites = clusters.size();
   int tracker = clusters[0]->get_tracker();
-  std::cerr << "PR: " << tracker << " " << r << " " << phi_0 << " " << tan_lambda << std::endl;
+  std::cerr << "PR: " << tracker << " " << x0 << " " << y0 << " " << r << " "
+                      << phi_0 << " " << tan_lambda << std::endl;
   KalmanSite first_plane;
   double site_0_turning_angle, x, y;
   if ( tracker == 0 ) {
-    double delta_phi = 1100./(r*tan_lambda);
-    site_0_turning_angle = (phi_0+delta_phi); // *PI/180.;
+    int sign = 1;
+    double delta_phi = sign*1100./(r*tan_lambda);
+    site_0_turning_angle = (phi_0-delta_phi); // *PI/180.;
     x = -(x0 + r*cos(site_0_turning_angle));
     y = -(y0 + r*sin(site_0_turning_angle));
   } else {
@@ -509,3 +512,6 @@ void KalmanTrackFit::process_clusters(std::vector<SciFiSpacePoint> &spacepoints,
 
   std::sort(clusters.begin(), clusters.end(), sort_by_id);
 }
+
+// } // ~namespace MAUS
+

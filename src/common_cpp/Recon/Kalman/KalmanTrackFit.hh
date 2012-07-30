@@ -31,6 +31,8 @@
 #include "TMatrixD.h"
 
 #include "src/common_cpp/Recon/SciFi/SciFiEvent.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiHelicalPRTrack.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiStraightPRTrack.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
 #include "src/common_cpp/Recon/Kalman/HelicalTrack.hh"
 #include "src/common_cpp/Recon/Kalman/StraightTrack.hh"
@@ -40,6 +42,8 @@
 #include "src/common_cpp/Recon/SciFi/SeedFinder.hh"
 
 // namespace ublas = boost::numeric::ublas;
+
+// namespace MAUS {
 
 class KalmanTrackFit {
  public:
@@ -79,5 +83,8 @@ class KalmanTrackFit {
 
 // private:
 };
+
+// } // ~namespace MAUS
+
 
 #endif

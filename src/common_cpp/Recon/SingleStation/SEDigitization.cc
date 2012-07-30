@@ -103,7 +103,7 @@ void SEDigitization::process(SESpill &spill, Json::Value const &daq) {
       int adc_ped = adc - pedestal;
       // Exclude missing modules.
       if ( plane != -1 ) { // pe > 1.0 &&
-        SEDigit *digit = new SEDigit(spill, eventNo, plane, channel, pe, time, adc_ped);
+        SEDigit *digit = new SEDigit(spill, eventNo, plane, channel, pe, time, adc);
         event->add_digit(digit);
       }
     }  // ends loop over channels (j)

@@ -348,7 +348,8 @@ void PatternRecognition::make_straight_tracks(const int num_points,
   int outer_st_num = -1, inner_st_num = -1;
   set_end_stations(ignore_stations, outer_st_num, inner_st_num);
 
-  if (spnts_by_station.size() == _n_stations && outer_st_num > -1 && outer_st_num < _n_stations
+  if (static_cast<int>(spnts_by_station.size()) == _n_stations
+      && outer_st_num > -1 && outer_st_num < _n_stations
       && inner_st_num > -1 && inner_st_num < _n_stations) {
 
     // Loop over spacepoints in outer station
@@ -757,7 +758,7 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
                       std::ofstream out1("params_recon.txt", std::ios::out | std::ios::app);
                       out1 << circle.get_R() << "\t" << tan_lambda << "\t";
                       out1 << Phi_0 << "\t" << pt << "\t" << pz << "\t";
-                      out1 << 0  << good_spnts[0]->get_tracker() << std::endl;
+                      out1 << 0  << "\t" << good_spnts[0]->get_tracker() << std::endl;
                     }
 
                     if ( !_use_full_helix_fit ) {
@@ -1022,7 +1023,7 @@ void PatternRecognition::calculate_dipangle(const std::vector<SciFiSpacePoint*> 
     // Multiply each element of dphi by R so that each element dphi_ji goes to ds_ji
     dphi_to_ds(R, dphi, ds);
     if ( debug > 0 ) {
-      for ( int i = 0; i < ds.size(); i++ ) {
+      for ( int i = 0; i < static_cast<int>(ds.size()); i++ ) {
         std::cout << "ds = " << ds[i] << std::endl;
         std::cout << "dz = " << dz[i] << std::endl;
       }

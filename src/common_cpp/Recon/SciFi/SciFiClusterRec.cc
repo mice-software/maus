@@ -131,13 +131,6 @@ void SciFiClusterRec::construct(SciFiCluster *clust, std::vector<const MiceModul
     alpha = -alpha;
   }
   clust->set_alpha(alpha);
-/*
-  if ( plane == 0 ) {
-    plane = 1;
-  } else if (plane == 1 ) {
-    plane = 0;
-  }
-*/
   int id = 15*tracker + 3*(station-1) + (plane);
   clust->set_id(id);
 }

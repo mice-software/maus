@@ -17,11 +17,24 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_SCIFIEVENT_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_SCIFIEVENT_
 
-#include "Rtypes.h"  // ROOT
+// C++ headers
+#include <vector>
+
+// ROOT headers
+#include "Rtypes.h"
+
+// MAUS headers
+#include "src/common_cpp/DataStructure/Hit.hh"
+#include "src/common_cpp/DataStructure/SciFiDigit.hh"
+#include "src/common_cpp/DataStructure/SciFiCluster.hh"
 
 namespace MAUS {
 
-/** @class SciFiEvent comment
+typedef std::vector<SciFiHit*> SciFiHitPArray;
+typedef std::vector<SciFiDigit*> SciFiDigitPArray;
+typedef std::vector<SciFiCluster*> SciFiClusterPArray;
+
+/** @class SciFiEvent A container to hold other SciFi containers, representing a particle event
  *
  */
 
@@ -39,12 +52,33 @@ class SciFiEvent {
     /** Destructor - any member pointers are deleted */
     virtual ~SciFiEvent();
 
+    /** Hits */
+    void add_hit(SciFiHit* hit) { _scifihits.push_back(hit); }
+    SciFiHitPArray hits() const { return _scifihits; }
+
+    /** Digits */
+    void add_digit(SciFiDigit* digit) { _scifidigits.push_back(digit); }
+    SciFiDigitPArray digits() const { return _scifidigits; }
+
+    /** Clusters */
+    void add_cluster(SciFiCluster* cluster) { _scificlusters.push_back(cluster); }
+    SciFiClusterPArray clusters() const { return _scificlusters; }
 
   private:
 
+    /** Hits in an event */
+    SciFiHitPArray _scifihits;
+
+    /** Digits in an event */
+    SciFiDigitPArray _scifidigits;
+
+    /** Clusters in an event */
+    SciFiClusterPArray _scificlusters;
+
     ClassDef(SciFiEvent, 1)
 };
-}
+
+} // ~namespace MAUS
 
 #endif  // _SRC_COMMON_CPP_DATASTRUCTURE_SCIFIEVENT_
 
