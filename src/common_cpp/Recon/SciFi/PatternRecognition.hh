@@ -396,7 +396,7 @@ class PatternRecognition {
     static const double _chisq_diff = 3.;
     static const double _AB_cut = .7;       // Need to decide on appropriate cut here!!!
     static const double _active_diameter = 300.0;  // Active volume diameter a tracker in mm
-    static const bool _helical_pr_on = 1;   // Flag to turn on helical pr (0 off, 1 on)
+    static const bool _helical_pr_on = 0;   // Flag to turn on helical pr (0 off, 1 on)
     static const bool _straight_pr_on = 1;  // Flag to turn on straight pr (0 off, 1 on)
     static const bool _use_full_helix_fit = 0;  // Flag to turn on non-linear helix fit
 

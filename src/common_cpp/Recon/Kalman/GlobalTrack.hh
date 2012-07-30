@@ -18,23 +18,16 @@
 #ifndef GLOBALTRACK_HH
 #define GLOBALTRACK_HH
 
-// C headers
-#include <assert.h>
-#include <math.h>
-
-// C++ headers
-#include <string>
-#include <vector>
-
-#include "TMath.h"
-#include "TMatrixD.h"
-
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
+
+// namespace MAUS {
 
 class GlobalTrack : public KalmanTrack {
  public:
 
   void update_propagator(KalmanSite *old_site, KalmanSite *new_site);
 };
+
+// } // ~namespace MAUS
 
 #endif

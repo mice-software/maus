@@ -51,10 +51,6 @@ class SciFiDigit {
 
   ~SciFiDigit();
 
-  SciFiDigit(const SciFiDigit &digit);
-
-  SciFiDigit& operator=(const SciFiDigit &digit);
-
   void set_spill(int spill) { _spill = spill; }
 
   int get_spill()   const { return _spill; }
@@ -82,19 +78,11 @@ class SciFiDigit {
 
   void set_npe(double npe) { _npe = npe; }
 
-  double get_npe()     const { return _npe; }
-/*
-  int get_adc() const { return _adc; }
+  double get_npe()     const { return _npe;     }
 
-  void set_adc(int adc) { _adc = adc; }
-
-  int get_tdc() const { return _tdc; }
-
-  void set_tdc(int tdc) { _tdc = tdc; }
-*/
   void set_time(double time) { _time = time; }
 
-  double get_time()    const { return _time; }
+  double get_time()    const { return _time;    }
 
   void set_used()   { _used = true; }
 
@@ -112,8 +100,6 @@ class SciFiDigit {
   CLHEP::Hep3Vector _position, _p;
 
   int _spill, _event;
-
-  // int _adc, _tdc;
 
   int _tracker, _station, _plane, _channel;
 

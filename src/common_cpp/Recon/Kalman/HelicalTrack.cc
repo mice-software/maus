@@ -18,6 +18,8 @@
 #include "src/common_cpp/Recon/Kalman/HelicalTrack.hh"
 #define PI 3.14159265
 
+// namespace MAUS {
+
 HelicalTrack::HelicalTrack(SciFiHelicalPRTrack const &seed) {
   // Initialise straight-track member matrices:
   _G.ResizeTo(2, 2);
@@ -156,3 +158,4 @@ void HelicalTrack::calc_system_noise(KalmanSite *site) {
 */
 }
 
+// } // ~namespace MAUS

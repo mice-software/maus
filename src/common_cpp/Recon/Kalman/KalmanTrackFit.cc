@@ -20,6 +20,8 @@
 
 #define PI 3.14159265
 
+// namespace MAUS {
+
 KalmanTrackFit::KalmanTrackFit() {
   std::cout << "---------------------Birth of Kalman Filter--------------------" << std::endl;
 }
@@ -510,3 +512,6 @@ void KalmanTrackFit::process_clusters(std::vector<SciFiSpacePoint> &spacepoints,
 
   std::sort(clusters.begin(), clusters.end(), sort_by_id);
 }
+
+// } // ~namespace MAUS
+
