@@ -275,7 +275,7 @@ std::string  ReduceCppTrackerMCSingleStation::process(std::string document) {
           cluster_count2 += cluster1_size;
           pyfile << "Total number of clusters: Tracker 1: " << cluster_count1
             << "   Tracker 2: " << cluster_count2 << std::endl;
-          
+
           for (int i = 0; i < cluster0_size; i++) {
             _npe = scuts["tracker0"][i]["npe"].asDouble();
             _tracker = scuts["tracker0"][i]["tracker"].asInt();

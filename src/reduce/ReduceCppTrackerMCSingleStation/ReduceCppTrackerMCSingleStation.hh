@@ -116,7 +116,6 @@ class ReduceCppTrackerMCSingleStation {
 
   double Tspace_eff;
   double Tcluster_eff;
-
 };
 
 #endif
