@@ -30,49 +30,35 @@
 #include <sstream>
 #include <vector>
 
-// Third Party
-#include "CLHEP/Vector/ThreeVector.h"
-
 // MAUS headers
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
 #include "src/common_cpp/Recon/SciFi/SimpleHelix.hh"
-#include "src/common_cpp/Recon/SciFi/SimpleLine.hh"
-#include "src/common_cpp/Recon/SciFi/SimpleCircle.hh"
 
 // namespace MAUS {
 
 class SciFiHelicalPRTrack {
   public:
     // Constructors
-    // Default constructor
     SciFiHelicalPRTrack();
-    // Constructor from parameters
-    SciFiHelicalPRTrack(int tracker, int num_points, double x0, double y0, double z0, double phi0,
-                        double psi0, double dsdz, double R, double chisq);
-    // Constructor from SimpleCircle and SimpleLine
-    SciFiHelicalPRTrack(int tracker, int num_points, CLHEP::Hep3Vector pos0, SimpleCircle circle,
-                        SimpleLine line_sz);
-    // Constructor from SimpleHelix
+    SciFiHelicalPRTrack(int tracker, double x0, double y0, double z0,
+                        double phi0, double psi0, double dzds, double R);
+    // SciFiHelicalPRTrack(int tracker, std::vector<double> r0, int station,
+    //                     double phi0, double psi0, double dzds, double R);
     SciFiHelicalPRTrack(int tracker, int num_points, CLHEP::Hep3Vector pos0, SimpleHelix helix);
-
-    // Copy constructor
-    SciFiHelicalPRTrack(const SciFiHelicalPRTrack &_htrk);
-
-    // Equality constructor
-    SciFiHelicalPRTrack& operator=(const SciFiHelicalPRTrack &_htrk);
 
     // Destructors
     ~SciFiHelicalPRTrack();  // Default destructor
 
     // Getters
     std::vector<SciFiSpacePoint> get_spacepoints() const { return _spoints; }
+    // std::vector<double> get_r0() const { return _r0; }
 
     double get_x0() const { return _x0; }
     double get_y0() const { return _y0; }
     double get_z0() const { return _z0; }
     double get_phi0() const { return _phi0; }
     double get_psi0() const { return _psi0; }
-    double get_dsdz() const { return _dsdz; }
+    double get_dzds() const { return _dzds; }
     double get_R() const { return _R; }
     int get_tracker() const { return _tracker; }
     // int get_station() const { return _station; }
@@ -80,7 +66,7 @@ class SciFiHelicalPRTrack {
     double get_chisq() const { return _chisq; }
     double get_chisq_dof() const { return _chisq_dof; }
 
-    // std::vector<double> get_vsl();
+    std::vector<double> get_vsl();
 
     // Setters
     void set_spacepoints(std::vector<SciFiSpacePoint> spoints) { _spoints = spoints; }
@@ -90,7 +76,7 @@ class SciFiHelicalPRTrack {
     void set_z0(double z0) { _z0 = z0; }
     void set_phi0(double phi0) { _phi0 = phi0; }
     void set_psi0(double psi0) { _psi0 = psi0; }
-    void set_dsdz(double dsdz) { _dsdz = dsdz; }
+    void set_dzds(double dzds) { _dzds = dzds; }
     void set_R(double R) { _R = R; }
     void set_num_points(int num_points) { _num_points = num_points; }
     void set_chisq(double chisq) { _chisq = chisq; }
@@ -103,21 +89,23 @@ class SciFiHelicalPRTrack {
     void print_params();
 
   private:
-    // std::vector<double> _vsl;
+    std::vector<SciFiSpacePoint> _spoints;
+
+    std::vector<double> _vsl;
+    // std::vector<double> r0;
+
+    int _tracker;
+    int _num_points;
     // int _station;
     double _x0;
     double _y0;
     double _z0;
     double _phi0;
     double _psi0;
-    double _dsdz;
+    double _dzds;
     double _R;
-    int _tracker;
-    int _num_points;
     double _chisq;
     double _chisq_dof;
-
-    std::vector<SciFiSpacePoint> _spoints;
 };
 // } // ~namespace MAUS
 

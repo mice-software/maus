@@ -382,23 +382,23 @@ class PatternRecognition {
                        double &dx, double &dy);
 
   private:
-    static const int debug = 2; // Set output level, 0 = little, 1 = more couts, 2 = files as well
+    static const int debug = 0; // Set output level, 0 = little, 1 = more couts, 2 = files as well
     static const int _n_trackers = 2;
     static const int _n_stations = 5;
     static const int _n_bins = 100;         // Number of bins in each residuals histogram
     static const double _sd_1to4 = 0.3844;  // Position error associated with stations 1 through 4
     static const double _sd_5 = 0.4298;     // Position error associated with station 5
     static const double _res_cut = 2;      // Road cut for linear fit in mm
-    static const double _R_res_cut = 30.;    // Road cut for circle radius in mm
+    static const double _R_res_cut = 100.;    // Road cut for circle radius in mm
     static const double _chisq_cut = 15;    // Cut on the chi^2 of the least squares fit in mm
-    static const double _sz_chisq_cut = 100; // Cut on the sz chi^2 from least squares fit in mm
+    static const double _sz_chisq_cut = 50; // Cut on the sz chi^2 from least squares fit in mm
     static const double _helix_chisq_cut = 100;
     static const double _chisq_diff = 3.;
     static const double _AB_cut = .7;       // Need to decide on appropriate cut here!!!
     static const double _active_diameter = 300.0;  // Active volume diameter a tracker in mm
-    static const bool _helical_pr_on = 1;   // Flag to turn on helical pr (0 off, 1 on)
-    static const bool _straight_pr_on = 0;  // Flag to turn on straight pr (0 off, 1 on)
-    static const bool _use_full_helix_fit = 0; // Flag to turn on non-linear helix fit (0 off, 1 on)
+    static const bool _helical_pr_on = 0;   // Flag to turn on helical pr (0 off, 1 on)
+    static const bool _straight_pr_on = 1;  // Flag to turn on straight pr (0 off, 1 on)
+    static const bool _use_full_helix_fit = 0;  // Flag to turn on non-linear helix fit
 
     // Some output files - only to be kept when in development stages
     ofstream * _f_res;

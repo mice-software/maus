@@ -21,41 +21,41 @@
 
 // Constructor
 SimpleCircle::SimpleCircle() {
-  _x0 = -1.0;
-  _x0_err = -1.0;
-  _y0 = -1.0;
-  _y0_err = -1.0;
-  _R = -1.0;
-  _R_err = -1.0;
-  _alpha = -1.0;
-  _alpha_err = -1.0;
-  _beta = -1.0;
-  _beta_err = -1.0;
-  _gamma = -1.0;
-  _gamma_err = -1.0;
-  _kappa = -1.0;
-  _kappa_err = -1.0;
-  _delta_R = -1.0;
-  _chisq = -1.0;
+  _x0 = 0.0;
+  _x0_err = 0.0;
+  _y0 = 0.0;
+  _y0_err = 0.0;
+  _R = 0.0;
+  _R_err = 0.0;
+  _alpha = 0.0;
+  _alpha_err = 0.0;
+  _beta = 0.0;
+  _beta_err = 0.0;
+  _gamma = 0.0;
+  _gamma_err = 0.0;
+  _kappa = 0.0;
+  _kappa_err = 0.0;
+  _delta_R = 0.0;
+  _chisq = 0.0;
 }
 
 SimpleCircle::SimpleCircle(double x0, double y0, double R) {
   _x0 = x0;
-  _x0_err = -1.0;
+  _x0_err = 0.0;
   _y0 = x0;
-  _y0_err = -1.0;
+  _y0_err = 0.0;
   _R = R;
-  _R_err = -1.0;
-  _alpha = -1.0;
-  _alpha_err = -1.0;
-  _beta = -1.0;
-  _beta_err = -1.0;
-  _gamma = -1.0;
-  _gamma_err = -1.0;
-  _kappa = -1.0;
-  _kappa_err = -1.0;
-  _delta_R = -1.0;
-  _chisq = -1.0;
+  _R_err = 0.0;
+  _alpha = 0.0;
+  _alpha_err = 0.0;
+  _beta = 0.0;
+  _beta_err = 0.0;
+  _gamma = 0.0;
+  _gamma_err = 0.0;
+  _kappa = 0.0;
+  _kappa_err = 0.0;
+  _delta_R = 0.0;
+  _chisq = 0.0;
 }
 
 SimpleCircle::SimpleCircle(double x0, double x0_err, double y0, double y0_err, double R,
@@ -84,22 +84,22 @@ SimpleCircle::SimpleCircle(double x0, double x0_err, double y0, double y0_err, d
 SimpleCircle::~SimpleCircle() {}
 
 void SimpleCircle::clear() {
-  _x0 = -1.0;
-  _x0_err = -1.0;
-  _y0 = -1.0;
-  _y0_err = -1.0;
-  _R = -1.0;
-  _R_err = -1.0;
-  _alpha = -1.0;
-  _alpha_err = -1.0;
-  _beta = -1.0;
-  _beta_err = -1.0;
-  _gamma = -1.0;
-  _gamma_err = -1.0;
-  _kappa = -1.0;
-  _kappa_err = -1.0;
-  _delta_R = -1.0;
-  _chisq = -1.0;
+  _x0 = 0.0;
+  _x0_err = 0.0;
+  _y0 = 0.0;
+  _y0_err = 0.0;
+  _R = 0.0;
+  _R_err = 0.0;
+  _alpha = 0.0;
+  _alpha_err = 0.0;
+  _beta = 0.0;
+  _beta_err = 0.0;
+  _gamma = 0.0;
+  _gamma_err = 0.0;
+  _kappa = 0.0;
+  _kappa_err = 0.0;
+  _delta_R = 0.0;
+  _chisq = 0.0;
 }
 
 void SimpleCircle::set_parameters(double x0, double x0_err, double y0, double y0_err,

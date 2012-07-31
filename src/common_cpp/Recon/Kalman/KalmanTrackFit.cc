@@ -239,7 +239,7 @@ void KalmanTrackFit::initialise(SciFiHelicalPRTrack &seed, std::vector<KalmanSit
   double p = 200.0;
   // double pz = seed.get_pz();
   double phi_0 = seed.get_phi0();
-  double tan_lambda = seed.get_dsdz();
+  double tan_lambda = seed.get_dzds();
 
   std::vector<SciFiCluster*> clusters;
 
