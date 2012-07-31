@@ -50,7 +50,7 @@ def run_simulation(ref_phys, phys, dec, pi_half, mu_half, prod): #pylint: disabl
     Run simulation to generate some data. We only want to do this once, so I
     pull it out into a separate part of the test.
     """
-    out_name = os.path.join(MAUS_ROOT_DIR, "tmp", "simulation.")
+    out_name = os.path.join(MAUS_ROOT_DIR, "tmp", "test_physics_model.")
     for value in [ref_phys, phys, dec, pi_half, mu_half]:
         out_name += str(value)+"_"
     out_name += str(prod)
