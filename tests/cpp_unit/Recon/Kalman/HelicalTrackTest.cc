@@ -31,7 +31,7 @@ class HelicalTrackTest : public ::testing::Test {
   KalmanSite old_site;
   KalmanSite new_site;
   int tracker;
-  double x0, y0, radius, pt, pz, phi0, tan_lambda;
+  double x0, y0, radius, pt, pz, phi0, tan_lambda, kappa;
   void set_up_sites();
 };
 
@@ -45,6 +45,7 @@ void HelicalTrackTest::set_up_seed() {
   pt = 1.2*radius; // MeV/c
   pz = 220.0;
   tan_lambda = pz/pt;
+  kappa = -1./pt;
   phi0 = 0.0;
   // set_spacepoints(std::vector<SciFiSpacePoint> spoints) { _spoints = spoints; }
   seed.set_x0(x0);
@@ -68,21 +69,14 @@ void HelicalTrackTest::set_up_sites() {
   a(4, 0) = tan_lambda;
   old_site.set_a(a);
 }
-/*
-TEST_F(HelicalTrackTest, test_constructor) {
-  set_up_seed();
-  HelicalTrack *track = new HelicalTrack(seed);
-  EXPECT_EQ(x0, track->get_x0());
-  EXPECT_EQ(y0, track->get_y0());
-  delete track;
-  // EXPECT_EQ(radius, track->get_r());
-}
-*/
+
 TEST_F(HelicalTrackTest, test_propagator) {
   set_up_seed();
   set_up_sites();
 
   HelicalTrack *track = new HelicalTrack(seed);
+  EXPECT_EQ(x0, track->get_x0());
+  EXPECT_EQ(y0, track->get_y0());
 
   track->update_propagator(&old_site, &new_site);
   TMatrixD F(5, 5);
@@ -90,8 +84,8 @@ TEST_F(HelicalTrackTest, test_propagator) {
   TMatrixD a(5, 1);
   a(0, 0) = x0+radius*cos(phi0);
   a(1, 0) = y0+radius*sin(phi0);
-  a(2, 0) = radius;
-  a(3, 0) = phi0;
+  a(2, 0) = phi0;
+  a(3, 0) = kappa;
   a(4, 0) = tan_lambda;
 
   TMatrixD a_temp(5, 1);

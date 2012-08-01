@@ -63,9 +63,10 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   double old_x   = prev_site(0, 0);
   double old_y   = prev_site(1, 0);
   double old_r   = prev_site(2, 0);
-  double old_phi  = prev_site(3, 0);
+  double old_kappa  = prev_site(3, 0);
   double old_tan_lambda = prev_site(4, 0);
 
+  double old_phi = 
   // Find d_rho.
   double circle_x = _x0+old_r*cos(old_phi);
   double circle_y = _y0+old_r*sin(old_phi);
@@ -81,9 +82,44 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   double delta_phi = _sign*deltaZ/(old_r * old_tan_lambda);
   double new_phi   = (old_phi+delta_phi);
   std::cerr << "Phi: " << old_phi << " " << new_phi << std::endl;
+  double _alpha = 1./(0.3*4.);
   //assert(delta_phi < 4);
   // double old_phi_degrees = old_site_phi;
   // Build _F.
+  _F(0, 0) = 1.0+(old_x-_x0*old_r*cos(old_phi)*cos(old_phi))/d_rho;
+  _F(0, 1) = (old_y-_y0*old_r*sin(old_phi)*cos(old_phi))/d_rho;;
+  _F(0, 2) = -d_rho*sin(old_phi) + (_alpha/old_kappa)*(-sin(old_phi) + sin(new_phi));
+  _F(0, 3) = 
+  _F(0, 4) = 
+
+  _F(1, 0) = 0.0;
+  _F(1, 1) = 1.0;
+  _F(1, 2) = _sign*( sin(old_phi) - sin(new_phi) ) -
+             cos(new_phi)*deltaZ/(old_tan_lambda*old_r);
+
+  _F(1, 3) = d_rho*cos(old_phi) +
+             _sign*old_r*(cos(old_phi) - cos(new_phi));
+  _F(1, 4) = cos(new_phi)*
+             deltaZ/(old_tan_lambda*old_tan_lambda);
+
+  _F(2, 0) = 0.0;
+  _F(2, 1) = 0.0;
+  _F(2, 2) = 1.0;
+  _F(2, 3) = 0.0;
+  _F(2, 4) = 0.0;
+
+  _F(3, 0) = 0.0;
+  _F(3, 1) = 0.0;
+  _F(3, 2) = 0.0;
+  _F(3, 3) = 1.0;
+  _F(3, 4) = 0.0;
+
+  _F(4, 0) = 0.0;
+  _F(4, 1) = 0.0;
+  _F(4, 2) = 0.0;
+  _F(4, 3) = 0.0;
+  _F(4, 4) = 1.0;
+/*
   _F(0, 0) = 1.0;
   _F(0, 1) = 0.0;
   _F(0, 2) = _sign*( cos(old_phi) - cos(new_phi) ) -
@@ -120,7 +156,7 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   _F(4, 2) = 0.0;
   _F(4, 3) = 0.0;
   _F(4, 4) = 1.0;
-
+*/
   // for ( int i = 0; i < 5; i++ ) {
     // _F(i, i) = 1.;
   // }
