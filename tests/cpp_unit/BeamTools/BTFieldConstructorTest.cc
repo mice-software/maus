@@ -23,6 +23,7 @@
 
 #include "Config/MiceModule.hh"
 
+#include "src/common_cpp/FieldTools/DerivativesSolenoid.hh"
 #include "src/common_cpp/FieldTools/SectorMagneticFieldMap.hh"
 #include "src/common_cpp/FieldTools/SectorField.hh"
 
@@ -254,6 +255,25 @@ TEST_F(BTFieldConstructorTest, GetSectorMagneticFieldMapTest) {
       << "axis " << k << ": " << point[0] << " " << point[1] << " " << point[2];
   }
   MAUS::SectorMagneticFieldMap::ClearFieldCache();
+}
+
+TEST_F(BTFieldConstructorTest, GetDerivativesSolenoidTest) {
+  _mod[0]->addPropertyString("FieldType", "DerivativesSolenoid");
+  _mod[0]->addPropertyString("EndFieldType", "Tanh");
+  _mod[0]->addPropertyDouble("EndLength", 1.);
+  _mod[0]->addPropertyDouble("CentreLength", 5.);
+  _mod[0]->addPropertyInt("MaxEndPole", 3);
+  _mod[0]->addPropertyDouble("PeakField", 2.);
+  _mod[0]->addPropertyDouble("ZMax", 5.);
+  _mod[0]->addPropertyDouble("RMax", 4.);
+
+  MAUS::DerivativesSolenoid* map = static_cast<MAUS::DerivativesSolenoid*>
+                                                    (_field->GetField(_mod[0]));
+  EXPECT_EQ(map->GetPeakField(), 2.);
+  EXPECT_EQ(map->GetRMax(), 4.);
+  EXPECT_EQ(map->GetZMax(), 5.);
+  EXPECT_EQ(map->GetHighestOrder(), 3);
+  EXPECT_NEAR(map->GetEndFieldModel()->Function(5.0, 0), 0.5, 1e-6);
 }
 }
 

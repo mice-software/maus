@@ -263,7 +263,7 @@ class InputTransformExecutor: # pylint: disable=R0903, R0902
                 if (spill_run_number == None):
                     # There was no run_num in spill so add a 0 (pure MC run).
                     spill_run_number = 0
-                    spill_doc["run_num"] = spill_run_number
+                    spill_doc["run_number"] = spill_run_number
                     spill = json.dumps(spill_doc)
                 if (spill_run_number != self.run_number):
                     if (not DataflowUtilities.is_start_of_run(spill_doc)):

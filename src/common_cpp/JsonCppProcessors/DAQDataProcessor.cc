@@ -26,34 +26,34 @@ DAQDataProcessor::DAQDataProcessor()
       _tof0_proc(new TOFDaqProcessor), _trigger_proc(new TriggerProcessor) {
     RegisterValueBranch
           ("V830", &_V830_proc, &DAQData::GetV830,
-          &DAQData::SetV830, true);
+          &DAQData::SetV830, false);
     RegisterValueBranch
           ("trigger_request", &_trigger_request_proc, &DAQData::GetTriggerRequestArray,
-          &DAQData::SetTriggerRequestArray, true);
+          &DAQData::SetTriggerRequestArray, false);
     RegisterValueBranch
           ("tof1", &_tof1_proc, &DAQData::GetTOF1DaqArray,
-          &DAQData::SetTOF1DaqArray, true);
+          &DAQData::SetTOF1DaqArray, false);
     RegisterValueBranch
           ("ckov", &_ckov_proc, &DAQData::GetCkovArray,
-          &DAQData::SetCkovArray, true);
+          &DAQData::SetCkovArray, false);
     RegisterValueBranch
           ("tof2", &_tof2_proc, &DAQData::GetTOF2DaqArray,
-          &DAQData::SetTOF2DaqArray, true);
+          &DAQData::SetTOF2DaqArray, false);
     RegisterValueBranch
           ("unknown", &_unknown_proc, &DAQData::GetUnknownArray,
-          &DAQData::SetUnknownArray, true);
+          &DAQData::SetUnknownArray, false);
     RegisterValueBranch
           ("kl", &_kl_proc, &DAQData::GetKLArray,
-          &DAQData::SetKLArray, true);
+          &DAQData::SetKLArray, false);
     RegisterValueBranch
           ("tag", &_tag_proc, &DAQData::GetTagArray,
-          &DAQData::SetTagArray, true);
+          &DAQData::SetTagArray, false);
     RegisterValueBranch
           ("tof0", &_tof0_proc, &DAQData::GetTOF0DaqArray,
-          &DAQData::SetTOF0DaqArray, true);
+          &DAQData::SetTOF0DaqArray, false);
     RegisterValueBranch
           ("trigger", &_trigger_proc, &DAQData::GetTriggerArray,
-          &DAQData::SetTriggerArray, true);
+          &DAQData::SetTriggerArray, false);
 }
 }  // namespace MAUS
 

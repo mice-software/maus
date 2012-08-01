@@ -159,11 +159,11 @@ void V1731::SetMaxPos(int max_pos) {
     _max_pos = max_pos;
 }
 
-int V1731::GetTriggerTimeTag() const {
+double V1731::GetTriggerTimeTag() const {
     return _trigger_time_tag;
 }
 
-void V1731::SetTriggerTimeTag(int trigger_time_tag) {
+void V1731::SetTriggerTimeTag(double trigger_time_tag) {
     _trigger_time_tag = trigger_time_tag;
 }
 

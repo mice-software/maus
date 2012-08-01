@@ -84,7 +84,6 @@ void BTTracker::integrate(double target_indie, double* y, const BTField* field, 
   gsl_odeiv_system    system  = {FuncEqM, NULL, 8, NULL};
 
   double h      = step_size;
-  bool   fail   = false;
   int    nsteps = 0;
   while(fabs(indie-target_indie) > 1e-6)
   {
@@ -93,7 +92,6 @@ void BTTracker::integrate(double target_indie, double* y, const BTField* field, 
     if(status != GSL_SUCCESS)
     {
       throw(Squeal(Squeal::recoverable, "Failed during tracking", "BTTracker::integrate") );
-      fail = true;
       break;
     }
     if(nsteps > _maxNSteps)
@@ -103,7 +101,6 @@ void BTTracker::integrate(double target_indie, double* y, const BTField* field, 
           << "t: " << y[0] << " pos: " << y[1] << " " << y[2] << " " << y[3] << "\n"
           << "E: " << y[4] << " mom: " << y[5] << " " << y[6] << " " << y[7] << std::endl; 
       throw(Squeal(Squeal::recoverable, ios.str()+" Exceeded maximum number of steps\n", "BTTracker::integrate") );
-      fail = true;
       break;
     }
   }
@@ -405,7 +402,6 @@ void BTTracker::integrateMany(double target_indie, int n_events, double* y, doub
   gsl_odeiv_system    system  = {FuncEqM, NULL, 8*n_events, NULL};
 
   double h      = step_size;
-  bool   fail   = false;
   int    nsteps = 0;
   while(fabs(indie-target_indie) > 1e-6)
   {
@@ -414,7 +410,6 @@ void BTTracker::integrateMany(double target_indie, int n_events, double* y, doub
     if(status != GSL_SUCCESS)
     {
       throw(Squeal(Squeal::recoverable, "Failed during tracking", "BTTracker::integrateMany") );
-      fail = true;
       break;
     }
     if(nsteps > _maxNSteps)
@@ -424,7 +419,6 @@ void BTTracker::integrateMany(double target_indie, int n_events, double* y, doub
           << "t: " << y[0] << " pos: " << y[1] << " " << y[2] << " " << y[3] << "\n"
           << "E: " << y[4] << " mom: " << y[5] << " " << y[6] << " " << y[7] << std::endl; 
       throw(Squeal(Squeal::recoverable, ios.str()+"Exceeded maximum number of steps\n", "BTTracker::integrateMany") );
-      fail = true;
       break;
     }
   }

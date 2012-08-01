@@ -44,7 +44,7 @@ class CkovEvent {
     CkovEvent& operator=(const CkovEvent& _ckovevent);
 
     /** Destructor - any member pointers are deleted */
-    ~CkovEvent();
+    virtual ~CkovEvent();
 
 
     /** Returns CkovDigitArray */

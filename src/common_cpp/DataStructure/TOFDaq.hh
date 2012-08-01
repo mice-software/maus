@@ -47,7 +47,7 @@ class TOFDaq {
     TOFDaq& operator=(const TOFDaq& _tofdaq);
 
     /** Destructor - any member pointers are deleted */
-    ~TOFDaq();
+    virtual ~TOFDaq();
 
 
     /** Returns V1724Array */

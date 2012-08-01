@@ -24,6 +24,9 @@
 
 #pragma link C++ class MAUS::ThreeVector+;
 
+#pragma link C++ class MAUS::RunHeader+;
+#pragma link C++ class MAUS::RunFooter+;
+
 #pragma link C++ class MAUS::Spill+;
 #pragma link C++ class MAUS::Scalars+;
 #pragma link C++ class MAUS::EMRSpillData+;

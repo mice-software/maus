@@ -52,8 +52,7 @@ TEST_FILE_G4BL = {
     "beam":{
         "particle_generator":"file",
         "beam_file_format":"g4beamline_bl_track_file",
-        "beam_file":"%s/src/map/MapPyBeamMaker/test_g4bl.dat"
-          % os.environ.get("MAUS_ROOT_DIR"),
+        "beam_file":"$MAUS_ROOT_DIR/src/map/MapPyBeamMaker/test_g4bl.dat",
         "file_particles_per_spill":5,
         "random_seed":0,
         "definitions":[]
@@ -205,8 +204,8 @@ class TestMapPyBeamMaker(unittest.TestCase): # pylint: disable = R0904
         self.beam_maker.birth(json.dumps(TEST_FILE_G4BL))
         self.assertEqual(self.beam_maker.particle_generator, "file")
         self.assertEqual(self.beam_maker.use_beam_file, True)
-        self.assertEqual(self.beam_maker.beam_file, \
-    "%s/src/map/MapPyBeamMaker/test_g4bl.dat" % os.environ.get("MAUS_ROOT_DIR"))
+        self.assertEqual(self.beam_maker.beam_file,
+      os.path.expandvars("$MAUS_ROOT_DIR/src/map/MapPyBeamMaker/test_g4bl.dat"))
         self.assertEqual(self.beam_maker.beam_file_format, 
                          "g4beamline_bl_track_file")
         self.assertEqual(self.beam_maker.file_particles_per_spill, 5)
