@@ -43,7 +43,7 @@ bool ascending_station_numb(const SciFiSpacePoint& pnt1, const SciFiSpacePoint& 
 }
 
 bool SeedFinder::process(std::vector<SciFiSpacePoint> spacepoints) {
-  Hep3Vector pos1, pos2, pos3;
+  CLHEP::Hep3Vector pos1, pos2, pos3;
   SciFiSpacePoint sp1, sp2, sp3;
   int numb_spacepoints = spacepoints.size();
   sp1 = (spacepoints[0]);
@@ -127,9 +127,9 @@ void SeedFinder::momentumFromPoints(SciFiSpacePoint pnt1,
   // --------------------------------------------
   // ============================================
 
-  Hep3Vector pos1 = spacepoints[0].get_position();
-  Hep3Vector pos2 = spacepoints[1].get_position();
-  Hep3Vector pos3 = spacepoints[2].get_position();
+  CLHEP::Hep3Vector pos1 = spacepoints[0].get_position();
+  CLHEP::Hep3Vector pos2 = spacepoints[1].get_position();
+  CLHEP::Hep3Vector pos3 = spacepoints[2].get_position();
 
   // determine the phi angles of each three points
   double phi1, phi2, phi3;
@@ -209,7 +209,8 @@ void SeedFinder::momentumFromPoints(SciFiSpacePoint pnt1,
   // return true;
 }
 
-void SeedFinder::determineCentre(Hep3Vector& p1, Hep3Vector& p2, Hep3Vector& p3) {
+void SeedFinder::determineCentre(CLHEP::Hep3Vector& p1, CLHEP::Hep3Vector& p2,
+                                 CLHEP::Hep3Vector& p3) {
   CLHEP::HepMatrix a(3, 3);
   CLHEP::HepMatrix d(3, 3);
   CLHEP::HepMatrix e(3, 3);
@@ -280,7 +281,7 @@ void SeedFinder::determinePtFromR() { // double& r, double& B, double& pt ) {
   _pt = _r * _B * 0.3; // pt in MeV
 }
 
-void SeedFinder::determinePhi(Hep3Vector& pos, double& phi ) {
+void SeedFinder::determinePhi(CLHEP::Hep3Vector& pos, double& phi ) {
   // phi = atan2(pos.x() - _x0, pos.y() - _y0);
   phi = atan2(pos.y() - _y0, pos.x() - _x0); // correction
 

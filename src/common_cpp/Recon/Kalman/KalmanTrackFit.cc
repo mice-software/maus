@@ -44,7 +44,8 @@ bool sort_by_id(SciFiCluster *a, SciFiCluster *b ) {
 //
 // Global track fit.
 //
-void KalmanTrackFit::process(Hep3Vector &tof0, Hep3Vector &se, Hep3Vector &tof1) {
+void KalmanTrackFit::process(CLHEP::Hep3Vector &tof0, CLHEP::Hep3Vector &se,
+                             CLHEP::Hep3Vector &tof1) {
 /*  std::vector<KalmanSite> sites;
   KalmanTrack *track = new GlobalTrack();
   initialise_global_track(tof0, se, tof1, sites);
@@ -77,8 +78,9 @@ void KalmanTrackFit::process(Hep3Vector &tof0, Hep3Vector &se, Hep3Vector &tof1)
 */
 }
 
-void KalmanTrackFit::initialise_global_track(Hep3Vector &tof0, Hep3Vector &se,
-                                             Hep3Vector &tof1, std::vector<KalmanSite> &sites) {
+void KalmanTrackFit::initialise_global_track(CLHEP::Hep3Vector &tof0, CLHEP::Hep3Vector &se,
+                                             CLHEP::Hep3Vector &tof1,
+                                             std::vector<KalmanSite> &sites) {
   double se_tof1_sep = 60.0; // cm
   double se_tof0_sep = 720.0; // cm
 

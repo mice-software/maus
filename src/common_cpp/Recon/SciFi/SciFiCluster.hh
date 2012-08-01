@@ -22,27 +22,11 @@
 
 #ifndef SCIFICLUSTER_HH
 #define SCIFICLUSTER_HH
+
 // C headers
-#include <assert.h>
-#include <json/json.h>
-#include <CLHEP/Random/RandPoisson.h>
-#include <CLHEP/Random/RandGauss.h>
-#include <CLHEP/Random/RandExponential.h>
 #include <CLHEP/Vector/ThreeVector.h>
 
-// C++ headers
-#include <cmath>
-#include <iostream>
-#include <string>
-#include <sstream>
-#include <vector>
-
-// other headers
-#include "CLHEP/Units/PhysicalConstants.h"
-#include "CLHEP/Matrix/Matrix.h"
-#include "CLHEP/Vector/Rotation.h"
-
-#include "src/legacy/Config/MiceModule.hh"
+// MAUS headers
 #include "src/common_cpp/Recon/SciFi/SciFiDigit.hh"
 
 // namespace MAUS {
@@ -102,19 +86,19 @@ class SciFiCluster {
 
   bool is_used() const { return _used; }
 
-  void set_direction(Hep3Vector direction) { _direction = direction; }
+  void set_direction(CLHEP::Hep3Vector direction) { _direction = direction; }
 
-  Hep3Vector get_direction() const { return _direction; }
+  CLHEP::Hep3Vector get_direction() const { return _direction; }
 
-  void set_position(Hep3Vector position) { _position = position; }
+  void set_position(CLHEP::Hep3Vector position) { _position = position; }
 
-  Hep3Vector get_position() const { return _position; }
+  CLHEP::Hep3Vector get_position() const { return _position; }
 
-  void set_relative_position(Hep3Vector rel_pos) { _relat_pos = rel_pos; }
+  void set_relative_position(CLHEP::Hep3Vector rel_pos) { _relat_pos = rel_pos; }
 
   void set_alpha(double channel) { _alpha = channel; }
 
-  Hep3Vector get_relative_position() const { return _relat_pos; }
+  CLHEP::Hep3Vector get_relative_position() const { return _relat_pos; }
 
   double get_alpha() const { return _alpha; }
 
@@ -122,16 +106,16 @@ class SciFiCluster {
 
   int get_id() const { return _id; }
 
-  void set_true_momentum(Hep3Vector p) { _p = p; }
+  void set_true_momentum(CLHEP::Hep3Vector p) { _p = p; }
 
-  Hep3Vector get_true_momentum() const { return _p; }
+  CLHEP::Hep3Vector get_true_momentum() const { return _p; }
 
-  void set_true_position(Hep3Vector position) { _pos = position; }
+  void set_true_position(CLHEP::Hep3Vector position) { _pos = position; }
 
-  Hep3Vector get_true_position() const { return _pos; }
+  CLHEP::Hep3Vector get_true_position() const { return _pos; }
 
  private:
-  Hep3Vector _pos, _p;
+  CLHEP::Hep3Vector _pos, _p;
 
   bool _used;
 
@@ -141,11 +125,11 @@ class SciFiCluster {
 
   double _channel_w, _npe, _time;
 
-  Hep3Vector _direction;
+  CLHEP::Hep3Vector _direction;
 
-  Hep3Vector _position;
+  CLHEP::Hep3Vector _position;
 
-  Hep3Vector _relat_pos;
+  CLHEP::Hep3Vector _relat_pos;
 
   double _alpha;
 

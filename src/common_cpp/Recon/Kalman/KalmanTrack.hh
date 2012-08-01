@@ -21,6 +21,7 @@
 
 // C headers
 #include <assert.h>
+#include <CLHEP/Vector/ThreeVector.h>
 
 // C++ headers
 #include <string>

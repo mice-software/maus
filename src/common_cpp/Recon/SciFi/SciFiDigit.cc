@@ -28,5 +28,28 @@ SciFiDigit::SciFiDigit(int spill, int event, int tracker, int station,
                         _channel(channel), _npe(npe), _time(time), _used(false) {
 }
 
+SciFiDigit::SciFiDigit(const SciFiDigit& _scifidigit)
+          : _spill(0), _event(0), _tracker(0), _station(0), _plane(0), _channel(0),
+            _npe(0.0), _time(0.0), _used(false) {
+  *this = _scifidigit;
+}
+
+SciFiDigit& SciFiDigit::operator=(const SciFiDigit& _scifidigit) {
+    if (this == &_scifidigit) {
+        return *this;
+    }
+    _spill = _scifidigit._spill;
+    _event = _scifidigit._event;
+    _tracker = _scifidigit._tracker;
+    _station = _scifidigit._station;
+    _plane = _scifidigit._plane;
+    _channel = _scifidigit._channel;
+    _npe = _scifidigit._npe;
+    _time = _scifidigit._time;
+    _used = _scifidigit._used;
+    return *this;
+}
+
+
 SciFiDigit::~SciFiDigit() {}
 // } // ends namespace MAUS

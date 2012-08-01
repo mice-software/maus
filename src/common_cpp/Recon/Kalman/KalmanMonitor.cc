@@ -227,7 +227,7 @@ void KalmanMonitor::save_global_track(std::vector<KalmanSite> const &sites) {
   }
 }
 double KalmanMonitor::get_smoothed_measurement(KalmanSite &a_site) {
-  Hep3Vector dir = a_site.get_direction();
+  CLHEP::Hep3Vector dir = a_site.get_direction();
   double dx = dir.x();
   double dy = dir.y();
   static const double A = 2./(7.*0.427);

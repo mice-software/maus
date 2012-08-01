@@ -83,9 +83,9 @@ class KalmanSite {
 
   double get_alpha() const { return _alpha; }
 
-  void set_direction(Hep3Vector dir) { _direction = dir; }
+  void set_direction(CLHEP::Hep3Vector dir) { _direction = dir; }
 
-  Hep3Vector get_direction() const { return _direction; }
+  CLHEP::Hep3Vector get_direction() const { return _direction; }
 
   void set_z(double z) { _z = z; }
 
@@ -108,19 +108,19 @@ class KalmanSite {
   double get_residual_y() const { return _residual_y; }
 
   /////////////////////////////////////
-  void set_true_momentum(Hep3Vector mc_mom) { _mc_mom = mc_mom; }
+  void set_true_momentum(CLHEP::Hep3Vector mc_mom) { _mc_mom = mc_mom; }
 
-  Hep3Vector get_true_momentum() const { return _mc_mom; }
+  CLHEP::Hep3Vector get_true_momentum() const { return _mc_mom; }
 
-  void set_true_position(Hep3Vector mc_pos) { _mc_pos = mc_pos; }
+  void set_true_position(CLHEP::Hep3Vector mc_pos) { _mc_pos = mc_pos; }
 
-  Hep3Vector get_true_position() const { return _mc_pos; }
+  CLHEP::Hep3Vector get_true_position() const { return _mc_pos; }
   /////////////////////////////////////
 
  private:
-  Hep3Vector _mc_pos;
+  CLHEP::Hep3Vector _mc_pos;
 
-  Hep3Vector _mc_mom;
+  CLHEP::Hep3Vector _mc_mom;
 
   /// The state vector.
   TMatrixD _a;
@@ -147,7 +147,7 @@ class KalmanSite {
 
   int _id;
 
-  Hep3Vector _direction;
+  CLHEP::Hep3Vector _direction;
 
   /// The residual at this site. (filtered-meas)
   double _residual_x, _residual_y;

@@ -15,6 +15,11 @@
  *
  */
 
+// C headers
+#include <CLHEP/Vector/ThreeVector.h>
+#include <CLHEP/Matrix/Matrix.h>
+#include <CLHEP/Units/PhysicalConstants.h>
+
 // C++ headers
 #include <iostream>
 #include <fstream>
@@ -26,7 +31,6 @@
 
 // External libs headers
 #include "gsl/gsl_fit.h"
-#include "CLHEP/Matrix/Matrix.h"
 #include "TROOT.h"
 
 // MAUS headers
@@ -617,7 +621,7 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
                     // If the spacepoint has not already been used in a track fit
                     if ( !spnts_by_station[st_num][sp_no]->get_used() ) {
 
-                      Hep3Vector pos = spnts_by_station[st_num][sp_no]->get_position();
+                      CLHEP::Hep3Vector pos = spnts_by_station[st_num][sp_no]->get_position();
                       double dR = delta_R(circle, pos); // Calculate the residual dR
 
                       if ( debug > 1 ) {
@@ -1041,7 +1045,7 @@ double PatternRecognition::calculate_Phi(double xpos, double ypos, const SimpleC
   double angle = atan2(ypos - y_c, xpos - x_c);
 
   if ( angle < 0. )
-    angle += 2. * pi;
+    angle += 2. * CLHEP::pi;
   if ( debug > 0 ) std::cout << "Phi = " << angle << " (This is just from circle fit)\n";
   return angle;
 } // ~calculate_Phi(...)
@@ -1055,13 +1059,13 @@ bool PatternRecognition::turns_between_stations(const std::vector<double> &dz,
     for ( int i = 0; i < static_cast<int>(dphi.size()) - 1; ++i ) {
       int j = i + 1;
       if ( dphi[i] < 0 )
-        dphi[i] += 2. * pi;
+        dphi[i] += 2. * CLHEP::pi;
 
       if ( dphi[j] < 0 )
-        dphi[j] += 2. * pi;
+        dphi[j] += 2. * CLHEP::pi;
 
       if ( dphi[j] < dphi[i] )
-        dphi[j] += 2. * pi;
+        dphi[j] += 2. * CLHEP::pi;
 
       double z_ratio = dz[j] / dz[i];
       double phi_ratio = dphi[j] / dphi[i];
@@ -1087,12 +1091,12 @@ bool PatternRecognition::AB_ratio(double &dphi_ji, double &dphi_kj, double dz_ji
   for ( int n = 0; n < 10; ++n ) // {
     for ( int m = 0; m < 10; ++m ) { // m always less than or equal to n
       double A, B;
-      A = ( dphi_kj + ( 2 * n * pi ) ) / ( dphi_ji + ( 2 * m * pi ) ); // phi_ratio
+      A = ( dphi_kj + ( 2 * n * CLHEP::pi ) ) / ( dphi_ji + ( 2 * m * CLHEP::pi ) ); // phi_ratio
       B = dz_kj / dz_ji; // z_ratio
       if ( debug > 0 ) std::cout <<  " A - B  = " << fabs(A - B)/B << std::endl;
       if ( fabs(A - B) / B < _AB_cut ) {
-        dphi_kj += 2 * n * pi;
-        dphi_ji += 2 * m * pi;
+        dphi_kj += 2 * n * CLHEP::pi;
+        dphi_ji += 2 * m * CLHEP::pi;
 
         return true;
       }
@@ -1559,8 +1563,8 @@ void PatternRecognition::set_ignore_stations(const std::vector<int> &ignore_stat
 void PatternRecognition::draw_line(const SciFiSpacePoint *sp1, const SciFiSpacePoint *sp2,
                                    SimpleLine &line_x, SimpleLine &line_y) {
 
-  Hep3Vector pos_outer = sp1->get_position();
-  Hep3Vector pos_inner = sp2->get_position();
+  CLHEP::Hep3Vector pos_outer = sp1->get_position();
+  CLHEP::Hep3Vector pos_inner = sp2->get_position();
 
   line_x.set_m(( pos_inner.x() - pos_outer.x()) / (pos_inner.z() - pos_outer.z() ));
   line_x.set_c(pos_outer.x() - ( pos_outer.z() * line_x.get_m()) );
@@ -1571,7 +1575,7 @@ void PatternRecognition::draw_line(const SciFiSpacePoint *sp1, const SciFiSpaceP
 void PatternRecognition::calc_residual(const SciFiSpacePoint *sp, const SimpleLine &line_x,
                                        const SimpleLine &line_y, double &dx, double &dy) {
 
-    Hep3Vector pos = sp->get_position();
+    CLHEP::Hep3Vector pos = sp->get_position();
     dx = pos.x() - ( line_x.get_c() + ( pos.z() * line_x.get_m() ) );
     dy = pos.y() - ( line_y.get_c() + ( pos.z() * line_y.get_m() ) );
 } // ~calc_residual(...)

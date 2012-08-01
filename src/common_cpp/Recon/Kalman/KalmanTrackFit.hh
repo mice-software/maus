@@ -55,7 +55,7 @@ class KalmanTrackFit {
 
   void process(std::vector<SciFiStraightPRTrack> straight_tracks);
 
-  void process(Hep3Vector &tof0, Hep3Vector &se, Hep3Vector &tof1);
+  void process(CLHEP::Hep3Vector &tof0, CLHEP::Hep3Vector &se, CLHEP::Hep3Vector &tof1);
 
   // This will: initialise the state vector;
   // Set covariance matrix;
@@ -64,8 +64,8 @@ class KalmanTrackFit {
 
   void initialise(SciFiHelicalPRTrack &evt, std::vector<KalmanSite> &sites);
 
-  void initialise_global_track(Hep3Vector &tof0, Hep3Vector &se,
-                               Hep3Vector &tof1, std::vector<KalmanSite> &sites);
+  void initialise_global_track(CLHEP::Hep3Vector &tof0, CLHEP::Hep3Vector &se,
+                               CLHEP::Hep3Vector &tof1, std::vector<KalmanSite> &sites);
 
   void process_clusters(std::vector<SciFiSpacePoint> &spacepoints,
                         std::vector<SciFiCluster*> &clusters);

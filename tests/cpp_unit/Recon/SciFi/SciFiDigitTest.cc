@@ -28,6 +28,100 @@ class SciFiDigitTest : public ::testing::Test {
   virtual void TearDown() {}
 };
 
+TEST_F(SciFiDigitTest, test_default_constructor) {
+  SciFiDigit *digit = new SciFiDigit();
+  EXPECT_FALSE(digit->is_used());
+}
+
+TEST_F(SciFiDigitTest, test_parameter_constructor) {
+  int spill = 1;
+  int event = 2;
+  int tracker = 1;
+  int station = 2;
+  int plane = 0;
+  int channel = 106;
+  double npe = 3.2;
+  double time = 12.2;
+
+  SciFiDigit *digit = new SciFiDigit(spill, event, tracker, station, plane, channel, npe, time);
+
+  EXPECT_EQ(digit->get_spill(), spill);
+  EXPECT_EQ(digit->get_event(), event);
+  EXPECT_EQ(digit->get_tracker(), tracker);
+  EXPECT_EQ(digit->get_station(), station);
+  EXPECT_EQ(digit->get_plane(), plane);
+  EXPECT_EQ(digit->get_channel(), channel);
+  EXPECT_EQ(digit->get_npe(), npe);
+  EXPECT_EQ(digit->get_time(), time);
+  EXPECT_FALSE(digit->is_used());
+}
+
+TEST_F(SciFiDigitTest, test_copy_constructor) {
+  int spill = 1;
+  int event = 2;
+  int tracker = 1;
+  int station = 2;
+  int plane = 0;
+  int channel = 106;
+  double npe = 3.2;
+  double time = 12.2;
+
+  SciFiDigit *digit1 = new SciFiDigit(spill, event, tracker, station, plane, channel, npe, time);
+  SciFiDigit *digit2 = new SciFiDigit(*digit1);
+  delete digit1;
+
+  EXPECT_EQ(digit2->get_spill(), spill);
+  EXPECT_EQ(digit2->get_event(), event);
+  EXPECT_EQ(digit2->get_tracker(), tracker);
+  EXPECT_EQ(digit2->get_station(), station);
+  EXPECT_EQ(digit2->get_plane(), plane);
+  EXPECT_EQ(digit2->get_channel(), channel);
+  EXPECT_EQ(digit2->get_npe(), npe);
+  EXPECT_EQ(digit2->get_time(), time);
+  EXPECT_FALSE(digit2->is_used());
+}
+
+TEST_F(SciFiDigitTest, test_destructor) {
+  int spill = 1;
+  int event = 2;
+  int tracker = 1;
+  int station = 2;
+  int plane = 0;
+  int channel = 106;
+  double npe = 3.2;
+  double time = 12.2;
+
+  SciFiDigit *digit = new SciFiDigit(spill, event, tracker, station, plane, channel, npe, time);
+  delete digit;
+}
+
+TEST_F(SciFiDigitTest, test_assignment_operator) {
+  int spill = 1;
+  int event = 2;
+  int tracker = 1;
+  int station = 2;
+  int plane = 0;
+  int channel = 106;
+  double npe = 3.2;
+  double time = 12.2;
+
+  SciFiDigit *digit1 = new SciFiDigit(spill, event, tracker, station, plane, channel, npe, time);
+  SciFiDigit *digit2 = new SciFiDigit();
+  *digit2 = *digit1;
+  delete digit1;
+
+  EXPECT_EQ(digit2->get_spill(), spill);
+  EXPECT_EQ(digit2->get_event(), event);
+  EXPECT_EQ(digit2->get_tracker(), tracker);
+  EXPECT_EQ(digit2->get_station(), station);
+  EXPECT_EQ(digit2->get_plane(), plane);
+  EXPECT_EQ(digit2->get_channel(), channel);
+  EXPECT_EQ(digit2->get_npe(), npe);
+  EXPECT_EQ(digit2->get_time(), time);
+  EXPECT_FALSE(digit2->is_used());
+}
+
+
 TEST_F(SciFiDigitTest, test_setters_getters) {
   int spill = 1;
   int event = 2;
@@ -66,26 +160,4 @@ TEST_F(SciFiDigitTest, test_used_flag) {
   EXPECT_TRUE(digit->is_used());
 }
 
-TEST_F(SciFiDigitTest, test_constructor) {
-  int spill = 1;
-  int event = 2;
-  int tracker = 1;
-  int station = 2;
-  int plane = 0;
-  int channel = 106;
-  double npe = 3.2;
-  double time = 12.2;
-
-  SciFiDigit *digit = new SciFiDigit(spill, event, tracker, station, plane, channel, npe, time);
-
-  EXPECT_EQ(digit->get_spill(), spill);
-  EXPECT_EQ(digit->get_event(), event);
-  EXPECT_EQ(digit->get_tracker(), tracker);
-  EXPECT_EQ(digit->get_station(), station);
-  EXPECT_EQ(digit->get_plane(), plane);
-  EXPECT_EQ(digit->get_channel(), channel);
-  EXPECT_EQ(digit->get_npe(), npe);
-  EXPECT_EQ(digit->get_time(), time);
-  EXPECT_FALSE(digit->is_used());
-}
 // } // namespace

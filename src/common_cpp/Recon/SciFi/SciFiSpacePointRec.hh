@@ -30,6 +30,8 @@
 #include <CLHEP/Random/RandGauss.h>
 #include <CLHEP/Random/RandExponential.h>
 #include <CLHEP/Units/PhysicalConstants.h>
+#include <CLHEP/Vector/ThreeVector.h>
+#include <CLHEP/Matrix/Matrix.h>
 
 // C++ headers
 #include <cmath>

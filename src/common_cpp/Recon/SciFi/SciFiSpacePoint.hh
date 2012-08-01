@@ -26,6 +26,7 @@
 // C headers
 #include <assert.h>
 #include <json/json.h>
+#include <CLHEP/Vector/ThreeVector.h>
 
 #include <CLHEP/Random/RandPoisson.h>
 #include <CLHEP/Random/RandGauss.h>
@@ -78,9 +79,9 @@ class SciFiSpacePoint {
 
   std::string get_type()  const { return _type; }
 
-  void set_position(Hep3Vector position) { _position = position; }
+  void set_position(CLHEP::Hep3Vector position) { _position = position; }
 
-  Hep3Vector get_position() const { return _position; }
+  CLHEP::Hep3Vector get_position() const { return _position; }
 
   void set_chi2(double chi2) { _chi2 = chi2; }
 
@@ -105,7 +106,7 @@ class SciFiSpacePoint {
 
   double _npe;
 
-  Hep3Vector _position;
+  CLHEP::Hep3Vector _position;
 
   double _chi2;
 

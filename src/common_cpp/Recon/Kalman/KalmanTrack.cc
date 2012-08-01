@@ -85,7 +85,7 @@ void KalmanTrack::update_G(KalmanSite *a_site) {
 }
 
 void KalmanTrack::update_H(KalmanSite *a_site) {
-  Hep3Vector dir = a_site->get_direction();
+  CLHEP::Hep3Vector dir = a_site->get_direction();
   double dx = dir.x();
   double dy = dir.y();
 
