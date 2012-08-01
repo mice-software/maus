@@ -201,7 +201,7 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
          export PATH="\${maus_bin_dirs}:\${PATH}" # else add it
      fi
 
-     maus_lib_dirs="\${MAUS_THIRD_PARTY}/third_party/install/lib:\${MAUS_THIRD_PARTY}/third_party/install/lib64"
+     maus_lib_dirs="\${MAUS_THIRD_PARTY}/third_party/install/lib"
      if [ "$arch" == "Darwin" ]; then
          maus_lib_dirs="\${MAUS_THIRD_PARTY}/third_party/install/Python.framework/Versions/2.7/lib:\${maus_lib_dirs}"
      fi
@@ -228,22 +228,24 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      # Celery
      export CELERY_CONFIG_MODULE="mauscelery.celeryconfig"
 
-     #export CLHEP_BASE_DIR="\${MAUS_THIRD_PARTY}/third_party/install/\${G4VERS}"
-
      export G4DEBUG=1
-     export G4VERS=geant4.9.5.p01
+     export G4VERS=geant4.9.2.p04
      export G4SYSTEM=$arch-g++
+     export G4INSTALL="\${MAUS_THIRD_PARTY}/third_party/build/\${G4VERS}"
+     export G4LIB="\${G4INSTALL}/lib"
+     export $DYLIB_VAR="\${G4LIB}/\${G4SYSTEM}:\${$DYLIB_VAR}"
+     export G4INCLUDE="\${G4INSTALL}/include/"
+     export G4TMP="\${G4INSTALL}"
      export G4VIS_BUILD_DAWNFILE_DRIVER=1
      export G4VIS_USE_DAWNFILE=1
      export G4VIS_USE=0
      export G4OPTIMISE=2
      export OGLHOME=/usr/X11R6
-     export G4DATA="${MAUS_THIRD_PARTY}/third_party/install/share/Geant4-9.5.1/data"
-     export G4LEDATA="${G4DATA}/G4EMLOW6.23/"
-     export G4ABLADATA="${G4DATA}/G4ABLA3.0/"
-     export G4NEUTRONDATA="${G4DATA}/G4NDL3.13/"
-     export G4LEVELGAMMADATA="${G4DATA}/PhotonEvaporation2.2/"
-     export G4RADIOACTIVEDATA="${G4DATA}/RadioactiveDecay3.4/"
+     export G4LEDATA="\${G4INSTALL}/data/G4EMLOW6.2/"
+     export G4ABLADATA="\${G4INSTALL}/data/G4ABLA3.0/"
+     export G4NEUTRONDATA="\${G4INSTALL}/data/G4NDL3.13/"
+     export G4LEVELGAMMADATA"=\${G4INSTALL}/data/PhotonEvaporation2.0/"
+     export G4RADIOACTIVEDATA"=\${G4INSTALL}/data/RadioactiveDecay3.2/"
 
      export MICEFILES="\${MAUS_ROOT_DIR}/src/legacy/FILES"
 
@@ -252,6 +254,8 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      export maus_debug=0 # enable debugging
      export maus_gprof=0 # enable cpp profiling of cpp unit tests 
                          # requires gprof
+     export maus_assert_active=0 # enable assert() command - disabled by default
+                                 # as better to use exceptions
 
      echo "SUCCESS: MAUS setup"
 else
