@@ -75,7 +75,8 @@ def arg_parser():
     parser = argparse.ArgumentParser(description=DESCRIPTION, \
                            formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--input-file', dest='input_file', \
-                        help='Read in json file with this name', required=True)
+                        help='Read in raw data tarball file with this name', \
+                        required=True)
     parser.add_argument('--test', dest='test_mode', \
                         help='Run the batch job using test cdb output',
                         action='store_true', default=False)

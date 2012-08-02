@@ -72,7 +72,7 @@ class InputCppDAQOfflineDataTestCase(unittest.TestCase): #pylint:disable=R0904
         digester = md5.new()
 
         for i in self.mapper.emitter():
-            digester.update(i)
+            digester.update(i) #pylint: disable=E1101
             event_count = event_count + 1
 
         # We should now have processed 26 events
