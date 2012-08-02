@@ -35,9 +35,9 @@ HelicalTrack::HelicalTrack(SciFiHelicalPRTrack const &seed) {
   // tracker 1: B = -4T.
   int tracker = seed.get_tracker();
   if ( tracker == 0 ) {
-    _sign = -1;
+    _sign = 1; //fliping all signs..because x is flipped
   } else {
-    _sign = 1;
+    _sign = -1;
   }
   // _r  = seed.get_R();
 }
@@ -53,7 +53,7 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   if ( new_site->get_id() < 15 ) {
     deltaZ = - deltaZ;
   }
-
+  assert(deltaZ>0);
   // std::cerr << new_site->get_id() << " " << old_site->get_id() << std::endl;
   // std::cerr << new_site->get_z() << " " << old_site->get_z() << std::endl;
   // Find drho.
@@ -66,7 +66,14 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   double old_kappa  = prev_site(3, 0);
   double old_tan_lambda = prev_site(4, 0);
 
-  double old_phi = 
+  double old_phi;
+  if ( old_kappa > 0 ) {
+    old_phi = atan((_y0-old_y)/(_x0-old_x));
+  } else {
+    old_phi = atan((old_y-_y0)/(old_x-_x0));
+  }
+
+
   // Find d_rho.
   double circle_x = _x0+old_r*cos(old_phi);
   double circle_y = _y0+old_r*sin(old_phi);
@@ -76,21 +83,49 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
     d_rho = -d_rho;
   }
 
-  std::cerr << "Drho: " << d_rho << std::endl;
-
   // double new_phi = - old_site_kappa * deltaZ/(_alpha * old_site_tan_lambda);
   double delta_phi = _sign*deltaZ/(old_r * old_tan_lambda);
   double new_phi   = (old_phi+delta_phi);
-  std::cerr << "Phi: " << old_phi << " " << new_phi << std::endl;
   double _alpha = 1./(0.3*4.);
+  double drho_dr, drho_dkappa;
+  if ( d_rho == 0 ) {
+    drho_dr     = 0;
+    drho_dkappa = 0;
+  } else {
+    drho_dr = -(1./d_rho)*( (old_x-_x0*old_r*cos(old_phi))*_x0*cos(old_phi) +
+                            (old_y-_y0*old_r*sin(old_phi))*_y0*sin(old_phi) );
+
+    drho_dkappa = (1./d_rho)*( (old_x - _sign*_alpha*_x0*cos(old_phi)/old_kappa)*
+                                       (_sign*_alpha*_x0*cos(old_phi))/(old_kappa*old_kappa) +
+                               (old_y - _sign*_alpha*_y0*sin(old_phi)/old_kappa)*
+                                       (_sign*_alpha*_y0*sin(old_phi))/(old_kappa*old_kappa) );
+  }
+
+  std::cerr << "Track Parameters: " << "\n"
+            << "old x:     " << old_x << "\n"
+            << "old y:     " << old_y << "\n"
+            << "old R:     " << old_r << "\n"
+            << "old kappa: " << old_kappa << "\n"
+            << "old tan_lambda: " << old_tan_lambda << "\n"
+            << "old phi:   " << old_phi << "\n"
+            << "new phi:   " << new_phi << "\n"
+            << "circle_x:  " << circle_x << "\n"
+            << "circle_y:  " << circle_y << "\n"
+            << "drho:      " << d_rho << "\n"
+            << "drho derivatives: " << drho_dr << " " << drho_dkappa << std::endl;
+  std::cerr << "New Parameters: " << "\n"
+            << "x:     " <<  old_x+d_rho*cos(old_phi)+(_alpha/old_kappa)*(cos(old_phi)-cos(new_phi)) << "\n"
+            << "y:     " <<  old_y+d_rho*sin(old_phi)+(_alpha/old_kappa)*(sin(old_phi)-sin(new_phi)) << "\n";
+
+
   //assert(delta_phi < 4);
   // double old_phi_degrees = old_site_phi;
   // Build _F.
-  _F(0, 0) = 1.0+(old_x-_x0*old_r*cos(old_phi)*cos(old_phi))/d_rho;
-  _F(0, 1) = (old_y-_y0*old_r*sin(old_phi)*cos(old_phi))/d_rho;;
+  _F(0, 0) = 1.0+((old_x-_x0*old_r*cos(old_phi))*cos(old_phi))/d_rho;
+  _F(0, 1) = ((old_y-_y0*old_r*sin(old_phi))*cos(old_phi))/d_rho;
   _F(0, 2) = -d_rho*sin(old_phi) + (_alpha/old_kappa)*(-sin(old_phi) + sin(new_phi));
-  _F(0, 3) = 
-  _F(0, 4) = 
+  _F(0, 3) = drho_dr*cos(old_phi) + _sign*(cos(old_phi) - cos(new_phi));
+  _F(0, 4) = drho_dkappa*cos(old_phi) - _alpha/(old_kappa*old_kappa)*(cos(old_phi) - cos(new_phi));
 
   _F(1, 0) = 0.0;
   _F(1, 1) = 1.0;

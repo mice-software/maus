@@ -58,14 +58,14 @@ void HelicalTrackTest::set_up_seed() {
 
 void HelicalTrackTest::set_up_sites() {
   old_site.set_z(0.0);
-  new_site.set_z(-1100.0);
+  new_site.set_z(-550.0);
   new_site.set_id(10);
 
   TMatrixD a(5, 1);
-  a(0, 0) = x0+radius*cos(phi0);
-  a(1, 0) = y0+radius*sin(phi0);
+  a(0, 0) = x0+radius*cos(phi0)+0.1;
+  a(1, 0) = y0+radius*sin(phi0)+0.2;
   a(2, 0) = radius;
-  a(3, 0) = phi0;
+  a(3, 0) = kappa;
   a(4, 0) = tan_lambda;
   old_site.set_a(a);
 }
@@ -84,7 +84,7 @@ TEST_F(HelicalTrackTest, test_propagator) {
   TMatrixD a(5, 1);
   a(0, 0) = x0+radius*cos(phi0);
   a(1, 0) = y0+radius*sin(phi0);
-  a(2, 0) = phi0;
+  a(2, 0) = radius;
   a(3, 0) = kappa;
   a(4, 0) = tan_lambda;
 
