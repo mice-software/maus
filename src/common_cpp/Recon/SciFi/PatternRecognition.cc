@@ -761,7 +761,7 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
                       std::ofstream out1("params_recon.txt", std::ios::out | std::ios::app);
                       out1 << circle.get_R() << "\t" << tan_lambda << "\t";
                       out1 << Phi_0 << "\t" << pt << "\t" << pz << "\t";
-                      out1 << 0  << good_spnts[0]->get_tracker() << std::endl;
+                      out1 << 0  <<"\t"<< good_spnts[0]->get_tracker() << std::endl;
                     }
 
                     if ( !_use_full_helix_fit ) {
@@ -1091,7 +1091,7 @@ bool PatternRecognition::AB_ratio(double &dphi_ji, double &dphi_kj, double dz_ji
   for ( int n = 0; n < 10; ++n ) // {
     for ( int m = 0; m < 10; ++m ) { // m always less than or equal to n
       double A, B;
-      A = ( dphi_kj + ( 2 * n * CLHEP::pi ) ) / ( dphi_ji + ( 2 * m * CLHEP::pi ) ); // phi_ratio
+      A = ( dphi_kj + ( 2 * m * CLHEP::pi ) ) / ( dphi_ji + ( 2 * n * CLHEP::pi ) ); // phi_ratio
       B = dz_kj / dz_ji; // z_ratio
       if ( debug > 0 ) std::cout <<  " A - B  = " << fabs(A - B)/B << std::endl;
       if ( fabs(A - B) / B < _AB_cut ) {
