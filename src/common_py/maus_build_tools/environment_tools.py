@@ -382,6 +382,9 @@ def set_geant4(conf, env):
     Nb: sometimes geant4 builds some but not all libraries - so we really do
     need to check for every one.
     """
+    g4_include = os.getenv('G4INCLUDE')
+    if g4_include != '' and g4_include != None:
+        env.Append(CPPPATH=[g4_include])
     if not conf.CheckCXXHeader('Geant4/G4EventManager.hh'):
         my_exit(1)
 
