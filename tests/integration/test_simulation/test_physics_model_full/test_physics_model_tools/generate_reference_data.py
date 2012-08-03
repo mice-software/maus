@@ -22,7 +22,7 @@ generating reference tests and geometry sets
 
 
 #import test_physics_model_tools
-import test_physics_model_tools.code_comparison as cc
+import code_comparison as cc
 import os
 import xboa.Common as Common
 import operator
@@ -43,6 +43,8 @@ import exceptions
 MICE_CONFIGURATIONS = [ #thickness in mm, momentum in MeV/c
 {'__material__':'lH2' , '__thickness__':350.,  '__momentum__':200.,
  '__pid__':-13, '__step__':100., '__nev__':100000, '__seed__':1}, # 100k events
+]
+void = [
 {'__material__':'lH2',  '__thickness__':350.,  '__momentum__':400., 
  '__pid__':-13, '__step__':100., '__nev__':10000, '__seed__':1},
 {'__material__':'lH2',  '__thickness__':350.,  '__momentum__':800., 
@@ -323,8 +325,6 @@ class TestFactory:
                 print 'Caught exception in configuration ', config, \
                                                             'code', self.__code
                 sys.excepthook(*sys.exc_info())
-                if sys.exc_info()[0] == exceptions.KeyboardInterrupt:
-                    raise exceptions.KeyboardInterrupt
         print >> fout, '\n]\n'
         fout.close()
 
