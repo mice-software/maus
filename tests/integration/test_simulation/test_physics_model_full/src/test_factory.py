@@ -28,20 +28,20 @@ list of tests that run against that geometry.
 """
 
 
-#import test_physics_model_tools
-import os
 import operator
 import sys
 
 import xboa.Common as Common
 
-import code_setup
-import tests
-import geometry
+import code_setup # pylint: disable=W0403
+import tests # pylint: disable=W0403
+import geometry # pylint: disable=W0403
 
 
 MICE_CONFIGURATIONS = [ #thickness in mm, momentum in MeV/c
 {'__material__':'lH2' , '__thickness__':350.,  '__momentum__':200.,
+ '__pid__':-13, '__step__':100., '__nev__':1000, '__seed__':1}, # 100k events
+{'__material__':'lH2' , '__thickness__':35.,  '__momentum__':200.,
  '__pid__':-13, '__step__':100., '__nev__':1000, '__seed__':1}, # 100k events
 ]
 void = [
@@ -127,12 +127,6 @@ class TestFactory:
     The reference dataset contains sufficient information to then rerun on each
     new version.
     """
-    maus   = 'maus'
-    g4bl   = 'g4bl'
-    icool  = 'icool'
-    g4mice = 'g4mice_simulation'
-    codes  = (maus, g4bl, icool, g4mice)
-
     n_ks_divs = 500
 
     my_tests = [
@@ -141,22 +135,6 @@ class TestFactory:
       tests.KSTest.new('energy', 'MeV', [202.+x/4. for x in range(n_ks_divs+1)],
                                    [0]*n_ks_divs, 10000, 1.0, 10000, 0.0, 0.01)
     ]
-
-    #list of configuration substitutions
-    pos_keys = ['__thickness__', '__step__'] #dimensions of position
-    mom_keys = ['__momentum__'] #dimensions of momentum
-    mat_keys = ['__material__'] #materials (encoding between ICOOL and G4)
-    pid_keys = ['__pid__'] #pid (different encoding between ICOOL and G4)
-    no_keys  = ['__nev__','__seed__'] #not code dependent
-
-    g4mice_material_to_g4bl = {
-    'lH2':'LH2', 'LITHIUM_HYDRIDE':'LITHIUM_HYDRIDE', 'Al':'Al', 'Be':'Be',
-    'lHe':'lHe', 'STEEL304':'Fe','Cu':'Cu'
-    }
-
-    test_dir = os.path.expandvars(
-             '$MAUS_ROOT_DIR/tests/integration/test_simulation/'+\
-             'test_physics_model_full')
 
     def __init__(self, code):
         self.__code = code
@@ -169,22 +147,6 @@ class TestFactory:
                 '__nev__':(lambda x: x),
                 '__seed__':(lambda x: x),
                }
-
-    def temp(file_name):
-        """Prefix to temporary directory"""
-        return os.path.join(TestFactory.test_dir, 'tmp', file_name)
-    temp = staticmethod(temp)
-
-    def source(file_name):
-        """Prefix to source files directory"""
-        return os.path.join(TestFactory.test_dir, 'files', file_name)
-    source = staticmethod(source)
-
-    def ref_data(file_name):
-        """Prefix to reference data directory"""
-        return os.path.join(TestFactory.test_dir, 'ref_data', file_name)
-    ref_data = staticmethod(ref_data)
-
 
     def code_convert(self, config):
         """
@@ -213,18 +175,6 @@ class TestFactory:
         return str(self.__code)+': '+_dt+' mm '+_mat+' with '+_nev+' '+\
                 _pz+' MeV/c '+_pid+' '+_dz+' mm steps'
 
-    def bunch_read(self):
-        """Function call for xboa to read in output data set"""
-        return self.__code.get_bunch_read_keys()
-        bunch_read = {
-          self.g4mice:('g4mice_virtual_hit', 'Sim.out.gz'),
-        }
-
-    def bunch_index(self):
-        """Index of the relevant station containing bunch data to be tested"""
-        bunch_index = {self.maus:2, self.g4mice:2, self.icool:5, self.g4bl:2}
-        return bunch_index[self.__code]
-
     def code_parameters(self):
         """Controls how each executable will be called by MAUS"""
         code_parameters = (
@@ -233,14 +183,6 @@ class TestFactory:
             self.__code.get_substitutions()
         )
         return code_parameters
-        code_parameters = {
-          self.g4mice:(
-              os.path.join('$MICESRC','Applications','Simulation','Simulation'),
-            [self.prefix('cards')],
-            {self.prefix('cards.in'):self.prefix('cards'),
-             self.prefix('MaterialBlock.in'):self.prefix('MaterialBlock.dat')}),
-        }
-        return code_parameters[self.__code]
 
     def build_geometry(self, config):
         """Build and run a set of tests for a specific geometry set up"""
@@ -251,7 +193,7 @@ class TestFactory:
         geo.code_model = self.code_parameters()
         geo.substitutions = self.code_convert(config)
         geo.bunch_index = self.__code.get_bunch_index()
-        geo.bunch_read = self.bunch_read()
+        geo.bunch_read = self.__code.get_bunch_read_keys()
         geo.tests = self.my_tests
         #now run a batch job to get axis range right on tests
         geo.run_mc()
@@ -275,7 +217,7 @@ class TestFactory:
         """
         Build and run a full reference data set from a list of configurations
         """
-        fout_name = self.ref_data(self.__code.get_output_filename())
+        fout_name = geometry.ref_data(self.__code.get_output_filename())
         fout = open(fout_name, 'w')
         print >> fout, '[\n'
         for config in configurations:
@@ -293,29 +235,22 @@ def main():
     """
     Generate tests for each code listed in the program argument
     """
-    here = os.getcwd()
-    try:
-        os.chdir(os.path.expandvars('$MAUS_ROOT_DIR/tmp'))
-        code_converters = {
-            'maus':code_setup.MausSetup(),
-            'icool':code_setup.IcoolSetup(),
-            'g4bl':code_setup.G4blSetup(),
-        }
-        if len(sys.argv) == 1:
-            print """
+    code_converters = {
+        'maus':code_setup.MausSetup(),
+        'icool':code_setup.IcoolSetup(),
+        'g4bl':code_setup.G4blSetup(),
+    }
+    if len(sys.argv) == 1:
+        print """
 Error - call using
-     generate_reference_data.py <code_1> <code_2> <...>
+ generate_reference_data.py <code_1> <code_2> <...>
 where <code_n> is one of"""
-            for key in code_converters.keys():
-                print "   ", key
-            print
-        for arg in sys.argv[1:]:
-            test_factory = TestFactory(code_converters[arg])
-            test_factory.build_test_data(MICE_CONFIGURATIONS)
-    except:
-        raise
-    finally:
-        os.chdir(here)
+        for key in code_converters.keys():
+            print "   ", key
+        print
+    for arg in sys.argv[1:]:
+        test_factory = TestFactory(code_converters[arg])
+        test_factory.build_test_data(MICE_CONFIGURATIONS)
     sys.exit(0)
 
 if __name__ == '__main__':

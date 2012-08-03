@@ -14,13 +14,11 @@
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-Framework for Application-level tests for G4MICE
-
 Application-level tests for MAUS simulation (and other monte carlo codes)
 usually involve running an application against some geometry files and then
 running a set of tests on the output. code_comparison provides a framework for
-these sorts of tests. In code_comparison we define a geometry object and
-associate with each geometry object a set of test objects. 
+these sorts of tests. We define a geometry object and associate with each
+geometry object a set of test objects. 
 
 * The geometry object knows enough to set-up a geometry and any other input data
    and run the code. Because it's faster, the geometry also reads the output.
@@ -28,13 +26,6 @@ associate with each geometry object a set of test objects.
   them appropriately and calculate appropriate test variables on the output
 * eval( repr(geometry) ) should recreate a copy of the geometry. Then storage of
   reference datasets and geometries is done by writing repr(geometry) to disk
-
-In this file I define
-
-* geometry = geometry object for running simulation code as described above
-* test     = test abstract data type
-* ks_test  = implementation of test that does a Kolmogorov-Smirnov test of some 
-             user-defined list of variables against some bunch
 
 This can be run as a standalone program from the command line, in which case it 
 takes two arguments
@@ -63,12 +54,11 @@ takes two arguments
 #      with wanting more than one constructor with the same number of parameters
 
 import sys
-import os
 
-from tests import Test
-from tests import KSTest
-from tests import HitEqualityTest
-from geometry import Geometry
+from tests import Test # pylint: disable=W0611, W0403
+from tests import KSTest # pylint: disable=W0611, W0403
+from tests import HitEqualityTest # pylint: disable=W0611, W0403
+from geometry import Geometry # pylint: disable=W0611, W0403
 
 def read_geometries(ref_data_in):
     """
@@ -99,11 +89,9 @@ def run_tests(geometries_in, geometries_out):
     Run all the geometries in the list
       geometry_list = list of geometry objects
     """
-    here = os.getcwd()
     (passes, fails, warns)=(0, 0, 0)
     for geo_in in geometries_in: 
         try:
-            os.chdir(os.path.expandvars('$MAUS_ROOT_DIR/tmp'))
             geo_out = geo_in.deepcopy()
             (my_passes, my_fails, my_warnings) = geo_out.run_tests()
             passes += my_passes
@@ -114,8 +102,6 @@ def run_tests(geometries_in, geometries_out):
         except Exception: #pylint: disable=W0703
             print 'Caught exception in geometry ', geo_in.name
             sys.excepthook(*sys.exc_info())
-        finally:
-            os.chdir(here)
     return (passes, fails, warns)
 
 

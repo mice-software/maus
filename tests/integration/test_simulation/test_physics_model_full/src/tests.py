@@ -36,6 +36,9 @@ class Test:
 
     Geometry object runs the Monte Carlo and returns a xboa.Bunch.Bunch object
     which contains particle data.
+
+    _hists is a list of histograms - for plotting multiple tests on the same
+    canvas (used by test_plot)
     """
     def __init__(self):
         """Initialise the test to 0."""
@@ -83,6 +86,9 @@ class Test:
         raise(NotImplementedError(__name__+\
                                     " not implemented for this test class"))
     make_plots = staticmethod(make_plots)
+
+    _hists = []
+
 
 ####################
 
@@ -256,21 +262,23 @@ class KSTest(Test): #note inheritance from test pylint: disable=R0902
 
         lower, upper = KSTest.hist_width(ks_test_list)
 
+        h_start = len(Test._hists)
         hist = xboa.Common.make_root_histogram(
-                  name+'-'+str(len(Common._hist_persistent)),
-                  [], name, n_x_bins = 10000, xmin=lower, xmax=upper,
+                  name+'-'+str(len(Test._hists)),
+                  [], name, n_x_bins = 10000, xmin=lower, xmax=upper, ymin=0.,
                   line_color=10)
         hist.Draw()
+        Test._hists.append(hist)
         # ack need complicated bin widths
         for k, test in  enumerate(ks_test_list): 
             bin_array = KSTest.__get_bins(test.bins)
-            hist = ROOT.TH1D(name+'-'+str(len(Common._hist_persistent)), 
+            hist = ROOT.TH1D(name+'-'+str(len(Test._hists)),  # pylint: disable = E1101, C0301
                              ';'+name, len(test.bins)-1, bin_array)
             if test.content[-1] != 0.:
                 c_out = KSTest.pdf_function(test.content)
                 for i, value in enumerate(c_out): 
                     hist.SetBinContent(i+1, value)
-            Common._hist_persistent.append(hist)
+            Test._hists.append(hist)
             color = k+1
             while color in bad_colors: 
                 color += 1
@@ -278,7 +286,7 @@ class KSTest(Test): #note inheritance from test pylint: disable=R0902
             hist.SetStats(False)
             hist.Draw('same')
         canv.Update()
-        return (canv, h_start, len(Common._hist_persistent))
+        return (canv, Test._hists[h_start:len(Test._hists)])
     make_plots = staticmethod(make_plots)
 
 #######################

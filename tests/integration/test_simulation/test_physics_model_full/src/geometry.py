@@ -19,8 +19,32 @@ codes
 """
 
 import os
+import subprocess
 import xboa.Common as Common
 from xboa.Bunch import Bunch
+
+TEST_DIR = os.path.expandvars(
+   '$MAUS_ROOT_DIR/tests/integration/test_simulation/test_physics_model_full'
+)
+
+
+def temp(file_name):
+    """Prefix to temporary directory"""
+    tmp_dir = \
+           os.path.expandvars('$MAUS_ROOT_DIR/tmp/test_physics_model_full/')
+    if not os.path.exists(tmp_dir):
+        os.mkdir(tmp_dir)
+    if not os.path.isdir(tmp_dir):
+        raise OSError("test_factory area "+tmp_dir+" is not a directory")
+    return os.path.join(tmp_dir, file_name)
+
+def source(file_name):
+    """Prefix to source files directory"""
+    return os.path.join(TEST_DIR, 'files', file_name)
+
+def ref_data(file_name):
+    """Prefix to reference data directory"""
+    return os.path.join(TEST_DIR, 'ref_data', file_name)
 
 class Geometry:
     """
@@ -41,6 +65,8 @@ class Geometry:
     debug.
 
       name         = human-readable string name used to identify the geometry
+                     should be in form <code>_<code_version>:
+                     <geoemtry unique ID>
       code_model   = tuple of (system_call used to run the code; list of command 
                      line arguments; dict of file_in:file_out files required for 
                      substitution)
@@ -108,20 +134,23 @@ class Geometry:
         return Bunch.new_dict_from_read_builtin(*self.bunch_read)\
                                                               [self.bunch_index]
 
-
     def run_mc(self):
         """
         Set-up auxiliary files and run executable
         """
-        (executable, command_line_args, auxiliary_files) = self.code_model
-        print self.code_model
-        for fin, fout in auxiliary_files.iteritems():
-            Common.substitute(fin, fout, self.substitutions)
-        if command_line_args != None:
-            for arg in command_line_args:
-                executable += ' '+arg
-        print executable
-        os.system(executable)
+        here = os.getcwd()
+        try:
+            os.chdir(temp('./'))
+            (executable, command_line_args, substitution_files) = \
+                                                                 self.code_model
+            print self.code_model
+            for fin, fout in substitution_files.iteritems():
+                Common.substitute(fin, fout, self.substitutions)
+            proc = subprocess.Popen([executable]+command_line_args)
+            proc.wait()
+        finally:
+            os.chdir(here)
+
 
     def run_tests(self):
         """

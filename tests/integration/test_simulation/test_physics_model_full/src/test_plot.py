@@ -15,137 +15,164 @@
 #<http://www.gnu.org/licenses/>.
 #
 
-import code_comparison as cc
-from code_comparison import geometry
-from code_comparison import ks_test
-import xboa.Common as Common
-import sys
-import os
-import ROOT
-import string
-
 """
 Make plots from some set of tests.
 
-We have some set of tests, done with many geometries and codes. To make meaningful plots, we need to
-find the same tests that were made on the same geometry in different codes (or versions of the same code)
-and plot them.
+We have some set of tests, done with many geometries and codes. To make
+meaningful plots, we need to find the same tests that were made on the same
+geometry in different codes (or versions of the same code) and plot them.
+
+So the excercise here is to manipulate the geometry name to identify the code,
+code version, and geometry; group tests belonging to the same tests
 """
 
-g4bl   = 'g4bl'              #string id for g4bl
-icool  = 'icool'             #string id for icool
-g4mice = 'g4mice_simulation' #string id for g4mice_simulation
-maus = 'maus'
-codes  = (maus, )          #tuple of codes for which TestPlot.py will attempt to make plots
+import geometry # pylint: disable=W0403
+from geometry import Geometry # pylint: disable=W0403, W0611
+from tests import KSTest # pylint: disable=W0403
+import os
+import ROOT
+import glob
 
-plot_dir         = 'plots'              #directory to put the plots
-plot_formats     = ['png'] #list of plot formats
-
-#dicts below give version, directory of output, filename of output (within the directory), label to put in plot legend
-#filename and label gets a substitution of $version for the version number
-versions    = {g4mice:('release-2-3-0', 'release-2-4-0','release-2-4-1'), g4bl:('2.02','2.06'),               icool:('10', '13', '17','20',), maus:('some_version', )}
-filenames   = {g4mice:'g4mice.$version.dat',    g4bl:'g4bl_$version.test_data.dat', icool:'icool_3.$version.test_data.dat',                   maus:'maus.$version.ref_data.dat'}
-dirs        = {g4mice:'.',                      g4bl:'g4bl_data',                   icool:'icool_data',                                       maus:'maus_data'}
-labels      = {g4mice:'g4mice $version',        g4bl:'g4bl $version',               icool:'icool v3.$version',                                maus:'maus $version'}
-
-def version_substitute(name, the_version):
-  """
-  Replace all instances of $version in name with the_version
-    name        = some string with format definition
-    the_version = some string containing a version number    
-  """
-  return string.Template(name).substitute(version=the_version)
+INPUT_DIR = geometry.ref_data('')
+PLOT_DIR = os.path.join('$MAUS_ROOT_DIR', 'tests', 'integration',
+                        'plots', 'test_physics_model_full')
+PLOT_DIR = os.path.expandvars(PLOT_DIR)
+PLOT_FORMATS = ['png'] #list of plot formats
 
 def load_geometries():
-  """
-  Load geometry files.
-  Returns a tuple of (geometry_list, dict_of{geometry:code_version})
-  """
-  geometries       = []
-  geometry_version = {}
-  for code in codes:
-    print code
-    for version in versions[code]:
-      fname = version_substitute(filenames[code], version)
-      path  = os.path.join(dirs[code],fname)
-      new_geometries = eval( open(path).read() )
-      print '  ',path
-      for geo in new_geometries: 
-        geometry_version[geo] = version_substitute(labels[code], version)
-      geometries += new_geometries
-  return (geometries, geometry_version)
+    """
+    Load geometry files.
+    Returns a tuple of (geometry_list, dict_of{geometry:code_version})
+    """
+    geometries       = []
+    for path in glob.glob(geometry.ref_data('*.dat')):
+        print path
+        new_geometries = eval( open(path).read() )
+        geometries += new_geometries
+    return geometries
 
-def group_geometries(geometry_list, geometry_comparator=lambda x,y: cmp(x.name, y.name)):
-  """
-  Group geometries into sub lists.
-  Return value is list of lists, where list[i] contains a set of equal geometries, while all geometries
-  in list[i+1] are > geometries in list[i]. Geometry comparisons are done by geometry_comparator function
-  (default is to sort by name).
-  """
-  geo_list_out = []
-  geometry_list.sort(cmp=geometry_comparator)
-  for i,geo in enumerate(geometry_list):
-    if i==0 or geometry_comparator(geometry_list[i-1], geo) != 0:
-      geo_list_out.append([])
-    geo_list_out[-1].append(geo)
-  return geo_list_out
+def histogram_title(geo):
+    """
+    Manipulate geo.name to generate a histogram title string
+    """
+    return file_name(geo).replace('_', ' ')
 
-def group_tests(geometry_list, test_comparator=lambda x,y: cmp(x.variable, y.variable)):
-  """
-  Group all tests in the geometry list by variable
-  Return value is a tuple of (list_of_list_of_tests, dict_of{test:geometry})
-  """
-  test_lists = []
-  test_dict  = {}
-  for test in geometry_list[0].tests: 
-    test_lists.append([test])
-    test_dict[test] = geometry_list[0]
-  for geo  in geometry_list[1:]:
-    for test_list in test_lists:
-      for test in geo.tests:
-        if test_comparator(test, test_list[0]) == 0: 
-          test_list.append(test)
-          test_dict[test] = geo
-  return (test_lists, test_dict)
+def file_name(geo):
+    """
+    Manipulate geo.name to generate a filename string
+    """
+    print geo.name
+    sort_name = geo.name.split(' ')[1:] # strip out code name/version number
+    sort_name = [item+'_' for item in sort_name[:-1]]+[sort_name[-1]] # spaces
+    sort_name = ''.join(sort_name)
+    sort_name = sort_name.replace('/', '')
+    return sort_name  
+
+def code_name(geo):
+    """
+    Manipulate geo.name to extract a string like '<code_name> <version>'
+    """
+    name = geo.name.split(':')[0]
+    return name.replace('_', ' ')
+
+def geometry_comparator(geometry_1, geometry_2):
+    """
+    Return comparator of the file_name of geometries (i.e. name excluding code
+    and version)
+    """
+    return cmp(file_name(geometry_1), file_name(geometry_2))
+
+def group_geometries(geometry_list):
+    """
+    Group geometries into sub lists.
+    Return value is list of lists, where list[i] contains a set of equal
+    geometries (i.e. name is the same, bar the code).
+    """
+    geo_list_out = []
+    geometry_list.sort(cmp=geometry_comparator)
+    for i, geo in enumerate(geometry_list):
+        if i == 0 or geometry_comparator(geometry_list[i-1], geo) != 0:
+            geo_list_out.append([])
+        geo_list_out[-1].append(geo)
+    return geo_list_out
+
+def test_comparator(test_1, test_2):
+    """
+    Return comparator of the test.variable
+    """
+    return cmp(test_1.variable, test_2.variable)
+
+def group_tests(geometry_list):
+    """
+    Group all tests in the geometry list by variable
+    Return value is a tuple of (list_of_list_of_tests, dict_of{test:geometry})
+    """
+    test_lists = []
+    test_dict  = {}
+    for test in geometry_list[0].tests:
+        test_lists.append([test])
+        test_dict[test] = geometry_list[0]
+    for geo  in geometry_list[1:]:
+        for test_list in test_lists:
+            for test in geo.tests:
+                if test_comparator(test, test_list[0]) == 0: 
+                    test_list.append(test)
+                    test_dict[test] = geo
+    return (test_lists, test_dict)
+
+def build_legend(canvas):
+    """
+    Build a legend for the canvas
+    """
+    canvas.cd()
+    leg = canvas.BuildLegend() #histogram legend
+    leg.SetX1(0.13)
+    leg.SetX2(0.5)
+    leg.SetY1(0.6)
+    leg.SetFillColor(10)
+    leg.SetBorderSize(0)
+    canvas.Update()
+
+def build_title(canvas, name):
+    """
+    Build a title for the canvas
+    """
+    canvas.cd()
+    leg2 = ROOT.TLegend(0.1, 0.9, 0.9, 1.0) #pylint: disable = E1101
+    leg2.SetHeader(histogram_title(name))
+    leg2.SetFillColor(10)
+    leg2.SetBorderSize(0)
+    leg2.Draw()
+    canvas.Update()
 
 def main():
-  """
-  Main loop - load geometry and tests, sort geometry by name, then sort tests by type, then make plots.
-  """
-  try:    os.mkdir(plot_dir)
-  except: pass #may fail if directory already exists
-  (geometries, geometry_version) = load_geometries()
-  geo_groups = group_geometries(geometries)
-  for geo_list in geo_groups:
-    (test_group, test_dict) = group_tests(geo_list)
-    for test_list in test_group:
-      geo_name = test_dict[test_list[0]].name
-      (canv, h_start, h_end) = ks_test.make_plots(test_list, bin_function=ks_test.pdf_function)
-      h_list = Common._hist_persistent[h_start:h_end]
-      for i,h in enumerate(h_list):
-        geo = test_dict[test_list[i]]
-        h.SetName(str(geometry_version[geo])+' ('+str(test_list[i].test_result())+')' )
-      leg = canv.BuildLegend() #histogram legend
-      leg.SetX1(0.13)
-      leg.SetX2(0.5)
-      leg.SetY1(0.6)
-      leg.SetFillColor(10)
-      leg.SetBorderSize(0)
-      leg2 = ROOT.TLegend(0.1,0.9,0.9,1.0) #title bar
-      leg2.SetHeader(geo_name)
-      leg2.SetFillColor(10)
-      leg2.SetBorderSize(0)
-      leg2.Draw()
-      canv.Update()
-      outname = geo_name+'_'+test_list[0].variable
-      outname = outname.replace(' ','_')
-      outname = outname.replace('/','')
-      for form in plot_formats:
-        plot_path = os.path.join(plot_dir,outname+'.'+form)
-        canv.Print(plot_path)
-  return 0
+    """
+    Main loop - load geometry and tests, sort geometry by name, then sort 
+    tests by type, then make plots.
+    """
+    try:
+        os.mkdir(PLOT_DIR)
+    except OSError:
+        pass #may fail if directory already exists
+    geometries = load_geometries()
+    geo_groups = group_geometries(geometries)
+    for geo_list in geo_groups:
+        (test_group, test_dict) = group_tests(geo_list)
+        for test_list in test_group:
+            (canv, h_list) = KSTest.make_plots(test_list)
+            for i, histogram in enumerate(h_list):
+                if i > 0:
+                    histogram.SetName(code_name(test_dict[test_list[i-1]]))
+            build_legend(canv)
+            build_title(canv, test_dict[test_list[0]])
+            fname = file_name(test_dict[test_list[0]])
+            for form in PLOT_FORMATS:
+                plot_path = os.path.join(PLOT_DIR, fname+'.'+form)
+                canv.Print(plot_path)
+    return 0
 
-if __name__=='__main__':
-  sys.exit(main())
+if __name__ == '__main__':
+    main()
+    raw_input()
 
 

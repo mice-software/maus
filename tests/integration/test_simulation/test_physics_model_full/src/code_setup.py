@@ -19,7 +19,7 @@ Contains setup information for each of the different codes
 
 import os
 import xboa.Common as Common
-from test_factory import TestFactory
+import geometry # pylint: disable=W0403
 
 class CodeSetup:
     """
@@ -97,10 +97,15 @@ class MausSetup(CodeSetup):
     def __init__(self):
         """Initialise - does nothing"""
         CodeSetup.__init__(self)
+        maus_version = open(os.path.expandvars('$MAUS_ROOT_DIR/README'))\
+                                                                     .readline()
+        maus_version = maus_version.rstrip('\n')
+        maus_version = maus_version.split(' ')[-1]
+        self._version = maus_version
 
     def __str__(self):
         """Return name of this code"""
-        return 'maus'
+        return 'maus_'+self._version
 
     def convert_position(self, value):
         """Does nothing"""
@@ -120,33 +125,30 @@ class MausSetup(CodeSetup):
 
     def get_substitutions(self):
         """Input file is configuration file and geometry definitions"""
-        return {TestFactory.source('maus/configuration.in'):\
-                TestFactory.temp('configuration.py'),
-                TestFactory.source('maus/MaterialBlock.in'):\
-                TestFactory.temp('MaterialBlock.dat')}
+        return {geometry.source('maus/configuration.in'):\
+                geometry.temp('configuration.py'),
+                geometry.source('maus/MaterialBlock.in'):\
+                geometry.temp('MaterialBlock.dat')}
 
     def get_executable(self):
         """Executable is simulate_mice.py"""
-        return os.path.join('$MAUS_ROOT_DIR', 'bin', 'simulate_mice.py')
+        path = os.path.join('$MAUS_ROOT_DIR', 'bin', 'simulate_mice.py')
+        return os.path.expandvars(path)
 
     def get_parameters(self):
         """Command line parameter to specify control files"""
-        return ['--configuration_file', TestFactory.temp('configuration.py'),
+        return ['--configuration_file', geometry.temp('configuration.py'),
                 '--simulation_geometry_filename', 
-                                          TestFactory.temp('MaterialBlock.dat'),
-                '--output_root_file_name', TestFactory.temp('maus_output.root')]
+                                          geometry.temp('MaterialBlock.dat'),
+                '--output_root_file_name', geometry.temp('maus_output.root')]
 
     def get_output_filename(self):
         """Output filename dynamically pulls MAUS version from README"""
-        maus_version = open(os.path.expandvars('$MAUS_ROOT_DIR/README'))\
-                                                                     .readline()
-        maus_version = maus_version.rstrip('\n')
-        maus_version = maus_version.split(' ')[-1]
-        return 'maus.'+maus_version+'.ref_data.dat'
+        return 'maus.'+self._version+'.ref_data.dat'
 
     def get_bunch_read_keys(self):
         """I/O type is maus_root_virtual_hit"""
-        return ('maus_root_virtual_hit', TestFactory.temp('maus_output.root'))
+        return ('maus_root_virtual_hit', geometry.temp('maus_output.root'))
 
     def get_bunch_index(self):
         return 2
@@ -165,9 +167,12 @@ class IcoolSetup(CodeSetup):
         if os.getenv('ICOOL_VERSION') == None:
             raise EnvironmentError("Need to define $ICOOL_VERSION "+\
                                    "environment variable with ICOOL version")
+        self._version = os.getenv('ICOOL_VERSION')
+
+
     def __str__(self):
         """Return name of this code"""
-        return 'icool'
+        return 'icool_'+self._version
 
     def convert_position(self, value):
         """Does nothing"""
@@ -196,7 +201,7 @@ class IcoolSetup(CodeSetup):
 
     def get_substitutions(self):
         """Input file is configuration file and geometry definitions"""
-        return {TestFactory.source('icool/for001.in'):\
+        return {geometry.source('icool/for001.in'):\
                 './for001.dat',}
 
     def get_executable(self):
@@ -209,11 +214,11 @@ class IcoolSetup(CodeSetup):
 
     def get_output_filename(self):
         """Output filename dynamically pulls MAUS version from README"""
-        return 'icool.'+os.environ['ICOOL_VERSION']+'.ref_data.dat'
+        return 'icool.'+self._version+'.ref_data.dat'
 
     def get_bunch_read_keys(self):
         """I/O type is maus_root_virtual_hit"""
-        return ('icool_for009', TestFactory.temp('for009.dat'))
+        return ('icool_for009', geometry.temp('for009.dat'))
 
     def get_bunch_index(self):
         """Bunch is station 2"""
@@ -232,10 +237,11 @@ class G4blSetup(CodeSetup):
         if os.getenv('G4BL_VERSION') == None:
             raise EnvironmentError("Need to define $G4BL_VERSION "+\
                                    "environment variable with G4bl version")
+        self._version = os.getenv('G4BL_VERSION')
 
     def __str__(self):
         """Return name of this code"""
-        return 'g4bl'
+        return 'g4bl_'+self._version
 
     def convert_position(self, value):
         """Does nothing"""
@@ -259,8 +265,8 @@ class G4blSetup(CodeSetup):
 
     def get_substitutions(self):
         """Input file is configuration file and geometry definitions"""
-        return {TestFactory.source('g4bl/g4bl_deck.in'):\
-                TestFactory.temp('g4bl_deck')}
+        return {geometry.source('g4bl/g4bl_deck.in'):\
+                geometry.temp('g4bl_deck')}
 
     def get_executable(self):
         """Executable is simulate_mice.py"""
@@ -268,16 +274,82 @@ class G4blSetup(CodeSetup):
 
     def get_parameters(self):
         """Command line parameter to specify control files"""
-        return [TestFactory.temp('g4bl_deck')]
+        return [geometry.temp('g4bl_deck')]
 
     def get_output_filename(self):
         """Output filename dynamically pulls MAUS version from README"""
-        return 'g4bl.'+os.environ['G4BL_VERSION']+'.ref_data.dat'
+        return 'g4bl.'+self._version+'.ref_data.dat'
 
     def get_bunch_read_keys(self):
         """I/O type is maus_root_virtual_hit"""
-        return ('icool_for009', './for009_g4bl.txt')
+        return ('icool_for009',  geometry.temp('for009_g4bl.txt'))
 
     def get_bunch_index(self):
         return 2
+
+class G4MICESetup(CodeSetup):
+    """
+    Conversions and setup for MAUS - which is the default format and hence
+    mostly null-ops
+    """
+    def __init__(self):
+        """Initialise - does nothing"""
+        CodeSetup.__init__(self)
+        if os.getenv('MICESRC') == None:
+            raise EnvironmentError("Need to define $MICESRC environment "+\
+                                   "variable with G4MICE root directory")
+        if os.getenv('G4MICE_VERSION') == None:
+            raise EnvironmentError("Need to define $G4MICE_VERSION "+\
+                                   "environment variable with G4MICE version")
+        self._version = os.getenv('G4MICE_VERSION')
+
+    def __str__(self):
+        """Return name of this code"""
+        return 'g4mice_'+self._version
+
+
+    def convert_position(self, value):
+        """Does nothing"""
+        return value
+
+    def convert_momentum(self, value):
+        """Does nothing"""
+        return value
+
+    def convert_pid(self, value):
+        """Does nothing"""
+        return value
+
+    def convert_material(self, value):
+        """Does nothing"""
+        return value
+
+    def get_substitutions(self):
+        """Input file is configuration file and geometry definitions"""
+        return {geometry.source('g4mice/cards.in'):\
+                geometry.temp('cards'),
+                geometry.source('g4mice/MaterialBlock.in'):\
+                'MaterialBlock.dat'}
+
+    def get_executable(self):
+        """Executable is simulate_mice.py"""
+        return os.path.join('$MICESRC', 'Applications', 'Simulation', 
+                                                                   'Simulation')
+
+    def get_parameters(self):
+        """Command line parameter to specify control files"""
+        return [geometry.temp('cards')]
+
+    def get_output_filename(self):
+        """Output filename dynamically pulls MAUS version from README"""
+        g4mice_version = os.getenv('G4MICE_VERSION')
+        return 'maus.'+self._version+'.ref_data.dat'
+
+    def get_bunch_read_keys(self):
+        """I/O type is maus_root_virtual_hit"""
+        return ('g4mice_virtual_hit', geometry.temp('Sim.out.gz'))
+
+    def get_bunch_index(self):
+        return 2
+
 
