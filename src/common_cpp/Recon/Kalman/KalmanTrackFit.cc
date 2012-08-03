@@ -244,13 +244,13 @@ void KalmanTrackFit::initialise(SciFiHelicalPRTrack &seed, std::vector<KalmanSit
   double kappa;
   double phi_0 = seed.get_phi0();
   double dsdz = seed.get_dsdz();
-  double tan_lambda = 1 / dsdz;
+  double tan_lambda = 1. / dsdz;
 
   std::vector<SciFiCluster*> clusters;
 
   std::vector<SciFiSpacePoint> spacepoints = seed.get_spacepoints();
   process_clusters(spacepoints, clusters);
-  // the clusters are sorted by now.
+  // the clusters are sorted at this point.
 
   int numb_sites = clusters.size();
   int tracker = clusters[0]->get_tracker();

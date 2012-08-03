@@ -93,18 +93,28 @@ TEST_F(SciFiClusterTest, test_constructor) {
                                      tracker, station, plane, channel, npe, time);
   EXPECT_FALSE(digit->is_used());
 
-  SciFiCluster *cluster = new SciFiCluster(digit);
+  SciFiCluster cluster = SciFiCluster(digit);
 
-  EXPECT_EQ(cluster->get_spill(), spill);
-  EXPECT_EQ(cluster->get_event(), event);
-  EXPECT_EQ(tracker, cluster->get_tracker());
-  EXPECT_EQ(station, cluster->get_station());
-  EXPECT_EQ(plane, cluster->get_plane());
-  EXPECT_EQ(channel, cluster->get_channel());
-  EXPECT_EQ(npe, cluster->get_npe());
-  EXPECT_EQ(time, cluster->get_time());
-  EXPECT_FALSE(cluster->is_used());
+  EXPECT_EQ(cluster.get_spill(), spill);
+  EXPECT_EQ(cluster.get_event(), event);
+  EXPECT_EQ(tracker, cluster.get_tracker());
+  EXPECT_EQ(station, cluster.get_station());
+  EXPECT_EQ(plane, cluster.get_plane());
+  EXPECT_EQ(channel, cluster.get_channel());
+  EXPECT_EQ(npe, cluster.get_npe());
+  EXPECT_EQ(time, cluster.get_time());
+  EXPECT_FALSE(cluster.is_used());
   EXPECT_TRUE(digit->is_used());
+
+  // Test copy constructor.
+  SciFiCluster copy = SciFiCluster(cluster);
+  EXPECT_EQ(copy.get_spill(), spill);
+  EXPECT_EQ(copy.get_event(), event);
+  // Test = operator.
+  SciFiCluster second_copy;
+  second_copy = copy;
+  EXPECT_EQ(second_copy.get_spill(), spill);
+  EXPECT_EQ(second_copy.get_event(), event);
 }
 
 TEST_F(SciFiClusterTest, test_add_digit) {

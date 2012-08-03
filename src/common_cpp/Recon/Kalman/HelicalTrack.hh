@@ -30,9 +30,7 @@
 #include "TMath.h"
 #include "TMatrixD.h"
 
-// #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
-#include "src/common_cpp/Recon/SciFi/SeedFinder.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiHelicalPRTrack.hh"
 
 // namespace MAUS {
