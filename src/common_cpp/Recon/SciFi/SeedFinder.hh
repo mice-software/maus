@@ -17,13 +17,20 @@
 #ifndef  SEEDFINDER_HH
 #define SEEDFINDER_HH
 
+// C headers
+#include <CLHEP/Vector/ThreeVector.h>
+#include <CLHEP/Matrix/Matrix.h>
+
+// C++ headers
 #include <vector>
 #include <algorithm>
+
+// ROOT headers
 #include "TTree.h"
 #include "TH1I.h"
 #include "TFile.h"
 
-#include "CLHEP/Matrix/Matrix.h"
+// MAUS headers
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiEvent.hh"
 
@@ -37,11 +44,11 @@ class SeedFinder {
 
   void momentumFromPoints(SciFiSpacePoint pnt1, SciFiSpacePoint pnt2, SciFiSpacePoint pnt3);
 
-  void determineCentre(Hep3Vector& p1, Hep3Vector& p2, Hep3Vector& p3);
+  void determineCentre(CLHEP::Hep3Vector& p1, CLHEP::Hep3Vector& p2, CLHEP::Hep3Vector& p3);
 
   void determinePtFromR();
 
-  void determinePhi(Hep3Vector& pos, double& phi);
+  void determinePhi(CLHEP::Hep3Vector& pos, double& phi);
 
   void print_to_file();
 

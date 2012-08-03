@@ -18,6 +18,8 @@
 #include "src/common_cpp/Recon/Kalman/HelicalTrack.hh"
 #define PI 3.14159265
 
+// namespace MAUS {
+
 const double HelicalTrack::_alpha = 1.0/(0.3*4.);
 
 HelicalTrack::HelicalTrack(SciFiHelicalPRTrack const &seed) {
@@ -38,7 +40,7 @@ HelicalTrack::HelicalTrack(SciFiHelicalPRTrack const &seed) {
   // tracker 1: B = -4T.
   int tracker = seed.get_tracker();
   if ( tracker == 0 ) {
-    _sign = 1; //flipped signs
+    _sign = 1; // flipped signs
     _B = 4.0;
   } else {
     _sign = -1;
@@ -120,18 +122,20 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
             << "y:     " << _projected_y << "\n";
   std::cerr << "Signed Radius: " << _alpha/old_kappa << "\n";
 
-  //assert(delta_phi < 4);
+  // assert(delta_phi < 4);
   // Build _F.
   _F(0, 0) = 1.0 + drho_dx*cos(old_phi);
   _F(0, 1) = drho_dy*cos(old_phi);
   _F(0, 2) = drho_dr*cos(old_phi) + _h*(cos(old_phi) - cos(new_phi));
-  _F(0, 3) = 0.0; // drho_dkappa*cos(old_phi) - _h*(_alpha/old_kappa_2)*(cos(old_phi) - cos(new_phi));
+  _F(0, 3) = 0.0;
+  // drho_dkappa*cos(old_phi) - _h*(_alpha/old_kappa_2)*(cos(old_phi) - cos(new_phi));
   _F(0, 4) = 0.0;
 
   _F(1, 0) = drho_dx*sin(old_phi);
   _F(1, 1) = 1.0 + drho_dy*sin(old_phi);
   _F(1, 2) = drho_dr*sin(old_phi) + _h*(sin(old_phi) - sin(new_phi));
-  _F(1, 3) = 0.0; // drho_dkappa*sin(old_phi) - _h*(_alpha/old_kappa_2)*(sin(old_phi) - sin(new_phi));
+  _F(1, 3) = 0.0;
+  // drho_dkappa*sin(old_phi) - _h*(_alpha/old_kappa_2)*(sin(old_phi) - sin(new_phi));
   _F(1, 4) = 0.0;
 
   _F(2, 0) = 0.0;
@@ -175,3 +179,6 @@ void HelicalTrack::calc_system_noise(KalmanSite *site) {
   _Q(3, 4) = kappa * my * (1+mx*mx+my*my) * C /(1+mx*mx);
 */
 }
+
+// } // ~namespace MAUS
+

@@ -23,6 +23,8 @@
 #include <assert.h>
 
 // C++ headers
+#include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
 #include "CLHEP/Vector/ThreeVector.h"
@@ -36,6 +38,8 @@
 
 #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
 // namespace ublas = boost::numeric::ublas;
+
+// namespace MAUS {
 
 class KalmanMonitor {
  public:
@@ -63,5 +67,7 @@ class KalmanMonitor {
   double _site[30], _err[30];
 */
 };
+
+// } // ~namespace MAUS
 
 #endif

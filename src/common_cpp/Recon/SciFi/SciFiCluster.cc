@@ -30,7 +30,6 @@ SciFiCluster::SciFiCluster(SciFiDigit *digit):_used(false),
                                               _npe(digit->get_npe()),
                                               _time(digit->get_time()) {
   digit->set_used();
-  // _digits.push_back(digit);
   _pos = digit->get_true_position();
   _p   = digit->get_true_momentum();
 }
@@ -39,7 +38,6 @@ SciFiCluster::~SciFiCluster() {}
 
 void SciFiCluster::add_digit(SciFiDigit* neigh) {
   neigh->set_used();
-  // _digits.push_back(neigh);
 
   _npe += neigh->get_npe();
   _channel_w /= 2.0;
@@ -63,7 +61,6 @@ SciFiCluster::SciFiCluster(const SciFiCluster &cluster) {
   _relat_pos = cluster.get_relative_position();
   _alpha     = cluster.get_alpha();
   _id        = cluster.get_id();
-  // _digits    = cluster.get_digits();
 }
 
 SciFiCluster& SciFiCluster::operator=(const SciFiCluster &cluster) {
@@ -83,7 +80,6 @@ SciFiCluster& SciFiCluster::operator=(const SciFiCluster &cluster) {
   _relat_pos = cluster.get_relative_position();
   _alpha     = cluster.get_alpha();
   _id        = cluster.get_id();
-  // _digits    = cluster.get_digits();
 }
 
 // } // ~namespace MAUS

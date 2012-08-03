@@ -56,7 +56,7 @@ void HelicalTrackTest::set_up_seed() {
   seed.set_x0(x0);
   seed.set_y0(y0);
   seed.set_phi0(phi0);
-  seed.set_dzds(tan_lambda);
+  seed.set_dsdz(1./tan_lambda);
   seed.set_R(radius);
   seed.set_tracker(tracker);
 }
@@ -94,8 +94,8 @@ TEST_F(HelicalTrackTest, test_propagator) {
   double projected_x = track->get_projected_x();
   double projected_y = track->get_projected_y();
 
-  EXPECT_TRUE(abs(projected_x-a_temp(0, 0))<err);
-  EXPECT_TRUE(abs(projected_y-a_temp(1, 0))<err);
+  EXPECT_TRUE(abs(projected_x-a_temp(0, 0)) < err);
+  EXPECT_TRUE(abs(projected_y-a_temp(1, 0)) < err);
 }
 
 } // namespace

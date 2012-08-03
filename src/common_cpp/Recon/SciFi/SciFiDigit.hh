@@ -15,46 +15,35 @@
  *
  */
 
-/** @class SciFiDigit
- *  Digitize events by running Tracker electronics simulation.
- */
-
 #ifndef SCIFIDIGIT_HH
 #define SCIFIDIGIT_HH
+
 // C headers
-#include <assert.h>
-#include <json/json.h>
-
-#include <CLHEP/Random/RandPoisson.h>
-#include <CLHEP/Random/RandGauss.h>
-#include <CLHEP/Random/RandExponential.h>
-#include <CLHEP/Units/PhysicalConstants.h>
 #include <CLHEP/Vector/ThreeVector.h>
-
-// C++ headers
-#include <cmath>
-#include <iostream>
-#include <string>
-#include <sstream>
-#include <vector>
 
 // namespace MAUS {
 
+/** @class SciFiDigit Represents a channel hit in a tracker station plane. */
+
 class SciFiDigit {
  public:
+  /** Default constructor - initialises to 0/NULL */
   SciFiDigit(); // Default constructor
 
-  /** @brief Constructs a scifi digit initializing member variables.
-   */
+  /** Constructor - initialises member variables from arguments */
   SciFiDigit(int spill, int event, int tracker, int station,
              int plane, int channel, double npe, double time );
 
-  ~SciFiDigit();
+  /** Copy constructor - any pointers are deep copied */
+  SciFiDigit(const SciFiDigit& _scifidigit);
 
-  SciFiDigit(const SciFiDigit &digit);
+  /** Assignment operator - any pointers are deep copied */
+  SciFiDigit& operator=(const SciFiDigit& _scifidigit);
 
-  SciFiDigit& operator=(const SciFiDigit &digit);
+  /** Destructor - any member pointers are deleted */
+  virtual ~SciFiDigit();
 
+  // Getters and Setters
   void set_spill(int spill) { _spill = spill; }
 
   int get_spill()   const { return _spill; }
@@ -63,7 +52,6 @@ class SciFiDigit {
 
   int get_event() const { return _event; }
 
-  // list of getters and setters.
   void set_tracker(int trackerNo) { _tracker = trackerNo; }
 
   int get_tracker() const { return _tracker; }
@@ -82,19 +70,11 @@ class SciFiDigit {
 
   void set_npe(double npe) { _npe = npe; }
 
-  double get_npe()     const { return _npe; }
-/*
-  int get_adc() const { return _adc; }
+  double get_npe()     const { return _npe;     }
 
-  void set_adc(int adc) { _adc = adc; }
-
-  int get_tdc() const { return _tdc; }
-
-  void set_tdc(int tdc) { _tdc = tdc; }
-*/
   void set_time(double time) { _time = time; }
 
-  double get_time()    const { return _time; }
+  double get_time()    const { return _time;    }
 
   void set_used()   { _used = true; }
 
@@ -112,9 +92,6 @@ class SciFiDigit {
   CLHEP::Hep3Vector _position, _p;
 
   int _spill, _event;
-
-  // int _adc, _tdc;
-
   int _tracker, _station, _plane, _channel;
 
   double _npe, _time;

@@ -20,36 +20,44 @@
  *
  */
 
-#ifndef SCIFISPACEPOINT_HH
-#define SCIFISPACEPOINT_HH
+#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_SCIFISPACEPOINT_HH_
+#define _SRC_COMMON_CPP_DATASTRUCTURE_SCIFISPACEPOINT_HH_
 
-// C headers
-#include <assert.h>
-#include <json/json.h>
-#include <CLHEP/Vector/ThreeVector.h>
-
-#include <CLHEP/Random/RandPoisson.h>
-#include <CLHEP/Random/RandGauss.h>
-#include <CLHEP/Random/RandExponential.h>
-#include <CLHEP/Units/PhysicalConstants.h>
 
 // C++ headers
 #include <string>
 #include <vector>
 
-#include "src/common_cpp/Recon/SciFi/SciFiCluster.hh"
+// ROOT headers
+#include "Rtypes.h"
 
-// namespace MAUS {
+// MAUS headers
+#include "src/common_cpp/DataStructure/SciFiEvent.hh"  // For cluster array type def
+#include "src/common_cpp/DataStructure/SciFiCluster.hh"
+#include "src/common_cpp/DataStructure/ThreeVector.hh"
+
+namespace MAUS {
 
 class SciFiSpacePoint {
  public:
-  SciFiSpacePoint(); // Default constructor
 
+  /** Default constructor - initialises to 0/NULL */
+  SciFiSpacePoint();
+
+  /** Copy constructor - any pointers are deep copied */
+  SciFiSpacePoint(const SciFiSpacePoint &_scifispacepoint);
+
+  /** Two cluster constructor  */
   SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2, SciFiCluster *clust3);
 
+  /** Three cluster constructor  */
   SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2);
 
+  /** Destructor  */
   ~SciFiSpacePoint();
+
+  /** Assignment operator - any pointers are deep copied */
+  SciFiSpacePoint& operator=(const SciFiSpacePoint &_scifispacepoint);
 
   void set_spill(int spill) { _spill = spill; }
 
@@ -79,9 +87,9 @@ class SciFiSpacePoint {
 
   std::string get_type()  const { return _type; }
 
-  void set_position(CLHEP::Hep3Vector position) { _position = position; }
+  void set_position(ThreeVector position) { _position = position; }
 
-  CLHEP::Hep3Vector get_position() const { return _position; }
+  ThreeVector get_position() const { return _position; }
 
   void set_chi2(double chi2) { _chi2 = chi2; }
 
@@ -97,26 +105,22 @@ class SciFiSpacePoint {
 
   void set_channels(std::vector<SciFiCluster*> channels) { _channels = channels; }
 
-  std::vector<SciFiCluster*> get_channels()  const { return _channels; }
+  SciFiClusterPArray get_channels()  const { return _channels; }
 
  private:
-  int _spill, _event;
-
-  int _tracker, _station;
-
-  double _npe;
-
-  CLHEP::Hep3Vector _position;
-
-  double _chi2;
-
   bool _used;
+
+  int _spill, _event, _tracker, _station;
   // int _time, _time_error, _time_res;
+
+  double _npe, _chi2;
 
   std::string _type;
 
-  std::vector<SciFiCluster*>  _channels;
+  ThreeVector _position;
+
+  SciFiClusterPArray  _channels;
 };  // Don't forget this trailing colon!!!!
-// } // ~namespace MAUS
+} // ~namespace MAUS
 
 #endif

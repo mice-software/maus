@@ -19,21 +19,22 @@
 
 #include "src/common_cpp/Recon/SciFi/SciFiDigit.hh"
 
-// MAUS namespace {
-class SciFiDigitTest : public ::testing::Test {
+namespace MAUS {
+
+class SciFiDigitTestDS : public ::testing::Test {
  protected:
-  SciFiDigitTest()  {}
-  virtual ~SciFiDigitTest() {}
+  SciFiDigitTestDS()  {}
+  virtual ~SciFiDigitTestDS() {}
   virtual void SetUp()    {}
   virtual void TearDown() {}
 };
 
-TEST_F(SciFiDigitTest, test_default_constructor) {
+TEST_F(SciFiDigitTestDS, test_default_constructor) {
   SciFiDigit *digit = new SciFiDigit();
   EXPECT_FALSE(digit->is_used());
 }
 
-TEST_F(SciFiDigitTest, test_parameter_constructor) {
+TEST_F(SciFiDigitTestDS, test_parameter_constructor) {
   int spill = 1;
   int event = 2;
   int tracker = 1;
@@ -56,7 +57,7 @@ TEST_F(SciFiDigitTest, test_parameter_constructor) {
   EXPECT_FALSE(digit->is_used());
 }
 
-TEST_F(SciFiDigitTest, test_copy_constructor) {
+TEST_F(SciFiDigitTestDS, test_copy_constructor) {
   int spill = 1;
   int event = 2;
   int tracker = 1;
@@ -81,21 +82,7 @@ TEST_F(SciFiDigitTest, test_copy_constructor) {
   EXPECT_FALSE(digit2->is_used());
 }
 
-TEST_F(SciFiDigitTest, test_destructor) {
-  int spill = 1;
-  int event = 2;
-  int tracker = 1;
-  int station = 2;
-  int plane = 0;
-  int channel = 106;
-  double npe = 3.2;
-  double time = 12.2;
-
-  SciFiDigit *digit = new SciFiDigit(spill, event, tracker, station, plane, channel, npe, time);
-  delete digit;
-}
-
-TEST_F(SciFiDigitTest, test_assignment_operator) {
+TEST_F(SciFiDigitTestDS, test_assignment_operator) {
   int spill = 1;
   int event = 2;
   int tracker = 1;
@@ -122,7 +109,7 @@ TEST_F(SciFiDigitTest, test_assignment_operator) {
 }
 
 
-TEST_F(SciFiDigitTest, test_setters_getters) {
+TEST_F(SciFiDigitTestDS, test_setters_getters) {
   int spill = 1;
   int event = 2;
   int tracker = 1;
@@ -152,7 +139,7 @@ TEST_F(SciFiDigitTest, test_setters_getters) {
   EXPECT_EQ(digit->get_time(), time);
 }
 
-TEST_F(SciFiDigitTest, test_used_flag) {
+TEST_F(SciFiDigitTestDS, test_used_flag) {
   SciFiDigit *digit = new SciFiDigit();
   EXPECT_FALSE(digit->is_used());
 
@@ -160,4 +147,4 @@ TEST_F(SciFiDigitTest, test_used_flag) {
   EXPECT_TRUE(digit->is_used());
 }
 
-// } // namespace
+} // ~namespace MAUS

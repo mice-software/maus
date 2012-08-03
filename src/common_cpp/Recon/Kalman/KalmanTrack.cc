@@ -16,6 +16,8 @@
  */
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
 
+// namespace MAUS {
+
 // Initialize geometry constants.
 const double KalmanTrack::A = 2./(7.*0.427);
 const double KalmanTrack::ACTIVE_RADIUS = 150.;
@@ -83,7 +85,7 @@ void KalmanTrack::update_G(KalmanSite *a_site) {
 }
 
 void KalmanTrack::update_H(KalmanSite *a_site) {
-  Hep3Vector dir = a_site->get_direction();
+  CLHEP::Hep3Vector dir = a_site->get_direction();
   double dx = dir.x();
   double dy = dir.y();
 
@@ -226,3 +228,5 @@ void KalmanTrack::smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_si
   C_smooth =  TMatrixD(C, TMatrixD::kPlus, temp5);
   smoothing_site->set_smoothed_covariance_matrix(C_smooth);
 }
+
+// } // ~namespace MAUS

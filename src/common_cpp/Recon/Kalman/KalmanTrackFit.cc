@@ -20,6 +20,8 @@
 
 #define PI 3.14159265
 
+// namespace MAUS {
+
 KalmanTrackFit::KalmanTrackFit() {
   std::cout << "---------------------Birth of Kalman Filter--------------------" << std::endl;
 }
@@ -42,7 +44,8 @@ bool sort_by_id(SciFiCluster *a, SciFiCluster *b ) {
 //
 // Global track fit.
 //
-void KalmanTrackFit::process(Hep3Vector &tof0, Hep3Vector &se, Hep3Vector &tof1) {
+void KalmanTrackFit::process(CLHEP::Hep3Vector &tof0, CLHEP::Hep3Vector &se,
+                             CLHEP::Hep3Vector &tof1) {
 /*  std::vector<KalmanSite> sites;
   KalmanTrack *track = new GlobalTrack();
   initialise_global_track(tof0, se, tof1, sites);
@@ -75,8 +78,9 @@ void KalmanTrackFit::process(Hep3Vector &tof0, Hep3Vector &se, Hep3Vector &tof1)
 */
 }
 
-void KalmanTrackFit::initialise_global_track(Hep3Vector &tof0, Hep3Vector &se,
-                                             Hep3Vector &tof1, std::vector<KalmanSite> &sites) {
+void KalmanTrackFit::initialise_global_track(CLHEP::Hep3Vector &tof0, CLHEP::Hep3Vector &se,
+                                             CLHEP::Hep3Vector &tof1,
+                                             std::vector<KalmanSite> &sites) {
   double se_tof1_sep = 60.0; // cm
   double se_tof0_sep = 720.0; // cm
 
@@ -239,7 +243,8 @@ void KalmanTrackFit::initialise(SciFiHelicalPRTrack &seed, std::vector<KalmanSit
   double pt = 0.3*4.*r;
   double kappa;
   double phi_0 = seed.get_phi0();
-  double tan_lambda = (seed.get_dzds());
+  double dsdz = seed.get_dsdz();
+  double tan_lambda = 1 / dsdz;
 
   std::vector<SciFiCluster*> clusters;
 
@@ -253,13 +258,14 @@ void KalmanTrackFit::initialise(SciFiHelicalPRTrack &seed, std::vector<KalmanSit
   std::cerr << "PR: " << tracker << " " << x0 << " " << y0 << " " << r << " "
                       << phi_0 << " " << tan_lambda << std::endl;
   KalmanSite first_plane;
-  int sign;
+  int sign, Q;
   double site_0_turning_angle, x, y;
   if ( tracker == 0 ) {
+    Q = 1; // only mu+ for now...
     sign = 1;
-    kappa = sign/pt;
+    kappa = Q/pt;
     double delta_phi = sign*1100./(r*tan_lambda);
-    site_0_turning_angle = (phi_0-delta_phi); // *PI/180.;
+    site_0_turning_angle = (phi_0+delta_phi); // *PI/180.;
     x = -(x0 + r*cos(site_0_turning_angle));
     y = -(y0 + r*sin(site_0_turning_angle));
   } else {
@@ -514,3 +520,6 @@ void KalmanTrackFit::process_clusters(std::vector<SciFiSpacePoint> &spacepoints,
 
   std::sort(clusters.begin(), clusters.end(), sort_by_id);
 }
+
+// } // ~namespace MAUS
+

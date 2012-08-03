@@ -1,4 +1,4 @@
-/* This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
+/* This file is part of MAUS: http://micewww.pp.rl.ac.uk/projects/maus
  *
  * MAUS is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -12,14 +12,15 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
-#include "src/common_cpp/Recon/SciFi/SciFiDigit.hh"
+#include "src/common_cpp/DataStructure/SciFiDigit.hh"
 
-// namespace MAUS {
 
-SciFiDigit::SciFiDigit():_used(false) {}
+namespace MAUS {
+
+SciFiDigit::SciFiDigit():_used(false) {
+}
 
 SciFiDigit::SciFiDigit(int spill, int event, int tracker, int station,
                        int plane, int channel, double npe, double time )
@@ -50,6 +51,7 @@ SciFiDigit& SciFiDigit::operator=(const SciFiDigit& _scifidigit) {
     return *this;
 }
 
+SciFiDigit::~SciFiDigit() {
+}
 
-SciFiDigit::~SciFiDigit() {}
-// } // ends namespace MAUS
+} // ~namespace MAUS
