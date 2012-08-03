@@ -7,7 +7,6 @@ number_of_events = __nev__
 energy = (momentum**2.+xboa.Common.pdg_pid_to_mass[abs(pid)]**2.)**0.5
 
 spill_generator_number_of_spills =  number_of_events/100
-simulation_geometry_filename = "MaterialBlock.dat"
 beam = {
     "particle_generator":"counter", # routine for generating empty primaries
     "random_seed":0, # random seed for beam generation; controls also how the MC

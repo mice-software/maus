@@ -12,14 +12,14 @@ $SUB denseh2 120
 &SUB bunch2  0
 &SUB apertr  0.30
 
- &cont npart=_nev_ bgen=.true. dectrk=.true. f9dp=8 steprk=.false.
- varstep=.true. nprnt=-1 prlevel=1 ntuple=.false. rnseed=-_seed_
+ &cont npart=__nev__ bgen=.true. dectrk=.true. f9dp=8 steprk=.false.
+ varstep=.true. nprnt=-1 prlevel=1 ntuple=.false. rnseed=-__seed__
  spin=.false. spintrk=0 spinmatter=0 bzfldprd=20
  fsav=.true. fsavset=.true. izfile=447 !rfdiag=89 
  phasemodel=3 output1=.true. /
  &bmt nbeamtyp=1 /
- 1 _pid_ 1. 1
- 0.  0.  0.   0.  0.  _momentum_
+ 1 __pid__ 1. 1
+ 0.  0.  0.   0.  0.  __momentum__
  0.  0.  0.   0.  0.  0.
  1
  1 20. 0 0
@@ -41,11 +41,11 @@ $SUB denseh2 120
 SECTION
 OUTPUT
 SREGION         ! Drift
-_thickness_  1    _step_
+__thickness__  1    __step__
 1  0.   1.0
 NONE
   0. 0. 0. 0. 0.   0. 0. 0. 0. 0.  0. 0. 0. 0. 0.
-_material_
+__material__
 CBLOCK
    0. 0. 0. 0. 0.   0. 0. 0. 0. 0.
 OUTPUT
