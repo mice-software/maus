@@ -250,7 +250,6 @@ class Downloader: #pylint: disable = R0902
         @param  downloadedpath The path location where the files will be 
                                unpacked to. 
         """
-        print download_path
         if not os.path.exists(download_path):
             raise OSError('Path '+download_path+' does not exist')
         downloaded_file = self.geometry_cdb.get_gdml_for_run(long(run_num))
