@@ -236,8 +236,10 @@ void KalmanTrackFit::initialise(SciFiHelicalPRTrack &seed, std::vector<KalmanSit
   double r = seed.get_R();
   double p = 200.0;
   // double pz = seed.get_pz();
+  double pt = 0.3*4.*r;
+  double kappa;
   double phi_0 = seed.get_phi0();
-  double tan_lambda = seed.get_dzds();
+  double tan_lambda = (seed.get_dzds());
 
   std::vector<SciFiCluster*> clusters;
 
@@ -247,32 +249,34 @@ void KalmanTrackFit::initialise(SciFiHelicalPRTrack &seed, std::vector<KalmanSit
 
   int numb_sites = clusters.size();
   int tracker = clusters[0]->get_tracker();
+
   std::cerr << "PR: " << tracker << " " << x0 << " " << y0 << " " << r << " "
                       << phi_0 << " " << tan_lambda << std::endl;
   KalmanSite first_plane;
+  int sign;
   double site_0_turning_angle, x, y;
   if ( tracker == 0 ) {
-    int sign = 1;
+    sign = 1;
+    kappa = sign/pt;
     double delta_phi = sign*1100./(r*tan_lambda);
     site_0_turning_angle = (phi_0-delta_phi); // *PI/180.;
     x = -(x0 + r*cos(site_0_turning_angle));
     y = -(y0 + r*sin(site_0_turning_angle));
   } else {
+    sign = -1;
+    kappa = sign/pt;
     site_0_turning_angle = phi_0; // *PI/180.;
     x = x0 + r*cos(site_0_turning_angle);
     y = y0 + r*sin(site_0_turning_angle);
   }
 
-  // double x = x0 + r*cos(site_0_turning_angle);
-  // double y = y0 + r*sin(site_0_turning_angle);
   std::cerr << "SEED: " << x << " " << y << " " << site_0_turning_angle << std::endl;
-  double kappa = 1./p;
 
   TMatrixD a(5, 1);
   a(0, 0) = x;
   a(1, 0) = y;
   a(2, 0) = r;
-  a(3, 0) = site_0_turning_angle;
+  a(3, 0) = kappa;
   a(4, 0) = tan_lambda;
 
   first_plane.set_projected_a(a);

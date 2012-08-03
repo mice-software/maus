@@ -207,7 +207,11 @@ void RealDataDigitization::
 }
 
 bool RealDataDigitization::is_good_channel(const int board, const int bank, const int chan_ro) {
-  return good_chan[board][bank][chan_ro];
+  if ( board < 16 && bank < 4 && chan_ro < 128 ) {
+    return good_chan[board][bank][chan_ro];
+  } else {
+    return false;
+  }
 }
 
 bool RealDataDigitization::load_bad_channels() {

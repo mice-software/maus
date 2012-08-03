@@ -33,11 +33,16 @@ class HelicalTrackTest : public ::testing::Test {
   int tracker;
   double x0, y0, radius, pt, pz, phi0, tan_lambda, kappa;
   void set_up_sites();
+  TMatrixD a;
+  static const double err = 1e-2;
 };
 
 void HelicalTrackTest::set_up_seed() {
   // mu+; B = 4T.
-  // int sign_BQ = 1;
+  int sign_BQ = 1;
+  int h = -sign_BQ;
+  int sign= 1;
+  int Q = 1;
   tracker = 0;
   x0 = 0.0;
   y0 = 0.0;
@@ -45,7 +50,7 @@ void HelicalTrackTest::set_up_seed() {
   pt = 1.2*radius; // MeV/c
   pz = 220.0;
   tan_lambda = pz/pt;
-  kappa = -1./pt;
+  kappa = Q/pt;
   phi0 = 0.0;
   // set_spacepoints(std::vector<SciFiSpacePoint> spoints) { _spoints = spoints; }
   seed.set_x0(x0);
@@ -61,7 +66,7 @@ void HelicalTrackTest::set_up_sites() {
   new_site.set_z(-550.0);
   new_site.set_id(10);
 
-  TMatrixD a(5, 1);
+  a.ResizeTo(5, 1);
   a(0, 0) = x0+radius*cos(phi0)+0.1;
   a(1, 0) = y0+radius*sin(phi0)+0.2;
   a(2, 0) = radius;
@@ -81,25 +86,16 @@ TEST_F(HelicalTrackTest, test_propagator) {
   track->update_propagator(&old_site, &new_site);
   TMatrixD F(5, 5);
   F = track->get_propagator();
-  TMatrixD a(5, 1);
-  a(0, 0) = x0+radius*cos(phi0);
-  a(1, 0) = y0+radius*sin(phi0);
-  a(2, 0) = radius;
-  a(3, 0) = kappa;
-  a(4, 0) = tan_lambda;
-
   TMatrixD a_temp(5, 1);
   a_temp = TMatrixD(F, TMatrixD::kMult, a);
   a.Print();
   F.Print();
   a_temp.Print();
-  EXPECT_EQ(0, 0);
-/*
-old_site.get_z();
-old_site.get_state_vector();
+  double projected_x = track->get_projected_x();
+  double projected_y = track->get_projected_y();
 
-new_site.get_z();
-*/
+  EXPECT_TRUE(abs(projected_x-a_temp(0, 0))<err);
+  EXPECT_TRUE(abs(projected_y-a_temp(1, 0))<err);
 }
 
 } // namespace
