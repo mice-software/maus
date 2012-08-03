@@ -201,7 +201,8 @@ bool RealDataDigitization::
   return found;
 }
 
-bool RealDataDigitization::is_good_channel(const int board, const int bank, const int chan_ro) const {
+bool RealDataDigitization::is_good_channel(const int board, const int bank,
+                                           const int chan_ro) const {
   if ( board < 16 && bank < 4 && chan_ro < 128 ) {
     return good_chan[board][bank][chan_ro];
   } else {
