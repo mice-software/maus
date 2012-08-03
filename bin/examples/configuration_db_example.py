@@ -68,7 +68,7 @@ def run():
         print my_runs[2873]['magnets']['d1']['set_current']"
     """
     my_runs = beamline.get_beamline_for_run(2873)
-    print  my_runs[2873]['magnets']['d1']['setCurrent']
+    print  my_runs[2873]['magnets']['d1']['set_current']
 
     print """
     Lastly you can search by target pulses:'
