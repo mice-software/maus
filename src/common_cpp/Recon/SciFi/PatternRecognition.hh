@@ -42,7 +42,6 @@
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiStraightPRTrack.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiHelicalPRTrack.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiPRTrack.hh"
 
 // namespace MAUS {
 
@@ -230,6 +229,76 @@ class PatternRecognition {
      */
     void dphi_to_ds(double R, const std::vector<double> &dphi, std::vector<double> &ds);
 
+    /** @brief Fit a full helix to the spacepoints with a nonlinear least squares fit
+     *
+     *  A non-linear least squares helix fit is performed on spacepoints which passed previous
+     *  chisq circle and line tests in the x-y and s-z projections, respectively.  This is the last
+     *  fit in the helical pattern recognition routine, and will provide the initial parameter
+     *  values for the Kalman Filter. Returns true if a good fit has been made in a reasonable
+     *  number of iterations.  Returns false otherwise.
+     *
+     *  @param spnts - Vector containing spacepoints being used for the fit, in order of
+     *                 innermost to outermost stations
+     *
+     */
+    bool full_helix_fit(const std::vector<SciFiSpacePoint*> &spnts, const SimpleCircle &circle,
+                        const SimpleLine &line_sz, SimpleHelix &helix);
+
+    /** @brief Calculates helix at a point i
+     *
+     *  Finds helix function at the ith spacepoint using the parameter values and the spacepoint
+     *
+     *  @param R - raidus of helix
+     *  @param phi_0 - turning angle of initial spacepoint
+     *  @param tan_lambda - helix dip angle
+     *  @param xi - Helix value x at point i (cartesian)
+     *  @param yi - Helix value y at point i
+     *  @param zi - Helix value z at point i
+     *
+     */
+    void helix_function_at_i(double R, double phi_0, double tan_lambda, double A, double B,
+                             double C, double phi_i, double &xi, double &yi, double &zi);
+
+    /** @brief Calculates helix chisq
+     *
+     *  Calculates chisq for given parameter values and spacepoints
+     *
+     *  @param spnts - Vector containing spacepoints being used for the fit, in order of
+     *                 innermost to outermost stations
+     *  @param turning_angles - vector containing turning angles for each spacepoint.
+     *                  organized inner-> outermost stations for i = 0.... N
+     *  @param Phi_0 - azimuthal angle of inital spacepoint in x-y plane
+     *  @param tan_lambda - helix dip angle
+     *  @param R - radius of helix
+     *
+     */
+    double calculate_chisq(const std::vector<SciFiSpacePoint*> &spnts,
+                           const std::vector<double> &turning_angles, double Phi_0,
+                           double tan_lambda, double R);
+
+    /** @brief Calculates the adjustments to the seed parameters
+     *
+     *  By taking first, second, and mixed derivatives of chi_sq for helix, we calculate the
+     *  adjustments to the seed paramters R, Phi_0, and tan_lambda. i.e. R' = R + dR, where R' is
+     *  the new parameter value, R is the seed value, and dR is the adjustment. Inputs are inital
+     *  seed parameters and the outputs are the ajustments.
+     *
+     *  @param spnts - Vector containing spacepoints being used for the fit, in order of innermost
+     *                 to outermost stations
+     *  @param turning_angles - vector containing turning angles for each spacepoint.
+     *                  organized inner-> outermost stations for i = 0.... N
+     *  @param R - initial R value as calculated from circle fit
+     *  @param phi_0 - turning angle of initial spacepoint as calculate from circle fit
+     *  @param tan_lambda - helix dip angle calculated from the slope of line in the s-z projection
+     *  @param dR - adjustment to R
+     *  @param dphi_0 - adjumtment to phi_0
+     *  @param dtan_lmabda - adjustment to tan_lmabda
+     *
+     */
+    void calculate_adjustments(const std::vector<SciFiSpacePoint*> &spnts,
+                               const std::vector<double> &turning_angles, double R, double phi_0,
+                               double tan_lambda, double &dR, double &dphi_0, double &dtan_lambda);
+
     /** @brief Determine which two stations the initial line should be drawn between
      * 
      *  The initial line is to be drawn between the two outermost stations being used.
@@ -312,7 +381,7 @@ class PatternRecognition {
                        double &dx, double &dy);
 
   private:
-    static const int debug = 2; // Set output level, 0 = little, 1 = more couts, 2 = files as well
+    static const int debug = 0; // Set output level, 0 = little, 1 = more couts, 2 = files as well
     static const int _n_trackers = 2;
     static const int _n_stations = 5;
     static const int _n_bins = 100;         // Number of bins in each residuals histogram
@@ -321,12 +390,12 @@ class PatternRecognition {
     static const double _res_cut = 2;      // Road cut for linear fit in mm
     static const double _R_res_cut = 100.;    // Road cut for circle radius in mm
     static const double _chisq_cut = 15;    // Cut on the chi^2 of the least squares fit in mm
-    static const double _sz_chisq_cut = 150; // Cut on the sz chi^2 from least squares fit in mm
+    static const double _sz_chisq_cut = 50; // Cut on the sz chi^2 from least squares fit in mm
     static const double _helix_chisq_cut = 100;
     static const double _chisq_diff = 3.;
-    static const double _AB_cut = .65;       // Need to decide on appropriate cut here!!!
+    static const double _AB_cut = .7;       // Need to decide on appropriate cut here!!!
     static const double _active_diameter = 300.0;  // Active volume diameter a tracker in mm
-    static const bool _helical_pr_on = 1;   // Flag to turn on helical pr (0 off, 1 on)
+    static const bool _helical_pr_on = 0;   // Flag to turn on helical pr (0 off, 1 on)
     static const bool _straight_pr_on = 1;  // Flag to turn on straight pr (0 off, 1 on)
     static const bool _use_full_helix_fit = 0;  // Flag to turn on non-linear helix fit
 
