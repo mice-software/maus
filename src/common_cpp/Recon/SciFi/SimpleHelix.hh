@@ -39,7 +39,7 @@ class SimpleHelix {
 
     // Getters
     double get_Phi_0() const { return _Phi_0; }
-    double get_Phi0_err() const { return _Phi_0_err; }
+    double get_Phi_0_err() const { return _Phi_0_err; }
     double get_R() const { return _R; }
     double get_R_err() const { return _R_err; }
     double get_tan_lambda() const { return _tan_lambda; }

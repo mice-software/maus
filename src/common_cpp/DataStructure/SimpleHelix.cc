@@ -48,6 +48,8 @@ SimpleHelix::SimpleHelix(double Phi_0, double Phi_0_err, double R, double R_err,
   _Psi_0_err = Psi_0_err;
   _chisq = chisq;
   _chisq_dof = chisq_dof;
+  _dsdz = 0.0;
+  _dsdz_err = 0.0;
 }
 
 // Destructor
