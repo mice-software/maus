@@ -42,7 +42,7 @@ SimpleCircle::SimpleCircle() {
 SimpleCircle::SimpleCircle(double x0, double y0, double R) {
   _x0 = x0;
   _x0_err = 0.0;
-  _y0 = x0;
+  _y0 = y0;
   _y0_err = 0.0;
   _R = R;
   _R_err = 0.0;

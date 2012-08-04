@@ -15,20 +15,20 @@
  *
  */
 
-#include "src/common_cpp/DataStructure/SimpleLine.hh"
+#include "src/common_cpp/Recon/SciFi/SimpleLine.hh"
 #include "gtest/gtest.h"
 
-namespace MAUS {
+// namespace MAUS {
 
-class SimpleLineTestDS : public ::testing::Test {
+class SimpleLineTest : public ::testing::Test {
   protected:
-    SimpleLineTestDS()  {}
-    virtual ~SimpleLineTestDS() {}
+    SimpleLineTest()  {}
+    virtual ~SimpleLineTest() {}
     virtual void SetUp()    {}
     virtual void TearDown() {}
 };
 
-TEST_F(SimpleLineTestDS, test_default_constructor) {
+TEST_F(SimpleLineTest, test_default_constructor) {
   SimpleLine l1;
   EXPECT_EQ(l1.get_c(), 0.0);
   EXPECT_EQ(l1.get_c_err(), 0.0);
@@ -38,7 +38,7 @@ TEST_F(SimpleLineTestDS, test_default_constructor) {
   EXPECT_EQ(l1.get_chisq_dof(), 0.0);
 }
 
-TEST_F(SimpleLineTestDS, test_first_parameter_constructor) {
+TEST_F(SimpleLineTest, test_first_parameter_constructor) {
   double c = 1.0;
   double m = 2.0;
 
@@ -48,7 +48,7 @@ TEST_F(SimpleLineTestDS, test_first_parameter_constructor) {
   EXPECT_EQ(l1.get_m(), m);
 }
 
-TEST_F(SimpleLineTestDS, test_second_parameter_constructor) {
+TEST_F(SimpleLineTest, test_second_parameter_constructor) {
   double c = 1.0;
   double c_err = 0.1;
   double m = 2.0;
@@ -66,7 +66,7 @@ TEST_F(SimpleLineTestDS, test_second_parameter_constructor) {
   EXPECT_EQ(l1.get_chisq_dof(), chisq_dof);
 }
 
-TEST_F(SimpleLineTestDS, test_getters_setters_clear) {
+TEST_F(SimpleLineTest, test_getters_setters_clear) {
   double c = 1.0;
   double c_err = 0.1;
   double m = 2.0;
@@ -109,4 +109,4 @@ TEST_F(SimpleLineTestDS, test_getters_setters_clear) {
   EXPECT_EQ(l1.get_chisq_dof(), chisq_dof);
 }
 
-} // ~namespace MAUS
+// } // ~namespace MAUS
