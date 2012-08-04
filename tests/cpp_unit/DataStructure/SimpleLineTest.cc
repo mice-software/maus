@@ -57,7 +57,7 @@ TEST_F(SimpleLineTestDS, test_second_parameter_constructor) {
   double chisq_dof = 0.5;
 
   SimpleLine l1(c, c_err, m, m_err, chisq, chisq_dof);
-  
+
   EXPECT_EQ(l1.get_c(), c);
   EXPECT_EQ(l1.get_c_err(), c_err);
   EXPECT_EQ(l1.get_m(), m);

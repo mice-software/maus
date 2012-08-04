@@ -102,9 +102,9 @@ std::string MapCppTrackerRecon::process(std::string document) {
         std::cout << "Pattern Recognition complete." << std::endl;
       }
       // Kalman Track Fit.
-      // if ( event.straightprtracks().size() || event.helicalprtracks().size() ) {
-      //  track_fit(event);
-      // }
+      if ( event.straightprtracks().size() || event.helicalprtracks().size() ) {
+        track_fit(event);
+      }
       // Perform alignment study.
       // if ( event.spacepoints().size() == 5 ) {
       //  perform_alignment_study(event);
@@ -404,7 +404,7 @@ void MapCppTrackerRecon::save_to_json(SciFiEvent &evt, int event_i) {
     Json::Value track;
     track["num_points"] = evt.helicalprtracks()[track_i].get_num_points();
     track["R"]          = evt.helicalprtracks()[track_i].get_R();
-    track["dzds"]       = evt.helicalprtracks()[track_i].get_dzds();
+    track["dsdz"]       = evt.helicalprtracks()[track_i].get_dsdz();
     track["Phi_0"]      = evt.helicalprtracks()[track_i].get_phi0();
     track["starting_point"]["x"] = evt.helicalprtracks()[track_i].get_x0();
     track["starting_point"]["y"] = evt.helicalprtracks()[track_i].get_y0();

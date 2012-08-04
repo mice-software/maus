@@ -761,7 +761,7 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
                       std::ofstream out1("params_recon.txt", std::ios::out | std::ios::app);
                       out1 << circle.get_R() << "\t" << tan_lambda << "\t";
                       out1 << Phi_0 << "\t" << pt << "\t" << pz << "\t";
-                      out1 << 0  << good_spnts[0]->get_tracker() << std::endl;
+                      out1 << 0  <<"\t"<< good_spnts[0]->get_tracker() << std::endl;
                     }
 
                     if ( !_use_full_helix_fit ) {
@@ -790,55 +790,6 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
                       htrks.push_back(track);
                     }
 
-
-                    // NOTE this isn't working right now, so we aren't going to use it and we will
-                    // see how well reconstruction holds...
-                    if ( _use_full_helix_fit ) {
-                      bool good_helix = full_helix_fit(good_spnts, circle, line_sz, helix);
-
-                      if ( debug > 1 ) {
-                        std::ofstream out_helix("helix_red_chisq.txt",
-                                                std::ios::out | std::ios::app);
-                        out_helix << helix.get_chisq() / (num_points - 2) <<"\t";
-                        out_helix << good_spnts[0]->get_tracker()<< std::endl;
-
-                        std::ofstream out_helix2("helix_chisq.txt", std::ios::out | std::ios::app);
-                        out_helix2 << helix.get_chisq() << "\t" << good_spnts[0]->get_tracker();
-                        out_helix2 << std::endl;
-                      }
-
-                      if ( good_helix ) {
-                        // push helix back into track object once its made
-                        if ( debug > 0 )
-                          std::cout << "Helix fit found, adding " << num_points << "pt track **\n";
-
-                        CLHEP::Hep3Vector pos_0 = good_spnts[0]->get_position();
-                        SciFiHelicalPRTrack track(-1, num_points, pos_0, helix);
-
-                        if ( debug > 1 ) {
-                          std::ofstream outblank("sp_per_track.txt",
-                                                 std::ios::out | std::ios::app);
-                          outblank << num_points << "\t" << good_spnts[0]->get_tracker() << "\n";
-                        }
-
-                        // Set all the good sp to used and convert pointers to variables
-                        std::vector<SciFiSpacePoint> good_spnts_variables;
-                        good_spnts_variables.resize(good_spnts.size());
-
-                        for ( int i = 0; i < static_cast<int>(good_spnts.size()); ++i ) {
-                          good_spnts[i]->set_used(true);
-                          good_spnts_variables[i] = *good_spnts[i];
-                        }
-                        // Populate the sp of the track and then push the trk back into trks vect
-                        track.set_spacepoints(good_spnts_variables);
-                        htrks.push_back(track);
-                      } else { // Debugging **************
-                        if ( debug > 0 ) {
-                          std::cout << "Helix fit didn't converge for reasonable # of interations.";
-                          std::cout << " Track is rejected...." << std::endl;
-                        }
-                      }
-                    }
                   } else { // Debugging **************
                     if ( debug > 0 ) {
                       std::cout << "sz chisq = " << line_sz.get_chisq();
@@ -929,11 +880,11 @@ void PatternRecognition::circle_fit(const std::vector<SciFiSpacePoint*> &spnts,
     R = sqrt((4 * alpha) + (beta * beta) + (gamma * gamma)) / (2 * alpha);
 
   if ( debug > 0 ) {
-    std::cout << "alpha = " << alpha << std::endl;
-    std::cout << "beta = " << beta << std::endl;
-    std::cout << "gamma = " << gamma << std::endl;
-    if ( R < 0. )
-      std::cout << "R was < 0 geometrically but taking abs_val for physical correctness\n";
+  // std::cout << "alpha = " << alpha << std::endl;
+  // std::cout << "beta = " << beta << std::endl;
+  // std::cout << "gamma = " << gamma << std::endl;
+  // if ( R < 0. )
+  //   std::cout << "R was < 0 geometrically but taking abs_val for physical correctness\n";
   }
 
   R = fabs(R);
@@ -1091,9 +1042,9 @@ bool PatternRecognition::AB_ratio(double &dphi_ji, double &dphi_kj, double dz_ji
   for ( int n = 0; n < 10; ++n ) // {
     for ( int m = 0; m < 10; ++m ) { // m always less than or equal to n
       double A, B;
-      A = ( dphi_kj + ( 2 * n * CLHEP::pi ) ) / ( dphi_ji + ( 2 * m * CLHEP::pi ) ); // phi_ratio
+      A = ( dphi_kj + ( 2 * m * CLHEP::pi ) ) / ( dphi_ji + ( 2 * n * CLHEP::pi ) ); // phi_ratio
       B = dz_kj / dz_ji; // z_ratio
-      if ( debug > 0 ) std::cout <<  " A - B  = " << fabs(A - B)/B << std::endl;
+     // if ( debug > 0 ) std::cout <<  " A - B  = " << fabs(A - B)/B << std::endl;
       if ( fabs(A - B) / B < _AB_cut ) {
         dphi_kj += 2 * n * CLHEP::pi;
         dphi_ji += 2 * m * CLHEP::pi;
@@ -1113,289 +1064,6 @@ void PatternRecognition::dphi_to_ds(double R, const std::vector<double> &dphi,
     ds.push_back(ds_ji);
   }
 } // ~dphi_to_ds(...)
-
-bool PatternRecognition::full_helix_fit(const std::vector<SciFiSpacePoint*> &spnts,
-                                        const SimpleCircle &circle, const SimpleLine &line_sz,
-                                        SimpleHelix &helix) {
-  // If the counter reaches 10 before an acceptable chisq value is reached, then we reject the track
-  // This is because we've already done the
-
-  // Initial parameters
-  double R = circle.get_R();
-  double Phi_0 = helix.get_Phi_0();
-
-  double dsdz = line_sz.get_m();
-
-  double tan_lambda = 1 / dsdz;
-
-  if ( debug > 0 ) std::cout << "dsdz = " << dsdz << std::endl;
-
-  if ( debug > 0 ) std::cout << "tan_lambda = " << tan_lambda << std::endl;
-  CLHEP::Hep3Vector starting_point = spnts[0]->get_position();
-
-  // Calculate chisq with initial params
-  double best_chisq = calculate_chisq(spnts, circle.get_turning_angle(), Phi_0, tan_lambda, R);
-  // double best_chi2dof = best_chisq / static_cast<int>(spnts.size());
-
-  if ( debug > 0 ) std::cout<< "initial best chisq = " << best_chisq << std::endl;
-
-  // double R_prime, Phi_0_prime, tan_lambda_prime, dsdz_prime = 0.;
-
-  if ( best_chisq/ (static_cast<int>(spnts.size()) - 2) < _helix_chisq_cut ) {
-    if ( debug > 0 ) {
-      std::cout << "best_chisq = " << best_chisq << std::endl;
-      std::cout << "yay, finished" << std::endl;
-    }
-    helix.set_R(R);
-    helix.set_Phi_0(Phi_0);
-    helix.set_dsdz(dsdz);
-    helix.set_tan_lambda(tan_lambda);
-    helix.set_chisq_dof(best_chisq / static_cast<int>(spnts.size()));
-    helix.set_chisq(best_chisq);
-    return true;
-  }
-
-  // Declare adjustments to parameters and chisq that will be calculated after adjuments are made
-  for ( int i = 0; i < 10; ++i ) {
-    double dR, dPhi_0, dtan_lambda = 0.; // Adjustments reset to zero with every iteration
-    calculate_adjustments(spnts, circle.get_turning_angle(), R, Phi_0, tan_lambda, dR, dPhi_0,
-                          dtan_lambda);
-
-    R -= dR;
-    Phi_0 -= dPhi_0;
-    tan_lambda -= dtan_lambda;
-
-    dsdz = 1/tan_lambda;
-    double chisq = calculate_chisq(spnts, circle.get_turning_angle(), Phi_0, tan_lambda, R);
-
-    if ( fabs(best_chisq - chisq) < _chisq_diff ||
-         best_chisq/ (static_cast<int>(spnts.size()) - 2) < _helix_chisq_cut ) {
-      if ( debug > 0 ) std::cout << "yay, finished" << std::endl;
-      best_chisq = chisq;
-      helix.set_R(R);
-      helix.set_Phi_0(Phi_0);
-      helix.set_dsdz(dsdz);
-      helix.set_tan_lambda(tan_lambda);
-      helix.set_chisq_dof(best_chisq / (static_cast<int>(spnts.size()) -2 ));
-      helix.set_chisq(best_chisq);
-      return true;
-      // returns the helix too
-    }
-
-    if ( chisq > best_chisq && fabs(best_chisq - chisq) > _chisq_diff ) {
-      if ( debug > 0 ) std::cout << "** chisq > best_chisq.... and chisq = "<< chisq << "\n";
-
-      // If the new chi2 you calculate is larger than previous, then the minimum has been passed
-
-      while (chisq > best_chisq && chisq/(static_cast<int>(spnts.size()) - 2) > _helix_chisq_cut) {
-        dR /= 2;
-        dPhi_0 /= 2;
-        dtan_lambda /= 2;
-
-        R += dR;
-        Phi_0 += dPhi_0;
-        tan_lambda += dtan_lambda;
-
-        dsdz = 1/ tan_lambda;
-        ++i; // This counts as an iteration.
-        chisq = calculate_chisq(spnts, circle.get_turning_angle(), Phi_0, tan_lambda, R);
-        // double chisq_dof = chisq / static_cast<int>(spnts.size());
-        if ( debug > 0 ) std::cout << "new chisq = " << chisq << std::endl;
-
-        if ( fabs(best_chisq - chisq) < _chisq_diff ||
-          best_chisq/ (static_cast<int>(spnts.size()) - 2) < _helix_chisq_cut ) {
-          if ( debug > 0 ) std::cout << "yay, finished" << std::endl;
-          best_chisq = chisq;
-          helix.set_R(R);
-          helix.set_Phi_0(Phi_0);
-          helix.set_dsdz(dsdz);
-          helix.set_tan_lambda(tan_lambda);
-          helix.set_chisq_dof(best_chisq / (static_cast<int>(spnts.size()) -2 ));
-          helix.set_chisq(best_chisq);
-
-          return true;
-          // returns the helix too
-        }
-
-        if ( i == 10 || fabs(chisq - best_chisq) < _chisq_diff)
-          break;
-      }
-    } // ~ chisq > best_chisq && fabs(chisq - best_chisq) > 1
-
-      if ( debug > 0 ) {
-        std::cout << "chisq = " << chisq << std::endl;
-        std::cout << "best_chisq = " << best_chisq << std::endl;
-        std::cout << "chisq difference = " << fabs(chisq - best_chisq) << std::endl;
-      }
-      if ( fabs(best_chisq - chisq) < _chisq_diff ||
-           chisq/ (static_cast<int>(spnts.size()) - 2) < _helix_chisq_cut ) {
-        if ( debug > 0 ) std::cout << "yay, finished" << std::endl;
-        best_chisq = chisq;
-        helix.set_R(R);
-        helix.set_Phi_0(Phi_0);
-        helix.set_dsdz(dsdz);
-        helix.set_tan_lambda(tan_lambda);
-        helix.set_chisq_dof(best_chisq / (static_cast<int>(spnts.size()) -2 ));
-        helix.set_chisq(best_chisq);
-        return true;
-        // returns the helix too
-      } else if ( chisq < best_chisq && fabs(best_chisq - chisq) > _chisq_diff ) {
-        best_chisq = chisq; // If we reduced chisq but still not at miniumum
-      } // i will iterate.
-    } // ~i
-  // Return false if the loop above hasn't returned true, on in other words, i reached 10 before
-  // we reached a good chisq convergence then we return false.
-  return false;
-} // ~full_helix_fit(...)
-
-double PatternRecognition::calculate_chisq(const std::vector<SciFiSpacePoint*> &spnts,
-                                           const std::vector<double> &turning_angles, double Phi_0,
-                                           double tan_lambda, double R) {
-  double chi2 = 0;
-  for ( unsigned int i = 0; i < spnts.size(); ++i ) {
-
-    CLHEP::Hep3Vector p = spnts[i]->get_position();
-    double phi_i;
-    phi_i = turning_angles[i];
-
-    phi_i -= Phi_0;
-    double A, B, C;
-    A = spnts[0]->get_position().x();
-    B = spnts[0]->get_position().y();
-    C = spnts[0]->get_position().z();
-
-    double xi, yi, zi;
-
-    helix_function_at_i(R, Phi_0, tan_lambda, A, B, C, phi_i, xi, yi, zi);
-
-    if ( debug > 0 ) {
-      std::cout << "Making sure helix is reconstructing properly..." << std::endl;
-      std::cout << "x_recon = " << xi<< " should equal   x_sp = " << p.x() << std::endl;
-      std::cout << "y_recon = " << yi<< " should equal   y_sp = " << p.y() << std::endl;
-      std::cout << "z_recon = " << zi<< " should equal   z_sp = " << p.z() << std::endl;
-    }
-
-    double sd = -1;
-    if ( spnts[i]->get_station() == 5 )
-      sd = _sd_5;
-    else
-      sd = _sd_1to4;
-
-    double w = 1 / (sd * sd);
-
-    chi2 += w*((p.x()-xi)*(p.x()-xi)) + w*((p.y()-yi)*(p.y()-yi)); // + ((p.z()-zi)*(p.z()-zi));
-  }
-  return chi2;
-} // ~calculate_chisq(...)
-
-void PatternRecognition::helix_function_at_i(double R, double phi_0, double tan_lambda,
-                                             double A, double B, double C, double phi_i,
-                                             double &xi, double &yi, double &zi) {
-    xi = A + R * (cos(phi_i) - 1) * cos(phi_0) - R * sin(phi_i) * sin(phi_0);
-    yi = B + R * (cos(phi_i) - 1) * sin(phi_0) + R * sin(phi_i) * cos(phi_0);
-    zi = C + (R * phi_i * tan_lambda);
-} // ~helix_function_at_i
-
-void PatternRecognition::calculate_adjustments(const std::vector<SciFiSpacePoint*> &spnts,
-                                               const std::vector<double> &turning_angles, double R,
-                                               double phi_0, double tan_lambda, double &dR,
-                                               double &dphi_0, double &dtan_lambda) {
-  CLHEP::HepMatrix G(3, 3); // symmetric matrix containing second derivatives w.r.t. each parameter
-  CLHEP::HepMatrix g(3, 1); // vector containing first derivatives w.r.t. each parameter
-
-  dR = 0.;
-  dphi_0 = 0;
-  dtan_lambda = 0;
-
-  double A, B, C;
-  A = spnts[0]->get_position().x();
-  B = spnts[0]->get_position().y();
-  C = spnts[0]->get_position().z();
-
-  // construct the individual matrix elements as 0 to begin with.
-  double G_rr = 0., G_bb = 0., G_ll = 0., G_rb = 0., G_br = 0., G_rl = 0., G_lr = 0.;
-  double G_bl = 0., G_lb = 0.; // These will remain 0.
-
-  double g_r = 0., g_b = 0., g_l = 0.;
-
-  for ( int i = 0; i < static_cast<int>(spnts.size()); ++i ) {
-
-    CLHEP::Hep3Vector p = spnts[i]->get_position();
-    double phi_i;
-    phi_i = turning_angles[i];
-    phi_i -= phi_0; // Everything relative to starting point.
-
-    // Get errors on x and y measurements (equal).  Note error on z negligible.
-    double sd = -1;
-    if ( spnts[i]->get_station() == 5 )
-      sd = _sd_5;
-    else
-      sd = _sd_1to4;
-
-    double w = 1 / (sd * sd);
-
-    double xi = 0., yi = 0., zi = 0;
-    helix_function_at_i(R, phi_0, tan_lambda, A, B, C, phi_i, xi, yi, zi);
-
-    // Calculate the elements of the gradient vector g
-    g_r += w * (((p.x() - xi)*(xi - A)) + ((p.y() - yi)*(yi - B))) + ((p.z() - zi)*(zi - C));
-    g_b += w * (-1*((p.x() - xi)*(yi - B)) + ((p.y() - yi)*(xi - A)));
-    g_l += (p.z() - zi) * phi_i;
-
-    // Calculate the elements of the matrix G
-    G_rr += (w*((xi - A)*(xi - A) + (yi - B)*(yi - B))) + (zi - C)*(zi - C);
-    G_rb += w *(((p.x() - xi)*(yi - B)) - ((p.y() - yi)*(xi - A)));
-    G_rl += ((zi - C) - (p.z() - zi)) * phi_i;
-    G_bb += w * ((p.x() - A) * (xi - A) + (p.y() - B) * (yi - B));
-    G_ll += phi_i * phi_i;
-  } // end i
-
-  g_r = (-2 / R) * g_r;
-  g_b = -2 * g_b;
-  g_l = -2 * R * g_l;
-
-  G_rr = (2 / (R * R)) * G_rr;
-  G_rb = (2 / R) * G_rb;
-  G_br = G_rb;
-  G_rl = 2 * G_rl;
-  G_lr = G_rl;
-  G_bb = 2 * G_bb;
-  G_ll = 2 * R * R * G_ll;
-
-  // Now we fill the matrix and gradient vector.
-  G[0][0] = G_rr;
-  G[0][1] = G_rb;
-  G[0][2] = G_rl;
-
-  G[1][0] = G_br;
-  G[1][1] = G_bb;
-  G[1][2] = G_bl; // Should be 0
-
-  G[2][0] = G_lr;
-  G[2][1] = G_lb; // Should be 0
-  G[2][2] = G_ll;
-
-  // Column vector
-  g[0][0] = g_r;
-  g[1][0] = g_b;
-  g[2][0] = g_l;
-
-  // Now we calculate the corrections to the parameters
-  int ierr;
-  G.invert(ierr);
-  CLHEP::HepMatrix d_params = G * g; // (3x3)(3x1) = (3x1) vector of corrections
-
-  if ( debug > 0 ) std::cout<< d_params << std::endl;
-
-  dR = d_params[0][0];
-  dphi_0 = d_params[1][0];
-  dtan_lambda = d_params[2][0];
-
-  // Calculate errors here for now, but I don't think we need them unless its just for book-keeping
-  double R_err = 2*G[0][0];
-  double Phi_0_err = 2*G[1][1];
-  double tan_lambda_err = 2*G[2][2];
-} // ~calculate_adjustments(...)
 
 // For linear Pattern Recognition use
 void PatternRecognition::set_end_stations(const std::vector<int> ignore_stations,

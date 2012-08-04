@@ -39,7 +39,6 @@
 #include "src/common_cpp/Recon/Kalman/GlobalTrack.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanMonitor.hh"
-#include "src/common_cpp/Recon/SciFi/SeedFinder.hh"
 
 // namespace ublas = boost::numeric::ublas;
 

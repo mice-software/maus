@@ -88,10 +88,10 @@ void RealDataDigitization::process(SciFiSpill &spill, Json::Value const &daq) {
 
       // Find tracker, station, plane, channel.
       int tracker, station, plane, channel;
-      get_StatPlaneChannel(board, bank, channel_ro, tracker, station, plane, channel);
+      bool found = get_StatPlaneChannel(board, bank, channel_ro, tracker, station, plane, channel);
 
       // Exclude missing modules.
-      if ( pe > 1.0 && tracker != -1 ) {
+      if ( pe > 1.0 && found ) {
         SciFiDigit *digit = new SciFiDigit(spill, eventNo,
                                            tracker, station, plane, channel, pe, tdc);
         event->add_digit(digit);
@@ -140,8 +140,6 @@ void RealDataDigitization::read_in_all_Boards(std::ifstream &inf) {
         std::istringstream ist1(line.c_str());
         ist1 >> unique_chan_no >> board >> bank >> chan >> p >> g;
 
-        // int temp = unique_chan_no;
-
         Json::Value channel;
         channel["pedestal"]=p;
         channel["gain"]=g;
@@ -185,9 +183,9 @@ bool RealDataDigitization::load_mapping(std::string file) {
   return true;
 }
 
-void RealDataDigitization::
+bool RealDataDigitization::
      get_StatPlaneChannel(int& board, int& bank, int& chan_ro,
-                          int& tracker, int& station, int& plane, int& channel) {
+                          int& tracker, int& station, int& plane, int& channel) const {
   bool found = false;
   tracker = station = plane = channel = -1;
 
@@ -200,12 +198,16 @@ void RealDataDigitization::
       found = true;
     }
   }
-
-  // assert(found);
+  return found;
 }
 
-bool RealDataDigitization::is_good_channel(const int board, const int bank, const int chan_ro) {
-  return good_chan[board][bank][chan_ro];
+bool RealDataDigitization::is_good_channel(const int board, const int bank,
+                                           const int chan_ro) const {
+  if ( board < 16 && bank < 4 && chan_ro < 128 ) {
+    return good_chan[board][bank][chan_ro];
+  } else {
+    return false;
+  }
 }
 
 bool RealDataDigitization::load_bad_channels() {

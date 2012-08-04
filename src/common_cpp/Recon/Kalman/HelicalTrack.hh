@@ -30,9 +30,7 @@
 #include "TMath.h"
 #include "TMatrixD.h"
 
-// #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
-#include "src/common_cpp/Recon/SciFi/SeedFinder.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiHelicalPRTrack.hh"
 
 // namespace MAUS {
@@ -50,10 +48,23 @@ class HelicalTrack : public KalmanTrack {
   double get_y0() const { return _y0; }
 
   double get_r() const { return _r; }
+
+  double get_projected_x() const { return _projected_x; }
+
+  double get_projected_y() const { return _projected_y; }
+
  private:
   double _x0, _y0, _r;
 
-  int _sign;
+  double _B, _q;
+
+  int _sign, _h;
+
+  static const double _alpha;
+
+  double _projected_x;
+
+  double _projected_y;
 
   // static const double ALPHA = -1.0/(300000000.*4.);
 };

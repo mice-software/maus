@@ -79,8 +79,8 @@ class RealDataDigitization {
 
   /** @brief Converts read-out map into SciFi Fibre map
    */
-  void get_StatPlaneChannel(int &board, int &bank, int &chan_ro,
-                            int &tracker, int &station, int &plane, int &channel);
+  bool get_StatPlaneChannel(int &board, int &bank, int &chan_ro,
+                            int &tracker, int &station, int &plane, int &channel) const;
 
   /** @brief Reads the bad channel list from file.
    */
@@ -88,7 +88,7 @@ class RealDataDigitization {
 
   /** @brief Returns value depends on the goodness of the channel.
    */
-  bool is_good_channel(int board, int bank, int chan_ro);
+  bool is_good_channel(int board, int bank, int chan_ro) const;
 
  private:
   /// A vector containing calibration values for every 4 banks of the 16 boards.

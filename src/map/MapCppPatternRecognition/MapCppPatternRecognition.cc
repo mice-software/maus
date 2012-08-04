@@ -216,7 +216,7 @@ void MapCppPatternRecognition::save_to_json(SciFiEvent &evt) {
     Json::Value a_track;
     a_track["num_points"] = evt.helicalprtracks()[track_i].get_num_points();
     a_track["R"]          = evt.helicalprtracks()[track_i].get_R();
-    a_track["dzds"]       = evt.helicalprtracks()[track_i].get_dzds();
+    a_track["dsdz"]       = evt.helicalprtracks()[track_i].get_dsdz();
     a_track["Phi_0"]      = evt.helicalprtracks()[track_i].get_phi0();
     a_track["starting_point"]["x"] = evt.helicalprtracks()[track_i].get_x0();
     a_track["starting_point"]["y"] = evt.helicalprtracks()[track_i].get_y0();

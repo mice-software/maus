@@ -30,13 +30,15 @@ class RealDataDigitizationTest : public ::testing::Test {
 };
 
 TEST_F(RealDataDigitizationTest, test_calibration_load) {
-  RealDataDigitization test_case;
-  bool bad_calib = test_case.load_calibration("nonsense.txt");
+  RealDataDigitization test_case_1;
+  bool bad_calib = test_case_1.load_calibration("nonsense.txt");
   EXPECT_FALSE(bad_calib);
-  bool good_calib = test_case.load_calibration("scifi_calibration_30_09_2011.txt");
+  RealDataDigitization test_case_2;
+  bool good_calib = test_case_2.load_calibration("scifi_calibration_30_09_2011.txt");
   EXPECT_TRUE(good_calib);
-  /*
-  std::vector<Json::Value> calibration_data = test_case.get_calibration();
+/*
+  std::vector<Json::Value> calibration_data[16][4];
+  calibration_data = test_case_2.get_calibration();
   int num_boards = 16;
   int num_banks = 4;
   int num_channels = 128;
@@ -46,7 +48,8 @@ TEST_F(RealDataDigitizationTest, test_calibration_load) {
     for ( int bank_i = 0; bank_i < num_banks; bank_i++ ) {
       EXPECT_EQ(num_channels, calibration_data[board_i][bank_i].size());
     }
-  }*/
+  }
+*/
 }
 
 TEST_F(RealDataDigitizationTest, test_mapping_load) {
@@ -73,7 +76,22 @@ TEST_F(RealDataDigitizationTest, test_mapping_load) {
   int number_missing_channels = 14*128;
   // have to take this test out till we sort out
   // our calibration...
-  // EXPECT_EQ(number_missing_channels, missing_channel_counter);
+  EXPECT_EQ(number_missing_channels, missing_channel_counter);
+  int board = 0;
+  int bank = 0;
+  int chan_ro = 0;
+  int tracker = 0;
+  int station = 0;
+  int plane = 0;
+  int channel = 0;
+  int bad_bank = 99;
+
+  bool correct = test_case.get_StatPlaneChannel(board, bank, chan_ro,
+                                                tracker, station, plane, channel);
+  EXPECT_TRUE(correct);
+  bool wrong = test_case.get_StatPlaneChannel(board, bad_bank, chan_ro,
+                                                tracker, station, plane, channel);
+  EXPECT_FALSE(wrong);
 }
 
 TEST_F(RealDataDigitizationTest, test_bad_channel_load) {
@@ -87,4 +105,35 @@ TEST_F(RealDataDigitizationTest, test_bad_channel_load) {
   EXPECT_TRUE(test_case.is_good_channel(good_channel[0], good_channel[1], good_channel[2]));
   EXPECT_FALSE(test_case.is_good_channel(out_of_range[0], out_of_range[1], out_of_range[2]));
 }
+
+TEST_F(RealDataDigitizationTest, test_read_in_all_boards) {
+  char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
+  std::string file="scifi_calibration_30_09_2011.txt";
+  std::string fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerDigits/"+file;
+  std::ifstream inf(fname.c_str());
+
+  RealDataDigitization test_case;
+  test_case.read_in_all_Boards(inf);
+}
+
+TEST_F(RealDataDigitizationTest, test_process) {
+  char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
+  std::string file="lab7_unpacked";
+  std::string fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerDigits/"+file;
+  std::ifstream inf(fname.c_str());
+
+  SciFiSpill spill;
+
+  std::string line;
+  getline(inf, line);
+  getline(inf, line);
+
+  Json::Value root = JsonWrapper::StringToJson(line);
+  Json::Value daq = root.get("daq_data", 0);
+
+  RealDataDigitization test_case;
+  test_case.process(spill, daq);
+  EXPECT_TRUE(spill.events().size()>0);
+}
+
 // } // namespace

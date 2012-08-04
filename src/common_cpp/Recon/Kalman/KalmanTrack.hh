@@ -62,6 +62,8 @@ class KalmanTrack {
 
   void smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_site);
 
+  TMatrixD get_propagator() { return _F; }
+
  protected:
   TMatrixD _H;
 
