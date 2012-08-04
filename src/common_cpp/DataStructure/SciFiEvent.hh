@@ -30,9 +30,6 @@
 
 namespace MAUS {
 
-typedef std::vector<SciFiHit*> SciFiHitPArray;
-typedef std::vector<SciFiDigit*> SciFiDigitPArray;
-typedef std::vector<SciFiCluster*> SciFiClusterPArray;
 
 /** @class SciFiEvent A container to hold other SciFi containers, representing a particle event
  *

@@ -43,14 +43,26 @@
 
 class SciFiSpacePoint {
  public:
-  SciFiSpacePoint(); // Default constructor
 
+  /** Default constructor - initialises to 0/NULL */
+  SciFiSpacePoint();
+
+  /** Copy constructor - any pointers are deep copied */
+  SciFiSpacePoint(const SciFiSpacePoint &_scifispacepoint);
+
+  /** Two cluster constructor  */
   SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2, SciFiCluster *clust3);
 
+  /** Three cluster constructor  */
   SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2);
 
-  ~SciFiSpacePoint();
+  /** Destructor  */
+  virtual ~SciFiSpacePoint();
 
+  /** Assignment operator - any pointers are deep copied */
+  SciFiSpacePoint& operator=(const SciFiSpacePoint &_scifispacepoint);
+
+  // Getters and setters
   void set_spill(int spill) { _spill = spill; }
 
   int get_spill()   const { return _spill; }
@@ -100,22 +112,19 @@ class SciFiSpacePoint {
   std::vector<SciFiCluster*> get_channels()  const { return _channels; }
 
  private:
-  int _spill, _event;
-
-  int _tracker, _station;
-
-  double _npe;
-
-  CLHEP::Hep3Vector _position;
-
-  double _chi2;
-
   bool _used;
-  // int _time, _time_error, _time_res;
+
+  int _spill, _event, _tracker, _station;
+
+  double _npe, _chi2;
 
   std::string _type;
 
   std::vector<SciFiCluster*>  _channels;
+
+  CLHEP::Hep3Vector _position;
+
+  // int _time, _time_error, _time_res;
 };  // Don't forget this trailing colon!!!!
 // } // ~namespace MAUS
 

@@ -33,23 +33,26 @@
 
 class SciFiCluster {
  public:
-  SciFiCluster(); // Default constructor
 
-  /** @brief Constructs cluster from a single digit.
-   */
+  /** Default constructor - initialises to 0/NULL */
+  SciFiCluster();
+
+  /** Copy constructor - any pointers are deep copied */
+  SciFiCluster(const SciFiCluster &_scificluster);
+
+  /** Constructor - creates cluster from a single digit */
   explicit SciFiCluster(SciFiDigit *digit);
 
-  ~SciFiCluster();
+  /** Destructor - any member pointers are deleted */
+  virtual ~SciFiCluster();
 
-  /** @brief Performs the cluster merging.
-  */
+  /** Assignment operator - any pointers are deep copied */
+  SciFiCluster& operator=(const SciFiCluster &_scificluster);
+
+  /** Performs the cluster merging. */
   void add_digit(SciFiDigit* neigh);
 
-  SciFiCluster(const SciFiCluster &cluster);
-
-  SciFiCluster& operator=(const SciFiCluster &cluster);
-
-  // list of setters and getters
+  // Getters and Setters
   void set_spill(int spill) { _spill = spill; }
 
   int get_spill()   const { return _spill; }
@@ -115,25 +118,14 @@ class SciFiCluster {
   CLHEP::Hep3Vector get_true_position() const { return _pos; }
 
  private:
-  CLHEP::Hep3Vector _pos, _p;
-
   bool _used;
 
-  int _spill, _event;
+  int _spill, _event, _tracker, _station, _plane, _id;
 
-  int _tracker, _station, _plane;
+  double _channel_w, _npe, _time, _alpha;
 
-  double _channel_w, _npe, _time;
-
-  CLHEP::Hep3Vector _direction;
-
-  CLHEP::Hep3Vector _position;
-
-  CLHEP::Hep3Vector _relat_pos;
-
-  double _alpha;
-
-  int _id;
+  CLHEP::Hep3Vector _pos, _p;
+  CLHEP::Hep3Vector _direction, _position, _relat_pos;
 };  // Don't forget this trailing colon!!!!
 // } // ~namespace MAUS
 

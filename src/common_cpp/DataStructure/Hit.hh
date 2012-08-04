@@ -151,6 +151,7 @@ class Hit {
 };
 
 typedef Hit<SciFiChannelId> SciFiHit;
+typedef std::vector<SciFiHit*> SciFiHitPArray;
 typedef Hit<TOFChannelId> TOFHit;
 typedef Hit<SpecialVirtualChannelId> SpecialVirtualHit;
 }

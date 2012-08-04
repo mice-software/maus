@@ -17,8 +17,8 @@
 
 /** @class SciFiStraightPRTrack */
 
-#ifndef  SCIFISTRAIGHTPRTRACK_HH
-#define SCIFISTRAIGHTPRTRACK_HH
+#ifndef  _SRC_COMMON_CPP_DATASTRUCTURE_SCIFISTRAIGHTPRTRACK_HH
+#define _SRC_COMMON_CPP_DATASTRUCTURE_SCIFISTRAIGHTPRTRACK_HH
 
 // C++ headers
 #include <vector>
@@ -27,10 +27,10 @@
 #include "Rtypes.h"
 
 // MAUS headers
-#include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
-#include "src/common_cpp/Recon/SciFi/SimpleLine.hh"
+#include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
+#include "src/common_cpp/DataStructure/SimpleLine.hh"
 
-// namespace MAUS {
+namespace MAUS {
 
 class SciFiStraightPRTrack {
   public:
@@ -55,7 +55,7 @@ class SciFiStraightPRTrack {
     SciFiStraightPRTrack& operator=(const SciFiStraightPRTrack &_strk);
 
     // Getters
-    std::vector<SciFiSpacePoint> get_spacepoints() const { return _spoints; }
+    SciFiSpacePointArray get_spacepoints() const { return _spoints; }
 
     double get_x0() const { return _x0; }
     double get_y0() const { return _y0; }
@@ -68,7 +68,7 @@ class SciFiStraightPRTrack {
     int get_num_points() const { return _num_points; }
 
     // Setters
-    void set_spacepoints(std::vector<SciFiSpacePoint> spoints) { _spoints = spoints; }
+    void set_spacepoints(SciFiSpacePointArray spoints) { _spoints = spoints; }
 
     void set_x0(double x0) { _x0 = x0; }
     void set_y0(double y0) { _y0 = y0; }
@@ -83,7 +83,7 @@ class SciFiStraightPRTrack {
     void print_params();
 
   private:
-    std::vector<SciFiSpacePoint> _spoints;
+    SciFiSpacePointArray _spoints;
 
     int _tracker;
     int _num_points;
@@ -95,8 +95,12 @@ class SciFiStraightPRTrack {
     double _x_chisq;
     double _y_chisq;
 
-    // ClassDef(SciFiStraightPRTrack, 1)
+    ClassDef(SciFiStraightPRTrack, 1)
 };
-// } // ~namespace MAUS
+
+typedef std::vector<SciFiStraightPRTrack*> SciFiStraightPRTrackPArray;
+typedef std::vector<SciFiStraightPRTrack> SciFiStraightPRTrackArray;
+
+} // ~namespace MAUS
 
 #endif

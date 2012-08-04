@@ -16,9 +16,9 @@
  */
 
 #include <vector>
-#include "src/common_cpp/Recon/SciFi/SciFiStraightPRTrack.hh"
+#include "src/common_cpp/DataStructure/SciFiStraightPRTrack.hh"
 
-// namespace MAUS {
+namespace MAUS {
 
 // Constructors
 SciFiStraightPRTrack::SciFiStraightPRTrack() : _x0(-1.0), _mx(-1.0), _x_chisq(-1.0),
@@ -96,4 +96,4 @@ void SciFiStraightPRTrack::print_params() {
   std::cout << " my is " << _my << std::endl;
   std::cout << " y_chisq is " << _y_chisq << std::endl;
 }
-// } // ~namespace MAUS
+} // ~namespace MAUS
