@@ -35,7 +35,7 @@
 
 // MAUS headers
 #include "src/common_cpp/Recon/SciFi/PatternRecognition.hh"
-#include "src/common_cpp/Recon/SciFi/SimpleLine.hh"
+#include "src/common_cpp/DataStructure/SimpleLine.hh"
 #include "src/common_cpp/Recon/SciFi/SimpleCircle.hh"
 #include "src/common_cpp/Recon/SciFi/SimpleHelix.hh"
 
