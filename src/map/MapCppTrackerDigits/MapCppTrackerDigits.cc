@@ -17,6 +17,8 @@
 
 #include "src/map/MapCppTrackerDigits/MapCppTrackerDigits.hh"
 
+namespace MAUS {
+
 bool MapCppTrackerDigits::birth(std::string argJsonConfigDocument) {
   _classname = "MapCppTrackerDigits";
 
@@ -51,7 +53,7 @@ bool MapCppTrackerDigits::death() {
 std::string MapCppTrackerDigits::process(std::string document) {
   // Writes a line in the JSON document.
   Json::FastWriter writer;
-  SciFiSpill spill;
+  MAUS::SciFiSpill spill;
 
   try {
     // Load input.
@@ -78,7 +80,7 @@ std::string MapCppTrackerDigits::process(std::string document) {
   return writer.write(root);
 }
 
-void MapCppTrackerDigits::save_to_json(SciFiSpill &spill) {
+void MapCppTrackerDigits::save_to_json(MAUS::SciFiSpill &spill) {
   int number_particle_ev = spill.events().size();
   for ( int event_i = 0; event_i < number_particle_ev; ++event_i ) {
     SciFiEvent evt = *(spill.events()[event_i]);
@@ -124,3 +126,5 @@ std::string MapCppTrackerDigits::JsonToString(Json::Value json_in) {
   JsonWrapper::Print(ss_io, json_in);
   return ss_io.str();
 }
+
+} // ~namespace MAUS
