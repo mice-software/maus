@@ -14,7 +14,6 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-// #include "src/common_cpp/Recon/SciFi/SciFiHelicalPRTrack.hh"
 #include "src/common_cpp/Recon/Kalman/HelicalTrack.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
 #include "gtest/gtest.h"
@@ -44,8 +43,8 @@ void HelicalTrackTest::set_up_seed() {
   int sign= 1;
   int Q = 1;
   tracker = 0;
-  x0 = 0.0;
-  y0 = 0.0;
+  x0 = 1.0;
+  y0 = 1.0;
   radius = 8.0; // mm
   pt = 1.2*radius; // MeV/c
   pz = 220.0;
