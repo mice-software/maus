@@ -83,6 +83,7 @@
 #pragma link C++ class MAUS::CkovA+;
 #pragma link C++ class MAUS::CkovB+;
 #pragma link C++ class MAUS::Tag+;
+#pragma link C++ class MAUS::SciFiSpill+;
 #pragma link C++ class MAUS::SciFiEvent+;
 #pragma link C++ class MAUS::SciFiDigit+;
 #pragma link C++ class MAUS::SciFiCluster+;

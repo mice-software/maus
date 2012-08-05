@@ -38,9 +38,8 @@ SciFiStraightPRTrack::SciFiStraightPRTrack(int tracker, int num_points,
   _y0 = y0;
   _my = my;
   _y_chisq = y_chisq;
-
-  _num_points = num_points;
   _tracker = tracker;
+  _num_points = num_points;
 }
 
 SciFiStraightPRTrack::SciFiStraightPRTrack(int tracker, int num_points,
@@ -57,8 +56,8 @@ SciFiStraightPRTrack::SciFiStraightPRTrack(int tracker, int num_points,
   _my = line_y.get_m();
   _y_chisq = line_y.get_chisq();
 
-  _num_points = num_points;
   _tracker = tracker;
+  _num_points = num_points;
 }
 
 SciFiStraightPRTrack::SciFiStraightPRTrack(const SciFiStraightPRTrack &_strk)
@@ -82,9 +81,10 @@ SciFiStraightPRTrack &SciFiStraightPRTrack::operator=(const SciFiStraightPRTrack
     _y0 = _strk.get_y0();
     _my = _strk.get_my();
     _y_chisq = _strk.get_y_chisq();
-    _num_points = _strk.get_num_points();
     _tracker = _strk.get_tracker();
+    _num_points = _strk.get_num_points();
     _spoints = _strk.get_spacepoints();
+    return *this;
 }
 
 // Other

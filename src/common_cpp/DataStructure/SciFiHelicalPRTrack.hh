@@ -95,8 +95,6 @@ class SciFiHelicalPRTrack {
     void print_params();
 
   private:
-    int _tracker;
-    int _num_points;
 
     double _x0;
     double _y0;
@@ -108,10 +106,16 @@ class SciFiHelicalPRTrack {
     double _chisq;
     double _chisq_dof;
 
+    int _tracker;
+    int _num_points;
+
     SciFiSpacePointArray _spoints;
 
     ClassDef(SciFiHelicalPRTrack, 1)
 };
+
+typedef std::vector<SciFiHelicalPRTrack*> SciFiHelicalPRTrackPArray;
+typedef std::vector<SciFiHelicalPRTrack> SciFiHelicalPRTrackArray;
 
 } // ~namespace MAUS
 

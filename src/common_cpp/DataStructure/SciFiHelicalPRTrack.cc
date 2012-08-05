@@ -96,6 +96,7 @@ SciFiHelicalPRTrack &SciFiHelicalPRTrack::operator=(const SciFiHelicalPRTrack &_
     _num_points = _htrk.get_num_points();
     _tracker = _htrk.get_tracker();
     _spoints = _htrk.get_spacepoints();
+    return *this;
 }
 
 SciFiHelicalPRTrack::SciFiHelicalPRTrack(const SciFiHelicalPRTrack &_htrk)

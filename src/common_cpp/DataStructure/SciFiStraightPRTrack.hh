@@ -58,10 +58,11 @@ class SciFiStraightPRTrack {
     SciFiSpacePointArray get_spacepoints() const { return _spoints; }
 
     double get_x0() const { return _x0; }
-    double get_y0() const { return _y0; }
     double get_mx() const { return _mx; }
-    double get_my() const { return _my; }
     double get_x_chisq() const { return _x_chisq; }
+
+    double get_y0() const { return _y0; }
+    double get_my() const { return _my; }
     double get_y_chisq() const { return _y_chisq; }
 
     int get_tracker() const { return _tracker; }
@@ -71,10 +72,11 @@ class SciFiStraightPRTrack {
     void set_spacepoints(SciFiSpacePointArray spoints) { _spoints = spoints; }
 
     void set_x0(double x0) { _x0 = x0; }
-    void set_y0(double y0) { _y0 = y0; }
     void set_mx(double mx) { _mx = mx; }
-    void set_my(double my) { _my = my; }
     void set_x_chisq(double x_chisq) { _x_chisq = x_chisq; }
+
+    void set_y0(double y0) { _y0 = y0; }
+    void set_my(double my) { _my = my; }
     void set_y_chisq(double y_chisq) { _y_chisq = y_chisq; }
 
     void set_tracker(int tracker) { _tracker = tracker; }
@@ -85,16 +87,15 @@ class SciFiStraightPRTrack {
   private:
     SciFiSpacePointArray _spoints;
 
-    int _tracker;
-    int _num_points;
-
     double _x0;
-    double _y0;
     double _mx;
-    double _my;
     double _x_chisq;
+    double _y0;
+    double _my;
     double _y_chisq;
 
+    int _tracker;
+    int _num_points;
     ClassDef(SciFiStraightPRTrack, 1)
 };
 
