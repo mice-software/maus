@@ -17,6 +17,9 @@
 
 #include "src/map/MapCppTrackerMCDigitization/MapCppTrackerMCDigitization.hh"
 
+
+namespace MAUS {
+
 bool MapCppTrackerMCDigitization::birth(std::string argJsonConfigDocument) {
   _classname = "MapCppTrackerMCDigitization";
 
@@ -77,7 +80,7 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
     // if bad, write error file
     return writer.write(root);
   }
-  SciFiSpill spill;
+  MAUS::SciFiSpill spill;
 
   // ==========================================================
   //  Loop over particle events and fill Event object with digits.
@@ -91,7 +94,7 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
   } // ends loop particles
   // ================= Reconstruction =========================
   for ( unsigned int event_i = 0; event_i < spill.events().size(); event_i++ ) {
-    SciFiEvent event = *(spill.events()[event_i]);
+    MAUS::SciFiEvent event = *(spill.events()[event_i]);
 
     // std::cerr << "Hits in event: " << event.hits().size() << std::endl;
     if ( event.hits().size() ) {
@@ -107,8 +110,8 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
 }
 
 void MapCppTrackerMCDigitization::
-     json_to_cpp(Json::Value js_event, SciFiSpill &spill) {
-  SciFiEvent* event = new SciFiEvent();
+     json_to_cpp(Json::Value js_event, MAUS::SciFiSpill &spill) {
+  MAUS::SciFiEvent* event = new MAUS::SciFiEvent();
   Json::Value _hits = js_event["sci_fi_hits"];
   // std::cout << "Number of hits fed in: " << _hits.size() << std::endl;
   for ( unsigned int j = 0; j < _hits.size(); j++ ) {
@@ -125,7 +128,13 @@ void MapCppTrackerMCDigitization::
     fibre   = channel_id["fibre_number"].asInt();
     edep    = hit["energy_deposited"].asDouble();
     time    = hit["time"].asDouble();
-    SciFiHit *a_hit = new SciFiHit(tracker, station, plane, fibre, edep, time);
+    MAUS::SciFiHit *a_hit = new MAUS::SciFiHit();
+    a_hit->GetChannelId()->SetTrackerNumber(tracker);
+    a_hit->GetChannelId()->SetStationNumber(station);
+    a_hit->GetChannelId()->SetPlaneNumber(plane);
+    a_hit->GetChannelId()->SetFibreNumber(fibre);
+    a_hit->SetEnergyDeposited(edep);
+    a_hit->SetTime(time);
     event->add_hit(a_hit);
 
     // .start. TO BE REMOVED .start.//
@@ -136,10 +145,10 @@ void MapCppTrackerMCDigitization::
     x  = hit["position"]["x"].asDouble();
     y  = hit["position"]["y"].asDouble();
     z  = hit["position"]["z"].asDouble();
-    Hep3Vector position(x, y, z);
-    Hep3Vector momentum(px, py, pz);
-    a_hit->set_true_position(position);
-    a_hit->set_true_momentum(momentum);
+    ThreeVector position(x, y, z);
+    ThreeVector momentum(px, py, pz);
+    a_hit->SetPosition(position);
+    a_hit->SetMomentum(momentum);
     // .end. TO BE REMOVED .end.//
   }
   spill.add_event(event);
@@ -159,41 +168,41 @@ bool MapCppTrackerMCDigitization::check_sanity_mc(Json::Value mc) {
 }
 
 
-void MapCppTrackerMCDigitization::construct_digits(SciFiEvent &evt) {
+void MapCppTrackerMCDigitization::construct_digits(MAUS::SciFiEvent &evt) {
   int number_of_hits = evt.hits().size();
   for ( int hit_i = 0; hit_i < number_of_hits; hit_i++ ) {
-    if ( !evt.hits()[hit_i]->is_used() ) {
-      SciFiHit *a_hit = evt.hits()[hit_i];
-      a_hit->set_used();
+    if ( !evt.hits()[hit_i]->GetChannelId()->GetUsed() ) {
+      MAUS::SciFiHit *a_hit = evt.hits()[hit_i];
+      a_hit->GetChannelId()->SetUsed(true);
 
       // Get nPE from this hit.
-      double edep = a_hit->get_edep();
+      double edep = a_hit->GetEnergyDeposited();
       double nPE  = compute_npe(edep);
 
       // Compute tdc count.
-      double time   = a_hit->get_time();
+      double time   = a_hit->GetTime();
       // int tdcCounts = compute_tdc_counts(time);
       int chanNo = compute_chan_no(a_hit);
 
       // loop over all the other hits
       for ( int hit_j = hit_i+1; hit_j < number_of_hits; hit_j++ ) {
         if ( check_param(evt.hits()[hit_i], evt.hits()[hit_j]) ) {
-          SciFiHit *same_digit = evt.hits()[hit_j];
-          double edep_j = same_digit->get_edep();
+          MAUS::SciFiHit *same_digit = evt.hits()[hit_j];
+          double edep_j = same_digit->GetEnergyDeposited();
           nPE  += compute_npe(edep_j);
-          same_digit->set_used();
+          same_digit->GetChannelId()->SetUsed(true);
         } // if-statement
       } // ends l-loop over all the array
-      int tracker = a_hit->get_tracker();
-      int station = a_hit->get_station();
-      int plane = a_hit->get_plane();
+      int tracker = a_hit->GetChannelId()->GetTrackerNumber();
+      int station = a_hit->GetChannelId()->GetStationNumber();
+      int plane = a_hit->GetChannelId()->GetPlaneNumber();
       int spill = 99;
       int event = 99;
       SciFiDigit *a_digit = new SciFiDigit(spill, event,
                                            tracker, station, plane, chanNo, nPE, time);
       // .start. TO BE REMOVED .start.//
-      Hep3Vector position = a_hit->get_true_position();
-      Hep3Vector momentum = a_hit->get_true_momentum();
+      ThreeVector position = a_hit->GetPosition();
+      ThreeVector momentum = a_hit->GetMomentum();
       a_digit->set_true_position(position);
       a_digit->set_true_momentum(momentum);
       // .end. TO BE REMOVED .end.//
@@ -220,12 +229,12 @@ int MapCppTrackerMCDigitization::compute_tdc_counts(double time) {
   return tdcCounts;
 }
 
-int MapCppTrackerMCDigitization::compute_chan_no(SciFiHit *ahit) {
-  int tracker = ahit->get_tracker();
-  int station = ahit->get_station();
-  int plane   = ahit->get_plane();
+int MapCppTrackerMCDigitization::compute_chan_no(MAUS::SciFiHit *ahit) {
+  int tracker = ahit->GetChannelId()->GetTrackerNumber();
+  int station = ahit->GetChannelId()->GetStationNumber();
+  int plane   = ahit->GetChannelId()->GetPlaneNumber();
 
-  // std::cout << "Time: " << ahit->get_time() << std::endl;
+  // std::cout << "Time: " << ahit->GetTime() << std::endl;
   // std::cout << tracker << " " << station << " " << plane << std::endl;
   const MiceModule* this_plane = NULL;
   for ( unsigned int j = 0; !this_plane && j < modules.size(); j++ ) {
@@ -242,7 +251,7 @@ int MapCppTrackerMCDigitization::compute_chan_no(SciFiHit *ahit) {
   assert(this_plane != NULL);
 
   int numberFibres = static_cast<int> (7*2*(this_plane->propertyDouble("CentralFibre")+0.5));
-  int fiberNumber = ahit->get_fibre();
+  int fiberNumber = ahit->GetChannelId()->GetFibreNumber();
   int chanNo;
 
   if ( tracker == 0 ) {
@@ -302,17 +311,17 @@ int MapCppTrackerMCDigitization::compute_adc_counts(double numb_pe) {
   return adcCounts;
 }
 
-bool MapCppTrackerMCDigitization::check_param(SciFiHit *hit1, SciFiHit *hit2) {
-  if ( hit2->is_used() ) {
+bool MapCppTrackerMCDigitization::check_param(MAUS::SciFiHit *hit1, MAUS::SciFiHit *hit2) {
+  if ( hit2->GetChannelId()->GetUsed() ) {
     return false;
   } else {
     // two hits passed to the check_param function
-    int tracker1 = hit1->get_tracker();
-    int tracker2 = hit2->get_tracker();
-    int station1 = hit1->get_station();
-    int station2 = hit2->get_station();
-    int plane1   = hit1->get_plane();
-    int plane2   = hit2->get_plane();
+    int tracker1 = hit1->GetChannelId()->GetTrackerNumber();
+    int tracker2 = hit2->GetChannelId()->GetTrackerNumber();
+    int station1 = hit1->GetChannelId()->GetStationNumber();
+    int station2 = hit2->GetChannelId()->GetStationNumber();
+    int plane1   = hit1->GetChannelId()->GetPlaneNumber();
+    int plane2   = hit2->GetChannelId()->GetPlaneNumber();
     double chan1 = compute_chan_no(hit1);
     double chan2 = compute_chan_no(hit2);
 
@@ -326,7 +335,7 @@ bool MapCppTrackerMCDigitization::check_param(SciFiHit *hit1, SciFiHit *hit2) {
   }
 }
 
-void MapCppTrackerMCDigitization::save_to_json(SciFiEvent &evt, int event_i) {
+void MapCppTrackerMCDigitization::save_to_json(MAUS::SciFiEvent &evt, int event_i) {
   Json::Value digits_tracker0;
   Json::Value digits_tracker1;
   for ( unsigned int dig_i = 0; dig_i < evt.digits().size(); dig_i++ ) {
@@ -338,9 +347,9 @@ void MapCppTrackerMCDigitization::save_to_json(SciFiEvent &evt, int event_i) {
     digit["channel"]= evt.digits()[dig_i]->get_channel();
     digit["npe"]    = evt.digits()[dig_i]->get_npe();
     digit["time"]   = evt.digits()[dig_i]->get_time();
-    Hep3Vector position;
+    ThreeVector position;
     position = evt.digits()[dig_i]->get_true_position();
-    Hep3Vector momentum;
+    ThreeVector momentum;
     momentum = evt.digits()[dig_i]->get_true_momentum();
     digit["true_position"]["x"] = position.x();
     digit["true_position"]["y"] = position.y();
@@ -357,3 +366,6 @@ void MapCppTrackerMCDigitization::save_to_json(SciFiEvent &evt, int event_i) {
   root["recon_events"][event_i]["sci_fi_event"]["sci_fi_digits"]["tracker0"] = digits_tracker0;
   root["recon_events"][event_i]["sci_fi_event"]["sci_fi_digits"]["tracker1"] = digits_tracker1;
 }
+
+} // ~namespace MAUS
+

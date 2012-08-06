@@ -86,7 +86,6 @@ class SciFiEvent {
                           _scifihelicalprtracks = tracks; }
   std::vector<SciFiHelicalPRTrack> helicalprtracks() const {return _scifihelicalprtracks; }
 
-
  private:
 
   /// Residuals histograms

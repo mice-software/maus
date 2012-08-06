@@ -22,6 +22,7 @@
 
 #ifndef _COMPONENTS_MAP_MAPCPPTRACKERMCDIGITIZATION_H_
 #define _COMPONENTS_MAP_MAPCPPTRACKERMCDIGITIZATION_H_
+
 // C headers
 #include <assert.h>
 #include <json/json.h>
@@ -39,8 +40,10 @@
 #include "Config/MiceModule.hh"
 #include "Interface/Squeak.hh"
 #include "src/common_cpp/DataStructure/Hit.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiSpill.hh"
+#include "src/common_cpp/DataStructure/SciFiSpill.hh"
+#include "src/common_cpp/DataStructure/ThreeVector.hh"
 
+namespace MAUS {
 
 class MapCppTrackerMCDigitization {
  public:
@@ -74,11 +77,11 @@ class MapCppTrackerMCDigitization {
    *
    *  Checks the sanity of of the MC branch
    */
-  void json_to_cpp(Json::Value json_event, SciFiSpill &spill);
+  void json_to_cpp(Json::Value json_event, MAUS::SciFiSpill &spill);
 
   /** @brief builds digits and stores them in the SciFiEvent
    */
-  void construct_digits(SciFiEvent &event);
+  void construct_digits(MAUS::SciFiEvent &event);
 
   /** @brief computes npe from energy deposits.
    */
@@ -86,7 +89,7 @@ class MapCppTrackerMCDigitization {
 
   /** @brief computes scifi chan numb from GEANT fibre copy numb
    */
-  int compute_chan_no(SciFiHit *ahit);
+  int compute_chan_no(MAUS::SciFiHit *ahit);
 
   /** @brief computes tdc from time.
    */
@@ -98,11 +101,11 @@ class MapCppTrackerMCDigitization {
 
   /** @brief checks if hits belong to the same scifi channel.
    */
-  bool check_param(SciFiHit *hit1, SciFiHit *hit2);
+  bool check_param(MAUS::SciFiHit *hit1, MAUS::SciFiHit *hit2);
 
   /** @brief saves digits to json.
    */
-  void save_to_json(SciFiEvent &evt, int event_i);
+  void save_to_json(MAUS::SciFiEvent &evt, int event_i);
 
  private:
   /// This is the Mice Module
@@ -121,5 +124,7 @@ class MapCppTrackerMCDigitization {
   /// an array contaning all MiceModules
   std::vector<const MiceModule*> modules;
 };  // Don't forget this trailing colon!!!!
+
+} // ~namespace MAUS
 
 #endif
