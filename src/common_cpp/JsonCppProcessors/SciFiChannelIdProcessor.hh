@@ -32,6 +32,7 @@ class SciFiChannelIdProcessor : public ObjectProcessor<SciFiChannelId> {
 
  private:
     IntProcessor _int_proc;
+    BoolProcessor _bool_proc;
 };
 }
 
