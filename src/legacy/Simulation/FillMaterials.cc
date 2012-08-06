@@ -205,6 +205,8 @@ void  fillMaterials( MICERun& run )
 
 	double C = 1e-24*(m3);
 //	double C = run.DataCards->fetchValueDouble("AerogelClarity");
+	RayleighPhotE[0] = 0.;
+	RayleighSL[0]    = 0.;
 	for(unsigned int i=1;i<=63;i++)
 	{
 		RayleighPhotE[i] = ( 1.6 + i*5e-2 )*eV;

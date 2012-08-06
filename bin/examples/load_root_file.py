@@ -66,11 +66,11 @@ def main():
         if spill.GetDaqEventType() == "physics_event":
             # note PyROOT gives a segmentation fault if we try to call the STL
             # vector directly
-            for i in range(spill.GetReconEventSize()):
-                tof_event = spill.GetAReconEvent(i).GetTOFEvent()
+            for i in range(spill.GetReconEvents().size()):
+                tof_event = spill.GetReconEvents()[i].GetTOFEvent()
                 digits = tof_event.GetTOFEventDigit()
-                for i in range(digits.GetTOF1DigitArraySize()):
-                    tof1_digit = digits.GetTOF1DigitArrayElement(i)
+                for i in range(digits.GetTOF1DigitArray().size()):
+                    tof1_digit = digits.GetTOF1DigitArray()[i]
                     if tof1_digit.GetPlane() == 0:
                         tof1_digits_0_hist.Fill(tof1_digit.GetSlab())
                     else:
