@@ -15,55 +15,55 @@
  *
  */
 
-#include "src/common_cpp/Simulation/MAUSVisManager.hh"
+#include <string>
 
-#include <G4VRML1File.hh>
-#include <G4VRML2File.hh>
-#include <G4HepRepFile.hh>
-#include <G4DAWNFILE.hh>
-#include <G4TrajectoryDrawByParticleID.hh>
+#include "Geant4/G4VRML1File.hh"
+#include "Geant4/G4VRML2File.hh"
+#include "Geant4/G4HepRepFile.hh"
+#include "Geant4/G4DAWNFILE.hh"
+#include "Geant4/G4TrajectoryDrawByParticleID.hh"
 
 #ifdef G4VIS_USE_DAWN
-#include <G4FukuiRenderer.hh>
+#include "Geant4/G4FukuiRenderer.hh"
 #endif
 
 #ifdef G4VIS_USE_OPACS
-#include <G4Wo.hh>
-#include <G4Xo.hh>
+#include "Geant4/G4Wo.hh"
+#include "Geant4/G4Xo.hh"
 #endif
 
 #ifdef G4VIS_USE_OPENGLX
-#include <G4OpenGLImmediateX.hh>
-#include <G4OpenGLStoredX.hh>
+#include "Geant4/G4OpenGLImmediateX.hh"
+#include "Geant4/G4OpenGLStoredX.hh"
 #endif
 
 #ifdef G4VIS_USE_OPENGLWIN32
-#include <G4OpenGLImmediateWin32.hh>
-#include <G4OpenGLStoredWin32.hh>
+#include "Geant4/G4OpenGLImmediateWin32.hh"
+#include "Geant4/G4OpenGLStoredWin32.hh"
 #endif
 
 #ifdef G4VIS_USE_OPENGLXM
-#include <G4OpenGLImmediateXm.hh>
-#include <G4OpenGLStoredXm.hh>
+#include "Geant4/G4OpenGLImmediateXm.hh"
+#include "Geant4/G4OpenGLStoredXm.hh"
 #endif
 
 #ifdef G4VIS_USE_OIX
-#include <G4OpenInventorX.hh>
+#include "Geant4/G4OpenInventorX.hh"
 #endif
 
 #ifdef G4VIS_USE_OIWIN32
-#include <G4OpenInventorWin32.hh>
+#include "Geant4/G4OpenInventorWin32.hh"
 #endif
 
 #ifdef G4VIS_USE_VRML
-#include <G4VRML1.hh>
-#include <G4VRML2.hh>
+#include "Geant4/G4VRML1.hh"
+#include "Geant4/G4VRML2.hh"
 #endif
-
-#include <string>
 
 #include "src/legacy/Interface/MICERun.hh"
 #include "src/legacy/Interface/Squeak.hh"
+#include "src/common_cpp/Simulation/MAUSVisManager.hh"
+
 
 namespace MAUS {
 

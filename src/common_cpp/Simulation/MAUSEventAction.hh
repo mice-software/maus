@@ -18,7 +18,7 @@
 #ifndef _SRC_COMMON_CPP_SIMULATION_MAUSEVENTACTION_HH_
 #define _SRC_COMMON_CPP_SIMULATION_MAUSEVENTACTION_HH_
 
-#include "G4UserEventAction.hh"
+#include "Geant4/G4UserEventAction.hh"
 
 #include "json/value.h"
 

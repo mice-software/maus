@@ -22,9 +22,11 @@
 #include "src/common_cpp/Simulation/FieldPhaser.hh"
 
 #include "src/legacy/Interface/Squeak.hh"
+#include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Simulation/MAUSPhysicsList.hh"
 #include "src/common_cpp/Simulation/MAUSVisManager.hh"
 #include "src/common_cpp/Simulation/MAUSRunAction.hh"
+
 
 namespace MAUS {
 
@@ -135,7 +137,7 @@ void MAUSGeant4Manager::SetVisManager() {
   if (_visManager != NULL) delete _visManager;
   _visManager = NULL;
   // if _visManager == NULL, attempt to build it
-  Json::Value& conf = *MICERun::getInstance()->jsonConfiguration;
+  Json::Value& conf = *Globals::GetInstance()->GetConfigurationCards();
   if (JsonWrapper::GetProperty
            (conf, "geant4_visualisation", JsonWrapper::booleanValue).asBool()) {
       _visManager = new MAUSVisManager;

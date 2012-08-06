@@ -18,9 +18,9 @@
 #ifndef SciFiPlane_h
 #define SciFiPlane_h 1
 
-#include <G4Tubs.hh>
-#include <G4ThreeVector.hh>
-#include <globals.hh>
+#include "Geant4/G4Tubs.hh"
+#include "Geant4/G4ThreeVector.hh"
+#include "Geant4/globals.hh"
 
 #include "Config/MiceModule.hh"
 

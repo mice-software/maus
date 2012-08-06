@@ -22,19 +22,18 @@
 
 #include "json/json.h"
 
-#include "globals.hh"
+#include "Geant4/globals.hh"
+#include "Geant4/G4StepLimiter.hh"
+#include "Geant4/G4UImanager.hh"
+#include "Geant4/G4ProcessTable.hh"
+#include "Geant4/G4ProcessVector.hh"
+#include "Geant4/G4PhysListFactory.hh"
 
-#include "G4UImanager.hh"
-#include "G4ProcessTable.hh"
-#include "G4ProcessVector.hh"
-#include "G4PhysListFactory.hh"
+#include "Interface/Squeak.hh"
 
+#include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Simulation/MAUSPhysicsList.hh"
-
-#include "Interface/dataCards.hh"
-#include "Interface/MICERun.hh"
-#include "Interface/Squeak.hh"
 
 namespace MAUS {
 
@@ -48,20 +47,21 @@ const int         MAUSPhysicsList::_nScatNames   = 8;
 const int         MAUSPhysicsList::_nELossNames  = 9;
 
 MAUSPhysicsList::MAUSPhysicsList(G4VModularPhysicsList* physList)
-                                              : G4VModularPhysicsList(*physList)
-{}
+                                                       : G4VUserPhysicsList() {
+  _list = physList;
+}
 
 MAUSPhysicsList::~MAUSPhysicsList()
 {}
 
 MAUSPhysicsList* MAUSPhysicsList::GetMAUSPhysicsList() {
-  Json::Value& dc = *MICERun::getInstance()->jsonConfiguration;
+  Json::Value& dc = *Globals::GetInstance()->GetConfigurationCards();
   std::string physModel = JsonWrapper::GetProperty
                      (dc, "physics_model", JsonWrapper::stringValue).asString();
   G4PhysListFactory fact;
   if (fact.IsReferencePhysList(physModel)) {
     MAUSPhysicsList* mpl =
-                     new MAUSPhysicsList(fact.GetReferencePhysList(physModel) );
+                     new MAUSPhysicsList(fact.GetReferencePhysList(physModel));
     try {
         mpl->Setup();
         return mpl;
@@ -186,8 +186,12 @@ void MAUSPhysicsList::SetHadronic(hadronic hadronicModel) {
   }
 }
 
+void MAUSPhysicsList::ConstructParticle() {
+    _list->ConstructParticle();
+}
+
 void MAUSPhysicsList::ConstructProcess() {
-    G4VModularPhysicsList::ConstructProcess();
+    _list->ConstructProcess();
     SetSpecialProcesses();
 }
 
@@ -218,7 +222,7 @@ void MAUSPhysicsList::SetParticleHalfLife(std::string particleName,
 }
 
 void MAUSPhysicsList::Setup() {
-    Json::Value& dc = *MICERun::getInstance()->jsonConfiguration;
+    Json::Value& dc = *Globals::GetInstance()->GetConfigurationCards();
     std::string refPhysicsModel = JsonWrapper::GetProperty(dc,
             "reference_physics_processes", JsonWrapper::stringValue).asString();
     std::string physicsModel = JsonWrapper::GetProperty(dc, "physics_processes",

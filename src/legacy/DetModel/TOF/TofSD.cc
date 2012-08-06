@@ -1,7 +1,7 @@
 // MAUS WARNING: THIS IS LEGACY CODE.
 #include "TofSD.hh"
 #include "Interface/dataCards.hh"
-#include <G4StepStatus.hh>
+#include "Geant4/G4StepStatus.hh"
 #include <cstring>
 #include "Interface/MICEEvent.hh"
 #include "Config/MiceModule.hh"

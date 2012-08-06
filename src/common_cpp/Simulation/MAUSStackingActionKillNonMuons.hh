@@ -27,8 +27,8 @@
 #ifndef _SRC_CPP_CORE_SIMULATION_MAUSSTACKINGACTION_HH_
 #define _SRC_CPP_CORE_SIMULATION_MAUSSTACKINGACTION_HH_
 
-#include <G4UserStackingAction.hh>
-#include <G4Track.hh>
+#include "Geant4/G4UserStackingAction.hh"
+#include "Geant4/G4Track.hh"
 
 class G4Track;
 

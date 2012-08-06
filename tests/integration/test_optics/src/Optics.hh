@@ -17,7 +17,7 @@
 #include "src/legacy/Optics/TransferMap.hh"
 #include "src/legacy/Optics/TransportManager.hh"
 
-#include "G4RunManager.hh"
+#include "Geant4/G4RunManager.hh"
 
 #include "CLHEP/Matrix/Matrix.h"
 #include "CLHEP/Matrix/Vector.h"

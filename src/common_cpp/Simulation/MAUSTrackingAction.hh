@@ -23,8 +23,8 @@
 
 #include "json/json.h"  // for datastructure
 
-#include "G4Track.hh"  //  arg to tracking action
-#include "G4UserTrackingAction.hh"  //  inherit from
+#include "Geant4/G4Track.hh"  //  arg to tracking action
+#include "Geant4/G4UserTrackingAction.hh"  //  inherit from
 
 #include "src/common_cpp/Simulation/MAUSSteppingAction.hh"
 

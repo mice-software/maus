@@ -67,7 +67,7 @@ class MapCppSimulationTestCase(unittest.TestCase):
     def test_birth(self):  # pylint: disable=R0201
         """Check we get an error for bad input to birth"""
         test_mapper = MapCppSimulation()
-        assert(test_mapper.birth(json.dumps("{")) == False)
+        self.assertTrue(test_mapper.birth(json.dumps(self.configuration)))
 
     def test_empty(self):
         """Check mapper runs for empty string, returning an error"""
@@ -137,6 +137,7 @@ class MapCppSimulationTestCase(unittest.TestCase):
     configuration = {
       "verbose_level":2,
       "simulation_geometry_filename":"Test.dat",
+      "reconstruction_geometry_filename":"Test.dat",
       "maximum_number_of_steps":1000,
       "keep_steps":True,
       "keep_tracks":True,
