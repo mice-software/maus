@@ -82,7 +82,7 @@ class SciFiDigit {
 
     double get_time()    const { return _time;    }
 
-    void set_used()   { _used = true; }
+    void set_used(bool used)   { _used = used; }
 
     bool is_used()     const { return _used; }
 
