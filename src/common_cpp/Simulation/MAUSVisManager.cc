@@ -159,18 +159,23 @@ void MAUSVisManager::SetupRun() {
   G4ThreeVector photon_rgb = GetColour("photon_vis_colour");
 
   // This sets up a geant4 model which changes the colours of the particles
-  G4TrajectoryDrawByParticleID* model = new G4TrajectoryDrawByParticleID;
-  model->SetDefault(default_rgb);
-  model->Set("pi+", pi_plus_rgb);
-  model->Set("pi-", pi_minus_rgb);
-  model->Set("mu+", mu_plus_rgb);
-  model->Set("mu-", mu_minus_rgb);
-  model->Set("e+", e_plus_rgb);
-  model->Set("e-", e_minus_rgb);
-  model->Set("gamma", gamma_rgb);
-  model->Set("neutron", neutron_rgb);
-  model->Set("photon", photon_rgb);
-  RegisterModel(model);
+  const std::string model_name = "Particle Colour Model";
+  const G4VTrajectoryModel * current_model = CurrentTrajDrawModel();
+  if (model_name != current_model->Name()) {
+    G4TrajectoryDrawByParticleID* model
+      = new G4TrajectoryDrawByParticleID(model_name);
+    model->SetDefault(default_rgb);
+    model->Set("pi+", pi_plus_rgb);
+    model->Set("pi-", pi_minus_rgb);
+    model->Set("mu+", mu_plus_rgb);
+    model->Set("mu-", mu_minus_rgb);
+    model->Set("e+", e_plus_rgb);
+    model->Set("e-", e_minus_rgb);
+    model->Set("gamma", gamma_rgb);
+    model->Set("neutron", neutron_rgb);
+    model->Set("photon", photon_rgb);
+    RegisterModel(model);
+  }
 
   if (verbose > 0) {
       // doesnt seem to work - writes to std::cerr regardless... set
