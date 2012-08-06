@@ -19,7 +19,8 @@
 #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
 #include "gtest/gtest.h"
 
-namespace {
+namespace MAUS {
+
 class HelicalTrackTest : public ::testing::Test {
  protected:
   HelicalTrackTest()  {}
@@ -98,4 +99,4 @@ TEST_F(HelicalTrackTest, test_propagator) {
   EXPECT_TRUE(abs(projected_y-a_temp(1, 0)) < err);
 }
 
-} // namespace
+} // ~namespace MAUS

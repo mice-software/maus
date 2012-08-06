@@ -16,7 +16,7 @@
  */
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
 
-// namespace MAUS {
+namespace MAUS {
 
 // Initialize geometry constants.
 const double KalmanTrack::A = 2./(7.*0.427);
@@ -229,4 +229,4 @@ void KalmanTrack::smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_si
   smoothing_site->set_smoothed_covariance_matrix(C_smooth);
 }
 
-// } // ~namespace MAUS
+} // ~namespace MAUS

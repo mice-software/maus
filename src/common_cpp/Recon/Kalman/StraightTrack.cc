@@ -16,7 +16,7 @@
  */
 #include "src/common_cpp/Recon/Kalman/StraightTrack.hh"
 
-// namespace MAUS {
+namespace MAUS {
 
 void StraightTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site) {
   // Reset.
@@ -57,4 +57,4 @@ void StraightTrack::calc_system_noise(KalmanSite *site) {
   _Q(3, 4) = kappa * my * (1+mx*mx+my*my) * C /(1+mx*mx);
 }
 
-// } // ~namespace MAUS
+} // ~namespace MAUS

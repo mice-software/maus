@@ -39,7 +39,7 @@
 #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
 // namespace ublas = boost::numeric::ublas;
 
-// namespace MAUS {
+namespace MAUS {
 
 class KalmanMonitor {
  public:
@@ -68,6 +68,6 @@ class KalmanMonitor {
 */
 };
 
-// } // ~namespace MAUS
+} // ~namespace MAUS
 
 #endif

@@ -18,7 +18,7 @@
 #include "src/common_cpp/Recon/Kalman/HelicalTrack.hh"
 #define PI 3.14159265
 
-// namespace MAUS {
+namespace MAUS {
 
 const double HelicalTrack::_alpha = 1.0/(0.3*4.);
 
@@ -180,5 +180,4 @@ void HelicalTrack::calc_system_noise(KalmanSite *site) {
 */
 }
 
-// } // ~namespace MAUS
-
+} // ~namespace MAUS

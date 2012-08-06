@@ -31,9 +31,9 @@
 #include "TMatrixD.h"
 
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiHelicalPRTrack.hh"
+#include "src/common_cpp/DataStructure/SciFiHelicalPRTrack.hh"
 
-// namespace MAUS {
+namespace MAUS {
 
 class HelicalTrack : public KalmanTrack {
  public:
@@ -69,6 +69,6 @@ class HelicalTrack : public KalmanTrack {
   // static const double ALPHA = -1.0/(300000000.*4.);
 };
 
-// } // ~namespace MAUS
+} // ~namespace MAUS
 
 #endif

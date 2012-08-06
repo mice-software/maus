@@ -17,7 +17,7 @@
 
 #include "src/common_cpp/Recon/Kalman/KalmanMonitor.hh"
 
-// namespace MAUS {
+namespace MAUS {
 
 KalmanMonitor::KalmanMonitor() {
   // histo = new TH1F("h","monitor; site; alpha",30, 0, 30);
@@ -270,5 +270,5 @@ double KalmanMonitor::get_smoothed_measurement(KalmanSite &a_site) {
   K.Print();
 */
 
-// } // ~namespace MAUS
+} // ~namespace MAUS
 

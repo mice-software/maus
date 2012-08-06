@@ -101,7 +101,7 @@ class MapCppTrackerRecon {
 
   // void make_seed_and_fit(MAUS::SciFiEvent &event);
 
-  // void track_fit(MAUS::SciFiEvent &evt);
+  void track_fit(MAUS::SciFiEvent &evt);
 
   void save_to_json(MAUS::SciFiEvent &evt, int event_i);
 
