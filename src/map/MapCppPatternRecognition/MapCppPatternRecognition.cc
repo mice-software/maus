@@ -17,6 +17,8 @@
 
 #include "src/map/MapCppPatternRecognition/MapCppPatternRecognition.hh"
 
+namespace MAUS {
+
 bool MapCppPatternRecognition::birth(std::string argJsonConfigDocument) {
   _classname = "MapCppPatternRecognition";
 
@@ -123,7 +125,7 @@ void MapCppPatternRecognition::make_SciFiSpill(Json::Value spacepoint_array, Sci
       Json::Value spacepoint;
       spacepoint = event[j];
       int tracker, station;
-      CLHEP::Hep3Vector position;
+      ThreeVector position;
       tracker  = spacepoint["tracker"].asInt();
       // tracker -= 1;
       station  = spacepoint["station"].asInt();
@@ -150,7 +152,7 @@ void MapCppPatternRecognition::make_SciFiSpill(Json::Value spacepoint_array, Sci
           _y +=.0001;
         }
         _z = spacepoint["position"]["z"].asDouble();
-        CLHEP::Hep3Vector pos(_x, _y, _z);
+        ThreeVector pos(_x, _y, _z);
         position = pos;
       } else {
       position = JsonWrapper::JsonToThreeVector(spacepoint["position"]);
@@ -186,7 +188,7 @@ void MapCppPatternRecognition::save_to_json(SciFiEvent &evt) {
     // spacepoints_in_event["npe"]    = evt.spacepoints()[evt_i]->get_npe();
     // spacepoints_in_event["time"]   = evt.spacepoints()[evt_i]->get_time();
     // spacepoints_in_event["type"]   = evt.spacepoints()[evt_i]->get_type();
-    Hep3Vector pos = evt.spacepoints()[evt_i]->get_position();
+    ThreeVector pos = evt.spacepoints()[evt_i]->get_position();
     spacepoints_in_event["position"]["x"]   = pos.x();
     spacepoints_in_event["position"]["y"]   = pos.y();
     spacepoints_in_event["position"]["z"]   = pos.z();
@@ -254,3 +256,6 @@ std::string MapCppPatternRecognition::JsonToString(Json::Value json_in) {
   JsonWrapper::Print(ss_io, json_in);
   return ss_io.str();
 }
+
+} // ~namespace MAUS
+

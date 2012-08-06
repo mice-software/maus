@@ -16,7 +16,7 @@
  */
 #include "src/common_cpp/Recon/Kalman/StraightTrack.hh"
 
-// namespace MAUS {
+namespace MAUS {
 
 void StraightTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site) {
   // Reset.
@@ -44,17 +44,17 @@ void StraightTrack::calc_system_noise(KalmanSite *site) {
   double kappa = a(4, 0);
   double Z = 1.;
   double r0 = 0.00167; // cm3/g
-  double p = 1/kappa; // MeV/c
+  double p = 1./kappa; // MeV/c
   double v = p/105.7;
-  double C = 13.6*Z*pow(r0, 0.5)*(1+0.038*log(r0))/(v*p);
+  double C = 13.6*Z*pow(r0, 0.5)*(1.+0.038*log(r0))/(v*p);
 
-  _Q(2, 2) = (1+pow(mx, 2.))*(1+pow(mx, 2.)+pow(my, 2.))*C;
-  _Q(3, 3) = (1+pow(my, 2.))*(1+pow(mx, 2.)+pow(my, 2.))*C;
-  _Q(2, 3) = mx*my*(1+mx*mx+my*my)*C;
-  _Q(3, 2) = mx*my*(1+mx*mx+my*my)*C;
+  _Q(2, 2) = (1.+pow(mx, 2.))*(1.+pow(mx, 2.)+pow(my, 2.))*C;
+  _Q(3, 3) = (1.+pow(my, 2.))*(1.+pow(mx, 2.)+pow(my, 2.))*C;
+  _Q(2, 3) = mx*my*(1.+mx*mx+my*my)*C;
+  _Q(3, 2) = mx*my*(1.+mx*mx+my*my)*C;
 
-  _Q(4, 4) = kappa*kappa*my*my*C/(1+mx*mx);
-  _Q(3, 4) = kappa * my * (1+mx*mx+my*my) * C /(1+mx*mx);
+  _Q(4, 4) = kappa*kappa*my*my*C/(1.+mx*mx);
+  _Q(3, 4) = kappa * my * (1.+mx*mx+my*my) * C /(1.+mx*mx);
 }
 
-// } // ~namespace MAUS
+} // ~namespace MAUS

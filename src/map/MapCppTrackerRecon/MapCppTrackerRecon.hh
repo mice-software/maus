@@ -22,6 +22,7 @@
 
 #ifndef _SRC_MAP_MAPCPPTrackerRecon_H_
 #define _SRC_MAP_MAPCPPTrackerRecon_H_
+
 // C headers
 #include <assert.h>
 #include <json/json.h>
@@ -40,17 +41,19 @@
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 
-#include "src/common_cpp/Recon/SciFi/SciFiSpill.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiEvent.hh"
+#include "src/common_cpp/DataStructure/SciFiDigit.hh"
+#include "src/common_cpp/DataStructure/SciFiCluster.hh"
+#include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
+#include "src/common_cpp/DataStructure/SciFiEvent.hh"
+#include "src/common_cpp/DataStructure/SciFiSpill.hh"
 #include "src/common_cpp/Recon/SciFi/RealDataDigitization.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiClusterRec.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePointRec.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiDigit.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiCluster.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
 #include "src/common_cpp/Recon/SciFi/PatternRecognition.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanTrackFit.hh"
 // #include "src/common_cpp/Recon/SciFi/SeedFinder.hh"
+
+namespace MAUS {
 
 class MapCppTrackerRecon {
  public:
@@ -80,37 +83,37 @@ class MapCppTrackerRecon {
    *  \param digits the MC digits
    *  \param a_spill the SciFiSpill we are processing
    */
-  void fill_digits_vector(Json::Value &digits, SciFiSpill &a_spill);
+  void fill_digits_vector(Json::Value &digits, MAUS::SciFiSpill &a_spill);
 
   /** performs the cluster reconstruction
    *
    *  \param evt the current SciFiEvent
    */
-  void cluster_recon(SciFiEvent &evt);
+  void cluster_recon(MAUS::SciFiEvent &evt);
 
   /** performs the spacepoint reconstruction
    *
    *  \param evt the current SciFiEvent
    */
-  void spacepoint_recon(SciFiEvent &evt);
+  void spacepoint_recon(MAUS::SciFiEvent &evt);
 
-  void pattern_recognition(SciFiEvent &evt);
+  void pattern_recognition(MAUS::SciFiEvent &evt);
 
-  // void make_seed_and_fit(SciFiEvent &event);
+  // void make_seed_and_fit(MAUS::SciFiEvent &event);
 
-  void track_fit(SciFiEvent &evt);
+  void track_fit(MAUS::SciFiEvent &evt);
 
-  void save_to_json(SciFiEvent &evt, int event_i);
+  void save_to_json(MAUS::SciFiEvent &evt, int event_i);
 
-  void print_event_info(SciFiEvent &event);
+  void print_event_info(MAUS::SciFiEvent &event);
 
   Json::Value ConvertToJson(std::string jsonString);
 
   std::string JsonToString(Json::Value json_in);
 
-  void perform_alignment_study(SciFiEvent &evt);
+  void perform_alignment_study(MAUS::SciFiEvent &evt);
 
-  void fit(std::vector<SciFiSpacePoint*> spacepoints,
+  void fit(std::vector<MAUS::SciFiSpacePoint*> spacepoints,
                              double &x_const, double &x_slope,
                              double &y_const, double &y_slope);
 
@@ -132,4 +135,7 @@ class MapCppTrackerRecon {
 
   int SciFiRunRecon;
 }; // Don't forget this trailing colon!!!!
+
+} // ~namespace MAUS
+
 #endif

@@ -28,22 +28,18 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include <map>
 #include <string>
 
 // MAUS headers
 #include "src/common_cpp/DataStructure/SimpleLine.hh"
-#include "src/common_cpp/Recon/SciFi/SimpleCircle.hh"
-#include "src/common_cpp/Recon/SciFi/SimpleHelix.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiEvent.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiHit.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiDigit.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiCluster.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiStraightPRTrack.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiHelicalPRTrack.hh"
+#include "src/common_cpp/DataStructure/SimpleCircle.hh"
+#include "src/common_cpp/DataStructure/SimpleHelix.hh"
+#include "src/common_cpp/DataStructure/SciFiEvent.hh"
+#include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
+#include "src/common_cpp/DataStructure/SciFiStraightPRTrack.hh"
+#include "src/common_cpp/DataStructure/SciFiHelicalPRTrack.hh"
 
-// namespace MAUS {
+namespace MAUS {
 
 class PatternRecognition {
   public:
@@ -156,7 +152,7 @@ class PatternRecognition {
      * acceptable with a cut, and if they are, append them to the trial track.
      *
      */
-    double delta_R(const SimpleCircle &circle, const CLHEP::Hep3Vector &pos);
+    double delta_R(const SimpleCircle &circle, const ThreeVector &pos);
 
     /** @brief Fit a circle to spacepoints in x-y projection
      *
@@ -400,11 +396,12 @@ class PatternRecognition {
     static const bool _use_full_helix_fit = 0;  // Flag to turn on non-linear helix fit
 
     // Some output files - only to be kept when in development stages
-    ofstream * _f_res;
-    ofstream * _f_res_good;
-    ofstream * _f_res_chosen;
-    ofstream * _f_trks;
+    std::ofstream * _f_res;
+    std::ofstream * _f_res_good;
+    std::ofstream * _f_res_chosen;
+    std::ofstream * _f_trks;
 };
-// } // ~namespace MAUS
+
+} // ~namespace MAUS
 
 #endif

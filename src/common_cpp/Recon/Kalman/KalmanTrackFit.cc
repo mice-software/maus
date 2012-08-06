@@ -20,7 +20,7 @@
 
 #define PI 3.14159265
 
-// namespace MAUS {
+namespace MAUS {
 
 KalmanTrackFit::KalmanTrackFit() {
   std::cout << "---------------------Birth of Kalman Filter--------------------" << std::endl;
@@ -81,6 +81,7 @@ void KalmanTrackFit::process(CLHEP::Hep3Vector &tof0, CLHEP::Hep3Vector &se,
 void KalmanTrackFit::initialise_global_track(CLHEP::Hep3Vector &tof0, CLHEP::Hep3Vector &se,
                                              CLHEP::Hep3Vector &tof1,
                                              std::vector<KalmanSite> &sites) {
+/*
   double se_tof1_sep = 60.0; // cm
   double se_tof0_sep = 720.0; // cm
 
@@ -96,7 +97,7 @@ void KalmanTrackFit::initialise_global_track(CLHEP::Hep3Vector &tof0, CLHEP::Hep
   // the clusters are sorted by now.
 
   int numb_sites = 3; // clusters.size();
-
+*/
   /* double z = clusters[0]->get_position().z();
   // int tracker = clusters[0]->get_tracker();
   double mx, my, x, y;
@@ -185,7 +186,7 @@ void KalmanTrackFit::process(std::vector<SciFiStraightPRTrack> straight_tracks) 
 
     KalmanMonitor monitor;
     // monitor.save(sites);
-    // monitor.save_mc(sites);
+    monitor.save_mc(sites);
     // monitor.print_info(sites);
     delete track;
   }
@@ -521,5 +522,5 @@ void KalmanTrackFit::process_clusters(std::vector<SciFiSpacePoint> &spacepoints,
   std::sort(clusters.begin(), clusters.end(), sort_by_id);
 }
 
-// } // ~namespace MAUS
+} // ~namespace MAUS
 

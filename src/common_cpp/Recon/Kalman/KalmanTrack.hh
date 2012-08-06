@@ -32,7 +32,7 @@
 
 #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
 
-// namespace MAUS {
+namespace MAUS {
 
 class KalmanSite;
 
@@ -64,6 +64,8 @@ class KalmanTrack {
 
   TMatrixD get_propagator() { return _F; }
 
+  TMatrixD get_system_noise() { return _Q; }
+
  protected:
   TMatrixD _H;
 
@@ -84,7 +86,7 @@ class KalmanTrack {
   static const double CHAN_WIDTH;// = 1.333; // (1.4945) effective channel width without overlap
 };
 
-// } // ~namespace MAUS
+} // ~namespace MAUS
 
 #endif
 

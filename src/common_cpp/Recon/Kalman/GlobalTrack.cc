@@ -16,7 +16,7 @@
  */
 #include "src/common_cpp/Recon/Kalman/GlobalTrack.hh"
 
-// namespace MAUS {
+namespace MAUS {
 
 void GlobalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site) {
   // Reset.
@@ -36,5 +36,5 @@ void GlobalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site) 
   // _F.Print();
 }
 
-// } // ~namespace MAUS
+} // ~namespace MAUS
 

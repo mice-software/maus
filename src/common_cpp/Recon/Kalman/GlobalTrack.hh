@@ -20,7 +20,7 @@
 
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
 
-// namespace MAUS {
+namespace MAUS {
 
 class GlobalTrack : public KalmanTrack {
  public:
@@ -28,6 +28,6 @@ class GlobalTrack : public KalmanTrack {
   void update_propagator(KalmanSite *old_site, KalmanSite *new_site);
 };
 
-// } // ~namespace MAUS
+} // ~namespace MAUS
 
 #endif

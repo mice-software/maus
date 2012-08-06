@@ -23,4 +23,4 @@ SciFiSpill::SciFiSpill() {
 }
 
 SciFiSpill::~SciFiSpill() {}
-// }// ~namespace MAUS
+// } // ~namespace MAUS

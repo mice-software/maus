@@ -16,19 +16,17 @@
  */
 
 /** @class SciFiSpill
- *  D...
+ *  Spill object for SciFi data, holding only SciFiEvents
  *
  */
 
 #ifndef SCIFISPILL_HH
 #define SCIFISPILL_HH
-// C headers
 
 // C++ headers
 #include <vector>
-// #include <string>
 
-// others
+// MAUS headers
 #include "src/common_cpp/Recon/SciFi/SciFiEvent.hh"
 
 // namespace MAUS {

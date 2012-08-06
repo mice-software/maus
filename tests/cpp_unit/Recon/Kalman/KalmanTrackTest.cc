@@ -20,7 +20,8 @@
 
 #include "gtest/gtest.h"
 
-namespace {
+namespace MAUS {
+
 class KalmanTrackTest : public ::testing::Test {
  protected:
   KalmanTrackTest()  {}
@@ -39,9 +40,6 @@ TEST_F(KalmanTrackTest, test_updateG) {
 TEST_F(KalmanTrackTest, test_propagator) {
 }
 
-} // namespace
-
-
 void KalmanTrack::update_G(KalmanSite *a_site) {
   double alpha = (a_site->get_measurement())(0, 0);
   double l = pow(ACTIVE_RADIUS*ACTIVE_RADIUS -
@@ -54,4 +52,5 @@ void KalmanTrack::update_G(KalmanSite *a_site) {
   _G.Invert();
 }
 */
-}
+
+} // ~namespace MAUS

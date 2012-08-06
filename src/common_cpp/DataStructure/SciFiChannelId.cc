@@ -19,11 +19,11 @@
 namespace MAUS {
 
 SciFiChannelId::SciFiChannelId()
-    : _fiber(0), _station(0), _tracker(0), _plane(0) {
+    : _fibre(0), _station(0), _tracker(0), _plane(0) {
 }
 
 SciFiChannelId::SciFiChannelId(const SciFiChannelId& channel)
-    : _fiber(channel._fiber), _station(channel._station),
+    : _fibre(channel._fibre), _station(channel._station),
       _tracker(channel._tracker), _plane(channel._plane) {
 }
 
@@ -31,7 +31,7 @@ SciFiChannelId& SciFiChannelId::operator=(const SciFiChannelId& channel) {
     if (this == &channel) {
         return *this;
     }
-    _fiber = channel._fiber;
+    _fibre = channel._fibre;
     _station = channel._station;
     _tracker = channel._tracker;
     _plane = channel._plane;
@@ -41,12 +41,12 @@ SciFiChannelId& SciFiChannelId::operator=(const SciFiChannelId& channel) {
 SciFiChannelId::~SciFiChannelId() {
 }
 
-int SciFiChannelId::GetFiberNumber() const {
-    return _fiber;
+int SciFiChannelId::GetFibreNumber() const {
+    return _fibre;
 }
 
-void SciFiChannelId::SetFiberNumber(int fiber) {
-    _fiber = fiber;
+void SciFiChannelId::SetFibreNumber(int fibre) {
+    _fibre = fibre;
 }
 
 int SciFiChannelId::GetStationNumber() const {
@@ -72,5 +72,13 @@ int SciFiChannelId::GetPlaneNumber() const {
 void SciFiChannelId::SetPlaneNumber(int plane) {
     _plane = plane;
 }
+
+bool SciFiChannelId::GetUsed() const {
+    return _used;
 }
 
+void SciFiChannelId::SetUsed(bool used) {
+    _used = used;
+}
+
+} // ~namespace MAUS

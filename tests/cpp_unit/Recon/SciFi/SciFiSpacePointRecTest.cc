@@ -20,15 +20,16 @@
 
 // Other headers
 #include "Config/MiceModule.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiEvent.hh"
+#include "src/common_cpp/DataStructure/SciFiEvent.hh"
+#include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
+#include "src/common_cpp/DataStructure/SciFiCluster.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePointRec.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiCluster.hh"
 
 #include "gtest/gtest.h"
 
-// MAUS namespace {
-class SciFiSpacePointRecTest : public ::testing::Test {
+namespace MAUS {
+
+  class SciFiSpacePointRecTest : public ::testing::Test {
  protected:
   SciFiSpacePointRecTest()  {}
   virtual ~SciFiSpacePointRecTest() {}
@@ -98,3 +99,5 @@ TEST_F(SciFiSpacePointRecTest, test_duplet_radius) {
   bool test_2 = a_test.duplet_within_radius(c1, c2);
   EXPECT_FALSE(test_2);
 }
+
+} // ~namespace MAUS

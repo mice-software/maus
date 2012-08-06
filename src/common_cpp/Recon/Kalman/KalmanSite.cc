@@ -17,7 +17,7 @@
 
 #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
 
-// namespace MAUS {
+namespace MAUS {
 
 KalmanSite::KalmanSite() {
   _C.ResizeTo(5, 5);
@@ -79,4 +79,4 @@ KalmanSite& KalmanSite::operator=(const KalmanSite &site) {
   _mc_mom = site.get_true_momentum();
 }
 
-// } // ~namespace MAUS
+} // ~namespace MAUS

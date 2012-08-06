@@ -25,6 +25,7 @@
 #include "TDecompSVD.h"
 #include "TF1.h"
 
+namespace MAUS {
 
 bool MapCppTrackerRecon::birth(std::string argJsonConfigDocument) {
   _classname = "MapCppTrackerRecon";
@@ -306,6 +307,8 @@ void MapCppTrackerRecon::make_seed_and_fit(SciFiEvent &event) {
   }
 }
 */
+
+
 void MapCppTrackerRecon::track_fit(SciFiEvent &evt) {
   KalmanTrackFit fit;
   if ( evt.helicalprtracks().size() )
@@ -313,6 +316,7 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) {
   if ( evt.straightprtracks().size() )
     fit.process(evt.straightprtracks());
 }
+
 
 void MapCppTrackerRecon::save_to_json(SciFiEvent &evt, int event_i) {
   // ------- CLUSTERS -------------------------------------------------------
@@ -464,3 +468,6 @@ std::string MapCppTrackerRecon::JsonToString(Json::Value json_in) {
   JsonWrapper::Print(ss_io, json_in);
   return ss_io.str();
 }
+
+} // ~namespace MAUS
+
