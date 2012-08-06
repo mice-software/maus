@@ -46,10 +46,10 @@ geometry object a set of test objects.
 
 import sys
 
-from src.tests import Test # pylint: disable=W0611
-from src.tests import KSTest # pylint: disable=W0611
-from src.tests import HitEqualityTest # pylint: disable=W0611
-from src.geometry import Geometry # pylint: disable=W0611
+from physics_model_test.tests import Test # pylint: disable=W0611
+from physics_model_test.tests import KSTest # pylint: disable=W0611
+from physics_model_test.tests import HitEqualityTest # pylint: disable=W0611
+from physics_model_test.geometry import Geometry # pylint: disable=W0611
 
 def read_geometries(ref_data_in):
     """

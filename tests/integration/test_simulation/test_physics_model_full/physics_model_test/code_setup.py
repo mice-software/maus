@@ -19,7 +19,7 @@ Contains setup information for each of the different codes
 
 import os
 import xboa.Common as Common
-from src import geometry
+from physics_model_test import geometry
 
 class CodeSetup:
     """

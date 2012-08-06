@@ -29,8 +29,8 @@ code version, and geometry; group tests belonging to the same tests
 import os
 import ROOT
 
-from src.geometry import Geometry # pylint: disable=W0611
-from src.tests import KSTest
+from physics_model_test.geometry import Geometry # pylint: disable=W0611
+from physics_model_test.tests import KSTest
 
 PLOT_DIR = os.path.join('$MAUS_ROOT_DIR', 'tests', 'integration',
                         'plots', 'test_physics_model_full')

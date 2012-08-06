@@ -18,9 +18,9 @@ Generates tests for subsequent call by test_runner
 """
 
 import sys
-from src import tests
-from src import code_setup
-from src.test_factory import TestFactory
+from physics_model_test import tests
+from physics_model_test import code_setup
+from physics_model_test.test_factory import TestFactory
 
 TEST_CONFIGURATIONS = [ #thickness in mm, momentum in MeV/c
 {'__material__':'lH2' , '__thickness__':350.,  '__momentum__':200.,
@@ -37,7 +37,7 @@ MICE_CONFIGURATIONS = [
 {'__material__':'lH2',  '__thickness__':350.,  '__momentum__':800., 
  '__pid__':-13, '__step__':100., '__nev__':10000, '__seed__':1},
 {'__material__':'LITHIUM_HYDRIDE',  '__thickness__':10.,  '__momentum__':100.,
- '__pid__':-13, '__step__':100., '__nev__':10000, '__seed__':1}, # 100k events
+ '__pid__':-13, '__step__':100., '__nev__':100000, '__seed__':1}, # 100k events
 {'__material__':'LITHIUM_HYDRIDE',  '__thickness__':10.,  '__momentum__':200.,
  '__pid__':-13, '__step__':100., '__nev__':100000, '__seed__':1},
 {'__material__':'LITHIUM_HYDRIDE',  '__thickness__':10.,  '__momentum__':400.,
@@ -134,7 +134,7 @@ where <code_n> is one of"""
         print
     for arg in sys.argv[1:]:
         test_factory = TestFactory(code_converters[arg](), TESTS)
-        test_factory.build_test_data(TEST_CONFIGURATIONS)
+        test_factory.build_test_data(MICE_CONFIGURATIONS)
     sys.exit(0)
 
 if __name__ == '__main__':

@@ -36,7 +36,7 @@ import sys
 
 import xboa.Common as Common
 
-from src import geometry
+from physics_model_test import geometry
 
 class TestFactory:
     """
