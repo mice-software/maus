@@ -30,6 +30,7 @@
 
 Json::Value SetupConfig() {
   Json::Value config(Json::objectValue);
+  config["check_volume_overlaps"] = true;
   config["reconstruction_geometry_filename"] = "Test.dat";
   config["simulation_geometry_filename"] = "Test.dat";
   config["maximum_number_of_steps"] = 10000;
@@ -49,11 +50,11 @@ Json::Value SetupConfig() {
 }
 
 int main(int argc, char **argv) {
-  MAUS::GlobalsManager::InitialiseGlobals
-                                     (JsonWrapper::JsonToString(SetupConfig()));
-  ::testing::InitGoogleTest(&argc, argv);
   int test_out = -1;
   try {
+      MAUS::GlobalsManager::InitialiseGlobals
+                                         (JsonWrapper::JsonToString(SetupConfig()));
+      ::testing::InitGoogleTest(&argc, argv);
       test_out = RUN_ALL_TESTS();
   } catch(Squeal squee) {
       std::cerr << squee.GetMessage() << "\n" << squee.GetLocation() << "\n"
