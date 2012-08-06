@@ -22,6 +22,7 @@
 
 #ifndef _SRC_MAP_MAPCPPTrackerDigits_H_
 #define _SRC_MAP_MAPCPPTrackerDigits_H_
+
 // C headers
 #include <assert.h>
 #include <json/json.h>
@@ -40,11 +41,12 @@
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 
-#include "src/common_cpp/Recon/SciFi/SciFiSpill.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiEvent.hh"
+#include "src/common_cpp/DataStructure/SciFiSpill.hh"
+#include "src/common_cpp/DataStructure/SciFiEvent.hh"
 #include "src/common_cpp/Recon/SciFi/RealDataDigitization.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiDigit.hh"
+#include "src/common_cpp/DataStructure/SciFiDigit.hh"
 
+namespace MAUS {
 
 class MapCppTrackerDigits {
  public:
@@ -69,7 +71,7 @@ class MapCppTrackerDigits {
    */
   std::string process(std::string document);
 
-  void save_to_json(SciFiSpill &spill);
+  void save_to_json(MAUS::SciFiSpill &spill);
 
   Json::Value ConvertToJson(std::string jsonString);
 
@@ -92,3 +94,5 @@ class MapCppTrackerDigits {
   int SciFiRunRecon;
 }; // Don't forget this trailing colon!!!!
 #endif
+
+} // ~namespace MAUS

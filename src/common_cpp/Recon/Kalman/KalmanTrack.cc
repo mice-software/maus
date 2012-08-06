@@ -39,15 +39,15 @@ KalmanTrack::KalmanTrack() {
 //
 void KalmanTrack::calc_predicted_state(KalmanSite *old_site, KalmanSite *new_site) {
   TMatrixD a = old_site->get_a();
-  std::cerr << "Old state filtered state: " << std::endl;
-  a.Print();
+  // std::cerr << "Old state filtered state: " << std::endl;
+  // a.Print();
 
   TMatrixD a_projected = TMatrixD(_F, TMatrixD::kMult, a);
   new_site->set_projected_a(a_projected);
-  std::cerr << "Old state filtered state: " << std::endl;
-  _F.Print();
-  std::cerr << "New projected state: " << std::endl;
-  a_projected.Print();
+  // std::cerr << "Old state filtered state: " << std::endl;
+  // _F.Print();
+  // std::cerr << "New projected state: " << std::endl;
+  // a_projected.Print();
 }
 
 //

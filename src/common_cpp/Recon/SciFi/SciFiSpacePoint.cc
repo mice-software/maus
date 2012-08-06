@@ -19,10 +19,23 @@
 
 // namespace MAUS {
 
-SciFiSpacePoint::SciFiSpacePoint() { _used = false; }
+// Default constructor
+SciFiSpacePoint::SciFiSpacePoint(): _used(false) {}
 
-SciFiSpacePoint::~SciFiSpacePoint() {}
+// Copy contructor
+SciFiSpacePoint::SciFiSpacePoint(const SciFiSpacePoint &_scifispacepoint):_used(false),
+                                                                          _spill(0),
+                                                                          _event(0),
+                                                                          _tracker(0),
+                                                                          _station(0),
+                                                                          _npe(0.0),
+                                                                          _chi2(0.0),
+                                                                          _type(""),
+                                                                          _position(0, 0, 0) {
+  *this = _scifispacepoint;
+}
 
+// Two cluster constructor
 SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2, SciFiCluster *clust3) {
   _used = false;
   _type = "triplet";
@@ -46,6 +59,7 @@ SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2, Sci
   // _time_res   = 0;
 }
 
+// Three cluster constructor
 SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2) {
   _used = false;
   _type = "duplet";
@@ -65,5 +79,31 @@ SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2) {
   // _time = 0;
   // _time_error = 0;
   // _time_res   = 0;
+}
+
+// Destructor
+SciFiSpacePoint::~SciFiSpacePoint() {}
+
+// Assignment operator
+SciFiSpacePoint& SciFiSpacePoint::operator=(const SciFiSpacePoint &_scifispacepoint) {
+  if (this == &_scifispacepoint) {
+    return *this;
+  }
+  _used      = _scifispacepoint.is_used();
+  _spill     = _scifispacepoint.get_spill();
+  _event     = _scifispacepoint.get_event();
+  _tracker   = _scifispacepoint.get_tracker();
+  _station   = _scifispacepoint.get_station();
+  _npe       = _scifispacepoint.get_npe();
+  _chi2      = _scifispacepoint.get_chi2();
+  _type      = _scifispacepoint.get_type();
+  _position  = _scifispacepoint.get_position();
+
+  _channels.resize(_scifispacepoint._channels.size());
+  for (unsigned int i = 0; i < _scifispacepoint._channels.size(); ++i) {
+    _channels[i] = new SciFiCluster(*_scifispacepoint._channels[i]);
+  }
+
+  return *this;
 }
 // } // ~namespace MAUS

@@ -15,26 +15,24 @@
  *
  */
 
-/** @class SimpleHelix
- *
- *
- */
+/** @class SimpleHelix */
 
-#ifndef  SIMPLEHELIX_HH
-#define SIMPLEHELIX_HH
+#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_SIMPLEHELIX_HH_
+#define _SRC_COMMON_CPP_DATASTRUCTURE_SIMPLEHELIX_HH_
 
-// namespace MAUS {
+namespace MAUS {
 
 class SimpleHelix {
   public:
-
-    // Constructors
+    /** Default constructor */
     SimpleHelix();
+
+    /** Parameter constructor */
     SimpleHelix(double Phi_0, double Phi_0_err, double R, double R_err, double tan_lambda,
                 double tan_lambda_err, double Psi_0, double Psi0_err, double chisq,
                 double chisq_dof);
 
-    // Destructor
+    /** Destructor */
     ~SimpleHelix();
 
     // Getters
@@ -83,6 +81,7 @@ class SimpleHelix {
     double _chisq;
     double _chisq_dof;
 };
-// } // ~namespace MAUS
+
+} // ~namespace MAUS
 
 #endif

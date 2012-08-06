@@ -15,9 +15,9 @@
  *
  */
 
-#include "src/common_cpp/Recon/SciFi/SimpleHelix.hh"
+#include "src/common_cpp/DataStructure/SimpleHelix.hh"
 
-// namespace MAUS {
+namespace MAUS {
 
 // Constructors
 SimpleHelix::SimpleHelix() {
@@ -84,4 +84,5 @@ void SimpleHelix::set_parameters(double Phi_0, double Phi_0_err, double R, doubl
   _chisq = chisq;
   _chisq_dof = chisq_dof;
 }
-// } // ~namespace MAUS
+
+} // ~namespace MAUS

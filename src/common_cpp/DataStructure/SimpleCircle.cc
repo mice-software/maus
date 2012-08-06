@@ -15,9 +15,9 @@
  *
  */
 
-#include "src/common_cpp/Recon/SciFi/SimpleCircle.hh"
+#include "src/common_cpp/DataStructure/SimpleCircle.hh"
 
-// namespace MAUS {
+namespace MAUS {
 
 // Constructor
 SimpleCircle::SimpleCircle() {
@@ -123,4 +123,5 @@ void SimpleCircle::set_parameters(double x0, double x0_err, double y0, double y0
   _delta_R = delta_R;
   _chisq = chisq;
 }
-// } // ~namespace MAUS
+
+} // ~namespace MAUS

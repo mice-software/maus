@@ -32,7 +32,6 @@
 #include "Rtypes.h"
 
 // MAUS headers
-#include "src/common_cpp/DataStructure/SciFiEvent.hh"  // For cluster array type def
 #include "src/common_cpp/DataStructure/SciFiCluster.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
 
@@ -54,7 +53,7 @@ class SciFiSpacePoint {
   SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2);
 
   /** Destructor  */
-  ~SciFiSpacePoint();
+  virtual ~SciFiSpacePoint();
 
   /** Assignment operator - any pointers are deep copied */
   SciFiSpacePoint& operator=(const SciFiSpacePoint &_scifispacepoint);
@@ -103,7 +102,7 @@ class SciFiSpacePoint {
 
   bool get_used() const { return _used; }
 
-  void set_channels(std::vector<SciFiCluster*> channels) { _channels = channels; }
+  void set_channels(SciFiClusterPArray channels) { _channels = channels; }
 
   SciFiClusterPArray get_channels()  const { return _channels; }
 
@@ -120,7 +119,13 @@ class SciFiSpacePoint {
   ThreeVector _position;
 
   SciFiClusterPArray  _channels;
+
+  ClassDef(SciFiSpacePoint, 1)
 };  // Don't forget this trailing colon!!!!
+
+typedef std::vector<SciFiSpacePoint*> SciFiSpacePointPArray;
+typedef std::vector<SciFiSpacePoint> SciFiSpacePointArray;
+
 } // ~namespace MAUS
 
 #endif

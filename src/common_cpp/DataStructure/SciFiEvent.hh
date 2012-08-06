@@ -27,12 +27,12 @@
 #include "src/common_cpp/DataStructure/Hit.hh"
 #include "src/common_cpp/DataStructure/SciFiDigit.hh"
 #include "src/common_cpp/DataStructure/SciFiCluster.hh"
+#include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
+#include "src/common_cpp/DataStructure/SciFiStraightPRTrack.hh"
+#include "src/common_cpp/DataStructure/SciFiHelicalPRTrack.hh"
 
 namespace MAUS {
 
-typedef std::vector<SciFiHit*> SciFiHitPArray;
-typedef std::vector<SciFiDigit*> SciFiDigitPArray;
-typedef std::vector<SciFiCluster*> SciFiClusterPArray;
 
 /** @class SciFiEvent A container to hold other SciFi containers, representing a particle event
  *
@@ -46,7 +46,7 @@ class SciFiEvent {
     /** Copy constructor - any pointers are deep copied */
     SciFiEvent(const SciFiEvent& _scifievent);
 
-    /** Equality operator - any pointers are deep copied */
+    /** Assignment operator - any pointers are deep copied */
     SciFiEvent& operator=(const SciFiEvent& _scifievent);
 
     /** Destructor - any member pointers are deleted */
@@ -64,19 +64,54 @@ class SciFiEvent {
     void add_cluster(SciFiCluster* cluster) { _scificlusters.push_back(cluster); }
     SciFiClusterPArray clusters() const { return _scificlusters; }
 
+    /** Spacepoints */
+    void add_spacepoint(SciFiSpacePoint* spacepoint) { _scifispacepoints.push_back(spacepoint); }
+    SciFiSpacePointPArray spacepoints() const { return _scifispacepoints; }
+
+    /** Seeds */
+    void add_seeds(SciFiSpacePoint* seed) { _scifiseeds.push_back(seed); }
+    SciFiSpacePointPArray seeds() const { return _scifiseeds; }
+
+    /** Straight Pattern Recognition tracks */
+    void add_straightprtrack(SciFiStraightPRTrack track) {
+                             _scifistraightprtracks.push_back(track); }
+    void set_straightprtrack(SciFiStraightPRTrackArray tracks) { _scifistraightprtracks = tracks; }
+    SciFiStraightPRTrackArray straightprtracks() const { return _scifistraightprtracks; }
+
+    /** Helical Pattern Recognition tracks */
+    void add_helicalprtrack(SciFiHelicalPRTrack track) { _scifihelicalprtracks.push_back(track); }
+    void set_helicalprtrack(SciFiHelicalPRTrackArray tracks) { _scifihelicalprtracks = tracks; }
+    SciFiHelicalPRTrackArray helicalprtracks() const { return _scifihelicalprtracks; }
+
+
   private:
 
     /** Hits in an event */
-    SciFiHitPArray _scifihits;
+    SciFiHitPArray                      _scifihits;
 
     /** Digits in an event */
-    SciFiDigitPArray _scifidigits;
+    SciFiDigitPArray                    _scifidigits;
 
     /** Clusters in an event */
-    SciFiClusterPArray _scificlusters;
+    SciFiClusterPArray                  _scificlusters;
+
+    /** SpacePoints in an event */
+    SciFiSpacePointPArray               _scifispacepoints;
+
+    /** Seeds for track fitting */
+    SciFiSpacePointPArray               _scifiseeds;
+
+    /** Straight tracks */
+    SciFiStraightPRTrackArray           _scifistraightprtracks;
+
+    /** Helical tracks */
+    SciFiHelicalPRTrackArray            _scifihelicalprtracks;
 
     ClassDef(SciFiEvent, 1)
 };
+
+typedef std::vector<SciFiEvent*> SciFiEventPArray;
+typedef std::vector<SciFiEvent> SciFiEventArray;
 
 } // ~namespace MAUS
 

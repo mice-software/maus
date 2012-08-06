@@ -83,9 +83,13 @@
 #pragma link C++ class MAUS::CkovA+;
 #pragma link C++ class MAUS::CkovB+;
 #pragma link C++ class MAUS::Tag+;
+#pragma link C++ class MAUS::SciFiSpill+;
 #pragma link C++ class MAUS::SciFiEvent+;
 #pragma link C++ class MAUS::SciFiDigit+;
 #pragma link C++ class MAUS::SciFiCluster+;
+#pragma link C++ class MAUS::SciFiSpacePoint+;
+#pragma link C++ class MAUS::SciFiStraightPRTrack+;
+#pragma link C++ class MAUS::SciFiHelicalPRTrack+;
 
 #pragma link C++ global gROOT;
 #pragma link C++ global gEnv;

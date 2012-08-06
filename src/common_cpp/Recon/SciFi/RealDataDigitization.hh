@@ -47,11 +47,11 @@
 // from old file
 #include "Config/MiceModule.hh"
 
-#include "src/common_cpp/Recon/SciFi/SciFiDigit.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiEvent.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiSpill.hh"
+#include "src/common_cpp/DataStructure/SciFiDigit.hh"
+#include "src/common_cpp/DataStructure/SciFiEvent.hh"
+#include "src/common_cpp/DataStructure/SciFiSpill.hh"
 
-// namespace MAUS {
+namespace MAUS {
 
 class RealDataDigitization {
  public:
@@ -110,6 +110,7 @@ class RealDataDigitization {
   std::vector<int> _inWG;
   std::vector<int> _WGfib;
 };  // Don't forget this trailing colon!!!!
-// } // ~namespace MAUS
+
+} // ~namespace MAUS
 
 #endif

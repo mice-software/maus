@@ -89,18 +89,18 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   double delta_phi = _h*deltaZ/(old_r * old_tan_lambda);
   double new_phi   = (old_phi+delta_phi);
 
-  double drho_dr, drho_dkappa, drho_dx, drho_dy;
-  double old_kappa_2 = old_kappa*old_kappa;
+  double drho_dr, drho_dx, drho_dy; // drho_dkappa
+  // double old_kappa_2 = old_kappa*old_kappa;
   if ( d_rho == 0 ) {
     drho_dx     = 0.;
     drho_dy     = 0.;
     drho_dr     = 0.;
-    drho_dkappa = 0.;
+    // drho_dkappa = 0.;
   } else {
-    drho_dx     = (1./d_rho)*( old_x - _x0 - old_r*cos(old_phi) );
-    drho_dy     = (1./d_rho)*( old_y - _y0 - old_r*sin(old_phi) );
+    drho_dx     = (1./abs(d_rho))*( old_x - _x0 - old_r*cos(old_phi) );
+    drho_dy     = (1./abs(d_rho))*( old_y - _y0 - old_r*sin(old_phi) );
     drho_dr     = -(cos(old_phi)*drho_dx + sin(old_phi)*drho_dy);
-    drho_dkappa = -(_alpha/old_kappa_2)*drho_dr;
+    // drho_dkappa = -(_alpha/old_kappa_2)*drho_dr;
   }
   std::cerr << "Track Parameters: " << "\n"
             << "old x:     " << old_x << "\n"
@@ -114,13 +114,13 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
             << "circle_y:  " << circle_y << "\n"
             << "drho:      " << d_rho << "\n"
             << "drho derivatives: " << drho_dx << " " << drho_dy << " "
-                                    << drho_dr << " " << drho_dkappa << std::endl;
-  _projected_x = old_x+d_rho*cos(old_phi)+_h*(_alpha/old_kappa)*(cos(old_phi)-cos(new_phi));
-  _projected_y = old_y+d_rho*sin(old_phi)+_h*(_alpha/old_kappa)*(sin(old_phi)-sin(new_phi));
+                                    << drho_dr << std::endl;
+  _projected_x = old_x+d_rho*cos(old_phi)+_h*old_r*(cos(old_phi)-cos(new_phi));
+  _projected_y = old_y+d_rho*sin(old_phi)+_h*old_r*(sin(old_phi)-sin(new_phi));
   std::cerr << "New Parameters: " << "\n"
             << "x:     " << _projected_x << "\n"
             << "y:     " << _projected_y << "\n";
-  std::cerr << "Signed Radius: " << _alpha/old_kappa << "\n";
+   std::cerr << "Signed Radius: " << _h*old_r << "\n";
 
   // assert(delta_phi < 4);
   // Build _F.

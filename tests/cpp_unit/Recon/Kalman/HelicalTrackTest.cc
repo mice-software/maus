@@ -43,8 +43,8 @@ void HelicalTrackTest::set_up_seed() {
   int sign= 1;
   int Q = 1;
   tracker = 0;
-  x0 = 1.0;
-  y0 = 1.0;
+  x0 = 5.0;
+  y0 = 0.0;
   radius = 8.0; // mm
   pt = 1.2*radius; // MeV/c
   pz = 220.0;
@@ -62,12 +62,12 @@ void HelicalTrackTest::set_up_seed() {
 
 void HelicalTrackTest::set_up_sites() {
   old_site.set_z(0.0);
-  new_site.set_z(-550.0);
+  new_site.set_z(-1100.0/5.);
   new_site.set_id(10);
 
   a.ResizeTo(5, 1);
-  a(0, 0) = x0+radius*cos(phi0)+0.1;
-  a(1, 0) = y0+radius*sin(phi0)+0.2;
+  a(0, 0) = x0+radius*cos(phi0)+1.0;
+  a(1, 0) = y0+radius*sin(phi0);
   a(2, 0) = radius;
   a(3, 0) = kappa;
   a(4, 0) = tan_lambda;

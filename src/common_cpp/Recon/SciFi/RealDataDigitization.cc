@@ -17,7 +17,7 @@
 
 #include "src/common_cpp/Recon/SciFi/RealDataDigitization.hh"
 
-// namespace MAUS {
+namespace MAUS {
 
 RealDataDigitization::RealDataDigitization() {}
 
@@ -236,4 +236,5 @@ bool RealDataDigitization::load_bad_channels() {
   }
   return true;
 }
-// } // ~namespace MAUS
+
+} // ~namespace MAUS

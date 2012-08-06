@@ -17,6 +17,8 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_SCIFIDIGIT_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_SCIFIDIGIT_
 
+// C++ headers
+#include <vector>
 
 // ROOT headers
 #include "Rtypes.h"
@@ -104,6 +106,8 @@ class SciFiDigit {
 
     ClassDef(SciFiDigit, 1)
 };
+
+typedef std::vector<SciFiDigit*> SciFiDigitPArray;
 
 } // ~namespace MAUS
 

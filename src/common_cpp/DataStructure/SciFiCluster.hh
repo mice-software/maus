@@ -23,6 +23,9 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_SCIFICLUSTER_HH_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_SCIFICLUSTER_HH_
 
+// C++ headers
+#include <vector>
+
 // ROOT headers
 #include "Rtypes.h"
 
@@ -131,6 +134,8 @@ class SciFiCluster {
 
   ClassDef(SciFiCluster, 1)
 }; // Don't forget this trailing colon!!!!
+
+typedef std::vector<SciFiCluster*> SciFiClusterPArray;
 
 } // ~namespace MAUS
 

@@ -17,10 +17,11 @@
 
 #include "gtest/gtest.h"
 
-#include "src/common_cpp/Recon/SciFi/SciFiSpill.hh"
+#include "src/common_cpp/DataStructure/SciFiSpill.hh"
 #include "src/common_cpp/Recon/SciFi/RealDataDigitization.hh"
 
-// MAUS namespace {
+namespace MAUS {
+
 class RealDataDigitizationTest : public ::testing::Test {
  protected:
   RealDataDigitizationTest()  {}
@@ -136,4 +137,4 @@ TEST_F(RealDataDigitizationTest, test_process) {
   EXPECT_TRUE(spill.events().size()>0);
 }
 
-// } // namespace
+} // ~namespace MAUS
