@@ -36,7 +36,7 @@ Json::Value SetupConfig() {
   config["maximum_number_of_steps"] = 10000;
   config["keep_tracks"] = true;
   config["keep_steps"] = true;
-  config["verbose_level"] = 1;
+  config["verbose_level"] = 2;
   config["geant4_visualisation"] = false;
   config["physics_model"] = "QGSP_BERT";
   config["reference_physics_processes"] = "mean_energy_loss";
