@@ -26,15 +26,6 @@ geometry object a set of test objects.
   them appropriately and calculate appropriate test variables on the output
 * eval( repr(geometry) ) should recreate a copy of the geometry. Then storage of
   reference datasets and geometries is done by writing repr(geometry) to disk
-
-This can be run as a standalone program from the command line, in which case it 
-takes two arguments
-
-  --in=<some_file> defines input file which contains reference geometry objects 
-                   and tests
-  --out=<some_file> defines output file; will write updated reference data to
-                    out
-
 """
 
 #TODO: #pylint: disable=W0511 
@@ -55,10 +46,10 @@ takes two arguments
 
 import sys
 
-from tests import Test # pylint: disable=W0611, W0403
-from tests import KSTest # pylint: disable=W0611, W0403
-from tests import HitEqualityTest # pylint: disable=W0611, W0403
-from geometry import Geometry # pylint: disable=W0611, W0403
+from src.tests import Test # pylint: disable=W0611
+from src.tests import KSTest # pylint: disable=W0611
+from src.tests import HitEqualityTest # pylint: disable=W0611
+from src.geometry import Geometry # pylint: disable=W0611
 
 def read_geometries(ref_data_in):
     """
@@ -118,35 +109,6 @@ def code_comparison_test(ref_data_in, ref_data_out):
     for geo in geometries_out:
         print geo
     return (passes, fails, warns)
-
-def main(argv=None):
-    """
-    If called directly from the command line, parse command line arguments as 
-    file names and run the tests.
-    """
-    if argv == None:
-        argv = sys.argv
-    arg_dict = {}
-    for arg in argv: 
-        if( len(arg.split('='))>1 ):
-            arg_dict[arg.split('=')[0]] = arg.split('=')[1]
-    arg_list = ['--in','--out']
-    args = ['', '']
-    for i, arg in enumerate(arg_list):
-        if arg in arg_dict:
-            args[i] = arg_dict[arg]
-        else:
-            args[i] = None
-    (passes, fails, warns) = code_comparison_test(args[0], args[1])
-    print '========================='
-    print '|| PhysicsModelTest    ||'
-    print '========================='
-    print '\n'+str(passes)+' passes   '+str(fails)+' fails    '+\
-               str(warns)+' warnings\n'
-    return fails
-
-if __name__ == "__main__":
-    sys.exit(main())
 
 
 

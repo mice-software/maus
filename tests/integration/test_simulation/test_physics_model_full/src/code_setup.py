@@ -19,7 +19,7 @@ Contains setup information for each of the different codes
 
 import os
 import xboa.Common as Common
-import geometry # pylint: disable=W0403
+from src import geometry
 
 class CodeSetup:
     """
@@ -342,7 +342,6 @@ class G4MICESetup(CodeSetup):
 
     def get_output_filename(self):
         """Output filename dynamically pulls MAUS version from README"""
-        g4mice_version = os.getenv('G4MICE_VERSION')
         return 'maus.'+self._version+'.ref_data.dat'
 
     def get_bunch_read_keys(self):

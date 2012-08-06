@@ -26,26 +26,25 @@ So the excercise here is to manipulate the geometry name to identify the code,
 code version, and geometry; group tests belonging to the same tests
 """
 
-import geometry # pylint: disable=W0403
-from geometry import Geometry # pylint: disable=W0403, W0611
-from tests import KSTest # pylint: disable=W0403
 import os
 import ROOT
-import glob
 
-INPUT_DIR = geometry.ref_data('')
+from src.geometry import Geometry # pylint: disable=W0611
+from src.tests import KSTest
+
 PLOT_DIR = os.path.join('$MAUS_ROOT_DIR', 'tests', 'integration',
                         'plots', 'test_physics_model_full')
 PLOT_DIR = os.path.expandvars(PLOT_DIR)
-PLOT_FORMATS = ['png'] #list of plot formats
+PLOT_FORMATS = ['png', 'root', 'eps'] #list of plot formats
 
-def load_geometries():
+def load_geometries(file_list):
     """
     Load geometry files.
     Returns a tuple of (geometry_list, dict_of{geometry:code_version})
     """
-    geometries       = []
-    for path in glob.glob(geometry.ref_data('*.dat')):
+    geometries = []
+    file_paths = file_list
+    for path in file_paths:
         print path
         new_geometries = eval( open(path).read() )
         geometries += new_geometries
@@ -145,7 +144,7 @@ def build_title(canvas, name):
     leg2.Draw()
     canvas.Update()
 
-def main():
+def plot(file_list):
     """
     Main loop - load geometry and tests, sort geometry by name, then sort 
     tests by type, then make plots.
@@ -154,7 +153,7 @@ def main():
         os.mkdir(PLOT_DIR)
     except OSError:
         pass #may fail if directory already exists
-    geometries = load_geometries()
+    geometries = load_geometries(file_list)
     geo_groups = group_geometries(geometries)
     for geo_list in geo_groups:
         (test_group, test_dict) = group_tests(geo_list)
@@ -170,9 +169,4 @@ def main():
                 plot_path = os.path.join(PLOT_DIR, fname+'.'+form)
                 canv.Print(plot_path)
     return 0
-
-if __name__ == '__main__':
-    main()
-    raw_input()
-
 

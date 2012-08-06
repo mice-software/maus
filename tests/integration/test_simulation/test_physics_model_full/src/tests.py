@@ -120,12 +120,14 @@ class KSTest(Test): #note inheritance from test pylint: disable=R0902
         self.ks_dist   = 0.
         self.ks_prob   = 0.
         self.ks_tol    = 1.
+        self.n_bins    = 0
     
     def __repr__(self):
         return 'KSTest.new('+repr(self.variable)+','+repr(self.units)+','+\
                 repr(self.bins)+','+repr(self.content)+','+repr(self.n_events)+\
                 ','+repr(self.pid)+','+repr(self.ks_dist)+','+\
-                repr(self.ks_prob)+','+repr(self.ks_tol)+')'
+                repr(self.ks_prob)+','+repr(self.ks_tol)+','+repr(self.n_bins)+\
+                ')'
 
     def __str__(self):
         """Summary of the KS test along with test pass information"""
@@ -133,7 +135,7 @@ class KSTest(Test): #note inheritance from test pylint: disable=R0902
                str(self.ks_dist)+' probability '+str(self.ks_prob)+\
                ' tolerance '+str(self.ks_tol)+' : '+str(self.test_result())
 
-    def new(variable, units, bins, content, n_events, pid, ks_dist, ks_prob, ks_tol): #pylint: disable=R0913, C0301
+    def new(variable, units, bins, content, n_events, pid, ks_dist, ks_prob, ks_tol, n_bins): #pylint: disable=R0913, C0301
         """
         Initialises the object
         """
@@ -147,6 +149,7 @@ class KSTest(Test): #note inheritance from test pylint: disable=R0902
         my_ks_test.ks_dist   = copy.deepcopy(ks_dist)
         my_ks_test.ks_prob   = copy.deepcopy(ks_prob)
         my_ks_test.ks_tol    = copy.deepcopy(ks_tol)
+        my_ks_test.n_bins    = copy.deepcopy(n_bins)
         return my_ks_test
     new = staticmethod(new)
 
@@ -155,7 +158,8 @@ class KSTest(Test): #note inheritance from test pylint: disable=R0902
         Return a copy of the object
         """
         return KSTest.new(self.variable, self.units, self.bins, self.n_events, 
-                self.content, self.pid, self.ks_dist, self.ks_prob, self.ks_tol)
+                self.content, self.pid, self.ks_dist, self.ks_prob, self.ks_tol,
+                self.n_bins)
 
     def run_test(self, test_bunch):
         """

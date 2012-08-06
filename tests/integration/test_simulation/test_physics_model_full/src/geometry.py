@@ -27,7 +27,6 @@ TEST_DIR = os.path.expandvars(
    '$MAUS_ROOT_DIR/tests/integration/test_simulation/test_physics_model_full'
 )
 
-
 def temp(file_name):
     """Prefix to temporary directory"""
     tmp_dir = \
