@@ -75,7 +75,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         sleep 1
 	./Configure -install
   mkdir ${MAUS_ROOT_DIR}/third_party/build/${directory}/include/Geant4
-  mv ${MAUS_ROOT_DIR}/third_party/build/${directory}/include/*.hh ${MAUS_ROOT_DIR}/third_party/build/${directory}/include/Geant4
+  mv ${MAUS_ROOT_DIR}/third_party/build/${directory}/include/* ${MAUS_ROOT_DIR}/third_party/build/${directory}/include/Geant4
 	            ################################################## 
 	echo
         echo "INFO: The package should be locally build now in your"
