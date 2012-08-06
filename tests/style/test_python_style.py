@@ -93,10 +93,16 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
                     if root_dir in test_dirs:
                         ignore = True
                 if not ignore:
+                    for local_dir in self.local_dirs:
+                        if maus_dir.find(local_dir) > -1:
+                            os.chdir(local_dir)
+                            maus_dir = maus_dir[len(local_dir)+1:]
+                            break
                     file_name = os.path.join(maus_dir, file_name)
                     errors = self.run_pylint(file_name, fout)
                     if errors > 0:
                         error_files.append(file_name)
+                    os.chdir(self.maus_root_dir)
         return error_files
 
     def run_force_files(self, fout):
@@ -180,6 +186,9 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
     include_dirs = ['doc', 'tests', 'src', 'bin', 'doc']
     # exclude if dir path globs to one of the following 
     exclude_dirs = ['bin/user', 'src/*/*/build']
+    # if any of these are in the path, chdir to the directory first
+    # don't have nested local_dirs
+    local_dirs = ['tests/integration/test_simulation/test_physics_model_full']
     # exclude if filename includes one of the following
     exclude_files = [
         'test_cdb__init__.py', # makes pylint error
