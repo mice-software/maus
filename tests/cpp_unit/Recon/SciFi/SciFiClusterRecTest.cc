@@ -21,13 +21,14 @@
 // Other headers
 #include "Config/MiceModule.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiClusterRec.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiCluster.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiDigit.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiEvent.hh"
+#include "src/common_cpp/DataStructure/SciFiCluster.hh"
+#include "src/common_cpp/DataStructure/SciFiDigit.hh"
+#include "src/common_cpp/DataStructure/SciFiEvent.hh"
 
 #include "gtest/gtest.h"
 
-// MAUS namespace {
+namespace MAUS {
+
 class SciFiClusterRecTest : public ::testing::Test {
  protected:
   SciFiClusterRecTest()  {
@@ -77,4 +78,5 @@ TEST_F(SciFiClusterRecTest, test_process) {
   cluster->construct(modules);*/
   // think of tests for direction and position...
 }
-// } // namespace
+
+} // ~namespace MAUS

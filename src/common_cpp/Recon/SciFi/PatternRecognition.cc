@@ -16,30 +16,29 @@
  */
 
 // C headers
-#include <CLHEP/Vector/ThreeVector.h>
 #include <CLHEP/Matrix/Matrix.h>
 #include <CLHEP/Units/PhysicalConstants.h>
 
 // C++ headers
 #include <iostream>
 #include <fstream>
-#include <map>
 #include <vector>
 #include <cmath>
 #include <string>
 #include <sstream>
 
 // External libs headers
-#include "gsl/gsl_fit.h"
 #include "TROOT.h"
 
 // MAUS headers
 #include "src/common_cpp/Recon/SciFi/PatternRecognition.hh"
 #include "src/common_cpp/DataStructure/SimpleLine.hh"
-#include "src/common_cpp/Recon/SciFi/SimpleCircle.hh"
-#include "src/common_cpp/Recon/SciFi/SimpleHelix.hh"
+#include "src/common_cpp/DataStructure/SimpleCircle.hh"
+#include "src/common_cpp/DataStructure/SimpleHelix.hh"
+#include "src/common_cpp/DataStructure/ThreeVector.hh"
 
-// namespace MAUS {
+
+namespace MAUS {
 
 PatternRecognition::PatternRecognition() {
   if (debug == 2) {
@@ -622,7 +621,7 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
                     // If the spacepoint has not already been used in a track fit
                     if ( !spnts_by_station[st_num][sp_no]->get_used() ) {
 
-                      CLHEP::Hep3Vector pos = spnts_by_station[st_num][sp_no]->get_position();
+                      ThreeVector pos = spnts_by_station[st_num][sp_no]->get_position();
                       double dR = delta_R(circle, pos); // Calculate the residual dR
 
                       if ( debug > 1 ) {
@@ -769,7 +768,7 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
                       helix.set_dsdz(line_sz.get_m());
                       helix.set_R(circle.get_R());
                       helix.set_tan_lambda(1 / line_sz.get_m());
-                      CLHEP::Hep3Vector pos_0 = good_spnts[0]->get_position();
+                      ThreeVector pos_0 = good_spnts[0]->get_position();
 
                       SciFiHelicalPRTrack track(-1, num_points, pos_0, helix);
 
@@ -813,7 +812,7 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
                         if ( debug > 0 )
                           std::cout << "Helix fit found, adding " << num_points << "pt track **\n";
 
-                        CLHEP::Hep3Vector pos_0 = good_spnts[0]->get_position();
+                        ThreeVector pos_0 = good_spnts[0]->get_position();
                         SciFiHelicalPRTrack track(-1, num_points, pos_0, helix);
 
                         if ( debug > 1 ) {
@@ -963,7 +962,7 @@ void PatternRecognition::circle_fit(const std::vector<SciFiSpacePoint*> &spnts,
   circle.set_chisq(chi2); // should I leave this un-reduced?
 } // ~circle_fit(...)
 
-double PatternRecognition::delta_R(const SimpleCircle &circle, const CLHEP::Hep3Vector &pos) {
+double PatternRecognition::delta_R(const SimpleCircle &circle, const ThreeVector &pos) {
 
   double x0 = circle.get_x0();
   double y0 = circle.get_y0();
@@ -1132,7 +1131,7 @@ bool PatternRecognition::full_helix_fit(const std::vector<SciFiSpacePoint*> &spn
   if ( debug > 0 ) std::cout << "dsdz = " << dsdz << std::endl;
 
   if ( debug > 0 ) std::cout << "tan_lambda = " << tan_lambda << std::endl;
-  CLHEP::Hep3Vector starting_point = spnts[0]->get_position();
+  ThreeVector starting_point = spnts[0]->get_position();
 
   // Calculate chisq with initial params
   double best_chisq = calculate_chisq(spnts, circle.get_turning_angle(), Phi_0, tan_lambda, R);
@@ -1255,7 +1254,7 @@ double PatternRecognition::calculate_chisq(const std::vector<SciFiSpacePoint*> &
   double chi2 = 0;
   for ( unsigned int i = 0; i < spnts.size(); ++i ) {
 
-    CLHEP::Hep3Vector p = spnts[i]->get_position();
+    ThreeVector p = spnts[i]->get_position();
     double phi_i;
     phi_i = turning_angles[i];
 
@@ -1321,7 +1320,7 @@ void PatternRecognition::calculate_adjustments(const std::vector<SciFiSpacePoint
 
   for ( int i = 0; i < static_cast<int>(spnts.size()); ++i ) {
 
-    CLHEP::Hep3Vector p = spnts[i]->get_position();
+    ThreeVector p = spnts[i]->get_position();
     double phi_i;
     phi_i = turning_angles[i];
     phi_i -= phi_0; // Everything relative to starting point.
@@ -1564,8 +1563,8 @@ void PatternRecognition::set_ignore_stations(const std::vector<int> &ignore_stat
 void PatternRecognition::draw_line(const SciFiSpacePoint *sp1, const SciFiSpacePoint *sp2,
                                    SimpleLine &line_x, SimpleLine &line_y) {
 
-  CLHEP::Hep3Vector pos_outer = sp1->get_position();
-  CLHEP::Hep3Vector pos_inner = sp2->get_position();
+  ThreeVector pos_outer = sp1->get_position();
+  ThreeVector pos_inner = sp2->get_position();
 
   line_x.set_m(( pos_inner.x() - pos_outer.x()) / (pos_inner.z() - pos_outer.z() ));
   line_x.set_c(pos_outer.x() - ( pos_outer.z() * line_x.get_m()) );
@@ -1576,9 +1575,9 @@ void PatternRecognition::draw_line(const SciFiSpacePoint *sp1, const SciFiSpaceP
 void PatternRecognition::calc_residual(const SciFiSpacePoint *sp, const SimpleLine &line_x,
                                        const SimpleLine &line_y, double &dx, double &dy) {
 
-    CLHEP::Hep3Vector pos = sp->get_position();
+    ThreeVector pos = sp->get_position();
     dx = pos.x() - ( line_x.get_c() + ( pos.z() * line_x.get_m() ) );
     dy = pos.y() - ( line_y.get_c() + ( pos.z() * line_y.get_m() ) );
 } // ~calc_residual(...)
 
-// } // ~namespace MAUS
+} // ~namespace MAUS

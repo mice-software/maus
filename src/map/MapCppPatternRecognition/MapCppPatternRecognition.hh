@@ -22,6 +22,7 @@
 
 #ifndef _SRC_MAP_MAPCPPPatternRecognition_H_
 #define _SRC_MAP_MAPCPPPatternRecognition_H_
+
 // C headers
 #include <assert.h>
 #include <json/json.h>
@@ -40,16 +41,18 @@
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 
-#include "src/common_cpp/Recon/SciFi/SciFiSpill.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiEvent.hh"
-#include "src/common_cpp/Recon/SciFi/RealDataDigitization.hh"
+#include "src/common_cpp/DataStructure/SciFiDigit.hh"
+#include "src/common_cpp/DataStructure/SciFiCluster.hh"
+#include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
+#include "src/common_cpp/DataStructure/SciFiEvent.hh"
+#include "src/common_cpp/DataStructure/SciFiSpill.hh"
+#include "src/common_cpp/DataStructure/ThreeVector.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiClusterRec.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePointRec.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiDigit.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiCluster.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
 #include "src/common_cpp/Recon/SciFi/PatternRecognition.hh"
 // #include "src/common_cpp/Recon/SciFi/KalmanTrackFit.hh"
+
+namespace MAUS {
 
 class MapCppPatternRecognition {
  public:
@@ -80,15 +83,15 @@ class MapCppPatternRecognition {
    * @param spill SciFiSpill that we are filling
    *
    */
-  void make_SciFiSpill(Json::Value spacepoint_array, SciFiSpill &spill);
+  void make_SciFiSpill(Json::Value spacepoint_array, MAUS::SciFiSpill &spill);
 
-  void pattern_recognition(SciFiEvent &evt);
+  void pattern_recognition(MAUS::SciFiEvent &evt);
 
-  // void track_fit(SciFiEvent &evt);
+  // void track_fit(MAUS::SciFiEvent &evt);
 
-  void save_to_json(SciFiEvent &evt);
+  void save_to_json(MAUS::SciFiEvent &evt);
 
-  void print_event_info(SciFiEvent &event);
+  void print_event_info(MAUS::SciFiEvent &event);
 
   Json::Value ConvertToJson(std::string jsonString);
 
@@ -112,4 +115,7 @@ class MapCppPatternRecognition {
 
   int SciFiRunRecon;
 }; // Don't forget this trailing colon!!!!
+
+} // ~namespace MAUS
+
 #endif

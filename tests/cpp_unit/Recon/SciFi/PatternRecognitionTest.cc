@@ -18,14 +18,15 @@
 #include <cmath>
 
 #include "gtest/gtest.h"
-#include "CLHEP/Vector/ThreeVector.h"
 
 #include "src/common_cpp/Recon/SciFi/PatternRecognition.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiStraightPRTrack.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiEvent.hh"
+#include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
+#include "src/common_cpp/DataStructure/SciFiStraightPRTrack.hh"
+#include "src/common_cpp/DataStructure/SciFiEvent.hh"
+#include "src/common_cpp/DataStructure/ThreeVector.hh"
 
-namespace {
+namespace MAUS {
+
 class PatternRecognitionTest : public ::testing::Test {
  protected:
   PatternRecognitionTest()  {}
@@ -102,7 +103,7 @@ TEST_F(PatternRecognitionTest, test_make_straight_tracks) {
   SciFiSpacePoint *sp4 = new SciFiSpacePoint();
   SciFiSpacePoint *sp5 = new SciFiSpacePoint();
 
-  CLHEP::Hep3Vector pos(-68.24883333333334, -57.810948479361, -0.652299999999741);
+  ThreeVector pos(-68.24883333333334, -57.810948479361, -0.652299999999741);
   sp1->set_position(pos);
   sp1->set_tracker(0);
   sp1->set_station(1);
@@ -179,4 +180,5 @@ TEST_F(PatternRecognitionTest, test_make_straight_tracks) {
   EXPECT_TRUE(compare_doubles(my, strks[0].get_my(), epsilon));
   EXPECT_TRUE(compare_doubles(y_chisq, strks[0].get_y_chisq(), epsilon));
 }
-}// namespace
+
+} // ~namespace MAUS

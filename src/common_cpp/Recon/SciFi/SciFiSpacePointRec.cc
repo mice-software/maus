@@ -17,7 +17,7 @@
 
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePointRec.hh"
 
-// namespace MAUS {
+namespace MAUS {
 
 SciFiSpacePointRec::SciFiSpacePointRec() {}
 
@@ -105,7 +105,7 @@ void SciFiSpacePointRec::process(SciFiEvent &evt) {
 
 bool SciFiSpacePointRec::duplet_within_radius(SciFiCluster* candidate_A,
                                               SciFiCluster* candidate_B) {
-  CLHEP::Hep3Vector pos = crossing_pos(candidate_A, candidate_B);
+  ThreeVector pos = crossing_pos(candidate_A, candidate_B);
   double radius = pow(pow(pos.x(), 2.0)+pow(pos.y(), 2.0), 0.5);
   if ( radius < _acceptable_radius ) {
     return true;
@@ -164,19 +164,19 @@ void SciFiSpacePointRec::build_triplet(SciFiSpacePoint* triplet) {
   SciFiCluster *vcluster = channels[2];
 
   // This is the position of the space-point
-  CLHEP::Hep3Vector p1 = crossing_pos(vcluster, xcluster);
-  CLHEP::Hep3Vector p2 = crossing_pos(vcluster, wcluster);
-  CLHEP::Hep3Vector p3 = crossing_pos(xcluster, wcluster);
-  CLHEP::Hep3Vector position = (p1+p2+p3)/3.0;
+  ThreeVector p1 = crossing_pos(vcluster, xcluster);
+  ThreeVector p2 = crossing_pos(vcluster, wcluster);
+  ThreeVector p3 = crossing_pos(xcluster, wcluster);
+  ThreeVector position = (p1+p2+p3)/3.0;
   triplet->set_position(position);
 
   // Vector p stores the crossing position of views v and w.
-  CLHEP::Hep3Vector p(p2);
+  ThreeVector p(p2);
 
   // Now, determine the perpendicular distance from the hit on the X view
   // to the intersection of the V and W views
-  CLHEP::Hep3Vector x_dir(xcluster->get_direction());
-  CLHEP::Hep3Vector x_pos(xcluster->get_position());
+  ThreeVector x_dir(xcluster->get_direction());
+  ThreeVector x_pos(xcluster->get_position());
 
   // Assume that the station is perpendicular to the Z axis
   // get_chi_squared(x_pos,p);
@@ -212,10 +212,10 @@ void SciFiSpacePointRec::build_duplet(SciFiSpacePoint* duplet) {
   SciFiCluster *clusterA = channels[0];
   SciFiCluster *clusterB = channels[1];
 
-  CLHEP::Hep3Vector p1 = crossing_pos(clusterA, clusterB);
+  ThreeVector p1 = crossing_pos(clusterA, clusterB);
 
   // This is the position of the space-point.
-  CLHEP::Hep3Vector position(p1);
+  ThreeVector position(p1);
   duplet->set_position(position);
 
 /*
@@ -233,15 +233,15 @@ void SciFiSpacePointRec::build_duplet(SciFiSpacePoint* duplet) {
 // This function calculates the intersection position of two clusters.
 // The position of a space-point will be the mean
 // of all 3 possible intersections.
-CLHEP::Hep3Vector SciFiSpacePointRec::crossing_pos(SciFiCluster* c1,
+ThreeVector SciFiSpacePointRec::crossing_pos(SciFiCluster* c1,
                                          SciFiCluster* c2) {
-    CLHEP::Hep3Vector d1 = c1->get_direction();
+    ThreeVector d1 = c1->get_direction();
 
-    CLHEP::Hep3Vector d2 = c2->get_direction();
+    ThreeVector d2 = c2->get_direction();
 
-    CLHEP::Hep3Vector c1_pos(c1->get_position());
+    ThreeVector c1_pos(c1->get_position());
 
-    CLHEP::Hep3Vector c2_pos(c2->get_position());
+    ThreeVector c2_pos(c2->get_position());
 
     CLHEP::HepMatrix m1(3, 3, 0);
 
@@ -274,11 +274,12 @@ CLHEP::Hep3Vector SciFiSpacePointRec::crossing_pos(SciFiCluster* c1,
     double t1 = m1.determinant() / pow((d1.cross(d2)).mag(), 2.);
     double t2 = m2.determinant() / pow((d1.cross(d2)).mag(), 2.);
 
-    CLHEP::Hep3Vector p1 = c1_pos+t1*d1;
-    CLHEP::Hep3Vector p2 = c2_pos+t2*d2;
+    ThreeVector p1 = c1_pos+t1*d1;
+    ThreeVector p2 = c2_pos+t2*d2;
 
-    CLHEP::Hep3Vector an_intersection = (p1+p2)/2.;
+    ThreeVector an_intersection = (p1+p2)/2.;
 
     return an_intersection;
 }
-// } // ~namespace MAUS
+
+} // ~namespace MAUS

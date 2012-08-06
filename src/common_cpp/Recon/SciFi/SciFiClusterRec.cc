@@ -16,6 +16,8 @@
  */
 #include "src/common_cpp/Recon/SciFi/SciFiClusterRec.hh"
 
+namespace MAUS {
+
 SciFiClusterRec::SciFiClusterRec() {}
 
 SciFiClusterRec::SciFiClusterRec(int cluster_exception, double min_npe)
@@ -73,8 +75,8 @@ void SciFiClusterRec::process(SciFiEvent &evt, std::vector<const MiceModule*> mo
 }
 
 void SciFiClusterRec::construct(SciFiCluster *clust, std::vector<const MiceModule*> modules) {
-  Hep3Vector perp(-1., 0., 0.);
-  Hep3Vector dir(0, 1, 0);
+  ThreeVector perp(-1., 0., 0.);
+  ThreeVector dir(0, 1, 0);
   int tracker = clust->get_tracker();
   int station = clust->get_station();
   int plane   = clust->get_plane();
@@ -105,13 +107,13 @@ void SciFiClusterRec::construct(SciFiCluster *clust, std::vector<const MiceModul
 
   double dist_mm = Pitch * 7.0 / 2.0 * (clust->get_channel() - CentralFibre);
 
-  Hep3Vector position = dist_mm * perp + this_plane->globalPosition();
+  ThreeVector position = dist_mm * perp + this_plane->globalPosition();
 
-  Hep3Vector reference = get_reference_frame_pos(clust->get_tracker(), modules);
+  ThreeVector reference = get_reference_frame_pos(clust->get_tracker(), modules);
 
-  // Hep3Vector tracker_ref_frame_pos = position - reference;
+  // ThreeVector tracker_ref_frame_pos = position - reference;
 
-  Hep3Vector tracker_ref_frame_pos;
+  ThreeVector tracker_ref_frame_pos;
   if ( clust->get_tracker() == 0 ) {
     tracker_ref_frame_pos = - (position - reference);
   } else {
@@ -124,7 +126,7 @@ void SciFiClusterRec::construct(SciFiCluster *clust, std::vector<const MiceModul
   // Set relative position & channel number for the Kalman Filter.
   // This is the position of the cluster relatively to station 1 of the tracker (0 or 1)
   // with the displacement of the station centre subtracted.
-  // Hep3Vector relative_position = position - this_plane->globalPosition();
+  // ThreeVector relative_position = position - this_plane->globalPosition();
   double alpha = clust->get_channel() - CentralFibre;
   // clust->set_relative_position(relative_position);
   if ( tracker == 1 ) {
@@ -135,7 +137,7 @@ void SciFiClusterRec::construct(SciFiCluster *clust, std::vector<const MiceModul
   clust->set_id(id);
 }
 
-Hep3Vector SciFiClusterRec::get_reference_frame_pos(int tracker,
+ThreeVector SciFiClusterRec::get_reference_frame_pos(int tracker,
                                                     std::vector<const MiceModule*> modules) {
   const MiceModule* reference_plane = NULL;
 
@@ -156,7 +158,7 @@ Hep3Vector SciFiClusterRec::get_reference_frame_pos(int tracker,
     }
   }
   assert(reference_plane != NULL);
-  Hep3Vector reference_pos =  reference_plane->globalPosition();
+  ThreeVector reference_pos =  reference_plane->globalPosition();
 
   return reference_pos;
 }
@@ -176,3 +178,5 @@ bool SciFiClusterRec::are_neighbours(SciFiDigit *seed_i, SciFiDigit *seed_j) {
 
   return neigh;
 }
+
+} // ~namespace MAUS

@@ -22,6 +22,7 @@
 
 #ifndef SCIFICLUSTERREC_HH
 #define SCIFICLUSTERREC_HH
+
 // C headers
 #include <assert.h>
 #include <json/json.h>
@@ -40,10 +41,11 @@
 #include "CLHEP/Vector/Rotation.h"
 
 #include "src/legacy/Config/MiceModule.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiEvent.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiDigit.hh"
+#include "src/common_cpp/DataStructure/SciFiEvent.hh"
+#include "src/common_cpp/DataStructure/SciFiDigit.hh"
+#include "src/common_cpp/DataStructure/ThreeVector.hh"
 
-// namespace MAUS {
+namespace MAUS {
 
 class SciFiClusterRec {
  public:
@@ -65,7 +67,7 @@ class SciFiClusterRec {
    */
   void construct(SciFiCluster *clust, std::vector<const MiceModule*> modules);
 
-  Hep3Vector get_reference_frame_pos(int tracker, std::vector<const MiceModule*> modules);
+  ThreeVector get_reference_frame_pos(int tracker, std::vector<const MiceModule*> modules);
 
   bool are_neighbours(SciFiDigit *seed_i, SciFiDigit *seed_j);
 
@@ -75,6 +77,7 @@ class SciFiClusterRec {
 
   double _min_npe;
 };  // Don't forget this trailing colon!!!!
-// } // ~namespace MAUS
+
+} // ~namespace MAUS
 
 #endif
