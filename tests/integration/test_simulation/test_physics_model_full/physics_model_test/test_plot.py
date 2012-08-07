@@ -36,6 +36,7 @@ PLOT_DIR = os.path.join('$MAUS_ROOT_DIR', 'tests', 'integration',
                         'plots', 'test_physics_model_full')
 PLOT_DIR = os.path.expandvars(PLOT_DIR)
 PLOT_FORMATS = ['png', 'root', 'eps'] #list of plot formats
+LEGENDS = []
 
 def load_geometries(file_list):
     """
@@ -64,9 +65,9 @@ def file_name(geo, test):
     """
     Manipulate geo.name to generate a filename string
     """
-    file_name = histogram_title(geo)
-    file_name += ' '+test.variable
-    return file_name.replace(' ', '_')
+    name = histogram_title(geo)
+    name += ' '+test.variable
+    return name.replace(' ', '_')
 
 def code_name(geo):
     """
@@ -132,7 +133,7 @@ def build_legend(canvas):
     leg.SetFillColor(10)
     leg.SetBorderSize(0)
     canvas.Update()
-    return leg
+    LEGENDS.append(leg)
 
 def build_title(canvas, name):
     """
@@ -145,7 +146,8 @@ def build_title(canvas, name):
     leg2.SetBorderSize(0)
     leg2.Draw()
     canvas.Update()
-    return leg2
+    LEGENDS.append(leg2)
+
 
 def plot(file_list):
     """
@@ -165,11 +167,12 @@ def plot(file_list):
             for i, histogram in enumerate(h_list):
                 if i > 0:
                     histogram.SetName(code_name(test_dict[test_list[i-1]]))
-            legend = build_legend(canv)
-            title = build_title(canv, test_dict[test_list[0]])
+            build_legend(canv)
+            build_title(canv, test_dict[test_list[0]])
             fname = file_name(test_dict[test_list[0]], test_list[0])
             for form in PLOT_FORMATS:
                 plot_path = os.path.join(PLOT_DIR, fname+'.'+form)
                 canv.Print(plot_path)
     return 0
+
 
