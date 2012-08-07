@@ -54,18 +54,19 @@ def histogram_title(geo):
     """
     Manipulate geo.name to generate a histogram title string
     """
-    return file_name(geo).replace('_', ' ')
+    sort_name = geo.name.split(' ')[1:] # strip out code name/version number
+    sort_name = [item+' ' for item in sort_name[:-1]]+[sort_name[-1]] # spaces
+    sort_name = ''.join(sort_name)
+    sort_name = sort_name.replace('/', '')
+    return sort_name
 
-def file_name(geo):
+def file_name(geo, test):
     """
     Manipulate geo.name to generate a filename string
     """
-    print geo.name
-    sort_name = geo.name.split(' ')[1:] # strip out code name/version number
-    sort_name = [item+'_' for item in sort_name[:-1]]+[sort_name[-1]] # spaces
-    sort_name = ''.join(sort_name)
-    sort_name = sort_name.replace('/', '')
-    return sort_name  
+    file_name = histogram_title(geo)
+    file_name += ' '+test.variable
+    return file_name.replace(' ', '_')
 
 def code_name(geo):
     """
@@ -76,10 +77,10 @@ def code_name(geo):
 
 def geometry_comparator(geometry_1, geometry_2):
     """
-    Return comparator of the file_name of geometries (i.e. name excluding code
-    and version)
+    Return comparator of the histogram_title of geometries (i.e. name excluding
+    code and version)
     """
-    return cmp(file_name(geometry_1), file_name(geometry_2))
+    return cmp(histogram_title(geometry_1), histogram_title(geometry_2))
 
 def group_geometries(geometry_list):
     """
@@ -131,6 +132,7 @@ def build_legend(canvas):
     leg.SetFillColor(10)
     leg.SetBorderSize(0)
     canvas.Update()
+    return leg
 
 def build_title(canvas, name):
     """
@@ -143,6 +145,7 @@ def build_title(canvas, name):
     leg2.SetBorderSize(0)
     leg2.Draw()
     canvas.Update()
+    return leg2
 
 def plot(file_list):
     """
@@ -162,9 +165,9 @@ def plot(file_list):
             for i, histogram in enumerate(h_list):
                 if i > 0:
                     histogram.SetName(code_name(test_dict[test_list[i-1]]))
-            build_legend(canv)
-            build_title(canv, test_dict[test_list[0]])
-            fname = file_name(test_dict[test_list[0]])
+            legend = build_legend(canv)
+            title = build_title(canv, test_dict[test_list[0]])
+            fname = file_name(test_dict[test_list[0]], test_list[0])
             for form in PLOT_FORMATS:
                 plot_path = os.path.join(PLOT_DIR, fname+'.'+form)
                 canv.Print(plot_path)
