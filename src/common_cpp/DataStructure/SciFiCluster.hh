@@ -90,7 +90,7 @@ class SciFiCluster {
 
   double get_channel()  const { return _channel_w; }
 
-  void set_used() { _used = true; }
+  void set_used(bool used) { _used = used; }
 
   bool is_used() const { return _used; }
 
