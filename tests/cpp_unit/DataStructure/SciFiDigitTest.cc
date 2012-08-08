@@ -17,7 +17,7 @@
 
 #include "gtest/gtest.h"
 
-#include "src/common_cpp/Recon/SciFi/SciFiDigit.hh"
+#include "src/common_cpp/DataStructure/SciFiDigit.hh"
 
 namespace MAUS {
 
@@ -143,7 +143,7 @@ TEST_F(SciFiDigitTestDS, test_used_flag) {
   SciFiDigit *digit = new SciFiDigit();
   EXPECT_FALSE(digit->is_used());
 
-  digit->set_used();
+  digit->set_used(true);
   EXPECT_TRUE(digit->is_used());
 }
 

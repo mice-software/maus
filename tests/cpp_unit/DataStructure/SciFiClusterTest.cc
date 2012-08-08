@@ -192,7 +192,7 @@ TEST_F(SciFiClusterTestDS, test_setters_getters) {
 TEST_F(SciFiClusterTestDS, test_used_flag) {
   SciFiCluster *cluster = new SciFiCluster();
   EXPECT_FALSE(cluster->is_used());
-  cluster->set_used();
+  cluster->set_used(true);
   EXPECT_TRUE(cluster->is_used());
 }
 

@@ -29,7 +29,7 @@
 #include "TMath.h"
 #include "TMatrixD.h"
 
-#include "src/common_cpp/Recon/SciFi/SciFiCluster.hh"
+#include "src/common_cpp/DataStructure/SciFiCluster.hh"
 
 namespace MAUS {
 

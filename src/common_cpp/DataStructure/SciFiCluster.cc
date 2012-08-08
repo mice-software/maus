@@ -71,7 +71,7 @@ SciFiCluster::SciFiCluster(SciFiDigit *_scifidigit):_used(false),
                                                     _channel_w(_scifidigit->get_channel()),
                                                     _npe(_scifidigit->get_npe()),
                                                     _time(_scifidigit->get_time()) {
-  _scifidigit->set_used();
+  _scifidigit->set_used(true);
   _pos = _scifidigit->get_true_position();
   _p   = _scifidigit->get_true_momentum();
 }
@@ -105,7 +105,7 @@ SciFiCluster& SciFiCluster::operator=(const SciFiCluster &_scificluster) {
 
 // Merge digits
 void SciFiCluster::add_digit(SciFiDigit* neigh) {
-  neigh->set_used();
+  neigh->set_used(true);
 
   _npe += neigh->get_npe();
   _channel_w /= 2.0;

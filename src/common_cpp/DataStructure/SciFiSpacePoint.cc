@@ -63,9 +63,9 @@ SciFiSpacePoint::SciFiSpacePoint(const SciFiSpacePoint &_scifispacepoint):_used(
 SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2, SciFiCluster *clust3) {
   _used = false;
   _type = "triplet";
-  clust1->set_used();
-  clust2->set_used();
-  clust3->set_used();
+  clust1->set_used(true);
+  clust2->set_used(true);
+  clust3->set_used(true);
   _channels.push_back(clust1);
   _channels.push_back(clust2);
   _channels.push_back(clust3);
@@ -87,8 +87,8 @@ SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2, Sci
 SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2) {
   _used = false;
   _type = "duplet";
-  clust1->set_used();
-  clust2->set_used();
+  clust1->set_used(true);
+  clust2->set_used(true);
   _channels.push_back(clust1);
   _channels.push_back(clust2);
 
