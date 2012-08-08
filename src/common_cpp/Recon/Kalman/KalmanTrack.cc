@@ -32,6 +32,9 @@ KalmanTrack::KalmanTrack() {
 
   _Q.ResizeTo(5, 5);
   _Q.Zero(); // mcs is off.
+
+  _x0 = 0.0;
+  _y0 = 0.0;
 }
 
 //
@@ -43,11 +46,13 @@ void KalmanTrack::calc_predicted_state(KalmanSite *old_site, KalmanSite *new_sit
   // a.Print();
 
   TMatrixD a_projected = TMatrixD(_F, TMatrixD::kMult, a);
+  // a_projected(1, 0) = a_projected(1, 0) + _x0;
+  // a_projected(2, 0) = a_projected(2, 0) + _y0;
   new_site->set_projected_a(a_projected);
   // std::cerr << "Old state filtered state: " << std::endl;
   // _F.Print();
-  // std::cerr << "New projected state: " << std::endl;
-  // a_projected.Print();
+  std::cerr << "New projected state: " << std::endl;
+  a_projected.Print();
 }
 
 //

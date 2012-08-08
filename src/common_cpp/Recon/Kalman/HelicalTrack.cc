@@ -22,6 +22,8 @@ namespace MAUS {
 
 const double HelicalTrack::_alpha = 1.0/(0.3*4.);
 
+const double HelicalTrack::Pi = 3.14159265;
+
 HelicalTrack::HelicalTrack(SciFiHelicalPRTrack const &seed) {
   // Initialise straight-track member matrices:
   _G.ResizeTo(2, 2);
@@ -70,35 +72,59 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   double old_tan_lambda = prev_site(4, 0);
   // ... and previous site phi.
   double old_phi;
-  double argument;
+  // double argument;
   // if ( old_kappa > 0 ) {
-    argument = (_y0-old_y)/(_x0-old_x);
-    old_phi = atan(argument);
+  //  argument = (old_y-_y0)/(old_x-_x0);
+  //  old_phi = atan(argument);
 
+  //if (old_kappa > 0.) old_phi = atan2((_y0-old_y),(_x0-old_x));
+
+  //if (old_kappa < 0.)
+  old_phi = atan2((old_y-_y0),(old_x-_x0));
+  while (old_phi < 0.)      old_phi += 2.0*Pi;
+  while (old_phi > 2.0*Pi)  old_phi -= 2.0*Pi;
+  std::cerr << "FIRST PASS, PHI0 IS :" << old_phi << std::endl;
   //} else {
   //  old_phi = atan((old_y-_y0)/(old_x-_x0));
   //  argument = (old_y-_y0)/(old_x-_x0);
   // }
+  // phi derivatives
+  double argument =(old_y-_y0)/(old_x-_x0);
+  std::cerr << "ARGUMENT IS " << argument << std::endl;
+
+  double a_factor = 1./(1.+argument*argument);
+  double dphi_dx = - a_factor*argument*1./(old_x-_x0);
+  double dphi_dy =  a_factor/(old_x-_x0);
   // Compute d_rho.
   double circle_x = _x0+old_r*cos(old_phi);
   double circle_y = _y0+old_r*sin(old_phi);
-  double d_rho = pow(pow(old_x-circle_x, 2.) +
-                     pow(old_y-circle_y, 2.), 0.5);
-  // If pivot falls inside the circle, drho is positive; negative otherwise.
-  if ( pow(pow(old_x-_x0, 2.)+pow(old_y-_y0, 2.), 0.5) > old_r ) {
-    d_rho = -d_rho;
-  }
+
+  double drho_x   = -( old_x - (_x0 + old_r*cos(old_phi)) );
+  std::cerr << "drho_x calculation: -(" << old_x << "- (" << _x0 << "+" << old_r*cos(old_phi) << ")" << std::endl; 
+  double drho_y   = -( old_y - (_y0 + old_r*sin(old_phi)) );
+
   double delta_phi = _h*deltaZ/(old_r * old_tan_lambda);
   double new_phi   = (old_phi+delta_phi);
-  double drho_dr, drho_dx, drho_dy;
-  if ( d_rho == 0 ) {
-    drho_dx     = 0.0;
-    drho_dy     = 0.0;
-    drho_dr     = 0.0;
+  // drho partial derivatives
+  double drho_x_dx, drho_x_dy, drho_x_dR;
+  if ( drho_x == 0.0 ) {
+    drho_x_dx = 0.0;
+    drho_x_dy = 0.0;
+    drho_x_dR = 0.0;
   } else {
-    drho_dx     = ( old_x - _x0 - old_r*cos(old_phi) )/fabs(d_rho);
-    drho_dy     = ( old_y - _y0 - old_r*sin(old_phi) )/fabs(d_rho);
-    drho_dr     = -(cos(old_phi)*drho_dx + sin(old_phi)*drho_dy);
+    drho_x_dx = -1.-old_r*sin(old_phi)*dphi_dx;
+    drho_x_dy = -old_r*sin(old_phi)*dphi_dy;
+    drho_x_dR = cos(old_phi);
+  }
+  double drho_y_dx, drho_y_dy, drho_y_dR;
+  if ( drho_y == 0.0 ) {
+    drho_y_dx = 0.0;
+    drho_y_dy = 0.0;
+    drho_y_dR = 0.0;
+  } else {
+    drho_y_dx = old_r*cos(old_phi)*dphi_dx;
+    drho_y_dy = -1.+old_r*cos(old_phi)*dphi_dy;
+    drho_y_dR = sin(old_phi);
   }
   std::cerr << "Track Parameters: " << "\n"
             << "old x:     " << old_x << "\n"
@@ -108,13 +134,18 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
             << "old tan_lambda: " << old_tan_lambda << "\n"
             << "old phi:   " << old_phi << "\n"
             << "new phi:   " << new_phi << "\n"
+            << "dphi_dx:   " << dphi_dx << "\n"
+            << "dphi_dy:   " << dphi_dy << "\n"
             << "circle_x:  " << circle_x << "\n"
             << "circle_y:  " << circle_y << "\n"
-            << "drho:      " << d_rho << "\n"
-            << "drho derivatives: " << drho_dx << " " << drho_dy << " "
-                                    << drho_dr << std::endl;
-  _projected_x = old_x+d_rho*cos(old_phi)+_h*old_r*(cos(old_phi)-cos(new_phi));
-  _projected_y = old_y+d_rho*sin(old_phi)+_h*old_r*(sin(old_phi)-sin(new_phi));
+            << "drho x:      " << drho_x << "\n"
+            << "drho y:      " << drho_y << "\n"
+            << "drhox derivatives: " << drho_x_dx << " " << drho_x_dy << " "
+                                     << drho_x_dR << "\n"
+            << "drhoy derivatives: " << drho_y_dx << " " << drho_y_dy << " "
+                                     << drho_y_dR << std::endl;
+  _projected_x = old_x+drho_x+_h*old_r*(cos(old_phi)-cos(new_phi));
+  _projected_y = old_y+drho_y+_h*old_r*(sin(old_phi)-sin(new_phi));
   std::cerr << "New Parameters: " << "\n"
             << "x:     " << _projected_x << "\n"
             << "y:     " << _projected_y << "\n";
@@ -122,13 +153,13 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
 
   // assert(delta_phi < 4);
   // Build _F.
-  _F(0, 0) = 1.0 + drho_dx*cos(old_phi);
-  _F(0, 1) = drho_dy*cos(old_phi);
-  _F(0, 2) = drho_dr*cos(old_phi) + _h*(cos(old_phi) - cos(new_phi));
+  _F(0, 0) = 1.0 + drho_x_dx - _h*old_r*dphi_dx*(sin(old_phi)-sin(new_phi));
+  _F(0, 1) = drho_x_dy - _h*old_r*dphi_dy*(sin(old_phi)-sin(new_phi));
+  _F(0, 2) = drho_x_dR + _h*(cos(old_phi)-cos(new_phi));
 
-  _F(1, 0) = drho_dx*sin(old_phi);
-  _F(1, 1) = 1.0 + drho_dy*sin(old_phi);
-  _F(1, 2) = drho_dr*sin(old_phi) + _h*(sin(old_phi) - sin(new_phi));
+  _F(1, 0) = drho_y_dx + _h*old_r*dphi_dx*(cos(old_phi)-cos(new_phi));
+  _F(1, 1) = 1.0 + drho_y_dy+_h*old_r*dphi_dy*(cos(old_phi)-cos(new_phi));
+  _F(1, 2) = drho_y_dR + _h*(sin(old_phi)-sin(new_phi));
 
   _F(2, 2) = 1.0;
   _F(3, 3) = 1.0;

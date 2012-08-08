@@ -91,7 +91,7 @@ void RealDataDigitization::process(SciFiSpill &spill, Json::Value const &daq) {
       bool found = get_StatPlaneChannel(board, bank, channel_ro, tracker, station, plane, channel);
 
       // Exclude missing modules.
-      if ( pe > 1.0 && found ) {
+      if ( found ) { // pe > 1.0 &&
         SciFiDigit *digit = new SciFiDigit(spill, eventNo,
                                            tracker, station, plane, channel, pe, tdc);
         event->add_digit(digit);

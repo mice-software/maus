@@ -62,6 +62,8 @@ class HelicalTrack : public KalmanTrack {
 
   static const double _alpha;
 
+  static const double Pi;
+
   double _projected_x;
 
   double _projected_y;

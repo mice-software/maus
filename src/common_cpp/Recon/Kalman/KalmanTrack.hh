@@ -77,6 +77,7 @@ class KalmanTrack {
 
   TMatrixD _F;
 
+  double _x0, _y0;
   // static const double sigma_x = 0.64; // x measurement resolution
 
   static const double A; // = 2./(7.*0.427); // mm to channel convertion factor.
