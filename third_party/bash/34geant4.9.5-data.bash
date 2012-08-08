@@ -12,6 +12,7 @@ fi
 
 for data_source in G4ABLA.3.0 G4EMLOW.6.23 G4NDL.3.13 PhotonEvaporation.2.2 G4RadioactiveDecay.3.4
 do
+    cd ${source}
     filename=${data_source}.tar.gz
     md5sum -c ${filename}.md5
     if [ $? != 0 ]; then
