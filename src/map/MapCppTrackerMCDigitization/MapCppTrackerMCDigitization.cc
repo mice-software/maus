@@ -61,7 +61,7 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
     return writer.write(root);
   }
   // Check if the JSON document has a 'mc' branch, else return error
-  if (!root.isMember("mc")) {
+  if (!root.isMember("mc_events")) {
     Json::Value errors;
     std::stringstream ss;
     ss << _classname << " says:" << "I need an MC branch to simulate.";
@@ -71,7 +71,7 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
   }
 
   Json::Value mc;
-  mc = root.get("mc", 0);
+  mc = root.get("mc_events", 0);
   // check sanity of json input file and mc brach
   if ( !check_sanity_mc(mc) ) {
     // if bad, write error file
