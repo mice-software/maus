@@ -94,12 +94,12 @@ export G4VIS_USE_DAWNFILE=1
 export G4VIS_USE=0
 export G4OPTIMISE=2
 export OGLHOME=/usr/X11R6
-export G4DATA="${MAUS_THIRD_PARTY}/third_party/install/share/Geant4-9.5.1/data"
-export G4LEDATA="${G4DATA}/G4EMLOW6.23/"
-export G4ABLADATA="${G4DATA}/G4ABLA3.0/"
-export G4NEUTRONDATA="${G4DATA}/G4NDL3.13/"
-export G4LEVELGAMMADATA="${G4DATA}/PhotonEvaporation2.2/"
-export G4RADIOACTIVEDATA="${G4DATA}/RadioactiveDecay3.4/"
+export G4DATA="\${MAUS_THIRD_PARTY}/third_party/install/share/Geant4-9.5.1/data"
+export G4LEDATA="\${G4DATA}/G4EMLOW6.23/"
+export G4ABLADATA="\${G4DATA}/G4ABLA3.0/"
+export G4NEUTRONDATA="\${G4DATA}/G4NDL3.13/"
+export G4LEVELGAMMADATA="\${G4DATA}/PhotonEvaporation2.2/"
+export G4RADIOACTIVEDATA="\${G4DATA}/RadioactiveDecay3.4/"
 # GEANT4 installs to lib64 on 64bit systems
 export LD_LIBRARY_PATH="${MAUS_THIRD_PARTY}/third_party/install/lib64:${LD_LIBRARY_PATH}"
 EOF
