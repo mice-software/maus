@@ -19,7 +19,7 @@ Generates plots using test data in ref_data and tmp folder
 
 import glob
 
-from physics_model_test import test_plot
+from physics_model_test import plotter
 from physics_model_test import geometry
 
 def main():
@@ -29,7 +29,8 @@ def main():
     """
     reference_data = glob.glob(geometry.ref_data("*ref_data.dat"))
     test_data = glob.glob(geometry.ref_data("*test_data.dat"))
-    test_plot.plot(reference_data+test_data)
+    plotter.plot(reference_data+test_data)
 
 if __name__ == "__main__":
     main()
+    raw_input()

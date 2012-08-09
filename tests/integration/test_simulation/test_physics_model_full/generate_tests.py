@@ -18,9 +18,9 @@ Generates tests for subsequent call by test_runner
 """
 
 import sys
-from physics_model_test import tests
+from physics_model_test import all_tests
 from physics_model_test import code_setup
-from physics_model_test.test_factory import TestFactory
+from physics_model_test.factory import TestFactory
 
 TEST_CONFIGURATIONS = [ #thickness in mm, momentum in MeV/c
 {'__material__':'lH2' , '__thickness__':350.,  '__momentum__':200.,
@@ -105,12 +105,29 @@ MICE_CONFIGURATIONS = [
  '__pid__':-13, '__step__':10., '__nev__':10000, '__seed__':1},
 ]
 
+LH2_ONLY_CONFIGURATIONS = [
+{'__material__':'lH2' , '__thickness__':350.,  '__momentum__':200.,
+ '__pid__':-13, '__step__':100., '__nev__':100000, '__seed__':1}, # 100k events
+{'__material__':'lH2',  '__thickness__':350.,  '__momentum__':100., 
+ '__pid__':-13, '__step__':100., '__nev__':10000, '__seed__':1},
+{'__material__':'lH2',  '__thickness__':350.,  '__momentum__':400., 
+ '__pid__':-13, '__step__':100., '__nev__':10000, '__seed__':1},
+{'__material__':'lH2',  '__thickness__':350.,  '__momentum__':800., 
+ '__pid__':-13, '__step__':100., '__nev__':10000, '__seed__':1},
+{'__material__':'lH2' , '__thickness__':350.,  '__momentum__':200.,
+ '__pid__':-13, '__step__':10., '__nev__':10000, '__seed__':1},
+{'__material__':'lH2' , '__thickness__':350.,  '__momentum__':200.,
+ '__pid__':-13, '__step__':1., '__nev__':10000, '__seed__':1},
+]
+
+ERIT_CONFIGURATIONS = [
+]
 
 N_KS_DIVS = 500
 TESTS = [
-  tests.KSTest.new('px',     'MeV/c', [-50.+x for x in range(N_KS_DIVS+1)],
+  all_tests.KSTest.new('px', 'MeV/c', [-50.+x for x in range(N_KS_DIVS+1)],
                    [0]*N_KS_DIVS, 10000, 1.0, 10000, 0.0, 0.01, N_KS_DIVS),
-  tests.KSTest.new('energy', 'MeV',   [202.+x/4. for x in range(N_KS_DIVS+1)],
+  all_tests.KSTest.new('energy', 'MeV', [202.+x/4. for x in range(N_KS_DIVS+1)],
                    [0]*N_KS_DIVS, 10000, 1.0, 10000, 0.0, 0.01, N_KS_DIVS)
 ]
 

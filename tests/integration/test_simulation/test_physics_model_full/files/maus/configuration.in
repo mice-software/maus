@@ -25,4 +25,5 @@ beam = {
     }]
 }
 verbose_level = 1
+production_threshold = 5.0
 

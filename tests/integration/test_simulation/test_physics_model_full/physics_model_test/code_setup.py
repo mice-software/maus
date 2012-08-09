@@ -97,11 +97,15 @@ class MausSetup(CodeSetup):
     def __init__(self):
         """Initialise - does nothing"""
         CodeSetup.__init__(self)
-        maus_version = open(os.path.expandvars('$MAUS_ROOT_DIR/README'))\
+        if os.getenv('MAUS_VERSION') == None:
+            maus_version = open(os.path.expandvars('$MAUS_ROOT_DIR/README'))\
                                                                      .readline()
-        maus_version = maus_version.rstrip('\n')
-        maus_version = maus_version.split(' ')[-1]
-        self._version = maus_version
+            maus_version = maus_version.rstrip('\n')
+            maus_version = maus_version.split(' ')[-1]
+            self._version = maus_version
+        else:
+            self._version = os.getenv('MAUS_VERSION')
+            
 
     def __str__(self):
         """Return name of this code"""

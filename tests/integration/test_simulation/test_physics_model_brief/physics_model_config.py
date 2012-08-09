@@ -24,7 +24,7 @@ import os
 mrd = os.environ["MAUS_ROOT_DIR"]
 
 simulation_geometry_filename = os.path.join(
-  mrd, "tests", "integration", "test_simulation", "test_physics_model", 
+  mrd, "tests", "integration", "test_simulation", "test_physics_model_brief", 
   "PhysicsModelTest.dat"
 )
 spill_generator_number_of_spills = 2

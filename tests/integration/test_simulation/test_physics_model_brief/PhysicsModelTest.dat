@@ -20,7 +20,7 @@ Configuration Test
   {
     PropertyString Volume Cylinder
     Dimensions 100. 100. mm
-    PropertyString Material Al
+    PropertyString Material Galactic
     Position 0.0 0.0 2. m
   }
 

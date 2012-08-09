@@ -30,7 +30,7 @@ import os
 import ROOT
 
 from physics_model_test.geometry import Geometry # pylint: disable=W0611
-from physics_model_test.tests import KSTest
+from physics_model_test.all_tests import KSTest
 
 PLOT_DIR = os.path.join('$MAUS_ROOT_DIR', 'tests', 'integration',
                         'plots', 'test_physics_model_full')
@@ -121,17 +121,20 @@ def group_tests(geometry_list):
                     test_dict[test] = geo
     return (test_lists, test_dict)
 
-def build_legend(canvas):
+def build_legend(canvas, histograms, legends):
     """
     Build a legend for the canvas
     """
     canvas.cd()
-    leg = canvas.BuildLegend() #histogram legend
-    leg.SetX1(0.13)
-    leg.SetX2(0.5)
-    leg.SetY1(0.6)
+    leg_min =  0.89-0.07*len(histograms)
+    if leg_min < 0.1:
+        leg_min = 0.1
+    leg = ROOT.TLegend(0.13, leg_min, 0.5, 0.89) # pylint: disable=E1101
+    for i, hist in enumerate(histograms):
+        leg.AddEntry(hist, legends[i])
     leg.SetFillColor(10)
     leg.SetBorderSize(0)
+    leg.Draw()
     canvas.Update()
     LEGENDS.append(leg)
 
@@ -164,10 +167,8 @@ def plot(file_list):
         (test_group, test_dict) = group_tests(geo_list)
         for test_list in test_group:
             (canv, h_list) = KSTest.make_plots(test_list)
-            for i, histogram in enumerate(h_list):
-                if i > 0:
-                    histogram.SetName(code_name(test_dict[test_list[i-1]]))
-            build_legend(canv)
+            legends = [code_name(test_dict[test]) for test in test_list]
+            build_legend(canv, h_list[1:], legends)
             build_title(canv, test_dict[test_list[0]])
             fname = file_name(test_dict[test_list[0]], test_list[0])
             for form in PLOT_FORMATS:

@@ -29,7 +29,7 @@ import ROOT
 #   formula, probably some other stuff
 
 
-class Test:
+class BaseTest:
     """
     Test object is an abstract type that contains enough information to run
     a test against some bunch of particle data
@@ -92,7 +92,7 @@ class Test:
 
 ####################
 
-class KSTest(Test): #note inheritance from test pylint: disable=R0902
+class KSTest(BaseTest): #note inheritance from test pylint: disable=R0902
     """
     ks test object is a summary of information generated and used for ks test. 
     Idea is to make a summary information such that we don't need to store round 
@@ -110,7 +110,7 @@ class KSTest(Test): #note inheritance from test pylint: disable=R0902
                  the same as some reference data
     """
     def __init__(self):
-        Test.__init__(self)
+        BaseTest.__init__(self)
         self.variable  = ''
         self.units     = ''
         self.bins      = []
@@ -295,7 +295,7 @@ class KSTest(Test): #note inheritance from test pylint: disable=R0902
 
 #######################
 
-class HitEqualityTest(Test):
+class HitEqualityTest(BaseTest):
     """
     Hit equality test checks that two hits are equal within some floating point
     tolerance.
@@ -307,7 +307,7 @@ class HitEqualityTest(Test):
     """
     def __init__(self):
         """Initialise an empty equality test"""
-        Test.__init__(self)
+        BaseTest.__init__(self)
         self.bunch     = Bunch()
         self.tolerance = xboa.Common.float_tolerance    
         self.test_out  = 'fail'
