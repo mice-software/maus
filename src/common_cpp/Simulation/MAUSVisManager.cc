@@ -21,6 +21,7 @@
 #include <G4VRML2File.hh>
 #include <G4HepRepFile.hh>
 #include <G4DAWNFILE.hh>
+#include <G4TrajectoryDrawByParticleID.hh>
 
 #ifdef G4VIS_USE_DAWN
 #include <G4FukuiRenderer.hh>
@@ -121,6 +122,16 @@ void MAUSVisManager::RegisterGraphicsSystems() {
   PrintAvailableGraphicsSystems();
 }
 
+G4ThreeVector GetColour(std::string colour_name) {
+  Json::Value& conf = *MICERun::getInstance()->jsonConfiguration;
+  Json::Value json_rgb = JsonWrapper::GetProperty(conf, colour_name, JsonWrapper::objectValue);
+  G4ThreeVector rgb;
+  rgb[0] = JsonWrapper::GetProperty(json_rgb, "red", JsonWrapper::realValue).asDouble();
+  rgb[1] = JsonWrapper::GetProperty(json_rgb, "green", JsonWrapper::realValue).asDouble();
+  rgb[2] = JsonWrapper::GetProperty(json_rgb, "blue", JsonWrapper::realValue).asDouble();
+  return rgb;
+}
+
 // needs error handling
 void MAUSVisManager::SetupRun() {
   Json::Value& conf = *MICERun::getInstance()->jsonConfiguration;
@@ -134,6 +145,37 @@ void MAUSVisManager::SetupRun() {
            (conf, "visualisation_zoom", JsonWrapper::realValue).asDouble();
   int verbose = JsonWrapper::GetProperty
            (conf, "verbose_level", JsonWrapper::intValue).asInt();
+  int accumulate_tracks = JsonWrapper::GetProperty
+           (conf, "accumulate_tracks", JsonWrapper::intValue).asInt();
+  G4ThreeVector default_rgb = GetColour("default_vis_colour");
+  G4ThreeVector pi_plus_rgb = GetColour("pi_plus_vis_colour");
+  G4ThreeVector pi_minus_rgb = GetColour("pi_minus_vis_colour");
+  G4ThreeVector mu_plus_rgb = GetColour("mu_plus_vis_colour");
+  G4ThreeVector mu_minus_rgb = GetColour("mu_minus_vis_colour");
+  G4ThreeVector e_plus_rgb = GetColour("e_plus_vis_colour");
+  G4ThreeVector e_minus_rgb = GetColour("e_minus_vis_colour");
+  G4ThreeVector gamma_rgb = GetColour("gamma_vis_colour");
+  G4ThreeVector neutron_rgb = GetColour("neutron_vis_colour");
+  G4ThreeVector photon_rgb = GetColour("photon_vis_colour");
+
+  // This sets up a geant4 model which changes the colours of the particles
+  const std::string model_name = "Particle Colour Model";
+  const G4VTrajectoryModel * current_model = CurrentTrajDrawModel();
+  if (model_name != current_model->Name()) {
+    G4TrajectoryDrawByParticleID* model
+      = new G4TrajectoryDrawByParticleID(model_name);
+    model->SetDefault(default_rgb);
+    model->Set("pi+", pi_plus_rgb);
+    model->Set("pi-", pi_minus_rgb);
+    model->Set("mu+", mu_plus_rgb);
+    model->Set("mu-", mu_minus_rgb);
+    model->Set("e+", e_plus_rgb);
+    model->Set("e-", e_minus_rgb);
+    model->Set("gamma", gamma_rgb);
+    model->Set("neutron", neutron_rgb);
+    model->Set("photon", photon_rgb);
+    RegisterModel(model);
+  }
 
   if (verbose > 0) {
       // doesnt seem to work - writes to std::cerr regardless... set
@@ -148,6 +190,11 @@ void MAUSVisManager::SetupRun() {
   ApplyCommand("/vis/drawVolume");
   ApplyCommand("/tracking/storeTrajectory 1");
   ApplyCommand("/vis/scene/add/trajectories");
+  if (accumulate_tracks == 1) {
+      ApplyCommand("/vis/scene/endOfEventAction accumulate");
+      ApplyCommand("/vis/scene/endOfRunAction accumulate");
+  }
+  ApplyCommand("/vis/modeling/trajectories/list");
 }
 
 void MAUSVisManager::TearDownRun() {

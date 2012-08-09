@@ -1,0 +1,7 @@
+NOTE
+
+Everything in this directory prefixed by Py will be built into a shared object.
+So PyMyCode.hh and PyMyCode.cc will be built into a shared object like
+mycode.so, and it is assumed that these codes will have a python import function
+somewhere inside, like initmycode(). See the existing examples.
+

@@ -37,7 +37,7 @@ const TransferMap * LinearApproximationOpticsModel::CalculateTransferMap(
     const std::vector<reconstruction::global::TrackPoint> & station_hits)
     const {
   const int particle_id = start_plane_hits[0].particle_id();
-  
+
   double start_plane = start_plane_hits[0].z();
 
   double hit_total = 0.0;
@@ -46,12 +46,11 @@ const TransferMap * LinearApproximationOpticsModel::CalculateTransferMap(
     hit_total += hit->z();
   }
   double end_plane = hit_total / station_hits.size();
-  
+
   const double mass
     = reconstruction::global::Particle::GetInstance()->GetMass(particle_id);
-  
+
   return new LinearApproximationTransferMap(start_plane, end_plane, mass);
-    
 }
 
 TransferMap * LinearApproximationTransferMap::Inverse() const {
@@ -67,7 +66,8 @@ CovarianceMatrix LinearApproximationTransferMap::Transport(
 
 PhaseSpaceVector LinearApproximationTransferMap::Transport(
     const PhaseSpaceVector & vector) const {
-fprintf(stdout, "CHECKPOINT Transport() 0\n"); fflush(stdout);
+fprintf(stdout, "CHECKPOINT Transport() 0\n");
+fflush(stdout);
   // Use the energy and momentum to determine when and where the particle would
   // be if it were traveling in free space from start_plane_ to end_plane_.
   PhaseSpaceVector transported_vector(vector);
@@ -107,7 +107,8 @@ std::cout << "Delta Y: " << delta_y << " mm" << std::endl;
   transported_vector[2] += delta_x;
   transported_vector[4] += delta_y;
 
-fprintf(stdout, "CHECKPOINT Transport() 999\n"); fflush(stdout);
+fprintf(stdout, "CHECKPOINT Transport() 999\n");
+fflush(stdout);
   return transported_vector;
 }
 

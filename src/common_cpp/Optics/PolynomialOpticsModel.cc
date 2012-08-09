@@ -168,7 +168,7 @@ std::cout.flush();
   TransferMap * transfer_map = new PolynomialTransferMap(
     *polynomial_map, reference_particle_);
   delete polynomial_map;
-  
+
   return transfer_map;
 }
 
@@ -239,5 +239,4 @@ std::cout.flush();
     }
   }
 */
- 
 }  // namespace MAUS

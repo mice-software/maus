@@ -145,7 +145,8 @@ TransferMapOpticsModel::~TransferMapOpticsModel() {
 }
 
 void TransferMapOpticsModel::Build() {
-std::cout << "CHECKPOINT Build(): BEGIN" << std::endl; std::cout.flush();
+std::cout << "CHECKPOINT Build(): BEGIN" << std::endl;
+std::cout.flush();
   // Create some test hits at the desired First plane
   const std::vector<TrackPoint> first_plane_hits = BuildFirstPlaneHits();
 
@@ -169,7 +170,7 @@ std::cout << "CHECKPOINT Build(): BEGIN" << std::endl; std::cout.flush();
   std::map<int, std::vector<TrackPoint> >::iterator station_hits;
   for (station_hits = station_hits_map.begin();
        station_hits != station_hits_map.end();
-       ++ station_hits) {
+       ++station_hits) {
     // find the average z coordinate for the station
     std::vector<TrackPoint>::iterator station_hit;
 
@@ -181,7 +182,8 @@ std::cout << "DEBUG Build(): station plane = " << station_plane << std::endl;
     transfer_maps_[station_plane]
       = CalculateTransferMap(first_plane_hits, station_hits->second);
   }
-std::cout << "CHECKPOINT Build(): 187" << std::endl; std::cout.flush();
+std::cout << "CHECKPOINT Build(): 187" << std::endl;
+std::cout.flush();
 
   // make sure we don't override mc_events
   Json::Value * configuration = MICERun::getInstance()->jsonConfiguration;
@@ -199,7 +201,8 @@ std::cout << "CHECKPOINT Build(): 187" << std::endl; std::cout.flush();
   fillMaterials(simulation);
   MAUSGeant4Manager::GetInstance()->SetPhases();
   */
-std::cout << "CHECKPOINT Build(): END" << std::endl; std::cout.flush();
+std::cout << "CHECKPOINT Build(): END" << std::endl;
+std::cout.flush();
 }
 
 const TransferMap * TransferMapOpticsModel::FindTransferMap(
@@ -261,7 +264,7 @@ const std::vector<TrackPoint> TransferMapOpticsModel::BuildFirstPlaneHits() {
   std::vector<TrackPoint> first_plane_hits;
   first_plane_hits.push_back(reference_particle_);
 
-  for(int coordinate_index = 0; coordinate_index < 6; ++coordinate_index) {
+  for (int coordinate_index = 0; coordinate_index < 6; ++coordinate_index) {
     // Make a copy of the reference trajectory vector
     TrackPoint first_plane_hit = reference_particle_;
 
@@ -333,7 +336,7 @@ CovarianceMatrix TransferMapOpticsModel::Transport(
     = inverted_start_plane_map->Transport(
       end_plane_map->Transport(covariances));
   delete inverted_start_plane_map;
-  
+
   return transported_covariances;
 }
 
@@ -347,7 +350,7 @@ PhaseSpaceVector TransferMapOpticsModel::Transport(
   PhaseSpaceVector transported_vector = inverted_start_plane_map->Transport(
     end_plane_map->Transport(vector));
   delete inverted_start_plane_map;
-  
+
   return transported_vector;
 }
 }  // namespace MAUS

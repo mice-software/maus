@@ -21,6 +21,7 @@
 // C++ headers
 #include <string>
 #include <vector>
+#include <map>
 
 // external libraries
 #include "TMinuit.h"

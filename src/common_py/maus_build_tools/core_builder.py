@@ -20,6 +20,8 @@ Tools to build core library (libMausCpp) and core library unit tests
 import os
 import glob
 import subprocess
+import json
+import string # pylint: disable=W0402
 
 MAUS_ROOT_DIR = os.environ['MAUS_ROOT_DIR']
 
@@ -60,7 +62,7 @@ def build_lib_maus_cpp(env):
     targetpath = 'src/common_cpp/libMausCpp'
     maus_cpp = env.SharedLibrary(target = targetpath,
                                  source = common_cpp_files,
-                                 LIBS=env['LIBS'] + ['recpack'])
+                                 LIBS=env['LIBS'])
     env.Install("build", maus_cpp)
     #Build an extra copy with the .dylib extension for linking on OS X
     if (os.uname()[0] == 'Darwin'):
@@ -69,8 +71,53 @@ def build_lib_maus_cpp(env):
         Depends(maus_cpp_so, maus_cpp) #pylint: disable = E0602
         env.Install("build", maus_cpp_so)
 
+def camelback_to_underscores(string_camelback):
+    """
+    Convert from ANameLikeThis to a_name_like_this (python module naming
+    convention)
+    """
+    string_underscores = string_camelback[0].lower()
+    for char in string_camelback[1:]:
+        if char in string.ascii_uppercase:
+            string_underscores += '_'+char.lower()
+        else:
+            string_underscores += char
+    return string_underscores
 
-def build_cpp_tests(env):
+def build_python_modules(env):
+    """
+    Build python modules
+
+    For each *.cc file in src/common_cpp/Python build a corresponding *.so file.
+    These should be python modules. Depends on libMausCpp.so so that needs to be
+    built first.
+    """
+    target_files = glob.glob("src/py_cpp/*cc")
+    init_all = []
+
+    for ccpath in target_files:
+        path, libname = os.path.split(ccpath)
+        # strip 'Py', '.cc', make lowercase, add underscores
+        libname = camelback_to_underscores(libname[2:-3])
+        targetpath = os.path.join(path, libname)
+        maus_cpp = env.SharedLibrary(target = targetpath,
+                               source = ccpath,
+                               LIBS=env['LIBS'] + ['libMausCpp'])
+        init_all.append(libname)
+        if not os.path.exists("build/maus_cpp"):
+            os.mkdir("build/maus_cpp")
+        env.Install("build/maus_cpp", maus_cpp)
+        #Build an extra copy with the .dylib extension for linking on OS X
+        if (os.uname()[0] == 'Darwin'):
+            maus_cpp_so = env.Dylib2SO(targetpath)
+            # Depends == SCons global variable??
+            Depends(maus_cpp_so, maus_cpp) #pylint: disable = E0602
+            env.Install("build", maus_cpp_so)
+    init = open("build/maus_cpp/__init__.py", 'w')
+    print >> init, '__all__ =', json.dumps(init_all)
+    init.close()
+
+def build_cpp_tests(env, module_list):
     """
     Build cpp unit tests
 
@@ -89,13 +136,13 @@ def build_cpp_tests(env):
 
     env.Program(target = 'tests/cpp_unit/test_cpp_unit', \
                 source = test_cpp_files, \
-                LIBS= env['LIBS'] + ['recpack'] + ['MausCpp'])
+                LIBS= env['LIBS'] + ['MausCpp'])
     env.Install('build', ['tests/cpp_unit/test_cpp_unit'])
 
     test_optics_files = glob.glob("tests/integration/test_optics/src/*cc")
     test_optics = env.Program(target = 'tests/integration/test_optics/optics', \
                                source = test_optics_files, \
-                               LIBS= env['LIBS'] + ['MausCpp'])
+                               LIBS= env['LIBS'] + ['MausCpp'] + module_list)
     env.Install('build', test_optics)
 
 def build_data_structure(env):

@@ -38,7 +38,7 @@ class PhaseSpaceVector : public Vector<double> {
   /* @brief  Base class copy constructor. This only copies the first 6 elements
    *         of the Vector<double> object.
    */
-  PhaseSpaceVector(const Vector<double>& original_instance);
+  explicit PhaseSpaceVector(const Vector<double>& original_instance);
 
   /* @brief  Copy constructor.
    */
@@ -48,7 +48,7 @@ class PhaseSpaceVector : public Vector<double> {
    * if type = aseSpaceVector::kTemporalPhaseSpace or x, Px, y, Py, z, Pz if
    * type = haseSpaceVector::kPositionalPhaseSpace.
    */
-  PhaseSpaceVector(double const * const array);
+  explicit PhaseSpaceVector(double const * const array);
 
   /* @brief	Create with the given initial coordinates.
    */
@@ -61,15 +61,15 @@ class PhaseSpaceVector : public Vector<double> {
   PhaseSpaceVector & operator=(const PhaseSpaceVector & rhs);
 
   // accessors
-  double time()       const {return (*this)[0];};
+  double time()       const {return (*this)[0];}
   double t()          const {return time();}
-  double energy()     const {return (*this)[1];};
+  double energy()     const {return (*this)[1];}
   double E()          const {return energy();}
-  double x()          const {return (*this)[2];};
-  double x_momentum() const {return (*this)[3];};
+  double x()          const {return (*this)[2];}
+  double x_momentum() const {return (*this)[3];}
   double Px()         const {return x_momentum();}
-  double y()          const {return (*this)[4];};
-  double y_momentum() const {return (*this)[5];};
+  double y()          const {return (*this)[4];}
+  double y_momentum() const {return (*this)[5];}
   double Py()         const {return y_momentum();}
 
   // mutators

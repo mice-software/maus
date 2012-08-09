@@ -80,7 +80,7 @@ void __TestStdOutputs(int i) {
       EXPECT_EQ(std::clog.rdbuf(), Squeak::clogOut().rdbuf()) << i << " "
                                               << static_cast<int>(Squeak::info);
     }
-    if (i > static_cast<int>(Squeak::warning)) {
+    if (i > static_cast<int>(Squeak::error)) {
       EXPECT_EQ(std::cerr.rdbuf(), Squeak::nullOut().rdbuf()) << i << " "
                                            << static_cast<int>(Squeak::warning);
     } else {

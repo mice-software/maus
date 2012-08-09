@@ -125,7 +125,7 @@ class TrackPoint : public MAUS::PhaseSpaceVector {
   void set_uncertainties(const CovarianceMatrix & uncertainties);
   const CovarianceMatrix & uncertainties() const;
 
-  double z()          const {return z_;};
+  double z()          const {return z_;}
   double z_momentum() const;
   double Pz()         const {return z_momentum();}
   void set_z(double z)            {z_ = z;}

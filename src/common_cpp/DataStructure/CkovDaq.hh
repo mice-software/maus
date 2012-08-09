@@ -44,7 +44,7 @@ class CkovDaq {
     CkovDaq& operator=(const CkovDaq& _ckovdaq);
 
     /** Destructor - any member pointers are deleted */
-    ~CkovDaq();
+    virtual ~CkovDaq();
 
 
     /** Returns V1731Array */

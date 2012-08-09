@@ -496,7 +496,7 @@ void                       TriangularMesh::Simplex::SwapEdge           (Point& n
 	Simplex2.f_children.push_back(tri1);
 	Simplex2.f_children.push_back(tri2);
 
-	Point* oldOpp;
+	Point* oldOpp = NULL;
 	if(opp[0] == &newPoint) oldOpp = opp[1];
 	else                    oldOpp = opp[0];
 	tri1->CheckEdge(newPoint);

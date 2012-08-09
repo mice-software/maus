@@ -53,7 +53,7 @@ class V1724 {
     V1724& operator=(const V1724& _v1724);
 
     /** Destructor - any member pointers are deleted */
-    ~V1724();
+    virtual ~V1724();
 
 
     /** Returns LdcId */
@@ -99,10 +99,10 @@ class V1724 {
     void SetChannelKey(std::string channel_key);
 
     /** Returns TriggerTimeTag */
-    int GetTriggerTimeTag() const;
+    double GetTriggerTimeTag() const;
 
     /** Sets TriggerTimeTag */
-    void SetTriggerTimeTag(int trigger_time_tag);
+    void SetTriggerTimeTag(double trigger_time_tag);
 
     /** Returns TimeStamp */
     int GetTimeStamp() const;
@@ -148,7 +148,7 @@ class V1724 {
     int _phys_event_number;
     int _charge_pm;
     std::string _channel_key;
-    int _trigger_time_tag;
+    double _trigger_time_tag;
     int _time_stamp;
     int _pedestal;
     int _part_event_number;

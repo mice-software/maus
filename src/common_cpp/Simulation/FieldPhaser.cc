@@ -17,12 +17,14 @@
 
 #include <vector>
 #include <set>
+#include <limits>
+#include <utility>
 
 #include "src/common_cpp/Simulation/FieldPhaser.hh"
 
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 #include "src/common_cpp/Simulation/MAUSPhysicsList.hh"
-#include "src/legacy/Interface/VirtualHit.hh"
+#include "src/legacy/Interface/VirtualHit.hh"  // ACK! conflict in DataStructure
 
 namespace MAUS {
 
@@ -59,9 +61,11 @@ void FieldPhaser::MakeVirtualPlanes(BTPhaser::FieldForPhasing* cavity) {
     _phaserVirtualPlanes.AddPlane(plane_ptr, NULL);
 }
 
+
 void FieldPhaser::SetPhases() {
     MAUSGeant4Manager* mgm = MAUSGeant4Manager::GetInstance();
     MAUSPrimaryGeneratorAction::PGParticle ref = mgm->GetReferenceParticle();
+
     SetUp();
     int n_attempts = 0;
     try {
@@ -73,18 +77,11 @@ void FieldPhaser::SetPhases() {
             Json::Value tracks = mgm->RunParticle(ref);
             Json::Value v_hits = JsonWrapper::GetProperty
                               (tracks, "virtual_hits", JsonWrapper::arrayValue);
-            if (v_hits.size() == 0) break;
-            std::set<int> phased_stations;
-            for (unsigned int j = 0; j < v_hits.size(); ++j) {
-                VirtualHit hit = _phaserVirtualPlanes.ReadHit(v_hits[j]);
-                if (BTPhaser::GetInstance()->
-                                     SetThePhase(hit.GetPos(), hit.GetTime())) {
-                    ref = MAUSPrimaryGeneratorAction::PGParticle(hit);
-                    phased_stations.insert(hit.GetStationNumber());
-                }
-            }
-            _phaserVirtualPlanes.RemovePlanes(phased_stations);
-        }
+            if (v_hits.size() == 0)
+                break;
+            else
+                ref = TryToPhase(v_hits);
+       }
     }
     catch(...) {}
     Squeak::mout(Squeak::info) << "\nMade " << n_attempts
@@ -92,12 +89,54 @@ void FieldPhaser::SetPhases() {
           << BTPhaser::GetInstance()->NumberOfCavities() << " cavities with "
           << _phaserVirtualPlanes.GetPlanes().size() << " remaining"
           << std::endl;
+    for (size_t i = 0; i < _phaserVirtualPlanes.GetPlanes().size(); ++i) {
+        Squeak::mout(Squeak::debug) << "Failed to phase cavity at position " <<
+                _phaserVirtualPlanes.GetPlanes()[i]->GetPosition() << std::endl;
+    }
     if (_phaserVirtualPlanes.GetPlanes().size() > 0) {
         TearDown();
         throw(Squeal(Squeal::recoverable, "Failed to phase cavities",
               "FieldPhaser::PhaseCavities"));
     }
     TearDown();
+}
+
+MAUSPrimaryGeneratorAction::PGParticle FieldPhaser::TryToPhase
+                                                          (Json::Value v_hits) {
+    MAUSGeant4Manager* mgm = MAUSGeant4Manager::GetInstance();
+    std::set<int> phased_stations;
+    std::vector<std::pair<VirtualHit, bool> > phased_hits;
+
+    MAUSPrimaryGeneratorAction::PGParticle ref = mgm->GetReferenceParticle();
+    for (unsigned int j = 0; j < v_hits.size(); ++j) {
+        VirtualHit hit = _phaserVirtualPlanes.ReadHit(v_hits[j]);
+        bool is_phased = BTPhaser::GetInstance()->
+                                       SetThePhase(hit.GetPos(), hit.GetTime());
+        std::pair<VirtualHit, bool> phase_pair(hit, is_phased);
+        phased_hits.push_back(phase_pair);
+        if (is_phased)
+            phased_stations.insert(hit.GetStationNumber());
+    }
+    _phaserVirtualPlanes.RemovePlanes(phased_stations);
+
+    // reference particle can skip cavities so we have to look for the first
+    // unphased cavity and start the particle from the previous hit
+
+    // no cavities phased
+    if (!phased_hits[0].second) {
+        return ref;
+    }
+
+    // some cavities phased
+    for (unsigned int j = 1; j < phased_hits.size(); ++j) {
+        if (!phased_hits[j].second) {
+            return MAUSPrimaryGeneratorAction::PGParticle
+                                                       (phased_hits[j-1].first);
+        }
+    }
+
+    // all cavities phased
+    return ref;
 }
 
 void FieldPhaser::TearDown() {

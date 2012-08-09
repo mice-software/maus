@@ -94,7 +94,8 @@ bool MapCppGlobalTrackReconstructor::birth(std::string configuration) {
 }
 
 void MapCppGlobalTrackReconstructor::SetupOpticsModel() {
-fprintf(stdout, "CHECKPOINT: SetupOpticsModel() 0\n"); fflush(stdout);
+fprintf(stdout, "CHECKPOINT: SetupOpticsModel() 0\n");
+fflush(stdout);
   Json::Value optics_model_names = JsonWrapper::GetProperty(
       configuration_,
       "reconstruction_optics_models",
@@ -110,7 +111,8 @@ fprintf(stdout, "CHECKPOINT: SetupOpticsModel() 0\n"); fflush(stdout);
     }
   }
 
-fprintf(stdout, "CHECKPOINT: SetupOpticsModel() 1\n"); fflush(stdout);
+fprintf(stdout, "CHECKPOINT: SetupOpticsModel() 1\n");
+fflush(stdout);
   switch (model) {
     case 0: {
       // "Differentiating"
@@ -133,7 +135,8 @@ fprintf(stdout, "CHECKPOINT: SetupOpticsModel() 1\n"); fflush(stdout);
       break;
     }
     case 2: {
-fprintf(stdout, "CHECKPOINT SetupOpticsModel() 1.1c\n"); fflush(stdout);
+fprintf(stdout, "CHECKPOINT SetupOpticsModel() 1.1c\n");
+fflush(stdout);
      optics_model_ = new PolynomialOpticsModel(configuration_);
       break;
     }
@@ -149,7 +152,8 @@ fprintf(stdout, "CHECKPOINT SetupOpticsModel() 1.1c\n"); fflush(stdout);
     }
     case 4: {
       // "Linear Approximation"
-fprintf(stdout, "CHECKPOINT SetupOpticsModel() 1.1e\n"); fflush(stdout);
+fprintf(stdout, "CHECKPOINT SetupOpticsModel() 1.1e\n");
+fflush(stdout);
      optics_model_ = new LinearApproximationOpticsModel(configuration_);
       break;
     }
@@ -162,9 +166,11 @@ fprintf(stdout, "CHECKPOINT SetupOpticsModel() 1.1e\n"); fflush(stdout);
                    "MapCppGlobalTrackReconstructor::SetupOpticsModel()()"));
     }
   }
-fprintf(stdout, "CHECKPOINT: SetupOpticsModel() 2\n"); fflush(stdout);
+fprintf(stdout, "CHECKPOINT: SetupOpticsModel() 2\n");
+fflush(stdout);
   optics_model_->Build();
-fprintf(stdout, "CHECKPOINT: SetupOpticsModel() 3\n"); fflush(stdout);
+fprintf(stdout, "CHECKPOINT: SetupOpticsModel() 3\n");
+fflush(stdout);
 }
 
 void MapCppGlobalTrackReconstructor::SetupTrackFitter() {
@@ -277,7 +283,8 @@ std::cout << "DEBUG process(): Run Data = " << std::endl << run_data_ << std::en
   std::vector<MAUS::reconstruction::global::Track> tracks;
   CorrelateTrackPoints(tracks);
 
-std::cout << "CHECKPOINT process(): 279" << std::endl; std::cout.flush();
+std::cout << "CHECKPOINT process(): 279" << std::endl;
+std::cout.flush();
   int particle_id;
   if (reconstruction_input_->beam_polarity_negative()) {
     particle_id = Particle::kMuMinus;
@@ -288,7 +295,8 @@ std::cout << "CHECKPOINT process(): 279" << std::endl; std::cout.flush();
   Json::Value global_tracks;
 
   // Find the best fit track for each particle traversing the lattice
-std::cout << "CHECKPOINT process(): 290" << std::endl; std::cout.flush();
+std::cout << "CHECKPOINT process(): 290" << std::endl;
+std::cout.flush();
   size_t track_count = 0;
   for (std::vector<MAUS::reconstruction::global::Track>::const_iterator
           measured_track = tracks.begin();
@@ -306,7 +314,8 @@ std::cout << "Best Fit Track: " << best_fit_track << std::endl;
   }
 
 std::cout << "DEBUG process(): # particles = " << global_tracks.size()
-          << "\t# track points = " << track_count << std::endl; std::cout.flush();
+          << "\t# track points = " << track_count << std::endl;
+std::cout.flush();
 
   // TODO(plane1@hawk.iit.edu) Update the run data with reconstruction results.
   run_data_["global_tracks"] = global_tracks;
@@ -314,7 +323,8 @@ std::cout << "DEBUG process(): # particles = " << global_tracks.size()
   // pass on the updated run data to the next map in the workflow
   Json::FastWriter writer;
   std::string output = writer.write(run_data_);
-std::cout << "CHECKPOINT process(): 315" << std::endl; std::cout.flush();
+std::cout << "CHECKPOINT process(): 315" << std::endl;
+std::cout.flush();
 
   return output;
 }
@@ -390,7 +400,7 @@ void MapCppGlobalTrackReconstructor::LoadTestingData() {
 
   try {
     Json::Value testing_data = JsonWrapper::GetProperty(
-        configuration_,"testing_data", JsonWrapper::objectValue);
+        configuration_, "testing_data", JsonWrapper::objectValue);
 
     const Json::Value beam_polarity_negative_json = JsonWrapper::GetProperty(
         testing_data, "beam_polarity_negative", JsonWrapper::booleanValue);
@@ -425,7 +435,7 @@ void MapCppGlobalTrackReconstructor::LoadTestingData() {
 
     const Json::Value sci_fi_hits = JsonWrapper::GetProperty(
         mc_event, "sci_fi_hits", JsonWrapper::arrayValue);
-    const size_t sci_fi_hit_count = sci_fi_hits.size(); 
+    const size_t sci_fi_hit_count = sci_fi_hits.size();
     for (size_t index = 0; index < sci_fi_hit_count; ++index) {
       const Json::Value sci_fi_hit = sci_fi_hits[index];
 
@@ -483,7 +493,7 @@ void MapCppGlobalTrackReconstructor::LoadTestingData() {
 
     const Json::Value tof_hits = JsonWrapper::GetProperty(
         mc_event, "tof_hits", JsonWrapper::arrayValue);
-    const size_t tof_hit_count = tof_hits.size(); 
+    const size_t tof_hit_count = tof_hits.size();
     for (size_t index = 0; index < tof_hit_count; ++index) {
       const Json::Value tof_hit = tof_hits[index];
 
@@ -530,7 +540,7 @@ void MapCppGlobalTrackReconstructor::LoadTestingData() {
        case 1: detector_id = Detector::kTOF1_1 + plane; break;
        case 2: detector_id = Detector::kTOF2_1 + plane; break;
       }
- 
+
       track_point.set_detector_id(detector_id);
       std::map<int, Detector>::const_iterator detector
         = detectors.find(detector_id);
@@ -640,7 +650,7 @@ void MapCppGlobalTrackReconstructor::LoadMonteCarloData(
         configuration_, "testing_data", JsonWrapper::objectValue);
     const Json::Value mc_events = JsonWrapper::GetProperty(
         testing_data, branch_name, JsonWrapper::arrayValue);
-        //run_data_, branch_name, JsonWrapper::arrayValue);
+        // run_data_, branch_name, JsonWrapper::arrayValue);
 std::cout << "DEBUG LoadMonteCarloData(): # particles = " << mc_events.size()
           << std::endl;
     for (Json::Value::UInt particle_index = Json::Value::UInt(0);
@@ -655,7 +665,7 @@ std::cout << "DEBUG LoadMonteCarloData(): # particles = " << mc_events.size()
 std::cout << "DEBUG LoadMonteCarloData(): Hit Group Name = " << *hit_group_name
           << std::endl;
         const Json::Value hit_group = mc_event[*hit_group_name];
-        //if (!hit_group.isArray()) {
+        // if (!hit_group.isArray()) {
         if (*hit_group_name != "tof_hits") {
 std::cout << "DEBUG LoadMonteCarloData(): Is Array = " << hit_group.isArray()
           << std::endl;
@@ -853,7 +863,7 @@ std::cout << "Final Z: " << track_point.z() << std::endl;
   momentum["y"] = track_point.Py();
   momentum["z"] = track_point.Pz();
   track_point_node["momentum"] = momentum;
-  
+
   track_point_node["time"] = track_point.t();
   track_point_node["energy"] = track_point.E();
 

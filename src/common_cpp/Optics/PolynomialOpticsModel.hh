@@ -51,7 +51,7 @@ class PolynomialOpticsModel : public TransferMapOpticsModel {
   //  Constructors
   // *************************
 
-  PolynomialOpticsModel(const Json::Value & configuration);
+  explicit PolynomialOpticsModel(const Json::Value & configuration);
 
   /** @brief no memory allocated so doesn't do anything.
    */
@@ -83,7 +83,7 @@ class PolynomialOpticsModel : public TransferMapOpticsModel {
     static const Algorithm kSweepingChiSquaredWithVariableWalls;
    private:
     Algorithm() : id_(0) {}
-    Algorithm(size_t id) : id_(id) {}
+    explicit Algorithm(size_t id) : id_(id) {}
     size_t id_;
   };
 

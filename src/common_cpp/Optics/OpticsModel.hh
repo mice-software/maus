@@ -68,7 +68,7 @@ class OpticsModel {
       const = 0;
 
   const double first_plane() const {return first_plane_;}
-  void set_first_plane(const double first_plane) {first_plane_ = first_plane;}  
+  void set_first_plane(const double first_plane) {first_plane_ = first_plane;}
  protected:
   double first_plane_;
 };

@@ -90,8 +90,9 @@ MinuitTrackFitter::MinuitTrackFitter(
   minimiser->FixParameter(4);
 */
   minimiser->FixParameter(1);
-//Int_t DefineParameter( Int_t parNo, const char *name, Double_t initVal, Double_t initErr, Double_t lowerLimit, Double_t upperLimit )
-
+// Int_t DefineParameter(Int_t parNo, const char *name, Double_t initVal,
+//                       Double_t initErr, Double_t lowerLimit,
+//                       Double_t upperLimit )
 }
 
 MinuitTrackFitter::~MinuitTrackFitter() {
@@ -99,7 +100,8 @@ MinuitTrackFitter::~MinuitTrackFitter() {
 }
 
 void MinuitTrackFitter::Fit(const Track & detector_events, Track & track) {
-std::cout << "CHECKPOINT Fit(): BEGIN" << std::endl; std::cout.flush();
+std::cout << "CHECKPOINT Fit(): BEGIN" << std::endl;
+std::cout.flush();
   detector_events_ = &detector_events;
   track_ = &track;
 
@@ -122,12 +124,14 @@ std::cout << "CHECKPOINT Fit(): BEGIN" << std::endl; std::cout.flush();
   minimiser->Migrad();
 
   // TODO(plane1@hawk.iit.edu) Handle status from minimiser
-std::cout << "CHECKPOINT Fit(): END" << std::endl; std::cout.flush();
+std::cout << "CHECKPOINT Fit(): END" << std::endl;
+std::cout.flush();
 }
 
 Double_t MinuitTrackFitter::ScoreTrack(
     Double_t const * const start_plane_track_coordinates) {
-std::cout << "CHECKPOINT ScoreTrack(): 0" << std::endl; std::cout.flush();
+std::cout << "CHECKPOINT ScoreTrack(): 0" << std::endl;
+std::cout.flush();
   // clear the last saved track
   track_->clear();
 
@@ -195,7 +199,7 @@ std::cout << "DEBUG ScoreTrack(): Chi Squared: " << chi_squared << std::endl;
 
 bool MinuitTrackFitter::ValidGuess(const TrackPoint & guess) const {
   bool valid = true;
-  
+
   if (guess != guess) {
     // No NaN guesses
     valid = false;

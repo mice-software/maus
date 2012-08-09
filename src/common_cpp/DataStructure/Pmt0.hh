@@ -45,7 +45,7 @@ class Pmt0 {
     Pmt0& operator=(const Pmt0& _pmt0);
 
     /** Destructor - any member pointers are deleted */
-    ~Pmt0();
+    virtual ~Pmt0();
 
 
     /** Returns RawTime */

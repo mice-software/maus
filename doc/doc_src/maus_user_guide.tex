@@ -1,8 +1,26 @@
 \documentclass[a4paper, 10pt] {report}
-
+% general packages
+\usepackage{html}
 \usepackage{tabularx}
 \usepackage{multirow}
 \usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{color}
+\usepackage{listings}
+\input{rgb}
+
+% mice module (open office conversion) packages
+\usepackage[ascii]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb,amsfonts,textcomp}
+\usepackage{color}
+\usepackage{array}
+\usepackage{supertabular}
+\usepackage{hhline}
+%\hypersetup{pdftex, colorlinks=true, linkcolor=blue, citecolor=blue, filecolor=blue, urlcolor=blue, pdftitle=, pdfauthor=, pdfsubject=, pdfkeywords=}
+
 \begin{document}
 
 \vspace*{2.0cm}
@@ -13,16 +31,23 @@
 \Large{ \bf{User Guide} }
 \end{center}
 
-%\chapter{Running for the First Time}
-%\include{first_time_running}
+\tableofcontents
 
-\chapter{Data Structure}
+\newpage
+
+\include{introduction}
 \input{data_structure}
-
-\chapter{Monte Carlo}
+\input{api}
 \input{simulation}
+\input{geometry}
 
-%\chapter{Detector Description}
+% mice modules documentation originally from open office - hence some weirdness
+% historical MiceModule.pdf document in doc/doc_src/run_control
+\input{mice_modules/mice_module_bureaucracy} % just some definitions for latex
+\input{mice_modules/mice_module_usage} % how to use mice modules
+\input{mice_modules/mice_module_geometry} % how to set up a geometry
+\input{mice_modules/mice_module_fields} % how to set up fields
+
 %\include{detectors/tof}
 %\include{detectors/tracker}
 %\include{detectors/emr}

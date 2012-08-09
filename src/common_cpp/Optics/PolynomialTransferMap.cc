@@ -73,7 +73,7 @@ TransferMap * PolynomialTransferMap::Inverse() const {
       inverse_map,
       *reference_trajectory_in_,
       *reference_trajectory_out_);
-  
+
   return transfer_map;
 }
 

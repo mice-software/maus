@@ -30,6 +30,12 @@ TEST(JsonWrapperTest, StringToJson) {
   EXPECT_THROW(JsonWrapper::StringToJson(bad_json), Squeal);
 }
 
+TEST(JsonWrapperTest, JsonToString) {
+  Json::Value json = Json::Value("bob");
+  std::string val = JsonWrapper::JsonToString(json);
+  EXPECT_EQ(val, std::string("\"bob\""));
+}
+
 TEST(JsonWrapperTest, GetItemTest) {
   std::string good_json = "[2, 3, 4]";
   Json::Value good_val = JsonWrapper::StringToJson(good_json);

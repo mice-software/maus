@@ -35,7 +35,7 @@ class SciFiChannelId {
     SciFiChannelId& operator=(const SciFiChannelId& channel);
 
     /** Destructor (does nothing)*/
-    ~SciFiChannelId();
+    virtual ~SciFiChannelId();
 
     /** Get index of the fibre that was hit */
     int GetFiberNumber() const;

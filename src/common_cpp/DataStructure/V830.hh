@@ -44,7 +44,7 @@ class V830 {
     V830& operator=(const V830& _v830);
 
     /** Destructor - any member pointers are deleted */
-    ~V830();
+    virtual ~V830();
 
 
     /** Returns LdcId */

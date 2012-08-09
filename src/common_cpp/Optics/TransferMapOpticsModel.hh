@@ -57,14 +57,14 @@ class TransferMapOpticsModel : public OpticsModel {
   /* @brief initialize the generator using the configuration.
    * @params configuration the configuration as a Json document
    */
-  TransferMapOpticsModel(const Json::Value & configuration);
+  explicit TransferMapOpticsModel(const Json::Value & configuration);
 
   ~TransferMapOpticsModel();
 
   /* @brief 
    */
   void Build();
-  
+
   const TransferMap * GenerateTransferMap(const double plane) const;
  protected:
   const dataCards * data_cards_;

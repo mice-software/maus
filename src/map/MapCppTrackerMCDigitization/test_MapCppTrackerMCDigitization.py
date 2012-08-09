@@ -65,7 +65,10 @@ class MapCppTrackerMCDigitizationTestCase(unittest.TestCase):
         # Spill 2 is sain.
         spill_2 = self._file.readline().rstrip()
         output_2 = self.mapper.process(spill_2)
-        self.assertTrue("digits" in json.loads(output_2))
+        json_2 = json.loads(output_2)
+        self.assertTrue("mc_events" in json_2)
+        self.assertTrue(len(json_2["mc_events"]) == 28)
+        self.assertTrue("digits" in json_2)
         # spill 3 is end of event
         spill_3 = self._file.readline().rstrip()
         output_3 = self.mapper.process(spill_3)

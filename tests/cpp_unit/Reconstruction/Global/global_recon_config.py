@@ -21,12 +21,18 @@ Configuration for Global Reconstruction
 import os
 
 # Non-default settings
-verbose_level=0
-particle_decay=False
+verbose_level = 0
+particle_decay = False
 
 # We need enough spills that we have a good chance of having the single-muon
 # beam make it through the entire lattice
-spill_generator_number_of_spills=50
+spill_generator_number_of_spills = 50
+
+simulation_reference_particle = { # used for setting particle phase
+    "position":{"x":0.0, "y":-0.0, "z":-5500.0},
+    "momentum":{"x":0.0, "y":0.0, "z":1.0},
+    "particle_id":-13, "energy":226.0, "time":0.0, "random_seed":10
+}
 
 beam = {
     "particle_generator":"counter",
@@ -48,11 +54,14 @@ beam = {
           "alpha_y":0.5, # beam converging (into Q7-9)
           "emittance_y":0.5, # smallish emittance
        },
-       "longitudinal":{"longitudinal_mode":"sawtooth_time", # longitudinal distribution sawtooth in time
-                   "momentum_variable":"p", # Gaussian in total momentum (options energy, pz)
-                   "sigma_p":25., # RMS total momentum
-                   "t_start":-1.e6, # start time of sawtooth
-                   "t_end":+1.e6}, # end time of sawtooth
+       "longitudinal":{
+          # longitudinal distribution sawtooth in time
+          "longitudinal_mode":"sawtooth_time",
+          # Gaussian in total momentum (options energy, pz)
+          "momentum_variable":"p",
+          "sigma_p":25., # RMS total momentum
+          "t_start":-1.e6, # start time of sawtooth
+          "t_end":+1.e6}, # end time of sawtooth
        "coupling":{"coupling_mode":"none"} # no dispersion
     }]
 }

@@ -60,7 +60,7 @@ class V1731 {
     V1731& operator=(const V1731& _v1731);
 
     /** Destructor - any member pointers are deleted */
-    ~V1731();
+    virtual ~V1731();
 
 
     /** Returns LdcId */
@@ -136,10 +136,10 @@ class V1731 {
     void SetMaxPos(int max_pos);
 
     /** Returns TriggerTimeTag */
-    int GetTriggerTimeTag() const;
+    double GetTriggerTimeTag() const;
 
     /** Sets TriggerTimeTag */
-    void SetTriggerTimeTag(int trigger_time_tag);
+    void SetTriggerTimeTag(double trigger_time_tag);
 
     /** Returns TimeStamp */
     int GetTimeStamp() const;
@@ -189,7 +189,7 @@ class V1731 {
     int _position_min;
     int _pulse_area;
     int _max_pos;
-    int _trigger_time_tag;
+    double _trigger_time_tag;
     int _time_stamp;
     std::string _detector;
     int _part_event_number;

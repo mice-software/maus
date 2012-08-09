@@ -120,9 +120,10 @@ def get_environment():
     # libraries
     env = SCons.Environment.Environment(SHLIBPREFIX="",
                  BUILDERS = {'Dylib2SO' : DYLIB2SO}) # pylint: disable-msg=E0602
-    if os.path.isfile('.use_llvm_with_maus'):
-        env['CC'] = "llvm-gcc"
-        env['CXX'] = "llvm-g++"
+    if os.getenv('CC') != None:
+        env['CC'] = os.getenv["CC"]
+    if os.getenv('CXX') != None:
+        env['CXX'] = os.getenv["CXX"]
 
     env.Tool \
           ('swig', '%s/third_party/swig-2.0.1' % os.environ['MAUS_THIRD_PARTY'])
@@ -147,7 +148,8 @@ def get_environment():
                         "%s/third_party/install/include/python2.7" % maus_third,
                         "%s/third_party/install/include/root" % maus_third,
                         "%s/src/legacy" % maus_root,
-                        "%s/src/common_cpp" % maus_root, ""])
+                        "%s/src/common_cpp" % maus_root,
+                        "%s/" % maus_root])
 
     env['USE_G4'] = False
     env['USE_ROOT'] = False
@@ -165,7 +167,7 @@ def set_lib(conf, env, lib):
     """
     if lib not in LIBS.keys():
         raise KeyError('Library '+str(lib)+' is not registered for '+\
-                       'linking. Should be one of '+LIBS.keys())
+                       'linking. Should be one of '+str(LIBS.keys()))
     set_lib_func = LIBS[lib]
     set_lib_func(conf, env)
 
@@ -224,6 +226,8 @@ def cpp_extras(env):
     # optimise by default
     optimise = not ('maus_no_optimize' in os.environ 
                   and os.environ['maus_no_optimize'] != '0')
+    assert_active = 'maus_assert_active' in os.environ \
+                    and os.environ['maus_assert_active'] != '0'
     
     if lcov:
         env.Append(LIBS=['gcov'])
@@ -239,6 +243,9 @@ def cpp_extras(env):
 
     if not (lcov or debug or gprof) and optimise:
         env.Append(CCFLAGS=["""-O3"""])        
+
+    if not assert_active: # disable debug flags
+        env.Append(CCFLAGS=["""-DNDEBUG"""])
 
 def set_python(conf, env): # pylint: disable=W0613
     """
@@ -495,14 +502,6 @@ def set_geant4(conf, env):
 
         geant4_extras(env, conf)
 
-def set_recpack(conf, env): # pylint: disable=W0613
-    """
-    Setup recpack
-    """
-    if not conf.CheckLib('recpack', language='c++') or\
-       not conf.CheckCXXHeader('recpack/RecpackManager.h'):
-        my_exit(1)
-
 def set_gtest(conf, env): # pylint: disable=W0613
     """
     Setup google tests (framework for cpp tests)
@@ -557,7 +556,6 @@ LIBS = {
     'root':set_root,
     'clhep':set_clhep,
     'geant4':set_geant4,
-    'recpack':set_recpack,
     'gtest':set_gtest,
     'unpacker':set_unpacker,
 }

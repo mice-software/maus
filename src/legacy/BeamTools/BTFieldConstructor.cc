@@ -7,10 +7,10 @@
 #include "src/legacy/Interface/STLUtils.hh"
 
 #include "src/common_cpp/FieldTools/SectorMagneticFieldMap.hh"
+#include "src/common_cpp/FieldTools/DerivativesSolenoid.hh"
 
 #include "BeamTools/BTFieldConstructor.hh"
 #include "BeamTools/BTMultipole.hh"
-#include "BeamTools/BTFastSolenoid.hh"
 #include "BeamTools/BTSolenoid.hh"
 #include "BeamTools/BTFieldGroup.hh"
 #include "BeamTools/BTPhaser.hh"
@@ -26,7 +26,7 @@ std::string       BTFieldConstructor::_defaultSolenoidMode = "";
 const int         BTFieldConstructor::_numberOfFieldTypes  = 14;
 const std::string BTFieldConstructor::_fieldTypes[15] 
            = {"Solenoid","PillBox","MagneticFieldMap", "Quadrupole", "RFFieldMap", 
-              "RectangularField", "CylindricalField", "Dipole1", "Dipole2", "Multipole", "CombinedFunction", "FastSolenoid", 
+              "RectangularField", "CylindricalField", "Dipole1", "Dipole2", "Multipole", "CombinedFunction", "DerivativesSolenoid", 
               "FieldAmalgamation","SectorMagneticFieldMap",""};
 int               BTFieldConstructor::_fieldNameIndex = 0;
 
@@ -126,8 +126,8 @@ BTField * BTFieldConstructor::GetField(const MiceModule * theModule)
 	std::string field = theModule->propertyStringThis("FieldType");
 	if(field == "Solenoid")
 		return GetSolenoid(theModule);
-	if(field == "FastSolenoid")
-		return GetFastSolenoid(theModule);
+	if(field == "DerivativesSolenoid")
+		return GetDerivativesSolenoid(theModule);
 	else if(field == "PillBox")
 		return GetRFCavity(theModule);
 	else if(field == "MagneticFieldMap")
@@ -524,36 +524,21 @@ BTMultipole::EndFieldModel* BTFieldConstructor::GetEndFieldModel
           "BTFieldConstructor::GetEndFieldModel"));
 }
 
-BTField * BTFieldConstructor::GetFastSolenoid(const MiceModule * theModule)
+BTField * BTFieldConstructor::GetDerivativesSolenoid(const MiceModule * theModule)
 {
-  BTFastSolenoid * fast = NULL;
-  std::string mode      = theModule->propertyStringThis("EndFieldModel");
-  double      peakField = theModule->propertyDoubleThis("PeakField");
-  double      zMax      = theModule->propertyDoubleThis("ZMax");
-  double      rMax      = theModule->propertyDoubleThis("RMax");
-  int         order     = theModule->propertyIntThis   ("Order");
-  bool        lookup    = true;
-
-  try{lookup = theModule->propertyBoolThis("LookupMode");} catch(...) {}
-  if(mode == "Tanh")
-  {
-    double eFoldDist = theModule->propertyDoubleThis("EFoldLength");
-    double length    = theModule->propertyDoubleThis("CentreLength");
-    fast = new BTFastSolenoid( BTFastSolenoid::BTFastTanh  (peakField, eFoldDist, length, zMax, rMax, order));
+  double      peak_field = theModule->propertyDoubleThis("PeakField");
+  double      z_max = theModule->propertyDoubleThis("ZMax");
+  double      r_max = theModule->propertyDoubleThis("RMax");
+  int         order = theModule->propertyIntThis   ("MaxEndPole");
+  MAUS::EndFieldModel* end_field = GetEndFieldModel(theModule, 0);
+  if (end_field == NULL) {  // hard edged == NULL
+      throw(Squeal(Squeal::recoverable,
+                   "DerivativesSolenoid must have soft edged end field",
+                   "BTFieldConstructor::GetDerivativesSolenoid"));
   }
-  else if(mode == "Glaser")
-  {
-    double lambda    = theModule->propertyDoubleThis("Lambda");
-    fast = new BTFastSolenoid( BTFastSolenoid::BTFastGlaser(peakField, lambda, zMax, rMax, order));
-  }
-  else
-    throw(Squeal(Squeal::recoverable, "EndFieldModel "+mode+" not recognised in module "+theModule->name(), "BTFieldConstructor::GetFastSolenoid"));
-  if(lookup)
-  {
-    double lookupStep = theModule->propertyDoubleThis("LookupStepSize");
-    fast->DoLookup(lookupStep);
-  }
-  return fast;
+  MAUS::DerivativesSolenoid* sol = new MAUS::DerivativesSolenoid
+                                   (peak_field, r_max, z_max, order, end_field);
+  return sol;
 }
 
 BTField * BTFieldConstructor::GetFieldAmalgamation(const MiceModule * theModule)
@@ -608,9 +593,7 @@ void BTFieldConstructor::SetDefaults()
 	//use default for now BTPillBox::SetStaticPhaseModel(RFParams->phaseModel());
 	//Defaults for Quadrupoles
 	vector<double> AVec = MagParams->QuadrupoleFringeParameters();
-	double AArray[6];
 	if(AVec.size()==0) AVec = vector<double>(6);
-	for(unsigned int i=0; i<6; i++) AArray[i] = AVec[i];
 	BTPhaser::GetInstance()->SetPhaseTolerance (RFParams->rfPhaseTolerance());
 	int gridSpace[3] = {MagParams->FieldGridX(),MagParams->FieldGridY(),MagParams->FieldGridZ()};
 	BTFieldGroup::SetGridDefault(std::vector<int>(gridSpace, gridSpace+3));

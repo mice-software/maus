@@ -66,11 +66,11 @@ def main():
         if spill.GetDaqEventType() == "physics_event":
             # note PyROOT gives a segmentation fault if we try to call the STL
             # vector directly
-            for i in range(spill.GetReconEventSize()):
-                tof_event = spill.GetAReconEvent(i).GetTOFEvent()
+            for i in range(spill.GetReconEvents().size()):
+                tof_event = spill.GetReconEvents()[i].GetTOFEvent()
                 digits = tof_event.GetTOFEventDigit()
-                for i in range(digits.GetTOF1DigitArraySize()):
-                    tof1_digit = digits.GetTOF1DigitArrayElement(i)
+                for i in range(digits.GetTOF1DigitArray().size()):
+                    tof1_digit = digits.GetTOF1DigitArray()[i]
                     if tof1_digit.GetPlane() == 0:
                         tof1_digits_0_hist.Fill(tof1_digit.GetSlab())
                     else:
@@ -82,16 +82,21 @@ def main():
                             "tof1_digits_0")
     tof1_digits_0_hist.Draw()
     canvas_0.Draw()
-    canvas_0.Print('tof1_digits_0.png')
+    canvas_0.Print('tof1_digits_0_load_root_file.root')
+    canvas_0.Print('tof1_digits_0_load_root_file.png')
     canvas_1 = ROOT.TCanvas("tof1_digits_1", # pylint: disable = E1101
                             "tof1_digits_1")
     tof1_digits_1_hist.Draw()
     canvas_1.Draw()
-    canvas_1.Print('tof1_digits_1.png')
-    # wait for user to say we are done
-    # note it is a feature of ROOT that if you close the file it will delete
-    # existing histograms...
+    canvas_0.Print('tof1_digits_1_load_root_file.root')
+    canvas_1.Print('tof1_digits_1_load_root_file.png')
+
     print "Closing root file"
+
+    # A feature of ROOT is that closing the root file has weird effects like
+    # deleting the histograms drawn above from memory - beware. Probably also
+    # silently deallocates memory assigned to data. Probably does some other
+    # sinister stuff.
     root_file.Close()
 
 if __name__ == "__main__":

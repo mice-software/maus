@@ -229,7 +229,7 @@ TEST_F(PolynomialMapTest, GetAvgChi2OfDifference) {
   try {
     pvec.GetAvgChi2OfDifference(in, out);
     testpass = false;
-  } catch (Squeal squee) {}
+  } catch (Squeal squeal) {}
   ASSERT_TRUE(testpass);
 
   for (int i = 0; i < 10; i++) {
@@ -255,7 +255,7 @@ TEST_F(PolynomialMapTest, GetAvgChi2OfDifference) {
   try {
     pvec.GetAvgChi2OfDifference(in, out);
     testpass = false;
-  } catch (Squeal squee) {}
+  } catch (Squeal squeal) {}
   ASSERT_TRUE(testpass);
 
   // in[i] size != point dimension
@@ -265,7 +265,7 @@ TEST_F(PolynomialMapTest, GetAvgChi2OfDifference) {
   try {
     pvec.GetAvgChi2OfDifference(in, out);
     testpass = false;
-  } catch (Squeal squee) {}
+  } catch (Squeal squeal) {}
   ASSERT_TRUE(testpass);
 
   // out[i] size != value dimension
@@ -276,7 +276,7 @@ TEST_F(PolynomialMapTest, GetAvgChi2OfDifference) {
   try {
     pvec.GetAvgChi2OfDifference(in, out);
     testpass = false;
-  } catch (Squeal squee) {}
+  } catch (Squeal squeal) {}
   ASSERT_TRUE(testpass);
 }
 
@@ -449,7 +449,7 @@ TEST_F(PolynomialMapTest, LeastSquaresFitting) {
       bad_points, values,
       2, constraintPVec->GetCoefficientsAsVector(), weights);
     testpass = false;
-  } catch (Squeal squee) {}
+  } catch (Squeal squeal) {}
   ASSERT_TRUE(testpass);
 
   // bad values size
@@ -460,7 +460,7 @@ TEST_F(PolynomialMapTest, LeastSquaresFitting) {
       points, bad_values,
       2, constraintPVec->GetCoefficientsAsVector(), weights);
     testpass = false;
-  } catch (Squeal squee) {}
+  } catch (Squeal squeal) {}
   ASSERT_TRUE(testpass);
 
   testpass = true;
@@ -656,7 +656,7 @@ TEST_F(PolynomialMapTest, SpaceTransform) {
   try {
     coefficient.SpaceTransform(space_in, space_out);
     testpass = false;
-  } catch (Squeal squee) {}
+  } catch (Squeal squeal) {}
   ASSERT_TRUE(testpass);
 
   // out variable not in space mapping
@@ -666,6 +666,6 @@ TEST_F(PolynomialMapTest, SpaceTransform) {
   try {
     coefficient.SpaceTransform(space_in, space_out);
     testpass = false;
-  } catch (Squeal squee) {}
+  } catch (Squeal squeal) {}
   ASSERT_TRUE(testpass);
 }

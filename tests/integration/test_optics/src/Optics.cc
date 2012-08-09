@@ -66,15 +66,15 @@ void SetupSimulation(MiceModule* root, std::vector< ::CovarianceMatrix> envelope
   simRun.miceModule    = root;
   simRun.miceMaterials = new MiceMaterials();
   simRun.jsonConfiguration = new Json::Value(Json::objectValue);
-  (*simRun.jsonConfiguration)["verbose_level"] = Json::Value(0);
-  (*simRun.jsonConfiguration)["maximum_number_of_steps"] = Json::Value(10000);
+  (*simRun.jsonConfiguration)["verbose_level"] = Json::Value(1);
+  (*simRun.jsonConfiguration)["maximum_number_of_steps"] = Json::Value(25000);
   (*simRun.jsonConfiguration)["geant4_visualisation"] = Json::Value(false);
   (*simRun.jsonConfiguration)["keep_steps"] = Json::Value(false);
   (*simRun.jsonConfiguration)["keep_tracks"] = Json::Value(false);
   (*simRun.jsonConfiguration)["physics_model"] = Json::Value("QGSP_BERT");
   (*simRun.jsonConfiguration)["reference_physics_processes"] = Json::Value("mean_energy_loss");//
-  (*simRun.jsonConfiguration)["physics_processes"] = Json::Value("standard");//
-  (*simRun.jsonConfiguration)["particle_decay"] = Json::Value(true);// # set to true to activate particle decay, or False to inactivate particle decay
+  (*simRun.jsonConfiguration)["physics_processes"] = Json::Value("mean_energy_loss");//
+  (*simRun.jsonConfiguration)["particle_decay"] = Json::Value(false);// # set to true to activate particle decay, or False to inactivate particle decay
   (*simRun.jsonConfiguration)["charged_pion_half_life"] = Json::Value(-1.);// # set the pi+, pi- half life [ns]. Negative value means use geant4 default
   (*simRun.jsonConfiguration)["muon_half_life"] = Json::Value(-1.);// # set the mu+, mu- half life [ns]. Negative value means use geant4 default
   (*simRun.jsonConfiguration)["production_threshold"] = Json::Value(0.5);// # set the threshold for delta ray production [mm]
@@ -174,6 +174,14 @@ void Envelope(const MiceModule* root, std::vector< ::CovarianceMatrix>& env_out,
   try{deltaMax[3] = mod->propertyDouble("Delta_Px_Max");} catch(...) {}
   try{deltaMax[4] = mod->propertyDouble("Delta_y_Max" );} catch(...) {}
   try{deltaMax[5] = mod->propertyDouble("Delta_Py_Max");} catch(...) {}
+  for (size_t i = 0; i < 6; ++i) {
+      if (deltaMax[i] <= 0.) {
+          throw(Squeal(Squeal::recoverable,
+                  "DeltaMax should be > 0. in Envelope module "+mod->fullName(),
+                  "Optics::GetDelta"));
+      }
+  }
+
   return deltaMax;
 }
 
@@ -191,6 +199,14 @@ void Envelope(const MiceModule* root, std::vector< ::CovarianceMatrix>& env_out,
   try{delta[3] = mod->propertyDouble("Delta_Px");} catch(...) {}
   try{delta[4] = mod->propertyDouble("Delta_y" );} catch(...) {}
   try{delta[5] = mod->propertyDouble("Delta_Py");} catch(...) {}
+  for (size_t i = 0; i < 6; ++i) {
+      if (delta[i] <= 0.) {
+          throw(Squeal(Squeal::recoverable,
+                  "DeltaMax should be > 0. in Envelope module "+mod->fullName(),
+                  "Optics::GetDelta"));
+      }
+  }
+
   return delta;
 }
 
@@ -495,7 +511,61 @@ void MakeOutput(std::vector< ::CovarianceMatrix> matrix, std::vector< ::Transfer
   try{TextOutput(matrix, env_mod->propertyString("ShortTextOutput"));} catch(...) {Squeak::mout(Squeak::debug) << "Failed to find short text file" << std::endl;}
   try{LongTextOutput(matrix, tms, env_mod->propertyString("LongTextOutput"));} catch(...) {Squeak::mout(Squeak::debug) << "Failed to find long text file" << std::endl;}
   try{RootOutput(matrix, tms, env_mod->propertyString("RootOutput"), "Output from G4MICE Optics");} catch(...) {Squeak::mout(Squeak::debug) << "Failed to find root file" << std::endl;}
+  try{JsonOutput(matrix, tms, env_mod->propertyString("JsonOutput"));} catch(...) {Squeak::mout(Squeak::debug) << "Failed to find root file" << std::endl;}
 }
+
+void JsonOutput(std::vector< ::CovarianceMatrix> matrix, std::vector< ::TransferMap*> tms, std::string outfile) {
+  std::string names[6] = {"t","E","x","Px","y","Py"};
+  ofstream out(outfile.c_str());
+  if(!out) throw(Squeal(Squeal::recoverable, "Failed to open "+outfile, "Optics::TextOutput"));
+  std::string out_names_arr[] = {
+      "mean_t", "mean_E", "mean_x", "mean_Px", "mean_y", "mean_Py", "mean_z", "mean_Pz", "planeType", "planeNumber", "statisticalWeight", "betaTrans", "alphaTrans", "gammaTrans", "phiTrans", "angularMommentum", "amplitudePzCovariance", "beta_x", "alpha_x", "gamma_x", "phi_x", "beta_y", "alpha_y", "gamma_y", "phi_y", "beta_t", "alpha_t", "gamma_t", "dispersion_x", "dispersion_y", "emittance_x", "emittance_y", "emittance_t", "emittance4D", "emittance6D"};
+  std::vector<std::string> out_names(out_names_arr, out_names_arr+35);
+  for(int j=0; j<6; j++) {
+    for(int k=0; k<6; k++)
+      out_names.push_back("Covariance("+names[j]+","+names[k]+")");
+  }
+  
+  Json::Value cov_out;
+  for(unsigned int i=0; i<matrix.size(); i++)
+  {
+    Json::Value json_cov;
+    AnalysisPlaneBank f_theBank = matrix[i].GetAnalysisPlaneBank();
+
+    ::CovarianceMatrix cov = matrix[i];
+    double alpha_x=cov.GetTwoDAlpha(1), gamma_x=cov.GetTwoDGamma(1), alpha_y=cov.GetTwoDAlpha(2),     gamma_y=cov.GetTwoDGamma(2), 
+           alpha_t=cov.GetTwoDAlpha(0), gamma_t=cov.GetTwoDGamma(0), alpha_trans=cov.GetAlphaTrans(), gamma_trans=cov.GetGammaTrans(),
+           disp_x=cov.GetDispersion(1), disp_y=cov.GetDispersion(1);
+    double phi_trans(0), phi_x(0), phi_y(0);
+    if(i>0) {
+      try{phi_x = tms[i-1]->PhaseAdvance(1);} catch(Squeal squee) {}
+      try{phi_y = tms[i-1]->PhaseAdvance(2);} catch(Squeal squee) {}
+      phi_trans = (phi_x+phi_y)/2.;
+    }
+    for(int j=0; j<6; j++) {
+      json_cov[out_names[j]] = f_theBank.sums[j];
+    }
+    json_cov[out_names[6]] = f_theBank.z;
+    json_cov[out_names[7]] = f_theBank.pz;
+    json_cov[out_names[8]] = f_theBank.planeType;
+    json_cov[out_names[9]] = f_theBank.planeNumber;
+    double out_list[] = {f_theBank.weight, f_theBank.beta_p, alpha_trans, gamma_trans, phi_trans, f_theBank.l_can, f_theBank.amplitudePzCovariance, f_theBank.beta[1], alpha_x, gamma_x, phi_x, f_theBank.beta[2], alpha_y, gamma_y, phi_y, f_theBank.beta[0], alpha_t, gamma_t, disp_x, disp_y, f_theBank.em2d[1], f_theBank.em2d[2], f_theBank.em2d[0], f_theBank.em4dXY, f_theBank.em6dTXY};
+    for(int j=0; j<25; j++)
+        json_cov[out_names[j+10]] = out_list[j];
+    int l = 0;
+    for(int j=0; j<6; j++) {
+      for(int k=0; k<6; k++) {
+        json_cov[out_names[l+35]] = matrix[i].GetKineticCovariances()[j][k];
+        l++;
+      }
+    }
+    cov_out.append(json_cov);
+  }
+  Json::FastWriter writer;
+  out << writer.write(cov_out);
+  out.close();
+}
+
 
 void TextOutput(std::vector< ::CovarianceMatrix> matrix, std::string outfile)
 {
@@ -529,10 +599,9 @@ void LongTextOutput(std::vector< ::CovarianceMatrix> matrix, std::vector< ::Tran
     double alpha_x=cov.GetTwoDAlpha(1), gamma_x=cov.GetTwoDGamma(1), alpha_y=cov.GetTwoDAlpha(2),     gamma_y=cov.GetTwoDGamma(2), 
            alpha_t=cov.GetTwoDAlpha(0), gamma_t=cov.GetTwoDGamma(0), alpha_trans=cov.GetAlphaTrans(), gamma_trans=cov.GetGammaTrans(),
            disp_x=cov.GetDispersion(1), disp_y=cov.GetDispersion(1);
-    double phi_trans(0), phi_x(0), phi_y(0), phi_t(0);
+    double phi_trans(0), phi_x(0), phi_y(0);
     if(i>0)
     {
-      try{phi_t     = tms[i-1]->PhaseAdvance(0);} catch(Squeal squee) {}
       try{phi_x     = tms[i-1]->PhaseAdvance(1);} catch(Squeal squee) {}
       try{phi_y     = tms[i-1]->PhaseAdvance(2);} catch(Squeal squee) {}
       phi_trans = (phi_x+phi_y)/2.;
@@ -552,7 +621,14 @@ void LongTextOutput(std::vector< ::CovarianceMatrix> matrix, std::vector< ::Tran
       out << std::endl;
     }
   }
+  out.close();
 
+  ofstream out_tm(("tm_"+outfile).c_str());
+  if(!out_tm) throw(Squeal(Squeal::recoverable, "Failed to open "+outfile, "Optics::TextOutput"));
+  for(unsigned int i=0; i<tms.size(); i++) {
+    out_tm << *tms[i];
+  }
+  out_tm.close();
 }
 
 
@@ -615,10 +691,9 @@ void RootOutput(std::vector< ::CovarianceMatrix> matrix, std::vector< ::Transfer
     double alpha_x=cov.GetTwoDAlpha(1), gamma_x=cov.GetTwoDGamma(1), alpha_y=cov.GetTwoDAlpha(2),     gamma_y=cov.GetTwoDGamma(2), 
            alpha_t=cov.GetTwoDAlpha(0), gamma_t=cov.GetTwoDGamma(0), alpha_trans=cov.GetAlphaTrans(), gamma_trans=cov.GetGammaTrans(),
            disp_x=cov.GetDispersion(1), disp_y=cov.GetDispersion(1);
-    double phi_trans(0), phi_x(0), phi_y(0), phi_t(0);
+    double phi_trans(0), phi_x(0), phi_y(0);
     if(i>0)
     {
-      try{phi_t     = tms[i-1]->PhaseAdvance(0);} catch(Squeal squee) {}
       try{phi_x     = tms[i-1]->PhaseAdvance(1);} catch(Squeal squee) {}
       try{phi_y     = tms[i-1]->PhaseAdvance(2);} catch(Squeal squee) {}
       phi_trans = (phi_x+phi_y)/2.;
@@ -704,6 +779,9 @@ void CloseGzFile()
 
 namespace Optimiser
 {
+  // Note method inline void G4RunManager::GeometryHasBeenModified() - can be
+  // used to reload the geometry...
+
   //Variables
   MiceModule*             g_root_mod = NULL;
   std::vector<Parameter*> g_parameters;

@@ -169,9 +169,12 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
         counting the number of lines in the pylint summary file. If this
         increases, throws an error.
         """
+        here = os.getcwd()
+        os.chdir(self.maus_root_dir)
         file_name = self.run_all_pylints()
         # just go by number of lines - bit of a hack but will do
         self.postprocess_error_file(file_name)
+        os.chdir(here)
 
     # folders in maus_root_dir to look at
     include_dirs = ['doc', 'tests', 'src', 'bin', 'doc']
@@ -190,7 +193,9 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
 
     ignore_files = [
       'src/common_py/SpillSchema.py', # data file
-      'src/common_py/ConfigurationDefaults.py'] # data file
+      'src/common_py/ConfigurationDefaults.py', # data file
+      'tests/cpp_unit/Reconstruction/Global/global_recon_config.py', # data file
+      'tests/cpp_unit/Reconstruction/Global/single_muon_json.py'] # data file
 
 
 if __name__ == '__main__':
