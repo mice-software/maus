@@ -103,12 +103,12 @@ TEST_F(MAUSSteppingActionTest, UserSteppingActionMaxNStepsTest) {
   stepping->UserSteppingAction(step);
 
   ASSERT_TRUE(tracking->GetTracks()[Json::Value::UInt(0)].isObject());
-  EXPECT_TRUE(tracking->GetTracks()[Json::Value::UInt(0)]["KillReason"].type()
-                                                            == Json::nullValue);
+  EXPECT_EQ(tracking->GetTracks()[Json::Value::UInt(0)]["kill_reason"].type(),
+                                                             Json::stringValue);
   for (int i = 0; i < maxNSteps+1; ++i)
     track->IncrementCurrentStepNumber();
   stepping->UserSteppingAction(step);
-  EXPECT_EQ(tracking->GetTracks()[Json::Value::UInt(0)]["KillReason"].type(),
+  EXPECT_EQ(tracking->GetTracks()[Json::Value::UInt(0)]["kill_reason"].type(),
                                                              Json::stringValue);
   EXPECT_EQ(track->GetTrackStatus(), fStopAndKill);
 

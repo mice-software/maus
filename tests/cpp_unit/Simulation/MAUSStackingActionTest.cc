@@ -22,6 +22,8 @@
 #include "Geant4/G4Track.hh"
 #include "Geant4/G4ClassificationOfNewTrack.hh"
 
+#include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
+#include "src/common_cpp/Simulation/MAUSTrackingAction.hh"
 #include "src/common_cpp/Simulation/MAUSStackingAction.hh"
 
 namespace MAUS {
@@ -58,7 +60,12 @@ G4Track* MakeTrack() {
                          G4ParticleTable::GetParticleTable()->FindParticle(-13);
     G4DynamicParticle* dyn =
                        new G4DynamicParticle(pd, G4ThreeVector(0., 0., 1.), 1.);
-    return new G4Track(dyn, 0., G4ThreeVector(0., 0., 0.));
+    G4Track* track = new G4Track(dyn, 0., G4ThreeVector(0., 0., 0.));
+    track->SetTrackID(0);
+    MAUSTrackingAction* ta = MAUSGeant4Manager::GetInstance()->GetTracking();
+    ta->SetTracks(Json::Value(Json::arrayValue));
+    ta->PreUserTrackingAction(track);
+    return track;
 }
 
 TEST(MAUSStackingActionTest, ClassifyNewTrackTest) {
@@ -66,6 +73,7 @@ TEST(MAUSStackingActionTest, ClassifyNewTrackTest) {
 
     // pid is mu+; ke > 0.1 - not in keep_or_kill - default should be to run
     G4Track* track_1 = MakeTrack();
+
     msa.SetDefaultKeepOrKill(true);
     EXPECT_EQ(msa.ClassifyNewTrack(track_1), fWaiting);
     msa.SetDefaultKeepOrKill(false);

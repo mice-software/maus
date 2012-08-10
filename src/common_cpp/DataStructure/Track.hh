@@ -100,6 +100,12 @@ class Track {
      */
     void SetSteps(StepArray* steps);
 
+    /** Get the reason MAUS gives for killing particle (default empty string) */
+    std::string GetKillReason() const;
+
+    /** Set the reason MAUS gives for killing particle (default empty string) */
+    void SetKillReason(std::string reason);
+
   private:
     StepArray* _steps;
 
@@ -110,7 +116,8 @@ class Track {
 
     int _particle_id;
     int _track_id;
-    int _parent_track_id;
+    int _parent_track_id; 
+    std::string _kill_reason;
 
     ClassDef(Track, 1)
 };

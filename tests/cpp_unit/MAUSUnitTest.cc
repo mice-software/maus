@@ -45,7 +45,9 @@ Json::Value SetupConfig() {
   config["charged_pion_half_life"] = -1.;
   config["muon_half_life"] = -1.;
   config["production_threshold"] = 0.5;
-  config["production_threshold"] = 0.5;
+  config["default_keep_or_kill"] = true;
+  config["keep_or_kill_particles"] = "{\"neutron\":False}";
+  config["kinetic_energy_threshold"] = 0.1;
   return config;
 }
 
