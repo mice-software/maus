@@ -401,8 +401,9 @@ void ReduceCppMCTracker::Save() {
 }
 
 bool ReduceCppMCTracker::Trigger(Json::Value path) {
-  if (path.size() > 0) {return true;}
-  return false;
+  // if (path.size() > 0) {return true;}
+  // return false;
+  return true;
 }
 
 

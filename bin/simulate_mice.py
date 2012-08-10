@@ -48,7 +48,8 @@ def run():
 
     # The Go() drives all the components you pass in, then check the file
     # (default simulation.out) for output
-    MAUS.Go(my_input, my_map, MAUS.ReducePyDoNothing(), my_output, datacards)
+    #MAUS.Go(my_input, my_map, MAUS.ReducePyDoNothing(), my_output, datacards)
+    MAUS.Go(my_input, my_map, MAUS.ReduceCppMCTracker(), my_output, datacards)
 
 if __name__ == '__main__':
     run()
