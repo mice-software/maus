@@ -98,7 +98,8 @@ void MAUSTrackingAction::SetTracks(Json::Value tracks) {
     _tracks = tracks;
 }
 
-void MAUSTrackingAction::SetKillReason(G4Track* aTrack, std::string reason) {
+void MAUSTrackingAction::SetKillReason
+                                  (const G4Track* aTrack, std::string reason) {
     for (size_t i = 0; i < _tracks.size(); ++i) {
         if (_tracks[i]["track_id"] == aTrack->GetTrackID()) {
             _tracks[i]["KillReason"] = Json::Value(reason);

@@ -49,6 +49,7 @@ void MAUSSteppingAction::UserSteppingAction(const G4Step * aStep) {
 
     // kill particles that are looping
     G4Track* aTrack = aStep->GetTrack();
+    std::cerr << aTrack->GetDefinition()->GetParticleName() << " " << aTrack->GetTrackID() << " "<< aTrack->GetCurrentStepNumber() << " " << aTrack->GetMomentum() << std::endl;
     if (aTrack->GetCurrentStepNumber() > _maxNSteps) {
         std::stringstream ss;
         ss << aTrack->GetCurrentStepNumber() <<  " steps greater than maximum "

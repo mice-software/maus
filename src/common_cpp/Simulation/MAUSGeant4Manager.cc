@@ -23,6 +23,7 @@
 
 #include "src/legacy/Interface/Squeak.hh"
 #include "src/common_cpp/Utils/Globals.hh"
+#include "src/common_cpp/Simulation/MAUSStackingAction.hh"
 #include "src/common_cpp/Simulation/MAUSPhysicsList.hh"
 #include "src/common_cpp/Simulation/MAUSVisManager.hh"
 #include "src/common_cpp/Simulation/MAUSRunAction.hh"
@@ -58,7 +59,7 @@ MAUSGeant4Manager::MAUSGeant4Manager() {
     _runManager->SetUserAction(_trackAct);
     _runManager->SetUserAction(_stepAct);
     _runManager->SetUserAction(_eventAct);
-    //  _runManager->SetUserAction(new MAUSStackingActionKillNonMuons);
+    _runManager->SetUserAction(new MAUSStackingAction);
     _runManager->SetUserAction(new MAUSRunAction);
     _virtPlanes = new VirtualPlaneManager;
     _virtPlanes->ConstructVirtualPlanes(

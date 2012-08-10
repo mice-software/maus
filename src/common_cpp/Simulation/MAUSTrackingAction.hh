@@ -74,7 +74,7 @@ class MAUSTrackingAction : public G4UserTrackingAction {
 
     /** @brief If MAUS kills a particle, give the reason here
      */
-    void SetKillReason(G4Track* aTrack, std::string reason);
+    void SetKillReason(const G4Track* aTrack, std::string reason);
 
  private:
     Json::Value _tracks;
