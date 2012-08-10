@@ -42,6 +42,12 @@ MAUSGeant4Manager* MAUSGeant4Manager::GetInstance() {
 }
 
 MAUSGeant4Manager::MAUSGeant4Manager() {
+    if (_instance != NULL)
+        throw(Squeal(
+              Squeal::recoverable,
+              "Attempt to initialise MAUSGeant4Manager twice", 
+              "MAUSGeant4Manager::MAUSGeant4Manager"));
+    _instance = this;
     _visManager = NULL;  // set by GetVisManager
     SetVisManager();
     _runManager = new G4RunManager;
@@ -64,8 +70,10 @@ MAUSGeant4Manager::MAUSGeant4Manager() {
     _virtPlanes = new VirtualPlaneManager;
     _virtPlanes->ConstructVirtualPlanes(
       MICERun::getInstance()->btFieldConstructor,
-      MICERun::getInstance()->miceModule);
+      MICERun::getInstance()->miceModule
+    );
     _runManager->Initialize();
+    FieldPhaser().SetPhases();
 }
 
 MAUSGeant4Manager::~MAUSGeant4Manager() {

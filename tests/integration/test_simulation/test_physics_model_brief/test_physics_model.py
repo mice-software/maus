@@ -65,13 +65,12 @@ def run_simulation(ref_phys, phys, dec, pi_half, mu_half, prod): #pylint: disabl
       "-muon_half_life", str(mu_half),
       "-production_threshold", str(prod),
       "-output_root_file_name", str(out_name)+".root",
-      "-", "",
     ], stdout=log_file, stderr=subprocess.STDOUT)
     proc.wait()
     proc = subprocess.Popen([CONV_PATH,
                             "-input_root_file_name", str(out_name)+".root",
                             "-output_json_file_name", str(out_name)+".json"],
-                            stdout=log_file)
+                            stdout=log_file, stderr=subprocess.STDOUT)
     proc.wait()
     return out_name+".json"
 
@@ -135,16 +134,12 @@ class PhysicsModelTest(unittest.TestCase): # pylint: disable = R0904
         # particle has no energy loss
         file_de = run_simulation("none", "mean_energy_loss", False,
                                                                   -1., -1., 5.)
-        print file_de
         bunch_de = Bunch.new_dict_from_read_builtin('maus_virtual_hit',
                                                            file_de, "pid")[211]
         # should lose energy in absorber
         de_hits_1 = bunch_de.get_hits('station', 1) # pions us of material
         de_hits_2 = bunch_de.get_hits('station', 2) # pions ds of material
         # check we lose energy through the absorber
-        print len(bunch_de)
-        for hit in bunch_de:
-            print hit['station'], hit['event_number'], hit['particle_number'], hit
         self.assertNotAlmostEqual(de_hits_1 [0]['pz'], de_hits_2[1]['pz'], 3)
         # check two particles lose same energy through absorber (no stochastics)
         self.assertAlmostEqual(de_hits_2 [0]['pz'], de_hits_2[1]['pz'], 3)
@@ -163,7 +158,7 @@ class PhysicsModelTest(unittest.TestCase): # pylint: disable = R0904
 
     def test_decay(self):
         """
-        Check that we can disable particle 
+        Check that we can disable particle decay
         """
         file_decay = run_simulation("none", "none", True, 1.e-9, 1.e+9, 5.)
         bunch = Bunch.new_dict_from_read_builtin \

@@ -29,13 +29,12 @@ simulation_geometry_filename = os.path.join(
 )
 spill_generator_number_of_spills = 2
 verbose_level = 0
-keep_tracks = True
+keep_steps = True
 
-# energy is very low - so that particles probably decay if they are unstable
 simulation_reference_particle = {
     "position":{"x":0.0, "y":-0.0, "z":0.0},
     "momentum":{"x":0.0, "y":0.0, "z":1.0},
-    "particle_id":211, "energy":140.0, "time":0.0, "random_seed":0
+    "particle_id":211, "energy":200.0, "time":0.0, "random_seed":0
 }
 
 beam = {

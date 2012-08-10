@@ -19,8 +19,8 @@ Configuration Test
   MiceModule Material // check stochastic processes by putting some material in
   {
     PropertyString Volume Cylinder
-    Dimensions 100. 100. mm
-    PropertyString Material Galactic
+    Dimensions 100. 10. mm
+    PropertyString Material Al
     Position 0.0 0.0 2. m
   }
 
@@ -43,7 +43,7 @@ Configuration Test
       Dimensions 100. 0.999 mm
       PropertyString Material Galactic
       // field definition
-      PropertyHep3Vector Position 0. 0. 99. m
+      PropertyHep3Vector Position 0. 0. 50. m
       PropertyString FieldType PillBox
       PropertyDouble Length 1. mm
       PropertyString CavityMode Unphased
