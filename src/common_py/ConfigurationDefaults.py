@@ -76,6 +76,15 @@ particle_decay = True # set to true to activate particle decay, or False to inac
 charged_pion_half_life = -1. # set the pi+, pi- half life [ns]. Negative value means use geant4 default
 muon_half_life = -1. # set the mu+, mu- half life [ns]. Negative value means use geant4 default
 production_threshold = 0.5 # set the threshold for delta ray production [mm]
+kinetic_cutoff=1.0 # set minimum kinetic energy of a track at birth [MeV/c]
+default_keep_or_kill = True
+# map of string pdg pids; always keep particles on creation if their pdg maps to True; always kill particles on creation if their pdg maps to False. Default comes from default_keep_or_kill
+keep_or_kill_particles = {"mu+":True, "mu-":True,   
+                          "nu_e":False, "antu_nu_e":False,
+                          "nu_mu":False, "antu_nu_mu":False,
+                          "nu_tau":False, "antu_nu_tau":False,
+}
+kinetic_energy_threshold = 0.1 # kill tracks with initial kinetic energy below energy_threshold
 
 # geant4 visualisation (not event display)
 geant4_visualisation = False
