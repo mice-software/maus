@@ -33,7 +33,8 @@ MAUSStackingAction::MAUSStackingAction()
     _default = cards["default_keep_or_kill"].asBool();
     _kinetic_energy_threshold = cards["kinetic_energy_threshold"].asDouble();
     Json::Value keep_flags = cards["keep_or_kill_particles"];
-    for (Json::Value::iterator it = keep_flags.begin(); it != keep_flags.end(); ++it) {
+    for (Json::Value::iterator it = keep_flags.begin();
+                                                 it != keep_flags.end(); ++it) {
         _pdg_pid_keep_kill[it.key().asString()] =
                                        keep_flags[it.key().asString()].asBool();
     }
@@ -55,7 +56,7 @@ G4ClassificationOfNewTrack MAUSStackingAction::ClassifyNewTrack
             MAUSGeant4Manager::GetInstance()->GetTracking()
                                     ->SetKillReason(aTrack, "PID "+name+
                                    " not in keep list and default set to kill");
-            return fKill;            
+            return fKill;
         }
     } else { // name is in keep_kill map
         if (!_pdg_pid_keep_kill[name]) {

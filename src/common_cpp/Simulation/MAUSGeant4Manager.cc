@@ -45,7 +45,7 @@ MAUSGeant4Manager::MAUSGeant4Manager() {
     if (_instance != NULL)
         throw(Squeal(
               Squeal::recoverable,
-              "Attempt to initialise MAUSGeant4Manager twice", 
+              "Attempt to initialise MAUSGeant4Manager twice",
               "MAUSGeant4Manager::MAUSGeant4Manager"));
     _instance = this;
     _visManager = NULL;  // set by GetVisManager
