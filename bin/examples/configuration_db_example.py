@@ -86,7 +86,7 @@ def run():
 
             help(cdb)
         """
-    except cdb._exceptions.CdbTemporaryError:
+    except cdb.CdbTemporaryError:
         sys.excepthook(*sys.exc_info())
         print """
         Failed to run example - check network connection!

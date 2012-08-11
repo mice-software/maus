@@ -43,7 +43,6 @@ def run_example(example_name):
     """
     Run an example as an executable
     """
-    print 'Running', example_name
     os.chdir(os.path.join(os.environ['MAUS_ROOT_DIR'], 'tmp'))
     images_before = get_images()
     mangled_name = os.path.split(example_name)[-1] # just the file name
@@ -51,6 +50,7 @@ def run_example(example_name):
     log = 'test_examples_'+mangled_name+'.log'
     log = os.path.join(os.environ["MAUS_ROOT_DIR"], "tmp", log)
     log_file = open(log, 'w')
+    print 'Running', example_name, 'logging in', log
     proc = subprocess.Popen([example_name],
                             stdout=log_file, stderr=subprocess.STDOUT)
     proc.communicate('\n')
