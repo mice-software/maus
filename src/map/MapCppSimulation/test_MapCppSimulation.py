@@ -157,6 +157,9 @@ class MapCppSimulationTestCase(unittest.TestCase):
       "charged_pion_half_life":-1.,
       "muon_half_life":-1.,
       "production_threshold":0.5,
+      "kinetic_cutoff":1.0,
+      "default_keep_or_kill":True,
+      "keep_or_kill_particles":{},
     }
 
 

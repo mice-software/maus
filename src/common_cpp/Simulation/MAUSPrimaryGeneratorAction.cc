@@ -26,9 +26,9 @@
 
 #include "CLHEP/Random/Random.h"
 
-#include "src/legacy/Interface/MICERun.hh"
 #include "src/legacy/Config/MiceModule.hh"
 
+#include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Simulation/MAUSPrimaryGeneratorAction.hh"
 
 namespace MAUS {
@@ -93,7 +93,7 @@ void MAUSPrimaryGeneratorAction::GeneratePrimaries(G4Event* argEvent) {
 }
 
 bool MAUSPrimaryGeneratorAction::isInWorldVolume(double x, double y, double z) {
-  MiceModule* root = MICERun::getInstance()->miceModule;
+  MiceModule* root = Globals::GetInstance()->GetMonteCarloMiceModules();
   if (root == NULL) {
       return true;
   }

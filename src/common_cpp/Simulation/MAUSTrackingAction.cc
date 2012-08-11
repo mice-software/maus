@@ -19,6 +19,7 @@
 #include <string>
 #include <iostream>
 
+#include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 #include "src/common_cpp/Simulation/MAUSTrackingAction.hh"
 
@@ -26,7 +27,7 @@ namespace MAUS {
 
 MAUSTrackingAction::MAUSTrackingAction() : _tracks(), _keepTracks(true),
                                            _stepping(NULL) {
-    Json::Value& conf = *MICERun::getInstance()->jsonConfiguration;
+    Json::Value& conf = *Globals::GetInstance()->GetConfigurationCards();
     _keepTracks = JsonWrapper::GetProperty
                  (conf, "keep_tracks", JsonWrapper::booleanValue).asBool() ||
                   JsonWrapper::GetProperty
