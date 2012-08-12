@@ -9,5 +9,8 @@ if [ -z "${MAUS_ROOT_DIR}" ]; then  # see if the variable exists yet
 fi
 
 
-MAUS_TEST_PLOT_DIR=${MAUS_ROOT_DIR}/tests/integration/plots/ python ${MAUS_THIRD_PARTY}/third_party/install/bin/nosetests -v ${MAUS_ROOT_DIR}/tests/integration
+MAUS_TEST_PLOT_DIR=${MAUS_ROOT_DIR}/tests/integration/plots/ \
+python ${MAUS_THIRD_PARTY}/third_party/install/bin/nosetests -v \
+--exclude-dir tests/integration/test_simulation/test_physics_model_full \
+${MAUS_ROOT_DIR}/tests/integration
 

@@ -15,27 +15,27 @@
  *
  */
 
-#include <G4VPhysicalVolume.hh>
-#include <G4VSolid.hh>
-#include <G4Material.hh>
-#include <G4Element.hh>
-#include <G4LogicalVolume.hh>
-#include <G4ThreeVector.hh>
-#include <G4PVPlacement.hh>
-#include <globals.hh>
-#include <G4SDManager.hh>
-#include <G4UserLimits.hh>
-#include <G4Tubs.hh>
-#include <G4PVParameterised.hh>
-
 #include <limits>
+
+#include "Geant4/G4VPhysicalVolume.hh"
+#include "Geant4/G4VSolid.hh"
+#include "Geant4/G4Material.hh"
+#include "Geant4/G4Element.hh"
+#include "Geant4/G4LogicalVolume.hh"
+#include "Geant4/G4ThreeVector.hh"
+#include "Geant4/G4PVPlacement.hh"
+#include "Geant4/globals.hh"
+#include "Geant4/G4SDManager.hh"
+#include "Geant4/G4UserLimits.hh"
+#include "Geant4/G4Tubs.hh"
+#include "Geant4/G4PVParameterised.hh"
+
+#include "gtest/gtest.h"
+#include "CLHEP/Random/Random.h"
 
 #include "src/legacy/Config/MiceModule.hh"
 
 #include "src/common_cpp/DetModel/SciFi/SciFiPlane.hh"
-
-#include "gtest/gtest.h"
-#include "CLHEP/Random/Random.h"
 
 namespace {
 class SciFiPlaneTest : public ::testing::Test {

@@ -18,7 +18,7 @@
 #ifndef SciFiSD_h
 #define SciFiSD_h 1
 
-#include <json/json.h>
+#include "json/json.h"
 #include "DetModel/MAUSSD.hh"
 
 /** @brief The Scintilating Fibre Sensitive Detector

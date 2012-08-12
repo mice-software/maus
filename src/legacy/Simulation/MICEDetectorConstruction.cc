@@ -14,40 +14,41 @@
 #include "EngModel/MultipoleAperture.hh"
 #include "EngModel/MiceModToG4Solid.hh"
 #include "src/common_cpp/Simulation/VirtualPlanes.hh"
+#include "src/common_cpp/Utils/Globals.hh"
 
-#include "G4VSolid.hh"
-#include "G4Material.hh"
-#include "G4Element.hh"
-#include "G4LogicalVolume.hh"
-#include "G4ThreeVector.hh"
-#include "G4PVPlacement.hh"
-#include "globals.hh"
-#include "G4FieldManager.hh"
-#include "G4UniformMagField.hh"
-#include "G4ChordFinder.hh"
-#include "G4SDManager.hh"
-#include "G4TransportationManager.hh"
-#include "G4UserLimits.hh"
-#include "G4EquationOfMotion.hh"
-#include "G4EqMagElectricField.hh"
-#include "G4Mag_UsualEqRhs.hh"
+#include "Geant4/G4VSolid.hh"
+#include "Geant4/G4Material.hh"
+#include "Geant4/G4Element.hh"
+#include "Geant4/G4LogicalVolume.hh"
+#include "Geant4/G4ThreeVector.hh"
+#include "Geant4/G4PVPlacement.hh"
+#include "Geant4/globals.hh"
+#include "Geant4/G4FieldManager.hh"
+#include "Geant4/G4UniformMagField.hh"
+#include "Geant4/G4ChordFinder.hh"
+#include "Geant4/G4SDManager.hh"
+#include "Geant4/G4TransportationManager.hh"
+#include "Geant4/G4UserLimits.hh"
+#include "Geant4/G4EquationOfMotion.hh"
+#include "Geant4/G4EqMagElectricField.hh"
+#include "Geant4/G4Mag_UsualEqRhs.hh"
 //Electromagnetic steppers:W
-#include "G4ClassicalRK4.hh"
-#include "G4SimpleHeum.hh"
-#include "G4ImplicitEuler.hh"
-#include "G4SimpleRunge.hh"
-#include "G4ExplicitEuler.hh"
-#include "G4CashKarpRKF45.hh"
+#include "Geant4/G4ClassicalRK4.hh"
+#include "Geant4/G4SimpleHeum.hh"
+#include "Geant4/G4ImplicitEuler.hh"
+#include "Geant4/G4SimpleRunge.hh"
+#include "Geant4/G4ExplicitEuler.hh"
+#include "Geant4/G4CashKarpRKF45.hh"
 //Magnetic only steppers:
-#include "G4HelixImplicitEuler.hh"
-#include "G4HelixExplicitEuler.hh"
-#include "G4HelixSimpleRunge.hh"
-#include "G4HelixHeum.hh"
+#include "Geant4/G4HelixImplicitEuler.hh"
+#include "Geant4/G4HelixExplicitEuler.hh"
+#include "Geant4/G4HelixSimpleRunge.hh"
+#include "Geant4/G4HelixHeum.hh"
 
-#include "G4PVPlacement.hh"
+#include "Geant4/G4PVPlacement.hh"
 //#ifdef G4VIS_USE
-#include "G4VisAttributes.hh"
-#include "G4Colour.hh"
+#include "Geant4/G4VisAttributes.hh"
+#include "Geant4/G4Colour.hh"
 //#endif*/
 
 #include <sstream>
@@ -77,11 +78,7 @@ MICEDetectorConstruction::MICEDetectorConstruction( MICERun& run ) : _simRun(*MI
   _event = new MICEEvent();
   _model = run.miceModule;
   _materials = run.miceMaterials;
-  if (_simRun.DataCards == NULL)
-    throw(Squeal(Squeal::recoverable,
-                 "Failed to acquire datacards",
-                 "MiceDetectorConstruction::MiceDetectorConstruction()"));
-  _checkVolumes = (_simRun.DataCards->fetchValueInt("CheckVolumeOverlaps") == 1);
+  _checkVolumes = (*MAUS::Globals::GetConfigurationCards())["check_volume_overlaps"].asBool();
   _hasBTFields = false;
 
   if (_model == NULL)
@@ -132,10 +129,10 @@ G4VPhysicalVolume* MICEDetectorConstruction::Construct()
     globalFieldMgr->SetDetectorField ( magField );
     globalFieldMgr->CreateChordFinder( magField );
   }
-
+  if(_checkVolumes) Squeak::setStandardOutputs(0); //turn on cout if check volumes is active
   for( int i = 0; i < _model->daughters(); ++i )
     addDaughter( _model->daughter( i ), MICEExpHall );
-
+  if(_checkVolumes) Squeak::setStandardOutputs(-1); //turn cout back to default mode if check volumes is active
   return MICEExpHall;
 }
 
@@ -190,6 +187,20 @@ void    MICEDetectorConstruction::addDaughter( MiceModule* mod, G4VPhysicalVolum
     G4VSolid* solid = MiceModToG4Solid::buildSolid(mod);
     logic = new G4LogicalVolume( solid, mat, mod->name() + "Logic", 0, 0, 0 );
     place = new G4PVPlacement( (G4RotationMatrix*) mod->rotationPointer(), mod->position(), mod->name(), logic, moth, false, 0, _checkVolumes);
+    Squeak::errorLevel my_err = Squeak::debug;
+    if(mod->mother()->isRoot()) my_err = Squeak::info;
+    Squeak::mout(my_err) << "Placing " << mod->name() << " of type " 
+                        << mod->volType() << " position: " 
+                        << mod->globalPosition() << " rotationVector: " 
+                        << mod->globalRotation().getAxis() 
+                        << " angle: "  << mod->globalRotation().delta()/degree 
+                        << " volume: "
+                        << solid->GetCubicVolume()/meter/meter/meter << " m^3 ";
+    if(mod->propertyExistsThis("Material", "string"))
+        Squeak::mout(my_err)  << " material: "
+                             << mod->propertyStringThis("Material") << std::endl;
+    else
+        Squeak::mout(my_err)  << std::endl;
   }
 
   if(!_hasBTFields)

@@ -79,6 +79,7 @@ class MapCppSimulationVisualisationTestCase(unittest.TestCase):
     configuration = {
       "verbose_level":4,
       "simulation_geometry_filename":"Test.dat",
+      "reconstruction_geometry_filename":"Test.dat",
       "maximum_number_of_steps":1000,
       "keep_steps":True,
       "keep_tracks":True,

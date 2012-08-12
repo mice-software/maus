@@ -32,7 +32,7 @@ SIM_PATH = os.path.join(MAUS_ROOT_DIR, "bin", "simulate_mice.py")
 PLOT_DIR = os.path.join(MAUS_ROOT_DIR, "tests", "integration", \
                                     "plots", "physics_list")
 TEST_DIR = os.path.join(MAUS_ROOT_DIR, "tests", "integration", \
-                                    "test_simulation", "test_physics_model")
+                                "test_simulation", "test_physics_model_brief")
 SETUP_DONE = False
 CONV_PATH = os.path.join(MAUS_ROOT_DIR, "bin", "utilities", "root_to_json.py")
 
@@ -50,12 +50,13 @@ def run_simulation(ref_phys, phys, dec, pi_half, mu_half, prod): #pylint: disabl
     Run simulation to generate some data. We only want to do this once, so I
     pull it out into a separate part of the test.
     """
-    out_name = os.path.join(MAUS_ROOT_DIR, "tmp", "simulation.")
+    out_name = os.path.join(MAUS_ROOT_DIR, "tmp", "test_physics_model.")
     for value in [ref_phys, phys, dec, pi_half, mu_half]:
         out_name += str(value)+"_"
     out_name += str(prod)
     log_file = open(out_name+".log", "w")
     config = os.path.join(TEST_DIR, 'physics_model_config.py')
+    #return out_name+".json"
     proc = subprocess.Popen([SIM_PATH, '-configuration_file', config, 
       "-reference_physics_processes", str(ref_phys),
       "-physics_processes", str(phys),
@@ -69,7 +70,7 @@ def run_simulation(ref_phys, phys, dec, pi_half, mu_half, prod): #pylint: disabl
     proc = subprocess.Popen([CONV_PATH,
                             "-input_root_file_name", str(out_name)+".root",
                             "-output_json_file_name", str(out_name)+".json"],
-                            stdout=log_file)
+                            stdout=log_file, stderr=subprocess.STDOUT)
     proc.wait()
     return out_name+".json"
 
@@ -157,7 +158,7 @@ class PhysicsModelTest(unittest.TestCase): # pylint: disable = R0904
 
     def test_decay(self):
         """
-        Check that we can disable particle 
+        Check that we can disable particle decay
         """
         file_decay = run_simulation("none", "none", True, 1.e-9, 1.e+9, 5.)
         bunch = Bunch.new_dict_from_read_builtin \

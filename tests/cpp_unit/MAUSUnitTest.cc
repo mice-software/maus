@@ -30,6 +30,7 @@
 
 Json::Value SetupConfig() {
   Json::Value config(Json::objectValue);
+  config["check_volume_overlaps"] = true;
   config["reconstruction_geometry_filename"] = "Test.dat";
   config["simulation_geometry_filename"] = "Test.dat";
   config["maximum_number_of_steps"] = 10000;
@@ -44,16 +45,24 @@ Json::Value SetupConfig() {
   config["charged_pion_half_life"] = -1.;
   config["muon_half_life"] = -1.;
   config["production_threshold"] = 0.5;
-  config["production_threshold"] = 0.5;
+  config["default_keep_or_kill"] = true;
+  config["keep_or_kill_particles"] = "{\"neutron\":False}";
+  config["kinetic_energy_threshold"] = 0.1;
+  config["simulation_reference_particle"] = JsonWrapper::StringToJson(
+    std::string("{\"position\":{\"x\":0.0,\"y\":-0.0,\"z\":-5500.0},")+
+    std::string("\"momentum\":{\"x\":0.0,\"y\":0.0,\"z\":1.0},")+
+    std::string("\"particle_id\":-13,\"energy\":226.0,\"time\":0.0,")+
+    std::string("\"random_seed\":10}")
+  );
   return config;
 }
 
 int main(int argc, char **argv) {
-  MAUS::GlobalsManager::InitialiseGlobals
-                                     (JsonWrapper::JsonToString(SetupConfig()));
-  ::testing::InitGoogleTest(&argc, argv);
   int test_out = -1;
   try {
+      MAUS::GlobalsManager::InitialiseGlobals
+                                         (JsonWrapper::JsonToString(SetupConfig()));
+      ::testing::InitGoogleTest(&argc, argv);
       test_out = RUN_ALL_TESTS();
   } catch(Squeal squee) {
       std::cerr << squee.GetMessage() << "\n" << squee.GetLocation() << "\n"

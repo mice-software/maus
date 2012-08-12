@@ -18,8 +18,8 @@
 
 #include "gtest/gtest.h"
 
-#include <G4RunManager.hh>
-#include <G4SDManager.hh>
+#include "Geant4/G4RunManager.hh"
+#include "Geant4/G4SDManager.hh"
 
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"

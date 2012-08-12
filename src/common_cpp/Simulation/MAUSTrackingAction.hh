@@ -23,8 +23,8 @@
 
 #include "json/json.h"  // for datastructure
 
-#include "G4Track.hh"  //  arg to tracking action
-#include "G4UserTrackingAction.hh"  //  inherit from
+#include "Geant4/G4Track.hh"  //  arg to tracking action
+#include "Geant4/G4UserTrackingAction.hh"  //  inherit from
 
 #include "src/common_cpp/Simulation/MAUSSteppingAction.hh"
 
@@ -74,7 +74,7 @@ class MAUSTrackingAction : public G4UserTrackingAction {
 
     /** @brief If MAUS kills a particle, give the reason here
      */
-    void SetKillReason(G4Track* aTrack, std::string reason);
+    void SetKillReason(const G4Track* aTrack, std::string reason);
 
  private:
     Json::Value _tracks;

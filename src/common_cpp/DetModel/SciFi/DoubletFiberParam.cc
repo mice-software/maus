@@ -14,9 +14,9 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#include <G4VPhysicalVolume.hh>
-#include <G4ThreeVector.hh>
-#include <G4Tubs.hh>
+#include "Geant4/G4VPhysicalVolume.hh"
+#include "Geant4/G4ThreeVector.hh"
+#include "Geant4/G4Tubs.hh"
 
 #include "src/common_cpp/DetModel/SciFi/DoubletFiberParam.hh"
 

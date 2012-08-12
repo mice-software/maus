@@ -21,9 +21,9 @@
 #include <string>
 #include <queue>
 
-#include "G4ParticleGun.hh"
-#include "G4ParticleTable.hh"
-#include "G4VUserPrimaryGeneratorAction.hh"  // inherit from
+#include "Geant4/G4ParticleGun.hh"
+#include "Geant4/G4ParticleTable.hh"
+#include "Geant4/G4VUserPrimaryGeneratorAction.hh"  // inherit from
 
 #include "src/legacy/Interface/Squeak.hh"
 #include "src/legacy/Interface/VirtualHit.hh"

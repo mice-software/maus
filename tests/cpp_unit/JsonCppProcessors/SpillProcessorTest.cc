@@ -63,7 +63,7 @@ std::string STEP =
         std::string("\"momentum\":{\"x\":9.,\"y\":10.,\"z\":11.}}");
 
 std::string TRACK_SEED =
-        std::string("{\"particle_id\":1,\"track_id\":2,")+
+        std::string("{\"particle_id\":1,\"track_id\":2,\"kill_reason\":\"Z\",")+
         std::string("\"parent_track_id\":3,")+
         std::string("\"initial_position\":{\"x\":6.,\"y\":7.,\"z\":8.},")+
         std::string("\"initial_momentum\":{\"x\":9.,\"y\":10.,\"z\":11.},")+

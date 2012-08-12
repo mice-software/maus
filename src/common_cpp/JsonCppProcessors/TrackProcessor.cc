@@ -25,6 +25,10 @@ TrackProcessor::TrackProcessor() : _step_proc(new StepProcessor()) {
                                                    &Track::SetParticleId, true);
     RegisterValueBranch("track_id", &_int_proc, &Track::GetTrackId,
                                                       &Track::SetTrackId, true);
+    RegisterValueBranch("kill_reason", &_string_proc, &Track::GetKillReason,
+                                                   &Track::SetKillReason, true);
+    RegisterValueBranch("parent_track_id", &_int_proc,
+                      &Track::GetParentTrackId, &Track::SetParentTrackId, true);
     RegisterValueBranch("parent_track_id", &_int_proc,
                       &Track::GetParentTrackId, &Track::SetParentTrackId, true);
     RegisterPointerBranch("steps", &_step_proc, &Track::GetSteps,

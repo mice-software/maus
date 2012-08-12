@@ -19,6 +19,7 @@
 #include <string>
 #include <iostream>
 
+#include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 #include "src/common_cpp/Simulation/MAUSTrackingAction.hh"
 
@@ -26,7 +27,7 @@ namespace MAUS {
 
 MAUSTrackingAction::MAUSTrackingAction() : _tracks(), _keepTracks(true),
                                            _stepping(NULL) {
-    Json::Value& conf = *MICERun::getInstance()->jsonConfiguration;
+    Json::Value& conf = *Globals::GetInstance()->GetConfigurationCards();
     _keepTracks = JsonWrapper::GetProperty
                  (conf, "keep_tracks", JsonWrapper::booleanValue).asBool() ||
                   JsonWrapper::GetProperty
@@ -56,6 +57,7 @@ void MAUSTrackingAction::PreUserTrackingAction(const G4Track* aTrack) {
         json_track["particle_id"] = aTrack->GetDefinition()->GetPDGEncoding();
         json_track["track_id"] = aTrack->GetTrackID();
         json_track["parent_track_id"] = aTrack->GetParentID();
+        json_track["kill_reason"] = "";
         if (_stepping->GetWillKeepSteps())
             _stepping->SetSteps(Json::Value(Json::arrayValue));
         _tracks.append(json_track);
@@ -98,10 +100,11 @@ void MAUSTrackingAction::SetTracks(Json::Value tracks) {
     _tracks = tracks;
 }
 
-void MAUSTrackingAction::SetKillReason(G4Track* aTrack, std::string reason) {
+void MAUSTrackingAction::SetKillReason
+                                  (const G4Track* aTrack, std::string reason) {
     for (size_t i = 0; i < _tracks.size(); ++i) {
         if (_tracks[i]["track_id"] == aTrack->GetTrackID()) {
-            _tracks[i]["KillReason"] = Json::Value(reason);
+            _tracks[i]["kill_reason"] = reason;
         }
     }
 }
