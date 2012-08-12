@@ -37,7 +37,7 @@ namespace Simulation
   //Load datacards
   dataCards*             LoadDataCards(int argc, char** argv);
   //Setup geometry etc; will add ellipses using matrix, make it a std::vector<CovarianceMatrix>() to ignore
-  void                   SetupSimulation(MiceModule* root, std::vector<CovarianceMatrix> matrix);
+  MiceModule*            SetupSimulation(std::vector<CovarianceMatrix> matrix);
   //Phase cavities
   void                   PhaseCavities  (PhaseSpaceVector ref);
   //Run an event through the simulation

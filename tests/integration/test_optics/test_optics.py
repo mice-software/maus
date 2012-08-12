@@ -22,6 +22,7 @@ def run_optics(test):
 																						stdout = open('log.'+test, 'w'))
     proc.wait()
     print 'with return code', proc.returncode
+    return proc.returncode
 
 def get_data(test):
     """
@@ -70,7 +71,8 @@ class TestOptics(unittest.TestCase): # pylint: disable=R0904
         beta function.
         """
         for test in TEST_NAMES:
-            run_optics(test)
+            return_code = run_optics(test)
+            self.assertEqual(return_code, 0)
             (z_out, beta) = get_data(test)
             if 'MAUS_TEST_PLOT_DIR' in os.environ:
                 plot_data(test, z_out, beta, os.environ['MAUS_TEST_PLOT_DIR'])
