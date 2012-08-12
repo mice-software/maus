@@ -1,5 +1,11 @@
 #!/bin/bash
 
+cmake --version
+if [ $? != 0 ]; then
+    echo "FATAL: Require cmake to build g4.9.5.p01"
+    exit 1
+fi
+
 ./configure
 source env.sh
 ./third_party/build_all.bash
