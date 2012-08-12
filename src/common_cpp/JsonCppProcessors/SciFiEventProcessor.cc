@@ -18,8 +18,18 @@
 
 namespace MAUS {
 
-SciFiEventProcessor::SciFiEventProcessor() {
+SciFiEventProcessor::SciFiEventProcessor() : _sf_hit_array_proc(new SciFiHitProcessor),
+                                             _sf_digit_array_proc(new SciFiDigitProcessor),
+                                             _sf_cluster_array_proc(new SciFiClusterProcessor),
+                                             _sf_spoint_array_proc(new SciFiSpacePointProcessor) {
+
+  RegisterValueBranch("hits", &_sf_hit_array_proc,
+                      &SciFiEvent::hits, &SciFiEvent::set_hits, false);
+  RegisterValueBranch("digits", &_sf_digit_array_proc,
+                      &SciFiEvent::digits, &SciFiEvent::set_digits, false);
+  RegisterValueBranch("clusters", &_sf_cluster_array_proc,
+                      &SciFiEvent::clusters, &SciFiEvent::set_clusters, false);
+  RegisterValueBranch("spacepoints", &_sf_spoint_array_proc,
+                      &SciFiEvent::spacepoints, &SciFiEvent::set_spacepoints, false);
 }
-}  // namespace MAUS
-
-
+} // ~namespace MAUS

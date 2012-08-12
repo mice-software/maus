@@ -54,18 +54,23 @@ class SciFiEvent {
 
     /** Hits */
     void add_hit(SciFiHit* hit) { _scifihits.push_back(hit); }
+    void set_hits(SciFiHitPArray scifihits) { _scifihits = scifihits; }
     SciFiHitPArray hits() const { return _scifihits; }
 
     /** Digits */
     void add_digit(SciFiDigit* digit) { _scifidigits.push_back(digit); }
+    void set_digits(SciFiDigitPArray scifidigits) { _scifidigits = scifidigits; }
     SciFiDigitPArray digits() const { return _scifidigits; }
 
     /** Clusters */
     void add_cluster(SciFiCluster* cluster) { _scificlusters.push_back(cluster); }
+    void set_clusters(SciFiClusterPArray scificlusters) { _scificlusters = scificlusters; }
     SciFiClusterPArray clusters() const { return _scificlusters; }
 
     /** Spacepoints */
     void add_spacepoint(SciFiSpacePoint* spacepoint) { _scifispacepoints.push_back(spacepoint); }
+    void set_spacepoints(SciFiSpacePointPArray scifispacepoints) {
+                        _scifispacepoints = scifispacepoints; }
     SciFiSpacePointPArray spacepoints() const { return _scifispacepoints; }
 
     /** Seeds */

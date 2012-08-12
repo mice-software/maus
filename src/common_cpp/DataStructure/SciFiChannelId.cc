@@ -19,12 +19,12 @@
 namespace MAUS {
 
 SciFiChannelId::SciFiChannelId()
-    : _fibre(0), _station(0), _tracker(0), _plane(0) {
+    : _fibre(0), _station(0), _tracker(0), _plane(0), _used(false) {
 }
 
 SciFiChannelId::SciFiChannelId(const SciFiChannelId& channel)
     : _fibre(channel._fibre), _station(channel._station),
-      _tracker(channel._tracker), _plane(channel._plane) {
+      _tracker(channel._tracker), _plane(channel._plane), _used(false) {
 }
 
 SciFiChannelId& SciFiChannelId::operator=(const SciFiChannelId& channel) {
@@ -35,6 +35,7 @@ SciFiChannelId& SciFiChannelId::operator=(const SciFiChannelId& channel) {
     _station = channel._station;
     _tracker = channel._tracker;
     _plane = channel._plane;
+	_used = channel._used;
     return *this;
 }
 
