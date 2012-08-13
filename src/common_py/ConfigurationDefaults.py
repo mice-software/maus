@@ -58,7 +58,7 @@ keep_only_muon_tracks = False
 keep_tracks = False # set to true to keep start and end point of every track
 keep_steps = False # set to true to keep start and end point of every track and
                    # every step point
-simulation_geometry_filename = "Test.dat" # geometry used by simulation
+simulation_geometry_filename = "Stage6.dat" # geometry used by simulation
 check_volume_overlaps = False
 maximum_number_of_steps = 10000 # particles are killed after this number of
                                 # steps (assumed to be stuck in the fields)
