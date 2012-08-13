@@ -14,10 +14,10 @@
 #ifndef KLGlue_h
 #define KLGlue_h 1
 
-#include "G4Tubs.hh"
-#include "G4Box.hh"
-#include "G4ThreeVector.hh"
-#include "globals.hh"
+#include "Geant4/G4Tubs.hh"
+#include "Geant4/G4Box.hh"
+#include "Geant4/G4ThreeVector.hh"
+#include "Geant4/globals.hh"
 #include "Config/MiceModule.hh"
 
 class G4LogicalVolume;

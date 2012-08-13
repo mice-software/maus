@@ -22,9 +22,12 @@
 #include "src/common_cpp/Simulation/FieldPhaser.hh"
 
 #include "src/legacy/Interface/Squeak.hh"
+#include "src/common_cpp/Utils/Globals.hh"
+#include "src/common_cpp/Simulation/MAUSStackingAction.hh"
 #include "src/common_cpp/Simulation/MAUSPhysicsList.hh"
 #include "src/common_cpp/Simulation/MAUSVisManager.hh"
 #include "src/common_cpp/Simulation/MAUSRunAction.hh"
+
 
 namespace MAUS {
 
@@ -39,6 +42,12 @@ MAUSGeant4Manager* MAUSGeant4Manager::GetInstance() {
 }
 
 MAUSGeant4Manager::MAUSGeant4Manager() {
+    if (_instance != NULL)
+        throw(Squeal(
+              Squeal::recoverable,
+              "Attempt to initialise MAUSGeant4Manager twice",
+              "MAUSGeant4Manager::MAUSGeant4Manager"));
+    _instance = this;
     _visManager = NULL;  // set by GetVisManager
     SetVisManager();
     _runManager = new G4RunManager;
@@ -56,13 +65,15 @@ MAUSGeant4Manager::MAUSGeant4Manager() {
     _runManager->SetUserAction(_trackAct);
     _runManager->SetUserAction(_stepAct);
     _runManager->SetUserAction(_eventAct);
-    //  _runManager->SetUserAction(new MAUSStackingActionKillNonMuons);
+    _runManager->SetUserAction(new MAUSStackingAction);
     _runManager->SetUserAction(new MAUSRunAction);
     _virtPlanes = new VirtualPlaneManager;
     _virtPlanes->ConstructVirtualPlanes(
       MICERun::getInstance()->btFieldConstructor,
-      MICERun::getInstance()->miceModule);
+      MICERun::getInstance()->miceModule
+    );
     _runManager->Initialize();
+    FieldPhaser().SetPhases();
 }
 
 MAUSGeant4Manager::~MAUSGeant4Manager() {
@@ -135,7 +146,7 @@ void MAUSGeant4Manager::SetVisManager() {
   if (_visManager != NULL) delete _visManager;
   _visManager = NULL;
   // if _visManager == NULL, attempt to build it
-  Json::Value& conf = *MICERun::getInstance()->jsonConfiguration;
+  Json::Value& conf = *Globals::GetInstance()->GetConfigurationCards();
   if (JsonWrapper::GetProperty
            (conf, "geant4_visualisation", JsonWrapper::booleanValue).asBool()) {
       _visManager = new MAUSVisManager;

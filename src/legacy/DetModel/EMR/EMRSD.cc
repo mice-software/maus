@@ -6,11 +6,11 @@
 */
 #include "EMRSD.hh"
 
-#include "G4HCofThisEvent.hh"
-#include "G4Step.hh"
-#include "G4ThreeVector.hh"
-#include "G4SDManager.hh"
-#include "G4ios.hh"
+#include "Geant4/G4HCofThisEvent.hh"
+#include "Geant4/G4Step.hh"
+#include "Geant4/G4ThreeVector.hh"
+#include "Geant4/G4SDManager.hh"
+#include "Geant4/G4ios.hh"
 
 #include "Interface/dataCards.hh"
 #include <fstream>
@@ -18,7 +18,7 @@
 #include "Interface/MICEEvent.hh"
 #include "Interface/dataCards.hh"
 #include "Config/MiceModule.hh"
-#include <G4StepStatus.hh>
+#include "Geant4/G4StepStatus.hh"
 #include <cstring>
 #include <iostream>
 

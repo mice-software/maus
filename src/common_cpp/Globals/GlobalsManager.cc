@@ -44,6 +44,9 @@ void GlobalsManager::InitialiseGlobals(std::string json_datacards) {
                       "GlobalsManager::InitialiseGlobals"));
     }
     Globals* process = new Globals();
+    // Putting this here makes partially initialised Globals available for
+    // initialisation. Beware!
+    Globals::_process = process;
     try {
 
         Json::Value config = JsonWrapper::StringToJson(json_datacards);
@@ -79,10 +82,10 @@ void GlobalsManager::InitialiseGlobals(std::string json_datacards) {
         process->_field_constructor = MICERun::getInstance()->btFieldConstructor;
         process->_field_constructor->Print(Squeak::mout(Squeak::info));
     } catch(Squeal squee) {
+        Globals::_process = NULL;
         delete process;
         throw squee;
     }
-    Globals::_process = process;
 }
 
 void GlobalsManager::DeleteGlobals() {

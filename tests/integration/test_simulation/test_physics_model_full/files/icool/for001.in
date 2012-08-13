@@ -1,0 +1,62 @@
+bunched phase rotation (p99s)
+&SUB frfcool 201.25
+&SUB Vrfcool 16.00
+&SUB ficool 35.0
+&SUB nrotate 10.050
+&SUB nbunch 10.0
+&SUB vrotate 13.0
+&SUB firotate 5
+$SUB denseh2 120
+&SUB fibunxer 0
+&SUB bunch1  9
+&SUB bunch2  0
+&SUB apertr  0.30
+
+ &cont npart=__nev__ bgen=.true. dectrk=.true. f9dp=8 steprk=.false.
+ varstep=.true. nprnt=-1 prlevel=1 ntuple=.false. rnseed=-__seed__
+ spin=.false. spintrk=0 spinmatter=0 bzfldprd=20
+ fsav=.true. fsavset=.true. izfile=447 !rfdiag=89 
+ phasemodel=3 output1=.true. /
+ &bmt nbeamtyp=1 /
+ 1 __pid__ 1. 1
+ 0.  0.  0.   0.  0.  __momentum__
+ 0.  0.  0.   0.  0.  0.
+ 1
+ 1 20. 0 0
+ &ints ldecay=.true. ldedx=.true. lstrag=.true. lscatter=.true.
+  delev=2 straglev=5 scatlev=6  /
+ &nhs nhist=2   /
+ 0.100 0.001 50 10 1
+ 0.100 0.001 50 6 27
+ &nsc nscat=0  sauto=.true. /
+ &nzh nzhist=2 /
+ 2  0. 0.22857 70 0. 0. 33
+ 2  10. 0.37143 70 0. 0. 33
+ &nrh nrhist=0 /
+ &nem nemit=20  /
+  1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 27
+ &ncv ncovar=3 /
+ 1 17 27
+
+SECTION
+OUTPUT
+SREGION         ! Drift
+__thickness__  1    __step__
+1  0.   1.0
+NONE
+  0. 0. 0. 0. 0.   0. 0. 0. 0. 0.  0. 0. 0. 0. 0.
+__material__
+CBLOCK
+   0. 0. 0. 0. 0.   0. 0. 0. 0. 0.
+OUTPUT
+SREGION         ! Drift
+1e-3  1    1e-2
+1  0.   1.0
+NONE
+  0. 0. 0. 0. 0.   0. 0. 0. 0. 0.  0. 0. 0. 0. 0.
+VAC
+NONE
+   0. 0. 0. 0. 0.   0. 0. 0. 0. 0.
+ENDSECTION
+
+

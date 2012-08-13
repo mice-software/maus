@@ -5,6 +5,16 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v0.3.2
+  The following functionality was added:
+    - 
+  If upgrading from the previous version, the following third party library
+  scripts need to be rerun:
+    - third_party/bash/31geant4.bash   
+    - third_party/bash/40python_extras.bash   
+    - third_party/bash/44cdb.bash   
+
+
 MAUS-v0.3.1
   The following functionality was added:
     - An example script to get the field at one or more points was added. In

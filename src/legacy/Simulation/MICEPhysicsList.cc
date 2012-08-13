@@ -1,10 +1,10 @@
 // MAUS WARNING: THIS IS LEGACY CODE.
-#include "globals.hh"
+#include "Geant4/globals.hh"
 
-#include "G4UImanager.hh"
-#include "G4ProcessTable.hh"
-#include "G4ProcessVector.hh"
-#include "G4PhysListFactory.hh"
+#include "Geant4/G4UImanager.hh"
+#include "Geant4/G4ProcessTable.hh"
+#include "Geant4/G4ProcessVector.hh"
+#include "Geant4/G4PhysListFactory.hh"
 
 #include "Interface/dataCards.hh"
 #include "Interface/MICERun.hh"

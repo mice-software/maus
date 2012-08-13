@@ -56,3 +56,4 @@ src/common_cpp/DataStructure/MausDataStructure.h
 third_party/install/man/man1
 third_party/install/man/man3
 install_log_std
+env_geant4.9.5.p01.sh

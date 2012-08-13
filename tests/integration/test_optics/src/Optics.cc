@@ -3,13 +3,15 @@
 
 #include "TTree.h"
 #include "TFile.h"
-#include "G4VSolid.hh"
+#include "Geant4/G4VSolid.hh"
 
 #include "json/json.h"
 
 #include "Optics.hh"
 
+#include "src/common_cpp/Globals/GlobalsManager.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
+#include "src/common_cpp/Utils/Globals.hh"
 #include "src/legacy/Interface/MiceMaterials.hh"
 #include "src/common_cpp/Simulation/MAUSPrimaryGeneratorAction.hh"
 #include "src/common_cpp/Simulation/MAUSPrimaryGeneratorAction.hh"
@@ -60,31 +62,39 @@ void  PhaseCavities(::PhaseSpaceVector ref) {
     MAUSGeant4Manager::GetInstance()->SetPhases();
 }
 
-void SetupSimulation(MiceModule* root, std::vector< ::CovarianceMatrix> envelope)
+MiceModule* SetupSimulation(std::vector< ::CovarianceMatrix> envelope)
 {
-  simRun.DataCards     = &MyDataCards;
-  simRun.miceModule    = root;
-  simRun.miceMaterials = new MiceMaterials();
-  simRun.jsonConfiguration = new Json::Value(Json::objectValue);
-  (*simRun.jsonConfiguration)["verbose_level"] = Json::Value(1);
-  (*simRun.jsonConfiguration)["maximum_number_of_steps"] = Json::Value(25000);
-  (*simRun.jsonConfiguration)["geant4_visualisation"] = Json::Value(false);
-  (*simRun.jsonConfiguration)["keep_steps"] = Json::Value(false);
-  (*simRun.jsonConfiguration)["keep_tracks"] = Json::Value(false);
-  (*simRun.jsonConfiguration)["physics_model"] = Json::Value("QGSP_BERT");
-  (*simRun.jsonConfiguration)["reference_physics_processes"] = Json::Value("mean_energy_loss");//
-  (*simRun.jsonConfiguration)["physics_processes"] = Json::Value("mean_energy_loss");//
-  (*simRun.jsonConfiguration)["particle_decay"] = Json::Value(false);// # set to true to activate particle decay, or False to inactivate particle decay
-  (*simRun.jsonConfiguration)["charged_pion_half_life"] = Json::Value(-1.);// # set the pi+, pi- half life [ns]. Negative value means use geant4 default
-  (*simRun.jsonConfiguration)["muon_half_life"] = Json::Value(-1.);// # set the mu+, mu- half life [ns]. Negative value means use geant4 default
-  (*simRun.jsonConfiguration)["production_threshold"] = Json::Value(0.5);// # set the threshold for delta ray production [mm]
+  Json::Value json_config(Json::objectValue);
+  json_config["verbose_level"] = Json::Value(1);
+  json_config["maximum_number_of_steps"] = Json::Value(25000);
+  json_config["geant4_visualisation"] = Json::Value(false);
+  json_config["keep_steps"] = Json::Value(false);
+  json_config["keep_tracks"] = Json::Value(false);
+  json_config["physics_model"] = Json::Value("QGSP_BERT");
+  json_config["reference_physics_processes"] = Json::Value("mean_energy_loss");//
+  json_config["physics_processes"] = Json::Value("mean_energy_loss");//
+  json_config["particle_decay"] = Json::Value(false);// # set to true to activate particle decay, or False to inactivate particle decay
+  json_config["charged_pion_half_life"] = Json::Value(-1.);// # set the pi+, pi- half life [ns]. Negative value means use geant4 default
+  json_config["muon_half_life"] = Json::Value(-1.);// # set the mu+, mu- half life [ns]. Negative value means use geant4 default
+  json_config["production_threshold"] = Json::Value(0.5);// # set the threshold for delta ray production [mm]
+  json_config["default_keep_or_kill"] = true;
+  json_config["keep_or_kill_particles"] = "{}";
+  json_config["kinetic_energy_threshold"] = 0.1;
+  json_config["simulation_reference_particle"] = JsonWrapper::StringToJson(
+    std::string("{\"position\":{\"x\":0.0,\"y\":-0.0,\"z\":-5500.0},")+
+    std::string("\"momentum\":{\"x\":0.0,\"y\":0.0,\"z\":1.0},")+
+    std::string("\"particle_id\":-13,\"energy\":226.0,\"time\":0.0,")+
+    std::string("\"random_seed\":10}")
+  );
+  json_config["check_volume_overlaps"] = true;
+  json_config["reconstruction_geometry_filename"] = MyDataCards.fetchValueString("MiceModel");
+  json_config["simulation_geometry_filename"] = MyDataCards.fetchValueString( "MiceModel" );
 
-  Squeak::setStandardOutputs();
-  fillMaterials(simRun);
-  
-  g4Manager = MAUSGeant4Manager::GetInstance();
-
-  simRun.btFieldConstructor->Print(Squeak::mout(Squeak::info));
+  std::string str_config = JsonWrapper::JsonToString(json_config);
+  MAUS::GlobalsManager::InitialiseGlobals(str_config);
+  g4Manager = MAUS::Globals::GetInstance()->GetGeant4Manager();
+  simRun.DataCards = &MyDataCards;
+  return MAUS::Globals::GetMonteCarloMiceModules();
 }
 
 std::vector<G4VSolid*> MakeCylinderEnvelope(std::vector< ::CovarianceMatrix> matrix, double InterpolationSize)
@@ -951,7 +961,7 @@ int main(int argc, char **argv)
   Squeak::mout() << "||   Optics   ||" << std::endl;
   Squeak::mout() << "\\\\============//" << std::endl;
   Squeak::mout(Squeak::info) << "Parsing control files" << std::endl;
-  MiceModule* root   = new MiceModule( MyDataCards.fetchValueString( "MiceModel" ) );
+  MiceModule* root   = Simulation::SetupSimulation(std::vector< ::CovarianceMatrix>());
   std::vector<MiceModule*> optim = root->findModulesByPropertyExistsNC("string", "Optimiser");
   if(optim.size()>0)
   {
@@ -959,7 +969,6 @@ int main(int argc, char **argv)
     Optimiser::PushParameters(root, Optimiser::g_parameters);
   }
   Squeak::mout(Squeak::info) << "Building geometry" << std::endl;
-  Simulation::SetupSimulation(root, std::vector< ::CovarianceMatrix>());
 
   //Try to run the optimiser
   Squeak::mout(Squeak::info) << "Looking for optimisation requests" << std::endl;
@@ -977,8 +986,8 @@ int main(int argc, char **argv)
 
   Squeak::mout(Squeak::info) << "done" << std::endl;
   }
-  catch(Squeal exc)         {Squeak::mout(Squeak::error) << "Caught Squeal        " << std::endl; exc.Print();}
-  catch(std::exception exc) {Squeak::mout(Squeak::error) << "Caught std::exception" << std::endl; Squeak::mout(Squeak::error) << exc.what() << std::endl;}
+  catch(Squeal exc)         {Squeak::mout(Squeak::error) << "Caught Squeal        " << std::endl; exc.Print(); exit(1);}
+  catch(std::exception exc) {Squeak::mout(Squeak::error) << "Caught std::exception" << std::endl; Squeak::mout(Squeak::error) << exc.what() << std::endl; exit(1);}
   exit(0);
 }
 

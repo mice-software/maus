@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 #http://www.linuxfromscratch.org/blfs/view/6.3/general/libxslt.html
 
-version=0.0.3.0
-directory=cdb-0.0.3.0
-filename=cdb-0.0.3.0.tar.gz
-filename_mash=cdb0.0.3.0.tar.gz-20120607142818-9lmlyve0idmzos46-1/cdb-0.0.3.0.tar.gz
+version=0.0.4.0
+directory=cdb-0.0.4.0
+filename=cdb-0.0.4.0.tar.gz
+filename_mash=cdb0.0.4.0.tar.gz-20120720080600-64epf8t02zeezjtk-1/cdb-0.0.4.0.tar.gz
 url=http://bazaar.launchpad.net/~antony-wilson/mcdb/mice.cdb.client.api-python/download/head:/${filename_mash}
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ]

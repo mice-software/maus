@@ -19,7 +19,7 @@
 #include <string>
 #include "src/common_cpp/Utils/TOFChannelMap.hh"
 #include "Config/MiceModule.hh"
-#include "Interface/Squeak.hh"
+#include "Interface/Squeal.hh"
 
 //////////////////////////////////////////////////////////////////////
 bool MapCppTOFMCDigitizer::birth(std::string argJsonConfigDocument) {
@@ -37,7 +37,10 @@ bool MapCppTOFMCDigitizer::birth(std::string argJsonConfigDocument) {
   }
 
   // get the geometry
-  assert(_configJSON.isMember("reconstruction_geometry_filename"));
+  if (!_configJSON.isMember("reconstruction_geometry_filename"))
+      throw(Squeal(Squeal::recoverable,
+                   "Could not find geometry file",
+                   "MapCppTOFMCDigitizer::birth"));
   std::string filename;
   filename = _configJSON["reconstruction_geometry_filename"].asString();
   // get the tof geometry modules
@@ -130,12 +133,24 @@ std::vector<Json::Value> MapCppTOFMCDigitizer::make_tof_digits(Json::Value hits)
       if (fDebug) std::cout << "hit# " << j << hit << std::endl;
 
       // make sure we can get the station/slab info
-      assert(hit.isMember("channel_id"));
-      assert(hit.isMember("momentum"));
-      assert(hit.isMember("time"));
+      if (!hit.isMember("channel_id"))
+          throw(Squeal(Squeal::recoverable,
+                       "No channel_id in hit",
+                       "MapCppTOFMCDigitizer::make_tof_digits"));
+      if (!hit.isMember("momentum"))
+          throw(Squeal(Squeal::recoverable,
+                       "No momentum in hit",
+                       "MapCppTOFMCDigitizer::make_tof_digits"));
+      if (!hit.isMember("time"))
+          throw(Squeal(Squeal::recoverable,
+                       "No time in hit",
+                       "MapCppTOFMCDigitizer::make_tof_digits"));
       Json::Value channel_id = hit["channel_id"];
 
-      assert(hit.isMember("energy_deposited"));
+      if (!hit.isMember("energy_deposited"))
+          throw(Squeal(Squeal::recoverable,
+                       "No energy_deposited in hit",
+                       "MapCppTOFMCDigitizer::make_tof_digits"));
       double edep = hit["energy_deposited"].asDouble();
 
       if (fDebug) {
@@ -174,7 +189,10 @@ std::vector<Json::Value> MapCppTOFMCDigitizer::make_tof_digits(Json::Value hits)
       } // end loop over tof_modules
 
       // make sure we actually found a tof module corresponding to this hit
-      assert(hit_module != NULL);
+      if (hit_module == NULL)
+          throw(Squeal(Squeal::recoverable,
+                       "No TOF module for hit",
+                       "MapCppTOFMCDigitizer::make_tof_digits"));
 
       // now get the position of the hit
       Hep3Vector hpos = JsonWrapper::JsonToThreeVector(hit["position"]);
@@ -319,10 +337,19 @@ bool MapCppTOFMCDigitizer::check_sanity_mc(std::string document) {
 double MapCppTOFMCDigitizer::get_npe(double edep, double dist) {
       double peRes = 1e-4;
       double nphot = 0;
-      assert(_configJSON.isMember("TOFattenuationLength"));
-      assert(_configJSON.isMember("TOFpmtQuantumEfficiency"));
 
-      assert(_configJSON.isMember("TOFconversionFactor"));
+      if (!_configJSON.isMember("TOFattenuationLength"))
+          throw(Squeal(Squeal::recoverable,
+                "Could not find TOFattenauationLength in config",
+                "MapCppTOFMCDigitizer::get_npe"));
+      if (!_configJSON.isMember("reconstruction_geometry_filename"))
+          throw(Squeal(Squeal::recoverable,
+                "Could not find TOFpmtQuantumEfficiency in config",
+                "MapCppTOFMCDigitizer::get_npe"));
+      if (!_configJSON.isMember("TOFconversionFactor"))
+          throw(Squeal(Squeal::recoverable,
+                       "Could not find TOFconversionFactor in config",
+                       "MapCppTOFMCDigitizer::birth"));
       nphot = edep / (_configJSON["TOFconversionFactor"].asDouble());
 
       nphot *= exp(-dist / (_configJSON["TOFattenuationLength"].asDouble()));

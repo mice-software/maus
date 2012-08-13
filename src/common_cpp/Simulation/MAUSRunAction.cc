@@ -15,9 +15,9 @@
  *
  */
 
-#include "G4Run.hh"
-#include "G4VVisManager.hh"
-#include "G4UImanager.hh"
+#include "Geant4/G4Run.hh"
+#include "Geant4/G4VVisManager.hh"
+#include "Geant4/G4UImanager.hh"
 
 #include "src/common_cpp/Simulation/MAUSRunAction.hh"
 

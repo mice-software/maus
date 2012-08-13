@@ -37,8 +37,8 @@
 #include <fstream>
 #include <string>
 
-#include "globals.hh"
-#include "G4Polycone.hh"
+#include "Geant4/globals.hh"
+#include "Geant4/G4Polycone.hh"
 #include "Interface/Spline1D.hh"
 #include "Config/MiceModule.hh"
 #include "src/common_cpp/Utils/MAUSEvaluator.hh"

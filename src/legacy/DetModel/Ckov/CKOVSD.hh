@@ -4,7 +4,7 @@
 #ifndef CKOVSD_h
 #define CKOVSD_h 1
 
-#include "G4VSensitiveDetector.hh"
+#include "Geant4/G4VSensitiveDetector.hh"
 #include "Interface/CkovHit.hh"
 #include "CLHEP/Vector/ThreeVector.h"
 

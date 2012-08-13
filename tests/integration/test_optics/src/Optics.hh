@@ -17,7 +17,7 @@
 #include "src/legacy/Optics/TransferMap.hh"
 #include "src/legacy/Optics/TransportManager.hh"
 
-#include "G4RunManager.hh"
+#include "Geant4/G4RunManager.hh"
 
 #include "CLHEP/Matrix/Matrix.h"
 #include "CLHEP/Matrix/Vector.h"
@@ -37,7 +37,7 @@ namespace Simulation
   //Load datacards
   dataCards*             LoadDataCards(int argc, char** argv);
   //Setup geometry etc; will add ellipses using matrix, make it a std::vector<CovarianceMatrix>() to ignore
-  void                   SetupSimulation(MiceModule* root, std::vector<CovarianceMatrix> matrix);
+  MiceModule*            SetupSimulation(std::vector<CovarianceMatrix> matrix);
   //Phase cavities
   void                   PhaseCavities  (PhaseSpaceVector ref);
   //Run an event through the simulation

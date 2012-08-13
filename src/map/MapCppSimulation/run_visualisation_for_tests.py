@@ -75,8 +75,9 @@ class MapCppSimulationVisualisationTestCase(unittest.TestCase):
             os.rename(filename, os.environ['MAUS_ROOT_DIR']+'/tmp/'+filename) 
 
     configuration = {
-      "verbose_level":4,
+      "verbose_level":2,
       "simulation_geometry_filename":"Test.dat",
+      "reconstruction_geometry_filename":"Test.dat",
       "maximum_number_of_steps":1000,
       "keep_steps":True,
       "keep_tracks":True,
