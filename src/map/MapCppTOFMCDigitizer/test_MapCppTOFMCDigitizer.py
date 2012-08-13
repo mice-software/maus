@@ -22,9 +22,10 @@ class MapCppTOFMCDigitizer(unittest.TestCase):  #pylint: disable = R0904
             is called.
         """
         cls.mapper = MAUS.MapCppTOFMCDigitizer()
-        conf = Configuration()
+        conf_json = json.loads(Configuration().getConfigJSON())
+        conf_json["reconstruction_geometry_filename"] = "Stage6.dat"
         # Test whether the configuration files were loaded correctly at birth
-        success = cls.mapper.birth(conf.getConfigJSON())
+        success = cls.mapper.birth(json.dumps(conf_json))
         if not success:
             raise Exception('InitializeFail', 'Could not start worker')
 
