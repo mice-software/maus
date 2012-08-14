@@ -54,6 +54,6 @@ SciFiSpacePointProcessor::SciFiSpacePointProcessor()
                         &SciFiSpacePoint::set_position, true);
 
     RegisterValueBranch("clusters", &_sf_cluster_array_proc,
-                        &SciFiSpacePoint::get_channels, &SciFiSpacePoint::set_channels, false);
+                        &SciFiSpacePoint::get_channels, &SciFiSpacePoint::set_channels, true);
 }
 } // ~namespace MAUS
