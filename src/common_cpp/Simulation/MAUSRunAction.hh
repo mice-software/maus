@@ -18,8 +18,8 @@
 #ifndef SRC_COMMON_CPP_SIMULATION_MAUSRunAction_H
 #define SRC_COMMON_CPP_SIMULATION_MAUSRunAction_H
 
-#include "globals.hh"
-#include "G4UserRunAction.hh"
+#include "Geant4/globals.hh"
+#include "Geant4/G4UserRunAction.hh"
 
 namespace MAUS {
 

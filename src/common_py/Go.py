@@ -102,7 +102,8 @@ class Go: # pylint: disable=R0921, R0903
                 json.dumps(json_config_dictionary, indent=2)
         print "Initialising Globals"
         # Initialise field maps, geant4, etc
-        maus_cpp.globals.birth(json.dumps(json_config_dictionary))        
+        if not maus_cpp.globals.has_instance():
+            maus_cpp.globals.birth(json.dumps(json_config_dictionary))        
         try:
             # Set up the dataflow executor.
             if type_of_dataflow == 'pipeline_single_thread':

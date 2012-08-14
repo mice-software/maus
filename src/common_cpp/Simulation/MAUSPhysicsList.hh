@@ -15,16 +15,14 @@
  *
  */
 
-#ifndef MICEPhysicsList_h
-#define MICEPhysicsList_h 1
+#ifndef _SRC_COMMON_CPP_SIMULATION_MAUSPHYSICSLIST_HH_
+#define _SRC_COMMON_CPP_SIMULATION_MAUSPHYSICSLIST_HH_
 
 #include <string>
 
-#include "G4VModularPhysicsList.hh"
-#include "G4UImanager.hh"
+#include "Geant4/G4VUserPhysicsList.hh"
 
-#include "G4UserSpecialCuts.hh"
-#include "G4StepLimiter.hh"
+class G4VModularPhysicsList;
 
 namespace MAUS {
 
@@ -39,9 +37,12 @@ namespace MAUS {
  *  (i) Predefined commands to switch on and off stochastic processes, defined
  *  by datacards
  *  (ii) User-defined G4UI macros to modify processes by hand
+ *
+ *  Potentially a more robust way to do this is to make MAUSPhysicsList more
+ *  like something that modifies the Geant4 default physics list... shrug
  */
 
-class MAUSPhysicsList: public G4VModularPhysicsList {
+class MAUSPhysicsList: public G4VUserPhysicsList {
   public:
 
     /** Controls EM scattering model - Multiple Coulomb Scattering or None
@@ -84,6 +85,8 @@ class MAUSPhysicsList: public G4VModularPhysicsList {
     /** Construct the process table and add any MAUS specific processes 
      */
     void ConstructProcess();
+
+    void ConstructParticle();
 
     /** Does nothing - included to overload pure virtual base class function
      */
@@ -194,6 +197,7 @@ class MAUSPhysicsList: public G4VModularPhysicsList {
     void SetParticleHalfLife(std::string particleName, double halfLife);
 
   private:
+
     static const std::string _scatNames[];
     static const std::string _eLossNames[];
     static const int         _nScatNames;
@@ -207,6 +211,8 @@ class MAUSPhysicsList: public G4VModularPhysicsList {
     double      _piHalfLife;
     double      _muHalfLife;
     double      _productionThreshold;
+
+    G4VModularPhysicsList* _list;
 };
 }
 

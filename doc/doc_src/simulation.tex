@@ -207,7 +207,7 @@ A number of classes are provided for basic initialisation of GEANT4.
 
 \begin{itemize}
 \item MAUSGeant4Manager: is responsible for handling interface to GEANT4. MAUSGeant4Manager handles initialisation of the GEANT4 bindings as well as accessors for individual GEANT4 objects (see below). Interfaces are provided to run one or many particles through the geometry, returning the relevant event data. The MAUSGeant4Manager sets and clears the event action before each run.
-\item MAUSPhysicsList: contains routines to set up the GEANT4 physical processes. Datacards settings are provided to disable stochastic processes or all processes and set a few parameters.
+\item MAUSPhysicsList: contains routines to set up the GEANT4 physical processes. Datacards settings are provided to disable stochastic processes or all processes and set a few parameters. In the end, the physics list set up gets called by the FieldPhaser.
 \item FieldPhaser: the field phaser is a MAUS-specific tool for automatically phasing fields, for example RF cavities, such that they ramp coincidentally with incoming particles. The FieldPhaser contains routines to fire test ("reference") particles through the accelerator lattice and phase fields appropriately. The FieldPhaser phasing routines are called after GEANT4 is first initialised.
 \item VirtualPlanes: the VirtualPlanes routines are designed to extract particle data from the GEANT4 tracking independently of the GEANT4 geometry. The VirtualPlanes routines watches for steps that step across some plane in physical space, or some time, or some proper time, and then interpolates from the step ends to the plane in question.
 \item FillMaterials: (legacy) the FillMaterials routines are used to initialise a number of specific 
@@ -222,8 +222,8 @@ The GEANT4 \emph{Action} objects provide interfaces for MAUS-specific function c
 \item MAUSEventAction: sets up the running for a particular inbound particle. At the beginning of each event, the virtual planes, tracking, detectors and stepping are all cleared. After the event the event data is pulled into the event data from each element.
 \item MAUSTrackingAction: is called when a new track is created or destroyed. If \verb|keep_tracks| datacard is set to True, on particle creation, MAUSTrackingAction writes the initial and final track position and momentum to the output data tree. If \verb|keep_steps| is set to True MAUSTrackingAction gets step data from MAUSSteppingAction and writes this also.
 \item MAUSSteppingAction: is called at each step of the particle. If \verb|keep_steps| datacard is set to True, output step data is recorded. MAUSSteppingAction kills particles if they exceed the \verb|maximum_number_of_steps| datacard. MAUSSteppingAction calls the VirtualPlanes routines on each step.
+\item MAUSStackingAction: is called when a new track is created, prioritising particle tracking. Handles killing particles based on the \verb|kinetic_energy_threshold|, \verb|default_keep_or_kill| and \verb|keep_or_kill_particles| datacards.
 \item MAUSPrimaryGeneratorAction: is called at the start of every event and sets the particle data for each event. In MAUS, this particle generation is handled externally and so the MAUSPrimaryGeneratorAction role is to look for the primary object on the Monte Carlo event and convert this into a GEANT4 event object.
-\item MAUSStackingActionKillNonMuons: is never initialised and should be removed.
 \end{itemize}
 
 \begin{table*}
@@ -264,6 +264,9 @@ Name & Meaning \\
 \verb|charged_pion_half_life| & Set the half life for charged pions.\\
 \verb|muon_half_life| & Set the half life for muons.\\
 \verb|production_threshold| & Set the geant4 production threshold.\\
+\verb|kinetic_energy_threshold| & Threshold for kinetic energy of new particles at production. Particles with kinetic energy below this value will not be tracked.\\
+\verb|default_keep_or_kill| & If set to \verb|true|, keep particles with type not listed in \verb|keep_or_kill_particles|. If set to \verb|false|, kill particles with type not listed in \verb|keep_or_kill_particles|\\
+\verb|keep_or_kill_particles| & Maps string particle type name to boolean flag. If set to true, always keep particles of this type. If set to false, always kill particles of this type. If not set, apply \verb|default_keep_or_kill|\\
 \begin{makeimage} % force latex2html to render as an html table 
 \end{makeimage} 
 \end{tabularx}

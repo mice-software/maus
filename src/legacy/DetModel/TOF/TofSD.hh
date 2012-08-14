@@ -7,7 +7,7 @@
 #define _TOFSD_HH_ 1
 
 #include "DetModel/MAUSSD.hh"
-#include "G4VSensitiveDetector.hh"
+#include "Geant4/G4VSensitiveDetector.hh"
 #include <json/json.h>
 #include <string>
 

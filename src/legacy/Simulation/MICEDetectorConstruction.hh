@@ -14,8 +14,8 @@
 #include <string>
 #include <vector>
 #include <json/json.h>
-#include "G4VUserDetectorConstruction.hh"
-#include "G4UniformMagField.hh"
+#include "Geant4/G4VUserDetectorConstruction.hh"
+#include "Geant4/G4UniformMagField.hh"
 
 #include "DetModel/MAUSSD.hh"  
 

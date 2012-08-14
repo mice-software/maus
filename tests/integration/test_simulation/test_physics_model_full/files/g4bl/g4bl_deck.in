@@ -1,0 +1,22 @@
+*	example2.in  4/2/03 TJR
+*
+* Simple example g4beamline file:
+*	There are 4 Study2 cooling cells.
+*	This version uses a Gaussian beam
+
+# QGSP is the "default" physics use-case for HEP
+physics QGSP_BIC
+param   maxStep=__step__
+
+beam gaussian meanMomentum=__momentum__ sigmaP=1e-15 sigmaXp=1e-15 sigmaYp=1e-15  \
+	firstEvent=__seed__*__nev__ nEvents=__nev__ beamZ=-500 particle=__pid__
+
+# define a detector for the center of each absorber
+virtualdetector Det radius=1000. length=1 format=for009 file=for009_g4bl
+tubs Absorber length=__thickness__ outerRadius=1000.0 color=1.0,0.0,1.0 material=__material__
+
+place Det z=-200.
+place Absorber
+place Det z=+200.
+
+

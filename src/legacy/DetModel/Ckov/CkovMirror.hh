@@ -10,21 +10,21 @@
 #ifndef CkovMirror_h
 #define CkovMirror_h 1
 
-#include "G4UnionSolid.hh"
-#include "G4SubtractionSolid.hh"
-#include "G4IntersectionSolid.hh"
-#include "G4Box.hh"
-#include "G4Cons.hh"
-#include "G4EllipticalCone.hh"
-#include "G4LogicalVolume.hh"
-#include "G4PVPlacement.hh"
+#include "Geant4/G4UnionSolid.hh"
+#include "Geant4/G4SubtractionSolid.hh"
+#include "Geant4/G4IntersectionSolid.hh"
+#include "Geant4/G4Box.hh"
+#include "Geant4/G4Cons.hh"
+#include "Geant4/G4EllipticalCone.hh"
+#include "Geant4/G4LogicalVolume.hh"
+#include "Geant4/G4PVPlacement.hh"
 
-#include "G4RotationMatrix.hh"
-#include "G4LogicalSkinSurface.hh"
-#include "G4OpBoundaryProcess.hh"
+#include "Geant4/G4RotationMatrix.hh"
+#include "Geant4/G4LogicalSkinSurface.hh"
+#include "Geant4/G4OpBoundaryProcess.hh"
 
-#include "G4ThreeVector.hh"
-#include "globals.hh"
+#include "Geant4/G4ThreeVector.hh"
+#include "Geant4/globals.hh"
 #include "Config/MiceModule.hh"
 #include <cmath> 
 

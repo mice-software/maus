@@ -18,9 +18,9 @@
 #include <string>
 #include <algorithm>
 
-#include "G4Track.hh"
-#include "G4Step.hh"
-#include "G4StepPoint.hh"
+#include "Geant4/G4Track.hh"
+#include "Geant4/G4Step.hh"
+#include "Geant4/G4StepPoint.hh"
 
 #include "json/json.h"
 

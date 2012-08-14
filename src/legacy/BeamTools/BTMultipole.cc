@@ -163,7 +163,7 @@ CLHEP::Hep3Vector BTMultipole::TransformToRotatedStraightEnds
     return CLHEP::Hep3Vector(Point[0], Point[1], Point[2]);
   double pos[3] = {Point[0], Point[1], Point[2]-0.5*(_length-_centreLength)};
   CLHEP::Hep3Vector trans = TransformToRotatedConstant(pos);
-  if (trans > _centreLength)
+  if (trans[2] > _centreLength)
     trans = _endRotation*(trans-_endPoint)+_endPoint;
   trans[2] += 0.5*(_length-_centreLength);
   return trans;

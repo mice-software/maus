@@ -9,7 +9,7 @@
 #ifndef _SPECIALVIRTUALSD_HH_
 #define _SPECIALVIRTUALSD_HH_  1
 
-#include "G4VSensitiveDetector.hh"
+#include "Geant4/G4VSensitiveDetector.hh"
 #include "Interface/SpecialHit.hh"
 #include "Config/MiceModule.hh"
 #include "Interface/MICEEvent.hh"

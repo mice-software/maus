@@ -12,11 +12,11 @@
 
 #include "Interface/MiceMaterials.hh"
 #include "Interface/dataCards.hh"
-#include "G4Material.hh"
-#include "G4IonisParamMat.hh"
-#include "G4Element.hh"
+#include "Geant4/G4Material.hh"
+#include "Geant4/G4IonisParamMat.hh"
+#include "Geant4/G4Element.hh"
 
-#include "G4NistManager.hh"
+#include "Geant4/G4NistManager.hh"
 #include "CLHEP/Units/PhysicalConstants.h"
 #include <math.h>
 
@@ -205,6 +205,8 @@ void  fillMaterials( MICERun& run )
 
 	double C = 1e-24*(m3);
 //	double C = run.DataCards->fetchValueDouble("AerogelClarity");
+	RayleighPhotE[0] = 0.;
+	RayleighSL[0]    = 0.;
 	for(unsigned int i=1;i<=63;i++)
 	{
 		RayleighPhotE[i] = ( 1.6 + i*5e-2 )*eV;
