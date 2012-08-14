@@ -225,20 +225,13 @@ class KSTest(BaseTest): #note inheritance from test pylint: disable=R0902
         """
         Return the maximum and minimum of the histogram
         """
-        (lower, upper) = -1, -1
+        (lower, upper) = None, None
         for ks_test in ks_test_list:
-            index = 0
             data_max = max(ks_test.content) #Probably 1
-            while ks_test.content[index] < 0.01*data_max and \
-                  index < len(ks_test.content):
-                index += 1
-            if ks_test.bins[index] < lower or lower < 0:
-                lower = ks_test.bins[index]
-            while ks_test.content[index] < 0.99*data_max and \
-                  index < len(ks_test.content):
-                index += 1
-            if ks_test.bins[index] > upper or upper < 0:
-                upper = ks_test.bins[index+1]
+            if lower == None or ks_test.bins[0] < lower:
+                lower = ks_test.bins[0]
+            if upper == None or ks_test.bins[-1] > upper:
+                upper = ks_test.bins[-1]
         return lower, upper
     hist_width = staticmethod(hist_width)
 

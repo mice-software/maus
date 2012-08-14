@@ -94,6 +94,24 @@ class TestFactory:
         )
         return code_parameters
 
+    def _get_min_max(var, bunch, n_sigma_cut, n_sigma_bins):
+        """
+        Return minimum and maximum bins
+        
+        Choose bin based on mean_x-n_sigma_bins*sigma_x; but we calculate
+        sigma_x and mean_x after applying a cut on the tails to remove outliers 
+        (at mean_x-n_sigma_bins*sigma_x. var is string variable, bunch is the
+        bunch.
+        """
+        mean_x = bunch.mean([var])[var]
+        sigma_x = bunch.moment([var, var])**0.5
+        bunch.cut({var:mean_x-sigma_x*n_sigma_cut}, operator.le)
+        bunch.cut({var:mean_x+sigma_x*n_sigma_cut}, operator.ge)
+        mean_x = bunch.mean([var])[var]
+        sigma_x = bunch.moment([var, var])**0.5
+        return [mean_x-sigma_x*n_sigma_bins, mean_x+sigma_x*n_sigma_bins]
+    _get_min_max = staticmethod(_get_min_max)
+
     def build_geometry(self, config):
         """Build and run a set of tests for a specific geometry set up"""
         geo = geometry.Geometry()
@@ -112,12 +130,12 @@ class TestFactory:
         for i, test in enumerate(geo.tests):
             test.pid = pid
             bunch.conditional_remove({'pid':pid}, operator.ne)
-            [xmin, xmax] = Common.min_max(
-                                bunch.list_get_hit_variable([test.variable])[0])
+            [xmin, xmax] = self._get_min_max(test.variable, bunch, 5, 5)
             xmin *= Common.units[test.units]
             xmax *= Common.units[test.units]
             test.bins = [xmin+(xmax-xmin)*x/float(test.n_bins) \
                                               for x in range(test.n_bins+1)]
+            print xmin, xmax
             geo.tests[i]  = test.run_test(bunch)
         print geo.name
         sys.stdout.flush()
