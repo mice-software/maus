@@ -4,7 +4,7 @@ directory=xboa-0.13.1
 filename=${directory}.tar.gz
 url=http://sourceforge.net/projects/xboa/files/${filename}/download
 
-my_prefix=install
+my_prefix=/install
 my_destdir=${MAUS_ROOT_DIR}/third_party
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then

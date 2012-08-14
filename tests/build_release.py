@@ -142,7 +142,7 @@ def main():
     print "Doing server build"
     build_user_guide()
     build_doxygen()
-    build_test_output()
+    #build_test_output()
     build_third_party_tarball()
     scp_in, version = copy_targets()
     if len(sys.argv) > 1:
