@@ -81,7 +81,7 @@ class MapCppTrackerMCDigitization {
 
   /** @brief builds digits and stores them in the SciFiEvent
    */
-  void construct_digits(MAUS::SciFiEvent &event);
+  void construct_digits(MAUS::SciFiEvent &event, int spill_num, int evnt_num);
 
   /** @brief computes npe from energy deposits.
    */
