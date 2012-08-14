@@ -227,7 +227,6 @@ class KSTest(BaseTest): #note inheritance from test pylint: disable=R0902
         """
         (lower, upper) = None, None
         for ks_test in ks_test_list:
-            data_max = max(ks_test.content) #Probably 1
             if lower == None or ks_test.bins[0] < lower:
                 lower = ks_test.bins[0]
             if upper == None or ks_test.bins[-1] > upper:
