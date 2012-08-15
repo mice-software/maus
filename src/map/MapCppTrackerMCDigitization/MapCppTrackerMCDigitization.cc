@@ -34,9 +34,9 @@ bool MapCppTrackerMCDigitization::birth(std::string argJsonConfigDocument) {
 
   // Get the tracker modules; they will be necessary
   // for the channel number calculation
-  assert(_configJSON.isMember("reconstruction_geometry_filename"));
+  assert(_configJSON.isMember("simulation_geometry_filename"));
   std::string filename;
-  filename = _configJSON["reconstruction_geometry_filename"].asString();
+  filename = _configJSON["simulation_geometry_filename"].asString();
   _module = new MiceModule(filename);
   modules = _module->findModulesByPropertyString("SensitiveDetector", "SciFi");
 
