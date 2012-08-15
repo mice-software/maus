@@ -157,7 +157,6 @@ def build_title(canvas, name):
     canvas.Update()
     LEGENDS.append(leg2)
 
-
 def plot(file_list):
     """
     Main loop - load geometry and tests, sort geometry by name, then sort 

@@ -94,7 +94,7 @@ class TestFactory:
         )
         return code_parameters
 
-    def _get_min_max(var, bunch, n_sigma_cut, n_sigma_bins):
+    def _get_min_max(var, bunch): # pylint: disable=R0914
         """
         Return minimum and maximum bins
         
@@ -103,20 +103,55 @@ class TestFactory:
         (at mean_x-n_sigma_bins*sigma_x. var is string variable, bunch is the
         bunch.
         """
-        mean_x = bunch.mean([var])[var]
-        sigma_x = bunch.moment([var, var])**0.5
-        bunch.cut({var:mean_x-sigma_x*n_sigma_cut}, operator.le)
-        bunch.cut({var:mean_x+sigma_x*n_sigma_cut}, operator.ge)
-        mean_x = bunch.mean([var])[var]
-        sigma_x = bunch.moment([var, var])**0.5
-        return [mean_x-sigma_x*n_sigma_bins, mean_x+sigma_x*n_sigma_bins]
+        # iterates over histogrammed bunch and looks for impurity
+        # better to use raw data...
+        impurity = 100./bunch.bunch_weight()
+        if impurity > 0.01:
+            impurity = 0.01
+        mean = bunch.mean([var])[var]
+        sigma = bunch.moment([var, var])**0.5
+        n_bins = len(bunch)/100
+        min_max = [mean-5.*sigma, mean+5.*sigma]
+        for count in range(2): # pylint: disable=W0612
+            bins = [min_max[0]+i*(min_max[1]-min_max[0])/float(n_bins) \
+                                                         for i in range(n_bins)]
+            hist = bunch.histogram_var_bins(var, bins, '')
+            values = [item[0] for item in hist[0]] # get rid of numpy array
+            min_max = [None, None]
+            sum_wt = 0.
+            for index, val in enumerate(values):
+                sum_wt += val/sum(values)
+                if min_max[0] == None and sum_wt > impurity/2.:
+                    min_max[0] = bins[index]
+                if min_max[1] == None and sum_wt > 1.-impurity/2.:
+                    min_max[1] = bins[index+1]
+            if min_max[0] == None:
+                min_max[0] = bins[0]
+            if min_max[1] == None:
+                min_max[1] = bins[-1]
+        return min_max
     _get_min_max = staticmethod(_get_min_max)
+
+    def build_ks_test(self, test, config, bunch):
+        """
+        Build a ks test based on a configuration and bunch data
+        """
+        pid = config['__pid__']
+        test.pid = pid
+        bunch.conditional_remove({'pid':pid}, operator.ne)
+        [xmin, xmax] = self._get_min_max(test.variable, bunch)
+        xmin *= Common.units[test.units]
+        xmax *= Common.units[test.units]
+        test.n_bins = config['__nev__']/100
+        test.content = [index for index in range(test.n_bins)]
+        test.bins = [xmin+(xmax-xmin)*x/float(test.n_bins) \
+                                          for x in range(test.n_bins+1)]
+        return test
 
     def build_geometry(self, config):
         """Build and run a set of tests for a specific geometry set up"""
         geo = geometry.Geometry()
         #first setup the geometry basics
-        pid      = config['__pid__']
         geo.name = self.make_name(config)
         geo.code_model = self.code_parameters()
         geo.substitutions = self.code_convert(config)
@@ -128,14 +163,7 @@ class TestFactory:
         bunch = geo.read_bunch()
         #adjust the geometry
         for i, test in enumerate(geo.tests):
-            test.pid = pid
-            bunch.conditional_remove({'pid':pid}, operator.ne)
-            [xmin, xmax] = self._get_min_max(test.variable, bunch, 5, 5)
-            xmin *= Common.units[test.units]
-            xmax *= Common.units[test.units]
-            test.bins = [xmin+(xmax-xmin)*x/float(test.n_bins) \
-                                              for x in range(test.n_bins+1)]
-            print xmin, xmax
+            test = self.build_ks_test(test, config, bunch)
             geo.tests[i]  = test.run_test(bunch)
         print geo.name
         sys.stdout.flush()
@@ -149,6 +177,7 @@ class TestFactory:
         fout = open(fout_name, 'w')
         print >> fout, '[\n'
         for config in configurations:
+            print config
             try:
                 geo = self.build_geometry(config)
                 print >> fout, repr(geo),','

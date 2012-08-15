@@ -27,7 +27,7 @@ def main():
     Search for test data in geometry.ref_data('./') and geometry.temp('./'); if
     found, plot it
     """
-    reference_data = glob.glob(geometry.ref_data("*ref_data.dat"))
+    reference_data = glob.glob(geometry.ref_data("g4bl.test.ref_data.dat"))
     test_data = glob.glob(geometry.ref_data("*test_data.dat"))
     plotter.plot(reference_data+test_data)
 

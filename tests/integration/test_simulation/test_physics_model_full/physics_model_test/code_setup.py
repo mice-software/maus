@@ -199,7 +199,8 @@ class IcoolSetup(CodeSetup):
               'Be':'BE',
               'lHe':'LHE',
               'STEEL304':'FE',
-              'Cu':'CU'
+              'Cu':'CU',
+              'C':'C',
         }
         return conversions[value]
 
@@ -263,7 +264,7 @@ class G4blSetup(CodeSetup):
         """Does nothing"""
         conversions = {
             'lH2':'LH2', 'LITHIUM_HYDRIDE':'LITHIUM_HYDRIDE', 'Al':'Al', 
-            'Be':'Be', 'lHe':'lHe', 'STEEL304':'Fe','Cu':'Cu'
+            'Be':'Be', 'lHe':'lHe', 'STEEL304':'Fe','Cu':'Cu', 'C':'C',
         }
         return conversions[value] 
 

@@ -261,7 +261,7 @@ class KSTest(BaseTest): #note inheritance from test pylint: disable=R0902
         h_start = len(BaseTest._hists)
         hist = xboa.Common.make_root_histogram(
                   name+'-'+str(len(BaseTest._hists)),
-                  [], name, n_x_bins = 10000, xmin=lower, xmax=upper, ymin=0.,
+                  [], name, n_x_bins = 10000, xmin=lower, xmax=upper, ymin=1e-8,
                   line_color=10)
         hist.Draw()
         BaseTest._hists.append(hist)
@@ -281,6 +281,7 @@ class KSTest(BaseTest): #note inheritance from test pylint: disable=R0902
             hist.SetLineColor(color)
             hist.SetStats(False)
             hist.Draw('same')
+        canv.SetLogy()
         canv.Update()
         return (canv, BaseTest._hists[h_start:len(BaseTest._hists)])
     make_plots = staticmethod(make_plots)
