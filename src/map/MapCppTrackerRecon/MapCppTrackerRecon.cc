@@ -224,7 +224,7 @@ void MapCppTrackerRecon::fill_digits_vector(Json::Value &digits, SciFiSpill &a_s
     for ( unsigned int j = 0; j < digits_merged.size(); j++ ) {
       Json::Value digit;
       digit = digits_merged[j];
-      int tracker, station, plane, channel;
+      int tracker, station, plane, channel, spill, event;
       double npe, time;
       spill   = digit["phys_evt_num"].asInt();
       event   = digit["part_evt_num"].asInt();

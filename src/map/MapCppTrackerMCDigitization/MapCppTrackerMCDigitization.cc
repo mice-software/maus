@@ -169,7 +169,8 @@ bool MapCppTrackerMCDigitization::check_sanity_mc(Json::Value mc) {
 }
 
 
-void MapCppTrackerMCDigitization::construct_digits(MAUS::SciFiEvent &evt, int spill_num, int evnt_num) {
+void MapCppTrackerMCDigitization::construct_digits
+    (MAUS::SciFiEvent &evt, int spill_num, int evnt_num) {
   int number_of_hits = evt.hits().size();
   for ( int hit_i = 0; hit_i < number_of_hits; hit_i++ ) {
     if ( !evt.hits()[hit_i]->GetChannelId()->GetUsed() ) {
