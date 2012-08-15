@@ -225,20 +225,12 @@ class KSTest(BaseTest): #note inheritance from test pylint: disable=R0902
         """
         Return the maximum and minimum of the histogram
         """
-        (lower, upper) = -1, -1
+        (lower, upper) = None, None
         for ks_test in ks_test_list:
-            index = 0
-            data_max = max(ks_test.content) #Probably 1
-            while ks_test.content[index] < 0.01*data_max and \
-                  index < len(ks_test.content):
-                index += 1
-            if ks_test.bins[index] < lower or lower < 0:
-                lower = ks_test.bins[index]
-            while ks_test.content[index] < 0.99*data_max and \
-                  index < len(ks_test.content):
-                index += 1
-            if ks_test.bins[index] > upper or upper < 0:
-                upper = ks_test.bins[index+1]
+            if lower == None or ks_test.bins[0] < lower:
+                lower = ks_test.bins[0]
+            if upper == None or ks_test.bins[-1] > upper:
+                upper = ks_test.bins[-1]
         return lower, upper
     hist_width = staticmethod(hist_width)
 
@@ -269,7 +261,7 @@ class KSTest(BaseTest): #note inheritance from test pylint: disable=R0902
         h_start = len(BaseTest._hists)
         hist = xboa.Common.make_root_histogram(
                   name+'-'+str(len(BaseTest._hists)),
-                  [], name, n_x_bins = 10000, xmin=lower, xmax=upper, ymin=0.,
+                  [], name, n_x_bins = 10000, xmin=lower, xmax=upper, ymin=1e-8,
                   line_color=10)
         hist.Draw()
         BaseTest._hists.append(hist)
@@ -289,6 +281,7 @@ class KSTest(BaseTest): #note inheritance from test pylint: disable=R0902
             hist.SetLineColor(color)
             hist.SetStats(False)
             hist.Draw('same')
+        canv.SetLogy()
         canv.Update()
         return (canv, BaseTest._hists[h_start:len(BaseTest._hists)])
     make_plots = staticmethod(make_plots)

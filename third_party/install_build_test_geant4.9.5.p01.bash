@@ -16,6 +16,6 @@ bash third_party/bash/34geant4.9.5-data.bash
 source env_geant4.9.5.p01.sh
 scons -c
 scons -j8
-bash tests/unit_tests.bash
+bash tests/run_tests.bash
 
 
