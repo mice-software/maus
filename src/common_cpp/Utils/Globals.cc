@@ -65,8 +65,12 @@ dataCards* Globals::GetLegacyCards() {
     return GetInstance()->_legacy_cards;
 }
 
-BTFieldConstructor* Globals::GetBTFieldConstructor() {
-    return GetInstance()->_field_constructor;
+BTFieldConstructor* Globals::GetMCFieldConstructor() {
+    return GetInstance()->_mc_field_constructor;
+}
+
+BTFieldConstructor* Globals::GetReconFieldConstructor() {
+    return GetInstance()->_recon_field_constructor;
 }
 
 MAUSGeant4Manager* Globals::GetGeant4Manager() {

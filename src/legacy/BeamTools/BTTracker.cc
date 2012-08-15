@@ -2,7 +2,7 @@
 #include "BTField.hh"
 #include "BTTracker.hh"
 #include "Interface/Squeal.hh"
-#include "Interface/MICERun.hh"
+#include "src/common_cpp/Utils/Globals.hh"
 
 #include "CLHEP/Vector/Rotation.h"
 #include "CLHEP/Vector/ThreeVector.h"
@@ -56,8 +56,8 @@ void BTTracker::integrate(double target_indie, double* y, const BTField* field, 
   _rotback = rot.inverse();
 
   //Probably not the most efficient, but only does it once per integrate call
-  _absoluteError = MICERun::getInstance()->DataCards->fetchValueDouble("VirtualAbsoluteError");
-  _relativeError = MICERun::getInstance()->DataCards->fetchValueDouble("VirtualRelativeError");
+  _absoluteError = (*MAUS::Globals::GetInstance()->GetConfigurationCards())["field_tracker_absolute_error"].asDouble();
+  _absoluteError = (*MAUS::Globals::GetInstance()->GetConfigurationCards())["field_tracker_relative_error"].asDouble();
 
   double indie  = 0.;
   switch (indep)
@@ -381,9 +381,9 @@ void BTTracker::integrateMany(double target_indie, int n_events, double* y, doub
   int (*FuncEqM)(double z, const double y[], double f[], void *params)=NULL;
 
   //Probably not the most efficient, but only does it once per integrate call
-  _absoluteError = MICERun::getInstance()->DataCards->fetchValueDouble("VirtualAbsoluteError");
-  _relativeError = MICERun::getInstance()->DataCards->fetchValueDouble("VirtualRelativeError");
-  _maxNSteps     = MICERun::getInstance()->DataCards->fetchValueInt("MaxStepsWOELoss");
+  _absoluteError = (*MAUS::Globals::GetInstance()->GetConfigurationCards())["field_tracker_absolute_error"].asDouble();
+  _relativeError = (*MAUS::Globals::GetInstance()->GetConfigurationCards())["field_tracker_relative_error"].asDouble();
+  _maxNSteps     = (*MAUS::Globals::GetInstance()->GetConfigurationCards())["maximum_number_of_steps"].asInt();
 
   _nevents    = n_events;
   _charges    = charge;

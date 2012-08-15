@@ -85,6 +85,8 @@ keep_or_kill_particles = {"mu+":True, "mu-":True,
                           "nu_tau":False, "antu_nu_tau":False,
 }
 kinetic_energy_threshold = 0.1 # kill tracks with initial kinetic energy below energy_threshold
+field_tracker_absolute_error = 1.e-4 # set absolute error on MAUS internal stepping routines - used by e.g. VirtualPlanes to control accuracy of interpolation
+field_tracker_relative_error = 1.e-4 # set relative error on MAUS internal stepping routines - used by e.g. VirtualPlanes to control accuracy of interpolation
 
 # geant4 visualisation (not event display)
 geant4_visualisation = False
