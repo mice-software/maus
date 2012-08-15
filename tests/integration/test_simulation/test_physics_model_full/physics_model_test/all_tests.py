@@ -281,7 +281,6 @@ class KSTest(BaseTest): #note inheritance from test pylint: disable=R0902
             hist.SetLineColor(color)
             hist.SetStats(False)
             hist.Draw('same')
-        canv.SetLogy()
         canv.Update()
         return (canv, BaseTest._hists[h_start:len(BaseTest._hists)])
     make_plots = staticmethod(make_plots)
