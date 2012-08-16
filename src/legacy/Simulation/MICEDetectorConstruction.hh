@@ -38,7 +38,7 @@ class TofSD;
 class MICEDetectorConstruction : public G4VUserDetectorConstruction {
 
 public:
-  MICEDetectorConstruction( MICERun& run );
+  MICEDetectorConstruction(MiceModule* model, Json::Value* cards);
 
   ~MICEDetectorConstruction();
 
@@ -57,37 +57,30 @@ private:
 
   std::vector<MAUS::MAUSSD*> _SDs; // todo: add get/set 
   
-  void		addDaughter( MiceModule*, G4VPhysicalVolume* );
+  void  addDaughter( MiceModule*, G4VPhysicalVolume* );
 
+  void  setUserLimits( G4LogicalVolume*, MiceModule* );
 
-  void		setUserLimits( G4LogicalVolume*, MiceModule* );
-
-  void		setMagneticField( G4LogicalVolume*, MiceModule* );
+  void  setMagneticField( G4LogicalVolume*, MiceModule* );
 
   //Set G4 Stepping Accuracy parameters
-  void		setSteppingAccuracy();
+  void  setSteppingAccuracy();
   //Set G4 Stepping Algorithm
-  void		setSteppingAlgorithm();
+  void  setSteppingAlgorithm();
 
   //Build a Q35 using Q35.hh methods
   G4LogicalVolume* BuildQ35(MiceModule * mod);
 
-  MICEEvent*			_event;
-
-  MiceModule*			_model;
-  MiceMaterials*		_materials;
+  MICEEvent* _event;
+  MiceModule* _model;
+  MiceMaterials* _materials;
   Json::Value* _cards;
-
-  G4LogicalVolume*		MICEExpHallLog;
-  BTFieldConstructor *		_btField;
-  MiceMagneticField *		_miceMagneticField;
-  MiceElectroMagneticField *	_miceElectroMagneticField;
-
-  static const double		_pillBoxSpecialVirtualLength;
-  G4UniformMagField* 		magField;
-  TofSD*			_tofSD;
-  bool				_checkVolumes;
-  MICERun& _simRun;
+  G4LogicalVolume* MICEExpHallLog;
+  BTFieldConstructor* _btField;
+  MiceMagneticField* _miceMagneticField;
+  MiceElectroMagneticField* _miceElectroMagneticField;
+  TofSD* _tofSD;
+  bool _checkVolumes;
 };
 
 #endif

@@ -72,17 +72,15 @@
 
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 
-const double MICEDetectorConstruction::_pillBoxSpecialVirtualLength = 1.e-6*mm;
-
-MICEDetectorConstruction::MICEDetectorConstruction( MICERun& run ) : _simRun(*MICERun::getInstance()), _checkVolumes(false)
+MICEDetectorConstruction::MICEDetectorConstruction(MiceModule* model, Json::Value* cards) : _checkVolumes(false)
 {
   _event = new MICEEvent();
-  _model = run.miceModule;
-  _cards = MAUS::Globals::GetInstance()->GetConfigurationCards();
-  run.miceMaterials = fillMaterials(NULL);
+  _model = model;
+  _cards = cards;
  
-  _materials = run.miceMaterials;
-  _checkVolumes = (*_cards)["check_volume_overlaps"].asBool();
+  _materials = fillMaterials(NULL);
+  _checkVolumes = JsonWrapper::GetProperty
+        (*_cards, "check_volume_overlaps", JsonWrapper::booleanValue).asBool();
   if (_cards == NULL)
     throw(Squeal(Squeal::recoverable,
                  "Failed to acquire datacards",
@@ -103,9 +101,6 @@ MICEDetectorConstruction::~MICEDetectorConstruction() {
 
 G4VPhysicalVolume* MICEDetectorConstruction::Construct()
 {
-  bool checkVolumes = JsonWrapper::GetProperty
-        (*_cards, "check_volume_overlaps", JsonWrapper::booleanValue).asBool();
-
   G4Box* MICEExpHallBox = new G4Box( _model->name(), _model->dimensions().x(),
                            _model->dimensions().y(), _model->dimensions().z() );
   G4Material* hallMat = _materials->materialByName
@@ -114,7 +109,7 @@ G4VPhysicalVolume* MICEDetectorConstruction::Construct()
                            ( MICEExpHallBox, hallMat, _model->name(), 0, 0, 0 );
 
   G4PVPlacement* MICEExpHall = new G4PVPlacement( 0, G4ThreeVector(),
-                     _model->name(), MICEExpHallLog, 0, false, 0, checkVolumes);
+                   _model->name(), MICEExpHallLog, 0, false, 0, _checkVolumes);
 
   G4VisAttributes* vis = new G4VisAttributes( false );
 
@@ -124,11 +119,11 @@ G4VPhysicalVolume* MICEDetectorConstruction::Construct()
 
   setBTMagneticField( _model );
   // turn on cout if check volumes is active
-  if(checkVolumes) Squeak::setStandardOutputs(0);
+  if(_checkVolumes) Squeak::setStandardOutputs(0);
   for( int i = 0; i < _model->daughters(); ++i )
     addDaughter( _model->daughter( i ), MICEExpHall );
   // turn cout back to default mode if check volumes is active
-  if(checkVolumes) Squeak::setStandardOutputs(-1);
+  if(_checkVolumes) Squeak::setStandardOutputs(-1);
   return MICEExpHall;
 }
 
@@ -310,7 +305,7 @@ void MICEDetectorConstruction::setBTMagneticField(MiceModule* rootModule)
   _miceElectroMagneticField = new MiceElectroMagneticField(_btField);
   setSteppingAlgorithm();
   setSteppingAccuracy();
-  _simRun.btFieldConstructor = _btField;
+  MICERun::getInstance()->btFieldConstructor = _btField;
 
 }
 
@@ -437,7 +432,7 @@ void MICEDetectorConstruction::setSteppingAccuracy()
 }
 
 Json::Value MICEDetectorConstruction::GetSDHits(int i){
-  if (i >= 0 and ((size_t) i) < _SDs.size() and _SDs[i]){
+  if (i >= 0 and ((size_t) i) < _SDs.size() and _SDs[i]) {
     if (_SDs[i]->isHit()) {
       return _SDs[i]->GetHits();
     }

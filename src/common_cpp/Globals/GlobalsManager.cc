@@ -85,7 +85,7 @@ void GlobalsManager::InitialiseGlobals(std::string json_datacards) {
             process->_recon_field_constructor = process->_mc_field_constructor;
         } else {
             process->_recon_field_constructor =
-                                 new BTFieldConstructor( process->_recon_mods);
+                                 new BTFieldConstructor(process->_recon_mods);
         }
     } catch(Squeal squee) {
         Globals::_process = NULL;

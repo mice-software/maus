@@ -51,7 +51,9 @@ MAUSGeant4Manager::MAUSGeant4Manager() {
     _visManager = NULL;  // set by GetVisManager
     SetVisManager();
     _runManager = new G4RunManager;
-    _detector   = new MICEDetectorConstruction(*MICERun::getInstance());
+    MiceModule* model = Globals::GetInstance()->GetMonteCarloMiceModules();
+    Json::Value* cards = Globals::GetInstance()->GetConfigurationCards();
+    _detector   = new MICEDetectorConstruction(model, cards );
     _runManager->SetUserInitialization(_detector);
 
     _physList = MAUSPhysicsList::GetMAUSPhysicsList();
