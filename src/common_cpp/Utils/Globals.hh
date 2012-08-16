@@ -26,7 +26,6 @@
 class Squeak;
 class dataCards;
 class MICERun;
-class MiceMaterials;
 class MiceModule;
 class BTFieldConstructor;
 
@@ -158,7 +157,6 @@ class Globals {
     BTFieldConstructor* _mc_field_constructor;
     BTFieldConstructor* _recon_field_constructor;
     MAUSGeant4Manager* _maus_geant4_manager;
-    MiceMaterials* _mice_materials;
     static Globals* _process;
     // responsible for construction etc
     friend class GlobalsManager;

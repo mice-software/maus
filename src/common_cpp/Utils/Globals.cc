@@ -45,7 +45,7 @@ bool Globals::HasInstance() {
 Globals::Globals()
   : _configuration_cards(NULL), _legacy_mice_run(NULL), _error_handler(NULL),
     _legacy_cards(NULL), _run_action_manager(NULL), _mc_mods(NULL),
-    _recon_mods(NULL), _maus_geant4_manager(NULL), _mice_materials(NULL) {
+    _recon_mods(NULL), _maus_geant4_manager(NULL) {
 }
 
 // in all the below I call GetInstance() to check that _process is initialised
