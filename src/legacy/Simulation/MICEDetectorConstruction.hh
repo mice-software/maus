@@ -20,6 +20,7 @@
 #include "DetModel/MAUSSD.hh"  
 
 #include "Interface/MICERun.hh"
+#include "Interface/MiceMaterials.hh"
 
 #include "BeamTools/BTFieldConstructor.hh"
 #include "EngModel/MiceMagneticField.hh"
@@ -33,11 +34,11 @@ class G4VSolid;
 class MICEEvent;
 class TofSD;
 
-class MICEDetectorConstruction : public G4VUserDetectorConstruction
-{
+
+class MICEDetectorConstruction : public G4VUserDetectorConstruction {
 
 public:
-  MICEDetectorConstruction( MICERun&);
+  MICEDetectorConstruction( MICERun& run );
 
   ~MICEDetectorConstruction();
 
@@ -75,17 +76,18 @@ private:
 
   MiceModule*			_model;
   MiceMaterials*		_materials;
+  Json::Value* _cards;
+
   G4LogicalVolume*		MICEExpHallLog;
   BTFieldConstructor *		_btField;
   MiceMagneticField *		_miceMagneticField;
   MiceElectroMagneticField *	_miceElectroMagneticField;
-  MICERun&                      _simRun;
-  bool _hasBTFields;
 
   static const double		_pillBoxSpecialVirtualLength;
   G4UniformMagField* 		magField;
   TofSD*			_tofSD;
   bool				_checkVolumes;
+  MICERun& _simRun;
 };
 
 #endif
