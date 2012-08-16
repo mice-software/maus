@@ -135,17 +135,22 @@ TEST_F(GlobalsTest, TestAccessors) {
     GlobalsManager::InitialiseGlobals(str);
     EXPECT_NE(Globals::GetInstance(),
               static_cast<Globals*>(NULL));
+    std::cerr << "RUNACTION" << std::endl;
     test_accessors(Globals::GetRunActionManager,
                    GlobalsManager::SetRunActionManager,
                    static_cast<RunActionManager*>(NULL));
+    std::cerr << "LEGACY" << std::endl;
     test_accessors(Globals::GetLegacyCards,
                    GlobalsManager::SetLegacyCards, new dataCards());
+    std::cerr << "MCMOD" << std::endl;
     test_accessors(Globals::GetMonteCarloMiceModules,
                    GlobalsManager::SetMonteCarloMiceModules,
                    new MiceModule());
+    std::cerr << "RECONMOD" << std::endl;
     test_accessors(Globals::GetReconstructionMiceModules,
                    GlobalsManager::SetReconstructionMiceModules,
                    new MiceModule());
+    std::cerr << "DONE" << std::endl;
 /*
     test_accessors(Globals::GetBTFieldConstructor,
                    GlobalsManager::SetBTFieldConstructor,
@@ -161,6 +166,7 @@ TEST_F(GlobalsTest, TestAccessors) {
                    static_cast<MAUSGeant4Manager*>(NULL));
 */
     GlobalsManager::DeleteGlobals();
+    std::cerr << "DELETE" << std::endl;
 }
 }
 

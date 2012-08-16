@@ -151,14 +151,16 @@ void GlobalsManager::DeleteGlobals() {
 
 void GlobalsManager::SetReconstructionMiceModules
                                                       (MiceModule* recon_mods) {
-    if (Globals::GetInstance()->_recon_mods != NULL) {
+    if (Globals::GetInstance()->_recon_mods != NULL &&
+      Globals::GetInstance()->_recon_mods != Globals::GetInstance()->_mc_mods) {
         delete Globals::_process->_recon_mods;
     }
     Globals:: _process->_recon_mods = recon_mods;
 }
 
 void GlobalsManager::SetMonteCarloMiceModules(MiceModule* mc_mods) {
-    if (Globals::GetInstance()->_mc_mods != NULL) {
+    if (Globals::GetInstance()->_mc_mods != NULL &&
+      Globals::GetInstance()->_recon_mods != Globals::GetInstance()->_mc_mods) {
         delete Globals::_process->_mc_mods;
     }
     Globals::_process->_mc_mods = mc_mods;

@@ -57,7 +57,7 @@ void BTTracker::integrate(double target_indie, double* y, const BTField* field, 
 
   //Probably not the most efficient, but only does it once per integrate call
   _absoluteError = (*MAUS::Globals::GetInstance()->GetConfigurationCards())["field_tracker_absolute_error"].asDouble();
-  _absoluteError = (*MAUS::Globals::GetInstance()->GetConfigurationCards())["field_tracker_relative_error"].asDouble();
+  _relativeError = (*MAUS::Globals::GetInstance()->GetConfigurationCards())["field_tracker_relative_error"].asDouble();
 
   double indie  = 0.;
   switch (indep)
