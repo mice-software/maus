@@ -45,7 +45,7 @@
 #include "src/common_cpp/DataStructure/SciFiCluster.hh"
 #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
 #include "src/common_cpp/DataStructure/SciFiEvent.hh"
-#include "src/common_cpp/DataStructure/SciFiSpill.hh"
+#include "src/common_cpp/DataStructure/Spill.hh"
 #include "src/common_cpp/Recon/SciFi/RealDataDigitization.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiClusterRec.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePointRec.hh"
@@ -70,40 +70,57 @@ class MapCppTrackerRecon {
    */
   bool death();
 
-  /** process JSON document
+  /** Process JSON document
    *
-   *  Receive a document with MC hits and return
-   *  a document with digits
+   *  Receive a document with digits (either MC or real) and then call the higher level
+   *  reconstruction algorithms
+   * 
    * \param document a line/spill from the JSON input
    */
   std::string process(std::string document);
 
-  /** fills digits from MC digitization
-   *
-   *  \param digits the MC digits
-   *  \param a_spill the SciFiSpill we are processing
-   */
-  void fill_digits_vector(Json::Value &digits, MAUS::SciFiSpill &a_spill);
-
-  /** performs the cluster reconstruction
+  /** Performs the cluster reconstruction
    *
    *  \param evt the current SciFiEvent
    */
   void cluster_recon(MAUS::SciFiEvent &evt);
 
-  /** performs the spacepoint reconstruction
+  /** Performs the spacepoint reconstruction
    *
    *  \param evt the current SciFiEvent
    */
   void spacepoint_recon(MAUS::SciFiEvent &evt);
 
+  /** Performs the pattern recogniton
+   *
+   *  Pattern Recogntion identifies which spacepoints are associate with particle tracks,
+   *  then fits functions to the tracks using simple least squared fitting 
+   * 
+   *  \param evt the current SciFiEvent
+   */
   void pattern_recognition(MAUS::SciFiEvent &evt);
 
   // void make_seed_and_fit(MAUS::SciFiEvent &event);
 
+  /** Performs the final track fit
+   *
+   *  Track fit takes the spacepoints from Pattern Recognition and, going back to the clusters
+   *  which formed the spacepoints, fits the tracks more acurately using a Kalman filter
+   *
+   *  \param evt the current SciFiEvent
+   */
   void track_fit(MAUS::SciFiEvent &evt);
 
-  void save_to_json(MAUS::SciFiEvent &evt, int event_i);
+  /** Takes json data and returns a Sc
+   *
+   *  Track fit takes the spacepoints from Pattern Recognition and, going back to the clusters
+   *  which formed the spacepoints, fits the tracks more acurately using a Kalman filter
+   *
+   *  \param evt the current SciFiEvent
+   */
+  MAUS::Spill read_in_json(std::string json_data);
+
+  void save_to_json(MAUS::Spill &spill);
 
   void print_event_info(MAUS::SciFiEvent &event);
 
