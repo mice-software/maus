@@ -55,6 +55,7 @@ BTFieldConstructor::BTFieldConstructor(MiceModule * rootModule) :
 
 BTFieldConstructor::~BTFieldConstructor() {
     MAUS::SectorMagneticFieldMap::ClearFieldCache();
+    std::cerr << "DELETE field" << std::endl;
 }
 
 void BTFieldConstructor::BuildFields(MiceModule * rootModule)

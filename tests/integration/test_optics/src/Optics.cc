@@ -843,7 +843,7 @@ namespace Optimiser
     if(g_rebuild_simulation)
     {
       Squeak::mout(Squeak::debug) << "Rebuilding fields" << std::endl;
-      BTFieldConstructor*   field   = (BTFieldConstructor*)MICERun::getInstance()->btFieldConstructor;
+      BTFieldConstructor*   field   = (BTFieldConstructor*)MAUS::Globals::GetInstance()->GetMCFieldConstructor();
       BTFieldGroup*         mfield  = (BTFieldGroup*)field->GetMagneticField();
       BTFieldGroup*         emfield = (BTFieldGroup*)field->GetElectroMagneticField();
       std::vector<BTField*> field_v = mfield->GetFields();
@@ -857,7 +857,7 @@ namespace Optimiser
       emfield->Close();
       Squeak::mout(Squeak::debug) << "Deleted fields" << std::endl;
       field->BuildFields(g_root_mod);
-      MICERun::getInstance()->btFieldConstructor->Print(Squeak::mout(Squeak::debug)); 
+      field->Print(Squeak::mout(Squeak::debug)); 
     }
     std::vector<double> score = GetScore();
     for(int i=0; i<int(g_parameters.size()); i++)

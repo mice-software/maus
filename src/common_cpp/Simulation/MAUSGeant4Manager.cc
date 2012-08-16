@@ -71,7 +71,7 @@ MAUSGeant4Manager::MAUSGeant4Manager() {
     _runManager->SetUserAction(new MAUSRunAction);
     _virtPlanes = new VirtualPlaneManager;
     _virtPlanes->ConstructVirtualPlanes(
-      MICERun::getInstance()->btFieldConstructor,
+      GetField(),
       MICERun::getInstance()->miceModule
     );
     _runManager->Initialize();

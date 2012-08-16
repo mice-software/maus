@@ -305,8 +305,6 @@ void MICEDetectorConstruction::setBTMagneticField(MiceModule* rootModule)
   _miceElectroMagneticField = new MiceElectroMagneticField(_btField);
   setSteppingAlgorithm();
   setSteppingAccuracy();
-  MICERun::getInstance()->btFieldConstructor = _btField;
-
 }
 
 //Set G4 Stepping Algorithm for BTFields

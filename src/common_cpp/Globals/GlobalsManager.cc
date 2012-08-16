@@ -46,7 +46,6 @@ void GlobalsManager::InitialiseGlobals(std::string json_datacards) {
     // initialisation. Beware!
     Globals::_process = process;
     try {
-
         Json::Value config = JsonWrapper::StringToJson(json_datacards);
         process->_configuration_cards = new Json::Value(config);
         process->_legacy_mice_run = MICERun::getInstance();
@@ -78,8 +77,7 @@ void GlobalsManager::InitialiseGlobals(std::string json_datacards) {
         }
         process->_legacy_mice_run->miceModule = process->_mc_mods;
         process->_maus_geant4_manager = MAUSGeant4Manager::GetInstance();
-        process->_mc_field_constructor =
-                                     MICERun::getInstance()->btFieldConstructor;
+        process->_mc_field_constructor = process->_maus_geant4_manager->GetField();
         process->_mc_field_constructor->Print(Squeak::mout(Squeak::info));
         if (process->_recon_mods == process->_mc_mods) {
             process->_recon_field_constructor = process->_mc_field_constructor;

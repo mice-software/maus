@@ -53,6 +53,8 @@ public:
 
   int GetSDSize() { return _SDs.size(); }
 
+  BTFieldConstructor* GetField() {return _btField;}
+
 private:
 
   std::vector<MAUS::MAUSSD*> _SDs; // todo: add get/set 
