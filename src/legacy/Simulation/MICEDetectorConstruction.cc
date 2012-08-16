@@ -78,8 +78,8 @@ MICEDetectorConstruction::MICEDetectorConstruction( MICERun& run ) : _simRun(*MI
 {
   _event = new MICEEvent();
   _model = run.miceModule;
-  run.miceMaterials = new MiceMaterials();
-  fillMaterials(*MICERun::getInstance());
+  run.miceMaterials = fillMaterials(NULL);
+  
   _materials = run.miceMaterials;
   _checkVolumes = (*MAUS::Globals::GetConfigurationCards())["check_volume_overlaps"].asBool();
   _hasBTFields = false;
