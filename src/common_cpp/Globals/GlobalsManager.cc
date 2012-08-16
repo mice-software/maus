@@ -18,9 +18,7 @@
 #include "src/legacy/Interface/Squeal.hh"
 #include "src/legacy/Interface/Squeak.hh"
 #include "src/legacy/Interface/MICERun.hh"
-#include "src/legacy/Interface/MiceMaterials.hh"
 #include "src/legacy/Config/MiceModule.hh"
-
 
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "src/common_cpp/Utils/RunActionManager.hh"
@@ -79,9 +77,6 @@ void GlobalsManager::InitialiseGlobals(std::string json_datacards) {
             process->_recon_mods = new MiceModule(rec_file);
         }
         process->_legacy_mice_run->miceModule = process->_mc_mods;
-        process->_mice_materials = new MiceMaterials();  // delete
-        MICERun::getInstance()->miceMaterials = process->_mice_materials;
-        fillMaterials(*MICERun::getInstance());
         process->_maus_geant4_manager = MAUSGeant4Manager::GetInstance();
         process->_mc_field_constructor =
                                      MICERun::getInstance()->btFieldConstructor;
@@ -104,11 +99,8 @@ void GlobalsManager::DeleteGlobals() {
     // (it's legacy anyway)
     if (Globals::_process == NULL) {
         throw(Squeal(Squeal::recoverable,
-             "Attempt to delete Globals when it was already initialised",
+             "Attempt to delete Globals when it was not initialised",
                       "GlobalsManager::DeleteGlobals"));
-    }
-    if (Globals::_process->_mice_materials != NULL) {
-        delete Globals::_process->_mice_materials;
     }
     if (Globals::_process->_maus_geant4_manager != NULL) {
         // delete Globals::_process->_maus_geant4_manager;
@@ -116,14 +108,14 @@ void GlobalsManager::DeleteGlobals() {
     if (Globals::_process->_mc_field_constructor != NULL) {
         // delete Globals::_process->_field_constructor;
     }
-    if (Globals::_process->_recon_mods != NULL) {
+    if (Globals::GetInstance()->_recon_mods != NULL) {
         delete Globals::_process->_recon_mods;
         if (Globals::_process->_recon_mods == Globals::_process->_mc_mods) {
             Globals::_process->_mc_mods = NULL;
         }
         Globals::_process->_recon_mods = NULL;
     }
-    if (Globals::_process->_mc_mods != NULL) {
+    if (Globals::GetInstance()->_mc_mods != NULL) {
         delete Globals::_process->_mc_mods;
         Globals::_process->_mc_mods = NULL;
     }
@@ -152,7 +144,7 @@ void GlobalsManager::DeleteGlobals() {
 void GlobalsManager::SetReconstructionMiceModules
                                                       (MiceModule* recon_mods) {
     if (Globals::GetInstance()->_recon_mods != NULL &&
-      Globals::GetInstance()->_recon_mods != Globals::GetInstance()->_mc_mods) {
+      Globals::GetInstance()->_mc_mods != Globals::GetInstance()->_recon_mods) {
         delete Globals::_process->_recon_mods;
     }
     Globals:: _process->_recon_mods = recon_mods;
@@ -160,7 +152,7 @@ void GlobalsManager::SetReconstructionMiceModules
 
 void GlobalsManager::SetMonteCarloMiceModules(MiceModule* mc_mods) {
     if (Globals::GetInstance()->_mc_mods != NULL &&
-      Globals::GetInstance()->_recon_mods != Globals::GetInstance()->_mc_mods) {
+      Globals::GetInstance()->_mc_mods != Globals::GetInstance()->_recon_mods) {
         delete Globals::_process->_mc_mods;
     }
     Globals::_process->_mc_mods = mc_mods;

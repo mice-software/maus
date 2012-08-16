@@ -58,6 +58,7 @@
 #include "Interface/MICERun.hh"
 #include "Config/MiceModule.hh"
 #include "Interface/MiceMaterials.hh"
+#include "Simulation/FillMaterials.hh"
 
 #include "DetModel/SciFi/SciFiPlane.hh"
 #include "DetModel/KL/KLGlue.hh"
@@ -77,6 +78,8 @@ MICEDetectorConstruction::MICEDetectorConstruction( MICERun& run ) : _simRun(*MI
 {
   _event = new MICEEvent();
   _model = run.miceModule;
+  run.miceMaterials = new MiceMaterials();
+  fillMaterials(*MICERun::getInstance());
   _materials = run.miceMaterials;
   _checkVolumes = (*MAUS::Globals::GetConfigurationCards())["check_volume_overlaps"].asBool();
   _hasBTFields = false;
