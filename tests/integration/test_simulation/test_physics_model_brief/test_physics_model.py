@@ -92,7 +92,7 @@ class PhysicsModelTest(unittest.TestCase): # pylint: disable = R0904
         Long 100 m baseline is chosen st pion is likely to decay.
         """
         file_no_de = run_simulation("none", "none", False, -1., -1., 5.)
-        bunch_no_de = Bunch.new_dict_from_read_builtin('maus_virtual_hit',
+        bunch_no_de = Bunch.new_dict_from_read_builtin('maus_root_virtual_hit',
                                                          file_no_de, "pid")[211]
         # assert no energy lost in absorber
         self.assertAlmostEqual(bunch_no_de[0]['pz'], bunch_no_de[1]['pz'], 3)
@@ -104,7 +104,7 @@ class PhysicsModelTest(unittest.TestCase): # pylint: disable = R0904
 
         file_de = run_simulation("mean_energy_loss", "mean_energy_loss",
                                                           False, -1., -1., 5.)
-        bunch_de = Bunch.new_dict_from_read_builtin('maus_virtual_hit',
+        bunch_de = Bunch.new_dict_from_read_builtin('maus_root_virtual_hit',
                                                             file_de, "pid")[211]
         # assert energy lost in absorber
         self.assertNotAlmostEqual(bunch_de[0]['pz'], bunch_de[1]['pz'], 3)
@@ -128,7 +128,7 @@ class PhysicsModelTest(unittest.TestCase): # pylint: disable = R0904
         # particle has no energy loss
         file_de = run_simulation("none", "mean_energy_loss", False,
                                                                   -1., -1., 5.)
-        bunch_de = Bunch.new_dict_from_read_builtin('maus_virtual_hit',
+        bunch_de = Bunch.new_dict_from_read_builtin('maus_root_virtual_hit',
                                                            file_de, "pid")[211]
         # should lose energy in absorber
         de_hits_1 = bunch_de.get_hits('station', 1) # pions us of material
