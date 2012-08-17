@@ -51,7 +51,7 @@ The magnetic field that will be placed in the region.\\\hline
 
 {\itshape Length} &
 double\\\hline
-{\itshape Radius} &
+{\itshape FieldRadius} &
 double\\\hline
 \end{tabular}\hspace*{-\tabcolsep}
 } &
@@ -247,21 +247,12 @@ Maximum derivative used in calculating the end field of the solenoid.\\\hline
 \end{supertabular}
 \end{center}
 \subsection{Phasing Models}
-MAUS has a number of sophisticated models for phasing RF cavities. These powerful models can make setting up RF
-cavities with realistic fields both quick and easy.
+MAUS has a number of models for phasing RF cavities.
 
 When CavityMode is Unphased, MAUS attempts to phase the cavity itself. When using CavityMode Unphased MAUS needs to
-know when particles enter, cross the middle, and leave cavities. This means that:
-
-\liststyleLxiii
-\begin{itemize}
-\item The cavity must sit in a rectangular or cylindrical physical volume.
-\item No other physical volumes may overlap or sit within the physical volume of the cavity.
-\end{itemize}
-If these conditions are not met the phasing algorithm is likely to fail.
-
-To phase a cavity, MAUS builds a volume in the centre of the cavity that is used for phasing and then fires a
-reference particle through the system. Stochastic processes are always disabled during this process, while mean energy
+know when particles enter, cross the middle, and leave cavities. To phase a cavity, MAUS builds a virtual detector in the
+centre of the cavity that is used for phasing and then fires a reference particle through the system. Stochastic
+processes are always disabled during this process, while mean energy
 loss can be disabled using the datacard ReferenceEnergyLossModel. If a reference particle crosses a plane through the
 centre of a cavity, it sets the phase of the cavity to the time at which the particle crosses. 
 
