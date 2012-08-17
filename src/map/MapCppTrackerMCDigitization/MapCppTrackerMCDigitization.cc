@@ -14,7 +14,7 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
+#include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
 #include "src/map/MapCppTrackerMCDigitization/MapCppTrackerMCDigitization.hh"
 
 
@@ -81,6 +81,8 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
     return writer.write(root);
   }
   MAUS::SciFiSpill spill;
+  Spill maus_spill;
+  maus_spill.SetReconEvents(new ReconEventArray);
 
   // ==========================================================
   //  Loop over particle events and fill Event object with digits.
@@ -94,18 +96,21 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
   } // ends loop particles
   // ================= Reconstruction =========================
   for ( unsigned int event_i = 0; event_i < spill.events().size(); event_i++ ) {
-    MAUS::SciFiEvent event = *(spill.events()[event_i]);
+    MAUS::SciFiEvent * event = spill.events()[event_i];
 
     // std::cerr << "Hits in event: " << event.hits().size() << std::endl;
-    if ( event.hits().size() ) {
+    if ( event->hits().size() ) {
       // for each fiber-hit, make a digit
       int _nSpill = root["spill_number"].asInt();
-      construct_digits(event, _nSpill, event_i);
+      construct_digits(*event, _nSpill, event_i);
     }
+    ReconEvent *revt = new ReconEvent();
+    revt->SetSciFiEvent(event);
+    maus_spill.GetReconEvents()->push_back(revt);
     // std::cerr << "Digits in Event: " << event.digits().size() << " " << std::endl;
-    save_to_json(event, event_i);
   }
 
+  save_to_json(maus_spill);
   // ==========================================================
   return writer.write(root);
 }
@@ -337,36 +342,9 @@ bool MapCppTrackerMCDigitization::check_param(MAUS::SciFiHit *hit1, MAUS::SciFiH
   }
 }
 
-void MapCppTrackerMCDigitization::save_to_json(MAUS::SciFiEvent &evt, int event_i) {
-  Json::Value digits_tracker0;
-  Json::Value digits_tracker1;
-  for ( unsigned int dig_i = 0; dig_i < evt.digits().size(); dig_i++ ) {
-    Json::Value digit;
-    int tracker = evt.digits()[dig_i]->get_tracker();
-    digit["tracker"]= tracker;
-    digit["station"]= evt.digits()[dig_i]->get_station();
-    digit["plane"]  = evt.digits()[dig_i]->get_plane();
-    digit["channel"]= evt.digits()[dig_i]->get_channel();
-    digit["npe"]    = evt.digits()[dig_i]->get_npe();
-    digit["time"]   = evt.digits()[dig_i]->get_time();
-    ThreeVector position;
-    position = evt.digits()[dig_i]->get_true_position();
-    ThreeVector momentum;
-    momentum = evt.digits()[dig_i]->get_true_momentum();
-    digit["true_position"]["x"] = position.x();
-    digit["true_position"]["y"] = position.y();
-    digit["true_position"]["z"] = position.z();
-    digit["true_momentum"]["x"] = momentum.x();
-    digit["true_momentum"]["y"] = momentum.y();
-    digit["true_momentum"]["z"] = momentum.z();
-
-    if ( tracker == 0 )
-      digits_tracker0.append(digit);
-    if ( tracker == 1 )
-      digits_tracker1.append(digit);
-  }
-  root["recon_events"][event_i]["sci_fi_event"]["sci_fi_digits"]["tracker0"] = digits_tracker0;
-  root["recon_events"][event_i]["sci_fi_event"]["sci_fi_digits"]["tracker1"] = digits_tracker1;
+void MapCppTrackerMCDigitization::save_to_json(Spill &spill) {
+  SpillProcessor spill_proc;
+  root = *spill_proc.CppToJson(spill);
 }
 
 } // ~namespace MAUS

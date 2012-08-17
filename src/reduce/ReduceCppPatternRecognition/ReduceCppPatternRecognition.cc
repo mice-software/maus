@@ -436,12 +436,12 @@ void ReduceCppPatternRecognition::update_info(TCanvas * c1, TPaveText *pt) {
   pt->AddText(s1.c_str());
   ss1.str("");
 
-  ss1 << "Cumulative spoints: " << get_num_spoints();
+  ss1 << "Cumulative spoints: " << get_num_spoints() + spoint_size;
   s1 = ss1.str();
   pt->AddText(s1.c_str());
   ss1.str("");
 
-  ss1 << "Cumulative tracks: " << get_num_tracks();
+  ss1 << "Cumulative tracks: " << get_num_tracks() + track_size;
   s1 = ss1.str();
   pt->AddText(s1.c_str());
   ss1.str("");
