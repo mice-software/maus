@@ -89,6 +89,16 @@ MiceModule* SetupSimulation(std::vector< ::CovarianceMatrix> envelope)
   json_config["check_volume_overlaps"] = true;
   json_config["reconstruction_geometry_filename"] = MyDataCards.fetchValueString("MiceModel");
   json_config["simulation_geometry_filename"] = MyDataCards.fetchValueString( "MiceModel" );
+  json_config["stepping_algorithm"] = "ClassicalRK4";
+  json_config["delta_one_step"] = -1.;
+  json_config["delta_intersection"] = -1.;
+  json_config["epsilon_min"] = -1.;
+  json_config["epsilon_max"] = -1.;
+  json_config["miss_distance"] = -1.;
+  json_config["everything_special_virtual"] = false;
+  json_config["field_tracker_absolute_error"] = 1.e-4;
+  json_config["field_tracker_relative_error"] = 1.e-4;
+
 
   std::string str_config = JsonWrapper::JsonToString(json_config);
   MAUS::GlobalsManager::InitialiseGlobals(str_config);
