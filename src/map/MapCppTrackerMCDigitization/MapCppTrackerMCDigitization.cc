@@ -34,9 +34,9 @@ bool MapCppTrackerMCDigitization::birth(std::string argJsonConfigDocument) {
 
   // Get the tracker modules; they will be necessary
   // for the channel number calculation
-  assert(_configJSON.isMember("reconstruction_geometry_filename"));
+  assert(_configJSON.isMember("simulation_geometry_filename"));
   std::string filename;
-  filename = _configJSON["reconstruction_geometry_filename"].asString();
+  filename = _configJSON["simulation_geometry_filename"].asString();
   _module = new MiceModule(filename);
   modules = _module->findModulesByPropertyString("SensitiveDetector", "SciFi");
 
@@ -99,7 +99,8 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
     // std::cerr << "Hits in event: " << event.hits().size() << std::endl;
     if ( event.hits().size() ) {
       // for each fiber-hit, make a digit
-      construct_digits(event);
+      int _nSpill = root["spill_number"].asInt();
+      construct_digits(event, _nSpill, event_i);
     }
     // std::cerr << "Digits in Event: " << event.digits().size() << " " << std::endl;
     save_to_json(event, event_i);
@@ -168,7 +169,8 @@ bool MapCppTrackerMCDigitization::check_sanity_mc(Json::Value mc) {
 }
 
 
-void MapCppTrackerMCDigitization::construct_digits(MAUS::SciFiEvent &evt) {
+void MapCppTrackerMCDigitization::construct_digits
+    (MAUS::SciFiEvent &evt, int spill_num, int evnt_num) {
   int number_of_hits = evt.hits().size();
   for ( int hit_i = 0; hit_i < number_of_hits; hit_i++ ) {
     if ( !evt.hits()[hit_i]->GetChannelId()->GetUsed() ) {
@@ -196,8 +198,8 @@ void MapCppTrackerMCDigitization::construct_digits(MAUS::SciFiEvent &evt) {
       int tracker = a_hit->GetChannelId()->GetTrackerNumber();
       int station = a_hit->GetChannelId()->GetStationNumber();
       int plane = a_hit->GetChannelId()->GetPlaneNumber();
-      int spill = 99;
-      int event = 99;
+      int spill = spill_num;
+      int event = evnt_num;
       SciFiDigit *a_digit = new SciFiDigit(spill, event,
                                            tracker, station, plane, chanNo, nPE, time);
       // .start. TO BE REMOVED .start.//

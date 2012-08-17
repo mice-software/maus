@@ -250,7 +250,6 @@ void MapCppTrackerRecon::pattern_recognition(SciFiEvent &evt) {
   pr1.process(evt);
 }
 
-
 void MapCppTrackerRecon::track_fit(SciFiEvent &evt) {
   KalmanTrackFit fit;
   if ( evt.helicalprtracks().size() )

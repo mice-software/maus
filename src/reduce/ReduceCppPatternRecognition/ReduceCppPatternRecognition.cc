@@ -49,7 +49,7 @@ bool ReduceCppPatternRecognition::birth(std::string argJsonConfigDocument) {
   TCanvas *sp_xy_1 = new TCanvas("sp_xy_1",
                                    "Spacepoint x-y Projections (1 Spill)", 200, 10, 700, 500);
   sp_xy_1->Divide(3, 2);
-  TCanvas *c_info = new TCanvas("c_info", "Info Box", 200, 10, 300, 170);
+  TCanvas *c_info = new TCanvas("c_info", "Info Box", 300, 335);
   c_info->Update();  // Just to get rid of a compiler warning for an unused variable
 
   // Set up TTree to hold spacepoints
@@ -107,7 +107,7 @@ std::string ReduceCppPatternRecognition::process(std::string document) {
                        (gROOT->GetListOfCanvases()->FindObject("sp_xy_1"));
     TCanvas *c_info = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c_info"));
 
-    TPaveText *pt = new TPaveText(.05, .1, .95, .8);
+    TPaveText *pt = new TPaveText(.05, .1, .95, .95);
     TTree * p_spoints  = &_spoints;
     TTree * p_spoints_1spill = &_spoints_1spill;
 
@@ -384,6 +384,53 @@ void ReduceCppPatternRecognition::update_info(TCanvas * c1, TPaveText *pt) {
   std::stringstream ss1;
   std::string s1;
   ss1 << "Spill #: " << _nSpills;
+  s1 = ss1.str();
+  c1->cd(1);
+  pt->AddText(s1.c_str());
+  ss1.str("");
+
+  int event_size = 0;
+  int digit_size = 0;
+  int cluster_size = 0;
+  int spoint_size = 0;
+  int track_size = 0;
+
+  if ( _spill.GetReconEvents() ) {
+    event_size = _spill.GetReconEvents()->size();
+    for ( unsigned int evt_i = 0; evt_i < _spill.GetReconEvents()->size(); evt_i++ ) {
+      SciFiEvent *event = _spill.GetReconEvents()->at(evt_i)->GetSciFiEvent();
+      digit_size += event->digits().size();
+      cluster_size += event->clusters().size();
+      spoint_size += event->spacepoints().size();
+      track_size += event->straightprtracks().size();
+    }
+  }
+
+  ss1 << "Events: " << event_size;
+  s1 = ss1.str();
+  c1->cd(1);
+  pt->AddText(s1.c_str());
+  ss1.str("");
+
+  ss1 << "Digits: " << digit_size;
+  s1 = ss1.str();
+  c1->cd(1);
+  pt->AddText(s1.c_str());
+  ss1.str("");
+
+  ss1 << "Clusters: " << cluster_size;
+  s1 = ss1.str();
+  c1->cd(1);
+  pt->AddText(s1.c_str());
+  ss1.str("");
+
+  ss1 << "Spacepoints: " << spoint_size;
+  s1 = ss1.str();
+  c1->cd(1);
+  pt->AddText(s1.c_str());
+  ss1.str("");
+
+  ss1 << "Tracks: " << track_size;
   s1 = ss1.str();
   c1->cd(1);
   pt->AddText(s1.c_str());
