@@ -78,6 +78,7 @@ void GlobalsManager::InitialiseGlobals(std::string json_datacards) {
         process->_legacy_mice_run->miceModule = process->_mc_mods;
         process->_maus_geant4_manager = MAUSGeant4Manager::GetInstance();
         process->_mc_field_constructor = process->_maus_geant4_manager->GetField();
+        process->_maus_geant4_manager->SetPhases();
         process->_mc_field_constructor->Print(Squeak::mout(Squeak::info));
         if (process->_recon_mods == process->_mc_mods) {
             process->_recon_field_constructor = process->_mc_field_constructor;
