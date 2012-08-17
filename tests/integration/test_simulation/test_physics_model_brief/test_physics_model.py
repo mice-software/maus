@@ -56,7 +56,6 @@ def run_simulation(ref_phys, phys, dec, pi_half, mu_half, prod): #pylint: disabl
     out_name += str(prod)
     log_file = open(out_name+".log", "w")
     config = os.path.join(TEST_DIR, 'physics_model_config.py')
-    #return out_name+".json"
     proc = subprocess.Popen([SIM_PATH, '-configuration_file', config, 
       "-reference_physics_processes", str(ref_phys),
       "-physics_processes", str(phys),
@@ -67,12 +66,7 @@ def run_simulation(ref_phys, phys, dec, pi_half, mu_half, prod): #pylint: disabl
       "-output_root_file_name", str(out_name)+".root",
     ], stdout=log_file, stderr=subprocess.STDOUT)
     proc.wait()
-    proc = subprocess.Popen([CONV_PATH,
-                            "-input_root_file_name", str(out_name)+".root",
-                            "-output_json_file_name", str(out_name)+".json"],
-                            stdout=log_file, stderr=subprocess.STDOUT)
-    proc.wait()
-    return out_name+".json"
+    return out_name+".root"
 
 
 class PhysicsModelTest(unittest.TestCase): # pylint: disable = R0904
@@ -147,7 +141,7 @@ class PhysicsModelTest(unittest.TestCase): # pylint: disable = R0904
         self.assertAlmostEqual(de_hits_2[1]['px'], 0., 3)
 
         file_strag = run_simulation("none", "standard", False, -1., -1., 5.)
-        bunch_strag = Bunch.new_dict_from_read_builtin('maus_virtual_hit',
+        bunch_strag = Bunch.new_dict_from_read_builtin('maus_root_virtual_hit',
                                                       file_strag, "pid")[211]
         strag_hits = bunch_strag.get_hits('station', 2) # pions ds of material
         # check two particles lose different energy through absorber 
@@ -162,21 +156,21 @@ class PhysicsModelTest(unittest.TestCase): # pylint: disable = R0904
         """
         file_decay = run_simulation("none", "none", True, 1.e-9, 1.e+9, 5.)
         bunch = Bunch.new_dict_from_read_builtin \
-                                         ('maus_virtual_hit', file_decay, "pid")
+                                   ('maus_root_virtual_hit', file_decay, "pid")
         # pions should decay immediately; muons should never decay
         self.assertTrue(-13 in bunch.keys())
         self.assertFalse(211 in bunch.keys())
     
         file_decay = run_simulation("none", "none", True, 1.e+9, 1.e-9, 5.)
         bunch = Bunch.new_dict_from_read_builtin \
-                                         ('maus_virtual_hit', file_decay, "pid")
+                                   ('maus_root_virtual_hit', file_decay, "pid")
         # muons should decay immediately; pions should never decay
         self.assertTrue(211 in bunch.keys())
         self.assertFalse(-13 in bunch.keys())
     
         file_decay = run_simulation("none", "none", False, 1.e+9, 1.e+9, 5.)
         bunch = Bunch.new_dict_from_read_builtin \
-                                         ('maus_virtual_hit', file_decay, "pid")
+                                   ('maus_root_virtual_hit', file_decay, "pid")
         # decays off
         self.assertTrue(211 in bunch.keys())
         self.assertTrue(-13 in bunch.keys())
