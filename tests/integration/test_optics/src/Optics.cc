@@ -89,6 +89,16 @@ MiceModule* SetupSimulation(std::vector< ::CovarianceMatrix> envelope)
   json_config["check_volume_overlaps"] = true;
   json_config["reconstruction_geometry_filename"] = MyDataCards.fetchValueString("MiceModel");
   json_config["simulation_geometry_filename"] = MyDataCards.fetchValueString( "MiceModel" );
+  json_config["stepping_algorithm"] = "ClassicalRK4";
+  json_config["delta_one_step"] = -1.;
+  json_config["delta_intersection"] = -1.;
+  json_config["epsilon_min"] = -1.;
+  json_config["epsilon_max"] = -1.;
+  json_config["miss_distance"] = -1.;
+  json_config["everything_special_virtual"] = false;
+  json_config["field_tracker_absolute_error"] = 1.e-4;
+  json_config["field_tracker_relative_error"] = 1.e-4;
+
 
   std::string str_config = JsonWrapper::JsonToString(json_config);
   MAUS::GlobalsManager::InitialiseGlobals(str_config);
@@ -843,7 +853,7 @@ namespace Optimiser
     if(g_rebuild_simulation)
     {
       Squeak::mout(Squeak::debug) << "Rebuilding fields" << std::endl;
-      BTFieldConstructor*   field   = (BTFieldConstructor*)MICERun::getInstance()->btFieldConstructor;
+      BTFieldConstructor*   field   = (BTFieldConstructor*)MAUS::Globals::GetInstance()->GetMCFieldConstructor();
       BTFieldGroup*         mfield  = (BTFieldGroup*)field->GetMagneticField();
       BTFieldGroup*         emfield = (BTFieldGroup*)field->GetElectroMagneticField();
       std::vector<BTField*> field_v = mfield->GetFields();
@@ -857,7 +867,7 @@ namespace Optimiser
       emfield->Close();
       Squeak::mout(Squeak::debug) << "Deleted fields" << std::endl;
       field->BuildFields(g_root_mod);
-      MICERun::getInstance()->btFieldConstructor->Print(Squeak::mout(Squeak::debug)); 
+      field->Print(Squeak::mout(Squeak::debug)); 
     }
     std::vector<double> score = GetScore();
     for(int i=0; i<int(g_parameters.size()); i++)

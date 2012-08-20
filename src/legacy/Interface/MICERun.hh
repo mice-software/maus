@@ -38,7 +38,6 @@ public :
   TofCalib*           tofCalib;
   dataCards*          DataCards;
   TrajectoryManager*  trajectoryManager;
-  BTFieldConstructor* btFieldConstructor;
   Json::Value*        jsonConfiguration;
 
   MICERun()
@@ -52,7 +51,6 @@ public :
     vlpcCalib = NULL;
     DataCards = NULL;
     trajectoryManager = NULL;
-    btFieldConstructor = NULL;
     jsonConfiguration = NULL;
   };
 
@@ -71,7 +69,6 @@ private :
     vlpcCalib = NULL;
     DataCards = NULL;
     trajectoryManager = NULL;
-    btFieldConstructor = NULL;
     jsonConfiguration = NULL;
   };
 

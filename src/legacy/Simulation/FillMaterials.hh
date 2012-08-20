@@ -11,9 +11,11 @@
 #ifndef SIMULATION_FILLMATERIALS_HH
 #define SIMULATION_FILLMATERIALS_HH 1
 
-#include "Interface/MICERun.hh"
-
-void	fillMaterials( MICERun& );
+/** Append to the list of mice materials. If materials is NULL, initialises a
+ *  new list from scratch and fills it.
+ */
+class MiceMaterials;
+MiceMaterials* fillMaterials(MiceMaterials* materials_list);
 
 #endif
 

@@ -20,6 +20,7 @@
 #include "DetModel/MAUSSD.hh"  
 
 #include "Interface/MICERun.hh"
+#include "Interface/MiceMaterials.hh"
 
 #include "BeamTools/BTFieldConstructor.hh"
 #include "EngModel/MiceMagneticField.hh"
@@ -33,11 +34,11 @@ class G4VSolid;
 class MICEEvent;
 class TofSD;
 
-class MICEDetectorConstruction : public G4VUserDetectorConstruction
-{
+
+class MICEDetectorConstruction : public G4VUserDetectorConstruction {
 
 public:
-  MICEDetectorConstruction( MICERun&);
+  MICEDetectorConstruction(MiceModule* model, Json::Value* cards);
 
   ~MICEDetectorConstruction();
 
@@ -52,40 +53,36 @@ public:
 
   int GetSDSize() { return _SDs.size(); }
 
+  BTFieldConstructor* GetField() {return _btField;}
+
 private:
 
   std::vector<MAUS::MAUSSD*> _SDs; // todo: add get/set 
   
-  void		addDaughter( MiceModule*, G4VPhysicalVolume* );
+  void  addDaughter( MiceModule*, G4VPhysicalVolume* );
 
+  void  setUserLimits( G4LogicalVolume*, MiceModule* );
 
-  void		setUserLimits( G4LogicalVolume*, MiceModule* );
-
-  void		setMagneticField( G4LogicalVolume*, MiceModule* );
+  void  setMagneticField( G4LogicalVolume*, MiceModule* );
 
   //Set G4 Stepping Accuracy parameters
-  void		setSteppingAccuracy();
+  void  setSteppingAccuracy();
   //Set G4 Stepping Algorithm
-  void		setSteppingAlgorithm();
+  void  setSteppingAlgorithm();
 
   //Build a Q35 using Q35.hh methods
   G4LogicalVolume* BuildQ35(MiceModule * mod);
 
-  MICEEvent*			_event;
-
-  MiceModule*			_model;
-  MiceMaterials*		_materials;
-  G4LogicalVolume*		MICEExpHallLog;
-  BTFieldConstructor *		_btField;
-  MiceMagneticField *		_miceMagneticField;
-  MiceElectroMagneticField *	_miceElectroMagneticField;
-  MICERun&                      _simRun;
-  bool _hasBTFields;
-
-  static const double		_pillBoxSpecialVirtualLength;
-  G4UniformMagField* 		magField;
-  TofSD*			_tofSD;
-  bool				_checkVolumes;
+  MICEEvent* _event;
+  MiceModule* _model;
+  MiceMaterials* _materials;
+  Json::Value* _cards;
+  G4LogicalVolume* MICEExpHallLog;
+  BTFieldConstructor* _btField;
+  MiceMagneticField* _miceMagneticField;
+  MiceElectroMagneticField* _miceElectroMagneticField;
+  TofSD* _tofSD;
+  bool _checkVolumes;
 };
 
 #endif

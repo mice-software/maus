@@ -67,6 +67,7 @@ simulation_reference_particle = { # used for setting particle phase
     "momentum":{"x":0.0, "y":0.0, "z":1.0},
     "particle_id":-13, "energy":226.0, "time":0.0, "random_seed":10
 }
+everything_special_virtual = False
 
 # geant4 physics model
 physics_model = "QGSP_BERT" # Physics package loaded by MAUS to set default values; modifications can be made
@@ -85,6 +86,15 @@ keep_or_kill_particles = {"mu+":True, "mu-":True,
                           "nu_tau":False, "antu_nu_tau":False,
 }
 kinetic_energy_threshold = 0.1 # kill tracks with initial kinetic energy below energy_threshold
+field_tracker_absolute_error = 1.e-4 # set absolute error on MAUS internal stepping routines - used by e.g. VirtualPlanes to control accuracy of interpolation
+field_tracker_relative_error = 1.e-4 # set relative error on MAUS internal stepping routines - used by e.g. VirtualPlanes to control accuracy of interpolation
+
+stepping_algorithm = "ClassicalRK4" # numerical integration routine
+delta_one_step = -1.
+delta_intersection = -1.
+epsilon_min = -1.
+epsilon_max = -1.
+miss_distance = -1.
 
 # geant4 visualisation (not event display)
 geant4_visualisation = False
