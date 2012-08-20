@@ -163,7 +163,7 @@ CLHEP::Hep3Vector BTMultipole::TransformToRotatedStraightEnds
     return CLHEP::Hep3Vector(Point[0], Point[1], Point[2]);
   double pos[3] = {Point[0], Point[1], Point[2]-0.5*(_length-_centreLength)};
   CLHEP::Hep3Vector trans = TransformToRotatedConstant(pos);
-  if (trans > _centreLength)
+  if (trans[2] > _centreLength)
     trans = _endRotation*(trans-_endPoint)+_endPoint;
   trans[2] += 0.5*(_length-_centreLength);
   return trans;
@@ -293,9 +293,6 @@ void BTMultipole::EndFieldValue(CLHEP::Hep3Vector pos, double *field) const {
   if (fabs(pos.y()) > _height/2.)   return;
   pos[2] -= _length/2.;
   int    n(_pole);
-  double curvFac     = 1.;
-  if (_curvature == constant || (_curvature == straightEnds && pos.z() < 0.))
-    curvFac = RadiusOfCurvature(pos.z())/(pos.x()+RadiusOfCurvature(pos.z()));
   const double x = pos[0];
   const double y = pos[1];
   const double z = pos[2];

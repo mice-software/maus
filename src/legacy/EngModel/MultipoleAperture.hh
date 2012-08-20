@@ -7,7 +7,7 @@
 #ifndef Multipole_h
 #define Multipole_h 1
 
-#include "G4VSolid.hh"
+#include "Geant4/G4VSolid.hh"
 #include "Config/MiceModule.hh"
 
 class MultipoleAperture

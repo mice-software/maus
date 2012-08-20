@@ -19,7 +19,7 @@
 #include <string>
 #include "src/common_cpp/Utils/TOFChannelMap.hh"
 #include "Config/MiceModule.hh"
-#include "Interface/Squeak.hh"
+#include "Interface/Squeal.hh"
 
 //////////////////////////////////////////////////////////////////////
 bool MapCppTOFMCDigitizer::birth(std::string argJsonConfigDocument) {
@@ -37,7 +37,10 @@ bool MapCppTOFMCDigitizer::birth(std::string argJsonConfigDocument) {
   }
 
   // get the geometry
-  assert(_configJSON.isMember("reconstruction_geometry_filename"));
+  if (!_configJSON.isMember("reconstruction_geometry_filename"))
+      throw(Squeal(Squeal::recoverable,
+                   "Could not find geometry file",
+                   "MapCppTOFMCDigitizer::birth"));
   std::string filename;
   filename = _configJSON["reconstruction_geometry_filename"].asString();
   // get the tof geometry modules
@@ -108,9 +111,11 @@ std::string MapCppTOFMCDigitizer::process(std::string document) {
        tof_evt[i] = fill_tof_evt(i, snum, all_tof_digits);
        if (fDebug) {
           std::cout << "mcevt: " << i << " tof" << snum << " " << _hits.size()
-                    << " hits, " << all_tof_digits.size() << " digits" << std::endl;
+                    << " hits, " << all_tof_digits.size() << std::endl;
        }
-       root["digits"][_stationKeys[snum]].append(tof_evt[i]);
+       Json::Value tof_digs = fill_tof_evt(i, snum, all_tof_digits);
+       root["recon_events"][i]["tof_event"]["tof_digits"][_stationKeys[snum]]
+                                                                     = tof_digs;
      } // end loop over stations
   } // end loop over events
   // write it out
@@ -128,17 +133,30 @@ std::vector<Json::Value> MapCppTOFMCDigitizer::make_tof_digits(Json::Value hits)
       if (fDebug) std::cout << "hit# " << j << hit << std::endl;
 
       // make sure we can get the station/slab info
-      assert(hit.isMember("channel_id"));
-      assert(hit.isMember("momentum"));
-      assert(hit.isMember("time"));
+      if (!hit.isMember("channel_id"))
+          throw(Squeal(Squeal::recoverable,
+                       "No channel_id in hit",
+                       "MapCppTOFMCDigitizer::make_tof_digits"));
+      if (!hit.isMember("momentum"))
+          throw(Squeal(Squeal::recoverable,
+                       "No momentum in hit",
+                       "MapCppTOFMCDigitizer::make_tof_digits"));
+      if (!hit.isMember("time"))
+          throw(Squeal(Squeal::recoverable,
+                       "No time in hit",
+                       "MapCppTOFMCDigitizer::make_tof_digits"));
       Json::Value channel_id = hit["channel_id"];
 
-      assert(hit.isMember("energy_deposited"));
+      if (!hit.isMember("energy_deposited"))
+          throw(Squeal(Squeal::recoverable,
+                       "No energy_deposited in hit",
+                       "MapCppTOFMCDigitizer::make_tof_digits"));
       double edep = hit["energy_deposited"].asDouble();
 
       if (fDebug) {
          std::cout << "tofhit: " << hit["channel_id"] << " "
-                   << hit["position"] << " " << hit["momentum"] << " " << hit["time"] << std::endl;
+                   << hit["position"] << " " << hit["momentum"]
+                   << " " << hit["time"] << std::endl;
       }
 
       int stn = hit["channel_id"]["station_number"].asInt();
@@ -171,7 +189,10 @@ std::vector<Json::Value> MapCppTOFMCDigitizer::make_tof_digits(Json::Value hits)
       } // end loop over tof_modules
 
       // make sure we actually found a tof module corresponding to this hit
-      assert(hit_module != NULL);
+      if (hit_module == NULL)
+          throw(Squeal(Squeal::recoverable,
+                       "No TOF module for hit",
+                       "MapCppTOFMCDigitizer::make_tof_digits"));
 
       // now get the position of the hit
       Hep3Vector hpos = JsonWrapper::JsonToThreeVector(hit["position"]);
@@ -290,7 +311,7 @@ bool MapCppTOFMCDigitizer::check_sanity_mc(std::string document) {
   }
 
   // Check if the JSON document has a 'mc' branch, else return error
-  if (!root.isMember("mc")) {
+  if (!root.isMember("mc_events")) {
     Json::Value errors;
     std::stringstream ss;
     ss << _classname << " says:" << "I need an MC branch to simulate.";
@@ -299,7 +320,7 @@ bool MapCppTOFMCDigitizer::check_sanity_mc(std::string document) {
     return false;
   }
 
-  mc = root.get("mc", 0);
+  mc = root.get("mc_events", 0);
   // Check if JSON document is of the right type, else return error
   if (!mc.isArray()) {
     Json::Value errors;
@@ -316,10 +337,19 @@ bool MapCppTOFMCDigitizer::check_sanity_mc(std::string document) {
 double MapCppTOFMCDigitizer::get_npe(double edep, double dist) {
       double peRes = 1e-4;
       double nphot = 0;
-      assert(_configJSON.isMember("TOFattenuationLength"));
-      assert(_configJSON.isMember("TOFpmtQuantumEfficiency"));
 
-      assert(_configJSON.isMember("TOFconversionFactor"));
+      if (!_configJSON.isMember("TOFattenuationLength"))
+          throw(Squeal(Squeal::recoverable,
+                "Could not find TOFattenauationLength in config",
+                "MapCppTOFMCDigitizer::get_npe"));
+      if (!_configJSON.isMember("reconstruction_geometry_filename"))
+          throw(Squeal(Squeal::recoverable,
+                "Could not find TOFpmtQuantumEfficiency in config",
+                "MapCppTOFMCDigitizer::get_npe"));
+      if (!_configJSON.isMember("TOFconversionFactor"))
+          throw(Squeal(Squeal::recoverable,
+                       "Could not find TOFconversionFactor in config",
+                       "MapCppTOFMCDigitizer::birth"));
       nphot = edep / (_configJSON["TOFconversionFactor"].asDouble());
 
       nphot *= exp(-dist / (_configJSON["TOFattenuationLength"].asDouble()));
@@ -362,7 +392,7 @@ void MapCppTOFMCDigitizer::findTriggerPixel(std::vector<Json::Value> all_tof_dig
 //////////////////////////////////////////////////////////////////////
 Json::Value MapCppTOFMCDigitizer::fill_tof_evt(int evnum, int snum,
                                              std::vector<Json::Value> all_tof_digits) {
-  Json::Value tof_digit;
+  Json::Value tof_digit(Json::arrayValue);
   // return null if this evt had no tof hits
   if (all_tof_digits.size() == 0) return tof_digit;
   double npe;
@@ -391,7 +421,8 @@ Json::Value MapCppTOFMCDigitizer::fill_tof_evt(int evnum, int snum,
 
       // convert light yield to adc & set the charge
       int adc = static_cast<int>(npe / (_configJSON["TOFadcConversionFactor"].asDouble()));
-      digit["charge"] = adc;
+      // ROGERS = changed from "charge" to "charge_pm" for data integrity
+      digit["charge_pm"] = adc;
       // NOTE: needs tweaking/verifying -- DR 3/15
       digit["charge_mm"] = adc;
       digit["tof_key"] = all_tof_digits[i]["tof_key"].asString();
@@ -426,12 +457,20 @@ Json::Value MapCppTOFMCDigitizer::fill_tof_evt(int evnum, int snum,
       digit["leading_time"] = tdc;
       digit["trigger_request_leading_time"] =
                          all_tof_digits[i]["trigger_request_leading_time"].asInt();
-      digit["trailing_time"] = 0.;
+      // ROGERS addition to maintain data integrity 03-May-2012
+      //  - trigger_leading_time
+      //  - trigger_trailing_time
+      //  - trigger_request_trailing_timr
+      digit["trigger_leading_time"] = 0;
+      digit["trigger_trailing_time"] = 0;
+      digit["trigger_request_trailing_time"] = 0;
+      digit["trailing_time"] = 0;
+      digit["time_stamp"] = 0;
+      digit["trigger_time_tag"] = 0;
 
       // store event number
       digit["phys_event_number"] = evnum;
       digit["part_event_number"] = evnum;
-
 
       tof_digit.append(digit);
       if (fDebug)

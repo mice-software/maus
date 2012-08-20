@@ -1,0 +1,4 @@
+#dates need to get geomtry ids
+get_ids_start_time = "2011-03-20 09:00:00"
+get_ids_stop_time = "2012-04-26 09:00:00"
+get_ids_create_file = False

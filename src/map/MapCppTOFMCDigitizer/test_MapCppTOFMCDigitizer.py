@@ -22,9 +22,10 @@ class MapCppTOFMCDigitizer(unittest.TestCase):  #pylint: disable = R0904
             is called.
         """
         cls.mapper = MAUS.MapCppTOFMCDigitizer()
-        conf = Configuration()
+        conf_json = json.loads(Configuration().getConfigJSON())
+        conf_json["reconstruction_geometry_filename"] = "Stage6.dat"
         # Test whether the configuration files were loaded correctly at birth
-        success = cls.mapper.birth(conf.getConfigJSON())
+        success = cls.mapper.birth(json.dumps(conf_json))
         if not success:
             raise Exception('InitializeFail', 'Could not start worker')
 
@@ -50,8 +51,8 @@ class MapCppTOFMCDigitizer(unittest.TestCase):  #pylint: disable = R0904
         # a real spill
         spill = _file.readline().rstrip()
         output = self.mapper.process(spill)
-        self.assertTrue("digits" in json.loads(output))
-
+        self.assertTrue("tof_digits" in \
+                             json.loads(output)["recon_events"][0]["tof_event"])
         _file.close()
 
     @classmethod

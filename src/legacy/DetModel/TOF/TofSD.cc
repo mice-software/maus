@@ -1,7 +1,7 @@
 // MAUS WARNING: THIS IS LEGACY CODE.
 #include "TofSD.hh"
 #include "Interface/dataCards.hh"
-#include <G4StepStatus.hh>
+#include "Geant4/G4StepStatus.hh"
 #include <cstring>
 #include "Interface/MICEEvent.hh"
 #include "Config/MiceModule.hh"
@@ -37,7 +37,6 @@ G4bool TofSD::ProcessHits(G4Step* aStep, G4TouchableHistory* History)
   _hits["tof_hits"][hit_i]["channel_id"] = channel_id;
 
   _hits["tof_hits"][hit_i]["energy_deposited"] = 0.0;
-  _hits["tof_hits"][hit_i]["path_length"] = 0.0;
 
   G4Track* track = aStep->GetTrack();
 
@@ -58,7 +57,6 @@ G4bool TofSD::ProcessHits(G4Step* aStep, G4TouchableHistory* History)
   _hits["tof_hits"][hit_i]["time"] = aStep->GetPreStepPoint()->GetGlobalTime();
   
   _hits["tof_hits"][hit_i]["charge"] = track->GetDefinition()->GetPDGCharge();
-  _hits["tof_hits"][hit_i]["mass"] = track->GetDefinition()->GetPDGMass();
   _hits["tof_hits"][hit_i]["particle_id"] = track->GetDefinition()->GetPDGEncoding();
   _hits["tof_hits"][hit_i]["energy"] = track->GetTotalEnergy();
   _hits["tof_hits"][hit_i]["track_id"] = aStep->GetTrack()->GetTrackID();

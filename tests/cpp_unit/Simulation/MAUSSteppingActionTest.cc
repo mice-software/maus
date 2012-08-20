@@ -1,23 +1,23 @@
-// This file is a part of MAUS
-//
-// MAUS is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// MAUS is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with MAUS in the doc folder.  If not, see
-// <http://www.gnu.org/licenses/>.
+/* This file is part of MAUS: http://  micewww.pp.rl.ac.uk:8080/projects/maus
+ * 
+ * MAUS is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * MAUS is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with MAUS.  If not, see <http://  www.gnu.org/licenses/>.
+ */
 
 #include "gtest/gtest.h"
 
-#include "G4Step.hh"
-#include "G4ParticleTable.hh"
+#include "Geant4/G4Step.hh"
+#include "Geant4/G4ParticleTable.hh"
 
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
@@ -97,18 +97,18 @@ TEST_F(MAUSSteppingActionTest, UserSteppingActionMaxNStepsTest) {
                (conf, "maximum_number_of_steps", JsonWrapper::intValue).asInt();
   MAUSTrackingAction* tracking = MAUSGeant4Manager::GetInstance()->GetTracking();
   tracking->SetWillKeepTracks(true);
-  tracking->SetTracks(Json::Value(Json::objectValue));
+  tracking->SetTracks(Json::Value(Json::arrayValue));
   tracking->PreUserTrackingAction(step->GetTrack());
   stepping->SetSteps(Json::Value(Json::arrayValue));
   stepping->UserSteppingAction(step);
 
-  ASSERT_TRUE(tracking->GetTracks()["track_0"].isObject());
-  EXPECT_TRUE(tracking->GetTracks()["track_0"]["KillReason"].type() ==
-                                                             Json::nullValue);
+  ASSERT_TRUE(tracking->GetTracks()[Json::Value::UInt(0)].isObject());
+  EXPECT_EQ(tracking->GetTracks()[Json::Value::UInt(0)]["kill_reason"].type(),
+                                                             Json::stringValue);
   for (int i = 0; i < maxNSteps+1; ++i)
     track->IncrementCurrentStepNumber();
   stepping->UserSteppingAction(step);
-  EXPECT_EQ(tracking->GetTracks()["track_0"]["KillReason"].type(),
+  EXPECT_EQ(tracking->GetTracks()[Json::Value::UInt(0)]["kill_reason"].type(),
                                                              Json::stringValue);
   EXPECT_EQ(track->GetTrackStatus(), fStopAndKill);
 

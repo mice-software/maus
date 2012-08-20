@@ -45,6 +45,7 @@ class ConfigurationTestCase(unittest.TestCase): #pylint: disable = R0904
         # are hard coded (e.g. version number)
         exclusions = [
           "maus_version", # changed at runtime, tested below 
+          "reconstruction_geometry_filename", # changed at runtime, tested below
           "os", # module needed to use environment variables
           "__doc__", # docstring from ConfigurationDefaults
         ]
@@ -63,6 +64,25 @@ class ConfigurationTestCase(unittest.TestCase): #pylint: disable = R0904
         self.assertEqual(len(numbers), 3)
         for num in numbers:
             int(num) # should be able to convert to number
+
+    def test_recon_filename(self):
+        """Check that the version is defined correctly"""
+        # default should have them equal if reconstruction_geometry_filename is
+        # empty string
+        config = json.loads(Configuration().getConfigJSON())
+        string_file = io.StringIO\
+                       (u"reconstruction_geometry_filename = ''\n"+\
+                        u"simulation_geometry_filename = 'Test.dat'\n")
+        self.assertEqual(config['simulation_geometry_filename'], 
+                         config['reconstruction_geometry_filename'])
+
+        # else should be different
+        string_file = io.StringIO\
+                       (u"reconstruction_geometry_filename = 'Test.dat'")
+        conf = Configuration()
+        value = json.loads(conf.getConfigJSON(string_file))
+        self.assertEqual(value['reconstruction_geometry_filename'], 'Test.dat')
+        
 
     def test_new_value(self):
         """Test that we can create a configuration value from an input file"""

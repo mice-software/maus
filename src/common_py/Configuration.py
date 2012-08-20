@@ -35,7 +35,7 @@ class Configuration:
         """        
         self.readme = os.path.join(os.environ['MAUS_ROOT_DIR'], 'README')
 
-    def getConfigJSON(self, config_file = None, command_line_args = False):
+    def getConfigJSON(self, config_file = None, command_line_args = False): # pylint:disable = C0301, C0103
         """
         Returns JSON config document
 
@@ -70,9 +70,9 @@ class Configuration:
             assert not isinstance(config_file, str)
             exec(config_file.read(), globals(), config_dict) # pylint: disable=W0122,C0301
 
-        if config_dict['maus_version'] != "":
-            raise ValueError("MAUS version cannot be changed by the user")
-        config_dict['maus_version'] = self.get_version_from_readme()
+        config_dict['maus_version'] = self.handler_maus_version(config_dict)
+        config_dict['reconstruction_geometry_filename'] = \
+                      self.handler_reconstruction_geometry_filename(config_dict)
         config_dict = self.check_config_dict(config_dict)
         self.configuration_to_error_handler(config_dict)
         config_json_str = json.JSONEncoder().encode(config_dict)
@@ -93,7 +93,7 @@ class Configuration:
         # created to store the path and filename to a datacard
         parser = argparse.ArgumentParser()
         for key in sorted(config_dict.keys()):
-            parser.add_argument('-'+key, action='store', dest=key, 
+            parser.add_argument('--'+key, '-'+key, action='store', dest=key, 
                                 default=config_dict[key])
         results = parser.parse_args()
 
@@ -145,20 +145,32 @@ class Configuration:
                 ". Can only parse string, int, bool, float types.")
         return config_dict
         
-    def get_version_from_readme(self):
+    def handler_maus_version(self, _config_dict):
         """
         Version is taken as the first line in $MAUS_ROOT_DIR/README
         """
+        if _config_dict['maus_version'] != "":
+            raise ValueError("MAUS version cannot be changed by the user")
         readme = open(self.readme)
         version = readme.readline().rstrip('\n')
         return version
+
+    def handler_reconstruction_geometry_filename(self, _config_dict): # pylint: disable=C0103, R0201, C0301
+        """
+        reconstruction_geometry_filename follows simulation_geometry_filename
+        if an empty string
+        """
+        if _config_dict['reconstruction_geometry_filename'] == '':
+            return _config_dict['simulation_geometry_filename']
+        return _config_dict['reconstruction_geometry_filename']
+        
 
     def configuration_to_error_handler(self, config_dict): #pylint:disable=R0201
         """
         Hand configuration parameters to the error handler, so it can set itself
         up
         """
-        ErrorHandler.DefaultHandler().ConfigurationToErrorHandler(config_dict)
+        ErrorHandler.DefaultHandler().ConfigurationToErrorHandler(config_dict) # pylint:disable = C0301, C0103
 
     def check_config_dict(self, config_dict): #pylint:disable=R0201
         """

@@ -49,7 +49,7 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
         IF is_birthed
           IF end_of_run == None
               end_of_run = 
-                  {"daq_event_type":"end_of_run",  "run_num":run_number}
+                  {"daq_event_type":"end_of_run",  "run_number":run_number}
           Send end_of_run to merger
           DEATH merger and outputter
         BIRTH merger and outputter
@@ -163,7 +163,7 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
             print "  ...creating one to flush the mergers!"
             self.end_of_run = {"daq_data":None, \
                 "daq_event_type":"end_of_run", \
-                "run_num":self.run_number, \
+                "run_number":self.run_number, \
                 "spill_num":-1}
         end_of_run_spill = json.dumps(self.end_of_run)
         spill = self.merger.process(end_of_run_spill)

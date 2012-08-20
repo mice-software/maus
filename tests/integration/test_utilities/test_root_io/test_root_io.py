@@ -23,36 +23,41 @@ convert to root and then convert back to json
 import os
 import subprocess
 import unittest
+import json
 
 MRD = os.getenv("MAUS_ROOT_DIR")
 ANALYSIS = os.path.join(MRD, "bin", "analyze_data_offline.py")
 SIMULATION = os.path.join(MRD, "bin", "simulate_mice.py")
-ROOT_TO_JSON = os.path.join(MRD, "bin", "user", "root_to_json.py")
-JSON_TO_ROOT = os.path.join(MRD, "bin", "user", "json_to_root.py")
+ROOT_TO_JSON = os.path.join(MRD, "bin", "utilities", "root_to_json.py")
+JSON_TO_ROOT = os.path.join(MRD, "bin", "utilities", "json_to_root.py")
 
-def run_analyze_offline(json_file_name):
+def run_analyze_offline(root_file_name):
     """
     Run the offline analysis with default dataset
     """
     try:
-        os.remove(json_file_name)
+        os.remove(root_file_name)
     except OSError:
         pass
     subproc = subprocess.Popen([ANALYSIS,
-                                "-output_json_file_name", json_file_name])
+                                "-output_root_file_name", root_file_name,
+                                "-TOF_findTriggerPixelCut", "2.0"])
     subproc.wait()
 
-def run_mc_simulation(json_file_name):
+def run_mc_simulation(root_file_name):
     """
     Run the offline analysis with default dataset
     """
     try:
-        os.remove(json_file_name)
+        os.remove(root_file_name)
     except OSError:
         pass
+    config_file_name = os.path.join(MRD,
+           "tests/integration/test_utilities/test_root_io/root_io_mc_config.py")
     subproc = subprocess.Popen([SIMULATION,
-                                "-output_json_file_name", json_file_name,
-                                "-simulation_geometry_filename", "Test.dat"])
+                                "-configuration_file", config_file_name,
+                                "-output_root_file_name", root_file_name,
+                                ])
     subproc.wait()
 
 def run_json_to_root(json_file_name, root_file_name):
@@ -66,7 +71,7 @@ def run_json_to_root(json_file_name, root_file_name):
     subproc = subprocess.Popen([JSON_TO_ROOT,
                                 "-input_json_file_name", json_file_name,
                                 "-output_root_file_name", root_file_name,
-                                "-verbose_level", "1"])
+                                "-verbose_level", "01"])
 
     subproc.wait()
 
@@ -88,33 +93,116 @@ class RootIOTest(unittest.TestCase): #pylint: disable=R0904
     """
     Check that the conversion from ROOT to JSON works okay
     """
-    def _test_analyze_offline(self): #pylint: disable=R0201
+    def test_analyze_offline(self): #pylint: disable=R0201
         """
-        check that we can run the offline analysis, convert to root, convert
+        Check that we can run the offline analysis, convert to root, convert
         back to json
         """
-        ana_json = os.path.join \
-                              (MRD, "tmp", "test_root_io_offline_analysis.json")
+        ana_json_in = os.path.join \
+                           (MRD, "tmp", "test_root_io_offline_analysis_IN.json")
         ana_root = os.path.join \
                               (MRD, "tmp", "test_root_io_offline_analysis.root")
-        run_analyze_offline(ana_json)
-        run_json_to_root(ana_json, ana_root)
+        ana_json_out = os.path.join \
+                          (MRD, "tmp", "test_root_io_offline_analysis_OUT.json")
+        run_analyze_offline(ana_root)
+        run_root_to_json(ana_root, ana_json_in)
+        run_json_to_root(ana_json_in, ana_root)
+        run_root_to_json(ana_root, ana_json_out)
+        self.__check_equality(ana_json_in, ana_json_out)
+
 
     def test_simulate_mice(self): #pylint: disable=R0201
         """
-        check that we can run simulate_mice, convert to root, convert back to
+        Check that we can run simulate_mice, convert to root, convert back to
         json
         """
-        sim_json = os.path.join \
+        sim_json_in = os.path.join \
                               (MRD, "tmp", "test_root_io_simulate_mice_IN.json")
         sim_root = os.path.join \
                               (MRD, "tmp", "test_root_io_simulate_mice.root")
         sim_json_out = os.path.join \
                              (MRD, "tmp", "test_root_io_simulate_mice_OUT.json")
-#        run_mc_simulation(sim_json)
-        run_json_to_root(sim_json, sim_root)
+        run_mc_simulation(sim_root)
+        run_root_to_json(sim_root, sim_json_in)
+        run_json_to_root(sim_json_in, sim_root)
         run_root_to_json(sim_root, sim_json_out)
+        self.__check_equality(sim_json_in, sim_json_out)
 
+    def __check_equality(self, json_in_fname, json_out_fname):
+        """
+        Check that two files containing json documents on each line are the same 
+        """
+        json_fin = open(json_in_fname).readlines()
+        json_fout = open(json_out_fname).readlines()
+        self.assertEqual(len(json_fin), len(json_fout))
+        for i in range(len(json_fin)):
+            jin = json.loads(json_fin[i])
+            jout = json.loads(json_fout[i])
+            self.__almost_equal(jin, jout, verbose=False)
+
+
+    def __almost_equal(self, # pylint: disable=R0913, R0912
+                       item_in, item_out, verbose=True, branch=None, tol=1e-9):
+        """
+        Check that two json data structures are the same.
+
+        If there are extra branches in item_out that's okay but we require that
+        they have default constructors (empty arrays, dicts and strings,
+        numerics are 0, bools are either true or false).
+        """
+        if branch == None:
+            branch = []
+        if verbose == True:
+            print branch
+        my_msg =  "item_in:\n  "+json.dumps(item_in, indent=2)
+        my_msg += "\nitem_out:\n  "+json.dumps(item_out, indent=2)
+        my_msg += "\nin branch:\n  "+str(branch)
+        if type(item_in) != type(None):
+            self.assertEqual(type(item_in), type(item_out), msg=my_msg)
+        if type(item_in) == type({}):
+            keys_in = item_in.keys()
+            keys_out = item_out.keys()
+            for key in keys_in:
+                self.assertTrue(key in keys_out, msg=my_msg+\
+                                                      "\nMissing key "+str(key))
+            if verbose == True:
+                print keys_in
+                print keys_out
+            for key in keys_in:
+                self.__almost_equal(item_in[key], item_out[key],
+                                  verbose=verbose, branch=branch+[key], tol=tol)
+            for key in keys_out:
+                if key not in keys_in:
+                    self.__is_default_value(item_out[key])
+        elif type(item_in) == type([]):
+            self.assertEqual(len(item_in), len(item_out), msg=my_msg)
+            for i in range(len(item_in)):
+                self.__almost_equal(item_in[i], item_out[i],
+                                 verbose=verbose, branch=branch+['[]'], tol=tol)
+        elif type(item_in) == type(1.):
+            my_tol = tol+abs(item_in)*tol 
+            self.assertTrue(abs(item_in-item_out) < my_tol,
+                msg=my_msg+"\nFloats were different  in: "+str(item_in)+\
+                "  out: "+str(item_out)+"  diff: "+str(item_in-item_out)+\
+                "  tol: "+str(my_tol))
+        elif type(item_in) == type(None):
+            self.__is_default_value(item_out)
+        else:
+            self.assertEqual(item_in, item_out, msg=my_msg)
+
+    def __is_default_value(self, value):
+        """
+        Check that a json value has some default value
+        """
+        if type(value) == type("") or type(value) == type([]):
+            self.assertEqual(len(value), 0)
+        elif type(value) == type({}):
+            self.assertEqual(len(value.keys()), 0)
+        elif type(value) == type(0.):
+            self.assertAlmostEqual(value, 0., 1e-12)
+        elif type(value) == type(0):
+            self.assertEqual(value, 0)
+        #None and bool types are always okay
 
 if __name__ == "__main__":
     unittest.main()

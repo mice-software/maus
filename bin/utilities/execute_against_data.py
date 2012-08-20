@@ -75,7 +75,8 @@ def arg_parser():
     parser = argparse.ArgumentParser(description=DESCRIPTION, \
                            formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--input-file', dest='input_file', \
-                        help='Read in json file with this name', required=True)
+                        help='Read in raw data tarball file with this name', \
+                        required=True)
     parser.add_argument('--test', dest='test_mode', \
                         help='Run the batch job using test cdb output',
                         action='store_true', default=False)
@@ -288,8 +289,8 @@ class RunSettings: #pylint: disable = R0902
                                                           (self.input_file_name)
         self.run_number_as_string = str(self.run_number).rjust(5, '0')
         self.tar_file_name = self.run_number_as_string+"_offline.tar"
-        self.recon_file_name = self.run_number_as_string+"_recon.json"
-        self.mc_file_name = self.run_number_as_string+"_sim.json"
+        self.recon_file_name = self.run_number_as_string+"_recon.root"
+        self.mc_file_name = self.run_number_as_string+"_sim.root"
         self.maus_root_dir = os.environ["MAUS_ROOT_DIR"]
         self.download_target = 'downloads'
 
@@ -320,7 +321,7 @@ class RunSettings: #pylint: disable = R0902
         return [
             '-simulation_geometry_filename', \
                    os.path.join(self.download_target, 'ParentGeometryFile.dat'),
-            '-output_json_file_name', self.mc_file_name,
+            '-output_root_file_name', self.mc_file_name,
             '-verbose_level', '0',
         ]
     
@@ -336,7 +337,7 @@ class RunSettings: #pylint: disable = R0902
         return [
             '-reconstruction_geometry_filename', os.path.join \
                                (self.download_target, 'ParentGeometryFile.dat'),
-            '-output_json_file_name', str(self.recon_file_name),
+            '-output_root_file_name', str(self.recon_file_name),
             '-daq_data_file', str(self.run_number),
             '-daq_data_path', './',
             '-verbose_level', '0',

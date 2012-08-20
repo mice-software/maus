@@ -29,7 +29,7 @@ class irstream;
 
 namespace MAUS {
 
-class JsonCppConverter;
+class CppJsonConverter;
 
 /** @class InputCppRoot
  *
@@ -72,17 +72,9 @@ class InputCppRoot {
       return "";
     }
 
-    /** Returns sizeof the spill object
-     *
-     *  When setting up TTrees directly in ROOT, it is necessary to hand ROOT
-     *  the size of the class member. This is difficult (impossible?) to access
-     *  from python, so we provide a convenience function here.
-     */
-    int my_sizeof();
-
   private:
     irstream* _infile;
-    JsonCppConverter* _jsonCppConverter;
+    CppJsonConverter* _cppJsonConverter;
     Data* _data;
     std::string _filename;
     std::string _classname;

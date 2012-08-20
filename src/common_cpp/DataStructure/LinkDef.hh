@@ -23,11 +23,29 @@
 #pragma link C++ class MAUS::Data+;
 
 #pragma link C++ class MAUS::ThreeVector+;
+#pragma link C++ class std::vector<int>;
+
+#pragma link C++ class MAUS::RunHeader+;
+#pragma link C++ class MAUS::RunFooter+;
 
 #pragma link C++ class MAUS::Spill+;
+#pragma link C++ class std::map<std::string, std::string>;
+#pragma link C++ class std::pair<std::string, std::string>;
+#pragma link C++ class std::vector<MCEvent*>;
+#pragma link C++ class std::vector<ReconEvent*>;
 #pragma link C++ class MAUS::Scalars+;
 #pragma link C++ class MAUS::EMRSpillData+;
 #pragma link C++ class MAUS::DAQData+;
+#pragma link C++ class std::vector<KLDaq*>;
+#pragma link C++ class std::vector<CkovDaq*>;
+#pragma link C++ class std::vector<TOFDaq*>;
+#pragma link C++ class std::vector<Trigger*>;
+#pragma link C++ class std::vector<TOFDaq*>;
+#pragma link C++ class std::vector<TOFDaq*>;
+#pragma link C++ class std::vector<TriggerRequest*>;
+#pragma link C++ class std::vector<Unknown*>;
+#pragma link C++ class std::vector<Tag*>;
+
 #pragma link C++ class MAUS::ReconEvent+;
 
 #pragma link C++ class MAUS::TOFEvent+;
@@ -38,15 +56,64 @@
 #pragma link C++ class MAUS::GlobalEvent+;
 
 #pragma link C++ class MAUS::MCEvent+;
+#pragma link C++ class std::vector<Track>;
+#pragma link C++ class std::vector<VirtualHit>;
+#pragma link C++ class std::vector<SciFiHit>;
+#pragma link C++ class std::vector<TOFHit>;
+#pragma link C++ class std::vector<SpecialVirtualHit>;
+
 #pragma link C++ class MAUS::VirtualHit+;
 #pragma link C++ class MAUS::Primary+;
 #pragma link C++ class MAUS::Step+;
+#pragma link C++ class MAUS::Track+;
+#pragma link C++ class std::vector<Step>;
 #pragma link C++ class MAUS::SciFiHit+;
 #pragma link C++ class MAUS::SciFiChannelId+;
 #pragma link C++ class MAUS::TOFHit+;
 #pragma link C++ class MAUS::TOFChannelId+;
 #pragma link C++ class MAUS::SpecialVirtualHit+;
 #pragma link C++ class MAUS::SpecialVirtualChannelId+;
+
+#pragma link C++ class MAUS::V1290+;
+#pragma link C++ class std::vector<V1290>;
+#pragma link C++ class MAUS::EMREvent+;
+#pragma link C++ class MAUS::ReconEvent+;
+#pragma link C++ class MAUS::V1731+;
+#pragma link C++ class std::vector<V1731>;
+#pragma link C++ class MAUS::TOFDigit+;
+#pragma link C++ class MAUS::V830+;
+#pragma link C++ class MAUS::TOFSlabHit+;
+#pragma link C++ class MAUS::CkovDigit+;
+#pragma link C++ class MAUS::V1724+;
+#pragma link C++ class std::vector<V1724>;
+#pragma link C++ class MAUS::GlobalEvent+;
+#pragma link C++ class MAUS::TOFSpacePoint+;
+#pragma link C++ class std::vector<TOFSpacePoint>;
+#pragma link C++ class MAUS::Trigger+;
+#pragma link C++ class MAUS::Pmt1+;
+#pragma link C++ class MAUS::Pmt0+;
+#pragma link C++ class MAUS::TOFEventSlabHit+;
+#pragma link C++ class std::vector<TOFSlabHit>;
+#pragma link C++ class MAUS::TriggerEvent+;
+#pragma link C++ class MAUS::CkovEvent+;
+#pragma link C++ class std::vector<CkovDigit>;
+#pragma link C++ class MAUS::KLDaq+;
+#pragma link C++ class MAUS::KLEvent+;
+#pragma link C++ class MAUS::TOFDaq+;
+#pragma link C++ class MAUS::TOFEvent+;
+#pragma link C++ class MAUS::TOFEventSpacePoint+;
+#pragma link C++ class MAUS::TOFEventDigit+;
+#pragma link C++ class std::vector<TOFDigit>;
+#pragma link C++ class MAUS::Unknown+;
+#pragma link C++ class MAUS::CkovDaq+;
+#pragma link C++ class MAUS::Channels+;
+#pragma link C++ class MAUS::TriggerRequest+;
+#pragma link C++ class MAUS::DAQData+;
+#pragma link C++ class MAUS::CkovA+;
+#pragma link C++ class MAUS::CkovB+;
+#pragma link C++ class MAUS::Tag+;
+#pragma link C++ class MAUS::SciFiEvent+;
+
 
 #pragma link C++ global gROOT;
 #pragma link C++ global gEnv;

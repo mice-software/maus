@@ -120,9 +120,10 @@ def get_environment():
     # libraries
     env = SCons.Environment.Environment(SHLIBPREFIX="",
                  BUILDERS = {'Dylib2SO' : DYLIB2SO}) # pylint: disable-msg=E0602
-    if os.path.isfile('.use_llvm_with_maus'):
-        env['CC'] = "llvm-gcc"
-        env['CXX'] = "llvm-g++"
+    if os.getenv('CC') != None:
+        env['CC'] = os.getenv["CC"]
+    if os.getenv('CXX') != None:
+        env['CXX'] = os.getenv["CXX"]
 
     env.Tool \
           ('swig', '%s/third_party/swig-2.0.1' % os.environ['MAUS_THIRD_PARTY'])
@@ -147,7 +148,8 @@ def get_environment():
                         "%s/third_party/install/include/python2.7" % maus_third,
                         "%s/third_party/install/include/root" % maus_third,
                         "%s/src/legacy" % maus_root,
-                        "%s/src/common_cpp" % maus_root, ""])
+                        "%s/src/common_cpp" % maus_root,
+                        "%s/" % maus_root])
 
     env['USE_G4'] = False
     env['USE_ROOT'] = False
@@ -165,7 +167,7 @@ def set_lib(conf, env, lib):
     """
     if lib not in LIBS.keys():
         raise KeyError('Library '+str(lib)+' is not registered for '+\
-                       'linking. Should be one of '+LIBS.keys())
+                       'linking. Should be one of '+str(LIBS.keys()))
     set_lib_func = LIBS[lib]
     set_lib_func(conf, env)
 
@@ -224,6 +226,8 @@ def cpp_extras(env):
     # optimise by default
     optimise = not ('maus_no_optimize' in os.environ 
                   and os.environ['maus_no_optimize'] != '0')
+    assert_active = 'maus_assert_active' in os.environ \
+                    and os.environ['maus_assert_active'] != '0'
     
     if lcov:
         env.Append(LIBS=['gcov'])
@@ -239,6 +243,9 @@ def cpp_extras(env):
 
     if not (lcov or debug or gprof) and optimise:
         env.Append(CCFLAGS=["""-O3"""])        
+
+    if not assert_active: # disable debug flags
+        env.Append(CCFLAGS=["""-DNDEBUG"""])
 
 def set_python(conf, env): # pylint: disable=W0613
     """
@@ -301,41 +308,30 @@ def get_root_libs():
                 'm', \
                 'pthread']
 
-def set_root(conf, env):
+def set_root(conf, env): # pylint: disable=W0613
     """
     Setup root
     """
     if not conf.CheckCommand('root'):
-        print "Cound't find root.  If you want it, after installing GSL, run:"
-        print ("     MAUS_ROOT_DIR=%s ./third_party/bash/21root.bash" \
-                   % os.environ['MAUS_ROOT_DIR'])
-        print ("where you can install GSL by running:")
-        print ("     MAUS_ROOT_DIR=%s ./third_party/bash/20gsl.bash" \
-                   % os.environ['MAUS_ROOT_DIR'])
+        print "Fatal - couldn't find root library."
         my_exit(1)
 
-    else:
-        print
-        print "!! Found the program 'root', so MAUS will use it."
-        print
-        env['USE_ROOT'] = True
+    if not conf.CheckCommand('root-config'):
+        my_exit(1)
 
-        if not conf.CheckCommand('root-config'):
+    conf.env.ParseConfig("root-config --cflags --ldflags --libs")
+
+    root_libs = get_root_libs()
+
+    for lib in root_libs:
+        if not conf.CheckLib(lib, language='c++'):
             my_exit(1)
 
-        conf.env.ParseConfig("root-config --cflags --ldflags --libs")
+    if not conf.CheckCXXHeader('TH1F.h'):
+        my_exit(1)
 
-        root_libs = get_root_libs()
-
-        for lib in root_libs:
-            if not conf.CheckLib(lib, language='c++'):
-                my_exit(1)
-
-        if not conf.CheckCXXHeader('TH1F.h'):
-            my_exit(1)
-
-        if not conf.CheckCXXHeader('TMinuit.h'):
-            my_exit(1)
+    if not conf.CheckCXXHeader('TMinuit.h'):
+        my_exit(1)
 
 def set_clhep(conf, env): # pylint: disable=W0613
     """
@@ -351,7 +347,8 @@ def get_g4_libs(): # pylint: disable=W0511
     """
     List of geant4 libraries
     """
-    return [ 'G4FR', 
+    if os.environ['G4VERS'] == 'geant4.9.2.p04':
+        return [ 'G4FR', 
              'G4RayTracer',
              'G4Tree',
              'G4UIGAG',
@@ -461,6 +458,38 @@ def get_g4_libs(): # pylint: disable=W0511
              'G4vis_management',
              'G4volumes',
              'G4xrays']
+    else:
+        return ['G4analysis',
+            'G4error_propagation',
+            'G4geometry',
+            'G4graphics_reps',
+            'G4materials',
+            'G4particles',
+            'G4processes',
+            'G4run',
+            'G4Tree',
+            'G4visXXX', # pylint: disable = W0511
+            'G4clhep',
+            'G4event',
+            'G4global',
+            'G4intercoms',
+            'G4modeling',
+            'G4persistency',
+            'G4RayTracer',
+            'G4tracking',
+            'G4visHepRep',
+            'G4VRML',
+            'G4digits_hits',
+            'G4FR',
+            'G4GMocren',
+            'G4interfaces',
+            'G4parmodels',
+            'G4physicslists',
+            'G4readout',
+            'G4track',
+            'G4vis_management',
+            'G4zlib',
+            ]
 
 
 def set_geant4(conf, env):
@@ -470,38 +499,19 @@ def set_geant4(conf, env):
     Nb: sometimes geant4 builds some but not all libraries - so we really do
     need to check for every one.
     """
-    if 'G4INSTALL' not in os.environ or \
-        (not os.path.exists(os.environ.get('G4INSTALL'))):
-        print "ERROR: Cound't find geant4"
+    g4_include = os.getenv('G4INCLUDE')
+    if g4_include != '' and g4_include != None:
+        env.Append(CPPPATH=[g4_include])
+    if not conf.CheckCXXHeader('Geant4/G4EventManager.hh'):
         my_exit(1)
-    else:
-        print
-        print "!! Found the package 'geant4', so assume you want to use it."
-        print
-        env['USE_G4'] = True
 
-        env.Append(LIBPATH = ["%s/%s" % (os.environ.get('G4LIB'),
-                              os.environ.get('G4SYSTEM'))])
-        env.Append(CPPPATH=[os.environ.get("G4INCLUDE")])
+    env.Append(LIBS=get_g4_libs())
 
-        if not conf.CheckCXXHeader('G4EventManager.hh'):
+    for lib in get_g4_libs():
+        if not conf.CheckLib(lib, language='c++'):
             my_exit(1)
 
-        env.Append(LIBS=get_g4_libs())
-
-        for lib in get_g4_libs():
-            if not conf.CheckLib(lib, language='c++'):
-                my_exit(1)
-
-        geant4_extras(env, conf)
-
-def set_recpack(conf, env): # pylint: disable=W0613
-    """
-    Setup recpack
-    """
-    if not conf.CheckLib('recpack', language='c++') or\
-       not conf.CheckCXXHeader('recpack/RecpackManager.h'):
-        my_exit(1)
+    geant4_extras(env, conf)
 
 def set_gtest(conf, env): # pylint: disable=W0613
     """
@@ -557,7 +567,6 @@ LIBS = {
     'root':set_root,
     'clhep':set_clhep,
     'geant4':set_geant4,
-    'recpack':set_recpack,
     'gtest':set_gtest,
     'unpacker':set_unpacker,
 }

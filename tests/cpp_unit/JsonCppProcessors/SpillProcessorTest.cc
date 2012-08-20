@@ -63,7 +63,7 @@ std::string STEP =
         std::string("\"momentum\":{\"x\":9.,\"y\":10.,\"z\":11.}}");
 
 std::string TRACK_SEED =
-        std::string("{\"particle_id\":1,\"track_id\":2,")+
+        std::string("{\"particle_id\":1,\"track_id\":2,\"kill_reason\":\"Z\",")+
         std::string("\"parent_track_id\":3,")+
         std::string("\"initial_position\":{\"x\":6.,\"y\":7.,\"z\":8.},")+
         std::string("\"initial_momentum\":{\"x\":9.,\"y\":10.,\"z\":11.},")+
@@ -81,11 +81,11 @@ std::string PRIMARY =
     std::string("\"momentum\":{\"x\":9.,\"y\":10.,\"z\":11.}}");
 
 std::string SF_CHANNEL_ID =
-    std::string("{\"fiber_number\":1,\"station_number\":2,\"plane_number\":3,")+
+    std::string("{\"fibre_number\":1,\"station_number\":2,\"plane_number\":3,")+
     std::string("\"tracker_number\":4}");
 
 std::string TOF_CHANNEL_ID =
-    std::string("{\"slab\":1,\"station\":2,\"plane\":3}");
+    std::string("{\"slab\":1,\"station_number\":2,\"plane\":3}");
 
 std::string SV_CHANNEL_ID =
     std::string("{\"station\":1}");
@@ -121,19 +121,18 @@ std::string MC_EVENT =
     std::string("\"tracks\":[")+TRACK_STEP+","+TRACK_NO_STEP+"]}";
 
 std::string RECON_EVENT =
-    std::string("{\"tof_event\":{},\"scifi_event\":{},\"ckov_event\":{},")+
-    std::string("\"kl_event\":{},\"emr_event\":{},\"trigger_event\":{},")+
-    std::string("\"global_event\":{}}");
+    std::string("{\"part_event_number\":1}");
 
 std::string SPILL_SEED =
-    std::string("{\"scalars\":{},\"daq_data\":{},\"emr_spill_data\":{},")+
-    std::string("\"recon_events\":[")+RECON_EVENT+","+RECON_EVENT+"],"+
-    std::string("\"spill_number\":1, \"errors\":{\"an_error\":\"message\"}");
+    std::string("{\"spill_number\":1, \"run_number\":-1, ")+
+    std::string("\"daq_event_type\":\"physics_event\", ")+
+    std::string("\"errors\":{\"an_error\":\"message\"}");
 
-std::string SPILL_MC = SPILL_SEED+","+
-    std::string("\"mc_events\":[")+MC_EVENT+","+MC_EVENT+"]}";
+std::string SPILL_ALL = SPILL_SEED+","+
+    std::string("\"scalars\":{}, \"emr_spill_data\":{}, ")+
+    std::string("\"mc_events\":[], \"recon_events\":[]}");
 
-std::string SPILL_NO_MC = SPILL_SEED+"}";
+std::string SPILL_MINIMAL = SPILL_SEED+"}";
 
 
 TEST(SpillProcessorTest, ThreeVectorProcessorTest) {
@@ -198,14 +197,14 @@ TEST(SpillProcessorTest, MCEventProcessorTest) {
 }
 
 TEST(SpillProcessorTest, ReconEventProcessorTest) {
-    ReconEventProcessor proc;
+    ReconEventProcessor proc;  // just a minimal recon event here
     test_value(&proc, RECON_EVENT);
 }
 
 TEST(SpillProcessorTest, SpillProcessorTest) {
     SpillProcessor proc;
-    test_value(&proc, SPILL_NO_MC);
-    test_value(&proc, SPILL_MC);
+    test_value(&proc, SPILL_MINIMAL);
+    test_value(&proc, SPILL_ALL);
 }
 }
 }

@@ -18,7 +18,7 @@
 
 #include "gtest/gtest.h"
 
-#include "G4Event.hh"
+#include "Geant4/G4Event.hh"
 
 #include "CLHEP/Random/Random.h"
 
@@ -79,15 +79,17 @@ TEST_F(MAUSPrimaryGeneratorActionTest, GeneratePrimariesTest) {
     primary->Push(part_in);
     primary->Push(part_in);
 
-    part_in.energy = 105.; //non-physical
+    part_in.energy = 105.; // non-physical
     primary->Push(part_in);
 
     part_in.energy = 226.;
-    part_in.pid = 0; //non-physical?
+    part_in.pid = 0; // non-physical?
     primary->Push(part_in);
 
-    part_in.seed = std::numeric_limits<unsigned int>::max()+1; 
+    part_in.pid = -13;
+    part_in.x = 1e9;  // outside world volume
     primary->Push(part_in);
+    part_in.x = 1;  // outside world volume
 
     G4Event* event = new G4Event();
     for (size_t i=0; i<2; ++i) {
@@ -107,12 +109,13 @@ TEST_F(MAUSPrimaryGeneratorActionTest, GeneratePrimariesTest) {
     EXPECT_NEAR(part_in.py*p_norm, event->GetPrimaryVertex()->GetPrimary()->GetPy(), 1e-3);
     EXPECT_NEAR(part_in.pz*p_norm, event->GetPrimaryVertex()->GetPrimary()->GetPz(), 1e-3);
 
-    EXPECT_EQ(27, CLHEP::HepRandom::getTheSeed());
-    EXPECT_EQ(-13,  event->GetPrimaryVertex()->GetPrimary()->GetPDGcode());
+    EXPECT_EQ(part_in.seed, CLHEP::HepRandom::getTheSeed());
+    EXPECT_EQ(part_in.pid,  event->GetPrimaryVertex()->GetPrimary()->GetPDGcode());
 
-    for (size_t i=0; i<4; ++i) {
+    for (size_t i=0; i<5; ++i) {
         EXPECT_THROW(primary->GeneratePrimaries(event), Squeal);
     }
+ 
     delete event;
 }
 

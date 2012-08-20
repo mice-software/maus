@@ -21,14 +21,16 @@ namespace MAUS {
 Track::Track() : _steps(NULL), _initial_position(0, 0, 0),
                  _final_position(0, 0, 0),
                  _initial_momentum(0, 0, 0), _final_momentum(0, 0, 0),
-                 _particle_id(0), _track_id(0), _parent_track_id(0) {
+                 _particle_id(0), _track_id(0), _parent_track_id(0),
+                 _kill_reason("")  {
 }
 
 Track::Track(const Track& track)
                : _steps(NULL), _initial_position(0, 0, 0),
                  _final_position(0, 0, 0),
                  _initial_momentum(0, 0, 0), _final_momentum(0, 0, 0),
-                 _particle_id(0), _track_id(0), _parent_track_id(0)  {
+                 _particle_id(0), _track_id(0), _parent_track_id(0),
+                 _kill_reason("")  {
     *this = track;
 }
 
@@ -42,7 +44,7 @@ Track& Track::operator=(const Track& track) {
     if (track._steps == NULL) {
         _steps = NULL;
     } else {
-        _steps = new std::vector<Step>(*(track._steps));
+        _steps = new StepArray(*(track._steps));
     }
     _initial_position = track._initial_position;
     _final_position = track._final_position;
@@ -51,6 +53,7 @@ Track& Track::operator=(const Track& track) {
     _particle_id = track._particle_id;
     _track_id = track._track_id;
     _parent_track_id = track._parent_track_id;
+    _kill_reason = track._kill_reason;
     return *this;
 }
 
@@ -117,12 +120,19 @@ void Track::SetParentTrackId(int id) {
     _parent_track_id = id;
 }
 
-std::vector<Step>* Track::GetSteps() const {
+StepArray* Track::GetSteps() const {
     return _steps;
 }
 
-void Track::SetSteps(std::vector<Step>* steps) {
+void Track::SetSteps(StepArray* steps) {
     _steps = steps;
 }
+
+std::string Track::GetKillReason() const {
+    return _kill_reason;
 }
 
+void Track::SetKillReason(std::string reason) {
+    _kill_reason = reason;
+}
+}  // namespace MAUS

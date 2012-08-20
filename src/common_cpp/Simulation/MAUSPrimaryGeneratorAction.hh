@@ -21,13 +21,16 @@
 #include <string>
 #include <queue>
 
-#include "G4ParticleGun.hh"
-#include "G4ParticleTable.hh"
-#include "G4VUserPrimaryGeneratorAction.hh"  // inherit from
+#include "Geant4/G4ParticleGun.hh"
+#include "Geant4/G4ParticleTable.hh"
+#include "Geant4/G4VUserPrimaryGeneratorAction.hh"  // inherit from
 
 #include "src/legacy/Interface/Squeak.hh"
 #include "src/legacy/Interface/VirtualHit.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
+
+// TODO (Rogers): should use src/common_cpp/DataStructure/Primary.hh rather than
+//                PGParticle
 
 namespace MAUS {
 
@@ -89,6 +92,14 @@ class MAUSPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
    *  @returns the value of the particle on the front of the queue
    */
   PGParticle Pop();
+
+  /** @brief Return true if (x, y, z) are in the world volume
+   *
+   *  Checks the dimensions of the root MiceModule to find if x, y, z are
+   *  inside. Returns true if they are. Always returns true if the root
+   *  MiceModule is NULL.
+   */
+  bool isInWorldVolume(double x, double y, double z);
 
  protected:
   G4ParticleGun*          gun;

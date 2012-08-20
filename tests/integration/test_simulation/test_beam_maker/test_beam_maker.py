@@ -24,6 +24,7 @@ Use Kolmogorov Smirnov test to compare distributions a lot of the time...
 import unittest
 import os
 import subprocess
+import math
 
 import ROOT
 import numpy
@@ -35,16 +36,20 @@ import xboa.Common as Common #pylint: disable=F0401
 MAUS_ROOT_DIR = os.getenv("MAUS_ROOT_DIR")
 TMP_PATH = os.path.join(MAUS_ROOT_DIR, "tmp")
 SIM_PATH = os.path.join(MAUS_ROOT_DIR, "bin", "simulate_mice.py")
+CONV_PATH = os.path.join(MAUS_ROOT_DIR, "bin", "utilities", "root_to_json.py")
 PLOT_DIR = os.path.join(MAUS_ROOT_DIR, "tests", "integration", \
                                     "plots", "beam_maker")
 TEST_DIR = os.path.join(MAUS_ROOT_DIR, "tests", "integration", \
                         "test_simulation", "test_beam_maker")
 DEF_SIM = os.path.join(TMP_PATH, 'simulation_defaults.out')
 BIN_SIM = os.path.join(TMP_PATH, 'simulation_binomial.out')
+NAN_SIM = os.path.join(TMP_PATH, 'simulation_nan.out')
 BIN_P = 0.1
 BIN_N = 20
 N_SPILLS = 1000
 WEIGHTS_TO_PID = {-11:0.08, 211:0.02, -13:0.90}
+
+SETUP_DONE = False
 
 def make_plot_dir():
     """
@@ -61,17 +66,43 @@ def run_simulations():
     pull it out into a separate part of the test.
     """
     out = open(TMP_PATH+'/test_beam_maker_output.out', 'w')
+    
+    # run simulation
     subproc = subprocess.Popen([SIM_PATH, '-configuration_file', \
                            os.path.join(TEST_DIR, 'default_beam_config.py')], \
                            stdout = out)
     subproc.wait()
-    os.rename('simulation.out', DEF_SIM)
+    # run format conversion
+    subproc = subprocess.Popen([CONV_PATH, '-configuration_file', \
+                           os.path.join(TEST_DIR, 'default_beam_config.py'),
+                          '-output_json_file_name', DEF_SIM], \
+                           stdout = out)
+    subproc.wait()
 
+    # run simulation
     subproc = subprocess.Popen([SIM_PATH, '-configuration_file', \
                            os.path.join(TEST_DIR, 'binomial_beam_config.py')], \
                            stdout = out)
     subproc.wait()
-    os.rename('simulation.out', BIN_SIM)
+    # run format conversion
+    subproc = subprocess.Popen([CONV_PATH, '-configuration_file', \
+                           os.path.join(TEST_DIR, 'binomial_beam_config.py'),
+                          '-output_json_file_name', BIN_SIM], \
+                           stdout = out)
+    subproc.wait()
+    
+    # run simulation
+    subproc = subprocess.Popen([SIM_PATH, '-configuration_file', \
+                           os.path.join(TEST_DIR, 'nan_beam_config.py')], \
+                           stdout = out)
+    subproc.wait()
+    # run format conversion
+    subproc = subprocess.Popen([CONV_PATH, '-configuration_file', \
+                           os.path.join(TEST_DIR, 'nan_beam_config.py'),
+                          '-output_json_file_name', NAN_SIM], \
+                           stdout = out)
+    subproc.wait()
+
     out.close()
 
 class BeamMakerTest(unittest.TestCase): # pylint: disable = R0904
@@ -84,10 +115,11 @@ class BeamMakerTest(unittest.TestCase): # pylint: disable = R0904
         """
         run tests the first time the class is instantiated
         """
-        if not self.setup_done:
+        global SETUP_DONE # pylint: disable = W0603
+        if not SETUP_DONE:
             make_plot_dir()
             run_simulations()
-            self.setup_done = True
+            SETUP_DONE = True
 
     def test_defaults(self):
         """
@@ -184,6 +216,32 @@ class BeamMakerTest(unittest.TestCase): # pylint: disable = R0904
               msg=msg_)
         self.__cmp_matrix(test, covs)
 
+    def test_no_nan(self):
+        """
+        Check that no nans appear
+        """
+        bunch = Bunch.new_from_read_builtin('maus_primary', NAN_SIM)
+        self.assertAlmostEqual(bunch.bunch_weight(), 1000.)
+        for hit in bunch:
+            self.assertFalse(math.isnan(hit['energy']))
+        canvas, hist = bunch.root_histogram('kinetic_energy', 'MeV', xmin=0.,
+                                                          xmax=150.)
+        cmp_hist = ROOT.TH1D("test", "test", hist.GetNbinsX(), 0., 150.) # pylint: disable = E1101, C0301
+        for h_bin in range(1, hist.GetNbinsX()+1):
+            sigma = 25.
+            norm = 2.*bunch.bunch_weight()/sigma/(2.*math.pi)**0.5
+            norm *= 150./hist.GetNbinsX()
+            my_x = hist.GetBinCenter(h_bin)
+            my_y = math.exp(-my_x**2./2./sigma**2.)*norm
+            cmp_hist.Fill(my_x, my_y)
+        cmp_hist.SetLineStyle(2)
+        cmp_hist.Draw("SAME")
+        ks_value = cmp_hist.KolmogorovTest(hist)
+        print "nan energy ks_value", ks_value
+        canvas.Update()
+        canvas.Print(PLOT_DIR+"/nan_energy_distribution_test.png")
+        self.assertGreater(ks_value, 1e-3)
+
     def test_sawtooth_time(self):
         """
         Check that beam maker generates sawtooth t distribution correctly
@@ -200,9 +258,9 @@ class BeamMakerTest(unittest.TestCase): # pylint: disable = R0904
         cmp_hist.Draw("SAME")
         ks_value = cmp_hist.KolmogorovTest(hist)
         print "sawtooth t ks_value", ks_value
-        self.assertGreater(ks_value, 1e-3)
         canvas.Update()
         canvas.Print(PLOT_DIR+"/sawtooth_time_distribution_test.png")
+        self.assertGreater(ks_value, 1e-3)
 
     def test_uniform_time(self):
         """
@@ -221,9 +279,9 @@ class BeamMakerTest(unittest.TestCase): # pylint: disable = R0904
         cmp_hist.Draw("SAME")
         ks_value = cmp_hist.KolmogorovTest(hist)
         print "uniform t ks_value", ks_value
-        self.assertGreater(ks_value, 1e-3)
         canvas.Update()
         canvas.Print(PLOT_DIR+"/uniform_time_distribution_test.png")
+        self.assertGreater(ks_value, 1e-3)
 
     setup_done = False
 

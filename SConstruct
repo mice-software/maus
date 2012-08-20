@@ -36,7 +36,7 @@ uses scons library to handle builds. We have three submodules
 # this import fails if calling as a python script - call with scons
 from SCons.Script.SConscript import SConsEnvironment # pylint: disable=F0401
 
-import maus_build_tools.environment_tools
+import maus_build_tools.environment_tools 
 import maus_build_tools.core_builder
 import maus_build_tools.module_builder
 
@@ -64,7 +64,7 @@ def setup_environment():
     conf = Configure(env, tests) # pylint: disable=E0602
     # check libraries exist; add them into the environment
     for lib in ['compiler', 'python', 'gsl', 'root', 'clhep', 'geant4',
-                'recpack', 'gtest', 'unpacker']:
+                'gtest', 'unpacker']:
         maus_build_tools.environment_tools.set_lib(conf, env, lib)
     return _maus_root_dir, env
 
@@ -72,22 +72,24 @@ def build_libraries(maus_root_dir, env):
     """
     Build the maus libraries
 
-    Build core libraries, cpp tests, python tests, modules
+    Build core libraries, cpp tests, python tests, python utilities, modules
     """
     # build the data structure (separate library so we can port it to external
     # deps)
     maus_build_tools.core_builder.build_data_structure(env)
     # build the maus cpp core library (libMausCpp.so)
     maus_build_tools.core_builder.build_lib_maus_cpp(env)
-    # build the cpp tests (test_cpp_unit)
-    maus_build_tools.core_builder.build_cpp_tests(env)
     # install the python tests (pure python, no build to do)
     maus_build_tools.core_builder.install_python_tests(maus_root_dir, env)
     # build the modules - inputters, mappers, reducers, outputters
-    stuff_to_import = SConsEnvironment.jDev.register_modules()
+    (cpp_libs, python_libs) = SConsEnvironment.jDev.register_modules()
     # build the MAUS python library (MAUS.py)
     maus_build_tools.module_builder.build_maus_lib \
-                           ('%s/build/MAUS.py' % maus_root_dir, stuff_to_import)
+                      ('%s/build/MAUS.py' % maus_root_dir, cpp_libs+python_libs)
+    # build the cpp tests (test_cpp_unit)
+    maus_build_tools.core_builder.build_cpp_tests(env, cpp_libs)
+    # build python utilities
+    maus_build_tools.core_builder.build_python_modules(env)
 
 def main():
     """

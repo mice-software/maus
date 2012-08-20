@@ -17,6 +17,7 @@ Single-threaded dataflows module.
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
 import json
+import maus_cpp.run_action_manager
 
 from framework.utilities import DataflowUtilities
 
@@ -48,7 +49,7 @@ class PipelineSingleThreadDataflowExecutor:
 
     def execute(self):
         """
-        Execute the dataflow - spills are, in turn, read from the 
+        Execute the dataflow - events are, in turn, read from the 
         input, passed through the transform, merge and output.
 
         @param self Object reference.
@@ -57,9 +58,15 @@ class PipelineSingleThreadDataflowExecutor:
         assert(self.inputer.birth(self.json_config_doc) == True)
         emitter = self.inputer.emitter()
         # This helps us time how long the setup that sometimes happens
-        # in the first spill takes
-        print("HINT: MAUS will process 1 spill only at first...")
+        # in the first event takes
+        print("HINT: MAUS will process 1 event only at first...")
         map_buffer = DataflowUtilities.buffer_input(emitter, 1)
+
+        # NEEDS TO BE UNCOMMENTED - but only when I figure out how to implement
+        # in multithreaded mode also
+        #print "START OF RUN: Calling start of run"
+        #run_number=DataflowUtilities.get_run_number(json.loads(map_buffer[0]))
+        #maus_cpp.run_action_manager.start_of_run(run_number)
 
         print("TRANSFORM: Setting up transformer (this can take a while...)")
         assert(self.transformer.birth(self.json_config_doc) == True)
@@ -70,14 +77,14 @@ class PipelineSingleThreadDataflowExecutor:
         print("OUTPUT: Setting up outputer")
         assert(self.outputer.birth(self.json_config_doc) == True)
 
-        print("PIPELINE: Get spill, TRANSFORM, MERGE, OUTPUT, repeat")
+        print("PIPELINE: Get event, TRANSFORM, MERGE, OUTPUT, repeat")
 
         i = 0
         while len(map_buffer) != 0:
-            for spill in map_buffer:
-                spill = self.transformer.process(spill)
-                spill = self.merger.process(spill)
-                self.outputer.save(spill)
+            for event in map_buffer:
+                event = self.transformer.process(event)
+                event = self.merger.process(event)
+                self.outputer.save(event)
 
             i += len(map_buffer)
             map_buffer = DataflowUtilities.buffer_input(emitter, 1)
@@ -85,17 +92,8 @@ class PipelineSingleThreadDataflowExecutor:
             # Not Python 3 compatible print() due to backward
             # compatability. 
             print "TRANSFORM/MERGE/OUTPUT: ",
-            print "Processed %d spills so far," % i,
-            print "%d spills in buffer." % (len(map_buffer))
-
-        print("CLOSING PIPELINE: Sending END_OF_RUN to merger")
-
-        end_of_run = {"daq_data":None, "daq_event_type":"end_of_run",
-            "run_num":1,
-            "spill_num":-1}
-        end_of_run_spill = json.dumps(end_of_run)
-        spill = self.merger.process(end_of_run_spill)
-        self.outputer.save(spill)
+            print "Processed %d events so far," % i,
+            print "%d events in buffer." % (len(map_buffer))
 
         print("TRANSFORM: Shutting down transformer")
         assert(self.transformer.death() == True)
@@ -105,6 +103,7 @@ class PipelineSingleThreadDataflowExecutor:
 
         print("OUTPUT: Shutting down outputer")
         assert(self.outputer.death() == True)
+        maus_cpp.run_action_manager.end_of_run()
 
     @staticmethod
     def get_dataflow_description():

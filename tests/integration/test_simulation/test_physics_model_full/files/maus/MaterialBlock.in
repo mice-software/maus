@@ -1,0 +1,38 @@
+Configuration Block 
+{
+  Substitution $material  __material__
+  Substitution $thickness __thickness__
+  Substitution $mat_step  __step__
+
+  Dimensions 1000 1000 $thickness*4+10. mm
+  PropertyString Material Galactic
+  PropertyDouble G4StepMax $mat_step mm
+
+  Module Cylinder 
+  {
+    PropertyString     Volume     Cylinder
+    PropertyString     Material   $material
+    PropertyDouble     G4StepMax  $mat_step mm
+    PropertyHep3Vector Position   0. 0. $thickness/2+3 mm
+    PropertyHep3Vector Dimensions 1000. $thickness -1. mm
+    Module Virtual
+    {
+      PropertyString Volume              None
+      PropertyString SensitiveDetector   Virtual
+      PropertyString IndependentVariable Z 
+      PropertyHep3Vector Position   0. 0. -$thickness/2-1 mm
+    }
+    Module Virtual
+    {
+      PropertyString Volume              None
+      PropertyString SensitiveDetector   Virtual
+      PropertyString IndependentVariable Z 
+      PropertyHep3Vector Position   0. 0. $thickness/2+1 mm
+    }
+  }
+  
+
+}
+
+
+

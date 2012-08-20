@@ -52,7 +52,8 @@ class PointerArrayProcessor : public ProcessorBase<std::vector<ArrayContents*> >
      *  @param json_array Json arrayValue
      *
      *  @returns std::vector C++ representation of the data. As with all
-     *  processors, caller has ownership of this memory
+     *  processors, caller has ownership of this memory. NULL values in the json
+     *  representation always give NULL values in the cpp representation.
      */
     std::vector<ArrayContents*>* JsonToCpp(const Json::Value& json_array);
 
@@ -62,7 +63,8 @@ class PointerArrayProcessor : public ProcessorBase<std::vector<ArrayContents*> >
      *
      *  @returns Json::Value arrayValue with vector contents in Json
      *  representation. As with all processors, caller has ownership of this
-     *  memory
+     *  memory. NULL values in the cpp representation always give NULL values in
+     *  the json representation.
      */
     Json::Value* CppToJson(const std::vector<ArrayContents*>& cpp_array);
   private:
@@ -96,7 +98,8 @@ class ValueArrayProcessor : public ProcessorBase<std::vector<ArrayContents> > {
      *  @param json_array Json arrayValue
      *
      *  @returns std::vector C++ representation of the data. As with all
-     *  processors, caller has ownership of this memory
+     *  processors, caller has ownership of this memory. Note json null values
+     *  usually result in an exception, depending on the ArrayContentsProcessor.
      */
     std::vector<ArrayContents>* JsonToCpp(const Json::Value& json_array);
 
@@ -106,7 +109,7 @@ class ValueArrayProcessor : public ProcessorBase<std::vector<ArrayContents> > {
      *
      *  @returns Json::Value arrayValue with vector contents in Json
      *  representation. As with all processors, caller has ownership of this
-     *  memory
+     *  memory.
      */
     Json::Value* CppToJson(const std::vector<ArrayContents>& cpp_array);
   private:

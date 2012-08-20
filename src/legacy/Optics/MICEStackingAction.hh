@@ -1,7 +1,7 @@
 #ifndef MICEStackingAction_H
 #define MICEStackingAction_H 1
 
-#include "G4UserStackingAction.hh"
+#include "Geant4/G4UserStackingAction.hh"
 
 class G4Track;
 

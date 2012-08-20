@@ -25,25 +25,14 @@
 
 #include "json/value.h"
 
-/////////// Needed until persistency move is done /////////////
-#include "src/legacy/Interface/dataCards.hh"
-#include "src/legacy/Interface/MICEEvent.hh"
-#include "src/legacy/Interface/MICERun.hh"
-
-#include "src/legacy/Config/MiceModule.hh"
-#include "src/legacy/Interface/MiceMaterials.hh"
-#include "src/legacy/Simulation/FillMaterials.hh"
-/////////// Needed until persistency move is done //////////////
-
-/////////// Needed until I clean up legacy tests to gtest framework //////////
-#include "src/legacy/Interface/Squeak.hh"
-/////////// Needed until I clean up legacy tests to gtest framework //////////
-
-#include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
-
+#include "src/common_cpp/Utils/JsonWrapper.hh"
+#include "src/common_cpp/Globals/GlobalsManager.hh"
 
 Json::Value SetupConfig() {
   Json::Value config(Json::objectValue);
+  config["check_volume_overlaps"] = true;
+  config["reconstruction_geometry_filename"] = "Test.dat";
+  config["simulation_geometry_filename"] = "Test.dat";
   config["maximum_number_of_steps"] = 10000;
   config["keep_tracks"] = true;
   config["keep_steps"] = true;
@@ -56,22 +45,24 @@ Json::Value SetupConfig() {
   config["charged_pion_half_life"] = -1.;
   config["muon_half_life"] = -1.;
   config["production_threshold"] = 0.5;
+  config["default_keep_or_kill"] = true;
+  config["keep_or_kill_particles"] = "{\"neutron\":False}";
+  config["kinetic_energy_threshold"] = 0.1;
+  config["simulation_reference_particle"] = JsonWrapper::StringToJson(
+    std::string("{\"position\":{\"x\":0.0,\"y\":-0.0,\"z\":-5500.0},")+
+    std::string("\"momentum\":{\"x\":0.0,\"y\":0.0,\"z\":1.0},")+
+    std::string("\"particle_id\":-13,\"energy\":226.0,\"time\":0.0,")+
+    std::string("\"random_seed\":10}")
+  );
   return config;
 }
 
 int main(int argc, char **argv) {
-  ///// Try to keep static set up to a minimum (not very unit testy)
-  MICERun::getInstance()->jsonConfiguration = new Json::Value(SetupConfig());
-  dataCards MyDataCards(0);
-  MICERun::getInstance()->DataCards = &MyDataCards;
-  MICERun::getInstance()->miceModule = new MiceModule("Test.dat");  // delete
-  MICERun::getInstance()->miceMaterials = new MiceMaterials();  // delete
-  fillMaterials(*MICERun::getInstance());
-  Squeak::setOutput(Squeak::debug, Squeak::nullOut());
-  Squeak::setStandardOutputs();
-  ::testing::InitGoogleTest(&argc, argv);
   int test_out = -1;
   try {
+      MAUS::GlobalsManager::InitialiseGlobals
+                                         (JsonWrapper::JsonToString(SetupConfig()));
+      ::testing::InitGoogleTest(&argc, argv);
       test_out = RUN_ALL_TESTS();
   } catch(Squeal squee) {
       std::cerr << squee.GetMessage() << "\n" << squee.GetLocation() << "\n"
@@ -79,7 +70,7 @@ int main(int argc, char **argv) {
   } catch(std::exception exc) {
       std::cerr << "Caught std::exception" << "\n" << exc.what() << std::endl;
   }
-  delete MAUS::MAUSGeant4Manager::GetInstance();
+  MAUS::GlobalsManager::DeleteGlobals();
   return test_out;
 }
 

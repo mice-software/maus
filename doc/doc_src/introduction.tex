@@ -1,0 +1,103 @@
+\chapter{What Who and How?}
+\label{chapter:introduction}
+MAUS (MICE Analysis User Software) is the MICE project's tracking, detector reconstruction and accelerator physics analysis framework. MAUS is designed to fulfil a number of functions for physicists interested in studying MICE data:
+
+\begin{itemize}
+\item Model the behaviour of particles traversing MICE
+\item Model the MICE detector's electronics response to particles
+\item Perform pattern recognition to reconstruct particle trajectories from electronics output
+\item Provide a framework for high level accelerator physics analysis
+\item Provide online diagnostics during running of MICE
+\end{itemize}
+
+In addition to MAUS's role within MICE, the code is also used for generic accelerator development, in particular for the Neutrino Factory.
+
+\section{Who Should Use MAUS}
+MAUS is intended to be used by physicists interested in studying the MICE data. MAUS is designed to function as a general tool for modelling particle accelerators and associated detector systems. The modular system, described in the API section, makes MAUS suitable for use by any accelerator or detector group wishing to perform simulation or reconstruction work.
+
+\section{Getting the Code and Installing MAUS}
+Installation is described in a separate document, available at \url{http://micewww.pp.rl.ac.uk/projects/maus/wiki/Install}
+
+\section{Running MAUS}
+MAUS contains several applications to perform various tasks. Two main applications are provided. \verb|bin/simulate_mice.py| makes a Monte Carlo simulation of the experiment and \verb|bin/analyze_data_offline.py| reconstructs an existing data file. Start a clean shell and move into the top level MAUS directory. Then type
+\begin{verbatim}
+ > source env.sh
+ > ${MAUS_ROOT_DIR}/bin/simulate_mice.py
+ > ${MAUS_ROOT_DIR}/bin/analyze_data_offline.py
+\end{verbatim}
+
+\subsection{Run Control}
+The routines can be controlled by a number of settings that enable users to specify run configurations, as specified in this document. Most control variables can be controlled directly from the comamnd line, for example doing
+\begin{verbatim}
+ > ${MAUS_ROOT_DIR}/bin/simulate_mice.py \
+                    --simulation_geometry_filename Test.dat
+\end{verbatim}
+To get a (long) list of all command line variables use the \verb|-h| switch.
+\begin{verbatim}
+ > ${MAUS_ROOT_DIR}/bin/simulate_mice.py -h
+\end{verbatim}
+
+More complex control variables can be controlled using a configuration file, which contains a list of configuration options.
+\begin{verbatim}
+ > ${MAUS_ROOT_DIR}/bin/simulate_mice.py --configuration_file config.py
+\end{verbatim}
+where a sample configuration file for the example above might look like
+\begin{verbatim}
+simulation_geometry_filename = "Test.dat"
+\end{verbatim}
+Note that where on the command line a tag like \verb|--variable value| was used, in the configuration file \verb|variable = "value"| is used. In fact the configuration file is a python script. When loaded, MAUS looks for variables in it's variable list and loads them in as configuration options. Other variables are ignored. This gives users the full power of a scripting language while setting up run configurations. For example, one might choose to use a different filename,
+\begin{verbatim}
+import os
+simulation_geometry_filename = os.path.join(
+                          os.environ["MICEFILES"]
+                          "Models/Configurations/Test.dat"
+)
+\end{verbatim}
+This configuration will then load the file at \verb|$MICEFILES/Models/Configurations/Test.dat|
+
+The default configuration file can be found at \verb|src/common_py/ConfigurationDefaults.py| which contains a list of all possible configuration variables and is loaded by default by MAUS. Any variables not specified by the user are taken from the configuration defaults.
+
+\subsection{Other Applications}
+There are several other applications in the \verb|bin| directory and associated subdirectories.
+\begin{itemize}
+\item \verb|bin/examples| contains example scripts for accessing a number of useful features of the API
+\item \verb|bin/utilities| contains utility functions that perform a number of useful utilities to do with data manipulation, etc
+\item \verb|bin/user| contains analysis functions that our users have found useful, but are not necessarily thoroughly tested or documented
+\item \verb|bin/publications| contains analysis code used for writing a particular (MICE) publication
+\end{itemize}
+
+\section{Accessing Data}
+By default, MAUS writes data as a ROOT file. ROOT is a widely available high energy physics data analysis library, available from \url{''http://root.cern.ch''} and prepacked with the MAUS third party libraries. Two techniques are foreseen for accessing the data.
+
+\subsection{Loading ROOT Files in Python Using PyROOT}
+The standard scripting tool in MAUS is python. The ROOT data structure can be loaded in python using the PyROOT package. An example of how to perform a simple analysis with PyROOT is available in \verb|bin/examples/load_root_file.py|.
+
+\subsection{Loading ROOT Files on the ROOT Command Line}
+One can load ROOT files from the command line using the ROOT interactive display. It is first necessary to load the MAUS class dictionary. Then The TBrowser ROOT GUI can be used to browse to the desired location and interrogate the data structure interactively. For example,
+
+\begin{verbatim}
+$ source env.sh
+$ root
+
+  *******************************************
+  *                                         *
+  *        W E L C O M E  to  R O O T       *
+  *                                         *
+  *   Version   5.30/03   20 October 2011   *
+  *                                         *
+  *  You are welcome to visit our Web site  *
+  *          http://root.cern.ch            *
+  *                                         *
+  *******************************************
+
+ROOT 5.30/03 (tags/v5-30-03@41540, Oct 24 2011, 11:51:36 on linuxx8664gcc)
+
+CINT/ROOT C/C++ Interpreter version 5.18.00, July 2, 2010
+Type ? for help. Commands must be C++ statements.
+Enclose multiple statements between { }.
+root [0] .L $MAUS_ROOT_DIR/build/libMausCpp.so
+root [1] TBrowser b
+\end{verbatim}
+
+More information on accessing the data is available in the data structure chapter \ref{chapter:data_structure}
+

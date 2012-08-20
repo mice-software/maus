@@ -55,5 +55,10 @@ void Data::SetSpill(Spill* spill) {
 Spill* Data::GetSpill() const {
     return _spill;
 }
+
+int Data::my_sizeof() {
+  Data spill;
+  return sizeof(spill);
+}
 }
 

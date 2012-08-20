@@ -19,9 +19,9 @@
 
 #include "json/json.h"
 
-#include "G4Step.hh"
-#include "G4StepPoint.hh"
-#include "G4ParticleTable.hh"
+#include "Geant4/G4Step.hh"
+#include "Geant4/G4StepPoint.hh"
+#include "Geant4/G4ParticleTable.hh"
 
 #include "CLHEP/Vector/Rotation.h"
 #include "CLHEP/Vector/ThreeVector.h"

@@ -92,7 +92,7 @@ void Squeak::setStandardOutputs(int verboseLevel) {
   }
   activateCout(verboseLevel <= Squeak::debug);
   activateClog(verboseLevel <= Squeak::info);
-  activateCerr(verboseLevel <= Squeak::warning);
+  activateCerr(verboseLevel <= Squeak::error);
 }
 
 void Squeak::activateCout(bool isActive) {

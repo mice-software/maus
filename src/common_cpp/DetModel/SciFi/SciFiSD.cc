@@ -14,27 +14,29 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#include "src/common_cpp/DetModel/SciFi/SciFiSD.hh"
-
-#include <G4TransportationManager.hh>
-#include <G4FieldManager.hh>
-#include <G4Field.hh>
-#include <G4HCofThisEvent.hh>
-#include <G4Step.hh>
-#include <G4ThreeVector.hh>
-#include <G4SDManager.hh>
-#include <G4ios.hh>
 
 #include <iostream>
 #include <fstream>
 #include <cmath>
-#include "Interface/MICEEvent.hh"
-#include "src/legacy/Config/MiceModule.hh"
+
+
+#include "Geant4/G4TransportationManager.hh"
+#include "Geant4/G4FieldManager.hh"
+#include "Geant4/G4Field.hh"
+#include "Geant4/G4HCofThisEvent.hh"
+#include "Geant4/G4Step.hh"
+#include "Geant4/G4ThreeVector.hh"
+#include "Geant4/G4SDManager.hh"
+#include "Geant4/G4ios.hh"
 
 #include "TFile.h"
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TTree.h"
+
+#include "Interface/MICEEvent.hh"
+#include "src/legacy/Config/MiceModule.hh"
+#include "src/common_cpp/DetModel/SciFi/SciFiSD.hh"
 
 SciFiSD::SciFiSD(MiceModule* mod) : MAUSSD(mod) {
 }
@@ -44,7 +46,7 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
 
   G4double edep = aStep->GetTotalEnergyDeposit();
 
-  double pid = aStep->GetTrack()->GetDefinition()->GetPDGEncoding();
+  int pid = aStep->GetTrack()->GetDefinition()->GetPDGEncoding();
 
   if ( edep == 0. ) return false;
   if ( fabs(pid) != 13 ) return false;
@@ -73,7 +75,7 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
   _hits["sci_fi_hits"][hit_i]["energy"] = aStep->GetTrack()->GetTotalEnergy();
   _hits["sci_fi_hits"][hit_i]["charge"] =
                              aStep->GetTrack()->GetDefinition()->GetPDGCharge();
-  _hits["sci_fi_hits"][hit_i]["pid"] = pid;
+  _hits["sci_fi_hits"][hit_i]["particle_id"] = pid;
   _hits["sci_fi_hits"][hit_i]["time"] =
                                       aStep->GetPreStepPoint()->GetGlobalTime();
   _hits["sci_fi_hits"][hit_i]["energy_deposited"] = edep;

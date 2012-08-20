@@ -37,9 +37,10 @@ class MapCppTrackerMCDigitizationTestCase(unittest.TestCase):
             is called.
         """
         self.mapper = MapCppTrackerMCDigitization()
-        conf = Configuration()
+        conf = json.loads(Configuration().getConfigJSON())
+        conf["reconstruction_geometry_filename"] = "Stage6.dat"
         # Test whether the configuration files were loaded correctly at birth
-        success = self.mapper.birth(conf.getConfigJSON())
+        success = self.mapper.birth(json.dumps(conf))
         if not success:
             raise Exception('InitializeFail', 'Could not start worker')
 
