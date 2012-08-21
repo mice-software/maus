@@ -33,6 +33,7 @@ some test-dependent code in build_geometry (need to fettle the axes for KSTest)
 
 import operator
 import sys
+import copy
 
 import xboa.Common as Common
 
@@ -129,6 +130,9 @@ class TestFactory:
                 min_max[0] = bins[0]
             if min_max[1] == None:
                 min_max[1] = bins[-1]
+            delta = min_max[1] - min_max[0]
+            min_max[1] += delta*0.1
+            min_max[0] -= delta*0.1
         return min_max
     _get_min_max = staticmethod(_get_min_max)
 
@@ -154,7 +158,7 @@ class TestFactory:
         #first setup the geometry basics
         geo.name = self.make_name(config)
         geo.code_model = self.code_parameters()
-        geo.substitutions = self.code_convert(config)
+        geo.substitutions = self.code_convert(copy.deepcopy(config))
         geo.bunch_index = self._code.get_bunch_index()
         geo.bunch_read = self._code.get_bunch_read_keys()
         geo.tests = self._tests

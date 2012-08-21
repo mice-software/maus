@@ -32,7 +32,7 @@ def _ke2p(kinetic_energy):
     return momentum
 
 TEST_CONFIGURATIONS = [ #thickness in mm, momentum in MeV/c
-{'__material__':'Al',   '__thickness__':0.5, '__momentum__':200.,
+{'__material__':'lH2',   '__thickness__':100., '__momentum__':200.,
  '__pid__':-13, '__step__':100., '__nev__':10000, '__seed__':1},
 ]
 

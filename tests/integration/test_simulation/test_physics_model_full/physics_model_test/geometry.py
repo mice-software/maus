@@ -130,6 +130,7 @@ class Geometry:
         """
         Read the input file
         """
+        print self.bunch_read
         return Bunch.new_dict_from_read_builtin(*self.bunch_read)\
                                                               [self.bunch_index]
 
