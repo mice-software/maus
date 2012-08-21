@@ -32,10 +32,10 @@ TEST(SqueakTest, SqueakSetOutputMoutErrorLevelTest) {
   Squeak::errorLevel err[] = {Squeak::debug, Squeak::info, Squeak::warning,
                                                   Squeak::error, Squeak::fatal};
   for (int i = 0; i < 5; ++i) {
-    Squeak::setOutput(err[i], sstr);
+    Squeak::setAnOutput(err[i], sstr);
     ASSERT_EQ(Squeak::mout(err[i]), sstr) << "errorLevel " << err[i]
                                                                    << " failed";
-    Squeak::setOutput(err[i], std::cout);
+    Squeak::setAnOutput(err[i], std::cout);
     ASSERT_EQ(Squeak::mout(err[i]), std::cout) << "errorLevel " << err[i]
                                                                    << " failed";
   }
@@ -47,9 +47,9 @@ TEST(SqueakTest, SqueakMoutExceptionTest) {
   Squeal::exceptionLevel exc[] = {Squeal::recoverable, Squeal::nonRecoverable};
   Squeak::errorLevel err[] = {Squeak::error, Squeak::fatal};
   for (int i = 0; i < 2; ++i) {
-    Squeak::setOutput(err[i], sstr);
+    Squeak::setAnOutput(err[i], sstr);
     ASSERT_EQ(Squeak::mout(exc[i]), sstr);
-    Squeak::setOutput(err[i], std::cout);
+    Squeak::setAnOutput(err[i], std::cout);
     ASSERT_EQ(Squeak::mout(exc[i]), std::cout);
   }
 }
@@ -57,9 +57,9 @@ TEST(SqueakTest, SqueakMoutExceptionTest) {
 // test mout()
 TEST(SqueakTest, SqueakMoutDefaultTest) {
   std::stringstream sstr;
-  Squeak::setOutput(Squeak::debug, sstr);
+  Squeak::setAnOutput(Squeak::debug, sstr);
   ASSERT_EQ(Squeak::mout(), sstr);
-  Squeak::setOutput(Squeak::debug, std::cout);
+  Squeak::setAnOutput(Squeak::debug, std::cout);
   ASSERT_EQ(Squeak::mout(), std::cout);
 }
 
@@ -123,7 +123,7 @@ TEST(SqueakTest, ActivateCerrTest) {
   EXPECT_EQ(std::cerr.rdbuf(), Squeak::cerrOut().rdbuf());
 }
 
-TEST(SqueakTest, SetStandardOutputs) {
+TEST(SqueakTest, SetStandardOutputsTest) {
   for (int i = -1; i < 6; ++i) {
     Squeak::setStandardOutputs(i);
     __TestStdOutputs(i);
@@ -132,6 +132,10 @@ TEST(SqueakTest, SetStandardOutputs) {
     Squeak::setStandardOutputs(i);
     __TestStdOutputs(i);
   }
+}
+
+TEST(SqueakTest, SetOutputsTest) {
+  EXPECT_TRUE(false);
 }
 }
 

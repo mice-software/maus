@@ -70,9 +70,11 @@ Json::Value SetupConfig() {
 int main(int argc, char **argv) {
   int test_out = -1;
   try {
+      std::cout << "Initialising Globals" << std::endl;
       MAUS::GlobalsManager::InitialiseGlobals
-                                         (JsonWrapper::JsonToString(SetupConfig()));
+                                     (JsonWrapper::JsonToString(SetupConfig()));
       ::testing::InitGoogleTest(&argc, argv);
+      std::cout << "Running tests" << std::endl;
       test_out = RUN_ALL_TESTS();
   } catch(Squeal squee) {
       std::cerr << squee.GetMessage() << "\n" << squee.GetLocation() << "\n"

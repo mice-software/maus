@@ -19,7 +19,6 @@
 
 #include "DetModel/MAUSSD.hh"  
 
-#include "Interface/MICERun.hh"
 #include "Interface/MiceMaterials.hh"
 
 #include "BeamTools/BTFieldConstructor.hh"
