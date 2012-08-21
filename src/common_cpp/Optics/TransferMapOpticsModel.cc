@@ -239,6 +239,22 @@ std::cout << "DEBUG TransferMapOpticsModel::MapStationsToHits(): "
 
 CovarianceMatrix TransferMapOpticsModel::Transport(
     const CovarianceMatrix & covariances,
+    const double end_plane) const {
+  TransferMap const * transfer_map = GenerateTransferMap(end_plane);
+
+  if (transfer_map == NULL) {
+    throw(Squeal(Squeal::nonRecoverable,
+                  "Got NULL transfer map.",
+                  "MAUS::TransferMapOpticsModel::Transport()"));
+  }
+  CovarianceMatrix transported_covariances
+    = transfer_map->Transport(covariances);
+
+  return transported_covariances;
+}
+
+CovarianceMatrix TransferMapOpticsModel::Transport(
+    const CovarianceMatrix & covariances,
     const double start_plane,
     const double end_plane) const {
   const TransferMap * start_plane_map = FindTransferMap(start_plane);
@@ -250,6 +266,25 @@ CovarianceMatrix TransferMapOpticsModel::Transport(
   delete inverted_start_plane_map;
 
   return transported_covariances;
+}
+
+PhaseSpaceVector TransferMapOpticsModel::Transport(
+    const PhaseSpaceVector & vector,
+    const double end_plane) const {
+std::cout << "DEBUG TransferMapOpticsModel::Transport(): Line 276" << std::endl; std::cout.flush();
+  TransferMap const * transfer_map = GenerateTransferMap(end_plane);
+std::cout << "DEBUG TransferMapOpticsModel::Transport(): Line 278" << std::endl; std::cout.flush();
+  if (transfer_map == NULL) {
+    throw(Squeal(Squeal::nonRecoverable,
+                  "Got NULL transfer map.",
+                  "MAUS::TransferMapOpticsModel::Transport()"));
+  }
+
+std::cout << "DEBUG TransferMapOpticsModel::Transport(): Line 285" << std::endl; std::cout.flush();
+  PhaseSpaceVector transported_vector = transfer_map->Transport(vector);
+
+std::cout << "DEBUG TransferMapOpticsModel::Transport(): Line 292" << std::endl; std::cout.flush();
+  return transported_vector;
 }
 
 PhaseSpaceVector TransferMapOpticsModel::Transport(

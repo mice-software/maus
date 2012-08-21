@@ -35,13 +35,17 @@ class OpticsModel {
 
   virtual void Build() = 0;
 
-  /* @brief Dynamically allocate a new TransferMap between two z-axis.
+  /* @brief transports a beam envelope (covariance matrix) between the first
+   *        simulation plane and the specified end plane.
    *
-   * The user of this function takes ownership of the dynamically allocated
-   * memory and is responsible for deallocating it.
+   * @params covariances the matrix of second moments of the phase space
+   *                    variables {t, E, x, Px, y, Py} to be transported
+   * @params start_plane the z plane to transport from
+   * @params end_plane the z plane to transport to
    */
-  virtual const TransferMap * GenerateTransferMap(
-      const double plane) const = 0;
+  virtual CovarianceMatrix Transport(const CovarianceMatrix & covariances,
+                                     const double end_plane)
+      const = 0;
 
   /* @brief transports a beam envelope (covariance matrix) between two z planes.
    *
@@ -52,6 +56,17 @@ class OpticsModel {
    */
   virtual CovarianceMatrix Transport(const CovarianceMatrix & covariances,
                                      const double start_plane,
+                                     const double end_plane)
+      const = 0;
+
+  /* @brief transports a phase space vector ({t, E, x, Px, y, Py}) between the first
+   *        simulation plane and the specified end plane.
+   *
+   * @params vector the phase space vector to be transported
+   * @params start_plane the z plane to transport from
+   * @params end_plane the z plane to transport to
+   */
+  virtual PhaseSpaceVector Transport(const PhaseSpaceVector & vector,
                                      const double end_plane)
       const = 0;
 

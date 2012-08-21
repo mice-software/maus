@@ -65,8 +65,27 @@ class TransferMapOpticsModel : public OpticsModel {
    */
   void Build();
 
-  const TransferMap * GenerateTransferMap(const double plane) const;
+  // ******************************
+  //  OpticsModel functions
+  // ******************************
+
+  CovarianceMatrix Transport(const CovarianceMatrix & covariances,
+                                     const double end_plane) const;
+
+  CovarianceMatrix Transport(const CovarianceMatrix & covariances,
+                                     const double start_plane,
+                                     const double end_plane) const;
+
+  PhaseSpaceVector Transport(const PhaseSpaceVector & vector,
+                                     const double end_plane) const;
+
+  PhaseSpaceVector Transport(const PhaseSpaceVector & vector,
+                                     const double start_plane,
+                                     const double end_plane) const;
+
  protected:
+  const TransferMap * GenerateTransferMap(const double plane) const;
+
   const dataCards * data_cards_;
   const MiceMaterials * mice_materials_;
   const MiceModule * mice_module_;
@@ -95,14 +114,6 @@ class TransferMapOpticsModel : public OpticsModel {
         station_hits);
 
   const TransferMap * FindTransferMap(const double end_plane) const;
-
-  CovarianceMatrix Transport(const CovarianceMatrix & covariances,
-                                     const double start_plane,
-                                     const double end_plane) const;
-
-  PhaseSpaceVector Transport(const PhaseSpaceVector & vector,
-                                     const double start_plane,
-                                     const double end_plane) const;
 
   /* @brief called by Build() to calculate transfer maps between the start plane
    * and the station planes. The returned pointer points to a newly allocated

@@ -179,7 +179,6 @@ std::cout.flush();
   }
   track_->push_back(guess);
 
-  TransferMap const * transfer_map = NULL;
   CovarianceMatrix const * uncertainties = NULL;
   std::vector<TrackPoint>::const_iterator events
     = detector_events_->begin();
@@ -191,15 +190,8 @@ std::cout << "DEBUG ScoreTrack(): Guess: " << guess << std::endl;
 std::cout << "DEBUG ScoreTrack(): Measured: " << *events << std::endl;
     // calculate the next guess
     const double end_plane = events->z();
-    transfer_map
-      = optics_model_->GenerateTransferMap(end_plane);
-    if (transfer_map == NULL) {
-    throw(Squeal(Squeal::nonRecoverable,
-                 "Got NULL transfer map.",
-                 "MAUS::MinuitTrackFitter::ScoreTrack()"));
-    }
     TrackPoint point = TrackPoint(
-      transfer_map->Transport(guess), end_plane);
+      optics_model_->Transport(guess, end_plane), end_plane);
     // assume the particle didn't decay
     point.set_particle_id(events->particle_id());
 std::cout << "DEBUG ScoreTrack(): Calculated: " << point << std::endl;
