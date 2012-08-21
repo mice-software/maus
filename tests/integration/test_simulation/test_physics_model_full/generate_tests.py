@@ -38,8 +38,9 @@ TEST_CONFIGURATIONS = [ #thickness in mm, momentum in MeV/c
 
 LH2_ONLY_CONFIGURATIONS = [
 {'__material__':'lH2' , '__thickness__':350.,  '__momentum__':200.,
- '__pid__':-13, '__step__':100., '__nev__':100000, '__seed__':1}, # 100k events
-{'__material__':'lH2',  '__thickness__':350.,  '__momentum__':400., 
+ '__pid__':-13, '__step__':100., '__nev__':1000, '__seed__':1},
+]
+void = [{'__material__':'lH2',  '__thickness__':350.,  '__momentum__':400., 
  '__pid__':-13, '__step__':100., '__nev__':10000, '__seed__':1},
 {'__material__':'lH2',  '__thickness__':350.,  '__momentum__':800., 
  '__pid__':-13, '__step__':100., '__nev__':10000, '__seed__':1},
