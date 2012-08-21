@@ -72,7 +72,7 @@ class Squeak {
 
   /// Set the ostream for all items below "level" to /dev/null
 
-  /// If threshold is less than 
+  /// If threshold is less than
   /// * Squeak::debug then mout(Squeak::debug) redirects to std::cout
   /// * Squeak::info then mout(Squeak::info) redirects to std::clog
   /// * Squeak::warning then mout(Squeak::warning) redirects to std::cerr

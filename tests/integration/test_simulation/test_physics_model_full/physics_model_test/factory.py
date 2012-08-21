@@ -143,6 +143,7 @@ class TestFactory:
         pid = config['__pid__']
         test.pid = pid
         bunch.conditional_remove({'pid':pid}, operator.ne)
+        print len(bunch)
         [xmin, xmax] = self._get_min_max(test.variable, bunch)
         xmin *= Common.units[test.units]
         xmax *= Common.units[test.units]

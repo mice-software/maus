@@ -18,10 +18,11 @@ Contains setup information for each of the different codes
 """
 
 import os
+import glob
 import xboa.Common as Common
 from physics_model_test import geometry
 
-class CodeSetup:
+class CodeSetup(object):
     """
     Base class for handling conversions of units/etc between different codes.
     """
@@ -358,6 +359,12 @@ class G4MICESetup(CodeSetup):
 
 class Muon1Setup(CodeSetup):
     """
+    Muon1 needs to run in it's local directory. I assume a script exists called
+
+    muon1.bash
+    
+    that sits in $MUON1_DIR and calls muon1 with appropriate command line flags
+    then moves output file 'muon1_output.csv' to geometry.temp()
     """
     def __init__(self):
         """Initialise - does nothing"""
@@ -421,4 +428,67 @@ class Muon1Setup(CodeSetup):
 
     def get_bunch_index(self):
         return 0
+
+
+class IcoolElmsSetup(IcoolSetup):
+    """
+    Conversions and setup for ICOOL_ELMS
+    
+    Need to set up a file called elmscom.txt which instructs icool where to get
+    ELMS data from. I assume a file exists like
+
+    RunDirectory.txt
+    
+    and a set of files like
+
+    ELMSFv3run*
+
+    in directory pointed to by $ICOOL_ELMSDB environment variable.
+    """
+    def __init__(self):
+        """
+        Additional initialisation is environment variable giving location of
+        elmsdb
+        """
+        super(IcoolElmsSetup, self).__init__()
+        if os.getenv('ICOOL_ELMSDB') == None:
+            raise EnvironmentError("Need to define $ICOOL_ELMSDB "+\
+                                  "environment variable with ELMS data")
+        run_dir = os.path.expandvars("${ICOOL_ELMSDB}/RunDirectory.txt")
+        if not os.path.isfile(run_dir):
+            raise EnvironmentError("Couldn't find "+run_dir+" needed for elms")
+        elms_db = "${ICOOL_ELMSDB}/ELMSFv3run*"
+        if len(glob.glob(os.path.expandvars(elms_db))) < 1:
+            raise EnvironmentError("Couldn't find files like "+elms_db+\
+                                                            " needed for elms")
+        IcoolElmsSetup._substitute_elmscom()
+
+    def __str__(self):
+        """Return icool_elms_<version>"""
+        return 'icool-elms_'+self._version
+
+    def convert_material(self, value):
+        """Convert material strings"""
+        conversions = {
+              'lH2':'LH',
+        }
+        return conversions[value]
+
+    def get_substitutions(self):
+        """Input file is configuration file and geometry definitions"""
+        return {
+            geometry.source('icool/for001_elms.in'):'./for001.dat',
+        }
+
+    def get_output_filename(self):
+        """Output filename dynamically pulls MAUS version from README"""
+        return 'icool_elms.'+self._version+'.ref_data.dat'
+
+    def _substitute_elmscom():
+        """Switch out environment variable into _elmscom.txt"""
+        Common.substitute(
+            geometry.source('icool/_elmscom.txt'), 'elmscom.txt',
+            {'${ICOOL_ELMSDB}':os.path.expandvars('${ICOOL_ELMSDB}')}
+        )
+    _substitute_elmscom = staticmethod(_substitute_elmscom)
 

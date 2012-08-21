@@ -36,20 +36,21 @@ TEST_CONFIGURATIONS = [ #thickness in mm, momentum in MeV/c
  '__pid__':-13, '__step__':100., '__nev__':10000, '__seed__':1},
 ]
 
-LH2_ONLY_CONFIGURATIONS = [
+LH2_ONLY_CONFIGURATIONS = [ # icool_elms recommends step size of 5 mm
 {'__material__':'lH2' , '__thickness__':350.,  '__momentum__':200.,
- '__pid__':-13, '__step__':100., '__nev__':1000, '__seed__':1},
-]
-void = [{'__material__':'lH2',  '__thickness__':350.,  '__momentum__':400., 
- '__pid__':-13, '__step__':100., '__nev__':10000, '__seed__':1},
+ '__pid__':-13, '__step__':5., '__nev__':100000, '__seed__':1},
+{'__material__':'lH2',  '__thickness__':350.,  '__momentum__':400., 
+ '__pid__':-13, '__step__':5., '__nev__':10000, '__seed__':1},
 {'__material__':'lH2',  '__thickness__':350.,  '__momentum__':800., 
- '__pid__':-13, '__step__':100., '__nev__':10000, '__seed__':1},
+ '__pid__':-13, '__step__':5., '__nev__':10000, '__seed__':1},
 {'__material__':'lH2',  '__thickness__':350.,  '__momentum__':200., 
  '__pid__':-13, '__step__':0.1, '__nev__':10000, '__seed__':1},
 {'__material__':'lH2',  '__thickness__':350.,  '__momentum__':200., 
  '__pid__':-13, '__step__':1., '__nev__':10000, '__seed__':1},
 {'__material__':'lH2',  '__thickness__':350.,  '__momentum__':200., 
  '__pid__':-13, '__step__':10., '__nev__':10000, '__seed__':1},
+{'__material__':'lH2',  '__thickness__':350.,  '__momentum__':200., 
+ '__pid__':-13, '__step__':100., '__nev__':10000, '__seed__':1},
 ]
 
 MICE_CONFIGURATIONS = [
@@ -159,6 +160,7 @@ def main():
     code_converters = {
         'maus':code_setup.MausSetup,
         'icool':code_setup.IcoolSetup,
+        'icool_elms':code_setup.IcoolElmsSetup,
         'g4bl':code_setup.G4blSetup,
         'muon1':code_setup.Muon1Setup,
     }
@@ -173,7 +175,10 @@ where <code_n> is one of"""
         print
     for arg in sys.argv[1:]:
         test_factory = TestFactory(code_converters[arg](), TESTS)
-        test_factory.build_test_data(LH2_ONLY_CONFIGURATIONS)
+        if arg == 'muon1' or arg == 'icool_elms':
+            test_factory.build_test_data(LH2_ONLY_CONFIGURATIONS)
+        else:
+            test_factory.build_test_data(MICE_CONFIGURATIONS)
     sys.exit(0)
 
 if __name__ == '__main__':
