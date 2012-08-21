@@ -106,6 +106,7 @@ TrackPoint & TrackPoint::operator=(const TrackPoint& rhs) {
   PhaseSpaceVector::operator=(rhs);
   detector_id_ = rhs.detector_id_;
   particle_id_ = rhs.particle_id_;
+  z_ = rhs.z_;
 
   delete uncertainties_;
   uncertainties_ = new CovarianceMatrix(*rhs.uncertainties_);

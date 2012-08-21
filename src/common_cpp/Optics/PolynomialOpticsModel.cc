@@ -20,6 +20,7 @@
 
 #include "Optics/PolynomialOpticsModel.hh"
 
+#include <cfloat>
 #include <math.h>
 
 #include <iomanip>
@@ -54,7 +55,7 @@ const PolynomialOpticsModel::Algorithm
 PolynomialOpticsModel::PolynomialOpticsModel(const Json::Value & configuration)
       : TransferMapOpticsModel(configuration), algorithm_(Algorithm::kNone) {
   // Determine which fitting algorithm to use
-  SetupAlgorithm(configuration);
+  SetupAlgorithm();
 
   // TODO(plane1@hawk.iit.edu) get the following from the configuration
   polynomial_order_ = 3;
@@ -63,13 +64,13 @@ PolynomialOpticsModel::PolynomialOpticsModel(const Json::Value & configuration)
 }
 
 
-void PolynomialOpticsModel::SetupAlgorithm(const Json::Value & configuration) {
+void PolynomialOpticsModel::SetupAlgorithm() {
   Json::Value algorithm_names = JsonWrapper::GetProperty(
-      configuration,
+      *configuration_,
       "PolynomialOpticsModel_algorithms",
       JsonWrapper::arrayValue);
   Json::Value algorithm_name = JsonWrapper::GetProperty(
-      configuration,
+      *configuration_,
       "PolynomialOpticsModel_algorithm",
       JsonWrapper::stringValue);
   size_t algorithm;
@@ -100,26 +101,35 @@ const TransferMap * PolynomialOpticsModel::CalculateTransferMap(
     const std::vector<reconstruction::global::TrackPoint> & station_hits)
     const {
 
+  if (start_plane_hits.size() != station_hits.size()) {
+    throw(Squeal(Squeal::nonRecoverable,
+                  "The number of start plane hits is not the same as the number "
+                  "of hits per station.",
+                  "PolynomialOpticsModel::CalculateTransferMap()"));
+  }
+
   std::vector< std::vector<double> > points;
   for (size_t pt_index = 0; pt_index < start_plane_hits.size(); ++pt_index) {
-std::cout << "Point[" << pt_index << "]: " << start_plane_hits[pt_index] << std::endl;
     std::vector<double> point;
     for (size_t coord_index = 0; coord_index < 6; ++coord_index) {
-      point.push_back(start_plane_hits[pt_index][coord_index]);
+      if (start_plane_hits[pt_index][coord_index] < 1.0e-8) {
+        // Set zero coordinates = DBL_MIN to avoid singular covariance matrices
+        point.push_back(1.0e-6);
+      } else {
+        point.push_back(start_plane_hits[pt_index][coord_index]);
+      }
     }
     points.push_back(point);
   }
 
   std::vector< std::vector<double> > values;
-  for (size_t val_index = 0; val_index < start_plane_hits.size(); ++val_index) {
-std::cout << "Value[" << val_index << "]: " << station_hits[val_index] << std::endl;
+  for (size_t val_index = 0; val_index < station_hits.size(); ++val_index) {
     std::vector<double> value;
     for (size_t coord_index = 0; coord_index < 6; ++coord_index) {
       value.push_back(station_hits[val_index][coord_index]);
     }
     values.push_back(value);
   }
-std::cout.flush();
 
   PolynomialMap * polynomial_map = NULL;
 

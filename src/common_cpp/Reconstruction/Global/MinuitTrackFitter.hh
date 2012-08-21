@@ -57,7 +57,7 @@ class MinuitTrackFitter : public TrackFitter, public TObject {
 
   ~MinuitTrackFitter();
 
-  Double_t ScoreTrack(Double_t const * const start_plane_track_coordinates);
+  Double_t ScoreTrack(Double_t * const start_plane_track_coordinates);
  protected:
   static const size_t kPhaseSpaceDimension;
 

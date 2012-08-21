@@ -46,66 +46,7 @@ using reconstruction::global::Particle;
 
 TransferMapOpticsModel::TransferMapOpticsModel(
     const Json::Value & configuration) {
-  // Prepare for simulating First plane particles through MICE
-/*
-if (maus_configuration_ == NULL) {
-  std:cout << "DEBUG TransferMapOpticsModel(): MAUS configuration is NULL" << std::endl;
-}
-  simulation.jsonConfiguration = new Json::Value(configuration);
-  Json::Value& config = *simulation.jsonConfiguration;
-  config["verbose_level"] = Json::Value(0);
-
-  config["maximum_number_of_steps"] = Json::Value(10000);
-  config["geant4_visualisation"] = Json::Value(false);
-  config["keep_steps"] = Json::Value(false);
-  config["keep_tracks"] = Json::Value(false);
-  config["physics_model"] = Json::Value("QGSP_BERT");
-  config["reference_physics_processes"] = Json::Value("mean_energy_loss");
-  config["physics_processes"] = Json::Value("standard");
-  config["particle_decay"] = Json::Value(true);
-  config["charged_pion_half_life"] = Json::Value(-1.);  // use geant4 default
-  config["muon_half_life"] = Json::Value(-1.);  // use geant4 default
-  // # set the threshold for delta ray production [mm]
-  config["production_threshold"] = Json::Value(0.5);
-
-  // Next function disables std::cout, std::clog,
-  // std::cerr depending on VerboseLevel
-  Squeak::setStandardOutputs();
-
-  // Data Cards setup
-  data_cards_ = simulation.DataCards;
-if (data_cards_ == NULL) {
-  std::cout << "DEBUG TransferMapOpticsModel(): MAUS Data Cards is NULL" << std::endl;
-}
-  simulation.DataCards = new dataCards("Simulation");
-
-  // Materials
-  mice_materials_ = simulation.miceMaterials;
-if (data_cards_ == NULL) {
-  std::cout << "DEBUG TransferMapOpticsModel(): MAUS Mice Materials is NULL" << std::endl;
-}
-  simulation.miceMaterials = new MiceMaterials();
-
-  // MICE Model setup
-  Json::Value module_name = JsonWrapper::GetProperty(config,
-                                                 "simulation_geometry_filename",
-                                                 JsonWrapper::stringValue);
-  mice_module_ = simulation.miceModule;
-if (data_cards_ == NULL) {
-  std::cout << "DEBUG TransferMapOpticsModel(): MAUS Mice Module is NULL" << std::endl;
-}
-  simulation.miceModule = new MiceModule(module_name.asString());
-
-  // G4 Materials
-  fillMaterials(simulation);
-
-  MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
-
-  // RF cavity phases
-  simulator->SetPhases();
-  Squeak::mout(Squeak::info) << "Fields:" << std::endl;
-  simulation.btFieldConstructor->Print(Squeak::mout(Squeak::info));
-*/
+  configuration_ = &configuration;
   // Reference Particle
   MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
   reference_pgparticle_ = simulator->GetReferenceParticle();
@@ -123,7 +64,7 @@ if (data_cards_ == NULL) {
 
   // First plane particle coordinate deltas
   Json::Value delta_values = JsonWrapper::GetProperty(
-      configuration,
+      *configuration_,
       "TransferMapOpticsModel_Deltas",
       JsonWrapper::objectValue);
   deltas_ = PhaseSpaceVector(
@@ -145,8 +86,6 @@ TransferMapOpticsModel::~TransferMapOpticsModel() {
 }
 
 void TransferMapOpticsModel::Build() {
-std::cout << "CHECKPOINT Build(): BEGIN" << std::endl;
-std::cout.flush();
   // Create some test hits at the desired First plane
   const std::vector<TrackPoint> first_plane_hits = BuildFirstPlaneHits();
 
@@ -175,34 +114,12 @@ std::cout.flush();
     std::vector<TrackPoint>::iterator station_hit;
 
     double station_plane = station_hits->second.begin()->z();
-std::cout << "DEBUG Build(): station plane = " << station_plane << std::endl;
 
     // Generate a transfer map between the First plane and the current station
     // and map the station ID to the transfer map
     transfer_maps_[station_plane]
       = CalculateTransferMap(first_plane_hits, station_hits->second);
   }
-std::cout << "CHECKPOINT Build(): 187" << std::endl;
-std::cout.flush();
-
-  // make sure we don't override mc_events
-  Json::Value * configuration = MICERun::getInstance()->jsonConfiguration;
-  configuration->removeMember("mc_events");
-  /*
-  MICERun & simulation = *MICERun::getInstance();
-  delete simulation.DataCards;
-  simulation.DataCards = const_cast<dataCards *>(data_cards_);
-  delete simulation.miceMaterials;
-  simulation.miceMaterials = const_cast<MiceMaterials *>(mice_materials_);
-  delete simulation.miceModule;
-  simulation.miceModule = const_cast<MiceModule *>(mice_module_);
-  delete simulation.jsonConfiguration;
-  simulation.jsonConfiguration = const_cast<Json::Value *>(maus_configuration_);
-  fillMaterials(simulation);
-  MAUSGeant4Manager::GetInstance()->SetPhases();
-  */
-std::cout << "CHECKPOINT Build(): END" << std::endl;
-std::cout.flush();
 }
 
 const TransferMap * TransferMapOpticsModel::FindTransferMap(
@@ -244,8 +161,6 @@ const TransferMap * TransferMapOpticsModel::FindTransferMap(
   if (transfer_map_entry == transfer_maps_.end()) {
     --transfer_map_entry;
   }
-std::cout << "DEBUG GenerateTransferMap(): generating transfer map between "
-          << first_plane_ << " and " << transfer_map_entry->first << std::endl;
   return transfer_map_entry->second;
 }
 
@@ -295,14 +210,11 @@ void TransferMapOpticsModel::MapStationsToHits(
                  "No events were generated during simulation.",
                  "MAUS::TransferMapOpticsModel::MapStationsToHits()"));
   }
-  if (events.size() == 0) {
-    throw(Squeal(Squeal::nonRecoverable,
-                  "No virtual hits were generated during simulation.",
-                  "MAUS::TransferMapOpticsModel::MapStationsToHits()"));
-  }
   for (size_t event_index = 0; event_index < events.size(); ++event_index) {
     // Iterate through each hit recorded during the current event
     const Json::Value hits = events[event_index]["virtual_hits"];
+std::cout << "DEBUG TransferMapOpticsModel::MapStationsToHits(): "
+          << "# Hits = " << hits.size() << std::endl;
     for (size_t hit_index = 0; hit_index < hits.size(); ++hit_index) {
       const Json::Value hit = hits[hit_index];
       const int particle_id = hit["particle_id"].asInt();

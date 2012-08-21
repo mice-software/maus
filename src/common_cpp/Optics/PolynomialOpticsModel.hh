@@ -98,7 +98,7 @@ class PolynomialOpticsModel : public TransferMapOpticsModel {
     const std::vector<reconstruction::global::TrackPoint> & station_hits)
     const;
 
-  void SetupAlgorithm(const Json::Value & configuration);
+  void SetupAlgorithm();
 };
 
 

@@ -25,6 +25,7 @@
 #include <vector>
 
 #include "TMinuit.h"
+#include "json/json.h"
 
 #include "Interface/Squeal.hh"
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
@@ -34,6 +35,7 @@
 #include "Reconstruction/Global/Particle.hh"
 #include "Reconstruction/Global/Track.hh"
 #include "Reconstruction/Global/TrackPoint.hh"
+#include "src/common_cpp/Utils/JsonWrapper.hh"
 
 namespace MAUS {
 namespace reconstruction {
@@ -56,6 +58,7 @@ for (size_t index = 0; index < 6; ++index) {
 
   MinuitTrackFitter * track_fitter
     = static_cast<MinuitTrackFitter *>(minuit->GetObjectFit());
+
   score = track_fitter->ScoreTrack(phase_space_coordinate_values);
 }
 
@@ -66,33 +69,58 @@ MinuitTrackFitter::MinuitTrackFitter(
   // Setup *global* scope Minuit object
   common_cpp_optics_reconstruction_minuit_track_fitter_minuit
     = new TMinuit(kPhaseSpaceDimension);
-
   TMinuit * minimiser
     = common_cpp_optics_reconstruction_minuit_track_fitter_minuit;
-  minimiser->SetMaxIterations(100);
+
+  Json::Value const * configuration = optics_model.configuration();
+
+  const double max_iterations = JsonWrapper::GetProperty(
+      *configuration, "reconstruction_minuit_max_iterations",
+      JsonWrapper::intValue).asInt();
+  minimiser->SetMaxIterations(max_iterations);
+
   minimiser->SetObjectFit(this);
+
   minimiser->SetFCN(
     common_cpp_optics_reconstruction_minuit_track_fitter_score_function);
 
   // setup the index, name, init value, step size, min, and max value for each
   // phase space variable (mins and maxes calculated from 800MeV/c ISIS beam)
   int error_flag = 0;
-  // TODO(plane1@hawk.iit.edu) put this in the configuration file
-  minimiser->mnparm(0, "Time", 0., 0.1, -1000., 1., error_flag);   // ns
-  minimiser->mnparm(1, "Energy", 200., 1, 105.7, 1860., error_flag);  // MeV
+  const Json::Value parameters = JsonWrapper::GetProperty(
+      *configuration, "reconstruction_minuit_parameters",
+      JsonWrapper::arrayValue);
+  const Json::Value::UInt parameter_count = parameters.size();
+  for (Json::Value::UInt index = 0; index < parameter_count; ++index) {
+    const Json::Value parameter = parameters[index];
+    const std::string name = JsonWrapper::GetProperty(
+        parameter, "name", JsonWrapper::stringValue).asString();
+    const bool fixed = JsonWrapper::GetProperty(
+        parameter, "fixed", JsonWrapper::booleanValue).asBool();
+    const double initial_value = JsonWrapper::GetProperty(
+        parameter, "initial_value", JsonWrapper::realValue).asDouble();
+    const double value_step = JsonWrapper::GetProperty(
+        parameter, "value_step", JsonWrapper::realValue).asDouble();
+    const double min_value = JsonWrapper::GetProperty(
+        parameter, "min_value", JsonWrapper::realValue).asDouble();
+    const double max_value = JsonWrapper::GetProperty(
+        parameter, "max_value", JsonWrapper::realValue).asDouble();
+    
+    minimiser->mnparm(index, name, initial_value, value_step,
+                       min_value, max_value, error_flag);
+    if (fixed) {
+      minimiser->FixParameter(index);
+    }
+  }
+  /*
+  minimiser->mnparm(0, "Time", 0., 0.1, -2., 2., error_flag);   // ns
+  minimiser->mnparm(1, "Energy", 1860., 1, 105.7, 1860., error_flag);  // MeV
   minimiser->mnparm(2, "X", 0, 0.001, -150., 150., error_flag);      // mm
   minimiser->mnparm(3, "Px", 0., 0.1, -100., 100, error_flag);    // MeV/c
   minimiser->mnparm(4, "Y", 0, 0.001, -150., 150., error_flag);      // mm
   minimiser->mnparm(5, "Py", 0., 0.1, -100., 100, error_flag);    // MeV/c
-/*
-  minimiser->mnparm(4, "Z", start_plane, 0.001, -15000., 200000., error_flag);      // mm
-  minimiser->mnparm(5, "Pz", 1., 0.1, -1., 500, error_flag);    // MeV/c
-  minimiser->FixParameter(4);
-*/
   minimiser->FixParameter(1);
-// Int_t DefineParameter(Int_t parNo, const char *name, Double_t initVal,
-//                       Double_t initErr, Double_t lowerLimit,
-//                       Double_t upperLimit )
+  */
 }
 
 MinuitTrackFitter::~MinuitTrackFitter() {
@@ -129,7 +157,7 @@ std::cout.flush();
 }
 
 Double_t MinuitTrackFitter::ScoreTrack(
-    Double_t const * const start_plane_track_coordinates) {
+    Double_t * const start_plane_track_coordinates) {
 std::cout << "CHECKPOINT ScoreTrack(): 0" << std::endl;
 std::cout.flush();
   // clear the last saved track
@@ -193,6 +221,8 @@ std::cout << "DEBUG ScoreTrack(): Chi Squared: " << chi_squared << std::endl;
 
     ++events;
   }
+std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): "
+          << "Energy = " << guess[1] << "\tScore = " << chi_squared << std::endl;
 
   return chi_squared;
 }

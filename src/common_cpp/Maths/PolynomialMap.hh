@@ -82,6 +82,11 @@ class PolynomialMap : public VectorMap {
    */
   ~PolynomialMap() { }
 
+  /** @brief  Construct a polynomial vector, passing polynomial coefficients
+   *          as a matrix.
+   */
+  PolynomialMap(const PolynomialMap & original_instance);
+
   /** @brief  Reinitialise the polynomial vector with new point (x) dimension
    *          and coefficients.
    */
@@ -150,6 +155,10 @@ class PolynomialMap : public VectorMap {
    */
   PolynomialMap Chain(const PolynomialMap& Q) const;
 
+  /** @brief  Return pseudoinverse of the coefficient matrix.
+   */
+  PolynomialMap * Inverse() const;
+
   /** @brief  Return inverse of the polynomial truncated at order n (in general
    *          an infinite series that does not converge, so beware!)
    *          - NOT IMPLEMENTED
@@ -157,21 +166,39 @@ class PolynomialMap : public VectorMap {
   PolynomialMap Inverse(int max_order) const;
 
   /** @brief  Make a vector like \f$(c, x, x^2, x^3...)\f$.
-   *  @param[in] polyVector  should be of size NumberOfPolynomialCoefficients().
+   *  @param[in] point      should be of size PointDimension().
+   *  @param[in] polyVector should be of size NumberOfPolynomialCoefficients().
    *
    *  could be static but faster as member function (use lookup table for
    *  _polyKey).
    */
-  Vector<double>& MakePolynomialVector(const Vector<double>& point,
+  Vector<double>& MakePolynomialVector(const Vector<double> & point,
                                        Vector<double>& polyVector) const;
 
   /** @brief  Make a vector like \f$(c, x, x^2, x^3...)\f$.
+   *  @param[in] point      should be of size PointDimension().
    *  @param[in] polyVector should be of size NumberOfPolynomialCoefficients().
    *
    *  Could be static but faster as member function (use lookup table for
    *  _polyKey).
    */
-  double* MakePolynomialVector(const double* point, double* polyVector) const;
+  double * MakePolynomialVector(double const * const polyVector, double* point)
+      const;
+
+  /** @brief  Take a vector like \f$(c, x, x^2, x^3...)\f$ and extract the
+   *    first order values (i.e. x, y, z, ...).
+   *  @param[in] polyVector should be of size NumberOfPolynomialCoefficients().
+   *  @param[in] point      should be of size PointDimension().
+   */
+  Vector<double>& UnmakePolynomialVector(const Vector<double>& polyVector,
+                                       Vector<double>& point) const;
+
+  /** @brief  Take a vector like \f$(c, x, x^2, x^3...)\f$ and extract the
+   *    first order values (i.e. x, y, z, ...).
+   *  @param[in] polyVector should be of size NumberOfPolynomialCoefficients().
+   *  @param[in] point      should be of size PointDimension().
+   */
+  double* UnmakePolynomialVector(const double* point, double* polyVector) const;
 
   /** Transforms from a 1d index of polynomial coefficients to an nd index.
    *  This is slow - you should use it to build a lookup table.
