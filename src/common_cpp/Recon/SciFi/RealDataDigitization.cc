@@ -23,7 +23,11 @@ RealDataDigitization::RealDataDigitization() {}
 
 RealDataDigitization::~RealDataDigitization() {}
 
-void RealDataDigitization::process(SciFiSpill &spill, Json::Value const &daq) {
+void RealDataDigitization::process(Spill &spill, Json::Value const &daq) {
+  // Check to see if the spill ReconEventArray pointer has been initialised
+  if (spill.GetReconEvents() == NULL)
+    spill.SetReconEvents(new ReconEventArray());
+
   // -------------------------------------------------
   // Load calibration, mapping and bad channel list.
   // These calls are to be replaced by CDB interface...
@@ -97,7 +101,9 @@ void RealDataDigitization::process(SciFiSpill &spill, Json::Value const &daq) {
         event->add_digit(digit);
       }
     }  // ends loop over channels (j)
-    spill.add_event(event);
+    ReconEvent * revt = new ReconEvent();
+    revt->SetSciFiEvent(new SciFiEvent(*event));
+    spill.GetReconEvents()->push_back(revt);
   }  // ends loop over events (i)
 }
 

@@ -15,6 +15,8 @@
  *
  */
 
+#include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
+#include "src/common_cpp/DataStructure/ReconEvent.hh"
 #include "src/map/MapCppTrackerDigits/MapCppTrackerDigits.hh"
 
 namespace MAUS {
@@ -51,9 +53,10 @@ bool MapCppTrackerDigits::death() {
 }
 
 std::string MapCppTrackerDigits::process(std::string document) {
-  // Writes a line in the JSON document.
+  std::cout << "Digitising tracker data\n";
+
   Json::FastWriter writer;
-  MAUS::SciFiSpill spill;
+  Spill spill;
 
   try {
     // Load input.
@@ -64,7 +67,6 @@ std::string MapCppTrackerDigits::process(std::string document) {
       // Process the input.
       RealDataDigitization real;
       real.process(spill, daq);
-
       // Save to JSON output.
       save_to_json(spill);
     }
@@ -76,38 +78,23 @@ std::string MapCppTrackerDigits::process(std::string document) {
     root["errors"] = errors;
     return writer.write(root);
   }
-
   return writer.write(root);
 }
 
-void MapCppTrackerDigits::save_to_json(MAUS::SciFiSpill &spill) {
-  int number_particle_ev = spill.events().size();
-  for ( int event_i = 0; event_i < number_particle_ev; ++event_i ) {
-    SciFiEvent evt = *(spill.events()[event_i]);
-    // ------- DIGITS -------------------------------------------------------
-    Json::Value sci_fi_digits_tracker0;
-    Json::Value sci_fi_digits_tracker1;
-    for ( unsigned int dig_i = 0; dig_i < evt.digits().size(); dig_i++ ) {
-      Json::Value digit;
-      int tracker = evt.digits()[dig_i]->get_tracker();
-      digit["tracker"]= tracker;
-      digit["station"]= evt.digits()[dig_i]->get_station();
-      digit["plane"]  = evt.digits()[dig_i]->get_plane();
-      digit["channel"]= evt.digits()[dig_i]->get_channel();
-      digit["npe"]    = evt.digits()[dig_i]->get_npe();
-      digit["time"]   = evt.digits()[dig_i]->get_time();
-      if ( tracker == 0 ) sci_fi_digits_tracker0.append(digit);
-      if ( tracker == 1 ) sci_fi_digits_tracker1.append(digit);
-    }
-    //
-    // Save everything in data structrure tree.
-    //
-    // Tracker 0 -------------------------------------------------------------------
-    root["recon_events"][event_i]["sci_fi_event"]["sci_fi_digits"]["tracker0"]
-                                                 = sci_fi_digits_tracker0;
-    // Tracker 1 -------------------------------------------------------------------
-    root["recon_events"][event_i]["sci_fi_event"]["sci_fi_digits"]["tracker1"]
-                                                 = sci_fi_digits_tracker1;
+void MapCppTrackerDigits::save_to_json(Spill &spill) {
+  SpillProcessor spill_proc;
+  root = *spill_proc.CppToJson(spill);
+}
+
+void MapCppTrackerDigits::sfspill_to_mausspill(SciFiSpill &sfspill, Spill &mspill) {
+
+  mspill.SetReconEvents(new ReconEventArray());
+
+  for ( unsigned int event_i = 0; event_i < sfspill.events().size(); ++event_i ) {
+    ReconEvent * revt = new ReconEvent();
+    // Pointers should be deep copied
+    revt->SetSciFiEvent(new SciFiEvent(*(sfspill.events()[event_i])));
+    mspill.GetReconEvents()->push_back(revt);
   }
 }
 

@@ -41,6 +41,7 @@
 #include "Interface/Squeak.hh"
 #include "src/common_cpp/DataStructure/Hit.hh"
 #include "src/common_cpp/DataStructure/SciFiSpill.hh"
+#include "src/common_cpp/DataStructure/Spill.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
 
 namespace MAUS {
@@ -105,7 +106,7 @@ class MapCppTrackerMCDigitization {
 
   /** @brief saves digits to json.
    */
-  void save_to_json(MAUS::SciFiEvent &evt, int event_i);
+  void save_to_json(MAUS::Spill &spill);
 
  private:
   /// This is the Mice Module

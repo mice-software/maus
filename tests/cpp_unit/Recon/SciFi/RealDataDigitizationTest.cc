@@ -17,7 +17,7 @@
 
 #include "gtest/gtest.h"
 
-#include "src/common_cpp/DataStructure/SciFiSpill.hh"
+#include "src/common_cpp/DataStructure/Spill.hh"
 #include "src/common_cpp/Recon/SciFi/RealDataDigitization.hh"
 
 namespace MAUS {
@@ -123,7 +123,7 @@ TEST_F(RealDataDigitizationTest, test_process) {
   std::string fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerDigits/"+file;
   std::ifstream inf(fname.c_str());
 
-  SciFiSpill spill;
+  Spill spill;
 
   std::string line;
   getline(inf, line);
@@ -134,7 +134,8 @@ TEST_F(RealDataDigitizationTest, test_process) {
 
   RealDataDigitization test_case;
   test_case.process(spill, daq);
-  EXPECT_TRUE(spill.events().size()>0);
+  ASSERT_TRUE(spill.GetReconEvents()->size() > 0);
+  // Needs more...
 }
 
 } // ~namespace MAUS
