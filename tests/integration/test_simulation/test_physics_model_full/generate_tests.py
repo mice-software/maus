@@ -159,6 +159,7 @@ def main():
         'maus':code_setup.MausSetup,
         'icool':code_setup.IcoolSetup,
         'g4bl':code_setup.G4blSetup,
+        'muon1':code_setup.Muon1Setup,
     }
     print sys.argv
     if len(sys.argv) == 1:
@@ -171,7 +172,7 @@ where <code_n> is one of"""
         print
     for arg in sys.argv[1:]:
         test_factory = TestFactory(code_converters[arg](), TESTS)
-        test_factory.build_test_data(MICE_CONFIGURATIONS)
+        test_factory.build_test_data(LH2_ONLY_CONFIGURATIONS)
     sys.exit(0)
 
 if __name__ == '__main__':

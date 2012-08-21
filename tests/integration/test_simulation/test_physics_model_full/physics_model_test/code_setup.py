@@ -356,4 +356,69 @@ class G4MICESetup(CodeSetup):
     def get_bunch_index(self):
         return 2
 
+class Muon1Setup(CodeSetup):
+    """
+    """
+    def __init__(self):
+        """Initialise - does nothing"""
+        CodeSetup.__init__(self)
+        if os.getenv('MUON1_DIR') == None:
+            raise EnvironmentError("Need to define $MUON1_DIR "+\
+                                   "environment variable with MUON1 directory")
+        if os.getenv('MUON1_VERSION') == None:
+            raise EnvironmentError("Need to define $MUON1_VERSION "+\
+                                   "environment variable with MUON1 version")
+        self._version = os.getenv('MUON1_VERSION')
+        self._lattice = os.path.expandvars('$MUON1_DIR/lattices/')
+
+    def __str__(self):
+        """Return name of this code"""
+        return 'muon1_'+self._version
+
+    def convert_material(self, value):
+        """Does nothing"""
+        conversions = {
+            'lH2':'LH2lumped\probarray%03d.dat'
+        }
+        return conversions[value]
+
+    def convert_position(self, value):
+        """Does nothing"""
+        return value
+
+    def convert_momentum(self, value):
+        """Converts to energy"""
+        return (value**2.+Common.pdg_pid_to_mass[13]**2.)**0.5-\
+               Common.pdg_pid_to_mass[13]
+
+    def convert_pid(self, value):
+        """Only mu+ are allowed"""
+        if value == -13:
+            return "muon"
+        else:
+            raise IndexError("PID "+str(value)+" not available in muon1")
+
+    def get_substitutions(self):
+        """Input file is configuration file and geometry definitions"""
+        return {geometry.source('muon1/absorber_test.in'):\
+                os.path.join(self._lattice, 'absorber_test.txt')}
+
+    def get_executable(self):
+        """Executable is simulate_mice.py"""
+        return os.path.expandvars('$MUON1_DIR/muon1.bash')
+
+    def get_parameters(self):
+        """Command line parameter to specify control files"""
+        return []
+
+    def get_output_filename(self):
+        """Output filename dynamically pulls MAUS version from README"""
+        return 'muon1.'+self._version+'.ref_data.dat'
+
+    def get_bunch_read_keys(self):
+        """I/O type is maus_root_virtual_hit"""
+        return ('muon1_csv',  geometry.temp('muon1_output.csv'))
+
+    def get_bunch_index(self):
+        return 0
 
