@@ -26,7 +26,6 @@
 
 #include "json/value.h"
 
-#include "Utils/JsonWrapper.hh"
 #include "Interface/Squeal.hh"
 
 /// Squeak class is designed to redirect output to std::out or file
@@ -70,23 +69,23 @@ class Squeak {
   /// Set the ostream for a given error level (Squeal)
   static void setAnOutput(errorLevel level, std::ostream& out);
 
-  /// Set the ostream for all items below "level" to /dev/null
+  /// Set the ostream for all items below "verboseLevel" to /dev/null
 
-  /// If threshold is less than
-  /// * Squeak::debug then mout(Squeak::debug) redirects to std::cout
-  /// * Squeak::info then mout(Squeak::info) redirects to std::clog
-  /// * Squeak::warning then mout(Squeak::warning) redirects to std::cerr
-  /// * Squeak::error then mout(Squeak::error) redirects to std::cerr
-  /// * Squeak::fatal then mout(Squeak::fatal) redirects to std::cerr
+  /// If verboseLevel is less than or equal to
+  /// - Squeak::debug then mout(Squeak::debug) redirects to std::cout
+  /// - Squeak::info then mout(Squeak::info) redirects to std::clog
+  /// - Squeak::warning then mout(Squeak::warning) redirects to std::cerr
+  /// - Squeak::error then mout(Squeak::error) redirects to std::cerr
+  /// - Squeak::fatal then mout(Squeak::fatal) redirects to std::cerr
   /// Note that the redirection is independent of setStandardOutputs status
   static void setOutputs(int verboseLevel);
 
   /// Turn on/off std::cout, std::cerr, std::clog
 
   /// Set standard outputs to /dev/null depending on verboseLevel:
-  ///   * if verboseLevel > int(Squeak::debug), set std::cout to /dev/null
-  ///   * if verboseLevel > int(Squeak::info), set std::clog to /dev/null
-  ///   * if verboseLevel > int(Squeak::warning), set std::cerr to /dev/null
+  /// - if verboseLevel > int(Squeak::debug), set std::cout to /dev/null
+  /// - if verboseLevel > int(Squeak::info), set std::clog to /dev/null
+  /// - if verboseLevel > int(Squeak::warning), set std::cerr to /dev/null
   /// GEANT4 has very verbose output that hides important run control info, so
   /// we can just turn it off by redirecting std::cout here.
   static void setStandardOutputs(int verboseLevel);
@@ -122,7 +121,6 @@ class Squeak {
   static std::ostream& cerrOut();
 
  private:
-  errorLevel GetVerboseLevel();
   // constructor is called by any call to mout
   // defines std::map output
   Squeak();
