@@ -535,35 +535,7 @@ bool MagFieldMap::IsSameG4MiceBinary(vector<double*> inpSheets, std::string mapF
 
 std::string	MagFieldMap::ReplaceVariables( std::string fileName )
 {
-  unsigned int pos = 0;
-  std::string fullName;
-
-  while( pos < fileName.size() )
-  {
-    if( fileName[pos] == '$' ) 	// we've found an environment variable 
-    {
-      ++pos;
-      if( fileName[pos] == '{' )
-	++pos;
-      int end = pos +1;
-      while( fileName[end] != '}' )
-        ++end;
-      std::string variable;
-      for( int vpos = pos; vpos < end; ++vpos )
-        variable += fileName[vpos];
-      if(getenv( variable.c_str() ) == NULL) 
-          throw(Squeal(Squeal::recoverable, "Error - "+variable+" environment variable was not defined", "MagFieldMap::MagFieldMap"));
-      fullName += std::string( getenv( variable.c_str() ) );
-      pos = end + 1;
-    }
-    else
-    {
-      fullName += fileName[pos];
-      ++pos;
-    }
-  }
-
-  return fullName;
+  return STLUtils::ReplaceVariables(fileName);
 }
 
 
