@@ -177,7 +177,6 @@ TEST(SqueakTest, SetOutputsTest) {
     Squeak::setOutputs(i);
     __TestOutputs(i);
   }
-
 }
 }
 
