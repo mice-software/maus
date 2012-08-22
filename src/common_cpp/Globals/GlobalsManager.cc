@@ -46,6 +46,7 @@ void GlobalsManager::InitialiseGlobals(std::string json_datacards) {
     // initialisation. Beware!
     Globals::_process = process;
     try {
+        std::cerr << "Globals manager" << std::endl;
         Json::Value config = JsonWrapper::StringToJson(json_datacards);
         process->_configuration_cards = new Json::Value(config);
         process->_legacy_mice_run = MICERun::getInstance();
@@ -57,6 +58,7 @@ void GlobalsManager::InitialiseGlobals(std::string json_datacards) {
         // we set up logging but for now leave singleton-like access
         // meaning that we can't reinitialise the logging
         Logging::setStandardOutputs(verbose_level);
+        Logging::setOutputs(verbose_level);
         // we set up CppErrorHandler but for now leave singleton-like access
         // meaning that we can't reinitialise the error handler
         process->_error_handler = CppErrorHandler::getInstance();

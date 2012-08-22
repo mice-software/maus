@@ -90,7 +90,7 @@ field_tracker_absolute_error = 1.e-4 # set absolute error on MAUS internal stepp
 field_tracker_relative_error = 1.e-4 # set relative error on MAUS internal stepping routines - used by e.g. VirtualPlanes to control accuracy of interpolation
 
 stepping_algorithm = "ClassicalRK4" # numerical integration routine
-delta_one_step = -1.
+delta_one_step = -1. # Geant4 step accuracy parameter
 delta_intersection = -1.
 epsilon_min = -1.
 epsilon_max = -1.

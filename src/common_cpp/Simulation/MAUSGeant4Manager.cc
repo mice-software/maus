@@ -72,7 +72,7 @@ MAUSGeant4Manager::MAUSGeant4Manager() {
     _virtPlanes = new VirtualPlaneManager;
     _virtPlanes->ConstructVirtualPlanes(
       GetField(),
-      MICERun::getInstance()->miceModule
+      model
     );
     _runManager->Initialize();
 }
@@ -93,7 +93,7 @@ void MAUSGeant4Manager::SetPhases() {
 MAUSPrimaryGeneratorAction::PGParticle
                                      MAUSGeant4Manager::GetReferenceParticle() {
     MAUSPrimaryGeneratorAction::PGParticle p;
-    Json::Value* conf = MICERun::getInstance()->jsonConfiguration;
+    Json::Value* conf = Globals::GetInstance()->GetConfigurationCards();
     Json::Value ref = JsonWrapper::GetProperty
              (*conf, "simulation_reference_particle", JsonWrapper::objectValue);
     p.ReadJson(ref);

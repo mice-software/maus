@@ -34,7 +34,6 @@ std::vector<MICEEvent*> ReadLoop( std::string filename, std::vector<std::string>
 namespace Simulation
 {
 bool                        settingRF  = false;
-MICERun&                    simRun     = *MICERun::getInstance();
 MAUSGeant4Manager*          g4Manager  = NULL;
 
 dataCards* LoadDataCards(int argc, char** argv)
@@ -47,7 +46,6 @@ dataCards* LoadDataCards(int argc, char** argv)
       Squeak::mout(Squeak::error) << "Data Card file " << cardName << " not found" << std::endl;
       return NULL;
     }
-    MICERun::getInstance()->DataCards = &MyDataCards;
   }
   else
   {
@@ -58,7 +56,7 @@ dataCards* LoadDataCards(int argc, char** argv)
 }
 
 void  PhaseCavities(::PhaseSpaceVector ref) {
-    (*simRun.jsonConfiguration)["simulation_reference_particle"] =  ConvertToPGParticle(ref).WriteJson();   
+    (*MAUS::Globals::GetConfigurationCards())["simulation_reference_particle"] =  ConvertToPGParticle(ref).WriteJson();   
     MAUSGeant4Manager::GetInstance()->SetPhases();
 }
 
@@ -103,7 +101,7 @@ MiceModule* SetupSimulation(std::vector< ::CovarianceMatrix> envelope)
   std::string str_config = JsonWrapper::JsonToString(json_config);
   MAUS::GlobalsManager::InitialiseGlobals(str_config);
   g4Manager = MAUS::Globals::GetInstance()->GetGeant4Manager();
-  simRun.DataCards = &MyDataCards;
+  MAUS::GlobalsManager::SetLegacyCards(&MyDataCards);
   return MAUS::Globals::GetMonteCarloMiceModules();
 }
 
@@ -966,11 +964,10 @@ int main(int argc, char **argv)
   try{
   //Some global setup
   if( Simulation::LoadDataCards(argc, argv) == NULL ) exit(1);
-  Squeak::setStandardOutputs();
   Squeak::mout() << "//============\\\\" << std::endl;
   Squeak::mout() << "||   Optics   ||" << std::endl;
   Squeak::mout() << "\\\\============//" << std::endl;
-  Squeak::mout(Squeak::info) << "Parsing control files" << std::endl;
+  Squeak::mout() << "Parsing control files" << std::endl;
   MiceModule* root   = Simulation::SetupSimulation(std::vector< ::CovarianceMatrix>());
   std::vector<MiceModule*> optim = root->findModulesByPropertyExistsNC("string", "Optimiser");
   if(optim.size()>0)

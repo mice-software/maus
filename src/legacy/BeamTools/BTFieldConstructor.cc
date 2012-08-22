@@ -515,7 +515,9 @@ BTMultipole::EndFieldModel* BTFieldConstructor::GetEndFieldModel
 			else propertyExists = false;
 		}
 		if (engeNumber == 1)
-      enge = MagnetParameters::getInstance()->QuadrupoleFringeParameters();
+      throw(Squeal(Squeal::recoverable,
+          "Must define at least one Enge parameter for Enge end field",
+          "BTFieldConstructor::GetEndFieldModel"));
 		return new BTMultipole::EngeEndField
                                        (enge, x0, l, max_p);
   }
