@@ -16,9 +16,9 @@ local_env.Append(LIBS=['MDMonitor'])
 
 # Return("my_variable") should return a value - but doesn't appear to work
 # instead I set a flag in .sconf_temp/ to indicate a subproject failed
-if (not conf.CheckCXXHeader('Monitoring.hh')):
+if (not conf.CheckCXXHeader('MDmonitoring.hh')):
     print """
-Monitoring.hh file required for online operation not found.
+MDmonitoring.hh file required for online operation not found.
 InputCppDAQOnlineData module will not be built.
 """
     fail(project)
