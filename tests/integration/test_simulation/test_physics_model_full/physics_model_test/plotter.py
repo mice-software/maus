@@ -134,15 +134,24 @@ def build_legend(canvas, tests, test_dict, histograms):
     leg_min =  0.89-0.08*len(histograms)
     if leg_min < 0.1:
         leg_min = 0.1
-    leg = ROOT.TLegend(0.63, leg_min, 0.99, 0.90) # pylint: disable=E1101
+    leg = ROOT.TLegend(0.0, leg_min, 0.4, 0.90) # pylint: disable=E1101
     leg.SetEntrySeparation(0.6)
     for i, hist in enumerate(histograms):
         leg.AddEntry(hist, legends[i])
     leg.SetFillColor(10)
-    leg.SetBorderSize(1)
+    leg.SetBorderSize(0)
     leg.Draw()
     canvas.Update()
     LEGENDS.append(leg)
+
+def set_margins(canvas):
+    """
+    Make some clearance for the legend
+    """
+    canvas.SetLeftMargin(0.4)
+    canvas.SetRightMargin(0.05)
+    canvas.Update()
+    
 
 def build_title(canvas, name):
     """
@@ -174,6 +183,7 @@ def plot(file_list):
             (canv, h_list) = KSTest.make_plots(test_list)
             build_legend(canv, test_list, test_dict, h_list[1:])
             build_title(canv, test_dict[test_list[0]])
+            set_margins(canv)
             fname = file_name(test_dict[test_list[0]], test_list[0])
             for form in PLOT_FORMATS:
                 plot_path = os.path.join(PLOT_DIR, fname+'.'+form)

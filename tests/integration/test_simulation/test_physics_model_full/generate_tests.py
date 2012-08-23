@@ -53,6 +53,23 @@ LH2_ONLY_CONFIGURATIONS = [ # icool_elms recommends step size of 5 mm
  '__pid__':-13, '__step__':100., '__nev__':10000, '__seed__':1},
 ]
 
+BE_PLUG_CONFIGURATIONS = [
+{'__material__':'Be',   '__thickness__':100., '__momentum__':200.,
+ '__pid__':-13, '__step__':100., '__nev__':10000, '__seed__':1},
+{'__material__':'Be',   '__thickness__':100., '__momentum__':200.,
+ '__pid__':2212, '__step__':100., '__nev__':10000, '__seed__':1},
+{'__material__':'Be',   '__thickness__':100., '__momentum__':400.,
+ '__pid__':2212, '__step__':100., '__nev__':10000, '__seed__':1},
+{'__material__':'Be',   '__thickness__':100., '__momentum__':800.,
+ '__pid__':2212, '__step__':100., '__nev__':10000, '__seed__':1},
+{'__material__':'Be',   '__thickness__':100., '__momentum__':200.,
+ '__pid__':211, '__step__':100., '__nev__':10000, '__seed__':1},
+{'__material__':'Be',   '__thickness__':100., '__momentum__':200.,
+ '__pid__':-11, '__step__':100., '__nev__':10000, '__seed__':1},
+{'__material__':'Be',   '__thickness__':200., '__momentum__':200.,
+ '__pid__':-13, '__step__':100., '__nev__':10000, '__seed__':1},
+]
+
 MICE_CONFIGURATIONS = [
 {'__material__':'LITHIUM_HYDRIDE',  '__thickness__':10.,  '__momentum__':100.,
  '__pid__':-13, '__step__':100., '__nev__':10000, '__seed__':1},
