@@ -28,6 +28,8 @@
 
 #include "json/json.h"
 
+#include "src/common_cpp/DataStructure/Spill.hh"
+
 // Root
 #include "TTree.h"
 #include "TH1I.h"
@@ -46,6 +48,8 @@
 #include "TFrame.h"
 #include "TF1.h"
 #include "TPaveText.h"
+
+namespace MAUS {
 
 class ReduceCppPatternRecognition {
 
@@ -72,9 +76,12 @@ class ReduceCppPatternRecognition {
   std::string process(std::string document);
 
   int const get_num_tracks() { return _tracks.GetEntries(); }
-  int const get_num_spoints() { return _spacepoints.GetEntries(); }
+  int const get_num_spoints() { return _spoints.GetEntries(); }
+  MAUS::Spill get_spill() { return _spill; }
 
  private:
+
+  Json::Value root;
 
   std::string _classname;
   std::string _filename;
@@ -89,8 +96,8 @@ class ReduceCppPatternRecognition {
   double _npe;
   int _tracker_dig;
 
-  TTree _spacepoints;
-  TTree _spacepoints_1spill;
+  TTree _spoints;
+  TTree _spoints_1spill;
   int _tracker;
   int _station;
   int _type;
@@ -113,6 +120,18 @@ class ReduceCppPatternRecognition {
   std::vector<TF1> _trks_zx_trkr1;
   std::vector<TF1> _trks_zy_trkr1;
 
+  // The current spill
+  Spill _spill;
+
+  /** Takes json data and returns a Spill
+   *
+   *  Track fit takes the spacepoints from Pattern Recognition and, going back to the clusters
+   *  which formed the spacepoints, fits the tracks more acurately using a Kalman filter
+   *
+   *  \param json_data a string holding spill's worth of data in json format
+   */
+  bool read_in_json(std::string json_data);
+
   void draw_histos(TTree * t1, TCanvas * c1);
   void draw_graphs(TTree * t1, TCanvas * c1);
   void draw_tracks(TCanvas * c1);
@@ -122,6 +141,8 @@ class ReduceCppPatternRecognition {
   void Save();
   void update_info(TCanvas * c1, TPaveText *pt);
 };
+
+} // ~namespace MAUS
 
 #endif
 

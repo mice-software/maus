@@ -49,7 +49,8 @@
 
 #include "src/common_cpp/DataStructure/SciFiDigit.hh"
 #include "src/common_cpp/DataStructure/SciFiEvent.hh"
-#include "src/common_cpp/DataStructure/SciFiSpill.hh"
+#include "src/common_cpp/DataStructure/ReconEvent.hh"
+#include "src/common_cpp/DataStructure/Spill.hh"
 
 namespace MAUS {
 
@@ -63,7 +64,7 @@ class RealDataDigitization {
    *  @params spill A SciFiSpill to be filled
    *  @params input_event The DAQ JSON Tracker Event
    */
-  void process(SciFiSpill &spill, Json::Value const &input_event);
+  void process(Spill &spill, Json::Value const &input_event);
 
   /** @brief Reads in the calibration.
    */

@@ -24,58 +24,55 @@
 #include "Interface/Squeal.hh"
 #include "Interface/dataCards.hh"
 
+#include "src/common_cpp/DataStructure/SciFiDigit.hh"
+#include "src/common_cpp/DataStructure/SciFiCluster.hh"
+#include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
+#include "src/common_cpp/DataStructure/SciFiStraightPRTrack.hh"
+#include "src/common_cpp/DataStructure/SciFiEvent.hh"
+#include "src/common_cpp/DataStructure/Spill.hh"
+#include "src/common_cpp/DataStructure/ReconEvent.hh"
+#include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
+
 #include "src/reduce/ReduceCppPatternRecognition/ReduceCppPatternRecognition.hh"
+
+namespace MAUS {
 
 bool ReduceCppPatternRecognition::birth(std::string argJsonConfigDocument) {
 
   _classname = "ReduceCppPatternRecognition";
-  _filename = "cosmics.root";                     // The output file
+  _filename = "reduce_pattern_recognition.root"; // The output file
   _nSpills = 0;
 
   // Set up the ROOT canvases
-  // TCanvas *c1 = new TCanvas("c1", "Spacepoint X, Y, Z Histos", 200, 10, 700, 500);
-  // c1->Divide(3, 2);
-
-  TCanvas *c2 = new TCanvas("c2", "Spacepoint RealSpace Projections", 200, 10, 700, 500);
-  c2->Divide(3, 2);
-
-  // TCanvas *c3 = new TCanvas("c3", "Spacepoint X, Y, Z Histos (1 Spill)", 200, 10, 700, 500);
-  // c3->Divide(3, 2);
-
-  TCanvas *c4 = new TCanvas("c4", "Spacepoint RealSpace Projections (1 Spill)", 200, 10, 700, 500);
-  c4->Divide(3, 2);
-
-  TCanvas *c5 = new TCanvas("c5", "Info Box", 200, 10, 300, 170);
-  c5->Update();  // Just to get rid of a compiler warning for an unused variable
-
-
-  // Set up TTree to hold digits
-  _digits.SetNameTitle("digits", "digits");
-  _digits.Branch("npe", &_npe, "npe/D");
-  _digits.Branch("tracker", &_tracker_dig, "tracker/I");
+  TCanvas *sp_xy = new TCanvas("sp_xy", "Spacepoint x-y Projections", 200, 10, 700, 500);
+  sp_xy->Divide(3, 2);
+  TCanvas *sp_xy_1 = new TCanvas("sp_xy_1",
+                                   "Spacepoint x-y Projections (1 Spill)", 200, 10, 700, 500);
+  sp_xy_1->Divide(3, 2);
+  TCanvas *c_info = new TCanvas("c_info", "Info Box", 300, 335);
+  c_info->Update();  // Just to get rid of a compiler warning for an unused variable
 
   // Set up TTree to hold spacepoints
-  _spacepoints.SetNameTitle("spacepoints", "spacepoints");
-  _spacepoints.Branch("tracker", &_tracker, "tracker/I");
-  _spacepoints.Branch("station", &_station, "station/I");
-  _spacepoints.Branch("x", &_x, "x/D");
-  _spacepoints.Branch("y", &_y, "y/D");
-  _spacepoints.Branch("z", &_z, "z/D");
-  _spacepoints.Branch("type", &_type, "type/I");
+  _spoints.SetNameTitle("spacepoints", "spacepoints");
+  _spoints.Branch("tracker", &_tracker, "tracker/I");
+  _spoints.Branch("station", &_station, "station/I");
+  _spoints.Branch("x", &_x, "x/D");
+  _spoints.Branch("y", &_y, "y/D");
+  _spoints.Branch("z", &_z, "z/D");
+  _spoints.Branch("type", &_type, "type/I");
 
   // Second TTre to hold spacepoints for just the current spill
-  _spacepoints_1spill.SetNameTitle("spacepoints_1spill", "spacepoints_1spill");
-  _spacepoints_1spill.Branch("tracker", &_tracker, "tracker/I");
-  _spacepoints_1spill.Branch("station", &_station, "station/I");
-  _spacepoints_1spill.Branch("x", &_x, "x/D");
-  _spacepoints_1spill.Branch("y", &_y, "y/D");
-  _spacepoints_1spill.Branch("z", &_z, "z/D");
-  _spacepoints_1spill.Branch("type", &_type, "type/I");
+  _spoints_1spill.SetNameTitle("spacepoints_1spill", "spacepoints_1spill");
+  _spoints_1spill.Branch("tracker", &_tracker, "tracker/I");
+  _spoints_1spill.Branch("station", &_station, "station/I");
+  _spoints_1spill.Branch("x", &_x, "x/D");
+  _spoints_1spill.Branch("y", &_y, "y/D");
+  _spoints_1spill.Branch("z", &_z, "z/D");
+  _spoints_1spill.Branch("type", &_type, "type/I");
 
-  // Set up TTree to hold Pattern Recognition tracks
+  // Set up TTree to hold Pattern Recognition straight tracks
   _tracks.SetNameTitle("tracks", "tracks");
-  // _tracks.Branch("station_hits", &_station_hits, "station_hits/I");
-  _tracks.Branch("tracker", &_tracker_event, "tracker/I");
+  _tracks.Branch("tracker", &_tracker, "tracker/I");
   _tracks.Branch("mx", &_mx, "mx/D");
   _tracks.Branch("my", &_my, "my/D");
   _tracks.Branch("x0", &_x0, "x0/D");
@@ -96,170 +93,111 @@ bool ReduceCppPatternRecognition::birth(std::string argJsonConfigDocument) {
   return false;
 }
 
-std::string  ReduceCppPatternRecognition::process(std::string document) {
-
+std::string ReduceCppPatternRecognition::process(std::string document) {
   std::cout << "Starting Pattern Recognition Reducer" << std::endl;
 
-  //  JsonCpp setup
-  Json::FastWriter writer;
-  Json::Value root;
-  Json::Value xEventType;
+  // Read in the JSON data to a Spill object
+  bool read_success = read_in_json(document);
 
-  try {
-    root = JsonWrapper::StringToJson(document);}
-  catch(...) {
-    Json::Value errors;
-    std::stringstream ss;
-    ss << _classname << " says: Failed to parse input document";
-    errors["bad_json_document"] = ss.str();
-    root["errors"] = errors;
-    return writer.write(root);
-  }
+  if (read_success) {
 
-  // Retrieve the ROOT canvases
-  // TCanvas *c1 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c1"));
-  TCanvas *c2 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c2"));
-  // TCanvas *c3 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c3"));
-  TCanvas *c4 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c4"));
-  TCanvas *c5 = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c5"));
-  TPaveText *pt = new TPaveText(.05, .1, .95, .8);
-  TTree * p_spoints  = &_spacepoints;
-  TTree * p_spoints_1spill  = &_spacepoints_1spill;
+    // Retrieve the ROOT canvases
+    TCanvas *sp_xy = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("sp_xy"));
+    TCanvas *sp_xy_1 = reinterpret_cast<TCanvas*>
+                       (gROOT->GetListOfCanvases()->FindObject("sp_xy_1"));
+    TCanvas *c_info = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c_info"));
 
-  update_info(c5, pt);
+    TPaveText *pt = new TPaveText(.05, .1, .95, .95);
+    TTree * p_spoints  = &_spoints;
+    TTree * p_spoints_1spill = &_spoints_1spill;
 
-  // Populate the TTrees
-  _spacepoints_1spill.Reset();
-  try {
-    if ( root.isMember("recon_events") ) {
-      int n_events = root["recon_events"].size();
+    update_info(c_info, pt);
 
-      // Loop over events.
-      for (int event_i = 0; event_i < n_events; event_i++) {
-
-        Json::Value spacepoints_tracker0 = root["recon_events"][event_i]["sci_fi_event"]
-        ["sci_fi_space_points"]["tracker0"];
-        Json::Value spacepoints_tracker1 = root["recon_events"][event_i]["sci_fi_event"]
-        ["sci_fi_space_points"]["tracker1"];
-
-        int n_sp_tracker0 = spacepoints_tracker0.size();
-        int n_sp_tracker1 = spacepoints_tracker1.size();
-
-        bool station_hit[2][6] = { {false, false, false, false, false, false},
-                                   {false, false, false, false, false, false}};
-
-        for ( int sp_i = 0; sp_i < n_sp_tracker0; sp_i++ ) {
-          // Fill station number.
-          int station = spacepoints_tracker0[sp_i]["station"].asInt();
-          _station = station;
-          station_hit[0][station]=true;
-          // Fill type.
-          std::string type = spacepoints_tracker0[sp_i]["type"].asString();
-          if ( type == "triplet" ) {
-            _type = 3;
-          }
-          if ( type == "duplet" ) {
-            _type = 2;
-          }
-          _tracker = 0;
-          _x = spacepoints_tracker0[sp_i]["position"]["x"].asDouble();
-          _y = spacepoints_tracker0[sp_i]["position"]["y"].asDouble();
-          _z = spacepoints_tracker0[sp_i]["position"]["z"].asDouble();
-          _spacepoints.Fill();
-          _spacepoints_1spill.Fill();
-        }
-
-        for ( int sp_i = 0; sp_i < n_sp_tracker1; sp_i++ ) {
-          // Fill station number.
-          int station = spacepoints_tracker1[sp_i]["station"].asInt();
-          _station = station;
-          station_hit[1][station]=true;
-          // Fill type.
-          std::string type = spacepoints_tracker1[sp_i]["type"].asString();
-          if ( type == "triplet" ) {
-            _type = 3;
-          }
-          if ( type == "duplet" ) {
-            _type = 2;
-          }
-          _tracker = 1;
-          _x = spacepoints_tracker1[sp_i]["position"]["x"].asDouble();
-          _y = spacepoints_tracker1[sp_i]["position"]["y"].asDouble();
-          _z = spacepoints_tracker1[sp_i]["position"]["z"].asDouble();
-          _spacepoints.Fill();
-          _spacepoints_1spill.Fill();
-        }
-
-        Json::Value tracks_tracker0 = root["recon_events"][event_i]["sci_fi_event"]
-        ["sci_fi_pr_tracks"]["straight"]["tracker0"];
-        Json::Value tracks_tracker1 = root["recon_events"][event_i]["sci_fi_event"]
-        ["sci_fi_pr_tracks"]["straight"]["tracker1"];
-
-        for ( int trk_i = 0; trk_i < static_cast<int>(tracks_tracker0.size()); trk_i++ ) {
-          _mx = tracks_tracker0[trk_i]["mx"].asDouble();
-          _my = tracks_tracker0[trk_i]["my"].asDouble();
-          _x0 = tracks_tracker0[trk_i]["x0"].asDouble();
-          _y0 = tracks_tracker0[trk_i]["y0"].asDouble();
-          _num_points = tracks_tracker0[trk_i]["num_points"].asInt();
-          _tracks.Fill();
-          _trks_zx_trkr0.push_back(make_track(_x0, _mx));
-          _trks_zy_trkr0.push_back(make_track(_y0, _my));
-          std::cout << "reducer t0 tracks: " << tracks_tracker0.size();
-          std::cout << " x0 = " << _x0 << " mx = " << _mx;
-          std::cout << " y0 = " << _y0 << " my = " << _my << std::endl;
-        }
-
-        for ( int trk_i = 0; trk_i < static_cast<int>(tracks_tracker1.size()); trk_i++ ) {
-          _mx = tracks_tracker1[trk_i]["mx"].asDouble();
-          _my = tracks_tracker1[trk_i]["my"].asDouble();
-          _x0 = tracks_tracker1[trk_i]["x0"].asDouble();
-          _y0 = tracks_tracker1[trk_i]["y0"].asDouble();
-          _num_points = tracks_tracker1[trk_i]["num_points"].asInt();
-          _tracks.Fill();
-          _trks_zx_trkr1.push_back(make_track(_x0, _mx));
-          _trks_zy_trkr1.push_back(make_track(_y0, _my));
-          std::cout << "reducer t1 tracks: " << tracks_tracker1.size();
-          std::cout << " x0 = " << _x0 << " mx = " << _mx;
-          std::cout << " y0 = " << _y0 << " my = " << _my << std::endl;
-        }
-      } // ends loop over particle events
-    } else {
-      std::cout << "No recon events found" << std::endl;
+    // Populate the TTrees
+    _spoints_1spill.Reset();  // Reset so that this tree only holds data for the current spill
+    try {
+      if ( _spill.GetReconEvents() ) {
+        // Loop over events
+        for ( unsigned int evt_i = 0; evt_i < _spill.GetReconEvents()->size(); evt_i++ ) {
+          SciFiEvent *event = _spill.GetReconEvents()->at(evt_i)->GetSciFiEvent();
+          // Loop over spacepoints
+          for ( unsigned int sp_i = 0; sp_i < event->spacepoints().size(); sp_i++ ) {
+            SciFiSpacePoint *spoint = event->spacepoints()[sp_i];
+            // Fill station number
+            _station = spoint->get_station();
+            // Fill type
+            if ( spoint->get_type() == "triplet" )
+              _type = 3;
+            if ( spoint->get_type() == "duplet" )
+              _type = 2;
+            // Fill tracker number
+            _tracker = spoint->get_tracker();
+            // Fill position
+            _x = spoint->get_position().x();
+            _y = spoint->get_position().y();
+            _z = spoint->get_position().z();
+            // Fill trees
+            _spoints.Fill();
+            _spoints_1spill.Fill();
+          } // ~Loop over spacepoints
+          // Loop over straight tracks
+          for ( unsigned int trk_i = 0; trk_i < event->straightprtracks().size(); trk_i++ ) {
+            SciFiStraightPRTrack strk = event->straightprtracks()[trk_i];
+            _x0 = strk.get_x0();
+            _mx = strk.get_mx();
+            _y0 = strk.get_y0();
+            _my = strk.get_my();
+            _num_points = strk.get_num_points();
+            _tracker = strk.get_tracker();
+            _tracks.Fill();
+            if ( _tracker == 0 ) {
+              _trks_zx_trkr0.push_back(make_track(_x0, _mx));
+              _trks_zy_trkr0.push_back(make_track(_y0, _my));
+            } else if ( _tracker == 1 ) {
+              _trks_zx_trkr1.push_back(make_track(_x0, _mx));
+              _trks_zy_trkr1.push_back(make_track(_y0, _my));
+            }
+            // std::cout << " x0 = " << _x0 << " mx = " << _mx;
+            // std::cout << " y0 = " << _y0 << " my = " << _my << std::endl;
+          } // ~Loop over straight tracks
+        } // ~Loop over events
+      } else {
+        // std::cout << "No recon events found" << std::endl;
+      }
+    } catch(Squeal squee) {
+      Squeak::mout(Squeak::error) << squee.GetMessage() << std::endl;
+      root = MAUS::CppErrorHandler::getInstance()->HandleSqueal(root, squee, _classname);
+    } catch(std::exception exc) {
+      Squeak::mout(Squeak::error) << exc.what() << std::endl;
+      root = MAUS::CppErrorHandler::getInstance()->HandleStdExc(root, exc, _classname);
     }
-  } catch(Squeal squee) {
-     Squeak::mout(Squeak::error) << squee.GetMessage() << std::endl;
-    root = MAUS::CppErrorHandler::getInstance()->HandleSqueal(root, squee, _classname);
-  } catch(std::exception exc) {
-    Squeak::mout(Squeak::error) << exc.what() << std::endl;
-    root = MAUS::CppErrorHandler::getInstance()->HandleStdExc(root, exc, _classname);
+
+    _nSpills++;
+
+    // Draw the graphs and histos
+    if ( p_spoints->GetEntries() > 0 ) {
+      draw_graphs(p_spoints, sp_xy);
+    }
+
+    if ( p_spoints_1spill->GetEntries() > 0 ) {
+      draw_graphs(p_spoints_1spill, sp_xy_1);
+    }
+
+    if ( get_num_tracks() > 0 ) {
+      draw_tracks(sp_xy_1);
+      sp_xy_1->Update();
+    }
+
+    clear_tracks();
+
+    std::cout << "Finished spill " << _nSpills << std::endl;
+    std::cout << "Spacepoints this spill: " << _spoints_1spill.GetEntries() << std::endl;
+    std::cout << "Cumulative spacepoints: " << _spoints.GetEntries() << std::endl;
+  } else {
+    std::cerr << "Failed to import json to spill\n";
   }
 
-  _nSpills++;
-
-  // Draw the graphs and histos
-  if ( p_spoints->GetEntries() > 0 ) {
-    // draw_histos(p_spoints, c1);
-    draw_graphs(p_spoints, c2);
-  }
-
-  if ( p_spoints_1spill->GetEntries() > 0 ) {
-    // draw_histos(p_spoints_1spill, c3);
-    draw_graphs(p_spoints_1spill, c4);
-  }
-
-  if ( get_num_tracks() > 0 ) {
-    std::cout << "Drawing tracks...\n";
-    draw_tracks(c4);
-    c4->Update();
-  }
-
-  clear_tracks();
-
-  // _tracks.Scan("x0:mx:y0:my:n_sp");
-  std::cout << "Finished spill " << _nSpills << std::endl;
-  std::cout << "Spacepoints this spill: " << _spacepoints_1spill.GetEntries() << std::endl;
-  std::cout << "Cumulative spacepoints: " << _spacepoints.GetEntries() << std::endl;
-  return document;
+  return JsonWrapper::JsonToString(root);
 }
 
 bool ReduceCppPatternRecognition::death()  {
@@ -267,13 +205,33 @@ bool ReduceCppPatternRecognition::death()  {
   return true;
 }
 
+bool ReduceCppPatternRecognition::read_in_json(std::string json_data) {
+
+  Json::FastWriter writer;
+  Json::Reader reader;
+
+  try {
+    root = JsonWrapper::StringToJson(json_data);
+    SpillProcessor spill_proc;
+    _spill = *spill_proc.JsonToCpp(root);
+    return true;
+  } catch(...) {
+    Json::Value errors;
+    std::stringstream ss;
+    ss << _classname << " says: Failed when importing JSON to Spill";
+    errors["bad_json_document"] = ss.str();
+    root["errors"] = errors;
+    writer.write(root);
+    return false;
+  }
+}
+
 void ReduceCppPatternRecognition::Save() {
   TFile datafile(_filename.c_str(), "recreate" );
   datafile.cd();
 
-  _digits.Write();
-  _spacepoints.Write();
-  _spacepoints_1spill.Write();
+  _spoints.Write();
+  _spoints_1spill.Write();
   _tracks.Write();
 
   datafile.Close();
@@ -292,7 +250,6 @@ void ReduceCppPatternRecognition::draw_tracks(TCanvas * c1) {
 
   for (int i = 0; i < static_cast<int>(_trks_zx_trkr0.size()); ++i) {
     c1->cd(2);
-    std::cout << "Drawing...\n";
     _trks_zx_trkr0[i].Draw("same");
     c1->Update();
   }
@@ -432,12 +389,59 @@ void ReduceCppPatternRecognition::update_info(TCanvas * c1, TPaveText *pt) {
   pt->AddText(s1.c_str());
   ss1.str("");
 
-  ss1 << "Cumulative spoints: " << get_num_spoints();
+  int event_size = 0;
+  int digit_size = 0;
+  int cluster_size = 0;
+  int spoint_size = 0;
+  int track_size = 0;
+
+  if ( _spill.GetReconEvents() ) {
+    event_size = _spill.GetReconEvents()->size();
+    for ( unsigned int evt_i = 0; evt_i < _spill.GetReconEvents()->size(); evt_i++ ) {
+      SciFiEvent *event = _spill.GetReconEvents()->at(evt_i)->GetSciFiEvent();
+      digit_size += event->digits().size();
+      cluster_size += event->clusters().size();
+      spoint_size += event->spacepoints().size();
+      track_size += event->straightprtracks().size();
+    }
+  }
+
+  ss1 << "Events: " << event_size;
+  s1 = ss1.str();
+  c1->cd(1);
+  pt->AddText(s1.c_str());
+  ss1.str("");
+
+  ss1 << "Digits: " << digit_size;
+  s1 = ss1.str();
+  c1->cd(1);
+  pt->AddText(s1.c_str());
+  ss1.str("");
+
+  ss1 << "Clusters: " << cluster_size;
+  s1 = ss1.str();
+  c1->cd(1);
+  pt->AddText(s1.c_str());
+  ss1.str("");
+
+  ss1 << "Spacepoints: " << spoint_size;
+  s1 = ss1.str();
+  c1->cd(1);
+  pt->AddText(s1.c_str());
+  ss1.str("");
+
+  ss1 << "Tracks: " << track_size;
+  s1 = ss1.str();
+  c1->cd(1);
+  pt->AddText(s1.c_str());
+  ss1.str("");
+
+  ss1 << "Cumulative spoints: " << get_num_spoints() + spoint_size;
   s1 = ss1.str();
   pt->AddText(s1.c_str());
   ss1.str("");
 
-  ss1 << "Cumulative tracks: " << get_num_tracks();
+  ss1 << "Cumulative tracks: " << get_num_tracks() + track_size;
   s1 = ss1.str();
   pt->AddText(s1.c_str());
   ss1.str("");
@@ -446,3 +450,4 @@ void ReduceCppPatternRecognition::update_info(TCanvas * c1, TPaveText *pt) {
   c1->Update();
 }
 
+} // ~namespace MAUS
