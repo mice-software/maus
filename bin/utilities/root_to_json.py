@@ -16,7 +16,7 @@
 # along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-"""Convert from json file to root file"""
+"""Convert from root file to json file"""
 
 import io   #  generic python library for I/O
 import gzip #  For compressed output # pylint: disable=W0611
@@ -26,13 +26,13 @@ import MAUS
 def run():
     """Run the macro"""
 
-    # This input generates spills from json document
+    # This generates events (usually spills) from a root binary file
     my_input = MAUS.InputCppRoot()
-    # This input outputs spills to root file
+    # This outputs events (usually spills) to a json ascii file
     my_output = MAUS.OutputPyJSON()
 
     # Execute inputter and outputter
-    # Mapper and Reducer does nothing 
+    # Mapper and Reducer does nothing
     MAUS.Go(my_input, MAUS.MapPyDoNothing(), MAUS.ReducePyDoNothing(), \
             my_output, io.StringIO(u""))
 
