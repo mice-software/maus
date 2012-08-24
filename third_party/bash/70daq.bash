@@ -36,8 +36,6 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         tar xvfz "${MAUS_ROOT_DIR}/third_party/source/${filename}" -C "${MAUS_ROOT_DIR}/third_party/build/${directory}" > /dev/null
         cd "${MAUS_ROOT_DIR}/third_party/build/${directory}"
         cp *.a "${MAUS_ROOT_DIR}/third_party/install/lib"
-	sed "s;#include \"monitor.h\";//#include \"monitor.h\";" MDmonitoring.hh > tmp.hh
-	mv tmp.hh MDmonitoring.hh
 	cp *.hh "${MAUS_ROOT_DIR}/third_party/install/include"
 	cd -
 	rm -Rf "${MAUS_ROOT_DIR}/third_party/build/${directory}"
