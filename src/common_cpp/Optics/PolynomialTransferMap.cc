@@ -97,14 +97,27 @@ CovarianceMatrix PolynomialTransferMap::Transport(
  */
 PhaseSpaceVector PolynomialTransferMap::Transport(
     PhaseSpaceVector const & input_vector) const {
+std::cout << "DEBUG PolynomialTransferMap::Transport() "
+          << "Input Vector = " << std::endl << input_vector << std::endl;
+std::cout << "DEBUG PolynomialTransferMap::Transport() "
+          << "Ref. Trajectory In = " << std::endl << *reference_trajectory_in_
+          << std::endl;
   // subtract off the input reference trajectory to obtain phase space delta
   Vector<double> phase_space_delta(input_vector - (*reference_trajectory_in_));
 
   // operate on the phase space delta with the polynomial map
+std::cout << "DEBUG PolynomialTransferMap::Transport() "
+          << "Delta = " << std::endl << phase_space_delta << std::endl;
   Vector<double> transformed_delta;
   polynomial_map_->F(phase_space_delta, transformed_delta);
+std::cout << "DEBUG PolynomialTransferMap::Transport() "
+          << "Transformed Delta = " << std::endl << transformed_delta
+          << std::endl;
 
   // add the transformed phase space delta to the output reference trajectory
+std::cout << "DEBUG PolynomialTransferMap::Transport() "
+          << "Ref. Trajectory Out = " << std::endl << *reference_trajectory_out_
+          << std::endl;
   PhaseSpaceVector output_vector
     = PhaseSpaceVector((*reference_trajectory_out_) + transformed_delta);
 

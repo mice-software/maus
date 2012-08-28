@@ -57,8 +57,12 @@ PolynomialOpticsModel::PolynomialOpticsModel(const Json::Value & configuration)
   // Determine which fitting algorithm to use
   SetupAlgorithm();
 
-  // TODO(plane1@hawk.iit.edu) get the following from the configuration
-  polynomial_order_ = 3;
+  polynomial_order_ = JsonWrapper::GetProperty(
+      *configuration_,
+      "PolynomialOpticsModel_order",
+      JsonWrapper::intValue).asInt();
+
+  // TODO(plane1@hawk.iit.edu) Get from configuration
   const std::vector<double> weights_(6, 1.);
   deltas_ = PhaseSpaceVector(1, 1, 1, 1, 1, 1);
 }
@@ -112,12 +116,14 @@ const TransferMap * PolynomialOpticsModel::CalculateTransferMap(
   for (size_t pt_index = 0; pt_index < start_plane_hits.size(); ++pt_index) {
     std::vector<double> point;
     for (size_t coord_index = 0; coord_index < 6; ++coord_index) {
+      /*
       if (start_plane_hits[pt_index][coord_index] < 1.0e-8) {
         // Set zero coordinates = DBL_MIN to avoid singular covariance matrices
         point.push_back(1.0e-6);
       } else {
+      */
         point.push_back(start_plane_hits[pt_index][coord_index]);
-      }
+      //}
     }
     points.push_back(point);
   }

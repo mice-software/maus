@@ -207,6 +207,8 @@ std::cout << "DEBUG ScoreTrack(): Uncertainties: " << *uncertainties << std::end
     // Sum the squares of the differences between the calculated phase space
     // coordinates and the measured coordinates.
     TrackPoint residual = TrackPoint(point - (*events));
+std::cout << "DEBUG ScoreTrack(): Point: " << point << std::endl;
+std::cout << "DEBUG ScoreTrack(): Event: " << *events << std::endl;
 std::cout << "DEBUG ScoreTrack(): Residual: " << residual << std::endl;
     chi_squared += (transpose(residual) * (*uncertainties) * residual)[0];
 std::cout << "DEBUG ScoreTrack(): Chi Squared: " << chi_squared << std::endl;

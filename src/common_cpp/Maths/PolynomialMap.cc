@@ -160,9 +160,15 @@ void  PolynomialMap::F(const Vector<double>& point, Vector<double>& value)
   const {
   // create a vector of point coordinate products that form, together with the
   // coefficents, the polynomial terms
+std::cout << "DEBUG PolynomialMap::F() " << "point = " << std::endl << point << std::endl;
   Vector<double> polynomial_vector(index_key_by_vector_.size(), 1.);
   MakePolynomialVector(point, polynomial_vector);
+std::cout << "DEBUG PolynomialMap::F() "
+          << "Polynomial Vectorized point = " << std::endl << polynomial_vector << std::endl;
+std::cout << "DEBUG PolynomialMap::F() "
+          << "Coefficient Matrix = " << std::endl << coefficient_matrix_ << std::endl;
   value = coefficient_matrix_ * polynomial_vector;
+std::cout << "DEBUG PolynomialMap::F() " << "value = " << std::endl << value << std::endl;
 }
 
 unsigned int PolynomialMap::PointDimension() const {
@@ -282,12 +288,23 @@ std::vector<int> PolynomialMap::IndexByVector
 
 size_t PolynomialMap::NumberOfPolynomialCoefficients(int pointDimension,
                                                      int order) {
-    int n = 0;
-    if (order <= 0) return 0;
-    for (int i = 1; i < order; ++i) {
-        n += gsl_sf_choose(pointDimension+i-1, i);
+std::cout << "DEBUG PolynomialMap::NumberOfPolynomialCoefficients(): "
+          << "Point dimension = " << pointDimension
+          << "\tPolynomial order = " << order << std::endl;
+std::cout.flush();
+    if (order <= 0) return 1;
+
+    int n = 1;
+    for (int i = 0; i < order; ++i) {
+        n += gsl_sf_choose(pointDimension+i, i+1);
+std::cout << "DEBUG PolynomialMap::NumberOfPolynomialCoefficients(): "
+          << pointDimension+i << " choose " << pointDimension+1 << " = "
+          << gsl_sf_choose(pointDimension+i, i+1) << std::endl;
     }
-    return n+1;
+std::cout << "DEBUG PolynomialMap::NumberOfPolynomialCoefficients(): "
+          << "Number of Polynomial Coefficients for point dimension "
+          << pointDimension << " and polynomial order " << order << " = " << n << std::endl;
+    return n;
 }
 
 std::ostream& operator<<(std::ostream& out, const PolynomialMap& pv) {
@@ -462,6 +479,9 @@ PolynomialMap* PolynomialMap::PolynomialLeastSquaresFit(
   // Algorithm: We have F2 = sum_i ( f_k f_l) where f are polynomial terms;
   // FY = sum_i (f_)
 
+std::cout << "DEBUG PolynomialMap::PolynomialLeastSquaresFit() "
+          << "polynomialOrder = " << std::endl << polynomialOrder;
+
   int pointDim = points[0].size();
   int valueDim = values[0].size();
   int nPoints  = points.size();
@@ -539,9 +559,17 @@ std::cout.flush();
                  "Could not find least squares fit for data",
                  "PolynomialMap::PolynomialLeastSquaresFit"));
   }
-  Matrix<double> A = F2_inverse * Fy;
+  Matrix<double> A = transpose(F2_inverse * Fy);
+std::cout << "DEBUG PolynomialMap::PolynomialLeastSquaresFit() "
+          << "F2 = " << std::endl << F2;
+std::cout << "DEBUG PolynomialMap::PolynomialLeastSquaresFit() "
+          << "F2_inverse = " << std::endl << F2_inverse;
+std::cout << "DEBUG PolynomialMap::PolynomialLeastSquaresFit() "
+          << "Fy = " << std::endl << Fy;
+std::cout << "DEBUG PolynomialMap::PolynomialLeastSquaresFit() "
+          << "Transfer Matrix = " << std::endl << A;
   delete temp;
-  return new PolynomialMap(pointDim, transpose(A));
+  return new PolynomialMap(pointDim, A);
 }
 
 PolynomialMap* PolynomialMap::ConstrainedPolynomialLeastSquaresFit(

@@ -52,11 +52,19 @@ TransferMapOpticsModel::TransferMapOpticsModel(
   reference_pgparticle_ = simulator->GetReferenceParticle();
   first_plane_ = reference_pgparticle_.z;
 
+std::cout << "DEBUG TransferMapOpticsModel::TransferMapOpticsModel(): "
+          << "Reference Particle Z = " << reference_pgparticle_.z
+          << std::endl;
+
   reference_particle_ = TrackPoint(
     reference_pgparticle_.time, reference_pgparticle_.energy,
     reference_pgparticle_.x, reference_pgparticle_.px,
     reference_pgparticle_.y, reference_pgparticle_.py,
     reference_pgparticle_.pid, reference_pgparticle_.z);
+
+std::cout << "DEBUG TransferMapOpticsModel::TransferMapOpticsModel(): "
+          << "Reference Particle Z = " << reference_particle_.z()
+          << std::endl;
 
   // Calculate time offset from t=0 at z=0
   const double first_plane_time = reference_pgparticle_.time;
@@ -124,18 +132,25 @@ void TransferMapOpticsModel::Build() {
 
 const TransferMap * TransferMapOpticsModel::FindTransferMap(
     const double end_plane) const {
+std::cout << "DEBUG TransferMapOpticsModel::FindTransferMap() "
+          << "Looking for map with z = " << end_plane << std::endl;
   // find the transfer map that transports a particle from the first plane
   // to the station that is nearest to the desired end_plane
   std::map<double, const TransferMap *>::const_iterator transfer_map_entry;
-  size_t map_index = 0;
   bool found_entry = false;
+int iteration = 0;
   for (transfer_map_entry = transfer_maps_.begin();
        !found_entry && (transfer_map_entry != transfer_maps_.end());
        ++transfer_map_entry) {
+std::cout << "DEBUG TransferMapOpticsModel::FindTransferMap() "
+          << "Iteration = " << iteration << std::endl;
     // determine whether the station before or after end_plane is closest
     double station_plane = transfer_map_entry->first;
     if (station_plane >= end_plane) {
-      if (transfer_map_entry == transfer_maps_.begin()) {
+std::cout << "DEBUG TransferMapOpticsModel::FindTransferMap() "
+          << "Found a map with z >= the end plane z" << std::endl;
+      if ((transfer_map_entry == transfer_maps_.begin()) &&
+          (station_plane > end_plane)) {
         std::ostringstream message_buffer;
         message_buffer << "Mapping detectors are all positioned downstream "
                        << "from one or more hits (End Plane: " << end_plane
@@ -144,23 +159,27 @@ const TransferMap * TransferMapOpticsModel::FindTransferMap(
                      "MAUS::TransferMapOpticsModel::GenerateTransferMap()"));
       }
       double after_delta = station_plane - end_plane;
-      --transfer_map_entry;
-      double before_delta = end_plane - transfer_map_entry->first;
-      if (after_delta < before_delta) {
-        ++transfer_map_entry;
+      if (transfer_map_entry != transfer_maps_.begin()) {
+std::cout << "DEBUG TransferMapOpticsModel::FindTransferMap() "
+          << "This map is the first in the map list." << std::endl;
+        --transfer_map_entry;
+        double before_delta = end_plane - transfer_map_entry->first;
+        if (after_delta < before_delta) {
+std::cout << "DEBUG TransferMapOpticsModel::FindTransferMap() "
+          << "The map after the end plane is the closest." << std::endl;
+          ++transfer_map_entry;
+        }
       }
 
       found_entry = true;
     }
-    if (!found_entry) {
-      ++map_index;
-    }
+++iteration;
   }
 
-  // end() is past the end of the vector, so bring the iterator back in
-  if (transfer_map_entry == transfer_maps_.end()) {
-    --transfer_map_entry;
+  if (transfer_map_entry != transfer_maps_.begin()) {
+    --transfer_map_entry;  // compensate for the final increment in the loop
   }
+
   return transfer_map_entry->second;
 }
 
