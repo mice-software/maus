@@ -798,11 +798,12 @@ std::ostream& MomentHeap::Print(std::ostream& out) const
   out << m_vars << "\n ************* " << std::endl;
   for(unsigned int i=0; i<m_higherMoments.size(); i++)
     out << *(m_higherMoments[i]) << "\n ************* " << std::endl;*/
-  for(int i=1; i<MaxOrder()+1; i++) 
+  for(int i = 0; i < MaxOrder(); ++i) 
   {
     int kvec_front = 1;
-    for(unsigned int j=MAUS::PolynomialMap::NumberOfPolynomialCoefficients(6, i); j<MAUS::PolynomialMap::NumberOfPolynomialCoefficients(6, i+1); j++) 
-    {
+    for(size_t j = MAUS::PolynomialMap::NumberOfPolynomialCoefficients(6, i);
+        j < MAUS::PolynomialMap::NumberOfPolynomialCoefficients(6, i+1);
+        ++j) {
       std::vector<int> kvec = MAUS::PolynomialMap::IndexByVector(j, 6);
       if(kvec.front() != kvec_front) {std::cout << "\n"; kvec_front = kvec.front();}
       for(unsigned int k=0; k<kvec.size()-1; k++) std::cout << kvec[k] << ".";
@@ -825,7 +826,8 @@ std::ostream& operator<<(std::ostream& out, const MomentHeap& heap)
 MAUS::PolynomialMap MomentHeap::Weighting(MomentHeap in, MomentHeap target, int order)
 {
   size_t dimension = 6;
-  size_t size      = MAUS::PolynomialMap::NumberOfPolynomialCoefficients(dimension, order+1);
+  size_t size = MAUS::PolynomialMap::NumberOfPolynomialCoefficients(
+      dimension, order);
   MAUS::Vector<double> u(size-1);
   MAUS::Matrix<double> M(size-1, size-1);
   for(size_t i=1; i<size; i++)

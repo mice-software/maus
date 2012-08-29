@@ -41,7 +41,9 @@ bool DifferentiatorTest()
     Squeak::mout(Squeak::debug) << "FunctionMap: " << testpass << std::endl;
     testpass &= vecP->PointDimension() == clone->PointDimension();
     Squeak::mout(Squeak::debug) << "PointDimension: " << testpass << std::endl;
-    testpass &= clone->NumberOfDiffRows() == MAUS::PolynomialMap::NumberOfPolynomialCoefficients(delta.size(),mag.size());
+    testpass &= clone->NumberOfDiffRows()
+                == MAUS::PolynomialMap::NumberOfPolynomialCoefficients(
+                    delta.size(), mag.size()-1);
     Squeak::mout(Squeak::debug) << "NumberOfDiffRows: " << testpass << std::endl;
     testpass &= clone->ValueDimension() == clone->NumberOfDiffRows()*clone->FunctionMap()->ValueDimension();
     Squeak::mout(Squeak::debug) << "ValueDim: " << testpass << std::endl;
@@ -131,9 +133,13 @@ bool PolynomialInterpolatorTest()
     Squeak::mout(Squeak::debug) << "Ctor etc: " << true << " " << std::flush;
     bool sizepass  = pInt->PointDimension()  == vecF->PointDimension() && pInt->ValueDimension()  == vecF->ValueDimension() &&
                      pInt->PolynomialOrder() == diffOrder+pointOrder && pInt->DifferentialOrder() == diffOrder && pInt->PointOrder() == pointOrder;
-    sizepass      &= pInt->NumberOfIndices() == MAUS::PolynomialMap::NumberOfPolynomialCoefficients(vecP->PointDimension(), diffOrder+pointOrder+1);
+    sizepass      &= pInt->NumberOfIndices()
+                     == MAUS::PolynomialMap::NumberOfPolynomialCoefficients(
+                        vecP->PointDimension(), diffOrder+pointOrder);
     sizepass      &= pInt->NumberOfPoints()  == ceil(pInt->NumberOfIndices()/pInt->NumberOfDiffIndices());
-    sizepass      &= pInt->NumberOfDiffIndices() == MAUS::PolynomialMap::NumberOfPolynomialCoefficients(vecP->PointDimension(), diffOrder+1);
+    sizepass      &= pInt->NumberOfDiffIndices()
+                     == MAUS::PolynomialMap::NumberOfPolynomialCoefficients(
+                        vecP->PointDimension(), diffOrder);
     sizepass      &= pInt->GetMesh() == grid;
     Squeak::mout(Squeak::debug) << "Bureaucracy: " << sizepass << " " << std::flush;
 

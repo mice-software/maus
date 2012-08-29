@@ -76,7 +76,8 @@ def build_libraries(maus_root_dir, env):
     """
     # build the data structure (separate library so we can port it to external
     # deps)
-    maus_build_tools.core_builder.build_data_structure(env)
+# FIXME(plane1@hawk.iit.edu) temporarily removed to increase build speed
+# maus_build_tools.core_builder.build_data_structure(env)
     # build the maus cpp core library (libMausCpp.so)
     maus_build_tools.core_builder.build_lib_maus_cpp(env)
     # install the python tests (pure python, no build to do)

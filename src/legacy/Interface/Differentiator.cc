@@ -12,18 +12,23 @@
 
 ////////////////////////// DIFFERENTIATOR ///////////////////////////
 
-Differentiator::Differentiator (VectorMap* in, std::vector<double> delta, std::vector<double> magnitude)
- : _inSize(in->PointDimension()), _outSize(MAUS::PolynomialMap::NumberOfPolynomialCoefficients(_inSize, magnitude.size())*in->ValueDimension()), _diffKey(), _factKey(),
-   _delta(delta), _magnitude(magnitude), _diffOrder(magnitude.size()), _y(in)
-{
-    for(int i=0; i<int(MAUS::PolynomialMap::NumberOfPolynomialCoefficients(_inSize, magnitude.size()) ); i++) 
-    {
-        _diffKey.push_back(MAUS::PolynomialMap::IndexByVector(i,_inSize));
-        _factKey.push_back(1);
-        std::vector<int> powerKey = MAUS::PolynomialMap::IndexByPower(i,_inSize);
-        for(int j=0; j<int(powerKey.size()); j++) 
-            _factKey[i] *= gsl_sf_fact(powerKey[j]);
+Differentiator::Differentiator(VectorMap* in, std::vector<double> delta,
+                               std::vector<double> magnitude)
+    : _inSize(in->PointDimension()),
+      _outSize(MAUS::PolynomialMap::NumberOfPolynomialCoefficients(_inSize, magnitude.size()-1)
+            * in->ValueDimension()),
+      _diffKey(), _factKey(), _delta(delta), _magnitude(magnitude),
+      _diffOrder(magnitude.size()), _y(in) {
+  size_t num_poly_coeff = MAUS::PolynomialMap::NumberOfPolynomialCoefficients(
+    _inSize, magnitude.size()-1);
+  for(size_t i = 0; i < num_poly_coeff; ++i) {
+    _diffKey.push_back(MAUS::PolynomialMap::IndexByVector(i,_inSize));
+    _factKey.push_back(1);
+    std::vector<int> powerKey = MAUS::PolynomialMap::IndexByPower(i,_inSize);
+    for(size_t j = 0; j < powerKey.size(); ++j) {
+        _factKey[i] *= gsl_sf_fact(powerKey[j]);
     }
+  }
 }
 
 std::vector< std::vector<double> > Differentiator::SetupInPoints(const MAUS::Vector<double>& inPoint) const
@@ -100,7 +105,6 @@ MAUS::Matrix<double> Differentiator::CentredPolynomialMap(const MAUS::Vector<dou
     MAUS::Matrix<double> in     = SetupMatrixIn (inVec, inPoint);
     MAUS::Matrix<double> out    = SetupMatrixOut(inVec);
     MAUS::Matrix<double> outMap = transpose(out) * inverse(in);
-
     return outMap;
 }
 
@@ -178,12 +182,12 @@ PolynomialInterpolator::PolynomialInterpolator(Mesh* mesh, VectorMap* F, int dif
 
 unsigned int PolynomialInterpolator::NumberOfDiffIndices() const {
   return MAUS::PolynomialMap::NumberOfPolynomialCoefficients(
-    PointDimension(), DifferentialOrder()+1);
+    PointDimension(), DifferentialOrder());
 }
 
 unsigned int PolynomialInterpolator::NumberOfIndices() const {
   return MAUS::PolynomialMap::NumberOfPolynomialCoefficients(
-    _inSize, _totalOrder+1);
+    _inSize, _totalOrder);
 }
 
 PolynomialInterpolator* PolynomialInterpolator::Clone()       const

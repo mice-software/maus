@@ -116,14 +116,12 @@ const TransferMap * PolynomialOpticsModel::CalculateTransferMap(
   for (size_t pt_index = 0; pt_index < start_plane_hits.size(); ++pt_index) {
     std::vector<double> point;
     for (size_t coord_index = 0; coord_index < 6; ++coord_index) {
-      /*
-      if (start_plane_hits[pt_index][coord_index] < 1.0e-8) {
+      if (start_plane_hits[pt_index][coord_index] < 1.0e-10) {
         // Set zero coordinates = DBL_MIN to avoid singular covariance matrices
-        point.push_back(1.0e-6);
+        point.push_back(1.0e-8);
       } else {
-      */
         point.push_back(start_plane_hits[pt_index][coord_index]);
-      //}
+      }
     }
     points.push_back(point);
   }

@@ -63,18 +63,18 @@ PolynomialMap::PolynomialMap(const PolynomialMap & original_instance) {
 }
 
 void PolynomialMap::SetCoefficients(int pointDim, Matrix<double> coeff) {
-  int nPCoeff      = coeff.number_of_columns();
+  int num_poly_coeff      = coeff.number_of_columns();
   point_dimension_        = pointDim;
   index_key_by_power_  = std::vector< std::vector<int> >();
   index_key_by_vector_ = std::vector< std::vector<int> >();
   polynomial_vector_ = std::vector<PolynomialCoefficient>();
-  for (int i = 0; i < nPCoeff; ++i)
+  for (int i = 0; i < num_poly_coeff; ++i)
     index_key_by_power_.push_back(IndexByPower(i, pointDim));
-  for (int i = 0; i < nPCoeff; ++i)
+  for (int i = 0; i < num_poly_coeff; ++i)
     index_key_by_vector_.push_back(IndexByVector(i, pointDim));
 
   for (size_t i = 0; i < coefficient_matrix_.number_of_rows(); ++i)
-    for (int j = 0; j < nPCoeff; ++j)
+    for (int j = 0; j < num_poly_coeff; ++j)
       polynomial_vector_.push_back(
           PolynomialMap::PolynomialCoefficient(index_key_by_vector_[j],
           i,
@@ -181,7 +181,7 @@ unsigned int PolynomialMap::ValueDimension() const {
 
 unsigned int PolynomialMap::PolynomialOrder() const {
   if (index_key_by_vector_.size() > 0) {
-    return index_key_by_vector_.back().size()+1;
+    return index_key_by_vector_.back().size();
   } else {
     return 0;
   }
@@ -208,8 +208,9 @@ Vector<double>&  PolynomialMap::MakePolynomialVector(const Vector<double>& point
                                                      Vector<double>& polyVector)
     const {
   for (size_t i = 0; i < index_key_by_vector_.size(); ++i) {
+    polyVector[i] = 1.;
     for (size_t j = 0; j < index_key_by_vector_[i].size(); ++j) {
-      polyVector(i+1) *= point(index_key_by_vector_[i][j]+1);
+      polyVector[i] *= point[index_key_by_vector_[i][j]];
     }
   }
   return polyVector;
@@ -298,7 +299,7 @@ std::cout.flush();
     for (int i = 0; i < order; ++i) {
         n += gsl_sf_choose(pointDimension+i, i+1);
 std::cout << "DEBUG PolynomialMap::NumberOfPolynomialCoefficients(): "
-          << pointDimension+i << " choose " << pointDimension+1 << " = "
+          << pointDimension+i << " choose " << i+1 << " = "
           << gsl_sf_choose(pointDimension+i, i+1) << std::endl;
     }
 std::cout << "DEBUG PolynomialMap::NumberOfPolynomialCoefficients(): "
@@ -457,17 +458,15 @@ PolynomialMap* PolynomialMap::PolynomialLeastSquaresFit(
     unsigned int                              polynomialOrder,
     const VectorMap*                          weightFunction) {
 
-  std::vector<double> weights(points.size());
   if (weightFunction == NULL) {
-    for (size_t i = 0; i < points.size(); ++i) {
-      weights[i] = 1.0;
-    }
-  } else {
-    for (size_t i = 0; i < points.size(); ++i) {
-      weightFunction->F(&points[i][0], &weights[i]);
-    }
+    // use default value for weights defined in PolnomialMap.hh
+    return PolynomialLeastSquaresFit(points, values, polynomialOrder);
   }
 
+  std::vector<double> weights(points.size());
+  for (size_t i = 0; i < points.size(); ++i) {
+    weightFunction->F(&points[i][0], &weights[i]);
+  }
   return PolynomialLeastSquaresFit(points, values, polynomialOrder, weights);
 }
 
@@ -500,7 +499,7 @@ std::cout << "DEBUG PolynomialMap::PolynomialLeastSquaresFit() "
   std::vector<double> wt(nPoints, 1);
   if (weights.size() > 0) wt = weights;
 
-  // sum over points, valuestemp;
+// sum over points, values
   for (int i = 0; i < nPoints;   ++i) {
     temp->MakePolynomialVector(&points[i][0], &tempFx[0]);
 std::cout << "tempFx[" << i << "]: ";
