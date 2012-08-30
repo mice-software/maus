@@ -388,6 +388,9 @@ class MatrixBase {
   // row major order
   void build_matrix(const size_t i, const size_t j, StdType const * const data);
 
+  void gsl_error_handler(const char * reason, const char * file,
+                         int line, int gsl_errno);
+
   GslType * matrix_;
 };
 

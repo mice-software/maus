@@ -481,94 +481,97 @@ PolynomialMap* PolynomialMap::PolynomialLeastSquaresFit(
 std::cout << "DEBUG PolynomialMap::PolynomialLeastSquaresFit() "
           << "polynomialOrder = " << std::endl << polynomialOrder;
 
-  int pointDim = points[0].size();
-  int valueDim = values[0].size();
-  int nPoints  = points.size();
-  int nCoeffs  = NumberOfPolynomialCoefficients(pointDim, polynomialOrder);
+  size_t pointDim = points[0].size();
+  size_t valueDim = values[0].size();
+  size_t nPoints  = points.size();
+  size_t nCoeffs  = NumberOfPolynomialCoefficients(pointDim, polynomialOrder);
 
-  Matrix<double> Fy(nCoeffs, valueDim, 0.);
-  Matrix<double> F2(nCoeffs, nCoeffs,  0.);
-
+  // create 
   Matrix<double> dummy(valueDim, nCoeffs, 0.);
-  for (int i = 0; i < valueDim; ++i)
-    for (int j = 0; j < nCoeffs; ++j)
+  for (size_t i = 0; i < valueDim; ++i)
+    for (size_t j = 0; j < nCoeffs; ++j)
       dummy(i+1, j+1) = 1;
-  PolynomialMap* temp = new PolynomialMap(pointDim, dummy);
+  PolynomialMap * polynomial_map = new PolynomialMap(pointDim, dummy);
 
-  std::vector<double> tempFx(nCoeffs, 0);  // tempfx = x_i^j
-  std::vector<double> wt(nPoints, 1);
-  if (weights.size() > 0) wt = weights;
-
-// sum over points, values
-  for (int i = 0; i < nPoints;   ++i) {
-    temp->MakePolynomialVector(&points[i][0], &tempFx[0]);
-std::cout << "tempFx[" << i << "]: ";
-std::cout.flush();
-for (size_t index = 0; index < tempFx.size(); ++index) std::cout << tempFx[index] << " ";
-    for (int j = 0; j < nCoeffs;    ++j) {
-      for (int k = 0; k < nCoeffs;  ++k) {
-        F2(j+1, k+1) += tempFx[k]*tempFx[j]*wt[i];
-      }
-    }
-std::cout << std::endl << "F2[" << i << "]:" << std::endl << F2;
-std::cout.flush();
-
-    for (int j = 0; j < nCoeffs;   ++j)
-      for (int k = 0; k < valueDim; k++)
-        Fy(j+1, k+1) += values[i][k]*tempFx[j]*wt[i];
-  }
-
-  double det = determinant(F2);
-  std::cout << "Determinant F2: " << det << std::endl;
-
-  if (det == 0.) {
-    bool null_row = true;
-    for (int j = 0; j < nCoeffs;    ++j) {
-      null_row = true;
-      for (int k = 0; k < nCoeffs;  ++k) {
-        if (F2(j+1, k+1) > 0.) {
-          null_row = false;
-        }
-      }
-      if (null_row) {
-        std::cout << "Row " << j << " is null." << std::endl;
-      }
-    }
-
-    bool null_column = true;
-    for (int k = 0; k < nCoeffs;    ++k) {
-      null_column = true;
-      for (int j = 0; j < nCoeffs;  ++j) {
-        if (F2(j+1, k+1) > 0.) {
-          null_column = false;
-        }
-      }
-      if (null_column) {
-        std::cout << "Column " << k << " is null." << std::endl;
-      }
+  // Create the design matrix
+  std::vector<double> point_poly_vector(nCoeffs, 0);
+  Matrix<double> design_matrix(nPoints, nCoeffs, 0.);  // design matrix
+  for (size_t row = 0; row < nPoints; ++row) {
+    polynomial_map->MakePolynomialVector(&points[row][0],
+                                         &point_poly_vector[0]);
+    for (size_t column = 0; column < nCoeffs; ++column) {
+      design_matrix(row+1, column+1) = point_poly_vector[column];
     }
   }
+std::cout << "DEBUG PolynomialMap::PolynomialLeastSquaresFit() "
+          << "A = " << std::endl << design_matrix;
 
+  // Create the value matrix
+  Matrix<double> value_matrix(nPoints, valueDim, 0.);  // value matrix
+  for (size_t row = 0; row < nPoints; ++row) {
+    for (size_t column = 0; column < valueDim; ++column) {
+      value_matrix(row+1, column+1) = values[row][column];
+    }
+  }
+std::cout << "DEBUG PolynomialMap::PolynomialLeastSquaresFit() "
+          << "Y = " << std::endl << value_matrix;
+
+  // Create the weight matrix (diagonal are the per-point/value weights)
+  Vector<double> weight_vector(nPoints, 1.);
+  Matrix<double> weight_matrix(nPoints, nPoints, 0.);
+  if (weights.size() > 0) {
+    if (weights.size() != nPoints) {
+      std::stringstream message;
+      message << "The number of weights (" << weights.size() << ") "
+              << "does not equal the number of data points (" << nPoints << ")"
+              << std::endl;
+      throw(Squeal(Squeal::recoverable,
+                  message.str(),
+                  "PolynomialMap::PolynomialLeastSquaresFit"));
+    }
+
+    weight_vector = Vector<double>(weights);
+  }
+  for (size_t index = 0; index < nPoints; ++index) {
+    weight_matrix(index+1, index+1) = weight_vector[index];
+  }
+std::cout << "DEBUG PolynomialMap::PolynomialLeastSquaresFit() "
+          << "W = " << std::endl << weight_matrix;
+
+  Matrix<double> design_matrix_transpose = transpose(design_matrix);
+
+  // F2 = A^T A, where A is the design matrix
+  Matrix<double> F2(nCoeffs, nCoeffs, 0.);
+  F2 = design_matrix_transpose * weight_matrix * design_matrix;
+std::cout << "DEBUG PolynomialMap::PolynomialLeastSquaresFit() "
+          << "F2 = " << std::endl << F2;
+
+  // Fy = A^T Y, where A is the design matrix and Y is the value matrix
+  Matrix<double> Fy(nCoeffs, valueDim, 0.);
+  Fy = design_matrix_transpose * weight_matrix * value_matrix;
+std::cout << "DEBUG PolynomialMap::PolynomialLeastSquaresFit() "
+          << "Fy = " << std::endl << Fy;
+
+  // F2^(-1) = (A^T A)^(-1), where A is the design matrix
   Matrix<double> F2_inverse;
   try {
     F2_inverse = inverse(F2);
   } catch(Squeal squee) {
-    delete temp;
+    delete polynomial_map;
+    std::stringstream message;
+    message << "Could not find least squares fit for data. Nested exception:"
+            << std::endl << "\"" << squee.GetMessage() << "\"" << std::endl;
     throw(Squeal(Squeal::recoverable,
-                 "Could not find least squares fit for data",
+                 message.str(),
                  "PolynomialMap::PolynomialLeastSquaresFit"));
   }
-  Matrix<double> A = transpose(F2_inverse * Fy);
+
+  // C = (A^T A)^(-1) A^T Y, where A is the design matrix and Y is the value matrix
+  Matrix<double> coefficient_matrix = transpose(F2_inverse * Fy);
 std::cout << "DEBUG PolynomialMap::PolynomialLeastSquaresFit() "
-          << "F2 = " << std::endl << F2;
-std::cout << "DEBUG PolynomialMap::PolynomialLeastSquaresFit() "
-          << "F2_inverse = " << std::endl << F2_inverse;
-std::cout << "DEBUG PolynomialMap::PolynomialLeastSquaresFit() "
-          << "Fy = " << std::endl << Fy;
-std::cout << "DEBUG PolynomialMap::PolynomialLeastSquaresFit() "
-          << "Transfer Matrix = " << std::endl << A;
-  delete temp;
-  return new PolynomialMap(pointDim, A);
+          << "Transfer Matrix = " << std::endl << coefficient_matrix;
+  polynomial_map->SetCoefficients(pointDim, coefficient_matrix);
+  return polynomial_map;
 }
 
 PolynomialMap* PolynomialMap::ConstrainedPolynomialLeastSquaresFit(

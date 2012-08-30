@@ -675,6 +675,24 @@ template void MatrixBase<double, gsl_matrix>::build_matrix(
 template void MatrixBase<complex, gsl_matrix_complex>::build_matrix(
   const size_t rows, const size_t columns, complex const * const data);
 
+template <typename StdType, typename GslType>
+void MatrixBase<StdType, GslType>::gsl_error_handler(const char *   reason,
+                                                     const char *   file,
+                                                     int            line,
+                                                     int            gsl_errno) {
+  throw(Squeal(
+      Squeal::recoverable,
+      reason,
+      "MatrixBase<StdType, GslType>::gsl_error_handler()"));
+}
+template void MatrixBase<double, gsl_matrix>::gsl_error_handler(
+    const char * reason, const char * file, int line, int gsl_errno);
+template void MatrixBase<complex, gsl_matrix_complex>::gsl_error_handler(
+    const char * reason, const char * file, int line, int gsl_errno);
+
+template void MatrixBase<complex, gsl_matrix_complex>::gsl_error_handler(
+    const char * reason, const char * file, int line, int gsl_errno);
+
 // ############################
 //  Matrix (public)
 // ############################
@@ -1010,6 +1028,12 @@ Matrix<double> inverse(
                  "Attempted to get inverse of non-square matrix",
                  "MAUS::inverse()"));
   }
+  if (determinant(matrix) == 0.) {
+    throw(Squeal(Squeal::recoverable,
+                 "Attempted to get inverse of singular matrix",
+                 "MAUS::inverse()"));
+  }
+
   Matrix<double> inverse(matrix);
   gsl_permutation* perm = gsl_permutation_alloc(rows);
   Matrix<double> lu(matrix);  // hold LU decomposition
