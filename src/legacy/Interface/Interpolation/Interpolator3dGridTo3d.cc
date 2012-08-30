@@ -15,6 +15,7 @@
  */
 
 #include "src/legacy/Interface/Interpolation/Interpolator3dGridTo3d.hh"
+#include "src/legacy/Interface/Squeal.hh"
 
 Interpolator3dGridTo3d::Interpolator3dGridTo3d
                                            (const Interpolator3dGridTo3d& rhs) {
