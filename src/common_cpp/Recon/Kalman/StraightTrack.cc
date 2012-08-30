@@ -26,13 +26,16 @@ void StraightTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site
   double new_z = new_site->get_z();
   double old_z = old_site->get_z();
   double deltaZ = new_z-old_z;
+  if ( new_site->get_id() < 15 ) {
+    deltaZ = - deltaZ;
+  }
 
   // Build _F.
   for ( int i = 0; i < 5; i++ ) {
     _F(i, i) = 1.;
   }
-  _F(0, 2) = fabs(deltaZ);
-  _F(1, 3) = fabs(deltaZ);
+  _F(0, 2) = deltaZ;
+  _F(1, 3) = deltaZ;
   // _F.Print();
 }
 

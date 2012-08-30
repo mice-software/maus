@@ -112,7 +112,8 @@ def copy_targets():
     if os.path.exists(TEMP_DST):
         shutil.rmtree(TEMP_DST)
     os.mkdir(TEMP_DST)
-    version = Configuration.Configuration().get_version_from_readme()
+    version = Configuration.Configuration().handler_maus_version(
+                                                            {'maus_version':''})
     version = version.replace(' ', '_')
     out_dir = os.path.join(TEMP_DST, version)
     os.mkdir(out_dir)
@@ -141,7 +142,7 @@ def main():
     print "Doing server build"
     build_user_guide()
     build_doxygen()
-    build_test_output()
+    #build_test_output()
     build_third_party_tarball()
     scp_in, version = copy_targets()
     if len(sys.argv) > 1:

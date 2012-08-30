@@ -1,0 +1,7 @@
+numEvts      __nev__
+MiceModel    MaterialBlock.dat
+BeamType     Pencil
+BeamMomentum __momentum__ MeV
+BeamPid      __pid__
+ZOffsetStart 0.
+VerboseLevel 1

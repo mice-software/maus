@@ -5,6 +5,19 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v0.3.2
+  The following functionality was added:
+    - Code now optionally builds against Geant4.9.5.p01. Use script in
+      third_party/install_build_test_geant4.9.5.p01.bash (a bit experimental)
+    - New datacards were added enabling cuts on particle type and energy at
+      production
+    - The default geometry was changed from Stage6.dat to Test.dat 
+  If upgrading from the previous version, the following third party library
+  scripts need to be rerun:
+    - third_party/bash/31geant4.bash   
+    - third_party/bash/40python_extras.bash   
+    - third_party/bash/44cdb.bash   
+
 MAUS-v0.3.1
   The following functionality was added:
     - An example script to get the field at one or more points was added. In

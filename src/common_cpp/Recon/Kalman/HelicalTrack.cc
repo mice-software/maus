@@ -34,21 +34,15 @@ HelicalTrack::HelicalTrack(SciFiHelicalPRTrack const &seed) {
   _Q.ResizeTo(5, 5);
   _Q.Zero(); // mcs is off.
 
-  _x0 = seed.get_x0();
-  _y0 = seed.get_y0();
-  _q = 1.0;
-  // pid -13 is mu+
-  // tracker 0: B = 4T,
-  // tracker 1: B = -4T.
-  int tracker = seed.get_tracker();
-  if ( tracker == 0 ) {
-    _sign = 1; // flipped signs
-    _B = 4.0;
-  } else {
-    _sign = -1;
-    _B = -4.0;
-  }
-  _h = - _sign;
+  double x0 = seed.get_x0();
+  double y0 = seed.get_y0();
+  double r  = seed.get_R();
+  double phi_0 = seed.get_phi0();
+
+  _xc = x0 - r *cos(phi_0);
+  _yc = y0 - r *sin(phi_0);
+
+  _h = -1;
 }
 
 void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site) {
@@ -58,50 +52,39 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   // Find dz.
   double new_z = new_site->get_z();
   double old_z = old_site->get_z();
+
   double deltaZ = new_z-old_z;
   if ( new_site->get_id() < 15 ) {
     deltaZ = - deltaZ;
   }
+
   // Get old state vector...
   TMatrixD prev_site(5, 1);
   prev_site = old_site->get_a();
-  double old_x   = prev_site(0, 0);
-  double old_y   = prev_site(1, 0);
+  // Change Coordinate reference frame to the centre of the circle.
+  double old_x   = prev_site(0, 0)-_xc;
+  double old_y   = prev_site(1, 0)-_yc;
   double old_r   = prev_site(2, 0);
   double old_kappa  = prev_site(3, 0);
   double old_tan_lambda = prev_site(4, 0);
-  // ... and previous site phi.
-  double old_phi;
-  // double argument;
-  // if ( old_kappa > 0 ) {
-  //  argument = (old_y-_y0)/(old_x-_x0);
-  //  old_phi = atan(argument);
 
-  //if (old_kappa > 0.) old_phi = atan2((_y0-old_y),(_x0-old_x));
-
-  //if (old_kappa < 0.)
-  old_phi = atan2((old_y-_y0),(old_x-_x0));
+  double my_xc = 0.0;
+  double my_yc = 0.0;
+  double old_phi = atan2((old_y-my_yc),(old_x-my_xc));
   while (old_phi < 0.)      old_phi += 2.0*Pi;
   while (old_phi > 2.0*Pi)  old_phi -= 2.0*Pi;
-  std::cerr << "FIRST PASS, PHI0 IS :" << old_phi << std::endl;
-  //} else {
-  //  old_phi = atan((old_y-_y0)/(old_x-_x0));
-  //  argument = (old_y-_y0)/(old_x-_x0);
-  // }
+
   // phi derivatives
-  double argument =(old_y-_y0)/(old_x-_x0);
-  std::cerr << "ARGUMENT IS " << argument << std::endl;
-
+  double argument =(old_y-my_yc)/(old_x-my_xc);
   double a_factor = 1./(1.+argument*argument);
-  double dphi_dx = - a_factor*argument*1./(old_x-_x0);
-  double dphi_dy =  a_factor/(old_x-_x0);
+  double dphi_dx = - a_factor*argument*1./(old_x-my_xc);
+  double dphi_dy =  a_factor/(old_x-my_xc);
   // Compute d_rho.
-  double circle_x = _x0+old_r*cos(old_phi);
-  double circle_y = _y0+old_r*sin(old_phi);
+  double circle_x = my_xc+old_r*cos(old_phi);
+  double circle_y = my_yc+old_r*sin(old_phi);
 
-  double drho_x   = -( old_x - (_x0 + old_r*cos(old_phi)) );
-  std::cerr << "drho_x calculation: -(" << old_x << "- (" << _x0 << "+" << old_r*cos(old_phi) << ")" << std::endl; 
-  double drho_y   = -( old_y - (_y0 + old_r*sin(old_phi)) );
+  double drho_x   = -( old_x - (my_xc + old_r*cos(old_phi)) );
+  double drho_y   = -( old_y - (my_yc + old_r*sin(old_phi)) );
 
   double delta_phi = _h*deltaZ/(old_r * old_tan_lambda);
   double new_phi   = (old_phi+delta_phi);
@@ -126,6 +109,7 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
     drho_y_dy = -1.+old_r*cos(old_phi)*dphi_dy;
     drho_y_dR = sin(old_phi);
   }
+/*
   std::cerr << "Track Parameters: " << "\n"
             << "old x:     " << old_x << "\n"
             << "old y:     " << old_y << "\n"
@@ -144,14 +128,15 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
                                      << drho_x_dR << "\n"
             << "drhoy derivatives: " << drho_y_dx << " " << drho_y_dy << " "
                                      << drho_y_dR << std::endl;
-  _projected_x = old_x+drho_x+_h*old_r*(cos(old_phi)-cos(new_phi));
-  _projected_y = old_y+drho_y+_h*old_r*(sin(old_phi)-sin(new_phi));
+*/
+  _projected_x = old_x+_xc+drho_x+_h*old_r*(cos(old_phi)-cos(new_phi));
+  _projected_y = old_y+_yc+drho_y+_h*old_r*(sin(old_phi)-sin(new_phi));
+/*
   std::cerr << "New Parameters: " << "\n"
             << "x:     " << _projected_x << "\n"
             << "y:     " << _projected_y << "\n";
   std::cerr << "Signed Radius: " << _h*old_r << "\n";
-
-  // assert(delta_phi < 4);
+*/
   // Build _F.
   _F(0, 0) = 1.0 + drho_x_dx - _h*old_r*dphi_dx*(sin(old_phi)-sin(new_phi));
   _F(0, 1) = drho_x_dy - _h*old_r*dphi_dy*(sin(old_phi)-sin(new_phi));
@@ -164,6 +149,23 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   _F(2, 2) = 1.0;
   _F(3, 3) = 1.0;
   _F(4, 4) = 1.0;
+}
+
+void HelicalTrack::calc_predicted_state(KalmanSite *old_site, KalmanSite *new_site) {
+  TMatrixD a = old_site->get_a();
+  // std::cerr << "Old state filtered state: " << std::endl;
+  // a.Print();
+  a(0, 0) = a(0, 0) - _xc;
+  a(1, 0) = a(1, 0) - _yc;
+  // a.Print();
+  TMatrixD a_projected = TMatrixD(_F, TMatrixD::kMult, a);
+  a_projected(0, 0) = a_projected(0, 0) + _xc;
+  a_projected(1, 0) = a_projected(1, 0) + _yc;
+  new_site->set_projected_a(a_projected);
+
+  // _F.Print();
+  // std::cerr << "New projected state: " << std::endl;
+  // a_projected.Print();
 }
 
 void HelicalTrack::calc_system_noise(KalmanSite *site) {

@@ -445,7 +445,7 @@ void MagFieldMap::WriteG4MiceBinaryMapV1(std::string mapFile)
 
 	float aSheetInformation[9];
 	//should be G4double
-	double outArray[4];
+	double outArray[4] = {0, 0, 0, 0};
 	//should be G4int
 	int numberOfSheets=(int)sheetInformation.size();
 	if(numberOfSheets==0) std::cerr << "Need sheet information to write field map" << std::endl;
@@ -466,10 +466,10 @@ void MagFieldMap::WriteG4MiceBinaryMapV1(std::string mapFile)
 
 
 	Mesh*   myMesh       = myInterpolator->GetMesh();
-	double* position     = new double[myInterpolator->GetMesh()->PositionDimension()]; 
-	double* value        = new double[myInterpolator->ValueDimension()];
+	double position[2] = {0., 0.};
+	double value[3] = {0., 0., 0.};
 	Mesh::Iterator itEnd = myMesh->End();
-	for (Mesh::Iterator it = myMesh->Begin(); it<itEnd; ++it)
+	for (Mesh::Iterator it = myMesh->Begin(); it < itEnd; ++it)
 	{
 		it.Position(position);
 		myInterpolator->F(it, value);
@@ -479,8 +479,6 @@ void MagFieldMap::WriteG4MiceBinaryMapV1(std::string mapFile)
 		outArray[3] = value[2];
 		fout.write(reinterpret_cast<char*>(outArray), sizeof(outArray));
 	}
-	delete [] position;
-	delete [] value;
 
 	if(!fout) std::cerr << "There was a problem writing the field map " << mapFile << std::endl;
 	fout.close();

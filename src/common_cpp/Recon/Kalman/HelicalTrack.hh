@@ -41,11 +41,13 @@ class HelicalTrack : public KalmanTrack {
 
   void update_propagator(KalmanSite *old_site, KalmanSite *new_site);
 
+  void calc_predicted_state(KalmanSite *old_site, KalmanSite *new_site);
+
   void calc_system_noise(KalmanSite *site);
 
-  double get_x0() const { return _x0; }
+  double get_xc() const { return _xc; }
 
-  double get_y0() const { return _y0; }
+  double get_yc() const { return _yc; }
 
   double get_r() const { return _r; }
 
@@ -54,11 +56,11 @@ class HelicalTrack : public KalmanTrack {
   double get_projected_y() const { return _projected_y; }
 
  private:
-  double _x0, _y0, _r;
+  double _xc, _yc, _r;
 
   double _B, _q;
 
-  int _sign, _h;
+  int _tracker, _sign, _h;
 
   static const double _alpha;
 

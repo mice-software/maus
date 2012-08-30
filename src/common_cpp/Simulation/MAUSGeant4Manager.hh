@@ -18,15 +18,14 @@
 #ifndef _SRC_COMMON_CPP_SIMULATION_MAUSGEANT4MANAGER_HH_
 #define _SRC_COMMON_CPP_SIMULATION_MAUSGEANT4MANAGER_HH_
 
-#include <G4RunManager.hh>
-#include <G4SDManager.hh>
+#include "Geant4/G4RunManager.hh"
+#include "Geant4/G4SDManager.hh"
 
 // should all be forward declarations? yes - but be careful about namespace
 #include "src/legacy/Simulation/FillMaterials.hh"
 #include "src/legacy/Simulation/MICEDetectorConstruction.hh"
 #include "src/common_cpp/Simulation/MAUSPrimaryGeneratorAction.hh"
 #include "src/common_cpp/Simulation/MAUSSteppingAction.hh"
-#include "src/common_cpp/Simulation/MAUSStackingActionKillNonMuons.hh"
 #include "src/common_cpp/Simulation/MAUSTrackingAction.hh"
 #include "src/common_cpp/Simulation/MAUSEventAction.hh"
 #include "src/common_cpp/Simulation/VirtualPlanes.hh"
@@ -147,6 +146,8 @@ class MAUSGeant4Manager {
 
   private:
     MAUSGeant4Manager();
+    MAUSGeant4Manager(const MAUSGeant4Manager& copy);
+    MAUSGeant4Manager& operator=(const MAUSGeant4Manager& copy);
 
     G4RunManager* _runManager;
     MAUSPhysicsList* _physList;

@@ -41,8 +41,9 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 	sleep 1
 
     x11=${MAUS_THIRD_PARTY}/third_party/install/lib/
-    # hack to find third party libraries - for ubuntu et al where they have weird and wonderful
-    # library locations to support multiple architectures. Sticks them in ${x11} directory
+    # hack to find third party libraries - for ubuntu et al where they have
+    # weird and wonderful library locations to support multiple architectures.
+    # Sticks them in ${x11} directory
     python ${MAUS_THIRD_PARTY}/third_party/install/bin/library_finder.py X11 Xext Xft
     ./configure --disable-xrootd --enable-gsl-shared \
               --with-gsl-incdir=${MAUS_ROOT_DIR}/third_party/install/include \

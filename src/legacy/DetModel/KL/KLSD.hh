@@ -7,7 +7,7 @@
 #ifndef KLSD_h
 #define KLSD_h 1
 
-#include "G4VSensitiveDetector.hh"
+#include "Geant4/G4VSensitiveDetector.hh"
 #include "Interface/KLHit.hh"
 
 class G4Step;

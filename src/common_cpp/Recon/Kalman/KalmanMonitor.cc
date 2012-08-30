@@ -88,17 +88,22 @@ void KalmanMonitor::print_info(std::vector<KalmanSite> const &sites) {
   for ( int i = 0; i < numb_sites; ++i ) {
     KalmanSite site = sites[i];
     std::cerr << "SITE ID: " << site.get_id() << std::endl;
-    // std::cerr << "SITE Z: " << site.get_z() << std::endl;
-    // std::cerr << "SITE Direction: " << "(" << site.get_direction().x() << ", " <<
-    //                                   site.get_direction().y() << ", " <<
-    //                                   site.get_direction().z() << ")" << std::endl;
+    std::cerr << "SITE Z: " << site.get_z() << std::endl;
+    std::cerr << "SITE Direction: " << "(" << site.get_direction().x() << ", " <<
+                                       site.get_direction().y() << ", " <<
+                                       site.get_direction().z() << ")" << std::endl;
 
     std::cerr << "SITE residual (mm): " << site.get_residual_x() << ", "
               << site.get_residual_y() << std::endl;
     std::cerr << "SITE measured alpha: " << site.get_alpha() << std::endl;
     std::cerr << "SITE projected alpha: " << site.get_projected_alpha() << std::endl;
-    // site.get_projected_a().Print();
-    // site.get_a().Print();
+    std::cerr << "================Projection================" << std::endl;
+    site.get_projected_a().Print();
+    site.get_projected_covariance_matrix().Print();
+    std::cerr << "=================Filtered=================" << std::endl;
+    site.get_a().Print();
+    site.get_covariance_matrix().Print();
+    std::cerr << "==========================================" << std::endl;
   }
 }
 
@@ -121,7 +126,7 @@ void KalmanMonitor::save_mc(std::vector<KalmanSite> const &sites) {
     double pull = _alpha_meas.at(i) - _alpha_projected.at(i);
     double alpha_smooth = get_smoothed_measurement(site);
     double pull2 = _alpha_meas.at(i) - alpha_smooth;
-    std::cerr << "MONITOR: " << _alpha_meas.at(i) << " " << alpha_smooth << std::endl;
+    // std::cerr << "MONITOR: " << _alpha_meas.at(i) << " " << alpha_smooth << std::endl;
     // std::cerr << "PULL: " << _alpha_meas.at(i) << " " << _alpha_extrap.at(i) << std::endl;
     TMatrixD a(5, 1);
     a = site.get_a();
@@ -164,7 +169,7 @@ void KalmanMonitor::save_mc(std::vector<KalmanSite> const &sites) {
     py = pt*sin(phi);
     pz = pt*tan_l;
 
-    double mc_radius = abs(mc_pt)/(4*0.3);
+    double mc_radius = abs(mc_pt)/(4.*0.3);
     double mc_tan_l  = mc_pz/mc_pt;
     double mc_phi = asin(mc_py/mc_pt);
 
@@ -173,12 +178,13 @@ void KalmanMonitor::save_mc(std::vector<KalmanSite> const &sites) {
     out2 // << a(0, 0)    << " " << C(0, 0) << " "
          // << a(1, 0)    << " " << C(1, 1) << " "
          // << res_x      << " " << res_y << " "
+         << a_projected(0, 0) << " " << a_projected(1, 0) << " "
          << a_smooth(0, 0) << " " << a_smooth(1, 0) << " "
          // << pr_x0+pr_mx*site.get_z() << " " << pr_y0+pr_my*site.get_z() << " "
          << px << " " << py << " " << pz << " "
          << mc_x << " " << mc_y << " " << mc_px << " " << mc_py << " " << mc_pz << " "
-         << a_smooth(2, 0) << " " << mc_radius << " " << a_smooth(3, 0) << " " << mc_phi << " "
-         << a_smooth(4, 0) << " " << mc_tan_l << " "
+         << a_projected(2, 0) << " " << mc_radius << " " << a_projected(3, 0) << " " << mc_phi << " "
+         << a_projected(4, 0) << " " << mc_tan_l << " "
          << pull << " " << pull2 << " " << id     << "\n";
     out2.close();
   }
@@ -226,6 +232,7 @@ void KalmanMonitor::save_global_track(std::vector<KalmanSite> const &sites) {
     out2.close();
   }
 }
+
 double KalmanMonitor::get_smoothed_measurement(KalmanSite &a_site) {
   CLHEP::Hep3Vector dir = a_site.get_direction();
   double dx = dir.x();

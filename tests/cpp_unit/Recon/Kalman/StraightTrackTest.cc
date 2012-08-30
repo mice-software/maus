@@ -62,7 +62,7 @@ TEST_F(StraightTrackTest, propagator_test) {
   EXPECT_TRUE(fabs(expected_x-a_temp(0, 0)) < err);
   EXPECT_TRUE(fabs(expected_y-a_temp(1, 0)) < err);
 }
-
+/*
 TEST_F(StraightTrackTest, noise_test) {
   set_up_sites();
   MAUS::StraightTrack *track = new MAUS::StraightTrack();
@@ -80,5 +80,5 @@ TEST_F(StraightTrackTest, noise_test) {
   double expected_value = (1.+pow(mx, 2.))*(1.+pow(mx, 2.)+pow(my, 2.))*C;
   EXPECT_EQ(expected_value,Q(2, 2));
 }
-
+*/
 }

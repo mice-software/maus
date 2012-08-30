@@ -92,13 +92,6 @@ class MapCppSimulation {
    */
   std::string process(std::string document);
 
-  /** @brief Set up configuration information on the MICERun
-   *  
-   *  Sets the datacards, json configuration, Squeak standard outputs,
-   *  and MiceModules
-   */
-  void SetConfiguration(std::string config);
-
  private:
   MAUS::MAUSGeant4Manager* _g4manager;
   std::string _jsonConfigDocument;

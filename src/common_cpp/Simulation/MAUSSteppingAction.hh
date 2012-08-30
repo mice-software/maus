@@ -23,10 +23,10 @@
 
 #include "json/json.h"
 
-#include "G4Step.hh"
-#include "G4StepPoint.hh"
-#include "G4Track.hh"
-#include "G4UserSteppingAction.hh"
+#include "Geant4/G4Step.hh"
+#include "Geant4/G4StepPoint.hh"
+#include "Geant4/G4Track.hh"
+#include "Geant4/G4UserSteppingAction.hh"
 
 namespace MAUS {
 
