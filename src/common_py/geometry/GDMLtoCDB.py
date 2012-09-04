@@ -197,14 +197,13 @@ class Downloader: #pylint: disable = R0902
         if not server_status in SERVER_OK:
             print 'Warning, server status is '+server_status 
         return self.wsdlurl
-
             
     def download_current(self, downloadpath):
         """
         @Method download_current, this method downloads the current valid 
                                   geometry and writes the files
 
-        this method decodes the uploaded geometry and acquires fromt the 
+        this method decodes the uploaded geometry and acquires from the 
         string this list of files contained within the upload. It then opens 
         files in the ~/maus/src/common_py/geometries/Download which correspond
         to the related gdml files and write the contents to these files.
@@ -216,10 +215,7 @@ class Downloader: #pylint: disable = R0902
             raise OSError('Path '+str(downloadpath)+' does not exist')
         else:
             downloadedfile = self.geometry_cdb.get_current_gdml()
-            zip_path = os.path.join(downloadpath, GEOMETRY_ZIPFILE)
-            fout = open(zip_path, 'w')
-            fout.write(downloadedfile)
-            fout.close()
+            self.__write_zip_file(downloadpath, downloadedfile)
 
     def download_geometry_by_id(self, id_num, download_path):
         """
@@ -238,7 +234,6 @@ class Downloader: #pylint: disable = R0902
             downloaded_file = self.geometry_cdb.get_gdml_for_id(id_num)
             self.__write_zip_file(download_path, downloaded_file)
 
-
     def download_geometry_by_run(self, run_num, download_path):
         """
         @Method download geometry for ID 
@@ -253,8 +248,8 @@ class Downloader: #pylint: disable = R0902
         if not os.path.exists(download_path):
             raise OSError('Path '+download_path+' does not exist')
         downloaded_file = self.geometry_cdb.get_gdml_for_run(long(run_num))
+        self.download_beamline_for_run(run_num, download_path)
         self.__write_zip_file(download_path, downloaded_file)
-
 
     def __write_zip_file(self, path_to_file, output_string): #pylint: disable = R0201, C0301
         """

@@ -151,7 +151,7 @@ class Formatter: #pylint: disable = R0902
         run_info = False
         fin = open(os.path.join(self.path_in, gdmlfile))
         for lines in fin.readlines():
-            if lines.find('run') >= 0:
+            if lines.find('run') >= 0 or lines.find('runs') >= 0:
                 run_info = True
         fin.close()
         if run_info == False:
@@ -159,12 +159,15 @@ class Formatter: #pylint: disable = R0902
             beamline_path = os.path.join(self.path_in, self.beamline_file)
             beamline = minidom.parse(beamline_path)
             for node in beamline.getElementsByTagName("run"):
-                maus_info = node
-            root_node = field.childNodes[0].childNodes[1]
-            root_node.insertBefore(maus_info, root_node.childNodes[0])
-            fout = open(os.path.join(self.path_out, gdmlfile), 'w')
-            field.writexml(fout)
-            fout.close()
+                run_info = node
+            if type(run_info) == bool:
+                raise IOError("Run number you have selected is not on the CDB")
+            else:
+                root_node = field.childNodes[0].childNodes[1]
+                root_node.insertBefore(run_info, root_node.childNodes[0])
+                fout = open(os.path.join(self.path_out, gdmlfile), 'w')
+                field.writexml(fout)
+                fout.close()
         print 'Run information merged!'
      
     def format_materials(self, gdmlfile):
@@ -207,7 +210,7 @@ class Formatter: #pylint: disable = R0902
         """
         fin = open(inputfile, 'r')
         gdmlfile = inputfile[:-4] + '.gdml'
-        fout = open(os.path.join(self.path_out, gdmlfile), 'w')
+        fout = open(gdmlfile, 'w')
         for line in fin.readlines():
             if line.find('<!-- Materials definition CallBack -->')>=0:
                 matdef = '<!-- Materials definition CallBack -->'

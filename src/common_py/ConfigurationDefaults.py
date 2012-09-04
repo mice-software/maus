@@ -234,6 +234,7 @@ geometry_upload_wsdl = "geometrySuperMouse?wsdl" # name of the web service used 
 geometry_upload_directory = "%s/files/geometry/upload" % os.environ.get("MAUS_ROOT_DIR") # name of the local directory where uploads are drawn from
 geometry_upload_note = "" # note, pushed to the server to describe the geometry. A note must be specified here (default will throw an exception).
 geometry_upload_valid_from = "" # date-time in format like: that the specified installation was made in the experiment. A date-time must be specified here (default will throw an exception).
+technical_drawing_name = "" #the name and version of the technical drawing from which the CAD model came.
 geometry_upload_cleanup = True # set to True to clean up after upload
 
 #dates need to get geomtry ids
