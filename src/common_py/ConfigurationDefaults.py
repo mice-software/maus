@@ -242,11 +242,11 @@ get_ids_start_time = ""
 get_ids_stop_time = ""
 get_ids_create_file = True
 
-+#get beamline information
-+get_beamline_by = "run_number" #This sets the method which you would like to query the beamline database. Options are 'run_number' and 'dates'
-+get_beamline_run_number = ""
-+get_beamline_start_time = ""
-+get_beamline_stop_time = ""
+#get beamline information
+get_beamline_by = "run_number" #This sets the method which you would like to query the beamline database. Options are 'run_number' and 'dates'
+get_beamline_run_number = ""
+get_beamline_start_time = ""
+get_beamline_stop_time = ""
 
 # this is used by ImputCppRealData
 Number_of_DAQ_Events = -1
